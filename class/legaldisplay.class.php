@@ -24,7 +24,6 @@
 
 require_once DOL_DOCUMENT_ROOT . "/core/class/commonobject.class.php";
 //require_once(DOL_DOCUMENT_ROOT."/societe/class/societe.class.php");
-//require_once(DOL_DOCUMENT_ROOT."/product/class/product.class.php");
 
 
 /**
@@ -71,6 +70,34 @@ class Legaldisplay extends CommonObject
 	public $model_pdf;
 	public $model_odt;
 	public $note_affich;
+
+	public $fields = array(
+		'rowid' =>array('type'=>'integer', 'label'=>'ID', 'enabled'=>1, 'visible'=>-1, 'notnull'=>1, 'position'=>10),
+		'ref' =>array('type'=>'varchar(50)', 'label'=>'Ref', 'enabled'=>1, 'visible'=>-1, 'notnull'=>1, 'showoncombobox'=>1, 'position'=>15),
+		'ref_ext' =>array('type'=>'integer', 'label'=>'Ref ext', 'enabled'=>1, 'visible'=>-1, 'position'=>20),
+		'entity' =>array('type'=>'integer', 'label'=>'Entity', 'default'=>1, 'enabled'=>1, 'visible'=>-2, 'notnull'=>1, 'position'=>25),
+		'date_creation' =>array('type'=>'datetime', 'label'=>'Date creation', 'enabled'=>1, 'visible'=>-1, 'position'=>30),
+		'date_debut' =>array('type'=>'datetime', 'label'=>'Date debut', 'enabled'=>1, 'visible'=>-1, 'notnull'=>1, 'position'=>35),
+		'date_fin' =>array('type'=>'datetime', 'label'=>'Date fin', 'enabled'=>1, 'visible'=>-1, 'notnull'=>1, 'position'=>40),
+		'tms' =>array('type'=>'timestamp', 'label'=>'Tms', 'enabled'=>1, 'visible'=>-1, 'notnull'=>1, 'position'=>45),
+		'description' =>array('type'=>'text', 'label'=>'Description', 'enabled'=>1, 'visible'=>0, 'position'=>50),
+		'fk_soc_labour_doctor' =>array('type'=>'integer', 'label'=>'Fk soc labour doctor', 'enabled'=>1, 'visible'=>0, 'position'=>55),
+		'fk_soc_labour_inspector' =>array('type'=>'integer', 'label'=>'Fk soc labour inspector', 'enabled'=>1, 'visible'=>0, 'position'=>60),
+		'fk_soc_samu' =>array('type'=>'integer', 'label'=>'Fk soc samu', 'enabled'=>1, 'visible'=>0, 'position'=>65),
+		'fk_soc_police' =>array('type'=>'integer', 'label'=>'Fk soc police', 'enabled'=>1, 'visible'=>0, 'position'=>70),
+		'fk_soc_urgency' =>array('type'=>'integer', 'label'=>'Fk soc urgency', 'enabled'=>1, 'visible'=>0, 'position'=>75),
+		'fk_soc_rights_defender' =>array('type'=>'integer', 'label'=>'Fk soc rights defender', 'enabled'=>1, 'visible'=>0, 'position'=>80),
+		'fk_soc_antipoison' =>array('type'=>'integer', 'label'=>'Fk soc antipoison', 'enabled'=>1, 'visible'=>0, 'position'=>85),
+		'fk_soc_responsible_prevent' =>array('type'=>'integer', 'label'=>'Fk soc responsible prevent', 'enabled'=>1, 'visible'=>0, 'position'=>90),
+		'import_key' =>array('type'=>'varchar(14)', 'label'=>'ImportId', 'enabled'=>1, 'visible'=>-1, 'position'=>95),
+		'status' =>array('type'=>'smallint', 'label'=>'Status', 'enabled'=>1, 'visible'=>-1, 'position'=>100),
+		'fk_user_creat' =>array('type'=>'integer', 'label'=>'Fk user creat', 'enabled'=>1, 'visible'=>-1, 'notnull'=>1, 'position'=>105),
+		'fk_user_modif' =>array('type'=>'integer', 'label'=>'Fk user modif', 'enabled'=>1, 'visible'=>-1, 'position'=>110),
+		'model_pdf' =>array('type'=>'varchar(255)', 'label'=>'Model pdf', 'enabled'=>1, 'visible'=>0, 'position'=>1115),
+		'model_odt' =>array('type'=>'varchar(255)', 'label'=>'Model odt', 'enabled'=>1, 'visible'=>0, 'position'=>120),
+		'note_affich' =>array('type'=>'varchar(255)', 'label'=>'Note affich', 'enabled'=>1, 'visible'=>0, 'position'=>125),
+	);
+
 
 
 	/**
@@ -287,7 +314,8 @@ class Legaldisplay extends CommonObject
 	function update($user=0, $notrigger=0)
 	{
 		global $conf, $langs;
-		$error=0;
+
+		$error = 0;
 
 		// Clean parameters
 

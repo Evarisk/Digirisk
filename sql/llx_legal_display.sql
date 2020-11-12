@@ -1,14 +1,13 @@
 create table llx_legal_display
 (
   rowid                       integer AUTO_INCREMENT PRIMARY KEY,
-  ref                         varchar(128) NOT NULL,
+  ref                         varchar(50) NOT NULL,
   ref_ext                     varchar(255) default NULL,
   entity                      integer default 1,
   date_creation               datetime default NULL,
   date_debut                  datetime default NULL,
   date_fin                    datetime default NULL,
   tms                         timestamp,
-  date_valid                  datetime,
   description                 text,
   fk_soc_labour_doctor        integer default NULL,
   fk_soc_labour_inspector     integer default NULL,
@@ -20,10 +19,9 @@ create table llx_legal_display
   fk_soc_responsible_prevent  integer default NULL,
   import_key                  integer,
   status                      smallint,
-  fk_user_creat               integer default NULL,
+  fk_user_creat               integer default NOT NULL,
   fk_user_modif               integer default NULL,
-  fk_user_valid               integer default NULL,
-  model_pdf                   varchar(128),
-  model_odt                   varchar(128),
-  note_affich                 varchar(128)
+  model_pdf                   varchar(255),
+  model_odt                   varchar(255),
+  note_affich                 varchar(255)
 )ENGINE=innodb;

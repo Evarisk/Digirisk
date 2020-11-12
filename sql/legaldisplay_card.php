@@ -120,7 +120,7 @@ if (empty($reshook))
 		$object->fk_soc_rights_defender = GETPOST("rights_defender");
 		$object->fk_soc_antipoison = GETPOST("antipoison");
 		$object->fk_soc_responsible_prevent = GETPOST("responsible_prevent");
-	
+
 
 		if (empty($object->ref))
 		{
