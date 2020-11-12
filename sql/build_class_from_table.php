@@ -33,7 +33,7 @@ if (substr($sapi_type, 0, 3) == 'cgi') {
 }
 
 // Include Dolibarr environment
-require_once($path."../../../master.inc.php");
+require_once($path . "../../../master.inc.php");
 // After this $db is a defined handler to database.
 
 // Main
@@ -72,6 +72,7 @@ $property=array();
 $table=$argv[1];
 $foundprimary=0;
 $resql=$db->DDLDescTable($table);
+
 if ($resql)
 {
 	$i=0;

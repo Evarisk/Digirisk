@@ -291,7 +291,7 @@ class modDigiriskDolibarr extends DolibarrModules
 			'titre'=>'Digirisk',
 			'mainmenu'=>'digiriskdolibarr',
 			'leftmenu'=>'',
-			'url'=>'/digiriskdolibarr/digiriskdolibarrindex.php',
+			'url'=>'/digiriskdolibarr/index.php',
 			'langs'=>'digiriskdolibarr@digiriskdolibarr', // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
 			'position'=>1000 + $r,
 			'enabled'=>'$conf->digiriskdolibarr->enabled', // Define condition to show or hide menu entry. Use '$conf->digiriskdolibarr->enabled' if entry must be visible if module is enabled.
@@ -335,7 +335,7 @@ class modDigiriskDolibarr extends DolibarrModules
 			'titre'=>'Générer',
 			'mainmenu'=>'digiriskdolibarr',
 			'leftmenu'=>'createlegaldisplay',
-			'url'=>'/digiriskdolibarr/legaldisplay_card.php',
+			'url'=>'/digiriskdolibarr/sql/out.legaldisplay_page.php',
 			'langs'=>'digiriskdolibarr@digiriskdolibarr',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
 			'position'=>1000+$r,
 			'enabled'=>'$conf->digiriskdolibarr->enabled',  // Define condition to show or hide menu entry. Use '$conf->digiriskdolibarr->enabled' if entry must be visible if module is enabled.
@@ -385,7 +385,7 @@ class modDigiriskDolibarr extends DolibarrModules
 			'target'=>'',
 			'user'=>2,				                // 0=Menu for internal users, 1=external users, 2=both
 		);
-	
+
 
 		// Exports profiles provided by this module
 		$r = 1;
@@ -451,7 +451,8 @@ class modDigiriskDolibarr extends DolibarrModules
 	{
 		$sql = array();
 
-		$this->_load_tables('/digiriskdolibarr/sql/');
+		$test = $this->_load_tables('/digiriskdolibarr/sql/');
+
 		return $this->_init($sql, $options);
 	}
 
