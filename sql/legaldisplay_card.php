@@ -57,6 +57,11 @@ $action		= GETPOST('action','alpha');
 $backtopage = GETPOST('backtopage');
 $myparam	= GETPOST('myparam','alpha');
 
+$date_start = dol_mktime(0, 0, 0, GETPOST('date_debutmonth', 'int'), GETPOST('date_debutday', 'int'), GETPOST('date_debutyear', 'int'));
+$date_end = dol_mktime(0, 0, 0, GETPOST('date_finmonth', 'int'), GETPOST('date_finday', 'int'), GETPOST('date_finyear', 'int'));
+$date = dol_mktime(0, 0, 0, GETPOST('datemonth', 'int'), GETPOST('dateday', 'int'), GETPOST('dateyear', 'int'));
+$ref = GETPOST("ref", 'alpha');
+
 // Protection if external user
 if ($user->societe_id > 0)
 {
@@ -104,8 +109,10 @@ if (empty($reshook))
 		$error=0;
 
 		/* object_prop_getpost_prop */
-		$object->prop1=GETPOST("field1");
-		$object->prop2=GETPOST("field2");
+		$object->ref = GETPOST("ref");
+		$object->date_debut = GETPOST("date_debut");
+		$object->date_fin = GETPOST("date_fin");
+		$object->fk_soc_antipoison = GETPOST("antipoison");
 
 		if (empty($object->ref))
 		{
@@ -118,8 +125,12 @@ if (empty($reshook))
 			$result=$object->create($user);
 			if ($result > 0)
 			{
+				echo '<pre>';
+				print_r($result);
+				echo '</pre>';
+				exit;
 				// Creation OK
-				$urltogo=$backtopage?$backtopage:dol_buildpath('/mymodule/list.php',1);
+				$urltogo=$backtopage?$backtopage:dol_buildpath('/custom/digiriskdolibarr/class/legaldisplay_list.php', 1);
 				header("Location: ".$urltogo);
 				exit;
 			}
@@ -146,6 +157,8 @@ if (empty($reshook))
 
 		$object->prop1=GETPOST("field1");
 		$object->prop2=GETPOST("field2");
+
+
 
 		if (empty($object->ref))
 		{
@@ -198,8 +211,6 @@ if (empty($reshook))
 
 /***************************************************
  * VIEW
- *
- * Put here all code to build page
  ****************************************************/
 
 $title = $langs->trans("LegalDisplay");
@@ -347,11 +358,12 @@ jQuery(document).ready(function() {
 //
 
 
-// Part to create
-if ( $action == 'create' ) {
-	print_fiche_titre( $langs->trans( "LegalDisplay" ) );
+// Create
+if ($action == 'create')
+{
+	print_fiche_titre($langs->trans("LegalDisplay"));
 
-	print '<form method="POST" action="'.$_SERVER["PHP_SELF"].'">';
+	print '<form method="POST" action="'.$_SERVER["PHP_SELF"].'" name="create">';
 	print '<input type="hidden" name="action" value="add">';
 	print '<input type="hidden" name="backtopage" value="'.$backtopage.'">';
 
@@ -361,6 +373,22 @@ if ( $action == 'create' ) {
 	print '<tr><td class="fieldrequired">'.$langs->trans("Ref").'</td><td>';
 	print '<input class="flat" type="text" size="36" name="ref" value="'.$ref.'">';
 	print '</td></tr>';
+
+	// Date start
+	print '<tr>';
+	print '<td class="titlefieldcreate fieldrequired">'.$langs->trans("DateStart").'</td>';
+	print '<td>';
+	print $form->selectDate($date_start ? $date_start : -1, 'date_debut', 0, 0, 0, '', 1, 1);
+	print '</td>';
+	print '</tr>';
+
+	// Date end
+	print '<tr>';
+	print '<td class="fieldrequired">'.$langs->trans("DateEnd").'</td>';
+	print '<td>';
+	print $form->selectDate($date_end ? $date_end : -1, 'date_fin', 0, 0, 0, '', 1, 1);
+	print '</td>';
+	print '</tr>';
 
 	if ( $soc->id > 0 && ( ! GETPOST( 'fac_rec', 'int' ) || !empty( $invoice_predefined->frequency ) ) ) {
 		// If thirdparty known and not a predefined invoiced without a recurring rule
@@ -386,31 +414,35 @@ if ( $action == 'create' ) {
 	{
 		print '<tr><td class="fieldrequired">'.$langs->trans('LabourDoctor').'</td>';
 		print '<td colspan="2">';
-		print $form->select_company($soc->id, 'socid', '((s.client = 1 OR s.client = 3) AND s.status=1)', 'SelectThirdParty', 0, 0, null, 0, 'minwidth300');
+		print $form->select_company($soc->id, 'labour_doctor', '', 'SelectThirdParty', 0, 0, null, 0, 'minwidth300');
+
 		print '<tr><td class="fieldrequired">'.$langs->trans('LabourInspector').'</td>';
 		print '<td colspan="2">';
-		print $form->select_company($soc->id, 'socid', '((s.client = 1 OR s.client = 3) AND s.status=1)', 'SelectThirdParty', 0, 0, null, 0, 'minwidth300');
+		print $form->select_company($soc->id, 'labour_inspector', '', 'SelectThirdParty', 0, 0, null, 0, 'minwidth300');
+
 		print '<tr><td class="fieldrequired">'.$langs->trans('Samu').'</td>';
 		print '<td colspan="2">';
-		print $form->select_company($soc->id, 'socid', '((s.client = 1 OR s.client = 3) AND s.status=1)', 'SelectThirdParty', 0, 0, null, 0, 'minwidth300');
+		print $form->select_company($soc->id, 'samu', '', 'SelectThirdParty', 0, 0, null, 0, 'minwidth300');
+
 		print '<tr><td class="fieldrequired">'.$langs->trans('Police').'</td>';
 		print '<td colspan="2">';
-		print $form->select_company($soc->id, 'socid', '((s.client = 1 OR s.client = 3) AND s.status=1)', 'SelectThirdParty', 0, 0, null, 0, 'minwidth300');
+		print $form->select_company($soc->id, 'police', '', 'SelectThirdParty', 0, 0, null, 0, 'minwidth300');
+
 		print '<tr><td class="fieldrequired">'.$langs->trans('Urgency').'</td>';
 		print '<td colspan="2">';
-		print $form->select_company($soc->id, 'socid', '((s.client = 1 OR s.client = 3) AND s.status=1)', 'SelectThirdParty', 0, 0, null, 0, 'minwidth300');
+		print $form->select_company($soc->id, 'urgency', '', 'SelectThirdParty', 0, 0, null, 0, 'minwidth300');
+
 		print '<tr><td class="fieldrequired">'.$langs->trans('RightsDefender').'</td>';
 		print '<td colspan="2">';
-		print $form->select_company($soc->id, 'socid', '((s.client = 1 OR s.client = 3) AND s.status=1)', 'SelectThirdParty', 0, 0, null, 0, 'minwidth300');
+		print $form->select_company($soc->id, 'rights_defender', '', 'SelectThirdParty', 0, 0, null, 0, 'minwidth300');
+
 		print '<tr><td class="fieldrequired">'.$langs->trans('Antipoison').'</td>';
 		print '<td colspan="2">';
-		print $form->select_company($soc->id, 'socid', '((s.client = 1 OR s.client = 3) AND s.status=1)', 'SelectThirdParty', 0, 0, null, 0, 'minwidth300');
+		print $form->select_company($soc->id, 'antipoison', '', 'SelectThirdParty', 0, 0, null, 0, 'minwidth300');
+
 		print '<tr><td class="fieldrequired">'.$langs->trans('ResponsiblePrevent').'</td>';
 		print '<td colspan="2">';
-		print $form->select_company($soc->id, 'socid', '((s.client = 1 OR s.client = 3) AND s.status=1)', 'SelectThirdParty', 0, 0, null, 0, 'minwidth300');
-		print '<tr><td class="fieldrequired">'.$langs->trans('LabourInspector').'</td>';
-		print '<td colspan="2">';
-		print $form->select_company($soc->id, 'socid', '((s.client = 1 OR s.client = 3) AND s.status=1)', 'SelectThirdParty', 0, 0, null, 0, 'minwidth300');
+		print $form->select_company($soc->id, 'responsible_prevent', '', 'SelectThirdParty', 0, 0, null, 0, 'minwidth300');
 		// Option to reload page to retrieve customer informations. Note, this clear other input
 		if (!empty($conf->global->RELOAD_PAGE_ON_CUSTOMER_CHANGE))
 		{

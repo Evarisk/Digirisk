@@ -46,25 +46,31 @@ class Legaldisplay extends CommonObject
 	 */
 	public $table_element = 'legaldisplay';
 
-	var $id;
+	public $id;
 
-	var $ref;
-	var $ref_ext;
-	var $entity;
-	var $date_creation='';
-	var $tms='';
-	var $date_valid='';
-	var $description;
-	var $import_key;
-	var $status;
-	var $fk_user_creat;
-	var $fk_user_modif;
-	var $fk_user_valid;
-	var $model_pdf;
-	var $model_odt;
-	var $note_affich;
-
-
+	public $ref;
+	public $ref_ext;
+	public $entity;
+	public $date_creation;
+	public $date_debut;
+	public $date_fin;
+	public $fk_soc_labour_doctor;
+	public $fk_soc_labour_inspector;
+	public $fk_soc_samu;
+	public $fk_soc_police;
+	public $fk_soc_urgency;
+	public $fk_soc_rights_defender;
+	public $fk_soc_antipoison;
+	public $fk_soc_responsible_prevent;
+	public $tms='';
+	public $description;
+	public $import_key;
+	public $status;
+	public $fk_user_creat;
+	public $fk_user_modif;
+	public $model_pdf;
+	public $model_odt;
+	public $note_affich;
 
 
 	/**
@@ -72,7 +78,7 @@ class Legaldisplay extends CommonObject
 	 *
 	 *  @param	DoliDb		$db      Database handler
 	 */
-	function __construct($db)
+	public function __construct($db)
 	{
 		$this->db = $db;
 	}
@@ -85,76 +91,78 @@ class Legaldisplay extends CommonObject
 	 *  @param  int		$notrigger   0=launch triggers after, 1=disable triggers
 	 *  @return int      		   	 <0 if KO, Id of created object if OK
 	 */
-	function create($user, $notrigger=0)
+	public function create($user, $notrigger = 0)
 	{
 		global $conf, $langs;
 
 		$error = 0;
 
+		$now = dol_now();
+
 		// Clean parameters
-
-		if (isset($this->ref)) $this->ref=trim($this->ref);
-		if (isset($this->ref_ext)) $this->ref_ext=trim($this->ref_ext);
-		if (isset($this->entity)) $this->entity=trim($this->entity);
-		if (isset($this->description)) $this->description=trim($this->description);
-		if (isset($this->import_key)) $this->import_key=trim($this->import_key);
-		if (isset($this->status)) $this->status=trim($this->status);
-		if (isset($this->fk_user_creat)) $this->fk_user_creat=trim($this->fk_user_creat);
-		if (isset($this->fk_user_modif)) $this->fk_user_modif=trim($this->fk_user_modif);
-		if (isset($this->fk_user_valid)) $this->fk_user_valid=trim($this->fk_user_valid);
-		if (isset($this->model_pdf)) $this->model_pdf=trim($this->model_pdf);
-		if (isset($this->model_odt)) $this->model_odt=trim($this->model_odt);
-		if (isset($this->note_affich)) $this->note_affich=trim($this->note_affich);
-
-
+		$this->description = trim($this->description);
+		$this->note_affich = trim($this->note_affich);
 
 		// Check parameters
-		// Put here code to add control on parameters values
+//		if (empty($this->date_debut) || empty($this->date_fin))
+//		{
+//			$this->error = $langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv('Date'));
+//			return -1;
+//		}
 
-		// Insert request
-		$sql = "INSERT INTO ".MAIN_DB_PREFIX."legal_display(";
-
-		$sql.= "ref,";
-		$sql.= "ref_ext,";
-		$sql.= "entity,";
-		$sql.= "date_creation,";
-		$sql.= "date_valid,";
-		$sql.= "description,";
-		$sql.= "import_key,";
-		$sql.= "status,";
-		$sql.= "fk_user_creat,";
-		$sql.= "fk_user_modif,";
-		$sql.= "fk_user_valid,";
-		$sql.= "model_pdf,";
-		$sql.= "model_odt,";
-		$sql.= "note_affich";
-
-
-		$sql.= ") VALUES (";
-
-		$sql.= " ".(! isset($this->ref)?'NULL':"'".$this->db->escape($this->ref)."'").",";
-		$sql.= " ".(! isset($this->ref_ext)?'NULL':"'".$this->db->escape($this->ref_ext)."'").",";
-		$sql.= " ".(! isset($this->entity)?'NULL':"'".$this->entity."'").",";
-		$sql.= " ".(! isset($this->date_creation) || dol_strlen($this->date_creation)==0?'NULL':$this->db->idate($this->date_creation)).",";
-		$sql.= " ".(! isset($this->date_valid) || dol_strlen($this->date_valid)==0?'NULL':$this->db->idate($this->date_valid)).",";
-		$sql.= " ".(! isset($this->description)?'NULL':"'".$this->db->escape($this->description)."'").",";
-		$sql.= " ".(! isset($this->import_key)?'NULL':"'".$this->import_key."'").",";
-		$sql.= " ".(! isset($this->status)?'NULL':"'".$this->status."'").",";
-		$sql.= " ".(! isset($this->fk_user_creat)?'NULL':"'".$this->fk_user_creat."'").",";
-		$sql.= " ".(! isset($this->fk_user_modif)?'NULL':"'".$this->fk_user_modif."'").",";
-		$sql.= " ".(! isset($this->fk_user_valid)?'NULL':"'".$this->fk_user_valid."'").",";
-		$sql.= " ".(! isset($this->model_pdf)?'NULL':"'".$this->db->escape($this->model_pdf)."'").",";
-		$sql.= " ".(! isset($this->model_odt)?'NULL':"'".$this->db->escape($this->model_odt)."'").",";
-		$sql.= " ".(! isset($this->note_affich)?'NULL':"'".$this->db->escape($this->note_affich)."'")."";
-
-
-		$sql.= ")";
+		// Create legal display
+		$fuserid = $this->fk_user_creat;
+		if (empty($fuserid)) $fuserid = $user->id;
 
 		$this->db->begin();
 
+		$sql = "INSERT INTO ".MAIN_DB_PREFIX."legal_display (";
+		$sql .= "ref";
+		$sql .= ", entity";
+		$sql .= ", date_creation";
+		$sql .= ", date_debut";
+		$sql .= ", date_fin";
+		$sql .= ", fk_soc_labour_doctor";
+		$sql .= ", fk_soc_labour_inspector";
+		$sql .= ", fk_soc_samu";
+		$sql .= ", fk_soc_police";
+		$sql .= ", fk_soc_urgency";
+		$sql .= ", fk_soc_rights_defender";
+		$sql .= ", fk_soc_antipoison";
+		$sql .= ", fk_soc_responsible_prevent";
+		$sql .= ", description";
+		$sql .= ", import_key";
+		$sql .= ", status";
+		$sql .= ", fk_user_creat";
+		$sql .= ", model_pdf";
+		$sql .= ", model_odt";
+		$sql .= ", note_affich";
+		$sql .= ") VALUES (";
+		$sql .= " ".(!empty($this->ref) ? "'".$this->db->escape($this->ref)."'" : 'null');
+		$sql .= ", ".$conf->entity;
+		$sql .= ", '".$this->db->idate($now)."'";
+		$sql .= ", '".$this->db->idate($this->date_debut)."'";
+		$sql .= ", '".$this->db->idate($this->date_fin)."'";
+		$sql .= ", ".(is_numeric($this->fk_soc_labour_doctor) ? $this->fk_soc_labour_doctor : '0');
+		$sql .= ", ".(is_numeric($this->fk_soc_labour_inspector) ? $this->fk_soc_labour_inspector : '0');
+		$sql .= ", ".(is_numeric($this->fk_soc_samu) ? $this->fk_soc_samu : '0');
+		$sql .= ", ".(is_numeric($this->fk_soc_police) ? $this->fk_soc_police : '0');
+		$sql .= ", ".(is_numeric($this->fk_soc_urgency) ? $this->fk_soc_urgency : '0');
+		$sql .= ", ".(is_numeric($this->fk_soc_rights_defender) ? $this->fk_soc_rights_defender : '0');
+		$sql .= ", ".(is_numeric($this->fk_soc_antipoison) ? $this->fk_soc_antipoison : '0');
+		$sql .= ", ".(is_numeric($this->fk_soc_responsible_prevent) ? $this->fk_soc_responsible_prevent : '0');
+		$sql .= ", '".$this->db->escape($this->description)."'";
+		$sql .= ", ".(!empty($this->import_key) ? "'".$this->db->escape($this->import_key)."'" : 'null');
+		$sql .= ", ".(is_numeric($this->status) ? $this->status : '0');
+		$sql .= ", ".$fuserid;
+		$sql .= ", ".(!empty($this->model_pdf) ? "'".$this->db->escape($this->model_pdf)."'" : 'null');
+		$sql .= ", ".(!empty($this->model_odt) ? "'".$this->db->escape($this->model_odt)."'" : 'null');
+		$sql .= ", ".(!empty($this->note_affich) ? "'".$this->db->escape($this->note_affich)."'" : 'null');
+		$sql .= ")";
+
 		dol_syslog(get_class($this)."::create sql=".$sql, LOG_DEBUG);
-		$resql=$this->db->query($sql);
-		if (! $resql) { $error++; $this->errors[]="Error ".$this->db->lasterror(); }
+		$resql = $this->db->query($sql);
+		if (! $resql) { $error++; $this->errors[] = "Error ".$this->db->lasterror(); }
 
 		if (! $error)
 		{
@@ -180,10 +188,10 @@ class Legaldisplay extends CommonObject
 			foreach($this->errors as $errmsg)
 			{
 				dol_syslog(get_class($this)."::create ".$errmsg, LOG_ERR);
-				$this->error.=($this->error?', '.$errmsg:$errmsg);
+				$this->error .= ($this->error?', '.$errmsg:$errmsg);
 			}
 			$this->db->rollback();
-			return -1*$error;
+			return -1 * $error;
 		}
 		else
 		{
