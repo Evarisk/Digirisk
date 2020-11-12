@@ -211,23 +211,26 @@ class Legaldisplay extends CommonObject
 	{
 		global $langs;
 		$sql = "SELECT";
-		$sql.= " t.rowid,";
-
-		$sql.= " t.ref,";
-		$sql.= " t.ref_ext,";
-		$sql.= " t.entity,";
-		$sql.= " t.date_creation,";
-		$sql.= " t.tms,";
-		$sql.= " t.date_valid,";
-		$sql.= " t.description,";
-		$sql.= " t.import_key,";
-		$sql.= " t.status,";
-		$sql.= " t.fk_user_creat,";
-		$sql.= " t.fk_user_modif,";
-		$sql.= " t.fk_user_valid,";
-		$sql.= " t.model_pdf,";
-		$sql.= " t.model_odt,";
-		$sql.= " t.note_affich";
+		$sql .= "t.ref";
+		$sql .= ", t.entity";
+		$sql .= ", t.date_creation";
+		$sql .= ", t.date_debut";
+		$sql .= ", t.date_fin";
+		$sql .= ", t.fk_soc_labour_doctor";
+		$sql .= ", t.fk_soc_labour_inspector";
+		$sql .= ", t.fk_soc_samu";
+		$sql .= ", t.fk_soc_police";
+		$sql .= ", t.fk_soc_urgency";
+		$sql .= ", t.fk_soc_rights_defender";
+		$sql .= ", t.fk_soc_antipoison";
+		$sql .= ", t.fk_soc_responsible_prevent";
+		$sql .= ", t.description";
+		$sql .= ", t.import_key";
+		$sql .= ", t.status";
+		$sql .= ", t.fk_user_creat";
+		$sql .= ", t.model_pdf";
+		$sql .= ", t.model_odt";
+		$sql .= ", t.note_affich";
 
 
 		$sql.= " FROM ".MAIN_DB_PREFIX."legal_display as t";

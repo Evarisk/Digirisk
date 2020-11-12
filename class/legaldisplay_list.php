@@ -18,7 +18,7 @@
  */
 
 /**
- *   	\file       dev/skeletons/skeleton_list.php
+ *   	\file       dev/digiriskdolibarrs/digiriskdolibarr_list.php
  *		\ingroup    mymodule othermodule1 othermodule2
  *		\brief      This file is an example of a php page
  *					Put here some comments
@@ -42,12 +42,13 @@ if (! $res && file_exists("../main.inc.php")) $res=@include '../main.inc.php';		
 if (! $res && file_exists("../../main.inc.php")) $res=@include '../../main.inc.php';			// to work if your module directory is into a subdir of root htdocs directory
 if (! $res && file_exists("../../../dolibarr/htdocs/main.inc.php")) $res=@include '../../../dolibarr/htdocs/main.inc.php';     // Used on dev env only
 if (! $res && file_exists("../../../../dolibarr/htdocs/main.inc.php")) $res=@include '../../../../dolibarr/htdocs/main.inc.php';   // Used on dev env only
+if (! $res && file_exists("../../../../../dolibarr/htdocs/main.inc.php")) $res=@include '../../../../../dolibarr/htdocs/main.inc.php';   // Used on dev env only
 if (! $res) die("Include of main fails");
 // Change this following line to use the correct relative path from htdocs
 require_once(DOL_DOCUMENT_ROOT.'/core/class/html.formcompany.class.php');
 require_once DOL_DOCUMENT_ROOT.'/core/lib/date.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/company.lib.php';
-dol_include_once('/mymodule/class/skeleton_class.class.php');
+dol_include_once('/digiriskdolibarr/class/legaldisplay.class.php');
 
 // Load traductions files requiredby by page
 $langs->load("mymodule");
@@ -73,7 +74,7 @@ $optioncss = GETPOST('optioncss','alpha');
 $limit = GETPOST("limit")?GETPOST("limit","int"):$conf->liste_limit;
 $sortfield = GETPOST('sortfield','alpha');
 $sortorder = GETPOST('sortorder','alpha');
-$page = GETPOST('page','int');
+//$page = GETPOST('page','int');
 if ($page == -1) { $page = 0; }
 $offset = $limit * $page;
 $pageprev = $page - 1;
@@ -127,7 +128,7 @@ if (is_array($extrafields->attribute_label) && count($extrafields->attribute_lab
 
 
 // Load object if id or ref is provided as parameter
-$object=new Skeleton_Class($db);
+$object=new Legaldisplay($db);
 if (($id > 0 || ! empty($ref)) && $action != 'add')
 {
 	$result=$object->fetch($id,$ref);
@@ -167,11 +168,11 @@ if (empty($reshook))
 	}
 
 	// Mass actions
-	$objectclass='Skeleton';
-	$objectlabel='Skeleton';
-	$permtoread = $user->rights->skeleton->read;
-	$permtodelete = $user->rights->skeleton->delete;
-	$uploaddir = $conf->skeleton->dir_output;
+	$objectclass='Digiriskdolibarr';
+	$objectlabel='Digiriskdolibarr';
+	$permtoread = $user->rights->digiriskdolibarr->read;
+	$permtodelete = $user->rights->digiriskdolibarr->delete;
+	$uploaddir = $conf->digiriskdolibarr->dir_output;
 	include DOL_DOCUMENT_ROOT.'/core/actions_massactions.inc.php';
 }
 
@@ -210,21 +211,38 @@ jQuery(document).ready(function() {
 
 
 $sql = "SELECT";
-$sql.= " t.rowid,";
-$sql.= " t.field1,";
-$sql.= " t.field2";
+$sql .= "t.ref";
+$sql .= ", t.entity";
+$sql .= ", t.date_creation";
+$sql .= ", t.date_debut";
+$sql .= ", t.date_fin";
+$sql .= ", t.fk_soc_labour_doctor";
+$sql .= ", t.fk_soc_labour_inspector";
+$sql .= ", t.fk_soc_samu";
+$sql .= ", t.fk_soc_police";
+$sql .= ", t.fk_soc_urgency";
+$sql .= ", t.fk_soc_rights_defender";
+$sql .= ", t.fk_soc_antipoison";
+$sql .= ", t.fk_soc_responsible_prevent";
+$sql .= ", t.description";
+$sql .= ", t.import_key";
+$sql .= ", t.status";
+$sql .= ", t.fk_user_creat";
+$sql .= ", t.model_pdf";
+$sql .= ", t.model_odt";
+$sql .= ", t.note_affich";
 // Add fields from extrafields
 foreach ($extrafields->attribute_label as $key => $val) $sql.=($extrafields->attribute_type[$key] != 'separate' ? ",ef.".$key.' as options_'.$key : '');
 // Add fields from hooks
 $parameters=array();
 $reshook=$hookmanager->executeHooks('printFieldListSelect',$parameters);    // Note that $action and $object may have been modified by hook
 $sql.=$hookmanager->resPrint;
-$sql.= " FROM ".MAIN_DB_PREFIX."mytable as t";
+$sql.= " FROM ".MAIN_DB_PREFIX."legal_display as t";
 if (is_array($extrafields->attribute_label) && count($extrafields->attribute_label)) $sql.= " LEFT JOIN ".MAIN_DB_PREFIX."mytable_extrafields as ef on (t.rowid = ef.fk_object)";
 $sql.= " WHERE 1 = 1";
 //$sql.= " WHERE u.entity IN (".getEntity('mytable',1).")";
-if ($search_field1) $sql.= natural_search("field1",$search_field1);
-if ($search_field2) $sql.= natural_search("field2",$search_field2);
+if ($search_field1) $sql.= natural_search("rowid",$search_field1);
+if ($search_field2) $sql.= natural_search("ref",$search_field2);
 if ($sall)          $sql.= natural_search(array_keys($fieldstosearchall), $sall);
 // Add where from extra fields
 foreach ($search_array_options as $key => $val)
@@ -271,7 +289,7 @@ if ($num == 1 && ! empty($conf->global->MAIN_SEARCH_DIRECT_OPEN_IF_ONLY_ONE) && 
 {
 	$obj = $db->fetch_object($resql);
 	$id = $obj->rowid;
-	header("Location: ".DOL_URL_ROOT.'/skeleton/card.php?id='.$id);
+	header("Location: ".DOL_URL_ROOT.'/digiriskdolibarr/card.php?id='.$id);
 	exit;
 }
 

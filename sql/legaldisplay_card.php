@@ -110,9 +110,17 @@ if (empty($reshook))
 
 		/* object_prop_getpost_prop */
 		$object->ref = GETPOST("ref");
-		$object->date_debut = GETPOST("date_debut");
-		$object->date_fin = GETPOST("date_fin");
+		$object->date_debut = strtotime(GETPOST("date_debut"));
+		$object->date_fin = strtotime(GETPOST("date_fin"));
+		$object->fk_soc_labour_doctor = GETPOST("labour_doctor");
+		$object->fk_soc_labour_inspector = GETPOST("labour_inspector");
+		$object->fk_soc_samu = GETPOST("samu");
+		$object->fk_soc_police = GETPOST("police");
+		$object->fk_soc_urgency = GETPOST("urgency");
+		$object->fk_soc_rights_defender = GETPOST("rights_defender");
 		$object->fk_soc_antipoison = GETPOST("antipoison");
+		$object->fk_soc_responsible_prevent = GETPOST("responsible_prevent");
+	
 
 		if (empty($object->ref))
 		{
@@ -125,10 +133,6 @@ if (empty($reshook))
 			$result=$object->create($user);
 			if ($result > 0)
 			{
-				echo '<pre>';
-				print_r($result);
-				echo '</pre>';
-				exit;
 				// Creation OK
 				$urltogo=$backtopage?$backtopage:dol_buildpath('/custom/digiriskdolibarr/class/legaldisplay_list.php', 1);
 				header("Location: ".$urltogo);
@@ -457,7 +461,6 @@ if ($action == 'create')
 			});
 			</script>';
 		}
-		if (!GETPOST('fac_rec', 'int')) print ' <a href="'.DOL_URL_ROOT.'/societe/card.php?action=create&client=3&fournisseur=0&backtopage='.urlencode($_SERVER["PHP_SELF"].'?action=create').'"><span class="fa fa-plus-circle valignmiddle paddingleft" title="'.$langs->trans("AddThirdParty").'"></span></a>';
 		print '</td>';
 		print '</tr>'."\n";
 	}
