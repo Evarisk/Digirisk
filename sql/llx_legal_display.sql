@@ -1,7 +1,7 @@
 create table llx_legal_display
 (
   rowid                       integer AUTO_INCREMENT PRIMARY KEY,
-  ref                         varchar(50) NOT NULL,
+  ref                         varchar(128) NOT NULL,
   ref_ext                     varchar(255) default NULL,
   entity                      integer default 1,
   date_creation               datetime default NULL,
@@ -17,9 +17,9 @@ create table llx_legal_display
   fk_soc_rights_defender      integer default NULL,
   fk_soc_antipoison           integer default NULL,
   fk_soc_responsible_prevent  integer default NULL,
-  import_key                  integer,
+  import_key                  integer default NULL,
   status                      smallint,
-  fk_user_creat               integer default NOT NULL,
+  fk_user_creat               integer default NULL,
   fk_user_modif               integer default NULL,
   model_pdf                   varchar(255),
   model_odt                   varchar(255),

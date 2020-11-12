@@ -18,8 +18,8 @@
  */
 
 /**
- *   	\file       dev/digiriskdolibarrs/digiriskdolibarr_list.php
- *		\ingroup    mymodule othermodule1 othermodule2
+ *   	\file       dev/digiriskdolibarr/digiriskdolibarr_list.php
+ *		\ingroup    digiriskdolibarr othermodule1 othermodule2
  *		\brief      This file is an example of a php page
  *					Put here some comments
  */
@@ -51,7 +51,7 @@ require_once DOL_DOCUMENT_ROOT.'/core/lib/company.lib.php';
 dol_include_once('/digiriskdolibarr/class/legaldisplay.class.php');
 
 // Load traductions files requiredby by page
-$langs->load("mymodule");
+$langs->load("digiriskdolibarr");
 $langs->load("other");
 
 $action=GETPOST('action','alpha');
@@ -65,11 +65,10 @@ $backtopage = GETPOST('backtopage');
 $myparam	= GETPOST('myparam','alpha');
 
 $search_all=trim(GETPOST("sall"));
-$search_field1=GETPOST("search_field1");
-$search_field2=GETPOST("search_field2");
+$date_debut = GETPOST("date_debut","int");
+$ref=GETPOST("ref");
 $search_myfield=GETPOST('search_myfield');
 $optioncss = GETPOST('optioncss','alpha');
-
 // Load variable for pagination
 $limit = GETPOST("limit")?GETPOST("limit","int"):$conf->liste_limit;
 $sortfield = GETPOST('sortfield','alpha');
@@ -91,30 +90,46 @@ if ($user->societe_id > 0)
 }
 
 // Initialize technical object to manage context to save list fields
-$contextpage=GETPOST('contextpage','aZ')?GETPOST('contextpage','aZ'):'mymodulelist';
+$contextpage=GETPOST('contextpage','aZ')?GETPOST('contextpage','aZ'):'legaldisplaylist';
 
 // Initialize technical object to manage hooks. Note that conf->hooks_modules contains array
-$hookmanager->initHooks(array('mymodulelist'));
+$hookmanager->initHooks(array('digiriskdolibarrlist'));
 $extrafields = new ExtraFields($db);
 
 // fetch optionals attributes and labels
-$extralabels = $extrafields->fetch_name_optionals_label('mymodule');
+$extralabels = $extrafields->fetch_name_optionals_label('legaldisplay');
 $search_array_options=$extrafields->getOptionalsFromPost($extralabels,'','search_');
 
 // List of fields to search into when doing a "search in all"
 $fieldstosearchall = array(
 	't.ref'=>'Ref',
-	't.note_public'=>'NotePublic',
+	't.fk_soc_labour_doctor'=>'MedecinTravail',
 );
 if (empty($user->socid)) $fieldstosearchall["t.note_private"]="NotePrivate";
 
 // Definition of fields for list
 $arrayfields=array(
-	't.field1'=>array('label'=>$langs->trans("Field1"), 'checked'=>1),
-	't.field2'=>array('label'=>$langs->trans("Field2"), 'checked'=>1),
-	//'t.entity'=>array('label'=>$langs->trans("Entity"), 'checked'=>1, 'enabled'=>(! empty($conf->multicompany->enabled) && empty($conf->multicompany->transverse_mode))),
-	't.datec'=>array('label'=>$langs->trans("DateCreationShort"), 'checked'=>0, 'position'=>500),
-	't.tms'=>array('label'=>$langs->trans("DateModificationShort"), 'checked'=>0, 'position'=>500),
+	// ICI C'EST LES REF DU HEADER DE LA LISTE YOUHOU 
+	't.ref'=>array('label'=>$langs->trans("Ref"), 'checked'=>1),
+	't.date_creation'=>array('label'=>$langs->trans("Date de création"), 'checked'=>0),
+	't.date_debut'=>array('label'=>$langs->trans("Date de début"), 'checked'=>1),
+	't.date_fin'=>array('label'=>$langs->trans("Date de fin"), 'checked'=>1),
+
+	't.fk_soc_labour_doctor'=>array('label'=>$langs->trans("Médecin du travail"), 'checked'=>1),
+	't.fk_soc_labour_inspector'=>array('label'=>$langs->trans("Inspecteur du travail"), 'checked'=>0),
+	't.fk_soc_samu'=>array('label'=>$langs->trans("SAMU"), 'checked'=>0),
+	't.fk_soc_police'=>array('label'=>$langs->trans("Police"), 'checked'=>0),
+	't.fk_soc_urgency'=>array('label'=>$langs->trans("Urgences"), 'checked'=>0),
+	't.fk_soc_rights_defender'=>array('label'=>$langs->trans("Défenseur du droit du travail"), 'checked'=>0),
+	't.fk_soc_antipoison'=>array('label'=>$langs->trans("Centre Antipoison"), 'checked'=>0),
+	't.fk_soc_responsible_prevent'=>array('label'=>$langs->trans("Responsable de la prévention"), 'checked'=>0),
+
+	't.description'=>array('label'=>$langs->trans("Description"), 'checked'=>0),
+	't.status'=>array('label'=>$langs->trans("Statut"), 'checked'=>0),
+	't.model_pdf'=>array('label'=>$langs->trans("Modèle PDF"), 'checked'=>0),
+	't.model_odt'=>array('label'=>$langs->trans("Modèle ODT"), 'checked'=>0),
+	't.note_affich'=>array('label'=>$langs->trans("NoteAffich"), 'checked'=>0)
+
 	//'t.statut'=>array('label'=>$langs->trans("Status"), 'checked'=>1, 'position'=>1000),
 );
 // Extra fields
@@ -159,8 +174,8 @@ if (empty($reshook))
 	// Purge search criteria
 	if (GETPOST("button_removefilter_x") || GETPOST("button_removefilter.x") ||GETPOST("button_removefilter")) // All tests are required to be compatible with all browsers
 	{
-		$search_field1='';
-		$search_field2='';
+		$rowid='';
+		$ref='';
 		$search_date_creation='';
 		$search_date_update='';
 		$toselect='';
@@ -190,7 +205,7 @@ $form=new Form($db);
 
 //$help_url="EN:Module_Customers_Orders|FR:Module_Commandes_Clients|ES:Módulo_Pedidos_de_clientes";
 $help_url='';
-$title = $langs->trans('MyModuleListTitle');
+$title = $langs->trans('Legal Display List');
 
 // Put here content of your page
 
@@ -211,7 +226,7 @@ jQuery(document).ready(function() {
 
 
 $sql = "SELECT";
-$sql .= "t.ref";
+$sql .= " t.ref";
 $sql .= ", t.entity";
 $sql .= ", t.date_creation";
 $sql .= ", t.date_debut";
@@ -231,6 +246,8 @@ $sql .= ", t.fk_user_creat";
 $sql .= ", t.model_pdf";
 $sql .= ", t.model_odt";
 $sql .= ", t.note_affich";
+$sql .= ", s.rowid as socid, s.nom as name, s.email, s.town, s.zip, s.fk_pays, s.client, s.fournisseur, s.code_client, s.code_fournisseur, s.code_compta as code_compta_client";
+
 // Add fields from extrafields
 foreach ($extrafields->attribute_label as $key => $val) $sql.=($extrafields->attribute_type[$key] != 'separate' ? ",ef.".$key.' as options_'.$key : '');
 // Add fields from hooks
@@ -238,11 +255,17 @@ $parameters=array();
 $reshook=$hookmanager->executeHooks('printFieldListSelect',$parameters);    // Note that $action and $object may have been modified by hook
 $sql.=$hookmanager->resPrint;
 $sql.= " FROM ".MAIN_DB_PREFIX."legal_display as t";
-if (is_array($extrafields->attribute_label) && count($extrafields->attribute_label)) $sql.= " LEFT JOIN ".MAIN_DB_PREFIX."mytable_extrafields as ef on (t.rowid = ef.fk_object)";
+$sql .= " LEFT JOIN ".MAIN_DB_PREFIX."societe as s on (s.rowid  = t.fk_soc_labour_doctor)";
+
+if (is_array($extrafields->attribute_label) && count($extrafields->attribute_label)) $sql.= " LEFT JOIN ".MAIN_DB_PREFIX."legal_display_extrafields as ef on (t.rowid = ef.fk_object)";
 $sql.= " WHERE 1 = 1";
-//$sql.= " WHERE u.entity IN (".getEntity('mytable',1).")";
-if ($search_field1) $sql.= natural_search("rowid",$search_field1);
-if ($search_field2) $sql.= natural_search("ref",$search_field2);
+//$sql.= " WHERE u.entity IN (".getEntity('legal_display',1).")";
+
+if ($rowid) $sql.= natural_search("rowid",$rowid);
+if ($ref) $sql.= natural_search("ref",$ref);
+
+
+
 if ($sall)          $sql.= natural_search(array_keys($fieldstosearchall), $sall);
 // Add where from extra fields
 foreach ($search_array_options as $key => $val)
@@ -289,7 +312,7 @@ if ($num == 1 && ! empty($conf->global->MAIN_SEARCH_DIRECT_OPEN_IF_ONLY_ONE) && 
 {
 	$obj = $db->fetch_object($resql);
 	$id = $obj->rowid;
-	header("Location: ".DOL_URL_ROOT.'/digiriskdolibarr/card.php?id='.$id);
+	header("Location: ".DOL_URL_ROOT.'/digiriskdolibarr/sql/legaldisplay_card.php?id='.$id);
 	exit;
 }
 
@@ -300,8 +323,8 @@ $arrayofselected=is_array($toselect)?$toselect:array();
 $param='';
 if (! empty($contextpage) && $contextpage != $_SERVER["PHP_SELF"]) $param.='&contextpage='.$contextpage;
 if ($limit > 0 && $limit != $conf->liste_limit) $param.='&limit='.$limit;
-if ($search_field1 != '') $param.= '&amp;search_field1='.urlencode($search_field1);
-if ($search_field2 != '') $param.= '&amp;search_field2='.urlencode($search_field2);
+if ($rowid != '') $param.= '&amp;search_field1='.urlencode($rowid);
+if ($ref != '') $param.= '&amp;search_field2='.urlencode($ref);
 if ($optioncss != '') $param.='&optioncss='.$optioncss;
 // Add $param from extra fields
 foreach ($search_array_options as $key => $val)
@@ -315,7 +338,7 @@ $arrayofmassactions =  array(
 	'presend'=>$langs->trans("SendByMail"),
 	'builddoc'=>$langs->trans("PDFMerge"),
 );
-if ($user->rights->mymodule->supprimer) $arrayofmassactions['delete']=$langs->trans("Delete");
+if ($user->rights->digiriskdolibarr->supprimer) $arrayofmassactions['delete']=$langs->trans("Delete");
 if ($massaction == 'presend') $arrayofmassactions=array();
 $massactionbutton=$form->selectMassAction('', $arrayofmassactions);
 
@@ -361,9 +384,14 @@ print '<table class="tagtable liste'.($moreforfilter?" listwithfilterbefore":"")
 
 // Fields title
 print '<tr class="liste_titre">';
+
 // LIST_OF_TD_TITLE_FIELDS
-//if (! empty($arrayfields['t.field1']['checked'])) print_liste_field_titre($arrayfields['t.field1']['label'],$_SERVER['PHP_SELF'],'t.field1','',$param,'',$sortfield,$sortorder);
-//if (! empty($arrayfields['t.field2']['checked'])) print_liste_field_titre($arrayfields['t.field2']['label'],$_SERVER['PHP_SELF'],'t.field2','',$param,'',$sortfield,$sortorder);
+if (! empty($arrayfields['t.ref']['checked'])) print_liste_field_titre($arrayfields['t.ref']['label'],$_SERVER['PHP_SELF'],'t.ref','',$param,'',$sortfield,$sortorder);
+if (! empty($arrayfields['t.date_creation']['checked'])) print_liste_field_titre($arrayfields['t.date_creation']['label'],$_SERVER['PHP_SELF'],'t.date_creation','',$param,'',$sortfield,$sortorder);
+if (! empty($arrayfields['t.date_debut']['checked'])) print_liste_field_titre($arrayfields['t.date_debut']['label'],$_SERVER['PHP_SELF'],'t.date_debut','',$param,'',$sortfield,$sortorder);
+if (! empty($arrayfields['t.date_fin']['checked'])) print_liste_field_titre($arrayfields['t.date_fin']['label'],$_SERVER['PHP_SELF'],'t.date_fin','',$param,'',$sortfield,$sortorder);
+if (! empty($arrayfields['t.fk_soc_labour_doctor']['checked'])) print_liste_field_titre($arrayfields['t.fk_soc_labour_doctor']['label'],$_SERVER['PHP_SELF'],'t.fk_soc_labour_doctor','',$param,'',$sortfield,$sortorder);
+
 // Extra fields
 if (is_array($extrafields->attribute_label) && count($extrafields->attribute_label))
 {
@@ -389,8 +417,8 @@ print '</tr>'."\n";
 // Fields title search
 print '<tr class="liste_titre">';
 // LIST_OF_TD_TITLE_SEARCH
-//if (! empty($arrayfields['t.field1']['checked'])) print '<td class="liste_titre"><input type="text" class="flat" name="search_field1" value="'.$search_field1.'" size="10"></td>';
-//if (! empty($arrayfields['t.field2']['checked'])) print '<td class="liste_titre"><input type="text" class="flat" name="search_field2" value="'.$search_field2.'" size="10"></td>';
+//if (! empty($arrayfields['t.field1']['checked'])) print '<td class="liste_titre"><input type="text" class="flat" name="search_field1" value="'.$rowid.'" size="10"></td>';
+//if (! empty($arrayfields['t.field2']['checked'])) print '<td class="liste_titre"><input type="text" class="flat" name="search_field2" value="'.$ref.'" size="10"></td>';
 // Extra fields
 if (is_array($extrafields->attribute_label) && count($extrafields->attribute_label))
 {
@@ -418,13 +446,18 @@ if (is_array($extrafields->attribute_label) && count($extrafields->attribute_lab
 $parameters=array('arrayfields'=>$arrayfields);
 $reshook=$hookmanager->executeHooks('printFieldListOption',$parameters);    // Note that $action and $object may have been modified by hook
 print $hookmanager->resPrint;
-if (! empty($arrayfields['t.datec']['checked']))
+if (! empty($arrayfields['t.date_debut']['checked']))
 {
 	// Date creation
 	print '<td class="liste_titre">';
 	print '</td>';
 }
-if (! empty($arrayfields['t.tms']['checked']))
+
+$legaldisplaystatic = new Legaldisplay($db);
+$thirdpartystatic = new Societe($db);
+
+
+if (! empty($arrayfields['t.ref']['checked']))
 {
 	// Date modification
 	print '<td class="liste_titre">';
@@ -451,20 +484,51 @@ $totalarray=array();
 while ($i < min($num, $limit))
 {
 	$obj = $db->fetch_object($resql);
+
+	$legaldisplaystatic->ref = $obj->ref;
+	$legaldisplaystatic->entity = $obj->entity;
+	$legaldisplaystatic->date_creation = $obj->date_creation;
+	$legaldisplaystatic->date_debut = $db->jdate($obj->date_debut);
+	$legaldisplaystatic->date_fin = $db->jdate($obj->date_fin);
+	$legaldisplaystatic->fk_soc_labour_doctor = $db->jdate($obj->fk_soc_labour_doctor);
+	$legaldisplaystatic->fk_soc_labour_inspector = $db->jdate($obj->fk_soc_labour_inspector);
+	$legaldisplaystatic->fk_soc_samu = $db->jdate($obj->fk_soc_samu);
+	$legaldisplaystatic->fk_soc_police = $db->jdate($obj->fk_soc_police);
+	$legaldisplaystatic->fk_soc_urgency = $obj->fk_soc_urgency;
+	$legaldisplaystatic->description = $obj->description;
+	$legaldisplaystatic->import_key = $obj->import_key;
+	$legaldisplaystatic->status = $obj->status;
+	$legaldisplaystatic->fk_user_creat = $obj->fk_user_creat;
+	$legaldisplaystatic->model_pdf = $obj->model_pdf;
+	$legaldisplaystatic->model_odt = $obj->model_odt;
+	$legaldisplaystatic->note_affich = $obj->note_affich;
+			
+	$thirdpartystatic->id = $obj->fk_soc_labour_doctor;
+	$thirdpartystatic->name = $obj->name;
+	$thirdpartystatic->client = $obj->client;
+	$thirdpartystatic->fournisseur = $obj->fournisseur;
+	$thirdpartystatic->code_client = $obj->code_client;
+	$thirdpartystatic->code_compta_client = $obj->code_compta_client;
+	$thirdpartystatic->code_fournisseur = $obj->code_fournisseur;
+	$thirdpartystatic->code_compta_fournisseur = $obj->code_compta_fournisseur;
+	$thirdpartystatic->email = $obj->email;
+	$thirdpartystatic->country_code = $obj->country_code;
+	
 	if ($obj)
 	{
+		
 		$var = !$var;
 
 		// Show here line of result
-		print '<tr '.$bc[$var].'>';
+		print '<tr class="oddeven" '.$bc[$var].'>';
 		// LIST_OF_TD_FIELDS_LIST
-		/*
-		if (! empty($arrayfields['t.field1']['checked']))
+		
+		/*if (! empty($arrayfields['t.ref']['checked']))
 		{
 			print '<td>'.$obj->field1.'</td>';
 			if (! $i) $totalarray['nbfield']++;
 		}
-		if (! empty($arrayfields['t.field2']['checked']))
+		if (! empty($arrayfields['t.date_debut']['checked']))
 		{
 			print '<td>'.$obj->field2.'</td>';
 			if (! $i) $totalarray['nbfield']++;
@@ -490,22 +554,50 @@ while ($i < min($num, $limit))
 		// Fields from hook
 		$parameters=array('arrayfields'=>$arrayfields, 'obj'=>$obj);
 		$reshook=$hookmanager->executeHooks('printFieldListValue',$parameters);    // Note that $action and $object may have been modified by hook
+		
 		print $hookmanager->resPrint;
+		// Ref
+		if (! empty($arrayfields['t.ref']['checked']))
+		{
+			print '<td>';
+			print '<table class="nobordernopadding"><tr class="nocellnopadd">';
+			print '<td class="nobordernopadding nowrap">';
+			print $legaldisplaystatic->getNomUrl(1);
+			print '</td>';
+		}
 		// Date creation
-		if (! empty($arrayfields['t.datec']['checked']))
+
+		if (! empty($arrayfields['t.date_debut']['checked']))
 		{
 			print '<td align="center">';
-			print dol_print_date($db->jdate($obj->date_creation), 'dayhour');
+			print dol_print_date($db->jdate($obj->date_debut), 'day');
 			print '</td>';
 			if (! $i) $totalarray['nbfield']++;
 		}
 		// Date modification
-		if (! empty($arrayfields['t.tms']['checked']))
+		if (! empty($arrayfields['t.date_fin']['checked']))
 		{
 			print '<td align="center">';
-			print dol_print_date($db->jdate($obj->date_update), 'dayhour');
+			print dol_print_date($db->jdate($obj->date_fin), 'day');
 			print '</td>';
 			if (! $i) $totalarray['nbfield']++;
+		}
+
+		//User
+		if (!empty($arrayfields['t.fk_soc_labour_doctor']['checked']))
+		{
+			print '<td class="tdoverflowmax200">';
+			if ($contextpage == 'postList')
+			{
+				print $thirdpartystatic->id;
+				
+			}
+			else
+			{
+				print $thirdpartystatic->getNomUrl(1);
+			}
+			print '</td>';
+			if (!$i) $totalarray['nbfield']++;
 		}
 		// Status
 		/*
@@ -532,7 +624,7 @@ while ($i < min($num, $limit))
 }
 
 // Show total line
-if (isset($totalarray['totalhtfield']))
+if (isset($totalarray['date_creation']))
 {
 	print '<tr class="liste_total">';
 	$i=0;
@@ -574,7 +666,7 @@ if ($massaction == 'builddoc' || $action == 'remove_file' || $show_files)
 	$genallowed=$user->rights->facture->lire;
 	$delallowed=$user->rights->facture->lire;
 
-	print $formfile->showdocuments('massfilesarea_mymodule','',$filedir,$urlsource,0,$delallowed,'',1,1,0,48,1,$param,$title,'');
+	print $formfile->showdocuments('massfilesarea_digiriskdolibarr','',$filedir,$urlsource,0,$delallowed,'',1,1,0,48,1,$param,$title,'');
 }
 else
 {

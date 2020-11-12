@@ -542,6 +542,60 @@ class Legaldisplay extends CommonObject
 
 
 	}
+	public function getNomUrl($withpicto = 0, $max = 0, $short = 0, $moretitle = '', $notooltip = 0, $save_lastsearch_value = -1)
+    {
+        global $langs, $conf;
 
+        $result = '';
+
+        $url = DOL_URL_ROOT.'/custom/digiriskdolibarr/sql/legaldisplay_card.php?id='.$this->id;
+
+        if ($short) return $url;
+        $label = '<u>'.$langs->trans("ShowLegalDisplay").'</u>';
+        if (!empty($this->ref))
+            $label .= '<br><b>'.$langs->trans('Ref').':</b> '.$this->ref;
+        if (!empty($this->total_ht))
+            $label .= '<br><b>'.$langs->trans('AmountHT').':</b> '.price($this->total_ht, 0, $langs, 0, -1, -1, $conf->currency);
+        if (!empty($this->total_tva))
+            $label .= '<br><b>'.$langs->trans('VAT').':</b> '.price($this->total_tva, 0, $langs, 0, -1, -1, $conf->currency);
+        if (!empty($this->total_ttc))
+            $label .= '<br><b>'.$langs->trans('AmountTTC').':</b> '.price($this->total_ttc, 0, $langs, 0, -1, -1, $conf->currency);
+        if ($moretitle) $label .= ' - '.$moretitle;
+
+        //if ($option != 'nolink')
+        //{
+        // Add param to save lastsearch_values or not
+        	$add_save_lastsearch_values = ($save_lastsearch_value == 1 ? 1 : 0);
+        	if ($save_lastsearch_value == -1 && preg_match('/list\.php/', $_SERVER["PHP_SELF"])) $add_save_lastsearch_values = 1;
+        	if ($add_save_lastsearch_values) $url .= '&save_lastsearch_values=1';
+        //}
+
+        $ref = $this->ref;
+        if (empty($ref)) $ref = $this->id;
+
+        $linkclose = '';
+        if (empty($notooltip))
+        {
+            if (!empty($conf->global->MAIN_OPTIMIZEFORTEXTBROWSER))
+            {
+                $label = $langs->trans("ShowLegalDisplay");
+                $linkclose .= ' alt="'.dol_escape_htmltag($label, 1).'"';
+            }
+            $linkclose .= ' title="'.dol_escape_htmltag($label, 1).'"';
+            $linkclose .= ' class="classfortooltip"';
+        }
+
+        $linkstart = '<a href="'.$url.'"';
+        $linkstart .= $linkclose.'>';
+        $linkend = '</a>';
+
+        $result .= $linkstart;
+        if ($withpicto) $result .= img_object(($notooltip ? '' : $label), $this->picto, ($notooltip ? (($withpicto != 2) ? 'class="paddingright"' : '') : 'class="'.(($withpicto != 2) ? 'paddingright ' : '').'classfortooltip"'), 0, 0, $notooltip ? 0 : 1);
+        if ($withpicto != 2) $result .= ($max ?dol_trunc($ref, $max) : $ref);
+        $result .= $linkend;
+
+        return $result;
+    }
 }
+
 ?>

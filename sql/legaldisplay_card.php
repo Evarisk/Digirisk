@@ -158,10 +158,17 @@ if (empty($reshook))
 	if ($action == 'update' && ! GETPOST('cancel'))
 	{
 		$error=0;
-
-		$object->prop1=GETPOST("field1");
-		$object->prop2=GETPOST("field2");
-
+		$object->ref = GETPOST("ref");
+		$object->date_debut = strtotime(GETPOST("date_debut"));
+		$object->date_fin = strtotime(GETPOST("date_fin"));
+		$object->fk_soc_labour_doctor = GETPOST("labour_doctor");
+		$object->fk_soc_labour_inspector = GETPOST("labour_inspector");
+		$object->fk_soc_samu = GETPOST("samu");
+		$object->fk_soc_police = GETPOST("police");
+		$object->fk_soc_urgency = GETPOST("urgency");
+		$object->fk_soc_rights_defender = GETPOST("rights_defender");
+		$object->fk_soc_antipoison = GETPOST("antipoison");
+		$object->fk_soc_responsible_prevent = GETPOST("responsible_prevent");
 
 
 		if (empty($object->ref))
