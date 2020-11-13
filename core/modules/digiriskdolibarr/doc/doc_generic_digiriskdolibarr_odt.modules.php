@@ -22,12 +22,12 @@
  */
 
 /**
- *	\file       htdocs/core/modules/digiriskdolibarr/doc/doc_generic_myobject_odt.modules.php
+ *	\file       htdocs/core/modules/digiriskdolibarr/doc/doc_generic_digiriskdolibarr_odt.modules.php
  *	\ingroup    digiriskdolibarr
- *	\brief      File of class to build ODT documents for myobjects
+ *	\brief      File of class to build ODT documents for digiriskdolibarr
  */
 
-dol_include_once('/digiriskdolibarr/core/modules/digiriskdolibarr/modules_myobject.php');
+dol_include_once('/digiriskdolibarr/core/modules/digiriskdolibarr/modules_digiriskdolibarr.php');
 require_once DOL_DOCUMENT_ROOT.'/product/class/product.class.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/company.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/functions2.lib.php';
@@ -38,7 +38,7 @@ require_once DOL_DOCUMENT_ROOT.'/core/lib/doc.lib.php';
 /**
  *	Class to build documents using ODF templates generator
  */
-class doc_generic_myobject_odt extends ModelePDFMyObject
+class doc_generic_digiriskdolibarr_odt extends ModelePDFMyObject
 {
 	/**
 	 * Issuer
