@@ -307,7 +307,7 @@ class modDigiriskDolibarr extends DolibarrModules
 			'titre'=>'Documents légaux',
 			'mainmenu'=>'digiriskdolibarr',
 			'leftmenu'=>'documents',
-			'url'=>'/digiriskdolibarr/legaldocuments_list.php',
+			'url'=>'/digiriskdolibarr/view/legaldocuments_list.php',
 			'langs'=>'digiriskdolibarr@digiriskdolibarr',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
 			'position'=>1000+$r,
 			'enabled'=>'$conf->digiriskdolibarr->enabled',  // Define condition to show or hide menu entry. Use '$conf->digiriskdolibarr->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
@@ -321,7 +321,7 @@ class modDigiriskDolibarr extends DolibarrModules
 			'titre'=>'Affichage légal',
 			'mainmenu'=>'digiriskdolibarr',
 			'leftmenu'=>'legaldisplay',
-			'url'=>'/digiriskdolibarr/legaldisplay_list.php',
+			'url'=>'/digiriskdolibarr/view/legaldisplay_list.php',
 			'langs'=>'digiriskdolibarr@digiriskdolibarr',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
 			'position'=>1000+$r,
 			'enabled'=>'$conf->digiriskdolibarr->enabled',  // Define condition to show or hide menu entry. Use '$conf->digiriskdolibarr->enabled' if entry must be visible if module is enabled.
@@ -335,7 +335,7 @@ class modDigiriskDolibarr extends DolibarrModules
 			'titre'=>'Générer',
 			'mainmenu'=>'digiriskdolibarr',
 			'leftmenu'=>'createlegaldisplay',
-			'url'=>'/digiriskdolibarr/sql/legaldisplay_card.php',
+			'url'=>'/digiriskdolibarr/view/legaldisplay_card.php',
 			'langs'=>'digiriskdolibarr@digiriskdolibarr',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
 			'position'=>1000+$r,
 			'enabled'=>'$conf->digiriskdolibarr->enabled',  // Define condition to show or hide menu entry. Use '$conf->digiriskdolibarr->enabled' if entry must be visible if module is enabled.
@@ -349,7 +349,7 @@ class modDigiriskDolibarr extends DolibarrModules
 			'titre'=>'Diffusion d\'informations',
 			'mainmenu'=>'digiriskdolibarr',
 			'leftmenu'=>'informations',
-			'url'=>'/digiriskdolibarr/informationsrelease_list.php',
+			'url'=>'/digiriskdolibarr/view/informationsrelease_list.php',
 			'langs'=>'digiriskdolibarr@digiriskdolibarr',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
 			'position'=>1050+$r,
 			'enabled'=>'$conf->digiriskdolibarr->enabled',  // Define condition to show or hide menu entry. Use '$conf->digiriskdolibarr->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
@@ -363,7 +363,7 @@ class modDigiriskDolibarr extends DolibarrModules
 			'titre'=>'Générer',
 			'mainmenu'=>'digiriskdolibarr',
 			'leftmenu'=>'informationsreleasecreate',
-			'url'=>'/digiriskdolibarr/informationsrelease_card.php' . '?action=create',
+			'url'=>'/digiriskdolibarr/view/informationsrelease_card.php' . '?action=create',
 			'langs'=>'digiriskdolibarr@digiriskdolibarr',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
 			'position'=>1050+$r,
 			'enabled'=>'$conf->digiriskdolibarr->enabled',  // Define condition to show or hide menu entry. Use '$conf->digiriskdolibarr->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
@@ -377,7 +377,7 @@ class modDigiriskDolibarr extends DolibarrModules
 			'titre'=>'New MyObject',
 			'mainmenu'=>'digiriskdolibarr',
 			'leftmenu'=>'digiriskdolibarr_myobject_new',
-			'url'=>'/digiriskdolibarr/myobject_card.php?action=create',
+			'url'=>'/digiriskdolibarr/view/myobject_card.php?action=create',
 			'langs'=>'digiriskdolibarr@digiriskdolibarr',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
 			'position'=>1000+$r,
 			'enabled'=>'$conf->digiriskdolibarr->enabled',  // Define condition to show or hide menu entry. Use '$conf->digiriskdolibarr->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.

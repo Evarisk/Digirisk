@@ -1,4 +1,4 @@
-create table llx_legal_display
+create table llx_legaldisplay
 (
   rowid                       integer AUTO_INCREMENT PRIMARY KEY,
   ref                         varchar(128) NOT NULL,

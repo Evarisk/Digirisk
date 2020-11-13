@@ -23,19 +23,19 @@
  */
 
 /**
- *  \file			htdocs/core/modules/digiriskdolibarr/modules_myobject.php
+ *  \file			htdocs/core/modules/digiriskdolibarr/modules_legaldisplay.php
  *  \ingroup		digiriskdolibarr
- *  \brief			File that contains parent class for myobjects document models and parent class for myobjects numbering models
+ *  \brief			File that contains parent class for legaldisplays document models and parent class for legaldisplays numbering models
  */
 
 require_once DOL_DOCUMENT_ROOT.'/core/class/commondocgenerator.class.php';
-require_once DOL_DOCUMENT_ROOT.'/compta/bank/class/account.class.php'; // required for use by classes that inherit
 
+require_once DOL_DOCUMENT_ROOT.'/custom/digiriskdolibarr/class/legaldisplay.class.php'; // required for use by classes that inherit
 
 /**
  *	Parent class for documents models
  */
-abstract class ModelePDFMyObject extends CommonDocGenerator
+abstract class ModelePDFLegalDisplay extends CommonDocGenerator
 {
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
@@ -51,7 +51,7 @@ abstract class ModelePDFMyObject extends CommonDocGenerator
 		// phpcs:enable
 		global $conf;
 
-		$type = 'myobject';
+		$type = 'legaldisplay';
 		$list = array();
 
 		include_once DOL_DOCUMENT_ROOT.'/core/lib/functions2.lib.php';
@@ -64,9 +64,9 @@ abstract class ModelePDFMyObject extends CommonDocGenerator
 
 
 /**
- *  Parent class to manage numbering of MyObject
+ *  Parent class to manage numbering of LegalDisplay
  */
-abstract class ModeleNumRefMyObject
+abstract class ModeleNumRefLegalDisplay
 {
 	/**
 	 * @var string Error code (or message)

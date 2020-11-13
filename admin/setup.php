@@ -254,12 +254,12 @@ if ($action == 'edit')
 
 $moduledir = 'digiriskdolibarr';
 $myTmpObjects = array();
-$myTmpObjects['MyObject']=array('includerefgeneration'=>0, 'includedocgeneration'=>1);
+$myTmpObjects['LegalDisplay']=array('includerefgeneration'=>0, 'includedocgeneration'=>1);
 
 
 foreach ($myTmpObjects as $myTmpObjectKey => $myTmpObjectArray) {
 
-	//if ($myTmpObjectKey == 'MyObject') continue;
+	//if ($myTmpObjectKey == 'LegalDisplay') continue;
 	if ($myTmpObjectArray['includerefgeneration']) {
 		/*
 		 * Orders Numbering model

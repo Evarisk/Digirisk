@@ -143,7 +143,7 @@ class Legaldisplay extends CommonObject
 
 		$this->db->begin();
 
-		$sql = "INSERT INTO ".MAIN_DB_PREFIX."legaldisplay (";
+		$sql = "INSERT INTO ".MAIN_DB_PREFIX."legal_display (";
 		$sql .= "ref";
 		$sql .= ", entity";
 		$sql .= ", date_creation";
@@ -193,7 +193,7 @@ class Legaldisplay extends CommonObject
 
 		if (! $error)
 		{
-			$this->id = $this->db->last_insert_id(MAIN_DB_PREFIX."legaldisplay");
+			$this->id = $this->db->last_insert_id(MAIN_DB_PREFIX."legal_display");
 
 			if (! $notrigger)
 			{
@@ -260,7 +260,7 @@ class Legaldisplay extends CommonObject
 		$sql .= ", t.note_affich";
 
 
-		$sql.= " FROM ".MAIN_DB_PREFIX."legaldisplay as t";
+		$sql.= " FROM ".MAIN_DB_PREFIX."legal_display as t";
 		$sql.= " WHERE t.rowid = ".$id;
 
 		dol_syslog(get_class($this)."::fetch sql=".$sql, LOG_DEBUG);
@@ -340,7 +340,7 @@ class Legaldisplay extends CommonObject
 		// Put here code to add a control on parameters values
 
 		// Update request
-		$sql = "UPDATE ".MAIN_DB_PREFIX."legaldisplay SET";
+		$sql = "UPDATE ".MAIN_DB_PREFIX."legal_display SET";
 
 		$sql.= " ref=".(isset($this->ref)?"'".$this->db->escape($this->ref)."'":"null").",";
 		$sql.= " ref_ext=".(isset($this->ref_ext)?"'".$this->db->escape($this->ref_ext)."'":"null").",";
@@ -434,7 +434,7 @@ class Legaldisplay extends CommonObject
 
 		if (! $error)
 		{
-			$sql = "DELETE FROM ".MAIN_DB_PREFIX."legaldisplay";
+			$sql = "DELETE FROM ".MAIN_DB_PREFIX."legal_display";
 			$sql.= " WHERE rowid=".$this->id;
 
 			dol_syslog(get_class($this)."::delete sql=".$sql);
@@ -597,26 +597,6 @@ class Legaldisplay extends CommonObject
         $result .= $linkend;
 
         return $result;
-	}
-	public function generateDocument($modele, $outputlangs, $hidedetails = 0, $hidedesc = 0, $hideref = 0, $moreparams = null)
-    {
-        global $conf, $langs;
-
-        $langs->load("trips");
-
-	    if (!dol_strlen($modele)) {
-		    $modele = 'einstein';
-
-		    if ($this->modelpdf) {
-			    $modele = $this->modelpdf;
-		    } elseif (!empty($conf->global->EXPENSEREPORT_ADDON_PDF)) {
-			    $modele = $conf->global->EXPENSEREPORT_ADDON_PDF;
-		    }
-	    }
-
-        $modelpath = "custom/digiriskdolibarr/core/modules/digiriskdolibarr/doc/";
-
-        return $this->commonGenerateDocument($modelpath, 'einstein', $outputlangs, $hidedetails, $hidedesc, $hideref, $moreparams);
     }
 }
 

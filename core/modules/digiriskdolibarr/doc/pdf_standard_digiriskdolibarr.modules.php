@@ -31,7 +31,7 @@
  *  \brief      File of class to generate document from standard template
  */
 
-dol_include_once('/digiriskdolibarr/core/modules/digiriskdolibarr/modules_digiriskdolibarr.php');
+dol_include_once('/digiriskdolibarr/core/modules/digiriskdolibarr/modules_legaldisplay.php');
 require_once DOL_DOCUMENT_ROOT.'/product/class/product.class.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/company.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/functions2.lib.php';
@@ -40,7 +40,7 @@ require_once DOL_DOCUMENT_ROOT.'/core/lib/pdf.lib.php';
 /**
  *	Class to manage PDF template standard_digiriskdolibarr
  */
-class pdf_standard_digiriskdolibarr extends ModelePDFMyObject
+class pdf_standard_digiriskdolibarr extends ModelePDFLegalDisplay
 {
     /**
      * @var DoliDb Database handler
@@ -374,7 +374,7 @@ class pdf_standard_digiriskdolibarr extends ModelePDFMyObject
 	            	$info = array(
 	            		'Name' => $this->emetteur->name,
 	            		'Location' => getCountry($this->emetteur->country_code, 0),
-	            		'Reason' => 'MYOBJECT',
+	            		'Reason' => 'LEGALDISPLAY',
 	            		'ContactInfo' => $this->emetteur->email
 	            	);
 	            	$pdf->setSignature($cert, $cert, $this->emetteur->name, '', 2, $info);

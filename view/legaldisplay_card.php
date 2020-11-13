@@ -34,7 +34,6 @@
 //if (! defined('NOREQUIREHTML'))  define('NOREQUIREHTML','1');			// If we don't need to load the html.form.class.php
 //if (! defined('NOREQUIREAJAX'))  define('NOREQUIREAJAX','1');
 //if (! defined("NOLOGIN"))        define("NOLOGIN",'1');				// If this page is public (can be called outside logged session)
-
 // Change this following line to use the correct relative path (../, ../../, etc)
 $res=0;
 if (! $res && file_exists("../main.inc.php")) $res=@include '../main.inc.php';					// to work if your module directory is into dolibarr root htdocs directory
@@ -44,8 +43,14 @@ if (!$res && file_exists("../../../../main.inc.php")) $res = @include "../../../
 if (! $res && file_exists("../../../dolibarr/htdocs/main.inc.php")) $res=@include '../../../dolibarr/htdocs/main.inc.php';     // Used on dev env only
 if (! $res && file_exists("../../../../dolibarr/htdocs/main.inc.php")) $res=@include '../../../../dolibarr/htdocs/main.inc.php';   // Used on dev env only
 if (! $res) die("Include of main fails");
+
 // Change this following line to use the correct relative path from htdocs
 dol_include_once('/digiriskdolibarr/class/legaldisplay.class.php');
+dol_include_once('../core/class/html.formfile.class.php');
+
+dol_include_once('../core/lib/functions2.lib.php');
+dol_include_once('../core/class/html.formorder.class.php');
+dol_include_once('../core/class/html.formmargin.class.php');
 
 // Load traductions files requiredby by page
 $langs->load("companies");
@@ -71,7 +76,7 @@ if ($user->societe_id > 0)
 if (empty($action) && empty($id) && empty($ref)) $action='create';
 
 // Load object if id or ref is provided as parameter
-$object=new Legaldisplay($db);
+$object = new Legaldisplay($db);
 if (($id > 0 || ! empty($ref)) && $action != 'add')
 {
 	$result=$object->fetch($id,$ref);
@@ -110,8 +115,8 @@ if (empty($reshook))
 
 		/* object_prop_getpost_prop */
 		$object->ref = GETPOST("ref");
-		$object->date_debut = strtotime(GETPOST("date_debut"));
-		$object->date_fin = strtotime(GETPOST("date_fin"));
+		$object->date_debut = mktime(GETPOST("date_debut"));
+		$object->date_fin = mktime(GETPOST("date_fin"));
 		$object->fk_soc_labour_doctor = GETPOST("labour_doctor");
 		$object->fk_soc_labour_inspector = GETPOST("labour_inspector");
 		$object->fk_soc_samu = GETPOST("samu");
@@ -120,7 +125,6 @@ if (empty($reshook))
 		$object->fk_soc_rights_defender = GETPOST("rights_defender");
 		$object->fk_soc_antipoison = GETPOST("antipoison");
 		$object->fk_soc_responsible_prevent = GETPOST("responsible_prevent");
-
 
 		if (empty($object->ref))
 		{
@@ -134,7 +138,7 @@ if (empty($reshook))
 			if ($result > 0)
 			{
 				// Creation OK
-				$urltogo=$backtopage?$backtopage:dol_buildpath('/custom/digiriskdolibarr/class/legaldisplay_list.php', 1);
+				$urltogo=$backtopage?$backtopage:dol_buildpath('/custom/digiriskdolibarr/view/legaldisplay_list.php', 1);
 				header("Location: ".$urltogo);
 				exit;
 			}
@@ -228,9 +232,11 @@ $title = $langs->trans("LegalDisplay");
 //if ( !empty( $conf->global->MAIN_HTML_TITLE ) && preg_match('/thirdpartynameonly/', $conf->global->MAIN_HTML_TITLE ) && $object->name ) $title = $object->name." - ".$langs->trans('Card');
 //$help_url = 'EN:Module_Third_Parties|FR:Module_Tiers|ES:Empresas';
 llxHeader( '', $title, '' );
-
 $form = new Form($db);
 $soc = new Societe($db);
+$formfile = new FormFile($db);
+$formorder = new FormOrder($db);
+$formmargin = new FormMargin($db);
 
 
 // Put here content of your page
@@ -373,7 +379,7 @@ jQuery(document).ready(function() {
 if ($action == 'create')
 {
 	print_fiche_titre($langs->trans("LegalDisplay"));
-
+	
 	print '<form method="POST" action="'.$_SERVER["PHP_SELF"].'" name="create">';
 	print '<input type="hidden" name="action" value="add">';
 	print '<input type="hidden" name="backtopage" value="'.$backtopage.'">';
@@ -423,9 +429,32 @@ if ($action == 'create')
 	}
 	else
 	{
+		/*
+		// Contact Medecin du travail
+print '<tr>';
+print '<td class="titlefield">'.$langs->trans("contac").'</td>';
+print '<td>';
+
+
+	$sql = "SELECT p.lastname, p.firstname, p.zip, p.town, p.phone";
+	$sql .= " FROM ".MAIN_DB_PREFIX."expensereport as e, ".MAIN_DB_PREFIX."payment_expensereport as p";
+
+	$sql .= "c.code as p_code, c.libelle as payment_type,";
+	$sql .= " WHERE p.fk_soc = '".$result."'";
+	$resql = $db->query($sql);
+	echo '<pre>'; print_r($resql); echo '</pre>'; exit;
+
+
+		*/
 		print '<tr><td class="fieldrequired">'.$langs->trans('LabourDoctor').'</td>';
 		print '<td colspan="2">';
 		print $form->select_company($soc->id, 'labour_doctor', '', 'SelectThirdParty', 0, 0, null, 0, 'minwidth300');
+
+		print '<tr><td class="fieldrequired">'.$langs->trans('Contact').'</td>';
+		print '<td colspan="2">';
+		$contactid = (GETPOST('userid') ? GETPOST('userid') : GETPOST('contactid'));
+		$result = $object->add_contact($contactid, GETPOST('type'), GETPOST('source'));
+		$form->select_contacts($contactid);
 
 		print '<tr><td class="fieldrequired">'.$langs->trans('LabourInspector').'</td>';
 		print '<td colspan="2">';
@@ -477,8 +506,9 @@ if ($action == 'create')
 	dol_fiche_end();
 
 	print '<div class="center"><input type="submit" class="button" name="add" value="'.$langs->trans("Create").'"> &nbsp; <input type="submit" class="button" name="cancel" value="'.$langs->trans("Cancel").'"></div>';
-
+	
 	print '</form>';
+
 }
 
 
@@ -501,20 +531,189 @@ if (($id || $ref) && $action == 'edit')
 	print '</form>';
 }
 
-
-
+// ICI C'EST LACTION VIEW
 // Part to show record
-if ($id && (empty($action) || $action == 'view'))
-{
-	dol_fiche_head();
 
 
+print '<h1>'.$action.'</h1><br/>';
+	dol_fiche_head($head, 'card', $langs->trans("LegalDisplay"), -1, 'trip');
+            	// Ref
+            	print '<tr><td class="titlefieldcreate">'.$langs->trans("Ref").'</td><td>';
+            	print $form->showrefnav($object, 'ref', $linkback, 1, 'ref', 'ref', '');
+            	print '</td></tr>';
+
+				print '<div class="fichecenter">';
+				print '<div class="fichehalfleft">';
+				print '<div class="underbanner clearboth"></div>';
+
+				print '<table class="border tableforfield centpercent">';
+
+				// Créé par
+
+				print '<tr>';
+				print '<td class="titlefield">'.$langs->trans("Créé par").'</td>';
+				print '<td>';
+
+				if ($object->fk_user_creat > 0)
+				{
+				    $usercreat = new User($db);
+				    $result = $usercreat->fetch($object->fk_user_creat);
+				    if ($result < 0) dol_print_error('', $usercreat->error);
+				    elseif ($result > 0) print $usercreat->getNomUrl(-1);
+				}
+				print '</td></tr>';
+
+				// Date début
+				
+				print '<tr>';
+				print '<td class="titlefield">'.$langs->trans("Début").'</td>';
+				print '<td>'.dol_print_date($object->date_debut, 'dayhour');
+				print '</td>';
+				print '</tr>';
+
+				// Date  fin
+
+				print '<tr>';
+				print '<td class="titlefield">'.$langs->trans("Fin").'</td>';
+				print '<td>'.dol_print_date($object->date_fin, 'dayhour');
+				print '</td>';
+				print '</tr>';
+
+				// Médecin du travail
+
+				print '<tr>';
+				print '<td class="titlefield">'.$langs->trans("Labourdoctor").'</td>';
+				print '<td>';
+
+				if ($object->fk_soc_labour_doctor > 0)
+				{
+				    $labourdoctor = new User($db);
+				    $result = $labourdoctor->fetch($object->fk_soc_labour_doctor);
+				    if ($result < 0) dol_print_error('', $labourdoctor->error);
+				    elseif ($result > 0) print $labourdoctor->getNomUrl(-1);
+				}
+				
+				print '</td></tr>';
+
+				// Inspecteur du travail
+				print '<tr>';
+				print '<td class="titlefield">'.$langs->trans("Labourinspector").'</td>';
+				print '<td>';
+
+				if ($object->fk_soc_labour_inspector > 0)
+				{
+				    $labourinspector = new User($db);
+				    $result = $labourinspector->fetch($object->fk_soc_labour_inspector);
+				    if ($result < 0) dol_print_error('', $labourinspector->error);
+				    elseif ($result > 0) print $labourinspector->getNomUrl(-1);
+				}
+
+				print '</td></tr>';
+
+				// SAMU
+
+				print '<tr>';
+				print '<td class="titlefield">'.$langs->trans("SAMU").'</td>';
+				print '<td>';
+
+				if ($object->fk_soc_samu > 0)
+				{
+				    $samu = new User($db);
+				    $result = $samu->fetch($object->fk_soc_samu);
+				    if ($result < 0) dol_print_error('', $samu->error);
+				    elseif ($result > 0) print $samu->getNomUrl(-1);
+				}
+
+				print '</td></tr>';
+
+				// Police
+				
+				print '<tr>';
+				print '<td class="titlefield">'.$langs->trans("Police").'</td>';
+				print '<td>';
+
+				if ($object->fk_soc_police > 0)
+				{
+				    $police = new User($db);
+				    $result = $police->fetch($object->fk_soc_police);
+				    if ($result < 0) dol_print_error('', $police->error);
+				    elseif ($result > 0) print $police->getNomUrl(-1);
+				}
+
+				print '</td></tr>';
+
+				// Urgences
+
+				print '<tr>';
+				print '<td class="titlefield">'.$langs->trans("Urgencies").'</td>';
+				print '<td>';
+
+				if ($object->fk_soc_urgency > 0)
+				{
+				    $urgencies = new User($db);
+				    $result = $urgencies->fetch($object->fk_soc_urgency);
+				    if ($result < 0) dol_print_error('', $urgencies->error);
+				    elseif ($result > 0) print $urgencies->getNomUrl(-1);
+				}
+
+				print '</td></tr>';
+
+				// Défenseur du droit du travail
+
+				print '<tr>';
+				print '<td class="titlefield">'.$langs->trans("Rights Defender").'</td>';
+				print '<td>';
+
+				if ($object->fk_soc_rights_defender > 0)
+				{
+				    $rights_defender = new User($db);
+				    $result = $rights_defender->fetch($object->fk_soc_rights_defender);
+				    if ($result < 0) dol_print_error('', $rights_defender->error);
+				    elseif ($result > 0) print $rights_defender->getNomUrl(-1);
+				}
+
+				print '</td></tr>';
+
+				// Antipoison
+
+				print '<tr>';
+				print '<td class="titlefield">'.$langs->trans("Antipoison").'</td>';
+				print '<td>';
+
+				if ($object->fk_soc_antipoison > 0)
+				{
+				    $antipoison = new User($db);
+				    $result = $antipoison->fetch($object->fk_soc_antipoison);
+				    if ($result < 0) dol_print_error('', $antipoison->error);
+				    elseif ($result > 0) print $antipoison->getNomUrl(-1);
+				}
+
+				print '</td></tr>';
+
+				// Responsable de prévention
+
+				print '<tr>';
+				print '<td class="titlefield">'.$langs->trans("Responsible Prevent").'</td>';
+				print '<td>';
+
+				if ($object->fk_soc_responsible_prevent > 0)
+				{
+				    $responsible_prevent = new User($db);
+				    $result = $responsible_prevent->fetch($object->fk_soc_responsible_prevent);
+				    if ($result < 0) dol_print_error('', $responsible_prevent->error);
+				    elseif ($result > 0) print $responsible_prevent->getNomUrl(-1);
+				}
+				print '</td></tr>';
+				print('</table>');
+				print('</div></div>');
 
 	dol_fiche_end();
 
 
 	// Buttons
+	/*
 	print '<div class="tabsAction">'."\n";
+
 	$parameters=array();
 	$reshook=$hookmanager->executeHooks('addMoreActionsButtons',$parameters,$object,$action);    // Note that $action and $object may have been modified by hook
 	if ($reshook < 0) setEventMessages($hookmanager->error, $hookmanager->errors, 'errors');
@@ -539,14 +738,40 @@ if ($id && (empty($action) || $action == 'view'))
 		}
 	}
 	print '</div>'."\n";
+*/		$upload_dir = $conf->adherent->dir_output;
+		$permissiontoadd = $user->rights->adherent->creer;
+		include DOL_DOCUMENT_ROOT.'/core/actions_builddoc.inc.php';
+	
+	if ($action != 'presend')
+	{
+		print '<!-- Tototutu -->'; 
 
+		print '<a name="builddoc"></a>'; // ancre
+		// Documents
+		$filename = dol_sanitizeFileName($object->ref);
+	
+		$relativepath = $objref.'/'.$objref.'.pdf';
+		$filedir = DOL_DATA_ROOT . '/digiriskdolibarr/legaldisplay';
 
+		$urlsource = $_SERVER["PHP_SELF"]."?id=".$id;
+		$genallowed = 1;
+		$delallowed = 1;
+	//	echo '<pre>'; var_dump([$objref, $filedir, $urlsource, $genallowed, $delallowed, $object->model_pdf, 1, 0, 0, 28, 0, '', '', '', $soc->default_lang, '', $object]); echo '</pre>'; exit;
+
+		print $formfile->showdocuments('digiriskdolibarr:legaldisplay',  $filename, $filedir, $urlsource, $genallowed, $delallowed);
+		$usercancreate = 1;
+	
+	}
+		// Actions to build doc
+	
 	// Example 2 : Adding links to objects
 	//$somethingshown=$form->showLinkedObjectBlock($object);
 	//$linktoelem = $form->showLinkToObjectBlock($object);
 	//if ($linktoelem) print '<br>'.$linktoelem;
 
-}
+// Select mail models is same action as presend
+
+
 
 
 // End of page
