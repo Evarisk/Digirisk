@@ -110,8 +110,8 @@ if (empty($reshook))
 
 		/* object_prop_getpost_prop */
 		$object->ref = GETPOST("ref");
-		$object->date_debut = strtotime(GETPOST("date_debut"));
-		$object->date_fin = strtotime(GETPOST("date_fin"));
+		$object->date_debut = mktime(GETPOST("date_debut"));
+		$object->date_fin = mktime(GETPOST("date_fin"));
 		$object->fk_soc_labour_doctor = GETPOST("labour_doctor");
 		$object->fk_soc_labour_inspector = GETPOST("labour_inspector");
 		$object->fk_soc_samu = GETPOST("samu");
@@ -120,7 +120,6 @@ if (empty($reshook))
 		$object->fk_soc_rights_defender = GETPOST("rights_defender");
 		$object->fk_soc_antipoison = GETPOST("antipoison");
 		$object->fk_soc_responsible_prevent = GETPOST("responsible_prevent");
-
 
 		if (empty($object->ref))
 		{
@@ -373,7 +372,7 @@ jQuery(document).ready(function() {
 if ($action == 'create')
 {
 	print_fiche_titre($langs->trans("LegalDisplay"));
-
+	
 	print '<form method="POST" action="'.$_SERVER["PHP_SELF"].'" name="create">';
 	print '<input type="hidden" name="action" value="add">';
 	print '<input type="hidden" name="backtopage" value="'.$backtopage.'">';
@@ -477,8 +476,9 @@ if ($action == 'create')
 	dol_fiche_end();
 
 	print '<div class="center"><input type="submit" class="button" name="add" value="'.$langs->trans("Create").'"> &nbsp; <input type="submit" class="button" name="cancel" value="'.$langs->trans("Cancel").'"></div>';
-
+	
 	print '</form>';
+
 }
 
 
@@ -502,12 +502,171 @@ if (($id || $ref) && $action == 'edit')
 }
 
 
-
+// ICI C'EST LACTION VIEW
 // Part to show record
 if ($id && (empty($action) || $action == 'view'))
 {
-	dol_fiche_head();
+	
+	dol_fiche_head($head, 'card', $langs->trans("LegalDisplay"), -1, 'trip');
+	print '</td></tr>';
 
+            	// Ref
+            	print '<tr><td class="titlefieldcreate">'.$langs->trans("Ref").'</td><td>';
+            	print $form->showrefnav($object, 'ref', $linkback, 1, 'ref', 'ref', '');
+            	print '</td></tr>';
+
+				print '<div class="fichecenter">';
+				print '<div class="fichehalfleft">';
+				print '<div class="underbanner clearboth"></div>';
+
+				print '<table class="border tableforfield centpercent">';
+
+				// Créé par
+
+				print '<tr>';
+				print '<td class="titlefield">'.$langs->trans("Créé par").'</td>';
+				print '<td>';
+
+				if ($object->fk_user_creat > 0)
+				{
+				    $usercreat = new User($db);
+				    $result = $usercreat->fetch($object->fk_user_creat);
+				    if ($result < 0) dol_print_error('', $usercreat->error);
+				    elseif ($result > 0) print $usercreat->getNomUrl(-1);
+				}
+				
+				// Date début
+
+				print '</td></tr>';
+				print '<tr>';
+				print '<td class="titlefield">'.$langs->trans("Début").'</td>';
+				print '<td>';
+				print '<td>'.dol_print_date($object->date_debut, 'dayhour');
+				print '</td>';
+				print '</tr>';
+				// Date  fin
+
+				print '</td></tr>';
+				print '<tr>';
+				print '<td class="titlefield">'.$langs->trans("Fin").'</td>';
+				print '<td>';
+				print '<td>'.dol_print_date($object->date_fin, 'dayhour');
+				print '</td>';
+				print '</tr>';
+
+				// Médecin du travail
+				print '<tr>';
+				print '<td class="titlefield">'.$langs->trans("Labourdoctor").'</td>';
+				print '<td>';
+
+				if ($object->fk_soc_labour_doctor > 0)
+				{
+				    $labourdoctor = new User($db);
+				    $result = $labourdoctor->fetch($object->fk_soc_labour_doctor);
+				    if ($result < 0) dol_print_error('', $labourdoctor->error);
+				    elseif ($result > 0) print $labourdoctor->getNomUrl(-1);
+				}
+
+				// Médecin du travail
+				print '<tr>';
+				print '<td class="titlefield">'.$langs->trans("Labourdoctor").'</td>';
+				print '<td>';
+
+				if ($object->fk_soc_labour_doctor > 0)
+				{
+				    $labourdoctor = new User($db);
+				    $result = $labourdoctor->fetch($object->fk_soc_labour_doctor);
+				    if ($result < 0) dol_print_error('', $labourdoctor->error);
+				    elseif ($result > 0) print $labourdoctor->getNomUrl(-1);
+				}
+
+
+				// Inspecteur du travail
+				print '<tr>';
+				print '<td class="titlefield">'.$langs->trans("Labourinspector").'</td>';
+				print '<td>';
+
+				if ($object->fk_soc_labour_inspector > 0)
+				{
+				    $labourinspector = new User($db);
+				    $result = $labourinspector->fetch($object->fk_soc_labour_inspector);
+				    if ($result < 0) dol_print_error('', $labourinspector->error);
+				    elseif ($result > 0) print $labourinspector->getNomUrl(-1);
+				}
+
+				// SAMU
+				print '<tr>';
+				print '<td class="titlefield">'.$langs->trans("SAMU").'</td>';
+				print '<td>';
+
+				if ($object->fk_soc_samu > 0)
+				{
+				    $samu = new User($db);
+				    $result = $samu->fetch($object->fk_soc_samu);
+				    if ($result < 0) dol_print_error('', $samu->error);
+				    elseif ($result > 0) print $samu->getNomUrl(-1);
+				}
+				// Police
+				print '<tr>';
+				print '<td class="titlefield">'.$langs->trans("Police").'</td>';
+				print '<td>';
+
+				if ($object->fk_soc_police > 0)
+				{
+				    $police = new User($db);
+				    $result = $police->fetch($object->fk_soc_police);
+				    if ($result < 0) dol_print_error('', $police->error);
+				    elseif ($result > 0) print $police->getNomUrl(-1);
+				}
+				// Urgences
+				print '<tr>';
+				print '<td class="titlefield">'.$langs->trans("Urgencies").'</td>';
+				print '<td>';
+
+				if ($object->fk_soc_urgency > 0)
+				{
+				    $urgencies = new User($db);
+				    $result = $urgencies->fetch($object->fk_soc_urgency);
+				    if ($result < 0) dol_print_error('', $urgencies->error);
+				    elseif ($result > 0) print $urgencies->getNomUrl(-1);
+				}
+				// Défenseur du droit du travail
+				print '<tr>';
+				print '<td class="titlefield">'.$langs->trans("Rights Defender").'</td>';
+				print '<td>';
+
+				if ($object->fk_soc_rights_defender > 0)
+				{
+				    $rights_defender = new User($db);
+				    $result = $rights_defender->fetch($object->fk_soc_rights_defender);
+				    if ($result < 0) dol_print_error('', $rights_defender->error);
+				    elseif ($result > 0) print $rights_defender->getNomUrl(-1);
+				}
+				// Antipoison
+				print '<tr>';
+				print '<td class="titlefield">'.$langs->trans("Antipoison").'</td>';
+				print '<td>';
+
+				if ($object->fk_soc_antipoison > 0)
+				{
+				    $antipoison = new User($db);
+				    $result = $antipoison->fetch($object->fk_soc_antipoison);
+				    if ($result < 0) dol_print_error('', $antipoison->error);
+				    elseif ($result > 0) print $antipoison->getNomUrl(-1);
+				}
+
+				// Responsable de prévention
+				print '<tr>';
+				print '<td class="titlefield">'.$langs->trans("Responsible Prevent").'</td>';
+				print '<td>';
+
+				if ($object->fk_soc_responsible_prevent > 0)
+				{
+				    $responsible_prevent = new User($db);
+				    $result = $responsible_prevent->fetch($object->fk_soc_responsible_prevent);
+				    if ($result < 0) dol_print_error('', $responsible_prevent->error);
+				    elseif ($result > 0) print $responsible_prevent->getNomUrl(-1);
+				}
 
 
 	dol_fiche_end();

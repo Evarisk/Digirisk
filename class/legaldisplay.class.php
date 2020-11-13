@@ -237,7 +237,7 @@ class Legaldisplay extends CommonObject
 	function fetch($id)
 	{
 		global $langs;
-		$sql = "SELECT";
+		$sql = "SELECT ";
 		$sql .= "t.ref";
 		$sql .= ", t.entity";
 		$sql .= ", t.date_creation";
@@ -271,24 +271,26 @@ class Legaldisplay extends CommonObject
 			{
 				$obj = $this->db->fetch_object($resql);
 
-				$this->id    = $obj->rowid;
-
 				$this->ref = $obj->ref;
-				$this->ref_ext = $obj->ref_ext;
 				$this->entity = $obj->entity;
 				$this->date_creation = $this->db->jdate($obj->date_creation);
-				$this->tms = $this->db->jdate($obj->tms);
-				$this->date_valid = $this->db->jdate($obj->date_valid);
+				$this->date_debut = $this->db->jdate($obj->date_debut);
+				$this->date_fin = $this->db->jdate($obj->date_fin);
+				$this->fk_soc_labour_doctor = $obj->fk_soc_labour_doctor;
+				$this->fk_soc_labour_inspector = $obj->fk_soc_labour_inspector;
+				$this->fk_soc_samu = $obj->fk_soc_samu;
+				$this->fk_soc_police = $obj->fk_soc_police;
+				$this->fk_soc_urgency = $obj->fk_soc_urgency;
+				$this->fk_soc_rights_defender = $obj->fk_soc_rights_defender;
+				$this->fk_soc_antipoison = $obj->fk_soc_antipoison;
+				$this->fk_soc_responsible_prevent = $obj->fk_soc_responsible_prevent;
 				$this->description = $obj->description;
 				$this->import_key = $obj->import_key;
 				$this->status = $obj->status;
 				$this->fk_user_creat = $obj->fk_user_creat;
-				$this->fk_user_modif = $obj->fk_user_modif;
-				$this->fk_user_valid = $obj->fk_user_valid;
 				$this->model_pdf = $obj->model_pdf;
 				$this->model_odt = $obj->model_odt;
 				$this->note_affich = $obj->note_affich;
-
 
 			}
 			$this->db->free($resql);
@@ -544,8 +546,8 @@ class Legaldisplay extends CommonObject
 	}
 	public function getNomUrl($withpicto = 0, $max = 0, $short = 0, $moretitle = '', $notooltip = 0, $save_lastsearch_value = -1)
     {
-        global $langs, $conf;
-
+		global $langs, $conf;
+	
         $result = '';
 
         $url = DOL_URL_ROOT.'/custom/digiriskdolibarr/sql/legaldisplay_card.php?id='.$this->id;

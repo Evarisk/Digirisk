@@ -226,7 +226,8 @@ jQuery(document).ready(function() {
 
 
 $sql = "SELECT";
-$sql .= " t.ref";
+$sql .= " t.rowid";
+$sql .= ", t.ref";
 $sql .= ", t.entity";
 $sql .= ", t.date_creation";
 $sql .= ", t.date_debut";
@@ -358,12 +359,12 @@ if ($sall)
 	foreach($fieldstosearchall as $key => $val) $fieldstosearchall[$key]=$langs->trans($val);
 	print $langs->trans("FilterOnInto", $sall) . join(', ',$fieldstosearchall);
 }
-
+/*
 $moreforfilter = '';
 $moreforfilter.='<div class="divsearchfield">';
-$moreforfilter.= $langs->trans('MyFilter') . ': <input type="text" name="search_myfield" value="'.dol_escape_htmltag($search_myfield).'">';
+$moreforfilter.= $langs->trans('Filtres') . ': <input type="text" name="search_myfield" value="'.dol_escape_htmltag($search_myfield).'">';
 $moreforfilter.= '</div>';
-
+*/
 $parameters=array();
 $reshook=$hookmanager->executeHooks('printFieldPreListTitle',$parameters);    // Note that $action and $object may have been modified by hook
 if (empty($reshook)) $moreforfilter .= $hookmanager->resPrint;
@@ -412,7 +413,6 @@ if (! empty($arrayfields['t.datec']['checked']))  print_liste_field_titre($array
 if (! empty($arrayfields['t.tms']['checked']))    print_liste_field_titre($arrayfields['t.tms']['label'],$_SERVER["PHP_SELF"],"t.tms","",$param,'align="center" class="nowrap"',$sortfield,$sortorder);
 //if (! empty($arrayfields['t.status']['checked'])) print_liste_field_titre($langs->trans("Status"),$_SERVER["PHP_SELF"],"t.status","",$param,'align="center"',$sortfield,$sortorder);
 print_liste_field_titre($selectedfields, $_SERVER["PHP_SELF"],"",'','','align="right"',$sortfield,$sortorder,'maxwidthsearch ');
-print '</tr>'."\n";
 
 // Fields title search
 print '<tr class="liste_titre">';
@@ -446,23 +446,20 @@ if (is_array($extrafields->attribute_label) && count($extrafields->attribute_lab
 $parameters=array('arrayfields'=>$arrayfields);
 $reshook=$hookmanager->executeHooks('printFieldListOption',$parameters);    // Note that $action and $object may have been modified by hook
 print $hookmanager->resPrint;
+/*
 if (! empty($arrayfields['t.date_debut']['checked']))
 {
 	// Date creation
 	print '<td class="liste_titre">';
 	print '</td>';
 }
-
+*/
 $legaldisplaystatic = new Legaldisplay($db);
 $thirdpartystatic = new Societe($db);
 
 
-if (! empty($arrayfields['t.ref']['checked']))
-{
-	// Date modification
-	print '<td class="liste_titre">';
-	print '</td>';
-}
+print  '</tr>';
+
 /*if (! empty($arrayfields['u.statut']['checked']))
 {
     // Status
@@ -471,12 +468,13 @@ if (! empty($arrayfields['t.ref']['checked']))
     print '</td>';
 }*/
 // Action column
+/*
 print '<td class="liste_titre" align="right">';
 $searchpitco=$form->showFilterAndCheckAddButtons($massactionbutton?1:0, 'checkforselect', 1);
 print $searchpitco;
 print '</td>';
 print '</tr>'."\n";
-
+*/
 
 $i=0;
 $var=true;
@@ -484,7 +482,8 @@ $totalarray=array();
 while ($i < min($num, $limit))
 {
 	$obj = $db->fetch_object($resql);
-
+	
+	$legaldisplaystatic->id = $obj->rowid;
 	$legaldisplaystatic->ref = $obj->ref;
 	$legaldisplaystatic->entity = $obj->entity;
 	$legaldisplaystatic->date_creation = $obj->date_creation;
@@ -519,20 +518,6 @@ while ($i < min($num, $limit))
 		
 		$var = !$var;
 
-		// Show here line of result
-		print '<tr class="oddeven" '.$bc[$var].'>';
-		// LIST_OF_TD_FIELDS_LIST
-		
-		/*if (! empty($arrayfields['t.ref']['checked']))
-		{
-			print '<td>'.$obj->field1.'</td>';
-			if (! $i) $totalarray['nbfield']++;
-		}
-		if (! empty($arrayfields['t.date_debut']['checked']))
-		{
-			print '<td>'.$obj->field2.'</td>';
-			if (! $i) $totalarray['nbfield']++;
-		}*/
 		// Extra fields
 		if (is_array($extrafields->attribute_label) && count($extrafields->attribute_label))
 		{
@@ -552,16 +537,16 @@ while ($i < min($num, $limit))
 			}
 		}
 		// Fields from hook
-		$parameters=array('arrayfields'=>$arrayfields, 'obj'=>$obj);
+		/*$parameters=array('arrayfields'=>$arrayfields, 'obj'=>$obj);
 		$reshook=$hookmanager->executeHooks('printFieldListValue',$parameters);    // Note that $action and $object may have been modified by hook
 		
-		print $hookmanager->resPrint;
+		print $hookmanager->resPrint;*/
+		print '<tr class="oddeven">';
+
 		// Ref
 		if (! empty($arrayfields['t.ref']['checked']))
 		{
-			print '<td>';
-			print '<table class="nobordernopadding"><tr class="nocellnopadd">';
-			print '<td class="nobordernopadding nowrap">';
+			print '<td class="tdoverflowmax200">';
 			print $legaldisplaystatic->getNomUrl(1);
 			print '</td>';
 		}
@@ -569,7 +554,7 @@ while ($i < min($num, $limit))
 
 		if (! empty($arrayfields['t.date_debut']['checked']))
 		{
-			print '<td align="center">';
+			print '<td class="tdoverflowmax200">';
 			print dol_print_date($db->jdate($obj->date_debut), 'day');
 			print '</td>';
 			if (! $i) $totalarray['nbfield']++;
@@ -577,7 +562,7 @@ while ($i < min($num, $limit))
 		// Date modification
 		if (! empty($arrayfields['t.date_fin']['checked']))
 		{
-			print '<td align="center">';
+			print '<td class="tdoverflowmax200">';
 			print dol_print_date($db->jdate($obj->date_fin), 'day');
 			print '</td>';
 			if (! $i) $totalarray['nbfield']++;
@@ -617,8 +602,8 @@ while ($i < min($num, $limit))
 		}
 		print '</td>';
 		if (! $i) $totalarray['nbfield']++;
-
 		print '</tr>';
+
 	}
 	$i++;
 }
@@ -655,7 +640,7 @@ print '</div>'."\n";
 
 print '</form>'."\n";
 
-
+/*
 if ($massaction == 'builddoc' || $action == 'remove_file' || $show_files)
 {
 	// Show list of available documents
@@ -673,7 +658,7 @@ else
 	print '<br><a name="show_files"></a><a href="'.$_SERVER["PHP_SELF"].'?show_files=1'.$param.'#show_files">'.$langs->trans("ShowTempMassFilesArea").'</a>';
 }
 
-
+*/
 // End of page
 llxFooter();
 $db->close();
