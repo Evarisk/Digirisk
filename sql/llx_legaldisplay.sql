@@ -21,6 +21,7 @@ create table llx_legaldisplay
   status                      smallint,
   fk_user_creat               integer default NULL,
   fk_user_modif               integer default NULL,
+  last_main_doc               varchar(255),
   model_pdf                   varchar(255),
   model_odt                   varchar(255),
   note_affich                 varchar(255)

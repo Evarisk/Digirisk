@@ -114,6 +114,7 @@ if (empty($reshook))
 		$error=0;
 
 		/* object_prop_getpost_prop */
+		$object->id = GETPOST("id");
 		$object->ref = GETPOST("ref");
 		$object->date_debut = mktime(GETPOST("date_debut"));
 		$object->date_fin = mktime(GETPOST("date_fin"));
@@ -138,7 +139,7 @@ if (empty($reshook))
 			if ($result > 0)
 			{
 				// Creation OK
-				$urltogo=$backtopage?$backtopage:dol_buildpath('/custom/digiriskdolibarr/view/legaldisplay_list.php', 1);
+				$urltogo=$backtopage?$backtopage:dol_buildpath('/custom/digiriskdolibarr/view/legaldisplay_card.php'.'?id='.$object->id, 1);
 				header("Location: ".$urltogo);
 				exit;
 			}
@@ -219,560 +220,562 @@ if (empty($reshook))
 			else setEventMessages($object->error,null,'errors');
 		}
 	}
-}
-
-
-
-
-/***************************************************
- * VIEW
- ****************************************************/
-
-$title = $langs->trans("LegalDisplay");
-//if ( !empty( $conf->global->MAIN_HTML_TITLE ) && preg_match('/thirdpartynameonly/', $conf->global->MAIN_HTML_TITLE ) && $object->name ) $title = $object->name." - ".$langs->trans('Card');
-//$help_url = 'EN:Module_Third_Parties|FR:Module_Tiers|ES:Empresas';
-llxHeader( '', $title, '' );
-$form = new Form($db);
-$soc = new Societe($db);
-$formfile = new FormFile($db);
-$formorder = new FormOrder($db);
-$formmargin = new FormMargin($db);
-
-
-// Put here content of your page
-
-// Example : Adding jquery code
-print '<script type="text/javascript" language="javascript">
-jQuery(document).ready(function() {
-	function init_myfunc()
+	else 
 	{
-		jQuery("#myid").removeAttr(\'disabled\');
-		jQuery("#myid").attr(\'disabled\',\'disabled\');
-	}
-	init_myfunc();
-	jQuery("#mybutton").click(function() {
-		init_needroot();
-	});
-});
-</script>';
+		/***************************************************
+		 * VIEW
+		 ****************************************************/
 
+		// Appelle actions_builddoc.inc qui envoie les headers
+		// Doit absolument être avant les print sinon les headers ne fonctionnent pas
+		$upload_dir = $conf->digiriskdolibarr->multidir_output[1] . '/'. get_exdir(0, 0, 0, 0, $object, 'member');
+		$permissiontoadd = 1;
+		include DOL_DOCUMENT_ROOT.'/core/actions_builddoc.inc.php';
 
-// Part to show a list
-//if ($action == 'list' || empty($id))
-//{
-//	$sql = "SELECT";
-//	$sql.= " rowid,";
-//
-//		$sql.= " ref,";
-//		$sql.= " ref_ext,";
-//		$sql.= " entity,";
-//		$sql.= " date_creation,";
-//		$sql.= " tms,";
-//		$sql.= " date_valid,";
-//		$sql.= " description,";
-//		$sql.= " import_key,";
-//		$sql.= " status,";
-//		$sql.= " fk_user_creat,";
-//		$sql.= " fk_user_modif,";
-//		$sql.= " fk_user_valid,";
-//		$sql.= " model_pdf,";
-//		$sql.= " model_odt,";
-//		$sql.= " note_affich";
-//
-//
-//	// Add fields for extrafields
-////	foreach ($extrafields->attribute_list as $key => $val) $sql.=",ef.".$key.' as options_'.$key;
-////	// Add fields from hooks
-////	$parameters=array();
-////	$reshook=$hookmanager->executeHooks('printFieldListSelect',$parameters);    // Note that $action and $object may have been modified by hook
-////	$sql.=$hookmanager->resPrint;
-////	$sql.= " FROM ".MAIN_DB_PREFIX."legal_display as t";
-////	$sql.= " WHERE field3 = 'xxx'";
-////	// Add where from hooks
-////	$parameters=array();
-////	$reshook=$hookmanager->executeHooks('printFieldListWhere',$parameters);    // Note that $action and $object may have been modified by hook
-////	$sql.=$hookmanager->resPrint;
-////	$sql.= " ORDER BY field1 ASC";
-//
-//	print '<form method="GET" id="searchFormList" action="'.$_SERVER["PHP_SELF"].'">';
-//
-//	if (! empty($moreforfilter))
-//	{
-//		print '<div class="liste_titre">';
-//		print $moreforfilter;
-//		$parameters=array();
-//		$reshook=$hookmanager->executeHooks('printFieldPreListTitle',$parameters);    // Note that $action and $object may have been modified by hook
-//		print $hookmanager->resPrint;
-//		print '</div>';
-//	}
-//
-//	print '<table class="noborder">'."\n";
-//
-//	// Fields title
-//	print '<tr class="liste_titre">';
-//	print_liste_field_titre($langs->trans('field1'),$_SERVER['PHP_SELF'],'t.field1','',$param,'',$sortfield,$sortorder);
-//	print_liste_field_titre($langs->trans('field2'),$_SERVER['PHP_SELF'],'t.field2','',$param,'',$sortfield,$sortorder);
-//	$parameters=array();
-//	$reshook=$hookmanager->executeHooks('printFieldListTitle',$parameters);    // Note that $action and $object may have been modified by hook
-//	print $hookmanager->resPrint;
-//	print '</tr>'."\n";
-//
-//	// Fields title search
-//	print '<tr class="liste_titre">';
-//	print '<td class="liste_titre">';
-//	print '<input type="text" class="flat" name="search_field1" value="'.$search_field1.'" size="10">';
-//	print '</td>';
-//	print '<td class="liste_titre">';
-//	print '<input type="text" class="flat" name="search_field2" value="'.$search_field2.'" size="10">';
-//	print '</td>';
-//	$parameters=array();
-//	$reshook=$hookmanager->executeHooks('printFieldListOption',$parameters);    // Note that $action and $object may have been modified by hook
-//	print $hookmanager->resPrint;
-//	print '</tr>'."\n";
-//
-//
-//	dol_syslog($script_file, LOG_DEBUG);
-//	$resql=$db->query($sql);
-//	if ($resql)
-//	{
-//		$num = $db->num_rows($resql);
-//		$i = 0;
-//		while ($i < $num)
-//		{
-//			$obj = $db->fetch_object($resql);
-//			if ($obj)
-//			{
-//				// You can use here results
-//				print '<tr>';
-//				print '<td>';
-//				print $obj->field1;
-//				print '</td><td>';
-//				print $obj->field2;
-//				print '</td>';
-//				$parameters=array('obj' => $obj);
-//				$reshook=$hookmanager->executeHooks('printFieldListValue',$parameters);    // Note that $action and $object may have been modified by hook
-//				print $hookmanager->resPrint;
-//				print '</tr>';
-//			}
-//			$i++;
-//		}
-//	}
-//	else
-//	{
-//		$error++;
-//		dol_print_error($db);
-//	}
-//
-//	$db->free($resql);
-//
-//	$parameters=array('sql' => $sql);
-//	$reshook=$hookmanager->executeHooks('printFieldListFooter',$parameters);    // Note that $action and $object may have been modified by hook
-//	print $hookmanager->resPrint;
-//
-//	print "</table>\n";
-//	print "</form>\n";
-//}
-//
+		$title = $langs->trans("LegalDisplay");
 
+		//if ( !empty( $conf->global->MAIN_HTML_TITLE ) && preg_match('/thirdpartynameonly/', $conf->global->MAIN_HTML_TITLE ) && $object->name ) $title = $object->name." - ".$langs->trans('Card');
+		//$help_url = 'EN:Module_Third_Parties|FR:Module_Tiers|ES:Empresas';
+		$form = new Form($db);
+		$soc = new Societe($db);
+		$formfile = new FormFile($db);
+		$formmargin = new FormMargin($db);
 
-// Create
-if ($action == 'create')
-{
-	print_fiche_titre($langs->trans("LegalDisplay"));
-	
-	print '<form method="POST" action="'.$_SERVER["PHP_SELF"].'" name="create">';
-	print '<input type="hidden" name="action" value="add">';
-	print '<input type="hidden" name="backtopage" value="'.$backtopage.'">';
+		llxHeader('', $title, '');
 
-	dol_fiche_head();
+		// Put here content of your page
 
-	print '<table class="border centpercent">'."\n";
-	print '<tr><td class="fieldrequired">'.$langs->trans("Ref").'</td><td>';
-	print '<input class="flat" type="text" size="36" name="ref" value="'.$ref.'">';
-	print '</td></tr>';
-
-	// Date start
-	print '<tr>';
-	print '<td class="titlefieldcreate fieldrequired">'.$langs->trans("DateStart").'</td>';
-	print '<td>';
-	print $form->selectDate($date_start ? $date_start : -1, 'date_debut', 0, 0, 0, '', 1, 1);
-	print '</td>';
-	print '</tr>';
-
-	// Date end
-	print '<tr>';
-	print '<td class="fieldrequired">'.$langs->trans("DateEnd").'</td>';
-	print '<td>';
-	print $form->selectDate($date_end ? $date_end : -1, 'date_fin', 0, 0, 0, '', 1, 1);
-	print '</td>';
-	print '</tr>';
-
-	if ( $soc->id > 0 && ( ! GETPOST( 'fac_rec', 'int' ) || !empty( $invoice_predefined->frequency ) ) ) {
-		// If thirdparty known and not a predefined invoiced without a recurring rule
-		print '<tr><td class="fieldrequired">'.$langs->trans('Customer').'</td>';
-		print '<td colspan="2">';
-		print $soc->getNomUrl(1);
-		print '<input type="hidden" name="socid" value="'.$soc->id.'">';
-		// Outstanding Bill
-		$arrayoutstandingbills = $soc->getOutstandingBills();
-		$outstandingBills = $arrayoutstandingbills['opened'];
-		print ' ('.$langs->trans('CurrentOutstandingBill').': ';
-		print price($outstandingBills, '', $langs, 0, 0, -1, $conf->currency);
-		if ($soc->outstanding_limit != '')
-		{
-			if ($outstandingBills > $soc->outstanding_limit) print img_warning($langs->trans("OutstandingBillReached"));
-			print ' / '.price($soc->outstanding_limit, '', $langs, 0, 0, -1, $conf->currency);
-		}
-		print ')';
-		print '</td>';
-		print '</tr>'."\n";
-	}
-	else
-	{
+		// Example : Adding jquery code
 		/*
-		// Contact Medecin du travail
-print '<tr>';
-print '<td class="titlefield">'.$langs->trans("contac").'</td>';
-print '<td>';
-
-
-	$sql = "SELECT p.lastname, p.firstname, p.zip, p.town, p.phone";
-	$sql .= " FROM ".MAIN_DB_PREFIX."expensereport as e, ".MAIN_DB_PREFIX."payment_expensereport as p";
-
-	$sql .= "c.code as p_code, c.libelle as payment_type,";
-	$sql .= " WHERE p.fk_soc = '".$result."'";
-	$resql = $db->query($sql);
-	echo '<pre>'; print_r($resql); echo '</pre>'; exit;
-
-
-		*/
-		print '<tr><td class="fieldrequired">'.$langs->trans('LabourDoctor').'</td>';
-		print '<td colspan="2">';
-		print $form->select_company($soc->id, 'labour_doctor', '', 'SelectThirdParty', 0, 0, null, 0, 'minwidth300');
-
-		print '<tr><td class="fieldrequired">'.$langs->trans('Contact').'</td>';
-		print '<td colspan="2">';
-		$contactid = (GETPOST('userid') ? GETPOST('userid') : GETPOST('contactid'));
-		$result = $object->add_contact($contactid, GETPOST('type'), GETPOST('source'));
-		$form->select_contacts($contactid);
-
-		print '<tr><td class="fieldrequired">'.$langs->trans('LabourInspector').'</td>';
-		print '<td colspan="2">';
-		print $form->select_company($soc->id, 'labour_inspector', '', 'SelectThirdParty', 0, 0, null, 0, 'minwidth300');
-
-		print '<tr><td class="fieldrequired">'.$langs->trans('Samu').'</td>';
-		print '<td colspan="2">';
-		print $form->select_company($soc->id, 'samu', '', 'SelectThirdParty', 0, 0, null, 0, 'minwidth300');
-
-		print '<tr><td class="fieldrequired">'.$langs->trans('Police').'</td>';
-		print '<td colspan="2">';
-		print $form->select_company($soc->id, 'police', '', 'SelectThirdParty', 0, 0, null, 0, 'minwidth300');
-
-		print '<tr><td class="fieldrequired">'.$langs->trans('Urgency').'</td>';
-		print '<td colspan="2">';
-		print $form->select_company($soc->id, 'urgency', '', 'SelectThirdParty', 0, 0, null, 0, 'minwidth300');
-
-		print '<tr><td class="fieldrequired">'.$langs->trans('RightsDefender').'</td>';
-		print '<td colspan="2">';
-		print $form->select_company($soc->id, 'rights_defender', '', 'SelectThirdParty', 0, 0, null, 0, 'minwidth300');
-
-		print '<tr><td class="fieldrequired">'.$langs->trans('Antipoison').'</td>';
-		print '<td colspan="2">';
-		print $form->select_company($soc->id, 'antipoison', '', 'SelectThirdParty', 0, 0, null, 0, 'minwidth300');
-
-		print '<tr><td class="fieldrequired">'.$langs->trans('ResponsiblePrevent').'</td>';
-		print '<td colspan="2">';
-		print $form->select_company($soc->id, 'responsible_prevent', '', 'SelectThirdParty', 0, 0, null, 0, 'minwidth300');
-		// Option to reload page to retrieve customer informations. Note, this clear other input
-		if (!empty($conf->global->RELOAD_PAGE_ON_CUSTOMER_CHANGE))
-		{
-			print '<script type="text/javascript">
-			$(document).ready(function() {
-				$("#socid").change(function() {
-					var socid = $(this).val();
-			        var fac_rec = $(\'#fac_rec\').val();
-					// reload page
-        			window.location.href = "'.$_SERVER["PHP_SELF"].'?action=create&socid="+socid+"&fac_rec="+fac_rec;
-				});
-			});
-			</script>';
-		}
-		print '</td>';
-		print '</tr>'."\n";
-	}
-
-	print '</table>'."\n";
-
-	dol_fiche_end();
-
-	print '<div class="center"><input type="submit" class="button" name="add" value="'.$langs->trans("Create").'"> &nbsp; <input type="submit" class="button" name="cancel" value="'.$langs->trans("Cancel").'"></div>';
-	
-	print '</form>';
-
-}
-
-
-
-// Part to edit record
-if (($id || $ref) && $action == 'edit')
-{
-	print '<form method="POST" action="'.$_SERVER["PHP_SELF"].'">';
-
-	dol_fiche_head();
-
-	print '<input type="hidden" name="action" value="add">';
-	print '<input type="hidden" name="backtopage" value="'.$backtopage.'">';
-	print '<input type="hidden" name="id" value="'.$object->id.'">';
-
-	dol_fiche_end();
-
-	print '<div class="center"><input type="submit" class="button" name="add" value="'.$langs->trans("Create").'"></div>';
-
-	print '</form>';
-}
-
-// ICI C'EST LACTION VIEW
-// Part to show record
-
-
-print '<h1>'.$action.'</h1><br/>';
-	dol_fiche_head($head, 'card', $langs->trans("LegalDisplay"), -1, 'trip');
-            	// Ref
-            	print '<tr><td class="titlefieldcreate">'.$langs->trans("Ref").'</td><td>';
-            	print $form->showrefnav($object, 'ref', $linkback, 1, 'ref', 'ref', '');
-            	print '</td></tr>';
-
-				print '<div class="fichecenter">';
-				print '<div class="fichehalfleft">';
-				print '<div class="underbanner clearboth"></div>';
-
-				print '<table class="border tableforfield centpercent">';
-
-				// Créé par
-
-				print '<tr>';
-				print '<td class="titlefield">'.$langs->trans("Créé par").'</td>';
-				print '<td>';
-
-				if ($object->fk_user_creat > 0)
-				{
-				    $usercreat = new User($db);
-				    $result = $usercreat->fetch($object->fk_user_creat);
-				    if ($result < 0) dol_print_error('', $usercreat->error);
-				    elseif ($result > 0) print $usercreat->getNomUrl(-1);
-				}
-				print '</td></tr>';
-
-				// Date début
-				
-				print '<tr>';
-				print '<td class="titlefield">'.$langs->trans("Début").'</td>';
-				print '<td>'.dol_print_date($object->date_debut, 'dayhour');
-				print '</td>';
-				print '</tr>';
-
-				// Date  fin
-
-				print '<tr>';
-				print '<td class="titlefield">'.$langs->trans("Fin").'</td>';
-				print '<td>'.dol_print_date($object->date_fin, 'dayhour');
-				print '</td>';
-				print '</tr>';
-
-				// Médecin du travail
-
-				print '<tr>';
-				print '<td class="titlefield">'.$langs->trans("Labourdoctor").'</td>';
-				print '<td>';
-
-				if ($object->fk_soc_labour_doctor > 0)
-				{
-				    $labourdoctor = new User($db);
-				    $result = $labourdoctor->fetch($object->fk_soc_labour_doctor);
-				    if ($result < 0) dol_print_error('', $labourdoctor->error);
-				    elseif ($result > 0) print $labourdoctor->getNomUrl(-1);
-				}
-				
-				print '</td></tr>';
-
-				// Inspecteur du travail
-				print '<tr>';
-				print '<td class="titlefield">'.$langs->trans("Labourinspector").'</td>';
-				print '<td>';
-
-				if ($object->fk_soc_labour_inspector > 0)
-				{
-				    $labourinspector = new User($db);
-				    $result = $labourinspector->fetch($object->fk_soc_labour_inspector);
-				    if ($result < 0) dol_print_error('', $labourinspector->error);
-				    elseif ($result > 0) print $labourinspector->getNomUrl(-1);
-				}
-
-				print '</td></tr>';
-
-				// SAMU
-
-				print '<tr>';
-				print '<td class="titlefield">'.$langs->trans("SAMU").'</td>';
-				print '<td>';
-
-				if ($object->fk_soc_samu > 0)
-				{
-				    $samu = new User($db);
-				    $result = $samu->fetch($object->fk_soc_samu);
-				    if ($result < 0) dol_print_error('', $samu->error);
-				    elseif ($result > 0) print $samu->getNomUrl(-1);
-				}
-
-				print '</td></tr>';
-
-				// Police
-				
-				print '<tr>';
-				print '<td class="titlefield">'.$langs->trans("Police").'</td>';
-				print '<td>';
-
-				if ($object->fk_soc_police > 0)
-				{
-				    $police = new User($db);
-				    $result = $police->fetch($object->fk_soc_police);
-				    if ($result < 0) dol_print_error('', $police->error);
-				    elseif ($result > 0) print $police->getNomUrl(-1);
-				}
-
-				print '</td></tr>';
-
-				// Urgences
-
-				print '<tr>';
-				print '<td class="titlefield">'.$langs->trans("Urgencies").'</td>';
-				print '<td>';
-
-				if ($object->fk_soc_urgency > 0)
-				{
-				    $urgencies = new User($db);
-				    $result = $urgencies->fetch($object->fk_soc_urgency);
-				    if ($result < 0) dol_print_error('', $urgencies->error);
-				    elseif ($result > 0) print $urgencies->getNomUrl(-1);
-				}
-
-				print '</td></tr>';
-
-				// Défenseur du droit du travail
-
-				print '<tr>';
-				print '<td class="titlefield">'.$langs->trans("Rights Defender").'</td>';
-				print '<td>';
-
-				if ($object->fk_soc_rights_defender > 0)
-				{
-				    $rights_defender = new User($db);
-				    $result = $rights_defender->fetch($object->fk_soc_rights_defender);
-				    if ($result < 0) dol_print_error('', $rights_defender->error);
-				    elseif ($result > 0) print $rights_defender->getNomUrl(-1);
-				}
-
-				print '</td></tr>';
-
-				// Antipoison
-
-				print '<tr>';
-				print '<td class="titlefield">'.$langs->trans("Antipoison").'</td>';
-				print '<td>';
-
-				if ($object->fk_soc_antipoison > 0)
-				{
-				    $antipoison = new User($db);
-				    $result = $antipoison->fetch($object->fk_soc_antipoison);
-				    if ($result < 0) dol_print_error('', $antipoison->error);
-				    elseif ($result > 0) print $antipoison->getNomUrl(-1);
-				}
-
-				print '</td></tr>';
-
-				// Responsable de prévention
-
-				print '<tr>';
-				print '<td class="titlefield">'.$langs->trans("Responsible Prevent").'</td>';
-				print '<td>';
-
-				if ($object->fk_soc_responsible_prevent > 0)
-				{
-				    $responsible_prevent = new User($db);
-				    $result = $responsible_prevent->fetch($object->fk_soc_responsible_prevent);
-				    if ($result < 0) dol_print_error('', $responsible_prevent->error);
-				    elseif ($result > 0) print $responsible_prevent->getNomUrl(-1);
-				}
-				print '</td></tr>';
-				print('</table>');
-				print('</div></div>');
-
-	dol_fiche_end();
-
-
-	// Buttons
-	/*
-	print '<div class="tabsAction">'."\n";
-
-	$parameters=array();
-	$reshook=$hookmanager->executeHooks('addMoreActionsButtons',$parameters,$object,$action);    // Note that $action and $object may have been modified by hook
-	if ($reshook < 0) setEventMessages($hookmanager->error, $hookmanager->errors, 'errors');
-
-	if (empty($reshook))
-	{
-		if ($user->rights->mymodule->write)
-		{
-			print '<div class="inline-block divButAction"><a class="butAction" href="'.$_SERVER["PHP_SELF"].'?id='.$object->id.'&amp;action=edit">'.$langs->trans("Modify").'</a></div>'."\n";
-		}
-
-		if ($user->rights->mymodule->delete)
-		{
-			if ($conf->use_javascript_ajax && empty($conf->dol_use_jmobile))	// We can't use preloaded confirm form with jmobile
+		print '<script type="text/javascript" language="javascript">
+		jQuery(document).ready(function() {
+			function init_myfunc()
 			{
-				print '<div class="inline-block divButAction"><span id="action-delete" class="butActionDelete">'.$langs->trans('Delete').'</span></div>'."\n";
+				jQuery("#myid").removeAttr(\'disabled\');
+				jQuery("#myid").attr(\'disabled\',\'disabled\');
+			}
+			init_myfunc();
+			jQuery("#mybutton").click(function() {
+				init_needroot();
+			});
+		});
+		</script>';
+		*/
+
+		// Part to show a list
+		//if ($action == 'list' || empty($id))
+		//{
+		//	$sql = "SELECT";
+		//	$sql.= " rowid,";
+		//
+		//		$sql.= " ref,";
+		//		$sql.= " ref_ext,";
+		//		$sql.= " entity,";
+		//		$sql.= " date_creation,";
+		//		$sql.= " tms,";
+		//		$sql.= " date_valid,";
+		//		$sql.= " description,";
+		//		$sql.= " import_key,";
+		//		$sql.= " status,";
+		//		$sql.= " fk_user_creat,";
+		//		$sql.= " fk_user_modif,";
+		//		$sql.= " fk_user_valid,";
+		//		$sql.= " model_pdf,";
+		//		$sql.= " model_odt,";
+		//		$sql.= " note_affich";
+		//
+		//
+		//	// Add fields for extrafields
+		////	foreach ($extrafields->attribute_list as $key => $val) $sql.=",ef.".$key.' as options_'.$key;
+		////	// Add fields from hooks
+		////	$parameters=array();
+		////	$reshook=$hookmanager->executeHooks('printFieldListSelect',$parameters);    // Note that $action and $object may have been modified by hook
+		////	$sql.=$hookmanager->resPrint;
+		////	$sql.= " FROM ".MAIN_DB_PREFIX."legal_display as t";
+		////	$sql.= " WHERE field3 = 'xxx'";
+		////	// Add where from hooks
+		////	$parameters=array();
+		////	$reshook=$hookmanager->executeHooks('printFieldListWhere',$parameters);    // Note that $action and $object may have been modified by hook
+		////	$sql.=$hookmanager->resPrint;
+		////	$sql.= " ORDER BY field1 ASC";
+		//
+		//	print '<form method="GET" id="searchFormList" action="'.$_SERVER["PHP_SELF"].'">';
+		//
+		//	if (! empty($moreforfilter))
+		//	{
+		//		print '<div class="liste_titre">';
+		//		print $moreforfilter;
+		//		$parameters=array();
+		//		$reshook=$hookmanager->executeHooks('printFieldPreListTitle',$parameters);    // Note that $action and $object may have been modified by hook
+		//		print $hookmanager->resPrint;
+		//		print '</div>';
+		//	}
+		//
+		//	print '<table class="noborder">'."\n";
+		//
+		//	// Fields title
+		//	print '<tr class="liste_titre">';
+		//	print_liste_field_titre($langs->trans('field1'),$_SERVER['PHP_SELF'],'t.field1','',$param,'',$sortfield,$sortorder);
+		//	print_liste_field_titre($langs->trans('field2'),$_SERVER['PHP_SELF'],'t.field2','',$param,'',$sortfield,$sortorder);
+		//	$parameters=array();
+		//	$reshook=$hookmanager->executeHooks('printFieldListTitle',$parameters);    // Note that $action and $object may have been modified by hook
+		//	print $hookmanager->resPrint;
+		//	print '</tr>'."\n";
+		//
+		//	// Fields title search
+		//	print '<tr class="liste_titre">';
+		//	print '<td class="liste_titre">';
+		//	print '<input type="text" class="flat" name="search_field1" value="'.$search_field1.'" size="10">';
+		//	print '</td>';
+		//	print '<td class="liste_titre">';
+		//	print '<input type="text" class="flat" name="search_field2" value="'.$search_field2.'" size="10">';
+		//	print '</td>';
+		//	$parameters=array();
+		//	$reshook=$hookmanager->executeHooks('printFieldListOption',$parameters);    // Note that $action and $object may have been modified by hook
+		//	print $hookmanager->resPrint;
+		//	print '</tr>'."\n";
+		//
+		//
+		//	dol_syslog($script_file, LOG_DEBUG);
+		//	$resql=$db->query($sql);
+		//	if ($resql)
+		//	{
+		//		$num = $db->num_rows($resql);
+		//		$i = 0;
+		//		while ($i < $num)
+		//		{
+		//			$obj = $db->fetch_object($resql);
+		//			if ($obj)
+		//			{
+		//				// You can use here results
+		//				print '<tr>';
+		//				print '<td>';
+		//				print $obj->field1;
+		//				print '</td><td>';
+		//				print $obj->field2;
+		//				print '</td>';
+		//				$parameters=array('obj' => $obj);
+		//				$reshook=$hookmanager->executeHooks('printFieldListValue',$parameters);    // Note that $action and $object may have been modified by hook
+		//				print $hookmanager->resPrint;
+		//				print '</tr>';
+		//			}
+		//			$i++;
+		//		}
+		//	}
+		//	else
+		//	{
+		//		$error++;
+		//		dol_print_error($db);
+		//	}
+		//
+		//	$db->free($resql);
+		//
+		//	$parameters=array('sql' => $sql);
+		//	$reshook=$hookmanager->executeHooks('printFieldListFooter',$parameters);    // Note that $action and $object may have been modified by hook
+		//	print $hookmanager->resPrint;
+		//
+		//	print "</table>\n";
+		//	print "</form>\n";
+		//}
+		//
+
+
+		// Create
+		if ($action == 'create')
+		{
+			print_fiche_titre($langs->trans("LegalDisplay"));
+			
+			print '<form method="POST" action="'.$_SERVER["PHP_SELF"].'" name="create">';
+			print '<input type="hidden" name="action" value="add">';
+			print '<input type="hidden" name="backtopage" value="'.$backtopage.'">';
+
+			dol_fiche_head();
+
+			print '<table class="border centpercent">'."\n";
+			print '<tr><td class="fieldrequired">'.$langs->trans("Ref").'</td><td>';
+			print '<input class="flat" type="text" size="36" name="ref" value="'.$ref.'">';
+			print '</td></tr>';
+
+			// Date start
+			print '<tr>';
+			print '<td class="titlefieldcreate fieldrequired">'.$langs->trans("DateStart").'</td>';
+			print '<td>';
+			print $form->selectDate($date_start ? $date_start : -1, 'date_debut', 0, 0, 0, '', 1, 1);
+			print '</td>';
+			print '</tr>';
+
+			// Date end
+			print '<tr>';
+			print '<td class="fieldrequired">'.$langs->trans("DateEnd").'</td>';
+			print '<td>';
+			print $form->selectDate($date_end ? $date_end : -1, 'date_fin', 0, 0, 0, '', 1, 1);
+			print '</td>';
+			print '</tr>';
+
+			if ( $soc->id > 0 && ( ! GETPOST( 'fac_rec', 'int' ) || !empty( $invoice_predefined->frequency ) ) ) {
+				// If thirdparty known and not a predefined invoiced without a recurring rule
+				print '<tr><td class="fieldrequired">'.$langs->trans('Customer').'</td>';
+				print '<td colspan="2">';
+				print $soc->getNomUrl(1);
+				print '<input type="hidden" name="socid" value="'.$soc->id.'">';
+				// Outstanding Bill
+				$arrayoutstandingbills = $soc->getOutstandingBills();
+				$outstandingBills = $arrayoutstandingbills['opened'];
+				print ' ('.$langs->trans('CurrentOutstandingBill').': ';
+				print price($outstandingBills, '', $langs, 0, 0, -1, $conf->currency);
+				if ($soc->outstanding_limit != '')
+				{
+					if ($outstandingBills > $soc->outstanding_limit) print img_warning($langs->trans("OutstandingBillReached"));
+					print ' / '.price($soc->outstanding_limit, '', $langs, 0, 0, -1, $conf->currency);
+				}
+				print ')';
+				print '</td>';
+				print '</tr>'."\n";
 			}
 			else
 			{
-				print '<div class="inline-block divButAction"><a class="butActionDelete" href="'.$_SERVER["PHP_SELF"].'?id='.$object->id.'&amp;action=delete">'.$langs->trans('Delete').'</a></div>'."\n";
+				/*
+				// Contact Medecin du travail
+		print '<tr>';
+		print '<td class="titlefield">'.$langs->trans("contac").'</td>';
+		print '<td>';
+
+
+			$sql = "SELECT p.lastname, p.firstname, p.zip, p.town, p.phone";
+			$sql .= " FROM ".MAIN_DB_PREFIX."expensereport as e, ".MAIN_DB_PREFIX."payment_expensereport as p";
+
+			$sql .= "c.code as p_code, c.libelle as payment_type,";
+			$sql .= " WHERE p.fk_soc = '".$result."'";
+			$resql = $db->query($sql);
+			echo '<pre>'; print_r($resql); echo '</pre>'; exit;
+
+
+				*/
+				print '<tr><td class="fieldrequired">'.$langs->trans('LabourDoctor').'</td>';
+				print '<td colspan="2">';
+				print $form->select_company($soc->id, 'labour_doctor', '', 'SelectThirdParty', 0, 0, null, 0, 'minwidth300');
+
+				print '<tr><td class="fieldrequired">'.$langs->trans('Contact').'</td>';
+				print '<td colspan="2">';
+				$contactid = (GETPOST('userid') ? GETPOST('userid') : GETPOST('contactid'));
+				$result = $object->add_contact($contactid, GETPOST('type'), GETPOST('source'));
+				$form->select_contacts($contactid);
+
+				print '<tr><td class="fieldrequired">'.$langs->trans('LabourInspector').'</td>';
+				print '<td colspan="2">';
+				print $form->select_company($soc->id, 'labour_inspector', '', 'SelectThirdParty', 0, 0, null, 0, 'minwidth300');
+
+				print '<tr><td class="fieldrequired">'.$langs->trans('Samu').'</td>';
+				print '<td colspan="2">';
+				print $form->select_company($soc->id, 'samu', '', 'SelectThirdParty', 0, 0, null, 0, 'minwidth300');
+
+				print '<tr><td class="fieldrequired">'.$langs->trans('Police').'</td>';
+				print '<td colspan="2">';
+				print $form->select_company($soc->id, 'police', '', 'SelectThirdParty', 0, 0, null, 0, 'minwidth300');
+
+				print '<tr><td class="fieldrequired">'.$langs->trans('Urgency').'</td>';
+				print '<td colspan="2">';
+				print $form->select_company($soc->id, 'urgency', '', 'SelectThirdParty', 0, 0, null, 0, 'minwidth300');
+
+				print '<tr><td class="fieldrequired">'.$langs->trans('RightsDefender').'</td>';
+				print '<td colspan="2">';
+				print $form->select_company($soc->id, 'rights_defender', '', 'SelectThirdParty', 0, 0, null, 0, 'minwidth300');
+
+				print '<tr><td class="fieldrequired">'.$langs->trans('Antipoison').'</td>';
+				print '<td colspan="2">';
+				print $form->select_company($soc->id, 'antipoison', '', 'SelectThirdParty', 0, 0, null, 0, 'minwidth300');
+
+				print '<tr><td class="fieldrequired">'.$langs->trans('ResponsiblePrevent').'</td>';
+				print '<td colspan="2">';
+				print $form->select_company($soc->id, 'responsible_prevent', '', 'SelectThirdParty', 0, 0, null, 0, 'minwidth300');
+				// Option to reload page to retrieve customer informations. Note, this clear other input
+				if (!empty($conf->global->RELOAD_PAGE_ON_CUSTOMER_CHANGE))
+				{
+					print '<script type="text/javascript">
+					$(document).ready(function() {
+						$("#socid").change(function() {
+							var socid = $(this).val();
+							var fac_rec = $(\'#fac_rec\').val();
+							// reload page
+							window.location.href = "'.$_SERVER["PHP_SELF"].'?action=create&socid="+socid+"&fac_rec="+fac_rec;
+						});
+					});
+					</script>';
+				}
+				print '</td>';
+				print '</tr>'."\n";
+			}
+
+			print '</table>'."\n";
+
+			dol_fiche_end();
+
+			print '<div class="center"><input type="submit" class="button" name="add" value="'.$langs->trans("Create").'"> &nbsp; <input type="submit" class="button" name="cancel" value="'.$langs->trans("Cancel").'"></div>';
+			
+			print '</form>';
+
+		} 
+		else 
+		{
+
+			// Part to edit record
+			if (($id || $ref) && $action == 'edit')
+			{
+				print '<form method="POST" action="'.$_SERVER["PHP_SELF"].'">';
+
+				dol_fiche_head();
+
+				print '<input type="hidden" name="action" value="add">';
+				print '<input type="hidden" name="backtopage" value="'.$backtopage.'">';
+				print '<input type="hidden" name="id" value="'.$object->id.'">';
+
+				dol_fiche_end();
+
+				print '<div class="center"><input type="submit" class="button" name="add" value="'.$langs->trans("Create").'"></div>';
+
+				print '</form>';
+			}
+
+			// Part to show record
+			// View
+
+			print '<h1>'.$action.'</h1><br/>';
+			dol_fiche_head($head, 'card', $langs->trans("LegalDisplay"), -1, 'trip');
+			// Ref
+			print '<tr><td class="titlefieldcreate">'.$langs->trans("Ref").'</td><td>';
+			print $form->showrefnav($object, 'ref', $linkback, 1, 'ref', 'ref', '');
+			print '</td></tr>';
+
+			print '<div class="fichecenter">';
+			print '<div class="fichehalfleft">';
+			print '<div class="underbanner clearboth"></div>';
+
+			print '<table class="border tableforfield centpercent">';
+
+			// Créé par
+
+			print '<tr>';
+			print '<td class="titlefield">'.$langs->trans("Créé par").'</td>';
+			print '<td>';
+
+			if ($object->fk_user_creat > 0)
+			{
+				$usercreat = new User($db);
+				$result = $usercreat->fetch($object->fk_user_creat);
+				if ($result < 0) dol_print_error('', $usercreat->error);
+				elseif ($result > 0) print $usercreat->getNomUrl(-1);
+			}
+			print '</td></tr>';
+
+			// Date début
+							
+			print '<tr>';
+			print '<td class="titlefield">'.$langs->trans("Début").'</td>';
+			print '<td>'.dol_print_date($object->date_debut, 'dayhour');
+			print '</td>';
+			print '</tr>';
+
+			// Date  fin
+
+			print '<tr>';
+			print '<td class="titlefield">'.$langs->trans("Fin").'</td>';
+			print '<td>'.dol_print_date($object->date_fin, 'dayhour');
+			print '</td>';
+			print '</tr>';
+
+			// Médecin du travail
+
+			print '<tr>';
+			print '<td class="titlefield">'.$langs->trans("Labourdoctor").'</td>';
+			print '<td>';
+
+			if ($object->fk_soc_labour_doctor > 0)
+			{
+				$labourdoctor = new User($db);
+				$result = $labourdoctor->fetch($object->fk_soc_labour_doctor);
+				if ($result < 0) dol_print_error('', $labourdoctor->error);
+				elseif ($result > 0) print $labourdoctor->getNomUrl(-1);
+			}
+							
+			print '</td></tr>';
+
+			// Inspecteur du travail
+			print '<tr>';
+			print '<td class="titlefield">'.$langs->trans("Labourinspector").'</td>';
+			print '<td>';
+
+			if ($object->fk_soc_labour_inspector > 0)
+			{
+				$labourinspector = new User($db);
+				$result = $labourinspector->fetch($object->fk_soc_labour_inspector);
+				if ($result < 0) dol_print_error('', $labourinspector->error);
+				elseif ($result > 0) print $labourinspector->getNomUrl(-1);
+			}
+
+			print '</td></tr>';
+
+			// SAMU
+
+			print '<tr>';
+			print '<td class="titlefield">'.$langs->trans("SAMU").'</td>';
+			print '<td>';
+
+			if ($object->fk_soc_samu > 0)
+			{
+				$samu = new User($db);
+				$result = $samu->fetch($object->fk_soc_samu);
+				if ($result < 0) dol_print_error('', $samu->error);
+				elseif ($result > 0) print $samu->getNomUrl(-1);
+			}
+
+			print '</td></tr>';
+
+			// Police
+							
+			print '<tr>';
+			print '<td class="titlefield">'.$langs->trans("Police").'</td>';
+			print '<td>';
+
+			if ($object->fk_soc_police > 0)
+			{
+				$police = new User($db);
+				$result = $police->fetch($object->fk_soc_police);
+				if ($result < 0) dol_print_error('', $police->error);
+				elseif ($result > 0) print $police->getNomUrl(-1);
+			}
+
+			print '</td></tr>';
+
+			// Urgences
+
+			print '<tr>';
+			print '<td class="titlefield">'.$langs->trans("Urgencies").'</td>';
+			print '<td>';
+
+			if ($object->fk_soc_urgency > 0)
+			{
+				$urgencies = new User($db);
+				$result = $urgencies->fetch($object->fk_soc_urgency);
+				if ($result < 0) dol_print_error('', $urgencies->error);
+				elseif ($result > 0) print $urgencies->getNomUrl(-1);
+			}
+
+			print '</td></tr>';
+
+			// Défenseur du droit du travail
+
+			print '<tr>';
+			print '<td class="titlefield">'.$langs->trans("Rights Defender").'</td>';
+			print '<td>';
+
+			if ($object->fk_soc_rights_defender > 0)
+			{
+				$rights_defender = new User($db);
+				$result = $rights_defender->fetch($object->fk_soc_rights_defender);
+				if ($result < 0) dol_print_error('', $rights_defender->error);
+				elseif ($result > 0) print $rights_defender->getNomUrl(-1);
+			}
+
+			print '</td></tr>';
+
+			// Antipoison
+
+			print '<tr>';
+			print '<td class="titlefield">'.$langs->trans("Antipoison").'</td>';
+			print '<td>';
+
+			if ($object->fk_soc_antipoison > 0)
+			{
+				$antipoison = new User($db);
+				$result = $antipoison->fetch($object->fk_soc_antipoison);
+				if ($result < 0) dol_print_error('', $antipoison->error);
+				elseif ($result > 0) print $antipoison->getNomUrl(-1);
+			}
+
+			print '</td></tr>';
+
+			// Responsable de prévention
+
+			print '<tr>';
+			print '<td class="titlefield">'.$langs->trans("Responsible Prevent").'</td>';
+			print '<td>';
+
+			if ($object->fk_soc_responsible_prevent > 0)
+			{
+				$responsible_prevent = new User($db);
+				$result = $responsible_prevent->fetch($object->fk_soc_responsible_prevent);
+				if ($result < 0) dol_print_error('', $responsible_prevent->error);
+				elseif ($result > 0) print $responsible_prevent->getNomUrl(-1);
+			}
+			print '</td></tr>';
+			print('</table>');
+			print('</div></div>');
+							
+			dol_fiche_end();
+
+
+				// Buttons
+				/*
+				print '<div class="tabsAction">'."\n";
+
+				$parameters=array();
+				$reshook=$hookmanager->executeHooks('addMoreActionsButtons',$parameters,$object,$action);    // Note that $action and $object may have been modified by hook
+				if ($reshook < 0) setEventMessages($hookmanager->error, $hookmanager->errors, 'errors');
+
+				if (empty($reshook))
+				{
+					if ($user->rights->mymodule->write)
+					{
+						print '<div class="inline-block divButAction"><a class="butAction" href="'.$_SERVER["PHP_SELF"].'?id='.$object->id.'&amp;action=edit">'.$langs->trans("Modify").'</a></div>'."\n";
+					}
+
+					if ($user->rights->mymodule->delete)
+					{
+						if ($conf->use_javascript_ajax && empty($conf->dol_use_jmobile))	// We can't use preloaded confirm form with jmobile
+						{
+							print '<div class="inline-block divButAction"><span id="action-delete" class="butActionDelete">'.$langs->trans('Delete').'</span></div>'."\n";
+						}
+						else
+						{
+							print '<div class="inline-block divButAction"><a class="butActionDelete" href="'.$_SERVER["PHP_SELF"].'?id='.$object->id.'&amp;action=delete">'.$langs->trans('Delete').'</a></div>'."\n";
+						}
+					}
+				}
+				print '</div>'."\n";
+			*/	
+					// Actions to build doc
+				
+				// Example 2 : Adding links to objects
+				//$somethingshown=$form->showLinkedObjectBlock($object);
+				//$linktoelem = $form->showLinkToObjectBlock($object);
+				//if ($linktoelem) print '<br>'.$linktoelem;
+
+			// Select mail models is same action as presend
+			if ($action != 'presend')
+			{
+				print '<a name="builddoc"></a>'; // ancre
+				// Documents
+				$filename = dol_sanitizeFileName($object->ref);
+				$relativepath = $objref.'/'.$objref.'.pdf';
+				$filedir = DOL_DATA_ROOT . '/digiriskdolibarr/legaldisplay/'.get_exdir(0, 0, 0, 0, $object, 'member');
+
+				$urlsource = $_SERVER["PHP_SELF"]."?id=".$id;
+				$genallowed = 1;
+				$delallowed = 1;
+				//	echo '<pre>'; var_dump([$objref, $filedir, $urlsource, $genallowed, $delallowed, $object->model_pdf, 1, 0, 0, 28, 0, '', '', '', $soc->default_lang, '', $object]); echo '</pre>'; exit;
+					
+				print $formfile->showdocuments('digiriskdolibarr:legaldisplay', $filename, $filedir, $urlsource, $genallowed, $delallowed);
+				$usercancreate = 1;
 			}
 		}
 	}
-	print '</div>'."\n";
-*/		$upload_dir = $conf->adherent->dir_output;
-		$permissiontoadd = $user->rights->adherent->creer;
-		include DOL_DOCUMENT_ROOT.'/core/actions_builddoc.inc.php';
-	
-	if ($action != 'presend')
-	{
-		print '<!-- Tototutu -->'; 
-
-		print '<a name="builddoc"></a>'; // ancre
-		// Documents
-		$filename = dol_sanitizeFileName($object->ref);
-	
-		$relativepath = $objref.'/'.$objref.'.pdf';
-		$filedir = DOL_DATA_ROOT . '/digiriskdolibarr/legaldisplay';
-
-		$urlsource = $_SERVER["PHP_SELF"]."?id=".$id;
-		$genallowed = 1;
-		$delallowed = 1;
-	//	echo '<pre>'; var_dump([$objref, $filedir, $urlsource, $genallowed, $delallowed, $object->model_pdf, 1, 0, 0, 28, 0, '', '', '', $soc->default_lang, '', $object]); echo '</pre>'; exit;
-
-		print $formfile->showdocuments('digiriskdolibarr:legaldisplay',  $filename, $filedir, $urlsource, $genallowed, $delallowed);
-		$usercancreate = 1;
-	
-	}
-		// Actions to build doc
-	
-	// Example 2 : Adding links to objects
-	//$somethingshown=$form->showLinkedObjectBlock($object);
-	//$linktoelem = $form->showLinkToObjectBlock($object);
-	//if ($linktoelem) print '<br>'.$linktoelem;
-
-// Select mail models is same action as presend
+}
 
 
 
+
+
+		
 
 // End of page
 llxFooter();

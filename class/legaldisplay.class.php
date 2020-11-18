@@ -271,6 +271,7 @@ class Legaldisplay extends CommonObject
 			{
 				$obj = $this->db->fetch_object($resql);
 
+				$this->id = $id;
 				$this->ref = $obj->ref;
 				$this->entity = $obj->entity;
 				$this->date_creation = $this->db->jdate($obj->date_creation);

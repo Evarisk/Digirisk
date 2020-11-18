@@ -32,12 +32,10 @@
 
 require_once DOL_DOCUMENT_ROOT.'/custom/digiriskdolibarr/core/modules/digiriskdolibarr/modules_legaldisplay.php';
 require_once DOL_DOCUMENT_ROOT.'/custom/digiriskdolibarr/core/modules/digiriskdolibarr/modules_legaldisplay.php';
-
 require_once DOL_DOCUMENT_ROOT.'/product/class/product.class.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/company.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/functions2.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/pdf.lib.php';
-
 
 /**
  *	Class to generate PDF orders with template Einstein
@@ -226,13 +224,12 @@ class pdf_einstein extends ModelePDFLegalDisplay
 		if (!empty($conf->global->MAIN_USE_FPDF)) $outputlangs->charset_output = 'ISO-8859-1';
 
 		// Load translation files required by the page
-		$outputlangs->loadLangs(array("main", "dict", "companies", "bills", "products", "orders", "deliveries"));
+		$outputlangs->loadLangs(array("main", "dict", "companies"));
 
 
 		if ($conf->commande->dir_output)
 		{
             $object->fetch_thirdparty();
-
             $deja_regle = 0;
 
             // Definition of $dir and $file
@@ -244,7 +241,7 @@ class pdf_einstein extends ModelePDFLegalDisplay
 			else
 			{
 				$objectref = dol_sanitizeFileName($object->ref);
-				$dir = $conf->legaldisplay->multidir_output[$object->entity]."/".$objectref;
+				$dir = $conf->digiriskdolibarr->multidir_output[1] .'/' . 'legaldisplay' . '/' .$objectref;
 				$file = $dir."/".$objectref.".pdf";
 			}
 
@@ -258,7 +255,7 @@ class pdf_einstein extends ModelePDFLegalDisplay
 			}
 
 			if (file_exists($dir))
-			{
+			{				
 				// Add pdfgeneration hook
 				if (!is_object($hookmanager))
 				{
@@ -305,6 +302,20 @@ class pdf_einstein extends ModelePDFLegalDisplay
 				if (!empty($conf->global->MAIN_DISABLE_PDF_COMPRESSION)) $pdf->SetCompression(false);
 
 				$pdf->SetMargins($this->marge_gauche, $this->marge_haute, $this->marge_droite); // Left, Top, Right
+				$pdf->Close();
+
+				$pdf->Output($file, 'F');
+
+				// Add pdfgeneration hook
+				$hookmanager->initHooks(array('pdfgeneration'));
+				$parameters = array('file'=>$file, 'object'=>$object, 'outputlangs'=>$outputlangs);
+				global $action;
+				$reshook = $hookmanager->executeHooks('afterPDFCreation', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
+				if ($reshook < 0)
+				{
+				    $this->error = $hookmanager->error;
+				    $this->errors = $hookmanager->errors;
+				}
 
 				// Loop on each lines
 				
