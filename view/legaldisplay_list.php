@@ -150,9 +150,6 @@ if (($id > 0 || ! empty($ref)) && $action != 'add')
 	if ($result < 0) dol_print_error($db);
 }
 
-
-
-
 /*******************************************************************
  * ACTIONS
  *
@@ -191,8 +188,6 @@ if (empty($reshook))
 	include DOL_DOCUMENT_ROOT.'/core/actions_massactions.inc.php';
 }
 
-
-
 /***************************************************
  * VIEW
  *
@@ -208,7 +203,7 @@ $help_url='';
 $title = $langs->trans('Legal Display List');
 
 // Put here content of your page
-
+/*
 // Example : Adding jquery code
 print '<script type="text/javascript" language="javascript">
 jQuery(document).ready(function() {
@@ -223,7 +218,7 @@ jQuery(document).ready(function() {
 	});
 });
 </script>';
-
+*/
 
 $sql = "SELECT";
 $sql .= " t.rowid";
@@ -418,6 +413,7 @@ print_liste_field_titre($selectedfields, $_SERVER["PHP_SELF"],"",'','','align="r
 // LIST_OF_TD_TITLE_SEARCH
 //if (! empty($arrayfields['t.field1']['checked'])) print '<td class="liste_titre"><input type="text" class="flat" name="search_field1" value="'.$rowid.'" size="10"></td>';
 //if (! empty($arrayfields['t.field2']['checked'])) print '<td class="liste_titre"><input type="text" class="flat" name="search_field2" value="'.$ref.'" size="10"></td>';
+print '</tr>';
 // Extra fields
 if (is_array($extrafields->attribute_label) && count($extrafields->attribute_label))
 {
@@ -445,35 +441,10 @@ if (is_array($extrafields->attribute_label) && count($extrafields->attribute_lab
 $parameters=array('arrayfields'=>$arrayfields);
 $reshook=$hookmanager->executeHooks('printFieldListOption',$parameters);    // Note that $action and $object may have been modified by hook
 print $hookmanager->resPrint;
-/*
-if (! empty($arrayfields['t.date_debut']['checked']))
-{
-	// Date creation
-	print '<td class="liste_titre">';
-	print '</td>';
-}
-*/
+
 $legaldisplaystatic = new Legaldisplay($db);
 $thirdpartystatic = new Societe($db);
 
-
-print  '</tr>';
-
-/*if (! empty($arrayfields['u.statut']['checked']))
-{
-    // Status
-    print '<td class="liste_titre" align="center">';
-    print $form->selectarray('search_statut', array('-1'=>'','0'=>$langs->trans('Disabled'),'1'=>$langs->trans('Enabled')),$search_statut);
-    print '</td>';
-}*/
-// Action column
-/*
-print '<td class="liste_titre" align="right">';
-$searchpitco=$form->showFilterAndCheckAddButtons($massactionbutton?1:0, 'checkforselect', 1);
-print $searchpitco;
-print '</td>';
-print '</tr>'."\n";
-*/
 
 $i=0;
 $var=true;
@@ -583,13 +554,6 @@ while ($i < min($num, $limit))
 			print '</td>';
 			if (!$i) $totalarray['nbfield']++;
 		}
-		// Status
-		/*
-		if (! empty($arrayfields['u.statut']['checked']))
-		{
-		  $userstatic->statut=$obj->statut;
-		  print '<td align="center">'.$userstatic->getLibStatut(3).'</td>';
-		}*/
 
 		// Action column
 		print '<td class="wrap" align="center">';
@@ -640,25 +604,6 @@ print '</div>'."\n";
 
 print '</form>'."\n";
 
-/*
-if ($massaction == 'builddoc' || $action == 'remove_file' || $show_files)
-{
-	// Show list of available documents
-	$urlsource=$_SERVER['PHP_SELF'].'?sortfield='.$sortfield.'&sortorder='.$sortorder;
-	$urlsource.=str_replace('&amp;','&',$param);
-
-	$filedir=$diroutputmassaction;
-	$genallowed=$user->rights->facture->lire;
-	$delallowed=$user->rights->facture->lire;
-
-	print $formfile->showdocuments('massfilesarea_digiriskdolibarr','',$filedir,$urlsource,0,$delallowed,'',1,1,0,48,1,$param,$title,'');
-}
-else
-{
-	print '<br><a name="show_files"></a><a href="'.$_SERVER["PHP_SELF"].'?show_files=1'.$param.'#show_files">'.$langs->trans("ShowTempMassFilesArea").'</a>';
-}
-
-*/
 // End of page
 llxFooter();
 $db->close();

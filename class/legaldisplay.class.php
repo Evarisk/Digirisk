@@ -599,6 +599,7 @@ class Legaldisplay extends CommonObject
 
         return $result;
 	}
+	
 	public function generateDocument($modele, $outputlangs, $hidedetails = 0, $hidedesc = 0, $hideref = 0, $moreparams = null)
     {
         global $conf, $langs;
