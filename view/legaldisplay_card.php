@@ -47,7 +47,7 @@ if (! $res) die("Include of main fails");
 // Change this following line to use the correct relative path from htdocs
 dol_include_once('/digiriskdolibarr/class/legaldisplay.class.php');
 dol_include_once('../core/class/html.formfile.class.php');
-
+dol_include_once('../contact/class/contact.class.php');
 dol_include_once('../core/lib/functions2.lib.php');
 dol_include_once('../core/class/html.formorder.class.php');
 dol_include_once('../core/class/html.formmargin.class.php');
@@ -434,6 +434,10 @@ if (empty($reshook))
 			}
 			else
 			{
+				if ($object->id > 0) {
+					$contactid = (GETPOST('userid') ? GETPOST('userid') : GETPOST('contactid'));
+					$result = $object->add_contact($contactid, $_POST["type"], $_POST["source"]);
+				}
 				/*
 				// Contact Medecin du travail
 		print '<tr>';
@@ -453,17 +457,11 @@ if (empty($reshook))
 				*/
 				print '<tr><td class="fieldrequired">'.$langs->trans('LabourDoctor').'</td>';
 				print '<td colspan="2">';
-				print $form->select_company($soc->id, 'labour_doctor', '', 'SelectThirdParty', 0, 0, null, 0, 'minwidth300');
-
-				print '<tr><td class="fieldrequired">'.$langs->trans('Contact').'</td>';
-				print '<td colspan="2">';
-				$contactid = (GETPOST('userid') ? GETPOST('userid') : GETPOST('contactid'));
-				$result = $object->add_contact($contactid, GETPOST('type'), GETPOST('source'));
-				$form->select_contacts($contactid);
+				$form->select_contacts($soc->id, $contactid, 'labour_doctor', 1, $srccontactslist);
 
 				print '<tr><td class="fieldrequired">'.$langs->trans('LabourInspector').'</td>';
 				print '<td colspan="2">';
-				print $form->select_company($soc->id, 'labour_inspector', '', 'SelectThirdParty', 0, 0, null, 0, 'minwidth300');
+				$form->select_contacts($soc->id, $contactid, 'labour_inspector', 1, $srccontactslist, '', 1);
 
 				print '<tr><td class="fieldrequired">'.$langs->trans('Samu').'</td>';
 				print '<td colspan="2">';
@@ -473,7 +471,7 @@ if (empty($reshook))
 				print '<td colspan="2">';
 				print $form->select_company($soc->id, 'police', '', 'SelectThirdParty', 0, 0, null, 0, 'minwidth300');
 
-				print '<tr><td class="fieldrequired">'.$langs->trans('Urgency').'</td>';
+				print '<tr><td class="fieldrequired">'.$langs->trans('TouteUrgence').'</td>';
 				print '<td colspan="2">';
 				print $form->select_company($soc->id, 'urgency', '', 'SelectThirdParty', 0, 0, null, 0, 'minwidth300');
 
@@ -487,7 +485,8 @@ if (empty($reshook))
 
 				print '<tr><td class="fieldrequired">'.$langs->trans('ResponsiblePrevent').'</td>';
 				print '<td colspan="2">';
-				print $form->select_company($soc->id, 'responsible_prevent', '', 'SelectThirdParty', 0, 0, null, 0, 'minwidth300');
+				
+				$form->select_contacts($soc->id, $contactid, 'responsible_prevent', 1, $srccontactslist, '', 1);
 				// Option to reload page to retrieve customer informations. Note, this clear other input
 				if (!empty($conf->global->RELOAD_PAGE_ON_CUSTOMER_CHANGE))
 				{
@@ -586,12 +585,12 @@ if (empty($reshook))
 			// Médecin du travail
 
 			print '<tr>';
-			print '<td class="titlefield">'.$langs->trans("Labourdoctor").'</td>';
+			print '<td class="titlefield">'.$langs->trans("LabourDoctor").'</td>';
 			print '<td>';
 
 			if ($object->fk_soc_labour_doctor > 0)
 			{
-				$labourdoctor = new User($db);
+				$labourdoctor = new Contact($db);
 				$result = $labourdoctor->fetch($object->fk_soc_labour_doctor);
 				if ($result < 0) dol_print_error('', $labourdoctor->error);
 				elseif ($result > 0) print $labourdoctor->getNomUrl(-1);
@@ -601,12 +600,12 @@ if (empty($reshook))
 
 			// Inspecteur du travail
 			print '<tr>';
-			print '<td class="titlefield">'.$langs->trans("Labourinspector").'</td>';
+			print '<td class="titlefield">'.$langs->trans("Labouronspector").'</td>';
 			print '<td>';
 
 			if ($object->fk_soc_labour_inspector > 0)
 			{
-				$labourinspector = new User($db);
+				$labourinspector = new Contact($db);
 				$result = $labourinspector->fetch($object->fk_soc_labour_inspector);
 				if ($result < 0) dol_print_error('', $labourinspector->error);
 				elseif ($result > 0) print $labourinspector->getNomUrl(-1);
@@ -649,7 +648,7 @@ if (empty($reshook))
 			// Urgences
 
 			print '<tr>';
-			print '<td class="titlefield">'.$langs->trans("Urgencies").'</td>';
+			print '<td class="titlefield">'.$langs->trans("TouteUrgence").'</td>';
 			print '<td>';
 
 			if ($object->fk_soc_urgency > 0)
@@ -665,7 +664,7 @@ if (empty($reshook))
 			// Défenseur du droit du travail
 
 			print '<tr>';
-			print '<td class="titlefield">'.$langs->trans("Rights Defender").'</td>';
+			print '<td class="titlefield">'.$langs->trans("RightsDefender").'</td>';
 			print '<td>';
 
 			if ($object->fk_soc_rights_defender > 0)
@@ -697,12 +696,11 @@ if (empty($reshook))
 			// Responsable de prévention
 
 			print '<tr>';
-			print '<td class="titlefield">'.$langs->trans("Responsible Prevent").'</td>';
+			print '<td class="titlefield">'.$langs->trans("ResponsiblePrevent").'</td>';
 			print '<td>';
-
 			if ($object->fk_soc_responsible_prevent > 0)
 			{
-				$responsible_prevent = new User($db);
+				$responsible_prevent = new Contact($db);
 				$result = $responsible_prevent->fetch($object->fk_soc_responsible_prevent);
 				if ($result < 0) dol_print_error('', $responsible_prevent->error);
 				elseif ($result > 0) print $responsible_prevent->getNomUrl(-1);

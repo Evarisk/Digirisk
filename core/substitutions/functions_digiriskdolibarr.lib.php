@@ -11,7 +11,8 @@
 function digiriskdolibarr_completesubstitutionarray(&$substitutionarray,$langs,$object)
 {
     global $conf,$db;
-    $myvalue='Put here calculated value to insert';
+
+    //Copier la condition ci-dessous pour chaque extrafield à rajouter
 
     if ($object->fk_soc_samu > 0)
     {
