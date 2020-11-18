@@ -602,7 +602,6 @@ class Legaldisplay extends CommonObject
 	public function generateDocument($modele, $outputlangs, $hidedetails = 0, $hidedesc = 0, $hideref = 0, $moreparams = null)
     {
         global $conf, $langs;
-
         $langs->load("trips");
 
 	    if (!dol_strlen($modele)) {
@@ -617,7 +616,7 @@ class Legaldisplay extends CommonObject
 
         $modelpath = "custom/digiriskdolibarr/core/modules/digiriskdolibarr/doc/";
 
-        return $this->commonGenerateDocument($modelpath, 'einstein', $outputlangs, $hidedetails, $hidedesc, $hideref, $moreparams);
+        return $this->commonGenerateDocument($modelpath, $modele, $outputlangs, $hidedetails, $hidedesc, $hideref, $moreparams);
     }
 }
 

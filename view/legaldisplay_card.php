@@ -622,10 +622,10 @@ if (empty($reshook))
 
 			if ($object->fk_soc_samu > 0)
 			{
-				$samu = new User($db);
+				$samu = new Societe($db);
 				$result = $samu->fetch($object->fk_soc_samu);
 				if ($result < 0) dol_print_error('', $samu->error);
-				elseif ($result > 0) print $samu->getNomUrl(-1);
+				elseif ($result > 0) print $samu->getNomUrl(1);
 			}
 
 			print '</td></tr>';
@@ -638,7 +638,7 @@ if (empty($reshook))
 
 			if ($object->fk_soc_police > 0)
 			{
-				$police = new User($db);
+				$police = new Societe($db);
 				$result = $police->fetch($object->fk_soc_police);
 				if ($result < 0) dol_print_error('', $police->error);
 				elseif ($result > 0) print $police->getNomUrl(-1);
@@ -654,7 +654,7 @@ if (empty($reshook))
 
 			if ($object->fk_soc_urgency > 0)
 			{
-				$urgencies = new User($db);
+				$urgencies = new Societe($db);
 				$result = $urgencies->fetch($object->fk_soc_urgency);
 				if ($result < 0) dol_print_error('', $urgencies->error);
 				elseif ($result > 0) print $urgencies->getNomUrl(-1);
@@ -670,7 +670,7 @@ if (empty($reshook))
 
 			if ($object->fk_soc_rights_defender > 0)
 			{
-				$rights_defender = new User($db);
+				$rights_defender = new Societe($db);
 				$result = $rights_defender->fetch($object->fk_soc_rights_defender);
 				if ($result < 0) dol_print_error('', $rights_defender->error);
 				elseif ($result > 0) print $rights_defender->getNomUrl(-1);
@@ -686,7 +686,7 @@ if (empty($reshook))
 
 			if ($object->fk_soc_antipoison > 0)
 			{
-				$antipoison = new User($db);
+				$antipoison = new Societe($db);
 				$result = $antipoison->fetch($object->fk_soc_antipoison);
 				if ($result < 0) dol_print_error('', $antipoison->error);
 				elseif ($result > 0) print $antipoison->getNomUrl(-1);

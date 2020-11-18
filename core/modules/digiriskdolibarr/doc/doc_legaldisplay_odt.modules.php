@@ -38,7 +38,7 @@ require_once DOL_DOCUMENT_ROOT.'/core/lib/doc.lib.php';
 /**
  *	Class to build documents using ODF templates generator
  */
-class doc_generic_legaldisplay_odt extends ModelePDFLegalDisplay
+class doc_legaldisplay_odt extends ModelePDFLegalDisplay
 {
 	/**
 	 * Issuer
@@ -116,7 +116,6 @@ class doc_generic_legaldisplay_odt extends ModelePDFLegalDisplay
 		$langs->loadLangs(array("errors", "companies"));
 
 		$form = new Form($this->db);
-
 		$texte = $this->description.".<br>\n";
 		$texte .= '<form action="'.$_SERVER["PHP_SELF"].'" method="POST">';
 		$texte .= '<input type="hidden" name="token" value="'.newToken().'">';
@@ -229,8 +228,7 @@ class doc_generic_legaldisplay_odt extends ModelePDFLegalDisplay
 
 		$outputlangs->loadLangs(array("main", "dict", "companies", "bills"));
 
-		if ($conf->commande->dir_output)
-		{
+		
 			// If $object is id instead of object
 			if (!is_object($object))
 			{
@@ -244,7 +242,7 @@ class doc_generic_legaldisplay_odt extends ModelePDFLegalDisplay
 				}
 			}
 
-			$dir = $conf->commande->multidir_output[isset($object->entity) ? $object->entity : 1];
+			$dir = $conf->digiriskdolibarr->multidir_output[isset($object->entity) ? $object->entity : 1] . '/legaldisplay';
 			$objectref = dol_sanitizeFileName($object->ref);
 			if (!preg_match('/specimen/i', $objectref)) $dir .= "/".$objectref;
 			$file = $dir."/".$objectref.".odt";
@@ -341,7 +339,7 @@ class doc_generic_legaldisplay_odt extends ModelePDFLegalDisplay
 					$odfHandler = new odf(
 						$srctemplatepath,
 						array(
-						'PATH_TO_TMP'	  => $conf->commande->dir_temp,
+						'PATH_TO_TMP'	  => $conf->digiriskdolibarr->dir_temp,
 						'ZIP_PROXY'		  => 'PclZipProxy', // PhpZipProxy or PclZipProxy. Got "bad compression method" error when using PhpZipProxy.
 						'DELIMITER_LEFT'  => '{',
 						'DELIMITER_RIGHT' => '}'
@@ -513,7 +511,7 @@ class doc_generic_legaldisplay_odt extends ModelePDFLegalDisplay
 				$this->error = $langs->transnoentities("ErrorCanNotCreateDir", $dir);
 				return -1;
 			}
-		}
+		
 
 		return -1;
 	}
