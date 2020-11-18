@@ -196,9 +196,9 @@ class DigiriskDolibarrFunctionalTest extends \PHPUnit_Extensions_Selenium2TestCa
 	 */
 	public function testConfigurationPage()
 	{
-		$this->url('/custom/digiriskdolibarr/admin/setup.php');
+		$this->url('/custom/digiriskdolibarr/admin/digriskdolibarr.php');
 		$this->authenticate();
-		return $this->assertContains('digiriskdolibarr/admin/setup.php', $this->url(), 'Configuration page');
+		return $this->assertContains('digiriskdolibarr/admin/digriskdolibarr.php', $this->url(), 'Configuration page');
 	}
 
 	/**
