@@ -35,7 +35,7 @@ function digiriskdolibarrAdminPrepareHead()
 	$h = 0;
 	$head = array();
 
-	$head[$h][0] = dol_buildpath("/digiriskdolibarr/admin/setup.php", 1);
+	$head[$h][0] = dol_buildpath("/digiriskdolibarr/admin/digriskdolibarr.php", 1);
 	$head[$h][1] = $langs->trans("Settings");
 	$head[$h][2] = 'settings';
 	$h++;

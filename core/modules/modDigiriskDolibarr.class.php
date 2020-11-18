@@ -2,7 +2,7 @@
 /* Copyright (C) 2004-2018  Laurent Destailleur     <eldy@users.sourceforge.net>
  * Copyright (C) 2018-2019  Nicolas ZABOURI         <info@inovea-conseil.com>
  * Copyright (C) 2019-2020  Frédéric France         <frederic.france@netlogic.fr>
- * Copyright (C) 2020 SuperAdmin
+ * Copyright (C) 2019-2020 Eoxia <dev@eoxia.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,7 +22,7 @@
  * 	\defgroup   digiriskdolibarr     Module DigiriskDolibarr
  *  \brief      DigiriskDolibarr module descriptor.
  *
- *  \file       htdocs/digiriskdolibarr/core/modules/modDigiriskDolibarr.class.php
+ *  \file       htdocs/custom/digiriskdolibarr/core/modules/modDigiriskDolibarr.class.php
  *  \ingroup    digiriskdolibarr
  *  \brief      Description and activation file for module DigiriskDolibarr
  */
@@ -41,40 +41,26 @@ class modDigiriskDolibarr extends DolibarrModules
 	public function __construct($db)
 	{
 		global $langs, $conf;
+
 		$this->db = $db;
 
 		// Id for module (must be unique).
 		// Use here a free id (See in Home -> System information -> Dolibarr for list of used modules id).
 		$this->numero = 501500; // TODO Go on page https://wiki.dolibarr.org/index.php/List_of_modules_id to reserve an id number for your module
-		// Key text used to identify module (for permissions, menus, etc...)
-		$this->rights_class = 'DIGIRISK FOR DOLIBARR';
+		$this->rights_class = 'digiriskdolibarr';
 		// Family can be 'base' (core modules),'crm','financial','hr','projects','products','ecm','technic' (transverse modules),'interface' (link with external tools),'other','...'
 		// It is used to group modules by family in module setup page
-		$this->family = "other";
-		// Module position in the family on 2 digits ('01', '10', '20', ...)
+		$this->family          = "other";
 		$this->module_position = '90';
-		// Gives the possibility for the module, to provide his own family info and position of this family (Overwrite $this->family and $this->module_position. Avoid this)
-		//$this->familyinfo = array('myownfamily' => array('position' => '01', 'label' => $langs->trans("MyOwnFamily")));
-		// Module label (no space allowed), used if translation string 'ModuleDigiriskDolibarrName' not found (DigiriskDolibarr is name of module).
-		$this->name = preg_replace('/^mod/i', '', get_class($this));
-		// Module description, used if translation string 'ModuleDigiriskDolibarrDesc' not found (DigiriskDolibarr is name of module).
-		$this->description = "Digirisk for Dolibarr";
-		// Used only if file README.md and README-LL.md not found.
-		$this->descriptionlong = "DigiriskDolibarr description (Long)";
-		$this->editor_name = 'Editor name';
-		$this->editor_url = 'https://www.example.com';
-		// Possible values for version are: 'development', 'experimental', 'dolibarr', 'dolibarr_deprecated' or a version string like 'x.y.z'
-		$this->version = '1.0';
-		// Url to the file with your last numberversion of this module
-		//$this->url_last_version = 'http://www.example.com/versionmodule.txt';
+		$this->name            = preg_replace('/^mod/i', '', get_class($this));
+		$this->description     = "Digirisk for Dolibarr";
+		$this->descriptionlong = "Digirisk for Dolibarr";
+		$this->editor_name     = 'Evarisk';
+		$this->editor_url      = 'https://evarisk.com';
+		$this->version         = '1.0.0';
+		$this->const_name      = 'MAIN_MODULE_'.strtoupper($this->name);
+		$this->picto           ='digiriskdolibarr@digiriskdolibarr';
 
-		// Key used in llx_const table to save module status enabled/disabled (where DIGIRISKDOLIBARR is value of property name of module in uppercase)
-		$this->const_name = 'MAIN_MODULE_'.strtoupper($this->name);
-		// Name of image file used for this module.
-		// If file is in theme/yourtheme/img directory under name object_pictovalue.png, use this->picto='pictovalue'
-		// If file is in module/img directory under name object_pictovalue.png, use this->picto='pictovalue@module'
-		$this->picto='digiriskdolibarr@digiriskdolibarr';
-		// Define some features supported by module (triggers, login, substitutions, menus, css, etc...)
 		$this->module_parts = array(
 			// Set this to 1 if module has its own trigger directory (core/triggers)
 			'triggers' => 0,
@@ -111,22 +97,22 @@ class modDigiriskDolibarr extends DolibarrModules
 			// Set this to 1 if features of module are opened to external users
 			'moduleforexternal' => 0,
 		);
-		// Data directories to create when module is enabled.
-		// Example: this->dirs = array("/digiriskdolibarr/temp","/digiriskdolibarr/subdir");
+
 		$this->dirs = array("/digiriskdolibarr/temp");
-		// Config pages. Put here list of php page, stored into digiriskdolibarr/admin directory, to use to setup module.
-		$this->config_page_url = array("setup.php@digiriskdolibarr");
+
+		// Config pages.
+		$this->config_page_url = array("digiriskdolibarr.php@digiriskdolibarr");
 		// Dependencies
-		// A condition to hide module
-		$this->hidden = false;
+
+		$this->hidden                  = false;
 		// List of module class names as string that must be enabled if this module is enabled. Example: array('always1'=>'modModuleToEnable1','always2'=>'modModuleToEnable2', 'FR1'=>'modModuleToEnableFR'...)
-		$this->depends = array();
-		$this->requiredby = array(); // List of module class names as string to disable if this one is disabled. Example: array('modModuleToDisable1', ...)
-		$this->conflictwith = array(); // List of module class names as string this module is in conflict with. Example: array('modModuleToDisable1', ...)
-		$this->langfiles = array("digiriskdolibarr@digiriskdolibarr");
-		$this->phpmin = array(5, 5); // Minimum version of PHP required by module
-		$this->need_dolibarr_version = array(11, -3); // Minimum version of Dolibarr required by module
-		$this->warnings_activation = array(); // Warning to show when we activate module. array('always'='text') or array('FR'='textfr','ES'='textes'...)
+		$this->depends                 = array();
+		$this->requiredby              = array();
+		$this->conflictwith            = array();
+		$this->langfiles               = array("digiriskdolibarr@digiriskdolibarr");
+		$this->phpmin                  = array(5, 5); // Minimum version of PHP required by module
+		$this->need_dolibarr_version   = array(11, -3); // Minimum version of Dolibarr required by module
+		$this->warnings_activation     = array(); // Warning to show when we activate module. array('always'='text') or array('FR'='textfr','ES'='textes'...)
 		$this->warnings_activation_ext = array(); // Warning to show when we activate an external module. array('always'='text') or array('FR'='textfr','ES'='textes'...)
 		//$this->automatic_activation = array('FR'=>'DigiriskDolibarrWasAutomaticallyActivatedBecauseOfYourCountryChoice');
 		//$this->always_enabled = true;								// If true, can't be disabled
@@ -144,8 +130,8 @@ class modDigiriskDolibarr extends DolibarrModules
 			'fr_FR:ParentCompany'=>'Maison mère ou revendeur'
 		)*/
 
-		if (!isset($conf->digiriskdolibarr) || !isset($conf->digiriskdolibarr->enabled)) {
-			$conf->digiriskdolibarr = new stdClass();
+		if ( ! isset($conf->digiriskdolibarr ) || ! isset( $conf->digiriskdolibarr->enabled ) ) {
+			$conf->digiriskdolibarr          = new stdClass();
 			$conf->digiriskdolibarr->enabled = 0;
 		}
 
@@ -239,65 +225,41 @@ class modDigiriskDolibarr extends DolibarrModules
 
 		// Permissions provided by this module
 		$this->rights = array();
-		$r = 0;
-		// Add here entries to declare new permissions
+		$r            = 0;
 		/* BEGIN MODULEBUILDER PERMISSIONS */
 		$this->rights[$r][0] = $this->numero + $r; // Permission id (must not be already used)
-		$this->rights[$r][1] = 'Read objects of digiriskdolibarr'; // Permission label
+		$this->rights[$r][1] = $langs->trans("ReadRight"); // Permission label
         $this->rights[$r][3] = 1;
-		$this->rights[$r][4] = 'digiriskdolibarr'; // In php code, permission will be checked by test if ($user->rights->digiriskdolibarr->level1->level2)
-		$this->rights[$r][5] = 'read'; // In php code, permission will be checked by test if ($user->rights->digiriskdolibarr->level1->level2)
+		$this->rights[$r][4] = 'read'; // In php code, permission will be checked by test if ($user->rights->digiriskdolibarr->level1->level2)
 		$r++;
-		$this->rights[$r][0] = $this->numero + $r; // Permission id (must not be already used)
-		$this->rights[$r][1] = 'Create/Update objects of digiriskdolibarr'; // Permission label
+		$this->rights[$r][0] = $this->numero + $r;
+		$this->rights[$r][1] = $langs->trans("CreateRight");
         $this->rights[$r][3] = 1;
-		$this->rights[$r][4] = 'digiriskdolibarr'; // In php code, permission will be checked by test if ($user->rights->digiriskdolibarr->level1->level2)
-		$this->rights[$r][5] = 'write'; // In php code, permission will be checked by test if ($user->rights->digiriskdolibarr->level1->level2)
+		$this->rights[$r][4] = 'write';
 		$r++;
-		$this->rights[$r][0] = $this->numero + $r; // Permission id (must not be already used)
-		$this->rights[$r][1] = 'Delete objects of digiriskdolibarr'; // Permission label
+		$this->rights[$r][0] = $this->numero + $r;
+		$this->rights[$r][1] = $langs->trans("DeleteRight");
         $this->rights[$r][3] = 1;
-		$this->rights[$r][4] = 'digiriskdolibarr'; // In php code, permission will be checked by test if ($user->rights->digiriskdolibarr->level1->level2)
-		$this->rights[$r][5] = 'delete'; // In php code, permission will be checked by test if ($user->rights->digiriskdolibarr->level1->level2)
-		$r++;
-		$this->rights[$r][0] = $this->numero + $r; // Permission id (must not be already used)
-		$this->rights[$r][1] = 'Read objects of digiriskdolibarr'; // Permission label
-        $this->rights[$r][3] = 1;
-		$this->rights[$r][4] = 'legaldisplay'; // In php code, permission will be checked by test if ($user->rights->digiriskdolibarr->level1->level2)
-		$this->rights[$r][5] = 'read'; // In php code, permission will be checked by test if ($user->rights->digiriskdolibarr->level1->level2)
-		$r++;
-		$this->rights[$r][0] = $this->numero + $r; // Permission id (must not be already used)
-		$this->rights[$r][1] = 'Create/Update objects of digiriskdolibarr'; // Permission label
-        $this->rights[$r][3] = 1;
-		$this->rights[$r][4] = 'legaldisplay'; // In php code, permission will be checked by test if ($user->rights->digiriskdolibarr->level1->level2)
-		$this->rights[$r][5] = 'write'; // In php code, permission will be checked by test if ($user->rights->digiriskdolibarr->level1->level2)
-		$r++;
-		$this->rights[$r][0] = $this->numero + $r; // Permission id (must not be already used)
-		$this->rights[$r][1] = 'Delete objects of digiriskdolibarr'; // Permission label
-        $this->rights[$r][3] = 1;
-		$this->rights[$r][4] = 'legaldisplay'; // In php code, permission will be checked by test if ($user->rights->digiriskdolibarr->level1->level2)
-		$this->rights[$r][5] = 'delete'; // In php code, permission will be checked by test if ($user->rights->digiriskdolibarr->level1->level2)
-		$r++;
+		$this->rights[$r][4] = 'delete';
 		/* END MODULEBUILDER PERMISSIONS */
 
 		// Main menu entries to add
 		$this->menu = array();
-		$r = 0;
-		// Add here entries to declare new menus
+		$r          = 0;
 		/* BEGIN MODULEBUILDER TOPMENU */
 		$this->menu[$r++] = array(
-			'fk_menu'=>'', // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
-			'type'=>'top', // This is a Top menu entry
-			'titre'=>'Digirisk',
-			'mainmenu'=>'digiriskdolibarr',
-			'leftmenu'=>'',
-			'url'=>'/digiriskdolibarr/index.php',
-			'langs'=>'digiriskdolibarr@digiriskdolibarr', // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
-			'position'=>1000 + $r,
-			'enabled'=>'$conf->digiriskdolibarr->enabled', // Define condition to show or hide menu entry. Use '$conf->digiriskdolibarr->enabled' if entry must be visible if module is enabled.
-			'perms'=>'1', // Use 'perms'=>'$user->rights->digiriskdolibarr->myobject->read' if you want your menu with a permission rules
-			'target'=>'',
-			'user'=>2, // 0=Menu for internal users, 1=external users, 2=both
+			'fk_menu'  => '', // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
+			'type'     => 'top', // This is a Top menu entry
+			'titre'    => 'Digirisk',
+			'mainmenu' => 'digiriskdolibarr',
+			'leftmenu' => '',
+			'url'      => '/digiriskdolibarr/index.php',
+			'langs'    => 'digiriskdolibarr@digiriskdolibarr', // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
+			'position' => 1000 + $r,
+			'enabled'  => '$conf->digiriskdolibarr->enabled', // Define condition to show or hide menu entry. Use '$conf->digiriskdolibarr->enabled' if entry must be visible if module is enabled.
+			'perms'    => '1', // Use 'perms'=>'$user->rights->digiriskdolibarr->myobject->read' if you want your menu with a permission rules
+			'target'   => '',
+			'user'     => 2, // 0=Menu for internal users, 1=external users, 2=both
 		);
 		/* END MODULEBUILDER TOPMENU */
 
