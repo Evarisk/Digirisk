@@ -27,13 +27,13 @@
  *	\brief      File of class to build ODT documents for digiriskdolibarr
  */
 
-dol_include_once('/digiriskdolibarr/core/modules/digiriskdolibarr/modules_legaldisplay.php');
-require_once DOL_DOCUMENT_ROOT.'/product/class/product.class.php';
-require_once DOL_DOCUMENT_ROOT.'/core/lib/company.lib.php';
-require_once DOL_DOCUMENT_ROOT.'/core/lib/functions2.lib.php';
-require_once DOL_DOCUMENT_ROOT.'/core/lib/files.lib.php';
-require_once DOL_DOCUMENT_ROOT.'/core/lib/doc.lib.php';
 
+dol_include_once('/digiriskdolibarr/core/modules/digiriskdolibarr/modules_legaldisplay.php');
+dol_include_once('/custom/digiriskdolibarr/lib/files.lib.php');
+dol_include_once('/core/lib/files.lib.php');
+require_once DOL_DOCUMENT_ROOT.'/core/lib/company.lib.php';
+require_once DOL_DOCUMENT_ROOT.'/custom/digiriskdolibarr/lib/functions.lib.php';
+require_once DOL_DOCUMENT_ROOT.'/core/lib/doc.lib.php';
 
 /**
  *	Class to build documents using ODF templates generator
@@ -228,12 +228,12 @@ class doc_legaldisplay_odt extends ModelePDFLegalDisplay
 
 		$outputlangs->loadLangs(array("main", "dict", "companies", "bills"));
 
-		
+
 			// If $object is id instead of object
 			if (!is_object($object))
 			{
 				$id = $object;
-				$object = new Commande($this->db);
+				$object = new Legaldisplay($this->db);
 				$result = $object->fetch($id);
 				if ($result < 0)
 				{
@@ -511,7 +511,7 @@ class doc_legaldisplay_odt extends ModelePDFLegalDisplay
 				$this->error = $langs->transnoentities("ErrorCanNotCreateDir", $dir);
 				return -1;
 			}
-		
+
 
 		return -1;
 	}

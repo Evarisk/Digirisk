@@ -266,7 +266,7 @@ class modDigiriskDolibarr extends DolibarrModules
 		$this->menu[$r++]=array(
 			'fk_menu'=>'fk_mainmenu=digiriskdolibarr',	    // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
 			'type'=>'left',			                // This is a Left menu entry
-			'titre'=>'Documents légaux',
+			'titre'=>'Documents Légaux',
 			'mainmenu'=>'digiriskdolibarr',
 			'leftmenu'=>'documents',
 			'url'=>'/digiriskdolibarr/view/legaldocuments_list.php',
@@ -280,7 +280,7 @@ class modDigiriskDolibarr extends DolibarrModules
 		$this->menu[$r++]=array(
 			'fk_menu'=>'fk_mainmenu=digiriskdolibarr,fk_leftmenu=documents',      // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
 			'type'=>'left',                          // This is a Top menu entry
-			'titre'=>'Affichage légal',
+			'titre'=>'Liste des affichages légaux',
 			'mainmenu'=>'digiriskdolibarr',
 			'leftmenu'=>'legaldisplay',
 			'url'=>'/digiriskdolibarr/view/legaldisplay_list.php',
@@ -294,7 +294,7 @@ class modDigiriskDolibarr extends DolibarrModules
 		$this->menu[$r++]=array(
 			'fk_menu'=>'fk_mainmenu=digiriskdolibarr,fk_leftmenu=legaldisplay',      // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
 			'type'=>'left',                          // This is a Top menu entry
-			'titre'=>'Générer',
+			'titre'=>'Nouveau',
 			'mainmenu'=>'digiriskdolibarr',
 			'leftmenu'=>'createlegaldisplay',
 			'url'=>'/digiriskdolibarr/view/legaldisplay_card.php',

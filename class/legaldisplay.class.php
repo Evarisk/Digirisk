@@ -548,7 +548,7 @@ class Legaldisplay extends CommonObject
 	public function getNomUrl($withpicto = 0, $max = 0, $short = 0, $moretitle = '', $notooltip = 0, $save_lastsearch_value = -1)
     {
 		global $langs, $conf;
-	
+
         $result = '';
 
         $url = DOL_URL_ROOT.'/custom/digiriskdolibarr/view/legaldisplay_card.php?id='.$this->id;
@@ -599,7 +599,7 @@ class Legaldisplay extends CommonObject
 
         return $result;
 	}
-	
+
 	public function generateDocument($modele, $outputlangs, $hidedetails = 0, $hidedesc = 0, $hideref = 0, $moreparams = null)
     {
         global $conf, $langs;
@@ -615,7 +615,7 @@ class Legaldisplay extends CommonObject
 		    }
 	    }
 
-        $modelpath = "custom/digiriskdolibarr/core/modules/digiriskdolibarr/doc/";
+        $modelpath = "/custom/digiriskdolibarr/core/modules/digiriskdolibarr/doc/";
 
         return $this->commonGenerateDocument($modelpath, $modele, $outputlangs, $hidedetails, $hidedesc, $hideref, $moreparams);
     }

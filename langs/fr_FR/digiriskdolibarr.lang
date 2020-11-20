@@ -44,5 +44,13 @@ MyPageName = Nom de ma page
 #
 # Box d'exemple
 #
-MyWidget = Mon widget
+LabourDoctor = Médecin du travail
+LabourInspector = Inspecteur du travail
+TouteUrgence = Toute Urgence 
+RightsDefender = Défenseur des droits 
+Antipoison = Centre Antipoison 
+ResponsiblePrevent = Responsable de la prévention
+
+LegalDisplay = Affichage Légal
+LegalDisplayList = Liste des affichages légaux
 MyWidgetDescription = Description de mon widget

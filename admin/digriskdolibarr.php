@@ -118,7 +118,7 @@ if ($action == 'updateMask')
 
 		if ($module->write_file($tmpobject, $langs) > 0)
 		{
-			header("Location: ".DOL_URL_ROOT."/document.php?modulepart=".strtolower($tmpobjectkey)."&file=SPECIMEN.pdf");
+			header("Location: ".DOL_URL_ROOT."/custom/digiriskdolibarr/document.php?modulepart=".strtolower($tmpobjectkey)."&file=SPECIMEN.pdf");
 			return;
 		} else {
 			setEventMessages($module->error, null, 'errors');

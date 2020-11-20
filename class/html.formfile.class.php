@@ -1,0 +1,1624 @@
+<?php
+/* Copyright (C) 2008-2013	Laurent Destailleur	<eldy@users.sourceforge.net>
+ * Copyright (C) 2010-2014	Regis Houssin		<regis.houssin@inodbox.com>
+ * Copyright (C) 2010-2016	Juanjo Menent		<jmenent@2byte.es>
+ * Copyright (C) 2013		Charles-Fr BENKE	<charles.fr@benke.fr>
+ * Copyright (C) 2013		Cédric Salvador		<csalvador@gpcsolutions.fr>
+ * Copyright (C) 2014		Marcos García		<marcosgdf@gmail.com>
+ * Copyright (C) 2015		Bahfir Abbes		<bafbes@gmail.com>
+ * Copyright (C) 2016-2017	Ferran Marcet		<fmarcet@2byte.es>
+ * Copyright (C) 2019       Frédéric France     <frederic.france@netlogic.fr>
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ */
+
+/**
+ *	\file       htdocs/core/class/html.formfile.class.php
+ *  \ingroup    core
+ *	\brief      File of class to offer components to list and upload files
+ */
+
+
+/**
+ *	Class to offer components to list and upload files
+ */
+class FormFile
+{
+	private $db;
+
+	/**
+	 * @var string Error code (or message)
+	 */
+	public $error;
+
+	public $numoffiles;
+	public $infofiles; // Used to return informations by function getDocumentsLink
+
+
+	/**
+	 *	Constructor
+	 *
+	 *  @param		DoliDB		$db      Database handler
+	 */
+	public function __construct($db)
+	{
+		$this->db = $db;
+		$this->numoffiles = 0;
+	}
+
+
+	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+	/**
+	 *  Show form to upload a new file.
+	 *
+	 *  @param  string		$url			Url
+	 *  @param  string		$title			Title zone (Title or '' or 'none')
+	 *  @param  int			$addcancel		1=Add 'Cancel' button
+	 *	@param	int			$sectionid		If upload must be done inside a particular ECM section (is sectionid defined, sectiondir must not be)
+	 * 	@param	int			$perm			Value of permission to allow upload
+	 *  @param  int			$size          	Length of input file area. Deprecated.
+	 *  @param	Object		$object			Object to use (when attachment is done on an element)
+	 *  @param	string		$options		Add an option column
+	 *  @param  integer     $useajax        Use fileupload ajax (0=never, 1=if enabled, 2=always whatever is option).
+	 *                                      Deprecated 2 should never be used and if 1 is used, option should no be enabled.
+	 *  @param	string		$savingdocmask	Mask to use to define output filename. For example 'XXXXX-__YYYYMMDD__-__file__'
+	 *  @param	integer		$linkfiles		1=Also add form to link files, 0=Do not show form to link files
+	 *  @param	string		$htmlname		Name and id of HTML form ('formuserfile' by default, 'formuserfileecm' when used to upload a file in ECM)
+	 *  @param	string		$accept			Specifies the types of files accepted (This is not a security check but an user interface facility. eg '.pdf,image/*' or '.png,.jpg' or 'video/*')
+	 *	@param	string		$sectiondir		If upload must be done inside a particular directory (if sectiondir defined, sectionid must not be)
+	 *  @param  int         $usewithoutform 0=Default, 1=Disable <form> and style to use in existing area
+	 *  @param	int			$capture		1=Add tag capture="capture" to force use of micro or video recording to generate file. When setting this to 1, you must also provide a value for $accept.
+	 * 	@return	int							<0 if KO, >0 if OK
+	 */
+	public function form_attach_new_file($url, $title = '', $addcancel = 0, $sectionid = 0, $perm = 1, $size = 50, $object = '', $options = '', $useajax = 1, $savingdocmask = '', $linkfiles = 1, $htmlname = 'formuserfile', $accept = '', $sectiondir = '', $usewithoutform = 0, $capture = 0)
+	{
+		// phpcs:enable
+		global $conf, $langs, $hookmanager;
+		$hookmanager->initHooks(array('formfile'));
+
+		// Deprecation warning
+		if ($useajax == 2) {
+			digiriskdol_syslog(__METHOD__.": using 2 for useajax is deprecated and should be not used", LOG_WARNING);
+		}
+
+		if (!empty($conf->browser->layout) && $conf->browser->layout != 'classic') $useajax = 0;
+
+		if ((!empty($conf->global->MAIN_USE_JQUERY_FILEUPLOAD) && $useajax) || ($useajax == 2))
+		{
+			// TODO: Check this works with 2 forms on same page
+			// TODO: Check this works with GED module, otherwise, force useajax to 0
+			// TODO: This does not support option savingdocmask
+			// TODO: This break feature to upload links too
+			return $this->_formAjaxFileUpload($object);
+		}
+		else
+		{
+			//If there is no permission and the option to hide unauthorized actions is enabled, then nothing is printed
+			if (!$perm && !empty($conf->global->MAIN_BUTTON_HIDE_UNAUTHORIZED)) {
+				return 1;
+			}
+
+			$out = "\n\n".'<!-- Start form attach new file --><div class="formattachnewfile">'."\n";
+
+			if (empty($title)) $title = $langs->trans("AttachANewFile");
+			if ($title != 'none') $out .= load_fiche_titre($title, null, null);
+
+			if (empty($usewithoutform))		// Try to avoid this and set instead the form by the caller.
+			{
+				$out .= '<form name="'.$htmlname.'" id="'.$htmlname.'" action="'.$url.'" enctype="multipart/form-data" method="POST">';
+				$out .= '<input type="hidden" name="token" value="'.newToken().'">';
+				$out .= '<input type="hidden" id="'.$htmlname.'_section_dir" name="section_dir" value="'.$sectiondir.'">';
+				$out .= '<input type="hidden" id="'.$htmlname.'_section_id"  name="section_id" value="'.$sectionid.'">';
+				$out .= '<input type="hidden" name="sortfield" value="'.GETPOST('sortfield', 'alpha').'">';
+				$out .= '<input type="hidden" name="sortorder" value="'.GETPOST('sortorder', 'aZ09').'">';
+			}
+
+			$out .= '<table class="nobordernopadding cenpercent">';
+			$out .= '<tr>';
+
+			if (!empty($options)) $out .= '<td>'.$options.'</td>';
+
+			$out .= '<td class="valignmiddle nowrap">';
+
+			$max = $conf->global->MAIN_UPLOAD_DOC; // In Kb
+			$maxphp = @ini_get('upload_max_filesize'); // In unknown
+			if (preg_match('/k$/i', $maxphp)) $maxphp = $maxphp * 1;
+			if (preg_match('/m$/i', $maxphp)) $maxphp = $maxphp * 1024;
+			if (preg_match('/g$/i', $maxphp)) $maxphp = $maxphp * 1024 * 1024;
+			if (preg_match('/t$/i', $maxphp)) $maxphp = $maxphp * 1024 * 1024 * 1024;
+			$maxphp2 = @ini_get('post_max_size'); // In unknown
+			if (preg_match('/k$/i', $maxphp2)) $maxphp2 = $maxphp2 * 1;
+			if (preg_match('/m$/i', $maxphp2)) $maxphp2 = $maxphp2 * 1024;
+			if (preg_match('/g$/i', $maxphp2)) $maxphp2 = $maxphp2 * 1024 * 1024;
+			if (preg_match('/t$/i', $maxphp2)) $maxphp2 = $maxphp2 * 1024 * 1024 * 1024;
+			// Now $max and $maxphp and $maxphp2 are in Kb
+			$maxmin = $max;
+			$maxphptoshow = $maxphptoshowparam = '';
+			if ($maxphp > 0)
+			{
+				$maxmin = min($max, $maxphp);
+				$maxphptoshow = $maxphp;
+				$maxphptoshowparam = 'upload_max_filesize';
+			}
+			if ($maxphp2 > 0)
+			{
+				$maxmin = min($max, $maxphp2);
+				if ($maxphp2 < $maxphp)
+				{
+					$maxphptoshow = $maxphp2;
+					$maxphptoshowparam = 'post_max_size';
+				}
+			}
+
+			if ($maxmin > 0)
+			{
+				// MAX_FILE_SIZE doit précéder le champ input de type file
+				$out .= '<input type="hidden" name="max_file_size" value="'.($maxmin * 1024).'">';
+			}
+
+			$out .= '<input class="flat minwidth400 maxwidth200onsmartphone" type="file"';
+			//$out .= ((!empty($conf->global->MAIN_DISABLE_MULTIPLE_FILEUPLOAD) || $conf->browser->layout != 'classic') ? ' name="userfile"' : ' name="userfile[]" multiple');
+			$out .= ((!empty($conf->global->MAIN_DISABLE_MULTIPLE_FILEUPLOAD)) ? ' name="userfile"' : ' name="userfile[]" multiple');
+			$out .= (empty($conf->global->MAIN_UPLOAD_DOC) || empty($perm) ? ' disabled' : '');
+			$out .= (!empty($accept) ? ' accept="'.$accept.'"' : ' accept=""');
+			$out .= (!empty($capture) ? ' capture="capture"' : '');
+			$out .= '>';
+			$out .= ' ';
+			if ($sectionid) {	// Show overwrite if exists for ECM module only
+				$langs->load('link');
+				$out .= '<input style="margin-right: 2px;" type="checkbox" id="overwritefile" name="overwritefile" value="1"><label for="overwritefile">'.$langs->trans("OverwriteIfExists").'</label>';
+			}
+			$out .= '<input type="submit" class="button reposition" name="sendit" value="'.$langs->trans("Upload").'"';
+			$out .= (empty($conf->global->MAIN_UPLOAD_DOC) || empty($perm) ? ' disabled' : '');
+			$out .= '>';
+
+			if ($addcancel)
+			{
+				$out .= ' &nbsp; ';
+				$out .= '<input type="submit" class="button" name="cancel" value="'.$langs->trans("Cancel").'">';
+			}
+
+			if (!empty($conf->global->MAIN_UPLOAD_DOC))
+			{
+				if ($perm)
+				{
+					$langs->load('other');
+					$out .= ' ';
+					$out .= info_admin($langs->trans("ThisLimitIsDefinedInSetup", $max, $maxphptoshow), 1);
+				}
+			}
+			else
+			{
+				$out .= ' ('.$langs->trans("UploadDisabled").')';
+			}
+			$out .= "</td></tr>";
+
+			if ($savingdocmask)
+			{
+				//add a global variable for disable the auto renaming on upload
+				$rename = (empty($conf->global->MAIN_DOC_UPLOAD_NOT_RENAME_BY_DEFAULT) ? 'checked' : '');
+
+				$out .= '<tr>';
+				if (!empty($options)) $out .= '<td>'.$options.'</td>';
+				$out .= '<td valign="middle" class="nowrap">';
+				$out .= '<input type="checkbox" '.$rename.' class="savingdocmask" name="savingdocmask" value="'.digiriskdol_escape_js($savingdocmask).'"> '.$langs->trans("SaveUploadedFileWithMask", preg_replace('/__file__/', $langs->transnoentitiesnoconv("OriginFileName"), $savingdocmask), $langs->transnoentitiesnoconv("OriginFileName"));
+				$out .= '</td>';
+				$out .= '</tr>';
+			}
+
+			$out .= "</table>";
+
+			if (empty($usewithoutform))
+			{
+				$out .= '</form>';
+				if (empty($sectionid)) $out .= '<br>';
+			}
+
+			$out .= "\n</div><!-- End form attach new file -->\n";
+
+			if ($linkfiles)
+			{
+				$out .= "\n".'<!-- Start form link new url --><div class="formlinknewurl">'."\n";
+				$langs->load('link');
+				$title = $langs->trans("LinkANewFile");
+				$out .= load_fiche_titre($title, null, null);
+
+				if (empty($usewithoutform))
+				{
+					$out .= '<form name="'.$htmlname.'_link" id="'.$htmlname.'_link" action="'.$url.'" method="POST">'."\n";
+					$out .= '<input type="hidden" name="token" value="'.newToken().'">'."\n";
+					$out .= '<input type="hidden" id="'.$htmlname.'_link_section_dir" name="link_section_dir" value="">'."\n";
+					$out .= '<input type="hidden" id="'.$htmlname.'_link_section_id"  name="link_section_id" value="'.$sectionid.'">'."\n";
+				}
+
+				$out .= '<div class="valignmiddle">';
+				$out .= '<div class="inline-block" style="padding-right: 10px;">';
+				if (!empty($conf->global->OPTIMIZEFORTEXTBROWSER)) $out .= '<label for="link">'.$langs->trans("URLToLink").':</label> ';
+				$out .= '<input type="text" name="link" class="flat minwidth400imp" id="link" placeholder="'.digiriskdol_escape_htmltag($langs->trans("URLToLink")).'">';
+				$out .= '</div>';
+				$out .= '<div class="inline-block" style="padding-right: 10px;">';
+				if (!empty($conf->global->OPTIMIZEFORTEXTBROWSER)) $out .= '<label for="label">'.$langs->trans("Label").':</label> ';
+				$out .= '<input type="text" class="flat" name="label" id="label" placeholder="'.digiriskdol_escape_htmltag($langs->trans("Label")).'">';
+				$out .= '<input type="hidden" name="objecttype" value="'.$object->element.'">';
+				$out .= '<input type="hidden" name="objectid" value="'.$object->id.'">';
+				$out .= '</div>';
+				$out .= '<div class="inline-block" style="padding-right: 10px;">';
+				$out .= '<input type="submit" class="button" name="linkit" value="'.$langs->trans("ToLink").'"';
+				$out .= (empty($conf->global->MAIN_UPLOAD_DOC) || empty($perm) ? ' disabled' : '');
+				$out .= '>';
+				$out .= '</div>';
+				$out .= '</div>';
+				if (empty($usewithoutform))
+				{
+					$out .= '<div class="clearboth"></div>';
+					$out .= '</form><br>';
+				}
+
+				$out .= "\n</div><!-- End form link new url -->\n";
+			}
+
+			$parameters = array('socid'=>(isset($GLOBALS['socid']) ? $GLOBALS['socid'] : ''), 'id'=>(isset($GLOBALS['id']) ? $GLOBALS['id'] : ''), 'url'=>$url, 'perm'=>$perm);
+			$res = $hookmanager->executeHooks('formattachOptions', $parameters, $object);
+			if (empty($res))
+			{
+				print '<div class="'.($usewithoutform ? 'inline-block valignmiddle' : 'attacharea attacharea'.$htmlname).'">';
+				print $out;
+				print '</div>';
+			}
+			print $hookmanager->resPrint;
+
+			return 1;
+		}
+	}
+
+	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+	/**
+	 *      Show the box with list of available documents for object
+	 *
+	 *      @param      string				$modulepart         propal, facture, facture_fourn, ...
+	 *      @param      string				$modulesubdir       Sub-directory to scan (Example: '0/1/10', 'FA/DD/MM/YY/9999'). Use '' if file is not into subdir of module.
+	 *      @param      string				$filedir            Directory to scan
+	 *      @param      string				$urlsource          Url of origin page (for return)
+	 *      @param      int					$genallowed         Generation is allowed (1/0 or array of formats)
+	 *      @param      int					$delallowed         Remove is allowed (1/0)
+	 *      @param      string				$modelselected      Model to preselect by default
+	 *      @param      integer				$allowgenifempty	Show warning if no model activated
+	 *      @param      integer				$forcenomultilang	Do not show language option (even if MAIN_MULTILANGS defined)
+	 *      @param      int					$iconPDF            Show only PDF icon with link (1/0)
+	 * 		@param		int					$notused	        Not used
+	 * 		@param		integer				$noform				Do not output html form tags
+	 * 		@param		string				$param				More param on http links
+	 * 		@param		string				$title				Title to show on top of form
+	 * 		@param		string				$buttonlabel		Label on submit button
+	 * 		@param		string				$codelang			Default language code to use on lang combo box if multilang is enabled
+	 * 		@return		int										<0 if KO, number of shown files if OK
+	 *      @deprecated                                         Use print xxx->showdocuments() instead.
+	 */
+	public function show_documents($modulepart, $modulesubdir, $filedir, $urlsource, $genallowed, $delallowed = 0, $modelselected = '', $allowgenifempty = 1, $forcenomultilang = 0, $iconPDF = 0, $notused = 0, $noform = 0, $param = '', $title = '', $buttonlabel = '', $codelang = '')
+	{
+		// phpcs:enable
+		$this->numoffiles = 0;
+		print $this->showdocuments($modulepart, $modulesubdir, $filedir, $urlsource, $genallowed, $delallowed, $modelselected, $allowgenifempty, $forcenomultilang, $iconPDF, $notused, $noform, $param, $title, $buttonlabel, $codelang);
+		return $this->numoffiles;
+	}
+
+	/**
+	 *      Return a string to show the box with list of available documents for object.
+	 *      This also set the property $this->numoffiles
+	 *
+	 *      @param      string				$modulepart         Module the files are related to ('propal', 'facture', 'facture_fourn', 'mymodule', 'mymodule:nameofsubmodule', 'mymodule_temp', ...)
+	 *      @param      string				$modulesubdir       Existing (so sanitized) sub-directory to scan (Example: '0/1/10', 'FA/DD/MM/YY/9999'). Use '' if file is not into subdir of module.
+	 *      @param      string				$filedir            Directory to scan
+	 *      @param      string				$urlsource          Url of origin page (for return)
+	 *      @param      int|string[]        $genallowed         Generation is allowed (1/0 or array list of templates)
+	 *      @param      int					$delallowed         Remove is allowed (1/0)
+	 *      @param      string				$modelselected      Model to preselect by default
+	 *      @param      integer				$allowgenifempty	Allow generation even if list of template ($genallowed) is empty (show however a warning)
+	 *      @param      integer				$forcenomultilang	Do not show language option (even if MAIN_MULTILANGS defined)
+	 *      @param      int					$iconPDF            Deprecated, see getDocumentsLink
+	 * 		@param		int					$notused	        Not used
+	 * 		@param		integer				$noform				Do not output html form tags
+	 * 		@param		string				$param				More param on http links
+	 * 		@param		string				$title				Title to show on top of form. Example: '' (Default to "Documents") or 'none'
+	 * 		@param		string				$buttonlabel		Label on submit button
+	 * 		@param		string				$codelang			Default language code to use on lang combo box if multilang is enabled
+	 * 		@param		string				$morepicto			Add more HTML content into cell with picto
+	 *      @param      Object              $object             Object when method is called from an object card.
+	 *      @param		int					$hideifempty		Hide section of generated files if there is no file
+	 *      @param      string              $removeaction       (optional) The action to remove a file
+	 * 		@return		string              					Output string with HTML array of documents (might be empty string)
+	 */
+	public function showdocuments($modulepart, $modulesubdir, $filedir, $urlsource, $genallowed, $delallowed = 0, $modelselected = '', $allowgenifempty = 1, $forcenomultilang = 0, $iconPDF = 0, $notused = 0, $noform = 0, $param = '', $title = '', $buttonlabel = '', $codelang = '', $morepicto = '', $object = null, $hideifempty = 0, $removeaction = 'remove_file')
+	{
+		// Deprecation warning
+		if (!empty($iconPDF)) {
+			dol_syslog(__METHOD__.": passing iconPDF parameter is deprecated", LOG_WARNING);
+		}
+
+		global $langs, $conf, $user, $hookmanager;
+		global $form;
+
+		if (!is_object($form)) $form = new Form($this->db);
+
+		include_once DOL_DOCUMENT_ROOT.'/custom/digiriskdolibarr/lib/files.lib.php';
+
+		// For backward compatibility
+		if (!empty($iconPDF)) {
+			return $this->digiriskgetDocumentsLink($modulepart, $modulesubdir, $filedir);
+		}
+
+
+		// Add entity in $param if not already exists
+		if (!preg_match('/entity\=[0-9]+/', $param)) {
+			$param .= 'entity='.(!empty($object->entity) ? $object->entity : $conf->entity);
+		}
+
+		$printer = 0;
+		if (in_array($modulepart, array('digiriskdolibarr:legaldisplay')))	// The direct print feature is implemented only for such elements
+		{
+			$printer = (!empty($user->rights->printing->read) && !empty($conf->printing->enabled)) ?true:false;
+		}
+
+		$hookmanager->initHooks(array('formfile'));
+
+		// Get list of files
+		$file_list = null;
+		if (!empty($filedir))
+		{
+			$file_list = digiriskdol_dir_list($filedir, 'files', 0, '', '(\.meta|_preview.*.*\.png)$', 'date', SORT_DESC);
+		}
+		if ($hideifempty && empty($file_list)) return '';
+
+		$out = '';
+		$forname = 'builddoc';
+		$headershown = 0;
+		$showempty = 0;
+		$i = 0;
+
+		$out .= "\n".'<!-- Start show_document -->'."\n";
+		//print 'filedir='.$filedir;
+
+		if (preg_match('/massfilesarea_/', $modulepart))
+		{
+			$out .= '<div id="show_files"><br></div>'."\n";
+			$title = $langs->trans("MassFilesArea").' <a href="" id="togglemassfilesarea" ref="shown">('.$langs->trans("Hide").')</a>';
+			$title .= '<script>
+				jQuery(document).ready(function() {
+					jQuery(\'#togglemassfilesarea\').click(function() {
+						if (jQuery(\'#togglemassfilesarea\').attr(\'ref\') == "shown")
+						{
+							jQuery(\'#'.$modulepart.'_table\').hide();
+							jQuery(\'#togglemassfilesarea\').attr("ref", "hidden");
+							jQuery(\'#togglemassfilesarea\').text("('.digiriskdol_escape_js($langs->trans("Show")).')");
+						}
+						else
+						{
+							jQuery(\'#'.$modulepart.'_table\').show();
+							jQuery(\'#togglemassfilesarea\').attr("ref","shown");
+							jQuery(\'#togglemassfilesarea\').text("('.digiriskdol_escape_js($langs->trans("Hide")).')");
+						}
+						return false;
+					});
+				});
+				</script>';
+		}
+
+		$titletoshow = $langs->trans("Documents");
+		if (!empty($title)) $titletoshow = ($title == 'none' ? '' : $title);
+
+		// Show table
+		if ($genallowed)
+		{
+			$modellist = array();
+
+			if ($modulepart == 'digiriskdolibarr:legaldisplay')
+			{
+				if (is_array($genallowed)) $modellist = $genallowed;
+				else
+				{
+					include_once DOL_DOCUMENT_ROOT.'/custom/digiriskdolibarr/core/modules/digiriskdolibarr/modules_legaldisplay.php';
+					$modellist = ModelePDFLegalDisplay::liste_modeles($this->db);
+				}
+			}
+
+			// Set headershown to avoid to have table opened a second time later
+			$headershown = 1;
+
+			if (empty($buttonlabel)) $buttonlabel = $langs->trans('Generate');
+
+			if ($conf->browser->layout == 'phone') $urlsource .= '#'.$forname.'_form'; // So we switch to form after a generation
+			if (empty($noform)) $out .= '<form action="'.$urlsource.(empty($conf->global->MAIN_JUMP_TAG) ? '' : '#builddoc').'" id="'.$forname.'_form" method="post">';
+			$out .= '<input type="hidden" name="action" value="builddoc">';
+			$out .= '<input type="hidden" name="token" value="'.newToken().'">';
+			$out .= load_fiche_titre($titletoshow, '', '');
+			$out .= '<div class="div-table-responsive-no-min">';
+			$out .= '<table class="liste formdoc noborder centpercent">';
+
+			$out .= '<tr class="liste_titre">';
+
+			$addcolumforpicto = ($delallowed || $printer || $morepicto);
+			$colspan = (3 + ($addcolumforpicto ? 1 : 0)); $colspanmore = 0;
+
+			$out .= '<th colspan="'.$colspan.'" class="formdoc liste_titre maxwidthonsmartphone center">';
+
+			// Model
+			if (!empty($modellist))
+			{
+				asort($modellist);
+				$out .= '<span class="hideonsmartphone">'.$langs->trans('Model').' </span>';
+				if (is_array($modellist) && count($modellist) == 1)    // If there is only one element
+				{
+					$arraykeys = array_keys($modellist);
+					$modelselected = $arraykeys[0];
+				}
+				$morecss = 'maxwidth200';
+				if ($conf->browser->layout == 'phone') $morecss = 'maxwidth100';
+				$out .= $form->selectarray('model', $modellist, $modelselected, $showempty, 0, 0, '', 0, 0, 0, '', $morecss);
+				if ($conf->use_javascript_ajax)
+
+				{
+					$out .= ajax_combobox('model');
+				}
+			}
+			else
+			{
+				$out .= '<div class="float">'.$langs->trans("Files").'</div>';
+			}
+
+			// Language code (if multilang)
+			if (($allowgenifempty || (is_array($modellist) && count($modellist) > 0)) && $conf->global->MAIN_MULTILANGS && !$forcenomultilang && (!empty($modellist) || $showempty))
+			{
+				include_once DOL_DOCUMENT_ROOT.'/core/class/html.formadmin.class.php';
+				$formadmin = new FormAdmin($this->db);
+				$defaultlang = $codelang ? $codelang : $langs->getDefaultLang();
+				$morecss = 'maxwidth150';
+				if ($conf->browser->layout == 'phone') $morecss = 'maxwidth100';
+				$out .= $formadmin->select_language($defaultlang, 'lang_id', 0, null, 0, 0, 0, $morecss);
+			}
+			else
+			{
+				$out .= '&nbsp;';
+			}
+
+			// Button
+			$genbutton = '<input class="button buttongen" id="'.$forname.'_generatebutton" name="'.$forname.'_generatebutton"';
+			$genbutton .= ' type="submit" value="'.$buttonlabel.'"';
+			if (!$allowgenifempty && !is_array($modellist) && empty($modellist)) $genbutton .= ' disabled';
+			$genbutton .= '>';
+			if ($allowgenifempty && !is_array($modellist) && empty($modellist) && empty($conf->digiriskdol_no_mouse_hover) && $modulepart != 'unpaid')
+			{
+				$langs->load("errors");
+				$genbutton .= ' '.img_warning($langs->transnoentitiesnoconv("WarningNoDocumentModelActivated"));
+			}
+			if (!$allowgenifempty && !is_array($modellist) && empty($modellist) && empty($conf->digiriskdol_no_mouse_hover) && $modulepart != 'unpaid') $genbutton = '';
+			if (empty($modellist) && !$showempty && $modulepart != 'unpaid') $genbutton = '';
+			$out .= $genbutton;
+			$out .= '</th>';
+			if (!empty($hookmanager->hooks['formfile']))
+			{
+
+				foreach ($hookmanager->hooks['formfile'] as $module)
+				{
+					if (method_exists($module, 'formBuilddocLineOptions'))
+					{
+						$colspanmore++;
+						$out .= '<th></th>';
+					}
+				}
+			}
+			$out .= '</tr>';
+			// Execute hooks
+			$parameters = array('colspan'=>($colspan + $colspanmore), 'socid'=>(isset($GLOBALS['socid']) ? $GLOBALS['socid'] : ''), 'id'=>(isset($GLOBALS['id']) ? $GLOBALS['id'] : ''), 'modulepart'=>$modulepart);
+			if (is_object($hookmanager))
+			{
+				$reshook = $hookmanager->executeHooks('formBuilddocOptions', $parameters, $GLOBALS['object']);
+				$out .= $hookmanager->resPrint;
+			}
+		}
+		// Get list of files
+		if (!empty($filedir))
+		{
+			$link_list = array();
+			if (is_object($object))
+			{
+				require_once DOL_DOCUMENT_ROOT.'/core/class/link.class.php';
+				$link = new Link($this->db);
+				$sortfield = $sortorder = null;
+				$res = $link->fetchAll($link_list, $object->element, $object->id, $sortfield, $sortorder);
+			}
+
+			$out .= '<!-- html.formfile::showdocuments -->'."\n";
+
+			// Show title of array if not already shown
+			if ((!empty($file_list) || !empty($link_list) || preg_match('/^massfilesarea/', $modulepart))
+				&& !$headershown)
+			{
+				$headershown = 1;
+				$out .= '<div class="titre">'.$titletoshow.'</div>'."\n";
+				$out .= '<div class="div-table-responsive-no-min">';
+				$out .= '<table class="noborder centpercent" id="'.$modulepart.'_table">'."\n";
+			}
+
+			// Loop on each file found
+			if (is_array($file_list))
+			{
+				foreach ($file_list as $file)
+				{
+					include_once(DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/lib/functions.lib.php');
+					include_once(DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/lib/files.lib.php');
+					// Define relative path for download link (depends on module)
+					$relativepath = $file["name"]; // Cas general
+					if ($modulesubdir) $relativepath = $modulesubdir."/".$file["name"]; // Cas propal, facture...
+					if ($modulepart == 'export') $relativepath = $file["name"]; // Other case
+
+					$out .= '<tr class="oddeven">';
+
+					$documenturl = DOL_URL_ROOT.'/custom/digiriskdolibarr/document.php';
+					if (isset($conf->global->DOL_URL_ROOT_DOCUMENT_PHP)) $documenturl = $conf->global->DOL_URL_ROOT_DOCUMENT_PHP; // To use another wrapper
+
+					// Show file name with link to download
+					$out .= '<td class="minwidth200">';
+					$out .= '<a class="documentdownload paddingright" href="'.$documenturl.'?modulepart='.$modulepart.'&amp;file='.urlencode($relativepath).($param ? '&'.$param : '').'"';
+
+					$mime = digiriskdol_mimetype($relativepath, '', 0);
+
+					if (preg_match('/text/', $mime)) $out .= ' target="_blank"';
+					$out .= '>';
+					$out .= digiriskimg_mime($file["name"], $langs->trans("File").': '.$file["name"]);
+					// LAAAAAA
+					$out .= dol_trunc($file["name"], 150);
+
+					$out .= '</a>'."\n";
+
+					$out .= $this->showPreview($file, $modulepart, $relativepath, 0, $param);
+					$out .= '</td>';
+
+					// Show file size
+					$size = (!empty($file['size']) ? $file['size'] : digiriskdol_filesize($filedir."/".$file["name"]));
+					$out .= '<td class="nowrap right">'.digiriskdol_print_size($size, 1, 1).'</td>';
+
+					// Show file date
+					$date = (!empty($file['date']) ? $file['date'] : digiriskdol_filemtime($filedir."/".$file["name"]));
+					$out .= '<td class="nowrap right">'.digiriskdol_print_date($date, 'dayhour', 'tzuser').'</td>';
+
+					if ($delallowed || $printer || $morepicto)
+					{
+						$out .= '<td class="right nowraponall">';
+						if ($delallowed)
+						{
+							$tmpurlsource = preg_replace('/#[a-zA-Z0-9_]*$/', '', $urlsource);
+							$out .= '<a href="'.$tmpurlsource.((strpos($tmpurlsource, '?') === false) ? '?' : '&amp;').'action='.$removeaction.'&amp;file='.urlencode($relativepath);
+							$out .= ($param ? '&amp;'.$param : '');
+							//$out.= '&modulepart='.$modulepart; // TODO obsolete ?
+							//$out.= '&urlsource='.urlencode($urlsource); // TODO obsolete ?
+							$out .= '">'.img_picto($langs->trans("Delete"), 'delete').'</a>';
+						}
+						if ($printer)
+						{
+							//$out.= '<td class="right">';
+							$out .= '<a class="marginleftonly" href="'.$urlsource.(strpos($urlsource, '?') ? '&amp;' : '?').'action=print_file&amp;printer='.$modulepart.'&amp;file='.urlencode($relativepath);
+							$out .= ($param ? '&amp;'.$param : '');
+							$out .= '">'.img_picto($langs->trans("PrintFile", $relativepath), 'printer.png').'</a>';
+						}
+						if ($morepicto)
+						{
+							$morepicto = preg_replace('/__FILENAMEURLENCODED__/', urlencode($relativepath), $morepicto);
+							$out .= $morepicto;
+						}
+						$out .= '</td>';
+					}
+
+					if (is_object($hookmanager))
+					{
+						$parameters = array('colspan'=>($colspan + $colspanmore), 'socid'=>(isset($GLOBALS['socid']) ? $GLOBALS['socid'] : ''), 'id'=>(isset($GLOBALS['id']) ? $GLOBALS['id'] : ''), 'modulepart'=>$modulepart, 'relativepath'=>$relativepath);
+						$res = $hookmanager->executeHooks('formBuilddocLineOptions', $parameters, $file);
+						if (empty($res))
+						{
+							$out .= $hookmanager->resPrint; // Complete line
+							$out .= '</tr>';
+						}
+						else
+						{
+							$out = $hookmanager->resPrint; // Replace all $out
+						}
+					}
+				}
+
+				$this->numoffiles++;
+			}
+			// Loop on each link found
+			if (is_array($link_list))
+			{
+				$colspan = 2;
+
+				foreach ($link_list as $file)
+				{
+					$out .= '<tr class="oddeven">';
+					$out .= '<td colspan="'.$colspan.'" class="maxwidhtonsmartphone">';
+					$out .= '<a data-ajax="false" href="'.$file->url.'" target="_blank">';
+					$out .= $file->label;
+					$out .= '</a>';
+					$out .= '</td>';
+					$out .= '<td class="right">';
+					$out .= digiriskdol_print_date($file->datea, 'dayhour');
+					$out .= '</td>';
+					if ($delallowed || $printer || $morepicto) $out .= '<td></td>';
+					$out .= '</tr>'."\n";
+				}
+				$this->numoffiles++;
+			}
+
+			if (count($file_list) == 0 && count($link_list) == 0 && $headershown)
+			{
+				$out .= '<tr><td colspan="'.(3 + ($addcolumforpicto ? 1 : 0)).'" class="opacitymedium">'.$langs->trans("None").'</td></tr>'."\n";
+			}
+		}
+
+		if ($headershown)
+		{
+			// Affiche pied du tableau
+			$out .= "</table>\n";
+			$out .= "</div>\n";
+			if ($genallowed)
+			{
+
+				if (empty($noform)) $out .= '</form>'."\n";
+			}
+		}
+
+		$out .= '<!-- End show_document -->'."\n";
+		//return ($i?$i:$headershown);
+		return $out;
+
+	}
+
+	/**
+	 *	Show a Document icon with link(s)
+	 *  You may want to call this into a div like this:
+	 *  print '<div class="inline-block valignmiddle">'.$formfile->getDocumentsLink($element_doc, $filename, $filedir).'</div>';
+	 *
+	 *	@param	string	$modulepart		propal, facture, facture_fourn, ...
+	 *	@param	string	$modulesubdir	Sub-directory to scan (Example: '0/1/10', 'FA/DD/MM/YY/9999'). Use '' if file is not into subdir of module.
+	 *	@param	string	$filedir		Full path to directory to scan
+	 *  @param	string	$filter			Filter filenames on this regex string (Example: '\.pdf$')
+	 *	@return	string              	Output string with HTML link of documents (might be empty string). This also fill the array ->infofiles
+	 */
+	public function digiriskgetDocumentsLink($modulepart, $modulesubdir, $filedir, $filter = '')
+	{
+		global $conf, $langs;
+
+		include_once DOL_DOCUMENT_ROOT.'/custom/digiriskdolibarr/lib/files.lib.php';
+		include_once DOL_DOCUMENT_ROOT.'/custom/digiriskdolibarr/lib/functions.lib.php';
+
+		$out = '';
+		$this->infofiles = array('nboffiles'=>0, 'extensions'=>array(), 'files'=>array());
+
+		$entity = 1; // Without multicompany
+
+		// Get object entity
+		if (!empty($conf->multicompany->enabled))
+		{
+			$regs = array();
+			preg_match('/\/([0-9]+)\/[^\/]+\/'.preg_quote($modulesubdir, '/').'$/', $filedir, $regs);
+			$entity = ((!empty($regs[1]) && $regs[1] > 1) ? $regs[1] : 1); // If entity id not found in $filedir this is entity 1 by default
+		}
+
+		// Get list of files starting with name of ref (but not followed by "-" to discard uploaded files and get only generated files)
+		// @todo Why not showing by default all files by just removing the '[^\-]+' at end of regex ?
+		if (!empty($conf->global->MAIN_SHOW_ALL_FILES_ON_DOCUMENT_TOOLTIP))
+		{
+			$filterforfilesearch = preg_quote(basename($modulesubdir), '/');
+		}
+		else
+		{
+			$filterforfilesearch = preg_quote(basename($modulesubdir), '/').'[^\-]+';
+		}
+		$file_list = digiriskdol_dir_list($filedir, 'files', 0, $filterforfilesearch, '\.meta$|\.png$'); // We also discard .meta and .png preview
+
+		//var_dump($file_list);
+		// For ajax treatment
+		$out .= '<!-- html.formfile::getDocumentsLink -->'."\n";
+		if (!empty($file_list))
+		{
+			$out = '<dl class="dropdown inline-block">
+    			<dt><a data-ajax="false" href="#" onClick="return false;">'.digiriskimg_picto('', 'listlight', '', 0, 0, 0, '', 'valignmiddle').'</a></dt>
+    			<dd><div class="multichoicedoc" style="position:absolute;left:100px;" ><ul class="ulselectedfields">';
+			$tmpout = '';
+
+			// Loop on each file found
+			$found = 0;
+			foreach ($file_list as $file)
+			{
+
+				$i++;
+				if ($filter && !preg_match('/'.$filter.'/i', $file["name"])) continue; // Discard this. It does not match provided filter.
+
+				$found++;
+				// Define relative path for download link (depends on module)
+				$relativepath = $file["name"]; // Cas general
+				if ($modulesubdir) $relativepath = $modulesubdir."/".$file["name"]; // Cas propal, facture...
+				// Autre cas
+				if ($modulepart == 'donation') {
+					$relativepath = digiriskget_exdir($modulesubdir, 2, 0, 0, null, 'donation').$file["name"];
+				}
+				if ($modulepart == 'export') {
+					$relativepath = $file["name"];
+				}
+
+				$this->infofiles['nboffiles']++;
+				$this->infofiles['files'][] = $file['fullname'];
+				$ext = pathinfo($file["name"], PATHINFO_EXTENSION);
+				if (empty($this->infofiles[$ext])) $this->infofiles['extensions'][$ext] = 1;
+				else $this->infofiles['extensions'][$ext]++;
+
+				// Preview
+				if (!empty($conf->use_javascript_ajax) && ($conf->browser->layout != 'phone'))
+				{
+					$tmparray = digiriskgetAdvancedPreviewUrl($modulepart, $relativepath, 1, '&entity='.$entity);
+					if ($tmparray && $tmparray['url'])
+					{
+						$tmpout .= '<li><a href="'.$tmparray['url'].'"'.($tmparray['css'] ? ' class="'.$tmparray['css'].'"' : '').($tmparray['mime'] ? ' mime="'.$tmparray['mime'].'"' : '').($tmparray['target'] ? ' target="'.$tmparray['target'].'"' : '').'>';
+						//$tmpout.= img_picto('','detail');
+						$tmpout .= '<i class="fa fa-search-plus paddingright" style="color: gray"></i>';
+						$tmpout .= $langs->trans("Preview").' '.$ext.'</a></li>';
+					}
+				}
+
+				// Download
+				$tmpout .= '<li class="nowrap"><a class="pictopreview nowrap" href="'.DOL_URL_ROOT.'/custom/digiriskdolibarr/document.php?modulepart='.$modulepart.'&amp;entity='.$entity.'&amp;file='.urlencode($relativepath).'"';
+				$mime = digiriskdol_mimetype($relativepath, '', 0);
+				if (preg_match('/text/', $mime)) $tmpout .= ' target="_blank"';
+				$tmpout .= '>';
+				$tmpout .= digiriskimg_mime($relativepath, $file["name"]);
+				$tmpout .= $langs->trans("Download").' '.$ext;
+				$tmpout .= '</a></li>'."\n";
+			}
+			$out .= $tmpout;
+			$out .= '</ul></div></dd>
+    			</dl>';
+
+			if (!$found) $out = '';
+		}
+		else
+		{
+			// TODO Add link to regenerate doc ?
+			//$out.= '<div id="gen_pdf_'.$modulesubdir.'" class="linkobject hideobject">'.img_picto('', 'refresh').'</div>'."\n";
+		}
+
+		return $out;
+	}
+
+
+	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+	/**
+	 *  Show list of documents in $filearray (may be they are all in same directory but may not)
+	 *  This also sync database if $upload_dir is defined.
+	 *
+	 *  @param	 array	$filearray          Array of files loaded by digiriskdol_dir_list('files') function before calling this.
+	 * 	@param	 Object	$object				Object on which document is linked to.
+	 * 	@param	 string	$modulepart			Value for modulepart used by download or viewimage wrapper.
+	 * 	@param	 string	$param				Parameters on sort links (param must start with &, example &aaa=bbb&ccc=ddd)
+	 * 	@param	 int	$forcedownload		Force to open dialog box "Save As" when clicking on file.
+	 * 	@param	 string	$relativepath		Relative path of docs (autodefined if not provided), relative to module dir, not to MAIN_DATA_ROOT.
+	 * 	@param	 int	$permonobject		Permission on object (so permission to delete or crop document)
+	 * 	@param	 int	$useinecm			Change output for use in ecm module:
+	 * 										0 or 6: Add a preview column. Show also a rename button. Show also a crop button for some values of $modulepart (must be supported into hard coded list in this function + photos_resize.php + restrictedArea + checkUserAccessToObject)
+	 * 										1: Add link to edit ECM entry
+	 * 										2: Add rename and crop link
+	 *                                      4: Add a preview column
+	 *                                      5: Add link to edit ECM entry and Add a preview column
+	 * 	@param	 string	$textifempty		Text to show if filearray is empty ('NoFileFound' if not defined)
+	 *  @param   int	$maxlength          Maximum length of file name shown.
+	 *  @param	 string	$title				Title before list. Use 'none' to disable title.
+	 *  @param	 string $url				Full url to use for click links ('' = autodetect)
+	 *  @param	 int	$showrelpart		0=Show only filename (default), 1=Show first level 1 dir
+	 *  @param   int    $permtoeditline     Permission to edit document line (You must provide a value, -1 is deprecated and must not be used any more)
+	 *  @param   string $upload_dir         Full path directory so we can know dir relative to MAIN_DATA_ROOT. Fill this to complete file data with database indexes.
+	 *  @param   string $sortfield          Sort field ('name', 'size', 'position', ...)
+	 *  @param   string $sortorder          Sort order ('ASC' or 'DESC')
+	 *  @param   int    $disablemove        1=Disable move button, 0=Position move is possible.
+	 *  @param	 int	$addfilterfields	Add line with filters
+	 *  @param	 int	$disablecrop		Disable crop feature on images (-1 = auto, prefer to set it explicitely to 0 or 1)
+	 * 	@return	 int						<0 if KO, nb of files shown if OK
+	 *  @see list_of_autoecmfiles()
+	 */
+	public function list_of_documents($filearray, $object, $modulepart, $param = '', $forcedownload = 0, $relativepath = '', $permonobject = 1, $useinecm = 0, $textifempty = '', $maxlength = 0, $title = '', $url = '', $showrelpart = 0, $permtoeditline = -1, $upload_dir = '', $sortfield = '', $sortorder = 'ASC', $disablemove = 1, $addfilterfields = 0, $disablecrop = -1)
+	{
+		// phpcs:enable
+		global $user, $conf, $langs, $hookmanager;
+		global $sortfield, $sortorder, $maxheightmini;
+		global $dolibarr_main_url_root;
+		global $form;
+
+		if ($disablecrop == -1)
+		{
+			$disablecrop = 1;
+			if (in_array($modulepart, array('digiriskdolibarr:legaldisplay'))) $disablecrop = 0;
+		}
+
+		// Define relative path used to store the file
+		if (empty($relativepath))
+		{
+			$relativepath = (!empty($object->ref) ?digiriskdol_sanitizeFileName($object->ref) : '').'/';
+			if ($object->element == 'invoice_supplier') $relativepath = get_exdir($object->id, 2, 0, 0, $object, 'invoice_supplier').$relativepath; // TODO Call using a defined value for $relativepath
+			if ($object->element == 'project_task') $relativepath = 'Call_not_supported_._Call_function_using_a_defined_relative_path_.';
+		}
+		// For backward compatiblity, we detect file stored into an old path
+		if (!empty($conf->global->PRODUCT_USE_OLD_PATH_FOR_PHOTO) && $filearray[0]['level1name'] == 'photos')
+		{
+			$relativepath = preg_replace('/^.*\/produit\//', '', $filearray[0]['path']).'/';
+		}
+		// Defined relative dir to DOL_DATA_ROOT
+		$relativedir = '';
+		if ($upload_dir)
+		{
+			$relativedir = preg_replace('/^'.preg_quote(DOL_DATA_ROOT, '/').'/', '', $upload_dir);
+			$relativedir = preg_replace('/^[\\/]/', '', $relativedir);
+		}
+		// For example here $upload_dir = '/pathtodocuments/commande/SO2001-123/'
+		// For example here $upload_dir = '/pathtodocuments/tax/vat/1'
+
+		$hookmanager->initHooks(array('formfile'));
+		$parameters = array(
+			'filearray' => $filearray,
+			'modulepart'=> $modulepart,
+			'param' => $param,
+			'forcedownload' => $forcedownload,
+			'relativepath' => $relativepath, // relative filename to module dir
+			'relativedir' => $relativedir, // relative dirname to DOL_DATA_ROOT
+			'permtodelete' => $permonobject,
+			'useinecm' => $useinecm,
+			'textifempty' => $textifempty,
+			'maxlength' => $maxlength,
+			'title' => $title,
+			'url' => $url
+		);
+		$reshook = $hookmanager->executeHooks('showFilesList', $parameters, $object);
+
+		if (isset($reshook) && $reshook != '') // null or '' for bypass
+		{
+			return $reshook;
+		}
+		else
+		{
+			if (!is_object($form))
+			{
+				include_once DOL_DOCUMENT_ROOT.'/core/class/html.form.class.php'; // The compoent may be included into ajax page that does not include the Form class
+				$form = new Form($this->db);
+			}
+
+			if (!preg_match('/&id=/', $param) && isset($object->id)) $param .= '&id='.$object->id;
+			$relativepathwihtoutslashend = preg_replace('/\/$/', '', $relativepath);
+			if ($relativepathwihtoutslashend) $param .= '&file='.urlencode($relativepathwihtoutslashend);
+
+			if ($permtoeditline < 0)  // Old behaviour for backward compatibility. New feature should call method with value 0 or 1
+			{
+				$permtoeditline = 0;
+				if (in_array($modulepart, array('product', 'produit', 'service')))
+				{
+					if ($user->rights->produit->creer && $object->type == Product::TYPE_PRODUCT) $permtoeditline = 1;
+					if ($user->rights->service->creer && $object->type == Product::TYPE_SERVICE) $permtoeditline = 1;
+				}
+			}
+			if (empty($conf->global->MAIN_UPLOAD_DOC))
+			{
+				$permtoeditline = 0;
+				$permonobject = 0;
+			}
+
+			// Show list of existing files
+			if ((empty($useinecm) || $useinecm == 6) && $title != 'none') print load_fiche_titre($title ? $title : $langs->trans("AttachedFiles"), '', 'file-upload', 0, '', 'table-list-of-attached-files');
+			if (empty($url)) $url = $_SERVER["PHP_SELF"];
+
+			print '<!-- html.formfile::list_of_documents -->'."\n";
+			if (GETPOST('action', 'aZ09') == 'editfile' && $permtoeditline)
+			{
+				print '<form action="'.$_SERVER["PHP_SELF"].'?'.$param.'" method="POST">';
+				print '<input type="hidden" name="token" value="'.newToken().'">';
+				print '<input type="hidden" name="action" value="renamefile">';
+				print '<input type="hidden" name="id" value="'.$object->id.'">';
+				print '<input type="hidden" name="modulepart" value="'.$modulepart.'">';
+			}
+
+			print '<div class="div-table-responsive-no-min">';
+			print '<table width="100%" id="tablelines" class="liste noborder nobottom">'."\n";
+
+			if (!empty($addfilterfields))
+			{
+				print '<tr class="liste_titre nodrag nodrop">';
+				print '<td><input type="search_doc_ref" value="'.digiriskdol_escape_htmltag(GETPOST('search_doc_ref', 'alpha')).'"></td>';
+				print '<td></td>';
+				print '<td></td>';
+				if (empty($useinecm) || $useinecm == 4 || $useinecm == 5 || $useinecm == 6) print '<td></td>';
+				print '<td></td>';
+				print '<td></td>';
+				if (!$disablemove) print '<td></td>';
+				print "</tr>\n";
+			}
+
+			print '<tr class="liste_titre nodrag nodrop">';
+			//print $url.' sortfield='.$sortfield.' sortorder='.$sortorder;
+			print_liste_field_titre('Documents2', $url, "name", "", $param, '', $sortfield, $sortorder, 'left ');
+			print_liste_field_titre('Size', $url, "size", "", $param, '', $sortfield, $sortorder, 'right ');
+			print_liste_field_titre('Date', $url, "date", "", $param, '', $sortfield, $sortorder, 'center ');
+			if (empty($useinecm) || $useinecm == 4 || $useinecm == 5 || $useinecm == 6) print_liste_field_titre('', $url, "", "", $param, '', $sortfield, $sortorder, 'center '); // Preview
+			print_liste_field_titre('');
+			print_liste_field_titre('');
+			if (!$disablemove) print_liste_field_titre('');
+			print "</tr>\n";
+
+			// Get list of files stored into database for same relative directory
+			if ($relativedir)
+			{
+				completeFileArrayWithDatabaseInfo($filearray, $relativedir);
+
+				//var_dump($sortfield.' - '.$sortorder);
+				if ($sortfield && $sortorder)	// If $sortfield is for example 'position_name', we will sort on the property 'position_name' (that is concat of position+name)
+				{
+					$filearray = digiriskdol_sort_array($filearray, $sortfield, $sortorder);
+				}
+			}
+
+			$nboffiles = count($filearray);
+			if ($nboffiles > 0) include_once DOL_DOCUMENT_ROOT.'/core/lib/images.lib.php';
+
+			$i = 0; $nboflines = 0; $lastrowid = 0;
+			foreach ($filearray as $key => $file)      // filearray must be only files here
+			{
+				if ($file['name'] != '.'
+					&& $file['name'] != '..'
+					&& !preg_match('/\.meta$/i', $file['name']))
+				{
+					if ($filearray[$key]['rowid'] > 0) $lastrowid = $filearray[$key]['rowid'];
+					$filepath = $relativepath.$file['name'];
+
+					$editline = 0;
+					$nboflines++;
+					print '<!-- Line list_of_documents '.$key.' relativepath = '.$relativepath.' -->'."\n";
+					// Do we have entry into database ?
+					print '<!-- In database: position='.$filearray[$key]['position'].' -->'."\n";
+					print '<tr class="oddeven" id="row-'.($filearray[$key]['rowid'] > 0 ? $filearray[$key]['rowid'] : 'AFTER'.$lastrowid.'POS'.($i + 1)).'">';
+
+					// File name
+					print '<td class="minwith200">';
+
+					// Show file name with link to download
+					//print "XX".$file['name'];	//$file['name'] must be utf8
+					print '<a class="paddingright" href="'.DOL_URL_ROOT.'/custom/digiriskdolibarr/document.php?modulepart='.$modulepart;
+					if ($forcedownload) print '&attachment=1';
+					if (!empty($object->entity)) print '&entity='.$object->entity;
+					print '&file='.urlencode($filepath);
+					print '">';
+					print digiriskimg_mime($file['name'], $file['name'].' ('.digiriskdol_print_size($file['size'], 0, 0).')', 'inline-block valignbottom paddingright');
+					if ($showrelpart == 1) print $relativepath;
+					//print digiriskdol_trunc($file['name'],$maxlength,'middle');
+					if (GETPOST('action', 'aZ09') == 'editfile' && $file['name'] == basename(GETPOST('urlfile', 'alpha')))
+					{
+						print '</a>';
+						$section_dir = dirname(GETPOST('urlfile', 'alpha'));
+						if (! preg_match('/\/$/', $section_dir)) $section_dir.='/';
+						print '<input type="hidden" name="section_dir" value="'.$section_dir.'">';
+						print '<input type="hidden" name="renamefilefrom" value="'.digiriskdol_escape_htmltag($file['name']).'">';
+						print '<input type="text" name="renamefileto" class="quatrevingtpercent" value="'.digiriskdol_escape_htmltag($file['name']).'">';
+						$editline = 1;
+					}
+					else
+					{
+						$filenametoshow = preg_replace('/\.noexe$/', '', $file['name']);
+						print digiriskdol_trunc($filenametoshow, 200);
+						print '</a>';
+					}
+					// Preview link
+					if (!$editline) print $this->showPreview($file, $modulepart, $filepath, 0, '&entity='.(!empty($object->entity) ? $object->entity : $conf->entity));
+
+					print "</td>\n";
+
+					// Size
+					$sizetoshow = digiriskdol_print_size($file['size'], 1, 1);
+					$sizetoshowbytes = digiriskdol_print_size($file['size'], 0, 1);
+
+					print '<td class="right nowraponall">';
+					if ($sizetoshow == $sizetoshowbytes) print $sizetoshow;
+					else {
+						print $form->textwithpicto($sizetoshow, $sizetoshowbytes, -1);
+					}
+					print '</td>';
+
+					// Date
+					print '<td class="center" style="width: 140px">'.digiriskdol_print_date($file['date'], "dayhour", "tzuser").'</td>'; // 140px = width for date with PM format
+
+					// Preview
+					if (empty($useinecm) || $useinecm == 4 || $useinecm == 5 || $useinecm == 6)
+					{
+						$fileinfo = pathinfo($file['name']);
+						print '<td class="center">';
+						if (image_format_supported($file['name']) >= 0)
+						{
+							if ($useinecm == 5 || $useinecm == 6)
+							{
+								$smallfile = getImageFileNameForSize($file['name'], ''); // There is no thumb for ECM module and Media filemanager, so we use true image. TODO Change this it is slow on image dir.
+							}
+							else
+							{
+								$smallfile = getImageFileNameForSize($file['name'], '_small'); // For new thumbs using same ext (in lower case however) than original
+							}
+							if (!digiriskdol_is_file($file['path'].'/'.$smallfile)) $smallfile = getImageFileNameForSize($file['name'], '_small', '.png'); // For backward compatibility of old thumbs that were created with filename in lower case and with .png extension
+							//print $file['path'].'/'.$smallfile.'<br>';
+
+							$urlforhref = getAdvancedPreviewUrl($modulepart, $relativepath.$fileinfo['filename'].'.'.strtolower($fileinfo['extension']), 1, '&entity='.(!empty($object->entity) ? $object->entity : $conf->entity));
+							if (empty($urlforhref)) {
+								$urlforhref = DOL_URL_ROOT.'/viewimage.php?modulepart='.$modulepart.'&entity='.(!empty($object->entity) ? $object->entity : $conf->entity).'&file='.urlencode($relativepath.$fileinfo['filename'].'.'.strtolower($fileinfo['extension']));
+								print '<a href="'.$urlforhref.'" class="aphoto" target="_blank">';
+							} else {
+								print '<a href="'.$urlforhref['url'].'" class="'.$urlforhref['css'].'" target="'.$urlforhref['target'].'" mime="'.$urlforhref['mime'].'">';
+							}
+							print '<img class="photo maxwidth200" height="'.(($useinecm == 4 || $useinecm == 5 || $useinecm == 6) ? '12' : $maxheightmini).'" src="'.DOL_URL_ROOT.'/viewimage.php?modulepart='.$modulepart.'&entity='.(!empty($object->entity) ? $object->entity : $conf->entity).'&file='.urlencode($relativepath.$smallfile).'" title="">';
+							print '</a>';
+						}
+						else print '&nbsp;';
+						print '</td>';
+					}
+
+					// Hash of file (only if we are in a mode where a scan of dir were done and we have id of file in ECM table)
+					print '<td class="center">';
+					if ($relativedir && $filearray[$key]['rowid'] > 0)
+					{
+						if ($editline)
+						{
+							print $langs->trans("FileSharedViaALink").' ';
+							print '<input class="inline-block" type="checkbox" name="shareenabled"'.($file['share'] ? ' checked="checked"' : '').' /> ';
+						}
+						else
+						{
+							if ($file['share'])
+							{
+								// Define $urlwithroot
+								$urlwithouturlroot = preg_replace('/'.preg_quote(DOL_URL_ROOT, '/').'$/i', '', trim($dolibarr_main_url_root));
+								$urlwithroot = $urlwithouturlroot.DOL_URL_ROOT; // This is to use external domain name found into config file
+								//$urlwithroot=DOL_MAIN_URL_ROOT;					// This is to use same domain name than current
+
+								//print '<span class="opacitymedium">'.$langs->trans("Hash").' : '.$file['share'].'</span>';
+								$forcedownload = 0;
+								$paramlink = '';
+								if (!empty($file['share'])) $paramlink .= ($paramlink ? '&' : '').'hashp='.$file['share']; // Hash for public share
+								if ($forcedownload) $paramlink .= ($paramlink ? '&' : '').'attachment=1';
+
+								$fulllink = $urlwithroot.'/custom/digiriskdolibarr/document.php'.($paramlink ? '?'.$paramlink : '');
+
+								print img_picto($langs->trans("FileSharedViaALink"), 'globe').' ';
+								print '<input type="text" class="quatrevingtpercent minwidth200imp" id="downloadlink" name="downloadexternallink" value="'.digiriskdol_escape_htmltag($fulllink).'">';
+							}
+							else
+							{
+								//print '<span class="opacitymedium">'.$langs->trans("FileNotShared").'</span>';
+							}
+						}
+					}
+					print '</td>';
+
+					// Actions buttons
+					if (!$editline)
+					{
+						// Delete or view link
+						// ($param must start with &)
+						print '<td class="valignmiddle right actionbuttons nowraponall"><!-- action on files -->';
+						if ($useinecm == 1 || $useinecm == 5)	// ECM manual tree only
+						{
+							// $section is inside $param
+							$newparam.=preg_replace('/&file=.*$/', '', $param);		// We don't need param file=
+							$backtopage = DOL_URL_ROOT.'/ecm/index.php?&section_dir='.urlencode($relativepath).$newparam;
+							print '<a class="editfielda" href="'.DOL_URL_ROOT.'/ecm/file_card.php?urlfile='.urlencode($file['name']).$param.'&backtopage='.urlencode($backtopage).'" class="editfilelink" rel="'.urlencode($file['name']).'">'.img_edit('default', 0, 'class="paddingrightonly"').'</a>';
+						}
+
+						if (empty($useinecm) || $useinecm == 2 || $useinecm == 6)	// 6=Media file manager
+						{
+							$newmodulepart = $modulepart;
+							if (in_array($modulepart, array('product', 'produit', 'service'))) $newmodulepart = 'produit|service';
+
+							if (!$disablecrop && image_format_supported($file['name']) > 0)
+							{
+								if ($permtoeditline)
+								{
+									// Link to resize
+									$moreparaminurl = '';
+									if ($object->id > 0) {
+										$moreparaminurl = '&id='.$object->id;
+									} elseif (GETPOST('website', 'alpha')) {
+										$moreparaminurl = '&website='.GETPOST('website', 'alpha');
+									}
+									print '<a class="editfielda" href="'.DOL_URL_ROOT.'/core/photos_resize.php?modulepart='.urlencode($newmodulepart).$moreparaminurl.'&file='.urlencode($relativepath.$fileinfo['filename'].'.'.strtolower($fileinfo['extension'])).'" title="'.digiriskdol_escape_htmltag($langs->trans("ResizeOrCrop")).'">'.img_picto($langs->trans("ResizeOrCrop"), 'resize', 'class="paddingrightonly"').'</a>';
+								}
+							}
+
+							if ($permtoeditline)
+							{
+								$paramsectiondir = (in_array($modulepart, array('medias', 'ecm')) ? '&section_dir='.urlencode($relativepath) : '');
+								print '<a class="editfielda reposition" href="'.(($useinecm == 1 || $useinecm == 5) ? '#' : ($url.'?action=editfile&urlfile='.urlencode($filepath).$paramsectiondir.$param)).'" class="editfilelink" rel="'.$filepath.'">'.img_edit('default', 0, 'class="paddingrightonly"').'</a>';
+							}
+						}
+						if ($permonobject)
+						{
+							$useajax = 1;
+							if (!empty($conf->digiriskdol_use_jmobile)) $useajax = 0;
+							if (empty($conf->use_javascript_ajax)) $useajax = 0;
+							if (!empty($conf->global->MAIN_ECM_DISABLE_JS)) $useajax = 0;
+							print '<a href="'.((($useinecm && $useinecm != 6) && $useajax) ? '#' : ($url.'?action=delete&urlfile='.urlencode($filepath).$param)).'" class="reposition deletefilelink" rel="'.$filepath.'">'.img_delete().'</a>';
+						}
+						print "</td>";
+
+						if (empty($disablemove))
+						{
+							if ($nboffiles > 1 && $conf->browser->layout != 'phone') {
+								print '<td class="linecolmove tdlineupdown center">';
+								if ($i > 0) {
+									print '<a class="lineupdown" href="'.$_SERVER["PHP_SELF"].'?id='.$this->id.'&amp;action=up&amp;rowid='.$line->id.'">'.img_up('default', 0, 'imgupforline').'</a>';
+								}
+								if ($i < $nboffiles - 1) {
+									print '<a class="lineupdown" href="'.$_SERVER["PHP_SELF"].'?id='.$this->id.'&amp;action=down&amp;rowid='.$line->id.'">'.img_down('default', 0, 'imgdownforline').'</a>';
+								}
+								print '</td>';
+							}
+							else {
+								print '<td'.(($conf->browser->layout != 'phone' && empty($disablemove)) ? ' class="linecolmove tdlineupdown center"' : ' class="linecolmove center"').'>';
+								print '</td>';
+							}
+						}
+					}
+					else
+					{
+						print '<td class="right">';
+						print '<input type="hidden" name="ecmfileid" value="'.$filearray[$key]['rowid'].'">';
+						print '<input type="submit" class="button" name="renamefilesave" value="'.digiriskdol_escape_htmltag($langs->trans("Save")).'">';
+						print '<input type="submit" class="button" name="cancel" value="'.digiriskdol_escape_htmltag($langs->trans("Cancel")).'">';
+						print '</td>';
+						if (empty($disablemove)) print '<td class="right"></td>';
+					}
+					print "</tr>\n";
+
+					$i++;
+				}
+			}
+			if ($nboffiles == 0)
+			{
+				$colspan = '6';
+				if (empty($disablemove)) $colspan++; // 6 columns or 7
+				print '<tr class="oddeven"><td colspan="'.$colspan.'" class="opacitymedium">';
+				if (empty($textifempty)) print $langs->trans("NoFileFound");
+				else print $textifempty;
+				print '</td></tr>';
+			}
+			print "</table>";
+			print '</div>';
+
+			if ($nboflines > 1 && is_object($object)) {
+				if (!empty($conf->use_javascript_ajax) && $permtoeditline) {
+					$table_element_line = 'ecm_files';
+					include DOL_DOCUMENT_ROOT.'/core/tpl/ajaxrow.tpl.php';
+				}
+			}
+
+			print ajax_autoselect('downloadlink');
+
+			if (GETPOST('action', 'aZ09') == 'editfile' && $permtoeditline)
+			{
+				print '</form>';
+			}
+
+			return $nboffiles;
+		}
+	}
+
+
+	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+	/**
+	 *	Show list of documents in a directory
+	 *
+	 *  @param	string	$upload_dir         Directory that was scanned
+	 *  @param  array	$filearray          Array of files loaded by digiriskdol_dir_list function before calling this function
+	 *  @param  string	$modulepart         Value for modulepart used by download wrapper
+	 *  @param  string	$param              Parameters on sort links
+	 *  @param  int		$forcedownload      Force to open dialog box "Save As" when clicking on file
+	 *  @param  string	$relativepath       Relative path of docs (autodefined if not provided)
+	 *  @param  int		$permissiontodelete       Permission to delete
+	 *  @param  int		$useinecm           Change output for use in ecm module
+	 *  @param  int		$textifempty        Text to show if filearray is empty
+	 *  @param  int		$maxlength          Maximum length of file name shown
+	 *  @param	string 	$url				Full url to use for click links ('' = autodetect)
+	 *  @param	int		$addfilterfields	Add line with filters
+	 *  @return int                 		<0 if KO, nb of files shown if OK
+	 *  @see list_of_documents()
+	 */
+	public function list_of_autoecmfiles($upload_dir, $filearray, $modulepart, $param, $forcedownload = 0, $relativepath = '', $permissiontodelete = 1, $useinecm = 0, $textifempty = '', $maxlength = 0, $url = '', $addfilterfields = 0)
+	{
+		// phpcs:enable
+		global $user, $conf, $langs, $form;
+		global $sortfield, $sortorder;
+		global $search_doc_ref;
+
+		digiriskdol_syslog(get_class($this).'::list_of_autoecmfiles upload_dir='.$upload_dir.' modulepart='.$modulepart);
+
+		// Show list of documents
+		if (empty($useinecm) || $useinecm == 6) print load_fiche_titre($langs->trans("AttachedFiles"));
+		if (empty($url)) $url = $_SERVER["PHP_SELF"];
+
+		if (!empty($addfilterfields))
+		{
+			print '<form action="'.$_SERVER['PHP_SELF'].'">';
+			print '<input type="hidden" name="token" value="'.newToken().'">';
+			print '<input type="hidden" name="module" value="'.$modulepart.'">';
+		}
+
+		print '<div class="div-table-responsive-no-min">';
+		print '<table width="100%" class="noborder">'."\n";
+
+		if (!empty($addfilterfields))
+		{
+			print '<tr class="liste_titre nodrag nodrop">';
+			print '<td class="liste_titre"></td>';
+			print '<td class="liste_titre"><input type="text" class="maxwidth100onsmartphone" name="search_doc_ref" value="'.digiriskdol_escape_htmltag($search_doc_ref).'"></td>';
+			print '<td class="liste_titre"></td>';
+			print '<td class="liste_titre"></td>';
+			// Action column
+			print '<td class="liste_titre center">';
+			$searchpicto = $form->showFilterButtons();
+			print $searchpicto;
+			print '</td>';
+			print "</tr>\n";
+		}
+
+		print '<tr class="liste_titre">';
+		$sortref = "fullname";
+		if ($modulepart == 'invoice_supplier') $sortref = 'level1name';
+		print_liste_field_titre("Ref", $url, $sortref, "", $param, '', $sortfield, $sortorder);
+		print_liste_field_titre("Documents2", $url, "name", "", $param, '', $sortfield, $sortorder);
+		print_liste_field_titre("Size", $url, "size", "", $param, '', $sortfield, $sortorder, 'right ');
+		print_liste_field_titre("Date", $url, "date", "", $param, '', $sortfield, $sortorder, 'center ');
+		print_liste_field_titre('', '', '');
+		print '</tr>'."\n";
+
+		// To show ref or specific information according to view to show (defined by $module)
+
+		if ($modulepart == 'digiriskdolibarr:legaldisplay')
+		{
+			include_once DOL_DOCUMENT_ROOT.'/custom/digiriskdolibarr/class/legaldisplay.class.php';
+			$object_instance = new Legaldisplay($this->db);
+		}
+
+		foreach ($filearray as $key => $file)
+		{
+			if (!is_dir($file['name'])
+				&& $file['name'] != '.'
+				&& $file['name'] != '..'
+				&& $file['name'] != 'CVS'
+				&& !preg_match('/\.meta$/i', $file['name']))
+			{
+				// Define relative path used to store the file
+				$relativefile = preg_replace('/'.preg_quote($upload_dir.'/', '/').'/', '', $file['fullname']);
+
+				$id = 0; $ref = ''; $label = '';
+
+				// To show ref or specific information according to view to show (defined by $module)
+				if ($modulepart == 'company' || $modulepart == 'tax') { preg_match('/(\d+)\/[^\/]+$/', $relativefile, $reg); $id = (isset($reg[1]) ? $reg[1] : ''); }
+				elseif ($modulepart == 'invoice_supplier') { preg_match('/([^\/]+)\/[^\/]+$/', $relativefile, $reg); $ref = (isset($reg[1]) ? $reg[1] : ''); if (is_numeric($ref)) { $id = $ref; $ref = ''; } }	// $ref may be also id with old supplier invoices
+				elseif ($modulepart == 'user' || $modulepart == 'holiday') { preg_match('/(.*)\/[^\/]+$/', $relativefile, $reg); $id = (isset($reg[1]) ? $reg[1] : ''); }
+				elseif (in_array($modulepart, array('digiriskdolibarr:legaldisplay')))
+				{
+					preg_match('/(.*)\/[^\/]+$/', $relativefile, $reg); $ref = (isset($reg[1]) ? $reg[1] : '');
+				}
+				else
+				{
+					//print 'Error: Value for modulepart = '.$modulepart.' is not yet implemented in function list_of_autoecmfiles'."\n";
+				}
+
+				if (!$id && !$ref) continue;
+				$found = 0;
+				if (!empty($this->cache_objects[$modulepart.'_'.$id.'_'.$ref]))
+				{
+					$found = 1;
+				}
+				else
+				{
+					//print 'Fetch '.$id." - ".$ref.'<br>';
+
+					if ($id) {
+						$result = $object_instance->fetch($id);
+					} else {
+						//fetchOneLike looks for objects with wildcards in its reference.
+						//It is useful for those masks who get underscores instead of their actual symbols
+						//fetchOneLike requires some info in the object. If it doesn't have it, then 0 is returned
+						//that's why we look only into fetchOneLike when fetch returns 0
+						if (!$result = $object_instance->fetch('', $ref)) {
+							$result = $object_instance->fetchOneLike($ref);
+						}
+					}
+
+					if ($result > 0) {  // Save object loaded into a cache
+						$found = 1; $this->cache_objects[$modulepart.'_'.$id.'_'.$ref] = clone $object_instance;
+					}
+					if ($result == 0) { $found = 1; $this->cache_objects[$modulepart.'_'.$id.'_'.$ref] = 'notfound'; unset($filearray[$key]); }
+				}
+
+				if (!$found > 0 || !is_object($this->cache_objects[$modulepart.'_'.$id.'_'.$ref])) continue; // We do not show orphelins files
+
+				print '<!-- Line list_of_autoecmfiles '.$key.' -->'."\n";
+				print '<tr class="oddeven">';
+				print '<td>';
+				if ($found > 0 && is_object($this->cache_objects[$modulepart.'_'.$id.'_'.$ref])) print $this->cache_objects[$modulepart.'_'.$id.'_'.$ref]->getNomUrl(1, 'document');
+				else print $langs->trans("ObjectDeleted", ($id ? $id : $ref));
+
+				//$modulesubdir=digiriskdol_sanitizeFileName($ref);
+				$modulesubdir = dirname($relativefile);
+
+				//$filedir=$conf->$modulepart->dir_output . '/' . digiriskdol_sanitizeFileName($obj->ref);
+				$filedir = $file['path'];
+				//$urlsource=$_SERVER['PHP_SELF'].'?id='.$obj->rowid;
+				//print $formfile->getDocumentsLink($modulepart, $filename, $filedir);
+
+				print '</td>';
+
+				// File
+				print '<td>';
+				//print "XX".$file['name']; //$file['name'] must be utf8
+				print '<a href="'.DOL_URL_ROOT.'/custom/digiriskdolibarr/document.php?modulepart='.$modulepart;
+				if ($forcedownload) print '&attachment=1';
+				print '&file='.urlencode($relativefile).'">';
+				print digiriskimg_mime($file['name'], $file['name'].' ('.digiriskdol_print_size($file['size'], 0, 0).')');
+				print digiriskdol_trunc($file['name'], $maxlength, 'middle');
+				print '</a>';
+
+				//print $this->getDocumentsLink($modulepart, $modulesubdir, $filedir, '^'.preg_quote($file['name'],'/').'$');
+				print $this->showPreview($file, $modulepart, $file['relativename']);
+
+				print "</td>\n";
+				print '<td class="right">'.digiriskdol_print_size($file['size'], 1, 1).'</td>';
+				print '<td class="center">'.digiriskdol_print_date($file['date'], "dayhour").'</td>';
+				print '<td class="right">';
+				//if (! empty($useinecm) && $useinecm != 6)  print '<a data-ajax="false" href="'.DOL_URL_ROOT.'/document.php?modulepart='.$modulepart;
+				//if ($forcedownload) print '&attachment=1';
+				//print '&file='.urlencode($relativefile).'">';
+				//print img_view().'</a> &nbsp; ';
+				//if ($permissiontodelete) print '<a href="'.$url.'?id='.$object->id.'&section='.$_REQUEST["section"].'&action=delete&urlfile='.urlencode($file['name']).'">'.img_delete().'</a>';
+				//else print '&nbsp;';
+				print "</td></tr>\n";
+			}
+		}
+
+		if (count($filearray) == 0)
+		{
+			print '<tr class="oddeven"><td colspan="5">';
+			if (empty($textifempty)) print '<span class="opacitymedium">'.$langs->trans("NoFileFound").'</span>';
+			else print '<span class="opacitymedium">'.$textifempty.'</span>';
+			print '</td></tr>';
+		}
+		print "</table>";
+		print '</div>';
+
+		if (!empty($addfilterfields)) print '</form>';
+		// Fin de zone
+	}
+
+	/**
+	 *    Show form to upload a new file with jquery fileupload.
+	 *    This form use the fileupload.php file.
+	 *
+	 *    @param	Object	$object		Object to use
+	 *    @return	void
+	 */
+	private function _formAjaxFileUpload($object)
+	{
+		global $langs, $conf;
+
+		// PHP post_max_size
+		$post_max_size				= ini_get('post_max_size');
+		$mul_post_max_size			= substr($post_max_size, -1);
+		$mul_post_max_size			= ($mul_post_max_size == 'M' ? 1048576 : ($mul_post_max_size == 'K' ? 1024 : ($mul_post_max_size == 'G' ? 1073741824 : 1)));
+		$post_max_size				= $mul_post_max_size * (int) $post_max_size;
+		// PHP upload_max_filesize
+		$upload_max_filesize		= ini_get('upload_max_filesize');
+		$mul_upload_max_filesize	= substr($upload_max_filesize, -1);
+		$mul_upload_max_filesize	= ($mul_upload_max_filesize == 'M' ? 1048576 : ($mul_upload_max_filesize == 'K' ? 1024 : ($mul_upload_max_filesize == 'G' ? 1073741824 : 1)));
+		$upload_max_filesize		= $mul_upload_max_filesize * (int) $upload_max_filesize;
+		// Max file size
+		$max_file_size = (($post_max_size < $upload_max_filesize) ? $post_max_size : $upload_max_filesize);
+
+		// Include main
+		include DOL_DOCUMENT_ROOT.'/core/tpl/ajax/fileupload_main.tpl.php';
+
+		// Include template
+		include DOL_DOCUMENT_ROOT.'/core/tpl/ajax/fileupload_view.tpl.php';
+	}
+
+	/**
+	 * Show array with linked files
+	 *
+	 * @param 	Object		$object			Object
+	 * @param 	int			$permissiontodelete	Deletion is allowed
+	 * @param 	string		$action			Action
+	 * @param 	string		$selected		???
+	 * @param	string		$param			More param to add into URL
+	 * @return 	int							Number of links
+	 */
+	public function listOfLinks($object, $permissiontodelete = 1, $action = null, $selected = null, $param = '')
+	{
+		global $user, $conf, $langs, $user;
+		global $sortfield, $sortorder;
+
+		$langs->load("link");
+
+		require_once DOL_DOCUMENT_ROOT.'/core/class/link.class.php';
+		$link = new Link($this->db);
+		$links = array();
+		if ($sortfield == "name") {
+			$sortfield = "label";
+		} elseif ($sortfield == "date") {
+			$sortfield = "datea";
+		} else {
+			$sortfield = null;
+		}
+		$res = $link->fetchAll($links, $object->element, $object->id, $sortfield, $sortorder);
+		$param .= (isset($object->id) ? '&id='.$object->id : '');
+
+		print '<!-- listOfLinks -->'."\n";
+
+		// Show list of associated links
+		print load_fiche_titre($langs->trans("LinkedFiles"), '', 'external-link-square-alt', 0, '', 'table-list-of-links');
+
+		print '<form action="'.$_SERVER['PHP_SELF'].($param ? '?'.$param : '').'" method="POST">';
+		print '<input type="hidden" name="token" value="'.newToken().'">';
+
+		print '<table width="100%" class="liste noborder nobottom">';
+		print '<tr class="liste_titre">';
+		print_liste_field_titre(
+			$langs->trans("Links"),
+			$_SERVER['PHP_SELF'],
+			"name",
+			"",
+			$param,
+			'',
+			$sortfield,
+			$sortorder,
+			''
+		);
+		print_liste_field_titre(
+			"",
+			"",
+			"",
+			"",
+			"",
+			'',
+			'',
+			'',
+			'right '
+		);
+		print_liste_field_titre(
+			$langs->trans("Date"),
+			$_SERVER['PHP_SELF'],
+			"date",
+			"",
+			$param,
+			'',
+			$sortfield,
+			$sortorder,
+			'center '
+		);
+		print_liste_field_titre(
+			'',
+			$_SERVER['PHP_SELF'],
+			"",
+			"",
+			$param,
+			'',
+			'',
+			'',
+			'center '
+		);
+		print_liste_field_titre('', '', '');
+		print '</tr>';
+		$nboflinks = count($links);
+		if ($nboflinks > 0) include_once DOL_DOCUMENT_ROOT.'/core/lib/images.lib.php';
+
+		foreach ($links as $link)
+		{
+			print '<tr class="oddeven">';
+			//edit mode
+			if ($action == 'update' && $selected === $link->id)
+			{
+				print '<td>';
+				print '<input type="hidden" name="id" value="'.$object->id.'">';
+				print '<input type="hidden" name="linkid" value="'.$link->id.'">';
+				print '<input type="hidden" name="action" value="confirm_updateline">';
+				print $langs->trans('Link').': <input type="text" name="link" value="'.$link->url.'">';
+				print '</td>';
+				print '<td>';
+				print $langs->trans('Label').': <input type="text" name="label" value="'.digiriskdol_escape_htmltag($link->label).'">';
+				print '</td>';
+				print '<td class="center">'.digiriskdol_print_date(digiriskdol_now(), "dayhour", "tzuser").'</td>';
+				print '<td class="right"></td>';
+				print '<td class="right">';
+				print '<input type="submit" name="save" class="button" value="'.digiriskdol_escape_htmltag($langs->trans('Save')).'">';
+				print '<input type="submit" name="cancel" class="button" value="'.digiriskdol_escape_htmltag($langs->trans('Cancel')).'">';
+				print '</td>';
+			}
+			else
+			{
+				print '<td>';
+				print img_picto('', 'globe').' ';
+				print '<a data-ajax="false" href="'.$link->url.'" target="_blank">';
+				print digiriskdol_escape_htmltag($link->label);
+				print '</a>';
+				print '</td>'."\n";
+				print '<td class="right"></td>';
+				print '<td class="center">'.digiriskdol_print_date($link->datea, "dayhour", "tzuser").'</td>';
+				print '<td class="center"></td>';
+				print '<td class="right">';
+				print '<a href="'.$_SERVER['PHP_SELF'].'?action=update&linkid='.$link->id.$param.'" class="editfilelink editfielda reposition" >'.img_edit().'</a>'; // id= is included into $param
+				if ($permissiontodelete) {
+					print ' &nbsp; <a class="deletefilelink" href="'.$_SERVER['PHP_SELF'].'?action=delete&linkid='.$link->id.$param.'">'.img_delete().'</a>'; // id= is included into $param
+				} else {
+					print '&nbsp;';
+				}
+				print '</td>';
+			}
+			print "</tr>\n";
+		}
+		if ($nboflinks == 0)
+		{
+			print '<tr class="oddeven"><td colspan="5" class="opacitymedium">';
+			print $langs->trans("NoLinkFound");
+			print '</td></tr>';
+		}
+		print "</table>";
+
+		print '</form>';
+
+		return $nboflinks;
+	}
+
+
+	/**
+	 * Show detail icon with link for preview
+	 *
+	 * @param   array     $file           Array with data of file. Example: array('name'=>...)
+	 * @param   string    $modulepart     propal, facture, facture_fourn, ...
+	 * @param   string    $relativepath   Relative path of docs
+	 * @param   integer   $ruleforpicto   Rule for picto: 0=Use the generic preview picto, 1=Use the picto of mime type of file)
+	 * @param	string	  $param		  More param on http links
+	 * @return  string    $out            Output string with HTML
+	 */
+	public function showPreview($file, $modulepart, $relativepath, $ruleforpicto = 0, $param = '')
+	{
+		global $langs, $conf;
+
+		$out = '';
+		if ($conf->browser->layout != 'phone' && !empty($conf->use_javascript_ajax))
+		{
+			$urladvancedpreview = digiriskgetAdvancedPreviewUrl($modulepart, $relativepath, 1, $param);
+		
+			// Return if a file is qualified for preview.
+			if (count($urladvancedpreview))
+			{
+				$out .= '<a class="pictopreview '.$urladvancedpreview['css'].'" href="'.$urladvancedpreview['url'].'"'.(empty($urladvancedpreview['mime']) ? '' : ' mime="'.$urladvancedpreview['mime'].'"').' '.(empty($urladvancedpreview['target']) ? '' : ' target="'.$urladvancedpreview['target'].'"').'>';
+				//$out.= '<a class="pictopreview">';
+				if (empty($ruleforpicto))
+				{
+					//$out.= img_picto($langs->trans('Preview').' '.$file['name'], 'detail');
+					$out .= '<span class="fa fa-search-plus" style="color: gray"></span>';
+				}
+				else $out .= digiriskimg_mime($relativepath, $langs->trans('Preview').' '.$file['name']);
+				$out .= '</a>';
+			}
+		}
+		return $out;
+	}
+}

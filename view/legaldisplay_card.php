@@ -46,7 +46,7 @@ if (! $res) die("Include of main fails");
 
 // Change this following line to use the correct relative path from htdocs
 dol_include_once('/digiriskdolibarr/class/legaldisplay.class.php');
-dol_include_once('../core/class/html.formfile.class.php');
+dol_include_once('../custom/digiriskdolibarr/class/html.formfile.class.php');
 dol_include_once('../contact/class/contact.class.php');
 dol_include_once('../core/lib/functions2.lib.php');
 dol_include_once('../core/class/html.formorder.class.php');
@@ -220,7 +220,7 @@ if (empty($reshook))
 			else setEventMessages($object->error,null,'errors');
 		}
 	}
-	else 
+	else
 	{
 		/***************************************************
 		 * VIEW
@@ -384,7 +384,7 @@ if (empty($reshook))
 		if ($action == 'create')
 		{
 			print_fiche_titre($langs->trans("LegalDisplay"));
-			
+
 			print '<form method="POST" action="'.$_SERVER["PHP_SELF"].'" name="create">';
 			print '<input type="hidden" name="action" value="add">';
 			print '<input type="hidden" name="backtopage" value="'.$backtopage.'">';
@@ -485,7 +485,7 @@ if (empty($reshook))
 
 				print '<tr><td class="fieldrequired">'.$langs->trans('ResponsiblePrevent').'</td>';
 				print '<td colspan="2">';
-				
+
 				$form->select_contacts($soc->id, $contactid, 'responsible_prevent', 1, $srccontactslist, '', 1);
 				// Option to reload page to retrieve customer informations. Note, this clear other input
 				if (!empty($conf->global->RELOAD_PAGE_ON_CUSTOMER_CHANGE))
@@ -510,11 +510,11 @@ if (empty($reshook))
 			dol_fiche_end();
 
 			print '<div class="center"><input type="submit" class="button" name="add" value="'.$langs->trans("Create").'"> &nbsp; <input type="submit" class="button" name="cancel" value="'.$langs->trans("Cancel").'"></div>';
-			
+
 			print '</form>';
 
-		} 
-		else 
+		}
+		else
 		{
 
 			// Part to edit record
@@ -567,7 +567,7 @@ if (empty($reshook))
 			print '</td></tr>';
 
 			// Date début
-							
+
 			print '<tr>';
 			print '<td class="titlefield">'.$langs->trans("Début").'</td>';
 			print '<td>'.dol_print_date($object->date_debut, 'dayhour');
@@ -595,7 +595,7 @@ if (empty($reshook))
 				if ($result < 0) dol_print_error('', $labourdoctor->error);
 				elseif ($result > 0) print $labourdoctor->getNomUrl(-1);
 			}
-							
+
 			print '</td></tr>';
 
 			// Inspecteur du travail
@@ -630,7 +630,7 @@ if (empty($reshook))
 			print '</td></tr>';
 
 			// Police
-							
+
 			print '<tr>';
 			print '<td class="titlefield">'.$langs->trans("Police").'</td>';
 			print '<td>';
@@ -708,7 +708,7 @@ if (empty($reshook))
 			print '</td></tr>';
 			print('</table>');
 			print('</div></div>');
-							
+
 			dol_fiche_end();
 
 
@@ -740,9 +740,9 @@ if (empty($reshook))
 					}
 				}
 				print '</div>'."\n";
-			*/	
+			*/
 					// Actions to build doc
-				
+
 				// Example 2 : Adding links to objects
 				//$somethingshown=$form->showLinkedObjectBlock($object);
 				//$linktoelem = $form->showLinkToObjectBlock($object);
@@ -761,7 +761,7 @@ if (empty($reshook))
 				$genallowed = 1;
 				$delallowed = 1;
 				//	echo '<pre>'; var_dump([$objref, $filedir, $urlsource, $genallowed, $delallowed, $object->model_pdf, 1, 0, 0, 28, 0, '', '', '', $soc->default_lang, '', $object]); echo '</pre>'; exit;
-					
+
 				print $formfile->showdocuments('digiriskdolibarr:legaldisplay', $filename, $filedir, $urlsource, $genallowed, $delallowed);
 				$usercancreate = 1;
 			}
@@ -773,7 +773,7 @@ if (empty($reshook))
 
 
 
-		
+
 
 // End of page
 llxFooter();

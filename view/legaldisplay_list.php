@@ -39,7 +39,9 @@
 // Change this following line to use the correct relative path (../, ../../, etc)
 $res=0;
 if (! $res && file_exists("../main.inc.php")) $res=@include '../main.inc.php';					// to work if your module directory is into dolibarr root htdocs directory
-if (! $res && file_exists("../../main.inc.php")) $res=@include '../../main.inc.php';			// to work if your module directory is into a subdir of root htdocs directory
+if (! $res && file_exists("../../main.inc.php")) $res=@include '../../main.inc.php';
+if (! $res && file_exists("../../../main.inc.php")) $res=@include '../../../main.inc.php';			// to work if your module directory is into a subdir of root htdocs directory
+// to work if your module directory is into a subdir of root htdocs directory
 if (! $res && file_exists("../../../dolibarr/htdocs/main.inc.php")) $res=@include '../../../dolibarr/htdocs/main.inc.php';     // Used on dev env only
 if (! $res && file_exists("../../../../dolibarr/htdocs/main.inc.php")) $res=@include '../../../../dolibarr/htdocs/main.inc.php';   // Used on dev env only
 if (! $res && file_exists("../../../../../dolibarr/htdocs/main.inc.php")) $res=@include '../../../../../dolibarr/htdocs/main.inc.php';   // Used on dev env only
@@ -109,7 +111,7 @@ if (empty($user->socid)) $fieldstosearchall["t.note_private"]="NotePrivate";
 
 // Definition of fields for list
 $arrayfields=array(
-	// ICI C'EST LES REF DU HEADER DE LA LISTE YOUHOU 
+	// ICI C'EST LES REF DU HEADER DE LA LISTE YOUHOU
 	't.ref'=>array('label'=>$langs->trans("Ref"), 'checked'=>1),
 	't.date_creation'=>array('label'=>$langs->trans("Date de création"), 'checked'=>0),
 	't.date_debut'=>array('label'=>$langs->trans("Date de début"), 'checked'=>1),
@@ -200,7 +202,7 @@ $form=new Form($db);
 
 //$help_url="EN:Module_Customers_Orders|FR:Module_Commandes_Clients|ES:Módulo_Pedidos_de_clientes";
 $help_url='';
-$title = $langs->trans('Legal Display List');
+$title = $langs->trans('LegalDisplayList');
 
 // Put here content of your page
 /*
@@ -452,7 +454,7 @@ $totalarray=array();
 while ($i < min($num, $limit))
 {
 	$obj = $db->fetch_object($resql);
-	
+
 	$legaldisplaystatic->id = $obj->rowid;
 	$legaldisplaystatic->ref = $obj->ref;
 	$legaldisplaystatic->entity = $obj->entity;
@@ -482,10 +484,10 @@ while ($i < min($num, $limit))
 	$thirdpartystatic->code_compta_fournisseur = $obj->code_compta_fournisseur;
 	$thirdpartystatic->email = $obj->email;
 	$thirdpartystatic->country_code = $obj->country_code;
-	
+
 	if ($obj)
 	{
-		
+
 		$var = !$var;
 
 		// Extra fields
@@ -509,7 +511,7 @@ while ($i < min($num, $limit))
 		// Fields from hook
 		/*$parameters=array('arrayfields'=>$arrayfields, 'obj'=>$obj);
 		$reshook=$hookmanager->executeHooks('printFieldListValue',$parameters);    // Note that $action and $object may have been modified by hook
-		
+
 		print $hookmanager->resPrint;*/
 		print '<tr class="oddeven">';
 
@@ -545,7 +547,7 @@ while ($i < min($num, $limit))
 			if ($contextpage == 'postList')
 			{
 				print $thirdpartystatic->id;
-				
+
 			}
 			else
 			{
