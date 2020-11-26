@@ -72,6 +72,7 @@ if ((float) DOL_VERSION >= 6)
 {
 	include DOL_DOCUMENT_ROOT.'/core/actions_setmoduleoptions.inc.php';
 }
+$type = explode('_',$value)[0];
 
 if ($action == 'updateMask')
 {
@@ -133,7 +134,8 @@ if ($action == 'updateMask')
 // Activate a model
 elseif ($action == 'set')
 {
-	$ret = addDocumentModel($value, $type, $label, $scandir);
+	$ret = addDocumentModel($value, $type);
+
 } elseif ($action == 'del')
 {
 	$tmpobjectkey = GETPOST('object');
