@@ -64,3 +64,180 @@ function digiriskdolibarrAdminPrepareHead()
 
 	return $head;
 }
+
+function digirisk_dolibarr_set_const($db, $name, $value, $type = 'chaine', $visible = 0, $note = '', $entity = 1)
+{
+	global $conf;
+
+	// Clean parameters
+	$name = trim($name);
+
+	// Check parameters
+	if (empty($name)) {
+		dol_print_error($db, "Error: Call to function dolibarr_set_const with wrong parameters", LOG_ERR);
+		exit;
+	}
+
+	//dol_syslog("dolibarr_set_const name=$name, value=$value type=$type, visible=$visible, note=$note entity=$entity");
+
+	$db->begin();
+
+	$sql = "DELETE FROM " . MAIN_DB_PREFIX . "digirisk_const";
+	$sql .= " WHERE name = " . $db->encrypt($name, 1);
+	if ($entity >= 0) $sql .= " AND entity = " . $entity;
+
+	dol_syslog("admin.lib::digirisk_dolibarr_set_const", LOG_DEBUG);
+	$resql = $db->query($sql);
+
+	if (strcmp($value, ''))    // true if different. Must work for $value='0' or $value=0
+	{
+		$sql = "INSERT INTO " . MAIN_DB_PREFIX . "digirisk_const(name,value,type,visible,note,entity)";
+		$sql .= " VALUES (";
+		$sql .= $db->encrypt($name, 1);
+		$sql .= ", " . $db->encrypt($value, 1);
+		$sql .= ",'" . $db->escape($type) . "'," . $visible . ",'" . $db->escape($note) . "'," . $entity . ")";
+
+		//print "sql".$value."-".pg_escape_string($value)."-".$sql;exit;
+		//print "xx".$db->escape($value);
+		dol_syslog("admin.lib::dolibarr_set_const", LOG_DEBUG);
+		$resql = $db->query($sql);
+	}
+
+	if ($resql) {
+		$db->commit();
+		$conf->global->$name = $value;
+		return 1;
+	} else {
+		$error = $db->lasterror();
+		$db->rollback();
+		return -1;
+	}
+}
+
+function digirisk_dolibarr_set_links($db, $name, $fk_user_author, $fk_soc, $contact_list, $entity = 1)
+{
+	global $conf;
+
+	// Clean parameters
+	$name = trim($name);
+		// Check parameters
+	if (empty($name))
+	{
+		dol_print_error($db, "Error: Call to function digirisk_dolibarr_set_links with wrong parameters", LOG_ERR);
+		exit;
+	}
+
+	//dol_syslog("dolibarr_set_const name=$name, value=$value type=$type, visible=$visible, note=$note entity=$entity");
+	$db->begin();
+
+	$sql = "DELETE FROM ".MAIN_DB_PREFIX."digirisk_links";
+	$sql .= " WHERE ref = ".$db->encrypt($name, 1);
+	if ($entity >= 0) $sql .= " AND entity = ".$entity;
+
+	dol_syslog("admin.lib::digirisk_dolibarr_set_links", LOG_DEBUG);
+	$resql = $db->query($sql);
+
+	if (!is_array($contact_list)) {
+		$sql = "INSERT INTO ".MAIN_DB_PREFIX."digirisk_links(ref, entity, fk_user_author, fk_soc, fk_contact)";
+		$sql .= " VALUES (";
+		$sql .= $db->encrypt($name, 1);
+		$sql .= ", ".$entity;
+		$sql .= ", ".(is_numeric($fk_user_author) ? $fk_user_author : '0');
+		$sql .= ", ".(is_numeric($fk_soc) ? $fk_soc : '0');
+		$sql .= ", ".(is_numeric($contact_list) ? $contact_list : '0');
+		$sql .= ")";
+		//print "sql".$value."-".pg_escape_string($value)."-".$sql;exit;
+		//print "xx".$db->escape($value);
+		dol_syslog("admin.lib::digirisk_dolibarr_set_links", LOG_DEBUG);
+		$resql = $db->query($sql);
+	}
+	else
+	{
+		foreach ($contact_list as $fk_contact) {
+
+			if (strcmp($fk_user_author, ''))    // true if different. Must work for $value='0' or $value=0
+			{
+				$sql = "INSERT INTO " . MAIN_DB_PREFIX . "digirisk_links(ref, entity, fk_user_author, fk_soc, fk_contact)";
+				$sql .= " VALUES (";
+				$sql .= $db->encrypt($name, 1);
+				$sql .= ", " . $entity;
+				$sql .= ", " . (is_numeric($fk_user_author) ? $fk_user_author : '0');
+				$sql .= ", " . (is_numeric($fk_soc) ? $fk_soc : '0');
+				$sql .= ", " . (is_numeric($fk_contact) ? $fk_contact : '0');
+				$sql .= ")";
+				//print "sql".$value."-".pg_escape_string($value)."-".$sql;exit;
+				//print "xx".$db->escape($value);
+				dol_syslog("admin.lib::digirisk_dolibarr_set_links", LOG_DEBUG);
+				$resql = $db->query($sql);
+			}
+		}
+	}
+
+	if ($resql)
+	{
+		$db->commit();
+		return $name;
+
+	}
+	else
+	{
+		$error = $db->lasterror();
+		$db->rollback();
+		return -1;
+	}
+}
+
+function digirisk_dolibarr_fetch_links($db, $name)
+{
+	global $conf;
+
+	//dol_syslog("dolibarr_set_const name=$name, value=$value type=$type, visible=$visible, note=$note entity=$entity");
+	$db->begin();
+
+	if ($name == 'all') {
+		$sql = "SELECT * FROM llx_digirisk_links";
+
+	}
+	else
+	{
+		$sql = "SELECT ";
+		$sql .= "ref, fk_user_author, fk_soc, fk_contact ";
+		$sql .= "FROM ".MAIN_DB_PREFIX."digirisk_links";
+		$sql .= " WHERE ref = '".$name . "'";
+	}
+
+
+	dol_syslog("admin.lib::digirisk_dolibarr_fetch_links", LOG_DEBUG);
+	$resql = $db->query($sql);
+	if ($resql->num_rows > 1) {
+		for ($i = 0; $i < $resql->num_rows; $i++) {
+			$obj = $db->fetch_object($resql);
+			$key = $obj->ref;
+			$objects[$key] = $obj;
+		}
+
+		if ($resql) {
+			$db->commit();
+			return $objects;
+
+		} else {
+			$error = $db->lasterror();
+			$db->rollback();
+			return -1;
+		}
+	}
+	else
+	{
+		$obj = $db->fetch_object($resql);
+
+		if ($resql) {
+			$db->commit();
+			return $obj;
+
+		} else {
+			$error = $db->lasterror();
+			$db->rollback();
+			return -1;
+		}
+	}
+}
