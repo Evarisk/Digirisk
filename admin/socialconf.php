@@ -27,7 +27,14 @@ require_once DOL_DOCUMENT_ROOT.'/core/lib/company.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/functions2.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/core/class/html.formother.class.php';
 require_once DOL_DOCUMENT_ROOT.'/core/class/html.formcompany.class.php';
+require_once DOL_DOCUMENT_ROOT.'/core/class/html.formactions.class.php';
+require_once DOL_DOCUMENT_ROOT.'/core/class/html.formfile.class.php';
+require_once DOL_DOCUMENT_ROOT.'/core/class/html.form.class.php';
 
+require_once DOL_DOCUMENT_ROOT.'/custom/digiriskdolibarr/class/links.class.php';
+require_once DOL_DOCUMENT_ROOT.'/custom/digiriskdolibarr/lib/digiriskdolibarr.lib.php';
+require_once DOL_DOCUMENT_ROOT.'/contact/class/contact.class.php';
+require_once DOL_DOCUMENT_ROOT.'/user/class/user.class.php';
 $action = GETPOST('action', 'aZ09');
 $contextpage = GETPOST('contextpage', 'aZ') ?GETPOST('contextpage', 'aZ') : 'adminsocial'; // To manage different context of search
 
@@ -51,6 +58,21 @@ if ($reshook < 0) setEventMessages($hookmanager->error, $hookmanager->errors, 'e
 if (($action == 'update' && !GETPOST("cancel", 'alpha'))
 	|| ($action == 'updateedit'))
 {
+	digirisk_dolibarr_set_const($db, "MODALITES_INFORMATIONS", GETPOST("modalites", 'none'), 'chaine', 0, '', $conf->entity);
+	digirisk_dolibarr_set_const($db, "DATE_ELECTION_CSE", GETPOST("dateelectionCSE", 'alpha'), 'date', 0, '', $conf->entity);
+	digirisk_dolibarr_set_const($db, "DATE_ELECTION_DELEGUES_PERSONNELS", GETPOST("dateelectiondelegue", 'none'), 'chaine', 0, '', $conf->entity);
+
+	$allLinks = digirisk_dolibarr_fetch_links($db, 'all');
+
+	$CSEtitulaires		= GETPOST('titulairesCSE', 'array') ? GETPOST('titulairesCSE', 'array') : $allLinks['titulairesCSE']->fk_user ;
+	$CSEsuppleants 		= GETPOST('suppleantsCSE', 'array') ? GETPOST('suppleantsCSE','array') : $allLinks['suppleantsCSE']->fk_user;
+	$DPtitulaires 		= GETPOST('DPtitulaires', 'array') ? GETPOST('DPtitulaires', 'array') : $allLinks['DPtitulaires']->fk_user ;
+	$DPsuppleants 		= GETPOST('DPsuppleants', 'array') ? GETPOST('DPsuppleants','array') : $allLinks['DPsuppleants']->fk_user;
+
+	digirisk_dolibarr_set_links($db, 'titulairesCSE',  1,0,0, $CSEtitulaires, $conf->entity);
+	digirisk_dolibarr_set_links($db, 'suppleantsCSE',  1, 0,0, $CSEsuppleants, $conf->entity);
+	digirisk_dolibarr_set_links($db, 'DPtitulaires',  1, 0,0,$DPtitulaires, $conf->entity);
+	digirisk_dolibarr_set_links($db, 'DPsuppleants',  1, 0,0,$DPsuppleants, $conf->entity);
 
 	if ($action != 'updateedit' && !$error)
 	{
@@ -95,38 +117,77 @@ print '<form method="POST" action="'.$_SERVER["PHP_SELF"].'" name="form_index">'
 print '<input type="hidden" name="token" value="'.newToken().'">';
 print '<input type="hidden" name="action" value="update">';
 
+$digiriskconst = digirisk_dolibarr_fetch_const($db);
+
 //Accords de participation
 print '<table class="noborder centpercent editmode">';
-print '<tr class="liste_titre"><th class="titlefield wordbreak">'.$langs->trans("Accords de participation").'</th><th>'.$langs->trans("Value").'</th></tr>'."\n";
+print '<tr class="liste_titre"><th class="titlefield wordbreak">'.$langs->trans("Accords de participation").'</th><th>'.$langs->trans("").'</th></tr>'."\n";
 
-print '<tr class="oddeven"><td><label for="name">'.$langs->trans("Modalités d\'informations").'</label></td><td>';
-print '<input name="nom" id="name" class="minwidth200" value="'.($conf->global->MAIN_INFO_ACCOUNTANT_NAME ? $conf->global->MAIN_INFO_ACCOUNTANT_NAME : GETPOST("nom", 'nohtml')).'"'.(empty($conf->global->MAIN_OPTIMIZEFORTEXTBROWSER) ? '' : ' autofocus="autofocus"').'></td></tr>'."\n";
+print '<tr class="oddeven"><td><label for="modalites">'.$langs->trans("Modalities").'</label></td><td>';
+print '<input name="modalites" id="modalites" class="minwidth200" value="'.($digiriskconst->MODALITES_INFORMATIONS ? $digiriskconst->MODALITES_INFORMATIONS : GETPOST("modalites", 'none')).'"'.(empty($digiriskconst->MAIN_OPTIMIZEFORTEXTBROWSER) ? '' : ' autofocus="autofocus"').'></td></tr>'."\n";
 
 //CSE
-print '<table class="noborder centpercent editmode">';
-print '<tr class="liste_titre"><th class="titlefield wordbreak">'.$langs->trans("CSE").'</th><th>'.$langs->trans("Value").'</th></tr>'."\n";
+print '<tr class="liste_titre"><th class="titlefield wordbreak">'.$langs->trans("CSE").'</th><th>'.$langs->trans("").'</th></tr>'."\n";
 
-print '<tr class="oddeven"><td><label for="address">'.$langs->trans("Date d'élection").'</label></td><td>';
-print '<textarea name="address" id="address" class="quatrevingtpercent" rows="'.ROWS_3.'">'.($conf->global->MAIN_INFO_ACCOUNTANT_ADDRESS ? $conf->global->MAIN_INFO_ACCOUNTANT_ADDRESS : GETPOST("address", 'nohtml')).'</textarea></td></tr>'."\n";
+//Date
+print '<tr class="oddeven"><td><label for="dateelectionCSE">'.$langs->trans("CSEElectionDate").'</label></td><td>';
+print '<input name="dateelectionCSE" id="dateelectionCSE" class="minwidth200" value="'.($digiriskconst->DATE_ELECTION_CSE ? $digiriskconst->DATE_ELECTION_CSE :  GETPOST("dateelectionCSE", 'alpha')).'"'.(empty($digiriskconst->MAIN_OPTIMIZEFORTEXTBROWSER) ? '' : ' autofocus="autofocus"').'></td></tr>'."\n";
 
-print '<tr class="oddeven"><td><label for="zipcode">'.$langs->trans("Titulaires").'</label></td><td>';
-print '<input class="minwidth100" name="zipcode" id="zipcode" value="'.($conf->global->MAIN_INFO_ACCOUNTANT_ZIP ? $conf->global->MAIN_INFO_ACCOUNTANT_ZIP : GETPOST("zipcode", 'alpha')).'"></td></tr>'."\n";
+//Titulaires
+print '<tr>';
+print '<td>'.$form->editfieldkey('Titulaires', 'titulairesCSE_id', '', $object, 0).'</td>';
+print '<td colspan="3" class="maxwidthonsmartphone">';
 
-print '<tr class="oddeven"><td><label for="town">'.$langs->trans("Suppléants").'</label></td><td>';
-print '<input name="town" class="minwidth100" id="town" value="'.($conf->global->MAIN_INFO_ACCOUNTANT_TOWN ? $conf->global->MAIN_INFO_ACCOUNTANT_TOWN : GETPOST("town", 'nohtml')).'"></td></tr>'."\n";
+$userlist = $form->select_dolusers('', '', 0, null, 0, '', '', 0, 0, 0, 'AND u.statut = 1', 0, '', '', 0, 1);
+$users_links = digirisk_dolibarr_fetch_links($db, 'titulairesCSE');
+$selected = (count(GETPOST('titulairesCSE', 'array')) > 0 ? GETPOST('titulairesCSE', 'array') : (GETPOST('titulairesCSE', 'int') > 0 ? array(GETPOST('titulairesCSE', 'int')) : $users_links->fk_user ));
+print $form->multiselectarray('titulairesCSE', $userlist, $selected, null, null, null, null, "90%");
+
+print '</td></tr>';
+
+//suppleants
+print '<tr>';
+print '<td>'.$form->editfieldkey('Suppléants', 'suppleantsCSE_id', '', $object, 0).'</td>';
+print '<td colspan="3" class="maxwidthonsmartphone">';
+
+$userlist = $form->select_dolusers('', '', 0, null, 0, '', '', 0, 0, 0, 'AND u.statut = 1', 0, '', '', 0, 1);
+$users_links = digirisk_dolibarr_fetch_links($db, 'suppleantsCSE');
+$selected = (count(GETPOST('suppleantsCSE', 'array')) > 0 ? GETPOST('suppleantsCSE', 'array') : (GETPOST('suppleantsCSE', 'int') > 0 ? array(GETPOST('suppleantsCSE', 'int')) : ($users_links->fk_user ? $users_links->fk_user : 0) ));
+print $form->multiselectarray('suppleantsCSE', $userlist, $selected, null, null, null, null, "90%");
+
+print '</td></tr>';
+
 
 //Délégués du personnel
 print '<table class="noborder centpercent editmode">';
 print '<tr class="liste_titre"><th class="titlefield wordbreak">'.$langs->trans("Délégués du personnel").'</th><th>'.$langs->trans("Value").'</th></tr>'."\n";
+//Date
+print '<tr class="oddeven"><td><label for="dateelectionCSE">'.$langs->trans("CSEElectionDate").'</label></td><td>';
+print '<input name="dateelectionCSE" id="dateelectionCSE" class="minwidth200" value="'.($digiriskconst->DATE_ELECTION_CSE ? $digiriskconst->DATE_ELECTION_CSE :  GETPOST("dateelectionCSE", 'alpha')).'"'.(empty($digiriskconst->MAIN_OPTIMIZEFORTEXTBROWSER) ? '' : ' autofocus="autofocus"').'></td></tr>'."\n";
 
-print '<tr class="oddeven"><td><label for="address">'.$langs->trans("Date d\'élection").'</label></td><td>';
-print '<textarea name="address" id="address" class="quatrevingtpercent" rows="'.ROWS_3.'">'.($conf->global->MAIN_INFO_ACCOUNTANT_ADDRESS ? $conf->global->MAIN_INFO_ACCOUNTANT_ADDRESS : GETPOST("address", 'nohtml')).'</textarea></td></tr>'."\n";
+//Titulaires
+print '<tr>';
+print '<td>'.$form->editfieldkey('Titulaires', 'DPtitulaires_id', '', $object, 0).'</td>';
+print '<td colspan="3" class="maxwidthonsmartphone">';
 
-print '<tr class="oddeven"><td><label for="zipcode">'.$langs->trans("Titulaires").'</label></td><td>';
-print '<input class="minwidth100" name="zipcode" id="zipcode" value="'.($conf->global->MAIN_INFO_ACCOUNTANT_ZIP ? $conf->global->MAIN_INFO_ACCOUNTANT_ZIP : GETPOST("zipcode", 'alpha')).'"></td></tr>'."\n";
+$userlist = $form->select_dolusers('', '', 0, null, 0, '', '', 0, 0, 0, 'AND u.statut = 1', 0, '', '', 0, 1);
+$users_links = digirisk_dolibarr_fetch_links($db, 'DPtitulaires');
+$selected = (count(GETPOST('DPtitulaires', 'array')) > 0 ? GETPOST('DPtitulaires', 'array') : (GETPOST('DPtitulaires', 'int') > 0 ? array(GETPOST('DPtitulaires', 'int')) : $users_links->fk_user ));
+print $form->multiselectarray('DPtitulaires', $userlist, $selected, null, null, null, null, "90%");
 
-print '<tr class="oddeven"><td><label for="town">'.$langs->trans("Suppléants").'</label></td><td>';
-print '<input name="town" class="minwidth100" id="town" value="'.($conf->global->MAIN_INFO_ACCOUNTANT_TOWN ? $conf->global->MAIN_INFO_ACCOUNTANT_TOWN : GETPOST("town", 'nohtml')).'"></td></tr>'."\n";
+print '</td></tr>';
+
+//suppleants
+print '<tr>';
+print '<td>'.$form->editfieldkey('Suppléants', 'DPsuppleants', '', $object, 0).'</td>';
+print '<td colspan="3" class="maxwidthonsmartphone">';
+
+$userlist = $form->select_dolusers('', '', 0, null, 0, '', '', 0, 0, 0, 'AND u.statut = 1', 0, '', '', 0, 1);
+$users_links = digirisk_dolibarr_fetch_links($db, 'DPsuppleants');
+$selected = (count(GETPOST('DPsuppleants', 'array')) > 0 ? GETPOST('DPsuppleants', 'array') : (GETPOST('DPsuppleants', 'int') > 0 ? array(GETPOST('DPsuppleants', 'int')) : ($users_links->fk_user ? $users_links->fk_user : 0) ));
+print $form->multiselectarray('DPsuppleants', $userlist, $selected, null, null, null, null, "90%");
+
+print '</td></tr>';
 
 print '</table>';
 

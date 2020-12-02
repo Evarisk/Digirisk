@@ -92,36 +92,37 @@ if (($action == 'update' && !GETPOST("cancel", 'alpha'))
 {
 	$allLinks = digirisk_dolibarr_fetch_links($db, 'all');
 
-	$labourdoctor_id = GETPOST('labourdoctor_socid', 'int') ? GETPOST('labourdoctor_socid', 'int') : $allLinks['LabourDoctor']->fk_soc ;
-	$labourdoctor_socpeopleassigned = !empty(GETPOST('labourdoctor_socpeopleassigned', 'array')) ? GETPOST('labourdoctor_socpeopleassigned', 'array') : (GETPOST('labourdoctor_contactid', 'int') ? GETPOST('labourdoctor_contactid', 'int') : $allLinks['LabourDoctor']->fk_contact);
+	$labourdoctor_id 					= GETPOST('labourdoctor_socid', 'int') ? GETPOST('labourdoctor_socid', 'int') : $allLinks['LabourDoctor']->fk_soc ;
+	$labourdoctor_socpeopleassigned 	= !empty(GETPOST('labourdoctor_socpeopleassigned', 'array')) ? GETPOST('labourdoctor_socpeopleassigned', 'array') : (GETPOST('labourdoctor_contactid', 'int') ? GETPOST('labourdoctor_contactid', 'int') : $allLinks['LabourDoctor']->fk_contact);
 
-	$labourinspector_id = GETPOST('labourinspector_socid', 'int') ? GETPOST('labourinspector_socid','int') : $allLinks['LabourInspector']->fk_soc;
-	$labourinspector_socpeopleassigned = !empty(GETPOST('labourinspector_contactid', 'int')) ? GETPOST('labourinspector_contactid','int') : (GETPOST('labourinspector_contactid', 'int') ? GETPOST('labourinspector_contactid', 'int') : $allLinks['LabourInspector']->fk_contact);
-
-	$samu_id = GETPOST('samu_socid', 'int') ? GETPOST('samu_socid', 'int') : $allLinks['SAMU']->fk_soc ;
-
-	$pompiers_id = GETPOST('pompiers_socid', 'int') ? GETPOST('pompiers_socid','int') : $allLinks['Pompiers']->fk_soc;
-
-	$police_id = GETPOST('police_socid', 'int') ? GETPOST('police_socid', 'int') : $allLinks['Police']->fk_soc ;
-
-	$touteurgence_id = GETPOST('touteurgence_socid', 'int') ? GETPOST('touteurgence_socid','int') : $allLinks['AllEmergencies']->fk_soc;
-
-	$defenseur_id = GETPOST('defenseur_socid', 'int') ? GETPOST('defenseur_socid', 'int') : $allLinks['RightsDefender']->fk_soc ;
-
-	$antipoison_id = GETPOST('antipoison_socid', 'int') ? GETPOST('antipoison_socid','int') : $allLinks['Antipoison']->fk_soc;
-
-	$responsible_id = GETPOST('responsible_socid', 'int') ? GETPOST('responsible_socid','int') : $allLinks['Responsible']->fk_soc;
+	$labourinspector_id					= GETPOST('labourinspector_socid', 'int') ? GETPOST('labourinspector_socid','int') : $allLinks['LabourInspector']->fk_soc;
+	$labourinspector_socpeopleassigned 	= !empty(GETPOST('labourinspector_contactid', 'int')) ? GETPOST('labourinspector_contactid','int') : (GETPOST('labourinspector_contactid', 'int') ? GETPOST('labourinspector_contactid', 'int') : $allLinks['LabourInspector']->fk_contact);
 
 	digirisk_dolibarr_set_links($db, 'LabourDoctor',  1, $labourdoctor_id,$labourdoctor_socpeopleassigned, $conf->entity);
 	digirisk_dolibarr_set_links($db, 'LabourInspector',  1, $labourinspector_id,$labourinspector_socpeopleassigned, $conf->entity);
 
-	digirisk_dolibarr_set_links($db, 'SAMU',  1, $samu_id,0, $conf->entity);
-	digirisk_dolibarr_set_links($db, 'Pompiers',  1, $pompiers_id,0, $conf->entity);
-	digirisk_dolibarr_set_links($db, 'Police',  1, $police_id,0, $conf->entity);
-	digirisk_dolibarr_set_links($db, 'AllEmergencies',  1, $touteurgence_id,0, $conf->entity);
-	digirisk_dolibarr_set_links($db, 'RightsDefender',  1, $defenseur_id,0, $conf->entity);
-	digirisk_dolibarr_set_links($db, 'Antipoison',  1, $antipoison_id,0, $conf->entity);
-	digirisk_dolibarr_set_links($db, 'Responsible',  1, $responsible_id,0, $conf->entity);
+	$samu_id		 	= GETPOST('samu_socid', 'int') ? GETPOST('samu_socid', 'int') : $allLinks['SAMU']->fk_soc ;
+	$pompiers_id 		= GETPOST('pompiers_socid', 'int') ? GETPOST('pompiers_socid','int') : $allLinks['Pompiers']->fk_soc;
+	$police_id 			= GETPOST('police_socid', 'int') ? GETPOST('police_socid', 'int') : $allLinks['Police']->fk_soc ;
+	$touteurgence_id 	= GETPOST('touteurgence_socid', 'int') ? GETPOST('touteurgence_socid','int') : $allLinks['AllEmergencies']->fk_soc;
+	$defenseur_id 		= GETPOST('defenseur_socid', 'int') ? GETPOST('defenseur_socid', 'int') : $allLinks['RightsDefender']->fk_soc ;
+	$antipoison_id 		= GETPOST('antipoison_socid', 'int') ? GETPOST('antipoison_socid','int') : $allLinks['Antipoison']->fk_soc;
+	$responsible_id 	= GETPOST('responsible_socid', 'int') ? GETPOST('responsible_socid','int') : $allLinks['Responsible']->fk_soc;
+
+	digirisk_dolibarr_set_links($db, 'SAMU',  1, $samu_id,0, 0, $conf->entity);
+	digirisk_dolibarr_set_links($db, 'Pompiers',  1, $pompiers_id,0,0, $conf->entity);
+	digirisk_dolibarr_set_links($db, 'Police',  1, $police_id,0,0, $conf->entity);
+	digirisk_dolibarr_set_links($db, 'AllEmergencies',  1, $touteurgence_id,0, 0, $conf->entity);
+	digirisk_dolibarr_set_links($db, 'RightsDefender',  1, $defenseur_id,0,0, $conf->entity);
+	digirisk_dolibarr_set_links($db, 'Antipoison',  1, $antipoison_id,0, 0,$conf->entity);
+	digirisk_dolibarr_set_links($db, 'Responsible',  1, $responsible_id,0, 0,$conf->entity);
+
+	digirisk_dolibarr_set_const($db, "CONSIGNE_DETAILLEE_EMPLACEMENT", GETPOST("emplacementCD", 'none'), 'chaine', 0, '', $conf->entity);
+	digirisk_dolibarr_set_const($db, "DESCRIPTION", GETPOST("description", 'none'), 'chaine', 0, '', $conf->entity);
+	digirisk_dolibarr_set_const($db, "MOYENS_GENERAUX", GETPOST("moyensgeneraux", 'none'), 'chaine', 0, '', $conf->entity);
+	digirisk_dolibarr_set_const($db, "CONSIGNES_GENERALES", GETPOST("consignesgenerales", 'none'), 'chaine', 0, '', $conf->entity);
+	digirisk_dolibarr_set_const($db, "REGLEMENT_INTERIEUR_EMPLACEMENT", GETPOST("emplacementRI", 'none'), 'chaine', 0, '', $conf->entity);
+	digirisk_dolibarr_set_const($db, "DOCUMENT_UNIQUE_EMPLACEMENT", GETPOST("emplacementDU", 'none'), 'chaine', 0, '', $conf->entity);
 
 	if ($action != 'updateedit' && !$error)
 	{
@@ -173,7 +174,7 @@ if ($conf->societe->enabled)
 	// MEDECIN DU TRAVAIL
 	print '<tr class="liste_titre"><th class="titlefield wordbreak">'.$langs->trans("LabourDoctor").'</th><th>.<i class="fas fa-briefcase-medical"></i></th></tr>'."\n";
 
-	print '<tr><td class="titlefieldcreate nowrap">'.$langs->trans("ActionOnCompany").'</td><td>';
+	print '<tr class="oddeven"><td class="titlefieldcreate nowrap">'.$langs->trans("ActionOnCompany").'</td><td>';
 	$labourdoctor_links = digirisk_dolibarr_fetch_links($db, 'LabourDoctor');
 
 	// Tiers
@@ -201,7 +202,7 @@ if ($conf->societe->enabled)
 	print '</td></tr>';
 
 	// Related contact
-	print '<tr><td class="nowrap">'.$langs->trans("ActionOnContact").'</td><td>';
+	print '<tr class="oddeven"><td class="nowrap">'.$langs->trans("ActionOnContact").'</td><td>';
 	$labourdoctorpreselectedids = $labourdoctor_links->fk_contact;
 
 	if ($labourdoctor_links->fk_contact) {
@@ -217,7 +218,7 @@ if ($conf->societe->enabled)
 
 	// INSPECTEUR DU TRAVAIL
 	print '<tr class="liste_titre"><th class="titlefield wordbreak">'.$langs->trans("LabourInspector").'</th><th>.<i class="fas fa-search"></i></th></tr>'."\n";
-	print '<tr><td class="titlefieldcreate nowrap">'.$langs->trans("ActionOnCompany").'</td><td>';
+	print '<tr class="oddeven"><td class="titlefieldcreate nowrap">'.$langs->trans("ActionOnCompany").'</td><td>';
 	$labourinspector_links = digirisk_dolibarr_fetch_links($db, 'LabourInspector');
 
 	// Tiers
@@ -245,7 +246,7 @@ if ($conf->societe->enabled)
 	print '</td></tr>';
 
 	// Related contacts
-	print '<tr><td class="nowrap">'.$langs->trans("ActionOnContact").'</td><td>';
+	print '<tr class="oddeven"><td class="nowrap">'.$langs->trans("ActionOnContact").'</td><td>';
 	$preselectedids = $labourinspector_links->fk_contact;
 	if ($labourinspector_links->fk_contact) {
 		print $form->selectcontacts($labourinspector_links->fk_soc, $labourinspector_links->fk_contact , 'labourinspector_contactid', 1, '', '', 0, 'quatrevingtpercent', false, 0, array(), false, 'multiple', 'labourinspector_contactid');
@@ -261,7 +262,7 @@ if ($conf->societe->enabled)
 	// SAMU
 	print '<tr class="liste_titre"><th class="titlefield wordbreak">'.$langs->trans("SAMU").'</th><th>.<i class="fas fa-hospital-alt"></i></th></tr>'."\n";
 
-	print '<tr><td class="titlefieldcreate nowrap">'.$langs->trans("ActionOnCompany").'</td><td>';
+	print '<tr class="oddeven"><td class="titlefieldcreate nowrap">'.$langs->trans("ActionOnCompany").'</td><td>';
 	$samu_links = digirisk_dolibarr_fetch_links($db, 'SAMU');
 
 	// Tiers
@@ -286,7 +287,7 @@ if ($conf->societe->enabled)
 	// Pompiers
 	print '<tr class="liste_titre"><th class="titlefield wordbreak">'.$langs->trans("Pompiers").'</th><th>.<i class="fas fa-ambulance"></i></th></tr>'."\n";
 
-	print '<tr><td class="titlefieldcreate nowrap">'.$langs->trans("ActionOnCompany").'</td><td>';
+	print '<tr class="oddeven"><td class="titlefieldcreate nowrap">'.$langs->trans("ActionOnCompany").'</td><td>';
 	$pompiers_links = digirisk_dolibarr_fetch_links($db, 'Pompiers');
 
 	// Tiers
@@ -311,7 +312,7 @@ if ($conf->societe->enabled)
 	// Police
 	print '<tr class="liste_titre"><th class="titlefield wordbreak">'.$langs->trans("Police").'</th><th>.<i class="fas fa-car"></i></th></tr>'."\n";
 
-	print '<tr><td class="titlefieldcreate nowrap">'.$langs->trans("ActionOnCompany").'</td><td>';
+	print '<tr class="oddeven"><td class="titlefieldcreate nowrap">'.$langs->trans("ActionOnCompany").'</td><td>';
 	$police_links = digirisk_dolibarr_fetch_links($db, 'Police');
 
 	// Tiers
@@ -336,7 +337,7 @@ if ($conf->societe->enabled)
 	// Toute Urgence
 	print '<tr class="liste_titre"><th class="titlefield wordbreak">'.$langs->trans("AllEmergencies").'</th><th>.<i class="fas fa-phone"></i></th></tr>'."\n";
 
-	print '<tr><td class="titlefieldcreate nowrap">'.$langs->trans("ActionOnCompany").'</td><td>';
+	print '<tr class="oddeven"><td class="titlefieldcreate nowrap">'.$langs->trans("ActionOnCompany").'</td><td>';
 	$touteurgence_links = digirisk_dolibarr_fetch_links($db, 'AllEmergencies');
 
 	// Tiers
@@ -361,7 +362,7 @@ if ($conf->societe->enabled)
 	// Défenseur des droits
 	print '<tr class="liste_titre"><th class="titlefield wordbreak">'.$langs->trans("RightsDefender").'</th><th>.<i class="fas fa-gavel"></i></th></tr>'."\n";
 
-	print '<tr><td class="titlefieldcreate nowrap">'.$langs->trans("ActionOnCompany").'</td><td>';
+	print '<tr class="oddeven"><td class="titlefieldcreate nowrap">'.$langs->trans("ActionOnCompany").'</td><td>';
 	$defenseur_links = digirisk_dolibarr_fetch_links($db, 'RightsDefender');
 
 	// Tiers
@@ -386,7 +387,7 @@ if ($conf->societe->enabled)
 	// Antipoison
 	print '<tr class="liste_titre"><th class="titlefield wordbreak">'.$langs->trans("Antipoison").'</th><th>.<i class="fas fa-skull-crossbones"></i></th></tr>'."\n";
 
-	print '<tr><td class="titlefieldcreate nowrap">'.$langs->trans("ActionOnCompany").'</td><td>';
+	print '<tr class="oddeven"><td class="titlefieldcreate nowrap">'.$langs->trans("ActionOnCompany").'</td><td>';
 	$antipoison_links = digirisk_dolibarr_fetch_links($db, 'Antipoison');
 
 	// Tiers
@@ -441,40 +442,41 @@ else
 }
 print '</td></tr>';
 
+$digiriskconst = digirisk_dolibarr_fetch_const($db);
 
 // Emplacement de la consigne détaillée
-print '<tr class="oddeven"><td><label for="name">'.$langs->trans("Emplacement de la consigne détaillée").'</label></td><td>';
-print '<input name="nom" id="name" class="minwidth200" value="'.($conf->global->MAIN_INFO_ACCOUNTANT_NAME ? $conf->global->MAIN_INFO_ACCOUNTANT_NAME : GETPOST("nom", 'nohtml')).'"'.(empty($conf->global->MAIN_OPTIMIZEFORTEXTBROWSER) ? '' : ' autofocus="autofocus"').'></td></tr>'."\n";
+print '<tr class="oddeven"><td><label for="emplacementCD">'.$langs->trans("Emplacement de la consigne détaillée").'</label></td><td>';
+print '<input name="emplacementCD" id="emplacementCD" class="minwidth200" value="'.($digiriskconst->CONSIGNE_DETAILLEE_EMPLACEMENT ? $digiriskconst->CONSIGNE_DETAILLEE_EMPLACEMENT : GETPOST("emplacementCD", 'none')).'"'.(empty($digiriskconst->MAIN_OPTIMIZEFORTEXTBROWSER) ? '' : ' autofocus="autofocus"').'></td></tr>'."\n";
 
 
 print '<table class="noborder centpercent editmode">';
 print '<tr class="liste_titre"><th class="titlefield">'.$langs->trans("Informations complémentaires de la société").'</th><th>'.$langs->trans("Value").'</th></tr>'."\n";
 
 // Description
-print '<tr class="oddeven"><td><label for="name">'.$langs->trans("Description").'</label></td><td>';
-print '<input name="nom" id="name" class="minwidth200" value="'.($conf->global->MAIN_INFO_ACCOUNTANT_NAME ? $conf->global->MAIN_INFO_ACCOUNTANT_NAME : GETPOST("nom", 'nohtml')).'"'.(empty($conf->global->MAIN_OPTIMIZEFORTEXTBROWSER) ? '' : ' autofocus="autofocus"').'></td></tr>'."\n";
+print '<tr class="oddeven"><td><label for="description">'.$langs->trans("Description").'</label></td><td>';
+print '<input name="description" id="description" class="minwidth200" value="'.($digiriskconst->DESCRIPTION ? $digiriskconst->DESCRIPTION : GETPOST("description", 'none')).'"'.(empty($digiriskconst->MAIN_OPTIMIZEFORTEXTBROWSER) ? '' : ' autofocus="autofocus"').'></td></tr>'."\n";
 
 // Moyens généraux mis à disposition
-print '<tr class="oddeven"><td><label for="name">'.$langs->trans("Moyens généraux mis à disposition").'</label></td><td>';
-print '<input name="nom" id="name" class="minwidth200" value="'.($conf->global->MAIN_INFO_ACCOUNTANT_NAME ? $conf->global->MAIN_INFO_ACCOUNTANT_NAME : GETPOST("nom", 'nohtml')).'"'.(empty($conf->global->MAIN_OPTIMIZEFORTEXTBROWSER) ? '' : ' autofocus="autofocus"').'></td></tr>'."\n";
+print '<tr class="oddeven"><td><label for="moyensgeneraux">'.$langs->trans("Moyens généraux mis à disposition").'</label></td><td>';
+print '<input name="moyensgeneraux" id="moyensgeneraux" class="minwidth200" value="'.($digiriskconst->MOYENS_GENERAUX ? $digiriskconst->MOYENS_GENERAUX : GETPOST("moyensgeneraux", 'none')).'"'.(empty($digiriskconst->MAIN_OPTIMIZEFORTEXTBROWSER) ? '' : ' autofocus="autofocus"').'></td></tr>'."\n";
 
 // Consignes générales
-print '<tr class="oddeven"><td><label for="name">'.$langs->trans(" Consignes générales").'</label></td><td>';
-print '<input name="nom" id="name" class="minwidth200" value="'.($conf->global->MAIN_INFO_ACCOUNTANT_NAME ? $conf->global->MAIN_INFO_ACCOUNTANT_NAME : GETPOST("nom", 'nohtml')).'"'.(empty($conf->global->MAIN_OPTIMIZEFORTEXTBROWSER) ? '' : ' autofocus="autofocus"').'></td></tr>'."\n";
+print '<tr class="oddeven"><td><label for="consignesgenerales">'.$langs->trans(" Consignes générales").'</label></td><td>';
+print '<input name="consignesgenerales" id="consignesgenerales" class="minwidth200" value="'.($digiriskconst->CONSIGNES_GENERALES ? $digiriskconst->CONSIGNES_GENERALES : GETPOST("consignesgenerales", 'none')).'"'.(empty($digiriskconst->MAIN_OPTIMIZEFORTEXTBROWSER) ? '' : ' autofocus="autofocus"').'></td></tr>'."\n";
 
-// Consignes de sécurité
+// RI
 print '<table class="noborder centpercent editmode">';
-print '<tr class="liste_titre"><th class="titlefield wordbreak">'.$langs->trans("Règlement intérieur").'</th><th>'.$langs->trans("Value").'</th></tr>'."\n";
-// Choix du tiers
-print '<tr class="oddeven"><td><label for="name">'.$langs->trans("Associer un tiers").'</label></td><td>';
-print '<input name="nom" id="name" class="minwidth200" value="'.($conf->global->MAIN_INFO_ACCOUNTANT_NAME ? $conf->global->MAIN_INFO_ACCOUNTANT_NAME : GETPOST("nom", 'nohtml')).'"'.(empty($conf->global->MAIN_OPTIMIZEFORTEXTBROWSER) ? '' : ' autofocus="autofocus"').'></td></tr>'."\n";
+print '<tr class="liste_titre"><th class="titlefield wordbreak">'.$langs->trans("Règlement intérieur").'</th><th>'.$langs->trans("Emplacement").'</th></tr>'."\n";
+// Emplacement
+print '<tr class="oddeven"><td><label for="emplacementRI">'.$langs->trans("Associer un tiers").'</label></td><td>';
+print '<input name="emplacementRI" id="emplacementRI" class="minwidth200" value="'.($digiriskconst->REGLEMENT_INTERIEUR_EMPLACEMENT ? $digiriskconst->REGLEMENT_INTERIEUR_EMPLACEMENT : GETPOST("emplacementRI", 'none')).'"'.(empty($digiriskconst->MAIN_OPTIMIZEFORTEXTBROWSER) ? '' : ' autofocus="autofocus"').'></td></tr>'."\n";
 
-// Consignes de sécurité
+// DU
 print '<table class="noborder centpercent editmode">';
-print '<tr class="liste_titre"><th class="titlefield wordbreak">'.$langs->trans("Document Unique").'</th><th>'.$langs->trans("Value").'</th></tr>'."\n";
-// Choix du tiers
-print '<tr class="oddeven"><td><label for="name">'.$langs->trans("Associer un tiers").'</label></td><td>';
-print '<input name="nom" id="name" class="minwidth200" value="'.($conf->global->MAIN_INFO_ACCOUNTANT_NAME ? $conf->global->MAIN_INFO_ACCOUNTANT_NAME : GETPOST("nom", 'nohtml')).'"'.(empty($conf->global->MAIN_OPTIMIZEFORTEXTBROWSER) ? '' : ' autofocus="autofocus"').'></td></tr>'."\n";
+print '<tr class="liste_titre"><th class="titlefield wordbreak">'.$langs->trans("Document Unique").'</th><th>'.$langs->trans("Emplacement").'</th></tr>'."\n";
+// Emplacement
+print '<tr class="oddeven"><td><label for="emplacementDU">'.$langs->trans("Associer un tiers").'</label></td><td>';
+print '<input name="emplacementDU" id="emplacementDU" class="minwidth200" value="'.($digiriskconst->DOCUMENT_UNIQUE_EMPLACEMENT ? $digiriskconst->DOCUMENT_UNIQUE_EMPLACEMENT : GETPOST("emplacementDU", 'none')).'"'.(empty($digiriskconst->MAIN_OPTIMIZEFORTEXTBROWSER) ? '' : ' autofocus="autofocus"').'></td></tr>'."\n";
 
 print '</td></tr>';
 

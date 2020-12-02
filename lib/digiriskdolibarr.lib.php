@@ -114,7 +114,51 @@ function digirisk_dolibarr_set_const($db, $name, $value, $type = 'chaine', $visi
 	}
 }
 
-function digirisk_dolibarr_set_links($db, $name, $fk_user_author, $fk_soc, $contact_list, $entity = 1)
+function digirisk_dolibarr_fetch_const($db, $type = 'chaine', $visible = 0, $note = '', $entity = 1)
+{
+	global $conf;
+
+
+	$db->begin();
+
+	$sql = "SELECT * FROM " . MAIN_DB_PREFIX . "digirisk_const";
+
+	$resql = $db->query($sql);
+
+	if ($resql->num_rows > 1) {
+		for ($i = 0; $i < $resql->num_rows; $i++) {
+			$obj = $db->fetch_object($resql);
+			$key = $obj->name;
+			$objects[$key] = $obj->value;
+		}
+		$objects = (object) $objects;
+		if ($resql) {
+			$db->commit();
+			return $objects;
+
+		} else {
+			$error = $db->lasterror();
+			$db->rollback();
+			return -1;
+		}
+	}
+	else
+	{
+		$obj = $db->fetch_object($resql);
+
+		if ($resql) {
+			$db->commit();
+			return $obj;
+
+		} else {
+			$error = $db->lasterror();
+			$db->rollback();
+			return -1;
+		}
+	}
+}
+
+function digirisk_dolibarr_set_links($db, $name, $fk_user_author, $fk_soc, $contact_list, $fk_user, $entity = 1)
 {
 	global $conf;
 
@@ -138,18 +182,26 @@ function digirisk_dolibarr_set_links($db, $name, $fk_user_author, $fk_soc, $cont
 	$resql = $db->query($sql);
 
 	if (!is_array($contact_list)) {
-		$sql = "INSERT INTO ".MAIN_DB_PREFIX."digirisk_links(ref, entity, fk_user_author, fk_soc, fk_contact)";
+		$sql = "INSERT INTO ".MAIN_DB_PREFIX."digirisk_links(ref, entity, fk_user_author, fk_soc, fk_contact, fk_user)";
 		$sql .= " VALUES (";
 		$sql .= $db->encrypt($name, 1);
 		$sql .= ", ".$entity;
 		$sql .= ", ".(is_numeric($fk_user_author) ? $fk_user_author : '0');
 		$sql .= ", ".(is_numeric($fk_soc) ? $fk_soc : '0');
-		$sql .= ", ".(is_numeric($contact_list) ? $contact_list : '0');
+		$sql .= ", ".(is_numeric($contact_list) ? $contact_list : '0') . ", ";
+		if (!empty($fk_user)) {
+			foreach ($fk_user as $user) {
+				$users[$user] = is_numeric($user) ? $user : '0';
+			}
+			$sql .= implode("",$users);
+		}
+
 		$sql .= ")";
 		//print "sql".$value."-".pg_escape_string($value)."-".$sql;exit;
 		//print "xx".$db->escape($value);
 		dol_syslog("admin.lib::digirisk_dolibarr_set_links", LOG_DEBUG);
 		$resql = $db->query($sql);
+
 	}
 	else
 	{
@@ -157,13 +209,16 @@ function digirisk_dolibarr_set_links($db, $name, $fk_user_author, $fk_soc, $cont
 
 			if (strcmp($fk_user_author, ''))    // true if different. Must work for $value='0' or $value=0
 			{
-				$sql = "INSERT INTO " . MAIN_DB_PREFIX . "digirisk_links(ref, entity, fk_user_author, fk_soc, fk_contact)";
+				$sql = "INSERT INTO " . MAIN_DB_PREFIX . "digirisk_links(ref, entity, fk_user_author, fk_soc, fk_contact, fk_user)";
 				$sql .= " VALUES (";
 				$sql .= $db->encrypt($name, 1);
 				$sql .= ", " . $entity;
 				$sql .= ", " . (is_numeric($fk_user_author) ? $fk_user_author : '0');
 				$sql .= ", " . (is_numeric($fk_soc) ? $fk_soc : '0');
 				$sql .= ", " . (is_numeric($fk_contact) ? $fk_contact : '0');
+				foreach ($fk_user as $user) {
+					$sql .= ", ".(is_numeric($user) ? $user : '0');
+				}
 				$sql .= ")";
 				//print "sql".$value."-".pg_escape_string($value)."-".$sql;exit;
 				//print "xx".$db->escape($value);
@@ -201,7 +256,7 @@ function digirisk_dolibarr_fetch_links($db, $name)
 	else
 	{
 		$sql = "SELECT ";
-		$sql .= "ref, fk_user_author, fk_soc, fk_contact ";
+		$sql .= "ref, fk_user_author, fk_soc, fk_contact, fk_user ";
 		$sql .= "FROM ".MAIN_DB_PREFIX."digirisk_links";
 		$sql .= " WHERE ref = '".$name . "'";
 	}
@@ -213,7 +268,13 @@ function digirisk_dolibarr_fetch_links($db, $name)
 		for ($i = 0; $i < $resql->num_rows; $i++) {
 			$obj = $db->fetch_object($resql);
 			$key = $obj->ref;
-			$objects[$key] = $obj;
+			if ($key !== 'fk_user') {
+				$objects[$key] = $obj;
+			}
+			else
+			{
+				$objects[$key] = array($obj);
+			}
 		}
 
 		if ($resql) {
@@ -229,7 +290,9 @@ function digirisk_dolibarr_fetch_links($db, $name)
 	else
 	{
 		$obj = $db->fetch_object($resql);
-
+		if (!empty($obj)) {
+			$obj->fk_user = array($obj->fk_user);
+		}
 		if ($resql) {
 			$db->commit();
 			return $obj;

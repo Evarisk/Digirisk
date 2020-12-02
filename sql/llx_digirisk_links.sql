@@ -7,6 +7,7 @@ create table llx_digirisk_links
   tms                           timestamp,
   fk_user_author                integer default NULL,
   fk_soc                        integer default NULL,
-  fk_contact                   integer default NULL
+  fk_contact                    integer default NULL,
+  fk_user                       integer default NULL
 
 )ENGINE=innodb;
