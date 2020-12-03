@@ -272,12 +272,15 @@ class doc_legaldisplay_odt extends ModelePDFLegalDisplay
 					$format = $conf->global->MAIN_DOC_USE_TIMING;
 					if ($format == '1') $format = '%Y%m%d%H%M%S';
 					$filename = $newfiletmp.'-'.dol_print_date(dol_now(), $format).'.'.$newfileformat;
+
 				}
 				else
 				{
 					$filename = $newfiletmp.'.'.$newfileformat;
+					$filename = dol_print_date($object->date_creation, '%Y%m%d') . '_' . $newfiletmp . '_A4' . '_V1.' . $newfileformat;
 				}
 				$file = $dir.'/'.$filename;
+
 				//print "newdir=".$dir;
 				//print "newfile=".$newfile;
 				//print "file=".$file;

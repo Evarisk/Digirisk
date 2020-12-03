@@ -466,16 +466,16 @@ print '<input name="consignesgenerales" id="consignesgenerales" class="minwidth2
 
 // RI
 print '<table class="noborder centpercent editmode">';
-print '<tr class="liste_titre"><th class="titlefield wordbreak">'.$langs->trans("Règlement intérieur").'</th><th>'.$langs->trans("Emplacement").'</th></tr>'."\n";
+print '<tr class="liste_titre"><th class="titlefield wordbreak">'.$langs->trans("Règlement intérieur").'</th><th>'.$langs->trans("").'</th></tr>'."\n";
 // Emplacement
-print '<tr class="oddeven"><td><label for="emplacementRI">'.$langs->trans("Associer un tiers").'</label></td><td>';
+print '<tr class="oddeven"><td><label for="emplacementRI">'.$langs->trans("Emplacement").'</label></td><td>';
 print '<input name="emplacementRI" id="emplacementRI" class="minwidth200" value="'.($digiriskconst->REGLEMENT_INTERIEUR_EMPLACEMENT ? $digiriskconst->REGLEMENT_INTERIEUR_EMPLACEMENT : GETPOST("emplacementRI", 'none')).'"'.(empty($digiriskconst->MAIN_OPTIMIZEFORTEXTBROWSER) ? '' : ' autofocus="autofocus"').'></td></tr>'."\n";
 
 // DU
 print '<table class="noborder centpercent editmode">';
-print '<tr class="liste_titre"><th class="titlefield wordbreak">'.$langs->trans("Document Unique").'</th><th>'.$langs->trans("Emplacement").'</th></tr>'."\n";
+print '<tr class="liste_titre"><th class="titlefield wordbreak">'.$langs->trans("Document Unique").'</th><th>'.$langs->trans("").'</th></tr>'."\n";
 // Emplacement
-print '<tr class="oddeven"><td><label for="emplacementDU">'.$langs->trans("Associer un tiers").'</label></td><td>';
+print '<tr class="oddeven"><td><label for="emplacementDU">'.$langs->trans("Emplacement").'</label></td><td>';
 print '<input name="emplacementDU" id="emplacementDU" class="minwidth200" value="'.($digiriskconst->DOCUMENT_UNIQUE_EMPLACEMENT ? $digiriskconst->DOCUMENT_UNIQUE_EMPLACEMENT : GETPOST("emplacementDU", 'none')).'"'.(empty($digiriskconst->MAIN_OPTIMIZEFORTEXTBROWSER) ? '' : ' autofocus="autofocus"').'></td></tr>'."\n";
 
 print '</td></tr>';

@@ -58,6 +58,7 @@ class ActionsDigiriskDolibarr
 			return -1;
 		}
 	}
+/*
 	function doActions($parameters, &$object, &$action)
 	{
 		global $hookmanager, $langs, $conf;
@@ -99,5 +100,5 @@ class ActionsDigiriskDolibarr
 			$this->errors[] = 'Error message';
 			return -1;
 		}
-	}
+	} */
 }

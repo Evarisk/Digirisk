@@ -105,7 +105,7 @@ $search_array_options=$extrafields->getOptionalsFromPost($extralabels,'','search
 // List of fields to search into when doing a "search in all"
 $fieldstosearchall = array(
 	't.ref'=>'Ref',
-	't.fk_soc_labour_doctor'=>'MedecinTravail',
+	't.fk_socpeople_labour_doctor'=>'MedecinTravail',
 );
 if (empty($user->socid)) $fieldstosearchall["t.note_private"]="NotePrivate";
 
@@ -117,8 +117,8 @@ $arrayfields=array(
 	't.date_debut'=>array('label'=>$langs->trans("Date de début"), 'checked'=>1),
 	't.date_fin'=>array('label'=>$langs->trans("Date de fin"), 'checked'=>1),
 
-	't.fk_soc_labour_doctor'=>array('label'=>$langs->trans("Médecin du travail"), 'checked'=>1),
-	't.fk_soc_labour_inspector'=>array('label'=>$langs->trans("Inspecteur du travail"), 'checked'=>0),
+	't.fk_socpeople_labour_doctor'=>array('label'=>$langs->trans("Médecin du travail"), 'checked'=>1),
+	't.fk_socpeople_labour_inspector'=>array('label'=>$langs->trans("Inspecteur du travail"), 'checked'=>0),
 	't.fk_soc_samu'=>array('label'=>$langs->trans("SAMU"), 'checked'=>0),
 	't.fk_soc_police'=>array('label'=>$langs->trans("Police"), 'checked'=>0),
 	't.fk_soc_urgency'=>array('label'=>$langs->trans("Urgences"), 'checked'=>0),
@@ -227,10 +227,8 @@ $sql .= " t.rowid";
 $sql .= ", t.ref";
 $sql .= ", t.entity";
 $sql .= ", t.date_creation";
-$sql .= ", t.date_debut";
-$sql .= ", t.date_fin";
-$sql .= ", t.fk_soc_labour_doctor";
-$sql .= ", t.fk_soc_labour_inspector";
+$sql .= ", t.fk_socpeople_labour_doctor";
+$sql .= ", t.fk_socpeople_labour_inspector";
 $sql .= ", t.fk_soc_samu";
 $sql .= ", t.fk_soc_police";
 $sql .= ", t.fk_soc_urgency";
@@ -252,8 +250,8 @@ foreach ($extrafields->attribute_label as $key => $val) $sql.=($extrafields->att
 $parameters=array();
 $reshook=$hookmanager->executeHooks('printFieldListSelect',$parameters);    // Note that $action and $object may have been modified by hook
 $sql.=$hookmanager->resPrint;
-$sql.= " FROM ".MAIN_DB_PREFIX."legaldisplay as t";
-$sql .= " LEFT JOIN ".MAIN_DB_PREFIX."societe as s on (s.rowid  = t.fk_soc_labour_doctor)";
+$sql.= " FROM ".MAIN_DB_PREFIX."digirisk_legaldisplay as t";
+$sql .= " LEFT JOIN ".MAIN_DB_PREFIX."societe as s on (s.rowid  = t.fk_socpeople_labour_doctor)";
 
 if (is_array($extrafields->attribute_label) && count($extrafields->attribute_label)) $sql.= " LEFT JOIN ".MAIN_DB_PREFIX."legaldisplay_extrafields as ef on (t.rowid = ef.fk_object)";
 $sql.= " WHERE 1 = 1";
@@ -388,7 +386,7 @@ if (! empty($arrayfields['t.ref']['checked'])) print_liste_field_titre($arrayfie
 if (! empty($arrayfields['t.date_creation']['checked'])) print_liste_field_titre($arrayfields['t.date_creation']['label'],$_SERVER['PHP_SELF'],'t.date_creation','',$param,'',$sortfield,$sortorder);
 if (! empty($arrayfields['t.date_debut']['checked'])) print_liste_field_titre($arrayfields['t.date_debut']['label'],$_SERVER['PHP_SELF'],'t.date_debut','',$param,'',$sortfield,$sortorder);
 if (! empty($arrayfields['t.date_fin']['checked'])) print_liste_field_titre($arrayfields['t.date_fin']['label'],$_SERVER['PHP_SELF'],'t.date_fin','',$param,'',$sortfield,$sortorder);
-if (! empty($arrayfields['t.fk_soc_labour_doctor']['checked'])) print_liste_field_titre($arrayfields['t.fk_soc_labour_doctor']['label'],$_SERVER['PHP_SELF'],'t.fk_soc_labour_doctor','',$param,'',$sortfield,$sortorder);
+if (! empty($arrayfields['t.fk_socpeople_labour_doctor']['checked'])) print_liste_field_titre($arrayfields['t.fk_socpeople_labour_doctor']['label'],$_SERVER['PHP_SELF'],'t.fk_socpeople_labour_doctor','',$param,'',$sortfield,$sortorder);
 
 // Extra fields
 if (is_array($extrafields->attribute_label) && count($extrafields->attribute_label))
@@ -461,8 +459,8 @@ while ($i < min($num, $limit))
 	$legaldisplaystatic->date_creation = $obj->date_creation;
 	$legaldisplaystatic->date_debut = $db->jdate($obj->date_debut);
 	$legaldisplaystatic->date_fin = $db->jdate($obj->date_fin);
-	$legaldisplaystatic->fk_soc_labour_doctor = $db->jdate($obj->fk_soc_labour_doctor);
-	$legaldisplaystatic->fk_soc_labour_inspector = $db->jdate($obj->fk_soc_labour_inspector);
+	$legaldisplaystatic->fk_socpeople_labour_doctor = $db->jdate($obj->fk_socpeople_labour_doctor);
+	$legaldisplaystatic->fk_socpeople_labour_inspector = $db->jdate($obj->fk_socpeople_labour_inspector);
 	$legaldisplaystatic->fk_soc_samu = $db->jdate($obj->fk_soc_samu);
 	$legaldisplaystatic->fk_soc_police = $db->jdate($obj->fk_soc_police);
 	$legaldisplaystatic->fk_soc_urgency = $obj->fk_soc_urgency;
@@ -474,7 +472,7 @@ while ($i < min($num, $limit))
 	$legaldisplaystatic->model_odt = $obj->model_odt;
 	$legaldisplaystatic->note_affich = $obj->note_affich;
 
-	$thirdpartystatic->id = $obj->fk_soc_labour_doctor;
+	$thirdpartystatic->id = $obj->fk_socpeople_labour_doctor;
 	$thirdpartystatic->name = $obj->name;
 	$thirdpartystatic->client = $obj->client;
 	$thirdpartystatic->fournisseur = $obj->fournisseur;
@@ -541,7 +539,7 @@ while ($i < min($num, $limit))
 		}
 
 		//User
-		if (!empty($arrayfields['t.fk_soc_labour_doctor']['checked']))
+		if (!empty($arrayfields['t.fk_socpeople_labour_doctor']['checked']))
 		{
 			print '<td class="tdoverflowmax200">';
 			if ($contextpage == 'postList')

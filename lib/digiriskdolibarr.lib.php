@@ -170,8 +170,7 @@ function digirisk_dolibarr_set_links($db, $name, $fk_user_author, $fk_soc, $cont
 		dol_print_error($db, "Error: Call to function digirisk_dolibarr_set_links with wrong parameters", LOG_ERR);
 		exit;
 	}
-
-	//dol_syslog("dolibarr_set_const name=$name, value=$value type=$type, visible=$visible, note=$note entity=$entity");
+		//dol_syslog("dolibarr_set_const name=$name, value=$value type=$type, visible=$visible, note=$note entity=$entity");
 	$db->begin();
 
 	$sql = "DELETE FROM ".MAIN_DB_PREFIX."digirisk_links";
@@ -182,6 +181,7 @@ function digirisk_dolibarr_set_links($db, $name, $fk_user_author, $fk_soc, $cont
 	$resql = $db->query($sql);
 
 	if (!is_array($contact_list)) {
+
 		$sql = "INSERT INTO ".MAIN_DB_PREFIX."digirisk_links(ref, entity, fk_user_author, fk_soc, fk_contact, fk_user)";
 		$sql .= " VALUES (";
 		$sql .= $db->encrypt($name, 1);
@@ -189,11 +189,16 @@ function digirisk_dolibarr_set_links($db, $name, $fk_user_author, $fk_soc, $cont
 		$sql .= ", ".(is_numeric($fk_user_author) ? $fk_user_author : '0');
 		$sql .= ", ".(is_numeric($fk_soc) ? $fk_soc : '0');
 		$sql .= ", ".(is_numeric($contact_list) ? $contact_list : '0') . ", ";
+
 		if (!empty($fk_user)) {
 			foreach ($fk_user as $user) {
 				$users[$user] = is_numeric($user) ? $user : '0';
 			}
 			$sql .= implode("",$users);
+		}
+		else
+		{
+			$sql.= "0";
 		}
 
 		$sql .= ")";

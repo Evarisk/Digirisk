@@ -47,6 +47,7 @@ if (! $res) die("Include of main fails");
 // Change this following line to use the correct relative path from htdocs
 dol_include_once('/digiriskdolibarr/class/legaldisplay.class.php');
 dol_include_once('../custom/digiriskdolibarr/class/html.formfile.class.php');
+dol_include_once('../custom/digiriskdolibarr/lib/digiriskdolibarr.lib.php');
 dol_include_once('../contact/class/contact.class.php');
 dol_include_once('../core/lib/functions2.lib.php');
 dol_include_once('../core/class/html.formorder.class.php');
@@ -114,19 +115,31 @@ if (empty($reshook))
 		$error=0;
 
 		/* object_prop_getpost_prop */
+
+		$digirisklinks = digirisk_dolibarr_fetch_links($db, 'all');
+		$digiriskconst = digirisk_dolibarr_fetch_const($db);
+
 		$object->id = GETPOST("id");
 		$object->ref = GETPOST("ref");
-		$object->date_debut = mktime(GETPOST("date_debut"));
-		$object->date_fin = mktime(GETPOST("date_fin"));
-		$object->fk_soc_labour_doctor = GETPOST("labour_doctor");
-		$object->fk_soc_labour_inspector = GETPOST("labour_inspector");
-		$object->fk_soc_samu = GETPOST("samu");
-		$object->fk_soc_police = GETPOST("police");
-		$object->fk_soc_urgency = GETPOST("urgency");
-		$object->fk_soc_rights_defender = GETPOST("rights_defender");
-		$object->fk_soc_antipoison = GETPOST("antipoison");
-		$object->fk_soc_responsible_prevent = GETPOST("responsible_prevent");
+		$object->fk_socpeople_labour_doctor = $digirisklinks['LabourDoctor']->fk_contact;
+		$object->fk_socpeople_labour_inspector =  $digirisklinks['LabourInspector']->fk_contact;
+		$object->fk_soc_samu =  $digirisklinks['SAMU']->fk_soc;
+		$object->fk_soc_pompiers =  $digirisklinks['Pompiers']->fk_soc;
 
+		$object->fk_soc_police =  $digirisklinks['Police']->fk_soc;
+		$object->fk_soc_urgency =  $digirisklinks['AllEmergencies']->fk_soc;
+		$object->fk_soc_rights_defender = $digirisklinks['RightsDefender']->fk_soc;
+		$object->fk_soc_antipoison =  $digirisklinks['Antipoison']->fk_soc;
+		$object->fk_soc_responsible_prevent =  $digirisklinks['Responsible']->fk_soc;
+
+		$object->note_consigne_detaillee = $digiriskconst->CONSIGNE_DETAILLEE_EMPLACEMENT;
+		$object->note_derogation_permanente = $digiriskconst->NOTE_DEROGATION_PERMANENTE;
+		$object->note_derogation_occas = $digiriskconst->NOTE_DEROGATION_OCCAS;
+		$object->note_convention_collective = $digiriskconst->CONVENTION_COLLECTIVE;
+		$object->note_lieu_cc = $digiriskconst->CONVENTION_COLLECTIVE_EMPLACEMENT;
+		$object->note_accord_participation = $digiriskconst->MODALITES_INFORMATIONS;
+		$object->note_lieu_cc = $digiriskconst->DOCUMENT_UNIQUE_EMPLACEMENT;
+		;
 		if (empty($object->ref))
 		{
 			$error++;
@@ -164,16 +177,25 @@ if (empty($reshook))
 	{
 		$error=0;
 		$object->ref = GETPOST("ref");
-		$object->date_debut = strtotime(GETPOST("date_debut"));
-		$object->date_fin = strtotime(GETPOST("date_fin"));
-		$object->fk_soc_labour_doctor = GETPOST("labour_doctor");
-		$object->fk_soc_labour_inspector = GETPOST("labour_inspector");
+		$object->fk_socpeople_labour_doctor = GETPOST("labour_doctor");
+		$object->fk_socpeople_labour_inspector = GETPOST("labour_inspector");
 		$object->fk_soc_samu = GETPOST("samu");
+		$object->fk_soc_pompiers = GETPOST("pompiers");
 		$object->fk_soc_police = GETPOST("police");
 		$object->fk_soc_urgency = GETPOST("urgency");
 		$object->fk_soc_rights_defender = GETPOST("rights_defender");
 		$object->fk_soc_antipoison = GETPOST("antipoison");
 		$object->fk_soc_responsible_prevent = GETPOST("responsible_prevent");
+
+		$digirisklinks = digirisk_dolibarr_fetch_links($db, 'all');
+		$digiriskconst = digirisk_dolibarr_fetch_const($db);
+
+		$object->note_consigne_detaillee = GETPOST("consigne_detaillee");
+		$object->note_derogation_permanente = GETPOST("derogation_permanente");
+		$object->note_derogation_occas = GETPOST("derogation_occas");
+		$object->note_convention_collective = GETPOST("convention_collective");
+		$object->note_lieu_cc = GETPOST("lieu_cc");
+		$object->note_accord_participation = GETPOST("accord_participation");
 
 
 		if (empty($object->ref))
@@ -243,143 +265,6 @@ if (empty($reshook))
 
 		llxHeader('', $title, '');
 
-		// Put here content of your page
-
-		// Example : Adding jquery code
-		/*
-		print '<script type="text/javascript" language="javascript">
-		jQuery(document).ready(function() {
-			function init_myfunc()
-			{
-				jQuery("#myid").removeAttr(\'disabled\');
-				jQuery("#myid").attr(\'disabled\',\'disabled\');
-			}
-			init_myfunc();
-			jQuery("#mybutton").click(function() {
-				init_needroot();
-			});
-		});
-		</script>';
-		*/
-
-		// Part to show a list
-		//if ($action == 'list' || empty($id))
-		//{
-		//	$sql = "SELECT";
-		//	$sql.= " rowid,";
-		//
-		//		$sql.= " ref,";
-		//		$sql.= " ref_ext,";
-		//		$sql.= " entity,";
-		//		$sql.= " date_creation,";
-		//		$sql.= " tms,";
-		//		$sql.= " date_valid,";
-		//		$sql.= " description,";
-		//		$sql.= " import_key,";
-		//		$sql.= " status,";
-		//		$sql.= " fk_user_creat,";
-		//		$sql.= " fk_user_modif,";
-		//		$sql.= " fk_user_valid,";
-		//		$sql.= " model_pdf,";
-		//		$sql.= " model_odt,";
-		//		$sql.= " note_affich";
-		//
-		//
-		//	// Add fields for extrafields
-		////	foreach ($extrafields->attribute_list as $key => $val) $sql.=",ef.".$key.' as options_'.$key;
-		////	// Add fields from hooks
-		////	$parameters=array();
-		////	$reshook=$hookmanager->executeHooks('printFieldListSelect',$parameters);    // Note that $action and $object may have been modified by hook
-		////	$sql.=$hookmanager->resPrint;
-		////	$sql.= " FROM ".MAIN_DB_PREFIX."legal_display as t";
-		////	$sql.= " WHERE field3 = 'xxx'";
-		////	// Add where from hooks
-		////	$parameters=array();
-		////	$reshook=$hookmanager->executeHooks('printFieldListWhere',$parameters);    // Note that $action and $object may have been modified by hook
-		////	$sql.=$hookmanager->resPrint;
-		////	$sql.= " ORDER BY field1 ASC";
-		//
-		//	print '<form method="GET" id="searchFormList" action="'.$_SERVER["PHP_SELF"].'">';
-		//
-		//	if (! empty($moreforfilter))
-		//	{
-		//		print '<div class="liste_titre">';
-		//		print $moreforfilter;
-		//		$parameters=array();
-		//		$reshook=$hookmanager->executeHooks('printFieldPreListTitle',$parameters);    // Note that $action and $object may have been modified by hook
-		//		print $hookmanager->resPrint;
-		//		print '</div>';
-		//	}
-		//
-		//	print '<table class="noborder">'."\n";
-		//
-		//	// Fields title
-		//	print '<tr class="liste_titre">';
-		//	print_liste_field_titre($langs->trans('field1'),$_SERVER['PHP_SELF'],'t.field1','',$param,'',$sortfield,$sortorder);
-		//	print_liste_field_titre($langs->trans('field2'),$_SERVER['PHP_SELF'],'t.field2','',$param,'',$sortfield,$sortorder);
-		//	$parameters=array();
-		//	$reshook=$hookmanager->executeHooks('printFieldListTitle',$parameters);    // Note that $action and $object may have been modified by hook
-		//	print $hookmanager->resPrint;
-		//	print '</tr>'."\n";
-		//
-		//	// Fields title search
-		//	print '<tr class="liste_titre">';
-		//	print '<td class="liste_titre">';
-		//	print '<input type="text" class="flat" name="search_field1" value="'.$search_field1.'" size="10">';
-		//	print '</td>';
-		//	print '<td class="liste_titre">';
-		//	print '<input type="text" class="flat" name="search_field2" value="'.$search_field2.'" size="10">';
-		//	print '</td>';
-		//	$parameters=array();
-		//	$reshook=$hookmanager->executeHooks('printFieldListOption',$parameters);    // Note that $action and $object may have been modified by hook
-		//	print $hookmanager->resPrint;
-		//	print '</tr>'."\n";
-		//
-		//
-		//	dol_syslog($script_file, LOG_DEBUG);
-		//	$resql=$db->query($sql);
-		//	if ($resql)
-		//	{
-		//		$num = $db->num_rows($resql);
-		//		$i = 0;
-		//		while ($i < $num)
-		//		{
-		//			$obj = $db->fetch_object($resql);
-		//			if ($obj)
-		//			{
-		//				// You can use here results
-		//				print '<tr>';
-		//				print '<td>';
-		//				print $obj->field1;
-		//				print '</td><td>';
-		//				print $obj->field2;
-		//				print '</td>';
-		//				$parameters=array('obj' => $obj);
-		//				$reshook=$hookmanager->executeHooks('printFieldListValue',$parameters);    // Note that $action and $object may have been modified by hook
-		//				print $hookmanager->resPrint;
-		//				print '</tr>';
-		//			}
-		//			$i++;
-		//		}
-		//	}
-		//	else
-		//	{
-		//		$error++;
-		//		dol_print_error($db);
-		//	}
-		//
-		//	$db->free($resql);
-		//
-		//	$parameters=array('sql' => $sql);
-		//	$reshook=$hookmanager->executeHooks('printFieldListFooter',$parameters);    // Note that $action and $object may have been modified by hook
-		//	print $hookmanager->resPrint;
-		//
-		//	print "</table>\n";
-		//	print "</form>\n";
-		//}
-		//
-
-
 		// Create
 		if ($action == 'create')
 		{
@@ -395,22 +280,6 @@ if (empty($reshook))
 			print '<tr><td class="fieldrequired">'.$langs->trans("Ref").'</td><td>';
 			print '<input class="flat" type="text" size="36" name="ref" value="'.$ref.'">';
 			print '</td></tr>';
-
-			// Date start
-			print '<tr>';
-			print '<td class="titlefieldcreate fieldrequired">'.$langs->trans("DateStart").'</td>';
-			print '<td>';
-			print $form->selectDate($date_start ? $date_start : -1, 'date_debut', 0, 0, 0, '', 1, 1);
-			print '</td>';
-			print '</tr>';
-
-			// Date end
-			print '<tr>';
-			print '<td class="fieldrequired">'.$langs->trans("DateEnd").'</td>';
-			print '<td>';
-			print $form->selectDate($date_end ? $date_end : -1, 'date_fin', 0, 0, 0, '', 1, 1);
-			print '</td>';
-			print '</tr>';
 
 			if ( $soc->id > 0 && ( ! GETPOST( 'fac_rec', 'int' ) || !empty( $invoice_predefined->frequency ) ) ) {
 				// If thirdparty known and not a predefined invoiced without a recurring rule
@@ -453,10 +322,11 @@ if (empty($reshook))
 			$resql = $db->query($sql);
 			echo '<pre>'; print_r($resql); echo '</pre>'; exit;
 
-
 				*/
+				/*
 				print '<tr><td class="fieldrequired">'.$langs->trans('LabourDoctor').'</td>';
 				print '<td colspan="2">';
+				//ICI PRINT CONTACT / TIERS
 				$form->select_contacts($soc->id, $contactid, 'labour_doctor', 1, $srccontactslist);
 
 				print '<tr><td class="fieldrequired">'.$langs->trans('LabourInspector').'</td>';
@@ -485,7 +355,6 @@ if (empty($reshook))
 
 				print '<tr><td class="fieldrequired">'.$langs->trans('ResponsiblePrevent').'</td>';
 				print '<td colspan="2">';
-
 				$form->select_contacts($soc->id, $contactid, 'responsible_prevent', 1, $srccontactslist, '', 1);
 				// Option to reload page to retrieve customer informations. Note, this clear other input
 				if (!empty($conf->global->RELOAD_PAGE_ON_CUSTOMER_CHANGE))
@@ -503,6 +372,8 @@ if (empty($reshook))
 				}
 				print '</td>';
 				print '</tr>'."\n";
+				*/
+
 			}
 
 			print '</table>'."\n";
@@ -540,6 +411,7 @@ if (empty($reshook))
 
 			print '<h1>'.$action.'</h1><br/>';
 			dol_fiche_head($head, 'card', $langs->trans("LegalDisplay"), -1, 'trip');
+
 			// Ref
 			print '<tr><td class="titlefieldcreate">'.$langs->trans("Ref").'</td><td>';
 			print $form->showrefnav($object, 'ref', $linkback, 1, 'ref', 'ref', '');
@@ -566,32 +438,18 @@ if (empty($reshook))
 			}
 			print '</td></tr>';
 
-			// Date début
-
-			print '<tr>';
-			print '<td class="titlefield">'.$langs->trans("Début").'</td>';
-			print '<td>'.dol_print_date($object->date_debut, 'dayhour');
-			print '</td>';
-			print '</tr>';
-
-			// Date  fin
-
-			print '<tr>';
-			print '<td class="titlefield">'.$langs->trans("Fin").'</td>';
-			print '<td>'.dol_print_date($object->date_fin, 'dayhour');
-			print '</td>';
-			print '</tr>';
-
 			// Médecin du travail
 
 			print '<tr>';
 			print '<td class="titlefield">'.$langs->trans("LabourDoctor").'</td>';
 			print '<td>';
 
-			if ($object->fk_soc_labour_doctor > 0)
+			if ($object->fk_socpeople_labour_doctor > 0)
 			{
 				$labourdoctor = new Contact($db);
-				$result = $labourdoctor->fetch($object->fk_soc_labour_doctor);
+
+				$result = $labourdoctor->fetch($object->fk_socpeople_labour_doctor);
+
 				if ($result < 0) dol_print_error('', $labourdoctor->error);
 				elseif ($result > 0) print $labourdoctor->getNomUrl(-1);
 			}
@@ -600,13 +458,13 @@ if (empty($reshook))
 
 			// Inspecteur du travail
 			print '<tr>';
-			print '<td class="titlefield">'.$langs->trans("Labouronspector").'</td>';
+			print '<td class="titlefield">'.$langs->trans("LabourInspector").'</td>';
 			print '<td>';
 
-			if ($object->fk_soc_labour_inspector > 0)
+			if ($object->fk_socpeople_labour_inspector > 0)
 			{
 				$labourinspector = new Contact($db);
-				$result = $labourinspector->fetch($object->fk_soc_labour_inspector);
+				$result = $labourinspector->fetch($object->fk_socpeople_labour_inspector);
 				if ($result < 0) dol_print_error('', $labourinspector->error);
 				elseif ($result > 0) print $labourinspector->getNomUrl(-1);
 			}
@@ -625,6 +483,22 @@ if (empty($reshook))
 				$result = $samu->fetch($object->fk_soc_samu);
 				if ($result < 0) dol_print_error('', $samu->error);
 				elseif ($result > 0) print $samu->getNomUrl(1);
+			}
+
+			print '</td></tr>';
+
+			// Pompiers
+
+			print '<tr>';
+			print '<td class="titlefield">'.$langs->trans("Pompiers").'</td>';
+			print '<td>';
+
+			if ($object->fk_soc_pompiers > 0)
+			{
+				$pompiers = new Societe($db);
+				$result = $pompiers->fetch($object->fk_soc_pompiers);
+				if ($result < 0) dol_print_error('', $pompiers->error);
+				elseif ($result > 0) print $pompiers->getNomUrl(1);
 			}
 
 			print '</td></tr>';
@@ -698,14 +572,19 @@ if (empty($reshook))
 			print '<tr>';
 			print '<td class="titlefield">'.$langs->trans("ResponsiblePrevent").'</td>';
 			print '<td>';
+
 			if ($object->fk_soc_responsible_prevent > 0)
 			{
-				$responsible_prevent = new Contact($db);
+				$responsible_prevent = new Societe($db);
+
 				$result = $responsible_prevent->fetch($object->fk_soc_responsible_prevent);
+
 				if ($result < 0) dol_print_error('', $responsible_prevent->error);
 				elseif ($result > 0) print $responsible_prevent->getNomUrl(-1);
 			}
 			print '</td></tr>';
+
+
 			print('</table>');
 			print('</div></div>');
 
