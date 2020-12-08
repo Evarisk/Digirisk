@@ -383,10 +383,6 @@ print '<tr class="liste_titre">';
 
 // LIST_OF_TD_TITLE_FIELDS
 if (! empty($arrayfields['t.ref']['checked'])) print_liste_field_titre($arrayfields['t.ref']['label'],$_SERVER['PHP_SELF'],'t.ref','',$param,'',$sortfield,$sortorder);
-if (! empty($arrayfields['t.date_creation']['checked'])) print_liste_field_titre($arrayfields['t.date_creation']['label'],$_SERVER['PHP_SELF'],'t.date_creation','',$param,'',$sortfield,$sortorder);
-if (! empty($arrayfields['t.date_debut']['checked'])) print_liste_field_titre($arrayfields['t.date_debut']['label'],$_SERVER['PHP_SELF'],'t.date_debut','',$param,'',$sortfield,$sortorder);
-if (! empty($arrayfields['t.date_fin']['checked'])) print_liste_field_titre($arrayfields['t.date_fin']['label'],$_SERVER['PHP_SELF'],'t.date_fin','',$param,'',$sortfield,$sortorder);
-if (! empty($arrayfields['t.fk_socpeople_labour_doctor']['checked'])) print_liste_field_titre($arrayfields['t.fk_socpeople_labour_doctor']['label'],$_SERVER['PHP_SELF'],'t.fk_socpeople_labour_doctor','',$param,'',$sortfield,$sortorder);
 
 // Extra fields
 if (is_array($extrafields->attribute_label) && count($extrafields->attribute_label))
@@ -462,6 +458,7 @@ while ($i < min($num, $limit))
 	$legaldisplaystatic->fk_socpeople_labour_doctor = $db->jdate($obj->fk_socpeople_labour_doctor);
 	$legaldisplaystatic->fk_socpeople_labour_inspector = $db->jdate($obj->fk_socpeople_labour_inspector);
 	$legaldisplaystatic->fk_soc_samu = $db->jdate($obj->fk_soc_samu);
+	$legaldisplaystatic->fk_soc_pompiers = $db->jdate($obj->fk_soc_pompiers);
 	$legaldisplaystatic->fk_soc_police = $db->jdate($obj->fk_soc_police);
 	$legaldisplaystatic->fk_soc_urgency = $obj->fk_soc_urgency;
 	$legaldisplaystatic->description = $obj->description;
@@ -520,40 +517,7 @@ while ($i < min($num, $limit))
 			print $legaldisplaystatic->getNomUrl(1);
 			print '</td>';
 		}
-		// Date creation
-
-		if (! empty($arrayfields['t.date_debut']['checked']))
-		{
-			print '<td class="tdoverflowmax200">';
-			print dol_print_date($db->jdate($obj->date_debut), 'day');
-			print '</td>';
-			if (! $i) $totalarray['nbfield']++;
-		}
-		// Date modification
-		if (! empty($arrayfields['t.date_fin']['checked']))
-		{
-			print '<td class="tdoverflowmax200">';
-			print dol_print_date($db->jdate($obj->date_fin), 'day');
-			print '</td>';
-			if (! $i) $totalarray['nbfield']++;
-		}
-
-		//User
-		if (!empty($arrayfields['t.fk_socpeople_labour_doctor']['checked']))
-		{
-			print '<td class="tdoverflowmax200">';
-			if ($contextpage == 'postList')
-			{
-				print $thirdpartystatic->id;
-
-			}
-			else
-			{
-				print $thirdpartystatic->getNomUrl(1);
-			}
-			print '</td>';
-			if (!$i) $totalarray['nbfield']++;
-		}
+		// Ici mettre ref du doc odt généré
 
 		// Action column
 		print '<td class="wrap" align="center">';
