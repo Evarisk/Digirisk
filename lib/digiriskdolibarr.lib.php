@@ -52,6 +52,11 @@ function digiriskdolibarrAdminPrepareHead()
 	$head[$h][2] = 'about';
 	$h++;
 
+	$head[$h][0] = dol_buildpath("/digiriskdolibarr/admin/accronym.php", 1);
+	$head[$h][1] = $langs->trans("Accronym");
+	$head[$h][2] = 'accronym';
+	$h++;
+
 	// Show more tabs from modules
 	// Entries must be declared in modules descriptor with line
 	//$this->tabs = array(
@@ -125,7 +130,7 @@ function digirisk_dolibarr_fetch_const($db, $type = 'chaine', $visible = 0, $not
 
 	$resql = $db->query($sql);
 
-	if ($resql->num_rows > 1) {
+	if ($resql->num_rows > 0) {
 		for ($i = 0; $i < $resql->num_rows; $i++) {
 			$obj = $db->fetch_object($resql);
 			$key = $obj->name;
@@ -135,20 +140,6 @@ function digirisk_dolibarr_fetch_const($db, $type = 'chaine', $visible = 0, $not
 		if ($resql) {
 			$db->commit();
 			return $objects;
-
-		} else {
-			$error = $db->lasterror();
-			$db->rollback();
-			return -1;
-		}
-	}
-	else
-	{
-		$obj = $db->fetch_object($resql);
-
-		if ($resql) {
-			$db->commit();
-			return $obj;
 
 		} else {
 			$error = $db->lasterror();
