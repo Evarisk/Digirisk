@@ -131,7 +131,7 @@ function digiriskdolibarr_completesubstitutionarray(&$substitutionarray,$langs,$
 	{
 		$substitutionarray['occasionnelle']=$object->note_derogation_occas;
 	}
-	/*
+
 	if (!empty($object->note_convention_collective))
 	{
 		$substitutionarray['intitule']=$object->note_convention_collective;
@@ -140,7 +140,7 @@ function digiriskdolibarr_completesubstitutionarray(&$substitutionarray,$langs,$
 	{
 		$substitutionarray['lieu_modalite']=$object->note_lieu_cc;
 	}
-	*/
+
 	if (!empty($object->note_accord_participation))
 	{
 		$substitutionarray['modalite_information_ap']=$object->note_accord_participation;

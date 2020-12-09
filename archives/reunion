@@ -1,0 +1,19 @@
+BDD :
+Une table digirisk_links_resources pour gérer les liens entre tiers/contacts/user
+ajout d'un statut pour archiver les changements
+digirisk_const à migrer dans const, préfixer par digirisk et traduire en anglais
+Objet affichage légal :
+-stocker toutes les infos dans un json
+-nouveau format de la table : rowid, ref, entity, date_creation, txt: CONTENU json
+
+rajouter des onglets au menu société : $this->tabs dans le descripteur du module
+
+Champs texte des menus à mettre en textarea (WYSIWYG) (pb de compatibilité avec ODT cependant)
+
+Objet affichage légal :
+-stocker toutes les infos dans un json
+-nouveau format de la table : rowid, ref, entity, date_creation, txt: CONTENU json
+
+déclarer les const initialisées vides dans le descripteur
+
+legaldisplay card pas mettre des liens de tiers mais plutôt une copie à linstant t

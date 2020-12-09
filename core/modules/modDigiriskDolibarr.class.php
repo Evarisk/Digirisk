@@ -140,7 +140,8 @@ class modDigiriskDolibarr extends DolibarrModules
 		$this->tabs = array();
 		// Rajouter les onglets ici
 		// Example:
-		// $this->tabs[] = array('data'=>'objecttype:+tabname1:Title1:mylangfile@digiriskdolibarr:$user->rights->digiriskdolibarr->read:/digiriskdolibarr/mynewtab1.php?id=__ID__');  					// To add a new tab identified by code tabname1
+		$this->tabs[] = array('data'=>'mycompany_admin:+security:Sécurité:@digiriskdolibarr:1:/custom/digiriskdolibarr/admin/securityconf.php');  					// To add a new tab identified by code tabname1
+		$this->tabs[] = array('data'=>'mycompany_admin:+social:Social:@digiriskdolibarr:1:/custom/digiriskdolibarr/admin/socialconf.php');  					// To add a new tab identified by code tabname1
 		// $this->tabs[] = array('data'=>'objecttype:+tabname2:SUBSTITUTION_Title2:mylangfile@digiriskdolibarr:$user->rights->othermodule->read:/digiriskdolibarr/mynewtab2.php?id=__ID__',  	// To add another new tab identified by code tabname2. Label will be result of calling all substitution functions on 'Title2' key.
 		// $this->tabs[] = array('data'=>'objecttype:-tabname:NU:conditiontoremove');                                                     										// To remove an existing tab identified by code tabname
 		//
