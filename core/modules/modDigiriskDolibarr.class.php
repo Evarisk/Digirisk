@@ -123,8 +123,23 @@ class modDigiriskDolibarr extends DolibarrModules
 		// Example: $this->const=array(1 => array('DIGIRISKDOLIBARR_MYNEWCONST1', 'chaine', 'myvalue', 'This is a constant to add', 1),
 		//                             2 => array('DIGIRISKDOLIBARR_MYNEWCONST2', 'chaine', 'myvalue', 'This is another constant to add', 0, 'current', 1)
 		// );
-		$this->const = array();
-		// Rajouter Const
+		$this->const = array(
+			// CONST CONFIGURATION
+			1 => array('GENERAL_MEANS','chaine','','General means', 1),
+			2 => array('GENERAL_RULES','chaine','','General rules', 1),
+			// CONST LEGAL DISPLAY
+			3 => array('LOCATION_OF_DETAILED_INSTRUCTION','chaine','','Location of detailed instruction', 1),
+			4 => array('DEROGATION_SCHEDULE_PERMANENT','chaine','','Location of detailed instruction', 1),
+			5 => array('DEROGATION_SCHEDULE_OCCASIONAL','chaine','','Location of detailed instruction', 1),
+			6 => array('COLLECTIVE_AGREEMENT_TITLE','chaine','','Location of detailed instruction', 1),
+			7 => array('COLLECTIVE_AGREEMENT_LOCATION','chaine','','Location of detailed instruction', 1),
+			8 => array('DUER_LOCATION','chaine','','Location of detailed instruction', 1),
+			9 => array('RULES_LOCATION','chaine','','Location of detailed instruction', 1),
+			10 => array('PARTICIPATION_AGREEMENT_INFORMATION_PROCEDURE','chaine','','Location of detailed instruction', 1),
+			// CONST INFORMATIONS SHARING
+			11 => array('PARTICIPATION_AGREEMENT_INFORMATION_PROCEDURE','chaine','','Location of detailed instruction', 1),
+		);
+
 		// Some keys to add into the overwriting translation tables
 		/*$this->overwrite_translation = array(
 			'en_US:ParentCompany'=>'Parent company or reseller',
