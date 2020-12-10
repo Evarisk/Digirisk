@@ -117,7 +117,7 @@ if (($action == 'update' && !GETPOST("cancel", 'alpha'))
 	digirisk_dolibarr_set_links($db, 'Antipoison',  1, $antipoison_id,0, 0,$conf->entity);
 	digirisk_dolibarr_set_links($db, 'Responsible',  1, $responsible_id,0, 0,$conf->entity);
 
-	digirisk_dolibarr_set_const($db, "CONSIGNE_DETAILLEE_EMPLACEMENT", GETPOST("emplacementCD", 'none'), 'chaine', 0, '', $conf->entity);
+	digirisk_dolibarr_set_const($db, "DETAILED_RULES_LOCATION", GETPOST("emplacementCD", 'none'), 'chaine', 0, '', $conf->entity);
 	digirisk_dolibarr_set_const($db, "DESCRIPTION", GETPOST("description", 'none'), 'chaine', 0, '', $conf->entity);
 	digirisk_dolibarr_set_const($db, "MOYENS_GENERAUX", GETPOST("moyensgeneraux", 'none'), 'chaine', 0, '', $conf->entity);
 	digirisk_dolibarr_set_const($db, "CONSIGNES_GENERALES", GETPOST("consignesgenerales", 'none'), 'chaine', 0, '', $conf->entity);
@@ -147,6 +147,7 @@ $form = new Form($db);
 $formother = new FormOther($db);
 $formcompany = new FormCompany($db);
 $object = new DigiriskLink($db);
+$digiriskconst = digirisk_dolibarr_fetch_const($db);
 
 $countrynotdefined = '<font class="error">'.$langs->trans("ErrorSetACountryFirst").' ('.$langs->trans("SeeAbove").')</font>';
 print '<span class="opacitymedium">'.$langs->trans("AccountantDesc")."</span><br>\n";
@@ -411,7 +412,6 @@ if ($conf->societe->enabled)
 }
 
 // Consignes de sécurité
-print '<table class="noborder centpercent editmode">';
 print '<tr class="liste_titre"><th class="titlefield wordbreak">'.$langs->trans("Consignes de sécurité").'</th><th>'.$langs->trans("Value").'</th></tr>'."\n";
 
 // Responsable à prévenir
@@ -429,6 +429,7 @@ if ($responsible_links->ref == 'Responsible' && $responsible_links->fk_soc > 0)
 // Téléphone
 	print '<tr class="oddeven"><td><label for="name">'.$langs->trans("Téléphone").'</label></td><td>';
 	print $societe->phone;
+	print '</td></tr>';
 
 }
 else
@@ -442,43 +443,35 @@ else
 }
 print '</td></tr>';
 
-$digiriskconst = digirisk_dolibarr_fetch_const($db);
-
 // Emplacement de la consigne détaillée
 print '<tr class="oddeven"><td><label for="emplacementCD">'.$langs->trans("Emplacement de la consigne détaillée").'</label></td><td>';
-print '<input name="emplacementCD" id="emplacementCD" class="minwidth200" value="'.($digiriskconst->CONSIGNE_DETAILLEE_EMPLACEMENT ? $digiriskconst->CONSIGNE_DETAILLEE_EMPLACEMENT : GETPOST("emplacementCD", 'none')).'"'.(empty($digiriskconst->MAIN_OPTIMIZEFORTEXTBROWSER) ? '' : ' autofocus="autofocus"').'></td></tr>'."\n";
+print '<textarea name="emplacementCD" id="emplacementCD" class="minwidth300" rows="'.ROWS_3.'">'.($digiriskconst->DETAILED_RULES_LOCATION ? $digiriskconst->DETAILED_RULES_LOCATION : '').'</textarea></td></tr>'."\n";
 
-
-print '<table class="noborder centpercent editmode">';
 print '<tr class="liste_titre"><th class="titlefield">'.$langs->trans("Informations complémentaires de la société").'</th><th>'.$langs->trans("Value").'</th></tr>'."\n";
 
 // Description
 print '<tr class="oddeven"><td><label for="description">'.$langs->trans("Description").'</label></td><td>';
-print '<input name="description" id="description" class="minwidth200" value="'.($digiriskconst->DESCRIPTION ? $digiriskconst->DESCRIPTION : GETPOST("description", 'none')).'"'.(empty($digiriskconst->MAIN_OPTIMIZEFORTEXTBROWSER) ? '' : ' autofocus="autofocus"').'></td></tr>'."\n";
+print '<textarea name="description" id="description" class="minwidth300" rows="'.ROWS_3.'">'.($digiriskconst->DESCRIPTION ? $digiriskconst->DESCRIPTION : '').'</textarea></td></tr>'."\n";
 
 // Moyens généraux mis à disposition
 print '<tr class="oddeven"><td><label for="moyensgeneraux">'.$langs->trans("Moyens généraux mis à disposition").'</label></td><td>';
-print '<input name="moyensgeneraux" id="moyensgeneraux" class="minwidth200" value="'.($digiriskconst->MOYENS_GENERAUX ? $digiriskconst->MOYENS_GENERAUX : GETPOST("moyensgeneraux", 'none')).'"'.(empty($digiriskconst->MAIN_OPTIMIZEFORTEXTBROWSER) ? '' : ' autofocus="autofocus"').'></td></tr>'."\n";
+print '<textarea name="moyensgeneraux" id="moyensgeneraux" class="minwidth300" rows="'.ROWS_3.'">'.($digiriskconst->MOYENS_GENERAUX ? $digiriskconst->MOYENS_GENERAUX : '').'</textarea></td></tr>'."\n";
 
 // Consignes générales
 print '<tr class="oddeven"><td><label for="consignesgenerales">'.$langs->trans(" Consignes générales").'</label></td><td>';
-print '<input name="consignesgenerales" id="consignesgenerales" class="minwidth200" value="'.($digiriskconst->CONSIGNES_GENERALES ? $digiriskconst->CONSIGNES_GENERALES : GETPOST("consignesgenerales", 'none')).'"'.(empty($digiriskconst->MAIN_OPTIMIZEFORTEXTBROWSER) ? '' : ' autofocus="autofocus"').'></td></tr>'."\n";
+print '<textarea name="consignesgenerales" id="consignesgenerales" class="minwidth300" rows="'.ROWS_3.'">'.($digiriskconst->CONSIGNES_GENERALES ? $digiriskconst->CONSIGNES_GENERALES : '').'</textarea></td></tr>'."\n";
 
 // RI
-print '<table class="noborder centpercent editmode">';
 print '<tr class="liste_titre"><th class="titlefield wordbreak">'.$langs->trans("Règlement intérieur").'</th><th>'.$langs->trans("").'</th></tr>'."\n";
 // Emplacement
 print '<tr class="oddeven"><td><label for="emplacementRI">'.$langs->trans("Emplacement").'</label></td><td>';
-print '<input name="emplacementRI" id="emplacementRI" class="minwidth200" value="'.($digiriskconst->REGLEMENT_INTERIEUR_EMPLACEMENT ? $digiriskconst->REGLEMENT_INTERIEUR_EMPLACEMENT : GETPOST("emplacementRI", 'none')).'"'.(empty($digiriskconst->MAIN_OPTIMIZEFORTEXTBROWSER) ? '' : ' autofocus="autofocus"').'></td></tr>'."\n";
+print '<textarea name="emplacementRI" id="emplacementRI" class="minwidth300" rows="'.ROWS_3.'">'.($digiriskconst->REGLEMENT_INTERIEUR_EMPLACEMENT ? $digiriskconst->REGLEMENT_INTERIEUR_EMPLACEMENT : '').'</textarea></td></tr>'."\n";
 
 // DU
-print '<table class="noborder centpercent editmode">';
 print '<tr class="liste_titre"><th class="titlefield wordbreak">'.$langs->trans("Document Unique").'</th><th>'.$langs->trans("").'</th></tr>'."\n";
 // Emplacement
 print '<tr class="oddeven"><td><label for="emplacementDU">'.$langs->trans("Emplacement").'</label></td><td>';
-print '<input name="emplacementDU" id="emplacementDU" class="minwidth200" value="'.($digiriskconst->DOCUMENT_UNIQUE_EMPLACEMENT ? $digiriskconst->DOCUMENT_UNIQUE_EMPLACEMENT : GETPOST("emplacementDU", 'none')).'"'.(empty($digiriskconst->MAIN_OPTIMIZEFORTEXTBROWSER) ? '' : ' autofocus="autofocus"').'></td></tr>'."\n";
-
-print '</td></tr>';
+print '<textarea name="emplacementDU" id="emplacementDU" class="minwidth300" rows="'.ROWS_3.'">'.($digiriskconst->DOCUMENT_UNIQUE_EMPLACEMENT ? $digiriskconst->DOCUMENT_UNIQUE_EMPLACEMENT : '').'</textarea></td></tr>'."\n";
 
 print '</table>';
 

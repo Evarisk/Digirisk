@@ -124,7 +124,7 @@ print '<table class="noborder centpercent editmode">';
 print '<tr class="liste_titre"><th class="titlefield wordbreak">'.$langs->trans("Accords de participation").'</th><th>'.$langs->trans("").'</th></tr>'."\n";
 
 print '<tr class="oddeven"><td><label for="modalites">'.$langs->trans("Modalities").'</label></td><td>';
-print '<input name="modalites" id="modalites" class="minwidth200" value="'.($digiriskconst->MODALITES_INFORMATIONS ? $digiriskconst->MODALITES_INFORMATIONS : GETPOST("modalites", 'none')).'"'.(empty($digiriskconst->MAIN_OPTIMIZEFORTEXTBROWSER) ? '' : ' autofocus="autofocus"').'></td></tr>'."\n";
+print '<textarea name="modalites" id="modalites" class="minwidth300" rows="'.ROWS_3.'">'.($digiriskconst->MODALITES_INFORMATIONS ? $digiriskconst->MODALITES_INFORMATIONS : '').'</textarea></td></tr>'."\n";
 
 //CSE
 print '<tr class="liste_titre"><th class="titlefield wordbreak">'.$langs->trans("CSE").'</th><th>'.$langs->trans("").'</th></tr>'."\n";
