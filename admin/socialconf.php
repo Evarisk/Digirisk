@@ -46,6 +46,10 @@ if (!$user->admin) accessforbidden();
 $error = 0;
 $hookmanager->initHooks(array('admincompany', 'globaladmin'));
 
+$date_cse = dol_mktime(0, 0, 0, GETPOST('date_debutmonth', 'int'), GETPOST('date_debutday', 'int'), GETPOST('date_debutyear', 'int'));
+$date_dp = dol_mktime(0, 0, 0, GETPOST('date_finmonth', 'int'), GETPOST('date_finday', 'int'), GETPOST('date_finyear', 'int'));
+$date = dol_mktime(0, 0, 0, GETPOST('datemonth', 'int'), GETPOST('dateday', 'int'), GETPOST('dateyear', 'int'));
+
 
 /*
  * Actions
@@ -58,9 +62,18 @@ if ($reshook < 0) setEventMessages($hookmanager->error, $hookmanager->errors, 'e
 if (($action == 'update' && !GETPOST("cancel", 'alpha'))
 	|| ($action == 'updateedit'))
 {
+
+	$date_cse = GETPOST('dateelectionCSE', 'none');
+	$date_cse = explode('/',$date_cse);
+	$date_cse = $date_cse[2] . '-' . $date_cse[1] . '-' . $date_cse[0];
+
+	$date_dp = GETPOST('dateelectionDP', 'none');
+	$date_dp = explode('/',$date_dp);
+	$date_dp = $date_dp[2] . '-' . $date_dp[1] . '-' . $date_dp[0];
+
 	digirisk_dolibarr_set_const($db, "MODALITES_INFORMATIONS", GETPOST("modalites", 'none'), 'chaine', 0, '', $conf->entity);
-	digirisk_dolibarr_set_const($db, "DATE_ELECTION_CSE", GETPOST("dateelectionCSE", 'alpha'), 'date', 0, '', $conf->entity);
-	digirisk_dolibarr_set_const($db, "DATE_ELECTION_DELEGUES_PERSONNELS", GETPOST("dateelectiondelegue", 'none'), 'chaine', 0, '', $conf->entity);
+	digirisk_dolibarr_set_const($db, "DATE_ELECTION_CSE", $date_cse, 'date', 0, '', $conf->entity);
+	digirisk_dolibarr_set_const($db, "DATE_ELECTION_DP", $date_dp, 'date', 0, '', $conf->entity);
 
 	$allLinks = digirisk_dolibarr_fetch_links($db, 'all');
 
@@ -94,9 +107,14 @@ $head = company_admin_prepare_head();
 
 dol_fiche_head($head, 'social', $langs->trans("Company"), -1, 'company');
 
-$form = new Form($db);
-$formother = new FormOther($db);
-$formcompany = new FormCompany($db);
+$form 			= new Form($db);
+$formother 		= new FormOther($db);
+$formcompany 	= new FormCompany($db);
+$digiriskconst 	= digirisk_dolibarr_fetch_const($db);
+
+
+$date_cse 	= $digiriskconst->DATE_ELECTION_CSE;
+$date_dp 	= $digiriskconst->DATE_ELECTION_DP;
 
 $countrynotdefined = '<font class="error">'.$langs->trans("ErrorSetACountryFirst").' ('.$langs->trans("SeeAbove").')</font>';
 print '<span class="opacitymedium">'.$langs->trans("AccountantDesc")."</span><br>\n";
@@ -113,11 +131,9 @@ print '$(document).ready(function () {
 	  });';
 print '</script>'."\n";
 
-print '<form method="POST" action="'.$_SERVER["PHP_SELF"].'" name="form_index">';
+print '<form method="POST" action="'.$_SERVER["PHP_SELF"].'" name="social_form">';
 print '<input type="hidden" name="token" value="'.newToken().'">';
 print '<input type="hidden" name="action" value="update">';
-
-$digiriskconst = digirisk_dolibarr_fetch_const($db);
 
 //Accords de participation
 print '<table class="noborder centpercent editmode">';
@@ -131,7 +147,7 @@ print '<tr class="liste_titre"><th class="titlefield wordbreak">'.$langs->trans(
 
 //Date
 print '<tr class="oddeven"><td><label for="dateelectionCSE">'.$langs->trans("CSEElectionDate").'</label></td><td>';
-print '<input name="dateelectionCSE" id="dateelectionCSE" class="minwidth200" value="'.($digiriskconst->DATE_ELECTION_CSE ? $digiriskconst->DATE_ELECTION_CSE :  GETPOST("dateelectionCSE", 'alpha')).'"'.(empty($digiriskconst->MAIN_OPTIMIZEFORTEXTBROWSER) ? '' : ' autofocus="autofocus"').'></td></tr>'."\n";
+print $form->selectDate(strtotime($date_cse) ? $date_cse : -1, 'dateelectionCSE', 0, 0, 0, 'social_form', 1, 1);
 
 //Titulaires
 print '<tr>';
@@ -162,8 +178,8 @@ print '</td></tr>';
 print '<table class="noborder centpercent editmode">';
 print '<tr class="liste_titre"><th class="titlefield wordbreak">'.$langs->trans("Délégués du personnel").'</th><th>'.$langs->trans("Value").'</th></tr>'."\n";
 //Date
-print '<tr class="oddeven"><td><label for="dateelectionCSE">'.$langs->trans("CSEElectionDate").'</label></td><td>';
-print '<input name="dateelectionCSE" id="dateelectionCSE" class="minwidth200" value="'.($digiriskconst->DATE_ELECTION_CSE ? $digiriskconst->DATE_ELECTION_CSE :  GETPOST("dateelectionCSE", 'alpha')).'"'.(empty($digiriskconst->MAIN_OPTIMIZEFORTEXTBROWSER) ? '' : ' autofocus="autofocus"').'></td></tr>'."\n";
+print '<tr class="oddeven"><td><label for="dateelectionDP">'.$langs->trans("DPElectionDate").'</label></td><td>';
+print $form->selectDate(strtotime($date_dp) ? $date_dp : -1, 'dateelectionDP', 0, 0, 0, 'social_form', 1, 1);
 
 //Titulaires
 print '<tr>';
