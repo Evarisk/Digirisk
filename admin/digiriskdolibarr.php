@@ -40,6 +40,7 @@ global $langs, $user;
 
 // Libraries
 require_once DOL_DOCUMENT_ROOT."/core/lib/admin.lib.php";
+require_once DOL_DOCUMENT_ROOT."/custom/digiriskdolibarr/class/legaldisplay.class.php";
 require_once '../lib/digiriskdolibarr.lib.php';
 //require_once "../class/myclass.class.php";
 
@@ -55,10 +56,7 @@ $backtopage = GETPOST('backtopage', 'alpha');
 
 $value = GETPOST('value', 'alpha');
 
-$arrayofparameters = array(
-	'DIGIRISKDOLIBARR_MYPARAM1'=>array('css'=>'minwidth200', 'enabled'=>1),
-	'DIGIRISKDOLIBARR_MYPARAM2'=>array('css'=>'minwidth500', 'enabled'=>1)
-);
+$arrayofparameters = array();
 
 $error = 0;
 $setupnotempty = 0;
@@ -181,6 +179,7 @@ elseif ($action == 'setdoc')
  * View
  */
 
+
 $form = new Form($db);
 
 $dirmodels = array_merge(array('/'), (array) $conf->modules_parts['models']);
@@ -197,61 +196,176 @@ print load_fiche_titre($langs->trans($page_name), $linkback, 'object_digiriskdol
 $head = digiriskdolibarrAdminPrepareHead();
 dol_fiche_head($head, 'settings', '', -1, "digiriskdolibarr@digiriskdolibarr");
 
-// Setup page goes here
-echo '<span class="opacitymedium">'.$langs->trans("DigiriskDolibarrSetupPage").'</span><br><br>';
 
+/*
+ *  Numbering module
+ */
 
-if ($action == 'edit')
+print load_fiche_titre($langs->trans("DigiriskDocumentsNumberingModule"), '', '');
+
+print '<table class="noborder centpercent">';
+print '<tr class="liste_titre">';
+print '<td>'.$langs->trans("Name").'</td>';
+print '<td>'.$langs->trans("Description").'</td>';
+print '<td class="nowrap">'.$langs->trans("Example").'</td>';
+print '<td class="center" width="60">'.$langs->trans("Status").'</td>';
+print '<td class="center" width="16">'.$langs->trans("ShortInfo").'</td>';
+print '</tr>'."\n";
+
+clearstatcache();
+
+foreach ($dirmodels as $reldir)
 {
-	print '<form method="POST" action="'.$_SERVER["PHP_SELF"].'">';
-	print '<input type="hidden" name="token" value="'.newToken().'">';
-	print '<input type="hidden" name="action" value="update">';
-
-	print '<table class="noborder centpercent">';
-	print '<tr class="liste_titre"><td class="titlefield">'.$langs->trans("Parameter").'</td><td>'.$langs->trans("Value").'</td></tr>';
-
-	foreach ($arrayofparameters as $key => $val)
+	$dir = dol_buildpath($reldir."custom/digiriskdolibarr/core/modules/digiriskdolibarr/");
+	// A CHANGER PAR DIGIRISK DOLIBARR
+	if (is_dir($dir))
 	{
-		print '<tr class="oddeven"><td>';
-		$tooltiphelp = (($langs->trans($key.'Tooltip') != $key.'Tooltip') ? $langs->trans($key.'Tooltip') : '');
-		print $form->textwithpicto($langs->trans($key), $tooltiphelp);
-		print '</td><td><input name="'.$key.'"  class="flat '.(empty($val['css']) ? 'minwidth200' : $val['css']).'" value="'.$conf->global->$key.'"></td></tr>';
-	}
-	print '</table>';
-
-	print '<br><div class="center">';
-	print '<input class="button" type="submit" value="'.$langs->trans("Save").'">';
-	print '</div>';
-
-	print '</form>';
-	print '<br>';
-} else {
-	if (!empty($arrayofparameters))
-	{
-		print '<table class="noborder centpercent">';
-		print '<tr class="liste_titre"><td class="titlefield">'.$langs->trans("Parameter").'</td><td>'.$langs->trans("Value").'</td></tr>';
-
-		foreach ($arrayofparameters as $key => $val)
+		$handle = opendir($dir);
+		if (is_resource($handle))
 		{
-			$setupnotempty++;
+			while (($file = readdir($handle)) !== false)
+			{
+				if (!is_dir($dir.$file) || (substr($file, 0, 1) <> '.' && substr($file, 0, 3) <> 'CVS'))
+				{
+					$filebis = $file;
+					$classname = preg_replace('/\.php$/', '', $file);
 
-			print '<tr class="oddeven"><td>';
-			$tooltiphelp = (($langs->trans($key.'Tooltip') != $key.'Tooltip') ? $langs->trans($key.'Tooltip') : '');
-			print $form->textwithpicto($langs->trans($key), $tooltiphelp);
-			print '</td><td>'.$conf->global->$key.'</td></tr>';
+					// For compatibility
+					if (!is_file($dir.$filebis))
+					{
+						$filebis = $file."/".$file.".modules.php";
+						$classname = "mod_digiriskdolibarr_".$file;
+					}
+					// Check if there is a filter on country
+					preg_match('/\-(.*)_(.*)$/', $classname, $reg);
+					if (!empty($reg[2]) && $reg[2] != strtoupper($mysoc->country_code)) continue;
+
+					$classname = preg_replace('/\-.*$/', '', $classname);
+
+					if (!class_exists($classname) && is_readable($dir.$filebis) && (preg_match('/mod/', $filebis) || preg_match('/mod_/', $classname)) && substr($filebis, dol_strlen($filebis) - 3, 3) == 'php')
+					{
+						// Charging the numbering class
+						require_once $dir.$filebis;
+
+						$module = new $classname($db);
+
+						// Show modules according to features level
+						if ($module->version == 'development' && $conf->global->MAIN_FEATURES_LEVEL < 2) continue;
+						if ($module->version == 'experimental' && $conf->global->MAIN_FEATURES_LEVEL < 1) continue;
+
+						if ($module->isEnabled())
+						{
+							print '<tr class="oddeven"><td width="100">';
+							echo preg_replace('/\-.*$/', '', preg_replace('/mod_digiriskdolibarr_/', '', preg_replace('/\.php$/', '', $file)));
+							print "</td><td>\n";
+
+							print $module->info();
+
+							print '</td>';
+
+							// Show example of numbering module
+							print '<td class="nowrap">';
+							$tmp = $module->getExample();
+							if (preg_match('/^Error/', $tmp)) print '<div class="error">'.$langs->trans($tmp).'</div>';
+							elseif ($tmp == 'NotConfigured') print $langs->trans($tmp);
+							else print $tmp;
+							print '</td>'."\n";
+
+							print '<td class="center">';
+							//print "> ".$conf->global->FACTURE_ADDON." - ".$file;
+							if ($conf->global->FACTURE_ADDON == $file || $conf->global->FACTURE_ADDON.'.php' == $file)
+							{
+								print img_picto($langs->trans("Activated"), 'switch_on');
+							}
+							else
+							{
+								print '<a class="reposition" href="'.$_SERVER["PHP_SELF"].'?action=setmod&value='.preg_replace('/\.php$/', '', $file).'&scan_dir='.$module->scandir.'&label='.urlencode($module->name).'" alt="'.$langs->trans("Default").'">'.img_picto($langs->trans("Disabled"), 'switch_off').'</a>';
+							}
+							print '</td>';
+
+							$legaldisplay = new Legaldisplay($db);
+							$legaldisplay->initAsSpecimen();
+
+							// Example for standard invoice
+							$htmltooltip = '';
+							$htmltooltip .= ''.$langs->trans("Version").': <b>'.$module->getVersion().'</b><br>';
+							$legaldisplay->type = 0;
+							$nextval = $module->getNextValue($mysoc, $legaldisplay);
+							if ("$nextval" != $langs->trans("NotAvailable")) {  // Keep " on nextval
+								$htmltooltip .= $langs->trans("NextValueForInvoices").': ';
+								if ($nextval) {
+									if (preg_match('/^Error/', $nextval) || $nextval == 'NotConfigured')
+										$nextval = $langs->trans($nextval);
+									$htmltooltip .= $nextval.'<br>';
+								} else {
+									$htmltooltip .= $langs->trans($module->error).'<br>';
+								}
+							}
+							// Example for remplacement
+							$legaldisplay->type = 1;
+							$nextval = $module->getNextValue($mysoc, $legaldisplay);
+							if ("$nextval" != $langs->trans("NotAvailable")) {  // Keep " on nextval
+								$htmltooltip .= $langs->trans("NextValueForReplacements").': ';
+								if ($nextval) {
+									if (preg_match('/^Error/', $nextval) || $nextval == 'NotConfigured')
+										$nextval = $langs->trans($nextval);
+									$htmltooltip .= $nextval.'<br>';
+								} else {
+									$htmltooltip .= $langs->trans($module->error).'<br>';
+								}
+							}
+
+							// Example for credit invoice
+							$legaldisplay->type = 2;
+							$nextval = $module->getNextValue($mysoc, $legaldisplay);
+							if ("$nextval" != $langs->trans("NotAvailable")) {  // Keep " on nextval
+								$htmltooltip .= $langs->trans("NextValueForCreditNotes").': ';
+								if ($nextval) {
+									if (preg_match('/^Error/', $nextval) || $nextval == 'NotConfigured')
+										$nextval = $langs->trans($nextval);
+									$htmltooltip .= $nextval.'<br>';
+								} else {
+									$htmltooltip .= $langs->trans($module->error).'<br>';
+								}
+							}
+							// Example for deposit invoice
+							$legaldisplay->type = 3;
+							$nextval = $module->getNextValue($mysoc, $legaldisplay);
+							if ("$nextval" != $langs->trans("NotAvailable")) {  // Keep " on nextval
+								$htmltooltip .= $langs->trans("NextValueForDeposit").': ';
+								if ($nextval) {
+									if (preg_match('/^Error/', $nextval) || $nextval == 'NotConfigured')
+										$nextval = $langs->trans($nextval);
+									$htmltooltip .= $nextval;
+								} else {
+									$htmltooltip .= $langs->trans($module->error);
+								}
+							}
+
+							print '<td class="center">';
+							print $form->textwithpicto('', $htmltooltip, 1, 0);
+
+							if ($conf->global->FACTURE_ADDON.'.php' == $file)  // If module is the one used, we show existing errors
+							{
+								if (!empty($module->error)) dol_htmloutput_mesg($module->error, '', 'error', 1);
+							}
+
+							print '</td>';
+
+							print "</tr>\n";
+						}
+					}
+				}
+			}
+			closedir($handle);
 		}
-
-		print '</table>';
-
-		print '<div class="tabsAction">';
-		print '<a class="butAction" href="'.$_SERVER["PHP_SELF"].'?action=edit">'.$langs->trans("Modify").'</a>';
-		print '</div>';
-	}
-	else
-	{
-		print '<br>'.$langs->trans("NothingToSetup");
 	}
 }
+
+print '</table>';
+
+// Setup page goes here
+echo '<span class="opacitymedium">'.$langs->trans("DigiriskDolibarrSetupPage").'</span><br><br>';
 
 
 $moduledir = 'digiriskdolibarr';

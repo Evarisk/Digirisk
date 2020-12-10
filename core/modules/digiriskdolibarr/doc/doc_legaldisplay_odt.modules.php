@@ -28,9 +28,9 @@
  */
 
 
-dol_include_once('/digiriskdolibarr/core/modules/digiriskdolibarr/modules_legaldisplay.php');
 dol_include_once('/custom/digiriskdolibarr/lib/files.lib.php');
 dol_include_once('/core/lib/files.lib.php');
+require_once DOL_DOCUMENT_ROOT.'/custom/digiriskdolibarr/core/modules/digiriskdolibarr/legaldisplay/modules_legaldisplay.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/company.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/custom/digiriskdolibarr/lib/functions.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/doc.lib.php';

@@ -427,7 +427,7 @@ class FormFile
 				if (is_array($genallowed)) $modellist = $genallowed;
 				else
 				{
-					include_once DOL_DOCUMENT_ROOT.'/custom/digiriskdolibarr/core/modules/digiriskdolibarr/modules_legaldisplay.php';
+					include_once DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/core/modules/digiriskdolibarr/modules_legaldisplay.php';
 					$modellist = ModelePDFLegalDisplay::liste_modeles($this->db);
 				}
 			}
@@ -1604,7 +1604,7 @@ class FormFile
 		if ($conf->browser->layout != 'phone' && !empty($conf->use_javascript_ajax))
 		{
 			$urladvancedpreview = digiriskgetAdvancedPreviewUrl($modulepart, $relativepath, 1, $param);
-		
+
 			// Return if a file is qualified for preview.
 			if (count($urladvancedpreview))
 			{

@@ -30,8 +30,7 @@
  *	\brief      File of Class to generate PDF orders with template Einstein
  */
 
-require_once DOL_DOCUMENT_ROOT.'/custom/digiriskdolibarr/core/modules/digiriskdolibarr/modules_legaldisplay.php';
-require_once DOL_DOCUMENT_ROOT.'/custom/digiriskdolibarr/core/modules/digiriskdolibarr/modules_legaldisplay.php';
+require_once DOL_DOCUMENT_ROOT.'/custom/digiriskdolibarr/core/modules/digiriskdolibarr/legaldisplay/modules_legaldisplay.php';
 require_once DOL_DOCUMENT_ROOT.'/product/class/product.class.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/company.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/functions2.lib.php';
@@ -255,7 +254,7 @@ class pdf_einstein extends ModelePDFLegalDisplay
 			}
 
 			if (file_exists($dir))
-			{				
+			{
 				// Add pdfgeneration hook
 				if (!is_object($hookmanager))
 				{
@@ -318,7 +317,7 @@ class pdf_einstein extends ModelePDFLegalDisplay
 				}
 
 				// Loop on each lines
-				
+
 				if (!empty($conf->global->MAIN_UMASK))
 					@chmod($file, octdec($conf->global->MAIN_UMASK));
 
