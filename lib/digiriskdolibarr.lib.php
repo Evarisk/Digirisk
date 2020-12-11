@@ -149,87 +149,60 @@ function digirisk_dolibarr_fetch_const($db, $type = 'chaine', $visible = 0, $not
 	}
 }
 
-function digirisk_dolibarr_set_links($db, $name, $fk_user_author, $fk_soc, $contact_list = 0, $fk_user, $entity = 1)
+function digirisk_dolibarr_set_resources($db, $ref, $fk_user_creat, $element_type, $element)
 {
-	global $conf;
+	global $conf, $langs;
 
-	// Clean parameters
-	$name = trim($name);
-		// Check parameters
-	if (empty($name))
+	$now = dol_now();
+
+	// Clean parameters.
+	$ref = trim($ref);
+
+	// Check parameters.
+	if (empty($ref))
 	{
-		dol_print_error($db, "Error: Call to function digirisk_dolibarr_set_links with wrong parameters", LOG_ERR);
+		//Error: Call to function digirisk_dolibarr_set_resources with wrong parameters"
+		dol_print_error($db, $langs->trans("ErrorDigirikDolibarrSetResources"), LOG_ERR);
 		exit;
 	}
-		//dol_syslog("dolibarr_set_const name=$name, value=$value type=$type, visible=$visible, note=$note entity=$entity");
+
+	//dol_syslog("dolibarr_set_const name=ref, value=$value type=$type, visible=$visible, note=$note entity=$entity");
 	$db->begin();
 
-	$sql = "DELETE FROM ".MAIN_DB_PREFIX."digirisk_links";
-	$sql .= " WHERE ref = ".$db->encrypt($name, 1);
-	if ($entity >= 0) $sql .= " AND entity = ".$entity;
+	$sql = "UPDATE ".MAIN_DB_PREFIX."digirisk_resources";
+	$sql .= " SET status = 0";
+	$sql .= " WHERE ref = ".$db->encrypt($ref, 1);
+	$sql .= " AND element_type = '".$element_type . "'";
+	$sql .= " AND entity IN (".getEntity('digiriskdolibarr').")";
+
+	dol_syslog("admin.lib::digirisk_dolibarr_set_resources", LOG_DEBUG);
+	$db->query($sql);
+
+	$sql = "INSERT INTO ".MAIN_DB_PREFIX."digirisk_resources (";
+	$sql .= "ref";
+	$sql .= ", entity";
+	$sql .= ", date_creation";
+	$sql .= ", status";
+	$sql .= ", element_type";
+	$sql .= ", element";
+	$sql .= ", fk_user_creat";
+	$sql .= ") VALUES (";
+	$sql .= " ".(!empty($ref) ? "'".$db->escape($ref)."'" : 'null');
+	$sql .= ", ".$conf->entity;
+	$sql .= ", '".$db->idate($now)."'";
+	$sql .= ", ". 1;
+	$sql .= ", ".(!empty($element_type) ? "'".$db->escape($element_type)."'" : 'null');
+	$sql .= ", ".(is_numeric($element) ? $element : '0');
+	$sql .= ", ".$fk_user_creat;
+	$sql .= ")";
 
 	dol_syslog("admin.lib::digirisk_dolibarr_set_links", LOG_DEBUG);
 	$resql = $db->query($sql);
 
-	if (!is_array($contact_list)) {
-
-		$sql = "INSERT INTO ".MAIN_DB_PREFIX."digirisk_links(ref, entity, fk_user_author, fk_soc, fk_contact, fk_user)";
-		$sql .= " VALUES (";
-		$sql .= $db->encrypt($name, 1);
-		$sql .= ", ".$entity;
-		$sql .= ", ".(is_numeric($fk_user_author) ? $fk_user_author : '0');
-		$sql .= ", ".(is_numeric($fk_soc) ? $fk_soc : '0');
-		$sql .= ", ".(is_numeric($contact_list) ? $contact_list : '0') . ", ";
-
-		if (is_array($fk_user)) {
-			foreach ($fk_user as $user) {
-				$users[$user] = is_numeric($user) ? $user : '0';
-			}
-			$sql .= implode("",$users);
-
-		}
-		else
-		{
-			$sql.= "0";
-		}
-
-		$sql .= ")";
-		//print "sql".$value."-".pg_escape_string($value)."-".$sql;exit;
-		//print "xx".$db->escape($value);
-		dol_syslog("admin.lib::digirisk_dolibarr_set_links", LOG_DEBUG);
-		$resql = $db->query($sql);
-
-	}
-	else
-	{
-		foreach ($contact_list as $fk_contact) {
-
-			if (strcmp($fk_user_author, ''))    // true if different. Must work for $value='0' or $value=0
-			{
-				$sql = "INSERT INTO " . MAIN_DB_PREFIX . "digirisk_links(ref, entity, fk_user_author, fk_soc, fk_contact, fk_user)";
-				$sql .= " VALUES (";
-				$sql .= $db->encrypt($name, 1);
-				$sql .= ", " . $entity;
-				$sql .= ", " . (is_numeric($fk_user_author) ? $fk_user_author : '0');
-				$sql .= ", " . (is_numeric($fk_soc) ? $fk_soc : '0');
-				$sql .= ", " . (is_numeric($fk_contact) ? $fk_contact : '0');
-				foreach ($fk_user as $user) {
-					$sql .= ", ".(is_numeric($user) ? $user : '0');
-				}
-				$sql .= ")";
-				//print "sql".$value."-".pg_escape_string($value)."-".$sql;exit;
-				//print "xx".$db->escape($value);
-				dol_syslog("admin.lib::digirisk_dolibarr_set_links", LOG_DEBUG);
-				$resql = $db->query($sql);
-			}
-		}
-	}
-
 	if ($resql)
 	{
 		$db->commit();
-		return $name;
-
+		return $ref;
 	}
 	else
 	{
@@ -239,7 +212,7 @@ function digirisk_dolibarr_set_links($db, $name, $fk_user_author, $fk_soc, $cont
 	}
 }
 
-function digirisk_dolibarr_fetch_links($db, $name)
+function digirisk_dolibarr_fetch_resources($db, $name, $element_type = '')
 {
 	global $conf;
 
@@ -247,57 +220,49 @@ function digirisk_dolibarr_fetch_links($db, $name)
 	$db->begin();
 
 	if ($name == 'all') {
-		$sql = "SELECT * FROM llx_digirisk_links";
-
+		$sql = "SELECT * FROM ".MAIN_DB_PREFIX."digirisk_resources";
 	}
 	else
 	{
 		$sql = "SELECT ";
-		$sql .= "ref, fk_user_author, fk_soc, fk_contact, fk_user ";
-		$sql .= "FROM ".MAIN_DB_PREFIX."digirisk_links";
+		$sql .= "ref, status, element_type, element";
+		$sql .= " FROM ".MAIN_DB_PREFIX."digirisk_resources";
 		$sql .= " WHERE ref = '".$name . "'";
+		$sql .= " AND element_type = '".$element_type . "'";
+		$sql .= " AND status = 1";
 	}
 
-
-	dol_syslog("admin.lib::digirisk_dolibarr_fetch_links", LOG_DEBUG);
+	dol_syslog("admin.lib::digirisk_dolibarr_fetch_resources", LOG_DEBUG);
 	$resql = $db->query($sql);
-	if ($resql->num_rows > 1) {
-		for ($i = 0; $i < $resql->num_rows; $i++) {
-			$obj = $db->fetch_object($resql);
-			$key = $obj->ref;
-			if ($key !== 'fk_user') {
+	if ( !empty( $resql )) {
+		if ($resql->num_rows > 1) {
+			for ($i = 0; $i < $resql->num_rows; $i++) {
+				$obj = $db->fetch_object($resql);
+				$key = $obj->ref;
 				$objects[$key] = $obj;
 			}
-			else
-			{
-				$objects[$key] = array($obj);
+
+			if ($resql) {
+				$db->commit();
+				return $objects;
+
+			} else {
+				$error = $db->lasterror();
+				$db->rollback();
+				return -1;
 			}
 		}
-
-		if ($resql) {
-			$db->commit();
-			return $objects;
-
-		} else {
-			$error = $db->lasterror();
-			$db->rollback();
-			return -1;
-		}
-	}
-	else
-	{
-		$obj = $db->fetch_object($resql);
-		if (!empty($obj)) {
-			$obj->fk_user = array($obj->fk_user);
-		}
-		if ($resql) {
-			$db->commit();
-			return $obj;
-
-		} else {
-			$error = $db->lasterror();
-			$db->rollback();
-			return -1;
+		else
+		{
+			if ($resql) {
+				$db->commit();
+				$obj = $db->fetch_object($resql);
+				return $obj;
+			} else {
+				$error = $db->lasterror();
+				$db->rollback();
+				return -1;
+			}
 		}
 	}
 }
