@@ -37,6 +37,13 @@ DigiriskDolibarrAbout = À propos de DigiriskDolibarr
 DigiriskDolibarrAboutPage = Page à propos de DigiriskDolibarr
 
 #
+# Page Accronyme
+#
+Accronym = Accronyme
+AccronymLegalDisplay = Identifiant de l'affichage légal
+AccronymInformationsSharing =  Identifiant des diffusion d'informations
+
+#
 # Page d'exemple
 #
 MyPageName = Nom de ma page
