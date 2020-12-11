@@ -117,29 +117,10 @@ if (empty($reshook))
 
 		/* object_prop_getpost_prop */
 
-		$digirisklinks = digirisk_dolibarr_fetch_links($db, 'all');
+		$digirisklinks = digirisk_dolibarr_fetch_resources($db, 'all');
 
 		$object->id = GETPOST("id");
 		$object->ref = GETPOST("ref");
-
-		$object->fk_socpeople_labour_doctor = $digirisklinks['LabourDoctor']->fk_contact;
-		$object->fk_socpeople_labour_inspector =  $digirisklinks['LabourInspector']->fk_contact;
-		$object->fk_soc_samu =  $digirisklinks['SAMU']->fk_soc;
-		$object->fk_soc_pompiers =  $digirisklinks['Pompiers']->fk_soc;
-
-		$object->fk_soc_police =  $digirisklinks['Police']->fk_soc;
-		$object->fk_soc_urgency =  $digirisklinks['AllEmergencies']->fk_soc;
-		$object->fk_soc_rights_defender = $digirisklinks['RightsDefender']->fk_soc;
-		$object->fk_soc_antipoison =  $digirisklinks['Antipoison']->fk_soc;
-		$object->fk_soc_responsible_prevent =  $digirisklinks['Responsible']->fk_soc;
-
-		$object->note_consigne_detaillee = $conf->global->LOCATION_OF_DETAILED_INSTRUCTION;
-		$object->note_derogation_permanente = $conf->global->DEROGATION_SCHEDULE_PERMANENT;
-		$object->note_derogation_occas = $conf->global->DEROGATION_SCHEDULE_OCCASIONAL;
-		$object->note_convention_collective = $conf->global->COLLECTIVE_AGREEMENT_TITLE;
-		$object->note_lieu_cc = $conf->global->COLLECTIVE_AGREEMENT_LOCATION;
-		$object->note_lieu_du = $conf->global->DUER_LOCATION;
-		$object->note_accord_participation = $conf->global->PARTICIPATION_AGREEMENT_INFORMATION_PROCEDURE;
 
 		if (empty($object->ref))
 		{
@@ -178,26 +159,6 @@ if (empty($reshook))
 	{
 		$error=0;
 		$object->ref = GETPOST("ref");
-		$object->fk_socpeople_labour_doctor = GETPOST("labour_doctor");
-		$object->fk_socpeople_labour_inspector = GETPOST("labour_inspector");
-		$object->fk_soc_samu = GETPOST("samu");
-		$object->fk_soc_pompiers = GETPOST("pompiers");
-		$object->fk_soc_police = GETPOST("police");
-		$object->fk_soc_urgency = GETPOST("urgency");
-		$object->fk_soc_rights_defender = GETPOST("rights_defender");
-		$object->fk_soc_antipoison = GETPOST("antipoison");
-		$object->fk_soc_responsible_prevent = GETPOST("responsible_prevent");
-
-		$digirisklinks = digirisk_dolibarr_fetch_links($db, 'all');
-		$digiriskconst = digirisk_dolibarr_fetch_const($db);
-
-		$object->note_consigne_detaillee = GETPOST("consigne_detaillee");
-		$object->note_derogation_permanente = GETPOST("derogation_permanente");
-		$object->note_derogation_occas = GETPOST("derogation_occas");
-		$object->note_convention_collective = GETPOST("convention_collective");
-		$object->note_lieu_cc = GETPOST("lieu_cc");
-		$object->note_accord_participation = GETPOST("accord_participation");
-
 
 		if (empty($object->ref))
 		{
@@ -345,7 +306,7 @@ if (empty($reshook))
 			// View
 
 			$legaldisplay = json_decode($object->json, false, 512, JSON_UNESCAPED_UNICODE)->LegalDisplay;
-			
+
 			print '<h1>'.$action.'</h1><br/>';
 			dol_fiche_head($head, 'card', $langs->trans("LegalDisplay"), -1, 'trip');
 
