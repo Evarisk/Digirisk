@@ -329,7 +329,7 @@ class modDigiriskDolibarr extends DolibarrModules
 			'titre'=>'Diffusion d\'informations',
 			'mainmenu'=>'digiriskdolibarr',
 			'leftmenu'=>'informations',
-			'url'=>'/digiriskdolibarr/view/informationsrelease_list.php',
+			'url'=>'/digiriskdolibarr/view/informations_sharing_list.php',
 			'langs'=>'digiriskdolibarr@digiriskdolibarr',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
 			'position'=>1050+$r,
 			'enabled'=>'$conf->digiriskdolibarr->enabled',  // Define condition to show or hide menu entry. Use '$conf->digiriskdolibarr->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
@@ -340,10 +340,10 @@ class modDigiriskDolibarr extends DolibarrModules
 		$this->menu[$r++]=array(
 			'fk_menu'=>'fk_mainmenu=digiriskdolibarr,fk_leftmenu=informations',      // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
 			'type'=>'left',			                // This is a Left menu entry
-			'titre'=>'Générer',
+			'titre'=>$langs->trans('New'),
 			'mainmenu'=>'digiriskdolibarr',
 			'leftmenu'=>'informationsreleasecreate',
-			'url'=>'/digiriskdolibarr/view/informationsrelease_card.php' . '?action=create',
+			'url'=>'/digiriskdolibarr/view/informations_sharing_card.php' . '?action=create',
 			'langs'=>'digiriskdolibarr@digiriskdolibarr',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
 			'position'=>1050+$r,
 			'enabled'=>'$conf->digiriskdolibarr->enabled',  // Define condition to show or hide menu entry. Use '$conf->digiriskdolibarr->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
@@ -445,7 +445,7 @@ class modDigiriskDolibarr extends DolibarrModules
 	{
 		$sql = array();
 
-		$test = $this->_load_tables('/digiriskdolibarr/sql/');
+		$this->_load_tables('/digiriskdolibarr/sql/');
 
 		return $this->_init($sql, $options);
 	}
