@@ -42,6 +42,14 @@ DigiriskDolibarrAbout = About DigiriskDolibarr
 DigiriskDolibarrAboutPage = DigiriskDolibarr about page
 
 #
+# Accronym page
+#
+Accronym = Accronym
+AccronymLegalDisplay = Legal display accronym
+AccronymInformationsSharing = Sharing informations accronym
+
+
+#
 # Sample page
 #
 MyPageName = My page name
