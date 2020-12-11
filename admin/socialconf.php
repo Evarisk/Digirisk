@@ -71,9 +71,9 @@ if (($action == 'update' && !GETPOST("cancel", 'alpha'))
 	$date_dp = explode('/',$date_dp);
 	$date_dp = $date_dp[2] . '-' . $date_dp[1] . '-' . $date_dp[0];
 
-	digirisk_dolibarr_set_const($db, "MODALITES_INFORMATIONS", GETPOST("modalites", 'none'), 'chaine', 0, '', $conf->entity);
-	digirisk_dolibarr_set_const($db, "DATE_ELECTION_CSE", $date_cse, 'date', 0, '', $conf->entity);
-	digirisk_dolibarr_set_const($db, "DATE_ELECTION_DP", $date_dp, 'date', 0, '', $conf->entity);
+	dolibarr_set_const($db, "DIGIRISK_PARTICIPATION_AGREEMENT_INFORMATION_PROCEDURE", GETPOST("modalites", 'none'), 'chaine', 0, '', $conf->entity);
+	dolibarr_set_const($db, "DIGIRISK_CSE_ELECTION_DATE", $date_cse, 'date', 0, '', $conf->entity);
+	dolibarr_set_const($db, "DIGIRISK_DP_ELECTION_DATE", $date_dp, 'date', 0, '', $conf->entity);
 
 	$allLinks = digirisk_dolibarr_fetch_links($db, 'all');
 
@@ -97,7 +97,7 @@ if (($action == 'update' && !GETPOST("cancel", 'alpha'))
 /*
  * View
  */
-
+global $conf;
 $help_url = '';
 llxHeader('', $langs->trans("CompanyFoundation"), $help_url);
 
@@ -110,11 +110,9 @@ dol_fiche_head($head, 'social', $langs->trans("Company"), -1, 'company');
 $form 			= new Form($db);
 $formother 		= new FormOther($db);
 $formcompany 	= new FormCompany($db);
-$digiriskconst 	= digirisk_dolibarr_fetch_const($db);
 
-
-$date_cse 	= $digiriskconst->DATE_ELECTION_CSE;
-$date_dp 	= $digiriskconst->DATE_ELECTION_DP;
+$date_cse 	= $conf->global->DIGIRISK_CSE_ELECTION_DATE;
+$date_dp 	= $conf->global->DIGIRISK_DP_ELECTION_DATE;
 
 $countrynotdefined = '<font class="error">'.$langs->trans("ErrorSetACountryFirst").' ('.$langs->trans("SeeAbove").')</font>';
 print '<span class="opacitymedium">'.$langs->trans("AccountantDesc")."</span><br>\n";
@@ -140,7 +138,7 @@ print '<table class="noborder centpercent editmode">';
 print '<tr class="liste_titre"><th class="titlefield wordbreak">'.$langs->trans("Accords de participation").'</th><th>'.$langs->trans("").'</th></tr>'."\n";
 
 print '<tr class="oddeven"><td><label for="modalites">'.$langs->trans("Modalities").'</label></td><td>';
-print '<textarea name="modalites" id="modalites" class="minwidth300" rows="'.ROWS_3.'">'.($digiriskconst->MODALITES_INFORMATIONS ? $digiriskconst->MODALITES_INFORMATIONS : '').'</textarea></td></tr>'."\n";
+print '<textarea name="modalites" id="modalites" class="minwidth300" rows="'.ROWS_3.'">'.($conf->global->DIGIRISK_PARTICIPATION_AGREEMENT_INFORMATION_PROCEDURE ? $conf->global->DIGIRISK_PARTICIPATION_AGREEMENT_INFORMATION_PROCEDURE : '').'</textarea></td></tr>'."\n";
 
 //CSE
 print '<tr class="liste_titre"><th class="titlefield wordbreak">'.$langs->trans("CSE").'</th><th>'.$langs->trans("").'</th></tr>'."\n";

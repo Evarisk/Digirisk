@@ -149,7 +149,7 @@ function digirisk_dolibarr_fetch_const($db, $type = 'chaine', $visible = 0, $not
 	}
 }
 
-function digirisk_dolibarr_set_links($db, $name, $fk_user_author, $fk_soc, $contact_list, $fk_user, $entity = 1)
+function digirisk_dolibarr_set_links($db, $name, $fk_user_author, $fk_soc, $contact_list = 0, $fk_user, $entity = 1)
 {
 	global $conf;
 
@@ -181,11 +181,12 @@ function digirisk_dolibarr_set_links($db, $name, $fk_user_author, $fk_soc, $cont
 		$sql .= ", ".(is_numeric($fk_soc) ? $fk_soc : '0');
 		$sql .= ", ".(is_numeric($contact_list) ? $contact_list : '0') . ", ";
 
-		if (!empty($fk_user)) {
+		if (is_array($fk_user)) {
 			foreach ($fk_user as $user) {
 				$users[$user] = is_numeric($user) ? $user : '0';
 			}
 			$sql .= implode("",$users);
+
 		}
 		else
 		{

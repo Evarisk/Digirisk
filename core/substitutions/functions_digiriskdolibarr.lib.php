@@ -15,140 +15,37 @@ function digiriskdolibarr_completesubstitutionarray(&$substitutionarray,$langs,$
     global $conf,$db;
 
     //Copier la condition ci-dessous pour chaque extrafield à rajouter
-	$const = digirisk_dolibarr_fetch_const($db);
-	$links = digirisk_dolibarr_fetch_links($db,'all');
 
-	if ($object->fk_socpeople_labour_doctor > 0)
-	{
-		$labour_doctor = new Contact($db);
-		$result = $labour_doctor->fetch($object->fk_socpeople_labour_doctor);
-		if ($result < 0) dol_print_error('', $labour_doctor->error);
-		elseif ($result > 0) {
+	$legaldisplay = json_decode($object->json, false, 512, JSON_UNESCAPED_UNICODE)->LegalDisplay;
 
-			$substitutionarray['service_de_sante_nom']=$labour_doctor->firstname . " " . $labour_doctor->lastname;
-			$substitutionarray['service_de_sante_adresse']=$labour_doctor->address;
-			$substitutionarray['service_de_sante_code_postal']=$labour_doctor->zip;
-			$substitutionarray['service_de_sante_ville']=$labour_doctor->town;
-			$substitutionarray['service_de_sante_telephone']=$labour_doctor->phone_pro;
-		}
-	}
+	$substitutionarray['service_de_sante_nom']=$legaldisplay->occupational_health_service->name;
+	$substitutionarray['service_de_sante_adresse']=$legaldisplay->occupational_health_service->address;
+	$substitutionarray['service_de_sante_code_postal']=$legaldisplay->occupational_health_service->zip;
+	$substitutionarray['service_de_sante_ville']=$legaldisplay->occupational_health_service->town;
+	$substitutionarray['service_de_sante_telephone']=$legaldisplay->occupational_health_service->phone;
 
-	if ($object->fk_socpeople_labour_inspector > 0)
-	{
-		$labour_inspector = new Contact($db);
-		$result = $labour_inspector->fetch($object->fk_socpeople_labour_inspector);
-		if ($result < 0) dol_print_error('', $labour_inspector->error);
-		elseif ($result > 0) {
-			$substitutionarray['inspection_du_travail_nom']=$labour_inspector->firstname . " " . $labour_inspector->lastname;
-			$substitutionarray['inspection_du_travail_adresse']=$labour_inspector->address;
-			$substitutionarray['inspection_du_travail_code_postal']=$labour_inspector->zip;
-			$substitutionarray['inspection_du_travail_ville']=$labour_inspector->town;
-			$substitutionarray['inspection_du_travail_telephone']=$labour_inspector->phone_pro;
-		}
-	}
+	$substitutionarray['inspection_du_travail_nom']=$legaldisplay->detective_work->name;
+	$substitutionarray['inspection_du_travail_adresse']=$legaldisplay->detective_work->address;
+	$substitutionarray['inspection_du_travail_code_postal']=$legaldisplay->detective_work->zip;
+	$substitutionarray['inspection_du_travail_ville']=$legaldisplay->detective_work->town;
+	$substitutionarray['inspection_du_travail_telephone']=$legaldisplay->detective_work->phone;
 
-    if ($object->fk_soc_samu > 0)
-    {
-		$samu = new Societe($db);
-		$result = $samu->fetch($object->fk_soc_samu);
-		if ($result < 0) dol_print_error('', $samu->error);
-		elseif ($result > 0) {
-            $substitutionarray['samu']=$samu->phone;
-        }
-    }
+    $substitutionarray['samu']=$legaldisplay->emergency_service->samu;
+	$substitutionarray['pompier']=$legaldisplay->emergency_service->pompier;
+	$substitutionarray['police']=$legaldisplay->emergency_service->police;
+	$substitutionarray['toute_urgence']=$legaldisplay->emergency_service->emergency;
+	$substitutionarray['defenseur_des_droits']=$legaldisplay->emergency_service->right_defender;
+	$substitutionarray['anti_poison']=$legaldisplay->emergency_service->poison_control_center;
 
-	if ($object->fk_soc_pompiers > 0)
-	{
-		$pompiers = new Societe($db);
-		$result = $pompiers->fetch($object->fk_soc_pompiers);
-		if ($result < 0) dol_print_error('', $pompiers->error);
-		elseif ($result > 0) {
-			$substitutionarray['pompier']=$pompiers->phone;
-		}
-	}
+	$substitutionarray['responsable_a_prevenir']=$legaldisplay->safety_rule->responsible_for_preventing;
+	$substitutionarray['telephone']=$legaldisplay->safety_rule->phone;
+	$substitutionarray['emplacement_des_consignes_detaillees']=$legaldisplay->safety_rule->location_of_detailed_instruction;
+	$substitutionarray['permanente']=$legaldisplay->derogation_schedule->permanent;
+	$substitutionarray['occasionnelle']=$legaldisplay->derogation_schedule->occasional;
+	$substitutionarray['intitule']=$legaldisplay->collective_agreement->title_of_the_applicable_collective_agreement;
+	$substitutionarray['lieu_modalite']=$legaldisplay->collective_agreement->location_and_access_terms_of_the_agreement;
+	$substitutionarray['modalite_information_ap']=$legaldisplay->participation_agreement->information_procedures;
+	$substitutionarray['modalite_access']=$legaldisplay->DUER->how_access_to_duer;
 
-	if ($object->fk_soc_police > 0)
-	{
-		$police = new Societe($db);
-		$result = $police->fetch($object->fk_soc_police);
-		if ($result < 0) dol_print_error('', $police->error);
-		elseif ($result > 0) {
-			$substitutionarray['police']=$police->phone;
-		}
-	}
-
-	if ($object->fk_soc_urgency > 0)
-	{
-		$urgency = new Societe($db);
-		$result = $urgency->fetch($object->fk_soc_urgency);
-		if ($result < 0) dol_print_error('', $urgency->error);
-		elseif ($result > 0) {
-			$substitutionarray['toute_urgence']=$urgency->phone;
-		}
-	}
-
-	if ($object->fk_soc_rights_defender > 0)
-	{
-		$rights_defender = new Societe($db);
-		$result = $rights_defender->fetch($object->fk_soc_rights_defender);
-		if ($result < 0) dol_print_error('', $rights_defender->error);
-		elseif ($result > 0) {
-			$substitutionarray['defenseur_des_droits']=$rights_defender->phone;
-		}
-	}
-
-	if ($object->fk_soc_antipoison > 0)
-	{
-		$antipoison = new Societe($db);
-		$result = $antipoison->fetch($object->fk_soc_antipoison);
-		if ($result < 0) dol_print_error('', $antipoison->error);
-		elseif ($result > 0) {
-			$substitutionarray['anti_poison']=$antipoison->phone;
-		}
-	}
-
-
-	if ($object->fk_soc_responsible_prevent > 0)
-	{
-		$responsible_prevent = new Societe($db);
-		$result = $responsible_prevent->fetch($object->fk_soc_responsible_prevent);
-		if ($result < 0) dol_print_error('', $responsible_prevent->error);
-		elseif ($result > 0) {
-			$substitutionarray['responsable_a_prevenir']=$responsible_prevent->name;
-			$substitutionarray['telephone']=$responsible_prevent->phone;
-		}
-	}
-
-	if (!empty($object->note_consigne_detaillee))
-	{
-			$substitutionarray['emplacement_des_consignes_detaillees']=$object->note_consigne_detaillee;
-	}
-	if (!empty($object->note_derogation_permanente))
-	{
-		$substitutionarray['permanente']=$object->note_derogation_permanente;
-	}
-	if (!empty($object->note_derogation_occas))
-	{
-		$substitutionarray['occasionnelle']=$object->note_derogation_occas;
-	}
-
-	if (!empty($object->note_convention_collective))
-	{
-		$substitutionarray['intitule']=$object->note_convention_collective;
-	}
-	if (!empty($object->note_lieu_cc))
-	{
-		$substitutionarray['lieu_modalite']=$object->note_lieu_cc;
-	}
-
-	if (!empty($object->note_accord_participation))
-	{
-		$substitutionarray['modalite_information_ap']=$object->note_accord_participation;
-	}
-
-	if (!empty($object->note_lieu_du))
-	{
-		$substitutionarray['modalite_access']=$object->note_lieu_du;
-	}
-
+	//AJOUTER HORAIRES
 }

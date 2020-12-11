@@ -56,7 +56,7 @@ dol_include_once('../core/class/html.formmargin.class.php');
 // Load traductions files requiredby by page
 $langs->load("companies");
 $langs->load("other");
-
+global $conf;
 // Get parameters
 $id			= GETPOST('id','int');
 $action		= GETPOST('action','alpha');
@@ -102,6 +102,7 @@ if ($reshook < 0) setEventMessages($hookmanager->error, $hookmanager->errors, 'e
 
 if (empty($reshook))
 {
+
 	// Action to add record
 	if ($action == 'add')
 	{
@@ -117,10 +118,10 @@ if (empty($reshook))
 		/* object_prop_getpost_prop */
 
 		$digirisklinks = digirisk_dolibarr_fetch_links($db, 'all');
-		$digiriskconst = digirisk_dolibarr_fetch_const($db);
 
 		$object->id = GETPOST("id");
 		$object->ref = GETPOST("ref");
+
 		$object->fk_socpeople_labour_doctor = $digirisklinks['LabourDoctor']->fk_contact;
 		$object->fk_socpeople_labour_inspector =  $digirisklinks['LabourInspector']->fk_contact;
 		$object->fk_soc_samu =  $digirisklinks['SAMU']->fk_soc;
@@ -132,14 +133,14 @@ if (empty($reshook))
 		$object->fk_soc_antipoison =  $digirisklinks['Antipoison']->fk_soc;
 		$object->fk_soc_responsible_prevent =  $digirisklinks['Responsible']->fk_soc;
 
-		$object->note_consigne_detaillee = $digiriskconst->CONSIGNE_DETAILLEE_EMPLACEMENT;
-		$object->note_derogation_permanente = $digiriskconst->NOTE_DEROGATION_PERMANENTE;
-		$object->note_derogation_occas = $digiriskconst->NOTE_DEROGATION_OCCAS;
-		$object->note_convention_collective = $digiriskconst->CONVENTION_COLLECTIVE;
-		$object->note_lieu_cc = $digiriskconst->CONVENTION_COLLECTIVE_EMPLACEMENT;
-		$object->note_accord_participation = $digiriskconst->MODALITES_INFORMATIONS;
-		$object->note_lieu_cc = $digiriskconst->DOCUMENT_UNIQUE_EMPLACEMENT;
-		;
+		$object->note_consigne_detaillee = $conf->global->LOCATION_OF_DETAILED_INSTRUCTION;
+		$object->note_derogation_permanente = $conf->global->DEROGATION_SCHEDULE_PERMANENT;
+		$object->note_derogation_occas = $conf->global->DEROGATION_SCHEDULE_OCCASIONAL;
+		$object->note_convention_collective = $conf->global->COLLECTIVE_AGREEMENT_TITLE;
+		$object->note_lieu_cc = $conf->global->COLLECTIVE_AGREEMENT_LOCATION;
+		$object->note_lieu_du = $conf->global->DUER_LOCATION;
+		$object->note_accord_participation = $conf->global->PARTICIPATION_AGREEMENT_INFORMATION_PROCEDURE;
+
 		if (empty($object->ref))
 		{
 			$error++;
@@ -307,72 +308,6 @@ if (empty($reshook))
 					$contactid = (GETPOST('userid') ? GETPOST('userid') : GETPOST('contactid'));
 					$result = $object->add_contact($contactid, $_POST["type"], $_POST["source"]);
 				}
-				/*
-				// Contact Medecin du travail
-		print '<tr>';
-		print '<td class="titlefield">'.$langs->trans("contac").'</td>';
-		print '<td>';
-
-
-			$sql = "SELECT p.lastname, p.firstname, p.zip, p.town, p.phone";
-			$sql .= " FROM ".MAIN_DB_PREFIX."expensereport as e, ".MAIN_DB_PREFIX."payment_expensereport as p";
-
-			$sql .= "c.code as p_code, c.libelle as payment_type,";
-			$sql .= " WHERE p.fk_soc = '".$result."'";
-			$resql = $db->query($sql);
-			echo '<pre>'; print_r($resql); echo '</pre>'; exit;
-
-				*/
-				/*
-				print '<tr><td class="fieldrequired">'.$langs->trans('LabourDoctor').'</td>';
-				print '<td colspan="2">';
-				//ICI PRINT CONTACT / TIERS
-				$form->select_contacts($soc->id, $contactid, 'labour_doctor', 1, $srccontactslist);
-
-				print '<tr><td class="fieldrequired">'.$langs->trans('LabourInspector').'</td>';
-				print '<td colspan="2">';
-				$form->select_contacts($soc->id, $contactid, 'labour_inspector', 1, $srccontactslist, '', 1);
-
-				print '<tr><td class="fieldrequired">'.$langs->trans('Samu').'</td>';
-				print '<td colspan="2">';
-				print $form->select_company($soc->id, 'samu', '', 'SelectThirdParty', 0, 0, null, 0, 'minwidth300');
-
-				print '<tr><td class="fieldrequired">'.$langs->trans('Police').'</td>';
-				print '<td colspan="2">';
-				print $form->select_company($soc->id, 'police', '', 'SelectThirdParty', 0, 0, null, 0, 'minwidth300');
-
-				print '<tr><td class="fieldrequired">'.$langs->trans('TouteUrgence').'</td>';
-				print '<td colspan="2">';
-				print $form->select_company($soc->id, 'urgency', '', 'SelectThirdParty', 0, 0, null, 0, 'minwidth300');
-
-				print '<tr><td class="fieldrequired">'.$langs->trans('RightsDefender').'</td>';
-				print '<td colspan="2">';
-				print $form->select_company($soc->id, 'rights_defender', '', 'SelectThirdParty', 0, 0, null, 0, 'minwidth300');
-
-				print '<tr><td class="fieldrequired">'.$langs->trans('Antipoison').'</td>';
-				print '<td colspan="2">';
-				print $form->select_company($soc->id, 'antipoison', '', 'SelectThirdParty', 0, 0, null, 0, 'minwidth300');
-
-				print '<tr><td class="fieldrequired">'.$langs->trans('ResponsiblePrevent').'</td>';
-				print '<td colspan="2">';
-				$form->select_contacts($soc->id, $contactid, 'responsible_prevent', 1, $srccontactslist, '', 1);
-				// Option to reload page to retrieve customer informations. Note, this clear other input
-				if (!empty($conf->global->RELOAD_PAGE_ON_CUSTOMER_CHANGE))
-				{
-					print '<script type="text/javascript">
-					$(document).ready(function() {
-						$("#socid").change(function() {
-							var socid = $(this).val();
-							var fac_rec = $(\'#fac_rec\').val();
-							// reload page
-							window.location.href = "'.$_SERVER["PHP_SELF"].'?action=create&socid="+socid+"&fac_rec="+fac_rec;
-						});
-					});
-					</script>';
-				}
-				print '</td>';
-				print '</tr>'."\n";
-				*/
 
 			}
 
@@ -409,6 +344,8 @@ if (empty($reshook))
 			// Part to show record
 			// View
 
+			$legaldisplay = json_decode($object->json, false, 512, JSON_UNESCAPED_UNICODE)->LegalDisplay;
+			
 			print '<h1>'.$action.'</h1><br/>';
 			dol_fiche_head($head, 'card', $langs->trans("LegalDisplay"), -1, 'trip');
 
@@ -443,32 +380,14 @@ if (empty($reshook))
 			print '<tr>';
 			print '<td class="titlefield">'.$langs->trans("LabourDoctor").'</td>';
 			print '<td>';
-
-			if ($object->fk_socpeople_labour_doctor > 0)
-			{
-				$labourdoctor = new Contact($db);
-
-				$result = $labourdoctor->fetch($object->fk_socpeople_labour_doctor);
-
-				if ($result < 0) dol_print_error('', $labourdoctor->error);
-				elseif ($result > 0) print $labourdoctor->getNomUrl(-1);
-			}
-
+			print $legaldisplay->occupational_health_service->name;
 			print '</td></tr>';
 
 			// Inspecteur du travail
 			print '<tr>';
 			print '<td class="titlefield">'.$langs->trans("LabourInspector").'</td>';
 			print '<td>';
-
-			if ($object->fk_socpeople_labour_inspector > 0)
-			{
-				$labourinspector = new Contact($db);
-				$result = $labourinspector->fetch($object->fk_socpeople_labour_inspector);
-				if ($result < 0) dol_print_error('', $labourinspector->error);
-				elseif ($result > 0) print $labourinspector->getNomUrl(-1);
-			}
-
+			print $legaldisplay->detective_work->name;
 			print '</td></tr>';
 
 			// SAMU
@@ -476,15 +395,7 @@ if (empty($reshook))
 			print '<tr>';
 			print '<td class="titlefield">'.$langs->trans("SAMU").'</td>';
 			print '<td>';
-
-			if ($object->fk_soc_samu > 0)
-			{
-				$samu = new Societe($db);
-				$result = $samu->fetch($object->fk_soc_samu);
-				if ($result < 0) dol_print_error('', $samu->error);
-				elseif ($result > 0) print $samu->getNomUrl(1);
-			}
-
+			print $legaldisplay->emergency_service->samu;
 			print '</td></tr>';
 
 			// Pompiers
@@ -492,15 +403,7 @@ if (empty($reshook))
 			print '<tr>';
 			print '<td class="titlefield">'.$langs->trans("Pompiers").'</td>';
 			print '<td>';
-
-			if ($object->fk_soc_pompiers > 0)
-			{
-				$pompiers = new Societe($db);
-				$result = $pompiers->fetch($object->fk_soc_pompiers);
-				if ($result < 0) dol_print_error('', $pompiers->error);
-				elseif ($result > 0) print $pompiers->getNomUrl(1);
-			}
-
+			print $legaldisplay->emergency_service->pompier;
 			print '</td></tr>';
 
 			// Police
@@ -508,15 +411,7 @@ if (empty($reshook))
 			print '<tr>';
 			print '<td class="titlefield">'.$langs->trans("Police").'</td>';
 			print '<td>';
-
-			if ($object->fk_soc_police > 0)
-			{
-				$police = new Societe($db);
-				$result = $police->fetch($object->fk_soc_police);
-				if ($result < 0) dol_print_error('', $police->error);
-				elseif ($result > 0) print $police->getNomUrl(-1);
-			}
-
+			print $legaldisplay->emergency_service->police;
 			print '</td></tr>';
 
 			// Urgences
@@ -524,15 +419,7 @@ if (empty($reshook))
 			print '<tr>';
 			print '<td class="titlefield">'.$langs->trans("TouteUrgence").'</td>';
 			print '<td>';
-
-			if ($object->fk_soc_urgency > 0)
-			{
-				$urgencies = new Societe($db);
-				$result = $urgencies->fetch($object->fk_soc_urgency);
-				if ($result < 0) dol_print_error('', $urgencies->error);
-				elseif ($result > 0) print $urgencies->getNomUrl(-1);
-			}
-
+			print $legaldisplay->emergency_service->emergency;
 			print '</td></tr>';
 
 			// Défenseur du droit du travail
@@ -540,15 +427,7 @@ if (empty($reshook))
 			print '<tr>';
 			print '<td class="titlefield">'.$langs->trans("RightsDefender").'</td>';
 			print '<td>';
-
-			if ($object->fk_soc_rights_defender > 0)
-			{
-				$rights_defender = new Societe($db);
-				$result = $rights_defender->fetch($object->fk_soc_rights_defender);
-				if ($result < 0) dol_print_error('', $rights_defender->error);
-				elseif ($result > 0) print $rights_defender->getNomUrl(-1);
-			}
-
+			print $legaldisplay->emergency_service->right_defender;
 			print '</td></tr>';
 
 			// Antipoison
@@ -556,15 +435,7 @@ if (empty($reshook))
 			print '<tr>';
 			print '<td class="titlefield">'.$langs->trans("Antipoison").'</td>';
 			print '<td>';
-
-			if ($object->fk_soc_antipoison > 0)
-			{
-				$antipoison = new Societe($db);
-				$result = $antipoison->fetch($object->fk_soc_antipoison);
-				if ($result < 0) dol_print_error('', $antipoison->error);
-				elseif ($result > 0) print $antipoison->getNomUrl(-1);
-			}
-
+			print $legaldisplay->emergency_service->poison_control_center;
 			print '</td></tr>';
 
 			// Responsable de prévention
@@ -572,16 +443,7 @@ if (empty($reshook))
 			print '<tr>';
 			print '<td class="titlefield">'.$langs->trans("ResponsiblePrevent").'</td>';
 			print '<td>';
-
-			if ($object->fk_soc_responsible_prevent > 0)
-			{
-				$responsible_prevent = new Societe($db);
-
-				$result = $responsible_prevent->fetch($object->fk_soc_responsible_prevent);
-
-				if ($result < 0) dol_print_error('', $responsible_prevent->error);
-				elseif ($result > 0) print $responsible_prevent->getNomUrl(-1);
-			}
+			print $legaldisplay->safety_rule->responsible_for_preventing;
 			print '</td></tr>';
 
 

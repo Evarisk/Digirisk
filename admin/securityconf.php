@@ -93,10 +93,10 @@ if (($action == 'update' && !GETPOST("cancel", 'alpha'))
 	$allLinks = digirisk_dolibarr_fetch_links($db, 'all');
 
 	$labourdoctor_id 					= GETPOST('labourdoctor_socid', 'int') ? GETPOST('labourdoctor_socid', 'int') : $allLinks['LabourDoctor']->fk_soc ;
-	$labourdoctor_socpeopleassigned 	= !empty(GETPOST('labourdoctor_socpeopleassigned', 'array')) ? GETPOST('labourdoctor_socpeopleassigned', 'array') : (GETPOST('labourdoctor_contactid', 'int') ? GETPOST('labourdoctor_contactid', 'int') : $allLinks['LabourDoctor']->fk_contact);
+	$labourdoctor_socpeopleassigned 	= !empty(GETPOST('labourdoctor_socpeopleassigned', 'array')) ? GETPOST('labourdoctor_socpeopleassigned', 'array') : (GETPOST('labourdoctor_contactid', 'int') ? GETPOST('labourdoctor_contactid', 'int') : 0);
 
 	$labourinspector_id					= GETPOST('labourinspector_socid', 'int') ? GETPOST('labourinspector_socid','int') : $allLinks['LabourInspector']->fk_soc;
-	$labourinspector_socpeopleassigned 	= !empty(GETPOST('labourinspector_contactid', 'int')) ? GETPOST('labourinspector_contactid','int') : (GETPOST('labourinspector_contactid', 'int') ? GETPOST('labourinspector_contactid', 'int') : $allLinks['LabourInspector']->fk_contact);
+	$labourinspector_socpeopleassigned 	= !empty(GETPOST('labourinspector_contactid', 'int')) ? GETPOST('labourinspector_contactid','int') : (GETPOST('labourinspector_contactid', 'int') ? GETPOST('labourinspector_contactid', 'int') : 0);
 
 	digirisk_dolibarr_set_links($db, 'LabourDoctor',  1, $labourdoctor_id,$labourdoctor_socpeopleassigned, $conf->entity);
 	digirisk_dolibarr_set_links($db, 'LabourInspector',  1, $labourinspector_id,$labourinspector_socpeopleassigned, $conf->entity);
@@ -117,12 +117,12 @@ if (($action == 'update' && !GETPOST("cancel", 'alpha'))
 	digirisk_dolibarr_set_links($db, 'Antipoison',  1, $antipoison_id,0, 0,$conf->entity);
 	digirisk_dolibarr_set_links($db, 'Responsible',  1, $responsible_id,0, 0,$conf->entity);
 
-	digirisk_dolibarr_set_const($db, "DETAILED_RULES_LOCATION", GETPOST("emplacementCD", 'none'), 'chaine', 0, '', $conf->entity);
-	digirisk_dolibarr_set_const($db, "DESCRIPTION", GETPOST("description", 'none'), 'chaine', 0, '', $conf->entity);
-	digirisk_dolibarr_set_const($db, "MOYENS_GENERAUX", GETPOST("moyensgeneraux", 'none'), 'chaine', 0, '', $conf->entity);
-	digirisk_dolibarr_set_const($db, "CONSIGNES_GENERALES", GETPOST("consignesgenerales", 'none'), 'chaine', 0, '', $conf->entity);
-	digirisk_dolibarr_set_const($db, "REGLEMENT_INTERIEUR_EMPLACEMENT", GETPOST("emplacementRI", 'none'), 'chaine', 0, '', $conf->entity);
-	digirisk_dolibarr_set_const($db, "DOCUMENT_UNIQUE_EMPLACEMENT", GETPOST("emplacementDU", 'none'), 'chaine', 0, '', $conf->entity);
+	dolibarr_set_const($db, "DIGIRISK_LOCATION_OF_DETAILED_INSTRUCTION", GETPOST("emplacementCD", 'none'), 'chaine', 0, '', $conf->entity);
+	dolibarr_set_const($db, "DIGIRISK_SOCIETY_DESCRIPTION", GETPOST("description", 'none'), 'chaine', 0, '', $conf->entity);
+	dolibarr_set_const($db, "DIGIRISK_GENERAL_MEANS", GETPOST("moyensgeneraux", 'none'), 'chaine', 0, '', $conf->entity);
+	dolibarr_set_const($db, "DIGIRISK_GENERAL_RULES", GETPOST("consignesgenerales", 'none'), 'chaine', 0, '', $conf->entity);
+	dolibarr_set_const($db, "DIGIRISK_RULES_LOCATION", GETPOST("emplacementRI", 'none'), 'chaine', 0, '', $conf->entity);
+	dolibarr_set_const($db, "DIGIRISK_DUER_LOCATION", GETPOST("emplacementDU", 'none'), 'chaine', 0, '', $conf->entity);
 
 	if ($action != 'updateedit' && !$error)
 	{
@@ -147,7 +147,6 @@ $form = new Form($db);
 $formother = new FormOther($db);
 $formcompany = new FormCompany($db);
 $object = new DigiriskLink($db);
-$digiriskconst = digirisk_dolibarr_fetch_const($db);
 
 $countrynotdefined = '<font class="error">'.$langs->trans("ErrorSetACountryFirst").' ('.$langs->trans("SeeAbove").')</font>';
 print '<span class="opacitymedium">'.$langs->trans("AccountantDesc")."</span><br>\n";
@@ -445,33 +444,33 @@ print '</td></tr>';
 
 // Emplacement de la consigne détaillée
 print '<tr class="oddeven"><td><label for="emplacementCD">'.$langs->trans("Emplacement de la consigne détaillée").'</label></td><td>';
-print '<textarea name="emplacementCD" id="emplacementCD" class="minwidth300" rows="'.ROWS_3.'">'.($digiriskconst->DETAILED_RULES_LOCATION ? $digiriskconst->DETAILED_RULES_LOCATION : '').'</textarea></td></tr>'."\n";
+print '<textarea name="emplacementCD" id="emplacementCD" class="minwidth300" rows="'.ROWS_3.'">'.($conf->global->DIGIRISK_LOCATION_OF_DETAILED_INSTRUCTION ? $conf->global->DIGIRISK_LOCATION_OF_DETAILED_INSTRUCTION : '').'</textarea></td></tr>'."\n";
 
 print '<tr class="liste_titre"><th class="titlefield">'.$langs->trans("Informations complémentaires de la société").'</th><th>'.$langs->trans("Value").'</th></tr>'."\n";
 
 // Description
 print '<tr class="oddeven"><td><label for="description">'.$langs->trans("Description").'</label></td><td>';
-print '<textarea name="description" id="description" class="minwidth300" rows="'.ROWS_3.'">'.($digiriskconst->DESCRIPTION ? $digiriskconst->DESCRIPTION : '').'</textarea></td></tr>'."\n";
+print '<textarea name="description" id="description" class="minwidth300" rows="'.ROWS_3.'">'.($conf->global->DIGIRISK_SOCIETY_DESCRIPTION ? $conf->global->DIGIRISK_SOCIETY_DESCRIPTION : '').'</textarea></td></tr>'."\n";
 
 // Moyens généraux mis à disposition
 print '<tr class="oddeven"><td><label for="moyensgeneraux">'.$langs->trans("Moyens généraux mis à disposition").'</label></td><td>';
-print '<textarea name="moyensgeneraux" id="moyensgeneraux" class="minwidth300" rows="'.ROWS_3.'">'.($digiriskconst->MOYENS_GENERAUX ? $digiriskconst->MOYENS_GENERAUX : '').'</textarea></td></tr>'."\n";
+print '<textarea name="moyensgeneraux" id="moyensgeneraux" class="minwidth300" rows="'.ROWS_3.'">'.($conf->global->DIGIRISK_GENERAL_MEANS ? $conf->global->DIGIRISK_GENERAL_MEANS : '').'</textarea></td></tr>'."\n";
 
 // Consignes générales
 print '<tr class="oddeven"><td><label for="consignesgenerales">'.$langs->trans(" Consignes générales").'</label></td><td>';
-print '<textarea name="consignesgenerales" id="consignesgenerales" class="minwidth300" rows="'.ROWS_3.'">'.($digiriskconst->CONSIGNES_GENERALES ? $digiriskconst->CONSIGNES_GENERALES : '').'</textarea></td></tr>'."\n";
+print '<textarea name="consignesgenerales" id="consignesgenerales" class="minwidth300" rows="'.ROWS_3.'">'.($conf->global->DIGIRISK_GENERAL_RULES ? $conf->global->DIGIRISK_GENERAL_RULES : '').'</textarea></td></tr>'."\n";
 
 // RI
 print '<tr class="liste_titre"><th class="titlefield wordbreak">'.$langs->trans("Règlement intérieur").'</th><th>'.$langs->trans("").'</th></tr>'."\n";
 // Emplacement
 print '<tr class="oddeven"><td><label for="emplacementRI">'.$langs->trans("Emplacement").'</label></td><td>';
-print '<textarea name="emplacementRI" id="emplacementRI" class="minwidth300" rows="'.ROWS_3.'">'.($digiriskconst->REGLEMENT_INTERIEUR_EMPLACEMENT ? $digiriskconst->REGLEMENT_INTERIEUR_EMPLACEMENT : '').'</textarea></td></tr>'."\n";
+print '<textarea name="emplacementRI" id="emplacementRI" class="minwidth300" rows="'.ROWS_3.'">'.($conf->global->DIGIRISK_RULES_LOCATION ? $conf->global->DIGIRISK_RULES_LOCATION : '').'</textarea></td></tr>'."\n";
 
 // DU
 print '<tr class="liste_titre"><th class="titlefield wordbreak">'.$langs->trans("Document Unique").'</th><th>'.$langs->trans("").'</th></tr>'."\n";
 // Emplacement
 print '<tr class="oddeven"><td><label for="emplacementDU">'.$langs->trans("Emplacement").'</label></td><td>';
-print '<textarea name="emplacementDU" id="emplacementDU" class="minwidth300" rows="'.ROWS_3.'">'.($digiriskconst->DOCUMENT_UNIQUE_EMPLACEMENT ? $digiriskconst->DOCUMENT_UNIQUE_EMPLACEMENT : '').'</textarea></td></tr>'."\n";
+print '<textarea name="emplacementDU" id="emplacementDU" class="minwidth300" rows="'.ROWS_3.'">'.($conf->global->DIGIRISK_DUER_LOCATION ? $conf->global->DIGIRISK_DUER_LOCATION : '').'</textarea></td></tr>'."\n";
 
 print '</table>';
 

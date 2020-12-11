@@ -427,7 +427,7 @@ class FormFile
 				if (is_array($genallowed)) $modellist = $genallowed;
 				else
 				{
-					include_once DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/core/modules/digiriskdolibarr/modules_legaldisplay.php';
+					include_once DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/core/modules/digiriskdolibarr/legaldisplay/modules_legaldisplay.php';
 					$modellist = ModelePDFLegalDisplay::liste_modeles($this->db);
 				}
 			}

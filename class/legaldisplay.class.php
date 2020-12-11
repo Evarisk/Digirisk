@@ -23,7 +23,8 @@
  */
 
 require_once DOL_DOCUMENT_ROOT . "/core/class/commonobject.class.php";
-//require_once(DOL_DOCUMENT_ROOT."/societe/class/societe.class.php");
+require_once DOL_DOCUMENT_ROOT.'/custom/digiriskdolibarr/lib/digiriskdolibarr.lib.php';
+require_once(DOL_DOCUMENT_ROOT."/societe/class/societe.class.php");
 
 
 /**
@@ -51,26 +52,7 @@ class Legaldisplay extends CommonObject
 	public $ref_ext;
 	public $entity;
 	public $date_creation;
-	public $date_debut;
-	public $date_fin;
-	public $fk_socpeople_labour_doctor;
-	public $fk_socpeople_labour_inspector;
-	public $fk_soc_samu;
-	public $fk_soc_pompiers;
-	public $fk_soc_police;
-	public $fk_soc_urgency;
-	public $fk_soc_rights_defender;
-	public $fk_soc_antipoison;
-	public $fk_soc_responsible_prevent;
-	public $note_consigne_detaillee;
-	public $note_derogation_permanente;
-	public $note_derogation_occas;
-	public $note_convention_collective;
-	public $note_lieu_cc;
-	public $note_accord_participation;
-	public $note_lieu_du;
-	public $tms='';
-	public $description;
+	public $json = array();
 	public $import_key;
 	public $status;
 	public $fk_user_creat;
@@ -85,26 +67,8 @@ class Legaldisplay extends CommonObject
 		'ref_ext' =>array('type'=>'integer', 'label'=>'Ref ext', 'enabled'=>1, 'visible'=>-1, 'position'=>20),
 		'entity' =>array('type'=>'integer', 'label'=>'Entity', 'default'=>1, 'enabled'=>1, 'visible'=>-2, 'notnull'=>1, 'position'=>25),
 		'date_creation' =>array('type'=>'datetime', 'label'=>'Date creation', 'enabled'=>1, 'visible'=>-1, 'position'=>30),
-		'date_debut' =>array('type'=>'datetime', 'label'=>'Date debut', 'enabled'=>1, 'visible'=>-1, 'notnull'=>1, 'position'=>35),
-		'date_fin' =>array('type'=>'datetime', 'label'=>'Date fin', 'enabled'=>1, 'visible'=>-1, 'notnull'=>1, 'position'=>40),
 		'tms' =>array('type'=>'timestamp', 'label'=>'Tms', 'enabled'=>1, 'visible'=>-1, 'notnull'=>1, 'position'=>45),
-		'description' =>array('type'=>'text', 'label'=>'Description', 'enabled'=>1, 'visible'=>0, 'position'=>50),
-		'fk_socpeople_labour_doctor' =>array('type'=>'integer', 'label'=>'Fk soc labour doctor', 'enabled'=>1, 'visible'=>0, 'position'=>55),
-		'fk_socpeople_labour_inspector' =>array('type'=>'integer', 'label'=>'Fk soc labour inspector', 'enabled'=>1, 'visible'=>0, 'position'=>60),
-		'fk_soc_samu' =>array('type'=>'integer', 'label'=>'Fk soc samu', 'enabled'=>1, 'visible'=>0, 'position'=>65),
-		'fk_soc_pompiers' =>array('type'=>'integer', 'label'=>'Fk soc pompiers', 'enabled'=>1, 'visible'=>0, 'position'=>65),
-		'fk_soc_police' =>array('type'=>'integer', 'label'=>'Fk soc police', 'enabled'=>1, 'visible'=>0, 'position'=>70),
-		'fk_soc_urgency' =>array('type'=>'integer', 'label'=>'Fk soc urgency', 'enabled'=>1, 'visible'=>0, 'position'=>75),
-		'fk_soc_rights_defender' =>array('type'=>'integer', 'label'=>'Fk soc rights defender', 'enabled'=>1, 'visible'=>0, 'position'=>80),
-		'fk_soc_antipoison' =>array('type'=>'integer', 'label'=>'Fk soc antipoison', 'enabled'=>1, 'visible'=>0, 'position'=>85),
-		'fk_soc_responsible_prevent' =>array('type'=>'integer', 'label'=>'Fk soc responsible prevent', 'enabled'=>1, 'visible'=>0, 'position'=>90),
-		'note_consigne_detaillee' =>array('type'=>'string', 'label'=>'Note consigne detaillee', 'enabled'=>1, 'visible'=>0, 'position'=>95),
-		'note_derogation_permanente' =>array('type'=>'string', 'label'=>'Note derogation permanente', 'enabled'=>1, 'visible'=>0, 'position'=>100),
-		'note_derogation_occas' =>array('type'=>'string', 'label'=>'Note derogation occasionnelle', 'enabled'=>1, 'visible'=>0, 'position'=>105),
-		'note_convention_collective' =>array('type'=>'string', 'label'=>'Note convention collective', 'enabled'=>1, 'visible'=>0, 'position'=>110),
-		'note_lieu_cc' =>array('type'=>'string', 'label'=>'Note lieu CC', 'enabled'=>1, 'visible'=>0, 'position'=>115),
-		'note_accord_participation' =>array('type'=>'string', 'label'=>'Note accord participation', 'enabled'=>1, 'visible'=>0, 'position'=>120),
-		'note_lieu_du' =>array('type'=>'string', 'label'=>'Note lieu DU', 'enabled'=>1, 'visible'=>0, 'position'=>125),
+		'json' =>array('type'=>'text', 'label'=>'Description', 'enabled'=>1, 'visible'=>0, 'position'=>50),
 		'import_key' =>array('type'=>'varchar(14)', 'label'=>'ImportId', 'enabled'=>1, 'visible'=>-1, 'position'=>130),
 		'status' =>array('type'=>'smallint', 'label'=>'Status', 'enabled'=>1, 'visible'=>-1, 'position'=>135),
 		'fk_user_creat' =>array('type'=>'integer', 'label'=>'Fk user creat', 'enabled'=>1, 'visible'=>-1, 'notnull'=>1, 'position'=>140),
@@ -113,8 +77,6 @@ class Legaldisplay extends CommonObject
 		'model_odt' =>array('type'=>'varchar(255)', 'label'=>'Model odt', 'enabled'=>1, 'visible'=>0, 'position'=>155),
 		'note_affich' =>array('type'=>'varchar(255)', 'label'=>'Note affich', 'enabled'=>1, 'visible'=>0, 'position'=>160),
 	);
-
-
 
 	/**
 	 *  Constructor
@@ -125,7 +87,6 @@ class Legaldisplay extends CommonObject
 	{
 		$this->db = $db;
 	}
-
 
 	/**
 	 *  Create a legal display into database
@@ -146,12 +107,93 @@ class Legaldisplay extends CommonObject
 		$this->description = trim($this->description);
 		$this->note_affich = trim($this->note_affich);
 
-		// Check parameters
-//		if (empty($this->date_debut) || empty($this->date_fin))
-//		{
-//			$this->error = $langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv('Date'));
-//			return -1;
-//		}
+		// REMPLIR JSON
+
+		$labour_doctor = new Contact($this->db);
+		$result = $labour_doctor->fetch($this->fk_socpeople_labour_doctor);
+
+		if ($result < 0) dol_print_error('', $labour_doctor->error);
+		elseif ($result > 0) {
+			$this->json['LegalDisplay']['occupational_health_service']['name'] = $labour_doctor->firstname . " " . $labour_doctor->lastname;
+			$this->json['LegalDisplay']['occupational_health_service']['address'] = $labour_doctor->address;
+			$this->json['LegalDisplay']['occupational_health_service']['zip'] = $labour_doctor->zip;
+			$this->json['LegalDisplay']['occupational_health_service']['town'] = $labour_doctor->town;
+			$this->json['LegalDisplay']['occupational_health_service']['phone'] = $labour_doctor->phone_pro;
+		}
+
+		$labour_inspector = new Contact($this->db);
+		$result = $labour_inspector->fetch($this->fk_socpeople_labour_inspector);
+		if ($result < 0) dol_print_error('', $labour_inspector->error);
+		elseif ($result > 0) {
+			$this->json['LegalDisplay']['detective_work']['name'] = $labour_inspector->firstname . " " . $labour_inspector->lastname;
+			$this->json['LegalDisplay']['detective_work']['address'] = $labour_inspector->address;
+			$this->json['LegalDisplay']['detective_work']['zip'] = $labour_inspector->zip;
+			$this->json['LegalDisplay']['detective_work']['town'] = $labour_inspector->town;
+			$this->json['LegalDisplay']['detective_work']['phone'] = $labour_inspector->phone_pro;
+		}
+
+		$samu = new Societe($this->db);
+		$result = $samu->fetch($this->fk_soc_samu);
+		if ($result < 0) dol_print_error('', $samu->error);
+		elseif ($result > 0) {
+			$this->json['LegalDisplay']['emergency_service']['samu']=$samu->phone;
+		}
+
+		$police = new Societe($this->db);
+		$result = $police->fetch($this->fk_soc_police);
+		if ($result < 0) dol_print_error('', $police->error);
+		elseif ($result > 0) {
+			$this->json['LegalDisplay']['emergency_service']['police']=$police->phone;
+		}
+
+		$pompiers = new Societe($this->db);
+		$result = $pompiers->fetch($this->fk_soc_pompiers);
+		if ($result < 0) dol_print_error('', $pompiers->error);
+		elseif ($result > 0) {
+			$this->json['LegalDisplay']['emergency_service']['pompier']=$pompiers->phone;
+		}
+
+		$urgency = new Societe($this->db);
+		$result = $urgency->fetch($this->fk_soc_urgency);
+		if ($result < 0) dol_print_error('', $urgency->error);
+		elseif ($result > 0) {
+			$this->json['LegalDisplay']['emergency_service']['emergency']=$urgency->phone;
+		}
+
+		$rights_defender = new Societe($this->db);
+		$result = $rights_defender->fetch($this->fk_soc_rights_defender);
+		if ($result < 0) dol_print_error('', $rights_defender->error);
+		elseif ($result > 0) {
+			$this->json['LegalDisplay']['emergency_service']['right_defender']=$rights_defender->phone;
+		}
+
+		$antipoison = new Societe($this->db);
+		$result = $antipoison->fetch($this->fk_soc_antipoison);
+		if ($result < 0) dol_print_error('', $antipoison->error);
+		elseif ($result > 0) {
+			$this->json['LegalDisplay']['emergency_service']['poison_control_center']=$antipoison->phone;
+		}
+
+		$responsible_prevent = new Societe($this->db);
+		$result = $responsible_prevent->fetch($this->fk_soc_responsible_prevent);
+		if ($result < 0) dol_print_error('', $responsible_prevent->error);
+		elseif ($result > 0) {
+			$this->json['LegalDisplay']['safety_rule']['responsible_for_preventing']=$responsible_prevent->name;
+			$this->json['LegalDisplay']['safety_rule']['phone']=$responsible_prevent->phone;
+		}
+
+		$const = digirisk_dolibarr_fetch_const($this->db);
+
+		// WORKING HOURS a RAJOUTER
+
+		$this->json['LegalDisplay']['safety_rule']['location_of_detailed_instruction']=$conf->global->DIGIRISK_LOCATION_OF_DETAILED_INSTRUCTION;
+		$this->json['LegalDisplay']['derogation_schedule']['permanent']=$conf->global->DIGIRISK_DEROGATION_SCHEDULE_PERMANENT;
+		$this->json['LegalDisplay']['derogation_schedule']['occasional']=$conf->global->DIGIRISK_DEROGATION_SCHEDULE_OCCASIONAL;
+		$this->json['LegalDisplay']['collective_agreement']['title_of_the_applicable_collective_agreement']=$conf->global->DIGIRISK_COLLECTIVE_AGREEMENT_TITLE;
+		$this->json['LegalDisplay']['collective_agreement']['location_and_access_terms_of_the_agreement']=$conf->global->DIGIRISK_COLLECTIVE_AGREEMENT_LOCATION;
+		$this->json['LegalDisplay']['DUER']['how_access_to_duer']=$conf->global->DIGIRISK_DUER_LOCATION;
+		$this->json['LegalDisplay']['rules']['location']=$conf->global->DIGIRISK_RULES_LOCATION;
+		$this->json['LegalDisplay']['participation_agreement']['information_procedures']=$conf->global->DIGIRISK_PARTICIPATION_AGREEMENT_INFORMATION_PROCEDURE;
 
 		// Create legal display
 		$fuserid = $this->fk_user_creat;
@@ -163,23 +205,7 @@ class Legaldisplay extends CommonObject
 		$sql .= "ref";
 		$sql .= ", entity";
 		$sql .= ", date_creation";
-		$sql .= ", fk_socpeople_labour_doctor";
-		$sql .= ", fk_socpeople_labour_inspector";
-		$sql .= ", fk_soc_samu";
-		$sql .= ", fk_soc_pompiers";
-		$sql .= ", fk_soc_police";
-		$sql .= ", fk_soc_urgency";
-		$sql .= ", fk_soc_rights_defender";
-		$sql .= ", fk_soc_antipoison";
-		$sql .= ", fk_soc_responsible_prevent";
-		$sql .= ", note_consigne_detaillee";
-		$sql .= ", note_derogation_permanente";
-		$sql .= ", note_derogation_occas";
-		$sql .= ", note_convention_collective";
-		$sql .= ", note_lieu_cc";
-		$sql .= ", note_accord_participation";
-		$sql .= ", note_lieu_du";
-		$sql .= ", description";
+		$sql .= ", json";
 		$sql .= ", import_key";
 		$sql .= ", status";
 		$sql .= ", fk_user_creat";
@@ -190,24 +216,7 @@ class Legaldisplay extends CommonObject
 		$sql .= " ".(!empty($this->ref) ? "'".$this->db->escape($this->ref)."'" : 'null');
 		$sql .= ", ".$conf->entity;
 		$sql .= ", '".$this->db->idate($now)."'";
-		$sql .= ", ".(is_numeric($this->fk_socpeople_labour_doctor) ? $this->fk_socpeople_labour_doctor : '0');
-		$sql .= ", ".(is_numeric($this->fk_socpeople_labour_inspector) ? $this->fk_socpeople_labour_inspector : '0');
-		$sql .= ", ".(is_numeric($this->fk_soc_samu) ? $this->fk_soc_samu : '0');
-		$sql .= ", ".(is_numeric($this->fk_soc_pompiers) ? $this->fk_soc_pompiers : '0');
-		$sql .= ", ".(is_numeric($this->fk_soc_police) ? $this->fk_soc_police : '0');
-		$sql .= ", ".(is_numeric($this->fk_soc_urgency) ? $this->fk_soc_urgency : '0');
-		$sql .= ", ".(is_numeric($this->fk_soc_rights_defender) ? $this->fk_soc_rights_defender : '0');
-		$sql .= ", ".(is_numeric($this->fk_soc_antipoison) ? $this->fk_soc_antipoison : '0');
-		$sql .= ", ".(is_numeric($this->fk_soc_responsible_prevent) ? $this->fk_soc_responsible_prevent : '0');
-
-		$sql .= ", '".(!empty($this->note_consigne_detaillee) ? $this->db->escape($this->note_consigne_detaillee) : '0')."'";
-		$sql .= ", '".(!empty($this->note_derogation_permanente) ? $this->db->escape($this->note_derogation_permanente) : '0')."'";
-		$sql .= ", '".(!empty($this->note_derogation_occas) ? $this->db->escape($this->note_derogation_occas) : '0')."'";
-		$sql .= ", '".(!empty($this->note_convention_collective) ? $this->db->escape($this->note_convention_collective) : '0')."'";
-		$sql .= ", '".(!empty($this->note_lieu_cc) ? $this->db->escape($this->note_lieu_cc) : '0')."'";
-		$sql .= ", '".(!empty($this->note_accord_participation) ? $this->db->escape($this->note_accord_participation) : '0')."'";
-		$sql .= ", '".(!empty($this->note_lieu_du) ? $this->db->escape($this->note_lieu_du) : '0')."'";
-		$sql .= ", '".$this->db->escape($this->description)."'";
+		$sql .= ", '".json_encode($this->json, JSON_UNESCAPED_UNICODE)."'";
 		$sql .= ", ".(!empty($this->import_key) ? "'".$this->db->escape($this->import_key)."'" : 'null');
 		$sql .= ", ".(is_numeric($this->status) ? $this->status : '0');
 		$sql .= ", ".$fuserid;
@@ -215,6 +224,7 @@ class Legaldisplay extends CommonObject
 		$sql .= ", ".(!empty($this->model_odt) ? "'".$this->db->escape($this->model_odt)."'" : 'null');
 		$sql .= ", ".(!empty($this->note_affich) ? "'".$this->db->escape($this->note_affich)."'" : 'null');
 		$sql .= ")";
+
 
 		dol_syslog(get_class($this)."::create sql=".$sql, LOG_DEBUG);
 		$resql = $this->db->query($sql);
@@ -257,24 +267,7 @@ class Legaldisplay extends CommonObject
 		$sql .= "t.ref";
 		$sql .= ", t.entity";
 		$sql .= ", t.date_creation";
-		$sql .= ", t.fk_socpeople_labour_doctor";
-		$sql .= ", t.fk_socpeople_labour_inspector";
-		$sql .= ", t.fk_soc_samu";
-		$sql .= ", t.fk_soc_pompiers";
-		$sql .= ", t.fk_soc_police";
-		$sql .= ", t.fk_soc_urgency";
-		$sql .= ", t.fk_soc_rights_defender";
-		$sql .= ", t.fk_soc_antipoison";
-		$sql .= ", t.fk_soc_responsible_prevent";
-		$sql .= ", t.note_consigne_detaillee";
-		$sql .= ", t.note_derogation_permanente";
-		$sql .= ", t.note_derogation_occas";
-		$sql .= ", t.note_convention_collective";
-		$sql .= ", t.note_lieu_cc";
-		$sql .= ", t.note_accord_participation";
-		$sql .= ", t.note_lieu_du";
-		$sql .= ", description";
-		$sql .= ", t.description";
+		$sql .= ", t.json";
 		$sql .= ", t.import_key";
 		$sql .= ", t.status";
 		$sql .= ", t.fk_user_creat";
@@ -284,7 +277,8 @@ class Legaldisplay extends CommonObject
 
 
 		$sql.= " FROM ".MAIN_DB_PREFIX."digirisk_legaldisplay as t";
-		$sql.= " WHERE t.rowid = ".$id;
+		$sql.= " WHERE t.rowid  = ".$id . " AND t.entity IN (".getEntity('digiriskdolibarr').")";@
+		//NOTE DEV : SELECT PRIMORDIAL POUR GERER LE MULTICOMPANY
 
 		dol_syslog(get_class($this)."::fetch sql=".$sql, LOG_DEBUG);
 		$resql=$this->db->query($sql);
@@ -298,23 +292,7 @@ class Legaldisplay extends CommonObject
 				$this->ref = $obj->ref;
 				$this->entity = $obj->entity;
 				$this->date_creation = $this->db->jdate($obj->date_creation);
-				$this->fk_socpeople_labour_doctor = $obj->fk_socpeople_labour_doctor;
-				$this->fk_socpeople_labour_inspector = $obj->fk_socpeople_labour_inspector;
-				$this->fk_soc_samu = $obj->fk_soc_samu;
-				$this->fk_soc_pompiers = $obj->fk_soc_pompiers;
-				$this->fk_soc_police = $obj->fk_soc_police;
-				$this->fk_soc_urgency = $obj->fk_soc_urgency;
-				$this->fk_soc_rights_defender = $obj->fk_soc_rights_defender;
-				$this->fk_soc_antipoison = $obj->fk_soc_antipoison;
-				$this->fk_soc_responsible_prevent = $obj->fk_soc_responsible_prevent;
-				$this->note_consigne_detaillee = $obj->note_consigne_detaillee;
-				$this->note_derogation_permanente = $obj->note_derogation_permanente;
-				$this->note_derogation_occas = $obj->note_derogation_occas;
-				$this->note_convention_collective = $obj->note_convention_collective;
-				$this->note_lieu_cc = $obj->note_lieu_cc;
-				$this->note_accord_participation = $obj->note_accord_participation;
-				$this->note_lieu_du = $obj->note_lieu_du;
-				$this->description = $obj->description;
+				$this->json = $obj->json;
 				$this->import_key = $obj->import_key;
 				$this->status = $obj->status;
 				$this->fk_user_creat = $obj->fk_user_creat;
@@ -348,6 +326,8 @@ class Legaldisplay extends CommonObject
 		global $conf, $langs;
 
 		$error = 0;
+
+		// FONCTION NON UTILISEE DANS LE FONCTIONNEMENT ACTUEL //
 
 		// Clean parameters
 
@@ -575,7 +555,7 @@ class Legaldisplay extends CommonObject
 
 
 	}
-	public function getNomUrl($withpicto = 0, $max = 0, $short = 0, $moretitle = '', $notooltip = 0, $save_lastsearch_value = -1)
+	function getNomUrl($withpicto = 0, $max = 0, $short = 0, $moretitle = '', $notooltip = 0, $save_lastsearch_value = -1)
     {
 		global $langs, $conf;
 
@@ -630,7 +610,7 @@ class Legaldisplay extends CommonObject
         return $result;
 	}
 
-	public function generateDocument($modele, $outputlangs, $hidedetails = 0, $hidedesc = 0, $hideref = 0, $moreparams = null)
+	function generateDocument($modele, $outputlangs, $hidedetails = 0, $hidedesc = 0, $hideref = 0, $moreparams = null)
     {
         global $conf, $langs;
         $langs->load("trips");
