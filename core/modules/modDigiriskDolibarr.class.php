@@ -125,19 +125,19 @@ class modDigiriskDolibarr extends DolibarrModules
 		// );
 		$this->const = array(
 			// CONST CONFIGURATION
-			1 => array('GENERAL_MEANS','chaine','','General means', 1),
-			2 => array('GENERAL_RULES','chaine','','General rules', 1),
+			1 => array('DIGIRISK_GENERAL_MEANS','chaine','','General means', 1),
+			2 => array('DIGIRISK_GENERAL_RULES','chaine','','General rules', 1),
 			// CONST LEGAL DISPLAY
-			3 => array('LOCATION_OF_DETAILED_INSTRUCTION','chaine','','Location of detailed instruction', 1),
-			4 => array('DEROGATION_SCHEDULE_PERMANENT','chaine','','Location of detailed instruction', 1),
-			5 => array('DEROGATION_SCHEDULE_OCCASIONAL','chaine','','Location of detailed instruction', 1),
-			6 => array('COLLECTIVE_AGREEMENT_TITLE','chaine','','Location of detailed instruction', 1),
-			7 => array('COLLECTIVE_AGREEMENT_LOCATION','chaine','','Location of detailed instruction', 1),
-			8 => array('DUER_LOCATION','chaine','','Location of detailed instruction', 1),
-			9 => array('RULES_LOCATION','chaine','','Location of detailed instruction', 1),
-			10 => array('PARTICIPATION_AGREEMENT_INFORMATION_PROCEDURE','chaine','','Location of detailed instruction', 1),
+			3 => array('DIGIRISK_LOCATION_OF_DETAILED_INSTRUCTION','chaine','','Location of detailed instruction', 1),
+			4 => array('DIGIRISK_DEROGATION_SCHEDULE_PERMANENT','chaine','','Location of detailed instruction', 1),
+			5 => array('DIGIRISK_DEROGATION_SCHEDULE_OCCASIONAL','chaine','','Location of detailed instruction', 1),
+			6 => array('DIGIRISK_COLLECTIVE_AGREEMENT_TITLE','chaine','','Location of detailed instruction', 1),
+			7 => array('DIGIRISK_COLLECTIVE_AGREEMENT_LOCATION','chaine','','Location of detailed instruction', 1),
+			8 => array('DIGIRISK_DUER_LOCATION','chaine','','Location of detailed instruction', 1),
+			9 => array('DIGIRISK_RULES_LOCATION','chaine','','Location of detailed instruction', 1),
+			10 => array('DIGIRISK_PARTICIPATION_AGREEMENT_INFORMATION_PROCEDURE','chaine','','Location of detailed instruction', 1),
 			// CONST INFORMATIONS SHARING
-			11 => array('PARTICIPATION_AGREEMENT_INFORMATION_PROCEDURE','chaine','','Location of detailed instruction', 1),
+			11 => array('DIGIRISK_PARTICIPATION_AGREEMENT_INFORMATION_PROCEDURE','chaine','','Location of detailed instruction', 1),
 		);
 
 		// Some keys to add into the overwriting translation tables
