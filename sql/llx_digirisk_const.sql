@@ -8,5 +8,4 @@ create table llx_digirisk_const
   visible                       tinyint(4),
   note                          text,
   tms                           timestamp
-
 )ENGINE=innodb;

@@ -1,1 +1,0 @@
-create table llx_informationsrelease
