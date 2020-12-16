@@ -75,17 +75,17 @@ if (($action == 'update' && !GETPOST("cancel", 'alpha'))
 	dolibarr_set_const($db, "DIGIRISK_CSE_ELECTION_DATE", $date_cse, 'date', 0, '', $conf->entity);
 	dolibarr_set_const($db, "DIGIRISK_DP_ELECTION_DATE", $date_dp, 'date', 0, '', $conf->entity);
 
-	$allLinks = digirisk_dolibarr_fetch_resources($db, 'all');
+	$allLinks = digirisk_dolibarr_fetch_resources($db, 'all', '');
 
-	$CSEtitulaires		= GETPOST('titulairesCSE', 'array') ? GETPOST('titulairesCSE', 'array') : $allLinks['titulairesCSE']->fk_user ;
-	$CSEsuppleants 		= GETPOST('suppleantsCSE', 'array') ? GETPOST('suppleantsCSE','array') : $allLinks['suppleantsCSE']->fk_user;
-	$DPtitulaires 		= GETPOST('DPtitulaires', 'array') ? GETPOST('DPtitulaires', 'array') : $allLinks['DPtitulaires']->fk_user ;
-	$DPsuppleants 		= GETPOST('DPsuppleants', 'array') ? GETPOST('DPsuppleants','array') : $allLinks['DPsuppleants']->fk_user;
+	$CSEtitulaires		= GETPOST('titulairesCSE', 'array') ? GETPOST('titulairesCSE', 'array') : $allLinks['titulairesCSE']->element ;
+	$CSEsuppleants 		= GETPOST('suppleantsCSE', 'array') ? GETPOST('suppleantsCSE','array') : $allLinks['suppleantsCSE']->element;
+	$DPtitulaires 		= GETPOST('DPtitulaires', 'array') ? GETPOST('DPtitulaires', 'array') : $allLinks['DPtitulaires']->element ;
+	$DPsuppleants 		= GETPOST('DPsuppleants', 'array') ? GETPOST('DPsuppleants','array') : $allLinks['DPsuppleants']->element;
 
-	digirisk_dolibarr_set_resources($db, 'titulairesCSE',  1,0,0, $CSEtitulaires,);
-	digirisk_dolibarr_set_resources($db, 'suppleantsCSE',  1, 0,0, $CSEsuppleants,);
-	digirisk_dolibarr_set_resources($db, 'DPtitulaires',  1, 0,0,$DPtitulaires,);
-	digirisk_dolibarr_set_resources($db, 'DPsuppleants',  1, 0,0,$DPsuppleants,);
+	digirisk_dolibarr_set_resources($db, 'titulairesCSE', 1, 'user', $CSEtitulaires);
+	digirisk_dolibarr_set_resources($db, 'suppleantsCSE', 1, 'user', $CSEsuppleants);
+	digirisk_dolibarr_set_resources($db, 'DPtitulaires', 1, 'user', $DPtitulaires);
+	digirisk_dolibarr_set_resources($db, 'DPsuppleants', 1, 'user', $DPsuppleants);
 
 	if ($action != 'updateedit' && !$error)
 	{
@@ -153,9 +153,15 @@ print '<td>'.$form->editfieldkey('Titulaires', 'titulairesCSE_id', '', $object, 
 print '<td colspan="3" class="maxwidthonsmartphone">';
 
 $userlist = $form->select_dolusers('', '', 0, null, 0, '', '', 0, 0, 0, 'AND u.statut = 1', 0, '', '', 0, 1);
-$users_links = digirisk_dolibarr_fetch_resources($db, 'titulairesCSE');
-$selected = (count(GETPOST('titulairesCSE', 'array')) > 0 ? GETPOST('titulairesCSE', 'array') : (GETPOST('titulairesCSE', 'int') > 0 ? array(GETPOST('titulairesCSE', 'int')) : $users_links->fk_user ));
-print $form->multiselectarray('titulairesCSE', $userlist, $selected, null, null, null, null, "90%");
+$users_links = digirisk_dolibarr_fetch_resources($db, 'titulairesCSE', 'user');
+$arrayselected = array();
+if (is_array($users_links)) {
+	foreach ($users_links as $users_link) {
+		$arrayselected[] = $users_link->element;
+	}
+}
+//$selected = (count(GETPOST('titulairesCSE', 'array')) > 0 ? GETPOST('titulairesCSE', 'array') : (GETPOST('titulairesCSE', 'int') > 0 ? array(GETPOST('titulairesCSE', 'int')) : $users_links->element ));
+print $form->multiselectarray('titulairesCSE', $userlist, $arrayselected, null, null, null, null, "90%");
 
 print '</td></tr>';
 
@@ -165,8 +171,8 @@ print '<td>'.$form->editfieldkey('Suppléants', 'suppleantsCSE_id', '', $object,
 print '<td colspan="3" class="maxwidthonsmartphone">';
 
 $userlist = $form->select_dolusers('', '', 0, null, 0, '', '', 0, 0, 0, 'AND u.statut = 1', 0, '', '', 0, 1);
-$users_links = digirisk_dolibarr_fetch_resources($db, 'suppleantsCSE');
-$selected = (count(GETPOST('suppleantsCSE', 'array')) > 0 ? GETPOST('suppleantsCSE', 'array') : (GETPOST('suppleantsCSE', 'int') > 0 ? array(GETPOST('suppleantsCSE', 'int')) : ($users_links->fk_user ? $users_links->fk_user : 0) ));
+$users_links = digirisk_dolibarr_fetch_resources($db, 'suppleantsCSE', 'user');
+$selected = (count(GETPOST('suppleantsCSE', 'array')) > 0 ? GETPOST('suppleantsCSE', 'array') : (GETPOST('suppleantsCSE', 'int') > 0 ? array(GETPOST('suppleantsCSE', 'int')) : ($users_links->element ? $users_links->element : 0) ));
 print $form->multiselectarray('suppleantsCSE', $userlist, $selected, null, null, null, null, "90%");
 
 print '</td></tr>';
@@ -185,8 +191,8 @@ print '<td>'.$form->editfieldkey('Titulaires', 'DPtitulaires_id', '', $object, 0
 print '<td colspan="3" class="maxwidthonsmartphone">';
 
 $userlist = $form->select_dolusers('', '', 0, null, 0, '', '', 0, 0, 0, 'AND u.statut = 1', 0, '', '', 0, 1);
-$users_links = digirisk_dolibarr_fetch_resources($db, 'DPtitulaires');
-$selected = (count(GETPOST('DPtitulaires', 'array')) > 0 ? GETPOST('DPtitulaires', 'array') : (GETPOST('DPtitulaires', 'int') > 0 ? array(GETPOST('DPtitulaires', 'int')) : $users_links->fk_user ));
+$users_links = digirisk_dolibarr_fetch_resources($db, 'DPtitulaires', 'user');
+$selected = (count(GETPOST('DPtitulaires', 'array')) > 0 ? GETPOST('DPtitulaires', 'array') : (GETPOST('DPtitulaires', 'int') > 0 ? array(GETPOST('DPtitulaires', 'int')) : $users_links->element ));
 print $form->multiselectarray('DPtitulaires', $userlist, $selected, null, null, null, null, "90%");
 
 print '</td></tr>';
@@ -197,8 +203,8 @@ print '<td>'.$form->editfieldkey('Suppléants', 'DPsuppleants', '', $object, 0).
 print '<td colspan="3" class="maxwidthonsmartphone">';
 
 $userlist = $form->select_dolusers('', '', 0, null, 0, '', '', 0, 0, 0, 'AND u.statut = 1', 0, '', '', 0, 1);
-$users_links = digirisk_dolibarr_fetch_resources($db, 'DPsuppleants');
-$selected = (count(GETPOST('DPsuppleants', 'array')) > 0 ? GETPOST('DPsuppleants', 'array') : (GETPOST('DPsuppleants', 'int') > 0 ? array(GETPOST('DPsuppleants', 'int')) : ($users_links->fk_user ? $users_links->fk_user : 0) ));
+$users_links = digirisk_dolibarr_fetch_resources($db, 'DPsuppleants', 'user');
+$selected = (count(GETPOST('DPsuppleants', 'array')) > 0 ? GETPOST('DPsuppleants', 'array') : (GETPOST('DPsuppleants', 'int') > 0 ? array(GETPOST('DPsuppleants', 'int')) : ($users_links->element ? $users_links->element : 0) ));
 print $form->multiselectarray('DPsuppleants', $userlist, $selected, null, null, null, null, "90%");
 
 print '</td></tr>';
@@ -207,14 +213,8 @@ print '</table>';
 
 print '<br><div class="center">';
 print '<input type="submit" class="button" name="save" value="'.$langs->trans("Save").'">';
-//print '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
-//print '<input type="submit" class="button" name="cancel" value="'.$langs->trans("Cancel").'">';
 print '</div>';
-//print '<br>';
-
 print '</form>';
 
-
 llxFooter();
-
 $db->close();

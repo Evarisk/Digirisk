@@ -221,6 +221,7 @@ function digirisk_dolibarr_fetch_resources($db, $name, $element_type = '')
 
 	if ($name == 'all') {
 		$sql = "SELECT * FROM ".MAIN_DB_PREFIX."digirisk_resources";
+		$sql .= " WHERE status = 1";
 	}
 	else
 	{
