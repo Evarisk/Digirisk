@@ -39,22 +39,6 @@ require_once DOL_DOCUMENT_ROOT.'/user/class/user.class.php';
 $action = GETPOST('action', 'aZ09');
 $contextpage = GETPOST('contextpage', 'aZ') ?GETPOST('contextpage', 'aZ') : 'adminsecurity'; // To manage different context of search
 
-$labourdoctor_id 				= GETPOST('labourdoctor_socid', 'int');
-$labourdoctor_contactid 		= GETPOST('labourdoctor_contactid', 'int');
-$labourdoctor_socpeopleassigned = GETPOST('labourdoctor_socpeopleassigned', 'array');
-
-$labourinspector_id					= GETPOST('labourinspector_socid', 'int');
-$labourinspector_contactid 			= GETPOST('labourinspector_contactid', 'int');
-$labourinspector_socpeopleassigned 	= GETPOST('labourinspector_socpeopleassigned', 'array');
-
-$samu_id		 	= GETPOST('samu_socid', 'int');
-$pompiers_id 		= GETPOST('pompiers_socid', 'int');
-$police_id 			= GETPOST('police_socid', 'int');
-$touteurgence_id 	= GETPOST('touteurgence_socid', 'int');
-$defenseur_id 		= GETPOST('defenseur_socid', 'int');
-$antipoison_id 		= GETPOST('antipoison_socid', 'int');
-$responsible_id 	= GETPOST('responsible_socid', 'int');
-
 $id = GETPOST('id', 'int');
 
 $origin = GETPOST('origin', 'alpha');
@@ -90,12 +74,14 @@ if ($reshook < 0) setEventMessages($hookmanager->error, $hookmanager->errors, 'e
 if (($action == 'update' && !GETPOST("cancel", 'alpha'))
 	|| ($action == 'updateedit'))
 {
+
+	//@todo pertinence getpos ou all_links
 	$allLinks = digirisk_dolibarr_fetch_resources($db, 'all');
 
-	$labourdoctor_id 					= GETPOST('labourdoctor_socid', 'int') ? GETPOST('labourdoctor_socid', 'int') : $allLinks['LabourDoctor']->fk_soc ;
+	$labourdoctor_id 					= GETPOST('labourdoctor_socid', 'int') ? GETPOST('labourdoctor_socid', 'int') : $allLinks['LabourDoctorSociete']->element ;
 	$labourdoctor_socpeopleassigned 	= !empty(GETPOST('labourdoctor_socpeopleassigned', 'array')) ? GETPOST('labourdoctor_socpeopleassigned', 'array') : (GETPOST('labourdoctor_contactid', 'int') ? GETPOST('labourdoctor_contactid', 'int') : 0);
 
-	$labourinspector_id					= GETPOST('labourinspector_socid', 'int') ? GETPOST('labourinspector_socid','int') : $allLinks['LabourInspector']->fk_soc;
+	$labourinspector_id					= GETPOST('labourinspector_socid', 'int') ? GETPOST('labourinspector_socid','int') : $allLinks['LabourInspectorSociete']->element;
 	$labourinspector_socpeopleassigned 	= !empty(GETPOST('labourinspector_contactid', 'int')) ? GETPOST('labourinspector_contactid','int') : (GETPOST('labourinspector_contactid', 'int') ? GETPOST('labourinspector_contactid', 'int') : 0);
 
 	digirisk_dolibarr_set_resources($db, 'LabourDoctorSociete',  1, 'societe', $labourdoctor_id);
@@ -103,21 +89,22 @@ if (($action == 'update' && !GETPOST("cancel", 'alpha'))
 	digirisk_dolibarr_set_resources($db, 'LabourInspectorSociete',  1, 'societe', $labourinspector_id);
 	digirisk_dolibarr_set_resources($db, 'LabourInspectorContact',  1, 'socpeople', $labourinspector_socpeopleassigned);
 
-	$samu_id		 	= GETPOST('samu_socid', 'int') ? GETPOST('samu_socid', 'int') : $allLinks['SAMU']->fk_soc ;
-	$pompiers_id 		= GETPOST('pompiers_socid', 'int') ? GETPOST('pompiers_socid','int') : $allLinks['Pompiers']->fk_soc;
-	$police_id 			= GETPOST('police_socid', 'int') ? GETPOST('police_socid', 'int') : $allLinks['Police']->fk_soc ;
-	$touteurgence_id 	= GETPOST('touteurgence_socid', 'int') ? GETPOST('touteurgence_socid','int') : $allLinks['AllEmergencies']->fk_soc;
-	$defenseur_id 		= GETPOST('defenseur_socid', 'int') ? GETPOST('defenseur_socid', 'int') : $allLinks['RightsDefender']->fk_soc ;
-	$antipoison_id 		= GETPOST('antipoison_socid', 'int') ? GETPOST('antipoison_socid','int') : $allLinks['Antipoison']->fk_soc;
-	$responsible_id 	= GETPOST('responsible_socid', 'int') ? GETPOST('responsible_socid','int') : $allLinks['Responsible']->fk_soc;
+	$samu_id		 	= GETPOST('samu_socid', 'int') ? GETPOST('samu_socid', 'int') : $allLinks['SAMU']->element ;
+	$pompiers_id 		= GETPOST('pompiers_socid', 'int') ? GETPOST('pompiers_socid','int') : $allLinks['Pompiers']->element;
+	$police_id 			= GETPOST('police_socid', 'int') ? GETPOST('police_socid', 'int') : $allLinks['Police']->element ;
+	$touteurgence_id 	= GETPOST('touteurgence_socid', 'int') ? GETPOST('touteurgence_socid','int') : $allLinks['AllEmergencies']->element;
+	$defenseur_id 		= GETPOST('defenseur_socid', 'int') ? GETPOST('defenseur_socid', 'int') : $allLinks['RightsDefender']->element ;
+	$antipoison_id 		= GETPOST('antipoison_socid', 'int') ? GETPOST('antipoison_socid','int') : $allLinks['Antipoison']->element;
+	$responsible_id 	= GETPOST('responsible_socid', 'int') ? GETPOST('responsible_socid','int') : $allLinks['Responsible']->element;
 
+//@todo fk_user creat
 	digirisk_dolibarr_set_resources($db, 'SAMU',  1, 'societe', $samu_id);
 	digirisk_dolibarr_set_resources($db, 'Pompiers',  1, 'societe', $pompiers_id);
 	digirisk_dolibarr_set_resources($db, 'Police',  1, 'societe', $police_id);
 	digirisk_dolibarr_set_resources($db, 'AllEmergencies',  1, 'societe',  $touteurgence_id);
 	digirisk_dolibarr_set_resources($db, 'RightsDefender',  1, 'societe',  $defenseur_id);
 	digirisk_dolibarr_set_resources($db, 'Antipoison',  1, 'societe', $antipoison_id);
-	digirisk_dolibarr_set_resources($db, 'Responsible',  1, 'societe', $responsible_id);
+	digirisk_dolibarr_set_resources($db, 'Responsible',  1, 'user', $responsible_id);
 
 	dolibarr_set_const($db, "DIGIRISK_LOCATION_OF_DETAILED_INSTRUCTION", GETPOST("emplacementCD", 'none'), 'chaine', 0, '', $conf->entity);
 	dolibarr_set_const($db, "DIGIRISK_SOCIETY_DESCRIPTION", GETPOST("description", 'none'), 'chaine', 0, '', $conf->entity);
@@ -267,14 +254,14 @@ if ($conf->societe->enabled)
 	print '<tr class="liste_titre"><th class="titlefield wordbreak">'.$langs->trans("SAMU").'</th><th>.<i class="fas fa-hospital-alt"></i></th></tr>'."\n";
 
 	print '<tr class="oddeven"><td class="titlefieldcreate nowrap">'.$langs->trans("ActionOnCompany").'</td><td>';
-	$samu_links = digirisk_dolibarr_fetch_resources($db, 'SAMU', 'societe');
+	$samu_resources = digirisk_dolibarr_fetch_resources($db, 'SAMU', 'societe');
 
 	// Tiers
-	if ($samu_links->ref == 'SAMU')
+	if ($samu_resources->ref == 'SAMU')
 	{
 		$societe = new Societe($db);
-		$societe->fetch($samu_links->element);
-		print $form->select_company($samu_links->element, 'samu_socid', '', 'SelectThirdParty', 1, 0, 0, 0, 'minwidth300');
+		$societe->fetch($samu_resources->element);
+		print $form->select_company($samu_resources->element, 'samu_socid', '', 'SelectThirdParty', 1, 0, 0, 0, 'minwidth300');
 
 	}
 	else
@@ -292,14 +279,14 @@ if ($conf->societe->enabled)
 	print '<tr class="liste_titre"><th class="titlefield wordbreak">'.$langs->trans("Pompiers").'</th><th>.<i class="fas fa-ambulance"></i></th></tr>'."\n";
 
 	print '<tr class="oddeven"><td class="titlefieldcreate nowrap">'.$langs->trans("ActionOnCompany").'</td><td>';
-	$pompiers_links = digirisk_dolibarr_fetch_resources($db, 'Pompiers', 'societe');
+	$pompiers_resources = digirisk_dolibarr_fetch_resources($db, 'Pompiers', 'societe');
 
 	// Tiers
-	if ($pompiers_links->ref == 'Pompiers')
+	if ($pompiers_resources->ref == 'Pompiers')
 	{
 		$societe = new Societe($db);
-		$societe->fetch($pompiers_links->element);
-		print $form->select_company($pompiers_links->element, 'pompiers_socid', '', 'SelectThirdParty', 1, 0, 0, 0, 'minwidth300');
+		$societe->fetch($pompiers_resources->element);
+		print $form->select_company($pompiers_resources->element, 'pompiers_socid', '', 'SelectThirdParty', 1, 0, 0, 0, 'minwidth300');
 
 	}
 	else
@@ -317,14 +304,14 @@ if ($conf->societe->enabled)
 	print '<tr class="liste_titre"><th class="titlefield wordbreak">'.$langs->trans("Police").'</th><th>.<i class="fas fa-car"></i></th></tr>'."\n";
 
 	print '<tr class="oddeven"><td class="titlefieldcreate nowrap">'.$langs->trans("ActionOnCompany").'</td><td>';
-	$police_links = digirisk_dolibarr_fetch_resources($db, 'Police', 'societe');
+	$police_resources = digirisk_dolibarr_fetch_resources($db, 'Police', 'societe');
 
 	// Tiers
-	if ($police_links->ref == 'Police')
+	if ($police_resources->ref == 'Police')
 	{
 		$societe = new Societe($db);
-		$societe->fetch($police_links->element);
-		print $form->select_company($police_links->element, 'police_socid', '', 'SelectThirdParty', 1, 0, 0, 0, 'minwidth300');
+		$societe->fetch($police_resources->element);
+		print $form->select_company($police_resources->element, 'police_socid', '', 'SelectThirdParty', 1, 0, 0, 0, 'minwidth300');
 
 	}
 	else
@@ -342,14 +329,14 @@ if ($conf->societe->enabled)
 	print '<tr class="liste_titre"><th class="titlefield wordbreak">'.$langs->trans("AllEmergencies").'</th><th>.<i class="fas fa-phone"></i></th></tr>'."\n";
 
 	print '<tr class="oddeven"><td class="titlefieldcreate nowrap">'.$langs->trans("ActionOnCompany").'</td><td>';
-	$touteurgence_links = digirisk_dolibarr_fetch_resources($db, 'AllEmergencies', 'societe');
+	$touteurgence_resources = digirisk_dolibarr_fetch_resources($db, 'AllEmergencies', 'societe');
 
 	// Tiers
-	if ($touteurgence_links->ref == 'AllEmergencies')
+	if ($touteurgence_resources->ref == 'AllEmergencies')
 	{
 		$societe = new Societe($db);
-		$societe->fetch($touteurgence_links->element);
-		print $form->select_company($touteurgence_links->element, 'touteurgence_socid', '', 'SelectThirdParty', 1, 0, 0, 0, 'minwidth300');
+		$societe->fetch($touteurgence_resources->element);
+		print $form->select_company($touteurgence_resources->element, 'touteurgence_socid', '', 'SelectThirdParty', 1, 0, 0, 0, 'minwidth300');
 
 	}
 	else
@@ -367,14 +354,14 @@ if ($conf->societe->enabled)
 	print '<tr class="liste_titre"><th class="titlefield wordbreak">'.$langs->trans("RightsDefender").'</th><th>.<i class="fas fa-gavel"></i></th></tr>'."\n";
 
 	print '<tr class="oddeven"><td class="titlefieldcreate nowrap">'.$langs->trans("ActionOnCompany").'</td><td>';
-	$defenseur_links = digirisk_dolibarr_fetch_resources($db, 'RightsDefender', 'societe');
+	$defenseur_resources = digirisk_dolibarr_fetch_resources($db, 'RightsDefender', 'societe');
 
 	// Tiers
-	if ($defenseur_links->ref == 'RightsDefender')
+	if ($defenseur_resources->ref == 'RightsDefender')
 	{
 		$societe = new Societe($db);
-		$societe->fetch($defenseur_links->element);
-		print $form->select_company($defenseur_links->element, 'defenseur_socid', '', 'SelectThirdParty', 1, 0, 0, 0, 'minwidth300');
+		$societe->fetch($defenseur_resources->element);
+		print $form->select_company($defenseur_resources->element, 'defenseur_socid', '', 'SelectThirdParty', 1, 0, 0, 0, 'minwidth300');
 
 	}
 	else
@@ -392,14 +379,14 @@ if ($conf->societe->enabled)
 	print '<tr class="liste_titre"><th class="titlefield wordbreak">'.$langs->trans("Antipoison").'</th><th>.<i class="fas fa-skull-crossbones"></i></th></tr>'."\n";
 
 	print '<tr class="oddeven"><td class="titlefieldcreate nowrap">'.$langs->trans("ActionOnCompany").'</td><td>';
-	$antipoison_links = digirisk_dolibarr_fetch_resources($db, 'Antipoison', 'societe');
+	$antipoison_resources = digirisk_dolibarr_fetch_resources($db, 'Antipoison', 'societe');
 
 	// Tiers
-	if ($antipoison_links->ref == 'Antipoison')
+	if ($antipoison_resources->ref == 'Antipoison')
 	{
 		$societe = new Societe($db);
-		$societe->fetch($antipoison_links->element);
-		print $form->select_company($antipoison_links->element, 'antipoison_socid', '', 'SelectThirdParty', 1, 0, 0, 0, 'minwidth300');
+		$societe->fetch($antipoison_resources->element);
+		print $form->select_company($antipoison_resources->element, 'antipoison_socid', '', 'SelectThirdParty', 1, 0, 0, 0, 'minwidth300');
 
 	}
 	else
@@ -420,28 +407,28 @@ print '<tr class="liste_titre"><th class="titlefield wordbreak">'.$langs->trans(
 // Responsable à prévenir
 
 print '<tr><td class="titlefieldcreate nowrap">'.$langs->trans("Responsable à prévenir").'</td><td>';
-$responsible_links = digirisk_dolibarr_fetch_resources($db, 'Responsible', 'societe');
+$responsible_resources = digirisk_dolibarr_fetch_resources($db, 'Responsible', 'user');
 
 // Tiers
-if ($responsible_links->ref == 'Responsible' && $responsible_links->element > 0)
+if ($responsible_resources->ref == 'Responsible' && $responsible_resources->element > 0)
 {
-	$societe = new Societe($db);
-	$societe->fetch($responsible_links->element);
+	$user = new User($db);
+	$user->fetch($responsible_resources->element);
 
-	print $form->select_company($responsible_links->element, 'responsible_socid', '', 'SelectThirdParty', 1, 0, 0, 0, 'minwidth300');
+	print $form->select_dolusers($responsible_resources->element, 'responsible_socid', 0, null, 0, 0, 0, 0, 'minwidth300');
 // Téléphone
 	print '<tr class="oddeven"><td><label for="name">'.$langs->trans("Téléphone").'</label></td><td>';
-	print $societe->phone;
+	print $user->office_phone;
 	print '</td></tr>';
 
 }
-else
+else //id = 0
 {
 	//For external user force the company to user company
 	if (!empty($user->socid)) {
-		print $form->select_company($user->socid, 'responsible_socid', '', 1, 1, 0, 0, 0, 'minwidth300');
+		print $form->select_dolusers($user->socid, 'responsible_socid', '', 1, 0, 0, 0, 0, 'minwidth300');
 	} else {
-		print $form->select_company('', 'responsible_socid', '', 'SelectThirdParty', 1, 0, 0 , 0, 'minwidth300');
+		print $form->select_dolusers('', 'responsible_socid', '', '', 0, 0, 0 , 0, 'minwidth300');
 	}
 }
 print '</td></tr>';
@@ -480,14 +467,8 @@ print '</table>';
 
 print '<br><div class="center">';
 print '<input type="submit" class="button" name="save" value="'.$langs->trans("Save").'">';
-//print '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
-//print '<input type="submit" class="button" name="cancel" value="'.$langs->trans("Cancel").'">';
 print '</div>';
-//print '<br>';
-
 print '</form>';
 
-
 llxFooter();
-
 $db->close();
