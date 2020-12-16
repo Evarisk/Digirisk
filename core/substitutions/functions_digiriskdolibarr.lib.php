@@ -47,5 +47,18 @@ function digiriskdolibarr_completesubstitutionarray(&$substitutionarray,$langs,$
 	$substitutionarray['modalite_information_ap']              = $legaldisplay->participation_agreement->information_procedures;
 	$substitutionarray['modalite_access']                      = $legaldisplay->DUER->how_access_to_duer;
 
-	//AJOUTER HORAIRES
+	$substitutionarray['lundi_matin']    = $legaldisplay->working_hour->monday_morning;
+	$substitutionarray['lundi_aprem']    = $legaldisplay->working_hour->monday_afternoon;
+	$substitutionarray['mardi_matin']    = $legaldisplay->working_hour->tuesday_morning;
+	$substitutionarray['mardi_aprem']    = $legaldisplay->working_hour->tuesday_afternoon;
+	$substitutionarray['mercredi_matin'] = $legaldisplay->working_hour->wednesday_morning;
+	$substitutionarray['mercredi_aprem'] = $legaldisplay->working_hour->wednesday_afternoon;
+	$substitutionarray['jeudi_matin']    = $legaldisplay->working_hour->thursday_morning;
+	$substitutionarray['jeudi_aprem']    = $legaldisplay->working_hour->thursday_afternoon;
+	$substitutionarray['vendredi_matin'] = $legaldisplay->working_hour->friday_morning;
+	$substitutionarray['vendredi_aprem'] = $legaldisplay->working_hour->friday_afternoon;
+	$substitutionarray['samedi_matin']   = $legaldisplay->working_hour->saturday_morning;
+	$substitutionarray['samedi_aprem']   = $legaldisplay->working_hour->saturday_afternoon;
+	$substitutionarray['dimanche_matin'] = $legaldisplay->working_hour->sunday_morning;
+	$substitutionarray['dimanche_aprem'] = $legaldisplay->working_hour->sunday_afternoon;
 }
