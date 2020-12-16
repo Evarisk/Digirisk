@@ -279,6 +279,15 @@ class doc_legaldisplay_odt extends ModelePDFLegalDisplay
 					$filename = $newfiletmp.'.'.$newfileformat;
 					$filename = dol_print_date($object->date_creation, '%Y%m%d') . '_' . $newfiletmp . '_A4' . '_V1.' . $newfileformat;
 				}
+				$object->last_main_doc = $filename;
+
+				$sql = "UPDATE ".MAIN_DB_PREFIX."digirisk_documents";
+				$sql .= " SET last_main_doc =" .(!empty($filename) ? "'".$this->db->escape($filename)."'" : 'null');
+				$sql .= " WHERE rowid = ".$object->id;
+
+				dol_syslog("admin.lib::Insert last main doc", LOG_DEBUG);
+				$this->db->query($sql);
+
 				$file = $dir.'/'.$filename;
 
 				//print "newdir=".$dir;

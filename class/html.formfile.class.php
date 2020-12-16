@@ -495,6 +495,9 @@ class FormFile
 			$genbutton = '<input class="button buttongen" id="'.$forname.'_generatebutton" name="'.$forname.'_generatebutton"';
 			$genbutton .= ' type="submit" value="'.$buttonlabel.'"';
 			if (!$allowgenifempty && !is_array($modellist) && empty($modellist)) $genbutton .= ' disabled';
+			if( !empty( $object->last_main_doc) ) {
+				$genbutton .= ' disabled';
+			}
 			$genbutton .= '>';
 			if ($allowgenifempty && !is_array($modellist) && empty($modellist) && empty($conf->digiriskdol_no_mouse_hover) && $modulepart != 'unpaid')
 			{
