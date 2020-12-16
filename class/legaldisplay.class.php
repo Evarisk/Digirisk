@@ -50,99 +50,121 @@ class Legaldisplay extends DigiriskDocuments
 
 		$now = dol_now();
 
-		$digirisk_all_links = digirisk_dolibarr_fetch_resources($this->db,"all");
+		$digirisk_resources = digirisk_dolibarr_fetch_resources($this->db,"all");
 
 		$labour_doctor_contact = new Contact($this->db);
-		$result = $labour_doctor_contact->fetch($digirisk_all_links['LabourDoctorContact']->element);
+		$result = $labour_doctor_contact->fetch($digirisk_resources['LabourDoctorContact']->element);
 
 		if ($result < 0) dol_print_error($langs->trans('NoLabourDoctorAssigned'), $labour_doctor_contact->error);
 		elseif ($result > 0) {
 			$this->json['LegalDisplay']['occupational_health_service']['name']    = $labour_doctor_contact->firstname . " " . $labour_doctor_contact->lastname;
-			$this->json['LegalDisplay']['occupational_health_service']['address'] = $labour_doctor_contact->address;
+			$this->json['LegalDisplay']['occupational_health_service']['address'] = preg_replace('/\s\s+/', ' ', $labour_doctor_contact->address);
 			$this->json['LegalDisplay']['occupational_health_service']['zip']     = $labour_doctor_contact->zip;
 			$this->json['LegalDisplay']['occupational_health_service']['town']    = $labour_doctor_contact->town;
 			$this->json['LegalDisplay']['occupational_health_service']['phone']   = $labour_doctor_contact->phone_pro;
 		}
 
-//		$labour_inspector = new Contact($this->db);
-//		$result = $labour_inspector->fetch($digirisk_all_links['LabourInspector']->fk_contact);
-//
-//		if ($result < 0) dol_print_error($langs->trans('NoLabourInspectorAssigned'), $labour_inspector->error);
-//		elseif ($result > 0) {
-//			$this->json['LegalDisplay']['detective_work']['name']    = $labour_inspector->firstname . " " . $labour_inspector->lastname;
-//			$this->json['LegalDisplay']['detective_work']['address'] = $labour_inspector->address;
-//			$this->json['LegalDisplay']['detective_work']['zip']     = $labour_inspector->zip;
-//			$this->json['LegalDisplay']['detective_work']['town']    = $labour_inspector->town;
-//			$this->json['LegalDisplay']['detective_work']['phone']   = $labour_inspector->phone_pro;
-//		}
-//
-//		$samu = new Societe($this->db);
-//		$result = $samu->fetch($digirisk_all_links['SAMU']->fk_soc);
-//
-//		if ($result < 0) dol_print_error($langs->trans('NoSamuAssigned'), $samu->error);
-//		elseif ($result > 0) {
-//			$this->json['LegalDisplay']['emergency_service']['samu'] = $samu->phone;
-//		}
-//
-//		$police = new Societe($this->db);
-//		$result = $police->fetch($digirisk_all_links['Police']->fk_soc);
-//
-//		if ($result < 0) dol_print_error($langs->trans('NoPoliceAssigned'), $police->error);
-//		elseif ($result > 0) {
-//			$this->json['LegalDisplay']['emergency_service']['police'] = $police->phone;
-//		}
-//
-//		$pompier = new Societe($this->db);
-//		$result = $pompier->fetch($digirisk_all_links['Pompiers']->fk_soc);
-//
-//		if ($result < 0) dol_print_error($langs->trans('NoPoliceAssigned'), $pompier->error);
-//		elseif ($result > 0) {
-//			$this->json['LegalDisplay']['emergency_service']['pompier'] = $pompier->phone;
-//		}
-//
-//		$emergency = new Societe($this->db);
-//		$result = $emergency->fetch($digirisk_all_links['AllEmergencies']->fk_soc);
-//
-//		if ($result < 0) dol_print_error($langs->trans('NoAllEmergenciesAssigned'), $emergency->error);
-//		elseif ($result > 0) {
-//			$this->json['LegalDisplay']['emergency_service']['emergency'] = $emergency->phone;
-//		}
-//
-//		$rights_defender = new Societe($this->db);
-//		$result = $rights_defender->fetch($digirisk_all_links['RightsDefender']->fk_soc);
-//
-//		if ($result < 0) dol_print_error($langs->trans('NoRightsDefenderAssigned'), $rights_defender->error);
-//		elseif ($result > 0) {
-//			$this->json['LegalDisplay']['emergency_service']['right_defender'] = $rights_defender->phone;
-//		}
-//
-//		$antipoison = new Societe($this->db);
-//		$result = $antipoison->fetch($digirisk_all_links['Antipoison']->fk_soc);
-//
-//		if ($result < 0) dol_print_error($langs->trans('NoRightsDefenderAssigned'), $antipoison->error);
-//		elseif ($result > 0) {
-//			$this->json['LegalDisplay']['emergency_service']['poison_control_center'] = $antipoison->phone;
-//		}
-//
-//		$responsible_prevent = new Societe($this->db);
-//		$result = $responsible_prevent->fetch($digirisk_all_links['Responsible']->fk_soc);
-//
-//		if ($result < 0) dol_print_error($langs->trans('NoResponsibleAssigned'), $responsible_prevent->error);
-//		elseif ($result > 0) {
-//			$this->json['LegalDisplay']['safety_rule']['responsible_for_preventing'] = $responsible_prevent->name;
-//			$this->json['LegalDisplay']['safety_rule']['phone']                      = $responsible_prevent->phone;
-//		}
-//
-//		//@todo WORKING HOURS a RAJOUTER
-//
-//		$this->json['LegalDisplay']['safety_rule']['location_of_detailed_instruction']                      = $conf->global->DIGIRISK_LOCATION_OF_DETAILED_INSTRUCTION;
-//		$this->json['LegalDisplay']['derogation_schedule']['permanent']                                     = $conf->global->DIGIRISK_DEROGATION_SCHEDULE_PERMANENT;
-//		$this->json['LegalDisplay']['derogation_schedule']['occasional']                                    = $conf->global->DIGIRISK_DEROGATION_SCHEDULE_OCCASIONAL;
-//		$this->json['LegalDisplay']['collective_agreement']['title_of_the_applicable_collective_agreement'] = $conf->global->DIGIRISK_COLLECTIVE_AGREEMENT_TITLE;
-//		$this->json['LegalDisplay']['collective_agreement']['location_and_access_terms_of_the_agreement']   = $conf->global->DIGIRISK_COLLECTIVE_AGREEMENT_LOCATION;
-//		$this->json['LegalDisplay']['DUER']['how_access_to_duer']                                           = $conf->global->DIGIRISK_DUER_LOCATION;
-//		$this->json['LegalDisplay']['rules']['location']                                                    = $conf->global->DIGIRISK_RULES_LOCATION;
-//		$this->json['LegalDisplay']['participation_agreement']['information_procedures']                    = $conf->global->DIGIRISK_PARTICIPATION_AGREEMENT_INFORMATION_PROCEDURE;
+		$labour_inspector_contact = new Contact($this->db);
+		$result = $labour_inspector_contact->fetch($digirisk_resources['LabourInspectorContact']->element);
+
+		if ($result < 0) dol_print_error($langs->trans('NoLabourInspectorAssigned'), $labour_inspector_contact->error);
+		elseif ($result > 0) {
+			$this->json['LegalDisplay']['detective_work']['name']    = $labour_inspector_contact->firstname . " " . $labour_inspector_contact->lastname;
+			$this->json['LegalDisplay']['detective_work']['address'] = preg_replace('/\s\s+/', ' ', $labour_inspector_contact->address);
+			$this->json['LegalDisplay']['detective_work']['zip']     = $labour_inspector_contact->zip;
+			$this->json['LegalDisplay']['detective_work']['town']    = $labour_inspector_contact->town;
+			$this->json['LegalDisplay']['detective_work']['phone']   = $labour_inspector_contact->phone_pro;
+		}
+
+		$samu = new Societe($this->db);
+		$result = $samu->fetch($digirisk_resources['SAMU']->element);
+
+		if ($result < 0) dol_print_error($langs->trans('NoSamuAssigned'), $samu->error);
+		elseif ($result > 0) {
+			$this->json['LegalDisplay']['emergency_service']['samu'] = $samu->phone;
+		}
+
+		$police = new Societe($this->db);
+		$result = $police->fetch($digirisk_resources['Police']->element);
+
+		if ($result < 0) dol_print_error($langs->trans('NoPoliceAssigned'), $police->error);
+		elseif ($result > 0) {
+			$this->json['LegalDisplay']['emergency_service']['police'] = $police->phone;
+		}
+
+		$pompier = new Societe($this->db);
+		$result = $pompier->fetch($digirisk_resources['Pompiers']->element);
+
+		if ($result < 0) dol_print_error($langs->trans('NoPoliceAssigned'), $pompier->error);
+		elseif ($result > 0) {
+			$this->json['LegalDisplay']['emergency_service']['pompier'] = $pompier->phone;
+		}
+
+		$emergency = new Societe($this->db);
+		$result = $emergency->fetch($digirisk_resources['AllEmergencies']->element);
+
+		if ($result < 0) dol_print_error($langs->trans('NoAllEmergenciesAssigned'), $emergency->error);
+		elseif ($result > 0) {
+			$this->json['LegalDisplay']['emergency_service']['emergency'] = $emergency->phone;
+		}
+
+		$rights_defender = new Societe($this->db);
+		$result = $rights_defender->fetch($digirisk_resources['RightsDefender']->element);
+
+		if ($result < 0) dol_print_error($langs->trans('NoRightsDefenderAssigned'), $rights_defender->error);
+		elseif ($result > 0) {
+			$this->json['LegalDisplay']['emergency_service']['right_defender'] = $rights_defender->phone;
+		}
+
+		$antipoison = new Societe($this->db);
+		$result = $antipoison->fetch($digirisk_resources['Antipoison']->element);
+
+		if ($result < 0) dol_print_error($langs->trans('NoRightsDefenderAssigned'), $antipoison->error);
+		elseif ($result > 0) {
+			$this->json['LegalDisplay']['emergency_service']['poison_control_center'] = $antipoison->phone;
+		}
+
+		$responsible_prevent = new User($this->db);
+		$result = $responsible_prevent->fetch($digirisk_resources['Responsible']->element);
+
+		if ($result < 0) dol_print_error($langs->trans('NoResponsibleAssigned'), $responsible_prevent->error);
+		elseif ($result > 0) {
+			$this->json['LegalDisplay']['safety_rule']['responsible_for_preventing'] = $responsible_prevent->firstname . " " . $responsible_prevent->lastname;
+			$this->json['LegalDisplay']['safety_rule']['phone']                      = $responsible_prevent->office_phone;
+		}
+
+		$opening_hours_monday    = explode(' ', $conf->global->MAIN_INFO_OPENINGHOURS_MONDAY);
+		$opening_hours_tuesday   = explode(' ', $conf->global->MAIN_INFO_OPENINGHOURS_TUESDAY);
+		$opening_hours_wednesday = explode(' ', $conf->global->MAIN_INFO_OPENINGHOURS_WEDNESDAY);
+		$opening_hours_thursday  = explode(' ', $conf->global->MAIN_INFO_OPENINGHOURS_THURSDAY);
+		$opening_hours_friday    = explode(' ', $conf->global->MAIN_INFO_OPENINGHOURS_FRIDAY);
+		$opening_hours_saturday  = explode(' ', $conf->global->MAIN_INFO_OPENINGHOURS_SATURDAY);
+		$opening_hours_sunday    = explode(' ', $conf->global->MAIN_INFO_OPENINGHOURS_SUNDAY);
+
+		$this->json['LegalDisplay']['working_hour']['monday_morning']    = $opening_hours_monday[0];
+		$this->json['LegalDisplay']['working_hour']['tuesday_morning']   = $opening_hours_tuesday[0];
+		$this->json['LegalDisplay']['working_hour']['wednesday_morning'] = $opening_hours_wednesday[0];
+		$this->json['LegalDisplay']['working_hour']['thursday_morning']  = $opening_hours_thursday[0];
+		$this->json['LegalDisplay']['working_hour']['friday_morning']    = $opening_hours_friday[0];
+		$this->json['LegalDisplay']['working_hour']['saturday_morning']  = $opening_hours_saturday[0];
+		$this->json['LegalDisplay']['working_hour']['sunday_morning']    = $opening_hours_sunday[0];
+
+		$this->json['LegalDisplay']['working_hour']['monday_afternoon']    = $opening_hours_monday[1];
+		$this->json['LegalDisplay']['working_hour']['tuesday_afternoon']   = $opening_hours_tuesday[1];
+		$this->json['LegalDisplay']['working_hour']['wednesday_afternoon'] = $opening_hours_wednesday[1];
+		$this->json['LegalDisplay']['working_hour']['thursday_afternoon']  = $opening_hours_thursday[1];
+		$this->json['LegalDisplay']['working_hour']['friday_afternoon']    = $opening_hours_friday[1];
+		$this->json['LegalDisplay']['working_hour']['saturday_afternoon']  = $opening_hours_saturday[1];
+		$this->json['LegalDisplay']['working_hour']['sunday_afternoon']    = $opening_hours_sunday[1];
+
+		$this->json['LegalDisplay']['safety_rule']['location_of_detailed_instruction']                      = $conf->global->DIGIRISK_LOCATION_OF_DETAILED_INSTRUCTION;
+		$this->json['LegalDisplay']['derogation_schedule']['permanent']                                     = $conf->global->DIGIRISK_DEROGATION_SCHEDULE_PERMANENT;
+		$this->json['LegalDisplay']['derogation_schedule']['occasional']                                    = $conf->global->DIGIRISK_DEROGATION_SCHEDULE_OCCASIONAL;
+		$this->json['LegalDisplay']['collective_agreement']['title_of_the_applicable_collective_agreement'] = $conf->global->DIGIRISK_COLLECTIVE_AGREEMENT_TITLE;
+		$this->json['LegalDisplay']['collective_agreement']['location_and_access_terms_of_the_agreement']   = $conf->global->DIGIRISK_COLLECTIVE_AGREEMENT_LOCATION;
+		$this->json['LegalDisplay']['DUER']['how_access_to_duer']                                           = $conf->global->DIGIRISK_DUER_LOCATION;
+		$this->json['LegalDisplay']['rules']['location']                                                    = $conf->global->DIGIRISK_RULES_LOCATION;
+		$this->json['LegalDisplay']['participation_agreement']['information_procedures']                    = $conf->global->DIGIRISK_PARTICIPATION_AGREEMENT_INFORMATION_PROCEDURE;
 
 		// Create legal display.
 		$fuserid = $this->fk_user_creat;

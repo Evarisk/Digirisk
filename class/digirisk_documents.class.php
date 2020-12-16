@@ -95,9 +95,8 @@ class DigiriskDocuments extends CommonObject
 	 *  @param	int		$id    Id object
 	 *  @return int          	<0 if KO, >0 if OK
 	 */
-	function fetch($id)
+	public function fetch($id)
 	{
-		global $langs;
 		$sql = "SELECT ";
 		$sql .= "t.ref";
 		$sql .= ", t.ref_ext";
@@ -110,37 +109,95 @@ class DigiriskDocuments extends CommonObject
 		$sql .= ", t.model_pdf";
 		$sql .= ", t.model_odt";
 		$sql .= ", t.type";
-
+		$sql .= ", t.last_main_doc";
 		$sql.= " FROM ".MAIN_DB_PREFIX."digirisk_documents"." as t";
-		$sql.= " WHERE t.rowid  = ".$id . " AND t.entity IN (".getEntity('digiriskdolibarr').")";
 		//NOTE DEV : SELECT PRIMORDIAL POUR GERER LE MULTICOMPANY
+		$sql.= " WHERE t.entity IN (".getEntity('digiriskdolibarr').")";
+		$sql.= " AND t.rowid = ".$id;
 
 		dol_syslog(get_class($this)."::fetch sql=".$sql, LOG_DEBUG);
-		$resql=$this->db->query($sql);
+		$resql = $this->db->query($sql);
+
 		if ($resql)
 		{
 			if ($this->db->num_rows($resql))
 			{
 				$obj = $this->db->fetch_object($resql);
 
-				$this->id = $id;
-				$this->ref = $obj->ref;
-				$this->ref_ext = $obj->ref_ext;
-				$this->entity = $obj->entity;
+				$this->id            = $id;
+				$this->ref           = $obj->ref;
+				$this->ref_ext       = $obj->ref_ext;
+				$this->entity        = $obj->entity;
 				$this->date_creation = $this->db->jdate($obj->date_creation);
-				$this->json = $obj->json;
-				$this->import_key = $obj->import_key;
-				$this->status = $obj->status;
+				$this->json          = $obj->json;
+				$this->import_key    = $obj->import_key;
+				$this->status        = $obj->status;
 				$this->fk_user_creat = $obj->fk_user_creat;
 				$this->fk_user_modif = $obj->fk_user_modif;
-				$this->model_pdf = $obj->model_pdf;
-				$this->model_odt = $obj->model_odt;
-				$this->type = $obj->type;
+				$this->model_pdf     = $obj->model_pdf;
+				$this->model_odt     = $obj->model_odt;
+				$this->type          = $obj->type;
+				$this->last_main_doc = $obj->last_main_doc;
 
 			}
+
 			$this->db->free($resql);
 
 			return 1;
+		}
+		else
+		{
+			$this->error="Error ".$this->db->lasterror();
+			dol_syslog(get_class($this)."::fetch ".$this->error, LOG_ERR);
+			return -1;
+		}
+	}
+
+	/**
+	 *  Load object in memory from the database
+	 *
+	 *  @param	sting		$type    object type
+	 *  @return int          	<0 if KO, >0 if OK
+	 */
+	public function fetch_all($type = '')
+	{
+		$sql = "SELECT ";
+		$sql .= "t.rowid";
+		$sql .= ", t.ref";
+		$sql .= ", t.ref_ext";
+		$sql .= ", t.entity";
+		$sql .= ", t.date_creation";
+		$sql .= ", t.json";
+		$sql .= ", t.import_key";
+		$sql .= ", t.status";
+		$sql .= ", t.fk_user_creat";
+		$sql .= ", t.model_pdf";
+		$sql .= ", t.model_odt";
+		$sql .= ", t.type";
+		$sql .= ", t.last_main_doc";
+		$sql.= " FROM ".MAIN_DB_PREFIX."digirisk_documents"." as t";
+		//NOTE DEV : SELECT PRIMORDIAL POUR GERER LE MULTICOMPANY
+		$sql.= " WHERE t.entity IN (".getEntity('digiriskdolibarr').")";
+		if (!empty($type)) {
+			$sql.= " AND t.type = "."'".$type."'";
+		}
+
+		dol_syslog(get_class($this)."::fetch sql=".$sql, LOG_DEBUG);
+		$resql = $this->db->query($sql);
+
+		if ($resql)
+		{
+			if ($this->db->num_rows($resql))
+			{
+				for ($i = 0; $i < $resql->num_rows; $i++) {
+					$obj = $this->db->fetch_object($resql);
+					$key = $obj->ref;
+					$objects[$key] = $obj;
+				}
+			}
+
+			$this->db->commit();
+			return $objects;
 		}
 		else
 		{
@@ -161,7 +218,7 @@ class DigiriskDocuments extends CommonObject
 	 * @param	array   $moreparams   add parameters
 	 * @return  int          	      <0 if KO, >0 if OK
 	 */
-	function generateDocument($modele, $outputlangs, $hidedetails = 0, $hidedesc = 0, $hideref = 0, $moreparams = null)
+    public function generateDocument($modele, $outputlangs, $hidedetails = 0, $hidedesc = 0, $hideref = 0, $moreparams = null)
     {
         global $conf;
 
@@ -178,6 +235,44 @@ class DigiriskDocuments extends CommonObject
 
         return $this->commonGenerateDocument($modelpath, $modele, $outputlangs, $hidedetails, $hidedesc, $hideref, $moreparams);
     }
+
+	public function getNomUrl($withpicto = 0, $max = 0, $short = 0, $moretitle = '', $notooltip = 0, $save_lastsearch_value = -1)
+	{
+		global $langs, $conf;
+		$result = '';
+		$url = DOL_URL_ROOT.'/custom/digiriskdolibarr/view/legaldisplay_card.php?id='.$this->id;
+		if ($short) return $url;
+		$label = '<u>'.$langs->trans("ShowLegalDisplay").'</u>';
+		if (!empty($this->ref))
+			$label .= '<br><b>'.$langs->trans('Ref').':</b> '.$this->ref;
+		if ($moretitle) $label .= ' - '.$moretitle;
+		// Add param to save lastsearch_values or not
+		$add_save_lastsearch_values = ($save_lastsearch_value == 1 ? 1 : 0);
+		if ($save_lastsearch_value == -1 && preg_match('/list\.php/', $_SERVER["PHP_SELF"])) $add_save_lastsearch_values = 1;
+		if ($add_save_lastsearch_values) $url .= '&save_lastsearch_values=1';
+		$ref = $this->ref;
+		if (empty($ref)) $ref = $this->id;
+		$linkclose = '';
+		if (empty($notooltip))
+		{
+			if (!empty($conf->global->MAIN_OPTIMIZEFORTEXTBROWSER))
+			{
+				$label = $langs->trans("ShowLegalDisplay");
+				$linkclose .= ' alt="'.dol_escape_htmltag($label, 1).'"';
+			}
+			$linkclose .= ' title="'.dol_escape_htmltag($label, 1).'"';
+			$linkclose .= ' class="classfortooltip"';
+		}
+		$linkstart = '<a href="'.$url.'"';
+		$linkstart .= $linkclose.'>';
+		$linkend = '</a>';
+		$result .= $linkstart;
+		if ($withpicto) $result .= img_object(($notooltip ? '' : $label), $this->picto, ($notooltip ? (($withpicto != 2) ? 'class="paddingright"' : '') : 'class="'.(($withpicto != 2) ? 'paddingright ' : '').'classfortooltip"'), 0, 0, $notooltip ? 0 : 1);
+		if ($withpicto != 2) $result .= ($max ?dol_trunc($ref, $max) : $ref);
+		$result .= $linkend;
+
+		return $result;
+	}
 }
 
 ?>

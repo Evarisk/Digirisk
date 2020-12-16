@@ -80,7 +80,7 @@ if (empty($action) && empty($id) && empty($ref)) $action='create';
 $object = new Legaldisplay($db);
 if (($id > 0 || ! empty($ref)) && $action != 'add')
 {
-	$result=$object->fetch($id,$ref);
+	$result=$object->fetch($id);
 	if ($result < 0) dol_print_error($db);
 }
 
@@ -462,9 +462,8 @@ if (empty($reshook))
 				$urlsource = $_SERVER["PHP_SELF"]."?id=".$id;
 				$genallowed = 1;
 				$delallowed = 1;
-				//	echo '<pre>'; var_dump([$objref, $filedir, $urlsource, $genallowed, $delallowed, $object->model_pdf, 1, 0, 0, 28, 0, '', '', '', $soc->default_lang, '', $object]); echo '</pre>'; exit;
 
-				print $formfile->showdocuments('digiriskdolibarr:legaldisplay', $filename, $filedir, $urlsource, $genallowed, $delallowed);
+				print $formfile->showdocuments('digiriskdolibarr:legaldisplay', $filename, $filedir, $urlsource, $genallowed, $delallowed, '', 1, 0, 0, 0, 0, '', '', '', '', '', $object);
 				$usercancreate = 1;
 			}
 		}
