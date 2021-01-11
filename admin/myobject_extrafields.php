@@ -61,14 +61,14 @@ require DOL_DOCUMENT_ROOT.'/core/actions_extrafields.inc.php';
  */
 
 
-llxHeader('', $langs->trans("DigiriskDolibarrSetup"), $help_url);
+llxHeader('', $langs->trans("DigiriskdolibarrSetup"), $help_url);
 
 
 $linkback = '<a href="'.DOL_URL_ROOT.'/admin/modules.php?restore_lastsearch_values=1">'.$langs->trans("BackToModuleList").'</a>';
-print load_fiche_titre($langs->trans("DigiriskDolibarrSetup"), $linkback, 'title_setup');
+print load_fiche_titre($langs->trans("DigiriskdolibarrSetup"), $linkback, 'title_setup');
 
 
-$head = digiriskdolibarrAdminPrepareHead(null);
+$head = digiriskdolibarrAdminPrepareHead();
 
 dol_fiche_head($head, 'myobject_extrafields', $langs->trans("MyObjectExtraFields"), -1, 'account');
 

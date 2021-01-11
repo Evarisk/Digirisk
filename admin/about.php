@@ -1,6 +1,6 @@
 <?php
 /* Copyright (C) 2004-2017 Laurent Destailleur  <eldy@users.sourceforge.net>
- * Copyright (C) 2020 SuperAdmin
+ * Copyright (C) 2021 SuperAdmin
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,7 +19,7 @@
 /**
  * \file    digiriskdolibarr/admin/about.php
  * \ingroup digiriskdolibarr
- * \brief   About page of module DigiriskDolibarr.
+ * \brief   About page of module Digiriskdolibarr.
  */
 
 // Load Dolibarr environment
@@ -65,7 +65,7 @@ $backtopage = GETPOST('backtopage', 'alpha');
 
 $form = new Form($db);
 
-$page_name = "DigiriskDolibarrAbout";
+$page_name = "DigiriskdolibarrAbout";
 llxHeader('', $langs->trans($page_name));
 
 // Subheader
@@ -77,8 +77,8 @@ print load_fiche_titre($langs->trans($page_name), $linkback, 'object_digiriskdol
 $head = digiriskdolibarrAdminPrepareHead();
 dol_fiche_head($head, 'about', '', 0, 'digiriskdolibarr@digiriskdolibarr');
 
-dol_include_once('/digiriskdolibarr/core/modules/modDigiriskDolibarr.class.php');
-$tmpmodule = new modDigiriskDolibarr($db);
+dol_include_once('/digiriskdolibarr/core/modules/modDigiriskdolibarr.class.php');
+$tmpmodule = new modDigiriskdolibarr($db);
 print $tmpmodule->getDescLong();
 
 // Page end

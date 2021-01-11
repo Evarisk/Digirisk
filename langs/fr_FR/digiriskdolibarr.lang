@@ -1,4 +1,4 @@
-# Copyright (C) 2020 SuperAdmin
+# Copyright (C) 2021 SuperAdmin
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -17,31 +17,24 @@
 # Générique
 #
 
-# Module label 'ModuleDigiriskDolibarrName'
-ModuleDigiriskDolibarrName = DigiriskDolibarr
-# Module description 'ModuleDigiriskDolibarrDesc'
-ModuleDigiriskDolibarrDesc = Description de DigiriskDolibarr
+# Module label 'ModuleDigiriskdolibarrName'
+ModuleDigiriskdolibarrName = Digiriskdolibarr
+# Module description 'ModuleDigiriskdolibarrDesc'
+ModuleDigiriskdolibarrDesc = Description de Digiriskdolibarr
 
 #
 # Page d'administration
 #
-DigiriskDolibarrSetup = Configuration du module DigiriskDolibarr
+DigiriskdolibarrSetup = Configuration du module Digiriskdolibarr
 Settings = Réglages
-DigiriskDolibarrSetupPage = Page de configuration du module DigiriskDolibarr
+DigiriskdolibarrSetupPage = Page de configuration du module Digiriskdolibarr
 
 #
 # Page À propos
 #
 About = À propos
-DigiriskDolibarrAbout = À propos de DigiriskDolibarr
-DigiriskDolibarrAboutPage = Page à propos de DigiriskDolibarr
-
-#
-# Page Accronyme
-#
-Accronym = Accronyme
-AccronymLegalDisplay = Identifiant de l'affichage légal
-AccronymInformationsSharing =  Identifiant des diffusion d'informations
+DigiriskdolibarrAbout = À propos de Digiriskdolibarr
+DigiriskdolibarrAboutPage = Page à propos de Digiriskdolibarr
 
 #
 # Page d'exemple
@@ -51,14 +44,5 @@ MyPageName = Nom de ma page
 #
 # Box d'exemple
 #
-LabourDoctor = Médecin du travail
-LabourInspector = Inspecteur du travail
-TouteUrgence = Toute Urgence 
-RightsDefender = Défenseur des droits 
-Antipoison = Centre Antipoison 
-ResponsiblePrevent = Responsable à prévenir
-
-LegalDisplay = Affichage Légal
-LegalDisplayList = Liste des affichages légaux
-
-DigiriskDocumentsNumberingModule = Modèle de numérotation des documents de Digirisk
+MyWidget = Mon widget
+MyWidgetDescription = Description de mon widget

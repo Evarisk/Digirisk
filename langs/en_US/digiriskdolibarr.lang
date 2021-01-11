@@ -1,4 +1,4 @@
-# Copyright (C) 2020 SuperAdmin
+# Copyright (C) 2021 SuperAdmin
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -17,17 +17,17 @@
 # Generic
 #
 
-# Module label 'ModuleDigiriskDolibarrName'
-ModuleDigiriskDolibarrName = DigiriskDolibarr
-# Module description 'ModuleDigiriskDolibarrDesc'
-ModuleDigiriskDolibarrDesc = DigiriskDolibarr description
+# Module label 'ModuleDigiriskdolibarrName'
+ModuleDigiriskdolibarrName = Digiriskdolibarr
+# Module description 'ModuleDigiriskdolibarrDesc'
+ModuleDigiriskdolibarrDesc = Digiriskdolibarr description
 
 #
 # Admin page
 #
-DigiriskDolibarrSetup = DigiriskDolibarr setup
+DigiriskdolibarrSetup = Digiriskdolibarr setup
 Settings = Settings
-DigiriskDolibarrSetupPage = DigiriskDolibarr setup page
+DigiriskdolibarrSetupPage = Digiriskdolibarr setup page
 DIGIRISKDOLIBARR_MYPARAM1 = My param 1
 DIGIRISKDOLIBARR_MYPARAM1Tooltip = My param 1 tooltip
 DIGIRISKDOLIBARR_MYPARAM2=My param 2
@@ -38,16 +38,8 @@ DIGIRISKDOLIBARR_MYPARAM2Tooltip=My param 2 tooltip
 # About page
 #
 About = About
-DigiriskDolibarrAbout = About DigiriskDolibarr
-DigiriskDolibarrAboutPage = DigiriskDolibarr about page
-
-#
-# Accronym page
-#
-Accronym = Accronym
-AccronymLegalDisplay = Legal display accronym
-AccronymInformationsSharing = Sharing informations accronym
-
+DigiriskdolibarrAbout = About Digiriskdolibarr
+DigiriskdolibarrAboutPage = Digiriskdolibarr about page
 
 #
 # Sample page

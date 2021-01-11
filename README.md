@@ -5,7 +5,7 @@
 Description...
 
 <!--
-![Screenshot digiriskdolibarr](img/screenshot_digiriskdolibarr.png?raw=true "DigiriskDolibarr"){imgmd}
+![Screenshot digiriskdolibarr](img/screenshot_digiriskdolibarr.png?raw=true "Digiriskdolibarr"){imgmd}
 -->
 
 Other modules are available on [Dolistore.com](https://www.dolistore.com).
