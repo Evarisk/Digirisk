@@ -24,6 +24,7 @@ CREATE TABLE llx_digiriskdolibarr_digiriskresources(
 	element_type varchar(50), 
 	element_id integer, 
 	status integer, 
-	ref varchar(128) NOT NULL
+	ref varchar(128) NOT NULL, 
+	entity integer DEFAULT 1
 	-- END MODULEBUILDER FIELDS
 ) ENGINE=innodb;

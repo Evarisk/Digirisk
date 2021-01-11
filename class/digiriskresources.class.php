@@ -103,6 +103,7 @@ class DigiriskResources extends CommonObject
 		'element_id' => array('type'=>'integer', 'label'=>'ElementID', 'enabled'=>'1', 'position'=>503, 'notnull'=>0, 'visible'=>-1,),
 		'status' => array('type'=>'integer', 'label'=>'Status', 'enabled'=>'1', 'position'=>501, 'notnull'=>0, 'visible'=>-1,),
 		'ref' => array('type'=>'varchar(128)', 'label'=>'Ref', 'enabled'=>'1', 'position'=>10, 'notnull'=>1, 'visible'=>1, 'comment'=>"ref for the object"),
+		'entity' => array('type'=>'integer', 'label'=>'Entity', 'enabled'=>'1', 'position'=>50, 'notnull'=>0, 'visible'=>-1,),
 	);
 	public $rowid;
 	public $tms;
@@ -113,6 +114,7 @@ class DigiriskResources extends CommonObject
 	public $element_id;
 	public $status;
 	public $ref;
+	public $entity;
 	// END MODULEBUILDER PROPERTIES
 
 
@@ -206,8 +208,71 @@ class DigiriskResources extends CommonObject
 	 */
 	public function create(User $user, $notrigger = false)
 	{
-
 		return $this->createCommon($user, $notrigger);
+	}
+
+	/**
+	 * Clone an object into another one
+	 *
+	 * @param  	varchar 	$ref      	name of resource
+	 * @param  	varchar 	$element_type     type of resource
+	 * @param  	int 	$element_id     Id of resource
+	 */
+	function digirisk_dolibarr_set_resources($db, $user, $ref, $element_type, $element_id, $entity = 1)
+	{
+		global $conf;
+		$now = dol_now();
+		// Clean parameters
+		$ref = trim($ref);
+
+		// Check parameters
+		if (empty($ref))
+		{
+			dol_print_error($db, "Error: Call to function dolibarr_set_const with wrong parameters", LOG_ERR);
+			exit;
+		}
+
+		//dol_syslog("dolibarr_set_const name=$name, value=$value type=$type, visible=$visible, note=$note entity=$entity");
+
+		$db->begin();
+
+		$sql = "DELETE FROM ".MAIN_DB_PREFIX."digiriskdolibarr_digiriskresources";
+		$sql .= " WHERE ref = ".$db->encrypt($ref, 1);
+		if ($entity >= 0) $sql .= " AND entity = ".$entity;
+		//RAJOUTER LIGNE POUR LE SELECT ENTITY
+
+		dol_syslog("admin.lib::digirisk_dolibarr_set_resources", LOG_DEBUG);
+		$resql = $db->query($sql);
+
+		if (strcmp($element_type, ''))	// true if different. Must work for $value='0' or $value=0
+		{
+			$sql = "INSERT INTO ".MAIN_DB_PREFIX."digiriskdolibarr_digiriskresources(ref,fk_user_creat,date_creation, element_type,element_id,entity)";
+			$sql .= " VALUES (";
+			$sql .= $db->encrypt($ref, 1);
+			$sql .= ", ".$db->encrypt($user, 1);
+			$sql .= ", '".date("Y-m-d",$now);
+			$sql .= "', ".$db->encrypt($element_type, 1);
+			$sql .= ", ".$db->encrypt($element_id, 1);
+			$sql .= ", ".$entity.")";
+
+			//print "sql".$value."-".pg_escape_string($value)."-".$sql;exit;
+			//print "xx".$db->escape($value);
+			dol_syslog("admin.lib::dolibarr_set_resources", LOG_DEBUG);
+			$resql = $db->query($sql);
+		}
+
+		if ($resql)
+		{
+			$db->commit();
+			$conf->global->$ref = $value;
+			return 1;
+		}
+		else
+		{
+			$error = $db->lasterror();
+			$db->rollback();
+			return -1;
+		}
 	}
 
 	/**
