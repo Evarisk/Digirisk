@@ -218,7 +218,7 @@ class DigiriskResources extends CommonObject
 	 * @param  	varchar 	$element_type     type of resource
 	 * @param  	int 	$element_id     Id of resource
 	 */
-	function digirisk_dolibarr_set_resources($db, $user, $ref, $element_type, $element_id, $entity = 1)
+	function digirisk_dolibarr_set_resources($db, $user_creat, $ref, $element_type, $element_id, $entity = 1)
 	{
 		global $conf;
 		$now = dol_now();
@@ -231,12 +231,13 @@ class DigiriskResources extends CommonObject
 			dol_print_error($db, "Error: Call to function dolibarr_set_const with wrong parameters", LOG_ERR);
 			exit;
 		}
-
 		//dol_syslog("dolibarr_set_const name=$name, value=$value type=$type, visible=$visible, note=$note entity=$entity");
 
 		$db->begin();
 
-		$sql = "DELETE FROM ".MAIN_DB_PREFIX."digiriskdolibarr_digiriskresources";
+		// Change le statut des ressources précédentes à 0
+		$sql = "UPDATE ".MAIN_DB_PREFIX."digiriskdolibarr_digiriskresources";
+		$sql .= " SET status = 0";
 		$sql .= " WHERE ref = ".$db->encrypt($ref, 1);
 		if ($entity >= 0) $sql .= " AND entity = ".$entity;
 		//RAJOUTER LIGNE POUR LE SELECT ENTITY
@@ -244,36 +245,42 @@ class DigiriskResources extends CommonObject
 		dol_syslog("admin.lib::digirisk_dolibarr_set_resources", LOG_DEBUG);
 		$resql = $db->query($sql);
 
-		if (strcmp($element_type, ''))	// true if different. Must work for $value='0' or $value=0
-		{
-			$sql = "INSERT INTO ".MAIN_DB_PREFIX."digiriskdolibarr_digiriskresources(ref,fk_user_creat,date_creation, element_type,element_id,entity)";
-			$sql .= " VALUES (";
-			$sql .= $db->encrypt($ref, 1);
-			$sql .= ", ".$db->encrypt($user, 1);
-			$sql .= ", '".date("Y-m-d",$now);
-			$sql .= "', ".$db->encrypt($element_type, 1);
-			$sql .= ", ".$db->encrypt($element_id, 1);
-			$sql .= ", ".$entity.")";
+			if (strcmp($element_type, '') && !empty($element_id))	// true if different. Must work for $value='0' or $value=0
+			{
+				$sql = "INSERT INTO ".MAIN_DB_PREFIX."digiriskdolibarr_digiriskresources(ref,fk_user_creat,date_creation, element_type,element_id,status,entity)";
+				$sql .= " VALUES ";
+				foreach ($element_id as $id) {
+					$sql .= "(" . $db->encrypt($ref, 1);
+					$sql .= ", " . $db->encrypt($user_creat, 1);
+					$sql .= ", '" . date("Y-m-d", $now);
+					$sql .= "', " . $db->encrypt($element_type, 1);
+					$sql .= ", " . $id;
+					$sql .= ", 1";
+					$sql .= ", " . $entity . "),";
+				}
+				$sql = substr($sql, 0,-1);
+				//print "sql".$value."-".pg_escape_string($value)."-".$sql;exit;
+				//print "xx".$db->escape($value);
+				dol_syslog("admin.lib::dolibarr_set_resources", LOG_DEBUG);
+				$resql = $db->query($sql);
+			}
 
-			//print "sql".$value."-".pg_escape_string($value)."-".$sql;exit;
-			//print "xx".$db->escape($value);
-			dol_syslog("admin.lib::dolibarr_set_resources", LOG_DEBUG);
-			$resql = $db->query($sql);
+			if ($resql)
+			{
+				$db->commit();
+				$conf->global->ref = $ref;
+				return 1;
+			}
+			else
+			{
+				$error = $db->lasterror();
+				$db->rollback();
+				return -1;
+			}
+			exit;
+
 		}
 
-		if ($resql)
-		{
-			$db->commit();
-			$conf->global->$ref = $value;
-			return 1;
-		}
-		else
-		{
-			$error = $db->lasterror();
-			$db->rollback();
-			return -1;
-		}
-	}
 
 	/**
 	 * Clone an object into another one
@@ -417,8 +424,9 @@ class DigiriskResources extends CommonObject
 		$sql = 'SELECT ';
 		$sql .= $this->getFieldList();
 		$sql .= ' FROM '.MAIN_DB_PREFIX.$this->table_element.' as t';
-		if (isset($this->ismultientitymanaged) && $this->ismultientitymanaged == 1) $sql .= ' WHERE t.entity IN ('.getEntity($this->table_element).')';
-		else $sql .= ' WHERE 1 = 1';
+		$sql .= ' WHERE status = 1';
+		if (isset($this->ismultientitymanaged) && $this->ismultientitymanaged == 1) $sql .= ' AND t.entity IN ('.getEntity($this->table_element).')';
+		else $sql .= ' AND 1 = 1';
 		// Manage filter
 		$sqlwhere = array();
 		if (count($filter) > 0) {

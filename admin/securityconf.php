@@ -75,49 +75,54 @@ if (($action == 'update' && !GETPOST("cancel", 'alpha'))
 {
 
 	//@todo pertinence getpos ou all_links
+
 	$resources = new DigiriskResources($db);
 	$links = $resources->fetchAll();
+	$allLinks = array();
+
 	foreach ($links as $link) {
-		$allLinks[$link->ref]->id = $link->element_id;
-		$allLinks[$link->ref]->type = $link->element_type;
+		if ($allLinks[$link->ref]->ref == $link->ref)
+		{
+			$i = 1;
+			$allLinks[$link->ref]->id[$i] = $link->element_id;
+			$i++;
+		}
+		else
+		{
+			$allLinks[$link->ref] 		= new stdclass;
+			$allLinks[$link->ref]->id[] = $link->element_id;
+			$allLinks[$link->ref]->type = $link->element_type;
+			$allLinks[$link->ref]->ref 	= $link->ref;
+		}
 	}
 
-	// a priori vu le fonctionnement ce serait pas mal de conserver le fonctionnement avec des fonctions d'insert (semblable à la fonction des const)
-	// pour digidoli set resources : update statuts précécents à 0
-	// pour digidoli set const : même fonctionnement que dolibarr set const
-	// pour fetch : fetch all + fetch spécifique
+	$labourdoctor_id[0] 					= GETPOST('labourdoctor_socid', 'int') > 0 ? GETPOST('labourdoctor_socid', 'int') : 0 ;
+	$labourinspector_id[0]					= GETPOST('labourinspector_socid', 'int') > 0 ? GETPOST('labourinspector_socid','int') : 0;
 
-	$labourdoctor_id 					= GETPOST('labourdoctor_socid', 'int') > 0 ? GETPOST('labourdoctor_socid', 'int') : $allLinks['LabourDoctorSociete']->id ;
-	$labourdoctor_socpeopleassigned 	= !empty(GETPOST('labourdoctor_contactid', 'array')) ? GETPOST('labourdoctor_contactid', 'array') : (GETPOST('labourdoctor_contactid', 'int') > 0 ? GETPOST('labourdoctor_contactid', 'int') : $allLinks['LabourDoctorContact']->id);
+	$labourdoctor_socpeopleassigned 	= !empty(GETPOST('labourdoctor_contactid', 'array')) ? GETPOST('labourdoctor_contactid', 'array') : (GETPOST('labourdoctor_contactid', 'int') > 0 ? GETPOST('labourdoctor_contactid', 'int') : 0);
+	$labourinspector_socpeopleassigned 	= !empty(GETPOST('labourinspector_contactid', 'array')) ? GETPOST('labourinspector_contactid','array') : (GETPOST('labourinspector_contactid', 'int') > 0 ? GETPOST('labourinspector_contactid', 'int') : 0);
 
-	$labourinspector_id					= GETPOST('labourinspector_socid', 'int') > 0 ? GETPOST('labourinspector_socid','int') : $allLinks['LabourInspectorSociete']->id;
-	$labourinspector_socpeopleassigned 	= !empty(GETPOST('labourinspector_contactid', 'array')) ? GETPOST('labourinspector_contactid','array') : (GETPOST('labourinspector_contactid', 'int') > 0 ? GETPOST('labourinspector_contactid', 'int') : $allLinks['LabourInspectorContact']->id);
+	$resources->digirisk_dolibarr_set_resources($db,$user->id,  'LabourDoctorSociete',  'societe', $labourdoctor_id, 1);
+	$resources->digirisk_dolibarr_set_resources($db,$user->id,  'LabourInspectorSociete',  'societe', $labourinspector_id, 1);
 
-	$resources = new DigiriskResources($db);
-	$resources->digirisk_dolibarr_set_resources($db,1,  'LabourDoctorSociete',  'societe', $labourdoctor_id, 1);
-	$resources->digirisk_dolibarr_set_resources($db,1,  'LabourDoctorContact',  'socpeople', $labourdoctor_socpeopleassigned, 1);
-	$resources->digirisk_dolibarr_set_resources($db,1,  'LabourInspectorSociete',  'societe', $labourinspector_id, 1);
-	$resources->digirisk_dolibarr_set_resources($db,1,  'LabourInspectorContact',  'socpeople', $labourinspector_socpeopleassigned, 1);
+	$resources->digirisk_dolibarr_set_resources($db,$user->id,  'LabourDoctorContact',  'socpeople', $labourdoctor_socpeopleassigned, 1);
+	$resources->digirisk_dolibarr_set_resources($db,$user->id,  'LabourInspectorContact',  'socpeople', $labourinspector_socpeopleassigned, 1);
 
-//	$resources->digirisk_dolibarr_set_resources($db, 'LabourInspectorSociete',  1, 'societe', $labourinspector_id);
-//	$resources->digirisk_dolibarr_set_resources($db, 'LabourInspectorContact',  1, 'socpeople', $labourinspector_socpeopleassigned);
+	$samu_id[0]		 		= GETPOST('samu_socid', 'int') ? GETPOST('samu_socid', 'int') : $allLinks['SAMU']->id[0];
+	$pompiers_id[0] 		= GETPOST('pompiers_socid', 'int') ? GETPOST('pompiers_socid','int') : $allLinks['Pompiers']->id[0];
+	$police_id[0] 			= GETPOST('police_socid', 'int') ? GETPOST('police_socid', 'int') : $allLinks['Police']->id[0] ;
+	$touteurgence_id[0] 	= GETPOST('touteurgence_socid', 'int') ? GETPOST('touteurgence_socid','int') : $allLinks['AllEmergencies']->id[0];
+	$defenseur_id[0] 		= GETPOST('defenseur_socid', 'int') ? GETPOST('defenseur_socid', 'int') : $allLinks['RightsDefender']->id[0] ;
+	$antipoison_id[0] 		= GETPOST('antipoison_socid', 'int') ? GETPOST('antipoison_socid','int') : $allLinks['Antipoison']->id[0];
+	$responsible_id[0]		= GETPOST('responsible_socid', 'int') ? GETPOST('responsible_socid','int') : $allLinks['Responsible']->id[0];
 
-	$samu_id		 	= GETPOST('samu_socid', 'int') ? GETPOST('samu_socid', 'int') : $allLinks['SAMU']->element ;
-	$pompiers_id 		= GETPOST('pompiers_socid', 'int') ? GETPOST('pompiers_socid','int') : $allLinks['Pompiers']->element;
-	$police_id 			= GETPOST('police_socid', 'int') ? GETPOST('police_socid', 'int') : $allLinks['Police']->element ;
-	$touteurgence_id 	= GETPOST('touteurgence_socid', 'int') ? GETPOST('touteurgence_socid','int') : $allLinks['AllEmergencies']->element;
-	$defenseur_id 		= GETPOST('defenseur_socid', 'int') ? GETPOST('defenseur_socid', 'int') : $allLinks['RightsDefender']->element ;
-	$antipoison_id 		= GETPOST('antipoison_socid', 'int') ? GETPOST('antipoison_socid','int') : $allLinks['Antipoison']->element;
-	$responsible_id 	= GETPOST('responsible_socid', 'int') ? GETPOST('responsible_socid','int') : $allLinks['Responsible']->element;
-
-//@todo fk_user creat
-//	$resources->digirisk_dolibarr_set_resources($db, 'SAMU',  1, 'societe', $samu_id);
-//	$resources->digirisk_dolibarr_set_resources($db, 'Pompiers',  1, 'societe', $pompiers_id);
-//	$resources->digirisk_dolibarr_set_resources($db, 'Police',  1, 'societe', $police_id);
-//	$resources->digirisk_dolibarr_set_resources($db, 'AllEmergencies',  1, 'societe',  $touteurgence_id);
-//	$resources->digirisk_dolibarr_set_resources($db, 'RightsDefender',  1, 'societe',  $defenseur_id);
-//	$resources->digirisk_dolibarr_set_resources($db, 'Antipoison',  1, 'societe', $antipoison_id);
-//	$resources->digirisk_dolibarr_set_resources($db, 'Responsible',  1, 'user', $responsible_id);
+	$resources->digirisk_dolibarr_set_resources($db,$user->id,  'SAMU',  'societe', $samu_id, 1);
+	$resources->digirisk_dolibarr_set_resources($db,$user->id,  'Pompiers',  'societe', $pompiers_id, 1);
+	$resources->digirisk_dolibarr_set_resources($db,$user->id,  'Police',  'societe', $police_id, 1);
+	$resources->digirisk_dolibarr_set_resources($db,$user->id,  'AllEmergencies',  'societe', $touteurgence_id, 1);
+	$resources->digirisk_dolibarr_set_resources($db,$user->id,  'RightsDefender',  'societe', $defenseur_id, 1);
+	$resources->digirisk_dolibarr_set_resources($db,$user->id,  'Antipoison',  'societe', $antipoison_id, 1);
+	$resources->digirisk_dolibarr_set_resources($db,$user->id,  'Responsible',  'societe', $responsible_id, 1);
 
 	dolibarr_set_const($db, "DIGIRISK_LOCATION_OF_DETAILED_INSTRUCTION", GETPOST("emplacementCD", 'none'), 'chaine', 0, '', $conf->entity);
 	dolibarr_set_const($db, "DIGIRISK_SOCIETY_DESCRIPTION", GETPOST("description", 'none'), 'chaine', 0, '', $conf->entity);
@@ -144,8 +149,25 @@ print load_fiche_titre($langs->trans("CompanyFoundation"), '', 'title_setup');
 $head = company_admin_prepare_head();
 
 dol_fiche_head($head, 'security', $langs->trans("Company"), -1, 'company');
-$testo = new DigiriskResources($db);
+$resources = new DigiriskResources($db);
+$links = $resources->fetchAll();
+$allLinks = array();
 
+foreach ($links as $link) {
+	if ($allLinks[$link->ref]->ref == $link->ref)
+	{
+		$i = 1;
+		$allLinks[$link->ref]->id[$i] = $link->element_id;
+		$i++;
+	}
+	else
+	{
+		$allLinks[$link->ref] 		= new stdClass;
+		$allLinks[$link->ref]->id[] = $link->element_id;
+		$allLinks[$link->ref]->type = $link->element_type;
+		$allLinks[$link->ref]->ref 	= $link->ref;
+	}
+}
 
 $form = new Form($db);
 $formother = new FormOther($db);
@@ -178,7 +200,7 @@ if ($conf->societe->enabled)
 	print '<tr class="liste_titre"><th class="titlefield wordbreak">'.$langs->trans("LabourDoctor").'</th><th>.<i class="fas fa-briefcase-medical"></i></th></tr>'."\n";
 
 	print '<tr class="oddeven"><td class="titlefieldcreate nowrap">'.$langs->trans("ActionOnCompany").'</td><td>';
-	//$labour_doctor_societe = digirisk_dolibarr_fetch_resources($db, 'LabourDoctorSociete', 'societe');
+	$labour_doctor_societe = $allLinks['LabourDoctorSociete'];
 
 	// Tiers
 	if ($labour_doctor_societe->ref == 'LabourDoctorSociete')
@@ -187,8 +209,8 @@ if ($conf->societe->enabled)
 		$events[] = array('method' => 'getContacts', 'url' => dol_buildpath('/core/ajax/contacts.php?showempty=1', 1), 'htmlname' => 'labourdoctor_contactid', 'params' => array('add-customer-contact' => 'disabled'));
 
 		$societe = new Societe($db);
-		$societe->fetch($labour_doctor_societe->element);
-		print $form->select_company($labour_doctor_societe->element, 'labourdoctor_socid', '', 'SelectThirdParty', 1, 0, $events, 0, 'minwidth300');
+		$societe->fetch($labour_doctor_societe->id);
+		print $form->select_company($labour_doctor_societe->id, 'labourdoctor_socid', '', 'SelectThirdParty', 1, 0, $events, 0, 'minwidth300');
 
 	}
 	else
@@ -206,24 +228,24 @@ if ($conf->societe->enabled)
 
 	// Related contact
 	print '<tr class="oddeven"><td class="nowrap">'.$langs->trans("ActionOnContact").'</td><td>';
-	//$labour_doctor_contact = digirisk_dolibarr_fetch_resources($db, 'LabourDoctorContact', 'socpeople');
-	$labour_doctorpreselectedids = $labour_doctor_contact->element;
+	$labour_doctor_contact = $allLinks['LabourDoctorContact'];
+	$labourdoctorpreselectedids = $labour_doctor_contact->id;
 
-	if ($labour_doctor_contact->element) {
-		print $form->selectcontacts($labour_doctor_societe->element, $labour_doctor_contact->element, 'labourdoctor_contactid', 1, '', '', 0, 'quatrevingtpercent', false, 0, array(), false, 'multiple', 'labourdoctor_contactid');
+	if ($labour_doctor_contact->id) {
+		print $form->selectcontacts($labour_doctor_societe->id[0], $labour_doctor_contact->id, 'labourdoctor_contactid[]', 1, '', '', 0, 'quatrevingtpercent', false, 0, array(), false, 'multiple', 'labourdoctor_contactid');
 	}
 	else
 	{
-		$labourdoctorpreselectedids = GETPOST('labourdoctor_contactid', 'int');
-		if (GETPOST('labourdoctor_contactid', 'int')) $labourdoctorpreselectedids[GETPOST('labourdoctor_contactid', 'int')] = GETPOST('labourdoctor_contactid', 'int');
-		print $form->selectcontacts(GETPOST('labourdoctor_socid', 'int'), $labourdoctorpreselectedids, 'labourdoctor_contactid', 1, '', '', 0, 'quatrevingtpercent', false, 0, array(), false, 'multiple', 'labourdoctor_contactid');
+		$labourdoctorpreselectedids = GETPOST('labourdoctor_contactid', 'array');
+		if (GETPOST('labourdoctor_contactid', 'array')) $labourdoctorpreselectedids[GETPOST('labourdoctor_contactid', 'array')] = GETPOST('labourdoctor_contactid', 'array');
+		print $form->selectcontacts(GETPOST('labourdoctor_socid', 'int'), $labourdoctorpreselectedids, 'labourdoctor_contactid[]', 1, '', '', 0, 'quatrevingtpercent', false, 0, array(), false, 'multiple', 'labourdoctor_contactid');
 	}
 	print '</td></tr>';
 
 	// INSPECTEUR DU TRAVAIL
 	print '<tr class="liste_titre"><th class="titlefield wordbreak">'.$langs->trans("LabourInspector").'</th><th>.<i class="fas fa-search"></i></th></tr>'."\n";
 	print '<tr class="oddeven"><td class="titlefieldcreate nowrap">'.$langs->trans("ActionOnCompany").'</td><td>';
-	//$labour_inspector_societe = digirisk_dolibarr_fetch_resources($db, 'LabourInspectorSociete', 'societe');
+	$labour_inspector_societe = $allLinks['LabourInspectorSociete'];
 
 	// Tiers
 	if ($labour_inspector_societe->ref == 'LabourInspectorSociete')
@@ -232,8 +254,8 @@ if ($conf->societe->enabled)
 		$events[] = array('method' => 'getContacts', 'url' => dol_buildpath('/core/ajax/contacts.php?showempty=1', 1), 'htmlname' => 'labourinspector_contactid', 'params' => array('add-customer-contact' => 'disabled'));
 
 		$societe = new Societe($db);
-		$societe->fetch($labour_inspector_societe->element);
-		print $form->select_company($labour_inspector_societe->element, 'labourinspector_socid', '', 'SelectThirdParty', 1, 0, $events, 0, 'minwidth300');
+		$societe->fetch($labour_inspector_societe->id[0]);
+		print $form->select_company($labour_inspector_societe->id[0], 'labourinspector_socid', '', 'SelectThirdParty', 1, 0, $events, 0, 'minwidth300');
 
 	}
 	else
@@ -251,16 +273,16 @@ if ($conf->societe->enabled)
 
 	// Related contacts
 	print '<tr class="oddeven"><td class="nowrap">'.$langs->trans("ActionOnContact").'</td><td>';
-	//$labour_inspector_contact = digirisk_dolibarr_fetch_resources($db, 'LabourInspectorContact', 'socpeople');
-	$preselectedids = $labour_inspector_contact->element;
-	if ($labour_inspector_contact->element) {
-		print $form->selectcontacts($labour_inspector_societe->element, $labour_inspector_contact->element , 'labourinspector_contactid', 1, '', '', 0, 'quatrevingtpercent', false, 0, array(), false, 'multiple', 'labourinspector_contactid');
+	$labour_inspector_contact =  $allLinks['LabourInspectorContact'];
+	$preselectedids = $labour_inspector_contact->id;
+	if ($labour_inspector_contact->id) {
+		print $form->selectcontacts($labour_inspector_societe->id[0], $labour_inspector_contact->id , 'labourinspector_contactid[]', 1, '', '', 0, 'quatrevingtpercent', false, 0, array(), false, 'multiple', 'labourinspector_contactid');
 	}
 	else
 	{
-		$preselectedids = GETPOST('labourinspector_contactid', 'int');
-		if (GETPOST('labourinspector_contactid', 'int')) $preselectedids[GETPOST('labourinspector_contactid', 'int')] = GETPOST('labourinspector_contactid', 'int');
-		print $form->selectcontacts(GETPOST('labourinspector_socid', 'int'), $preselectedids, 'labourinspector_contactid', 1, '', '', 0, 'quatrevingtpercent', false, 0, array(), false, 'multiple', 'labourinspector_contactid');
+		$preselectedids = GETPOST('labourinspector_contactid', 'array');
+		if (GETPOST('labourinspector_contactid', 'array')) $preselectedids[GETPOST('labourinspector_contactid', 'array')] = GETPOST('labourinspector_contactid', 'array');
+		print $form->selectcontacts(GETPOST('labourinspector_socid', 'int'), $preselectedids, 'labourinspector_contactid[]', 1, '', '', 0, 'quatrevingtpercent', false, 0, array(), false, 'multiple', 'labourinspector_contactid');
 	}
 	print '</td></tr>';
 
@@ -268,14 +290,14 @@ if ($conf->societe->enabled)
 	print '<tr class="liste_titre"><th class="titlefield wordbreak">'.$langs->trans("SAMU").'</th><th>.<i class="fas fa-hospital-alt"></i></th></tr>'."\n";
 
 	print '<tr class="oddeven"><td class="titlefieldcreate nowrap">'.$langs->trans("ActionOnCompany").'</td><td>';
-	//$samu_resources = digirisk_dolibarr_fetch_resources($db, 'SAMU', 'societe');
+	$samu_resources =  $allLinks['SAMU'];
 
 	// Tiers
 	if ($samu_resources->ref == 'SAMU')
 	{
 		$societe = new Societe($db);
-		$societe->fetch($samu_resources->element);
-		print $form->select_company($samu_resources->element, 'samu_socid', '', 'SelectThirdParty', 1, 0, 0, 0, 'minwidth300');
+		$societe->fetch($samu_resources->id[0]);
+		print $form->select_company($samu_resources->id[0], 'samu_socid', '', 'SelectThirdParty', 1, 0, 0, 0, 'minwidth300');
 
 	}
 	else
@@ -293,14 +315,14 @@ if ($conf->societe->enabled)
 	print '<tr class="liste_titre"><th class="titlefield wordbreak">'.$langs->trans("Pompiers").'</th><th>.<i class="fas fa-ambulance"></i></th></tr>'."\n";
 
 	print '<tr class="oddeven"><td class="titlefieldcreate nowrap">'.$langs->trans("ActionOnCompany").'</td><td>';
-	//$pompiers_resources = digirisk_dolibarr_fetch_resources($db, 'Pompiers', 'societe');
+	$pompiers_resources = $allLinks['Pompiers'];
 
 	// Tiers
 	if ($pompiers_resources->ref == 'Pompiers')
 	{
 		$societe = new Societe($db);
-		$societe->fetch($pompiers_resources->element);
-		print $form->select_company($pompiers_resources->element, 'pompiers_socid', '', 'SelectThirdParty', 1, 0, 0, 0, 'minwidth300');
+		$societe->fetch($pompiers_resources->id[0]);
+		print $form->select_company($pompiers_resources->id[0], 'pompiers_socid', '', 'SelectThirdParty', 1, 0, 0, 0, 'minwidth300');
 
 	}
 	else
@@ -318,14 +340,14 @@ if ($conf->societe->enabled)
 	print '<tr class="liste_titre"><th class="titlefield wordbreak">'.$langs->trans("Police").'</th><th>.<i class="fas fa-car"></i></th></tr>'."\n";
 
 	print '<tr class="oddeven"><td class="titlefieldcreate nowrap">'.$langs->trans("ActionOnCompany").'</td><td>';
-	//$police_resources = digirisk_dolibarr_fetch_resources($db, 'Police', 'societe');
+	$police_resources = $allLinks['Police'];
 
 	// Tiers
 	if ($police_resources->ref == 'Police')
 	{
 		$societe = new Societe($db);
-		$societe->fetch($police_resources->element);
-		print $form->select_company($police_resources->element, 'police_socid', '', 'SelectThirdParty', 1, 0, 0, 0, 'minwidth300');
+		$societe->fetch($police_resources->id[0]);
+		print $form->select_company($police_resources->id[0], 'police_socid', '', 'SelectThirdParty', 1, 0, 0, 0, 'minwidth300');
 
 	}
 	else
@@ -343,14 +365,14 @@ if ($conf->societe->enabled)
 	print '<tr class="liste_titre"><th class="titlefield wordbreak">'.$langs->trans("AllEmergencies").'</th><th>.<i class="fas fa-phone"></i></th></tr>'."\n";
 
 	print '<tr class="oddeven"><td class="titlefieldcreate nowrap">'.$langs->trans("ActionOnCompany").'</td><td>';
-	//$touteurgence_resources = digirisk_dolibarr_fetch_resources($db, 'AllEmergencies', 'societe');
+	$touteurgence_resources = $allLinks['AllEmergencies'];
 
 	// Tiers
 	if ($touteurgence_resources->ref == 'AllEmergencies')
 	{
 		$societe = new Societe($db);
-		$societe->fetch($touteurgence_resources->element);
-		print $form->select_company($touteurgence_resources->element, 'touteurgence_socid', '', 'SelectThirdParty', 1, 0, 0, 0, 'minwidth300');
+		$societe->fetch($touteurgence_resources->id[0]);
+		print $form->select_company($touteurgence_resources->id[0], 'touteurgence_socid', '', 'SelectThirdParty', 1, 0, 0, 0, 'minwidth300');
 
 	}
 	else
@@ -368,14 +390,14 @@ if ($conf->societe->enabled)
 	print '<tr class="liste_titre"><th class="titlefield wordbreak">'.$langs->trans("RightsDefender").'</th><th>.<i class="fas fa-gavel"></i></th></tr>'."\n";
 
 	print '<tr class="oddeven"><td class="titlefieldcreate nowrap">'.$langs->trans("ActionOnCompany").'</td><td>';
-	//$defenseur_resources = digirisk_dolibarr_fetch_resources($db, 'RightsDefender', 'societe');
+	$defenseur_resources = $allLinks['RightsDefender'];
 
 	// Tiers
 	if ($defenseur_resources->ref == 'RightsDefender')
 	{
 		$societe = new Societe($db);
-		$societe->fetch($defenseur_resources->element);
-		print $form->select_company($defenseur_resources->element, 'defenseur_socid', '', 'SelectThirdParty', 1, 0, 0, 0, 'minwidth300');
+		$societe->fetch($defenseur_resources->id[0]);
+		print $form->select_company($defenseur_resources->id[0], 'defenseur_socid', '', 'SelectThirdParty', 1, 0, 0, 0, 'minwidth300');
 
 	}
 	else
@@ -393,14 +415,14 @@ if ($conf->societe->enabled)
 	print '<tr class="liste_titre"><th class="titlefield wordbreak">'.$langs->trans("Antipoison").'</th><th>.<i class="fas fa-skull-crossbones"></i></th></tr>'."\n";
 
 	print '<tr class="oddeven"><td class="titlefieldcreate nowrap">'.$langs->trans("ActionOnCompany").'</td><td>';
-	//$antipoison_resources = digirisk_dolibarr_fetch_resources($db, 'Antipoison', 'societe');
+	$antipoison_resources = $allLinks['Antipoison'];
 
 	// Tiers
 	if ($antipoison_resources->ref == 'Antipoison')
 	{
 		$societe = new Societe($db);
-		$societe->fetch($antipoison_resources->element);
-		print $form->select_company($antipoison_resources->element, 'antipoison_socid', '', 'SelectThirdParty', 1, 0, 0, 0, 'minwidth300');
+		$societe->fetch($antipoison_resources->id[0]);
+		print $form->select_company($antipoison_resources->id[0], 'antipoison_socid', '', 'SelectThirdParty', 1, 0, 0, 0, 'minwidth300');
 
 	}
 	else
@@ -421,15 +443,15 @@ print '<tr class="liste_titre"><th class="titlefield wordbreak">'.$langs->trans(
 // Responsable à prévenir
 
 print '<tr><td class="titlefieldcreate nowrap">'.$langs->trans("Responsable à prévenir").'</td><td>';
-//$responsible_resources = digirisk_dolibarr_fetch_resources($db, 'Responsible', 'user');
+$responsible_resources = $allLinks['Responsible'];
 
 // Tiers
-if ($responsible_resources->ref == 'Responsible' && $responsible_resources->element > 0)
+if ($responsible_resources->ref == 'Responsible' && $responsible_resources->id[0] > 0)
 {
 	$user = new User($db);
-	$user->fetch($responsible_resources->element);
+	$user->fetch($responsible_resources->id[0]);
 
-	print $form->select_dolusers($responsible_resources->element, 'responsible_socid', 0, null, 0, 0, 0, 0, 'minwidth300');
+	print $form->select_dolusers($responsible_resources->id[0], 'responsible_socid', 0, null, 0, 0, 0, 0, 'minwidth300');
 // Téléphone
 	print '<tr class="oddeven"><td><label for="name">'.$langs->trans("Téléphone").'</label></td><td>';
 	print $user->office_phone;
