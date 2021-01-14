@@ -16,15 +16,18 @@
 
 CREATE TABLE llx_digiriskdolibarr_digiriskdocuments(
 	-- BEGIN MODULEBUILDER FIELDS
-	rowid INTEGER AUTO_INCREMENT PRIMARY KEY,
-	entity INTEGER DEFAULT 1 NOT NULL,
-	label VARCHAR(255),
-	qty INTEGER,
-	date_creation DATETIME NOT NULL,
-	tms TIMESTAMP,
-	fk_user_create INTEGER,
-	fk_user_modif INTEGER,
-	status INTEGER,
-	import_key VARCHAR(14)
+	rowid integer AUTO_INCREMENT PRIMARY KEY NOT NULL, 
+	ref varchar(128),
+	date_creation datetime NOT NULL, 
+	tms timestamp, 
+	fk_user_creat integer NOT NULL, 
+	model_pdf varchar(255), 
+	ref_ext varchar(128), 
+	json text, 
+	import_key integer, 
+	status integer NOT NULL, 
+	last_main_doc varchar(128), 
+	model_odt varchar(255), 
+	type varchar(128)
 	-- END MODULEBUILDER FIELDS
 ) ENGINE=innodb;

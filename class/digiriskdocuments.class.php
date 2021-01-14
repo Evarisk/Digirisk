@@ -96,39 +96,33 @@ class DigiriskDocuments extends CommonObject
 	public $fields=array(
 		'rowid' => array('type'=>'integer', 'label'=>'TechnicalID', 'enabled'=>'1', 'position'=>1, 'notnull'=>1, 'visible'=>0, 'noteditable'=>'1', 'index'=>1, 'comment'=>"Id"),
 		'ref' => array('type'=>'varchar(128)', 'label'=>'Ref', 'enabled'=>'1', 'position'=>10, 'notnull'=>1, 'visible'=>4, 'noteditable'=>'1', 'default'=>'(PROV)', 'index'=>1, 'searchall'=>1, 'showoncombobox'=>'1', 'comment'=>"Reference of object"),
-		'label' => array('type'=>'varchar(255)', 'label'=>'Label', 'enabled'=>'1', 'position'=>30, 'notnull'=>0, 'visible'=>1, 'searchall'=>1, 'css'=>'minwidth200', 'help'=>"Help text", 'showoncombobox'=>'1',),
-		'amount' => array('type'=>'price', 'label'=>'Amount', 'enabled'=>'1', 'position'=>40, 'notnull'=>0, 'visible'=>1, 'default'=>'null', 'isameasure'=>'1', 'help'=>"Help text for amount",),
-		'qty' => array('type'=>'real', 'label'=>'Qty', 'enabled'=>'1', 'position'=>45, 'notnull'=>0, 'visible'=>1, 'default'=>'0', 'isameasure'=>'1', 'css'=>'maxwidth75imp', 'help'=>"Help text for quantity",),
-		'fk_soc' => array('type'=>'integer:Societe:societe/class/societe.class.php:1:status=1 AND entity IN (__SHARED_ENTITIES__)', 'label'=>'ThirdParty', 'enabled'=>'1', 'position'=>50, 'notnull'=>-1, 'visible'=>1, 'index'=>1, 'help'=>"LinkToThirparty",),
-		'fk_project' => array('type'=>'integer:Project:projet/class/project.class.php:1', 'label'=>'Project', 'enabled'=>'1', 'position'=>52, 'notnull'=>-1, 'visible'=>-1, 'index'=>1,),
-		'description' => array('type'=>'text', 'label'=>'Description', 'enabled'=>'1', 'position'=>60, 'notnull'=>0, 'visible'=>3,),
-		'note_public' => array('type'=>'html', 'label'=>'NotePublic', 'enabled'=>'1', 'position'=>61, 'notnull'=>0, 'visible'=>0,),
-		'note_private' => array('type'=>'html', 'label'=>'NotePrivate', 'enabled'=>'1', 'position'=>62, 'notnull'=>0, 'visible'=>0,),
 		'date_creation' => array('type'=>'datetime', 'label'=>'DateCreation', 'enabled'=>'1', 'position'=>500, 'notnull'=>1, 'visible'=>-2,),
 		'tms' => array('type'=>'timestamp', 'label'=>'DateModification', 'enabled'=>'1', 'position'=>501, 'notnull'=>0, 'visible'=>-2,),
 		'fk_user_creat' => array('type'=>'integer:User:user/class/user.class.php', 'label'=>'UserAuthor', 'enabled'=>'1', 'position'=>510, 'notnull'=>1, 'visible'=>-2, 'foreignkey'=>'user.rowid',),
-		'fk_user_modif' => array('type'=>'integer:User:user/class/user.class.php', 'label'=>'UserModif', 'enabled'=>'1', 'position'=>511, 'notnull'=>-1, 'visible'=>-2,),
-		'import_key' => array('type'=>'varchar(14)', 'label'=>'ImportId', 'enabled'=>'1', 'position'=>1000, 'notnull'=>-1, 'visible'=>-2,),
 		'model_pdf' => array('type'=>'varchar(255)', 'label'=>'Model pdf', 'enabled'=>'1', 'position'=>1010, 'notnull'=>-1, 'visible'=>0,),
-		'status' => array('type'=>'smallint', 'label'=>'Status', 'enabled'=>'1', 'position'=>1000, 'notnull'=>1, 'visible'=>1, 'index'=>1, 'arrayofkeyval'=>array('0'=>'Brouillon', '1'=>'Valid&eacute;', '9'=>'Annul&eacute;'),),
+		'ref_ext' => array('type'=>'varchar(128)', 'label'=>'RefExt', 'enabled'=>'1', 'position'=>11, 'notnull'=>0, 'visible'=>-1,),
+		'json' => array('type'=>'text', 'label'=>'JSON', 'enabled'=>'1', 'position'=>502, 'notnull'=>0, 'visible'=>-1,),
+		'import_key' => array('type'=>'integer', 'label'=>'ImportKey', 'enabled'=>'1', 'position'=>504, 'notnull'=>0, 'visible'=>-1,),
+		'status' => array('type'=>'integer', 'label'=>'Status', 'enabled'=>'1', 'position'=>505, 'notnull'=>1, 'visible'=>-1,),
+		'last_main_doc' => array('type'=>'varchar(128)', 'label'=>'LastMainDoc', 'enabled'=>'1', 'position'=>520, 'notnull'=>0, 'visible'=>-1,),
+		'model_odt' => array('type'=>'varchar(255)', 'label'=>'Model ODT', 'enabled'=>'1', 'position'=>1020, 'notnull'=>0, 'visible'=>-1,),
+		'type' => array('type'=>'varchar(128)', 'label'=>'Type', 'enabled'=>'1', 'position'=>1100, 'notnull'=>0, 'visible'=>-1,),
+		'fk_user_modif' => array('type'=>'integer', 'label'=>'UserModif', 'enabled'=>'1', 'position'=>511, 'notnull'=>0, 'visible'=>0,),
 	);
 	public $rowid;
 	public $ref;
-	public $label;
-	public $amount;
-	public $qty;
-	public $fk_soc;
-	public $fk_project;
-	public $description;
-	public $note_public;
-	public $note_private;
 	public $date_creation;
 	public $tms;
 	public $fk_user_creat;
-	public $fk_user_modif;
-	public $import_key;
 	public $model_pdf;
+	public $ref_ext;
+	public $json;
+	public $import_key;
 	public $status;
+	public $last_main_doc;
+	public $model_odt;
+	public $type;
+	public $fk_user_modif;
 	// END MODULEBUILDER PROPERTIES
 
 
@@ -222,7 +216,32 @@ class DigiriskDocuments extends CommonObject
 	 */
 	public function create(User $user, $notrigger = false)
 	{
+		$now = dol_now();
+
+		$this->date_creation = $this->db->idate($now);
+		$this->tms 			 = $now;
+		$this->fk_user_creat = $user->id;
+		$this->ref_ext 		 = 'digirisk_' . $this->element . '_' . $this->ref;
+		$this->import_key 	 = "";
+		$this->status 		 = 1;
+		$this->type 		 = $this->element;
+		$this->DigiriskFillJSON($this);
+
 		return $this->createCommon($user, $notrigger);
+	}
+
+
+	public function DigiriskFillJSON($object) {
+
+		switch ($object->element) {
+			case "legaldisplay":
+				$this->json = $this->LegalDisplayFillJSON($object);
+				break;
+			case "informationssharing":
+				$this->json = $this->InformationsSharingFillJSON($object);
+				break;
+		}
+
 	}
 
 	/**
@@ -988,7 +1007,7 @@ class DigiriskDocuments extends CommonObject
 		$langs->load("digiriskdolibarr@digiriskdolibarr");
 
 		if (!dol_strlen($modele)) {
-			$modele = 'standard_digiriskdocuments';
+			$modele = 'standard_' . $this->type;
 
 			if ($this->modelpdf) {
 				$modele = $this->modelpdf;

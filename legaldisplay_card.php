@@ -61,11 +61,13 @@ require_once DOL_DOCUMENT_ROOT.'/core/class/html.formcompany.class.php';
 require_once DOL_DOCUMENT_ROOT.'/core/class/html.formfile.class.php';
 require_once DOL_DOCUMENT_ROOT.'/core/class/html.formprojet.class.php';
 dol_include_once('/digiriskdolibarr/class/legaldisplay.class.php');
+dol_include_once('/digiriskdolibarr/class/digiriskdocuments.class.php');
 dol_include_once('/digiriskdolibarr/lib/digiriskdolibarr_legaldisplay.lib.php');
 
 // Load translation files required by the page
 $langs->loadLangs(array("digiriskdolibarr@digiriskdolibarr", "other"));
 
+global $db;
 // Get parameters
 $id = GETPOST('id', 'int');
 $ref        = GETPOST('ref', 'alpha');
@@ -102,12 +104,19 @@ if (empty($action) && empty($id) && empty($ref)) $action = 'view';
 include DOL_DOCUMENT_ROOT.'/core/actions_fetchobject.inc.php'; // Must be include, not include_once.
 
 
-$permissiontoread = $user->rights->digiriskdolibarr->legaldisplay->read;
-$permissiontoadd = $user->rights->digiriskdolibarr->legaldisplay->write; // Used by the include of actions_addupdatedelete.inc.php and actions_lineupdown.inc.php
-$permissiontodelete = $user->rights->digiriskdolibarr->legaldisplay->delete || ($permissiontoadd && isset($object->status) && $object->status == $object::STATUS_DRAFT);
-$permissionnote = $user->rights->digiriskdolibarr->legaldisplay->write; // Used by the include of actions_setnotes.inc.php
-$permissiondellink = $user->rights->digiriskdolibarr->legaldisplay->write; // Used by the include of actions_dellink.inc.php
-$upload_dir = $conf->digiriskdolibarr->multidir_output[isset($object->entity) ? $object->entity : 1];
+//$permissiontoread = $user->rights->digiriskdolibarr->legaldisplay->read;
+//$permissiontoadd = $user->rights->digiriskdolibarr->legaldisplay->write; // Used by the include of actions_addupdatedelete.inc.php and actions_lineupdown.inc.php
+//$permissiontodelete = $user->rights->digiriskdolibarr->legaldisplay->delete || ($permissiontoadd && isset($object->status) && $object->status == $object::STATUS_DRAFT);
+//$permissionnote = $user->rights->digiriskdolibarr->legaldisplay->write; // Used by the include of actions_setnotes.inc.php
+//$permissiondellink = $user->rights->digiriskdolibarr->legaldisplay->write; // Used by the include of actions_dellink.inc.php
+
+// @todo DROITS
+$upload_dir = $conf->digiriskdolibarr->multidir_output[isset($object->entity) ? $object->entity : 1];$permissiontoread = $user->rights->digiriskdolibarr->legaldisplay->read;
+$permissiontoadd = 1;
+$permissiontodelete =  1;
+$permissionnote =  1;
+$permissiondellink =  1;
+$upload_dir = 1;
 
 // Security check - Protection if external user
 //if ($user->socid > 0) accessforbidden();
@@ -138,10 +147,13 @@ if (empty($reshook))
 			else $backtopage = dol_buildpath('/digiriskdolibarr/legaldisplay_card.php', 1).'?id='.($id > 0 ? $id : '__ID__');
 		}
 	}
+
 	$triggermodname = 'DIGIRISKDOLIBARR_LEGALDISPLAY_MODIFY'; // Name of trigger action code to execute when we modify record
 
+
 	// Actions cancel, add, update, update_extras, confirm_validate, confirm_delete, confirm_deleteline, confirm_clone, confirm_close, confirm_setdraft, confirm_reopen
-	include DOL_DOCUMENT_ROOT.'/core/actions_addupdatedelete.inc.php';
+	// @todo piste pourquoi le create redirige pas bien TAG
+	//include DOL_DOCUMENT_ROOT.'/core/actions_addupdatedelete.inc.php';
 
 	// Actions when linking object each other
 	include DOL_DOCUMENT_ROOT.'/core/actions_dellink.inc.php';
@@ -183,6 +195,9 @@ if (empty($reshook))
 $form = new Form($db);
 $formfile = new FormFile($db);
 $formproject = new FormProjets($db);
+$now = $db->idate(dol_now());
+$now = str_replace(':','-', $now);
+$now = str_replace(' ','_', $now);
 
 $title = $langs->trans("LegalDisplay");
 $help_url = '';
@@ -212,6 +227,7 @@ if ($action == 'create')
 	print '<form method="POST" action="'.$_SERVER["PHP_SELF"].'">';
 	print '<input type="hidden" name="token" value="'.newToken().'">';
 	print '<input type="hidden" name="action" value="add">';
+
 	if ($backtopage) print '<input type="hidden" name="backtopage" value="'.$backtopage.'">';
 	if ($backtopageforcancel) print '<input type="hidden" name="backtopageforcancel" value="'.$backtopageforcancel.'">';
 
@@ -223,8 +239,20 @@ if ($action == 'create')
 	print '<table class="border centpercent tableforfieldcreate">'."\n";
 
 	// Common attributes
-	include DOL_DOCUMENT_ROOT.'/core/tpl/commonfields_add.tpl.php';
+	unset($object->fields['import_key']);				// Hide field already shown in banner
+	unset($object->fields['json']);				// Hide field already shown in banner
+	unset($object->fields['import_key']);				// Hide field already shown in banner
+	unset($object->fields['model_odt']);				// Hide field already shown in banner
+	unset($object->fields['type']);					// Hide field already shown in banner
+	unset($object->fields['last_main_doc']);
+	unset($object->fields['ref_ext']);
+	unset($object->fields['status']);
 
+	include DOL_DOCUMENT_ROOT.'/core/tpl/commonfields_add.tpl.php';
+	print '<table class="border centpercent">'."\n";
+	print '<tr><td class="fieldrequired">'.$langs->trans("Ref").'</td><td>';
+	print '<input class="flat" type="text" size="36" name="ref" value="'.$now.'">';
+	print '</td></tr>';
 	// Other attributes
 	include DOL_DOCUMENT_ROOT.'/core/tpl/extrafields_add.tpl.php';
 
@@ -235,6 +263,7 @@ if ($action == 'create')
 	print '<div class="center">';
 	print '<input type="submit" class="button" name="add" value="'.dol_escape_htmltag($langs->trans("Create")).'">';
 	print '&nbsp; ';
+
 	print '<input type="'.($backtopage ? "submit" : "button").'" class="button" name="cancel" value="'.dol_escape_htmltag($langs->trans("Cancel")).'"'.($backtopage ? '' : ' onclick="javascript:history.go(-1)"').'>'; // Cancel for create does not post form if we don't know the backtopage
 	print '</div>';
 
@@ -384,8 +413,12 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 
 	// Common attributes
 	//$keyforbreak='fieldkeytoswitchonsecondcolumn';	// We change column just before this field
-	//unset($object->fields['fk_project']);				// Hide field already shown in banner
-	//unset($object->fields['fk_soc']);					// Hide field already shown in banner
+	unset($object->fields['import_key']);				// Hide field already shown in banner
+	unset($object->fields['json']);				// Hide field already shown in banner
+	unset($object->fields['import_key']);				// Hide field already shown in banner
+	unset($object->fields['model_odt']);				// Hide field already shown in banner
+	unset($object->fields['type']);					// Hide field already shown in banner
+	unset($object->fields['last_main_doc']);					// Hide field already shown in banner
 	include DOL_DOCUMENT_ROOT.'/core/tpl/commonfields_view.tpl.php';
 
 	// Other attributes. Fields from hook formObjectOptions and Extrafields.
@@ -468,7 +501,7 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 			if (empty($user->socid)) {
 				print '<a class="butAction" href="'.$_SERVER["PHP_SELF"].'?id='.$object->id.'&action=presend&mode=init#formmailbeforetitle">'.$langs->trans('SendMail').'</a>'."\n";
 			}
-
+			/*
 			// Back to draft
 			if ($object->status == $object::STATUS_VALIDATED)
 			{
@@ -477,7 +510,8 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 					print '<a class="butAction" href="'.$_SERVER['PHP_SELF'].'?id='.$object->id.'&action=confirm_setdraft&confirm=yes">'.$langs->trans("SetToDraft").'</a>';
 				}
 			}
-
+			*/
+			/*
 			// Modify
 			if ($permissiontoadd)
 			{
@@ -487,7 +521,8 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 			{
 				print '<a class="butActionRefused classfortooltip" href="#" title="'.dol_escape_htmltag($langs->trans("NotEnoughPermissions")).'">'.$langs->trans('Modify').'</a>'."\n";
 			}
-
+			*/
+			/*
 			// Validate
 			if ($object->status == $object::STATUS_DRAFT)
 			{
@@ -504,7 +539,8 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 					}
 				}
 			}
-
+			*/
+			/*
 			// Clone
 			if ($permissiontoadd)
 			{
@@ -561,15 +597,16 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 		print '<a name="builddoc"></a>'; // ancre
 
 		$includedocgeneration = 1;
-
 		// Documents
 		if ($includedocgeneration) {
 			$objref = dol_sanitizeFileName($object->ref);
+
 			$relativepath = $objref . '/' . $objref . '.pdf';
 			$filedir = $conf->digiriskdolibarr->dir_output.'/'.$object->element.'/'.$objref;
 			$urlsource = $_SERVER["PHP_SELF"] . "?id=" . $object->id;
-			$genallowed = $user->rights->digiriskdolibarr->legaldisplay->read;	// If you can read, you can build the PDF to read content
-			$delallowed = $user->rights->digiriskdolibarr->legaldisplay->write;	// If you can create/edit, you can remove a file on card
+			//@todo DROITS
+			$genallowed = 1;	// If you can read, you can build the PDF to read content
+			$delallowed = 1;	// If you can create/edit, you can remove a file on card
 			print $formfile->showdocuments('digiriskdolibarr:LegalDisplay', $object->element.'/'.$objref, $filedir, $urlsource, $genallowed, $delallowed, $object->model_pdf, 1, 0, 0, 28, 0, '', '', '', $langs->defaultlang);
 		}
 
@@ -604,6 +641,7 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 	$trackid = 'legaldisplay'.$object->id;
 
 	include DOL_DOCUMENT_ROOT.'/core/tpl/card_presend.tpl.php';
+
 }
 
 // End of page

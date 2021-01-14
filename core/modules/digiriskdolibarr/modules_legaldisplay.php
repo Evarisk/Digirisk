@@ -28,9 +28,8 @@
  *  \brief			File that contains parent class for legaldisplays document models and parent class for legaldisplays numbering models
  */
 
-require_once DOL_DOCUMENT_ROOT.'/core/class/commondocgenerator.class.php';
-require_once DOL_DOCUMENT_ROOT.'/compta/bank/class/account.class.php'; // required for use by classes that inherit
-
+require_once DOL_DOCUMENT_ROOT . '/core/class/commondocgenerator.class.php';
+require_once DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/class/legaldisplay.class.php'; // required for use by classes that inherit
 
 /**
  *	Parent class for documents models
@@ -54,7 +53,7 @@ abstract class ModelePDFLegalDisplay extends CommonDocGenerator
 		$type = 'legaldisplay';
 		$list = array();
 
-		include_once DOL_DOCUMENT_ROOT.'/core/lib/functions2.lib.php';
+		include_once DOL_DOCUMENT_ROOT . '/core/lib/functions2.lib.php';
 		$list = getListOfModels($db, $type, $maxfilenamelength);
 
 		return $list;
