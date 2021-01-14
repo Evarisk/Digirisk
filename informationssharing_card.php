@@ -17,9 +17,9 @@
  */
 
 /**
- *   	\file       digiriskdocuments_card.php
+ *   	\file       informationssharing_card.php
  *		\ingroup    digiriskdolibarr
- *		\brief      Page to create/edit/view digiriskdocuments
+ *		\brief      Page to create/edit/view informationssharing
  */
 
 //if (! defined('NOREQUIREDB'))              define('NOREQUIREDB','1');					// Do not create database handler $db
@@ -60,8 +60,8 @@ if (!$res) die("Include of main fails");
 require_once DOL_DOCUMENT_ROOT.'/core/class/html.formcompany.class.php';
 require_once DOL_DOCUMENT_ROOT.'/core/class/html.formfile.class.php';
 require_once DOL_DOCUMENT_ROOT.'/core/class/html.formprojet.class.php';
-dol_include_once('/digiriskdolibarr/class/digiriskdocuments.class.php');
-dol_include_once('/digiriskdolibarr/lib/digiriskdolibarr_digiriskdocuments.lib.php');
+dol_include_once('/digiriskdolibarr/class/informationssharing.class.php');
+dol_include_once('/digiriskdolibarr/lib/digiriskdolibarr_informationssharing.lib.php');
 
 // Load translation files required by the page
 $langs->loadLangs(array("digiriskdolibarr@digiriskdolibarr", "other"));
@@ -72,16 +72,16 @@ $ref        = GETPOST('ref', 'alpha');
 $action = GETPOST('action', 'aZ09');
 $confirm    = GETPOST('confirm', 'alpha');
 $cancel     = GETPOST('cancel', 'aZ09');
-$contextpage = GETPOST('contextpage', 'aZ') ?GETPOST('contextpage', 'aZ') : 'digiriskdocumentscard'; // To manage different context of search
+$contextpage = GETPOST('contextpage', 'aZ') ?GETPOST('contextpage', 'aZ') : 'informationssharingcard'; // To manage different context of search
 $backtopage = GETPOST('backtopage', 'alpha');
 $backtopageforcancel = GETPOST('backtopageforcancel', 'alpha');
 //$lineid   = GETPOST('lineid', 'int');
 
 // Initialize technical objects
-$object = new DigiriskDocuments($db);
+$object = new InformationsSharing($db);
 $extrafields = new ExtraFields($db);
 $diroutputmassaction = $conf->digiriskdolibarr->dir_output.'/temp/massgeneration/'.$user->id;
-$hookmanager->initHooks(array('digiriskdocumentscard', 'globalcard')); // Note that conf->hooks_modules contains array
+$hookmanager->initHooks(array('informationssharingcard', 'globalcard')); // Note that conf->hooks_modules contains array
 
 // Fetch optionals attributes and labels
 $extrafields->fetch_name_optionals_label($object->table_element);
@@ -102,11 +102,11 @@ if (empty($action) && empty($id) && empty($ref)) $action = 'view';
 include DOL_DOCUMENT_ROOT.'/core/actions_fetchobject.inc.php'; // Must be include, not include_once.
 
 
-$permissiontoread = $user->rights->digiriskdolibarr->digiriskdocuments->read;
-$permissiontoadd = $user->rights->digiriskdolibarr->digiriskdocuments->write; // Used by the include of actions_addupdatedelete.inc.php and actions_lineupdown.inc.php
-$permissiontodelete = $user->rights->digiriskdolibarr->digiriskdocuments->delete || ($permissiontoadd && isset($object->status) && $object->status == $object::STATUS_DRAFT);
-$permissionnote = $user->rights->digiriskdolibarr->digiriskdocuments->write; // Used by the include of actions_setnotes.inc.php
-$permissiondellink = $user->rights->digiriskdolibarr->digiriskdocuments->write; // Used by the include of actions_dellink.inc.php
+$permissiontoread = $user->rights->digiriskdolibarr->informationssharing->read;
+$permissiontoadd = $user->rights->digiriskdolibarr->informationssharing->write; // Used by the include of actions_addupdatedelete.inc.php and actions_lineupdown.inc.php
+$permissiontodelete = $user->rights->digiriskdolibarr->informationssharing->delete || ($permissiontoadd && isset($object->status) && $object->status == $object::STATUS_DRAFT);
+$permissionnote = $user->rights->digiriskdolibarr->informationssharing->write; // Used by the include of actions_setnotes.inc.php
+$permissiondellink = $user->rights->digiriskdolibarr->informationssharing->write; // Used by the include of actions_dellink.inc.php
 $upload_dir = $conf->digiriskdolibarr->multidir_output[isset($object->entity) ? $object->entity : 1];
 
 // Security check - Protection if external user
@@ -130,15 +130,15 @@ if (empty($reshook))
 {
 	$error = 0;
 
-	$backurlforlist = dol_buildpath('/digiriskdolibarr/digiriskdocuments_list.php', 1);
+	$backurlforlist = dol_buildpath('/digiriskdolibarr/informationssharing_list.php', 1);
 
 	if (empty($backtopage) || ($cancel && empty($id))) {
 		if (empty($backtopage) || ($cancel && strpos($backtopage, '__ID__'))) {
 			if (empty($id) && (($action != 'add' && $action != 'create') || $cancel)) $backtopage = $backurlforlist;
-			else $backtopage = dol_buildpath('/digiriskdolibarr/digiriskdocuments_card.php', 1).'?id='.($id > 0 ? $id : '__ID__');
+			else $backtopage = dol_buildpath('/digiriskdolibarr/informationssharing_card.php', 1).'?id='.($id > 0 ? $id : '__ID__');
 		}
 	}
-	$triggermodname = 'DIGIRISKDOLIBARR_DIGIRISKDOCUMENTS_MODIFY'; // Name of trigger action code to execute when we modify record
+	$triggermodname = 'DIGIRISKDOLIBARR_INFORMATIONSSHARING_MODIFY'; // Name of trigger action code to execute when we modify record
 
 	// Actions cancel, add, update, update_extras, confirm_validate, confirm_delete, confirm_deleteline, confirm_clone, confirm_close, confirm_setdraft, confirm_reopen
 	include DOL_DOCUMENT_ROOT.'/core/actions_addupdatedelete.inc.php';
@@ -157,7 +157,7 @@ if (empty($reshook))
 
 	if ($action == 'set_thirdparty' && $permissiontoadd)
 	{
-		$object->setValueFrom('fk_soc', GETPOST('fk_soc', 'int'), '', '', 'date', '', $user, 'DIGIRISKDOCUMENTS_MODIFY');
+		$object->setValueFrom('fk_soc', GETPOST('fk_soc', 'int'), '', '', 'date', '', $user, 'INFORMATIONSSHARING_MODIFY');
 	}
 	if ($action == 'classin' && $permissiontoadd)
 	{
@@ -165,9 +165,9 @@ if (empty($reshook))
 	}
 
 	// Actions to send emails
-	$triggersendname = 'DIGIRISKDOCUMENTS_SENTBYMAIL';
-	$autocopy = 'MAIN_MAIL_AUTOCOPY_DIGIRISKDOCUMENTS_TO';
-	$trackid = 'digiriskdocuments'.$object->id;
+	$triggersendname = 'INFORMATIONSSHARING_SENTBYMAIL';
+	$autocopy = 'MAIN_MAIL_AUTOCOPY_INFORMATIONSSHARING_TO';
+	$trackid = 'informationssharing'.$object->id;
 	include DOL_DOCUMENT_ROOT.'/core/actions_sendmails.inc.php';
 }
 
@@ -184,7 +184,7 @@ $form = new Form($db);
 $formfile = new FormFile($db);
 $formproject = new FormProjets($db);
 
-$title = $langs->trans("DigiriskDocuments");
+$title = $langs->trans("InformationsSharing");
 $help_url = '';
 llxHeader('', $title, $help_url);
 
@@ -207,7 +207,7 @@ jQuery(document).ready(function() {
 // Part to create
 if ($action == 'create')
 {
-	print load_fiche_titre($langs->trans("NewObject", $langs->transnoentitiesnoconv("DigiriskDocuments")), '', 'object_'.$object->picto);
+	print load_fiche_titre($langs->trans("NewObject", $langs->transnoentitiesnoconv("InformationsSharing")), '', 'object_'.$object->picto);
 
 	print '<form method="POST" action="'.$_SERVER["PHP_SELF"].'">';
 	print '<input type="hidden" name="token" value="'.newToken().'">';
@@ -246,7 +246,7 @@ if ($action == 'create')
 // Part to edit record
 if (($id || $ref) && $action == 'edit')
 {
-	print load_fiche_titre($langs->trans("DigiriskDocuments"), '', 'object_'.$object->picto);
+	print load_fiche_titre($langs->trans("InformationsSharing"), '', 'object_'.$object->picto);
 
 	print '<form method="POST" action="'.$_SERVER["PHP_SELF"].'">';
 	print '<input type="hidden" name="token" value="'.newToken().'">';
@@ -281,15 +281,15 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 {
 	$res = $object->fetch_optionals();
 
-	$head = digiriskdocumentsPrepareHead($object);
-	dol_fiche_head($head, 'card', $langs->trans("DigiriskDocuments"), -1, $object->picto);
+	$head = informationssharingPrepareHead($object);
+	dol_fiche_head($head, 'card', $langs->trans("InformationsSharing"), -1, $object->picto);
 
 	$formconfirm = '';
 
 	// Confirmation to delete
 	if ($action == 'delete')
 	{
-		$formconfirm = $form->formconfirm($_SERVER["PHP_SELF"].'?id='.$object->id, $langs->trans('DeleteDigiriskDocuments'), $langs->trans('ConfirmDeleteObject'), 'confirm_delete', '', 0, 1);
+		$formconfirm = $form->formconfirm($_SERVER["PHP_SELF"].'?id='.$object->id, $langs->trans('DeleteInformationsSharing'), $langs->trans('ConfirmDeleteObject'), 'confirm_delete', '', 0, 1);
 	}
 	// Confirmation to delete line
 	if ($action == 'deleteline')
@@ -332,7 +332,7 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 
 	// Object card
 	// ------------------------------------------------------------
-	$linkback = '<a href="'.dol_buildpath('/digiriskdolibarr/digiriskdocuments_list.php', 1).'?restore_lastsearch_values=1'.(!empty($socid) ? '&socid='.$socid : '').'">'.$langs->trans("BackToList").'</a>';
+	$linkback = '<a href="'.dol_buildpath('/digiriskdolibarr/informationssharing_list.php', 1).'?restore_lastsearch_values=1'.(!empty($socid) ? '&socid='.$socid : '').'">'.$langs->trans("BackToList").'</a>';
 
 	$morehtmlref = '<div class="refidno">';
 	/*
@@ -508,7 +508,7 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 			// Clone
 			if ($permissiontoadd)
 			{
-				print '<a class="butAction" href="'.$_SERVER['PHP_SELF'].'?id='.$object->id.'&socid='.$object->socid.'&action=clone&object=digiriskdocuments">'.$langs->trans("ToClone").'</a>'."\n";
+				print '<a class="butAction" href="'.$_SERVER['PHP_SELF'].'?id='.$object->id.'&socid='.$object->socid.'&action=clone&object=informationssharing">'.$langs->trans("ToClone").'</a>'."\n";
 			}
 
 			/*
@@ -568,13 +568,13 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 			$relativepath = $objref . '/' . $objref . '.pdf';
 			$filedir = $conf->digiriskdolibarr->dir_output.'/'.$object->element.'/'.$objref;
 			$urlsource = $_SERVER["PHP_SELF"] . "?id=" . $object->id;
-			$genallowed = $user->rights->digiriskdolibarr->digiriskdocuments->read;	// If you can read, you can build the PDF to read content
-			$delallowed = $user->rights->digiriskdolibarr->digiriskdocuments->write;	// If you can create/edit, you can remove a file on card
-			print $formfile->showdocuments('digiriskdolibarr:DigiriskDocuments', $object->element.'/'.$objref, $filedir, $urlsource, $genallowed, $delallowed, $object->model_pdf, 1, 0, 0, 28, 0, '', '', '', $langs->defaultlang);
+			$genallowed = $user->rights->digiriskdolibarr->informationssharing->read;	// If you can read, you can build the PDF to read content
+			$delallowed = $user->rights->digiriskdolibarr->informationssharing->write;	// If you can create/edit, you can remove a file on card
+			print $formfile->showdocuments('digiriskdolibarr:InformationsSharing', $object->element.'/'.$objref, $filedir, $urlsource, $genallowed, $delallowed, $object->model_pdf, 1, 0, 0, 28, 0, '', '', '', $langs->defaultlang);
 		}
 
 		// Show links to link elements
-		$linktoelem = $form->showLinkToObjectBlock($object, null, array('digiriskdocuments'));
+		$linktoelem = $form->showLinkToObjectBlock($object, null, array('informationssharing'));
 		$somethingshown = $form->showLinkedObjectBlock($object, $linktoelem);
 
 
@@ -582,7 +582,7 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 
 		$MAXEVENT = 10;
 
-		$morehtmlright = '<a href="'.dol_buildpath('/digiriskdolibarr/digiriskdocuments_agenda.php', 1).'?id='.$object->id.'">';
+		$morehtmlright = '<a href="'.dol_buildpath('/digiriskdolibarr/informationssharing_agenda.php', 1).'?id='.$object->id.'">';
 		$morehtmlright .= $langs->trans("SeeAll");
 		$morehtmlright .= '</a>';
 
@@ -598,10 +598,10 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 	if (GETPOST('modelselected')) $action = 'presend';
 
 	// Presend form
-	$modelmail = 'digiriskdocuments';
+	$modelmail = 'informationssharing';
 	$defaulttopic = 'InformationMessage';
 	$diroutput = $conf->digiriskdolibarr->dir_output;
-	$trackid = 'digiriskdocuments'.$object->id;
+	$trackid = 'informationssharing'.$object->id;
 
 	include DOL_DOCUMENT_ROOT.'/core/tpl/card_presend.tpl.php';
 }

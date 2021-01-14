@@ -17,9 +17,9 @@
  */
 
 /**
- *  \file       digiriskdocuments_document.php
+ *  \file       informationssharing_document.php
  *  \ingroup    digiriskdolibarr
- *  \brief      Tab for documents linked to DigiriskDocuments
+ *  \brief      Tab for documents linked to InformationsSharing
  */
 
 // Load Dolibarr environment
@@ -41,8 +41,8 @@ require_once DOL_DOCUMENT_ROOT.'/core/lib/company.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/files.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/images.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/core/class/html.formfile.class.php';
-dol_include_once('/digiriskdolibarr/class/digiriskdocuments.class.php');
-dol_include_once('/digiriskdolibarr/lib/digiriskdolibarr_digiriskdocuments.lib.php');
+dol_include_once('/digiriskdolibarr/class/informationssharing.class.php');
+dol_include_once('/digiriskdolibarr/lib/digiriskdolibarr_informationssharing.lib.php');
 
 // Load translation files required by the page
 $langs->loadLangs(array("digiriskdolibarr@digiriskdolibarr", "companies", "other", "mails"));
@@ -67,25 +67,25 @@ if (!$sortfield) $sortfield = "name";
 //if (! $sortfield) $sortfield="position_name";
 
 // Initialize technical objects
-$object = new DigiriskDocuments($db);
+$object = new InformationsSharing($db);
 $extrafields = new ExtraFields($db);
 $diroutputmassaction = $conf->digiriskdolibarr->dir_output.'/temp/massgeneration/'.$user->id;
-$hookmanager->initHooks(array('digiriskdocumentsdocument', 'globalcard')); // Note that conf->hooks_modules contains array
+$hookmanager->initHooks(array('informationssharingdocument', 'globalcard')); // Note that conf->hooks_modules contains array
 // Fetch optionals attributes and labels
 $extrafields->fetch_name_optionals_label($object->table_element);
 
 // Load object
 include DOL_DOCUMENT_ROOT.'/core/actions_fetchobject.inc.php'; // Must be include, not include_once  // Must be include, not include_once. Include fetch and fetch_thirdparty but not fetch_optionals
 
-//if ($id > 0 || ! empty($ref)) $upload_dir = $conf->digiriskdolibarr->multidir_output[$object->entity?$object->entity:$conf->entity] . "/digiriskdocuments/" . dol_sanitizeFileName($object->id);
-if ($id > 0 || !empty($ref)) $upload_dir = $conf->digiriskdolibarr->multidir_output[$object->entity ? $object->entity : $conf->entity]."/digiriskdocuments/".dol_sanitizeFileName($object->ref);
+//if ($id > 0 || ! empty($ref)) $upload_dir = $conf->digiriskdolibarr->multidir_output[$object->entity?$object->entity:$conf->entity] . "/informationssharing/" . dol_sanitizeFileName($object->id);
+if ($id > 0 || !empty($ref)) $upload_dir = $conf->digiriskdolibarr->multidir_output[$object->entity ? $object->entity : $conf->entity]."/informationssharing/".dol_sanitizeFileName($object->ref);
 
 // Security check - Protection if external user
 //if ($user->socid > 0) accessforbidden();
 //if ($user->socid > 0) $socid = $user->socid;
 //$result = restrictedArea($user, 'digiriskdolibarr', $object->id);
 
-$permissiontoadd = $user->rights->digiriskdolibarr->digiriskdocuments->write; // Used by the include of actions_addupdatedelete.inc.php
+$permissiontoadd = $user->rights->digiriskdolibarr->informationssharing->write; // Used by the include of actions_addupdatedelete.inc.php
 
 
 
@@ -102,7 +102,7 @@ include_once DOL_DOCUMENT_ROOT.'/core/actions_linkedfiles.inc.php';
 
 $form = new Form($db);
 
-$title = $langs->trans("DigiriskDocuments").' - '.$langs->trans("Files");
+$title = $langs->trans("InformationsSharing").' - '.$langs->trans("Files");
 $help_url = '';
 //$help_url='EN:Module_Third_Parties|FR:Module_Tiers|ES:Empresas';
 llxHeader('', $title, $help_url);
@@ -112,9 +112,9 @@ if ($object->id)
 	/*
 	 * Show tabs
 	 */
-	$head = digiriskdocumentsPrepareHead($object);
+	$head = informationssharingPrepareHead($object);
 
-	dol_fiche_head($head, 'document', $langs->trans("DigiriskDocuments"), -1, $object->picto);
+	dol_fiche_head($head, 'document', $langs->trans("InformationsSharing"), -1, $object->picto);
 
 
 	// Build file list
@@ -127,7 +127,7 @@ if ($object->id)
 
 	// Object card
 	// ------------------------------------------------------------
-	$linkback = '<a href="'.dol_buildpath('/digiriskdolibarr/digiriskdocuments_list.php', 1).'?restore_lastsearch_values=1'.(!empty($socid) ? '&socid='.$socid : '').'">'.$langs->trans("BackToList").'</a>';
+	$linkback = '<a href="'.dol_buildpath('/digiriskdolibarr/informationssharing_list.php', 1).'?restore_lastsearch_values=1'.(!empty($socid) ? '&socid='.$socid : '').'">'.$langs->trans("BackToList").'</a>';
 
 	$morehtmlref = '<div class="refidno">';
 	/*
@@ -189,14 +189,14 @@ if ($object->id)
 	dol_fiche_end();
 
 	$modulepart = 'digiriskdolibarr';
-	//$permission = $user->rights->digiriskdolibarr->digiriskdocuments->write;
+	//$permission = $user->rights->digiriskdolibarr->informationssharing->write;
 	$permission = 1;
-	//$permtoedit = $user->rights->digiriskdolibarr->digiriskdocuments->write;
+	//$permtoedit = $user->rights->digiriskdolibarr->informationssharing->write;
 	$permtoedit = 1;
 	$param = '&id='.$object->id;
 
-	//$relativepathwithnofile='digiriskdocuments/' . dol_sanitizeFileName($object->id).'/';
-	$relativepathwithnofile = 'digiriskdocuments/'.dol_sanitizeFileName($object->ref).'/';
+	//$relativepathwithnofile='informationssharing/' . dol_sanitizeFileName($object->id).'/';
+	$relativepathwithnofile = 'informationssharing/'.dol_sanitizeFileName($object->ref).'/';
 
 	include_once DOL_DOCUMENT_ROOT.'/core/tpl/document_actions_post_headers.tpl.php';
 }

@@ -17,9 +17,9 @@
  */
 
 /**
- *  \file       digiriskdocuments_agenda.php
+ *  \file       legaldisplay_agenda.php
  *  \ingroup    digiriskdolibarr
- *  \brief      Page of DigiriskDocuments events
+ *  \brief      Page of LegalDisplay events
  */
 
 // Load Dolibarr environment
@@ -40,8 +40,8 @@ if (!$res) die("Include of main fails");
 require_once DOL_DOCUMENT_ROOT.'/contact/class/contact.class.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/company.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/functions2.lib.php';
-dol_include_once('/digiriskdolibarr/class/digiriskdocuments.class.php');
-dol_include_once('/digiriskdolibarr/lib/digiriskdolibarr_digiriskdocuments.lib.php');
+dol_include_once('/digiriskdolibarr/class/legaldisplay.class.php');
+dol_include_once('/digiriskdolibarr/lib/digiriskdolibarr_legaldisplay.lib.php');
 
 
 // Load translation files required by the page
@@ -77,10 +77,10 @@ if (!$sortfield) $sortfield = 'a.datep,a.id';
 if (!$sortorder) $sortorder = 'DESC,DESC';
 
 // Initialize technical objects
-$object = new DigiriskDocuments($db);
+$object = new LegalDisplay($db);
 $extrafields = new ExtraFields($db);
 $diroutputmassaction = $conf->digiriskdolibarr->dir_output.'/temp/massgeneration/'.$user->id;
-$hookmanager->initHooks(array('digiriskdocumentsagenda', 'globalcard')); // Note that conf->hooks_modules contains array
+$hookmanager->initHooks(array('legaldisplayagenda', 'globalcard')); // Note that conf->hooks_modules contains array
 // Fetch optionals attributes and labels
 $extrafields->fetch_name_optionals_label($object->table_element);
 
@@ -93,7 +93,7 @@ if ($id > 0 || !empty($ref)) $upload_dir = $conf->digiriskdolibarr->multidir_out
 //if ($user->socid > 0) $socid = $user->socid;
 //$result = restrictedArea($user, 'digiriskdolibarr', $object->id);
 
-$permissiontoadd = $user->rights->digiriskdolibarr->digiriskdocuments->write; // Used by the include of actions_addupdatedelete.inc.php
+$permissiontoadd = $user->rights->digiriskdolibarr->legaldisplay->write; // Used by the include of actions_addupdatedelete.inc.php
 
 
 /*
@@ -137,14 +137,14 @@ if ($object->id > 0)
 	llxHeader('', $title, $help_url);
 
 	if (!empty($conf->notification->enabled)) $langs->load("mails");
-	$head = digiriskdocumentsPrepareHead($object);
+	$head = legaldisplayPrepareHead($object);
 
 
-	dol_fiche_head($head, 'agenda', $langs->trans("DigiriskDocuments"), -1, 'object_'.$object->picto);
+	dol_fiche_head($head, 'agenda', $langs->trans("LegalDisplay"), -1, 'object_'.$object->picto);
 
 	// Object card
 	// ------------------------------------------------------------
-	$linkback = '<a href="'.dol_buildpath('/digiriskdolibarr/digiriskdocuments_list.php', 1).'?restore_lastsearch_values=1'.(!empty($socid) ? '&socid='.$socid : '').'">'.$langs->trans("BackToList").'</a>';
+	$linkback = '<a href="'.dol_buildpath('/digiriskdolibarr/legaldisplay_list.php', 1).'?restore_lastsearch_values=1'.(!empty($socid) ? '&socid='.$socid : '').'">'.$langs->trans("BackToList").'</a>';
 
 	$morehtmlref = '<div class="refidno">';
 	/*
@@ -242,7 +242,7 @@ if ($object->id > 0)
 		if ($limit > 0 && $limit != $conf->liste_limit) $param .= '&limit='.urlencode($limit);
 
 
-		//print load_fiche_titre($langs->trans("ActionsOnDigiriskDocuments"), '', '');
+		//print load_fiche_titre($langs->trans("ActionsOnLegalDisplay"), '', '');
 
 		// List of all actions
 		$filters = array();
