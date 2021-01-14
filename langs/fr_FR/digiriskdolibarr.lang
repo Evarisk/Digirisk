@@ -37,12 +37,32 @@ DigiriskdolibarrAbout = À propos de Digiriskdolibarr
 DigiriskdolibarrAboutPage = Page à propos de Digiriskdolibarr
 
 #
-# Page d'exemple
+# Digirisk for Dolibarr
 #
-MyPageName = Nom de ma page
 
-#
-# Box d'exemple
-#
-MyWidget = Mon widget
-MyWidgetDescription = Description de mon widget
+DigiriskMenu = Ajoutez des informations sur votre société/organisation. Cliquez sur le bouton "Enregistrer" en bas de page pour sauvegarder
+
+LabourDoctor = Médecin du travail
+LabourInspector = Inspecteur du travail
+FireBrigade = Pompiers
+AllEmergencies = Toute Urgence
+RightsDefender = Défenseur des droits
+PoisonControlCenter = Centre Antipoison
+SafetyInstructions = Consignes de sécurité
+ResponsibleToNotify = Responsable à prévenir
+LocationOfDetailedInstructions = Emplacement de la consigne détaillée
+SocietyAdditionalDetails = Informations complémentaires de la société
+GeneralMeansAtDisposal = Moyens généraux mis à disposition
+GeneralInstructions = Consignes générales
+RulesOfProcedure = Règlement intérieur
+RisksEvaluation = Document Unique
+
+ParticipationAgreement = Accords de participation
+TermsAndConditions = Modalités
+ESC = Comité Social & Économique
+StaffRepresentatives = Délégués du personnel
+ElectionDate = Date d'élection
+Titulars = Titulaires
+Alternates = Suppléants
+
+

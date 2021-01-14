@@ -50,22 +50,23 @@ $aphour = GETPOST('aphour');
 $apmin = GETPOST('apmin');
 $p2hour = GETPOST('p2hour');
 $p2min = GETPOST('p2min');
+
 // Load translation files required by the page
 $langs->loadLangs(array('admin', 'companies'));
 
-$contact = new Contact($db);
-
-
 if (!$user->admin) accessforbidden();
+
+global $conf, $db;
+
+$contact = new Contact($db);
 
 $error = 0;
 $hookmanager->initHooks(array('admincompany', 'globaladmin'));
 
-
 /*
  * Actions
  */
-global $conf;
+
 $parameters = array();
 $reshook = $hookmanager->executeHooks('doActions', $parameters, $object, $action); // Note that $action and $object may have been modified by some hooks
 if ($reshook < 0) setEventMessages($hookmanager->error, $hookmanager->errors, 'errors');
@@ -83,9 +84,7 @@ if (($action == 'update' && !GETPOST("cancel", 'alpha'))
 	foreach ($links as $link) {
 		if ($allLinks[$link->ref]->ref == $link->ref)
 		{
-			$i = 1;
-			$allLinks[$link->ref]->id[$i] = $link->element_id;
-			$i++;
+			array_push($allLinks[$link->ref]->id,$link->element_id);
 		}
 		else
 		{
@@ -102,11 +101,11 @@ if (($action == 'update' && !GETPOST("cancel", 'alpha'))
 	$labourdoctor_socpeopleassigned 	= !empty(GETPOST('labourdoctor_contactid', 'array')) ? GETPOST('labourdoctor_contactid', 'array') : (GETPOST('labourdoctor_contactid', 'int') > 0 ? GETPOST('labourdoctor_contactid', 'int') : 0);
 	$labourinspector_socpeopleassigned 	= !empty(GETPOST('labourinspector_contactid', 'array')) ? GETPOST('labourinspector_contactid','array') : (GETPOST('labourinspector_contactid', 'int') > 0 ? GETPOST('labourinspector_contactid', 'int') : 0);
 
-	$resources->digirisk_dolibarr_set_resources($db,$user->id,  'LabourDoctorSociete',  'societe', $labourdoctor_id, 1);
-	$resources->digirisk_dolibarr_set_resources($db,$user->id,  'LabourInspectorSociete',  'societe', $labourinspector_id, 1);
+	$resources->digirisk_dolibarr_set_resources($db,$user->id,  'LabourDoctorSociety',  'societe', $labourdoctor_id, $conf->entity);
+	$resources->digirisk_dolibarr_set_resources($db,$user->id,  'LabourInspectorSociety',  'societe', $labourinspector_id, $conf->entity);
 
-	$resources->digirisk_dolibarr_set_resources($db,$user->id,  'LabourDoctorContact',  'socpeople', $labourdoctor_socpeopleassigned, 1);
-	$resources->digirisk_dolibarr_set_resources($db,$user->id,  'LabourInspectorContact',  'socpeople', $labourinspector_socpeopleassigned, 1);
+	$resources->digirisk_dolibarr_set_resources($db,$user->id,  'LabourDoctorContact',  'socpeople', $labourdoctor_socpeopleassigned, $conf->entity);
+	$resources->digirisk_dolibarr_set_resources($db,$user->id,  'LabourInspectorContact',  'socpeople', $labourinspector_socpeopleassigned, $conf->entity);
 
 	$samu_id[0]		 		= GETPOST('samu_socid', 'int') ? GETPOST('samu_socid', 'int') : $allLinks['SAMU']->id[0];
 	$pompiers_id[0] 		= GETPOST('pompiers_socid', 'int') ? GETPOST('pompiers_socid','int') : $allLinks['Pompiers']->id[0];
@@ -116,13 +115,13 @@ if (($action == 'update' && !GETPOST("cancel", 'alpha'))
 	$antipoison_id[0] 		= GETPOST('antipoison_socid', 'int') ? GETPOST('antipoison_socid','int') : $allLinks['Antipoison']->id[0];
 	$responsible_id[0]		= GETPOST('responsible_socid', 'int') ? GETPOST('responsible_socid','int') : $allLinks['Responsible']->id[0];
 
-	$resources->digirisk_dolibarr_set_resources($db,$user->id,  'SAMU',  'societe', $samu_id, 1);
-	$resources->digirisk_dolibarr_set_resources($db,$user->id,  'Pompiers',  'societe', $pompiers_id, 1);
-	$resources->digirisk_dolibarr_set_resources($db,$user->id,  'Police',  'societe', $police_id, 1);
-	$resources->digirisk_dolibarr_set_resources($db,$user->id,  'AllEmergencies',  'societe', $touteurgence_id, 1);
-	$resources->digirisk_dolibarr_set_resources($db,$user->id,  'RightsDefender',  'societe', $defenseur_id, 1);
-	$resources->digirisk_dolibarr_set_resources($db,$user->id,  'Antipoison',  'societe', $antipoison_id, 1);
-	$resources->digirisk_dolibarr_set_resources($db,$user->id,  'Responsible',  'societe', $responsible_id, 1);
+	$resources->digirisk_dolibarr_set_resources($db,$user->id,  'SAMU',  'societe', $samu_id, $conf->entity);
+	$resources->digirisk_dolibarr_set_resources($db,$user->id,  'Pompiers',  'societe', $pompiers_id, $conf->entity);
+	$resources->digirisk_dolibarr_set_resources($db,$user->id,  'Police',  'societe', $police_id, $conf->entity);
+	$resources->digirisk_dolibarr_set_resources($db,$user->id,  'AllEmergencies',  'societe', $touteurgence_id, $conf->entity);
+	$resources->digirisk_dolibarr_set_resources($db,$user->id,  'RightsDefender',  'societe', $defenseur_id, $conf->entity);
+	$resources->digirisk_dolibarr_set_resources($db,$user->id,  'Antipoison',  'societe', $antipoison_id, $conf->entity);
+	$resources->digirisk_dolibarr_set_resources($db,$user->id,  'Responsible',  'societe', $responsible_id, $conf->entity);
 
 	dolibarr_set_const($db, "DIGIRISK_LOCATION_OF_DETAILED_INSTRUCTION", GETPOST("emplacementCD", 'none'), 'chaine', 0, '', $conf->entity);
 	dolibarr_set_const($db, "DIGIRISK_SOCIETY_DESCRIPTION", GETPOST("description", 'none'), 'chaine', 0, '', $conf->entity);
@@ -137,6 +136,7 @@ if (($action == 'update' && !GETPOST("cancel", 'alpha'))
 		exit;
 	}
 }
+
 /*
  * View
  */
@@ -149,16 +149,19 @@ print load_fiche_titre($langs->trans("CompanyFoundation"), '', 'title_setup');
 $head = company_admin_prepare_head();
 
 dol_fiche_head($head, 'security', $langs->trans("Company"), -1, 'company');
+
+$form = new Form($db);
+$formother = new FormOther($db);
+$formcompany = new FormCompany($db);
 $resources = new DigiriskResources($db);
+
 $links = $resources->fetchAll();
 $allLinks = array();
 
 foreach ($links as $link) {
 	if ($allLinks[$link->ref]->ref == $link->ref)
 	{
-		$i = 1;
-		$allLinks[$link->ref]->id[$i] = $link->element_id;
-		$i++;
+		array_push($allLinks[$link->ref]->id,$link->element_id);
 	}
 	else
 	{
@@ -169,16 +172,14 @@ foreach ($links as $link) {
 	}
 }
 
-$form = new Form($db);
-$formother = new FormOther($db);
-$formcompany = new FormCompany($db);
-
 $countrynotdefined = '<font class="error">'.$langs->trans("ErrorSetACountryFirst").' ('.$langs->trans("SeeAbove").')</font>';
-print '<span class="opacitymedium">'.$langs->trans("AccountantDesc")."</span><br>\n";
+print '<span class="opacitymedium">'.$langs->trans("DigiriskMenu")."</span><br>\n";
 print "<br>\n";
+
 /**
  * Edit parameters
  */
+
 print "\n".'<script type="text/javascript" language="javascript">';
 print '$(document).ready(function () {
 		  $("#selectcountry_id").change(function() {
@@ -196,27 +197,31 @@ print '<table class="noborder centpercent editmode">';
 
 if ($conf->societe->enabled)
 {
-	// MEDECIN DU TRAVAIL
+	/*
+				*** Labour Doctor -- Médecin du travail ***
+	*/
+
 	print '<tr class="liste_titre"><th class="titlefield wordbreak">'.$langs->trans("LabourDoctor").'</th><th>.<i class="fas fa-briefcase-medical"></i></th></tr>'."\n";
-
 	print '<tr class="oddeven"><td class="titlefieldcreate nowrap">'.$langs->trans("ActionOnCompany").'</td><td>';
-	$labour_doctor_societe = $allLinks['LabourDoctorSociete'];
 
-	// Tiers
-	if ($labour_doctor_societe->ref == 'LabourDoctorSociete')
+	$labour_doctor_society = $allLinks['LabourDoctorSociety'];
+
+	// 			* Third party concerned - Tiers concerné *
+
+	if ($labour_doctor_society->ref == 'LabourDoctorSociety')
 	{
-		$events = array();
-		$events[] = array('method' => 'getContacts', 'url' => dol_buildpath('/core/ajax/contacts.php?showempty=1', 1), 'htmlname' => 'labourdoctor_contactid', 'params' => array('add-customer-contact' => 'disabled'));
+		$events 	= array();
+		$events[] 	= array('method' => 'getContacts', 'url' => dol_buildpath('/core/ajax/contacts.php?showempty=1', 1), 'htmlname' => 'labourdoctor_contactid', 'params' => array('add-customer-contact' => 'disabled'));
+		$societe 	= new Societe($db);
+		$societe->fetch($labour_doctor_society->id);
 
-		$societe = new Societe($db);
-		$societe->fetch($labour_doctor_societe->id);
-		print $form->select_company($labour_doctor_societe->id, 'labourdoctor_socid', '', 'SelectThirdParty', 1, 0, $events, 0, 'minwidth300');
-
+		print $form->select_company($labour_doctor_society->id, 'labourdoctor_socid', '', 'SelectThirdParty', 1, 0, $events, 0, 'minwidth300');
 	}
 	else
 	{
-		$events = array();
-		$events[] = array('method' => 'getContacts', 'url' => dol_buildpath('/core/ajax/contacts.php?showempty=1', 1), 'htmlname' => 'labourdoctor_contactid', 'params' => array('add-customer-contact' => 'disabled'));
+		$events 	= array();
+		$events[] 	= array('method' => 'getContacts', 'url' => dol_buildpath('/core/ajax/contacts.php?showempty=1', 1), 'htmlname' => 'labourdoctor_contactid', 'params' => array('add-customer-contact' => 'disabled'));
+
 		//For external user force the company to user company
 		if (!empty($user->socid)) {
 			print $form->select_company($user->socid, 'labourdoctor_socid', '', 1, 1, 0, $events, 0, 'minwidth300');
@@ -226,13 +231,15 @@ if ($conf->societe->enabled)
 	}
 	print '</td></tr>';
 
-	// Related contact
+	//			* Related contacts - Contacts associés *
+
 	print '<tr class="oddeven"><td class="nowrap">'.$langs->trans("ActionOnContact").'</td><td>';
-	$labour_doctor_contact = $allLinks['LabourDoctorContact'];
+
+	$labour_doctor_contact 		= $allLinks['LabourDoctorContact'];
 	$labourdoctorpreselectedids = $labour_doctor_contact->id;
 
 	if ($labour_doctor_contact->id) {
-		print $form->selectcontacts($labour_doctor_societe->id[0], $labour_doctor_contact->id, 'labourdoctor_contactid[]', 1, '', '', 0, 'quatrevingtpercent', false, 0, array(), false, 'multiple', 'labourdoctor_contactid');
+		print $form->selectcontacts($labour_doctor_society->id[0], $labour_doctor_contact->id, 'labourdoctor_contactid[]', 1, '', '', 0, 'quatrevingtpercent', false, 0, array(), false, 'multiple', 'labourdoctor_contactid');
 	}
 	else
 	{
@@ -242,21 +249,25 @@ if ($conf->societe->enabled)
 	}
 	print '</td></tr>';
 
-	// INSPECTEUR DU TRAVAIL
+	/*
+				*** Labour Inspector -- Inspecteur du travail ***
+	*/
+
 	print '<tr class="liste_titre"><th class="titlefield wordbreak">'.$langs->trans("LabourInspector").'</th><th>.<i class="fas fa-search"></i></th></tr>'."\n";
 	print '<tr class="oddeven"><td class="titlefieldcreate nowrap">'.$langs->trans("ActionOnCompany").'</td><td>';
-	$labour_inspector_societe = $allLinks['LabourInspectorSociete'];
 
-	// Tiers
-	if ($labour_inspector_societe->ref == 'LabourInspectorSociete')
+	$labour_inspector_societe = $allLinks['LabourInspectorSociety'];
+
+	// 			* Third party concerned - Tiers concerné *
+
+	if ($labour_inspector_societe->ref == 'LabourInspectorSociety')
 	{
-		$events = array();
-		$events[] = array('method' => 'getContacts', 'url' => dol_buildpath('/core/ajax/contacts.php?showempty=1', 1), 'htmlname' => 'labourinspector_contactid', 'params' => array('add-customer-contact' => 'disabled'));
-
-		$societe = new Societe($db);
+		$events 	= array();
+		$events[] 	= array('method' => 'getContacts', 'url' => dol_buildpath('/core/ajax/contacts.php?showempty=1', 1), 'htmlname' => 'labourinspector_contactid', 'params' => array('add-customer-contact' => 'disabled'));
+		$societe 	= new Societe($db);
 		$societe->fetch($labour_inspector_societe->id[0]);
-		print $form->select_company($labour_inspector_societe->id[0], 'labourinspector_socid', '', 'SelectThirdParty', 1, 0, $events, 0, 'minwidth300');
 
+		print $form->select_company($labour_inspector_societe->id[0], 'labourinspector_socid', '', 'SelectThirdParty', 1, 0, $events, 0, 'minwidth300');
 	}
 	else
 	{
@@ -271,10 +282,13 @@ if ($conf->societe->enabled)
 	}
 	print '</td></tr>';
 
-	// Related contacts
+	//			* Related contacts - Contacts associés *
+
 	print '<tr class="oddeven"><td class="nowrap">'.$langs->trans("ActionOnContact").'</td><td>';
-	$labour_inspector_contact =  $allLinks['LabourInspectorContact'];
-	$preselectedids = $labour_inspector_contact->id;
+
+	$labour_inspector_contact 	=  $allLinks['LabourInspectorContact'];
+	$preselectedids 			= $labour_inspector_contact->id;
+
 	if ($labour_inspector_contact->id) {
 		print $form->selectcontacts($labour_inspector_societe->id[0], $labour_inspector_contact->id , 'labourinspector_contactid[]', 1, '', '', 0, 'quatrevingtpercent', false, 0, array(), false, 'multiple', 'labourinspector_contactid');
 	}
@@ -286,17 +300,22 @@ if ($conf->societe->enabled)
 	}
 	print '</td></tr>';
 
-	// SAMU
-	print '<tr class="liste_titre"><th class="titlefield wordbreak">'.$langs->trans("SAMU").'</th><th>.<i class="fas fa-hospital-alt"></i></th></tr>'."\n";
+	/*
+				*** Emergencies -- SAMU ***
+	*/
 
+	print '<tr class="liste_titre"><th class="titlefield wordbreak">'.$langs->trans("SAMU").'</th><th>.<i class="fas fa-hospital-alt"></i></th></tr>'."\n";
 	print '<tr class="oddeven"><td class="titlefieldcreate nowrap">'.$langs->trans("ActionOnCompany").'</td><td>';
+
 	$samu_resources =  $allLinks['SAMU'];
 
-	// Tiers
+	// 			* Third party concerned - Tiers concerné *
+
 	if ($samu_resources->ref == 'SAMU')
 	{
 		$societe = new Societe($db);
 		$societe->fetch($samu_resources->id[0]);
+
 		print $form->select_company($samu_resources->id[0], 'samu_socid', '', 'SelectThirdParty', 1, 0, 0, 0, 'minwidth300');
 
 	}
@@ -311,13 +330,17 @@ if ($conf->societe->enabled)
 	}
 	print '</td></tr>';
 
-	// Pompiers
-	print '<tr class="liste_titre"><th class="titlefield wordbreak">'.$langs->trans("Pompiers").'</th><th>.<i class="fas fa-ambulance"></i></th></tr>'."\n";
+	/*
+				*** Fire Brigade -- Pompiers ***
+	*/
 
+	print '<tr class="liste_titre"><th class="titlefield wordbreak">'.$langs->trans("FireBrigade").'</th><th>.<i class="fas fa-ambulance"></i></th></tr>'."\n";
 	print '<tr class="oddeven"><td class="titlefieldcreate nowrap">'.$langs->trans("ActionOnCompany").'</td><td>';
+
 	$pompiers_resources = $allLinks['Pompiers'];
 
-	// Tiers
+	// 			* Third party concerned - Tiers concerné *
+
 	if ($pompiers_resources->ref == 'Pompiers')
 	{
 		$societe = new Societe($db);
@@ -336,13 +359,17 @@ if ($conf->societe->enabled)
 	}
 	print '</td></tr>';
 
-	// Police
-	print '<tr class="liste_titre"><th class="titlefield wordbreak">'.$langs->trans("Police").'</th><th>.<i class="fas fa-car"></i></th></tr>'."\n";
+	/*
+				*** Police -- Police ***
+	*/
 
+	print '<tr class="liste_titre"><th class="titlefield wordbreak">'.$langs->trans("Police").'</th><th>.<i class="fas fa-car"></i></th></tr>'."\n";
 	print '<tr class="oddeven"><td class="titlefieldcreate nowrap">'.$langs->trans("ActionOnCompany").'</td><td>';
+
 	$police_resources = $allLinks['Police'];
 
-	// Tiers
+	// 			* Third party concerned - Tiers concerné *
+
 	if ($police_resources->ref == 'Police')
 	{
 		$societe = new Societe($db);
@@ -361,13 +388,17 @@ if ($conf->societe->enabled)
 	}
 	print '</td></tr>';
 
-	// Toute Urgence
-	print '<tr class="liste_titre"><th class="titlefield wordbreak">'.$langs->trans("AllEmergencies").'</th><th>.<i class="fas fa-phone"></i></th></tr>'."\n";
+	/*
+				*** For any emergency -- Pour toute urgence ***
+	*/
 
+	print '<tr class="liste_titre"><th class="titlefield wordbreak">'.$langs->trans("AllEmergencies").'</th><th>.<i class="fas fa-phone"></i></th></tr>'."\n";
 	print '<tr class="oddeven"><td class="titlefieldcreate nowrap">'.$langs->trans("ActionOnCompany").'</td><td>';
+
 	$touteurgence_resources = $allLinks['AllEmergencies'];
 
-	// Tiers
+	// 			* Third party concerned - Tiers concerné *
+
 	if ($touteurgence_resources->ref == 'AllEmergencies')
 	{
 		$societe = new Societe($db);
@@ -386,13 +417,17 @@ if ($conf->societe->enabled)
 	}
 	print '</td></tr>';
 
-	// Défenseur des droits
-	print '<tr class="liste_titre"><th class="titlefield wordbreak">'.$langs->trans("RightsDefender").'</th><th>.<i class="fas fa-gavel"></i></th></tr>'."\n";
+	/*
+				*** Rights defender -- Défenseur des droits ***
+	*/
 
+	print '<tr class="liste_titre"><th class="titlefield wordbreak">'.$langs->trans("RightsDefender").'</th><th>.<i class="fas fa-gavel"></i></th></tr>'."\n";
 	print '<tr class="oddeven"><td class="titlefieldcreate nowrap">'.$langs->trans("ActionOnCompany").'</td><td>';
+
 	$defenseur_resources = $allLinks['RightsDefender'];
 
-	// Tiers
+	// 			* Third party concerned - Tiers concerné *
+
 	if ($defenseur_resources->ref == 'RightsDefender')
 	{
 		$societe = new Societe($db);
@@ -411,13 +446,17 @@ if ($conf->societe->enabled)
 	}
 	print '</td></tr>';
 
-	// Antipoison
-	print '<tr class="liste_titre"><th class="titlefield wordbreak">'.$langs->trans("Antipoison").'</th><th>.<i class="fas fa-skull-crossbones"></i></th></tr>'."\n";
+	/*
+				*** Poison control center -- Centre antipoison ***
+	*/
+
+	print '<tr class="liste_titre"><th class="titlefield wordbreak">'.$langs->trans("PoisonControlCenter").'</th><th>.<i class="fas fa-skull-crossbones"></i></th></tr>'."\n";
 
 	print '<tr class="oddeven"><td class="titlefieldcreate nowrap">'.$langs->trans("ActionOnCompany").'</td><td>';
 	$antipoison_resources = $allLinks['Antipoison'];
 
-	// Tiers
+	// 			* Third party concerned - Tiers concerné *
+
 	if ($antipoison_resources->ref == 'Antipoison')
 	{
 		$societe = new Societe($db);
@@ -437,23 +476,29 @@ if ($conf->societe->enabled)
 	print '</td></tr>';
 }
 
-// Consignes de sécurité
-print '<tr class="liste_titre"><th class="titlefield wordbreak">'.$langs->trans("Consignes de sécurité").'</th><th>'.$langs->trans("Value").'</th></tr>'."\n";
+/*
+			*** Safety instructions -- Consignes de sécurité ***
+*/
 
-// Responsable à prévenir
+print '<tr class="liste_titre"><th class="titlefield wordbreak">'.$langs->trans("SafetyInstructions").'</th><th>'.$langs->trans("Value").'</th></tr>'."\n";
 
-print '<tr><td class="titlefieldcreate nowrap">'.$langs->trans("Responsable à prévenir").'</td><td>';
+// 			* Responsible to notify - Responsable à prévenir *
+
+print '<tr><td class="titlefieldcreate nowrap">'.$langs->trans("ResponsibleToNotify").'</td><td>';
 $responsible_resources = $allLinks['Responsible'];
 
-// Tiers
+// 			* Third party concerned - Tiers concerné *
+
 if ($responsible_resources->ref == 'Responsible' && $responsible_resources->id[0] > 0)
 {
 	$user = new User($db);
 	$user->fetch($responsible_resources->id[0]);
 
 	print $form->select_dolusers($responsible_resources->id[0], 'responsible_socid', 0, null, 0, 0, 0, 0, 'minwidth300');
-// Téléphone
-	print '<tr class="oddeven"><td><label for="name">'.$langs->trans("Téléphone").'</label></td><td>';
+
+	// 			* Phone number - Numéro de téléphone *
+
+	print '<tr class="oddeven"><td><label for="name">'.$langs->trans("Phone").'</label></td><td>';
 	print $user->office_phone;
 	print '</td></tr>';
 
@@ -469,34 +514,48 @@ else //id = 0
 }
 print '</td></tr>';
 
-// Emplacement de la consigne détaillée
-print '<tr class="oddeven"><td><label for="emplacementCD">'.$langs->trans("Emplacement de la consigne détaillée").'</label></td><td>';
+// 			* Location of detailed instructions - Emplacement de la consigne détaillée *
+
+print '<tr class="oddeven"><td><label for="emplacementCD">'.$langs->trans("LocationOfDetailedInstructions").'</label></td><td>';
 print '<textarea name="emplacementCD" id="emplacementCD" class="minwidth300" rows="'.ROWS_3.'">'.($conf->global->DIGIRISK_LOCATION_OF_DETAILED_INSTRUCTION ? $conf->global->DIGIRISK_LOCATION_OF_DETAILED_INSTRUCTION : '').'</textarea></td></tr>'."\n";
 
-print '<tr class="liste_titre"><th class="titlefield">'.$langs->trans("Informations complémentaires de la société").'</th><th>'.$langs->trans("Value").'</th></tr>'."\n";
+/*
+			*** Society additional details -- Informations complémentaires de la société ***
+*/
 
-// Description
+print '<tr class="liste_titre"><th class="titlefield">'.$langs->trans("SocietyAdditionalDetails").'</th><th>'.$langs->trans("Value").'</th></tr>'."\n";
+
+// 			* Description - Emplacement de la consigne détaillée *
+
 print '<tr class="oddeven"><td><label for="description">'.$langs->trans("Description").'</label></td><td>';
 print '<textarea name="description" id="description" class="minwidth300" rows="'.ROWS_3.'">'.($conf->global->DIGIRISK_SOCIETY_DESCRIPTION ? $conf->global->DIGIRISK_SOCIETY_DESCRIPTION : '').'</textarea></td></tr>'."\n";
 
-// Moyens généraux mis à disposition
-print '<tr class="oddeven"><td><label for="moyensgeneraux">'.$langs->trans("Moyens généraux mis à disposition").'</label></td><td>';
+// 			* General means at disposal - Moyens généraux mis à disposition *
+
+print '<tr class="oddeven"><td><label for="moyensgeneraux">'.$langs->trans("GeneralMeansAtDisposal").'</label></td><td>';
 print '<textarea name="moyensgeneraux" id="moyensgeneraux" class="minwidth300" rows="'.ROWS_3.'">'.($conf->global->DIGIRISK_GENERAL_MEANS ? $conf->global->DIGIRISK_GENERAL_MEANS : '').'</textarea></td></tr>'."\n";
 
-// Consignes générales
-print '<tr class="oddeven"><td><label for="consignesgenerales">'.$langs->trans(" Consignes générales").'</label></td><td>';
+// 			* General instructions - Consignes générales *
+
+print '<tr class="oddeven"><td><label for="consignesgenerales">'.$langs->trans("GeneralInstructions").'</label></td><td>';
 print '<textarea name="consignesgenerales" id="consignesgenerales" class="minwidth300" rows="'.ROWS_3.'">'.($conf->global->DIGIRISK_GENERAL_RULES ? $conf->global->DIGIRISK_GENERAL_RULES : '').'</textarea></td></tr>'."\n";
 
-// RI
-print '<tr class="liste_titre"><th class="titlefield wordbreak">'.$langs->trans("Règlement intérieur").'</th><th>'.$langs->trans("").'</th></tr>'."\n";
-// Emplacement
-print '<tr class="oddeven"><td><label for="emplacementRI">'.$langs->trans("Emplacement").'</label></td><td>';
+// 			* Rules of procedure - Règlement intérieur *
+
+print '<tr class="liste_titre"><th class="titlefield wordbreak">'.$langs->trans("RulesOfProcedure").'</th><th>'.$langs->trans("").'</th></tr>'."\n";
+
+// 			* Rules of procedure location - Emplacement du règlement intérieur *
+
+print '<tr class="oddeven"><td><label for="emplacementRI">'.$langs->trans("Location").'</label></td><td>';
 print '<textarea name="emplacementRI" id="emplacementRI" class="minwidth300" rows="'.ROWS_3.'">'.($conf->global->DIGIRISK_RULES_LOCATION ? $conf->global->DIGIRISK_RULES_LOCATION : '').'</textarea></td></tr>'."\n";
 
-// DU
-print '<tr class="liste_titre"><th class="titlefield wordbreak">'.$langs->trans("Document Unique").'</th><th>'.$langs->trans("").'</th></tr>'."\n";
-// Emplacement
-print '<tr class="oddeven"><td><label for="emplacementDU">'.$langs->trans("Emplacement").'</label></td><td>';
+// 			* Risks evaluation - Document Unique *
+
+print '<tr class="liste_titre"><th class="titlefield wordbreak">'.$langs->trans("RisksEvaluation").'</th><th>'.$langs->trans("").'</th></tr>'."\n";
+
+// 			* Risks evaluation location - Emplacement du Document Unique *
+
+print '<tr class="oddeven"><td><label for="emplacementDU">'.$langs->trans("Location").'</label></td><td>';
 print '<textarea name="emplacementDU" id="emplacementDU" class="minwidth300" rows="'.ROWS_3.'">'.($conf->global->DIGIRISK_DUER_LOCATION ? $conf->global->DIGIRISK_DUER_LOCATION : '').'</textarea></td></tr>'."\n";
 
 print '</table>';
