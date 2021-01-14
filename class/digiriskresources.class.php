@@ -282,6 +282,32 @@ class DigiriskResources extends CommonObject
 		}
 
 
+	public function digirisk_dolibarr_fetch_resources() {
+
+		$resources = new DigiriskResources($this->db);
+
+		$links = $resources->fetchAll();
+		$allLinks = array();
+
+		foreach ($links as $link) {
+			if ($allLinks[$link->ref]->ref == $link->ref)
+			{
+				array_push($allLinks[$link->ref]->id,$link->element_id);
+			}
+			else
+			{
+				$allLinks[$link->ref] 		= new stdClass;
+				$allLinks[$link->ref]->id[] = $link->element_id;
+				$allLinks[$link->ref]->type = $link->element_type;
+				$allLinks[$link->ref]->ref 	= $link->ref;
+			}
+		}
+
+	return $allLinks;
+	}
+
+
+
 	/**
 	 * Clone an object into another one
 	 *

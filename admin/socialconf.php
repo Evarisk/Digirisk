@@ -65,22 +65,7 @@ if (($action == 'update' && !GETPOST("cancel", 'alpha'))
 {
 	// Initializing DigiriskResources object to get list of resources
 	$resources = new DigiriskResources($db);
-	$links = $resources->fetchAll();
-	$allLinks = array();
-
-	foreach ($links as $link) {
-		if ($allLinks[$link->ref]->ref == $link->ref)
-		{
-			array_push($allLinks[$link->ref]->id,$link->element_id);
-		}
-		else
-		{
-			$allLinks[$link->ref] 		= new stdClass;
-			$allLinks[$link->ref]->id[] = $link->element_id;
-			$allLinks[$link->ref]->type = $link->element_type;
-			$allLinks[$link->ref]->ref 	= $link->ref;
-		}
-	}
+	$allLinks = $resources->digirisk_dolibarr_fetch_resources();
 
 	$electionDateCSE = GETPOST('ElectionDateCSE', 'none');
 	$electionDateCSE = explode('/',$electionDateCSE);
@@ -129,22 +114,7 @@ $formother 	 = new FormOther($db);
 $formcompany = new FormCompany($db);
 $resources 	 = new DigiriskResources($db);
 
-$links 	  = $resources->fetchAll();
-$allLinks = array();
-
-foreach ($links as $link) {
-	if ($allLinks[$link->ref]->ref == $link->ref)
-	{
-		array_push($allLinks[$link->ref]->id,$link->element_id);
-	}
-	else
-	{
-		$allLinks[$link->ref] 		= new stdClass;
-		$allLinks[$link->ref]->id[] = $link->element_id;
-		$allLinks[$link->ref]->type = $link->element_type;
-		$allLinks[$link->ref]->ref 	= $link->ref;
-	}
-}
+$allLinks = $resources->digirisk_dolibarr_fetch_resources();
 
 $electionDateCSE 	= $conf->global->DIGIRISK_CSE_ELECTION_DATE;
 $electionDateDP 	= $conf->global->DIGIRISK_DP_ELECTION_DATE;

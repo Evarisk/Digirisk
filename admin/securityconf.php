@@ -78,22 +78,8 @@ if (($action == 'update' && !GETPOST("cancel", 'alpha'))
 	//@todo pertinence getpos ou all_links
 
 	$resources = new DigiriskResources($db);
-	$links = $resources->fetchAll();
-	$allLinks = array();
+	$allLinks = $resources->digirisk_dolibarr_fetch_resources();
 
-	foreach ($links as $link) {
-		if ($allLinks[$link->ref]->ref == $link->ref)
-		{
-			array_push($allLinks[$link->ref]->id,$link->element_id);
-		}
-		else
-		{
-			$allLinks[$link->ref] 		= new stdclass;
-			$allLinks[$link->ref]->id[] = $link->element_id;
-			$allLinks[$link->ref]->type = $link->element_type;
-			$allLinks[$link->ref]->ref 	= $link->ref;
-		}
-	}
 
 	$labourdoctor_id[0] 					= GETPOST('labourdoctor_socid', 'int') > 0 ? GETPOST('labourdoctor_socid', 'int') : 0 ;
 	$labourinspector_id[0]					= GETPOST('labourinspector_socid', 'int') > 0 ? GETPOST('labourinspector_socid','int') : 0;
@@ -154,23 +140,8 @@ $form = new Form($db);
 $formother = new FormOther($db);
 $formcompany = new FormCompany($db);
 $resources = new DigiriskResources($db);
+$allLinks = $resources->digirisk_dolibarr_fetch_resources();
 
-$links = $resources->fetchAll();
-$allLinks = array();
-
-foreach ($links as $link) {
-	if ($allLinks[$link->ref]->ref == $link->ref)
-	{
-		array_push($allLinks[$link->ref]->id,$link->element_id);
-	}
-	else
-	{
-		$allLinks[$link->ref] 		= new stdClass;
-		$allLinks[$link->ref]->id[] = $link->element_id;
-		$allLinks[$link->ref]->type = $link->element_type;
-		$allLinks[$link->ref]->ref 	= $link->ref;
-	}
-}
 
 $countrynotdefined = '<font class="error">'.$langs->trans("ErrorSetACountryFirst").' ('.$langs->trans("SeeAbove").')</font>';
 print '<span class="opacitymedium">'.$langs->trans("DigiriskMenu")."</span><br>\n";
