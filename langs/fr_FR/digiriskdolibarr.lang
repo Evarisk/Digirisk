@@ -63,7 +63,7 @@ DigiriskDocumentsNumberingModule = Modèle de numérotation des documents de Dig
 
 DigiriskNumberingDate = Fixe la référence comme étant la date et l'heure de création.
 DigiriskLegalDisplayJupiterModel = Fixe la référence comme étant : "legaldisplay_date_heure"
-DigiriskLegalDisplayStandardModel = Fixe la référence comme étant : "legaldisplay_heure_date"
+DigiriskLegalDisplayStandardModel = Fixe la référence comme étant : "date_heure_legaldisplay"
 DigiriskLegalDisplayAdvancedModel = Fixe la référence comme étant : "heure_date"
 
 LabourDoctor = Médecin du travail

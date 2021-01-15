@@ -279,7 +279,6 @@ foreach ($dirmodels as $reldir)
 							if ($conf->global->DIGIRISKDOLIBARR__ADDON == $file || $conf->global->DIGIRISKDOLIBARR__ADDON.'.php' == $file)
 							{
 								print img_picto($langs->trans("Activated"), 'switch_on');
-								dolibarr_set_const($db, 'DIGIRISK_LEGALDISPLAY_PREFIX', $module->prefixlegaldisplay, 'chaine');
 							}
 							else
 							{
