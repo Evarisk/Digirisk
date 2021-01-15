@@ -40,6 +40,7 @@ global $langs, $user;
 
 // Libraries
 require_once DOL_DOCUMENT_ROOT."/core/lib/admin.lib.php";
+require_once DOL_DOCUMENT_ROOT."/custom/digiriskdolibarr/class/legaldisplay.class.php";
 require_once '../lib/digiriskdolibarr.lib.php';
 //require_once "../class/myclass.class.php";
 
@@ -194,6 +195,139 @@ print load_fiche_titre($langs->trans($page_name), $linkback, 'object_digiriskdol
 // Configuration header
 $head = digiriskdolibarrAdminPrepareHead();
 dol_fiche_head($head, 'settings', '', -1, "digiriskdolibarr@digiriskdolibarr");
+
+
+
+/*
+ *  Numbering module
+ */
+
+print load_fiche_titre($langs->trans("DigiriskDocumentsNumberingModule"), '', '');
+
+print '<table class="noborder centpercent">';
+print '<tr class="liste_titre">';
+print '<td>'.$langs->trans("Name").'</td>';
+print '<td>'.$langs->trans("Description").'</td>';
+print '<td class="nowrap">'.$langs->trans("Example").'</td>';
+print '<td class="center" width="60">'.$langs->trans("Status").'</td>';
+print '<td class="center" width="16">'.$langs->trans("ShortInfo").'</td>';
+print '</tr>'."\n";
+
+clearstatcache();
+
+foreach ($dirmodels as $reldir)
+{
+	$dir = dol_buildpath($reldir."custom/digiriskdolibarr/core/modules/digiriskdolibarr/");
+	// A CHANGER PAR DIGIRISK DOLIBARR
+	if (is_dir($dir))
+	{
+		$handle = opendir($dir);
+		if (is_resource($handle))
+		{
+			while (($file = readdir($handle)) !== false)
+			{
+				if (!is_dir($dir.$file) || (substr($file, 0, 1) <> '.' && substr($file, 0, 3) <> 'CVS'))
+				{
+					$filebis = $file;
+
+					$classname = preg_replace('/\.php$/', '', $file);
+
+					// For compatibility
+					if (!is_file($dir.$filebis))
+					{
+						$filebis = $file."/".$file.".modules.php";
+						$classname = "mod_digiriskdolibarr_".$file;
+					}
+					// Check if there is a filter on country
+					preg_match('/\-(.*)_(.*)$/', $classname, $reg);
+					if (!empty($reg[2]) && $reg[2] != strtoupper($mysoc->country_code)) continue;
+
+					$classname = preg_replace('/\-.*$/', '', $classname);
+
+					if (!class_exists($classname) && is_readable($dir.$filebis) && (preg_match('/mod_/', $filebis) || preg_match('/mod_/', $classname)) && substr($filebis, dol_strlen($filebis) - 3, 3) == 'php')
+					{
+						// Charging the numbering class
+						require_once $dir.$filebis;
+
+						$module = new $classname($db);
+
+						// Show modules according to features level
+						if ($module->version == 'development' && $conf->global->MAIN_FEATURES_LEVEL < 2) continue;
+						if ($module->version == 'experimental' && $conf->global->MAIN_FEATURES_LEVEL < 1) continue;
+
+						if ($module->isEnabled())
+						{
+							print '<tr class="oddeven"><td width="100">';
+							echo preg_replace('/\-.*$/', '', preg_replace('/mod_digiriskdolibarr_/', '', preg_replace('/\.php$/', '', $file)));
+							print "</td><td>\n";
+
+							print $module->info();
+
+							print '</td>';
+
+							// Show example of numbering module
+							print '<td class="nowrap">';
+							$tmp = $module->prefixlegaldisplay;
+
+							if (preg_match('/^Error/', $tmp)) print '<div class="error">'.$langs->trans($tmp).'</div>';
+							elseif ($tmp == 'NotConfigured') print $langs->trans($tmp);
+							else print $tmp;
+							print '</td>'."\n";
+
+							print '<td class="center">';
+
+							if ($conf->global->DIGIRISKDOLIBARR__ADDON == $file || $conf->global->DIGIRISKDOLIBARR__ADDON.'.php' == $file)
+							{
+								print img_picto($langs->trans("Activated"), 'switch_on');
+								dolibarr_set_const($db, 'DIGIRISK_LEGALDISPLAY_PREFIX', $module->prefixlegaldisplay, 'chaine');
+							}
+							else
+							{
+								print '<a class="reposition" href="'.$_SERVER["PHP_SELF"].'?action=setmod&value='.preg_replace('/\.php$/', '', $file).'&scan_dir='.$module->scandir.'&label='.urlencode($module->name).'" alt="'.$langs->trans("Default").'">'.img_picto($langs->trans("Disabled"), 'switch_off').'</a>';
+							}
+							print '</td>';
+
+							$legaldisplay = new LegalDisplay($db);
+							$legaldisplay->initAsSpecimen();
+
+							// Example for standard invoice
+							$htmltooltip = '';
+							$htmltooltip .= ''.$langs->trans("Version").': <b>'.$module->getVersion().'</b><br>';
+							$legaldisplay->type = 0;
+							$nextval = $module->getNextValue($mysoc, $legaldisplay);
+							if ("$nextval" != $langs->trans("NotAvailable")) {  // Keep " on nextval
+								$htmltooltip .= $langs->trans("NextValueForInvoices").': ';
+								if ($nextval) {
+									if (preg_match('/^Error/', $nextval) || $nextval == 'NotConfigured')
+										$nextval = $langs->trans($nextval);
+									$htmltooltip .= $nextval.'<br>';
+								} else {
+									$htmltooltip .= $langs->trans($module->error).'<br>';
+								}
+							}
+
+							print '<td class="center">';
+							print $form->textwithpicto('', $htmltooltip, 1, 0);
+
+							if ($conf->global->DIGIRISKDOLIBARR__ADDON.'.php' == $file)  // If module is the one used, we show existing errors
+							{
+								if (!empty($module->error)) dol_htmloutput_mesg($module->error, '', 'error', 1);
+							}
+
+							print '</td>';
+
+							print "</tr>\n";
+						}
+					}
+				}
+			}
+			closedir($handle);
+		}
+	}
+}
+
+print '</table>';
+
 
 // Setup page goes here
 echo '<span class="opacitymedium">'.$langs->trans("DigiriskdolibarrSetupPage").'</span><br><br>';

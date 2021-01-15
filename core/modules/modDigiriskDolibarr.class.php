@@ -122,6 +122,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			// CONST CONFIGURATION
 			1 => array('DIGIRISK_GENERAL_MEANS','chaine','','General means', 1),
 			2 => array('DIGIRISK_GENERAL_RULES','chaine','','General rules', 1),
+			2 => array('DIGIRISK_LEGALDISPLAY_PREFIX','chaine','','Legal Display Prefix', 1),
 			// CONST LEGAL DISPLAY
 			3 => array('DIGIRISK_LOCATION_OF_DETAILED_INSTRUCTION','chaine','','Location of detailed instruction', 1),
 			4 => array('DIGIRISK_DEROGATION_SCHEDULE_PERMANENT','chaine','','Location of detailed instruction', 1),

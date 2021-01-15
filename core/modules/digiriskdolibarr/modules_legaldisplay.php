@@ -95,18 +95,6 @@ abstract class ModeleNumRefLegalDisplay
 	}
 
 	/**
-	 *	Returns an example of numbering
-	 *
-	 *	@return     string      Example
-	 */
-	public function getExample()
-	{
-		global $langs;
-		$langs->load("digiriskdolibarr@digiriskdolibarr");
-		return $langs->trans("NoExample");
-	}
-
-	/**
 	 *  Checks if the numbers already in the database do not
 	 *  cause conflicts that would prevent this numbering working.
 	 *

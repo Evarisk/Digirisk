@@ -1,9 +1,7 @@
 <?php
-/* Copyright (C) 2003-2007  Rodolphe Quiedeville        <rodolphe@quiedeville.org>
- * Copyright (C) 2004-2007  Laurent Destailleur         <eldy@users.sourceforge.net>
- * Copyright (C) 2005-2009  Regis Houssin               <regis.houssin@inodbox.com>
- * Copyright (C) 2008       Raphael Bertrand (Resultic) <raphael.bertrand@resultic.fr>
- * Copyright (C) 2019       Frédéric France             <frederic.france@netlogic.fr>
+/* Copyright (C) 2005-2008 Laurent Destailleur  <eldy@users.sourceforge.net>
+ * Copyright (C) 2005-2018 Regis Houssin        <regis.houssin@inodbox.com>
+ * Copyright (C) 2013      Juanjo Menent		<jmenent@2byte.es>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,16 +19,13 @@
  */
 
 /**
- * \file       htdocs/core/modules/digiriskdolibarr/mod_legaldisplay_advanced.php
- * \ingroup    digiriskdolibarr
- * \brief      File containing class for advanced numbering model of LegalDisplay
+ *	\file       htdocs/core/modules/facture/mod_facture_mars.php
+ *	\ingroup    facture
+ *	\brief      File containing class for numbering module Mars
  */
-
-dol_include_once('/digiriskdolibarr/core/modules/digiriskdolibarr/modules_legaldisplay.php');
-
-
+require_once DOL_DOCUMENT_ROOT.'/custom/digiriskdolibarr/core/modules/digiriskdolibarr/modules_legaldisplay.php';
 /**
- *	Class to manage customer Bom numbering rules advanced
+ * 	Class to manage invoice numbering rules Mars
  */
 class mod_legaldisplay_advanced extends ModeleNumRefLegalDisplay
 {
@@ -40,16 +35,27 @@ class mod_legaldisplay_advanced extends ModeleNumRefLegalDisplay
 	 */
 	public $version = 'dolibarr'; // 'development', 'experimental', 'dolibarr'
 
+	public $prefixlegaldisplay = 'legaldisplay';
+
 	/**
-	 * @var string Error message
+	 * @var string Error code (or message)
 	 */
 	public $error = '';
 
-	/**
-	 * @var string name
-	 */
-	public $name = 'advanced';
 
+	/**
+	 * Constructor
+	 */
+	public function __construct()
+	{
+		global $conf, $db;
+		$now = $db->idate(dol_now());
+		$nowDate = str_replace(':','-', $now);
+		$nowDate = str_replace(' ','_', $nowDate);
+		$this->prefixlegaldisplay =  $nowDate;
+		$conf->global->DIGIRISK_LEGALDISPLAY_PREFIX = $this->prefixlegaldisplay;
+
+	}
 
 	/**
 	 *  Returns the description of the numbering model
@@ -58,37 +64,9 @@ class mod_legaldisplay_advanced extends ModeleNumRefLegalDisplay
 	 */
 	public function info()
 	{
-		global $conf, $langs, $db;
-
-		$langs->load("bills");
-
-		$form = new Form($db);
-
-		$texte = $langs->trans('GenericNumRefModelDesc')."<br>\n";
-		$texte .= '<form action="'.$_SERVER["PHP_SELF"].'" method="POST">';
-		$texte .= '<input type="hidden" name="token" value="'.newToken().'">';
-		$texte .= '<input type="hidden" name="action" value="updateMask">';
-		$texte .= '<input type="hidden" name="maskconstBom" value="DIGIRISKDOLIBARR_LEGALDISPLAY_ADVANCED_MASK">';
-		$texte .= '<table class="nobordernopadding" width="100%">';
-
-		$tooltip = $langs->trans("GenericMaskCodes", $langs->transnoentities("LegalDisplay"), $langs->transnoentities("LegalDisplay"));
-		$tooltip .= $langs->trans("GenericMaskCodes2");
-		$tooltip .= $langs->trans("GenericMaskCodes3");
-		$tooltip .= $langs->trans("GenericMaskCodes4a", $langs->transnoentities("LegalDisplay"), $langs->transnoentities("LegalDisplay"));
-		$tooltip .= $langs->trans("GenericMaskCodes5");
-
-		// Parametrage du prefix
-		$texte .= '<tr><td>'.$langs->trans("Mask").':</td>';
-		$texte .= '<td class="right">'.$form->textwithpicto('<input type="text" class="flat" size="24" name="maskLegalDisplay" value="'.$conf->global->DIGIRISKDOLIBARR_LEGALDISPLAY_ADVANCED_MASK.'">', $tooltip, 1, 1).'</td>';
-
-		$texte .= '<td class="left" rowspan="2">&nbsp; <input type="submit" class="button" value="'.$langs->trans("Modify").'" name="Button"></td>';
-
-		$texte .= '</tr>';
-
-		$texte .= '</table>';
-		$texte .= '</form>';
-
-		return $texte;
+		global $langs;
+		$langs->load("digiriskdolibarr@digiriskdolibarr");
+		return $langs->trans('DigiriskLegalDisplayAdvancedModel', $this->prefixlegaldisplay);
 	}
 
 	/**
@@ -98,53 +76,29 @@ class mod_legaldisplay_advanced extends ModeleNumRefLegalDisplay
 	 */
 	public function getExample()
 	{
-		global $conf, $db, $langs, $mysoc;
+		global $conf;
 
-		$object = new LegalDisplay($db);
-		$object->initAsSpecimen();
-
-		/*$old_code_client = $mysoc->code_client;
-		$old_code_type = $mysoc->typent_code;
-		$mysoc->code_client = 'CCCCCCCCCC';
-		$mysoc->typent_code = 'TTTTTTTTTT';*/
-
-		$numExample = $this->getNextValue($object);
-
-		/*$mysoc->code_client = $old_code_client;
-		$mysoc->typent_code = $old_code_type;*/
-
-		if (!$numExample)
-		{
-			$numExample = $langs->trans('NotConfigured');
-		}
-		return $numExample;
+		return $conf->global->DIGIRISK_LEGALDISPLAY_PREFIX;
 	}
 
 	/**
-	 * 	Return next free value
+	 *  Checks if the numbers already in the database do not
+	 *  cause conflicts that would prevent this numbering working.
 	 *
-	 *  @param  Object		$object		Object we need next value for
-	 *  @return string      			Value if KO, <0 if KO
+	 *  @return     boolean     false if conflict, true if ok
 	 */
-	public function getNextValue($object)
+
+
+	/**
+	 *  Return next free value
+	 *
+	 *  @param  Societe     $objsoc         Object third party
+	 *  @param  string      $objforref      Object for number to search
+	 *  @param  string      $mode           'next' for next value or 'last' for last value
+	 *  @return string                      Next free value
+	 */
+	public function getNumRef($objsoc, $objforref, $mode = 'next')
 	{
-		global $db, $conf;
-
-		require_once DOL_DOCUMENT_ROOT.'/core/lib/functions2.lib.php';
-
-		// We get cursor rule
-		$mask = $conf->global->DIGIRISKDOLIBARR_LEGALDISPLAY_ADVANCED_MASK;
-
-		if (!$mask)
-		{
-			$this->error = 'NotConfigured';
-			return 0;
-		}
-
-		$date = $object->date;
-
-		$numFinal = get_next_value($db, $mask, 'digiriskdolibarr_legaldisplay', 'ref', '', null, $date);
-
-		return  $numFinal;
+		return $this->getNextValue($objsoc, $objforref, $mode);
 	}
 }

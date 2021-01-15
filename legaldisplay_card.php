@@ -67,7 +67,7 @@ dol_include_once('/digiriskdolibarr/lib/digiriskdolibarr_legaldisplay.lib.php');
 // Load translation files required by the page
 $langs->loadLangs(array("digiriskdolibarr@digiriskdolibarr", "other"));
 
-global $db;
+global $db, $conf;
 // Get parameters
 $id = GETPOST('id', 'int');
 $ref        = GETPOST('ref', 'alpha');
@@ -312,7 +312,7 @@ if ($action == 'create')
 	include DOL_DOCUMENT_ROOT.'/core/tpl/commonfields_add.tpl.php';
 
 	print '<tr><td class="fieldrequired">'.$langs->trans("Ref").'</td><td>';
-	print '<input class="flat" type="text" size="36" name="ref" value="'.$nowDate.'">';
+	print '<input class="flat" type="text" size="36" name="ref" value="'.$conf->global->DIGIRISK_LEGALDISPLAY_PREFIX.'">';
 	print '</td></tr>';
 
 	// Other attributes
