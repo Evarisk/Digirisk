@@ -243,7 +243,8 @@ class doc_legaldisplay_odt extends ModelePDFLegalDisplay
 
 		$dir = $conf->digiriskdolibarr->multidir_output[isset($object->entity) ? $object->entity : 1] . '/legaldisplay';
 		$objectref = dol_sanitizeFileName($object->ref);
-		if (!preg_match('/specimen/i', $objectref)) $dir .= "/".$objectref;
+		if (!preg_match('/specimen/i', $objectref)) $dir .= '/' . $objectref . "_legaldisplay_A4_V1.odt";
+
 		$file = $dir."/".$objectref.".odt";
 
 		if (!file_exists($dir))

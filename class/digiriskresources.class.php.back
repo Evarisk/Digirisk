@@ -256,10 +256,7 @@ class DigiriskResources extends CommonObject
 			dol_syslog("admin.lib::dolibarr_set_const", LOG_DEBUG);
 			$resql = $db->query($sql);
 		}
-		echo '<pre>';
-		print_r($db);
-		echo '</pre>';
-		exit;
+
 		if ($resql)
 		{
 			$db->commit();

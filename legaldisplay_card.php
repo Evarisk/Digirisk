@@ -111,12 +111,13 @@ include DOL_DOCUMENT_ROOT.'/core/actions_fetchobject.inc.php'; // Must be includ
 //$permissiondellink = $user->rights->digiriskdolibarr->legaldisplay->write; // Used by the include of actions_dellink.inc.php
 
 // @todo DROITS
-$upload_dir = $conf->digiriskdolibarr->multidir_output[isset($object->entity) ? $object->entity : 1];$permissiontoread = $user->rights->digiriskdolibarr->legaldisplay->read;
+$upload_dir = $conf->digiriskdolibarr->multidir_output[isset($object->entity) ? $object->entity : 1];
+$permissiontoread = 1;
 $permissiontoadd = 1;
-$permissiontodelete =  1;
-$permissionnote =  1;
-$permissiondellink =  1;
-$upload_dir = 1;
+$permissiontodelete = 1;
+$permissionnote = 1;
+$permissiondellink = 1;
+$upload_dir = $conf->digiriskdolibarr->multidir_output[isset($object->entity) ? $object->entity : 1];
 
 // Security check - Protection if external user
 //if ($user->socid > 0) accessforbidden();
@@ -150,10 +151,77 @@ if (empty($reshook))
 
 	$triggermodname = 'DIGIRISKDOLIBARR_LEGALDISPLAY_MODIFY'; // Name of trigger action code to execute when we modify record
 
+	// Action to add record
+	// Creation & Redirection
 
-	// Actions cancel, add, update, update_extras, confirm_validate, confirm_delete, confirm_deleteline, confirm_clone, confirm_close, confirm_setdraft, confirm_reopen
-	// @todo piste pourquoi le create redirige pas bien TAG
-	//include DOL_DOCUMENT_ROOT.'/core/actions_addupdatedelete.inc.php';
+	// Action to add record
+
+	if ($action == 'add' && !empty($permissiontoadd)) {
+
+		foreach ($object->fields as $key => $val) {
+			if ($object->fields[$key]['type'] == 'duration') {
+				if (GETPOST($key . 'hour') == '' && GETPOST($key . 'min') == '') continue; // The field was not submited to be edited
+			} else {
+				if (!GETPOSTISSET($key)) continue; // The field was not submited to be edited
+			}
+			// Ignore special fields
+			if (in_array($key, array('rowid', 'entity', 'date_creation', 'tms', 'fk_user_creat', 'fk_user_modif', 'import_key'))) continue;
+
+			// Set value to insert
+			if (in_array($object->fields[$key]['type'], array('text', 'html'))) {
+				$value = GETPOST($key, 'none');
+			} elseif ($object->fields[$key]['type'] == 'date') {
+				$value = dol_mktime(12, 0, 0, GETPOST($key . 'month', 'int'), GETPOST($key . 'day', 'int'), GETPOST($key . 'year', 'int'));
+			} elseif ($object->fields[$key]['type'] == 'datetime') {
+				$value = dol_mktime(GETPOST($key . 'hour', 'int'), GETPOST($key . 'min', 'int'), 0, GETPOST($key . 'month', 'int'), GETPOST($key . 'day', 'int'), GETPOST($key . 'year', 'int'));
+			} elseif ($object->fields[$key]['type'] == 'duration') {
+				$value = 60 * 60 * GETPOST($key . 'hour', 'int') + 60 * GETPOST($key . 'min', 'int');
+			} elseif (preg_match('/^(integer|price|real|double)/', $object->fields[$key]['type'])) {
+				$value = price2num(GETPOST($key, 'none')); // To fix decimal separator according to lang setup
+			} elseif ($object->fields[$key]['type'] == 'boolean') {
+				$value = (GETPOST($key) == 'on' ? 1 : 0);
+			} else {
+				$value = GETPOST($key, 'alphanohtml');
+			}
+			if (preg_match('/^integer:/i', $object->fields[$key]['type']) && $value == '-1') $value = ''; // This is an implicit foreign key field
+			if (!empty($object->fields[$key]['foreignkey']) && $value == '-1') $value = ''; // This is an explicit foreign key field
+
+			//var_dump($key.' '.$value.' '.$object->fields[$key]['type']);
+			$object->$key = $value;
+
+			if ($val['notnull'] > 0 && $object->$key == '' && !is_null($val['default']) && $val['default'] == '(PROV)') {
+				$object->$key = '(PROV)';
+			}
+
+			if ($val['notnull'] > 0 && $object->$key == '' && is_null($val['default'])) {
+				$error++;
+				setEventMessages($langs->trans("ErrorFieldRequired", $langs->transnoentitiesnoconv($val['label'])), null, 'errors');
+			}
+		}
+
+		if (!$error) {
+
+			$result = $object->create($user);
+
+			if ($result > 0) {
+				// Creation OK
+
+				$urltogo = $backtopage ? str_replace('__ID__', $result, $backtopage) : $backurlforlist;
+				$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $object->id, $urltogo); // New method to autoselect project after a New on another form object creation
+				header("Location: " . $urltogo);
+				exit;
+			} else {
+				// Creation KO
+				if (!empty($object->errors)) setEventMessages(null, $object->errors, 'errors');
+				else  setEventMessages($object->error, null, 'errors');
+				$action = 'create';
+			}
+		} else {
+			$action = 'create';
+		}
+	}
+
+
 
 	// Actions when linking object each other
 	include DOL_DOCUMENT_ROOT.'/core/actions_dellink.inc.php';
@@ -183,9 +251,6 @@ if (empty($reshook))
 	include DOL_DOCUMENT_ROOT.'/core/actions_sendmails.inc.php';
 }
 
-
-
-
 /*
  * View
  *
@@ -195,9 +260,10 @@ if (empty($reshook))
 $form = new Form($db);
 $formfile = new FormFile($db);
 $formproject = new FormProjets($db);
+
 $now = $db->idate(dol_now());
-$now = str_replace(':','-', $now);
-$now = str_replace(' ','_', $now);
+$nowDate = str_replace(':','-', $now);
+$nowDate = str_replace(' ','_', $nowDate);
 
 $title = $langs->trans("LegalDisplay");
 $help_url = '';
@@ -249,10 +315,11 @@ if ($action == 'create')
 	unset($object->fields['status']);
 
 	include DOL_DOCUMENT_ROOT.'/core/tpl/commonfields_add.tpl.php';
-	print '<table class="border centpercent">'."\n";
+
 	print '<tr><td class="fieldrequired">'.$langs->trans("Ref").'</td><td>';
-	print '<input class="flat" type="text" size="36" name="ref" value="'.$now.'">';
+	print '<input class="flat" type="text" size="36" name="ref" value="'.$nowDate.'">';
 	print '</td></tr>';
+
 	// Other attributes
 	include DOL_DOCUMENT_ROOT.'/core/tpl/extrafields_add.tpl.php';
 
@@ -602,12 +669,16 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 			$objref = dol_sanitizeFileName($object->ref);
 
 			$relativepath = $objref . '/' . $objref . '.pdf';
-			$filedir = $conf->digiriskdolibarr->dir_output.'/'.$object->element.'/'.$objref;
+			$dir_files = $object->element . '/' . $objref . "_legaldisplay_A4_V1.odt";
+			$filedir = $conf->digiriskdolibarr->dir_output.'/'.$dir_files;
+
 			$urlsource = $_SERVER["PHP_SELF"] . "?id=" . $object->id;
 			//@todo DROITS
 			$genallowed = 1;	// If you can read, you can build the PDF to read content
 			$delallowed = 1;	// If you can create/edit, you can remove a file on card
-			print $formfile->showdocuments('digiriskdolibarr:LegalDisplay', $object->element.'/'.$objref, $filedir, $urlsource, $genallowed, $delallowed, $object->model_pdf, 1, 0, 0, 28, 0, '', '', '', $langs->defaultlang);
+
+			print $formfile->showdocuments('digiriskdolibarr:LegalDisplay',$dir_files, $filedir, $urlsource, $genallowed, $delallowed, $object->model_pdf, 1, 0, 0, 28, 0, '', '', '', $langs->defaultlang);
+
 		}
 
 		// Show links to link elements
