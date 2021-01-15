@@ -27,6 +27,7 @@
  */
 
 dol_include_once('/digiriskdolibarr/core/modules/digiriskdolibarr/modules_informationssharing.php');
+dol_include_once('/digiriskdolibarr/class/informationssharing.class.php');
 
 
 /**
