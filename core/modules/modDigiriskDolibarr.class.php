@@ -31,7 +31,7 @@ include_once DOL_DOCUMENT_ROOT.'/core/modules/DolibarrModules.class.php';
 /**
  *  Description and activation class for module DigiriskDolibarr
  */
-class modDigiriskDolibarr extends DolibarrModules
+class modDigiriskdolibarr extends DolibarrModules
 {
 	/**
 	 * Constructor. Define names, constants, directories, boxes, permissions
@@ -176,22 +176,46 @@ class modDigiriskDolibarr extends DolibarrModules
 		// Permissions provided by this module
 		$this->rights = array();
 		$r            = 0;
-		/* BEGIN MODULEBUILDER PERMISSIONS */
-		$this->rights[$r][0] = $this->numero + $r; // Permission id (must not be already used)
-		$this->rights[$r][1] = $langs->trans("ReadRight"); // Permission label
-		$this->rights[$r][3] = 2;
-		$this->rights[$r][4] = 'read'; // In php code, permission will be checked by test if ($user->rights->digiriskdolibarr->level1->level2)
-		$r++;
-		$this->rights[$r][0] = $this->numero + $r;
-		$this->rights[$r][1] = $langs->trans("CreateRight");
+
+		/* LEGAL DISPLAY PERMISSIONS */
+		$this->rights[$r][0] = 1050;
+		$this->rights[$r][1] = $langs->trans('ReadLegalDisplay');
 		$this->rights[$r][3] = 1;
-		$this->rights[$r][4] = 'write';
+		$this->rights[$r][4] = 'legaldisplay';
+		$this->rights[$r][5] = 'read';
 		$r++;
-		$this->rights[$r][0] = $this->numero + $r;
-		$this->rights[$r][1] = $langs->trans("DeleteRight");
+		$this->rights[$r][0] = 1050 + $r;
+		$this->rights[$r][1] = $langs->trans('CreateLegalDisplay');
 		$this->rights[$r][3] = 1;
-		$this->rights[$r][4] = 'delete';
-		/* END MODULEBUILDER PERMISSIONS */
+		$this->rights[$r][4] = 'legaldisplay';
+		$this->rights[$r][5] = 'write';
+		$r++;
+		$this->rights[$r][0] = 1050 + $r;
+		$this->rights[$r][1] = $langs->trans('DeleteLegalDisplay');
+		$this->rights[$r][3] = 1;
+		$this->rights[$r][4] = 'legaldisplay';
+		$this->rights[$r][5] = 'delete';
+		$r++;
+
+		/* INFORMATIONS SHARING PERMISSIONS */
+
+		$this->rights[$r][0] = 1050 + $r;
+		$this->rights[$r][1] = $langs->trans('ReadInformationsSharing');
+		$this->rights[$r][3] = 1;
+		$this->rights[$r][4] = 'informationssharing';
+		$this->rights[$r][5] = 'read';
+		$r++;
+		$this->rights[$r][0] = 1050 + $r;
+		$this->rights[$r][1] = $langs->trans('CreateInformationsSharing');
+		$this->rights[$r][3] = 1;
+		$this->rights[$r][4] = 'informationssharing';
+		$this->rights[$r][5] = 'write';
+		$r++;
+		$this->rights[$r][0] = 1050 + $r;
+		$this->rights[$r][1] = $langs->trans('DeleteInformationsSharing');
+		$this->rights[$r][3] = 1;
+		$this->rights[$r][4] = 'informationssharing';
+		$this->rights[$r][5] = 'delete';
 
 		// Main menu entries to add
 		$this->menu = array();
