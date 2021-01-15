@@ -48,13 +48,11 @@ class mod_legaldisplay_jupiter extends ModeleNumRefLegalDisplay
 	 */
 	public function __construct()
 	{
-		global $conf, $db;
+		global $db;
 		$now = $db->idate(dol_now());
 		$nowDate = str_replace(':','-', $now);
 		$nowDate = str_replace(' ','_', $nowDate);
 		$this->prefixlegaldisplay =  $this->prefixlegaldisplay . '_' . $nowDate;
-		$conf->global->DIGIRISK_LEGALDISPLAY_PREFIX = $this->prefixlegaldisplay;
-
 	}
 
 	/**
@@ -76,9 +74,7 @@ class mod_legaldisplay_jupiter extends ModeleNumRefLegalDisplay
 	 */
 	public function getExample()
 	{
-		global $conf;
-
-		return $conf->global->DIGIRISK_LEGALDISPLAY_PREFIX;
+		return $this->prefixlegaldisplay;
 	}
 
 	/**
