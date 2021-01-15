@@ -106,7 +106,6 @@ class modDigiriskdolibarr extends DolibarrModules
 		// Dependencies
 
 		$this->hidden                  = false;
-		// List of module class names as string that must be enabled if this module is enabled. Example: array('always1'=>'modModuleToEnable1','always2'=>'modModuleToEnable2', 'FR1'=>'modModuleToEnableFR'...)
 		$this->depends                 = array();
 		$this->requiredby              = array();
 		$this->conflictwith            = array();
@@ -136,12 +135,6 @@ class modDigiriskdolibarr extends DolibarrModules
 			11 => array('DIGIRISK_PARTICIPATION_AGREEMENT_INFORMATION_PROCEDURE','chaine','','Location of detailed instruction', 1),
 		);
 
-		// Some keys to add into the overwriting translation tables
-		/*$this->overwrite_translation = array(
-			'en_US:ParentCompany'=>'Parent company or reseller',
-			'fr_FR:ParentCompany'=>'Maison mère ou revendeur'
-		)*/
-
 		if ( ! isset($conf->digiriskdolibarr ) || ! isset( $conf->digiriskdolibarr->enabled ) ) {
 			$conf->digiriskdolibarr          = new stdClass();
 			$conf->digiriskdolibarr->enabled = 0;
@@ -159,7 +152,6 @@ class modDigiriskdolibarr extends DolibarrModules
 
 
 		// Boxes/Widgets
-		// Add here list of php file(s) stored in digiriskdolibarr/core/boxes that contains a class to show a widget.
 		$this->boxes = array(
 			//  0 => array(
 			//      'file' => 'digiriskdolibarrwidget1.php@digiriskdolibarr',
@@ -170,7 +162,6 @@ class modDigiriskdolibarr extends DolibarrModules
 		);
 
 		// Cronjobs (List of cron jobs entries to add when module is enabled)
-		// unit_frequency must be 60 for minute, 3600 for hour, 86400 for day, 604800 for week
 		$this->cronjobs = array();
 
 		// Permissions provided by this module

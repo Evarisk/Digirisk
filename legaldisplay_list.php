@@ -216,7 +216,7 @@ $now = dol_now();
 
 //$help_url="EN:Module_LegalDisplay|FR:Module_LegalDisplay_FR|ES:Módulo_LegalDisplay";
 $help_url = '';
-$title = $langs->trans('ListOf', $langs->transnoentitiesnoconv("LegalDisplays"));
+$title = $langs->trans("LegalDisplayList");
 
 
 // Build and execute select

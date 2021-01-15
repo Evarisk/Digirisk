@@ -40,6 +40,24 @@ DigiriskdolibarrAboutPage = Page à propos de Digiriskdolibarr
 # DigiriskDolibarr
 #
 
+ReadLegalDisplay = Afficher un affichage légal
+CreateLegalDisplay = Créer un affichage légal
+DeleteLegalDisplay = Supprimer un affichage légal
+
+ReadInformationsSharing = Lire une diffusion d'informations
+CreateInformationsSharing = Créer une diffusion d'informations
+DeleteInformationsSharing = Supprimer une diffusion d'informations
+
+DigiriskDocumentsList = Liste des documents légaux
+
+LegalDisplay = Affichage légal
+NewLegalDisplay = Nouvel affichage légal
+LegalDisplayList = Liste des affichages légaux
+
+InformationsSharing = Diffusion d'informations
+NewInformationsSharing = Nouvelle diffusion d'informations
+InformationsSharingList = Liste des diffusions d'informations
+
 DigiriskMenu = Ajoutez des informations sur votre société/organisation. Cliquez sur le bouton "Enregistrer" en bas de page pour sauvegarder
 
 LabourDoctor = Médecin du travail
