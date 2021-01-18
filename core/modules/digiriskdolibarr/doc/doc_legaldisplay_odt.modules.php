@@ -243,7 +243,7 @@ class doc_legaldisplay_odt extends ModelePDFLegalDisplay
 
 		$dir = $conf->digiriskdolibarr->multidir_output[isset($object->entity) ? $object->entity : 1] . '/legaldisplay';
 		$objectref = dol_sanitizeFileName($object->ref);
-		if (!preg_match('/specimen/i', $objectref)) $dir .= '/' . $objectref . "_legaldisplay_A4_V1.odt";
+		if (!preg_match('/specimen/i', $objectref)) $dir .= '/' . $objectref . "_A4_V1.odt";
 
 		$file = $dir."/".$objectref.".odt";
 
@@ -264,6 +264,7 @@ class doc_legaldisplay_odt extends ModelePDFLegalDisplay
 			$newfiletmp = preg_replace('/template_/i', '', $newfiletmp);
 			$newfiletmp = preg_replace('/modele_/i', '', $newfiletmp);
 			$newfiletmp = $objectref.'_'.$newfiletmp;
+
 			//$file=$dir.'/'.$newfiletmp.'.'.dol_print_date(dol_now(),'%Y%m%d%H%M%S').'.odt';
 			// Get extension (ods or odt)
 			$newfileformat = substr($newfile, strrpos($newfile, '.') + 1);
@@ -276,8 +277,11 @@ class doc_legaldisplay_odt extends ModelePDFLegalDisplay
 			}
 			else
 			{
-				$filename = $newfiletmp.'.'.$newfileformat;
-				$filename = $newfiletmp . '_A4' . '_V1.' . $newfileformat;
+
+				$filename = $objectref.'.'.$newfileformat;
+
+				$filename = $objectref . '_A4' . '_V1.' . $newfileformat;
+
 			}
 			$object->last_main_doc = $filename;
 

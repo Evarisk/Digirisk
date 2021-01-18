@@ -454,7 +454,7 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 			$objref = dol_sanitizeFileName($object->ref);
 
 			$relativepath = $objref . '/' . $objref . '.pdf';
-			$dir_files = $object->element . '/' . $objref . "_legaldisplay_A4_V1.odt";
+			$dir_files = $object->element . '/' . $objref . "_A4_V1.odt";
 			$filedir = $conf->digiriskdolibarr->dir_output.'/'.$dir_files;
 
 			$urlsource = $_SERVER["PHP_SELF"] . "?id=" . $object->id;

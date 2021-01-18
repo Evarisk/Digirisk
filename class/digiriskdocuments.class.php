@@ -221,7 +221,7 @@ class DigiriskDocuments extends CommonObject
 		$this->date_creation = $this->db->idate($now);
 		$this->tms 			 = $now;
 		$this->fk_user_creat = $user->id;
-		$this->ref_ext 		 = 'digirisk_' . $this->element . '_' . $this->ref;
+		$this->ref_ext 		 = 'digirisk_' . '_' . $this->ref;
 		$this->import_key 	 = "";
 		$this->status 		 = 1;
 		$this->type 		 = $this->element;

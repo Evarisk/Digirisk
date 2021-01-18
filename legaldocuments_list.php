@@ -62,6 +62,8 @@ require_once DOL_DOCUMENT_ROOT.'/core/lib/company.lib.php';
 
 // load digiriskdolibarr libraries
 require_once __DIR__.'/class/legaldisplay.class.php';
+require_once __DIR__.'/class/digiriskdocuments.class.php';
+require_once __DIR__.'/class/informationssharing.class.php';
 
 // for other modules
 //dol_include_once('/othermodule/class/otherobject.class.php');
@@ -92,7 +94,7 @@ $pageprev = $page - 1;
 $pagenext = $page + 1;
 
 // Initialize technical objects
-$object = new LegalDisplay($db);
+$object = new DigiriskDocuments($db);
 $extrafields = new ExtraFields($db);
 $diroutputmassaction = $conf->digiriskdolibarr->dir_output.'/temp/massgeneration/'.$user->id;
 $hookmanager->initHooks(array('legaldisplaylist')); // Note that conf->hooks_modules contains array
@@ -198,8 +200,8 @@ if (empty($reshook))
 	}
 
 	// Mass actions
-	$objectclass = 'LegalDisplay';
-	$objectlabel = 'LegalDisplay';
+	$objectclass = 'DigiriskDocuments';
+	$objectlabel = 'DigiriskDocuments';
 	$uploaddir = $conf->digiriskdolibarr->dir_output;
 	include DOL_DOCUMENT_ROOT.'/core/actions_massactions.inc.php';
 }
@@ -214,9 +216,9 @@ $form = new Form($db);
 
 $now = dol_now();
 
-//$help_url="EN:Module_LegalDisplay|FR:Module_LegalDisplay_FR|ES:Módulo_LegalDisplay";
+//$help_url="EN:Module_DigiriskDocuments|FR:Module_DigiriskDocuments_FR|ES:Módulo_DigiriskDocuments";
 $help_url = '';
-$title = $langs->trans("LegalDisplayList");
+$title = $langs->trans("DigiriskDocumentsList");
 
 
 // Build and execute select
@@ -239,7 +241,6 @@ $sql .= " FROM ".MAIN_DB_PREFIX.$object->table_element." as t";
 if (is_array($extrafields->attributes[$object->table_element]['label']) && count($extrafields->attributes[$object->table_element]['label'])) $sql .= " LEFT JOIN ".MAIN_DB_PREFIX.$object->table_element."_extrafields as ef on (t.rowid = ef.fk_object)";
 if ($object->ismultientitymanaged == 1) $sql .= " WHERE t.entity IN (".getEntity($object->element).")";
 else $sql .= " WHERE 1 = 1";
-$sql .= " AND type = 'legaldisplay'";
 foreach ($search as $key => $val)
 {
 	if ($key == 'status' && $search[$key] == -1) continue;
@@ -379,9 +380,9 @@ $newcardbutton = dolGetButtonTitle($langs->trans('New'), '', 'fa fa-plus-circle'
 print_barre_liste($title, $page, $_SERVER["PHP_SELF"], $param, $sortfield, $sortorder, $massactionbutton, $num, $nbtotalofrecords, 'object_'.$object->picto, 0, $newcardbutton, '', $limit, 0, 0, 1);
 
 // Add code for pre mass action (confirmation or email presend form)
-$topicmail = "SendLegalDisplayRef";
+$topicmail = "SendDigiriskDocumentsRef";
 $modelmail = "legaldisplay";
-$objecttmp = new LegalDisplay($db);
+$objecttmp = new DigiriskDocuments($db);
 $trackid = 'xxxx'.$object->id;
 include DOL_DOCUMENT_ROOT.'/core/tpl/massactions_pre.tpl.php';
 
