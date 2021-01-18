@@ -216,7 +216,7 @@ $now = dol_now();
 
 //$help_url="EN:Module_InformationsSharing|FR:Module_InformationsSharing_FR|ES:Módulo_InformationsSharing";
 $help_url = '';
-$title = $langs->trans('ListOf', $langs->transnoentitiesnoconv("InformationsSharings"));
+$title = $langs->trans("InformationsSharingList");
 
 
 // Build and execute select
@@ -239,6 +239,7 @@ $sql .= " FROM ".MAIN_DB_PREFIX.$object->table_element." as t";
 if (is_array($extrafields->attributes[$object->table_element]['label']) && count($extrafields->attributes[$object->table_element]['label'])) $sql .= " LEFT JOIN ".MAIN_DB_PREFIX.$object->table_element."_extrafields as ef on (t.rowid = ef.fk_object)";
 if ($object->ismultientitymanaged == 1) $sql .= " WHERE t.entity IN (".getEntity($object->element).")";
 else $sql .= " WHERE 1 = 1";
+$sql .= " AND type = 'informationssharing'";
 foreach ($search as $key => $val)
 {
 	if ($key == 'status' && $search[$key] == -1) continue;

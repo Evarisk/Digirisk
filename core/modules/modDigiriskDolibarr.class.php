@@ -102,7 +102,7 @@ class modDigiriskdolibarr extends DolibarrModules
 		$this->dirs = array("/digiriskdolibarr/temp");
 
 		// Config pages.
-		$this->config_page_url = array("digiriskdolibarr.php@digiriskdolibarr");
+		$this->config_page_url = array("setup.php@digiriskdolibarr");
 		// Dependencies
 
 		$this->hidden                  = false;
@@ -123,6 +123,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			1 => array('DIGIRISK_GENERAL_MEANS','chaine','','General means', 1),
 			2 => array('DIGIRISK_GENERAL_RULES','chaine','','General rules', 1),
 			2 => array('DIGIRISK_LEGALDISPLAY_PREFIX','chaine','','Legal Display Prefix', 1),
+			2 => array('DIGIRISK_INFORMATIONSSHARING_PREFIX','chaine','','Legal Display Prefix', 1),
 			// CONST LEGAL DISPLAY
 			3 => array('DIGIRISK_LOCATION_OF_DETAILED_INSTRUCTION','chaine','','Location of detailed instruction', 1),
 			4 => array('DIGIRISK_DEROGATION_SCHEDULE_PERMANENT','chaine','','Location of detailed instruction', 1),
@@ -277,7 +278,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			'titre'=>'Diffusion d\'informations',
 			'mainmenu'=>'digiriskdolibarr',
 			'leftmenu'=>'informations',
-			'url'=>'/digiriskdolibarr/view/informationssharing_list.php',
+			'url'=>'/digiriskdolibarr/informationssharing_list.php',
 			'langs'=>'digiriskdolibarr@digiriskdolibarr',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
 			'position'=>48520+$r,
 			'enabled'=>'$conf->digiriskdolibarr->enabled',  // Define condition to show or hide menu entry. Use '$conf->digiriskdolibarr->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
@@ -291,7 +292,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			'titre'=>$langs->trans('New'),
 			'mainmenu'=>'digiriskdolibarr',
 			'leftmenu'=>'informationsreleasecreate',
-			'url'=>'/digiriskdolibarr/view/informationssharing_card.php' . '?action=create',
+			'url'=>'/digiriskdolibarr/informationssharing_card.php' . '?action=create',
 			'langs'=>'digiriskdolibarr@digiriskdolibarr',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
 			'position'=>48520+$r,
 			'enabled'=>'$conf->digiriskdolibarr->enabled',  // Define condition to show or hide menu entry. Use '$conf->digiriskdolibarr->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.

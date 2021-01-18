@@ -28,8 +28,8 @@
  *  \brief			File that contains parent class for informationssharings document models and parent class for informationssharings numbering models
  */
 
-require_once DOL_DOCUMENT_ROOT.'/core/class/commondocgenerator.class.php';
-require_once DOL_DOCUMENT_ROOT.'/compta/bank/class/account.class.php'; // required for use by classes that inherit
+require_once DOL_DOCUMENT_ROOT . '/core/class/commondocgenerator.class.php';
+require_once DOL_DOCUMENT_ROOT . '/compta/bank/class/account.class.php'; // required for use by classes that inherit
 
 
 /**
@@ -54,8 +54,9 @@ abstract class ModelePDFInformationsSharing extends CommonDocGenerator
 		$type = 'informationssharing';
 		$list = array();
 
-		include_once DOL_DOCUMENT_ROOT.'/core/lib/functions2.lib.php';
+		include_once DOL_DOCUMENT_ROOT . '/core/lib/functions2.lib.php';
 		$list = getListOfModels($db, $type, $maxfilenamelength);
+
 
 		return $list;
 	}

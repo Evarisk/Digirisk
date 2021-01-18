@@ -30,14 +30,14 @@
 
 dol_include_once('/custom/digiriskdolibarr/lib/files.lib.php');
 dol_include_once('/core/lib/files.lib.php');
-require_once DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/core/modules/digiriskdolibarr/modules_legaldisplay.php';
+require_once DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/core/modules/digiriskdolibarr/modules_informationssharing.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/company.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/doc.lib.php';
 
 /**
  *	Class to build documents using ODF templates generator
  */
-class doc_legaldisplay_odt extends ModelePDFLegalDisplay
+class doc_informationssharing_A4_odt extends ModelePDFInformationsSharing
 {
 	/**
 	 * Issuer
@@ -83,17 +83,6 @@ class doc_legaldisplay_odt extends ModelePDFLegalDisplay
 		$this->marge_droite = 0;
 		$this->marge_haute = 0;
 		$this->marge_basse = 0;
-
-		$this->option_logo = 1; // Affiche logo
-		$this->option_tva = 0; // Gere option tva COMMANDE_TVAOPTION
-		$this->option_modereg = 0; // Affiche mode reglement
-		$this->option_condreg = 0; // Affiche conditions reglement
-		$this->option_codeproduitservice = 0; // Affiche code produit-service
-		$this->option_multilang = 1; // Dispo en plusieurs langues
-		$this->option_escompte = 0; // Affiche si il y a eu escompte
-		$this->option_credit_note = 0; // Support credit notes
-		$this->option_freetext = 1; // Support add of a personalised text
-		$this->option_draft_watermark = 0; // Support add of a watermark on drafts
 
 		// Recupere emetteur
 		$this->emetteur = $mysoc;
@@ -232,7 +221,7 @@ class doc_legaldisplay_odt extends ModelePDFLegalDisplay
 		if (!is_object($object))
 		{
 			$id = $object;
-			$object = new Legaldisplay($this->db);
+			$object = new InformationsSharing($this->db);
 			$result = $object->fetch($id);
 			if ($result < 0)
 			{
@@ -241,9 +230,9 @@ class doc_legaldisplay_odt extends ModelePDFLegalDisplay
 			}
 		}
 
-		$dir = $conf->digiriskdolibarr->multidir_output[isset($object->entity) ? $object->entity : 1] . '/legaldisplay';
+		$dir = $conf->digiriskdolibarr->multidir_output[isset($object->entity) ? $object->entity : 1] . '/informationssharing';
 		$objectref = dol_sanitizeFileName($object->ref);
-		if (!preg_match('/specimen/i', $objectref)) $dir .= '/' . $objectref . "_A4_V1.odt";
+		if (!preg_match('/specimen/i', $objectref)) $dir .= '/' . $objectref;
 
 		$file = $dir."/".$objectref.".odt";
 

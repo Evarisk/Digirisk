@@ -62,11 +62,20 @@ InformationsSharingList = Liste des diffusions d'informations
 
 DigiriskMenu = Ajoutez des informations sur votre société/organisation. Cliquez sur le bouton "Enregistrer" en bas de page pour sauvegarder
 DigiriskDocumentsNumberingModule = Modèle de numérotation des documents de Digirisk
+DigiriskLegalDisplayNumberingModule = Modèle de numérotation des affichages légaux de Digirisk
+DigiriskInformationsSharingNumberingModule = Modèle de numérotation des diffusions d'information de Digirisk
 
 DigiriskNumberingDate = Fixe la référence comme étant la date et l'heure de création.
 DigiriskLegalDisplayJupiterModel = Fixe la référence comme étant : "legaldisplay_date_heure"
 DigiriskLegalDisplayStandardModel = Fixe la référence comme étant : "date_heure_legaldisplay"
-DigiriskLegalDisplayAdvancedModel = Fixe la référence comme étant : "heure_date"
+DigiriskLegalDisplayAdvancedModel = Fixe la référence comme étant : "date_heure"
+DigiriskTemplateDocumentLegalDisplay = Modèle de documents des affichages légaux de Digirisk
+NothingToSetupOnThisPage = Aucune configuration n'est nécessaire sur cette page
+
+DigiriskInformationsSharingStandardModel = Fixe la référence comme étant : "date_heure_informationssharing"
+DigiriskInformationsSharingAdvancedModel = Fixe la référence comme étant : "date_heure"
+DigiriskTemplateDocumentInformationsSharing = Modèle de documents des diffusions d'information de Digirisk
+
 
 LabourDoctor = Médecin du travail
 LabourInspector = Inspecteur du travail

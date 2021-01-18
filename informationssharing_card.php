@@ -22,26 +22,6 @@
  *		\brief      Page to create/edit/view informationssharing
  */
 
-//if (! defined('NOREQUIREDB'))              define('NOREQUIREDB','1');					// Do not create database handler $db
-//if (! defined('NOREQUIREUSER'))            define('NOREQUIREUSER','1');				// Do not load object $user
-//if (! defined('NOREQUIRESOC'))             define('NOREQUIRESOC','1');				// Do not load object $mysoc
-//if (! defined('NOREQUIRETRAN'))            define('NOREQUIRETRAN','1');				// Do not load object $langs
-//if (! defined('NOSCANGETFORINJECTION'))    define('NOSCANGETFORINJECTION','1');		// Do not check injection attack on GET parameters
-//if (! defined('NOSCANPOSTFORINJECTION'))   define('NOSCANPOSTFORINJECTION','1');		// Do not check injection attack on POST parameters
-//if (! defined('NOCSRFCHECK'))              define('NOCSRFCHECK','1');					// Do not check CSRF attack (test on referer + on token if option MAIN_SECURITY_CSRF_WITH_TOKEN is on).
-//if (! defined('NOTOKENRENEWAL'))           define('NOTOKENRENEWAL','1');				// Do not roll the Anti CSRF token (used if MAIN_SECURITY_CSRF_WITH_TOKEN is on)
-//if (! defined('NOSTYLECHECK'))             define('NOSTYLECHECK','1');				// Do not check style html tag into posted data
-//if (! defined('NOREQUIREMENU'))            define('NOREQUIREMENU','1');				// If there is no need to load and show top and left menu
-//if (! defined('NOREQUIREHTML'))            define('NOREQUIREHTML','1');				// If we don't need to load the html.form.class.php
-//if (! defined('NOREQUIREAJAX'))            define('NOREQUIREAJAX','1');       	  	// Do not load ajax.lib.php library
-//if (! defined("NOLOGIN"))                  define("NOLOGIN",'1');						// If this page is public (can be called outside logged session). This include the NOIPCHECK too.
-//if (! defined('NOIPCHECK'))                define('NOIPCHECK','1');					// Do not check IP defined into conf $dolibarr_main_restrict_ip
-//if (! defined("MAIN_LANG_DEFAULT"))        define('MAIN_LANG_DEFAULT','auto');					// Force lang to a particular value
-//if (! defined("MAIN_AUTHENTICATION_MODE")) define('MAIN_AUTHENTICATION_MODE','aloginmodule');		// Force authentication handler
-//if (! defined("NOREDIRECTBYMAINTOLOGIN"))  define('NOREDIRECTBYMAINTOLOGIN',1);		// The main.inc.php does not make a redirect if not logged, instead show simple error message
-//if (! defined("FORCECSP"))                 define('FORCECSP','none');					// Disable all Content Security Policies
-
-
 // Load Dolibarr environment
 $res = 0;
 // Try main.inc.php into web root known defined into CONTEXT_DOCUMENT_ROOT (not always defined)
@@ -60,27 +40,35 @@ if (!$res) die("Include of main fails");
 require_once DOL_DOCUMENT_ROOT.'/core/class/html.formcompany.class.php';
 require_once DOL_DOCUMENT_ROOT.'/core/class/html.formfile.class.php';
 require_once DOL_DOCUMENT_ROOT.'/core/class/html.formprojet.class.php';
+
 dol_include_once('/digiriskdolibarr/class/informationssharing.class.php');
+dol_include_once('/digiriskdolibarr/class/digiriskdocuments.class.php');
+dol_include_once('/digiriskdolibarr/core/modules/digiriskdolibarr/mod_informationssharing_jupiter.php');
+dol_include_once('/digiriskdolibarr/core/modules/digiriskdolibarr/mod_informationssharing_standard.php');
+dol_include_once('/digiriskdolibarr/core/modules/digiriskdolibarr/mod_informationssharing_advanced.php');
+
 dol_include_once('/digiriskdolibarr/lib/digiriskdolibarr_informationssharing.lib.php');
+
+global $db, $conf, $langs;
 
 // Load translation files required by the page
 $langs->loadLangs(array("digiriskdolibarr@digiriskdolibarr", "other"));
 
 // Get parameters
-$id = GETPOST('id', 'int');
-$ref        = GETPOST('ref', 'alpha');
-$action = GETPOST('action', 'aZ09');
-$confirm    = GETPOST('confirm', 'alpha');
-$cancel     = GETPOST('cancel', 'aZ09');
-$contextpage = GETPOST('contextpage', 'aZ') ?GETPOST('contextpage', 'aZ') : 'informationssharingcard'; // To manage different context of search
-$backtopage = GETPOST('backtopage', 'alpha');
+$id 				 = GETPOST('id', 'int');
+$ref        		 = GETPOST('ref', 'alpha');
+$action 			 = GETPOST('action', 'aZ09');
+$confirm    		 = GETPOST('confirm', 'alpha');
+$cancel     		 = GETPOST('cancel', 'aZ09');
+$contextpage 		 = GETPOST('contextpage', 'aZ') ?GETPOST('contextpage', 'aZ') : 'informationssharingcard'; // To manage different context of search
+$backtopage 		 = GETPOST('backtopage', 'alpha');
 $backtopageforcancel = GETPOST('backtopageforcancel', 'alpha');
-//$lineid   = GETPOST('lineid', 'int');
 
 // Initialize technical objects
-$object = new InformationsSharing($db);
-$extrafields = new ExtraFields($db);
+$object 			 = new InformationsSharing($db);
+$extrafields  	 	 = new ExtraFields($db);
 $diroutputmassaction = $conf->digiriskdolibarr->dir_output.'/temp/massgeneration/'.$user->id;
+
 $hookmanager->initHooks(array('informationssharingcard', 'globalcard')); // Note that conf->hooks_modules contains array
 
 // Fetch optionals attributes and labels
@@ -90,7 +78,8 @@ $search_array_options = $extrafields->getOptionalsFromPost($object->table_elemen
 
 // Initialize array of search criterias
 $search_all = trim(GETPOST("search_all", 'alpha'));
-$search = array();
+$search 	= array();
+
 foreach ($object->fields as $key => $val)
 {
 	if (GETPOST('search_'.$key, 'alpha')) $search[$key] = GETPOST('search_'.$key, 'alpha');
@@ -101,14 +90,15 @@ if (empty($action) && empty($id) && empty($ref)) $action = 'view';
 // Load object
 include DOL_DOCUMENT_ROOT.'/core/actions_fetchobject.inc.php'; // Must be include, not include_once.
 
-
+$upload_dir = $conf->digiriskdolibarr->multidir_output[isset($object->entity) ? $object->entity : 1];
 $permissiontoread = $user->rights->digiriskdolibarr->informationssharing->read;
-$permissiontoadd = $user->rights->digiriskdolibarr->informationssharing->write; // Used by the include of actions_addupdatedelete.inc.php and actions_lineupdown.inc.php
+$permissiontoadd = $user->rights->digiriskdolibarr->informationssharing->write;
 $permissiontodelete = $user->rights->digiriskdolibarr->informationssharing->delete || ($permissiontoadd && isset($object->status) && $object->status == $object::STATUS_DRAFT);
-$permissionnote = $user->rights->digiriskdolibarr->informationssharing->write; // Used by the include of actions_setnotes.inc.php
-$permissiondellink = $user->rights->digiriskdolibarr->informationssharing->write; // Used by the include of actions_dellink.inc.php
+$permissionnote = $user->rights->digiriskdolibarr->informationssharing->write;
+$permissiondellink = $user->rights->digiriskdolibarr->informationssharing->write;
 $upload_dir = $conf->digiriskdolibarr->multidir_output[isset($object->entity) ? $object->entity : 1];
 
+//@todo security check
 // Security check - Protection if external user
 //if ($user->socid > 0) accessforbidden();
 //if ($user->socid > 0) $socid = $user->socid;
@@ -116,7 +106,6 @@ $upload_dir = $conf->digiriskdolibarr->multidir_output[isset($object->entity) ? 
 //$result = restrictedArea($user, 'digiriskdolibarr', $object->id, '', '', 'fk_soc', 'rowid', $isdraft);
 
 //if (!$permissiontoread) accessforbidden();
-
 
 /*
  * Actions
@@ -138,9 +127,10 @@ if (empty($reshook))
 			else $backtopage = dol_buildpath('/digiriskdolibarr/informationssharing_card.php', 1).'?id='.($id > 0 ? $id : '__ID__');
 		}
 	}
-	$triggermodname = 'DIGIRISKDOLIBARR_INFORMATIONSSHARING_MODIFY'; // Name of trigger action code to execute when we modify record
 
-	// Actions cancel, add, update, update_extras, confirm_validate, confirm_delete, confirm_deleteline, confirm_clone, confirm_close, confirm_setdraft, confirm_reopen
+	$triggermodname = 'DIGIRISKDOLIBARR_LEGALDISPLAY_MODIFY'; // Name of trigger action code to execute when we modify record
+
+	// Action to add record
 	include DOL_DOCUMENT_ROOT.'/core/actions_addupdatedelete.inc.php';
 
 	// Actions when linking object each other
@@ -149,15 +139,12 @@ if (empty($reshook))
 	// Actions when printing a doc from card
 	include DOL_DOCUMENT_ROOT.'/core/actions_printing.inc.php';
 
-	// Action to move up and down lines of object
-	//include DOL_DOCUMENT_ROOT.'/core/actions_lineupdown.inc.php';
-
 	// Action to build doc
 	include DOL_DOCUMENT_ROOT.'/core/actions_builddoc.inc.php';
 
 	if ($action == 'set_thirdparty' && $permissiontoadd)
 	{
-		$object->setValueFrom('fk_soc', GETPOST('fk_soc', 'int'), '', '', 'date', '', $user, 'INFORMATIONSSHARING_MODIFY');
+		$object->setValueFrom('fk_soc', GETPOST('fk_soc', 'int'), '', '', 'date', '', $user, 'LEGALDISPLAY_MODIFY');
 	}
 	if ($action == 'classin' && $permissiontoadd)
 	{
@@ -165,14 +152,11 @@ if (empty($reshook))
 	}
 
 	// Actions to send emails
-	$triggersendname = 'INFORMATIONSSHARING_SENTBYMAIL';
-	$autocopy = 'MAIN_MAIL_AUTOCOPY_INFORMATIONSSHARING_TO';
+	$triggersendname = 'LEGALDISPLAY_SENTBYMAIL';
+	$autocopy = 'MAIN_MAIL_AUTOCOPY_LEGALDISPLAY_TO';
 	$trackid = 'informationssharing'.$object->id;
 	include DOL_DOCUMENT_ROOT.'/core/actions_sendmails.inc.php';
 }
-
-
-
 
 /*
  * View
@@ -180,12 +164,13 @@ if (empty($reshook))
  * Put here all code to build page
  */
 
-$form = new Form($db);
-$formfile = new FormFile($db);
+$form 		 = new Form($db);
+$formfile 	 = new FormFile($db);
 $formproject = new FormProjets($db);
 
-$title = $langs->trans("InformationsSharing");
+$title 	  = $langs->trans("InformationsSharing");
 $help_url = '';
+
 llxHeader('', $title, $help_url);
 
 // Example : Adding jquery code
@@ -207,23 +192,38 @@ jQuery(document).ready(function() {
 // Part to create
 if ($action == 'create')
 {
-	print load_fiche_titre($langs->trans("NewObject", $langs->transnoentitiesnoconv("InformationsSharing")), '', 'object_'.$object->picto);
+	print load_fiche_titre($langs->trans("NewInformationsSharing"), '', 'object_'.$object->picto);
 
 	print '<form method="POST" action="'.$_SERVER["PHP_SELF"].'">';
 	print '<input type="hidden" name="token" value="'.newToken().'">';
 	print '<input type="hidden" name="action" value="add">';
+
 	if ($backtopage) print '<input type="hidden" name="backtopage" value="'.$backtopage.'">';
 	if ($backtopageforcancel) print '<input type="hidden" name="backtopageforcancel" value="'.$backtopageforcancel.'">';
 
 	dol_fiche_head(array(), '');
 
-	// Set some default values
-	//if (! GETPOSTISSET('fieldname')) $_POST['fieldname'] = 'myvalue';
-
 	print '<table class="border centpercent tableforfieldcreate">'."\n";
 
 	// Common attributes
+	unset($object->fields['import_key']);				// Hide field already shown in banner
+	unset($object->fields['json']);				// Hide field already shown in banner
+	unset($object->fields['import_key']);				// Hide field already shown in banner
+	unset($object->fields['model_odt']);				// Hide field already shown in banner
+	unset($object->fields['type']);					// Hide field already shown in banner
+	unset($object->fields['last_main_doc']);
+	unset($object->fields['ref_ext']);
+	unset($object->fields['status']);
+
 	include DOL_DOCUMENT_ROOT.'/core/tpl/commonfields_add.tpl.php';
+
+	$digirisk_addon = $conf->global->DIGIRISKDOLIBARR_INFORMATIONSSHARING_ADDON;
+	$modele = new $digirisk_addon($db);
+
+	print '<tr><td class="fieldrequired">'.$langs->trans("Ref").'</td><td>';
+	print '<input hidden class="flat" type="text" size="36" name="ref" value="'.$modele->prefixinformationssharing.'">';
+	print $modele->prefixinformationssharing;
+	print '</td></tr>';
 
 	// Other attributes
 	include DOL_DOCUMENT_ROOT.'/core/tpl/extrafields_add.tpl.php';
@@ -235,12 +235,12 @@ if ($action == 'create')
 	print '<div class="center">';
 	print '<input type="submit" class="button" name="add" value="'.dol_escape_htmltag($langs->trans("Create")).'">';
 	print '&nbsp; ';
+
 	print '<input type="'.($backtopage ? "submit" : "button").'" class="button" name="cancel" value="'.dol_escape_htmltag($langs->trans("Cancel")).'"'.($backtopage ? '' : ' onclick="javascript:history.go(-1)"').'>'; // Cancel for create does not post form if we don't know the backtopage
 	print '</div>';
 
 	print '</form>';
 
-	//dol_set_focus('input[name="ref"]');
 }
 
 // Part to edit record
@@ -307,16 +307,6 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 	if ($action == 'xxx')
 	{
 		$formquestion = array();
-		/*
-		$forcecombo=0;
-		if ($conf->browser->name == 'ie') $forcecombo = 1;	// There is a bug in IE10 that make combo inside popup crazy
-		$formquestion = array(
-			// 'text' => $langs->trans("ConfirmClone"),
-			// array('type' => 'checkbox', 'name' => 'clone_content', 'label' => $langs->trans("CloneMainAttributes"), 'value' => 1),
-			// array('type' => 'checkbox', 'name' => 'update_prices', 'label' => $langs->trans("PuttingPricesUpToDate"), 'value' => 1),
-			// array('type' => 'other',    'name' => 'idwarehouse',   'label' => $langs->trans("SelectWarehouseForStockDecrease"), 'value' => $formproduct->selectWarehouses(GETPOST('idwarehouse')?GETPOST('idwarehouse'):'ifone', 'idwarehouse', '', 1, 0, 0, '', 0, $forcecombo))
-		);
-		*/
 		$formconfirm = $form->formconfirm($_SERVER["PHP_SELF"].'?id='.$object->id, $langs->trans('XXX'), $text, 'confirm_xxx', $formquestion, 0, 1, 220);
 	}
 
@@ -335,47 +325,9 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 	$linkback = '<a href="'.dol_buildpath('/digiriskdolibarr/informationssharing_list.php', 1).'?restore_lastsearch_values=1'.(!empty($socid) ? '&socid='.$socid : '').'">'.$langs->trans("BackToList").'</a>';
 
 	$morehtmlref = '<div class="refidno">';
-	/*
-	 // Ref customer
-	 $morehtmlref.=$form->editfieldkey("RefCustomer", 'ref_client', $object->ref_client, $object, 0, 'string', '', 0, 1);
-	 $morehtmlref.=$form->editfieldval("RefCustomer", 'ref_client', $object->ref_client, $object, 0, 'string', '', null, null, '', 1);
-	 // Thirdparty
-	 $morehtmlref.='<br>'.$langs->trans('ThirdParty') . ' : ' . (is_object($object->thirdparty) ? $object->thirdparty->getNomUrl(1) : '');
-	 // Project
-	 if (! empty($conf->projet->enabled))
-	 {
-	 $langs->load("projects");
-	 $morehtmlref.='<br>'.$langs->trans('Project') . ' ';
-	 if ($permissiontoadd)
-	 {
-	 //if ($action != 'classify') $morehtmlref.='<a class="editfielda" href="' . $_SERVER['PHP_SELF'] . '?action=classify&amp;id=' . $object->id . '">' . img_edit($langs->transnoentitiesnoconv('SetProject')) . '</a> ';
-	 $morehtmlref.=' : ';
-	 if ($action == 'classify') {
-	 //$morehtmlref.=$form->form_project($_SERVER['PHP_SELF'] . '?id=' . $object->id, $object->socid, $object->fk_project, 'projectid', 0, 0, 1, 1);
-	 $morehtmlref.='<form method="post" action="'.$_SERVER['PHP_SELF'].'?id='.$object->id.'">';
-	 $morehtmlref.='<input type="hidden" name="action" value="classin">';
-	 $morehtmlref.='<input type="hidden" name="token" value="'.newToken().'">';
-	 $morehtmlref.=$formproject->select_projects($object->socid, $object->fk_project, 'projectid', $maxlength, 0, 1, 0, 1, 0, 0, '', 1);
-	 $morehtmlref.='<input type="submit" class="button valignmiddle" value="'.$langs->trans("Modify").'">';
-	 $morehtmlref.='</form>';
-	 } else {
-	 $morehtmlref.=$form->form_project($_SERVER['PHP_SELF'] . '?id=' . $object->id, $object->socid, $object->fk_project, 'none', 0, 0, 0, 1);
-	 }
-	 } else {
-	 if (! empty($object->fk_project)) {
-	 $proj = new Project($db);
-	 $proj->fetch($object->fk_project);
-	 $morehtmlref .= ': '.$proj->getNomUrl();
-	 } else {
-	 $morehtmlref .= '';
-	 }
-	 }
-	 }*/
 	$morehtmlref .= '</div>';
 
-
 	dol_banner_tab($object, 'ref', $linkback, 1, 'ref', 'ref', $morehtmlref);
-
 
 	print '<div class="fichecenter">';
 	print '<div class="fichehalfleft">';
@@ -383,9 +335,13 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 	print '<table class="border centpercent tableforfield">'."\n";
 
 	// Common attributes
-	//$keyforbreak='fieldkeytoswitchonsecondcolumn';	// We change column just before this field
-	//unset($object->fields['fk_project']);				// Hide field already shown in banner
-	//unset($object->fields['fk_soc']);					// Hide field already shown in banner
+	unset($object->fields['import_key']);
+	unset($object->fields['json']);
+	unset($object->fields['import_key']);
+	unset($object->fields['model_odt']);
+	unset($object->fields['type']);
+	unset($object->fields['last_main_doc']);
+
 	include DOL_DOCUMENT_ROOT.'/core/tpl/commonfields_view.tpl.php';
 
 	// Other attributes. Fields from hook formObjectOptions and Extrafields.
@@ -398,7 +354,6 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 	print '<div class="clearboth"></div>';
 
 	dol_fiche_end();
-
 
 	/*
 	 * Lines
@@ -453,7 +408,6 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 		print "</form>\n";
 	}
 
-
 	// Buttons for actions
 
 	if ($action != 'presend' && $action != 'editline') {
@@ -469,73 +423,6 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 				print '<a class="butAction" href="'.$_SERVER["PHP_SELF"].'?id='.$object->id.'&action=presend&mode=init#formmailbeforetitle">'.$langs->trans('SendMail').'</a>'."\n";
 			}
 
-			// Back to draft
-			if ($object->status == $object::STATUS_VALIDATED)
-			{
-				if ($permissiontoadd)
-				{
-					print '<a class="butAction" href="'.$_SERVER['PHP_SELF'].'?id='.$object->id.'&action=confirm_setdraft&confirm=yes">'.$langs->trans("SetToDraft").'</a>';
-				}
-			}
-
-			// Modify
-			if ($permissiontoadd)
-			{
-				print '<a class="butAction" href="'.$_SERVER["PHP_SELF"].'?id='.$object->id.'&action=edit">'.$langs->trans("Modify").'</a>'."\n";
-			}
-			else
-			{
-				print '<a class="butActionRefused classfortooltip" href="#" title="'.dol_escape_htmltag($langs->trans("NotEnoughPermissions")).'">'.$langs->trans('Modify').'</a>'."\n";
-			}
-
-			// Validate
-			if ($object->status == $object::STATUS_DRAFT)
-			{
-				if ($permissiontoadd)
-				{
-					if (empty($object->table_element_line) || (is_array($object->lines) && count($object->lines) > 0))
-					{
-						print '<a class="butAction" href="'.$_SERVER['PHP_SELF'].'?id='.$object->id.'&action=confirm_validate&confirm=yes">'.$langs->trans("Validate").'</a>';
-					}
-					else
-					{
-						$langs->load("errors");
-						print '<a class="butActionRefused" href="" title="'.$langs->trans("ErrorAddAtLeastOneLineFirst").'">'.$langs->trans("Validate").'</a>';
-					}
-				}
-			}
-
-			// Clone
-			if ($permissiontoadd)
-			{
-				print '<a class="butAction" href="'.$_SERVER['PHP_SELF'].'?id='.$object->id.'&socid='.$object->socid.'&action=clone&object=informationssharing">'.$langs->trans("ToClone").'</a>'."\n";
-			}
-
-			/*
-			if ($permissiontoadd)
-			{
-				if ($object->status == $object::STATUS_ENABLED)
-				{
-					print '<a class="butActionDelete" href="'.$_SERVER["PHP_SELF"].'?id='.$object->id.'&action=disable">'.$langs->trans("Disable").'</a>'."\n";
-				}
-				else
-				{
-					print '<a class="butAction" href="'.$_SERVER["PHP_SELF"].'?id='.$object->id.'&action=enable">'.$langs->trans("Enable").'</a>'."\n";
-				}
-			}
-			if ($permissiontoadd)
-			{
-				if ($object->status == $object::STATUS_VALIDATED)
-				{
-					print '<a class="butActionDelete" href="'.$_SERVER["PHP_SELF"].'?id='.$object->id.'&action=close">'.$langs->trans("Cancel").'</a>'."\n";
-				}
-				else
-				{
-					print '<a class="butAction" href="'.$_SERVER["PHP_SELF"].'?id='.$object->id.'&action=reopen">'.$langs->trans("Re-Open").'</a>'."\n";
-				}
-			}
-			*/
-
 			// Delete (need delete permission, or if draft, just need create/modify permission)
 			if ($permissiontodelete || ($object->status == $object::STATUS_DRAFT && $permissiontoadd))
 			{
@@ -549,11 +436,12 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 		print '</div>'."\n";
 	}
 
-
 	// Select mail models is same action as presend
 	if (GETPOST('modelselected')) {
 		$action = 'presend';
 	}
+
+	// Document Generation -- Génération des documents
 
 	if ($action != 'presend')
 	{
@@ -561,22 +449,25 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 		print '<a name="builddoc"></a>'; // ancre
 
 		$includedocgeneration = 1;
-
 		// Documents
 		if ($includedocgeneration) {
 			$objref = dol_sanitizeFileName($object->ref);
+
 			$relativepath = $objref . '/' . $objref . '.pdf';
-			$filedir = $conf->digiriskdolibarr->dir_output.'/'.$object->element.'/'.$objref;
+			$dir_files = $object->element . '/' . $objref;
+			$filedir = $conf->digiriskdolibarr->dir_output.'/'.$dir_files;
+
 			$urlsource = $_SERVER["PHP_SELF"] . "?id=" . $object->id;
 			$genallowed = $user->rights->digiriskdolibarr->informationssharing->read;	// If you can read, you can build the PDF to read content
-			$delallowed = $user->rights->digiriskdolibarr->informationssharing->write;	// If you can create/edit, you can remove a file on card
-			print $formfile->showdocuments('digiriskdolibarr:InformationsSharing', $object->element.'/'.$objref, $filedir, $urlsource, $genallowed, $delallowed, $object->model_pdf, 1, 0, 0, 28, 0, '', '', '', $langs->defaultlang);
+			$delallowed = $user->rights->digiriskdolibarr->informationssharing->create;	// If you can create/edit, you can remove a file on card
+
+			print $formfile->showdocuments('digiriskdolibarr:InformationsSharing',$dir_files, $filedir, $urlsource, $genallowed, $delallowed, $object->model_odt, 1, 0, 0, 28, 0, '', '', '', $langs->defaultlang);
+
 		}
 
 		// Show links to link elements
 		$linktoelem = $form->showLinkToObjectBlock($object, null, array('informationssharing'));
 		$somethingshown = $form->showLinkedObjectBlock($object, $linktoelem);
-
 
 		print '</div><div class="fichehalfright"><div class="ficheaddleft">';
 
@@ -604,6 +495,7 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 	$trackid = 'informationssharing'.$object->id;
 
 	include DOL_DOCUMENT_ROOT.'/core/tpl/card_presend.tpl.php';
+
 }
 
 // End of page

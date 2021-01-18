@@ -217,7 +217,7 @@ if ($action == 'create')
 
 	include DOL_DOCUMENT_ROOT.'/core/tpl/commonfields_add.tpl.php';
 
-	$digirisk_addon = $conf->global->DIGIRISKDOLIBARR__ADDON;
+	$digirisk_addon = $conf->global->DIGIRISKDOLIBARR_LEGALDISPLAY_ADDON;
 	$modele = new $digirisk_addon($db);
 
 	print '<tr><td class="fieldrequired">'.$langs->trans("Ref").'</td><td>';
@@ -454,14 +454,14 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 			$objref = dol_sanitizeFileName($object->ref);
 
 			$relativepath = $objref . '/' . $objref . '.pdf';
-			$dir_files = $object->element . '/' . $objref . "_A4_V1.odt";
+			$dir_files = $object->element . '/' . $objref;
 			$filedir = $conf->digiriskdolibarr->dir_output.'/'.$dir_files;
 
 			$urlsource = $_SERVER["PHP_SELF"] . "?id=" . $object->id;
 			$genallowed = $user->rights->digiriskdolibarr->legaldisplay->read;	// If you can read, you can build the PDF to read content
 			$delallowed = $user->rights->digiriskdolibarr->legaldisplay->create;	// If you can create/edit, you can remove a file on card
 
-			print $formfile->showdocuments('digiriskdolibarr:LegalDisplay',$dir_files, $filedir, $urlsource, $genallowed, $delallowed, $object->model_pdf, 1, 0, 0, 28, 0, '', '', '', $langs->defaultlang);
+			print $formfile->showdocuments('digiriskdolibarr:LegalDisplay',$dir_files, $filedir, $urlsource, $genallowed, $delallowed, $object->model_odt, 1, 0, 0, 28, 0, '', '', '', $langs->defaultlang);
 
 		}
 

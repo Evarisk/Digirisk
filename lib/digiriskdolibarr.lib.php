@@ -52,6 +52,16 @@ function digiriskdolibarrAdminPrepareHead()
 	$head[$h][2] = 'about';
 	$h++;
 
+	$head[$h][0] = dol_buildpath("/digiriskdolibarr/admin/legaldisplay.php", 1);
+	$head[$h][1] = $langs->trans("LegalDisplay");
+	$head[$h][2] = 'legaldisplay';
+	$h++;
+
+	$head[$h][0] = dol_buildpath("/digiriskdolibarr/admin/informationssharing.php", 1);
+	$head[$h][1] = $langs->trans("InformationsSharing");
+	$head[$h][2] = 'informationssharing';
+	$h++;
+
 	// Show more tabs from modules
 	// Entries must be declared in modules descriptor with line
 	//$this->tabs = array(
