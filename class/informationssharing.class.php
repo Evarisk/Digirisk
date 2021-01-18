@@ -172,11 +172,11 @@ class InformationsSharing extends DigiriskDocuments
 
 		if (!empty ($digirisk_resources)) {
 
-			$json['delegues_du_personnels_date']    = $conf->global->DIGIRISK_CSE_ELECTION_DATE;
+			$json['InformationsSharing']['delegues_du_personnels_date']    = $conf->global->DIGIRISK_CSE_ELECTION_DATE;
 
 
 
-			$json['delegues_du_personnels_titulaires']    = '';
+			$json['InformationsSharing']['delegues_du_personnels_titulaires']    = '';
 
 			if (!empty ($digirisk_resources['TitularsCSE']->id )) {
 				foreach ($digirisk_resources['TitularsCSE']->id as $cse_titular) {
@@ -184,12 +184,12 @@ class InformationsSharing extends DigiriskDocuments
 					$cse_titulars = new User($this->db);
 					$result = $cse_titulars->fetch($cse_titular);
 					if ($result > 0) {
-						$json['delegues_du_personnels_titulaires']  .= $cse_titulars->firstname . " " . $cse_titulars->lastname ;
+						$json['InformationsSharing']['delegues_du_personnels_titulaires']  .= $cse_titulars->firstname . " " . $cse_titulars->lastname ;
 					}
 				}
 			}
 
-			$json['delegues_du_personnels_suppleants']    = '';
+			$json['InformationsSharing']['delegues_du_personnels_suppleants']    = '';
 
 			if (!empty ($digirisk_resources['AlternatesCSE']->id )) {
 				foreach ($digirisk_resources['AlternatesCSE']->id as $cse_alternate) {
@@ -197,12 +197,12 @@ class InformationsSharing extends DigiriskDocuments
 					$cse_alternates = new User($this->db);
 					$result = $cse_alternates->fetch($cse_alternate);
 					if ($result > 0) {
-						$json['delegues_du_personnels_suppleants']  .= $cse_alternates->firstname . " " . $cse_alternates->lastname ;
+						$json['InformationsSharing']['delegues_du_personnels_suppleants']  .= $cse_alternates->firstname . " " . $cse_alternates->lastname ;
 					}
 				}
 			}
 
-			$json['delegues_du_personnels_suppleants']    = '';
+			$json['InformationsSharing']['delegues_du_personnels_suppleants']    = '';
 
 			if (!empty ($digirisk_resources['AlternatesCSE']->id )) {
 				foreach ($digirisk_resources['AlternatesCSE']->id as $cse_alternate) {
@@ -210,15 +210,15 @@ class InformationsSharing extends DigiriskDocuments
 					$cse_alternates = new User($this->db);
 					$result = $cse_alternates->fetch($cse_alternate);
 					if ($result > 0) {
-						$json['delegues_du_personnels_suppleants']  .= $cse_alternates->firstname . " " . $cse_alternates->lastname ;
+						$json['InformationsSharing']['delegues_du_personnels_suppleants']  .= $cse_alternates->firstname . " " . $cse_alternates->lastname ;
 					}
 				}
 			}
 
-			$json['membres_du_comite_entreprise_date']    = $conf->global->DIGIRISK_DP_ELECTION_DATE;
+			$json['InformationsSharing']['membres_du_comite_entreprise_date']    = $conf->global->DIGIRISK_DP_ELECTION_DATE;
 
 
-			$json['membres_du_comite_entreprise_titulaires']    = '';
+			$json['InformationsSharing']['membres_du_comite_entreprise_titulaires']    = '';
 
 			if (!empty ($digirisk_resources['TitularsDP']->id )) {
 				foreach ($digirisk_resources['TitularsDP']->id as $dp_titular) {
@@ -226,12 +226,12 @@ class InformationsSharing extends DigiriskDocuments
 					$dp_titulars = new User($this->db);
 					$result = $dp_titulars->fetch($dp_titular);
 					if ($result > 0) {
-						$json['membres_du_comite_entreprise_titulaires']  .= $dp_titulars->firstname . " " . $dp_titulars->lastname ;
+						$json['InformationsSharing']['membres_du_comite_entreprise_titulaires']  .= $dp_titulars->firstname . " " . $dp_titulars->lastname ;
 					}
 				}
 			}
 
-			$json['membres_du_comite_entreprise_suppleants']    = '';
+			$json['InformationsSharing']['membres_du_comite_entreprise_suppleants']    = '';
 
 			if (!empty ($digirisk_resources['AlternatesDP']->id )) {
 				foreach ($digirisk_resources['AlternatesDP']->id as $dp_alternate) {
@@ -239,7 +239,7 @@ class InformationsSharing extends DigiriskDocuments
 					$dp_alternates = new User($this->db);
 					$result = $dp_alternates->fetch($dp_alternate);
 					if ($result > 0) {
-						$json['membres_du_comite_entreprise_suppleants']  .= $dp_alternates->firstname . " " . $dp_alternates->lastname ;
+						$json['InformationsSharing']['membres_du_comite_entreprise_suppleants']  .= $dp_alternates->firstname . " " . $dp_alternates->lastname ;
 					}
 				}
 			}
