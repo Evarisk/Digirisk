@@ -20,7 +20,7 @@
 # Module label 'ModuleDigiriskdolibarrName'
 ModuleDigiriskdolibarrName = Digiriskdolibarr
 # Module description 'ModuleDigiriskdolibarrDesc'
-ModuleDigiriskdolibarrDesc = Description de Digiriskdolibarr
+ModuleDigiriskdolibarrDesc = Digirisk pour Dolibarr
 
 #
 # Page d'administration
@@ -39,6 +39,8 @@ DigiriskdolibarrAboutPage = Page à propos de Digiriskdolibarr
 #
 # DigiriskDolibarr
 #
+
+DigiriskDolibarrDescription = Digirisk pour Dolibarr
 
 ReadLegalDisplay = Afficher un affichage légal
 CreateLegalDisplay = Créer un affichage légal

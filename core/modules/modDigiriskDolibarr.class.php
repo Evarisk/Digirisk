@@ -53,7 +53,7 @@ class modDigiriskdolibarr extends DolibarrModules
 		$this->family          = "other";
 		$this->module_position = '90';
 		$this->name            = preg_replace('/^mod/i', '', get_class($this));
-		$this->description     = "DigiriskDolibarr";
+		$this->description     = $langs->trans('DigiriskDolibarrdDescription');
 		$this->descriptionlong = "DigiriskDolibarr";
 		$this->editor_name     = 'Evarisk';
 		$this->editor_url      = 'https://evarisk.com';
