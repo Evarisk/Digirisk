@@ -150,8 +150,27 @@ class modDigiriskdolibarr extends DolibarrModules
 		$this->tabs[] = array('data'=>'mycompany_admin:+social:Social:@digiriskdolibarr:1:/custom/digiriskdolibarr/admin/socialconf.php');  					// To add a new tab identified by code tabname1
                                   										// To remove an existing tab identified by code tabname
 		// Dictionaries
-		$this->dictionaries = array();
-
+		$this->dictionaries=array(
+			'langs'=>'digiriskdolibarr@digiriskdolibarr',
+			// List of tables we want to see into dictonnary editor
+			'tabname'=>array(MAIN_DB_PREFIX."c_conventions_collectives"),
+			// Label of tables
+			'tablib'=>array("Conventions Collectives"),
+			// Request to select fields
+			'tabsql'=>array('SELECT f.rowid as rowid, f.code, f.libelle, f.active FROM '.MAIN_DB_PREFIX.'c_conventions_collectives as f'),
+			// Sort order
+			'tabsqlsort'=>array("libelle ASC"),
+			// List of fields (result of select to show dictionary)
+			'tabfield'=>array("code,libelle"),
+			// List of fields (list of fields to edit a record)
+			'tabfieldvalue'=>array("code,libelle"),
+			// List of fields (list of fields for insert)
+			'tabfieldinsert'=>array("code,libelle"),
+			// Name of columns with primary key (try to always name it 'rowid')
+			'tabrowid'=>array("rowid"),
+			// Condition to show each dictionary
+			'tabcond'=>array($conf->digiriskdolibarr->enabled, $conf->digiriskdolibarr->enabled, $conf->digiriskdolibarr->enabled)
+		);
 
 		// Boxes/Widgets
 		$this->boxes = array(
