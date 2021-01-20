@@ -489,9 +489,27 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 	if (GETPOST('modelselected')) $action = 'presend';
 
 	// Presend form
-	$modelmail = 'legaldisplay';
-	$defaulttopic = 'InformationMessage';
-	$diroutput = $conf->digiriskdolibarr->dir_output;
+
+	//get contact to send to
+	$legaldisplay = json_decode($object->json, false, 512, JSON_UNESCAPED_UNICODE)->LegalDisplay;
+
+	$digirisk_resources = new DigiriskResources($db);
+	$societe 			= new Societe($db);
+
+	$labourdoctor = $digirisk_resources->digirisk_dolibarr_fetch_resources();
+	$labourdoctor = $labourdoctor['LabourInspectorSociety']->id[0];
+	$result 	  = $societe->fetch($labourdoctor);
+	if ($result > 0) {
+		$object->thirdparty = $societe;
+	}
+
+	//force generate document when 'send by mail' button is clicked
+	$object->modelpdf = 'legaldisplay_A4_odt';
+
+	//get title and content
+	$modelmail = 'Digirisk_LegalDisplay';
+	$defaulttopic = $langs->trans('SendLegalDisplay') . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
+	$diroutput = $conf->digiriskdolibarr->dir_output . '/legaldisplay';
 	$trackid = 'legaldisplay'.$object->id;
 
 	include DOL_DOCUMENT_ROOT.'/core/tpl/card_presend.tpl.php';

@@ -55,10 +55,12 @@ DigiriskDocumentsList = Liste des documents légaux
 LegalDisplay = Affichage légal
 NewLegalDisplay = Nouvel affichage légal
 LegalDisplayList = Liste des affichages légaux
+SendLegalDisplay = Affichage légal
 
 InformationsSharing = Diffusion d'informations
 NewInformationsSharing = Nouvelle diffusion d'informations
 InformationsSharingList = Liste des diffusions d'informations
+SendInformationsSharing = Diffusion d'informations
 
 DigiriskMenu = Ajoutez des informations sur votre société/organisation. Cliquez sur le bouton "Enregistrer" en bas de page pour sauvegarder
 DigiriskDocumentsNumberingModule = Modèle de numérotation des documents de Digirisk

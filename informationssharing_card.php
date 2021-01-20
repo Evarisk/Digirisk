@@ -489,9 +489,19 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 	if (GETPOST('modelselected')) $action = 'presend';
 
 	// Presend form
-	$modelmail = 'informationssharing';
-	$defaulttopic = 'InformationMessage';
-	$diroutput = $conf->digiriskdolibarr->dir_output;
+
+	//get contact to send to
+	$informationssharing = json_decode($object->json, false, 512, JSON_UNESCAPED_UNICODE)->InformationsSharing;
+
+	$digirisk_resources = new DigiriskResources($db);
+
+	//force generate document when 'send by mail' button is clicked
+	$object->modelpdf = 'informationssharing_A4_odt';
+
+	//get title and content
+	$modelmail = 'Digirisk_InformationsSharing';
+	$defaulttopic = $langs->trans('SendInformationsSharing') . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
+	$diroutput = $conf->digiriskdolibarr->dir_output . '/informationssharing';
 	$trackid = 'informationssharing'.$object->id;
 
 	include DOL_DOCUMENT_ROOT.'/core/tpl/card_presend.tpl.php';
