@@ -170,13 +170,11 @@ class InformationsSharing extends DigiriskDocuments
 		$resources 			= new DigiriskResources($this->db);
 		$digirisk_resources = $resources->digirisk_dolibarr_fetch_resources();
 
+		// 		*** JSON FILLING ***
 		if (!empty ($digirisk_resources)) {
 
-			$json['InformationsSharing']['delegues_du_personnels_date']    = $conf->global->DIGIRISK_CSE_ELECTION_DATE;
-
-
-
-			$json['InformationsSharing']['delegues_du_personnels_titulaires']    = '';
+			$json['InformationsSharing']['delegues_du_personnels_date']    	  = $conf->global->DIGIRISK_CSE_ELECTION_DATE;
+			$json['InformationsSharing']['delegues_du_personnels_titulaires'] = '';
 
 			if (!empty ($digirisk_resources['TitularsCSE']->id )) {
 				foreach ($digirisk_resources['TitularsCSE']->id as $cse_titular) {
@@ -189,7 +187,7 @@ class InformationsSharing extends DigiriskDocuments
 				}
 			}
 
-			$json['InformationsSharing']['delegues_du_personnels_suppleants']    = '';
+			$json['InformationsSharing']['delegues_du_personnels_suppleants'] = '';
 
 			if (!empty ($digirisk_resources['AlternatesCSE']->id )) {
 				foreach ($digirisk_resources['AlternatesCSE']->id as $cse_alternate) {
@@ -202,7 +200,7 @@ class InformationsSharing extends DigiriskDocuments
 				}
 			}
 
-			$json['InformationsSharing']['delegues_du_personnels_suppleants']    = '';
+			$json['InformationsSharing']['delegues_du_personnels_suppleants'] = '';
 
 			if (!empty ($digirisk_resources['AlternatesCSE']->id )) {
 				foreach ($digirisk_resources['AlternatesCSE']->id as $cse_alternate) {
@@ -215,10 +213,10 @@ class InformationsSharing extends DigiriskDocuments
 				}
 			}
 
-			$json['InformationsSharing']['membres_du_comite_entreprise_date']    = $conf->global->DIGIRISK_DP_ELECTION_DATE;
+			$json['InformationsSharing']['membres_du_comite_entreprise_date'] = $conf->global->DIGIRISK_DP_ELECTION_DATE;
 
 
-			$json['InformationsSharing']['membres_du_comite_entreprise_titulaires']    = '';
+			$json['InformationsSharing']['membres_du_comite_entreprise_titulaires'] = '';
 
 			if (!empty ($digirisk_resources['TitularsDP']->id )) {
 				foreach ($digirisk_resources['TitularsDP']->id as $dp_titular) {
@@ -231,7 +229,7 @@ class InformationsSharing extends DigiriskDocuments
 				}
 			}
 
-			$json['InformationsSharing']['membres_du_comite_entreprise_suppleants']    = '';
+			$json['InformationsSharing']['membres_du_comite_entreprise_suppleants'] = '';
 
 			if (!empty ($digirisk_resources['AlternatesDP']->id )) {
 				foreach ($digirisk_resources['AlternatesDP']->id as $dp_alternate) {
@@ -245,7 +243,6 @@ class InformationsSharing extends DigiriskDocuments
 			}
 
 				$object->json = json_encode($json, JSON_UNESCAPED_UNICODE);
-
 				return $object->json;
 
 		}

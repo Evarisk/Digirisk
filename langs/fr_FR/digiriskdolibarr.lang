@@ -41,7 +41,7 @@ DigiriskdolibarrAboutPage = Page à propos de Digiriskdolibarr
 #
 
 DigiriskDolibarrDescription = Digirisk pour Dolibarr
-
+CreatedOn = Créé le
 ReadLegalDisplay = Afficher un affichage légal
 CreateLegalDisplay = Créer un affichage légal
 DeleteLegalDisplay = Supprimer un affichage légal
@@ -78,7 +78,6 @@ DigiriskInformationsSharingStandardModel = Fixe la référence comme étant : "d
 DigiriskInformationsSharingAdvancedModel = Fixe la référence comme étant : "date_heure"
 DigiriskTemplateDocumentInformationsSharing = Modèle de documents des diffusions d'information de Digirisk
 
-
 LabourDoctor = Médecin du travail
 LabourInspector = Inspecteur du travail
 FireBrigade = Pompiers
@@ -99,6 +98,8 @@ TermsAndConditions = Modalités
 ESC = Comité Social & Économique
 StaffRepresentatives = Délégués du personnel
 ElectionDate = Date d'élection
+ElectionDateCSE = Date d'élection du CSE
+ElectionDateDP = Date d'élection des DP
 Titulars = Titulaires
 Alternates = Suppléants
 

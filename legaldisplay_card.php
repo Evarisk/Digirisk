@@ -342,6 +342,10 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 	unset($object->fields['type']);
 	unset($object->fields['last_main_doc']);
 
+	//JSON Decode and show fields
+	include DOL_DOCUMENT_ROOT.'/custom/digiriskdolibarr/core/tpl/digiriskdolibarr_legaldisplayfields_view.tpl.php';
+
+	//Show common fields
 	include DOL_DOCUMENT_ROOT.'/core/tpl/commonfields_view.tpl.php';
 
 	// Other attributes. Fields from hook formObjectOptions and Extrafields.
