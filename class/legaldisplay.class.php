@@ -281,6 +281,7 @@ class LegalDisplay extends DigiriskDocuments
 			$json['LegalDisplay']['derogation_schedule']['permanent']                                     = $conf->global->DIGIRISK_DEROGATION_SCHEDULE_PERMANENT;
 			$json['LegalDisplay']['derogation_schedule']['occasional']                                    = $conf->global->DIGIRISK_DEROGATION_SCHEDULE_OCCASIONAL;
 			$json['LegalDisplay']['collective_agreement']['title_of_the_applicable_collective_agreement'] = $conf->global->DIGIRISK_COLLECTIVE_AGREEMENT_TITLE;
+			$json['LegalDisplay']['collective_agreement']['title_of_the_applicable_collective_agreement'] = $conf->global->DIGIRISK_COLLECTIVE_AGREEMENT_TITLE . ' - ' . $this->getIDCCByCode($conf->global->DIGIRISK_COLLECTIVE_AGREEMENT_TITLE)->libelle;
 			$json['LegalDisplay']['collective_agreement']['location_and_access_terms_of_the_agreement']   = $conf->global->DIGIRISK_COLLECTIVE_AGREEMENT_LOCATION;
 			$json['LegalDisplay']['DUER']['how_access_to_duer']                                           = $conf->global->DIGIRISK_DUER_LOCATION;
 			$json['LegalDisplay']['rules']['location']                                                    = $conf->global->DIGIRISK_RULES_LOCATION;
@@ -294,6 +295,25 @@ class LegalDisplay extends DigiriskDocuments
 		{
 			return -1;
 		}
+	}
+
+	public function getIDCCByCode($code) {
+
+		$sql = "SELECT rowid, libelle";
+		$sql .= " FROM ".MAIN_DB_PREFIX.'c_conventions_collectives';
+		$sql .= " WHERE code = " . $code ;
+
+		$result = $this->db->query($sql);
+
+		if ($result)
+		{
+			$obj = $this->db->fetch_object($result);
+		}
+		else {
+			dol_print_error($this->db);
+		}
+
+		return $obj;
 	}
 
 	/**

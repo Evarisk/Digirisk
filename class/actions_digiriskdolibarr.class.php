@@ -103,12 +103,12 @@ class ActionsDigiriskdolibarr
 		{
 			?>
 			<script>
-				let InputTime = document.createElement("input");
-				IDCC_form = '<?php $formother->select_dictionary('lol','c_conventions_collectives', 'code', 'libelle') ;?>';
-				let $tr = $('<tr>');
-				$tr.append($('<td>').append('<?php echo $langs->trans('IDCC');?>'));
-				$tr.append($('<td>').append(IDCC_form));
-				console.log($tr)
+				IDCC_form = '<?php $formother->select_dictionary('DIGIRISK_COLLECTIVE_AGREEMENT_TITLE','c_conventions_collectives', 'code', 'libelle', $conf->global->DIGIRISK_COLLECTIVE_AGREEMENT_TITLE );?>';
+
+				let $tr = $('<tr class="oddeven"><td><label for="selectidcc_id"><?php print $langs->trans('IDCC');?></label></td>');
+
+				$tr.append('<td>' + IDCC_form + '</td></tr>');
+
 				let currElement = $('table:nth-child(7) .oddeven:last-child');
 				currElement.after($tr);
 			</script>
@@ -125,7 +125,29 @@ class ActionsDigiriskdolibarr
 		}
 	}
 
+	public function doActions($parameters, &$object, &$action, $hookmanager)
+	{
+		global $db, $conf, $user, $langs;
 
+		$error = 0; // Error counter
+
+		/* print_r($parameters); print_r($object); echo "action: " . $action; */
+		if (in_array($parameters['currentcontext'], array('admincompany')))	    // do something only for the context 'somecontext1' or 'somecontext2'
+		{
+			if ($action == 'updateedit' || $action == 'update') {
+				dolibarr_set_const($db, "DIGIRISK_COLLECTIVE_AGREEMENT_TITLE", GETPOST("DIGIRISK_COLLECTIVE_AGREEMENT_TITLE", 'nohtml'), 'chaine', 0, '', $conf->entity);
+			}
+		}
+
+		if (!$error) {
+			$this->results = array('myreturn' => 999);
+			$this->resprints = 'A text to show';
+			return 0; // or return 1 to replace standard code
+		} else {
+			$this->errors[] = 'Error message';
+			return -1;
+		}
+	}
 	/**
 	 * Overloading the doMassActions function : replacing the parent's function with the one below
 	 *

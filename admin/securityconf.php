@@ -115,6 +115,7 @@ if (($action == 'update' && !GETPOST("cancel", 'alpha'))
 	dolibarr_set_const($db, "DIGIRISK_GENERAL_RULES", GETPOST("consignesgenerales", 'none'), 'chaine', 0, '', $conf->entity);
 	dolibarr_set_const($db, "DIGIRISK_RULES_LOCATION", GETPOST("emplacementRI", 'none'), 'chaine', 0, '', $conf->entity);
 	dolibarr_set_const($db, "DIGIRISK_DUER_LOCATION", GETPOST("emplacementDU", 'none'), 'chaine', 0, '', $conf->entity);
+	dolibarr_set_const($db, "DIGIRISK_COLLECTIVE_AGREEMENT_LOCATION", GETPOST("emplacementCC", 'none'), 'chaine', 0, '', $conf->entity);
 
 	if ($action != 'updateedit' && !$error)
 	{
@@ -528,6 +529,16 @@ print '<tr class="liste_titre"><th class="titlefield wordbreak">'.$langs->trans(
 
 print '<tr class="oddeven"><td><label for="emplacementDU">'.$langs->trans("Location").'</label></td><td>';
 print '<textarea name="emplacementDU" id="emplacementDU" class="minwidth300" rows="'.ROWS_3.'">'.($conf->global->DIGIRISK_DUER_LOCATION ? $conf->global->DIGIRISK_DUER_LOCATION : '').'</textarea></td></tr>'."\n";
+
+
+// 			* Collective Agreement - Convention collective *
+
+print '<tr class="liste_titre"><th class="titlefield wordbreak">'.$langs->trans("CollectiveAgreement").'</th><th>'.$langs->trans("").'</th></tr>'."\n";
+
+// 			* Collective Agreement location - Emplacement de la Convention collective *
+
+print '<tr class="oddeven"><td><label for="emplacementCC">'.$langs->trans("Location").'</label></td><td>';
+print '<textarea name="emplacementCC" id="emplacementCC" class="minwidth300" rows="'.ROWS_3.'">'.($conf->global->DIGIRISK_COLLECTIVE_AGREEMENT_LOCATION ? $conf->global->DIGIRISK_COLLECTIVE_AGREEMENT_LOCATION : '').'</textarea></td></tr>'."\n";
 
 print '</table>';
 
