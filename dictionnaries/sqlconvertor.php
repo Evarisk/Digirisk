@@ -14,6 +14,7 @@ array_unshift($final_idcc_array, "0003");
 $i = 0;
 foreach ($lol as $final_idcc) {
 	$final_idcc_name_array[$i] = array_shift($final_idcc);
+	//Remplacer les ' par des ''
 	if (preg_match('/^[\w\s\'"&;:?!().-]{0,250}$/i', $final_idcc_name_array[$i])) {
 		preg_replace('/^[a-z0-9 :,.!().?";\'-]+$/i', " ''d", $final_idcc_name_array[$i] );
 	}
@@ -25,7 +26,7 @@ array_unshift($final_idcc_name_array, "Convention collective nationale des ouvri
 
 for ($i = 0; $i <= 774; $i++) {
 	$j = $i + 1;
-	$final_idcc_complete_array[$i] = "('" . $j . "'" . ',' . "'" . $final_idcc_array[$i] . "'" . ',' . "'" . $final_idcc_name_array[$i] . "'" . ',' . "'" . $final_idcc_name_array[$i] . "'" . ',' . "'" . 1 . "'" . '),';
+	$final_idcc_complete_array[$i] = "('" . $j . "'" . ',' . "'" . $final_idcc_array[$i] . "'" . ',' . "'" . $final_idcc_name_array[$i] . "'" . ',' . "'" . $final_idcc_name_array[$i] . "'" . ',' . "'" . 1 . "'" . ',1),';
 	print $final_idcc_complete_array[$i];
 }
 
