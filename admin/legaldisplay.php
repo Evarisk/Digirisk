@@ -283,7 +283,7 @@ foreach ($dirmodels as $reldir)
 
 							print '<td class="center">';
 
-							if ($conf->global->DIGIRISKDOLIBARR_LEGALDISPLAY_ADDON_PDF == $file || $conf->global->DIGIRISKDOLIBARR_LEGALDISPLAY_ADDON_PDF.'.php' == $file)
+							if ($conf->global->DIGIRISKDOLIBARR_LEGALDISPLAY_ADDON == $file || $conf->global->DIGIRISKDOLIBARR_LEGALDISPLAY_ADDON.'.php' == $file)
 							{
 								print img_picto($langs->trans("Activated"), 'switch_on');
 							}
