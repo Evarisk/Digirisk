@@ -100,7 +100,7 @@ if (($action == 'update' && !GETPOST("cancel", 'alpha'))
  * View
  */
 
-$help_url = '';
+$help_url = 'FR:Module_DigiriskDolibarr';
 llxHeader('', $langs->trans("CompanyFoundation"), $help_url);
 
 print load_fiche_titre($langs->trans("CompanyFoundation"), '', 'title_setup');

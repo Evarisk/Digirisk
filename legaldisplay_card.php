@@ -169,7 +169,7 @@ $formfile 	 = new FormFile($db);
 $formproject = new FormProjets($db);
 
 $title 	  = $langs->trans("LegalDisplay");
-$help_url = '';
+$help_url = 'FR:Module_DigiriskDolibarr';
 
 llxHeader('', $title, $help_url);
 

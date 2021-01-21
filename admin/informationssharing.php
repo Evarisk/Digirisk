@@ -185,8 +185,9 @@ $form = new Form($db);
 
 $dirmodels = array_merge(array('/'), (array) $conf->modules_parts['models']);
 
+$help_url = 'FR:Module_DigiriskDolibarr';
 $page_name = "DigiriskdolibarrSetup";
-llxHeader('', $langs->trans($page_name));
+llxHeader('', $langs->trans($page_name), $help_url);
 
 // Subheader
 $linkback = '<a href="'.($backtopage ? $backtopage : DOL_URL_ROOT.'/admin/modules.php?restore_lastsearch_values=1').'">'.$langs->trans("BackToModuleList").'</a>';

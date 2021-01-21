@@ -133,7 +133,7 @@ if ($object->id > 0)
 {
 	$title = $langs->trans("Agenda");
 	//if (! empty($conf->global->MAIN_HTML_TITLE) && preg_match('/thirdpartynameonly/',$conf->global->MAIN_HTML_TITLE) && $object->name) $title=$object->name." - ".$title;
-	$help_url = '';
+	$help_url = 'FR:Module_DigiriskDolibarr';
 	llxHeader('', $title, $help_url);
 
 	if (!empty($conf->notification->enabled)) $langs->load("mails");

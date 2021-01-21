@@ -73,8 +73,9 @@ $now = dol_now();
 
 $form = new Form($db);
 $formfile = new FormFile($db);
+$help_url = 'FR:Module_DigiriskDolibarr';
 
-llxHeader("", $langs->trans("DigiriskdolibarrArea"));
+llxHeader("", $langs->trans("DigiriskdolibarrArea"), $help_url);
 
 print load_fiche_titre($langs->trans("DigiriskdolibarrArea"), '', 'digiriskdolibarr.png@digiriskdolibarr');
 

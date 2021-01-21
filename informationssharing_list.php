@@ -215,7 +215,7 @@ $form = new Form($db);
 $now = dol_now();
 
 //$help_url="EN:Module_InformationsSharing|FR:Module_InformationsSharing_FR|ES:Módulo_InformationsSharing";
-$help_url = '';
+$help_url = 'FR:Module_DigiriskDolibarr';
 $title = $langs->trans("InformationsSharingList");
 
 

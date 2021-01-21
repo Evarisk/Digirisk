@@ -215,7 +215,7 @@ $form = new Form($db);
 $now = dol_now();
 
 //$help_url="EN:Module_LegalDisplay|FR:Module_LegalDisplay_FR|ES:Módulo_LegalDisplay";
-$help_url = '';
+$help_url = 'FR:Module_DigiriskDolibarr';
 $title = $langs->trans("LegalDisplayList");
 
 

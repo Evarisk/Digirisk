@@ -217,7 +217,7 @@ $form = new Form($db);
 $now = dol_now();
 
 //$help_url="EN:Module_DigiriskDocuments|FR:Module_DigiriskDocuments_FR|ES:Módulo_DigiriskDocuments";
-$help_url = '';
+$help_url = 'FR:Module_DigiriskDolibarr';
 $title = $langs->trans("DigiriskDocumentsList");
 
 
