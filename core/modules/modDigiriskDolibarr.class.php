@@ -122,19 +122,17 @@ class modDigiriskdolibarr extends DolibarrModules
 			// CONST CONFIGURATION
 			1 => array('DIGIRISK_GENERAL_MEANS','chaine','','General means', 1),
 			2 => array('DIGIRISK_GENERAL_RULES','chaine','','General rules', 1),
-			2 => array('DIGIRISK_LEGALDISPLAY_PREFIX','chaine','','Legal Display Prefix', 1),
-			2 => array('DIGIRISK_INFORMATIONSSHARING_PREFIX','chaine','','Legal Display Prefix', 1),
 			// CONST LEGAL DISPLAY
-			3 => array('DIGIRISK_LOCATION_OF_DETAILED_INSTRUCTION','chaine','','Location of detailed instruction', 1),
-			4 => array('DIGIRISK_DEROGATION_SCHEDULE_PERMANENT','chaine','','Location of detailed instruction', 1),
-			5 => array('DIGIRISK_DEROGATION_SCHEDULE_OCCASIONAL','chaine','','Location of detailed instruction', 1),
-			6 => array('DIGIRISK_COLLECTIVE_AGREEMENT_TITLE','chaine','','Location of detailed instruction', 1),
-			7 => array('DIGIRISK_COLLECTIVE_AGREEMENT_LOCATION','chaine','','Location of detailed instruction', 1),
-			8 => array('DIGIRISK_DUER_LOCATION','chaine','','Location of detailed instruction', 1),
-			9 => array('DIGIRISK_RULES_LOCATION','chaine','','Location of detailed instruction', 1),
-			10 => array('DIGIRISK_PARTICIPATION_AGREEMENT_INFORMATION_PROCEDURE','chaine','','Location of detailed instruction', 1),
-			// CONST INFORMATIONS SHARING
+			4 => array('DIGIRISK_LOCATION_OF_DETAILED_INSTRUCTION','chaine','','Location of detailed instruction', 1),
+			5 => array('DIGIRISK_DEROGATION_SCHEDULE_PERMANENT','chaine','','Location of detailed instruction', 1),
+			6 => array('DIGIRISK_DEROGATION_SCHEDULE_OCCASIONAL','chaine','','Location of detailed instruction', 1),
+			7 => array('DIGIRISK_COLLECTIVE_AGREEMENT_TITLE','chaine','','Location of detailed instruction', 1),
+			8 => array('DIGIRISK_COLLECTIVE_AGREEMENT_LOCATION','chaine','','Location of detailed instruction', 1),
+			9 => array('DIGIRISK_DUER_LOCATION','chaine','','Location of detailed instruction', 1),
+			10 => array('DIGIRISK_RULES_LOCATION','chaine','','Location of detailed instruction', 1),
 			11 => array('DIGIRISK_PARTICIPATION_AGREEMENT_INFORMATION_PROCEDURE','chaine','','Location of detailed instruction', 1),
+			// CONST INFORMATIONS SHARING
+			12 => array('DIGIRISK_IDCC_DICTIONNARY','chaine','','IDCC of company', 1)
 		);
 
 		if ( ! isset($conf->digiriskdolibarr ) || ! isset( $conf->digiriskdolibarr->enabled ) ) {
@@ -148,7 +146,9 @@ class modDigiriskdolibarr extends DolibarrModules
 		// Example:
 		$this->tabs[] = array('data'=>'mycompany_admin:+security:Sécurité:@digiriskdolibarr:1:/custom/digiriskdolibarr/admin/securityconf.php');  					// To add a new tab identified by code tabname1
 		$this->tabs[] = array('data'=>'mycompany_admin:+social:Social:@digiriskdolibarr:1:/custom/digiriskdolibarr/admin/socialconf.php');  					// To add a new tab identified by code tabname1
-                                  										// To remove an existing tab identified by code tabname
+		$this->tabs[] = array('data'=>'thirdparty:+thirdparty:Horaires:@digiriskdolibarr:1:/custom/digiriskdolibarr/openinghours_card.php&action=create');  					// To add a new tab identified by code tabname1
+
+		// To remove an existing tab identified by code tabname
 		// Dictionaries
 		$this->dictionaries=array(
 			'langs'=>'digiriskdolibarr@digiriskdolibarr',
