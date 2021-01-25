@@ -76,6 +76,8 @@ if (($action == 'update' && !GETPOST("cancel", 'alpha'))
 	$electionDateDP = $electionDateDP[2] . '-' . $electionDateDP[1] . '-' . $electionDateDP[0];
 
 	dolibarr_set_const($db, "DIGIRISK_PARTICIPATION_AGREEMENT_INFORMATION_PROCEDURE", GETPOST("modalites", 'none'), 'chaine', 0, '', $conf->entity);
+	dolibarr_set_const($db, "DIGIRISK_DEROGATION_SCHEDULE_PERMANENT", GETPOST("permanent", 'none'), 'chaine', 0, '', $conf->entity);
+	dolibarr_set_const($db, "DIGIRISK_DEROGATION_SCHEDULE_OCCASIONAL", GETPOST("occasional", 'none'), 'chaine', 0, '', $conf->entity);
 	dolibarr_set_const($db, "DIGIRISK_CSE_ELECTION_DATE", $electionDateCSE, 'date', 0, '', $conf->entity);
 	dolibarr_set_const($db, "DIGIRISK_DP_ELECTION_DATE", $electionDateDP, 'date', 0, '', $conf->entity);
 
@@ -149,6 +151,24 @@ print '<tr class="liste_titre"><th class="titlefield wordbreak">'.$langs->trans(
 
 print '<tr class="oddeven"><td><label for="modalites">'.$langs->trans("TermsAndConditions").'</label></td><td>';
 print '<textarea name="modalites" id="modalites" class="minwidth300" rows="'.ROWS_3.'">'.($conf->global->DIGIRISK_PARTICIPATION_AGREEMENT_INFORMATION_PROCEDURE ? $conf->global->DIGIRISK_PARTICIPATION_AGREEMENT_INFORMATION_PROCEDURE : '').'</textarea></td></tr>'."\n";
+
+/*
+				*** Exceptions to working hours -- Dérogations aux horaires de travail ***
+*/
+
+print '<table class="noborder centpercent editmode">';
+
+print '<tr class="liste_titre"><th class="titlefield wordbreak">'.$langs->trans("ExceptionsToWorkingHours").'</th><th>'.$langs->trans("").'</th></tr>'."\n";
+
+// 				* Permanent - Permanentes *
+
+print '<tr class="oddeven"><td><label for="permanent">'.$langs->trans("PermanentDerogation").'</label></td><td>';
+print '<textarea name="permanent" id="permanent" class="minwidth300" rows="'.ROWS_3.'">'.($conf->global->DIGIRISK_DEROGATION_SCHEDULE_PERMANENT ? $conf->global->DIGIRISK_DEROGATION_SCHEDULE_PERMANENT : '').'</textarea></td></tr>'."\n";
+
+// 				* Permanent - Permanentes *
+
+print '<tr class="oddeven"><td><label for="occasional">'.$langs->trans("OccasionalDerogation").'</label></td><td>';
+print '<textarea name="occasional" id="occasional" class="minwidth300" rows="'.ROWS_3.'">'.($conf->global->DIGIRISK_DEROGATION_SCHEDULE_OCCASIONAL ? $conf->global->DIGIRISK_DEROGATION_SCHEDULE_OCCASIONAL : '').'</textarea></td></tr>'."\n";
 
 /*
 				*** ESC -- CSE ***

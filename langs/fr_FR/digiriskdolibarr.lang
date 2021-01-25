@@ -44,6 +44,16 @@ DigiriskdolibarrAboutPage = Page à propos de Digiriskdolibarr
 DigiriskDolibarrDescription = Digirisk pour Dolibarr
 CreatedOn = Créé le
 ThirdpartyOpeningHours = Horaires du tiers
+DigiriskDay1 = 1
+DigiriskDay2 = 2
+DigiriskDay3 = 3
+DigiriskDay4 = 4
+DigiriskDay5 = 5
+DigiriskDay6 = 6
+
+ExceptionsToWorkingHours = Dérogations aux horaires de travail
+PermanentDerogation = Dérogation permanente
+OccasionalDerogation = Dérogation occasionnelle
 
 ReadLegalDisplay = Afficher un affichage légal
 CreateLegalDisplay = Créer un affichage légal

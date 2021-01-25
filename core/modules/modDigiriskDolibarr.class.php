@@ -124,13 +124,13 @@ class modDigiriskdolibarr extends DolibarrModules
 			2 => array('DIGIRISK_GENERAL_RULES','chaine','','General rules', 1),
 			// CONST LEGAL DISPLAY
 			4 => array('DIGIRISK_LOCATION_OF_DETAILED_INSTRUCTION','chaine','','Location of detailed instruction', 1),
-			5 => array('DIGIRISK_DEROGATION_SCHEDULE_PERMANENT','chaine','','Location of detailed instruction', 1),
-			6 => array('DIGIRISK_DEROGATION_SCHEDULE_OCCASIONAL','chaine','','Location of detailed instruction', 1),
-			7 => array('DIGIRISK_COLLECTIVE_AGREEMENT_TITLE','chaine','','Location of detailed instruction', 1),
-			8 => array('DIGIRISK_COLLECTIVE_AGREEMENT_LOCATION','chaine','','Location of detailed instruction', 1),
-			9 => array('DIGIRISK_DUER_LOCATION','chaine','','Location of detailed instruction', 1),
-			10 => array('DIGIRISK_RULES_LOCATION','chaine','','Location of detailed instruction', 1),
-			11 => array('DIGIRISK_PARTICIPATION_AGREEMENT_INFORMATION_PROCEDURE','chaine','','Location of detailed instruction', 1),
+			5 => array('DIGIRISK_DEROGATION_SCHEDULE_PERMANENT','chaine','','Permanent exceptions to working hours', 1),
+			6 => array('DIGIRISK_DEROGATION_SCHEDULE_OCCASIONAL','chaine','','Occasional exceptions to working hours', 1),
+			7 => array('DIGIRISK_COLLECTIVE_AGREEMENT_TITLE','chaine','','Title of the collective agreement', 1),
+			8 => array('DIGIRISK_COLLECTIVE_AGREEMENT_LOCATION','chaine','','Location of the collective agreement', 1),
+			9 => array('DIGIRISK_DUER_LOCATION','chaine','','Location of risks evaluation', 1),
+			10 => array('DIGIRISK_RULES_LOCATION','chaine','','Location of rules of procedure', 1),
+			11 => array('DIGIRISK_PARTICIPATION_AGREEMENT_INFORMATION_PROCEDURE','chaine','','Information procedure of participation agreement', 1),
 			// CONST INFORMATIONS SHARING
 			12 => array('DIGIRISK_IDCC_DICTIONNARY','chaine','','IDCC of company', 1)
 		);
