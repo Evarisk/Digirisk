@@ -29,6 +29,7 @@ require_once DOL_DOCUMENT_ROOT .'/societe/class/societe.class.php';
 require_once DOL_DOCUMENT_ROOT .'/user/class/user.class.php';
 dol_include_once('/digiriskdolibarr/class/digiriskdocuments.class.php');
 dol_include_once('/digiriskdolibarr/class/digiriskresources.class.php');
+dol_include_once('/digiriskdolibarr/class/openinghours.class.php');
 
 /**
  * Class for LegalDisplay
@@ -170,8 +171,21 @@ class LegalDisplay extends DigiriskDocuments
 		$resources 			= new DigiriskResources($this->db);
 		$digirisk_resources = $resources->digirisk_dolibarr_fetch_resources();
 
+		$thirdparty_openinghours = new Openinghours($this->db);
+
 		// 		*** JSON FILLING ***
 		if (!empty ($digirisk_resources )) {
+
+			$labour_doctor_societe = new Societe($this->db);
+			$result = $labour_doctor_societe->fetch($digirisk_resources['LabourDoctorSociety']->id[0]);
+
+			if ($result < 0) dol_print_error($langs->trans('NoLabourDoctorAssigned'), $labour_doctor_societe->error);
+			elseif ($result > 0) {
+
+				$labour_doctor_openinghours = $thirdparty_openinghours->fetch_by_element($labour_doctor_societe->id, $labour_doctor_societe->element);
+				$json['LegalDisplay']['occupational_health_service']['openinghours'] = "\r\n" . $labour_doctor_openinghours->day0 . "\r\n" . $labour_doctor_openinghours->day1 . "\r\n" . $labour_doctor_openinghours->day2 . "\r\n" . $labour_doctor_openinghours->day3 . "\r\n" . $labour_doctor_openinghours->day4 . "\r\n" . $labour_doctor_openinghours->day5 . "\r\n" . $labour_doctor_openinghours->day6;
+			}
+
 			$labour_doctor_contact = new Contact($this->db);
 			$result = $labour_doctor_contact->fetch($digirisk_resources['LabourDoctorContact']->id[0]);
 
@@ -182,6 +196,17 @@ class LegalDisplay extends DigiriskDocuments
 				$json['LegalDisplay']['occupational_health_service']['zip']     = $labour_doctor_contact->zip;
 				$json['LegalDisplay']['occupational_health_service']['town']    = $labour_doctor_contact->town;
 				$json['LegalDisplay']['occupational_health_service']['phone']   = $labour_doctor_contact->phone_pro;
+			}
+
+			$labour_inspector_societe = new Societe($this->db);
+			$result = $labour_inspector_societe->fetch($digirisk_resources['LabourInspectorSociety']->id[0]);
+
+			if ($result < 0) dol_print_error($langs->trans('NoLabourInspectorAssigned'), $labour_inspector_societe->error);
+			elseif ($result > 0) {
+
+				$labour_inspector_openinghours = $thirdparty_openinghours->fetch_by_element($labour_inspector_societe->id, $labour_inspector_societe->element);
+				$json['LegalDisplay']['detective_work']['openinghours'] = "\r\n" . $labour_inspector_openinghours->day0 . "\r\n" . $labour_inspector_openinghours->day1 . "\r\n" . $labour_inspector_openinghours->day2 . "\r\n" . $labour_inspector_openinghours->day3 . "\r\n" . $labour_inspector_openinghours->day4 . "\r\n" . $labour_inspector_openinghours->day5 . "\r\n" . $labour_inspector_openinghours->day6;
+
 			}
 
 			$labour_inspector_contact = new Contact($this->db);

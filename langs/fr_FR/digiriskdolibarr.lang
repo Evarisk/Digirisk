@@ -40,8 +40,11 @@ DigiriskdolibarrAboutPage = Page à propos de Digiriskdolibarr
 # DigiriskDolibarr
 #
 
+
 DigiriskDolibarrDescription = Digirisk pour Dolibarr
 CreatedOn = Créé le
+ThirdpartyOpeningHours = Horaires du tiers
+
 ReadLegalDisplay = Afficher un affichage légal
 CreateLegalDisplay = Créer un affichage légal
 DeleteLegalDisplay = Supprimer un affichage légal
@@ -92,6 +95,7 @@ GeneralMeansAtDisposal = Moyens généraux mis à disposition
 GeneralInstructions = Consignes générales
 RulesOfProcedure = Règlement intérieur
 RisksEvaluation = Document Unique
+CollectiveAgreement = Conventions collectives
 
 ParticipationAgreement = Accords de participation
 TermsAndConditions = Modalités

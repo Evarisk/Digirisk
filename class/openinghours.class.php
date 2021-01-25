@@ -40,7 +40,7 @@ class Openinghours extends CommonObject
 	/**
 	 * @var string Name of table without prefix where object is stored. This is also the key used for extrafields management.
 	 */
-	public $table_element = 'digiriskdolibarr_openinghours';
+	public $table_element = 'element_openinghours';
 
 	/**
 	 * @var int  Does this object support multicompany module ?
@@ -95,40 +95,38 @@ class Openinghours extends CommonObject
 	 */
 	public $fields=array(
 		'rowid' => array('type'=>'integer', 'label'=>'TechnicalID', 'enabled'=>'1', 'position'=>1, 'notnull'=>1, 'visible'=>0, 'noteditable'=>'1', 'index'=>1, 'comment'=>"Id"),
-		'ref' => array('type'=>'varchar(128)', 'label'=>'Ref', 'enabled'=>'1', 'position'=>10, 'notnull'=>1, 'visible'=>1, 'index'=>1, 'searchall'=>1, 'showoncombobox'=>'1', 'comment'=>"Reference of object"),
-		'label' => array('type'=>'varchar(255)', 'label'=>'Label', 'enabled'=>'1', 'position'=>30, 'notnull'=>0, 'visible'=>1, 'searchall'=>1, 'css'=>'minwidth200', 'help'=>"Help text", 'showoncombobox'=>'1',),
-		'amount' => array('type'=>'price', 'label'=>'Amount', 'enabled'=>'1', 'position'=>40, 'notnull'=>0, 'visible'=>1, 'default'=>'null', 'isameasure'=>'1', 'help'=>"Help text for amount",),
-		'qty' => array('type'=>'real', 'label'=>'Qty', 'enabled'=>'1', 'position'=>45, 'notnull'=>0, 'visible'=>1, 'default'=>'0', 'isameasure'=>'1', 'css'=>'maxwidth75imp', 'help'=>"Help text for quantity",),
-		'fk_soc' => array('type'=>'integer:Societe:societe/class/societe.class.php:1:status=1 AND entity IN (__SHARED_ENTITIES__)', 'label'=>'ThirdParty', 'enabled'=>'1', 'position'=>50, 'notnull'=>-1, 'visible'=>1, 'index'=>1, 'help'=>"LinkToThirparty",),
-		'fk_project' => array('type'=>'integer:Project:projet/class/project.class.php:1', 'label'=>'Project', 'enabled'=>'1', 'position'=>52, 'notnull'=>-1, 'visible'=>-1, 'index'=>1,),
-		'description' => array('type'=>'text', 'label'=>'Description', 'enabled'=>'1', 'position'=>60, 'notnull'=>0, 'visible'=>3,),
-		'note_public' => array('type'=>'html', 'label'=>'NotePublic', 'enabled'=>'1', 'position'=>61, 'notnull'=>0, 'visible'=>0,),
-		'note_private' => array('type'=>'html', 'label'=>'NotePrivate', 'enabled'=>'1', 'position'=>62, 'notnull'=>0, 'visible'=>0,),
-		'date_creation' => array('type'=>'datetime', 'label'=>'DateCreation', 'enabled'=>'1', 'position'=>500, 'notnull'=>1, 'visible'=>-2,),
 		'tms' => array('type'=>'timestamp', 'label'=>'DateModification', 'enabled'=>'1', 'position'=>501, 'notnull'=>0, 'visible'=>-2,),
 		'fk_user_creat' => array('type'=>'integer:User:user/class/user.class.php', 'label'=>'UserAuthor', 'enabled'=>'1', 'position'=>510, 'notnull'=>1, 'visible'=>-2, 'foreignkey'=>'user.rowid',),
-		'fk_user_modif' => array('type'=>'integer:User:user/class/user.class.php', 'label'=>'UserModif', 'enabled'=>'1', 'position'=>511, 'notnull'=>-1, 'visible'=>-2,),
-		'import_key' => array('type'=>'varchar(14)', 'label'=>'ImportId', 'enabled'=>'1', 'position'=>1000, 'notnull'=>-1, 'visible'=>-2,),
-		'model_pdf' => array('type'=>'varchar(255)', 'label'=>'Model pdf', 'enabled'=>'1', 'position'=>1010, 'notnull'=>-1, 'visible'=>0,),
-		'status' => array('type'=>'smallint', 'label'=>'Status', 'enabled'=>'1', 'position'=>1000, 'notnull'=>1, 'visible'=>1, 'index'=>1, 'arrayofkeyval'=>array('0'=>'Brouillon', '1'=>'Valid&eacute;', '9'=>'Annul&eacute;'),),
+		'ref_ext' => array('type'=>'varchar(128)', 'label'=>'RefExt', 'enabled'=>'1', 'position'=>11, 'notnull'=>0, 'visible'=>4, 'index'=>1,),
+		'date_creation' => array('type'=>'datetime', 'label'=>'DateCreation', 'enabled'=>'1', 'position'=>500, 'notnull'=>1, 'visible'=>-2,),
+		'element_type' => array('type'=>'varchar(50)', 'label'=>'ElementType', 'enabled'=>'1', 'position'=>502, 'notnull'=>0, 'visible'=>-1,),
+		'element_id' => array('type'=>'integer', 'label'=>'ElementID', 'enabled'=>'1', 'position'=>503, 'notnull'=>0, 'visible'=>-1,),
+		'status' => array('type'=>'integer', 'label'=>'Status', 'enabled'=>'1', 'position'=>501, 'notnull'=>0, 'visible'=>-1,),
+		'day0' => array('type'=>'varchar(128)', 'label'=>'Day 0', 'enabled'=>'1', 'position'=>510, 'notnull'=>0, 'visible'=>1, 'comment'=>"ref for the object"),
+		'day1' => array('type'=>'varchar(128)', 'label'=>'Day 1', 'enabled'=>'1', 'position'=>511, 'notnull'=>0, 'visible'=>1, 'comment'=>"ref for the object"),
+		'day2' => array('type'=>'varchar(128)', 'label'=>'Day 2', 'enabled'=>'1', 'position'=>512, 'notnull'=>0, 'visible'=>1, 'comment'=>"ref for the object"),
+		'day3' => array('type'=>'varchar(128)', 'label'=>'Day 3', 'enabled'=>'1', 'position'=>513, 'notnull'=>0, 'visible'=>1, 'comment'=>"ref for the object"),
+		'day4' => array('type'=>'varchar(128)', 'label'=>'Day 4', 'enabled'=>'1', 'position'=>514, 'notnull'=>0, 'visible'=>1, 'comment'=>"ref for the object"),
+		'day5' => array('type'=>'varchar(128)', 'label'=>'Day 5', 'enabled'=>'1', 'position'=>515, 'notnull'=>0, 'visible'=>1, 'comment'=>"ref for the object"),
+		'day6' => array('type'=>'varchar(128)', 'label'=>'Day 6', 'enabled'=>'1', 'position'=>516, 'notnull'=>0, 'visible'=>1, 'comment'=>"ref for the object"),
+		'entity' => array('type'=>'integer', 'label'=>'Entity', 'enabled'=>'1', 'position'=>50, 'notnull'=>0, 'visible'=>-1),
 	);
 	public $rowid;
-	public $ref;
-	public $label;
-	public $amount;
-	public $qty;
-	public $fk_soc;
-	public $fk_project;
-	public $description;
-	public $note_public;
-	public $note_private;
-	public $date_creation;
 	public $tms;
 	public $fk_user_creat;
-	public $fk_user_modif;
-	public $import_key;
-	public $model_pdf;
+	public $ref_ext;
+	public $date_creation;
+	public $element_type;
+	public $element_id;
 	public $status;
+	public $day0;
+	public $day1;
+	public $day2;
+	public $day3;
+	public $day4;
+	public $day5;
+	public $day6;
+	public $entity;
 	// END MODULEBUILDER PROPERTIES
 
 
@@ -222,6 +220,15 @@ class Openinghours extends CommonObject
 	 */
 	public function create(User $user, $notrigger = false)
 	{
+		// Change le statut des ressources précédentes à 0
+		$sql = "UPDATE ".MAIN_DB_PREFIX."$this->table_element";
+		$sql .= " SET status = 0";
+		$sql .= " WHERE element_type = "."'". $this->element_type . "'";
+		$sql .= " AND element_id = ".$this->element_id;
+		//RAJOUTER LIGNE POUR LE SELECT ENTITY
+
+		dol_syslog("admin.lib::digirisk_dolibarr_set_resources", LOG_DEBUG);
+		$resql = $this->db->query($sql);
 		return $this->createCommon($user, $notrigger);
 	}
 
@@ -329,6 +336,55 @@ class Openinghours extends CommonObject
 		$result = $this->fetchCommon($id, $ref);
 		if ($result > 0 && !empty($this->table_element_line)) $this->fetchLines();
 		return $result;
+	}
+
+	/**
+	 * Load object in memory from the database
+	 *
+	 * @param int    $id   Id object
+	 * @param string $ref  Ref
+	 * @return int         <0 if KO, 0 if not found, >0 if OK
+	 */
+	public function fetch_by_element($element_id, $element_type)
+	{
+		if (empty($element_type) && empty($element_id) && empty($morewhere)) return -1;
+
+
+		$sql = 'SELECT '.$this->getFieldList();
+		$sql .= ' FROM '.MAIN_DB_PREFIX.$this->table_element;
+
+		if (!empty($element_id))  $sql .= ' WHERE element_id = '.$element_id;
+		if (!empty($element_type)) $sql .= ' AND element_type = ' . "'" . $element_type . "'";
+		$sql .= ' AND status = 1';
+		if (empty($id) && isset($this->ismultientitymanaged) && $this->ismultientitymanaged == 1) $sql .= ' AND entity IN ('.getEntity($this->table_element).')';
+		if ($morewhere)   $sql .= $morewhere;
+
+		$res = $this->db->query($sql);
+
+		if ($res)
+		{
+			$obj = $this->db->fetch_object($res);
+			if ($obj)
+			{
+				$this->setVarsFromFetchObj($obj);
+
+				// Retreive all extrafield
+				// fetch optionals attributes and labels
+				$this->fetch_optionals();
+
+				return $obj;
+			}
+			else
+			{
+				return 0;
+			}
+		}
+		else
+		{
+			$this->error = $this->db->lasterror();
+			$this->errors[] = $this->error;
+			return -1;
+		}
 	}
 
 	/**

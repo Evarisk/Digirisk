@@ -146,7 +146,7 @@ class modDigiriskdolibarr extends DolibarrModules
 		// Example:
 		$this->tabs[] = array('data'=>'mycompany_admin:+security:Sécurité:@digiriskdolibarr:1:/custom/digiriskdolibarr/admin/securityconf.php');  					// To add a new tab identified by code tabname1
 		$this->tabs[] = array('data'=>'mycompany_admin:+social:Social:@digiriskdolibarr:1:/custom/digiriskdolibarr/admin/socialconf.php');  					// To add a new tab identified by code tabname1
-		$this->tabs[] = array('data'=>'thirdparty:+thirdparty:Horaires:@digiriskdolibarr:1:/custom/digiriskdolibarr/openinghours_card.php&action=create');  					// To add a new tab identified by code tabname1
+		$this->tabs[] = array('data'=>'thirdparty:+openinghours:Horaires:@digiriskdolibarr:1:/custom/digiriskdolibarr/openinghours_card.php?id=__ID__');  					// To add a new tab identified by code tabname1
 
 		// To remove an existing tab identified by code tabname
 		// Dictionaries
@@ -155,7 +155,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			// List of tables we want to see into dictonnary editor
 			'tabname'=>array(MAIN_DB_PREFIX."c_conventions_collectives"),
 			// Label of tables
-			'tablib'=>array("Conventions Collectives"),
+			'tablib'=>array("CollectiveAgreement"),
 			// Request to select fields
 			'tabsql'=>array('SELECT f.rowid as rowid, f.code, f.libelle, f.active FROM '.MAIN_DB_PREFIX.'c_conventions_collectives as f'),
 			// Sort order
