@@ -98,22 +98,27 @@ class ActionsDigiriskdolibarr
 
 		$error = 0; // Error counter
 		$formother = new FormOther($db);
+		$form = new Form($db);
 		/* print_r($parameters); print_r($object); echo "action: " . $action; */
 		if (in_array($parameters['currentcontext'], array('admincompany')))	    // do something only for the context 'somecontext1' or 'somecontext2'
 		{
-			?>
-			<script>
-				IDCC_form = '<?php $formother->select_dictionary('DIGIRISK_COLLECTIVE_AGREEMENT_TITLE','c_conventions_collectives', 'code', 'libelle', $conf->global->DIGIRISK_COLLECTIVE_AGREEMENT_TITLE );?>';
+			if ($conf->global->MAIN_INFO_SOCIETE_COUNTRY == '1:FR:France') {
 
-				let $tr = $('<tr class="oddeven"><td><label for="selectidcc_id"><?php print $langs->trans('IDCC');?></label></td>');
+				?>
+				<script>
+					IDCC_form = '<?php $formother->select_dictionary('DIGIRISK_COLLECTIVE_AGREEMENT_TITLE','c_conventions_collectives', 'code', 'libelle', $conf->global->DIGIRISK_COLLECTIVE_AGREEMENT_TITLE );?>';
 
-				$tr.append('<td>' + IDCC_form + '</td></tr>');
+					let $tr = $('<tr class="oddeven"><td><label for="selectidcc_id"><?php print $form->textwithpicto($langs->trans('IDCC'), 'Ce champ provient du module Digirisk pour Dolibarr </br> La nomenclature des conventions collectives provient de travail-emploi.gouv.fr ');?></label></td>');
+					$tr.append('<td>' + IDCC_form + '</td></tr>');
 
-				let currElement = $('table:nth-child(7) .oddeven:last-child');
-				currElement.after($tr);
-			</script>
-			<?php
+					let currElement = $('table:nth-child(7) .oddeven:last-child');
+					currElement.after($tr);
+				</script>
+				<?php
+			}
 		}
+
+		print ajax_combobox('DIGIRISK_COLLECTIVE_AGREEMENT_TITLE');
 
 		if (!$error) {
 			$this->results = array('myreturn' => 999);
