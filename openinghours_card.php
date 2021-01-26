@@ -176,7 +176,7 @@ if (!empty($societe->id)) $res = $societe->fetch_optionals();
 	//include DOL_DOCUMENT_ROOT . '/core/tpl/extrafields_view.tpl.php';
 
 
-print '<span class="opacitymedium">'.$langs->trans("OpeningHoursDesc")."</span>\n";
+print '<span class="opacitymedium">'.$langs->trans("ThirdpartyOpeningHours")."</span>\n";
 
 
 	//Show common fields

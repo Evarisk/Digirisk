@@ -44,7 +44,7 @@ print '<table class="noborder centpercent editmode">';
 print '<tr class="liste_titre"><th class="titlefield wordbreak">'.$langs->trans("Day").'</th><th>'.$langs->trans("Value").'</th></tr>'."\n";
 
 print '<tr class="oddeven"><td>';
-print $form->textwithpicto($langs->trans("DigiriskDay0"), $langs->trans("OpeningHoursFormatDesc"));
+print $form->textwithpicto($langs->trans("0"), $langs->trans("OpeningHoursFormatDesc"));
 print '</td><td>';
 print '<input name="day0" id="day0" class="minwidth100" value="'.($object->day0 ?$object->day0 : GETPOST("day0", 'alpha')).'"'.(empty($conf->global->MAIN_OPTIMIZEFORTEXTBROWSER) ? '' : ' autofocus="autofocus"').'></td></tr>'."\n";
 
