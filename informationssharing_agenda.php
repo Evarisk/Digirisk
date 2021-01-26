@@ -144,46 +144,10 @@ if ($object->id > 0)
 
 	// Object card
 	// ------------------------------------------------------------
-	$linkback = '<a href="'.dol_buildpath('/digiriskdolibarr/informationssharing_list.php', 1).'?restore_lastsearch_values=1'.(!empty($socid) ? '&socid='.$socid : '').'">'.$langs->trans("BackToList").'</a>';
+	$linkback = '<a href="'.dol_buildpath('/digiriskdolibarr/legaldisplay_list.php', 1).'?restore_lastsearch_values=1'.(!empty($socid) ? '&socid='.$socid : '').'">'.$langs->trans("BackToList").'</a>';
 
 	$morehtmlref = '<div class="refidno">';
-	/*
-	// Ref customer
-	$morehtmlref.=$form->editfieldkey("RefCustomer", 'ref_client', $object->ref_client, $object, 0, 'string', '', 0, 1);
-	$morehtmlref.=$form->editfieldval("RefCustomer", 'ref_client', $object->ref_client, $object, 0, 'string', '', null, null, '', 1);
-	// Thirdparty
-	$morehtmlref.='<br>'.$langs->trans('ThirdParty') . ' : ' . (is_object($object->thirdparty) ? $object->thirdparty->getNomUrl(1) : '');
-	// Project
-	if (! empty($conf->projet->enabled))
-	{
-		$langs->load("projects");
-		$morehtmlref.='<br>'.$langs->trans('Project') . ' ';
-		if ($permissiontoadd)
-		{
-			if ($action != 'classify')
-				//$morehtmlref.='<a class="editfielda" href="' . $_SERVER['PHP_SELF'] . '?action=classify&amp;id=' . $object->id . '">' . img_edit($langs->transnoentitiesnoconv('SetProject')) . '</a> : ';
-			$morehtmlref.=' : ';
-			if ($action == 'classify') {
-				//$morehtmlref.=$form->form_project($_SERVER['PHP_SELF'] . '?id=' . $object->id, $object->socid, $object->fk_project, 'projectid', 0, 0, 1, 1);
-				$morehtmlref.='<form method="post" action="'.$_SERVER['PHP_SELF'].'?id='.$object->id.'">';
-				$morehtmlref.='<input type="hidden" name="action" value="classin">';
-				$morehtmlref.='<input type="hidden" name="token" value="'.newToken().'">';
-				$morehtmlref.=$formproject->select_projects($object->socid, $object->fk_project, 'projectid', $maxlength, 0, 1, 0, 1, 0, 0, '', 1);
-				$morehtmlref.='<input type="submit" class="button valignmiddle" value="'.$langs->trans("Modify").'">';
-				$morehtmlref.='</form>';
-			} else {
-				$morehtmlref.=$form->form_project($_SERVER['PHP_SELF'] . '?id=' . $object->id, $object->socid, $object->fk_project, 'none', 0, 0, 0, 1);
-			}
-		} else {
-			if (! empty($object->fk_project)) {
-				$proj = new Project($db);
-				$proj->fetch($object->fk_project);
-				$morehtmlref .= ': '.$proj->getNomUrl();
-			} else {
-				$morehtmlref .= '';
-			}
-		}
-	}*/
+
 	$morehtmlref .= '</div>';
 
 
@@ -206,7 +170,7 @@ if ($object->id > 0)
 	$objthirdparty = $object;
 	$objcon = new stdClass();
 
-	$out = '&origin='.$object->element.'&originid='.$object->id;
+	$out = '&origin='.$object->element.'@digiriskdolibarr'.'&originid='.$object->id;
 	$permok = $user->rights->agenda->myactions->create;
 	if ((!empty($objthirdparty->id) || !empty($objcon->id)) && $permok)
 	{
@@ -219,37 +183,30 @@ if ($object->id > 0)
 	}
 
 
-	print '<div class="tabsAction">';
+	$morehtmlcenter = '';
 
 	if (!empty($conf->agenda->enabled))
 	{
-		if (!empty($user->rights->agenda->myactions->create) || !empty($user->rights->agenda->allactions->create))
-		{
-			print '<a class="butAction" href="'.DOL_URL_ROOT.'/comm/action/card.php?action=create'.$out.'">'.$langs->trans("AddAction").'</a>';
-		}
-		else
-		{
-			print '<a class="butActionRefused classfortooltip" href="#">'.$langs->trans("AddAction").'</a>';
-		}
-	}
+		$linktocreatetimeBtnStatus = !empty($user->rights->agenda->myactions->create) || !empty($user->rights->agenda->allactions->create);
 
-	print '</div>';
+		$morehtmlcenter = dolGetButtonTitle($langs->trans('AddAction'), '', 'fa fa-plus-circle', DOL_URL_ROOT.'/comm/action/card.php?action=create'.$out, '', $linktocreatetimeBtnStatus);
+	}
 
 	if (!empty($conf->agenda->enabled) && (!empty($user->rights->agenda->myactions->read) || !empty($user->rights->agenda->allactions->read)))
 	{
-		$param = '&id='.$object->id.'&socid='.$socid;
+		$param = '&id='.$object->id;
 		if (!empty($contextpage) && $contextpage != $_SERVER["PHP_SELF"]) $param .= '&contextpage='.urlencode($contextpage);
 		if ($limit > 0 && $limit != $conf->liste_limit) $param .= '&limit='.urlencode($limit);
 
+		print_barre_liste($langs->trans("ActionsOnInformationsSharing"), 0, $_SERVER["PHP_SELF"], '', $sortfield, $sortorder, '', 0, -1, '', 0, $morehtmlcenter, '', 0, 1, 1);
 
-		//print load_fiche_titre($langs->trans("ActionsOnInformationsSharing"), '', '');
 
 		// List of all actions
 		$filters = array();
 		$filters['search_agenda_label'] = $search_agenda_label;
 
 		// TODO Replace this with same code than into list.php
-		show_actions_done($conf, $langs, $db, $object, null, 0, $actioncode, '', $filters, $sortfield, $sortorder, 'mymmodule');
+		show_actions_done($conf, $langs, $db, $object, null, 0, $actioncode, '', $filters, $sortfield, $sortorder, 'digiriskdolibarr');
 	}
 }
 

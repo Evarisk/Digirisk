@@ -128,7 +128,6 @@ if (empty($reshook))
 		}
 	}
 
-	$triggermodname = 'DIGIRISKDOLIBARR_LEGALDISPLAY_MODIFY'; // Name of trigger action code to execute when we modify record
 
 	// Action to add record
 	include DOL_DOCUMENT_ROOT.'/core/actions_addupdatedelete.inc.php';

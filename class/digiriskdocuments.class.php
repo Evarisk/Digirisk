@@ -226,10 +226,10 @@ class DigiriskDocuments extends CommonObject
 		$this->status 		 = 1;
 		$this->type 		 = $this->element;
 		$this->DigiriskFillJSON($this);
-
+		// Changement de $this->element pour activer la génération d'un événement à la création
+		$this->element 		 = $this->element . '@digiriskdolibarr';
 		return $this->createCommon($user, $notrigger);
 	}
-
 
 	public function DigiriskFillJSON($object) {
 
@@ -999,7 +999,7 @@ class DigiriskDocuments extends CommonObject
 	 */
 	public function generateDocument($modele, $outputlangs, $hidedetails = 0, $hidedesc = 0, $hideref = 0, $moreparams = null)
 	{
-		global $conf, $langs;
+		global $conf, $langs, $user;
 
 		$result = 0;
 		$includedocgeneration = 1;
@@ -1022,6 +1022,13 @@ class DigiriskDocuments extends CommonObject
 			$result = $this->commonGenerateDocument($modelpath, $modele, $outputlangs, $hidedetails, $hidedesc, $hideref, $moreparams);
 		}
 
+		switch ($this->type) {
+			case 'legaldisplay' :
+				$trigger = $this->call_trigger('LEGALDISPLAY_GENERATE', $user);
+				break;
+			case 'informationssharing':
+				$trigger = $this->call_trigger('INFORMATIONSSHARING_GENERATE', $user);
+		}
 		return $result;
 	}
 

@@ -63,7 +63,7 @@ class modDigiriskdolibarr extends DolibarrModules
 
 		$this->module_parts = array(
 			// Set this to 1 if module has its own trigger directory (core/triggers)
-			'triggers' => 0,
+			'triggers' => 1,
 			// Set this to 1 if module has its own login method file (core/login)
 			'login' => 0,
 			// Set this to 1 if module has its own substitution function file (core/substitutions)
@@ -106,7 +106,7 @@ class modDigiriskdolibarr extends DolibarrModules
 		// Dependencies
 
 		$this->hidden                  = false;
-		$this->depends                 = array();
+		$this->depends                 = array('modAgenda');
 		$this->requiredby              = array();
 		$this->conflictwith            = array();
 		$this->langfiles               = array("digiriskdolibarr@digiriskdolibarr");
@@ -132,7 +132,9 @@ class modDigiriskdolibarr extends DolibarrModules
 			10 => array('DIGIRISK_RULES_LOCATION','chaine','','Location of rules of procedure', 1),
 			11 => array('DIGIRISK_PARTICIPATION_AGREEMENT_INFORMATION_PROCEDURE','chaine','','Information procedure of participation agreement', 1),
 			// CONST INFORMATIONS SHARING
-			12 => array('DIGIRISK_IDCC_DICTIONNARY','chaine','','IDCC of company', 1)
+			12 => array('DIGIRISK_IDCC_DICTIONNARY','chaine','','IDCC of company', 1),
+			13 => array('MAIN_AGENDA_ACTIONAUTO_LEGALDISPLAY_CREATE','chaine',1,'', 1),
+			14 => array('MAIN_AGENDA_ACTIONAUTO_INFORMATIONSSHARING_CREATE','chaine',1,'', 1)
 		);
 
 		if ( ! isset($conf->digiriskdolibarr ) || ! isset( $conf->digiriskdolibarr->enabled ) ) {

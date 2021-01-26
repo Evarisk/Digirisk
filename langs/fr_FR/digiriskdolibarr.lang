@@ -40,6 +40,8 @@ DigiriskdolibarrAboutPage = Page à propos de Digiriskdolibarr
 # DigiriskDolibarr
 #
 
+AgendaModuleRequired = Pour assurer la traçabilité des actions dans Digirisk, assurez-vous que le module Agenda est bien activé
+
 
 DigiriskDolibarrDescription = Digirisk pour Dolibarr
 CreatedOn = Créé le
@@ -59,9 +61,17 @@ ReadLegalDisplay = Afficher un affichage légal
 CreateLegalDisplay = Créer un affichage légal
 DeleteLegalDisplay = Supprimer un affichage légal
 
+LEGALDISPLAY_CREATEInDolibarr = Affichage légal créé dans Dolibarr
+ActionsOnLegalDisplay = Événements liés à l'affichage légal
+LegalDisplayGeneratedWithDolibarr = Affichage légal généré avec Dolibarr
+
 ReadInformationsSharing = Lire une diffusion d'informations
 CreateInformationsSharing = Créer une diffusion d'informations
 DeleteInformationsSharing = Supprimer une diffusion d'informations
+
+INFORMATIONSSHARING_CREATEInDolibarr = Diffusion d'informations créée dans Dolibarr
+ActionsOnInformationsSharing = Événements liés à la diffusion d'informations
+InformationsSharingGeneratedWithDolibarr = Diffusion d'informations générée avec Dolibarr
 
 DigiriskDocumentsList = Liste des documents légaux
 

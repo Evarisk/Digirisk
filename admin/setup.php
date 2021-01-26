@@ -200,7 +200,7 @@ dol_fiche_head($head, 'settings', '', -1, "digiriskdolibarr@digiriskdolibarr");
 
 
 if (empty($setupnotempty)) {
-	print '<br>'.$langs->trans("NothingToSetupOnThisPage");
+	print '<br>'.$langs->trans("AgendaModuleRequired");
 }
 
 // Page end
