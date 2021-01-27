@@ -99,7 +99,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			'moduleforexternal' => 0,
 		);
 
-		$this->dirs = array("/digiriskdolibarr/temp");
+		$this->dirs = array("/digiriskdolibarr/temp", "/doctemplates/digiriskdolibarr", "/doctemplates/digiriskdolibarr/legaldisplay", "/doctemplates/digiriskdolibarr/informationssharing");
 
 		// Config pages.
 		$this->config_page_url = array("setup.php@digiriskdolibarr");
@@ -134,7 +134,13 @@ class modDigiriskdolibarr extends DolibarrModules
 			// CONST INFORMATIONS SHARING
 			12 => array('DIGIRISK_IDCC_DICTIONNARY','chaine','','IDCC of company', 1),
 			13 => array('MAIN_AGENDA_ACTIONAUTO_LEGALDISPLAY_CREATE','chaine',1,'', 1),
-			14 => array('MAIN_AGENDA_ACTIONAUTO_INFORMATIONSSHARING_CREATE','chaine',1,'', 1)
+			14 => array('MAIN_AGENDA_ACTIONAUTO_INFORMATIONSSHARING_CREATE','chaine',1,'', 1),
+			15 => array('DIGIRISKDOLIBARR_LEGALDISPLAY_ADDON_ODT_PATH','chaine', DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/documents/doctemplates/legaldisplay/' ,'', 1),
+			16 => array('DIGIRISKDOLIBARR_LEGALDISPLAY_CUSTOM_ADDON_ODT_PATH','chaine', DOL_DATA_ROOT . '/doctemplates/digiriskdolibarr/legaldisplay/' ,'', 1),
+			17 => array('DIGIRISKDOLIBARR_INFORMATIONSSHARING_ADDON_ODT_PATH','chaine', DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/documents/doctemplates/informationssharing/' ,'', 1),
+			18 => array('DIGIRISKDOLIBARR_INFORMATIONSSHARING_CUSTOM_ADDON_ODT_PATH','chaine', DOL_DATA_ROOT . '/doctemplates/digiriskdolibarr/informationssharing/' ,'', 1),
+			19 => array('DIGIRISKDOLIBARR_INFORMATIONSSHARING_ADDON_ODT','chaine', 'mod_informationssharing_standard' ,'', 1),
+			20 => array('DIGIRISKDOLIBARR_LEGALDISPLAY_ADDON_ODT','chaine', 'mod_legaldisplay_standard' ,'', 1)
 		);
 
 		if ( ! isset($conf->digiriskdolibarr ) || ! isset( $conf->digiriskdolibarr->enabled ) ) {

@@ -465,7 +465,7 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 			$genallowed = $user->rights->digiriskdolibarr->informationssharing->read;	// If you can read, you can build the PDF to read content
 			$delallowed = $user->rights->digiriskdolibarr->informationssharing->create;	// If you can create/edit, you can remove a file on card
 
-			print $formfile->showdocuments('digiriskdolibarr:InformationsSharing',$dir_files, $filedir, $urlsource, $genallowed, $delallowed, $object->model_odt, 1, 0, 0, 28, 0, '', '', '', $langs->defaultlang);
+			print $formfile->showdocuments('digiriskdolibarr:InformationsSharing',$dir_files, $filedir, $urlsource, $genallowed, $delallowed, $conf->global->DIGIRISKDOLIBARR_INFORMATIONSSHARING_DEFAULT_MODEL, 1, 0, 0, 28, 0, '', '', '', $langs->defaultlang);
 
 		}
 

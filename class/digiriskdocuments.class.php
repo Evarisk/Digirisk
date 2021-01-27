@@ -1011,6 +1011,7 @@ class DigiriskDocuments extends CommonObject
 
 			if ($this->modelpdf) {
 				$modele = $this->modelpdf;
+				//@todo rename en ADDON_ODT
 			} elseif (!empty($conf->global->DIGIRISKDOCUMENTS_ADDON_PDF)) {
 				$modele = $conf->global->DIGIRISKDOCUMENTS_ADDON_PDF;
 			}
