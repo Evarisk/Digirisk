@@ -134,15 +134,18 @@ if ($action == 'updateMask')
 // Activate a model
 elseif ($action == 'set')
 {
+	$type = 'informationssharing';
+
 	$ret = addDocumentModel($value, $type, $label, $scandir);
 } elseif ($action == 'del')
 {
-	$tmpobjectkey = GETPOST('object');
+	$tmpobjectkey = preg_replace('/(_odt)/', '', $value);
+	$type = 'informationssharing';
 
 	$ret = delDocumentModel($value, $type);
 	if ($ret > 0)
 	{
-		$constforval = strtoupper($tmpobjectkey).'_ADDON_PDF';
+		$constforval = "DIGIRISKDOLIBARR_" . strtoupper($tmpobjectkey).'_ADDON_ODT';
 		if ($conf->global->$constforval == "$value") dolibarr_del_const($db, $constforval, $conf->entity);
 	}
 }
@@ -151,8 +154,11 @@ elseif ($action == 'set')
 elseif ($action == 'setdoc')
 {
 	$tmpobjectkey = $value;
-	$constforval = strtoupper($tmpobjectkey).'_ADDON_PDF';
+	$tmpobjectkey = preg_replace('/(_odt)/', '', $value);
+	$constforval = "DIGIRISKDOLIBARR_INFORMATIONSSHARING_DEFAULT_MODEL";
 
+	$type = 'informationssharing';
+	$label = '';
 	if (dolibarr_set_const($db, $constforval, $value, 'chaine', 0, '', $conf->entity))
 	{
 		// The constant that was read before the new set
@@ -164,7 +170,7 @@ elseif ($action == 'setdoc')
 	$ret = delDocumentModel($value, $type);
 	if ($ret > 0)
 	{
-		$ret = addDocumentModel($value, $type, $label, $scandir);
+		$ret = addDocumentModel($value, $type, $label);
 	}
 } elseif ($action == 'setmod')
 {
@@ -431,7 +437,7 @@ foreach ($dirmodels as $reldir)
 
 							// Default
 							print '<td class="center">';
-							if ($conf->global->EXPENSEREPORT_ADDON_PDF == "$name")
+							if ($conf->global->DIGIRISKDOLIBARR_INFORMATIONSSHARING_DEFAULT_MODEL == "$name")
 							{
 								print img_picto($langs->trans("Default"), 'on');
 							}

@@ -134,16 +134,18 @@ if ($action == 'updateMask')
 // Activate a model
 elseif ($action == 'set')
 {
+	$type = 'legaldisplay';
 
 	$ret = addDocumentModel($value, $type, $label, $scandir);
 } elseif ($action == 'del')
 {
-	$tmpobjectkey = GETPOST('object');
+	$tmpobjectkey = preg_replace('/(_odt)/', '', $value);
+	$type = 'legaldisplay';
 
 	$ret = delDocumentModel($value, $type);
 	if ($ret > 0)
 	{
-		$constforval = strtoupper($tmpobjectkey).'_ADDON_PDF';
+		$constforval = "DIGIRISKDOLIBARR_" . strtoupper($tmpobjectkey).'_ADDON_ODT';
 		if ($conf->global->$constforval == "$value") dolibarr_del_const($db, $constforval, $conf->entity);
 	}
 }
@@ -151,9 +153,11 @@ elseif ($action == 'set')
 // Set default model
 elseif ($action == 'setdoc')
 {
-	$tmpobjectkey = $value;
-	$constforval = strtoupper($tmpobjectkey).'_ADDON_PDF';
 
+	$tmpobjectkey = preg_replace('/(_odt)/', '', $value);
+	$constforval = "DIGIRISKDOLIBARR_LEGALDISPLAY_DEFAULT_MODEL";
+	$type = 'legaldisplay';
+	$label = '';
 	if (dolibarr_set_const($db, $constforval, $value, 'chaine', 0, '', $conf->entity))
 	{
 		// The constant that was read before the new set
@@ -163,9 +167,11 @@ elseif ($action == 'setdoc')
 
 	// On active le modele
 	$ret = delDocumentModel($value, $type);
+
 	if ($ret > 0)
 	{
-		$ret = addDocumentModel($value, $type, $label, $scandir);
+		$ret = addDocumentModel($value, $type, $label);
+
 	}
 } elseif ($action == 'setmod')
 {
@@ -186,10 +192,9 @@ $form = new Form($db);
 
 $dirmodels = array_merge(array('/'), (array) $conf->modules_parts['models']);
 
-$page_name = "DigiriskdolibarrSetup";
 $help_url = 'FR:Module_DigiriskDolibarr';
-
-llxHeader("", $langs->trans($page_name), $help_url);
+$page_name = "DigiriskdolibarrSetup";
+llxHeader('', $langs->trans($page_name), $help_url);
 
 // Subheader
 $linkback = '<a href="'.($backtopage ? $backtopage : DOL_URL_ROOT.'/admin/modules.php?restore_lastsearch_values=1').'">'.$langs->trans("BackToModuleList").'</a>';
@@ -333,7 +338,6 @@ foreach ($dirmodels as $reldir)
 		}
 	}
 }
-
 /*
  *  Documents models for Legal Display
  */
@@ -434,8 +438,7 @@ foreach ($dirmodels as $reldir)
 
 							// Default
 							print '<td class="center">';
-
-							if ($conf->global->DIGIRISKDOLIBARR_LEGALDISPLAY_ADDON_PDF == "$name")
+							if ($conf->global->DIGIRISKDOLIBARR_LEGALDISPLAY_DEFAULT_MODEL == "$name")
 							{
 								print img_picto($langs->trans("Default"), 'on');
 							}
