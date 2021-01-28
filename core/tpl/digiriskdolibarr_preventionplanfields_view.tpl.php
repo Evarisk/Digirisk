@@ -32,107 +32,216 @@ if (empty($conf) || !is_object($conf))
 if (!is_object($form)) $form = new Form($db);
 
 ?>
-	<!-- BEGIN PHP TEMPLATE digiriskdolibarr_preventionplanfields_view.tpl.php -->
+<!-- BEGIN PHP TEMPLATE digiriskdolibarr_preventionplanfields_view.tpl -->
 <?php
+if ($action == '') {
 
-$preventionplan = json_decode($object->json, false, 512, JSON_UNESCAPED_UNICODE)->PreventionPlan;
+	$preventionplan = json_decode($object->json, false, 512, JSON_UNESCAPED_UNICODE)->FirePermit;
 
 //Creation User
 
-print '<tr>';
-print '<td class="titlefield">'.$langs->trans("CreatedBy").'</td>';
-print '<td>';
+	print '<tr>';
+	print '<td class="titlefield">'.$langs->trans("CreatedBy").'</td>';
+	print '<td>';
 
-if ($object->fk_user_creat > 0)
-{
-	$usercreat = new User($db);
-	$result = $usercreat->fetch($object->fk_user_creat);
-	if ($result < 0) dol_print_error('', $usercreat->error);
-	elseif ($result > 0) print $usercreat->getNomUrl(-1);
-}
+	if ($object->fk_user_creat > 0)
+	{
+		$usercreat = new User($db);
+		$result = $usercreat->fetch($object->fk_user_creat);
+		if ($result < 0) dol_print_error('', $usercreat->error);
+		elseif ($result > 0) print $usercreat->getNomUrl(-1);
+	}
 
 //Creation Date
-print '</td></tr>';
+	print '</td></tr>';
 
-print '<tr>';
-print '<td class="titlefield">'.$langs->trans("CreatedOn").'</td>';
-print '<td>';
-
-print dol_print_date($object->date_creation);
-
-print '</td></tr>';
-
-// Médecin du travail
-
-print '<tr>';
-	print '<td class="titlefield">'.$langs->trans("LabourDoctor").'</td>';
+	print '<tr>';
+	print '<td class="titlefield">'.$langs->trans("CreatedOn").'</td>';
 	print '<td>';
-		print $preventionplan->occupational_health_service->name;
-		print '</td></tr>';
 
-// Inspecteur du travail
-print '<tr>';
-	print '<td class="titlefield">'.$langs->trans("LabourInspector").'</td>';
+	print dol_print_date($object->date_creation);
+
+	print '</td></tr>';
+
+//Date
+	print '<tr>';
+	print '<td class="titlefield">'.$langs->trans("UniqueIdentifier").'</td>';
 	print '<td>';
-		print $preventionplan->detective_work->name;
-		print '</td></tr>';
 
-// SAMU
+	print $preventionplan->unique_identifier_int;
+	print '</td></tr>';
 
-print '<tr>';
-	print '<td class="titlefield">'.$langs->trans("SAMU").'</td>';
+	print '</td></tr>';
+
+//Titulars
+	print '<tr>';
+	print '<td class="titlefield">'.$langs->trans("IsEnd").'</td>';
 	print '<td>';
-		print $preventionplan->emergency_service->samu;
-		print '</td></tr>';
 
-// Pompiers
+	print $preventionplan->is_end;
+	print '</td></tr>';
 
-print '<tr>';
-	print '<td class="titlefield">'.$langs->trans("Pompiers").'</td>';
+	print '</td></tr>';
+
+//Alternates
+	print '<tr>';
+	print '<td class="titlefield">'.$langs->trans("PreventionID").'</td>';
 	print '<td>';
-		print $preventionplan->emergency_service->pompier;
-		print '</td></tr>';
 
-// Police
+	print $preventionplan->prevention_id;
+	print '</td></tr>';
 
-print '<tr>';
-	print '<td class="titlefield">'.$langs->trans("Police").'</td>';
+	print '</td></tr>';
+
+// DP
+
+//Date
+	print '<tr>';
+	print '<td class="titlefield">'.$langs->trans("DateStart").'</td>';
 	print '<td>';
-		print $preventionplan->emergency_service->police;
-		print '</td></tr>';
 
-// Urgences
+	print $preventionplan->date_start;
+	print '</td></tr>';
 
-print '<tr>';
-	print '<td class="titlefield">'.$langs->trans("AllEmergencies").'</td>';
+	print '</td></tr>';
+
+//Titulars
+	print '<tr>';
+	print '<td class="titlefield">'.$langs->trans("DateEnd").'</td>';
 	print '<td>';
-		print $preventionplan->emergency_service->emergency;
-		print '</td></tr>';
 
-// Défenseur du droit du travail
+	print $preventionplan->date_end;
+	print '</td></tr>';
 
-print '<tr>';
-	print '<td class="titlefield">'.$langs->trans("RightsDefender").'</td>';
+	print '</td></tr>';
+
+//Alternates
+	print '<tr>';
+	print '<td class="titlefield">'.$langs->trans("DateEndIsDefined").'</td>';
 	print '<td>';
-		print $preventionplan->emergency_service->right_defender;
-		print '</td></tr>';
 
-// Antipoison
+	print $preventionplan->date_end__is_define;
+	print '</td></tr>';
 
-print '<tr>';
-	print '<td class="titlefield">'.$langs->trans("Antipoison").'</td>';
+	print '</td></tr>';
+
+//Alternates
+	print '<tr>';
+	print '<td class="titlefield">'.$langs->trans("DateClosure").'</td>';
 	print '<td>';
-		print $preventionplan->emergency_service->poison_control_center;
-		print '</td></tr>';
 
-// Responsable de prévention
+	print $preventionplan->date_closure;
+	print '</td></tr>';
 
-print '<tr>';
-	print '<td class="titlefield">'.$langs->trans("ResponsibleToNotify").'</td>';
+	print '</td></tr>';
+
+//Alternates
+	print '<tr>';
+	print '<td class="titlefield">'.$langs->trans("Former").'</td>';
 	print '<td>';
-		print $preventionplan->safety_rule->responsible_for_preventing;
-		print '</td></tr>';
+
+	print $preventionplan->former;
+	print '</td></tr>';
+
+	print '</td></tr>';
 
 
+//Alternates
+	print '<tr>';
+	print '<td class="titlefield">'.$langs->trans("MasterBuilder").'</td>';
+	print '<td>';
+
+	print $preventionplan->maitre_oeuvre;
+	print '</td></tr>';
+
+	print '</td></tr>';
+
+//Alternates
+	print '<tr>';
+	print '<td class="titlefield">'.$langs->trans("ExternalIntervener").'</td>';
+	print '<td>';
+
+	print $preventionplan->intervenant_exterieur;
+	print '</td></tr>';
+
+	print '</td></tr>';
+
+//Alternates
+	print '<tr>';
+	print '<td class="titlefield">'.$langs->trans("Intervener").'</td>';
+	print '<td>';
+
+	print $preventionplan->intervenants;
+	print '</td></tr>';
+
+	print '</td></tr>';
+
+//Alternates
+	print '<tr>';
+	print '<td class="titlefield">'.$langs->trans("ExternalSociety").'</td>';
+	print '<td>';
+
+	print $preventionplan->society_outside;
+	print '</td></tr>';
+
+	print '</td></tr>';
+
+//Alternates
+	print '<tr>';
+	print '<td class="titlefield">'.$langs->trans("Taxonomy").'</td>';
+	print '<td>';
+
+	print $preventionplan->taxonomy;
+	print '</td></tr>';
+
+	print '</td></tr>';
+
+}
+elseif ($action == 'create') {
+
+	//Changer pour les bons champs
+	print '<tr class="oddeven"><td><label for="unique_identifier_int">'.$langs->trans("UniqueIdentifier").'</label></td><td>';
+	print '<input name="unique_identifier_int" id="unique_identifier_int" class="minwidth300" rows="'.ROWS_3.'">'.($conf->global->DIGIRISK_GENERAL_RULES ? $conf->global->DIGIRISK_GENERAL_RULES : '').'</td></tr>'."\n";
+
+	print '<tr class="oddeven"><td><label for="is_end">'.$langs->trans("IsEnd").'</label></td><td>';
+	print '<input name="is_end" id="is_end" class="minwidth300" rows="'.ROWS_3.'"></td></tr>'."\n";
+
+	print '<tr class="oddeven"><td><label for="prevention_id">'.$langs->trans("PreventionID").'</label></td><td>';
+	print '<input name="prevention_id" id="prevention_id" class="minwidth300" rows="'.ROWS_3.'"></td></tr>'."\n";
+
+	print '<tr class="oddeven"><td><label for="date_start">'.$langs->trans("DateStart").'</label></td><td>';
+	print '<input name="date_start" id="date_start" class="minwidth300" rows="'.ROWS_3.'"></td></tr>'."\n";
+
+	print '<tr class="oddeven"><td><label for="date_end">'.$langs->trans("DateEnd").'</label></td><td>';
+	print '<input name="date_end" id="date_end" class="minwidth300" rows="'.ROWS_3.'"></td></tr>'."\n";
+
+	print '<tr class="oddeven"><td><label for="date_end__is_define">'.$langs->trans("DateEndIsDefined").'</label></td><td>';
+	print '<input name="date_end__is_define" id="date_end__is_define" class="minwidth300" rows="'.ROWS_3.'"></td></tr>'."\n";
+
+	print '<tr class="oddeven"><td><label for="date_closure">'.$langs->trans("DateClosure").'</label></td><td>';
+	print '<input name="date_closure" id="date_closure" class="minwidth300" rows="'.ROWS_3.'"></td></tr>'."\n";
+
+	print '<tr class="oddeven"><td><label for="former">'.$langs->trans("Former").'</label></td><td>';
+	print '<input name="former" id="former" class="minwidth300" rows="'.ROWS_3.'"></td></tr>'."\n";
+
+	print '<tr class="oddeven"><td><label for="maitre_oeuvre">'.$langs->trans("MasterBuilder").'</label></td><td>';
+	print '<input name="maitre_oeuvre" id="maitre_oeuvre" class="minwidth300" rows="'.ROWS_3.'"></td></tr>'."\n";
+
+	print '<tr class="oddeven"><td><label for="intervenant_exterieur">'.$langs->trans("ExternalIntervener").'</label></td><td>';
+	print '<input name="intervenant_exterieur" id="intervenant_exterieur" class="minwidth300" rows="'.ROWS_3.'"></td></tr>'."\n";
+
+	print '<tr class="oddeven"><td><label for="intervenants">'.$langs->trans("Intervener").'</label></td><td>';
+	print '<input name="intervenants" id="intervenants" class="minwidth300" rows="'.ROWS_3.'"></td></tr>'."\n";
+
+	print '<tr class="oddeven"><td><label for="society_outside">'.$langs->trans("ExternalSociety").'</label></td><td>';
+	print '<input name="society_outside" id="society_outside" class="minwidth300" rows="'.ROWS_3.'"></td></tr>'."\n";
+
+	print '<tr class="oddeven"><td><label for="taxonomy">'.$langs->trans("Taxonomy").'</label></td><td>';
+	print '<input name="taxonomy" id="taxonomy" class="minwidth300" rows="'.ROWS_3.'"></td></tr>'."\n";
+
+}
+elseif ($action == 'add') {
+
+}
 ?>
-<!-- END PHP TEMPLATE digiriskdolibarr_preventionplanfields_view.tpl.php -->
+<!-- END PHP TEMPLATE digiriskdolibarr_preventionplanfields_view.tpl -->
