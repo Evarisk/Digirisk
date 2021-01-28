@@ -67,6 +67,11 @@ function digiriskdolibarrAdminPrepareHead()
 	$head[$h][2] = 'firepermit';
 	$h++;
 
+	$head[$h][0] = dol_buildpath("/digiriskdolibarr/admin/preventionplan.php", 1);
+	$head[$h][1] = $langs->trans("PreventionPlan");
+	$head[$h][2] = 'preventionplan';
+	$h++;
+
 	// Show more tabs from modules
 	// Entries must be declared in modules descriptor with line
 	//$this->tabs = array(

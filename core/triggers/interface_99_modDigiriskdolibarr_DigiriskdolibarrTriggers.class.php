@@ -158,6 +158,24 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$ret = $actioncomm->create($user);
 				break;
 
+			case 'PREVENTIONPLAN_GENERATE' :
+				dol_syslog("Trigger '".$this->name."' for action '$action' launched by ".__FILE__.". id=".$object->id);
+				require_once DOL_DOCUMENT_ROOT.'/comm/action/class/actioncomm.class.php';
+				$now = dol_now();
+				$actioncomm = new ActionComm($this->db);
+
+				$actioncomm->elementtype = 'preventionplan@digiriskdolibarr';
+				$actioncomm->elementid   = $object->id;
+				$actioncomm->code 		 = 'AC_PREVENTIONPLAN_GENERATE';
+				$actioncomm->type_code 		 = 'AC_OTH_AUTO';
+				$actioncomm->label			 = $langs->trans('PreventionPlanGeneratedWithDolibarr');
+				$actioncomm->datep		 = $now;
+				$actioncomm->fk_element  = $object->id;
+				$actioncomm->userownerid = $user->id;
+
+				$ret = $actioncomm->create($user);
+				break;
+
 			default:
 				dol_syslog("Trigger '".$this->name."' for action '$action' launched by ".__FILE__.". id=".$object->id);
 				break;

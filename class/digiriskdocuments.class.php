@@ -245,6 +245,9 @@ class DigiriskDocuments extends CommonObject
 			case "firepermit":
 				$this->json = $this->FirePermitFillJSON($object);
 				break;
+			case "preventionplan":
+				$this->json = $this->PreventionPlanFillJSON($object);
+				break;
 		}
 
 	}

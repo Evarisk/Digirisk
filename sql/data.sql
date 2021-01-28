@@ -1,4 +1,4 @@
-INSERT INTO llx_document_model (nom, entity, type) VALUES ('informationssharing_A4_odt', 1, 'informationssharing'), ('legaldisplay_A4_odt', 1, 'legaldisplay'), ('firepermit_A4_odt', 1, 'firepermit');
+INSERT INTO llx_document_model (nom, entity, type) VALUES ('informationssharing_A4_odt', 1, 'informationssharing'), ('legaldisplay_A4_odt', 1, 'legaldisplay'), ('firepermit_A4_odt', 1, 'firepermit'), ('preventionplan_A4_odt', 1, 'preventionplan');
 INSERT INTO llx_c_action_trigger (elementtype, code, label, description, rang) VALUES
 ('informationssharing', 'INFORMATIONSSHARING_GENERATE', 'Informations Sharing Document Generated', 'Executed when a informations sharing document is generated', 1000),
 ('firepermit', 'FIREPERMIT_GENERATE', 'Fire Permit Document Generated', 'Executed when a fire permit document is generated', 1001),
