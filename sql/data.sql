@@ -1,4 +1,4 @@
-INSERT INTO llx_document_model (nom, entity, type) VALUES ('informationssharing_A4_odt', 1, 'informationssharing'), ('informationssharing_custom_odt', 1, 'informationssharing'), ('legaldisplay_A4_odt', 1, 'legaldisplay'), ('legaldisplay_custom_odt', 1, 'legaldisplay');
+INSERT INTO llx_document_model (nom, entity, type) VALUES ('informationssharing_A4_odt', 1, 'informationssharing'), ('legaldisplay_A4_odt', 1, 'legaldisplay');
 INSERT INTO llx_c_action_trigger (elementtype, code, label, description, rang) VALUES
 ('informationssharing', 'INFORMATIONSSHARING_GENERATE', 'Informations Sharing Document Generated', 'Executed when a informations sharing document is generated', 1001);
 ('legaldisplay', 'LEGALDISPLAY_GENERATE', 'Legal Display Document Generated', 'Executed when a legal display document is generated', 1000);
