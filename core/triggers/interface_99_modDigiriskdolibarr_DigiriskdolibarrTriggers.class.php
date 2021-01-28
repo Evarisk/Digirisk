@@ -117,6 +117,8 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->label			 = $langs->trans('InformationsSharingGeneratedWithDolibarr');
 				$actioncomm->datep		 = $now;
 				$actioncomm->fk_element  = $object->id;
+				$actioncomm->userownerid = $user->id;
+
 				$ret = $actioncomm->create($user);
 				break;
 
@@ -133,6 +135,26 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->label			 = $langs->trans('LegalDisplayGeneratedWithDolibarr');
 				$actioncomm->datep		 = $now;
 				$actioncomm->fk_element  = $object->id;
+				$actioncomm->userownerid = $user->id;
+
+				$ret = $actioncomm->create($user);
+				break;
+
+			case 'FIREPERMIT_GENERATE' :
+				dol_syslog("Trigger '".$this->name."' for action '$action' launched by ".__FILE__.". id=".$object->id);
+				require_once DOL_DOCUMENT_ROOT.'/comm/action/class/actioncomm.class.php';
+				$now = dol_now();
+				$actioncomm = new ActionComm($this->db);
+
+				$actioncomm->elementtype = 'firepermit@digiriskdolibarr';
+				$actioncomm->elementid   = $object->id;
+				$actioncomm->code 		 = 'AC_FIREPERMIT_GENERATE';
+				$actioncomm->type_code 		 = 'AC_OTH_AUTO';
+				$actioncomm->label			 = $langs->trans('FirePermitGeneratedWithDolibarr');
+				$actioncomm->datep		 = $now;
+				$actioncomm->fk_element  = $object->id;
+				$actioncomm->userownerid = $user->id;
+
 				$ret = $actioncomm->create($user);
 				break;
 

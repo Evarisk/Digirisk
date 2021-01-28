@@ -99,14 +99,14 @@ class modDigiriskdolibarr extends DolibarrModules
 			'moduleforexternal' => 0,
 		);
 
-		$this->dirs = array("/digiriskdolibarr/temp", "/ecm/digiriskdolibarr", "/ecm/digiriskdolibarr/legaldisplay", "/ecm/digiriskdolibarr/informationssharing");
+		$this->dirs = array("/digiriskdolibarr/temp", "/ecm/digiriskdolibarr", "/ecm/digiriskdolibarr/legaldisplay", "/ecm/digiriskdolibarr/informationssharing", "/ecm/digiriskdolibarr/firepermit");
 
 		// Config pages.
 		$this->config_page_url = array("setup.php@digiriskdolibarr");
 		// Dependencies
 
 		$this->hidden                  = false;
-		$this->depends                 = array('modAgenda, modECM');
+		$this->depends                 = array('modAgenda', 'modECM');
 		$this->requiredby              = array();
 		$this->conflictwith            = array();
 		$this->langfiles               = array("digiriskdolibarr@digiriskdolibarr");
@@ -137,10 +137,13 @@ class modDigiriskdolibarr extends DolibarrModules
 			14 => array('MAIN_AGENDA_ACTIONAUTO_INFORMATIONSSHARING_CREATE','chaine',1,'', 1),
 			15 => array('DIGIRISKDOLIBARR_LEGALDISPLAY_ADDON_ODT_PATH','chaine', DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/documents/doctemplates/legaldisplay/' ,'', 1),
 			16 => array('DIGIRISKDOLIBARR_LEGALDISPLAY_CUSTOM_ADDON_ODT_PATH','chaine', DOL_DATA_ROOT . '/ecm/digiriskdolibarr/legaldisplay/' ,'', 1),
-			17 => array('DIGIRISKDOLIBARR_INFORMATIONSSHARING_ADDON_ODT_PATH','chaine', DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/documents/doctemplates/informationssharing/' ,'', 1),
-			18 => array('DIGIRISKDOLIBARR_INFORMATIONSSHARING_CUSTOM_ADDON_ODT_PATH','chaine', DOL_DATA_ROOT . '/ecm/digiriskdolibarr/informationssharing/' ,'', 1),
-			19 => array('DIGIRISKDOLIBARR_INFORMATIONSSHARING_ADDON','chaine', 'mod_informationssharing_standard' ,'', 1),
-			20 => array('DIGIRISKDOLIBARR_LEGALDISPLAY_ADDON','chaine', 'mod_legaldisplay_standard' ,'', 1)
+			17 => array('DIGIRISKDOLIBARR_LEGALDISPLAY_ADDON','chaine', 'mod_legaldisplay_standard' ,'', 1),
+			18 => array('DIGIRISKDOLIBARR_INFORMATIONSSHARING_ADDON_ODT_PATH','chaine', DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/documents/doctemplates/informationssharing/' ,'', 1),
+			19 => array('DIGIRISKDOLIBARR_INFORMATIONSSHARING_CUSTOM_ADDON_ODT_PATH','chaine', DOL_DATA_ROOT . '/ecm/digiriskdolibarr/informationssharing/' ,'', 1),
+			20 => array('DIGIRISKDOLIBARR_INFORMATIONSSHARING_ADDON','chaine', 'mod_informationssharing_standard' ,'', 1),
+			21 => array('DIGIRISKDOLIBARR_FIREPERMIT_ADDON_ODT_PATH','chaine', DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/documents/doctemplates/firepermit/' ,'', 1),
+			22 => array('DIGIRISKDOLIBARR_FIREPERMIT_CUSTOM_ADDON_ODT_PATH','chaine', DOL_DATA_ROOT . '/ecm/digiriskdolibarr/firepermit/' ,'', 1),
+			23 => array('DIGIRISKDOLIBARR_FIREPERMIT_ADDON','chaine', 'mod_firepermit_standard' ,'', 1)
 		);
 
 		if ( ! isset($conf->digiriskdolibarr ) || ! isset( $conf->digiriskdolibarr->enabled ) ) {
@@ -236,6 +239,26 @@ class modDigiriskdolibarr extends DolibarrModules
 		$this->rights[$r][3] = 1;
 		$this->rights[$r][4] = 'informationssharing';
 		$this->rights[$r][5] = 'delete';
+		$r++;
+
+		/* FIRE PERMIT PERMISSIONS */
+		$this->rights[$r][0] = 1050 + $r;
+		$this->rights[$r][1] = $langs->trans('ReadFirePermit');
+		$this->rights[$r][3] = 1;
+		$this->rights[$r][4] = 'firepermit';
+		$this->rights[$r][5] = 'read';
+		$r++;
+		$this->rights[$r][0] = 1050 + $r;
+		$this->rights[$r][1] = $langs->trans('CreateFirePermit');
+		$this->rights[$r][3] = 1;
+		$this->rights[$r][4] = 'firepermit';
+		$this->rights[$r][5] = 'write';
+		$r++;
+		$this->rights[$r][0] = 1050 + $r;
+		$this->rights[$r][1] = $langs->trans('DeleteFirePermit');
+		$this->rights[$r][3] = 1;
+		$this->rights[$r][4] = 'firepermit';
+		$this->rights[$r][5] = 'delete';
 
 		// Main menu entries to add
 		$this->menu = array();
@@ -320,6 +343,34 @@ class modDigiriskdolibarr extends DolibarrModules
 			'mainmenu'=>'digiriskdolibarr',
 			'leftmenu'=>'informationsreleasecreate',
 			'url'=>'/digiriskdolibarr/informationssharing_card.php' . '?action=create',
+			'langs'=>'digiriskdolibarr@digiriskdolibarr',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
+			'position'=>48520+$r,
+			'enabled'=>'$conf->digiriskdolibarr->enabled',  // Define condition to show or hide menu entry. Use '$conf->digiriskdolibarr->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
+			'perms'=>'1',			                // Use 'perms'=>'$user->rights->digiriskdolibarr->level1->level2' if you want your menu with a permission rules
+			'target'=>'',
+			'user'=>2,				                // 0=Menu for internal users, 1=external users, 2=both
+		);
+		$this->menu[$r++]=array(
+			'fk_menu'=>'fk_mainmenu=digiriskdolibarr,fk_leftmenu=documents',      // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
+			'type'=>'left',			                // This is a Left menu entry
+			'titre'=>'Permis de feu',
+			'mainmenu'=>'digiriskdolibarr',
+			'leftmenu'=>'firepermit',
+			'url'=>'/digiriskdolibarr/firepermit_list.php',
+			'langs'=>'digiriskdolibarr@digiriskdolibarr',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
+			'position'=>48520+$r,
+			'enabled'=>'$conf->digiriskdolibarr->enabled',  // Define condition to show or hide menu entry. Use '$conf->digiriskdolibarr->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
+			'perms'=>'1',			                // Use 'perms'=>'$user->rights->digiriskdolibarr->level1->level2' if you want your menu with a permission rules
+			'target'=>'',
+			'user'=>2,				                // 0=Menu for internal users, 1=external users, 2=both
+		);
+		$this->menu[$r++]=array(
+			'fk_menu'=>'fk_mainmenu=digiriskdolibarr,fk_leftmenu=firepermit',      // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
+			'type'=>'left',			                // This is a Left menu entry
+			'titre'=>$langs->trans('New'),
+			'mainmenu'=>'digiriskdolibarr',
+			'leftmenu'=>'firepermitecreate',
+			'url'=>'/digiriskdolibarr/firepermit_card.php' . '?action=create',
 			'langs'=>'digiriskdolibarr@digiriskdolibarr',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
 			'position'=>48520+$r,
 			'enabled'=>'$conf->digiriskdolibarr->enabled',  // Define condition to show or hide menu entry. Use '$conf->digiriskdolibarr->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
