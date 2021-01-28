@@ -125,6 +125,9 @@ if (empty($reshook))
 
 	$triggermodname = 'DIGIRISKDOLIBARR_LEGALDISPLAY_MODIFY'; // Name of trigger action code to execute when we modify record
 
+	// JSON filling
+
+
 	// Action to add record
 	include DOL_DOCUMENT_ROOT.'/core/actions_addupdatedelete.inc.php';
 
@@ -219,6 +222,9 @@ if ($action == 'create')
 	print '<input hidden class="flat" type="text" size="36" name="ref" value="'.$modele->prefixfirepermit.'">';
 	print $modele->prefixfirepermit;
 	print '</td></tr>';
+
+
+	include DOL_DOCUMENT_ROOT.'/custom/digiriskdolibarr/core/tpl/digiriskdolibarr_firepermitfields_view.tpl.php';
 
 	// Other attributes
 	include DOL_DOCUMENT_ROOT.'/core/tpl/extrafields_add.tpl.php';

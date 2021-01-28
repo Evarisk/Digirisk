@@ -164,162 +164,32 @@ class FirePermit extends DigiriskDocuments
 			}
 		}
 	}
-	public function FirepermitFillJSON($object) {
+	public function FirePermitFillJSON($object) {
 
 		global $langs, $conf;
 
-		$resources 			= new DigiriskResources($this->db);
-		$digirisk_resources = $resources->digirisk_dolibarr_fetch_resources();
+		$json['FirePermit']['unique_identifier_int'] = GETPOST('unique_identifier_int');
+		$json['FirePermit']['is_end'] = GETPOST('is_end');
+		$json['FirePermit']['prevention_id'] = GETPOST('prevention_id');
+		$json['FirePermit']['date_start'] = GETPOST('date_start');
+		$json['FirePermit']['date_end'] = GETPOST('date_end');
+		$json['FirePermit']['date_end__is_define'] = GETPOST('date_end__is_define');
+		$json['FirePermit']['date_closure'] = GETPOST('date_closure');
+		$json['FirePermit']['former'] = GETPOST('former');
+		$json['FirePermit']['maitre_oeuvre'] = GETPOST('maitre_oeuvre');
+		$json['FirePermit']['intervenant_exterieur'] = GETPOST('intervenant_exterieur');
+		$json['FirePermit']['intervenants'] = GETPOST('intervenants');
+		$json['FirePermit']['society_outside'] = GETPOST('society_outside');
+		$json['FirePermit']['taxonomy'] = GETPOST('taxonomy');
 
-		$thirdparty_openinghours = new Openinghours($this->db);
+		$object->json = json_encode($json, JSON_UNESCAPED_UNICODE);
 
-		// 		*** JSON FILLING ***
-		if (!empty ($digirisk_resources )) {
-
-			$labour_doctor_societe = new Societe($this->db);
-			$result = $labour_doctor_societe->fetch($digirisk_resources['LabourDoctorSociety']->id[0]);
-
-			if ($result < 0) dol_print_error($langs->trans('NoLabourDoctorAssigned'), $labour_doctor_societe->error);
-			elseif ($result > 0) {
-
-				$labour_doctor_openinghours = $thirdparty_openinghours->fetch_by_element($labour_doctor_societe->id, $labour_doctor_societe->element);
-				$json['FirePermit']['occupational_health_service']['openinghours'] = "\r\n" . $labour_doctor_openinghours->day0 . "\r\n" . $labour_doctor_openinghours->day1 . "\r\n" . $labour_doctor_openinghours->day2 . "\r\n" . $labour_doctor_openinghours->day3 . "\r\n" . $labour_doctor_openinghours->day4 . "\r\n" . $labour_doctor_openinghours->day5 . "\r\n" . $labour_doctor_openinghours->day6;
-			}
-
-			$labour_doctor_contact = new Contact($this->db);
-			$result = $labour_doctor_contact->fetch($digirisk_resources['LabourDoctorContact']->id[0]);
-
-			if ($result < 0) dol_print_error($langs->trans('NoLabourDoctorAssigned'), $labour_doctor_contact->error);
-			elseif ($result > 0) {
-				$json['FirePermit']['occupational_health_service']['name']    = $labour_doctor_contact->firstname . " " . $labour_doctor_contact->lastname;
-				$json['FirePermit']['occupational_health_service']['address'] = preg_replace('/\s\s+/', ' ', $labour_doctor_contact->address);
-				$json['FirePermit']['occupational_health_service']['zip']     = $labour_doctor_contact->zip;
-				$json['FirePermit']['occupational_health_service']['town']    = $labour_doctor_contact->town;
-				$json['FirePermit']['occupational_health_service']['phone']   = $labour_doctor_contact->phone_pro;
-			}
-
-			$labour_inspector_societe = new Societe($this->db);
-			$result = $labour_inspector_societe->fetch($digirisk_resources['LabourInspectorSociety']->id[0]);
-
-			if ($result < 0) dol_print_error($langs->trans('NoLabourInspectorAssigned'), $labour_inspector_societe->error);
-			elseif ($result > 0) {
-
-				$labour_inspector_openinghours = $thirdparty_openinghours->fetch_by_element($labour_inspector_societe->id, $labour_inspector_societe->element);
-				$json['FirePermit']['detective_work']['openinghours'] = "\r\n" . $labour_inspector_openinghours->day0 . "\r\n" . $labour_inspector_openinghours->day1 . "\r\n" . $labour_inspector_openinghours->day2 . "\r\n" . $labour_inspector_openinghours->day3 . "\r\n" . $labour_inspector_openinghours->day4 . "\r\n" . $labour_inspector_openinghours->day5 . "\r\n" . $labour_inspector_openinghours->day6;
-
-			}
-
-			$labour_inspector_contact = new Contact($this->db);
-			$result = $labour_inspector_contact->fetch($digirisk_resources['LabourInspectorContact']->id[0]);
-
-			if ($result < 0) dol_print_error($langs->trans('NoLabourInspectorAssigned'), $labour_inspector_contact->error);
-			elseif ($result > 0) {
-				$json['FirePermit']['detective_work']['name']    = $labour_inspector_contact->firstname . " " . $labour_inspector_contact->lastname;
-				$json['FirePermit']['detective_work']['address'] = preg_replace('/\s\s+/', ' ', $labour_inspector_contact->address);
-				$json['FirePermit']['detective_work']['zip']     = $labour_inspector_contact->zip;
-				$json['FirePermit']['detective_work']['town']    = $labour_inspector_contact->town;
-				$json['FirePermit']['detective_work']['phone']   = $labour_inspector_contact->phone_pro;
-			}
-
-			$samu = new Societe($this->db);
-			$result = $samu->fetch($digirisk_resources['SAMU']->id[0]);
-
-			if ($result < 0) dol_print_error($langs->trans('NoSamuAssigned'), $samu->error);
-			elseif ($result > 0) {
-				$json['FirePermit']['emergency_service']['samu'] = $samu->phone;
-			}
-
-			$police = new Societe($this->db);
-			$result = $police->fetch($digirisk_resources['Police']->id[0]);
-
-			if ($result < 0) dol_print_error($langs->trans('NoPoliceAssigned'), $police->error);
-			elseif ($result > 0) {
-				$json['FirePermit']['emergency_service']['police'] = $police->phone;
-			}
-
-			$pompier = new Societe($this->db);
-			$result = $pompier->fetch($digirisk_resources['Pompiers']->id[0]);
-
-			if ($result < 0) dol_print_error($langs->trans('NoPoliceAssigned'), $pompier->error);
-			elseif ($result > 0) {
-				$json['FirePermit']['emergency_service']['pompier'] = $pompier->phone;
-			}
-
-			$emergency = new Societe($this->db);
-			$result = $emergency->fetch($digirisk_resources['AllEmergencies']->id[0]);
-
-			if ($result < 0) dol_print_error($langs->trans('NoAllEmergenciesAssigned'), $emergency->error);
-			elseif ($result > 0) {
-				$json['FirePermit']['emergency_service']['emergency'] = $emergency->phone;
-			}
-
-			$rights_defender = new Societe($this->db);
-			$result = $rights_defender->fetch($digirisk_resources['RightsDefender']->id[0]);
-
-			if ($result < 0) dol_print_error($langs->trans('NoRightsDefenderAssigned'), $rights_defender->error);
-			elseif ($result > 0) {
-				$json['FirePermit']['emergency_service']['right_defender'] = $rights_defender->phone;
-			}
-
-			$antipoison = new Societe($this->db);
-			$result = $antipoison->fetch($digirisk_resources['Antipoison']->id[0]);
-
-			if ($result < 0) dol_print_error($langs->trans('NoRightsDefenderAssigned'), $antipoison->error);
-			elseif ($result > 0) {
-				$json['FirePermit']['emergency_service']['poison_control_center'] = $antipoison->phone;
-			}
-
-			$responsible_prevent = new User($this->db);
-			$result = $responsible_prevent->fetch($digirisk_resources['Responsible']->id[0]);
-
-			if ($result < 0) dol_print_error($langs->trans('NoResponsibleAssigned'), $responsible_prevent->error);
-			elseif ($result > 0) {
-				$json['FirePermit']['safety_rule']['responsible_for_preventing'] = $responsible_prevent->firstname . " " . $responsible_prevent->lastname;
-				$json['FirePermit']['safety_rule']['phone']                      = $responsible_prevent->office_phone;
-			}
-
-			$opening_hours_monday    = explode(' ', $conf->global->MAIN_INFO_OPENINGHOURS_MONDAY);
-			$opening_hours_tuesday   = explode(' ', $conf->global->MAIN_INFO_OPENINGHOURS_TUESDAY);
-			$opening_hours_wednesday = explode(' ', $conf->global->MAIN_INFO_OPENINGHOURS_WEDNESDAY);
-			$opening_hours_thursday  = explode(' ', $conf->global->MAIN_INFO_OPENINGHOURS_THURSDAY);
-			$opening_hours_friday    = explode(' ', $conf->global->MAIN_INFO_OPENINGHOURS_FRIDAY);
-			$opening_hours_saturday  = explode(' ', $conf->global->MAIN_INFO_OPENINGHOURS_SATURDAY);
-			$opening_hours_sunday    = explode(' ', $conf->global->MAIN_INFO_OPENINGHOURS_SUNDAY);
-
-			$json['FirePermit']['working_hour']['monday_morning']    = $opening_hours_monday[0];
-			$json['FirePermit']['working_hour']['tuesday_morning']   = $opening_hours_tuesday[0];
-			$json['FirePermit']['working_hour']['wednesday_morning'] = $opening_hours_wednesday[0];
-			$json['FirePermit']['working_hour']['thursday_morning']  = $opening_hours_thursday[0];
-			$json['FirePermit']['working_hour']['friday_morning']    = $opening_hours_friday[0];
-			$json['FirePermit']['working_hour']['saturday_morning']  = $opening_hours_saturday[0];
-			$json['FirePermit']['working_hour']['sunday_morning']    = $opening_hours_sunday[0];
-
-			$json['FirePermit']['working_hour']['monday_afternoon']    = $opening_hours_monday[1];
-			$json['FirePermit']['working_hour']['tuesday_afternoon']   = $opening_hours_tuesday[1];
-			$json['FirePermit']['working_hour']['wednesday_afternoon'] = $opening_hours_wednesday[1];
-			$json['FirePermit']['working_hour']['thursday_afternoon']  = $opening_hours_thursday[1];
-			$json['FirePermit']['working_hour']['friday_afternoon']    = $opening_hours_friday[1];
-			$json['FirePermit']['working_hour']['saturday_afternoon']  = $opening_hours_saturday[1];
-			$json['FirePermit']['working_hour']['sunday_afternoon']    = $opening_hours_sunday[1];
-
-			$json['FirePermit']['safety_rule']['location_of_detailed_instruction']                      = $conf->global->DIGIRISK_LOCATION_OF_DETAILED_INSTRUCTION;
-			$json['FirePermit']['derogation_schedule']['permanent']                                     = $conf->global->DIGIRISK_DEROGATION_SCHEDULE_PERMANENT;
-			$json['FirePermit']['derogation_schedule']['occasional']                                    = $conf->global->DIGIRISK_DEROGATION_SCHEDULE_OCCASIONAL;
-			$json['FirePermit']['collective_agreement']['title_of_the_applicable_collective_agreement'] = $conf->global->DIGIRISK_COLLECTIVE_AGREEMENT_TITLE;
-			$json['FirePermit']['collective_agreement']['title_of_the_applicable_collective_agreement'] = $conf->global->DIGIRISK_COLLECTIVE_AGREEMENT_TITLE . ' - ' . $this->getIDCCByCode($conf->global->DIGIRISK_COLLECTIVE_AGREEMENT_TITLE)->libelle;
-			$json['FirePermit']['collective_agreement']['location_and_access_terms_of_the_agreement']   = $conf->global->DIGIRISK_COLLECTIVE_AGREEMENT_LOCATION;
-			$json['FirePermit']['DUER']['how_access_to_duer']                                           = $conf->global->DIGIRISK_DUER_LOCATION;
-			$json['FirePermit']['rules']['location']                                                    = $conf->global->DIGIRISK_RULES_LOCATION;
-			$json['FirePermit']['participation_agreement']['information_procedures']                    = $conf->global->DIGIRISK_PARTICIPATION_AGREEMENT_INFORMATION_PROCEDURE;
-
-			$object->json = json_encode($json, JSON_UNESCAPED_UNICODE);
-
-			return $object->json;
-		}
-		else
-		{
-			return -1;
-		}
+		return $object->json;
+//		}
+//		else
+//		{
+//			return -1;
+//		}
 	}
 
 	public function getIDCCByCode($code) {

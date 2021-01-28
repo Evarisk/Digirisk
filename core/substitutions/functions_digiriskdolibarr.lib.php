@@ -80,5 +80,24 @@ function digiriskdolibarr_completesubstitutionarray(&$substitutionarray,$langs,$
 			$substitutionarray['membres_du_comite_entreprise_suppleants'] = $informationssharing->membres_du_comite_entreprise_suppleants;
 
 			break;
+
+		case 'firepermit':
+
+			$firepermit = json_decode($object->json, false, 512, JSON_UNESCAPED_UNICODE)->FirePermit;
+
+			$substitutionarray['unique_identifier_int'] = $firepermit->unique_identifier_int;
+			$substitutionarray['is_end'] = $firepermit->is_end;
+			$substitutionarray['prevention_id'] = $firepermit->prevention_id;
+			$substitutionarray['date_start'] = $firepermit->date_start;
+			$substitutionarray['date_end'] = $firepermit->date_end;
+			$substitutionarray['date_end__is_define'] = $firepermit->date_end__is_define;
+			$substitutionarray['date_closure'] = $firepermit->date_closure;
+			$substitutionarray['former'] = $firepermit->former;
+			$substitutionarray['maitre_oeuvre'] = $firepermit->maitre_oeuvre;
+			$substitutionarray['intervenant_exterieur'] = $firepermit->intervenant_exterieur;
+			$substitutionarray['intervenants'] = $firepermit->intervenants;
+			$substitutionarray['society_outside'] = $firepermit->society_outside;
+			$substitutionarray['taxonomy'] = $firepermit->taxonomy;
+
 	}
 }
