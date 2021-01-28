@@ -97,13 +97,13 @@ class ActionsDigiriskdolibarr
 		global $db, $conf, $user, $langs;
 
 		$error = 0; // Error counter
-		$formother = new FormOther($db);
-		$form = new Form($db);
+		
 		/* print_r($parameters); print_r($object); echo "action: " . $action; */
 		if (in_array($parameters['currentcontext'], array('admincompany')))	    // do something only for the context 'somecontext1' or 'somecontext2'
 		{
 			if ($conf->global->MAIN_INFO_SOCIETE_COUNTRY == '1:FR:France') {
-
+				$formother = new FormOther($db);
+				$form = new Form($db);
 				?>
 				<script>
 					IDCC_form = '<?php $formother->select_dictionary('DIGIRISK_COLLECTIVE_AGREEMENT_TITLE','c_conventions_collectives', 'code', 'libelle', $conf->global->DIGIRISK_COLLECTIVE_AGREEMENT_TITLE );?>';
@@ -118,7 +118,7 @@ class ActionsDigiriskdolibarr
 			}
 		}
 
-		print ajax_combobox('DIGIRISK_COLLECTIVE_AGREEMENT_TITLE');
+		print ajax_combobox('selectDIGIRISK_COLLECTIVE_AGREEMENT_TITLE');
 
 		if (!$error) {
 			$this->results = array('myreturn' => 999);
