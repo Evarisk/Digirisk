@@ -25,22 +25,24 @@
  * \brief      File that contains the numbering module rules Saphir
  */
 
+require_once DOL_DOCUMENT_ROOT.'/custom/digiriskdolibarr/core/modules/digiriskdolibarr/modules_informationssharing.php';
+
 
 /**
  * Class of file that contains the numbering module rules Saphir
  */
-class mod_legaldisplay_titan extends ModeleNumRefLegalDisplay
+class mod_informationssharing_encelade extends ModeleNumRefInformationsSharing
 {
 	/**
-     * Dolibarr version of the loaded document
-     * @var string
-     */
+	 * Dolibarr version of the loaded document
+	 * @var string
+	 */
 	public $version = 'dolibarr'; // 'development', 'experimental', 'dolibarr'
 
 	/**
-     * @var string Error code (or message)
-     */
-    public $error = '';
+	 * @var string Error code (or message)
+	 */
+	public $error = '';
 
 	/**
 	 * @var string Nom du modele
@@ -64,7 +66,7 @@ class mod_legaldisplay_titan extends ModeleNumRefLegalDisplay
 		require_once DOL_DOCUMENT_ROOT.'/core/lib/functions2.lib.php';
 
 		// On defini critere recherche compteur
-		$mask = $conf->global->LEGALDISPLAY_TITAN_MASK;
+		$mask = $conf->global->INFORMATIONSSHARING_ENCELADE_MASK;
 
 		if (!$mask)
 		{
@@ -73,21 +75,21 @@ class mod_legaldisplay_titan extends ModeleNumRefLegalDisplay
 		}
 
 		// Get entities
-		$entity = getEntity('legaldisplay', 1, $object);
+		$entity = getEntity('informationssharing', 1, $object);
 
 		$date = dol_now();
 
-		$numFinal = get_next_value($db, $mask, 'digiriskdolibarr_digiriskdocuments', 'ref', " AND type = 'legaldisplay' ", $object, $date, 'next', false, null, $entity);
-		$this->prefixlegaldisplay = $numFinal;
+		$numFinal = get_next_value($db, $mask, 'digiriskdolibarr_digiriskdocuments', 'ref', " AND type = 'informationssharing' ", $object, $date, 'next', false, null, $entity);
+		$this->prefixinformationssharing = $numFinal;
 	}
-    /**
-     *  Return description of module
-     *
-     *  @return     string      Texte descripif
-     */
+	/**
+	 *  Return description of module
+	 *
+	 *  @return     string      Texte descripif
+	 */
 	public function info()
-    {
-    	global $conf, $langs, $db;
+	{
+		global $conf, $langs, $db;
 
 		$langs->load("bills");
 
@@ -97,7 +99,7 @@ class mod_legaldisplay_titan extends ModeleNumRefLegalDisplay
 		$texte .= '<form action="'.$_SERVER["PHP_SELF"].'" method="POST">';
 		$texte .= '<input type="hidden" name="token" value="'.newToken().'">';
 		$texte .= '<input type="hidden" name="action" value="updateMask">';
-		$texte .= '<input type="hidden" name="maskconstlegaldisplay" value="LEGALDISPLAY_TITAN_MASK">';
+		$texte .= '<input type="hidden" name="maskconstinformationssharing" value="INFORMATIONSSHARING_ENCELADE_MASK">';
 		$texte .= '<table class="nobordernopadding" width="100%">';
 
 		$tooltip = $langs->trans("GenericMaskCodes", $langs->transnoentities("Proposal"), $langs->transnoentities("Proposal"));
@@ -108,7 +110,7 @@ class mod_legaldisplay_titan extends ModeleNumRefLegalDisplay
 
 		// Parametrage du prefix
 		$texte .= '<tr><td>'.$langs->trans("Mask").':</td>';
-		$texte .= '<td class="right">'.$form->textwithpicto('<input type="text" class="flat" size="24" name="masklegaldisplay" value="'.$conf->global->LEGALDISPLAY_TITAN_MASK.'">', $tooltip, 1, 1).'</td>';
+		$texte .= '<td class="right">'.$form->textwithpicto('<input type="text" class="flat" size="24" name="maskinformationssharing" value="'.$conf->global->INFORMATIONSSHARING_ENCELADE_MASK.'">', $tooltip, 1, 1).'</td>';
 
 		$texte .= '<td class="left" rowspan="2">&nbsp; <input type="submit" class="button" value="'.$langs->trans("Modify").'" name="Button"></td>';
 
@@ -118,22 +120,22 @@ class mod_legaldisplay_titan extends ModeleNumRefLegalDisplay
 		$texte .= '</form>';
 
 		return $texte;
-    }
+	}
 
-    /**
-     *  Return an example of numbering
-     *
-     *  @return     string      Example
-     */
-    public function getExample()
-    {
-     	global $conf, $langs, $mysoc;
+	/**
+	 *  Return an example of numbering
+	 *
+	 *  @return     string      Example
+	 */
+	public function getExample()
+	{
+		global $conf, $langs, $mysoc;
 
-    	$old_code_client = $mysoc->code_client;
-    	$old_code_type = $mysoc->typent_code;
-    	$mysoc->code_client = 'CCCCCCCCCC';
-    	$mysoc->typent_code = 'TTTTTTTTTT';
-     	$numExample = $this->getNextValue($mysoc, '');
+		$old_code_client = $mysoc->code_client;
+		$old_code_type = $mysoc->typent_code;
+		$mysoc->code_client = 'CCCCCCCCCC';
+		$mysoc->typent_code = 'TTTTTTTTTT';
+		$numExample = $this->getNextValue($mysoc, '');
 		$mysoc->code_client = $old_code_client;
 		$mysoc->typent_code = $old_code_type;
 
@@ -143,7 +145,7 @@ class mod_legaldisplay_titan extends ModeleNumRefLegalDisplay
 		}
 
 		return $numExample;
-    }
+	}
 
 	/**
 	 *  Return next value
@@ -159,7 +161,7 @@ class mod_legaldisplay_titan extends ModeleNumRefLegalDisplay
 		require_once DOL_DOCUMENT_ROOT.'/core/lib/functions2.lib.php';
 
 		// On defini critere recherche compteur
-		$mask = $conf->global->LEGALDISPLAY_TITAN_MASK;
+		$mask = $conf->global->INFORMATIONSSHARING_ENCELADE_MASK;
 
 		if (!$mask)
 		{
@@ -168,12 +170,12 @@ class mod_legaldisplay_titan extends ModeleNumRefLegalDisplay
 		}
 
 		// Get entities
-		$entity = getEntity('legaldisplay', 1, $object);
+		$entity = getEntity('informationssharing', 1, $object);
 
 		$date = dol_now();
 
-		$numFinal = get_next_value($db, $mask, 'digiriskdolibarr_digiriskdocuments', 'ref', " AND type = 'legaldisplay' ", $object, $date, 'next', false, null, $entity);
-		$this->prefixlegaldisplay = $numFinal;
+		$numFinal = get_next_value($db, $mask, 'digiriskdolibarr_digiriskdocuments', 'ref', " AND type = 'informationssharing' ", $object, $date, 'next', false, null, $entity);
+		$this->prefixinformationssharing = $numFinal;
 		return  $numFinal;
 	}
 }

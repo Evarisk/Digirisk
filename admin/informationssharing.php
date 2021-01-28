@@ -76,10 +76,10 @@ if ((float) DOL_VERSION >= 6)
 
 if ($action == 'updateMask')
 {
-	$maskconstorder = GETPOST('maskconstorder', 'alpha');
-	$maskorder = GETPOST('maskorder', 'alpha');
+	$maskconstinformationssharing = GETPOST('maskconstinformationssharing', 'alpha');
+	$maskinformationssharing = GETPOST('maskinformationssharing', 'alpha');
 
-	if ($maskconstorder) $res = dolibarr_set_const($db, $maskconstorder, $maskorder, 'chaine', 0, '', $conf->entity);
+	if ($maskconstinformationssharing) $res = dolibarr_set_const($db, $maskconstinformationssharing, $maskinformationssharing, 'chaine', 0, '', $conf->entity);
 
 	if (!$res > 0) $error++;
 
