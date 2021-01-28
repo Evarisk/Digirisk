@@ -99,14 +99,8 @@ $permissionnote = $user->rights->digiriskdolibarr->legaldisplay->write;
 $permissiondellink = $user->rights->digiriskdolibarr->legaldisplay->write;
 $upload_dir = $conf->digiriskdolibarr->multidir_output[isset($object->entity) ? $object->entity : 1];
 
-//@todo security check
-// Security check - Protection if external user
-//if ($user->socid > 0) accessforbidden();
-//if ($user->socid > 0) $socid = $user->socid;
-//$isdraft = (($object->statut == $object::STATUS_DRAFT) ? 1 : 0);
-//$result = restrictedArea($user, 'digiriskdolibarr', $object->id, '', '', 'fk_soc', 'rowid', $isdraft);
-
-//if (!$permissiontoread) accessforbidden();
+if ($user->socid > 0) $socid = $user->socid;
+if (!$permissiontoread) accessforbidden();
 
 /*
  * Actions

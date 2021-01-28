@@ -91,7 +91,6 @@ if (!empty($canvas))
 	$objcanvas->getCanvas('thirdparty', 'card', $canvas);
 }
 
-// @todo droits
 // Security check
 $result = restrictedArea($user, 'societe', $socid, '&societe', '', 'fk_soc', 'rowid', $objcanvas);
 

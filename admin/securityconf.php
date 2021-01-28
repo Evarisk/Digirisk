@@ -75,8 +75,6 @@ if (($action == 'update' && !GETPOST("cancel", 'alpha'))
 	|| ($action == 'updateedit'))
 {
 
-	//@todo pertinence getpos ou all_links
-
 	$resources = new DigiriskResources($db);
 	$allLinks = $resources->digirisk_dolibarr_fetch_resources();
 
