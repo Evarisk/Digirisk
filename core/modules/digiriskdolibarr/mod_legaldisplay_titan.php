@@ -31,7 +31,7 @@ require_once DOL_DOCUMENT_ROOT.'/core/modules/propale/modules_propale.php';
 /**
  * Class of file that contains the numbering module rules Saphir
  */
-class mod_propale_saphir extends ModeleNumRefPropales
+class mod_legaldisplay_titan extends ModeleNumRefLegalDisplay
 {
 	/**
      * Dolibarr version of the loaded document
@@ -49,14 +49,39 @@ class mod_propale_saphir extends ModeleNumRefPropales
 	 * @deprecated
 	 * @see name
 	 */
-	public $nom = 'Saphir';
+	public $nom = 'Titan';
 
 	/**
 	 * @var string model name
 	 */
-	public $name = 'Saphir';
+	public $name = 'Titan';
 
+	/**
+	 * Constructor
+	 */
+	public function __construct()
+	{
+		global $db, $conf;
 
+		require_once DOL_DOCUMENT_ROOT.'/core/lib/functions2.lib.php';
+
+		// On defini critere recherche compteur
+		$mask = $conf->global->LEGALDISPLAY_TITAN_MASK;
+
+		if (!$mask)
+		{
+			$this->error = 'NotConfigured';
+			return 0;
+		}
+
+		// Get entities
+		$entity = getEntity('legaldisplay', 1, $object);
+
+		$date = dol_now();
+
+		$numFinal = get_next_value($db, $mask, 'digiriskdolibarr_digiriskdocuments', 'ref', " AND type = 'legaldisplay' ", $object, $date, 'next', false, null, $entity);
+		$this->prefixlegaldisplay = $numFinal;
+	}
     /**
      *  Return description of module
      *
@@ -74,7 +99,7 @@ class mod_propale_saphir extends ModeleNumRefPropales
 		$texte .= '<form action="'.$_SERVER["PHP_SELF"].'" method="POST">';
 		$texte .= '<input type="hidden" name="token" value="'.newToken().'">';
 		$texte .= '<input type="hidden" name="action" value="updateMask">';
-		$texte .= '<input type="hidden" name="maskconstpropal" value="PROPALE_SAPHIR_MASK">';
+		$texte .= '<input type="hidden" name="maskconstlegaldisplay" value="LEGALDISPLAY_TITAN_MASK">';
 		$texte .= '<table class="nobordernopadding" width="100%">';
 
 		$tooltip = $langs->trans("GenericMaskCodes", $langs->transnoentities("Proposal"), $langs->transnoentities("Proposal"));
@@ -85,7 +110,7 @@ class mod_propale_saphir extends ModeleNumRefPropales
 
 		// Parametrage du prefix
 		$texte .= '<tr><td>'.$langs->trans("Mask").':</td>';
-		$texte .= '<td class="right">'.$form->textwithpicto('<input type="text" class="flat" size="24" name="maskpropal" value="'.$conf->global->PROPALE_SAPHIR_MASK.'">', $tooltip, 1, 1).'</td>';
+		$texte .= '<td class="right">'.$form->textwithpicto('<input type="text" class="flat" size="24" name="masklegaldisplay" value="'.$conf->global->LEGALDISPLAY_TITAN_MASK.'">', $tooltip, 1, 1).'</td>';
 
 		$texte .= '<td class="left" rowspan="2">&nbsp; <input type="submit" class="button" value="'.$langs->trans("Modify").'" name="Button"></td>';
 
@@ -118,6 +143,7 @@ class mod_propale_saphir extends ModeleNumRefPropales
 		{
 			$numExample = 'NotConfigured';
 		}
+
 		return $numExample;
     }
 
@@ -128,14 +154,14 @@ class mod_propale_saphir extends ModeleNumRefPropales
 	 * 	@param	Propal		$propal		Object commercial proposal
 	 *  @return string      			Value if OK, 0 if KO
 	 */
-	public function getNextValue($objsoc, $propal)
+	public function getNextValue($object)
 	{
 		global $db, $conf;
 
 		require_once DOL_DOCUMENT_ROOT.'/core/lib/functions2.lib.php';
 
 		// On defini critere recherche compteur
-		$mask = $conf->global->PROPALE_SAPHIR_MASK;
+		$mask = $conf->global->LEGALDISPLAY_TITAN_MASK;
 
 		if (!$mask)
 		{
@@ -144,12 +170,12 @@ class mod_propale_saphir extends ModeleNumRefPropales
 		}
 
 		// Get entities
-		$entity = getEntity('proposalnumber', 1, $propal);
+		$entity = getEntity('legaldisplay', 1, $object);
 
-		$date = $propal->date;
+		$date = dol_now();
 
-		$numFinal = get_next_value($db, $mask, 'propal', 'ref', '', $objsoc, $date, 'next', false, null, $entity);
-
+		$numFinal = get_next_value($db, $mask, 'digiriskdolibarr_digiriskdocuments', 'ref', " AND type = 'legaldisplay' ", $object, $date, 'next', false, null, $entity);
+		$this->prefixlegaldisplay = $numFinal;
 		return  $numFinal;
 	}
 }

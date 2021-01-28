@@ -46,6 +46,7 @@ dol_include_once('/digiriskdolibarr/class/digiriskdocuments.class.php');
 dol_include_once('/digiriskdolibarr/core/modules/digiriskdolibarr/mod_legaldisplay_jupiter.php');
 dol_include_once('/digiriskdolibarr/core/modules/digiriskdolibarr/mod_legaldisplay_standard.php');
 dol_include_once('/digiriskdolibarr/core/modules/digiriskdolibarr/mod_legaldisplay_advanced.php');
+dol_include_once('/digiriskdolibarr/core/modules/digiriskdolibarr/mod_legaldisplay_titan.php');
 
 dol_include_once('/digiriskdolibarr/lib/digiriskdolibarr_legaldisplay.lib.php');
 

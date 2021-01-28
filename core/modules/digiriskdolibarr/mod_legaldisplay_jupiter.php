@@ -95,6 +95,5 @@ class mod_legaldisplay_jupiter extends ModeleNumRefLegalDisplay
 	 */
 	public function getNumRef($objsoc, $objforref, $mode = 'next')
 	{
-		return $this->getNextValue($objsoc, $objforref, $mode);
 	}
 }
