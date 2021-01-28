@@ -108,6 +108,7 @@ class DigiriskDocuments extends CommonObject
 		'model_odt' => array('type'=>'varchar(255)', 'label'=>'Model ODT', 'enabled'=>'1', 'position'=>1020, 'notnull'=>0, 'visible'=>-1,),
 		'type' => array('type'=>'varchar(128)', 'label'=>'Type', 'enabled'=>'1', 'position'=>1100, 'notnull'=>0, 'visible'=>-1,),
 		'fk_user_modif' => array('type'=>'integer', 'label'=>'UserModif', 'enabled'=>'1', 'position'=>511, 'notnull'=>0, 'visible'=>0,),
+		'entity' => array('type'=>'integer', 'label'=>'Entity', 'enabled'=>'1', 'position'=>12, 'notnull'=>1, 'visible'=>-1,),
 	);
 	public $rowid;
 	public $ref;
@@ -123,6 +124,7 @@ class DigiriskDocuments extends CommonObject
 	public $model_odt;
 	public $type;
 	public $fk_user_modif;
+	public $entity;
 	// END MODULEBUILDER PROPERTIES
 
 

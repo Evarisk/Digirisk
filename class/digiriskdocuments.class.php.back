@@ -107,6 +107,7 @@ class DigiriskDocuments extends CommonObject
 		'last_main_doc' => array('type'=>'varchar(128)', 'label'=>'LastMainDoc', 'enabled'=>'1', 'position'=>520, 'notnull'=>0, 'visible'=>-1,),
 		'model_odt' => array('type'=>'varchar(255)', 'label'=>'Model ODT', 'enabled'=>'1', 'position'=>1020, 'notnull'=>0, 'visible'=>-1,),
 		'type' => array('type'=>'varchar(128)', 'label'=>'Type', 'enabled'=>'1', 'position'=>1100, 'notnull'=>0, 'visible'=>-1,),
+		'fk_user_modif' => array('type'=>'integer', 'label'=>'UserModif', 'enabled'=>'1', 'position'=>511, 'notnull'=>0, 'visible'=>0,),
 	);
 	public $rowid;
 	public $ref;
@@ -121,6 +122,7 @@ class DigiriskDocuments extends CommonObject
 	public $last_main_doc;
 	public $model_odt;
 	public $type;
+	public $fk_user_modif;
 	// END MODULEBUILDER PROPERTIES
 
 
@@ -219,15 +221,15 @@ class DigiriskDocuments extends CommonObject
 		$this->date_creation = $this->db->idate($now);
 		$this->tms 			 = $now;
 		$this->fk_user_creat = $user->id;
-		$this->ref_ext 		 = 'digirisk_' . $this->element . '_' . $this->ref;
+		$this->ref_ext 		 = 'digirisk_' . $this->ref;
 		$this->import_key 	 = "";
 		$this->status 		 = 1;
 		$this->type 		 = $this->element;
 		$this->DigiriskFillJSON($this);
-
+		// Changement de $this->element pour activer la génération d'un événement à la création
+		$this->element 		 = $this->element . '@digiriskdolibarr';
 		return $this->createCommon($user, $notrigger);
 	}
-
 
 	public function DigiriskFillJSON($object) {
 
@@ -997,7 +999,7 @@ class DigiriskDocuments extends CommonObject
 	 */
 	public function generateDocument($modele, $outputlangs, $hidedetails = 0, $hidedesc = 0, $hideref = 0, $moreparams = null)
 	{
-		global $conf, $langs;
+		global $conf, $langs, $user;
 
 		$result = 0;
 		$includedocgeneration = 1;
@@ -1009,6 +1011,7 @@ class DigiriskDocuments extends CommonObject
 
 			if ($this->modelpdf) {
 				$modele = $this->modelpdf;
+				//@todo rename en ADDON_ODT
 			} elseif (!empty($conf->global->DIGIRISKDOCUMENTS_ADDON_PDF)) {
 				$modele = $conf->global->DIGIRISKDOCUMENTS_ADDON_PDF;
 			}
@@ -1020,6 +1023,13 @@ class DigiriskDocuments extends CommonObject
 			$result = $this->commonGenerateDocument($modelpath, $modele, $outputlangs, $hidedetails, $hidedesc, $hideref, $moreparams);
 		}
 
+		switch ($this->type) {
+			case 'legaldisplay' :
+				$trigger = $this->call_trigger('LEGALDISPLAY_GENERATE', $user);
+				break;
+			case 'informationssharing':
+				$trigger = $this->call_trigger('INFORMATIONSSHARING_GENERATE', $user);
+		}
 		return $result;
 	}
 

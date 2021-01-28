@@ -29,6 +29,7 @@ CREATE TABLE llx_digiriskdolibarr_digiriskdocuments(
 	last_main_doc varchar(128), 
 	model_odt varchar(255), 
 	type varchar(128), 
-	fk_user_modif integer
+	fk_user_modif integer, 
+	entity integer DEFAULT 1 NOT NULL
 	-- END MODULEBUILDER FIELDS
 ) ENGINE=innodb;

@@ -17,7 +17,7 @@
 CREATE TABLE llx_digiriskdolibarr_digiriskdocuments(
 	-- BEGIN MODULEBUILDER FIELDS
 	rowid integer AUTO_INCREMENT PRIMARY KEY NOT NULL, 
-	ref varchar(128),
+	ref varchar(128) DEFAULT '(PROV)' NOT NULL, 
 	date_creation datetime NOT NULL, 
 	tms timestamp, 
 	fk_user_creat integer NOT NULL, 
@@ -28,6 +28,7 @@ CREATE TABLE llx_digiriskdolibarr_digiriskdocuments(
 	status integer NOT NULL, 
 	last_main_doc varchar(128), 
 	model_odt varchar(255), 
-	type varchar(128)
+	type varchar(128), 
+	fk_user_modif integer
 	-- END MODULEBUILDER FIELDS
 ) ENGINE=innodb;
