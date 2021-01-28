@@ -20,9 +20,9 @@
  */
 
 /**
- * \file       htdocs/core/modules/propale/mod_propale_saphir.php
- * \ingroup    propale
- * \brief      File that contains the numbering module rules Saphir
+ *	\file       htdocs/custom/digiriskdolibarr/core/modules/digiriskdolibarr/mod_informationssharing_encelade.php
+ * \ingroup    digiriskdolibarr informationssharing
+ * \brief      File that contains the numbering module rules Encelade
  */
 
 require_once DOL_DOCUMENT_ROOT.'/custom/digiriskdolibarr/core/modules/digiriskdolibarr/modules_informationssharing.php';
@@ -82,6 +82,7 @@ class mod_informationssharing_encelade extends ModeleNumRefInformationsSharing
 		$numFinal = get_next_value($db, $mask, 'digiriskdolibarr_digiriskdocuments', 'ref', " AND type = 'informationssharing' ", $object, $date, 'next', false, null, $entity);
 		$this->prefixinformationssharing = $numFinal;
 	}
+
 	/**
 	 *  Return description of module
 	 *
@@ -150,8 +151,7 @@ class mod_informationssharing_encelade extends ModeleNumRefInformationsSharing
 	/**
 	 *  Return next value
 	 *
-	 *  @param	Societe		$objsoc     Object third party
-	 * 	@param	Propal		$propal		Object commercial proposal
+	 *  @param	Societe		$object     Object third party
 	 *  @return string      			Value if OK, 0 if KO
 	 */
 	public function getNextValue($object)

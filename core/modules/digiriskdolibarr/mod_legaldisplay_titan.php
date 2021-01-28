@@ -20,14 +20,13 @@
  */
 
 /**
- * \file       htdocs/core/modules/propale/mod_propale_saphir.php
- * \ingroup    propale
- * \brief      File that contains the numbering module rules Saphir
+ *	\file       htdocs/custom/digiriskdolibarr/core/modules/digiriskdolibarr/mod_legaldisplay_titan.php
+ * \ingroup     digiriskdolibarr legaldisplay
+ *	\brief      File containing class for numbering module Titan
  */
-
-
+require_once DOL_DOCUMENT_ROOT.'/custom/digiriskdolibarr/core/modules/digiriskdolibarr/modules_legaldisplay.php';
 /**
- * Class of file that contains the numbering module rules Saphir
+ * 	Class to manage legaldisplay numbering rules Titan
  */
 class mod_legaldisplay_titan extends ModeleNumRefLegalDisplay
 {

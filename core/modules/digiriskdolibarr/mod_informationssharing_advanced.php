@@ -19,13 +19,13 @@
  */
 
 /**
- *	\file       htdocs/core/modules/facture/mod_facture_mars.php
- *	\ingroup    facture
- *	\brief      File containing class for numbering module Mars
+ *	\file       htdocs/custom/digiriskdolibarr/core/modules/digiriskdolibarr/mod_informationssharing_advanced.php
+ *	\ingroup    digiriskdolibarr informationssharing
+ *	\brief      File containing class for numbering module Advanced
  */
 require_once DOL_DOCUMENT_ROOT.'/custom/digiriskdolibarr/core/modules/digiriskdolibarr/modules_informationssharing.php';
 /**
- * 	Class to manage invoice numbering rules Mars
+ * 	Class to manage informationssharing numbering rules Advanced
  */
 class mod_informationssharing_advanced extends ModeleNumRefInformationsSharing
 {

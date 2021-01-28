@@ -19,13 +19,13 @@
  */
 
 /**
- *	\file       htdocs/core/modules/facture/mod_facture_mars.php
- *	\ingroup    facture
- *	\brief      File containing class for numbering module Mars
+ *	\file       htdocs/custom/digiriskdolibarr/core/modules/digiriskdolibarr/mod_legaldisplay_standard.php
+ * \ingroup     digiriskdolibarr legaldisplay
+ *	\brief      File containing class for numbering module Standard
  */
 require_once DOL_DOCUMENT_ROOT.'/custom/digiriskdolibarr/core/modules/digiriskdolibarr/modules_legaldisplay.php';
 /**
- * 	Class to manage invoice numbering rules Mars
+ * 	Class to manage legaldisplay numbering rules Standard
  */
 class mod_legaldisplay_standard extends ModeleNumRefLegalDisplay
 {
