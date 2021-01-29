@@ -101,6 +101,7 @@ CreateInformationsSharing = Créer une diffusion d'informations
 DeleteInformationsSharing = Supprimer une diffusion d'informations
 
 HowToSetDataInformationsSharing = Pour configurer les données sur la diffusion d'informations, aller dans Accueil - Configuration - Société/Organisation - Social
+HowToSetDataLegalDisplay = Pour configurer les données sur l'affichage légal, aller dans Accueil - Configuration - Société/Organisation - Sécurité
 
 INFORMATIONSSHARING_CREATEInDolibarr = Diffusion d'informations créée dans Dolibarr
 ActionsOnInformationsSharing = Événements liés à la diffusion d'informations

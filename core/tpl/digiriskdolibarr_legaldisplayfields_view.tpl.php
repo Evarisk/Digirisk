@@ -65,14 +65,14 @@ print '</td></tr>';
 // Médecin du travail
 
 print '<tr>';
-	print '<td class="titlefield">'.$langs->trans("LabourDoctor").'</td>';
+	print '<td class="titlefield">'.$form->textwithpicto($langs->trans("LabourDoctor"), $langs->trans('HowToSetDataLegalDisplay')).'</td>';
 	print '<td>';
 		print $legaldisplay->occupational_health_service->name;
 		print '</td></tr>';
 
 // Inspecteur du travail
 print '<tr>';
-	print '<td class="titlefield">'.$langs->trans("LabourInspector").'</td>';
+	print '<td class="titlefield">'.$form->textwithpicto($langs->trans("LabourInspector"), $langs->trans('HowToSetDataLegalDisplay')).'</td>';
 	print '<td>';
 		print $legaldisplay->detective_work->name;
 		print '</td></tr>';
@@ -80,7 +80,7 @@ print '<tr>';
 // SAMU
 
 print '<tr>';
-	print '<td class="titlefield">'.$langs->trans("SAMU").'</td>';
+	print '<td class="titlefield">'.$form->textwithpicto($langs->trans("SAMU"), $langs->trans('HowToSetDataLegalDisplay')).'</td>';
 	print '<td>';
 		print $legaldisplay->emergency_service->samu;
 		print '</td></tr>';
@@ -88,15 +88,16 @@ print '<tr>';
 // Pompiers
 
 print '<tr>';
-	print '<td class="titlefield">'.$langs->trans("Pompiers").'</td>';
-	print '<td>';
+	print '<td class="titlefield">'.$form->textwithpicto($langs->trans("Pompiers"), $langs->trans('HowToSetDataLegalDisplay')).'</td>';
+
+print '<td>';
 		print $legaldisplay->emergency_service->pompier;
 		print '</td></tr>';
 
 // Police
 
 print '<tr>';
-	print '<td class="titlefield">'.$langs->trans("Police").'</td>';
+print '<td class="titlefield">'.$form->textwithpicto($langs->trans("Police"), $langs->trans('HowToSetDataLegalDisplay')).'</td>';
 	print '<td>';
 		print $legaldisplay->emergency_service->police;
 		print '</td></tr>';
@@ -104,7 +105,7 @@ print '<tr>';
 // Urgences
 
 print '<tr>';
-	print '<td class="titlefield">'.$langs->trans("AllEmergencies").'</td>';
+print '<td class="titlefield">'.$form->textwithpicto($langs->trans("AllEmergencies"), $langs->trans('HowToSetDataLegalDisplay')).'</td>';
 	print '<td>';
 		print $legaldisplay->emergency_service->emergency;
 		print '</td></tr>';
@@ -112,7 +113,7 @@ print '<tr>';
 // Défenseur du droit du travail
 
 print '<tr>';
-	print '<td class="titlefield">'.$langs->trans("RightsDefender").'</td>';
+print '<td class="titlefield">'.$form->textwithpicto($langs->trans("RightsDefender"), $langs->trans('HowToSetDataLegalDisplay')).'</td>';
 	print '<td>';
 		print $legaldisplay->emergency_service->right_defender;
 		print '</td></tr>';
@@ -120,7 +121,7 @@ print '<tr>';
 // Antipoison
 
 print '<tr>';
-	print '<td class="titlefield">'.$langs->trans("Antipoison").'</td>';
+print '<td class="titlefield">'.$form->textwithpicto($langs->trans("Antipoison"), $langs->trans('HowToSetDataLegalDisplay')).'</td>';
 	print '<td>';
 		print $legaldisplay->emergency_service->poison_control_center;
 		print '</td></tr>';
@@ -128,7 +129,7 @@ print '<tr>';
 // Responsable de prévention
 
 print '<tr>';
-	print '<td class="titlefield">'.$langs->trans("ResponsibleToNotify").'</td>';
+print '<td class="titlefield">'.$form->textwithpicto($langs->trans("ReponsibleToNotify"), $langs->trans('HowToSetDataLegalDisplay')).'</td>';
 	print '<td>';
 		print $legaldisplay->safety_rule->responsible_for_preventing;
 		print '</td></tr>';
