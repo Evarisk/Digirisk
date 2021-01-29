@@ -1037,6 +1037,13 @@ class DigiriskDocuments extends CommonObject
 				break;
 			case 'informationssharing':
 				$trigger = $this->call_trigger('INFORMATIONSSHARING_GENERATE', $user);
+				break;
+			case 'firepermit':
+				$trigger = $this->call_trigger('FIREPERMIT_GENERATE', $user);
+				break;
+			case 'preventionplan':
+				$trigger = $this->call_trigger('PREVENTIONPLAN_GENERATE', $user);
+				break;
 		}
 		return $result;
 	}
