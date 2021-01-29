@@ -100,6 +100,8 @@ ReadInformationsSharing = Lire une diffusion d'informations
 CreateInformationsSharing = Créer une diffusion d'informations
 DeleteInformationsSharing = Supprimer une diffusion d'informations
 
+HowToSetDataInformationsSharing = Pour configurer les données sur la diffusion d'informations, aller dans Accueil - Configuration - Société/Organisation - Social
+
 INFORMATIONSSHARING_CREATEInDolibarr = Diffusion d'informations créée dans Dolibarr
 ActionsOnInformationsSharing = Événements liés à la diffusion d'informations
 InformationsSharingGeneratedWithDolibarr = Diffusion d'informations générée avec Dolibarr
