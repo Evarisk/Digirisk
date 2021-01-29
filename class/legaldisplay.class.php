@@ -179,8 +179,7 @@ class LegalDisplay extends DigiriskDocuments
 			$labour_doctor_societe = new Societe($this->db);
 			$result = $labour_doctor_societe->fetch($digirisk_resources['LabourDoctorSociety']->id[0]);
 
-			if ($result < 0) dol_print_error($langs->trans('NoLabourDoctorAssigned'), $labour_doctor_societe->error);
-			elseif ($result > 0) {
+			if ($result > 0) {
 
 				$labour_doctor_openinghours = $thirdparty_openinghours->fetch_by_element($labour_doctor_societe->id, $labour_doctor_societe->element);
 				$json['LegalDisplay']['occupational_health_service']['openinghours'] = "\r\n" . $labour_doctor_openinghours->day0 . "\r\n" . $labour_doctor_openinghours->day1 . "\r\n" . $labour_doctor_openinghours->day2 . "\r\n" . $labour_doctor_openinghours->day3 . "\r\n" . $labour_doctor_openinghours->day4 . "\r\n" . $labour_doctor_openinghours->day5 . "\r\n" . $labour_doctor_openinghours->day6;
@@ -189,8 +188,7 @@ class LegalDisplay extends DigiriskDocuments
 			$labour_doctor_contact = new Contact($this->db);
 			$result = $labour_doctor_contact->fetch($digirisk_resources['LabourDoctorContact']->id[0]);
 
-			if ($result < 0) dol_print_error($langs->trans('NoLabourDoctorAssigned'), $labour_doctor_contact->error);
-			elseif ($result > 0) {
+			if ($result > 0) {
 				$json['LegalDisplay']['occupational_health_service']['name']    = $labour_doctor_contact->firstname . " " . $labour_doctor_contact->lastname;
 				$json['LegalDisplay']['occupational_health_service']['address'] = preg_replace('/\s\s+/', ' ', $labour_doctor_contact->address);
 				$json['LegalDisplay']['occupational_health_service']['zip']     = $labour_doctor_contact->zip;
@@ -201,8 +199,7 @@ class LegalDisplay extends DigiriskDocuments
 			$labour_inspector_societe = new Societe($this->db);
 			$result = $labour_inspector_societe->fetch($digirisk_resources['LabourInspectorSociety']->id[0]);
 
-			if ($result < 0) dol_print_error($langs->trans('NoLabourInspectorAssigned'), $labour_inspector_societe->error);
-			elseif ($result > 0) {
+			if ($result > 0) {
 
 				$labour_inspector_openinghours = $thirdparty_openinghours->fetch_by_element($labour_inspector_societe->id, $labour_inspector_societe->element);
 				$json['LegalDisplay']['detective_work']['openinghours'] = "\r\n" . $labour_inspector_openinghours->day0 . "\r\n" . $labour_inspector_openinghours->day1 . "\r\n" . $labour_inspector_openinghours->day2 . "\r\n" . $labour_inspector_openinghours->day3 . "\r\n" . $labour_inspector_openinghours->day4 . "\r\n" . $labour_inspector_openinghours->day5 . "\r\n" . $labour_inspector_openinghours->day6;
@@ -212,8 +209,7 @@ class LegalDisplay extends DigiriskDocuments
 			$labour_inspector_contact = new Contact($this->db);
 			$result = $labour_inspector_contact->fetch($digirisk_resources['LabourInspectorContact']->id[0]);
 
-			if ($result < 0) dol_print_error($langs->trans('NoLabourInspectorAssigned'), $labour_inspector_contact->error);
-			elseif ($result > 0) {
+			if ($result > 0) {
 				$json['LegalDisplay']['detective_work']['name']    = $labour_inspector_contact->firstname . " " . $labour_inspector_contact->lastname;
 				$json['LegalDisplay']['detective_work']['address'] = preg_replace('/\s\s+/', ' ', $labour_inspector_contact->address);
 				$json['LegalDisplay']['detective_work']['zip']     = $labour_inspector_contact->zip;
@@ -224,56 +220,49 @@ class LegalDisplay extends DigiriskDocuments
 			$samu = new Societe($this->db);
 			$result = $samu->fetch($digirisk_resources['SAMU']->id[0]);
 
-			if ($result < 0) dol_print_error($langs->trans('NoSamuAssigned'), $samu->error);
-			elseif ($result > 0) {
+			if ($result > 0) {
 				$json['LegalDisplay']['emergency_service']['samu'] = $samu->phone;
 			}
 
 			$police = new Societe($this->db);
 			$result = $police->fetch($digirisk_resources['Police']->id[0]);
 
-			if ($result < 0) dol_print_error($langs->trans('NoPoliceAssigned'), $police->error);
-			elseif ($result > 0) {
+			if ($result > 0) {
 				$json['LegalDisplay']['emergency_service']['police'] = $police->phone;
 			}
 
 			$pompier = new Societe($this->db);
 			$result = $pompier->fetch($digirisk_resources['Pompiers']->id[0]);
 
-			if ($result < 0) dol_print_error($langs->trans('NoPoliceAssigned'), $pompier->error);
-			elseif ($result > 0) {
+			if ($result > 0) {
 				$json['LegalDisplay']['emergency_service']['pompier'] = $pompier->phone;
 			}
 
 			$emergency = new Societe($this->db);
 			$result = $emergency->fetch($digirisk_resources['AllEmergencies']->id[0]);
 
-			if ($result < 0) dol_print_error($langs->trans('NoAllEmergenciesAssigned'), $emergency->error);
-			elseif ($result > 0) {
+			if ($result > 0) {
 				$json['LegalDisplay']['emergency_service']['emergency'] = $emergency->phone;
 			}
 
 			$rights_defender = new Societe($this->db);
 			$result = $rights_defender->fetch($digirisk_resources['RightsDefender']->id[0]);
 
-			if ($result < 0) dol_print_error($langs->trans('NoRightsDefenderAssigned'), $rights_defender->error);
-			elseif ($result > 0) {
+			if ($result > 0) {
 				$json['LegalDisplay']['emergency_service']['right_defender'] = $rights_defender->phone;
 			}
 
 			$antipoison = new Societe($this->db);
 			$result = $antipoison->fetch($digirisk_resources['Antipoison']->id[0]);
 
-			if ($result < 0) dol_print_error($langs->trans('NoRightsDefenderAssigned'), $antipoison->error);
-			elseif ($result > 0) {
+			if ($result > 0) {
 				$json['LegalDisplay']['emergency_service']['poison_control_center'] = $antipoison->phone;
 			}
 
 			$responsible_prevent = new User($this->db);
 			$result = $responsible_prevent->fetch($digirisk_resources['Responsible']->id[0]);
 
-			if ($result < 0) dol_print_error($langs->trans('NoResponsibleAssigned'), $responsible_prevent->error);
-			elseif ($result > 0) {
+			if ($result > 0) {
 				$json['LegalDisplay']['safety_rule']['responsible_for_preventing'] = $responsible_prevent->firstname . " " . $responsible_prevent->lastname;
 				$json['LegalDisplay']['safety_rule']['phone']                      = $responsible_prevent->office_phone;
 			}
