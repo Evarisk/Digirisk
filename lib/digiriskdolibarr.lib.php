@@ -77,6 +77,11 @@ function digiriskdolibarrAdminPrepareHead()
 	$head[$h][2] = 'groupment';
 	$h++;
 
+	$head[$h][0] = dol_buildpath("/digiriskdolibarr/admin/workunit.php", 1);
+	$head[$h][1] = $langs->trans("Workunit");
+	$head[$h][2] = 'workunit';
+	$h++;
+
 	// Show more tabs from modules
 	// Entries must be declared in modules descriptor with line
 	//$this->tabs = array(

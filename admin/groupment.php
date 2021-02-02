@@ -154,7 +154,7 @@ elseif ($action == 'setdoc')
 {
 
 	$tmpobjectkey = preg_replace('/(_odt)/', '', $value);
-	$constforval = "DIGIRISKDOLIBARR_LEGALDISPLAY_DEFAULT_MODEL";
+	$constforval = "DIGIRISKDOLIBARR_GROUPMENT_DEFAULT_MODEL";
 	$type = 'groupment';
 	$label = '';
 	if (dolibarr_set_const($db, $constforval, $value, 'chaine', 0, '', $conf->entity))
@@ -289,7 +289,7 @@ foreach ($dirmodels as $reldir)
 
 							print '<td class="center">';
 
-							if ($conf->global->DIGIRISKDOLIBARR_LEGALDISPLAY_ADDON == $file || $conf->global->DIGIRISKDOLIBARR_LEGALDISPLAY_ADDON.'.php' == $file)
+							if ($conf->global->DIGIRISKDOLIBARR_GROUPMENT_ADDON == $file || $conf->global->DIGIRISKDOLIBARR_GROUPMENT_ADDON.'.php' == $file)
 							{
 								print img_picto($langs->trans("Activated"), 'switch_on');
 							}
@@ -321,7 +321,7 @@ foreach ($dirmodels as $reldir)
 							print '<td class="center">';
 							print $form->textwithpicto('', $htmltooltip, 1, 0);
 
-							if ($conf->global->DIGIRISKDOLIBARR_LEGALDISPLAY_ADDON.'.php' == $file)  // If module is the one used, we show existing errors
+							if ($conf->global->DIGIRISKDOLIBARR_GROUPMENT_ADDON.'.php' == $file)  // If module is the one used, we show existing errors
 							{
 								if (!empty($module->error)) dol_htmloutput_mesg($module->error, '', 'error', 1);
 							}
@@ -437,7 +437,7 @@ foreach ($dirmodels as $reldir)
 
 							// Default
 							print '<td class="center">';
-							if ($conf->global->DIGIRISKDOLIBARR_LEGALDISPLAY_DEFAULT_MODEL == "$name")
+							if ($conf->global->DIGIRISKDOLIBARR_GROUPMENT_DEFAULT_MODEL == "$name")
 							{
 								print img_picto($langs->trans("Default"), 'on');
 							}

@@ -43,8 +43,10 @@ require_once DOL_DOCUMENT_ROOT.'/core/class/html.formprojet.class.php';
 
 dol_include_once('/digiriskdolibarr/class/digiriskelement.class.php');
 dol_include_once('/digiriskdolibarr/class/digiriskdocuments.class.php');
+dol_include_once('/digiriskdolibarr/class/groupment.class.php');
 dol_include_once('/digiriskdolibarr/lib/digiriskdolibarr_digiriskelement.lib.php');
 dol_include_once('/digiriskdolibarr/core/modules/digiriskdolibarr/mod_groupment_standard.php');
+dol_include_once('/digiriskdolibarr/core/modules/digiriskdolibarr/mod_workunit_standard.php');
 
 global $db, $conf, $langs;
 
@@ -112,7 +114,7 @@ if (empty($reshook))
 {
 	$error = 0;
 
-	$backurlforlist = dol_buildpath('/digiriskdolibarr/digiriskelement_list.php', 1);
+	$backurlforlist = dol_buildpath('/digiriskdolibarr/digiriskelement_card.php', 1);
 
 	if (empty($backtopage) || ($cancel && empty($id))) {
 		if (empty($backtopage) || ($cancel && strpos($backtopage, '__ID__'))) {
@@ -191,6 +193,7 @@ if ($action == 'create')
 	print '<input type="hidden" name="action" value="add">';
 
 	if ($backtopage) print '<input type="hidden" name="backtopage" value="'.$backtopage.'">';
+
 	if ($backtopageforcancel) print '<input type="hidden" name="backtopageforcancel" value="'.$backtopageforcancel.'">';
 
 	dol_fiche_head(array(), '');
@@ -309,12 +312,11 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 
 	// Object card
 	// ------------------------------------------------------------
-	$linkback = '<a href="'.dol_buildpath('/digiriskdolibarr/digiriskelement_list.php', 1).'?restore_lastsearch_values=1'.(!empty($socid) ? '&socid='.$socid : '').'">'.$langs->trans("BackToList").'</a>';
 
 	$morehtmlref = '<div class="refidno">';
 	$morehtmlref .= '</div>';
 
-	dol_banner_tab($object, 'ref', $linkback, 0, 'ref', 'ref', $morehtmlref);
+	dol_banner_tab($object, 'ref', '', 0, 'ref', 'ref', $morehtmlref);
 
 	print '<div class="fichecenter">';
 	print '<div class="fichehalfleft">';
@@ -434,14 +436,14 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 			$objref = dol_sanitizeFileName($object->ref);
 
 			$relativepath = $objref . '/' . $objref . '.pdf';
-			$dir_files = $object->element . '/' . $objref;
+			$dir_files = $object->element_type . '/' . $objref;
 			$filedir = $conf->digiriskdolibarr->dir_output.'/'.$dir_files;
 
 			$urlsource = $_SERVER["PHP_SELF"] . "?id=" . $object->id;
 			$genallowed = $user->rights->digiriskdolibarr->digiriskelement->read;	// If you can read, you can build the PDF to read content
 			$delallowed = $user->rights->digiriskdolibarr->digiriskelement->create;	// If you can create/edit, you can remove a file on card
 
-			print $formfile->showdocuments('digiriskdolibarr:DigiriskElement',$dir_files, $filedir, $urlsource, $genallowed, $delallowed, $conf->global->DIGIRISKDOLIBARR_DIGIRISKELEMENT_DEFAULT_MODEL, 1, 0, 0, 28, 0, '', '', '', $langs->defaultlang);
+			print $formfile->showdocuments('digiriskdolibarr:Groupment',$dir_files, $filedir, $urlsource, $genallowed, $delallowed, $conf->global->DIGIRISKDOLIBARR_GROUPMENT_DEFAULT_MODEL, 1, 0, 0, 28, 0, '', '', '', $langs->defaultlang);
 
 		}
 
@@ -460,7 +462,7 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 		// List of actions on element
 		include_once DOL_DOCUMENT_ROOT.'/core/class/html.formactions.class.php';
 		$formactions = new FormActions($db);
-		$somethingshown = $formactions->showactions($object, $object->element.'@digiriskdolibarr', (is_object($object->thirdparty) ? $object->thirdparty->id : 0), 1, '', $MAXEVENT, '', $morehtmlright);
+		$somethingshown = $formactions->showactions($object, $object->element_type.'@digiriskdolibarr', (is_object($object->thirdparty) ? $object->thirdparty->id : 0), 1, '', $MAXEVENT, '', $morehtmlright);
 
 		print '</div></div></div>';
 	}

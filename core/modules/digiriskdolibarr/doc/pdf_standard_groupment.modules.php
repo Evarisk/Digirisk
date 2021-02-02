@@ -31,7 +31,7 @@
  *  \brief      File of class to generate document from standard template
  */
 
-dol_include_once('/digiriskdolibarr/core/modules/digiriskdolibarr/modules_digiriskelement.php');
+dol_include_once('/digiriskdolibarr/core/modules/digiriskdolibarr/modules_groupment.php');
 require_once DOL_DOCUMENT_ROOT . '/product/class/product.class.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/company.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/functions2.lib.php';
@@ -39,9 +39,9 @@ require_once DOL_DOCUMENT_ROOT . '/core/lib/pdf.lib.php';
 
 
 /**
- *	Class to manage PDF template standard_digiriskelement
+ *	Class to manage PDF template standard_groupment
  */
-class pdf_standard_digiriskelement extends ModelePDFDigiriskElement
+class pdf_standard_groupment extends ModelePDFGroupment
 {
 	/**
 	 * @var DoliDb Database handler
@@ -291,18 +291,18 @@ class pdf_standard_digiriskelement extends ModelePDFDigiriskElement
 
 		//if (count($realpatharray) == 0) $this->posxpicture=$this->posxtva;
 
-		if ($conf->digiriskdolibarr->dir_output.'/digiriskelement')
+		if ($conf->digiriskdolibarr->dir_output.'/groupment')
 		{
 			$object->fetch_thirdparty();
 
 			// Definition of $dir and $file
 			if ($object->specimen)
 			{
-				$dir = $conf->digiriskdolibarr->dir_output.'/digiriskelement';
+				$dir = $conf->digiriskdolibarr->dir_output.'/groupment';
 				$file = $dir."/SPECIMEN.pdf";
 			} else {
 				$objectref = dol_sanitizeFileName($object->ref);
-				$dir = $conf->digiriskdolibarr->dir_output.'/digiriskelement/'.$objectref;
+				$dir = $conf->digiriskdolibarr->dir_output.'/groupment/'.$objectref;
 				$file = $dir."/".$objectref.".pdf";
 			}
 			if (!file_exists($dir))

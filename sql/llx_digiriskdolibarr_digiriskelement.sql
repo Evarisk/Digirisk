@@ -25,9 +25,9 @@ CREATE TABLE llx_digiriskdolibarr_digiriskelement(
 	fk_user_creat integer NOT NULL, 
 	fk_user_modif integer, 
 	import_key varchar(14), 
-	status smallint NOT NULL, 
+	status smallint, 
 	element_type varchar(50), 
-	fk_parent integer, 
-	entity integer DEFAULT 1 NOT NULL
+	fk_parent integer DEFAULT 0 NOT NULL,
+	model_pdf varchar(255)
 	-- END MODULEBUILDER FIELDS
 ) ENGINE=innodb;

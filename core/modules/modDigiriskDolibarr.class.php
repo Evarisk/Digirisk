@@ -99,7 +99,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			'moduleforexternal' => 0,
 		);
 
-		$this->dirs = array("/digiriskdolibarr/temp", "/ecm/digiriskdolibarr", "/ecm/digiriskdolibarr/legaldisplay", "/ecm/digiriskdolibarr/informationssharing", "/ecm/digiriskdolibarr/firepermit", "/ecm/digiriskdolibarr/preventionplan");
+		$this->dirs = array("/digiriskdolibarr/temp", "/ecm/digiriskdolibarr", "/ecm/digiriskdolibarr/legaldisplay", "/ecm/digiriskdolibarr/informationssharing", "/ecm/digiriskdolibarr/firepermit", "/ecm/digiriskdolibarr/preventionplan", "/ecm/digiriskdolibarr/groupment");
 
 		// Config pages.
 		$this->config_page_url = array("setup.php@digiriskdolibarr");
@@ -118,6 +118,7 @@ class modDigiriskdolibarr extends DolibarrModules
 		//$this->always_enabled = true;								// If true, can't be disabled
 
 		// Constants
+		//TODO ranger les const correctement
 		$this->const = array(
 			// CONST CONFIGURATION
 			1 => array('DIGIRISK_GENERAL_MEANS','chaine','','General means', 1),
@@ -149,7 +150,13 @@ class modDigiriskdolibarr extends DolibarrModules
 			26 => array('DIGIRISKDOLIBARR_PREVENTIONPLAN_ADDON_ODT_PATH','chaine', DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/documents/doctemplates/preventionplan/' ,'', 1),
 			27 => array('DIGIRISKDOLIBARR_PREVENTIONPLAN_CUSTOM_ADDON_ODT_PATH','chaine', DOL_DATA_ROOT . '/ecm/digiriskdolibarr/preventionplan/' ,'', 1),
 			28 => array('DIGIRISKDOLIBARR_PREVENTIONPLAN_ADDON','chaine', 'mod_preventionplan_standard' ,'', 1),
-			29 => array('DIGIRISKDOLIBARR_PREVENTIONPLAN_DEFAULT_MODEL','chaine', 'preventionplan_A4_odt' ,'', 1)
+			29 => array('DIGIRISKDOLIBARR_PREVENTIONPLAN_DEFAULT_MODEL','chaine', 'preventionplan_A4_odt' ,'', 1),
+			30 => array('DIGIRISKDOLIBARR_GROUPMENT_ADDON_ODT_PATH','chaine', DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/documents/doctemplates/groupment/' ,'', 1),
+			31 => array('DIGIRISKDOLIBARR_GROUPMENT_CUSTOM_ADDON_ODT_PATH','chaine', DOL_DATA_ROOT . '/ecm/digiriskdolibarr/groupment/' ,'', 1),
+			32 => array('DIGIRISKDOLIBARR_GROUPMENT_ADDON','chaine', 'mod_groupment_standard' ,'', 1),
+			33 => array('DIGIRISKDOLIBARR_GROUPMENT_DEFAULT_MODEL','chaine', 'groupment_A4_odt' ,'', 1),
+			34 => array('MAIN_AGENDA_ACTIONAUTO_GROUPMENT_CREATE','chaine',1,'', 1),
+			35 => array('MAIN_AGENDA_ACTIONAUTO_WORKUNIT_CREATE','chaine',1,'', 1)
 		);
 
 		if ( ! isset($conf->digiriskdolibarr ) || ! isset( $conf->digiriskdolibarr->enabled ) ) {
@@ -461,21 +468,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			'titre'=>$langs->trans('GP/UT Organisation'),
 			'mainmenu'=>'digiriskdolibarr',
 			'leftmenu'=>'digiriskelement',
-			'url'=>'/digiriskdolibarr/digiriskelement_card.php' . '?id=1',
-			'langs'=>'digiriskdolibarr@digiriskdolibarr',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
-			'position'=>48520+$r,
-			'enabled'=>'$conf->digiriskdolibarr->enabled',  // Define condition to show or hide menu entry. Use '$conf->digiriskdolibarr->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
-			'perms'=>'1',			                // Use 'perms'=>'$user->rights->digiriskdolibarr->level1->level2' if you want your menu with a permission rules
-			'target'=>'',
-			'user'=>2,				                // 0=Menu for internal users, 1=external users, 2=both
-		);
-		$this->menu[$r++]=array(
-			'fk_menu'=>'fk_mainmenu=digiriskdolibarr,fk_leftmenu=digiriskelement',      // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
-			'type'=>'left',			                // This is a Left menu entry
-			'titre'=>$langs->trans('New GP/UT'),
-			'mainmenu'=>'digiriskdolibarr',
-			'leftmenu'=>'digiriskelementcreate',
-			'url'=>'/digiriskdolibarr/digiriskelement_card.php' . '?action=create',
+			'url'=>'/digiriskdolibarr/digiriskelement_card.php',
 			'langs'=>'digiriskdolibarr@digiriskdolibarr',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
 			'position'=>48520+$r,
 			'enabled'=>'$conf->digiriskdolibarr->enabled',  // Define condition to show or hide menu entry. Use '$conf->digiriskdolibarr->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.

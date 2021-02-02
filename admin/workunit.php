@@ -40,7 +40,7 @@ global $langs, $user;
 
 // Libraries
 require_once DOL_DOCUMENT_ROOT."/core/lib/admin.lib.php";
-require_once DOL_DOCUMENT_ROOT."/custom/digiriskdolibarr/class/legaldisplay.class.php";
+require_once DOL_DOCUMENT_ROOT."/custom/digiriskdolibarr/class/digiriskelement.class.php";
 require_once '../lib/digiriskdolibarr.lib.php';
 
 // Translations
@@ -75,10 +75,10 @@ if ((float) DOL_VERSION >= 6)
 
 if ($action == 'updateMask')
 {
-	$maskconstlegaldisplay = GETPOST('maskconstlegaldisplay', 'alpha');
-	$masklegaldisplay = GETPOST('masklegaldisplay', 'alpha');
+	$maskconstdigiriskelement = GETPOST('maskconstdigiriskelement', 'alpha');
+	$maskdigiriskelement = GETPOST('maskdigiriskelement', 'alpha');
 
-	if ($maskconstlegaldisplay) $res = dolibarr_set_const($db, $maskconstlegaldisplay, $masklegaldisplay, 'chaine', 0, '', $conf->entity);
+	if ($maskconstdigiriskelement) $res = dolibarr_set_const($db, $maskconstdigiriskelement, $maskdigiriskelement, 'chaine', 0, '', $conf->entity);
 
 	if (!$res > 0) $error++;
 
@@ -133,13 +133,13 @@ if ($action == 'updateMask')
 // Activate a model
 elseif ($action == 'set')
 {
-	$type = 'legaldisplay';
+	$type = 'workunit';
 
 	$ret = addDocumentModel($value, $type, $label, $scandir);
 } elseif ($action == 'del')
 {
 	$tmpobjectkey = preg_replace('/(_odt)/', '', $value);
-	$type = 'legaldisplay';
+	$type = 'workunit';
 
 	$ret = delDocumentModel($value, $type);
 	if ($ret > 0)
@@ -154,8 +154,8 @@ elseif ($action == 'setdoc')
 {
 
 	$tmpobjectkey = preg_replace('/(_odt)/', '', $value);
-	$constforval = "DIGIRISKDOLIBARR_LEGALDISPLAY_DEFAULT_MODEL";
-	$type = 'legaldisplay';
+	$constforval = "DIGIRISKDOLIBARR_WORKUNIT_DEFAULT_MODEL";
+	$type = 'workunit';
 	$label = '';
 	if (dolibarr_set_const($db, $constforval, $value, 'chaine', 0, '', $conf->entity))
 	{
@@ -176,7 +176,7 @@ elseif ($action == 'setdoc')
 {
 	// TODO Check if numbering module chosen can be activated
 	// by calling method canBeActivated
-	$tmpobjectkey = 'legaldisplay';
+	$tmpobjectkey = 'workunit';
 	$constforval = 'DIGIRISKDOLIBARR_'.strtoupper($tmpobjectkey)."_ADDON";
 	dolibarr_set_const($db, $constforval, $value, 'chaine', 0, '', $conf->entity);
 }
@@ -202,7 +202,7 @@ print load_fiche_titre($langs->trans($page_name), $linkback, 'object_digiriskdol
 
 // Configuration header
 $head = digiriskdolibarrAdminPrepareHead();
-dol_fiche_head($head, 'legaldisplay', '', -1, "digiriskdolibarr@digiriskdolibarr");
+dol_fiche_head($head, 'workunit', '', -1, "digiriskdolibarr@digiriskdolibarr");
 
 
 
@@ -210,7 +210,7 @@ dol_fiche_head($head, 'legaldisplay', '', -1, "digiriskdolibarr@digiriskdolibarr
  *  Numbering module
  */
 
-print load_fiche_titre($langs->trans("DigiriskLegalDisplayNumberingModule"), '', '');
+print load_fiche_titre($langs->trans("DigiriskWorkUnitNumberingModule"), '', '');
 
 print '<table class="noborder centpercent">';
 print '<tr class="liste_titre">';
@@ -243,7 +243,7 @@ foreach ($dirmodels as $reldir)
 
 					$classname = preg_replace('/\.php$/', '', $file);
 
-					// preg_match('/^legaldisplay/', $file)
+					// preg_match('/^workunit/', $file)
 					// For compatibility
 					if (!is_file($dir.$filebis))
 					{
@@ -257,7 +257,7 @@ foreach ($dirmodels as $reldir)
 
 					$classname = preg_replace('/\-.*$/', '', $classname);
 
-					if (!class_exists($classname) && is_readable($dir.$filebis) && (preg_match('/mod_/', $filebis) || preg_match('/mod_/', $classname)) && substr($filebis, dol_strlen($filebis) - 3, 3) == 'php' && preg_match('/legaldisplay/i', $classname))
+					if (!class_exists($classname) && is_readable($dir.$filebis) && (preg_match('/mod_/', $filebis) || preg_match('/mod_/', $classname)) && substr($filebis, dol_strlen($filebis) - 3, 3) == 'php' && preg_match('/workunit/i', $classname))
 					{
 						// Charging the numbering class
 						require_once $dir.$filebis;
@@ -280,7 +280,7 @@ foreach ($dirmodels as $reldir)
 
 							// Show example of numbering module
 							print '<td class="nowrap">';
-							$tmp = $module->prefixlegaldisplay;
+							$tmp = $module->getExample();
 
 							if (preg_match('/^Error/', $tmp)) print '<div class="error">'.$langs->trans($tmp).'</div>';
 							elseif ($tmp == 'NotConfigured') print $langs->trans($tmp);
@@ -289,7 +289,7 @@ foreach ($dirmodels as $reldir)
 
 							print '<td class="center">';
 
-							if ($conf->global->DIGIRISKDOLIBARR_LEGALDISPLAY_ADDON == $file || $conf->global->DIGIRISKDOLIBARR_LEGALDISPLAY_ADDON.'.php' == $file)
+							if ($conf->global->DIGIRISKDOLIBARR_WORKUNIT_ADDON == $file || $conf->global->DIGIRISKDOLIBARR_WORKUNIT_ADDON.'.php' == $file)
 							{
 								print img_picto($langs->trans("Activated"), 'switch_on');
 							}
@@ -299,14 +299,14 @@ foreach ($dirmodels as $reldir)
 							}
 							print '</td>';
 
-							$legaldisplay = new LegalDisplay($db);
-							$legaldisplay->initAsSpecimen();
+							$workunit = new DigiriskElement($db);
+							$workunit->initAsSpecimen();
 
 							// Example for standard invoice
 							$htmltooltip = '';
 							$htmltooltip .= ''.$langs->trans("Version").': <b>'.$module->getVersion().'</b><br>';
-							$legaldisplay->type = 0;
-							$nextval = $module->getNextValue($mysoc, $legaldisplay);
+							$workunit->type = 0;
+							$nextval = $module->getNextValue($workunit);
 							if ("$nextval" != $langs->trans("NotAvailable")) {  // Keep " on nextval
 								$htmltooltip .= $langs->trans("NextValueForInvoices").': ';
 								if ($nextval) {
@@ -321,7 +321,7 @@ foreach ($dirmodels as $reldir)
 							print '<td class="center">';
 							print $form->textwithpicto('', $htmltooltip, 1, 0);
 
-							if ($conf->global->DIGIRISKDOLIBARR_LEGALDISPLAY_ADDON.'.php' == $file)  // If module is the one used, we show existing errors
+							if ($conf->global->DIGIRISKDOLIBARR_WORKUNIT_ADDON.'.php' == $file)  // If module is the one used, we show existing errors
 							{
 								if (!empty($module->error)) dol_htmloutput_mesg($module->error, '', 'error', 1);
 							}
@@ -341,10 +341,10 @@ foreach ($dirmodels as $reldir)
  *  Documents models for Legal Display
  */
 
-print load_fiche_titre($langs->trans("DigiriskTemplateDocumentLegalDisplay"), '', '');
+print load_fiche_titre($langs->trans("DigiriskTemplateDocumentWorkUnit"), '', '');
 
 // Defini tableau def des modeles
-$type = 'legaldisplay';
+$type = 'workunit';
 $def = array();
 $sql = "SELECT nom";
 $sql .= " FROM ".MAIN_DB_PREFIX."document_model";
@@ -396,7 +396,7 @@ foreach ($dirmodels as $reldir)
 			arsort($filelist);
 			foreach ($filelist as $file)
 			{
-				if (preg_match('/\.modules\.php$/i', $file) && preg_match('/^(pdf_|doc_)/', $file) && preg_match('/legaldisplay/i', $file) && preg_match('/odt/i', $file))
+				if (preg_match('/\.modules\.php$/i', $file) && preg_match('/^(pdf_|doc_)/', $file) && preg_match('/workunit/i', $file) && preg_match('/odt/i', $file))
 				{
 					if (file_exists($dir.'/'.$file))
 					{
@@ -437,7 +437,7 @@ foreach ($dirmodels as $reldir)
 
 							// Default
 							print '<td class="center">';
-							if ($conf->global->DIGIRISKDOLIBARR_LEGALDISPLAY_DEFAULT_MODEL == "$name")
+							if ($conf->global->DIGIRISKDOLIBARR_WORKUNIT_DEFAULT_MODEL == "$name")
 							{
 								print img_picto($langs->trans("Default"), 'on');
 							}

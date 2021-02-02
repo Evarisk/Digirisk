@@ -103,10 +103,10 @@ class DigiriskElement extends CommonObject
 		'fk_user_creat' => array('type'=>'integer:User:user/class/user.class.php', 'label'=>'UserAuthor', 'enabled'=>'1', 'position'=>510, 'notnull'=>1, 'visible'=>-2, 'foreignkey'=>'user.rowid',),
 		'fk_user_modif' => array('type'=>'integer:User:user/class/user.class.php', 'label'=>'UserModif', 'enabled'=>'1', 'position'=>511, 'notnull'=>-1, 'visible'=>-2,),
 		'import_key' => array('type'=>'varchar(14)', 'label'=>'ImportId', 'enabled'=>'1', 'position'=>1000, 'notnull'=>-1, 'visible'=>-2,),
-		'status' => array('type'=>'smallint', 'label'=>'Status', 'enabled'=>'1', 'position'=>1000, 'notnull'=>1, 'visible'=>1, 'index'=>1, 'arrayofkeyval'=>array('0'=>'Brouillon', '1'=>'Valid&eacute;', '9'=>'Annul&eacute;'),),
+		'status' => array('type'=>'smallint', 'label'=>'Status', 'enabled'=>'1', 'position'=>1000, 'notnull'=>0, 'visible'=>1, 'index'=>1,),
 		'element_type' => array('type'=>'varchar(50)', 'label'=>'ElementType', 'enabled'=>'1', 'position'=>1010, 'notnull'=>-1, 'visible'=>1,),
-		'fk_parent' => array('type'=>'integer', 'label'=>'ParentElement', 'enabled'=>'1', 'position'=>1020, 'notnull'=>-1, 'visible'=>1,),
-		'entity' => array('type'=>'integer', 'label'=>'Entity', 'enabled'=>'1', 'position'=>20, 'notnull'=>1, 'visible'=>0,),
+		'fk_parent' => array('type'=>'integer', 'label'=>'ParentElement', 'enabled'=>'1', 'position'=>1020, 'notnull'=>1, 'visible'=>1, 'default'=>0,),
+		'model_pdf' => array('type'=>'varchar(255)', 'label'=>'Model pdf', 'enabled'=>'1', 'position'=>1030, 'notnull'=>-1, 'visible'=>0,),
 	);
 	public $rowid;
 	public $ref;
@@ -120,7 +120,7 @@ class DigiriskElement extends CommonObject
 	public $status;
 	public $element_type;
 	public $fk_parent;
-	public $entity;
+	public $model_pdf;
 	// END MODULEBUILDER PROPERTIES
 
 
@@ -389,7 +389,6 @@ class DigiriskElement extends CommonObject
 		if (!empty($limit)) {
 			$sql .= ' '.$this->db->plimit($limit, $offset);
 		}
-
 		$resql = $this->db->query($sql);
 		if ($resql) {
 			$num = $this->db->num_rows($resql);
@@ -972,7 +971,7 @@ class DigiriskElement extends CommonObject
 	 */
 	public function generateDocument($modele, $outputlangs, $hidedetails = 0, $hidedesc = 0, $hideref = 0, $moreparams = null)
 	{
-		global $conf, $langs;
+		global $conf, $langs, $user;
 
 		$result = 0;
 		$includedocgeneration = 1;
@@ -993,6 +992,15 @@ class DigiriskElement extends CommonObject
 
 		if ($includedocgeneration) {
 			$result = $this->commonGenerateDocument($modelpath, $modele, $outputlangs, $hidedetails, $hidedesc, $hideref, $moreparams);
+		}
+
+		switch ($this->element_type) {
+			case 'groupment':
+				$trigger = $this->call_trigger('GROUPMENT_GENERATE', $user);
+				break;
+			case 'workunit':
+				$trigger = $this->call_trigger('WORKUNIT_GENERATE', $user);
+				break;
 		}
 
 		return $result;
@@ -1097,7 +1105,7 @@ class DigiriskElement extends CommonObject
 
 		<?php //Body navigation digirisk
 		$object = new DigiriskElement($this->db);
-		$objects = $object->fetchAll(); ?>
+		$objects = $object->fetch_all(); ?>
 
 		<div id="id-container" class="id-container">
 			<div class="side-nav" style="width: 500px; display: block">
@@ -1106,9 +1114,9 @@ class DigiriskElement extends CommonObject
 						<div class="navigation-container">
 							<div class="society-header">
 								<span class="icon fas fa-building fa-fw"></span>
-								<div class="title">
-									<?php echo $conf->global->MAIN_INFO_SOCIETE_NOM ?>
-								</div>
+									<div class="title">
+										<a href="digiriskelement_card.php"><?php echo $conf->global->MAIN_INFO_SOCIETE_NOM ?></a>
+									</div>
 								<div class="add-container">
 									<a href="digiriskelement_card.php?action=create&element_type=groupment">
 										<div class="wpeo-button button-square-50 wpeo-tooltip-event" data-direction="bottom" data-color="light" aria-label="<?php echo $langs->trans('NewGroupment'); ?>"><span class="button-icon fas fa-home"></span><span class="button-add animated fas fa-plus-circle"></span></div>
@@ -1132,43 +1140,67 @@ class DigiriskElement extends CommonObject
 							</div>
 							<ul class="workunit-list">
 								<?php if( !empty( $objects ) ) {
-									foreach( $objects as $element ) { ?>
-										<li class="unit <?php //echo ( $society->ID === $selected_society_id ) ? 'active' : ''; echo ( \eoxia\Post_Util::is_parent( $society->ID, $selected_society_id ) ) ? 'toggled' : ''; ?>"
-											data-id="<?php //echo esc_attr( $society->ID ); ?>">
-											<div class="unit-container">
-												<?php
-												// && \eoxia\Post_Util::have_child( $society->ID, array( 'digi-group', 'digi-workunit' ) )
-												if ( $element->element_type == 'groupment' ) { ?>
-													<div class="toggle-unit">
-														<i class="toggle-icon fas fa-chevron-right"></i>
-													</div>
-												<?php } else { ?>
-													<div class="spacer"></div>
-												<?php } ?>
+									foreach ($objects as $all_elements) {
+										foreach ($all_elements as $element) { ?>
+											<li class="unit <?php //echo ( $society->ID === $selected_society_id ) ? 'active' : ''; echo ( \eoxia\Post_Util::is_parent( $society->ID, $selected_society_id ) ) ? 'toggled' : ''; ?>"
+												data-id="<?php //echo esc_attr( $society->ID ); ?>">
+												<div class="unit-container">
+													<?php
+													// && \eoxia\Post_Util::have_child( $society->ID, array( 'digi-group', 'digi-workunit' ) )
+													if ($element->element_type == 'groupment') { ?>
+														<div class="toggle-unit">
+															<i class="toggle-icon fas fa-chevron-right"></i>
+														</div>
+													<?php } else { ?>
+														<div class="spacer"></div>
+													<?php } ?>
 
-												<div class="title">
+													<div class="title">
 													<span class="title-container">
 														<span class="ref"><?php echo $element->ref; ?></span>
 														<span class="name"><?php echo $element->getNomUrl(); ?></span>
 													</span>
-												</div>
+													</div>
 
-												<?php if ( $element->element_type == 'groupment' ) { ?>
-													<div class="add-container">
-														<div class="wpeo-button button-square-50 wpeo-tooltip-event" data-direction="bottom" data-color="light" aria-label="<?php echo $langs->trans('NewGroupment'); ?>"><span class="button-icon dashicons dashicons-admin-multisite"></span><span class="button-add animated fas fa-plus-circle"></span></div>
-														<div class="wpeo-button button-square-50 wpeo-tooltip-event" data-direction="bottom" data-color="light" aria-label="<?php echo $langs->trans('NewWorkunit'); ?>"><span class="button-icon dashicons dashicons-admin-home"></span><span class="button-add animated fas fa-plus-circle"></span></div>
-													</div>
-													<div class="mobile-add-container wpeo-dropdown dropdown-right option">
-														<div class="dropdown-toggle"><i class="action fas fa-ellipsis-v"></i></div>
-														<ul class="dropdown-content">
-															<li class="dropdown-item" data-type="Group_Class"><i class="icon dashicons dashicons-admin-multisite"></i><?php echo $langs->trans('NewGroupment'); ?></li>
-															<li class="dropdown-item" data-type="Workunit_Class"><i class="icon dashicons dashicons-admin-home"></i><?php echo $langs->trans('NewWorkunit'); ?></li>
-														</ul>
-													</div>
-												<?php } ?>
-											</div>
-										</li>
-									<?php }
+													<?php if ($element->element_type == 'groupment') { ?>
+														<div class="add-container">
+															<a href="digiriskelement_card.php?action=create&element_type=groupment&fk_parent=<?php echo $element->id; ?>">
+																<div
+																	class="wpeo-button button-square-50 wpeo-tooltip-event"
+																	data-direction="bottom" data-color="light"
+																	aria-label="<?php echo $langs->trans('NewGroupment'); ?>">
+																	<span class="button-icon fas fa-home"></span><span
+																		class="button-add animated fas fa-plus-circle"></span>
+																</div>
+															</a>
+															<a href="digiriskelement_card.php?action=create&element_type=workunit&fk_parent=<?php echo $element->id; ?>">
+																<div
+																	class="wpeo-button button-square-50 wpeo-tooltip-event"
+																	data-direction="bottom" data-color="light"
+																	aria-label="<?php echo $langs->trans('NewWorkunit'); ?>">
+																	<span class="button-icon fas fa-home"></span><span
+																		class="button-add animated fas fa-plus-circle"></span>
+																</div>
+															</a>
+														</div>
+														<div
+															class="mobile-add-container wpeo-dropdown dropdown-right option">
+															<div class="dropdown-toggle"><i
+																	class="action fas fa-ellipsis-v"></i></div>
+															<ul class="dropdown-content">
+																<li class="dropdown-item" data-type="Group_Class"><i
+																		class="icon dashicons dashicons-admin-multisite"></i><?php echo $langs->trans('NewGroupment'); ?>
+																</li>
+																<li class="dropdown-item" data-type="Workunit_Class"><i
+																		class="icon dashicons dashicons-admin-home"></i><?php echo $langs->trans('NewWorkunit'); ?>
+																</li>
+															</ul>
+														</div>
+													<?php } ?>
+												</div>
+											</li>
+										<?php }
+									}
 								} ?>
 							</ul>
 						</div>
@@ -1185,6 +1217,21 @@ class DigiriskElement extends CommonObject
 			return;
 		}
 		main_area($title);
+	}
+
+	public function fetch_all( $fk_parent = 0, $objectsAll = array()) {
+		$object = new DigiriskElement($this->db);
+		$objects = $object->fetchAll('', '', 0, 0, array( "customsql" => "`fk_parent` = $fk_parent" ));
+
+		$objectsAll[ $fk_parent ] = $objects;
+
+		if ( ! empty( $objects ) ) {
+			foreach ( $objects as $element ) {
+				$objectsAll = $this->fetch_all( $element->id, $objectsAll );
+			}
+		}
+
+		return $objectsAll;
 	}
 }
 

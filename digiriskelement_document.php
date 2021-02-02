@@ -105,7 +105,7 @@ $form = new Form($db);
 $title = $langs->trans("DigiriskElement").' - '.$langs->trans("Files");
 $help_url = '';
 //$help_url='EN:Module_Third_Parties|FR:Module_Tiers|ES:Empresas';
-llxHeader('', $title, $help_url);
+$object->digiriskHeader('', $title, $help_url);
 
 if ($object->id)
 {
@@ -127,8 +127,6 @@ if ($object->id)
 
 	// Object card
 	// ------------------------------------------------------------
-	$linkback = '<a href="'.dol_buildpath('/digiriskdolibarr/digiriskelement_list.php', 1).'?restore_lastsearch_values=1'.(!empty($socid) ? '&socid='.$socid : '').'">'.$langs->trans("BackToList").'</a>';
-
 	$morehtmlref = '<div class="refidno">';
 	/*
 	 // Ref customer
@@ -169,7 +167,7 @@ if ($object->id)
 	 }*/
 	$morehtmlref .= '</div>';
 
-	dol_banner_tab($object, 'ref', $linkback, 1, 'ref', 'ref', $morehtmlref);
+	dol_banner_tab($object, 'ref', '', 0, 'ref', 'ref', $morehtmlref);
 
 	print '<div class="fichecenter">';
 

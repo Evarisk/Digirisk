@@ -113,8 +113,8 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->elementtype = 'informationssharing@digiriskdolibarr';
 				$actioncomm->elementid   = $object->id;
 				$actioncomm->code 		 = 'AC_INFORMATIONSSHARING_GENERATE';
-				$actioncomm->type_code 		 = 'AC_OTH_AUTO';
-				$actioncomm->label			 = $langs->trans('InformationsSharingGeneratedWithDolibarr');
+				$actioncomm->type_code 	 = 'AC_OTH_AUTO';
+				$actioncomm->label		 = $langs->trans('InformationsSharingGeneratedWithDolibarr');
 				$actioncomm->datep		 = $now;
 				$actioncomm->fk_element  = $object->id;
 				$actioncomm->userownerid = $user->id;
@@ -132,8 +132,8 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->elementtype = 'legaldisplay@digiriskdolibarr';
 				$actioncomm->elementid   = $object->id;
 				$actioncomm->code 		 = 'AC_LEGALDISPLAY_GENERATE';
-				$actioncomm->type_code 		 = 'AC_OTH_AUTO';
-				$actioncomm->label			 = $langs->trans('LegalDisplayGeneratedWithDolibarr');
+				$actioncomm->type_code 	 = 'AC_OTH_AUTO';
+				$actioncomm->label		 = $langs->trans('LegalDisplayGeneratedWithDolibarr');
 				$actioncomm->datep		 = $now;
 				$actioncomm->fk_element  = $object->id;
 				$actioncomm->userownerid = $user->id;
@@ -151,8 +151,8 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->elementtype = 'firepermit@digiriskdolibarr';
 				$actioncomm->elementid   = $object->id;
 				$actioncomm->code 		 = 'AC_FIREPERMIT_GENERATE';
-				$actioncomm->type_code 		 = 'AC_OTH_AUTO';
-				$actioncomm->label			 = $langs->trans('FirePermitGeneratedWithDolibarr');
+				$actioncomm->type_code 	 = 'AC_OTH_AUTO';
+				$actioncomm->label		 = $langs->trans('FirePermitGeneratedWithDolibarr');
 				$actioncomm->datep		 = $now;
 				$actioncomm->fk_element  = $object->id;
 				$actioncomm->userownerid = $user->id;
@@ -170,8 +170,27 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->elementtype = 'preventionplan@digiriskdolibarr';
 				$actioncomm->elementid   = $object->id;
 				$actioncomm->code 		 = 'AC_PREVENTIONPLAN_GENERATE';
-				$actioncomm->type_code 		 = 'AC_OTH_AUTO';
-				$actioncomm->label			 = $langs->trans('PreventionPlanGeneratedWithDolibarr');
+				$actioncomm->type_code 	 = 'AC_OTH_AUTO';
+				$actioncomm->label		 = $langs->trans('PreventionPlanGeneratedWithDolibarr');
+				$actioncomm->datep		 = $now;
+				$actioncomm->fk_element  = $object->id;
+				$actioncomm->userownerid = $user->id;
+				$actioncomm->percentage = -1;
+
+				$ret = $actioncomm->create($user);
+				break;
+
+			case 'GROUPMENT_GENERATE' :
+				dol_syslog("Trigger '".$this->name."' for action '$action' launched by ".__FILE__.". id=".$object->id);
+				require_once DOL_DOCUMENT_ROOT.'/comm/action/class/actioncomm.class.php';
+				$now = dol_now();
+				$actioncomm = new ActionComm($this->db);
+
+				$actioncomm->elementtype = 'groupment@digiriskdolibarr';
+				$actioncomm->elementid   = $object->id;
+				$actioncomm->code 		 = 'AC_GROUPMENT_GENERATE';
+				$actioncomm->type_code 	 = 'AC_OTH_AUTO';
+				$actioncomm->label		 = $langs->trans('GroupmentGeneratedWithDolibarr');
 				$actioncomm->datep		 = $now;
 				$actioncomm->fk_element  = $object->id;
 				$actioncomm->userownerid = $user->id;
