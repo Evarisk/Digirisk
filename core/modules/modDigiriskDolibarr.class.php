@@ -80,7 +80,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			'theme' => 0,
 			// Set this to relative path of css file if module has its own css file
 			'css' => array(
-				//    '/digiriskdolibarr/css/digiriskdolibarr.css.php',
+				'/digiriskdolibarr/css/digiriskdolibarr.css.php',
 			),
 			// Set this to relative path of js file if module must load a js on all pages
 			'js' => array(
@@ -287,6 +287,27 @@ class modDigiriskdolibarr extends DolibarrModules
 		$this->rights[$r][3] = 1;
 		$this->rights[$r][4] = 'preventionplan';
 		$this->rights[$r][5] = 'delete';
+		$r++;
+
+		/* GP/UT ORGANISATION PERMISSIONS */
+
+		$this->rights[$r][0] = 1050 + $r;
+		$this->rights[$r][1] = $langs->trans('ReadDigiriskElement');
+		$this->rights[$r][3] = 1;
+		$this->rights[$r][4] = 'digiriskelement';
+		$this->rights[$r][5] = 'read';
+		$r++;
+		$this->rights[$r][0] = 1050 + $r;
+		$this->rights[$r][1] = $langs->trans('CreateDigiriskElement');
+		$this->rights[$r][3] = 1;
+		$this->rights[$r][4] = 'digiriskelement';
+		$this->rights[$r][5] = 'write';
+		$r++;
+		$this->rights[$r][0] = 1050 + $r;
+		$this->rights[$r][1] = $langs->trans('DeleteDigiriskElement');
+		$this->rights[$r][3] = 1;
+		$this->rights[$r][4] = 'digiriskelement';
+		$this->rights[$r][5] = 'delete';
 
 		// Main menu entries to add
 		$this->menu = array();
@@ -427,6 +448,34 @@ class modDigiriskdolibarr extends DolibarrModules
 			'mainmenu'=>'digiriskdolibarr',
 			'leftmenu'=>'preventionplancreate',
 			'url'=>'/digiriskdolibarr/preventionplan_card.php' . '?action=create',
+			'langs'=>'digiriskdolibarr@digiriskdolibarr',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
+			'position'=>48520+$r,
+			'enabled'=>'$conf->digiriskdolibarr->enabled',  // Define condition to show or hide menu entry. Use '$conf->digiriskdolibarr->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
+			'perms'=>'1',			                // Use 'perms'=>'$user->rights->digiriskdolibarr->level1->level2' if you want your menu with a permission rules
+			'target'=>'',
+			'user'=>2,				                // 0=Menu for internal users, 1=external users, 2=both
+		);
+		$this->menu[$r++]=array(
+			'fk_menu'=>'fk_mainmenu=digiriskdolibarr',	    // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
+			'type'=>'left',			                // This is a Left menu entry
+			'titre'=>$langs->trans('GP/UT Organisation'),
+			'mainmenu'=>'digiriskdolibarr',
+			'leftmenu'=>'digiriskelement',
+			'url'=>'/digiriskdolibarr/digiriskelement_card.php' . '?id=1',
+			'langs'=>'digiriskdolibarr@digiriskdolibarr',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
+			'position'=>48520+$r,
+			'enabled'=>'$conf->digiriskdolibarr->enabled',  // Define condition to show or hide menu entry. Use '$conf->digiriskdolibarr->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
+			'perms'=>'1',			                // Use 'perms'=>'$user->rights->digiriskdolibarr->level1->level2' if you want your menu with a permission rules
+			'target'=>'',
+			'user'=>2,				                // 0=Menu for internal users, 1=external users, 2=both
+		);
+		$this->menu[$r++]=array(
+			'fk_menu'=>'fk_mainmenu=digiriskdolibarr,fk_leftmenu=digiriskelement',      // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
+			'type'=>'left',			                // This is a Left menu entry
+			'titre'=>$langs->trans('New GP/UT'),
+			'mainmenu'=>'digiriskdolibarr',
+			'leftmenu'=>'digiriskelementcreate',
+			'url'=>'/digiriskdolibarr/digiriskelement_card.php' . '?action=create',
 			'langs'=>'digiriskdolibarr@digiriskdolibarr',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
 			'position'=>48520+$r,
 			'enabled'=>'$conf->digiriskdolibarr->enabled',  // Define condition to show or hide menu entry. Use '$conf->digiriskdolibarr->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
