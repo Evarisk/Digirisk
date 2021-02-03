@@ -18,7 +18,7 @@ CREATE TABLE llx_digiriskdolibarr_digiriskelement(
 	-- BEGIN MODULEBUILDER FIELDS
 	rowid integer AUTO_INCREMENT PRIMARY KEY NOT NULL, 
 	ref varchar(128) NOT NULL, 
-	label varchar(255), 
+	label varchar(255) NOT NULL,
 	description text, 
 	date_creation datetime NOT NULL, 
 	tms timestamp, 
