@@ -30,14 +30,14 @@
 
 dol_include_once('/custom/digiriskdolibarr/lib/files.lib.php');
 dol_include_once('/core/lib/files.lib.php');
-require_once DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/core/modules/digiriskdolibarr/modules_groupment.php';
+require_once DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/core/modules/digiriskdolibarr/modules_workunit.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/company.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/doc.lib.php';
 
 /**
  *	Class to build documents using ODF templates generator
  */
-class doc_groupment_A4_odt extends ModelePDFGroupment
+class doc_workunit_A4_odt extends ModelePDFWorkUnit
 {
 	/**
 	 * Issuer
@@ -70,9 +70,9 @@ class doc_groupment_A4_odt extends ModelePDFGroupment
 		$langs->loadLangs(array("main", "companies"));
 
 		$this->db = $db;
-		$this->name = $langs->trans('DigiriskGroupmentDigiriskTemplate');
+		$this->name = $langs->trans('DigiriskWorkUnitDigiriskTemplate');
 		$this->description = $langs->trans("DocumentModelOdt");
-		$this->scandir = 'DIGIRISKDOLIBARR_GROUPMENT_ADDON_ODT_PATH'; // Name of constant that is used to save list of directories to scan
+		$this->scandir = 'DIGIRISKDOLIBARR_WORKUNIT_ADDON_ODT_PATH'; // Name of constant that is used to save list of directories to scan
 
 		// Page size for A4 format
 		$this->type = 'odt';
@@ -108,13 +108,13 @@ class doc_groupment_A4_odt extends ModelePDFGroupment
 		$texte .= '<form action="'.$_SERVER["PHP_SELF"].'" method="POST">';
 		$texte .= '<input type="hidden" name="token" value="'.newToken().'">';
 		$texte .= '<input type="hidden" name="action" value="setModuleOptions">';
-		$texte .= '<input type="hidden" name="param1" value="DIGIRISKDOLIBARR_GROUPMENT_ADDON_ODT_PATH">';
+		$texte .= '<input type="hidden" name="param1" value="DIGIRISKDOLIBARR_WORKUNIT_ADDON_ODT_PATH">';
 		$texte .= '<table class="nobordernopadding" width="100%">';
 
 		// List of directories area
 		$texte .= '<tr><td>';
 		$texttitle = $langs->trans("ListOfDirectories");
-		$listofdir = explode(',', preg_replace('/[\r\n]+/', ',', trim($conf->global->DIGIRISKDOLIBARR_GROUPMENT_ADDON_ODT_PATH)));
+		$listofdir = explode(',', preg_replace('/[\r\n]+/', ',', trim($conf->global->DIGIRISKDOLIBARR_WORKUNIT_ADDON_ODT_PATH)));
 		$listoffiles = array();
 		foreach ($listofdir as $key=>$tmpdir)
 		{
@@ -138,7 +138,7 @@ class doc_groupment_A4_odt extends ModelePDFGroupment
 		$texte .= $form->textwithpicto($texttitle, $texthelp, 1, 'help', '', 1);
 		$texte .= '<div><div style="display: inline-block; min-width: 100px; vertical-align: middle;">';
 		$texte .= '<textarea class="flat" cols="60" name="value1">';
-		$texte .= $conf->global->DIGIRISKDOLIBARR_GROUPMENT_ADDON_ODT_PATH;
+		$texte .= $conf->global->DIGIRISKDOLIBARR_WORKUNIT_ADDON_ODT_PATH;
 		$texte .= '</textarea>';
 		$texte .= '</div><div style="display: inline-block; vertical-align: middle;">';
 		$texte .= '<input type="submit" class="button" value="'.$langs->trans("Modify").'" name="Button">';
@@ -146,7 +146,7 @@ class doc_groupment_A4_odt extends ModelePDFGroupment
 
 		// Scan directories
 		$nbofiles = count($listoffiles);
-		if (!empty($conf->global->DIGIRISKDOLIBARR_GROUPMENT_ADDON_ODT_PATH))
+		if (!empty($conf->global->DIGIRISKDOLIBARR_WORKUNIT_ADDON_ODT_PATH))
 		{
 			$texte .= $langs->trans("NumberOfModelFilesFound").': <b>';
 			//$texte.=$nbofiles?'<a id="a_'.get_class($this).'" href="#">':'';
@@ -230,7 +230,7 @@ class doc_groupment_A4_odt extends ModelePDFGroupment
 			}
 		}
 
-		$dir = $conf->digiriskdolibarr->multidir_output[isset($object->entity) ? $object->entity : 1] . '/groupment';
+		$dir = $conf->digiriskdolibarr->multidir_output[isset($object->entity) ? $object->entity : 1] . '/workunit';
 		$objectref = dol_sanitizeFileName($object->ref);
 		if (!preg_match('/specimen/i', $objectref)) $dir .= '/' . $objectref;
 

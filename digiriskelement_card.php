@@ -443,7 +443,13 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 			$genallowed = $user->rights->digiriskdolibarr->digiriskelement->read;	// If you can read, you can build the PDF to read content
 			$delallowed = $user->rights->digiriskdolibarr->digiriskelement->create;	// If you can create/edit, you can remove a file on card
 
-			print $formfile->showdocuments('digiriskdolibarr:Groupment',$dir_files, $filedir, $urlsource, $genallowed, $delallowed, $conf->global->DIGIRISKDOLIBARR_GROUPMENT_DEFAULT_MODEL, 1, 0, 0, 28, 0, '', '', '', $langs->defaultlang);
+			if ( $object->element_type == 'groupment' ) {
+				$modulepart = 'digiriskdolibarr:Groupment';
+			} else {
+				$modulepart = 'digiriskdolibarr:WorkUnit';
+			}
+
+			print $formfile->showdocuments($modulepart,$dir_files, $filedir, $urlsource, $genallowed, $delallowed, $conf->global->DIGIRISKDOLIBARR_GROUPMENT_DEFAULT_MODEL, 1, 0, 0, 28, 0, '', '', '', $langs->defaultlang);
 
 		}
 

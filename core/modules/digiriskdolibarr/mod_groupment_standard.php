@@ -97,14 +97,14 @@ class mod_groupment_standard extends ModeleNumRefDigiriskElement
 		}
 		else
 		{
-			dol_syslog("mod_digiriskelement_standard::getNextValue", LOG_DEBUG);
+			dol_syslog("mod_groupment_standard::getNextValue", LOG_DEBUG);
 			return -1;
 		}
 
 		if ($max >= (pow(10, 4) - 1)) $num = $max + 1; // If counter > 9999, we do not format on 4 chars, we take number as it is
 		else $num = sprintf("%s", $max + 1);
 
-		dol_syslog("mod_digiriskelement_standard::getNextValue return ".$this->prefixgroupment.$num);
+		dol_syslog("mod_groupment_standard::getNextValue return ".$this->prefixgroupment.$num);
 		return $this->prefixgroupment.$num;
 	}
 

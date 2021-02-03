@@ -99,7 +99,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			'moduleforexternal' => 0,
 		);
 
-		$this->dirs = array("/digiriskdolibarr/temp", "/ecm/digiriskdolibarr", "/ecm/digiriskdolibarr/legaldisplay", "/ecm/digiriskdolibarr/informationssharing", "/ecm/digiriskdolibarr/firepermit", "/ecm/digiriskdolibarr/preventionplan", "/ecm/digiriskdolibarr/groupment");
+		$this->dirs = array("/digiriskdolibarr/temp", "/ecm/digiriskdolibarr", "/ecm/digiriskdolibarr/legaldisplay", "/ecm/digiriskdolibarr/informationssharing", "/ecm/digiriskdolibarr/firepermit", "/ecm/digiriskdolibarr/preventionplan", "/ecm/digiriskdolibarr/groupment", "/ecm/digiriskdolibarr/workunit");
 
 		// Config pages.
 		$this->config_page_url = array("setup.php@digiriskdolibarr");
@@ -156,7 +156,11 @@ class modDigiriskdolibarr extends DolibarrModules
 			32 => array('DIGIRISKDOLIBARR_GROUPMENT_ADDON','chaine', 'mod_groupment_standard' ,'', 1),
 			33 => array('DIGIRISKDOLIBARR_GROUPMENT_DEFAULT_MODEL','chaine', 'groupment_A4_odt' ,'', 1),
 			34 => array('MAIN_AGENDA_ACTIONAUTO_GROUPMENT_CREATE','chaine',1,'', 1),
-			35 => array('MAIN_AGENDA_ACTIONAUTO_WORKUNIT_CREATE','chaine',1,'', 1)
+			35 => array('MAIN_AGENDA_ACTIONAUTO_WORKUNIT_CREATE','chaine',1,'', 1),
+			36 => array('DIGIRISKDOLIBARR_WORKUNIT_ADDON_ODT_PATH','chaine', DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/documents/doctemplates/workunit/' ,'', 1),
+			37 => array('DIGIRISKDOLIBARR_WORKUNIT_CUSTOM_ADDON_ODT_PATH','chaine', DOL_DATA_ROOT . '/ecm/digiriskdolibarr/workunit/' ,'', 1),
+			38 => array('DIGIRISKDOLIBARR_WORKUNIT_ADDON','chaine', 'mod_groupment_standard' ,'', 1),
+			39 => array('DIGIRISKDOLIBARR_WORKUNIT_DEFAULT_MODEL','chaine', 'groupment_A4_odt' ,'', 1)
 		);
 
 		if ( ! isset($conf->digiriskdolibarr ) || ! isset( $conf->digiriskdolibarr->enabled ) ) {

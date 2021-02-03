@@ -199,6 +199,25 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$ret = $actioncomm->create($user);
 				break;
 
+			case 'WORKUNIT_GENERATE' :
+				dol_syslog("Trigger '".$this->name."' for action '$action' launched by ".__FILE__.". id=".$object->id);
+				require_once DOL_DOCUMENT_ROOT.'/comm/action/class/actioncomm.class.php';
+				$now = dol_now();
+				$actioncomm = new ActionComm($this->db);
+
+				$actioncomm->elementtype = 'workunit@digiriskdolibarr';
+				$actioncomm->elementid   = $object->id;
+				$actioncomm->code 		 = 'AC_WORKUNIT_GENERATE';
+				$actioncomm->type_code 	 = 'AC_OTH_AUTO';
+				$actioncomm->label		 = $langs->trans('WorkUnitGeneratedWithDolibarr');
+				$actioncomm->datep		 = $now;
+				$actioncomm->fk_element  = $object->id;
+				$actioncomm->userownerid = $user->id;
+				$actioncomm->percentage = -1;
+
+				$ret = $actioncomm->create($user);
+				break;
+
 			default:
 				dol_syslog("Trigger '".$this->name."' for action '$action' launched by ".__FILE__.". id=".$object->id);
 				break;

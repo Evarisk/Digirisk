@@ -338,7 +338,7 @@ foreach ($dirmodels as $reldir)
 	}
 }
 /*
- *  Documents models for Legal Display
+ *  Documents models for Work Unit
  */
 
 print load_fiche_titre($langs->trans("DigiriskTemplateDocumentWorkUnit"), '', '');
