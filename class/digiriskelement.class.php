@@ -24,6 +24,7 @@
 
 // Put here all includes required by your class file
 require_once DOL_DOCUMENT_ROOT.'/core/class/commonobject.class.php';
+require_once DOL_DOCUMENT_ROOT.'/core/lib/files.lib.php';
 //require_once DOL_DOCUMENT_ROOT . '/societe/class/societe.class.php';
 //require_once DOL_DOCUMENT_ROOT . '/product/class/product.class.php';
 
@@ -1087,12 +1088,7 @@ class DigiriskElement extends CommonObject
 				</div>
 				<div class="topnav-right">
 					<div class="login_block_other">
-						<input type="text" id="search" name="search" onkeyup="Search2(<?php echo $keyCodeForEnter; ?>);"  placeholder="<?php echo $langs->trans("Search"); ?>" autofocus>
-						<a onclick="ClearSearch();"><span class="fa fa-backspace"></span></a>
 						<a onclick="window.location.href='<?php echo DOL_URL_ROOT; ?>';"><span class="fas fa-home"></span></a>
-						<?php if (empty($conf->dol_use_jmobile)) { ?>
-							<a onclick="FullScreen();"><span class="fa fa-expand-arrows-alt"></span></a>
-						<?php } ?>
 					</div>
 					<div class="login_block_user">
 						<?php print top_menu_user(1, DOL_URL_ROOT.'/user/logout.php'); ?>
@@ -1104,8 +1100,9 @@ class DigiriskElement extends CommonObject
 
 
 		<?php //Body navigation digirisk
-		$object = new DigiriskElement($this->db);
-		$objects = $object->fetch_all(); ?>
+		$object  = new DigiriskElement($this->db);
+		$objects = $object->fetchAll();
+		$results  = $this->recurse_tree(0,0,$objects) ?>
 
 		<div id="id-container" class="id-container">
 			<div class="side-nav" style="width: 500px; display: block">
@@ -1135,73 +1132,12 @@ class DigiriskElement extends CommonObject
 								<div class="close-popup"><i class="icon fas fa-times"></i></div>
 							</div>
 							<div class="toolbar">
-								<div class="toggle-plus tooltip hover" aria-label="<?php echo$langs->trans('UnwrapAll'); ?>"><span class="icon fas fa-plus-square"></span></div>
-								<div class="toggle-minus tooltip hover" aria-label="<?php echo$langs->trans('WrapAll'); ?>"><span class="icon fas fa-minus-square"></span></div>
+								<div class="toggle-plus tooltip hover" aria-label="<?php echo $langs->trans('UnwrapAll'); ?>"><span class="icon fas fa-plus-square"></span></div>
+								<div class="toggle-minus tooltip hover" aria-label="<?php echo $langs->trans('WrapAll'); ?>"><span class="icon fas fa-minus-square"></span></div>
 							</div>
+
 							<ul class="workunit-list">
-								<?php if( !empty( $objects ) ) {
-									foreach ($objects as $element) { ?>
-										<li class="unit <?php //echo ( $society->ID === $selected_society_id ) ? 'active' : ''; echo ( \eoxia\Post_Util::is_parent( $society->ID, $selected_society_id ) ) ? 'toggled' : ''; ?>"
-											data-id="<?php //echo esc_attr( $society->ID ); ?>">
-											<div class="unit-container">
-												<?php $width = 50; $cssclass = 'photoref';
-												print '<span class="floatleft inline-block valignmiddle divphotoref">'.$element->show_photos('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity].'/workunit', 'small', 5, 0, 0, 0, $width, 0).'</span>'; ?>
-												<?php
-												// && \eoxia\Post_Util::have_child( $society->ID, array( 'digi-group', 'digi-workunit' ) )
-												if ($element->element_type == 'groupment') { ?>
-													<div class="toggle-unit">
-														<i class="toggle-icon fas fa-chevron-right"></i>
-													</div>
-												<?php } else { ?>
-													<div class="spacer"></div>
-												<?php } ?>
-
-												<div class="title">
-												<span class="title-container">
-													<span class="ref"><?php echo $element->ref; ?></span>
-													<span class="name"><?php echo $element->getNomUrl(); ?></span>
-												</span>
-												</div>
-
-												<?php if ($element->element_type == 'groupment') { ?>
-													<div class="add-container">
-														<a href="digiriskelement_card.php?action=create&element_type=groupment&fk_parent=<?php echo $element->id; ?>">
-															<div
-																class="wpeo-button button-square-50 wpeo-tooltip-event"
-																data-direction="bottom" data-color="light"
-																aria-label="<?php echo $langs->trans('NewGroupment'); ?>">
-																<span class="button-icon fas fa-home"></span><span
-																	class="button-add animated fas fa-plus-circle"></span>
-															</div>
-														</a>
-														<a href="digiriskelement_card.php?action=create&element_type=workunit&fk_parent=<?php echo $element->id; ?>">
-															<div
-																class="wpeo-button button-square-50 wpeo-tooltip-event"
-																data-direction="bottom" data-color="light"
-																aria-label="<?php echo $langs->trans('NewWorkunit'); ?>">
-																<span class="button-icon fas fa-home"></span><span
-																	class="button-add animated fas fa-plus-circle"></span>
-															</div>
-														</a>
-													</div>
-													<div
-														class="mobile-add-container wpeo-dropdown dropdown-right option">
-														<div class="dropdown-toggle"><i
-																class="action fas fa-ellipsis-v"></i></div>
-														<ul class="dropdown-content">
-															<li class="dropdown-item" data-type="Group_Class"><i
-																	class="icon dashicons dashicons-admin-multisite"></i><?php echo $langs->trans('NewGroupment'); ?>
-															</li>
-															<li class="dropdown-item" data-type="Workunit_Class"><i
-																	class="icon dashicons dashicons-admin-home"></i><?php echo $langs->trans('NewWorkunit'); ?>
-															</li>
-														</ul>
-													</div>
-												<?php } ?>
-											</div>
-										</li>
-									<?php }
-								} ?>
+								<?php $this->display_recurse_tree($results) ?>
 							</ul>
 						</div>
 					</div>
@@ -1219,53 +1155,80 @@ class DigiriskElement extends CommonObject
 		main_area($title);
 	}
 
-	public function fetch_all( $fk_parent = 0, $objectsAll = array()) {
-		$object = new DigiriskElement($this->db);
-		$objects = $object->fetchAll();
-
-		if ( ! empty( $objects ) ) {
-			foreach ( $objects as $element ) {
-				$objects_children = $object->fetchAll('', '', 0, 0, array( "customsql" => "`fk_parent` = $element->id" ));
-				$objects_All[$element->id] = $element;
-				foreach ($objects_children as $element_children) {
-					$objects_All[$element_children->id] = $element_children;
-				}
+	function recurse_tree($parent, $niveau, $array) {
+		$result = array();
+		foreach ($array as $noeud) {
+			if ($parent == $noeud->fk_parent) {
+				$result[$noeud->id] = array(
+					'id'       => $noeud->id,
+					'object'   => $noeud,
+					'children' => $this->recurse_tree($noeud->id, ($niveau + 1), $array),
+				);
 			}
 		}
-
-		return $objects_All;
+		return $result;
 	}
-}
 
+	function display_recurse_tree($results) {
+		global $conf, $langs;
 
-
-
-
-
-
-
-
-
-/**
- * Class DigiriskElementLine. You can also remove this and generate a CRUD class for lines objects.
- */
-class DigiriskElementLine
-{
-	// To complete with content of an object DigiriskElementLine
-	// We should have a field rowid, fk_digiriskelement and position
-
-	/**
-	 * @var int  Does object support extrafields ? 0=No, 1=Yes
-	 */
-	public $isextrafieldmanaged = 0;
-
-	/**
-	 * Constructor
-	 *
-	 * @param DoliDb $db Database handler
-	 */
-	public function __construct(DoliDB $db)
-	{
-		$this->db = $db;
+		if ( !empty( $results ) ) {
+			foreach ($results as $element) { ?>
+				<li class="unit<?php //echo ( $society->ID === $selected_society_id ) ? 'active' : ''; echo ( \eoxia\Post_Util::is_parent( $society->ID, $selected_society_id ) ) ? 'toggled' : ''; ?>" data-id="<?php //echo esc_attr( $society->ID ); ?>">
+					<div class="unit-container">
+						<?php if ($element['object']->element_type == 'groupment' && count($element['children'])) { ?>
+							<div class="toggle-unit">
+								<i class="toggle-icon fas fa-chevron-right"></i>
+							</div>
+						<?php } else { ?>
+							<div class="spacer"></div>
+						<?php } ?>
+						<?php $filearray = dol_dir_list($conf->digiriskdolibarr->multidir_output[$conf->entity].'/'.$element['object']->element_type.'/'.$element['object']->ref.'/', "files", 0, '', '(\.odt|_preview.*\.png)$', 'position_name', 'asc', 1);
+						if (count($filearray)) {
+							print '<span class="floatleft inline-block valignmiddle divphotoref">'.$element['object']->show_photos('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity].'/'.$element['object']->element_type, 'small', 1, 0, 0, 0, 50, 0, 0, 0, 0, $element['object']->element_type).'</span>';
+						} else {
+							$nophoto = '/public/theme/common/nophoto.png'; ?>
+							<span class="floatleft inline-block valignmiddle divphotoref"><img class="photodigiriskdolibarr" alt="No photo" src="<?php echo DOL_URL_ROOT.$nophoto ?>"></span>
+						<?php } ?>
+						<div class="title">
+							<span class="title-container">
+								<span class="ref"><?php echo $element['object']->ref; ?></span>
+								<span class="name"><?php echo $element['object']->getNomUrl(); ?></span>
+							</span>
+						</div>
+						<?php if ($element['object']->element_type == 'groupment') { ?>
+							<div class="add-container">
+								<a href="digiriskelement_card.php?action=create&element_type=groupment&fk_parent=<?php echo $element['object']->id; ?>">
+									<div
+										class="wpeo-button button-square-50 wpeo-tooltip-event"
+										data-direction="bottom" data-color="light"
+										aria-label="<?php echo $langs->trans('NewGroupment'); ?>">
+										<span class="button-icon fas fa-home"></span>
+										<span class="button-add animated fas fa-plus-circle"></span>
+									</div>
+								</a>
+								<a href="digiriskelement_card.php?action=create&element_type=workunit&fk_parent=<?php echo $element['object']->id; ?>">
+									<div
+										class="wpeo-button button-square-50 wpeo-tooltip-event"
+										data-direction="bottom" data-color="light"
+										aria-label="<?php echo $langs->trans('NewWorkunit'); ?>">
+										<span class="button-icon fas fa-home"></span>
+										<span class="button-add animated fas fa-plus-circle"></span>
+									</div>
+								</a>
+							</div>
+							<div class="mobile-add-container wpeo-dropdown dropdown-right option">
+								<div class="dropdown-toggle"><i class="action fas fa-ellipsis-v"></i></div>
+								<ul class="dropdown-content">
+									<li class="dropdown-item" data-type="Group_Class"><i class="icon dashicons dashicons-admin-multisite"></i><?php echo $langs->trans('NewGroupment'); ?></li>
+									<li class="dropdown-item" data-type="Workunit_Class"><i class="icon dashicons dashicons-admin-home"></i><?php echo $langs->trans('NewWorkunit'); ?></li>
+								</ul>
+							</div>
+						<?php } ?>
+					</div>
+					<ul class="sub-list"><?php $this->display_recurse_tree($element['children']) ?></ul>
+				</li>
+			<?php }
+		}
 	}
 }
