@@ -134,7 +134,9 @@ if ($object->id > 0)
 	$title = $langs->trans("Agenda");
 	//if (! empty($conf->global->MAIN_HTML_TITLE) && preg_match('/thirdpartynameonly/',$conf->global->MAIN_HTML_TITLE) && $object->name) $title=$object->name." - ".$title;
 	$help_url = 'FR:Module_DigiriskDolibarr';
-	$object->digiriskHeader('', $title, $help_url);
+	$morejs = array("/digiriskdolibarr/js/digiriskdolibarr.js.php");
+
+	$object->digiriskHeader('', $title, $help_url, '', '', '', $morejs);
 
 	if (!empty($conf->notification->enabled)) $langs->load("mails");
 	$head = digiriskelementPrepareHead($object);
@@ -144,14 +146,12 @@ if ($object->id > 0)
 
 	// Object card
 	// ------------------------------------------------------------
-	$linkback = '<a href="'.dol_buildpath('/digiriskdolibarr/digiriskelement_list.php', 1).'?restore_lastsearch_values=1'.(!empty($socid) ? '&socid='.$socid : '').'">'.$langs->trans("BackToList").'</a>';
-
 	$morehtmlref = '<div class="refidno">';
-
 	$morehtmlref .= '</div>';
+	$width = 80; $cssclass = 'photoref';
+	$morehtmlleft .= '<div class="floatleft inline-block valignmiddle divphotoref">'.$object->show_photos('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$entity].'/'.$object->element_type, 'small', 5, 0, 0, 0, $width, 0, 0, 0,0, $object->element_type).'</div>';
 
-
-	dol_banner_tab($object, 'ref', $linkback, 1, 'ref', 'ref', $morehtmlref);
+	dol_banner_tab($object, 'ref', '', 0, 'ref', 'ref', $morehtmlref, '', 0, $morehtmlleft);
 
 	print '<div class="fichecenter">';
 	print '<div class="underbanner clearboth"></div>';

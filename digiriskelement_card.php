@@ -162,10 +162,25 @@ $form 		 = new Form($db);
 $formfile 	 = new FormFile($db);
 $formproject = new FormProjets($db);
 
-$title 	  = $langs->trans("DigiriskElement");
+if ( $object->element_type == 'groupment' ) {
+	$title = $langs->trans("Groupment");
+	$title_create = $langs->trans("NewGroupment");
+	$title_edit = $langs->trans("ModifyGroupment");
+} else if ( $object->element_type == 'workunit' ) {
+	$title = $langs->trans("WorkUnit");
+	$title_create = $langs->trans("NewWorkUnit");
+	$title_edit = $langs->trans("ModifyWorkUnit");
+	$object->picto = 'workunit@digiriskdolibarr';
+} else {
+	$title_create = $langs->trans("NewDigiriskElement");
+}
+
 $help_url = 'FR:Module_DigiriskDolibarr';
 
-$object->digiriskHeader('', $title, $help_url);
+
+$morejs = array("/digiriskdolibarr/js/digiriskdolibarr.js.php");
+
+$object->digiriskHeader('', $title, $help_url, '', '', '', $morejs);
 
 // Example : Adding jquery code
 print '<script type="text/javascript" language="javascript">
@@ -186,7 +201,7 @@ jQuery(document).ready(function() {
 // Part to create
 if ($action == 'create')
 {
-	print load_fiche_titre($langs->trans("NewDigiriskElement"), '', 'object_'.$object->picto);
+	print load_fiche_titre($title_create, '', 'object_'.$object->picto, '', '', 'digitest');
 
 	print '<form method="POST" action="'.$_SERVER["PHP_SELF"].'">';
 	print '<input type="hidden" name="token" value="'.newToken().'">';
@@ -236,7 +251,7 @@ if ($action == 'create')
 // Part to edit record
 if (($id || $ref) && $action == 'edit')
 {
-	print load_fiche_titre($langs->trans("DigiriskElement"), '', 'object_'.$object->picto);
+	print load_fiche_titre($title_edit, '', 'object_'.$object->picto, '', '', 'digitest');
 
 	print '<form method="POST" action="'.$_SERVER["PHP_SELF"].'">';
 	print '<input type="hidden" name="token" value="'.newToken().'">';
@@ -272,6 +287,7 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 	$res = $object->fetch_optionals();
 
 	$head = digiriskelementPrepareHead($object);
+
 	dol_fiche_head($head, 'card', $langs->trans("DigiriskElement"), -1, $object->picto);
 
 	$formconfirm = '';
@@ -315,8 +331,10 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 
 	$morehtmlref = '<div class="refidno">';
 	$morehtmlref .= '</div>';
+	$width = 80; $cssclass = 'photoref';
+	$morehtmlleft .= '<div class="floatleft inline-block valignmiddle divphotoref">'.$object->show_photos('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$entity].'/'.$object->element_type, 'small', 5, 0, 0, 0, $width,0, 0, 0, 0, $object->element_type).'</div>';
 
-	dol_banner_tab($object, 'ref', '', 0, 'ref', 'ref', $morehtmlref);
+	dol_banner_tab($object, 'ref', '', 0, 'ref', 'ref', $morehtmlref, '', 0, $morehtmlleft);
 
 	print '<div class="fichecenter">';
 	print '<div class="fichehalfleft">';
@@ -400,6 +418,16 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 
 		if (empty($reshook))
 		{
+			// Modify
+			if ($permissiontoadd)
+			{
+				print '<a class="butAction" href="'.$_SERVER["PHP_SELF"].'?id='.$object->id.'&action=edit">'.$langs->trans("Modify").'</a>'."\n";
+			}
+			else
+			{
+				print '<a class="butActionRefused classfortooltip" href="#" title="'.dol_escape_htmltag($langs->trans("NotEnoughPermissions")).'">'.$langs->trans('Modify').'</a>'."\n";
+			}
+
 			// Send
 			if (empty($user->socid)) {
 				print '<a class="butAction" href="'.$_SERVER["PHP_SELF"].'?id='.$object->id.'&action=presend&mode=init#formmailbeforetitle">'.$langs->trans('SendMail').'</a>'."\n";
@@ -454,8 +482,8 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 		}
 
 		// Show links to link elements
-		$linktoelem = $form->showLinkToObjectBlock($object, null, array('digiriskelement'));
-		$somethingshown = $form->showLinkedObjectBlock($object, $linktoelem);
+		//$linktoelem = $form->showLinkToObjectBlock($object, null, array('digiriskelement'));
+		//$somethingshown = $form->showLinkedObjectBlock($object, $linktoelem);
 
 		print '</div><div class="fichehalfright"><div class="ficheaddleft">';
 

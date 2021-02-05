@@ -78,7 +78,7 @@ $extrafields->fetch_name_optionals_label($object->table_element);
 include DOL_DOCUMENT_ROOT.'/core/actions_fetchobject.inc.php'; // Must be include, not include_once  // Must be include, not include_once. Include fetch and fetch_thirdparty but not fetch_optionals
 
 //if ($id > 0 || ! empty($ref)) $upload_dir = $conf->digiriskdolibarr->multidir_output[$object->entity?$object->entity:$conf->entity] . "/digiriskelement/" . dol_sanitizeFileName($object->id);
-if ($id > 0 || !empty($ref)) $upload_dir = $conf->digiriskdolibarr->multidir_output[$object->entity ? $object->entity : $conf->entity]."/workunit/".dol_sanitizeFileName($object->ref);
+if ($id > 0 || !empty($ref)) $upload_dir = $conf->digiriskdolibarr->multidir_output[$object->entity ? $object->entity : $conf->entity]."/".$object->element_type."/".dol_sanitizeFileName($object->ref);
 
 // Security check - Protection if external user
 //if ($user->socid > 0) accessforbidden();
@@ -105,7 +105,9 @@ $form = new Form($db);
 $title = $langs->trans("DigiriskElement").' - '.$langs->trans("Files");
 $help_url = '';
 //$help_url='EN:Module_Third_Parties|FR:Module_Tiers|ES:Empresas';
-$object->digiriskHeader('', $title, $help_url);
+$morejs = array("/digiriskdolibarr/js/digiriskdolibarr.js.php");
+
+$object->digiriskHeader('', $title, $help_url, '', '', '', $morejs);
 
 if ($object->id)
 {
@@ -166,14 +168,8 @@ if ($object->id)
 	 }
 	 }*/
 	$width = 80; $cssclass = 'photoref';
-	$object->element = 'workunit';
-
-
-	$morehtmlleft .= '<div class="floatleft inline-block valignmiddle divphotoref">'.$object->show_photos('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$entity].'/workunit', 'small', 5, 0, 0, 0, $width, 0).'</div>';
-
-
+	$morehtmlleft .= '<div class="floatleft inline-block valignmiddle divphotoref">'.$object->show_photos('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$entity].'/'.$object->element_type, 'small', 5, 0, 0, 0, $width, 0, 0, 0, 0, $object->element_type).'</div>';
 	$morehtmlref .= '</div>';
-
 
 	dol_banner_tab($object, 'ref', '', 0, 'ref', 'ref', $morehtmlref, '', 0, $morehtmlleft);
 
@@ -202,7 +198,7 @@ if ($object->id)
 	$param = '&id='.$object->id;
 
 	//$relativepathwithnofile='digiriskelement/' . dol_sanitizeFileName($object->id).'/';
-	$relativepathwithnofile = 'workunit/'.dol_sanitizeFileName($object->ref).'/';
+	$relativepathwithnofile = $object->element_type.'/'.dol_sanitizeFileName($object->ref).'/';
 
 	include_once DOL_DOCUMENT_ROOT.'/core/tpl/document_actions_post_headers.tpl.php';
 }
