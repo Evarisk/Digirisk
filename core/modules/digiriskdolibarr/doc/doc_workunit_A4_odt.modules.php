@@ -70,7 +70,7 @@ class doc_workunit_A4_odt extends ModelePDFWorkUnit
 		$langs->loadLangs(array("main", "companies"));
 
 		$this->db = $db;
-		$this->name = $langs->trans('DigiriskWorkUnitDigiriskTemplate');
+		$this->name = $langs->trans('WorkUnitDigiriskTemplate');
 		$this->description = $langs->trans("DocumentModelOdt");
 		$this->scandir = 'DIGIRISKDOLIBARR_WORKUNIT_ADDON_ODT_PATH'; // Name of constant that is used to save list of directories to scan
 

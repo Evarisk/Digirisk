@@ -84,7 +84,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			),
 			// Set this to relative path of js file if module must load a js on all pages
 			'js' => array(
-				//   '/digiriskdolibarr/js/digiriskdolibarr.js.php',
+				'/digiriskdolibarr/js/digiriskdolibarr.js.php',
 			),
 			// Set here all hooks context managed by module. To find available hook context, make a "grep -r '>initHooks(' *" on source code. You can also set hook context to 'all'
 			'hooks' => array(
@@ -469,7 +469,7 @@ class modDigiriskdolibarr extends DolibarrModules
 		$this->menu[$r++]=array(
 			'fk_menu'=>'fk_mainmenu=digiriskdolibarr',	    // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
 			'type'=>'left',			                // This is a Left menu entry
-			'titre'=>$langs->trans('GP/UT Organisation'),
+			'titre'=>$langs->trans('GPUTOrganisation'),
 			'mainmenu'=>'digiriskdolibarr',
 			'leftmenu'=>'digiriskelement',
 			'url'=>'/digiriskdolibarr/digiriskelement_card.php',

@@ -78,7 +78,7 @@ function digiriskdolibarrAdminPrepareHead()
 	$h++;
 
 	$head[$h][0] = dol_buildpath("/digiriskdolibarr/admin/workunit.php", 1);
-	$head[$h][1] = $langs->trans("Workunit");
+	$head[$h][1] = $langs->trans("WorkUnit");
 	$head[$h][2] = 'workunit';
 	$h++;
 

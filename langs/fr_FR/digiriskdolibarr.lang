@@ -42,6 +42,7 @@ DigiriskdolibarrAboutPage = Page à propos de Digiriskdolibarr
 # DigiriskDolibarr
 #
 
+Create = Créer
 CreatedOn = Créé le
 DigiriskDocumentsList = Liste des documents légaux
 NothingToSetupOnThisPage = Aucune configuration n'est nécessaire sur cette page
@@ -167,6 +168,57 @@ DigiriskPreventionPlanStandardModel = Fixe la référence comme étant : "date_h
 DigiriskTemplateDocumentPreventionPlan = Modèle de documents des plans de prévention de Digirisk
 PreventionPlanCustomTemplate = ODT custom des plans de prévention
 PreventionPlanDigiriskTemplate = ODT par défaut des plans de prévention
+
+#
+# Element Digirisk
+#
+
+GPUTOrganisation = Organisation des GP/UT
+
+ReadDigiriskElement = Lire un element digirisk
+CreateDigiriskElement = Créer un element digirisk
+DeleteDigiriskElement = Supprimer un element digirisk
+
+PreventionPlan = Plan de prévention
+NewDigiriskElement = Nouveau element digirisk
+
+#
+# Groupement
+#
+
+GROUPMENT_CREATEInDolibarr = Groupement créée dans Dolibarr
+ActionsOnGroupment = Événements liés au groupement
+GroupmentGeneratedWithDolibarr = Groupement générée avec Dolibarr
+
+Groupment = Groupement
+NewGroupment = Nouveau groupement
+ModifyGroupment = Modifier groupement
+
+DigiriskGroupmentNumberingModule = Modèle de numérotation des groupements de Digirisk
+DigiriskGroupmentStandardModel = Fixe la référence comme étant : "GPn"
+
+DigiriskTemplateDocumentGroupment = Modèle de documents des groupements de Digirisk
+GroupmentPlanCustomTemplate = ODT custom des groupements
+GroupmentDigiriskTemplate = ODT par défaut des groupements
+
+#
+# Unité de travail
+#
+
+WORKUNIT_CREATEInDolibarr = Unité de travail créée dans Dolibarr
+ActionsOnWorkUnit = Événements liés au unité de travail
+WorkUnitGeneratedWithDolibarr = Unité de travail générée avec Dolibarr
+
+WorkUnit = Unité de travail
+NewWorkUnit = Nouvelle unité de travail
+ModifyWorkUnit = Modifier unité de travail
+
+DigiriskWorkUnitNumberingModule = Modèle de numérotation des unités de travail de Digirisk
+DigiriskWorkUnitStandardModel = Fixe la référence comme étant : "UTn"
+
+DigiriskTemplateDocumentPreventionPlan = Modèle de documents des unités de travail de Digirisk
+WorkUnitCustomTemplate = ODT custom des unités de travail
+WorkUnitDigiriskTemplate = ODT par défaut des unités de travail
 
 #
 # Data

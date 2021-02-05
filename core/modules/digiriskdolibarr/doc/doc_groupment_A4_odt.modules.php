@@ -70,7 +70,7 @@ class doc_groupment_A4_odt extends ModelePDFGroupment
 		$langs->loadLangs(array("main", "companies"));
 
 		$this->db = $db;
-		$this->name = $langs->trans('DigiriskGroupmentDigiriskTemplate');
+		$this->name = $langs->trans('GroupmentDigiriskTemplate');
 		$this->description = $langs->trans("DocumentModelOdt");
 		$this->scandir = 'DIGIRISKDOLIBARR_GROUPMENT_ADDON_ODT_PATH'; // Name of constant that is used to save list of directories to scan
 
