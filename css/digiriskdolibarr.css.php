@@ -1001,6 +1001,7 @@ div.mainmenu.digiriskdolibarr {
 
 .wpeo-wrap .navigation-container .unit > .unit-container {
 	padding: 4px 0 0 0;
+	height: 54px;
 }
 
 .wpeo-wrap .navigation-container .unit > .unit-container:hover .title .name {
@@ -5440,6 +5441,8 @@ canvas {
 
 .wpeo-wrap a {
 	background-color: transparent;
+	text-decoration: none;
+	--colortextlink: white;
 }
 
 .wpeo-wrap a:active,
@@ -11264,3 +11267,20 @@ to {
 	z-index: 99999 !important;
 }
 
+li.unit::marker {
+	font-size: 0px;
+}
+
+.photodigiriskdolibarr {
+	background-color: rgb(27,28,35);
+	width: 50px;
+}
+
+.unit-container img.photo.photowithmargin {
+	width: 50px;
+	margin: 0px;
+}
+
+.digitest img {
+	height: 14px;
+}

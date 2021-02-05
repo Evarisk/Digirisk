@@ -59,4 +59,221 @@ else header('Cache-Control: no-cache');
 
 /* Javascript library of module DigiriskDolibarr */
 
+'use strict';
 
+/**
+ * @namespace EO_Framework_Init
+ *
+ * @author Eoxia <dev@eoxia.com>
+ * @copyright 2015-2018 Eoxia
+ */
+
+/*
+
+ */
+
+if ( ! window.eoxiaJS ) {
+
+	/**
+	 * [eoxiaJS description]
+	 *
+	 * @memberof EO_Framework_Init
+	 *
+	 * @type {Object}
+	 */
+	window.eoxiaJS = {};
+
+	/**
+	 * [scriptsLoaded description]
+	 *
+	 * @memberof EO_Framework_Init
+	 *
+	 * @type {Boolean}
+	 */
+	window.eoxiaJS.scriptsLoaded = false;
+}
+
+if ( ! window.eoxiaJS.scriptsLoaded ) {
+
+	/**
+	 * [description]
+	 *
+	 * @memberof EO_Framework_Init
+	 *
+	 * @returns {void} [description]
+	 */
+	window.eoxiaJS.init = function() {
+		window.eoxiaJS.load_list_script();
+	};
+
+	/**
+	 * [description]
+	 *
+	 * @memberof EO_Framework_Init
+	 *
+	 * @returns {void} [description]
+	 */
+	window.eoxiaJS.load_list_script = function() {
+		if ( ! window.eoxiaJS.scriptsLoaded ) {
+			var key = undefined, slug = undefined;
+			for ( key in window.eoxiaJS ) {
+
+				if ( window.eoxiaJS[key].init ) {
+					window.eoxiaJS[key].init();
+				}
+
+				for ( slug in window.eoxiaJS[key] ) {
+
+					if ( window.eoxiaJS[key] && window.eoxiaJS[key][slug] && window.eoxiaJS[key][slug].init ) {
+						window.eoxiaJS[key][slug].init();
+					}
+
+				}
+			}
+
+			window.eoxiaJS.scriptsLoaded = true;
+		}
+	};
+
+	/**
+	 * [description]
+	 *
+	 * @memberof EO_Framework_Init
+	 *
+	 * @returns {void} [description]
+	 */
+	window.eoxiaJS.refresh = function() {
+		var key = undefined;
+		var slug = undefined;
+		for ( key in window.eoxiaJS ) {
+			if ( window.eoxiaJS[key].refresh ) {
+				window.eoxiaJS[key].refresh();
+			}
+
+			for ( slug in window.eoxiaJS[key] ) {
+
+				if ( window.eoxiaJS[key] && window.eoxiaJS[key][slug] && window.eoxiaJS[key][slug].refresh ) {
+					window.eoxiaJS[key][slug].refresh();
+				}
+			}
+		}
+	};
+
+	/**
+	 * [description]
+	 *
+	 * @memberof EO_Framework_Init
+	 *
+	 * @param  {void} cbName [description]
+	 * @param  {void} cbArgs [description]
+	 * @returns {void}        [description]
+	 */
+	window.eoxiaJS.cb = function( cbName, cbArgs ) {
+		var key = undefined;
+		var slug = undefined;
+		for ( key in window.eoxiaJS ) {
+
+			for ( slug in window.eoxiaJS[key] ) {
+
+				if ( window.eoxiaJS[key] && window.eoxiaJS[key][slug] && window.eoxiaJS[key][slug][cbName] ) {
+					window.eoxiaJS[key][slug][cbName](cbArgs);
+				}
+			}
+		}
+	};
+
+	jQuery( document ).ready( window.eoxiaJS.init );
+}
+
+/**
+ * Initialise l'objet "navigation" ainsi que la méthode "init" obligatoire pour la bibliothèque EoxiaJS.
+ *
+ * @since 6.0.0
+ * @version 7.0.0
+ */
+
+window.eoxiaJS.navigation = {};
+
+/**
+ * La méthode appelée automatiquement par la bibliothèque EoxiaJS.
+ *
+ * @return {void}
+ *
+ * @since 6.0.0
+ * @version 6.2.4
+ */
+window.eoxiaJS.navigation.init = function() {
+	window.eoxiaJS.navigation.event();
+};
+
+/**
+ * La méthode contenant tous les évènements pour la navigation.
+ *
+ * @since 6.0.0
+ * @version 6.3.0
+ *
+ * @return {void}
+ */
+window.eoxiaJS.navigation.event = function() {
+	jQuery( document ).on( 'click', '.digirisk-wrap .navigation-container .unit-container .toggle-unit', window.eoxiaJS.navigation.switchToggle );
+	jQuery( document ).on( 'click', '.digirisk-wrap .navigation-container .toolbar div', window.eoxiaJS.navigation.toggleAll );
+};
+
+/**
+ * Gestion du toggle dans la navigation.
+ *
+ * @since 6.3.0
+ * @version 6.3.0
+ *
+ * @param  {MouseEvent} event Les attributs lors du clic.
+ * @return {void}
+ */
+window.eoxiaJS.navigation.switchToggle = function( event ) {
+	event.preventDefault();
+
+	if ( jQuery( this ).find( '.toggle-icon' ).hasClass( 'fa-chevron-down' ) ) {
+		jQuery(this).find( '.toggle-icon' ).removeClass('fa-chevron-down').addClass('fa-chevron-right');
+		jQuery(this).closest('.unit').removeClass('toggled');
+	} else {
+		jQuery(this).find( '.toggle-icon' ).removeClass('fa-chevron-right').addClass('fa-chevron-down');
+		jQuery(this).closest('.unit').addClass('toggled');
+	}
+};
+
+/**
+ * Déplies ou replies tous les éléments enfants
+ *
+ * @since 6.3.0
+ * @version 6.3.0
+ *
+ * @param  {MouseEvent} event Les attributs lors du clic
+ * @return {void}
+ */
+window.eoxiaJS.navigation.toggleAll = function( event ) {
+	event.preventDefault();
+
+	if ( jQuery( this ).hasClass( 'toggle-plus' ) ) {
+		jQuery( '.digirisk-wrap .navigation-container .workunit-list .unit .toggle-icon').removeClass( 'fa-chevron-right').addClass( 'fa-chevron-down' );
+		jQuery( '.digirisk-wrap .navigation-container .workunit-list .unit' ).addClass( 'toggled' );
+	}
+
+	if ( jQuery( this ).hasClass( 'toggle-minus' ) ) {
+		jQuery( '.digirisk-wrap .navigation-container .workunit-list .unit.toggled' ).removeClass( 'toggled' );
+		jQuery( '.digirisk-wrap .navigation-container .workunit-list .unit .toggle-icon').addClass( 'fa-chevron-right').removeClass( 'fa-chevron-down' );
+	}
+};
+
+/**
+ * Ajout la classe 'active' à l'élément.
+ *
+ * @since 6.3.0
+ * @version 6.3.0
+ *
+ * @param  {HTMLDivElement} element L'attribut de l'élement.
+ * @return {boolean}
+ */
+window.eoxiaJS.navigation.setUnitActive = function( element ) {
+	jQuery( '.digirisk-wrap .navigation-container .unit.active' ).removeClass( 'active' );
+	jQuery( element ).closest( '.unit' ).addClass( 'active' );
+	return true;
+};
