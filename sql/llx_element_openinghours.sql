@@ -24,13 +24,13 @@ CREATE TABLE llx_element_openinghours(
 	element_type varchar(50),
 	element_id integer,
 	status integer,
-	day0 varchar(128),
-	day1 varchar(128),
-	day2 varchar(128),
-	day3 varchar(128),
-	day4 varchar(128),
-	day5 varchar(128),
-	day6 varchar(128),
+	monday varchar(128),
+	tuesday varchar(128),
+	wednesday varchar(128),
+	thursday varchar(128),
+	friday varchar(128),
+	saturday varchar(128),
+	sunday varchar(128),
 	entity integer DEFAULT 1
 	-- END MODULEBUILDER FIELDS
 ) ENGINE=innodb;

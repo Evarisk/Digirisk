@@ -117,13 +117,13 @@ if (($action == 'update' && !GETPOST("cancel", 'alpha'))
 	$object->element_type = $societe->element;
 	$object->element_id = GETPOST('id');
 	$object->status = 1;
-	$object->day0 = GETPOST('day0', 'string');
-	$object->day1 = GETPOST('day1', 'string');
-	$object->day2 = GETPOST('day2', 'string');
-	$object->day3 = GETPOST('day3', 'string');
-	$object->day4 = GETPOST('day4', 'string');
-	$object->day5 = GETPOST('day5', 'string');
-	$object->day6 = GETPOST('day6', 'string');
+	$object->monday = GETPOST('monday', 'string');
+	$object->tuesday = GETPOST('tuesday', 'string');
+	$object->wednesday = GETPOST('wednesday', 'string');
+	$object->thursday = GETPOST('thursday', 'string');
+	$object->friday = GETPOST('friday', 'string');
+	$object->saturday = GETPOST('saturday', 'string');
+	$object->sunday = GETPOST('sunday', 'string');
 	$object->create($user);
 
 }

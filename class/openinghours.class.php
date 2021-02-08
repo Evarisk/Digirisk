@@ -102,13 +102,13 @@ class Openinghours extends CommonObject
 		'element_type' => array('type'=>'varchar(50)', 'label'=>'ElementType', 'enabled'=>'1', 'position'=>502, 'notnull'=>0, 'visible'=>-1,),
 		'element_id' => array('type'=>'integer', 'label'=>'ElementID', 'enabled'=>'1', 'position'=>503, 'notnull'=>0, 'visible'=>-1,),
 		'status' => array('type'=>'integer', 'label'=>'Status', 'enabled'=>'1', 'position'=>501, 'notnull'=>0, 'visible'=>-1,),
-		'day0' => array('type'=>'varchar(128)', 'label'=>'Day 0', 'enabled'=>'1', 'position'=>510, 'notnull'=>0, 'visible'=>1, 'comment'=>"ref for the object"),
-		'day1' => array('type'=>'varchar(128)', 'label'=>'Day 1', 'enabled'=>'1', 'position'=>511, 'notnull'=>0, 'visible'=>1, 'comment'=>"ref for the object"),
-		'day2' => array('type'=>'varchar(128)', 'label'=>'Day 2', 'enabled'=>'1', 'position'=>512, 'notnull'=>0, 'visible'=>1, 'comment'=>"ref for the object"),
-		'day3' => array('type'=>'varchar(128)', 'label'=>'Day 3', 'enabled'=>'1', 'position'=>513, 'notnull'=>0, 'visible'=>1, 'comment'=>"ref for the object"),
-		'day4' => array('type'=>'varchar(128)', 'label'=>'Day 4', 'enabled'=>'1', 'position'=>514, 'notnull'=>0, 'visible'=>1, 'comment'=>"ref for the object"),
-		'day5' => array('type'=>'varchar(128)', 'label'=>'Day 5', 'enabled'=>'1', 'position'=>515, 'notnull'=>0, 'visible'=>1, 'comment'=>"ref for the object"),
-		'day6' => array('type'=>'varchar(128)', 'label'=>'Day 6', 'enabled'=>'1', 'position'=>516, 'notnull'=>0, 'visible'=>1, 'comment'=>"ref for the object"),
+		'monday' => array('type'=>'varchar(128)', 'label'=>'Day 0', 'enabled'=>'1', 'position'=>510, 'notnull'=>0, 'visible'=>1, 'comment'=>"ref for the object"),
+		'tuesday' => array('type'=>'varchar(128)', 'label'=>'Day 1', 'enabled'=>'1', 'position'=>511, 'notnull'=>0, 'visible'=>1, 'comment'=>"ref for the object"),
+		'wednesday' => array('type'=>'varchar(128)', 'label'=>'Day 2', 'enabled'=>'1', 'position'=>512, 'notnull'=>0, 'visible'=>1, 'comment'=>"ref for the object"),
+		'thursday' => array('type'=>'varchar(128)', 'label'=>'Day 3', 'enabled'=>'1', 'position'=>513, 'notnull'=>0, 'visible'=>1, 'comment'=>"ref for the object"),
+		'friday' => array('type'=>'varchar(128)', 'label'=>'Day 4', 'enabled'=>'1', 'position'=>514, 'notnull'=>0, 'visible'=>1, 'comment'=>"ref for the object"),
+		'saturday' => array('type'=>'varchar(128)', 'label'=>'Day 5', 'enabled'=>'1', 'position'=>515, 'notnull'=>0, 'visible'=>1, 'comment'=>"ref for the object"),
+		'sunday' => array('type'=>'varchar(128)', 'label'=>'Day 6', 'enabled'=>'1', 'position'=>516, 'notnull'=>0, 'visible'=>1, 'comment'=>"ref for the object"),
 		'entity' => array('type'=>'integer', 'label'=>'Entity', 'enabled'=>'1', 'position'=>50, 'notnull'=>0, 'visible'=>-1),
 	);
 	public $rowid;
@@ -119,13 +119,13 @@ class Openinghours extends CommonObject
 	public $element_type;
 	public $element_id;
 	public $status;
-	public $day0;
-	public $day1;
-	public $day2;
-	public $day3;
-	public $day4;
-	public $day5;
-	public $day6;
+	public $monday;
+	public $tuesday;
+	public $wednesday;
+	public $thursday;
+	public $friday;
+	public $saturday;
+	public $sunday;
 	public $entity;
 	// END MODULEBUILDER PROPERTIES
 

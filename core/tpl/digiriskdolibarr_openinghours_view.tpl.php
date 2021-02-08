@@ -43,40 +43,47 @@ print '<table class="noborder centpercent editmode">';
 
 print '<tr class="liste_titre"><th class="titlefield wordbreak">'.$langs->trans("Day").'</th><th>'.$langs->trans("Value").'</th></tr>'."\n";
 
+
+
+
+
+
+
+
 print '<tr class="oddeven"><td>';
 print $form->textwithpicto($langs->trans("0"), $langs->trans("OpeningHoursFormatDesc"));
 print '</td><td>';
-print '<input name="day0" id="day0" class="minwidth100" value="'.($object->day0 ?$object->day0 : GETPOST("day0", 'alpha')).'"'.(empty($conf->global->MAIN_OPTIMIZEFORTEXTBROWSER) ? '' : ' autofocus="autofocus"').'></td></tr>'."\n";
+print '<input name="monday" id="monday" class="minwidth100" value="'.($object->monday ?$object->monday : GETPOST("monday", 'alpha')).'"'.(empty($conf->global->MAIN_OPTIMIZEFORTEXTBROWSER) ? '' : ' autofocus="autofocus"').'></td></tr>'."\n";
 
 print '<tr class="oddeven"><td>';
 print $form->textwithpicto($langs->trans("DigiriskDay1"), $langs->trans("OpeningHoursFormatDesc"));
 print '</td><td>';
-print '<input name="day1" id="day1" class="minwidth100" value="'.($object->day1 ?$object->day1  : GETPOST("day1", 'alpha')).'"'.(empty($conf->global->MAIN_OPTIMIZEFORTEXTBROWSER) ? '' : ' autofocus="autofocus"').'></td></tr>'."\n";
+print '<input name="tuesday" id="tuesday" class="minwidth100" value="'.($object->tuesday ?$object->tuesday  : GETPOST("tuesday", 'alpha')).'"'.(empty($conf->global->MAIN_OPTIMIZEFORTEXTBROWSER) ? '' : ' autofocus="autofocus"').'></td></tr>'."\n";
 
 print '<tr class="oddeven"><td>';
 print $form->textwithpicto($langs->trans("DigiriskDay2"), $langs->trans("OpeningHoursFormatDesc"));
 print '</td><td>';
-print '<input name="day2" id="day2" class="minwidth100" value="'.($object->day2 ?$object->day2 : GETPOST("day2", 'alpha')).'"'.(empty($conf->global->MAIN_OPTIMIZEFORTEXTBROWSER) ? '' : ' autofocus="autofocus"').'></td></tr>'."\n";
+print '<input name="wednesday" id="wednesday" class="minwidth100" value="'.($object->wednesday ?$object->wednesday : GETPOST("wednesday", 'alpha')).'"'.(empty($conf->global->MAIN_OPTIMIZEFORTEXTBROWSER) ? '' : ' autofocus="autofocus"').'></td></tr>'."\n";
 
 print '<tr class="oddeven"><td>';
 print $form->textwithpicto($langs->trans("DigiriskDay3"), $langs->trans("OpeningHoursFormatDesc"));
 print '</td><td>';
-print '<input name="day3" id="day3" class="minwidth100" value="'.($object->day3 ?$object->day3 : GETPOST("day3", 'alpha')).'"'.(empty($conf->global->MAIN_OPTIMIZEFORTEXTBROWSER) ? '' : ' autofocus="autofocus"').'></td></tr>'."\n";
+print '<input name="thursday" id="thursday" class="minwidth100" value="'.($object->thursday ?$object->thursday : GETPOST("thursday", 'alpha')).'"'.(empty($conf->global->MAIN_OPTIMIZEFORTEXTBROWSER) ? '' : ' autofocus="autofocus"').'></td></tr>'."\n";
 
 print '<tr class="oddeven"><td>';
 print $form->textwithpicto($langs->trans("DigiriskDay4"), $langs->trans("OpeningHoursFormatDesc"));
 print '</td><td>';
-print '<input name="day4" id="day4" class="minwidth100" value="'.($object->day4 ?$object->day4 : GETPOST("day4", 'alpha')).'"'.(empty($conf->global->MAIN_OPTIMIZEFORTEXTBROWSER) ? '' : ' autofocus="autofocus"').'></td></tr>'."\n";
+print '<input name="friday" id="friday" class="minwidth100" value="'.($object->friday ?$object->friday : GETPOST("friday", 'alpha')).'"'.(empty($conf->global->MAIN_OPTIMIZEFORTEXTBROWSER) ? '' : ' autofocus="autofocus"').'></td></tr>'."\n";
 
 print '<tr class="oddeven"><td>';
 print $form->textwithpicto($langs->trans("DigiriskDay5"), $langs->trans("OpeningHoursFormatDesc"));
 print '</td><td>';
-print '<input name="day5" id="day5" class="minwidth100" value="'.($object->day5 ?$object->day5 : GETPOST("day5", 'alpha')).'"'.(empty($conf->global->MAIN_OPTIMIZEFORTEXTBROWSER) ? '' : ' autofocus="autofocus"').'></td></tr>'."\n";
+print '<input name="saturday" id="saturday" class="minwidth100" value="'.($object->saturday ?$object->saturday : GETPOST("saturday", 'alpha')).'"'.(empty($conf->global->MAIN_OPTIMIZEFORTEXTBROWSER) ? '' : ' autofocus="autofocus"').'></td></tr>'."\n";
 
 print '<tr class="oddeven"><td>';
 print $form->textwithpicto($langs->trans("DigiriskDay6"), $langs->trans("OpeningHoursFormatDesc"));
 print '</td><td>';
-print '<input name="day6" id="day6" class="minwidth100" value="'.($object->day6 ?$object->day6 : GETPOST("day6", 'alpha')).'"'.(empty($conf->global->MAIN_OPTIMIZEFORTEXTBROWSER) ? '' : ' autofocus="autofocus"').'></td></tr>'."\n";
+print '<input name="sunday" id="sunday" class="minwidth100" value="'.($object->sunday ?$object->sunday : GETPOST("sunday", 'alpha')).'"'.(empty($conf->global->MAIN_OPTIMIZEFORTEXTBROWSER) ? '' : ' autofocus="autofocus"').'></td></tr>'."\n";
 
 print '</table>';
 
