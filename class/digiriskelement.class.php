@@ -1110,26 +1110,28 @@ class DigiriskElement extends CommonObject
 					<div class="digirisk-wrap wpeo-wrap">
 						<div class="navigation-container">
 							<div class="society-header">
-								<span class="icon fas fa-building fa-fw"></span>
-									<div class="title">
-										<a href="digiriskelement_card.php"><?php echo $conf->global->MAIN_INFO_SOCIETE_NOM ?></a>
+								<a class="linkElement" href="digiriskelement_card.php">
+									<span class="icon fas fa-building fa-fw"></span>
+										<div class="title">
+										<?php echo $conf->global->MAIN_INFO_SOCIETE_NOM ?>
+										</div>
+									<div class="add-container">
+										<a href="digiriskelement_card.php?action=create&element_type=groupment">
+											<div class="wpeo-button button-square-50 wpeo-tooltip-event" data-direction="bottom" data-color="light" aria-label="<?php echo $langs->trans('NewGroupment'); ?>"><span class="button-icon fas fa-home"></span><span class="button-add animated fas fa-plus-circle"></span></div>
+										</a>
+										<a href="digiriskelement_card.php?action=create&element_type=workunit">
+											<div class="wpeo-button button-square-50 wpeo-tooltip-event" data-direction="bottom" data-color="light" aria-label="<?php echo $langs->trans('NewWorkunit'); ?>"><span class="button-icon fas fa-home"></span><span class="button-add animated fas fa-plus-circle"></span></div>
+										</a>
 									</div>
-								<div class="add-container">
-									<a href="digiriskelement_card.php?action=create&element_type=groupment">
-										<div class="wpeo-button button-square-50 wpeo-tooltip-event" data-direction="bottom" data-color="light" aria-label="<?php echo $langs->trans('NewGroupment'); ?>"><span class="button-icon fas fa-home"></span><span class="button-add animated fas fa-plus-circle"></span></div>
-									</a>
-									<a href="digiriskelement_card.php?action=create&element_type=workunit">
-										<div class="wpeo-button button-square-50 wpeo-tooltip-event" data-direction="bottom" data-color="light" aria-label="<?php echo $langs->trans('NewWorkunit'); ?>"><span class="button-icon fas fa-home"></span><span class="button-add animated fas fa-plus-circle"></span></div>
-									</a>
-								</div>
-								<div class="mobile-add-container wpeo-dropdown dropdown-right option">
-									<div class="dropdown-toggle"><i class="action fas fa-ellipsis-v"></i></div>
-									<ul class="dropdown-content">
-										<li class="dropdown-item" data-type="Group_Class"><i class="icon dashicons dashicons-admin-multisite"></i><?php //echo //esc_attr( 'Ajouter groupement', 'digirisk' ); ?></li>
-										<li class="dropdown-item" data-type="Workunit_Class"><i class="icon dashicons dashicons-admin-home"></i><?php //echo //esc_attr( 'Ajouter unité', 'digirisk' ); ?></li>
-									</ul>
-								</div>
-								<div class="close-popup"><i class="icon fas fa-times"></i></div>
+									<div class="mobile-add-container wpeo-dropdown dropdown-right option">
+										<div class="dropdown-toggle"><i class="action fas fa-ellipsis-v"></i></div>
+										<ul class="dropdown-content">
+											<li class="dropdown-item" data-type="Group_Class"><i class="icon dashicons dashicons-admin-multisite"></i><?php //echo //esc_attr( 'Ajouter groupement', 'digirisk' ); ?></li>
+											<li class="dropdown-item" data-type="Workunit_Class"><i class="icon dashicons dashicons-admin-home"></i><?php //echo //esc_attr( 'Ajouter unité', 'digirisk' ); ?></li>
+										</ul>
+									</div>
+									<div class="close-popup"><i class="icon fas fa-times"></i></div>
+								</a>
 							</div>
 							<div class="toolbar">
 								<div class="toggle-plus tooltip hover" aria-label="<?php echo $langs->trans('UnwrapAll'); ?>"><span class="icon fas fa-plus-square"></span></div>
@@ -1174,7 +1176,7 @@ class DigiriskElement extends CommonObject
 
 		if ( !empty( $results ) ) {
 			foreach ($results as $element) { ?>
-				<li class="unit<?php //echo ( $society->ID === $selected_society_id ) ? 'active' : ''; echo ( \eoxia\Post_Util::is_parent( $society->ID, $selected_society_id ) ) ? 'toggled' : ''; ?>" data-id="<?php //echo esc_attr( $society->ID ); ?>">
+				<li class="unit">
 					<div class="unit-container">
 						<?php if ($element['object']->element_type == 'groupment' && count($element['children'])) { ?>
 							<div class="toggle-unit">
@@ -1191,10 +1193,12 @@ class DigiriskElement extends CommonObject
 							<span class="floatleft inline-block valignmiddle divphotoref"><img class="photodigiriskdolibarr" alt="No photo" src="<?php echo DOL_URL_ROOT.$nophoto ?>"></span>
 						<?php } ?>
 						<div class="title">
-							<span class="title-container">
-								<span class="ref"><?php echo $element['object']->ref; ?></span>
-								<span class="name"><?php echo $element['object']->getNomUrl(); ?></span>
-							</span>
+							<a class="linkElement" href="digiriskelement_card.php?id=<?php echo $element['object']->id; ?>">
+								<span class="title-container">
+									<span class="ref"><?php echo $element['object']->ref; ?></span>
+									<span class="name"><?php echo $element['object']->label; ?></span>
+								</span>
+							</a>
 						</div>
 						<?php if ($element['object']->element_type == 'groupment') { ?>
 							<div class="add-container">
@@ -1230,5 +1234,68 @@ class DigiriskElement extends CommonObject
 				</li>
 			<?php }
 		}
+	}
+
+
+		/**
+	 *  Show tab footer of a card.
+	 *  Note: $object->next_prev_filter can be set to restrict select to find next or previous record by $form->showrefnav.
+	 *
+	 *  @param	Object	$object			Object to show
+	 *  @param	string	$paramid   		Name of parameter to use to name the id into the URL next/previous link
+	 *  @param	string	$morehtml  		More html content to output just before the nav bar
+	 *  @param	int		$shownav	  	Show Condition (navigation is shown if value is 1)
+	 *  @param	string	$fieldid   		Nom du champ en base a utiliser pour select next et previous (we make the select max and min on this field). Use 'none' for no prev/next search.
+	 *  @param	string	$fieldref   	Nom du champ objet ref (object->ref) a utiliser pour select next et previous
+	 *  @param	string	$morehtmlref  	More html to show after ref
+	 *  @param	string	$moreparam  	More param to add in nav link url.
+	 *	@param	int		$nodbprefix		Do not include DB prefix to forge table name
+	 *	@param	string	$morehtmlleft	More html code to show before ref
+	 *	@param	string	$morehtmlstatus	More html code to show under navigation arrows
+	 *  @param  int     $onlybanner     Put this to 1, if the card will contains only a banner (this add css 'arearefnobottom' on div)
+	 *	@param	string	$morehtmlright	More html code to show before navigation arrows
+	 *  @return	void
+	 */
+	function digirisk_banner_tab($object, $paramid, $morehtml = '', $shownav = 1, $fieldid = 'rowid', $fieldref = 'ref', $morehtmlref = '', $moreparam = '', $nodbprefix = 0, $morehtmlleft = '', $morehtmlstatus = '', $onlybanner = 0, $morehtmlright = '')
+	{
+		global $conf, $form, $user, $langs;
+
+		$showimage = 0;
+		$entity = (empty($object->entity) ? $conf->entity : $object->entity);
+
+		if ($object->element == 'ticket')
+		{
+			$width = 80; $cssclass = 'photoref';
+			$maxvisiblephotos = (isset($conf->global->TICKET_MAX_VISIBLE_PHOTO) ? $conf->global->TICKET_MAX_VISIBLE_PHOTO : 2);
+			if ($conf->browser->layout == 'phone') $maxvisiblephotos = 1;
+			if ($showimage)
+			{
+				$showphoto = $object->show_photos('ticket', $conf->ticket->multidir_output[$entity], 'small', $maxvisiblephotos, 0, 0, 0, $width, 0);
+				if ($object->nbphoto > 0)
+				{
+					$morehtmlleft .= '<div class="floatleft inline-block valignmiddle divphotoref">'.$showphoto.'</div>';
+				}
+				else
+				{
+					$showimage = 0;
+				}
+			}
+			if (!$showimage)
+			{
+				if (!empty($conf->global->TICKET_NODISPLAYIFNOPHOTO)) {
+					$nophoto = '';
+					$morehtmlleft .= '<div class="floatleft inline-block valignmiddle divphotoref"></div>';
+				}
+				else {    // Show no photo link
+					$nophoto = '/public/theme/common/nophoto.png';
+					$morehtmlleft .= '<div class="floatleft inline-block valignmiddle divphotoref"><img class="photo'.$modulepart.($cssclass ? ' '.$cssclass : '').'" alt="No photo" border="0"'.($width ? ' style="width: '.$width.'px"' : '').' src="'.DOL_URL_ROOT.$nophoto.'"></div>';
+				}
+			}
+		}
+
+		print '<div class="'.($onlybanner ? 'arearefnobottom ' : 'arearef ').'heightref valignmiddle centpercent">';
+		print $form->showrefnav($object, $paramid, $morehtml, $shownav, $fieldid, $fieldref, $morehtmlref, $moreparam, $nodbprefix, $morehtmlleft, $morehtmlstatus, $morehtmlright);
+		print '</div>';
+		print '<div class="underrefbanner clearboth"></div>';
 	}
 }

@@ -217,13 +217,11 @@ window.eoxiaJS.navigation.init = function() {
 window.eoxiaJS.navigation.event = function() {
 	jQuery( document ).on( 'click', '.digirisk-wrap .navigation-container .unit-container .toggle-unit', window.eoxiaJS.navigation.switchToggle );
 	jQuery( document ).on( 'click', '.digirisk-wrap .navigation-container .toolbar div', window.eoxiaJS.navigation.toggleAll );
+	jQuery( document ).on( 'change', '.digirisk-wrap .navigation-container .workunit-list .unit .unit-container .title', window.eoxiaJS.navigation.setUnitActive );
 };
 
 /**
  * Gestion du toggle dans la navigation.
- *
- * @since 6.3.0
- * @version 6.3.0
  *
  * @param  {MouseEvent} event Les attributs lors du clic.
  * @return {void}
@@ -242,9 +240,6 @@ window.eoxiaJS.navigation.switchToggle = function( event ) {
 
 /**
  * Déplies ou replies tous les éléments enfants
- *
- * @since 6.3.0
- * @version 6.3.0
  *
  * @param  {MouseEvent} event Les attributs lors du clic
  * @return {void}
@@ -266,14 +261,11 @@ window.eoxiaJS.navigation.toggleAll = function( event ) {
 /**
  * Ajout la classe 'active' à l'élément.
  *
- * @since 6.3.0
- * @version 6.3.0
- *
- * @param  {HTMLDivElement} element L'attribut de l'élement.
- * @return {boolean}
+ * @param  {MouseEvent} event Les attributs lors du clic.
+ * @return {void}
  */
-window.eoxiaJS.navigation.setUnitActive = function( element ) {
+window.eoxiaJS.navigation.setUnitActive = function( event ) {
 	jQuery( '.digirisk-wrap .navigation-container .unit.active' ).removeClass( 'active' );
-	jQuery( element ).closest( '.unit' ).addClass( 'active' );
-	return true;
+	console.log( this );
+	jQuery( this ).closest( '.unit' ).addClass( 'active' );
 };

@@ -63,6 +63,7 @@ $contextpage 		 = GETPOST('contextpage', 'aZ') ?GETPOST('contextpage', 'aZ') : '
 $backtopage 		 = GETPOST('backtopage', 'alpha');
 $backtopageforcancel = GETPOST('backtopageforcancel', 'alpha');
 $element_type        = GETPOST('element_type', 'alpha');
+$fk_parent           = GETPOST('fk_parent', 'int');
 
 
 // Initialize technical objects
@@ -215,6 +216,8 @@ if ($action == 'create')
 
 	unset($object->fields['ref']);
 	unset($object->fields['status']);
+	unset($object->fields['element_type']);
+	unset($object->fields['fk_parent']);
 
 	print '<table class="border centpercent tableforfieldcreate">'."\n";
 
@@ -229,6 +232,9 @@ if ($action == 'create')
 	print '</td></tr>';
 
 	include DOL_DOCUMENT_ROOT.'/core/tpl/commonfields_add.tpl.php';
+
+	print '<input hidden class="flat" type="text" size="36" name="element_type" value="'.$element_type.'">';
+	print '<input hidden class="flat" type="text" size="36" name="fk_parent" value="'.$fk_parent.'">';
 
 	// Other attributes
 	include DOL_DOCUMENT_ROOT.'/core/tpl/extrafields_add.tpl.php';
@@ -261,6 +267,10 @@ if (($id || $ref) && $action == 'edit')
 	if ($backtopageforcancel) print '<input type="hidden" name="backtopageforcancel" value="'.$backtopageforcancel.'">';
 
 	dol_fiche_head();
+
+	unset($object->fields['status']);
+	unset($object->fields['element_type']);
+	unset($object->fields['fk_parent']);
 
 	print '<table class="border centpercent tableforfieldedit">'."\n";
 
@@ -336,10 +346,24 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 
 	dol_banner_tab($object, 'ref', '', 0, 'ref', 'ref', $morehtmlref, '', 0, $morehtmlleft);
 
+	unset($object->fields['element_type']);
+	unset($object->fields['fk_parent']);
+
 	print '<div class="fichecenter">';
 	print '<div class="fichehalfleft">';
 	print '<div class="underbanner clearboth"></div>';
 	print '<table class="border centpercent tableforfield">'."\n";
+
+
+	print '<tr><td class="titlefield">'.$langs->trans("ElementType").'</td><td>';
+	print $langs->trans($object->element_type);
+	print '</td></tr>';
+
+	print '<tr><td class="titlefield">'.$langs->trans("ParentElement").'</td><td>';
+	$result = $object->fetch($object->fk_parent);
+	$parent_element = $object;
+	print $object->fk_parent > 0 ? $parent_element->getNomUrl() : $conf->global->MAIN_INFO_SOCIETE_NOM;
+	print '</td></tr>';
 
 	//Show common fields
 	include DOL_DOCUMENT_ROOT.'/core/tpl/commonfields_view.tpl.php';

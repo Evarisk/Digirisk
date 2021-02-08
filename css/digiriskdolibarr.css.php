@@ -11284,3 +11284,8 @@ li.unit::marker {
 .digitest img {
 	height: 14px;
 }
+
+.linkElement {
+	display: flex;
+	width: 100%;
+}
