@@ -485,6 +485,8 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 		$includedocgeneration = 1;
 		// Documents
 		if ($includedocgeneration) {
+		
+			$object->fetch($id);
 			$objref = dol_sanitizeFileName($object->ref);
 
 			$relativepath = $objref . '/' . $objref . '.pdf';
