@@ -70,7 +70,7 @@ $fk_parent           = GETPOST('fk_parent', 'int');
 $object 			 = new DigiriskElement($db);
 $extrafields  	 	 = new ExtraFields($db);
 $diroutputmassaction = $conf->digiriskdolibarr->dir_output.'/temp/massgeneration/'.$user->id;
-
+$object->fetch($id);
 $hookmanager->initHooks(array('digiriskelementcard', 'globalcard')); // Note that conf->hooks_modules contains array
 
 // Fetch optionals attributes and labels
@@ -135,7 +135,6 @@ if (empty($reshook))
 	include DOL_DOCUMENT_ROOT.'/core/actions_printing.inc.php';
 
 	// Action to build doc
-	include DOL_DOCUMENT_ROOT.'/core/actions_builddoc.inc.php';
 
 	if ($action == 'set_thirdparty' && $permissiontoadd)
 	{
@@ -183,22 +182,16 @@ $morejs = array("/digiriskdolibarr/js/digiriskdolibarr.js.php");
 
 $object->digiriskHeader('', $title, $help_url, '', '', '', $morejs);
 
+?>
+<div id="cardContent" value="">
+
+<?php
 // Example : Adding jquery code
-print '<script type="text/javascript" language="javascript">
-jQuery(document).ready(function() {
-	function init_myfunc()
-	{
-		jQuery("#myid").removeAttr(\'disabled\');
-		jQuery("#myid").attr(\'disabled\',\'disabled\');
-	}
-	init_myfunc();
-	jQuery("#mybutton").click(function() {
-		init_myfunc();
-	});
-});
-</script>';
+$idFromMenu = explode('?',$_SERVER['REQUEST_URI']);
 
-
+if (is_numeric($idFromMenu[1])) {
+	$object->fetch($idFromMenu[1]);
+}
 // Part to create
 if ($action == 'create')
 {
@@ -474,26 +467,85 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 	if (GETPOST('modelselected')) {
 		$action = 'presend';
 	}
+	if ($action == 'builddoc' && $permissiontoadd)
+	{
+
+
+			// Reload to get all modified line records and be ready for hooks
+
+			$ret = $object->fetch($id);
+
+			$ret = $object->fetch_thirdparty();
+			/*if (empty($object->id) || ! $object->id > 0)
+			{
+				dol_print_error('Object must have been loaded by a fetch');
+				exit;
+			}*/
+
+			// Save last template used to generate document
+			if (GETPOST('model', 'alpha'))
+			{
+				$object->setDocModel($user, GETPOST('model', 'alpha'));
+			}
+
+			$outputlangs = $langs;
+			$newlang = '';
+
+			if ($conf->global->MAIN_MULTILANGS && empty($newlang) && GETPOST('lang_id', 'aZ09')) $newlang = GETPOST('lang_id', 'aZ09');
+			if ($conf->global->MAIN_MULTILANGS && empty($newlang) && isset($object->thirdparty->default_lang)) $newlang = $object->thirdparty->default_lang; // for proposal, order, invoice, ...
+			if ($conf->global->MAIN_MULTILANGS && empty($newlang) && isset($object->default_lang)) $newlang = $object->default_lang; // for thirdparty
+			if (!empty($newlang))
+			{
+				$outputlangs = new Translate("", $conf);
+				$outputlangs->setDefaultLang($newlang);
+			}
+
+			// To be sure vars is defined
+			if (empty($hidedetails)) $hidedetails = 0;
+			if (empty($hidedesc)) $hidedesc = 0;
+			if (empty($hideref)) $hideref = 0;
+			if (empty($moreparams)) $moreparams = null;
+			$model = 'DIGIRISKDOLIBARR_' . strtoupper($object->element_type) . '_DEFAULT_MODEL';
+
+			$result = $object->generateDocument($conf->global->$model, $outputlangs, $hidedetails, $hidedesc, $hideref, $moreparams);
+
+			if ($result <= 0)
+			{
+				setEventMessages($object->error, $object->errors, 'errors');
+				$action = '';
+			}
+			else
+			{
+
+			}
+
+
+	}
 
 	// Document Generation -- Génération des documents
 
 	if ($action != 'presend')
 	{
+		$idFromMenu = explode('?',$_SERVER['REQUEST_URI']);
 		print '<div class="fichecenter"><div class="fichehalfleft">';
+		print '<input hidden id ="id" name="id" value="'.$idFromMenu[1].'">';
 		print '<a name="builddoc"></a>'; // ancre
 
 		$includedocgeneration = 1;
 		// Documents
 		if ($includedocgeneration) {
-		
-			$object->fetch($id);
+
+			if (isset($idFromMenu[1])) {
+				$object->fetch($idFromMenu[1]);
+				$id = $idFromMenu;
+			}
 			$objref = dol_sanitizeFileName($object->ref);
 
 			$relativepath = $objref . '/' . $objref . '.pdf';
 			$dir_files = $object->element_type . '/' . $objref;
 			$filedir = $conf->digiriskdolibarr->dir_output.'/'.$dir_files;
 
-			$urlsource = $_SERVER["PHP_SELF"] . "?id=" . $object->id;
+			$urlsource = $_SERVER["PHP_SELF"];
 			$genallowed = $user->rights->digiriskdolibarr->digiriskelement->read;	// If you can read, you can build the PDF to read content
 			$delallowed = $user->rights->digiriskdolibarr->digiriskelement->create;	// If you can create/edit, you can remove a file on card
 
@@ -503,7 +555,7 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 				$modulepart = 'digiriskdolibarr:WorkUnit';
 			}
 
-			print $formfile->showdocuments($modulepart,$dir_files, $filedir, $urlsource, $genallowed, $delallowed, $conf->global->DIGIRISKDOLIBARR_GROUPMENT_DEFAULT_MODEL, 1, 0, 0, 28, 0, '', '', '', $langs->defaultlang);
+			print $formfile->showdocuments($modulepart,$dir_files, $filedir, $urlsource, $genallowed, $delallowed, $conf->global->DIGIRISKDOLIBARR_GROUPMENT_DEFAULT_MODEL, 1, 0, 0, 28, 0, '', '', '', $langs->defaultlang, '');
 
 		}
 
@@ -542,6 +594,7 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 	$trackid = 'digiriskelement'.$object->id;
 
 	include DOL_DOCUMENT_ROOT.'/core/tpl/card_presend.tpl.php';
+	print '</div>';
 
 }
 

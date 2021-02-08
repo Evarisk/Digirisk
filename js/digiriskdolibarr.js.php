@@ -217,7 +217,9 @@ window.eoxiaJS.navigation.init = function() {
 window.eoxiaJS.navigation.event = function() {
 	jQuery( document ).on( 'click', '.digirisk-wrap .navigation-container .unit-container .toggle-unit', window.eoxiaJS.navigation.switchToggle );
 	jQuery( document ).on( 'click', '.digirisk-wrap .navigation-container .toolbar div', window.eoxiaJS.navigation.toggleAll );
-	jQuery( document ).on( 'change', '.digirisk-wrap .navigation-container .workunit-list .unit .unit-container .title', window.eoxiaJS.navigation.setUnitActive );
+	jQuery( document ).on( 'click', '.digirisk-wrap .navigation-container .workunit-list .unit .unit-container .title', window.eoxiaJS.navigation.scores );
+	jQuery( document ).on( 'click', '.digirisk-wrap .navigation-container .workunit-list .unit .unit-container .title', window.eoxiaJS.navigation.setUnitActive );
+	jQuery( document ).on( 'click', '.fichecenter .button', window.eoxiaJS.generate );
 };
 
 /**
@@ -266,6 +268,28 @@ window.eoxiaJS.navigation.toggleAll = function( event ) {
  */
 window.eoxiaJS.navigation.setUnitActive = function( event ) {
 	jQuery( '.digirisk-wrap .navigation-container .unit.active' ).removeClass( 'active' );
-	console.log( this );
+	//console.log( this );
+	let id = $(this).attr('value')
+
 	jQuery( this ).closest( '.unit' ).addClass( 'active' );
+	jQuery( this ).closest( '.unit' ).attr( 'value', id );
+
+};
+
+window.eoxiaJS.navigation.scores = function( event ) {
+	let id = $(this).attr('value')
+	$('#cardContent').empty()
+
+	//URL = 'digiriskelement_card.php' + '#' + id;
+	$('#cardContent').attr('value', id)
+	//window.location.href = URL
+	$('#cardContent').load(document.URL  +  ' #cardContent' , id);
+};
+
+window.eoxiaJS.generate = function( event ) {
+	let id = $('.unit.active').attr('value')
+	$('#cardContent').empty()
+
+	$('#cardContent').load(document.URL + '?id=' + id + '&action=builddoc' +  ' #cardContent' , id);
+
 };

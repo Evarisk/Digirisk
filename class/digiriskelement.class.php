@@ -106,8 +106,9 @@ class DigiriskElement extends CommonObject
 		'import_key' => array('type'=>'varchar(14)', 'label'=>'ImportId', 'enabled'=>'1', 'position'=>1000, 'notnull'=>-1, 'visible'=>-2,),
 		'status' => array('type'=>'smallint', 'label'=>'Status', 'enabled'=>'1', 'position'=>1000, 'notnull'=>0, 'visible'=>1, 'index'=>1,),
 		'element_type' => array('type'=>'varchar(50)', 'label'=>'ElementType', 'enabled'=>'1', 'position'=>1010, 'notnull'=>-1, 'visible'=>1,),
-		'fk_parent' => array('type'=>'integer', 'label'=>'ParentElement', 'enabled'=>'1', 'position'=>1020, 'notnull'=>1, 'visible'=>1, 'default'=>0,),
+		'fk_parent' => array('type'=>'integer', 'label'=>'ParentElement', 'enabled'=>'1', 'position'=>1020, 'notnull'=>1, 'visible'=>1,),
 		'model_pdf' => array('type'=>'varchar(255)', 'label'=>'Model pdf', 'enabled'=>'1', 'position'=>1030, 'notnull'=>-1, 'visible'=>0,),
+		'last_main_doc' => array('type'=>'varchar(50)', 'label'=>'LastMainDoc', 'enabled'=>'1', 'position'=>1050, 'notnull'=>0, 'visible'=>-1,),
 	);
 	public $rowid;
 	public $ref;
@@ -122,6 +123,7 @@ class DigiriskElement extends CommonObject
 	public $element_type;
 	public $fk_parent;
 	public $model_pdf;
+	public $last_main_doc;
 	// END MODULEBUILDER PROPERTIES
 
 
@@ -972,11 +974,10 @@ class DigiriskElement extends CommonObject
 	 */
 	public function generateDocument($modele, $outputlangs, $hidedetails = 0, $hidedesc = 0, $hideref = 0, $moreparams = null)
 	{
-		global $conf, $langs, $user;
 
+		global $conf, $langs, $user;
 		$result = 0;
 		$includedocgeneration = 1;
-
 		$langs->load("digiriskdolibarr@digiriskdolibarr");
 
 		if (!dol_strlen($modele)) {
@@ -988,13 +989,11 @@ class DigiriskElement extends CommonObject
 				$modele = $conf->global->DIGIRISKELEMENT_ADDON_PDF;
 			}
 		}
-
 		$modelpath = "core/modules/digiriskdolibarr/doc/";
 
 		if ($includedocgeneration) {
 			$result = $this->commonGenerateDocument($modelpath, $modele, $outputlangs, $hidedetails, $hidedesc, $hideref, $moreparams);
 		}
-
 		switch ($this->element_type) {
 			case 'groupment':
 				$trigger = $this->call_trigger('GROUPMENT_GENERATE', $user);
@@ -1139,8 +1138,8 @@ class DigiriskElement extends CommonObject
 							</div>
 
 							<ul class="workunit-list">
-								<?php $this->display_recurse_tree($results) ?>
-							</ul>
+									<?php $this->display_recurse_tree($results) ?>
+								</ul>
 						</div>
 					</div>
 				</div>
@@ -1192,13 +1191,13 @@ class DigiriskElement extends CommonObject
 							$nophoto = '/public/theme/common/nophoto.png'; ?>
 							<span class="floatleft inline-block valignmiddle divphotoref"><img class="photodigiriskdolibarr" alt="No photo" src="<?php echo DOL_URL_ROOT.$nophoto ?>"></span>
 						<?php } ?>
-						<div class="title">
-							<a class="linkElement" href="digiriskelement_card.php?id=<?php echo $element['object']->id; ?>">
-								<span class="title-container">
-									<span class="ref"><?php echo $element['object']->ref; ?></span>
-									<span class="name"><?php echo $element['object']->label; ?></span>
-								</span>
-							</a>
+						<div class="title local-refresh <?php echo $element['object']->id; ?>" id="scores" value="<?php echo $element['object']->id ?>" >
+<!--								<a class="linkElement" href="digiriskelement_card.php?id=--><?php //echo $element['object']->id; ?><!--">-->
+									<span class="title-container">
+										<span class="ref"><?php echo $element['object']->ref; ?></span>
+										<span class="name"><?php echo $element['object']->label; ?></span>
+									</span>
+<!--								</a>-->
 						</div>
 						<?php if ($element['object']->element_type == 'groupment') { ?>
 							<div class="add-container">

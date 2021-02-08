@@ -18,7 +18,7 @@ CREATE TABLE llx_digiriskdolibarr_digiriskelement(
 	-- BEGIN MODULEBUILDER FIELDS
 	rowid integer AUTO_INCREMENT PRIMARY KEY NOT NULL, 
 	ref varchar(128) NOT NULL, 
-	label varchar(255) NOT NULL,
+	label varchar(255) NOT NULL, 
 	description text, 
 	date_creation datetime NOT NULL, 
 	tms timestamp, 
@@ -27,7 +27,8 @@ CREATE TABLE llx_digiriskdolibarr_digiriskelement(
 	import_key varchar(14), 
 	status smallint, 
 	element_type varchar(50), 
-	fk_parent integer DEFAULT 0 NOT NULL,
-	model_pdf varchar(255)
+	fk_parent integer NOT NULL, 
+	model_pdf varchar(255), 
+	last_main_doc varchar(50)
 	-- END MODULEBUILDER FIELDS
 ) ENGINE=innodb;

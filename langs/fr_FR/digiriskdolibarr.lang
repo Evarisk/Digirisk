@@ -186,9 +186,9 @@ NewDigiriskElement = Nouveau element digirisk
 # Groupement
 #
 
-GROUPMENT_CREATEInDolibarr = Groupement créée dans Dolibarr
+GROUPMENT_CREATEInDolibarr = Groupement crée dans Dolibarr
 ActionsOnGroupment = Événements liés au groupement
-GroupmentGeneratedWithDolibarr = Groupement générée avec Dolibarr
+GroupmentGeneratedWithDolibarr = Groupement généré avec Dolibarr
 
 groupment = Groupement
 Groupment = Groupement
