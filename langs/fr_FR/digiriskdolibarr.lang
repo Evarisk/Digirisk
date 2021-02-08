@@ -49,7 +49,7 @@ NothingToSetupOnThisPage = Aucune configuration n'est nécessaire sur cette page
 DocumentModels = Modèles de documents
 DigiriskMenu = Ajoutez des informations sur votre société/organisation. Cliquez sur le bouton "Enregistrer" en bas de page pour sauvegarder
 DigiriskDocumentsNumberingModule = Modèle de numérotation des documents de Digirisk
-
+DigiriskNumberOfModelFilesFound = Nombre de modèles par défaut
 #
 # Horaires d'ouverture
 #

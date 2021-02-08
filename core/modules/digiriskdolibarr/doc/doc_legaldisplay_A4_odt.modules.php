@@ -130,25 +130,13 @@ class doc_legaldisplay_A4_odt extends ModelePDFLegalDisplay
 				if (count($tmpfiles)) $listoffiles = array_merge($listoffiles, $tmpfiles);
 			}
 		}
-		$texthelp = $langs->trans("ListOfDirectoriesForModelGenODT");
-		// Add list of substitution keys
-		$texthelp .= '<br>'.$langs->trans("FollowingSubstitutionKeysCanBeUsed").'<br>';
-		$texthelp .= $langs->transnoentitiesnoconv("FullListOnOnlineDocumentation"); // This contains an url, we don't modify it
 
-		$texte .= $form->textwithpicto($texttitle, $texthelp, 1, 'help', '', 1);
-		$texte .= '<div><div style="display: inline-block; min-width: 100px; vertical-align: middle;">';
-		$texte .= '<textarea class="flat" cols="60" name="value1">';
-		$texte .= $conf->global->DIGIRISKDOLIBARR_LEGALDISPLAY_ADDON_ODT_PATH;
-		$texte .= '</textarea>';
-		$texte .= '</div><div style="display: inline-block; vertical-align: middle;">';
-		$texte .= '<input type="submit" class="button" value="'.$langs->trans("Modify").'" name="Button">';
-		$texte .= '<br></div></div>';
 
 		// Scan directories
 		$nbofiles = count($listoffiles);
 		if (!empty($conf->global->DIGIRISKDOLIBARR_LEGALDISPLAY_ADDON_ODT_PATH))
 		{
-			$texte .= $langs->trans("NumberOfModelFilesFound").': <b>';
+			$texte .= $langs->trans("DigiriskNumberOfModelFilesFound").': <b>';
 			//$texte.=$nbofiles?'<a id="a_'.get_class($this).'" href="#">':'';
 			$texte .= count($listoffiles);
 			//$texte.=$nbofiles?'</a>':'';
@@ -167,10 +155,7 @@ class doc_legaldisplay_A4_odt extends ModelePDFLegalDisplay
 
 		$texte .= '</td>';
 
-		$texte .= '<td rowspan="2" class="tdtop hideonsmartphone">';
-		$texte .= $langs->trans("ExampleOfDirectoriesForModelGen");
-		$texte .= '</td>';
-		$texte .= '</tr>';
+
 
 		$texte .= '</table>';
 		$texte .= '</form>';
