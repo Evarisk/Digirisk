@@ -217,9 +217,17 @@ window.eoxiaJS.navigation.init = function() {
 window.eoxiaJS.navigation.event = function() {
 	jQuery( document ).on( 'click', '.digirisk-wrap .navigation-container .unit-container .toggle-unit', window.eoxiaJS.navigation.switchToggle );
 	jQuery( document ).on( 'click', '.digirisk-wrap .navigation-container .toolbar div', window.eoxiaJS.navigation.toggleAll );
-	jQuery( document ).on( 'click', '.digirisk-wrap .navigation-container .workunit-list .unit .unit-container .title', window.eoxiaJS.navigation.scores );
-	jQuery( document ).on( 'click', '.digirisk-wrap .navigation-container .workunit-list .unit .unit-container .title', window.eoxiaJS.navigation.setUnitActive );
-	jQuery( document ).on( 'click', '.fichecenter .button', window.eoxiaJS.generate );
+	jQuery( document ).on( 'click', '#slider', window.eoxiaJS.navigation.setUnitActive );
+	//jQuery( document ).on( 'click', '.fichecenter .button', window.eoxiaJS.generate );
+	jQuery( document ).on( 'click', '#slider', window.eoxiaJS.redirect );
+	jQuery( document ).on( 'click', '#builddoc_generatebutton', window.eoxiaJS.redirectAfterGenerate );
+	jQuery( document ).on( 'click', '#actionButtonEdit', window.eoxiaJS.redirectAfterEdit );
+	jQuery( document ).on( 'click', '#actionButtonCancel', window.eoxiaJS.redirectAfterCancel );
+
+	//jQuery( document ).on( 'click', '#document', window.eoxiaJS.redirectAfterTabs );
+	//jQuery( document ).on( 'click', '#actionButtonSave', window.eoxiaJS.redirectAfterSave );
+	//jQuery( document ).on( 'click', '#actionButtonCreate', window.eoxiaJS.redirectAfterCreate );
+	//jQuery( document ).on( 'haschange', window.eoxiaJS.redirectAfterCreate );
 };
 
 /**
@@ -270,26 +278,134 @@ window.eoxiaJS.navigation.setUnitActive = function( event ) {
 	jQuery( '.digirisk-wrap .navigation-container .unit.active' ).removeClass( 'active' );
 	//console.log( this );
 	let id = $(this).attr('value')
-
 	jQuery( this ).closest( '.unit' ).addClass( 'active' );
 	jQuery( this ).closest( '.unit' ).attr( 'value', id );
 
 };
 
-window.eoxiaJS.navigation.scores = function( event ) {
-	let id = $(this).attr('value')
-	$('#cardContent').empty()
+//window.eoxiaJS.generate = function( event ) {
+//	let id = $('.unit.active').attr('value')
+//	$('#cardContent').empty()
+//
+//	$('#cardContent').load(document.URL + '?id=' + id + '&action=builddoc' +  ' #cardContent' , id);
+//
+//};
 
-	//URL = 'digiriskelement_card.php' + '#' + id;
+window.eoxiaJS.redirect = function( event ) {
+	var params = new window.URLSearchParams(window.location.search);
+
+	let id = $(params.get('id'))	//get ID from div selected in left menu
+	history.pushState({ path: this.path }, '', this.href)
+	//change URL without refresh
+
+	//empty and fill object card
+	$('#cardContent').empty()
 	$('#cardContent').attr('value', id)
-	//window.location.href = URL
 	$('#cardContent').load(document.URL  +  ' #cardContent' , id);
+
+	return false
+
 };
 
-window.eoxiaJS.generate = function( event ) {
-	let id = $('.unit.active').attr('value')
+
+window.eoxiaJS.redirectAfterGenerate = function( event ) {
+
+	var params = new window.URLSearchParams(window.location.search);
+
+	let id = $(params.get('id'))
+	//get ID from div selected in left menu
+	history.pushState({ path: document.URL + '&action=builddoc'}, '', this.href)
+	//change URL without refresh
+
+	//empty and fill object card
 	$('#cardContent').empty()
+	$('#cardContent').attr('value', id)
+	$('#cardContent').load(document.URL + '&action=builddoc' + ' #cardContent' , id);
 
-	$('#cardContent').load(document.URL + '?id=' + id + '&action=builddoc' +  ' #cardContent' , id);
+	return false
 
 };
+//
+//window.eoxiaJS.redirectAfterTabs = function( event ) {
+//
+//	var params = new window.URLSearchParams(window.location.search);
+//	let value = $(this).attr('id')
+//	let id = $(params.get('id'))
+//alert(this.href)
+//	//get ID from div selected in left menu
+//	history.pushState({ path:  document.URL}, '', this.href)
+//	//change URL without refresh
+//
+//	//empty and fill object card
+//	$('#cardContent').empty()
+//	$('#cardContent').attr('value', id)
+//	$('#cardContent').load( document.URL + ' #cardContent' , id);
+//
+//return false;
+//};
+
+window.eoxiaJS.redirectAfterEdit = function( event ) {
+	var params = new window.URLSearchParams(window.location.search);
+
+	let id = $(params.get('id'))
+	//get ID from div selected in left menu
+	history.pushState({ path: window.location.search}, '', this.href)
+	//change URL without refresh
+
+	//empty and fill object card
+	$('#cardContent').empty()
+	$('#cardContent').attr('value', id)
+	$('#cardContent').load(document.URL + '&action=edit' + ' #cardContent' , id);
+
+	return false
+
+};
+
+window.eoxiaJS.redirectAfterCancel = function( event ) {
+	var params = new window.URLSearchParams(window.location.search);
+	let id = $(params.get('id'))
+	let action = $(params.get('action'))
+	//get ID from div selected in left menu
+	history.pushState({ path: document.URL.replace('&action=' + action,'')}, '', document.URL.replace('&action=edit',''))
+	//change URL without refresh
+
+	//empty and fill object card
+	$('#cardContent').empty()
+	$('#cardContent').attr('value', id)
+	$('#cardContent').load( document.URL.replace('&action=edit','') + ' #cardContent' , id);
+
+
+};
+//
+//window.eoxiaJS.redirectAfterSave = function( event ) {
+//
+//	var params = new window.URLSearchParams(window.location.search);
+//	let id = $(params.get('id'))
+//		alert(test)
+//	//get ID from div selected in left menu
+//	history.pushState({ path: document.URL.replace('&action=edit','')}, '', document.URL.replace('&action=edit',''))
+//	//change URL without refresh
+//
+//	//empty and fill object card
+//	$('#cardContent').empty()
+//	$('#cardContent').attr('value', id)
+//	$('#cardContent').load( document.URL.replace('&action=edit','') + ' #cardContent' , id);
+//
+//
+//};
+//
+//window.eoxiaJS.redirectAfterCreate = function( event ) {
+//
+//	var params = new window.URLSearchParams(window.location.search);
+//	let id = $(params.get('id'))
+//	alert(id)
+//	history.pushState({ path: document.URL.replace('&action=create','')}, '', document.URL.replace('&action=edit',''))
+//	//change URL without refresh
+//
+//	//empty and fill object card
+//	$('#cardContent').empty()
+//	$('#cardContent').attr('value', id)
+//	$('#cardContent').load( document.URL.replace('&action=edit','') + ' #cardContent' , id);
+//
+//
+//};

@@ -1101,8 +1101,7 @@ class DigiriskElement extends CommonObject
 		<?php //Body navigation digirisk
 		$object  = new DigiriskElement($this->db);
 		$objects = $object->fetchAll();
-		$results  = $this->recurse_tree(0,0,$objects) ?>
-
+		$results  = $this->recurse_tree(0,0,$objects); ?>
 		<div id="id-container" class="id-container">
 			<div class="side-nav" style="width: 500px; display: block">
 				<div id="id-left" style="width: 500px">
@@ -1191,13 +1190,13 @@ class DigiriskElement extends CommonObject
 							$nophoto = '/public/theme/common/nophoto.png'; ?>
 							<span class="floatleft inline-block valignmiddle divphotoref"><img class="photodigiriskdolibarr" alt="No photo" src="<?php echo DOL_URL_ROOT.$nophoto ?>"></span>
 						<?php } ?>
-						<div class="title local-refresh <?php echo $element['object']->id; ?>" id="scores" value="<?php echo $element['object']->id ?>" >
-<!--								<a class="linkElement" href="digiriskelement_card.php?id=--><?php //echo $element['object']->id; ?><!--">-->
+						<div class="title" id="scores" value="<?php echo $element['object']->id ?>" >
+								<a id="slider" class="linkElement" href="digiriskelement_card.php?id=<?php echo $element['object']->id; ?>">
 									<span class="title-container">
 										<span class="ref"><?php echo $element['object']->ref; ?></span>
 										<span class="name"><?php echo $element['object']->label; ?></span>
 									</span>
-<!--								</a>-->
+								</a>
 						</div>
 						<?php if ($element['object']->element_type == 'groupment') { ?>
 							<div class="add-container">
