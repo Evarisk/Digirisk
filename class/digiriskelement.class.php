@@ -1114,10 +1114,10 @@ class DigiriskElement extends CommonObject
 										<?php echo $conf->global->MAIN_INFO_SOCIETE_NOM ?>
 										</div>
 									<div class="add-container">
-										<a href="digiriskelement_card.php?action=create&element_type=groupment&fk_parent=0">
+										<a id="newGroupment" href="digiriskelement_card.php?action=create&element_type=groupment&fk_parent=0">
 											<div class="wpeo-button button-square-50 wpeo-tooltip-event" data-direction="bottom" data-color="light" aria-label="<?php echo $langs->trans('NewGroupment'); ?>"><span class="button-icon fas fa-home"></span><span class="button-add animated fas fa-plus-circle"></span></div>
 										</a>
-										<a href="digiriskelement_card.php?action=create&element_type=workunit&fk_parent=0">
+										<a id="newWorkunit" href="digiriskelement_card.php?action=create&element_type=workunit&fk_parent=0">
 											<div class="wpeo-button button-square-50 wpeo-tooltip-event" data-direction="bottom" data-color="light" aria-label="<?php echo $langs->trans('NewWorkunit'); ?>"><span class="button-icon fas fa-home"></span><span class="button-add animated fas fa-plus-circle"></span></div>
 										</a>
 									</div>
@@ -1200,7 +1200,7 @@ class DigiriskElement extends CommonObject
 						</div>
 						<?php if ($element['object']->element_type == 'groupment') { ?>
 							<div class="add-container">
-								<a href="digiriskelement_card.php?action=create&element_type=groupment&fk_parent=<?php echo $element['object']->id; ?>">
+								<a id="newGroupment" href="digiriskelement_card.php?action=create&element_type=groupment&fk_parent=<?php echo $element['object']->id; ?>">
 									<div
 										class="wpeo-button button-square-50 wpeo-tooltip-event"
 										data-direction="bottom" data-color="light"
@@ -1209,7 +1209,7 @@ class DigiriskElement extends CommonObject
 										<span class="button-add animated fas fa-plus-circle"></span>
 									</div>
 								</a>
-								<a href="digiriskelement_card.php?action=create&element_type=workunit&fk_parent=<?php echo $element['object']->id; ?>">
+								<a id="newWorkunit" href="digiriskelement_card.php?action=create&element_type=workunit&fk_parent=<?php echo $element['object']->id; ?>">
 									<div
 										class="wpeo-button button-square-50 wpeo-tooltip-event"
 										data-direction="bottom" data-color="light"

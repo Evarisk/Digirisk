@@ -212,6 +212,7 @@ if ($action == 'create')
 	unset($object->fields['status']);
 	unset($object->fields['element_type']);
 	unset($object->fields['fk_parent']);
+	unset($object->fields['last_main_doc']);
 
 	print '<table class="border centpercent tableforfieldcreate">'."\n";
 
@@ -241,7 +242,7 @@ if ($action == 'create')
 	print '<input type="submit" class="button" id ="actionButtonCreate" name="add" value="'.dol_escape_htmltag($langs->trans("Create")).'">';
 	print '&nbsp; ';
 
-	print '<input type="'.($backtopage ? "submit" : "button").'" id ="actionButtonCancel" class="button" name="cancel" value="'.dol_escape_htmltag($langs->trans("Cancel")).'"'.($backtopage ? '' : ' onclick="javascript:history.go(-1)"').'>'; // Cancel for create does not post form if we don't know the backtopage
+	print '<input type="'.($backtopage ? "submit" : "button").'" id ="actionButtonCancelCreate" class="button" name="cancel" value="'.dol_escape_htmltag($langs->trans("Cancel")).'"'.($backtopage ? '' : ' onclick="javascript:history.go(-1)"').'>'; // Cancel for create does not post form if we don't know the backtopage
 	print '</div>';
 
 	print '</form>';
@@ -265,6 +266,7 @@ if (($id || $ref) && $action == 'edit')
 	unset($object->fields['status']);
 	unset($object->fields['element_type']);
 	unset($object->fields['fk_parent']);
+	unset($object->fields['last_main_doc']);
 
 	print '<table class="border centpercent tableforfieldedit">'."\n";
 
@@ -279,7 +281,7 @@ if (($id || $ref) && $action == 'edit')
 	dol_fiche_end();
 
 	print '<div class="center"><input type="submit" id ="actionButtonSave" class="button" name="save" value="'.$langs->trans("Save").'">';
-	print ' &nbsp; <input type="submit" id ="actionButtonCancel" class="button" name="cancel" value="'.$langs->trans("Cancel").'">';
+	print ' &nbsp; <input type="submit" id ="actionButtonCancelEdit" class="button" name="cancel" value="'.$langs->trans("Cancel").'">';
 	print '</div>';
 
 	print '</form>';
@@ -342,6 +344,7 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 
 	unset($object->fields['element_type']);
 	unset($object->fields['fk_parent']);
+	unset($object->fields['last_main_doc']);
 
 	print '<div class="fichecenter">';
 	print '<div class="fichehalfleft">';
@@ -356,7 +359,7 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 	print '<tr><td class="titlefield">'.$langs->trans("ParentElement").'</td><td>';
 	$result = $object->fetch($object->fk_parent);
 	$parent_element = $object;
-	print $object->fk_parent > 0 ? $parent_element->getNomUrl() : $conf->global->MAIN_INFO_SOCIETE_NOM;
+	print $parent_element->ref . ( !empty($parent_element->description) ?  ' - ' . $parent_element->description : '');
 	print '</td></tr>';
 
 	//Show common fields
