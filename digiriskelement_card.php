@@ -357,7 +357,8 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 	print '</td></tr>';
 
 	print '<tr><td class="titlefield">'.$langs->trans("ParentElement").'</td><td>';
-	$result = $object->fetch($object->fk_parent);
+	$parent = new DigiriskElement($db);
+	$result = $parent->fetch($object->fk_parent);
 	$parent_element = $object;
 	print $parent_element->ref . ( !empty($parent_element->description) ?  ' - ' . $parent_element->description : '');
 	print '</td></tr>';
