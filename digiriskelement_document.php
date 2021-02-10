@@ -134,10 +134,10 @@ if ($object->id)
 	$morehtmlref = '<div class="refidno">';
 
 	$width = 80; $cssclass = 'photoref';
-	$morehtmlleft .= '<div class="floatleft inline-block valignmiddle divphotoref">'.$object->show_photos('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$entity].'/'.$object->element_type, 'small', 5, 0, 0, 0, $width, 0, 0, 0, 0, $object->element_type).'</div>';
-	$morehtmlref .= '</div>';
+	$morehtmlleft .= '<div class="floatleft inline-block valignmiddle divphotoref">'.$object->digirisk_show_photos('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$entity].'/'.$object->element_type, 'small', 5, 0, 0, 0, $width,0, 0, 0, 0, $object->element_type).'</div>';
 
-	dol_banner_tab($object, 'ref', '', 0, 'ref', 'ref', $morehtmlref, '', 0, $morehtmlleft);
+	$object->digirisk_banner_tab($object, 'ref', '', 0, 'ref', 'ref', $morehtmlref, '', 0, $morehtmlleft);	$morehtmlref .= '</div>';
+
 
 	print '<div class="fichecenter">';
 

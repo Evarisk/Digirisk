@@ -219,20 +219,20 @@ window.eoxiaJS.navigation.event = function() {
 	jQuery( document ).on( 'click', '.digirisk-wrap .navigation-container .toolbar div', window.eoxiaJS.navigation.toggleAll );
 	jQuery( document ).on( 'click', '#slider', window.eoxiaJS.navigation.setUnitActive );
 
-
+	//menu button
 	jQuery( document ).on( 'click', '#slider', window.eoxiaJS.redirect );
+	jQuery( document ).on( 'click', '#newGroupment', window.eoxiaJS.redirect );
+	jQuery( document ).on( 'click', '#newWorkunit', window.eoxiaJS.redirect );
 	// tabs
 	jQuery( document ).on( 'click', '#document', window.eoxiaJS.redirect );
 	jQuery( document ).on( 'click', '#card', window.eoxiaJS.redirect );
 	jQuery( document ).on( 'click', '#agenda', window.eoxiaJS.redirect );
+
 	//action buttons
-	jQuery( document ).on( 'click', '#newGroupment', window.eoxiaJS.redirect );
-	jQuery( document ).on( 'click', '#newWorkunit', window.eoxiaJS.redirect );
 	jQuery( document ).on( 'click', '#actionButtonEdit', window.eoxiaJS.redirect );
 	jQuery( document ).on( 'click', '#builddoc_generatebutton', window.eoxiaJS.redirectAfterGenerate );
 	jQuery( document ).on( 'click', '#actionButtonCancelEdit', window.eoxiaJS.redirectAfterCancelEdit );
 	jQuery( document ).on( 'click', '#actionButtonCancelCreate', window.eoxiaJS.redirectAfterCancelCreate );
-
 
 	//jQuery( document ).on( 'click', '#actionButtonSave', window.eoxiaJS.redirectAfterSave );
 	//jQuery( document ).on( 'click', '#actionButtonCreate', window.eoxiaJS.redirectAfterCreate );
@@ -291,26 +291,6 @@ window.eoxiaJS.navigation.setUnitActive = function( event ) {
 	jQuery( this ).closest( '.unit' ).attr( 'value', id );
 
 };
-//window.eoxiaJS.setUnitActiveFromURL = function( event ) {
-//alert('url changed')
-//	var params = new window.URLSearchParams(window.location.search);
-//	var id = $(params.get('id'))
-//	jQuery( '.digirisk-wrap .navigation-container .unit.active' ).attr( 'value' );
-//
-//	jQuery( this ).closest( '.unit' ).addClass( 'active' );
-//	jQuery( this ).closest( '.unit' ).attr( 'value', id );
-//	console.log(	jQuery( '.digirisk-wrap .navigation-container .unit.active' ).attr( 'value' ))
-//
-//
-//};
-
-//window.eoxiaJS.generate = function( event ) {
-//	let id = $('.unit.active').attr('value')
-//	$('#cardContent').empty()
-//
-//	$('#cardContent').load(document.URL + '?id=' + id + '&action=builddoc' +  ' #cardContent' , id);
-//
-//};
 
 window.eoxiaJS.redirect = function( event ) {
 
@@ -329,7 +309,6 @@ window.eoxiaJS.redirect = function( event ) {
 	return false;
 };
 
-
 window.eoxiaJS.redirectAfterGenerate = function( event ) {
 
 	var params = new window.URLSearchParams(window.location.search);
@@ -347,42 +326,6 @@ window.eoxiaJS.redirectAfterGenerate = function( event ) {
 	return false
 
 };
-
-
-//
-//window.eoxiaJS.redirectAfterTabs = function( event ) {
-//
-//	var params = new window.URLSearchParams(window.location.search);
-//	let id = $(params.get('id'))
-//
-//	//get ID from div selected in left menu
-//	history.pushState({ path:  document.URL}, '', this.href)
-//	//change URL without refresh
-//
-//	//empty and fill object card
-//	$('#cardContent').empty()
-//	$('#cardContent').attr('value', id)
-//	$('#cardContent').load( document.URL + ' #cardContent' , id);
-//
-//return false;
-//};
-//
-//window.eoxiaJS.redirectAfterEdit = function( event ) {
-//	var params = new window.URLSearchParams(window.location.search);
-//
-//	let id = $(params.get('id'))
-//	//get ID from div selected in left menu
-//	history.pushState({ path: window.location.search}, '', this.href)
-//	//change URL without refresh
-//
-//	//empty and fill object card
-//	$('#cardContent').empty()
-//	$('#cardContent').attr('value', id)
-//	$('#cardContent').load(document.URL + '&action=edit' + ' #cardContent' , id);
-//
-//	return false
-//
-//};
 
 window.eoxiaJS.redirectAfterCancelEdit = function( event ) {
 
@@ -405,7 +348,6 @@ window.eoxiaJS.redirectAfterCancelEdit = function( event ) {
 
 window.eoxiaJS.redirectAfterCancelCreate = function( event ) {
 
-
 	var params = new window.URLSearchParams(window.location.search);
 	let id = $(params.get('id'))
 
@@ -419,14 +361,10 @@ window.eoxiaJS.redirectAfterCancelCreate = function( event ) {
 	} else {
 		history.pushState({ path:  document.URL}, '', URL)
 	}
-	console.log(URL)
-	console.log(parentID)
-	jQuery( '.digirisk-wrap .navigation-container .unit.active' ).removeClass( 'active' );
-	//console.log( this );
 
+	jQuery( '.digirisk-wrap .navigation-container .unit.active' ).removeClass( 'active' );
 	jQuery( `#scores[value="${parentID}"]` ).closest( '.unit' ).addClass( 'active' );
 	jQuery( '#scores' ).closest( '.unit' ).attr( 'value', parentID );
-
 
 	//empty and fill object card
 	$('#cardContent').empty()
