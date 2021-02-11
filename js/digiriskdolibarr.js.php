@@ -230,7 +230,7 @@ window.eoxiaJS.navigation.event = function() {
 
 	//action buttons
 	jQuery( document ).on( 'click', '#actionButtonEdit', window.eoxiaJS.redirect );
-	jQuery( document ).on( 'click', '#builddoc_generatebutton', window.eoxiaJS.redirectAfterGenerate );
+	jQuery( document ).on( 'click', '.elementDocument #builddoc_generatebutton', window.eoxiaJS.redirectAfterGenerate );
 	jQuery( document ).on( 'click', '#actionButtonCancelEdit', window.eoxiaJS.redirectAfterCancelEdit );
 	jQuery( document ).on( 'click', '#actionButtonCancelCreate', window.eoxiaJS.redirectAfterCancelCreate );
 
@@ -393,17 +393,21 @@ window.eoxiaJS.redirectAfterCancelCreate = function( event ) {
 //};
 //
 //window.eoxiaJS.redirectAfterCreate = function( event ) {
-//
+//alert('huhu')
+//	console.log(event)
 //	var params = new window.URLSearchParams(window.location.search);
-//	let id = $(params.get('id'))
+//	var id = $(params.get('id'))
+//	var label = $('input[name="label"]').value
+//	console.log($('input[name="label"]'))
 //	alert(id)
-//	history.pushState({ path: document.URL.replace('&action=create','')}, '', document.URL.replace('&action=edit',''))
+//	alert(label)
+//	history.pushState({ path: document.URL.replace('create','add') + '&label=' + 'hihihi' }, '', document.URL.replace('create','add')+ '&label=' + 'hihihi')
 //	//change URL without refresh
 //
 //	//empty and fill object card
 //	$('#cardContent').empty()
 //	$('#cardContent').attr('value', id)
-//	$('#cardContent').load( document.URL.replace('&action=edit','') + ' #cardContent' , id);
+//	$('#cardContent').load( document.URL.replace('&action=create','add')+ '&label='  + 'hihihi' + ' #cardContent' , id);
 //
 //
 //};

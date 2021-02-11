@@ -65,7 +65,6 @@ $backtopageforcancel = GETPOST('backtopageforcancel', 'alpha');
 $element_type        = GETPOST('element_type', 'alpha');
 $fk_parent           = GETPOST('fk_parent', 'int');
 
-
 // Initialize technical objects
 $object 			 = new DigiriskElement($db);
 $extrafields  	 	 = new ExtraFields($db);
@@ -124,7 +123,6 @@ if (empty($reshook))
 		}
 	}
 
-
 	// Action to add record
 	include DOL_DOCUMENT_ROOT.'/core/actions_addupdatedelete.inc.php';
 
@@ -135,7 +133,7 @@ if (empty($reshook))
 	include DOL_DOCUMENT_ROOT.'/core/actions_printing.inc.php';
 
 	// Action to build doc
-//	include DOL_DOCUMENT_ROOT.'/core/actions_builddoc.inc.php';
+    //include DOL_DOCUMENT_ROOT.'/core/actions_builddoc.inc.php';
 
 	if ($action == 'set_thirdparty' && $permissiontoadd)
 	{
@@ -188,11 +186,7 @@ $object->digiriskHeader('', $title, $help_url, '', '', '', $morejs);
 
 <?php
 // Example : Adding jquery code
-$idFromMenu = explode('?',$_SERVER['REQUEST_URI']);
 
-if (is_numeric($idFromMenu[1])) {
-	$object->fetch($idFromMenu[1]);
-}
 // Part to create
 if ($action == 'create')
 {
@@ -357,9 +351,8 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 	print '</td></tr>';
 
 	print '<tr><td class="titlefield">'.$langs->trans("ParentElement").'</td><td>';
-	$parent = new DigiriskElement($db);
-	$result = $parent->fetch($object->fk_parent);
-	$parent_element = $object;
+	$parent_element = new DigiriskElement($db);
+	$result = $parent_element->fetch($object->fk_parent);
 	print $parent_element->ref . ( !empty($parent_element->description) ?  ' - ' . $parent_element->description : '');
 	print '</td></tr>';
 
@@ -525,18 +518,13 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 
 	if ($action != 'presend')
 	{
-		$idFromMenu = explode('?',$_SERVER['REQUEST_URI']);
-		print '<div class="fichecenter"><div class="fichehalfleft">';
+		print '<div class="fichecenter"><div class="fichehalfleft elementDocument">';
 		print '<a name="builddoc"></a>'; // ancre
 
 		$includedocgeneration = 1;
 		// Documents
 		if ($includedocgeneration) {
 
-			if (isset($idFromMenu[1])) {
-				$object->fetch($idFromMenu[1]);
-				$id = $idFromMenu;
-			}
 			$objref = dol_sanitizeFileName($object->ref);
 
 			$relativepath = $objref . '/' . $objref . '.pdf';
