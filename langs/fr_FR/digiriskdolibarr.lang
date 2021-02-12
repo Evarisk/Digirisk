@@ -226,6 +226,7 @@ WorkUnitDigiriskTemplate = ODT par défaut des unités de travail
 # Data
 #
 
+digiriskdolibarr = Digirisk Dolibarr
 LabourDoctor = Médecin du travail
 LabourInspector = Inspecteur du travail
 FireBrigade = Pompiers
