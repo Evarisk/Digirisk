@@ -1138,6 +1138,32 @@ class DigiriskElement extends CommonObject
 
 							<ul class="workunit-list">
 									<?php $this->display_recurse_tree($results) ?>
+
+									<script>
+									// Get previous menu to display it
+									var MENU = localStorage.menu
+									if (MENU == null || MENU == '') {
+										MENU = new Set()
+									} else {
+										MENU = JSON.parse(MENU)
+										MENU = new Set(MENU)
+									}
+
+									MENU.forEach((id) =>  {
+										jQuery( '#menu'+id).removeClass( 'fa-chevron-right').addClass( 'fa-chevron-down' );
+										jQuery( '#unit'+id ).addClass( 'toggled' );
+									})
+
+									// Set active unit active
+									jQuery( '.digirisk-wrap .navigation-container .unit.active' ).removeClass( 'active' );
+
+									var params = new window.URLSearchParams(window.location.search);
+									var id = params.get('id')
+
+									jQuery( '#unit'  + id ).addClass( 'active' );
+									jQuery( '#unit'  +id  ).closest( '.unit' ).attr( 'value', id );
+
+									</script>
 								</ul>
 						</div>
 					</div>
@@ -1174,11 +1200,11 @@ class DigiriskElement extends CommonObject
 
 		if ( !empty( $results ) ) {
 			foreach ($results as $element) { ?>
-				<li class="unit">
+				<li class="unit" id="unit<?php  echo $element['object']->id; ?>">
 					<div class="unit-container">
 						<?php if ($element['object']->element_type == 'groupment' && count($element['children'])) { ?>
 							<div class="toggle-unit">
-								<i class="toggle-icon fas fa-chevron-right"></i>
+								<i class="toggle-icon fas fa-chevron-right" id="menu<?php echo $element['object']->id;?>"></i>
 							</div>
 						<?php } else { ?>
 							<div class="spacer"></div>
@@ -1191,7 +1217,7 @@ class DigiriskElement extends CommonObject
 							<span class="floatleft inline-block valignmiddle divphotoref"><img class="photodigiriskdolibarr" alt="No photo" src="<?php echo DOL_URL_ROOT.$nophoto ?>"></span>
 						<?php } ?>
 						<div class="title" id="scores" value="<?php echo $element['object']->id ?>" >
-								<a id="slider" class="linkElement" href="digiriskelement_card.php?id=<?php echo $element['object']->id; ?>">
+								<a id="slider" class="linkElement id<?php echo $element['object']->id;?>" href="digiriskelement_card.php?id=<?php echo $element['object']->id; ?>">
 									<span class="title-container">
 										<span class="ref"><?php echo $element['object']->ref; ?></span>
 										<span class="name"><?php echo $element['object']->label; ?></span>

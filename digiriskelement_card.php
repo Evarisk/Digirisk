@@ -122,7 +122,19 @@ if (empty($reshook))
 			else $backtopage = dol_buildpath('/digiriskdolibarr/digiriskelement_card.php', 1).'?id='.($id > 0 ? $id : '__ID__');
 		}
 	}
+	if ($action == 'add') { ?>
+		<script>
+			jQuery( '.digirisk-wrap .navigation-container .unit.active' ).removeClass( 'active' );
+			//console.log( this );
+			let id = $(this).attr('value')
+			jQuery( this ).closest( '.unit' ).addClass( 'active' );
 
+			var unitActive = jQuery( this ).closest( '.unit.active' ).attr('id')
+			localStorage.setItem('unitactive', unitActive );
+
+			jQuery( this ).closest( '.unit' ).attr( 'value', id );
+		</script>
+	<?php }
 	// Action to add record
 	include DOL_DOCUMENT_ROOT.'/core/actions_addupdatedelete.inc.php';
 
@@ -133,7 +145,7 @@ if (empty($reshook))
 	include DOL_DOCUMENT_ROOT.'/core/actions_printing.inc.php';
 
 	// Action to build doc
-    //include DOL_DOCUMENT_ROOT.'/core/actions_builddoc.inc.php';
+    include DOL_DOCUMENT_ROOT.'/core/actions_builddoc.inc.php';
 
 	if ($action == 'set_thirdparty' && $permissiontoadd)
 	{
@@ -216,7 +228,7 @@ if ($action == 'create')
 	$modele = new $digirisk_addon($db);
 
 	print '<tr><td class="fieldrequired">'.$langs->trans("Ref").'</td><td>';
-	print '<input hidden class="flat" type="text" size="36" name="ref" value="'.$modele->getNextValue($object).'">';
+	print '<input hidden class="flat" type="text" size="36" name="ref" id="ref" value="'.$modele->getNextValue($object).'">';
 	print $modele->getNextValue($object);
 	print '</td></tr>';
 
@@ -350,10 +362,16 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 	print $langs->trans($object->element_type);
 	print '</td></tr>';
 
+	print '<div class="titlefield hidden elementID" id="elementID" value="'.$object->id.'">'.$langs->trans("ID").'</div>';
 	print '<tr><td class="titlefield">'.$langs->trans("ParentElement").'</td><td>';
 	$parent_element = new DigiriskElement($db);
 	$result = $parent_element->fetch($object->fk_parent);
-	print $parent_element->ref . ( !empty($parent_element->description) ?  ' - ' . $parent_element->description : '');
+	if ($result > 0) {
+		print $parent_element->ref . ( !empty($parent_element->description) ?  ' - ' . $parent_element->description : '');
+	}
+	else {
+		print $conf->global->MAIN_INFO_SOCIETE_NOM;
+	}
 	print '</td></tr>';
 
 	//Show common fields
@@ -465,55 +483,7 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 	if (GETPOST('modelselected')) {
 		$action = 'presend';
 	}
-	if ($action == 'builddoc' && $permissiontoadd)
-	{
 
-
-			// Reload to get all modified line records and be ready for hooks
-
-			$ret = $object->fetch($id);
-
-			$ret = $object->fetch_thirdparty();
-			/*if (empty($object->id) || ! $object->id > 0)
-			{
-				dol_print_error('Object must have been loaded by a fetch');
-				exit;
-			}*/
-
-			// Save last template used to generate document
-			if (GETPOST('model', 'alpha'))
-			{
-				$object->setDocModel($user, GETPOST('model', 'alpha'));
-			}
-
-			$outputlangs = $langs;
-			$newlang = '';
-
-			if ($conf->global->MAIN_MULTILANGS && empty($newlang) && GETPOST('lang_id', 'aZ09')) $newlang = GETPOST('lang_id', 'aZ09');
-			if ($conf->global->MAIN_MULTILANGS && empty($newlang) && isset($object->thirdparty->default_lang)) $newlang = $object->thirdparty->default_lang; // for proposal, order, invoice, ...
-			if ($conf->global->MAIN_MULTILANGS && empty($newlang) && isset($object->default_lang)) $newlang = $object->default_lang; // for thirdparty
-			if (!empty($newlang))
-			{
-				$outputlangs = new Translate("", $conf);
-				$outputlangs->setDefaultLang($newlang);
-			}
-
-			// To be sure vars is defined
-			if (empty($hidedetails)) $hidedetails = 0;
-			if (empty($hidedesc)) $hidedesc = 0;
-			if (empty($hideref)) $hideref = 0;
-			if (empty($moreparams)) $moreparams = null;
-			$model = 'DIGIRISKDOLIBARR_' . strtoupper($object->element_type) . '_DEFAULT_MODEL';
-
-			$result = $object->generateDocument($conf->global->$model, $outputlangs, $hidedetails, $hidedesc, $hideref, $moreparams);
-
-			if ($result <= 0)
-			{
-				setEventMessages($object->error, $object->errors, 'errors');
-				$action = '';
-			}
-
-	}
 	// Document Generation -- Génération des documents
 
 	if ($action != 'presend')
@@ -531,7 +501,7 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 			$dir_files = $object->element_type . '/' . $objref;
 			$filedir = $conf->digiriskdolibarr->dir_output.'/'.$dir_files;
 
-			$urlsource = $_SERVER["PHP_SELF"];
+			$urlsource = $_SERVER["PHP_SELF"] . '?id=' . $object->id;
 			$genallowed = $user->rights->digiriskdolibarr->digiriskelement->read;	// If you can read, you can build the PDF to read content
 			$delallowed = $user->rights->digiriskdolibarr->digiriskelement->create;	// If you can create/edit, you can remove a file on card
 

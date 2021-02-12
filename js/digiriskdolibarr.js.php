@@ -215,7 +215,10 @@ window.eoxiaJS.navigation.init = function() {
  * @return {void}
  */
 window.eoxiaJS.navigation.event = function() {
+	//toggles
 	jQuery( document ).on( 'click', '.digirisk-wrap .navigation-container .unit-container .toggle-unit', window.eoxiaJS.navigation.switchToggle );
+	jQuery( document ).on( 'click', '#newGroupment', window.eoxiaJS.navigation.switchToggle );
+	jQuery( document ).on( 'click', '#newWorkunit', window.eoxiaJS.navigation.switchToggle );
 	jQuery( document ).on( 'click', '.digirisk-wrap .navigation-container .toolbar div', window.eoxiaJS.navigation.toggleAll );
 	jQuery( document ).on( 'click', '#slider', window.eoxiaJS.navigation.setUnitActive );
 
@@ -230,13 +233,8 @@ window.eoxiaJS.navigation.event = function() {
 
 	//action buttons
 	jQuery( document ).on( 'click', '#actionButtonEdit', window.eoxiaJS.redirect );
-	jQuery( document ).on( 'click', '.elementDocument #builddoc_generatebutton', window.eoxiaJS.redirectAfterGenerate );
-	jQuery( document ).on( 'click', '#actionButtonCancelEdit', window.eoxiaJS.redirectAfterCancelEdit );
 	jQuery( document ).on( 'click', '#actionButtonCancelCreate', window.eoxiaJS.redirectAfterCancelCreate );
 
-	//jQuery( document ).on( 'click', '#actionButtonSave', window.eoxiaJS.redirectAfterSave );
-	//jQuery( document ).on( 'click', '#actionButtonCreate', window.eoxiaJS.redirectAfterCreate );
-	//jQuery( document ).on( 'haschange', window.eoxiaJS.redirectAfterCreate );
 };
 
 /**
@@ -248,13 +246,33 @@ window.eoxiaJS.navigation.event = function() {
 window.eoxiaJS.navigation.switchToggle = function( event ) {
 	event.preventDefault();
 
-	if ( jQuery( this ).find( '.toggle-icon' ).hasClass( 'fa-chevron-down' ) ) {
-		jQuery(this).find( '.toggle-icon' ).removeClass('fa-chevron-down').addClass('fa-chevron-right');
-		jQuery(this).closest('.unit').removeClass('toggled');
+	var MENU = localStorage.menu
+	if (MENU == null || MENU == '') {
+		MENU = new Set()
 	} else {
+		MENU = JSON.parse(MENU)
+		MENU = new Set(MENU)
+	}
+
+	if ( jQuery( this ).find( '.toggle-icon' ).hasClass( 'fa-chevron-down' ) ) {
+
+		jQuery(this).find( '.toggle-icon' ).removeClass('fa-chevron-down').addClass('fa-chevron-right');
+		var idUnToggled = jQuery(this).closest('.unit').attr('id').split('unit')[1]
+		jQuery(this).closest('.unit').removeClass('toggled');
+
+		MENU.delete(idUnToggled)
+		localStorage.setItem('menu',  JSON.stringify(Array.from(MENU.keys())))
+
+	} else {
+
 		jQuery(this).find( '.toggle-icon' ).removeClass('fa-chevron-right').addClass('fa-chevron-down');
 		jQuery(this).closest('.unit').addClass('toggled');
+
+		var idToggled = jQuery(this).closest('.unit').attr('id').split('unit')[1]
+		MENU.add(idToggled)
+		localStorage.setItem('menu',  JSON.stringify(Array.from(MENU.keys())))
 	}
+
 };
 
 /**
@@ -267,15 +285,27 @@ window.eoxiaJS.navigation.toggleAll = function( event ) {
 	event.preventDefault();
 
 	if ( jQuery( this ).hasClass( 'toggle-plus' ) ) {
+
 		jQuery( '.digirisk-wrap .navigation-container .workunit-list .unit .toggle-icon').removeClass( 'fa-chevron-right').addClass( 'fa-chevron-down' );
 		jQuery( '.digirisk-wrap .navigation-container .workunit-list .unit' ).addClass( 'toggled' );
+
+		// local storage add all
+		let MENU = $( '.digirisk-wrap .navigation-container .workunit-list .unit .title' ).get().map( v => v.attributes.value.value)
+		localStorage.setItem('menu', JSON.stringify(Object.values(MENU)) )
+
 	}
 
 	if ( jQuery( this ).hasClass( 'toggle-minus' ) ) {
 		jQuery( '.digirisk-wrap .navigation-container .workunit-list .unit.toggled' ).removeClass( 'toggled' );
 		jQuery( '.digirisk-wrap .navigation-container .workunit-list .unit .toggle-icon').addClass( 'fa-chevron-right').removeClass( 'fa-chevron-down' );
+
+		// local storage delete all
+		let emptyMenu = new Set('0')
+		localStorage.setItem('menu', JSON.stringify(Object.values(emptyMenu)) )
+
 	}
 };
+
 
 /**
  * Ajout la classe 'active' à l'élément.
@@ -284,9 +314,10 @@ window.eoxiaJS.navigation.toggleAll = function( event ) {
  * @return {void}
  */
 window.eoxiaJS.navigation.setUnitActive = function( event ) {
+
 	jQuery( '.digirisk-wrap .navigation-container .unit.active' ).removeClass( 'active' );
-	//console.log( this );
 	let id = $(this).attr('value')
+
 	jQuery( this ).closest( '.unit' ).addClass( 'active' );
 	jQuery( this ).closest( '.unit' ).attr( 'value', id );
 
@@ -307,43 +338,6 @@ window.eoxiaJS.redirect = function( event ) {
 	$('#cardContent').load( document.URL + ' #cardContent' , id);
 
 	return false;
-};
-
-window.eoxiaJS.redirectAfterGenerate = function( event ) {
-
-	var params = new window.URLSearchParams(window.location.search);
-
-	var id = $(params.get('id'))
-	//get ID from div selected in left menu
-	history.pushState({ path: document.URL + '&action=builddoc'}, '', this.href)
-	//change URL without refresh
-
-	//empty and fill object card
-	$('#cardContent').empty()
-	$('#cardContent').attr('value', id)
-	$('#cardContent').load(document.URL + '&action=builddoc' + ' #cardContent' , id);
-
-	return false
-
-};
-
-window.eoxiaJS.redirectAfterCancelEdit = function( event ) {
-
-	var params = new window.URLSearchParams(window.location.search);
-	var id = $(params.get('id'))
-	//for cancel edit
-	var URL = document.URL.split("&action")[0]
-
-	history.pushState({ path:  document.URL}, '', URL)
-
-
-	//empty and fill object card
-	$('#cardContent').empty()
-	$('#cardContent').attr('value', id)
-	$('#cardContent').load( document.URL + ' #cardContent' , id);
-
-	return false;
-
 };
 
 window.eoxiaJS.redirectAfterCancelCreate = function( event ) {
@@ -374,40 +368,3 @@ window.eoxiaJS.redirectAfterCancelCreate = function( event ) {
 	return false;
 
 };
-//
-//window.eoxiaJS.redirectAfterSave = function( event ) {
-//
-//	var params = new window.URLSearchParams(window.location.search);
-//	let id = $(params.get('id'))
-//		alert(test)
-//	//get ID from div selected in left menu
-//	history.pushState({ path: document.URL.replace('&action=edit','')}, '', document.URL.replace('&action=edit',''))
-//	//change URL without refresh
-//
-//	//empty and fill object card
-//	$('#cardContent').empty()
-//	$('#cardContent').attr('value', id)
-//	$('#cardContent').load( document.URL.replace('&action=edit','') + ' #cardContent' , id);
-//
-//
-//};
-//
-//window.eoxiaJS.redirectAfterCreate = function( event ) {
-//alert('huhu')
-//	console.log(event)
-//	var params = new window.URLSearchParams(window.location.search);
-//	var id = $(params.get('id'))
-//	var label = $('input[name="label"]').value
-//	console.log($('input[name="label"]'))
-//	alert(id)
-//	alert(label)
-//	history.pushState({ path: document.URL.replace('create','add') + '&label=' + 'hihihi' }, '', document.URL.replace('create','add')+ '&label=' + 'hihihi')
-//	//change URL without refresh
-//
-//	//empty and fill object card
-//	$('#cardContent').empty()
-//	$('#cardContent').attr('value', id)
-//	$('#cardContent').load( document.URL.replace('&action=create','add')+ '&label='  + 'hihihi' + ' #cardContent' , id);
-//
-//
-//};
