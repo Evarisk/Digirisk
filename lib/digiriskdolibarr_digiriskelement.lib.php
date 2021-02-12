@@ -38,7 +38,7 @@ function digiriskelementPrepareHead($object)
 
 	$head[$h][0] = dol_buildpath("/digiriskdolibarr/digiriskelement_card.php", 1).'?id='.$object->id;
 	$head[$h][1] = $langs->trans("Card");
-	$head[$h][2] = 'card';
+	$head[$h][2] = 'elementCard';
 	$h++;
 
 	if (isset($object->fields['note_public']) || isset($object->fields['note_private']))
@@ -61,12 +61,12 @@ function digiriskelementPrepareHead($object)
 	$head[$h][0] = dol_buildpath("/digiriskdolibarr/digiriskelement_document.php", 1).'?id='.$object->id;
 	$head[$h][1] = $langs->trans('Documents');
 	if (($nbFiles + $nbLinks) > 0) $head[$h][1] .= '<span class="badge marginleftonlyshort">'.($nbFiles + $nbLinks).'</span>';
-	$head[$h][2] = 'document';
+	$head[$h][2] = 'elementDocument';
 	$h++;
 
 	$head[$h][0] = dol_buildpath("/digiriskdolibarr/digiriskelement_agenda.php", 1).'?id='.$object->id;
 	$head[$h][1] = $langs->trans("Events");
-	$head[$h][2] = 'agenda';
+	$head[$h][2] = 'elementAgenda';
 	$h++;
 
 	// Show more tabs from modules

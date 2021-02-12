@@ -227,9 +227,9 @@ window.eoxiaJS.navigation.event = function() {
 	jQuery( document ).on( 'click', '#newGroupment', window.eoxiaJS.redirect );
 	jQuery( document ).on( 'click', '#newWorkunit', window.eoxiaJS.redirect );
 	// tabs
-	jQuery( document ).on( 'click', '#document', window.eoxiaJS.redirect );
-	jQuery( document ).on( 'click', '#card', window.eoxiaJS.redirect );
-	jQuery( document ).on( 'click', '#agenda', window.eoxiaJS.redirect );
+	jQuery( document ).on( 'click', '#elementDocument', window.eoxiaJS.redirect );
+	jQuery( document ).on( 'click', '#elementCard', window.eoxiaJS.redirect );
+	jQuery( document ).on( 'click', '#elementAgenda', window.eoxiaJS.redirect );
 
 	//action buttons
 	jQuery( document ).on( 'click', '#actionButtonEdit', window.eoxiaJS.redirect );
