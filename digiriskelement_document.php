@@ -118,7 +118,7 @@ if ($object->id)
 
 	$head = digiriskelementPrepareHead($object);
 
-	dol_fiche_head($head, 'document', $langs->trans("DigiriskElement"), -1, $object->picto);
+	dol_fiche_head($head, 'elementDocument', $langs->trans("DigiriskElement"), -1, $object->picto);
 
 
 	// Build file list

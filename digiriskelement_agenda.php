@@ -144,7 +144,7 @@ if ($object->id > 0)
 	$head = digiriskelementPrepareHead($object);
 
 
-	dol_fiche_head($head, 'agenda', $langs->trans("DigiriskElement"), -1, 'object_'.$object->picto);
+	dol_fiche_head($head, 'elementAgenda', $langs->trans("DigiriskElement"), -1, 'object_'.$object->picto);
 
 	// Object card
 	// ------------------------------------------------------------

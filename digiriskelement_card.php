@@ -300,7 +300,7 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 
 	$head = digiriskelementPrepareHead($object);
 
-	dol_fiche_head($head, 'card', $langs->trans("DigiriskElement"), -1, $object->picto);
+	dol_fiche_head($head, 'elementCard', $langs->trans("DigiriskElement"), -1, $object->picto);
 
 	$formconfirm = '';
 
