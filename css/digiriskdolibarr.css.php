@@ -803,7 +803,10 @@ div.mainmenu.digiriskdolibarr {
 	}
 }
 
-.wpeo-wrap .wpeo-table.evaluation-method .table-cell {
+.wpeo-wrap .wpeo-table.evaluation-method .
+
+
+{
 	margin: 0;
 	text-align: center;
 	border: 1px solid rgba(0, 0, 0, 0.1);
@@ -1306,12 +1309,12 @@ div.mainmenu.digiriskdolibarr {
 }
 
 .wpeo-wrap .wpeo-table.table-flex .table-row.table-header {
-	background: #fff;
+	background: #33333e;
 	border-bottom: 2px solid rgba(0, 0, 0, 0.3);
 }
 
 .wpeo-wrap .wpeo-table.table-flex .table-row.table-header .table-cell {
-	color: rgba(0, 0, 0, 0.8);
+	color: rgba(255, 255, 255, 0.8);
 }
 
 .wpeo-wrap .wpeo-table.table-flex .table-row:not(.table-header):nth-of-type(odd) {
@@ -1548,7 +1551,7 @@ div.mainmenu.digiriskdolibarr {
 	.wpeo-wrap .wpeo-table.table-risk .table-row:not(.table-header) {
 		flex-wrap: wrap;
 		flex-direction: row !important;
-		background: #fff !important;
+		background: #0000c1 !important;
 		margin-bottom: 2em;
 		border: 1px solid rgba(0, 0, 0, 0.1);
 	}

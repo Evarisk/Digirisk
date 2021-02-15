@@ -223,6 +223,11 @@ WorkUnitCustomTemplate = ODT custom des unités de travail
 WorkUnitDigiriskTemplate = ODT par défaut des unités de travail
 
 #
+Risks
+#
+
+Risks = Risques
+#
 # Data
 #
 

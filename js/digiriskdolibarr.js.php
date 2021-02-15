@@ -230,6 +230,7 @@ window.eoxiaJS.navigation.event = function() {
 	jQuery( document ).on( 'click', '#elementDocument', window.eoxiaJS.redirect );
 	jQuery( document ).on( 'click', '#elementCard', window.eoxiaJS.redirect );
 	jQuery( document ).on( 'click', '#elementAgenda', window.eoxiaJS.redirect );
+	jQuery( document ).on( 'click', '#elementRisk', window.eoxiaJS.redirect );
 
 	//action buttons
 	jQuery( document ).on( 'click', '#actionButtonEdit', window.eoxiaJS.redirect );

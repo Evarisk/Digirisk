@@ -129,7 +129,7 @@ print '<td class="titlefield">'.$form->textwithpicto($langs->trans("Antipoison")
 // Responsable de prévention
 
 print '<tr>';
-print '<td class="titlefield">'.$form->textwithpicto($langs->trans("ReponsibleToNotify"), $langs->trans('HowToSetDataLegalDisplay')).'</td>';
+print '<td class="titlefield">'.$form->textwithpicto($langs->trans("ResponsibleToNotify"), $langs->trans('HowToSetDataLegalDisplay')).'</td>';
 	print '<td>';
 		print $legaldisplay->safety_rule->responsible_for_preventing;
 		print '</td></tr>';
