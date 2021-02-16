@@ -479,7 +479,7 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 											if (!empty($lastCotation)) {
 												foreach ($lastCotation as $cot) {
 													if ($cot->cotation > 0) { ?>
-														<div class="action cotation default-cotation" data-scale="<?php echo $cot->get_evaluation_scale() ?>">
+														<div class="action cotation default-cotation modal-open" data-scale="<?php echo $cot->get_evaluation_scale() ?>" value="<?php echo $risk->id ?>">
 															<span><?php echo $cot->cotation; ?></span>
 														</div>
 														<div id="cotation_modal<?php echo $risk->id ?>" class="wpeo-modal" value="<?php echo $risk->id ?>">
@@ -521,7 +521,7 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 																	</div>
 																</div>
 																<div class="wpeo-button button-grey modal-close">
-																	<span><?php echo $langs->trans('Close'); ?></span>
+																	<span><?php echo $langs->trans('CloseTab'); ?></span>
 																</div>
 															</div>
 														</div>
@@ -827,37 +827,7 @@ dol_fiche_end();
 //	include DOL_DOCUMENT_ROOT.'/core/tpl/card_presend.tpl.php';
 //	print '</div>';
 
-} ?>
-<script>
-var riskId = 0;
-Object.values($('.wpeo-modal')).forEach(v => {
-	riskId = $(v).attr('value')
-	var modal = document.getElementById("cotation_modal"+riskId);
-// Get the button that opens the modal
-	var btn = document.getElementById("cotation_square"+riskId);
-
-// When the user clicks the button, open the modal
-	btn.onclick = function() {
-		$(modal).addClass('modal-active')
-		modal.style.display = "block";
-	}
-
-// When the user clicks on <span> (x), close the modal
-	window.onclick = function() {
-		modal.style.display = "none";
-	}
-
-// When the user clicks anywhere outside of the modal, close it
-	window.onclick = function(event) {
-		if (event.target == modal) {
-			modal.style.display = "none";
-		}
-	}
-})
-console.log(riskId)
-// Get the modal
-
-														</script> <?php
+}
 // End of page
 llxFooter();
 $db->close();

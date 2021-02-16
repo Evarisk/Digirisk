@@ -234,6 +234,7 @@ window.eoxiaJS.navigation.event = function() {
 
 	//modal
 	jQuery( document ).on( 'click', '.modal-close', window.eoxiaJS.closeModal );
+	jQuery( document ).on( 'click', '.modal-open', window.eoxiaJS.openModal );
 
 	//action buttons
 	jQuery( document ).on( 'click', '#actionButtonEdit', window.eoxiaJS.redirect );
@@ -378,17 +379,27 @@ window.eoxiaJS.redirectAfterCancelCreate = function( event ) {
 
 };
 
+// Onglet risques
+
 window.eoxiaJS.closeModal = function ( event ) {
 	$('.modal-active').removeClass('modal-active')
 }
+window.eoxiaJS.openModal = function ( event ) {
+
+	let idSelected = $(this).attr('value')
+
+	$('.modal-active').removeClass('modal-active')
+	$('#cotation_modal'+idSelected).addClass('modal-active')
+}
 window.eoxiaJS.editRisk = function ( event ) {
-	//empty and fill object card
+
 	let editedRiskId = $(this).attr('value')
 	$('#risk_row_'+editedRiskId).empty()
-	$('#risk_row_'+editedRiskId).load( document.URL + '&action=editRisk' + editedRiskId + ' #risk_row_'+editedRiskId+' > div' )
+	$('#risk_row_'+editedRiskId).load( document.URL + '&action=editRisk' + editedRiskId + ' #risk_row_'+editedRiskId+' > div')
+
 }
 window.eoxiaJS.saveRisk = function ( event ) {
-	//empty and fill object card
+
 	let editedRiskId = $(this).attr('value')
 
 	var description = $('#riskComment'+editedRiskId).val()
@@ -402,7 +413,6 @@ window.eoxiaJS.saveRisk = function ( event ) {
 	if (cotation !== 0) {
 		cotationPost = '&cotation=' + cotation
 	}
-	console.log(document.URL + '&action=saveRisk' + editedRiskId + cotationPost + descriptionPost)
 	$('#risk_row_'+editedRiskId).empty()
 	$('#risk_row_'+editedRiskId).load( document.URL + '&action=saveRisk' + editedRiskId + cotationPost + descriptionPost + ' #risk_row_'+editedRiskId+' > div', function() {
 		$.getScript('digiriskdolibarr.js.php')
