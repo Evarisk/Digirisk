@@ -159,8 +159,14 @@ class modDigiriskdolibarr extends DolibarrModules
 			35 => array('MAIN_AGENDA_ACTIONAUTO_WORKUNIT_CREATE','chaine',1,'', 1),
 			36 => array('DIGIRISKDOLIBARR_WORKUNIT_ADDON_ODT_PATH','chaine', DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/documents/doctemplates/workunit/' ,'', 1),
 			37 => array('DIGIRISKDOLIBARR_WORKUNIT_CUSTOM_ADDON_ODT_PATH','chaine', DOL_DATA_ROOT . '/ecm/digiriskdolibarr/workunit/' ,'', 1),
-			38 => array('DIGIRISKDOLIBARR_WORKUNIT_ADDON','chaine', 'mod_groupment_standard' ,'', 1),
-			39 => array('DIGIRISKDOLIBARR_WORKUNIT_DEFAULT_MODEL','chaine', 'groupment_A4_odt' ,'', 1)
+			38 => array('DIGIRISKDOLIBARR_WORKUNIT_ADDON','chaine', 'mod_workunit_standard' ,'', 1),
+			39 => array('DIGIRISKDOLIBARR_WORKUNIT_DEFAULT_MODEL','chaine', 'workunit_A4_odt' ,'', 1),
+			40 => array('DIGIRISKDOLIBARR_RISK_ADDON_ODT_PATH','chaine', DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/documents/doctemplates/risk/' ,'', 1),
+			41 => array('DIGIRISKDOLIBARR_RISK_CUSTOM_ADDON_ODT_PATH','chaine', DOL_DATA_ROOT . '/ecm/digiriskdolibarr/risk/' ,'', 1),
+			42 => array('DIGIRISKDOLIBARR_RISK_ADDON','chaine', 'mod_risk_standard' ,'', 1),
+			43 => array('DIGIRISKDOLIBARR_RISK_DEFAULT_MODEL','chaine', 'risk_A4_odt' ,'', 1),
+			44 => array('MAIN_AGENDA_ACTIONAUTO_RISK_CREATE','chaine',1,'', 1)
+
 		);
 
 		if ( ! isset($conf->digiriskdolibarr ) || ! isset( $conf->digiriskdolibarr->enabled ) ) {
@@ -319,6 +325,28 @@ class modDigiriskdolibarr extends DolibarrModules
 		$this->rights[$r][3] = 1;
 		$this->rights[$r][4] = 'digiriskelement';
 		$this->rights[$r][5] = 'delete';
+		$r++;
+
+		/* RISKS PERMISSIONS */
+
+		$this->rights[$r][0] = 1050 + $r;
+		$this->rights[$r][1] = $langs->trans('ReadDigiriskRisk');
+		$this->rights[$r][3] = 1;
+		$this->rights[$r][4] = 'risk';
+		$this->rights[$r][5] = 'read';
+		$r++;
+		$this->rights[$r][0] = 1050 + $r;
+		$this->rights[$r][1] = $langs->trans('CreateDigiriskRisk');
+		$this->rights[$r][3] = 1;
+		$this->rights[$r][4] = 'risk';
+		$this->rights[$r][5] = 'write';
+		$r++;
+		$this->rights[$r][0] = 1050 + $r;
+		$this->rights[$r][1] = $langs->trans('DeleteDigiriskRisk');
+		$this->rights[$r][3] = 1;
+		$this->rights[$r][4] = 'risk';
+		$this->rights[$r][5] = 'delete';
+
 
 		// Main menu entries to add
 		$this->menu = array();

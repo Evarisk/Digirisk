@@ -426,6 +426,8 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 								<div class="table-cell table-50 cell-risk" data-title="Risque">
 									<?php echo 'picto' ?>
 								</div>
+
+
 								<div class="table-cell table-50 cell-cotation" data-title="Cot.">
 							<!--		--><?php //Risk_Evaluation_Class::g()->display( $risk ); ?>
 									<?php echo '48' ?>
@@ -566,10 +568,20 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 //										?>
 										selectbox picto cat
 									</div>
-									<div data-title="Cot." class="table-cell table-50 cell-cotation">
-<!--										--><?php //do_shortcode( '[digi_dropdown_evaluation_method risk_id=' . $risk->data['id'] . ']' ); ?>
-										cot
-									</div>
+<!--									<div data-title="Cot." class="table-cell table-50 cell-cotation">-->
+<!--										<div class="wpeo-dropdown dropdown-grid dropdown-padding-0 cotation-container wpeo-tooltip-event dropdown-active" aria-label="Veuillez remplir la cotation" data-color="red" data-tooltip-persist="true">-->
+<!--											<span data-scale="-1" class="dropdown-toggle dropdown-add-button cotation">-->
+<!--												<span><i class="fas fa-chart-line"></i><i class="fas fa-plus-circle icon-add"></i></span>-->
+<!--											</span>-->
+<!--											<ul class="dropdown-content wpeo-gridlayout grid-5 grid-gap-0 dropdown-list">-->
+<!--												<li data-id="0" data-evaluation-id="67" data-variable-id="68" data-seuil="1" data-scale="1" class="dropdown-item cotation">0</li>-->
+<!--												<li data-id="0" data-evaluation-id="67" data-variable-id="68" data-seuil="2" data-scale="2" class="dropdown-item cotation">48</li>-->
+<!--												<li data-id="0" data-evaluation-id="67" data-variable-id="68" data-seuil="3" data-scale="3" class="dropdown-item cotation">51</li>-->
+<!--												<li data-id="0" data-evaluation-id="67" data-variable-id="68" data-seuil="4" data-scale="4" class="dropdown-item cotation">100</li>-->
+<!--												<li class="dropdown-item wpeo-tooltip-event wpeo-modal-event cotation method" aria-label="Méthode Evarisk" data-action="load_modal_method_evaluation" data-title="Édition de la cotation" data-class="wpeo-wrap evaluation-method modal-risk-0" data-nonce="fdf361278c" data-id="61" wpeo-before-cb="digirisk/evaluationMethodEvarisk/fillVariables" data-risk-id="0"><i class="icon fa fa-cog"></i></li>-->
+<!--											</ul>-->
+<!--										</div>-->
+<!--									</div>-->
 									<div data-title="Photo" class="table-cell table-50 cell-photo">
 <!--										--><?php //echo do_shortcode( '[wpeo_upload id="' . ( ( $risk->data['preset'] ) ? 0 : $risk->data['id'] ) . '" model_name="' . $risk->get_class() . '" single="false" field_name="image" title="' . $risk->data['unique_identifier'] . ' - ' . $risk->data['evaluation']->data['unique_identifier'] . '" ]' ); ?>
 									photo
