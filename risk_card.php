@@ -43,7 +43,7 @@
 
 
 // Load Dolibarr environment
-use digi\Risk_Category_Class;use digi\Risk_Evaluation_Class;$res = 0;
+$res=0;
 // Try main.inc.php into web root known defined into CONTEXT_DOCUMENT_ROOT (not always defined)
 if (!$res && !empty($_SERVER["CONTEXT_DOCUMENT_ROOT"])) $res = @include $_SERVER["CONTEXT_DOCUMENT_ROOT"]."/main.inc.php";
 // Try main.inc.php into web root detected using web root calculated from SCRIPT_FILENAME
@@ -61,6 +61,7 @@ require_once DOL_DOCUMENT_ROOT.'/core/class/html.formcompany.class.php';
 require_once DOL_DOCUMENT_ROOT.'/core/class/html.formfile.class.php';
 require_once DOL_DOCUMENT_ROOT.'/core/class/html.formprojet.class.php';
 dol_include_once('/digiriskdolibarr/class/risk.class.php');
+dol_include_once('/digiriskdolibarr/class/digiriskevaluation.class.php');
 dol_include_once('/digiriskdolibarr/class/digiriskelement.class.php');
 dol_include_once('/digiriskdolibarr/lib/digiriskdolibarr_digiriskelement.lib.php');
 
@@ -148,22 +149,43 @@ if (empty($reshook))
 		}
 	}
 	$triggermodname = 'DIGIRISKDOLIBARR_RISK_MODIFY'; // Name of trigger action code to execute when we modify record
+
+
 	if ($action == 'add') {
 		$riskComment = GETPOST('riskComment');
 		$fk_element = GETPOST('id');
+		$cotation = GETPOST('cotation');
+
 
 		$risk->description = $riskComment ? $riskComment : '';
 		$risk->fk_element = $fk_element ? $fk_element : 0;
 		if (!$error)
 		{
 			$result = $risk->create($user);
+
 			if ($result > 0)
 			{
-				// Creation OK
-				$urltogo = $backtopage ? str_replace('__ID__', $result, $backtopage) : $backurlforlist;
-				$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $risk->id, $urltogo); // New method to autoselect project after a New on another form object creation
-				header("Location: ".$urltogo);
-				exit;
+				$evaluation = new DigiriskEvaluation($db);
+				$evaluation->cotation = $cotation;
+				$evaluation->fk_risk = $risk->id;
+				$evaluation->status = 1;
+				$result2 = $evaluation->create($user);
+
+				if ($result2 > 0)
+				{
+					// Creation OK
+					$urltogo = $backtopage ? str_replace('__ID__', $result2, $backtopage) : $backurlforlist;
+					$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $evaluation->id, $urltogo); // New method to autoselect project after a New on another form object creation
+					header("Location: ".$urltogo);
+					exit;
+				}
+				else
+				{
+					// Creation KO
+					if (!empty($evaluation->errors)) setEventMessages(null, $evaluation->errors, 'errors');
+					else  setEventMessages($evaluation->error, null, 'errors');
+					$action = 'create';
+				}
 			}
 			else
 			{
@@ -297,13 +319,6 @@ if (($id || $ref) && $action == 'edit')
 	dol_fiche_head();
 
 	print '<table class="border centpercent tableforfieldedit">'."\n";
-
-
-?>
-
-<?php
-
-
 	print '</table>';
 
 	dol_fiche_end();
@@ -412,7 +427,7 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 							if (!empty($risks)) {
 								foreach ($risks as $risk) {
 							?>
-							<div class="table-row risk-row method-evarisk-simplified">
+							<div class="table-row risk-row method-evarisk-simplified" id="risk_row_<?php echo $risk->id ?>">
 								<div data-title="Ref." class="table-cell table-75 cell-reference">
 									<!-- La popup pour les actions correctives -->
 							<!--		--><?php //\eoxia\View_Util::exec( 'digirisk', 'corrective_task', 'popup', array() ); ?>
@@ -427,82 +442,89 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 									<?php echo 'picto' ?>
 								</div>
 
-
 								<div class="table-cell table-50 cell-cotation" data-title="Cot.">
-							<!--		--><?php //Risk_Evaluation_Class::g()->display( $risk ); ?>
-									<?php echo '48' ?>
+									<div class="cotation-container grid wpeo-modal-event tooltip hover cotation-square" id="cotation_square<?php echo $risk->id ?>">
+										<?php
+										$evaluation = new DigiriskEvaluation($db);
+										$lastCotation = $evaluation->fetchFromParent($risk->id,1);
 
+										if ($action == 'editRisk' . $risk->id) {
+											print '<input type="number" name="cotation" id="cotation">';
+										} else {
+											if (!empty($lastCotation)) {
+												foreach ($lastCotation as $cot) {
+													if ($cot->cotation > 0) { ?>
+														<div class="action cotation default-cotation" data-scale="<?php echo $cot->get_evaluation_scale() ?>">
+															<span><?php echo $cot->cotation; ?></span>
+														</div>
+														<div id="cotation_modal<?php echo $risk->id ?>" class="wpeo-modal" value="<?php echo $risk->id ?>">
+															<div class="modal-container wpeo-modal-event">
+																<div class="modal-content" id="#modalContent">
+																	<div class="wpeo-table table-flex table-risk">
+																		<h2><?php echo $langs->trans('CotationHistoric') ?></h2>
+																		<div class="table-row table-header">
+																			<div class="table-cell table-50"><?php echo $langs->trans( 'Ref'); ?></div>
+																			<div class="table-cell table-150"><?php echo $langs->trans( 'Date' ); ?></div>
+																			<div class="table-cell table-50"><?php echo $langs->trans( 'Cot' ); ?></div>
+																			<div class="table-cell"><?php echo $langs->trans( 'Comment' ); ?></div>
+																		</div>
+																		<?php
+																		$cotationList = $evaluation->fetchFromParent($risk->id);
+																		if (!empty($cotationList)) {
+																			foreach ($cotationList as $cotation) {
+
+																				?>
+																				<div class="table-row risk-row">
+																					<div class="table-cell table-50" data-title="Ref.">
+																						<span><strong><?php echo  $cotation->id ; ?></strong></span>
+																					</div>
+																					<div class="table-cell table-150" data-title="Date">
+																						<?php echo dol_print_date($cotation->date_creation, 'Y/m/d') ; ?>
+																					</div>
+																					<div class="table-cell table-50" data-title="Cot.">
+																						<div class="cotation-container grid">
+																							<div class="action cotation default-cotation level<?php echo $cot->get_evaluation_scale(); ?>">
+																								<span><?php echo  $cotation->cotation ; ?></span>
+																							</div>
+																						</div>
+																					</div>
+																				</div>
+																				<?php
+																			}
+																		}
+																		?>
+																	</div>
+																</div>
+																<div class="wpeo-button button-grey modal-close">
+																	<span><?php echo $langs->trans('Close'); ?></span>
+																</div>
+															</div>
+														</div>
+													<?php }
+												}
+											}
+										}
+										?>
+									</div>
 								</div>
+
+
+
 								<div class="table-cell table-50 cell-photo" data-title="Photo">
 							<!--		--><?php //echo do_shortcode( '[wpeo_upload id="' . $risk->data['id'] . '" model_name="' . $risk->get_class() . '" single="false" field_name="image" title="' . $risk->data['unique_identifier'] . '" ]' ); ?>
 									<?php echo 'photo' ?>
 
-									<!-- Trigger/Open The Modal -->
-									<button id="myBtn">Open Modal</button>
-
-									<!-- The Modal -->
-									<div id="myModal" class="wpeo-modal">
-
-										<!-- Modal content -->
-										<div class="modal-container wpeo-modal-event">
-											<div class="modal-content">
-												<span class="close">&times;</span>
-												<p>Some text in the Modal..</p>
-												<p>Some text in the Modal..</p>
-												<p>Some text in the Modal..</p>
-												<p>Some text in the Modal..</p>
-												<p>Some text in the Modal..</p>
-												<p>Some text in the Modal..</p>
-												<p>Some text in the Modal..</p>
-												<p>Some text in the Modal..</p>
-												<p>Some text in the Modal..</p>
-												<p>Some text in the Modal..</p>
-												<p>Some text in the Modal..</p>
-												<p>Some text in the Modal..</p>
-												<p>Some text in the Modal..</p>
-												<p>Some text in the Modal..</p>
-												<p>Some text in the Modal..</p>
-												<p>Some text in the Modal..</p>
-												<p>Some text in the Modal..</p>
-											</div>
-										</div>
-									</div>
-
-									<script>
-										// Get the modal
-										var modal = document.getElementById("myModal");
-										// Get the button that opens the modal
-										var btn = document.getElementById("myBtn");
-
-										// Get the <span> element that closes the modal
-										var span = document.getElementsByClassName("close")[0];
-
-										// When the user clicks the button, open the modal
-										btn.onclick = function() {
-											console.log(modal.style)
-											$(modal).addClass('modal-active')
-											modal.style.display = "block";
-										}
-
-										// When the user clicks on <span> (x), close the modal
-										span.onclick = function() {
-											modal.style.display = "none";
-										}
-
-										// When the user clicks anywhere outside of the modal, close it
-										window.onclick = function(event) {
-											if (event.target == modal) {
-												modal.style.display = "none";
-											}
-										}
-									</script>
-
-
 								</div>
 
 								<div class="table-cell table-300 cell-comment" data-title="Commentaire" class="padding">
-							<!--        --><?php //do_shortcode( '[digi_comment id="' . $risk->data['id'] . '" namespace="digi" type="risk_evaluation_comment" display="view"]' ); ?>
-										<?php echo $risk->description ?>
+										<?php
+										if ($action == 'editRisk'.$risk->id) {
+											print '<input type="text" name="description" id=description">';
+										}
+										else {
+											echo $risk->description;
+										}
+										?>
 
 								</div>
 								<div class="table-cell cell-tasks" data-title="Tâches" class="padding">
@@ -511,28 +533,58 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 
 								</div>
 								<div class="table-cell cell-action table-150 table-padding-0 table-end" data-title="Action">
-									<div class="action wpeo-gridlayout grid-gap-0 grid-3">
-										<!-- Editer un risque -->
-										<div class="wpeo-button button-square-50 button-transparent w50 edit action-attribute">
-											<i class="button-icon fas fa-pencil-alt"></i>
+									<?php
+									print '<form method="POST" action="'.$_SERVER["PHP_SELF"].'">';
+									print '<input type="hidden" name="token" value="'.newToken().'">';
+									print '<input type="hidden" name="action" value="update">';
+									print '<input type="hidden" name="id" value="'.$object->id.'">';
+									if ($backtopage) print '<input type="hidden" name="backtopage" value="'.$backtopage.'">';
+									if ($backtopageforcancel) print '<input type="hidden" name="backtopageforcancel" value="'.$backtopageforcancel.'">';
+
+
+									if ($action == 'editRisk'.$risk->id) {
+										?>
+
+										<div class="action" id="action<?php echo $risk->id ?>"  value="<?php echo $risk->id ?>">
+											<button type="submit" name="save" style="color: #3495f0; background-color: transparent; width:30%; border:none; margin-right:20%;">
+												<div data-parent="risk-row" data-loader="wpeo-table" class="wpeo-button button-square-50 button-green save action-input">
+													<i class="button-icon fas fa-save"></i>
+												</div>
+											</button>
 										</div>
 
-										<!-- Options avancées -->
-										<div class="wpeo-button button-square-50 button-transparent w50 move action-attribute">
-												<i class="icon fas fa-arrows-alt"></i>
-										</div>
 
-										<!-- Supprimer un risque -->
-										<div class="wpeo-button button-square-50 button-transparent w50 delete action-attribute">
-											<i class="button-icon fas fa-times"></i>
+									<?php
+										print '</form>';
+									}
+									elseif ($action == 'saveRisk37') {
+										echo '<pre>'; print_r('yes'); echo '</pre>'; exit;
+									} else {
+
+									?>
+										<div class="action wpeo-gridlayout grid-gap-0 grid-3">
+											<!-- Editer un risque -->
+											<div class="wpeo-button button-square-50 button-transparent w50 edit action-attribute risk-edit" value="<?php echo $risk->id ?>">
+												<i class="button-icon fas fa-pencil-alt"></i>
+											</div>
+
+											<!-- Options avancées -->
+											<div class="wpeo-button button-square-50 button-transparent w50 move action-attribute">
+													<i class="icon fas fa-arrows-alt"></i>
+											</div>
+
+											<!-- Supprimer un risque -->
+											<div class="wpeo-button button-square-50 button-transparent w50 delete action-attribute">
+												<i class="button-icon fas fa-times"></i>
+											</div>
 										</div>
-									</div>
+								<?php } ?>
 								</div>
 							</div>
-									<?php }
+									<?php
 								}
+							}
 							?>
-
 
 					<?php
 
@@ -547,27 +599,16 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 								<input type="hidden" name="from_preset" value="<?php echo $risk->data['preset'] ? 1 : 0; ?>" />
 								<?php  ?>
 									<div data-title="Ref." class="table-cell table-75 cell-reference">
-										<?php if ( $risk->data['preset'] ) : ?>
-											-
-										<?php
-										else :
-											// getNextValue
-												?>
-<!--												<span><strong>--><?php //echo $risk->data['unique_identifier'] . ' - ' . $risk->data['evaluation']->data['unique_identifier'] ); ?><!--</span></strong>-->
-											<?php
-										endif;
-										?>
+
 									</div>
-									<div data-title="Risque" data-title="Risque" class="table-cell table-50 cell-risk">
-<!--										--><?php
-//										if ( isset( $can_edit_risk_category ) && $can_edit_risk_category ) :
-//											do_shortcode( '[digi_dropdown_categories_risk id="' . $risk->data['id'] . '" type="risk" display="edit" category_risk_id="' . $risk->data['risk_category']->data['id'] . '" preset="' . ( ( $risk->data['preset'] ) ? '1' : '0' ) . '"]' );
-//										else :
-//											do_shortcode( '[digi_dropdown_categories_risk id="' . $risk->data['id'] . '" type="risk" display="' . ( ( 0 !== $risk->data['id'] && ! $risk->data['preset'] ) ? 'view' : 'edit' ) . '" category_risk_id="' . $risk->data['risk_category']->data['id'] . '" preset="' . ( ( $risk->data['preset'] ) ? '1' : '0' ) . '"]' );
-//										endif;
-//										?>
-										selectbox picto cat
+								<div data-title="Risque" data-title="Risque" class="table-cell table-50 cell-risk">
+
+									select box picto cat
+								</div>
+									<div data-title="Cot." class="table-cell table-50 cell-cotation">
+										<input type="number" id="cotation" name="cotation" value="">
 									</div>
+
 <!--									<div data-title="Cot." class="table-cell table-50 cell-cotation">-->
 <!--										<div class="wpeo-dropdown dropdown-grid dropdown-padding-0 cotation-container wpeo-tooltip-event dropdown-active" aria-label="Veuillez remplir la cotation" data-color="red" data-tooltip-persist="true">-->
 <!--											<span data-scale="-1" class="dropdown-toggle dropdown-add-button cotation">-->
@@ -590,7 +631,7 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 <!--										--><?php //do_shortcode( '[digi_comment id="' . $risk->data['id'] . '" namespace="digi" type="risk_evaluation_comment" display="edit" add_button="' . ( ( $risk->data['preset'] ) ? '0' : '1' ) . '"]' ); ?>
 
 										<?php
-												print '<textarea name="riskComment" id="riskComment" class="minwidth300" rows="'.ROWS_2.'">'.('').'</textarea></td></tr>'."\n";
+												print '<textarea name="riskComment" id="riskComment" class="minwidth300" rows="'.ROWS_2.'">'.('').'</textarea>'."\n";
 									?></div>
 									<div class="table-cell table-150 table-end cell-action" data-title="action">
 										<?php if ( 0) : ?>
@@ -599,30 +640,11 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 											</div>
 										<?php else : ?>
 											<div class="action">
-												<?php if ( -1 != $risk->data['risk_category']->data['id'] && -1 != $risk->data['evaluation']->data['scale'] ) : ?>
-<!--												<a href="risk_card.php?action=add" name="add" type="submit">-->
-<!---->
-<!--													<div class="wpeo-button button-square-50 add action-input button-progress">-->
-<!--														<i class="button-icon fas fa-plus"></i></div>-->
-<!--												</a>-->
-
-														<?php
-													print '&nbsp; ';
-													print '<button type="submit" name="add" style="color: #3495f0; background-color: transparent; width:30%; border:none; margin-right:20%;">';
-													print '<div class="wpeo-button button-square-50 button-event add action-input button-progress">
-															<i class="button-icon fas fa-plus"></i>
-															</button>';
-													print '</div></div>';
-													?>
-												<?php else : ?>
-													<div data-namespace="digirisk"
-														 data-module="risk"
-														 data-before-method="beforeSaveRisk"
-														 data-loader="wpeo-table"
-														 data-parent="risk-row"
-														 class="wpeo-button button-square-50 button-disable button-event add action-input button-progress">
-														<i class="button-icon fas fa-plus"></i></div>
-												<?php endif; ?>
+												<button type="submit" name="add" style="color: #3495f0; background-color: transparent; width:30%; border:none; margin-right:20%;">
+													<div class="wpeo-button button-square-50 button-event add action-input button-progress">
+														<i class="button-icon fas fa-plus"></i>
+													</div>
+												</button>
 											</div>
 										<?php endif; ?>
 									</div>
@@ -639,13 +661,7 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 </div>
 
 	<?php
-	print '</table>';
-	print '</div>';
-	print '</div>';
-
-	print '<div class="clearboth"></div>';
-
-	dol_fiche_end();
+dol_fiche_end();
 
 	// Buttons for actions
 
@@ -799,8 +815,37 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 //	include DOL_DOCUMENT_ROOT.'/core/tpl/card_presend.tpl.php';
 //	print '</div>';
 
-}
+} ?>
+<script>
+var riskId = 0;
+Object.values($('.wpeo-modal')).forEach(v => {
+	riskId = $(v).attr('value')
+	var modal = document.getElementById("cotation_modal"+riskId);
+// Get the button that opens the modal
+	var btn = document.getElementById("cotation_square"+riskId);
 
+// When the user clicks the button, open the modal
+	btn.onclick = function() {
+		$(modal).addClass('modal-active')
+		modal.style.display = "block";
+	}
+
+// When the user clicks on <span> (x), close the modal
+	window.onclick = function() {
+		modal.style.display = "none";
+	}
+
+// When the user clicks anywhere outside of the modal, close it
+	window.onclick = function(event) {
+		if (event.target == modal) {
+			modal.style.display = "none";
+		}
+	}
+})
+console.log(riskId)
+// Get the modal
+
+														</script> <?php
 // End of page
 llxFooter();
 $db->close();

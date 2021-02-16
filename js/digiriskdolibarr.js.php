@@ -230,11 +230,19 @@ window.eoxiaJS.navigation.event = function() {
 	jQuery( document ).on( 'click', '#elementDocument', window.eoxiaJS.redirect );
 	jQuery( document ).on( 'click', '#elementCard', window.eoxiaJS.redirect );
 	jQuery( document ).on( 'click', '#elementAgenda', window.eoxiaJS.redirect );
-	jQuery( document ).on( 'click', '#elementRisk', window.eoxiaJS.redirect );
+	// Désactivé pour le moment : le load ne charge pas l'event du bouton
+	//jQuery( document ).on( 'click', '#elementRisk', window.eoxiaJS.redirect );
+
+	//modal
+	jQuery( document ).on( 'click', '.modal-close', window.eoxiaJS.closeModal );
 
 	//action buttons
 	jQuery( document ).on( 'click', '#actionButtonEdit', window.eoxiaJS.redirect );
 	jQuery( document ).on( 'click', '#actionButtonCancelCreate', window.eoxiaJS.redirectAfterCancelCreate );
+
+
+	//risks
+	jQuery( document ).on( 'click', '.risk-edit', window.eoxiaJS.editRisk );
 
 };
 
@@ -369,3 +377,19 @@ window.eoxiaJS.redirectAfterCancelCreate = function( event ) {
 	return false;
 
 };
+
+window.eoxiaJS.closeModal = function ( event ) {
+	$('.modal-active').removeClass('modal-active')
+}
+window.eoxiaJS.editRisk = function ( event ) {
+	//empty and fill object card
+	let editedRiskId = $(this).attr('value')
+	$('#risk_row_'+editedRiskId).empty()
+	$('#risk_row_'+editedRiskId).load( document.URL + '&action=editRisk' + editedRiskId + ' #risk_row_'+editedRiskId , id);
+}
+//window.eoxiaJS.saveRisk = function ( event ) {
+//	//empty and fill object card
+//	let editedRiskId = $(this).attr('value')
+//	$('#risk_row_'+editedRiskId).empty()
+//	$('#risk_row_'+editedRiskId).load( document.URL + '&action=editRisk' + editedRiskId + ' #risk_row_'+editedRiskId , id);
+//}

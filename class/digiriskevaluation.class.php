@@ -17,9 +17,9 @@
  */
 
 /**
- * \file        class/risk.class.php
+ * \file        class/digiriskevaluation.class.php
  * \ingroup     digiriskdolibarr
- * \brief       This file is a CRUD class file for Risk (Create/Read/Update/Delete)
+ * \brief       This file is a CRUD class file for DigiriskEvaluation (Create/Read/Update/Delete)
  */
 
 // Put here all includes required by your class file
@@ -28,19 +28,19 @@ require_once DOL_DOCUMENT_ROOT.'/core/class/commonobject.class.php';
 //require_once DOL_DOCUMENT_ROOT . '/product/class/product.class.php';
 
 /**
- * Class for Risk
+ * Class for DigiriskEvaluation
  */
-class Risk extends CommonObject
+class DigiriskEvaluation extends CommonObject
 {
 	/**
 	 * @var string ID to identify managed object.
 	 */
-	public $element = 'risk';
+	public $element = 'digiriskevaluation';
 
 	/**
 	 * @var string Name of table without prefix where object is stored. This is also the key used for extrafields management.
 	 */
-	public $table_element = 'digiriskdolibarr_risk';
+	public $table_element = 'digiriskdolibarr_digiriskevaluation';
 
 	/**
 	 * @var int  Does this object support multicompany module ?
@@ -54,9 +54,9 @@ class Risk extends CommonObject
 	public $isextrafieldmanaged = 1;
 
 	/**
-	 * @var string String with name of icon for risk. Must be the part after the 'object_' into object_risk.png
+	 * @var string String with name of icon for digiriskevaluation. Must be the part after the 'object_' into object_digiriskevaluation.png
 	 */
-	public $picto = 'risk@digiriskdolibarr';
+	public $picto = 'digiriskevaluation@digiriskdolibarr';
 
 
 	const STATUS_DRAFT = 0;
@@ -96,37 +96,29 @@ class Risk extends CommonObject
 	public $fields=array(
 		'rowid' => array('type'=>'integer', 'label'=>'TechnicalID', 'enabled'=>'1', 'position'=>1, 'notnull'=>1, 'visible'=>0, 'noteditable'=>'1', 'index'=>1, 'comment'=>"Id"),
 		'ref' => array('type'=>'varchar(128)', 'label'=>'Ref', 'enabled'=>'1', 'position'=>10, 'notnull'=>1, 'visible'=>4, 'noteditable'=>'1', 'default'=>'(PROV)', 'index'=>1, 'searchall'=>1, 'showoncombobox'=>'1', 'comment'=>"Reference of object"),
-		'fk_project' => array('type'=>'integer:Project:projet/class/project.class.php:1', 'label'=>'Project', 'enabled'=>'1', 'position'=>52, 'notnull'=>-1, 'visible'=>-1, 'index'=>1,),
-		'description' => array('type'=>'text', 'label'=>'Description', 'enabled'=>'1', 'position'=>60, 'notnull'=>0, 'visible'=>3,),
 		'date_creation' => array('type'=>'datetime', 'label'=>'DateCreation', 'enabled'=>'1', 'position'=>500, 'notnull'=>1, 'visible'=>-2,),
 		'tms' => array('type'=>'timestamp', 'label'=>'DateModification', 'enabled'=>'1', 'position'=>501, 'notnull'=>0, 'visible'=>-2,),
 		'fk_user_creat' => array('type'=>'integer:User:user/class/user.class.php', 'label'=>'UserAuthor', 'enabled'=>'1', 'position'=>510, 'notnull'=>1, 'visible'=>-2, 'foreignkey'=>'user.rowid',),
 		'fk_user_modif' => array('type'=>'integer:User:user/class/user.class.php', 'label'=>'UserModif', 'enabled'=>'1', 'position'=>511, 'notnull'=>-1, 'visible'=>-2,),
 		'import_key' => array('type'=>'varchar(14)', 'label'=>'ImportId', 'enabled'=>'1', 'position'=>1000, 'notnull'=>-1, 'visible'=>-2,),
-		'model_pdf' => array('type'=>'varchar(255)', 'label'=>'Model pdf', 'enabled'=>'1', 'position'=>1010, 'notnull'=>-1, 'visible'=>0,),
-		'model_odt' => array('type'=>'varchar(255)', 'label'=>'Model odt', 'enabled'=>'1', 'position'=>1011, 'notnull'=>0, 'visible'=>-1,),
-		'ref_ext' => array('type'=>'varchar(255)', 'label'=>'RefExt', 'enabled'=>'1', 'position'=>50, 'notnull'=>0, 'visible'=>-1,),
-		'fk_element' => array('type'=>'integer', 'label'=>'FK Element', 'enabled'=>'1', 'position'=>50, 'notnull'=>1, 'visible'=>-1,),
-		'category' => array('type'=>'varchar(255)', 'label'=>'varchar', 'enabled'=>'1', 'position'=>50, 'notnull'=>0, 'visible'=>-1,),
-		'fk_projet' => array('type'=>'integer', 'label'=>'FK Projet', 'enabled'=>'1', 'position'=>50, 'notnull'=>1, 'visible'=>-1,),
-		'status' => array('type'=>'integer', 'label'=>'Status', 'enabled'=>'1', 'position'=>50, 'notnull'=>0, 'visible'=>-1,),
+		'ref_ext' => array('type'=>'varchar(128)', 'label'=>'RefExt', 'enabled'=>'1', 'position'=>12, 'notnull'=>0, 'visible'=>-1,),
+		'status' => array('type'=>'integer', 'label'=>'Status', 'enabled'=>'1', 'position'=>1010, 'notnull'=>0, 'visible'=>-1,),
+		'cotation' => array('type'=>'integer', 'label'=>'Cotation', 'enabled'=>'1', 'position'=>1050, 'notnull'=>0, 'visible'=>-1,),
+		'method' => array('type'=>'varchar(50)', 'label'=>'EvaluationMethod', 'enabled'=>'1', 'position'=>1100, 'notnull'=>0, 'visible'=>-1,),
+		'fk_risk' => array('type'=>'integer', 'label'=>'ParentRisk', 'enabled'=>'1', 'position'=>50, 'notnull'=>0, 'visible'=>-1,),
 	);
 	public $rowid;
 	public $ref;
-	public $fk_project;
-	public $description;
 	public $date_creation;
 	public $tms;
 	public $fk_user_creat;
 	public $fk_user_modif;
 	public $import_key;
-	public $model_pdf;
-	public $model_odt;
 	public $ref_ext;
-	public $fk_element;
-	public $category;
-	public $fk_projet;
 	public $status;
+	public $cotation;
+	public $method;
+	public $fk_risk;
 	// END MODULEBUILDER PROPERTIES
 
 
@@ -135,17 +127,17 @@ class Risk extends CommonObject
 	/**
 	 * @var int    Name of subtable line
 	 */
-	//public $table_element_line = 'digiriskdolibarr_riskline';
+	//public $table_element_line = 'digiriskdolibarr_digiriskevaluationline';
 
 	/**
 	 * @var int    Field with ID of parent key if this object has a parent
 	 */
-	//public $fk_element = 'fk_risk';
+	//public $fk_element = 'fk_digiriskevaluation';
 
 	/**
 	 * @var int    Name of subtable class that manage subtable lines
 	 */
-	//public $class_element_line = 'Riskline';
+	//public $class_element_line = 'DigiriskEvaluationline';
 
 	/**
 	 * @var array	List of child tables. To test if we can delete object.
@@ -157,10 +149,10 @@ class Risk extends CommonObject
 	 *               If name matches '@ClassNAme:FilePathClass;ParentFkFieldName' it will
 	 *               call method deleteByParentField(parentId, ParentFkFieldName) to fetch and delete child object
 	 */
-	//protected $childtablesoncascade = array('digiriskdolibarr_riskdet');
+	//protected $childtablesoncascade = array('digiriskdolibarr_digiriskevaluationdet');
 
 	/**
-	 * @var RiskLine[]     Array of subtable lines
+	 * @var DigiriskEvaluationLine[]     Array of subtable lines
 	 */
 	//public $lines = array();
 
@@ -181,7 +173,7 @@ class Risk extends CommonObject
 		if (empty($conf->multicompany->enabled) && isset($this->fields['entity'])) $this->fields['entity']['enabled'] = 0;
 
 		// Example to show how to set values of fields definition dynamically
-		/*if ($user->rights->digiriskdolibarr->risk->read) {
+		/*if ($user->rights->digiriskdolibarr->digiriskevaluation->read) {
 			$this->fields['myfield']['visible'] = 1;
 			$this->fields['myfield']['noteditable'] = 0;
 		}*/
@@ -335,15 +327,17 @@ class Risk extends CommonObject
 	 * @param int    $parent_id   Id parent object
 	 * @return int         <0 if KO, 0 if not found, >0 if OK
 	 */
-	public function fetchFromParent($parent_id)
+	public function fetchFromParent($parent_id, $active = 0)
 	{
-		$filter = array('fk_element' => $parent_id);
+		$filter = array('fk_risk' => $parent_id);
 		if ($active) $filter['status'] = 1;
 
 		$result = $this->fetchAll('', '', 0, 0, $filter, 'AND');
+
 		if ($result > 0 && !empty($this->table_element_line)) $this->fetchLines();
 		return $result;
 	}
+
 	/**
 	 * Load object lines in memory from the database
 	 *
@@ -412,6 +406,7 @@ class Risk extends CommonObject
 		}
 
 		$resql = $this->db->query($sql);
+
 		if ($resql) {
 			$num = $this->db->num_rows($resql);
 			$i = 0;
@@ -504,8 +499,8 @@ class Risk extends CommonObject
 			return 0;
 		}
 
-		/*if (! ((empty($conf->global->MAIN_USE_ADVANCED_PERMS) && ! empty($user->rights->digiriskdolibarr->risk->write))
-		 || (! empty($conf->global->MAIN_USE_ADVANCED_PERMS) && ! empty($user->rights->digiriskdolibarr->risk->risk_advance->validate))))
+		/*if (! ((empty($conf->global->MAIN_USE_ADVANCED_PERMS) && ! empty($user->rights->digiriskdolibarr->digiriskevaluation->write))
+		 || (! empty($conf->global->MAIN_USE_ADVANCED_PERMS) && ! empty($user->rights->digiriskdolibarr->digiriskevaluation->digiriskevaluation_advance->validate))))
 		 {
 		 $this->error='NotEnoughPermissions';
 		 dol_syslog(get_class($this)."::valid ".$this->error, LOG_ERR);
@@ -548,7 +543,7 @@ class Risk extends CommonObject
 			if (!$error && !$notrigger)
 			{
 				// Call trigger
-				$result = $this->call_trigger('RISK_VALIDATE', $user);
+				$result = $this->call_trigger('DIGIRISKEVALUATION_VALIDATE', $user);
 				if ($result < 0) $error++;
 				// End call triggers
 			}
@@ -562,16 +557,16 @@ class Risk extends CommonObject
 			if (preg_match('/^[\(]?PROV/i', $this->ref))
 			{
 				// Now we rename also files into index
-				$sql = 'UPDATE '.MAIN_DB_PREFIX."ecm_files set filename = CONCAT('".$this->db->escape($this->newref)."', SUBSTR(filename, ".(strlen($this->ref) + 1).")), filepath = 'risk/".$this->db->escape($this->newref)."'";
-				$sql .= " WHERE filename LIKE '".$this->db->escape($this->ref)."%' AND filepath = 'risk/".$this->db->escape($this->ref)."' and entity = ".$conf->entity;
+				$sql = 'UPDATE '.MAIN_DB_PREFIX."ecm_files set filename = CONCAT('".$this->db->escape($this->newref)."', SUBSTR(filename, ".(strlen($this->ref) + 1).")), filepath = 'digiriskevaluation/".$this->db->escape($this->newref)."'";
+				$sql .= " WHERE filename LIKE '".$this->db->escape($this->ref)."%' AND filepath = 'digiriskevaluation/".$this->db->escape($this->ref)."' and entity = ".$conf->entity;
 				$resql = $this->db->query($sql);
 				if (!$resql) { $error++; $this->error = $this->db->lasterror(); }
 
 				// We rename directory ($this->ref = old ref, $num = new ref) in order not to lose the attachments
 				$oldref = dol_sanitizeFileName($this->ref);
 				$newref = dol_sanitizeFileName($num);
-				$dirsource = $conf->digiriskdolibarr->dir_output.'/risk/'.$oldref;
-				$dirdest = $conf->digiriskdolibarr->dir_output.'/risk/'.$newref;
+				$dirsource = $conf->digiriskdolibarr->dir_output.'/digiriskevaluation/'.$oldref;
+				$dirdest = $conf->digiriskdolibarr->dir_output.'/digiriskevaluation/'.$newref;
 				if (!$error && file_exists($dirsource))
 				{
 					dol_syslog(get_class($this)."::validate() rename dir ".$dirsource." into ".$dirdest);
@@ -580,7 +575,7 @@ class Risk extends CommonObject
 					{
 						dol_syslog("Rename ok");
 						// Rename docs starting with $oldref with $newref
-						$listoffiles = dol_dir_list($conf->digiriskdolibarr->dir_output.'/risk/'.$newref, 'files', 1, '^'.preg_quote($oldref, '/'));
+						$listoffiles = dol_dir_list($conf->digiriskdolibarr->dir_output.'/digiriskevaluation/'.$newref, 'files', 1, '^'.preg_quote($oldref, '/'));
 						foreach ($listoffiles as $fileentry)
 						{
 							$dirsource = $fileentry['name'];
@@ -636,7 +631,7 @@ class Risk extends CommonObject
 		 return -1;
 		 }*/
 
-		return $this->setStatusCommon($user, self::STATUS_DRAFT, $notrigger, 'RISK_UNVALIDATE');
+		return $this->setStatusCommon($user, self::STATUS_DRAFT, $notrigger, 'DIGIRISKEVALUATION_UNVALIDATE');
 	}
 
 	/**
@@ -661,7 +656,7 @@ class Risk extends CommonObject
 		 return -1;
 		 }*/
 
-		return $this->setStatusCommon($user, self::STATUS_CANCELED, $notrigger, 'RISK_CLOSE');
+		return $this->setStatusCommon($user, self::STATUS_CANCELED, $notrigger, 'DIGIRISKEVALUATION_CLOSE');
 	}
 
 	/**
@@ -686,7 +681,7 @@ class Risk extends CommonObject
 		 return -1;
 		 }*/
 
-		return $this->setStatusCommon($user, self::STATUS_VALIDATED, $notrigger, 'RISK_REOPEN');
+		return $this->setStatusCommon($user, self::STATUS_VALIDATED, $notrigger, 'DIGIRISKEVALUATION_REOPEN');
 	}
 
 	/**
@@ -707,14 +702,14 @@ class Risk extends CommonObject
 
 		$result = '';
 
-		$label = '<u>'.$langs->trans("Risk").'</u>';
+		$label = '<u>'.$langs->trans("DigiriskEvaluation").'</u>';
 		$label .= '<br>';
 		$label .= '<b>'.$langs->trans('Ref').':</b> '.$this->ref;
 		if (isset($this->status)) {
 			$label .= '<br><b>'.$langs->trans("Status").":</b> ".$this->getLibStatut(5);
 		}
 
-		$url = dol_buildpath('/digiriskdolibarr/risk_card.php', 1).'?id='.$this->id;
+		$url = dol_buildpath('/digiriskdolibarr/digiriskevaluation_card.php', 1).'?id='.$this->id;
 
 		if ($option != 'nolink')
 		{
@@ -729,7 +724,7 @@ class Risk extends CommonObject
 		{
 			if (!empty($conf->global->MAIN_OPTIMIZEFORTEXTBROWSER))
 			{
-				$label = $langs->trans("ShowRisk");
+				$label = $langs->trans("ShowDigiriskEvaluation");
 				$linkclose .= ' alt="'.dol_escape_htmltag($label, 1).'"';
 			}
 			$linkclose .= ' title="'.dol_escape_htmltag($label, 1).'"';
@@ -778,7 +773,7 @@ class Risk extends CommonObject
 		//if ($withpicto != 2) $result.=(($addlabel && $this->label) ? $sep . dol_trunc($this->label, ($addlabel > 1 ? $addlabel : 0)) : '');
 
 		global $action, $hookmanager;
-		$hookmanager->initHooks(array('riskdao'));
+		$hookmanager->initHooks(array('digiriskevaluationdao'));
 		$parameters = array('id'=>$this->id, 'getnomurl'=>$result);
 		$reshook = $hookmanager->executeHooks('getNomUrl', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
 		if ($reshook > 0) $result = $hookmanager->resPrint;
@@ -901,8 +896,8 @@ class Risk extends CommonObject
 	{
 		$this->lines = array();
 
-		$objectline = new RiskLine($this->db);
-		$result = $objectline->fetchAll('ASC', 'position', 0, 0, array('customsql'=>'fk_risk = '.$this->id));
+		$objectline = new DigiriskEvaluationLine($this->db);
+		$result = $objectline->fetchAll('ASC', 'position', 0, 0, array('customsql'=>'fk_digiriskevaluation = '.$this->id));
 
 		if (is_numeric($result))
 		{
@@ -927,16 +922,16 @@ class Risk extends CommonObject
 		global $langs, $conf;
 		$langs->load("digiriskdolibarr@digiriskdolibarr");
 
-		if (empty($conf->global->DIGIRISKDOLIBARR_RISK_ADDON)) {
-			$conf->global->DIGIRISKDOLIBARR_RISK_ADDON = 'mod_risk_standard';
+		if (empty($conf->global->DIGIRISKDOLIBARR_DIGIRISKEVALUATION_ADDON)) {
+			$conf->global->DIGIRISKDOLIBARR_DIGIRISKEVALUATION_ADDON = 'mod_digiriskevaluation_standard';
 		}
 
-		if (!empty($conf->global->DIGIRISKDOLIBARR_RISK_ADDON))
+		if (!empty($conf->global->DIGIRISKDOLIBARR_DIGIRISKEVALUATION_ADDON))
 		{
 			$mybool = false;
 
-			$file = $conf->global->DIGIRISKDOLIBARR_RISK_ADDON.".php";
-			$classname = $conf->global->DIGIRISKDOLIBARR_RISK_ADDON;
+			$file = $conf->global->DIGIRISKDOLIBARR_DIGIRISKEVALUATION_ADDON.".php";
+			$classname = $conf->global->DIGIRISKDOLIBARR_DIGIRISKEVALUATION_ADDON;
 
 			// Include file with class
 			$dirmodels = array_merge(array('/'), (array) $conf->modules_parts['models']);
@@ -1001,12 +996,12 @@ class Risk extends CommonObject
 		$langs->load("digiriskdolibarr@digiriskdolibarr");
 
 		if (!dol_strlen($modele)) {
-			$modele = 'standard_risk';
+			$modele = 'standard_digiriskevaluation';
 
 			if ($this->modelpdf) {
 				$modele = $this->modelpdf;
-			} elseif (!empty($conf->global->RISK_ADDON_PDF)) {
-				$modele = $conf->global->RISK_ADDON_PDF;
+			} elseif (!empty($conf->global->DIGIRISKEVALUATION_ADDON_PDF)) {
+				$modele = $conf->global->DIGIRISKEVALUATION_ADDON_PDF;
 			}
 		}
 
@@ -1048,15 +1043,33 @@ class Risk extends CommonObject
 
 		return $error;
 	}
+
+	/**
+	 * Return scale level for risk evaluation
+	 *
+	 * @return	int			between 1 and 4
+	 */
+	public function get_evaluation_scale() {
+		switch ($this->cotation) {
+			case $this->cotation<48 :
+				return 1;
+			case $this->cotation<51 :
+				return 2;
+			case $this->cotation<80:
+				return 3;
+			case $this->cotation>79:
+				return 4;
+		}
+	}
 }
 
 /**
- * Class RiskLine. You can also remove this and generate a CRUD class for lines objects.
+ * Class DigiriskEvaluationLine. You can also remove this and generate a CRUD class for lines objects.
  */
-class RiskLine
+class DigiriskEvaluationLine
 {
-	// To complete with content of an object RiskLine
-	// We should have a field rowid, fk_risk and position
+	// To complete with content of an object DigiriskEvaluationLine
+	// We should have a field rowid, fk_digiriskevaluation and position
 
 	/**
 	 * @var int  Does object support extrafields ? 0=No, 1=Yes
