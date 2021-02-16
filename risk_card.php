@@ -426,8 +426,33 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 							$risks = $risk->fetchFromParent($object->id);
 							if (!empty($risks)) {
 								foreach ($risks as $risk) {
+
 							?>
+
 							<div class="table-row risk-row method-evarisk-simplified" id="risk_row_<?php echo $risk->id ?>">
+								<?php
+									if ($action == 'editRisk'.$risk->id) {
+										print '<form method="POST" action="' . $_SERVER["PHP_SELF"] . '">';
+										print '<input type="hidden" name="token" value="' . newToken() . '">';
+										print '<input type="hidden" name="action" value="update">';
+										print '<input type="hidden" name="id" value="' . $object->id . '">';
+										if ($backtopage) print '<input type="hidden" name="backtopage" value="' . $backtopage . '">';
+										if ($backtopageforcancel) print '<input type="hidden" name="backtopageforcancel" value="' . $backtopageforcancel . '">';
+									}
+
+										if ($action == 'saveRisk'.$risk->id) {
+
+										$comment = GETPOST('riskComment');
+										$cotation = GETPOST('cotation');
+
+										$risk->description = $comment;
+										$risk->update($user);
+										$evaluation = new DigiriskEvaluation($db);
+										$evaluation->cotation = $cotation;
+										$evaluation->fk_risk = $risk->id;
+										$evaluation->status = 1;
+										$evaluation->create($user);
+									} ?>
 								<div data-title="Ref." class="table-cell table-75 cell-reference">
 									<!-- La popup pour les actions correctives -->
 							<!--		--><?php //\eoxia\View_Util::exec( 'digirisk', 'corrective_task', 'popup', array() ); ?>
@@ -449,7 +474,7 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 										$lastCotation = $evaluation->fetchFromParent($risk->id,1);
 
 										if ($action == 'editRisk' . $risk->id) {
-											print '<input type="number" name="cotation" id="cotation">';
+											print '<input type="number" name="cotation" id="cotation'.$risk->id.'">';
 										} else {
 											if (!empty($lastCotation)) {
 												foreach ($lastCotation as $cot) {
@@ -519,7 +544,7 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 								<div class="table-cell table-300 cell-comment" data-title="Commentaire" class="padding">
 										<?php
 										if ($action == 'editRisk'.$risk->id) {
-											print '<input type="text" name="description" id=description">';
+											print '<textarea name="riskComment" id="riskComment'.$risk->id.'" class="minwidth300" rows="'.ROWS_2.'">'.('').'</textarea>'."\n";
 										}
 										else {
 											echo $risk->description;
@@ -534,32 +559,19 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 								</div>
 								<div class="table-cell cell-action table-150 table-padding-0 table-end" data-title="Action">
 									<?php
-									print '<form method="POST" action="'.$_SERVER["PHP_SELF"].'">';
-									print '<input type="hidden" name="token" value="'.newToken().'">';
-									print '<input type="hidden" name="action" value="update">';
-									print '<input type="hidden" name="id" value="'.$object->id.'">';
-									if ($backtopage) print '<input type="hidden" name="backtopage" value="'.$backtopage.'">';
-									if ($backtopageforcancel) print '<input type="hidden" name="backtopageforcancel" value="'.$backtopageforcancel.'">';
-
 
 									if ($action == 'editRisk'.$risk->id) {
+
 										?>
-
-										<div class="action" id="action<?php echo $risk->id ?>"  value="<?php echo $risk->id ?>">
-											<button type="submit" name="save" style="color: #3495f0; background-color: transparent; width:30%; border:none; margin-right:20%;">
-												<div data-parent="risk-row" data-loader="wpeo-table" class="wpeo-button button-square-50 button-green save action-input">
-													<i class="button-icon fas fa-save"></i>
-												</div>
-											</button>
+										<div class="action wpeo-button button-square-50 button-green save action-input risk-save" value="<?php echo $risk->id ?>">
+											<i class="button-icon fas fa-save"></i>
 										</div>
-
 
 									<?php
 										print '</form>';
 									}
-									elseif ($action == 'saveRisk37') {
-										echo '<pre>'; print_r('yes'); echo '</pre>'; exit;
-									} else {
+									else
+									{
 
 									?>
 										<div class="action wpeo-gridlayout grid-gap-0 grid-3">

@@ -212,6 +212,15 @@ class DigiriskEvaluation extends CommonObject
 	 */
 	public function create(User $user, $notrigger = false)
 	{
+		$previousEvaluation = $this->fetchFromParent($this->fk_risk, 1);
+
+		// Change le statut des ressources précédentes à 0
+		$sql = "UPDATE ".MAIN_DB_PREFIX."digiriskdolibarr_digiriskevaluation";
+		$sql .= " SET status = 0";
+		$sql .= " WHERE fk_risk = ".$this->fk_risk;
+		$resql = $this->db->query($sql);
+
+		//RAJOUTER LIGNE POUR LE SELECT ENTITY
 		return $this->createCommon($user, $notrigger);
 	}
 
