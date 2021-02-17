@@ -1059,14 +1059,17 @@ class DigiriskEvaluation extends CommonObject
 	 * @return	int			between 1 and 4
 	 */
 	public function get_evaluation_scale() {
+		if (!$this->cotation) {
+			return 1;
+		}
 		switch ($this->cotation) {
-			case $this->cotation<48 :
+			case ($this->cotation<48):
 				return 1;
-			case $this->cotation<51 :
+			case ($this->cotation<51) :
 				return 2;
-			case $this->cotation<80:
+			case( $this->cotation<80):
 				return 3;
-			case $this->cotation>79:
+			case ($this->cotation>79):
 				return 4;
 		}
 	}

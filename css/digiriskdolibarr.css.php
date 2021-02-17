@@ -735,7 +735,12 @@ div.mainmenu.digiriskdolibarr {
 .wpeo-wrap .cotation.default-cotation:hover {
 	background: rgba(0, 0, 0, 0.1);
 }
-
+.wpeo-wrap .cotation:after {
+	content: '' !important;
+}
+.wpeo-wrap .cotation:before {
+	content: '' !important;
+}
 .wpeo-wrap .cotation[data-scale="2"], .wpeo-wrap .cotation[data-scale="3"], .wpeo-wrap .cotation[data-scale="4"] {
 	color: #fff !important;
 }
@@ -8701,7 +8706,7 @@ to {
 
 .wpeo-dropdown .dropdown-content .dropdown-item {
 	padding: 0.6em;
-	background: #fff;
+	/*background: #fff;*/
 	-webkit-transition: all 0.2s ease-out;
 	transition: all 0.2s ease-out;
 }

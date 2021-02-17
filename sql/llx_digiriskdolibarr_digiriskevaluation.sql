@@ -25,7 +25,7 @@ CREATE TABLE llx_digiriskdolibarr_digiriskevaluation(
 	import_key varchar(14), 
 	ref_ext varchar(128), 
 	status integer, 
-	cotation integer, 
+	cotation integer default 0,
 	method varchar(50), 
 	fk_risk integer
 	-- END MODULEBUILDER FIELDS

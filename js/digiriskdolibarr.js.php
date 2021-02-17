@@ -229,8 +229,7 @@ window.eoxiaJS.navigation.event = function() {
 	jQuery( document ).on( 'click', '#elementDocument', window.eoxiaJS.redirect );
 	jQuery( document ).on( 'click', '#elementCard', window.eoxiaJS.redirect );
 	jQuery( document ).on( 'click', '#elementAgenda', window.eoxiaJS.redirect );
-	// Désactivé pour le moment : le load ne charge pas l'event du bouton
-	//jQuery( document ).on( 'click', '#elementRisk', window.eoxiaJS.redirect );
+	jQuery( document ).on( 'click', '#elementRisk', window.eoxiaJS.redirect );
 
 	//modal
 	jQuery( document ).on( 'click', '.modal-close', window.eoxiaJS.closeModal );
@@ -243,10 +242,67 @@ window.eoxiaJS.navigation.event = function() {
 
 	//risks
 	jQuery( document ).on( 'click', '.risk-edit', window.eoxiaJS.editRisk );
+	jQuery( document ).on( 'click', '.risk-create', window.eoxiaJS.createRisk );
 	jQuery( document ).on( 'click', '.risk-save', window.eoxiaJS.saveRisk );
+	//dropdown cotation
+	jQuery( document ).on( 'click', '.table.risk .dropdown-list li.dropdown-item:not(.open-popup), .wpeo-table.table-listing-risk .dropdown-list li.dropdown-item:not(.open-popup), .wpeo-table.table-risk .dropdown-list li.dropdown-item:not(.open-popup)', window.eoxiaJS.selectSeuil );
 
 };
 
+
+/**
+ * Clique sur une des cotations simples.
+ *
+ * @param  {ClickEvent} event L'état du clic.
+ * @return {void}
+ *
+ * @since 6.0.0
+ * @version 7.0.0
+ */
+window.eoxiaJS.selectSeuil = function( event ) {
+	var element      = jQuery( this );
+	var riskID       = element.data( 'id' );
+	var seuil        = element.data( 'seuil' );
+	var variableID   = element.data( 'variable-id' );
+	var evaluationID = element.data( 'evaluation-id' );
+
+	jQuery( '.risk-row.edit[data-id="' + riskID + '"] .cotation-container .dropdown-toggle.cotation span' ).text( jQuery( this ).text() );
+	jQuery( '.risk-row.edit[data-id="' + riskID + '"] .cotation-container .dropdown-toggle.cotation' ).attr( 'data-scale', seuil );
+
+	if ( variableID && seuil ) {
+		window.eoxiaJS.updateInputVariables( riskID, evaluationID, variableID, seuil );
+	}
+};
+
+window.eoxiaJS.updateInputVariables = function( riskID, evaluationID, variableID, value, field ) {
+
+	$('#cotationInput').attr('value', evaluationID)
+	console.log(evaluationID)
+	$('#cotationSpan').text(evaluationID)
+	let scale = 0
+
+	// faire fonction scale
+	switch (true) {
+		case (evaluationID < 48):
+			scale = 1
+			break;
+		case (evaluationID < 51):
+			scale = 2
+			break;
+		case (evaluationID < 79):
+			scale = 3
+			break;
+		case (evaluationID < 101):
+			scale = 4
+			break;
+		case (evaluationID === 0):
+			scale = 1
+			break;
+	}
+	console.log(scale)
+	$('#cotationSpan').attr('data-scale', scale)
+
+};
 /**
  * Gestion du toggle dans la navigation.
  *
@@ -384,6 +440,7 @@ window.eoxiaJS.redirectAfterCancelCreate = function( event ) {
 window.eoxiaJS.closeModal = function ( event ) {
 	$('.modal-active').removeClass('modal-active')
 }
+
 window.eoxiaJS.openModal = function ( event ) {
 
 	let idSelected = $(this).attr('value')
@@ -391,6 +448,25 @@ window.eoxiaJS.openModal = function ( event ) {
 	$('.modal-active').removeClass('modal-active')
 	$('#cotation_modal'+idSelected).addClass('modal-active')
 }
+
+window.eoxiaJS.createRisk = function ( event ) {
+
+	var description = $('#riskComment').val()
+	var descriptionPost = ''
+	if (description !== '') {
+		descriptionPost = '&riskComment=' + description
+	}
+
+	var cotation = $('#cotationSpan').text()
+	var cotationPost = ''
+	if (cotation !== 0) {
+		cotationPost = '&cotation=' + cotation
+	}
+
+	$('.main-table').load( document.URL + '&action=add' + cotationPost + descriptionPost + ' .main-table')
+
+}
+
 window.eoxiaJS.editRisk = function ( event ) {
 
 	let editedRiskId = $(this).attr('value')
@@ -398,6 +474,7 @@ window.eoxiaJS.editRisk = function ( event ) {
 	$('#risk_row_'+editedRiskId).load( document.URL + '&action=editRisk' + editedRiskId + ' #risk_row_'+editedRiskId+' > div')
 
 }
+
 window.eoxiaJS.saveRisk = function ( event ) {
 
 	let editedRiskId = $(this).attr('value')
@@ -417,4 +494,159 @@ window.eoxiaJS.saveRisk = function ( event ) {
 	$('#risk_row_'+editedRiskId).load( document.URL + '&action=saveRisk' + editedRiskId + cotationPost + descriptionPost + ' #risk_row_'+editedRiskId+' > div', function() {
 		$.getScript('digiriskdolibarr.js.php')
 	});
+}
+
+// A mettre dans un fichier dropdown
+/**
+ * [dropdown description]
+ *
+ * @memberof EO_Framework_Dropdown
+ *
+ * @type {Object}
+ */
+window.eoxiaJS.dropdown = {};
+
+/**
+ * [description]
+ *
+ * @memberof EO_Framework_Dropdown
+ *
+ * @returns {void} [description]
+ */
+window.eoxiaJS.dropdown.init = function() {
+	window.eoxiaJS.dropdown.event();
+};
+
+/**
+ * [description]
+ *
+ * @memberof EO_Framework_Dropdown
+ *
+ * @returns {void} [description]
+ */
+window.eoxiaJS.dropdown.event = function() {
+	jQuery( document ).on( 'keyup', window.eoxiaJS.dropdown.keyup );
+	jQuery( document ).on( 'click', '.wpeo-dropdown:not(.dropdown-active) .dropdown-toggle:not(.disabled)', window.eoxiaJS.dropdown.open );
+	jQuery( document ).on( 'click', '.wpeo-dropdown.dropdown-active .dropdown-content', function(e) { e.stopPropagation() } );
+	jQuery( document ).on( 'click', '.wpeo-dropdown.dropdown-active:not(.dropdown-force-display) .dropdown-content .dropdown-item', window.eoxiaJS.dropdown.close  );
+	jQuery( document ).on( 'click', '.wpeo-dropdown.dropdown-active', function ( e ) { window.eoxiaJS.dropdown.close( e ); e.stopPropagation(); } );
+	jQuery( document ).on( 'click', 'body', window.eoxiaJS.dropdown.close );
+};
+
+/**
+ * [description]
+ *
+ * @memberof EO_Framework_Dropdown
+ *
+ * @param  {void} event [description]
+ * @returns {void}       [description]
+ */
+window.eoxiaJS.dropdown.keyup = function( event ) {
+	if ( 27 === event.keyCode ) {
+		window.eoxiaJS.dropdown.close();
+	}
+};
+
+/**
+ * [description]
+ *
+ * @memberof EO_Framework_Dropdown
+ *
+ * @param  {void} event [description]
+ * @returns {void}       [description]
+ */
+window.eoxiaJS.dropdown.open = function( event ) {
+	var triggeredElement = jQuery( this );
+	var angleElement = triggeredElement.find('[data-fa-i2svg]');
+	var callbackData = {};
+	var key = undefined;
+
+	window.eoxiaJS.dropdown.close( event, jQuery( this ) );
+
+	if ( triggeredElement.attr( 'data-action' ) ) {
+		window.eoxiaJS.loader.display( triggeredElement );
+
+		triggeredElement.get_data( function( data ) {
+			for ( key in callbackData ) {
+				if ( ! data[key] ) {
+					data[key] = callbackData[key];
+				}
+			}
+
+			window.eoxiaJS.request.send( triggeredElement, data, function( element, response ) {
+				triggeredElement.closest( '.wpeo-dropdown' ).find( '.dropdown-content' ).html( response.data.view );
+
+				triggeredElement.closest( '.wpeo-dropdown' ).addClass( 'dropdown-active' );
+
+				/* Toggle Button Icon */
+				if ( angleElement ) {
+					window.eoxiaJS.dropdown.toggleAngleClass( angleElement );
+				}
+			} );
+		} );
+	} else {
+		triggeredElement.closest( '.wpeo-dropdown' ).addClass( 'dropdown-active' );
+
+		/* Toggle Button Icon */
+		if ( angleElement ) {
+			window.eoxiaJS.dropdown.toggleAngleClass( angleElement );
+		}
+	}
+
+	event.stopPropagation();
+};
+
+/**
+ * [description]
+ *
+ * @memberof EO_Framework_Dropdown
+ *
+ * @param  {void} event [description]
+ * @returns {void}       [description]
+ */
+window.eoxiaJS.dropdown.close = function( event ) {
+	var _element = jQuery( this );
+	jQuery( '.wpeo-dropdown.dropdown-active:not(.no-close)' ).each( function() {
+		var toggle = jQuery( this );
+		var triggerObj = {
+			close: true
+		};
+
+		_element.trigger( 'dropdown-before-close', [ toggle, _element, triggerObj ] );
+
+		if ( triggerObj.close ) {
+			toggle.removeClass( 'dropdown-active' );
+
+			/* Toggle Button Icon */
+			var angleElement = jQuery( this ).find('.dropdown-toggle').find('[data-fa-i2svg]');
+			if ( angleElement ) {
+				window.eoxiaJS.dropdown.toggleAngleClass( angleElement );
+			}
+		} else {
+			return;
+		}
+	});
+};
+
+/**
+ * [description]
+ *
+ * @memberof EO_Framework_Dropdown
+ *
+ * @param  {void} button [description]
+ * @returns {void}        [description]
+ */
+window.eoxiaJS.dropdown.toggleAngleClass = function( button ) {
+	if ( button.hasClass('fa-caret-down') || button.hasClass('fa-caret-up') ) {
+		button.toggleClass('fa-caret-down').toggleClass('fa-caret-up');
+	}
+	else if ( button.hasClass('fa-caret-circle-down') || button.hasClass('fa-caret-circle-up') ) {
+		button.toggleClass('fa-caret-circle-down').toggleClass('fa-caret-circle-up');
+	}
+	else if ( button.hasClass('fa-angle-down') || button.hasClass('fa-angle-up') ) {
+		button.toggleClass('fa-angle-down').toggleClass('fa-angle-up');
+	}
+	else if ( button.hasClass('fa-chevron-circle-down') || button.hasClass('fa-chevron-circle-up') ) {
+		button.toggleClass('fa-chevron-circle-down').toggleClass('fa-chevron-circle-up');
+	}
 }

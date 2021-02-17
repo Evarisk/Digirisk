@@ -156,7 +156,6 @@ if (empty($reshook))
 		$fk_element = GETPOST('id');
 		$cotation = GETPOST('cotation');
 
-
 		$risk->description = $riskComment ? $riskComment : '';
 		$risk->fk_element = $fk_element ? $fk_element : 0;
 		if (!$error)
@@ -409,7 +408,7 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 			<div class="wpeo-tab">
 				<div class="tab-container">
 					<div class="tab-content tab-active">
-						<div class="wpeo-table table-flex table-risk">
+						<div class="wpeo-table table-flex table-risk main-table">
 							<div class="table-row table-header">
 								<div class="table-cell table-75"><?php echo 'Ref'; ?>.</div>
 								<div class="table-cell table-50"><?php echo 'Risque'; ?></div>
@@ -472,13 +471,12 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 										<?php
 										$evaluation = new DigiriskEvaluation($db);
 										$lastCotation = $evaluation->fetchFromParent($risk->id,1);
-
-										if ($action == 'editRisk' . $risk->id) {
-											print '<input type="number" name="cotation" id="cotation'.$risk->id.'">';
-										} else {
-											if (!empty($lastCotation)) {
-												foreach ($lastCotation as $cot) {
-													if ($cot->cotation > 0) { ?>
+										if (!empty($lastCotation)) {
+											foreach ($lastCotation as $cot) {
+												if ($action == 'editRisk' . $risk->id) {
+													print '<input type="number" name="cotation" id="cotation'.$risk->id.'" value="'.$cot->cotation.'">';
+												} else {
+													if ($cot->cotation >= 0) { ?>
 														<div class="action cotation default-cotation modal-open" data-scale="<?php echo $cot->get_evaluation_scale() ?>" value="<?php echo $risk->id ?>">
 															<span><?php echo $cot->cotation; ?></span>
 														</div>
@@ -508,7 +506,7 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 																					</div>
 																					<div class="table-cell table-50" data-title="Cot.">
 																						<div class="cotation-container grid">
-																							<div class="action cotation default-cotation level<?php echo $cot->get_evaluation_scale(); ?>">
+																							<div class="action cotation default-cotation level<?php echo $cotation->get_evaluation_scale(); ?>">
 																								<span><?php echo  $cotation->cotation ; ?></span>
 																							</div>
 																						</div>
@@ -525,7 +523,7 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 																</div>
 															</div>
 														</div>
-													<?php }
+											<?php 	}
 												}
 											}
 										}
@@ -544,7 +542,7 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 								<div class="table-cell table-300 cell-comment" data-title="Commentaire" class="padding">
 										<?php
 										if ($action == 'editRisk'.$risk->id) {
-											print '<textarea name="riskComment" id="riskComment'.$risk->id.'" class="minwidth300" rows="'.ROWS_2.'">'.('').'</textarea>'."\n";
+											print '<textarea name="riskComment" id="riskComment'.$risk->id.'" class="minwidth300" rows="'.ROWS_2.'">'.$risk->description.'</textarea>'."\n";
 										}
 										else {
 											echo $risk->description;
@@ -618,23 +616,49 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 									select box picto cat
 								</div>
 									<div data-title="Cot." class="table-cell table-50 cell-cotation">
-										<input type="number" id="cotation" name="cotation" value="">
-									</div>
+											<input type="hidden" name="evaluation_method_id" value="<?php echo $evaluation_method_id ; ?>" />
+											<textarea style="display: none;" name="evaluation_variables"><?php echo ! empty( $risk->data['evaluation']->data ) ? $risk->data['evaluation']->data['variables'] : '{}'; ?></textarea>
 
-<!--									<div data-title="Cot." class="table-cell table-50 cell-cotation">-->
-<!--										<div class="wpeo-dropdown dropdown-grid dropdown-padding-0 cotation-container wpeo-tooltip-event dropdown-active" aria-label="Veuillez remplir la cotation" data-color="red" data-tooltip-persist="true">-->
-<!--											<span data-scale="-1" class="dropdown-toggle dropdown-add-button cotation">-->
-<!--												<span><i class="fas fa-chart-line"></i><i class="fas fa-plus-circle icon-add"></i></span>-->
-<!--											</span>-->
-<!--											<ul class="dropdown-content wpeo-gridlayout grid-5 grid-gap-0 dropdown-list">-->
-<!--												<li data-id="0" data-evaluation-id="67" data-variable-id="68" data-seuil="1" data-scale="1" class="dropdown-item cotation">0</li>-->
-<!--												<li data-id="0" data-evaluation-id="67" data-variable-id="68" data-seuil="2" data-scale="2" class="dropdown-item cotation">48</li>-->
-<!--												<li data-id="0" data-evaluation-id="67" data-variable-id="68" data-seuil="3" data-scale="3" class="dropdown-item cotation">51</li>-->
-<!--												<li data-id="0" data-evaluation-id="67" data-variable-id="68" data-seuil="4" data-scale="4" class="dropdown-item cotation">100</li>-->
-<!--												<li class="dropdown-item wpeo-tooltip-event wpeo-modal-event cotation method" aria-label="Méthode Evarisk" data-action="load_modal_method_evaluation" data-title="Édition de la cotation" data-class="wpeo-wrap evaluation-method modal-risk-0" data-nonce="fdf361278c" data-id="61" wpeo-before-cb="digirisk/evaluationMethodEvarisk/fillVariables" data-risk-id="0"><i class="icon fa fa-cog"></i></li>-->
-<!--											</ul>-->
-<!--										</div>-->
-<!--									</div>-->
+											<div class="wpeo-dropdown dropdown-grid dropdown-padding-0 cotation-container wpeo-tooltip-event"
+												 aria-label="<?php  echo 'Veuillez remplir la cotation'; ?>"
+												 data-color="red"
+												 data-tooltip-persist="true">
+												<span data-scale="<?php echo ! empty( $risk->data['evaluation'] ) ? $risk->data['evaluation']->data['scale'] : 0; ?>" class="dropdown-toggle dropdown-add-button cotation" id="cotationSpan">
+													<input type="hidden" name="cotation" id="cotationInput" value="">
+													<i class="fas fa-chart-line"></i>
+													<i class="fas fa-plus"></i>
+												</span>
+												<ul class="dropdown-content wpeo-gridlayout grid-5 grid-gap-0 dropdown-list">
+													<?php
+													$defaultCotation = array(0, 48, 51, 100);
+													$evaluation = new DigiriskEvaluation($db);
+													if ( ! empty( $defaultCotation )) :
+														foreach ( $defaultCotation as $request ) :
+															$evaluation->cotation = $request;
+
+															?>
+															<li data-id="<?php echo 0; ?>"
+																data-evaluation-id="<?php echo $request; ?>"
+																data-variable-id="<?php echo 152+$request; ?>"
+																data-seuil="<?php echo  $evaluation->get_evaluation_scale(); ?>"
+																data-scale="<?php echo  $evaluation->get_evaluation_scale(); ?>"
+																class="dropdown-item cotation"><?php echo $request; ?></li>
+
+														<?php
+														endforeach;
+													endif;
+
+													?>
+													<li class="dropdown-item wpeo-tooltip-event wpeo-modal-event cotation method" data-class="wpeo-wrap evaluation-method modal-risk" data-risk-id="<?php echo  $risk->id ; ?>">
+														<i class="icon fa fa-cog"></i>
+													</li>
+
+													
+												</ul>
+
+											</div>
+
+									</div>
 									<div data-title="Photo" class="table-cell table-50 cell-photo">
 <!--										--><?php //echo do_shortcode( '[wpeo_upload id="' . ( ( $risk->data['preset'] ) ? 0 : $risk->data['id'] ) . '" model_name="' . $risk->get_class() . '" single="false" field_name="image" title="' . $risk->data['unique_identifier'] . ' - ' . $risk->data['evaluation']->data['unique_identifier'] . '" ]' ); ?>
 									photo
@@ -652,11 +676,9 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 											</div>
 										<?php else : ?>
 											<div class="action">
-												<button type="submit" name="add" style="color: #3495f0; background-color: transparent; width:30%; border:none; margin-right:20%;">
-													<div class="wpeo-button button-square-50 button-event add action-input button-progress">
+													<div class="risk-create wpeo-button button-square-50 button-event add action-input button-progress">
 														<i class="button-icon fas fa-plus"></i>
 													</div>
-												</button>
 											</div>
 										<?php endif; ?>
 									</div>
