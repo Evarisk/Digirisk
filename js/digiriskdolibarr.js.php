@@ -828,6 +828,30 @@ window.eoxiaJS.evaluationMethodEvarisk.selectSeuil = function( event ) {
 		//} );
 	}
 };
+
+window.eoxiaJS.getDynamicScale = function (cotation) {
+	let scale = 0
+
+	// faire fonction scale
+	switch (true) {
+		case (cotation < 48):
+			scale = 1
+			return scale;
+		case (cotation < 51):
+			scale = 2
+			return scale;
+		case (cotation < 79):
+			scale = 3
+			return scale;
+		case (cotation < 101):
+			scale = 4
+			return scale;
+		case (cotation === 0):
+			scale = 1
+			return scale;
+	}
+}
+
 window.eoxiaJS.evaluationMethodEvarisk.updateInputVariables = function( riskID, evaluationID, variableID, value, field ) {
 	var updateEvaluationID = false;
 
@@ -844,29 +868,47 @@ window.eoxiaJS.evaluationMethodEvarisk.updateInputVariables = function( riskID, 
 	currentVal[variableID] = value;
 
 	field.val( JSON.stringify( currentVal ) );
-	console.log(Object.keys(currentVal).length)
-	if ( updateEvaluationID ) {
+
+ 	if ( updateEvaluationID ) {
 		jQuery( '.risk-row.edit[data-id="' + riskID + '"] input[name="evaluation_method_id"]' ).val( evaluationID );
 	}
-	// Rend le bouton "active".
+	// Rend le bouton "active" et met à jour la cotation et la scale
 	if (Object.keys(currentVal).length === 5) {
 	let cotationBeforeAdapt = currentVal[0] * currentVal[1] * currentVal[2] * currentVal[3] * currentVal[4]
-	console.log(cotationBeforeAdapt)
-			jQuery( '.wpeo-button.cotation-save.button-disable' ).removeClass( 'button-disable' );
+
+	fetch('js/json/default.json')
+		.then(response => response.json())
+		.then(data => {
+			// Do something with your data
+			let cotationAfterAdapt = data[0].option.matrix[cotationBeforeAdapt]
+
+			$('#current_equivalence').text(cotationAfterAdapt)
+			$('.cotation.cotation-span').attr('data-scale', window.eoxiaJS.getDynamicScale(cotationAfterAdapt) )
+		});
+
+	jQuery( '.wpeo-button.cotation-save.button-disable' ).removeClass( 'button-disable' );
 	}
 };
 
 window.eoxiaJS.evaluationMethodEvarisk.save = function( event ) {
 	var riskID       = jQuery( this ).data( 'id' );
-	var evaluationID = jQuery( '.wpeo-modal.modal-active.modal-risk-' + riskID + ' .digi-method-evaluation-id' ).val();
-	var value        = jQuery( '.wpeo-modal.modal-active.modal-risk-' + riskID + ' textarea' ).val();
+	let value 		 = $('.cotation.cotation-span').text()
+	console.log(value)
+	console.log(riskID)
+	let evaluationMethod = "digirisk"
+	$('#cotationInput').attr('value', value)
+	$('#cotationMethod').attr('value', evaluationMethod)
 
-	jQuery( '.risk-row.edit[data-id="' + riskID + '"] textarea[name="evaluation_variables"]' ).val( value );
-	jQuery( '.risk-row.edit[data-id="' + riskID + '"] input[name="evaluation_method_id"]' ).val( evaluationID );
+	$('#cotationSpan').text(value)
 
-	// On met à jour l'affichage de la cotation.
-	jQuery( '.risk-row.edit[data-id="' + riskID + '"] .cotation:first' ).attr( 'data-scale', jQuery( '.wpeo-modal.modal-risk-' + riskID + ' .cotation' ).attr( 'data-scale' ) );
-	jQuery( '.risk-row.edit[data-id="' + riskID + '"] .cotation:first span' ).text( jQuery( '.wpeo-modal.modal-risk-' + riskID + ' .cotation span' ).text() );
+	$('#cotationSpan').attr('data-scale', window.eoxiaJS.getDynamicScale(value))
+	//
+	//jQuery( '.risk-row.edit[data-id="' + riskID + '"] textarea[name="evaluation_variables"]' ).val( value );
+	//jQuery( '.risk-row.edit[data-id="' + riskID + '"] input[name="evaluation_method_id"]' ).val( evaluationID );
+	//
+	//// On met à jour l'affichage de la cotation.
+	//jQuery( '.risk-row.edit[data-id="' + riskID + '"] .cotation:first' ).attr( 'data-scale', jQuery( '.wpeo-modal.modal-risk-' + riskID + ' .cotation' ).attr( 'data-scale' ) );
+	//jQuery( '.risk-row.edit[data-id="' + riskID + '"] .cotation:first span' ).text( jQuery( '.wpeo-modal.modal-risk-' + riskID + ' .cotation span' ).text() );
 
 	window.eoxiaJS.evaluationMethodEvarisk.close_modal( undefined, riskID );
 };

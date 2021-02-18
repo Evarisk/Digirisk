@@ -610,7 +610,6 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 
 								$string = file_get_contents(DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/js/json/default.json');
 								$json_a = json_decode($string, true);
-								echo '<pre>'; print_r( $json_a ); echo '</pre>'; exit;
 
 								?>
 							<div class="table-row risk-row edit" data-id="<?php echo $risk->data['id'] ; ?>">
@@ -665,42 +664,16 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 											</li>
 										</ul>
 										<div id="digirisk_evaluation_modal<?php echo $risk->id ?>" class="wpeo-modal wpeo-wrap evaluation-method modal-risk-0" value="<?php echo $risk->id ?>">
+										<?php $evaluation_method = $json_a[0];
+										$evaluation_method_survey = $evaluation_method['option']['variable'];
+										?>
 											<div class="modal-container">
 												<div class="modal-header">
 													<h2><?php echo $langs->trans('CotationEdition') ?></h2>
 												</div>
-												<div class="modal-content" id="#modalContent">	<!--														Contenu à remplacer par celui de la modal d'édition de la cotation-->
-														<?php 	$evaluation_method_survey = array(
-															'0' => array(
-																'question' => 'Pas de blessure',
-																'seuil' => '0',
-																'id' => '1'
+												<div class="modal-content" id="#modalContent">
+												<!--														Contenu à remplacer par celui de la modal d'édition de la cotation-->
 
-															),
-															'1' => array(
-																'question' => 'Un peu de blessure',
-																'seuil' => '1',
-																'id' => '2',
-															),
-															'2' => array(
-																'question' => 'Pas mal de blessures',
-																'seuil' => '2',
-																'id' => '3',
-															),
-															'3' => array(
-																'question' => 'Vachement de blessure',
-																'seuil' => '3',
-																'id' => '4'
-															),
-															'4' => array(
-																'question' => 'Un peu de blessure',
-																'seuil' => '4',
-																'id' => '5'
-															),
-
-														);
-														$evaluation_method_criteres = array('Gravite','Exposition', 'Occurence', 'Formation', 'Protection');
-																?>
 														<input type="hidden" class="digi-method-evaluation-id" value="<?php echo 0 ; ?>" />
 														<textarea style="display: none" name="evaluation_variables" class="tmp_evaluation_variable"><?php echo '{}'; ?></textarea>
 														<p><i class="fas fa-info-circle"></i> <?php echo 'Cliquez sur les cases du tableau pour remplir votre évaluation'; ?></p>
@@ -720,10 +693,10 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 																endfor; ?>
 															</div>
 															<?php $i = 0; ?>
-															<?php foreach($evaluation_method_criteres as $critere) { ?>
+															<?php foreach($evaluation_method_survey as $critere) { ?>
 															<div class="table-row">
-																<div class="table-cell"><?php echo $critere ; ?></div>
-																<?php foreach($evaluation_method_survey as $request) {
+																<div class="table-cell"><?php echo $critere['name'] ; ?></div>
+																<?php foreach($critere['option']['survey']['request'] as $request) {
 																	?>
 																<div class="table-cell can-select <?php echo  $is_active  ?>"
 																				data-id="<?php echo  $risk->id ? $risk->id : 0 ; ?>"
@@ -739,13 +712,13 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 												</div>
 												<div class="modal-footer">
 													<?php $evaluation->cotation = 0  ?>
-													<span data-scale="<?php echo $evaluation->get_evaluation_scale() ?>" class="cotation">
+													<span data-scale="<?php echo $evaluation->get_evaluation_scale() ?>" class="cotation cotation-span">
 														<span id="current_equivalence">0</span>
 													</span>
 													<div class="wpeo-button button-grey modal-close">
 														<span><?php echo $langs->trans('CloseTab'); ?></span>
 													</div>
-													<div class="wpeo-button cotation-save button-disable<?php echo $risk->data['evaluation']->data['id'] ?>" data-id="<?php echo $risk->data['id']; ?>">
+													<div class="wpeo-button button-main cotation-save button-disable" data-id="<?php echo $risk->id ? $risk->id : 0; ?>">
 														<span><?php echo 'Enregistrer la cotation'; ?></span>
 													</div>
 												</div>
