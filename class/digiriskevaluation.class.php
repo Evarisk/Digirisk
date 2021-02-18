@@ -106,6 +106,11 @@ class DigiriskEvaluation extends CommonObject
 		'cotation' => array('type'=>'integer', 'label'=>'Cotation', 'enabled'=>'1', 'position'=>1050, 'notnull'=>0, 'visible'=>-1,),
 		'method' => array('type'=>'varchar(50)', 'label'=>'EvaluationMethod', 'enabled'=>'1', 'position'=>1100, 'notnull'=>0, 'visible'=>-1,),
 		'fk_risk' => array('type'=>'integer', 'label'=>'ParentRisk', 'enabled'=>'1', 'position'=>50, 'notnull'=>0, 'visible'=>-1,),
+		'gravite' => array('type'=>'integer', 'label'=>'Gravity', 'enabled'=>'1', 'position'=>1200, 'notnull'=>0, 'visible'=>-1,),
+		'protection' => array('type'=>'integer', 'label'=>'Protection', 'enabled'=>'1', 'position'=>1240, 'notnull'=>0, 'visible'=>-1,),
+		'occurence' => array('type'=>'integer', 'label'=>'Occurence', 'enabled'=>'1', 'position'=>1220, 'notnull'=>0, 'visible'=>-1,),
+		'formation' => array('type'=>'integer', 'label'=>'Formation', 'enabled'=>'1', 'position'=>1230, 'notnull'=>0, 'visible'=>-1,),
+		'exposition' => array('type'=>'integer', 'label'=>'Exposition', 'enabled'=>'1', 'position'=>1210, 'notnull'=>0, 'visible'=>-1,),
 	);
 	public $rowid;
 	public $ref;
@@ -119,6 +124,11 @@ class DigiriskEvaluation extends CommonObject
 	public $cotation;
 	public $method;
 	public $fk_risk;
+	public $gravite;
+	public $protection;
+	public $occurence;
+	public $formation;
+	public $exposition;
 	// END MODULEBUILDER PROPERTIES
 
 

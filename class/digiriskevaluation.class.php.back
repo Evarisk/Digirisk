@@ -105,6 +105,11 @@ class DigiriskEvaluation extends CommonObject
 		'status' => array('type'=>'integer', 'label'=>'Status', 'enabled'=>'1', 'position'=>1010, 'notnull'=>0, 'visible'=>-1,),
 		'cotation' => array('type'=>'integer', 'label'=>'Cotation', 'enabled'=>'1', 'position'=>1050, 'notnull'=>0, 'visible'=>-1,),
 		'method' => array('type'=>'varchar(50)', 'label'=>'EvaluationMethod', 'enabled'=>'1', 'position'=>1100, 'notnull'=>0, 'visible'=>-1,),
+		'fk_risk' => array('type'=>'integer', 'label'=>'ParentRisk', 'enabled'=>'1', 'position'=>50, 'notnull'=>0, 'visible'=>-1,),
+		'gravite' => array('type'=>'integer', 'label'=>'Gravity', 'enabled'=>'1', 'position'=>1200, 'notnull'=>0, 'visible'=>-1,),
+		'protection' => array('type'=>'integer', 'label'=>'Protection', 'enabled'=>'1', 'position'=>1240, 'notnull'=>0, 'visible'=>-1,),
+		'occurence' => array('type'=>'integer', 'label'=>'Occurence', 'enabled'=>'1', 'position'=>1220, 'notnull'=>0, 'visible'=>-1,),
+		'formation' => array('type'=>'integer', 'label'=>'Formation', 'enabled'=>'1', 'position'=>1230, 'notnull'=>0, 'visible'=>-1,),
 	);
 	public $rowid;
 	public $ref;
@@ -117,6 +122,11 @@ class DigiriskEvaluation extends CommonObject
 	public $status;
 	public $cotation;
 	public $method;
+	public $fk_risk;
+	public $gravite;
+	public $protection;
+	public $occurence;
+	public $formation;
 	// END MODULEBUILDER PROPERTIES
 
 
@@ -210,6 +220,15 @@ class DigiriskEvaluation extends CommonObject
 	 */
 	public function create(User $user, $notrigger = false)
 	{
+		$previousEvaluation = $this->fetchFromParent($this->fk_risk, 1);
+
+		// Change le statut des ressources précédentes à 0
+		$sql = "UPDATE ".MAIN_DB_PREFIX."digiriskdolibarr_digiriskevaluation";
+		$sql .= " SET status = 0";
+		$sql .= " WHERE fk_risk = ".$this->fk_risk;
+		$resql = $this->db->query($sql);
+
+		//RAJOUTER LIGNE POUR LE SELECT ENTITY
 		return $this->createCommon($user, $notrigger);
 	}
 
@@ -327,9 +346,11 @@ class DigiriskEvaluation extends CommonObject
 	 */
 	public function fetchFromParent($parent_id, $active = 0)
 	{
-		$filter = array('fk_parent_risk' => $parent_id);
+		$filter = array('fk_risk' => $parent_id);
 		if ($active) $filter['status'] = 1;
+
 		$result = $this->fetchAll('', '', 0, 0, $filter, 'AND');
+
 		if ($result > 0 && !empty($this->table_element_line)) $this->fetchLines();
 		return $result;
 	}
@@ -402,6 +423,7 @@ class DigiriskEvaluation extends CommonObject
 		}
 
 		$resql = $this->db->query($sql);
+
 		if ($resql) {
 			$num = $this->db->num_rows($resql);
 			$i = 0;
@@ -1037,6 +1059,27 @@ class DigiriskEvaluation extends CommonObject
 		$this->db->commit();
 
 		return $error;
+	}
+
+	/**
+	 * Return scale level for risk evaluation
+	 *
+	 * @return	int			between 1 and 4
+	 */
+	public function get_evaluation_scale() {
+		if (!$this->cotation) {
+			return 1;
+		}
+		switch ($this->cotation) {
+			case ($this->cotation<48):
+				return 1;
+			case ($this->cotation<51) :
+				return 2;
+			case( $this->cotation<80):
+				return 3;
+			case ($this->cotation>79):
+				return 4;
+		}
 	}
 }
 

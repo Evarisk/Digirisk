@@ -841,22 +841,28 @@ div.mainmenu.digiriskdolibarr {
 
 .wpeo-wrap .wpeo-table.evaluation-method .table-cell.can-select:hover {
 	cursor: pointer;
-}
-
-.wpeo-wrap .wpeo-table.evaluation-method .table-cell.can-select:hover::after {
 	transform: scale(1);
 	opacity: 1;
 }
 
-.wpeo-wrap .wpeo-table.evaluation-method .table-cell.can-select.active {
-	color: #fff;
+.wpeo-wrap .wpeo-table.evaluation-method .table-cell.can-select:hover::after {
+	/*transform: scale(1);*/
+	/*opacity: 1;*/					/*  @todo remettre les after quand le css sera réglé */
 }
 
-.wpeo-wrap .wpeo-table.evaluation-method .table-cell.can-select.active::after {
-	transform: scale(1) !important;
+.wpeo-wrap .wpeo-table.evaluation-method .table-cell.can-select.active {
+	color: #fff;
+	transform: scale(1) !important;*/
 	opacity: 1 !important;
 	background: #3495f0;
 	z-index: -1;
+}
+
+.wpeo-wrap .wpeo-table.evaluation-method .table-cell.can-select.active::after {
+	/*transform: scale(1) !important;*/
+	/*opacity: 1 !important;*/
+	/*background: #3495f0;*/
+	/*z-index: -1;*/
 }
 
 .wpeo-wrap .wpeo-table.evaluation-method .table-row > .table-cell:first-child {

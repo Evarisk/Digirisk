@@ -26,6 +26,11 @@ CREATE TABLE llx_digiriskdolibarr_digiriskevaluation(
 	ref_ext varchar(128), 
 	status integer, 
 	cotation integer, 
-	method varchar(50)
+	method varchar(50), 
+	fk_risk integer, 
+	gravite integer, 
+	protection integer, 
+	occurence integer, 
+	formation integer
 	-- END MODULEBUILDER FIELDS
 ) ENGINE=innodb;
