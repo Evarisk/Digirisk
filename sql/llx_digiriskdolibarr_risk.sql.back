@@ -30,6 +30,7 @@ CREATE TABLE llx_digiriskdolibarr_risk(
 	ref_ext varchar(255), 
 	fk_element integer NOT NULL, 
 	category varchar(255), 
-	fk_projet integer NOT NULL
+	fk_projet integer NOT NULL, 
+	status integer
 	-- END MODULEBUILDER FIELDS
 ) ENGINE=innodb;

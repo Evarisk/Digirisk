@@ -110,6 +110,7 @@ class Risk extends CommonObject
 		'category' => array('type'=>'varchar(255)', 'label'=>'varchar', 'enabled'=>'1', 'position'=>50, 'notnull'=>0, 'visible'=>-1,),
 		'fk_projet' => array('type'=>'integer', 'label'=>'FK Projet', 'enabled'=>'1', 'position'=>50, 'notnull'=>1, 'visible'=>-1,),
 		'status' => array('type'=>'integer', 'label'=>'Status', 'enabled'=>'1', 'position'=>50, 'notnull'=>0, 'visible'=>-1,),
+		'entity' => array('type'=>'integer', 'label'=>'Entity', 'enabled'=>'1', 'position'=>40, 'notnull'=>0, 'visible'=>-1,),
 	);
 	public $rowid;
 	public $ref;
@@ -127,6 +128,7 @@ class Risk extends CommonObject
 	public $category;
 	public $fk_projet;
 	public $status;
+	public $entity;
 	// END MODULEBUILDER PROPERTIES
 
 
@@ -337,7 +339,7 @@ class Risk extends CommonObject
 	 */
 	public function fetchFromParent($parent_id)
 	{
-		$filter = array('fk_element' => $parent_id);
+		$filter = array('customsql' => 'fk_element=' . $this->db->escape($parent_id));
 		if ($active) $filter['status'] = 1;
 
 		$result = $this->fetchAll('', '', 0, 0, $filter, 'AND');

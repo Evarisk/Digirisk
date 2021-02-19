@@ -239,10 +239,9 @@ window.eoxiaJS.navigation.event = function() {
 	jQuery( document ).on( 'click', '#actionButtonEdit', window.eoxiaJS.redirect );
 	jQuery( document ).on( 'click', '#actionButtonCancelCreate', window.eoxiaJS.redirectAfterCancelCreate );
 
-
 	//risks
 	jQuery( document ).on( 'click', '.risk-edit', window.eoxiaJS.editRisk );
-	jQuery( document ).on( 'click', '.risk-create', window.eoxiaJS.createRisk );
+	jQuery( document ).on( 'click', '.risk-create:not(.button-disable)', window.eoxiaJS.createRisk );
 	jQuery( document ).on( 'click', '.risk-save', window.eoxiaJS.saveRisk );
 	//dropdown cotation
 	jQuery( document ).on( 'click', '.table.risk .dropdown-list li.dropdown-item:not(.open-popup), .wpeo-table.table-listing-risk .dropdown-list li.dropdown-item:not(.open-popup), .wpeo-table.table-risk .dropdown-list li.dropdown-item:not(.open-popup)', window.eoxiaJS.selectSeuil );
@@ -352,6 +351,14 @@ window.eoxiaJS.redirect = function( event ) {
 
 	return false;
 };
+$(document).ready(function(){
+	$('#createRisko').on('submit', function(e){
+		e.preventDefault();
+		console.log('oui')
+
+
+	});
+});
 
 window.eoxiaJS.redirectAfterCancelCreate = function( event ) {
 
@@ -382,6 +389,8 @@ window.eoxiaJS.redirectAfterCancelCreate = function( event ) {
 
 };
 
+
+
 // Onglet risques
 
 window.eoxiaJS.closeModal = function ( event ) {
@@ -406,6 +415,9 @@ window.eoxiaJS.openModal = function ( event ) {
 
 window.eoxiaJS.createRisk = function ( event ) {
 
+
+	$('.risk-create.wpeo-button.add').addClass('button-disable');
+
 	var description = $('#riskComment').val()
 	var descriptionPost = ''
 	if (description !== '') {
@@ -423,6 +435,13 @@ window.eoxiaJS.createRisk = function ( event ) {
 	if (cotation !== 0) {
 		cotationPost = '&cotation=' + cotation
 	}
+
+	var ref = $('#new_item_ref').val()
+	var refPost = ''
+	if (ref !== 0) {
+		refPost = '&ref=' + ref
+	}
+
 	let criteres = ''
 	Object.values($('.table-cell.active.cell-0')).forEach(function(v) {
 		if ($(v).data( 'seuil' ) > -1) {
@@ -430,8 +449,7 @@ window.eoxiaJS.createRisk = function ( event ) {
 		}
 
 	})
-
-	$('.main-table').load( document.URL + '&action=add' + cotationPost + descriptionPost + methodPost + criteres + ' .main-table')
+	$('.main-table').load( document.URL + '&action=add' + refPost + cotationPost + descriptionPost + methodPost + criteres + ' .main-table')
 
 }
 
@@ -473,14 +491,11 @@ window.eoxiaJS.saveRisk = function ( event ) {
 
 	})
 
-	console.log(Object.values($('.table-cell.active')))
-
-	console.log('&action=saveRisk' + editedRiskId + cotationPost + methodPost  + descriptionPost)
 	$('#risk_row_'+editedRiskId).empty()
-	$('#risk_row_'+editedRiskId).load( document.URL + '&action=saveRisk' + editedRiskId + cotationPost + methodPost + criteres  + descriptionPost + ' #risk_row_'+editedRiskId+' > div')
+	$('#risk_row_'+editedRiskId).load( document.URL + '&action=saveRisk&riskID=' + editedRiskId + cotationPost + methodPost + criteres  + descriptionPost + ' #risk_row_'+editedRiskId+' > div')
 }
 
-// A mettre dans un fichier dropdown
+// Dropdown
 /**
  * [dropdown description]
  *

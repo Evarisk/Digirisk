@@ -348,7 +348,7 @@ class DigiriskEvaluation extends CommonObject
 	 */
 	public function fetchFromParent($parent_id, $active = 0)
 	{
-		$filter = array('fk_risk' => $parent_id);
+		$filter = array('customsql' => 'fk_risk=' . $this->db->escape($parent_id));
 		if ($active) $filter['status'] = 1;
 
 		$result = $this->fetchAll('', '', 0, 0, $filter, 'AND');
@@ -942,7 +942,7 @@ class DigiriskEvaluation extends CommonObject
 		$langs->load("digiriskdolibarr@digiriskdolibarr");
 
 		if (empty($conf->global->DIGIRISKDOLIBARR_DIGIRISKEVALUATION_ADDON)) {
-			$conf->global->DIGIRISKDOLIBARR_DIGIRISKEVALUATION_ADDON = 'mod_digiriskevaluation_standard';
+			$conf->global->DIGIRISKDOLIBARR_DIGIRISKEVALUATION_ADDON = 'mod_evaluation_standard';
 		}
 
 		if (!empty($conf->global->DIGIRISKDOLIBARR_DIGIRISKEVALUATION_ADDON))

@@ -165,7 +165,9 @@ class modDigiriskdolibarr extends DolibarrModules
 			41 => array('DIGIRISKDOLIBARR_RISK_CUSTOM_ADDON_ODT_PATH','chaine', DOL_DATA_ROOT . '/ecm/digiriskdolibarr/risk/' ,'', 1),
 			42 => array('DIGIRISKDOLIBARR_RISK_ADDON','chaine', 'mod_risk_standard' ,'', 1),
 			43 => array('DIGIRISKDOLIBARR_RISK_DEFAULT_MODEL','chaine', 'risk_A4_odt' ,'', 1),
-			44 => array('MAIN_AGENDA_ACTIONAUTO_RISK_CREATE','chaine',1,'', 1)
+			44 => array('MAIN_AGENDA_ACTIONAUTO_RISK_CREATE','chaine',1,'', 1),
+			45 => array('RISK_STANDARD_MASK','chaine','R{0000}','', 1)
+
 
 		);
 

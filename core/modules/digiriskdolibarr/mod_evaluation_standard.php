@@ -23,11 +23,11 @@
  * \ingroup     digiriskdolibarr risk
  *	\brief      File containing class for numbering module Standard
  */
-require_once DOL_DOCUMENT_ROOT.'/custom/digiriskdolibarr/core/modules/digiriskdolibarr/modules_risk.php';
+require_once DOL_DOCUMENT_ROOT.'/custom/digiriskdolibarr/core/modules/digiriskdolibarr/modules_digiriskevaluation.php';
 /**
  * 	Class to manage risk numbering rules Standard
  */
-class mod_risk_standard extends ModeleNumRefRisk
+class mod_evaluation_standard extends ModeleNumRefDigiriskEvaluation
 {
 	/**
 	 * Dolibarr version of the loaded document
@@ -35,12 +35,14 @@ class mod_risk_standard extends ModeleNumRefRisk
 	 */
 	public $version = 'dolibarr'; // 'development', 'experimental', 'dolibarr'
 
-	public $prefixrisk = '';
+	public $prefixevaluation = 'evaluation';
 
 	/**
 	 * @var string Error code (or message)
 	 */
 	public $error = '';
+
+
 
 	/**
 	 *  Returns the description of the numbering model
@@ -51,18 +53,18 @@ class mod_risk_standard extends ModeleNumRefRisk
 	{
 		global $langs;
 		$langs->load("digiriskdolibarr@digiriskdolibarr");
-		return $langs->trans('DigiriskRiskStandardModel', $this->prefixrisk);
+		return $langs->trans('DigiriskEvaluationStandardModel', $this->prefixevaluation);
 	}
 
-/**
- *  Return an example of numbering
- *
- *  @return     string      Example
- */
-public function getExample()
-{
-	return $this->prefixrisk."1";
-}
+	/**
+	 *  Return an example of numbering
+	 *
+	 *  @return     string      Example
+	 */
+	public function getExample()
+	{
+		return $this->prefixevaluation."0001";
+	}
 	/**
 	 * Return next value not used or last value used
 	 *
@@ -83,14 +85,12 @@ public function getExample()
 		}
 
 		// Get entities
-		$entity = $conf->entity;
+		$entity = getEntity('evaluation', 1, $object);
 
 		$date = dol_now();
 
-		$numFinal = get_next_value($db, $mask, 'digiriskdolibarr_risk', 'ref','', $object, $date, 'next', false, null, $entity);
-
-
-		$this->prefixrisk = $numFinal;
+		$numFinal = get_next_value($db, $mask, 'digiriskdolibarr_evaluation', 'ref','', $object, $date, 'next', false, null, $entity);
+		$this->prefixevaluation = $numFinal;
 		return  $numFinal;
 	}
 
@@ -102,8 +102,8 @@ public function getExample()
 	 *  @param  string      $mode           'next' for next value or 'last' for last value
 	 *  @return string                      Next free value
 	 */
-	public function getNumRef($objforref, $mode = 'next')
+	public function getNumRef($objsoc, $objforref, $mode = 'next')
 	{
-		return $this->getNextValue($objforref, $mode);
+		return $this->getNextValue($objsoc, $objforref, $mode);
 	}
 }

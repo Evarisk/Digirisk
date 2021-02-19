@@ -28,9 +28,8 @@
  *  \brief			File that contains parent class for risks document models and parent class for risks numbering models
  */
 
-require_once DOL_DOCUMENT_ROOT.'/core/class/commondocgenerator.class.php';
-require_once DOL_DOCUMENT_ROOT.'/compta/bank/class/account.class.php'; // required for use by classes that inherit
-
+require_once DOL_DOCUMENT_ROOT . '/core/class/commondocgenerator.class.php';
+require_once DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/class/risk.class.php'; // required for use by classes that inherit
 
 /**
  *	Parent class for documents models
@@ -54,7 +53,7 @@ abstract class ModelePDFRisk extends CommonDocGenerator
 		$type = 'risk';
 		$list = array();
 
-		include_once DOL_DOCUMENT_ROOT.'/core/lib/functions2.lib.php';
+		include_once DOL_DOCUMENT_ROOT . '/core/lib/functions2.lib.php';
 		$list = getListOfModels($db, $type, $maxfilenamelength);
 
 		return $list;
@@ -93,18 +92,6 @@ abstract class ModeleNumRefRisk
 		global $langs;
 		$langs->load("digiriskdolibarr@digiriskdolibarr");
 		return $langs->trans("NoDescription");
-	}
-
-	/**
-	 *	Returns an example of numbering
-	 *
-	 *	@return     string      Example
-	 */
-	public function getExample()
-	{
-		global $langs;
-		$langs->load("digiriskdolibarr@digiriskdolibarr");
-		return $langs->trans("NoExample");
 	}
 
 	/**

@@ -31,6 +31,7 @@ CREATE TABLE llx_digiriskdolibarr_risk(
 	fk_element integer NOT NULL, 
 	category varchar(255), 
 	fk_projet integer NOT NULL, 
-	status integer
+	status integer, 
+	entity integer DEFAULT 1
 	-- END MODULEBUILDER FIELDS
 ) ENGINE=innodb;
