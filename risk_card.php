@@ -45,6 +45,7 @@ dol_include_once('/digiriskdolibarr/class/risk.class.php');
 dol_include_once('/digiriskdolibarr/class/digiriskevaluation.class.php');
 dol_include_once('/digiriskdolibarr/class/digiriskelement.class.php');
 dol_include_once('/digiriskdolibarr/core/modules/digiriskdolibarr/mod_risk_standard.php');
+dol_include_once('/digiriskdolibarr/core/modules/digiriskdolibarr/mod_evaluation_standard.php');
 dol_include_once('/digiriskdolibarr/lib/digiriskdolibarr_digiriskelement.lib.php');
 
 // Load translation files required by the page
@@ -142,9 +143,9 @@ if (empty($reshook))
 
 		$risk->description = $riskComment ? $riskComment : '';
 		$risk->fk_element = $fk_element ? $fk_element : 0;
-
-		if ($ref) {
-			$risk->ref = $ref;
+		$refRisk = new $conf->global->DIGIRISKDOLIBARR_RISK_ADDON();
+		if ($refRisk) {
+			$risk->ref = $refRisk->getNextValue($risk);
 		}
 
 		if (!$error)
@@ -153,6 +154,7 @@ if (empty($reshook))
 
 			if ($result > 0)
 			{
+
 				$formation = GETPOST('formation');
 				$protection = GETPOST('protection');
 				$occurrence = GETPOST('occurrence');
@@ -160,11 +162,12 @@ if (empty($reshook))
 				$exposition = GETPOST('exposition');
 
 				$evaluation = new DigiriskEvaluation($db);
+				$refCot = new $conf->global->DIGIRISKDOLIBARR_EVALUATION_ADDON();
 				$evaluation->cotation = $cotation;
 				$evaluation->fk_risk = $risk->id;
 				$evaluation->status = 1;
 				$evaluation->method = $method;
-
+				$evaluation->ref   = $refCot->getNumRef($evaluation);
 				$evaluation->formation  	= $formation ;
 				$evaluation->protection  	= $protection ;
 				$evaluation->occurrence  	= $occurrence ;
@@ -216,6 +219,9 @@ if (empty($reshook))
 	$evaluation->fk_risk = $riskID;
 	$evaluation->status = 1;
 	$evaluation->method = $method;
+
+	$refCot = new $conf->global->DIGIRISKDOLIBARR_EVALUATION_ADDON();
+	$evaluation->ref = $refCot->getNextValue($evaluation);
 
 	if ($method == 'digirisk') {
 		$evaluation->formation  	= $formation ;
@@ -275,6 +281,7 @@ $object->digiriskHeader('', $title, $help_url, '', '', '', $morejs);
 	<div id="cardContent" value="">
 
 <?php
+
 // Example : Adding jquery code
 //print '<script type="text/javascript" language="javascript">
 //jQuery(document).ready(function() {
@@ -290,8 +297,8 @@ $object->digiriskHeader('', $title, $help_url, '', '', '', $morejs);
 //});
 //</script>';
 
-// Part to show record
-if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'create')))
+// VIEW
+if ($object->id > 0)
 {
 	$res = $object->fetch_optionals();
 
@@ -343,6 +350,9 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 							$risks = $risk->fetchFromParent($object->id);
 							if (!empty($risks)) {
 								foreach ($risks as $risk) {
+									$evaluation = new DigiriskEvaluation($db);
+									$lastCotation = $evaluation->fetchFromParent($risk->id,1);
+									$lastCotation = array_shift($lastCotation);
 //									action = edit
 								if ($action == 'editRisk' . $risk->id) {
 								?>
@@ -353,8 +363,10 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 													<?php
 													$riskRef = substr($risk->ref, 1);
 													$riskRef = ltrim($riskRef, '0');
+													$cotationRef = substr($lastCotation->ref, 1);
+													$cotationRef = ltrim($cotationRef, '0');
 													// au lieu de 'R' mettre l'accronyme des risques qui sera futurement configurable dans digirisk
-													echo 'R' . $riskRef; ?>
+													echo 'R' . $riskRef . ' - E' . $cotationRef; ?>
 												</strong>
 											</span>
 										</div>
@@ -364,15 +376,12 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 										<div class="table-cell table-50 cell-cotation" data-title="Cot.">
 											<div class="cotation-container grid wpeo-modal-event tooltip hover cotation-square" id="cotation_square<?php echo $risk->id ?>">
 											<?php
-											$evaluation = new DigiriskEvaluation($db);
-											$lastCotation = $evaluation->fetchFromParent($risk->id,1);
 											if (!empty($lastCotation)) {
 												//ici pas faire un foreach, accèder juste au premier élément
-												foreach ($lastCotation as $cot) {
+												$cot = $lastCotation;
 													if ($action == 'editRisk' . $risk->id) { ?>
 														<div data-title="Cot." class="table-cell table-50 cell-cotation">
-
-														<textarea style="display: none;" name="evaluation_variables"><?php echo ! empty( $risk->data['evaluation']->data ) ? $risk->data['evaluation']->data['variables'] : '{}'; ?></textarea>
+															<textarea style="display: none;" name="evaluation_variables"><?php echo ! empty( $risk->data['evaluation']->data ) ? $risk->data['evaluation']->data['variables'] : '{}'; ?></textarea>
 															<div class="wpeo-dropdown dropdown-grid dropdown-padding-0 cotation-container wpeo-tooltip-event"
 																 aria-label="<?php  echo 'Veuillez remplir la cotation'; ?>"
 																 data-color="red"
@@ -478,7 +487,6 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 														</div>
 													<?php
 													}
-												}
 											}?>
 										</div>
 									</div>
@@ -502,6 +510,8 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 								</div>
 
 <!--								action = view-->
+
+
 								<?php
 								} else {
 								?>
@@ -513,8 +523,10 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 												<?php
 												$riskRef = substr($risk->ref, 1);
 												$riskRef = ltrim($riskRef, '0');
+												$cotationRef = substr($lastCotation->ref, 1);
+												$cotationRef = ltrim($cotationRef, '0');
 												// au lieu de 'R' mettre l'accronyme des risques qui sera futurement configurable dans digirisk
-												echo 'R' . $riskRef; ?>
+												echo 'R' . $riskRef . ' - E' . $cotationRef; ?>
 											</strong>
 										</span>
 									</div>

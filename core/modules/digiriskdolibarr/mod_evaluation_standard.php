@@ -19,13 +19,13 @@
  */
 
 /**
- *	\file       htdocs/custom/digiriskdolibarr/core/modules/digiriskdolibarr/mod_risk_standard.php
- * \ingroup     digiriskdolibarr risk
+ *	\file       htdocs/custom/digiriskdolibarr/core/modules/digiriskdolibarr/mod_evaluation_standard.php
+ * \ingroup     digiriskdolibarr evaluation
  *	\brief      File containing class for numbering module Standard
  */
 require_once DOL_DOCUMENT_ROOT.'/custom/digiriskdolibarr/core/modules/digiriskdolibarr/modules_digiriskevaluation.php';
 /**
- * 	Class to manage risk numbering rules Standard
+ * 	Class to manage evaluation numbering rules Standard
  */
 class mod_evaluation_standard extends ModeleNumRefDigiriskEvaluation
 {
@@ -35,14 +35,12 @@ class mod_evaluation_standard extends ModeleNumRefDigiriskEvaluation
 	 */
 	public $version = 'dolibarr'; // 'development', 'experimental', 'dolibarr'
 
-	public $prefixevaluation = 'evaluation';
+	public $prefixevaluation = '';
 
 	/**
 	 * @var string Error code (or message)
 	 */
 	public $error = '';
-
-
 
 	/**
 	 *  Returns the description of the numbering model
@@ -63,7 +61,7 @@ class mod_evaluation_standard extends ModeleNumRefDigiriskEvaluation
 	 */
 	public function getExample()
 	{
-		return $this->prefixevaluation."0001";
+		return $this->prefixevaluation."1";
 	}
 	/**
 	 * Return next value not used or last value used
@@ -76,7 +74,7 @@ class mod_evaluation_standard extends ModeleNumRefDigiriskEvaluation
 		require_once DOL_DOCUMENT_ROOT.'/core/lib/functions2.lib.php';
 
 		// On defini critere recherche compteur
-		$mask = $conf->global->RISK_STANDARD_MASK;
+		$mask = $conf->global->EVALUATION_STANDARD_MASK;
 
 		if (!$mask)
 		{
@@ -85,11 +83,13 @@ class mod_evaluation_standard extends ModeleNumRefDigiriskEvaluation
 		}
 
 		// Get entities
-		$entity = getEntity('evaluation', 1, $object);
+		$entity = $conf->entity;
 
 		$date = dol_now();
 
-		$numFinal = get_next_value($db, $mask, 'digiriskdolibarr_evaluation', 'ref','', $object, $date, 'next', false, null, $entity);
+		$numFinal = get_next_value($db, $mask, 'digiriskdolibarr_digiriskevaluation', 'ref','', $object, $date, 'next', false, null, $entity);
+
+
 		$this->prefixevaluation = $numFinal;
 		return  $numFinal;
 	}
@@ -102,8 +102,8 @@ class mod_evaluation_standard extends ModeleNumRefDigiriskEvaluation
 	 *  @param  string      $mode           'next' for next value or 'last' for last value
 	 *  @return string                      Next free value
 	 */
-	public function getNumRef($objsoc, $objforref, $mode = 'next')
+	public function getNumRef($objforref, $mode = 'next')
 	{
-		return $this->getNextValue($objsoc, $objforref, $mode);
+		return $this->getNextValue($objforref, $mode);
 	}
 }

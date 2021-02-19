@@ -111,6 +111,7 @@ class DigiriskEvaluation extends CommonObject
 		'occurrence' => array('type'=>'integer', 'label'=>'Occurrence', 'enabled'=>'1', 'position'=>1220, 'notnull'=>0, 'visible'=>-1,),
 		'formation' => array('type'=>'integer', 'label'=>'Formation', 'enabled'=>'1', 'position'=>1230, 'notnull'=>0, 'visible'=>-1,),
 		'exposition' => array('type'=>'integer', 'label'=>'Exposition', 'enabled'=>'1', 'position'=>1210, 'notnull'=>0, 'visible'=>-1,),
+		'entity' => array('type'=>'integer', 'label'=>'Entity', 'enabled'=>'1', 'position'=>40, 'notnull'=>0, 'visible'=>-1,),
 	);
 	public $rowid;
 	public $ref;
@@ -129,6 +130,7 @@ class DigiriskEvaluation extends CommonObject
 	public $occurrence;
 	public $formation;
 	public $exposition;
+	public $entity;
 	// END MODULEBUILDER PROPERTIES
 
 
