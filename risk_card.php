@@ -159,18 +159,30 @@ if (empty($reshook))
 
 		$risk->description = $riskComment ? $riskComment : '';
 		$risk->fk_element = $fk_element ? $fk_element : 0;
+
 		if (!$error)
 		{
 			$result = $risk->create($user);
 
 			if ($result > 0)
 			{
+				$formation = GETPOST('formation');
+				$protection = GETPOST('protection');
+				$occurrence = GETPOST('occurrence');
+				$gravite = GETPOST('gravite');
+				$exposition = GETPOST('exposition');
+
 				$evaluation = new DigiriskEvaluation($db);
 				$evaluation->cotation = $cotation;
 				$evaluation->fk_risk = $risk->id;
 				$evaluation->status = 1;
 				$evaluation->method = $method;
 
+				$evaluation->formation  	= $formation ;
+				$evaluation->protection  	= $protection ;
+				$evaluation->occurrence  	= $occurrence ;
+				$evaluation->gravite  		= $gravite ;
+				$evaluation->exposition  	= $exposition ;
 				$result2 = $evaluation->create($user);
 
 				if ($result2 > 0)
@@ -400,7 +412,8 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 	print '<div class="fichecenter wpeo-wrap">';
 	print '<div class="underbanner clearboth"></div>';
 	print '<table class="border centpercent tableforfield">'."\n";
-	$risk->fetch(1)
+	$string = file_get_contents(DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/js/json/default.json');
+							$json_a = json_decode($string, true);
 	?>
 	<div class="wpeo-grid">
 		<h1><?php echo $langs->trans('Risks'). ' - ' . $object->ref . ' ' . $object->label ?></h1>
@@ -446,13 +459,28 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 
 										$comment = GETPOST('riskComment');
 										$cotation = GETPOST('cotation');
+										$method = GETPOST('cotationMethod');
 
-										$risk->description = $comment;
-										$risk->update($user);
+										$formation = GETPOST('formation');
+										$protection = GETPOST('protection');
+										$occurrence = GETPOST('occurrence');
+										$gravite = GETPOST('gravite');
+										$exposition = GETPOST('exposition');
+
 										$evaluation = new DigiriskEvaluation($db);
 										$evaluation->cotation = $cotation;
 										$evaluation->fk_risk = $risk->id;
 										$evaluation->status = 1;
+										$evaluation->method = $method;
+										
+										if ($method == 'digirisk') {
+											$evaluation->formation  	= $formation ;
+											$evaluation->protection  	= $protection ;
+											$evaluation->occurrence  	= $occurrence ;
+											$evaluation->gravite  		= $gravite ;
+											$evaluation->exposition  	= $exposition ;
+										}
+
 										$evaluation->create($user);
 									} ?>
 								<div data-title="Ref." class="table-cell table-75 cell-reference">
@@ -476,9 +504,120 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 										$lastCotation = $evaluation->fetchFromParent($risk->id,1);
 										if (!empty($lastCotation)) {
 											foreach ($lastCotation as $cot) {
-												if ($action == 'editRisk' . $risk->id) {
-													print '<input type="number" name="cotation" id="cotation'.$risk->id.'" value="'.$cot->cotation.'">';
-												} else {
+												if ($action == 'editRisk' . $risk->id) { ?>
+												<?php   ?>
+									<div data-title="Cot." class="table-cell table-50 cell-cotation">
+
+									<textarea style="display: none;" name="evaluation_variables"><?php echo ! empty( $risk->data['evaluation']->data ) ? $risk->data['evaluation']->data['variables'] : '{}'; ?></textarea>
+										<div class="wpeo-dropdown dropdown-grid dropdown-padding-0 cotation-container wpeo-tooltip-event"
+											 aria-label="<?php  echo 'Veuillez remplir la cotation'; ?>"
+											 data-color="red"
+											 data-tooltip-persist="true">
+											<input type="hidden" name="cotation" id="cotationInput" value="">
+											<input type="hidden" name="cotationMethod" id="cotationMethod<?php echo $risk->id ?>" value="">
+											<span data-scale="<?php echo $cot->get_evaluation_scale() ?>" class="dropdown-toggle dropdown-add-button cotation cotation<?php echo $risk->id ?>" id="cotationSpan<?php echo $risk->id ?>">
+												<?php echo $cot->cotation; ?>
+											</span>
+											<ul class="dropdown-content wpeo-gridlayout grid-5 grid-gap-0 dropdown-list">
+												<?php
+												$defaultCotation = array(0, 48, 51, 100);
+												$evaluation = new DigiriskEvaluation($db);
+												if ( ! empty( $defaultCotation )) :
+													foreach ( $defaultCotation as $request ) :
+														$evaluation->cotation = $request;
+														?>
+														<li data-id="<?php echo $risk->id; ?>"
+															data-evaluation-method="standard"
+															data-evaluation-id="<?php echo $request; ?>"
+															data-variable-id="<?php echo 152+$request; ?>"
+															data-seuil="<?php echo  $evaluation->get_evaluation_scale(); ?>"
+															data-scale="<?php echo  $evaluation->get_evaluation_scale(); ?>"
+															class="dropdown-item cotation"><?php echo $request; ?></li>
+													<?php
+													endforeach;
+												endif;
+												?>
+												<li class="action digirisk-evaluation modal-open wpeo-tooltip-event cotation method"
+													data-evaluation-method="digirisk"
+													data-scale="<?php echo $evaluation->get_evaluation_scale() ?>"
+													value="<?php echo $risk->id ?>">
+													<i class="icon fa fa-cog"></i>
+												</li>
+											</ul>
+											<div id="digirisk_evaluation_modal<?php echo $risk->id ?>" class="wpeo-modal wpeo-wrap evaluation-method modal-risk-<?php echo $risk->id ?>" value="<?php echo $risk->id ?>">
+												<?php $evaluation_method = $json_a[0];
+												$evaluation_method_survey = $evaluation_method['option']['variable'];
+												?>
+												<div class="modal-container">
+													<div class="modal-header">
+														<h2><?php echo $langs->trans('CotationEdition') ?></h2>
+													</div>
+													<div class="modal-content" id="#modalContent">
+														<!--														Contenu à remplacer par celui de la modal d'édition de la cotation-->
+
+														<input type="hidden" class="digi-method-evaluation-id" value="<?php echo 0 ; ?>" />
+														<?php
+														$tmp_evaluation_variables[0] = $cot->gravite;
+														$tmp_evaluation_variables[1] = $cot->exposition;
+														$tmp_evaluation_variables[2] = $cot->occurence;
+														$tmp_evaluation_variables[3] = $cot->formation;
+														$tmp_evaluation_variables[4] = $cot->protection;
+
+
+														?>
+														<textarea style="display: none" name="evaluation_variables" class="tmp_evaluation_variable"><?php echo json_encode($tmp_evaluation_variables); ?></textarea>
+														<p><i class="fas fa-info-circle"></i> <?php echo 'Cliquez sur les cases du tableau pour remplir votre évaluation'; ?></p>
+
+														<div class="wpeo-table evaluation-method table-flex table-<?php echo count($evaluation_method_survey) + 1; ?>">
+															<div class="table-row table-header">
+																<div class="table-cell">
+																	<span></span>
+																</div>
+																<?php
+																for ( $i = 0; $i < count($evaluation_method_survey); $i++ ) :
+																	?>
+																	<div class="table-cell">
+																		<span><?php echo $i; ?></span>
+																	</div>
+																<?php
+																endfor; ?>
+															</div>
+															<?php $i = 0; ?>
+															<?php foreach($evaluation_method_survey as $critere) { ?>
+																<div class="table-row">
+																	<div class="table-cell"><?php echo $critere['name'] ; ?></div>
+																	<?php foreach($critere['option']['survey']['request'] as $request) {
+																		$name = strtolower($critere['name']);
+																		?>
+																		<div class="table-cell can-select <?php echo $name ?><?php if($cot->$name == $request['seuil']) { echo ' active'; }  ?> cell-<?php echo $risk->id?>"
+																			 data-id="<?php echo  $risk->id ? $risk->id : 0 ; ?>"
+																			 data-type="<?php echo  $name ; ?>"
+																			 data-evaluation-id="<?php echo $evaluation_id ? $evaluation_id : 0 ; ?>"
+																			 data-variable-id="<?php echo $i ; ?>"
+																			 data-seuil="<?php echo  $request['seuil']; ?>">
+																			<?php echo  $request['question'] ; ?>
+																		</div>
+																	<?php } $i++;  ?>
+																</div>
+															<?php } ?>
+														</div>
+													</div>
+													<div class="modal-footer">
+														<span data-scale="<?php echo $cot->get_evaluation_scale() ?>" class="cotation cotation-span<?php echo $risk->id ?>">
+														<span id="current_equivalence<?php echo $risk->id ?>"><?php echo $cot->cotation ?></span>
+													</span>
+														<div class="wpeo-button button-grey modal-close">
+															<span><?php echo $langs->trans('CloseTab'); ?></span>
+														</div>
+														<div class="wpeo-button button-main cotation-save <?php if (count($tmp_evaluation_variables) !== 5) echo 'button-disable' ?>" data-id="<?php echo $risk->id ? $risk->id : 0; ?>">
+															<span><?php echo 'Enregistrer la cotation'; ?></span>
+														</div>
+													</div>
+												</div>
+											</div>
+										</div>
+									</div> <?php
+									} else {
 													if ($cot->cotation >= 0) { ?>
 														<div class="action cotation default-cotation modal-open" data-scale="<?php echo $cot->get_evaluation_scale() ?>" value="<?php echo $risk->id ?>">
 															<span><?php echo $cot->cotation; ?></span>
@@ -594,24 +733,19 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 								<?php } ?>
 								</div>
 							</div>
-									<?php
+							<?php
 								}
 							}
 							?>
 
-					<?php
+							<?php
 
-					print '<form method="POST" action="'.$_SERVER["PHP_SELF"].'">';
-					print '<input type="hidden" name="token" value="'.newToken().'">';
-					print '<input type="hidden" name="action" value="add">';
-					$risk = new Risk($db)
-					?>
-					<?php
+							print '<form method="POST" action="'.$_SERVER["PHP_SELF"].'">';
+							print '<input type="hidden" name="token" value="'.newToken().'">';
+							print '<input type="hidden" name="action" value="add">';
+							$risk = new Risk($db);
 
-								$string = file_get_contents(DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/js/json/default.json');
-								$json_a = json_decode($string, true);
-
-								?>
+							?>
 							<div class="table-row risk-row edit" data-id="<?php echo $risk->data['id'] ; ?>">
 								<!-- Les champs obligatoires pour le formulaire -->
 								<input type="hidden" name="parent_id" value="<?php echo $society_id; ?>" />
@@ -632,8 +766,8 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 									 data-color="red"
 									 data-tooltip-persist="true">
 									 	<input type="hidden" name="cotation" id="cotationInput" value="">
-										<input type="hidden" name="cotationMethod" id="cotationMethod" value="">
-										<span data-scale="<?php echo ! empty( $risk->data['evaluation'] ) ? $risk->data['evaluation']->data['scale'] : 0; ?>" class="dropdown-toggle dropdown-add-button cotation" id="cotationSpan">
+										<input type="hidden" name="cotationMethod" id="cotationMethod0" value="">
+										<span data-scale="<?php echo ! empty( $risk->data['evaluation'] ) ? $risk->data['evaluation']->data['scale'] : 0; ?>" class="dropdown-toggle dropdown-add-button cotation" id="cotationSpan0">
 											<i class="fas fa-chart-line"></i>
 											<i class="fas fa-plus"></i>
 										</span>
@@ -693,12 +827,15 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 																endfor; ?>
 															</div>
 															<?php $i = 0; ?>
-															<?php foreach($evaluation_method_survey as $critere) { ?>
+															<?php foreach($evaluation_method_survey as $critere) {
+																$name = strtolower($critere['name']);
+																?>
 															<div class="table-row">
 																<div class="table-cell"><?php echo $critere['name'] ; ?></div>
 																<?php foreach($critere['option']['survey']['request'] as $request) {
 																	?>
-																<div class="table-cell can-select <?php echo  $is_active  ?>"
+																<div class="table-cell can-select cell-<?php echo 0 ?>"
+																data-type="<?php echo $name ?>"
 																				data-id="<?php echo  $risk->id ? $risk->id : 0 ; ?>"
 																				data-evaluation-id="<?php echo $evaluation_id ? $evaluation_id : 0 ; ?>"
 																				data-variable-id="<?php echo $i ; ?>"
@@ -712,8 +849,8 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 												</div>
 												<div class="modal-footer">
 													<?php $evaluation->cotation = 0  ?>
-													<span data-scale="<?php echo $evaluation->get_evaluation_scale() ?>" class="cotation cotation-span">
-														<span id="current_equivalence">0</span>
+													<span data-scale="<?php echo $evaluation->get_evaluation_scale() ?>" class="cotation cotation-span0">
+														<span id="current_equivalence<?php echo 0 ?>"></span>
 													</span>
 													<div class="wpeo-button button-grey modal-close">
 														<span><?php echo $langs->trans('CloseTab'); ?></span>

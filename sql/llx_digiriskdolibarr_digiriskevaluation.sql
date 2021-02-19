@@ -30,7 +30,7 @@ CREATE TABLE llx_digiriskdolibarr_digiriskevaluation(
 	fk_risk integer, 
 	gravite integer, 
 	protection integer, 
-	occurence integer, 
+	occurrence integer,
 	formation integer, 
 	exposition integer
 	-- END MODULEBUILDER FIELDS

@@ -735,12 +735,7 @@ div.mainmenu.digiriskdolibarr {
 .wpeo-wrap .cotation.default-cotation:hover {
 	background: rgba(0, 0, 0, 0.1);
 }
-.wpeo-wrap .cotation:after {
-	content: '' !important;
-}
-.wpeo-wrap .cotation:before {
-	content: '' !important;
-}
+
 .wpeo-wrap .cotation[data-scale="2"], .wpeo-wrap .cotation[data-scale="3"], .wpeo-wrap .cotation[data-scale="4"] {
 	color: #fff !important;
 }

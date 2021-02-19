@@ -215,10 +215,10 @@ window.eoxiaJS.navigation.init = function() {
  */
 window.eoxiaJS.navigation.event = function() {
 	//toggles
-	jQuery( document ).on( 'click', '-wrap .navigation-container .unit-container .toggle-unit', window.eoxiaJS.navigation.switchToggle );
+	jQuery( document ).on( 'click', '.digirisk-wrap .navigation-container .unit-container .toggle-unit', window.eoxiaJS.navigation.switchToggle );
 	jQuery( document ).on( 'click', '#newGroupment', window.eoxiaJS.navigation.switchToggle );
 	jQuery( document ).on( 'click', '#newWorkunit', window.eoxiaJS.navigation.switchToggle );
-	jQuery( document ).on( 'click', '-wrap .navigation-container .toolbar div', window.eoxiaJS.navigation.toggleAll );
+	jQuery( document ).on( 'click', '.digirisk-wrap .navigation-container .toolbar div', window.eoxiaJS.navigation.toggleAll );
 	jQuery( document ).on( 'click', '#slider', window.eoxiaJS.navigation.setUnitActive );
 
 	//menu button
@@ -250,61 +250,6 @@ window.eoxiaJS.navigation.event = function() {
 };
 
 
-/**
- * Clique sur une des cotations simples.
- *
- * @param  {ClickEvent} event L'état du clic.
- * @return {void}
- *
- * @since 6.0.0
- * @version 7.0.0
- */
-window.eoxiaJS.selectSeuil = function( event ) {
-	var element      = jQuery( this );
-	var riskID       = element.data( 'id' );
-	var seuil        = element.data( 'seuil' );
-	var variableID   = element.data( 'variable-id' );
-	var evaluationID = element.data( 'evaluation-id' );
-	var evaluationMethod = element.data( 'evaluation-method' );
-
-	jQuery( '.risk-row.edit[data-id="' + riskID + '"] .cotation-container .dropdown-toggle.cotation span' ).text( jQuery( this ).text() );
-	jQuery( '.risk-row.edit[data-id="' + riskID + '"] .cotation-container .dropdown-toggle.cotation' ).attr( 'data-scale', seuil );
-
-	if ( variableID && seuil ) {
-		window.eoxiaJS.updateInputVariables( riskID, evaluationID, variableID, seuil, evaluationMethod );
-	}
-};
-
-window.eoxiaJS.updateInputVariables = function( riskID, evaluationID, variableID, value, evaluationMethod, field ) {
-
-	$('#cotationInput').attr('value', evaluationID)
-	$('#cotationMethod').attr('value', evaluationMethod)
-
-	$('#cotationSpan').text(evaluationID)
-	let scale = 0
-
-	// faire fonction scale
-	switch (true) {
-		case (evaluationID < 48):
-			scale = 1
-			break;
-		case (evaluationID < 51):
-			scale = 2
-			break;
-		case (evaluationID < 79):
-			scale = 3
-			break;
-		case (evaluationID < 101):
-			scale = 4
-			break;
-		case (evaluationID === 0):
-			scale = 1
-			break;
-	}
-
-	$('#cotationSpan').attr('data-scale', scale)
-
-};
 /**
  * Gestion du toggle dans la navigation.
  *
@@ -354,18 +299,18 @@ window.eoxiaJS.navigation.toggleAll = function( event ) {
 
 	if ( jQuery( this ).hasClass( 'toggle-plus' ) ) {
 
-		jQuery( '-wrap .navigation-container .workunit-list .unit .toggle-icon').removeClass( 'fa-chevron-right').addClass( 'fa-chevron-down' );
-		jQuery( '-wrap .navigation-container .workunit-list .unit' ).addClass( 'toggled' );
+		jQuery( '.digirisk-wrap .navigation-container .workunit-list .unit .toggle-icon').removeClass( 'fa-chevron-right').addClass( 'fa-chevron-down' );
+		jQuery( '.digirisk-wrap .navigation-container .workunit-list .unit' ).addClass( 'toggled' );
 
 		// local storage add all
-		let MENU = $( '-wrap .navigation-container .workunit-list .unit .title' ).get().map( v => v.attributes.value.value)
+		let MENU = $( '.digirisk-wrap .navigation-container .workunit-list .unit .title' ).get().map( v => v.attributes.value.value)
 		localStorage.setItem('menu', JSON.stringify(Object.values(MENU)) )
 
 	}
 
 	if ( jQuery( this ).hasClass( 'toggle-minus' ) ) {
-		jQuery( '-wrap .navigation-container .workunit-list .unit.toggled' ).removeClass( 'toggled' );
-		jQuery( '-wrap .navigation-container .workunit-list .unit .toggle-icon').addClass( 'fa-chevron-right').removeClass( 'fa-chevron-down' );
+		jQuery( '.digirisk-wrap .navigation-container .workunit-list .unit.toggled' ).removeClass( 'toggled' );
+		jQuery( '.digirisk-wrap .navigation-container .workunit-list .unit .toggle-icon').addClass( 'fa-chevron-right').removeClass( 'fa-chevron-down' );
 
 		// local storage delete all
 		let emptyMenu = new Set('0')
@@ -383,7 +328,7 @@ window.eoxiaJS.navigation.toggleAll = function( event ) {
  */
 window.eoxiaJS.navigation.setUnitActive = function( event ) {
 
-	jQuery( '-wrap .navigation-container .unit.active' ).removeClass( 'active' );
+	jQuery( '.digirisk-wrap .navigation-container .unit.active' ).removeClass( 'active' );
 	let id = $(this).attr('value')
 
 	jQuery( this ).closest( '.unit' ).addClass( 'active' );
@@ -424,7 +369,7 @@ window.eoxiaJS.redirectAfterCancelCreate = function( event ) {
 		history.pushState({ path:  document.URL}, '', URL)
 	}
 
-	jQuery( '-wrap .navigation-container .unit.active' ).removeClass( 'active' );
+	jQuery( '.digirisk-wrap .navigation-container .unit.active' ).removeClass( 'active' );
 	jQuery( `#scores[value="${parentID}"]` ).closest( '.unit' ).addClass( 'active' );
 	jQuery( '#scores' ).closest( '.unit' ).attr( 'value', parentID );
 
@@ -447,6 +392,7 @@ window.eoxiaJS.openModal = function ( event ) {
 
 	let idSelected = $(this).attr('value')
 
+
 	$('.modal-active').removeClass('modal-active')
 	console.log(this)
 	if ($(this).hasClass('digirisk-evaluation')) {
@@ -465,21 +411,27 @@ window.eoxiaJS.createRisk = function ( event ) {
 	if (description !== '') {
 		descriptionPost = '&riskComment=' + description
 	}
-	console.log($('#cotationMethod'))
-	var method = $('#cotationMethod').val()
+
+	var method = $('#cotationMethod0').val()
 	var methodPost = ''
 	if (method !== '') {
 		methodPost = '&cotationMethod=' + method
 	}
 
-	var cotation = $('#cotationSpan').text()
+	var cotation = $('#cotationSpan0').text()
 	var cotationPost = ''
 	if (cotation !== 0) {
 		cotationPost = '&cotation=' + cotation
 	}
-	console.log(document.URL + '&action=add' + cotationPost + descriptionPost + methodPost )
+	let criteres = ''
+	Object.values($('.table-cell.active.cell-0')).forEach(function(v) {
+		if ($(v).data( 'seuil' ) > -1) {
+			criteres += '&' + $(v).data( 'type' ) + '=' + $(v).data( 'seuil' )
+		}
 
-	$('.main-table').load( document.URL + '&action=add' + cotationPost + descriptionPost + methodPost + ' .main-table')
+	})
+
+	$('.main-table').load( document.URL + '&action=add' + cotationPost + descriptionPost + methodPost + criteres + ' .main-table')
 
 }
 
@@ -501,15 +453,31 @@ window.eoxiaJS.saveRisk = function ( event ) {
 		descriptionPost = '&riskComment=' + description
 	}
 
-	var cotation = $('#cotation'+editedRiskId).val()
+	var method = $('#cotationMethod'+editedRiskId).val()
+	var methodPost = ''
+	if (method !== '') {
+		methodPost = '&cotationMethod=' + method
+	}
+
+	var cotation = $('.cotation'+editedRiskId).text()
 	var cotationPost = ''
 	if (cotation !== 0) {
 		cotationPost = '&cotation=' + cotation
 	}
+
+	let criteres = ''
+	Object.values($('.table-cell.active')).forEach(function(v) {
+		if ($(v).data( 'seuil' ) > -1) {
+			criteres += '&' + $(v).data( 'type' ) + '=' + $(v).data( 'seuil' )
+		}
+
+	})
+
+	console.log(Object.values($('.table-cell.active')))
+
+	console.log('&action=saveRisk' + editedRiskId + cotationPost + methodPost  + descriptionPost)
 	$('#risk_row_'+editedRiskId).empty()
-	$('#risk_row_'+editedRiskId).load( document.URL + '&action=saveRisk' + editedRiskId + cotationPost + descriptionPost + ' #risk_row_'+editedRiskId+' > div', function() {
-		$.getScript('digiriskdolibarr.js.php')
-	});
+	$('#risk_row_'+editedRiskId).load( document.URL + '&action=saveRisk' + editedRiskId + cotationPost + methodPost + criteres  + descriptionPost + ' #risk_row_'+editedRiskId+' > div')
 }
 
 // A mettre dans un fichier dropdown
@@ -674,98 +642,39 @@ window.eoxiaJS.dropdown.toggleAngleClass = function( button ) {
  *
  */
 
-
 /**
- * Initialise l'objet "evaluationMethodEvarisk" ainsi que la méthode "init" obligatoire pour la bibliothèque EoxiaJS.
+ * Clique sur une des cotations simples.
  *
- * @since 1.0
- * @version 6.2.6.0
+ * @param  {ClickEvent} event L'état du clic.
+ * @return {void}
+ *
+ * @since 6.0.0
+ * @version 7.0.0
  */
-window.eoxiaJS.evaluationMethodEvarisk = {};
-
-window.eoxiaJS.evaluationMethodEvarisk.init = function() {
-	window.eoxiaJS.evaluationMethodEvarisk.event();
-};
-
-window.eoxiaJS.evaluationMethodEvarisk.event = function() {
-	jQuery( document ).on( 'click', '.wpeo-modal.evaluation-method .wpeo-table.evaluation-method .table-cell.can-select', window.eoxiaJS.evaluationMethodEvarisk.selectSeuil );
-	jQuery( document ).on( 'click', '.wpeo-modal.evaluation-method .wpeo-button.button-main', window.eoxiaJS.evaluationMethodEvarisk.save );
-	jQuery( document ).on( 'click', '.wpeo-modal.evaluation-method .wpeo-button.button-secondary', window.eoxiaJS.evaluationMethodEvarisk.close_modal );
-};
-
-window.eoxiaJS.evaluationMethodEvarisk.selectSeuil = function( event ) {
-	jQuery( this ).closest( '.table-row' ).find( '.active' ).removeClass( 'active' );
-	jQuery( this ).addClass( 'active' );
-
+window.eoxiaJS.selectSeuil = function( event ) {
 	var element      = jQuery( this );
 	var riskID       = element.data( 'id' );
 	var seuil        = element.data( 'seuil' );
 	var variableID   = element.data( 'variable-id' );
 	var evaluationID = element.data( 'evaluation-id' );
+	var evaluationMethod = element.data( 'evaluation-method' );
 
-	window.eoxiaJS.updateInputVariables( riskID, evaluationID, variableID, seuil, jQuery( '.wpeo-modal.modal-active.modal-risk-' + riskID + ' textarea' ) );
+	jQuery( '.risk-row.edit[data-id="' + riskID + '"] .cotation-container .dropdown-toggle.cotation span' ).text( jQuery( this ).text() );
+	jQuery( '.risk-row.edit[data-id="' + riskID + '"] .cotation-container .dropdown-toggle.cotation' ).attr( 'data-scale', seuil );
 
-	var data = {
-		action: 'get_scale',
-		method_evaluation_id: evaluationID,
-		variables: jQuery( '.wpeo-modal.modal-risk-' + riskID + ' textarea' ).val()
-	};
-
-	var currentVal    = JSON.parse(jQuery( '.wpeo-modal.modal-risk-' + riskID + ' textarea' ).val());
-	var canGetDetails = true;
-	for (var key in currentVal) {
-		if (currentVal[key] == '') {
-			canGetDetails = false;
-		}
-	}
-
-	if ( jQuery( '.wpeo-modal.modal-active.modal-risk-' + riskID + ' .table-cell.active' ).length == 5 ) {
-		if ( jQuery( '.wpeo-modal.modal-active.modal-risk-' + riskID + ' .button-main' ).length ) {
-			window.eoxiaJS.loader.display( jQuery( '.wpeo-modal.modal-active.modal-risk-' + riskID + ' .button-main' ) );
-			jQuery( '.wpeo-modal.modal-active.modal-risk-' + riskID + ' .button-main' ).addClass( 'disabled' );
-		}
-		jQuery.post( window.ajaxurl, data, function( response ) {
-			if ( response.data.details ) {
-				if ( jQuery( '.wpeo-modal.modal-active.modal-risk-' + riskID + ' .button-main' ).length ) {
-					window.eoxiaJS.loader.remove( jQuery( '.wpeo-modal.modal-active.modal-risk-' + riskID + ' .button-main' ) );
-					jQuery( '.wpeo-modal.modal-active.modal-risk-' + riskID + ' .button-main' ).removeClass( 'disabled' );
-				}
-				jQuery( '.wpeo-modal.modal-active.modal-risk-' + riskID + ' .cotation' ).attr( 'data-scale', response.data.details.scale );
-				jQuery( '.wpeo-modal.modal-active.modal-risk-' + riskID + ' .cotation span' ).text( response.data.details.equivalence );
-				jQuery( '.wpeo-modal.modal-active.modal-risk-' + riskID + ' .wpeo-button.button-disable' ).removeClass( 'button-disable' ).addClass( 'button-main' );
-			}
-		} );
+	if ( variableID && seuil ) {
+		window.eoxiaJS.updateInputVariables( riskID, evaluationID, variableID, seuil, evaluationMethod );
 	}
 };
 
+window.eoxiaJS.updateInputVariables = function( riskID, evaluationID, variableID, value, evaluationMethod, field ) {
 
-window.eoxiaJS.evaluationMethodEvarisk.save = function( event ) {
-	var riskID       = jQuery( this ).data( 'id' );
-	var evaluationID = jQuery( '.wpeo-modal.modal-active.modal-risk-' + riskID + ' .digi-method-evaluation-id' ).val();
-	var value        = jQuery( '.wpeo-modal.modal-active.modal-risk-' + riskID + ' textarea' ).val();
+	$('#cotationInput').attr('value', evaluationID)
+	$('#cotationMethod'+riskID).attr('value', evaluationMethod)
+	$('#cotationSpan'+riskID).text(evaluationID)
+	$('#cotationSpan'+riskID).attr('data-scale', window.eoxiaJS.getDynamicScale(evaluationID))
 
-	jQuery( '.risk-row.edit[data-id="' + riskID + '"] textarea[name="evaluation_variables"]' ).val( value );
-	jQuery( '.risk-row.edit[data-id="' + riskID + '"] input[name="evaluation_method_id"]' ).val( evaluationID );
-
-	// On met à jour l'affichage de la cotation.
-	jQuery( '.risk-row.edit[data-id="' + riskID + '"] .cotation:first' ).attr( 'data-scale', jQuery( '.wpeo-modal.modal-risk-' + riskID + ' .cotation' ).attr( 'data-scale' ) );
-	jQuery( '.risk-row.edit[data-id="' + riskID + '"] .cotation:first span' ).text( jQuery( '.wpeo-modal.modal-risk-' + riskID + ' .cotation span' ).text() );
-
-	window.eoxiaJS.evaluationMethodEvarisk.close_modal( undefined, riskID );
 };
-
-window.eoxiaJS.evaluationMethodEvarisk.close_modal = function( event, riskID ) {
-	if ( ! riskID ) {
-		riskID = jQuery( this ).data( 'id' );
-	}
-
-	jQuery( '.wpeo-modal.modal-active .modal-close' ).click();
-};
-
-window.eoxiaJS.evaluationMethodEvarisk.fillVariables = function( element ) {
-	element.attr( 'data-variables', element.closest( 'td' ).find( 'textarea[name="evaluation_variables"]' ).val() );
-}
-
 /**
  * Initialise l'objet "evaluationMethodEvarisk" ainsi que la méthode "init" obligatoire pour la bibliothèque EoxiaJS.
  *
@@ -796,12 +705,6 @@ window.eoxiaJS.evaluationMethodEvarisk.selectSeuil = function( event ) {
 
 	window.eoxiaJS.evaluationMethodEvarisk.updateInputVariables( riskID, evaluationID, variableID, seuil, jQuery( '.wpeo-modal.modal-active.modal-risk-' + riskID + ' textarea' ) );
 
-	var data = {
-		action: 'get_scale',
-		method_evaluation_id: evaluationID,
-		variables: jQuery( '.wpeo-modal.modal-risk-' + riskID + ' textarea' ).val()
-	};
-
 	var currentVal    = JSON.parse(jQuery( '.wpeo-modal.modal-risk-' + riskID + ' textarea' ).val());
 	var canGetDetails = true;
 	for (var key in currentVal) {
@@ -812,27 +715,14 @@ window.eoxiaJS.evaluationMethodEvarisk.selectSeuil = function( event ) {
 	console.log(riskID)
 	if ( jQuery( '.wpeo-modal.modal-active.modal-risk-' + riskID + ' .table-cell.active' ).length == 5 ) {
 		if ( jQuery( '.wpeo-modal.modal-active.modal-risk-' + riskID + ' .button-main' ).length ) {
-			//window.eoxiaJS.loader.display( jQuery( '.wpeo-modal.modal-active.modal-risk-' + riskID + ' .button-main' ) );
 			jQuery( '.wpeo-modal.modal-active.modal-risk-' + riskID + ' .button-main' ).addClass( 'disabled' );
 		}
-		//jQuery.post( window.ajaxurl, data, function( response ) {
-		//	if ( response.data.details ) {
-		//		if ( jQuery( '.wpeo-modal.modal-active.modal-risk-' + riskID + ' .button-main' ).length ) {
-		//			window.eoxiaJS.loader.remove( jQuery( '.wpeo-modal.modal-active.modal-risk-' + riskID + ' .button-main' ) );
-		//			jQuery( '.wpeo-modal.modal-active.modal-risk-' + riskID + ' .button-main' ).removeClass( 'disabled' );
-		//		}
-		//		jQuery( '.wpeo-modal.modal-active.modal-risk-' + riskID + ' .cotation' ).attr( 'data-scale', response.data.details.scale );
-		//		jQuery( '.wpeo-modal.modal-active.modal-risk-' + riskID + ' .cotation span' ).text( response.data.details.equivalence );
-		//		jQuery( '.wpeo-modal.modal-active.modal-risk-' + riskID + ' .wpeo-button.button-disable' ).removeClass( 'button-disable' ).addClass( 'button-main' );
-		//	}
-		//} );
 	}
 };
 
 window.eoxiaJS.getDynamicScale = function (cotation) {
 	let scale = 0
 
-	// faire fonction scale
 	switch (true) {
 		case (cotation < 48):
 			scale = 1
@@ -855,60 +745,48 @@ window.eoxiaJS.getDynamicScale = function (cotation) {
 window.eoxiaJS.evaluationMethodEvarisk.updateInputVariables = function( riskID, evaluationID, variableID, value, field ) {
 	var updateEvaluationID = false;
 
-	console.log('riskID= ' + riskID)
-	console.log('evaluationID= ' + evaluationID)
-	console.log('variableID= ' + variableID)
-	console.log('value= ' + value)
-	console.log('field= ' + field)
-	//field = jQuery( '.risk-row.edit[data-id="' + riskID + '"] textarea[name="evaluation_variables"]' );
-	console.log(field)
 
-	var currentVal = JSON.parse(field.val());
-	//field.text(value)
-	currentVal[variableID] = value;
+	console.log($('.table-cell.active'))
 
-	field.val( JSON.stringify( currentVal ) );
+	let criteres = []
+	Object.values($('.table-cell.active.cell-'+riskID)).forEach(function(v) {
+		if ($(v).data( 'seuil' ) > -1) {
+			criteres.push($(v).data( 'seuil' ))
+		}
+
+	})
 
  	if ( updateEvaluationID ) {
 		jQuery( '.risk-row.edit[data-id="' + riskID + '"] input[name="evaluation_method_id"]' ).val( evaluationID );
 	}
+
 	// Rend le bouton "active" et met à jour la cotation et la scale
-	if (Object.keys(currentVal).length === 5) {
-	let cotationBeforeAdapt = currentVal[0] * currentVal[1] * currentVal[2] * currentVal[3] * currentVal[4]
+	if (criteres.length === 5) {
+		let cotationBeforeAdapt = criteres[0] * criteres[1] * criteres[2] * criteres[3] * criteres[4]
 
-	fetch('js/json/default.json')
-		.then(response => response.json())
-		.then(data => {
-			// Do something with your data
-			let cotationAfterAdapt = data[0].option.matrix[cotationBeforeAdapt]
+		fetch('js/json/default.json')
+			.then(response => response.json())
+			.then(data => {
 
-			$('#current_equivalence').text(cotationAfterAdapt)
-			$('.cotation.cotation-span').attr('data-scale', window.eoxiaJS.getDynamicScale(cotationAfterAdapt) )
-		});
+				let cotationAfterAdapt = data[0].option.matrix[cotationBeforeAdapt]
+				$('.cotation.cotation-span'+riskID).attr('data-scale', window.eoxiaJS.getDynamicScale(cotationAfterAdapt) )
 
-	jQuery( '.wpeo-button.cotation-save.button-disable' ).removeClass( 'button-disable' );
+				$('#current_equivalence'+riskID).text(cotationAfterAdapt)
+			});
+
+		jQuery( '.wpeo-button.cotation-save.button-disable' ).removeClass( 'button-disable' );
 	}
 };
 
 window.eoxiaJS.evaluationMethodEvarisk.save = function( event ) {
 	var riskID       = jQuery( this ).data( 'id' );
-	let value 		 = $('.cotation.cotation-span').text()
-	console.log(value)
-	console.log(riskID)
+	let value 		 = $('.cotation.cotation-span'+riskID).text()
 	let evaluationMethod = "digirisk"
+
 	$('#cotationInput').attr('value', value)
-	$('#cotationMethod').attr('value', evaluationMethod)
-
-	$('#cotationSpan').text(value)
-
-	$('#cotationSpan').attr('data-scale', window.eoxiaJS.getDynamicScale(value))
-	//
-	//jQuery( '.risk-row.edit[data-id="' + riskID + '"] textarea[name="evaluation_variables"]' ).val( value );
-	//jQuery( '.risk-row.edit[data-id="' + riskID + '"] input[name="evaluation_method_id"]' ).val( evaluationID );
-	//
-	//// On met à jour l'affichage de la cotation.
-	//jQuery( '.risk-row.edit[data-id="' + riskID + '"] .cotation:first' ).attr( 'data-scale', jQuery( '.wpeo-modal.modal-risk-' + riskID + ' .cotation' ).attr( 'data-scale' ) );
-	//jQuery( '.risk-row.edit[data-id="' + riskID + '"] .cotation:first span' ).text( jQuery( '.wpeo-modal.modal-risk-' + riskID + ' .cotation span' ).text() );
+	$('#cotationMethod'+riskID).attr('value', evaluationMethod)
+	$('#cotationSpan'+riskID).text(value)
+	$('#cotationSpan'+riskID).attr('data-scale', window.eoxiaJS.getDynamicScale(value))
 
 	window.eoxiaJS.evaluationMethodEvarisk.close_modal( undefined, riskID );
 };
