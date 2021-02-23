@@ -5451,7 +5451,7 @@ canvas {
 .wpeo-wrap a {
 	background-color: transparent;
 	text-decoration: none;
-	--colortextlink: white;
+	/*--colortextlink: white;*/
 }
 
 .wpeo-wrap a:active,

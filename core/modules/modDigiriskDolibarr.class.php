@@ -170,8 +170,6 @@ class modDigiriskdolibarr extends DolibarrModules
 			46 => array('EVALUATION_STANDARD_MASK','chaine','E{0000}','', 1),
 			47 => array('DIGIRISKDOLIBARR_EVALUATION_ADDON','chaine', 'mod_evaluation_standard' ,'', 1)
 
-
-
 		);
 
 		if ( ! isset($conf->digiriskdolibarr ) || ! isset( $conf->digiriskdolibarr->enabled ) ) {

@@ -140,9 +140,11 @@ if (empty($reshook))
 		$ref 			= GETPOST('ref');
 		$cotation 		= GETPOST('cotation');
 		$method 		= GETPOST('cotationMethod');
+		$category 		= GETPOST('category');
 
 		$risk->description = $riskComment ? $riskComment : '';
 		$risk->fk_element = $fk_element ? $fk_element : 0;
+		$risk->category = $category;
 		$refRisk = new $conf->global->DIGIRISKDOLIBARR_RISK_ADDON();
 		if ($refRisk) {
 			$risk->ref = $refRisk->getNextValue($risk);
@@ -320,7 +322,7 @@ if ($object->id > 0)
 	print '<div class="underbanner clearboth"></div>';
 	print '<table class="border centpercent tableforfield">'."\n";
 	$string = file_get_contents(DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/js/json/default.json');
-							$json_a = json_decode($string, true);
+	$json_a = json_decode($string, true);
 	?>
 	<div class="wpeo-grid">
 		<h1><?php echo $langs->trans('Risks'). ' - ' . $object->ref . ' ' . $object->label ?></h1>
@@ -370,9 +372,17 @@ if ($object->id > 0)
 												</strong>
 											</span>
 										</div>
+
 										<div class="table-cell table-50 cell-risk" data-title="Risque">
-											<?php echo 'picto' ?>
+											<div class="wpeo-dropdown dropdown-large category-danger padding wpeo-tooltip-event"
+												data-tooltip-persist="true"
+												data-color="red"
+												data-nonce="<?php echo 'check_predefined_danger'; ?>"
+												aria-label="<?php 'Vous devez choisir une catégorie de risque.'?>">
+												<img class="danger-category-pic tooltip hover" src="<?php echo '/dolibarr/htdocs/custom/digiriskdolibarr/img/categorieDangers/' . $risk->get_danger_category($risk) . '.png' ; ?>" aria-label="" />
+											</div>
 										</div>
+
 										<div class="table-cell table-50 cell-cotation" data-title="Cot.">
 											<div class="cotation-container grid wpeo-modal-event tooltip hover cotation-square" id="cotation_square<?php echo $risk->id ?>">
 											<?php
@@ -499,7 +509,6 @@ if ($object->id > 0)
 										?>
 									</div>
 									<div class="table-cell cell-tasks" data-title="Tâches" class="padding">
-										<?php echo 'les tâches liées' ?>
 
 									</div>
 									<div class="table-cell cell-action table-150 table-padding-0 table-end" data-title="Action">
@@ -531,7 +540,13 @@ if ($object->id > 0)
 										</span>
 									</div>
 									<div class="table-cell table-50 cell-risk" data-title="Risque">
-										<?php echo 'picto' ?>
+										<div class="wpeo-dropdown dropdown-large category-danger padding wpeo-tooltip-event"
+											data-tooltip-persist="true"
+											data-color="red"
+											data-nonce="<?php echo 'check_predefined_danger'; ?>"
+											aria-label="<?php 'Vous devez choisir une catégorie de risque.'?>">
+											<img class="danger-category-pic tooltip hover" src="<?php echo '/dolibarr/htdocs/custom/digiriskdolibarr/img/categorieDangers/' . $risk->get_danger_category($risk) . '.png' ; ?>" aria-label="" />
+										</div>
 									</div>
 									<div class="table-cell table-50 cell-cotation" data-title="Cot.">
 										<div class="cotation-container grid wpeo-modal-event tooltip hover cotation-square" id="cotation_square<?php echo $risk->id ?>">
@@ -604,9 +619,23 @@ if ($object->id > 0)
 											?>
 									</div>
 									<div class="table-cell cell-tasks" data-title="Tâches" class="padding">
-										<!--        --><?php //do_shortcode( '[digi_comment id="' . $risk->data['id'] . '" namespace="digi" type="risk_evaluation_comment" display="view"]' ); ?>
-										<?php echo 'les tâches liées' ?>
-
+<!--									VUE SI Y A DES TACHES   -->
+										<?php $related_tasks = $risk->get_related_tasks($risk);
+										if (!empty($related_tasks) ) {
+											foreach ($related_tasks as $related_task) {
+												$related_task->fetchTimeSpent($related_task->id);
+												print '<span class="fas fa-tasks infobox-project paddingright classfortooltip">';
+												print $related_task->getNomUrl();
+												print '<a href="/dolibarr/htdocs/projet/tasks/time.php?id=' . $related_task->id . '&withproject=1">' . '&nbsp' .  gmdate('H:i', $related_task->duration_effective ) . '</a>';
+												print '</span></br>';
+											}
+										}
+										else
+										{
+											print $langs->trans('NoTaskLinked');
+										}
+//<!--									VUE SI Y EN A PAS   -->
+										?>
 									</div>
 									<div class="table-cell cell-action table-150 table-padding-0 table-end" data-title="Action">
 											<div class="action wpeo-gridlayout grid-gap-0 grid-3">
@@ -644,8 +673,32 @@ if ($object->id > 0)
 								<input type="hidden" id="new_item_ref" name="new_item_ref" value="<?php echo $numref->getNextValue($risk); ?>">
 								</div>
 								<div data-title="Risque" data-title="Risque" class="table-cell table-50 cell-risk">
-
-									select box picto cat
+									<input class="input-hidden-danger" type="hidden" name="risk_category_id" value='<?php echo $selected_risk_category; ?>' />
+									<div class="wpeo-dropdown dropdown-large category-danger padding wpeo-tooltip-event"
+										data-tooltip-persist="true"
+										data-color="red"
+										data-nonce="<?php echo 'check_predefined_danger'; ?>"
+										aria-label="<?php 'Vous devez choisir une catégorie de risque.'?>">
+										<div class="dropdown-toggle dropdown-add-button button-cotation">
+											<span class="<?php echo !empty($selected_risk_category) ? 'hidden' : '' ; ?>"><i class="fas fa-exclamation-triangle"></i><i class="fas fa-plus-circle icon-add"></i></span>
+											<img class="danger-category-pic hidden tooltip hover" src="<?php echo $selected_risk_category?>" aria-label="" />
+										</div>
+										<ul class="dropdown-content wpeo-grid grid-5">
+											<?php
+											$dangerCategories = $risk->get_danger_categories();
+//											faire une script/fichier qui les récupère et qui leur donne un nom pour le hover et un id pour le stock, dans une variable $risk_category
+											if ( ! empty( $dangerCategories ) ) :
+												foreach ( $dangerCategories as $dangerCategory ) :
+													?>
+													<li class="item dropdown-item wpeo-tooltip-event classfortooltip" title="<?php echo $dangerCategory['name']; ?>" data-is-preset="<?php echo ''; ?>" aria-label="<?php echo 'oui'; ?>" data-id="<?php echo $dangerCategory['position'] ?>">
+														<img src="<?php echo '/dolibarr/htdocs/custom/digiriskdolibarr/img/categorieDangers/' . $dangerCategory['thumbnail_name'] . '.png'?>" class="attachment-thumbail size-thumbnail photo photowithmargin" alt="" loading="lazy" width="48" height="48">
+													</li>
+													<?php
+												endforeach;
+											endif;
+											?>
+										</ul>
+									</div>
 								</div>
 								<div data-title="Cot." class="table-cell table-50 cell-cotation">
 

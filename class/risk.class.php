@@ -24,6 +24,7 @@
 
 // Put here all includes required by your class file
 require_once DOL_DOCUMENT_ROOT.'/core/class/commonobject.class.php';
+require_once DOL_DOCUMENT_ROOT.'/projet/class/task.class.php';
 //require_once DOL_DOCUMENT_ROOT . '/societe/class/societe.class.php';
 //require_once DOL_DOCUMENT_ROOT . '/product/class/product.class.php';
 
@@ -1050,6 +1051,77 @@ class Risk extends CommonObject
 
 		return $error;
 	}
+
+	/**
+
+	 *
+	 * Get risk categories json in /digiriskdolibarr/js/json/
+	 * @return	array $risk_categories
+	 */
+	public function get_danger_categories()
+	{
+
+		$json_categories = file_get_contents(DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/js/json/dangerCategories.json');
+		$risk_categories = json_decode($json_categories, true);
+
+		return $risk_categories;
+	}
+
+	/**
+	 *
+	 * Get danger category picto path
+	 * @return	string $category['thumbnail_name']     path to danger category picto, -1 if don't exist
+	 */
+	public function get_danger_category($risk)
+	{
+
+		$risk_categories = $this->get_danger_categories();
+
+		foreach ($risk_categories as $category) {
+			if ($category['position'] == $risk->category) {
+				return $category['thumbnail_name'];
+			}
+		}
+	return -1;
+	}
+
+	/**
+	 *
+	 * Get children tasks
+	 * @return	array			$records or -1 if error
+	 */
+	public function get_related_tasks($risk)
+	{
+		$limit = 0;
+		$sql = "SELECT * FROM" . ' llx_projet_task_extrafields' . ' WHERE fk_risk =' . $risk->id;
+		$resql = $this->db->query($sql);
+
+		if ($resql) {
+			$num = $this->db->num_rows($resql);
+			$i = 0;
+			while ($i < ($limit ? min($limit, $num) : $num))
+			{
+				$obj = $this->db->fetch_object($resql);
+
+				$record = new Task($this->db);
+				$record->fetch($obj->fk_object);
+				$records[$record->id] = $record;
+
+				$i++;
+			}
+			$this->db->free($resql);
+
+			return $records;
+		} else {
+			$this->errors[] = 'Error '.$this->db->lasterror();
+			dol_syslog(__METHOD__.' '.join(',', $this->errors), LOG_ERR);
+
+			return -1;
+		}
+
+
+	}
+
 }
 
 /**

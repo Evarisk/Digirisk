@@ -1,0 +1,97 @@
+[
+	{
+		"name": "Risques de trébuchement, heurt ou autre perturbation du mouvement",
+		"thumbnail_name": "chutePP_PictoCategorie_v2",
+		"position": 0
+	},
+	{
+		"name": "Risques de chute de hauteur",
+		"thumbnail_name": "chuteH_PictoCategorie_v2",
+		"position": 1
+	},
+	{
+		"name": "Risques liés aux circulations internes de véhicules",
+		"thumbnail_name": "circulation_PictoCategorie_v2",
+		"position": 3
+	},
+	{
+		"name": "Risques routiers en mission",
+		"thumbnail_name": "circulation_v2",
+		"position": 4
+	},
+	{
+		"name": "Risques liés à la charge physique de travail",
+		"thumbnail_name": "activitePhysique_v2",
+		"position": 5
+	},
+	{
+		"name": "Risques liés à la manutention mécanique",
+		"thumbnail_name": "manutentionMe_PictoCategorie_v2",
+		"position": 6
+	},
+	{
+		"name": "Risques liés aux produits, aux émissions et aux déchets",
+		"thumbnail_name": "produitsC_PictoCategorie_v2",
+		"position": 7
+	},
+	{
+		"name": "Risques liés aux agents biologiques",
+		"thumbnail_name": "manqueHygiene_PictoCategorie_v2",
+		"position": 8
+	},
+	{
+		"name": "Risques liés aux équipements de travail",
+		"thumbnail_name": "machine_PictoCategorie_v2",
+		"position": 9
+	},
+	{
+		"name": "Risques liés aux effondrements et aux chutes d'objets",
+		"thumbnail_name": "effondrement_PictoCategorie_v2",
+		"position": 10
+	},
+	{
+		"name": "Risques et nuisances liés au bruit",
+		"thumbnail_name": "nuisances_PictoCategorie_v2",
+		"position": 11
+	},
+	{
+		"name": "Risques liés aux ambiances thermiques",
+		"thumbnail_name": "climat_PictoCategorie_v2",
+		"position": 12
+	},
+	{
+		"name": "Risques d'incendie, d'explosion",
+		"thumbnail_name": "incendies_PictoCategorie_v2",
+		"position": 13
+	},
+	{
+		"name": "Risques liés à l'électricité",
+		"thumbnail_name": "electricite_PictoCategorie_v2",
+		"position": 14
+	},
+	{
+		"name": "Risques liés aux ambiances lumineuses",
+		"thumbnail_name": "eclairage_PictoCategorie_v2",
+		"position": 15
+	},
+	{
+		"name": "Risques liés aux rayonnements",
+		"thumbnail_name": "rayonnement_v2",
+		"position": 16
+	},
+	{
+		"name": "Risques psychosociaux",
+		"thumbnail_name": "rps_v2",
+		"position": 17
+	},
+	{
+		"name": "Risques liés à l'amiante",
+		"thumbnail_name": "amiante_v2",
+		"position": 18
+	},
+	{
+		"name": "Risques autres",
+		"thumbnail_name": "autre_PictoCategorie_v2",
+		"position": 19
+	}
+]
