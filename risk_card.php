@@ -141,8 +141,7 @@ if (empty($reshook))
 		$cotation 		= GETPOST('cotation');
 		$method 		= GETPOST('cotationMethod');
 		$category 		= GETPOST('category');
-
-		$risk->description = $riskComment ? $riskComment : '';
+		$risk->description = $db->escape($riskComment);
 		$risk->fk_element = $fk_element ? $fk_element : 0;
 		$risk->category = $category;
 		$refRisk = new $conf->global->DIGIRISKDOLIBARR_RISK_ADDON();
@@ -205,35 +204,44 @@ if (empty($reshook))
 
 	if ($action == 'saveRisk') {
 
-	$riskID 	= GETPOST('riskID');
-	$comment 	= GETPOST('riskComment');
-	$cotation 	= GETPOST('cotation');
-	$method 	= GETPOST('cotationMethod');
+		$riskID 	= GETPOST('riskID');
+		$comment 	= GETPOST('riskComment');
+		$cotation 	= GETPOST('cotation');
+		$method 	= GETPOST('cotationMethod');
 
-	$formation 	= GETPOST('formation');
-	$protection = GETPOST('protection');
-	$occurrence = GETPOST('occurrence');
-	$gravite 	= GETPOST('gravite');
-	$exposition = GETPOST('exposition');
+		$formation 	= GETPOST('formation');
+		$protection = GETPOST('protection');
+		$occurrence = GETPOST('occurrence');
+		$gravite 	= GETPOST('gravite');
+		$exposition = GETPOST('exposition');
 
-	$evaluation = new DigiriskEvaluation($db);
-	$evaluation->cotation = $cotation;
-	$evaluation->fk_risk = $riskID;
-	$evaluation->status = 1;
-	$evaluation->method = $method;
+		$evaluation = new DigiriskEvaluation($db);
+		$evaluation->cotation = $cotation;
+		$evaluation->fk_risk = $riskID;
+		$evaluation->status = 1;
+		$evaluation->method = $method;
 
-	$refCot = new $conf->global->DIGIRISKDOLIBARR_EVALUATION_ADDON();
-	$evaluation->ref = $refCot->getNextValue($evaluation);
+		$refCot = new $conf->global->DIGIRISKDOLIBARR_EVALUATION_ADDON();
+		$evaluation->ref = $refCot->getNextValue($evaluation);
 
-	if ($method == 'digirisk') {
-		$evaluation->formation  	= $formation ;
-		$evaluation->protection  	= $protection ;
-		$evaluation->occurrence  	= $occurrence ;
-		$evaluation->gravite  		= $gravite ;
-		$evaluation->exposition  	= $exposition ;
+		if ($method == 'digirisk') {
+			$evaluation->formation  	= $formation ;
+			$evaluation->protection  	= $protection ;
+			$evaluation->occurrence  	= $occurrence ;
+			$evaluation->gravite  		= $gravite ;
+			$evaluation->exposition  	= $exposition ;
+		}
+
+		$evaluation->create($user);
 	}
 
-	$evaluation->create($user);
+	if ($action == "deleteRisk") {
+
+		$id = GETPOST('deletedRiskId');
+
+		$risk = new Risk($db);
+		$risk->fetch($id);
+		$risk->delete($user);
 	}
 
 	// Actions when linking object each other
@@ -650,7 +658,7 @@ if ($object->id > 0)
 												</div>
 
 												<!-- Supprimer un risque -->
-												<div class="wpeo-button button-square-50 button-transparent w50 delete action-attribute">
+												<div class="wpeo-button button-square-50 button-transparent w50 delete action-attribute risk-delete" value="<?php echo $risk->id ?>">
 													<i class="button-icon fas fa-times"></i>
 												</div>
 											</div>

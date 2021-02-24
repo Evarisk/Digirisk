@@ -243,6 +243,7 @@ window.eoxiaJS.navigation.event = function() {
 	jQuery( document ).on( 'click', '.risk-edit', window.eoxiaJS.editRisk );
 	jQuery( document ).on( 'click', '.risk-create:not(.button-disable)', window.eoxiaJS.createRisk );
 	jQuery( document ).on( 'click', '.risk-save', window.eoxiaJS.saveRisk );
+	jQuery( document ).on( 'click', '.risk-delete', window.eoxiaJS.deleteRisk );
 	//dropdown cotation
 	jQuery( document ).on( 'click', '.table.risk .dropdown-list li.dropdown-item:not(.open-popup), .wpeo-table.table-listing-risk .dropdown-list li.dropdown-item:not(.open-popup), .wpeo-table.table-risk .dropdown-list li.dropdown-item:not(.open-popup)', window.eoxiaJS.selectSeuil );
 
@@ -418,9 +419,10 @@ window.eoxiaJS.createRisk = function ( event ) {
 	$('.risk-create.wpeo-button.add').addClass('button-disable');
 
 	var description = $('#riskComment').val()
+
 	var descriptionPost = ''
 	if (description !== '') {
-		descriptionPost = '&riskComment=' + description
+		descriptionPost = '&riskComment=' + encodeURI(description)
 	}
 
 	var method = $('#cotationMethod0').val()
@@ -454,6 +456,7 @@ window.eoxiaJS.createRisk = function ( event ) {
 		}
 
 	})
+
 	$('.main-table').load( document.URL + '&action=add' + refPost + categoryPost + cotationPost + descriptionPost + methodPost + criteres + ' .main-table')
 
 }
@@ -466,16 +469,28 @@ window.eoxiaJS.editRisk = function ( event ) {
 
 }
 
+window.eoxiaJS.deleteRisk = function ( event ) {
+
+	let deletedRiskId = $(this).attr('value')
+	var r = confirm('Are you sure you want to delete this risk ?')
+	if (r == true) {
+		$('#risk_row_'+deletedRiskId).empty()
+		$('#risk_row_'+deletedRiskId).load( document.URL + '&action=deleteRisk&deletedRiskId=' + deletedRiskId + ' #risk_row_'+deletedRiskId+' > div')
+	} else {
+		return false
+	}
+}
+
 window.eoxiaJS.saveRisk = function ( event ) {
 
 	let editedRiskId = $(this).attr('value')
 
 	var description = $('#riskComment'+editedRiskId).val()
+
 	var descriptionPost = ''
 	if (description !== '') {
-		descriptionPost = '&riskComment=' + description
+		descriptionPost = '&riskComment=' + encodeURI(description)
 	}
-
 	var method = $('#cotationMethod'+editedRiskId).val()
 	var methodPost = ''
 	if (method !== '') {
@@ -860,7 +875,7 @@ window.eoxiaJS.riskCategory.selectDanger = function( event ) {
 	element.closest('.wpeo-dropdown').find('.dropdown-toggle img').attr('sizes', '');
 	element.closest('.wpeo-dropdown').find('.dropdown-toggle img').attr('aria-label', element.closest('.tooltip').attr('aria-label'));
 
-	window.eoxiaJS.tooltip.remove(element.closest('.risk-row').find('.category-danger.wpeo-tooltip-event'));
+	//window.eoxiaJS.tooltip.remove(element.closest('.risk-row').find('.category-danger.wpeo-tooltip-event'));
 
 	//// Rend le bouton "active".
 	//if ( '{}' !== element.closest( '.risk-row' ).find( 'textarea[name="evaluation_variables"]' ).val() ) {
