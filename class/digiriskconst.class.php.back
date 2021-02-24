@@ -104,6 +104,7 @@ class DigiriskConst extends CommonObject
 		'ref_ext' => array('type'=>'varchar(128)', 'label'=>'RefExt', 'enabled'=>'1', 'position'=>11, 'notnull'=>0, 'visible'=>-1,),
 		'status' => array('type'=>'integer', 'label'=>'Status', 'enabled'=>'1', 'position'=>509, 'notnull'=>0, 'visible'=>-1,),
 		'type' => array('type'=>'varchar(50)', 'label'=>'Type', 'enabled'=>'1', 'position'=>1000, 'notnull'=>0, 'visible'=>-1,),
+		'value' => array('type'=>'varchar(128)', 'label'=>'Value', 'enabled'=>'1', 'position'=>1001, 'notnull'=>0, 'visible'=>-1,),
 	);
 	public $rowid;
 	public $date_creation;
@@ -115,6 +116,7 @@ class DigiriskConst extends CommonObject
 	public $ref_ext;
 	public $status;
 	public $type;
+	public $value;
 	// END MODULEBUILDER PROPERTIES
 
 

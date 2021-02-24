@@ -161,6 +161,7 @@ if (empty($reshook))
 				$occurrence = GETPOST('occurrence');
 				$gravite = GETPOST('gravite');
 				$exposition = GETPOST('exposition');
+				$evaluationComment = GETPOST('evaluationComment');
 
 				$evaluation = new DigiriskEvaluation($db);
 				$refCot = new $conf->global->DIGIRISKDOLIBARR_EVALUATION_ADDON();
@@ -169,11 +170,13 @@ if (empty($reshook))
 				$evaluation->status = 1;
 				$evaluation->method = $method;
 				$evaluation->ref   = $refCot->getNumRef($evaluation);
-				$evaluation->formation  	= $formation ;
-				$evaluation->protection  	= $protection ;
-				$evaluation->occurrence  	= $occurrence ;
-				$evaluation->gravite  		= $gravite ;
-				$evaluation->exposition  	= $exposition ;
+				$evaluation->formation  	= $formation;
+				$evaluation->protection  	= $protection;
+				$evaluation->occurrence  	= $occurrence;
+				$evaluation->gravite  		= $gravite;
+				$evaluation->exposition  	= $exposition;
+				$evaluation->comment = $db->escape($evaluationComment);
+
 				$result2 = $evaluation->create($user);
 
 				if ($result2 > 0)
@@ -204,10 +207,11 @@ if (empty($reshook))
 
 	if ($action == 'saveRisk') {
 
-		$riskID 	= GETPOST('riskID');
-		$comment 	= GETPOST('riskComment');
-		$cotation 	= GETPOST('cotation');
-		$method 	= GETPOST('cotationMethod');
+		$riskID 			= GETPOST('riskID');
+		$comment 			= GETPOST('riskComment');
+		$cotation 			= GETPOST('cotation');
+		$method 			= GETPOST('cotationMethod');
+		$evaluationComment 	= GETPOST('evaluationComment');
 
 		$formation 	= GETPOST('formation');
 		$protection = GETPOST('protection');
@@ -220,6 +224,7 @@ if (empty($reshook))
 		$evaluation->fk_risk = $riskID;
 		$evaluation->status = 1;
 		$evaluation->method = $method;
+		$evaluation->comment = $db->escape($evaluationComment);
 
 		$refCot = new $conf->global->DIGIRISKDOLIBARR_EVALUATION_ADDON();
 		$evaluation->ref = $refCot->getNextValue($evaluation);
@@ -346,10 +351,10 @@ if ($object->id > 0)
 						<div class="wpeo-table table-flex table-risk main-table">
 							<div class="table-row table-header">
 								<div class="table-cell table-75"><?php echo 'Ref'; ?>.</div>
+								<div class="table-cell table-150"><?php echo $langs->trans('riskDescription'); ?></div>
 								<div class="table-cell table-50"><?php echo 'Risque'; ?></div>
-								<div class="table-cell table-50"><?php echo 'Cot'; ?></div>
 								<div class="table-cell table-50"><?php echo 'Photo'; ?></div>
-								<div class="table-cell table-300"><?php echo 'Description'; ?></div>
+								<div class="table-cell table-200"><?php echo $langs->trans('lastEvaluation'); ?></div>
 								<div class="table-cell"><?php echo 'Tâches'; ?></div>
 								<div class="table-cell table-100 table-end"></div>
 							</div>
@@ -358,11 +363,11 @@ if ($object->id > 0)
 							-->
 							<?php
 							$risks = $risk->fetchFromParent($object->id);
-							if (!empty($risks)) {
+							if ($risks !== -1) {
 								foreach ($risks as $risk) {
 									$evaluation = new DigiriskEvaluation($db);
-									$lastCotation = $evaluation->fetchFromParent($risk->id,1);
-									$lastCotation = array_shift($lastCotation);
+									$lastEvaluation = $evaluation->fetchFromParent($risk->id,1);
+									$lastEvaluation = array_shift($lastEvaluation);
 //									action = edit
 								if ($action == 'editRisk' . $risk->id) {
 								?>
@@ -373,12 +378,22 @@ if ($object->id > 0)
 													<?php
 													$riskRef = substr($risk->ref, 1);
 													$riskRef = ltrim($riskRef, '0');
-													$cotationRef = substr($lastCotation->ref, 1);
+													$cotationRef = substr($lastEvaluation->ref, 1);
 													$cotationRef = ltrim($cotationRef, '0');
 													// au lieu de 'R' mettre l'accronyme des risques qui sera futurement configurable dans digirisk
 													echo 'R' . $riskRef . ' - E' . $cotationRef; ?>
 												</strong>
 											</span>
+										</div>
+
+										<div class="table-cell table-150 cell-comment" data-title="Commentaire" class="padding">
+											<?php
+											print '<textarea name="riskComment" id="riskComment'.$risk->id.'" class="minwidth150" rows="'.ROWS_2.'">'.$risk->description.'</textarea>'."\n";
+											?>
+										</div>
+
+										<div class="table-cell table-50 cell-photo" data-title="Photo">
+											<?php echo 'photo' ?>
 										</div>
 
 										<div class="table-cell table-50 cell-risk" data-title="Risque">
@@ -394,9 +409,9 @@ if ($object->id > 0)
 										<div class="table-cell table-50 cell-cotation" data-title="Cot.">
 											<div class="cotation-container grid wpeo-modal-event tooltip hover cotation-square" id="cotation_square<?php echo $risk->id ?>">
 											<?php
-											if (!empty($lastCotation)) {
+											if (!empty($lastEvaluation)) {
 												//ici pas faire un foreach, accèder juste au premier élément
-												$cot = $lastCotation;
+												$cot = $lastEvaluation;
 													if ($action == 'editRisk' . $risk->id) { ?>
 														<div data-title="Cot." class="table-cell table-50 cell-cotation">
 															<textarea style="display: none;" name="evaluation_variables"><?php echo ! empty( $risk->data['evaluation']->data ) ? $risk->data['evaluation']->data['variables'] : '{}'; ?></textarea>
@@ -508,14 +523,13 @@ if ($object->id > 0)
 											}?>
 										</div>
 									</div>
-									<div class="table-cell table-50 cell-photo" data-title="Photo">
-										<?php echo 'photo' ?>
+
+									<div class="table-cell table-150 cell-comment" data-title="Commentaire" class="padding">
+											<?php
+											print '<textarea name="evaluationComment" id="evaluationComment'.$risk->id.'" class="minwidth150" rows="'.ROWS_2.'">'.$lastEvaluation->comment.'</textarea>'."\n";
+											?>
 									</div>
-									<div class="table-cell table-300 cell-comment" data-title="Commentaire" class="padding">
-										<?php
-										print '<textarea name="riskComment" id="riskComment'.$risk->id.'" class="minwidth300" rows="'.ROWS_2.'">'.$risk->description.'</textarea>'."\n";
-										?>
-									</div>
+
 									<div class="table-cell cell-tasks" data-title="Tâches" class="padding">
 
 									</div>
@@ -540,13 +554,20 @@ if ($object->id > 0)
 												<?php
 												$riskRef = substr($risk->ref, 1);
 												$riskRef = ltrim($riskRef, '0');
-												$cotationRef = substr($lastCotation->ref, 1);
+												$cotationRef = substr($lastEvaluation->ref, 1);
 												$cotationRef = ltrim($cotationRef, '0');
 												// au lieu de 'R' mettre l'accronyme des risques qui sera futurement configurable dans digirisk
 												echo 'R' . $riskRef . ' - E' . $cotationRef; ?>
 											</strong>
 										</span>
 									</div>
+
+									<div class="table-cell table-150 cell-comment" data-title="Description" class="padding">
+											<?php
+												echo $risk->description;
+											?>
+									</div>
+
 									<div class="table-cell table-50 cell-risk" data-title="Risque">
 										<div class="wpeo-dropdown dropdown-large category-danger padding wpeo-tooltip-event"
 											data-tooltip-persist="true"
@@ -556,14 +577,20 @@ if ($object->id > 0)
 											<img class="danger-category-pic tooltip hover" src="<?php echo '/dolibarr/htdocs/custom/digiriskdolibarr/img/categorieDangers/' . $risk->get_danger_category($risk) . '.png' ; ?>" aria-label="" />
 										</div>
 									</div>
+
+									<div class="table-cell table-50 cell-photo" data-title="Photo">
+										<?php echo 'photo' ?>
+									</div>
+
+
 									<div class="table-cell table-50 cell-cotation" data-title="Cot.">
 										<div class="cotation-container grid wpeo-modal-event tooltip hover cotation-square" id="cotation_square<?php echo $risk->id ?>">
 										<?php
 										$evaluation = new DigiriskEvaluation($db);
-										$lastCotation = $evaluation->fetchFromParent($risk->id,1);
-										if (!empty($lastCotation)) {
+										$lastEvaluation = $evaluation->fetchFromParent($risk->id,1);
+										if (!empty($lastEvaluation)) {
 											//ici pas faire un foreach, accèder juste au premier élément
-											foreach ($lastCotation as $cot) {
+											foreach ($lastEvaluation as $cot) {
 														if ($cot->cotation >= 0) { ?>
 															<div class="action cotation default-cotation modal-open" data-scale="<?php echo $cot->get_evaluation_scale() ?>" value="<?php echo $risk->id ?>">
 																<span><?php echo $cot->cotation; ?></span>
@@ -590,7 +617,7 @@ if ($object->id > 0)
 																							<span><strong><?php echo  $cotation->id ; ?></strong></span>
 																						</div>
 																						<div class="table-cell table-150" data-title="Date">
-																							<?php echo dol_print_date($cotation->date_creation, 'Y/m/d') ; ?>
+																							<?php echo date("Y/m/d", $cotation->date_creation) ; ?>
 																						</div>
 																						<div class="table-cell table-50" data-title="Cot.">
 																							<div class="cotation-container grid">
@@ -598,6 +625,9 @@ if ($object->id > 0)
 																									<span><?php echo  $cotation->cotation ; ?></span>
 																								</div>
 																							</div>
+																						</div>
+																						<div class="table-cell" data-title="Comment">
+																							<?php echo $cotation->comment ; ?>
 																						</div>
 																					</div>
 																					<?php
@@ -618,24 +648,28 @@ if ($object->id > 0)
 											?>
 										</div>
 									</div>
-									<div class="table-cell table-50 cell-photo" data-title="Photo">
-										<?php echo 'photo' ?>
+
+									<div class="table-cell table-150" data-title="evaluationComment" class="padding">
+										<?php
+										$lastEval = array_shift($lastEvaluation);
+										$evaluations = $evaluation->fetchFromParent($risk->id);
+										echo date("Y/m/d", $lastEval->date_creation) . ' : ';
+										echo $lastEval->comment;
+										print '</br>';
+										echo 'il y a ' . count($evaluations) . ' evaluations sur ce risque';
+
+										?>
 									</div>
-									<div class="table-cell table-300 cell-comment" data-title="Commentaire" class="padding">
-											<?php
-												echo $risk->description;
-											?>
-									</div>
+
 									<div class="table-cell cell-tasks" data-title="Tâches" class="padding">
 <!--									VUE SI Y A DES TACHES   -->
 										<?php $related_tasks = $risk->get_related_tasks($risk);
 										if (!empty($related_tasks) ) {
 											foreach ($related_tasks as $related_task) {
 												$related_task->fetchTimeSpent($related_task->id);
-												print '<span class="fas fa-tasks infobox-project paddingright classfortooltip">';
-												print $related_task->getNomUrl();
-												print '<a href="/dolibarr/htdocs/projet/tasks/time.php?id=' . $related_task->id . '&withproject=1">' . '&nbsp' .  gmdate('H:i', $related_task->duration_effective ) . '</a>';
-												print '</span></br>';
+												print '<a target="_blank">' . $related_task->getNomUrl(1) . '</a>';
+												print '<a target="_blank" href="/dolibarr/htdocs/projet/tasks/time.php?id=' . $related_task->id . '&withproject=1">' . '&nbsp' .  gmdate('H:i', $related_task->duration_effective ) . '</a>';
+												print '</br>';
 											}
 										}
 										else
@@ -678,8 +712,15 @@ if ($object->id > 0)
 								<input type="hidden" name="id" value="<?php echo $object->id; ?>" />
 								<input type="hidden" name="from_preset" value="<?php echo $risk->data['preset'] ? 1 : 0; ?>" />
 								<div data-title="Ref." class="table-cell table-75 cell-reference">
-								<input type="hidden" id="new_item_ref" name="new_item_ref" value="<?php echo $numref->getNextValue($risk); ?>">
+									<input type="hidden" id="new_item_ref" name="new_item_ref" value="<?php echo $numref->getNextValue($risk); ?>">
 								</div>
+
+								<div data-title="Description" class="table-cell table-150 cell-comment">
+									<?php
+									print '<textarea name="riskComment" id="riskComment" class="minwidth150" rows="'.ROWS_2.'">'.('').'</textarea>'."\n";
+									?>
+								</div>
+
 								<div data-title="Risque" data-title="Risque" class="table-cell table-50 cell-risk">
 									<input class="input-hidden-danger" type="hidden" name="risk_category_id" value='<?php echo $selected_risk_category; ?>' />
 									<div class="wpeo-dropdown dropdown-large category-danger padding wpeo-tooltip-event"
@@ -708,6 +749,11 @@ if ($object->id > 0)
 										</ul>
 									</div>
 								</div>
+
+								<div data-title="Photo" class="table-cell table-50 cell-photo">
+								photo
+								</div>
+
 								<div data-title="Cot." class="table-cell table-50 cell-cotation">
 
 									<textarea style="display: none;" name="evaluation_variables"><?php echo ! empty( $risk->data['evaluation']->data ) ? $risk->data['evaluation']->data['variables'] : '{}'; ?></textarea>
@@ -810,14 +856,13 @@ if ($object->id > 0)
 										</div>
 									</div>
 								</div>
-								<div data-title="Photo" class="table-cell table-50 cell-photo">
-								photo
-								</div>
-								<div data-title="Description" class="table-cell table-100 cell-comment">
+
+								<div data-title="evaluationComment" class="table-cell table-100 cell-comment">
 									<?php
-									print '<textarea name="riskComment" id="riskComment" class="minwidth300" rows="'.ROWS_2.'">'.('').'</textarea>'."\n";
+									print '<textarea name="evaluationComment" id="evaluationComment" class="minwidth150" rows="'.ROWS_2.'">'.('').'</textarea>'."\n";
 									?>
 								</div>
+
 								<div class="table-cell table-150 table-end cell-action" data-title="action">
 								<?php if ( 0) : ?>
 									<div class="action">

@@ -30,8 +30,9 @@ CREATE TABLE llx_digiriskdolibarr_digiriskevaluation(
 	fk_risk integer, 
 	gravite integer, 
 	protection integer, 
-	occurrence integer,
+	occurrence integer, 
 	formation integer, 
-	exposition integer
+	exposition integer, 
+	entity integer DEFAULT 1
 	-- END MODULEBUILDER FIELDS
 ) ENGINE=innodb;

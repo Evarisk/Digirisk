@@ -419,10 +419,15 @@ window.eoxiaJS.createRisk = function ( event ) {
 	$('.risk-create.wpeo-button.add').addClass('button-disable');
 
 	var description = $('#riskComment').val()
-
 	var descriptionPost = ''
 	if (description !== '') {
 		descriptionPost = '&riskComment=' + encodeURI(description)
+	}
+
+	var comment = $('#evaluationComment').val()
+	var commentPost = ''
+	if (comment !== '') {
+		commentPost = '&evaluationComment=' + encodeURI(comment)
 	}
 
 	var method = $('#cotationMethod0').val()
@@ -457,7 +462,7 @@ window.eoxiaJS.createRisk = function ( event ) {
 
 	})
 
-	$('.main-table').load( document.URL + '&action=add' + refPost + categoryPost + cotationPost + descriptionPost + methodPost + criteres + ' .main-table')
+	$('.main-table').load( document.URL + '&action=add' + refPost + commentPost + categoryPost + cotationPost + descriptionPost + methodPost + criteres + ' .main-table')
 
 }
 
@@ -491,6 +496,13 @@ window.eoxiaJS.saveRisk = function ( event ) {
 	if (description !== '') {
 		descriptionPost = '&riskComment=' + encodeURI(description)
 	}
+
+	var comment = $('#evaluationComment'+editedRiskId).val()
+	var commentPost = ''
+	if (comment !== '') {
+		commentPost = '&evaluationComment=' + encodeURI(comment)
+	}
+
 	var method = $('#cotationMethod'+editedRiskId).val()
 	var methodPost = ''
 	if (method !== '') {
@@ -510,9 +522,9 @@ window.eoxiaJS.saveRisk = function ( event ) {
 		}
 
 	})
-
+		console.log(this)
 	$('#risk_row_'+editedRiskId).empty()
-	$('#risk_row_'+editedRiskId).load( document.URL + '&action=saveRisk&riskID=' + editedRiskId + cotationPost + methodPost + criteres  + descriptionPost + ' #risk_row_'+editedRiskId+' > div')
+	$('#risk_row_'+editedRiskId).load( document.URL + '&action=saveRisk&riskID=' + editedRiskId + commentPost + cotationPost + methodPost + criteres  + descriptionPost + ' #risk_row_'+editedRiskId+' > div')
 }
 
 // Dropdown

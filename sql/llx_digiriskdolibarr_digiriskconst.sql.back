@@ -25,6 +25,7 @@ CREATE TABLE llx_digiriskdolibarr_digiriskconst(
 	name varchar(128) NOT NULL, 
 	ref_ext varchar(128), 
 	status integer, 
-	type varchar(50)
+	type varchar(50), 
+	value varchar(128)
 	-- END MODULEBUILDER FIELDS
 ) ENGINE=innodb;
