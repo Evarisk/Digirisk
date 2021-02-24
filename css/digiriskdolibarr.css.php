@@ -8727,6 +8727,11 @@ to {
 	clear: both;
 }
 
+.dropdown-item::before {
+	display: none;
+	content: '';
+}
+
 .wpeo-dropdown.dropdown-list .dropdown-item img {
 	float: left;
 	margin-right: 0.4em;
