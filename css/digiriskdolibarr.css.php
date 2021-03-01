@@ -462,7 +462,7 @@ div.mainmenu.digiriskdolibarr {
 }
 
 .wpeo-wrap .main-container {
-	width: 76%;
+	width: 100%;
 	padding-left: 10px;
 }
 

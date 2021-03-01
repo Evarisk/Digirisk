@@ -41,6 +41,7 @@ if (!$res) die("Include of main fails");
 require_once DOL_DOCUMENT_ROOT.'/core/class/html.formcompany.class.php';
 require_once DOL_DOCUMENT_ROOT.'/core/class/html.formfile.class.php';
 require_once DOL_DOCUMENT_ROOT.'/core/class/html.formprojet.class.php';
+require_once DOL_DOCUMENT_ROOT.'/core/modules/project/task/mod_task_simple.php';
 dol_include_once('/digiriskdolibarr/class/risk.class.php');
 dol_include_once('/digiriskdolibarr/class/digiriskevaluation.class.php');
 dol_include_once('/digiriskdolibarr/class/digiriskelement.class.php');
@@ -143,6 +144,7 @@ if (empty($reshook))
 		$category 		= GETPOST('category');
 		$risk->description = $db->escape($riskComment);
 		$risk->fk_element = $fk_element ? $fk_element : 0;
+		$risk->fk_projet = $conf->global->DIGIRISKDOLIBARR_DU_PROJECT;
 		$risk->category = $category;
 		$refRisk = new $conf->global->DIGIRISKDOLIBARR_RISK_ADDON();
 		if ($refRisk) {
@@ -156,12 +158,16 @@ if (empty($reshook))
 			if ($result > 0)
 			{
 				$task = new Task($db);
+				$third_party = new Societe($db);
 				$extrafields->fetch_name_optionals_label($task->table_element);
 
-				$task->ref                              = "TK2102-0005";
+				$taskRef = new $conf->global->PROJECT_TASK_ADDON();
+
+				$task->ref                              = $taskRef->getNextValue($third_party, $task);
 				$task->label                            = 'salut';
-				$task->fk_project                       = 2;
+				$task->fk_project                       = $conf->global->DIGIRISKDOLIBARR_DU_PROJECT;
 				$task->date_c                           = dol_now();
+				$task->fk_task_parent                   = 0;
 				$task->array_options['options_fk_risk'] = $risk->id;
 
 				$task->create($user);
@@ -397,7 +403,65 @@ if ($object->id > 0) {
 											</div>
 
 											<div class="table-cell table-50 cell-photo" data-title="Photo">
-												<?php echo 'photo' ?>
+												<div class="photo-container grid wpeo-modal-event tooltip hover">
+													<?php $filearray = dol_dir_list($conf->digiriskdolibarr->multidir_output[$conf->entity].'/'.$element['object']->element_type.'/'.$element['object']->ref.'/', "files", 0, '', '(\.odt|_preview.*\.png)$', 'position_name', 'asc', 1);
+													if (count($filearray)) : ?>
+														<?php print '<span class="floatleft inline-block valignmiddle divphotoref">'.$element['object']->digirisk_show_photos('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity].'/'.$element['object']->element_type, 'small', 1, 0, 0, 0, 50, 0, 0, 0, 0, $element['object']->element_type).'</span>'; ?>
+													<?php else : ?>
+													<?php $nophoto = '/public/theme/common/nophoto.png'; ?>
+													<div class="action photo default-photo modal-open" value="<?php echo $risk->id ?>">
+														<span class="floatleft inline-block valignmiddle divphotoref"><img class="photodigiriskdolibarr" alt="No photo" src="<?php echo DOL_URL_ROOT.$nophoto ?>"></span>
+													</div>
+															<!-- Modal-AddPhoto -->
+													<div id="photo_modal<?php echo $risk->id ?>" class="wpeo-modal">
+														<div class="modal-container wpeo-modal-event">
+															<!-- Modal-Header -->
+															<div class="modal-header">
+																<h2 class="modal-title"><?php echo $langs->trans('AddPhoto') ?></h2>
+																<div class="modal-close"><i class="fas fa-times"></i></div>
+															</div>
+															<!-- Modal-Content -->
+															<div class="modal-content" id="#modalContent">
+																<div class="formattachnewfile">
+																	<div class="centpercent notopnoleftnoright table-fiche-title">
+																		<div class="titre">
+																			<div class="nobordernopadding valignmiddle col-title">
+																				<div class="titre inline-block">Ajouter un nouveau fichier/document</div>
+																			</div>
+																		</div>
+
+																		<div>
+																		<!-- The `multiple` attribute lets users select multiple files. -->
+																			<input type="file" id="riskDocument" multiple>
+																			<input id="riskDocumentSubmit" type="submit" class="button reposition" name="sendit" value="<?php echo $risk->id ?>">
+<!--																			<input class="flat minwidth400 maxwidth200onsmartphone" type="file" name="userfile[]" multiple="" accept="">-->
+
+<!--																				<input type="hidden" name="token" value="$2y$10$5rhdz.l2MZKXbsA2hOneJ.wCIUYwjTBympf/y0g1F4S5gjTZbxJLu">-->
+<!--																				<input type="hidden" id="formuserfile_section_dir" name="section_dir" value="">-->
+<!--																				<input type="hidden" id="formuserfile_section_id" name="section_id" value="0">-->
+<!--																				<input type="hidden" name="sortfield" value="">-->
+<!--																				<input type="hidden" name="sortorder" value="">-->
+<!--																				<div class="nobordernopadding cenpercent">-->
+<!--																					<div class="valignmiddle nowrap">-->
+<!--																						<input type="hidden" name="max_file_size" value="2097152">-->
+<!--																						<input class="flat minwidth400 maxwidth200onsmartphone" type="file" name="userfile[]" multiple="" accept="">-->
+<!--																						<input type="submit" class="button reposition" name="sendit" value="Envoyer fichier">-->
+<!--																					</div>-->
+<!--																				</div>-->
+																		</div>
+																	</div>
+																</div>
+															</div>
+															<!-- Modal-Footer -->
+															<div class="modal-footer">
+																<div class="wpeo-button button-grey modal-close">
+																	<span><?php echo $langs->trans('CloseModal'); ?></span>
+																</div>
+															</div>
+														</div>
+													</div>
+													<?php endif; ?>
+												</div>
 											</div>
 
 											<div class="table-cell table-50 cell-risk" data-title="Risque">
@@ -528,7 +592,7 @@ if ($object->id > 0) {
 											</div>
 
 											<div class="table-cell cell-action table-150 table-padding-0 table-end" data-title="Action">
-												<div class="action wpeo-button button-square-50 button-green save action-input risk-save">
+												<div class="action wpeo-button button-square-50 button-green save action-input risk-save" value="<?php echo $risk->id ?>">
 													<i class="button-icon fas fa-save"></i>
 												</div>
 											</div>
@@ -562,9 +626,9 @@ if ($object->id > 0) {
 										</div>
 
 										<div class="table-cell table-50 cell-photo" data-title="Photo">
-											<?php $filearray = dol_dir_list($conf->digiriskdolibarr->multidir_output[$conf->entity].'/'.$element['object']->element_type.'/'.$element['object']->ref.'/', "files", 0, '', '(\.odt|_preview.*\.png)$', 'position_name', 'asc', 1);
+											<?php $filearray = dol_dir_list($conf->digiriskdolibarr->multidir_output[$conf->entity].'/'.$risk->element.'/'.$risk->ref.'/', "files", 0, '', '(\.odt|_preview.*\.png)$', 'position_name', 'asc', 1);
 												if (count($filearray)) {
-													print '<span class="floatleft inline-block valignmiddle divphotoref">'.$element['object']->digirisk_show_photos('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity].'/'.$element['object']->element_type, 'small', 1, 0, 0, 0, 50, 0, 0, 0, 0, $element['object']->element_type).'</span>';
+													print '<span class="floatleft inline-block valignmiddle divphotoref">'.$risk->digirisk_show_photos('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity].'/'.$risk->element, 'small', 1, 0, 0, 0, 50, 0, 0, 0, 0, $risk->element).'</span>';
 												} else {
 												$nophoto = '/public/theme/common/nophoto.png'; ?>
 												<span class="floatleft inline-block valignmiddle divphotoref"><img class="photodigiriskdolibarr" alt="No photo" src="<?php echo DOL_URL_ROOT.$nophoto ?>"></span>
@@ -678,22 +742,22 @@ if ($object->id > 0) {
 										</div>
 
 										<div class="table-cell cell-action table-150 table-padding-0 table-end" data-title="Action">
-												<div class="action wpeo-gridlayout grid-gap-0 grid-3">
-													<!-- Editer un risque -->
-													<div class="wpeo-button button-square-50 button-transparent w50 edit action-attribute risk-edit" value="<?php echo $risk->id ?>">
-														<i class="button-icon fas fa-pencil-alt"></i>
-													</div>
-
-													<!-- Options avancées -->
-													<div class="wpeo-button button-square-50 button-transparent w50 move action-attribute">
-															<i class="icon fas fa-arrows-alt"></i>
-													</div>
-
-													<!-- Supprimer un risque -->
-													<div class="wpeo-button button-square-50 button-transparent w50 delete action-attribute risk-delete" value="<?php echo $risk->id ?>">
-														<i class="button-icon fas fa-times"></i>
-													</div>
+											<div class="action wpeo-gridlayout grid-gap-0 grid-3">
+												<!-- Editer un risque -->
+												<div class="wpeo-button button-square-50 button-transparent w50 edit action-attribute risk-edit" value="<?php echo $risk->id ?>">
+													<i class="button-icon fas fa-pencil-alt"></i>
 												</div>
+
+												<!-- Options avancées -->
+												<div class="wpeo-button button-square-50 button-transparent w50 move action-attribute">
+														<i class="icon fas fa-arrows-alt"></i>
+												</div>
+
+												<!-- Supprimer un risque -->
+												<div class="wpeo-button button-square-50 button-transparent w50 delete action-attribute risk-delete" value="<?php echo $risk->id ?>">
+													<i class="button-icon fas fa-times"></i>
+												</div>
+											</div>
 										</div>
 									</div>
 									<?php endif; ?>
@@ -769,22 +833,28 @@ if ($object->id > 0) {
 													</div>
 													<!-- Modal-Content -->
 													<div class="modal-content" id="#modalContent">
-													<?php
-														// Show upload form (document and links)
-//														$formfile = new FormFile($db);
-//
-//														$formfile->form_attach_new_file(
-//															$_SERVER["PHP_SELF"].'?id='.$object->id.(empty($withproject) ? '' : '&withproject=1').(empty($moreparam) ? '' : $moreparam),
-//															'',
-//															0,
-//															0,
-//															$permission,
-//															$conf->browser->layout == 'phone' ? 40 : 60,
-//															$object,
-//															'',
-//															1,
-//															$savingdocmask
-//														); ?>
+														<div class="formattachnewfile">
+															<div class="centpercent notopnoleftnoright table-fiche-title">
+																<div class="titre">
+																	<div class="nobordernopadding valignmiddle col-title">
+																		<div class="titre inline-block">Ajouter un nouveau fichier/document</div>
+																	</div>
+																</div>
+															</div>
+															<form name="formuserfile" id="formuserfile" action="/dolibarr-12.0.3/htdocs/custom/digiriskdolibarr/archives/risk_document.php?id=1" enctype="multipart/form-data" method="POST"><input type="hidden" name="token" value="$2y$10$5rhdz.l2MZKXbsA2hOneJ.wCIUYwjTBympf/y0g1F4S5gjTZbxJLu">
+																<input type="hidden" id="formuserfile_section_dir" name="section_dir" value="">
+																<input type="hidden" id="formuserfile_section_id" name="section_id" value="0">
+																<input type="hidden" name="sortfield" value="">
+																<input type="hidden" name="sortorder" value="">
+																<div class="nobordernopadding cenpercent">
+																	<div class="valignmiddle nowrap">
+																		<input type="hidden" name="max_file_size" value="2097152">
+																		<input class="flat minwidth400 maxwidth200onsmartphone" type="file" name="userfile[]" multiple="" accept="">
+																		<input type="submit" class="button reposition" name="sendit" value="Envoyer fichier">
+																	</div>
+																</div>
+															</form>
+														</div>
 													</div>
 													<!-- Modal-Footer -->
 													<div class="modal-footer">
@@ -911,7 +981,7 @@ if ($object->id > 0) {
 								<div class="table-cell table-150 table-end cell-action" data-title="action">
 									<?php if ( 0) : ?>
 										<div class="action">
-											<div data-parent="risk-row" data-loader="wpeo-table" class="wpeo-button button-square-50 button-green save action-input"><i class="button-icon fas fa-save"></i></div>
+											<div data-parent="risk-row" data-loader="wpeo-table" class="wpeo-button button-square-50 button-green save action-input" value="<?php echo $risk->id ?>"><i class="button-icon fas fa-save"></i></div>
 										</div>
 									<?php else : ?>
 										<div class="action">

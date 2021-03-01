@@ -106,7 +106,7 @@ class modDigiriskdolibarr extends DolibarrModules
 		// Dependencies
 
 		$this->hidden                  = false;
-		$this->depends                 = array('modAgenda', 'modECM');
+		$this->depends                 = array('modAgenda', 'modECM', 'modProjet');
 		$this->requiredby              = array();
 		$this->conflictwith            = array();
 		$this->langfiles               = array("digiriskdolibarr@digiriskdolibarr");
@@ -168,7 +168,8 @@ class modDigiriskdolibarr extends DolibarrModules
 			44 => array('MAIN_AGENDA_ACTIONAUTO_RISK_CREATE','chaine',1,'', 1),
 			45 => array('RISK_STANDARD_MASK','chaine','R{0000}','', 1),
 			46 => array('EVALUATION_STANDARD_MASK','chaine','E{0000}','', 1),
-			47 => array('DIGIRISKDOLIBARR_EVALUATION_ADDON','chaine', 'mod_evaluation_standard' ,'', 1)
+			47 => array('DIGIRISKDOLIBARR_EVALUATION_ADDON','chaine', 'mod_evaluation_standard' ,'', 1),
+			48 => array('DIGIRISKDOLIBARR_DU_PROJECT','chaine', '' ,'', 1)
 
 		);
 
@@ -547,11 +548,34 @@ class modDigiriskdolibarr extends DolibarrModules
 	 */
 	public function init($options = '')
 	{
-		global $langs;
+		global $conf, $langs, $user;
 
 		$sql = array();
 
 		$this->_load_tables('/digiriskdolibarr/sql/');
+
+		if ( $conf->global->DIGIRISKDOLIBARR_DU_PROJECT == 0 ) {
+
+			require_once DOL_DOCUMENT_ROOT . '/projet/class/project.class.php';
+			require_once DOL_DOCUMENT_ROOT . '/societe/class/societe.class.php';
+			require_once DOL_DOCUMENT_ROOT . '/core/modules/project/mod_project_simple.php';
+
+			$project = new Project($this->db);
+
+			$third_party = new Societe($this->db);
+			$projectRef = new $conf->global->PROJECT_ADDON();
+
+			$project->ref = $projectRef->getNextValue($third_party, $project);
+			$project->title = $langs->trans('RisksEvaluation');
+			$project->description = $langs->trans('RisksEvaluationDescription');
+			$project->date_c = dol_now();
+			$project->date_start = dol_now();
+			$project->usage_task = 1;
+
+			$project_id = $project->create($user);
+
+			dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_DU_PROJECT', $project_id);
+		}
 
 		// Create extrafields during init
 		include_once DOL_DOCUMENT_ROOT.'/core/class/extrafields.class.php';

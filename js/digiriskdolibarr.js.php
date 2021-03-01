@@ -230,6 +230,7 @@ window.eoxiaJS.navigation.event = function() {
 	jQuery( document ).on( 'click', '#elementCard', window.eoxiaJS.redirect );
 	jQuery( document ).on( 'click', '#elementAgenda', window.eoxiaJS.redirect );
 	jQuery( document ).on( 'click', '#elementRisk', window.eoxiaJS.redirect );
+	jQuery( document ).on( 'click', '#riskDocumentSubmit', window.eoxiaJS.redirectRiskDocument );
 
 	//modal
 	jQuery( document ).on( 'click', '.modal-close', window.eoxiaJS.closeModal );
@@ -351,14 +352,6 @@ window.eoxiaJS.redirect = function( event ) {
 	$('#cardContent').load( document.URL + ' #cardContent' , id);
 	return false;
 };
-$(document).ready(function(){
-	$('#createRisko').on('submit', function(e){
-		e.preventDefault();
-		console.log('oui')
-
-
-	});
-});
 
 window.eoxiaJS.redirectAfterCancelCreate = function( event ) {
 
@@ -390,6 +383,38 @@ window.eoxiaJS.redirectAfterCancelCreate = function( event ) {
 };
 
 
+
+window.eoxiaJS.redirectRiskDocument = function( event ) {
+	var fileList = "";
+	var riskID = jQuery( this ).attr('value');
+	var fileSelector = document.getElementById('riskDocument');
+	fileList = fileSelector.files[0];
+
+	var formData = new FormData();
+
+	formData.append("userfile", fileList);
+	var request = new XMLHttpRequest();
+	request.open("POST", document.URL.split('risk_card')[0] + 'archives/risk_document.php?id=' + riskID + '&sendit=true');
+	request.send(formData);
+
+	window.location.reload();
+	//$('#cardContent').empty()
+	//$('#cardContent').load( document.URL + ' #cardContent');
+
+	//var params = new window.URLSearchParams(window.location.search);
+	//var id = $(params.get('id'));
+	//
+	////get ID from div selected in left menu
+	//history.pushState({ path:  document.URL}, '', this.href);
+	////change URL without refresh
+	//
+	////empty and fill object card
+
+	//$('#cardContent').empty();
+	////$('#cardContent').attr('value', id)
+	//$('#cardContent').load( document.URL.split('risk_card')[0] + 'archives/risk_document.php?id=' + riskID + '&sendit=salut');
+	//return false;
+};
 
 // Onglet risques
 
