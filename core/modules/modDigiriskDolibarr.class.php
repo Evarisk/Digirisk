@@ -547,9 +547,17 @@ class modDigiriskdolibarr extends DolibarrModules
 	 */
 	public function init($options = '')
 	{
+		global $langs;
+
 		$sql = array();
 
 		$this->_load_tables('/digiriskdolibarr/sql/');
+
+		// Create extrafields during init
+		include_once DOL_DOCUMENT_ROOT.'/core/class/extrafields.class.php';
+		$extra_fields = new ExtraFields( $this->db );
+
+		$extra_fields->addExtraField( 'fk_risk', $langs->trans("fk_risk"), 'int', 1020, 10, 'task', 0, 0, '', '', '', '', 1);
 
 		return $this->_init($sql, $options);
 	}

@@ -399,17 +399,17 @@ window.eoxiaJS.closeModal = function ( event ) {
 
 window.eoxiaJS.openModal = function ( event ) {
 
-	let idSelected = $(this).attr('value')
+	let idSelected = $(this).attr('value');
 
 
-	$('.modal-active').removeClass('modal-active')
+	$('.modal-active').removeClass('modal-active');
 	console.log(this)
 	if ($(this).hasClass('digirisk-evaluation')) {
-		$('#digirisk_evaluation_modal'+idSelected).addClass('modal-active')
+		$('#digirisk_evaluation_modal'+idSelected).addClass('modal-active');
 	}
 	else {
-		$('#cotation_modal'+idSelected).addClass('modal-active')
-
+		$('#cotation_modal'+idSelected).addClass('modal-active');
+		$('#photo_modal'+idSelected).addClass('modal-active');
 	}
 }
 

@@ -1448,7 +1448,7 @@ div.mainmenu.digiriskdolibarr {
 	margin-top: 0;
 }
 
-.wpeo-wrap .wpeo-table.table-flex .comment-container .comment .avatar {
+.wpeo-wrap .wpeo-table.table-flex .avatar {
 	border-radius: 50%;
 	width: 30px;
 	height: 30px;
@@ -1457,7 +1457,7 @@ div.mainmenu.digiriskdolibarr {
 	color: #fff;
 }
 
-.wpeo-wrap .wpeo-table.table-flex .comment-container .comment .avatar span {
+.wpeo-wrap .wpeo-table.table-flex .avatar span {
 	line-height: 30px;
 }
 
@@ -11302,4 +11302,9 @@ li.unit::marker {
 .linkElement {
 	display: flex;
 	width: 100%;
+}
+
+.dropdown-toggle::after {
+	display : none;
+	content: '';
 }
