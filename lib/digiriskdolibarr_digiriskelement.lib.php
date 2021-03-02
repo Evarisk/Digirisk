@@ -36,6 +36,11 @@ function digiriskelementPrepareHead($object)
 	$h = 0;
 	$head = array();
 
+	$head[$h][0] = dol_buildpath("/digiriskdolibarr/risk_card.php", 1).'?id='.$object->id;
+	$head[$h][1] = $langs->trans("Risks");
+	$head[$h][2] = 'elementRisk';
+	$h++;
+
 	$head[$h][0] = dol_buildpath("/digiriskdolibarr/digiriskelement_card.php", 1).'?id='.$object->id;
 	$head[$h][1] = $langs->trans("Card");
 	$head[$h][2] = 'elementCard';
@@ -67,11 +72,6 @@ function digiriskelementPrepareHead($object)
 	$head[$h][0] = dol_buildpath("/digiriskdolibarr/digiriskelement_agenda.php", 1).'?id='.$object->id;
 	$head[$h][1] = $langs->trans("Events");
 	$head[$h][2] = 'elementAgenda';
-	$h++;
-
-	$head[$h][0] = dol_buildpath("/digiriskdolibarr/risk_card.php", 1).'?id='.$object->id;
-	$head[$h][1] = $langs->trans("Risks");
-	$head[$h][2] = 'elementRisk';
 	$h++;
 
 	complete_head_from_modules($conf, $langs, $object, $head, $h, 'digiriskelement@digiriskdolibarr');
