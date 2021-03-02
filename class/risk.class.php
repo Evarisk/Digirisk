@@ -1149,7 +1149,7 @@ class Risk extends CommonObject
 		include_once DOL_DOCUMENT_ROOT.'/core/lib/images.lib.php';
 
 		$sortfield = 'position_name';
-		$sortorder = 'asc';
+		$sortorder = 'desc';
 
 		$dir = $sdir.'/';
 		$pdir = '/' . $subdir . '/';
