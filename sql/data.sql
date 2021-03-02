@@ -6,7 +6,6 @@ INSERT INTO llx_c_action_trigger (elementtype, code, label, description) VALUES 
 INSERT INTO llx_c_action_trigger (elementtype, code, label, description) VALUES ('groupment', 'GROUPMENT_GENERATE', 'Groupment Document Generated', 'Executed when a groupment document is generated');
 INSERT INTO llx_c_action_trigger (elementtype, code, label, description) VALUES ('workunit', 'WORKUNIT_GENERATE', 'Work Unit Document Generated', 'Executed when a work unit document is generated');
 INSERT INTO llx_c_action_trigger (elementtype, code, label, description) VALUES ('risk', 'RISK_GENERATE', 'Risk Document Generated', 'Executed when a risk document is generated');
-INSERT INTO llx_extrafields (name, elementtype, label, type, size, enabled, pos, param, list, fk_user_author) VALUES ('fk_risk', 'projet_task', 'fk_risk', 'int', 10, 1, 1020, 'a:1:{s:7:"options";a:1:{s:0:"";N;}}', 1, 1);
 INSERT INTO llx_c_email_templates (entity,module,type_template,lang,private,fk_user,datec,label,position,enabled,active,topic,joinfiles,content,content_lines)
 VALUES (1,null,'Digirisk_LegalDisplay','',0,null,null,'Digirisk_LegalDisplay',1,1,1,'[__[MAIN_INFO_SOCIETE_NOM]__] - __(SendLegalDisplay)__',1,
 concat('Bonjour,'
