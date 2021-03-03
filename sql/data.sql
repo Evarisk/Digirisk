@@ -1,4 +1,12 @@
-INSERT INTO llx_document_model (nom, entity, type) VALUES ('informationssharing_A4_odt', 1, 'informationssharing'), ('legaldisplay_A4_odt', 1, 'legaldisplay'), ('firepermit_A4_odt', 1, 'firepermit'), ('preventionplan_A4_odt', 1, 'preventionplan'), ('groupment_A4_odt', 1, 'groupment'),('workunit_A4_odt', 1, 'workunit'),('risk_A4_odt', 1, 'risk');
+INSERT INTO llx_document_model (nom, entity, type) VALUES ('informationssharing_A4_odt', 1, 'informationssharing');
+INSERT INTO llx_document_model (nom, entity, type) VALUES ('legaldisplay_A4_odt', 1, 'legaldisplay');
+INSERT INTO llx_document_model (nom, entity, type) VALUES ('firepermit_A4_odt', 1, 'firepermit');
+INSERT INTO llx_document_model (nom, entity, type) VALUES ('preventionplan_A4_odt', 1, 'preventionplan');
+INSERT INTO llx_document_model (nom, entity, type) VALUES ('groupment_A4_odt', 1, 'groupment');
+INSERT INTO llx_document_model (nom, entity, type) VALUES ('workunit_A4_odt', 1, 'workunit');
+INSERT INTO llx_document_model (nom, entity, type) VALUES ('risk_A4_odt', 1, 'risk');
+INSERT INTO llx_document_model (nom, entity, type) VALUES ('groupment_listing_risks_photos_odt', 1, 'groupment');
+
 INSERT INTO llx_c_action_trigger (elementtype, code, label, description) VALUES ('informationssharing', 'INFORMATIONSSHARING_GENERATE', 'Informations Sharing Document Generated', 'Executed when a informations sharing document is generated');
 INSERT INTO llx_c_action_trigger (elementtype, code, label, description) VALUES ('firepermit', 'FIREPERMIT_GENERATE', 'Fire Permit Document Generated', 'Executed when a fire permit document is generated');
 INSERT INTO llx_c_action_trigger (elementtype, code, label, description) VALUES ('legaldisplay', 'LEGALDISPLAY_GENERATE', 'Legal Display Document Generated', 'Executed when a legal display document is generated');
@@ -6,6 +14,7 @@ INSERT INTO llx_c_action_trigger (elementtype, code, label, description) VALUES 
 INSERT INTO llx_c_action_trigger (elementtype, code, label, description) VALUES ('groupment', 'GROUPMENT_GENERATE', 'Groupment Document Generated', 'Executed when a groupment document is generated');
 INSERT INTO llx_c_action_trigger (elementtype, code, label, description) VALUES ('workunit', 'WORKUNIT_GENERATE', 'Work Unit Document Generated', 'Executed when a work unit document is generated');
 INSERT INTO llx_c_action_trigger (elementtype, code, label, description) VALUES ('risk', 'RISK_GENERATE', 'Risk Document Generated', 'Executed when a risk document is generated');
+
 INSERT INTO llx_c_email_templates (entity,module,type_template,lang,private,fk_user,datec,label,position,enabled,active,topic,joinfiles,content,content_lines)
 VALUES (1,null,'Digirisk_LegalDisplay','',0,null,null,'Digirisk_LegalDisplay',1,1,1,'[__[MAIN_INFO_SOCIETE_NOM]__] - __(SendLegalDisplay)__',1,
 concat('Bonjour,'
