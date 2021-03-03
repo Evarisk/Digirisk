@@ -394,7 +394,7 @@ window.eoxiaJS.redirectRiskDocument = function( event ) {
 
 	formData.append("userfile", fileList);
 	var request = new XMLHttpRequest();
-	request.open("POST", document.URL.split('risk_card')[0] + 'archives/risk_document.php?id=' + riskID + '&sendit=true');
+	request.open("POST", document.URL.split('digiriskelement_risk')[0] + 'archives/risk_document.php?id=' + riskID + '&sendit=true');
 	request.send(formData);
 
 	window.location.reload();

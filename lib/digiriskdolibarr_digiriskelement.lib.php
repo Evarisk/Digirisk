@@ -36,7 +36,7 @@ function digiriskelementPrepareHead($object)
 	$h = 0;
 	$head = array();
 
-	$head[$h][0] = dol_buildpath("/digiriskdolibarr/risk_card.php", 1).'?id='.$object->id;
+	$head[$h][0] = dol_buildpath("/digiriskdolibarr/digiriskelement_risk.php", 1).'?id='.$object->id;
 	$head[$h][1] = $langs->trans("Risks");
 	$head[$h][2] = 'elementRisk';
 	$h++;

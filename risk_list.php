@@ -808,7 +808,7 @@ while ($i < ($limit ? min($num, $limit) : $num))
 							</div>
 							<div class="table-cell cell-comment">
 								<?php $user->fetch($lastEvaluation->fk_user_creat);
-								echo $user->getNomUrl() . ' '. $langs->trans('EvaluatedOn') . ' '. date('Y/m/d H:i:s', $lastEvaluation->date_creation) . ' : ' . $lastEvaluation->comment;
+								echo $user->getNomUrl() . ' '. $langs->trans('EvaluatedOn') . ' '. date('Y/m/d H:i:sz', $lastEvaluation->date_creation) . ' : ' . $lastEvaluation->comment;
 								?>
 							</div>
 						</div>
