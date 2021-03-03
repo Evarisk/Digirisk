@@ -36,7 +36,7 @@ function riskPrepareHead($object)
 	$h = 0;
 	$head = array();
 
-	$head[$h][0] = dol_buildpath("/digiriskdolibarr/risk_card.php", 1).'?id='.$object->id;
+	$head[$h][0] = dol_buildpath("/digiriskdolibarr/digiriskelement_risk.php", 1).'?id='.$object->id;
 	$head[$h][1] = $langs->trans("Card");
 	$head[$h][2] = 'card';
 	$h++;

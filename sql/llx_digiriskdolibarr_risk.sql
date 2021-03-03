@@ -18,7 +18,6 @@ CREATE TABLE llx_digiriskdolibarr_risk(
 	-- BEGIN MODULEBUILDER FIELDS
 	rowid integer AUTO_INCREMENT PRIMARY KEY NOT NULL, 
 	ref varchar(128) DEFAULT '(PROV)' NOT NULL, 
-	fk_project integer, 
 	description text, 
 	date_creation datetime NOT NULL, 
 	tms timestamp, 
@@ -32,6 +31,7 @@ CREATE TABLE llx_digiriskdolibarr_risk(
 	category varchar(255), 
 	fk_projet integer NOT NULL, 
 	status integer, 
+	has_photo integer, 
 	entity integer DEFAULT 1
 	-- END MODULEBUILDER FIELDS
 ) ENGINE=innodb;

@@ -227,6 +227,14 @@ Risks
 #
 
 Risks = Risques
+RiskList = Listing de risques
+RiskListWP = Listing de risques WP
+RiskListDolibarr = Listing de risques Doli
+hasPhoto = Photo
+RiskCategory = Catégorie
+EvaluationMethod = Méthode d'évaluation
+lastEvaluationOn = Dernière évaluation le
+EvaluatedOn = le
 #
 # Data
 #

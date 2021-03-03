@@ -96,26 +96,25 @@ class Risk extends CommonObject
 	 */
 	public $fields=array(
 		'rowid' => array('type'=>'integer', 'label'=>'TechnicalID', 'enabled'=>'1', 'position'=>1, 'notnull'=>1, 'visible'=>0, 'noteditable'=>'1', 'index'=>1, 'comment'=>"Id"),
-		'ref' => array('type'=>'varchar(128)', 'label'=>'Ref', 'enabled'=>'1', 'position'=>10, 'notnull'=>1, 'visible'=>4, 'noteditable'=>'1', 'default'=>'(PROV)', 'index'=>1, 'searchall'=>1, 'showoncombobox'=>'1', 'comment'=>"Reference of object"),
-		'fk_project' => array('type'=>'integer:Project:projet/class/project.class.php:1', 'label'=>'Project', 'enabled'=>'1', 'position'=>52, 'notnull'=>-1, 'visible'=>-1, 'index'=>1,),
-		'description' => array('type'=>'text', 'label'=>'Description', 'enabled'=>'1', 'position'=>60, 'notnull'=>0, 'visible'=>3,),
-		'date_creation' => array('type'=>'datetime', 'label'=>'DateCreation', 'enabled'=>'1', 'position'=>500, 'notnull'=>1, 'visible'=>-2,),
-		'tms' => array('type'=>'timestamp', 'label'=>'DateModification', 'enabled'=>'1', 'position'=>501, 'notnull'=>0, 'visible'=>-2,),
-		'fk_user_creat' => array('type'=>'integer:User:user/class/user.class.php', 'label'=>'UserAuthor', 'enabled'=>'1', 'position'=>510, 'notnull'=>1, 'visible'=>-2, 'foreignkey'=>'user.rowid',),
-		'fk_user_modif' => array('type'=>'integer:User:user/class/user.class.php', 'label'=>'UserModif', 'enabled'=>'1', 'position'=>511, 'notnull'=>-1, 'visible'=>-2,),
-		'import_key' => array('type'=>'varchar(14)', 'label'=>'ImportId', 'enabled'=>'1', 'position'=>1000, 'notnull'=>-1, 'visible'=>-2,),
-		'model_pdf' => array('type'=>'varchar(255)', 'label'=>'Model pdf', 'enabled'=>'1', 'position'=>1010, 'notnull'=>-1, 'visible'=>0,),
-		'model_odt' => array('type'=>'varchar(255)', 'label'=>'Model odt', 'enabled'=>'1', 'position'=>1011, 'notnull'=>0, 'visible'=>-1,),
-		'ref_ext' => array('type'=>'varchar(255)', 'label'=>'RefExt', 'enabled'=>'1', 'position'=>50, 'notnull'=>0, 'visible'=>-1,),
-		'fk_element' => array('type'=>'integer', 'label'=>'FK Element', 'enabled'=>'1', 'position'=>50, 'notnull'=>1, 'visible'=>-1,),
-		'category' => array('type'=>'varchar(255)', 'label'=>'varchar', 'enabled'=>'1', 'position'=>50, 'notnull'=>0, 'visible'=>-1,),
-		'fk_projet' => array('type'=>'integer', 'label'=>'FK Projet', 'enabled'=>'1', 'position'=>50, 'notnull'=>1, 'visible'=>-1,),
-		'status' => array('type'=>'integer', 'label'=>'Status', 'enabled'=>'1', 'position'=>50, 'notnull'=>0, 'visible'=>-1,),
-		'entity' => array('type'=>'integer', 'label'=>'Entity', 'enabled'=>'1', 'position'=>40, 'notnull'=>0, 'visible'=>-1,),
+		'ref' => array('type'=>'varchar(128)', 'label'=>'Ref', 'enabled'=>'1', 'position'=>2, 'notnull'=>1, 'visible'=>4, 'noteditable'=>'1', 'default'=>'(PROV)', 'index'=>1, 'searchall'=>1, 'showoncombobox'=>'1', 'comment'=>"Reference of object"),
+		'description' => array('type'=>'text', 'label'=>'Description', 'enabled'=>'1', 'position'=>16, 'notnull'=>0, 'visible'=>-2,),
+		'date_creation' => array('type'=>'datetime', 'label'=>'DateCreation', 'enabled'=>'1', 'position'=>4, 'notnull'=>1, 'visible'=>-2,),
+		'tms' => array('type'=>'timestamp', 'label'=>'DateModification', 'enabled'=>'1', 'position'=>5, 'notnull'=>0, 'visible'=>0,),
+		'fk_user_creat' => array('type'=>'integer:User:user/class/user.class.php', 'label'=>'UserAuthor', 'enabled'=>'1', 'position'=>6, 'notnull'=>1, 'visible'=>-2, 'foreignkey'=>'user.rowid',),
+		'fk_user_modif' => array('type'=>'integer:User:user/class/user.class.php', 'label'=>'UserModif', 'enabled'=>'1', 'position'=>7, 'notnull'=>-1, 'visible'=>-2,),
+		'import_key' => array('type'=>'varchar(14)', 'label'=>'ImportId', 'enabled'=>'1', 'position'=>8, 'notnull'=>-1, 'visible'=>-2,),
+		'model_pdf' => array('type'=>'varchar(255)', 'label'=>'Model pdf', 'enabled'=>'1', 'position'=>9, 'notnull'=>-1, 'visible'=>0,),
+		'model_odt' => array('type'=>'varchar(255)', 'label'=>'Model odt', 'enabled'=>'1', 'position'=>10, 'notnull'=>0, 'visible'=>-1,),
+		'ref_ext' => array('type'=>'varchar(255)', 'label'=>'RefExt', 'enabled'=>'1', 'position'=>11, 'notnull'=>0, 'visible'=>-1,),
+		'fk_element' => array('type'=>'integer', 'label'=>'FK Element', 'enabled'=>'1', 'position'=>12, 'notnull'=>1, 'visible'=>-1,),
+		'category' => array('type'=>'varchar(255)', 'label'=>'RiskCategory', 'enabled'=>'1', 'position'=>3, 'notnull'=>0, 'visible'=>-1,),
+		'fk_projet' => array('type'=>'integer', 'label'=>'FK Projet', 'enabled'=>'1', 'position'=>14, 'notnull'=>1, 'visible'=>-1,),
+		'status' => array('type'=>'integer', 'label'=>'Status', 'enabled'=>'1', 'position'=>15, 'notnull'=>0, 'visible'=>-1,),
+		'has_photo' => array('type'=>'integer', 'label'=>'hasPhoto', 'enabled'=>'1', 'position'=>13, 'notnull'=>0, 'visible'=>-1,),
+		'entity' => array('type'=>'integer', 'label'=>'Entity', 'enabled'=>'1', 'position'=>17, 'notnull'=>0, 'visible'=>-1,),
 	);
 	public $rowid;
 	public $ref;
-	public $fk_project;
 	public $description;
 	public $date_creation;
 	public $tms;
@@ -129,6 +128,7 @@ class Risk extends CommonObject
 	public $category;
 	public $fk_projet;
 	public $status;
+	public $has_photo;
 	public $entity;
 	// END MODULEBUILDER PROPERTIES
 
@@ -717,7 +717,7 @@ class Risk extends CommonObject
 			$label .= '<br><b>'.$langs->trans("Status").":</b> ".$this->getLibStatut(5);
 		}
 
-		$url = dol_buildpath('/digiriskdolibarr/risk_card.php', 1).'?id='.$this->id;
+		$url = dol_buildpath('/digiriskdolibarr/digiriskelement_risk.php', 1).'?id='.$this->id;
 
 		if ($option != 'nolink')
 		{
@@ -1092,7 +1092,7 @@ class Risk extends CommonObject
 	 */
 	public function get_related_tasks($risk)
 	{
-		$limit = 0;
+		$limit = 1;
 		$sql = "SELECT * FROM" . ' llx_projet_task_extrafields' . ' WHERE fk_risk =' . $risk->id;
 		$resql = $this->db->query($sql);
 
@@ -1353,6 +1353,8 @@ class Risk extends CommonObject
 
 		return $return;
 	}
+
+
 
 }
 
