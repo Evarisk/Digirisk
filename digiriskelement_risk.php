@@ -367,10 +367,14 @@ if ($object->id > 0) {
 							<div class="table-row table-header">
 								<div class="table-cell table-50"><?php echo $langs->trans('Ref');?></div>
 								<div class="table-cell table-50"><?php echo $langs->trans('Risk'); ?></div>
-								<div class="table-cell table-150"><?php echo $langs->trans('RiskDescription'); ?></div>
+								<?php if ( $conf->global->DIGIRISKDOLIBARR_RISK_ADVANCED ) : ?>
+									<div class="table-cell table-150"><?php echo $langs->trans('RiskDescription'); ?></div>
+								<?php endif; ?>
 								<div class="table-cell table-50"><?php echo $langs->trans('Photo'); ?></div>
 								<div class="table-cell table-200"><?php echo $langs->trans('LastEvaluation'); ?></div>
-								<div class="table-cell"><?php echo $langs->trans('Tasks'); ?></div>
+								<?php if ( $conf->global->DIGIRISKDOLIBARR_RISK_ADVANCED ) : ?>
+									<div class="table-cell"><?php echo $langs->trans('Tasks'); ?></div>
+								<?php endif; ?>
 								<div class="table-cell table-100 table-end"></div>
 							</div>
 							<!-- SI le fetchFromParent des risques n'est pas vide alors pour chacun on affiche la vue suivante : -->
@@ -393,7 +397,7 @@ if ($object->id > 0) {
 														$cotationRef = substr($lastEvaluation->ref, 1);
 														$cotationRef = ltrim($cotationRef, '0');
 														// au lieu de 'R' mettre l'accronyme des risques qui sera futurement configurable dans digirisk
-														echo 'R' . $riskRef . ' - E' . $cotationRef; ?>
+														echo 'R' . $riskRef ?>
 													</strong>
 												</span>
 											</div>
@@ -404,15 +408,18 @@ if ($object->id > 0) {
 
 											<div class="table-cell table-50 cell-photo" data-title="Photo">
 												<div class="photo-container grid wpeo-modal-event tooltip hover">
-													<?php $filearray = dol_dir_list($conf->digiriskdolibarr->multidir_output[$conf->entity].'/'.$element['object']->element_type.'/'.$element['object']->ref.'/', "files", 0, '', '(\.odt|_preview.*\.png)$', 'position_name', 'asc', 1);
+													<?php $filearray = dol_dir_list($conf->digiriskdolibarr->multidir_output[$conf->entity].'/'.$risk->element.'/'.$risk->ref.'/', "files", 0, '', '(\.odt|_preview.*\.png)$', 'position_name', 'asc', 1);
 													if (count($filearray)) : ?>
-														<?php print '<span class="floatleft inline-block valignmiddle divphotoref">'.$element['object']->digirisk_show_photos('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity].'/'.$element['object']->element_type, 'small', 1, 0, 0, 0, 50, 0, 0, 0, 0, $element['object']->element_type).'</span>'; ?>
+														<div class="action photo default-photo modal-open" value="<?php echo $risk->id ?>">
+														<?php print '<span class="floatleft inline-block valignmiddle divphotoref">'.$risk->digirisk_show_photos('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity].'/'.$risk->element, 'small', 1, 0, 0, 0, 50, 0, 0, 0, 0, $risk->element).'</span>'; ?>
+														</div>
 													<?php else : ?>
-													<?php $nophoto = '/public/theme/common/nophoto.png'; ?>
-													<div class="action photo default-photo modal-open" value="<?php echo $risk->id ?>">
-														<span class="floatleft inline-block valignmiddle divphotoref"><img class="photodigiriskdolibarr" alt="No photo" src="<?php echo DOL_URL_ROOT.$nophoto ?>"></span>
-													</div>
-															<!-- Modal-AddPhoto -->
+														<?php $nophoto = '/public/theme/common/nophoto.png'; ?>
+														<div class="action photo default-photo modal-open" value="<?php echo $risk->id ?>">
+															<span class="floatleft inline-block valignmiddle divphotoref"><img class="photodigiriskdolibarr" alt="No photo" src="<?php echo DOL_URL_ROOT.$nophoto ?>"></span>
+														</div>
+													<?php endif; ?>
+													<!-- Modal-AddPhoto -->
 													<div id="photo_modal<?php echo $risk->id ?>" class="wpeo-modal">
 														<div class="modal-container wpeo-modal-event">
 															<!-- Modal-Header -->
@@ -426,28 +433,13 @@ if ($object->id > 0) {
 																	<div class="centpercent notopnoleftnoright table-fiche-title">
 																		<div class="titre">
 																			<div class="nobordernopadding valignmiddle col-title">
-																				<div class="titre inline-block">Ajouter un nouveau fichier/document</div>
+																				<div class="titre inline-block"><?php echo $langs->trans('AddPhotoTitle') ?></div>
 																			</div>
 																		</div>
 
 																		<div>
-																		<!-- The `multiple` attribute lets users select multiple files. -->
 																			<input type="file" id="riskDocument" multiple>
 																			<input id="riskDocumentSubmit" type="submit" class="button reposition" name="sendit" value="<?php echo $risk->id ?>">
-<!--																			<input class="flat minwidth400 maxwidth200onsmartphone" type="file" name="userfile[]" multiple="" accept="">-->
-
-<!--																				<input type="hidden" name="token" value="$2y$10$5rhdz.l2MZKXbsA2hOneJ.wCIUYwjTBympf/y0g1F4S5gjTZbxJLu">-->
-<!--																				<input type="hidden" id="formuserfile_section_dir" name="section_dir" value="">-->
-<!--																				<input type="hidden" id="formuserfile_section_id" name="section_id" value="0">-->
-<!--																				<input type="hidden" name="sortfield" value="">-->
-<!--																				<input type="hidden" name="sortorder" value="">-->
-<!--																				<div class="nobordernopadding cenpercent">-->
-<!--																					<div class="valignmiddle nowrap">-->
-<!--																						<input type="hidden" name="max_file_size" value="2097152">-->
-<!--																						<input class="flat minwidth400 maxwidth200onsmartphone" type="file" name="userfile[]" multiple="" accept="">-->
-<!--																						<input type="submit" class="button reposition" name="sendit" value="Envoyer fichier">-->
-<!--																					</div>-->
-<!--																				</div>-->
 																		</div>
 																	</div>
 																</div>
@@ -460,7 +452,6 @@ if ($object->id > 0) {
 															</div>
 														</div>
 													</div>
-													<?php endif; ?>
 												</div>
 											</div>
 
@@ -587,9 +578,11 @@ if ($object->id > 0) {
 												<?php print '<textarea name="evaluationComment" id="evaluationComment'.$risk->id.'" class="minwidth150" rows="'.ROWS_2.'">'.$lastEvaluation->comment.'</textarea>'."\n"; ?>
 											</div>
 
-											<div class="table-cell cell-tasks" data-title="Tâches" class="padding">
+											<?php if ( $conf->global->DIGIRISKDOLIBARR_RISK_ADVANCED ) : ?>
+												<div class="table-cell cell-tasks" data-title="Tâches" class="padding">
 
-											</div>
+												</div>
+											<?php endif; ?>
 
 											<div class="table-cell cell-action table-150 table-padding-0 table-end" data-title="Action">
 												<div class="action wpeo-button button-square-50 button-green save action-input risk-save" value="<?php echo $risk->id ?>">
@@ -621,9 +614,11 @@ if ($object->id > 0) {
 											</div>
 										</div>
 
-										<div class="table-cell table-150 cell-comment" data-title="Description" class="padding">
-											<?php echo $risk->description; ?>
-										</div>
+										<?php if ( $conf->global->DIGIRISKDOLIBARR_RISK_ADVANCED ) : ?>
+											<div class="table-cell table-150 cell-comment" data-title="Description" class="padding">
+												<?php echo $risk->description; ?>
+											</div>
+										<?php endif; ?>
 
 										<div class="table-cell table-50 cell-photo" data-title="Photo">
 											<?php $filearray = dol_dir_list($conf->digiriskdolibarr->multidir_output[$conf->entity].'/'.$risk->element.'/'.$risk->ref.'/', "files", 0, '', '(\.odt|_preview.*\.png)$', 'position_name', 'asc', 1);
@@ -706,15 +701,17 @@ if ($object->id > 0) {
 										<div class="table-cell table-150" data-title="evaluationComment" class="padding">
 											<?php
 											$lastEval = array_shift($lastEvaluation);
-											$evaluations = $evaluation->fetchFromParent($risk->id);
-											echo date("d/m/Y", $lastEval->date_creation) . ' : ';
+											$evaluations = $evaluation->fetchFromParent($risk->id); ?>
+											<span><i class="fas fa-calendar-alt"></i> <?php echo date("d/m/Y", $lastEval->date_creation) . ' : '; ?></span>
+											<?php
 											echo $lastEval->comment;
 											print '</br>';
 											echo 'il y a ' . count($evaluations) . ' evaluations sur ce risque';
 											?>
 										</div>
 
-										<div class="table-cell cell-tasks" data-title="Tâches" class="padding">
+										<?php if ( $conf->global->DIGIRISKDOLIBARR_RISK_ADVANCED ) : ?>
+											<div class="table-cell cell-tasks" data-title="Tâches" class="padding">
 											<span class="cell-tasks-container">
 	<!--										VUE SI Y A DES TACHES   -->
 												<?php $related_tasks = $risk->get_related_tasks($risk);
@@ -740,6 +737,7 @@ if ($object->id > 0) {
 											</span>
 	<!--									VUE SI Y EN A PAS   -->
 										</div>
+										<?php endif; ?>
 
 										<div class="table-cell cell-action table-150 table-padding-0 table-end" data-title="Action">
 											<div class="action wpeo-gridlayout grid-gap-0 grid-3">
@@ -774,6 +772,7 @@ if ($object->id > 0) {
 
 								<div data-title="Ref." class="table-cell table-50 cell-reference">
 									<input type="hidden" id="new_item_ref" name="new_item_ref" value="<?php echo $numref->getNextValue($risk); ?>">
+										<span class="ref"><?php echo '-' ?></span>
 								</div>
 
 								<div data-title="Risque" data-title="Risque" class="table-cell table-50 cell-risk">

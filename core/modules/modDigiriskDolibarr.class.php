@@ -169,8 +169,9 @@ class modDigiriskdolibarr extends DolibarrModules
 			45 => array('RISK_STANDARD_MASK','chaine','R{0000}','', 1),
 			46 => array('EVALUATION_STANDARD_MASK','chaine','E{0000}','', 1),
 			47 => array('DIGIRISKDOLIBARR_EVALUATION_ADDON','chaine', 'mod_evaluation_standard' ,'', 1),
-			48 => array('DIGIRISKDOLIBARR_DU_PROJECT','chaine', '' ,'', 1)
-
+			48 => array('DIGIRISKDOLIBARR_DU_PROJECT','chaine', '' ,'', 1),
+			49 => array('DIGIRISKDOLIBARR_RISK_SIMPLIFIED','chaine', 1,'', 1),
+			50 => array('DIGIRISKDOLIBARR_RISK_ADVANCED','chaine', 0,'', 1)
 		);
 
 		if ( ! isset($conf->digiriskdolibarr ) || ! isset( $conf->digiriskdolibarr->enabled ) ) {

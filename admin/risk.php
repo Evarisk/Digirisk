@@ -54,6 +54,7 @@ $action = GETPOST('action', 'alpha');
 $backtopage = GETPOST('backtopage', 'alpha');
 
 $value = GETPOST('value', 'alpha');
+$label = GETPOST('label', 'alpha');
 
 $arrayofparameters = array(
 	'DIGIRISKDOLIBARR_MYPARAM1'=>array('css'=>'minwidth200', 'enabled'=>1),
@@ -181,7 +182,15 @@ elseif ($action == 'setdoc')
 	dolibarr_set_const($db, $constforval, $value, 'chaine', 0, '', $conf->entity);
 }
 
-
+elseif ($action == 'setmethod')
+{
+	$constforval = 'DIGIRISKDOLIBARR_RISK_'.$label;
+	dolibarr_set_const($db, $constforval, $value, 'chaine', 0, '', $conf->entity);
+}  elseif ($action == 'delmethod')
+{
+	$constforval = 'DIGIRISKDOLIBARR_RISK_'.$label;
+	dolibarr_set_const($db, $constforval, $value, 'chaine', 0, '', $conf->entity);
+}
 
 /*
  * View
@@ -482,6 +491,74 @@ foreach ($dirmodels as $reldir)
 		}
 	}
 }
+
+/*
+ *  Numbering module
+ */
+
+print load_fiche_titre($langs->trans("DigiriskRiskMethod"), '', '');
+
+print '<table class="noborder centpercent">';
+print '<tr class="liste_titre">';
+print '<td>'.$langs->trans("Name").'</td>';
+print '<td>'.$langs->trans("Description").'</td>';
+print '<td class="center" width="60">'.$langs->trans("Status").'</td>';
+print '<td class="center" width="16">'.$langs->trans("ShortInfo").'</td>';
+print '</tr>'."\n";
+
+clearstatcache();
+
+print '<tr class="oddeven"><td width="100">';
+echo $langs->trans("SimplifiedRiskMethod");
+print "</td><td>\n";
+echo $langs->trans("SimplifiedRiskMethodDesc");
+print '</td>'."\n";
+if ( $conf->global->DIGIRISKDOLIBARR_RISK_SIMPLIFIED )
+{
+	print '<td class="center">'."\n";
+	print '<a href="'.$_SERVER["PHP_SELF"].'?action=delmethod&amp;value=0&amp;label=SIMPLIFIED">';
+	print img_picto($langs->trans("Enabled"), 'switch_on');
+	print '</a>';
+	print "</td>";
+}
+else
+{
+	print '<td class="center">'."\n";
+	print '<a href="'.$_SERVER["PHP_SELF"].'?action=setmethod&amp;value=1&amp;label=SIMPLIFIED">'.img_picto($langs->trans("Disabled"), 'switch_off').'</a>';
+	print "</td>";
+}
+
+print '</td>';
+print '<td class="center">';
+print $form->textwithpicto('', 'test', 1, 0);
+print '</td>';
+print "</tr>\n";
+
+print '<tr class="oddeven"><td width="100">';
+echo $langs->trans("AdvancedRiskMethod");
+print "</td><td>\n";
+echo $langs->trans("AdvancedRiskMethodDesc");
+print '</td>'."\n";
+if ( $conf->global->DIGIRISKDOLIBARR_RISK_ADVANCED )
+{
+	print '<td class="center">'."\n";
+	print '<a href="'.$_SERVER["PHP_SELF"].'?action=delmethod&amp;value=0&amp;label=ADVANCED">';
+	print img_picto($langs->trans("Enabled"), 'switch_on');
+	print '</a>';
+	print "</td>";
+}
+else
+{
+	print '<td class="center">'."\n";
+	print '<a href="'.$_SERVER["PHP_SELF"].'?action=setmethod&amp;value=1&amp;label=ADVANCED">'.img_picto($langs->trans("Disabled"), 'switch_off').'</a>';
+	print "</td>";
+}
+print '</td>';
+print '<td class="center">';
+print $form->textwithpicto('', 'test', 1, 0);
+print '</td>';
+print "</tr>\n";
+
 print '</table>';
 
 // Page end
