@@ -219,6 +219,7 @@ class DigiriskElement extends CommonObject
 	 */
 	public function create(User $user, $notrigger = false)
 	{
+		$this->element = $this->element_type . '@digiriskdolibarr';
 		return $this->createCommon($user, $notrigger);
 	}
 
@@ -994,19 +995,21 @@ class DigiriskElement extends CommonObject
 		$modelpath = "core/modules/digiriskdolibarr/doc/";
 
 		$template = preg_replace('/_odt/', '.odt', $modele );
-		$path = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/documents/doctemplates/groupment/';
+		$path = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/documents/doctemplates/'. $this->element_type . '/';
 		$modele = $modele.":". $path . "template_" . $template;
 
 		if ($includedocgeneration) {
 			$result = $this->commonGenerateDocument($modelpath, $modele, $outputlangs, $hidedetails, $hidedesc, $hideref, $moreparams);
 		}
-		switch ($this->element_type) {
-			case 'groupment':
-				$trigger = $this->call_trigger('GROUPMENT_GENERATE', $user);
-				break;
-			case 'workunit':
-				$trigger = $this->call_trigger('WORKUNIT_GENERATE', $user);
-				break;
+
+		if ( preg_match( '/listing_risks_photos/', $template ) ) {
+			$this->call_trigger('LISTING_RISKS_PHOTOS_GENERATE', $user);
+		} elseif ( preg_match( '/listing_risks_actions/', $template ) ) {
+			$this->call_trigger('LISTING_RISKS_ACTIONS_GENERATE', $user);
+		} elseif ( preg_match( '/groupment/', $template ) ) {
+			$this->call_trigger('GROUPMENT_GENERATE', $user);
+		} elseif ( preg_match( '/workunit/', $template ) ) {
+			$this->call_trigger('WORKUNIT_GENERATE', $user);
 		}
 
 		return $result;
