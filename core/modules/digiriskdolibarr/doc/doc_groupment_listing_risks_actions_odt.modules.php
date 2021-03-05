@@ -22,7 +22,7 @@
  */
 
 /**
- *	\file       htdocs/core/modules/digiriskdolibarr/doc/doc_generic_digiriskdolibarr_odt.modules.php
+ *	\file       htdocs/core/modules/digiriskdolibarr/doc/doc_groupment_listing_risks_actions_odt.modules.php
  *	\ingroup    digiriskdolibarr
  *	\brief      File of class to build ODT documents for digiriskdolibarr
  */
@@ -30,8 +30,6 @@
 
 dol_include_once('/custom/digiriskdolibarr/lib/files.lib.php');
 dol_include_once('/core/lib/files.lib.php');
-dol_include_once('/digiriskdolibarr/class/risk.class.php');
-dol_include_once('/digiriskdolibarr/class/digiriskevaluation.class.php');
 require_once DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/core/modules/digiriskdolibarr/modules_groupment.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/company.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/doc.lib.php';
@@ -39,7 +37,7 @@ require_once DOL_DOCUMENT_ROOT.'/core/lib/doc.lib.php';
 /**
  *	Class to build documents using ODF templates generator
  */
-class doc_groupment_A4_odt extends ModelePDFGroupment
+class doc_groupment_listing_risks_actions_odt extends ModelePDFGroupment
 {
 	/**
 	 * Issuer
@@ -253,11 +251,7 @@ class doc_groupment_A4_odt extends ModelePDFGroupment
 			}
 			else
 			{
-
-				$filename = $objectref.'.'.$newfileformat;
-
-				$filename = $objectref . '_A4' . '_V1.' . $newfileformat;
-
+				$filename = 'test_V1.' . $newfileformat;
 			}
 			$object->last_main_doc = $filename;
 
@@ -402,10 +396,7 @@ class doc_groupment_A4_odt extends ModelePDFGroupment
 			{
 				$foundtagforlines = 1;
 				try {
-//					$listlines = $odfHandler->setSegment('risq4');
-//					$listlines = $odfHandler->setSegment('risq3');
-//					$listlines = $odfHandler->setSegment('risq2');
-//					$listlines = $odfHandler->setSegment('risq1');
+					$listlines = $odfHandler->setSegment('lines');
 				}
 				catch (OdfException $e)
 				{
@@ -416,57 +407,32 @@ class doc_groupment_A4_odt extends ModelePDFGroupment
 				if ($foundtagforlines)
 				{
 					$linenumber = 0;
-
-					$risk = new Risk($this->db);
-
-					if ( ! empty( $object ) ) {
-						$risks = $risk->fetchRisksOrderedByCotation($object->id);
-						if ($risks !== -1) {
-							for ($i = 1; $i <= 4; $i++ ) {
-								$listlines = $odfHandler->setSegment('risq' . $i);
-
-								foreach ($risks as $line) {
-									$evaluation = new DigiriskEvaluation($this->db);
-									$lastEvaluation = $evaluation->fetchFromParent($line->id, 1);
-									$lastEvaluation = array_shift($lastEvaluation);
-									$scale = $lastEvaluation->get_evaluation_scale();
-
-									if ( $scale == $i ) {
-										$tmparray['nomDanger'] = $line->get_danger_name($line);
-
-										$riskRef = substr($line->ref, 1);
-										$riskRef = ltrim($riskRef, '0');
-										$cotationRef = substr($lastEvaluation->ref, 1);
-										$cotationRef = ltrim($cotationRef, '0');
-										$tmparray['identifiantRisque'] = 'R'. $riskRef . ' - E' . $cotationRef;
-										$tmparray['quotationRisque'] = $lastEvaluation->cotation;
-										$tmparray['commentaireRisque'] = $lastEvaluation->comment;
-
-										//$linenumber++;
-										//$tmparray = $this->get_substitutionarray_lines($line, $outputlangs, $linenumber);
-
-										unset($tmparray['object_fields']);
-
-										complete_substitutions_array($tmparray, $outputlangs, $object, $line, "completesubstitutionarray_lines");
-										// Call the ODTSubstitutionLine hook
-										$parameters = array('odfHandler' => &$odfHandler, 'file' => $file, 'object' => $object, 'outputlangs' => $outputlangs, 'substitutionarray' => &$tmparray, 'line' => $line);
-										$reshook = $hookmanager->executeHooks('ODTSubstitutionLine', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
-										foreach ($tmparray as $key => $val) {
-											try {
-												$listlines->setVars($key, $val, true, 'UTF-8');
-											} catch (OdfException $e) {
-												dol_syslog($e->getMessage(), LOG_INFO);
-											} catch (SegmentException $e) {
-												dol_syslog($e->getMessage(), LOG_INFO);
-											}
-										}
-										$listlines->merge();
-									}
-								}
-								$odfHandler->mergeSegment($listlines);
+					foreach ($object->lines as $line)
+					{
+						$linenumber++;
+						$tmparray = $this->get_substitutionarray_lines($line, $outputlangs, $linenumber);
+						complete_substitutions_array($tmparray, $outputlangs, $object, $line, "completesubstitutionarray_lines");
+						// Call the ODTSubstitutionLine hook
+						$parameters = array('odfHandler'=>&$odfHandler, 'file'=>$file, 'object'=>$object, 'outputlangs'=>$outputlangs, 'substitutionarray'=>&$tmparray, 'line'=>$line);
+						$reshook = $hookmanager->executeHooks('ODTSubstitutionLine', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
+						foreach ($tmparray as $key => $val)
+						{
+							try
+							{
+								$listlines->setVars($key, $val, true, 'UTF-8');
+							}
+							catch (OdfException $e)
+							{
+								dol_syslog($e->getMessage(), LOG_INFO);
+							}
+							catch (SegmentException $e)
+							{
+								dol_syslog($e->getMessage(), LOG_INFO);
 							}
 						}
+						$listlines->merge();
 					}
+					$odfHandler->mergeSegment($listlines);
 				}
 			}
 			catch (OdfException $e)
