@@ -25,6 +25,8 @@
 // Put here all includes required by your class file
 require_once DOL_DOCUMENT_ROOT.'/core/class/commonobject.class.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/files.lib.php';
+dol_include_once('/digiriskdolibarr/class/risk.class.php');
+dol_include_once('/digiriskdolibarr/class/digiriskevaluation.class.php');
 //require_once DOL_DOCUMENT_ROOT . '/societe/class/societe.class.php';
 //require_once DOL_DOCUMENT_ROOT . '/product/class/product.class.php';
 
@@ -1523,5 +1525,38 @@ class DigiriskElement extends CommonObject
 		print $form->showrefnav($object, $paramid, $morehtml, $shownav, $fieldid, $fieldref, $morehtmlref, $moreparam, $nodbprefix, $morehtmlleft, $morehtmlstatus, $morehtmlright);
 		print '</div>';
 		print '<div class="underrefbanner clearboth"></div>';
+	}
+
+	public function DigiriskElementDocuments($object, $element_type) {
+		global $langs, $conf;
+
+		$risk = new Risk($this->db);
+		$data = array();
+
+		if ( ! empty( $object ) ) {
+			$risks = $risk->fetchFromParent($object->id);
+				if ($risks !== -1) {
+					foreach ($risks as $key => $risk) {
+						$evaluation = new DigiriskEvaluation($this->db);
+						$lastEvaluation = $evaluation->fetchFromParent($risk->id,1);
+						$lastEvaluation = array_shift($lastEvaluation);
+
+						$data['risk']['nomDanger']         = $risk->get_danger_name($risk);
+						$data['risk']['identifiantRisque'] = $risk->ref . ' - ' . $lastEvaluation->ref;
+						$data['risk']['quotationRisque']   = $lastEvaluation->cotation;
+						$data['risk']['commentaireRisque'] = $lastEvaluation->comment;
+					}
+				}
+
+				$data[$element_type]['reference']   = $object->ref;
+				$data[$element_type]['nom']         = $object->label;
+				$data[$element_type]['description'] = $object->description;
+
+			return $data;
+		}
+		else
+		{
+			return -1;
+		}
 	}
 }

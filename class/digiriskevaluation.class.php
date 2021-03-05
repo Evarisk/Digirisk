@@ -1079,13 +1079,13 @@ class DigiriskEvaluation extends CommonObject
 			return 1;
 		}
 		switch ($this->cotation) {
-			case ($this->cotation<48):
+			case ($this->cotation < 48):
 				return 1;
-			case ($this->cotation<51) :
+			case ($this->cotation < 51) :
 				return 2;
-			case( $this->cotation<80):
+			case( $this->cotation < 80):
 				return 3;
-			case ($this->cotation>79):
+			case ($this->cotation >= 80):
 				return 4;
 		}
 	}

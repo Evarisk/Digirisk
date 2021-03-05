@@ -347,6 +347,63 @@ class Risk extends CommonObject
 		if ($result > 0 && !empty($this->table_element_line)) $this->fetchLines();
 		return $result;
 	}
+
+	/**
+	 * Load object in memory from the database
+	 *
+	 * @param int    $parent_id   Id parent object
+	 * @return int         <0 if KO, 0 if not found, >0 if OK
+	 */
+	public function fetchRisksOrderedByCotation($parent_id)
+	{
+		$object  = new DigiriskElement($this->db);
+		$objects = $object->fetchAll();
+		$elements = $this->recurse_tree_risk($parent_id,0,$objects);
+		echo '<pre>';
+		print_r($elements);
+		echo '</pre>';
+		exit;
+
+		foreach ( $elements as $element ) {
+
+			$risk = new Risk($this->db);
+
+			$result = $risk->fetchFromParent($element['id']);
+
+			foreach ( $result as $risk ) {
+				$evaluation = new DigiriskEvaluation($this->db);
+				$evaluation->fetchFromParent($risk->id, 1);
+				$lastEvaluation = $evaluation->fetchFromParent($risk->id,1);
+				$lastEvaluation = array_shift($lastEvaluation);
+
+				$risk->lastEvaluation = $lastEvaluation->cotation;
+			}
+		}
+
+//		usort($result,function($first,$second){
+//			return $first->lastEvaluation < $second->lastEvaluation;
+//		});
+
+		return $result;
+	}
+
+	function recurse_tree_risk($parent, $niveau, $array) {
+		foreach ($array as $noeud) {
+			if ($parent == $noeud->fk_parent) {
+				if (!isset ($result)) {
+					$result = array();
+				}
+				//$result[$noeud->ref] = $this->fetchFromParent($noeud->id);
+				$result[$noeud->ref] = $this->recurse_tree_risk($noeud->id, ($niveau + 1), $array);
+			}
+		}
+
+		return $result;
+	}
+
+
+
+
 	/**
 	 * Load object lines in memory from the database
 	 *
@@ -1083,6 +1140,24 @@ class Risk extends CommonObject
 			}
 		}
 	return -1;
+	}
+
+	/**
+	 *
+	 * Get danger category picto path
+	 * @return	string $category['thumbnail_name']     path to danger category picto, -1 if don't exist
+	 */
+	public function get_danger_name($risk)
+	{
+
+		$risk_categories = $this->get_danger_categories();
+
+		foreach ($risk_categories as $category) {
+			if ($category['position'] == $risk->category) {
+				return $category['name'];
+			}
+		}
+		return -1;
 	}
 
 	/**

@@ -250,6 +250,15 @@ class DigiriskDocuments extends CommonObject
 				break;
 		}
 
+		if ( $object->element == "digiriskelement" ) {
+			$element_type = $object->element_type;
+		}
+
+		switch ($element_type) {
+			case "groupment":
+				$this->json = $this->GroupmentFillJSON($object);
+				break;
+		}
 	}
 
 	/**
