@@ -354,55 +354,64 @@ class Risk extends CommonObject
 	 * @param int    $parent_id   Id parent object
 	 * @return int         <0 if KO, 0 if not found, >0 if OK
 	 */
-	public function fetchRisksOrderedByCotation($parent_id)
+	public function fetchRisksOrderedByCotation($parent_id, $recursive = false)
 	{
 		$object  = new DigiriskElement($this->db);
 		$objects = $object->fetchAll();
-		$elements = $this->recurse_tree_risk($parent_id,0,$objects);
-		echo '<pre>';
-		print_r($elements);
-		echo '</pre>';
-		exit;
 
-		foreach ( $elements as $element ) {
+		$risk = new Risk($this->db);
 
-			$risk = new Risk($this->db);
+		$result = $risk->fetchFromParent($parent_id);
 
-			$result = $risk->fetchFromParent($element['id']);
+		// RISQUES du parent.
+		foreach ( $result as $risk ) {
+			$evaluation = new DigiriskEvaluation($this->db);
+			$evaluation->fetchFromParent($risk->id, 1);
+			$lastEvaluation = $evaluation->fetchFromParent($risk->id,1);
+			$lastEvaluation = array_shift($lastEvaluation);
 
-			foreach ( $result as $risk ) {
-				$evaluation = new DigiriskEvaluation($this->db);
-				$evaluation->fetchFromParent($risk->id, 1);
-				$lastEvaluation = $evaluation->fetchFromParent($risk->id,1);
-				$lastEvaluation = array_shift($lastEvaluation);
+			$risk->lastEvaluation = $lastEvaluation->cotation;
 
-				$risk->lastEvaluation = $lastEvaluation->cotation;
-			}
+			$risks[$risk->id] = $risk;
 		}
 
-//		usort($result,function($first,$second){
-//			return $first->lastEvaluation < $second->lastEvaluation;
-//		});
+		if ( $recursive ) {
+			$elements = $object->recurse_tree($parent_id,0,$objects);
 
-		return $result;
-	}
+			// Super fonction itérations flat.
+			$it = new RecursiveIteratorIterator(new RecursiveArrayIterator($elements));
+			foreach($it as $key => $v) {
+				$element[$key][$v] = $v;
+			}
 
-	function recurse_tree_risk($parent, $niveau, $array) {
-		foreach ($array as $noeud) {
-			if ($parent == $noeud->fk_parent) {
-				if (!isset ($result)) {
-					$result = array();
+			$children_id = array_shift ($element);
+
+			// RISQUES des enfants du parent.
+			foreach ( $children_id as $element ) {
+
+				$risk = new Risk($this->db);
+
+				$result = $risk->fetchFromParent($element);
+
+				foreach ( $result as $risk ) {
+					$evaluation = new DigiriskEvaluation($this->db);
+					$evaluation->fetchFromParent($risk->id, 1);
+					$lastEvaluation = $evaluation->fetchFromParent($risk->id,1);
+					$lastEvaluation = array_shift($lastEvaluation);
+
+					$risk->lastEvaluation = $lastEvaluation->cotation;
+
+					$risks[$risk->id] = $risk;
 				}
-				//$result[$noeud->ref] = $this->fetchFromParent($noeud->id);
-				$result[$noeud->ref] = $this->recurse_tree_risk($noeud->id, ($niveau + 1), $array);
 			}
 		}
 
-		return $result;
+		usort($risks,function($first,$second){
+			return $first->lastEvaluation < $second->lastEvaluation;
+		});
+
+		return $risks;
 	}
-
-
-
 
 	/**
 	 * Load object lines in memory from the database
@@ -1165,10 +1174,9 @@ class Risk extends CommonObject
 	 * Get children tasks
 	 * @return	array			$records or -1 if error
 	 */
-	public function get_related_tasks($risk)
+	public function get_related_tasks($risk, $limit = 1)
 	{
-		$limit = 1;
-		$sql = "SELECT * FROM" . ' llx_projet_task_extrafields' . ' WHERE fk_risk =' . $risk->id;
+		$sql = "SELECT * FROM " . MAIN_DB_PREFIX.'projet_task_extrafields' . ' WHERE fk_risk =' . $risk->id;
 		$resql = $this->db->query($sql);
 
 		if ($resql) {
