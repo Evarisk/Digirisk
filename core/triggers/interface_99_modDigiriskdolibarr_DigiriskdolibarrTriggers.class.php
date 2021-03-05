@@ -218,8 +218,58 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$ret = $actioncomm->create($user);
 				break;
 
+			case 'LISTING_RISKS_PHOTOS_GENERATE' :
+				dol_syslog("Trigger '".$this->name."' for action '$action' launched by ".__FILE__.". id=".$object->id);
+				require_once DOL_DOCUMENT_ROOT.'/comm/action/class/actioncomm.class.php';
+				$now = dol_now();
+				$actioncomm = new ActionComm($this->db);
+
+				$actioncomm->elementtype = 'groupment@digiriskdolibarr';
+				$actioncomm->elementid   = $object->id;
+				$actioncomm->code 		 = 'AC_LISTING_RISKS_PHOTOS_GENERATE';
+				$actioncomm->type_code 	 = 'AC_OTH_AUTO';
+				$actioncomm->label		 = $langs->trans('ListingRisksPhotosGeneratedWithDolibarr');
+				$actioncomm->datep		 = $now;
+				$actioncomm->fk_element  = $object->id;
+				$actioncomm->userownerid = $user->id;
+				$actioncomm->percentage = -1;
+
+				$ret = $actioncomm->create($user);
+				break;
+
+			case 'LISTING_RISKS_ACTIONS_GENERATE' :
+			dol_syslog("Trigger '".$this->name."' for action '$action' launched by ".__FILE__.". id=".$object->id);
+			require_once DOL_DOCUMENT_ROOT.'/comm/action/class/actioncomm.class.php';
+			$now = dol_now();
+			$actioncomm = new ActionComm($this->db);
+
+			$actioncomm->elementtype = 'groupment@digiriskdolibarr';
+			$actioncomm->elementid   = $object->id;
+			$actioncomm->code 		 = 'AC_LISTING_RISKS_ACTIONS_GENERATE';
+			$actioncomm->type_code 	 = 'AC_OTH_AUTO';
+			$actioncomm->label		 = $langs->trans('ListingRisksActionsGeneratedWithDolibarr');
+			$actioncomm->datep		 = $now;
+			$actioncomm->fk_element  = $object->id;
+			$actioncomm->userownerid = $user->id;
+			$actioncomm->percentage = -1;
+
+			$ret = $actioncomm->create($user);
+			break;
+
 			default:
 				dol_syslog("Trigger '".$this->name."' for action '$action' launched by ".__FILE__.". id=".$object->id);
+				break;
+
+			case 'DIGIRISKELEMENT_CREATE' :
+
+				if ( $object->element_type == 'groupment' ) {
+					$object->call_trigger('GROUPMENT_CREATE', $user);
+				}
+
+				if ( $object->element_type == 'workunit' ) {
+					$object->call_trigger('WORKUNIT_CREATE', $user);
+				}
+
 				break;
 		}
 
