@@ -250,11 +250,9 @@ class doc_workunit_A4_odt extends ModelePDFWorkUnit
 			}
 			else
 			{
-
-				$filename = $objectref.'.'.$newfileformat;
-
-				$filename = $objectref . '_A4' . '_V1.' . $newfileformat;
-
+				$objectlabel = dol_sanitizeFileName($object->label);
+				$objectlabel = preg_replace('/ /', '_', $objectlabel);
+				$filename = dol_print_date(dol_now(),'%Y%m%d') . '_' . $objectref . '_' . $langs->trans('WorkUnitSheet') . '_' . $objectlabel . '.' . $newfileformat;
 			}
 			$object->last_main_doc = $filename;
 
@@ -399,7 +397,10 @@ class doc_workunit_A4_odt extends ModelePDFWorkUnit
 			{
 				$foundtagforlines = 1;
 				try {
-					$listlines = $odfHandler->setSegment('lines');
+//					$listlines = $odfHandler->setSegment('risq4');
+//					$listlines = $odfHandler->setSegment('risq3');
+//					$listlines = $odfHandler->setSegment('risq2');
+//					$listlines = $odfHandler->setSegment('risq1');
 				}
 				catch (OdfException $e)
 				{
@@ -410,32 +411,57 @@ class doc_workunit_A4_odt extends ModelePDFWorkUnit
 				if ($foundtagforlines)
 				{
 					$linenumber = 0;
-					foreach ($object->lines as $line)
-					{
-						$linenumber++;
-						$tmparray = $this->get_substitutionarray_lines($line, $outputlangs, $linenumber);
-						complete_substitutions_array($tmparray, $outputlangs, $object, $line, "completesubstitutionarray_lines");
-						// Call the ODTSubstitutionLine hook
-						$parameters = array('odfHandler'=>&$odfHandler, 'file'=>$file, 'object'=>$object, 'outputlangs'=>$outputlangs, 'substitutionarray'=>&$tmparray, 'line'=>$line);
-						$reshook = $hookmanager->executeHooks('ODTSubstitutionLine', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
-						foreach ($tmparray as $key => $val)
-						{
-							try
-							{
-								$listlines->setVars($key, $val, true, 'UTF-8');
-							}
-							catch (OdfException $e)
-							{
-								dol_syslog($e->getMessage(), LOG_INFO);
-							}
-							catch (SegmentException $e)
-							{
-								dol_syslog($e->getMessage(), LOG_INFO);
+
+					$risk = new Risk($this->db);
+
+					if ( ! empty( $object ) ) {
+						$risks = $risk->fetchRisksOrderedByCotation($object->id);
+						if ($risks !== -1) {
+							for ($i = 1; $i <= 4; $i++ ) {
+								$listlines = $odfHandler->setSegment('risq' . $i);
+
+								foreach ($risks as $line) {
+									$evaluation = new DigiriskEvaluation($this->db);
+									$lastEvaluation = $evaluation->fetchFromParent($line->id, 1);
+									$lastEvaluation = array_shift($lastEvaluation);
+									$scale = $lastEvaluation->get_evaluation_scale();
+
+									if ( $scale == $i ) {
+										$tmparray['nomDanger'] = $line->get_danger_name($line);
+
+										$riskRef = substr($line->ref, 1);
+										$riskRef = ltrim($riskRef, '0');
+										$cotationRef = substr($lastEvaluation->ref, 1);
+										$cotationRef = ltrim($cotationRef, '0');
+										$tmparray['identifiantRisque'] = 'R'. $riskRef . ' - E' . $cotationRef;
+										$tmparray['quotationRisque'] = $lastEvaluation->cotation;
+										$tmparray['commentaireRisque'] = dol_print_date( $lastEvaluation->date_creation, '%A %e %B %G %H:%M' ) . ': ' . $lastEvaluation->comment;
+
+										//$linenumber++;
+										//$tmparray = $this->get_substitutionarray_lines($line, $outputlangs, $linenumber);
+
+										unset($tmparray['object_fields']);
+
+										complete_substitutions_array($tmparray, $outputlangs, $object, $line, "completesubstitutionarray_lines");
+										// Call the ODTSubstitutionLine hook
+										$parameters = array('odfHandler' => &$odfHandler, 'file' => $file, 'object' => $object, 'outputlangs' => $outputlangs, 'substitutionarray' => &$tmparray, 'line' => $line);
+										$reshook = $hookmanager->executeHooks('ODTSubstitutionLine', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
+										foreach ($tmparray as $key => $val) {
+											try {
+												$listlines->setVars($key, $val, true, 'UTF-8');
+											} catch (OdfException $e) {
+												dol_syslog($e->getMessage(), LOG_INFO);
+											} catch (SegmentException $e) {
+												dol_syslog($e->getMessage(), LOG_INFO);
+											}
+										}
+										$listlines->merge();
+									}
+								}
+								$odfHandler->mergeSegment($listlines);
 							}
 						}
-						$listlines->merge();
 					}
-					$odfHandler->mergeSegment($listlines);
 				}
 			}
 			catch (OdfException $e)

@@ -112,22 +112,19 @@ function digiriskdolibarr_completesubstitutionarray(&$substitutionarray,$langs,$
 
 			$groupments = $object->DigiriskElementDocuments($object, $element_type);
 
-//			echo '<pre>';
-//			print_r($groupments);
-//			echo '</pre>';
-//			exit;
-
 			$substitutionarray['reference']   = $groupments[$element_type]['reference'];
 			$substitutionarray['nom']         = $groupments[$element_type]['nom'];
 			$substitutionarray['description'] = $groupments[$element_type]['description'];
-//
-//			foreach ( $groupments as $key => $groupment ) {
-//
-//				$substitutionarray['nomDanger'][] = $groupment['risk'][$key]['nomDanger'];
-//				$substitutionarray['identifiantRisque'][] = $groupment['risk'][$key]['identifiantRisque'];
-//				$substitutionarray['quotationRisque'][] = $groupment['risk'][$key]['quotationRisque'];
-//				$substitutionarray['commentaireRisque'][] = $groupment['risk'][$key]['commentaireRisque'];
-//			}
+
+			break;
+
+		case 'workunit':
+
+			$workunits = $object->DigiriskElementDocuments($object, $element_type);
+
+			$substitutionarray['reference']   = $workunits[$element_type]['reference'];
+			$substitutionarray['nom']         = $workunits[$element_type]['nom'];
+			$substitutionarray['description'] = $workunits[$element_type]['description'];
 
 			break;
 	}

@@ -251,7 +251,9 @@ class doc_groupment_listing_risks_photos_odt extends ModelePDFGroupment
 			}
 			else
 			{
-				$filename = 'test_V1.' . $newfileformat;
+				$objectlabel = dol_sanitizeFileName($object->label);
+				$objectlabel = preg_replace('/ /', '_', $objectlabel);
+				$filename = dol_print_date(dol_now(),'%Y%m%d') . '_' . $objectref . '_' . $langs->trans('ListingRisksPhoto') . '_' . $objectlabel . '.' . $newfileformat;
 			}
 			$object->last_main_doc = $filename;
 
@@ -411,7 +413,7 @@ class doc_groupment_listing_risks_photos_odt extends ModelePDFGroupment
 					$risk = new Risk($this->db);
 
 					if ( ! empty( $object ) ) {
-						$risks = $risk->fetchRisksOrderedByCotation($object->id);
+						$risks = $risk->fetchRisksOrderedByCotation($object->id, true);
 						if ($risks !== -1) {
 							for ($i = 1; $i <= 4; $i++ ) {
 								$listlines = $odfHandler->setSegment('risk' . $i);
@@ -423,7 +425,11 @@ class doc_groupment_listing_risks_photos_odt extends ModelePDFGroupment
 									$scale = $lastEvaluation->get_evaluation_scale();
 
 									if ( $scale == $i ) {
-										$tmparray['nomElement'] = $object->ref;
+
+										$element = new DigiriskElement($this->db);
+										$element->fetch($line->fk_element);
+
+										$tmparray['nomElement'] = $element->ref . ' - ' . $element->label;
 										$tmparray['nomDanger'] = $line->get_danger_name($line);
 
 										$riskRef = substr($line->ref, 1);
@@ -432,7 +438,8 @@ class doc_groupment_listing_risks_photos_odt extends ModelePDFGroupment
 										$cotationRef = ltrim($cotationRef, '0');
 										$tmparray['identifiantRisque'] = 'R'. $riskRef . ' - E' . $cotationRef;
 										$tmparray['quotationRisque'] = $lastEvaluation->cotation;
-										$tmparray['commentaireRisque'] = $lastEvaluation->comment;
+										$tmparray['commentaireRisque'] = dol_print_date( $lastEvaluation->date_creation, '%A %e %B %G %H:%M' ) . ': ' . $lastEvaluation->comment;
+										//$tmparray['photoAssociee'] = $lastEvaluation->photo;
 
 										//$linenumber++;
 										//$tmparray = $this->get_substitutionarray_lines($line, $outputlangs, $linenumber);
@@ -446,6 +453,7 @@ class doc_groupment_listing_risks_photos_odt extends ModelePDFGroupment
 										foreach ($tmparray as $key => $val) {
 											try {
 												$listlines->setVars($key, $val, true, 'UTF-8');
+												//$listlines->setImage($key, $val);
 											} catch (OdfException $e) {
 												dol_syslog($e->getMessage(), LOG_INFO);
 											} catch (SegmentException $e) {

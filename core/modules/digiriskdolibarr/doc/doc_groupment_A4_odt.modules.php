@@ -253,11 +253,9 @@ class doc_groupment_A4_odt extends ModelePDFGroupment
 			}
 			else
 			{
-
-				$filename = $objectref.'.'.$newfileformat;
-
-				$filename = $objectref . '_A4' . '_V1.' . $newfileformat;
-
+				$objectlabel = dol_sanitizeFileName($object->label);
+				$objectlabel = preg_replace('/ /', '_', $objectlabel);
+				$filename = dol_print_date(dol_now(),'%Y%m%d') . '_' . $objectref . '_' . $langs->trans('GPSheet') . '_' . $objectlabel . '.' . $newfileformat;
 			}
 			$object->last_main_doc = $filename;
 
@@ -440,7 +438,7 @@ class doc_groupment_A4_odt extends ModelePDFGroupment
 										$cotationRef = ltrim($cotationRef, '0');
 										$tmparray['identifiantRisque'] = 'R'. $riskRef . ' - E' . $cotationRef;
 										$tmparray['quotationRisque'] = $lastEvaluation->cotation;
-										$tmparray['commentaireRisque'] = $lastEvaluation->comment;
+										$tmparray['commentaireRisque'] = dol_print_date( $lastEvaluation->date_creation, '%A %e %B %G %H:%M' ) . ': ' . $lastEvaluation->comment;
 
 										//$linenumber++;
 										//$tmparray = $this->get_substitutionarray_lines($line, $outputlangs, $linenumber);
