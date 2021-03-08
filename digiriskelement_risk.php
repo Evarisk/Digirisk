@@ -984,7 +984,7 @@ if ($object->id > 0) {
 										</div>
 									<?php else : ?>
 										<div class="action">
-											<div class="risk-create wpeo-button button-square-50 button-event add action-input button-progress">
+											<div class="risk-create wpeo-button button-square-50 button-event add action-input button-progress button-disable">
 												<i class="button-icon fas fa-plus"></i>
 											</div>
 										</div>

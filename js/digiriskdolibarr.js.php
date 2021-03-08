@@ -745,7 +745,12 @@ window.eoxiaJS.updateInputVariables = function( riskID, evaluationID, variableID
 	$('#cotationMethod'+riskID).attr('value', evaluationMethod)
 	$('#cotationSpan'+riskID).text(evaluationID)
 	$('#cotationSpan'+riskID).attr('data-scale', window.eoxiaJS.getDynamicScale(evaluationID))
+	var element = jQuery(this);
 
+	// Rend le bouton "active".
+	if ( window.eoxiaJS.riskCategory.haveDataInInput(element)) {
+		$( '.action .wpeo-button.button-disable' ).removeClass( 'button-disable' );
+	}
 };
 /**
  * Initialise l'objet "evaluationMethodEvarisk" ainsi que la méthode "init" obligatoire pour la bibliothèque EoxiaJS.
@@ -914,10 +919,11 @@ window.eoxiaJS.riskCategory.selectDanger = function( event ) {
 
 	//window.eoxiaJS.tooltip.remove(element.closest('.risk-row').find('.category-danger.wpeo-tooltip-event'));
 
-	//// Rend le bouton "active".
-	//if ( '{}' !== element.closest( '.risk-row' ).find( 'textarea[name="evaluation_variables"]' ).val() ) {
-	//	element.closest( 'tr' ).find( '.action .wpeo-button.button-disable' ).removeClass( 'button-disable' );
-	//}
+	// Rend le bouton "active".
+	if ( window.eoxiaJS.riskCategory.haveDataInInput(element)) {
+		$( '.action .wpeo-button.button-disable' ).removeClass( 'button-disable' );
+	}
+
 
 //	// Si aucune donnée est entrée, on lance la requête.
 //	if ( element.data( 'is-preset' ) && ! window.eoxiaJS.riskCategory.haveDataInInput( element ) ) {
@@ -933,13 +939,8 @@ window.eoxiaJS.riskCategory.selectDanger = function( event ) {
 //};
 };
 window.eoxiaJS.riskCategory.haveDataInInput = function( element ) {
-	if ( '{}' != element.closest( '.risk-row' ).find( 'textarea[name="evaluation_variables"]' ).val() ) {
+	if ( $( '.risk-row' ).find( 'input[name="risk_category_id"]' ).val() > 0  && $('#cotationMethod0').val()  ) {
 		return true;
 	}
-
-	if ( '' != element.closest( '.risk-row' ).find( 'textarea[name="list_comment[0][content]"]' ).val() ) {
-		return true;
-	}
-
 	return false;
 };
