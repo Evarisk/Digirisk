@@ -113,7 +113,8 @@ class DigiriskEvaluation extends CommonObject
 		'formation' => array('type'=>'integer', 'label'=>'Formation', 'enabled'=>'1', 'position'=>46, 'notnull'=>0, 'visible'=>-1,),
 		'exposition' => array('type'=>'integer', 'label'=>'Exposition', 'enabled'=>'1', 'position'=>47, 'notnull'=>0, 'visible'=>-1,),
 		'comment' => array('type'=>'text', 'label'=>'Comment', 'enabled'=>'1', 'position'=>48, 'notnull'=>0, 'visible'=>0,),
-		'entity' => array('type'=>'integer', 'label'=>'Entity', 'enabled'=>'1', 'position'=>49, 'notnull'=>0, 'visible'=>-1,),
+		'photo' => array('type'=>'varchar(128)', 'label'=>'Photo', 'enabled'=>'1', 'position'=>50, 'notnull'=>0, 'visible'=>-1,),
+		'entity' => array('type'=>'integer', 'label'=>'entity', 'enabled'=>'1', 'position'=>49, 'notnull'=>0, 'visible'=>-1,),
 	);
 	public $rowid;
 	public $ref;
@@ -125,6 +126,7 @@ class DigiriskEvaluation extends CommonObject
 	public $ref_ext;
 	public $status;
 	public $cotation;
+	public $has_tasks;
 	public $method;
 	public $fk_risk;
 	public $gravite;
@@ -133,7 +135,7 @@ class DigiriskEvaluation extends CommonObject
 	public $formation;
 	public $exposition;
 	public $comment;
-	public $has_tasks;
+	public $photo;
 	public $entity;
 	// END MODULEBUILDER PROPERTIES
 

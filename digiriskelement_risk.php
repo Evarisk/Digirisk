@@ -142,13 +142,17 @@ if (empty($reshook))
 		$cotation 		= GETPOST('cotation');
 		$method 		= GETPOST('cotationMethod');
 		$category 		= GETPOST('category');
-		$risk->description = $db->escape($riskComment);
-		$risk->fk_element = $fk_element ? $fk_element : 0;
-		$risk->fk_projet = $conf->global->DIGIRISKDOLIBARR_DU_PROJECT;
-		$risk->category = $category;
-		$refRisk = new $conf->global->DIGIRISKDOLIBARR_RISK_ADDON();
+		$photo 			= GETPOST('photo');
+
+		$risk->description 	= $db->escape($riskComment);
+		$risk->fk_element 	= $fk_element ? $fk_element : 0;
+		$risk->fk_projet 	= $conf->global->DIGIRISKDOLIBARR_DU_PROJECT;
+		$risk->category 	= $category;
+		$refRiskMod 		= new $conf->global->DIGIRISKDOLIBARR_RISK_ADDON();
+		$refRisk 			= $refRiskMod->getNextValue($risk);
+
 		if ($refRisk) {
-			$risk->ref = $refRisk->getNextValue($risk);
+			$risk->ref = $refRisk;
 		}
 
 		if (!$error)
@@ -172,26 +176,30 @@ if (empty($reshook))
 
 				$task->create($user);
 
-				$formation = GETPOST('formation');
-				$protection = GETPOST('protection');
-				$occurrence = GETPOST('occurrence');
-				$gravite = GETPOST('gravite');
-				$exposition = GETPOST('exposition');
-				$evaluationComment = GETPOST('evaluationComment');
+				$formation 			= GETPOST('formation');
+				$protection 		= GETPOST('protection');
+				$occurrence 		= GETPOST('occurrence');
+				$gravite 			= GETPOST('gravite');
+				$exposition 		= GETPOST('exposition');
+				$evaluationComment 	= GETPOST('evaluationComment');
+				$evaluation 		= new DigiriskEvaluation($db);
+				$refCot 			= new $conf->global->DIGIRISKDOLIBARR_EVALUATION_ADDON();
 
-				$evaluation = new DigiriskEvaluation($db);
-				$refCot = new $conf->global->DIGIRISKDOLIBARR_EVALUATION_ADDON();
-				$evaluation->cotation = $cotation;
-				$evaluation->fk_risk = $risk->id;
-				$evaluation->status = 1;
-				$evaluation->method = $method;
-				$evaluation->ref   = $refCot->getNumRef($evaluation);
+				mkdir(DOL_DATA_ROOT . '/digiriskdolibarr/risk/' . $refRisk);
+				copy(DOL_DATA_ROOT . '/ecm/digiriskdolibarr/medias/tmp/' . $photo,DOL_DATA_ROOT . '/digiriskdolibarr/risk/' .  $refRisk . '/' . $photo);
+
+				$evaluation->photo			= $photo;
+				$evaluation->cotation 		= $cotation;
+				$evaluation->fk_risk 		= $risk->id;
+				$evaluation->status 		= 1;
+				$evaluation->method 		= $method;
+				$evaluation->ref   			= $refCot->getNumRef($evaluation);
 				$evaluation->formation  	= $formation;
 				$evaluation->protection  	= $protection;
 				$evaluation->occurrence  	= $occurrence;
 				$evaluation->gravite  		= $gravite;
 				$evaluation->exposition  	= $exposition;
-				$evaluation->comment = $db->escape($evaluationComment);
+				$evaluation->comment 		= $db->escape($evaluationComment);
 
 				$result2 = $evaluation->create($user);
 
@@ -228,6 +236,7 @@ if (empty($reshook))
 		$cotation 			= GETPOST('cotation');
 		$method 			= GETPOST('cotationMethod');
 		$evaluationComment 	= GETPOST('evaluationComment');
+		$photo 				= GETPOST('photo');
 
 		$formation 	= GETPOST('formation');
 		$protection = GETPOST('protection');
@@ -235,15 +244,27 @@ if (empty($reshook))
 		$gravite 	= GETPOST('gravite');
 		$exposition = GETPOST('exposition');
 
-		$evaluation = new DigiriskEvaluation($db);
-		$evaluation->cotation = $cotation;
-		$evaluation->fk_risk = $riskID;
-		$evaluation->status = 1;
-		$evaluation->method = $method;
-		$evaluation->comment = $db->escape($evaluationComment);
+		$evaluation 			= new DigiriskEvaluation($db);
+		$evaluation->cotation 	= $cotation;
+		$evaluation->fk_risk 	= $riskID;
+		$evaluation->status 	= 1;
+		$evaluation->method 	= $method;
+		$evaluation->comment 	= $db->escape($evaluationComment);
+		$evaluation->photo 		= $photo;
 
-		$refCot = new $conf->global->DIGIRISKDOLIBARR_EVALUATION_ADDON();
-		$evaluation->ref = $refCot->getNextValue($evaluation);
+		$risk = new Risk($db);
+		$risk->fetch($riskID);
+		$files = dol_dir_list(DOL_DATA_ROOT . '/digiriskdolibarr/risk/' . $risk->ref . '/');
+		foreach ($files as $file) {
+			unlink(DOL_DATA_ROOT . '/digiriskdolibarr/risk/' . $risk->ref . '/' . $file['name']);
+		}
+
+		dol_delete_dir(DOL_DATA_ROOT . '/digiriskdolibarr/risk/' . $risk->ref );
+		mkdir(DOL_DATA_ROOT . '/digiriskdolibarr/risk/' . $risk->ref);
+		copy(DOL_DATA_ROOT . '/ecm/digiriskdolibarr/medias/tmp/' . $photo,DOL_DATA_ROOT . '/digiriskdolibarr/risk/' .  $risk->ref . '/' . $photo);
+
+		$refCot 			= new $conf->global->DIGIRISKDOLIBARR_EVALUATION_ADDON();
+		$evaluation->ref 	= $refCot->getNextValue($evaluation);
 
 		if ($method == 'digirisk') {
 			$evaluation->formation  	= $formation ;
@@ -407,51 +428,87 @@ if ($object->id > 0) {
 											</div>
 
 											<div class="table-cell table-50 cell-photo" data-title="Photo">
-												<div class="photo-container grid wpeo-modal-event tooltip hover">
-													<?php $filearray = dol_dir_list($conf->digiriskdolibarr->multidir_output[$conf->entity].'/'.$risk->element.'/'.$risk->ref.'/', "files", 0, '', '(\.odt|_preview.*\.png)$', 'position_name', 'asc', 1);
+												<div class="photo-container grid wpeo-modal-event tooltip hover" value="<?php echo $risk->id ?>">
+													<?php
+
+													$relativepath = 'digiriskdolibarr/medias/tmp';
+													$modulepart = 'ecm';
+													$path = '/dolibarr/htdocs/document.php?modulepart=' . $modulepart  . '&attachment=0&file=' . str_replace('/', '%2F', $relativepath) . '/';
+													$filearray = dol_dir_list($conf->digiriskdolibarr->multidir_output[$conf->entity].'/'.$risk->ref.'/', "files", 0, '', '(\.odt|_preview.*\.png)$', 'position_name', 'asc', 1);
 													if (count($filearray)) : ?>
-														<div class="action photo default-photo modal-open" value="<?php echo $risk->id ?>">
-														<?php print '<span class="floatleft inline-block valignmiddle divphotoref">'.$risk->digirisk_show_photos('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity].'/'.$risk->element, 'small', 1, 0, 0, 0, 50, 0, 0, 0, 0, $risk->element).'</span>'; ?>
-														</div>
+														<?php print '<span class="floatleft inline-block valignmiddle divphotoref">'.$risk->digirisk_show_photos('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity].'/', 'small', 1, 0, 0, 0, 50, 0, 0, 0, 0).'</span>'; ?>
 													<?php else : ?>
 														<?php $nophoto = '/public/theme/common/nophoto.png'; ?>
 														<div class="action photo default-photo modal-open" value="<?php echo $risk->id ?>">
-															<span class="floatleft inline-block valignmiddle divphotoref"><img class="photodigiriskdolibarr" alt="No photo" src="<?php echo DOL_URL_ROOT.$nophoto ?>"></span>
+															<span class="floatleft inline-block valignmiddle divphotoref photo-edit<?php echo $risk->id ?>">
+																<input type="hidden" value="<?php echo $path ?>" id="pathToPhoto<?php echo $risk->id ?>">
+																<img class="photo maxwidth50"  src="<?php echo $path . $lastEvaluation->photo ?>">
+															</span>
 														</div>
-													<?php endif; ?>
-													<!-- Modal-AddPhoto -->
-													<div id="photo_modal<?php echo $risk->id ?>" class="wpeo-modal">
-														<div class="modal-container wpeo-modal-event">
-															<!-- Modal-Header -->
-															<div class="modal-header">
-																<h2 class="modal-title"><?php echo $langs->trans('AddPhoto') ?></h2>
-																<div class="modal-close"><i class="fas fa-times"></i></div>
-															</div>
-															<!-- Modal-Content -->
-															<div class="modal-content" id="#modalContent">
-																<div class="formattachnewfile">
-																	<div class="centpercent notopnoleftnoright table-fiche-title">
-																		<div class="titre">
-																			<div class="nobordernopadding valignmiddle col-title">
-																				<div class="titre inline-block"><?php echo $langs->trans('AddPhotoTitle') ?></div>
-																			</div>
-																		</div>
 
-																		<div>
-																			<input type="file" id="riskDocument" multiple>
-																			<input id="riskDocumentSubmit" type="submit" class="button reposition" name="sendit" value="<?php echo $risk->id ?>">
-																		</div>
+														<!-- Modal-AddPhoto -->
+														<div id="photo_modal<?php echo $risk->id ?>" class="wpeo-modal">
+															<div class="modal-container wpeo-modal-event">
+																<!-- Modal-Header -->
+																<div class="modal-header">
+																	<h2 class="modal-title"><?php echo $langs->trans('AddPhoto') ?></h2>
+																	<div class="modal-close"><i class="fas fa-times"></i></div>
+																</div>
+																<!-- Modal-Content -->
+																<div class="modal-content" id="#modalContent">
+																	Ajoutez de nouveaux fichiers dans 'digiriskdolibarr/medias'
+																	<div class="action">
+																		<a href="<?php echo '../../ecm/index.php' ?>" target="_blank">
+																			<div class="wpeo-button button-square-50 button-event add action-input button-progress">
+																				<i class="button-icon fas fa-plus"></i>
+																			</div>
+																		</a>
+																	</div>
+
+																	<input type="hidden" id="photoLinked<?php echo $risk->id ?>" value="">
+																	<div class="wpeo-table table-row">
+																		<?php
+																		$files =  dol_dir_list(DOL_DATA_ROOT . '/ecm/digiriskdolibarr/medias/tmp');
+																		$relativepath = 'digiriskdolibarr/medias/tmp';
+																		$modulepart = 'ecm';
+																		$path = '/dolibarr/htdocs/document.php?modulepart=' . $modulepart  . '&attachment=0&file=' . str_replace('/', '%2F', $relativepath);
+																		$i = 0;
+
+																		if ( !empty($files)) {
+																			foreach ($files as $file) {
+
+																				print '<div class="table-cell center clickable-photo clickable-photo'. $i .'" value="'. $i .'">';
+																				if (image_format_supported($file['name']) >= 0)
+																				{
+																					$fullpath = $path . '/' . $file['relativename'] . '&entity=' . $conf->entity;
+																					?>
+																						<input type="hidden" id="filename<?php echo $risk->id ?>" value="<?php echo $file['name'] ?>">
+																						<img class="photo photo<?php echo $i ?> maxwidth200" src="<?php echo $fullpath; ?>">
+																					<?php
+																				}
+																				else {
+																					print '&nbsp;';
+																				}
+																				$i++;
+
+																				print '</div>';
+																			}
+																		}
+
+																		// 	 $formfile->list_of_documents($files, '', 'digiriskdolibarr');
+																		?>
+																	</div>
+
+																</div>
+																<!-- Modal-Footer -->
+																<div class="modal-footer">
+																	<div class="wpeo-button button-grey modal-close">
+																		<span><?php echo $langs->trans('CloseModal'); ?></span>
 																	</div>
 																</div>
 															</div>
-															<!-- Modal-Footer -->
-															<div class="modal-footer">
-																<div class="wpeo-button button-grey modal-close">
-																	<span><?php echo $langs->trans('CloseModal'); ?></span>
-																</div>
-															</div>
 														</div>
-													</div>
+													<?php endif; ?>
 												</div>
 											</div>
 
@@ -620,6 +677,11 @@ if ($object->id > 0) {
 											</div>
 										<?php endif; ?>
 
+										<?php
+										$evaluation = new DigiriskEvaluation($db);
+										$lastEvaluation = $evaluation->fetchFromParent($risk->id,1);
+										$lastEvaluation = array_shift($lastEvaluation);
+										?>
 										<div class="table-cell table-50 cell-photo" data-title="Photo">
 											<?php $filearray = dol_dir_list($conf->digiriskdolibarr->multidir_output[$conf->entity].'/'.$risk->element.'/'.$risk->ref.'/', "files", 0, '', '(\.odt|_preview.*\.png)$', 'position_name', 'asc', 1);
 												if (count($filearray)) {
@@ -633,11 +695,10 @@ if ($object->id > 0) {
 										<div class="table-cell table-50 cell-cotation" data-title="Cot.">
 											<div class="cotation-container grid wpeo-modal-event tooltip hover cotation-square" id="cotation_square<?php echo $risk->id ?>">
 											<?php
-											$evaluation = new DigiriskEvaluation($db);
-											$lastEvaluation = $evaluation->fetchFromParent($risk->id,1);
+
 											if (!empty($lastEvaluation)) :
 												//ici pas faire un foreach, accèder juste au premier élément
-												foreach ($lastEvaluation as $cot) :
+													$cot = $lastEvaluation;
 													if ($cot->cotation >= 0) : ?>
 																<div class="action cotation default-cotation modal-open" data-scale="<?php echo $cot->get_evaluation_scale() ?>" value="<?php echo $risk->id ?>">
 																	<span><?php echo $cot->cotation; ?></span>
@@ -693,18 +754,16 @@ if ($object->id > 0) {
 																	</div>
 																</div>
 															<?php endif; ?>
-												<?php endforeach; ?>
 											<?php endif; ?>
 											</div>
 										</div>
 
 										<div class="table-cell table-150" data-title="evaluationComment" class="padding">
 											<?php
-											$lastEval = array_shift($lastEvaluation);
 											$evaluations = $evaluation->fetchFromParent($risk->id); ?>
-											<span><i class="fas fa-calendar-alt"></i> <?php echo date("d/m/Y", $lastEval->date_creation) . ' : '; ?></span>
+											<span><i class="fas fa-calendar-alt"></i> <?php echo date("d/m/Y", $lastEvaluation->date_creation) . ' : '; ?></span>
 											<?php
-											echo $lastEval->comment;
+											echo $lastEvaluation->comment;
 											print '</br>';
 											echo 'il y a ' . count($evaluations) . ' evaluations sur ce risque';
 											?>
@@ -813,13 +872,20 @@ if ($object->id > 0) {
 
 								<div class="table-cell table-50 cell-photo" data-title="Photo">
 									<div class="photo-container grid wpeo-modal-event tooltip hover">
-										<?php $filearray = dol_dir_list($conf->digiriskdolibarr->multidir_output[$conf->entity].'/'.$element['object']->element_type.'/'.$element['object']->ref.'/', "files", 0, '', '(\.odt|_preview.*\.png)$', 'position_name', 'asc', 1);
+										<?php
+										$relativepath = 'digiriskdolibarr/medias/tmp';
+										$modulepart = 'ecm';
+										$path = '/dolibarr/htdocs/document.php?modulepart=' . $modulepart  . '&attachment=0&file=' . str_replace('/', '%2F', $relativepath) . '/';
+										$filearray = dol_dir_list($conf->digiriskdolibarr->multidir_output[$conf->entity].'/'.$element['object']->element_type.'/'.$element['object']->ref.'/', "files", 0, '', '(\.odt|_preview.*\.png)$', 'position_name', 'asc', 1);
 										if (count($filearray)) : ?>
 											<?php print '<span class="floatleft inline-block valignmiddle divphotoref">'.$element['object']->digirisk_show_photos('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity].'/'.$element['object']->element_type, 'small', 1, 0, 0, 0, 50, 0, 0, 0, 0, $element['object']->element_type).'</span>'; ?>
 										<?php else : ?>
 											<?php $nophoto = '/public/theme/common/nophoto.png'; ?>
 											<div class="action photo default-photo modal-open" value="<?php echo $risk->id ?>">
-												<span class="floatleft inline-block valignmiddle divphotoref"><img class="photodigiriskdolibarr" alt="No photo" src="<?php echo DOL_URL_ROOT.$nophoto ?>"></span>
+												<span class="floatleft inline-block valignmiddle divphotoref photo-edit0">
+													<input type="hidden" value="<?php echo $path ?>" id="pathToPhoto0">
+													<img class="photo maxwidth50"  src="<?php echo DOL_URL_ROOT.'/public/theme/common/nophoto.png' ?>">
+												</span>
 											</div>
 
 											<!-- Modal-AddPhoto -->
@@ -832,28 +898,49 @@ if ($object->id > 0) {
 													</div>
 													<!-- Modal-Content -->
 													<div class="modal-content" id="#modalContent">
-														<div class="formattachnewfile">
-															<div class="centpercent notopnoleftnoright table-fiche-title">
-																<div class="titre">
-																	<div class="nobordernopadding valignmiddle col-title">
-																		<div class="titre inline-block">Ajouter un nouveau fichier/document</div>
-																	</div>
+														Ajoutez de nouveaux fichiers dans 'digiriskdolibarr/medias'
+														<div class="action">
+															<a href="<?php echo '../../ecm/index.php' ?>" target="_blank">
+																<div class="wpeo-button button-square-50 button-event add action-input button-progress">
+																	<i class="button-icon fas fa-plus"></i>
 																</div>
-															</div>
-															<form name="formuserfile" id="formuserfile" action="/dolibarr-12.0.3/htdocs/custom/digiriskdolibarr/archives/risk_document.php?id=1" enctype="multipart/form-data" method="POST"><input type="hidden" name="token" value="$2y$10$5rhdz.l2MZKXbsA2hOneJ.wCIUYwjTBympf/y0g1F4S5gjTZbxJLu">
-																<input type="hidden" id="formuserfile_section_dir" name="section_dir" value="">
-																<input type="hidden" id="formuserfile_section_id" name="section_id" value="0">
-																<input type="hidden" name="sortfield" value="">
-																<input type="hidden" name="sortorder" value="">
-																<div class="nobordernopadding cenpercent">
-																	<div class="valignmiddle nowrap">
-																		<input type="hidden" name="max_file_size" value="2097152">
-																		<input class="flat minwidth400 maxwidth200onsmartphone" type="file" name="userfile[]" multiple="" accept="">
-																		<input type="submit" class="button reposition" name="sendit" value="Envoyer fichier">
-																	</div>
-																</div>
-															</form>
+															</a>
 														</div>
+
+														<input type="hidden" id="photoLinked0" value="">
+														<div class="wpeo-table table-row">
+															<?php
+															$files =  dol_dir_list(DOL_DATA_ROOT . '/ecm/digiriskdolibarr/medias/tmp');
+															$relativepath = 'digiriskdolibarr/medias/tmp';
+															$modulepart = 'ecm';
+															$path = '/dolibarr/htdocs/document.php?modulepart=' . $modulepart  . '&attachment=0&file=' . str_replace('/', '%2F', $relativepath);
+															$i = 0;
+
+															if ( !empty($files)) {
+																foreach ($files as $file) {
+
+																	print '<div class="table-cell center clickable-photo clickable-photo'. $i .'" value="'. $i .'">';
+																	if (image_format_supported($file['name']) >= 0)
+																	{
+																		$fullpath = $path . '/' . $file['relativename'] . '&entity=' . $conf->entity;
+																		?>
+																			<input type="hidden" id="filename0" value="<?php echo $file['name'] ?>">
+																			<img class="photo photo<?php echo $i ?> maxwidth200" src="<?php echo $fullpath; ?>">
+																		<?php
+																	}
+																	else {
+																		print '&nbsp;';
+																	}
+																	$i++;
+
+																	print '</div>';
+																}
+															}
+
+															// 	 $formfile->list_of_documents($files, '', 'digiriskdolibarr');
+															?>
+														</div>
+
 													</div>
 													<!-- Modal-Footer -->
 													<div class="modal-footer">

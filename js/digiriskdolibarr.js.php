@@ -240,6 +240,10 @@ window.eoxiaJS.navigation.event = function() {
 	jQuery( document ).on( 'click', '#actionButtonEdit', window.eoxiaJS.redirect );
 	jQuery( document ).on( 'click', '#actionButtonCancelCreate', window.eoxiaJS.redirectAfterCancelCreate );
 
+	//photos
+
+	jQuery( document ).on( 'click', '.clickable-photo', window.eoxiaJS.selectPhoto );
+
 	//risks
 	jQuery( document ).on( 'click', '.risk-edit', window.eoxiaJS.editRisk );
 	jQuery( document ).on( 'click', '.risk-create:not(.button-disable)', window.eoxiaJS.createRisk );
@@ -479,6 +483,12 @@ window.eoxiaJS.createRisk = function ( event ) {
 		categoryPost = '&category=' + category
 	}
 
+	var photo = $('#photoLinked0').val()
+	var photoPost = ''
+	if (photo !== 0) {
+		photoPost = '&photo=' + encodeURI(photo)
+	}
+
 	let criteres = ''
 	Object.values($('.table-cell.active.cell-0')).forEach(function(v) {
 		if ($(v).data( 'seuil' ) > -1) {
@@ -487,7 +497,7 @@ window.eoxiaJS.createRisk = function ( event ) {
 
 	})
 
-	$('.main-table').load( document.URL + '&action=add' + refPost + commentPost + categoryPost + cotationPost + descriptionPost + methodPost + criteres + ' .main-table')
+	$('.main-table').load( document.URL + '&action=add' + refPost + commentPost + categoryPost + cotationPost + descriptionPost + methodPost + criteres + photoPost + ' .main-table')
 
 }
 
@@ -547,9 +557,16 @@ window.eoxiaJS.saveRisk = function ( event ) {
 		}
 
 	})
-		console.log(this)
+
+	var photo = $('#photoLinked'+editedRiskId).val()
+	var photoPost = ''
+	if (photo !== 0) {
+		photoPost = '&photo=' + encodeURI(photo)
+	}
+
+	console.log(this)
 	$('#risk_row_'+editedRiskId).empty()
-	$('#risk_row_'+editedRiskId).load( document.URL + '&action=saveRisk&riskID=' + editedRiskId + commentPost + cotationPost + methodPost + criteres  + descriptionPost + ' #risk_row_'+editedRiskId+' > div')
+	$('#risk_row_'+editedRiskId).load( document.URL + '&action=saveRisk&riskID=' + editedRiskId + commentPost + cotationPost + methodPost + criteres  + descriptionPost + photoPost + ' #risk_row_'+editedRiskId+' > div')
 }
 
 // Dropdown
@@ -944,3 +961,23 @@ window.eoxiaJS.riskCategory.haveDataInInput = function( element ) {
 	}
 	return false;
 };
+
+
+
+// Photos
+
+window.eoxiaJS.selectPhoto = function( event ) {
+	let photoID = $(this).attr('value')
+
+	$('.clicked-photo').children('img.photo').attr('style', 'none !important')
+	$('.clicked-photo').removeClass('clicked-photo')
+
+	$('.clickable-photo'+photoID).children('img.photo'+photoID).attr('style', 'border: 5px solid #555 !important')
+	$('.clickable-photo'+photoID).addClass('clicked-photo')
+	let riskToAssign = $(this).children('input').attr('id').split('filename')[1]
+
+	let photoName = $('.clicked-photo').children('#filename'+riskToAssign).attr('value')
+	$('#photoLinked'+riskToAssign).attr('value', photoName)
+	$('.photo-edit'+riskToAssign).children('img').attr('src' , $('#pathToPhoto'+riskToAssign).val() + photoName)
+};
+
