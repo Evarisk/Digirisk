@@ -394,9 +394,10 @@ foreach ($dirmodels as $reldir)
 			}
 			closedir($handle);
 			arsort($filelist);
+
 			foreach ($filelist as $file)
 			{
-				if (preg_match('/\.modules\.php$/i', $file) && preg_match('/^(pdf_|doc_)/', $file) && preg_match('/groupment/i', $file) && preg_match('/odt/i', $file))
+				if (preg_match('/\.modules\.php$/i', $file) && preg_match('/^(pdf_|doc_)/', $file) && preg_match('/groupment_A4/i', $file) && preg_match('/odt/i', $file))
 				{
 					if (file_exists($dir.'/'.$file))
 					{

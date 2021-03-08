@@ -50,6 +50,8 @@ DocumentModels = Modèles de documents
 DigiriskMenu = Ajoutez des informations sur votre société/organisation. Cliquez sur le bouton "Enregistrer" en bas de page pour sauvegarder
 DigiriskDocumentsNumberingModule = Modèle de numérotation des documents de Digirisk
 DigiriskNumberOfModelFilesFound = Nombre de modèles par défaut
+DigiriskConfig = Configuration du module
+
 #
 # Horaires d'ouverture
 #
@@ -94,7 +96,7 @@ LegalDisplayCustomTemplate = ODT custom des affichages légaux
 LegalDisplayDigiriskTemplate = ODT par défaut des affichages légaux
 
 #
-# Diffision d'informations
+# Diffusion d'informations
 #
 
 ReadInformationsSharing = Lire une diffusion d'informations
@@ -235,6 +237,8 @@ RiskCategory = Catégorie
 EvaluationMethod = Méthode d'évaluation
 lastEvaluationOn = Dernière évaluation le
 EvaluatedOn = le
+TasksManagement = Gestion des tâches
+ProjectLinked = Projet lié aux tâches des risques
 #
 # Data
 #

@@ -398,6 +398,7 @@ foreach ($dirmodels as $reldir)
 			{
 				if (preg_match('/\.modules\.php$/i', $file) && preg_match('/^(pdf_|doc_)/', $file) && preg_match('/legaldisplay/i', $file) && preg_match('/odt/i', $file))
 				{
+
 					if (file_exists($dir.'/'.$file))
 					{
 						$name = substr($file, 4, dol_strlen($file) - 16);

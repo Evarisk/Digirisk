@@ -99,7 +99,16 @@ class modDigiriskdolibarr extends DolibarrModules
 			'moduleforexternal' => 0,
 		);
 
-		$this->dirs = array("/digiriskdolibarr/temp", "/ecm/digiriskdolibarr", "/ecm/digiriskdolibarr/legaldisplay", "/ecm/digiriskdolibarr/informationssharing", "/ecm/digiriskdolibarr/firepermit", "/ecm/digiriskdolibarr/preventionplan", "/ecm/digiriskdolibarr/groupment", "/ecm/digiriskdolibarr/workunit");
+		$this->dirs = array(
+			"/digiriskdolibarr/temp",
+			"/ecm/digiriskdolibarr",
+			"/ecm/digiriskdolibarr/legaldisplay",
+			"/ecm/digiriskdolibarr/informationssharing",
+			"/ecm/digiriskdolibarr/firepermit",
+			"/ecm/digiriskdolibarr/preventionplan",
+			"/ecm/digiriskdolibarr/groupment",
+			"/ecm/digiriskdolibarr/workunit"
+		);
 
 		// Config pages.
 		$this->config_page_url = array("setup.php@digiriskdolibarr");
@@ -171,7 +180,8 @@ class modDigiriskdolibarr extends DolibarrModules
 			47 => array('DIGIRISKDOLIBARR_EVALUATION_ADDON','chaine', 'mod_evaluation_standard' ,'', 1),
 			48 => array('DIGIRISKDOLIBARR_DU_PROJECT','chaine', '' ,'', 1),
 			49 => array('DIGIRISKDOLIBARR_RISK_SIMPLIFIED','chaine', 1,'', 1),
-			50 => array('DIGIRISKDOLIBARR_RISK_ADVANCED','chaine', 0,'', 1)
+			50 => array('DIGIRISKDOLIBARR_RISK_ADVANCED','chaine', 0,'', 1),
+			51 => array('DIGIRISKDOLIBARR_PROJECT_LINKED','integer', 0,'', 1)
 		);
 
 		if ( ! isset($conf->digiriskdolibarr ) || ! isset( $conf->digiriskdolibarr->enabled ) ) {
@@ -459,20 +469,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			'target'=>'',
 			'user'=>2,				                // 0=Menu for internal users, 1=external users, 2=both
 		);
-		$this->menu[$r++]=array(
-			'fk_menu'=>'fk_mainmenu=digiriskdolibarr',	    // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
-			'type'=>'left',			                // This is a Left menu entry
-			'titre'=>$langs->trans('DocumentModels'),
-			'mainmenu'=>'digiriskdolibarr',
-			'leftmenu'=>'digiriskdocumentmodels',
-			'url'=>'/digiriskdolibarr/admin/setup.php',
-			'langs'=>'digiriskdolibarr@digiriskdolibarr',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
-			'position'=>48520+$r,
-			'enabled'=>'$conf->digiriskdolibarr->enabled',  // Define condition to show or hide menu entry. Use '$conf->digiriskdolibarr->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
-			'perms'=>'1',			                // Use 'perms'=>'$user->rights->digiriskdolibarr->level1->level2' if you want your menu with a permission rules
-			'target'=>'',
-			'user'=>2,				                // 0=Menu for internal users, 1=external users, 2=both
-		);
+
 		$this->menu[$r++]=array(
 			'fk_menu'=>'fk_mainmenu=digiriskdolibarr',	    // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
 			'type'=>'left',			                // This is a Left menu entry
@@ -491,7 +488,7 @@ class modDigiriskdolibarr extends DolibarrModules
 		$this->menu[$r++]=array(
 			'fk_menu'=>'fk_mainmenu=digiriskdolibarr',	    // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
 			'type'=>'left',			                // This is a Left menu entry
-			'titre'=>$langs->trans('RiskListDolibarr'),
+			'titre'=>$langs->trans('RiskList'),
 			'mainmenu'=>'digiriskdolibarr',
 			'leftmenu'=>'digirisklistingrisk',
 			'url'=>'/digiriskdolibarr/risk_list.php',
@@ -506,10 +503,10 @@ class modDigiriskdolibarr extends DolibarrModules
 		$this->menu[$r++]=array(
 			'fk_menu'=>'fk_mainmenu=digiriskdolibarr',	    // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
 			'type'=>'left',			                // This is a Left menu entry
-			'titre'=>$langs->trans('RiskListWP'),
+			'titre'=>$langs->trans('DigiriskConfig'),
 			'mainmenu'=>'digiriskdolibarr',
-			'leftmenu'=>'digirisklistingrisk',
-			'url'=>'/digiriskdolibarr/risks_list.php',
+			'leftmenu'=>'digiriskdocumentmodels',
+			'url'=>'/digiriskdolibarr/admin/setup.php',
 			'langs'=>'digiriskdolibarr@digiriskdolibarr',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
 			'position'=>48520+$r,
 			'enabled'=>'$conf->digiriskdolibarr->enabled',  // Define condition to show or hide menu entry. Use '$conf->digiriskdolibarr->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
@@ -517,8 +514,22 @@ class modDigiriskdolibarr extends DolibarrModules
 			'target'=>'',
 			'user'=>2,				                // 0=Menu for internal users, 1=external users, 2=both
 		);
+//
+//		$this->menu[$r++]=array(
+//			'fk_menu'=>'fk_mainmenu=digiriskdolibarr',	    // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
+//			'type'=>'left',			                // This is a Left menu entry
+//			'titre'=>$langs->trans('RiskListWP'),
+//			'mainmenu'=>'digiriskdolibarr',
+//			'leftmenu'=>'digirisklistingrisk',
+//			'url'=>'/digiriskdolibarr/risks_list.php',
+//			'langs'=>'digiriskdolibarr@digiriskdolibarr',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
+//			'position'=>48520+$r,
+//			'enabled'=>'$conf->digiriskdolibarr->enabled',  // Define condition to show or hide menu entry. Use '$conf->digiriskdolibarr->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
+//			'perms'=>'1',			                // Use 'perms'=>'$user->rights->digiriskdolibarr->level1->level2' if you want your menu with a permission rules
+//			'target'=>'',
+//			'user'=>2,				                // 0=Menu for internal users, 1=external users, 2=both
+//		);
 		// Exports profiles provided by this module
-		$r = 1;
 		/* BEGIN MODULEBUILDER EXPORT DIGIRISKCONST */
 		/*
 		$langs->load("digiriskdolibarr@digiriskdolibarr");
@@ -549,7 +560,6 @@ class modDigiriskdolibarr extends DolibarrModules
 		/* END MODULEBUILDER EXPORT DIGIRISKCONST */
 
 		// Imports profiles provided by this module
-		$r = 1;
 		/* BEGIN MODULEBUILDER IMPORT DIGIRISKCONST */
 		/*
 		 $langs->load("digiriskdolibarr@digiriskdolibarr");
