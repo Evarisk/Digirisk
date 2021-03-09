@@ -186,7 +186,7 @@ if (empty($reshook))
 				$refCot 			= new $conf->global->DIGIRISKDOLIBARR_EVALUATION_ADDON();
 
 				mkdir(DOL_DATA_ROOT . '/digiriskdolibarr/risk/' . $refRisk);
-				copy(DOL_DATA_ROOT . '/ecm/digiriskdolibarr/medias/tmp/' . $photo,DOL_DATA_ROOT . '/digiriskdolibarr/risk/' .  $refRisk . '/' . $photo);
+				copy(DOL_DATA_ROOT . '/ecm/digiriskdolibarr/medias/' . $photo,DOL_DATA_ROOT . '/digiriskdolibarr/risk/' .  $refRisk . '/' . $photo);
 
 				$evaluation->photo			= $photo;
 				$evaluation->cotation 		= $cotation;
@@ -261,7 +261,7 @@ if (empty($reshook))
 
 		dol_delete_dir(DOL_DATA_ROOT . '/digiriskdolibarr/risk/' . $risk->ref );
 		mkdir(DOL_DATA_ROOT . '/digiriskdolibarr/risk/' . $risk->ref);
-		copy(DOL_DATA_ROOT . '/ecm/digiriskdolibarr/medias/tmp/' . $photo,DOL_DATA_ROOT . '/digiriskdolibarr/risk/' .  $risk->ref . '/' . $photo);
+		copy(DOL_DATA_ROOT . '/ecm/digiriskdolibarr/medias/' . $photo,DOL_DATA_ROOT . '/digiriskdolibarr/risk/' .  $risk->ref . '/' . $photo);
 
 		$refCot 			= new $conf->global->DIGIRISKDOLIBARR_EVALUATION_ADDON();
 		$evaluation->ref 	= $refCot->getNextValue($evaluation);
@@ -431,7 +431,7 @@ if ($object->id > 0) {
 												<div class="photo-container grid wpeo-modal-event tooltip hover" value="<?php echo $risk->id ?>">
 													<?php
 
-													$relativepath = 'digiriskdolibarr/medias/tmp';
+													$relativepath = 'digiriskdolibarr/medias';
 													$modulepart = 'ecm';
 													$path = '/dolibarr/htdocs/document.php?modulepart=' . $modulepart  . '&attachment=0&file=' . str_replace('/', '%2F', $relativepath) . '/';
 													$filearray = dol_dir_list($conf->digiriskdolibarr->multidir_output[$conf->entity].'/'.$risk->ref.'/', "files", 0, '', '(\.odt|_preview.*\.png)$', 'position_name', 'asc', 1);
@@ -468,8 +468,8 @@ if ($object->id > 0) {
 																	<input type="hidden" id="photoLinked<?php echo $risk->id ?>" value="">
 																	<div class="wpeo-table table-row">
 																		<?php
-																		$files =  dol_dir_list(DOL_DATA_ROOT . '/ecm/digiriskdolibarr/medias/tmp');
-																		$relativepath = 'digiriskdolibarr/medias/tmp';
+																		$files =  dol_dir_list(DOL_DATA_ROOT . '/ecm/digiriskdolibarr/medias');
+																		$relativepath = 'digiriskdolibarr/medias';
 																		$modulepart = 'ecm';
 																		$path = '/dolibarr/htdocs/document.php?modulepart=' . $modulepart  . '&attachment=0&file=' . str_replace('/', '%2F', $relativepath);
 																		$i = 0;
@@ -873,7 +873,7 @@ if ($object->id > 0) {
 								<div class="table-cell table-50 cell-photo" data-title="Photo">
 									<div class="photo-container grid wpeo-modal-event tooltip hover">
 										<?php
-										$relativepath = 'digiriskdolibarr/medias/tmp';
+										$relativepath = 'digiriskdolibarr/medias';
 										$modulepart = 'ecm';
 										$path = '/dolibarr/htdocs/document.php?modulepart=' . $modulepart  . '&attachment=0&file=' . str_replace('/', '%2F', $relativepath) . '/';
 										$filearray = dol_dir_list($conf->digiriskdolibarr->multidir_output[$conf->entity].'/'.$element['object']->element_type.'/'.$element['object']->ref.'/', "files", 0, '', '(\.odt|_preview.*\.png)$', 'position_name', 'asc', 1);
@@ -910,8 +910,8 @@ if ($object->id > 0) {
 														<input type="hidden" id="photoLinked0" value="">
 														<div class="wpeo-table table-row">
 															<?php
-															$files =  dol_dir_list(DOL_DATA_ROOT . '/ecm/digiriskdolibarr/medias/tmp');
-															$relativepath = 'digiriskdolibarr/medias/tmp';
+															$files =  dol_dir_list(DOL_DATA_ROOT . '/ecm/digiriskdolibarr/medias');
+															$relativepath = 'digiriskdolibarr/medias';
 															$modulepart = 'ecm';
 															$path = '/dolibarr/htdocs/document.php?modulepart=' . $modulepart  . '&attachment=0&file=' . str_replace('/', '%2F', $relativepath);
 															$i = 0;

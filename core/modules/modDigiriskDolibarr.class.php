@@ -108,8 +108,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			"/ecm/digiriskdolibarr/preventionplan",
 			"/ecm/digiriskdolibarr/groupment",
 			"/ecm/digiriskdolibarr/workunit",
-			"/ecm/digiriskdolibarr/medias",
-			"/ecm/digiriskdolibarr/medias/tmp"
+			"/ecm/digiriskdolibarr/medias"
 		);
 
 		// Config pages.
