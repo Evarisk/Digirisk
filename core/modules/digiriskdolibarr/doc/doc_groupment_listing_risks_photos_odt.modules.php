@@ -33,6 +33,7 @@ dol_include_once('/core/lib/files.lib.php');
 require_once DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/core/modules/digiriskdolibarr/modules_groupment.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/company.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/doc.lib.php';
+require_once DOL_DOCUMENT_ROOT.'/core/lib/images.lib.php';
 
 /**
  *	Class to build documents using ODF templates generator
@@ -430,19 +431,20 @@ class doc_groupment_listing_risks_photos_odt extends ModelePDFGroupment
 										$element->fetch($line->fk_element);
 
 										$tmparray['nomElement'] = $element->ref . ' - ' . $element->label;
-										$tmparray['nomDanger'] = $line->get_danger_name($line);
+										$tmparray['nomDanger'] 	= $line->get_danger_name($line);
 
-										$riskRef = substr($line->ref, 1);
-										$riskRef = ltrim($riskRef, '0');
-										$cotationRef = substr($lastEvaluation->ref, 1);
-										$cotationRef = ltrim($cotationRef, '0');
-										$tmparray['identifiantRisque'] = 'R'. $riskRef . ' - E' . $cotationRef;
-										$tmparray['quotationRisque'] = $lastEvaluation->cotation;
-										$tmparray['commentaireRisque'] = dol_print_date( $lastEvaluation->date_creation, '%A %e %B %G %H:%M' ) . ': ' . $lastEvaluation->comment;
-										//$tmparray['photoAssociee'] = $lastEvaluation->photo;
+										$riskRef 		= substr($line->ref, 1);
+										$riskRef 		= ltrim($riskRef, '0');
+										$cotationRef 	= substr($lastEvaluation->ref, 1);
+										$cotationRef 	= ltrim($cotationRef, '0');
 
-										//$linenumber++;
-										//$tmparray = $this->get_substitutionarray_lines($line, $outputlangs, $linenumber);
+										$tmparray['identifiantRisque'] 	= 'R'. $riskRef . ' - E' . $cotationRef;
+										$tmparray['quotationRisque'] 	= $lastEvaluation->cotation;
+										$tmparray['commentaireRisque']	= dol_print_date( $lastEvaluation->date_creation, '%A %e %B %G %H:%M' ) . ': ' . $lastEvaluation->comment;
+
+										$path 						= DOL_DATA_ROOT .'/digiriskdolibarr/risk/' . $line->ref ;
+										$image 						= $path . '/' . $lastEvaluation->photo;
+										$tmparray['photoAssociee'] = $image;
 
 										unset($tmparray['object_fields']);
 
@@ -452,8 +454,13 @@ class doc_groupment_listing_risks_photos_odt extends ModelePDFGroupment
 										$reshook = $hookmanager->executeHooks('ODTSubstitutionLine', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
 										foreach ($tmparray as $key => $val) {
 											try {
-												$listlines->setVars($key, $val, true, 'UTF-8');
-												//$listlines->setImage($key, $val);
+												if (file_exists($val)) {
+													dol_imageResizeOrCrop($val, 0, 200, 200);
+													$listlines->setImage($key, $val);
+												} else {
+													$listlines->setVars($key, $val, true, 'UTF-8');
+												}
+
 											} catch (OdfException $e) {
 												dol_syslog($e->getMessage(), LOG_INFO);
 											} catch (SegmentException $e) {
