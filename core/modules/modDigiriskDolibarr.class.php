@@ -108,6 +108,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			"/ecm/digiriskdolibarr/preventionplan",
 			"/ecm/digiriskdolibarr/groupment",
 			"/ecm/digiriskdolibarr/workunit",
+			"/ecm/digiriskdolibarr/signalisation",
 			"/ecm/digiriskdolibarr/medias"
 		);
 
@@ -182,7 +183,13 @@ class modDigiriskdolibarr extends DolibarrModules
 			48 => array('DIGIRISKDOLIBARR_DU_PROJECT','chaine', '' ,'', 1),
 			49 => array('DIGIRISKDOLIBARR_RISK_SIMPLIFIED','chaine', 1,'', 1),
 			50 => array('DIGIRISKDOLIBARR_RISK_ADVANCED','chaine', 0,'', 1),
-			51 => array('DIGIRISKDOLIBARR_PROJECT_LINKED','integer', 0,'', 1)
+			51 => array('DIGIRISKDOLIBARR_PROJECT_LINKED','integer', 0,'', 1),
+			40 => array('DIGIRISKDOLIBARR_SIGNALISATION_ADDON_ODT_PATH','chaine', DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/documents/doctemplates/signalisation/' ,'', 1),
+			41 => array('DIGIRISKDOLIBARR_SIGNALISATION_CUSTOM_ADDON_ODT_PATH','chaine', DOL_DATA_ROOT . '/ecm/digiriskdolibarr/signalisation/' ,'', 1),
+			42 => array('DIGIRISKDOLIBARR_SIGNALISATION_ADDON','chaine', 'mod_digirisksignalisation_standard' ,'', 1),
+			43 => array('DIGIRISKDOLIBARR_SIGNALISATION_DEFAULT_MODEL','chaine', 'signalisation_A4_odt' ,'', 1),
+			46 => array('SIGNALISATION_STANDARD_MASK','chaine','E{0000}','', 1),
+
 		);
 
 		if ( ! isset($conf->digiriskdolibarr ) || ! isset( $conf->digiriskdolibarr->enabled ) ) {

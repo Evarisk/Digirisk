@@ -244,6 +244,14 @@ window.eoxiaJS.navigation.event = function() {
 
 	jQuery( document ).on( 'click', '.clickable-photo', window.eoxiaJS.selectPhoto );
 
+	//signalisation
+
+	jQuery( document ).on( 'click', '.signalisation-edit', window.eoxiaJS.editSignalisation );
+	jQuery( document ).on( 'click', '.signalisation-create:not(.button-disable)', window.eoxiaJS.createSignalisation );
+	jQuery( document ).on( 'click', '.signalisation-save', window.eoxiaJS.saveSignalisation );
+	jQuery( document ).on( 'click', '.signalisation-delete', window.eoxiaJS.deleteSignalisation );
+	jQuery( document ).on( 'click', '.signalisation-pic', window.eoxiaJS.haveSignalisationDataInInput );
+
 	//risks
 	jQuery( document ).on( 'click', '.risk-edit', window.eoxiaJS.editRisk );
 	jQuery( document ).on( 'click', '.risk-create:not(.button-disable)', window.eoxiaJS.createRisk );
@@ -568,7 +576,6 @@ window.eoxiaJS.saveRisk = function ( event ) {
 	$('#risk_row_'+editedRiskId).empty()
 	$('#risk_row_'+editedRiskId).load( document.URL + '&action=saveRisk&riskID=' + editedRiskId + commentPost + cotationPost + methodPost + criteres  + descriptionPost + photoPost + ' #risk_row_'+editedRiskId+' > div')
 }
-
 // Dropdown
 /**
  * [dropdown description]
@@ -981,3 +988,83 @@ window.eoxiaJS.selectPhoto = function( event ) {
 	$('.photo-edit'+riskToAssign).children('img').attr('src' , $('#pathToPhoto'+riskToAssign).val() + photoName)
 };
 
+// Onglet signalisations
+
+
+
+window.eoxiaJS.createSignalisation = function ( event ) {
+
+
+	$('.risk-create.wpeo-button.add').addClass('button-disable');
+
+	var description = $('#signalisationComment').val()
+	var descriptionPost = ''
+	if (description !== '') {
+		descriptionPost = '&signalisationComment=' + encodeURI(description)
+	}
+
+	var ref = $('#new_item_ref').val()
+	var refPost = ''
+	if (ref !== 0) {
+		refPost = '&ref=' + ref
+	}
+
+	var category = $('.input-hidden-danger').val()
+	var categoryPost = ''
+	if (category !== 0) {
+		categoryPost = '&category=' + category
+	}
+
+	var photo = $('#photoLinked0').val()
+	var photoPost = ''
+	if (photo !== 0) {
+		photoPost = '&photo=' + encodeURI(photo)
+	}
+
+	$('.main-table').load( document.URL + '&action=add' + refPost  + categoryPost  + descriptionPost  + photoPost + ' .main-table')
+
+}
+
+window.eoxiaJS.editSignalisation = function ( event ) {
+
+	let editedSignalisationId = $(this).attr('value')
+	$('#signalisation_row_'+editedSignalisationId).empty()
+	$('#signalisation_row_'+editedSignalisationId).load( document.URL + '&action=editSignalisation' + editedSignalisationId + ' #signalisation_row_'+editedSignalisationId+' > div')
+
+}
+
+window.eoxiaJS.deleteSignalisation = function ( event ) {
+
+	let deletedSignalisationId = $(this).attr('value')
+	var r = confirm('Are you sure you want to delete this risk ?')
+	if (r == true) {
+		$('#risk_row_'+deletedSignalisationId).empty()
+		$('#risk_row_'+deletedSignalisationId).load( document.URL + '&action=deleteSignalisation&deletedSignalisationId=' + deletedSignalisationId + ' #risk_row_'+deletedSignalisationId+' > div')
+	} else {
+		return false
+	}
+}
+
+window.eoxiaJS.saveSignalisation = function ( event ) {
+
+	let editedSignalisationId = $(this).attr('value')
+
+	var description = $('#signalisationComment'+editedSignalisationId).val()
+
+	var descriptionPost = ''
+	if (description !== '') {
+		descriptionPost = '&riskComment=' + encodeURI(description)
+	}
+
+	var photo = $('#photoLinked'+editedSignalisationId).val()
+	var photoPost = ''
+	if (photo !== 0) {
+		photoPost = '&photo=' + encodeURI(photo)
+	}
+
+	$('#risk_row_'+editedSignalisationId).empty()
+	$('#risk_row_'+editedSignalisationId).load( document.URL + '&action=saveSignalisation&signalisationID=' + editedSignalisationId + descriptionPost + photoPost + ' #risk_row_'+editedSignalisationId+' > div')
+}
+window.eoxiaJS.haveSignalisationDataInInput = function( element ) {
+	$( '.action .wpeo-button.button-disable' ).removeClass( 'button-disable' );
+};

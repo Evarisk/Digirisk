@@ -87,6 +87,11 @@ function digiriskdolibarrAdminPrepareHead()
 	$head[$h][2] = 'risk';
 	$h++;
 
+	$head[$h][0] = dol_buildpath("/digiriskdolibarr/admin/signalisation.php", 1);
+	$head[$h][1] = $langs->trans("Signalisations");
+	$head[$h][2] = 'signalisation';
+	$h++;
+
 //	$head[$h][0] = dol_buildpath("/digiriskdolibarr/admin/evaluations.php", 1);
 //	$head[$h][1] = $langs->trans("Evaluations");
 //	$head[$h][2] = 'evaluation';
