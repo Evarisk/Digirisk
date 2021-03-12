@@ -346,14 +346,14 @@ class DigiriskSignalisation extends CommonObject
 	 * Get danger category picto path
 	 * @return	string $category['thumbnail_name']     path to danger category picto, -1 if don't exist
 	 */
-	public function get_signalisation_category($signalisation)
+	public function get_signalisation_category($signalisation, $param = 'name_thumbnail')
 	{
 
 		$signalisation_categories = $this->get_signalisation_categories();
 
 		foreach ($signalisation_categories as $category) {
 			if ($category['position'] == $signalisation->category) {
-				return $category['name_thumbnail'];
+				return $category[$param];
 			}
 		}
 		return -1;

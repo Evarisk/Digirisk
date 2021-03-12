@@ -1036,10 +1036,10 @@ window.eoxiaJS.editSignalisation = function ( event ) {
 window.eoxiaJS.deleteSignalisation = function ( event ) {
 
 	let deletedSignalisationId = $(this).attr('value')
-	var r = confirm('Are you sure you want to delete this risk ?')
+	var r = confirm('Are you sure you want to delete this signalisation ?')
 	if (r == true) {
-		$('#risk_row_'+deletedSignalisationId).empty()
-		$('#risk_row_'+deletedSignalisationId).load( document.URL + '&action=deleteSignalisation&deletedSignalisationId=' + deletedSignalisationId + ' #risk_row_'+deletedSignalisationId+' > div')
+		$('#signalisation_row_'+deletedSignalisationId).empty()
+		$('#signalisation_row_'+deletedSignalisationId).load( document.URL + '&action=deleteSignalisation&deletedSignalisationId=' + deletedSignalisationId + ' #signalisation_row_'+deletedSignalisationId+' > div')
 	} else {
 		return false
 	}
@@ -1050,10 +1050,9 @@ window.eoxiaJS.saveSignalisation = function ( event ) {
 	let editedSignalisationId = $(this).attr('value')
 
 	var description = $('#signalisationComment'+editedSignalisationId).val()
-
 	var descriptionPost = ''
 	if (description !== '') {
-		descriptionPost = '&riskComment=' + encodeURI(description)
+		descriptionPost = '&signalisationComment=' + encodeURI(description)
 	}
 
 	var photo = $('#photoLinked'+editedSignalisationId).val()
@@ -1062,8 +1061,8 @@ window.eoxiaJS.saveSignalisation = function ( event ) {
 		photoPost = '&photo=' + encodeURI(photo)
 	}
 
-	$('#risk_row_'+editedSignalisationId).empty()
-	$('#risk_row_'+editedSignalisationId).load( document.URL + '&action=saveSignalisation&signalisationID=' + editedSignalisationId + descriptionPost + photoPost + ' #risk_row_'+editedSignalisationId+' > div')
+	$('#signalisation_row_'+editedSignalisationId).empty()
+	$('#signalisation_row_'+editedSignalisationId).load( document.URL + '&action=saveSignalisation&signalisationID=' + editedSignalisationId + descriptionPost + photoPost + ' #signalisation_row_'+editedSignalisationId+' > div')
 }
 window.eoxiaJS.haveSignalisationDataInInput = function( element ) {
 	$( '.action .wpeo-button.button-disable' ).removeClass( 'button-disable' );

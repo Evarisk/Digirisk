@@ -188,7 +188,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			41 => array('DIGIRISKDOLIBARR_SIGNALISATION_CUSTOM_ADDON_ODT_PATH','chaine', DOL_DATA_ROOT . '/ecm/digiriskdolibarr/signalisation/' ,'', 1),
 			42 => array('DIGIRISKDOLIBARR_SIGNALISATION_ADDON','chaine', 'mod_digirisksignalisation_standard' ,'', 1),
 			43 => array('DIGIRISKDOLIBARR_SIGNALISATION_DEFAULT_MODEL','chaine', 'signalisation_A4_odt' ,'', 1),
-			46 => array('SIGNALISATION_STANDARD_MASK','chaine','E{0000}','', 1),
+			46 => array('SIGNALISATION_STANDARD_MASK','chaine','S{0000}','', 1),
 
 		);
 

@@ -174,29 +174,17 @@ if (empty($reshook))
 
 	if ($action == 'saveSignalisation') {
 
-		$signalisationID 			= GETPOST('riskID');
-		$comment 			= GETPOST('riskComment');
-		$cotation 			= GETPOST('cotation');
-		$method 			= GETPOST('cotationMethod');
-		$evaluationComment 	= GETPOST('evaluationComment');
-		$photo 				= GETPOST('photo');
+		$signalisationID = GETPOST('signalisationID');
+		$comment 		 = GETPOST('signalisationComment');
+		$photo 			 = GETPOST('photo');
 
-		$formation 	= GETPOST('formation');
-		$protection = GETPOST('protection');
-		$occurrence = GETPOST('occurrence');
-		$gravite 	= GETPOST('gravite');
-		$exposition = GETPOST('exposition');
-
-		$evaluation 			= new DigiriskEvaluation($db);
-		$evaluation->cotation 	= $cotation;
-		$evaluation->fk_risk 	= $signalisationID;
-		$evaluation->status 	= 1;
-		$evaluation->method 	= $method;
-		$evaluation->comment 	= $db->escape($evaluationComment);
-		$evaluation->photo 		= $photo;
-
-		$signalisation = new Risk($db);
+		$signalisation = new DigiriskSignalisation($db);
 		$signalisation->fetch($signalisationID);
+
+		$signalisation->description 	= $db->escape($comment);
+		$signalisation->photo 			= $photo;
+
+		$signalisation->update($user);
 		$files = dol_dir_list(DOL_DATA_ROOT . '/digiriskdolibarr/signalisation/' . $signalisation->ref . '/');
 		foreach ($files as $file) {
 			unlink(DOL_DATA_ROOT . '/digiriskdolibarr/signalisation/' . $signalisation->ref . '/' . $file['name']);
@@ -206,25 +194,13 @@ if (empty($reshook))
 		mkdir(DOL_DATA_ROOT . '/digiriskdolibarr/signalisation/' . $signalisation->ref);
 		copy(DOL_DATA_ROOT . '/ecm/digiriskdolibarr/medias/' . $photo,DOL_DATA_ROOT . '/digiriskdolibarr/signalisation/' .  $signalisation->ref . '/' . $photo);
 
-		$refCot 			= new $conf->global->DIGIRISKDOLIBARR_EVALUATION_ADDON();
-		$evaluation->ref 	= $refCot->getNextValue($evaluation);
-
-		if ($method == 'digirisk') {
-			$evaluation->formation  	= $formation ;
-			$evaluation->protection  	= $protection ;
-			$evaluation->occurrence  	= $occurrence ;
-			$evaluation->gravite  		= $gravite ;
-			$evaluation->exposition  	= $exposition ;
-		}
-
-		$evaluation->create($user);
 	}
 
 	if ($action == "deleteSignalisation") {
 
 		$id = GETPOST('deletedSignalisationId');
 
-		$signalisation = new Signalisation($db);
+		$signalisation = new DigiriskSignalisation($db);
 		$signalisation->fetch($id);
 		$signalisation->delete($user);
 	}
@@ -343,7 +319,7 @@ if ($object->id > 0) {
 
 									// action = edit
 									if ($action == 'editSignalisation' . $signalisation->id) : ?>
-										<div class="table-row recommendation-row method-evarisk-simplified" id="signalisation_row_<?php echo $signalisation->id ?>">
+										<div class="table-row recommendation-row" id="signalisation_row_<?php echo $signalisation->id ?>">
 											<div data-title="Ref." class="table-cell table-50 cell-reference">
 												<span>
 													<strong>
@@ -357,8 +333,13 @@ if ($object->id > 0) {
 												</span>
 											</div>
 
-											<div class="table-cell table-150 cell-comment" data-title="Commentaire" class="padding">
-												<?php print '<textarea name="signalisationComment" id="signalisationComment'.$signalisation->id.'" class="minwidth150" rows="'.ROWS_2.'">'.$signalisation->description.'</textarea>'."\n"; ?>
+											<div class="table-cell table-150 cell-signalisation" data-title="Signalisation">
+												<div class="wpeo-dropdown dropdown-large category-signalisation padding wpeo-tooltip-event"
+													data-tooltip-persist="true"
+													data-color="red"
+													aria-label="<?php 'Vous devez choisir une catégorie de risque.'?>">
+													<img class="danger-category-pic tooltip hover" src="<?php echo DOL_URL_ROOT . '/custom/digiriskdolibarr/img/' . $signalisation->get_signalisation_category($signalisation) ; ?>" aria-label="" />
+												</div>
 											</div>
 
 											<div class="table-cell table-50 cell-photo" data-title="Photo">
@@ -402,7 +383,7 @@ if ($object->id > 0) {
 																		</a>
 																	</div>
 
-																	<input type="hidden" id="photoLinked<?php echo $signalisation->id ?>" value="">
+																	<input type="hidden" id="photoLinked<?php echo $signalisation->id ?>" value="<?php echo $signalisation->photo ?>">
 																	<div class="wpeo-table table-row">
 																		<?php
 																		$files =  dol_dir_list(DOL_DATA_ROOT . '/ecm/digiriskdolibarr/medias');
@@ -449,17 +430,8 @@ if ($object->id > 0) {
 												</div>
 											</div>
 
-											<div class="table-cell table-50 cell-signalisation" data-title="Signalisation">
-												<div class="wpeo-dropdown dropdown-large category-signalisation padding wpeo-tooltip-event"
-													data-tooltip-persist="true"
-													data-color="red"
-													aria-label="<?php 'Vous devez choisir une catégorie de risque.'?>">
-													<img class="danger-category-pic tooltip hover" src="<?php echo DOL_URL_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $signalisation->get_danger_category($signalisation) . '.png' ; ?>" aria-label="" />
-												</div>
-											</div>
-
-											<div class="table-cell table-150 cell-comment" data-title="Commentaire" class="padding">
-												<?php print '<textarea name="evaluationComment" id="evaluationComment'.$signalisation->id.'" class="minwidth150" rows="'.ROWS_2.'">'.$lastEvaluation->comment.'</textarea>'."\n"; ?>
+											<div class="table-cell table-150 cell-comment" data-title="signalisationComment" class="padding">
+												<?php print '<textarea name="evaluationComment" id="signalisationComment'.$signalisation->id.'" class="minwidth150" rows="'.ROWS_2.'">'.$signalisation->description.'</textarea>'."\n"; ?>
 											</div>
 
 

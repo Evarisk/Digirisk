@@ -32,6 +32,7 @@ dol_include_once('/custom/digiriskdolibarr/lib/files.lib.php');
 dol_include_once('/core/lib/files.lib.php');
 dol_include_once('/digiriskdolibarr/class/risk.class.php');
 dol_include_once('/digiriskdolibarr/class/digiriskevaluation.class.php');
+dol_include_once('/digiriskdolibarr/class/digirisksignalisation.class.php');
 require_once DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/core/modules/digiriskdolibarr/modules_groupment.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/company.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/doc.lib.php';
@@ -464,6 +465,50 @@ class doc_groupment_A4_odt extends ModelePDFGroupment
 								$odfHandler->mergeSegment($listlines);
 							}
 						}
+					}
+
+					$signalisation = new DigiriskSignalisation($this->db);
+
+					if ( ! empty( $object ) ) {
+						$signalisations = $signalisation->fetchFromParent($object->id);
+						if ($signalisations !== -1) {
+							$listlines = $odfHandler->setSegment('affectedRecommandation');
+
+							foreach ($signalisations as $line) {
+
+								$signalisationRef = substr($line->ref, 1);
+								$signalisationRef = ltrim($signalisationRef, '0');
+
+								$path 									= DOL_DOCUMENT_ROOT .'/custom/digiriskdolibarr/img/';
+
+								$tmparray['recommandationIcon'] 		= $path . '/' . $signalisation->get_signalisation_category($signalisation);
+								$tmparray['identifiantRecommandation'] 	= 'S'. $signalisationRef;
+								$tmparray['recommandationName'] 		= $line->get_signalisation_category($line, 'name');
+								$tmparray['recommandationComment'] 		= $line->description;
+
+								unset($tmparray['object_fields']);
+
+								complete_substitutions_array($tmparray, $outputlangs, $object, $line, "completesubstitutionarray_lines");
+								// Call the ODTSubstitutionLine hook
+								$parameters = array('odfHandler' => &$odfHandler, 'file' => $file, 'object' => $object, 'outputlangs' => $outputlangs, 'substitutionarray' => &$tmparray, 'line' => $line);
+								$reshook = $hookmanager->executeHooks('ODTSubstitutionLine', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
+								foreach ($tmparray as $key => $val) {
+									try {
+										if (file_exists($val)) {
+											$listlines->setImage($key, $val);
+										} else {
+											$listlines->setVars($key, $val, true, 'UTF-8');
+										}
+									} catch (OdfException $e) {
+										dol_syslog($e->getMessage(), LOG_INFO);
+									} catch (SegmentException $e) {
+										dol_syslog($e->getMessage(), LOG_INFO);
+									}
+								}
+								$listlines->merge();
+							}
+						}
+						$odfHandler->mergeSegment($listlines);
 					}
 				}
 			}
