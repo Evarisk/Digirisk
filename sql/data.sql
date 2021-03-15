@@ -5,8 +5,8 @@ INSERT INTO llx_document_model (nom, entity, type) VALUES ('preventionplan_A4_od
 INSERT INTO llx_document_model (nom, entity, type) VALUES ('groupment_A4_odt', 1, 'groupment');
 INSERT INTO llx_document_model (nom, entity, type) VALUES ('workunit_A4_odt', 1, 'workunit');
 INSERT INTO llx_document_model (nom, entity, type) VALUES ('risk_A4_odt', 1, 'risk');
-INSERT INTO llx_document_model (nom, entity, type) VALUES ('groupment_listing_risks_photos_odt', 1, 'groupment');
-INSERT INTO llx_document_model (nom, entity, type) VALUES ('groupment_listing_risks_actions_odt', 1, 'groupment');
+INSERT INTO llx_document_model (nom, entity, type) VALUES ('listing_risks_photos_odt', 1, 'listingrisksphoto');
+INSERT INTO llx_document_model (nom, entity, type) VALUES ('listing_risks_actions_odt', 1, 'listingrisksaction');
 
 INSERT INTO llx_c_action_trigger (elementtype, code, label, description) VALUES ('informationssharing', 'INFORMATIONSSHARING_GENERATE', 'Informations Sharing Document Generated', 'Executed when a informations sharing document is generated');
 INSERT INTO llx_c_action_trigger (elementtype, code, label, description) VALUES ('firepermit', 'FIREPERMIT_GENERATE', 'Fire Permit Document Generated', 'Executed when a fire permit document is generated');

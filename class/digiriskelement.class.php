@@ -997,9 +997,15 @@ class DigiriskElement extends CommonObject
 		$modelpath = "core/modules/digiriskdolibarr/doc/";
 
 		$template = preg_replace('/_odt/', '.odt', $modele );
-		$path = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/documents/doctemplates/'. $this->element_type . '/';
-		$modele = $modele.":". $path . "template_" . $template;
 
+		if ( preg_match( '/listing_risks_photos/', $template ) ) {
+			$path = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/documents/doctemplates/listingrisksphoto/';
+		} elseif ( preg_match( '/listing_risks_actions/', $template ) ) {
+			$path = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/documents/doctemplates/listingrisksaction/';
+		} elseif ( preg_match( '/groupment/', $template ) || preg_match( '/workunit/', $template ) ) {
+			$path = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/documents/doctemplates/'. $this->element_type . '/';
+		}
+		$modele = $modele.":". $path . "template_" . $template;
 		if ($includedocgeneration) {
 			$result = $this->commonGenerateDocument($modelpath, $modele, $outputlangs, $hidedetails, $hidedesc, $hideref, $moreparams);
 		}
@@ -1228,7 +1234,7 @@ class DigiriskElement extends CommonObject
 							<span class="floatleft inline-block valignmiddle divphotoref"><img class="photodigiriskdolibarr" alt="No photo" src="<?php echo DOL_URL_ROOT.$nophoto ?>"></span>
 						<?php } ?>
 						<div class="title" id="scores" value="<?php echo $element['object']->id ?>" >
-								<a id="slider" class="linkElement id<?php echo $element['object']->id;?>" href="digiriskelement_card.php?id=<?php echo $element['object']->id; ?>">
+								<a id="slider" class="linkElement id<?php echo $element['object']->id;?>" href="digiriskelement_risk.php?id=<?php echo $element['object']->id; ?>">
 									<span class="title-container">
 										<span class="ref"><?php echo $element['object']->ref; ?></span>
 										<span class="name"><?php echo $element['object']->label; ?></span>

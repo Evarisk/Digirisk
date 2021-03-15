@@ -92,6 +92,16 @@ function digiriskdolibarrAdminPrepareHead()
 	$head[$h][2] = 'signalisation';
 	$h++;
 
+	$head[$h][0] = dol_buildpath("/digiriskdolibarr/admin/listingrisksphoto.php", 1);
+	$head[$h][1] = $langs->trans("ListingRisksPhoto");
+	$head[$h][2] = 'listingrisksphoto';
+	$h++;
+
+	$head[$h][0] = dol_buildpath("/digiriskdolibarr/admin/listingrisksaction.php", 1);
+	$head[$h][1] = $langs->trans("ListingRisksAction");
+	$head[$h][2] = 'listingrisksaction';
+	$h++;
+
 //	$head[$h][0] = dol_buildpath("/digiriskdolibarr/admin/evaluations.php", 1);
 //	$head[$h][1] = $langs->trans("Evaluations");
 //	$head[$h][2] = 'evaluation';

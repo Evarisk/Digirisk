@@ -47,8 +47,18 @@ function digiriskelementPrepareHead($object)
 		$h++;
 
 		$head[$h][0] = dol_buildpath("/digiriskdolibarr/digiriskelement_card.php", 1).'?id='.$object->id;
-		$head[$h][1] = $langs->trans("Card");
+		$head[$h][1] = $langs->trans("Card") . ' ' . $object->ref;
 		$head[$h][2] = 'elementCard';
+		$h++;
+
+		$head[$h][0] = dol_buildpath("/digiriskdolibarr/digiriskelement_listingrisksphoto.php", 1).'?id='.$object->id;
+		$head[$h][1] = $langs->trans("ListingRisksPhoto");
+		$head[$h][2] = 'listingrisksphoto';
+		$h++;
+
+		$head[$h][0] = dol_buildpath("/digiriskdolibarr/digiriskelement_listingrisksaction.php", 1).'?id='.$object->id;
+		$head[$h][1] = $langs->trans("ListingRisksAction");
+		$head[$h][2] = 'listingriskaction';
 		$h++;
 
 		if (isset($object->fields['note_public']) || isset($object->fields['note_private']))
@@ -86,7 +96,7 @@ function digiriskelementPrepareHead($object)
 	} else {
 
 		$head[$h][0] = dol_buildpath("/digiriskdolibarr/digiriskelement_card.php", 1);
-		$head[$h][1] = $langs->trans("Card");
+		$head[$h][1] = $langs->trans("Informations");
 		$head[$h][2] = 'elementCard';
 		$h++;
 
@@ -99,6 +109,26 @@ function digiriskelementPrepareHead($object)
 		$head[$h][1] = $langs->trans("InformationsSharing");
 		$head[$h][2] = 'informationssharing';
 		$h++;
+
+		$head[$h][0] = dol_buildpath("/digiriskdolibarr/digiriskelement_listingrisksphoto.php", 1);
+		$head[$h][1] = $langs->trans("ListingRisksPhoto");
+		$head[$h][2] = 'listingrisksphoto';
+		$h++;
+
+		$head[$h][0] = dol_buildpath("/digiriskdolibarr/digiriskelement_listingrisksaction.php", 1);
+		$head[$h][1] = $langs->trans("ListingRisksAction");
+		$head[$h][2] = 'listingriskaction';
+		$h++;
+
+//		$head[$h][0] = dol_buildpath("/digiriskdolibarr/digiriskelement_evaluator.php", 1);
+//		$head[$h][1] = $langs->trans("Evaluator");
+//		$head[$h][2] = 'evaluator';
+//		$h++;
+
+//		$head[$h][0] = dol_buildpath("/digiriskdolibarr/digiriskelement_duer.php", 1);
+//		$head[$h][1] = $langs->trans("ListingRisksAction");
+//		$head[$h][2] = 'duer';
+//		$h++;
 
 		if (isset($object->fields['note_public']) || isset($object->fields['note_private']))
 		{
@@ -123,10 +153,10 @@ function digiriskelementPrepareHead($object)
 		$head[$h][2] = 'elementDocument';
 		$h++;
 
-		$head[$h][0] = dol_buildpath("/digiriskdolibarr/digiriskelement_agenda.php", 1);
-		$head[$h][1] = $langs->trans("Events");
-		$head[$h][2] = 'elementAgenda';
-		$h++;
+//		$head[$h][0] = dol_buildpath("/digiriskdolibarr/digiriskelement_agenda.php", 1);
+//		$head[$h][1] = $langs->trans("Events");
+//		$head[$h][2] = 'elementAgenda';
+//		$h++;
 
 		complete_head_from_modules($conf, $langs, $object, $head, $h, 'digiriskelement@digiriskdolibarr');
 

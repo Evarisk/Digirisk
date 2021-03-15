@@ -239,6 +239,9 @@ lastEvaluationOn = Dernière évaluation le
 EvaluatedOn = le
 TasksManagement = Gestion des tâches
 ProjectLinked = Projet lié aux tâches des risques
+ListingRisksPhoto = Listing des risques photo
+ListingRisksAction = Listing des actions correctives
+
 #
 # Data
 #
