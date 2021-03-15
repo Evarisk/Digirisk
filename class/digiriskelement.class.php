@@ -1090,32 +1090,8 @@ class DigiriskElement extends CommonObject
 			$tmpcsstouse .= ' colorblind-'.strip_tags($conf->global->MAIN_OPTIMIZEFORCOLORBLIND);
 		}
 
-		print '<body id="mainbody" class="'.$tmpcsstouse.'">'."\n"; ?>
-
-		<?php //Top Menu ?>
-		<?php if (empty($conf->global->TAKEPOS_HIDE_HEAD_BAR)) { ?>
-		<div class="header">
-			<div class="topnav">
-				<div class="topnav-left">
-					<div class="inline-block valignmiddle">
-						<img src="img/digiriskdolibarr.png" width="32" height="32" alt="" class="inline-block">
-						<span class="hideonsmartphone"><?php echo $langs->trans("Digirisk"); ?></span>
-					</div>
-				</div>
-				<div class="topnav-right">
-					<div class="login_block_other">
-						<a onclick="window.location.href='<?php echo DOL_URL_ROOT; ?>';"><span class="fas fa-home"></span></a>
-					</div>
-					<div class="login_block_user">
-						<?php print top_menu_user(1, DOL_URL_ROOT.'/user/logout.php'); ?>
-					</div>
-				</div>
-			</div>
-		</div>
-	<?php } ?>
-
-
-		<?php //Body navigation digirisk
+		print '<body id="mainbody" class="'.$tmpcsstouse.'">'."\n";
+		llxHeader('');//Body navigation digirisk
 		$object  = new DigiriskElement($this->db);
 		$objects = $object->fetchAll('', '', 0,0,array('entity' => $conf->entity));
 		$results  = $this->recurse_tree(0,0,$objects); ?>

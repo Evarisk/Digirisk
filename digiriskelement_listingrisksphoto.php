@@ -361,7 +361,7 @@ if ((empty($action) || ($action != 'edit' && $action != 'create')))
 	}
 
 	// Document Generation -- Génération des documents
-	print '<h2>' . $langs->trans('ListingRisksPhoto') . '</h2>';
+	print '<h2>' . $langs->trans('ListingRisksPhoto') . ($object->id ? ' ' . $object->ref : ' ' . 'global') . '</h2>';
 
 	if ($action != 'presend')
 	{
