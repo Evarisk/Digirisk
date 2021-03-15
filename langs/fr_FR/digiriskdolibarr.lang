@@ -241,6 +241,8 @@ TasksManagement = Gestion des tâches
 ProjectLinked = Projet lié aux tâches des risques
 ListingRisksPhoto = Listing des risques photo
 ListingRisksAction = Listing des actions correctives
+ListingRisksPhotosGeneratedWithDolibarr = Listing de risques photo généré avec Dolibarr
+ListingRisksActionsGeneratedWithDolibarr = Listing de risques actions correctives généré avec Dolibarr
 
 #
 # Data

@@ -1571,4 +1571,43 @@ class DigiriskElement extends CommonObject
 			return -1;
 		}
 	}
+		/**
+	 *		Set last model used by doc generator
+	 *
+	 *		@param		User	$user		User object that make change
+	 *		@param		string	$modelpdf	Modele name
+	 *		@return		int					<0 if KO, >0 if OK
+	 */
+	public function setDocModel($user, $modelpdf)
+	{
+		if (!$this->table_element)
+		{
+			dol_syslog(get_class($this)."::setDocModel was called on objet with property table_element not defined", LOG_ERR);
+			return -1;
+		}
+		if ($this->id > 0) {
+			$newmodelpdf = dol_trunc($modelpdf, 255);
+
+		$sql = "UPDATE ".MAIN_DB_PREFIX.$this->table_element;
+		$sql .= " SET model_pdf = '".$this->db->escape($newmodelpdf)."'";
+		$sql .= " WHERE rowid = ".$this->id;
+		// if ($this->element == 'facture') $sql.= " AND fk_statut < 2";
+		// if ($this->element == 'propal')  $sql.= " AND fk_statut = 0";
+
+		dol_syslog(get_class($this)."::setDocModel", LOG_DEBUG);
+		$resql = $this->db->query($sql);
+		if ($resql)
+		{
+			$this->modelpdf = $modelpdf;
+			return 1;
+		}
+		else
+		{
+			dol_print_error($this->db);
+			return 0;
+		}
+		}
+
+	}
+
 }

@@ -58,7 +58,7 @@ function digiriskelementPrepareHead($object)
 
 		$head[$h][0] = dol_buildpath("/digiriskdolibarr/digiriskelement_listingrisksaction.php", 1).'?id='.$object->id;
 		$head[$h][1] = $langs->trans("ListingRisksAction");
-		$head[$h][2] = 'listingriskaction';
+		$head[$h][2] = 'listingrisksaction';
 		$h++;
 
 		if (isset($object->fields['note_public']) || isset($object->fields['note_private']))
@@ -117,7 +117,7 @@ function digiriskelementPrepareHead($object)
 
 		$head[$h][0] = dol_buildpath("/digiriskdolibarr/digiriskelement_listingrisksaction.php", 1);
 		$head[$h][1] = $langs->trans("ListingRisksAction");
-		$head[$h][2] = 'listingriskaction';
+		$head[$h][2] = 'listingrisksaction';
 		$h++;
 
 //		$head[$h][0] = dol_buildpath("/digiriskdolibarr/digiriskelement_evaluator.php", 1);

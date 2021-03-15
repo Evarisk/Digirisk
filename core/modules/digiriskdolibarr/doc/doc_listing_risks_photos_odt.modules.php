@@ -203,22 +203,33 @@ class doc_listing_risks_photos_odt extends ModelePDFListingRisksPhoto
 		$outputlangs->loadLangs(array("main", "dict", "companies", "bills"));
 
 
-		// If $object is id instead of object
-		if (!is_object($object))
-		{
-			$id = $object;
-			$object = new DigiriskElement($this->db);
-			$result = $object->fetch($id);
-			if ($result < 0)
+		if ($object->id > 0) {
+			// If $object is id instead of object
+			if (!is_object($object))
 			{
-				dol_print_error($this->db, $object->error);
-				return -1;
+				$id = $object;
+				$object = new DigiriskElement($this->db);
+				$result = $object->fetch($id);
+				if ($result < 0)
+				{
+					dol_print_error($this->db, $object->error);
+					return -1;
+				}
 			}
+		} else {
+			$object = new DigiriskElement($this->db);
+
+			$object->modelpdf = 'listing_risks_photos_odt';
 		}
 
-		$dir = $conf->digiriskdolibarr->multidir_output[isset($object->entity) ? $object->entity : 1] . '/listingrisksphoto';
+
+		$dir = $conf->digiriskdolibarr->multidir_output[isset($conf->entity) ? $conf->entity : 1] . '/listingrisksphoto';
 		$objectref = dol_sanitizeFileName($object->ref);
-		if (!preg_match('/specimen/i', $objectref)) $dir .= '/' . $objectref;
+		if (strlen($objectref)) {
+			if (!preg_match('/specimen/i', $objectref)) $dir .= '/' . $objectref;
+		} else {
+			$dir .= '/' . 'mycompany';
+		}
 
 		$file = $dir."/".$objectref.".odt";
 
@@ -254,16 +265,20 @@ class doc_listing_risks_photos_odt extends ModelePDFListingRisksPhoto
 			{
 				$objectlabel = dol_sanitizeFileName($object->label);
 				$objectlabel = preg_replace('/ /', '_', $objectlabel);
-				$filename = dol_print_date(dol_now(),'%Y%m%d') . '_' . $objectref . '_listing_risques_photo_' . $objectlabel . '.' . $newfileformat;
+				$filename = dol_print_date(dol_now(),'%Y%m%d') . (strlen($objectref) ? '_' . $objectref : '') . '_listing_risques_photo_' . (strlen($objectlabel) ? $objectlabel : 'global') . '.' . $newfileformat;
 			}
 			$object->last_main_doc = $filename;
 
-			$sql = "UPDATE ".MAIN_DB_PREFIX."digirisk_documents";
-			$sql .= " SET last_main_doc =" .(!empty($filename) ? "'".$this->db->escape($filename)."'" : 'null');
-			$sql .= " WHERE rowid = ".$object->id;
+			if ($object->id > 0) {
+				$sql = "UPDATE ".MAIN_DB_PREFIX."digirisk_documents";
+				$sql .= " SET last_main_doc =" .(!empty($filename) ? "'".$this->db->escape($filename)."'" : 'null');
+				$sql .= " WHERE rowid = ".$object->id;
 
-			dol_syslog("admin.lib::Insert last main doc", LOG_DEBUG);
-			$this->db->query($sql);
+				dol_syslog("admin.lib::Insert last main doc", LOG_DEBUG);
+				$this->db->query($sql);
+			}
+
+
 
 			$file = $dir.'/'.$filename;
 
@@ -415,6 +430,66 @@ class doc_listing_risks_photos_odt extends ModelePDFListingRisksPhoto
 
 					if ( ! empty( $object ) ) {
 						$risks = $risk->fetchRisksOrderedByCotation($object->id, true);
+						if ($risks !== -1) {
+							for ($i = 1; $i <= 4; $i++ ) {
+								$listlines = $odfHandler->setSegment('risk' . $i);
+
+								foreach ($risks as $line) {
+									$evaluation = new DigiriskEvaluation($this->db);
+									$lastEvaluation = $evaluation->fetchFromParent($line->id, 1);
+									$lastEvaluation = array_shift($lastEvaluation);
+									$scale = $lastEvaluation->get_evaluation_scale();
+
+									if ( $scale == $i ) {
+
+										$element = new DigiriskElement($this->db);
+										$element->fetch($line->fk_element);
+
+										$tmparray['nomElement'] = $element->ref . ' - ' . $element->label;
+										$tmparray['nomDanger'] 	= $line->get_danger_name($line);
+
+										$riskRef 		= substr($line->ref, 1);
+										$riskRef 		= ltrim($riskRef, '0');
+										$cotationRef 	= substr($lastEvaluation->ref, 1);
+										$cotationRef 	= ltrim($cotationRef, '0');
+
+										$tmparray['identifiantRisque'] 	= 'R'. $riskRef . ' - E' . $cotationRef;
+										$tmparray['quotationRisque'] 	= $lastEvaluation->cotation;
+										$tmparray['commentaireRisque']	= dol_print_date( $lastEvaluation->date_creation, '%A %e %B %G %H:%M' ) . ': ' . $lastEvaluation->comment;
+
+										$path 						= DOL_DATA_ROOT .'/digiriskdolibarr/risk/' . $line->ref ;
+										$image 						= $path . '/' . $lastEvaluation->photo;
+										$tmparray['photoAssociee'] = $image;
+
+										unset($tmparray['object_fields']);
+
+										complete_substitutions_array($tmparray, $outputlangs, $object, $line, "completesubstitutionarray_lines");
+										// Call the ODTSubstitutionLine hook
+										$parameters = array('odfHandler' => &$odfHandler, 'file' => $file, 'object' => $object, 'outputlangs' => $outputlangs, 'substitutionarray' => &$tmparray, 'line' => $line);
+										$reshook = $hookmanager->executeHooks('ODTSubstitutionLine', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
+										foreach ($tmparray as $key => $val) {
+											try {
+												if (file_exists($val)) {
+													dol_imageResizeOrCrop($val, 0, 200, 200);
+													$listlines->setImage($key, $val);
+												} else {
+													$listlines->setVars($key, $val, true, 'UTF-8');
+												}
+
+											} catch (OdfException $e) {
+												dol_syslog($e->getMessage(), LOG_INFO);
+											} catch (SegmentException $e) {
+												dol_syslog($e->getMessage(), LOG_INFO);
+											}
+										}
+										$listlines->merge();
+									}
+								}
+								$odfHandler->mergeSegment($listlines);
+							}
+						}
+					} else {
+						$risks = $risk->fetchRisksOrderedByCotation(0, true);
 						if ($risks !== -1) {
 							for ($i = 1; $i <= 4; $i++ ) {
 								$listlines = $odfHandler->setSegment('risk' . $i);
