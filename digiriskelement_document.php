@@ -108,8 +108,16 @@ $help_url = '';
 $morejs = array("/digiriskdolibarr/js/digiriskdolibarr.js.php");
 
 $object->digiriskHeader('', $title, $help_url, '', '', '', $morejs);
+if (!$object->id) {
 
-if ($object->id)
+	$object->ref = $conf->global->MAIN_INFO_SOCIETE_NOM;
+	$object->label = 'Societe principale';
+	$object->entity = 2;
+	unset($object->fields['element_type']);
+
+
+}
+if (true)
 {
 	/*
 	 * Show tabs

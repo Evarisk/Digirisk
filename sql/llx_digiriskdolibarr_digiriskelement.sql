@@ -29,6 +29,7 @@ CREATE TABLE llx_digiriskdolibarr_digiriskelement(
 	element_type varchar(50), 
 	fk_parent integer NOT NULL, 
 	model_pdf varchar(255), 
-	last_main_doc varchar(50)
+	last_main_doc varchar(50), 
+	entity integer DEFAULT 1
 	-- END MODULEBUILDER FIELDS
 ) ENGINE=innodb;

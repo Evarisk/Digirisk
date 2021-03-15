@@ -219,6 +219,7 @@ if ($action == 'create')
 	unset($object->fields['element_type']);
 	unset($object->fields['fk_parent']);
 	unset($object->fields['last_main_doc']);
+	unset($object->fields['entity']);
 
 	print '<table class="border centpercent tableforfieldcreate">'."\n";
 
@@ -273,6 +274,7 @@ if (($id || $ref) && $action == 'edit')
 	unset($object->fields['element_type']);
 	unset($object->fields['fk_parent']);
 	unset($object->fields['last_main_doc']);
+	unset($object->fields['entity']);
 
 	print '<table class="border centpercent tableforfieldedit">'."\n";
 
@@ -292,9 +294,17 @@ if (($id || $ref) && $action == 'edit')
 
 	print '</form>';
 }
+if (!$object->id) {
 
+	$object->ref = $conf->global->MAIN_INFO_SOCIETE_NOM;
+	$object->label = 'Societe principale';
+	$object->entity = 2;
+	unset($object->fields['element_type']);
+
+
+}
 // Part to show record
-if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'create')))
+if ((empty($action) || ($action != 'edit' && $action != 'create')))
 {
 	$res = $object->fetch_optionals();
 
@@ -344,35 +354,49 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 	$morehtmlref = '<div class="refidno">';
 	$morehtmlref .= '</div>';
 	$width = 80; $cssclass = 'photoref';
-	$morehtmlleft .= '<div class="floatleft inline-block valignmiddle divphotoref">'.$object->digirisk_show_photos('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$entity].'/'.$object->element_type, 'small', 5, 0, 0, 0, $width,0, 0, 0, 0, $object->element_type).'</div>';
+
+	$relativepath = 'logos';
+	$path = '/dolibarr/htdocs/document.php?modulepart=mycompany&attachment=0&file=' . str_replace('/', '%2F', $relativepath) . '/';
+	$morehtmlleft .= '<img class="photo maxwidth50"  src="' . $path . 'logobdj.jpg' .'">';
 
 	$object->digirisk_banner_tab($object, 'ref', '', 0, 'ref', 'ref', $morehtmlref, '', 0, $morehtmlleft);
 
 	unset($object->fields['element_type']);
 	unset($object->fields['fk_parent']);
 	unset($object->fields['last_main_doc']);
+	unset($object->fields['entity']);
 
 	print '<div class="fichecenter">';
 	print '<div class="fichehalfleft">';
 	print '<div class="underbanner clearboth"></div>';
 	print '<table class="border centpercent tableforfield">'."\n";
 
+	if ($object->id) {
 
-	print '<tr><td class="titlefield">'.$langs->trans("ElementType").'</td><td>';
-	print $langs->trans($object->element_type);
-	print '</td></tr>';
+		print '<tr><td class="titlefield">' . $langs->trans("ElementType") . '</td><td>';
+		print $langs->trans($object->element_type);
+		print '</td></tr>';
 
-	print '<div class="titlefield hidden elementID" id="elementID" value="'.$object->id.'">'.$langs->trans("ID").'</div>';
-	print '<tr><td class="titlefield">'.$langs->trans("ParentElement").'</td><td>';
-	$parent_element = new DigiriskElement($db);
-	$result = $parent_element->fetch($object->fk_parent);
-	if ($result > 0) {
-		print $parent_element->ref . ( !empty($parent_element->description) ?  ' - ' . $parent_element->description : '');
+		print '<div class="titlefield hidden elementID" id="elementID" value="'.$object->id.'">'.$langs->trans("ID").'</div>';
+		print '<tr><td class="titlefield">'.$langs->trans("ParentElement").'</td><td>';
+		$parent_element = new DigiriskElement($db);
+		$result = $parent_element->fetch($object->fk_parent);
+		if ($result > 0) {
+			print $parent_element->ref . ( !empty($parent_element->description) ?  ' - ' . $parent_element->description : '');
+		}
+		else
+		{
+			print $conf->global->MAIN_INFO_SOCIETE_NOM;
+		}
+
+		print '</td></tr>';
+
+	} else {
+		unset($object->fields['description']);
+		unset($object->fields['label']);
 	}
-	else {
-		print $conf->global->MAIN_INFO_SOCIETE_NOM;
-	}
-	print '</td></tr>';
+
+
 
 	//Show common fields
 	include DOL_DOCUMENT_ROOT.'/core/tpl/commonfields_view.tpl.php';

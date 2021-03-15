@@ -129,7 +129,16 @@ if (empty($reshook))
 
 $form = new Form($db);
 
-if ($object->id > 0)
+if (!$object->id) {
+
+	$object->ref = $conf->global->MAIN_INFO_SOCIETE_NOM;
+	$object->label = 'Societe principale';
+	$object->entity = 2;
+	unset($object->fields['element_type']);
+
+
+}
+if (true)
 {
 
 	$title = $langs->trans("Agenda");

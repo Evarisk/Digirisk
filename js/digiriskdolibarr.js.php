@@ -350,18 +350,25 @@ window.eoxiaJS.navigation.setUnitActive = function( event ) {
 };
 
 window.eoxiaJS.redirect = function( event ) {
-
+	var URLToGo = '';
 	var params = new window.URLSearchParams(window.location.search);
 	var id = $(params.get('id'))
 
 	//get ID from div selected in left menu
 	history.pushState({ path:  document.URL}, '', this.href)
 	//change URL without refresh
+	if (!id) {
+		URLToGo = document.URL.split('?id=')[0]
+	} else {
+		URLToGo = document.URL
+	}
+	console.log(id)
+	console.log(URLToGo)
 
 	//empty and fill object card
 	$('#cardContent').empty()
 	//$('#cardContent').attr('value', id)
-	$('#cardContent').load( document.URL + ' #cardContent' , id);
+	$('#cardContent').load( URLToGo + ' #cardContent' , id);
 	return false;
 };
 

@@ -111,6 +111,7 @@ class DigiriskElement extends CommonObject
 		'fk_parent' => array('type'=>'integer', 'label'=>'ParentElement', 'enabled'=>'1', 'position'=>1020, 'notnull'=>1, 'visible'=>1,),
 		'model_pdf' => array('type'=>'varchar(255)', 'label'=>'Model pdf', 'enabled'=>'1', 'position'=>1030, 'notnull'=>-1, 'visible'=>0,),
 		'last_main_doc' => array('type'=>'varchar(50)', 'label'=>'LastMainDoc', 'enabled'=>'1', 'position'=>1050, 'notnull'=>0, 'visible'=>-1,),
+		'entity' => array('type'=>'integer', 'label'=>'Entity', 'enabled'=>'1', 'position'=>550, 'notnull'=>0, 'visible'=>-1,),
 	);
 	public $rowid;
 	public $ref;
@@ -126,6 +127,7 @@ class DigiriskElement extends CommonObject
 	public $fk_parent;
 	public $model_pdf;
 	public $last_main_doc;
+	public $entity;
 	// END MODULEBUILDER PROPERTIES
 
 
@@ -1109,7 +1111,7 @@ class DigiriskElement extends CommonObject
 
 		<?php //Body navigation digirisk
 		$object  = new DigiriskElement($this->db);
-		$objects = $object->fetchAll();
+		$objects = $object->fetchAll('', '', 0,0,array('entity' => $conf->entity));
 		$results  = $this->recurse_tree(0,0,$objects); ?>
 		<div id="id-container" class="id-container">
 			<div class="side-nav" style="width: 500px; display: block">
@@ -1287,7 +1289,7 @@ class DigiriskElement extends CommonObject
 	 *  @param		int		$usesharelink	Use the public shared link of image (if not available, the 'nophoto' image will be shown instead)
 	 *  @return     string					Html code to show photo. Number of photos shown is saved in this->nbphoto
 	 */
-	public function digirisk_show_photos($modulepart, $sdir, $size = 0, $nbmax = 0, $nbbyrow = 5, $showfilename = 0, $showaction = 0, $maxHeight = 120, $maxWidth = 160, $nolink = 0, $notitle = 0, $usesharelink = 0, $subdir)
+	public function digirisk_show_photos($modulepart, $sdir, $size = 0, $nbmax = 0, $nbbyrow = 5, $showfilename = 0, $showaction = 0, $maxHeight = 120, $maxWidth = 160, $nolink = 0, $notitle = 0, $usesharelink = 0, $subdir = '')
 	{
         // phpcs:enable
 		global $conf, $user, $langs;
@@ -1299,7 +1301,9 @@ class DigiriskElement extends CommonObject
 		$sortorder = 'asc';
 
 		$dir = $sdir.'/';
+
 		$pdir = '/' . $subdir . '/';
+
 
 		$dir .= get_exdir(0, 0, 0, 0, $this, $modulepart).$this->ref.'/';
 		$pdir .= get_exdir(0, 0, 0, 0, $this, $modulepart).$this->ref.'/';
@@ -1327,7 +1331,6 @@ class DigiriskElement extends CommonObject
 		$nbphoto = 0;
 
 		$filearray = dol_dir_list($dir, "files", 0, '', '(\.meta|_preview.*\.png)$', $sortfield, (strtolower($sortorder) == 'desc' ?SORT_DESC:SORT_ASC), 1);
-
 		/*if (! empty($conf->global->PRODUCT_USE_OLD_PATH_FOR_PHOTO))    // For backward compatiblity, we scan also old dirs
 		 {
 		 $filearrayold=dol_dir_list($dirold,"files",0,'','(\.meta|_preview.*\.png)$',$sortfield,(strtolower($sortorder)=='desc'?SORT_DESC:SORT_ASC),1);

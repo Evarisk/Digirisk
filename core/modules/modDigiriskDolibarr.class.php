@@ -117,7 +117,7 @@ class modDigiriskdolibarr extends DolibarrModules
 		// Dependencies
 
 		$this->hidden                  = false;
-		$this->depends                 = array('modAgenda', 'modECM', 'modProjet');
+		$this->depends                 = array('modAgenda', 'modECM', 'modProject');
 		$this->requiredby              = array();
 		$this->conflictwith            = array();
 		$this->langfiles               = array("digiriskdolibarr@digiriskdolibarr");
@@ -184,11 +184,11 @@ class modDigiriskdolibarr extends DolibarrModules
 			49 => array('DIGIRISKDOLIBARR_RISK_SIMPLIFIED','chaine', 1,'', 1),
 			50 => array('DIGIRISKDOLIBARR_RISK_ADVANCED','chaine', 0,'', 1),
 			51 => array('DIGIRISKDOLIBARR_PROJECT_LINKED','integer', 0,'', 1),
-			40 => array('DIGIRISKDOLIBARR_SIGNALISATION_ADDON_ODT_PATH','chaine', DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/documents/doctemplates/signalisation/' ,'', 1),
-			41 => array('DIGIRISKDOLIBARR_SIGNALISATION_CUSTOM_ADDON_ODT_PATH','chaine', DOL_DATA_ROOT . '/ecm/digiriskdolibarr/signalisation/' ,'', 1),
-			42 => array('DIGIRISKDOLIBARR_SIGNALISATION_ADDON','chaine', 'mod_digirisksignalisation_standard' ,'', 1),
-			43 => array('DIGIRISKDOLIBARR_SIGNALISATION_DEFAULT_MODEL','chaine', 'signalisation_A4_odt' ,'', 1),
-			46 => array('SIGNALISATION_STANDARD_MASK','chaine','S{0000}','', 1),
+			52 => array('DIGIRISKDOLIBARR_SIGNALISATION_ADDON_ODT_PATH','chaine', DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/documents/doctemplates/signalisation/' ,'', 1),
+			53 => array('DIGIRISKDOLIBARR_SIGNALISATION_CUSTOM_ADDON_ODT_PATH','chaine', DOL_DATA_ROOT . '/ecm/digiriskdolibarr/signalisation/' ,'', 1),
+			54 => array('DIGIRISKDOLIBARR_SIGNALISATION_ADDON','chaine', 'mod_digirisksignalisation_standard' ,'', 1),
+			55 => array('DIGIRISKDOLIBARR_SIGNALISATION_DEFAULT_MODEL','chaine', 'signalisation_A4_odt' ,'', 1),
+			56 => array('SIGNALISATION_STANDARD_MASK','chaine','S{0000}','', 1),
 
 		);
 
