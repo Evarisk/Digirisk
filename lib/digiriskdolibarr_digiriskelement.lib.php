@@ -100,24 +100,24 @@ function digiriskelementPrepareHead($object)
 		$head[$h][2] = 'elementCard';
 		$h++;
 
-		$head[$h][0] = dol_buildpath("/digiriskdolibarr/legaldisplay_card.php?action=create", 1);
+		$head[$h][0] = dol_buildpath("/digiriskdolibarr/digiriskelement_legaldisplay.php", 1);
 		$head[$h][1] = $langs->trans("LegalDisplay");
-		$head[$h][2] = 'legaldisplay';
+		$head[$h][2] = 'elementLegaldisplay';
 		$h++;
 
 		$head[$h][0] = dol_buildpath("/digiriskdolibarr/informationssharing_card.php?action=create", 1);
 		$head[$h][1] = $langs->trans("InformationsSharing");
-		$head[$h][2] = 'informationssharing';
+		$head[$h][2] = 'elementInformationssharing';
 		$h++;
 
 		$head[$h][0] = dol_buildpath("/digiriskdolibarr/digiriskelement_listingrisksphoto.php", 1);
 		$head[$h][1] = $langs->trans("ListingRisksPhoto");
-		$head[$h][2] = 'listingrisksphoto';
+		$head[$h][2] = 'elementListingrisksphoto';
 		$h++;
 
 		$head[$h][0] = dol_buildpath("/digiriskdolibarr/digiriskelement_listingrisksaction.php", 1);
 		$head[$h][1] = $langs->trans("ListingRisksAction");
-		$head[$h][2] = 'listingrisksaction';
+		$head[$h][2] = 'elementListingrisksaction';
 		$h++;
 
 //		$head[$h][0] = dol_buildpath("/digiriskdolibarr/digiriskelement_evaluator.php", 1);

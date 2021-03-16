@@ -313,21 +313,26 @@ class LegalDisplay extends DigiriskDocuments
 
 	public function getIDCCByCode($code) {
 
-		$sql = "SELECT rowid, libelle";
-		$sql .= " FROM ".MAIN_DB_PREFIX.'c_conventions_collectives';
-		$sql .= " WHERE code = " . $code ;
+		if (isset($code) && $code !== '') {
+			$sql = "SELECT rowid, libelle";
+			$sql .= " FROM ".MAIN_DB_PREFIX.'c_conventions_collectives';
+			$sql .= " WHERE code = " . $code ;
 
-		$result = $this->db->query($sql);
+			$result = $this->db->query($sql);
 
-		if ($result)
-		{
-			$obj = $this->db->fetch_object($result);
+			if ($result)
+			{
+				$obj = $this->db->fetch_object($result);
+			}
+			else {
+				dol_print_error($this->db);
+			}
+
+			return $obj;
+		} else {
+			return '';
 		}
-		else {
-			dol_print_error($this->db);
-		}
 
-		return $obj;
 	}
 
 	/**

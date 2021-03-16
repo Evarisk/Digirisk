@@ -42,7 +42,7 @@ require_once DOL_DOCUMENT_ROOT.'/core/class/html.formfile.class.php';
 require_once DOL_DOCUMENT_ROOT.'/core/class/html.formprojet.class.php';
 
 dol_include_once('/digiriskdolibarr/class/digiriskelement.class.php');
-dol_include_once('/digiriskdolibarr/class/listingrisksphoto.class.php');
+dol_include_once('/digiriskdolibarr/class/legaldisplay.class.php');
 dol_include_once('/digiriskdolibarr/class/digiriskdocuments.class.php');
 dol_include_once('/digiriskdolibarr/class/groupment.class.php');
 dol_include_once('/digiriskdolibarr/lib/digiriskdolibarr_digiriskelement.lib.php');
@@ -69,6 +69,7 @@ $fk_parent           = GETPOST('fk_parent', 'int');
 
 // Initialize technical objects
 $object 			 = new DigiriskElement($db);
+$legaldisplay 		 = new LegalDisplay($db);
 $extrafields  	 	 = new ExtraFields($db);
 $diroutputmassaction = $conf->digiriskdolibarr->dir_output.'/temp/massgeneration/'.$user->id;
 $object->fetch($id);
@@ -148,16 +149,12 @@ if (empty($reshook))
 
 	// Action to build doc
 
-	if ($action == 'builddoc' && $permissiontoadd)
-	{
+	if ($action == 'builddoc' && $permissiontoadd) {
 
-		if (is_numeric(GETPOST('model', 'alpha')))
-		{
+		if (is_numeric(GETPOST('model', 'alpha'))) {
 			$error = $langs->trans("ErrorFieldRequired", $langs->transnoentities("Model"));
-		}
-		else
-		{
-			if($id > 0) {
+		} else {
+			if ($id > 0) {
 				// Reload to get all modified line records and be ready for hooks
 				$ret = $object->fetch($id);
 				$ret = $object->fetch_thirdparty();
@@ -168,8 +165,7 @@ if (empty($reshook))
 				}*/
 
 				// Save last template used to generate document
-				if (GETPOST('model', 'alpha'))
-				{
+				if (GETPOST('model', 'alpha')) {
 					$object->setDocModel($user, GETPOST('model', 'alpha'));
 				}
 
@@ -190,8 +186,7 @@ if (empty($reshook))
 				if ($conf->global->MAIN_MULTILANGS && empty($newlang) && GETPOST('lang_id', 'aZ09')) $newlang = GETPOST('lang_id', 'aZ09');
 				if ($conf->global->MAIN_MULTILANGS && empty($newlang) && isset($object->thirdparty->default_lang)) $newlang = $object->thirdparty->default_lang; // for proposal, order, invoice, ...
 				if ($conf->global->MAIN_MULTILANGS && empty($newlang) && isset($object->default_lang)) $newlang = $object->default_lang; // for thirdparty
-				if (!empty($newlang))
-				{
+				if (!empty($newlang)) {
 					$outputlangs = new Translate("", $conf);
 					$outputlangs->setDefaultLang($newlang);
 				}
@@ -203,14 +198,11 @@ if (empty($reshook))
 				if (empty($moreparams)) $moreparams = null;
 
 				$result = $object->generateDocument($object->modelpdf, $outputlangs, $hidedetails, $hidedesc, $hideref, $moreparams);
-				if ($result <= 0)
-				{
+				if ($result <= 0) {
 					setEventMessages($object->error, $object->errors, 'errors');
 					$action = '';
-				}
-				else
-				{
-					if (empty($donotredirect))	// This is set when include is done by bulk action "Bill Orders"
+				} else {
+					if (empty($donotredirect))    // This is set when include is done by bulk action "Bill Orders"
 					{
 						setEventMessages($langs->trans("FileGenerated"), null);
 
@@ -218,7 +210,7 @@ if (empty($reshook))
 						$urltoredirect = preg_replace('/#builddoc$/', '', $urltoredirect);
 						$urltoredirect = preg_replace('/action=builddoc&?/', '', $urltoredirect); // To avoid infinite loop
 
-						header('Location: '.$urltoredirect.'#builddoc');
+						header('Location: ' . $urltoredirect . '#builddoc');
 						exit;
 					}
 				}
@@ -230,8 +222,7 @@ if (empty($reshook))
 				if ($conf->global->MAIN_MULTILANGS && empty($newlang) && GETPOST('lang_id', 'aZ09')) $newlang = GETPOST('lang_id', 'aZ09');
 				if ($conf->global->MAIN_MULTILANGS && empty($newlang) && isset($object->thirdparty->default_lang)) $newlang = $object->thirdparty->default_lang; // for proposal, order, invoice, ...
 				if ($conf->global->MAIN_MULTILANGS && empty($newlang) && isset($object->default_lang)) $newlang = $object->default_lang; // for thirdparty
-				if (!empty($newlang))
-				{
+				if (!empty($newlang)) {
 					$outputlangs = new Translate("", $conf);
 					$outputlangs->setDefaultLang($newlang);
 				}
@@ -242,15 +233,12 @@ if (empty($reshook))
 				if (empty($hideref)) $hideref = 0;
 				if (empty($moreparams)) $moreparams = null;
 
-				$result = $object->generateDocument('listing_risks_photos_odt', $outputlangs, $hidedetails, $hidedesc, $hideref, $moreparams);
-				if ($result <= 0)
-				{
+				$result = $object->generateDocument('legaldisplay_A4_odt', $outputlangs, $hidedetails, $hidedesc, $hideref, $moreparams);
+				if ($result <= 0) {
 					setEventMessages($object->error, $object->errors, 'errors');
 					$action = '';
-				}
-				else
-				{
-					if (empty($donotredirect))	// This is set when include is done by bulk action "Bill Orders"
+				} else {
+					if (empty($donotredirect))    // This is set when include is done by bulk action "Bill Orders"
 					{
 						setEventMessages($langs->trans("FileGenerated"), null);
 
@@ -258,12 +246,11 @@ if (empty($reshook))
 						$urltoredirect = preg_replace('/#builddoc$/', '', $urltoredirect);
 						$urltoredirect = preg_replace('/action=builddoc&?/', '', $urltoredirect); // To avoid infinite loop
 
-						header('Location: '.$urltoredirect.'#builddoc');
+						header('Location: ' . $urltoredirect . '#builddoc');
 						exit;
 					}
 				}
 			}
-
 		}
 	}
 //
@@ -320,6 +307,9 @@ if (!$object->id) {
 
 
 }
+
+	// Document Generation -- Génération des documents
+
 // Part to show record
 if ((empty($action) || ($action != 'edit' && $action != 'create')))
 {
@@ -327,10 +317,9 @@ if ((empty($action) || ($action != 'edit' && $action != 'create')))
 
 	$head = digiriskelementPrepareHead($object);
 
-	dol_fiche_head($head, 'elementListingrisksphoto', $langs->trans("DigiriskElement"), -1, $object->picto);
+	dol_fiche_head($head, 'elementLegaldisplay', $langs->trans("DigiriskElement"), -1, $object->picto);
 
 	$formconfirm = '';
-
 
 
 
@@ -342,15 +331,48 @@ if ((empty($action) || ($action != 'edit' && $action != 'create')))
 	$width = 80; $cssclass = 'photoref';
 
 	$relativepath = 'logos';
-	$path = '/dolibarr/htdocs/document.php?modulepart=mycompany&attachment=0&file=' . str_replace('/', '%2F', $relativepath) . '/';
-	$morehtmlleft .= '<img class="photo maxwidth50"  src="' . $path . 'logobdj.jpg' .'">';
+	$path = '/dolibarr/documents/' .( $conf->entity > 1 ? $conf->entity . '/' : '') . 'mycompany/logos/';
+	$logo = dol_dir_list(DOL_DATA_ROOT  . '/' . ( $conf->entity > 1 ? $conf->entity  : '') . '/mycompany/logos/');
 
+	if (!empty($logo)) {
+		$logo = array_shift($logo)['name'];
+		$morehtmlleft .= '<img class="photo maxwidth50"  src="' . DOL_DATA_ROOT  . '/' . ( $conf->entity > 1 ? $conf->entity  : '') . '/mycompany/logos/' . $logo .'">';
+
+	}
 	$object->digirisk_banner_tab($object, 'ref', '', 0, 'ref', 'ref', $morehtmlref, '', 0, $morehtmlleft);
 
 	unset($object->fields['element_type']);
 	unset($object->fields['fk_parent']);
 	unset($object->fields['last_main_doc']);
 	unset($object->fields['entity']);
+
+	print '<div class="fichecenter">';
+	print '<div class="fichehalfleft">';
+	print '<div class="underbanner clearboth"></div>';
+	print '<table class="border centpercent tableforfield">' . "\n";
+
+	// Common attributes
+	unset($object->fields['import_key']);
+	unset($object->fields['json']);
+	unset($object->fields['import_key']);
+	unset($object->fields['model_odt']);
+	unset($object->fields['type']);
+	unset($object->fields['last_main_doc']);
+	unset($object->fields['label']);
+	unset($object->fields['description']);
+
+	//JSON Decode and show fields
+	include DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/core/tpl/digiriskdolibarr_legaldisplayfields_view.tpl.php';
+
+	//Show common fields
+	include DOL_DOCUMENT_ROOT . '/core/tpl/commonfields_view.tpl.php';
+
+	// Other attributes. Fields from hook formObjectOptions and Extrafields.
+	include DOL_DOCUMENT_ROOT . '/core/tpl/extrafields_view.tpl.php';
+
+	print '</table>';
+	print '</div>';
+	print '</div>';
 
 
 	dol_fiche_end();
@@ -361,48 +383,29 @@ if ((empty($action) || ($action != 'edit' && $action != 'create')))
 	}
 
 	// Document Generation -- Génération des documents
-	print '<h2>' . $langs->trans('ListingRisksPhoto') . ($object->id ? ' ' . $object->ref : ' ' . 'global') . '</h2>';
 
 	if ($action != 'presend')
 	{
 		print '<div class="fichecenter"><div class="fichehalfleft elementDocument">';
 		print '<a name="builddoc"></a>'; // ancre
+		print '<h2>' . $langs->trans('LegalDisplay') . ($object->id ? ' ' . $object->ref : ' ' . 'global') . '</h2>';
 
 		$includedocgeneration = 1;
 		// Documents
-		if ($includedocgeneration ) {
-			if ($object->id > 0)
-			{
-				$objref = dol_sanitizeFileName($object->ref);
-				$relativepath = $objref . '/' . $objref . '.pdf';
-				$dir_files = 'listingrisksphoto/' . $objref;
-				$filedir = $conf->digiriskdolibarr->dir_output.'/'.$dir_files;
+		if ($includedocgeneration) {
 
-				$urlsource = $_SERVER["PHP_SELF"] . '?id=' . $object->id;
-				$genallowed = $user->rights->digiriskdolibarr->digiriskelement->read;	// If you can read, you can build the PDF to read content
-				$delallowed = $user->rights->digiriskdolibarr->digiriskelement->create;	// If you can create/edit, you can remove a file on card
+			$objref = dol_sanitizeFileName($object->ref);
 
-				$modulepart = 'digiriskdolibarr:ListingRisksPhoto';
+			$relativepath = $objref . '/' . $objref . '.pdf';
+			$dir_files = 'legaldisplay';
+			$filedir = $conf->digiriskdolibarr->dir_output.'/'.$dir_files;
+			$urlsource = $_SERVER["PHP_SELF"];
+			$genallowed = $user->rights->digiriskdolibarr->legaldisplay->read;	// If you can read, you can build the PDF to read content
+			$delallowed = $user->rights->digiriskdolibarr->legaldisplay->create;	// If you can create/edit, you can remove a file on card
 
-				print $formfile->showdocuments($modulepart,$dir_files, $filedir, $urlsource, $genallowed, $delallowed, $conf->global->DIGIRISKDOLIBARR_LISTINGRISKSPHOTO_DEFAULT_MODEL, 1, 0, 0, 28, 0, '', '', '', $langs->defaultlang, '');
+			$modulepart = 'digiriskdolibarr:LegalDisplay';
 
-			} else {
-				$objref = dol_sanitizeFileName($object->ref);
-				$relativepath = 'mycompany/mycompany' . '.pdf';
-				$dir_files = 'listingrisksphoto/mycompany';
-				$filedir = $conf->digiriskdolibarr->dir_output.'/'.$dir_files;
-				$object->modelpdf = 'listing_risks_photos_odt';
-				$urlsource = $_SERVER["PHP_SELF"];
-				$genallowed = $user->rights->digiriskdolibarr->digiriskelement->read;	// If you can read, you can build the PDF to read content
-				$delallowed = $user->rights->digiriskdolibarr->digiriskelement->create;	// If you can create/edit, you can remove a file on card
-
-				$modulepart = 'digiriskdolibarr:ListingRisksPhoto';
-
-				print $formfile->showdocuments($modulepart,$dir_files, $filedir, $urlsource, $genallowed, $delallowed, $conf->global->DIGIRISKDOLIBARR_LISTINGRISKSPHOTO_DEFAULT_MODEL, 1, 0, 0, 28, 0, '', '', '', $langs->defaultlang, '');
-
-			}
-
-
+			print $formfile->showdocuments($modulepart,$dir_files, $filedir, $urlsource, $genallowed, $delallowed, $conf->global->DIGIRISKDOLIBARR_LEGALDISPLAY_DEFAULT_MODEL, 1, 0, 0, 28, 0, '', '', '', $langs->defaultlang, '');
 		}
 
 	}

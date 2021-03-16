@@ -980,7 +980,6 @@ class DigiriskElement extends CommonObject
 	public function generateDocument($modele, $outputlangs, $hidedetails = 0, $hidedesc = 0, $hideref = 0, $moreparams = null)
 	{
 		global $conf, $langs, $user;
-
 		$result = 0;
 		$includedocgeneration = 1;
 		$langs->load("digiriskdolibarr@digiriskdolibarr");
@@ -1004,7 +1003,11 @@ class DigiriskElement extends CommonObject
 			$path = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/documents/doctemplates/listingrisksaction/';
 		} elseif ( preg_match( '/groupment/', $template ) || preg_match( '/workunit/', $template ) ) {
 			$path = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/documents/doctemplates/'. $this->element_type . '/';
+		} elseif ( preg_match( '/legaldisplay/', $template ) ) {
+
+			$path = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/documents/doctemplates/legaldisplay/';
 		}
+
 		$modele = $modele.":". $path . "template_" . $template;
 		if ($includedocgeneration) {
 			$result = $this->commonGenerateDocument($modelpath, $modele, $outputlangs, $hidedetails, $hidedesc, $hideref, $moreparams);

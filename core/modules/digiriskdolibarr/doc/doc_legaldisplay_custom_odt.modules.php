@@ -225,20 +225,11 @@ class doc_legaldisplay_custom_odt extends ModelePDFLegalDisplay
 		$outputlangs->loadLangs(array("main", "dict", "companies", "bills"));
 
 
-		// If $object is id instead of object
-		if (!is_object($object))
-		{
-			$id = $object;
-			$object = new LegalDisplay($this->db);
-			$result = $object->fetch($id);
-			if ($result < 0)
-			{
-				dol_print_error($this->db, $object->error);
-				return -1;
-			}
-		}
+		$legaldisplay = new LegalDisplay($this->db);
+		$legaldisplay->create($user);
 
-		$dir = $conf->digiriskdolibarr->multidir_output[isset($object->entity) ? $object->entity : 1] . '/legaldisplay';
+		$dir = $conf->digiriskdolibarr->multidir_output[isset($conf->entity) ? $conf->entity : 1] . '/legaldisplay';
+
 		$objectref = dol_sanitizeFileName($object->ref);
 		if (!preg_match('/specimen/i', $objectref)) $dir .= '/' . $objectref;
 
@@ -277,7 +268,7 @@ class doc_legaldisplay_custom_odt extends ModelePDFLegalDisplay
 
 				$filename = $objectref.'.'.$newfileformat;
 
-				$filename = $objectref . '_custom.' . $newfileformat;
+				$filename = dol_print_date(dol_now(),'%Y%m%d') . (strlen($objectref) ? '_' . $objectref : '') . '_affichage_legal_custom' . (strlen($objectlabel) ? $objectlabel : 'global') . '.' . $newfileformat;
 
 			}
 			$object->last_main_doc = $filename;
@@ -394,7 +385,7 @@ class doc_legaldisplay_custom_odt extends ModelePDFLegalDisplay
 			if ($usecontact && is_object($contactobject)) $array_thirdparty_contact = $this->get_substitutionarray_contact($contactobject, $outputlangs, 'contact');
 
 			$tmparray = array_merge($substitutionarray, $array_object_from_properties, $array_user, $array_soc, $array_thirdparty, $array_objet, $array_other, $array_thirdparty_contact);
-			complete_substitutions_array($tmparray, $outputlangs, $object);
+			complete_substitutions_array($tmparray, $outputlangs, $legaldisplay);
 
 			// Call the ODTSubstitution hook
 			$parameters = array('odfHandler'=>&$odfHandler, 'file'=>$file, 'object'=>$object, 'outputlangs'=>$outputlangs, 'substitutionarray'=>&$tmparray);

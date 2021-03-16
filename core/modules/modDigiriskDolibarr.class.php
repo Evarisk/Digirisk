@@ -197,6 +197,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			62 => array('DIGIRISKDOLIBARR_LISTINGRISKSACTION_CUSTOM_ADDON_ODT_PATH','chaine', DOL_DATA_ROOT . '/ecm/digiriskdolibarr/listingrisksaction/' ,'', 1),
 			63 => array('DIGIRISKDOLIBARR_LISTINGRISKSACTION_ADDON','chaine', 'mod_listingrisksaction_standard' ,'', 1),
 			64 => array('DIGIRISKDOLIBARR_LISTINGRISKSACTION_DEFAULT_MODEL','chaine', 'listing_risks_action_odt' ,'', 1),
+			65 => array('LEGALDISPLAY_STANDARD_MASK','chaine','V{0000}','', 1),
 
 		);
 

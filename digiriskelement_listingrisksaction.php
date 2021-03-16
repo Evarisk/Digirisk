@@ -313,7 +313,7 @@ if ((empty($action) || ($action != 'edit' && $action != 'create')))
 
 	$head = digiriskelementPrepareHead($object);
 
-	dol_fiche_head($head, 'listingrisksaction', $langs->trans("DigiriskElement"), -1, $object->picto);
+	dol_fiche_head($head, 'elmentListingrisksaction', $langs->trans("DigiriskElement"), -1, $object->picto);
 
 	$formconfirm = '';
 
@@ -327,9 +327,14 @@ if ((empty($action) || ($action != 'edit' && $action != 'create')))
 	$width = 80; $cssclass = 'photoref';
 
 	$relativepath = 'logos';
-	$path = '/dolibarr/htdocs/document.php?modulepart=mycompany&attachment=0&file=' . str_replace('/', '%2F', $relativepath) . '/';
-	$morehtmlleft .= '<img class="photo maxwidth50"  src="' . $path . 'logobdj.jpg' .'">';
+	$path = '/dolibarr/documents/' .( $conf->entity > 1 ? $conf->entity . '/' : '') . 'mycompany/logos/';
+	$logo = dol_dir_list(DOL_DATA_ROOT  . '/' . ( $conf->entity > 1 ? $conf->entity  : '') . '/mycompany/logos/');
 
+	if (!empty($logo)) {
+		$logo = array_shift($logo)['name'];
+		$morehtmlleft .= '<img class="photo maxwidth50"  src="' . DOL_DATA_ROOT  . '/' . ( $conf->entity > 1 ? $conf->entity  : '') . '/mycompany/logos/' . $logo .'">';
+
+	}
 	$object->digirisk_banner_tab($object, 'ref', '', 0, 'ref', 'ref', $morehtmlref, '', 0, $morehtmlleft);
 
 	unset($object->fields['element_type']);

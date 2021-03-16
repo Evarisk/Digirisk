@@ -19,7 +19,7 @@ function digiriskdolibarr_completesubstitutionarray(&$substitutionarray,$langs,$
 	$type = $object->element;
 
 	switch ($type) {
-		case 'legaldisplay':
+		case 'legaldisplay@digiriskdolibarr':
 
 			$legaldisplay = json_decode($object->json, false, 512, JSON_UNESCAPED_UNICODE)->LegalDisplay;
 

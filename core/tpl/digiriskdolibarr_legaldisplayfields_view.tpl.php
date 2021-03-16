@@ -15,7 +15,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  *
  * Need to have following variables defined:
- * $object (invoice, order, ...)
+ * $legaldisplay (invoice, order, ...)
  * $action
  * $conf
  * $langs
@@ -35,7 +35,8 @@ if (!is_object($form)) $form = new Form($db);
 	<!-- BEGIN PHP TEMPLATE digiriskdolibarr_legaldisplayfields_view.tpl.php -->
 <?php
 
-$legaldisplay = json_decode($object->json, false, 512, JSON_UNESCAPED_UNICODE)->LegalDisplay;
+$legaldisplay = json_decode($legaldisplay->LegaldisplayFillJSON($legaldisplay), false, 512, JSON_UNESCAPED_UNICODE)->LegalDisplay;
+
 
 //Creation User
 
@@ -43,10 +44,10 @@ print '<tr>';
 print '<td class="titlefield">'.$langs->trans("CreatedBy").'</td>';
 print '<td>';
 
-if ($object->fk_user_creat > 0)
+if ($legaldisplay->fk_user_creat > 0)
 {
 	$usercreat = new User($db);
-	$result = $usercreat->fetch($object->fk_user_creat);
+	$result = $usercreat->fetch($legaldisplay->fk_user_creat);
 	if ($result < 0) dol_print_error('', $usercreat->error);
 	elseif ($result > 0) print $usercreat->getNomUrl(-1);
 }
@@ -58,7 +59,7 @@ print '<tr>';
 print '<td class="titlefield">'.$langs->trans("CreatedOn").'</td>';
 print '<td>';
 
-print dol_print_date($object->date_creation);
+print dol_print_date($legaldisplay->date_creation);
 
 print '</td></tr>';
 

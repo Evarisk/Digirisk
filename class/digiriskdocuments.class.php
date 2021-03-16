@@ -1022,7 +1022,10 @@ class DigiriskDocuments extends CommonObject
 		$includedocgeneration = 1;
 
 		$langs->load("digiriskdolibarr@digiriskdolibarr");
-
+		echo '<pre>';
+		print_r($this);
+		echo '</pre>';
+		exit;
 		if (!dol_strlen($modele)) {
 			$modele = 'standard_' . $this->type;
 
