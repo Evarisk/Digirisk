@@ -1079,7 +1079,6 @@ class DigiriskElement extends CommonObject
 		global $conf, $langs;
 
 		// html header
-		top_htmlhead($head, $title, $disablejs, $disablehead, $arrayofjs, $arrayofcss);
 
 		$tmpcsstouse = 'sidebar-collapse'.($morecssonbody ? ' '.$morecssonbody : '');
 		// If theme MD and classic layer, we open the menulayer by default.
@@ -1094,7 +1093,7 @@ class DigiriskElement extends CommonObject
 		}
 
 		print '<body id="mainbody" class="'.$tmpcsstouse.'">'."\n";
-		llxHeader('');//Body navigation digirisk
+		llxHeader('', $langs->trans('DigiriskElement'));//Body navigation digirisk
 		$object  = new DigiriskElement($this->db);
 		$objects = $object->fetchAll('', '', 0,0,array('entity' => $conf->entity));
 		$results  = $this->recurse_tree(0,0,$objects); ?>
