@@ -1290,12 +1290,15 @@ class DigiriskElement extends CommonObject
 		$sortorder = 'asc';
 
 		$dir = $sdir.'/';
-
 		$pdir = '/' . $subdir . '/';
 
-
-		$dir .= get_exdir(0, 0, 0, 0, $this, $modulepart).$this->ref.'/';
-		$pdir .= get_exdir(0, 0, 0, 0, $this, $modulepart).$this->ref.'/';
+		if ($this->tms > 0) {
+			$dir .= get_exdir(0, 0, 0, 0, $this, $modulepart).$this->ref.'/';
+			$pdir .= get_exdir(0, 0, 0, 0, $this, $modulepart).$this->ref.'/';
+		} else {
+			$dir .= get_exdir(0, 0, 0, 0, $this, $modulepart);
+			$pdir .= get_exdir(0, 0, 0, 0, $this, $modulepart);
+		}
 
 		// For backward compatibility
 		if ($modulepart == 'product' && !empty($conf->global->PRODUCT_USE_OLD_PATH_FOR_PHOTO))
@@ -1303,7 +1306,6 @@ class DigiriskElement extends CommonObject
 			$dir = $sdir.'/'.get_exdir($this->id, 2, 0, 0, $this, $modulepart).$this->id."/photos/";
 			$pdir = '/'.get_exdir($this->id, 2, 0, 0, $this, $modulepart).$this->id."/photos/";
 		}
-
 		// Defined relative dir to DOL_DATA_ROOT
 		$relativedir = '';
 		if ($dir)
@@ -1352,8 +1354,8 @@ class DigiriskElement extends CommonObject
 					if ($size == 1 || $size == 'small') {   // Format vignette
 						// Find name of thumb file
 						$photo_vignette = basename(getImageFileNameForSize($dir.$file, '_small'));
-						if (!dol_is_file($dirthumb.$photo_vignette)) $photo_vignette = '';
 
+						if (!dol_is_file($dirthumb.$photo_vignette)) $photo_vignette = '';
 						// Get filesize of original file
 						$imgarray = dol_getImageSize($dir.$photo);
 

@@ -313,7 +313,7 @@ if ((empty($action) || ($action != 'edit' && $action != 'create')))
 
 	$head = digiriskelementPrepareHead($object);
 
-	dol_fiche_head($head, 'elmentListingrisksaction', $langs->trans("DigiriskElement"), -1, $object->picto);
+	dol_fiche_head($head, 'elementListingrisksaction', $langs->trans("DigiriskElement"), -1, $object->picto);
 
 	$formconfirm = '';
 
@@ -325,15 +325,10 @@ if ((empty($action) || ($action != 'edit' && $action != 'create')))
 	$morehtmlref = '<div class="refidno">';
 	$morehtmlref .= '</div>';
 	$width = 80; $cssclass = 'photoref';
-
-	$relativepath = 'logos';
-	$path = '/dolibarr/documents/' .( $conf->entity > 1 ? $conf->entity . '/' : '') . 'mycompany/logos/';
-	$logo = dol_dir_list(DOL_DATA_ROOT  . '/' . ( $conf->entity > 1 ? $conf->entity  : '') . '/mycompany/logos/');
-
-	if (!empty($logo)) {
-		$logo = array_shift($logo)['name'];
-		$morehtmlleft .= '<img class="photo maxwidth50"  src="' . DOL_DATA_ROOT  . '/' . ( $conf->entity > 1 ? $conf->entity  : '') . '/mycompany/logos/' . $logo .'">';
-
+	if (isset($object->element_type)) {
+		$morehtmlleft .= '<div class="floatleft inline-block valignmiddle divphotoref">'.$object->digirisk_show_photos('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$entity].'/'.$object->element_type, 'small', 5, 0, 0, 0, $width,0, 0, 0, 0, $object->element_type).'</div>';
+	} else {
+		$morehtmlleft .= '<div class="floatleft inline-block valignmiddle divphotoref">'.$object->digirisk_show_photos('mycompany', $conf->mycompany->dir_output . '/logos', 'small', 5, 0, 0, 0, $width,0, 0, 0, 0, 'logos').'</div>';
 	}
 	$object->digirisk_banner_tab($object, 'ref', '', 0, 'ref', 'ref', $morehtmlref, '', 0, $morehtmlleft);
 
