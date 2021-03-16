@@ -249,7 +249,7 @@ class doc_legaldisplay_A4_odt extends ModelePDFLegalDisplay
 
 				$filename = $objectref.'.'.$newfileformat;
 
-				$filename = $ref;
+				$filename = $ref. '.odt';
 
 			}
 			$object->last_main_doc = $filename;

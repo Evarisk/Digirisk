@@ -1004,8 +1004,9 @@ class DigiriskElement extends CommonObject
 		} elseif ( preg_match( '/groupment/', $template ) || preg_match( '/workunit/', $template ) ) {
 			$path = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/documents/doctemplates/'. $this->element_type . '/';
 		} elseif ( preg_match( '/legaldisplay/', $template ) ) {
-
 			$path = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/documents/doctemplates/legaldisplay/';
+		} elseif ( preg_match( '/informationssharing/', $template ) ) {
+			$path = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/documents/doctemplates/informationssharing/';
 		}
 
 		$modele = $modele.":". $path . "template_" . $template;

@@ -31,6 +31,7 @@
 dol_include_once('/custom/digiriskdolibarr/lib/files.lib.php');
 dol_include_once('/core/lib/files.lib.php');
 require_once DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/core/modules/digiriskdolibarr/modules_informationssharing.php';
+require_once DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/core/modules/digiriskdolibarr/mod_informationssharing_standard.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/company.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/doc.lib.php';
 
@@ -131,6 +132,7 @@ class doc_informationssharing_A4_odt extends ModelePDFInformationsSharing
 			}
 		}
 
+
 		// Scan directories
 		$nbofiles = count($listoffiles);
 		if (!empty($conf->global->DIGIRISKDOLIBARR_INFORMATIONSSHARING_ADDON_ODT_PATH))
@@ -201,20 +203,14 @@ class doc_informationssharing_A4_odt extends ModelePDFInformationsSharing
 		$outputlangs->loadLangs(array("main", "dict", "companies", "bills"));
 
 
-		// If $object is id instead of object
-		if (!is_object($object))
-		{
-			$id = $object;
-			$object = new InformationsSharing($this->db);
-			$result = $object->fetch($id);
-			if ($result < 0)
-			{
-				dol_print_error($this->db, $object->error);
-				return -1;
-			}
-		}
+		$informationssharing = new InformationsSharing($this->db);
+		$mod = new $conf->global->DIGIRISKDOLIBARR_INFORMATIONSSHARING_ADDON_ODT($this->db);
+		$ref = $mod->getNextValue($informationssharing);
 
-		$dir = $conf->digiriskdolibarr->multidir_output[isset($object->entity) ? $object->entity : 1] . '/informationssharing';
+		$informationssharing->ref = $ref;
+		$informationssharing->create($user);
+
+		$dir = $conf->digiriskdolibarr->multidir_output[isset($conf->entity) ? $conf->entity : 1] . '/informationssharing';
 		$objectref = dol_sanitizeFileName($object->ref);
 		if (!preg_match('/specimen/i', $objectref)) $dir .= '/' . $objectref;
 
@@ -253,7 +249,7 @@ class doc_informationssharing_A4_odt extends ModelePDFInformationsSharing
 
 				$filename = $objectref.'.'.$newfileformat;
 
-				$filename = $objectref . '_A4' . '_V1.' . $newfileformat;
+				$filename = $ref . '.odt';
 
 			}
 			$object->last_main_doc = $filename;
@@ -370,7 +366,7 @@ class doc_informationssharing_A4_odt extends ModelePDFInformationsSharing
 			if ($usecontact && is_object($contactobject)) $array_thirdparty_contact = $this->get_substitutionarray_contact($contactobject, $outputlangs, 'contact');
 
 			$tmparray = array_merge($substitutionarray, $array_object_from_properties, $array_user, $array_soc, $array_thirdparty, $array_objet, $array_other, $array_thirdparty_contact);
-			complete_substitutions_array($tmparray, $outputlangs, $object);
+			complete_substitutions_array($tmparray, $outputlangs, $informationssharing);
 
 			// Call the ODTSubstitution hook
 			$parameters = array('odfHandler'=>&$odfHandler, 'file'=>$file, 'object'=>$object, 'outputlangs'=>$outputlangs, 'substitutionarray'=>&$tmparray);

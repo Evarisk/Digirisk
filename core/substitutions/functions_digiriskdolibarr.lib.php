@@ -71,7 +71,7 @@ function digiriskdolibarr_completesubstitutionarray(&$substitutionarray,$langs,$
 
 			break;
 
-		case 'informationssharing':
+		case 'informationssharing@digiriskdolibarr':
 
 			$informationssharing = json_decode($object->json, false, 512, JSON_UNESCAPED_UNICODE)->InformationsSharing;
 

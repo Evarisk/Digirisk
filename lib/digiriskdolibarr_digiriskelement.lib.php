@@ -105,7 +105,7 @@ function digiriskelementPrepareHead($object)
 		$head[$h][2] = 'elementLegaldisplay';
 		$h++;
 
-		$head[$h][0] = dol_buildpath("/digiriskdolibarr/informationssharing_card.php?action=create", 1);
+		$head[$h][0] = dol_buildpath("/digiriskdolibarr/digiriskelement_informationssharing.php", 1);
 		$head[$h][1] = $langs->trans("InformationsSharing");
 		$head[$h][2] = 'elementInformationssharing';
 		$h++;

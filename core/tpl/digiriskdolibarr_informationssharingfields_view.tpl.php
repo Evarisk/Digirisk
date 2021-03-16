@@ -35,32 +35,32 @@ if (!is_object($form)) $form = new Form($db);
 	<!-- BEGIN PHP TEMPLATE digiriskdolibarr_informationssharingfields_view.tpl -->
 <?php
 
-$informationssharing = json_decode($object->json, false, 512, JSON_UNESCAPED_UNICODE)->InformationsSharing;
-
-//Creation User
-
-print '<tr>';
-print '<td class="titlefield">'.$langs->trans("CreatedBy").'</td>';
-print '<td>';
-
-if ($object->fk_user_creat > 0)
-{
-	$usercreat = new User($db);
-	$result = $usercreat->fetch($object->fk_user_creat);
-	if ($result < 0) dol_print_error('', $usercreat->error);
-	elseif ($result > 0) print $usercreat->getNomUrl(-1);
-}
-
-//Creation Date
-print '</td></tr>';
-
-print '<tr>';
-print '<td class="titlefield">'.$langs->trans("CreatedOn").'</td>';
-print '<td>';
-
-print dol_print_date($object->date_creation);
-
-print '</td></tr>';
+$informationssharing = json_decode($informationssharing->InformationssharingFillJSON($informationssharing), false, 512, JSON_UNESCAPED_UNICODE)->InformationsSharing;
+//
+////Creation User
+//
+//print '<tr>';
+//print '<td class="titlefield">'.$langs->trans("CreatedBy").'</td>';
+//print '<td>';
+//
+//if ($object->fk_user_creat > 0)
+//{
+//	$usercreat = new User($db);
+//	$result = $usercreat->fetch($object->fk_user_creat);
+//	if ($result < 0) dol_print_error('', $usercreat->error);
+//	elseif ($result > 0) print $usercreat->getNomUrl(-1);
+//}
+//
+////Creation Date
+//print '</td></tr>';
+//
+//print '<tr>';
+//print '<td class="titlefield">'.$langs->trans("CreatedOn").'</td>';
+//print '<td>';
+//
+//print dol_print_date($object->date_creation);
+//
+//print '</td></tr>';
 
 
 // CSE
