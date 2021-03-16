@@ -51,6 +51,7 @@ DigiriskMenu = Ajoutez des informations sur votre société/organisation. Clique
 DigiriskDocumentsNumberingModule = Modèle de numérotation des documents de Digirisk
 DigiriskNumberOfModelFilesFound = Nombre de modèles par défaut
 DigiriskConfig = Configuration du module
+DigiriskConfigSociety = Configuration de la société
 
 #
 # Horaires d'ouverture

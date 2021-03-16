@@ -451,6 +451,7 @@ class Risk extends CommonObject
 		$sql .= ' FROM '.MAIN_DB_PREFIX.$this->table_element.' as t';
 		if (isset($this->ismultientitymanaged) && $this->ismultientitymanaged == 1) $sql .= ' WHERE t.entity IN ('.getEntity($this->table_element).')';
 		else $sql .= ' WHERE 1 = 1';
+
 		// Manage filter
 		$sqlwhere = array();
 		if (count($filter) > 0) {
