@@ -53,12 +53,12 @@ function digiriskelementPrepareHead($object)
 
 		$head[$h][0] = dol_buildpath("/digiriskdolibarr/digiriskelement_listingrisksphoto.php", 1).'?id='.$object->id;
 		$head[$h][1] = $langs->trans("ListingRisksPhoto");
-		$head[$h][2] = 'listingrisksphoto';
+		$head[$h][2] = 'elementListingrisksphoto';
 		$h++;
 
 		$head[$h][0] = dol_buildpath("/digiriskdolibarr/digiriskelement_listingrisksaction.php", 1).'?id='.$object->id;
 		$head[$h][1] = $langs->trans("ListingRisksAction");
-		$head[$h][2] = 'listingrisksaction';
+		$head[$h][2] = 'elementListingrisksaction';
 		$h++;
 
 		if (isset($object->fields['note_public']) || isset($object->fields['note_private']))

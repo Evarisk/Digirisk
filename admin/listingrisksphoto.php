@@ -309,7 +309,7 @@ foreach ($dirmodels as $reldir)
 							$listingrisksphoto->type = 0;
 							$nextval = $module->getNextValue($listingrisksphoto);
 							if ("$nextval" != $langs->trans("NotAvailable")) {  // Keep " on nextval
-								$htmltooltip .= $langs->trans("NextValueForInvoices").': ';
+								$htmltooltip .= $langs->trans("NextValueForListingRisksPhoto").': ';
 								if ($nextval) {
 									if (preg_match('/^Error/', $nextval) || $nextval == 'NotConfigured')
 										$nextval = $langs->trans($nextval);

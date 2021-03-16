@@ -280,7 +280,7 @@ foreach ($dirmodels as $reldir)
 
 							// Show example of numbering module
 							print '<td class="nowrap">';
-							$tmp = $module->prefixinformationssharing;
+							$tmp = $module->getExample();
 
 							if (preg_match('/^Error/', $tmp)) print '<div class="error">'.$langs->trans($tmp).'</div>';
 							elseif ($tmp == 'NotConfigured') print $langs->trans($tmp);
@@ -306,9 +306,9 @@ foreach ($dirmodels as $reldir)
 							$htmltooltip = '';
 							$htmltooltip .= ''.$langs->trans("Version").': <b>'.$module->getVersion().'</b><br>';
 							$informationssharing->type = 0;
-							$nextval = $module->getNextValue($mysoc, $informationssharing);
+							$nextval = $module->getNextValue($informationssharing);
 							if ("$nextval" != $langs->trans("NotAvailable")) {  // Keep " on nextval
-								$htmltooltip .= $langs->trans("NextValueForInvoices").': ';
+								$htmltooltip .= $langs->trans("NextValueForInformationsSharing").': ';
 								if ($nextval) {
 									if (preg_match('/^Error/', $nextval) || $nextval == 'NotConfigured')
 										$nextval = $langs->trans($nextval);

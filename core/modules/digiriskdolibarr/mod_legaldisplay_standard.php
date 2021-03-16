@@ -49,26 +49,27 @@ class mod_legaldisplay_standard extends ModeleNumRefDigiriskElement
 	 */
 	public function info()
 	{
-		global $langs;
+		global $langs, $db;
 		$langs->load("digiriskdolibarr@digiriskdolibarr");
-		$now = $this->db->idate(dol_now());
+		$now = $db->idate(dol_now());
 		$nowDate = str_replace(':','-', $now);
 		$nowDate = str_replace(' ','_', $nowDate);
 		return $langs->trans('DigiriskLegalDisplayStandardModel',$nowDate . '_affichage_legal_' . $this->prefixlegaldisplay);
 	}
 
-	/**
+	/**Â
 	 *  Return an example of numbering
 	 *
 	 *  @return     string      Example
 	 */
 	public function getExample()
 	{
-		global $conf;
-		$now = $this->db->idate(dol_now());
-		$nowDate = str_replace(':','-', $now);
-		$nowDate = str_replace(' ','_', $nowDate);
-		return $nowDate . '_affichage_legal_' . $this->prefixlegaldisplay."1";
+		global $conf,$db;
+		$now = $db->idate(dol_now());
+		$now = preg_split('/ /', $now);
+
+		$now = $now[0];
+		return $now . '_affichage_legal_' . $this->prefixlegaldisplay."1";
 	}
 
 	/**

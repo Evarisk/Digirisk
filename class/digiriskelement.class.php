@@ -1093,7 +1093,10 @@ class DigiriskElement extends CommonObject
 		}
 
 		print '<body id="mainbody" class="'.$tmpcsstouse.'">'."\n";
-		llxHeader('', $langs->trans('DigiriskElement'));//Body navigation digirisk
+
+		llxHeader('', $langs->trans('DigiriskElement'));
+
+		//Body navigation digirisk
 		$object  = new DigiriskElement($this->db);
 		$objects = $object->fetchAll('', '', 0,0,array('entity' => $conf->entity));
 		$results  = $this->recurse_tree(0,0,$objects); ?>

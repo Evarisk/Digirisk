@@ -280,7 +280,7 @@ foreach ($dirmodels as $reldir)
 
 							// Show example of numbering module
 							print '<td class="nowrap">';
-							$tmp = $module->prefixlegaldisplay;
+							$tmp = $module->getExample();
 
 							if (preg_match('/^Error/', $tmp)) print '<div class="error">'.$langs->trans($tmp).'</div>';
 							elseif ($tmp == 'NotConfigured') print $langs->trans($tmp);
@@ -302,13 +302,13 @@ foreach ($dirmodels as $reldir)
 							$legaldisplay = new LegalDisplay($db);
 							$legaldisplay->initAsSpecimen();
 
-							// Example for standard invoice
+							// Example for legal display
 							$htmltooltip = '';
 							$htmltooltip .= ''.$langs->trans("Version").': <b>'.$module->getVersion().'</b><br>';
 							$legaldisplay->type = 0;
-							$nextval = $module->getNextValue($mysoc, $legaldisplay);
+							$nextval = $module->getNextValue($legaldisplay);
 							if ("$nextval" != $langs->trans("NotAvailable")) {  // Keep " on nextval
-								$htmltooltip .= $langs->trans("NextValueForInvoices").': ';
+								$htmltooltip .= $langs->trans("NextValueForLegalDisplay").': ';
 								if ($nextval) {
 									if (preg_match('/^Error/', $nextval) || $nextval == 'NotConfigured')
 										$nextval = $langs->trans($nextval);
