@@ -35,7 +35,7 @@ class mod_risk_standard extends ModeleNumRefRisk
 	 */
 	public $version = 'dolibarr'; // 'development', 'experimental', 'dolibarr'
 
-	public $prefixrisk = '';
+	public $prefixrisk = 'R';
 
 	/**
 	 * @var string Error code (or message)
@@ -54,45 +54,61 @@ class mod_risk_standard extends ModeleNumRefRisk
 		return $langs->trans('DigiriskRiskStandardModel', $this->prefixrisk);
 	}
 
-/**
- *  Return an example of numbering
- *
- *  @return     string      Example
- */
-public function getExample()
-{
-	return $this->prefixrisk."1";
-}
 	/**
-	 * Return next value not used or last value used
+	 *  Return an example of numbering
 	 *
+	 *  @return     string      Example
+	 */
+	public function getExample()
+	{
+		global $conf;
+
+		return $this->prefixrisk."1";
+	}
+
+	/**
+	 * 	Return next free value
+	 *
+	 *  @param  Object		$object		Object we need next value for
+	 *  @return string      			Value if KO, <0 if KO
 	 */
 	public function getNextValue($object)
 	{
 		global $db, $conf;
 
-		require_once DOL_DOCUMENT_ROOT.'/core/lib/functions2.lib.php';
-
-		// On defini critere recherche compteur
-		$mask = $conf->global->RISK_STANDARD_MASK;
-
-		if (!$mask)
-		{
-			$this->error = 'NotConfigured';
-			return 0;
+		// first we get the max value
+		$posindice = strlen($this->prefixrisk) + 1;
+		$sql = "SELECT MAX(CAST(SUBSTRING(ref FROM ".$posindice.") AS SIGNED)) as max";
+		$sql .= " FROM ".MAIN_DB_PREFIX."digiriskdolibarr_risk";
+		$sql .= " WHERE ref LIKE '".$db->escape($this->prefixrisk)."%'";
+		if ($object->ismultientitymanaged == 1) {
+			$sql .= " AND entity = ".$conf->entity;
+		}
+		elseif ($object->ismultientitymanaged == 2) {
+			// TODO
 		}
 
-		// Get entities
-		$entity = $conf->entity;
+		$resql = $db->query($sql);
+		if ($resql)
+		{
+			$obj = $db->fetch_object($resql);
+			if ($obj) $max = intval($obj->max);
+			else $max = 0;
+		}
+		else
+		{
+			dol_syslog("mod_risk_standard::getNextValue", LOG_DEBUG);
+			return -1;
+		}
 
-		$date = dol_now();
+		if ($max >= (pow(10, 4) - 1)) $num = $max + 1; // If counter > 9999, we do not format on 4 chars, we take number as it is
+		else $num = sprintf("%s", $max + 1);
 
-		$numFinal = get_next_value($db, $mask, 'digiriskdolibarr_risk', 'ref','', $object, $date, 'next', false, null, $entity);
-
-
-		$this->prefixrisk = $numFinal;
-		return  $numFinal;
+		dol_syslog("mod_risk_standard::getNextValue return ".$this->prefixrisk.$num);
+		return $this->prefixrisk.$num;
 	}
+
+
 
 	/**
 	 *  Return next free value
@@ -102,8 +118,8 @@ public function getExample()
 	 *  @param  string      $mode           'next' for next value or 'last' for last value
 	 *  @return string                      Next free value
 	 */
-	public function getNumRef($objforref, $mode = 'next')
+	public function getNumRef($objsoc, $objforref, $mode = 'next')
 	{
-		return $this->getNextValue($objforref, $mode);
+		return $this->getNextValue($objsoc, $objforref, $mode);
 	}
 }

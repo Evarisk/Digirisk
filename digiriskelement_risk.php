@@ -186,7 +186,7 @@ if (empty($reshook))
 				$evaluation->fk_risk 		= $risk->id;
 				$evaluation->status 		= 1;
 				$evaluation->method 		= $method;
-				$evaluation->ref   			= $refCot->getNumRef($evaluation);
+				$evaluation->ref   			= $refCot->getNextValue($evaluation);
 				$evaluation->formation  	= $formation;
 				$evaluation->protection  	= $protection;
 				$evaluation->occurrence  	= $occurrence;
@@ -341,7 +341,6 @@ $object->digiriskHeader('', $title, $help_url, '', '', '', $morejs);
 //	});
 //});
 //</script>';
-
 // VIEW
 if ($object->id > 0) {
 	$res = $object->fetch_optionals();
@@ -370,7 +369,9 @@ if ($object->id > 0) {
 		<h1><?php echo $langs->trans('Risks'). ' - ' . $object->ref . ' ' . $object->label ?></h1>
 	</div>
 
-	<?php $numref = new $conf->global->DIGIRISKDOLIBARR_RISK_ADDON(); ?>
+	<?php $numref = new $conf->global->DIGIRISKDOLIBARR_RISK_ADDON();
+
+	?>
 
 	<div class="digirisk-wrap wpeo-wrap">
 		<div class="main-container">
@@ -405,13 +406,7 @@ if ($object->id > 0) {
 											<div data-title="Ref." class="table-cell table-50 cell-reference">
 												<span>
 													<strong>
-														<?php
-														$riskRef = substr($risk->ref, 1);
-														$riskRef = ltrim($riskRef, '0');
-														$cotationRef = substr($lastEvaluation->ref, 1);
-														$cotationRef = ltrim($cotationRef, '0');
-														// au lieu de 'R' mettre l'accronyme des risques qui sera futurement configurable dans digirisk
-														echo 'R' . $riskRef ?>
+														<?php echo $risk->ref ?>
 													</strong>
 												</span>
 											</div>
@@ -646,11 +641,7 @@ if ($object->id > 0) {
 										<div data-title="Ref." class="table-cell table-50 cell-reference">
 											<span>
 												<strong>
-													<?php
-													$riskRef = substr($risk->ref, 1);
-													$riskRef = ltrim($riskRef, '0');
-													// au lieu de 'R' mettre l'accronyme des risques qui sera futurement configurable dans digirisk
-													echo 'R' . $riskRef?>
+													<?php echo $risk->ref?>
 												</strong>
 											</span>
 										</div>
@@ -720,7 +711,7 @@ if ($object->id > 0) {
 																								</div>
 																							</div>
 																							<div>
-																								<span class="ref"><?php echo 'E'. $cotation->id ; ?></span>
+																								<span class="ref"><?php echo $cotation->ref ; ?></span>
 																								<span class="author">
 																									<div class="avatar" style="background-color: #50a1ed;">
 																										<?php $user = new User($db); ?>

@@ -35,7 +35,7 @@ class mod_evaluation_standard extends ModeleNumRefDigiriskEvaluation
 	 */
 	public $version = 'dolibarr'; // 'development', 'experimental', 'dolibarr'
 
-	public $prefixevaluation = '';
+	public $prefixevaluation = 'E';
 
 	/**
 	 * @var string Error code (or message)
@@ -61,38 +61,54 @@ class mod_evaluation_standard extends ModeleNumRefDigiriskEvaluation
 	 */
 	public function getExample()
 	{
+		global $conf;
+
 		return $this->prefixevaluation."1";
 	}
+
 	/**
-	 * Return next value not used or last value used
+	 * 	Return next free value
 	 *
+	 *  @param  Object		$object		Object we need next value for
+	 *  @return string      			Value if KO, <0 if KO
 	 */
 	public function getNextValue($object)
 	{
 		global $db, $conf;
 
-		require_once DOL_DOCUMENT_ROOT.'/core/lib/functions2.lib.php';
-
-		// On defini critere recherche compteur
-		$mask = $conf->global->EVALUATION_STANDARD_MASK;
-
-		if (!$mask)
-		{
-			$this->error = 'NotConfigured';
-			return 0;
+		// first we get the max value
+		$posindice = strlen($this->prefixevaluation) + 1;
+		$sql = "SELECT MAX(CAST(SUBSTRING(ref FROM ".$posindice.") AS SIGNED)) as max";
+		$sql .= " FROM ".MAIN_DB_PREFIX."digiriskdolibarr_digiriskevaluation";
+		$sql .= " WHERE ref LIKE '".$db->escape($this->prefixevaluation)."%'";
+		if ($object->ismultientitymanaged == 1) {
+			$sql .= " AND entity = ".$conf->entity;
+		}
+		elseif ($object->ismultientitymanaged == 2) {
+			// TODO
 		}
 
-		// Get entities
-		$entity = $conf->entity;
+		$resql = $db->query($sql);
+		if ($resql)
+		{
+			$obj = $db->fetch_object($resql);
+			if ($obj) $max = intval($obj->max);
+			else $max = 0;
+		}
+		else
+		{
+			dol_syslog("mod_evaluation_standard::getNextValue", LOG_DEBUG);
+			return -1;
+		}
 
-		$date = dol_now();
+		if ($max >= (pow(10, 4) - 1)) $num = $max + 1; // If counter > 9999, we do not format on 4 chars, we take number as it is
+		else $num = sprintf("%s", $max + 1);
 
-		$numFinal = get_next_value($db, $mask, 'digiriskdolibarr_digiriskevaluation', 'ref','', $object, $date, 'next', false, null, $entity);
-
-
-		$this->prefixevaluation = $numFinal;
-		return  $numFinal;
+		dol_syslog("mod_evaluation_standard::getNextValue return ".$this->prefixevaluation.$num);
+		return $this->prefixevaluation.$num;
 	}
+
+
 
 	/**
 	 *  Return next free value
@@ -102,8 +118,8 @@ class mod_evaluation_standard extends ModeleNumRefDigiriskEvaluation
 	 *  @param  string      $mode           'next' for next value or 'last' for last value
 	 *  @return string                      Next free value
 	 */
-	public function getNumRef($objforref, $mode = 'next')
+	public function getNumRef($objsoc, $objforref, $mode = 'next')
 	{
-		return $this->getNextValue($objforref, $mode);
+		return $this->getNextValue($objsoc, $objforref, $mode);
 	}
 }
