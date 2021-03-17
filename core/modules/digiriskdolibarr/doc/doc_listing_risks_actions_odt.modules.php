@@ -440,7 +440,6 @@ class doc_listing_risks_actions_odt extends ModelePDFListingRisksAction
 										$scale = $lastEvaluation->get_evaluation_scale();
 									}
 
-
 									if ( $scale == $i ) {
 
 										$element = new DigiriskElement($this->db);

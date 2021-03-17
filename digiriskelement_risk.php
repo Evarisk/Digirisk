@@ -38,6 +38,7 @@ if (!$res && file_exists("../../main.inc.php")) $res = @include "../../main.inc.
 if (!$res && file_exists("../../../main.inc.php")) $res = @include "../../../main.inc.php";
 if (!$res) die("Include of main fails");
 
+require_once DOL_DOCUMENT_ROOT.'/core/lib/images.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/core/class/html.formcompany.class.php';
 require_once DOL_DOCUMENT_ROOT.'/core/class/html.formfile.class.php';
 require_once DOL_DOCUMENT_ROOT.'/core/class/html.formprojet.class.php';
@@ -178,8 +179,24 @@ if (empty($reshook))
 				$evaluation 		= new DigiriskEvaluation($db);
 				$refCot 			= new $conf->global->DIGIRISKDOLIBARR_EVALUATION_ADDON();
 
-				mkdir(DOL_DATA_ROOT . '/digiriskdolibarr/risk/' . $refRisk);
-				copy(DOL_DATA_ROOT . '/ecm/digiriskdolibarr/medias/' . $photo,DOL_DATA_ROOT . '/digiriskdolibarr/risk/' .  $refRisk . '/' . $photo);
+				//photo upload and thumbs generation
+
+				$pathToECMPhoto = DOL_DATA_ROOT . '/ecm/digiriskdolibarr/medias/' . $photo;
+				$pathToRiskPhoto = DOL_DATA_ROOT . '/digiriskdolibarr/risk/' . $refRisk ;
+
+				mkdir($pathToRiskPhoto);
+				copy($pathToECMPhoto,$pathToRiskPhoto . '/' . $photo);
+
+				global $maxwidthmini, $maxheightmini, $maxwidthsmall,$maxheightsmall ;
+				$destfull = $pathToRiskPhoto . '/' . $photo;
+
+				// Create thumbs
+				// We can't use $object->addThumbs here because there is no $object known
+				// Used on logon for example
+				$imgThumbSmall = vignette($destfull, $maxwidthsmall, $maxheightsmall, '_small', 50, "thumbs");
+				// Create mini thumbs for image (Ratio is near 16/9)
+				// Used on menu or for setup page for example
+				$imgThumbMini = vignette($destfull, $maxwidthmini, $maxheightmini, '_mini', 50, "thumbs");
 
 				$evaluation->photo			= $photo;
 				$evaluation->cotation 		= $cotation;
@@ -247,14 +264,19 @@ if (empty($reshook))
 
 		$risk = new Risk($db);
 		$risk->fetch($riskID);
-		$files = dol_dir_list(DOL_DATA_ROOT . '/digiriskdolibarr/risk/' . $risk->ref . '/');
+
+		$pathToECMPhoto = DOL_DATA_ROOT . '/ecm/digiriskdolibarr/medias/' . $photo;
+		$pathToRiskPhoto = DOL_DATA_ROOT . '/digiriskdolibarr/risk/' . $risk->ref ;
+
+		$files = dol_dir_list($pathToRiskPhoto . '/');
 		foreach ($files as $file) {
-			unlink(DOL_DATA_ROOT . '/digiriskdolibarr/risk/' . $risk->ref . '/' . $file['name']);
+			unlink($pathToRiskPhoto . '/' . $file['name']);
 		}
 
-		dol_delete_dir(DOL_DATA_ROOT . '/digiriskdolibarr/risk/' . $risk->ref );
-		mkdir(DOL_DATA_ROOT . '/digiriskdolibarr/risk/' . $risk->ref);
-		copy(DOL_DATA_ROOT . '/ecm/digiriskdolibarr/medias/' . $photo,DOL_DATA_ROOT . '/digiriskdolibarr/risk/' .  $risk->ref . '/' . $photo);
+		dol_delete_dir($pathToRiskPhoto );
+		mkdir($pathToRiskPhoto);
+		copy($pathToECMPhoto,$pathToRiskPhoto . '/' . $photo);
+
 
 		$refCot 			= new $conf->global->DIGIRISKDOLIBARR_EVALUATION_ADDON();
 		$evaluation->ref 	= $refCot->getNextValue($evaluation);

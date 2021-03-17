@@ -28,12 +28,13 @@ require_once DOL_DOCUMENT_ROOT.'/contact/class/contact.class.php';
 require_once DOL_DOCUMENT_ROOT .'/societe/class/societe.class.php';
 require_once DOL_DOCUMENT_ROOT .'/user/class/user.class.php';
 dol_include_once('/digiriskdolibarr/class/digiriskelement.class.php');
+dol_include_once('/digiriskdolibarr/class/digiriskdocuments.class.php');
 dol_include_once('/digiriskdolibarr/class/digiriskresources.class.php');
 
 /**
  * Class for Groupment
  */
-class ListingRisksPhoto extends DigiriskElement
+class ListingRisksPhoto extends DigiriskDocuments
 {
 
 	/**

@@ -168,10 +168,8 @@ if (true)
 	dol_fiche_end();
 
 	$modulepart = 'digiriskdolibarr';
-	//$permission = $user->rights->digiriskdolibarr->digiriskelement->write;
-	$permission = 1;
-	//$permtoedit = $user->rights->digiriskdolibarr->digiriskelement->write;
-	$permtoedit = 1;
+	$permission = $user->rights->digiriskdolibarr->digiriskelement->write;
+	$permtoedit = $user->rights->digiriskdolibarr->digiriskelement->write;
 	$param = '&id='.$object->id;
 
 	//$relativepathwithnofile='digiriskelement/' . dol_sanitizeFileName($object->id).'/';

@@ -437,8 +437,10 @@ class doc_listing_risks_photos_odt extends ModelePDFListingRisksPhoto
 								foreach ($risks as $line) {
 									$evaluation = new DigiriskEvaluation($this->db);
 									$lastEvaluation = $evaluation->fetchFromParent($line->id, 1);
-									$lastEvaluation = array_shift($lastEvaluation);
-									$scale = $lastEvaluation->get_evaluation_scale();
+									if ( !empty ($lastEvaluation)) {
+										$lastEvaluation = array_shift($lastEvaluation);
+										$scale = $lastEvaluation->get_evaluation_scale();
+									}
 
 									if ( $scale == $i ) {
 
@@ -470,11 +472,20 @@ class doc_listing_risks_photos_odt extends ModelePDFListingRisksPhoto
 										foreach ($tmparray as $key => $val) {
 											try {
 												if (file_exists($val)) {
-													dol_imageResizeOrCrop($val, 0, 200, 200);
+													$list = getimagesize($val);
+													$newWidth = 200;
+
+													if ($list[0]) {
+														$ratio = $newWidth / $list[0];
+														$newHeight = $ratio * $list[1];
+														dol_imageResizeOrCrop($val, 0, $newWidth, $newHeight);
+													}
+
 													$listlines->setImage($key, $val);
 												} else {
 													$listlines->setVars($key, $val, true, 'UTF-8');
 												}
+
 
 											} catch (OdfException $e) {
 												dol_syslog($e->getMessage(), LOG_INFO);
@@ -482,6 +493,7 @@ class doc_listing_risks_photos_odt extends ModelePDFListingRisksPhoto
 												dol_syslog($e->getMessage(), LOG_INFO);
 											}
 										}
+
 										$listlines->merge();
 									}
 								}
