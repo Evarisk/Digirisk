@@ -298,6 +298,20 @@ if (empty($reshook))
 
 		$risk = new Risk($db);
 		$risk->fetch($id);
+
+		$pathToRiskPhoto = DOL_DATA_ROOT . '/digiriskdolibarr/risk/' . $risk->ref ;
+
+		$files = dol_dir_list($pathToRiskPhoto . '/');
+		foreach ($files as $file) {
+			unlink($pathToRiskPhoto . '/' . $file['name']);
+		}
+		dol_delete_dir($pathToRiskPhoto);
+		$evaluation = new DigiriskEvaluation($db);
+		$lastEvaluations =  $evaluation->fetchFromParent($id);
+		foreach ($lastEvaluations as $lastEvaluation ) {
+			$lastEvaluation->delete($user);
+		}
+
 		$risk->delete($user);
 	}
 

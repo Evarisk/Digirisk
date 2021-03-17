@@ -516,7 +516,7 @@ window.eoxiaJS.createRisk = function ( event ) {
 		}
 
 	})
-	
+
 	$('.main-table').load( document.URL + '&action=add' + refPost + commentPost + categoryPost + cotationPost + descriptionPost + methodPost + criteres + photoPost + ' .main-table')
 
 }
