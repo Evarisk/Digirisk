@@ -370,7 +370,41 @@ if ((empty($action) || ($action != 'edit' && $action != 'create')))
 				$modulepart = 'digiriskdolibarr:ListingRisksAction';
 
 				print $formfile->showdocuments($modulepart,$dir_files, $filedir, $urlsource, $genallowed, $delallowed, $conf->global->DIGIRISKDOLIBARR_LISTINGRISKSACTION_DEFAULT_MODEL, 1, 0, 0, 28, 0, '', '', '', $langs->defaultlang, '');
+//Select mail models is same action as presend
+				if (GETPOST('modelselected')) $action = 'presend';
 
+				// Presend form
+
+				//force generate document when 'send by mail' button is clicked
+				$object->modelpdf = 'digiriskelement_A4_odt';
+
+				//get title and content
+				$modelmail = 'Digirisk_DigiriskElement';
+				$defaulttopic = $langs->trans('SendDigiriskElement') . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
+				$diroutput = $conf->digiriskdolibarr->dir_output . '/digiriskelement';
+				$trackid = 'digiriskelement'.$object->id;
+
+				include DOL_DOCUMENT_ROOT.'/core/tpl/card_presend.tpl.php';
+				print '</div>';
+
+				// Show links to link elements
+				//$linktoelem = $form->showLinkToObjectBlock($object, null, array('digiriskelement'));
+				//$somethingshown = $form->showLinkedObjectBlock($object, $linktoelem);
+
+				print '</div><div class="fichehalfright"><div class="ficheaddleft">';
+
+				$MAXEVENT = 10;
+
+				$morehtmlright = '<a href="'.dol_buildpath('/digiriskdolibarr/digiriskelement_agenda.php', 1).'?id='.$object->id.'">';
+				$morehtmlright .= $langs->trans("SeeAll");
+				$morehtmlright .= '</a>';
+
+				// List of actions on element
+				include_once DOL_DOCUMENT_ROOT.'/core/class/html.formactions.class.php';
+				$formactions = new FormActions($db);
+				$somethingshown = $formactions->showactions($object, $object->element_type.'@digiriskdolibarr', (is_object($object->thirdparty) ? $object->thirdparty->id : 0), 1, '', $MAXEVENT, '', $morehtmlright);
+
+				print '</div></div></div>';
 			}
 			else {
 				$objref = dol_sanitizeFileName($object->ref);
@@ -392,41 +426,7 @@ if ((empty($action) || ($action != 'edit' && $action != 'create')))
 
 	}
 
-	//Select mail models is same action as presend
-	if (GETPOST('modelselected')) $action = 'presend';
 
-	// Presend form
-
-	//force generate document when 'send by mail' button is clicked
-	$object->modelpdf = 'digiriskelement_A4_odt';
-
-	//get title and content
-	$modelmail = 'Digirisk_DigiriskElement';
-	$defaulttopic = $langs->trans('SendDigiriskElement') . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
-	$diroutput = $conf->digiriskdolibarr->dir_output . '/digiriskelement';
-	$trackid = 'digiriskelement'.$object->id;
-
-	include DOL_DOCUMENT_ROOT.'/core/tpl/card_presend.tpl.php';
-	print '</div>';
-
-	// Show links to link elements
-	//$linktoelem = $form->showLinkToObjectBlock($object, null, array('digiriskelement'));
-	//$somethingshown = $form->showLinkedObjectBlock($object, $linktoelem);
-
-	print '</div><div class="fichehalfright"><div class="ficheaddleft">';
-
-	$MAXEVENT = 10;
-
-	$morehtmlright = '<a href="'.dol_buildpath('/digiriskdolibarr/digiriskelement_agenda.php', 1).'?id='.$object->id.'">';
-	$morehtmlright .= $langs->trans("SeeAll");
-	$morehtmlright .= '</a>';
-
-	// List of actions on element
-	include_once DOL_DOCUMENT_ROOT.'/core/class/html.formactions.class.php';
-	$formactions = new FormActions($db);
-	$somethingshown = $formactions->showactions($object, $object->element_type.'@digiriskdolibarr', (is_object($object->thirdparty) ? $object->thirdparty->id : 0), 1, '', $MAXEVENT, '', $morehtmlright);
-
-	print '</div></div></div>';
 }
 
 //Select mail models is same action as presend

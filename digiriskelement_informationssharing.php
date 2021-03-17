@@ -420,24 +420,7 @@ if ((empty($action) || ($action != 'edit' && $action != 'create')))
 	include DOL_DOCUMENT_ROOT.'/core/tpl/card_presend.tpl.php';
 	print '</div>';
 
-	// Show links to link elements
-	//$linktoelem = $form->showLinkToObjectBlock($object, null, array('digiriskelement'));
-	//$somethingshown = $form->showLinkedObjectBlock($object, $linktoelem);
 
-	print '</div><div class="fichehalfright"><div class="ficheaddleft">';
-
-	$MAXEVENT = 10;
-
-	$morehtmlright = '<a href="'.dol_buildpath('/digiriskdolibarr/digiriskelement_agenda.php', 1).'?id='.$object->id.'">';
-	$morehtmlright .= $langs->trans("SeeAll");
-	$morehtmlright .= '</a>';
-
-	// List of actions on element
-	include_once DOL_DOCUMENT_ROOT.'/core/class/html.formactions.class.php';
-	$formactions = new FormActions($db);
-	$somethingshown = $formactions->showactions($object, $object->element_type.'@digiriskdolibarr', (is_object($object->thirdparty) ? $object->thirdparty->id : 0), 1, '', $MAXEVENT, '', $morehtmlright);
-
-	print '</div></div></div>';
 }
 
 //Select mail models is same action as presend

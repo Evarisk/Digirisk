@@ -1023,6 +1023,10 @@ class DigiriskElement extends CommonObject
 			$this->call_trigger('GROUPMENT_GENERATE', $user);
 		} elseif ( preg_match( '/workunit/', $template ) ) {
 			$this->call_trigger('WORKUNIT_GENERATE', $user);
+		} elseif ( preg_match( '/legaldisplay/', $template ) ) {
+			$this->call_trigger('LEGALDISPLAY_GENERATE', $user);
+		} elseif ( preg_match( '/informationssharing/', $template ) ) {
+			$this->call_trigger('INFORMATIONSSHARING_GENERATE', $user);
 		}
 
 		return $result;
