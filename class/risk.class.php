@@ -364,16 +364,19 @@ class Risk extends CommonObject
 		$result = $risk->fetchFromParent($parent_id);
 
 		// RISQUES du parent.
-		foreach ( $result as $risk ) {
-			$evaluation = new DigiriskEvaluation($this->db);
-			$evaluation->fetchFromParent($risk->id, 1);
-			$lastEvaluation = $evaluation->fetchFromParent($risk->id,1);
-			$lastEvaluation = array_shift($lastEvaluation);
+		if (!empty ($result)) {
+			foreach ( $result as $risk ) {
+				$evaluation = new DigiriskEvaluation($this->db);
+				$evaluation->fetchFromParent($risk->id, 1);
+				$lastEvaluation = $evaluation->fetchFromParent($risk->id,1);
+				$lastEvaluation = array_shift($lastEvaluation);
 
-			$risk->lastEvaluation = $lastEvaluation->cotation;
+				$risk->lastEvaluation = $lastEvaluation->cotation;
 
-			$risks[$risk->id] = $risk;
+				$risks[$risk->id] = $risk;
+			}
 		}
+
 
 		if ( $recursive ) {
 			$elements = $object->recurse_tree($parent_id,0,$objects);
@@ -392,17 +395,19 @@ class Risk extends CommonObject
 				$risk = new Risk($this->db);
 
 				$result = $risk->fetchFromParent($element);
+				if ( !empty ($result)) {
+					foreach ( $result as $risk ) {
+						$evaluation = new DigiriskEvaluation($this->db);
+						$evaluation->fetchFromParent($risk->id, 1);
+						$lastEvaluation = $evaluation->fetchFromParent($risk->id,1);
+						$lastEvaluation = array_shift($lastEvaluation);
 
-				foreach ( $result as $risk ) {
-					$evaluation = new DigiriskEvaluation($this->db);
-					$evaluation->fetchFromParent($risk->id, 1);
-					$lastEvaluation = $evaluation->fetchFromParent($risk->id,1);
-					$lastEvaluation = array_shift($lastEvaluation);
+						$risk->lastEvaluation = $lastEvaluation->cotation;
 
-					$risk->lastEvaluation = $lastEvaluation->cotation;
-
-					$risks[$risk->id] = $risk;
+						$risks[$risk->id] = $risk;
+					}
 				}
+
 			}
 		}
 

@@ -31,6 +31,7 @@
 dol_include_once('/custom/digiriskdolibarr/lib/files.lib.php');
 dol_include_once('/core/lib/files.lib.php');
 require_once DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/core/modules/digiriskdolibarr/modules_listingrisksaction.php';
+//require_once DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/core/modules/digiriskdolibarr/mod_listingrisksaction_standard.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/company.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/doc.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/images.lib.php';
@@ -222,6 +223,10 @@ class doc_listing_risks_actions_odt extends ModelePDFListingRisksAction
 			$object->modelpdf = 'listing_risks_actions_odt';
 		}
 
+//		$listingrisksaction = new ListingRisksAction($this->db);
+//
+//		$mod = new $conf->global->DIGIRISKDOLIBARR_LISTINGRISKSACTION_ADDON($this->db);
+//		$ref = $mod->getNextValue($listingrisksaction);
 
 		$dir = $conf->digiriskdolibarr->multidir_output[isset($conf->entity) ? $conf->entity : 1] . '/listingrisksaction';
 		$objectref = dol_sanitizeFileName($object->ref);
@@ -265,7 +270,10 @@ class doc_listing_risks_actions_odt extends ModelePDFListingRisksAction
 			{
 				$objectlabel = dol_sanitizeFileName($object->label);
 				$objectlabel = preg_replace('/ /', '_', $objectlabel);
+
 				$filename = dol_print_date(dol_now(),'%Y%m%d') . (strlen($objectref) ? '_' . $objectref : '') . '_listing_risques_actions_correctives_' . (strlen($objectlabel) ? $objectlabel : 'global') . '.' . $newfileformat;
+
+//				$filename = $ref . '.odt';
 			}
 			$object->last_main_doc = $filename;
 
@@ -288,16 +296,6 @@ class doc_listing_risks_actions_odt extends ModelePDFListingRisksAction
 			//print "conf->societe->dir_temp=".$conf->societe->dir_temp;
 
 			dol_mkdir($conf->digiriskdolibarr->dir_temp);
-
-
-			// If CUSTOMER contact defined on order, we use it
-			$usecontact = false;
-			$arrayidcontact = $object->getIdContact('external', 'CUSTOMER');
-			if (count($arrayidcontact) > 0)
-			{
-				$usecontact = true;
-				$result = $object->fetch_contact($arrayidcontact[0]);
-			}
 
 			// Recipient name
 			$contactobject = null;
@@ -437,8 +435,11 @@ class doc_listing_risks_actions_odt extends ModelePDFListingRisksAction
 								foreach ($risks as $line) {
 									$evaluation = new DigiriskEvaluation($this->db);
 									$lastEvaluation = $evaluation->fetchFromParent($line->id, 1);
-									$lastEvaluation = array_shift($lastEvaluation);
-									$scale = $lastEvaluation->get_evaluation_scale();
+									if ( !empty ($lastEvaluation) ) {
+										$lastEvaluation = array_shift($lastEvaluation);
+										$scale = $lastEvaluation->get_evaluation_scale();
+									}
+
 
 									if ( $scale == $i ) {
 
