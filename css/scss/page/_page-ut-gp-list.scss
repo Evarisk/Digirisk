@@ -20,7 +20,7 @@
   }
   .navigation-container {
     //padding-left: 10px;
-    padding-right: 10px;
+    //padding-right: 10px;
   }
 
   .add-container {
@@ -43,6 +43,7 @@
   padding-top: 27px;
   position: relative;
   padding-left: 10px;
+  padding-right: 10px;
 
   .title {
     font-weight: 700;
@@ -62,6 +63,7 @@
 /** Toolbar */
 .page-ut-gp-list .side-nav .toolbar {
   padding-left: 10px;
+  padding-right: 10px;
 
   .toggle-plus, .toggle-minus {
     display: inline-block;
@@ -100,6 +102,9 @@
 
       &:hover {
         cursor: pointer;
+      }
+      .toggle-icon {
+        line-height: 40px;
       }
     }
     .spacer {
@@ -196,8 +201,13 @@
   }
 
   .unit.active {
-    > .unit-container .name {
-      font-weight: 600;
+    > .unit-container {
+      .title {
+        background: rgba(0,0,0,0.1);
+        .name {
+          font-weight: 600;
+        }
+      }
     }
   }
 

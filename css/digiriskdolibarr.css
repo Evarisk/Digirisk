@@ -405,10 +405,6 @@
   padding: 0 !important;
 }
 
-.page-ut-gp-list .side-nav .navigation-container {
-  padding-right: 10px;
-}
-
 .page-ut-gp-list .side-nav .add-container {
   position: absolute;
   right: 0;
@@ -429,6 +425,7 @@
   padding-top: 27px;
   position: relative;
   padding-left: 10px;
+  padding-right: 10px;
 }
 
 .page-ut-gp-list .side-nav .society-header .title {
@@ -449,6 +446,7 @@
 /** Toolbar */
 .page-ut-gp-list .side-nav .toolbar {
   padding-left: 10px;
+  padding-right: 10px;
 }
 
 .page-ut-gp-list .side-nav .toolbar .toggle-plus, .page-ut-gp-list .side-nav .toolbar .toggle-minus {
@@ -495,6 +493,10 @@
 
 .page-ut-gp-list .side-nav .workunit-list .unit-container .toggle-unit:hover {
   cursor: pointer;
+}
+
+.page-ut-gp-list .side-nav .workunit-list .unit-container .toggle-unit .toggle-icon {
+  line-height: 40px;
 }
 
 .page-ut-gp-list .side-nav .workunit-list .unit-container .spacer {
@@ -598,7 +600,11 @@
   background: rgba(0, 0, 0, 0.3);
 }
 
-.page-ut-gp-list .side-nav .workunit-list .unit.active > .unit-container .name {
+.page-ut-gp-list .side-nav .workunit-list .unit.active > .unit-container .title {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.page-ut-gp-list .side-nav .workunit-list .unit.active > .unit-container .title .name {
   font-weight: 600;
 }
 
