@@ -449,7 +449,8 @@ window.eoxiaJS.closeModal = function ( event ) {
 window.eoxiaJS.openModal = function ( event ) {
 
 	let idSelected = $(this).attr('value');
-
+	console.log('kk')
+	console.log(idSelected)
 
 	$('.modal-active').removeClass('modal-active');
 	console.log(this)

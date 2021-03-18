@@ -754,14 +754,14 @@ while ($i < ($limit ? min($num, $limit) : $num))
 				?>
 
 				<!-- Afficahge évaluation dans tableau -->
-				<div class="risk-evaluation">
+				<div class="risk-evaluation ">
 					<div id="cotation_square<?php echo $object->id ?>" class="evaluation-cotation" data-scale="<?php echo $lastEvaluation->get_evaluation_scale() ?>">
 						<span><?php echo $lastEvaluation->cotation; ?></span>
 					</div>
 					<div class="evaluation-photo"><i class="fas fa-image"></i></div>
 					<div class="evaluation-content">
 						<div class="evaluation-data">
-							<span class="evaluation-reference modal-open"><?php echo $lastEvaluation->ref; ?></span>
+							<span class="evaluation-reference action cotation default-cotation modal-open" value="<?php echo $risk->id ?>"><?php echo $lastEvaluation->ref; ?></span>
 							<span class="evaluation-author">
 								<?php $user->fetch($lastEvaluation->fk_user_creat); ?>
 								<?php echo $user->getNomUrl( 0, '', 0, 0, 2 ); ?>
@@ -769,7 +769,7 @@ while ($i < ($limit ? min($num, $limit) : $num))
 							<span class="evaluation-date">
 								<i class="fas fa-calendar-alt"></i> <?php echo date('d/m/Y', $lastEvaluation->date_creation); ?>
 							</span>
-							<span class="evaluation-count"><i class="fas fa-comments"></i> 999</span>
+							<span class="evaluation-count"><i class="fas fa-comments"></i><?php echo count($cotationList) ?></span>
 						</div>
 						<div class="evaluation-comment">
 							<?php echo $lastEvaluation->comment; ?>
@@ -781,15 +781,11 @@ while ($i < ($limit ? min($num, $limit) : $num))
 				</div>
 				<!-- Fin affichage évaluation -->
 
-
-				<div class="digirisk-wrap wpeo-wrap">
-					<div class="wpeo-table table-flex table-risk main-table">
-						<div class="table-row risk-row">
-							<div class="table-cell table-50 cell-cotation" data-title="Cot.">
+<!--				<div class="digirisk-wrap wpeo-wrap">-->
+<!--					<div class="wpeo-table table-flex table-risk main-table">-->
+<!--						<div class="table-row risk-row">-->
+<!--							<div class="table-cell table-50 cell-cotation" data-title="Cot.">-->
 								<div class="cotation-container grid wpeo-modal-event tooltip hover cotation-square" id="cotation_square<?php echo $object->id ?>">
-									<div class="action cotation default-cotation modal-open" data-scale="<?php echo $lastEvaluation->get_evaluation_scale() ?>" value="<?php echo $risk->id ?>">
-										<span><?php echo $lastEvaluation->cotation; ?></span>
-									</div>
 											<!-- Modal-EvaluationsList -->
 									<div id="cotation_modal<?php echo $risk->id ?>" class="wpeo-modal" value="<?php echo $risk->id ?>">
 										<div class="modal-container wpeo-modal-event">
@@ -805,29 +801,35 @@ while ($i < ($limit ? min($num, $limit) : $num))
 													$cotationList = $evaluation->fetchFromParent($object->id);
 													if (!empty($cotationList)) :
 														foreach ($cotationList as $cotation) : ?>
-															<li class="evaluations-item">
-																<div class="cotation-container grid">
-																	<div class="action cotation default-cotation level<?php echo $cotation->get_evaluation_scale(); ?>">
-																		<span><?php echo  $cotation->cotation; ?></span>
+															<div class="risk-evaluation">
+																<div id="cotation_square<?php echo $object->id ?>" class="evaluation-cotation" data-scale="<?php echo $cotation->get_evaluation_scale() ?>">
+																	<span><?php echo $cotation->cotation; ?></span>
+																</div>
+																<div class="evaluation-photo"><i class="fas fa-image"></i></div>
+																<div class="evaluation-content">
+																	<div class="evaluation-data">
+																		<span class="evaluation-reference action cotation default-cotation modal-open" value="<?php echo $risk->id ?>"><?php echo $lastEvaluation->ref; ?></span>
+																		<span class="evaluation-author">
+																			<?php $user->fetch($cotation->fk_user_creat); ?>
+																			<?php echo $user->getNomUrl( 0, '', 0, 0, 2 ); ?>
+																		</span>
+																		<span class="evaluation-date">
+																			<i class="fas fa-calendar-alt"></i> <?php echo date('d/m/Y', $cotation->date_creation); ?>
+																		</span>
+																		<span class="evaluation-count"><i class="fas fa-comments"></i><?php echo count($cotationList) ?></span>
+																	</div>
+																	<div class="evaluation-comment">
+																		<?php echo $cotation->comment; ?>
 																	</div>
 																</div>
-																<div>
-																	<span class="ref"><?php echo 'E'. $cotation->id ; ?></span>
-																	<span class="author">
-																		<div class="avatar" style="background-color: #50a1ed;">
-																			<?php $user = new User($db); ?>
-																			<?php $user->fetch($cotation->fk_user_creat); ?>
-																			<span><?php echo $user->firstname[0] . $user->lastname[0]; ?></span>
-																		</div>
-																	</span>
-																	<span class="date"><i class="fas fa-calendar-alt"></i> <?php echo date("d/m/Y", $cotation->date_creation); ?></span>
+																<div class="evluation-add wpeo-button button-square-40 button-primary">
+																	<i class="fas fa-edit button-icon"></i>
 																</div>
-																<span class="comment"><?php echo $cotation->comment; ?></span>
-																<hr>
-															</li>
+															</div>
 														<?php endforeach; ?>
 												</ul>
 											</div>
+
 											<!-- Modal-Footer -->
 											<div class="modal-footer">
 												<div class="wpeo-button button-grey modal-close">
@@ -838,15 +840,10 @@ while ($i < ($limit ? min($num, $limit) : $num))
 									</div>
 								<?php endif; ?>
 								</div>
-							</div>
-							<div class="table-cell cell-comment">
-								<?php $user->fetch($lastEvaluation->fk_user_creat);
-								echo $user->getNomUrl() . ' '. $langs->trans('EvaluatedOn') . ' '. date('Y/m/d H:i:sz', $lastEvaluation->date_creation) . ' : ' . $lastEvaluation->comment;
-								?>
-							</div>
-						</div>
-					</div>
-				</div> <?php
+<!--							</div>-->
+<!--						</div>-->
+<!--					</div>-->
+<!--				</div> --><?php
 			}
 			elseif ($key == 'has_tasks') { ?>
 				<div class="table-cell cell-tasks" data-title="Tâches" class="padding">
