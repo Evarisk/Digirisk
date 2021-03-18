@@ -1,0 +1,100 @@
+.risk-evaluation {
+  display: flex;
+  box-sizing: border-box;
+
+  * {
+    box-sizing: border-box;
+  }
+  > * {
+    margin-top: auto;
+    margin-bottom: auto;
+  }
+
+  .evaluation-cotation {
+    width: 40px;
+    min-width: 40px;
+    height: 40px;
+    line-height: 40px;
+    text-align: center;
+    border-radius: 6px;
+    background: $color__grey;
+    color: rgba(0,0,0,0.8);
+    font-size: 16px;
+    font-weight: 600;
+    margin-right: 0.5em;
+
+    &[data-scale="1"] {
+      background: $color__grey;
+    }
+    &[data-scale="2"] {
+      background: $color__yellow;
+      color: #fff;
+    }
+    &[data-scale="3"] {
+      background: $color__red;
+      color: #fff;
+    }
+    &[data-scale="4"] {
+      background: $color__dark;
+      color: #fff;
+    }
+  }
+
+  .evaluation-photo {
+    width: 40px;
+    min-width: 40px;
+    height: 40px;
+    line-height: 40px;
+    text-align: center;
+    background: $color__grey;
+    color: rgba(0,0,0,0.3);
+    margin-right: 0.5em;
+  }
+
+  .evaluation-content .evaluation-data {
+    display: flex;
+    flex-wrap: wrap;
+
+    > * {
+      margin: auto 0.2em;
+    }
+
+    .evaluation-reference {
+      color: $color__secondary;
+      font-weight: 600;
+
+      &:hover {
+        text-decoration: underline;
+        cursor: pointer;
+      }
+    }
+    .evaluation-author {
+      display: inline-block;
+      width: 25px;
+      min-width: 25px;
+      height: 25px;
+      line-height: 25px;
+      background: rgba(0,0,0,0.5);
+      overflow: hidden;
+      text-transform: uppercase;
+      font-size: 14px;
+      font-weight: 600;
+      border-radius: 50%;
+
+      a {
+        color: #fff !important;
+      }
+    }
+    .evaluation-count {
+      background: rgba(0,0,0,0.2);
+      font-size: 12px;
+      border-radius: 4px;
+      padding: 0.2em 0.4em;
+    }
+  }
+
+  .evluation-add {
+    min-width: 40px;
+    margin-left: 0.5em;
+  }
+}

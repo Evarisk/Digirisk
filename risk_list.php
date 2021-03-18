@@ -752,6 +752,36 @@ while ($i < ($limit ? min($num, $limit) : $num))
 			if ($key == 'status') print $lastEvaluation->getLibStatut(5);
 			elseif ($key == 'cotation') {
 				?>
+
+				<!-- Afficahge évaluation dans tableau -->
+				<div class="risk-evaluation">
+					<div id="cotation_square<?php echo $object->id ?>" class="evaluation-cotation" data-scale="<?php echo $lastEvaluation->get_evaluation_scale() ?>">
+						<span><?php echo $lastEvaluation->cotation; ?></span>
+					</div>
+					<div class="evaluation-photo"><i class="fas fa-image"></i></div>
+					<div class="evaluation-content">
+						<div class="evaluation-data">
+							<span class="evaluation-reference modal-open"><?php echo $lastEvaluation->ref; ?></span>
+							<span class="evaluation-author">
+								<?php $user->fetch($lastEvaluation->fk_user_creat); ?>
+								<?php echo $user->getNomUrl( 0, '', 0, 0, 2 ); ?>
+							</span>
+							<span class="evaluation-date">
+								<i class="fas fa-calendar-alt"></i> <?php echo date('d/m/Y', $lastEvaluation->date_creation); ?>
+							</span>
+							<span class="evaluation-count"><i class="fas fa-comments"></i> 999</span>
+						</div>
+						<div class="evaluation-comment">
+							<?php echo $lastEvaluation->comment; ?>
+						</div>
+					</div>
+					<div class="evluation-add wpeo-button button-square-40 button-primary">
+						<i class="fas fa-plus button-icon"></i>
+					</div>
+				</div>
+				<!-- Fin affichage évaluation -->
+
+
 				<div class="digirisk-wrap wpeo-wrap">
 					<div class="wpeo-table table-flex table-risk main-table">
 						<div class="table-row risk-row">
