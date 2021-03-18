@@ -1106,9 +1106,9 @@ class DigiriskElement extends CommonObject
 		$object  = new DigiriskElement($this->db);
 		$objects = $object->fetchAll('', '', 0,0,array('entity' => $conf->entity));
 		$results  = $this->recurse_tree(0,0,$objects); ?>
-		<div id="id-container" class="id-container">
-			<div class="side-nav" style="width: 500px; display: block">
-				<div id="id-left" style="width: 500px">
+		<div id="id-container" class="id-container page-ut-gp-list">
+			<div class="side-nav">
+				<div id="id-left">
 					<div class="digirisk-wrap wpeo-wrap">
 						<div class="navigation-container">
 							<div class="society-header">
@@ -1119,20 +1119,20 @@ class DigiriskElement extends CommonObject
 										</div>
 									<div class="add-container">
 										<a id="newGroupment" href="digiriskelement_card.php?action=create&element_type=groupment&fk_parent=0">
-											<div class="wpeo-button button-square-50 wpeo-tooltip-event" data-direction="bottom" data-color="light" aria-label="<?php echo $langs->trans('NewGroupment'); ?>"><span class="button-icon fas fa-home"></span><span class="button-add animated fas fa-plus-circle"></span></div>
+											<div class="wpeo-button button-square-40 button-secondary wpeo-tooltip-event" data-direction="bottom" data-color="light" aria-label="<?php echo $langs->trans('NewGroupment'); ?>"><strong>GP</strong><span class="button-add animated fas fa-plus-circle"></span></div>
 										</a>
 										<a id="newWorkunit" href="digiriskelement_card.php?action=create&element_type=workunit&fk_parent=0">
-											<div class="wpeo-button button-square-50 wpeo-tooltip-event" data-direction="bottom" data-color="light" aria-label="<?php echo $langs->trans('NewWorkunit'); ?>"><span class="button-icon fas fa-home"></span><span class="button-add animated fas fa-plus-circle"></span></div>
+											<div class="wpeo-button button-square-40 wpeo-tooltip-event" data-direction="bottom" data-color="light" aria-label="<?php echo $langs->trans('NewWorkunit'); ?>"><strong>UT</strong><span class="button-add animated fas fa-plus-circle"></span></div>
 										</a>
 									</div>
-									<div class="mobile-add-container wpeo-dropdown dropdown-right option">
-										<div class="dropdown-toggle"><i class="action fas fa-ellipsis-v"></i></div>
-										<ul class="dropdown-content">
-											<li class="dropdown-item" data-type="Group_Class"><i class="icon dashicons dashicons-admin-multisite"></i><?php //echo //esc_attr( 'Ajouter groupement', 'digirisk' ); ?></li>
-											<li class="dropdown-item" data-type="Workunit_Class"><i class="icon dashicons dashicons-admin-home"></i><?php //echo //esc_attr( 'Ajouter unité', 'digirisk' ); ?></li>
-										</ul>
-									</div>
-									<div class="close-popup"><i class="icon fas fa-times"></i></div>
+<!--									<div class="mobile-add-container wpeo-dropdown dropdown-right option">-->
+<!--										<div class="dropdown-toggle"><i class="action fas fa-ellipsis-v"></i></div>-->
+<!--										<ul class="dropdown-content">-->
+<!--											<li class="dropdown-item" data-type="Group_Class"><i class="icon dashicons dashicons-admin-multisite"></i>--><?php ////echo //esc_attr( 'Ajouter groupement', 'digirisk' ); ?><!--</li>-->
+<!--											<li class="dropdown-item" data-type="Workunit_Class"><i class="icon dashicons dashicons-admin-home"></i>--><?php ////echo //esc_attr( 'Ajouter unité', 'digirisk' ); ?><!--</li>-->
+<!--										</ul>-->
+<!--									</div>-->
+<!--									<div class="close-popup"><i class="icon fas fa-times"></i></div>-->
 								</a>
 							</div>
 							<div class="toolbar">
@@ -1204,7 +1204,7 @@ class DigiriskElement extends CommonObject
 
 		if ( !empty( $results ) ) {
 			foreach ($results as $element) { ?>
-				<li class="unit" id="unit<?php  echo $element['object']->id; ?>">
+				<li class="unit type-<?php echo $element['object']->element_type; ?>" id="unit<?php  echo $element['object']->id; ?>">
 					<div class="unit-container">
 						<?php if ($element['object']->element_type == 'groupment' && count($element['children'])) { ?>
 							<div class="toggle-unit">
@@ -1232,30 +1232,30 @@ class DigiriskElement extends CommonObject
 							<div class="add-container">
 								<a id="newGroupment" href="digiriskelement_card.php?action=create&element_type=groupment&fk_parent=<?php echo $element['object']->id; ?>">
 									<div
-										class="wpeo-button button-square-50 wpeo-tooltip-event"
+										class="wpeo-button button-secondary button-square-40 wpeo-tooltip-event"
 										data-direction="bottom" data-color="light"
 										aria-label="<?php echo $langs->trans('NewGroupment'); ?>">
-										<span class="button-icon fas fa-home"></span>
+										<strong>GP</strong>
 										<span class="button-add animated fas fa-plus-circle"></span>
 									</div>
 								</a>
 								<a id="newWorkunit" href="digiriskelement_card.php?action=create&element_type=workunit&fk_parent=<?php echo $element['object']->id; ?>">
 									<div
-										class="wpeo-button button-square-50 wpeo-tooltip-event"
+										class="wpeo-button button-square-40 wpeo-tooltip-event"
 										data-direction="bottom" data-color="light"
 										aria-label="<?php echo $langs->trans('NewWorkunit'); ?>">
-										<span class="button-icon fas fa-home"></span>
+										<strong>UT</strong>
 										<span class="button-add animated fas fa-plus-circle"></span>
 									</div>
 								</a>
 							</div>
-							<div class="mobile-add-container wpeo-dropdown dropdown-right option">
-								<div class="dropdown-toggle"><i class="action fas fa-ellipsis-v"></i></div>
-								<ul class="dropdown-content">
-									<li class="dropdown-item" data-type="Group_Class"><i class="icon dashicons dashicons-admin-multisite"></i><?php echo $langs->trans('NewGroupment'); ?></li>
-									<li class="dropdown-item" data-type="Workunit_Class"><i class="icon dashicons dashicons-admin-home"></i><?php echo $langs->trans('NewWorkunit'); ?></li>
-								</ul>
-							</div>
+<!--							<div class="mobile-add-container wpeo-dropdown dropdown-right option">-->
+<!--								<div class="dropdown-toggle"><i class="action fas fa-ellipsis-v"></i></div>-->
+<!--								<ul class="dropdown-content">-->
+<!--									<li class="dropdown-item" data-type="Group_Class"><i class="icon dashicons dashicons-admin-multisite"></i>--><?php //echo $langs->trans('NewGroupment'); ?><!--</li>-->
+<!--									<li class="dropdown-item" data-type="Workunit_Class"><i class="icon dashicons dashicons-admin-home"></i>--><?php //echo $langs->trans('NewWorkunit'); ?><!--</li>-->
+<!--								</ul>-->
+<!--							</div>-->
 						<?php } ?>
 					</div>
 					<ul class="sub-list"><?php $this->display_recurse_tree($element['children']) ?></ul>

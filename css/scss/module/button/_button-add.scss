@@ -1,0 +1,21 @@
+.wpeo-button {
+  .button-add {
+    position: absolute;
+    top: 0.4em;
+    right: 0.2em;
+    opacity: 0.6;
+    font-size: 14px;
+    transition: all 0.2s ease-out;
+  }
+
+  &:hover {
+    .button-add {
+      opacity: 0.8;
+    }
+  }
+}
+
+.wpeo-button.button-square-40 .button-add {
+  top: 0.1em;
+  right: 0;
+}
