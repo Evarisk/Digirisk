@@ -678,6 +678,10 @@
   margin-right: 0.5em;
 }
 
+.risk-evaluation .evaluation-content {
+  width: 100%;
+}
+
 .risk-evaluation .evaluation-content .evaluation-data {
   display: -webkit-box;
   display: -ms-flexbox;
