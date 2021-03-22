@@ -106,11 +106,11 @@ class Risk extends CommonObject
 		'model_pdf' => array('type'=>'varchar(255)', 'label'=>'Model pdf', 'enabled'=>'1', 'position'=>9, 'notnull'=>-1, 'visible'=>0,),
 		'model_odt' => array('type'=>'varchar(255)', 'label'=>'Model odt', 'enabled'=>'1', 'position'=>10, 'notnull'=>0, 'visible'=>-1,),
 		'ref_ext' => array('type'=>'varchar(255)', 'label'=>'RefExt', 'enabled'=>'1', 'position'=>11, 'notnull'=>0, 'visible'=>-1,),
-		'fk_element' => array('type'=>'integer', 'label'=>'FK Element', 'enabled'=>'1', 'position'=>12, 'notnull'=>1, 'visible'=>-1,),
+		'fk_element' => array('type'=>'integer', 'label'=>'FK Element', 'enabled'=>'1', 'position'=>12, 'notnull'=>1, 'visible'=>0,),
 		'category' => array('type'=>'varchar(255)', 'label'=>'RiskCategory', 'enabled'=>'1', 'position'=>3, 'notnull'=>0, 'visible'=>-1,),
-		'fk_projet' => array('type'=>'integer', 'label'=>'FK Projet', 'enabled'=>'1', 'position'=>14, 'notnull'=>1, 'visible'=>-1,),
+		'fk_projet' => array('type'=>'integer:Project:projet/class/project.class.php', 'label'=>'Projet', 'enabled'=>'1', 'position'=>14, 'notnull'=>1, 'visible'=>-1,),
 		'status' => array('type'=>'integer', 'label'=>'Status', 'enabled'=>'1', 'position'=>15, 'notnull'=>0, 'visible'=>-1,),
-		'has_photo' => array('type'=>'integer', 'label'=>'hasPhoto', 'enabled'=>'1', 'position'=>13, 'notnull'=>0, 'visible'=>-1,),
+		'has_photo' => array('type'=>'integer', 'label'=>'hasPhoto', 'enabled'=>'1', 'position'=>13, 'notnull'=>0, 'visible'=>0),
 		'entity' => array('type'=>'integer', 'label'=>'Entity', 'enabled'=>'1', 'position'=>17, 'notnull'=>0, 'visible'=>-1,),
 	);
 	public $rowid;

@@ -722,7 +722,7 @@ div.mainmenu.digiriskdolibarr {
 	line-height: 1.4;
 }
 
-.wpeo-wrap .cotation {
+.cotation {
 	display: block;
 	width: 50px;
 	min-width: 50px;
@@ -732,51 +732,51 @@ div.mainmenu.digiriskdolibarr {
 	transition: all 0.2s ease-out;
 }
 
-.wpeo-wrap .cotation.default-cotation:hover {
+.cotation.default-cotation:hover {
 	background: rgba(0, 0, 0, 0.1);
 }
 
-.wpeo-wrap .cotation[data-scale="2"], .wpeo-wrap .cotation[data-scale="3"], .wpeo-wrap .cotation[data-scale="4"] {
+.cotation[data-scale="2"], .wpeo-wrap .cotation[data-scale="3"], .wpeo-wrap .cotation[data-scale="4"] {
 	color: #fff !important;
 }
 
-.wpeo-wrap .cotation[data-scale="1"], .wpeo-wrap .cotation.level1 {
+.cotation[data-scale="1"], .wpeo-wrap .cotation.level1 {
 	background: #e2e2e2;
 	color: rgba(0, 0, 0, 0.6);
 }
 
-.wpeo-wrap .cotation[data-scale="1"]:hover, .wpeo-wrap .cotation.level1:hover {
+.cotation[data-scale="1"]:hover, .wpeo-wrap .cotation.level1:hover {
 	background: #cecece;
 }
 
-.wpeo-wrap .cotation[data-scale="2"], .wpeo-wrap .cotation.level2 {
+.cotation[data-scale="2"], .wpeo-wrap .cotation.level2 {
 	background: #e9ad4f;
 	color: #fff;
 }
 
-.wpeo-wrap .cotation[data-scale="2"]:hover, .wpeo-wrap .cotation.level2:hover {
+.cotation[data-scale="2"]:hover, .wpeo-wrap .cotation.level2:hover {
 	background: #e49c2b;
 }
 
-.wpeo-wrap .cotation[data-scale="3"], .wpeo-wrap .cotation.level3 {
+.cotation[data-scale="3"], .wpeo-wrap .cotation.level3 {
 	background: #e05353;
 	color: #fff;
 }
 
-.wpeo-wrap .cotation[data-scale="3"]:hover, .wpeo-wrap .cotation.level3:hover {
+.cotation[data-scale="3"]:hover, .wpeo-wrap .cotation.level3:hover {
 	background: #da3030;
 }
 
-.wpeo-wrap .cotation[data-scale="4"], .wpeo-wrap .cotation.level4 {
+.cotation[data-scale="4"], .wpeo-wrap .cotation.level4 {
 	background: #2b2b2b;
 	color: #fff;
 }
 
-.wpeo-wrap .cotation[data-scale="4"]:hover, .wpeo-wrap .cotation.level4:hover {
+.cotation[data-scale="4"]:hover, .wpeo-wrap .cotation.level4:hover {
 	background: #171717;
 }
 
-.wpeo-wrap .cotation.method {
+.cotation.method {
 	background: #3495f0;
 	color: #fff;
 }
@@ -789,21 +789,21 @@ div.mainmenu.digiriskdolibarr {
 	float: left;
 }
 
-.wpeo-wrap .wpeo-table.evaluation-method {
+.wpeo-table.evaluation-method {
 	background: none !important;
 }
 
-.wpeo-wrap .wpeo-table.evaluation-method .table-row.table-header {
+.wpeo-table.evaluation-method .table-row.table-header {
 	background: #fff !important;
 }
 
 @media (max-width: 480px) {
-	.wpeo-wrap .wpeo-table.evaluation-method .table-row.table-header {
+	.wpeo-table.evaluation-method .table-row.table-header {
 		display: none;
 	}
 }
 
-.wpeo-wrap .wpeo-table.evaluation-method .
+.wpeo-table.evaluation-method .
 
 
 {
@@ -815,12 +815,12 @@ div.mainmenu.digiriskdolibarr {
 }
 
 @media (max-width: 480px) {
-	.wpeo-wrap .wpeo-table.evaluation-method .table-cell {
+	.wpeo-table.evaluation-method .table-cell {
 		width: 100% !important;
 	}
 }
 
-.wpeo-wrap .wpeo-table.evaluation-method .table-cell.can-select::after {
+.wpeo-table.evaluation-method .table-cell.can-select::after {
 	display: block;
 	content: '';
 	position: absolute;
@@ -834,18 +834,18 @@ div.mainmenu.digiriskdolibarr {
 	transition: all 0.2s ease-out;
 }
 
-.wpeo-wrap .wpeo-table.evaluation-method .table-cell.can-select:hover {
+.wpeo-table.evaluation-method .table-cell.can-select:hover {
 	cursor: pointer;
 	transform: scale(1);
 	opacity: 1;
 }
 
-.wpeo-wrap .wpeo-table.evaluation-method .table-cell.can-select:hover::after {
+.wpeo-table.evaluation-method .table-cell.can-select:hover::after {
 	/*transform: scale(1);*/
 	/*opacity: 1;*/					/*  @todo remettre les after quand le css sera réglé */
 }
 
-.wpeo-wrap .wpeo-table.evaluation-method .table-cell.can-select.active {
+.wpeo-table.evaluation-method .table-cell.can-select.active {
 	color: #fff;
 	transform: scale(1) !important;*/
 	opacity: 1 !important;
@@ -853,41 +853,41 @@ div.mainmenu.digiriskdolibarr {
 	z-index: -1;
 }
 
-.wpeo-wrap .wpeo-table.evaluation-method .table-cell.can-select.active::after {
+.wpeo-table.evaluation-method .table-cell.can-select.active::after {
 	/*transform: scale(1) !important;*/
 	/*opacity: 1 !important;*/
 	/*background: #3495f0;*/
 	/*z-index: -1;*/
 }
 
-.wpeo-wrap .wpeo-table.evaluation-method .table-row > .table-cell:first-child {
+.wpeo-table.evaluation-method .table-row > .table-cell:first-child {
 	background: #3495f0;
 	color: #fff;
 }
 
 @media (max-width: 480px) {
-	.wpeo-wrap .wpeo-table.evaluation-method .table-row > .table-cell:first-child {
+	.wpeo-table.evaluation-method .table-row > .table-cell:first-child {
 		background: #272a35;
 	}
 }
 
-.wpeo-wrap .wpeo-table.evaluation-method .table-row:not(.header) .table-cell:nth-of-type(2).active::after {
+.wpeo-table.evaluation-method .table-row:not(.header) .table-cell:nth-of-type(2).active::after {
 	background: #3495f0;
 }
 
-.wpeo-wrap .wpeo-table.evaluation-method .table-row:not(.header) .table-cell:nth-of-type(3).active::after {
+.wpeo-table.evaluation-method .table-row:not(.header) .table-cell:nth-of-type(3).active::after {
 	background: #0f6fc9;
 }
 
-.wpeo-wrap .wpeo-table.evaluation-method .table-row:not(.header) .table-cell:nth-of-type(4).active::after {
+.wpeo-table.evaluation-method .table-row:not(.header) .table-cell:nth-of-type(4).active::after {
 	background: #0a4781;
 }
 
-.wpeo-wrap .wpeo-table.evaluation-method .table-row:not(.header) .table-cell:nth-of-type(5).active::after {
+.wpeo-table.evaluation-method .table-row:not(.header) .table-cell:nth-of-type(5).active::after {
 	background: #04203a;
 }
 
-.wpeo-wrap .wpeo-table.evaluation-method .table-row:not(.header) .table-cell:nth-of-type(6).active::after {
+.wpeo-table.evaluation-method .table-row:not(.header) .table-cell:nth-of-type(6).active::after {
 	background: black;
 }
 

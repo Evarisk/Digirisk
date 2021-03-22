@@ -248,6 +248,7 @@ window.eoxiaJS.navigation.event = function() {
 	//photos
 
 	jQuery( document ).on( 'click', '.clickable-photo', window.eoxiaJS.selectPhoto );
+	jQuery( document ).on( 'click', '.save-photo', window.eoxiaJS.savePhoto );
 
 	//signalisation
 
@@ -262,6 +263,14 @@ window.eoxiaJS.navigation.event = function() {
 	jQuery( document ).on( 'click', '.risk-create:not(.button-disable)', window.eoxiaJS.createRisk );
 	jQuery( document ).on( 'click', '.risk-save', window.eoxiaJS.saveRisk );
 	jQuery( document ).on( 'click', '.risk-delete', window.eoxiaJS.deleteRisk );
+
+	// evaluations
+	jQuery( document ).on( 'click', '.select-evaluation-method', window.eoxiaJS.selectEvaluationMethod);
+	jQuery( document ).on( 'click', '.evaluation-create', window.eoxiaJS.createEvaluation);
+	jQuery( document ).on( 'click', '.evaluation-save', window.eoxiaJS.saveEvaluation);
+	//jQuery( document ).on( 'click', '.evaluation-delete', window.eoxiaJS.deleteEvaluation);
+	jQuery( document ).on( 'click', '.evaluation-edit', window.eoxiaJS.editEvaluation);
+
 	//dropdown cotation
 	jQuery( document ).on( 'click', '.table.risk .dropdown-list li.dropdown-item:not(.open-popup), .wpeo-table.table-listing-risk .dropdown-list li.dropdown-item:not(.open-popup), .wpeo-table.table-risk .dropdown-list li.dropdown-item:not(.open-popup)', window.eoxiaJS.selectSeuil );
 
@@ -449,17 +458,22 @@ window.eoxiaJS.closeModal = function ( event ) {
 window.eoxiaJS.openModal = function ( event ) {
 
 	let idSelected = $(this).attr('value');
-	console.log('kk')
+
 	console.log(idSelected)
 
-	$('.modal-active').removeClass('modal-active');
-	console.log(this)
-	if ($(this).hasClass('digirisk-evaluation')) {
-		$('#digirisk_evaluation_modal'+idSelected).addClass('modal-active');
+	if ($(this).hasClass('photo')) {
+
+	} else {
+		$('.modal-active').removeClass('modal-active');
+
 	}
-	else {
-		$('#cotation_modal'+idSelected).addClass('modal-active');
-		$('#photo_modal'+idSelected).addClass('modal-active');
+
+	if ($(this).hasClass('evaluation-add')) {
+		$('#edit_add_evaluation' + idSelected).addClass('modal-active');
+	} else if ($(this).hasClass('evaluation-list')) {
+		$('#list_evaluations' + idSelected).addClass('modal-active');
+	} else if ($(this).hasClass('evaluation-photo-open')) {
+		$('#photo_modal' + idSelected).addClass('modal-active');
 	}
 }
 
@@ -589,6 +603,29 @@ window.eoxiaJS.saveRisk = function ( event ) {
 	$('#risk_row_'+editedRiskId).empty()
 	$('#risk_row_'+editedRiskId).load( document.URL + '&action=saveRisk&riskID=' + editedRiskId + commentPost + cotationPost + methodPost + criteres  + descriptionPost + photoPost + ' #risk_row_'+editedRiskId+' > div')
 }
+
+window.eoxiaJS.selectEvaluationMethod = function ( event ) {
+
+	$('.select-evaluation-method.selected').removeClass('selected')
+
+	$(this).addClass('selected')
+	$(this).removeClass('button-grey')
+	$(this).addClass('button-blue');
+
+	$('.select-evaluation-method:not(.selected').removeClass('button-blue');
+	$('.select-evaluation-method:not(.selected').addClass('button-grey');
+
+
+	if($(this).hasClass('evaluation-standard')) {
+		$('.cotation-advanced').attr('style', 'display:none')
+		$('.cotation-standard').attr('style', 'display:block')
+	} else {
+		$('.cotation-standard').attr('style', 'display:none')
+		$('.cotation-advanced').attr('style', 'display:block')
+	}
+
+}
+
 // Dropdown
 /**
  * [dropdown description]
@@ -802,12 +839,13 @@ window.eoxiaJS.evaluationMethodEvarisk.init = function() {
 };
 
 window.eoxiaJS.evaluationMethodEvarisk.event = function() {
-	jQuery( document ).on( 'click', '.wpeo-modal.evaluation-method .wpeo-table.evaluation-method .table-cell.can-select', window.eoxiaJS.evaluationMethodEvarisk.selectSeuil );
-	jQuery( document ).on( 'click', '.wpeo-modal.evaluation-method .wpeo-button.button-main', window.eoxiaJS.evaluationMethodEvarisk.save );
-	jQuery( document ).on( 'click', '.wpeo-modal.evaluation-method .wpeo-button.button-secondary', window.eoxiaJS.evaluationMethodEvarisk.close_modal );
+	jQuery( document ).on( 'click', '.wpeo-table.evaluation-method .table-cell.can-select', window.eoxiaJS.evaluationMethodEvarisk.selectSeuil );
+	jQuery( document ).on( 'click', '.wpeo-button.button-main', window.eoxiaJS.evaluationMethodEvarisk.save );
+	jQuery( document ).on( 'click', '.wpeo-button.button-secondary', window.eoxiaJS.evaluationMethodEvarisk.close_modal );
 };
 
 window.eoxiaJS.evaluationMethodEvarisk.selectSeuil = function( event ) {
+	console.log('oui')
 	jQuery( this ).closest( '.table-row' ).find( '.active' ).removeClass( 'active' );
 	jQuery( this ).addClass( 'active' );
 
@@ -818,7 +856,7 @@ window.eoxiaJS.evaluationMethodEvarisk.selectSeuil = function( event ) {
 	var evaluationID = element.data( 'evaluation-id' );
 
 	window.eoxiaJS.evaluationMethodEvarisk.updateInputVariables( riskID, evaluationID, variableID, seuil, jQuery( '.wpeo-modal.modal-active.modal-risk-' + riskID + ' textarea' ) );
-
+console.log(jQuery( '.wpeo-modal.modal-risk-' + riskID + ' textarea' ).val())
 	var currentVal    = JSON.parse(jQuery( '.wpeo-modal.modal-risk-' + riskID + ' textarea' ).val());
 	var canGetDetails = true;
 	for (var key in currentVal) {
@@ -861,7 +899,6 @@ window.eoxiaJS.evaluationMethodEvarisk.updateInputVariables = function( riskID, 
 
 
 	console.log($('.table-cell.active'))
-
 	let criteres = []
 	Object.values($('.table-cell.active.cell-'+riskID)).forEach(function(v) {
 		if ($(v).data( 'seuil' ) > -1) {
@@ -1001,6 +1038,12 @@ window.eoxiaJS.selectPhoto = function( event ) {
 	$('.photo-edit'+riskToAssign).children('img').attr('src' , $('#pathToPhoto'+riskToAssign).val() + photoName)
 };
 
+window.eoxiaJS.savePhoto = function( event ) {
+
+	$('.wpeo-modal.modal-photo.modal-active').removeClass('modal-active')
+
+}
+
 // Onglet signalisations
 
 
@@ -1080,3 +1123,120 @@ window.eoxiaJS.saveSignalisation = function ( event ) {
 window.eoxiaJS.haveSignalisationDataInInput = function( element ) {
 	$( '.action .wpeo-button.button-disable' ).removeClass( 'button-disable' );
 };
+
+// Evaluations
+
+window.eoxiaJS.createEvaluation = function ( event ) {
+
+
+	$('.evaluation-create.wpeo-button.add').addClass('button-disable');
+
+	var riskToAssign = $(this).children('input').val()
+	var riskToAssignPost = ''
+	if (riskToAssign !== '') {
+		riskToAssignPost = '&riskToAssign=' + encodeURI(riskToAssign)
+	}
+
+	var comment = $('#evaluationComment'+riskToAssign).val()
+	var commentPost = ''
+	if (comment !== '') {
+		commentPost = '&evaluationComment=' + encodeURI(comment)
+	}
+
+	var method = $('#cotationMethod'+riskToAssign).val()
+	var methodPost = ''
+	if (method !== '') {
+		methodPost = '&cotationMethod=' + method
+	}
+
+	var cotation = $('#cotationSpan'+riskToAssign).text()
+	var cotationPost = ''
+	if (cotation !== 0) {
+		cotationPost = '&cotation=' + cotation
+	}
+
+	var photo = $('#photoLinked'+riskToAssign).val()
+	var photoPost = ''
+	if (photo !== 0) {
+		photoPost = '&photo=' + encodeURI(photo)
+	}
+
+	let criteres = ''
+	Object.values($('.table-cell.active.cell-0')).forEach(function(v) {
+		if ($(v).data( 'seuil' ) > -1) {
+			criteres += '&' + $(v).data( 'type' ) + '=' + $(v).data( 'seuil' )
+		}
+	})
+console.log( document.URL + '&action=addEvaluation' + riskToAssignPost + commentPost + cotationPost + methodPost + criteres + photoPost)
+	$('#risk_row_'+riskToAssign).empty()
+	$('#risk_row_'+riskToAssign).load( document.URL + '&action=addEvaluation' + riskToAssignPost + commentPost + cotationPost + methodPost + criteres + photoPost + ' .main-table')
+
+}
+
+window.eoxiaJS.editEvaluation = function ( event ) {
+
+	let editedRiskId = $(this).attr('value')
+	$('#risk_row_'+editedRiskId).empty()
+	$('#risk_row_'+editedRiskId).load( document.URL + '&action=addEvaluation' + ' #risk_row_'+editedRiskId+' > div')
+
+}
+
+//window.eoxiaJS.deleteEvaluation = function ( event ) {
+//
+//	let deletedRiskId = $(this).attr('value')
+//	var r = confirm('Are you sure you want to delete this risk ?')
+//	if (r == true) {
+//		$('#risk_row_'+deletedRiskId).empty()
+//		$('#risk_row_'+deletedRiskId).load( document.URL + '&action=deleteRisk&deletedRiskId=' + deletedRiskId + ' #risk_row_'+deletedRiskId+' > div')
+//	} else {
+//		return false
+//	}
+//}
+
+window.eoxiaJS.saveEvaluation = function ( event ) {
+
+	let editedRiskId = $(this).attr('value')
+
+	var description = $('#riskComment'+editedRiskId).val()
+
+	var descriptionPost = ''
+	if (description !== '') {
+		descriptionPost = '&riskComment=' + encodeURI(description)
+	}
+
+	var comment = $('#evaluationComment'+editedRiskId).val()
+	var commentPost = ''
+	if (comment !== '') {
+		commentPost = '&evaluationComment=' + encodeURI(comment)
+	}
+
+	var method = $('#cotationMethod'+editedRiskId).val()
+	var methodPost = ''
+	if (method !== '') {
+		methodPost = '&cotationMethod=' + method
+	}
+
+	var cotation = $('.cotation'+editedRiskId).text()
+	var cotationPost = ''
+	if (cotation !== 0) {
+		cotationPost = '&cotation=' + cotation
+	}
+
+	let criteres = ''
+	Object.values($('.table-cell.active')).forEach(function(v) {
+		if ($(v).data( 'seuil' ) > -1) {
+			criteres += '&' + $(v).data( 'type' ) + '=' + $(v).data( 'seuil' )
+		}
+
+	})
+
+	var photo = $('#photoLinked'+editedRiskId).val()
+	var photoPost = ''
+	if (photo !== 0) {
+		photoPost = '&photo=' + encodeURI(photo)
+	}
+
+	console.log(this)
+	$('#risk_row_'+editedRiskId).empty()
+	$('#risk_row_'+editedRiskId).load( document.URL + '&action=saveRisk&riskID=' + editedRiskId + commentPost + cotationPost + methodPost + criteres  + descriptionPost + photoPost + ' #risk_row_'+editedRiskId+' > div')
+}

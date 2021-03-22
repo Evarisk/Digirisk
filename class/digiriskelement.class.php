@@ -49,7 +49,7 @@ class DigiriskElement extends CommonObject
 	 * @var int  Does this object support multicompany module ?
 	 * 0=No test on entity, 1=Test with field entity, 'field@table'=Test with link by field@table
 	 */
-	public $ismultientitymanaged = 0;
+	public $ismultientitymanaged = 1;
 
 	/**
 	 * @var int  Does object support extrafields ? 0=No, 1=Yes
@@ -367,9 +367,9 @@ class DigiriskElement extends CommonObject
 		$sql = 'SELECT ';
 		$sql .= $this->getFieldList();
 		$sql .= ' FROM '.MAIN_DB_PREFIX.$this->table_element.' as t';
-//		if (isset($this->ismultientitymanaged) && $this->ismultientitymanaged == 1) $sql .= ' WHERE t.entity IN ('.getEntity($this->table_element).')';
-		$sql .= ' WHERE 1 = 1';
-		$sql .= " AND t.entity =".$conf->entity;
+		if (isset($this->ismultientitymanaged) && $this->ismultientitymanaged == 1) $sql .= ' WHERE t.entity IN ('.getEntity($this->table_element).')';
+//		$sql .= ' WHERE 1 = 1';
+//		$sql .= " AND t.entity =".$conf->entity;
 		// Manage filter
 		$sqlwhere = array();
 		if (count($filter) > 0) {
