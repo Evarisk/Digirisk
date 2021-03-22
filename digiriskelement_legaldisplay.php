@@ -380,7 +380,7 @@ if ((empty($action) || ($action != 'edit' && $action != 'create')))
 
 	if ($action != 'presend')
 	{
-		print '<div class="fichecenter"><div class="fichehalfleft elementDocument">';
+		print '<div class="fichecenter"><div class="elementDocument">';
 		print '<a name="builddoc"></a>'; // ancre
 		print '<h2>' . $langs->trans('LegalDisplay') . ($object->id ? ' ' . $object->ref : ' ' . 'global') . '</h2>';
 

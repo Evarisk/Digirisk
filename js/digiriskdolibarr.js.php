@@ -452,7 +452,12 @@ window.eoxiaJS.openModal = function ( event ) {
 	console.log('kk')
 	console.log(idSelected)
 
-	$('.modal-active').removeClass('modal-active');
+	if ($(this).hasClass('photo')) {
+		console.log('photo')
+	} else {
+		$('.modal-active').removeClass('modal-active');
+
+	}
 	console.log(this)
 	if ($(this).hasClass('digirisk-evaluation')) {
 		$('#digirisk_evaluation_modal'+idSelected).addClass('modal-active');

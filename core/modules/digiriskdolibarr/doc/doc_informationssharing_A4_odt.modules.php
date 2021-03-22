@@ -204,7 +204,7 @@ class doc_informationssharing_A4_odt extends ModelePDFInformationsSharing
 
 
 		$informationssharing = new InformationsSharing($this->db);
-		$mod = new $conf->global->DIGIRISKDOLIBARR_INFORMATIONSSHARING_ADDON_ODT($this->db);
+		$mod = new $conf->global->DIGIRISKDOLIBARR_INFORMATIONSSHARING_ADDON($this->db);
 		$ref = $mod->getNextValue($informationssharing);
 
 		$informationssharing->ref = $ref;

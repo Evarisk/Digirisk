@@ -204,7 +204,8 @@ class doc_legaldisplay_A4_odt extends ModelePDFLegalDisplay
 
 
 		$legaldisplay = new LegalDisplay($this->db);
-		$mod = new $conf->global->DIGIRISKDOLIBARR_LEGALDISPLAY_ADDON_ODT($this->db);
+
+		$mod = new $conf->global->DIGIRISKDOLIBARR_LEGALDISPLAY_ADDON($this->db);
 		$ref = $mod->getNextValue($legaldisplay);
 
 		$legaldisplay->ref = $ref;
