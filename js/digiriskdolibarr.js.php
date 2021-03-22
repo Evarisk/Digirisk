@@ -1149,7 +1149,7 @@ window.eoxiaJS.createEvaluation = function ( event ) {
 		methodPost = '&cotationMethod=' + method
 	}
 
-	var cotation = $('#cotationSpan'+riskToAssign).text()
+	var cotation = $('#current_equivalence'+riskToAssign).text()
 	var cotationPost = ''
 	if (cotation !== 0) {
 		cotationPost = '&cotation=' + cotation

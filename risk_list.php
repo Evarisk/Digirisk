@@ -1208,7 +1208,73 @@ while ($i < ($limit ? min($num, $limit) : $num))
 									<input type="hidden" class="evaluation-method" value="advanced">
 									Avancé
 								</div>
-								
+								<div>
+									Cotation
+									<div class="wpeo-gridlayout cotation-standard">
+										<?php
+										$defaultCotation = array(0, 48, 51, 100);
+										$evaluation = new DigiriskEvaluation($db);
+										if ( ! empty( $defaultCotation )) :
+											foreach ( $defaultCotation as $request ) :
+												$evaluation->cotation = $request; ?>
+												<div data-id="<?php echo 0; ?>"
+													 data-evaluation-method="standard"
+													 data-evaluation-id="<?php echo $request; ?>"
+													 data-variable-id="<?php echo 152+$request; ?>"
+													 data-seuil="<?php echo  $evaluation->get_evaluation_scale(); ?>"
+													 data-scale="<?php echo  $evaluation->get_evaluation_scale(); ?>"
+													 class="evaluation-cotation cotation wpeo-button"><?php echo $request; ?>
+												</div>
+											<?php endforeach;
+										endif; ?>
+									</div>
+									<?php
+									$string = file_get_contents(DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/js/json/default.json');
+									$json_a = json_decode($string, true);
+
+									$evaluation_method = $json_a[0];
+									$evaluation_method_survey = $evaluation_method['option']['variable'];
+									?>
+									<div class="wpeo-gridlayout cotation-advanced" style="display:none">
+										<input type="hidden" class="digi-method-evaluation-id" value="<?php echo $object->id ; ?>" />
+										<textarea style="display: none" name="evaluation_variables" class="tmp_evaluation_variable"><?php echo '{}'; ?></textarea>
+										<p><i class="fas fa-info-circle"></i> <?php echo 'Cliquez sur les cases du tableau pour remplir votre évaluation'; ?></p>
+										<div class="wpeo-table evaluation-method table-flex table-<?php echo count($evaluation_method_survey) + 1; ?>">
+											<div class="table-row table-header">
+												<div class="table-cell">
+													<span></span>
+												</div>
+												<?php
+												for ( $l = 0; $l < count($evaluation_method_survey); $l++ ) :
+													?>
+													<div class="table-cell">
+														<span><?php echo $l; ?></span>
+													</div>
+												<?php
+												endfor; ?>
+											</div>
+											<?php $l = 0; ?>
+											<?php foreach($evaluation_method_survey as $critere) {
+												$name = strtolower($critere['name']);
+												?>
+												<div class="table-row">
+													<div class="table-cell"><?php echo $critere['name'] ; ?></div>
+													<?php foreach($critere['option']['survey']['request'] as $request) {
+														?>
+														<div class="table-cell can-select cell-<?php echo $object->id ?>"
+															 data-type="<?php echo $name ?>"
+															 data-id="<?php echo  $object->id ? $object->id : 0 ; ?>"
+															 data-evaluation-id="<?php echo $evaluation_id ? $evaluation_id : 0 ; ?>"
+															 data-variable-id="<?php echo $l ; ?>"
+															 data-seuil="<?php echo  $request['seuil']; ?>">
+															<?php echo  $request['question'] ; ?>
+														</div>
+													<?php } $l++;  ?>
+												</div>
+											<?php } ?>
+										</div>
+									</div>
+								</div>
 
 								<div>
 									<div class="photo-container grid wpeo-modal-event tooltip hover">
@@ -1240,7 +1306,7 @@ while ($i < ($limit ? min($num, $limit) : $num))
 														<div class="modal-close"><i class="fas fa-times"></i></div>
 													</div>
 													<!-- Modal-Content -->
-													<div class="modal-content" id="#modalContent">
+													<div class="modal-content" id="#modalContent<?php echo $object->id ?>">
 														Ajoutez de nouveaux fichiers dans 'digiriskdolibarr/medias'
 														<div class="action">
 															<a href="<?php echo '../../ecm/index.php' ?>" target="_blank">
@@ -1257,57 +1323,51 @@ while ($i < ($limit ? min($num, $limit) : $num))
 															$relativepath = 'digiriskdolibarr/medias';
 															$modulepart = 'ecm';
 															$path = '/dolibarr/htdocs/document.php?modulepart=' . $modulepart  . '&attachment=0&file=' . str_replace('/', '%2F', $relativepath);
-															$i = 0;
-															if ( !empty($files)) {
+															$j = 0;
+
+															if ( !empty($files) ) {
 																foreach ($files as $file) {
-																	print '<div class="table-cell center clickable-photo clickable-photo'. $i .'" value="'. $i .'">';
+																	print '<div class="table-cell center clickable-photo clickable-photo'. $j .'" value="'. $j .'">';
 																	if (image_format_supported($file['name']) >= 0)
 																	{
 																		$fullpath = $path . '/' . $file['relativename'] . '&entity=' . $conf->entity;
 																		?>
 																			<input type="hidden" id="filename<?php echo $object->id ?>" value="<?php echo $file['name'] ?>">
-																			<img class="photo photo<?php echo $i ?> maxwidth200" src="<?php echo $fullpath; ?>">
+																			<img class="photo photo<?php echo $j ?> maxwidth200" src="<?php echo $fullpath; ?>">
 																		<?php
 																	}
 																	else {
 																		print '&nbsp;';
 																	}
-														$i++;
+																	$j++;
 
-															print '</div>';
-														}
-													}
-													// 	 $formfile->list_of_documents($files, '', 'digiriskdolibarr');
-													?>
-												</div>
-											</div>
-											<!-- Modal-Footer -->
-											<div class="modal-footer">
+																}
+															}
+														?>
+														</div>
+													</div>
 
-												<div class="wpeo-button button-grey button-blue save-photo">
-													<span><?php echo $langs->trans('SavePhoto'); ?></span>
+													<!-- Modal-Footer -->
+													<div class="modal-footer">
+														<div class="wpeo-button button-grey button-blue save-photo">
+															<span><?php echo $langs->trans('SavePhoto'); ?></span>
+														</div>
+														<div class="wpeo-button button-grey modal-close">
+															<span><?php echo $langs->trans('CloseModal'); ?></span>
+														</div>
+													</div>
 												</div>
-												<div class="wpeo-button button-grey modal-close">
-													<span><?php echo $langs->trans('CloseModal'); ?></span>
-												</div>
 											</div>
-										</div>
-										<!-- Modal-Footer -->
-										<div class="modal-footer">
-											<div class="wpeo-button button-grey button-blue">
-												<span><?php echo $langs->trans('SavePhoto'); ?></span>
-											</div>
-											<div class="wpeo-button button-grey modal-close">
-												<span><?php echo $langs->trans('CloseModal'); ?></span>
-											</div>
-										</div>
+										<?php endif; ?>
 									</div>
 								</div>
-								<?php endif; ?>
-								<div data-title="evaluationComment<?php echo $object->id ?>" class="table-cell table-100 cell-comment">
-								Commentaire :
-									<?php print '<textarea name="evaluationComment'. $object->id .'" id="evaluationComment'. $object->id .'" class="minwidth150" rows="'.ROWS_2.'">'.('').'</textarea>'."\n"; ?>
+								<div>
+									<div data-title="evaluationComment<?php echo $object->id ?>" class="table-cell table-100 cell-comment">
+										Commentaire :
+										<?php print '<textarea name="evaluationComment'. $object->id .'" id="evaluationComment'. $object->id .'" class="minwidth150" rows="'.ROWS_2.'">'.('').'</textarea>'."\n"; ?>
+									</div>
 								</div>
+
 							</div>
 
 
