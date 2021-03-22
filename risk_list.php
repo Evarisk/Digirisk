@@ -1292,6 +1292,15 @@ while ($i < ($limit ? min($num, $limit) : $num))
 												</div>
 											</div>
 										</div>
+										<!-- Modal-Footer -->
+										<div class="modal-footer">
+											<div class="wpeo-button button-grey button-blue">
+												<span><?php echo $langs->trans('SavePhoto'); ?></span>
+											</div>
+											<div class="wpeo-button button-grey modal-close">
+												<span><?php echo $langs->trans('CloseModal'); ?></span>
+											</div>
+										</div>
 									</div>
 								</div>
 								<?php endif; ?>
