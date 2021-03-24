@@ -97,7 +97,7 @@ class Risk extends CommonObject
 	public $fields=array(
 		'rowid' => array('type'=>'integer', 'label'=>'TechnicalID', 'enabled'=>'1', 'position'=>1, 'notnull'=>1, 'visible'=>0, 'noteditable'=>'1', 'index'=>1, 'comment'=>"Id"),
 		'ref' => array('type'=>'varchar(128)', 'label'=>'Ref', 'enabled'=>'1', 'position'=>2, 'notnull'=>1, 'visible'=>4, 'noteditable'=>'1', 'default'=>'(PROV)', 'index'=>1, 'searchall'=>1, 'showoncombobox'=>'1', 'comment'=>"Reference of object"),
-		'description' => array('type'=>'text', 'label'=>'Description', 'enabled'=>'1', 'position'=>16, 'notnull'=>0, 'visible'=>-2,),
+		'category' => array('type'=>'varchar(255)', 'label'=>'RiskCategory', 'enabled'=>'1', 'position'=>3, 'notnull'=>0, 'visible'=>1,),
 		'date_creation' => array('type'=>'datetime', 'label'=>'DateCreation', 'enabled'=>'1', 'position'=>4, 'notnull'=>1, 'visible'=>-2,),
 		'tms' => array('type'=>'timestamp', 'label'=>'DateModification', 'enabled'=>'1', 'position'=>5, 'notnull'=>0, 'visible'=>0,),
 		'fk_user_creat' => array('type'=>'integer:User:user/class/user.class.php', 'label'=>'UserAuthor', 'enabled'=>'1', 'position'=>6, 'notnull'=>1, 'visible'=>-2, 'foreignkey'=>'user.rowid',),
@@ -107,10 +107,10 @@ class Risk extends CommonObject
 		'model_odt' => array('type'=>'varchar(255)', 'label'=>'Model odt', 'enabled'=>'1', 'position'=>10, 'notnull'=>0, 'visible'=>-1,),
 		'ref_ext' => array('type'=>'varchar(255)', 'label'=>'RefExt', 'enabled'=>'1', 'position'=>11, 'notnull'=>0, 'visible'=>-1,),
 		'fk_element' => array('type'=>'integer', 'label'=>'FK Element', 'enabled'=>'1', 'position'=>12, 'notnull'=>1, 'visible'=>0,),
-		'category' => array('type'=>'varchar(255)', 'label'=>'RiskCategory', 'enabled'=>'1', 'position'=>3, 'notnull'=>0, 'visible'=>-1,),
+		'has_photo' => array('type'=>'integer', 'label'=>'hasPhoto', 'enabled'=>'1', 'position'=>13, 'notnull'=>0, 'visible'=>0),
 		'fk_projet' => array('type'=>'integer:Project:projet/class/project.class.php', 'label'=>'Projet', 'enabled'=>'1', 'position'=>14, 'notnull'=>1, 'visible'=>-1,),
 		'status' => array('type'=>'integer', 'label'=>'Status', 'enabled'=>'1', 'position'=>15, 'notnull'=>0, 'visible'=>-1,),
-		'has_photo' => array('type'=>'integer', 'label'=>'hasPhoto', 'enabled'=>'1', 'position'=>13, 'notnull'=>0, 'visible'=>0),
+		'description' => array('type'=>'text', 'label'=>'Description', 'enabled'=>'1', 'position'=>16, 'notnull'=>0, 'visible'=>1,),
 		'entity' => array('type'=>'integer', 'label'=>'Entity', 'enabled'=>'1', 'position'=>17, 'notnull'=>0, 'visible'=>-1,),
 	);
 	public $rowid;
