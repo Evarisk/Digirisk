@@ -634,7 +634,7 @@
   margin-bottom: auto;
 }
 
-.risk-evaluation .evaluation-cotation {
+.risk-evaluation .risk-evaluation-cotation {
   width: 40px;
   min-width: 40px;
   height: 40px;
@@ -648,26 +648,26 @@
   margin-right: 0.5em;
 }
 
-.risk-evaluation .evaluation-cotation[data-scale="1"] {
+.risk-evaluation .risk-evaluation-cotation[data-scale="1"] {
   background: #ececec;
 }
 
-.risk-evaluation .evaluation-cotation[data-scale="2"] {
+.risk-evaluation .risk-evaluation-cotation[data-scale="2"] {
   background: #e9ad4f;
   color: #fff;
 }
 
-.risk-evaluation .evaluation-cotation[data-scale="3"] {
+.risk-evaluation .risk-evaluation-cotation[data-scale="3"] {
   background: #e05353;
   color: #fff;
 }
 
-.risk-evaluation .evaluation-cotation[data-scale="4"] {
+.risk-evaluation .risk-evaluation-cotation[data-scale="4"] {
   background: #2b2b2b;
   color: #fff;
 }
 
-.risk-evaluation .evaluation-photo {
+.risk-evaluation .risk-evaluation-photo {
   width: 40px;
   min-width: 40px;
   height: 40px;
@@ -678,11 +678,11 @@
   margin-right: 0.5em;
 }
 
-.risk-evaluation .evaluation-content {
+.risk-evaluation .risk-evaluation-content {
   width: 100%;
 }
 
-.risk-evaluation .evaluation-content .evaluation-data {
+.risk-evaluation .risk-evaluation-content .risk-evaluation-data {
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
@@ -690,21 +690,21 @@
   flex-wrap: wrap;
 }
 
-.risk-evaluation .evaluation-content .evaluation-data > * {
+.risk-evaluation .risk-evaluation-content .risk-evaluation-data > * {
   margin: auto 0.2em;
 }
 
-.risk-evaluation .evaluation-content .evaluation-data .evaluation-reference {
+.risk-evaluation .risk-evaluation-content .risk-evaluation-data .risk-evaluation-reference {
   color: #263C5C;
   font-weight: 600;
 }
 
-.risk-evaluation .evaluation-content .evaluation-data .evaluation-reference:hover {
+.risk-evaluation .risk-evaluation-content .risk-evaluation-data .risk-evaluation-reference:hover {
   text-decoration: underline;
   cursor: pointer;
 }
 
-.risk-evaluation .evaluation-content .evaluation-data .evaluation-author {
+.risk-evaluation .risk-evaluation-content .risk-evaluation-data .risk-evaluation-author {
   display: inline-block;
   width: 25px;
   min-width: 25px;
@@ -718,18 +718,18 @@
   border-radius: 50%;
 }
 
-.risk-evaluation .evaluation-content .evaluation-data .evaluation-author a {
+.risk-evaluation .risk-evaluation-content .risk-evaluation-data .risk-evaluation-author a {
   color: #fff !important;
 }
 
-.risk-evaluation .evaluation-content .evaluation-data .evaluation-count {
+.risk-evaluation .risk-evaluation-content .risk-evaluation-data .risk-evaluation-count {
   background: rgba(0, 0, 0, 0.2);
   font-size: 12px;
   border-radius: 4px;
   padding: 0.2em 0.4em;
 }
 
-.risk-evaluation .evluation-add {
+.risk-evaluation .risk-evluation-add {
   min-width: 40px;
   margin-left: 0.5em;
 }

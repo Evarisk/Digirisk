@@ -10,7 +10,7 @@
     margin-bottom: auto;
   }
 
-  .evaluation-cotation {
+  .risk-evaluation-cotation {
     width: 40px;
     min-width: 40px;
     height: 40px;
@@ -40,7 +40,7 @@
     }
   }
 
-  .evaluation-photo {
+  .risk-evaluation-photo {
     width: 40px;
     min-width: 40px;
     height: 40px;
@@ -51,10 +51,10 @@
     margin-right: 0.5em;
   }
 
-  .evaluation-content {
+  .risk-evaluation-content {
     width: 100%;
   }
-  .evaluation-content .evaluation-data {
+  .risk-evaluation-content .risk-evaluation-data {
     display: flex;
     flex-wrap: wrap;
 
@@ -62,7 +62,7 @@
       margin: auto 0.2em;
     }
 
-    .evaluation-reference {
+    .risk-evaluation-reference {
       color: $color__secondary;
       font-weight: 600;
 
@@ -71,7 +71,7 @@
         cursor: pointer;
       }
     }
-    .evaluation-author {
+    .risk-evaluation-author {
       display: inline-block;
       width: 25px;
       min-width: 25px;
@@ -88,7 +88,7 @@
         color: #fff !important;
       }
     }
-    .evaluation-count {
+    .risk-evaluation-count {
       background: rgba(0,0,0,0.2);
       font-size: 12px;
       border-radius: 4px;
@@ -96,7 +96,7 @@
     }
   }
 
-  .evluation-add {
+  .risk-evluation-add {
     min-width: 40px;
     margin-left: 0.5em;
   }

@@ -3247,7 +3247,7 @@ div.mainmenu.digiriskdolibarr {
 }
 
 .wpeo-wrap .wpeo-gridlayout {
-	display: grid !important;
+	display: grid;
 }
 
 .wpeo-wrap .wpeo-gridlayout {
@@ -11307,4 +11307,20 @@ li.unit::marker {
 .dropdown-toggle::after {
 	display : none;
 	content: '';
+}
+
+.risk-evaluation-header {
+	display : flex;
+}
+
+.cotation-standard {
+	display : flex;
+}
+
+.modal-content {
+	display : grid;
+}
+
+.risk-evaluation .risk-evaluation-photo {
+	background: none !important;
 }
