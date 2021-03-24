@@ -95,7 +95,7 @@ class DigiriskEvaluation extends CommonObject
 	 */
 	public $fields=array(
 		'rowid' => array('type'=>'integer', 'label'=>'TechnicalID', 'enabled'=>'1', 'position'=>30, 'notnull'=>1, 'visible'=>0, 'noteditable'=>'1', 'index'=>1, 'comment'=>"Id"),
-		'ref' => array('type'=>'varchar(128)', 'label'=>'Ref', 'enabled'=>'1', 'position'=>31, 'notnull'=>1, 'visible'=>4, 'noteditable'=>'1', 'default'=>'(PROV)', 'index'=>1, 'searchall'=>1, 'showoncombobox'=>'1', 'comment'=>"Reference of object"),
+		'ref' => array('type'=>'varchar(128)', 'label'=>'Ref', 'enabled'=>'1', 'position'=>31, 'notnull'=>1, 'visible'=>0, 'noteditable'=>'1', 'default'=>'(PROV)', 'index'=>1, 'searchall'=>1, 'showoncombobox'=>'1', 'comment'=>"Reference of object"),
 		'date_creation' => array('type'=>'datetime', 'label'=>'DateCreation', 'enabled'=>'1', 'position'=>32, 'notnull'=>1, 'visible'=>-2,),
 		'tms' => array('type'=>'timestamp', 'label'=>'DateModification', 'enabled'=>'1', 'position'=>33, 'notnull'=>0, 'visible'=>-2,),
 		'fk_user_creat' => array('type'=>'integer:User:user/class/user.class.php', 'label'=>'UserAuthor', 'enabled'=>'1', 'position'=>34, 'notnull'=>1, 'visible'=>-2, 'foreignkey'=>'user.rowid',),
@@ -360,7 +360,6 @@ class DigiriskEvaluation extends CommonObject
 		if ($active) $filter['status'] = 1;
 
 		$result = $this->fetchAll('', '', 0, 0, $filter, 'AND');
-
 		if ($result > 0 && !empty($this->table_element_line)) $this->fetchLines();
 		return $result;
 	}
@@ -1090,6 +1089,35 @@ class DigiriskEvaluation extends CommonObject
 			case ($this->cotation >= 80):
 				return 4;
 		}
+	}
+
+	/**
+	 * Return scale level for risk evaluation
+	 *
+	 * @return	int			between 1 and 4
+	 */
+	public function show_photo_evaluation($element) {
+		global $conf;
+
+		$risk = new Risk($this->db);
+
+		$relativepath = 'digiriskdolibarr/medias';
+		$modulepart   = 'ecm';
+		$path         = DOL_URL_ROOT .'/document.php?modulepart=' . $modulepart  . '&attachment=0&file=' . str_replace('/', '%2F', $relativepath) . '/';
+		$filearray    = dol_dir_list($conf->digiriskdolibarr->multidir_output[$conf->entity].'/'.$element->element.'/'.$element->ref.'/', "files", 0, '', '(\.odt|_preview.*\.png)$', 'position_name', 'asc', 1);
+
+		if (count($filearray)) : ?>
+			<?php print '<span class="floatleft inline-block valignmiddle divphotoref">'.$risk->digirisk_show_photos('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity].'/'.$element->element, 'small', 1, 0, 0, 0, 50, 0, 0, 0, 0, $element->element).'</span>'; ?>
+		<?php else : ?>
+			<?php $nophoto = '/public/theme/common/nophoto.png'; ?>
+			<div class="action photo default-photo evaluation-photo-open modal-open" value="0">
+				<span class="floatleft inline-block valignmiddle divphotoref photo-edit0">
+					<input type="hidden" value="<?php echo $path ?>" id="pathToPhoto0">
+					<img class="photo maxwidth50"  src="<?php echo DOL_URL_ROOT. $nophoto ?>">
+				</span>
+			</div>
+		<?php endif; ?>
+		<?php
 	}
 }
 
