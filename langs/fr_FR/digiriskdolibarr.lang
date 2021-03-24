@@ -226,12 +226,14 @@ WorkUnitCustomTemplate = ODT custom des unités de travail
 WorkUnitDigiriskTemplate = ODT par défaut des unités de travail
 
 #
-Risks
+# Risks
 #
 
 Risks = Risques
 RiskList = Listing de risques
 RiskListWP = Listing de risques WP
+AddRisk = Ajout du risque
+EditRisk = Edition du risque
 RiskListDolibarr = Listing de risques Doli
 hasPhoto = Photo
 RiskCategory = Catégorie
