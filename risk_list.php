@@ -1275,7 +1275,12 @@ while ($i < ($limit ? min($num, $limit) : $num))
 										</div>
 									</div>
 								</div>
-
+								<div>
+									<div data-title="evaluationComment<?php echo $object->id ?>" class="table-cell table-100 cell-comment">
+										Commentaire :
+										<?php print '<textarea name="evaluationComment'. $object->id .'" id="evaluationComment'. $object->id .'" class="minwidth150" rows="'.ROWS_2.'">'.('').'</textarea>'."\n"; ?>
+									</div>
+								</div>
 								<div>
 									<div class="photo-container grid wpeo-modal-event tooltip hover">
 									PHOTO :
@@ -1359,12 +1364,6 @@ while ($i < ($limit ? min($num, $limit) : $num))
 												</div>
 											</div>
 										<?php endif; ?>
-									</div>
-								</div>
-								<div>
-									<div data-title="evaluationComment<?php echo $object->id ?>" class="table-cell table-100 cell-comment">
-										Commentaire :
-										<?php print '<textarea name="evaluationComment'. $object->id .'" id="evaluationComment'. $object->id .'" class="minwidth150" rows="'.ROWS_2.'">'.('').'</textarea>'."\n"; ?>
 									</div>
 								</div>
 
