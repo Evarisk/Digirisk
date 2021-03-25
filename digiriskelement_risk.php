@@ -513,7 +513,7 @@ if ($object->id > 0) {
 	$string = file_get_contents(DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/js/json/default.json');
 	$json_a = json_decode($string, true); ?>
 
-	<div class="wpeo-button button-square-40 button-primary modal-open risk-add" value="<?php echo $object->id ?>">
+	<div class="risk-add wpeo-button button-square-40 button-primary modal-open" value="<?php echo $object->id ?>">
 		<i class="fas fa-plus button-icon"></i>
 	</div>
 
