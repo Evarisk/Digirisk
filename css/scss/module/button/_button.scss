@@ -107,24 +107,38 @@
   width: 30px;
   height: 30px;
   line-height: 24px; // ne pas oublier les bordures : 6px
+
   .button-icon {
     font-size: 12px;
+    line-height: 24px;
   }
 }
 .wpeo-button.button-square-40 {
   width: 40px;
   height: 40px;
   line-height: 34px; // ne pas oublier les bordures : 6px
+
+  .button-icon {
+    line-height: 34px;
+  }
 }
 .wpeo-button.button-square-50 {
   width: 50px;
   height: 50px;
   line-height: 44px; // ne pas oublier les bordures : 6px
+
+  .button-icon {
+    line-height: 44px;
+  }
 }
 .wpeo-button.button-square-60 {
   width: 60px;
   height: 60px;
   line-height: 54px; // ne pas oublier les bordures : 6px
+
+  .button-icon {
+    line-height: 54px;
+  }
 }
 
 // Floats

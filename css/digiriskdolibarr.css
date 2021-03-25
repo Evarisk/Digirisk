@@ -300,11 +300,16 @@
 
 .wpeo-button.button-square-30 .button-icon {
   font-size: 12px;
+  line-height: 24px;
 }
 
 .wpeo-button.button-square-40 {
   width: 40px;
   height: 40px;
+  line-height: 34px;
+}
+
+.wpeo-button.button-square-40 .button-icon {
   line-height: 34px;
 }
 
@@ -314,9 +319,17 @@
   line-height: 44px;
 }
 
+.wpeo-button.button-square-50 .button-icon {
+  line-height: 44px;
+}
+
 .wpeo-button.button-square-60 {
   width: 60px;
   height: 60px;
+  line-height: 54px;
+}
+
+.wpeo-button.button-square-60 .button-icon {
   line-height: 54px;
 }
 
@@ -616,7 +629,7 @@
   display: block;
 }
 
-.risk-evaluation-container {
+.risk-evaluation-container .risk-evaluation-single {
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
@@ -624,17 +637,17 @@
   box-sizing: border-box;
 }
 
-.risk-evaluation-container * {
+.risk-evaluation-container .risk-evaluation-single * {
   -webkit-box-sizing: border-box;
   box-sizing: border-box;
 }
 
-.risk-evaluation-container > * {
+.risk-evaluation-container .risk-evaluation-single > * {
   margin-top: auto;
   margin-bottom: auto;
 }
 
-.risk-evaluation-container .risk-evaluation-cotation {
+.risk-evaluation-container .risk-evaluation-single .risk-evaluation-cotation {
   width: 40px;
   min-width: 40px;
   height: 40px;
@@ -648,26 +661,26 @@
   margin-right: 0.5em;
 }
 
-.risk-evaluation-container .risk-evaluation-cotation[data-scale="1"] {
+.risk-evaluation-container .risk-evaluation-single .risk-evaluation-cotation[data-scale="1"] {
   background: #ececec;
 }
 
-.risk-evaluation-container .risk-evaluation-cotation[data-scale="2"] {
+.risk-evaluation-container .risk-evaluation-single .risk-evaluation-cotation[data-scale="2"] {
   background: #e9ad4f;
   color: #fff;
 }
 
-.risk-evaluation-container .risk-evaluation-cotation[data-scale="3"] {
+.risk-evaluation-container .risk-evaluation-single .risk-evaluation-cotation[data-scale="3"] {
   background: #e05353;
   color: #fff;
 }
 
-.risk-evaluation-container .risk-evaluation-cotation[data-scale="4"] {
+.risk-evaluation-container .risk-evaluation-single .risk-evaluation-cotation[data-scale="4"] {
   background: #2b2b2b;
   color: #fff;
 }
 
-.risk-evaluation-container .risk-evaluation-photo {
+.risk-evaluation-container .risk-evaluation-single .risk-evaluation-photo {
   width: 40px;
   min-width: 40px;
   height: 40px;
@@ -678,11 +691,17 @@
   margin-right: 0.5em;
 }
 
-.risk-evaluation-container .risk-evaluation-content {
+.risk-evaluation-container .risk-evaluation-single .risk-evaluation-photo .photodigiriskdolibarr {
+  width: 100%;
+  height: auto;
+  background: #fff;
+}
+
+.risk-evaluation-container .risk-evaluation-single .risk-evaluation-content {
   width: 100%;
 }
 
-.risk-evaluation-container .risk-evaluation-content .risk-evaluation-data {
+.risk-evaluation-container .risk-evaluation-single .risk-evaluation-content .risk-evaluation-data {
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
@@ -690,21 +709,21 @@
   flex-wrap: wrap;
 }
 
-.risk-evaluation-container .risk-evaluation-content .risk-evaluation-data > * {
+.risk-evaluation-container .risk-evaluation-single .risk-evaluation-content .risk-evaluation-data > * {
   margin: auto 0.2em;
 }
 
-.risk-evaluation-container .risk-evaluation-content .risk-evaluation-data .risk-evaluation-reference {
+.risk-evaluation-container .risk-evaluation-single .risk-evaluation-content .risk-evaluation-data .risk-evaluation-reference {
   color: #263C5C;
   font-weight: 600;
 }
 
-.risk-evaluation-container .risk-evaluation-content .risk-evaluation-data .risk-evaluation-reference:hover {
+.risk-evaluation-container .risk-evaluation-single .risk-evaluation-content .risk-evaluation-data .risk-evaluation-reference:hover {
   text-decoration: underline;
   cursor: pointer;
 }
 
-.risk-evaluation-container .risk-evaluation-content .risk-evaluation-data .risk-evaluation-author {
+.risk-evaluation-container .risk-evaluation-single .risk-evaluation-content .risk-evaluation-data .risk-evaluation-author {
   display: inline-block;
   width: 25px;
   min-width: 25px;
@@ -718,18 +737,18 @@
   border-radius: 50%;
 }
 
-.risk-evaluation-container .risk-evaluation-content .risk-evaluation-data .risk-evaluation-author a {
+.risk-evaluation-container .risk-evaluation-single .risk-evaluation-content .risk-evaluation-data .risk-evaluation-author a {
   color: #fff !important;
 }
 
-.risk-evaluation-container .risk-evaluation-content .risk-evaluation-data .risk-evaluation-count {
+.risk-evaluation-container .risk-evaluation-single .risk-evaluation-content .risk-evaluation-data .risk-evaluation-count {
   background: rgba(0, 0, 0, 0.2);
   font-size: 12px;
   border-radius: 4px;
   padding: 0.2em 0.4em;
 }
 
-.risk-evaluation-container .risk-evluation-add {
+.risk-evaluation-container .risk-evaluation-single .risk-evaluation-add {
   min-width: 40px;
   margin-left: 0.5em;
 }

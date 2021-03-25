@@ -1,4 +1,4 @@
-.risk-evaluation-container {
+.risk-evaluation-container .risk-evaluation-single {
   display: flex;
   box-sizing: border-box;
 
@@ -49,6 +49,12 @@
     background: $color__grey;
     color: rgba(0,0,0,0.3);
     margin-right: 0.5em;
+
+    .photodigiriskdolibarr {
+      width: 100%;
+      height: auto;
+      background: #fff;
+    }
   }
 
   .risk-evaluation-content {
@@ -96,7 +102,7 @@
     }
   }
 
-  .risk-evluation-add {
+  .risk-evaluation-add {
     min-width: 40px;
     margin-left: 0.5em;
   }
