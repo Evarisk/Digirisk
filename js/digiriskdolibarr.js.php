@@ -464,12 +464,6 @@ window.eoxiaJS.closeModal = function ( event ) {
 window.eoxiaJS.openModal = function ( event ) {
 	let idSelected = $(this).attr('value');
 
-	//if ($(this).hasClass('photo') || $(this).hasClass('risk-evaluation-edit')) {
-	//
-	//} else {
-	//	$('.modal-active').removeClass('modal-active');
-	//}
-
 	//Open modal evaluation
 	if ($(this).hasClass('risk-evaluation-add')) {
 		$('#risk_evaluation_add' + idSelected).addClass('modal-active');
@@ -480,7 +474,6 @@ window.eoxiaJS.openModal = function ( event ) {
 	} else if ($(this).hasClass('risk-evaluation-edit')) {
 		$('#risk_evaluation_edit' + idSelected).addClass('modal-active');
 	}
-
 
 	//Open modal risk
 	if ($(this).hasClass('risk-add')) {
