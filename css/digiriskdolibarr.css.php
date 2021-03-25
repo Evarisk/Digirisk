@@ -11324,3 +11324,6 @@ li.unit::marker {
 .risk-evaluation .risk-evaluation-photo {
 	background: none !important;
 }
+
+
+.risk
