@@ -326,6 +326,7 @@ if ($action == 'add' && $canadduser) {
 				$usercats = GETPOST('usercats', 'array');
 				$object->setCategories($usercats);
 			}
+
 			$db->commit();
 
 			header("Location: ".$_SERVER['PHP_SELF'].'?id='.$id);
@@ -863,7 +864,7 @@ if ($canadduser) {
 									<input type="text" id="login" placeholder="<?php echo $langs->trans('Login') ; ?>" name="login" value="" />
 								</div>
 								<div class="table-cell table-150">
-									<input type="text" id="password" placeholder="<?php echo $langs->trans('Password') ; ?>" name="password" value="" />
+									<input type="password" id="password" placeholder="<?php echo $langs->trans('Password') ; ?>" name="password" value="" />
 								</div>
 								<div class="table-cell">
 									<button type="submit" name="create" style="color: #3495f0; background-color: transparent; width:30%; border:none; margin-right:30%;">
