@@ -102,6 +102,7 @@ class modDigiriskdolibarr extends DolibarrModules
 
 		$this->dirs = array(
 			"/digiriskdolibarr/temp",
+			"/digiriskdolibarr/evaluation",
 			"/ecm/digiriskdolibarr",
 			"/ecm/digiriskdolibarr/legaldisplay",
 			"/ecm/digiriskdolibarr/informationssharing",
@@ -259,19 +260,16 @@ class modDigiriskdolibarr extends DolibarrModules
 		/* LEGAL DISPLAY PERMISSIONS */
 		$this->rights[$r][0] = 1050;
 		$this->rights[$r][1] = $langs->trans('ReadLegalDisplay');
-		$this->rights[$r][3] = 1;
 		$this->rights[$r][4] = 'legaldisplay';
 		$this->rights[$r][5] = 'read';
 		$r++;
 		$this->rights[$r][0] = 1050 + $r;
 		$this->rights[$r][1] = $langs->trans('CreateLegalDisplay');
-		$this->rights[$r][3] = 1;
 		$this->rights[$r][4] = 'legaldisplay';
 		$this->rights[$r][5] = 'write';
 		$r++;
 		$this->rights[$r][0] = 1050 + $r;
 		$this->rights[$r][1] = $langs->trans('DeleteLegalDisplay');
-		$this->rights[$r][3] = 1;
 		$this->rights[$r][4] = 'legaldisplay';
 		$this->rights[$r][5] = 'delete';
 		$r++;
@@ -280,19 +278,16 @@ class modDigiriskdolibarr extends DolibarrModules
 
 		$this->rights[$r][0] = 1050 + $r;
 		$this->rights[$r][1] = $langs->trans('ReadInformationsSharing');
-		$this->rights[$r][3] = 1;
 		$this->rights[$r][4] = 'informationssharing';
 		$this->rights[$r][5] = 'read';
 		$r++;
 		$this->rights[$r][0] = 1050 + $r;
 		$this->rights[$r][1] = $langs->trans('CreateInformationsSharing');
-		$this->rights[$r][3] = 1;
 		$this->rights[$r][4] = 'informationssharing';
 		$this->rights[$r][5] = 'write';
 		$r++;
 		$this->rights[$r][0] = 1050 + $r;
 		$this->rights[$r][1] = $langs->trans('DeleteInformationsSharing');
-		$this->rights[$r][3] = 1;
 		$this->rights[$r][4] = 'informationssharing';
 		$this->rights[$r][5] = 'delete';
 		$r++;
@@ -301,19 +296,16 @@ class modDigiriskdolibarr extends DolibarrModules
 
 		$this->rights[$r][0] = 1050 + $r;
 		$this->rights[$r][1] = $langs->trans('ReadFirePermit');
-		$this->rights[$r][3] = 1;
 		$this->rights[$r][4] = 'firepermit';
 		$this->rights[$r][5] = 'read';
 		$r++;
 		$this->rights[$r][0] = 1050 + $r;
 		$this->rights[$r][1] = $langs->trans('CreateFirePermit');
-		$this->rights[$r][3] = 1;
 		$this->rights[$r][4] = 'firepermit';
 		$this->rights[$r][5] = 'write';
 		$r++;
 		$this->rights[$r][0] = 1050 + $r;
 		$this->rights[$r][1] = $langs->trans('DeleteFirePermit');
-		$this->rights[$r][3] = 1;
 		$this->rights[$r][4] = 'firepermit';
 		$this->rights[$r][5] = 'delete';
 		$r++;
@@ -322,19 +314,16 @@ class modDigiriskdolibarr extends DolibarrModules
 
 		$this->rights[$r][0] = 1050 + $r;
 		$this->rights[$r][1] = $langs->trans('ReadPreventionPlan');
-		$this->rights[$r][3] = 1;
 		$this->rights[$r][4] = 'preventionplan';
 		$this->rights[$r][5] = 'read';
 		$r++;
 		$this->rights[$r][0] = 1050 + $r;
 		$this->rights[$r][1] = $langs->trans('CreatePreventionPlan');
-		$this->rights[$r][3] = 1;
 		$this->rights[$r][4] = 'preventionplan';
 		$this->rights[$r][5] = 'write';
 		$r++;
 		$this->rights[$r][0] = 1050 + $r;
 		$this->rights[$r][1] = $langs->trans('DeletePreventionPlan');
-		$this->rights[$r][3] = 1;
 		$this->rights[$r][4] = 'preventionplan';
 		$this->rights[$r][5] = 'delete';
 		$r++;
@@ -343,19 +332,16 @@ class modDigiriskdolibarr extends DolibarrModules
 
 		$this->rights[$r][0] = 1050 + $r;
 		$this->rights[$r][1] = $langs->trans('ReadDigiriskElement');
-		$this->rights[$r][3] = 1;
 		$this->rights[$r][4] = 'digiriskelement';
 		$this->rights[$r][5] = 'read';
 		$r++;
 		$this->rights[$r][0] = 1050 + $r;
 		$this->rights[$r][1] = $langs->trans('CreateDigiriskElement');
-		$this->rights[$r][3] = 1;
 		$this->rights[$r][4] = 'digiriskelement';
 		$this->rights[$r][5] = 'write';
 		$r++;
 		$this->rights[$r][0] = 1050 + $r;
 		$this->rights[$r][1] = $langs->trans('DeleteDigiriskElement');
-		$this->rights[$r][3] = 1;
 		$this->rights[$r][4] = 'digiriskelement';
 		$this->rights[$r][5] = 'delete';
 		$r++;
@@ -364,19 +350,16 @@ class modDigiriskdolibarr extends DolibarrModules
 
 		$this->rights[$r][0] = 1050 + $r;
 		$this->rights[$r][1] = $langs->trans('ReadDigiriskRisk');
-		$this->rights[$r][3] = 1;
 		$this->rights[$r][4] = 'risk';
 		$this->rights[$r][5] = 'read';
 		$r++;
 		$this->rights[$r][0] = 1050 + $r;
 		$this->rights[$r][1] = $langs->trans('CreateDigiriskRisk');
-		$this->rights[$r][3] = 1;
 		$this->rights[$r][4] = 'risk';
 		$this->rights[$r][5] = 'write';
 		$r++;
 		$this->rights[$r][0] = 1050 + $r;
 		$this->rights[$r][1] = $langs->trans('DeleteDigiriskRisk');
-		$this->rights[$r][3] = 1;
 		$this->rights[$r][4] = 'risk';
 		$this->rights[$r][5] = 'delete';
 
@@ -636,17 +619,18 @@ class modDigiriskdolibarr extends DolibarrModules
 			require_once DOL_DOCUMENT_ROOT . '/societe/class/societe.class.php';
 			require_once DOL_DOCUMENT_ROOT . '/core/modules/project/mod_project_simple.php';
 
-			$project = new Project($this->db);
-
+			$project     = new Project($this->db);
 			$third_party = new Societe($this->db);
-			$projectRef = new $conf->global->PROJECT_ADDON();
+			$projectRef  = new $conf->global->PROJECT_ADDON();
 
-			$project->ref = $projectRef->getNextValue($third_party, $project);
-			$project->title = $langs->trans('RisksEvaluation');
-			$project->description = $langs->trans('RisksEvaluationDescription');
-			$project->date_c = dol_now();
-			$project->date_start = dol_now();
-			$project->usage_task = 1;
+			$project->ref         = $projectRef->getNextValue($third_party, $project);
+			$project->title       = $langs->trans('ActionPlanDU');
+			$project->description = $langs->trans('ActionPlanDUDescription');
+			$project->date_c      = dol_now();
+			//$project->date_start = dol_now(); -> option
+			$project->usage_task  = 1;
+			//$project->date_end = dol_now(); -> option
+			$project->statut      = 1;
 
 			$project_id = $project->create($user);
 
