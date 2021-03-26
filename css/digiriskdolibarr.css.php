@@ -730,6 +730,8 @@ div.mainmenu.digiriskdolibarr {
 	line-height: 50px;
 	text-align: center;
 	transition: all 0.2s ease-out;
+	border-radius: 5px;
+	margin: 2px;
 }
 
 .cotation.default-cotation:hover {
@@ -794,7 +796,7 @@ div.mainmenu.digiriskdolibarr {
 }
 
 .wpeo-table.evaluation-method .table-row.table-header {
-	background: #fff !important;
+	background: #fff;
 }
 
 @media (max-width: 480px) {
@@ -861,8 +863,9 @@ div.mainmenu.digiriskdolibarr {
 }
 
 .wpeo-table.evaluation-method .table-row > .table-cell:first-child {
-	background: #3495f0;
-	color: #fff;
+	background: #33333e;
+	color: rgba(255, 255, 255, 0.8);
+	margin: 0;
 }
 
 @media (max-width: 480px) {
@@ -1321,6 +1324,7 @@ div.mainmenu.digiriskdolibarr {
 
 .wpeo-wrap .wpeo-table.table-flex .table-row.table-header .table-cell {
 	color: rgba(255, 255, 255, 0.8);
+	text-align: center;
 }
 
 .wpeo-wrap .wpeo-table.table-flex .table-row:not(.table-header):nth-of-type(odd) {
@@ -10905,6 +10909,7 @@ to {
 	margin: auto 0;
 	width: 100%;
 	padding: 0.8em 0.6em;
+	text-align: center;
 }
 
 @media (max-width: 770px) {
@@ -11323,4 +11328,26 @@ li.unit::marker {
 
 .risk-evaluation .risk-evaluation-photo {
 	background: none !important;
+}
+
+.selected-cotation {
+	border: 5px solid green;
+	border-radius: 5px;
+}
+
+.risk-content {
+	display: flex;
+}
+
+.risk-category {
+	display: grid;
+	margin-right: 10px;
+}
+
+.risk-description {
+	display: grid;
+}
+
+.risk-evaluation-container {
+	display: flex;
 }
