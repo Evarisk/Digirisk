@@ -230,22 +230,41 @@ WorkUnitDigiriskTemplate = ODT par défaut des unités de travail
 #
 
 Risks = Risques
+Risk = Risque
 RiskList = Listing de risques
+RisksList = Liste de risques
 RiskListWP = Listing de risques WP
-AddRisk = Ajout du risque
+AddRiskTitle = Ajout du risque
+AddRiskButton = Ajouter le risque
 EditRisk = Edition du risque
+UpdateRisk = Mettre à jour
 RiskListDolibarr = Listing de risques Doli
 hasPhoto = Photo
 RiskCategory = Catégorie
-EvaluationMethod = Méthode d'évaluation
-lastEvaluationOn = Dernière évaluation le
-EvaluatedOn = le
+
 TasksManagement = Gestion des tâches
 ProjectLinked = Projet lié aux tâches des risques
 ListingRisksPhoto = Listing des risques photo
 ListingRisksAction = Listing des actions correctives
 ListingRisksPhotosGeneratedWithDolibarr = Listing de risques photo généré avec Dolibarr
 ListingRisksActionsGeneratedWithDolibarr = Listing de risques actions correctives généré avec Dolibarr
+
+#
+# Evaluation
+#
+
+EvalautionCreate = Ajout de l'évaluation
+UpdateEvaluation = Mettre à jour
+EvaluationMethod = Méthode d'évaluation
+lastEvaluationOn = Dernière évaluation le
+EvaluatedOn = le
+
+SimpleCotation = Cotation simple
+AdvancedCotation = Cotation avancée
+Evaluation = Évaluation
+SelectCotation = Sélectionnez les cases pour calculer votre cotation
+EvaluationList = Liste des évaluations du risque
+
 
 #
 # Data
@@ -280,6 +299,11 @@ Alternates = Suppléants
 
 ElementType = Type d'élément
 ParentElement = Élément parent
+
+CloseModal = Fermer
+
+ActionPlanDU = Plan d'action Document Unique
+ActionPlanDUDescription = Description du plan d'action Document Unique
 
 
 
