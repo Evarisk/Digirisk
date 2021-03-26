@@ -1229,9 +1229,8 @@ class Risk extends CommonObject
 	 *  @param		int		$usesharelink	Use the public shared link of image (if not available, the 'nophoto' image will be shown instead)
 	 *  @return     string					Html code to show photo. Number of photos shown is saved in this->nbphoto
 	 */
-	public function digirisk_show_photos($modulepart, $sdir, $size = 0, $nbmax = 0, $nbbyrow = 5, $showfilename = 0, $showaction = 0, $maxHeight = 120, $maxWidth = 160, $nolink = 0, $notitle = 0, $usesharelink = 0, $subdir)
+	public function digirisk_show_photos($modulepart, $sdir, $size = 0, $nbmax = 0, $nbbyrow = 5, $showfilename = 0, $showaction = 0, $maxHeight = 120, $maxWidth = 160, $nolink = 0, $notitle = 0, $usesharelink = 0, $subdir, $object)
 	{
-		// phpcs:enable
 		global $conf, $user, $langs;
 
 		include_once DOL_DOCUMENT_ROOT.'/core/lib/files.lib.php';
@@ -1241,17 +1240,10 @@ class Risk extends CommonObject
 		$sortorder = 'desc';
 
 		$dir = $sdir.'/';
-		$pdir = '/' . $subdir . '/';
+		$pdir = $subdir . '/';
 
-		$dir .= get_exdir(0, 0, 0, 0, $this, $modulepart).$this->ref.'/';
-		$pdir .= get_exdir(0, 0, 0, 0, $this, $modulepart).$this->ref.'/';
-
-		// For backward compatibility
-		if ($modulepart == 'product' && !empty($conf->global->PRODUCT_USE_OLD_PATH_FOR_PHOTO))
-		{
-			$dir = $sdir.'/'.get_exdir($this->id, 2, 0, 0, $this, $modulepart).$this->id."/photos/";
-			$pdir = '/'.get_exdir($this->id, 2, 0, 0, $this, $modulepart).$this->id."/photos/";
-		}
+		$dir .= get_exdir(0, 0, 0, 0, $object, $modulepart).$object->ref.'/';
+		$pdir .= get_exdir(0, 0, 0, 0, $object, $modulepart).$object->ref.'/';
 
 		// Defined relative dir to DOL_DATA_ROOT
 		$relativedir = '';
@@ -1269,17 +1261,10 @@ class Risk extends CommonObject
 		$nbphoto = 0;
 
 		$filearray = dol_dir_list($dir, "files", 0, '', '(\.meta|_preview.*\.png)$', $sortfield, (strtolower($sortorder) == 'desc' ?SORT_DESC:SORT_ASC), 1);
-
-		/*if (! empty($conf->global->PRODUCT_USE_OLD_PATH_FOR_PHOTO))    // For backward compatiblity, we scan also old dirs
-		 {
-		 $filearrayold=dol_dir_list($dirold,"files",0,'','(\.meta|_preview.*\.png)$',$sortfield,(strtolower($sortorder)=='desc'?SORT_DESC:SORT_ASC),1);
-		 $filearray=array_merge($filearray, $filearrayold);
-		 }*/
-
 		completeFileArrayWithDatabaseInfo($filearray, $relativedir);
-
 		if (count($filearray))
 		{
+
 			if ($sortfield && $sortorder)
 			{
 				$filearray = dol_sort_array($filearray, $sortfield, $sortorder);
@@ -1321,9 +1306,9 @@ class Risk extends CommonObject
 						$relativefile = preg_replace('/^\//', '', $pdir.$photo);
 						if (empty($nolink))
 						{
-							$urladvanced = getAdvancedPreviewUrl($modulepart, $relativefile, 0, 'entity='.$this->entity);
+							$urladvanced = getAdvancedPreviewUrl($modulepart, $relativefile, 0, 'entity='.$object->entity);
 							if ($urladvanced) $return .= '<a href="'.$urladvanced.'">';
-							else $return .= '<a href="'.DOL_URL_ROOT.'/viewimage.php?modulepart='.$modulepart.'&entity='.$this->entity.'&file='.urlencode($pdir.$photo).'" class="aphoto" target="_blank">';
+							else $return .= '<a href="'.DOL_URL_ROOT.'/viewimage.php?modulepart='.$modulepart.'&entity='.$object->entity.'&file='.urlencode($pdir.$photo).'" class="aphoto" target="_blank">';
 						}
 
 						// Show image (width height=$maxHeight)
@@ -1357,11 +1342,11 @@ class Risk extends CommonObject
 							if (empty($maxHeight) || $photo_vignette && $imgarray['height'] > $maxHeight)
 							{
 								$return .= '<!-- Show thumb -->';
-								$return .= '<img class="photo photowithmargin"  height="'.$maxHeight.'" src="'.DOL_URL_ROOT.'/viewimage.php?modulepart='.$modulepart.'&entity='.$this->entity.'&file='.urlencode($pdirthumb.$photo_vignette).'" title="'.dol_escape_htmltag($alt).'">';
+								$return .= '<img class="photo"  height="'.$maxHeight.'" src="'.DOL_URL_ROOT.'/viewimage.php?modulepart='.$modulepart.'&entity='.$object->entity.'&file='.urlencode($pdirthumb.$photo_vignette).'" title="'.dol_escape_htmltag($alt).'">';
 							}
 							else {
 								$return .= '<!-- Show original file -->';
-								$return .= '<img class="photo photowithmargin" height="'.$maxHeight.'" src="'.DOL_URL_ROOT.'/viewimage.php?modulepart='.$modulepart.'&entity='.$this->entity.'&file='.urlencode($pdir.$photo).'" title="'.dol_escape_htmltag($alt).'">';
+								$return .= '<img class="photo photowithmargin" height="'.$maxHeight.'" src="'.DOL_URL_ROOT.'/viewimage.php?modulepart='.$modulepart.'&entity='.$object->entity.'&file='.urlencode($pdir.$photo).'" title="'.dol_escape_htmltag($alt).'">';
 							}
 						}
 
@@ -1439,12 +1424,8 @@ class Risk extends CommonObject
 		}
 
 		$this->nbphoto = $nbphoto;
-
 		return $return;
 	}
-
-
-
 }
 
 /**
