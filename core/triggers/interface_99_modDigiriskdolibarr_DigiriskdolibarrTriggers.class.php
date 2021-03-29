@@ -224,7 +224,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$now = dol_now();
 				$actioncomm = new ActionComm($this->db);
 
-				$actioncomm->elementtype = 'groupment@digiriskdolibarr';
+				$actioncomm->elementtype = $object->element_type.'@digiriskdolibarr';
 				$actioncomm->elementid   = $object->id;
 				$actioncomm->code 		 = 'AC_LISTING_RISKS_PHOTOS_GENERATE';
 				$actioncomm->type_code 	 = 'AC_OTH_AUTO';
@@ -243,7 +243,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 			$now = dol_now();
 			$actioncomm = new ActionComm($this->db);
 
-			$actioncomm->elementtype = 'groupment@digiriskdolibarr';
+			$actioncomm->elementtype = $object->element_type.'@digiriskdolibarr';
 			$actioncomm->elementid   = $object->id;
 			$actioncomm->code 		 = 'AC_LISTING_RISKS_ACTIONS_GENERATE';
 			$actioncomm->type_code 	 = 'AC_OTH_AUTO';
