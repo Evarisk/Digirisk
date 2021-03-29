@@ -416,7 +416,7 @@ class doc_workunit_A4_odt extends ModelePDFWorkUnit
 
 					if ( ! empty( $object ) ) {
 						$risks = $risk->fetchRisksOrderedByCotation($object->id);
-						if ($risks !== -1) {
+						if ($risks > 0 && !empty($risks)) {
 							for ($i = 1; $i <= 4; $i++ ) {
 								$listlines = $odfHandler->setSegment('risq' . $i);
 
@@ -427,14 +427,9 @@ class doc_workunit_A4_odt extends ModelePDFWorkUnit
 									$scale = $lastEvaluation->get_evaluation_scale();
 
 									if ( $scale == $i ) {
-										$tmparray['nomDanger'] = $line->get_danger_name($line);
-
-										$riskRef = substr($line->ref, 1);
-										$riskRef = ltrim($riskRef, '0');
-										$cotationRef = substr($lastEvaluation->ref, 1);
-										$cotationRef = ltrim($cotationRef, '0');
-										$tmparray['identifiantRisque'] = 'R'. $riskRef . ' - E' . $cotationRef;
-										$tmparray['quotationRisque'] = $lastEvaluation->cotation;
+										$tmparray['nomDanger']         = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $line->get_danger_category($line) . '.png';
+										$tmparray['identifiantRisque'] 	= $line->ref . ' - ' . $lastEvaluation->ref;
+										$tmparray['quotationRisque']   = $lastEvaluation->cotation;
 										$tmparray['commentaireRisque'] = dol_print_date( $lastEvaluation->date_creation, '%A %e %B %G %H:%M' ) . ': ' . $lastEvaluation->comment;
 
 										//$linenumber++;
@@ -448,7 +443,12 @@ class doc_workunit_A4_odt extends ModelePDFWorkUnit
 										$reshook = $hookmanager->executeHooks('ODTSubstitutionLine', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
 										foreach ($tmparray as $key => $val) {
 											try {
-												$listlines->setVars($key, $val, true, 'UTF-8');
+												if ( $val == $tmparray['nomDanger'] ) {
+													$listlines->setImage($key, $val);
+												}
+												else {
+													$listlines->setVars($key, $val, true, 'UTF-8');
+												}
 											} catch (OdfException $e) {
 												dol_syslog($e->getMessage(), LOG_INFO);
 											} catch (SegmentException $e) {

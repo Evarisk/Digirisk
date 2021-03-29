@@ -289,16 +289,6 @@ class doc_listing_risks_photos_odt extends ModelePDFListingRisksPhoto
 
 			dol_mkdir($conf->digiriskdolibarr->dir_temp);
 
-
-			// If CUSTOMER contact defined on order, we use it
-			$usecontact = false;
-			$arrayidcontact = $object->getIdContact('external', 'CUSTOMER');
-			if (count($arrayidcontact) > 0)
-			{
-				$usecontact = true;
-				$result = $object->fetch_contact($arrayidcontact[0]);
-			}
-
 			// Recipient name
 			$contactobject = null;
 			if (!empty($usecontact))
@@ -430,11 +420,11 @@ class doc_listing_risks_photos_odt extends ModelePDFListingRisksPhoto
 
 					if ( ! empty( $object ) ) {
 						$risks = $risk->fetchRisksOrderedByCotation($object->id, true);
-						if ($risks !== -1) {
+						if ($risks > 0 && !empty($risks)) {
 							for ($i = 1; $i <= 4; $i++ ) {
 								$listlines = $odfHandler->setSegment('risk' . $i);
 
-								foreach ($risks as $line) {
+									foreach ($risks as $line) {
 									$evaluation = new DigiriskEvaluation($this->db);
 									$lastEvaluation = $evaluation->fetchFromParent($line->id, 1);
 									if ( !empty ($lastEvaluation)) {
@@ -447,21 +437,15 @@ class doc_listing_risks_photos_odt extends ModelePDFListingRisksPhoto
 										$element = new DigiriskElement($this->db);
 										$element->fetch($line->fk_element);
 
-										$tmparray['nomElement'] = $element->ref . ' - ' . $element->label;
-										$tmparray['nomDanger'] 	= $line->get_danger_name($line);
-
-										$riskRef 		= substr($line->ref, 1);
-										$riskRef 		= ltrim($riskRef, '0');
-										$cotationRef 	= substr($lastEvaluation->ref, 1);
-										$cotationRef 	= ltrim($cotationRef, '0');
-
-										$tmparray['identifiantRisque'] 	= 'R'. $riskRef . ' - E' . $cotationRef;
+										$tmparray['nomElement']         = $element->ref . ' - ' . $element->label;
+										$tmparray['nomDanger'] 	        = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $line->get_danger_category($line) . '.png';
+										$tmparray['identifiantRisque'] 	= $line->ref . ' - ' . $lastEvaluation->ref;
 										$tmparray['quotationRisque'] 	= $lastEvaluation->cotation;
 										$tmparray['commentaireRisque']	= dol_print_date( $lastEvaluation->date_creation, '%A %e %B %G %H:%M' ) . ': ' . $lastEvaluation->comment;
 
-										$path 						= DOL_DATA_ROOT .'/digiriskdolibarr/risk/' . $line->ref ;
+										$path 						= DOL_DATA_ROOT .'/digiriskdolibarr/evaluation/' . $lastEvaluation->ref;
 										$image 						= $path . '/' . $lastEvaluation->photo;
-										$tmparray['photoAssociee'] = $image;
+										$tmparray['photoAssociee']  = $image;
 
 										unset($tmparray['object_fields']);
 
@@ -471,7 +455,7 @@ class doc_listing_risks_photos_odt extends ModelePDFListingRisksPhoto
 										$reshook = $hookmanager->executeHooks('ODTSubstitutionLine', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
 										foreach ($tmparray as $key => $val) {
 											try {
-												if (file_exists($val)) {
+												if (file_exists($val) && $val == $image) {
 													$list = getimagesize($val);
 													$newWidth = 200;
 
@@ -482,9 +466,12 @@ class doc_listing_risks_photos_odt extends ModelePDFListingRisksPhoto
 													}
 
 													$listlines->setImage($key, $val);
+												} elseif ( $val == $tmparray['nomDanger'] ){
+													$listlines->setImage($key, $val);
 												} else {
 													$listlines->setVars($key, $val, true, 'UTF-8');
 												}
+
 
 
 											} catch (OdfException $e) {
