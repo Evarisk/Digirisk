@@ -364,7 +364,7 @@ class Risk extends CommonObject
 		$result = $risk->fetchFromParent($parent_id);
 
 		// RISQUES du parent.
-		if (!empty ($result)) {
+		if ($result > 0 && !empty ($result)) {
 			foreach ( $result as $risk ) {
 				$evaluation = new DigiriskEvaluation($this->db);
 				$evaluation->fetchFromParent($risk->id, 1);
@@ -387,27 +387,30 @@ class Risk extends CommonObject
 				$element[$key][$v] = $v;
 			}
 
-			$children_id = array_shift ($element);
+			if (is_array($element)) {
+				$children_id = array_shift ($element);
+			}
 
 			// RISQUES des enfants du parent.
-			foreach ( $children_id as $element ) {
+			if (!empty ($children_id)) {
+				foreach ($children_id as $element) {
 
-				$risk = new Risk($this->db);
+					$risk = new Risk($this->db);
 
-				$result = $risk->fetchFromParent($element);
-				if ( !empty ($result)) {
-					foreach ( $result as $risk ) {
-						$evaluation = new DigiriskEvaluation($this->db);
-						$evaluation->fetchFromParent($risk->id, 1);
-						$lastEvaluation = $evaluation->fetchFromParent($risk->id,1);
-						$lastEvaluation = array_shift($lastEvaluation);
+					$result = $risk->fetchFromParent($element);
+					if (!empty ($result)) {
+						foreach ($result as $risk) {
+							$evaluation = new DigiriskEvaluation($this->db);
+							$evaluation->fetchFromParent($risk->id, 1);
+							$lastEvaluation = $evaluation->fetchFromParent($risk->id, 1);
+							$lastEvaluation = array_shift($lastEvaluation);
 
-						$risk->lastEvaluation = $lastEvaluation->cotation;
+							$risk->lastEvaluation = $lastEvaluation->cotation;
 
-						$risks[$risk->id] = $risk;
+							$risks[$risk->id] = $risk;
+						}
 					}
 				}
-
 			}
 		}
 
