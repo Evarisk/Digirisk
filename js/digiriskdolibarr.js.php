@@ -577,15 +577,15 @@ window.eoxiaJS.saveRisk = function ( event ) {
 }
 
 window.eoxiaJS.selectEvaluationMethod = function ( event ) {
-
-	$('.select-evaluation-method.selected').removeClass('selected')
+	var elementParent = jQuery(this).closest('.modal-container')
+	elementParent.find('.select-evaluation-method.selected').removeClass('selected')
 
 	$(this).addClass('selected')
 	$(this).removeClass('button-grey')
 	$(this).addClass('button-blue');
 
-	$('.select-evaluation-method:not(.selected').removeClass('button-blue');
-	$('.select-evaluation-method:not(.selected').addClass('button-grey');
+	elementParent.find('.select-evaluation-method:not(.selected)').removeClass('button-blue');
+	elementParent.find('.select-evaluation-method:not(.selected)').addClass('button-grey');
 
 
 	if($(this).hasClass('evaluation-standard')) {
@@ -775,6 +775,7 @@ window.eoxiaJS.dropdown.toggleAngleClass = function( button ) {
  */
 window.eoxiaJS.selectSeuil = function( event ) {
 	var element      = jQuery( this );
+	var elementParent = jQuery(this).closest('.modal-container')
 	var riskID       = element.data( 'id' );
 	var seuil        = element.data( 'seuil' );
 	var variableID   = element.data( 'variable-id' );
@@ -786,14 +787,11 @@ window.eoxiaJS.selectSeuil = function( event ) {
 	element.addClass('selected-cotation')
 
 	if ( variableID && seuil ) {
-		window.eoxiaJS.updateInputVariables( riskID, evaluationID, variableID, seuil, evaluationMethod );
+		window.eoxiaJS.updateInputVariables( riskID, evaluationID, variableID, seuil, evaluationMethod, elementParent);
 	}
-
-	element.closest('.risk-evaluation-add-modal').find('.button-disable').removeClass('button-disable')
 };
 
-window.eoxiaJS.updateInputVariables = function( riskID, evaluationID, variableID, value, evaluationMethod, field ) {
-
+window.eoxiaJS.updateInputVariables = function(riskID, evaluationID, variableID, value, evaluationMethod, elementParent) {
 	$('#cotationInput'+riskID).attr('value', evaluationID)
 	$('#cotationMethod'+riskID).attr('value', evaluationMethod)
 	//$('#cotationSpan'+riskID).text(evaluationID)
@@ -801,7 +799,7 @@ window.eoxiaJS.updateInputVariables = function( riskID, evaluationID, variableID
 	var element = jQuery(this);
 
 	// Rend le bouton "active".
-	window.eoxiaJS.riskCategory.haveDataInInput()
+	window.eoxiaJS.riskCategory.haveDataInInput( elementParent )
 };
 /**
  * Initialise l'objet "evaluationMethodEvarisk" ainsi que la méthode "init" obligatoire pour la bibliothèque EoxiaJS.
@@ -825,14 +823,14 @@ window.eoxiaJS.evaluationMethodEvarisk.selectSeuil = function( event ) {
 	jQuery( this ).closest( '.table-row' ).find( '.active' ).removeClass( 'active' );
 	jQuery( this ).addClass( 'active' );
 
+	var elementParent = jQuery(this).closest('.modal-container')
 	var element      = jQuery( this );
 	var riskID       = element.data( 'id' );
 	var seuil        = element.data( 'seuil' );
 	var variableID   = element.data( 'variable-id' );
 	var evaluationID = element.data( 'evaluation-id' );
 
-	window.eoxiaJS.evaluationMethodEvarisk.updateInputVariables( riskID, evaluationID, variableID, seuil, jQuery( '.wpeo-modal.modal-active.modal-risk-' + riskID + ' textarea' ) );
-
+	window.eoxiaJS.evaluationMethodEvarisk.updateInputVariables( riskID, evaluationID, variableID, seuil, elementParent );
 };
 
 window.eoxiaJS.getDynamicScale = function (cotation) {
@@ -857,14 +855,15 @@ window.eoxiaJS.getDynamicScale = function (cotation) {
 	}
 }
 
-window.eoxiaJS.evaluationMethodEvarisk.updateInputVariables = function( riskID, evaluationID, variableID, value, field ) {
+window.eoxiaJS.evaluationMethodEvarisk.updateInputVariables = function( riskID, evaluationID, variableID, value, elementParent ) {
+
 	let criteres = []
-	Object.values($('.table-cell.active.cell-'+riskID)).forEach(function(v) {
+	Object.values(elementParent.find('.table-cell.active.cell-'+evaluationID)).forEach(function(v) {
 		if ($(v).data( 'seuil' ) > -1) {
 			criteres.push($(v).data( 'seuil' ))
 		}
 	})
-
+	console.log(criteres)
 	// Rend le bouton "active" et met à jour la cotation et la scale
 	if (criteres.length === 5) {
 		let cotationBeforeAdapt = criteres[0] * criteres[1] * criteres[2] * criteres[3] * criteres[4]
@@ -877,9 +876,9 @@ window.eoxiaJS.evaluationMethodEvarisk.updateInputVariables = function( riskID, 
 				$('.risk-evaluation-calculated-cotation').find('.risk-evaluation-cotation').attr('data-scale', window.eoxiaJS.getDynamicScale(cotationAfterAdapt))
 				$('.risk-evaluation-calculated-cotation').find('.risk-evaluation-cotation span').text(cotationAfterAdapt)
 				$('.risk-evaluation-cotation').find('.risk-evaluation-seuil').val(cotationAfterAdapt)
-				window.eoxiaJS.riskCategory.haveDataInInput()
 
-			});
+				window.eoxiaJS.riskCategory.haveDataInInput(elementParent)
+		});
 	}
 };
 
@@ -945,6 +944,7 @@ window.eoxiaJS.riskCategory.selectDanger = function( event ) {
 
 	element.closest('.fichecenter').find('.input-hidden-danger').val(element.data('id'));
 
+	var elementParent = jQuery(this).closest('.modal-container')
 
 
 
@@ -952,7 +952,7 @@ window.eoxiaJS.riskCategory.selectDanger = function( event ) {
 	//window.eoxiaJS.tooltip.remove(element.closest('.risk-row').find('.category-danger.wpeo-tooltip-event'));
 
 	// Rend le bouton "active".
-	window.eoxiaJS.riskCategory.haveDataInInput()
+	window.eoxiaJS.riskCategory.haveDataInInput(elementParent)
 
 
 //	// Si aucune donnée est entrée, on lance la requête.
@@ -968,13 +968,19 @@ window.eoxiaJS.riskCategory.selectDanger = function( event ) {
 //	}
 //};
 };
-window.eoxiaJS.riskCategory.haveDataInInput = function( element ) {
-	var element = $('.risk-add-modal');
-	var category = element.find('input[name="risk_category_id"]')
+window.eoxiaJS.riskCategory.haveDataInInput = function( elementParent ) {
+	var element = elementParent.parent().parent()
 	var cotation = element.find('.risk-evaluation-seuil')
 
-	if ( category.val() > 0  && cotation.val() > 0 ) {
-		element.find('.button-disable').removeClass('button-disable');
+	if (element.hasClass('risk-add-modal')) {
+		var category = element.find('input[name="risk_category_id"]')
+		if ( category.val() > 0  && cotation.val() > 0  ) {
+			element.find('.button-disable').removeClass('button-disable');
+		}
+	} else if (element.hasClass('risk-evaluation-add-modal')) {
+		if ( cotation.val() > 0 ) {
+			element.find('.button-disable').removeClass('button-disable');
+		}
 	}
 };
 

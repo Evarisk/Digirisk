@@ -1419,10 +1419,13 @@ while ($i < ($limit ? min($num, $limit) : $num))
 																								<div class="table-row">
 																									<div class="table-cell"><?php echo $critere['name'] ; ?></div>
 																									<?php foreach($critere['option']['survey']['request'] as $request) : ?>
-																										<div class="table-cell can-select cell-<?php echo $cotation->id ? $cotation->id : 0; echo $request['seuil'] == $cotation->$name ? " active" : "" ; ?>"
+																										<div class="table-cell can-select cell-<?php echo $cotation->id ? $cotation->id : 0;
+																											if (!empty($request['seuil'])) {
+																												echo $request['seuil'] == $cotation->$name ? " active" : "" ;
+																											} ?>"
 																											 data-type="<?php echo $name ?>"
 																											 data-id="<?php echo  $risk->id ? $risk->id : 0 ; ?>"
-																											 data-evaluation-id="<?php echo $evaluation_id ? $evaluation_id : 0 ; ?>"
+																											 data-evaluation-id="<?php echo $cotation->id ? $cotation->id : 0 ; ?>"
 																											 data-variable-id="<?php echo $l ; ?>"
 																											 data-seuil="<?php echo  $request['seuil']; ?>">
 																											<?php echo  $request['question'] ; ?>
@@ -1703,7 +1706,7 @@ print '</form>'."\n"; ?>
 											<div class="table-row">
 												<div class="table-cell"><?php echo $critere['name'] ; ?></div>
 												<?php foreach($critere['option']['survey']['request'] as $request) : ?>
-													<div class="table-cell can-select cell-<?php echo  $risk->id ? $risk->id : 0 ; ?>"
+													<div class="table-cell can-select cell-<?php echo  $evaluation_id ? $evaluation_id : 0 ; ?>"
 														 data-type="<?php echo $name ?>"
 														 data-id="<?php echo  $risk->id ? $risk->id : 0 ; ?>"
 														 data-evaluation-id="<?php echo $evaluation_id ? $evaluation_id : 0 ; ?>"
