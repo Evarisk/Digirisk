@@ -833,13 +833,6 @@ window.eoxiaJS.evaluationMethodEvarisk.selectSeuil = function( event ) {
 
 	window.eoxiaJS.evaluationMethodEvarisk.updateInputVariables( riskID, evaluationID, variableID, seuil, jQuery( '.wpeo-modal.modal-active.modal-risk-' + riskID + ' textarea' ) );
 
-	var elementBIS = $('.risk-add-modal');
-	var category = elementBIS.find('input[name="risk_category_id"]')
-	var cotation = elementBIS.find('.risk-evaluation-seuil')
-
-	if ( category.val() > 0  && cotation.val() > 0 ) {
-		elementBIS.find('.button-disable').removeClass('button-disable');
-	}
 };
 
 window.eoxiaJS.getDynamicScale = function (cotation) {
@@ -884,6 +877,8 @@ window.eoxiaJS.evaluationMethodEvarisk.updateInputVariables = function( riskID, 
 				$('.risk-evaluation-calculated-cotation').find('.risk-evaluation-cotation').attr('data-scale', window.eoxiaJS.getDynamicScale(cotationAfterAdapt))
 				$('.risk-evaluation-calculated-cotation').find('.risk-evaluation-cotation span').text(cotationAfterAdapt)
 				$('.risk-evaluation-cotation').find('.risk-evaluation-seuil').val(cotationAfterAdapt)
+				window.eoxiaJS.riskCategory.haveDataInInput()
+
 			});
 	}
 };
