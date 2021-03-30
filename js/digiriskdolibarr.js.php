@@ -832,19 +832,13 @@ window.eoxiaJS.evaluationMethodEvarisk.selectSeuil = function( event ) {
 	var evaluationID = element.data( 'evaluation-id' );
 
 	window.eoxiaJS.evaluationMethodEvarisk.updateInputVariables( riskID, evaluationID, variableID, seuil, jQuery( '.wpeo-modal.modal-active.modal-risk-' + riskID + ' textarea' ) );
-console.log(jQuery( '.wpeo-modal.modal-risk-' + riskID + ' textarea' ).val())
-	var currentVal    = JSON.parse(jQuery( '.wpeo-modal.modal-risk-' + riskID + ' textarea' ).val());
-	var canGetDetails = true;
-	for (var key in currentVal) {
-		if (currentVal[key] == '') {
-			canGetDetails = false;
-		}
-	}
-	console.log(riskID)
-	if ( jQuery( '.wpeo-modal.modal-active.modal-risk-' + riskID + ' .table-cell.active' ).length == 5 ) {
-		if ( jQuery( '.wpeo-modal.modal-active.modal-risk-' + riskID + ' .button-main' ).length ) {
-			jQuery( '.wpeo-modal.modal-active.modal-risk-' + riskID + ' .button-main' ).addClass( 'disabled' );
-		}
+
+	var elementBIS = $('.risk-add-modal');
+	var category = elementBIS.find('input[name="risk_category_id"]')
+	var cotation = elementBIS.find('.risk-evaluation-seuil')
+
+	if ( category.val() > 0  && cotation.val() > 0 ) {
+		elementBIS.find('.button-disable').removeClass('button-disable');
 	}
 };
 
@@ -871,21 +865,12 @@ window.eoxiaJS.getDynamicScale = function (cotation) {
 }
 
 window.eoxiaJS.evaluationMethodEvarisk.updateInputVariables = function( riskID, evaluationID, variableID, value, field ) {
-	var updateEvaluationID = false;
-
-	console.log(riskID)
-
-	console.log($('.table-cell.active'))
 	let criteres = []
 	Object.values($('.table-cell.active.cell-'+riskID)).forEach(function(v) {
 		if ($(v).data( 'seuil' ) > -1) {
 			criteres.push($(v).data( 'seuil' ))
 		}
 	})
-
- 	if ( updateEvaluationID ) {
-		jQuery( '.risk-row.edit[data-id="' + riskID + '"] input[name="evaluation_method_id"]' ).val( evaluationID );
-	}
 
 	// Rend le bouton "active" et met à jour la cotation et la scale
 	if (criteres.length === 5) {
@@ -900,8 +885,6 @@ window.eoxiaJS.evaluationMethodEvarisk.updateInputVariables = function( riskID, 
 				$('.risk-evaluation-calculated-cotation').find('.risk-evaluation-cotation span').text(cotationAfterAdapt)
 				$('.risk-evaluation-cotation').find('.risk-evaluation-seuil').val(cotationAfterAdapt)
 			});
-
-		jQuery( '.wpeo-button.cotation-save.button-disable' ).removeClass( 'button-disable' );
 	}
 };
 
@@ -1192,7 +1175,7 @@ window.eoxiaJS.saveEvaluation = function ( event ) {
 	}
 
 	let criteres = ''
-	Object.values($('.table-cell.active.cell-0')).forEach(function(v) {
+	Object.values($('.table-cell.active.cell-'+evaluationID)).forEach(function(v) {
 		if ($(v).data( 'seuil' ) > -1) {
 			criteres += '&' + $(v).data( 'type' ) + '=' + $(v).data( 'seuil' )
 		}
