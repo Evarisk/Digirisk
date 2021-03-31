@@ -471,6 +471,42 @@ class DigiriskEvaluation extends CommonObject
 	}
 
 	/**
+	 * Update object into database
+	 *
+	 * @param  User $user      User that modifies
+	 * @return int             <0 if KO, >0 if OK
+	 */
+	public function updateEvaluationStatus(User $user, $risk_id)
+	{
+		dol_syslog(__METHOD__, LOG_DEBUG);
+		$sql = 'SELECT ';
+		$sql .= $this->getFieldList();
+		$sql .= ' FROM '.MAIN_DB_PREFIX.$this->table_element.' as t';
+		if (isset($this->ismultientitymanaged) && $this->ismultientitymanaged == 1) $sql .= ' WHERE t.entity IN ('.getEntity($this->table_element).')';
+		else $sql .= ' WHERE 1 = 1';
+		$sql .= ' AND fk_risk = '.$risk_id;
+		$sql .= ' ORDER BY t.rowid DESC';
+		$sql .= ' LIMIT 1';
+
+		$resql = $this->db->query($sql);
+
+		if ($resql) {
+			$evaluation = new DigiriskEvaluation($this->db);
+			$obj = $this->db->fetch_object($resql);
+			$this->db->free($resql);
+			$evaluation->fetch($obj->rowid);
+			$evaluation->status = 1;
+			$records = $evaluation->update($user);
+			return $records;
+		} else {
+			$this->errors[] = 'Error '.$this->db->lasterror();
+			dol_syslog(__METHOD__.' '.join(',', $this->errors), LOG_ERR);
+
+			return -1;
+		}
+	}
+
+	/**
 	 * Delete object in database
 	 *
 	 * @param User $user       User that deletes
