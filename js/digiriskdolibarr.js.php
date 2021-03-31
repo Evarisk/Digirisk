@@ -466,6 +466,7 @@ window.eoxiaJS.openModal = function ( event ) {
 	//Open modal evaluation
 	if ($(this).hasClass('risk-evaluation-add')) {
 		$('#risk_evaluation_add').addClass('modal-active');
+		$('.risk-evaluation-create').attr('value', idSelected);
 	} else if ($(this).hasClass('risk-evaluation-list')) {
 		$('#risk_evaluation_list' + idSelected).addClass('modal-active');
 	} else if ($(this).hasClass('risk-evaluation-photo')) {
@@ -946,9 +947,6 @@ window.eoxiaJS.riskCategory.selectDanger = function( event ) {
 
 	var elementParent = jQuery(this).closest('.modal-container')
 
-
-
-
 	//window.eoxiaJS.tooltip.remove(element.closest('.risk-row').find('.category-danger.wpeo-tooltip-event'));
 
 	// Rend le bouton "active".
@@ -974,11 +972,11 @@ window.eoxiaJS.riskCategory.haveDataInInput = function( elementParent ) {
 
 	if (element.hasClass('risk-add-modal')) {
 		var category = element.find('input[name="risk_category_id"]')
-		if ( category.val() > 0  && cotation.val() > 0  ) {
+		if ( category.val() >= 0  && cotation.val() >= 0  ) {
 			element.find('.button-disable').removeClass('button-disable');
 		}
 	} else if (element.hasClass('risk-evaluation-add-modal')) {
-		if ( cotation.val() > 0 ) {
+		if ( cotation.val() >= 0 ) {
 			element.find('.button-disable').removeClass('button-disable');
 		}
 	}
