@@ -708,10 +708,12 @@ if (!preg_match('/(evaluation)/', $sortfield)) {
 	$sql .= preg_replace('/^,/', '', $hookmanager->resPrint);
 	$sql = preg_replace('/,\s*$/', '', $sql);
 	$sql .= " FROM ".MAIN_DB_PREFIX.$evaluation->table_element." as evaluation";
+	$sql .= " LEFT JOIN ".MAIN_DB_PREFIX.$risk->table_element." as r on (evaluation.fk_risk = r.rowid)";
 	if (is_array($extrafields->attributes[$evaluation->table_element]['label']) && count($extrafields->attributes[$evaluation->table_element]['label'])) $sql .= " LEFT JOIN ".MAIN_DB_PREFIX.$evaluation->table_element."_extrafields as ef on (evaluation.rowid = ef.fk_object)";
 	if ($evaluation->ismultientitymanaged == 1) $sql .= " WHERE evaluation.entity IN (".getEntity($evaluation->element).")";
 	else $sql .= " WHERE 1 = 1";
-	$sql .= " AND status = 1";
+	$sql .= " AND evaluation.status = 1";
+	$sql .= " AND r.fk_element =".$id;
 	foreach ($search as $key => $val)
 	{
 		if ($key == 'status' && $search[$key] == -1) continue;
@@ -1135,6 +1137,7 @@ foreach ($evaluation->fields as $key => $val)
 		} else {
 			$sortorder = 'asc';
 		}
+
 		print getTitleFieldOfList($arrayfields['evaluation.'.$key]['label'], 0, $_SERVER['PHP_SELF'], 'evaluation.'.$key, '', $param, ($cssforfield ? 'class="'.$cssforfield.'"' : ''), $evalsortfield, $sortorder, ($cssforfield ? $cssforfield.' ' : ''))."\n";
 	}
 }
