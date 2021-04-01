@@ -80,7 +80,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			'theme' => 0,
 			// Set this to relative path of css file if module has its own css file
 			'css' => array(
-				'/digiriskdolibarr/css/digiriskdolibarr.css.php',
+//				'/digiriskdolibarr/css/digiriskdolibarr.css.php',
 				'/digiriskdolibarr/css/digiriskdolibarr.css',
 			),
 			// Set this to relative path of js file if module must load a js on all pages

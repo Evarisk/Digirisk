@@ -1,0 +1,42 @@
+.risk-evaluation-cotation {
+  width: 50px;
+  min-width: 50px;
+  height: 50px;
+  line-height: 50px;
+  text-align: center;
+  border-radius: 6px;
+  background: $color__grey;
+  color: rgba(0,0,0,0.8);
+  font-size: 16px;
+  font-weight: 600;
+  margin-right: 0.5em;
+
+  &[data-scale="1"] {
+    background: $color__grey;
+  }
+  &[data-scale="2"] {
+    background: $color__yellow;
+    color: #fff;
+  }
+  &[data-scale="3"] {
+    background: $color__red;
+    color: #fff;
+  }
+  &[data-scale="4"] {
+    background: $color__dark;
+    color: #fff;
+  }
+
+  &.selected-cotation {
+    box-shadow: 0 0 0 2px $color__primary;
+  }
+}
+
+.can-select {
+  transition: all 0.2s ease-out;
+
+  &:hover {
+    cursor: pointer;
+    opacity: 0.8;
+  }
+}

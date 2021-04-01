@@ -1,0 +1,30 @@
+.wpeo-dropdown {
+  .dropdown-content {
+    .dropdown-item {
+      padding: 0.6em;
+      background: #fff;
+      transition: all 0.2s ease-out;
+      &:hover {
+        cursor: pointer;
+        background: rgba(0,0,0,0.1);
+      }
+    }
+  }
+}
+
+.wpeo-dropdown.dropdown-list {
+  .dropdown-content {
+    text-align: left;
+  }
+  .dropdown-item {
+    &::after {
+      display: block;
+      content: '';
+      clear: both;
+    }
+    img {
+      float: left;
+      margin-right: 0.4em;
+    }
+  }
+}

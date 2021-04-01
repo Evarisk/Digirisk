@@ -594,11 +594,15 @@ window.eoxiaJS.selectEvaluationMethod = function ( event ) {
 		$('.cotation-standard').attr('style', 'display:block')
 		$('.risk-evaluation-calculated-cotation').attr('style', 'display:none')
 		$('.risk-evaluation-method').val('standard')
+		$(this).closest('.risk-evaluation-container').removeClass('advanced');
+		$(this).closest('.risk-evaluation-container').addClass('standard');
 	} else {
 		$('.cotation-standard').attr('style', 'display:none')
 		$('.cotation-advanced').attr('style', 'display:block')
 		$('.risk-evaluation-calculated-cotation').attr('style', 'display:block')
 		$('.risk-evaluation-method').val('advanced')
+		$(this).closest('.risk-evaluation-container').addClass('advanced');
+		$(this).closest('.risk-evaluation-container').removeClass('standard');
 	}
 
 }

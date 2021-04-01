@@ -15,29 +15,6 @@
     min-width: 40px;
     height: 40px;
     line-height: 40px;
-    text-align: center;
-    border-radius: 6px;
-    background: $color__grey;
-    color: rgba(0,0,0,0.8);
-    font-size: 16px;
-    font-weight: 600;
-    margin-right: 0.5em;
-
-    &[data-scale="1"] {
-      background: $color__grey;
-    }
-    &[data-scale="2"] {
-      background: $color__yellow;
-      color: #fff;
-    }
-    &[data-scale="3"] {
-      background: $color__red;
-      color: #fff;
-    }
-    &[data-scale="4"] {
-      background: $color__dark;
-      color: #fff;
-    }
   }
 
   .risk-evaluation-photo {

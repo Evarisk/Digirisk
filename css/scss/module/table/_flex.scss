@@ -1,0 +1,98 @@
+/*--------------------------------------------------------------
+	Table Flex
+
+    .table-25  : max-width: 25px
+    .table-50  : max-width: 50px
+    .table-75  : max-width: 75px
+    .table-100 : max-width: 100px
+    ...
+    .table-500 : max-width: 500px;
+
+    .table-end       : Utiliser la classe table-end justifie la cellule sur la droite
+    .table-padding-0 : Enleve les marges internes d’une cellule
+--------------------------------------------------------------*/
+
+.wpeo-table.table-flex {
+  display: flex;
+  flex-direction: column;
+  font-size: 14px;
+}
+
+/** Ligne */
+.wpeo-table.table-flex .table-row {
+  display: flex;
+  flex-wrap: nowrap;
+  flex-direction: row;
+
+  &:not(.table-header):nth-of-type(odd) {
+    background: rgba(0,0,0,0.05);
+  }
+}
+
+/** Ligne entete */
+.wpeo-table.table-flex .table-row.table-header {
+  background: $color__secondary;
+
+  .table-cell {
+    font-weight: 700;
+    color: #fff;
+  }
+}
+
+/** Cellule */
+.wpeo-table.table-flex .table-cell {
+  margin: auto 0;
+  width: 100%;
+  padding: 0.8em 0.6em;
+
+  @media ( max-width: $media__medium ) {
+    padding: 0.4em;
+  }
+}
+
+/** Taille générale des cellules */
+.wpeo-table.table-flex {
+  @for $i from 1 through 10 {
+    &.table-#{$i} .table-cell {
+      width: 100%/$i;
+    }
+  }
+}
+
+/** Taille spécifiques des cellules */
+.wpeo-table.table-flex .table-cell {
+  $w: 25;
+  @for $i from 1 through 20 {
+    $y: $w*$i;
+    &.table-#{$y} {
+      max-width: #{$y}px;
+      min-width: #{$y}px;
+    }
+  }
+  &.table-full {
+    width: 100%;
+  }
+}
+
+/** Différentes classes */
+.wpeo-table.table-flex .table-cell {
+  &.table-end {
+    text-align: right;
+    margin-left: auto;
+  }
+  &.table-padding-0 {
+    padding: 0;
+  }
+}
+
+/** Responsive mobile */
+@media ( max-width: $media__small ) {
+  .wpeo-table.table-flex {
+    .table-row {
+      flex-direction: column;
+    }
+    .table-cell {
+      width: 100%;
+    }
+  }
+}

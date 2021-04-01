@@ -1,0 +1,134 @@
+/*--------------------------------------------------------------
+	Module : Dropdown
+	Version : 1.0.0
+
+	.wpeo-dropdown -> classe de base du mobule
+		.grid -> Affichage en grille
+		.list -> Affichage en liste
+--------------------------------------------------------------*/
+
+.wpeo-dropdown {
+  position: relative;
+  display: inline-block;
+
+  .dropdown-toggle {
+    display: inline-block;
+
+    span ~ *[class*="icon"]{
+      margin-left: 10px;
+    }
+  }
+  .dropdown-content {
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(-10px);
+    transition: all 0.2s ease-out;
+    position: absolute;
+    background: #fff;
+    z-index: 99;
+    border: 1px solid rgba(0,0,0,0.1);
+    box-shadow: 0 0 10px 0px rgba(0,0,0,0.3);
+    width: 220px;
+    padding: 0.6em;
+  }
+  &.dropdown-active .dropdown-content {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(0);
+  }
+  ul, li {
+    margin: 0;
+    list-style-type: none;
+    padding: 0;
+  }
+  .dropdown-item {
+    display: block;
+    color: rgba(0,0,0,0.7);
+    text-decoration: none;
+
+    &::before {
+      display: none;
+      content: '';
+    }
+
+    .dropdown-result-title, .dropdown-result-subtitle {
+      display: block;
+    }
+    .dropdown-result-title {
+      font-size: 14px;
+    }
+    .dropdown-result-subtitle {
+      font-size: 12px;
+      color: rgba(0,0,0,0.5);
+    }
+  }
+}
+
+/** Taille */
+.wpeo-dropdown {
+  &.dropdown-small .dropdown-content {
+    width: 60px;
+  }
+  &.dropdown-medium .dropdown-content {
+    width: 220px;
+  }
+  &.dropdown-large .dropdown-content {
+    width: 360px;
+  }
+}
+
+/** Padding */
+.wpeo-dropdown {
+  &.dropdown-padding-0 .dropdown-content {
+    padding: 0;
+  }
+  &.dropdown-padding-1 .dropdown-content {
+    padding: 0.6em;
+  }
+  &.dropdown-padding-2 .dropdown-content {
+    padding: 1.2em;
+  }
+}
+
+/** Alignement */
+.wpeo-dropdown {
+  &.dropdown-left .dropdown-content {
+    left: 0;
+  }
+  &.dropdown-right .dropdown-content {
+    right: 0;
+  }
+
+  &.dropdown-horizontal.dropdown-left .dropdown-content {
+    left: 100%;
+  }
+  &.dropdown-horizontal.dropdown-right .dropdown-content {
+    right: 100%;
+  }
+}
+
+/** Sens */
+.wpeo-dropdown {
+  &.dropdown-horizontal .dropdown-content {
+    top: 0;
+    width: auto !important;
+    display: flex;
+    flex-wrap: nowrap;
+    flex-direction: row;
+  }
+}
+
+/** Disable */
+.wpeo-dropdown .dropdown-item {
+  &.dropdown-item-disable {
+    opacity: 0.6;
+    cursor: default !important;
+    pointer-events: none;
+    // Pointer events: none; seulement sur les enfants pour permettre l'utilisation d'une tooltip ou autre module.
+    > * {
+    }
+  }
+}
+
+@import "list";
+@import "grid";
