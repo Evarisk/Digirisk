@@ -395,6 +395,26 @@
 
 .page-ut-gp-list {
   margin-left: -30px;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+  display: block !important;
+  width: 100%;
+}
+
+.page-ut-gp-list * {
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+.page-ut-gp-list .fiche {
+  margin-right: 0 !important;
+}
+
+/** Screen */
+.page-ut-gp-list #id-right {
+  padding-left: 250px;
+  width: calc(100% + 30px);
+  display: block;
 }
 
 /** UT / GP Navigation */
@@ -426,11 +446,6 @@
   pointer-events: none;
   -webkit-transition: all 0.2s ease-out;
   transition: all 0.2s ease-out;
-}
-
-/** Screen */
-.page-ut-gp-list #id-right {
-  padding-left: 250px;
 }
 
 /** Header */

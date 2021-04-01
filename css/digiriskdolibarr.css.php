@@ -169,7 +169,7 @@ div.mainmenu.digiriskdolibarr {
 # Normalize
 --------------------------------------------------------------*/
 .wpeo-wrap {
-	padding-right: 20px;
+	/*padding-right: 20px;*/
 }
 
 .wpeo-wrap * {

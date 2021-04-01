@@ -1,6 +1,24 @@
 .page-ut-gp-list {
   margin-left: -30px;
+  box-sizing: border-box;
+  display: block !important;
+  width: 100%;
+
+  * {
+    box-sizing: border-box;
+  }
+  .fiche {
+    margin-right: 0 !important;
+  }
 }
+
+/** Screen */
+.page-ut-gp-list #id-right {
+  padding-left: 250px;
+  width: calc(100% + 30px);
+  display: block;
+}
+
 
 /** UT / GP Navigation */
 .page-ut-gp-list .side-nav {
@@ -31,11 +49,6 @@
     pointer-events: none;
     transition: all 0.2s ease-out;
   }
-}
-
-/** Screen */
-.page-ut-gp-list #id-right {
-  padding-left: 250px;
 }
 
 /** Header */
