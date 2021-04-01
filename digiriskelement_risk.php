@@ -1,6 +1,6 @@
 <?php
 /* Copyright (C) 2017 Laurent Destailleur  <eldy@users.sourceforge.net>
- * Copyright (C) ---Put here your own copyright and developer email---
+ * Copyright (C) 2021 EOXIA <dev@eoxia.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -55,20 +55,16 @@ dol_include_once('/digiriskdolibarr/lib/digiriskdolibarr_function.lib.php');
 $langs->loadLangs(array("digiriskdolibarr@digiriskdolibarr", "other"));
 
 // Get parameters
-$id = GETPOST('id', 'int');
-$ref        = GETPOST('ref', 'alpha');
-$action = GETPOST('action', 'aZ09');
-$massaction = GETPOST('massaction', 'alpha'); // The bulk action (combo box choice into lists)
-$confirm    = GETPOST('confirm', 'alpha');
-$cancel     = GETPOST('cancel', 'aZ09');
-$contextpage = GETPOST('contextpage', 'aZ') ?GETPOST('contextpage', 'aZ') : 'riskcard'; // To manage different context of search
-$backtopage = GETPOST('backtopage', 'alpha');
-$backtopageforcancel = GETPOST('backtopageforcancel', 'alpha');
-
-$toselect   = GETPOST('toselect', 'array'); // Array of ids of elements selected into a list
-$sortfield = GETPOST('sortfield', 'alpha');
-$sortorder = GETPOST('sortorder', 'alpha');
-//$lineid   = GETPOST('lineid', 'int');
+$id                  = GETPOST('id', 'int');
+$action              = GETPOST('action', 'aZ09');
+$massaction          = GETPOST('massaction', 'alpha'); // The bulk action (combo box choice into lists)
+$confirm             = GETPOST('confirm', 'alpha');
+$cancel              = GETPOST('cancel', 'aZ09');
+$contextpage         = GETPOST('contextpage', 'aZ') ?GETPOST('contextpage', 'aZ') : 'riskcard'; // To manage different context of search
+$backtopage          = GETPOST('backtopage', 'alpha');
+$toselect            = GETPOST('toselect', 'array'); // Array of ids of elements selected into a list
+$sortfield           = GETPOST('sortfield', 'alpha');
+$sortorder           = GETPOST('sortorder', 'alpha');
 
 // Initialize technical objects
 $object            = new DigiriskElement($db);
@@ -77,7 +73,7 @@ $evaluation        = new DigiriskEvaluation($db);
 $extrafields       = new ExtraFields($db);
 $refRiskMod        = new $conf->global->DIGIRISKDOLIBARR_RISK_ADDON();
 $refEvaluationMod  = new $conf->global->DIGIRISKDOLIBARR_EVALUATION_ADDON();
-$diroutputmassaction = $conf->digiriskdolibarr->dir_output.'/temp/massgeneration/'.$user->id;
+
 $hookmanager->initHooks(array('riskcard', 'globalcard')); // Note that conf->hooks_modules contains array
 
 // Fetch optionals attributes and labels
@@ -88,6 +84,7 @@ $search_array_options = $extrafields->getOptionalsFromPost($risk->table_element,
 if (!$sortfield) $sortfield = "t.".key($risk->fields); // Set here default search field. By default 1st field in definition.
 if (!$sortorder) $sortorder = "ASC";
 if (!$evalsortfield) $evalsortfield = "evaluation.".key($evaluation->fields);
+
 // Initialize array of search criterias
 $search_all = GETPOST('search_all', 'alphanohtml') ? trim(GETPOST('search_all', 'alphanohtml')) : trim(GETPOST('sall', 'alphanohtml'));
 $search = array();
@@ -102,10 +99,6 @@ foreach ($risk->fields as $key => $val)
 {
 	if ($val['searchall']) $fieldstosearchall['t.'.$key] = $val['label'];
 }
-foreach ($evaluation->fields as $key => $val)
-{
-	if ($val['searchall']) $fieldstosearchall['evaluation.'.$key] = $val['label'];
-}
 
 // Definition of fields for list
 $arrayfields = array();
@@ -114,33 +107,22 @@ foreach ($risk->fields as $key => $val)
 	// If $val['visible']==0, then we never show the field
 	if (!empty($val['visible'])) $arrayfields['t.'.$key] = array('label'=>$val['label'], 'checked'=>(($val['visible'] < 0) ? 0 : 1), 'enabled'=>($val['enabled'] && ($val['visible'] != 3)), 'position'=>$val['position']);
 }
-
 foreach ($evaluation->fields as $key => $val)
 {
 	// If $val['visible']==0, then we never show the field
 	if (!empty($val['visible'])) $arrayfields['evaluation.'.$key] = array('label'=>$val['label'], 'checked'=>(($val['visible'] < 0) ? 0 : 1), 'enabled'=>($val['enabled'] && ($val['visible'] != 3)), 'position'=>$val['position']);
 }
 
-if (empty($action) && empty($id) && empty($ref)) $action = 'view';
-
-// Load object
+// Load Digirisk_element object
 include DOL_DOCUMENT_ROOT.'/core/actions_fetchobject.inc.php'; // Must be include, not include_once.
 
-
+//Permission for digiriskelement_risk
 $permissiontoread = $user->rights->digiriskdolibarr->risk->read;
-$permissiontoadd = $user->rights->digiriskdolibarr->risk->write; // Used by the include of actions_addupdatedelete.inc.php and actions_lineupdown.inc.php
-$permissiontodelete = $user->rights->digiriskdolibarr->risk->delete || ($permissiontoadd && isset($risk->status) && $risk->status == $risk::STATUS_DRAFT);
-$permissionnote = $user->rights->digiriskdolibarr->risk->write; // Used by the include of actions_setnotes.inc.php
-$permissiondellink = $user->rights->digiriskdolibarr->risk->write; // Used by the include of actions_dellink.inc.php
-$upload_dir = $conf->digiriskdolibarr->multidir_output[isset($risk->entity) ? $risk->entity : 1];
+$permissiontoadd = $user->rights->digiriskdolibarr->risk->write;
+$permissiontodelete = $user->rights->digiriskdolibarr->risk->delete;
 
 // Security check - Protection if external user
-//if ($user->socid > 0) accessforbidden();
-//if ($user->socid > 0) $socid = $user->socid;
-//$isdraft = (($risk->statut == $risk::STATUS_DRAFT) ? 1 : 0);
-//$result = restrictedArea($user, 'digiriskdolibarr', $risk->id, '', '', 'fk_soc', 'rowid', $isdraft);
-
-//if (!$permissiontoread) accessforbidden();
+if (!$permissiontoread) accessforbidden();
 
 
 /*
@@ -148,7 +130,6 @@ $upload_dir = $conf->digiriskdolibarr->multidir_output[isset($risk->entity) ? $r
  */
 
 if (GETPOST('cancel', 'alpha')) { $action = 'list'; $massaction = ''; }
-if (!GETPOST('confirmmassaction', 'alpha') && $massaction != 'presend' && $massaction != 'confirm_presend') { $massaction = ''; }
 
 $parameters = array();
 $reshook = $hookmanager->executeHooks('doActions', $parameters, $risk, $action); // Note that $action and $risk may have been modified by some hooks
@@ -181,71 +162,54 @@ if (empty($reshook))
 
 	$error = 0;
 
-	$backurlforlist = dol_buildpath('/digiriskdolibarr/risk_list.php', 1);
+	$backtopage = dol_buildpath('/digiriskdolibarr/digiriskelement_risk.php', 1).'?id='.($id > 0 ? $id : '__ID__');
 
-	if (empty($backtopage) || ($cancel && empty($id))) {
-		if (empty($backtopage) || ($cancel && strpos($backtopage, '__ID__'))) {
-			if (empty($id) && (($action != 'add' && $action != 'create') || $cancel)) $backtopage = $backurlforlist;
-			else $backtopage = dol_buildpath('/digiriskdolibarr/digiriskelement_risk.php', 1).'?id='.($id > 0 ? $id : '__ID__');
-		}
-	}
-	$triggermodname = 'DIGIRISKDOLIBARR_RISK_MODIFY'; // Name of trigger action code to execute when we modify record
+	if (!$error && $action == 'add' && $permissiontoadd) {
 
-	if ($action == 'add') {
+		$riskComment = GETPOST('riskComment');
+		$fk_element  = GETPOST('id');
+		$ref         = GETPOST('ref');
+		$cotation    = GETPOST('cotation');
+		$method      = GETPOST('cotationMethod');
+		$category    = GETPOST('category');
+		$photo       = GETPOST('photo');
 
-		$riskComment 	= GETPOST('riskComment');
-		$fk_element		= GETPOST('id');
-		$ref 			= GETPOST('ref');
-		$cotation 		= GETPOST('cotation');
-		$method 		= GETPOST('cotationMethod');
-		$category 		= GETPOST('category');
-		$photo 			= GETPOST('photo');
+		$risk->description = $db->escape($riskComment);
+		$risk->fk_element  = $fk_element ? $fk_element : 0;
+		$risk->fk_projet   = $conf->global->DIGIRISKDOLIBARR_DU_PROJECT;
+		$risk->category    = $category;
+		$risk->ref         = $refRiskMod->getNextValue($risk);
 
-		$risk->description 	= $db->escape($riskComment);
-		$risk->fk_element 	= $fk_element ? $fk_element : 0;
-		$risk->fk_projet 	= $conf->global->DIGIRISKDOLIBARR_DU_PROJECT;
-		$risk->category 	= $category;
-		$refRiskMod 		= new $conf->global->DIGIRISKDOLIBARR_RISK_ADDON();
-		$refRisk 			= $refRiskMod->getNextValue($risk);
-
-		if ($refRisk) {
-			$risk->ref = $refRisk;
-		}
-
-		if (!$error)
-		{
+		if (!$error) {
 			$result = $risk->create($user);
-
-			if ($result > 0)
-			{
-				$task = new Task($db);
-				$third_party = new Societe($db);
-				$extrafields->fetch_name_optionals_label($task->table_element);
-
-				$taskRef = new $conf->global->PROJECT_TASK_ADDON();
-
-				$task->ref                              = $taskRef->getNextValue($third_party, $task);
-				$task->label                            = 'salut';
-				$task->fk_project                       = $conf->global->DIGIRISKDOLIBARR_DU_PROJECT;
-				$task->date_c                           = dol_now();
-				$task->fk_task_parent                   = 0;
-				$task->array_options['options_fk_risk'] = $risk->id;
-
-				$task->create($user);
-
-				$formation 			= GETPOST('formation');
-				$protection 		= GETPOST('protection');
-				$occurrence 		= GETPOST('occurrence');
-				$gravite 			= GETPOST('gravite');
-				$exposition 		= GETPOST('exposition');
+			if ($result > 0) {
 				$evaluationComment 	= GETPOST('evaluationComment');
-				$evaluation 		= new DigiriskEvaluation($db);
-				$refCot 			= new $conf->global->DIGIRISKDOLIBARR_EVALUATION_ADDON();
+
+				$evaluation->photo       = $photo;
+				$evaluation->cotation    = $cotation;
+				$evaluation->fk_risk     = $risk->id;
+				$evaluation->status      = 1;
+				$evaluation->method      = $method;
+				$evaluation->ref         = $refEvaluationMod->getNextValue($evaluation);
+				$evaluation->comment     = $db->escape($evaluationComment);
+
+				if ($method == 'advanced') {
+					$formation  = GETPOST('formation');
+					$protection = GETPOST('protection');
+					$occurrence = GETPOST('occurrence');
+					$gravite    = GETPOST('gravite');
+					$exposition = GETPOST('exposition');
+
+					$evaluation->formation  = $formation;
+					$evaluation->protection = $protection;
+					$evaluation->occurrence = $occurrence;
+					$evaluation->gravite    = $gravite;
+					$evaluation->exposition = $exposition;
+				}
 
 				//photo upload and thumbs generation
-
 				$pathToECMPhoto = DOL_DATA_ROOT . '/ecm/digiriskdolibarr/medias/' . $photo;
-				$pathToEvaluationPhoto = DOL_DATA_ROOT . '/digiriskdolibarr/evaluation/' . $refCot->getNextValue($evaluation);
+				$pathToEvaluationPhoto = DOL_DATA_ROOT . '/digiriskdolibarr/evaluation/' . $evaluation->ref;
 
 				mkdir($pathToEvaluationPhoto);
 				copy($pathToECMPhoto,$pathToEvaluationPhoto . '/' . $photo);
@@ -254,237 +218,57 @@ if (empty($reshook))
 				$destfull = $pathToEvaluationPhoto . '/' . $photo;
 
 				// Create thumbs
-				// We can't use $object->addThumbs here because there is no $object known
-				// Used on logon for example
 				$imgThumbSmall = vignette($destfull, $maxwidthsmall, $maxheightsmall, '_small', 50, "thumbs");
 				// Create mini thumbs for image (Ratio is near 16/9)
-				// Used on menu or for setup page for example
 				$imgThumbMini = vignette($destfull, $maxwidthmini, $maxheightmini, '_mini', 50, "thumbs");
-
-				$evaluation->photo			= $photo;
-				$evaluation->cotation 		= $cotation;
-				$evaluation->fk_risk 		= $risk->id;
-				$evaluation->status 		= 1;
-				$evaluation->method 		= $method;
-				$evaluation->ref   			= $refCot->getNextValue($evaluation);
-				$evaluation->formation  	= $formation;
-				$evaluation->protection  	= $protection;
-				$evaluation->occurrence  	= $occurrence;
-				$evaluation->gravite  		= $gravite;
-				$evaluation->exposition  	= $exposition;
-				$evaluation->comment 		= $db->escape($evaluationComment);
 
 				$result2 = $evaluation->create($user);
 
-				if ($result2 > 0)
-				{
-					// Creation OK
-					$urltogo = $backtopage ? str_replace('__ID__', $result2, $backtopage) : $backurlforlist;
-					$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $evaluation->id, $urltogo); // New method to autoselect project after a New on another form object creation
+				if ($result2 > 0) {
+					// Creation risk + evaluation OK
+					$urltogo = str_replace('__ID__', $result2, $backtopage);
+					$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
 					header("Location: ".$urltogo);
 					exit;
-				}
-				else
-				{
-					// Creation KO
+				} else {
+					// Creation evaluation KO
 					if (!empty($evaluation->errors)) setEventMessages(null, $evaluation->errors, 'errors');
 					else  setEventMessages($evaluation->error, null, 'errors');
-					$action = 'create';
 				}
 			}
 			else
 			{
-				// Creation KO
+				// Creation risk KO
 				if (!empty($risk->errors)) setEventMessages(null, $risk->errors, 'errors');
 				else  setEventMessages($risk->error, null, 'errors');
-				$action = 'create';
 			}
 		}
 	}
 
-	if ($action == 'saveRisk') {
+	if (!$error && $action == 'saveRisk' && $permissiontoadd) {
 
 		$riskID      = GETPOST('riskID');
 		$description = GETPOST('riskComment');
 		$category    = GETPOST('riskCategory');
 
-		$risk = new Risk($db);
 		$risk->fetch($riskID);
 
 		$risk->description = $description;
 		$risk->category    = $category;
 
-		$risk->update($user);
+		$result = $risk->update($user);
 
-	}
-
-	if ($action == "deleteRisk") {
-
-		$id = GETPOST('deletedRiskId');
-
-		$risk = new Risk($db);
-		$risk->fetch($id);
-
-		$pathToRiskPhoto = DOL_DATA_ROOT . '/digiriskdolibarr/risk/' . $risk->ref ;
-
-		$files = dol_dir_list($pathToRiskPhoto . '/');
-		foreach ($files as $file) {
-			unlink($pathToRiskPhoto . '/' . $file['name']);
-		}
-		dol_delete_dir($pathToRiskPhoto);
-		$evaluation = new DigiriskEvaluation($db);
-		$lastEvaluations =  $evaluation->fetchFromParent($id);
-		foreach ($lastEvaluations as $lastEvaluation ) {
-			$lastEvaluation->delete($user);
-		}
-
-		$risk->delete($user);
-	}
-
-	if ($action == 'addEvaluation') {
-
-		$formation 			= GETPOST('formation');
-		$protection 		= GETPOST('protection');
-		$occurrence 		= GETPOST('occurrence');
-		$gravite 			= GETPOST('gravite');
-		$exposition 		= GETPOST('exposition');
-		$evaluationComment 	= GETPOST('evaluationComment');
-		$riskID 			= GETPOST('riskToAssign');
-		$cotation 		= GETPOST('cotation');
-		$method 		= GETPOST('cotationMethod');
-		$photo 			= GETPOST('photo');
-
-		$risk->fetch($riskID);
-		//photo upload and thumbs generation
-		if ( !empty ($photo) ) {
-			$pathToECMPhoto = DOL_DATA_ROOT . '/ecm/digiriskdolibarr/medias/' . $photo;
-			$pathToEvaluationPhoto = DOL_DATA_ROOT . '/digiriskdolibarr/evaluation/' . $refEvaluationMod->getNextValue($evaluation);
-
-			mkdir($pathToEvaluationPhoto);
-			copy($pathToECMPhoto,$pathToEvaluationPhoto . '/' . $photo);
-
-			global $maxwidthmini, $maxheightmini, $maxwidthsmall,$maxheightsmall ;
-			$destfull = $pathToEvaluationPhoto . '/' . $photo;
-
-			// Create thumbs
-			// We can't use $object->addThumbs here because there is no $object known
-			// Used on logon for example
-			$imgThumbSmall = vignette($destfull, $maxwidthsmall, $maxheightsmall, '_small', 50, "thumbs");
-			// Create mini thumbs for image (Ratio is near 16/9)
-			// Used on menu or for setup page for example
-			$imgThumbMini = vignette($destfull, $maxwidthmini, $maxheightmini, '_mini', 50, "thumbs");
-		}
-
-		$evaluation->photo			= $photo;
-		$evaluation->cotation 		= $cotation;
-		$evaluation->fk_risk 		= $risk->id;
-		$evaluation->status 		= 1;
-		$evaluation->method 		= $method;
-		$evaluation->ref   			= $refEvaluationMod->getNextValue($evaluation);
-		$evaluation->formation  	= $formation;
-		$evaluation->protection  	= $protection;
-		$evaluation->occurrence  	= $occurrence;
-		$evaluation->gravite  		= $gravite;
-		$evaluation->exposition  	= $exposition;
-		$evaluation->comment 		= $db->escape($evaluationComment);
-
-		$result2 = $evaluation->create($user);
-
-		if ($result2 > 0)
-		{
+		if ($result > 0) {
+			// Update risk OK
+			$urltogo = str_replace('__ID__', $result, $backtopage);
+			$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
+			header("Location: ".$urltogo);
 			exit;
+		} else {
+			// Update risk KO
+			if (!empty($risk->errors)) setEventMessages(null, $risk->errors, 'errors');
+			else  setEventMessages($risk->error, null, 'errors');
 		}
-		else
-		{
-			// Creation KO
-			if (!empty($evaluation->errors)) setEventMessages(null, $evaluation->errors, 'errors');
-			else  setEventMessages($evaluation->error, null, 'errors');
-			$action = 'create';
-		}
-	}
-
-	if ($action == 'saveEvaluation') {
-
-		$evaluationID 		= GETPOST('evaluationID');
-		$cotation 			= GETPOST('cotation');
-		$method 			= GETPOST('cotationMethod');
-		$evaluationComment 	= GETPOST('evaluationComment');
-		$photo 				= GETPOST('photo');
-
-		$formation 	= GETPOST('formation');
-		$protection = GETPOST('protection');
-		$occurrence = GETPOST('occurrence');
-		$gravite 	= GETPOST('gravite');
-		$exposition = GETPOST('exposition');
-
-		$evaluation->fetch($evaluationID);
-
-		$evaluation->cotation 	= $cotation;
-		$evaluation->method 	= $method;
-		$evaluation->comment 	= $db->escape($evaluationComment);
-		$evaluation->photo 		= $photo;
-
-		$pathToECMPhoto = DOL_DATA_ROOT . '/ecm/digiriskdolibarr/medias/' . $photo;
-		$pathToEvaluationPhoto = DOL_DATA_ROOT . '/digiriskdolibarr/evaluation/' . $evaluation->ref ;
-
-		$files = dol_dir_list($pathToEvaluationPhoto);
-		foreach ($files as $file) {
-			if (is_file($file['fullname'])) {
-				unlink($file['fullname']);
-			}
-		}
-
-		$files = dol_dir_list($pathToEvaluationPhoto . '/thumbs');
-		foreach ($files as $file) {
-			unlink($file['fullname']);
-		}
-
-		copy($pathToECMPhoto,$pathToEvaluationPhoto . '/' . $photo);
-
-		global $maxwidthmini, $maxheightmini, $maxwidthsmall,$maxheightsmall ;
-		$destfull = $pathToEvaluationPhoto . '/' . $photo;
-
-		// Create thumbs
-		// We can't use $object->addThumbs here because there is no $object known
-		// Used on logon for example
-		$imgThumbSmall = vignette($destfull, $maxwidthsmall, $maxheightsmall, '_small', 50, "thumbs");
-		// Create mini thumbs for image (Ratio is near 16/9)
-		// Used on menu or for setup page for example
-		$imgThumbMini = vignette($destfull, $maxwidthmini, $maxheightmini, '_mini', 50, "thumbs");
-
-		if ($method == 'advanced') {
-			$evaluation->formation  	= $formation ;
-			$evaluation->protection  	= $protection ;
-			$evaluation->occurrence  	= $occurrence ;
-			$evaluation->gravite  		= $gravite ;
-			$evaluation->exposition  	= $exposition ;
-		}
-
-		$evaluation->update($user);
-	}
-
-	if ($action == "deleteEvaluation") {
-		$evaluation_id = GETPOST('deletedEvaluationId');
-		$test = $evaluation->fetch($evaluation_id);
-
-		$pathToEvaluationPhoto = DOL_DATA_ROOT . '/digiriskdolibarr/evaluation/' . $evaluation->ref ;
-		$files = dol_dir_list($pathToEvaluationPhoto);
-		foreach ($files as $file) {
-			if (is_file($file['fullname'])) {
-				unlink($file['fullname']);
-			}
-		}
-		$files = dol_dir_list($pathToEvaluationPhoto . '/thumbs');
-		foreach ($files as $file) {
-			unlink($file['fullname']);
-		}
-
-		dol_delete_dir($pathToEvaluationPhoto . '/thumbs');
-		dol_delete_dir($pathToEvaluationPhoto);
-
-		$previousEvaluation = $evaluation;
-		$evaluation->delete($user);
-		$previousEvaluation->updateEvaluationStatus($user,$evaluation->fk_risk);
 	}
 
 	if (!$error && ($massaction == 'delete' || ($action == 'delete' && $confirm == 'yes')) && $permissiontodelete) {
@@ -514,19 +298,207 @@ if (empty($reshook))
 						$lastEvaluation->delete($user);
 					}
 				}
-				$risk->delete($user);
+				$result = $risk->delete($user);
+
+				if ($result > 0) {
+					// Delete risk OK
+					$urltogo = str_replace('__ID__', $result, $backtopage);
+					$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
+					header("Location: ".$urltogo);
+					exit;
+				} else {
+					// Delete risk KO
+					if (!empty($risk->errors)) setEventMessages(null, $risk->errors, 'errors');
+					else  setEventMessages($risk->error, null, 'errors');
+				}
 			}
 		}
 	}
 
-	// Actions when linking object each other
-	include DOL_DOCUMENT_ROOT.'/core/actions_dellink.inc.php';
+	if (!$error && $action == 'addEvaluation' && $permissiontoadd) {
+		$evaluationComment = GETPOST('evaluationComment');
+		$riskID            = GETPOST('riskToAssign');
+		$cotation          = GETPOST('cotation');
+		$method            = GETPOST('cotationMethod');
+		$photo             = GETPOST('photo');
+
+		$risk->fetch($riskID);
+		//photo upload and thumbs generation
+		if ( !empty ($photo) ) {
+			$pathToECMPhoto = DOL_DATA_ROOT . '/ecm/digiriskdolibarr/medias/' . $photo;
+			$pathToEvaluationPhoto = DOL_DATA_ROOT . '/digiriskdolibarr/evaluation/' . $refEvaluationMod->getNextValue($evaluation);
+
+			mkdir($pathToEvaluationPhoto);
+			copy($pathToECMPhoto,$pathToEvaluationPhoto . '/' . $photo);
+
+			global $maxwidthmini, $maxheightmini, $maxwidthsmall,$maxheightsmall ;
+			$destfull = $pathToEvaluationPhoto . '/' . $photo;
+
+			// Create thumbs
+			// We can't use $object->addThumbs here because there is no $object known
+			// Used on logon for example
+			$imgThumbSmall = vignette($destfull, $maxwidthsmall, $maxheightsmall, '_small', 50, "thumbs");
+			// Create mini thumbs for image (Ratio is near 16/9)
+			// Used on menu or for setup page for example
+			$imgThumbMini = vignette($destfull, $maxwidthmini, $maxheightmini, '_mini', 50, "thumbs");
+		}
+
+		$evaluation->photo      = $photo;
+		$evaluation->cotation   = $cotation;
+		$evaluation->fk_risk    = $risk->id;
+		$evaluation->status     = 1;
+		$evaluation->method     = $method;
+		$evaluation->ref        = $refEvaluationMod->getNextValue($evaluation);
+		$evaluation->comment    = $db->escape($evaluationComment);
+
+		if ($method == 'advanced') {
+			$formation  = GETPOST('formation');
+			$protection = GETPOST('protection');
+			$occurrence = GETPOST('occurrence');
+			$gravite    = GETPOST('gravite');
+			$exposition = GETPOST('exposition');
+
+			$evaluation->formation  = $formation;
+			$evaluation->protection = $protection;
+			$evaluation->occurrence = $occurrence;
+			$evaluation->gravite    = $gravite;
+			$evaluation->exposition = $exposition;
+		}
+
+		$result = $evaluation->create($user);
+
+		if ($result > 0)
+		{
+			// Creation evaluation OK
+			$urltogo = str_replace('__ID__', $result, $backtopage);
+			$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
+			header("Location: ".$urltogo);
+			exit;
+		}
+		else
+		{
+			// Creation evaluation KO
+			if (!empty($evaluation->errors)) setEventMessages(null, $evaluation->errors, 'errors');
+			else  setEventMessages($evaluation->error, null, 'errors');
+		}
+	}
+
+	if (!$error && $action == 'saveEvaluation' && $permissiontoadd) {
+
+		$evaluationID      = GETPOST('evaluationID');
+		$cotation          = GETPOST('cotation');
+		$method            = GETPOST('cotationMethod');
+		$evaluationComment = GETPOST('evaluationComment');
+		$photo             = GETPOST('photo');
+
+		$evaluation->fetch($evaluationID);
+
+		$evaluation->cotation = $cotation;
+		$evaluation->method   = $method;
+		$evaluation->comment  = $db->escape($evaluationComment);
+		$evaluation->photo    = $photo;
+
+		if ($method == 'advanced') {
+			$formation  = GETPOST('formation');
+			$protection = GETPOST('protection');
+			$occurrence = GETPOST('occurrence');
+			$gravite    = GETPOST('gravite');
+			$exposition = GETPOST('exposition');
+
+			$evaluation->formation  = $formation;
+			$evaluation->protection = $protection;
+			$evaluation->occurrence = $occurrence;
+			$evaluation->gravite    = $gravite;
+			$evaluation->exposition = $exposition;
+		}
+
+		$pathToECMPhoto        = DOL_DATA_ROOT . '/ecm/digiriskdolibarr/medias/' . $photo;
+		$pathToEvaluationPhoto = DOL_DATA_ROOT . '/digiriskdolibarr/evaluation/' . $evaluation->ref ;
+
+		$files = dol_dir_list($pathToEvaluationPhoto);
+		foreach ($files as $file) {
+			if (is_file($file['fullname'])) {
+				unlink($file['fullname']);
+			}
+		}
+
+		$files = dol_dir_list($pathToEvaluationPhoto . '/thumbs');
+		foreach ($files as $file) {
+			unlink($file['fullname']);
+		}
+
+		copy($pathToECMPhoto,$pathToEvaluationPhoto . '/' . $photo);
+
+		global $maxwidthmini, $maxheightmini, $maxwidthsmall,$maxheightsmall ;
+		$destfull = $pathToEvaluationPhoto . '/' . $photo;
+
+		// Create thumbs
+		$imgThumbSmall = vignette($destfull, $maxwidthsmall, $maxheightsmall, '_small', 50, "thumbs");
+		// Create mini thumbs for image (Ratio is near 16/9)
+		$imgThumbMini = vignette($destfull, $maxwidthmini, $maxheightmini, '_mini', 50, "thumbs");
+
+		$result = $evaluation->update($user);
+
+		if ($result > 0)
+		{
+			// Update evaluation OK
+			$urltogo = str_replace('__ID__', $result, $backtopage);
+			$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
+			header("Location: ".$urltogo);
+			exit;
+		}
+		else
+		{
+			// Update evaluation KO
+			if (!empty($evaluation->errors)) setEventMessages(null, $evaluation->errors, 'errors');
+			else  setEventMessages($evaluation->error, null, 'errors');
+		}
+	}
+
+	if (!$error && $action == "deleteEvaluation" && $permissiontodelete) {
+		$evaluation_id = GETPOST('deletedEvaluationId');
+
+		$evaluation->fetch($evaluation_id);
+
+		$pathToEvaluationPhoto = DOL_DATA_ROOT . '/digiriskdolibarr/evaluation/' . $evaluation->ref ;
+		$files = dol_dir_list($pathToEvaluationPhoto);
+		foreach ($files as $file) {
+			if (is_file($file['fullname'])) {
+				unlink($file['fullname']);
+			}
+		}
+
+		$files = dol_dir_list($pathToEvaluationPhoto . '/thumbs');
+		foreach ($files as $file) {
+			unlink($file['fullname']);
+		}
+
+		dol_delete_dir($pathToEvaluationPhoto . '/thumbs');
+		dol_delete_dir($pathToEvaluationPhoto);
+
+		$previousEvaluation = $evaluation;
+		$result = $evaluation->delete($user);
+		$previousEvaluation->updateEvaluationStatus($user,$evaluation->fk_risk);
+
+		if ($result > 0)
+		{
+			// Delete evaluation OK
+			$urltogo = str_replace('__ID__', $result, $backtopage);
+			$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
+			header("Location: ".$urltogo);
+			exit;
+		}
+		else
+		{
+			// Delete evaluation KO
+			if (!empty($evaluation->errors)) setEventMessages(null, $evaluation->errors, 'errors');
+			else  setEventMessages($evaluation->error, null, 'errors');
+		}
+	}
 }
 
 /*
  * View
- *
- * Put here all code to build page
  */
 
 $form = new Form($db);
