@@ -487,11 +487,37 @@ if (empty($reshook))
 		$previousEvaluation->updateEvaluationStatus($user,$evaluation->fk_risk);
 	}
 
-	// Mass actions
-	$objectclass = 'Risk';
-	$objectlabel = 'Risk';
-	$uploaddir = $conf->digiriskdolibarr->dir_output;
-	include DOL_DOCUMENT_ROOT.'/core/actions_massactions.inc.php';
+	if (!$error && ($massaction == 'delete' || ($action == 'delete' && $confirm == 'yes')) && $permissiontodelete) {
+		if (!empty($toselect)) {
+			foreach ($toselect as $toselectedid) {
+				$ListEvaluations =  $evaluation->fetchFromParent($toselectedid,0);
+				$risk->fetch($toselectedid);
+
+				if (!empty ($ListEvaluations) && $ListEvaluations > 0) {
+					foreach ($ListEvaluations as $lastEvaluation ) {
+						$pathToEvaluationPhoto = DOL_DATA_ROOT . '/digiriskdolibarr/evaluation/' . $lastEvaluation->ref;
+
+						$files = dol_dir_list($pathToEvaluationPhoto);
+						foreach ($files as $file) {
+							if (is_file($file['fullname'])) {
+								unlink($file['fullname']);
+							}
+						}
+
+						$files = dol_dir_list($pathToEvaluationPhoto . '/thumbs');
+						foreach ($files as $file) {
+							unlink($file['fullname']);
+						}
+						dol_delete_dir($pathToEvaluationPhoto. '/thumbs');
+						dol_delete_dir($pathToEvaluationPhoto);
+
+						$lastEvaluation->delete($user);
+					}
+				}
+				$risk->delete($user);
+			}
+		}
+	}
 
 	// Actions when linking object each other
 	include DOL_DOCUMENT_ROOT.'/core/actions_dellink.inc.php';
@@ -1338,7 +1364,7 @@ while ($i < ($limit ? min($num, $limit) : $num))
 															<div class="risk-evaluation-photo">
 																<?php $filearray = dol_dir_list($conf->digiriskdolibarr->multidir_output[$conf->entity].'/'.$cotation->element.'/'.$cotation->ref, "files", 0, '', '(\.odt|_preview.*\.png)$', 'position_name', 'asc', 1);
 																if (count($filearray)) {
-																	print '<span class="floatleft inline-block valignmiddle divphotoref">'.digirisk_show_photos('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity].'/'.$cotation->element, 'small', 1, 0, 0, 0, 40, 0, 0, 0, 0, $cotation->element, $cotation).'</span>';
+																	print '<span class="floatleft inline-block valignmiddle divphotoref">'.digirisk_show_photos('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity].'/'.$cotation->element, 'small', 1, 0, 0, 0, 40, 0, 1, 0, 0, $cotation->element, $cotation).'</span>';
 																} else {
 																	$nophoto = '/public/theme/common/nophoto.png'; ?>
 																	<span class="floatleft inline-block valignmiddle divphotoref"><img class="photodigiriskdolibarr" alt="No photo" src="<?php echo DOL_URL_ROOT.$nophoto ?>"></span>
@@ -1468,7 +1494,7 @@ while ($i < ($limit ? min($num, $limit) : $num))
 																				<div class="action risk-evaluation-photo default-photo modal-open" value="<?php echo $cotation->id ?>">
 																					<?php $filearray = dol_dir_list($conf->digiriskdolibarr->multidir_output[$conf->entity].'/'.$cotation->element.'/'.$cotation->ref, "files", 0, '', '(\.odt|_preview.*\.png)$', 'position_name', 'asc', 1);
 																					if (count($filearray)) {
-																						print '<span class="floatleft inline-block valignmiddle divphotoref risk-evaluation-photo-single">'.digirisk_show_photos('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity].'/'.$cotation->element, 'small', 1, 0, 0, 0, 40, 0, 0, 0, 0, $cotation->element, $cotation).'<input class="filename" type="hidden" value="'.$cotation->photo.'"/>'.'</span>';
+																						print '<span class="floatleft inline-block valignmiddle divphotoref risk-evaluation-photo-single">'.digirisk_show_photos('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity].'/'.$cotation->element, 'small', 1, 0, 0, 0, 40, 0, 1, 0, 0, $cotation->element, $cotation).'<input class="filename" type="hidden" value="'.$cotation->photo.'"/>'.'</span>';
 																					} else {
 																						$nophoto = '/public/theme/common/nophoto.png'; ?>
 																						<span class="floatleft inline-block valignmiddle divphotoref risk-evaluation-photo-single"><img class="photodigiriskdolibarr" alt="No photo" src="<?php echo DOL_URL_ROOT.$nophoto ?>">
