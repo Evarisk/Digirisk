@@ -46,11 +46,11 @@ class modDigiriskdolibarr extends DolibarrModules
 
 		// Id for module (must be unique).
 		// Use here a free id (See in Home -> System information -> Dolibarr for list of used modules id).
-		$this->numero = 501500; // TODO Go on page https://wiki.dolibarr.org/index.php/List_of_modules_id to reserve an id number for your module
+		$this->numero = 436302; // TODO Go on page https://wiki.dolibarr.org/index.php/List_of_modules_id to reserve an id number for your module
 		$this->rights_class = 'digiriskdolibarr';
 		// Family can be 'base' (core modules),'crm','financial','hr','projects','products','ecm','technic' (transverse modules),'interface' (link with external tools),'other','...'
 		// It is used to group modules by family in module setup page
-		$this->family          = "other";
+		$this->family          = "interface";
 		$this->module_position = '90';
 		$this->name            = preg_replace('/^mod/i', '', get_class($this));
 		$this->description     = $langs->trans('DigiriskDolibarrdDescription');
@@ -258,17 +258,17 @@ class modDigiriskdolibarr extends DolibarrModules
 		$r            = 0;
 
 		/* LEGAL DISPLAY PERMISSIONS */
-		$this->rights[$r][0] = 1050;
+		$this->rights[$r][0] = $this->numero.$r;
 		$this->rights[$r][1] = $langs->trans('ReadLegalDisplay');
 		$this->rights[$r][4] = 'legaldisplay';
 		$this->rights[$r][5] = 'read';
 		$r++;
-		$this->rights[$r][0] = 1050 + $r;
+		$this->rights[$r][0] = $this->numero.$r;
 		$this->rights[$r][1] = $langs->trans('CreateLegalDisplay');
 		$this->rights[$r][4] = 'legaldisplay';
 		$this->rights[$r][5] = 'write';
 		$r++;
-		$this->rights[$r][0] = 1050 + $r;
+		$this->rights[$r][0] = $this->numero.$r;
 		$this->rights[$r][1] = $langs->trans('DeleteLegalDisplay');
 		$this->rights[$r][4] = 'legaldisplay';
 		$this->rights[$r][5] = 'delete';
@@ -276,17 +276,17 @@ class modDigiriskdolibarr extends DolibarrModules
 
 		/* INFORMATIONS SHARING PERMISSIONS */
 
-		$this->rights[$r][0] = 1050 + $r;
+		$this->rights[$r][0] = $this->numero.$r;
 		$this->rights[$r][1] = $langs->trans('ReadInformationsSharing');
 		$this->rights[$r][4] = 'informationssharing';
 		$this->rights[$r][5] = 'read';
 		$r++;
-		$this->rights[$r][0] = 1050 + $r;
+		$this->rights[$r][0] = $this->numero.$r;
 		$this->rights[$r][1] = $langs->trans('CreateInformationsSharing');
 		$this->rights[$r][4] = 'informationssharing';
 		$this->rights[$r][5] = 'write';
 		$r++;
-		$this->rights[$r][0] = 1050 + $r;
+		$this->rights[$r][0] = $this->numero.$r;
 		$this->rights[$r][1] = $langs->trans('DeleteInformationsSharing');
 		$this->rights[$r][4] = 'informationssharing';
 		$this->rights[$r][5] = 'delete';
@@ -294,17 +294,17 @@ class modDigiriskdolibarr extends DolibarrModules
 
 		/* FIRE PERMIT PERMISSIONS */
 
-		$this->rights[$r][0] = 1050 + $r;
+		$this->rights[$r][0] = $this->numero.$r;
 		$this->rights[$r][1] = $langs->trans('ReadFirePermit');
 		$this->rights[$r][4] = 'firepermit';
 		$this->rights[$r][5] = 'read';
 		$r++;
-		$this->rights[$r][0] = 1050 + $r;
+		$this->rights[$r][0] = $this->numero.$r;
 		$this->rights[$r][1] = $langs->trans('CreateFirePermit');
 		$this->rights[$r][4] = 'firepermit';
 		$this->rights[$r][5] = 'write';
 		$r++;
-		$this->rights[$r][0] = 1050 + $r;
+		$this->rights[$r][0] = $this->numero.$r;
 		$this->rights[$r][1] = $langs->trans('DeleteFirePermit');
 		$this->rights[$r][4] = 'firepermit';
 		$this->rights[$r][5] = 'delete';
@@ -312,17 +312,17 @@ class modDigiriskdolibarr extends DolibarrModules
 
 		/* PREVENTION PLAN PERMISSIONS */
 
-		$this->rights[$r][0] = 1050 + $r;
+		$this->rights[$r][0] = $this->numero.$r;
 		$this->rights[$r][1] = $langs->trans('ReadPreventionPlan');
 		$this->rights[$r][4] = 'preventionplan';
 		$this->rights[$r][5] = 'read';
 		$r++;
-		$this->rights[$r][0] = 1050 + $r;
+		$this->rights[$r][0] = $this->numero.$r;
 		$this->rights[$r][1] = $langs->trans('CreatePreventionPlan');
 		$this->rights[$r][4] = 'preventionplan';
 		$this->rights[$r][5] = 'write';
 		$r++;
-		$this->rights[$r][0] = 1050 + $r;
+		$this->rights[$r][0] = $this->numero.$r;
 		$this->rights[$r][1] = $langs->trans('DeletePreventionPlan');
 		$this->rights[$r][4] = 'preventionplan';
 		$this->rights[$r][5] = 'delete';
@@ -330,17 +330,17 @@ class modDigiriskdolibarr extends DolibarrModules
 
 		/* GP/UT ORGANISATION PERMISSIONS */
 
-		$this->rights[$r][0] = 1050 + $r;
+		$this->rights[$r][0] = $this->numero.$r;
 		$this->rights[$r][1] = $langs->trans('ReadDigiriskElement');
 		$this->rights[$r][4] = 'digiriskelement';
 		$this->rights[$r][5] = 'read';
 		$r++;
-		$this->rights[$r][0] = 1050 + $r;
+		$this->rights[$r][0] = $this->numero.$r;
 		$this->rights[$r][1] = $langs->trans('CreateDigiriskElement');
 		$this->rights[$r][4] = 'digiriskelement';
 		$this->rights[$r][5] = 'write';
 		$r++;
-		$this->rights[$r][0] = 1050 + $r;
+		$this->rights[$r][0] = $this->numero.$r;
 		$this->rights[$r][1] = $langs->trans('DeleteDigiriskElement');
 		$this->rights[$r][4] = 'digiriskelement';
 		$this->rights[$r][5] = 'delete';
@@ -348,17 +348,17 @@ class modDigiriskdolibarr extends DolibarrModules
 
 		/* RISKS PERMISSIONS */
 
-		$this->rights[$r][0] = 1050 + $r;
+		$this->rights[$r][0] = $this->numero.$r;
 		$this->rights[$r][1] = $langs->trans('ReadDigiriskRisk');
 		$this->rights[$r][4] = 'risk';
 		$this->rights[$r][5] = 'read';
 		$r++;
-		$this->rights[$r][0] = 1050 + $r;
+		$this->rights[$r][0] = $this->numero.$r;
 		$this->rights[$r][1] = $langs->trans('CreateDigiriskRisk');
 		$this->rights[$r][4] = 'risk';
 		$this->rights[$r][5] = 'write';
 		$r++;
-		$this->rights[$r][0] = 1050 + $r;
+		$this->rights[$r][0] = $this->numero.$r;
 		$this->rights[$r][1] = $langs->trans('DeleteDigiriskRisk');
 		$this->rights[$r][4] = 'risk';
 		$this->rights[$r][5] = 'delete';

@@ -1100,7 +1100,7 @@ class DigiriskElement extends CommonObject
 
 		print '<body id="mainbody" class="'.$tmpcsstouse.'">'."\n";
 
-		llxHeader('', $langs->trans('DigiriskElement'));
+		llxHeader('', $title, $help_url);
 
 		//Body navigation digirisk
 		$object  = new DigiriskElement($this->db);
