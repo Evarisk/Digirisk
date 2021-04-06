@@ -1,6 +1,5 @@
 <?php
-/* Copyright (C) 2007-2017 Laurent Destailleur  <eldy@users.sourceforge.net>
- * Copyright (C) ---Put here your own copyright and developer email---
+/* Copyright (C) 2021 EOXIA <dev@eoxia.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,27 +21,9 @@
  *		\brief      List page for risk
  */
 
-//if (! defined('NOREQUIREDB'))              define('NOREQUIREDB', '1');					// Do not create database handler $db
-//if (! defined('NOREQUIREUSER'))            define('NOREQUIREUSER', '1');					// Do not load object $user
-//if (! defined('NOREQUIRESOC'))             define('NOREQUIRESOC', '1');					// Do not load object $mysoc
-//if (! defined('NOREQUIRETRAN'))            define('NOREQUIRETRAN', '1');					// Do not load object $langs
-//if (! defined('NOSCANGETFORINJECTION'))    define('NOSCANGETFORINJECTION', '1');			// Do not check injection attack on GET parameters
-//if (! defined('NOSCANPOSTFORINJECTION'))   define('NOSCANPOSTFORINJECTION', '1');			// Do not check injection attack on POST parameters
-//if (! defined('NOCSRFCHECK'))              define('NOCSRFCHECK', '1');					// Do not check CSRF attack (test on referer + on token if option MAIN_SECURITY_CSRF_WITH_TOKEN is on).
-//if (! defined('NOTOKENRENEWAL'))           define('NOTOKENRENEWAL', '1');					// Do not roll the Anti CSRF token (used if MAIN_SECURITY_CSRF_WITH_TOKEN is on)
-//if (! defined('NOSTYLECHECK'))             define('NOSTYLECHECK', '1');					// Do not check style html tag into posted data
-//if (! defined('NOIPCHECK'))                define('NOIPCHECK', '1');						// Do not check IP defined into conf $dolibarr_main_restrict_ip
-//if (! defined('NOREQUIREMENU'))            define('NOREQUIREMENU', '1');					// If there is no need to load and show top and left menu
-//if (! defined('NOREQUIREHTML'))            define('NOREQUIREHTML', '1');					// If we don't need to load the html.form.class.php
-//if (! defined('NOREQUIREAJAX'))            define('NOREQUIREAJAX', '1');       		  	// Do not load ajax.lib.php library
-//if (! defined("NOLOGIN"))                  define("NOLOGIN", '1');						// If this page is public (can be called outside logged session)
-//if (! defined("MAIN_LANG_DEFAULT"))        define('MAIN_LANG_DEFAULT', 'auto');			// Force lang to a particular value
-//if (! defined("MAIN_AUTHENTICATION_MODE")) define('MAIN_AUTHENTICATION_MODE', 'aloginmodule');		// Force authentication handler
-//if (! defined("NOREDIRECTBYMAINTOLOGIN"))  define('NOREDIRECTBYMAINTOLOGIN', '1');		// The main.inc.php does not make a redirect if not logged, instead show simple error message
-//if (! defined("XFRAMEOPTIONS_ALLOWALL"))   define('XFRAMEOPTIONS_ALLOWALL', '1');			// Do not add the HTTP header 'X-Frame-Options: SAMEORIGIN' but 'X-Frame-Options: ALLOWALL'
 
 // Load Dolibarr environment
-$res = 0;
+$res=0;
 // Try main.inc.php into web root known defined into CONTEXT_DOCUMENT_ROOT (not always defined)
 if (!$res && !empty($_SERVER["CONTEXT_DOCUMENT_ROOT"])) $res = @include $_SERVER["CONTEXT_DOCUMENT_ROOT"]."/main.inc.php";
 // Try main.inc.php into web root detected using web root calculated from SCRIPT_FILENAME
@@ -56,148 +37,99 @@ if (!$res && file_exists("../../main.inc.php")) $res = @include "../../main.inc.
 if (!$res && file_exists("../../../main.inc.php")) $res = @include "../../../main.inc.php";
 if (!$res) die("Include of main fails");
 
-require_once DOL_DOCUMENT_ROOT.'/core/class/html.formcompany.class.php';
-require_once DOL_DOCUMENT_ROOT.'/core/lib/date.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/images.lib.php';
-require_once DOL_DOCUMENT_ROOT.'/core/lib/company.lib.php';
-require_once DOL_DOCUMENT_ROOT.'/custom/digiriskdolibarr/class/digiriskevaluation.class.php';
-require_once DOL_DOCUMENT_ROOT.'/core/class/html.formfile.class.php';
-require_once DOL_DOCUMENT_ROOT.'/core/class/html.formprojet.class.php';
-require_once DOL_DOCUMENT_ROOT.'/core/modules/project/task/mod_task_simple.php';
+require_once DOL_DOCUMENT_ROOT.'/core/class/html.form.class.php';
 dol_include_once('/digiriskdolibarr/class/risk.class.php');
 dol_include_once('/digiriskdolibarr/class/digiriskevaluation.class.php');
 dol_include_once('/digiriskdolibarr/class/digiriskelement.class.php');
 dol_include_once('/digiriskdolibarr/core/modules/digiriskdolibarr/mod_risk_standard.php');
 dol_include_once('/digiriskdolibarr/core/modules/digiriskdolibarr/mod_evaluation_standard.php');
 dol_include_once('/digiriskdolibarr/lib/digiriskdolibarr_digiriskelement.lib.php');
-
-// load digiriskdolibarr libraries
-require_once __DIR__.'/class/risk.class.php';
-
-// for other modules
-//dol_include_once('/othermodule/class/otherobject.class.php');
+dol_include_once('/digiriskdolibarr/lib/digiriskdolibarr_function.lib.php');
 
 // Load translation files required by the page
 $langs->loadLangs(array("digiriskdolibarr@digiriskdolibarr", "other"));
 
-$action     = GETPOST('action', 'aZ09') ?GETPOST('action', 'aZ09') : 'view'; // The action 'add', 'create', 'edit', 'update', 'view', ...
-$massaction = GETPOST('massaction', 'alpha'); // The bulk action (combo box choice into lists)
-$show_files = GETPOST('show_files', 'int'); // Show files area generated by bulk actions ?
-$confirm    = GETPOST('confirm', 'alpha'); // Result of a confirmation
-$cancel     = GETPOST('cancel', 'alpha'); // We click on a Cancel button
-$toselect   = GETPOST('toselect', 'array'); // Array of ids of elements selected into a list
-$contextpage = GETPOST('contextpage', 'aZ') ? GETPOST('contextpage', 'aZ') : 'risklist'; // To manage different context of search
-$backtopage = GETPOST('backtopage', 'alpha'); // Go back to a dedicated page
-$optioncss  = GETPOST('optioncss', 'aZ'); // Option for the css output (always '' except when 'print')
-
-$id = GETPOST('id', 'int');
-
-// Load variable for pagination
-$limit = GETPOST('limit', 'int') ? GETPOST('limit', 'int') : $conf->liste_limit;
-$sortfield = GETPOST('sortfield', 'alpha');
-$sortorder = GETPOST('sortorder', 'alpha');
-$page = GETPOSTISSET('pageplusone') ? (GETPOST('pageplusone') - 1) : GETPOST("page", 'int');
-if (empty($page) || $page < 0 || GETPOST('button_search', 'alpha') || GETPOST('button_removefilter', 'alpha')) { $page = 0; }     // If $page is not defined, or '' or -1 or if we click on clear filters
-$offset = $limit * $page;
-$pageprev = $page - 1;
-$pagenext = $page + 1;
+// Get parameters
+$id                  = GETPOST('id', 'int');
+$action              = GETPOST('action', 'aZ09');
+$massaction          = GETPOST('massaction', 'alpha'); // The bulk action (combo box choice into lists)
+$confirm             = GETPOST('confirm', 'alpha');
+$cancel              = GETPOST('cancel', 'aZ09');
+$contextpage         = GETPOST('contextpage', 'aZ') ?GETPOST('contextpage', 'aZ') : 'risklist'; // To manage different context of search
+$backtopage          = GETPOST('backtopage', 'alpha');
+$toselect            = GETPOST('toselect', 'array'); // Array of ids of elements selected into a list
+$sortfield           = GETPOST('sortfield', 'alpha');
+$sortorder           = GETPOST('sortorder', 'alpha');
 
 // Initialize technical objects
-$object = new Risk($db);
-$extrafields = new ExtraFields($db);
-$evaluation = new DigiriskEvaluation($db);
-$diroutputmassaction = $conf->digiriskdolibarr->dir_output.'/temp/massgeneration/'.$user->id;
-$hookmanager->initHooks(array('risklist')); // Note that conf->hooks_modules contains array
+$object            = new DigiriskElement($db);
+$risk              = new Risk($db);
+$evaluation        = new DigiriskEvaluation($db);
+$extrafields       = new ExtraFields($db);
+$refRiskMod        = new $conf->global->DIGIRISKDOLIBARR_RISK_ADDON();
+$refEvaluationMod  = new $conf->global->DIGIRISKDOLIBARR_EVALUATION_ADDON();
+
+$hookmanager->initHooks(array('risklist', 'globalcard')); // Note that conf->hooks_modules contains array
 
 // Fetch optionals attributes and labels
-$extrafields->fetch_name_optionals_label($object->table_element);
-//$extrafields->fetch_name_optionals_label($object->table_element_line);
-
-$search_array_options = $extrafields->getOptionalsFromPost($object->table_element, '', 'search_');
+$extrafields->fetch_name_optionals_label($risk->table_element);
+$search_array_options = $extrafields->getOptionalsFromPost($risk->table_element, '', 'search_');
 
 // Default sort order (if not yet defined by previous GETPOST)
-if (!$sortfield) $sortfield = "t.".key($object->fields); // Set here default search field. By default 1st field in definition.
+if (!$sortfield) $sortfield = "t.".key($risk->fields); // Set here default search field. By default 1st field in definition.
 if (!$sortorder) $sortorder = "ASC";
 if (!$evalsortfield) $evalsortfield = "evaluation.".key($evaluation->fields);
+
 // Initialize array of search criterias
 $search_all = GETPOST('search_all', 'alphanohtml') ? trim(GETPOST('search_all', 'alphanohtml')) : trim(GETPOST('sall', 'alphanohtml'));
 $search = array();
-foreach ($object->fields as $key => $val)
+foreach ($risk->fields as $key => $val)
 {
 	if (GETPOST('search_'.$key, 'alpha') !== '') $search[$key] = GETPOST('search_'.$key, 'alpha');
 }
 
 // List of fields to search into when doing a "search in all"
 $fieldstosearchall = array();
-foreach ($object->fields as $key => $val)
+foreach ($risk->fields as $key => $val)
 {
 	if ($val['searchall']) $fieldstosearchall['t.'.$key] = $val['label'];
-}
-foreach ($evaluation->fields as $key => $val)
-{
-	if ($val['searchall']) $fieldstosearchall['evaluation.'.$key] = $val['label'];
 }
 
 // Definition of fields for list
 $arrayfields = array();
-foreach ($object->fields as $key => $val)
+foreach ($risk->fields as $key => $val)
 {
 	// If $val['visible']==0, then we never show the field
 	if (!empty($val['visible'])) $arrayfields['t.'.$key] = array('label'=>$val['label'], 'checked'=>(($val['visible'] < 0) ? 0 : 1), 'enabled'=>($val['enabled'] && ($val['visible'] != 3)), 'position'=>$val['position']);
 }
-
 foreach ($evaluation->fields as $key => $val)
 {
 	// If $val['visible']==0, then we never show the field
 	if (!empty($val['visible'])) $arrayfields['evaluation.'.$key] = array('label'=>$val['label'], 'checked'=>(($val['visible'] < 0) ? 0 : 1), 'enabled'=>($val['enabled'] && ($val['visible'] != 3)), 'position'=>$val['position']);
 }
 
-// Extra fields
-if (is_array($extrafields->attributes[$object->table_element]['label']) && count($extrafields->attributes[$object->table_element]['label']) > 0)
-{
-	foreach ($extrafields->attributes[$object->table_element]['label'] as $key => $val)
-	{
-		if (!empty($extrafields->attributes[$object->table_element]['list'][$key])) {
-			$arrayfields["ef.".$key] = array(
-				'label'=>$extrafields->attributes[$object->table_element]['label'][$key],
-				'checked'=>(($extrafields->attributes[$object->table_element]['list'][$key] < 0) ? 0 : 1),
-				'position'=>$extrafields->attributes[$object->table_element]['pos'][$key],
-				'enabled'=>(abs($extrafields->attributes[$object->table_element]['list'][$key]) != 3 && $extrafields->attributes[$object->table_element]['perms'][$key]),
-				'langfile'=>$extrafields->attributes[$object->table_element]['langfile'][$key]
-			);
-		}
-	}
-}
-$object->fields = dol_sort_array($object->fields, 'position');
-$arrayfields = dol_sort_array($arrayfields, 'position');
+// Load Digirisk_element object
+include DOL_DOCUMENT_ROOT.'/core/actions_fetchobject.inc.php'; // Must be include, not include_once.
 
+//Permission for digiriskelement_risk
 $permissiontoread = $user->rights->digiriskdolibarr->risk->read;
 $permissiontoadd = $user->rights->digiriskdolibarr->risk->write;
 $permissiontodelete = $user->rights->digiriskdolibarr->risk->delete;
 
-// Security check
-if (empty($conf->digiriskdolibarr->enabled)) accessforbidden('Module not enabled');
-$socid = 0;
-if ($user->socid > 0)	// Protection if external user
-{
-	//$socid = $user->socid;
-	accessforbidden();
-}
-//$result = restrictedArea($user, 'digiriskdolibarr', $id, '');
-//if (!$permissiontoread) accessforbidden();
-
-
+// Security check - Protection if external user
+if (!$permissiontoread) accessforbidden();
 
 /*
  * Actions
  */
 
 if (GETPOST('cancel', 'alpha')) { $action = 'list'; $massaction = ''; }
-if (!GETPOST('confirmmassaction', 'alpha') && $massaction != 'presend' && $massaction != 'confirm_presend') { $massaction = ''; }
 
 $parameters = array();
-$reshook = $hookmanager->executeHooks('doActions', $parameters, $object, $action); // Note that $action and $object may have been modified by some hooks
+$reshook = $hookmanager->executeHooks('doActions', $parameters, $risk, $action); // Note that $action and $risk may have been modified by some hooks
 if ($reshook < 0) setEventMessages($hookmanager->error, $hookmanager->errors, 'errors');
+
 if (empty($reshook))
 {
 	// Selection of new fields
@@ -206,7 +138,11 @@ if (empty($reshook))
 	// Purge search criteria
 	if (GETPOST('button_removefilter_x', 'alpha') || GETPOST('button_removefilter.x', 'alpha') || GETPOST('button_removefilter', 'alpha')) // All tests are required to be compatible with all browsers
 	{
-		foreach ($object->fields as $key => $val)
+		foreach ($risk->fields as $key => $val)
+		{
+			$search[$key] = '';
+		}
+		foreach ($evaluation->fields as $key => $val)
 		{
 			$search[$key] = '';
 		}
@@ -219,344 +155,260 @@ if (empty($reshook))
 		$massaction = ''; // Protection to avoid mass action if we force a new search during a mass action confirmation
 	}
 
-	if ($action == 'add') {
+	$error = 0;
 
-		$riskComment 	= GETPOST('riskComment');
-		$fk_element		= GETPOST('id');
-		$ref 			= GETPOST('ref');
-		$cotation 		= GETPOST('cotation');
-		$method 		= GETPOST('cotationMethod');
-		$category 		= GETPOST('category');
-		$photo 			= GETPOST('photo');
+	$backtopage = dol_buildpath('/digiriskdolibarr/risk_list.php', 1);
 
-		$risk->description 	= $db->escape($riskComment);
-		$risk->fk_element 	= $fk_element ? $fk_element : 0;
-		$risk->fk_projet 	= $conf->global->DIGIRISKDOLIBARR_DU_PROJECT;
-		$risk->category 	= $category;
-		$refRiskMod 		= new $conf->global->DIGIRISKDOLIBARR_RISK_ADDON();
-		$refRisk 			= $refRiskMod->getNextValue($risk);
+	if (!$error && $action == 'saveRisk' && $permissiontoadd) {
+		$riskID      = GETPOST('riskID');
+		$description = GETPOST('riskComment');
+		$category    = GETPOST('riskCategory');
 
-		if ($refRisk) {
-			$risk->ref = $refRisk;
+		$risk->fetch($riskID);
+
+		$risk->description = $description;
+		$risk->category    = $category;
+
+		$result = $risk->update($user);
+
+		if ($result > 0) {
+			// Update risk OK
+			$urltogo = str_replace('__ID__', $result, $backtopage);
+			$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
+			header("Location: ".$urltogo);
+			exit;
+		} else {
+			// Update risk KO
+			if (!empty($risk->errors)) setEventMessages(null, $risk->errors, 'errors');
+			else  setEventMessages($risk->error, null, 'errors');
 		}
+	}
 
-		if (!$error)
-		{
-			$result = $risk->create($user);
+	if (!$error && ($massaction == 'delete' || ($action == 'delete' && $confirm == 'yes')) && $permissiontodelete) {
+		if (!empty($toselect)) {
+			foreach ($toselect as $toselectedid) {
+				$ListEvaluations =  $evaluation->fetchFromParent($toselectedid,0);
+				$risk->fetch($toselectedid);
 
-			if ($result > 0)
-			{
-				$task = new Task($db);
-				$third_party = new Societe($db);
-				$extrafields->fetch_name_optionals_label($task->table_element);
+				if (!empty ($ListEvaluations) && $ListEvaluations > 0) {
+					foreach ($ListEvaluations as $lastEvaluation ) {
+						$pathToEvaluationPhoto = DOL_DATA_ROOT . '/digiriskdolibarr/evaluation/' . $lastEvaluation->ref;
 
-				$taskRef = new $conf->global->PROJECT_TASK_ADDON();
+						$files = dol_dir_list($pathToEvaluationPhoto);
+						foreach ($files as $file) {
+							if (is_file($file['fullname'])) {
+								unlink($file['fullname']);
+							}
+						}
 
-				$task->ref                              = $taskRef->getNextValue($third_party, $task);
-				$task->label                            = 'salut';
-				$task->fk_project                       = $conf->global->DIGIRISKDOLIBARR_DU_PROJECT;
-				$task->date_c                           = dol_now();
-				$task->fk_task_parent                   = 0;
-				$task->array_options['options_fk_risk'] = $risk->id;
+						$files = dol_dir_list($pathToEvaluationPhoto . '/thumbs');
+						foreach ($files as $file) {
+							unlink($file['fullname']);
+						}
+						dol_delete_dir($pathToEvaluationPhoto. '/thumbs');
+						dol_delete_dir($pathToEvaluationPhoto);
 
-				$task->create($user);
+						$lastEvaluation->delete($user);
+					}
+				}
 
-				$formation 			= GETPOST('formation');
-				$protection 		= GETPOST('protection');
-				$occurrence 		= GETPOST('occurrence');
-				$gravite 			= GETPOST('gravite');
-				$exposition 		= GETPOST('exposition');
-				$evaluationComment 	= GETPOST('evaluationComment');
-				$evaluation 		= new DigiriskEvaluation($db);
-				$refCot 			= new $conf->global->DIGIRISKDOLIBARR_EVALUATION_ADDON();
+				$result = $risk->delete($user);
 
-				//photo upload and thumbs generation
-
-				$pathToECMPhoto = DOL_DATA_ROOT . '/ecm/digiriskdolibarr/medias/' . $photo;
-				$pathToRiskPhoto = DOL_DATA_ROOT . '/digiriskdolibarr/risk/' . $refRisk ;
-
-				mkdir($pathToRiskPhoto);
-				copy($pathToECMPhoto,$pathToRiskPhoto . '/' . $photo);
-
-				global $maxwidthmini, $maxheightmini, $maxwidthsmall,$maxheightsmall ;
-				$destfull = $pathToRiskPhoto . '/' . $photo;
-
-				// Create thumbs
-				// We can't use $object->addThumbs here because there is no $object known
-				// Used on logon for example
-				$imgThumbSmall = vignette($destfull, $maxwidthsmall, $maxheightsmall, '_small', 50, "thumbs");
-				// Create mini thumbs for image (Ratio is near 16/9)
-				// Used on menu or for setup page for example
-				$imgThumbMini = vignette($destfull, $maxwidthmini, $maxheightmini, '_mini', 50, "thumbs");
-
-				$evaluation->photo			= $photo;
-				$evaluation->cotation 		= $cotation;
-				$evaluation->fk_risk 		= $risk->id;
-				$evaluation->status 		= 1;
-				$evaluation->method 		= $method;
-				$evaluation->ref   			= $refCot->getNextValue($evaluation);
-				$evaluation->formation  	= $formation;
-				$evaluation->protection  	= $protection;
-				$evaluation->occurrence  	= $occurrence;
-				$evaluation->gravite  		= $gravite;
-				$evaluation->exposition  	= $exposition;
-				$evaluation->comment 		= $db->escape($evaluationComment);
-
-				$result2 = $evaluation->create($user);
-
-				if ($result2 > 0)
-				{
-					// Creation OK
-					$urltogo = $backtopage ? str_replace('__ID__', $result2, $backtopage) : $backurlforlist;
-					$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $evaluation->id, $urltogo); // New method to autoselect project after a New on another form object creation
+				if ($result > 0) {
+					// Delete risk OK
+					$urltogo = str_replace('__ID__', $result, $backtopage);
+					$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
 					header("Location: ".$urltogo);
 					exit;
-				}
-				else
-				{
-					// Creation KO
-					if (!empty($evaluation->errors)) setEventMessages(null, $evaluation->errors, 'errors');
-					else  setEventMessages($evaluation->error, null, 'errors');
-					$action = 'create';
+				} else {
+					// Delete risk KO
+					if (!empty($risk->errors)) setEventMessages(null, $risk->errors, 'errors');
+					else  setEventMessages($risk->error, null, 'errors');
 				}
 			}
-			else
-			{
-				// Creation KO
-				if (!empty($risk->errors)) setEventMessages(null, $risk->errors, 'errors');
-				else  setEventMessages($risk->error, null, 'errors');
-				$action = 'create';
+		}
+	}
+
+	if (!$error && $action == 'addEvaluation' && $permissiontoadd) {
+		$evaluationComment = GETPOST('evaluationComment');
+		$riskID            = GETPOST('riskToAssign');
+		$cotation          = GETPOST('cotation');
+		$method            = GETPOST('cotationMethod');
+		$photo             = GETPOST('photo');
+
+		$risk->fetch($riskID);
+		//photo upload and thumbs generation
+		if ( !empty ($photo) ) {
+			$pathToECMPhoto = DOL_DATA_ROOT . '/ecm/digiriskdolibarr/medias/' . $photo;
+			$pathToEvaluationPhoto = DOL_DATA_ROOT . '/digiriskdolibarr/evaluation/' . $refEvaluationMod->getNextValue($evaluation);
+
+			mkdir($pathToEvaluationPhoto);
+			copy($pathToECMPhoto,$pathToEvaluationPhoto . '/' . $photo);
+
+			global $maxwidthmini, $maxheightmini, $maxwidthsmall,$maxheightsmall ;
+			$destfull = $pathToEvaluationPhoto . '/' . $photo;
+
+			// Create thumbs
+			// We can't use $object->addThumbs here because there is no $object known
+			// Used on logon for example
+			$imgThumbSmall = vignette($destfull, $maxwidthsmall, $maxheightsmall, '_small', 50, "thumbs");
+			// Create mini thumbs for image (Ratio is near 16/9)
+			// Used on menu or for setup page for example
+			$imgThumbMini = vignette($destfull, $maxwidthmini, $maxheightmini, '_mini', 50, "thumbs");
+		}
+
+		$evaluation->photo      = $photo;
+		$evaluation->cotation   = $cotation;
+		$evaluation->fk_risk    = $risk->id;
+		$evaluation->status     = 1;
+		$evaluation->method     = $method;
+		$evaluation->ref        = $refEvaluationMod->getNextValue($evaluation);
+		$evaluation->comment    = $db->escape($evaluationComment);
+
+		if ($method == 'advanced') {
+			$formation  = GETPOST('formation');
+			$protection = GETPOST('protection');
+			$occurrence = GETPOST('occurrence');
+			$gravite    = GETPOST('gravite');
+			$exposition = GETPOST('exposition');
+
+			$evaluation->formation  = $formation;
+			$evaluation->protection = $protection;
+			$evaluation->occurrence = $occurrence;
+			$evaluation->gravite    = $gravite;
+			$evaluation->exposition = $exposition;
+		}
+
+		$result = $evaluation->create($user);
+
+		if ($result > 0)
+		{
+			// Creation evaluation OK
+			$urltogo = str_replace('__ID__', $result, $backtopage);
+			$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
+			header("Location: ".$urltogo);
+			exit;
+		}
+		else
+		{
+			// Creation evaluation KO
+			if (!empty($evaluation->errors)) setEventMessages(null, $evaluation->errors, 'errors');
+			else  setEventMessages($evaluation->error, null, 'errors');
+		}
+	}
+
+	if (!$error && $action == 'saveEvaluation' && $permissiontoadd) {
+		$evaluationID      = GETPOST('evaluationID');
+		$cotation          = GETPOST('cotation');
+		$method            = GETPOST('cotationMethod');
+		$evaluationComment = GETPOST('evaluationComment');
+		$photo             = GETPOST('photo');
+
+		$evaluation->fetch($evaluationID);
+
+		$evaluation->cotation = $cotation;
+		$evaluation->method   = $method;
+		$evaluation->comment  = $db->escape($evaluationComment);
+		$evaluation->photo    = $photo;
+
+		if ($method == 'advanced') {
+			$formation  = GETPOST('formation');
+			$protection = GETPOST('protection');
+			$occurrence = GETPOST('occurrence');
+			$gravite    = GETPOST('gravite');
+			$exposition = GETPOST('exposition');
+
+			$evaluation->formation  = $formation;
+			$evaluation->protection = $protection;
+			$evaluation->occurrence = $occurrence;
+			$evaluation->gravite    = $gravite;
+			$evaluation->exposition = $exposition;
+		}
+
+		$pathToECMPhoto        = DOL_DATA_ROOT . '/ecm/digiriskdolibarr/medias/' . $photo;
+		$pathToEvaluationPhoto = DOL_DATA_ROOT . '/digiriskdolibarr/evaluation/' . $evaluation->ref ;
+
+		$files = dol_dir_list($pathToEvaluationPhoto);
+		foreach ($files as $file) {
+			if (is_file($file['fullname'])) {
+				unlink($file['fullname']);
 			}
 		}
-	}
 
-	if ($action == 'saveRisk') {
-
-		$riskID 			= GETPOST('riskID');
-		$comment 			= GETPOST('riskComment');
-		$cotation 			= GETPOST('cotation');
-		$method 			= GETPOST('cotationMethod');
-		$evaluationComment 	= GETPOST('evaluationComment');
-		$photo 				= GETPOST('photo');
-
-		$formation 	= GETPOST('formation');
-		$protection = GETPOST('protection');
-		$occurrence = GETPOST('occurrence');
-		$gravite 	= GETPOST('gravite');
-		$exposition = GETPOST('exposition');
-
-		$evaluation 			= new DigiriskEvaluation($db);
-		$evaluation->cotation 	= $cotation;
-		$evaluation->fk_risk 	= $riskID;
-		$evaluation->status 	= 1;
-		$evaluation->method 	= $method;
-		$evaluation->comment 	= $db->escape($evaluationComment);
-		$evaluation->photo 		= $photo;
-
-		$risk = new Risk($db);
-		$risk->fetch($riskID);
-
-		$pathToECMPhoto = DOL_DATA_ROOT . '/ecm/digiriskdolibarr/medias/' . $photo;
-		$pathToRiskPhoto = DOL_DATA_ROOT . '/digiriskdolibarr/risk/' . $risk->ref ;
-
-		$files = dol_dir_list($pathToRiskPhoto . '/');
+		$files = dol_dir_list($pathToEvaluationPhoto . '/thumbs');
 		foreach ($files as $file) {
-			unlink($pathToRiskPhoto . '/' . $file['name']);
+			unlink($file['fullname']);
 		}
 
-		dol_delete_dir($pathToRiskPhoto );
-		mkdir($pathToRiskPhoto);
-		copy($pathToECMPhoto,$pathToRiskPhoto . '/' . $photo);
+		copy($pathToECMPhoto,$pathToEvaluationPhoto . '/' . $photo);
 
+		global $maxwidthmini, $maxheightmini, $maxwidthsmall,$maxheightsmall ;
+		$destfull = $pathToEvaluationPhoto . '/' . $photo;
 
-		$refCot 			= new $conf->global->DIGIRISKDOLIBARR_EVALUATION_ADDON();
-		$evaluation->ref 	= $refCot->getNextValue($evaluation);
+		// Create thumbs
+		$imgThumbSmall = vignette($destfull, $maxwidthsmall, $maxheightsmall, '_small', 50, "thumbs");
+		// Create mini thumbs for image (Ratio is near 16/9)
+		$imgThumbMini = vignette($destfull, $maxwidthmini, $maxheightmini, '_mini', 50, "thumbs");
 
-		if ($method == 'digirisk') {
-			$evaluation->formation  	= $formation ;
-			$evaluation->protection  	= $protection ;
-			$evaluation->occurrence  	= $occurrence ;
-			$evaluation->gravite  		= $gravite ;
-			$evaluation->exposition  	= $exposition ;
+		$result = $evaluation->update($user);
+
+		if ($result > 0)
+		{
+			// Update evaluation OK
+			$urltogo = str_replace('__ID__', $result, $backtopage);
+			$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
+			header("Location: ".$urltogo);
+			exit;
 		}
-
-		$evaluation->create($user);
+		else
+		{
+			// Update evaluation KO
+			if (!empty($evaluation->errors)) setEventMessages(null, $evaluation->errors, 'errors');
+			else  setEventMessages($evaluation->error, null, 'errors');
+		}
 	}
 
-	if ($action == "deleteRisk") {
+	if (!$error && $action == "deleteEvaluation" && $permissiontodelete) {
+		$evaluation_id = GETPOST('deletedEvaluationId');
 
-		$id = GETPOST('deletedRiskId');
+		$evaluation->fetch($evaluation_id);
 
-		$risk = new Risk($db);
-		$risk->fetch($id);
-
-		$pathToRiskPhoto = DOL_DATA_ROOT . '/digiriskdolibarr/risk/' . $risk->ref ;
-
-		$files = dol_dir_list($pathToRiskPhoto . '/');
+		$pathToEvaluationPhoto = DOL_DATA_ROOT . '/digiriskdolibarr/evaluation/' . $evaluation->ref ;
+		$files = dol_dir_list($pathToEvaluationPhoto);
 		foreach ($files as $file) {
-			unlink($pathToRiskPhoto . '/' . $file['name']);
-		}
-		dol_delete_dir($pathToRiskPhoto);
-		$evaluation = new DigiriskEvaluation($db);
-		$lastEvaluations =  $evaluation->fetchFromParent($id);
-		foreach ($lastEvaluations as $lastEvaluation ) {
-			$lastEvaluation->delete($user);
+			if (is_file($file['fullname'])) {
+				unlink($file['fullname']);
+			}
 		}
 
-		$risk->delete($user);
-	}
-
-	if ($action == 'addEvaluation') {
-
-				$formation 			= GETPOST('formation');
-				$protection 		= GETPOST('protection');
-				$occurrence 		= GETPOST('occurrence');
-				$gravite 			= GETPOST('gravite');
-				$exposition 		= GETPOST('exposition');
-				$evaluationComment 	= GETPOST('evaluationComment');
-				$riskID 			= GETPOST('riskToAssign');
-
-				$riskComment 	= GETPOST('riskComment');
-				$cotation 		= GETPOST('cotation');
-				$method 		= GETPOST('cotationMethod');
-				$photo 			= GETPOST('photo');
-
-				$evaluation 		= new DigiriskEvaluation($db);
-				$refCot 			= new $conf->global->DIGIRISKDOLIBARR_EVALUATION_ADDON();
-
-				$risk = new Risk($db);
-				$risk->fetch($riskID);
-				//photo upload and thumbs generation
-
-				$pathToECMPhoto = DOL_DATA_ROOT . '/ecm/digiriskdolibarr/medias/' . $photo;
-				$pathToRiskPhoto = DOL_DATA_ROOT . '/digiriskdolibarr/risk/' . $risk->ref ;
-
-				copy($pathToECMPhoto,$pathToRiskPhoto . '/' . $photo);
-
-				global $maxwidthmini, $maxheightmini, $maxwidthsmall,$maxheightsmall ;
-				$destfull = $pathToRiskPhoto . '/' . $photo;
-
-				// Create thumbs
-				// We can't use $object->addThumbs here because there is no $object known
-				// Used on logon for example
-				$imgThumbSmall = vignette($destfull, $maxwidthsmall, $maxheightsmall, '_small', 50, "thumbs");
-				// Create mini thumbs for image (Ratio is near 16/9)
-				// Used on menu or for setup page for example
-				$imgThumbMini = vignette($destfull, $maxwidthmini, $maxheightmini, '_mini', 50, "thumbs");
-
-				$evaluation->photo			= $photo;
-				$evaluation->cotation 		= $cotation;
-				$evaluation->fk_risk 		= $risk->id;
-				$evaluation->status 		= 1;
-				$evaluation->method 		= $method;
-				$evaluation->ref   			= $refCot->getNextValue($evaluation);
-				$evaluation->formation  	= $formation;
-				$evaluation->protection  	= $protection;
-				$evaluation->occurrence  	= $occurrence;
-				$evaluation->gravite  		= $gravite;
-				$evaluation->exposition  	= $exposition;
-				$evaluation->comment 		= $db->escape($evaluationComment);
-
-				$result2 = $evaluation->create($user);
-
-				if ($result2 > 0)
-				{
-
-					exit;
-				}
-				else
-				{
-					// Creation KO
-					if (!empty($evaluation->errors)) setEventMessages(null, $evaluation->errors, 'errors');
-					else  setEventMessages($evaluation->error, null, 'errors');
-					$action = 'create';
-				}
-	}
-
-	if ($action == 'saveEvaluation') {
-
-		$riskID 			= GETPOST('riskID');
-		$comment 			= GETPOST('riskComment');
-		$cotation 			= GETPOST('cotation');
-		$method 			= GETPOST('cotationMethod');
-		$evaluationComment 	= GETPOST('evaluationComment');
-		$photo 				= GETPOST('photo');
-
-		$formation 	= GETPOST('formation');
-		$protection = GETPOST('protection');
-		$occurrence = GETPOST('occurrence');
-		$gravite 	= GETPOST('gravite');
-		$exposition = GETPOST('exposition');
-
-		$evaluation 			= new DigiriskEvaluation($db);
-		$evaluation->cotation 	= $cotation;
-		$evaluation->fk_risk 	= $riskID;
-		$evaluation->status 	= 1;
-		$evaluation->method 	= $method;
-		$evaluation->comment 	= $db->escape($evaluationComment);
-		$evaluation->photo 		= $photo;
-
-		$risk = new Risk($db);
-		$risk->fetch($riskID);
-
-		$pathToECMPhoto = DOL_DATA_ROOT . '/ecm/digiriskdolibarr/medias/' . $photo;
-		$pathToRiskPhoto = DOL_DATA_ROOT . '/digiriskdolibarr/risk/' . $risk->ref ;
-
-		$files = dol_dir_list($pathToRiskPhoto . '/');
+		$files = dol_dir_list($pathToEvaluationPhoto . '/thumbs');
 		foreach ($files as $file) {
-			unlink($pathToRiskPhoto . '/' . $file['name']);
+			unlink($file['fullname']);
 		}
 
-		dol_delete_dir($pathToRiskPhoto );
-		mkdir($pathToRiskPhoto);
-		copy($pathToECMPhoto,$pathToRiskPhoto . '/' . $photo);
+		dol_delete_dir($pathToEvaluationPhoto . '/thumbs');
+		dol_delete_dir($pathToEvaluationPhoto);
 
+		$previousEvaluation = $evaluation;
+		$result = $evaluation->delete($user);
+		$previousEvaluation->updateEvaluationStatus($user,$evaluation->fk_risk);
 
-		$refCot 			= new $conf->global->DIGIRISKDOLIBARR_EVALUATION_ADDON();
-		$evaluation->ref 	= $refCot->getNextValue($evaluation);
-
-		if ($method == 'digirisk') {
-			$evaluation->formation  	= $formation ;
-			$evaluation->protection  	= $protection ;
-			$evaluation->occurrence  	= $occurrence ;
-			$evaluation->gravite  		= $gravite ;
-			$evaluation->exposition  	= $exposition ;
+		if ($result > 0)
+		{
+			// Delete evaluation OK
+			$urltogo = str_replace('__ID__', $result, $backtopage);
+			$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
+			header("Location: ".$urltogo);
+			exit;
 		}
-
-		$evaluation->create($user);
+		else
+		{
+			// Delete evaluation KO
+			if (!empty($evaluation->errors)) setEventMessages(null, $evaluation->errors, 'errors');
+			else  setEventMessages($evaluation->error, null, 'errors');
+		}
 	}
-
-	if ($action == "deleteEvaluation") {
-
-		$id = GETPOST('deletedRiskId');
-
-		$risk = new Risk($db);
-		$risk->fetch($id);
-
-		$pathToRiskPhoto = DOL_DATA_ROOT . '/digiriskdolibarr/risk/' . $risk->ref ;
-
-		$files = dol_dir_list($pathToRiskPhoto . '/');
-		foreach ($files as $file) {
-			unlink($pathToRiskPhoto . '/' . $file['name']);
-		}
-		dol_delete_dir($pathToRiskPhoto);
-		$evaluation = new DigiriskEvaluation($db);
-		$lastEvaluations =  $evaluation->fetchFromParent($id);
-		foreach ($lastEvaluations as $lastEvaluation ) {
-			$lastEvaluation->delete($user);
-		}
-
-		$risk->delete($user);
-	}
-
-	// Mass actions
-	$objectclass = 'Risk';
-	$objectlabel = 'Risk';
-	$uploaddir = $conf->digiriskdolibarr->dir_output;
-	include DOL_DOCUMENT_ROOT.'/core/actions_massactions.inc.php';
 }
-
-
 
 /*
  * View
@@ -564,79 +416,70 @@ if (empty($reshook))
 
 $form = new Form($db);
 
-$now = dol_now();
-//$evaluation = new DigiriskEvaluation($db);
-//
-//$evaluation->fields['ref']['visible'] = 0;
-//$evaluation->fields['cotation']['visible'] = 4;
+$title    = $langs->trans("DigiriskElementRisk");
+$help_url = 'FR:Module_DigiriskDolibarr';
+$morejs   = array("/digiriskdolibarr/js/digiriskdolibarr.js.php");
 
-//$help_url="EN:Module_Risk|FR:Module_Risk_FR|ES:Módulo_Risk";
-$help_url = '';
-$title = $langs->trans('ListOf', $langs->transnoentitiesnoconv("Risks"));
+llxHeader('', $title, $help_url, '', '', '', $morejs);
+// Object card
+// ------------------------------------------------------------
+print '<div class="fichecenter wpeo-wrap">';
+print '<form method="POST" id="searchFormList" action="'.$_SERVER["PHP_SELF"].'?id='.$object->id.'">'."\n";
+print '<input type="hidden" name="token" value="'.newToken().'">';
+print '<input type="hidden" name="formfilteraction" id="formfilteraction" value="list">';
+print '<input type="hidden" name="action" value="list">';
+print '<input type="hidden" name="id" value="'.$id.'">';
+print '<input type="hidden" name="sortfield" value="'.$sortfield.'">';
+print '<input type="hidden" name="sortorder" value="'.$sortorder.'">';
+//print '<input type="hidden" name="page" value="'.$page.'">';
+print '<input type="hidden" name="contextpage" value="'.$contextpage.'">';
 
+$advanced_method_cotation_json  = file_get_contents(DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/js/json/default.json');
+$advanced_method_cotation_array = json_decode($advanced_method_cotation_json, true);
 
 // Build and execute select
 // --------------------------------------------------------------------
 if (!preg_match('/(evaluation)/', $sortfield)) {
-
 	$sql = 'SELECT ';
-	foreach ($object->fields as $key => $val)
+	foreach ($risk->fields as $key => $val)
 	{
-			$sql .= 't.'.$key.', ';
+		$sql .= 't.'.$key.', ';
 	}
-// Add fields from extrafields
-	if (!empty($extrafields->attributes[$object->table_element]['label'])) {
-		foreach ($extrafields->attributes[$object->table_element]['label'] as $key => $val) $sql .= ($extrafields->attributes[$object->table_element]['type'][$key] != 'separate' ? "ef.".$key.' as options_'.$key.', ' : '');
+	// Add fields from extrafields
+	if (!empty($extrafields->attributes[$risk->table_element]['label'])) {
+		foreach ($extrafields->attributes[$risk->table_element]['label'] as $key => $val) $sql .= ($extrafields->attributes[$risk->table_element]['type'][$key] != 'separate' ? "ef.".$key.' as options_'.$key.', ' : '');
 	}
-// Add fields from hooks
+	// Add fields from hooks
 	$parameters = array();
-	$reshook = $hookmanager->executeHooks('printFieldListSelect', $parameters, $object); // Note that $action and $object may have been modified by hook
+	$reshook = $hookmanager->executeHooks('printFieldListSelect', $parameters, $risk); // Note that $action and $risk may have been modified by hook
 	$sql .= preg_replace('/^,/', '', $hookmanager->resPrint);
 	$sql = preg_replace('/,\s*$/', '', $sql);
-	$sql .= " FROM ".MAIN_DB_PREFIX.$object->table_element." as t";
-	if (is_array($extrafields->attributes[$object->table_element]['label']) && count($extrafields->attributes[$object->table_element]['label'])) $sql .= " LEFT JOIN ".MAIN_DB_PREFIX.$object->table_element."_extrafields as ef on (t.rowid = ef.fk_object)";
-//	if ($object->ismultientitymanaged == 1) $sql .= " WHERE t.entity IN (".getEntity($object->element).")";
+	$sql .= " FROM ".MAIN_DB_PREFIX.$risk->table_element." as t";
+	if (is_array($extrafields->attributes[$risk->table_element]['label']) && count($extrafields->attributes[$risk->table_element]['label'])) $sql .= " LEFT JOIN ".MAIN_DB_PREFIX.$risk->table_element."_extrafields as ef on (t.rowid = ef.fk_object)";
+	if ($risk->ismultientitymanaged == 1) $sql .= " WHERE t.entity IN (".getEntity($risk->element).")";
 	$sql .= " WHERE 1 = 1";
-	$sql .= " AND entity = ".$conf->entity;
+
 	foreach ($search as $key => $val)
 	{
 		if ($key == 'status' && $search[$key] == -1) continue;
-		$mode_search = (($object->isInt($object->fields[$key]) || $object->isFloat($object->fields[$key])) ? 1 : 0);
-		if (strpos($object->fields[$key]['type'], 'integer:') === 0) {
+		$mode_search = (($risk->isInt($risk->fields[$key]) || $risk->isFloat($risk->fields[$key])) ? 1 : 0);
+		if (strpos($risk->fields[$key]['type'], 'integer:') === 0) {
 			if ($search[$key] == '-1') $search[$key] = '';
 			$mode_search = 2;
 		}
 		if ($search[$key] != '') $sql .= natural_search($key, $search[$key], (($key == 'status') ? 2 : $mode_search));
 	}
 	if ($search_all) $sql .= natural_search(array_keys($fieldstosearchall), $search_all);
-//$sql.= dolSqlDateFilter("t.field", $search_xxxday, $search_xxxmonth, $search_xxxyear);
-// Add where from extra fields
+	// Add where from extra fields
 	include DOL_DOCUMENT_ROOT.'/core/tpl/extrafields_list_search_sql.tpl.php';
-// Add where from hooks
-	$parameters = array();
-	$reshook = $hookmanager->executeHooks('printFieldListWhere', $parameters, $object); // Note that $action and $object may have been modified by hook
-	$sql .= $hookmanager->resPrint;
-
-	/* If a group by is required
-	$sql.= " GROUP BY ";
-	foreach($object->fields as $key => $val)
-	{
-		$sql.='t.'.$key.', ';
-	}
-	// Add fields from extrafields
-	if (! empty($extrafields->attributes[$object->table_element]['label'])) {
-		foreach ($extrafields->attributes[$object->table_element]['label'] as $key => $val) $sql.=($extrafields->attributes[$object->table_element]['type'][$key] != 'separate' ? "ef.".$key.', ' : '');
-	}
 	// Add where from hooks
-	$parameters=array();
-	$reshook=$hookmanager->executeHooks('printFieldListGroupBy',$parameters);    // Note that $action and $object may have been modified by hook
-	$sql.=$hookmanager->resPrint;
-	$sql=preg_replace('/,\s*$/','', $sql);
-	*/
+	$parameters = array();
+	$reshook = $hookmanager->executeHooks('printFieldListWhere', $parameters, $risk); // Note that $action and $risk may have been modified by hook
+	$sql .= $hookmanager->resPrint;
 
 	$sql .= $db->order($sortfield, $sortorder);
 
-// Count total nb of records
+	// Count total nb of records
 	$nbtotalofrecords = '';
 	if (empty($conf->global->MAIN_DISABLE_FULL_SCANLIST))
 	{
@@ -649,7 +492,7 @@ if (!preg_match('/(evaluation)/', $sortfield)) {
 			$offset = 0;
 		}
 	}
-// if total of record found is smaller than limit, no need to do paging and to restart another select with limits set.
+	// if total of record found is smaller than limit, no need to do paging and to restart another select with limits set.
 	if (is_numeric($nbtotalofrecords) && ($limit > $nbtotalofrecords || empty($limit)))
 	{
 		$num = $nbtotalofrecords;
@@ -668,35 +511,36 @@ if (!preg_match('/(evaluation)/', $sortfield)) {
 		$num = $db->num_rows($resql);
 	}
 
-// Direct jump if only one record found
+	// Direct jump if only one record found
 	if ($num == 1 && !empty($conf->global->MAIN_SEARCH_DIRECT_OPEN_IF_ONLY_ONE) && $search_all && !$page)
 	{
 		$obj = $db->fetch_object($resql);
 		$id = $obj->rowid;
-		header("Location: ".dol_buildpath('/digiriskdolibarr/digiriskelement_risk.php', 1).'?id='.$id);
+		header("Location: ".dol_buildpath('/digiriskdolibarr/risk_list.php', 1));
 		exit;
 	}
-
 } else {
+
 	$sql = 'SELECT ';
 	foreach ($evaluation->fields as $key => $val)
 	{
 		$sql .= 'evaluation.'.$key.', ';
 	}
-// Add fields from extrafields
+	// Add fields from extrafields
 	if (!empty($extrafields->attributes[$evaluation->table_element]['label'])) {
 		foreach ($extrafields->attributes[$evaluation->table_element]['label'] as $key => $val) $sql .= ($extrafields->attributes[$evaluation->table_element]['type'][$key] != 'separate' ? "ef.".$key.' as options_'.$key.', ' : '');
 	}
-// Add fields from hooks
+	// Add fields from hooks
 	$parameters = array();
 	$reshook = $hookmanager->executeHooks('printFieldListSelect', $parameters, $evaluation); // Note that $action and $evaluation may have been modified by hook
 	$sql .= preg_replace('/^,/', '', $hookmanager->resPrint);
 	$sql = preg_replace('/,\s*$/', '', $sql);
 	$sql .= " FROM ".MAIN_DB_PREFIX.$evaluation->table_element." as evaluation";
+	$sql .= " LEFT JOIN ".MAIN_DB_PREFIX.$risk->table_element." as r on (evaluation.fk_risk = r.rowid)";
 	if (is_array($extrafields->attributes[$evaluation->table_element]['label']) && count($extrafields->attributes[$evaluation->table_element]['label'])) $sql .= " LEFT JOIN ".MAIN_DB_PREFIX.$evaluation->table_element."_extrafields as ef on (evaluation.rowid = ef.fk_object)";
 	if ($evaluation->ismultientitymanaged == 1) $sql .= " WHERE evaluation.entity IN (".getEntity($evaluation->element).")";
 	else $sql .= " WHERE 1 = 1";
-	$sql .= " AND status = 1";
+	$sql .= " AND evaluation.status = 1";
 	foreach ($search as $key => $val)
 	{
 		if ($key == 'status' && $search[$key] == -1) continue;
@@ -708,78 +552,25 @@ if (!preg_match('/(evaluation)/', $sortfield)) {
 		if ($search[$key] != '') $sql .= natural_search($key, $search[$key], (($key == 'status') ? 2 : $mode_search));
 	}
 	if ($search_all) $sql .= natural_search(array_keys($fieldstosearchall), $search_all);
-//$sql.= dolSqlDateFilter("t.field", $search_xxxday, $search_xxxmonth, $search_xxxyear);
-// Add where from extra fields
+	// Add where from extra fields
 	include DOL_DOCUMENT_ROOT.'/core/tpl/extrafields_list_search_sql.tpl.php';
-// Add where from hooks
+	// Add where from hooks
 	$parameters = array();
 	$reshook = $hookmanager->executeHooks('printFieldListWhere', $parameters, $evaluation); // Note that $action and $evaluation may have been modified by hook
 	$sql .= $hookmanager->resPrint;
 
 	$sql .= $db->order($sortfield, $sortorder);
 
-// Count total nb of records
-	$nbtotalofrecords = '';
-	if (empty($conf->global->MAIN_DISABLE_FULL_SCANLIST))
-	{
-		$resql = $db->query($sql);
+	if ($limit) $sql .= $db->plimit($limit + 1, $offset);
 
-		$nbtotalofrecords = $db->num_rows($resql);
-		if (($page * $limit) > $nbtotalofrecords)	// if total of record found is smaller than page * limit, goto and load page 0
-		{
-			$page = 0;
-			$offset = 0;
-		}
-	}
-// if total of record found is smaller than limit, no need to do paging and to restart another select with limits set.
-	if (is_numeric($nbtotalofrecords) && ($limit > $nbtotalofrecords || empty($limit)))
+	$resql = $db->query($sql);
+	if (!$resql)
 	{
-		$num = $nbtotalofrecords;
-	}
-	else
-	{
-		if ($limit) $sql .= $db->plimit($limit + 1, $offset);
-
-		$resql = $db->query($sql);
-		if (!$resql)
-		{
-			dol_print_error($db);
-			exit;
-		}
-
-		$num = $db->num_rows($resql);
-	}
-
-// Direct jump if only one record found
-	if ($num == 1 && !empty($conf->global->MAIN_SEARCH_DIRECT_OPEN_IF_ONLY_ONE) && $search_all && !$page)
-	{
-		$obj = $db->fetch_object($resql);
-		$id = $obj->rowid;
-		header("Location: ".dol_buildpath('/digiriskdolibarr/digiriskelement_risk.php', 1).'?id='.$id);
+		dol_print_error($db);
 		exit;
 	}
+	$num = $db->num_rows($resql);
 }
-
-
-// Output page
-// --------------------------------------------------------------------
-
-llxHeader('', $title, $help_url);
-
-// Example : Adding jquery code
-print '<script type="text/javascript" language="javascript">
-jQuery(document).ready(function() {
-	function init_myfunc()
-	{
-		jQuery("#myid").removeAttr(\'disabled\');
-		jQuery("#myid").attr(\'disabled\',\'disabled\');
-	}
-	init_myfunc();
-	jQuery("#mybutton").click(function() {
-		init_myfunc();
-	});
-});
-</script>';
 
 $arrayofselected = is_array($toselect) ? $toselect : array();
 
@@ -791,40 +582,17 @@ foreach ($search as $key => $val)
 	if (is_array($search[$key]) && count($search[$key])) foreach ($search[$key] as $skey) $param .= '&search_'.$key.'[]='.urlencode($skey);
 	else $param .= '&search_'.$key.'='.urlencode($search[$key]);
 }
-if ($optioncss != '')     $param .= '&optioncss='.urlencode($optioncss);
 // Add $param from extra fields
 include DOL_DOCUMENT_ROOT.'/core/tpl/extrafields_list_search_param.tpl.php';
 
 // List of mass actions available
-$arrayofmassactions = array(
-	//'validate'=>$langs->trans("Validate"),
-	//'generate_doc'=>$langs->trans("ReGeneratePDF"),
-	//'builddoc'=>$langs->trans("PDFMerge"),
-	//'presend'=>$langs->trans("SendByMail"),
-);
+$arrayofmassactions = array();
 if ($permissiontodelete) $arrayofmassactions['predelete'] = '<span class="fa fa-trash paddingrightonly"></span>'.$langs->trans("Delete");
-if (GETPOST('nomassaction', 'int') || in_array($massaction, array('presend', 'predelete'))) $arrayofmassactions = array();
-$massactionbutton = $form->selectMassAction('', $arrayofmassactions);
+$massactionbutton = $form->selectMassAction('', $arrayofmassactions); ?>
 
-print '<form method="POST" id="searchFormList" action="'.$_SERVER["PHP_SELF"].'">'."\n";
-if ($optioncss != '') print '<input type="hidden" name="optioncss" value="'.$optioncss.'">';
-print '<input type="hidden" name="token" value="'.newToken().'">';
-print '<input type="hidden" name="formfilteraction" id="formfilteraction" value="list">';
-print '<input type="hidden" name="action" value="list">';
-print '<input type="hidden" name="sortfield" value="'.$sortfield.'">';
-print '<input type="hidden" name="sortorder" value="'.$sortorder.'">';
-//print '<input type="hidden" name="page" value="'.$page.'">';
-print '<input type="hidden" name="contextpage" value="'.$contextpage.'">';
+<?php $title = $langs->trans('DigiriskElementRisksList');
+print_barre_liste($title, $page, $_SERVER["PHP_SELF"], $param, $sortfield, $sortorder, $massactionbutton, $num, $nbtotalofrecords, '', 0, $newcardbutton, '', $limit, 0, 0, 1);
 
-$newcardbutton = dolGetButtonTitle($langs->trans('New'), '', 'fa fa-plus-circle', dol_buildpath('/digiriskdolibarr/digiriskelement_risk.php', 1).'?action=create&backtopage='.urlencode($_SERVER['PHP_SELF']), '', $permissiontoadd);
-
-print_barre_liste($title, $page, $_SERVER["PHP_SELF"], $param, $sortfield, $sortorder, $massactionbutton, $num, $nbtotalofrecords, 'object_'.$object->picto, 0, $newcardbutton, '', $limit, 0, 0, 1);
-
-// Add code for pre mass action (confirmation or email presend form)
-$topicmail = "SendRiskRef";
-$modelmail = "risk";
-$objecttmp = new Risk($db);
-$trackid = 'xxxx'.$object->id;
 include DOL_DOCUMENT_ROOT.'/core/tpl/massactions_pre.tpl.php';
 
 if ($search_all)
@@ -834,12 +602,8 @@ if ($search_all)
 }
 
 $moreforfilter = '';
-/*$moreforfilter.='<div class="divsearchfield">';
-$moreforfilter.= $langs->trans('MyFilter') . ': <input type="text" name="search_myfield" value="'.dol_escape_htmltag($search_myfield).'">';
-$moreforfilter.= '</div>';*/
-
 $parameters = array();
-$reshook = $hookmanager->executeHooks('printFieldPreListTitle', $parameters, $object); // Note that $action and $object may have been modified by hook
+$reshook = $hookmanager->executeHooks('printFieldPreListTitle', $parameters, $risk); // Note that $action and $risk may have been modified by hook
 if (empty($reshook)) $moreforfilter .= $hookmanager->resPrint;
 else $moreforfilter = $hookmanager->resPrint;
 
@@ -857,23 +621,19 @@ $selectedfields .= (count($arrayofmassactions) ? $form->showCheckAddButtons('che
 print '<div class="div-table-responsive">'; // You can use div-table-responsive-no-min if you dont need reserved height for your table
 print '<table class="tagtable nobottomiftotal liste'.($moreforfilter ? " listwithfilterbefore" : "").'">'."\n";
 
-
 // Fields title search
 // --------------------------------------------------------------------
 print '<tr class="liste_titre">';
-foreach ($object->fields as $key => $val)
+foreach ($risk->fields as $key => $val)
 {
 	$cssforfield = (empty($val['css']) ? '' : $val['css']);
 	if ($key == 'status') $cssforfield .= ($cssforfield ? ' ' : '').'center';
-	elseif (in_array($val['type'], array('date', 'datetime', 'timestamp'))) $cssforfield .= ($cssforfield ? ' ' : '').'center';
-	elseif (in_array($val['type'], array('timestamp'))) $cssforfield .= ($cssforfield ? ' ' : '').'nowrap';
-	elseif (in_array($val['type'], array('double(24,8)', 'double(6,3)', 'integer', 'real', 'price')) && $val['label'] != 'TechnicalID') $cssforfield .= ($cssforfield ? ' ' : '').'right';
 	if (!empty($arrayfields['t.'.$key]['checked']))
 	{
 		print '<td class="liste_titre'.($cssforfield ? ' '.$cssforfield : '').'">';
 		if (is_array($val['arrayofkeyval'])) print $form->selectarray('search_'.$key, $val['arrayofkeyval'], $search[$key], $val['notnull'], 0, 0, '', 1, 0, 0, '', 'maxwidth75');
 		elseif (strpos($val['type'], 'integer:') === 0) {
-			print $object->showInputField($val, $key, $search[$key], '', '', 'search_', 'maxwidth150', 1);
+			print $risk->showInputField($val, $key, $search[$key], '', '', 'search_', 'maxwidth150', 1);
 		}
 		elseif (!preg_match('/^(date|timestamp)/', $val['type'])) print '<input type="text" class="flat maxwidth75" name="search_'.$key.'" value="'.dol_escape_htmltag($search[$key]).'">';
 		print '</td>';
@@ -884,27 +644,21 @@ foreach ($evaluation->fields as $key => $val)
 {
 	$cssforfield = (empty($val['css']) ? '' : $val['css']);
 	if ($key == 'status') $cssforfield .= ($cssforfield ? ' ' : '').'center';
-	elseif (in_array($val['type'], array('date', 'datetime', 'timestamp'))) $cssforfield .= ($cssforfield ? ' ' : '').'center';
-	elseif (in_array($val['type'], array('timestamp'))) $cssforfield .= ($cssforfield ? ' ' : '').'nowrap';
-	elseif (in_array($val['type'], array('double(24,8)', 'double(6,3)', 'integer', 'real', 'price')) && $val['label'] != 'TechnicalID') $cssforfield .= ($cssforfield ? ' ' : '').'right';
 	if (!empty($arrayfields['evaluation.'.$key]['checked']))
 	{
 		print '<td class="liste_titre'.'">';
-		if (is_array($val['arrayofkeyval'])) print $form->selectarray('search_'.$key, $val['arrayofkeyval'], $search[$key], $val['notnull'], 0, 0, '', 1, 0, 0, '', 'maxwidth75');
-		elseif (strpos($val['type'], 'integer:') === 0) {
-			print $evaluation->showInputField($val, $key, $search[$key], '', '', 'search_', 'maxwidth150', 1);
-		}
-		elseif (!preg_match('/^(date|timestamp)/', $val['type'])) print '<input type="text" class="flat maxwidth75" name="search_'.$key.'" value="'.dol_escape_htmltag($search[$key]).'">';
 		print '</td>';
 	}
 }
+
 // Extra fields
 include DOL_DOCUMENT_ROOT.'/core/tpl/extrafields_list_search_input.tpl.php';
 
 // Fields from hook
 $parameters = array('arrayfields'=>$arrayfields);
-$reshook = $hookmanager->executeHooks('printFieldListOption', $parameters, $object); // Note that $action and $object may have been modified by hook
+$reshook = $hookmanager->executeHooks('printFieldListOption', $parameters, $risk); // Note that $action and $risk may have been modified by hook
 print $hookmanager->resPrint;
+
 // Action column
 print '<td class="liste_titre maxwidthsearch">';
 $searchpicto = $form->showFilterButtons();
@@ -912,18 +666,13 @@ print $searchpicto;
 print '</td>';
 print '</tr>'."\n";
 
-
 // Fields title label
 // --------------------------------------------------------------------
 print '<tr class="liste_titre">';
-foreach ($object->fields as $key => $val)
+foreach ($risk->fields as $key => $val)
 {
 	$cssforfield = (empty($val['css']) ? '' : $val['css']);
 	if ($key == 'status') $cssforfield .= ($cssforfield ? ' ' : '').'center';
-	elseif (in_array($val['type'], array('date', 'datetime', 'timestamp'))) $cssforfield .= ($cssforfield ? ' ' : '').'center';
-	elseif (in_array($val['type'], array('timestamp'))) $cssforfield .= ($cssforfield ? ' ' : '').'nowrap';
-	elseif (in_array($val['type'], array('double(24,8)', 'double(6,3)', 'integer', 'real', 'price')) && $val['label'] != 'TechnicalID') $cssforfield .= ($cssforfield ? ' ' : '').'right';
-
 	if (!empty($arrayfields['t.'.$key]['checked']))
 	{
 		print getTitleFieldOfList($arrayfields['t.'.$key]['label'], 0, $_SERVER['PHP_SELF'], 't.'.$key, '', $param, ($cssforfield ? 'class="'.$cssforfield.'"' : ''), $sortfield, $sortorder, ($cssforfield ? $cssforfield.' ' : ''))."\n";
@@ -934,14 +683,9 @@ foreach ($object->fields as $key => $val)
 foreach ($evaluation->fields as $key => $val)
 {
 	if ($key == 'status') $cssforfield .= ($cssforfield ? ' ' : '').'center';
-	elseif (in_array($val['type'], array('date', 'datetime', 'timestamp'))) $cssforfield .= ($cssforfield ? ' ' : '').'center';
-	elseif (in_array($val['type'], array('timestamp'))) $cssforfield .= ($cssforfield ? ' ' : '').'nowrap';
-	elseif (in_array($val['type'], array('double(24,8)', 'double(6,3)', 'integer', 'real', 'price')) && $val['label'] != 'TechnicalID') $cssforfield .= ($cssforfield ? ' ' : '').'right';
-
 	if (!empty($arrayfields['evaluation.'.$key]['checked']))
 	{
 		$cssforfield = '';
-
 		if (GETPOST('sortorder') == 'asc') {
 			$sortorder = 'desc';
 		} else {
@@ -949,37 +693,19 @@ foreach ($evaluation->fields as $key => $val)
 		}
 		print getTitleFieldOfList($arrayfields['evaluation.'.$key]['label'], 0, $_SERVER['PHP_SELF'], 'evaluation.'.$key, '', $param, ($cssforfield ? 'class="'.$cssforfield.'"' : ''), $evalsortfield, $sortorder, ($cssforfield ? $cssforfield.' ' : ''))."\n";
 	}
-
 }
 
 // Extra fields
 include DOL_DOCUMENT_ROOT.'/core/tpl/extrafields_list_search_title.tpl.php';
+
 // Hook fields
 $parameters = array('arrayfields'=>$arrayfields, 'param'=>$param, 'sortfield'=>$sortfield, 'sortorder'=>$sortorder);
-$reshook = $hookmanager->executeHooks('printFieldListTitle', $parameters, $object); // Note that $action and $object may have been modified by hook
+$reshook = $hookmanager->executeHooks('printFieldListTitle', $parameters, $risk); // Note that $action and $risk may have been modified by hook
 print $hookmanager->resPrint;
-
-// Ajouter contenu de la liste titre
-
-//print getTitleFieldOfList($langs->trans('Evaluation') , $_SERVER['PHP_SELF'], '', '', $param, ($cssforfield ? 'class="'.$cssforfield.'"' : ''), $sortfield, $sortorder, ($cssforfield ? $cssforfield.' ' : ''));
-
-
 
 // Action column
 print getTitleFieldOfList($selectedfields, 0, $_SERVER["PHP_SELF"], '', '', '', '', $sortfield, $sortorder, 'center maxwidthsearch ')."\n";
 print '</tr>'."\n";
-
-
-// Detect if we need a fetch on each output line
-$needToFetchEachLine = 0;
-if (is_array($extrafields->attributes[$object->table_element]['computed']) && count($extrafields->attributes[$object->table_element]['computed']) > 0)
-{
-	foreach ($extrafields->attributes[$object->table_element]['computed'] as $key => $val)
-	{
-		if (preg_match('/\$object/', $val)) $needToFetchEachLine++; // There is at least one compute field that use $object
-	}
-}
-
 
 // Loop on record
 // --------------------------------------------------------------------
@@ -992,441 +718,442 @@ while ($i < ($limit ? min($num, $limit) : $num))
 {
 	$obj = $db->fetch_object($resql);
 
-
-
 	if (empty($obj)) break; // Should not happen
 
 	// Si on trie avec un champ d'une évaluation, on fetch le risque et non l'évaluation
 	if ($obj->fk_risk > 0) {
-		$object->fetch($obj->fk_risk);
+		$risk->fetch($obj->fk_risk);
 	} else {
-		// Store properties in $object
-		$object->setVarsFromFetchObj($obj);
+		// Store properties in $risk
+		$risk->setVarsFromFetchObj($obj);
 	}
 
 	// Show here line of result
-	print '<tr class="oddeven" id="risk_row_'. $object->id .'">';
+	print '<tr class="oddeven risk-row risk_row_'. $risk->id .'" id="risk_row_'. $risk->id .'">';
 
-	foreach ($object->fields as $key => $val)
+	foreach ($risk->fields as $key => $val)
 	{
 		$cssforfield = (empty($val['css']) ? '' : $val['css']);
-		if (in_array($val['type'], array('date', 'datetime', 'timestamp'))) $cssforfield .= ($cssforfield ? ' ' : '').'center';
-		elseif ($key == 'status') $cssforfield .= ($cssforfield ? ' ' : '').'center';
-
-		if (in_array($val['type'], array('timestamp'))) $cssforfield .= ($cssforfield ? ' ' : '').'nowrap';
+		if ($key == 'status') $cssforfield .= ($cssforfield ? ' ' : '').'center';
 		elseif ($key == 'ref') $cssforfield .= ($cssforfield ? ' ' : '').'nowrap';
-
-		if (in_array($val['type'], array('double(24,8)', 'double(6,3)', 'integer', 'real', 'price')) && $key != 'status') $cssforfield .= ($cssforfield ? ' ' : '').'right';
-		//if (in_array($key, array('fk_soc', 'fk_user', 'fk_warehouse'))) $cssforfield = 'tdoverflowmax100';
-
 		if (!empty($arrayfields['t.'.$key]['checked']))
 		{
 			print '<td'.($cssforfield ? ' class="'.$cssforfield.'"' : '').' style="width:2%">';
-			if ($key == 'status') print $object->getLibStatut(5);
-
-			elseif ($key == 'category') {
-				?>
+			if ($key == 'status') print $risk->getLibStatut(5);
+			elseif ($key == 'category') { ?>
 				<div class="table-cell table-50 cell-risk" data-title="Risque">
-					<div class="wpeo-dropdown dropdown-large category-danger padding wpeo-tooltip-event"
-						 data-tooltip-persist="true"
-						 data-color="red"
-						 aria-label="<?php 'Vous devez choisir une catégorie de risque.'?>">
-						<img class="danger-category-pic tooltip hover" src="<?php echo DOL_URL_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $object->get_danger_category($object) . '.png' ; ?>" aria-label="" />
+					<div class="wpeo-dropdown dropdown-large category-danger padding">
+						<img class="danger-category-pic hover" src="<?php echo DOL_URL_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $risk->get_danger_category($risk) . '.png' ; ?>"/>
+					</div>
+				</div>
+				</div>
+				<?php
+			}
+
+			elseif ($key == 'ref') {
+				?>
+				<div class="risk-container" value="<?php echo $risk->id ?>">
+				<!-- BUTTON MODAL RISK EDIT -->
+				<div class="risk-edit modal-open" value="<?php echo $risk->id ?>"><i class="fas fa-exclamation-triangle"></i><?php echo ' ' . $risk->ref; ?></div>
+				<!-- RISK EDIT MODAL -->
+				<div id="risk_edit<?php echo $risk->id ?>" class="wpeo-modal modal-risk-<?php echo $risk->id ?>">
+					<div class="modal-container wpeo-modal-event">
+						<!-- Modal-Header -->
+						<div class="modal-header">
+							<h2 class="modal-title"><?php echo $langs->trans('EditRisk') . ' ' . $risk->ref ?></h2>
+							<div class="modal-close"><i class="fas fa-times"></i></div>
+						</div>
+						<!-- MODAL RISK EDIT CONTENT -->
+						<div class="modal-content" id="#modalContent">
+							<div class="risk-content">
+								<div class="risk-category">
+									<span class="title"><?php echo $langs->trans('Risk'); ?></span>
+									<input class="input-hidden-danger" type="hidden" name="risk_category_id" value=<?php echo $risk->category ?> />
+									<div class="wpeo-dropdown dropdown-large dropdown-grid category-danger padding">
+										<div class="dropdown-toggle dropdown-add-button button-cotation">
+											<img class="danger-category-pic tooltip hover" src="<?php echo DOL_URL_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $risk->get_danger_category($risk) . '.png'?>"" />
+										</div>
+										<ul class="dropdown-content wpeo-gridlayout grid-5 grid-gap-0">
+											<?php
+											$dangerCategories = $risk->get_danger_categories();
+											if ( ! empty( $dangerCategories ) ) :
+												foreach ( $dangerCategories as $dangerCategory ) : ?>
+													<li class="item dropdown-item wpeo-tooltip-event classfortooltip" data-is-preset="<?php echo ''; ?>" data-id="<?php echo $dangerCategory['position'] ?>">
+														<img src="<?php echo DOL_URL_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $dangerCategory['thumbnail_name'] . '.png'?>" class="attachment-thumbail size-thumbnail photo photowithmargin" alt="" loading="lazy" width="48" height="48">
+													</li>
+												<?php endforeach;
+											endif; ?>
+										</ul>
+									</div>
+								</div>
+								<div class="risk-description">
+									<span class="title"><?php echo $langs->trans('Description'); ?></span>
+									<?php print '<textarea name="riskComment" rows="'.ROWS_2.'">'.$risk->description.'</textarea>'."\n"; ?>
+								</div>
+							</div>
+						</div>
+						<!-- Modal-Footer -->
+						<div class="modal-footer">
+							<div class="risk-save wpeo-button button-green save modal-close" value="<?php echo $risk->id ?>">
+								<span><i class="fas fa-save"></i>  <?php echo $langs->trans('UpdateRisk'); ?></span>
+							</div>
+						</div>
 					</div>
 				</div>
 				<?php
 			}
-			else print $object->showOutputField($val, $key, $object->$key, '');
+			else print $risk->showOutputField($val, $key, $risk->$key, '');
 			print '</td>';
 			if (!$i) $totalarray['nbfield']++;
 			if (!empty($val['isameasure']))
 			{
 				if (!$i) $totalarray['pos'][$totalarray['nbfield']] = 't.'.$key;
-				$totalarray['val']['t.'.$key] += $object->$key;
+				$totalarray['val']['t.'.$key] += $risk->$key;
 			}
 		}
-
 	}
-	$lastEvaluation = $evaluation->fetchFromParent($object->id, 1);
-	if (!empty ($lastEvaluation)) {
-		$lastEvaluation = array_shift($lastEvaluation);
 
-		if (empty($evaluation)) break; // Should not happen
-
-		// Store properties in $object
-
-		foreach ($lastEvaluation->fields as $key => $val)
+	// Store properties in $lastEvaluation
+	foreach ($evaluation->fields as $key => $val)
+	{
+		$cssforfield = (empty($val['css']) ? '' : $val['css']);
+		if ($key == 'status') $cssforfield .= ($cssforfield ? ' ' : '').'center';
+		elseif ($key == 'ref') $cssforfield .= ($cssforfield ? ' ' : '').'nowrap';
+		if (!empty($arrayfields['evaluation.'.$key]['checked']))
 		{
-			$cssforfield = (empty($val['css']) ? '' : $val['css']);
-			if (in_array($val['type'], array('date', 'datetime', 'timestamp'))) $cssforfield .= ($cssforfield ? ' ' : '').'center';
-			elseif ($key == 'status') $cssforfield .= ($cssforfield ? ' ' : '').'center';
-
-			if (in_array($val['type'], array('timestamp'))) $cssforfield .= ($cssforfield ? ' ' : '').'nowrap';
-			elseif ($key == 'ref') $cssforfield .= ($cssforfield ? ' ' : '').'nowrap';
-
-			if (in_array($val['type'], array('double(24,8)', 'double(6,3)', 'integer', 'real', 'price')) && $key != 'status') $cssforfield .= ($cssforfield ? ' ' : '').'right';
-			//if (in_array($key, array('fk_soc', 'fk_user', 'fk_warehouse'))) $cssforfield = 'tdoverflowmax100';
-
-			if (!empty($arrayfields['evaluation.'.$key]['checked']))
-			{
-				$cssforfield = '';
-				print '<td'.($cssforfield ? ' class="'.$cssforfield.'"' : '').'>';
-				if ($key == 'status') print $lastEvaluation->getLibStatut(5);
-				elseif ($key == 'cotation') {
-					$cotationList = $evaluation->fetchFromParent($object->id);
-					?>
-
-					<!-- Afficahge évaluation dans tableau -->
-					<div class="risk-evaluation wpeo-modal-event ">
-						<div id="cotation_square<?php echo $object->id ?>" class="evaluation-cotation" data-scale="<?php echo $lastEvaluation->get_evaluation_scale() ?>">
-							<span><?php echo $lastEvaluation->cotation; ?></span>
-						</div>
-						<div class="evaluation-photo">
-							<?php $filearray = dol_dir_list($conf->digiriskdolibarr->multidir_output[$conf->entity].'/'.$object->element.'/'.$object->ref, "files", 0, '', '(\.odt|_preview.*\.png)$', 'position_name', 'asc', 1);
-							if (count($filearray)) {
-								print '<span class="floatleft inline-block valignmiddle divphotoref">'.$object->digirisk_show_photos('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity].'/'.$object->element, 'small', 1, 0, 0, 0, 50, 0, 0, 0, 0, $object->element).'</span>';
-							} else {
-								$nophoto = '/public/theme/common/nophoto.png'; ?>
-								<span class="floatleft inline-block valignmiddle divphotoref"><img class="photodigiriskdolibarr" alt="No photo" src="<?php echo DOL_URL_ROOT.$nophoto ?>"></span>
-							<?php } ?>
-						</div>
-						<div class="evaluation-content">
-							<div class="evaluation-data">
-								<span class="evaluation-reference evaluation-list action cotation default-cotation modal-open" value="<?php echo $object->id ?>"><?php echo $lastEvaluation->ref; ?></span>
-								<span class="evaluation-author">
-									<?php $user->fetch($lastEvaluation->fk_user_creat); ?>
-									<?php echo $user->getNomUrl( 0, '', 0, 0, 2 ); ?>
-								</span>
-								<span class="evaluation-date">
-									<i class="fas fa-calendar-alt"></i> <?php echo date('d/m/Y', $lastEvaluation->date_creation); ?>
-								</span>
-								<span class="evaluation-count"><i class="fas fa-comments"></i><?php echo count($cotationList) ?></span>
+			$cssforfield = '';
+			print '<td'.($cssforfield ? ' class="'.$cssforfield.'"' : '').'>';
+			if ($key == 'cotation') {
+				$lastEvaluation = $evaluation->fetchFromParent($risk->id, 1);
+				if (!empty ($lastEvaluation) && $lastEvaluation > 0) {
+					$lastEvaluation = array_shift($lastEvaluation);
+					$cotationList = $evaluation->fetchFromParent($risk->id); ?>
+					<div class="risk-evaluation-container" value="<?php echo $risk->id ?>">
+						<!-- RISK EVALUATION SINGLE -->
+						<div class="risk-evaluation-single">
+							<div class="risk-evaluation-cotation" data-scale="<?php echo $lastEvaluation->get_evaluation_scale() ?>">
+								<span><?php echo $lastEvaluation->cotation; ?></span>
 							</div>
-							<div class="evaluation-comment">
-								<?php echo $lastEvaluation->comment; ?>
+							<div class="risk-evaluation-photo">
+								<?php $filearray = dol_dir_list($conf->digiriskdolibarr->multidir_output[$conf->entity].'/'.$lastEvaluation->element.'/'.$lastEvaluation->ref, "files", 0, '', '(\.odt|_preview.*\.png)$', 'position_name', 'asc', 1);
+								if (count($filearray)) {
+									print '<span class="floatleft inline-block valignmiddle divphotoref">'.digirisk_show_photos('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity].'/'.$lastEvaluation->element, 'small', 1, 0, 0, 0, 40, 0, 0, 0, 0, $lastEvaluation->element, $lastEvaluation).'</span>';
+								} else {
+									$nophoto = '/public/theme/common/nophoto.png'; ?>
+									<span class="floatleft inline-block valignmiddle divphotoref"><img class="photodigiriskdolibarr" alt="No photo" src="<?php echo DOL_URL_ROOT.$nophoto ?>"></span>
+								<?php } ?>
+							</div>
+							<div class="risk-evaluation-content">
+								<div class="risk-evaluation-data">
+									<!-- BUTTON MODAL RISK EVALUATION LIST  -->
+									<span class="risk-evaluation-reference risk-evaluation-list modal-open" value="<?php echo $risk->id ?>"><?php echo $lastEvaluation->ref; ?></span>
+									<span class="risk-evaluation-author">
+										<?php $user->fetch($lastEvaluation->fk_user_creat); ?>
+										<?php echo $user->getNomUrl( 0, '', 0, 0, 2 ); ?>
+									</span>
+									<span class="risk-evaluation-date">
+										<i class="fas fa-calendar-alt"></i> <?php echo date('d/m/Y', $lastEvaluation->date_creation); ?>
+									</span>
+									<span class="risk-evaluation-count"><i class="fas fa-comments"></i><?php echo count($cotationList) ?></span>
+								</div>
+								<div class="risk-evaluation-comment"><?php echo $lastEvaluation->comment; ?></div>
+							</div>
+							<!-- BUTTON MODAL RISK EVALUATION ADD  -->
+							<div class="risk-evaluation-add wpeo-button button-square-40 button-primary modal-open" value="<?php echo $risk->id ?>">
+								<i class="fas fa-plus button-icon"></i>
 							</div>
 						</div>
-						<div class="evaluation-add wpeo-button button-square-40 button-primary modal-open" value="<?php echo $object->id ?>">
+						<!-- RISK EVALUATION LIST MODAL -->
+						<div class="risk-evaluation-list-modal">
+							<div class="wpeo-modal" id="risk_evaluation_list<?php echo $risk->id ?>">
+								<div class="modal-container wpeo-modal-event">
+									<!-- Modal-Header -->
+									<div class="modal-header">
+										<h2 class="modal-title"><?php echo $langs->trans('EvaluationList')  . ' R' . $risk->id ?></h2>
+										<div class="modal-refresh modal-close"><i class="fas fa-times"></i></div>
+									</div>
+									<!-- MODAL RISK EVALUATION LIST CONTENT -->
+									<div class="modal-content" id="#modalContent">
+										<ul class="risk-evaluations-list">
+											<?php if (!empty($cotationList)) :
+												foreach ($cotationList as $cotation) : ?>
+													<li class="risk-evaluation risk-evaluation<?php echo $cotation->id ?>" value="<?php echo $cotation->id ?>">
+														<div class="risk-evaluation-container">
+															<div class="risk-evaluation-single">
+																<div class="risk-evaluation-cotation" data-scale="<?php echo $cotation->get_evaluation_scale() ?>">
+																	<span><?php echo $cotation->cotation; ?></span>
+																</div>
+																<div class="risk-evaluation-photo">
+																	<?php $filearray = dol_dir_list($conf->digiriskdolibarr->multidir_output[$conf->entity].'/'.$cotation->element.'/'.$cotation->ref, "files", 0, '', '(\.odt|_preview.*\.png)$', 'position_name', 'asc', 1);
+																	if (count($filearray)) {
+																		print '<span class="floatleft inline-block valignmiddle divphotoref">'.digirisk_show_photos('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity].'/'.$cotation->element, 'small', 1, 0, 0, 0, 40, 0, 1, 0, 0, $cotation->element, $cotation).'</span>';
+																	} else {
+																		$nophoto = '/public/theme/common/nophoto.png'; ?>
+																		<span class="floatleft inline-block valignmiddle divphotoref"><img class="photodigiriskdolibarr" alt="No photo" src="<?php echo DOL_URL_ROOT.$nophoto ?>"></span>
+																	<?php } ?>
+																</div>
+																<div class="risk-evaluation-content">
+																	<div class="risk-evaluation-data">
+																		<span class="risk-evaluation-reference"><?php echo $cotation->ref; ?></span>
+																		<span class="risk-evaluation-author">
+																			<?php $user->fetch($cotation->fk_user_creat); ?>
+																			<?php echo $user->getNomUrl( 0, '', 0, 0, 2 ); ?>
+																		</span>
+																		<span class="risk-evaluation-date">
+																			<i class="fas fa-calendar-alt"></i> <?php echo date('d/m/Y', $cotation->date_creation); ?>
+																		</span>
+																		<span class="risk-evaluation-count"><i class="fas fa-comments"></i><?php echo count($cotationList) ?></span>
+																	</div>
+																	<div class="risk-evaluation-comment"><?php echo $cotation->comment; ?></div>
+																</div>
+															</div>
+															<!-- BUTTON MODAL RISK EVALUATION EDIT  -->
+															<div class="risk-evaluation-edit wpeo-button button-square-50 button-grey modal-open" value="<?php echo $cotation->id ?>">
+																<i class="fas fa-pencil-alt button-icon"></i>
+															</div>
+															<div class="risk-evaluation-delete wpeo-button button-square-50 button-grey">
+																<i class="fas fa-trash button-icon"></i>
+															</div>
+														</div>
+														<!-- RISK EVALUATION EDIT MODAL-->
+														<div class="risk-evaluation-edit-modal">
+															<div class="wpeo-modal modal-risk" id="risk_evaluation_edit<?php echo $cotation->id ?>">
+																<div class="modal-container wpeo-modal-event">
+																	<!-- Modal-Header -->
+																	<div class="modal-header">
+																		<h2 class="modal-title"><?php echo $langs->trans('EvaluationEdit') . ' ' . $cotation->id ?></h2>
+																		<div class="modal-refresh modal-close"><i class="fas fa-times"></i></div>
+																	</div>
+																	<!-- Modal EDIT Evaluation Content-->
+																	<div class="modal-content" id="#modalContent<?php echo $cotation->id ?>">
+																		<div class="risk-evaluation-container <?php echo $cotation->method; ?>">
+																			<div class="risk-evaluation-header">
+																				<div class="wpeo-button evaluation-standard select-evaluation-method<?php echo ($cotation->method == "standard") ? " selected button-blue" : " button-grey" ?> button-radius-2">
+																					<span><?php echo $langs->trans('SimpleCotation') ?></span>
+																				</div>
+																				<div class="wpeo-button evaluation-advanced select-evaluation-method<?php echo ($cotation->method == "advanced") ? " selected button-blue" : " button-grey" ?> button-radius-2">
+																					<span><?php echo $langs->trans('AdvancedCotation') ?></span>
+																				</div>
+																				<input class="risk-evaluation-method" type="hidden" value="<?php echo $cotation->method ?>" />
+																			</div>
+																			<div class="risk-evaluation-content-wrapper">
+																				<div class="risk-evaluation-content">
+																					<div class="cotation-container">
+																						<div class="cotation-standard" style="<?php echo ($cotation->method == "standard") ? " display:block" : " display:none" ?>">
+																							<span class="title"><i class="fas fa-chart-line"></i><?php echo ' ' . $langs->trans('Cotation'); ?></span>
+																							<div class="cotation-listing wpeo-gridlayout grid-4 grid-gap-0">
+																								<?php
+																								$defaultCotation = array(0, 48, 51, 100);
+																								if ( ! empty( $defaultCotation )) :
+																									foreach ( $defaultCotation as $request ) :
+																										$evaluation->cotation = $request; ?>
+																										<div data-id="<?php echo 0; ?>"
+																											 data-evaluation-method="standard"
+																											 data-evaluation-id="<?php echo $request; ?>"
+																											 data-variable-id="<?php echo 152+$request; ?>"
+																											 data-seuil="<?php echo  $evaluation->get_evaluation_scale(); ?>"
+																											 data-scale="<?php echo  $evaluation->get_evaluation_scale(); ?>"
+																											 class="risk-evaluation-cotation cotation<?php echo ($cotation->cotation == $request) ? " selected-cotation" : "" ?>"><?php echo $request; ?></div>
+																									<?php endforeach;
+																								endif; ?>
+																							</div>
+																						</div>
+																						<input class="risk-evaluation-seuil" type="hidden" value="<?php echo $cotation->cotation ?>">
+																						<?php
+																						$evaluation_method = $advanced_method_cotation_array[0];
+																						$evaluation_method_survey = $evaluation_method['option']['variable'];
+																						?>
+																						<div class="wpeo-gridlayout cotation-advanced" style="<?php echo ($cotation->method == "advanced") ? " display:block" : " display:none" ?>">
+																							<input type="hidden" class="digi-method-evaluation-id" value="<?php echo $risk->id ; ?>" />
+																							<textarea style="display: none" name="evaluation_variables" class="tmp_evaluation_variable"><?php echo '{}'; ?></textarea>
+																							<span class="title"><i class="fas fa-info-circle"></i> <?php echo $langs->trans('SelectCotation') ?></span>
+																							<div class="wpeo-table evaluation-method table-flex table-<?php echo count($evaluation_method_survey) + 1; ?>">
+																								<div class="table-row table-header">
+																									<div class="table-cell">
+																										<span></span>
+																									</div>
+																									<?php for ( $l = 0; $l < count($evaluation_method_survey); $l++ ) : ?>
+																										<div class="table-cell">
+																											<span><?php echo $l; ?></span>
+																										</div>
+																									<?php endfor; ?>
+																								</div>
+																								<?php $l = 0;
+																								foreach($evaluation_method_survey as $critere) :
+																									$name = strtolower($critere['name']); ?>
+																									<div class="table-row">
+																										<div class="table-cell"><?php echo $critere['name'] ; ?></div>
+																										<?php foreach($critere['option']['survey']['request'] as $request) : ?>
+																											<div class="table-cell can-select cell-<?php echo $cotation->id ? $cotation->id : 0;
+																											if (!empty($request['seuil'])) {
+																												echo $request['seuil'] == $cotation->$name ? " active" : "" ;
+																											} ?>"
+																												 data-type="<?php echo $name ?>"
+																												 data-id="<?php echo  $risk->id ? $risk->id : 0 ; ?>"
+																												 data-evaluation-id="<?php echo $cotation->id ? $cotation->id : 0 ; ?>"
+																												 data-variable-id="<?php echo $l ; ?>"
+																												 data-seuil="<?php echo  $request['seuil']; ?>">
+																												<?php echo  $request['question'] ; ?>
+																											</div>
+																										<?php endforeach; $l++; ?>
+																									</div>
+																								<?php endforeach; ?>
+																							</div>
+																						</div>
+																					</div>
+																				</div>
+																				<div class="risk-evaluation-photo">
+																					<span class="title"><?php echo $langs->trans('Photo'); ?></span>
+																					<div class="risk-evaluation-photo-container wpeo-modal-event tooltip hover">
+																						<?php
+																						$relativepath = 'digiriskdolibarr/medias';
+																						$modulepart = 'ecm';
+																						$path = DOL_URL_ROOT.'/document.php?modulepart=' . $modulepart  . '&attachment=0&file=' . str_replace('/', '%2F', $relativepath) . '/';
+																						$nophoto = '/public/theme/common/nophoto.png'; ?>
+																						<!-- BUTTON RISK EVALUATION PHOTO MODAL -->
+																						<div class="action risk-evaluation-photo default-photo modal-open" value="<?php echo $cotation->id ?>">
+																							<?php $filearray = dol_dir_list($conf->digiriskdolibarr->multidir_output[$conf->entity].'/'.$cotation->element.'/'.$cotation->ref, "files", 0, '', '(\.odt|_preview.*\.png)$', 'position_name', 'asc', 1);
+																							if (count($filearray)) {
+																								print '<span class="floatleft inline-block valignmiddle divphotoref risk-evaluation-photo-single">'.digirisk_show_photos('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity].'/'.$cotation->element, 'small', 1, 0, 0, 0, 40, 0, 1, 0, 0, $cotation->element, $cotation).'<input class="filename" type="hidden" value="'.$cotation->photo.'"/>'.'</span>';
+																							} else {
+																								$nophoto = '/public/theme/common/nophoto.png'; ?>
+																								<span class="floatleft inline-block valignmiddle divphotoref risk-evaluation-photo-single"><img class="photodigiriskdolibarr" alt="No photo" src="<?php echo DOL_URL_ROOT.$nophoto ?>">
+																									<input class="filename" type="hidden" value="<?php echo $cotation->photo ?>">
+																								</span>
+																							<?php } ?>
+																						</div>
+																						<!-- RISK EVALUATION PHOTO MODAL -->
+																						<div class="wpeo-modal modal-photo" id="risk_evaluation_photo<?php echo $cotation->id ?>">
+																							<div class="modal-container wpeo-modal-event">
+																								<!-- Modal-Header -->
+																								<div class="modal-header">
+																									<h2 class="modal-title"><?php echo $langs->trans('AddPhoto') ?></h2>
+																									<div class="modal-close"><i class="fas fa-times"></i></div>
+																								</div>
+																								<!-- Modal-Content -->
+																								<div class="modal-content" id="#modalContent<?php echo $cotation->id ?>">
+																									<div class="action">
+																										<a href="<?php echo '../../ecm/index.php' ?>" target="_blank">
+																											<div class="wpeo-button button-square-50 button-blue">
+																												<i class="button-icon fas fa-plus"></i>
+																											</div>
+																										</a>
+																									</div>
+																									<div class="wpeo-table table-row">
+																										<?php
+																										$files =  dol_dir_list(DOL_DATA_ROOT . '/ecm/digiriskdolibarr/medias');
+																										$relativepath = 'digiriskdolibarr/medias';
+																										$modulepart = 'ecm';
+																										$path = DOL_URL_ROOT.'/document.php?modulepart=' . $modulepart  . '&attachment=0&file=' . str_replace('/', '%2F', $relativepath);
+																										$j = 0;
+
+																										if ( !empty($files) ) :
+																											foreach ($files as $file) :
+																												print '<div class="table-cell center clickable-photo clickable-photo'. $j .'" value="'. $j .'">';
+																												if (image_format_supported($file['name']) >= 0) :
+																													$fullpath = $path . '/' . $file['relativename'] . '&entity=' . $conf->entity; ?>
+																													<input class="filename" type="hidden" value="<?php echo $file['name'] ?>">
+																													<img class="photo photo<?php echo $j ?> maxwidth200" src="<?php echo $fullpath; ?>">
+																												<?php else : print '&nbsp;';
+																												endif;
+																												$j++;
+																												print '</div>';
+																											endforeach;
+																										endif; ?>
+																									</div>
+																								</div>
+																								<!-- Modal-Footer -->
+																								<div class="modal-footer">
+																									<div class="save-photo wpeo-button button-blue">
+																										<span><?php echo $langs->trans('SavePhoto'); ?></span>
+																									</div>
+																									<div class="wpeo-button button-grey modal-close">
+																										<span><?php echo $langs->trans('CloseModal'); ?></span>
+																									</div>
+																								</div>
+																							</div>
+																						</div>
+																					</div>
+																				</div>
+																				<div class="risk-evaluation-calculated-cotation"  style="<?php echo ($cotation->method == "advanced") ? " display:block" : " display:none" ?>">
+																					<span class="title"><i class="fas fa-chart-line"></i> <?php echo $langs->trans('CalculatedCotation'); ?></span>
+																					<div data-scale="<?php echo $cotation->get_evaluation_scale() ?>" class="risk-evaluation-cotation cotation">
+																						<span><?php echo  $cotation->cotation ?></span>
+																					</div>
+																				</div>
+																				<div class="risk-evaluation-comment">
+																					<span class="title"><i class="fas fa-comment-dots"></i> <?php echo $langs->trans('Comment'); ?></span>
+																					<?php print '<textarea name="evaluationComment'. $cotation->id .'" rows="'.ROWS_2.'">'.$cotation->comment.'</textarea>'."\n"; ?>
+																				</div>
+																			</div>
+																		</div>
+																	</div>
+																	<!-- Modal-Footer -->
+																	<div class="modal-footer">
+																		<div class="wpeo-button risk-evaluation-save button-green">
+																			<i class="fas fa-save"></i> <?php echo $langs->trans('UpdateEvaluation'); ?>
+																		</div>
+																	</div>
+																</div>
+															</div>
+															<hr>
+														</div>
+													</li>
+												<?php endforeach; ?>
+											<?php endif; ?>
+										</ul>
+									</div>
+									<!-- Modal-Footer -->
+									<div class="modal-footer">
+										<div class="wpeo-button button-grey modal-refresh modal-close">
+											<span><?php echo $langs->trans('CloseModal'); ?></span>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				<?php } else { ?>
+					<div class="risk-evaluation-container">
+						<div class="risk-evaluation-add wpeo-button button-square-40 button-primary modal-open" value="<?php echo $risk->id ?>">
 							<i class="fas fa-plus button-icon"></i>
 						</div>
 					</div>
-
-					<div class="cotation-container grid wpeo-modal-event tooltip hover cotation-square" id="cotation_square<?php echo $object->id ?>">
-
-						<!-- Modal-EvaluationsList -->
-
-						<div id="list_evaluations<?php echo $object->id ?>" class="wpeo-modal" value="<?php echo $object->id ?>">
-							<div class="modal-container wpeo-modal-event">
-								<!-- Modal-Header -->
-								<div class="modal-header">
-									<h2 class="modal-title">
-										<?php echo $langs->trans('EvaluationsList') ?>
-										<div class="evaluation-add wpeo-button button-square-40 button-primary">
-											<i class="fas fa-plus button-icon"></i>
-										</div>
-									</h2>
-
-									<div class="modal-close"><i class="fas fa-times"></i></div>
-								</div>
-								<!-- Modal-Content -->
-								<div class="modal-content" id="#modalContent">
-									<ul class="evaluations-list" style="display: grid">
-									<?php
-										$cotationList = $evaluation->fetchFromParent($object->id);
-										if (!empty($cotationList)) :
-											foreach ($cotationList as $cotation) : ?>
-												<div class="risk-evaluation">
-													<div id="cotation_square<?php echo $object->id ?>" class="evaluation-cotation" data-scale="<?php echo $cotation->get_evaluation_scale() ?>">
-														<span><?php echo $cotation->cotation; ?></span>
-													</div>
-													<div class="evaluation-photo">
-
-													<i class="fas fa-image"></i>
-
-													</div>
-													<div class="evaluation-content">
-														<div class="evaluation-data">
-															<span class="evaluation-reference action cotation default-cotation" value="<?php echo $object->id ?>"><?php echo $cotation->ref; ?></span>
-															<span class="evaluation-author">
-																<?php $user->fetch($cotation->fk_user_creat); ?>
-																<?php echo $user->getNomUrl( 0, '', 0, 0, 2 ); ?>
-															</span>
-															<span class="evaluation-date">
-																<i class="fas fa-calendar-alt"></i> <?php echo date('d/m/Y', $cotation->date_creation); ?>
-															</span>
-															<span class="evaluation-count"><i class="fas fa-comments"></i><?php echo count($cotationList) ?></span>
-														</div>
-														<div class="evaluation-comment">
-															<?php echo $cotation->comment; ?>
-														</div>
-													</div>
-													<div class="evaluation-edit wpeo-button button-square-40 button-primary">
-														<i class="fas fa-edit button-icon"></i>
-													</div>
-													<div class="evaluation-delete wpeo-button button-square-40 button-grey">
-														<i class="fas fa-times button-icon"></i>
-													</div>
-												</div>
-											<?php endforeach; ?>
-										<?php endif; ?>
-									</ul>
-								</div>
-								<!-- Modal-Footer -->
-								<div class="modal-footer">
-									<div class="wpeo-button button-grey modal-close">
-										<span><?php echo $langs->trans('CloseModal'); ?></span>
+				<?php } ?>
+			<?php } elseif ($key == 'has_tasks') { ?>
+				<div class="table-cell cell-tasks" data-title="Tâches" class="padding">
+					<span class="cell-tasks-container">
+	<!--				VUE SI Y A DES TACHES   -->
+						<?php $related_tasks = $risk->get_related_tasks($risk);
+						if (($related_tasks !== -1) ) :
+							foreach ($related_tasks as $related_task) :
+								$related_task->fetchTimeSpent($related_task->id); ?>
+								<span class="ref"><?php echo $related_task->ref; ?></span>
+	<!--							// @todo truc sympa pour l'author.-->
+								<span class="author">
+									<div class="avatar" style="background-color: #50a1ed;">
+										<?php $user = new User($db); ?>
+										<?php $user->fetch($related_task->fk_user_creat); ?>
+										<span><?php echo $user->firstname[0] . $user->lastname[0]; ?></span>
 									</div>
-								</div>
-							</div>
-						</div>
-					</div>
-
-<!--					MODAL EDIT / ADD EVALUATION
--->
-					<?php if ($object->id < 1) $idObj = 0;
-					else $idObj = $object->id;
-					?>
-					<div id="edit_add_evaluation<?php echo $object->id ?>" class="wpeo-modal risk-evaluation modal-risk-<?php echo $object->id ?>" value="<?php echo $object->id ?>">
-						<div class="modal-container wpeo-modal-event">
-							<!-- Modal-Header -->
-							<div class="modal-header">
-								<h2 class="modal-title">
-									<?php echo $langs->trans('EvaluationCreate') . ' - Risque ' . $object->id ?>
-								</h2>
-
-								<div class="modal-close"><i class="fas fa-times"></i></div>
-							</div>
-							<!-- Modal-Content -->
-							<div class="modal-content" id="#modalContent<?php echo $object->id ?>">
-								<div class="w-100 minwidth100 wpeo-button button-square-40 evaluation-standard select-evaluation-method button-blue">
-									<input id="cotationMethod<?php echo $object->id ?>" type="hidden" class="evaluation-method" value="standard">
-
-									Simplifié
-								</div>
-
-								<div class="w-100 minwidth100 wpeo-button button-square-40 evaluation-advanced select-evaluation-method button-grey">
-									<input type="hidden" class="evaluation-method" value="advanced">
-									Avancé
-								</div>
-								<div>
-									Cotation
-									<div class="wpeo-gridlayout cotation-standard">
-										<?php
-										$defaultCotation = array(0, 48, 51, 100);
-										$evaluation = new DigiriskEvaluation($db);
-										if ( ! empty( $defaultCotation )) :
-											foreach ( $defaultCotation as $request ) :
-												$evaluation->cotation = $request; ?>
-												<div data-id="<?php echo 0; ?>"
-													 data-evaluation-method="standard"
-													 data-evaluation-id="<?php echo $request; ?>"
-													 data-variable-id="<?php echo 152+$request; ?>"
-													 data-seuil="<?php echo  $evaluation->get_evaluation_scale(); ?>"
-													 data-scale="<?php echo  $evaluation->get_evaluation_scale(); ?>"
-													 class="evaluation-cotation cotation wpeo-button"><?php echo $request; ?>
-												</div>
-											<?php endforeach;
-										endif; ?>
-									</div>
-									<?php
-									$string = file_get_contents(DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/js/json/default.json');
-									$json_a = json_decode($string, true);
-
-									$evaluation_method = $json_a[0];
-									$evaluation_method_survey = $evaluation_method['option']['variable'];
-									?>
-									<div class="wpeo-gridlayout cotation-advanced" style="display:none">
-										<input type="hidden" class="digi-method-evaluation-id" value="<?php echo $object->id ; ?>" />
-										<textarea style="display: none" name="evaluation_variables" class="tmp_evaluation_variable"><?php echo '{}'; ?></textarea>
-										<p><i class="fas fa-info-circle"></i> <?php echo 'Cliquez sur les cases du tableau pour remplir votre évaluation'; ?></p>
-										<div class="wpeo-table evaluation-method table-flex table-<?php echo count($evaluation_method_survey) + 1; ?>">
-											<div class="table-row table-header">
-												<div class="table-cell">
-													<span></span>
-												</div>
-												<?php
-												for ( $l = 0; $l < count($evaluation_method_survey); $l++ ) :
-													?>
-													<div class="table-cell">
-														<span><?php echo $l; ?></span>
-													</div>
-												<?php
-												endfor; ?>
-											</div>
-											<?php $l = 0; ?>
-											<?php foreach($evaluation_method_survey as $critere) {
-												$name = strtolower($critere['name']);
-												?>
-												<div class="table-row">
-													<div class="table-cell"><?php echo $critere['name'] ; ?></div>
-													<?php foreach($critere['option']['survey']['request'] as $request) {
-														?>
-														<div class="table-cell can-select cell-<?php echo $object->id ?>"
-															 data-type="<?php echo $name ?>"
-															 data-id="<?php echo  $object->id ? $object->id : 0 ; ?>"
-															 data-evaluation-id="<?php echo $evaluation_id ? $evaluation_id : 0 ; ?>"
-															 data-variable-id="<?php echo $l ; ?>"
-															 data-seuil="<?php echo  $request['seuil']; ?>">
-															<?php echo  $request['question'] ; ?>
-														</div>
-													<?php } $l++;  ?>
-												</div>
-											<?php } ?>
-										</div>
-									</div>
-								</div>
-								<div>
-									<div data-title="evaluationComment<?php echo $object->id ?>" class="table-cell table-100 cell-comment">
-										Commentaire :
-										<?php print '<textarea name="evaluationComment'. $object->id .'" id="evaluationComment'. $object->id .'" class="minwidth150" rows="'.ROWS_2.'">'.('').'</textarea>'."\n"; ?>
-									</div>
-								</div>
-								<div>
-									<div class="photo-container grid wpeo-modal-event tooltip hover">
-									PHOTO :
-										<?php
-										$relativepath = 'digiriskdolibarr/medias';
-										$modulepart = 'ecm';
-										$path = '/dolibarr/htdocs/document.php?modulepart=' . $modulepart  . '&attachment=0&file=' . str_replace('/', '%2F', $relativepath) . '/';
-										$filearray = dol_dir_list($conf->digiriskdolibarr->multidir_output[$conf->entity].'/'.$element['object']->element_type.'/'.$element['object']->ref.'/', "files", 0, '', '(\.odt|_preview.*\.png)$', 'position_name', 'asc', 1);
-										if (count($filearray)) : ?>
-											<?php print '<span class="floatleft inline-block valignmiddle divphotoref">'.$element['object']->digirisk_show_photos('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity].'/'.$element['object']->element_type, 'small', 1, 0, 0, 0, 50, 0, 0, 0, 0, $element['object']->element_type).'</span>'; ?>
-										<?php else : ?>
-											<?php $nophoto = '/public/theme/common/nophoto.png'; ?>
-											<div class="action photo evaluation-photo-open default-photo modal-open" value="<?php echo $object->id ?>">
-
-												<span class="floatleft inline-block valignmiddle divphotoref photo-edit<?php echo $object->id ?>">
-													<input type="hidden" value="<?php echo $path ?>" id="pathToPhoto<?php echo $object->id ?>">
-													<img class="photo maxwidth50"  src="<?php echo DOL_URL_ROOT.'/public/theme/common/nophoto.png' ?>">
-												</span>
-											</div>
-
-											<!-- Modal-AddPhoto -->
-
-											<div id="photo_modal<?php echo $object->id ?>" class="wpeo-modal modal-photo">
-												<div class="modal-container wpeo-modal-event">
-													<!-- Modal-Header -->
-													<div class="modal-header">
-														<h2 class="modal-title"><?php echo $langs->trans('AddPhoto') ?></h2>
-														<div class="modal-close"><i class="fas fa-times"></i></div>
-													</div>
-													<!-- Modal-Content -->
-													<div class="modal-content" id="#modalContent<?php echo $object->id ?>">
-														Ajoutez de nouveaux fichiers dans 'digiriskdolibarr/medias'
-														<div class="action">
-															<a href="<?php echo '../../ecm/index.php' ?>" target="_blank">
-																<div class="wpeo-button button-square-50 button-event add action-input button-progress">
-																	<i class="button-icon fas fa-plus"></i>
-																</div>
-															</a>
-														</div>
-
-														<input type="hidden" id="photoLinked<?php echo $object->id ?>" value="">
-														<div class="wpeo-table table-row">
-															<?php
-															$files =  dol_dir_list(DOL_DATA_ROOT . '/ecm/digiriskdolibarr/medias');
-															$relativepath = 'digiriskdolibarr/medias';
-															$modulepart = 'ecm';
-															$path = '/dolibarr/htdocs/document.php?modulepart=' . $modulepart  . '&attachment=0&file=' . str_replace('/', '%2F', $relativepath);
-															$j = 0;
-
-															if ( !empty($files) ) {
-																foreach ($files as $file) {
-																	print '<div class="table-cell center clickable-photo clickable-photo'. $j .'" value="'. $j .'">';
-																	if (image_format_supported($file['name']) >= 0)
-																	{
-																		$fullpath = $path . '/' . $file['relativename'] . '&entity=' . $conf->entity;
-																		?>
-																			<input type="hidden" id="filename<?php echo $object->id ?>" value="<?php echo $file['name'] ?>">
-																			<img class="photo photo<?php echo $j ?> maxwidth200" src="<?php echo $fullpath; ?>">
-																		<?php
-																	}
-																	else {
-																		print '&nbsp;';
-																	}
-																	$j++;
-
-																}
-															}
-														?>
-														</div>
-													</div>
-
-													<!-- Modal-Footer -->
-													<div class="modal-footer">
-														<div class="wpeo-button button-grey button-blue save-photo">
-															<span><?php echo $langs->trans('SavePhoto'); ?></span>
-														</div>
-														<div class="wpeo-button button-grey modal-close">
-															<span><?php echo $langs->trans('CloseModal'); ?></span>
-														</div>
-													</div>
-												</div>
-											</div>
-										<?php endif; ?>
-									</div>
-								</div>
-
-							</div>
-
-
-							<!-- Modal-Footer -->
-							<div class="modal-footer">
-								<?php
-									$evaluation = new DigiriskEvaluation($db);
-									$evaluation->cotation = 0;
-								?>
-								<div data-scale="<?php echo $evaluation->get_evaluation_scale() ?>" class="cotation cotation-span<?php echo $object->id ?>">
-									<span id="current_equivalence<?php echo $object->id ?>"></span>
-								</div>
-
-								<div class="wpeo-button evaluation-create button-blue modal-close">
-								<input type="hidden" value="<?php echo $object->id ?>" class="risk-to-assign">
-									<i class="fas fa-plus"></i>
-										<?php echo $langs->trans('Add'); ?>
-								</div>
-							</div>
-						</div>
-					</div>
-
-		<?php	} elseif ($key == 'has_tasks') {
-					?>
-					<div class="table-cell cell-tasks" data-title="Tâches" class="padding">
-						<span class="cell-tasks-container">
-		<!--				VUE SI Y A DES TACHES   -->
-							<?php $related_tasks = $object->get_related_tasks($object);
-							if (($related_tasks !== -1) ) :
-								foreach ($related_tasks as $related_task) :
-									$related_task->fetchTimeSpent($related_task->id); ?>
-									<span class="ref"><?php echo $related_task->ref; ?></span>
-		<!--							// @todo truc sympa pour l'author.-->
-									<span class="author">
-										<div class="avatar" style="background-color: #50a1ed;">
-											<?php $user = new User($db); ?>
-											<?php $user->fetch($related_task->fk_user_creat); ?>
-											<span><?php echo $user->firstname[0] . $user->lastname[0]; ?></span>
-										</div>
-									</span>
-									<span class="date"><i class="fas fa-calendar-alt"></i><?php echo date("d/m/Y", $related_task->date_c) ?></span>
-									<span class="label"><?php echo $related_task->label; ?></span>
-									<!--													print '<a target="_blank" href="/dolibarr/htdocs/projet/tasks/time.php?id=' . $related_task->id . '&withproject=1">' . '&nbsp' .  gmdate('H:i', $related_task->duration_effective ) . '</a>';-->
-								<?php endforeach; ?>
-							<?php else : ?>
-								<span class="name"><?php echo $langs->trans('NoTaskLinked'); ?></span>
-							<?php endif; ?>
-						</span>
-						<!--									VUE SI Y EN A PAS   -->
-					</div>
-				<?php
-				}
-				else print $lastEvaluation->showOutputField($val, $key, $lastEvaluation->$key, '');
-				print '</td>';
-				if (!$i) $totalarray['nbfield']++;
-				if (!empty($val['isameasure']))
-				{
-					if (!$i) $totalarray['pos'][$totalarray['nbfield']] = 't.'.$key;
-					$totalarray['val']['t.'.$key] += $lastEvaluation->$key;
-				}
+								</span>
+								<span class="date"><i class="fas fa-calendar-alt"></i><?php echo date("d/m/Y", $related_task->date_c) ?></span>
+								<span class="label"><?php echo $related_task->label; ?></span>
+								<!--													print '<a target="_blank" href="/dolibarr/htdocs/projet/tasks/time.php?id=' . $related_task->id . '&withproject=1">' . '&nbsp' .  gmdate('H:i', $related_task->duration_effective ) . '</a>';-->
+							<?php endforeach; ?>
+						<?php else : ?>
+							<span class="name"><?php echo $langs->trans('NoTaskLinked'); ?></span>
+						<?php endif; ?>
+					</span>
+					<!--									VUE SI Y EN A PAS   -->
+				</div>
+			<?php } else print $lastEvaluation->showOutputField($val, $key, $lastEvaluation->$key, '');
+			print '</td>';
+			if (!$i) $totalarray['nbfield']++;
+			if (!empty($val['isameasure']))
+			{
+				if (!$i) $totalarray['pos'][$totalarray['nbfield']] = 't.'.$key;
+				$totalarray['val']['t.'.$key] += $lastEvaluation->$key;
 			}
 		}
 	}
@@ -1435,30 +1162,24 @@ while ($i < ($limit ? min($num, $limit) : $num))
 	include DOL_DOCUMENT_ROOT.'/core/tpl/extrafields_list_print_fields.tpl.php';
 
 	// Fields from hook
-	$parameters = array('arrayfields'=>$arrayfields, 'object'=>$object, 'obj'=>$obj, 'i'=>$i, 'totalarray'=>&$totalarray);
-	$reshook = $hookmanager->executeHooks('printFieldListValue', $parameters, $object); // Note that $action and $object may have been modified by hook
+	$parameters = array('arrayfields'=>$arrayfields, 'object'=>$risk, 'obj'=>$obj, 'i'=>$i, 'totalarray'=>&$totalarray);
+	$reshook = $hookmanager->executeHooks('printFieldListValue', $parameters, $risk); // Note that $action and $risk may have been modified by hook
 	print $hookmanager->resPrint;
-//	print '<td class="nowrap"><td>'. $langs->trans('Evaluation') .'</td>';
-//	print '</td>';
+
 	// Action column
 	print '<td class="nowrap center">';
 	if ($massactionbutton || $massaction)   // If we are in select mode (massactionbutton defined) or if we have already selected and sent an action ($massaction) defined
 	{
 		$selected = 0;
-		if (in_array($object->id, $arrayofselected)) $selected = 1;
-		print '<input id="cb'.$object->id.'" class="flat checkforselect" type="checkbox" name="toselect[]" value="'.$object->id.'"'.($selected ? ' checked="checked"' : '').'>';
+		if (in_array($risk->id, $arrayofselected)) $selected = 1;
+		print '<input id="cb'.$risk->id.'" class="flat checkforselect" type="checkbox" name="toselect[]" value="'.$risk->id.'"'.($selected ? ' checked="checked"' : '').'>';
 	}
 
 	print '</td>';
 	if (!$i) $totalarray['nbfield']++;
-
 	print '</tr>'."\n";
 	$i++;
-
 }
-
-// Show total line
-include DOL_DOCUMENT_ROOT.'/core/tpl/list_print_total.tpl.php';
 
 // If no record found
 if ($num == 0)
@@ -1468,37 +1189,198 @@ if ($num == 0)
 	print '<tr><td colspan="'.$colspan.'" class="opacitymedium">'.$langs->trans("NoRecordFound").'</td></tr>';
 }
 
-
 $db->free($resql);
 
 $parameters = array('arrayfields'=>$arrayfields, 'sql'=>$sql);
-$reshook = $hookmanager->executeHooks('printFieldListFooter', $parameters, $object); // Note that $action and $object may have been modified by hook
-print $hookmanager->resPrint;
+$reshook = $hookmanager->executeHooks('printFieldListFooter', $parameters, $risk); // Note that $action and $risk may have been modified by hook
+print $hookmanager->resPrint; ?>
 
-print '</table>'."\n";
+<!-- RISK EVALUATION ADD MODAL-->
+<div class="risk-evaluation-add-modal">
+	<div class="wpeo-modal modal-risk" id="risk_evaluation_add">
+		<div class="modal-container wpeo-modal-event">
+			<!-- Modal-Header -->
+			<div class="modal-header">
+				<h2 class="modal-title"><?php echo $langs->trans('EvaluationCreate') . ' ' . $refEvaluationMod->getNextValue($evaluation); ?></h2>
+				<div class="modal-close"><i class="fas fa-times"></i></div>
+			</div>
+			<!-- Modal-ADD Evaluation Content-->
+			<div class="modal-content" id="#modalContent">
+				<div class="risk-evaluation-container">
+					<div class="risk-evaluation-header">
+						<div class="wpeo-button evaluation-standard select-evaluation-method selected button-blue button-radius-2">
+							<span><?php echo $langs->trans('SimpleCotation') ?></span>
+						</div>
+						<div class="wpeo-button evaluation-advanced select-evaluation-method button-grey button-radius-2">
+							<span><?php echo $langs->trans('AdvancedCotation') ?></span>
+						</div>
+						<input class="risk-evaluation-method" type="hidden" value="standard">
+					</div>
+					<div class="risk-evaluation-content-wrapper">
+						<div class="risk-evaluation-content">
+							<div class="cotation-container">
+								<div class="cotation-standard">
+									<span class="title"><i class="fas fa-chart-line"></i><?php echo ' ' . $langs->trans('Cotation'); ?><required>*</required></span>
+									<div class="cotation-listing wpeo-gridlayout grid-4 grid-gap-0">
+										<?php
+										$defaultCotation = array(0, 48, 51, 100);
+										if ( ! empty( $defaultCotation )) :
+											foreach ( $defaultCotation as $request ) :
+												$evaluation->cotation = $request; ?>
+												<div data-id="<?php echo 0; ?>"
+													 data-evaluation-method="standard"
+													 data-evaluation-id="<?php echo $request; ?>"
+													 data-variable-id="<?php echo 152+$request; ?>"
+													 data-seuil="<?php echo  $evaluation->get_evaluation_scale(); ?>"
+													 data-scale="<?php echo  $evaluation->get_evaluation_scale(); ?>"
+													 class="risk-evaluation-cotation cotation"><?php echo $request; ?></div>
+											<?php endforeach;
+										endif; ?>
+									</div>
+								</div>
+								<input class="risk-evaluation-seuil" type="hidden">
+								<?php
+								$evaluation_method = $advanced_method_cotation_array[0];
+								$evaluation_method_survey = $evaluation_method['option']['variable'];
+								?>
+								<div class="wpeo-gridlayout cotation-advanced" style="display:none">
+									<input type="hidden" class="digi-method-evaluation-id" value="<?php echo $risk->id ; ?>" />
+									<textarea style="display: none" name="evaluation_variables" class="tmp_evaluation_variable"><?php echo '{}'; ?></textarea>
+									<p><i class="fas fa-info-circle"></i> <?php echo $langs->trans('SelectCotation') ?></p>
+									<div class="wpeo-table evaluation-method table-flex table-<?php echo count($evaluation_method_survey) + 1; ?>">
+										<div class="table-row table-header">
+											<div class="table-cell">
+												<span></span>
+											</div>
+											<?php for ( $l = 0; $l < count($evaluation_method_survey); $l++ ) : ?>
+												<div class="table-cell">
+													<span><?php echo $l; ?></span>
+												</div>
+											<?php endfor; ?>
+										</div>
+										<?php $l = 0; ?>
+										<?php foreach($evaluation_method_survey as $critere) :
+											$name = strtolower($critere['name']); ?>
+											<div class="table-row">
+												<div class="table-cell"><?php echo $critere['name'] ; ?></div>
+												<?php foreach($critere['option']['survey']['request'] as $request) : ?>
+													<div class="table-cell can-select cell-<?php echo  $evaluation_id ? $evaluation_id : 0 ; ?>"
+														 data-type="<?php echo $name ?>"
+														 data-id="<?php echo  $risk->id ? $risk->id : 0 ; ?>"
+														 data-evaluation-id="<?php echo $evaluation_id ? $evaluation_id : 0 ; ?>"
+														 data-variable-id="<?php echo $l ; ?>"
+														 data-seuil="<?php echo  $request['seuil']; ?>">
+														<?php echo  $request['question'] ; ?>
+													</div>
+												<?php endforeach; $l++; ?>
+											</div>
+										<?php endforeach; ?>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="risk-evaluation-photo">
+							<span class="title"><?php echo $langs->trans('Photo'); ?></span>
+							<div class="risk-evaluation-photo-container wpeo-modal-event tooltip hover">
+								<?php
+								$relativepath = 'digiriskdolibarr/medias';
+								$modulepart = 'ecm';
+								$path = DOL_URL_ROOT.'/document.php?modulepart=' . $modulepart  . '&attachment=0&file=' . str_replace('/', '%2F', $relativepath) . '/';
+								$nophoto = '/public/theme/common/nophoto.png'; ?>
+								<!-- BUTTON RISK EVALUATION PHOTO MODAL -->
+								<div class="action risk-evaluation-photo default-photo modal-open" value="<?php echo $risk->id ?>">
+									<span class="floatleft inline-block valignmiddle divphotoref risk-evaluation-photo-single">
+										<input type="hidden" value="<?php echo $path ?>">
+										<input class="filename" type="hidden" value="">
+										<img class="photo maxwidth50"  src="<?php echo DOL_URL_ROOT.'/public/theme/common/nophoto.png' ?>">
+									</span>
+								</div>
+								<!-- RISK EVALUATION PHOTO MODAL -->
+								<div class="wpeo-modal modal-photo" id="risk_evaluation_photo<?php echo $risk->id ?>">
+									<div class="modal-container wpeo-modal-event">
+										<!-- Modal-Header -->
+										<div class="modal-header">
+											<h2 class="modal-title"><?php echo $langs->trans('AddPhoto') ?></h2>
+											<div class="modal-close"><i class="fas fa-times"></i></div>
+										</div>
+										<!-- Modal-Content -->
+										<div class="modal-content" id="#modalContent<?php echo $object->id ?>">
+											<div class="action">
+												<a href="<?php echo '../../ecm/index.php' ?>" target="_blank">
+													<div class="wpeo-button button-square-50 button-blue">
+														<i class="button-icon fas fa-plus"></i>
+													</div>
+												</a>
+											</div>
+											<div class="wpeo-table table-row">
+												<?php
+												$files =  dol_dir_list(DOL_DATA_ROOT . '/ecm/digiriskdolibarr/medias');
+												$relativepath = 'digiriskdolibarr/medias';
+												$modulepart = 'ecm';
+												$path = DOL_URL_ROOT.'/document.php?modulepart=' . $modulepart  . '&attachment=0&file=' . str_replace('/', '%2F', $relativepath);
+												$j = 0;
+
+												if ( !empty($files) ) :
+													foreach ($files as $file) :
+														print '<div class="table-cell center clickable-photo clickable-photo'. $j .'" value="'. $j .'">';
+														if (image_format_supported($file['name']) >= 0) :
+															$fullpath = $path . '/' . $file['relativename'] . '&entity=' . $conf->entity; ?>
+															<input class="filename" type="hidden" value="<?php echo $file['name'] ?>">
+															<img class="photo photo<?php echo $j ?> maxwidth200" src="<?php echo $fullpath; ?>">
+														<?php else : print '&nbsp;';
+														endif;
+														$j++;
+														print '</div>';
+													endforeach;
+												endif; ?>
+											</div>
+										</div>
+										<!-- Modal-Footer -->
+										<div class="modal-footer">
+											<div class="save-photo wpeo-button button-blue">
+												<span><?php echo $langs->trans('SavePhoto'); ?></span>
+											</div>
+											<div class="wpeo-button button-grey modal-close">
+												<span><?php echo $langs->trans('CloseModal'); ?></span>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="risk-evaluation-calculated-cotation" style="display: none">
+							<span class="title"><i class="fas fa-chart-line"></i> <?php echo $langs->trans('CalculatedCotation'); ?><required>*</required></span>
+							<div data-scale="1" class="risk-evaluation-cotation cotation">
+								<span><?php echo 0 ?></span>
+							</div>
+						</div>
+						<div class="risk-evaluation-comment">
+							<span class="title"><i class="fas fa-comment-dots"></i> <?php echo $langs->trans('Comment'); ?></span>
+							<?php print '<textarea name="evaluationComment'. $risk->id .'" rows="'.ROWS_2.'">'.('').'</textarea>'."\n"; ?>
+						</div>
+					</div>
+				</div>
+			</div>
+			<!-- Modal-Footer -->
+			<div class="modal-footer">
+				<div class="risk-evaluation-create wpeo-button button-blue button-disable modal-close" value="">
+					<i class="fas fa-plus"></i> <?php echo $langs->trans('Add'); ?>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<?php print '</table>'."\n";
+print '<!-- End table -->';
 print '</div>'."\n";
-
+print '<!-- End div class="div-table-responsive" -->';
 print '</form>'."\n";
+print '<!-- End form -->';
+print '</div>'."\n";
+print '<!-- End div class="fichecenter" -->';
 
-if (in_array('builddoc', $arrayofmassactions) && ($nbtotalofrecords === '' || $nbtotalofrecords))
-{
-	$hidegeneratedfilelistifempty = 1;
-	if ($massaction == 'builddoc' || $action == 'remove_file' || $show_files) $hidegeneratedfilelistifempty = 0;
-
-	require_once DOL_DOCUMENT_ROOT.'/core/class/html.formfile.class.php';
-	$formfile = new FormFile($db);
-
-	// Show list of available documents
-	$urlsource = $_SERVER['PHP_SELF'].'?sortfield='.$sortfield.'&sortorder='.$sortorder;
-	$urlsource .= str_replace('&amp;', '&', $param);
-
-	$filedir = $diroutputmassaction;
-	$genallowed = $permissiontoread;
-	$delallowed = $permissiontoadd;
-
-	print $formfile->showdocuments('massfilesarea_digiriskdolibarr', '', $filedir, $urlsource, 0, $delallowed, '', 1, 1, 0, 48, 1, $param, $title, '', '', '', null, $hidegeneratedfilelistifempty);
-}
-
+dol_fiche_end();
 // End of page
 llxFooter();
 $db->close();
