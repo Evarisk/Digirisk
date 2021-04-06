@@ -1,1 +1,9 @@
 @import "risk";
+
+.wpeo-modal .modal-container {
+  ul, li {
+    margin: 0;
+    list-style-type: none;
+    padding: 0;
+  }
+}

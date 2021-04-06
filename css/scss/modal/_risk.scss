@@ -86,3 +86,17 @@
     }
   }
 }
+
+/** Listing */
+.wpeo-modal .modal-container .risk-evaluations-list {
+  .risk-evaluation > .risk-evaluation-container {
+    display: flex;
+
+    .risk-evaluation-single {
+      width: 100%;
+    }
+    .risk-evaluation-actions {
+      margin-left: auto;
+    }
+  }
+}

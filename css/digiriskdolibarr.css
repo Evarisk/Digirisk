@@ -1655,6 +1655,15 @@
   display: block;
 }
 
+.risk-container .risk-edit {
+  color: #263C5C;
+}
+
+.risk-container .risk-edit:hover {
+  cursor: pointer;
+  text-decoration: underline;
+}
+
 .risk-evaluation-container .risk-evaluation-single {
   display: -webkit-box;
   display: -ms-flexbox;
@@ -1946,4 +1955,25 @@
 
 .wpeo-modal[class*="modal-risk"] .modal-container .risk-evaluation-container.advanced .risk-evaluation-photo {
   margin-right: 1em;
+}
+
+/** Listing */
+.wpeo-modal .modal-container .risk-evaluations-list .risk-evaluation > .risk-evaluation-container {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+}
+
+.wpeo-modal .modal-container .risk-evaluations-list .risk-evaluation > .risk-evaluation-container .risk-evaluation-single {
+  width: 100%;
+}
+
+.wpeo-modal .modal-container .risk-evaluations-list .risk-evaluation > .risk-evaluation-container .risk-evaluation-actions {
+  margin-left: auto;
+}
+
+.wpeo-modal .modal-container ul, .wpeo-modal .modal-container li {
+  margin: 0;
+  list-style-type: none;
+  padding: 0;
 }

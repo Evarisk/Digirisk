@@ -1213,11 +1213,13 @@ if ($object->id > 0) {
 																	</div>
 																</div>
 																<!-- BUTTON MODAL RISK EVALUATION EDIT  -->
-																<div class="risk-evaluation-edit wpeo-button button-square-50 button-grey modal-open" value="<?php echo $cotation->id ?>">
-																	<i class="fas fa-pencil-alt button-icon"></i>
-																</div>
-																<div class="risk-evaluation-delete wpeo-button button-square-50 button-grey">
-																	<i class="fas fa-trash button-icon"></i>
+																<div class="risk-evaluation-actions wpeo-gridlayout grid-2 grid-gap-0">
+																	<div class="risk-evaluation-edit wpeo-button button-square-50 button-grey modal-open" value="<?php echo $cotation->id ?>">
+																		<i class="fas fa-pencil-alt button-icon"></i>
+																	</div>
+																	<div class="risk-evaluation-delete wpeo-button button-square-50 button-transparent">
+																		<i class="fas fa-trash button-icon"></i>
+																	</div>
 																</div>
 															</div>
 															<!-- RISK EVALUATION EDIT MODAL-->
