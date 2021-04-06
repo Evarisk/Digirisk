@@ -1,0 +1,8 @@
+.risk-container .risk-edit {
+  color: $color__secondary;
+
+  &:hover {
+    cursor: pointer;
+    text-decoration: underline;
+  }
+}
