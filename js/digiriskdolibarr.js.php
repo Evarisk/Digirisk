@@ -950,7 +950,7 @@ window.eoxiaJS.evaluation.createEvaluation = function ( event ) {
 		}
 	})
 
-	//$(this).closest('.fichecenter').find('.risk_row_'+riskToAssign).find('.risk-evaluation-container').load( document.URL + '&action=addEvaluation' + riskToAssignPost + methodPost + cotationPost + criteres + photoPost + commentPost + ' .risk_row_'+riskToAssign+' .risk-evaluation-container');
+	$(this).closest('.div-table-responsive').load( document.URL + '&action=addEvaluation' + riskToAssignPost + methodPost + cotationPost + criteres + photoPost + commentPost + ' .div-table-responsive');
 };
 
 /**

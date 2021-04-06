@@ -527,7 +527,6 @@ if ($object->id > 0) {
 	//print '<input type="hidden" name="page" value="'.$page.'">';
 	print '<input type="hidden" name="contextpage" value="'.$contextpage.'">';
 	print '<div class="underbanner clearboth"></div>';
-	print '<table class="border centpercent tableforfield">'."\n";
 
 	$advanced_method_cotation_json  = file_get_contents(DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/js/json/default.json');
 	$advanced_method_cotation_array = json_decode($advanced_method_cotation_json, true);
@@ -1221,13 +1220,6 @@ if ($object->id > 0) {
 																	<i class="fas fa-trash button-icon"></i>
 																</div>
 															</div>
-															<!-- BUTTON MODAL RISK EVALUATION EDIT  -->
-															<div class="risk-evaluation-edit wpeo-button button-square-50 button-grey modal-open" value="<?php echo $cotation->id ?>">
-																<i class="fas fa-pencil-alt button-icon"></i>
-															</div>
-															<div class="risk-evaluation-delete wpeo-button button-square-50 button-grey">
-																<i class="fas fa-trash button-icon"></i>
-															</div>
 															<!-- RISK EVALUATION EDIT MODAL-->
 															<div class="risk-evaluation-edit-modal">
 																<div class="wpeo-modal modal-risk" id="risk_evaluation_edit<?php echo $cotation->id ?>">
@@ -1684,8 +1676,21 @@ if ($object->id > 0) {
 		</div>
 	</div>
 
-	<?php dol_fiche_end();
+	<?php print '</table>'."\n";
+	print '<!-- End table -->';
+	print '</div>'."\n";
+	print '<!-- End div class="div-table-responsive" -->';
+	print '</form>'."\n";
+	print '<!-- End form -->';
+	print '</div>'."\n";
+	print '<!-- End div class="fichecenter" -->';
+
+	dol_fiche_end();
 }
+
+print '</div>'."\n";
+print '<!-- End div class="cardcontent" -->';
+
 // End of page
 llxFooter();
 $db->close();
