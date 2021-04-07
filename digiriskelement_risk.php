@@ -43,7 +43,7 @@ dol_include_once('/digiriskdolibarr/class/risk.class.php');
 dol_include_once('/digiriskdolibarr/class/digiriskevaluation.class.php');
 dol_include_once('/digiriskdolibarr/class/digiriskelement.class.php');
 dol_include_once('/digiriskdolibarr/core/modules/digiriskdolibarr/mod_risk_standard.php');
-dol_include_once('/digiriskdolibarr/core/modules/digiriskdolibarr/mod_evaluation_standard.php');
+dol_include_once('/digiriskdolibarr/core/modules/digiriskdolibarr/mod_riskassessment_standard.php');
 dol_include_once('/digiriskdolibarr/lib/digiriskdolibarr_digiriskelement.lib.php');
 dol_include_once('/digiriskdolibarr/lib/digiriskdolibarr_function.lib.php');
 
@@ -68,7 +68,7 @@ $risk              = new Risk($db);
 $evaluation        = new DigiriskEvaluation($db);
 $extrafields       = new ExtraFields($db);
 $refRiskMod        = new $conf->global->DIGIRISKDOLIBARR_RISK_ADDON();
-$refEvaluationMod  = new $conf->global->DIGIRISKDOLIBARR_EVALUATION_ADDON();
+$refEvaluationMod  = new $conf->global->DIGIRISKDOLIBARR_RISKASSESSMENT_ADDON();
 
 $hookmanager->initHooks(array('riskcard', 'globalcard')); // Note that conf->hooks_modules contains array
 
