@@ -150,7 +150,6 @@ if (empty($reshook))
 	// Action to build doc
 
 	if ($action == 'builddoc' && $permissiontoadd) {
-
 		if (is_numeric(GETPOST('model', 'alpha'))) {
 			$error = $langs->trans("ErrorFieldRequired", $langs->transnoentities("Model"));
 		} else {
@@ -233,7 +232,9 @@ if (empty($reshook))
 				if (empty($hideref)) $hideref = 0;
 				if (empty($moreparams)) $moreparams = null;
 
-				$result = $object->generateDocument('legaldisplay_A4_odt', $outputlangs, $hidedetails, $hidedesc, $hideref, $moreparams);
+				$model = GETPOST('model', 'alpha');
+
+				$result = $legaldisplay->generateDocument($model, $outputlangs, $hidedetails, $hidedesc, $hideref, $moreparams);
 				if ($result <= 0) {
 					setEventMessages($object->error, $object->errors, 'errors');
 					$action = '';
