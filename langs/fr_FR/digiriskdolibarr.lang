@@ -88,9 +88,7 @@ SendLegalDisplay = Affichage légal
 
 DigiriskLegalDisplayNumberingModule = Modèle de numérotation des affichages légaux de Digirisk
 DigiriskNumberingDate = Fixe la référence comme étant la date et l'heure de création.
-DigiriskLegalDisplayJupiterModel = Fixe la référence comme étant : "legaldisplay_date_heure"
-DigiriskLegalDisplayStandardModel = Fixe la référence comme étant : "date_heure_legaldisplay"
-DigiriskLegalDisplayAdvancedModel = Fixe la référence comme étant : "date_heure"
+DigiriskLegalDisplayStandardModel = Renvoie le numéro sous la forme LDn où n est un compteur séquentiel sans rupture et sans remise à 0.
 
 DigiriskTemplateDocumentLegalDisplay = Modèle de documents des affichages légaux de Digirisk
 LegalDisplayCustomTemplate = ODT custom des affichages légaux
@@ -117,8 +115,7 @@ InformationsSharingList = Liste des diffusions d'informations
 SendInformationsSharing = Diffusion d'informations
 
 DigiriskInformationsSharingNumberingModule = Modèle de numérotation des diffusions d'information de Digirisk
-DigiriskInformationsSharingStandardModel = Fixe la référence comme étant : "date_heure_informationssharing"
-DigiriskInformationsSharingAdvancedModel = Fixe la référence comme étant : "date_heure"
+DigiriskInformationsSharingStandardModel = Renvoie le numéro sous la forme ISn où n est un compteur séquentiel sans rupture et sans remise à 0.
 
 DigiriskTemplateDocumentInformationsSharing = Modèle de documents des diffusions d'information de Digirisk
 InformationsSharingCustomTemplate = ODT custom des diffusions d'information
@@ -142,7 +139,7 @@ FirePermitList = Liste des permis de feu
 SendFirePermit = Permis de feu
 
 DigiriskFirePermitNumberingModule = Modèle de numérotation des permis de feu de Digirisk
-DigiriskFirePermitStandardModel = Fixe la référence comme étant : "date_heure_firepermit"
+DigiriskFirePermitStandardModel = Renvoie le numéro sous la forme FPn où n est un compteur séquentiel sans rupture et sans remise à 0.
 
 DigiriskTemplateDocumentFirePermit = Modèle de documents des permis de feu de Digirisk
 FirePermitCustomTemplate = ODT custom des permis de feu
@@ -166,7 +163,7 @@ PreventionPlanList = Liste des plans de prévention
 SendPreventionPlan = Plan de prévention
 
 DigiriskPreventionPlanNumberingModule = Modèle de numérotation des plans de prévention de Digirisk
-DigiriskPreventionPlanStandardModel = Fixe la référence comme étant : "date_heure_preventionplan"
+DigiriskPreventionPlanStandardModel = Renvoie le numéro sous la forme PPn où n est un compteur séquentiel sans rupture et sans remise à 0.
 
 DigiriskTemplateDocumentPreventionPlan = Modèle de documents des plans de prévention de Digirisk
 PreventionPlanCustomTemplate = ODT custom des plans de prévention
@@ -199,7 +196,7 @@ NewGroupment = Nouveau groupement
 ModifyGroupment = Modifier groupement
 
 DigiriskGroupmentNumberingModule = Modèle de numérotation des groupements de Digirisk
-DigiriskGroupmentStandardModel = Fixe la référence comme étant : "GPn"
+DigiriskGroupmentStandardModel = Renvoie le numéro sous la forme GPn où n est un compteur séquentiel sans rupture et sans remise à 0.
 
 DigiriskTemplateDocumentGroupment = Modèle de documents des groupements de Digirisk
 GroupmentPlanCustomTemplate = ODT custom des groupements
@@ -219,7 +216,7 @@ NewWorkUnit = Nouvelle unité de travail
 ModifyWorkUnit = Modifier unité de travail
 
 DigiriskWorkUnitNumberingModule = Modèle de numérotation des unités de travail de Digirisk
-DigiriskWorkUnitStandardModel = Fixe la référence comme étant : "UTn"
+DigiriskWorkUnitStandardModel = Renvoie le numéro sous la forme WUn où n est un compteur séquentiel sans rupture et sans remise à 0.
 
 DigiriskTemplateDocumentPreventionPlan = Modèle de documents des unités de travail de Digirisk
 WorkUnitCustomTemplate = ODT custom des unités de travail
@@ -305,5 +302,34 @@ CloseModal = Fermer
 ActionPlanDU = Plan d'action Document Unique
 ActionPlanDUDescription = Description du plan d'action Document Unique
 
+DigiriskListingRisksPhotoStandardModel = Renvoie le numéro sous la forme RLPn où n est un compteur séquentiel sans rupture et sans remise à 0.
+DigiriskListingRisksPhotoNumberingModule = Modèle de numérotation des listing des risques photo de Digirisk
+DigiriskTemplateDocumentListingRisksPhoto = Modèle de documents des listing des risques photo de Digirisk
 
+DigiriskListingRisksActionStandardModel = Renvoie le numéro sous la forme RLAn où n est un compteur séquentiel sans rupture et sans remise à 0.
+DigiriskListingRisksActionNumberingModule = Modèle de numérotation des listing des actions correctives de Digirisk
+DigiriskTemplateDocumentListingRisksAction = Modèle de documents des listing des actions correctives de Digirisk
+
+DigiriskGroupmentDocumentStandardModel = Renvoie le numéro sous la forme GPDn où n est un compteur séquentiel sans rupture et sans remise à 0.
+DigiriskGroupmentDocumentNumberingModule = Modèle de numérotation des fiches de groupement de Digirisk
+DigiriskTemplateDocumentGroupmentDocument = Modèle de documents des fiches de groupement de Digirisk
+
+DigiriskWorkUnitDocumentStandardModel = Renvoie le numéro sous la forme WUDn où n est un compteur séquentiel sans rupture et sans remise à 0.
+DigiriskWorkUnitDocumentNumberingModule = Modèle de numérotation des fiches d'unité de travail de Digirisk
+DigiriskTemplateDocumentWorkUnitDocument = Modèle de documents des fiches d'unité de travail de Digirisk
+
+DigiriskRiskStandardModel = Renvoie le numéro sous la forme RKn où n est un compteur séquentiel sans rupture et sans remise à 0.
+DigiriskRiskNumberingModule = Modèle de numérotation des risques de Digirisk
+
+DigiriskRiskAssessmentStandardModel = Renvoie le numéro sous la forme RAn où n est un compteur séquentiel sans rupture et sans remise à 0.
+DigiriskRiskAssessmentNumberingModule = Modèle de numérotation des évaluations des risques de Digirisk
+
+GroupmentDocument = Fiche de Groupement
+WorkUnitDocument = Fiche d'Unité de travail
+RiskAssessment = Évaluation
+RiskAnalysis = Analyse des risques
+SelectProject = Choix du projet
+
+DigiriskDocuments = Document Digirisk
+DigiriskElement = Element Digirisk
 
