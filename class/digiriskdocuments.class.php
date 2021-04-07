@@ -218,6 +218,8 @@ class DigiriskDocuments extends CommonObject
 	 */
 	public function create(User $user, $notrigger = false)
 	{
+		global $conf;
+
 		$now = dol_now();
 
 		$this->date_creation = $this->db->idate($now);
@@ -227,6 +229,8 @@ class DigiriskDocuments extends CommonObject
 		$this->import_key 	 = "";
 		$this->status 		 = 1;
 		$this->type 		 = $this->element;
+		$constforval         = "DIGIRISKDOLIBARR_" . strtoupper($this->type).'_ADDON_ODT';
+		$this->model_odt     = $conf->global->$constforval;
 		$this->DigiriskFillJSON($this);
 		// Changement de $this->element pour activer la génération d'un événement à la création
 		$this->element 		 = $this->element . '@digiriskdolibarr';
@@ -1014,49 +1018,69 @@ class DigiriskDocuments extends CommonObject
 	 *  @param      null|array  $moreparams     Array to provide more information
 	 *  @return     int         				0 if KO, 1 if OK
 	 */
+	/**
+	 *  Create a document onto disk according to template module.
+	 *
+	 *  @param	    string		$modele			Force template to use ('' to not force)
+	 *  @param		Translate	$outputlangs	objet lang a utiliser pour traduction
+	 *  @param      int			$hidedetails    Hide details of lines
+	 *  @param      int			$hidedesc       Hide description
+	 *  @param      int			$hideref        Hide ref
+	 *  @param      null|array  $moreparams     Array to provide more information
+	 *  @return     int         				0 if KO, 1 if OK
+	 */
 	public function generateDocument($modele, $outputlangs, $hidedetails = 0, $hidedesc = 0, $hideref = 0, $moreparams = null)
 	{
 		global $conf, $langs, $user;
-
 		$result = 0;
 		$includedocgeneration = 1;
-
 		$langs->load("digiriskdolibarr@digiriskdolibarr");
-		echo '<pre>';
-		print_r($this);
-		echo '</pre>';
-		exit;
+
 		if (!dol_strlen($modele)) {
-			$modele = 'standard_' . $this->type;
+			$modele = 'standard_digiriskelement';
 
 			if ($this->modelpdf) {
 				$modele = $this->modelpdf;
-				//@todo rename en ADDON_ODT
-			} elseif (!empty($conf->global->DIGIRISKDOCUMENTS_ADDON_PDF)) {
-				$modele = $conf->global->DIGIRISKDOCUMENTS_ADDON_PDF;
+			} elseif (!empty($conf->global->DIGIRISKELEMENT_ADDON_PDF)) {
+				$modele = $conf->global->DIGIRISKELEMENT_ADDON_PDF;
 			}
 		}
 
 		$modelpath = "core/modules/digiriskdolibarr/doc/";
 
+		$template = preg_replace('/_odt/', '.odt', $modele );
+
+		if ( preg_match( '/listing_risks_photos/', $template ) ) {
+			$path = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/documents/doctemplates/listingrisksphoto/';
+		} elseif ( preg_match( '/listing_risks_actions/', $template ) ) {
+			$path = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/documents/doctemplates/listingrisksaction/';
+		} elseif ( preg_match( '/groupment/', $template ) || preg_match( '/workunit/', $template ) ) {
+			$path = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/documents/doctemplates/'. $this->element_type . '/';
+		} elseif ( preg_match( '/legaldisplay/', $template ) ) {
+			$path = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/documents/doctemplates/legaldisplay/';
+		} elseif ( preg_match( '/informationssharing/', $template ) ) {
+			$path = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/documents/doctemplates/informationssharing/';
+		}
+
+		$modele = $modele.":". $path . "template_" . $template;
 		if ($includedocgeneration) {
 			$result = $this->commonGenerateDocument($modelpath, $modele, $outputlangs, $hidedetails, $hidedesc, $hideref, $moreparams);
 		}
 
-		switch ($this->type) {
-			case 'legaldisplay' :
-				$trigger = $this->call_trigger('LEGALDISPLAY_GENERATE', $user);
-				break;
-			case 'informationssharing':
-				$trigger = $this->call_trigger('INFORMATIONSSHARING_GENERATE', $user);
-				break;
-			case 'firepermit':
-				$trigger = $this->call_trigger('FIREPERMIT_GENERATE', $user);
-				break;
-			case 'preventionplan':
-				$trigger = $this->call_trigger('PREVENTIONPLAN_GENERATE', $user);
-				break;
+		if ( preg_match( '/listing_risks_photos/', $template ) ) {
+			$this->call_trigger('LISTING_RISKS_PHOTOS_GENERATE', $user);
+		} elseif ( preg_match( '/listing_risks_actions/', $template ) ) {
+			$this->call_trigger('LISTING_RISKS_ACTIONS_GENERATE', $user);
+		} elseif ( preg_match( '/groupment/', $template ) ) {
+			$this->call_trigger('GROUPMENT_GENERATE', $user);
+		} elseif ( preg_match( '/workunit/', $template ) ) {
+			$this->call_trigger('WORKUNIT_GENERATE', $user);
+		} elseif ( preg_match( '/legaldisplay/', $template ) ) {
+			$this->call_trigger('LEGALDISPLAY_GENERATE', $user);
+		} elseif ( preg_match( '/informationssharing/', $template ) ) {
+			$this->call_trigger('INFORMATIONSSHARING_GENERATE', $user);
 		}
+
 		return $result;
 	}
 
