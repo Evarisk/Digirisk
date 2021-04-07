@@ -19,15 +19,15 @@
  */
 
 /**
- *	\file       htdocs/custom/digiriskdolibarr/core/modules/digiriskdolibarr/mod_legaldisplay_jupiter.php
- * \ingroup     digiriskdolibarr legaldisplay
- *	\brief      File containing class for numbering module Jupiter
+ *	\file       htdocs/custom/digiriskdolibarr/core/modules/digiriskdolibarr/mod_signalisation_standard.php
+ * \ingroup     digiriskdolibarr signalisation
+ *	\brief      File containing class for numbering module Standard
  */
-require_once DOL_DOCUMENT_ROOT.'/custom/digiriskdolibarr/core/modules/digiriskdolibarr/modules_legaldisplay.php';
+require_once DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/core/modules/digiriskdolibarr/modules_digirisksignalisation.php';
 /**
- * 	Class to manage legaldisplay numbering rules Jupiter
+ * 	Class to manage signalisation numbering rules Standard
  */
-class mod_legaldisplay_jupiter extends ModeleNumRefLegalDisplay
+class mod_digirisksignalisation_standard extends ModeleNumRefDigiriskSignalisation
 {
 	/**
 	 * Dolibarr version of the loaded document
@@ -35,25 +35,12 @@ class mod_legaldisplay_jupiter extends ModeleNumRefLegalDisplay
 	 */
 	public $version = 'dolibarr'; // 'development', 'experimental', 'dolibarr'
 
-	public $prefixlegaldisplay = 'legaldisplay';
+	public $prefixsignalisation = 'S';
 
 	/**
 	 * @var string Error code (or message)
 	 */
 	public $error = '';
-
-
-	/**
-	 * Constructor
-	 */
-	public function __construct()
-	{
-		global $db;
-		$now = $db->idate(dol_now());
-		$nowDate = str_replace(':','-', $now);
-		$nowDate = str_replace(' ','_', $nowDate);
-		$this->prefixlegaldisplay =  $this->prefixlegaldisplay . '_' . $nowDate;
-	}
 
 	/**
 	 *  Returns the description of the numbering model
@@ -64,7 +51,7 @@ class mod_legaldisplay_jupiter extends ModeleNumRefLegalDisplay
 	{
 		global $langs;
 		$langs->load("digiriskdolibarr@digiriskdolibarr");
-		return $langs->trans('DigiriskLegalDisplayJupiterModel', $this->prefixlegaldisplay);
+		return $langs->trans('DigiriskSignalisationStandardModel', $this->prefixsignalisation);
 	}
 
 	/**
@@ -74,16 +61,38 @@ class mod_legaldisplay_jupiter extends ModeleNumRefLegalDisplay
 	 */
 	public function getExample()
 	{
-		return $this->prefixlegaldisplay;
+		return $this->prefixsignalisation."1";
 	}
-
 	/**
-	 *  Checks if the numbers already in the database do not
-	 *  cause conflicts that would prevent this numbering working.
+	 * Return next value not used or last value used
 	 *
-	 *  @return     boolean     false if conflict, true if ok
 	 */
+	public function getNextValue($object)
+	{
+		global $db, $conf;
 
+		require_once DOL_DOCUMENT_ROOT . '/core/lib/functions2.lib.php';
+
+		// On defini critere recherche compteur
+		$mask = $conf->global->SIGNALISATION_STANDARD_MASK;
+
+		if (!$mask)
+		{
+			$this->error = 'NotConfigured';
+			return 0;
+		}
+
+		// Get entities
+		$entity = $conf->entity;
+
+		$date = dol_now();
+
+		$numFinal = get_next_value($db, $mask, 'digiriskdolibarr_digirisksignalisation', 'ref','', $object, $date, 'next', false, null, $entity);
+
+
+		$this->prefixsignalisation = $numFinal;
+		return  $numFinal;
+	}
 
 	/**
 	 *  Return next free value
@@ -93,7 +102,8 @@ class mod_legaldisplay_jupiter extends ModeleNumRefLegalDisplay
 	 *  @param  string      $mode           'next' for next value or 'last' for last value
 	 *  @return string                      Next free value
 	 */
-	public function getNumRef($objsoc, $objforref, $mode = 'next')
+	public function getNumRef($objforref, $mode = 'next')
 	{
+		return $this->getNextValue($objforref, $mode);
 	}
 }

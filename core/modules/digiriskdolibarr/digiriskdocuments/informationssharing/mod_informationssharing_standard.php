@@ -1,7 +1,5 @@
 <?php
-/* Copyright (C) 2005-2008 Laurent Destailleur  <eldy@users.sourceforge.net>
- * Copyright (C) 2005-2018 Regis Houssin        <regis.houssin@inodbox.com>
- * Copyright (C) 2013      Juanjo Menent		<jmenent@2byte.es>
+/* Copyright (C) 2021 EOXIA <dev@eoxia.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,15 +17,17 @@
  */
 
 /**
- *	\file       htdocs/custom/digiriskdolibarr/core/modules/digiriskdolibarr/mod_groupment_standard.php
- * \ingroup     digiriskdolibarr groupment
+ *	\file       htdocs/custom/digiriskdolibarr/core/modules/digiriskdolibarr/mod_informationssharing_standard.php
+ * \ingroup     digiriskdolibarr
  *	\brief      File containing class for numbering module Standard
  */
-require_once DOL_DOCUMENT_ROOT.'/custom/digiriskdolibarr/core/modules/digiriskdolibarr/modules_digiriskelement.php';
+
+dol_include_once('/custom/digiriskdolibarr/core/modules/digiriskdolibarr/digiriskdocuments/modules_digiriskdocuments.php');
+
 /**
- * 	Class to manage groupment numbering rules Standard
+ * 	Class to manage informationssharing numbering rules Standard
  */
-class mod_groupment_standard extends ModeleNumRefDigiriskElement
+class mod_informationssharing_standard extends ModeleNumRefDigiriskDocuments
 {
 	/**
 	 * Dolibarr version of the loaded document
@@ -35,7 +35,15 @@ class mod_groupment_standard extends ModeleNumRefDigiriskElement
 	 */
 	public $version = 'dolibarr'; // 'development', 'experimental', 'dolibarr'
 
-	public $prefixgroupment = 'GP';
+	/**
+	 * @var string document prefix
+	 */
+	public $prefix = 'IS';
+
+	/**
+	 * @var string model name
+	 */
+	public $name = 'Rhéa';
 
 	/**
 	 * @var string Error code (or message)
@@ -51,7 +59,7 @@ class mod_groupment_standard extends ModeleNumRefDigiriskElement
 	{
 		global $langs;
 		$langs->load("digiriskdolibarr@digiriskdolibarr");
-		return $langs->trans('DigiriskGroupmentStandardModel', $this->prefixgroupment);
+		return $langs->trans('DigiriskInformationsSharingStandardModel', $this->prefix);
 	}
 
 	/**
@@ -61,9 +69,7 @@ class mod_groupment_standard extends ModeleNumRefDigiriskElement
 	 */
 	public function getExample()
 	{
-		global $conf;
-
-		return $this->prefixgroupment."1";
+		return $this->prefix."1";
 	}
 
 	/**
@@ -72,20 +78,17 @@ class mod_groupment_standard extends ModeleNumRefDigiriskElement
 	 *  @param  Object		$object		Object we need next value for
 	 *  @return string      			Value if KO, <0 if KO
 	 */
-	public function getNextValue($object)
+	public function getNextValue($object, $version = 0)
 	{
 		global $db, $conf;
 
 		// first we get the max value
-		$posindice = strlen($this->prefixgroupment) + 1;
+		$posindice = strlen($this->prefix) + 1;
 		$sql = "SELECT MAX(CAST(SUBSTRING(ref FROM ".$posindice.") AS SIGNED)) as max";
-		$sql .= " FROM ".MAIN_DB_PREFIX."digiriskdolibarr_digiriskelement";
-		$sql .= " WHERE ref LIKE '".$db->escape($this->prefixgroupment)."%'";
+		$sql .= " FROM ".MAIN_DB_PREFIX."digiriskdolibarr_digiriskdocuments";
+		$sql .= " WHERE ref LIKE '".$db->escape($this->prefix)."%'";
 		if ($object->ismultientitymanaged == 1) {
 			$sql .= " AND entity = ".$conf->entity;
-		}
-		elseif ($object->ismultientitymanaged == 2) {
-			// TODO
 		}
 
 		$resql = $db->query($sql);
@@ -97,29 +100,14 @@ class mod_groupment_standard extends ModeleNumRefDigiriskElement
 		}
 		else
 		{
-			dol_syslog("mod_groupment_standard::getNextValue", LOG_DEBUG);
+			dol_syslog("mod_informationssharing_standard::getNextValue", LOG_DEBUG);
 			return -1;
 		}
 
 		if ($max >= (pow(10, 4) - 1)) $num = $max + 1; // If counter > 9999, we do not format on 4 chars, we take number as it is
 		else $num = sprintf("%s", $max + 1);
 
-		dol_syslog("mod_groupment_standard::getNextValue return ".$this->prefixgroupment.$num);
-		return $this->prefixgroupment.$num;
-	}
-
-
-
-	/**
-	 *  Return next free value
-	 *
-	 *  @param  Societe     $objsoc         Object third party
-	 *  @param  string      $objforref      Object for number to search
-	 *  @param  string      $mode           'next' for next value or 'last' for last value
-	 *  @return string                      Next free value
-	 */
-	public function getNumRef($objsoc, $objforref, $mode = 'next')
-	{
-		return $this->getNextValue($objsoc, $objforref, $mode);
+		dol_syslog("mod_informationssharing_standard::getNextValue return ".$this->prefix.$num);
+		return $this->prefix.$num;
 	}
 }

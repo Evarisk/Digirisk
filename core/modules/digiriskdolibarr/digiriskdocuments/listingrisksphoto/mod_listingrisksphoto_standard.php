@@ -1,7 +1,5 @@
 <?php
-/* Copyright (C) 2005-2008 Laurent Destailleur  <eldy@users.sourceforge.net>
- * Copyright (C) 2005-2018 Regis Houssin        <regis.houssin@inodbox.com>
- * Copyright (C) 2013      Juanjo Menent		<jmenent@2byte.es>
+/* Copyright (C) 2021 EOXIA <dev@eoxia.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,15 +17,17 @@
  */
 
 /**
- *	\file       htdocs/custom/digiriskdolibarr/core/modules/digiriskdolibarr/mod_legaldisplay_standard.php
- * \ingroup     digiriskdolibarr legaldisplay
+ *	\file       htdocs/custom/digiriskdolibarr/core/modules/digiriskdolibarr/mod_listingrisksphoto_standard.php
+ * \ingroup     digiriskdolibarr
  *	\brief      File containing class for numbering module Standard
  */
-require_once DOL_DOCUMENT_ROOT.'/custom/digiriskdolibarr/core/modules/digiriskdolibarr/modules_digiriskelement.php';
+
+dol_include_once('/custom/digiriskdolibarr/core/modules/digiriskdolibarr/digiriskdocuments/modules_digiriskdocuments.php');
+
 /**
- * 	Class to manage legaldisplay numbering rules Standard
+ * 	Class to manage listingrisksphoto numbering rules Standard
  */
-class mod_legaldisplay_standard extends ModeleNumRefDigiriskElement
+class mod_listingrisksphoto_standard extends ModeleNumRefDigiriskDocuments
 {
 	/**
 	 * Dolibarr version of the loaded document
@@ -35,7 +35,15 @@ class mod_legaldisplay_standard extends ModeleNumRefDigiriskElement
 	 */
 	public $version = 'dolibarr'; // 'development', 'experimental', 'dolibarr'
 
-	public $prefixlegaldisplay = 'V';
+	/**
+	 * @var string document prefix
+	 */
+	public $prefix = 'RLP';
+
+	/**
+	 * @var string model name
+	 */
+	public $name = 'Daphnis';
 
 	/**
 	 * @var string Error code (or message)
@@ -49,27 +57,19 @@ class mod_legaldisplay_standard extends ModeleNumRefDigiriskElement
 	 */
 	public function info()
 	{
-		global $langs, $db;
+		global $langs;
 		$langs->load("digiriskdolibarr@digiriskdolibarr");
-		$now = $db->idate(dol_now());
-		$nowDate = str_replace(':','-', $now);
-		$nowDate = str_replace(' ','_', $nowDate);
-		return $langs->trans('DigiriskLegalDisplayStandardModel',$nowDate . '_affichage_legal_' . $this->prefixlegaldisplay);
+		return $langs->trans('DigiriskListingRisksPhotoStandardModel', $this->prefix);
 	}
 
-	/**Â
+	/**
 	 *  Return an example of numbering
 	 *
 	 *  @return     string      Example
 	 */
 	public function getExample()
 	{
-		global $conf,$db;
-		$now = $db->idate(dol_now());
-		$now = preg_split('/ /', $now);
-
-		$now = $now[0];
-		return $now . '_affichage_legal_' . $this->prefixlegaldisplay."1";
+		return $this->prefix."1";
 	}
 
 	/**
@@ -81,57 +81,33 @@ class mod_legaldisplay_standard extends ModeleNumRefDigiriskElement
 	public function getNextValue($object, $version = 0)
 	{
 		global $db, $conf;
-		$now = $db->idate(dol_now());
-		$now = preg_split('/ /', $now);
 
-		$now = $now[0];
 		// first we get the max value
-		$posindice = strlen($now . '_affichage_legal_' . $this->prefixlegaldisplay) + 1;
+		$posindice = strlen($this->prefix) + 1;
 		$sql = "SELECT MAX(CAST(SUBSTRING(ref FROM ".$posindice.") AS SIGNED)) as max";
 		$sql .= " FROM ".MAIN_DB_PREFIX."digiriskdolibarr_digiriskdocuments";
-		$sql .= " WHERE ref LIKE '".$db->escape($now . '_affichage_legal_' . $this->prefixlegaldisplay)."%'";
+		$sql .= " WHERE ref LIKE '".$db->escape($this->prefix)."%'";
 		if ($object->ismultientitymanaged == 1) {
 			$sql .= " AND entity = ".$conf->entity;
-		}
-		elseif ($object->ismultientitymanaged == 2) {
-			// TODO
 		}
 
 		$resql = $db->query($sql);
 		if ($resql)
 		{
 			$obj = $db->fetch_object($resql);
-
 			if ($obj) $max = intval($obj->max);
 			else $max = 0;
 		}
 		else
 		{
-			dol_syslog("mod_legaldisplay_standard::getNextValue", LOG_DEBUG);
+			dol_syslog("mod_listingrisksphoto_standard::getNextValue", LOG_DEBUG);
 			return -1;
 		}
 
 		if ($max >= (pow(10, 4) - 1)) $num = $max + 1; // If counter > 9999, we do not format on 4 chars, we take number as it is
 		else $num = sprintf("%s", $max + 1);
 
-		dol_syslog("mod_legaldisplay_standard::getNextValue return ".$this->prefixlegaldisplay.$num);
-
-
-			return $now . '_affichage_legal_' . $this->prefixlegaldisplay.$num;
-	}
-
-
-
-	/**
-	 *  Return next free value
-	 *
-	 *  @param  Societe     $objsoc         Object third party
-	 *  @param  string      $objforref      Object for number to search
-	 *  @param  string      $mode           'next' for next value or 'last' for last value
-	 *  @return string                      Next free value
-	 */
-	public function getNumRef($objsoc, $objforref, $mode = 'next')
-	{
-		return $this->getNextValue($objsoc, $objforref, $mode);
+		dol_syslog("mod_listingrisksphoto_standard::getNextValue return ".$this->prefix.$num);
+		return $this->prefix.$num;
 	}
 }
