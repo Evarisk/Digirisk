@@ -30,15 +30,15 @@
 
 dol_include_once('/custom/digiriskdolibarr/lib/files.lib.php');
 dol_include_once('/core/lib/files.lib.php');
-require_once DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/core/modules/digiriskdolibarr/modules_legaldisplay.php';
-require_once DOL_DOCUMENT_ROOT.'/core/lib/company.lib.php';
-require_once DOL_DOCUMENT_ROOT.'/core/lib/functions2.lib.php';
-require_once DOL_DOCUMENT_ROOT.'/core/lib/files.lib.php';
-require_once DOL_DOCUMENT_ROOT.'/core/lib/doc.lib.php';
+require_once DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/core/modules/digiriskdolibarr/digiriskdocuments/preventionplan/modules_preventionplan.php';
+require_once DOL_DOCUMENT_ROOT . '/core/lib/company.lib.php';
+require_once DOL_DOCUMENT_ROOT . '/core/lib/functions2.lib.php';
+require_once DOL_DOCUMENT_ROOT . '/core/lib/files.lib.php';
+require_once DOL_DOCUMENT_ROOT . '/core/lib/doc.lib.php';
 /**
  *	Class to build documents using ODF templates generator
  */
-class doc_legaldisplay_custom_odt extends ModelePDFLegalDisplay
+class doc_preventionplan_custom_odt extends ModelePDFPreventionPlan
 {
 	/**
 	 * Issuer
@@ -71,9 +71,9 @@ class doc_legaldisplay_custom_odt extends ModelePDFLegalDisplay
 		$langs->loadLangs(array("main", "companies"));
 
 		$this->db = $db;
-		$this->name = $langs->trans('LegalDisplayCustomTemplate');
+		$this->name = $langs->trans('PreventionPlanCustomTemplate');
 		$this->description = $langs->trans("DocumentModelOdt");
-		$this->scandir = "DIGIRISKDOLIBARR_LEGALDISPLAY_CUSTOM_ADDON_ODT_PATH"; // Name of constant that is used to save list of directories to scan
+		$this->scandir = "DIGIRISKDOLIBARR_PREVENTIONPLAN_CUSTOM_ADDON_ODT_PATH"; // Name of constant that is used to save list of directories to scan
 
 		// Page size for A4 format
 		$this->type = 'odt';
@@ -110,13 +110,13 @@ class doc_legaldisplay_custom_odt extends ModelePDFLegalDisplay
 		$texte .= '<form action="'.$_SERVER["PHP_SELF"].'" method="POST" enctype="multipart/form-data">';
 		$texte .= '<input type="hidden" name="token" value="'.newToken().'">';
 		$texte .= '<input type="hidden" name="action" value="setModuleOptions">';
-		$texte .= '<input type="hidden" name="param1" value="DIGIRISKDOLIBARR_LEGALDISPLAY_CUSTOM_ADDON_ODT_PATH">';
+		$texte .= '<input type="hidden" name="param1" value="DIGIRISKDOLIBARR_PREVENTIONPLAN_CUSTOM_ADDON_ODT_PATH">';
 		$texte .= '<table class="nobordernopadding" width="100%">';
 
 		// List of directories area
 		$texte .= '<tr><td valign="middle">';
 		$texttitle = $langs->trans("ListOfDirectories");
-		$listofdir = explode(',', preg_replace('/[\r\n]+/', ',', trim($conf->global->DIGIRISKDOLIBARR_LEGALDISPLAY_CUSTOM_ADDON_ODT_PATH)));
+		$listofdir = explode(',', preg_replace('/[\r\n]+/', ',', trim($conf->global->DIGIRISKDOLIBARR_PREVENTIONPLAN_CUSTOM_ADDON_ODT_PATH)));
 		$listoffiles = array();
 
 		foreach ($listofdir as $key=>$tmpdir)
@@ -141,7 +141,7 @@ class doc_legaldisplay_custom_odt extends ModelePDFLegalDisplay
 		$texte .= $form->textwithpicto($texttitle, $texthelp, 1, 'help', '', 1);
 		$texte .= '<div><div style="display: inline-block; min-width: 100px; vertical-align: middle;">';
 		$texte .= '<textarea class="flat" cols="60" name="value1">';
-		$texte .= $conf->global->DIGIRISKDOLIBARR_LEGALDISPLAY_CUSTOM_ADDON_ODT_PATH;
+		$texte .= $conf->global->DIGIRISKDOLIBARR_PREVENTIONPLAN_CUSTOM_ADDON_ODT_PATH;
 		$texte .= '</textarea>';
 		$texte .= '</div><div style="display: inline-block; vertical-align: middle;">';
 		$texte .= '<input type="submit" class="button" value="'.$langs->trans("Modify").'" name="Button">';
@@ -149,7 +149,7 @@ class doc_legaldisplay_custom_odt extends ModelePDFLegalDisplay
 
 		// Scan directories
 		$nbofiles = count($listoffiles);
-		if (!empty($conf->global->DIGIRISKDOLIBARR_LEGALDISPLAY_CUSTOM_ADDON_ODT_PATH))
+		if (!empty($conf->global->DIGIRISKDOLIBARR_PREVENTIONPLAN_CUSTOM_ADDON_ODT_PATH))
 		{
 			$texte .= $langs->trans("NumberOfModelFilesFound").': <b>';
 			//$texte.=$nbofiles?'<a id="a_'.get_class($this).'" href="#">':'';
@@ -168,7 +168,7 @@ class doc_legaldisplay_custom_odt extends ModelePDFLegalDisplay
 		}
 		// Add input to upload a new template file.
 		$texte .= '<div>'.$langs->trans("UploadNewTemplate").' <input type="file" name="uploadfile">';
-		$texte .= '<input type="hidden" value="DIGIRISKDOLIBARR_LEGALDISPLAY_CUSTOM_ADDON_ODT_PATH" name="keyforuploaddir">';
+		$texte .= '<input type="hidden" value="DIGIRISKDOLIBARR_PREVENTIONPLAN_CUSTOM_ADDON_ODT_PATH" name="keyforuploaddir">';
 		$texte .= '<input type="submit" class="button" value="'.dol_escape_htmltag($langs->trans("Upload")).'" name="upload">';
 		$texte .= '</div>';
 		$texte .= '</td>';
@@ -212,7 +212,7 @@ class doc_legaldisplay_custom_odt extends ModelePDFLegalDisplay
 		// Add odtgeneration hook
 		if (!is_object($hookmanager))
 		{
-			include_once DOL_DOCUMENT_ROOT.'/core/class/hookmanager.class.php';
+			include_once DOL_DOCUMENT_ROOT . '/core/class/hookmanager.class.php';
 			$hookmanager = new HookManager($this->db);
 		}
 		$hookmanager->initHooks(array('odtgeneration'));
@@ -225,11 +225,20 @@ class doc_legaldisplay_custom_odt extends ModelePDFLegalDisplay
 		$outputlangs->loadLangs(array("main", "dict", "companies", "bills"));
 
 
-		$legaldisplay = new LegalDisplay($this->db);
-		$legaldisplay->create($user);
+		// If $object is id instead of object
+		if (!is_object($object))
+		{
+			$id = $object;
+			$object = new PreventionPlan($this->db);
+			$result = $object->fetch($id);
+			if ($result < 0)
+			{
+				dol_print_error($this->db, $object->error);
+				return -1;
+			}
+		}
 
-		$dir = $conf->digiriskdolibarr->multidir_output[isset($conf->entity) ? $conf->entity : 1] . '/legaldisplay';
-
+		$dir = $conf->digiriskdolibarr->multidir_output[isset($object->entity) ? $object->entity : 1] . '/preventionplan';
 		$objectref = dol_sanitizeFileName($object->ref);
 		if (!preg_match('/specimen/i', $objectref)) $dir .= '/' . $objectref;
 
@@ -268,7 +277,7 @@ class doc_legaldisplay_custom_odt extends ModelePDFLegalDisplay
 
 				$filename = $objectref.'.'.$newfileformat;
 
-				$filename = dol_print_date(dol_now(),'%Y%m%d') . (strlen($objectref) ? '_' . $objectref : '') . '_affichage_legal_custom' . (strlen($objectlabel) ? $objectlabel : 'global') . '.' . $newfileformat;
+				$filename = $objectref . '_custom.' . $newfileformat;
 
 			}
 			$object->last_main_doc = $filename;
@@ -385,7 +394,7 @@ class doc_legaldisplay_custom_odt extends ModelePDFLegalDisplay
 			if ($usecontact && is_object($contactobject)) $array_thirdparty_contact = $this->get_substitutionarray_contact($contactobject, $outputlangs, 'contact');
 
 			$tmparray = array_merge($substitutionarray, $array_object_from_properties, $array_user, $array_soc, $array_thirdparty, $array_objet, $array_other, $array_thirdparty_contact);
-			complete_substitutions_array($tmparray, $outputlangs, $legaldisplay);
+			complete_substitutions_array($tmparray, $outputlangs, $object);
 
 			// Call the ODTSubstitution hook
 			$parameters = array('odfHandler'=>&$odfHandler, 'file'=>$file, 'object'=>$object, 'outputlangs'=>$outputlangs, 'substitutionarray'=>&$tmparray);

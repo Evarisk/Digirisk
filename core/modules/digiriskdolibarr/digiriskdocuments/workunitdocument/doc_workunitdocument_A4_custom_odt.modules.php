@@ -30,15 +30,15 @@
 
 dol_include_once('/custom/digiriskdolibarr/lib/files.lib.php');
 dol_include_once('/core/lib/files.lib.php');
-require_once DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/core/modules/digiriskdolibarr/modules_informationssharing.php';
-require_once DOL_DOCUMENT_ROOT.'/core/lib/company.lib.php';
-require_once DOL_DOCUMENT_ROOT.'/core/lib/functions2.lib.php';
-require_once DOL_DOCUMENT_ROOT.'/core/lib/files.lib.php';
-require_once DOL_DOCUMENT_ROOT.'/core/lib/doc.lib.php';
+require_once DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/core/modules/digiriskdolibarr/digiriskdocuments/workunitdocument/modules_workunitdocument.php';
+require_once DOL_DOCUMENT_ROOT . '/core/lib/company.lib.php';
+require_once DOL_DOCUMENT_ROOT . '/core/lib/functions2.lib.php';
+require_once DOL_DOCUMENT_ROOT . '/core/lib/files.lib.php';
+require_once DOL_DOCUMENT_ROOT . '/core/lib/doc.lib.php';
 /**
  *	Class to build documents using ODF templates generator
  */
-class doc_informationssharing_custom_odt extends ModelePDFInformationsSharing
+class doc_workunitdocument_A4_custom_odt extends ModelePDFWorkUnitDocument
 {
 	/**
 	 * Issuer
@@ -71,9 +71,9 @@ class doc_informationssharing_custom_odt extends ModelePDFInformationsSharing
 		$langs->loadLangs(array("main", "companies"));
 
 		$this->db = $db;
-		$this->name = $langs->trans('InformationsSharingCustomTemplate');
+		$this->name = $langs->trans('WorkUnitCustomTemplate');
 		$this->description = $langs->trans("DocumentModelOdt");
-		$this->scandir = "DIGIRISKDOLIBARR_INFORMATIONSSHARING_CUSTOM_ADDON_ODT_PATH"; // Name of constant that is used to save list of directories to scan
+		$this->scandir = "DIGIRISKDOLIBARR_WORKUNIT_CUSTOM_ADDON_ODT_PATH"; // Name of constant that is used to save list of directories to scan
 
 		// Page size for A4 format
 		$this->type = 'odt';
@@ -110,13 +110,13 @@ class doc_informationssharing_custom_odt extends ModelePDFInformationsSharing
 		$texte .= '<form action="'.$_SERVER["PHP_SELF"].'" method="POST" enctype="multipart/form-data">';
 		$texte .= '<input type="hidden" name="token" value="'.newToken().'">';
 		$texte .= '<input type="hidden" name="action" value="setModuleOptions">';
-		$texte .= '<input type="hidden" name="param1" value="DIGIRISKDOLIBARR_INFORMATIONSSHARING_CUSTOM_ADDON_ODT_PATH">';
+		$texte .= '<input type="hidden" name="param1" value="DIGIRISKDOLIBARR_WORKUNIT_CUSTOM_ADDON_ODT_PATH">';
 		$texte .= '<table class="nobordernopadding" width="100%">';
 
 		// List of directories area
 		$texte .= '<tr><td valign="middle">';
 		$texttitle = $langs->trans("ListOfDirectories");
-		$listofdir = explode(',', preg_replace('/[\r\n]+/', ',', trim($conf->global->DIGIRISKDOLIBARR_INFORMATIONSSHARING_CUSTOM_ADDON_ODT_PATH)));
+		$listofdir = explode(',', preg_replace('/[\r\n]+/', ',', trim($conf->global->DIGIRISKDOLIBARR_WORKUNIT_CUSTOM_ADDON_ODT_PATH)));
 		$listoffiles = array();
 
 		foreach ($listofdir as $key=>$tmpdir)
@@ -141,7 +141,7 @@ class doc_informationssharing_custom_odt extends ModelePDFInformationsSharing
 		$texte .= $form->textwithpicto($texttitle, $texthelp, 1, 'help', '', 1);
 		$texte .= '<div><div style="display: inline-block; min-width: 100px; vertical-align: middle;">';
 		$texte .= '<textarea class="flat" cols="60" name="value1">';
-		$texte .= $conf->global->DIGIRISKDOLIBARR_INFORMATIONSSHARING_CUSTOM_ADDON_ODT_PATH;
+		$texte .= $conf->global->DIGIRISKDOLIBARR_WORKUNIT_CUSTOM_ADDON_ODT_PATH;
 		$texte .= '</textarea>';
 		$texte .= '</div><div style="display: inline-block; vertical-align: middle;">';
 		$texte .= '<input type="submit" class="button" value="'.$langs->trans("Modify").'" name="Button">';
@@ -149,7 +149,7 @@ class doc_informationssharing_custom_odt extends ModelePDFInformationsSharing
 
 		// Scan directories
 		$nbofiles = count($listoffiles);
-		if (!empty($conf->global->DIGIRISKDOLIBARR_INFORMATIONSSHARING_CUSTOM_ADDON_ODT_PATH))
+		if (!empty($conf->global->DIGIRISKDOLIBARR_WORKUNIT_CUSTOM_ADDON_ODT_PATH))
 		{
 			$texte .= $langs->trans("NumberOfModelFilesFound").': <b>';
 			//$texte.=$nbofiles?'<a id="a_'.get_class($this).'" href="#">':'';
@@ -168,7 +168,7 @@ class doc_informationssharing_custom_odt extends ModelePDFInformationsSharing
 		}
 		// Add input to upload a new template file.
 		$texte .= '<div>'.$langs->trans("UploadNewTemplate").' <input type="file" name="uploadfile">';
-		$texte .= '<input type="hidden" value="DIGIRISKDOLIBARR_INFORMATIONSSHARING_CUSTOM_ADDON_ODT_PATH" name="keyforuploaddir">';
+		$texte .= '<input type="hidden" value="DIGIRISKDOLIBARR_WORKUNIT_CUSTOM_ADDON_ODT_PATH" name="keyforuploaddir">';
 		$texte .= '<input type="submit" class="button" value="'.dol_escape_htmltag($langs->trans("Upload")).'" name="upload">';
 		$texte .= '</div>';
 		$texte .= '</td>';
@@ -212,7 +212,7 @@ class doc_informationssharing_custom_odt extends ModelePDFInformationsSharing
 		// Add odtgeneration hook
 		if (!is_object($hookmanager))
 		{
-			include_once DOL_DOCUMENT_ROOT.'/core/class/hookmanager.class.php';
+			include_once DOL_DOCUMENT_ROOT . '/core/class/hookmanager.class.php';
 			$hookmanager = new HookManager($this->db);
 		}
 		$hookmanager->initHooks(array('odtgeneration'));
@@ -229,7 +229,7 @@ class doc_informationssharing_custom_odt extends ModelePDFInformationsSharing
 		if (!is_object($object))
 		{
 			$id = $object;
-			$object = new InformationsSharing($this->db);
+			$object = new WorkUnit($this->db);
 			$result = $object->fetch($id);
 			if ($result < 0)
 			{
@@ -238,7 +238,7 @@ class doc_informationssharing_custom_odt extends ModelePDFInformationsSharing
 			}
 		}
 
-		$dir = $conf->digiriskdolibarr->multidir_output[isset($object->entity) ? $object->entity : 1] . '/informationssharing';
+		$dir = $conf->digiriskdolibarr->multidir_output[isset($object->entity) ? $object->entity : 1] . '/workunit_A4';
 		$objectref = dol_sanitizeFileName($object->ref);
 		if (!preg_match('/specimen/i', $objectref)) $dir .= '/' . $objectref;
 

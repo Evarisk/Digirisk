@@ -30,15 +30,14 @@
 
 dol_include_once('/custom/digiriskdolibarr/lib/files.lib.php');
 dol_include_once('/core/lib/files.lib.php');
-require_once DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/core/modules/digiriskdolibarr/modules_firepermit.php';
-require_once DOL_DOCUMENT_ROOT.'/core/lib/company.lib.php';
-require_once DOL_DOCUMENT_ROOT.'/core/lib/functions2.lib.php';
-require_once DOL_DOCUMENT_ROOT.'/core/lib/files.lib.php';
-require_once DOL_DOCUMENT_ROOT.'/core/lib/doc.lib.php';
+require_once DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/core/modules/digiriskdolibarr/digiriskdocuments/informationssharing/modules_informationssharing.php';
+require_once DOL_DOCUMENT_ROOT . '/core/lib/company.lib.php';
+require_once DOL_DOCUMENT_ROOT . '/core/lib/doc.lib.php';
+
 /**
  *	Class to build documents using ODF templates generator
  */
-class doc_firepermit_custom_odt extends ModelePDFFirePermit
+class doc_informationssharing_A4_odt extends ModelePDFInformationsSharing
 {
 	/**
 	 * Issuer
@@ -71,9 +70,9 @@ class doc_firepermit_custom_odt extends ModelePDFFirePermit
 		$langs->loadLangs(array("main", "companies"));
 
 		$this->db = $db;
-		$this->name = $langs->trans('FirePermitCustomTemplate');
+		$this->name = $langs->trans('InformationsSharingDigiriskTemplate');
 		$this->description = $langs->trans("DocumentModelOdt");
-		$this->scandir = "DIGIRISKDOLIBARR_FIREPERMIT_CUSTOM_ADDON_ODT_PATH"; // Name of constant that is used to save list of directories to scan
+		$this->scandir = 'DIGIRISKDOLIBARR_INFORMATIONSSHARING_ADDON_ODT_PATH'; // Name of constant that is used to save list of directories to scan
 
 		// Page size for A4 format
 		$this->type = 'odt';
@@ -105,20 +104,18 @@ class doc_firepermit_custom_odt extends ModelePDFFirePermit
 		$langs->loadLangs(array("errors", "companies"));
 
 		$form = new Form($this->db);
-
 		$texte = $this->description.".<br>\n";
-		$texte .= '<form action="'.$_SERVER["PHP_SELF"].'" method="POST" enctype="multipart/form-data">';
+		$texte .= '<form action="'.$_SERVER["PHP_SELF"].'" method="POST">';
 		$texte .= '<input type="hidden" name="token" value="'.newToken().'">';
 		$texte .= '<input type="hidden" name="action" value="setModuleOptions">';
-		$texte .= '<input type="hidden" name="param1" value="DIGIRISKDOLIBARR_FIREPERMIT_CUSTOM_ADDON_ODT_PATH">';
+		$texte .= '<input type="hidden" name="param1" value="DIGIRISKDOLIBARR_INFORMATIONSSHARING_ADDON_ODT_PATH">';
 		$texte .= '<table class="nobordernopadding" width="100%">';
 
 		// List of directories area
-		$texte .= '<tr><td valign="middle">';
+		$texte .= '<tr><td>';
 		$texttitle = $langs->trans("ListOfDirectories");
-		$listofdir = explode(',', preg_replace('/[\r\n]+/', ',', trim($conf->global->DIGIRISKDOLIBARR_FIREPERMIT_CUSTOM_ADDON_ODT_PATH)));
+		$listofdir = explode(',', preg_replace('/[\r\n]+/', ',', trim($conf->global->DIGIRISKDOLIBARR_INFORMATIONSSHARING_ADDON_ODT_PATH)));
 		$listoffiles = array();
-
 		foreach ($listofdir as $key=>$tmpdir)
 		{
 			$tmpdir = trim($tmpdir);
@@ -133,30 +130,19 @@ class doc_firepermit_custom_odt extends ModelePDFFirePermit
 				if (count($tmpfiles)) $listoffiles = array_merge($listoffiles, $tmpfiles);
 			}
 		}
-		$texthelp = $langs->trans("ListOfDirectoriesForModelGenODT");
-		// Add list of substitution keys
-		$texthelp .= '<br>'.$langs->trans("FollowingSubstitutionKeysCanBeUsed").'<br>';
-		$texthelp .= $langs->transnoentitiesnoconv("FullListOnOnlineDocumentation"); // This contains an url, we don't modify it
 
-		$texte .= $form->textwithpicto($texttitle, $texthelp, 1, 'help', '', 1);
-		$texte .= '<div><div style="display: inline-block; min-width: 100px; vertical-align: middle;">';
-		$texte .= '<textarea class="flat" cols="60" name="value1">';
-		$texte .= $conf->global->DIGIRISKDOLIBARR_FIREPERMIT_CUSTOM_ADDON_ODT_PATH;
-		$texte .= '</textarea>';
-		$texte .= '</div><div style="display: inline-block; vertical-align: middle;">';
-		$texte .= '<input type="submit" class="button" value="'.$langs->trans("Modify").'" name="Button">';
-		$texte .= '<br></div></div>';
 
 		// Scan directories
 		$nbofiles = count($listoffiles);
-		if (!empty($conf->global->DIGIRISKDOLIBARR_FIREPERMIT_CUSTOM_ADDON_ODT_PATH))
+		if (!empty($conf->global->DIGIRISKDOLIBARR_INFORMATIONSSHARING_ADDON_ODT_PATH))
 		{
-			$texte .= $langs->trans("NumberOfModelFilesFound").': <b>';
+			$texte .= $langs->trans("DigiriskNumberOfModelFilesFound").': <b>';
 			//$texte.=$nbofiles?'<a id="a_'.get_class($this).'" href="#">':'';
 			$texte .= count($listoffiles);
 			//$texte.=$nbofiles?'</a>':'';
 			$texte .= '</b>';
 		}
+
 		if ($nbofiles)
 		{
 			$texte .= '<div id="div_'.get_class($this).'" class="hidden">';
@@ -166,17 +152,10 @@ class doc_firepermit_custom_odt extends ModelePDFFirePermit
 			}
 			$texte .= '</div>';
 		}
-		// Add input to upload a new template file.
-		$texte .= '<div>'.$langs->trans("UploadNewTemplate").' <input type="file" name="uploadfile">';
-		$texte .= '<input type="hidden" value="DIGIRISKDOLIBARR_FIREPERMIT_CUSTOM_ADDON_ODT_PATH" name="keyforuploaddir">';
-		$texte .= '<input type="submit" class="button" value="'.dol_escape_htmltag($langs->trans("Upload")).'" name="upload">';
-		$texte .= '</div>';
+
 		$texte .= '</td>';
 
-		$texte .= '<td rowspan="2" class="tdtop hideonsmartphone">';
-		$texte .= $langs->trans("ExampleOfDirectoriesForModelGen");
-		$texte .= '</td>';
-		$texte .= '</tr>';
+
 
 		$texte .= '</table>';
 		$texte .= '</form>';
@@ -199,7 +178,6 @@ class doc_firepermit_custom_odt extends ModelePDFFirePermit
 	public function write_file($object, $outputlangs, $srctemplatepath, $hidedetails = 0, $hidedesc = 0, $hideref = 0)
 	{
 		// phpcs:enable
-
 		global $user, $langs, $conf, $mysoc, $hookmanager;
 
 		if (empty($srctemplatepath))
@@ -208,11 +186,10 @@ class doc_firepermit_custom_odt extends ModelePDFFirePermit
 			return -1;
 		}
 
-
 		// Add odtgeneration hook
 		if (!is_object($hookmanager))
 		{
-			include_once DOL_DOCUMENT_ROOT.'/core/class/hookmanager.class.php';
+			include_once DOL_DOCUMENT_ROOT . '/core/class/hookmanager.class.php';
 			$hookmanager = new HookManager($this->db);
 		}
 		$hookmanager->initHooks(array('odtgeneration'));
@@ -225,20 +202,14 @@ class doc_firepermit_custom_odt extends ModelePDFFirePermit
 		$outputlangs->loadLangs(array("main", "dict", "companies", "bills"));
 
 
-		// If $object is id instead of object
-		if (!is_object($object))
-		{
-			$id = $object;
-			$object = new FirePermit($this->db);
-			$result = $object->fetch($id);
-			if ($result < 0)
-			{
-				dol_print_error($this->db, $object->error);
-				return -1;
-			}
-		}
+		$informationssharing = new InformationsSharing($this->db);
+		$mod = new $conf->global->DIGIRISKDOLIBARR_INFORMATIONSSHARING_ADDON($this->db);
+		$ref = $mod->getNextValue($informationssharing);
 
-		$dir = $conf->digiriskdolibarr->multidir_output[isset($object->entity) ? $object->entity : 1] . '/firepermit';
+		$informationssharing->ref = $ref;
+		$informationssharing->create($user);
+
+		$dir = $conf->digiriskdolibarr->multidir_output[isset($conf->entity) ? $conf->entity : 1] . '/informationssharing';
 		$objectref = dol_sanitizeFileName($object->ref);
 		if (!preg_match('/specimen/i', $objectref)) $dir .= '/' . $objectref;
 
@@ -277,7 +248,7 @@ class doc_firepermit_custom_odt extends ModelePDFFirePermit
 
 				$filename = $objectref.'.'.$newfileformat;
 
-				$filename = $objectref . '_custom.' . $newfileformat;
+				$filename = $ref . '.odt';
 
 			}
 			$object->last_main_doc = $filename;
@@ -394,7 +365,7 @@ class doc_firepermit_custom_odt extends ModelePDFFirePermit
 			if ($usecontact && is_object($contactobject)) $array_thirdparty_contact = $this->get_substitutionarray_contact($contactobject, $outputlangs, 'contact');
 
 			$tmparray = array_merge($substitutionarray, $array_object_from_properties, $array_user, $array_soc, $array_thirdparty, $array_objet, $array_other, $array_thirdparty_contact);
-			complete_substitutions_array($tmparray, $outputlangs, $object);
+			complete_substitutions_array($tmparray, $outputlangs, $informationssharing);
 
 			// Call the ODTSubstitution hook
 			$parameters = array('odfHandler'=>&$odfHandler, 'file'=>$file, 'object'=>$object, 'outputlangs'=>$outputlangs, 'substitutionarray'=>&$tmparray);

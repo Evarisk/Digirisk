@@ -30,15 +30,17 @@
 
 dol_include_once('/custom/digiriskdolibarr/lib/files.lib.php');
 dol_include_once('/core/lib/files.lib.php');
-require_once DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/core/modules/digiriskdolibarr/modules_preventionplan.php';
-require_once DOL_DOCUMENT_ROOT.'/core/lib/company.lib.php';
-require_once DOL_DOCUMENT_ROOT.'/core/lib/functions2.lib.php';
-require_once DOL_DOCUMENT_ROOT.'/core/lib/files.lib.php';
-require_once DOL_DOCUMENT_ROOT.'/core/lib/doc.lib.php';
+dol_include_once('/digiriskdolibarr/class/risk.class.php');
+dol_include_once('/digiriskdolibarr/class/digiriskevaluation.class.php');
+dol_include_once('/digiriskdolibarr/class/digirisksignalisation.class.php');
+require_once DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/core/modules/digiriskdolibarr/digiriskdocuments/groupmentdocument/modules_groupmentdocument.php';
+require_once DOL_DOCUMENT_ROOT . '/core/lib/company.lib.php';
+require_once DOL_DOCUMENT_ROOT . '/core/lib/doc.lib.php';
+
 /**
  *	Class to build documents using ODF templates generator
  */
-class doc_preventionplan_custom_odt extends ModelePDFPreventionPlan
+class doc_groupmentdocument_A4_odt extends ModelePDFGroupmentDocument
 {
 	/**
 	 * Issuer
@@ -71,9 +73,9 @@ class doc_preventionplan_custom_odt extends ModelePDFPreventionPlan
 		$langs->loadLangs(array("main", "companies"));
 
 		$this->db = $db;
-		$this->name = $langs->trans('PreventionPlanCustomTemplate');
+		$this->name = $langs->trans('GroupmentDigiriskTemplate');
 		$this->description = $langs->trans("DocumentModelOdt");
-		$this->scandir = "DIGIRISKDOLIBARR_PREVENTIONPLAN_CUSTOM_ADDON_ODT_PATH"; // Name of constant that is used to save list of directories to scan
+		$this->scandir = 'DIGIRISKDOLIBARR_GROUPMENT_ADDON_ODT_PATH'; // Name of constant that is used to save list of directories to scan
 
 		// Page size for A4 format
 		$this->type = 'odt';
@@ -105,20 +107,18 @@ class doc_preventionplan_custom_odt extends ModelePDFPreventionPlan
 		$langs->loadLangs(array("errors", "companies"));
 
 		$form = new Form($this->db);
-
 		$texte = $this->description.".<br>\n";
-		$texte .= '<form action="'.$_SERVER["PHP_SELF"].'" method="POST" enctype="multipart/form-data">';
+		$texte .= '<form action="'.$_SERVER["PHP_SELF"].'" method="POST">';
 		$texte .= '<input type="hidden" name="token" value="'.newToken().'">';
 		$texte .= '<input type="hidden" name="action" value="setModuleOptions">';
-		$texte .= '<input type="hidden" name="param1" value="DIGIRISKDOLIBARR_PREVENTIONPLAN_CUSTOM_ADDON_ODT_PATH">';
+		$texte .= '<input type="hidden" name="param1" value="DIGIRISKDOLIBARR_GROUPMENT_ADDON_ODT_PATH">';
 		$texte .= '<table class="nobordernopadding" width="100%">';
 
 		// List of directories area
-		$texte .= '<tr><td valign="middle">';
+		$texte .= '<tr><td>';
 		$texttitle = $langs->trans("ListOfDirectories");
-		$listofdir = explode(',', preg_replace('/[\r\n]+/', ',', trim($conf->global->DIGIRISKDOLIBARR_PREVENTIONPLAN_CUSTOM_ADDON_ODT_PATH)));
+		$listofdir = explode(',', preg_replace('/[\r\n]+/', ',', trim($conf->global->DIGIRISKDOLIBARR_GROUPMENT_ADDON_ODT_PATH)));
 		$listoffiles = array();
-
 		foreach ($listofdir as $key=>$tmpdir)
 		{
 			$tmpdir = trim($tmpdir);
@@ -133,30 +133,19 @@ class doc_preventionplan_custom_odt extends ModelePDFPreventionPlan
 				if (count($tmpfiles)) $listoffiles = array_merge($listoffiles, $tmpfiles);
 			}
 		}
-		$texthelp = $langs->trans("ListOfDirectoriesForModelGenODT");
-		// Add list of substitution keys
-		$texthelp .= '<br>'.$langs->trans("FollowingSubstitutionKeysCanBeUsed").'<br>';
-		$texthelp .= $langs->transnoentitiesnoconv("FullListOnOnlineDocumentation"); // This contains an url, we don't modify it
 
-		$texte .= $form->textwithpicto($texttitle, $texthelp, 1, 'help', '', 1);
-		$texte .= '<div><div style="display: inline-block; min-width: 100px; vertical-align: middle;">';
-		$texte .= '<textarea class="flat" cols="60" name="value1">';
-		$texte .= $conf->global->DIGIRISKDOLIBARR_PREVENTIONPLAN_CUSTOM_ADDON_ODT_PATH;
-		$texte .= '</textarea>';
-		$texte .= '</div><div style="display: inline-block; vertical-align: middle;">';
-		$texte .= '<input type="submit" class="button" value="'.$langs->trans("Modify").'" name="Button">';
-		$texte .= '<br></div></div>';
 
 		// Scan directories
 		$nbofiles = count($listoffiles);
-		if (!empty($conf->global->DIGIRISKDOLIBARR_PREVENTIONPLAN_CUSTOM_ADDON_ODT_PATH))
+		if (!empty($conf->global->DIGIRISKDOLIBARR_GROUPMENT_ADDON_ODT_PATH))
 		{
-			$texte .= $langs->trans("NumberOfModelFilesFound").': <b>';
+			$texte .= $langs->trans("DigiriskNumberOfModelFilesFound").': <b>';
 			//$texte.=$nbofiles?'<a id="a_'.get_class($this).'" href="#">':'';
 			$texte .= count($listoffiles);
 			//$texte.=$nbofiles?'</a>':'';
 			$texte .= '</b>';
 		}
+
 		if ($nbofiles)
 		{
 			$texte .= '<div id="div_'.get_class($this).'" class="hidden">';
@@ -166,17 +155,10 @@ class doc_preventionplan_custom_odt extends ModelePDFPreventionPlan
 			}
 			$texte .= '</div>';
 		}
-		// Add input to upload a new template file.
-		$texte .= '<div>'.$langs->trans("UploadNewTemplate").' <input type="file" name="uploadfile">';
-		$texte .= '<input type="hidden" value="DIGIRISKDOLIBARR_PREVENTIONPLAN_CUSTOM_ADDON_ODT_PATH" name="keyforuploaddir">';
-		$texte .= '<input type="submit" class="button" value="'.dol_escape_htmltag($langs->trans("Upload")).'" name="upload">';
-		$texte .= '</div>';
+
 		$texte .= '</td>';
 
-		$texte .= '<td rowspan="2" class="tdtop hideonsmartphone">';
-		$texte .= $langs->trans("ExampleOfDirectoriesForModelGen");
-		$texte .= '</td>';
-		$texte .= '</tr>';
+
 
 		$texte .= '</table>';
 		$texte .= '</form>';
@@ -199,7 +181,6 @@ class doc_preventionplan_custom_odt extends ModelePDFPreventionPlan
 	public function write_file($object, $outputlangs, $srctemplatepath, $hidedetails = 0, $hidedesc = 0, $hideref = 0)
 	{
 		// phpcs:enable
-
 		global $user, $langs, $conf, $mysoc, $hookmanager;
 
 		if (empty($srctemplatepath))
@@ -208,11 +189,10 @@ class doc_preventionplan_custom_odt extends ModelePDFPreventionPlan
 			return -1;
 		}
 
-
 		// Add odtgeneration hook
 		if (!is_object($hookmanager))
 		{
-			include_once DOL_DOCUMENT_ROOT.'/core/class/hookmanager.class.php';
+			include_once DOL_DOCUMENT_ROOT . '/core/class/hookmanager.class.php';
 			$hookmanager = new HookManager($this->db);
 		}
 		$hookmanager->initHooks(array('odtgeneration'));
@@ -229,7 +209,7 @@ class doc_preventionplan_custom_odt extends ModelePDFPreventionPlan
 		if (!is_object($object))
 		{
 			$id = $object;
-			$object = new PreventionPlan($this->db);
+			$object = new DigiriskElement($this->db);
 			$result = $object->fetch($id);
 			if ($result < 0)
 			{
@@ -238,7 +218,7 @@ class doc_preventionplan_custom_odt extends ModelePDFPreventionPlan
 			}
 		}
 
-		$dir = $conf->digiriskdolibarr->multidir_output[isset($object->entity) ? $object->entity : 1] . '/preventionplan';
+		$dir = $conf->digiriskdolibarr->multidir_output[isset($object->entity) ? $object->entity : 1] . '/groupment';
 		$objectref = dol_sanitizeFileName($object->ref);
 		if (!preg_match('/specimen/i', $objectref)) $dir .= '/' . $objectref;
 
@@ -274,11 +254,9 @@ class doc_preventionplan_custom_odt extends ModelePDFPreventionPlan
 			}
 			else
 			{
-
-				$filename = $objectref.'.'.$newfileformat;
-
-				$filename = $objectref . '_custom.' . $newfileformat;
-
+				$objectlabel = dol_sanitizeFileName($object->label);
+				$objectlabel = preg_replace('/ /', '_', $objectlabel);
+				$filename = dol_print_date(dol_now(),'%Y%m%d') . '_' . $objectref . '_' . $langs->trans('GPSheet') . '_' . $objectlabel . '.' . $newfileformat;
 			}
 			$object->last_main_doc = $filename;
 
@@ -423,7 +401,10 @@ class doc_preventionplan_custom_odt extends ModelePDFPreventionPlan
 			{
 				$foundtagforlines = 1;
 				try {
-					$listlines = $odfHandler->setSegment('lines');
+//					$listlines = $odfHandler->setSegment('risq4');
+//					$listlines = $odfHandler->setSegment('risq3');
+//					$listlines = $odfHandler->setSegment('risq2');
+//					$listlines = $odfHandler->setSegment('risq1');
 				}
 				catch (OdfException $e)
 				{
@@ -434,32 +415,100 @@ class doc_preventionplan_custom_odt extends ModelePDFPreventionPlan
 				if ($foundtagforlines)
 				{
 					$linenumber = 0;
-					foreach ($object->lines as $line)
-					{
-						$linenumber++;
-						$tmparray = $this->get_substitutionarray_lines($line, $outputlangs, $linenumber);
-						complete_substitutions_array($tmparray, $outputlangs, $object, $line, "completesubstitutionarray_lines");
-						// Call the ODTSubstitutionLine hook
-						$parameters = array('odfHandler'=>&$odfHandler, 'file'=>$file, 'object'=>$object, 'outputlangs'=>$outputlangs, 'substitutionarray'=>&$tmparray, 'line'=>$line);
-						$reshook = $hookmanager->executeHooks('ODTSubstitutionLine', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
-						foreach ($tmparray as $key => $val)
-						{
-							try
-							{
-								$listlines->setVars($key, $val, true, 'UTF-8');
-							}
-							catch (OdfException $e)
-							{
-								dol_syslog($e->getMessage(), LOG_INFO);
-							}
-							catch (SegmentException $e)
-							{
-								dol_syslog($e->getMessage(), LOG_INFO);
+
+					$risk = new Risk($this->db);
+
+					if ( ! empty( $object ) ) {
+						$risks = $risk->fetchRisksOrderedByCotation($object->id);
+						if ($risks > 0 && !empty($risks)) {
+							for ($i = 1; $i <= 4; $i++ ) {
+								$listlines = $odfHandler->setSegment('risq' . $i);
+								foreach ($risks as $line) {
+										$evaluation = new DigiriskEvaluation($this->db);
+										$lastEvaluation = $evaluation->fetchFromParent($line->id, 1);
+										$lastEvaluation = array_shift($lastEvaluation);
+										$scale = $lastEvaluation->get_evaluation_scale();
+
+										if ( $scale == $i ) {
+											$tmparray['nomDanger']          = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $line->get_danger_category($line) . '.png';
+											$tmparray['identifiantRisque'] 	= $line->ref . ' - ' . $lastEvaluation->ref;
+											$tmparray['quotationRisque']    = $lastEvaluation->cotation;
+											$tmparray['commentaireRisque']  = dol_print_date( $lastEvaluation->date_creation, '%A %e %B %G %H:%M' ) . ': ' . $lastEvaluation->comment;
+
+											//$linenumber++;
+											//$tmparray = $this->get_substitutionarray_lines($line, $outputlangs, $linenumber);
+
+											unset($tmparray['object_fields']);
+
+											complete_substitutions_array($tmparray, $outputlangs, $object, $line, "completesubstitutionarray_lines");
+											// Call the ODTSubstitutionLine hook
+											$parameters = array('odfHandler' => &$odfHandler, 'file' => $file, 'object' => $object, 'outputlangs' => $outputlangs, 'substitutionarray' => &$tmparray, 'line' => $line);
+											$reshook = $hookmanager->executeHooks('ODTSubstitutionLine', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
+											foreach ($tmparray as $key => $val) {
+												try {
+													if ( $val == $tmparray['nomDanger'] ) {
+														$listlines->setImage($key, $val);
+													}
+													else {
+														$listlines->setVars($key, $val, true, 'UTF-8');
+													}
+												} catch (OdfException $e) {
+													dol_syslog($e->getMessage(), LOG_INFO);
+												} catch (SegmentException $e) {
+													dol_syslog($e->getMessage(), LOG_INFO);
+												}
+											}
+											$listlines->merge();
+										}
+									}
+								$odfHandler->mergeSegment($listlines);
 							}
 						}
-						$listlines->merge();
 					}
-					$odfHandler->mergeSegment($listlines);
+
+					$signalisation = new DigiriskSignalisation($this->db);
+
+					if ( ! empty( $object ) ) {
+						$signalisations = $signalisation->fetchFromParent($object->id);
+						if ($signalisations !== -1) {
+							$listlines = $odfHandler->setSegment('affectedRecommandation');
+
+							foreach ($signalisations as $line) {
+
+								$signalisationRef = substr($line->ref, 1);
+								$signalisationRef = ltrim($signalisationRef, '0');
+
+								$path 									= DOL_DOCUMENT_ROOT .'/custom/digiriskdolibarr/img/';
+
+								$tmparray['recommandationIcon'] 		= $path . '/' . $signalisation->get_signalisation_category($signalisation);
+								$tmparray['identifiantRecommandation'] 	= 'S'. $signalisationRef;
+								$tmparray['recommandationName'] 		= $line->get_signalisation_category($line, 'name');
+								$tmparray['recommandationComment'] 		= $line->description;
+
+								unset($tmparray['object_fields']);
+
+								complete_substitutions_array($tmparray, $outputlangs, $object, $line, "completesubstitutionarray_lines");
+								// Call the ODTSubstitutionLine hook
+								$parameters = array('odfHandler' => &$odfHandler, 'file' => $file, 'object' => $object, 'outputlangs' => $outputlangs, 'substitutionarray' => &$tmparray, 'line' => $line);
+								$reshook = $hookmanager->executeHooks('ODTSubstitutionLine', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
+								foreach ($tmparray as $key => $val) {
+									try {
+										if (file_exists($val)) {
+											$listlines->setImage($key, $val);
+										} else {
+											$listlines->setVars($key, $val, true, 'UTF-8');
+										}
+									} catch (OdfException $e) {
+										dol_syslog($e->getMessage(), LOG_INFO);
+									} catch (SegmentException $e) {
+										dol_syslog($e->getMessage(), LOG_INFO);
+									}
+								}
+								$listlines->merge();
+							}
+						}
+						$odfHandler->mergeSegment($listlines);
+					}
 				}
 			}
 			catch (OdfException $e)

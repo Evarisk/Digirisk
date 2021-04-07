@@ -1,11 +1,5 @@
 <?php
-/* Copyright (C) 2003-2004 Rodolphe Quiedeville <rodolphe@quiedeville.org>
- * Copyright (C) 2004-2011 Laurent Destailleur  <eldy@users.sourceforge.net>
- * Copyright (C) 2004      Eric Seigne          <eric.seigne@ryxeo.com>
- * Copyright (C) 2005-2012 Regis Houssin        <regis.houssin@inodbox.com>
- * Copyright (C) 2006      Andre Cianfarani     <acianfa@free.fr>
- * Copyright (C) 2012      Juanjo Menent	    <jmenent@2byte.es>
- * Copyright (C) 2014      Marcos García        <marcosgdf@gmail.com>
+/* Copyright (C) 2021 EOXIA <dev@eoxia.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,18 +17,17 @@
  */
 
 /**
- *  \file			htdocs/core/modules/digiriskdolibarr/modules_workunit.php
+ *  \file			htdocs/core/modules/digiriskdolibarr/modules_listingrisksphoto.php
  *  \ingroup		digiriskdolibarr
- *  \brief			File that contains parent class for workunits document models and parent class for workunits numbering models
+ *  \brief			File that contains parent class for listingrisksphotos document models
  */
 
 require_once DOL_DOCUMENT_ROOT . '/core/class/commondocgenerator.class.php';
-require_once DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/class/workunit.class.php'; // required for use by classes that inherit
 
 /**
  *	Parent class for documents models
  */
-abstract class ModelePDFWorkUnit extends CommonDocGenerator
+abstract class ModelePDFListingRisksPhoto extends CommonDocGenerator
 {
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
@@ -47,10 +40,7 @@ abstract class ModelePDFWorkUnit extends CommonDocGenerator
 	 */
 	public static function liste_modeles($db, $maxfilenamelength = 0)
 	{
-		// phpcs:enable
-		global $conf;
-
-		$type = 'workunit';
+		$type = 'listingrisksphoto';
 		$list = array();
 
 		include_once DOL_DOCUMENT_ROOT . '/core/lib/functions2.lib.php';

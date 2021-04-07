@@ -1,11 +1,5 @@
 <?php
-/* Copyright (C) 2003-2004 Rodolphe Quiedeville <rodolphe@quiedeville.org>
- * Copyright (C) 2004-2011 Laurent Destailleur  <eldy@users.sourceforge.net>
- * Copyright (C) 2004      Eric Seigne          <eric.seigne@ryxeo.com>
- * Copyright (C) 2005-2012 Regis Houssin        <regis.houssin@inodbox.com>
- * Copyright (C) 2006      Andre Cianfarani     <acianfa@free.fr>
- * Copyright (C) 2012      Juanjo Menent	    <jmenent@2byte.es>
- * Copyright (C) 2014      Marcos García        <marcosgdf@gmail.com>
+/* Copyright (C) 2021 EOXIA <dev@eoxia.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,49 +17,15 @@
  */
 
 /**
- *  \file			htdocs/core/modules/digiriskdolibarr/modules_digiriskelement.php
+ *  \file			htdocs/core/modules/digiriskdolibarr/modules_RiskAnalysis.php
  *  \ingroup		digiriskdolibarr
- *  \brief			File that contains parent class for digiriskelements document models and parent class for digiriskelements numbering models
+ *  \brief			File that contains parent class for RiskAnalysis numbering models
  */
-
-require_once DOL_DOCUMENT_ROOT . '/core/class/commondocgenerator.class.php';
-require_once DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/class/digiriskelement.class.php'; // required for use by classes that inherit
 
 /**
- *	Parent class for documents models
+ *  Parent class to manage numbering of RiskAnalysis
  */
-abstract class ModelePDFDigiriskElement extends CommonDocGenerator
-{
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-	/**
-	 *  Return list of active generation modules
-	 *
-	 *  @param	DoliDB	$db     			Database handler
-	 *  @param  integer	$maxfilenamelength  Max length of value to show
-	 *  @return	array						List of templates
-	 */
-	public static function liste_modeles($db, $maxfilenamelength = 0)
-	{
-		// phpcs:enable
-		global $conf;
-
-		$type = 'digiriskelement';
-		$list = array();
-
-		include_once DOL_DOCUMENT_ROOT . '/core/lib/functions2.lib.php';
-		$list = getListOfModels($db, $type, $maxfilenamelength);
-
-		return $list;
-	}
-}
-
-
-
-/**
- *  Parent class to manage numbering of DigiriskElement
- */
-abstract class ModeleNumRefDigiriskElement
+abstract class ModeleNumRefRiskAnalysis
 {
 	/**
 	 * @var string Error code (or message)

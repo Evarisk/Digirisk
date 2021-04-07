@@ -30,15 +30,14 @@
 
 dol_include_once('/custom/digiriskdolibarr/lib/files.lib.php');
 dol_include_once('/core/lib/files.lib.php');
-require_once DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/core/modules/digiriskdolibarr/modules_workunit.php';
-require_once DOL_DOCUMENT_ROOT.'/core/lib/company.lib.php';
-require_once DOL_DOCUMENT_ROOT.'/core/lib/functions2.lib.php';
-require_once DOL_DOCUMENT_ROOT.'/core/lib/files.lib.php';
-require_once DOL_DOCUMENT_ROOT.'/core/lib/doc.lib.php';
+require_once DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/core/modules/digiriskdolibarr/digiriskdocuments/firepermit/modules_firepermit.php';
+require_once DOL_DOCUMENT_ROOT . '/core/lib/company.lib.php';
+require_once DOL_DOCUMENT_ROOT . '/core/lib/doc.lib.php';
+
 /**
  *	Class to build documents using ODF templates generator
  */
-class doc_workunit_A4_custom_odt extends ModelePDFWorkUnit
+class doc_firepermit_A4_odt extends ModelePDFFirePermit
 {
 	/**
 	 * Issuer
@@ -71,9 +70,9 @@ class doc_workunit_A4_custom_odt extends ModelePDFWorkUnit
 		$langs->loadLangs(array("main", "companies"));
 
 		$this->db = $db;
-		$this->name = $langs->trans('WorkUnitCustomTemplate');
+		$this->name = $langs->trans('FirePermitDigiriskTemplate');
 		$this->description = $langs->trans("DocumentModelOdt");
-		$this->scandir = "DIGIRISKDOLIBARR_WORKUNIT_CUSTOM_ADDON_ODT_PATH"; // Name of constant that is used to save list of directories to scan
+		$this->scandir = 'DIGIRISKDOLIBARR_FIREPERMIT_ADDON_ODT_PATH'; // Name of constant that is used to save list of directories to scan
 
 		// Page size for A4 format
 		$this->type = 'odt';
@@ -105,20 +104,18 @@ class doc_workunit_A4_custom_odt extends ModelePDFWorkUnit
 		$langs->loadLangs(array("errors", "companies"));
 
 		$form = new Form($this->db);
-
 		$texte = $this->description.".<br>\n";
-		$texte .= '<form action="'.$_SERVER["PHP_SELF"].'" method="POST" enctype="multipart/form-data">';
+		$texte .= '<form action="'.$_SERVER["PHP_SELF"].'" method="POST">';
 		$texte .= '<input type="hidden" name="token" value="'.newToken().'">';
 		$texte .= '<input type="hidden" name="action" value="setModuleOptions">';
-		$texte .= '<input type="hidden" name="param1" value="DIGIRISKDOLIBARR_WORKUNIT_CUSTOM_ADDON_ODT_PATH">';
+		$texte .= '<input type="hidden" name="param1" value="DIGIRISKDOLIBARR_FIREPERMIT_ADDON_ODT_PATH">';
 		$texte .= '<table class="nobordernopadding" width="100%">';
 
 		// List of directories area
-		$texte .= '<tr><td valign="middle">';
+		$texte .= '<tr><td>';
 		$texttitle = $langs->trans("ListOfDirectories");
-		$listofdir = explode(',', preg_replace('/[\r\n]+/', ',', trim($conf->global->DIGIRISKDOLIBARR_WORKUNIT_CUSTOM_ADDON_ODT_PATH)));
+		$listofdir = explode(',', preg_replace('/[\r\n]+/', ',', trim($conf->global->DIGIRISKDOLIBARR_FIREPERMIT_ADDON_ODT_PATH)));
 		$listoffiles = array();
-
 		foreach ($listofdir as $key=>$tmpdir)
 		{
 			$tmpdir = trim($tmpdir);
@@ -133,30 +130,19 @@ class doc_workunit_A4_custom_odt extends ModelePDFWorkUnit
 				if (count($tmpfiles)) $listoffiles = array_merge($listoffiles, $tmpfiles);
 			}
 		}
-		$texthelp = $langs->trans("ListOfDirectoriesForModelGenODT");
-		// Add list of substitution keys
-		$texthelp .= '<br>'.$langs->trans("FollowingSubstitutionKeysCanBeUsed").'<br>';
-		$texthelp .= $langs->transnoentitiesnoconv("FullListOnOnlineDocumentation"); // This contains an url, we don't modify it
 
-		$texte .= $form->textwithpicto($texttitle, $texthelp, 1, 'help', '', 1);
-		$texte .= '<div><div style="display: inline-block; min-width: 100px; vertical-align: middle;">';
-		$texte .= '<textarea class="flat" cols="60" name="value1">';
-		$texte .= $conf->global->DIGIRISKDOLIBARR_WORKUNIT_CUSTOM_ADDON_ODT_PATH;
-		$texte .= '</textarea>';
-		$texte .= '</div><div style="display: inline-block; vertical-align: middle;">';
-		$texte .= '<input type="submit" class="button" value="'.$langs->trans("Modify").'" name="Button">';
-		$texte .= '<br></div></div>';
 
 		// Scan directories
 		$nbofiles = count($listoffiles);
-		if (!empty($conf->global->DIGIRISKDOLIBARR_WORKUNIT_CUSTOM_ADDON_ODT_PATH))
+		if (!empty($conf->global->DIGIRISKDOLIBARR_FIREPERMIT_ADDON_ODT_PATH))
 		{
-			$texte .= $langs->trans("NumberOfModelFilesFound").': <b>';
+			$texte .= $langs->trans("DigiriskNumberOfModelFilesFound").': <b>';
 			//$texte.=$nbofiles?'<a id="a_'.get_class($this).'" href="#">':'';
 			$texte .= count($listoffiles);
 			//$texte.=$nbofiles?'</a>':'';
 			$texte .= '</b>';
 		}
+
 		if ($nbofiles)
 		{
 			$texte .= '<div id="div_'.get_class($this).'" class="hidden">';
@@ -166,17 +152,10 @@ class doc_workunit_A4_custom_odt extends ModelePDFWorkUnit
 			}
 			$texte .= '</div>';
 		}
-		// Add input to upload a new template file.
-		$texte .= '<div>'.$langs->trans("UploadNewTemplate").' <input type="file" name="uploadfile">';
-		$texte .= '<input type="hidden" value="DIGIRISKDOLIBARR_WORKUNIT_CUSTOM_ADDON_ODT_PATH" name="keyforuploaddir">';
-		$texte .= '<input type="submit" class="button" value="'.dol_escape_htmltag($langs->trans("Upload")).'" name="upload">';
-		$texte .= '</div>';
+
 		$texte .= '</td>';
 
-		$texte .= '<td rowspan="2" class="tdtop hideonsmartphone">';
-		$texte .= $langs->trans("ExampleOfDirectoriesForModelGen");
-		$texte .= '</td>';
-		$texte .= '</tr>';
+
 
 		$texte .= '</table>';
 		$texte .= '</form>';
@@ -199,7 +178,6 @@ class doc_workunit_A4_custom_odt extends ModelePDFWorkUnit
 	public function write_file($object, $outputlangs, $srctemplatepath, $hidedetails = 0, $hidedesc = 0, $hideref = 0)
 	{
 		// phpcs:enable
-
 		global $user, $langs, $conf, $mysoc, $hookmanager;
 
 		if (empty($srctemplatepath))
@@ -208,11 +186,10 @@ class doc_workunit_A4_custom_odt extends ModelePDFWorkUnit
 			return -1;
 		}
 
-
 		// Add odtgeneration hook
 		if (!is_object($hookmanager))
 		{
-			include_once DOL_DOCUMENT_ROOT.'/core/class/hookmanager.class.php';
+			include_once DOL_DOCUMENT_ROOT . '/core/class/hookmanager.class.php';
 			$hookmanager = new HookManager($this->db);
 		}
 		$hookmanager->initHooks(array('odtgeneration'));
@@ -229,7 +206,7 @@ class doc_workunit_A4_custom_odt extends ModelePDFWorkUnit
 		if (!is_object($object))
 		{
 			$id = $object;
-			$object = new WorkUnit($this->db);
+			$object = new Legaldisplay($this->db);
 			$result = $object->fetch($id);
 			if ($result < 0)
 			{
@@ -238,7 +215,7 @@ class doc_workunit_A4_custom_odt extends ModelePDFWorkUnit
 			}
 		}
 
-		$dir = $conf->digiriskdolibarr->multidir_output[isset($object->entity) ? $object->entity : 1] . '/workunit_A4';
+		$dir = $conf->digiriskdolibarr->multidir_output[isset($object->entity) ? $object->entity : 1] . '/firepermit';
 		$objectref = dol_sanitizeFileName($object->ref);
 		if (!preg_match('/specimen/i', $objectref)) $dir .= '/' . $objectref;
 
@@ -277,7 +254,7 @@ class doc_workunit_A4_custom_odt extends ModelePDFWorkUnit
 
 				$filename = $objectref.'.'.$newfileformat;
 
-				$filename = $objectref . '_custom.' . $newfileformat;
+				$filename = $objectref . '_A4' . '_V1.' . $newfileformat;
 
 			}
 			$object->last_main_doc = $filename;
