@@ -42,8 +42,8 @@ require_once DOL_DOCUMENT_ROOT.'/core/class/html.form.class.php';
 dol_include_once('/digiriskdolibarr/class/risk.class.php');
 dol_include_once('/digiriskdolibarr/class/digiriskevaluation.class.php');
 dol_include_once('/digiriskdolibarr/class/digiriskelement.class.php');
-dol_include_once('/digiriskdolibarr/core/modules/digiriskdolibarr/mod_risk_standard.php');
-dol_include_once('/digiriskdolibarr/core/modules/digiriskdolibarr/mod_riskassessment_standard.php');
+dol_include_once('/digiriskdolibarr/core/modules/digiriskdolibarr/riskanalysis/risk/mod_risk_standard.php');
+dol_include_once('/digiriskdolibarr/core/modules/digiriskdolibarr/riskanalysis/riskassessment/mod_riskassessment_standard.php');
 dol_include_once('/digiriskdolibarr/lib/digiriskdolibarr_digiriskelement.lib.php');
 dol_include_once('/digiriskdolibarr/lib/digiriskdolibarr_function.lib.php');
 
