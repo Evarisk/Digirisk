@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2021 SuperAdmin
+/* Copyright (C) 2021 EOXIA <dev@eoxia.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,13 +16,11 @@
  */
 
 /**
- * \file    digiriskdolibarr/lib/digiriskdolibarr.lib.php
+ * \file    lib/digiriskdolibarr_function.lib.php
  * \ingroup digiriskdolibarr
  * \brief   Library files with common functions for Digiriskdolibarr
  */
 
-
-// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 /**
  *  Show photos of an object (nbmax maximum), into several columns
  *
@@ -236,4 +234,320 @@ function digirisk_show_photos($modulepart, $sdir, $size = 0, $nbmax = 0, $nbbyro
 
 	$object->nbphoto = $nbphoto;
 	return $return;
+}
+
+/**
+ *      Return a string to show the box with list of available documents for object.
+ *      This also set the property $this->numoffiles
+ *
+ *      @param      string				$modulepart         Module the files are related to ('propal', 'facture', 'facture_fourn', 'mymodule', 'mymodule:nameofsubmodule', 'mymodule_temp', ...)
+ *      @param      string				$modulesubdir       Existing (so sanitized) sub-directory to scan (Example: '0/1/10', 'FA/DD/MM/YY/9999'). Use '' if file is not into subdir of module.
+ *      @param      string				$filedir            Directory to scan
+ *      @param      string				$urlsource          Url of origin page (for return)
+ *      @param      int|string[]        $genallowed         Generation is allowed (1/0 or array list of templates)
+ *      @param      int					$delallowed         Remove is allowed (1/0)
+ *      @param      string				$modelselected      Model to preselect by default
+ *      @param      integer				$allowgenifempty	Allow generation even if list of template ($genallowed) is empty (show however a warning)
+ *      @param      integer				$forcenomultilang	Do not show language option (even if MAIN_MULTILANGS defined)
+ *      @param      int					$iconPDF            Deprecated, see getDocumentsLink
+ * 		@param		int					$notused	        Not used
+ * 		@param		integer				$noform				Do not output html form tags
+ * 		@param		string				$param				More param on http links
+ * 		@param		string				$title				Title to show on top of form. Example: '' (Default to "Documents") or 'none'
+ * 		@param		string				$buttonlabel		Label on submit button
+ * 		@param		string				$codelang			Default language code to use on lang combo box if multilang is enabled
+ * 		@param		string				$morepicto			Add more HTML content into cell with picto
+ *      @param      Object              $object             Object when method is called from an object card.
+ *      @param		int					$hideifempty		Hide section of generated files if there is no file
+ *      @param      string              $removeaction       (optional) The action to remove a file
+ * 		@return		string              					Output string with HTML array of documents (might be empty string)
+ */
+function digiriskshowdocuments($modulepart, $modulesubdir, $filedir, $urlsource, $genallowed, $delallowed = 0, $modelselected = '', $allowgenifempty = 1, $forcenomultilang = 0, $notused = 0, $noform = 0, $param = '', $title = '', $buttonlabel = '', $codelang = '', $morepicto = '', $object = null, $hideifempty = 0, $removeaction = 'remove_file')
+{
+	global $db, $langs, $conf, $user, $hookmanager, $form;
+
+	if (!is_object($form)) $form = new Form($this->db);
+
+	include_once DOL_DOCUMENT_ROOT.'/core/lib/files.lib.php';
+
+	// Add entity in $param if not already exists
+	if (!preg_match('/entity\=[0-9]+/', $param)) {
+		$param .= ($param ? '&' : '').'entity='.(!empty($object->entity) ? $object->entity : $conf->entity);
+	}
+
+	$hookmanager->initHooks(array('formfile'));
+
+	// Get list of files
+	$file_list = null;
+	if (!empty($filedir))
+	{
+		$file_list = dol_dir_list($filedir, 'files', 0, '', '(\.meta|_preview.*.*\.png)$', 'date', SORT_DESC);
+	}
+	if ($hideifempty && empty($file_list)) return '';
+
+	$out = '';
+	$forname = 'builddoc';
+	$headershown = 0;
+	$showempty = 0;
+
+	$out .= "\n".'<!-- Start show_document -->'."\n";
+
+	$titletoshow = $langs->trans("Documents");
+	if (!empty($title)) $titletoshow = ($title == 'none' ? '' : $title);
+
+	// Show table
+	if ($genallowed)
+	{
+		$submodulepart = $modulepart;
+		// modulepart = 'nameofmodule' or 'nameofmodule:NameOfObject'
+		$tmp = explode(':', $modulepart);
+		if (!empty($tmp[1])) {
+			$modulepart = $tmp[0];
+			$submodulepart = $tmp[1];
+		}
+
+		// For normalized external modules.
+		$file = dol_buildpath('/'.$modulepart.'/core/modules/'.$modulepart.'/digiriskdocuments/'.strtolower($submodulepart).'/modules_'.strtolower($submodulepart).'.php', 0);
+		include_once $file;
+
+		$class = 'ModeleODT'.$submodulepart;
+
+		if (class_exists($class))
+		{
+			$modellist = call_user_func($class.'::liste_modeles', $db);
+		}
+		else
+		{
+			dol_print_error($db, "Bad value for modulepart '".$modulepart."' in showdocuments");
+			return -1;
+		}
+
+		// Set headershown to avoid to have table opened a second time later
+		$headershown = 1;
+
+		if (empty($buttonlabel)) $buttonlabel = $langs->trans('Generate');
+
+		if ($conf->browser->layout == 'phone') $urlsource .= '#'.$forname.'_form'; // So we switch to form after a generation
+		if (empty($noform)) $out .= '<form action="'.$urlsource.(empty($conf->global->MAIN_JUMP_TAG) ? '' : '#builddoc').'" id="'.$forname.'_form" method="post">';
+		$out .= '<input type="hidden" name="action" value="builddoc">';
+		$out .= '<input type="hidden" name="token" value="'.newToken().'">';
+
+		$out .= load_fiche_titre($titletoshow, '', '');
+		$out .= '<div class="div-table-responsive-no-min">';
+		$out .= '<table class="liste formdoc noborder centpercent">';
+
+		$out .= '<tr class="liste_titre">';
+
+		$addcolumforpicto = ($delallowed || $printer || $morepicto);
+		$colspan = (3 + ($addcolumforpicto ? 1 : 0)); $colspanmore = 0;
+
+		$out .= '<th colspan="'.$colspan.'" class="formdoc liste_titre maxwidthonsmartphone center">';
+
+		// Model
+		if (!empty($modellist))
+		{
+			asort($modellist);
+			$out .= '<span class="hideonsmartphone">'.$langs->trans('Model').' </span>';
+			if (is_array($modellist) && count($modellist) == 1)    // If there is only one element
+			{
+				$arraykeys = array_keys($modellist);
+				$modelselected = $arraykeys[0];
+			}
+			$morecss = 'maxwidth200';
+			if ($conf->browser->layout == 'phone') $morecss = 'maxwidth100';
+			$out .= $form->selectarray('model', $modellist, $modelselected, $showempty, 0, 0, '', 0, 0, 0, '', $morecss);
+			if ($conf->use_javascript_ajax)
+			{
+				$out .= ajax_combobox('model');
+			}
+		}
+		else
+		{
+			$out .= '<div class="float">'.$langs->trans("Files").'</div>';
+		}
+
+		// Language code (if multilang)
+		if (($allowgenifempty || (is_array($modellist) && count($modellist) > 0)) && $conf->global->MAIN_MULTILANGS && !$forcenomultilang && (!empty($modellist) || $showempty))
+		{
+			include_once DOL_DOCUMENT_ROOT.'/core/class/html.formadmin.class.php';
+			$formadmin = new FormAdmin($this->db);
+			$defaultlang = $codelang ? $codelang : $langs->getDefaultLang();
+			$morecss = 'maxwidth150';
+			if ($conf->browser->layout == 'phone') $morecss = 'maxwidth100';
+			$out .= $formadmin->select_language($defaultlang, 'lang_id', 0, null, 0, 0, 0, $morecss);
+		}
+		else
+		{
+			$out .= '&nbsp;';
+		}
+
+		// Button
+		$genbutton = '<input class="button buttongen" id="'.$forname.'_generatebutton" name="'.$forname.'_generatebutton"';
+		$genbutton .= ' type="submit" value="'.$buttonlabel.'"';
+		if (!$allowgenifempty && !is_array($modellist) && empty($modellist)) $genbutton .= ' disabled';
+		$genbutton .= '>';
+		if ($allowgenifempty && !is_array($modellist) && empty($modellist) && empty($conf->dol_no_mouse_hover) && $modulepart != 'unpaid')
+		{
+			$langs->load("errors");
+			$genbutton .= ' '.img_warning($langs->transnoentitiesnoconv("WarningNoDocumentModelActivated"));
+		}
+		if (!$allowgenifempty && !is_array($modellist) && empty($modellist) && empty($conf->dol_no_mouse_hover) && $modulepart != 'unpaid') $genbutton = '';
+		if (empty($modellist) && !$showempty && $modulepart != 'unpaid') $genbutton = '';
+		$out .= $genbutton;
+		$out .= '</th>';
+
+		if (!empty($hookmanager->hooks['formfile']))
+		{
+			foreach ($hookmanager->hooks['formfile'] as $module)
+			{
+				if (method_exists($module, 'formBuilddocLineOptions'))
+				{
+					$colspanmore++;
+					$out .= '<th></th>';
+				}
+			}
+		}
+		$out .= '</tr>';
+
+		// Execute hooks
+		$parameters = array('colspan'=>($colspan + $colspanmore), 'socid'=>(isset($GLOBALS['socid']) ? $GLOBALS['socid'] : ''), 'id'=>(isset($GLOBALS['id']) ? $GLOBALS['id'] : ''), 'modulepart'=>$modulepart);
+		if (is_object($hookmanager))
+		{
+			$reshook = $hookmanager->executeHooks('formBuilddocOptions', $parameters, $GLOBALS['object']);
+			$out .= $hookmanager->resPrint;
+		}
+	}
+
+	// Get list of files
+	if (!empty($filedir))
+	{
+		$link_list = array();
+		if (is_object($object))
+		{
+			require_once DOL_DOCUMENT_ROOT.'/core/class/link.class.php';
+			$link = new Link($db);
+			$sortfield = $sortorder = null;
+			$res = $link->fetchAll($link_list, $object->element, $object->id, $sortfield, $sortorder);
+		}
+
+		$out .= '<!-- html.formfile::showdocuments -->'."\n";
+
+		// Show title of array if not already shown
+		if ((!empty($file_list) || !empty($link_list) || preg_match('/^massfilesarea/', $modulepart))
+			&& !$headershown)
+		{
+			$headershown = 1;
+			$out .= '<div class="titre">'.$titletoshow.'</div>'."\n";
+			$out .= '<div class="div-table-responsive-no-min">';
+			$out .= '<table class="noborder centpercent" id="'.$modulepart.'_table">'."\n";
+		}
+
+		// Loop on each file found
+		if (is_array($file_list))
+		{
+			foreach ($file_list as $file)
+			{
+				// Define relative path for download link (depends on module)
+				$relativepath = $file["name"]; // Cas general
+				if ($modulesubdir) $relativepath = $modulesubdir."/".$file["name"]; // Cas propal, facture...
+
+				$out .= '<tr class="oddeven">';
+
+				$documenturl = DOL_URL_ROOT.'/document.php';
+				if (isset($conf->global->DOL_URL_ROOT_DOCUMENT_PHP)) $documenturl = $conf->global->DOL_URL_ROOT_DOCUMENT_PHP; // To use another wrapper
+
+				// Show file name with link to download
+				$out .= '<td class="minwidth200">';
+				$out .= '<a class="documentdownload paddingright" href="'.$documenturl.'?modulepart='.$modulepart.'&amp;file='.urlencode($relativepath).($param ? '&'.$param : '').'"';
+
+				$mime = dol_mimetype($relativepath, '', 0);
+				if (preg_match('/text/', $mime)) $out .= ' target="_blank"';
+				$out .= '>';
+				$out .= img_mime($file["name"], $langs->trans("File").': '.$file["name"]);
+				$out .= dol_trunc($file["name"], 150);
+				$out .= '</a>'."\n";
+				$out .= '</td>';
+
+				// Show file size
+				$size = (!empty($file['size']) ? $file['size'] : dol_filesize($filedir."/".$file["name"]));
+				$out .= '<td class="nowrap right">'.dol_print_size($size, 1, 1).'</td>';
+
+				// Show file date
+				$date = (!empty($file['date']) ? $file['date'] : dol_filemtime($filedir."/".$file["name"]));
+				$out .= '<td class="nowrap right">'.dol_print_date($date, 'dayhour', 'tzuser').'</td>';
+
+				if ($delallowed || $morepicto)
+				{
+					$out .= '<td class="right nowraponall">';
+					if ($delallowed)
+					{
+						$tmpurlsource = preg_replace('/#[a-zA-Z0-9_]*$/', '', $urlsource);
+						$out .= '<a href="'.$tmpurlsource.((strpos($tmpurlsource, '?') === false) ? '?' : '&amp;').'action='.$removeaction.'&amp;file='.urlencode($relativepath);
+						$out .= ($param ? '&amp;'.$param : '');
+						$out .= '">'.img_picto($langs->trans("Delete"), 'delete').'</a>';
+					}
+					if ($morepicto)
+					{
+						$morepicto = preg_replace('/__FILENAMEURLENCODED__/', urlencode($relativepath), $morepicto);
+						$out .= $morepicto;
+					}
+					$out .= '</td>';
+				}
+
+				if (is_object($hookmanager))
+				{
+					$parameters = array('colspan'=>($colspan + $colspanmore), 'socid'=>(isset($GLOBALS['socid']) ? $GLOBALS['socid'] : ''), 'id'=>(isset($GLOBALS['id']) ? $GLOBALS['id'] : ''), 'modulepart'=>$modulepart, 'relativepath'=>$relativepath);
+					$res = $hookmanager->executeHooks('formBuilddocLineOptions', $parameters, $file);
+					if (empty($res))
+					{
+						$out .= $hookmanager->resPrint; // Complete line
+						$out .= '</tr>';
+					}
+					else
+					{
+						$out = $hookmanager->resPrint; // Replace all $out
+					}
+				}
+			}
+		}
+		// Loop on each link found
+		if (is_array($link_list))
+		{
+			$colspan = 2;
+
+			foreach ($link_list as $file)
+			{
+				$out .= '<tr class="oddeven">';
+				$out .= '<td colspan="'.$colspan.'" class="maxwidhtonsmartphone">';
+				$out .= '<a data-ajax="false" href="'.$file->url.'" target="_blank">';
+				$out .= $file->label;
+				$out .= '</a>';
+				$out .= '</td>';
+				$out .= '<td class="right">';
+				$out .= dol_print_date($file->datea, 'dayhour');
+				$out .= '</td>';
+				if ($delallowed || $printer || $morepicto) $out .= '<td></td>';
+				$out .= '</tr>'."\n";
+			}
+		}
+
+		if (count($file_list) == 0 && count($link_list) == 0 && $headershown)
+		{
+			$out .= '<tr><td colspan="'.(3 + ($addcolumforpicto ? 1 : 0)).'" class="opacitymedium">'.$langs->trans("None").'</td></tr>'."\n";
+		}
+	}
+
+	if ($headershown)
+	{
+		// Affiche pied du tableau
+		$out .= "</table>\n";
+		$out .= "</div>\n";
+		if ($genallowed)
+		{
+			if (empty($noform)) $out .= '</form>'."\n";
+		}
+	}
+	$out .= '<!-- End show_document -->'."\n";
+
+	return $out;
 }
