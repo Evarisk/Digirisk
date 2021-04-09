@@ -1018,123 +1018,21 @@ class DigiriskDocuments extends CommonObject
 	 *  @param      null|array  $moreparams     Array to provide more information
 	 *  @return     int         				0 if KO, 1 if OK
 	 */
-	/**
-	 *  Create a document onto disk according to template module.
-	 *
-	 *  @param	    string		$modele			Force template to use ('' to not force)
-	 *  @param		Translate	$outputlangs	objet lang a utiliser pour traduction
-	 *  @param      int			$hidedetails    Hide details of lines
-	 *  @param      int			$hidedesc       Hide description
-	 *  @param      int			$hideref        Hide ref
-	 *  @param      null|array  $moreparams     Array to provide more information
-	 *  @return     int         				0 if KO, 1 if OK
-	 */
 	public function generateDocument($modele, $outputlangs, $hidedetails = 0, $hidedesc = 0, $hideref = 0, $moreparams = null)
 	{
-		global $conf, $langs, $user;
+		global $langs, $user;
 		$result = 0;
 		$includedocgeneration = 1;
 		$langs->load("digiriskdolibarr@digiriskdolibarr");
 
-		if (!dol_strlen($modele)) {
-			$modele = 'standard_digiriskelement';
+		$modelpath = "core/modules/digiriskdolibarr/digiriskdocuments/".$this->element."/";
 
-			if ($this->modelpdf) {
-				$modele = $this->modelpdf;
-			} elseif (!empty($conf->global->DIGIRISKELEMENT_ADDON_PDF)) {
-				$modele = $conf->global->DIGIRISKELEMENT_ADDON_PDF;
-			}
-		}
-
-		$modelpath = "core/modules/digiriskdolibarr/doc/";
-
-		$template = preg_replace('/_odt/', '.odt', $modele );
-
-		if ( preg_match( '/listing_risks_photos/', $template ) ) {
-			$path = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/documents/doctemplates/listingrisksphoto/';
-		} elseif ( preg_match( '/listing_risks_actions/', $template ) ) {
-			$path = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/documents/doctemplates/listingrisksaction/';
-		} elseif ( preg_match( '/groupment/', $template ) || preg_match( '/workunit/', $template ) ) {
-			$path = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/documents/doctemplates/'. $this->element_type . '/';
-		} elseif ( preg_match( '/legaldisplay/', $template ) ) {
-			$path = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/documents/doctemplates/legaldisplay/';
-		} elseif ( preg_match( '/informationssharing/', $template ) ) {
-			$path = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/documents/doctemplates/informationssharing/';
-		}
-
-		$modele = $modele.":". $path . "template_" . $template;
 		if ($includedocgeneration) {
 			$result = $this->commonGenerateDocument($modelpath, $modele, $outputlangs, $hidedetails, $hidedesc, $hideref, $moreparams);
 		}
 
-		if ( preg_match( '/listing_risks_photos/', $template ) ) {
-			$this->call_trigger('LISTING_RISKS_PHOTOS_GENERATE', $user);
-		} elseif ( preg_match( '/listing_risks_actions/', $template ) ) {
-			$this->call_trigger('LISTING_RISKS_ACTIONS_GENERATE', $user);
-		} elseif ( preg_match( '/groupment/', $template ) ) {
-			$this->call_trigger('GROUPMENT_GENERATE', $user);
-		} elseif ( preg_match( '/workunit/', $template ) ) {
-			$this->call_trigger('WORKUNIT_GENERATE', $user);
-		} elseif ( preg_match( '/legaldisplay/', $template ) ) {
-			$this->call_trigger('LEGALDISPLAY_GENERATE', $user);
-		} elseif ( preg_match( '/informationssharing/', $template ) ) {
-			$this->call_trigger('INFORMATIONSSHARING_GENERATE', $user);
-		}
+		$this->call_trigger(strtoupper($this->element).'_GENERATE', $user);
 
 		return $result;
-	}
-
-	/**
-	 * Action executed by scheduler
-	 * CAN BE A CRON TASK. In such a case, parameters come from the schedule job setup field 'Parameters'
-	 * Use public function doScheduledJob($param1, $param2, ...) to get parameters
-	 *
-	 * @return	int			0 if OK, <>0 if KO (this function is used also by cron so only 0 is OK)
-	 */
-	public function doScheduledJob()
-	{
-		global $conf, $langs;
-
-		//$conf->global->SYSLOG_FILE = 'DOL_DATA_ROOT/dolibarr_mydedicatedlofile.log';
-
-		$error = 0;
-		$this->output = '';
-		$this->error = '';
-
-		dol_syslog(__METHOD__, LOG_DEBUG);
-
-		$now = dol_now();
-
-		$this->db->begin();
-
-		// ...
-
-		$this->db->commit();
-
-		return $error;
-	}
-}
-
-/**
- * Class DigiriskDocumentsLine. You can also remove this and generate a CRUD class for lines objects.
- */
-class DigiriskDocumentsLine
-{
-	// To complete with content of an object DigiriskDocumentsLine
-	// We should have a field rowid, fk_digiriskdocuments and position
-
-	/**
-	 * @var int  Does object support extrafields ? 0=No, 1=Yes
-	 */
-	public $isextrafieldmanaged = 0;
-
-	/**
-	 * Constructor
-	 *
-	 * @param DoliDb $db Database handler
-	 */
-	public function __construct(DoliDB $db)
-	{
-		$this->db = $db;
 	}
 }
