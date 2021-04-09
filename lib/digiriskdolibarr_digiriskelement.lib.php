@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) ---Put here your own copyright and developer email---
+/* Copyright (C) 2021 EOXIA <dev@eoxia.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,7 +24,7 @@
 /**
  * Prepare array of tabs for DigiriskElement
  *
- * @param	DigiriskElement	$object		DigiriskElement
+ * @param	DigiriskElement $object DigiriskElement
  * @return 	array					Array of tabs
  */
 function digiriskelementPrepareHead($object)
@@ -41,9 +41,14 @@ function digiriskelementPrepareHead($object)
 		$head[$h][2] = 'elementRisk';
 		$h++;
 
-		$head[$h][0] = dol_buildpath("/digiriskdolibarr/digiriskelement_signalisation.php", 1).'?id='.$object->id;
-		$head[$h][1] = $langs->trans("Signalisation");
-		$head[$h][2] = 'elementSignalisation';
+		$head[$h][0] = dol_buildpath("/digiriskdolibarr/digiriskelement_assessor.php", 1).'?id='.$object->id;
+		$head[$h][1] = $langs->trans("Assessor");
+		$head[$h][2] = 'elementAssessor';
+		$h++;
+
+		$head[$h][0] = dol_buildpath("/digiriskdolibarr/digiriskelement_sign.php", 1).'?id='.$object->id;
+		$head[$h][1] = $langs->trans("Sign");
+		$head[$h][2] = 'elementSign';
 		$h++;
 
 		$head[$h][0] = dol_buildpath("/digiriskdolibarr/digiriskelement_card.php", 1).'?id='.$object->id;
@@ -51,25 +56,15 @@ function digiriskelementPrepareHead($object)
 		$head[$h][2] = 'elementCard';
 		$h++;
 
-		$head[$h][0] = dol_buildpath("/digiriskdolibarr/digiriskelement_listingrisksphoto.php", 1).'?id='.$object->id;
-		$head[$h][1] = $langs->trans("ListingRisksPhoto");
-		$head[$h][2] = 'elementListingrisksphoto';
-		$h++;
+		if ($object->element_type == 'groupment') {
+			$head[$h][0] = dol_buildpath("/digiriskdolibarr/digiriskelement_listingrisksaction.php", 1).'?id='.$object->id;
+			$head[$h][1] = $langs->trans("ListingRisksAction");
+			$head[$h][2] = 'elementListingRisksAction';
+			$h++;
 
-		$head[$h][0] = dol_buildpath("/digiriskdolibarr/digiriskelement_listingrisksaction.php", 1).'?id='.$object->id;
-		$head[$h][1] = $langs->trans("ListingRisksAction");
-		$head[$h][2] = 'elementListingrisksaction';
-		$h++;
-
-		if (isset($object->fields['note_public']) || isset($object->fields['note_private']))
-		{
-			$nbNote = 0;
-			if (!empty($object->note_private)) $nbNote++;
-			if (!empty($object->note_public)) $nbNote++;
-			$head[$h][0] = dol_buildpath('/digiriskdolibarr/digiriskelement_note.php', 1).'?id='.$object->id;
-			$head[$h][1] = $langs->trans('Notes');
-			if ($nbNote > 0) $head[$h][1] .= (empty($conf->global->MAIN_OPTIMIZEFORTEXTBROWSER) ? '<span class="badge marginleftonlyshort">'.$nbNote.'</span>' : '');
-			$head[$h][2] = 'note';
+			$head[$h][0] = dol_buildpath("/digiriskdolibarr/digiriskelement_listingrisksphoto.php", 1).'?id='.$object->id;
+			$head[$h][1] = $langs->trans("ListingRisksPhoto");
+			$head[$h][2] = 'elementListingRisksPhoto';
 			$h++;
 		}
 
@@ -90,11 +85,7 @@ function digiriskelementPrepareHead($object)
 		$h++;
 
 		complete_head_from_modules($conf, $langs, $object, $head, $h, 'digiriskelement@digiriskdolibarr');
-
-		complete_head_from_modules($conf, $langs, $object, $head, $h, 'digiriskelement@digiriskdolibarr', 'remove');
-
 	} else {
-
 		$head[$h][0] = dol_buildpath("/digiriskdolibarr/digiriskelement_card.php", 1);
 		$head[$h][1] = $langs->trans("Informations");
 		$head[$h][2] = 'elementCard';
@@ -102,68 +93,35 @@ function digiriskelementPrepareHead($object)
 
 		$head[$h][0] = dol_buildpath("/digiriskdolibarr/digiriskelement_legaldisplay.php", 1);
 		$head[$h][1] = $langs->trans("LegalDisplay");
-		$head[$h][2] = 'elementLegaldisplay';
+		$head[$h][2] = 'elementLegalDisplay';
 		$h++;
 
 		$head[$h][0] = dol_buildpath("/digiriskdolibarr/digiriskelement_informationssharing.php", 1);
 		$head[$h][1] = $langs->trans("InformationsSharing");
-		$head[$h][2] = 'elementInformationssharing';
-		$h++;
-
-		$head[$h][0] = dol_buildpath("/digiriskdolibarr/digiriskelement_listingrisksphoto.php", 1);
-		$head[$h][1] = $langs->trans("ListingRisksPhoto");
-		$head[$h][2] = 'elementListingrisksphoto';
+		$head[$h][2] = 'elementInformationsSharing';
 		$h++;
 
 		$head[$h][0] = dol_buildpath("/digiriskdolibarr/digiriskelement_listingrisksaction.php", 1);
 		$head[$h][1] = $langs->trans("ListingRisksAction");
-		$head[$h][2] = 'elementListingrisksaction';
+		$head[$h][2] = 'elementListingRisksAction';
 		$h++;
 
-//		$head[$h][0] = dol_buildpath("/digiriskdolibarr/digiriskelement_evaluator.php", 1);
-//		$head[$h][1] = $langs->trans("Evaluator");
-//		$head[$h][2] = 'evaluator';
-//		$h++;
+		$head[$h][0] = dol_buildpath("/digiriskdolibarr/digiriskelement_listingrisksphoto.php", 1);
+		$head[$h][1] = $langs->trans("ListingRisksPhoto");
+		$head[$h][2] = 'elementListingRisksPhoto';
+		$h++;
 
-//		$head[$h][0] = dol_buildpath("/digiriskdolibarr/digiriskelement_duer.php", 1);
-//		$head[$h][1] = $langs->trans("ListingRisksAction");
-//		$head[$h][2] = 'duer';
-//		$h++;
+		$head[$h][0] = dol_buildpath("/digiriskdolibarr/digiriskelement_duer.php", 1);
+		$head[$h][1] = $langs->trans("DUER");
+		$head[$h][2] = 'elementDUER';
+		$h++;
 
-		if (isset($object->fields['note_public']) || isset($object->fields['note_private']))
-		{
-			$nbNote = 0;
-			if (!empty($object->note_private)) $nbNote++;
-			if (!empty($object->note_public)) $nbNote++;
-			$head[$h][0] = dol_buildpath('/digiriskdolibarr/digiriskelement_note.php', 1);
-			$head[$h][1] = $langs->trans('Notes');
-			if ($nbNote > 0) $head[$h][1] .= (empty($conf->global->MAIN_OPTIMIZEFORTEXTBROWSER) ? '<span class="badge marginleftonlyshort">'.$nbNote.'</span>' : '');
-			$head[$h][2] = 'note';
-			$h++;
-		}
-//
-//		require_once DOL_DOCUMENT_ROOT.'/core/lib/files.lib.php';
-//		require_once DOL_DOCUMENT_ROOT.'/core/class/link.class.php';
-//		$upload_dir = $conf->digiriskdolibarr->dir_output."/digiriskelement/".dol_sanitizeFileName($object->ref);
-//		$nbFiles = count(dol_dir_list($upload_dir, 'files', 0, '', '(\.meta|_preview.*\.png)$'));
-//		$nbLinks = Link::count($db, $object->element, $object->id);
-//		$head[$h][0] = dol_buildpath("/digiriskdolibarr/digiriskelement_document.php", 1);
-//		$head[$h][1] = $langs->trans('Documents');
-//		if (($nbFiles + $nbLinks) > 0) $head[$h][1] .= '<span class="badge marginleftonlyshort">'.($nbFiles + $nbLinks).'</span>';
-//		$head[$h][2] = 'elementDocument';
-//		$h++;
-
-//		$head[$h][0] = dol_buildpath("/digiriskdolibarr/digiriskelement_agenda.php", 1);
-//		$head[$h][1] = $langs->trans("Events");
-//		$head[$h][2] = 'elementAgenda';
-//		$h++;
+		$head[$h][0] = dol_buildpath("/digiriskdolibarr/digiriskelement_agenda.php", 1);
+		$head[$h][1] = $langs->trans("Events");
+		$head[$h][2] = 'elementAgenda';
+		$h++;
 
 		complete_head_from_modules($conf, $langs, $object, $head, $h, 'digiriskelement@digiriskdolibarr');
-
-		complete_head_from_modules($conf, $langs, $object, $head, $h, 'digiriskelement@digiriskdolibarr', 'remove');
-
 	}
-
-
 	return $head;
 }

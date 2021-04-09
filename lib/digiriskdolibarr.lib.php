@@ -16,7 +16,7 @@
  */
 
 /**
- * \file    digiriskdolibarr/lib/digiriskdolibarr.lib.php
+ * \file    lib/digiriskdolibarr.lib.php
  * \ingroup digiriskdolibarr
  * \brief   Library files with common functions for Digiriskdolibarr
  */
