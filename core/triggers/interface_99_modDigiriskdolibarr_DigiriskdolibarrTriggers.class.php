@@ -1,9 +1,9 @@
 <?php
-/* Copyright (C) 2021 SuperAdmin
+/* Copyright (C) 2021 EOXIA <dev@eoxia.com>
  *
- * This program is free software: you can redistribute it and/or modify
+ * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
+ * the Free Software Foundation; either version 3 of the License, or
  * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
@@ -12,28 +12,18 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ * or see https://www.gnu.org/
  */
+
 
 /**
  * \file    core/triggers/interface_99_modDigiriskdolibarr_DigiriskdolibarrTriggers.class.php
  * \ingroup digiriskdolibarr
- * \brief   Example trigger.
- *
- * Put detailed description here.
- *
- * \remarks You can create other triggers by copying this one.
- * - File name should be either:
- *      - interface_99_modDigiriskdolibarr_MyTrigger.class.php
- *      - interface_99_all_MyTrigger.class.php
- * - The file must stay in core/triggers
- * - The class name must be InterfaceMytrigger
- * - The constructor method must be named InterfaceMytrigger
- * - The name property name must be MyTrigger
+ * \brief   Digirisk Dolibarr trigger.
  */
 
 require_once DOL_DOCUMENT_ROOT.'/core/triggers/dolibarrtriggers.class.php';
-
 
 /**
  *  Class of triggers for Digiriskdolibarr module
@@ -57,7 +47,6 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 		$this->name = preg_replace('/^Interface/i', '', get_class($this));
 		$this->family = "demo";
 		$this->description = "Digiriskdolibarr triggers.";
-		// 'development', 'experimental', 'dolibarr' or version
 		$this->version = '1.0.0';
 		$this->picto = 'digiriskdolibarr@digiriskdolibarr';
 	}
@@ -82,7 +71,6 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 		return $this->description;
 	}
 
-
 	/**
 	 * Function called when a Dolibarrr business event is done.
 	 * All functions "runTrigger" are triggered if file
@@ -99,9 +87,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 	{
 		if (empty($conf->digiriskdolibarr->enabled)) return 0; // If module is not enabled, we do nothing
 
-		// Put here code you want to execute when a Dolibarr business events occurs.
 		// Data and type of action are stored into $object and $action
-		$date = dol_now();
 
 		switch ($action) {
 			case 'INFORMATIONSSHARING_GENERATE' :
@@ -112,15 +98,15 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 
 				$actioncomm->elementtype = 'informationssharing@digiriskdolibarr';
 				$actioncomm->elementid   = $object->id;
-				$actioncomm->code 		 = 'AC_INFORMATIONSSHARING_GENERATE';
-				$actioncomm->type_code 	 = 'AC_OTH_AUTO';
-				$actioncomm->label		 = $langs->trans('InformationsSharingGeneratedWithDolibarr');
-				$actioncomm->datep		 = $now;
+				$actioncomm->code        = 'AC_INFORMATIONSSHARING_GENERATE';
+				$actioncomm->type_code   = 'AC_OTH_AUTO';
+				$actioncomm->label       = $langs->trans('InformationsSharingGeneratedWithDolibarr');
+				$actioncomm->datep       = $now;
 				$actioncomm->fk_element  = $object->id;
 				$actioncomm->userownerid = $user->id;
-				$actioncomm->percentage = -1;
+				$actioncomm->percentage  = -1;
 
-				$ret = $actioncomm->create($user);
+				$actioncomm->create($user);
 				break;
 
 			case 'LEGALDISPLAY_GENERATE' :
@@ -131,15 +117,15 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 
 				$actioncomm->elementtype = 'legaldisplay@digiriskdolibarr';
 				$actioncomm->elementid   = $object->id;
-				$actioncomm->code 		 = 'AC_LEGALDISPLAY_GENERATE';
-				$actioncomm->type_code 	 = 'AC_OTH_AUTO';
-				$actioncomm->label		 = $langs->trans('LegalDisplayGeneratedWithDolibarr');
-				$actioncomm->datep		 = $now;
+				$actioncomm->code        = 'AC_LEGALDISPLAY_GENERATE';
+				$actioncomm->type_code   = 'AC_OTH_AUTO';
+				$actioncomm->label       = $langs->trans('LegalDisplayGeneratedWithDolibarr');
+				$actioncomm->datep       = $now;
 				$actioncomm->fk_element  = $object->id;
 				$actioncomm->userownerid = $user->id;
-				$actioncomm->percentage = -1;
+				$actioncomm->percentage  = -1;
 
-				$ret = $actioncomm->create($user);
+				$actioncomm->create($user);
 				break;
 
 			case 'FIREPERMIT_GENERATE' :
@@ -150,15 +136,15 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 
 				$actioncomm->elementtype = 'firepermit@digiriskdolibarr';
 				$actioncomm->elementid   = $object->id;
-				$actioncomm->code 		 = 'AC_FIREPERMIT_GENERATE';
-				$actioncomm->type_code 	 = 'AC_OTH_AUTO';
-				$actioncomm->label		 = $langs->trans('FirePermitGeneratedWithDolibarr');
-				$actioncomm->datep		 = $now;
+				$actioncomm->code        = 'AC_FIREPERMIT_GENERATE';
+				$actioncomm->type_code   = 'AC_OTH_AUTO';
+				$actioncomm->label       = $langs->trans('FirePermitGeneratedWithDolibarr');
+				$actioncomm->datep       = $now;
 				$actioncomm->fk_element  = $object->id;
 				$actioncomm->userownerid = $user->id;
-				$actioncomm->percentage = -1;
+				$actioncomm->percentage  = -1;
 
-				$ret = $actioncomm->create($user);
+				$actioncomm->create($user);
 				break;
 
 			case 'PREVENTIONPLAN_GENERATE' :
@@ -169,56 +155,56 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 
 				$actioncomm->elementtype = 'preventionplan@digiriskdolibarr';
 				$actioncomm->elementid   = $object->id;
-				$actioncomm->code 		 = 'AC_PREVENTIONPLAN_GENERATE';
-				$actioncomm->type_code 	 = 'AC_OTH_AUTO';
-				$actioncomm->label		 = $langs->trans('PreventionPlanGeneratedWithDolibarr');
-				$actioncomm->datep		 = $now;
+				$actioncomm->code        = 'AC_PREVENTIONPLAN_GENERATE';
+				$actioncomm->type_code   = 'AC_OTH_AUTO';
+				$actioncomm->label       = $langs->trans('PreventionPlanGeneratedWithDolibarr');
+				$actioncomm->datep       = $now;
 				$actioncomm->fk_element  = $object->id;
 				$actioncomm->userownerid = $user->id;
-				$actioncomm->percentage = -1;
+				$actioncomm->percentage  = -1;
 
-				$ret = $actioncomm->create($user);
+				$actioncomm->create($user);
 				break;
 
-			case 'GROUPMENT_GENERATE' :
+			case 'GROUPMENTDOCUMENT_GENERATE' :
 				dol_syslog("Trigger '".$this->name."' for action '$action' launched by ".__FILE__.". id=".$object->id);
 				require_once DOL_DOCUMENT_ROOT.'/comm/action/class/actioncomm.class.php';
 				$now = dol_now();
 				$actioncomm = new ActionComm($this->db);
 
-				$actioncomm->elementtype = 'groupment@digiriskdolibarr';
+				$actioncomm->elementtype = 'groupmentdocument@digiriskdolibarr';
 				$actioncomm->elementid   = $object->id;
-				$actioncomm->code 		 = 'AC_GROUPMENT_GENERATE';
-				$actioncomm->type_code 	 = 'AC_OTH_AUTO';
-				$actioncomm->label		 = $langs->trans('GroupmentGeneratedWithDolibarr');
-				$actioncomm->datep		 = $now;
+				$actioncomm->code        = 'AC_GROUPMENTDOCUMENT_GENERATE';
+				$actioncomm->type_code   = 'AC_OTH_AUTO';
+				$actioncomm->label       = $langs->trans('GroupmentDocumentGeneratedWithDolibarr');
+				$actioncomm->datep       = $now;
 				$actioncomm->fk_element  = $object->id;
 				$actioncomm->userownerid = $user->id;
-				$actioncomm->percentage = -1;
+				$actioncomm->percentage  = -1;
 
-				$ret = $actioncomm->create($user);
+				$actioncomm->create($user);
 				break;
 
-			case 'WORKUNIT_GENERATE' :
+			case 'WORKUNITDOCUMENT_GENERATE' :
 				dol_syslog("Trigger '".$this->name."' for action '$action' launched by ".__FILE__.". id=".$object->id);
 				require_once DOL_DOCUMENT_ROOT.'/comm/action/class/actioncomm.class.php';
 				$now = dol_now();
 				$actioncomm = new ActionComm($this->db);
 
-				$actioncomm->elementtype = 'workunit@digiriskdolibarr';
+				$actioncomm->elementtype = 'workunitdocument@digiriskdolibarr';
 				$actioncomm->elementid   = $object->id;
-				$actioncomm->code 		 = 'AC_WORKUNIT_GENERATE';
-				$actioncomm->type_code 	 = 'AC_OTH_AUTO';
-				$actioncomm->label		 = $langs->trans('WorkUnitGeneratedWithDolibarr');
-				$actioncomm->datep		 = $now;
+				$actioncomm->code        = 'AC_WORKUNITDOCUMENT_GENERATE';
+				$actioncomm->type_code   = 'AC_OTH_AUTO';
+				$actioncomm->label       = $langs->trans('WorkUnitDocumentGeneratedWithDolibarr');
+				$actioncomm->datep       = $now;
 				$actioncomm->fk_element  = $object->id;
 				$actioncomm->userownerid = $user->id;
-				$actioncomm->percentage = -1;
+				$actioncomm->percentage  = -1;
 
-				$ret = $actioncomm->create($user);
+				$actioncomm->create($user);
 				break;
 
-			case 'LISTING_RISKS_PHOTOS_GENERATE' :
+			case 'LISTINGRISKSPHOTO_GENERATE' :
 				dol_syslog("Trigger '".$this->name."' for action '$action' launched by ".__FILE__.". id=".$object->id);
 				require_once DOL_DOCUMENT_ROOT.'/comm/action/class/actioncomm.class.php';
 				$now = dol_now();
@@ -226,18 +212,18 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 
 				$actioncomm->elementtype = $object->element_type.'@digiriskdolibarr';
 				$actioncomm->elementid   = $object->id;
-				$actioncomm->code 		 = 'AC_LISTING_RISKS_PHOTOS_GENERATE';
-				$actioncomm->type_code 	 = 'AC_OTH_AUTO';
-				$actioncomm->label		 = $langs->trans('ListingRisksPhotosGeneratedWithDolibarr');
-				$actioncomm->datep		 = $now;
+				$actioncomm->code        = 'AC_LISTINGRISKSPHOTO_GENERATE';
+				$actioncomm->type_code   = 'AC_OTH_AUTO';
+				$actioncomm->label       = $langs->trans('ListingRisksPhotoGeneratedWithDolibarr');
+				$actioncomm->datep       = $now;
 				$actioncomm->fk_element  = $object->id;
 				$actioncomm->userownerid = $user->id;
-				$actioncomm->percentage = -1;
+				$actioncomm->percentage  = -1;
 
-				$ret = $actioncomm->create($user);
+				$actioncomm->create($user);
 				break;
 
-			case 'LISTING_RISKS_ACTIONS_GENERATE' :
+			case 'LISTINGRISKSACTION_GENERATE' :
 			dol_syslog("Trigger '".$this->name."' for action '$action' launched by ".__FILE__.". id=".$object->id);
 			require_once DOL_DOCUMENT_ROOT.'/comm/action/class/actioncomm.class.php';
 			$now = dol_now();
@@ -245,15 +231,15 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 
 			$actioncomm->elementtype = $object->element_type.'@digiriskdolibarr';
 			$actioncomm->elementid   = $object->id;
-			$actioncomm->code 		 = 'AC_LISTING_RISKS_ACTIONS_GENERATE';
-			$actioncomm->type_code 	 = 'AC_OTH_AUTO';
-			$actioncomm->label		 = $langs->trans('ListingRisksActionsGeneratedWithDolibarr');
-			$actioncomm->datep		 = $now;
+			$actioncomm->code        = 'AC_LISTINGRISKSACTION_GENERATE';
+			$actioncomm->type_code   = 'AC_OTH_AUTO';
+			$actioncomm->label       = $langs->trans('ListingRisksActionGeneratedWithDolibarr');
+			$actioncomm->datep       = $now;
 			$actioncomm->fk_element  = $object->id;
 			$actioncomm->userownerid = $user->id;
-			$actioncomm->percentage = -1;
+			$actioncomm->percentage  = -1;
 
-			$ret = $actioncomm->create($user);
+			$actioncomm->create($user);
 			break;
 
 			default:
