@@ -27,7 +27,7 @@ require_once DOL_DOCUMENT_ROOT . '/core/class/commondocgenerator.class.php';
 /**
  *	Parent class for documents models
  */
-abstract class ModelePDFListingRisksAction extends CommonDocGenerator
+abstract class ModeleODTListingRisksAction extends CommonDocGenerator
 {
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps

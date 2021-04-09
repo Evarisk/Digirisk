@@ -1,10 +1,5 @@
 <?php
-/* Copyright (C) 2010-2012 	Laurent Destailleur <eldy@users.sourceforge.net>
- * Copyright (C) 2012		Juanjo Menent		<jmenent@2byte.es>
- * Copyright (C) 2014		Marcos García		<marcosgdf@gmail.com>
- * Copyright (C) 2016		Charlie Benke		<charlie@patas-monkey.com>
- * Copyright (C) 2018-2019  Philippe Grand      <philippe.grand@atoo-net.com>
- * Copyright (C) 2018       Frédéric France     <frederic.france@netlogic.fr>
+/* Copyright (C) 2021 EOXIA <dev@eoxia.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,22 +17,22 @@
  */
 
 /**
- *	\file       htdocs/core/modules/digiriskdolibarr/doc/doc_generic_digiriskdolibarr_odt.modules.php
+ *	\file       htdocs/core/modules/digiriskdolibarr/digiriskdocuments/firepermit/doc_firepermit_odt.modules.php
  *	\ingroup    digiriskdolibarr
  *	\brief      File of class to build ODT documents for digiriskdolibarr
  */
 
-
-dol_include_once('/custom/digiriskdolibarr/lib/files.lib.php');
-dol_include_once('/core/lib/files.lib.php');
-require_once DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/core/modules/digiriskdolibarr/digiriskdocuments/informationssharing/modules_informationssharing.php';
+require_once DOL_DOCUMENT_ROOT . '/core/lib/files.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/company.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/doc.lib.php';
+dol_include_once('/custom/digiriskdolibarr/lib/files.lib.php');
+dol_include_once('/custom/digiriskdolibarr/core/modules/digiriskdolibarr/digiriskdocuments/firepermit/mod_firepermit_standard.php');
+dol_include_once('/custom/digiriskdolibarr/core/modules/digiriskdolibarr/digiriskdocuments/firepermit/modules_firepermit.php');
 
 /**
  *	Class to build documents using ODF templates generator
  */
-class doc_informationssharing_A4_odt extends ModelePDFInformationsSharing
+class doc_firepermit_odt extends ModeleODTFirePermit
 {
 	/**
 	 * Issuer
@@ -56,7 +51,6 @@ class doc_informationssharing_A4_odt extends ModelePDFInformationsSharing
 	 */
 	public $version = 'dolibarr';
 
-
 	/**
 	 *	Constructor
 	 *
@@ -64,15 +58,15 @@ class doc_informationssharing_A4_odt extends ModelePDFInformationsSharing
 	 */
 	public function __construct($db)
 	{
-		global $conf, $langs, $mysoc;
+		global $langs, $mysoc;
 
 		// Load translation files required by the page
 		$langs->loadLangs(array("main", "companies"));
 
 		$this->db = $db;
-		$this->name = $langs->trans('InformationsSharingDigiriskTemplate');
+		$this->name = $langs->trans('FirePermitDigiriskTemplate');
 		$this->description = $langs->trans("DocumentModelOdt");
-		$this->scandir = 'DIGIRISKDOLIBARR_INFORMATIONSSHARING_ADDON_ODT_PATH'; // Name of constant that is used to save list of directories to scan
+		$this->scandir = 'DIGIRISKDOLIBARR_FIREPERMIT_ADDON_ODT_PATH'; // Name of constant that is used to save list of directories to scan
 
 		// Page size for A4 format
 		$this->type = 'odt';
@@ -89,7 +83,6 @@ class doc_informationssharing_A4_odt extends ModelePDFInformationsSharing
 		if (!$this->emetteur->country_code) $this->emetteur->country_code = substr($langs->defaultlang, -2); // By default if not defined
 	}
 
-
 	/**
 	 *	Return description of a module
 	 *
@@ -103,18 +96,17 @@ class doc_informationssharing_A4_odt extends ModelePDFInformationsSharing
 		// Load translation files required by the page
 		$langs->loadLangs(array("errors", "companies"));
 
-		$form = new Form($this->db);
 		$texte = $this->description.".<br>\n";
 		$texte .= '<form action="'.$_SERVER["PHP_SELF"].'" method="POST">';
 		$texte .= '<input type="hidden" name="token" value="'.newToken().'">';
 		$texte .= '<input type="hidden" name="action" value="setModuleOptions">';
-		$texte .= '<input type="hidden" name="param1" value="DIGIRISKDOLIBARR_INFORMATIONSSHARING_ADDON_ODT_PATH">';
+		$texte .= '<input type="hidden" name="param1" value="DIGIRISKDOLIBARR_FIREPERMIT_ADDON_ODT_PATH">';
 		$texte .= '<table class="nobordernopadding" width="100%">';
 
 		// List of directories area
 		$texte .= '<tr><td>';
 		$texttitle = $langs->trans("ListOfDirectories");
-		$listofdir = explode(',', preg_replace('/[\r\n]+/', ',', trim($conf->global->DIGIRISKDOLIBARR_INFORMATIONSSHARING_ADDON_ODT_PATH)));
+		$listofdir = explode(',', preg_replace('/[\r\n]+/', ',', trim($conf->global->DIGIRISKDOLIBARR_FIREPERMIT_ADDON_ODT_PATH)));
 		$listoffiles = array();
 		foreach ($listofdir as $key=>$tmpdir)
 		{
@@ -131,15 +123,12 @@ class doc_informationssharing_A4_odt extends ModelePDFInformationsSharing
 			}
 		}
 
-
 		// Scan directories
 		$nbofiles = count($listoffiles);
-		if (!empty($conf->global->DIGIRISKDOLIBARR_INFORMATIONSSHARING_ADDON_ODT_PATH))
+		if (!empty($conf->global->DIGIRISKDOLIBARR_FIREPERMIT_ADDON_ODT_PATH))
 		{
 			$texte .= $langs->trans("DigiriskNumberOfModelFilesFound").': <b>';
-			//$texte.=$nbofiles?'<a id="a_'.get_class($this).'" href="#">':'';
 			$texte .= count($listoffiles);
-			//$texte.=$nbofiles?'</a>':'';
 			$texte .= '</b>';
 		}
 
@@ -154,9 +143,6 @@ class doc_informationssharing_A4_odt extends ModelePDFInformationsSharing
 		}
 
 		$texte .= '</td>';
-
-
-
 		$texte .= '</table>';
 		$texte .= '</form>';
 
@@ -164,25 +150,27 @@ class doc_informationssharing_A4_odt extends ModelePDFInformationsSharing
 	}
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
 	/**
 	 *  Function to build a document on disk using the generic odt module.
 	 *
-	 *	@param		Commande	$object				Object source to build document
-	 *	@param		Translate	$outputlangs		Lang output object
-	 * 	@param		string		$srctemplatepath	Full path of source filename for generator using a template file
-	 *  @param		int			$hidedetails		Do not show line details
-	 *  @param		int			$hidedesc			Do not show desc
-	 *  @param		int			$hideref			Do not show ref
-	 *	@return		int         					1 if OK, <=0 if KO
+	 * @param FirePermit $object Object source to build document
+	 * @param Translate $outputlangs Lang output object
+	 * @param string $srctemplatepath Full path of source filename for generator using a template file
+	 * @param int $hidedetails Do not show line details
+	 * @param int $hidedesc Do not show desc
+	 * @param int $hideref Do not show ref
+	 * @return int         1 if OK, <=0 if KO
+	 * @throws Exception
 	 */
 	public function write_file($object, $outputlangs, $srctemplatepath, $hidedetails = 0, $hidedesc = 0, $hideref = 0)
 	{
 		// phpcs:enable
-		global $user, $langs, $conf, $mysoc, $hookmanager;
+		global $user, $langs, $conf, $hookmanager, $action;
 
 		if (empty($srctemplatepath))
 		{
-			dol_syslog("doc_generic_odt::write_file parameter srctemplatepath empty", LOG_WARNING);
+			dol_syslog("doc_firepermit_odt::write_file parameter srctemplatepath empty", LOG_WARNING);
 			return -1;
 		}
 
@@ -193,28 +181,20 @@ class doc_informationssharing_A4_odt extends ModelePDFInformationsSharing
 			$hookmanager = new HookManager($this->db);
 		}
 		$hookmanager->initHooks(array('odtgeneration'));
-		global $action;
 
 		if (!is_object($outputlangs)) $outputlangs = $langs;
-		$sav_charset_output = $outputlangs->charset_output;
 		$outputlangs->charset_output = 'UTF-8';
+		$outputlangs->loadLangs(array("main", "dict", "companies", "digiriskdolibarr@digiriskdolibarr"));
 
-		$outputlangs->loadLangs(array("main", "dict", "companies", "bills"));
+		$mod = new $conf->global->DIGIRISKDOLIBARR_FIREPERMIT_ADDON($this->db);
+		$ref = $mod->getNextValue($object);
 
+		$object->ref = $ref;
+		$object->create($user);
 
-		$informationssharing = new InformationsSharing($this->db);
-		$mod = new $conf->global->DIGIRISKDOLIBARR_INFORMATIONSSHARING_ADDON($this->db);
-		$ref = $mod->getNextValue($informationssharing);
-
-		$informationssharing->ref = $ref;
-		$informationssharing->create($user);
-
-		$dir = $conf->digiriskdolibarr->multidir_output[isset($conf->entity) ? $conf->entity : 1] . '/informationssharing';
+		$dir = $conf->digiriskdolibarr->multidir_output[isset($object->entity) ? $object->entity : 1] . '/firepermit';
 		$objectref = dol_sanitizeFileName($object->ref);
 		if (!preg_match('/specimen/i', $objectref)) $dir .= '/' . $objectref;
-
-		$file = $dir."/".$objectref.".odt";
-
 		if (!file_exists($dir))
 		{
 			if (dol_mkdir($dir) < 0)
@@ -226,96 +206,25 @@ class doc_informationssharing_A4_odt extends ModelePDFInformationsSharing
 
 		if (file_exists($dir))
 		{
-			//print "srctemplatepath=".$srctemplatepath;	// Src filename
-			$newfile = basename($srctemplatepath);
-			$newfiletmp = preg_replace('/\.od(t|s)/i', '', $newfile);
-			$newfiletmp = preg_replace('/template_/i', '', $newfiletmp);
-			$newfiletmp = preg_replace('/modele_/i', '', $newfiletmp);
-			$newfiletmp = $objectref.'_'.$newfiletmp;
-
-			//$file=$dir.'/'.$newfiletmp.'.'.dol_print_date(dol_now(),'%Y%m%d%H%M%S').'.odt';
-			// Get extension (ods or odt)
-			$newfileformat = substr($newfile, strrpos($newfile, '.') + 1);
-			if (!empty($conf->global->MAIN_DOC_USE_TIMING))
-			{
-				$format = $conf->global->MAIN_DOC_USE_TIMING;
-				if ($format == '1') $format = '%Y%m%d%H%M%S';
-				$filename = $newfiletmp.'-'.dol_print_date(dol_now(), $format).'.'.$newfileformat;
-
-			}
-			else
-			{
-
-				$filename = $objectref.'.'.$newfileformat;
-
-				$filename = $ref . '.odt';
-
-			}
+			$filename = $objectref.'.odt';
 			$object->last_main_doc = $filename;
 
-			$sql = "UPDATE ".MAIN_DB_PREFIX."digirisk_documents";
+			$sql = "UPDATE ".MAIN_DB_PREFIX."digiriskdolibarr_digiriskdocuments";
 			$sql .= " SET last_main_doc =" .(!empty($filename) ? "'".$this->db->escape($filename)."'" : 'null');
 			$sql .= " WHERE rowid = ".$object->id;
 
 			dol_syslog("admin.lib::Insert last main doc", LOG_DEBUG);
 			$this->db->query($sql);
-
 			$file = $dir.'/'.$filename;
-
-			//print "newdir=".$dir;
-			//print "newfile=".$newfile;
-			//print "file=".$file;
-			//print "conf->societe->dir_temp=".$conf->societe->dir_temp;
 
 			dol_mkdir($conf->digiriskdolibarr->dir_temp);
 
-
-			// If CUSTOMER contact defined on order, we use it
-			$usecontact = false;
-			$arrayidcontact = $object->getIdContact('external', 'CUSTOMER');
-			if (count($arrayidcontact) > 0)
-			{
-				$usecontact = true;
-				$result = $object->fetch_contact($arrayidcontact[0]);
-			}
-
-			// Recipient name
-			$contactobject = null;
-			if (!empty($usecontact))
-			{
-				// On peut utiliser le nom de la societe du contact
-				if (!empty($conf->global->MAIN_USE_COMPANY_NAME_OF_CONTACT)) $socobject = $object->contact;
-				else {
-					$socobject = $object->thirdparty;
-					// if we have a CUSTOMER contact and we dont use it as recipient we store the contact object for later use
-					$contactobject = $object->contact;
-				}
-			}
-			else
-			{
-				$socobject = $object->thirdparty;
-			}
-
 			// Make substitution
-			$substitutionarray = array(
-				'__FROM_NAME__' => $this->emetteur->name,
-				'__FROM_EMAIL__' => $this->emetteur->email,
-				'__TOTAL_TTC__' => $object->total_ttc,
-				'__TOTAL_HT__' => $object->total_ht,
-				'__TOTAL_VAT__' => $object->total_vat
-			);
+			$substitutionarray = array();
 			complete_substitutions_array($substitutionarray, $langs, $object);
 			// Call the ODTSubstitution hook
 			$parameters = array('file'=>$file, 'object'=>$object, 'outputlangs'=>$outputlangs, 'substitutionarray'=>&$substitutionarray);
 			$reshook = $hookmanager->executeHooks('ODTSubstitution', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
-
-			// Line of free text
-			$newfreetext = '';
-			$paramfreetext = 'ORDER_FREE_TEXT';
-			if (!empty($conf->global->$paramfreetext))
-			{
-				$newfreetext = make_substitutions($conf->global->$paramfreetext, $substitutionarray);
-			}
 
 			// Open and load template
 			require_once ODTPHP_PATH.'odf.php';
@@ -336,36 +245,14 @@ class doc_informationssharing_A4_odt extends ModelePDFInformationsSharing
 				dol_syslog($e->getMessage(), LOG_INFO);
 				return -1;
 			}
-			// After construction $odfHandler->contentXml contains content and
-			// [!-- BEGIN row.lines --]*[!-- END row.lines --] has been replaced by
-			// [!-- BEGIN lines --]*[!-- END lines --]
-			//print html_entity_decode($odfHandler->__toString());
-			//print exit;
-
-
-			// Make substitutions into odt of freetext
-			try {
-				$odfHandler->setVars('free_text', $newfreetext, true, 'UTF-8');
-			}
-			catch (OdfException $e)
-			{
-				dol_syslog($e->getMessage(), LOG_INFO);
-			}
 
 			// Define substitution array
 			$substitutionarray = getCommonSubstitutionArray($outputlangs, 0, null, $object);
 			$array_object_from_properties = $this->get_substitutionarray_each_var_object($object, $outputlangs);
-			$array_objet = $this->get_substitutionarray_object($object, $outputlangs);
-			$array_user = $this->get_substitutionarray_user($user, $outputlangs);
-			$array_soc = $this->get_substitutionarray_mysoc($mysoc, $outputlangs);
-			$array_thirdparty = $this->get_substitutionarray_thirdparty($socobject, $outputlangs);
-			$array_other = $this->get_substitutionarray_other($outputlangs);
-			// retrieve contact information for use in object as contact_xxx tags
-			$array_thirdparty_contact = array();
-			if ($usecontact && is_object($contactobject)) $array_thirdparty_contact = $this->get_substitutionarray_contact($contactobject, $outputlangs, 'contact');
+			$array_object = $this->get_substitutionarray_object($object, $outputlangs);
 
-			$tmparray = array_merge($substitutionarray, $array_object_from_properties, $array_user, $array_soc, $array_thirdparty, $array_objet, $array_other, $array_thirdparty_contact);
-			complete_substitutions_array($tmparray, $outputlangs, $informationssharing);
+			$tmparray = array_merge($substitutionarray, $array_object_from_properties, $array_object);
+			complete_substitutions_array($tmparray, $outputlangs, $object);
 
 			// Call the ODTSubstitution hook
 			$parameters = array('odfHandler'=>&$odfHandler, 'file'=>$file, 'object'=>$object, 'outputlangs'=>$outputlangs, 'substitutionarray'=>&$tmparray);
@@ -454,7 +341,6 @@ class doc_informationssharing_A4_odt extends ModelePDFInformationsSharing
 			}
 
 			// Call the beforeODTSave hook
-
 			$parameters = array('odfHandler'=>&$odfHandler, 'file'=>$file, 'object'=>$object, 'outputlangs'=>$outputlangs, 'substitutionarray'=>&$tmparray);
 			$reshook = $hookmanager->executeHooks('beforeODTSave', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
 
@@ -495,7 +381,6 @@ class doc_informationssharing_A4_odt extends ModelePDFInformationsSharing
 			$this->error = $langs->transnoentities("ErrorCanNotCreateDir", $dir);
 			return -1;
 		}
-
 
 		return -1;
 	}

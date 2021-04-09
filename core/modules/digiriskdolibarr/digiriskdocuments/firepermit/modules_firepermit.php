@@ -27,7 +27,7 @@ require_once DOL_DOCUMENT_ROOT . '/core/class/commondocgenerator.class.php';
 /**
  *	Parent class for documents models
  */
-abstract class ModelePDFFirePermit extends CommonDocGenerator
+abstract class ModeleODTFirePermit extends CommonDocGenerator
 {
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps

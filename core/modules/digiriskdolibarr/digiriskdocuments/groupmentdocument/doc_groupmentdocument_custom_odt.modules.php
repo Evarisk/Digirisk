@@ -1,10 +1,5 @@
 <?php
-/* Copyright (C) 2010-2012 	Laurent Destailleur <eldy@users.sourceforge.net>
- * Copyright (C) 2012		Juanjo Menent		<jmenent@2byte.es>
- * Copyright (C) 2014		Marcos García		<marcosgdf@gmail.com>
- * Copyright (C) 2016		Charlie Benke		<charlie@patas-monkey.com>
- * Copyright (C) 2018-2019  Philippe Grand      <philippe.grand@atoo-net.com>
- * Copyright (C) 2018       Frédéric France     <frederic.france@netlogic.fr>
+/* Copyright (C) 2021 EOXIA <dev@eoxia.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,25 +17,21 @@
  */
 
 /**
- *	\file       htdocs/core/modules/digiriskdolibarr/doc/doc_generic_digiriskdolibarr_odt.modules.php
+ *	\file       htdocs/core/modules/digiriskdolibarr/digiriskdocuments/groupmentdocument/doc_groupmentdocument_custom_odt.modules.php
  *	\ingroup    digiriskdolibarr
  *	\brief      File of class to build ODT documents for digiriskdolibarr
  */
 
-
-dol_include_once('/custom/digiriskdolibarr/lib/files.lib.php');
-dol_include_once('/core/lib/files.lib.php');
-dol_include_once('/digiriskdolibarr/class/risk.class.php');
-dol_include_once('/digiriskdolibarr/class/digiriskevaluation.class.php');
-dol_include_once('/digiriskdolibarr/class/digirisksignalisation.class.php');
-require_once DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/core/modules/digiriskdolibarr/digiriskdocuments/groupmentdocument/modules_groupmentdocument.php';
+require_once DOL_DOCUMENT_ROOT . '/core/lib/files.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/company.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/doc.lib.php';
-
+dol_include_once('/custom/digiriskdolibarr/lib/files.lib.php');
+dol_include_once('/custom/digiriskdolibarr/core/modules/digiriskdolibarr/digiriskdocuments/groupmentdocument/mod_groupmentdocument_standard.php');
+dol_include_once('/custom/digiriskdolibarr/core/modules/digiriskdolibarr/digiriskdocuments/groupmentdocument/modules_groupmentdocument.php');
 /**
  *	Class to build documents using ODF templates generator
  */
-class doc_groupmentdocument_A4_odt extends ModelePDFGroupmentDocument
+class doc_groupmentdocument_custom_odt extends ModeleODTGroupmentDocument
 {
 	/**
 	 * Issuer
@@ -59,7 +50,6 @@ class doc_groupmentdocument_A4_odt extends ModelePDFGroupmentDocument
 	 */
 	public $version = 'dolibarr';
 
-
 	/**
 	 *	Constructor
 	 *
@@ -67,15 +57,15 @@ class doc_groupmentdocument_A4_odt extends ModelePDFGroupmentDocument
 	 */
 	public function __construct($db)
 	{
-		global $conf, $langs, $mysoc;
+		global $langs, $mysoc;
 
 		// Load translation files required by the page
 		$langs->loadLangs(array("main", "companies"));
 
 		$this->db = $db;
-		$this->name = $langs->trans('GroupmentDigiriskTemplate');
+		$this->name = $langs->trans('GroupmentDocumentCustomDigiriskTemplate');
 		$this->description = $langs->trans("DocumentModelOdt");
-		$this->scandir = 'DIGIRISKDOLIBARR_GROUPMENT_ADDON_ODT_PATH'; // Name of constant that is used to save list of directories to scan
+		$this->scandir = 'DIGIRISKDOLIBARR_GROUPMENTDOCUMENT_CUSTOM_ADDON_ODT_PATH'; // Name of constant that is used to save list of directories to scan
 
 		// Page size for A4 format
 		$this->type = 'odt';
@@ -92,7 +82,6 @@ class doc_groupmentdocument_A4_odt extends ModelePDFGroupmentDocument
 		if (!$this->emetteur->country_code) $this->emetteur->country_code = substr($langs->defaultlang, -2); // By default if not defined
 	}
 
-
 	/**
 	 *	Return description of a module
 	 *
@@ -106,18 +95,17 @@ class doc_groupmentdocument_A4_odt extends ModelePDFGroupmentDocument
 		// Load translation files required by the page
 		$langs->loadLangs(array("errors", "companies"));
 
-		$form = new Form($this->db);
 		$texte = $this->description.".<br>\n";
 		$texte .= '<form action="'.$_SERVER["PHP_SELF"].'" method="POST">';
 		$texte .= '<input type="hidden" name="token" value="'.newToken().'">';
 		$texte .= '<input type="hidden" name="action" value="setModuleOptions">';
-		$texte .= '<input type="hidden" name="param1" value="DIGIRISKDOLIBARR_GROUPMENT_ADDON_ODT_PATH">';
+		$texte .= '<input type="hidden" name="param1" value="DIGIRISKDOLIBARR_GROUPMENTDOCUMENT_CUSTOM_ADDON_ODT_PATH">';
 		$texte .= '<table class="nobordernopadding" width="100%">';
 
 		// List of directories area
 		$texte .= '<tr><td>';
 		$texttitle = $langs->trans("ListOfDirectories");
-		$listofdir = explode(',', preg_replace('/[\r\n]+/', ',', trim($conf->global->DIGIRISKDOLIBARR_GROUPMENT_ADDON_ODT_PATH)));
+		$listofdir = explode(',', preg_replace('/[\r\n]+/', ',', trim($conf->global->DIGIRISKDOLIBARR_GROUPMENTDOCUMENT_CUSTOM_ADDON_ODT_PATH)));
 		$listoffiles = array();
 		foreach ($listofdir as $key=>$tmpdir)
 		{
@@ -134,15 +122,12 @@ class doc_groupmentdocument_A4_odt extends ModelePDFGroupmentDocument
 			}
 		}
 
-
 		// Scan directories
 		$nbofiles = count($listoffiles);
-		if (!empty($conf->global->DIGIRISKDOLIBARR_GROUPMENT_ADDON_ODT_PATH))
+		if (!empty($conf->global->DIGIRISKDOLIBARR_GROUPMENTDOCUMENT_CUSTOM_ADDON_ODT_PATH))
 		{
 			$texte .= $langs->trans("DigiriskNumberOfModelFilesFound").': <b>';
-			//$texte.=$nbofiles?'<a id="a_'.get_class($this).'" href="#">':'';
 			$texte .= count($listoffiles);
-			//$texte.=$nbofiles?'</a>':'';
 			$texte .= '</b>';
 		}
 
@@ -157,9 +142,6 @@ class doc_groupmentdocument_A4_odt extends ModelePDFGroupmentDocument
 		}
 
 		$texte .= '</td>';
-
-
-
 		$texte .= '</table>';
 		$texte .= '</form>';
 
@@ -170,7 +152,7 @@ class doc_groupmentdocument_A4_odt extends ModelePDFGroupmentDocument
 	/**
 	 *  Function to build a document on disk using the generic odt module.
 	 *
-	 *	@param		Commande	$object				Object source to build document
+	 *	@param		Groupment	$object				Object source to build document
 	 *	@param		Translate	$outputlangs		Lang output object
 	 * 	@param		string		$srctemplatepath	Full path of source filename for generator using a template file
 	 *  @param		int			$hidedetails		Do not show line details
@@ -181,11 +163,11 @@ class doc_groupmentdocument_A4_odt extends ModelePDFGroupmentDocument
 	public function write_file($object, $outputlangs, $srctemplatepath, $hidedetails = 0, $hidedesc = 0, $hideref = 0)
 	{
 		// phpcs:enable
-		global $user, $langs, $conf, $mysoc, $hookmanager;
+		global $user, $langs, $conf, $hookmanager, $action;
 
 		if (empty($srctemplatepath))
 		{
-			dol_syslog("doc_generic_odt::write_file parameter srctemplatepath empty", LOG_WARNING);
+			dol_syslog("doc_groupmentdocument_custom_odt::write_file parameter srctemplatepath empty", LOG_WARNING);
 			return -1;
 		}
 
@@ -196,33 +178,21 @@ class doc_groupmentdocument_A4_odt extends ModelePDFGroupmentDocument
 			$hookmanager = new HookManager($this->db);
 		}
 		$hookmanager->initHooks(array('odtgeneration'));
-		global $action;
 
 		if (!is_object($outputlangs)) $outputlangs = $langs;
-		$sav_charset_output = $outputlangs->charset_output;
 		$outputlangs->charset_output = 'UTF-8';
 
-		$outputlangs->loadLangs(array("main", "dict", "companies", "bills"));
+		$outputlangs->loadLangs(array("main", "dict", "companies", "digiriskdolibarr@digiriskdolibarr"));
 
+		$mod = new $conf->global->DIGIRISKDOLIBARR_GROUPMENTDOCUMENT_ADDON($this->db);
+		$ref = $mod->getNextValue($object);
 
-		// If $object is id instead of object
-		if (!is_object($object))
-		{
-			$id = $object;
-			$object = new DigiriskElement($this->db);
-			$result = $object->fetch($id);
-			if ($result < 0)
-			{
-				dol_print_error($this->db, $object->error);
-				return -1;
-			}
-		}
+		$object->ref = $ref;
+		$object->create($user);
 
-		$dir = $conf->digiriskdolibarr->multidir_output[isset($object->entity) ? $object->entity : 1] . '/groupment';
+		$dir = $conf->digiriskdolibarr->multidir_output[isset($object->entity) ? $object->entity : 1] . '/groupmentdocument';
 		$objectref = dol_sanitizeFileName($object->ref);
 		if (!preg_match('/specimen/i', $objectref)) $dir .= '/' . $objectref;
-
-		$file = $dir."/".$objectref.".odt";
 
 		if (!file_exists($dir))
 		{
@@ -235,94 +205,25 @@ class doc_groupmentdocument_A4_odt extends ModelePDFGroupmentDocument
 
 		if (file_exists($dir))
 		{
-			//print "srctemplatepath=".$srctemplatepath;	// Src filename
-			$newfile = basename($srctemplatepath);
-			$newfiletmp = preg_replace('/\.od(t|s)/i', '', $newfile);
-			$newfiletmp = preg_replace('/template_/i', '', $newfiletmp);
-			$newfiletmp = preg_replace('/modele_/i', '', $newfiletmp);
-			$newfiletmp = $objectref.'_'.$newfiletmp;
-
-			//$file=$dir.'/'.$newfiletmp.'.'.dol_print_date(dol_now(),'%Y%m%d%H%M%S').'.odt';
-			// Get extension (ods or odt)
-			$newfileformat = substr($newfile, strrpos($newfile, '.') + 1);
-			if (!empty($conf->global->MAIN_DOC_USE_TIMING))
-			{
-				$format = $conf->global->MAIN_DOC_USE_TIMING;
-				if ($format == '1') $format = '%Y%m%d%H%M%S';
-				$filename = $newfiletmp.'-'.dol_print_date(dol_now(), $format).'.'.$newfileformat;
-
-			}
-			else
-			{
-				$objectlabel = dol_sanitizeFileName($object->label);
-				$objectlabel = preg_replace('/ /', '_', $objectlabel);
-				$filename = dol_print_date(dol_now(),'%Y%m%d') . '_' . $objectref . '_' . $langs->trans('GPSheet') . '_' . $objectlabel . '.' . $newfileformat;
-			}
+			$filename = $objectref.'.odt';
 			$object->last_main_doc = $filename;
 
-			$sql = "UPDATE ".MAIN_DB_PREFIX."digirisk_documents";
+			$sql = "UPDATE ".MAIN_DB_PREFIX."digiriskdolibarr_digiriskdocuments";
 			$sql .= " SET last_main_doc =" .(!empty($filename) ? "'".$this->db->escape($filename)."'" : 'null');
 			$sql .= " WHERE rowid = ".$object->id;
 
 			dol_syslog("admin.lib::Insert last main doc", LOG_DEBUG);
 			$this->db->query($sql);
-
 			$file = $dir.'/'.$filename;
-
-			//print "newdir=".$dir;
-			//print "newfile=".$newfile;
-			//print "file=".$file;
-			//print "conf->societe->dir_temp=".$conf->societe->dir_temp;
 
 			dol_mkdir($conf->digiriskdolibarr->dir_temp);
 
-
-			// If CUSTOMER contact defined on order, we use it
-			$usecontact = false;
-			$arrayidcontact = $object->getIdContact('external', 'CUSTOMER');
-			if (count($arrayidcontact) > 0)
-			{
-				$usecontact = true;
-				$result = $object->fetch_contact($arrayidcontact[0]);
-			}
-
-			// Recipient name
-			$contactobject = null;
-			if (!empty($usecontact))
-			{
-				// On peut utiliser le nom de la societe du contact
-				if (!empty($conf->global->MAIN_USE_COMPANY_NAME_OF_CONTACT)) $socobject = $object->contact;
-				else {
-					$socobject = $object->thirdparty;
-					// if we have a CUSTOMER contact and we dont use it as recipient we store the contact object for later use
-					$contactobject = $object->contact;
-				}
-			}
-			else
-			{
-				$socobject = $object->thirdparty;
-			}
-
 			// Make substitution
-			$substitutionarray = array(
-				'__FROM_NAME__' => $this->emetteur->name,
-				'__FROM_EMAIL__' => $this->emetteur->email,
-				'__TOTAL_TTC__' => $object->total_ttc,
-				'__TOTAL_HT__' => $object->total_ht,
-				'__TOTAL_VAT__' => $object->total_vat
-			);
+			$substitutionarray = array();
 			complete_substitutions_array($substitutionarray, $langs, $object);
 			// Call the ODTSubstitution hook
 			$parameters = array('file'=>$file, 'object'=>$object, 'outputlangs'=>$outputlangs, 'substitutionarray'=>&$substitutionarray);
 			$reshook = $hookmanager->executeHooks('ODTSubstitution', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
-
-			// Line of free text
-			$newfreetext = '';
-			$paramfreetext = 'ORDER_FREE_TEXT';
-			if (!empty($conf->global->$paramfreetext))
-			{
-				$newfreetext = make_substitutions($conf->global->$paramfreetext, $substitutionarray);
-			}
 
 			// Open and load template
 			require_once ODTPHP_PATH.'odf.php';
@@ -343,35 +244,13 @@ class doc_groupmentdocument_A4_odt extends ModelePDFGroupmentDocument
 				dol_syslog($e->getMessage(), LOG_INFO);
 				return -1;
 			}
-			// After construction $odfHandler->contentXml contains content and
-			// [!-- BEGIN row.lines --]*[!-- END row.lines --] has been replaced by
-			// [!-- BEGIN lines --]*[!-- END lines --]
-			//print html_entity_decode($odfHandler->__toString());
-			//print exit;
-
-
-			// Make substitutions into odt of freetext
-			try {
-				$odfHandler->setVars('free_text', $newfreetext, true, 'UTF-8');
-			}
-			catch (OdfException $e)
-			{
-				dol_syslog($e->getMessage(), LOG_INFO);
-			}
 
 			// Define substitution array
 			$substitutionarray = getCommonSubstitutionArray($outputlangs, 0, null, $object);
 			$array_object_from_properties = $this->get_substitutionarray_each_var_object($object, $outputlangs);
-			$array_objet = $this->get_substitutionarray_object($object, $outputlangs);
-			$array_user = $this->get_substitutionarray_user($user, $outputlangs);
-			$array_soc = $this->get_substitutionarray_mysoc($mysoc, $outputlangs);
-			$array_thirdparty = $this->get_substitutionarray_thirdparty($socobject, $outputlangs);
-			$array_other = $this->get_substitutionarray_other($outputlangs);
-			// retrieve contact information for use in object as contact_xxx tags
-			$array_thirdparty_contact = array();
-			if ($usecontact && is_object($contactobject)) $array_thirdparty_contact = $this->get_substitutionarray_contact($contactobject, $outputlangs, 'contact');
+			$array_object = $this->get_substitutionarray_object($object, $outputlangs);
 
-			$tmparray = array_merge($substitutionarray, $array_object_from_properties, $array_user, $array_soc, $array_thirdparty, $array_objet, $array_other, $array_thirdparty_contact);
+			$tmparray = array_merge($substitutionarray, $array_object_from_properties, $array_object);
 			complete_substitutions_array($tmparray, $outputlangs, $object);
 
 			// Call the ODTSubstitution hook
@@ -400,67 +279,48 @@ class doc_groupmentdocument_A4_odt extends ModelePDFGroupmentDocument
 			try
 			{
 				$foundtagforlines = 1;
-				try {
-//					$listlines = $odfHandler->setSegment('risq4');
-//					$listlines = $odfHandler->setSegment('risq3');
-//					$listlines = $odfHandler->setSegment('risq2');
-//					$listlines = $odfHandler->setSegment('risq1');
-				}
-				catch (OdfException $e)
-				{
-					// We may arrive here if tags for lines not present into template
-					$foundtagforlines = 0;
-					dol_syslog($e->getMessage(), LOG_INFO);
-				}
 				if ($foundtagforlines)
 				{
-					$linenumber = 0;
-
 					$risk = new Risk($this->db);
-
 					if ( ! empty( $object ) ) {
 						$risks = $risk->fetchRisksOrderedByCotation($object->id);
 						if ($risks > 0 && !empty($risks)) {
 							for ($i = 1; $i <= 4; $i++ ) {
 								$listlines = $odfHandler->setSegment('risq' . $i);
 								foreach ($risks as $line) {
-										$evaluation = new DigiriskEvaluation($this->db);
-										$lastEvaluation = $evaluation->fetchFromParent($line->id, 1);
-										$lastEvaluation = array_shift($lastEvaluation);
-										$scale = $lastEvaluation->get_evaluation_scale();
+									$evaluation = new DigiriskEvaluation($this->db);
+									$lastEvaluation = $evaluation->fetchFromParent($line->id, 1);
+									$lastEvaluation = array_shift($lastEvaluation);
+									$scale = $lastEvaluation->get_evaluation_scale();
+									if ( $scale == $i ) {
+										$tmparray['nomDanger']          = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $line->get_danger_category($line) . '.png';
+										$tmparray['identifiantRisque'] 	= $line->ref . ' - ' . $lastEvaluation->ref;
+										$tmparray['quotationRisque']    = $lastEvaluation->cotation;
+										$tmparray['commentaireRisque']  = dol_print_date( $lastEvaluation->date_creation, '%A %e %B %G %H:%M' ) . ': ' . $lastEvaluation->comment;
 
-										if ( $scale == $i ) {
-											$tmparray['nomDanger']          = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $line->get_danger_category($line) . '.png';
-											$tmparray['identifiantRisque'] 	= $line->ref . ' - ' . $lastEvaluation->ref;
-											$tmparray['quotationRisque']    = $lastEvaluation->cotation;
-											$tmparray['commentaireRisque']  = dol_print_date( $lastEvaluation->date_creation, '%A %e %B %G %H:%M' ) . ': ' . $lastEvaluation->comment;
+										unset($tmparray['object_fields']);
 
-											//$linenumber++;
-											//$tmparray = $this->get_substitutionarray_lines($line, $outputlangs, $linenumber);
-
-											unset($tmparray['object_fields']);
-
-											complete_substitutions_array($tmparray, $outputlangs, $object, $line, "completesubstitutionarray_lines");
-											// Call the ODTSubstitutionLine hook
-											$parameters = array('odfHandler' => &$odfHandler, 'file' => $file, 'object' => $object, 'outputlangs' => $outputlangs, 'substitutionarray' => &$tmparray, 'line' => $line);
-											$reshook = $hookmanager->executeHooks('ODTSubstitutionLine', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
-											foreach ($tmparray as $key => $val) {
-												try {
-													if ( $val == $tmparray['nomDanger'] ) {
-														$listlines->setImage($key, $val);
-													}
-													else {
-														$listlines->setVars($key, $val, true, 'UTF-8');
-													}
-												} catch (OdfException $e) {
-													dol_syslog($e->getMessage(), LOG_INFO);
-												} catch (SegmentException $e) {
-													dol_syslog($e->getMessage(), LOG_INFO);
+										complete_substitutions_array($tmparray, $outputlangs, $object, $line, "completesubstitutionarray_lines");
+										// Call the ODTSubstitutionLine hook
+										$parameters = array('odfHandler' => &$odfHandler, 'file' => $file, 'object' => $object, 'outputlangs' => $outputlangs, 'substitutionarray' => &$tmparray, 'line' => $line);
+										$reshook = $hookmanager->executeHooks('ODTSubstitutionLine', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
+										foreach ($tmparray as $key => $val) {
+											try {
+												if ( $val == $tmparray['nomDanger'] ) {
+													$listlines->setImage($key, $val);
 												}
+												else {
+													$listlines->setVars($key, $val, true, 'UTF-8');
+												}
+											} catch (OdfException $e) {
+												dol_syslog($e->getMessage(), LOG_INFO);
+											} catch (SegmentException $e) {
+												dol_syslog($e->getMessage(), LOG_INFO);
 											}
-											$listlines->merge();
 										}
+										$listlines->merge();
 									}
+								}
 								$odfHandler->mergeSegment($listlines);
 							}
 						}
@@ -472,18 +332,13 @@ class doc_groupmentdocument_A4_odt extends ModelePDFGroupmentDocument
 						$signalisations = $signalisation->fetchFromParent($object->id);
 						if ($signalisations !== -1) {
 							$listlines = $odfHandler->setSegment('affectedRecommandation');
-
 							foreach ($signalisations as $line) {
+								$path             = DOL_DOCUMENT_ROOT .'/custom/digiriskdolibarr/img/';
 
-								$signalisationRef = substr($line->ref, 1);
-								$signalisationRef = ltrim($signalisationRef, '0');
-
-								$path 									= DOL_DOCUMENT_ROOT .'/custom/digiriskdolibarr/img/';
-
-								$tmparray['recommandationIcon'] 		= $path . '/' . $signalisation->get_signalisation_category($signalisation);
-								$tmparray['identifiantRecommandation'] 	= 'S'. $signalisationRef;
-								$tmparray['recommandationName'] 		= $line->get_signalisation_category($line, 'name');
-								$tmparray['recommandationComment'] 		= $line->description;
+								$tmparray['recommandationIcon']         = $path . '/' . $signalisation->get_signalisation_category($signalisation);
+								$tmparray['identifiantRecommandation']  = $line->ref;
+								$tmparray['recommandationName']         = $line->get_signalisation_category($line, 'name');
+								$tmparray['recommandationComment']      = $line->description;
 
 								unset($tmparray['object_fields']);
 
@@ -532,7 +387,6 @@ class doc_groupmentdocument_A4_odt extends ModelePDFGroupmentDocument
 			}
 
 			// Call the beforeODTSave hook
-
 			$parameters = array('odfHandler'=>&$odfHandler, 'file'=>$file, 'object'=>$object, 'outputlangs'=>$outputlangs, 'substitutionarray'=>&$tmparray);
 			$reshook = $hookmanager->executeHooks('beforeODTSave', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
 
@@ -573,7 +427,6 @@ class doc_groupmentdocument_A4_odt extends ModelePDFGroupmentDocument
 			$this->error = $langs->transnoentities("ErrorCanNotCreateDir", $dir);
 			return -1;
 		}
-
 
 		return -1;
 	}
