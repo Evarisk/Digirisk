@@ -21,7 +21,6 @@
  * \brief       This file is a class file for ListingRisksAction
  */
 
-// Put here all includes required by your class file
 dol_include_once('/digiriskdolibarr/class/digiriskdocuments.class.php');
 
 /**
