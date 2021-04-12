@@ -108,8 +108,10 @@ class modDigiriskdolibarr extends DolibarrModules
 			"/ecm/digiriskdolibarr/informationssharing",
 			"/ecm/digiriskdolibarr/firepermit",
 			"/ecm/digiriskdolibarr/preventionplan",
-			"/ecm/digiriskdolibarr/groupment",
-			"/ecm/digiriskdolibarr/workunit",
+			"/ecm/digiriskdolibarr/groupmentdocument",
+			"/ecm/digiriskdolibarr/workunitdocument",
+			"/ecm/digiriskdolibarr/listingrisksaction",
+			"/ecm/digiriskdolibarr/listingrisksphoto",
 			"/ecm/digiriskdolibarr/signalisation",
 			"/ecm/digiriskdolibarr/medias"
 		);
@@ -163,21 +165,22 @@ class modDigiriskdolibarr extends DolibarrModules
 			26 => array('DIGIRISKDOLIBARR_PREVENTIONPLAN_ADDON_ODT_PATH','chaine', DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/documents/doctemplates/preventionplan/' ,'', 1),
 			27 => array('DIGIRISKDOLIBARR_PREVENTIONPLAN_CUSTOM_ADDON_ODT_PATH','chaine', DOL_DATA_ROOT . '/ecm/digiriskdolibarr/preventionplan/' ,'', 1),
 			28 => array('DIGIRISKDOLIBARR_PREVENTIONPLAN_ADDON','chaine', 'mod_preventionplan_standard' ,'', 1),
-			29 => array('DIGIRISKDOLIBARR_PREVENTIONPLAN_DEFAULT_MODEL','chaine', 'preventionplan_A4_odt' ,'', 1),
-			30 => array('DIGIRISKDOLIBARR_GROUPMENT_ADDON_ODT_PATH','chaine', DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/documents/doctemplates/groupment/' ,'', 1),
-			31 => array('DIGIRISKDOLIBARR_GROUPMENT_CUSTOM_ADDON_ODT_PATH','chaine', DOL_DATA_ROOT . '/ecm/digiriskdolibarr/groupment/' ,'', 1),
-			32 => array('DIGIRISKDOLIBARR_GROUPMENT_ADDON','chaine', 'mod_groupment_standard' ,'', 1),
-			33 => array('DIGIRISKDOLIBARR_GROUPMENT_DEFAULT_MODEL','chaine', 'groupment_A4_odt' ,'', 1),
+			29 => array('DIGIRISKDOLIBARR_PREVENTIONPLAN_DEFAULT_MODEL','chaine', 'preventionplan_odt' ,'', 1),
+			30 => array('DIGIRISKDOLIBARR_GROUPMENTDOCUMENT_ADDON_ODT_PATH','chaine', DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/documents/doctemplates/groupmentdocument/' ,'', 1),
+			31 => array('DIGIRISKDOLIBARR_GROUPMENTDOCUMENT_CUSTOM_ADDON_ODT_PATH','chaine', DOL_DATA_ROOT . '/ecm/digiriskdolibarr/groupmentdocument/' ,'', 1),
+			32 => array('DIGIRISKDOLIBARR_GROUPMENTDOCUMENT_ADDON','chaine', 'mod_groupmentdocument_standard' ,'', 1),
+			80 => array('DIGIRISKDOLIBARR_GROUPMENT_ADDON','chaine', 'mod_groupment_standard' ,'', 1),
+			33 => array('DIGIRISKDOLIBARR_GROUPMENTDOCUMENT_DEFAULT_MODEL','chaine', 'groupmentdocument_odt' ,'', 1),
 			34 => array('MAIN_AGENDA_ACTIONAUTO_GROUPMENT_CREATE','chaine',1,'', 1),
 			35 => array('MAIN_AGENDA_ACTIONAUTO_WORKUNIT_CREATE','chaine',1,'', 1),
-			36 => array('DIGIRISKDOLIBARR_WORKUNIT_ADDON_ODT_PATH','chaine', DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/documents/doctemplates/workunit/' ,'', 1),
-			37 => array('DIGIRISKDOLIBARR_WORKUNIT_CUSTOM_ADDON_ODT_PATH','chaine', DOL_DATA_ROOT . '/ecm/digiriskdolibarr/workunit/' ,'', 1),
-			38 => array('DIGIRISKDOLIBARR_WORKUNIT_ADDON','chaine', 'mod_workunit_standard' ,'', 1),
-			39 => array('DIGIRISKDOLIBARR_WORKUNIT_DEFAULT_MODEL','chaine', 'workunit_A4_odt' ,'', 1),
+			70 => array('DIGIRISKDOLIBARR_WORKUNITDOCUMENT_ADDON_ODT_PATH','chaine', DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/documents/doctemplates/workunitdocument/' ,'', 1),
+			71 => array('DIGIRISKDOLIBARR_WORKUNITDOCUMENT_CUSTOM_ADDON_ODT_PATH','chaine', DOL_DATA_ROOT . '/ecm/digiriskdolibarr/workunitdocument/' ,'', 1),
+			72 => array('DIGIRISKDOLIBARR_WORKUNITDOCUMENT_ADDON','chaine', 'mod_workunitdocument_standard' ,'', 1),
+			73 => array('DIGIRISKDOLIBARR_WORKUNIT_ADDON','chaine', 'mod_workunit_standard' ,'', 1),
+			74 => array('DIGIRISKDOLIBARR_WORKUNITDOCUMENT_DEFAULT_MODEL','chaine', 'workunitdocument_odt' ,'', 1),
 			40 => array('DIGIRISKDOLIBARR_RISK_ADDON_ODT_PATH','chaine', DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/documents/doctemplates/risk/' ,'', 1),
 			41 => array('DIGIRISKDOLIBARR_RISK_CUSTOM_ADDON_ODT_PATH','chaine', DOL_DATA_ROOT . '/ecm/digiriskdolibarr/risk/' ,'', 1),
 			42 => array('DIGIRISKDOLIBARR_RISK_ADDON','chaine', 'mod_risk_standard' ,'', 1),
-			43 => array('DIGIRISKDOLIBARR_RISK_DEFAULT_MODEL','chaine', 'risk_A4_odt' ,'', 1),
 			44 => array('MAIN_AGENDA_ACTIONAUTO_RISK_CREATE','chaine',1,'', 1),
 			45 => array('RISK_STANDARD_MASK','chaine','R{0000}','', 1),
 			46 => array('EVALUATION_STANDARD_MASK','chaine','E{0000}','', 1),
@@ -194,12 +197,13 @@ class modDigiriskdolibarr extends DolibarrModules
 			57 => array('DIGIRISKDOLIBARR_LISTINGRISKSPHOTO_ADDON_ODT_PATH','chaine', DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/documents/doctemplates/listingrisksphoto/' ,'', 1),
 			58 => array('DIGIRISKDOLIBARR_LISTINGRISKSPHOTO_CUSTOM_ADDON_ODT_PATH','chaine', DOL_DATA_ROOT . '/ecm/digiriskdolibarr/listingrisksphoto/' ,'', 1),
 			59 => array('DIGIRISKDOLIBARR_LISTINGRISKSPHOTO_ADDON','chaine', 'mod_listingrisksphoto_standard' ,'', 1),
-			60 => array('DIGIRISKDOLIBARR_LISTINGRISKSPHOTO_DEFAULT_MODEL','chaine', 'listing_risks_photo_odt' ,'', 1),
+			60 => array('DIGIRISKDOLIBARR_LISTINGRISKSPHOTO_DEFAULT_MODEL','chaine', 'listingrisksphoto_odt' ,'', 1),
 			61 => array('DIGIRISKDOLIBARR_LISTINGRISKSACTION_ADDON_ODT_PATH','chaine', DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/documents/doctemplates/listingrisksaction/' ,'', 1),
 			62 => array('DIGIRISKDOLIBARR_LISTINGRISKSACTION_CUSTOM_ADDON_ODT_PATH','chaine', DOL_DATA_ROOT . '/ecm/digiriskdolibarr/listingrisksaction/' ,'', 1),
 			63 => array('DIGIRISKDOLIBARR_LISTINGRISKSACTION_ADDON','chaine', 'mod_listingrisksaction_standard' ,'', 1),
-			64 => array('DIGIRISKDOLIBARR_LISTINGRISKSACTION_DEFAULT_MODEL','chaine', 'listing_risks_actions_odt' ,'', 1),
+			64 => array('DIGIRISKDOLIBARR_LISTINGRISKSACTION_DEFAULT_MODEL','chaine', 'listingrisksaction_odt' ,'', 1),
 			65 => array('LEGALDISPLAY_STANDARD_MASK','chaine','V{0000}','', 1),
+			84 => array('DIGIRISKDOLIBARR_RISKASSESSMENT_ADDON','chaine', 'mod_riskassessment_standard' ,'', 1),
 
 		);
 
@@ -361,6 +365,40 @@ class modDigiriskdolibarr extends DolibarrModules
 		$this->rights[$r][0] = $this->numero.$r;
 		$this->rights[$r][1] = $langs->trans('DeleteDigiriskRisk');
 		$this->rights[$r][4] = 'risk';
+		$this->rights[$r][5] = 'delete';
+
+		/* LISTING RISKS ACTION PERMISSIONS */
+
+		$this->rights[$r][0] = $this->numero.$r;
+		$this->rights[$r][1] = $langs->trans('ReadListingRisksAction');
+		$this->rights[$r][4] = 'listingrisksaction';
+		$this->rights[$r][5] = 'read';
+		$r++;
+		$this->rights[$r][0] = $this->numero.$r;
+		$this->rights[$r][1] = $langs->trans('CreateReadListingRisksAction');
+		$this->rights[$r][4] = 'listingrisksaction';
+		$this->rights[$r][5] = 'write';
+		$r++;
+		$this->rights[$r][0] = $this->numero.$r;
+		$this->rights[$r][1] = $langs->trans('DeleteReadListingRisksAction');
+		$this->rights[$r][4] = 'listingrisksaction';
+		$this->rights[$r][5] = 'delete';
+
+		/* LISTING RISKS PHOTO PERMISSIONS */
+
+		$this->rights[$r][0] = $this->numero.$r;
+		$this->rights[$r][1] = $langs->trans('ReadListingRisksPhoto');
+		$this->rights[$r][4] = 'listingrisksphoto';
+		$this->rights[$r][5] = 'read';
+		$r++;
+		$this->rights[$r][0] = $this->numero.$r;
+		$this->rights[$r][1] = $langs->trans('CreateReadListingRisksPhoto');
+		$this->rights[$r][4] = 'listingrisksphoto';
+		$this->rights[$r][5] = 'write';
+		$r++;
+		$this->rights[$r][0] = $this->numero.$r;
+		$this->rights[$r][1] = $langs->trans('DeleteReadListingRisksPhoto');
+		$this->rights[$r][4] = 'listingrisksphoto';
 		$this->rights[$r][5] = 'delete';
 
 
