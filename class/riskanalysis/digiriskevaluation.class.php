@@ -17,30 +17,30 @@
  */
 
 /**
- * \file        class/digirisksignalisation.class.php
+ * \file        class/digiriskevaluation.class.php
  * \ingroup     digiriskdolibarr
- * \brief       This file is a CRUD class file for DigiriskSignalisation (Create/Read/Update/Delete)
+ * \brief       This file is a CRUD class file for DigiriskEvaluation (Create/Read/Update/Delete)
  */
 
 // Put here all includes required by your class file
-require_once DOL_DOCUMENT_ROOT.'/core/class/commonobject.class.php';
+require_once DOL_DOCUMENT_ROOT . '/core/class/commonobject.class.php';
 //require_once DOL_DOCUMENT_ROOT . '/societe/class/societe.class.php';
 //require_once DOL_DOCUMENT_ROOT . '/product/class/product.class.php';
 
 /**
- * Class for DigiriskSignalisation
+ * Class for DigiriskEvaluation
  */
-class DigiriskSignalisation extends CommonObject
+class DigiriskEvaluation extends CommonObject
 {
 	/**
 	 * @var string ID to identify managed object.
 	 */
-	public $element = 'digirisksignalisation';
+	public $element = 'evaluation';
 
 	/**
 	 * @var string Name of table without prefix where object is stored. This is also the key used for extrafields management.
 	 */
-	public $table_element = 'digiriskdolibarr_digirisksignalisation';
+	public $table_element = 'digiriskdolibarr_digiriskevaluation';
 
 	/**
 	 * @var int  Does this object support multicompany module ?
@@ -54,9 +54,9 @@ class DigiriskSignalisation extends CommonObject
 	public $isextrafieldmanaged = 1;
 
 	/**
-	 * @var string String with name of icon for digirisksignalisation. Must be the part after the 'object_' into object_digirisksignalisation.png
+	 * @var string String with name of icon for digiriskevaluation. Must be the part after the 'object_' into object_digiriskevaluation.png
 	 */
-	public $picto = 'digirisksignalisation@digiriskdolibarr';
+	public $picto = 'digiriskevaluation@digiriskdolibarr';
 
 
 	const STATUS_DRAFT = 0;
@@ -94,31 +94,47 @@ class DigiriskSignalisation extends CommonObject
 	 * @var array  Array with all fields and their property. Do not use it as a static var. It may be modified by constructor.
 	 */
 	public $fields=array(
-		'rowid' => array('type'=>'integer', 'label'=>'TechnicalID', 'enabled'=>'1', 'position'=>1, 'notnull'=>1, 'visible'=>0, 'noteditable'=>'1', 'index'=>1, 'comment'=>"Id"),
-		'ref' => array('type'=>'varchar(128)', 'label'=>'Ref', 'enabled'=>'1', 'position'=>10, 'notnull'=>1, 'visible'=>4, 'noteditable'=>'1', 'default'=>'(PROV)', 'index'=>1, 'searchall'=>1, 'showoncombobox'=>'1', 'comment'=>"Reference of object"),
-		'description' => array('type'=>'text', 'label'=>'Description', 'enabled'=>'1', 'position'=>60, 'notnull'=>0, 'visible'=>3,),
-		'date_creation' => array('type'=>'datetime', 'label'=>'DateCreation', 'enabled'=>'1', 'position'=>500, 'notnull'=>1, 'visible'=>-2,),
-		'tms' => array('type'=>'timestamp', 'label'=>'DateModification', 'enabled'=>'1', 'position'=>501, 'notnull'=>0, 'visible'=>-2,),
-		'fk_user_creat' => array('type'=>'integer:User:user/class/user.class.php', 'label'=>'UserAuthor', 'enabled'=>'1', 'position'=>510, 'notnull'=>1, 'visible'=>-2, 'foreignkey'=>'user.rowid',),
-		'fk_user_modif' => array('type'=>'integer:User:user/class/user.class.php', 'label'=>'UserModif', 'enabled'=>'1', 'position'=>511, 'notnull'=>-1, 'visible'=>-2,),
-		'import_key' => array('type'=>'varchar(14)', 'label'=>'ImportId', 'enabled'=>'1', 'position'=>1000, 'notnull'=>-1, 'visible'=>-2,),
-		'model_pdf' => array('type'=>'varchar(255)', 'label'=>'Model pdf', 'enabled'=>'1', 'position'=>1010, 'notnull'=>-1, 'visible'=>0,),
-		'fk_element' => array('type'=>'integer', 'label'=>'FK Element', 'enabled'=>'1', 'position'=>600, 'notnull'=>0, 'visible'=>-1,),
-		'category' => array('type'=>'integer', 'label'=>'Category', 'enabled'=>'1', 'position'=>650, 'notnull'=>0, 'visible'=>-1,),
-		'photo' => array('type'=>'varchar(128)', 'label'=>'Photo', 'enabled'=>'1', 'position'=>700, 'notnull'=>0, 'visible'=>-1,),
-		'entity' => array('type'=>'integer', 'label'=>'Entity', 'enabled'=>'1', 'position'=>50, 'notnull'=>0, 'visible'=>-1,),
+		'rowid' => array('type'=>'integer', 'label'=>'TechnicalID', 'enabled'=>'1', 'position'=>30, 'notnull'=>1, 'visible'=>0, 'noteditable'=>'1', 'index'=>1, 'comment'=>"Id"),
+		'ref' => array('type'=>'varchar(128)', 'label'=>'Ref', 'enabled'=>'1', 'position'=>31, 'notnull'=>1, 'visible'=>0, 'noteditable'=>'1', 'default'=>'(PROV)', 'index'=>1, 'searchall'=>1, 'showoncombobox'=>'1', 'comment'=>"Reference of object"),
+		'date_creation' => array('type'=>'datetime', 'label'=>'DateCreation', 'enabled'=>'1', 'position'=>32, 'notnull'=>1, 'visible'=>-0,),
+		'tms' => array('type'=>'timestamp', 'label'=>'DateModification', 'enabled'=>'1', 'position'=>33, 'notnull'=>0, 'visible'=>0,),
+		'fk_user_creat' => array('type'=>'integer:User:user/class/user.class.php', 'label'=>'UserAuthor', 'enabled'=>'1', 'position'=>34, 'notnull'=>1, 'visible'=>0, 'foreignkey'=>'user.rowid',),
+		'fk_user_modif' => array('type'=>'integer:User:user/class/user.class.php', 'label'=>'UserModif', 'enabled'=>'1', 'position'=>35, 'notnull'=>-1, 'visible'=>0,),
+		'import_key' => array('type'=>'varchar(14)', 'label'=>'ImportId', 'enabled'=>'1', 'position'=>36, 'notnull'=>-1, 'visible'=>0,),
+		'ref_ext' => array('type'=>'varchar(128)', 'label'=>'RefExt', 'enabled'=>'1', 'position'=>37, 'notnull'=>0, 'visible'=>0,),
+		'status' => array('type'=>'integer', 'label'=>'Status', 'enabled'=>'1', 'position'=>38, 'notnull'=>0, 'visible'=>0,),
+		'cotation' => array('type'=>'integer', 'label'=>'Evaluation', 'enabled'=>'1', 'position'=>39, 'notnull'=>0, 'visible'=>4,),
+		'has_tasks' => array('type'=>'integer', 'label'=>'Tasks', 'enabled'=>'1', 'position'=>40, 'notnull'=>0, 'visible'=>4,),
+		'method' => array('type'=>'varchar(50)', 'label'=>'EvaluationMethod', 'enabled'=>'1', 'position'=>41, 'notnull'=>0, 'visible'=>0,),
+		'fk_risk' => array('type'=>'integer', 'label'=>'ParentRisk', 'enabled'=>'1', 'position'=>42, 'notnull'=>0, 'visible'=>0,),
+		'gravite' => array('type'=>'integer', 'label'=>'Gravity', 'enabled'=>'1', 'position'=>43, 'notnull'=>0, 'visible'=>0,),
+		'protection' => array('type'=>'integer', 'label'=>'Protection', 'enabled'=>'1', 'position'=>44, 'notnull'=>0, 'visible'=>0,),
+		'occurrence' => array('type'=>'integer', 'label'=>'Occurrence', 'enabled'=>'1', 'position'=>45, 'notnull'=>0, 'visible'=>0,),
+		'formation' => array('type'=>'integer', 'label'=>'Formation', 'enabled'=>'1', 'position'=>46, 'notnull'=>0, 'visible'=>0,),
+		'exposition' => array('type'=>'integer', 'label'=>'Exposition', 'enabled'=>'1', 'position'=>47, 'notnull'=>0, 'visible'=>0,),
+		'comment' => array('type'=>'text', 'label'=>'Comment', 'enabled'=>'1', 'position'=>48, 'notnull'=>0, 'visible'=>0,),
+		'photo' => array('type'=>'varchar(128)', 'label'=>'Photo', 'enabled'=>'1', 'position'=>50, 'notnull'=>0, 'visible'=>0,),
+		'entity' => array('type'=>'integer', 'label'=>'entity', 'enabled'=>'1', 'position'=>49, 'notnull'=>0, 'visible'=>0,),
 	);
 	public $rowid;
 	public $ref;
-	public $description;
 	public $date_creation;
 	public $tms;
 	public $fk_user_creat;
 	public $fk_user_modif;
 	public $import_key;
-	public $model_pdf;
-	public $fk_element;
-	public $category;
+	public $ref_ext;
+	public $status;
+	public $cotation;
+	public $has_tasks;
+	public $method;
+	public $fk_risk;
+	public $gravite;
+	public $protection;
+	public $occurrence;
+	public $formation;
+	public $exposition;
+	public $comment;
 	public $photo;
 	public $entity;
 	// END MODULEBUILDER PROPERTIES
@@ -129,17 +145,17 @@ class DigiriskSignalisation extends CommonObject
 	/**
 	 * @var int    Name of subtable line
 	 */
-	//public $table_element_line = 'digiriskdolibarr_digirisksignalisationline';
+	//public $table_element_line = 'digiriskdolibarr_digiriskevaluationline';
 
 	/**
 	 * @var int    Field with ID of parent key if this object has a parent
 	 */
-	//public $fk_element = 'fk_digirisksignalisation';
+	//public $fk_element = 'fk_digiriskevaluation';
 
 	/**
 	 * @var int    Name of subtable class that manage subtable lines
 	 */
-	//public $class_element_line = 'DigiriskSignalisationline';
+	//public $class_element_line = 'DigiriskEvaluationline';
 
 	/**
 	 * @var array	List of child tables. To test if we can delete object.
@@ -151,10 +167,10 @@ class DigiriskSignalisation extends CommonObject
 	 *               If name matches '@ClassNAme:FilePathClass;ParentFkFieldName' it will
 	 *               call method deleteByParentField(parentId, ParentFkFieldName) to fetch and delete child object
 	 */
-	//protected $childtablesoncascade = array('digiriskdolibarr_digirisksignalisationdet');
+	//protected $childtablesoncascade = array('digiriskdolibarr_digiriskevaluationdet');
 
 	/**
-	 * @var DigiriskSignalisationLine[]     Array of subtable lines
+	 * @var DigiriskEvaluationLine[]     Array of subtable lines
 	 */
 	//public $lines = array();
 
@@ -175,7 +191,7 @@ class DigiriskSignalisation extends CommonObject
 		if (empty($conf->multicompany->enabled) && isset($this->fields['entity'])) $this->fields['entity']['enabled'] = 0;
 
 		// Example to show how to set values of fields definition dynamically
-		/*if ($user->rights->digiriskdolibarr->digirisksignalisation->read) {
+		/*if ($user->rights->digiriskdolibarr->digiriskevaluation->read) {
 			$this->fields['myfield']['visible'] = 1;
 			$this->fields['myfield']['noteditable'] = 0;
 		}*/
@@ -214,6 +230,15 @@ class DigiriskSignalisation extends CommonObject
 	 */
 	public function create(User $user, $notrigger = false)
 	{
+		$previousEvaluation = $this->fetchFromParent($this->fk_risk, 1);
+
+		// Change le statut des ressources précédentes à 0
+		$sql = "UPDATE ".MAIN_DB_PREFIX."digiriskdolibarr_digiriskevaluation";
+		$sql .= " SET status = 0";
+		$sql .= " WHERE fk_risk = ".$this->fk_risk;
+		$resql = $this->db->query($sql);
+
+		//RAJOUTER LIGNE POUR LE SELECT ENTITY
 		return $this->createCommon($user, $notrigger);
 	}
 
@@ -309,56 +334,6 @@ class DigiriskSignalisation extends CommonObject
 		}
 	}
 
-
-	/**
-	 * Load object in memory from the database
-	 *
-	 * @param int    $parent_id   Id parent object
-	 * @return int         <0 if KO, 0 if not found, >0 if OK
-	 */
-	public function fetchFromParent($parent_id)
-	{
-		$filter = array('customsql' => 'fk_element=' . $this->db->escape($parent_id));
-		if ($active) $filter['status'] = 1;
-
-		$result = $this->fetchAll('', '', 0, 0, $filter, 'AND');
-		if ($result > 0 && !empty($this->table_element_line)) $this->fetchLines();
-		return $result;
-	}
-
-	/**
-
-	 *
-	 * Get risk categories json in /digiriskdolibarr/js/json/
-	 * @return	array $risk_categories
-	 */
-	public function get_signalisation_categories()
-	{
-
-		$json_categories = file_get_contents(DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/js/json/signalisationCategories.json');
-		$signalisation_categories = json_decode($json_categories, true);
-
-		return $signalisation_categories;
-	}
-
-	/**
-	 *
-	 * Get danger category picto path
-	 * @return	string $category['thumbnail_name']     path to danger category picto, -1 if don't exist
-	 */
-	public function get_signalisation_category($signalisation, $param = 'name_thumbnail')
-	{
-
-		$signalisation_categories = $this->get_signalisation_categories();
-
-		foreach ($signalisation_categories as $category) {
-			if ($category['position'] == $signalisation->category) {
-				return $category[$param];
-			}
-		}
-		return -1;
-	}
-
 	/**
 	 * Load object in memory from the database
 	 *
@@ -369,6 +344,22 @@ class DigiriskSignalisation extends CommonObject
 	public function fetch($id, $ref = null)
 	{
 		$result = $this->fetchCommon($id, $ref);
+		if ($result > 0 && !empty($this->table_element_line)) $this->fetchLines();
+		return $result;
+	}
+
+	/**
+	 * Load object in memory from the database
+	 *
+	 * @param int    $parent_id   Id parent object
+	 * @return int         <0 if KO, 0 if not found, >0 if OK
+	 */
+	public function fetchFromParent($parent_id, $active = 0)
+	{
+		$filter = array('customsql' => 'fk_risk=' . $this->db->escape($parent_id));
+		if ($active) $filter['status'] = 1;
+
+		$result = $this->fetchAll('', '', 0, 0, $filter, 'AND');
 		if ($result > 0 && !empty($this->table_element_line)) $this->fetchLines();
 		return $result;
 	}
@@ -441,6 +432,7 @@ class DigiriskSignalisation extends CommonObject
 		}
 
 		$resql = $this->db->query($sql);
+
 		if ($resql) {
 			$num = $this->db->num_rows($resql);
 			$i = 0;
@@ -476,6 +468,42 @@ class DigiriskSignalisation extends CommonObject
 	public function update(User $user, $notrigger = false)
 	{
 		return $this->updateCommon($user, $notrigger);
+	}
+
+	/**
+	 * Update object into database
+	 *
+	 * @param  User $user      User that modifies
+	 * @return int             <0 if KO, >0 if OK
+	 */
+	public function updateEvaluationStatus(User $user, $risk_id)
+	{
+		dol_syslog(__METHOD__, LOG_DEBUG);
+		$sql = 'SELECT ';
+		$sql .= $this->getFieldList();
+		$sql .= ' FROM '.MAIN_DB_PREFIX.$this->table_element.' as t';
+		if (isset($this->ismultientitymanaged) && $this->ismultientitymanaged == 1) $sql .= ' WHERE t.entity IN ('.getEntity($this->table_element).')';
+		else $sql .= ' WHERE 1 = 1';
+		$sql .= ' AND fk_risk = '.$risk_id;
+		$sql .= ' ORDER BY t.rowid DESC';
+		$sql .= ' LIMIT 1';
+
+		$resql = $this->db->query($sql);
+
+		if ($resql) {
+			$evaluation = new DigiriskEvaluation($this->db);
+			$obj = $this->db->fetch_object($resql);
+			$this->db->free($resql);
+			$evaluation->fetch($obj->rowid);
+			$evaluation->status = 1;
+			$records = $evaluation->update($user);
+			return $records;
+		} else {
+			$this->errors[] = 'Error '.$this->db->lasterror();
+			dol_syslog(__METHOD__.' '.join(',', $this->errors), LOG_ERR);
+
+			return -1;
+		}
 	}
 
 	/**
@@ -522,7 +550,7 @@ class DigiriskSignalisation extends CommonObject
 	{
 		global $conf, $langs;
 
-		require_once DOL_DOCUMENT_ROOT.'/core/lib/files.lib.php';
+		require_once DOL_DOCUMENT_ROOT . '/core/lib/files.lib.php';
 
 		$error = 0;
 
@@ -533,8 +561,8 @@ class DigiriskSignalisation extends CommonObject
 			return 0;
 		}
 
-		/*if (! ((empty($conf->global->MAIN_USE_ADVANCED_PERMS) && ! empty($user->rights->digiriskdolibarr->digirisksignalisation->write))
-		 || (! empty($conf->global->MAIN_USE_ADVANCED_PERMS) && ! empty($user->rights->digiriskdolibarr->digirisksignalisation->digirisksignalisation_advance->validate))))
+		/*if (! ((empty($conf->global->MAIN_USE_ADVANCED_PERMS) && ! empty($user->rights->digiriskdolibarr->digiriskevaluation->write))
+		 || (! empty($conf->global->MAIN_USE_ADVANCED_PERMS) && ! empty($user->rights->digiriskdolibarr->digiriskevaluation->digiriskevaluation_advance->validate))))
 		 {
 		 $this->error='NotEnoughPermissions';
 		 dol_syslog(get_class($this)."::valid ".$this->error, LOG_ERR);
@@ -577,7 +605,7 @@ class DigiriskSignalisation extends CommonObject
 			if (!$error && !$notrigger)
 			{
 				// Call trigger
-				$result = $this->call_trigger('DIGIRISKSIGNALISATION_VALIDATE', $user);
+				$result = $this->call_trigger('DIGIRISKEVALUATION_VALIDATE', $user);
 				if ($result < 0) $error++;
 				// End call triggers
 			}
@@ -591,16 +619,16 @@ class DigiriskSignalisation extends CommonObject
 			if (preg_match('/^[\(]?PROV/i', $this->ref))
 			{
 				// Now we rename also files into index
-				$sql = 'UPDATE '.MAIN_DB_PREFIX."ecm_files set filename = CONCAT('".$this->db->escape($this->newref)."', SUBSTR(filename, ".(strlen($this->ref) + 1).")), filepath = 'digirisksignalisation/".$this->db->escape($this->newref)."'";
-				$sql .= " WHERE filename LIKE '".$this->db->escape($this->ref)."%' AND filepath = 'digirisksignalisation/".$this->db->escape($this->ref)."' and entity = ".$conf->entity;
+				$sql = 'UPDATE '.MAIN_DB_PREFIX."ecm_files set filename = CONCAT('".$this->db->escape($this->newref)."', SUBSTR(filename, ".(strlen($this->ref) + 1).")), filepath = 'digiriskevaluation/".$this->db->escape($this->newref)."'";
+				$sql .= " WHERE filename LIKE '".$this->db->escape($this->ref)."%' AND filepath = 'digiriskevaluation/".$this->db->escape($this->ref)."' and entity = ".$conf->entity;
 				$resql = $this->db->query($sql);
 				if (!$resql) { $error++; $this->error = $this->db->lasterror(); }
 
 				// We rename directory ($this->ref = old ref, $num = new ref) in order not to lose the attachments
 				$oldref = dol_sanitizeFileName($this->ref);
 				$newref = dol_sanitizeFileName($num);
-				$dirsource = $conf->digiriskdolibarr->dir_output.'/digirisksignalisation/'.$oldref;
-				$dirdest = $conf->digiriskdolibarr->dir_output.'/digirisksignalisation/'.$newref;
+				$dirsource = $conf->digiriskdolibarr->dir_output.'/digiriskevaluation/'.$oldref;
+				$dirdest = $conf->digiriskdolibarr->dir_output.'/digiriskevaluation/'.$newref;
 				if (!$error && file_exists($dirsource))
 				{
 					dol_syslog(get_class($this)."::validate() rename dir ".$dirsource." into ".$dirdest);
@@ -609,7 +637,7 @@ class DigiriskSignalisation extends CommonObject
 					{
 						dol_syslog("Rename ok");
 						// Rename docs starting with $oldref with $newref
-						$listoffiles = dol_dir_list($conf->digiriskdolibarr->dir_output.'/digirisksignalisation/'.$newref, 'files', 1, '^'.preg_quote($oldref, '/'));
+						$listoffiles = dol_dir_list($conf->digiriskdolibarr->dir_output.'/digiriskevaluation/'.$newref, 'files', 1, '^'.preg_quote($oldref, '/'));
 						foreach ($listoffiles as $fileentry)
 						{
 							$dirsource = $fileentry['name'];
@@ -665,7 +693,7 @@ class DigiriskSignalisation extends CommonObject
 		 return -1;
 		 }*/
 
-		return $this->setStatusCommon($user, self::STATUS_DRAFT, $notrigger, 'DIGIRISKSIGNALISATION_UNVALIDATE');
+		return $this->setStatusCommon($user, self::STATUS_DRAFT, $notrigger, 'DIGIRISKEVALUATION_UNVALIDATE');
 	}
 
 	/**
@@ -690,7 +718,7 @@ class DigiriskSignalisation extends CommonObject
 		 return -1;
 		 }*/
 
-		return $this->setStatusCommon($user, self::STATUS_CANCELED, $notrigger, 'DIGIRISKSIGNALISATION_CLOSE');
+		return $this->setStatusCommon($user, self::STATUS_CANCELED, $notrigger, 'DIGIRISKEVALUATION_CLOSE');
 	}
 
 	/**
@@ -715,7 +743,7 @@ class DigiriskSignalisation extends CommonObject
 		 return -1;
 		 }*/
 
-		return $this->setStatusCommon($user, self::STATUS_VALIDATED, $notrigger, 'DIGIRISKSIGNALISATION_REOPEN');
+		return $this->setStatusCommon($user, self::STATUS_VALIDATED, $notrigger, 'DIGIRISKEVALUATION_REOPEN');
 	}
 
 	/**
@@ -736,14 +764,14 @@ class DigiriskSignalisation extends CommonObject
 
 		$result = '';
 
-		$label = '<u>'.$langs->trans("DigiriskSignalisation").'</u>';
+		$label = '<u>'.$langs->trans("DigiriskEvaluation").'</u>';
 		$label .= '<br>';
 		$label .= '<b>'.$langs->trans('Ref').':</b> '.$this->ref;
 		if (isset($this->status)) {
 			$label .= '<br><b>'.$langs->trans("Status").":</b> ".$this->getLibStatut(5);
 		}
 
-		$url = dol_buildpath('/digiriskdolibarr/digiriskelement_signalisation.php', 1).'?id='.$this->id;
+		$url = dol_buildpath('/digiriskdolibarr/digiriskevaluation_card.php', 1).'?id='.$this->id;
 
 		if ($option != 'nolink')
 		{
@@ -758,7 +786,7 @@ class DigiriskSignalisation extends CommonObject
 		{
 			if (!empty($conf->global->MAIN_OPTIMIZEFORTEXTBROWSER))
 			{
-				$label = $langs->trans("ShowDigiriskSignalisation");
+				$label = $langs->trans("ShowDigiriskEvaluation");
 				$linkclose .= ' alt="'.dol_escape_htmltag($label, 1).'"';
 			}
 			$linkclose .= ' title="'.dol_escape_htmltag($label, 1).'"';
@@ -776,7 +804,7 @@ class DigiriskSignalisation extends CommonObject
 			if ($withpicto) $result .= img_object(($notooltip ? '' : $label), ($this->picto ? $this->picto : 'generic'), ($notooltip ? (($withpicto != 2) ? 'class="paddingright"' : '') : 'class="'.(($withpicto != 2) ? 'paddingright ' : '').'classfortooltip"'), 0, 0, $notooltip ? 0 : 1);
 		} else {
 			if ($withpicto) {
-				require_once DOL_DOCUMENT_ROOT.'/core/lib/files.lib.php';
+				require_once DOL_DOCUMENT_ROOT . '/core/lib/files.lib.php';
 
 				list($class, $module) = explode('@', $this->picto);
 				$upload_dir = $conf->$module->multidir_output[$conf->entity]."/$class/".dol_sanitizeFileName($this->ref);
@@ -807,7 +835,7 @@ class DigiriskSignalisation extends CommonObject
 		//if ($withpicto != 2) $result.=(($addlabel && $this->label) ? $sep . dol_trunc($this->label, ($addlabel > 1 ? $addlabel : 0)) : '');
 
 		global $action, $hookmanager;
-		$hookmanager->initHooks(array('digirisksignalisationdao'));
+		$hookmanager->initHooks(array('digiriskevaluationdao'));
 		$parameters = array('id'=>$this->id, 'getnomurl'=>$result);
 		$reshook = $hookmanager->executeHooks('getNomUrl', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
 		if ($reshook > 0) $result = $hookmanager->resPrint;
@@ -930,8 +958,8 @@ class DigiriskSignalisation extends CommonObject
 	{
 		$this->lines = array();
 
-		$objectline = new DigiriskSignalisationLine($this->db);
-		$result = $objectline->fetchAll('ASC', 'position', 0, 0, array('customsql'=>'fk_digirisksignalisation = '.$this->id));
+		$objectline = new DigiriskEvaluationLine($this->db);
+		$result = $objectline->fetchAll('ASC', 'position', 0, 0, array('customsql'=>'fk_digiriskevaluation = '.$this->id));
 
 		if (is_numeric($result))
 		{
@@ -956,16 +984,16 @@ class DigiriskSignalisation extends CommonObject
 		global $langs, $conf;
 		$langs->load("digiriskdolibarr@digiriskdolibarr");
 
-		if (empty($conf->global->DIGIRISKDOLIBARR_DIGIRISKSIGNALISATION_ADDON)) {
-			$conf->global->DIGIRISKDOLIBARR_DIGIRISKSIGNALISATION_ADDON = 'mod_digirisksignalisation_standard';
+		if (empty($conf->global->DIGIRISKDOLIBARR_DIGIRISKEVALUATION_ADDON)) {
+			$conf->global->DIGIRISKDOLIBARR_DIGIRISKEVALUATION_ADDON = 'mod_evaluation_standard';
 		}
 
-		if (!empty($conf->global->DIGIRISKDOLIBARR_DIGIRISKSIGNALISATION_ADDON))
+		if (!empty($conf->global->DIGIRISKDOLIBARR_DIGIRISKEVALUATION_ADDON))
 		{
 			$mybool = false;
 
-			$file = $conf->global->DIGIRISKDOLIBARR_DIGIRISKSIGNALISATION_ADDON.".php";
-			$classname = $conf->global->DIGIRISKDOLIBARR_DIGIRISKSIGNALISATION_ADDON;
+			$file = $conf->global->DIGIRISKDOLIBARR_DIGIRISKEVALUATION_ADDON.".php";
+			$classname = $conf->global->DIGIRISKDOLIBARR_DIGIRISKEVALUATION_ADDON;
 
 			// Include file with class
 			$dirmodels = array_merge(array('/'), (array) $conf->modules_parts['models']);
@@ -1030,12 +1058,12 @@ class DigiriskSignalisation extends CommonObject
 		$langs->load("digiriskdolibarr@digiriskdolibarr");
 
 		if (!dol_strlen($modele)) {
-			$modele = 'standard_digirisksignalisation';
+			$modele = 'standard_digiriskevaluation';
 
 			if ($this->modelpdf) {
 				$modele = $this->modelpdf;
-			} elseif (!empty($conf->global->DIGIRISKSIGNALISATION_ADDON_PDF)) {
-				$modele = $conf->global->DIGIRISKSIGNALISATION_ADDON_PDF;
+			} elseif (!empty($conf->global->DIGIRISKEVALUATION_ADDON_PDF)) {
+				$modele = $conf->global->DIGIRISKEVALUATION_ADDON_PDF;
 			}
 		}
 
@@ -1077,247 +1105,65 @@ class DigiriskSignalisation extends CommonObject
 
 		return $error;
 	}
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
 	/**
-	 *  Show photos of an object (nbmax maximum), into several columns
+	 * Return scale level for risk evaluation
 	 *
-	 *  @param		string	$modulepart		'product', 'ticket', ...
-	 *  @param      string	$sdir        	Directory to scan (full absolute path)
-	 *  @param      int		$size        	0=original size, 1='small' use thumbnail if possible
-	 *  @param      int		$nbmax       	Nombre maximum de photos (0=pas de max)
-	 *  @param      int		$nbbyrow     	Number of image per line or -1 to use div. Used only if size=1.
-	 * 	@param		int		$showfilename	1=Show filename
-	 * 	@param		int		$showaction		1=Show icon with action links (resize, delete)
-	 * 	@param		int		$maxHeight		Max height of original image when size='small' (so we can use original even if small requested). If 0, always use 'small' thumb image.
-	 * 	@param		int		$maxWidth		Max width of original image when size='small'
-	 *  @param      int     $nolink         Do not add a href link to view enlarged imaged into a new tab
-	 *  @param      int     $notitle        Do not add title tag on image
-	 *  @param		int		$usesharelink	Use the public shared link of image (if not available, the 'nophoto' image will be shown instead)
-	 *  @return     string					Html code to show photo. Number of photos shown is saved in this->nbphoto
+	 * @return	int			between 1 and 4
 	 */
-	public function digirisk_show_photos($modulepart, $sdir, $size = 0, $nbmax = 0, $nbbyrow = 5, $showfilename = 0, $showaction = 0, $maxHeight = 120, $maxWidth = 160, $nolink = 0, $notitle = 0, $usesharelink = 0, $subdir)
-	{
-		// phpcs:enable
-		global $conf, $user, $langs;
-
-		include_once DOL_DOCUMENT_ROOT.'/core/lib/files.lib.php';
-		include_once DOL_DOCUMENT_ROOT.'/core/lib/images.lib.php';
-
-		$sortfield = 'position_name';
-		$sortorder = 'desc';
-
-		$dir = $sdir.'/';
-		$pdir = '/' . $subdir . '/';
-
-		$dir .= get_exdir(0, 0, 0, 0, $this, $modulepart).$this->ref.'/';
-		$pdir .= get_exdir(0, 0, 0, 0, $this, $modulepart).$this->ref.'/';
-
-		// For backward compatibility
-		if ($modulepart == 'product' && !empty($conf->global->PRODUCT_USE_OLD_PATH_FOR_PHOTO))
-		{
-			$dir = $sdir.'/'.get_exdir($this->id, 2, 0, 0, $this, $modulepart).$this->id."/photos/";
-			$pdir = '/'.get_exdir($this->id, 2, 0, 0, $this, $modulepart).$this->id."/photos/";
+	public function get_evaluation_scale() {
+		if (!$this->cotation) {
+			return 1;
 		}
-
-		// Defined relative dir to DOL_DATA_ROOT
-		$relativedir = '';
-		if ($dir)
-		{
-			$relativedir = preg_replace('/^'.preg_quote(DOL_DATA_ROOT, '/').'/', '', $dir);
-			$relativedir = preg_replace('/^[\\/]/', '', $relativedir);
-			$relativedir = preg_replace('/[\\/]$/', '', $relativedir);
+		switch ($this->cotation) {
+			case ($this->cotation < 48):
+				return 1;
+			case ($this->cotation < 51) :
+				return 2;
+			case( $this->cotation < 80):
+				return 3;
+			case ($this->cotation >= 80):
+				return 4;
 		}
-
-		$dirthumb = $dir.'thumbs/';
-		$pdirthumb = $pdir.'thumbs/';
-
-		$return = '<!-- Photo -->'."\n";
-		$nbphoto = 0;
-
-		$filearray = dol_dir_list($dir, "files", 0, '', '(\.meta|_preview.*\.png)$', $sortfield, (strtolower($sortorder) == 'desc' ?SORT_DESC:SORT_ASC), 1);
-
-		/*if (! empty($conf->global->PRODUCT_USE_OLD_PATH_FOR_PHOTO))    // For backward compatiblity, we scan also old dirs
-		 {
-		 $filearrayold=dol_dir_list($dirold,"files",0,'','(\.meta|_preview.*\.png)$',$sortfield,(strtolower($sortorder)=='desc'?SORT_DESC:SORT_ASC),1);
-		 $filearray=array_merge($filearray, $filearrayold);
-		 }*/
-
-		completeFileArrayWithDatabaseInfo($filearray, $relativedir);
-
-		if (count($filearray))
-		{
-			if ($sortfield && $sortorder)
-			{
-				$filearray = dol_sort_array($filearray, $sortfield, $sortorder);
-			}
-
-			foreach ($filearray as $key => $val)
-			{
-				$photo = '';
-				$file = $val['name'];
-
-				//if (! utf8_check($file)) $file=utf8_encode($file);	// To be sure file is stored in UTF8 in memory
-
-				//if (dol_is_file($dir.$file) && image_format_supported($file) >= 0)
-				if (image_format_supported($file) >= 0)
-				{
-					$nbphoto++;
-					$photo = $file;
-					$viewfilename = $file;
-
-					if ($size == 1 || $size == 'small') {   // Format vignette
-						// Find name of thumb file
-						$photo_vignette = basename(getImageFileNameForSize($dir.$file, '_small'));
-						if (!dol_is_file($dirthumb.$photo_vignette)) $photo_vignette = '';
-
-						// Get filesize of original file
-						$imgarray = dol_getImageSize($dir.$photo);
-
-						if ($nbbyrow > 0)
-						{
-							if ($nbphoto == 1) $return .= '<table class="valigntop center centpercent" style="border: 0; padding: 2px; border-spacing: 2px; border-collapse: separate;">';
-
-							if ($nbphoto % $nbbyrow == 1) $return .= '<tr class="center valignmiddle" style="border: 1px">';
-							$return .= '<td style="width: '.ceil(100 / $nbbyrow).'%" class="photo">';
-						}
-						elseif ($nbbyrow < 0) $return .= '<div class="inline-block">';
-
-						$return .= "\n";
-
-						$relativefile = preg_replace('/^\//', '', $pdir.$photo);
-						if (empty($nolink))
-						{
-							$urladvanced = getAdvancedPreviewUrl($modulepart, $relativefile, 0, 'entity='.$this->entity);
-							if ($urladvanced) $return .= '<a href="'.$urladvanced.'">';
-							else $return .= '<a href="'.DOL_URL_ROOT.'/viewimage.php?modulepart='.$modulepart.'&entity='.$this->entity.'&file='.urlencode($pdir.$photo).'" class="aphoto" target="_blank">';
-						}
-
-						// Show image (width height=$maxHeight)
-						// Si fichier vignette disponible et image source trop grande, on utilise la vignette, sinon on utilise photo origine
-						$alt = $langs->transnoentitiesnoconv('File').': '.$relativefile;
-						$alt .= ' - '.$langs->transnoentitiesnoconv('Size').': '.$imgarray['width'].'x'.$imgarray['height'];
-						if ($notitle) $alt = '';
-
-						if ($usesharelink)
-						{
-							if ($val['share'])
-							{
-								if (empty($maxHeight) || $photo_vignette && $imgarray['height'] > $maxHeight)
-								{
-									$return .= '<!-- Show original file (thumb not yet available with shared links) -->';
-									$return .= '<img class="photo photowithmargin" height="'.$maxHeight.'" src="'.DOL_URL_ROOT.'/viewimage.php?hashp='.urlencode($val['share']).'" title="'.dol_escape_htmltag($alt).'">';
-								}
-								else {
-									$return .= '<!-- Show original file -->';
-									$return .= '<img class="photo photowithmargin" height="'.$maxHeight.'" src="'.DOL_URL_ROOT.'/viewimage.php?hashp='.urlencode($val['share']).'" title="'.dol_escape_htmltag($alt).'">';
-								}
-							}
-							else
-							{
-								$return .= '<!-- Show nophoto file (because file is not shared) -->';
-								$return .= '<img class="photo photowithmargin" height="'.$maxHeight.'" src="'.DOL_URL_ROOT.'/public/theme/common/nophoto.png" title="'.dol_escape_htmltag($alt).'">';
-							}
-						}
-						else
-						{
-							if (empty($maxHeight) || $photo_vignette && $imgarray['height'] > $maxHeight)
-							{
-								$return .= '<!-- Show thumb -->';
-								$return .= '<img class="photo photowithmargin"  height="'.$maxHeight.'" src="'.DOL_URL_ROOT.'/viewimage.php?modulepart='.$modulepart.'&entity='.$this->entity.'&file='.urlencode($pdirthumb.$photo_vignette).'" title="'.dol_escape_htmltag($alt).'">';
-							}
-							else {
-								$return .= '<!-- Show original file -->';
-								$return .= '<img class="photo photowithmargin" height="'.$maxHeight.'" src="'.DOL_URL_ROOT.'/viewimage.php?modulepart='.$modulepart.'&entity='.$this->entity.'&file='.urlencode($pdir.$photo).'" title="'.dol_escape_htmltag($alt).'">';
-							}
-						}
-
-						if (empty($nolink)) $return .= '</a>';
-						$return .= "\n";
-
-						if ($showfilename) $return .= '<br>'.$viewfilename;
-						if ($showaction)
-						{
-							$return .= '<br>';
-							// On propose la generation de la vignette si elle n'existe pas et si la taille est superieure aux limites
-							if ($photo_vignette && (image_format_supported($photo) > 0) && ($this->imgWidth > $maxWidth || $this->imgHeight > $maxHeight))
-							{
-								$return .= '<a href="'.$_SERVER["PHP_SELF"].'?id='.$this->id.'&amp;action=addthumb&amp;file='.urlencode($pdir.$viewfilename).'">'.img_picto($langs->trans('GenerateThumb'), 'refresh').'&nbsp;&nbsp;</a>';
-							}
-							// Special cas for product
-							if ($modulepart == 'product' && ($user->rights->produit->creer || $user->rights->service->creer))
-							{
-								// Link to resize
-								$return .= '<a href="'.DOL_URL_ROOT.'/core/photos_resize.php?modulepart='.urlencode('produit|service').'&id='.$this->id.'&amp;file='.urlencode($pdir.$viewfilename).'" title="'.dol_escape_htmltag($langs->trans("Resize")).'">'.img_picto($langs->trans("Resize"), 'resize', '').'</a> &nbsp; ';
-
-								// Link to delete
-								$return .= '<a href="'.$_SERVER["PHP_SELF"].'?id='.$this->id.'&amp;action=delete&amp;file='.urlencode($pdir.$viewfilename).'">';
-								$return .= img_delete().'</a>';
-							}
-						}
-						$return .= "\n";
-
-						if ($nbbyrow > 0)
-						{
-							$return .= '</td>';
-							if (($nbphoto % $nbbyrow) == 0) $return .= '</tr>';
-						}
-						elseif ($nbbyrow < 0) $return .= '</div>';
-					}
-
-					if (empty($size)) {     // Format origine
-						$return .= '<img class="photo photowithmargin" src="'.DOL_URL_ROOT.'/viewimage.php?modulepart='.$modulepart.'&entity='.$this->entity.'&file='.urlencode($pdir.$photo).'">';
-
-						if ($showfilename) $return .= '<br>'.$viewfilename;
-						if ($showaction)
-						{
-							// Special case for product
-							if ($modulepart == 'product' && ($user->rights->produit->creer || $user->rights->service->creer))
-							{
-								// Link to resize
-								$return .= '<a href="'.DOL_URL_ROOT.'/core/photos_resize.php?modulepart='.urlencode('produit|service').'&id='.$this->id.'&amp;file='.urlencode($pdir.$viewfilename).'" title="'.dol_escape_htmltag($langs->trans("Resize")).'">'.img_picto($langs->trans("Resize"), 'resize', '').'</a> &nbsp; ';
-
-								// Link to delete
-								$return .= '<a href="'.$_SERVER["PHP_SELF"].'?id='.$this->id.'&amp;action=delete&amp;file='.urlencode($pdir.$viewfilename).'">';
-								$return .= img_delete().'</a>';
-							}
-						}
-					}
-
-					// On continue ou on arrete de boucler ?
-					if ($nbmax && $nbphoto >= $nbmax) break;
-				}
-			}
-
-			if ($size == 1 || $size == 'small')
-			{
-				if ($nbbyrow > 0)
-				{
-					// Ferme tableau
-					while ($nbphoto % $nbbyrow)
-					{
-						$return .= '<td style="width: '.ceil(100 / $nbbyrow).'%">&nbsp;</td>';
-						$nbphoto++;
-					}
-
-					if ($nbphoto) $return .= '</table>';
-				}
-			}
-		}
-
-		$this->nbphoto = $nbphoto;
-
-		return $return;
 	}
 
+	/**
+	 * Return scale level for risk evaluation
+	 *
+	 * @return	int			between 1 and 4
+	 */
+	public function show_photo_evaluation($element) {
+		global $conf;
+
+		$risk = new Risk($this->db);
+
+		$relativepath = 'digiriskdolibarr/medias';
+		$modulepart   = 'ecm';
+		$path         = DOL_URL_ROOT .'/document.php?modulepart=' . $modulepart  . '&attachment=0&file=' . str_replace('/', '%2F', $relativepath) . '/';
+		$filearray    = dol_dir_list($conf->digiriskdolibarr->multidir_output[$conf->entity].'/'.$element->element.'/'.$element->ref.'/', "files", 0, '', '(\.odt|_preview.*\.png)$', 'position_name', 'asc', 1);
+
+		if (count($filearray)) : ?>
+			<?php print '<span class="floatleft inline-block valignmiddle divphotoref">'.$risk->digirisk_show_photos('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity].'/'.$element->element, 'small', 1, 0, 0, 0, 50, 0, 0, 0, 0, $element->element).'</span>'; ?>
+		<?php else : ?>
+			<?php $nophoto = '/public/theme/common/nophoto.png'; ?>
+			<div class="action photo default-photo evaluation-photo-open modal-open" value="0">
+				<span class="floatleft inline-block valignmiddle divphotoref photo-edit0">
+					<input type="hidden" value="<?php echo $path ?>" id="pathToPhoto0">
+					<img class="photo maxwidth50"  src="<?php echo DOL_URL_ROOT. $nophoto ?>">
+				</span>
+			</div>
+		<?php endif; ?>
+		<?php
+	}
 }
 
 /**
- * Class DigiriskSignalisationLine. You can also remove this and generate a CRUD class for lines objects.
+ * Class DigiriskEvaluationLine. You can also remove this and generate a CRUD class for lines objects.
  */
-class DigiriskSignalisationLine
+class DigiriskEvaluationLine
 {
-	// To complete with content of an object DigiriskSignalisationLine
-	// We should have a field rowid, fk_digirisksignalisation and position
+	// To complete with content of an object DigiriskEvaluationLine
+	// We should have a field rowid, fk_digiriskevaluation and position
 
 	/**
 	 * @var int  Does object support extrafields ? 0=No, 1=Yes
