@@ -205,9 +205,8 @@ if ($includedocgeneration) {
 	$urlsource  = $_SERVER["PHP_SELF"];
 	$modulepart = 'digiriskdolibarr:InformationsSharing';
 
-	print digiriskshowdocuments($modulepart,$dir_files, $filedir, $urlsource, $permissiontoadd, $permissiontodelete, $conf->global->DIGIRISKDOLIBARR_LEGALDISPLAY_DEFAULT_MODEL, 1, 0, 28, 0, '', $langs->trans('InformationsSharing'), '', $langs->defaultlang, '', $informationssharing);
+	print digiriskshowdocuments($modulepart,$dir_files, $filedir, $urlsource, $permissiontoadd, $permissiontodelete, $conf->global->DIGIRISKDOLIBARR_INFORMATIONSSHARING_DEFAULT_MODEL, 1, 0, 28, 0, '', $langs->trans('InformationsSharing'), '', $langs->defaultlang, '', $informationssharing);
 }
-
 
 // End of page
 llxFooter();

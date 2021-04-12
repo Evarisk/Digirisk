@@ -208,7 +208,6 @@ if ($includedocgeneration) {
 	print digiriskshowdocuments($modulepart,$dir_files, $filedir, $urlsource, $permissiontoadd, $permissiontodelete, $conf->global->DIGIRISKDOLIBARR_LEGALDISPLAY_DEFAULT_MODEL, 1, 0, 28, 0, '', $langs->trans('LegalDisplay'), '', $langs->defaultlang, '', $legaldisplay);
 }
 
-
 // End of page
 llxFooter();
 $db->close();
