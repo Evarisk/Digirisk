@@ -51,6 +51,8 @@ $setupnotempty = 0;
 /*
  * Actions
  */
+include DOL_DOCUMENT_ROOT.'/core/actions_setmoduleoptions.inc.php';
+
 if ($action == 'updateMask')
 {
 	$maskconstlistingrisksaction = GETPOST('maskconstlistingrisksaction', 'alpha');
@@ -71,8 +73,13 @@ if ($action == 'updateMask')
 // Activate a model
 elseif ($action == 'set')
 {
-	$label       = '';
-	$description = '';
+	$label = GETPOST('label', 'alpha');
+
+	if ( $value == 'listingrisksaction_odt' ) {
+		$description = "DIGIRISKDOLIBARR_".strtoupper($type)."_ADDON_ODT_PATH";
+	} elseif ( $value == 'listingrisksaction_custom_odt' ) {
+		$description = "DIGIRISKDOLIBARR_".strtoupper($type)."_CUSTOM_ADDON_ODT_PATH";
+	}
 
 	addDocumentModel($value, $type, $label, $description);
 } elseif ($action == 'del')
@@ -280,7 +287,7 @@ if (is_dir($dir))
 
 		foreach ($filelist as $file)
 		{
-			if (preg_match('/\.modules\.php$/i', $file) && preg_match('/^(pdf_|doc_)/', $file) && preg_match('/listing_risks_action/i', $file) && preg_match('/odt/i', $file))
+			if (preg_match('/\.modules\.php$/i', $file) && preg_match('/^(pdf_|doc_)/', $file) && preg_match('/listingrisksaction/i', $file) && preg_match('/odt/i', $file))
 			{
 				if (file_exists($dir.'/'.$file))
 				{

@@ -51,6 +51,8 @@ $setupnotempty = 0;
 /*
  * Actions
  */
+include DOL_DOCUMENT_ROOT.'/core/actions_setmoduleoptions.inc.php';
+
 if ($action == 'updateMask')
 {
 	$maskconstgroupmentdocument = GETPOST('maskconstgroupmentdocument', 'alpha');
@@ -71,8 +73,13 @@ if ($action == 'updateMask')
 // Activate a model
 elseif ($action == 'set')
 {
-	$label       = '';
-	$description = '';
+	$label = GETPOST('label', 'alpha');
+
+	if ( $value == 'groupmentdocument_odt' ) {
+		$description = "DIGIRISKDOLIBARR_".strtoupper($type)."_ADDON_ODT_PATH";
+	} elseif ( $value == 'groupmentdocument_custom_odt' ) {
+		$description = "DIGIRISKDOLIBARR_".strtoupper($type)."_CUSTOM_ADDON_ODT_PATH";
+	}
 
 	addDocumentModel($value, $type, $label, $description);
 } elseif ($action == 'del')
