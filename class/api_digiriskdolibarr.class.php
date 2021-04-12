@@ -1,6 +1,5 @@
 <?php
-/* Copyright (C) 2015   Jean-François Ferry     <jfefe@aternatik.fr>
- * Copyright (C) 2021 SuperAdmin
+/* Copyright (C) 2021 EOXIA <dev@eoxia.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,8 +18,6 @@
 use Luracast\Restler\RestException;
 
 dol_include_once('/digiriskdolibarr/class/digiriskconst.class.php');
-
-
 
 /**
  * \file    digiriskdolibarr/class/api_digiriskdolibarr.class.php
