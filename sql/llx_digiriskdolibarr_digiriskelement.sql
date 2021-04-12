@@ -1,4 +1,4 @@
--- Copyright (C) ---Put here your own copyright and developer email---
+-- Copyright (C) 2021 EOXIA <dev@eoxia.com>
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -13,23 +13,19 @@
 -- You should have received a copy of the GNU General Public License
 -- along with this program.  If not, see https://www.gnu.org/licenses/.
 
-
 CREATE TABLE llx_digiriskdolibarr_digiriskelement(
-	-- BEGIN MODULEBUILDER FIELDS
-	rowid integer AUTO_INCREMENT PRIMARY KEY NOT NULL, 
-	ref varchar(128) NOT NULL, 
-	label varchar(255) NOT NULL, 
-	description text, 
+	rowid         integer AUTO_INCREMENT PRIMARY KEY NOT NULL,
+	ref           varchar(128) DEFAULT '(PROV)' NOT NULL,
+	ref_ext       varchar(128),
+	entity        integer DEFAULT 1 NOT NULL,
 	date_creation datetime NOT NULL, 
-	tms timestamp, 
-	fk_user_creat integer NOT NULL, 
-	fk_user_modif integer, 
-	import_key varchar(14), 
-	status smallint, 
-	element_type varchar(50), 
-	fk_parent integer NOT NULL, 
-	model_pdf varchar(255), 
-	last_main_doc varchar(50), 
-	entity integer DEFAULT 1
-	-- END MODULEBUILDER FIELDS
+	tms           timestamp,
+	import_key    integer DEFAULT NULL,
+	status        smallint,
+	label         varchar(255) NOT NULL,
+	description   text,
+	element_type  varchar(50),
+	fk_user_creat integer NOT NULL,
+	fk_user_modif integer,
+	fk_parent     integer DEFAULT 0 NOT NULL,
 ) ENGINE=innodb;

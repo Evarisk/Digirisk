@@ -1,4 +1,4 @@
--- Copyright (C) ---Put here your own copyright and developer email---
+-- Copyright (C) 2021 EOXIA <dev@eoxia.com>
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -13,14 +13,6 @@
 -- You should have received a copy of the GNU General Public License
 -- along with this program.  If not, see https://www.gnu.org/licenses/.
 
-
--- BEGIN MODULEBUILDER INDEXES
 ALTER TABLE llx_digiriskdolibarr_risk ADD INDEX idx_digiriskdolibarr_risk_rowid (rowid);
 ALTER TABLE llx_digiriskdolibarr_risk ADD INDEX idx_digiriskdolibarr_risk_ref (ref);
 ALTER TABLE llx_digiriskdolibarr_risk ADD CONSTRAINT llx_digiriskdolibarr_risk_fk_user_creat FOREIGN KEY (fk_user_creat) REFERENCES llx_user(rowid);
--- END MODULEBUILDER INDEXES
-
---ALTER TABLE llx_digiriskdolibarr_risk ADD UNIQUE INDEX uk_digiriskdolibarr_risk_fieldxy(fieldx, fieldy);
-
---ALTER TABLE llx_digiriskdolibarr_risk ADD CONSTRAINT llx_digiriskdolibarr_risk_fk_field FOREIGN KEY (fk_field) REFERENCES llx_digiriskdolibarr_myotherobject(rowid);
-

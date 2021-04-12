@@ -1,19 +1,11 @@
 INSERT INTO llx_document_model (nom, entity, type, libelle, description) VALUES ('informationssharing_odt', 1, 'informationssharing', 'ODT templates', 'DIGIRISKDOLIBARR_INFORMATIONSSHARING_ADDON_ODT_PATH');
-INSERT INTO llx_document_model (nom, entity, type, libelle, description) VALUES ('informationssharing_custom_odt', 1, 'informationssharing', 'ODT templates', 'DIGIRISKDOLIBARR_INFORMATIONSSHARING_CUSTOM_ADDON_ODT_PATH');
 INSERT INTO llx_document_model (nom, entity, type, libelle, description) VALUES ('legaldisplay_odt', 1, 'legaldisplay', 'ODT templates', 'DIGIRISKDOLIBARR_LEGALDISPLAY_ADDON_ODT_PATH');
-INSERT INTO llx_document_model (nom, entity, type, libelle, description) VALUES ('legaldisplay_custom_odt', 1, 'legaldisplay', 'ODT templates', 'DIGIRISKDOLIBARR_LEGALDISPLAY_CUSTOM_ADDON_ODT_PATH');
 INSERT INTO llx_document_model (nom, entity, type, libelle, description) VALUES ('firepermit_odt', 1, 'firepermit', 'ODT templates', 'DIGIRISKDOLIBARR_FIREPERMIT_ADDON_ODT_PATH');
-INSERT INTO llx_document_model (nom, entity, type, libelle, description) VALUES ('firepermit_custom_odt', 1, 'firepermit', 'ODT templates', 'DIGIRISKDOLIBARR_FIREPERMIT_CUSTOM_ADDON_ODT_PATH');
 INSERT INTO llx_document_model (nom, entity, type, libelle, description) VALUES ('preventionplan_odt', 1, 'preventionplan', 'ODT templates', 'DIGIRISKDOLIBARR_PREVENTIONPLAN_ADDON_ODT_PATH');
-INSERT INTO llx_document_model (nom, entity, type, libelle, description) VALUES ('preventionplan_custom_odt', 1, 'preventionplan', 'ODT templates', 'DIGIRISKDOLIBARR_PREVENTIONPLAN_CUSTOM_ADDON_ODT_PATH');
-INSERT INTO llx_document_model (nom, entity, type, libelle, description) VALUES ('groupmentdocument_odt', 1, 'groupment', 'ODT templates', 'DIGIRISKDOLIBARR_GROUPMENTDOCUMENT_ADDON_ODT_PATH');
-INSERT INTO llx_document_model (nom, entity, type, libelle, description) VALUES ('groupmentdocument_custom_odt', 1, 'groupment', 'ODT templates', 'DIGIRISKDOLIBARR_GROUPMENTDOCUMENT_CUSTOM_ADDON_ODT_PATH');
-INSERT INTO llx_document_model (nom, entity, type, libelle, description) VALUES ('workunitdocument_odt', 1, 'workunit', 'ODT templates', 'DIGIRISKDOLIBARR_WORKUNITDOCUMENT_ADDON_ODT_PATH');
-INSERT INTO llx_document_model (nom, entity, type, libelle, description) VALUES ('workunitdocument_custom_odt', 1, 'workunit', 'ODT templates', 'DIGIRISKDOLIBARR_WORKUNITDOCUMENT_CUSTOM_ADDON_ODT_PATH');
-INSERT INTO llx_document_model (nom, entity, type, libelle, description) VALUES ('listingrisksaction_odt', 1, 'listingrisksaction', 'ODT templates', 'DIGIRISKDOLIBARR_LISTINGRIKSACTION_ADDON_ODT_PATH');
-INSERT INTO llx_document_model (nom, entity, type, libelle, description) VALUES ('listingrisksaction_custom_odt', 1, 'listingrisksaction', 'ODT templates', 'DIGIRISKDOLIBARR_LISTINGRIKSACTION_CUSTOM_ADDON_ODT_PATH');
-INSERT INTO llx_document_model (nom, entity, type, libelle, description) VALUES ('listingrisksphoto_odt', 1, 'listingrisksphoto', 'ODT templates', 'DIGIRISKDOLIBARR_LISTINGRIKSPHOTO_ADDON_ODT_PATH');
-INSERT INTO llx_document_model (nom, entity, type, libelle, description) VALUES ('listingrisksphoto_custom_odt', 1, 'listingrisksphoto', 'ODT templates', 'DIGIRISKDOLIBARR_LISTINGRIKSPHOTO_CUSTOM_ADDON_ODT_PATH');
+INSERT INTO llx_document_model (nom, entity, type, libelle, description) VALUES ('groupmentdocument_odt', 1, 'groupmentdocument', 'ODT templates', 'DIGIRISKDOLIBARR_GROUPMENTDOCUMENT_ADDON_ODT_PATH');
+INSERT INTO llx_document_model (nom, entity, type, libelle, description) VALUES ('workunitdocument_odt', 1, 'workunitdocument', 'ODT templates', 'DIGIRISKDOLIBARR_WORKUNITDOCUMENT_ADDON_ODT_PATH');
+INSERT INTO llx_document_model (nom, entity, type, libelle, description) VALUES ('listingrisksaction_odt', 1, 'listingrisksaction', 'ODT templates', 'DIGIRISKDOLIBARR_LISTINGRISKSACTION_ADDON_ODT_PATH');
+INSERT INTO llx_document_model (nom, entity, type, libelle, description) VALUES ('listingrisksphoto_odt', 1, 'listingrisksphoto', 'ODT templates', 'DIGIRISKDOLIBARR_LISTINGRISKSPHOTO_ADDON_ODT_PATH');
 
 INSERT INTO llx_c_action_trigger (elementtype, code, label, description) VALUES ('informationssharing', 'INFORMATIONSSHARING_GENERATE', 'Informations Sharing Document Generated', 'Executed when a informations sharing document is generated');
 INSERT INTO llx_c_action_trigger (elementtype, code, label, description) VALUES ('firepermit', 'FIREPERMIT_GENERATE', 'Fire Permit Document Generated', 'Executed when a fire permit document is generated');

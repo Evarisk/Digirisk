@@ -1,4 +1,4 @@
--- Copyright (C) ---Put here your own copyright and developer email---
+-- Copyright (C) 2021 EOXIA <dev@eoxia.com>
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -13,15 +13,10 @@
 -- You should have received a copy of the GNU General Public License
 -- along with this program.  If not, see https://www.gnu.org/licenses/.
 
-
--- BEGIN MODULEBUILDER INDEXES
 ALTER TABLE llx_digiriskdolibarr_digiriskelement ADD INDEX idx_digiriskdolibarr_digiriskelement_rowid (rowid);
 ALTER TABLE llx_digiriskdolibarr_digiriskelement ADD INDEX idx_digiriskdolibarr_digiriskelement_ref (ref);
-ALTER TABLE llx_digiriskdolibarr_digiriskelement ADD CONSTRAINT llx_digiriskdolibarr_digiriskelement_fk_user_creat FOREIGN KEY (fk_user_creat) REFERENCES llx_user(rowid);
 ALTER TABLE llx_digiriskdolibarr_digiriskelement ADD INDEX idx_digiriskdolibarr_digiriskelement_status (status);
--- END MODULEBUILDER INDEXES
+ALTER TABLE llx_digiriskdolibarr_digiriskelement ADD CONSTRAINT llx_digiriskdolibarr_digiriskelement_fk_user_creat FOREIGN KEY (fk_user_creat) REFERENCES llx_user(rowid);
 
---ALTER TABLE llx_digiriskdolibarr_digiriskelement ADD UNIQUE INDEX uk_digiriskdolibarr_digiriskelement_fieldxy(fieldx, fieldy);
 
---ALTER TABLE llx_digiriskdolibarr_digiriskelement ADD CONSTRAINT llx_digiriskdolibarr_digiriskelement_fk_field FOREIGN KEY (fk_field) REFERENCES llx_digiriskdolibarr_myotherobject(rowid);
 
