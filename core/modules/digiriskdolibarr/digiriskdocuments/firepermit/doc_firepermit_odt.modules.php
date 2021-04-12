@@ -193,8 +193,8 @@ class doc_firepermit_odt extends ModeleODTFirePermit
 		$object->create($user);
 
 		$dir = $conf->digiriskdolibarr->multidir_output[isset($object->entity) ? $object->entity : 1] . '/firepermit';
-		$objectref = dol_sanitizeFileName($object->ref);
-		if (!preg_match('/specimen/i', $objectref)) $dir .= '/' . $objectref;
+		$objectref = dol_sanitizeFileName($ref);
+		if (preg_match('/specimen/i', $objectref)) $dir .= '/specimen';
 		if (!file_exists($dir))
 		{
 			if (dol_mkdir($dir) < 0)
@@ -206,7 +206,11 @@ class doc_firepermit_odt extends ModeleODTFirePermit
 
 		if (file_exists($dir))
 		{
-			$filename = $objectref.'.odt';
+			$filename = preg_split('/firepermit\//' , $srctemplatepath);
+			$filename = preg_replace('/template_/','', $filename[1]);
+
+			$filename = $objectref . '_'. $filename;
+
 			$object->last_main_doc = $filename;
 
 			$sql = "UPDATE ".MAIN_DB_PREFIX."digiriskdolibarr_digiriskdocuments";

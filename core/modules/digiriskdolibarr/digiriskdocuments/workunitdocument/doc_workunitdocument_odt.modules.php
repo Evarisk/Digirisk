@@ -31,7 +31,7 @@ dol_include_once('/custom/digiriskdolibarr/core/modules/digiriskdolibarr/digiris
 /**
  *	Class to build documents using ODF templates generator
  */
-class doc_workunitdocument_odt extends ModelePDFWorkUnitDocument
+class doc_workunitdocument_odt extends ModeleODTWorkUnitDocument
 {
 	/**
 	 * Issuer
@@ -155,7 +155,7 @@ class doc_workunitdocument_odt extends ModelePDFWorkUnitDocument
 	/**
 	 *  Function to build a document on disk using the generic odt module.
 	 *
-	 *	@param		WorkUnit	$object				Object source to build document
+	 *	@param		WorkUnitDocument	$object				Object source to build document
 	 *	@param		Translate	$outputlangs		Lang output object
 	 * 	@param		string		$srctemplatepath	Full path of source filename for generator using a template file
 	 *  @param		int			$hidedetails		Do not show line details
@@ -194,8 +194,8 @@ class doc_workunitdocument_odt extends ModelePDFWorkUnitDocument
 		$object->create($user);
 
 		$dir = $conf->digiriskdolibarr->multidir_output[isset($object->entity) ? $object->entity : 1] . '/workunitdocument';
-		$objectref = dol_sanitizeFileName($object->ref);
-		if (!preg_match('/specimen/i', $objectref)) $dir .= '/' . $objectref;
+		$objectref = dol_sanitizeFileName($ref);
+		if (preg_match('/specimen/i', $objectref)) $dir .= '/specimen';
 
 		if (!file_exists($dir))
 		{
@@ -208,7 +208,11 @@ class doc_workunitdocument_odt extends ModelePDFWorkUnitDocument
 
 		if (file_exists($dir))
 		{
-			$filename = $objectref.'.odt';
+			$filename = preg_split('/workunitdocument\//' , $srctemplatepath);
+			$filename = preg_replace('/template_/','', $filename[1]);
+
+			$filename = $objectref . '_'. $filename;
+
 			$object->last_main_doc = $filename;
 
 			$sql = "UPDATE ".MAIN_DB_PREFIX."digiriskdolibarr_digiriskdocuments";

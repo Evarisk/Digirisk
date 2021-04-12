@@ -193,8 +193,8 @@ class doc_listingrisksphoto_odt extends ModeleODTListingRisksPhoto
 		$object->create($user);
 
 		$dir = $conf->digiriskdolibarr->multidir_output[isset($conf->entity) ? $conf->entity : 1] . '/listingrisksphoto';
-		$objectref = dol_sanitizeFileName($object->ref);
-		if (!preg_match('/specimen/i', $objectref)) $dir .= '/' . $objectref;
+		$objectref = dol_sanitizeFileName($ref);
+		if (preg_match('/specimen/i', $objectref)) $dir .= '/specimen';
 
 		if (!file_exists($dir))
 		{
@@ -207,7 +207,11 @@ class doc_listingrisksphoto_odt extends ModeleODTListingRisksPhoto
 
 		if (file_exists($dir))
 		{
-			$filename = $objectref.'.odt';
+			$filename = preg_split('/listingrisksphoto\//' , $srctemplatepath);
+			$filename = preg_replace('/template_/','', $filename[1]);
+
+			$filename = $objectref . '_'. $filename;
+
 			$object->last_main_doc = $filename;
 
 			$sql = "UPDATE ".MAIN_DB_PREFIX."digiriskdolibarr_digiriskdocuments";

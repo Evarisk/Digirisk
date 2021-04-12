@@ -103,6 +103,7 @@ class doc_legaldisplay_custom_odt extends ModeleODTLegalDisplay
 		$texte .= '<input type="hidden" name="token" value="'.newToken().'">';
 		$texte .= '<input type="hidden" name="action" value="setModuleOptions">';
 		$texte .= '<input type="hidden" name="param1" value="DIGIRISKDOLIBARR_LEGALDISPLAY_CUSTOM_ADDON_ODT_PATH">';
+		$texte .= '<input type="hidden" name="value1" value="'.$conf->global->DIGIRISKDOLIBARR_LEGALDISPLAY_CUSTOM_ADDON_ODT_PATH.'">';
 		$texte .= '<table class="nobordernopadding" width="100%">';
 
 		// List of directories area
