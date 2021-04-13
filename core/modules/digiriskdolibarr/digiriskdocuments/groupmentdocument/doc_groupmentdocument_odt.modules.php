@@ -26,7 +26,9 @@ require_once DOL_DOCUMENT_ROOT . '/core/lib/files.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/company.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/doc.lib.php';
 dol_include_once('/custom/digiriskdolibarr/lib/files.lib.php');
-dol_include_once('/custom/digiriskdolibarr/class/risksign.class.php');
+dol_include_once('/custom/digiriskdolibarr/class/riskanalysis/risk.class.php');
+dol_include_once('/custom/digiriskdolibarr/class/riskanalysis/riskassessment.class.php');
+dol_include_once('/custom/digiriskdolibarr/class/riskanalysis/risksign.class.php');
 dol_include_once('/custom/digiriskdolibarr/core/modules/digiriskdolibarr/digiriskdocuments/groupmentdocument/mod_groupmentdocument_standard.php');
 dol_include_once('/custom/digiriskdolibarr/core/modules/digiriskdolibarr/digiriskdocuments/groupmentdocument/modules_groupmentdocument.php');
 /**
@@ -161,7 +163,7 @@ class doc_groupmentdocument_odt extends ModeleODTGroupmentDocument
 	 *  @param		int			$hideref			Do not show ref
 	 *	@return		int         					1 if OK, <=0 if KO
 	 */
-	public function write_file($object, $outputlangs, $srctemplatepath, $hidedetails = 0, $hidedesc = 0, $hideref = 0)
+	public function write_file($object, $outputlangs, $srctemplatepath, $hidedetails = 0, $hidedesc = 0, $hideref = 0, $digiriskelement)
 	{
 		// phpcs:enable
 		global $user, $langs, $conf, $hookmanager, $action;
@@ -189,7 +191,9 @@ class doc_groupmentdocument_odt extends ModeleODTGroupmentDocument
 		$ref = $mod->getNextValue($object);
 
 		$object->ref = $ref;
-		$object->create($user);
+		$id = $object->create($user);
+
+		$object->fetch($id);
 
 		$dir = $conf->digiriskdolibarr->multidir_output[isset($object->entity) ? $object->entity : 1] . '/groupmentdocument';
 		$objectref = dol_sanitizeFileName($ref);
@@ -287,8 +291,8 @@ class doc_groupmentdocument_odt extends ModeleODTGroupmentDocument
 				if ($foundtagforlines)
 				{
 					$risk = new Risk($this->db);
-					if ( ! empty( $object ) ) {
-						$risks = $risk->fetchRisksOrderedByCotation($object->id);
+					if ( ! empty( $digiriskelement ) ) {
+						$risks = $risk->fetchRisksOrderedByCotation($digiriskelement->id);
 						if ($risks > 0 && !empty($risks)) {
 							for ($i = 1; $i <= 4; $i++ ) {
 								$listlines = $odfHandler->setSegment('risq' . $i);
@@ -331,44 +335,44 @@ class doc_groupmentdocument_odt extends ModeleODTGroupmentDocument
 						}
 					}
 
-					$signalisation = new DigiriskSignalisation($this->db);
-
-					if ( ! empty( $object ) ) {
-						$signalisations = $signalisation->fetchFromParent($object->id);
-						if ($signalisations !== -1) {
-							$listlines = $odfHandler->setSegment('affectedRecommandation');
-							foreach ($signalisations as $line) {
-								$path             = DOL_DOCUMENT_ROOT .'/custom/digiriskdolibarr/img/';
-
-								$tmparray['recommandationIcon']         = $path . '/' . $signalisation->get_signalisation_category($signalisation);
-								$tmparray['identifiantRecommandation']  = $line->ref;
-								$tmparray['recommandationName']         = $line->get_signalisation_category($line, 'name');
-								$tmparray['recommandationComment']      = $line->description;
-
-								unset($tmparray['object_fields']);
-
-								complete_substitutions_array($tmparray, $outputlangs, $object, $line, "completesubstitutionarray_lines");
-								// Call the ODTSubstitutionLine hook
-								$parameters = array('odfHandler' => &$odfHandler, 'file' => $file, 'object' => $object, 'outputlangs' => $outputlangs, 'substitutionarray' => &$tmparray, 'line' => $line);
-								$reshook = $hookmanager->executeHooks('ODTSubstitutionLine', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
-								foreach ($tmparray as $key => $val) {
-									try {
-										if (file_exists($val)) {
-											$listlines->setImage($key, $val);
-										} else {
-											$listlines->setVars($key, $val, true, 'UTF-8');
-										}
-									} catch (OdfException $e) {
-										dol_syslog($e->getMessage(), LOG_INFO);
-									} catch (SegmentException $e) {
-										dol_syslog($e->getMessage(), LOG_INFO);
-									}
-								}
-								$listlines->merge();
-							}
-						}
-						$odfHandler->mergeSegment($listlines);
-					}
+//					$signalisation = new RiskSign($this->db);
+//
+//					if ( ! empty( $object ) ) {
+//						$signalisations = $signalisation->fetchFromParent($object->id);
+//						if ($signalisations !== -1) {
+//							$listlines = $odfHandler->setSegment('affectedRecommandation');
+//							foreach ($signalisations as $line) {
+//								$path             = DOL_DOCUMENT_ROOT .'/custom/digiriskdolibarr/img/';
+//
+//								$tmparray['recommandationIcon']         = $path . '/' . $signalisation->get_signalisation_category($signalisation);
+//								$tmparray['identifiantRecommandation']  = $line->ref;
+//								$tmparray['recommandationName']         = $line->get_signalisation_category($line, 'name');
+//								$tmparray['recommandationComment']      = $line->description;
+//
+//								unset($tmparray['object_fields']);
+//
+//								complete_substitutions_array($tmparray, $outputlangs, $object, $line, "completesubstitutionarray_lines");
+//								// Call the ODTSubstitutionLine hook
+//								$parameters = array('odfHandler' => &$odfHandler, 'file' => $file, 'object' => $object, 'outputlangs' => $outputlangs, 'substitutionarray' => &$tmparray, 'line' => $line);
+//								$reshook = $hookmanager->executeHooks('ODTSubstitutionLine', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
+//								foreach ($tmparray as $key => $val) {
+//									try {
+//										if (file_exists($val)) {
+//											$listlines->setImage($key, $val);
+//										} else {
+//											$listlines->setVars($key, $val, true, 'UTF-8');
+//										}
+//									} catch (OdfException $e) {
+//										dol_syslog($e->getMessage(), LOG_INFO);
+//									} catch (SegmentException $e) {
+//										dol_syslog($e->getMessage(), LOG_INFO);
+//									}
+//								}
+//								$listlines->merge();
+//							}
+//						}
+//						$odfHandler->mergeSegment($listlines);
+//					}
 				}
 			}
 			catch (OdfException $e)

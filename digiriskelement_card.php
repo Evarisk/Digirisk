@@ -132,6 +132,8 @@ if (empty($reshook))
 
 		$model      = GETPOST('model', 'alpha');
 
+		$moreparams = $object;
+
 		$result = $digiriskelementdocument->generateDocument($model, $outputlangs, $hidedetails, $hidedesc, $hideref, $moreparams);
 		if ($result <= 0) {
 			setEventMessages($object->error, $object->errors, 'errors');
