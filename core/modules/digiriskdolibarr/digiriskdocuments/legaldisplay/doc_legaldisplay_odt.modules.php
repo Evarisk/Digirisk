@@ -190,7 +190,9 @@ class doc_legaldisplay_odt extends ModeleODTLegalDisplay
 		$ref = $mod->getNextValue($object);
 
 		$object->ref = $ref;
-		$object->create($user);
+		$id = $object->create($user, true);
+
+		$object->fetch($id);
 
 		$dir = $conf->digiriskdolibarr->multidir_output[isset($object->entity) ? $object->entity : 1] . '/legaldisplay';
 		$objectref = dol_sanitizeFileName($ref);

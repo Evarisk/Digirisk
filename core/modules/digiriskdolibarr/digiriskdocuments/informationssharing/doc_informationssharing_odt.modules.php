@@ -190,7 +190,9 @@ class doc_informationssharing_odt extends ModeleODTInformationsSharing
 		$ref = $mod->getNextValue($object);
 
 		$object->ref = $ref;
-		$object->create($user);
+		$id = $object->create($user, true);
+
+		$object->fetch($id);
 
 		$dir = $conf->digiriskdolibarr->multidir_output[isset($object->entity) ? $object->entity : 1] . '/informationssharing';
 		$objectref = dol_sanitizeFileName($ref);

@@ -165,7 +165,7 @@ if (empty($reshook))
 		$risk->ref         = $refRiskMod->getNextValue($risk);
 
 		if (!$error) {
-			$result = $risk->create($user);
+			$result = $risk->create($user, true);
 			if ($result > 0) {
 				$evaluationComment 	= GETPOST('evaluationComment');
 
