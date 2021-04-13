@@ -29,7 +29,7 @@ if (!$res) die("Include of main fails");
 require_once DOL_DOCUMENT_ROOT.'/core/class/html.formfile.class.php';
 
 dol_include_once('/digiriskdolibarr/class/digiriskelement.class.php');
-dol_include_once('/digiriskdolibarr/class/listingrisksphoto.class.php');
+dol_include_once('/digiriskdolibarr/class/digiriskdocuments/listingrisksphoto.class.php');
 dol_include_once('/digiriskdolibarr/lib/digiriskdolibarr_digiriskelement.lib.php');
 dol_include_once('/digiriskdolibarr/lib/digiriskdolibarr_function.lib.php');
 dol_include_once('/digiriskdolibarr/core/modules/digiriskdolibarr/digiriskdocuments/listingrisksphoto/modules_listingrisksphoto.php');
@@ -40,12 +40,15 @@ global $db, $conf, $langs;
 $langs->loadLangs(array("digiriskdolibarr@digiriskdolibarr", "other"));
 
 // Get parameters
+$id     = GETPOST('id', 'int');
 $action = GETPOST('action', 'aZ09');
 
 // Initialize technical objects
 $object       = new DigiriskElement($db);
 $listingrisksphoto = new ListingRisksPhoto($db);
 $hookmanager->initHooks(array('digiriskelementlistingrisksphoto', 'globalcard')); // Note that conf->hooks_modules contains array
+
+$object->fetch($id);
 
 $upload_dir         = $conf->digiriskdolibarr->multidir_output[isset($object->entity) ? $object->entity : 1];
 $permissiontoread   = $user->rights->digiriskdolibarr->listingrisksphoto->read;
@@ -84,6 +87,8 @@ if (empty($reshook))
 		if (empty($moreparams)) $moreparams = null;
 
 		$model      = GETPOST('model', 'alpha');
+
+		$moreparams = $object;
 
 		$result = $listingrisksphoto->generateDocument($model, $outputlangs, $hidedetails, $hidedesc, $hideref, $moreparams);
 		if ($result <= 0) {
@@ -136,12 +141,13 @@ if ($action == 'remove_file' && $permissiontodelete)
  */
 
 $formfile 	 = new FormFile($db);
+$emptyobject = new stdClass($db);
 
 $title    = $langs->trans('ListingRisksPhoto');
 $help_url = 'FR:Module_DigiriskDolibarr';
 $morejs   = array("/digiriskdolibarr/js/digiriskdolibarr.js.php");
 
-$object->digiriskHeader('', $title, $help_url, '', '', '', $morejs); ?>
+digiriskHeader('', $title, $help_url, '', '', '', $morejs); ?>
 
 	<div id="cardContent" value="">
 
@@ -164,9 +170,14 @@ $width = 80; $cssclass = 'photoref';
 
 $morehtmlref = '<div class="refidno">';
 $morehtmlref .= '</div>';
-$morehtmlleft .= '<div class="floatleft inline-block valignmiddle divphotoref">'.$object->digirisk_show_photos('mycompany', $conf->mycompany->dir_output . '/logos', 'small', 5, 0, 0, 0, $width,0, 0, 0, 0, 'logos').'</div>';
 
-$object->digirisk_banner_tab($object, 'ref', '', 0, 'ref', 'ref', $morehtmlref, '', 0, $morehtmlleft);
+if (isset($object->element_type)) {
+	$morehtmlleft .= '<div class="floatleft inline-block valignmiddle divphotoref">'.digirisk_show_photos('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$entity].'/'.$object->element_type, 'small', 5, 0, 0, 0, $width,0, 0, 0, 0, $object->element_type, $object).'</div>';
+} else {
+	$morehtmlleft .= '<div class="floatleft inline-block valignmiddle divphotoref">'.digirisk_show_photos('mycompany', $conf->mycompany->dir_output.'/logos', 'small', 5, 0, 0, 0, $width,0, 0, 0, 0, 'logos', $emptyobject).'</div>';
+}
+
+digirisk_banner_tab($object, 'ref', '', 0, 'ref', 'ref', $morehtmlref, '', 0, $morehtmlleft);
 
 unset($object->fields['element_type']);
 unset($object->fields['fk_parent']);
@@ -197,13 +208,22 @@ dol_fiche_end();
 // Document Generation -- Génération des documents
 $includedocgeneration = 1;
 if ($includedocgeneration) {
-	$dir_files  = 'listingrisksphoto';
-	$filedir    = $upload_dir . '/' . $dir_files;
-	$urlsource  = $_SERVER["PHP_SELF"];
+	if ($object->id > 0) {
+		$objref = dol_sanitizeFileName($object->ref);
+		$dir_files = 'listingrisksphoto/' . $objref;
+		$filedir = $conf->digiriskdolibarr->dir_output . '/' . $dir_files;
+		$urlsource = $_SERVER["PHP_SELF"] . '?id=' . $object->id;
+	} else {
+		$dir_files = 'listingrisksphoto';
+		$filedir = $upload_dir . '/' . $dir_files;
+		$urlsource = $_SERVER["PHP_SELF"];
+	}
+
 	$modulepart = 'digiriskdolibarr:ListingRisksPhoto';
 
 	print digiriskshowdocuments($modulepart,$dir_files, $filedir, $urlsource, $permissiontoadd, $permissiontodelete, $conf->global->DIGIRISKDOLIBARR_LISTINGRISKSPHOTO_DEFAULT_MODEL, 1, 0, 28, 0, '', $langs->trans('ListingRisksPhoto'), '', $langs->defaultlang, '', $listingrisksphoto);
 }
+
 
 // End of page
 llxFooter();

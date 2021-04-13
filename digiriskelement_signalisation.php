@@ -43,7 +43,7 @@ require_once DOL_DOCUMENT_ROOT.'/core/class/html.formfile.class.php';
 require_once DOL_DOCUMENT_ROOT.'/core/class/html.formprojet.class.php';
 require_once DOL_DOCUMENT_ROOT.'/core/modules/project/task/mod_task_simple.php';
 dol_include_once('/digiriskdolibarr/class/risk.class.php');
-dol_include_once('/digiriskdolibarr/class/digirisksignalisation.class.php');
+dol_include_once('/digiriskdolibarr/class/risksign.class.php');
 dol_include_once('/digiriskdolibarr/class/digiriskelement.class.php');
 dol_include_once('/digiriskdolibarr/core/modules/digiriskdolibarr/mod_digirisksignalisation_standard.php');
 dol_include_once('/digiriskdolibarr/core/modules/digiriskdolibarr/mod_evaluation_standard.php');

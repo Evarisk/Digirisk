@@ -30,8 +30,8 @@ require_once DOL_DOCUMENT_ROOT.'/core/class/html.formfile.class.php';
 
 dol_include_once('/digiriskdolibarr/class/digiriskdocuments.class.php');
 dol_include_once('/digiriskdolibarr/class/digiriskelement.class.php');
-dol_include_once('/digiriskdolibarr/class/groupmentdocument.class.php');
-dol_include_once('/digiriskdolibarr/class/workunitdocument.class.php');
+dol_include_once('/digiriskdolibarr/class/digiriskdocuments/groupmentdocument.class.php');
+dol_include_once('/digiriskdolibarr/class/digiriskdocuments/workunitdocument.class.php');
 dol_include_once('/digiriskdolibarr/lib/digiriskdolibarr_digiriskelement.lib.php');
 dol_include_once('/digiriskdolibarr/lib/digiriskdolibarr_function.lib.php');
 dol_include_once('/digiriskdolibarr/core/modules/digiriskdolibarr/digiriskelement/groupment/mod_groupment_standard.php');
@@ -182,7 +182,8 @@ if (empty($reshook))
  * View
  */
 
-$form = new Form($db);
+$form        = new Form($db);
+$emptyobject = new stdClass($db);
 
 if ( $object->element_type == 'groupment' ) {
 	$title        = $langs->trans("Groupment");
@@ -201,7 +202,7 @@ if ( $object->element_type == 'groupment' ) {
 $help_url = 'FR:Module_DigiriskDolibarr';
 $morejs   = array("/digiriskdolibarr/js/digiriskdolibarr.js.php");
 
-$object->digiriskHeader('', $title, $help_url, '', '', '', $morejs); ?>
+digiriskHeader('', $title, $help_url, '', '', '', $morejs); ?>
 
 <div id="cardContent" value="">
 
@@ -336,12 +337,12 @@ if ((empty($action) || ($action != 'edit' && $action != 'create')))
 	$morehtmlref = '<div class="refidno">';
 	$morehtmlref .= '</div>';
 	if (isset($object->element_type)) {
-		$morehtmlleft .= '<div class="floatleft inline-block valignmiddle divphotoref">'.$object->digirisk_show_photos('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$entity].'/'.$object->element_type, 'small', 5, 0, 0, 0, $width,0, 0, 0, 0, $object->element_type).'</div>';
+		$morehtmlleft .= '<div class="floatleft inline-block valignmiddle divphotoref">'.digirisk_show_photos('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$entity].'/'.$object->element_type, 'small', 5, 0, 0, 0, $width,0, 0, 0, 0, $object->element_type, $object).'</div>';
 	} else {
-		$morehtmlleft .= '<div class="floatleft inline-block valignmiddle divphotoref">'.$object->digirisk_show_photos('mycompany', $conf->mycompany->dir_output . '/logos', 'small', 5, 0, 0, 0, $width,0, 0, 0, 0, 'logos').'</div>';
+		$morehtmlleft .= '<div class="floatleft inline-block valignmiddle divphotoref">'.digirisk_show_photos('mycompany', $conf->mycompany->dir_output . '/logos', 'small', 5, 0, 0, 0, $width,0, 0, 0, 0, 'logos', $emptyobject).'</div>';
 	}
 
-	$object->digirisk_banner_tab($object, 'ref', '', 0, 'ref', 'ref', $morehtmlref, '', 0, $morehtmlleft);
+	digirisk_banner_tab($object, 'ref', '', 0, 'ref', 'ref', $morehtmlref, '', 0, $morehtmlleft);
 
 	unset($object->fields['element_type']);
 	unset($object->fields['fk_parent']);

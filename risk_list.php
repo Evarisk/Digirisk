@@ -23,27 +23,17 @@
 
 
 // Load Dolibarr environment
-$res=0;
-// Try main.inc.php into web root known defined into CONTEXT_DOCUMENT_ROOT (not always defined)
-if (!$res && !empty($_SERVER["CONTEXT_DOCUMENT_ROOT"])) $res = @include $_SERVER["CONTEXT_DOCUMENT_ROOT"]."/main.inc.php";
-// Try main.inc.php into web root detected using web root calculated from SCRIPT_FILENAME
-$tmp = empty($_SERVER['SCRIPT_FILENAME']) ? '' : $_SERVER['SCRIPT_FILENAME']; $tmp2 = realpath(__FILE__); $i = strlen($tmp) - 1; $j = strlen($tmp2) - 1;
-while ($i > 0 && $j > 0 && isset($tmp[$i]) && isset($tmp2[$j]) && $tmp[$i] == $tmp2[$j]) { $i--; $j--; }
-if (!$res && $i > 0 && file_exists(substr($tmp, 0, ($i + 1))."/main.inc.php")) $res = @include substr($tmp, 0, ($i + 1))."/main.inc.php";
-if (!$res && $i > 0 && file_exists(dirname(substr($tmp, 0, ($i + 1)))."/main.inc.php")) $res = @include dirname(substr($tmp, 0, ($i + 1)))."/main.inc.php";
-// Try main.inc.php using relative path
-if (!$res && file_exists("../main.inc.php")) $res = @include "../main.inc.php";
+$res = 0;
 if (!$res && file_exists("../../main.inc.php")) $res = @include "../../main.inc.php";
-if (!$res && file_exists("../../../main.inc.php")) $res = @include "../../../main.inc.php";
 if (!$res) die("Include of main fails");
 
 require_once DOL_DOCUMENT_ROOT.'/core/lib/images.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/core/class/html.form.class.php';
-dol_include_once('/digiriskdolibarr/class/risk.class.php');
-dol_include_once('/digiriskdolibarr/class/digiriskevaluation.class.php');
+dol_include_once('/digiriskdolibarr/class/riskanalysis/risk.class.php');
+dol_include_once('/digiriskdolibarr/class/riskanalysis/riskassessment.class.php');
 dol_include_once('/digiriskdolibarr/class/digiriskelement.class.php');
-dol_include_once('/digiriskdolibarr/core/modules/digiriskdolibarr/mod_risk_standard.php');
-dol_include_once('/digiriskdolibarr/core/modules/digiriskdolibarr/mod_evaluation_standard.php');
+dol_include_once('/digiriskdolibarr/core/modules/digiriskdolibarr/riskanalysis/risk/mod_risk_standard.php');
+dol_include_once('/digiriskdolibarr/core/modules/digiriskdolibarr/riskanalysis/riskassessment/mod_riskassessment_standard.php');
 dol_include_once('/digiriskdolibarr/lib/digiriskdolibarr_digiriskelement.lib.php');
 dol_include_once('/digiriskdolibarr/lib/digiriskdolibarr_function.lib.php');
 
@@ -65,10 +55,10 @@ $sortorder           = GETPOST('sortorder', 'alpha');
 // Initialize technical objects
 $object            = new DigiriskElement($db);
 $risk              = new Risk($db);
-$evaluation        = new DigiriskEvaluation($db);
+$evaluation        = new RiskAssessment($db);
 $extrafields       = new ExtraFields($db);
 $refRiskMod        = new $conf->global->DIGIRISKDOLIBARR_RISK_ADDON();
-$refEvaluationMod  = new $conf->global->DIGIRISKDOLIBARR_EVALUATION_ADDON();
+$refEvaluationMod  = new $conf->global->DIGIRISKDOLIBARR_RISKASSESSMENT_ADDON();
 
 $hookmanager->initHooks(array('risklist', 'globalcard')); // Note that conf->hooks_modules contains array
 
@@ -240,7 +230,7 @@ if (empty($reshook))
 		//photo upload and thumbs generation
 		if ( !empty ($photo) ) {
 			$pathToECMPhoto = DOL_DATA_ROOT . '/ecm/digiriskdolibarr/medias/' . $photo;
-			$pathToEvaluationPhoto = DOL_DATA_ROOT . '/digiriskdolibarr/evaluation/' . $refEvaluationMod->getNextValue($evaluation);
+			$pathToEvaluationPhoto = DOL_DATA_ROOT . '/digiriskdolibarr/riskassessment/' . $refEvaluationMod->getNextValue($evaluation);
 
 			mkdir($pathToEvaluationPhoto);
 			copy($pathToECMPhoto,$pathToEvaluationPhoto . '/' . $photo);
@@ -326,7 +316,7 @@ if (empty($reshook))
 		}
 
 		$pathToECMPhoto        = DOL_DATA_ROOT . '/ecm/digiriskdolibarr/medias/' . $photo;
-		$pathToEvaluationPhoto = DOL_DATA_ROOT . '/digiriskdolibarr/evaluation/' . $evaluation->ref ;
+		$pathToEvaluationPhoto = DOL_DATA_ROOT . '/digiriskdolibarr/riskassessment/' . $evaluation->ref ;
 
 		$files = dol_dir_list($pathToEvaluationPhoto);
 		foreach ($files as $file) {
@@ -373,7 +363,7 @@ if (empty($reshook))
 
 		$evaluation->fetch($evaluation_id);
 
-		$pathToEvaluationPhoto = DOL_DATA_ROOT . '/digiriskdolibarr/evaluation/' . $evaluation->ref ;
+		$pathToEvaluationPhoto = DOL_DATA_ROOT . '/digiriskdolibarr/riskassessment/' . $evaluation->ref ;
 		$files = dol_dir_list($pathToEvaluationPhoto);
 		foreach ($files as $file) {
 			if (is_file($file['fullname'])) {
@@ -457,7 +447,7 @@ if (!preg_match('/(evaluation)/', $sortfield)) {
 	$sql .= " FROM ".MAIN_DB_PREFIX.$risk->table_element." as t";
 	if (is_array($extrafields->attributes[$risk->table_element]['label']) && count($extrafields->attributes[$risk->table_element]['label'])) $sql .= " LEFT JOIN ".MAIN_DB_PREFIX.$risk->table_element."_extrafields as ef on (t.rowid = ef.fk_object)";
 	if ($risk->ismultientitymanaged == 1) $sql .= " WHERE t.entity IN (".getEntity($risk->element).")";
-	$sql .= " WHERE 1 = 1";
+	else $sql .= " WHERE 1 = 1";
 
 	foreach ($search as $key => $val)
 	{
