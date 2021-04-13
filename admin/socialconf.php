@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2018       Alexandre Spangaro      <aspangaro@open-dsi.fr>
+/* Copyright (C) 2021 EOXIA <dev@eoxia.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,41 +16,46 @@
  */
 
 /**
- *	\file       htdocs/admin/accountant.php
- *	\ingroup    accountant
- *	\brief      Setup page to configure accountant / auditor
+ * \file    digiriskdolibarr/admin/socialconf.php
+ * \ingroup digiriskdolibarr
+ * \brief   Digiriskdolibarr setup page for social data configuration.
  */
 
-require '../../../main.inc.php';
+// Load Dolibarr environment
+$res = 0;
+if (!$res && file_exists("../../../main.inc.php")) $res = @include "../../../main.inc.php";
+if (!$res) die("Include of main fails");
+
 require_once DOL_DOCUMENT_ROOT.'/core/lib/admin.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/company.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/functions2.lib.php';
-require_once DOL_DOCUMENT_ROOT.'/core/class/html.formother.class.php';
-require_once DOL_DOCUMENT_ROOT.'/core/class/html.formcompany.class.php';
 require_once DOL_DOCUMENT_ROOT.'/core/class/html.formactions.class.php';
-require_once DOL_DOCUMENT_ROOT.'/core/class/html.formfile.class.php';
 require_once DOL_DOCUMENT_ROOT.'/core/class/html.form.class.php';
 
-require_once DOL_DOCUMENT_ROOT.'/custom/digiriskdolibarr/class/digiriskresources.class.php';
-require_once DOL_DOCUMENT_ROOT.'/contact/class/contact.class.php';
-require_once DOL_DOCUMENT_ROOT.'/user/class/user.class.php';
-
-$action = GETPOST('action', 'aZ09');
-$contextpage = GETPOST('contextpage', 'aZ') ?GETPOST('contextpage', 'aZ') : 'adminsocial'; // To manage different context of search
-
-// Load translation files required by the page
-$langs->loadLangs(array('admin', 'companies'));
-
-if (!$user->admin) accessforbidden();
-
-$error = 0;
-$hookmanager->initHooks(array('admincompany', 'globaladmin'));
+dol_include_once('/custom/digiriskdolibarr/class/digiriskresources.class.php');
 
 global $conf, $db;
 
+// Translations
+$langs->loadLangs(array('admin', 'companies', "digiriskdolibarr@digiriskdolibarr"));
+
+// Access control
+if (!$user->admin) accessforbidden();
+
+// Parameters
+$action = GETPOST('action', 'aZ09');
+$error  = 0;
+
+// Initialize technical objects
+$resources = new DigiriskResources($db);
+
+$allLinks = $resources->digirisk_dolibarr_fetch_resources();
+
+$hookmanager->initHooks(array('admincompany', 'globaladmin'));
+
 $electionDateCSE = dol_mktime(0, 0, 0, GETPOST('date_debutmonth', 'int'), GETPOST('date_debutday', 'int'), GETPOST('date_debutyear', 'int'));
-$electionDateDP = dol_mktime(0, 0, 0, GETPOST('date_finmonth', 'int'), GETPOST('date_finday', 'int'), GETPOST('date_finyear', 'int'));
-$date = dol_mktime(0, 0, 0, GETPOST('datemonth', 'int'), GETPOST('dateday', 'int'), GETPOST('dateyear', 'int'));
+$electionDateDP  = dol_mktime(0, 0, 0, GETPOST('date_finmonth', 'int'), GETPOST('date_finday', 'int'), GETPOST('date_finyear', 'int'));
+$date            = dol_mktime(0, 0, 0, GETPOST('datemonth', 'int'), GETPOST('dateday', 'int'), GETPOST('dateyear', 'int'));
 
 /*
  * Actions
@@ -63,9 +68,6 @@ if ($reshook < 0) setEventMessages($hookmanager->error, $hookmanager->errors, 'e
 if (($action == 'update' && !GETPOST("cancel", 'alpha'))
 	|| ($action == 'updateedit'))
 {
-	// Initializing DigiriskResources object to get list of resources
-	$resources = new DigiriskResources($db);
-	$allLinks = $resources->digirisk_dolibarr_fetch_resources();
 
 	$electionDateCSE = GETPOST('ElectionDateCSE', 'none');
 	$electionDateCSE = explode('/',$electionDateCSE);
@@ -112,8 +114,6 @@ $head = company_admin_prepare_head();
 dol_fiche_head($head, 'social', $langs->trans("Company"), -1, 'company');
 
 $form 		 = new Form($db);
-$formother 	 = new FormOther($db);
-$formcompany = new FormCompany($db);
 $resources 	 = new DigiriskResources($db);
 
 $allLinks = $resources->digirisk_dolibarr_fetch_resources();
@@ -121,67 +121,56 @@ $allLinks = $resources->digirisk_dolibarr_fetch_resources();
 $electionDateCSE 	= $conf->global->DIGIRISK_CSE_ELECTION_DATE;
 $electionDateDP 	= $conf->global->DIGIRISK_DP_ELECTION_DATE;
 
-$countrynotdefined = '<font class="error">'.$langs->trans("ErrorSetACountryFirst").' ('.$langs->trans("SeeAbove").')</font>';
-
 print '<span class="opacitymedium">'.$langs->trans("DigiriskMenu")."</span><br>\n";
 print "<br>\n";
-
-print "\n".'<script type="text/javascript" language="javascript">';
-print '$(document).ready(function () {
-		  $("#selectcountry_id").change(function() {
-			document.form_index.action.value="updateedit";
-			document.form_index.submit();
-		  });
-	  });';
-print '</script>'."\n";
 
 print '<form method="POST" action="'.$_SERVER["PHP_SELF"].'" name="social_form">';
 print '<input type="hidden" name="token" value="'.newToken().'">';
 print '<input type="hidden" name="action" value="update">';
 
 /*
-				*** Participation Agreement -- Accords de participation ***
+*** Participation Agreement -- Accords de participation ***
 */
 
 print '<table class="noborder centpercent editmode">';
 
 print '<tr class="liste_titre"><th class="titlefield wordbreak">'.$langs->trans("ParticipationAgreement").'</th><th>'.$langs->trans("").'</th></tr>'."\n";
 
-// 				* Terms And Conditions - Modalités *
+// * Terms And Conditions - Modalités *
 
 print '<tr class="oddeven"><td><label for="modalites">'.$langs->trans("TermsAndConditions").'</label></td><td>';
 print '<textarea name="modalites" id="modalites" class="minwidth300" rows="'.ROWS_3.'">'.($conf->global->DIGIRISK_PARTICIPATION_AGREEMENT_INFORMATION_PROCEDURE ? $conf->global->DIGIRISK_PARTICIPATION_AGREEMENT_INFORMATION_PROCEDURE : '').'</textarea></td></tr>'."\n";
 
 /*
-				*** Exceptions to working hours -- Dérogations aux horaires de travail ***
+*** Exceptions to working hours -- Dérogations aux horaires de travail ***
 */
 
 print '<table class="noborder centpercent editmode">';
 
 print '<tr class="liste_titre"><th class="titlefield wordbreak">'.$langs->trans("ExceptionsToWorkingHours").'</th><th>'.$langs->trans("").'</th></tr>'."\n";
 
-// 				* Permanent - Permanentes *
+// * Permanent - Permanentes *
 
 print '<tr class="oddeven"><td><label for="permanent">'.$langs->trans("PermanentDerogation").'</label></td><td>';
 print '<textarea name="permanent" id="permanent" class="minwidth300" rows="'.ROWS_3.'">'.($conf->global->DIGIRISK_DEROGATION_SCHEDULE_PERMANENT ? $conf->global->DIGIRISK_DEROGATION_SCHEDULE_PERMANENT : '').'</textarea></td></tr>'."\n";
 
-// 				* Permanent - Permanentes *
+// * Permanent - Permanentes *
 
 print '<tr class="oddeven"><td><label for="occasional">'.$langs->trans("OccasionalDerogation").'</label></td><td>';
 print '<textarea name="occasional" id="occasional" class="minwidth300" rows="'.ROWS_3.'">'.($conf->global->DIGIRISK_DEROGATION_SCHEDULE_OCCASIONAL ? $conf->global->DIGIRISK_DEROGATION_SCHEDULE_OCCASIONAL : '').'</textarea></td></tr>'."\n";
 
 /*
-				*** ESC -- CSE ***
+*** ESC -- CSE ***
 */
 
 print '<tr class="liste_titre"><th class="titlefield wordbreak">'.$langs->trans("ESC").'</th><th>'.$langs->trans("").'</th></tr>'."\n";
 
-// 				* ESC Election Date - Date d'élection du CSE *
+// * ESC Election Date - Date d'élection du CSE *
 
 print '<tr class="oddeven"><td><label for="ElectionDateCSE">'.$langs->trans("ElectionDate").'</label></td><td>';
 print $form->selectDate(strtotime($electionDateCSE) ? $electionDateCSE : -1, 'ElectionDateCSE', 0, 0, 0, 'social_form', 1, 1);
 
-// 				* ESC Titulars - Titulaires CSE *
+// * ESC Titulars - Titulaires CSE *
 
 $userlist 	  = $form->select_dolusers('', '', 0, null, 0, '', '', 0, 0, 0, 'AND u.statut = 1', 0, '', '', 0, 1);
 $titulars_cse = $allLinks['TitularsCSE'];
@@ -194,7 +183,7 @@ print $form->multiselectarray('TitularsCSE', $userlist, $titulars_cse->id, null,
 
 print '</td></tr>';
 
-// 				* ESC Alternates - Suppléants CSE *
+// * ESC Alternates - Suppléants CSE *
 
 $userlist = $form->select_dolusers('', '', 0, null, 0, '', '', 0, 0, 0, 'AND u.statut = 1', 0, '', '', 0, 1);
 $alternates_cse = $allLinks['AlternatesCSE'];
@@ -208,7 +197,7 @@ print $form->multiselectarray('AlternatesCSE', $userlist, $alternates_cse->id, n
 print '</td></tr>';
 
 /*
-				*** Staff Representative -- Délégués du Personnel ***
+*** Staff Representative -- Délégués du Personnel ***
 */
 
 print '<table class="noborder centpercent editmode">';
@@ -217,7 +206,7 @@ print '<tr class="liste_titre"><th class="titlefield wordbreak">'.$langs->trans(
 print '<tr class="oddeven"><td><label for="ElectionDateDP">'.$langs->trans("ElectionDate").'</label></td><td>';
 print $form->selectDate(strtotime($electionDateDP) ? $electionDateDP : -1, 'ElectionDateDP', 0, 0, 0, 'social_form', 1, 1);
 
-// 				* Staff Representatives Titulars - Titulaires Délégués du Personnel *
+// * Staff Representatives Titulars - Titulaires Délégués du Personnel *
 
 $userlist 	  = $form->select_dolusers('', '', 0, null, 0, '', '', 0, 0, 0, 'AND u.statut = 1', 0, '', '', 0, 1);
 $titulars_dp = $allLinks['TitularsDP'];
@@ -230,7 +219,7 @@ print $form->multiselectarray('TitularsDP', $userlist, $titulars_dp->id, null, n
 
 print '</td></tr>';
 
-// 				* Staff Representatives Suppléants - Suppléants Délégués du Personnel *
+// * Staff Representatives Suppléants - Suppléants Délégués du Personnel *
 
 $userlist 	  = $form->select_dolusers('', '', 0, null, 0, '', '', 0, 0, 0, 'AND u.statut = 1', 0, '', '', 0, 1);
 $alternates_dp = $allLinks['AlternatesDP'];
