@@ -101,8 +101,7 @@ class modDigiriskdolibarr extends DolibarrModules
 		);
 
 		$this->dirs = array(
-			"/digiriskdolibarr/temp",
-			"/digiriskdolibarr/evaluation",
+			"/digiriskdolibarr/riskassessment",
 			"/ecm/digiriskdolibarr",
 			"/ecm/digiriskdolibarr/legaldisplay",
 			"/ecm/digiriskdolibarr/informationssharing",
@@ -183,8 +182,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			42 => array('DIGIRISKDOLIBARR_RISK_ADDON','chaine', 'mod_risk_standard' ,'', 1),
 			44 => array('MAIN_AGENDA_ACTIONAUTO_RISK_CREATE','chaine',1,'', 1),
 			45 => array('RISK_STANDARD_MASK','chaine','R{0000}','', 1),
-			46 => array('EVALUATION_STANDARD_MASK','chaine','E{0000}','', 1),
-			47 => array('DIGIRISKDOLIBARR_EVALUATION_ADDON','chaine', 'mod_evaluation_standard' ,'', 1),
+			46 => array('RISKASSESSMENT_STANDARD_MASK','chaine','E{0000}','', 1),
 			48 => array('DIGIRISKDOLIBARR_DU_PROJECT','chaine', '' ,'', 1),
 			49 => array('DIGIRISKDOLIBARR_RISK_SIMPLIFIED','chaine', 1,'', 1),
 			50 => array('DIGIRISKDOLIBARR_RISK_ADVANCED','chaine', 0,'', 1),
@@ -366,6 +364,7 @@ class modDigiriskdolibarr extends DolibarrModules
 		$this->rights[$r][1] = $langs->trans('DeleteDigiriskRisk');
 		$this->rights[$r][4] = 'risk';
 		$this->rights[$r][5] = 'delete';
+		$r++;
 
 		/* LISTING RISKS ACTION PERMISSIONS */
 
@@ -383,6 +382,7 @@ class modDigiriskdolibarr extends DolibarrModules
 		$this->rights[$r][1] = $langs->trans('DeleteReadListingRisksAction');
 		$this->rights[$r][4] = 'listingrisksaction';
 		$this->rights[$r][5] = 'delete';
+		$r++;
 
 		/* LISTING RISKS PHOTO PERMISSIONS */
 
@@ -400,7 +400,6 @@ class modDigiriskdolibarr extends DolibarrModules
 		$this->rights[$r][1] = $langs->trans('DeleteReadListingRisksPhoto');
 		$this->rights[$r][4] = 'listingrisksphoto';
 		$this->rights[$r][5] = 'delete';
-
 
 		// Main menu entries to add
 		$this->menu = array();
@@ -650,6 +649,9 @@ class modDigiriskdolibarr extends DolibarrModules
 		$sql = array();
 
 		$this->_load_tables('/digiriskdolibarr/sql/');
+		$this->_load_tables('/digiriskdolibarr/sql/digiriskdocuments/');
+		$this->_load_tables('/digiriskdolibarr/sql/digiriskelement/');
+		$this->_load_tables('/digiriskdolibarr/sql/riskanalysis/');
 
 		if ( $conf->global->DIGIRISKDOLIBARR_DU_PROJECT == 0 ) {
 
