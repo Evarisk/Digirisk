@@ -110,8 +110,8 @@ class LegalDisplay extends DigiriskDocuments
 				$morewhere .= ' AND element_type = ' . "'" . $labour_doctor_societe->element . "'";
 				$morewhere .= ' AND status = 1';
 
-				$labour_doctor_openinghours = $thirdparty_openinghours->fetch(0, '', $morewhere);
-				$json['LegalDisplay']['occupational_health_service']['openinghours'] = "\r\n" . $labour_doctor_openinghours->day0 . "\r\n" . $labour_doctor_openinghours->day1 . "\r\n" . $labour_doctor_openinghours->day2 . "\r\n" . $labour_doctor_openinghours->day3 . "\r\n" . $labour_doctor_openinghours->day4 . "\r\n" . $labour_doctor_openinghours->day5 . "\r\n" . $labour_doctor_openinghours->day6;
+				$thirdparty_openinghours->fetch(0, '', $morewhere);
+				$json['LegalDisplay']['occupational_health_service']['openinghours'] = "\r\n" . $thirdparty_openinghours->monday . "\r\n" . $thirdparty_openinghours->tuesday . "\r\n" . $thirdparty_openinghours->wednesday . "\r\n" . $thirdparty_openinghours->thursday . "\r\n" . $thirdparty_openinghours->friday . "\r\n" . $thirdparty_openinghours->saturday . "\r\n" . $thirdparty_openinghours->sunday;
 			}
 
 			$labour_doctor_contact = new Contact($this->db);
@@ -131,8 +131,8 @@ class LegalDisplay extends DigiriskDocuments
 				$morewhere .= ' AND element_type = ' . "'" . $labour_inspector_societe->element . "'";
 				$morewhere .= ' AND status = 1';
 
-				$labour_inspector_openinghours = $thirdparty_openinghours->fetch(0, '', $morewhere);
-				$json['LegalDisplay']['detective_work']['openinghours'] = "\r\n" . $labour_inspector_openinghours->day0 . "\r\n" . $labour_inspector_openinghours->day1 . "\r\n" . $labour_inspector_openinghours->day2 . "\r\n" . $labour_inspector_openinghours->day3 . "\r\n" . $labour_inspector_openinghours->day4 . "\r\n" . $labour_inspector_openinghours->day5 . "\r\n" . $labour_inspector_openinghours->day6;
+				$thirdparty_openinghours->fetch(0, '', $morewhere);
+				$json['LegalDisplay']['detective_work']['openinghours'] = "\r\n" . $thirdparty_openinghours->monday . "\r\n" . $thirdparty_openinghours->tuesday . "\r\n" . $thirdparty_openinghours->wednesday . "\r\n" . $thirdparty_openinghours->thursday . "\r\n" . $thirdparty_openinghours->friday . "\r\n" . $thirdparty_openinghours->saturday . "\r\n" . $thirdparty_openinghours->sunday;
 			}
 
 			$labour_inspector_contact = new Contact($this->db);
