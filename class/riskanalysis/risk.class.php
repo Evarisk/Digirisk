@@ -23,6 +23,7 @@
 
 require_once DOL_DOCUMENT_ROOT . '/core/class/commonobject.class.php';
 require_once DOL_DOCUMENT_ROOT . '/projet/class/task.class.php';
+dol_include_once('/custom/digiriskdolibarr/lib/digiriskdolibarr_function.lib.php');
 
 /**
  * Class for Risk
@@ -182,7 +183,7 @@ class Risk extends CommonObject
 		// RISQUES du parent.
 		if ($result > 0 && !empty ($result)) {
 			foreach ( $result as $risk ) {
-				$evaluation = new DigiriskEvaluation($this->db);
+				$evaluation = new RiskAssessment($this->db);
 				$lastEvaluation = $evaluation->fetchFromParent($risk->id,1);
 				if ( $lastEvaluation > 0  && !empty($lastEvaluation) ) {
 					$lastEvaluation = array_shift($lastEvaluation);
@@ -194,7 +195,7 @@ class Risk extends CommonObject
 		}
 
 		if ( $recursive ) {
-			$elements = $object->recurse_tree($parent_id,0,$objects);
+			$elements = recurse_tree($parent_id,0,$objects);
 			if ( $elements > 0  && !empty($elements) ) {
 				// Super fonction itérations flat.
 				$it = new RecursiveIteratorIterator(new RecursiveArrayIterator($elements));
@@ -215,7 +216,7 @@ class Risk extends CommonObject
 						$result = $risk->fetchFromParent($element);
 						if (!empty ($result)) {
 							foreach ($result as $risk) {
-								$evaluation = new DigiriskEvaluation($this->db);
+								$evaluation = new RiskAssessment($this->db);
 								$lastEvaluation = $evaluation->fetchFromParent($risk->id,1);
 								if ( $lastEvaluation > 0  && !empty($lastEvaluation) ) {
 									$lastEvaluation = array_shift($lastEvaluation);

@@ -21,8 +21,11 @@
  * \brief       This file is a class file for LegalDisplay
  */
 
+require_once DOL_DOCUMENT_ROOT.'/contact/class/contact.class.php';
+
 dol_include_once('/digiriskdolibarr/class/digiriskdocuments.class.php');
 dol_include_once('/digiriskdolibarr/class/digiriskresources.class.php');
+dol_include_once('/digiriskdolibarr/class/openinghours.class.php');
 
 /**
  * Class for LegalDisplay
@@ -103,7 +106,11 @@ class LegalDisplay extends DigiriskDocuments
 			$labour_doctor_societe = new Societe($this->db);
 			$result = $labour_doctor_societe->fetch($digirisk_resources['LabourDoctorSociety']->id[0]);
 			if ($result > 0) {
-				$labour_doctor_openinghours = $thirdparty_openinghours->fetch_by_element($labour_doctor_societe->id, $labour_doctor_societe->element);
+				$morewhere = ' AND element_id = ' . $labour_doctor_societe->id;
+				$morewhere .= ' AND element_type = ' . "'" . $labour_doctor_societe->element . "'";
+				$morewhere .= ' AND status = 1';
+
+				$labour_doctor_openinghours = $thirdparty_openinghours->fetch(0, '', $morewhere);
 				$json['LegalDisplay']['occupational_health_service']['openinghours'] = "\r\n" . $labour_doctor_openinghours->day0 . "\r\n" . $labour_doctor_openinghours->day1 . "\r\n" . $labour_doctor_openinghours->day2 . "\r\n" . $labour_doctor_openinghours->day3 . "\r\n" . $labour_doctor_openinghours->day4 . "\r\n" . $labour_doctor_openinghours->day5 . "\r\n" . $labour_doctor_openinghours->day6;
 			}
 
@@ -120,7 +127,11 @@ class LegalDisplay extends DigiriskDocuments
 			$labour_inspector_societe = new Societe($this->db);
 			$result = $labour_inspector_societe->fetch($digirisk_resources['LabourInspectorSociety']->id[0]);
 			if ($result > 0) {
-				$labour_inspector_openinghours = $thirdparty_openinghours->fetch_by_element($labour_inspector_societe->id, $labour_inspector_societe->element);
+				$morewhere = ' AND element_id = ' . $labour_inspector_societe->id;
+				$morewhere .= ' AND element_type = ' . "'" . $labour_inspector_societe->element . "'";
+				$morewhere .= ' AND status = 1';
+
+				$labour_inspector_openinghours = $thirdparty_openinghours->fetch(0, '', $morewhere);
 				$json['LegalDisplay']['detective_work']['openinghours'] = "\r\n" . $labour_inspector_openinghours->day0 . "\r\n" . $labour_inspector_openinghours->day1 . "\r\n" . $labour_inspector_openinghours->day2 . "\r\n" . $labour_inspector_openinghours->day3 . "\r\n" . $labour_inspector_openinghours->day4 . "\r\n" . $labour_inspector_openinghours->day5 . "\r\n" . $labour_inspector_openinghours->day6;
 			}
 

@@ -130,12 +130,13 @@ class Openinghours extends CommonObject
 	 * @param User $user User that creates
 	 * @param bool $notrigger false=launch triggers after, true=disable triggers
 	 * @return int             <0 if KO, Id of created object if OK
+	 * @throws Exception
 	 */
 	public function create(User $user, $notrigger = false)
 	{
 		$sql = "UPDATE " . MAIN_DB_PREFIX . "$this->table_element";
 		$sql .= " SET status = 0";
-		if (isset($this->ismultientitymanaged) && $this->ismultientitymanaged == 1) $sql .= ' WHERE t.entity IN (' . getEntity($this->table_element) . ')';
+		if (isset($this->ismultientitymanaged) && $this->ismultientitymanaged == 1) $sql .= ' WHERE entity IN (' . getEntity($this->table_element) . ')';
 		else $sql .= ' WHERE 1 = 1';
 		$sql .= " AND element_type = " . "'" . $this->element_type . "'";
 		$sql .= " AND element_id = " . $this->element_id;
@@ -148,150 +149,13 @@ class Openinghours extends CommonObject
 	/**
 	 * Load object in memory from the database
 	 *
-	 * @param int $id Id object
-	 * @param string $ref Ref
-	 * @return int         <0 if KO, 0 if not found, >0 if OK
+	 * @param	int    $id				Id object
+	 * @param	string $ref				Ref
+	 * @param	string	$morewhere		More SQL filters (' AND ...')
+	 * @return 	int         			<0 if KO, 0 if not found, >0 if OK
 	 */
-	public function fetch($id, $ref = null)
+	public function fetch($id, $ref = null, $morewhere = '')
 	{
-		return $this->fetchCommon($id, $ref);
-	}
-
-	/**
-	 * Load object in memory from the database
-	 *
-	 * @param int $id Id object
-	 * @param string $ref Ref
-	 * @return int         <0 if KO, 0 if not found, >0 if OK
-	 */
-	public function fetch_by_element($element_id, $element_type)
-	{
-		if (empty($element_type) && empty($element_id) && empty($morewhere)) return -1;
-
-		$sql = 'SELECT ' . $this->getFieldList();
-		$sql .= ' FROM ' . MAIN_DB_PREFIX . $this->table_element;
-		if (!empty($element_id)) $sql .= ' WHERE element_id = ' . $element_id;
-		if (!empty($element_type)) $sql .= ' AND element_type = ' . "'" . $element_type . "'";
-		$sql .= ' AND status = 1';
-		if (empty($id) && isset($this->ismultientitymanaged) && $this->ismultientitymanaged == 1) $sql .= ' AND entity IN (' . getEntity($this->table_element) . ')';
-		if ($morewhere) $sql .= $morewhere;
-
-		$res = $this->db->query($sql);
-
-		if ($res) {
-			$obj = $this->db->fetch_object($res);
-			if ($obj) {
-				$this->setVarsFromFetchObj($obj);
-
-				// Retreive all extrafield
-				// fetch optionals attributes and labels
-				$this->fetch_optionals();
-
-				return $obj;
-			} else {
-				return 0;
-			}
-		} else {
-			$this->error = $this->db->lasterror();
-			$this->errors[] = $this->error;
-			return -1;
-		}
-	}
-
-	/**
-	 * Load list of objects in memory from the database.
-	 *
-	 * @param string $sortorder Sort Order
-	 * @param string $sortfield Sort field
-	 * @param int $limit limit
-	 * @param int $offset Offset
-	 * @param array $filter Filter array. Example array('field'=>'valueforlike', 'customurl'=>...)
-	 * @param string $filtermode Filter mode (AND or OR)
-	 * @return array|int                 int <0 if KO, array of pages if OK
-	 */
-	public function fetchAll($sortorder = '', $sortfield = '', $limit = 0, $offset = 0, array $filter = array(), $filtermode = 'AND')
-	{
-		dol_syslog(__METHOD__, LOG_DEBUG);
-
-		$records = array();
-
-		$sql = 'SELECT ';
-		$sql .= $this->getFieldList();
-		$sql .= ' FROM ' . MAIN_DB_PREFIX . $this->table_element . ' as t';
-		if (isset($this->ismultientitymanaged) && $this->ismultientitymanaged == 1) $sql .= ' WHERE t.entity IN (' . getEntity($this->table_element) . ')';
-		else $sql .= ' WHERE 1 = 1';
-		// Manage filter
-		$sqlwhere = array();
-		if (count($filter) > 0) {
-			foreach ($filter as $key => $value) {
-				if ($key == 't.rowid') {
-					$sqlwhere[] = $key . '=' . $value;
-				} elseif (strpos($key, 'date') !== false) {
-					$sqlwhere[] = $key . ' = \'' . $this->db->idate($value) . '\'';
-				} elseif ($key == 'customsql') {
-					$sqlwhere[] = $value;
-				} else {
-					$sqlwhere[] = $key . ' LIKE \'%' . $this->db->escape($value) . '%\'';
-				}
-			}
-		}
-		if (count($sqlwhere) > 0) {
-			$sql .= ' AND (' . implode(' ' . $filtermode . ' ', $sqlwhere) . ')';
-		}
-
-		if (!empty($sortfield)) {
-			$sql .= $this->db->order($sortfield, $sortorder);
-		}
-		if (!empty($limit)) {
-			$sql .= ' ' . $this->db->plimit($limit, $offset);
-		}
-
-		$resql = $this->db->query($sql);
-		if ($resql) {
-			$num = $this->db->num_rows($resql);
-			$i = 0;
-			while ($i < ($limit ? min($limit, $num) : $num)) {
-				$obj = $this->db->fetch_object($resql);
-
-				$record = new self($this->db);
-				$record->setVarsFromFetchObj($obj);
-
-				$records[$record->id] = $record;
-
-				$i++;
-			}
-			$this->db->free($resql);
-
-			return $records;
-		} else {
-			$this->errors[] = 'Error ' . $this->db->lasterror();
-			dol_syslog(__METHOD__ . ' ' . join(',', $this->errors), LOG_ERR);
-
-			return -1;
-		}
-	}
-
-	/**
-	 * Update object into database
-	 *
-	 * @param User $user User that modifies
-	 * @param bool $notrigger false=launch triggers after, true=disable triggers
-	 * @return int             <0 if KO, >0 if OK
-	 */
-	public function update(User $user, $notrigger = false)
-	{
-		return $this->updateCommon($user, $notrigger);
-	}
-
-	/**
-	 * Delete object in database
-	 *
-	 * @param User $user User that deletes
-	 * @param bool $notrigger false=launch triggers after, true=disable triggers
-	 * @return int             <0 if KO, >0 if OK
-	 */
-	public function delete(User $user, $notrigger = false)
-	{
-		return $this->deleteCommon($user, $notrigger);
+		return $this->fetchCommon($id, $ref, $morewhere);
 	}
 }

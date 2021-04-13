@@ -42,7 +42,7 @@ class RiskAssessment extends CommonObject
 	 * @var int  Does this object support multicompany module ?
 	 * 0=No test on entity, 1=Test with field entity, 'field@table'=Test with link by field@table
 	 */
-	public $ismultientitymanaged = 0;
+	public $ismultientitymanaged = 1;
 
 	/**
 	 * @var int  Does object support extrafields ? 0=No, 1=Yes
@@ -58,41 +58,39 @@ class RiskAssessment extends CommonObject
 	 * @var array  Array with all fields and their property. Do not use it as a static var. It may be modified by constructor.
 	 */
 	public $fields=array(
-		'rowid' => array('type'=>'integer', 'label'=>'TechnicalID', 'enabled'=>'1', 'position'=>30, 'notnull'=>1, 'visible'=>0, 'noteditable'=>'1', 'index'=>1, 'comment'=>"Id"),
-		'ref' => array('type'=>'varchar(128)', 'label'=>'Ref', 'enabled'=>'1', 'position'=>31, 'notnull'=>1, 'visible'=>0, 'noteditable'=>'1', 'default'=>'(PROV)', 'index'=>1, 'searchall'=>1, 'showoncombobox'=>'1', 'comment'=>"Reference of object"),
-		'date_creation' => array('type'=>'datetime', 'label'=>'DateCreation', 'enabled'=>'1', 'position'=>32, 'notnull'=>1, 'visible'=>-0,),
-		'tms' => array('type'=>'timestamp', 'label'=>'DateModification', 'enabled'=>'1', 'position'=>33, 'notnull'=>0, 'visible'=>0,),
-		'fk_user_creat' => array('type'=>'integer:User:user/class/user.class.php', 'label'=>'UserAuthor', 'enabled'=>'1', 'position'=>34, 'notnull'=>1, 'visible'=>0, 'foreignkey'=>'user.rowid',),
-		'fk_user_modif' => array('type'=>'integer:User:user/class/user.class.php', 'label'=>'UserModif', 'enabled'=>'1', 'position'=>35, 'notnull'=>-1, 'visible'=>0,),
-		'import_key' => array('type'=>'varchar(14)', 'label'=>'ImportId', 'enabled'=>'1', 'position'=>36, 'notnull'=>-1, 'visible'=>0,),
-		'ref_ext' => array('type'=>'varchar(128)', 'label'=>'RefExt', 'enabled'=>'1', 'position'=>37, 'notnull'=>0, 'visible'=>0,),
-		'status' => array('type'=>'integer', 'label'=>'Status', 'enabled'=>'1', 'position'=>38, 'notnull'=>0, 'visible'=>0,),
-		'cotation' => array('type'=>'integer', 'label'=>'Evaluation', 'enabled'=>'1', 'position'=>39, 'notnull'=>0, 'visible'=>4,),
-		'has_tasks' => array('type'=>'integer', 'label'=>'Tasks', 'enabled'=>'1', 'position'=>40, 'notnull'=>0, 'visible'=>4,),
-		'method' => array('type'=>'varchar(50)', 'label'=>'EvaluationMethod', 'enabled'=>'1', 'position'=>41, 'notnull'=>0, 'visible'=>0,),
-		'fk_risk' => array('type'=>'integer', 'label'=>'ParentRisk', 'enabled'=>'1', 'position'=>42, 'notnull'=>0, 'visible'=>0,),
-		'gravite' => array('type'=>'integer', 'label'=>'Gravity', 'enabled'=>'1', 'position'=>43, 'notnull'=>0, 'visible'=>0,),
-		'protection' => array('type'=>'integer', 'label'=>'Protection', 'enabled'=>'1', 'position'=>44, 'notnull'=>0, 'visible'=>0,),
-		'occurrence' => array('type'=>'integer', 'label'=>'Occurrence', 'enabled'=>'1', 'position'=>45, 'notnull'=>0, 'visible'=>0,),
-		'formation' => array('type'=>'integer', 'label'=>'Formation', 'enabled'=>'1', 'position'=>46, 'notnull'=>0, 'visible'=>0,),
-		'exposition' => array('type'=>'integer', 'label'=>'Exposition', 'enabled'=>'1', 'position'=>47, 'notnull'=>0, 'visible'=>0,),
-		'comment' => array('type'=>'text', 'label'=>'Comment', 'enabled'=>'1', 'position'=>48, 'notnull'=>0, 'visible'=>0,),
-		'photo' => array('type'=>'varchar(128)', 'label'=>'Photo', 'enabled'=>'1', 'position'=>50, 'notnull'=>0, 'visible'=>0,),
-		'entity' => array('type'=>'integer', 'label'=>'entity', 'enabled'=>'1', 'position'=>49, 'notnull'=>0, 'visible'=>0,),
+		'rowid'         => array('type'=>'integer', 'label'=>'TechnicalID', 'enabled'=>'1', 'position'=>1, 'notnull'=>1, 'visible'=>0, 'noteditable'=>'1', 'index'=>1, 'comment'=>"Id"),
+		'ref'           => array('type'=>'varchar(128)', 'label'=>'Ref', 'enabled'=>'1', 'position'=>10, 'notnull'=>1, 'visible'=>0, 'noteditable'=>'1', 'default'=>'(PROV)', 'index'=>1, 'searchall'=>1, 'showoncombobox'=>'1', 'comment'=>"Reference of object"),
+		'ref_ext'       => array('type'=>'varchar(128)', 'label'=>'RefExt', 'enabled'=>'1', 'position'=>20, 'notnull'=>0, 'visible'=>0,),
+		'entity'        => array('type'=>'integer', 'label'=>'entity', 'enabled'=>'1', 'position'=>30, 'notnull'=>1, 'visible'=>0,),
+		'date_creation' => array('type'=>'datetime', 'label'=>'DateCreation', 'enabled'=>'1', 'position'=>40, 'notnull'=>1, 'visible'=>-0,),
+		'tms'           => array('type'=>'timestamp', 'label'=>'DateModification', 'enabled'=>'1', 'position'=>50, 'notnull'=>0, 'visible'=>0,),
+		'import_key'    => array('type'=>'varchar(14)', 'label'=>'ImportId', 'enabled'=>'1', 'position'=>60, 'notnull'=>-1, 'visible'=>0,),
+		'status'        => array('type'=>'smallint', 'label'=>'Status', 'enabled'=>'1', 'position'=>70, 'notnull'=>0, 'visible'=>0,),
+		'method'        => array('type'=>'varchar(50)', 'label'=>'EvaluationMethod', 'enabled'=>'1', 'position'=>80, 'notnull'=>0, 'visible'=>0,),
+		'cotation'      => array('type'=>'integer', 'label'=>'Evaluation', 'enabled'=>'1', 'position'=>90, 'notnull'=>0, 'visible'=>4,),
+		'gravite'       => array('type'=>'integer', 'label'=>'Gravity', 'enabled'=>'1', 'position'=>100, 'notnull'=>0, 'visible'=>0,),
+		'protection'    => array('type'=>'integer', 'label'=>'Protection', 'enabled'=>'1', 'position'=>110, 'notnull'=>0, 'visible'=>0,),
+		'occurrence'    => array('type'=>'integer', 'label'=>'Occurrence', 'enabled'=>'1', 'position'=>120, 'notnull'=>0, 'visible'=>0,),
+		'formation'     => array('type'=>'integer', 'label'=>'Formation', 'enabled'=>'1', 'position'=>130, 'notnull'=>0, 'visible'=>0,),
+		'exposition'    => array('type'=>'integer', 'label'=>'Exposition', 'enabled'=>'1', 'position'=>140, 'notnull'=>0, 'visible'=>0,),
+		'comment'       => array('type'=>'text', 'label'=>'Comment', 'enabled'=>'1', 'position'=>150, 'notnull'=>0, 'visible'=>0,),
+		'photo'         => array('type'=>'varchar(255)', 'label'=>'Photo', 'enabled'=>'1', 'position'=>160, 'notnull'=>0, 'visible'=>0,),
+		'has_tasks'     => array('type'=>'integer', 'label'=>'Tasks', 'enabled'=>'1', 'position'=>170, 'notnull'=>0, 'visible'=>4,),
+		'fk_user_creat' => array('type'=>'integer:User:user/class/user.class.php', 'label'=>'UserAuthor', 'enabled'=>'1', 'position'=>180, 'notnull'=>1, 'visible'=>0, 'foreignkey'=>'user.rowid',),
+		'fk_user_modif' => array('type'=>'integer:User:user/class/user.class.php', 'label'=>'UserModif', 'enabled'=>'1', 'position'=>190, 'notnull'=>-1, 'visible'=>0,),
+		'fk_risk'       => array('type'=>'integer', 'label'=>'ParentRisk', 'enabled'=>'1', 'position'=>200, 'notnull'=>1, 'visible'=>0,),
 	);
+
 	public $rowid;
 	public $ref;
+	public $ref_ext;
+	public $entity;
 	public $date_creation;
 	public $tms;
-	public $fk_user_creat;
-	public $fk_user_modif;
 	public $import_key;
-	public $ref_ext;
 	public $status;
 	public $cotation;
-	public $has_tasks;
 	public $method;
-	public $fk_risk;
 	public $gravite;
 	public $protection;
 	public $occurrence;
@@ -100,7 +98,10 @@ class RiskAssessment extends CommonObject
 	public $exposition;
 	public $comment;
 	public $photo;
-	public $entity;
+	public $has_tasks;
+	public $fk_user_creat;
+	public $fk_user_modif;
+	public $fk_risk;
 
 	/**
 	 * Constructor
@@ -153,7 +154,7 @@ class RiskAssessment extends CommonObject
 		$previousEvaluation = $this->fetchFromParent($this->fk_risk, 1);
 
 		// Change le statut des ressources précédentes à 0
-		$sql = "UPDATE ".MAIN_DB_PREFIX."digiriskdolibarr_digiriskevaluation";
+		$sql = "UPDATE ".MAIN_DB_PREFIX."digiriskdolibarr_riskassessment";
 		$sql .= " SET status = 0";
 		$sql .= " WHERE fk_risk = ".$this->fk_risk;
 		$resql = $this->db->query($sql);
@@ -171,9 +172,7 @@ class RiskAssessment extends CommonObject
 	 */
 	public function fetch($id, $ref = null)
 	{
-		$result = $this->fetchCommon($id, $ref);
-		if ($result > 0 && !empty($this->table_element_line)) $this->fetchLines();
-		return $result;
+		return $this->fetchCommon($id, $ref);
 	}
 
 	/**
@@ -187,9 +186,7 @@ class RiskAssessment extends CommonObject
 		$filter = array('customsql' => 'fk_risk=' . $this->db->escape($parent_id));
 		if ($active) $filter['status'] = 1;
 
-		$result = $this->fetchAll('', '', 0, 0, $filter, 'AND');
-		if ($result > 0 && !empty($this->table_element_line)) $this->fetchLines();
-		return $result;
+		return $this->fetchAll('', '', 0, 0, $filter, 'AND');
 	}
 
 	/**
@@ -205,8 +202,6 @@ class RiskAssessment extends CommonObject
 	 */
 	public function fetchAll($sortorder = '', $sortfield = '', $limit = 0, $offset = 0, array $filter = array(), $filtermode = 'AND')
 	{
-		global $conf;
-
 		dol_syslog(__METHOD__, LOG_DEBUG);
 
 		$records = array();
