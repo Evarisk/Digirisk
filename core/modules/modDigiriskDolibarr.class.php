@@ -120,7 +120,7 @@ class modDigiriskdolibarr extends DolibarrModules
 		// Dependencies
 
 		$this->hidden                  = false;
-		$this->depends                 = array('modAgenda', 'modECM', 'modProjet');
+		$this->depends                 = array('modAgenda', 'modECM', 'modProjet', 'modSociete');
 		$this->requiredby              = array();
 		$this->conflictwith            = array();
 		$this->langfiles               = array("digiriskdolibarr@digiriskdolibarr");
@@ -646,6 +646,8 @@ class modDigiriskdolibarr extends DolibarrModules
 	{
 		global $conf, $langs, $user;
 
+		$langs->load("digiriskdolibarr@digiriskdolibarr");
+
 		$sql = array();
 
 		$this->_load_tables('/digiriskdolibarr/sql/');
@@ -658,6 +660,8 @@ class modDigiriskdolibarr extends DolibarrModules
 			require_once DOL_DOCUMENT_ROOT . '/projet/class/project.class.php';
 			require_once DOL_DOCUMENT_ROOT . '/societe/class/societe.class.php';
 			require_once DOL_DOCUMENT_ROOT . '/core/modules/project/mod_project_simple.php';
+
+			dolibarr_set_const($this->db, 'MAIN_MODULE_PROJET',1);
 
 			$project     = new Project($this->db);
 			$third_party = new Societe($this->db);
