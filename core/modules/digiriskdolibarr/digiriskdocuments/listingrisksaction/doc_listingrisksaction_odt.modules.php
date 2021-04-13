@@ -26,6 +26,8 @@ require_once DOL_DOCUMENT_ROOT . '/core/lib/files.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/company.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/doc.lib.php';
 dol_include_once('/custom/digiriskdolibarr/lib/files.lib.php');
+dol_include_once('/custom/digiriskdolibarr/class/riskanalysis/risk.class.php');
+dol_include_once('/custom/digiriskdolibarr/class/riskanalysis/riskassessment.class.php');
 dol_include_once('/custom/digiriskdolibarr/core/modules/digiriskdolibarr/digiriskdocuments/listingrisksaction/mod_listingrisksaction_standard.php');
 dol_include_once('/custom/digiriskdolibarr/core/modules/digiriskdolibarr/digiriskdocuments/listingrisksaction/modules_listingrisksaction.php');
 
@@ -161,7 +163,7 @@ class doc_listingrisksaction_odt extends ModeleODTListingRisksAction
 	 *  @param		int			$hideref			Do not show ref
 	 *	@return		int         					1 if OK, <=0 if KO
 	 */
-	public function write_file($object, $outputlangs, $srctemplatepath, $hidedetails = 0, $hidedesc = 0, $hideref = 0)
+	public function write_file($object, $outputlangs, $srctemplatepath, $hidedetails = 0, $hidedesc = 0, $hideref = 0, $digiriskelement)
 	{
 		// phpcs:enable
 		global $user, $langs, $conf, $hookmanager, $action;
@@ -189,9 +191,16 @@ class doc_listingrisksaction_odt extends ModeleODTListingRisksAction
 		$ref = $mod->getNextValue($object);
 
 		$object->ref = $ref;
-		$object->create($user);
+		$id = $object->create($user);
 
-		$dir = $conf->digiriskdolibarr->multidir_output[isset($conf->entity) ? $conf->entity : 1] . '/listingrisksaction';
+		$object->fetch($id);
+
+		if ( ! isset( $digiriskelement->element_type ) ) {
+			$dir = $conf->digiriskdolibarr->multidir_output[isset($conf->entity) ? $conf->entity : 1] . '/listingrisksaction';
+		} else {
+			$dir = $conf->digiriskdolibarr->multidir_output[isset($conf->entity) ? $conf->entity : 1] . '/listingrisksaction/' . $digiriskelement->ref;
+		}
+
 		$objectref = dol_sanitizeFileName($ref);
 		if (preg_match('/specimen/i', $objectref)) $dir .= '/specimen';
 
@@ -286,14 +295,14 @@ class doc_listingrisksaction_odt extends ModeleODTListingRisksAction
 				if ($foundtagforlines)
 				{
 					$risk = new Risk($this->db);
-					if ( ! empty( $object ) ) {
-						$risks = $risk->fetchRisksOrderedByCotation($object->id, true);
+					if ( ! empty( $digiriskelement ) ) {
+						$risks = $risk->fetchRisksOrderedByCotation($digiriskelement->id, true);
 						if ($risks > 0 && !empty($risks)) {
 							for ($i = 1; $i <= 4; $i++ ) {
 								$listlines = $odfHandler->setSegment('risk' . $i);
 
 								foreach ($risks as $line) {
-									$evaluation = new DigiriskEvaluation($this->db);
+									$evaluation = new RiskAssessment($this->db);
 									$lastEvaluation = $evaluation->fetchFromParent($line->id, 1);
 									if ( !empty ($lastEvaluation) ) {
 										$lastEvaluation = array_shift($lastEvaluation);
@@ -347,7 +356,7 @@ class doc_listingrisksaction_odt extends ModeleODTListingRisksAction
 								$listlines = $odfHandler->setSegment('risk' . $i);
 
 								foreach ($risks as $line) {
-									$evaluation = new DigiriskEvaluation($this->db);
+									$evaluation = new RiskAssessment($this->db);
 									$lastEvaluation = $evaluation->fetchFromParent($line->id, 1);
 									$lastEvaluation = array_shift($lastEvaluation);
 									$scale = $lastEvaluation->get_evaluation_scale();

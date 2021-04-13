@@ -317,7 +317,7 @@ class doc_groupmentdocument_custom_odt extends ModeleODTGroupmentDocument
 							for ($i = 1; $i <= 4; $i++ ) {
 								$listlines = $odfHandler->setSegment('risq' . $i);
 								foreach ($risks as $line) {
-									$evaluation = new DigiriskEvaluation($this->db);
+									$evaluation = new RiskAssessment($this->db);
 									$lastEvaluation = $evaluation->fetchFromParent($line->id, 1);
 									$lastEvaluation = array_shift($lastEvaluation);
 									$scale = $lastEvaluation->get_evaluation_scale();

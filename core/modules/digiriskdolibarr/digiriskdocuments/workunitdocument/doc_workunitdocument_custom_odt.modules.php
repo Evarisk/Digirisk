@@ -318,7 +318,7 @@ class doc_workunitdocument_custom_odt extends ModeleODTWorkUnitDocument
 								$listlines = $odfHandler->setSegment('risq' . $i);
 
 								foreach ($risks as $line) {
-									$evaluation = new DigiriskEvaluation($this->db);
+									$evaluation = new RiskAssessment($this->db);
 									$lastEvaluation = $evaluation->fetchFromParent($line->id, 1);
 									$lastEvaluation = array_shift($lastEvaluation);
 									$scale = $lastEvaluation->get_evaluation_scale();

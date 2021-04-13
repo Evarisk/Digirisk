@@ -26,7 +26,7 @@ require_once DOL_DOCUMENT_ROOT . '/core/lib/files.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/company.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/doc.lib.php';
 dol_include_once('/custom/digiriskdolibarr/lib/files.lib.php');
-dol_include_once('/custom/digiriskdolibarr/class/digirisksignalisation.class.php');
+dol_include_once('/custom/digiriskdolibarr/class/risksign.class.php');
 dol_include_once('/custom/digiriskdolibarr/core/modules/digiriskdolibarr/digiriskdocuments/groupmentdocument/mod_groupmentdocument_standard.php');
 dol_include_once('/custom/digiriskdolibarr/core/modules/digiriskdolibarr/digiriskdocuments/groupmentdocument/modules_groupmentdocument.php');
 /**
@@ -293,7 +293,7 @@ class doc_groupmentdocument_odt extends ModeleODTGroupmentDocument
 							for ($i = 1; $i <= 4; $i++ ) {
 								$listlines = $odfHandler->setSegment('risq' . $i);
 								foreach ($risks as $line) {
-									$evaluation = new DigiriskEvaluation($this->db);
+									$evaluation = new RiskAssessment($this->db);
 									$lastEvaluation = $evaluation->fetchFromParent($line->id, 1);
 									$lastEvaluation = array_shift($lastEvaluation);
 									$scale = $lastEvaluation->get_evaluation_scale();
