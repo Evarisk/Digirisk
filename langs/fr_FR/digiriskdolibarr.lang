@@ -333,3 +333,12 @@ SelectProject = Choix du projet
 DigiriskDocuments = Document Digirisk
 DigiriskElement = Element Digirisk
 
+RiskEvaluationDocument = Document Unique
+DigiriskElementRisksList = Liste de risques
+
+OpeningHours = Horaires
+ThirdPartyOpeningHours = Horaires du tiers
+
+DigiriskElementRisk = Risques
+
+
