@@ -551,3 +551,238 @@ function digiriskshowdocuments($modulepart, $modulesubdir, $filedir, $urlsource,
 
 	return $out;
 }
+
+/**
+ *	Show HTML header HTML + BODY + Top menu + left menu + DIV
+ *
+ * @param 	string 	$head				Optionnal head lines
+ * @param 	string 	$title				HTML title
+ * @param	string	$help_url			Url links to help page
+ * 		                            	Syntax is: For a wiki page: EN:EnglishPage|FR:FrenchPage|ES:SpanishPage
+ *                                  	For other external page: http://server/url
+ * @param	string	$target				Target to use on links
+ * @param 	int    	$disablejs			More content into html header
+ * @param 	int    	$disablehead		More content into html header
+ * @param 	array  	$arrayofjs			Array of complementary js files
+ * @param 	array  	$arrayofcss			Array of complementary css files
+ * @param	string	$morequerystring	Query string to add to the link "print" to get same parameters (use only if autodetect fails)
+ * @param   string  $morecssonbody      More CSS on body tag.
+ * @param	string	$replacemainareaby	Replace call to main_area() by a print of this string
+ * @return	void
+ */
+function digiriskHeader($head = '', $title = '', $help_url = '', $target = '', $disablejs = 0, $disablehead = 0, $arrayofjs = '', $arrayofcss = '', $morequerystring = '', $morecssonbody = '', $replacemainareaby = '')
+{
+	global $conf, $langs, $db;
+
+	dol_include_once('/custom/digiriskdolibarr/core/modules/digiriskdolibarr/digiriskelement/groupment/mod_groupment_standard.php');
+	dol_include_once('/custom/digiriskdolibarr/core/modules/digiriskdolibarr/digiriskelement/workunit/mod_workunit_standard.php');
+
+	$mod_groupment = new $conf->global->DIGIRISKDOLIBARR_GROUPMENT_ADDON();
+	$mod_workunit = new $conf->global->DIGIRISKDOLIBARR_WORKUNIT_ADDON();
+
+	// html header
+	$tmpcsstouse = 'sidebar-collapse'.($morecssonbody ? ' '.$morecssonbody : '');
+	// If theme MD and classic layer, we open the menulayer by default.
+	if ($conf->theme == 'md' && !in_array($conf->browser->layout, array('phone', 'tablet')) && empty($conf->global->MAIN_OPTIMIZEFORTEXTBROWSER))
+	{
+		global $mainmenu;
+		if ($mainmenu != 'website') $tmpcsstouse = $morecssonbody; // We do not use sidebar-collpase by default to have menuhider open by default.
+	}
+
+	if (!empty($conf->global->MAIN_OPTIMIZEFORCOLORBLIND)) {
+		$tmpcsstouse .= ' colorblind-'.strip_tags($conf->global->MAIN_OPTIMIZEFORCOLORBLIND);
+	}
+
+	print '<body id="mainbody" class="'.$tmpcsstouse.'">'."\n";
+
+	llxHeader('', $title, $help_url);
+
+	//Body navigation digirisk
+	$object  = new DigiriskElement($db);
+	$objects = $object->fetchAll('', '', 0,0,array('entity' => $conf->entity));
+	$results = recurse_tree(0,0,$objects); ?>
+	<div id="id-container" class="id-container page-ut-gp-list">
+		<div class="side-nav">
+			<div id="id-left">
+				<div class="digirisk-wrap wpeo-wrap">
+					<div class="navigation-container">
+						<div class="society-header">
+							<a class="linkElement" href="../digiriskdolibarr/digiriskelement_card.php">
+								<span class="icon fas fa-building fa-fw"></span>
+								<div class="title"><?php echo $conf->global->MAIN_INFO_SOCIETE_NOM ?></div>
+								<div class="add-container">
+									<a id="newGroupment" href="../digiriskdolibarr/digiriskelement_card.php?action=create&element_type=groupment&fk_parent=0">
+										<div class="wpeo-button button-square-40 button-secondary wpeo-tooltip-event" data-direction="bottom" data-color="light" aria-label="<?php echo $langs->trans('NewGroupment'); ?>"><strong><?php echo $mod_groupment->prefix; ?></strong><span class="button-add animated fas fa-plus-circle"></span></div>
+									</a>
+									<a id="newWorkunit" href="../digiriskdolibarr/digiriskelement_card.php?action=create&element_type=workunit&fk_parent=0">
+										<div class="wpeo-button button-square-40 wpeo-tooltip-event" data-direction="bottom" data-color="light" aria-label="<?php echo $langs->trans('NewWorkUnit'); ?>"><strong><?php echo $mod_workunit->prefix; ?></strong><span class="button-add animated fas fa-plus-circle"></span></div>
+									</a>
+								</div>
+							</a>
+						</div>
+						<div class="toolbar">
+							<div class="toggle-plus tooltip hover" aria-label="<?php echo $langs->trans('UnwrapAll'); ?>"><span class="icon fas fa-plus-square"></span></div>
+							<div class="toggle-minus tooltip hover" aria-label="<?php echo $langs->trans('WrapAll'); ?>"><span class="icon fas fa-minus-square"></span></div>
+						</div>
+						<ul class="workunit-list">
+								<?php display_recurse_tree($results) ?>
+								<script>
+								// Get previous menu to display it
+								var MENU = localStorage.menu;
+								if (MENU == null || MENU == '') {
+									MENU = new Set()
+								} else {
+									MENU = JSON.parse(MENU);
+									MENU = new Set(MENU);
+								}
+
+								MENU.forEach((id) =>  {
+									jQuery( '#menu'+id).removeClass( 'fa-chevron-right').addClass( 'fa-chevron-down' );
+									jQuery( '#unit'+id ).addClass( 'toggled' );
+								});
+
+								// Set active unit active
+								jQuery( '.digirisk-wrap .navigation-container .unit.active' ).removeClass( 'active' );
+
+								var params = new window.URLSearchParams(window.location.search);
+								var id = params.get('id');
+
+								jQuery( '#unit'  + id ).addClass( 'active' );
+								jQuery( '#unit'  +id  ).closest( '.unit' ).attr( 'value', id );
+								</script>
+							</ul>
+					</div>
+				</div>
+			</div>
+		</div>
+	<?php
+
+	// main area
+	if ($replacemainareaby)
+	{
+		print $replacemainareaby;
+		return;
+	}
+	main_area($title);
+}
+
+/**
+ *	Recursive tree process
+ *
+ * @param	DigiriskElement $parent Element Parent of Digirisk Element object
+ * @param 	int             $niveau Depth of tree
+ * @param 	array           $array  Global Digirisk Element list
+ * @return	array           $result Global Digirisk Element list after recursive process
+ */
+function recurse_tree($parent, $niveau, $array) {
+	$result = array();
+	foreach ($array as $noeud) {
+		if ($parent == $noeud->fk_parent) {
+			$result[$noeud->id] = array(
+				'id'       => $noeud->id,
+				'object'   => $noeud,
+				'children' => recurse_tree($noeud->id, ($niveau + 1), $array),
+			);
+		}
+	}
+	return $result;
+}
+
+/**
+ *	Display Recursive tree process
+ *
+ * @param	array $result Global Digirisk Element list after recursive process
+ * @return	void
+ */
+function display_recurse_tree($results) {
+	global $conf, $langs;
+
+	dol_include_once('/custom/digiriskdolibarr/core/modules/digiriskdolibarr/digiriskelement/groupment/mod_groupment_standard.php');
+	dol_include_once('/custom/digiriskdolibarr/core/modules/digiriskdolibarr/digiriskelement/workunit/mod_workunit_standard.php');
+
+	$mod_groupment = new $conf->global->DIGIRISKDOLIBARR_GROUPMENT_ADDON();
+	$mod_workunit = new $conf->global->DIGIRISKDOLIBARR_WORKUNIT_ADDON();
+
+	if ( !empty( $results ) ) {
+		foreach ($results as $element) { ?>
+			<li class="unit type-<?php echo $element['object']->element_type; ?>" id="unit<?php  echo $element['object']->id; ?>">
+				<div class="unit-container">
+					<?php if ($element['object']->element_type == 'groupment' && count($element['children'])) { ?>
+						<div class="toggle-unit">
+							<i class="toggle-icon fas fa-chevron-right" id="menu<?php echo $element['object']->id;?>"></i>
+						</div>
+					<?php } else { ?>
+						<div class="spacer"></div>
+					<?php } ?>
+					<?php $filearray = dol_dir_list($conf->digiriskdolibarr->multidir_output[$conf->entity].'/'.$element['object']->element_type.'/'.$element['object']->ref.'/', "files", 0, '', '(\.odt|_preview.*\.png)$', 'position_name', 'asc', 1);
+					if (count($filearray)) {
+						print '<span class="floatleft inline-block valignmiddle divphotoref">'.digirisk_show_photos('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity].'/'.$element['object']->element_type, 'small', 1, 0, 0, 0, 50, 0, 0, 0, 0, $element['object']->element_type, $element['object']).'</span>';
+					} else {
+						$nophoto = '/public/theme/common/nophoto.png'; ?>
+						<span class="floatleft inline-block valignmiddle divphotoref"><img class="photodigiriskdolibarr" alt="No photo" src="<?php echo DOL_URL_ROOT.$nophoto ?>"></span>
+					<?php } ?>
+					<div class="title" id="scores" value="<?php echo $element['object']->id ?>" >
+							<a id="slider" class="linkElement id<?php echo $element['object']->id;?>" href="../digiriskdolibarr/digiriskelement_risk.php?id=<?php echo $element['object']->id; ?>">
+								<span class="title-container">
+									<span class="ref"><?php echo $element['object']->ref; ?></span>
+									<span class="name"><?php echo $element['object']->label; ?></span>
+								</span>
+							</a>
+					</div>
+					<?php if ($element['object']->element_type == 'groupment') { ?>
+						<div class="add-container">
+							<a id="newGroupment" href="../digiriskdolibarr/digiriskelement_card.php?action=create&element_type=groupment&fk_parent=<?php echo $element['object']->id; ?>">
+								<div
+									class="wpeo-button button-secondary button-square-40 wpeo-tooltip-event"
+									data-direction="bottom" data-color="light"
+									aria-label="<?php echo $langs->trans('NewGroupment'); ?>">
+									<strong><?php echo $mod_groupment->prefix; ?></strong>
+									<span class="button-add animated fas fa-plus-circle"></span>
+								</div>
+							</a>
+							<a id="newWorkunit" href="../digiriskdolibarr/digiriskelement_card.php?action=create&element_type=workunit&fk_parent=<?php echo $element['object']->id; ?>">
+								<div
+									class="wpeo-button button-square-40 wpeo-tooltip-event"
+									data-direction="bottom" data-color="light"
+									aria-label="<?php echo $langs->trans('NewWorkUnit'); ?>">
+									<strong><?php echo $mod_workunit->prefix; ?></strong>
+									<span class="button-add animated fas fa-plus-circle"></span>
+								</div>
+							</a>
+						</div>
+					<?php } ?>
+				</div>
+				<ul class="sub-list"><?php display_recurse_tree($element['children']) ?></ul>
+			</li>
+		<?php }
+	}
+}
+
+/**
+ *  Show tab footer of a card.
+ *  Note: $object->next_prev_filter can be set to restrict select to find next or previous record by $form->showrefnav.
+ *
+ *  @param	Object	$object			Object to show
+ *  @param	string	$paramid   		Name of parameter to use to name the id into the URL next/previous link
+ *  @param	string	$morehtml  		More html content to output just before the nav bar
+ *  @param	int		$shownav	  	Show Condition (navigation is shown if value is 1)
+ *  @param	string	$fieldid   		Nom du champ en base a utiliser pour select next et previous (we make the select max and min on this field). Use 'none' for no prev/next search.
+ *  @param	string	$fieldref   	Nom du champ objet ref (object->ref) a utiliser pour select next et previous
+ *  @param	string	$morehtmlref  	More html to show after ref
+ *  @param	string	$moreparam  	More param to add in nav link url.
+ *	@param	int		$nodbprefix		Do not include DB prefix to forge table name
+ *	@param	string	$morehtmlleft	More html code to show before ref
+ *	@param	string	$morehtmlstatus	More html code to show under navigation arrows
+ *  @param  int     $onlybanner     Put this to 1, if the card will contains only a banner (this add css 'arearefnobottom' on div)
+ *	@param	string	$morehtmlright	More html code to show before navigation arrows
+ *  @return	void
+ */
+function digirisk_banner_tab($object, $paramid, $morehtml = '', $shownav = 1, $fieldid = 'rowid', $fieldref = 'ref', $morehtmlref = '', $moreparam = '', $nodbprefix = 0, $morehtmlleft = '', $morehtmlstatus = '', $onlybanner = 0, $morehtmlright = '')
+{
+	global $form;
+
+	print '<div class="'.($onlybanner ? 'arearefnobottom ' : 'arearef ').'heightref valignmiddle centpercent">';
+	print $form->showrefnav($object, $paramid, $morehtml, $shownav, $fieldid, $fieldref, $morehtmlref, $moreparam, $nodbprefix, $morehtmlleft, $morehtmlstatus, $morehtmlright);
+	print '</div>';
+	print '<div class="underrefbanner clearboth"></div>';
+}
