@@ -1,4 +1,4 @@
--- Copyright (C) ---Put here your own copyright and developer email---
+-- Copyright (C) 2021 EOXIA <dev@eoxia.com>
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -13,27 +13,26 @@
 -- You should have received a copy of the GNU General Public License
 -- along with this program.  If not, see https://www.gnu.org/licenses/.
 
-
 CREATE TABLE llx_digiriskdolibarr_riskassessment(
-	rowid integer AUTO_INCREMENT PRIMARY KEY NOT NULL, 
-	ref varchar(128) DEFAULT '(PROV)' NOT NULL, 
+	rowid         integer AUTO_INCREMENT PRIMARY KEY NOT NULL,
+	ref           varchar(128) DEFAULT '(PROV)' NOT NULL,
+	ref_ext       varchar(128),
+	entity        integer DEFAULT 1 NOT NULL,
 	date_creation datetime NOT NULL, 
-	tms timestamp, 
-	fk_user_creat integer NOT NULL, 
-	fk_user_modif integer, 
-	import_key varchar(14), 
-	ref_ext varchar(128), 
-	status integer, 
-	cotation integer, 
-	has_tasks integer, 
-	method varchar(50), 
-	fk_risk integer, 
-	gravite integer, 
-	protection integer, 
-	occurrence integer, 
-	formation integer, 
-	exposition integer, 
-	comment text, 
-	photo varchar(128), 
-	entity integer DEFAULT 1
+	tms           timestamp,
+	import_key    varchar(14),
+	status        integer,
+	method        varchar(50),
+	cotation      integer,
+	gravite       integer,
+	protection    integer,
+	occurrence    integer,
+	formation     integer,
+	exposition    integer,
+	comment       text,
+	photo         varchar(255),
+	has_tasks     integer,
+	fk_user_creat integer NOT NULL,
+	fk_user_modif integer,
+	fk_risk       integer NOT NULL
 ) ENGINE=innodb;

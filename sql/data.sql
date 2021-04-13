@@ -17,30 +17,30 @@ INSERT INTO llx_c_action_trigger (elementtype, code, label, description) VALUES 
 INSERT INTO llx_c_action_trigger (elementtype, code, label, description) VALUES ('groupment', 'LISTING_RISKS_PHOTOS_GENERATE', 'Listing risks photos Generated', 'Executed when a listing risks photos is generated');
 INSERT INTO llx_c_action_trigger (elementtype, code, label, description) VALUES ('groupment', 'LISTING_RISKS_ACTIONS_GENERATE', 'Listing risks actions Generated', 'Executed when a listing risks actions is generated');
 
-INSERT INTO llx_c_email_templates (entity,module,type_template,lang,private,fk_user,datec,label,position,enabled,active,topic,joinfiles,content,content_lines)
-VALUES (1,null,'Digirisk_LegalDisplay','',0,null,null,'Digirisk_LegalDisplay',1,1,1,'[__[MAIN_INFO_SOCIETE_NOM]__] - __(SendLegalDisplay)__',1,
-concat('Bonjour,'
-, 0xd0a, 0xd0a,
-'Voici l’affichage légal généré en ce jour'
-, 0xd0a, 0xd0a,
-'Bien cordialement,'
-, 0xd0a, 0xd0a,
-'Service administratif', 0xd0a,
-'__MYCOMPANY_FULLADDRESS__', 0xd0a,
-'__MYCOMPANY_EMAIL__')
-,null),
-
-(1,null,'Digirisk_InformationsSharing','',0,null,null,'Digirisk_InformationsSharing',1,1,1,'[__[MAIN_INFO_SOCIETE_NOM]__] - __(SendInformationsSharing)__',1,
-concat('Bonjour,'
-, 0xd0a, 0xd0a,
-'Voici la diffusion d’informations générée en ce jour'
-, 0xd0a, 0xd0a,
-'Bien cordialement,'
-, 0xd0a, 0xd0a,
-'Service administratif', 0xd0a,
-'__MYCOMPANY_FULLADDRESS__', 0xd0a,
-'__MYCOMPANY_EMAIL__')
-,null);
+-- INSERT INTO llx_c_email_templates (entity,module,type_template,lang,private,fk_user,datec,label,position,enabled,active,topic,joinfiles,content,content_lines)
+-- VALUES (1,null,'Digirisk_LegalDisplay','',0,null,null,'Digirisk_LegalDisplay',1,1,1,'[__[MAIN_INFO_SOCIETE_NOM]__] - __(SendLegalDisplay)__',1,
+-- concat('Bonjour,'
+-- , 0xd0a, 0xd0a,
+-- 'Voici l’affichage légal généré en ce jour'
+-- , 0xd0a, 0xd0a,
+-- 'Bien cordialement,'
+-- , 0xd0a, 0xd0a,
+-- 'Service administratif', 0xd0a,
+-- '__MYCOMPANY_FULLADDRESS__', 0xd0a,
+-- '__MYCOMPANY_EMAIL__')
+-- ,null),
+--
+-- (1,null,'Digirisk_InformationsSharing','',0,null,null,'Digirisk_InformationsSharing',1,1,1,'[__[MAIN_INFO_SOCIETE_NOM]__] - __(SendInformationsSharing)__',1,
+-- concat('Bonjour,'
+-- , 0xd0a, 0xd0a,
+-- 'Voici la diffusion d’informations générée en ce jour'
+-- , 0xd0a, 0xd0a,
+-- 'Bien cordialement,'
+-- , 0xd0a, 0xd0a,
+-- 'Service administratif', 0xd0a,
+-- '__MYCOMPANY_FULLADDRESS__', 0xd0a,
+-- '__MYCOMPANY_EMAIL__')
+-- ,null);
 
 INSERT INTO `llx_c_conventions_collectives` (`rowid`, `entity`, `tms`, `code`, `libelle`, `description`, `tracking`, `active`, `module`) VALUES(1, 1, '2021-01-22 09:27:09', '0003', 'Convention collective nationale des ouvriers de la navigation intérieure de marchandises', 'Convention collective nationale des ouvriers de la navigation intérieure de marchandises', '1', 1, NULL);
 INSERT INTO `llx_c_conventions_collectives` (`rowid`, `entity`, `tms`, `code`, `libelle`, `description`, `tracking`, `active`, `module`) VALUES(2, 1, '2021-01-22 09:27:09', '0016', 'Convention collective nationale des transports routiers et activités auxiliaires du transport ', 'Convention collective nationale des transports routiers et activités auxiliaires du transport ', '1', 1, NULL);

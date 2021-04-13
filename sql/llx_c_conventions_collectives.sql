@@ -1,4 +1,4 @@
--- Copyright (C) ---Put here your own copyright and developer email---
+-- Copyright (C) 2021 EOXIA <dev@eoxia.com>
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -13,17 +13,14 @@
 -- You should have received a copy of the GNU General Public License
 -- along with this program.  If not, see https://www.gnu.org/licenses/.
 
-
 CREATE TABLE llx_c_conventions_collectives(
-	-- BEGIN MODULEBUILDER FIELDS
-	rowid integer AUTO_INCREMENT PRIMARY KEY NOT NULL,
-	entity integer default 1,
-	tms timestamp,
-	code varchar(128),
-	libelle varchar(512),
+	rowid       integer AUTO_INCREMENT PRIMARY KEY NOT NULL,
+	entity      integer default 1,
+	tms         timestamp,
+	code        varchar(128),
+	libelle     varchar(512),
 	description text,
-	tracking varchar(128) DEFAULT NULL,
-	active tinyint(4) DEFAULT 0,
-	module varchar(32) DEFAULT NULL
-	-- END MODULEBUILDER FIELDS
+	tracking    varchar(128) DEFAULT NULL,
+	active      tinyint(4) DEFAULT 0,
+	module      varchar(32) DEFAULT NULL
 );

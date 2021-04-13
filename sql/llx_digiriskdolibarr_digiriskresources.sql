@@ -23,5 +23,5 @@ CREATE TABLE llx_digiriskdolibarr_digiriskresources(
 	status        smallint,
     element_type  varchar(50),
 	element_id    integer NOT NULL,
-	fk_user_creat integer NOT NULL,
+	fk_user_creat integer NOT NULL
 ) ENGINE=innodb;

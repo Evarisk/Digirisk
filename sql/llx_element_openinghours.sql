@@ -28,5 +28,5 @@ CREATE TABLE llx_element_openinghours(
 	friday        varchar(128),
 	saturday      varchar(128),
 	sunday        varchar(128),
-	fk_user_creat integer NOT NULL,
+	fk_user_creat integer NOT NULL
 ) ENGINE=innodb;

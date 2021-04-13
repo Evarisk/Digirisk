@@ -17,6 +17,6 @@ create table llx_digiriskdolibarr_digiriskdocuments_extrafields(
     rowid      integer AUTO_INCREMENT PRIMARY KEY,
     tms        timestamp,
     import_key varchar(14),
-    fk_object  integer NOT NULL,
+    fk_object  integer NOT NULL
 ) ENGINE=innodb;
 

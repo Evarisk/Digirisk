@@ -27,5 +27,5 @@ CREATE TABLE llx_digiriskdolibarr_risk(
 	fk_user_creat integer NOT NULL,
 	fk_user_modif integer,
 	fk_element    integer NOT NULL,
-	fk_projet     integer NOT NULL,
+	fk_projet     integer NOT NULL
 ) ENGINE=innodb;
