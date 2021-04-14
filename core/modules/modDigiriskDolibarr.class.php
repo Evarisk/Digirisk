@@ -183,7 +183,6 @@ class modDigiriskdolibarr extends DolibarrModules
 			44 => array('MAIN_AGENDA_ACTIONAUTO_RISK_CREATE','chaine',1,'', 1),
 			45 => array('RISK_STANDARD_MASK','chaine','R{0000}','', 1),
 			46 => array('RISKASSESSMENT_STANDARD_MASK','chaine','E{0000}','', 1),
-			48 => array('DIGIRISKDOLIBARR_DU_PROJECT','chaine', '' ,'', 1),
 			49 => array('DIGIRISKDOLIBARR_RISK_SIMPLIFIED','chaine', 1,'', 1),
 			50 => array('DIGIRISKDOLIBARR_RISK_ADVANCED','chaine', 0,'', 1),
 			51 => array('DIGIRISKDOLIBARR_PROJECT_LINKED','integer', 0,'', 1),
@@ -202,7 +201,6 @@ class modDigiriskdolibarr extends DolibarrModules
 			64 => array('DIGIRISKDOLIBARR_LISTINGRISKSACTION_DEFAULT_MODEL','chaine', 'listingrisksaction_odt' ,'', 1),
 			65 => array('LEGALDISPLAY_STANDARD_MASK','chaine','V{0000}','', 1),
 			84 => array('DIGIRISKDOLIBARR_RISKASSESSMENT_ADDON','chaine', 'mod_riskassessment_standard' ,'', 1),
-			85 => array('DIGIRISKDOLIBARR_ACTIVE_STANDARD','integer', 1,'', 1),
 
 		);
 
@@ -643,7 +641,6 @@ class modDigiriskdolibarr extends DolibarrModules
 		$this->_load_tables('/digiriskdolibarr/sql/riskanalysis/');
 
 		if ( $conf->global->DIGIRISKDOLIBARR_DU_PROJECT == 0 ) {
-
 			require_once DOL_DOCUMENT_ROOT . '/projet/class/project.class.php';
 			require_once DOL_DOCUMENT_ROOT . '/societe/class/societe.class.php';
 			require_once DOL_DOCUMENT_ROOT . '/core/modules/project/mod_project_simple.php';
@@ -668,15 +665,19 @@ class modDigiriskdolibarr extends DolibarrModules
 			dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_DU_PROJECT', $project_id);
 		}
 
-		dol_include_once('/digiriskdolibarr/class/digiriskstandard.class.php');
+		if ( $conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD ==  0 ) {
+			dol_include_once('/digiriskdolibarr/class/digiriskstandard.class.php');
 
-		$digiriskstandard = new DigiriskStandard($this->db);
-		$digiriskstandard->ref           = 'DUER';
-		$digiriskstandard->description   = 'DUERDescription';
-		$digiriskstandard->date_creation = dol_now();
-		$digiriskstandard->status        = 1;
+			$digiriskstandard = new DigiriskStandard($this->db);
+			$digiriskstandard->ref = 'DUER';
+			$digiriskstandard->description = 'DUERDescription';
+			$digiriskstandard->date_creation = dol_now();
+			$digiriskstandard->status = 1;
 
-		$digiriskstandard->create($user);
+			$standard_id = $digiriskstandard->create($user);
+
+			dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_ACTIVE_STANDARD', $standard_id);
+		}
 
 		// Create extrafields during init
 		include_once DOL_DOCUMENT_ROOT.'/core/class/extrafields.class.php';
