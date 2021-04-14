@@ -379,6 +379,12 @@ window.eoxiaJS.modal.event = function() {
  */
 window.eoxiaJS.modal.openModal = function ( event ) {
 	let idSelected = $(this).attr('value');
+	if (document.URL.match(/#/)) {
+		var urlWithoutTag = document.URL.split(/#/)[0]
+	} else {
+		var urlWithoutTag = document.URL
+	}
+	history.pushState({ path:  document.URL}, '', urlWithoutTag);
 
 	// Open modal evaluation.
 	if ($(this).hasClass('risk-evaluation-add')) {
