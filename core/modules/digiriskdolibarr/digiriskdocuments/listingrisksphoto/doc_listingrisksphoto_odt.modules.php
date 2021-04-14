@@ -317,7 +317,7 @@ class doc_listingrisksphoto_odt extends ModeleODTListingRisksPhoto
 										$tmparray['nomElement']        = $element->ref . ' - ' . $element->label;
 										$tmparray['nomDanger']         = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $line->get_danger_category($line) . '.png';
 										$tmparray['identifiantRisque'] = $line->ref . ' - ' . $lastEvaluation->ref;
-										$tmparray['quotationRisque']   = $lastEvaluation->cotation;
+										$tmparray['quotationRisque']    = $lastEvaluation->cotation ? $lastEvaluation->cotation : '0' ;
 										$tmparray['commentaireRisque'] = dol_print_date( $lastEvaluation->date_creation, '%A %e %B %G %H:%M' ) . ': ' . $lastEvaluation->comment;
 
 										$path                      = DOL_DATA_ROOT .'/digiriskdolibarr/riskassessment/' . $lastEvaluation->ref ;
@@ -377,7 +377,7 @@ class doc_listingrisksphoto_odt extends ModeleODTListingRisksPhoto
 										$tmparray['nomElement']        = $element->ref . ' - ' . $element->label;
 										$tmparray['nomDanger']         = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $line->get_danger_category($line) . '.png';
 										$tmparray['identifiantRisque'] = $line->ref . ' - ' . $lastEvaluation->ref;
-										$tmparray['quotationRisque']   = $lastEvaluation->cotation;
+										$tmparray['quotationRisque']    = $lastEvaluation->cotation ? $lastEvaluation->cotation : '0' ;
 										$tmparray['commentaireRisque'] = dol_print_date( $lastEvaluation->date_creation, '%A %e %B %G %H:%M' ) . ': ' . $lastEvaluation->comment;
 
 										$path                      = DOL_DATA_ROOT .'/digiriskdolibarr/riskassessment/' . $lastEvaluation->ref ;
