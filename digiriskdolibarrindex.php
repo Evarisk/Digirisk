@@ -40,9 +40,9 @@ $langs->loadLangs(array("digiriskdolibarr@digiriskdolibarr"));
 
 $help_url = 'FR:Module_DigiriskDolibarr';
 
-llxHeader("", $langs->trans("DigiriskdolibarrArea"), $help_url);
+llxHeader("", $langs->trans("DigiriskDolibarrArea"), $help_url);
 
-print load_fiche_titre($langs->trans("DigiriskdolibarrArea"), '', 'digiriskdolibarr.png@digiriskdolibarr');
+print load_fiche_titre($langs->trans("DigiriskDolibarrArea"), '', 'digiriskdolibarr.png@digiriskdolibarr');
 
 // End of page
 llxFooter();
