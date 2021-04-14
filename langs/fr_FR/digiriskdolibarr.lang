@@ -1,4 +1,4 @@
-# Copyright (C) 2021 SuperAdmin
+# Copyright (C) 2021 EOXIA <dev@eoxia.com>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -19,13 +19,16 @@
 
 # Module label 'ModuleDigiriskdolibarrName'
 ModuleDigiriskdolibarrName = Digiriskdolibarr
+
 # Module description 'ModuleDigiriskdolibarrDesc'
 ModuleDigiriskdolibarrDesc = Digirisk pour Dolibarr
 
 #
 # Page d'administration
 #
-DigiriskdolibarrSetup = Configuration du module Digiriskdolibarr
+
+# Data - Donnée
+DigiriskdolibarrSetup = Configuration du module DigiriskDolibarr
 Settings = Réglages
 DigiriskdolibarrSetupPage = Page de configuration du module Digiriskdolibarr
 AgendaModuleRequired = Pour assurer la traçabilité des actions dans Digirisk, assurez-vous que le module Agenda est bien activé
@@ -34,6 +37,8 @@ DigiriskDolibarrDescription = Digirisk pour Dolibarr
 #
 # Page À propos
 #
+
+# Data - Donnée
 About = À propos
 DigiriskdolibarrAbout = À propos de Digiriskdolibarr
 DigiriskdolibarrAboutPage = Page à propos de Digiriskdolibarr
@@ -42,6 +47,7 @@ DigiriskdolibarrAboutPage = Page à propos de Digiriskdolibarr
 # DigiriskDolibarr
 #
 
+# Data - Donnée
 Create = Créer
 CreatedOn = Créé le
 DigiriskDocumentsList = Liste des documents légaux
@@ -53,184 +59,342 @@ DigiriskNumberOfModelFilesFound = Nombre de modèles par défaut
 DigiriskConfig = Configuration du module
 DigiriskConfigSociety = Configuration de la société
 
+DigiriskDolibarrArea = Page d'index de Digirisk Dolibarr
+
 #
 # Horaires d'ouverture
 #
 
-ThirdpartyOpeningHours = Horaires du tiers
-DigiriskDay1 = 1
-DigiriskDay2 = 2
-DigiriskDay3 = 3
-DigiriskDay4 = 4
-DigiriskDay5 = 5
-DigiriskDay6 = 6
+# Data - Donnée
+OpeningHours = Horaires
+ThirdPartyOpeningHours = Horaires du tiers
 
 ExceptionsToWorkingHours = Dérogations aux horaires de travail
 PermanentDerogation = Dérogation permanente
 OccasionalDerogation = Dérogation occasionnelle
 
+
+
 #
-# Affichage légal
+# DigriskDocuments - Documents Digirisk
 #
 
+# Data - Donnée
+DigiriskDocuments = Document Digirisk
+
+
+#
+# LegalDisplay - Affichage légal
+#
+
+# Right - Droit
 ReadLegalDisplay = Afficher un affichage légal
 CreateLegalDisplay = Créer un affichage légal
 DeleteLegalDisplay = Supprimer un affichage légal
 
+# Trigger - Déclencheur
 LEGALDISPLAY_CREATEInDolibarr = Affichage légal créé dans Dolibarr
 ActionsOnLegalDisplay = Événements liés à l'affichage légal
 LegalDisplayGeneratedWithDolibarr = Affichage légal généré avec Dolibarr
 
-LegalDisplay = Affichage légal
-NewLegalDisplay = Nouvel affichage légal
-LegalDisplayList = Liste des affichages légaux
-SendLegalDisplay = Affichage légal
-
+# Mod Numbering - Modèle de numérotation
 DigiriskLegalDisplayNumberingModule = Modèle de numérotation des affichages légaux de Digirisk
 DigiriskNumberingDate = Fixe la référence comme étant la date et l'heure de création.
 DigiriskLegalDisplayStandardModel = Renvoie le numéro sous la forme LDn où n est un compteur séquentiel sans rupture et sans remise à 0.
 
+# ODT Template - Template ODT
 DigiriskTemplateDocumentLegalDisplay = Modèle de documents des affichages légaux de Digirisk
-LegalDisplayCustomTemplate = ODT custom des affichages légaux
+LegalDisplayCustomDigiriskTemplate = ODT custom des affichages légaux
 LegalDisplayDigiriskTemplate = ODT par défaut des affichages légaux
 
+# Data - Donnée
+LegalDisplay = Affichage légal
+HowToSetDataLegalDisplay = Pour configurer les données sur l'affichage légal, aller dans Accueil - Configuration - Société/Organisation - Sécurité
+
+LabourDoctor = Médecin du travail
+LabourInspector = Inspecteur du travail
+FireBrigade = Pompiers
+AllEmergencies = Toute Urgence
+RightsDefender = Défenseur des droits
+PoisonControlCenter = Centre Antipoison
+
+SafetyInstructions = Consignes de sécurité
+ResponsibleToNotify = Responsable à prévenir
+LocationOfDetailedInstructions = Emplacement de la consigne détaillée
+
+SocietyAdditionalDetails = Informations complémentaires de la société
+GeneralMeansAtDisposal = Moyens généraux mis à disposition
+GeneralInstructions = Consignes générales
+RulesOfProcedure = Règlement intérieur
+
+CollectiveAgreement = Conventions collectives
+
+
+
 #
-# Diffusion d'informations
+# InformationsSharing - Diffusion d'informations
 #
 
+# Right - Droit
 ReadInformationsSharing = Lire une diffusion d'informations
 CreateInformationsSharing = Créer une diffusion d'informations
 DeleteInformationsSharing = Supprimer une diffusion d'informations
 
-HowToSetDataInformationsSharing = Pour configurer les données sur la diffusion d'informations, aller dans Accueil - Configuration - Société/Organisation - Social
-HowToSetDataLegalDisplay = Pour configurer les données sur l'affichage légal, aller dans Accueil - Configuration - Société/Organisation - Sécurité
-
+# Trigger - Déclencheur
 INFORMATIONSSHARING_CREATEInDolibarr = Diffusion d'informations créée dans Dolibarr
 ActionsOnInformationsSharing = Événements liés à la diffusion d'informations
 InformationsSharingGeneratedWithDolibarr = Diffusion d'informations générée avec Dolibarr
 
-InformationsSharing = Diffusion d'informations
-NewInformationsSharing = Nouvelle diffusion d'informations
-InformationsSharingList = Liste des diffusions d'informations
-SendInformationsSharing = Diffusion d'informations
-
+# Mod Numbering - Modèle de numérotation
 DigiriskInformationsSharingNumberingModule = Modèle de numérotation des diffusions d'information de Digirisk
 DigiriskInformationsSharingStandardModel = Renvoie le numéro sous la forme ISn où n est un compteur séquentiel sans rupture et sans remise à 0.
 
+# ODT Template - Template ODT
 DigiriskTemplateDocumentInformationsSharing = Modèle de documents des diffusions d'information de Digirisk
-InformationsSharingCustomTemplate = ODT custom des diffusions d'information
+InformationsSharingCustomDigiriskTemplate = ODT custom des diffusions d'information
 InformationsSharingDigiriskTemplate = ODT par défaut des diffusions d'information
 
+# Data - Donnée
+InformationsSharing = Diffusion d'informations
+HowToSetDataInformationsSharing = Pour configurer les données sur la diffusion d'informations, aller dans Accueil - Configuration - Société/Organisation - Social
+
+ParticipationAgreement = Accords de participation
+TermsAndConditions = Modalités
+
+ESC = Comité Social & Économique
+StaffRepresentatives = Délégués du personnel
+ElectionDate = Date d'élection
+ElectionDateCSE = Date d'élection du CSE
+ElectionDateDP = Date d'élection des DP
+
+Titulars = Titulaires
+Alternates = Suppléants
+
 #
-# Permis de feu
+# FirePermit - Permis de feu
 #
 
+# Right - Droit
 ReadFirePermit = Lire un permis de feu
 CreateFirePermit = Créer un permis de feu
 DeleteFirePermit = Supprimer un permis de feu
 
+# Trigger - Déclencheur
 FIREPERMIT_CREATEInDolibarr = Permis de feu créée dans Dolibarr
 ActionsOnFirePermit = Événements liés au permis de feu
 FirePermitGeneratedWithDolibarr = Permis de feu générée avec Dolibarr
 
-FirePermit = Permis de feu
-NewFirePermit = Nouveau permis de feu
-FirePermitList = Liste des permis de feu
-SendFirePermit = Permis de feu
-
+# Mod Numbering - Modèle de numérotation
 DigiriskFirePermitNumberingModule = Modèle de numérotation des permis de feu de Digirisk
 DigiriskFirePermitStandardModel = Renvoie le numéro sous la forme FPn où n est un compteur séquentiel sans rupture et sans remise à 0.
 
+# ODT Template - Template ODT
 DigiriskTemplateDocumentFirePermit = Modèle de documents des permis de feu de Digirisk
-FirePermitCustomTemplate = ODT custom des permis de feu
+FirePermitCustomDigiriskTemplate = ODT custom des permis de feu
 FirePermitDigiriskTemplate = ODT par défaut des permis de feu
 
+# Data - Donnée
+FirePermit = Permis de feu
+
+
+
 #
-# Plan de prévention
+# PreventionPlan - Plan de prévention
 #
 
+# Right - Droit
 ReadPreventionPlan = Lire un plan de prévention
 CreatePreventionPlan = Créer un plan de prévention
 DeletePreventionPlan = Supprimer un plan de prévention
 
+# Trigger - Déclencheur
 PREVENTIONPLAN_CREATEInDolibarr = Plan de prévention créée dans Dolibarr
 ActionsOnPreventionPlan = Événements liés au plan de prévention
 PreventionPlanGeneratedWithDolibarr = Plan de prévention générée avec Dolibarr
 
-PreventionPlan = Plan de prévention
-NewPreventionPlan = Nouveau plan de prévention
-PreventionPlanList = Liste des plans de prévention
-SendPreventionPlan = Plan de prévention
-
+# Mod Numbering - Modèle de numérotation
 DigiriskPreventionPlanNumberingModule = Modèle de numérotation des plans de prévention de Digirisk
 DigiriskPreventionPlanStandardModel = Renvoie le numéro sous la forme PPn où n est un compteur séquentiel sans rupture et sans remise à 0.
 
+# ODT Template - Template ODT
 DigiriskTemplateDocumentPreventionPlan = Modèle de documents des plans de prévention de Digirisk
-PreventionPlanCustomTemplate = ODT custom des plans de prévention
+PreventionPlanCustomDigiriskTemplate = ODT custom des plans de prévention
 PreventionPlanDigiriskTemplate = ODT par défaut des plans de prévention
 
+# Data - Donnée
+PreventionPlan = Plan de prévention
+
+
+
 #
-# Element Digirisk
+# ListingRisksPhoto - Listing des risques Photo
 #
 
-GPUTOrganisation = Organisation des GP/UT
+# Right - Droit
 
+# Trigger - Déclencheur
+ListingRisksPhotosGeneratedWithDolibarr = Listing de risques photo générée avec Dolibarr
+
+# Mod Numbering - Modèle de numérotation
+DigiriskListingRisksPhotoNumberingModule = Modèle de numérotation des listing des risques photo de Digirisk
+DigiriskListingRisksPhotoStandardModel = Renvoie le numéro sous la forme RLPn où n est un compteur séquentiel sans rupture et sans remise à 0.
+
+# ODT Template - Template ODT
+DigiriskTemplateDocumentListingRisksPhoto = Modèle de documents des listing des risques photo de Digirisk
+ListingRisksPhotoCustomDigiriskTemplate = ODT custom des listing des risques photo
+ListingRisksPhotoDigiriskTemplate = ODT par défaut des listing des risques photo
+
+# Data - Donnée
+ListingRisksPhoto = Listing des risques photo
+
+
+
+#
+# ListingRisksAction - Listing des risques action
+#
+
+# Right - Droit
+
+# Trigger - Déclencheur
+ListingRisksActionsGeneratedWithDolibarr = Listing de risques actions correctives générée avec Dolibarr
+
+# Mod Numbering - Modèle de numérotation
+DigiriskListingRisksActionNumberingModule = Modèle de numérotation des listing des actions correctives de Digirisk
+DigiriskListingRisksActionStandardModel = Renvoie le numéro sous la forme RLAn où n est un compteur séquentiel sans rupture et sans remise à 0.
+
+# ODT Template - Template ODT
+DigiriskTemplateDocumentListingRisksAction = Modèle de documents des listing des actions correctives de Digirisk
+ListingRisksActionCustomDigiriskTemplate = ODT custom des listing des actions correctives
+ListingRisksActionDigiriskTemplate = ODT par défaut des listing des actions correctives
+
+# Data - Donnée
+ListingRisksAction = Listing des actions correctives
+
+
+
+#
+# GroupmentDocument - Fiche Groupement
+#
+
+# Right - Droit
+
+# Trigger - Déclencheur
+
+# Mod Numbering - Modèle de numérotation
+DigiriskGroupmentDocumentNumberingModule = Modèle de numérotation des fiches de groupement de Digirisk
+DigiriskGroupmentDocumentStandardModel = Renvoie le numéro sous la forme GPDn où n est un compteur séquentiel sans rupture et sans remise à 0.
+
+# ODT Template - Template ODT
+DigiriskTemplateDocumentGroupmentDocument = Modèle de documents des fiches de groupement de Digirisk
+GroupmentDocumentCustomDigiriskTemplate = ODT custom des fiches de groupement
+GroupmentDocumentDigiriskTemplate = ODT par défaut des fiches de groupement
+
+# Data - Donnée
+GroupmentDocument = Fiche de Groupement
+
+
+
+#
+# WorkUnitDocumment - Fiche d'Unité de travail
+#
+
+# Right - Droit
+
+# Trigger - Déclencheur
+
+# Mod Numbering - Modèle de numérotation
+DigiriskWorkUnitDocumentNumberingModule = Modèle de numérotation des fiches d'unité de travail de Digirisk
+DigiriskWorkUnitDocumentStandardModel = Renvoie le numéro sous la forme WUDn où n est un compteur séquentiel sans rupture et sans remise à 0.
+
+# ODT Template - Template ODT
+DigiriskTemplateDocumentWorkUnitDocument = Modèle de documents des fiches d'unité de travail de Digirisk
+WorkUnitDocumentCustomDigiriskTemplate = ODT custom des fiches d'unité de travail
+WorkUnitDocumentDigiriskTemplate = ODT par défaut des fiches d'unité de travail
+
+# Data - Donnée
+WorkUnitDocument = Fiche d'Unité de travail
+
+
+
+#
+# DigirskElement - Element Digirisk
+#
+
+# Right - Droit
 ReadDigiriskElement = Lire un element digirisk
 CreateDigiriskElement = Créer un element digirisk
 DeleteDigiriskElement = Supprimer un element digirisk
 
-PreventionPlan = Plan de prévention
+# Data - Donnée
 NewDigiriskElement = Nouveau element digirisk
+GPUTOrganisation = Organisation des GP/UT
+DigiriskElement = Élement Digirisk
+
+ElementType = Type d'élément
+ParentElement = Élément parent
+
 
 #
-# Groupement
+# Groupment - Groupement
 #
 
+# Trigger - Déclencheur
 GROUPMENT_CREATEInDolibarr = Groupement créé dans Dolibarr
 ActionsOnGroupment = Événements liés au groupement
 GroupmentGeneratedWithDolibarr = Fiche groupement générée avec Dolibarr
 
-groupment = Groupement
+# Mod Numbering - Modèle de numérotation
+DigiriskGroupmentNumberingModule = Modèle de numérotation des groupements de Digirisk
+DigiriskGroupmentStandardModel = Renvoie le numéro sous la forme GPn où n est un compteur séquentiel sans rupture et sans remise à 0.
+
+# Data - Donnée
 Groupment = Groupement
 NewGroupment = Nouveau groupement
 ModifyGroupment = Modifier groupement
 
-DigiriskGroupmentNumberingModule = Modèle de numérotation des groupements de Digirisk
-DigiriskGroupmentStandardModel = Renvoie le numéro sous la forme GPn où n est un compteur séquentiel sans rupture et sans remise à 0.
 
-DigiriskTemplateDocumentGroupment = Modèle de documents des groupements de Digirisk
-GroupmentPlanCustomTemplate = ODT custom des groupements
-GroupmentDigiriskTemplate = ODT par défaut des groupements
 
 #
-# Unité de travail
+# WorkUnit - Unité de travail
 #
 
+# Trigger - Déclencheur
 WORKUNIT_CREATEInDolibarr = Unité de travail créée dans Dolibarr
 ActionsOnWorkUnit = Événements liés au unité de travail
 WorkUnitGeneratedWithDolibarr = Fiche Unité de travail générée avec Dolibarr
 
-workunit = Unité de travail
+# Mod Numbering - Modèle de numérotation
+DigiriskWorkUnitNumberingModule = Modèle de numérotation des unités de travail de Digirisk
+DigiriskWorkUnitStandardModel = Renvoie le numéro sous la forme WUn où n est un compteur séquentiel sans rupture et sans remise à 0.
+
+# Data - Donnée
 WorkUnit = Unité de travail
 NewWorkUnit = Nouvelle unité de travail
 ModifyWorkUnit = Modifier unité de travail
 
-DigiriskWorkUnitNumberingModule = Modèle de numérotation des unités de travail de Digirisk
-DigiriskWorkUnitStandardModel = Renvoie le numéro sous la forme WUn où n est un compteur séquentiel sans rupture et sans remise à 0.
 
-DigiriskTemplateDocumentPreventionPlan = Modèle de documents des unités de travail de Digirisk
-WorkUnitCustomTemplate = ODT custom des unités de travail
-WorkUnitDigiriskTemplate = ODT par défaut des unités de travail
+
+#
+# RisksAnalysis - Analyses de risques
+#
+
+# Data - Donnée
+RiskAnalysis = Analyse des risques
+
 
 #
 # Risks
 #
 
+# Mod Numbering - Modèle de numérotation
+DigiriskRiskNumberingModule = Modèle de numérotation des risques de Digirisk
+DigiriskRiskStandardModel = Renvoie le numéro sous la forme RKn où n est un compteur séquentiel sans rupture et sans remise à 0.
+
+# Data - Donnée
 Risks = Risques
 Risk = Risque
 RiskList = Listing de risques
 RisksList = Liste de risques
-RiskListWP = Listing de risques WP
 AddRiskTitle = Ajout du risque
 AddRiskButton = Ajouter le risque
 EditRisk = Edition du risque
@@ -238,18 +402,24 @@ UpdateRisk = Mettre à jour
 RiskListDolibarr = Listing de risques Doli
 hasPhoto = Photo
 RiskCategory = Catégorie
+DigiriskElementRisksList = Liste de risques
+DigiriskElementRisk = Risques
 
 TasksManagement = Gestion des tâches
 ProjectLinked = Projet lié aux tâches des risques
-ListingRisksPhoto = Listing des risques photo
-ListingRisksAction = Listing des actions correctives
-ListingRisksPhotosGeneratedWithDolibarr = Listing de risques photo généré avec Dolibarr
-ListingRisksActionsGeneratedWithDolibarr = Listing de risques actions correctives généré avec Dolibarr
+
+
 
 #
-# Evaluation
+# RiskAssessment - Évaluation
 #
 
+# Mod Numbering - Modèle de numérotation
+DigiriskRiskAssessmentStandardModel = Renvoie le numéro sous la forme RAn où n est un compteur séquentiel sans rupture et sans remise à 0.
+DigiriskRiskAssessmentNumberingModule = Modèle de numérotation des évaluations des risques de Digirisk
+
+# Data - Donnée
+RiskAssessment = Évaluation
 EvalautionCreate = Ajout de l'évaluation
 UpdateEvaluation = Mettre à jour
 EvaluationMethod = Méthode d'évaluation
@@ -258,90 +428,29 @@ EvaluatedOn = le
 
 SimpleCotation = Cotation simple
 AdvancedCotation = Cotation avancée
-Evaluation = Évaluation
 SelectCotation = Sélectionnez les cases pour calculer votre cotation
 EvaluationList = Liste des évaluations du risque
 
 
 #
-# Data
+# Other
 #
 
-digiriskdolibarr = Digirisk Dolibarr
-LabourDoctor = Médecin du travail
-LabourInspector = Inspecteur du travail
-FireBrigade = Pompiers
-AllEmergencies = Toute Urgence
-RightsDefender = Défenseur des droits
-PoisonControlCenter = Centre Antipoison
-SafetyInstructions = Consignes de sécurité
-ResponsibleToNotify = Responsable à prévenir
-LocationOfDetailedInstructions = Emplacement de la consigne détaillée
-SocietyAdditionalDetails = Informations complémentaires de la société
-GeneralMeansAtDisposal = Moyens généraux mis à disposition
-GeneralInstructions = Consignes générales
-RulesOfProcedure = Règlement intérieur
-RisksEvaluation = Document Unique
-CollectiveAgreement = Conventions collectives
-
-ParticipationAgreement = Accords de participation
-TermsAndConditions = Modalités
-ESC = Comité Social & Économique
-StaffRepresentatives = Délégués du personnel
-ElectionDate = Date d'élection
-ElectionDateCSE = Date d'élection du CSE
-ElectionDateDP = Date d'élection des DP
-Titulars = Titulaires
-Alternates = Suppléants
-
-ElementType = Type d'élément
-ParentElement = Élément parent
-
+# Data - Donnée
 CloseModal = Fermer
 
+RiskEvaluationDocument = Document Unique
 ActionPlanDU = Plan d'action Document Unique
 ActionPlanDUDescription = Description du plan d'action Document Unique
 
-DigiriskListingRisksPhotoStandardModel = Renvoie le numéro sous la forme RLPn où n est un compteur séquentiel sans rupture et sans remise à 0.
-DigiriskListingRisksPhotoNumberingModule = Modèle de numérotation des listing des risques photo de Digirisk
-DigiriskTemplateDocumentListingRisksPhoto = Modèle de documents des listing des risques photo de Digirisk
-
-DigiriskListingRisksActionStandardModel = Renvoie le numéro sous la forme RLAn où n est un compteur séquentiel sans rupture et sans remise à 0.
-DigiriskListingRisksActionNumberingModule = Modèle de numérotation des listing des actions correctives de Digirisk
-DigiriskTemplateDocumentListingRisksAction = Modèle de documents des listing des actions correctives de Digirisk
-
-DigiriskGroupmentDocumentStandardModel = Renvoie le numéro sous la forme GPDn où n est un compteur séquentiel sans rupture et sans remise à 0.
-DigiriskGroupmentDocumentNumberingModule = Modèle de numérotation des fiches de groupement de Digirisk
-DigiriskTemplateDocumentGroupmentDocument = Modèle de documents des fiches de groupement de Digirisk
-
-DigiriskWorkUnitDocumentStandardModel = Renvoie le numéro sous la forme WUDn où n est un compteur séquentiel sans rupture et sans remise à 0.
-DigiriskWorkUnitDocumentNumberingModule = Modèle de numérotation des fiches d'unité de travail de Digirisk
-DigiriskTemplateDocumentWorkUnitDocument = Modèle de documents des fiches d'unité de travail de Digirisk
-
-DigiriskRiskStandardModel = Renvoie le numéro sous la forme RKn où n est un compteur séquentiel sans rupture et sans remise à 0.
-DigiriskRiskNumberingModule = Modèle de numérotation des risques de Digirisk
-
-DigiriskRiskAssessmentStandardModel = Renvoie le numéro sous la forme RAn où n est un compteur séquentiel sans rupture et sans remise à 0.
-DigiriskRiskAssessmentNumberingModule = Modèle de numérotation des évaluations des risques de Digirisk
-
-GroupmentDocument = Fiche de Groupement
-WorkUnitDocument = Fiche d'Unité de travail
-RiskAssessment = Évaluation
-RiskAnalysis = Analyse des risques
 SelectProject = Choix du projet
-
-DigiriskDocuments = Document Digirisk
-DigiriskElement = Element Digirisk
-
-RiskEvaluationDocument = Document Unique
-DigiriskElementRisksList = Liste de risques
-
-OpeningHours = Horaires
-ThirdPartyOpeningHours = Horaires du tiers
-
-DigiriskElementRisk = Risques
 
 RiskEvaluator = Évaluateurs
 RiskSign = Signalisation
+
+
+
+
+
 
 
