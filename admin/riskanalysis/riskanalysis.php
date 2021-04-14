@@ -33,7 +33,7 @@ require_once DOL_DOCUMENT_ROOT . "/core/lib/admin.lib.php";
 dol_include_once('/custom/digiriskdolibarr/lib/digiriskdolibarr.lib.php');
 
 // Translations
-$langs->loadLangs(array("digiriskdolibarr@digiriskdolibarr"));
+$langs->loadLangs(array("admin", "digiriskdolibarr@digiriskdolibarr"));
 
 // Access control
 if (!$user->admin) accessforbidden();
