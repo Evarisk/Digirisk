@@ -16,7 +16,7 @@
  */
 
 /**
- *   	\file       digiriskelement_legaldisplay.php
+ *   	\file       digiriskelement_card.php
  *		\ingroup    digiriskdolibarr
  *		\brief      Page to create/edit/view digiriskelement
  */

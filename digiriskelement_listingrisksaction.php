@@ -29,8 +29,10 @@ if (!$res) die("Include of main fails");
 require_once DOL_DOCUMENT_ROOT.'/core/class/html.formfile.class.php';
 
 dol_include_once('/digiriskdolibarr/class/digiriskelement.class.php');
+dol_include_once('/digiriskdolibarr/class/digiriskstandard.class.php');
 dol_include_once('/digiriskdolibarr/class/digiriskdocuments/listingrisksaction.class.php');
 dol_include_once('/digiriskdolibarr/lib/digiriskdolibarr_digiriskelement.lib.php');
+dol_include_once('/digiriskdolibarr/lib/digiriskdolibarr_digiriskstandard.lib.php');
 dol_include_once('/digiriskdolibarr/lib/digiriskdolibarr_function.lib.php');
 dol_include_once('/digiriskdolibarr/core/modules/digiriskdolibarr/digiriskdocuments/listingrisksaction/modules_listingrisksaction.php');
 
@@ -45,10 +47,12 @@ $action = GETPOST('action', 'aZ09');
 
 // Initialize technical objects
 $object             = new DigiriskElement($db);
+$standard           = new DigiriskStandard($db);
 $listingrisksaction = new ListingRisksAction($db);
 $hookmanager->initHooks(array('digiriskelementlistingrisksaction', 'globalcard')); // Note that conf->hooks_modules contains array
 
 $object->fetch($id);
+$standard->fetch($conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD);
 
 $upload_dir         = $conf->digiriskdolibarr->multidir_output[isset($object->entity) ? $object->entity : 1];
 $permissiontoread   = $user->rights->digiriskdolibarr->listingrisksaction->read;
@@ -149,19 +153,17 @@ $morejs   = array("/digiriskdolibarr/js/digiriskdolibarr.js.php");
 
 digiriskHeader('', $title, $help_url, '', '', '', $morejs); ?>
 
-	<div id="cardContent" value="">
+<div id="cardContent" value="">
 
-<?php if (!$object->id) {
-	$object->ref    = $conf->global->MAIN_INFO_SOCIETE_NOM;
-	$object->label  = $langs->trans('Society');
-	$object->entity = $conf->entity;
-	unset($object->fields['element_type']);
+<?php $res  = $object->fetch_optionals();
+
+if (!$object->id) {
+	$head = digiriskstandardPrepareHead($standard);
+} else {
+	$head = digiriskelementPrepareHead($object);
 }
 
 // Part to show record
-$res  = $object->fetch_optionals();
-$head = digiriskelementPrepareHead($object);
-
 dol_fiche_head($head, 'elementListingRisksAction', '', -1, $object->picto);
 
 // Object card
@@ -173,11 +175,13 @@ $morehtmlref .= '</div>';
 
 if (isset($object->element_type)) {
 	$morehtmlleft .= '<div class="floatleft inline-block valignmiddle divphotoref">'.digirisk_show_photos('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$entity].'/'.$object->element_type, 'small', 5, 0, 0, 0, $width,0, 0, 0, 0, $object->element_type, $object).'</div>';
+	digirisk_banner_tab($object, 'ref', '', 0, 'ref', 'ref', $morehtmlref, '', 0, $morehtmlleft);
 } else {
 	$morehtmlleft .= '<div class="floatleft inline-block valignmiddle divphotoref">'.digirisk_show_photos('mycompany', $conf->mycompany->dir_output . '/logos', 'small', 5, 0, 0, 0, $width,0, 0, 0, 0, 'logos', $emptyobject).'</div>';
+	digirisk_banner_tab($standard, 'ref', '', 0, 'ref', 'ref', $morehtmlref, '', 0, $morehtmlleft);
 }
 
-digirisk_banner_tab($object, 'ref', '', 0, 'ref', 'ref', $morehtmlref, '', 0, $morehtmlleft);
+
 
 unset($object->fields['element_type']);
 unset($object->fields['fk_parent']);
@@ -185,7 +189,6 @@ unset($object->fields['last_main_doc']);
 unset($object->fields['entity']);
 
 print '<div class="fichecenter">';
-print '<div class="fichehalfleft">';
 print '<div class="underbanner clearboth"></div>';
 print '<table class="border centpercent tableforfield">' . "\n";
 
@@ -200,7 +203,6 @@ unset($object->fields['label']);
 unset($object->fields['description']);
 
 print '</table>';
-print '</div>';
 print '</div>';
 
 dol_fiche_end();
