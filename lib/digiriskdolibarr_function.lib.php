@@ -647,7 +647,7 @@ function digiriskHeader($head = '', $title = '', $help_url = '', $target = '', $
 
 								var params = new window.URLSearchParams(window.location.search);
 								var id = params.get('id');
-								if (window.location.search.match(/digiriskelement/)) {
+								if (document.URL.match(/digiriskelement/)) {
 									jQuery( '#unit'  + id ).addClass( 'active' );
 									jQuery( '#unit'  +id  ).closest( '.unit' ).attr( 'value', id );
                                 };
