@@ -202,6 +202,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			64 => array('DIGIRISKDOLIBARR_LISTINGRISKSACTION_DEFAULT_MODEL','chaine', 'listingrisksaction_odt' ,'', 1),
 			65 => array('LEGALDISPLAY_STANDARD_MASK','chaine','V{0000}','', 1),
 			84 => array('DIGIRISKDOLIBARR_RISKASSESSMENT_ADDON','chaine', 'mod_riskassessment_standard' ,'', 1),
+			85 => array('DIGIRISKDOLIBARR_ACTIVE_STANDARD','integer', 1,'', 1),
 
 		);
 
@@ -500,8 +501,8 @@ class modDigiriskdolibarr extends DolibarrModules
 			'type'=>'left', 										// This is a Left menu entry
 			'titre'=>$langs->trans('RiskEvaluationDocument'),
 			'mainmenu'=>'digiriskdolibarr',
-			'leftmenu'=>'digiriskelement',
-			'url'=>'/digiriskdolibarr/digiriskelement_card.php',
+			'leftmenu'=>'digiriskstandard',
+			'url'=>'/digiriskdolibarr/digiriskstandard_card.php?id='.$conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD,
 			'langs'=>'digiriskdolibarr@digiriskdolibarr',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
 			'position'=>48520+$r,
 			'enabled'=>'$conf->digiriskdolibarr->enabled',  // Define condition to show or hide menu entry. Use '$conf->digiriskdolibarr->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
@@ -569,21 +570,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			'target'=>'',
 			'user'=>2,				                // 0=Menu for internal users, 1=external users, 2=both
 		);
-//
-//		$this->menu[$r++]=array(
-//			'fk_menu'=>'fk_mainmenu=digiriskdolibarr',	    // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
-//			'type'=>'left',			                // This is a Left menu entry
-//			'titre'=>$langs->trans('RiskListWP'),
-//			'mainmenu'=>'digiriskdolibarr',
-//			'leftmenu'=>'digirisklistingrisk',
-//			'url'=>'/digiriskdolibarr/risks_list.php',
-//			'langs'=>'digiriskdolibarr@digiriskdolibarr',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
-//			'position'=>48520+$r,
-//			'enabled'=>'$conf->digiriskdolibarr->enabled',  // Define condition to show or hide menu entry. Use '$conf->digiriskdolibarr->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
-//			'perms'=>'1',			                // Use 'perms'=>'$user->rights->digiriskdolibarr->level1->level2' if you want your menu with a permission rules
-//			'target'=>'',
-//			'user'=>2,				                // 0=Menu for internal users, 1=external users, 2=both
-//		);
+
 		// Exports profiles provided by this module
 		/* BEGIN MODULEBUILDER EXPORT DIGIRISKCONST */
 		/*
@@ -680,6 +667,16 @@ class modDigiriskdolibarr extends DolibarrModules
 
 			dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_DU_PROJECT', $project_id);
 		}
+
+		dol_include_once('/digiriskdolibarr/class/digiriskstandard.class.php');
+
+		$digiriskstandard = new DigiriskStandard($this->db);
+		$digiriskstandard->ref           = 'DUER';
+		$digiriskstandard->description   = 'DUERDescription';
+		$digiriskstandard->date_creation = dol_now();
+		$digiriskstandard->status        = 1;
+
+		$digiriskstandard->create($user);
 
 		// Create extrafields during init
 		include_once DOL_DOCUMENT_ROOT.'/core/class/extrafields.class.php';
