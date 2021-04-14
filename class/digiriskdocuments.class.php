@@ -72,6 +72,7 @@ class DigiriskDocuments extends CommonObject
 		'model_odt'     => array('type'=>'varchar(255)', 'label'=>'Model ODT', 'enabled'=>'1', 'position'=>110, 'notnull'=>0, 'visible'=>-1,),
 		'last_main_doc' => array('type'=>'varchar(128)', 'label'=>'LastMainDoc', 'enabled'=>'1', 'position'=>120, 'notnull'=>0, 'visible'=>-1,),
 		'fk_user_creat' => array('type'=>'integer:User:user/class/user.class.php', 'label'=>'UserAuthor', 'enabled'=>'1', 'position'=>130, 'notnull'=>1, 'visible'=>-2, 'foreignkey'=>'user.rowid',),
+		'fk_standard'   => array('type'=>'integer', 'label'=>'Standard', 'enabled'=>'1', 'position'=>140, 'notnull'=>1, 'visible'=>0, 'default'=>1,),
 	);
 
 	public $rowid;
@@ -88,6 +89,7 @@ class DigiriskDocuments extends CommonObject
 	public $model_odt;
 	public $last_main_doc;
 	public $fk_user_creat;
+	public $fk_standard;
 
 	/**
 	 * Constructor
@@ -372,7 +374,7 @@ class DigiriskDocuments extends CommonObject
 			$result = $this->commonGenerateDocument($modelpath, $modele, $outputlangs, $hidedetails, $hidedesc, $hideref, $moreparams);
 		}
 
-		$this->call_trigger(strtoupper($this->element).'_GENERATE', $user);
+		$this->call_trigger(strtoupper($this->type).'_GENERATE', $user);
 
 		return $result;
 	}
