@@ -17,6 +17,7 @@ ALTER TABLE llx_digiriskdolibarr_digiriskelement ADD INDEX idx_digiriskdolibarr_
 ALTER TABLE llx_digiriskdolibarr_digiriskelement ADD INDEX idx_digiriskdolibarr_digiriskelement_ref (ref);
 ALTER TABLE llx_digiriskdolibarr_digiriskelement ADD INDEX idx_digiriskdolibarr_digiriskelement_status (status);
 ALTER TABLE llx_digiriskdolibarr_digiriskelement ADD CONSTRAINT llx_digiriskdolibarr_digiriskelement_fk_user_creat FOREIGN KEY (fk_user_creat) REFERENCES llx_user(rowid);
+-- ALTER TABLE llx_digiriskdolibarr_digiriskelement ADD CONSTRAINT llx_digiriskdolibarr_digiriskelement_fk_standard FOREIGN KEY (fk_standard) REFERENCES llx_digiriskdolibarr_digiriskstandard(rowid);
 
 
 

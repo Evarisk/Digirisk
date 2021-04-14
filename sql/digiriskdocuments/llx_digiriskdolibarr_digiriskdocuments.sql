@@ -27,5 +27,6 @@ CREATE TABLE llx_digiriskdolibarr_digiriskdocuments(
 	model_pdf     varchar(255),
 	model_odt     varchar(255),
 	last_main_doc varchar(128),
-	fk_user_creat integer NOT NULL
+	fk_user_creat integer NOT NULL,
+	fk_standard   integer DEFAULT 1 NOT NULL
 ) ENGINE=innodb;
