@@ -574,6 +574,7 @@ function digiriskHeader($head = '', $title = '', $help_url = '', $target = '', $
 {
 	global $conf, $langs, $db;
 
+	dol_include_once('/digiriskdolibarr/class/digiriskelement.class.php');
 	dol_include_once('/custom/digiriskdolibarr/core/modules/digiriskdolibarr/digiriskelement/groupment/mod_groupment_standard.php');
 	dol_include_once('/custom/digiriskdolibarr/core/modules/digiriskdolibarr/digiriskelement/workunit/mod_workunit_standard.php');
 
@@ -607,7 +608,7 @@ function digiriskHeader($head = '', $title = '', $help_url = '', $target = '', $
 				<div class="digirisk-wrap wpeo-wrap">
 					<div class="navigation-container">
 						<div class="society-header">
-							<a class="linkElement" href="../digiriskdolibarr/digiriskelement_card.php">
+							<a class="linkElement" href="../digiriskdolibarr/digiriskstandard_card.php?id=<?php echo $conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD ?>">
 								<span class="icon fas fa-building fa-fw"></span>
 								<div class="title"><?php echo $conf->global->MAIN_INFO_SOCIETE_NOM ?></div>
 								<div class="add-container">
@@ -646,9 +647,10 @@ function digiriskHeader($head = '', $title = '', $help_url = '', $target = '', $
 
 								var params = new window.URLSearchParams(window.location.search);
 								var id = params.get('id');
-
-								jQuery( '#unit'  + id ).addClass( 'active' );
-								jQuery( '#unit'  +id  ).closest( '.unit' ).attr( 'value', id );
+								if (window.location.search.match(/digiriskelement/)) {
+									jQuery( '#unit'  + id ).addClass( 'active' );
+									jQuery( '#unit'  +id  ).closest( '.unit' ).attr( 'value', id );
+                                };
 								</script>
 							</ul>
 					</div>
