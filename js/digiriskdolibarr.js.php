@@ -728,7 +728,7 @@ window.eoxiaJS.risk.createRisk = function ( event ) {
 		}
 	})
 
-	$('.fichecenter').load( document.URL + '&action=add' + categoryPost + descriptionPost + methodPost + cotationPost + criteres + photoPost + commentPost + ' .fichecenter');
+	$('.div-table-responsive').load( document.URL + '&action=add' + categoryPost + descriptionPost + methodPost + cotationPost + criteres + photoPost + commentPost + ' .div-table-responsive');
 };
 
 /**
