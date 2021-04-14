@@ -16,7 +16,7 @@
  */
 
 /**
- *   	\file       digiriskelement_legaldisplay.php
+ *   	\file       digiriskstandard_legaldisplay.php
  *		\ingroup    digiriskdolibarr
  *		\brief      Page to view legaldisplay
  */
@@ -28,9 +28,9 @@ if (!$res) die("Include of main fails");
 
 require_once DOL_DOCUMENT_ROOT.'/core/class/html.formfile.class.php';
 
-dol_include_once('/digiriskdolibarr/class/digiriskelement.class.php');
+dol_include_once('/digiriskdolibarr/class/digiriskstandard.class.php');
 dol_include_once('/digiriskdolibarr/class/digiriskdocuments/legaldisplay.class.php');
-dol_include_once('/digiriskdolibarr/lib/digiriskdolibarr_digiriskelement.lib.php');
+dol_include_once('/digiriskdolibarr/lib/digiriskdolibarr_digiriskstandard.lib.php');
 dol_include_once('/digiriskdolibarr/lib/digiriskdolibarr_function.lib.php');
 dol_include_once('/digiriskdolibarr/core/modules/digiriskdolibarr/digiriskdocuments/legaldisplay/modules_legaldisplay.php');
 
@@ -43,9 +43,11 @@ $langs->loadLangs(array("digiriskdolibarr@digiriskdolibarr", "other"));
 $action = GETPOST('action', 'aZ09');
 
 // Initialize technical objects
-$object       = new DigiriskElement($db);
+$object       = new DigiriskStandard($db);
 $legaldisplay = new LegalDisplay($db);
 $hookmanager->initHooks(array('digiriskelementlegaldisplay', 'globalcard')); // Note that conf->hooks_modules contains array
+
+$object->fetch($conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD);
 
 $upload_dir         = $conf->digiriskdolibarr->multidir_output[isset($object->entity) ? $object->entity : 1];
 $permissiontoread   = $user->rights->digiriskdolibarr->legaldisplay->read;
@@ -146,18 +148,11 @@ digiriskHeader('', $title, $help_url, '', '', '', $morejs); ?>
 
 <div id="cardContent" value="">
 
-<?php if (!$object->id) {
-	$object->ref    = $conf->global->MAIN_INFO_SOCIETE_NOM;
-	$object->label  = $langs->trans('Society');
-	$object->entity = $conf->entity;
-	unset($object->fields['element_type']);
-}
-
-// Part to show record
+<?php // Part to show record
 $res  = $object->fetch_optionals();
-$head = digiriskelementPrepareHead($object);
+$head = digiriskstandardPrepareHead($object);
 
-dol_fiche_head($head, 'elementLegalDisplay', '', -1, $object->picto);
+dol_fiche_head($head, 'standardLegalDisplay', '', -1, $object->picto);
 
 // Object card
 // ------------------------------------------------------------
@@ -169,25 +164,10 @@ $morehtmlleft .= '<div class="floatleft inline-block valignmiddle divphotoref">'
 
 digirisk_banner_tab($object, 'ref', '', 0, 'ref', 'ref', $morehtmlref, '', 0, $morehtmlleft);
 
-unset($object->fields['element_type']);
-unset($object->fields['fk_parent']);
-unset($object->fields['last_main_doc']);
-unset($object->fields['entity']);
-
 print '<div class="fichecenter">';
 print '<div class="fichehalfleft">';
 print '<div class="underbanner clearboth"></div>';
 print '<table class="border centpercent tableforfield">' . "\n";
-
-// Common attributes
-unset($object->fields['import_key']);
-unset($object->fields['json']);
-unset($object->fields['import_key']);
-unset($object->fields['model_odt']);
-unset($object->fields['type']);
-unset($object->fields['last_main_doc']);
-unset($object->fields['label']);
-unset($object->fields['description']);
 
 //JSON Decode and show fields
 include DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/core/tpl/digiriskdolibarr_legaldisplayfields_view.tpl.php';
