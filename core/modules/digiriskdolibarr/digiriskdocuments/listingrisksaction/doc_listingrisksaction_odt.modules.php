@@ -318,7 +318,7 @@ class doc_listingrisksaction_odt extends ModeleODTListingRisksAction
 										$tmparray['quotationRisque']   = $lastEvaluation->cotation;
 										$tmparray['commentaireRisque'] = dol_print_date( $lastEvaluation->date_creation, '%A %e %B %G %H:%M' ) . ': ' . $lastEvaluation->comment;
 
-										$path                      = DOL_DATA_ROOT .'/digiriskdolibarr/risk/' . $line->ref ;
+										$path                      = DOL_DATA_ROOT .'/digiriskdolibarr/riskassessment/' . $lastEvaluation->ref ;
 										$image                     = $path . '/' . $lastEvaluation->photo;
 										$tmparray['photoAssociee'] = $image;
 
