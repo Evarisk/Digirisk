@@ -177,6 +177,11 @@ function digiriskdolibarrAdminRiskAnalysisPrepareHead()
 	$head[$h][2] = 'riskassessment';
 	$h++;
 
+	$head[$h][0] = dol_buildpath("/digiriskdolibarr/admin/riskanalysis/risksign.php", 1);
+	$head[$h][1] = $langs->trans("RiskSign");
+	$head[$h][2] = 'risksign';
+	$h++;
+
 	$head[$h][0] = dol_buildpath("/digiriskdolibarr/admin/riskanalysis/task.php", 1);
 	$head[$h][1] = $langs->trans("Task");
 	$head[$h][2] = 'task';
