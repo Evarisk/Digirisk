@@ -148,6 +148,11 @@ function digiriskdolibarrAdminDigiriskElementPrepareHead()
 	$head[$h][2] = 'workunit';
 	$h++;
 
+	$head[$h][0] = dol_buildpath("/digiriskdolibarr/admin/digiriskelement/evaluator.php", 1);
+	$head[$h][1] = $langs->trans("Evaluator");
+	$head[$h][2] = 'evaluator';
+	$h++;
+
 	complete_head_from_modules($conf, $langs, null, $head, $h, 'digiriskdolibarr');
 
 	return $head;

@@ -396,6 +396,8 @@ window.eoxiaJS.modal.openModal = function ( event ) {
 		$(this).closest('.risk-evaluation-photo-container').find('#risk_evaluation_photo' + idSelected).addClass('modal-active');
 	} else if ($(this).hasClass('risk-evaluation-edit')) {
 		$('#risk_evaluation_edit' + idSelected).addClass('modal-active');
+	} else if ($(this).hasClass('evaluator-add')) {
+		$('#evaluator_add' + idSelected).addClass('modal-active');
 	}
 
 	// Open modal risk.
@@ -403,6 +405,9 @@ window.eoxiaJS.modal.openModal = function ( event ) {
 		$('#risk_add' + idSelected).addClass('modal-active');
 	}
 	if ($(this).hasClass('risk-edit')) {
+		$('#risk_edit' + idSelected).addClass('modal-active');
+	}
+	if ($(this).hasClass('evaluator-add')) {
 		$('#risk_edit' + idSelected).addClass('modal-active');
 	}
 
@@ -1369,4 +1374,129 @@ window.eoxiaJS.risksign.saveRiskSign = function ( event ) {
 	}
 
 	$(this).closest('.div-table-responsive').load( document.URL + '&action=saveRiskSign&riskSignID=' + editedRiskSignId + categoryPost + photoPost + descriptionPost + ' .div-table-responsive');
+};
+
+/**
+ * Initialise l'objet "signalisation" ainsi que la méthode "init" obligatoire pour la bibliothèque EoxiaJS.
+ *
+ * @since   1.0.0
+ * @version 1.0.0
+ */
+window.eoxiaJS.evaluator = {};
+
+/**
+ * La méthode appelée automatiquement par la bibliothèque EoxiaJS.
+ *
+ * @since   1.0.0
+ * @version 1.0.0
+ *
+ * @return {void}
+ */
+window.eoxiaJS.evaluator.init = function() {
+	window.eoxiaJS.evaluator.event();
+};
+
+/**
+ * La méthode contenant tous les évènements pour le evaluation.
+ *
+ * @since   1.0.0
+ * @version 1.0.0
+ *
+ * @return {void}
+ */
+window.eoxiaJS.evaluator.event = function() {
+	jQuery( document ).on( 'click', '.evaluator-create', window.eoxiaJS.evaluator.createEvaluator );
+	jQuery( document ).on( 'click', '.evaluator-delete', window.eoxiaJS.evaluator.deleteEvaluator );
+	jQuery( document ).on( 'click', '#userid'          , window.eoxiaJS.evaluator.selectUser );
+};
+
+/**
+ * Check value on riskCategory and riskCotation.
+ *
+ * @since   1.0.0
+ * @version 1.0.0
+ *
+ * @param  elementParent --- Parent element
+ * @return {void}
+ */
+window.eoxiaJS.evaluator.haveDataInInput = function( elementParent ) {
+	var element = elementParent.parent().parent();
+	var cotation = element.find('.risk-evaluation-seuil');
+
+	if (element.hasClass('risk-add-modal')) {
+		var category = element.find('input[name="risk_category_id"]')
+		if (category.val() >= 0 && cotation.val() >= 0) {
+			element.find('.button-disable').removeClass('button-disable');
+		}
+	} else if (element.hasClass('risk-evaluation-add-modal')) {
+		if (cotation.val() >= 0) {
+			element.find('.button-disable').removeClass('button-disable');
+		}
+	}
+};
+
+/**
+ * Clique sur une des cotations simples.
+ *
+ * @since   1.0.0
+ * @version 1.0.0
+ *
+ * @param  {ClickEvent} event L'état du clic.
+ * @return {void}
+ */
+window.eoxiaJS.evaluator.selectUser = function( event ) {
+	$('.user-selected').val(this.value)
+};
+/**
+ * Action create risk.
+ *
+ * @since   1.0.0
+ * @version 1.0.0
+ *
+ * @return {void}
+ */
+window.eoxiaJS.evaluator.createEvaluator = function ( event ) {
+	let elementEvaluator = $(this).closest('.fichecenter').find('.evaluator-content');
+
+
+
+	var user = $('.user-selected').val()
+	var userPost = '';
+	if (user !== 0) {
+		userPost = '&evaluatorID=' + encodeURI(user);
+	}
+
+	var date = elementEvaluator.find('#EvaluatorDate').val();
+	var datePost = '';
+	if (date !== '') {
+		datePost = '&date=' + encodeURI(date);
+	}
+
+	var duration = elementEvaluator.find('.evaluator-duration .duration').val();
+	var durationPost = '';
+	if (duration !== 0) {
+		durationPost = '&duration=' + duration;
+	}
+
+console.log(document.URL + '&action=add' + durationPost + datePost + userPost )
+	$('.div-table-responsive').load( document.URL + '&action=add' + durationPost + datePost + userPost + ' .div-table-responsive');
+};
+
+/**
+ * Action delete evaluator.
+ *
+ * @since   1.0.0
+ * @version 1.0.0
+ *
+ * @return {boolean}
+ */
+window.eoxiaJS.evaluator.deleteEvaluator = function ( event ) {
+	let deletedEvaluatorId = $(this).attr('value');
+	var r = confirm('Are you sure you want to delete this evaluator ?');
+	if (r == true) {
+		$('#evaluator_row_'+deletedEvaluatorId).empty();
+		$('#evaluator_row_'+deletedEvaluatorId).load( document.URL + '&action=deleteEvaluator&deletedEvaluatorId=' + deletedEvaluatorId + ' #evaluator_row_'+deletedEvaluatorId+' > div');
+	} else {
+		return false;
+	}
 };

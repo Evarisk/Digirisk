@@ -203,6 +203,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			65 => array('LEGALDISPLAY_STANDARD_MASK','chaine','V{0000}','', 1),
 			84 => array('DIGIRISKDOLIBARR_RISKASSESSMENT_ADDON','chaine', 'mod_riskassessment_standard' ,'', 1),
 			88 => array('DIGIRISKDOLIBARR_RISKSIGN_ADDON','chaine', 'mod_risksign_standard' ,'', 1),
+			80 => array('DIGIRISKDOLIBARR_EVALUATOR_ADDON','chaine', 'mod_evaluator_standard' ,'', 1),
 
 		);
 
@@ -420,6 +421,23 @@ class modDigiriskdolibarr extends DolibarrModules
 		$this->rights[$r][4] = 'risksign';
 		$this->rights[$r][5] = 'delete';
 		$r++;
+
+		/* EVALUATOR PERMISSIONS */
+
+		$this->rights[$r][0] = $this->numero.$r;
+		$this->rights[$r][1] = $langs->trans('ReadEvaluator');
+		$this->rights[$r][4] = 'evaluator';
+		$this->rights[$r][5] = 'read';
+		$r++;
+		$this->rights[$r][0] = $this->numero.$r;
+		$this->rights[$r][1] = $langs->trans('CreateReadEvaluator');
+		$this->rights[$r][4] = 'evaluator';
+		$this->rights[$r][5] = 'write';
+		$r++;
+		$this->rights[$r][0] = $this->numero.$r;
+		$this->rights[$r][1] = $langs->trans('DeleteReadEvaluator');
+		$this->rights[$r][4] = 'evaluator';
+		$this->rights[$r][5] = 'delete';
 
 		// Main menu entries to add
 		$this->menu = array();
