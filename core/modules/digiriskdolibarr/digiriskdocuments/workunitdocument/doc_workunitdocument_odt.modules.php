@@ -193,7 +193,7 @@ class doc_workunitdocument_odt extends ModeleODTWorkUnitDocument
 		$ref = $mod->getNextValue($object);
 
 		$object->ref = $ref;
-		$id = $object->create($user);
+		$id = $object->create($user, false, $digiriskelement);
 
 		$object->fetch($id);
 

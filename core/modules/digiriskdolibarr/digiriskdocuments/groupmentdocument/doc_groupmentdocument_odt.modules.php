@@ -191,7 +191,8 @@ class doc_groupmentdocument_odt extends ModeleODTGroupmentDocument
 		$ref = $mod->getNextValue($object);
 
 		$object->ref = $ref;
-		$id = $object->create($user);
+
+		$id = $object->create($user, false, $digiriskelement);
 
 		$object->fetch($id);
 

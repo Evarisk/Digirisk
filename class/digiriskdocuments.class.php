@@ -72,7 +72,8 @@ class DigiriskDocuments extends CommonObject
 		'model_odt'     => array('type'=>'varchar(255)', 'label'=>'Model ODT', 'enabled'=>'1', 'position'=>110, 'notnull'=>0, 'visible'=>-1,),
 		'last_main_doc' => array('type'=>'varchar(128)', 'label'=>'LastMainDoc', 'enabled'=>'1', 'position'=>120, 'notnull'=>0, 'visible'=>-1,),
 		'fk_user_creat' => array('type'=>'integer:User:user/class/user.class.php', 'label'=>'UserAuthor', 'enabled'=>'1', 'position'=>130, 'notnull'=>1, 'visible'=>-2, 'foreignkey'=>'user.rowid',),
-		'fk_standard'   => array('type'=>'integer', 'label'=>'Standard', 'enabled'=>'1', 'position'=>140, 'notnull'=>1, 'visible'=>0, 'default'=>1,),
+		'parent_type'   => array('type'=>'varchar(255)', 'label'=>'Parent_type', 'enabled'=>'1', 'position'=>140, 'notnull'=>1, 'visible'=>0, 'default'=>1,),
+		'parent_id'     => array('type'=>'integer', 'label'=>'Parent_id', 'enabled'=>'1', 'position'=>150, 'notnull'=>1, 'visible'=>0, 'default'=>1,),
 	);
 
 	public $rowid;
@@ -137,7 +138,7 @@ class DigiriskDocuments extends CommonObject
 	 * @param  bool $notrigger false=launch triggers after, true=disable triggers
 	 * @return int             <0 if KO, Id of created object if OK
 	 */
-	public function create(User $user, $notrigger = false)
+	public function create(User $user, $notrigger = false, $parentObject = 0)
 	{
 		global $conf;
 
@@ -151,6 +152,14 @@ class DigiriskDocuments extends CommonObject
 		$this->type          = $this->element;
 
 		$this->fk_user_creat = $user->id;
+
+		if ($parentObject->id > 0) {
+			$this->parent_id     = $parentObject->id;
+			$this->parent_type   = $parentObject->element_type;
+		} else {
+			$this->parent_id    = $conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD;
+			$this->parent_type  = 'digiriskstandard';
+		}
 
 		$this->DigiriskFillJSON($this);
 		$this->element = $this->element . '@digiriskdolibarr';
@@ -374,7 +383,7 @@ class DigiriskDocuments extends CommonObject
 			$result = $this->commonGenerateDocument($modelpath, $modele, $outputlangs, $hidedetails, $hidedesc, $hideref, $moreparams);
 		}
 
-		$this->call_trigger(strtoupper($this->type).'_GENERATE', $user);
+		$this->call_trigger(strtoupper($this->type).'_GENERATE', $user, $parent);
 
 		return $result;
 	}

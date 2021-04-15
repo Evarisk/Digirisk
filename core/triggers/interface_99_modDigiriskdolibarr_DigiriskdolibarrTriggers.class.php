@@ -96,13 +96,13 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$now = dol_now();
 				$actioncomm = new ActionComm($this->db);
 
-				$actioncomm->elementtype = 'informationssharing@digiriskdolibarr';
-				$actioncomm->elementid   = $object->id;
+				$actioncomm->elementtype = $object->parent_type . '@digiriskdolibarr';
+				$actioncomm->elementid   = $object->parent_id;
 				$actioncomm->code        = 'AC_INFORMATIONSSHARING_GENERATE';
 				$actioncomm->type_code   = 'AC_OTH_AUTO';
 				$actioncomm->label       = $langs->trans('InformationsSharingGeneratedWithDolibarr');
 				$actioncomm->datep       = $now;
-				$actioncomm->fk_element  = $object->id;
+				$actioncomm->fk_element  = $object->parent_id;
 				$actioncomm->userownerid = $user->id;
 				$actioncomm->percentage  = -1;
 
@@ -115,13 +115,13 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$now = dol_now();
 				$actioncomm = new ActionComm($this->db);
 
-				$actioncomm->elementtype = 'legaldisplay@digiriskdolibarr';
-				$actioncomm->elementid   = $object->id;
+				$actioncomm->elementtype = $object->parent_type . '@digiriskdolibarr';
+				$actioncomm->elementid   = $object->parent_id;
 				$actioncomm->code        = 'AC_LEGALDISPLAY_GENERATE';
 				$actioncomm->type_code   = 'AC_OTH_AUTO';
 				$actioncomm->label       = $langs->trans('LegalDisplayGeneratedWithDolibarr');
 				$actioncomm->datep       = $now;
-				$actioncomm->fk_element  = $object->id;
+				$actioncomm->fk_element  = $object->parent_id;
 				$actioncomm->userownerid = $user->id;
 				$actioncomm->percentage  = -1;
 
@@ -134,13 +134,13 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$now = dol_now();
 				$actioncomm = new ActionComm($this->db);
 
-				$actioncomm->elementtype = 'firepermit@digiriskdolibarr';
-				$actioncomm->elementid   = $object->id;
+				$actioncomm->elementtype = $object->parent_type . '@digiriskdolibarr';
+				$actioncomm->elementid   = $object->parent_id;
 				$actioncomm->code        = 'AC_FIREPERMIT_GENERATE';
 				$actioncomm->type_code   = 'AC_OTH_AUTO';
 				$actioncomm->label       = $langs->trans('FirePermitGeneratedWithDolibarr');
 				$actioncomm->datep       = $now;
-				$actioncomm->fk_element  = $object->id;
+				$actioncomm->fk_element  = $object->parent_id;
 				$actioncomm->userownerid = $user->id;
 				$actioncomm->percentage  = -1;
 
@@ -153,13 +153,13 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$now = dol_now();
 				$actioncomm = new ActionComm($this->db);
 
-				$actioncomm->elementtype = 'preventionplan@digiriskdolibarr';
-				$actioncomm->elementid   = $object->id;
+				$actioncomm->elementtype = $object->parent_type . '@digiriskdolibarr';
+				$actioncomm->elementid   = $object->parent_id;
 				$actioncomm->code        = 'AC_PREVENTIONPLAN_GENERATE';
 				$actioncomm->type_code   = 'AC_OTH_AUTO';
 				$actioncomm->label       = $langs->trans('PreventionPlanGeneratedWithDolibarr');
 				$actioncomm->datep       = $now;
-				$actioncomm->fk_element  = $object->id;
+				$actioncomm->fk_element  = $object->parent_id;
 				$actioncomm->userownerid = $user->id;
 				$actioncomm->percentage  = -1;
 
@@ -172,17 +172,18 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$now = dol_now();
 				$actioncomm = new ActionComm($this->db);
 
-				$actioncomm->elementtype = 'groupmentdocument@digiriskdolibarr';
-				$actioncomm->elementid   = $object->id;
+				$actioncomm->elementtype = $object->parent_type . '@digiriskdolibarr';
+				$actioncomm->elementid   = $object->parent_id;
 				$actioncomm->code        = 'AC_GROUPMENTDOCUMENT_GENERATE';
 				$actioncomm->type_code   = 'AC_OTH_AUTO';
 				$actioncomm->label       = $langs->trans('GroupmentDocumentGeneratedWithDolibarr');
 				$actioncomm->datep       = $now;
-				$actioncomm->fk_element  = $object->id;
+				$actioncomm->fk_element  = $object->parent_id;
 				$actioncomm->userownerid = $user->id;
 				$actioncomm->percentage  = -1;
 
-				$actioncomm->create($user);
+				$res = $actioncomm->create($user);
+
 				break;
 
 			case 'WORKUNITDOCUMENT_GENERATE' :
@@ -191,13 +192,13 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$now = dol_now();
 				$actioncomm = new ActionComm($this->db);
 
-				$actioncomm->elementtype = 'workunitdocument@digiriskdolibarr';
-				$actioncomm->elementid   = $object->id;
+				$actioncomm->elementtype = $object->parent_type . '@digiriskdolibarr';
+				$actioncomm->elementid   = $object->parent_id;
 				$actioncomm->code        = 'AC_WORKUNITDOCUMENT_GENERATE';
 				$actioncomm->type_code   = 'AC_OTH_AUTO';
 				$actioncomm->label       = $langs->trans('WorkUnitDocumentGeneratedWithDolibarr');
 				$actioncomm->datep       = $now;
-				$actioncomm->fk_element  = $object->id;
+				$actioncomm->fk_element  = $object->parent_id;
 				$actioncomm->userownerid = $user->id;
 				$actioncomm->percentage  = -1;
 
@@ -210,13 +211,13 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$now = dol_now();
 				$actioncomm = new ActionComm($this->db);
 
-				$actioncomm->elementtype = $object->element_type.'@digiriskdolibarr';
-				$actioncomm->elementid   = $object->id;
+				$actioncomm->elementtype = $object->parent_type . '@digiriskdolibarr';
+				$actioncomm->elementid   = $object->parent_id;
 				$actioncomm->code        = 'AC_LISTINGRISKSPHOTO_GENERATE';
 				$actioncomm->type_code   = 'AC_OTH_AUTO';
 				$actioncomm->label       = $langs->trans('ListingRisksPhotoGeneratedWithDolibarr');
 				$actioncomm->datep       = $now;
-				$actioncomm->fk_element  = $object->id;
+				$actioncomm->fk_element  = $object->parent_id;
 				$actioncomm->userownerid = $user->id;
 				$actioncomm->percentage  = -1;
 
@@ -229,13 +230,13 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 			$now = dol_now();
 			$actioncomm = new ActionComm($this->db);
 
-			$actioncomm->elementtype = $object->element_type.'@digiriskdolibarr';
-			$actioncomm->elementid   = $object->id;
+			$actioncomm->elementtype = $object->parent_type . '@digiriskdolibarr';
+			$actioncomm->elementid   = $object->parent_id;
 			$actioncomm->code        = 'AC_LISTINGRISKSACTION_GENERATE';
 			$actioncomm->type_code   = 'AC_OTH_AUTO';
 			$actioncomm->label       = $langs->trans('ListingRisksActionGeneratedWithDolibarr');
 			$actioncomm->datep       = $now;
-			$actioncomm->fk_element  = $object->id;
+			$actioncomm->fk_element  = $object->parent_id;
 			$actioncomm->userownerid = $user->id;
 			$actioncomm->percentage  = -1;
 

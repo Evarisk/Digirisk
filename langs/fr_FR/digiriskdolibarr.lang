@@ -233,7 +233,7 @@ PreventionPlan = Plan de prévention
 # Right - Droit
 
 # Trigger - Déclencheur
-ListingRisksPhotosGeneratedWithDolibarr = Listing de risques photo générée avec Dolibarr
+ListingRisksPhotoGeneratedWithDolibarr = Listing de risques photo généré avec Dolibarr
 
 # Mod Numbering - Modèle de numérotation
 DigiriskListingRisksPhotoNumberingModule = Modèle de numérotation des listing des risques photo de Digirisk
@@ -256,7 +256,7 @@ ListingRisksPhoto = Listing des risques photo
 # Right - Droit
 
 # Trigger - Déclencheur
-ListingRisksActionsGeneratedWithDolibarr = Listing de risques actions correctives générée avec Dolibarr
+ListingRisksActionGeneratedWithDolibarr = Listing de risques actions correctives généré avec Dolibarr
 
 # Mod Numbering - Modèle de numérotation
 DigiriskListingRisksActionNumberingModule = Modèle de numérotation des listing des actions correctives de Digirisk
@@ -320,7 +320,7 @@ WorkUnitDocument = Fiche d'Unité de travail
 # DigirskElement - Element Digirisk
 #
 
-# Right - Droit
+# Rights  - Droits
 ReadDigiriskElement = Lire un element digirisk
 CreateDigiriskElement = Créer un element digirisk
 DeleteDigiriskElement = Supprimer un element digirisk
@@ -371,6 +371,13 @@ DigiriskWorkUnitStandardModel = Renvoie le numéro sous la forme WUn où n est u
 WorkUnit = Unité de travail
 NewWorkUnit = Nouvelle unité de travail
 ModifyWorkUnit = Modifier unité de travail
+
+#
+# DigiriskStandard - Standard de Digirisk
+#
+
+# Trigger - Déclencheur
+ActionsOnDigiriskStandard = Événements liés au standard de Digirisk
 
 
 

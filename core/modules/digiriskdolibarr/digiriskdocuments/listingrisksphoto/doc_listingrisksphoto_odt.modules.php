@@ -193,7 +193,7 @@ class doc_listingrisksphoto_odt extends ModeleODTListingRisksPhoto
 		$ref = $mod->getNextValue($object);
 
 		$object->ref = $ref;
-		$id = $object->create($user);
+		$id = $object->create($user, false, $digiriskelement);
 
 		$object->fetch($id);
 

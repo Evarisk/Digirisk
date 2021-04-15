@@ -139,4 +139,29 @@ class DigiriskStandard extends CommonObject
 	{
 		return $this->fetchCommon($id, $ref);
 	}
+
+	/**
+	 *	Return clicable name (with picto eventually)
+	 *
+	 *	@param		int		$withpicto		0=No picto, 1=Include picto into link, 2=Only picto
+	 *	@return		string					Chaine avec URL
+	 */
+	public function getNomUrl($withpicto = 0)
+	{
+		global $conf, $langs;
+
+		$result = '';
+		$label = $langs->trans("Show").': '.$this->ref;
+
+		$link = '<a href="'.DOL_URL_ROOT.'/custom/digiriskdolibarr/digiriskstandard_card.php?id='.$conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD.'" title="'.dol_escape_htmltag($label, 1).'" class="classfortooltip">';
+		$linkend = '</a>';
+
+		$picto = 'trip';
+
+
+		if ($withpicto) $result .= ($link.img_object($label, $picto, 'class="classfortooltip"').$linkend);
+		if ($withpicto && $withpicto != 2) $result .= ' ';
+		if ($withpicto != 2) $result .= $link.$this->ref.$linkend;
+		return $result;
+	}
 }

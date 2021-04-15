@@ -191,7 +191,7 @@ class doc_listingrisksaction_odt extends ModeleODTListingRisksAction
 		$ref = $mod->getNextValue($object);
 
 		$object->ref = $ref;
-		$id = $object->create($user);
+		$id = $object->create($user, false, $digiriskelement);
 
 		$object->fetch($id);
 
