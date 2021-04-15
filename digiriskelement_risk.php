@@ -264,21 +264,27 @@ if (empty($reshook))
 					foreach ($ListEvaluations as $lastEvaluation ) {
 						$pathToEvaluationPhoto = DOL_DATA_ROOT . '/digiriskdolibarr/riskassessment/' . $lastEvaluation->ref;
 
-						$files = dol_dir_list($pathToEvaluationPhoto);
-						foreach ($files as $file) {
-							if (is_file($file['fullname'])) {
-								unlink($file['fullname']);
+						if ( file_exists( $pathToEvaluationPhoto ) && !(empty($lastEvaluation->ref))) {
+							$files = dol_dir_list($pathToEvaluationPhoto);
+							if (!empty($files)) {
+								foreach ($files as $file) {
+									if (is_file($file['fullname'])) {
+										unlink($file['fullname']);
+									}
+								}
 							}
-						}
 
-						$files = dol_dir_list($pathToEvaluationPhoto . '/thumbs');
-						foreach ($files as $file) {
-							unlink($file['fullname']);
-						}
-						dol_delete_dir($pathToEvaluationPhoto. '/thumbs');
-						dol_delete_dir($pathToEvaluationPhoto);
+							$files = dol_dir_list($pathToEvaluationPhoto . '/thumbs');
+							if (!empty($files)) {
+								foreach ($files as $file) {
+									unlink($file['fullname']);
+								}
+							}
+							dol_delete_dir($pathToEvaluationPhoto . '/thumbs');
+							dol_delete_dir($pathToEvaluationPhoto);
 
-						$lastEvaluation->delete($user);
+							$lastEvaluation->delete($user);
+						}
 					}
 				}
 
@@ -836,7 +842,7 @@ if ($object->id > 0) {
 
 													if ( !empty($files) ) :
 														foreach ($files as $file) :
-															print '<div class="table-cell center clickable-photo clickable-photo'. $j .'" value="'. $j .'">';
+															print '<div class="table-cell center clickable-photo clickable-photo'. $j .'" value="'. $j .'" element="risk-evaluation">';
 															if (image_format_supported($file['name']) >= 0) :
 																$fullpath = $path . '/' . $file['relativename'] . '&entity=' . $conf->entity; ?>
 																<input class="filename" type="hidden" value="<?php echo $file['name'] ?>">
@@ -1346,7 +1352,7 @@ if ($object->id > 0) {
 
 																											if ( !empty($files) ) :
 																												foreach ($files as $file) :
-																													print '<div class="table-cell center clickable-photo clickable-photo'. $j .'" value="'. $j .'">';
+																													print '<div class="table-cell center clickable-photo clickable-photo'. $j .'" value="'. $j .'" element="risk-evaluation">';
 																													if (image_format_supported($file['name']) >= 0) :
 																														$fullpath = $path . '/' . $file['relativename'] . '&entity=' . $conf->entity; ?>
 																														<input class="filename" type="hidden" value="<?php echo $file['name'] ?>">
@@ -1619,7 +1625,7 @@ if ($object->id > 0) {
 
 													if ( !empty($files) ) :
 														foreach ($files as $file) :
-															print '<div class="table-cell center clickable-photo clickable-photo'. $j .'" value="'. $j .'">';
+															print '<div class="table-cell center clickable-photo clickable-photo'. $j .'" value="'. $j .'" element="risk-evaluation">';
 															if (image_format_supported($file['name']) >= 0) :
 																$fullpath = $path . '/' . $file['relativename'] . '&entity=' . $conf->entity; ?>
 																<input class="filename" type="hidden" value="<?php echo $file['name'] ?>">
