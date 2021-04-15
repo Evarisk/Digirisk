@@ -32,7 +32,6 @@ global $langs, $user;
 // Libraries
 require_once DOL_DOCUMENT_ROOT . "/core/lib/admin.lib.php";
 dol_include_once('/custom/digiriskdolibarr/lib/digiriskdolibarr.lib.php');
-dol_include_once('/custom/digiriskdolibarr/class/digiriskdocuments.class.php');
 
 // Translations
 $langs->loadLangs(array("admin", "digiriskdolibarr@digiriskdolibarr"));
