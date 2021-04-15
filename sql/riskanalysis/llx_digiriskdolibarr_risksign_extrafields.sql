@@ -13,11 +13,10 @@
 -- You should have received a copy of the GNU General Public License
 -- along with this program. If not, see https://www.gnu.org/licenses/.
 
-create table llx_digiriskdolibarr_digirisksignalisation_extrafields
-(
-  rowid                     integer AUTO_INCREMENT PRIMARY KEY,
-  tms                       timestamp,
-  fk_object                 integer NOT NULL,
-  import_key                varchar(14)                          		-- import key
+create table llx_digiriskdolibarr_risksign_extrafields(
+    rowid      integer AUTO_INCREMENT PRIMARY KEY,
+    tms        timestamp,
+    fk_object  integer NOT NULL,
+    import_key varchar(14)
 ) ENGINE=innodb;
 

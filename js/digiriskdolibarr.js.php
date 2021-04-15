@@ -165,7 +165,7 @@ window.eoxiaJS.navigation.event = function() {
 	jQuery( document ).on( 'click', '#elementCard', window.eoxiaJS.navigation.redirect );
 	jQuery( document ).on( 'click', '#elementAgenda', window.eoxiaJS.navigation.redirect );
 	jQuery( document ).on( 'click', '#elementRisk', window.eoxiaJS.navigation.redirect );
-	jQuery( document ).on( 'click', '#elementSignalisation', window.eoxiaJS.navigation.redirect );
+	jQuery( document ).on( 'click', '#elementRiskSign', window.eoxiaJS.navigation.redirect );
 	jQuery( document ).on( 'click', '#elementLegaldisplay', window.eoxiaJS.navigation.redirect );
 	jQuery( document ).on( 'click', '#elementInformationssharing', window.eoxiaJS.navigation.redirect );
 	jQuery( document ).on( 'click', '#elementListingrisksaction', window.eoxiaJS.navigation.redirect );
@@ -405,6 +405,17 @@ window.eoxiaJS.modal.openModal = function ( event ) {
 	if ($(this).hasClass('risk-edit')) {
 		$('#risk_edit' + idSelected).addClass('modal-active');
 	}
+
+	// Open modal risksign.
+	if ($(this).hasClass('risksign-add')) {
+		$('#risksign_add' + idSelected).addClass('modal-active');
+	}
+	if ($(this).hasClass('risksign-edit')) {
+		$('#risksign_edit' + idSelected).addClass('modal-active');
+	}
+	if ($(this).hasClass('risksign-photo')) {
+		$(this).closest('.risksign-photo-container').find('#risksign_photo' + idSelected).addClass('modal-active');
+	}
 };
 
 /**
@@ -586,6 +597,74 @@ window.eoxiaJS.dropdown.toggleAngleClass = function( button ) {
 	else if ( button.hasClass('fa-chevron-circle-down') || button.hasClass('fa-chevron-circle-up') ) {
 		button.toggleClass('fa-chevron-circle-down').toggleClass('fa-chevron-circle-up');
 	}
+};
+
+/**
+ * Initialise l'objet "photo" ainsi que la méthode "init" obligatoire pour la bibliothèque EoxiaJS.
+ *
+ * @since   1.0.0
+ * @version 1.0.0
+ */
+window.eoxiaJS.photo = {};
+
+/**
+ * La méthode appelée automatiquement par la bibliothèque EoxiaJS.
+ *
+ * @since   1.0.0
+ * @version 1.0.0
+ *
+ * @return {void}
+ */
+window.eoxiaJS.photo.init = function() {
+	window.eoxiaJS.photo.event();
+};
+
+/**
+ * La méthode contenant tous les évènements pour le photo.
+ *
+ * @since   1.0.0
+ * @version 1.0.0
+ *
+ * @return {void}
+ */
+window.eoxiaJS.photo.event = function() {
+	// Photos
+	jQuery( document ).on( 'click', '.clickable-photo', window.eoxiaJS.photo.selectPhoto );
+	jQuery( document ).on( 'click', '.save-photo', window.eoxiaJS.photo.savePhoto );
+}
+
+/**
+ * Select photo.
+ *
+ * @since   1.0.0
+ * @version 1.0.0
+ *
+ * @return {void}
+ */
+window.eoxiaJS.photo.selectPhoto = function( event ) {
+	let photoID = $(this).attr('value');
+	let element = $(this).attr('element');
+
+	$('.clicked-photo').children('img.photo').attr('style', 'none !important');
+	$('.clicked-photo').removeClass('clicked-photo');
+
+	$('.clickable-photo'+photoID).children('img.photo'+photoID).attr('style', 'border: 5px solid #555 !important');
+	$('.clickable-photo'+photoID).addClass('clicked-photo');
+
+	$(this).closest('.'+element+'-photo-container').find('.'+element+'-photo-single .filename').val($('.clicked-photo .filename').val());
+	$(this).closest('.'+element+'-photo-container').find('.'+element+'-photo-single img').attr('src' , $('.clicked-photo img').attr('src'));
+};
+
+/**
+ * Action save photo.
+ *
+ * @since   1.0.0
+ * @version 1.0.0
+ *
+ * @return {void}
+ */
+window.eoxiaJS.photo.savePhoto = function( event ) {
+	$('.wpeo-modal.modal-photo.modal-active').removeClass('modal-active');
 };
 
 /**
@@ -811,9 +890,6 @@ window.eoxiaJS.evaluation.event = function() {
 	jQuery( document ).on( 'click', '.risk-evaluation-create', window.eoxiaJS.evaluation.createEvaluation);
 	jQuery( document ).on( 'click', '.risk-evaluation-save', window.eoxiaJS.evaluation.saveEvaluation);
 	jQuery( document ).on( 'click', '.risk-evaluation-delete', window.eoxiaJS.evaluation.deleteEvaluation);
-	// Photos
-	jQuery( document ).on( 'click', '.clickable-photo', window.eoxiaJS.evaluation.selectPhoto );
-	jQuery( document ).on( 'click', '.save-photo', window.eoxiaJS.evaluation.savePhoto );
 }
 
 /**
@@ -1131,12 +1207,12 @@ window.eoxiaJS.evaluationMethodEvarisk.selectSeuil = function( event ) {
 };
 
 /**
- * Initialise l'objet "signalisation" ainsi que la méthode "init" obligatoire pour la bibliothèque EoxiaJS.
+ * Initialise l'objet "risksign" ainsi que la méthode "init" obligatoire pour la bibliothèque EoxiaJS.
  *
  * @since   1.0.0
  * @version 1.0.0
  */
-window.eoxiaJS.signalisation = {};
+window.eoxiaJS.risksign = {};
 
 /**
  * La méthode appelée automatiquement par la bibliothèque EoxiaJS.
@@ -1146,127 +1222,151 @@ window.eoxiaJS.signalisation = {};
  *
  * @return {void}
  */
-window.eoxiaJS.signalisation.init = function() {
-	window.eoxiaJS.signalisation.event();
+window.eoxiaJS.risksign.init = function() {
+	window.eoxiaJS.risksign.event();
 };
 
 /**
- * La méthode contenant tous les évènements pour le evaluation.
+ * La méthode contenant tous les évènements pour le risksign.
  *
  * @since   1.0.0
  * @version 1.0.0
  *
  * @return {void}
  */
-window.eoxiaJS.signalisation.event = function() {
-	jQuery( document ).on( 'click', '.signalisation-edit', window.eoxiaJS.signalisation.editSignalisation );
-	jQuery( document ).on( 'click', '.signalisation-create:not(.button-disable)', window.eoxiaJS.signalisation.createSignalisation );
-	jQuery( document ).on( 'click', '.signalisation-save', window.eoxiaJS.signalisation.saveSignalisation );
-	jQuery( document ).on( 'click', '.signalisation-delete', window.eoxiaJS.signalisation.deleteSignalisation );
-	jQuery( document ).on( 'click', '.signalisation-pic', window.eoxiaJS.signalisation.haveSignalisationDataInInput );
+window.eoxiaJS.risksign.event = function() {
+	jQuery( document ).on( 'click', '.risksign-category-danger .item, .wpeo-table .risksign-category-danger .item', window.eoxiaJS.risksign.selectRiskSign );
+	jQuery( document ).on( 'click', '.risksign-create:not(.button-disable)', window.eoxiaJS.risksign.createRiskSign );
+	jQuery( document ).on( 'click', '.risksign-save', window.eoxiaJS.risksign.saveRiskSign );
+	jQuery( document ).on( 'click', '.risksign-delete', window.eoxiaJS.risksign.deleteRiskSign );
 };
 
+/**
+ * Lors du clic sur un riskSignCategory, remplaces le contenu du toggle et met l'image du risque sélectionné.
+ *
+ * @since   1.0.0
+ * @version 1.0.0
+ *
+ * @param  {MouseEvent} event [description]
+ * @return {void}
+ */
+window.eoxiaJS.risksign.selectRiskSign = function( event ) {
+	var element = jQuery(this);
+	element.closest('.content').removeClass('active');
+	element.closest('.wpeo-dropdown').find('.dropdown-toggle span').hide();
+	element.closest('.wpeo-dropdown').find('.dropdown-toggle img').show();
+	element.closest('.wpeo-dropdown').find('.dropdown-toggle img').attr('src', element.find('img').attr('src'));
+	element.closest('.wpeo-dropdown').find('.dropdown-toggle img').attr('aria-label', element.closest('.tooltip').attr('aria-label'));
+
+	element.closest('.fichecenter').find('.input-hidden-danger').val(element.data('id'));
+
+	var elementParent = jQuery(this).closest('.modal-container');
+
+	// Rend le bouton "active".
+	window.eoxiaJS.risksign.haveDataInInput(elementParent);
+};
 
 /**
- * Action create signalisation.
+ * Check value on riskSignCategory.
+ *
+ * @since   1.0.0
+ * @version 1.0.0
+ *
+ * @param  elementParent --- Parent element
+ * @return {void}
+ */
+window.eoxiaJS.risksign.haveDataInInput = function( elementParent ) {
+	var element = elementParent.parent().parent();
+
+	if (element.hasClass('risksign-add-modal')) {
+		var risksign_category = element.find('input[name="risksign_category_id"]')
+		if ( risksign_category.val() >= 0 ) {
+			element.find('.button-disable').removeClass('button-disable');
+		}
+	}
+};
+
+/**
+ * Action create risksign.
  *
  * @since   1.0.0
  * @version 1.0.0
  *
  * @return {void}
  */
-window.eoxiaJS.signalisation.createSignalisation = function ( event ) {
-	$('.risk-create.wpeo-button.add').addClass('button-disable');
+window.eoxiaJS.risksign.createRiskSign = function ( event ) {
+	let elementRiskSign = $(this).closest('.fichecenter').find('.risksign-content');
 
-	var description = $('#signalisationComment').val()
-	var descriptionPost = ''
-	if (description !== '') {
-		descriptionPost = '&signalisationComment=' + encodeURI(description)
-	}
-
-	var ref = $('#new_item_ref').val()
-	var refPost = ''
-	if (ref !== 0) {
-		refPost = '&ref=' + ref
-	}
-
-	var category = $('.input-hidden-danger').val()
-	var categoryPost = ''
+	var category = elementRiskSign.find('.risksign-category input').val();
+	var categoryPost = '';
 	if (category !== 0) {
-		categoryPost = '&category=' + category
+		categoryPost = '&riskSignCategory=' + category;
 	}
 
-	var photo = $('#photoLinked0').val()
-	var photoPost = ''
+	var photo = elementRiskSign.find('.risksign-photo-single .filename').val();
+	var photoPost = '';
 	if (photo !== 0) {
-		photoPost = '&photo=' + encodeURI(photo)
+		photoPost = '&photo=' + encodeURI(photo);
 	}
 
-	$('.main-table').load( document.URL + '&action=add' + refPost  + categoryPost  + descriptionPost  + photoPost + ' .main-table')
-}
+	var description = elementRiskSign.find('.risksign-description textarea').val();
+	var descriptionPost = '';
+	if (description !== '') {
+		descriptionPost = '&riskSignDescription=' + encodeURI(description);
+	}
+
+	$('.div-table-responsive').load( document.URL + '&action=add' + categoryPost + photoPost + descriptionPost + ' .div-table-responsive');
+};
+
 
 /**
- * Action edit signalisation.
+ * Action delete risksign.
  *
  * @since   1.0.0
  * @version 1.0.0
  *
  * @return {void}
  */
-window.eoxiaJS.signalisation.editSignalisation = function ( event ) {
-	let editedSignalisationId = $(this).attr('value')
-	$('#signalisation_row_'+editedSignalisationId).empty()
-	$('#signalisation_row_'+editedSignalisationId).load( document.URL + '&action=editSignalisation' + editedSignalisationId + ' #signalisation_row_'+editedSignalisationId+' > div')
-}
-
-/**
- * Action delete signalisation.
- *
- * @since   1.0.0
- * @version 1.0.0
- *
- * @return {void}
- */
-window.eoxiaJS.signalisation.deleteSignalisation = function ( event ) {
-
-	let deletedSignalisationId = $(this).attr('value')
-	var r = confirm('Are you sure you want to delete this signalisation ?')
+window.eoxiaJS.risksign.deleteRiskSign = function ( event ) {
+	let deletedRiskSignId = $(this).attr('value')
+	var r = confirm('Are you sure you want to delete this risksign ?')
 	if (r == true) {
-		$('#signalisation_row_'+deletedSignalisationId).empty()
-		$('#signalisation_row_'+deletedSignalisationId).load( document.URL + '&action=deleteSignalisation&deletedSignalisationId=' + deletedSignalisationId + ' #signalisation_row_'+deletedSignalisationId+' > div')
+		$('#risksign_row_'+deletedRiskSignId).empty()
+		$('#risksign_row_'+deletedRiskSignId).load( document.URL + '&action=deleteRiskSign&deletedRiskSignId=' + deletedRiskSignId + ' #risksign_row_'+deletedRiskSignId+' > div')
 	} else {
 		return false
 	}
-}
+};
 
 /**
- * Action save signalisation.
+ * Action save risksign.
  *
  * @since   1.0.0
  * @version 1.0.0
  *
  * @return {void}
  */
-window.eoxiaJS.signalisation.saveSignalisation = function ( event ) {
+window.eoxiaJS.risksign.saveRiskSign = function ( event ) {
+	let editedRiskSignId = $(this).attr('value');
+	let elementRiskSign = $(this).closest('.risksign-container').find('.risksign-content');
 
-	let editedSignalisationId = $(this).attr('value')
-
-	var description = $('#signalisationComment'+editedSignalisationId).val()
-	var descriptionPost = ''
-	if (description !== '') {
-		descriptionPost = '&signalisationComment=' + encodeURI(description)
+	var category = elementRiskSign.find('.risksign-category input').val();
+	var categoryPost = '';
+	if (category !== 0) {
+		categoryPost = '&riskSignCategory=' + category;
 	}
 
-	var photo = $('#photoLinked'+editedSignalisationId).val()
-	var photoPost = ''
+	var photo = elementRiskSign.find('.risksign-photo-single .filename').val();
+	var photoPost = '';
 	if (photo !== 0) {
-		photoPost = '&photo=' + encodeURI(photo)
+		photoPost = '&photo=' + encodeURI(photo);
 	}
 
-	$('#signalisation_row_'+editedSignalisationId).empty()
-	$('#signalisation_row_'+editedSignalisationId).load( document.URL + '&action=saveSignalisation&signalisationID=' + editedSignalisationId + descriptionPost + photoPost + ' #signalisation_row_'+editedSignalisationId+' > div')
-}
+	var description = elementRiskSign.find('.risksign-description textarea').val();
+	var descriptionPost = '';
+	if (description !== '') {
+		descriptionPost = '&riskSignDescription=' + encodeURI(description);
+	}
 
-window.eoxiaJS.signalisation.haveSignalisationDataInInput = function( element ) {
-	$( '.action .wpeo-button.button-disable' ).removeClass( 'button-disable' );
+	$(this).closest('.div-table-responsive').load( document.URL + '&action=saveRiskSign&riskSignID=' + editedRiskSignId + categoryPost + photoPost + descriptionPost + ' .div-table-responsive');
 };

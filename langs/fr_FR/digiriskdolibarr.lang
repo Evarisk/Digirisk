@@ -439,6 +439,26 @@ SelectCotation = Sélectionnez les cases pour calculer votre cotation
 EvaluationList = Liste des évaluations du risque
 
 
+
+#
+# RiskSign - Signalisation
+#
+
+# Mod Numbering - Modèle de numérotation
+DigiriskRiskSignStandardModel = Renvoie le numéro sous la forme RSn où n est un compteur séquentiel sans rupture et sans remise à 0.
+DigiriskRiskSignNumberingModule = Modèle de numérotation des signalisation des risques de Digirisk
+
+# Data - Donnée
+RiskSign = Signalisation
+RiskSignCategory = Catégorie
+AddRiskSignTitle = Ajout d'une signalisation
+AddRiskSignButton = Ajouter la signalisation
+UpdateRiskSign = Mettre à jour
+
+DigiriskElementRiskSignList = Liste des signalisations
+DigiriskElementRiskSign = Signalisation
+
+
 #
 # Other
 #

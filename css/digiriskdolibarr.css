@@ -1664,6 +1664,29 @@
   text-decoration: underline;
 }
 
+.risksign-photo {
+  width: 50px;
+  min-width: 50px;
+  height: 50px;
+  background: #ececec;
+  margin-right: 0.5em;
+}
+
+.risksign-photo .photodigiriskdolibarr {
+  width: 100%;
+  height: auto;
+  background: #fff;
+}
+
+.risksign-content {
+  width: 100%;
+}
+
+.risksign-add {
+  min-width: 40px;
+  margin-left: 0.5em;
+}
+
 .risk-evaluation-container .risk-evaluation-single {
   display: -webkit-box;
   display: -ms-flexbox;
@@ -1970,6 +1993,60 @@
 
 .wpeo-modal .modal-container .risk-evaluations-list .risk-evaluation > .risk-evaluation-container .risk-evaluation-actions {
   margin-left: auto;
+}
+
+.wpeo-modal[class*="modal-risksign"] .modal-container .title {
+  display: block;
+  font-weight: 600;
+  font-size: 13px;
+  margin-bottom: 0.6em;
+  color: rgba(0, 0, 0, 0.8);
+}
+
+.wpeo-modal[class*="modal-risksign"] .modal-container .title required {
+  font-size: 18px;
+  color: #0d8aff;
+  vertical-align: text-top;
+  line-height: 0.9;
+}
+
+.wpeo-modal[class*="modal-risksign"] .modal-container .section-title {
+  font-size: 16px;
+  color: rgba(0, 0, 0, 0.8);
+  font-weight: 600;
+  margin-bottom: 0.6em;
+  display: block;
+}
+
+.wpeo-modal[class*="modal-risksign"] .modal-container .risksign-content {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  padding-bottom: 1em;
+  margin-bottom: 1em;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+}
+
+.wpeo-modal[class*="modal-risksign"] .modal-container .risksign-content .risksign-category {
+  margin-right: 1.5em;
+}
+
+.wpeo-modal[class*="modal-risksign"] .modal-container .risksign-content .risksign-category .dropdown-toggle::after {
+  display: none;
+}
+
+.wpeo-modal[class*="modal-risksign"] .modal-container .risksign-content .risksign-photo img {
+  max-width: 50px;
+}
+
+.wpeo-modal[class*="modal-risksign"] .modal-container .risksign-content .risksign-description {
+  -webkit-box-flex: 1;
+  -ms-flex-positive: 1;
+  flex-grow: 1;
+}
+
+.wpeo-modal[class*="modal-risksign"] .modal-container .risksign-content .risksign-description textarea {
+  width: 100%;
 }
 
 .wpeo-modal .modal-container ul, .wpeo-modal .modal-container li {

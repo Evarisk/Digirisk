@@ -102,6 +102,7 @@ class modDigiriskdolibarr extends DolibarrModules
 
 		$this->dirs = array(
 			"/digiriskdolibarr/riskassessment",
+			"/digiriskdolibarr/risksign",
 			"/ecm/digiriskdolibarr",
 			"/ecm/digiriskdolibarr/legaldisplay",
 			"/ecm/digiriskdolibarr/informationssharing",
@@ -201,6 +202,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			64 => array('DIGIRISKDOLIBARR_LISTINGRISKSACTION_DEFAULT_MODEL','chaine', 'listingrisksaction_odt' ,'', 1),
 			65 => array('LEGALDISPLAY_STANDARD_MASK','chaine','V{0000}','', 1),
 			84 => array('DIGIRISKDOLIBARR_RISKASSESSMENT_ADDON','chaine', 'mod_riskassessment_standard' ,'', 1),
+			88 => array('DIGIRISKDOLIBARR_RISKSIGN_ADDON','chaine', 'mod_risksign_standard' ,'', 1),
 
 		);
 
@@ -399,6 +401,25 @@ class modDigiriskdolibarr extends DolibarrModules
 		$this->rights[$r][1] = $langs->trans('DeleteReadListingRisksPhoto');
 		$this->rights[$r][4] = 'listingrisksphoto';
 		$this->rights[$r][5] = 'delete';
+		$r++;
+
+		/* RISK SIGN PERMISSIONS */
+
+		$this->rights[$r][0] = $this->numero.$r;
+		$this->rights[$r][1] = $langs->trans('ReadDigiriskRiskSign');
+		$this->rights[$r][4] = 'risksign';
+		$this->rights[$r][5] = 'read';
+		$r++;
+		$this->rights[$r][0] = $this->numero.$r;
+		$this->rights[$r][1] = $langs->trans('CreateDigiriskRiskSign');
+		$this->rights[$r][4] = 'risksign';
+		$this->rights[$r][5] = 'write';
+		$r++;
+		$this->rights[$r][0] = $this->numero.$r;
+		$this->rights[$r][1] = $langs->trans('DeleteDigiriskRiskSign');
+		$this->rights[$r][4] = 'risksign';
+		$this->rights[$r][5] = 'delete';
+		$r++;
 
 		// Main menu entries to add
 		$this->menu = array();

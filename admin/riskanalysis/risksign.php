@@ -16,9 +16,9 @@
  */
 
 /**
- * \file    digiriskdolibarr/admin/groupment.php
+ * \file    digiriskdolibarr/admin/risksign.php
  * \ingroup digiriskdolibarr
- * \brief   Digiriskdolibarr groupment page.
+ * \brief   Digiriskdolibarr risksign page.
  */
 
 // Load Dolibarr environment
@@ -44,7 +44,7 @@ $action     = GETPOST('action', 'alpha');
 $backtopage = GETPOST('backtopage', 'alpha');
 $value      = GETPOST('value', 'alpha');
 
-$type          = 'groupment';
+$type          = 'risksign';
 $error         = 0;
 $setupnotempty = 0;
 
@@ -53,10 +53,10 @@ $setupnotempty = 0;
  */
 if ($action == 'updateMask')
 {
-	$maskconstgroupment = GETPOST('maskconstgroupment', 'alpha');
-	$maskgroupment      = GETPOST('maskgroupment', 'alpha');
+	$maskconstrisksign = GETPOST('maskconstrisksign', 'alpha');
+	$maskrisksign      = GETPOST('maskrisksign', 'alpha');
 
-	if ($maskconstgroupment) $res = dolibarr_set_const($db, $maskconstgroupment, $maskgroupment, 'chaine', 0, '', $conf->entity);
+	if ($maskconstrisksign) $res = dolibarr_set_const($db, $maskconstrisksign, $maskrisksign, 'chaine', 0, '', $conf->entity);
 
 	if (!$res > 0) $error++;
 
@@ -78,7 +78,7 @@ if ($action == 'setmod')
  * View
  */
 
-$form            = new Form($db);
+$form = new Form($db);
 
 $help_url  = 'FR:Module_DigiriskDolibarr';
 $page_name = "DigiriskdolibarrSetup";
@@ -92,15 +92,15 @@ print load_fiche_titre($langs->trans($page_name), $linkback, 'object_digiriskdol
 
 // Configuration header
 $head = digiriskdolibarrAdminPrepareHead();
-dol_fiche_head($head, 'digiriskelement', '', -1, "digiriskdolibarr@digiriskdolibarr");
-$head = digiriskdolibarrAdminDigiriskElementPrepareHead();
-dol_fiche_head($head, 'groupment', '', -1, "digiriskdolibarr@digiriskdolibarr");
+dol_fiche_head($head, 'riskanalysis', '', -1, "digiriskdolibarr@digiriskdolibarr");
+$head = digiriskdolibarrAdminRiskAnalysisPrepareHead();
+dol_fiche_head($head, 'risksign', '', -1, "digiriskdolibarr@digiriskdolibarr");
 
 /*
  *  Numbering module
  */
 
-print load_fiche_titre($langs->trans("DigiriskGroupmentNumberingModule"), '', '');
+print load_fiche_titre($langs->trans("DigiriskRiskSignNumberingModule"), '', '');
 
 print '<table class="noborder centpercent">';
 print '<tr class="liste_titre">';
@@ -113,7 +113,7 @@ print '</tr>'."\n";
 
 clearstatcache();
 
-$dir = dol_buildpath("/custom/digiriskdolibarr/core/modules/digiriskdolibarr/digiriskelement/".$type."/");
+$dir = dol_buildpath("/custom/digiriskdolibarr/core/modules/digiriskdolibarr/riskanalysis/".$type."/");
 if (is_dir($dir))
 {
 	$handle = opendir($dir);
@@ -152,7 +152,7 @@ if (is_dir($dir))
 						print '</td>'."\n";
 
 						print '<td class="center">';
-						if ($conf->global->DIGIRISKDOLIBARR_GROUPMENT_ADDON == $file || $conf->global->DIGIRISKDOLIBARR_GROUPMENT_ADDON.'.php' == $file)
+						if ($conf->global->DIGIRISKDOLIBARR_RISKSIGN_ADDON == $file || $conf->global->DIGIRISKDOLIBARR_RISKSIGN_ADDON.'.php' == $file)
 						{
 							print img_picto($langs->trans("Activated"), 'switch_on');
 						}
@@ -179,7 +179,7 @@ if (is_dir($dir))
 
 						print '<td class="center">';
 						print $form->textwithpicto('', $htmltooltip, 1, 0);
-						if ($conf->global->DIGIRISKDOLIBARR_GROUPMENT_ADDON.'.php' == $file)  // If module is the one used, we show existing errors
+						if ($conf->global->DIGIRISKDOLIBARR_RISKSIGN_ADDON.'.php' == $file)  // If module is the one used, we show existing errors
 						{
 							if (!empty($module->error)) dol_htmloutput_mesg($module->error, '', 'error', 1);
 						}
