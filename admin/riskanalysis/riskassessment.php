@@ -74,6 +74,12 @@ if ($action == 'setmod')
 	dolibarr_set_const($db, $constforval, $value, 'chaine', 0, '', $conf->entity);
 }
 
+if ($action == 'setmethod')
+{
+	$constforval = 'DIGIRISKDOLIBARR_MULTIPLE_'.strtoupper($type).'_METHOD';
+	dolibarr_set_const($db, $constforval, $value, 'integer', 0, '', $conf->entity);
+}
+
 /*
  * View
  */
@@ -194,6 +200,32 @@ if (is_dir($dir))
 }
 
 print '</table>';
+
+print load_fiche_titre($langs->trans("DigiriskRiskAssessmentData"), '', '');
+
+print '<table class="noborder centpercent">';
+print '<tr class="liste_titre">';
+print '<td>'.$langs->trans("Name").'</td>';
+print '<td>'.$langs->trans("Description").'</td>';
+print '<td class="center" width="60">'.$langs->trans("Status").'</td>';
+print '</tr>'."\n";
+
+print '<tr class="oddeven"><td>';
+print $langs->trans('MultipleRiskAssessmentMethodName');
+print "</td><td>\n";
+print $langs->trans('MultipleRiskAssessmentMethodDescription');
+print '</td>';
+
+print '<td class="center">';
+if ($conf->global->DIGIRISKDOLIBARR_MULTIPLE_RISKASSESSMENT_METHOD)
+{
+	print '<a class="reposition" href="'.$_SERVER["PHP_SELF"].'?action=setmethod&value=0" alt="'.$langs->trans("Default").'">'.img_picto($langs->trans("Activated"), 'switch_on');
+}
+else
+{
+	print '<a class="reposition" href="'.$_SERVER["PHP_SELF"].'?action=setmethod&value=1" alt="'.$langs->trans("Default").'">'.img_picto($langs->trans("Disabled"), 'switch_off').'</a>';
+}
+print '</td>';
 
 // Page end
 dol_fiche_end();
