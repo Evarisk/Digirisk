@@ -376,16 +376,32 @@ if ((empty($action) || ($action != 'edit' && $action != 'create')))
 
 		print '</td></tr>';
 
-	} else {
-		unset($object->fields['description']);
-		unset($object->fields['label']);
 	}
 
 	//Show common fields
-	include DOL_DOCUMENT_ROOT.'/core/tpl/commonfields_view.tpl.php';
+//	include DOL_DOCUMENT_ROOT.'/core/tpl/commonfields_view.tpl.php';
 
 	// Other attributes. Fields from hook formObjectOptions and Extrafields.
 	include DOL_DOCUMENT_ROOT.'/core/tpl/extrafields_view.tpl.php';
+
+	print '</table>';
+	print '</div>';
+
+	print '<div class="fichehalfright">';
+	print '<div class="ficheaddleft">';
+	print '<div class="underbanner clearboth"></div>';
+
+	print '<table class="border tableforfield" width="100%">';
+
+	// label
+	print '<td class="titlefield tdtop">'.$langs->trans("label").'</td><td>';
+	print dol_htmlentitiesbr($object->label);
+	print '</td></tr>';
+
+	// Description
+	print '<td class="titlefield tdtop">'.$langs->trans("Description").'</td><td>';
+	print dol_htmlentitiesbr($object->description);
+	print '</td></tr>';
 
 	print '</table>';
 	print '</div>';
