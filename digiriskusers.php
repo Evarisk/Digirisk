@@ -841,6 +841,9 @@ $reshook = $hookmanager->executeHooks('printFieldListFooter', $parameters); // N
 print $hookmanager->resPrint;
 
 print "</table>";
+
+print "</form>\n";
+
 if ($canadduser) {
 	print '<form action="'.$_SERVER['PHP_SELF'].'" method="POST" name="createuser">';
 	print '<input type="hidden" name="token" value="'.newToken().'">';
@@ -881,13 +884,12 @@ if ($canadduser) {
 		</div>
 	</div>
 	<?php
+	$action = '';
 	print '</form>';
 	print '</table></tr>';
 }
 
 print '</div>';
-
-print "</form>\n";
 
 $db->free($result);
 
