@@ -388,8 +388,8 @@ window.eoxiaJS.modal.openModal = function ( event ) {
 
 	// Open modal evaluation.
 	if ($(this).hasClass('risk-evaluation-add')) {
-		$('#risk_evaluation_add').addClass('modal-active');
-		$('.risk-evaluation-create').attr('value', idSelected);
+		$('#risk_evaluation_add'+idSelected).addClass('modal-active');
+		$('.risk-evaluation-create'+idSelected).attr('value', idSelected);
 	} else if ($(this).hasClass('risk-evaluation-list')) {
 		$('#risk_evaluation_list' + idSelected).addClass('modal-active');
 	} else if ($(this).hasClass('risk-evaluation-photo')) {

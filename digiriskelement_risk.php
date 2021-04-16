@@ -1160,7 +1160,7 @@ if ($object->id > 0) {
 									<div class="risk-evaluation-comment"><?php echo $lastEvaluation->comment; ?></div>
 								</div>
 								<!-- BUTTON MODAL RISK EVALUATION ADD  -->
-								<div class="risk-evaluation-add wpeo-button button-square-40 button-primary modal-open" value="<?php echo $risk->id ?>">
+								<div class="risk-evaluation-add wpeo-button button-square-40 button-primary modal-open" value="<?php echo $risk->id;?>">
 									<i class="fas fa-plus button-icon"></i>
 								</div>
 							</div>
@@ -1242,68 +1242,68 @@ if ($object->id > 0) {
 																				<div class="risk-evaluation-content-wrapper">
 																					<div class="risk-evaluation-content">
 																						<div class="cotation-container">
-																								<div class="cotation-standard" style="<?php echo ($cotation->method == "standard") ? " display:block" : " display:none" ?>">
-																									<span class="title"><i class="fas fa-chart-line"></i><?php echo ' ' . $langs->trans('Cotation'); ?></span>
-																									<div class="cotation-listing wpeo-gridlayout grid-4 grid-gap-0">
-																										<?php
-																										$defaultCotation = array(0, 48, 51, 100);
-																										if ( ! empty( $defaultCotation )) :
-																											foreach ( $defaultCotation as $request ) :
-																												$evaluation->cotation = $request; ?>
-																												<div data-id="<?php echo 0; ?>"
-																													 data-evaluation-method="standard"
-																													 data-evaluation-id="<?php echo $request; ?>"
-																													 data-variable-id="<?php echo 152+$request; ?>"
-																													 data-seuil="<?php echo  $evaluation->get_evaluation_scale(); ?>"
-																													 data-scale="<?php echo  $evaluation->get_evaluation_scale(); ?>"
-																													 class="risk-evaluation-cotation cotation<?php echo ($cotation->cotation == $request) ? " selected-cotation" : "" ?>"><?php echo $request; ?></div>
-																											<?php endforeach;
-																										endif; ?>
-																									</div>
-																								</div>
-																								<input class="risk-evaluation-seuil" type="hidden" value="<?php echo $cotation->cotation ?>">
-																								<?php
-																								$evaluation_method = $advanced_method_cotation_array[0];
-																								$evaluation_method_survey = $evaluation_method['option']['variable'];
-																								?>
-																								<div class="wpeo-gridlayout cotation-advanced" style="<?php echo ($cotation->method == "advanced") ? " display:block" : " display:none" ?>">
-																									<input type="hidden" class="digi-method-evaluation-id" value="<?php echo $risk->id ; ?>" />
-																									<textarea style="display: none" name="evaluation_variables" class="tmp_evaluation_variable"><?php echo '{}'; ?></textarea>
-																									<span class="title"><i class="fas fa-info-circle"></i> <?php echo $langs->trans('SelectCotation') ?></span>
-																									<div class="wpeo-table evaluation-method table-flex table-<?php echo count($evaluation_method_survey) + 1; ?>">
-																										<div class="table-row table-header">
-																											<div class="table-cell">
-																												<span></span>
-																											</div>
-																											<?php for ( $l = 0; $l < count($evaluation_method_survey); $l++ ) : ?>
-																												<div class="table-cell">
-																													<span><?php echo $l; ?></span>
-																												</div>
-																											<?php endfor; ?>
-																										</div>
-																										<?php $l = 0;
-																										foreach($evaluation_method_survey as $critere) :
-																											$name = strtolower($critere['name']); ?>
-																											<div class="table-row">
-																												<div class="table-cell"><?php echo $critere['name'] ; ?></div>
-																												<?php foreach($critere['option']['survey']['request'] as $request) : ?>
-																													<div class="table-cell can-select cell-<?php echo $cotation->id ? $cotation->id : 0;
-																														if (!empty($request['seuil'])) {
-																															echo $request['seuil'] == $cotation->$name ? " active" : "" ;
-																														} ?>"
-																														 data-type="<?php echo $name ?>"
-																														 data-id="<?php echo  $risk->id ? $risk->id : 0 ; ?>"
-																														 data-evaluation-id="<?php echo $cotation->id ? $cotation->id : 0 ; ?>"
-																														 data-variable-id="<?php echo $l ; ?>"
-																														 data-seuil="<?php echo  $request['seuil']; ?>">
-																														<?php echo  $request['question'] ; ?>
-																													</div>
-																												<?php endforeach; $l++; ?>
-																											</div>
-																										<?php endforeach; ?>
-																									</div>
+																							<div class="cotation-standard" style="<?php echo ($cotation->method == "standard") ? " display:block" : " display:none" ?>">
+																								<span class="title"><i class="fas fa-chart-line"></i><?php echo ' ' . $langs->trans('Cotation'); ?></span>
+																								<div class="cotation-listing wpeo-gridlayout grid-4 grid-gap-0">
+																									<?php
+																									$defaultCotation = array(0, 48, 51, 100);
+																									if ( ! empty( $defaultCotation )) :
+																										foreach ( $defaultCotation as $request ) :
+																											$evaluation->cotation = $request; ?>
+																											<div data-id="<?php echo 0; ?>"
+																												 data-evaluation-method="standard"
+																												 data-evaluation-id="<?php echo $request; ?>"
+																												 data-variable-id="<?php echo 152+$request; ?>"
+																												 data-seuil="<?php echo  $evaluation->get_evaluation_scale(); ?>"
+																												 data-scale="<?php echo  $evaluation->get_evaluation_scale(); ?>"
+																												 class="risk-evaluation-cotation cotation<?php echo ($cotation->cotation == $request) ? " selected-cotation" : "" ?>"><?php echo $request; ?></div>
+																										<?php endforeach;
+																									endif; ?>
 																								</div>
 																							</div>
+																							<input class="risk-evaluation-seuil" type="hidden" value="<?php echo $cotation->cotation ?>">
+																							<?php
+																							$evaluation_method = $advanced_method_cotation_array[0];
+																							$evaluation_method_survey = $evaluation_method['option']['variable'];
+																							?>
+																							<div class="wpeo-gridlayout cotation-advanced" style="<?php echo ($cotation->method == "advanced") ? " display:block" : " display:none" ?>">
+																								<input type="hidden" class="digi-method-evaluation-id" value="<?php echo $risk->id ; ?>" />
+																								<textarea style="display: none" name="evaluation_variables" class="tmp_evaluation_variable"><?php echo '{}'; ?></textarea>
+																								<span class="title"><i class="fas fa-info-circle"></i> <?php echo $langs->trans('SelectCotation') ?></span>
+																								<div class="wpeo-table evaluation-method table-flex table-<?php echo count($evaluation_method_survey) + 1; ?>">
+																									<div class="table-row table-header">
+																										<div class="table-cell">
+																											<span></span>
+																										</div>
+																										<?php for ( $l = 0; $l < count($evaluation_method_survey); $l++ ) : ?>
+																											<div class="table-cell">
+																												<span><?php echo $l; ?></span>
+																											</div>
+																										<?php endfor; ?>
+																									</div>
+																									<?php $l = 0;
+																									foreach($evaluation_method_survey as $critere) :
+																										$name = strtolower($critere['name']); ?>
+																										<div class="table-row">
+																											<div class="table-cell"><?php echo $critere['name'] ; ?></div>
+																											<?php foreach($critere['option']['survey']['request'] as $request) : ?>
+																												<div class="table-cell can-select cell-<?php echo $cotation->id ? $cotation->id : 0;
+																												if (!empty($request['seuil'])) {
+																													echo $request['seuil'] == $cotation->$name ? " active" : "" ;
+																												} ?>"
+																													 data-type="<?php echo $name ?>"
+																													 data-id="<?php echo  $risk->id ? $risk->id : 0 ; ?>"
+																													 data-evaluation-id="<?php echo $cotation->id ? $cotation->id : 0 ; ?>"
+																													 data-variable-id="<?php echo $l ; ?>"
+																													 data-seuil="<?php echo  $request['seuil']; ?>">
+																													<?php echo  $request['question'] ; ?>
+																												</div>
+																											<?php endforeach; $l++; ?>
+																										</div>
+																									<?php endforeach; ?>
+																								</div>
+																							</div>
+																						</div>
 																					</div>
 																					<div class="risk-evaluation-photo">
 																						<span class="title"><?php echo $langs->trans('Photo'); ?></span>
@@ -1415,6 +1415,185 @@ if ($object->id > 0) {
 									</div>
 								</div>
 							</div>
+							<!-- RISK EVALUATION ADD MODAL-->
+							<div class="risk-evaluation-add-modal">
+								<div class="wpeo-modal modal-risk" id="risk_evaluation_add<?php echo $risk->id?>">
+									<div class="modal-container wpeo-modal-event">
+										<!-- Modal-Header -->
+										<div class="modal-header">
+											<h2 class="modal-title"><?php echo $langs->trans('EvaluationCreate') . ' ' . $refEvaluationMod->getNextValue($evaluation)?></h2>
+											<div class="modal-close"><i class="fas fa-times"></i></div>
+										</div>
+										<!-- Modal-ADD Evaluation Content-->
+										<div class="modal-content" id="#modalContent<?php echo $risk->id?>">
+											<div class="risk-evaluation-container">
+												<div class="risk-evaluation-header">
+													<?php if ($lastEvaluation->method == 'standard') : ?>
+														<div class="wpeo-button evaluation-standard select-evaluation-method selected button-blue button-radius-2">
+															<span><?php echo $langs->trans('SimpleCotation') ?></span>
+														</div>
+													<?php elseif ($lastEvaluation->method == 'advanced') : ?>
+														<div class="wpeo-button evaluation-advanced select-evaluation-method button-blue button-radius-2">
+															<span><?php echo $langs->trans('AdvancedCotation') ?></span>
+														</div>
+													<?php endif; ?>
+													<input class="risk-evaluation-method" type="hidden" value="standard">
+												</div>
+												<div class="risk-evaluation-content-wrapper">
+													<div class="risk-evaluation-content">
+														<div class="cotation-container">
+															<?php if ($lastEvaluation->method == 'standard') : ?>
+																<div class="cotation-standard">
+																	<span class="title"><i class="fas fa-chart-line"></i><?php echo ' ' . $langs->trans('Cotation'); ?><required>*</required></span>
+																	<div class="cotation-listing wpeo-gridlayout grid-4 grid-gap-0">
+																		<?php
+																		$defaultCotation = array(0, 48, 51, 100);
+																		if ( ! empty( $defaultCotation )) :
+																			foreach ( $defaultCotation as $request ) :
+																				$evaluation->cotation = $request; ?>
+																				<div data-id="<?php echo 0; ?>"
+																					 data-evaluation-method="standard"
+																					 data-evaluation-id="<?php echo $request; ?>"
+																					 data-variable-id="<?php echo 152+$request; ?>"
+																					 data-seuil="<?php echo  $evaluation->get_evaluation_scale(); ?>"
+																					 data-scale="<?php echo  $evaluation->get_evaluation_scale(); ?>"
+																					 class="risk-evaluation-cotation cotation"><?php echo $request; ?></div>
+																			<?php endforeach;
+																		endif; ?>
+																	</div>
+																</div>
+																<input class="risk-evaluation-seuil" type="hidden">
+															<?php elseif ($lastEvaluation->method == 'advanced') :
+																$evaluation_method = $advanced_method_cotation_array[0];
+																$evaluation_method_survey = $evaluation_method['option']['variable']; ?>
+																<input class="risk-evaluation-seuil" type="hidden">
+																<div class="wpeo-gridlayout cotation-advanced">
+																	<input type="hidden" class="digi-method-evaluation-id" value="<?php echo $risk->id ; ?>" />
+																	<textarea style="display: none" name="evaluation_variables" class="tmp_evaluation_variable"><?php echo '{}'; ?></textarea>
+																	<p><i class="fas fa-info-circle"></i> <?php echo $langs->trans('SelectCotation') ?></p>
+																	<div class="wpeo-table evaluation-method table-flex table-<?php echo count($evaluation_method_survey) + 1; ?>">
+																		<div class="table-row table-header">
+																			<div class="table-cell">
+																				<span></span>
+																			</div>
+																			<?php for ( $l = 0; $l < count($evaluation_method_survey); $l++ ) : ?>
+																				<div class="table-cell">
+																					<span><?php echo $l; ?></span>
+																				</div>
+																			<?php endfor; ?>
+																		</div>
+																		<?php $l = 0; ?>
+																		<?php foreach($evaluation_method_survey as $critere) :
+																			$name = strtolower($critere['name']); ?>
+																			<div class="table-row">
+																				<div class="table-cell"><?php echo $critere['name'] ; ?></div>
+																				<?php foreach($critere['option']['survey']['request'] as $request) : ?>
+																					<div class="table-cell can-select cell-<?php echo  $evaluation_id ? $evaluation_id : 0 ; ?>"
+																						 data-type="<?php echo $name ?>"
+																						 data-id="<?php echo  $risk->id ? $risk->id : 0 ; ?>"
+																						 data-evaluation-id="<?php echo $evaluation_id ? $evaluation_id : 0 ; ?>"
+																						 data-variable-id="<?php echo $l ; ?>"
+																						 data-seuil="<?php echo  $request['seuil']; ?>">
+																						<?php echo  $request['question'] ; ?>
+																					</div>
+																				<?php endforeach; $l++; ?>
+																			</div>
+																		<?php endforeach; ?>
+																	</div>
+																</div>
+															<?php endif; ?>
+														</div>
+													</div>
+													<div class="risk-evaluation-photo">
+														<span class="title"><?php echo $langs->trans('Photo'); ?></span>
+														<div class="risk-evaluation-photo-container wpeo-modal-event tooltip hover">
+															<?php
+															$relativepath = 'digiriskdolibarr/medias';
+															$modulepart = 'ecm';
+															$path = DOL_URL_ROOT.'/document.php?modulepart=' . $modulepart  . '&attachment=0&file=' . str_replace('/', '%2F', $relativepath) . '/';
+															$nophoto = '/public/theme/common/nophoto.png'; ?>
+															<!-- BUTTON RISK EVALUATION PHOTO MODAL -->
+															<div class="action risk-evaluation-photo default-photo modal-open" value="<?php echo $risk->id ?>">
+																<span class="floatleft inline-block valignmiddle divphotoref risk-evaluation-photo-single">
+																	<input type="hidden" value="<?php echo $path ?>">
+																	<input class="filename" type="hidden" value="">
+																	<img class="photo maxwidth50"  src="<?php echo DOL_URL_ROOT.'/public/theme/common/nophoto.png' ?>">
+																</span>
+															</div>
+															<!-- RISK EVALUATION PHOTO MODAL -->
+															<div class="wpeo-modal modal-photo" id="risk_evaluation_photo<?php echo $risk->id ?>">
+																<div class="modal-container wpeo-modal-event">
+																	<!-- Modal-Header -->
+																	<div class="modal-header">
+																		<h2 class="modal-title"><?php echo $langs->trans('AddPhoto') ?></h2>
+																		<div class="modal-close"><i class="fas fa-times"></i></div>
+																	</div>
+																	<!-- Modal-Content -->
+																	<div class="modal-content" id="#modalContent<?php echo $object->id ?>">
+																		<div class="action">
+																			<a href="<?php echo '../../ecm/index.php' ?>" target="_blank">
+																				<div class="wpeo-button button-square-50 button-blue">
+																					<i class="button-icon fas fa-plus"></i>
+																				</div>
+																			</a>
+																		</div>
+																		<div class="wpeo-table table-row">
+																			<?php
+																			$files =  dol_dir_list(DOL_DATA_ROOT . '/ecm/digiriskdolibarr/medias');
+																			$relativepath = 'digiriskdolibarr/medias';
+																			$modulepart = 'ecm';
+																			$path = DOL_URL_ROOT.'/document.php?modulepart=' . $modulepart  . '&attachment=0&file=' . str_replace('/', '%2F', $relativepath);
+																			$j = 0;
+																			if ( !empty($files) ) :
+																				foreach ($files as $file) :
+																					print '<div class="table-cell center clickable-photo clickable-photo'. $j .'" value="'. $j .'" element="risk-evaluation">';
+																					if (image_format_supported($file['name']) >= 0) :
+																						$fullpath = $path . '/' . $file['relativename'] . '&entity=' . $conf->entity; ?>
+																						<input class="filename" type="hidden" value="<?php echo $file['name'] ?>">
+																						<img class="photo photo<?php echo $j ?> maxwidth200" src="<?php echo $fullpath; ?>">
+																					<?php else : print '&nbsp;';
+																					endif;
+																					$j++;
+																					print '</div>';
+																				endforeach;
+																			endif; ?>
+																		</div>
+																	</div>
+																	<!-- Modal-Footer -->
+																	<div class="modal-footer">
+																		<div class="save-photo wpeo-button button-blue">
+																			<span><?php echo $langs->trans('SavePhoto'); ?></span>
+																		</div>
+																		<div class="wpeo-button button-grey modal-close">
+																			<span><?php echo $langs->trans('CloseModal'); ?></span>
+																		</div>
+																	</div>
+																</div>
+															</div>
+														</div>
+													</div>
+													<div class="risk-evaluation-calculated-cotation">
+														<span class="title"><i class="fas fa-chart-line"></i> <?php echo $langs->trans('CalculatedCotation'); ?><required>*</required></span>
+														<div data-scale="1" class="risk-evaluation-cotation cotation">
+															<span><?php echo 0 ?></span>
+														</div>
+													</div>
+													<div class="risk-evaluation-comment">
+														<span class="title"><i class="fas fa-comment-dots"></i> <?php echo $langs->trans('Comment'); ?></span>
+														<?php print '<textarea name="evaluationComment'. $risk->id .'" rows="'.ROWS_2.'">'.('').'</textarea>'."\n"; ?>
+													</div>
+												</div>
+											</div>
+										</div>
+										<!-- Modal-Footer -->
+										<div class="modal-footer">
+											<div class="risk-evaluation-create wpeo-button button-blue button-disable modal-close" value="<?php echo $risk->id ?>">
+												<i class="fas fa-plus"></i> <?php echo $langs->trans('Add'); ?>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
 						</div>
 					<?php } else { ?>
 						<div class="risk-evaluation-container">
@@ -1498,181 +1677,7 @@ if ($object->id > 0) {
 	$reshook = $hookmanager->executeHooks('printFieldListFooter', $parameters, $risk); // Note that $action and $risk may have been modified by hook
 	print $hookmanager->resPrint; ?>
 
-	<!-- RISK EVALUATION ADD MODAL-->
-	<div class="risk-evaluation-add-modal">
-		<div class="wpeo-modal modal-risk" id="risk_evaluation_add">
-			<div class="modal-container wpeo-modal-event">
-				<!-- Modal-Header -->
-				<div class="modal-header">
-					<h2 class="modal-title"><?php echo $langs->trans('EvaluationCreate') . ' ' . $refEvaluationMod->getNextValue($evaluation); ?></h2>
-					<div class="modal-close"><i class="fas fa-times"></i></div>
-				</div>
-				<!-- Modal-ADD Evaluation Content-->
-				<div class="modal-content" id="#modalContent">
-					<div class="risk-evaluation-container">
-						<div class="risk-evaluation-header">
-							<div class="wpeo-button evaluation-standard select-evaluation-method selected button-blue button-radius-2">
-								<span><?php echo $langs->trans('SimpleCotation') ?></span>
-							</div>
-							<div class="wpeo-button evaluation-advanced select-evaluation-method button-grey button-radius-2">
-								<span><?php echo $langs->trans('AdvancedCotation') ?></span>
-							</div>
-							<input class="risk-evaluation-method" type="hidden" value="standard">
-						</div>
-						<div class="risk-evaluation-content-wrapper">
-							<div class="risk-evaluation-content">
-								<div class="cotation-container">
-										<div class="cotation-standard">
-											<span class="title"><i class="fas fa-chart-line"></i><?php echo ' ' . $langs->trans('Cotation'); ?><required>*</required></span>
-											<div class="cotation-listing wpeo-gridlayout grid-4 grid-gap-0">
-												<?php
-												$defaultCotation = array(0, 48, 51, 100);
-												if ( ! empty( $defaultCotation )) :
-													foreach ( $defaultCotation as $request ) :
-														$evaluation->cotation = $request; ?>
-														<div data-id="<?php echo 0; ?>"
-															 data-evaluation-method="standard"
-															 data-evaluation-id="<?php echo $request; ?>"
-															 data-variable-id="<?php echo 152+$request; ?>"
-															 data-seuil="<?php echo  $evaluation->get_evaluation_scale(); ?>"
-															 data-scale="<?php echo  $evaluation->get_evaluation_scale(); ?>"
-															 class="risk-evaluation-cotation cotation"><?php echo $request; ?></div>
-													<?php endforeach;
-												endif; ?>
-											</div>
-										</div>
-										<input class="risk-evaluation-seuil" type="hidden">
-										<?php
-										$evaluation_method = $advanced_method_cotation_array[0];
-										$evaluation_method_survey = $evaluation_method['option']['variable'];
-										?>
-										<div class="wpeo-gridlayout cotation-advanced" style="display:none">
-											<input type="hidden" class="digi-method-evaluation-id" value="<?php echo $risk->id ; ?>" />
-											<textarea style="display: none" name="evaluation_variables" class="tmp_evaluation_variable"><?php echo '{}'; ?></textarea>
-											<p><i class="fas fa-info-circle"></i> <?php echo $langs->trans('SelectCotation') ?></p>
-											<div class="wpeo-table evaluation-method table-flex table-<?php echo count($evaluation_method_survey) + 1; ?>">
-												<div class="table-row table-header">
-													<div class="table-cell">
-														<span></span>
-													</div>
-													<?php for ( $l = 0; $l < count($evaluation_method_survey); $l++ ) : ?>
-														<div class="table-cell">
-															<span><?php echo $l; ?></span>
-														</div>
-													<?php endfor; ?>
-												</div>
-												<?php $l = 0; ?>
-												<?php foreach($evaluation_method_survey as $critere) :
-													$name = strtolower($critere['name']); ?>
-													<div class="table-row">
-														<div class="table-cell"><?php echo $critere['name'] ; ?></div>
-														<?php foreach($critere['option']['survey']['request'] as $request) : ?>
-															<div class="table-cell can-select cell-<?php echo  $evaluation_id ? $evaluation_id : 0 ; ?>"
-																 data-type="<?php echo $name ?>"
-																 data-id="<?php echo  $risk->id ? $risk->id : 0 ; ?>"
-																 data-evaluation-id="<?php echo $evaluation_id ? $evaluation_id : 0 ; ?>"
-																 data-variable-id="<?php echo $l ; ?>"
-																 data-seuil="<?php echo  $request['seuil']; ?>">
-																<?php echo  $request['question'] ; ?>
-															</div>
-														<?php endforeach; $l++; ?>
-													</div>
-												<?php endforeach; ?>
-											</div>
-										</div>
-									</div>
-							</div>
-							<div class="risk-evaluation-photo">
-								<span class="title"><?php echo $langs->trans('Photo'); ?></span>
-								<div class="risk-evaluation-photo-container wpeo-modal-event tooltip hover">
-									<?php
-									$relativepath = 'digiriskdolibarr/medias';
-									$modulepart = 'ecm';
-									$path = DOL_URL_ROOT.'/document.php?modulepart=' . $modulepart  . '&attachment=0&file=' . str_replace('/', '%2F', $relativepath) . '/';
-									$nophoto = '/public/theme/common/nophoto.png'; ?>
-									<!-- BUTTON RISK EVALUATION PHOTO MODAL -->
-									<div class="action risk-evaluation-photo default-photo modal-open" value="<?php echo $risk->id ?>">
-										<span class="floatleft inline-block valignmiddle divphotoref risk-evaluation-photo-single">
-											<input type="hidden" value="<?php echo $path ?>">
-											<input class="filename" type="hidden" value="">
-											<img class="photo maxwidth50"  src="<?php echo DOL_URL_ROOT.'/public/theme/common/nophoto.png' ?>">
-										</span>
-									</div>
-									<!-- RISK EVALUATION PHOTO MODAL -->
-									<div class="wpeo-modal modal-photo" id="risk_evaluation_photo<?php echo $risk->id ?>">
-										<div class="modal-container wpeo-modal-event">
-											<!-- Modal-Header -->
-											<div class="modal-header">
-												<h2 class="modal-title"><?php echo $langs->trans('AddPhoto') ?></h2>
-												<div class="modal-close"><i class="fas fa-times"></i></div>
-											</div>
-											<!-- Modal-Content -->
-											<div class="modal-content" id="#modalContent<?php echo $object->id ?>">
-												<div class="action">
-													<a href="<?php echo '../../ecm/index.php' ?>" target="_blank">
-														<div class="wpeo-button button-square-50 button-blue">
-															<i class="button-icon fas fa-plus"></i>
-														</div>
-													</a>
-												</div>
-												<div class="wpeo-table table-row">
-													<?php
-													$files =  dol_dir_list(DOL_DATA_ROOT . '/ecm/digiriskdolibarr/medias');
-													$relativepath = 'digiriskdolibarr/medias';
-													$modulepart = 'ecm';
-													$path = DOL_URL_ROOT.'/document.php?modulepart=' . $modulepart  . '&attachment=0&file=' . str_replace('/', '%2F', $relativepath);
-													$j = 0;
 
-													if ( !empty($files) ) :
-														foreach ($files as $file) :
-															print '<div class="table-cell center clickable-photo clickable-photo'. $j .'" value="'. $j .'" element="risk-evaluation">';
-															if (image_format_supported($file['name']) >= 0) :
-																$fullpath = $path . '/' . $file['relativename'] . '&entity=' . $conf->entity; ?>
-																<input class="filename" type="hidden" value="<?php echo $file['name'] ?>">
-																<img class="photo photo<?php echo $j ?> maxwidth200" src="<?php echo $fullpath; ?>">
-															<?php else : print '&nbsp;';
-															endif;
-															$j++;
-															print '</div>';
-														endforeach;
-													endif; ?>
-												</div>
-											</div>
-											<!-- Modal-Footer -->
-											<div class="modal-footer">
-												<div class="save-photo wpeo-button button-blue">
-													<span><?php echo $langs->trans('SavePhoto'); ?></span>
-												</div>
-												<div class="wpeo-button button-grey modal-close">
-													<span><?php echo $langs->trans('CloseModal'); ?></span>
-												</div>
-											</div>
-										</div>
-									</div>
-								</div>
-							</div>
-							<div class="risk-evaluation-calculated-cotation" style="display: none">
-								<span class="title"><i class="fas fa-chart-line"></i> <?php echo $langs->trans('CalculatedCotation'); ?><required>*</required></span>
-								<div data-scale="1" class="risk-evaluation-cotation cotation">
-									<span><?php echo 0 ?></span>
-								</div>
-							</div>
-							<div class="risk-evaluation-comment">
-								<span class="title"><i class="fas fa-comment-dots"></i> <?php echo $langs->trans('Comment'); ?></span>
-								<?php print '<textarea name="evaluationComment'. $risk->id .'" rows="'.ROWS_2.'">'.('').'</textarea>'."\n"; ?>
-							</div>
-						</div>
-					</div>
-				</div>
-				<!-- Modal-Footer -->
-				<div class="modal-footer">
-					<div class="risk-evaluation-create wpeo-button button-blue button-disable modal-close" value="">
-						<i class="fas fa-plus"></i> <?php echo $langs->trans('Add'); ?>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
 
 	<?php print '</table>'."\n";
 	print '<!-- End table -->';
