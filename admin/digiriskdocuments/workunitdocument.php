@@ -328,7 +328,7 @@ if (is_dir($dir))
 
 						// Default
 						print '<td class="center">';
-						if ($conf->global->DIGIRISKDOLIBARR_WORKUNIT_DOCUMENT_DEFAULT_MODEL == $name)
+						if ($conf->global->DIGIRISKDOLIBARR_WORKUNITDOCUMENT_DEFAULT_MODEL == $name)
 						{
 							print img_picto($langs->trans("Default"), 'on');
 						}
