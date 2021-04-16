@@ -42,8 +42,8 @@ function digiriskelementPrepareHead($object)
 		$h++;
 
 		$head[$h][0] = dol_buildpath("/digiriskdolibarr/digiriskelement_evaluator.php", 1) . '?id=' . $object->id;
-		$head[$h][1] = $langs->trans("RiskEvaluator");
-		$head[$h][2] = 'elementRiskEvaluator';
+		$head[$h][1] = $langs->trans("Evaluator");
+		$head[$h][2] = 'elementEvaluator';
 		$h++;
 
 		$head[$h][0] = dol_buildpath("/digiriskdolibarr/digiriskelement_risksign.php", 1) . '?id=' . $object->id;
