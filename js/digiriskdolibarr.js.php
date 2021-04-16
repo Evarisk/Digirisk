@@ -156,20 +156,8 @@ window.eoxiaJS.navigation.event = function() {
 	jQuery( document ).on( 'click', '#newWorkunit', window.eoxiaJS.navigation.switchToggle );
 	jQuery( document ).on( 'click', '.digirisk-wrap .navigation-container .toolbar div', window.eoxiaJS.navigation.toggleAll );
 	jQuery( document ).on( 'click', '#slider', window.eoxiaJS.navigation.setUnitActive );
-	jQuery( document ).on( 'click', '#slider', window.eoxiaJS.navigation.redirect );
 	jQuery( document ).on( 'click', '#newGroupment', window.eoxiaJS.navigation.redirect );
 	jQuery( document ).on( 'click', '#newWorkunit', window.eoxiaJS.navigation.redirect );
-
-	// Tabs DigiriskElement
-	jQuery( document ).on( 'click', '#elementDocument', window.eoxiaJS.navigation.redirect );
-	jQuery( document ).on( 'click', '#elementCard', window.eoxiaJS.navigation.redirect );
-	jQuery( document ).on( 'click', '#elementAgenda', window.eoxiaJS.navigation.redirect );
-	jQuery( document ).on( 'click', '#elementRisk', window.eoxiaJS.navigation.redirect );
-	jQuery( document ).on( 'click', '#elementRiskSign', window.eoxiaJS.navigation.redirect );
-	jQuery( document ).on( 'click', '#elementLegaldisplay', window.eoxiaJS.navigation.redirect );
-	jQuery( document ).on( 'click', '#elementInformationssharing', window.eoxiaJS.navigation.redirect );
-	jQuery( document ).on( 'click', '#elementListingrisksaction', window.eoxiaJS.navigation.redirect );
-	jQuery( document ).on( 'click', '#elementListingrisksphoto', window.eoxiaJS.navigation.redirect );
 
 	// Action Button
 	jQuery( document ).on( 'click', '#actionButtonCancelCreate', window.eoxiaJS.navigation.redirectAfterCancelCreate );
