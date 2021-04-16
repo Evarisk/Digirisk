@@ -143,7 +143,8 @@ if (empty($reshook))
 		$risksign->ref         = $refRiskSignMod->getNextValue($risksign);
 		$risksign->category    = $riskSignCategory;
 		$risksign->photo       = $photo;
-		$risksign->description = $db->escape($riskSignDescription);
+		$risksign->description = $riskSignDescription;
+
 		$risksign->fk_element  = $fk_element ? $fk_element : 0;
 
 		//photo upload and thumbs generation
