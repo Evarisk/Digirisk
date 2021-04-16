@@ -433,6 +433,10 @@ EvaluationMethod = Méthode d'évaluation
 lastEvaluationOn = Dernière évaluation le
 EvaluatedOn = le
 
+DigiriskRiskAssessmentData = Donnée configurable des évaluations
+MultipleRiskAssessmentMethodName = Méthode d'évaluation multiple
+MultipleRiskAssessmentMethodDescription = Utilisation multiple des méthodes d'évaluation
+
 SimpleCotation = Cotation simple
 AdvancedCotation = Cotation avancée
 SelectCotation = Sélectionnez les cases pour calculer votre cotation
