@@ -158,7 +158,7 @@ if (empty($reshook))
 		$category    = GETPOST('category');
 		$photo       = GETPOST('photo');
 
-		$risk->description = $db->escape($riskComment);
+		$risk->description = $riskComment;
 		$risk->fk_element  = $fk_element ? $fk_element : 0;
 		$risk->fk_projet   = $conf->global->DIGIRISKDOLIBARR_DU_PROJECT;
 		$risk->category    = $category;
@@ -175,7 +175,7 @@ if (empty($reshook))
 				$evaluation->status      = 1;
 				$evaluation->method      = $method;
 				$evaluation->ref         = $refEvaluationMod->getNextValue($evaluation);
-				$evaluation->comment     = $db->escape($evaluationComment);
+				$evaluation->comment     = $evaluationComment;
 
 				if ($method == 'advanced') {
 					$formation  = GETPOST('formation');
@@ -339,7 +339,7 @@ if (empty($reshook))
 		$evaluation->status     = 1;
 		$evaluation->method     = $method;
 		$evaluation->ref        = $refEvaluationMod->getNextValue($evaluation);
-		$evaluation->comment    = $db->escape($evaluationComment);
+		$evaluation->comment    = $evaluationComment;
 
 		if ($method == 'advanced') {
 			$formation  = GETPOST('formation');
@@ -384,7 +384,7 @@ if (empty($reshook))
 
 		$evaluation->cotation = $cotation;
 		$evaluation->method   = $method;
-		$evaluation->comment  = $db->escape($evaluationComment);
+		$evaluation->comment  = $evaluationComment;
 		$evaluation->photo    = $photo;
 
 		if ($method == 'advanced') {
