@@ -156,6 +156,18 @@ class Evaluator extends CommonObject
 	}
 
 	/**
+	 * Load object in memory from the database
+	 *
+	 * @param int    $parent_id   Id parent object
+	 * @return int         <0 if KO, 0 if not found, >0 if OK
+	 */
+	public function fetchFromParent($parent_id)
+	{
+		$filter = array('customsql' => 'fk_parent=' . $this->db->escape($parent_id));
+		return $this->fetchAll('', '', 0, 0, $filter, 'AND');
+	}
+
+	/**
 	 * Load list of objects in memory from the database.
 	 *
 	 * @param  string      $sortorder    Sort Order
@@ -205,6 +217,7 @@ class Evaluator extends CommonObject
 		if (!empty($limit)) {
 			$sql .= ' '.$this->db->plimit($limit, $offset);
 		}
+
 		$resql = $this->db->query($sql);
 		if ($resql) {
 			$num = $this->db->num_rows($resql);

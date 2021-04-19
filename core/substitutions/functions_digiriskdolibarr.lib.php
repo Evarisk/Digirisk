@@ -36,6 +36,7 @@ require_once DOL_DOCUMENT_ROOT.'/custom/digiriskdolibarr/class/digiriskresources
 function digiriskdolibarr_completesubstitutionarray(&$substitutionarray,$langs,$object)
 {
 	$type = $object->element;
+	$element_type = $object->element_type;
 
 	switch ($type) {
 		case 'legaldisplay@digiriskdolibarr':
@@ -121,29 +122,14 @@ function digiriskdolibarr_completesubstitutionarray(&$substitutionarray,$langs,$
 			break;
 	}
 
-	if ( $type == "digiriskelement" ) {
-		$element_type = $object->element_type;
-	}
-
 	switch ($element_type) {
 
 		case 'groupment':
-
-			$groupments = $object->DigiriskElementDocuments($object, $element_type);
-
-			$substitutionarray['reference']   = $groupments[$element_type]['reference'];
-			$substitutionarray['nom']         = $groupments[$element_type]['nom'];
-			$substitutionarray['description'] = $groupments[$element_type]['description'];
-
-			break;
-
 		case 'workunit':
 
-			$workunits = $object->DigiriskElementDocuments($object, $element_type);
-
-			$substitutionarray['reference']   = $workunits[$element_type]['reference'];
-			$substitutionarray['nom']         = $workunits[$element_type]['nom'];
-			$substitutionarray['description'] = $workunits[$element_type]['description'];
+			$substitutionarray['reference']   = $object->ref;
+			$substitutionarray['nom']         = $object->label;
+			$substitutionarray['description'] = $object->description;
 
 			break;
 	}
