@@ -742,8 +742,8 @@ class modDigiriskdolibarr extends DolibarrModules
 			dol_include_once('/digiriskdolibarr/class/digiriskstandard.class.php');
 
 			$digiriskstandard = new DigiriskStandard($this->db);
-			$digiriskstandard->ref = 'DUER';
-			$digiriskstandard->description = 'DUERDescription';
+			$digiriskstandard->ref = 'DU';
+			$digiriskstandard->description = 'DUDescription';
 			$digiriskstandard->date_creation = dol_now();
 			$digiriskstandard->status = 1;
 
