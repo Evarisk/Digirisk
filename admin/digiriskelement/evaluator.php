@@ -75,6 +75,19 @@ if ($action == 'setmod')
 	dolibarr_set_const($db, $constforval, $value, 'chaine', 0, '', $conf->entity);
 }
 
+if (($action == 'update' && !GETPOST("cancel", 'alpha')) || ($action == 'updateedit'))
+{
+	$EvaluatorDuration = GETPOST('EvaluatorDuration','alpha');
+
+	dolibarr_set_const($db, "DIGIRISKDOLIBARR_EVALUATOR_DURATION", $EvaluatorDuration, 'integer', 0, '', $conf->entity);
+
+	if ($action != 'updateedit' && !$error)
+	{
+		header("Location: ".$_SERVER["PHP_SELF"]);
+		exit;
+	}
+}
+
 /*
  * View
  */
@@ -195,6 +208,28 @@ if (is_dir($dir))
 }
 
 print '</table>';
+
+print load_fiche_titre($langs->trans("DigiriskEvaluatorData"), '', '');
+
+print '<form method="POST" action="'.$_SERVER["PHP_SELF"].'" name="social_form">';
+print '<input type="hidden" name="token" value="'.newToken().'">';
+print '<input type="hidden" name="action" value="update">';
+print '<table class="noborder centpercent editmode">';
+print '<tr class="liste_titre">';
+print '<td>'.$langs->trans("Name").'</td>';
+print '<td>'.$langs->trans("Description").'</td>';
+print '<td>'.$langs->trans("Value").'</td>';
+print '<td>'.$langs->trans("Action").'</td>';
+print '</tr>'."\n";
+
+print '<tr class="oddeven"><td><label for="EvaluatorDuration">'.$langs->trans("EvaluatorDuration").'</label></td>';
+print '<td>'.$langs->trans("EvaluatorDurationDescription").'</td>';
+print '<td><input type="number" name="EvaluatorDuration" value="'.$conf->global->DIGIRISKDOLIBARR_EVALUATOR_DURATION.'"></td>';
+print '<td><input type="submit" class="button" name="save" value="'.$langs->trans("Save").'">';
+print '</td></tr>';
+
+print '</table>';
+print '</form>';
 
 // Page end
 dol_fiche_end();

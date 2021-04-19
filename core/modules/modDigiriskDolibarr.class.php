@@ -221,6 +221,8 @@ class modDigiriskdolibarr extends DolibarrModules
 			120 => array('MAIN_AGENDA_ACTIONAUTO_EVALUATOR_CREATE','chaine',1,'', 1),
 			121 => array('DIGIRISKDOLIBARR_EVALUATOR_ADDON','chaine', 'mod_evaluator_standard' ,'', 1),
 
+			122 => array('DIGIRISKDOLIBARR_EVALUATOR_DURATION','integer', 15 ,'', 1),
+
 			// CONST RISK ANALYSIS
 
 			// CONST RISK
