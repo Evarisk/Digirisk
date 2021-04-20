@@ -273,6 +273,30 @@ ListingRisksAction = Listing des actions correctives
 
 
 #
+# RiskAssessmentDocument - Document unique
+#
+
+# Right - Droit
+
+# Trigger - Déclencheur
+RiskAssessmentDocumentGeneratedWithDolibarr = Document unique généré avec Dolibarr
+
+# Mod Numbering - Modèle de numérotation
+DigiriskRiskAssessmentDocumentNumberingModule = Modèle de numérotation des documents unique de Digirisk
+DigiriskRiskAssessmentDocumentStandardModel = Renvoie le numéro sous la forme DUn où n est un compteur séquentiel sans rupture et sans remise à 0.
+
+# ODT Template - Template ODT
+DigiriskTemplateDocumentRiskAssessmentDocument = Modèle de documents des documents unique de Digirisk
+RiskAssessmentDocumentCustomDigiriskTemplate = ODT custom des documents unique
+RiskAssessmentDocumentDigiriskTemplate = ODT par défaut des documents unique
+
+# Data - Donnée
+RiskAssessmentDocument = Document unique
+RiskAssessmentDocumentDU = Plan d'action Document Unique
+RiskAssessmentDocumentDUDescription = Description du plan d'action Document Unique
+
+
+#
 # GroupmentDocument - Fiche Groupement
 #
 
@@ -372,6 +396,30 @@ WorkUnit = Unité de travail
 NewWorkUnit = Nouvelle unité de travail
 ModifyWorkUnit = Modifier unité de travail
 
+
+
+#
+# Evaluator - Évaluateur
+#
+
+# Trigger - Déclencheur
+EVALUATOR_CREATEInDolibarr = Évaluateur créée dans Dolibarr
+ActionsOnÉvaluateur = Événements liés au évaluateur
+
+# Mod Numbering - Modèle de numérotation
+DigiriskEvaluatorNumberingModule = Modèle de numérotation des évaluateurs de Digirisk
+DigiriskEvaluatorStandardModel = Renvoie le numéro sous la forme EVn où n est un compteur séquentiel sans rupture et sans remise à 0.
+
+# Data - Donnée
+Evaluator = Évaluateur
+EvaluatorList = Liste des évaluateurs
+AssignmentDate = Date d'affectation
+EvaluationDuration = Durée
+UserAssigned = Utilisateur assigné
+
+
+
+
 #
 # DigiriskStandard - Standard de Digirisk
 #
@@ -470,14 +518,9 @@ DigiriskElementRiskSign = Signalisation
 # Data - Donnée
 CloseModal = Fermer
 
-RiskEvaluationDocument = Document Unique
-ActionPlanDU = Plan d'action Document Unique
-ActionPlanDUDescription = Description du plan d'action Document Unique
-
 SelectProject = Choix du projet
 
-RiskEvaluator = Évaluateurs
-RiskSign = Signalisation
+
 
 
 
