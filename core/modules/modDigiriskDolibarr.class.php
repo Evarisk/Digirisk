@@ -751,7 +751,7 @@ class modDigiriskdolibarr extends DolibarrModules
 
 			$standard_id = $digiriskstandard->create($user);
 
-			dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_ACTIVE_STANDARD', $standard_id);
+			dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_ACTIVE_STANDARD', $standard_id, 'integer', 0, '', $digiriskstandard->entity);
 		}
 
 		// Create extrafields during init
