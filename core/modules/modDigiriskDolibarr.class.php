@@ -104,6 +104,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			"/digiriskdolibarr/riskassessment",
 			"/digiriskdolibarr/risksign",
 			"/ecm/digiriskdolibarr",
+			"/ecm/digiriskdolibarr/actionplan",
 			"/ecm/digiriskdolibarr/legaldisplay",
 			"/ecm/digiriskdolibarr/informationssharing",
 			"/ecm/digiriskdolibarr/firepermit",
@@ -141,6 +142,13 @@ class modDigiriskdolibarr extends DolibarrModules
 			3 => array('DIGIRISK_IDCC_DICTIONNARY','chaine','','IDCC of company', 1),
 
 			// CONST DIGIRISK DOCUMENTS
+
+			// CONST ACTION PLAN
+			4 => array('MAIN_AGENDA_ACTIONAUTO_ACTIONPLAN_CREATE','chaine',1,'', 1),
+			5 => array('DIGIRISKDOLIBARR_ACTIONPLAN_ADDON','chaine', 'mod_legaldisplay_standard' ,'', 1),
+			6 => array('DIGIRISKDOLIBARR_ACTIONPLAN_ADDON_ODT_PATH','chaine', DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/documents/doctemplates/actionplan/' ,'', 1),
+			7 => array('DIGIRISKDOLIBARR_ACTIONPLAN_CUSTOM_ADDON_ODT_PATH','chaine', DOL_DATA_ROOT . '/ecm/digiriskdolibarr/actionplan/' ,'', 1),
+			8 => array('DIGIRISKDOLIBARR_ACTIONPLAN__DEFAULT_MODEL','chaine', 'actionplan_odt' ,'', 1),
 
 			// CONST LEGAL DISPLAY
 			10 => array('DIGIRISK_LOCATION_OF_DETAILED_INSTRUCTION','chaine','','Location of detailed instruction', 1),
@@ -296,6 +304,23 @@ class modDigiriskdolibarr extends DolibarrModules
 		// Permissions provided by this module
 		$this->rights = array();
 		$r            = 0;
+
+		/* ACTION PLAN PERMISSIONS */
+		$this->rights[$r][0] = $this->numero.$r;
+		$this->rights[$r][1] = $langs->trans('ReadActionPlan');
+		$this->rights[$r][4] = 'actionplan';
+		$this->rights[$r][5] = 'read';
+		$r++;
+		$this->rights[$r][0] = $this->numero.$r;
+		$this->rights[$r][1] = $langs->trans('CreateActionPlan');
+		$this->rights[$r][4] = 'actionplan';
+		$this->rights[$r][5] = 'write';
+		$r++;
+		$this->rights[$r][0] = $this->numero.$r;
+		$this->rights[$r][1] = $langs->trans('DeleteActionPlan');
+		$this->rights[$r][4] = 'actionplan';
+		$this->rights[$r][5] = 'delete';
+		$r++;
 
 		/* LEGAL DISPLAY PERMISSIONS */
 		$this->rights[$r][0] = $this->numero.$r;
