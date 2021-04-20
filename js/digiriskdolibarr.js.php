@@ -281,7 +281,6 @@ window.eoxiaJS.navigation.redirect = function( event ) {
 	}
 
 	//empty and fill object card
-	$('#cardContent').empty();
 	$('#cardContent').load( URLToGo + ' #cardContent' , id);
 	return false;
 };
@@ -800,7 +799,7 @@ window.eoxiaJS.risk.createRisk = function ( event ) {
 		}
 	})
 
-	$('.div-table-responsive').load( document.URL + '&action=add' + categoryPost + descriptionPost + methodPost + cotationPost + criteres + photoPost + commentPost + ' .div-table-responsive');
+	$('.fichecenter').load( document.URL + '&action=add' + categoryPost + descriptionPost + methodPost + cotationPost + criteres + photoPost + commentPost + ' .fichecenter');
 };
 
 /**
@@ -1025,7 +1024,7 @@ window.eoxiaJS.evaluation.createEvaluation = function ( event ) {
 		}
 	})
 
-	$(this).closest('.div-table-responsive').load( document.URL + '&action=addEvaluation' + riskToAssignPost + methodPost + cotationPost + criteres + photoPost + commentPost + ' .div-table-responsive');
+	$(this).closest('.fichecenter').load( document.URL + '&action=addEvaluation' + riskToAssignPost + methodPost + cotationPost + criteres + photoPost + commentPost + ' .fichecenter');
 };
 
 /**
@@ -1308,7 +1307,7 @@ window.eoxiaJS.risksign.createRiskSign = function ( event ) {
 		descriptionPost = '&riskSignDescription=' + encodeURI(description);
 	}
 
-	$('.div-table-responsive').load( document.URL + '&action=add' + categoryPost + photoPost + descriptionPost + ' .div-table-responsive');
+	$('.fichecenter').load( document.URL + '&action=add' + categoryPost + photoPost + descriptionPost + ' .fichecenter');
 };
 
 
@@ -1365,7 +1364,7 @@ window.eoxiaJS.risksign.saveRiskSign = function ( event ) {
 };
 
 /**
- * Initialise l'objet "signalisation" ainsi que la méthode "init" obligatoire pour la bibliothèque EoxiaJS.
+ * Initialise l'objet "évaluateur" ainsi que la méthode "init" obligatoire pour la bibliothèque EoxiaJS.
  *
  * @since   1.0.0
  * @version 1.0.0
@@ -1385,7 +1384,7 @@ window.eoxiaJS.evaluator.init = function() {
 };
 
 /**
- * La méthode contenant tous les évènements pour le evaluation.
+ * La méthode contenant tous les évènements pour l'évaluateur.
  *
  * @since   1.0.0
  * @version 1.0.0
@@ -1399,32 +1398,7 @@ window.eoxiaJS.evaluator.event = function() {
 };
 
 /**
- * Check value on riskCategory and riskCotation.
- *
- * @since   1.0.0
- * @version 1.0.0
- *
- * @param  elementParent --- Parent element
- * @return {void}
- */
-window.eoxiaJS.evaluator.haveDataInInput = function( elementParent ) {
-	var element = elementParent.parent().parent();
-	var cotation = element.find('.risk-evaluation-seuil');
-
-	if (element.hasClass('risk-add-modal')) {
-		var category = element.find('input[name="risk_category_id"]')
-		if (category.val() >= 0 && cotation.val() >= 0) {
-			element.find('.button-disable').removeClass('button-disable');
-		}
-	} else if (element.hasClass('risk-evaluation-add-modal')) {
-		if (cotation.val() >= 0) {
-			element.find('.button-disable').removeClass('button-disable');
-		}
-	}
-};
-
-/**
- * Clique sur une des cotations simples.
+ * Clique sur une des user de la liste.
  *
  * @since   1.0.0
  * @version 1.0.0
@@ -1436,7 +1410,7 @@ window.eoxiaJS.evaluator.selectUser = function( event ) {
 	$('.user-selected').val(this.value)
 };
 /**
- * Action create risk.
+ * Action create evaluator.
  *
  * @since   1.0.0
  * @version 1.0.0
@@ -1466,8 +1440,7 @@ window.eoxiaJS.evaluator.createEvaluator = function ( event ) {
 		durationPost = '&duration=' + duration;
 	}
 
-console.log(document.URL + '&action=add' + durationPost + datePost + userPost )
-	$('.div-table-responsive').load( document.URL + '&action=add' + durationPost + datePost + userPost + ' .div-table-responsive');
+	$('.fichecenter').load( document.URL + '&action=add' + durationPost + datePost + userPost + ' .fichecenter');
 };
 
 /**
@@ -1487,4 +1460,82 @@ window.eoxiaJS.evaluator.deleteEvaluator = function ( event ) {
 	} else {
 		return false;
 	}
+};
+
+
+/**
+ * Initialise l'objet "digiriskusers" ainsi que la méthode "init" obligatoire pour la bibliothèque EoxiaJS.
+ *
+ * @since   1.0.0
+ * @version 1.0.0
+ */
+window.eoxiaJS.digiriskusers = {};
+
+/**
+ * La méthode appelée automatiquement par la bibliothèque EoxiaJS.
+ *
+ * @since   1.0.0
+ * @version 1.0.0
+ *
+ * @return {void}
+ */
+window.eoxiaJS.digiriskusers.init = function() {
+	window.eoxiaJS.digiriskusers.event();
+};
+
+/**
+ * La méthode contenant tous les évènements pour l'évaluateur.
+ *
+ * @since   1.0.0
+ * @version 1.0.0
+ *
+ * @return {void}
+ */
+window.eoxiaJS.digiriskusers.event = function() {
+	jQuery( document ).on( 'input', '.digirisk-users #firstname', window.eoxiaJS.digiriskusers.fillEmail );
+	jQuery( document ).on( 'input', '.digirisk-users #lastname', window.eoxiaJS.digiriskusers.fillEmail );
+};
+
+/**
+ * Clique sur une des user de la liste.
+ *
+ * @since   1.0.0
+ * @version 1.0.0
+ *
+ * @param  {ClickEvent} event L'état du clic.
+ * @return {void}
+ */
+window.eoxiaJS.digiriskusers.fillEmail = function( event ) {
+
+	var firstname = $('.digirisk-users #firstname').val()
+	var lastname = $('.digirisk-users #lastname').val()
+	var domainMail = jQuery( '.input-domain-mail' ).val();
+
+	var together = window.eoxiaJS.digiriskusers.removeDiacritics( firstname + '.' + lastname + '@' + domainMail ).toLowerCase();
+
+	$('.digirisk-users #email').val(together)
+};
+
+/**
+ * [description]
+ *
+ * @memberof EO_Framework_Global
+ *
+ * @param  {void} input [description]
+ * @returns {void}       [description]
+ */
+window.eoxiaJS.digiriskusers.removeDiacritics = function( input ) {
+	var output = '';
+	var normalized = input.normalize( 'NFD' );
+	var i = 0;
+	var j = 0;
+
+	while ( i < input.length ) {
+		output += normalized[j];
+
+		j += ( input[i] == normalized[j] ) ? 1 : 2;
+		i++;
+	}
+
+	return output;
 };

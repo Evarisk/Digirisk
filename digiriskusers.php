@@ -835,7 +835,7 @@ if ($canadduser) {
 	print '<input type="hidden" name="entity" value="'.$conf->entity.'">';
 
 	?>
-	<div class="digirisk-wrap wpeo-wrap" style="padding-right: 0 !important;">
+	<div class="digirisk-wrap wpeo-wrap digirisk-users" style="padding-right: 0 !important;">
 		<div class="main-container" style="width:auto;  margin-top:0 !important; padding-left:0 !important;">
 			<div class="wpeo-tab">
 				<div class="tab-container">
@@ -843,12 +843,20 @@ if ($canadduser) {
 						<div class="wpeo-table table-flex table-risk">
 							<div class="table-row user-row edit">
 								<input type="hidden" name="action" value="add" />
+								<input type="hidden" class="input-domain-mail" name="societyname" value="<?php echo preg_replace('/ /', '',$conf->global->MAIN_INFO_SOCIETE_NOM) . '.fr' ?>" />
+								<div class="table-cell table-150">
+									<input type="text" id="login" placeholder="<?php echo $langs->trans('Login') ; ?>" name="login" value="" />
+								</div>
 								<div class="table-cell table-150">
 									<input type="text" id="lastname" placeholder="<?php echo $langs->trans('LastName') ; ?>" name="lastname" value="<?php dol_escape_htmltag(GETPOST('lastname', 'alphanohtml'))?>" />
 								</div>
 								<div class="table-cell table-150">
-									<input type="text" id="login" placeholder="<?php echo $langs->trans('Login') ; ?>" name="login" value="" />
+									<input type="text" id="firstname" placeholder="<?php echo $langs->trans('FirstName') ; ?>" name="firstname" value="<?php dol_escape_htmltag(GETPOST('firstname', 'alphanohtml'))?>" />
 								</div>
+								<div class="table-cell table-300">
+									<input style="width:100%" type="email" id="email" placeholder="<?php echo $langs->trans('Email') ; ?>" name="email" value="" />
+								</div>
+
 								<div class="table-cell table-150">
 									<input type="password" id="password" placeholder="<?php echo $langs->trans('Password') ; ?>" name="password" value="" />
 								</div>
