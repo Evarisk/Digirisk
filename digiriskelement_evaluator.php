@@ -357,7 +357,7 @@ if ($object->id > 0) {
 						<div class="evaluator-assignment">
 							<div class="evaluator-duration">
 								<span class="title"><?php echo $langs->trans('Duration'); ?></span>
-								<?php print '<input type="number" class="duration" name="evaluatorDuration" rows="'.ROWS_2.'">'.$conf->global->DIGIRISKDOLIBARR_EVALUATION_DURATION."\n"; ?>
+								<?php print '<input type="number" class="duration" name="evaluatorDuration" rows="'.ROWS_2.'">'.$conf->global->DIGIRISKDOLIBARR_EVALUATOR_DURATION."\n"; ?>
 							</div>
 							<div class="evaluator-date">
 								<span class="title"><?php echo $langs->trans('Date'); ?></span>
