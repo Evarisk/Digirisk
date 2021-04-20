@@ -94,7 +94,7 @@ if (empty($reshook))
 		} else {
 			if (empty($donotredirect))
 			{
-				setEventMessages($langs->trans("FileGenerated"), null);
+				setEventMessages($langs->trans("FileGenerated") . ' - ' . $informationssharing->last_main_doc, null);
 
 				$urltoredirect = $_SERVER['REQUEST_URI'];
 				$urltoredirect = preg_replace('/#builddoc$/', '', $urltoredirect);
@@ -141,7 +141,7 @@ $formfile 	 = new FormFile($db);
 $emptyobject = new stdClass($db);
 
 $title    = $langs->trans('InformationsSharing');
-$help_url = 'FR:Module_DigiriskDolibarr';
+$help_url = 'FR:Module_DigiriskDolibarr#Diffusion_d.27informations';
 $morejs   = array("/digiriskdolibarr/js/digiriskdolibarr.js.php");
 
 digiriskHeader('', $title, $help_url, '', '', '', $morejs); ?>

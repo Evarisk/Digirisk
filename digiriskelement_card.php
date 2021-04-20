@@ -141,7 +141,7 @@ if (empty($reshook))
 		} else {
 			if (empty($donotredirect))
 			{
-				setEventMessages($langs->trans("FileGenerated"), null);
+				setEventMessages($langs->trans("FileGenerated") . ' - ' . $digiriskelementdocument->last_main_doc, null);
 
 				$urltoredirect = $_SERVER['REQUEST_URI'];
 				$urltoredirect = preg_replace('/#builddoc$/', '', $urltoredirect);

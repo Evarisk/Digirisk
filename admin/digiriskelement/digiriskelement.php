@@ -45,7 +45,7 @@ $backtopage = GETPOST('backtopage', 'alpha');
  * View
  */
 
-$help_url  = 'FR:Module_DigiriskDolibarr';
+$help_url  = 'FR:Module_DigiriskDolibarr#L.27onglet_.C3.89l.C3.A9ment_Digirisk';
 $page_name = "DigiriskdolibarrSetup";
 
 llxHeader('', $langs->trans($page_name), $help_url);

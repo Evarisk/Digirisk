@@ -110,7 +110,7 @@ if ($socid > 0 && empty($societe->id))
 
 $title = $langs->trans("ThirdParty");
 if (!empty($conf->global->MAIN_HTML_TITLE) && preg_match('/thirdpartynameonly/', $conf->global->MAIN_HTML_TITLE) && $societe->name) $title = $societe->name." - ".$langs->trans('OpeningHours');
-$help_url = 'EN:Module_Third_Parties|FR:Module_Tiers|ES:Empresas';
+$help_url = 'EN:Module_Third_Parties|FR:Module_DigiriskDolibarr#L.27onglet_Horaire_de_travail|ES:Empresas';
 llxHeader('', $title, $help_url);
 
 if (!empty($societe->id)) $res = $societe->fetch_optionals();

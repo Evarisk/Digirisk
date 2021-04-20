@@ -119,7 +119,7 @@ if (($action == 'update' && !GETPOST("cancel", 'alpha'))
 
 $form = new Form($db);
 
-$help_url = 'FR:Module_DigiriskDolibarr';
+$help_url = 'FR:Module_DigiriskDolibarr#L.27onglet_S.C3.A9curit.C3.A9';
 llxHeader('', $langs->trans("CompanyFoundation"), $help_url);
 
 print load_fiche_titre($langs->trans("CompanyFoundation"), '', 'title_setup');

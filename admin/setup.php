@@ -48,7 +48,7 @@ $setupnotempty = 0;
  */
 
 $page_name = "DigiriskdolibarrSetup";
-$help_url = 'FR:Module_DigiriskDolibarr';
+$help_url = 'FR:Module_DigiriskDolibarr#Configuration';
 
 llxHeader('', $langs->trans($page_name), $help_url);
 

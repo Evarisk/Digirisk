@@ -94,7 +94,7 @@ if (empty($reshook))
 		} else {
 			if (empty($donotredirect))
 			{
-				setEventMessages($langs->trans("FileGenerated"), null);
+				setEventMessages($langs->trans("FileGenerated") . ' - ' . $legaldisplay->last_main_doc, null);
 
 				$urltoredirect = $_SERVER['REQUEST_URI'];
 				$urltoredirect = preg_replace('/#builddoc$/', '', $urltoredirect);
@@ -141,7 +141,7 @@ $formfile 	 = new FormFile($db);
 $emptyobject = new stdClass($db);
 
 $title    = $langs->trans('LegalDisplay');
-$help_url = 'FR:Module_DigiriskDolibarr';
+$help_url = 'FR:Module_DigiriskDolibarr#Affichage_l.C3.A9gal';
 $morejs   = array("/digiriskdolibarr/js/digiriskdolibarr.js.php");
 
 digiriskHeader('', $title, $help_url, '', '', '', $morejs); ?>

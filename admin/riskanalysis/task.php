@@ -70,7 +70,7 @@ if (($action == 'update' && !GETPOST("cancel", 'alpha')) || ($action == 'updatee
  */
 if (!empty($conf->projet->enabled)) { $formproject = new FormProjets($db); }
 
-$help_url  = 'FR:Module_DigiriskDolibarr';
+$help_url  = 'FR:Module_DigiriskDolibarr#L.27onglet_T.C3.A2che';
 $page_name = "DigiriskdolibarrSetup";
 
 llxHeader('', $langs->trans($page_name), $help_url);

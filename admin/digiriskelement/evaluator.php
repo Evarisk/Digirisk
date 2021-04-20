@@ -94,7 +94,7 @@ if (($action == 'update' && !GETPOST("cancel", 'alpha')) || ($action == 'updatee
 
 $form            = new Form($db);
 
-$help_url  = 'FR:Module_DigiriskDolibarr';
+$help_url  = 'FR:Module_DigiriskDolibarr#L.27onglet_.C3.89valuateur';
 $page_name = "DigiriskdolibarrSetup";
 
 llxHeader('', $langs->trans($page_name), $help_url);
