@@ -232,7 +232,7 @@ if (is_dir($dir))
 }
 
 /*
-*  Documents models for Listing Risks Action
+*  Documents models for WorkUnit Document
 */
 
 print load_fiche_titre($langs->trans("DigiriskTemplateDocumentWorkUnitDocument"), '', '');
