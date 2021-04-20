@@ -18,7 +18,7 @@
 /**
  *   	\file       digiriskelement_evaluator.php
  *		\ingroup    digiriskdolibarr
- *		\brief      Page to create/edit/view risk
+ *		\brief      Page to create/edit/view evaluator
  */
 
 
@@ -93,10 +93,10 @@ foreach ($evaluator->fields as $key => $val)
 // Load Digirisk_element object
 include DOL_DOCUMENT_ROOT.'/core/actions_fetchobject.inc.php'; // Must be include, not include_once.
 
-//Permission for digiriskelement_risk
-$permissiontoread = $user->rights->digiriskdolibarr->risk->read;
-$permissiontoadd = $user->rights->digiriskdolibarr->risk->write;
-$permissiontodelete = $user->rights->digiriskdolibarr->risk->delete;
+//Permission for digiriskelement_evaluator
+$permissiontoread   = $user->rights->digiriskdolibarr->evaluator->read;
+$permissiontoadd    = $user->rights->digiriskdolibarr->evaluator->write;
+$permissiontodelete = $user->rights->digiriskdolibarr->evaluator->delete;
 
 // Security check - Protection if external user
 if (!$permissiontoread) accessforbidden();
@@ -232,6 +232,8 @@ if ($object->id > 0) {
 	if (is_array($extrafields->attributes[$evaluator->table_element]['label']) && count($extrafields->attributes[$evaluator->table_element]['label'])) $sql .= " LEFT JOIN ".MAIN_DB_PREFIX.$evaluator->table_element."_extrafields as ef on (t.rowid = ef.fk_object)";
 	if ($evaluator->ismultientitymanaged == 1) $sql .= " WHERE t.entity IN (".getEntity($evaluator->element).")";
 	else $sql .= " WHERE 1 = 1";
+	$sql .= " AND fk_parent = ".$id;
+
 	foreach ($search as $key => $val)
 	{
 		if ($key == 'status' && $search[$key] == -1) continue;
@@ -300,7 +302,6 @@ if ($object->id > 0) {
 	$reshook = $hookmanager->executeHooks('printFieldListWhere', $parameters, $evaluation); // Note that $action and $evaluation may have been modified by hook
 	$sql .= $hookmanager->resPrint;
 
-
 	if ($limit) $sql .= $db->plimit($limit + 1, $offset);
 
 	$resql = $db->query($sql);
@@ -333,7 +334,7 @@ if ($object->id > 0) {
 	?>
 
 	<!-- BUTTON MODAL EVALUATOR ADD -->
-	<?php $newcardbutton = '<div class="evaluator-add wpeo-button button-square-40 button-blue modal-open" value="'.$object->id.'"><i class="fas fa-exclamation-triangle button-icon"></i><i class="fas fa-plus-circle button-add animated"></i></div>' ?>
+	<?php $newcardbutton = '<div class="evaluator-add wpeo-button button-square-40 button-blue modal-open" value="'.$object->id.'"><i class="fas fa-user-check button-icon"></i><i class="fas fa-plus-circle button-add animated"></i></div>' ?>
 
 	<!-- EVALUATOR ADD MODAL-->
 	<div class="evaluator-add-modal" value="<?php echo $object->id ?>">
@@ -343,9 +344,7 @@ if ($object->id > 0) {
 				<div class="modal-header">
 					<h2 class="modal-title"><?php echo $langs->trans('AddEvaluatorTitle') . ' ' . $refEvaluatorMod->getNextValue($evaluator);  ?></h2>
 					<div class="modal-refresh modal-close"><i class="fas fa-times"></i></div>
-
 				</div>
-
 				<!-- Modal-ADD Evaluator Content-->
 				<div class="modal-content" id="#modalContent">
 					<div class="evaluator-content">
@@ -357,7 +356,7 @@ if ($object->id > 0) {
 						<div class="evaluator-assignment">
 							<div class="evaluator-duration">
 								<span class="title"><?php echo $langs->trans('Duration'); ?></span>
-								<?php print '<input type="number" class="duration" name="evaluatorDuration" rows="'.ROWS_2.'">'.$conf->global->DIGIRISKDOLIBARR_EVALUATOR_DURATION."\n"; ?>
+								<?php print '<input type="number" class="duration" name="evaluatorDuration" rows="'.ROWS_2.'" value="'.$conf->global->DIGIRISKDOLIBARR_EVALUATOR_DURATION.'">'; ?>
 							</div>
 							<div class="evaluator-date">
 								<span class="title"><?php echo $langs->trans('Date'); ?></span>
