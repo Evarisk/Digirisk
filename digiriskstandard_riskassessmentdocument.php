@@ -16,9 +16,9 @@
  */
 
 /**
- *   	\file       digiriskstandard_actionplan.php
+ *   	\file       digiriskstandard_riskassessmentdocument.php
  *		\ingroup    digiriskdolibarr
- *		\brief      Page to view actionplan
+ *		\brief      Page to view riskassessmentdocument
  */
 
 // Load Dolibarr environment
@@ -29,10 +29,10 @@ if (!$res) die("Include of main fails");
 require_once DOL_DOCUMENT_ROOT.'/core/class/html.formfile.class.php';
 
 dol_include_once('/digiriskdolibarr/class/digiriskstandard.class.php');
-dol_include_once('/digiriskdolibarr/class/digiriskdocuments/actionplan.class.php');
+dol_include_once('/digiriskdolibarr/class/digiriskdocuments/riskassessmentdocument.class.php');
 dol_include_once('/digiriskdolibarr/lib/digiriskdolibarr_digiriskstandard.lib.php');
 dol_include_once('/digiriskdolibarr/lib/digiriskdolibarr_function.lib.php');
-dol_include_once('/digiriskdolibarr/core/modules/digiriskdolibarr/digiriskdocuments/actionplan/modules_actionplan.php');
+dol_include_once('/digiriskdolibarr/core/modules/digiriskdolibarr/digiriskdocuments/riskassessmentdocument/modules_riskassessmentdocument.php');
 
 global $db, $conf, $langs;
 
@@ -44,15 +44,15 @@ $action = GETPOST('action', 'aZ09');
 
 // Initialize technical objects
 $object       = new DigiriskStandard($db);
-$actionplan = new ActionPlan($db);
-$hookmanager->initHooks(array('digiriskelementactionplan', 'globalcard')); // Note that conf->hooks_modules contains array
+$riskassessmentdocument = new RiskAssessmentDocument($db);
+$hookmanager->initHooks(array('digiriskelementriskassessmentdocument', 'globalcard')); // Note that conf->hooks_modules contains array
 
 $object->fetch($conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD);
 
 $upload_dir         = $conf->digiriskdolibarr->multidir_output[isset($object->entity) ? $object->entity : 1];
-$permissiontoread   = $user->rights->digiriskdolibarr->actionplan->read;
-$permissiontoadd    = $user->rights->digiriskdolibarr->actionplan->write;
-$permissiontodelete = $user->rights->digiriskdolibarr->actionplan->delete;
+$permissiontoread   = $user->rights->digiriskdolibarr->riskassessmentdocument->read;
+$permissiontoadd    = $user->rights->digiriskdolibarr->riskassessmentdocument->write;
+$permissiontodelete = $user->rights->digiriskdolibarr->riskassessmentdocument->delete;
 
 if (!$permissiontoread) accessforbidden();
 
@@ -87,14 +87,14 @@ if (empty($reshook))
 
 		$model      = GETPOST('model', 'alpha');
 
-		$result = $actionplan->generateDocument($model, $outputlangs, $hidedetails, $hidedesc, $hideref, $moreparams);
+		$result = $riskassessmentdocument->generateDocument($model, $outputlangs, $hidedetails, $hidedesc, $hideref, $moreparams);
 		if ($result <= 0) {
 			setEventMessages($object->error, $object->errors, 'errors');
 			$action = '';
 		} else {
 			if (empty($donotredirect))
 			{
-				setEventMessages($langs->trans("FileGenerated"), null);
+				setEventMessages($langs->trans("FileGenerated") . ' - ' . $riskassessmentdocument->last_main_doc, null);
 
 				$urltoredirect = $_SERVER['REQUEST_URI'];
 				$urltoredirect = preg_replace('/#builddoc$/', '', $urltoredirect);
@@ -140,8 +140,8 @@ if ($action == 'remove_file' && $permissiontodelete)
 $formfile 	 = new FormFile($db);
 $emptyobject = new stdClass($db);
 
-$title    = $langs->trans('ActionPlan');
-$help_url = 'FR:Module_DigiriskDolibarr';
+$title    = $langs->trans('RiskAssessmentDocument');
+$help_url = 'FR:Module_DigiriskDolibarr#Document_unique_2';
 $morejs   = array("/digiriskdolibarr/js/digiriskdolibarr.js.php");
 
 digiriskHeader('', $title, $help_url, '', '', '', $morejs); ?>
@@ -152,7 +152,7 @@ digiriskHeader('', $title, $help_url, '', '', '', $morejs); ?>
 $res  = $object->fetch_optionals();
 $head = digiriskstandardPrepareHead($object);
 
-dol_fiche_head($head, 'standardActionPlan', '', -1, $object->picto);
+dol_fiche_head($head, 'standardRiskAssessmentDocument', '', -1, $object->picto);
 
 // Object card
 // ------------------------------------------------------------
@@ -170,7 +170,7 @@ print '<div class="underbanner clearboth"></div>';
 print '<table class="border centpercent tableforfield">' . "\n";
 
 //JSON Decode and show fields
-include DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/core/tpl/digiriskdolibarr_actionplanfields_view.tpl.php';
+//include DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/core/tpl/digiriskdolibarr_riskassessmentdocumentfields_view.tpl.php';
 
 print '</table>';
 print '</div>';
@@ -181,12 +181,12 @@ dol_fiche_end();
 // Document Generation -- Génération des documents
 $includedocgeneration = 1;
 if ($includedocgeneration) {
-	$dir_files  = 'actionplan';
+	$dir_files  = 'riskassessmentdocument';
 	$filedir    = $upload_dir . '/' . $dir_files;
 	$urlsource  = $_SERVER["PHP_SELF"];
-	$modulepart = 'digiriskdolibarr:ActionPlan';
+	$modulepart = 'digiriskdolibarr:RiskAssessmentDocument';
 
-	print digiriskshowdocuments($modulepart,$dir_files, $filedir, $urlsource, $permissiontoadd, $permissiontodelete, $conf->global->DIGIRISKDOLIBARR_ACTIONPLAN_DEFAULT_MODEL, 1, 0, 28, 0, '', $langs->trans('ActionPlan'), '', $langs->defaultlang, '', $actionplan);
+	print digiriskshowdocuments($modulepart,$dir_files, $filedir, $urlsource, $permissiontoadd, $permissiontodelete, $conf->global->DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_DEFAULT_MODEL, 1, 0, 28, 0, '', $langs->trans('RiskAssessmentDocument'), '', $langs->defaultlang, '', $riskassessmentdocument);
 }
 
 // End of page

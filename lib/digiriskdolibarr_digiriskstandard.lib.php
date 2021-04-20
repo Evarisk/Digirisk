@@ -61,9 +61,9 @@ function digiriskstandardPrepareHead($object)
 	$head[$h][2] = 'elementListingRisksPhoto';
 	$h++;
 
-	$head[$h][0] = dol_buildpath("/digiriskdolibarr/digiriskstandard_actionplan.php", 1);
-	$head[$h][1] = $langs->trans("ActionPlan");
-	$head[$h][2] = 'standardActionPlan';
+	$head[$h][0] = dol_buildpath("/digiriskdolibarr/digiriskstandard_riskassessmentdocument.php", 1);
+	$head[$h][1] = $langs->trans("RiskAssessmentDocument");
+	$head[$h][2] = 'standardRiskAssessmentDocument';
 	$h++;
 
 	$head[$h][0] = dol_buildpath("/digiriskdolibarr/digiriskstandard_agenda.php", 1);

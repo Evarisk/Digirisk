@@ -104,7 +104,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			"/digiriskdolibarr/riskassessment",
 			"/digiriskdolibarr/risksign",
 			"/ecm/digiriskdolibarr",
-			"/ecm/digiriskdolibarr/actionplan",
+			"/ecm/digiriskdolibarr/riskassessmentdocument",
 			"/ecm/digiriskdolibarr/legaldisplay",
 			"/ecm/digiriskdolibarr/informationssharing",
 			"/ecm/digiriskdolibarr/firepermit",
@@ -143,12 +143,12 @@ class modDigiriskdolibarr extends DolibarrModules
 
 			// CONST DIGIRISK DOCUMENTS
 
-			// CONST ACTION PLAN
-			4 => array('MAIN_AGENDA_ACTIONAUTO_ACTIONPLAN_CREATE','chaine',1,'', 1),
-			5 => array('DIGIRISKDOLIBARR_ACTIONPLAN_ADDON','chaine', 'mod_legaldisplay_standard' ,'', 1),
-			6 => array('DIGIRISKDOLIBARR_ACTIONPLAN_ADDON_ODT_PATH','chaine', DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/documents/doctemplates/actionplan/' ,'', 1),
-			7 => array('DIGIRISKDOLIBARR_ACTIONPLAN_CUSTOM_ADDON_ODT_PATH','chaine', DOL_DATA_ROOT . '/ecm/digiriskdolibarr/actionplan/' ,'', 1),
-			8 => array('DIGIRISKDOLIBARR_ACTIONPLAN__DEFAULT_MODEL','chaine', 'actionplan_odt' ,'', 1),
+			// CONST RISK ASSESSMENTDOCUMENT
+			4 => array('MAIN_AGENDA_ACTIONAUTO_RISKASSESSMENTDOCUMENT_CREATE','chaine',1,'', 1),
+			5 => array('DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_ADDON','chaine', 'mod_legaldisplay_standard' ,'', 1),
+			6 => array('DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_ADDON_ODT_PATH','chaine', DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/documents/doctemplates/riskassessmentdocument/' ,'', 1),
+			7 => array('DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_CUSTOM_ADDON_ODT_PATH','chaine', DOL_DATA_ROOT . '/ecm/digiriskdolibarr/riskassessmentdocument/' ,'', 1),
+			8 => array('DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT__DEFAULT_MODEL','chaine', 'actionplan_odt' ,'', 1),
 
 			// CONST LEGAL DISPLAY
 			10 => array('DIGIRISK_LOCATION_OF_DETAILED_INSTRUCTION','chaine','','Location of detailed instruction', 1),
@@ -305,20 +305,20 @@ class modDigiriskdolibarr extends DolibarrModules
 		$this->rights = array();
 		$r            = 0;
 
-		/* ACTION PLAN PERMISSIONS */
+		/* RISK ASSESSMENT DOCUMENT PERMISSIONS */
 		$this->rights[$r][0] = $this->numero.$r;
 		$this->rights[$r][1] = $langs->trans('ReadActionPlan');
-		$this->rights[$r][4] = 'actionplan';
+		$this->rights[$r][4] = 'riskassessmentdocument';
 		$this->rights[$r][5] = 'read';
 		$r++;
 		$this->rights[$r][0] = $this->numero.$r;
 		$this->rights[$r][1] = $langs->trans('CreateActionPlan');
-		$this->rights[$r][4] = 'actionplan';
+		$this->rights[$r][4] = 'riskassessmentdocument';
 		$this->rights[$r][5] = 'write';
 		$r++;
 		$this->rights[$r][0] = $this->numero.$r;
 		$this->rights[$r][1] = $langs->trans('DeleteActionPlan');
-		$this->rights[$r][4] = 'actionplan';
+		$this->rights[$r][4] = 'riskassessmentdocument';
 		$this->rights[$r][5] = 'delete';
 		$r++;
 
@@ -597,7 +597,7 @@ class modDigiriskdolibarr extends DolibarrModules
 		$this->menu[$r++]=array(
 			'fk_menu'=>'fk_mainmenu=digiriskdolibarr',	    		// '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
 			'type'=>'left', 										// This is a Left menu entry
-			'titre'=>$langs->trans('RiskEvaluationDocument'),
+			'titre'=>$langs->trans('RiskAssessmentDocument'),
 			'mainmenu'=>'digiriskdolibarr',
 			'leftmenu'=>'digiriskstandard',
 			'url'=>'/digiriskdolibarr/digiriskstandard_card.php?id='.$conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD,
@@ -752,8 +752,8 @@ class modDigiriskdolibarr extends DolibarrModules
 			$projectRef  = new $conf->global->PROJECT_ADDON();
 
 			$project->ref         = $projectRef->getNextValue($third_party, $project);
-			$project->title       = $langs->trans('ActionPlanDU');
-			$project->description = $langs->trans('ActionPlanDUDescription');
+			$project->title       = $langs->trans('RiskAssessmentDocument');
+			$project->description = $langs->trans('RiskAssessmentDocumentDescription');
 			$project->date_c      = dol_now();
 			//$project->date_start = dol_now(); -> option
 			$project->usage_task  = 1;

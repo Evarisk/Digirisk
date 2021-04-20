@@ -17,9 +17,9 @@
  */
 
 /**
- *  \file			htdocs/core/modules/digiriskdolibarr/modules_actionplan.php
+ *  \file			htdocs/core/modules/digiriskdolibarr/modules_riskassessmentdocument.php
  *  \ingroup		digiriskdolibarr
- *  \brief			File that contains parent class for actionplans document models
+ *  \brief			File that contains parent class for riskassessmentdocuments document models
  */
 
 require_once DOL_DOCUMENT_ROOT . '/core/class/commondocgenerator.class.php';
@@ -27,7 +27,7 @@ require_once DOL_DOCUMENT_ROOT . '/core/class/commondocgenerator.class.php';
 /**
  *	Parent class for documents models
 */
-abstract class ModeleODTActionPlan extends CommonDocGenerator
+abstract class ModeleODTRiskAssessmentDocument extends CommonDocGenerator
 {
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
@@ -40,7 +40,7 @@ abstract class ModeleODTActionPlan extends CommonDocGenerator
 	 */
 	public static function liste_modeles($db, $maxfilenamelength = 0)
 	{
-		$type = 'actionplan';
+		$type = 'riskassessmentdocument';
 		$list = array();
 
 		include_once DOL_DOCUMENT_ROOT . '/core/lib/functions2.lib.php';

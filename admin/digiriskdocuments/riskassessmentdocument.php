@@ -16,9 +16,9 @@
  */
 
 /**
- * \file    digiriskdolibarr/admin/actionplan.php
+ * \file    digiriskdolibarr/admin/riskassessmentdocument.php
  * \ingroup digiriskdolibarr
- * \brief   Digiriskdolibarr actionplan page.
+ * \brief   Digiriskdolibarr riskassessmentdocument page.
  */
 
 // Load Dolibarr environment
@@ -44,7 +44,7 @@ $action     = GETPOST('action', 'alpha');
 $backtopage = GETPOST('backtopage', 'alpha');
 $value      = GETPOST('value', 'alpha');
 
-$type          = 'actionplan';
+$type          = 'riskassessmentdocument';
 $error         = 0;
 $setupnotempty = 0;
 
@@ -55,10 +55,10 @@ include DOL_DOCUMENT_ROOT.'/core/actions_setmoduleoptions.inc.php';
 
 if ($action == 'updateMask')
 {
-	$maskconstactionplan = GETPOST('maskconstactionplan', 'alpha');
-	$maskactionplan      = GETPOST('maskactionplan', 'alpha');
+	$maskconstriskassessmentdocument = GETPOST('maskconstriskassessmentdocument', 'alpha');
+	$maskriskassessmentdocument      = GETPOST('maskriskassessmentdocument', 'alpha');
 
-	if ($maskconstactionplan) $res = dolibarr_set_const($db, $maskconstactionplan, $maskactionplan, 'chaine', 0, '', $conf->entity);
+	if ($maskconstriskassessmentdocument) $res = dolibarr_set_const($db, $maskconstriskassessmentdocument, $maskriskassessmentdocument, 'chaine', 0, '', $conf->entity);
 
 	if (!$res > 0) $error++;
 
@@ -75,9 +75,9 @@ elseif ($action == 'set')
 {
 	$label = GETPOST('label', 'alpha');
 
-	if ( $value == 'actionplan_odt' ) {
+	if ( $value == 'riskassessmentdocument_odt' ) {
 		$description = "DIGIRISKDOLIBARR_".strtoupper($type)."_ADDON_ODT_PATH";
-	} elseif ( $value == 'actionplan_custom_odt' ) {
+	} elseif ( $value == 'riskassessmentdocument_custom_odt' ) {
 		$description = "DIGIRISKDOLIBARR_".strtoupper($type)."_CUSTOM_ADDON_ODT_PATH";
 	}
 
@@ -118,7 +118,7 @@ elseif ($action == 'setdoc')
 $form            = new Form($db);
 $object_document = new DigiriskDocuments($db);
 
-$help_url  = 'FR:Module_DigiriskDolibarr';
+$help_url  = 'FR:Module_DigiriskDolibarr#L.27onglet_Document_Unique';
 $page_name = "DigiriskdolibarrSetup";
 
 llxHeader('', $langs->trans($page_name), $help_url);
@@ -132,13 +132,13 @@ print load_fiche_titre($langs->trans($page_name), $linkback, 'object_digiriskdol
 $head = digiriskdolibarrAdminPrepareHead();
 dol_fiche_head($head, 'digiriskdocuments', '', -1, "digiriskdolibarr@digiriskdolibarr");
 $head = digiriskdolibarrAdminDigiriskDocumentsPrepareHead();
-dol_fiche_head($head, 'actionplan', '', -1, "digiriskdolibarr@digiriskdolibarr");
+dol_fiche_head($head, 'riskassessmentdocument', '', -1, "digiriskdolibarr@digiriskdolibarr");
 
 /*
  *  Numbering module
  */
 
-print load_fiche_titre($langs->trans("DigiriskActionPlanNumberingModule"), '', '');
+print load_fiche_titre($langs->trans("DigiriskRiskAssessmentDocumentNumberingModule"), '', '');
 
 print '<table class="noborder centpercent">';
 print '<tr class="liste_titre">';
@@ -190,7 +190,7 @@ if (is_dir($dir))
 						print '</td>'."\n";
 
 						print '<td class="center">';
-						if ($conf->global->DIGIRISKDOLIBARR_ACTIONPLAN_ADDON == $file || $conf->global->DIGIRISKDOLIBARR_ACTIONPLAN_ADDON.'.php' == $file)
+						if ($conf->global->DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_ADDON == $file || $conf->global->DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_ADDON.'.php' == $file)
 						{
 							print img_picto($langs->trans("Activated"), 'switch_on');
 						}
@@ -217,7 +217,7 @@ if (is_dir($dir))
 
 						print '<td class="center">';
 						print $form->textwithpicto('', $htmltooltip, 1, 0);
-						if ($conf->global->DIGIRISKDOLIBARR_ACTIONPLAN_ADDON.'.php' == $file)  // If module is the one used, we show existing errors
+						if ($conf->global->DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_ADDON.'.php' == $file)  // If module is the one used, we show existing errors
 						{
 							if (!empty($module->error)) dol_htmloutput_mesg($module->error, '', 'error', 1);
 						}
@@ -232,10 +232,10 @@ if (is_dir($dir))
 }
 
 /*
-*  Documents models for Action Plan
+*  Documents models for Risk Assessment Document
 */
 
-print load_fiche_titre($langs->trans("DigiriskTemplateDocumentActionPlan"), '', '');
+print load_fiche_titre($langs->trans("DigiriskTemplateDocumentRiskAssessmentDocument"), '', '');
 
 // Defini tableau def des modeles
 $def = array();
@@ -287,7 +287,7 @@ if (is_dir($dir))
 
 		foreach ($filelist as $file)
 		{
-			if (preg_match('/\.modules\.php$/i', $file) && preg_match('/^(pdf_|doc_)/', $file) && preg_match('/actionplan/i', $file) && preg_match('/odt/i', $file))
+			if (preg_match('/\.modules\.php$/i', $file) && preg_match('/^(pdf_|doc_)/', $file) && preg_match('/riskassessmentdocument/i', $file) && preg_match('/odt/i', $file))
 			{
 				if (file_exists($dir.'/'.$file))
 				{
@@ -328,7 +328,7 @@ if (is_dir($dir))
 
 						// Default
 						print '<td class="center">';
-						if ($conf->global->DIGIRISKDOLIBARR_ACTIONPLAN_DEFAULT_MODEL == $name)
+						if ($conf->global->DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_DEFAULT_MODEL == $name)
 						{
 							print img_picto($langs->trans("Default"), 'on');
 						}

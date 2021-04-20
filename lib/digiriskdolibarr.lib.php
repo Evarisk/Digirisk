@@ -99,14 +99,9 @@ function digiriskdolibarrAdminDigiriskDocumentsPrepareHead()
 	$head[$h][2] = 'listingrisksphoto';
 	$h++;
 
-	$head[$h][0] = dol_buildpath("/digiriskdolibarr/admin/digiriskdocuments/firepermit.php", 1);
-	$head[$h][1] = $langs->trans("FirePermit");
-	$head[$h][2] = 'firepermit';
-	$h++;
-
-	$head[$h][0] = dol_buildpath("/digiriskdolibarr/admin/digiriskdocuments/preventionplan.php", 1);
-	$head[$h][1] = $langs->trans("PreventionPlan");
-	$head[$h][2] = 'preventionplan';
+	$head[$h][0] = dol_buildpath("/digiriskdolibarr/admin/digiriskdocuments/riskassessmentdocument.php", 1);
+	$head[$h][1] = $langs->trans("RiskAssessmentDocument");
+	$head[$h][2] = 'riskassessmentdocument';
 	$h++;
 
 	$head[$h][0] = dol_buildpath("/digiriskdolibarr/admin/digiriskdocuments/groupmentdocument.php", 1);
@@ -117,6 +112,16 @@ function digiriskdolibarrAdminDigiriskDocumentsPrepareHead()
 	$head[$h][0] = dol_buildpath("/digiriskdolibarr/admin/digiriskdocuments/workunitdocument.php", 1);
 	$head[$h][1] = $langs->trans("WorkUnitDocument");
 	$head[$h][2] = 'workunitdocument';
+	$h++;
+
+	$head[$h][0] = dol_buildpath("/digiriskdolibarr/admin/digiriskdocuments/preventionplan.php", 1);
+	$head[$h][1] = $langs->trans("PreventionPlan");
+	$head[$h][2] = 'preventionplan';
+	$h++;
+
+	$head[$h][0] = dol_buildpath("/digiriskdolibarr/admin/digiriskdocuments/firepermit.php", 1);
+	$head[$h][1] = $langs->trans("FirePermit");
+	$head[$h][2] = 'firepermit';
 	$h++;
 
 	complete_head_from_modules($conf, $langs, null, $head, $h, 'digiriskdolibarr');

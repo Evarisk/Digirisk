@@ -17,7 +17,7 @@
  */
 
 /**
- *	\file       htdocs/custom/digiriskdolibarr/core/modules/digiriskdolibarr/mod_actionplan_standard.php
+ *	\file       htdocs/custom/digiriskdolibarr/core/modules/digiriskdolibarr/mod_riskassessmentdocument_standard.php
  * \ingroup     digiriskdolibarr
  *	\brief      File containing class for numbering module Standard
  */
@@ -25,9 +25,9 @@
 dol_include_once('/custom/digiriskdolibarr/core/modules/digiriskdolibarr/digiriskdocuments/modules_digiriskdocuments.php');
 
 /**
- * 	Class to manage actionplan numbering rules Standard
+ * 	Class to manage riskassessmentdocument numbering rules Standard
  */
-class mod_actionplan_standard extends ModeleNumRefDigiriskDocuments
+class mod_riskassessmentdocument_standard extends ModeleNumRefDigiriskDocuments
 {
 	/**
 	 * Dolibarr version of the loaded document
@@ -59,7 +59,7 @@ class mod_actionplan_standard extends ModeleNumRefDigiriskDocuments
 	{
 		global $langs;
 		$langs->load("digiriskdolibarr@digiriskdolibarr");
-		return $langs->trans('DigiriskActionPlanStandardModel', $this->prefix);
+		return $langs->trans('DigiriskRiskAssessmentDocumentStandardModel', $this->prefix);
 	}
 
 	/**
@@ -102,14 +102,14 @@ class mod_actionplan_standard extends ModeleNumRefDigiriskDocuments
 		}
 		else
 		{
-			dol_syslog("mod_actionplan_standard::getNextValue", LOG_DEBUG);
+			dol_syslog("mod_riskassessmentdocument_standard::getNextValue", LOG_DEBUG);
 			return -1;
 		}
 
 		if ($max >= (pow(10, 4) - 1)) $num = $max + 1; // If counter > 9999, we do not format on 4 chars, we take number as it is
 		else $num = sprintf("%s", $max + 1);
 
-		dol_syslog("mod_actionplan_standard::getNextValue return ".$this->prefix.$num);
+		dol_syslog("mod_riskassessmentdocument_standard::getNextValue return ".$this->prefix.$num);
 		return $this->prefix.$num;
 	}
 }
