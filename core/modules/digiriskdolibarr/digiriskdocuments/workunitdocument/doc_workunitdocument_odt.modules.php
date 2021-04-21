@@ -199,7 +199,7 @@ class doc_workunitdocument_odt extends ModeleODTWorkUnitDocument
 
 		$object->fetch($id);
 
-		$dir = $conf->digiriskdolibarr->multidir_output[isset($object->entity) ? $object->entity : 1] . '/workunitdocument';
+		$dir = $conf->digiriskdolibarr->multidir_output[isset($object->entity) ? $object->entity : 1] . '/workunitdocument/'. $digiriskelement->ref;
 		$objectref = dol_sanitizeFileName($ref);
 		if (preg_match('/specimen/i', $objectref)) $dir .= '/specimen';
 

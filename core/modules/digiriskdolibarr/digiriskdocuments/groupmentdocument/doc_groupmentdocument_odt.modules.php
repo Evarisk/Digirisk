@@ -197,7 +197,7 @@ class doc_groupmentdocument_odt extends ModeleODTGroupmentDocument
 
 		$object->fetch($id);
 
-		$dir = $conf->digiriskdolibarr->multidir_output[isset($object->entity) ? $object->entity : 1] . '/groupmentdocument';
+		$dir = $conf->digiriskdolibarr->multidir_output[isset($object->entity) ? $object->entity : 1] . '/groupmentdocument/'. $digiriskelement->ref;
 		$objectref = dol_sanitizeFileName($ref);
 		if (preg_match('/specimen/i', $objectref)) $dir .= '/specimen';
 
