@@ -27,8 +27,10 @@ if (!$res && file_exists("../../main.inc.php")) $res = @include "../../main.inc.
 if (!$res) die("Include of main fails");
 
 require_once DOL_DOCUMENT_ROOT.'/core/class/html.formfile.class.php';
-
 dol_include_once('/digiriskdolibarr/class/digiriskstandard.class.php');
+dol_include_once('/digiriskdolibarr/class/digiriskelement.class.php');
+dol_include_once('/digiriskdolibarr/class/digiriskdocuments/groupmentdocument.class.php');
+dol_include_once('/digiriskdolibarr/class/digiriskdocuments/workunitdocument.class.php');
 dol_include_once('/digiriskdolibarr/class/digiriskdocuments/riskassessmentdocument.class.php');
 dol_include_once('/digiriskdolibarr/lib/digiriskdolibarr_digiriskstandard.lib.php');
 dol_include_once('/digiriskdolibarr/lib/digiriskdolibarr_function.lib.php');
@@ -43,7 +45,8 @@ $langs->loadLangs(array("digiriskdolibarr@digiriskdolibarr", "other"));
 $action = GETPOST('action', 'aZ09');
 
 // Initialize technical objects
-$object       = new DigiriskStandard($db);
+$object                 = new DigiriskStandard($db);
+$digiriskelement        = new DigiriskElement($db);
 $riskassessmentdocument = new RiskAssessmentDocument($db);
 $hookmanager->initHooks(array('digiriskelementriskassessmentdocument', 'globalcard')); // Note that conf->hooks_modules contains array
 
@@ -88,6 +91,21 @@ if (empty($reshook))
 		$model      = GETPOST('model', 'alpha');
 
 		$result = $riskassessmentdocument->generateDocument($model, $outputlangs, $hidedetails, $hidedesc, $hideref, $moreparams);
+		$digiriskelementlist = $digiriskelement->fetchDigiriskElementFlat(0);
+
+		if ( ! empty( $digiriskelementlist ) ) {
+			foreach ($digiriskelementlist as $digiriskelementsingle) {
+				if ($digiriskelementsingle->element_type == 'groupment') {
+					$digiriskelementdocument = new GroupmentDocument($db);
+				} elseif ($digiriskelementsingle->element_type == 'workunit') {
+					$digiriskelementdocument = new WorkUnitDocument($db);
+				}
+				$moreparams = $digiriskelementsingle;
+				$digiriskelementdocumentmodel = 'DIGIRISKDOLIBARR_'.strtoupper($digiriskelementdocument->element).'_DEFAULT_MODEL';
+
+				$digiriskelementdocument->generateDocument($conf->global->$digiriskelementdocumentmodel, $outputlangs, $hidedetails, $hidedesc, $hideref, $moreparams);
+			}
+		}
 		if ($result <= 0) {
 			setEventMessages($object->error, $object->errors, 'errors');
 			$action = '';
