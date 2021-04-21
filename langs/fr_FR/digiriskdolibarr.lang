@@ -295,6 +295,10 @@ RiskAssessmentDocument = Document unique
 RiskAssessmentDocumentDU = Plan d'action Document Unique
 RiskAssessmentDocumentDUDescription = Description du plan d'action Document Unique
 
+RiskAssessmentMethod = * Étape 1 : Recuperation des informations\n- Visite des locaux\n- Recuperation des donnees du personnel\n\n * Etape 2 : Definition de la methodologie et de document\n- Validation des fiches d'unite de travail standard\n- Validation de l'arborescence des unites\n\n* Etape 3 : Realisation de l etude de risques\n- Sensibilisation des personnels aux risques et aux dangers\n- Creation des unites de travail avec le personnel et le ou les responsables\n- Evaluations des risques par unites de travail avec le personnel\n\n* Etape 4\n- Traitement et redaction du document unique
+RiskAssessmentSources = La sensibilisation des risques est definie dans l ed840 edite par l INRS.\nDans ce document vous trouverez:\n- La definition d un risque, d un danger et un schema explicatif\n- Les explications concernant les differentes methodes d evaluation\n
+RiskAssessmentImportantNote = Notes importantes
+RiskAssessmentSitePlans =
 
 #
 # GroupmentDocument - Fiche Groupement
