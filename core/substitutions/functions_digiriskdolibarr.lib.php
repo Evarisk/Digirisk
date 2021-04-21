@@ -120,6 +120,24 @@ function digiriskdolibarr_completesubstitutionarray(&$substitutionarray,$langs,$
 			$substitutionarray['taxonomy']              = $firepermit->taxonomy;
 
 			break;
+
+		case 'riskassessmentdocument@digiriskdolibarr':
+
+			$riskassessmentdocument = json_decode($object->json, false, 512, JSON_UNESCAPED_UNICODE)->RiskAssessmentDocument;
+
+			$substitutionarray['nomEntreprise']      = $riskassessmentdocument->nomEntreprise;
+			//$substitutionarray['dateAudit']        = $riskassessmentdocument->dateAudit;
+			$substitutionarray['emetteurDUER']       = $riskassessmentdocument->emetteurDUER;
+			$substitutionarray['dateGeneration']     = $riskassessmentdocument->dateGeneration;
+			$substitutionarray['destinataireDUER']   = $riskassessmentdocument->destinataireDUER;
+			$substitutionarray['telephone']          = $riskassessmentdocument->telephone;
+			$substitutionarray['portable']           = $riskassessmentdocument->portable;
+			$substitutionarray['methodologie']       = $langs->trans($riskassessmentdocument->methodologie);
+			$substitutionarray['sources']            = $langs->trans($riskassessmentdocument->sources);
+			$substitutionarray['remarqueImportante'] = $langs->trans($riskassessmentdocument->remarqueImportante);
+			$substitutionarray['dispoDesPlans']      = $langs->trans($riskassessmentdocument->dispoDesPlans);
+
+			break;
 	}
 
 	switch ($element_type) {
