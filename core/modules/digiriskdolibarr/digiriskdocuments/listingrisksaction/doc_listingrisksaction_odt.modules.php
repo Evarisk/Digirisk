@@ -318,10 +318,6 @@ class doc_listingrisksaction_odt extends ModeleODTListingRisksAction
 										$tmparray['quotationRisque']    = $lastEvaluation->cotation ? $lastEvaluation->cotation : '0' ;
 										$tmparray['commentaireRisque'] = dol_print_date( $lastEvaluation->date_creation, '%A %e %B %G %H:%M' ) . ': ' . $lastEvaluation->comment;
 
-										$path                      = DOL_DATA_ROOT .'/digiriskdolibarr/riskassessment/' . $lastEvaluation->ref ;
-										$image                     = $path . '/' . $lastEvaluation->photo;
-										$tmparray['photoAssociee'] = $image;
-
 										unset($tmparray['object_fields']);
 
 										complete_substitutions_array($tmparray, $outputlangs, $object, $line, "completesubstitutionarray_lines");
@@ -351,7 +347,7 @@ class doc_listingrisksaction_odt extends ModeleODTListingRisksAction
 					}
 					else {
 						$risks = $risk->fetchRisksOrderedByCotation(0, true);
-						if ($risks !== -1) {
+						if ($risks > 0 && !empty($risks)) {
 							for ($i = 1; $i <= 4; $i++ ) {
 								$listlines = $odfHandler->setSegment('risk' . $i);
 
@@ -369,10 +365,6 @@ class doc_listingrisksaction_odt extends ModeleODTListingRisksAction
 										$tmparray['identifiantRisque'] = $line->ref . ' - ' . $lastEvaluation->ref;
 										$tmparray['quotationRisque']    = $lastEvaluation->cotation ? $lastEvaluation->cotation : '0' ;
 										$tmparray['commentaireRisque'] = dol_print_date( $lastEvaluation->date_creation, '%A %e %B %G %H:%M' ) . ': ' . $lastEvaluation->comment;
-
-										$path                      = DOL_DATA_ROOT .'/digiriskdolibarr/risk/' . $line->ref ;
-										$image                     = $path . '/' . $lastEvaluation->photo;
-										$tmparray['photoAssociee'] = $image;
 
 										unset($tmparray['object_fields']);
 
