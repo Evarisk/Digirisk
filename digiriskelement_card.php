@@ -440,7 +440,8 @@ if ((empty($action) || ($action != 'edit' && $action != 'create')))
 		if ($includedocgeneration) {
 			print '<div class="fichecenter"><div class="fichehalfleft elementDocument">';
 
-			$dir_files = $digiriskelementdocument->element;
+			$objref = dol_sanitizeFileName($object->ref);
+			$dir_files = $digiriskelementdocument->element . '/' . $objref;
 			$filedir = $upload_dir . '/' . $dir_files;
 			$urlsource = $_SERVER["PHP_SELF"] . '?id='. $id;
 
