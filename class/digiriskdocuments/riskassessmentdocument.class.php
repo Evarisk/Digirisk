@@ -89,4 +89,39 @@ class RiskAssessmentDocument extends DigiriskDocuments
 			}
 		}
 	}
+
+	public function riskAssessmentDocumentFillJSON($object)
+	{
+		global $conf, $langs;
+
+		$user = new User($this->db);
+		$user->fetch($this->fk_user_creat);
+
+		// *** JSON FILLING ***
+		$json['RiskAssessmentDocument']['nomEntreprise'] = $conf->global->MAIN_INFO_SOCIETE_NOM;
+		//$json['riskAssessmentDocument']['dateAudit']        = $conf->global->DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_AUDIT_START_DATE . ' - ' . $conf->global->DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_AUDIT_END_DATE;
+		$json['RiskAssessmentDocument']['emetteurDUER'] = $user->lastname . ' ' . $user->firstname;
+		$json['RiskAssessmentDocument']['dateGeneration'] = $this->date_creation;
+
+		if ($conf->global->DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_RECIPIENT > 0) {
+			$user->fetch($conf->global->DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_RECIPIENT);
+
+			$json['RiskAssessmentDocument']['destinataireDUER'] = $user->lastname . ' ' . $user->firstname;
+			$json['RiskAssessmentDocument']['telephone'] = $user->office_phone;
+			$json['RiskAssessmentDocument']['portable'] = $user->user_mobile;
+		}else {
+			$json['RiskAssessmentDocument']['destinataireDUER'] = '';
+			$json['RiskAssessmentDocument']['telephone'] = '';
+			$json['RiskAssessmentDocument']['portable'] = '';
+		}
+
+		$json['RiskAssessmentDocument']['methodologie']       = $conf->global->DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_METHOD;
+		$json['RiskAssessmentDocument']['sources']            = $conf->global->DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_SOURCES;
+		$json['RiskAssessmentDocument']['remarqueImportante'] = $conf->global->DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_IMPORTANT_NOTE;
+		$json['RiskAssessmentDocument']['dispoDesPlans']      = $conf->global->DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_SITE_PLANS;
+
+		$object->json = json_encode($json, JSON_UNESCAPED_UNICODE);
+
+		return $object->json;
+	}
 }

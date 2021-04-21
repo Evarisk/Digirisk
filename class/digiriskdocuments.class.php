@@ -151,7 +151,7 @@ class DigiriskDocuments extends CommonObject
 		$this->status        = 1;
 		$this->type          = $this->element;
 
-		$this->fk_user_creat = $user->id;
+		$this->fk_user_creat = $user->id ? $user->id : 1;
 
 		if ($parentObject->id > 0) {
 			$this->parent_id     = $parentObject->id;
@@ -178,6 +178,9 @@ class DigiriskDocuments extends CommonObject
 				break;
 			case "informationssharing":
 				$this->json = $this->InformationsSharingFillJSON($object);
+				break;
+			case "riskassessmentdocument":
+				$this->json = $this->RiskAssessmentDocumentFillJSON($object);
 				break;
 		}
 	}
