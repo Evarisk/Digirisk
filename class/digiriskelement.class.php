@@ -236,6 +236,42 @@ class DigiriskElement extends CommonObject
 	}
 
 	/**
+	 * Load object in memory from the database
+	 *
+	 * @param int        $parent_id   Id parent object
+	 * @param boolean    $recursive   Recursive Mode
+	 * @return int         <0 if KO, 0 if not found, >0 if OK
+	 */
+	public function fetchDigiriskElementFlat($parent_id)
+	{
+		$object = new DigiriskElement($this->db);
+		$objects = $object->fetchAll();
+
+		$elements = recurse_tree($parent_id, 0, $objects);
+		if ($elements > 0 && !empty($elements)) {
+			// Super fonction itérations flat.
+			$it = new RecursiveIteratorIterator(new RecursiveArrayIterator($elements));
+			foreach ($it as $key => $v) {
+				$element[$key][$v] = $v;
+			}
+			if (is_array($element)) {
+				$children_id = array_shift($element);
+			}
+
+			if (!empty ($children_id)) {
+				foreach ($children_id as $id) {
+					$object = new DigiriskElement($this->db);
+					$result = $object->fetch($id);
+					if (!empty ($result)) {
+						$digiriskelementlist[$id] = $object;
+					}
+				}
+			}
+		}
+		return $digiriskelementlist;
+	}
+
+	/**
 	 * Update object into database
 	 *
 	 * @param  User $user      User that modifies
