@@ -151,10 +151,10 @@ class modDigiriskdolibarr extends DolibarrModules
 			174 => array('DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_SITE_PLANS','chaine','','', 1),
 
 			4 => array('MAIN_AGENDA_ACTIONAUTO_RISKASSESSMENTDOCUMENT_CREATE','chaine',1,'', 1),
-			5 => array('DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_ADDON','chaine', 'mod_legaldisplay_standard' ,'', 1),
+			5 => array('DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_ADDON','chaine', 'mod_riskassessmentdocument_standard' ,'', 1),
 			6 => array('DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_ADDON_ODT_PATH','chaine', DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/documents/doctemplates/riskassessmentdocument/' ,'', 1),
 			7 => array('DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_CUSTOM_ADDON_ODT_PATH','chaine', DOL_DATA_ROOT . '/ecm/digiriskdolibarr/riskassessmentdocument/' ,'', 1),
-			8 => array('DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT__DEFAULT_MODEL','chaine', 'actionplan_odt' ,'', 1),
+			8 => array('DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT__DEFAULT_MODEL','chaine', 'riskassessmentdocument_odt' ,'', 1),
 
 			// CONST LEGAL DISPLAY
 			10 => array('DIGIRISK_LOCATION_OF_DETAILED_INSTRUCTION','chaine','','Location of detailed instruction', 1),
