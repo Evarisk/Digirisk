@@ -188,13 +188,36 @@ print '<div class="underbanner clearboth"></div>';
 print '<table class="border centpercent tableforfield">' . "\n";
 
 //JSON Decode and show fields
-//include DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/core/tpl/digiriskdolibarr_riskassessmentdocumentfields_view.tpl.php';
+include DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/core/tpl/digiriskdolibarr_riskassessmentdocumentfields_view.tpl.php';
 
 print '</table>';
 print '</div>';
 print '</div>';
 
 dol_fiche_end();
+
+// Buttons for actions
+print '<div class="tabsAction" >' . "\n";
+$parameters = array();
+$reshook = $hookmanager->executeHooks('addMoreActionsButtons', $parameters, $object, $action); // Note that $action and $object may have been modified by hook
+if ($reshook < 0) setEventMessages($hookmanager->error, $hookmanager->errors, 'errors');
+
+if (empty($reshook)) {
+	// Modify
+	if ($permissiontoadd) {
+		print '<a class="butAction" id="actionButtonEdit" href="' . $_SERVER["PHP_SELF"] . '?id=' . $object->id . '&action=edit">' . $langs->trans("Modify") . '</a>' . "\n";
+	} else {
+		print '<a class="butActionRefused classfortooltip" href="#" title="' . dol_escape_htmltag($langs->trans("NotEnoughPermissions")) . '">' . $langs->trans('Modify') . '</a>' . "\n";
+	}
+
+	// Delete (need delete permission, or if draft, just need create/modify permission)
+	if ($permissiontodelete) {
+		print '<a class="butActionDelete" href="' . $_SERVER["PHP_SELF"] . '?id=' . $object->id . '&amp;action=delete">' . $langs->trans('Delete') . '</a>' . "\n";
+	} else {
+		print '<a class="butActionRefused classfortooltip" href="#" title="' . dol_escape_htmltag($langs->trans("NotEnoughPermissions")) . '">' . $langs->trans('Delete') . '</a>' . "\n";
+	}
+}
+print '</div>' . "\n";
 
 // Document Generation -- Génération des documents
 $includedocgeneration = 1;
