@@ -6,6 +6,7 @@ INSERT INTO llx_document_model (nom, entity, type, libelle, description) VALUES 
 INSERT INTO llx_document_model (nom, entity, type, libelle, description) VALUES ('workunitdocument_odt', 1, 'workunitdocument', 'ODT templates', 'DIGIRISKDOLIBARR_WORKUNITDOCUMENT_ADDON_ODT_PATH');
 INSERT INTO llx_document_model (nom, entity, type, libelle, description) VALUES ('listingrisksaction_odt', 1, 'listingrisksaction', 'ODT templates', 'DIGIRISKDOLIBARR_LISTINGRISKSACTION_ADDON_ODT_PATH');
 INSERT INTO llx_document_model (nom, entity, type, libelle, description) VALUES ('listingrisksphoto_odt', 1, 'listingrisksphoto', 'ODT templates', 'DIGIRISKDOLIBARR_LISTINGRISKSPHOTO_ADDON_ODT_PATH');
+INSERT INTO llx_document_model (nom, entity, type, libelle, description) VALUES ('riskassessmentdocument_odt', 1, 'riskassessmentdocument', 'ODT templates', 'DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_ADDON_ODT_PATH');
 
 INSERT INTO llx_c_action_trigger (elementtype, code, label, description) VALUES ('informationssharing', 'INFORMATIONSSHARING_GENERATE', 'Informations Sharing Document Generated', 'Executed when a informations sharing document is generated');
 INSERT INTO llx_c_action_trigger (elementtype, code, label, description) VALUES ('firepermit', 'FIREPERMIT_GENERATE', 'Fire Permit Document Generated', 'Executed when a fire permit document is generated');
@@ -15,6 +16,7 @@ INSERT INTO llx_c_action_trigger (elementtype, code, label, description) VALUES 
 INSERT INTO llx_c_action_trigger (elementtype, code, label, description) VALUES ('workunitdocument', 'WORKUNITDOCUMENT_GENERATE', 'Work Unit Document Generated', 'Executed when a work unit document is generated');
 INSERT INTO llx_c_action_trigger (elementtype, code, label, description) VALUES ('listingrisksphoto', 'LISTINGRISKSPHOTO_GENERATE', 'Listing risks photos Generated', 'Executed when a listing risks photos is generated');
 INSERT INTO llx_c_action_trigger (elementtype, code, label, description) VALUES ('listingrisksaction', 'LISTINGRISKSACTION_GENERATE', 'Listing risks actions Generated', 'Executed when a listing risks actions is generated');
+INSERT INTO llx_c_action_trigger (elementtype, code, label, description) VALUES ('riskassessmentdocument', 'RISKASSESSMENTDOCUMENT_GENERATE', 'Risk Assessment Document Generated', 'Executed when a risk assessment document is generated');
 
 -- INSERT INTO llx_c_email_templates (entity,module,type_template,lang,private,fk_user,datec,label,position,enabled,active,topic,joinfiles,content,content_lines)
 -- VALUES (1,null,'Digirisk_LegalDisplay','',0,null,null,'Digirisk_LegalDisplay',1,1,1,'[__[MAIN_INFO_SOCIETE_NOM]__] - __(SendLegalDisplay)__',1,
