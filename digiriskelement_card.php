@@ -229,6 +229,7 @@ if ($action == 'create')
 	unset($object->fields['fk_parent']);
 	unset($object->fields['last_main_doc']);
 	unset($object->fields['entity']);
+	unset($object->fields['description']);
 
 	print '<table class="border centpercent tableforfieldcreate">'."\n";
 
@@ -241,7 +242,13 @@ if ($action == 'create')
 	print $modele->getNextValue($object);
 	print '</td></tr>';
 
+
 	include DOL_DOCUMENT_ROOT.'/core/tpl/commonfields_add.tpl.php';
+
+	print '<tr><td>'.$langs->trans("Description").'</td><td>';
+	print '<input hidden class="flat" type="text" size="36" name="description" id="description">';
+	print '<textarea name="description" id="description" class="minwidth300" rows="'.ROWS_3.'">'.'</textarea>'."\n";
+	print '</td></tr>';
 
 	print '<input hidden class="flat" type="text" size="36" name="element_type" value="'.$element_type.'">';
 	print '<input hidden class="flat" type="text" size="36" name="fk_parent" value="'.$fk_parent.'">';
