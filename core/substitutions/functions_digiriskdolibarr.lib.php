@@ -126,7 +126,7 @@ function digiriskdolibarr_completesubstitutionarray(&$substitutionarray,$langs,$
 			$riskassessmentdocument = json_decode($object->json, false, 512, JSON_UNESCAPED_UNICODE)->RiskAssessmentDocument;
 
 			$substitutionarray['nomEntreprise']      = $riskassessmentdocument->nomEntreprise;
-			//$substitutionarray['dateAudit']        = $riskassessmentdocument->dateAudit;
+			$substitutionarray['dateAudit']          = $riskassessmentdocument->dateAudit;
 			$substitutionarray['emetteurDUER']       = $riskassessmentdocument->emetteurDUER;
 			$substitutionarray['dateGeneration']     = $riskassessmentdocument->dateGeneration;
 			$substitutionarray['destinataireDUER']   = $riskassessmentdocument->destinataireDUER;

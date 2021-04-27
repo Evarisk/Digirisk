@@ -26,7 +26,9 @@ $res = 0;
 if (!$res && file_exists("../../main.inc.php")) $res = @include "../../main.inc.php";
 if (!$res) die("Include of main fails");
 
+require_once DOL_DOCUMENT_ROOT.'/core/lib/admin.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/core/class/html.formfile.class.php';
+
 dol_include_once('/digiriskdolibarr/class/digiriskstandard.class.php');
 dol_include_once('/digiriskdolibarr/class/digiriskelement.class.php');
 dol_include_once('/digiriskdolibarr/class/digiriskdocuments/groupmentdocument.class.php');
@@ -70,6 +72,40 @@ if ($reshook < 0) setEventMessages($hookmanager->error, $hookmanager->errors, 'e
 if (empty($reshook))
 {
 	$error = 0;
+
+	if (($action == 'update' && !GETPOST("cancel", 'alpha'))
+		|| ($action == 'updateedit') && $permissiontoadd)
+	{
+
+		$auditStartDate = GETPOST('AuditStartDate', 'none');
+		$auditEndDate   = GETPOST('AuditEndDate', 'none');
+		$recipent       = GETPOST('Recipient', 'alpha');
+		$method         = GETPOST('Method', 'alpha');
+		$sources        = GETPOST('Sources', 'alpha');
+		$importantNote  = GETPOST('ImportantNote', 'alpha');
+		$sitePlans      = GETPOST('SitePlans', 'alpha');
+
+		$auditStartDate = explode('/',$auditStartDate);
+		$auditStartDate = $auditStartDate[2] . '-' . $auditStartDate[1] . '-' . $auditStartDate[0];
+
+		$auditEndDate = explode('/',$auditEndDate);
+		$auditEndDate = $auditEndDate[2] . '-' . $auditEndDate[1] . '-' . $auditEndDate[0];
+
+		dolibarr_set_const($db, "DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_AUDIT_START_DATE", $auditStartDate, 'date', 0, '', $conf->entity);
+		dolibarr_set_const($db, "DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_AUDIT_END_DATE", $auditEndDate, 'date', 0, '', $conf->entity);
+		dolibarr_set_const($db, "DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_RECIPIENT", $recipent, 'integer', 0, '', $conf->entity);
+
+		dolibarr_set_const($db, "DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_METHOD", $method, 'chaine', 0, '', $conf->entity);
+		dolibarr_set_const($db, "DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_SOURCES", $sources, 'chaine', 0, '', $conf->entity);
+		dolibarr_set_const($db, "DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_IMPORTANT_NOTE", $importantNote, 'chaine', 0, '', $conf->entity);
+		dolibarr_set_const($db, "DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_SITE_PLANS", $sitePlans, 'chaine', 0, '', $conf->entity);
+
+		if ($action != 'updateedit' && !$error)
+		{
+			header("Location: ".$_SERVER["PHP_SELF"]);
+			exit;
+		}
+	}
 
 	// Action to build doc
 	if ($action == 'builddoc' && $permissiontoadd) {
@@ -183,7 +219,6 @@ $morehtmlleft .= '<div class="floatleft inline-block valignmiddle divphotoref">'
 digirisk_banner_tab($object, 'ref', '', 0, 'ref', 'ref', $morehtmlref, '', 0, $morehtmlleft);
 
 print '<div class="fichecenter">';
-print '<div class="fichehalfleft">';
 print '<div class="underbanner clearboth"></div>';
 print '<table class="border centpercent tableforfield">' . "\n";
 
@@ -192,9 +227,6 @@ include DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/core/tpl/digiriskdolibarr_
 
 print '</table>';
 print '</div>';
-print '</div>';
-
-dol_fiche_end();
 
 // Buttons for actions
 print '<div class="tabsAction" >' . "\n";
@@ -205,23 +237,28 @@ if ($reshook < 0) setEventMessages($hookmanager->error, $hookmanager->errors, 'e
 if (empty($reshook)) {
 	// Modify
 	if ($permissiontoadd) {
-		print '<a class="butAction" id="actionButtonEdit" href="' . $_SERVER["PHP_SELF"] . '?id=' . $object->id . '&action=edit">' . $langs->trans("Modify") . '</a>' . "\n";
+		if ( $action == 'edit' ) {
+			print '<input type="submit" class="button" name="save" value="' . $langs->trans("Save") . '">';
+		} else {
+			print '<a class="butAction" id="actionButtonEdit" href="' . $_SERVER["PHP_SELF"] . '?action=edit">' . $langs->trans("Modify") . '</a>' . "\n";
+		}
 	} else {
-		print '<a class="butActionRefused classfortooltip" href="#" title="' . dol_escape_htmltag($langs->trans("NotEnoughPermissions")) . '">' . $langs->trans('Modify') . '</a>' . "\n";
-	}
-
-	// Delete (need delete permission, or if draft, just need create/modify permission)
-	if ($permissiontodelete) {
-		print '<a class="butActionDelete" href="' . $_SERVER["PHP_SELF"] . '?id=' . $object->id . '&amp;action=delete">' . $langs->trans('Delete') . '</a>' . "\n";
-	} else {
-		print '<a class="butActionRefused classfortooltip" href="#" title="' . dol_escape_htmltag($langs->trans("NotEnoughPermissions")) . '">' . $langs->trans('Delete') . '</a>' . "\n";
+		if ( $action == 'edit' ) {
+			print '<a class="butActionRefused classfortooltip" href="#" title="' . dol_escape_htmltag($langs->trans("NotEnoughPermissions")) . '">' . $langs->trans('Save') . '</a>' . "\n";
+		} else {
+			print '<a class="butActionRefused classfortooltip" href="#" title="' . dol_escape_htmltag($langs->trans("NotEnoughPermissions")) . '">' . $langs->trans('Modify') . '</a>' . "\n";
+		}
 	}
 }
-print '</div>' . "\n";
+
+print '</div>';
+print '</form>';
+
+dol_fiche_end();
 
 // Document Generation -- Génération des documents
 $includedocgeneration = 1;
-if ($includedocgeneration) {
+if ($includedocgeneration && $action != 'edit') {
 	$dir_files  = 'riskassessmentdocument';
 	$filedir    = $upload_dir . '/' . $dir_files;
 	$urlsource  = $_SERVER["PHP_SELF"];

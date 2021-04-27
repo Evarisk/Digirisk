@@ -35,57 +35,113 @@ if (!is_object($form)) $form = new Form($db);
 	<!-- BEGIN PHP TEMPLATE digiriskdolibarr_legaldisplayfields_view.tpl.php -->
 <?php
 
-$riskassessmentdocument = json_decode($riskassessmentdocument->riskAssessmentDocumentFillJSON($riskassessmentdocument), false, 512, JSON_UNESCAPED_UNICODE)->RiskAssessmentDocument;
+// Date d'audit
+if ( $action == "edit" && $permissiontoadd ) {
 
-// Médecin du travail
+	print '<form method="POST" action="'.$_SERVER["PHP_SELF"].'" name="edit">';
+	print '<input type="hidden" name="token" value="'.newToken().'">';
+	print '<input type="hidden" name="action" value="update">';
 
-print '<tr>';
-print '<td class="titlefield">'.$form->textwithpicto($langs->trans("AuditStartDate"), $langs->trans('HowToSetDataRiskAssessmentDocument')).'</td><td colspan="2">';
-print $form->selectDate($riskassessmentdocument->dateAudit, '', '', '', '', "add", 1, 1);
-print '</td></tr>';
+	print '<tr>';
+	print '<td class="titlefield"><label for="AuditStartDate">' . $form->textwithpicto($langs->trans("AuditStartDate"), $langs->trans('HowToSetDataRiskAssessmentDocument')) . '</label></td><td colspan="2">';
+	print $form->selectDate($conf->global->DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_AUDIT_START_DATE, 'AuditStartDate', '', '', '', "edit", 1, 1);
+	print '</td></tr>';
 
-print '<tr>';
-print '<td class="titlefield">'.$form->textwithpicto($langs->trans("AuditEndDate"), $langs->trans('HowToSetDataRiskAssessmentDocument')).'</td><td colspan="2">';
-print $form->selectDate($riskassessmentdocument->dateAudit, '', '', '', '', "add", 1, 1);
-print '</td></tr>';
+	print '<tr>';
+	print '<td class="titlefield"><label for="AuditStartDate">' . $form->textwithpicto($langs->trans("AuditEndDate"), $langs->trans('HowToSetDataRiskAssessmentDocument')) . '</label></td><td colspan="2">';
+	print $form->selectDate($conf->global->DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_AUDIT_END_DATE, 'AuditEndDate', '', '', '', "edit", 1, 1);
+	print '</td></tr>';
 
-// Inspecteur du travail
-print '<tr>';
-print '<td class="titlefield">'.$form->textwithpicto($langs->trans("Recipient"), $langs->trans('HowToSetDataRiskAssessmentDocument')).'</td><td colspan="2">';
-print $form->select_dolusers();
-print '</td></tr>';
+// Destinataire
 
-// SAMU
+	print '<tr>';
+	print '<td class="titlefield"><label for="Recipient">' . $form->textwithpicto($langs->trans("Recipient"), $langs->trans('HowToSetDataRiskAssessmentDocument')) . '</label></td><td colspan="2">';
+	print $form->select_dolusers($conf->global->DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_RECIPIENT, 'Recipient', 0, null, 0, '', '', 0, 0, 0, '', 0, '', '', 0, 0);
+	print '</td></tr>';
 
-print '<tr>';
-print '<td class="titlefield">'.$form->textwithpicto($langs->trans("Method"), $langs->trans('HowToSetDataRiskAssessmentDocument')).'</td>';
-print '<td>';
-print $langs->trans($riskassessmentdocument->methodologie.'Card');
-print '</td></tr>';
+// Méthodologie
 
-// Pompiers
+	print '<tr>';
+	print '<td class="titlefield"><label for="Method">' . $form->textwithpicto($langs->trans("Method"), $langs->trans('HowToSetDataRiskAssessmentDocument')) . '</label></td>';
+	print '<td>';
+	print '<textarea name="Method" id="Method" class="minwidth300" rows="'.ROWS_3.'">'.$conf->global->DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_METHOD.'</textarea>';
+	print '</td></tr>';
 
-print '<tr>';
-print '<td class="titlefield">'.$form->textwithpicto($langs->trans("Sources"), $langs->trans('HowToSetDataRiskAssessmentDocument')).'</td>';
-print '<td>';
-print $langs->trans($riskassessmentdocument->sources.'Card');
-print '</td></tr>';
+// Sources
 
-// Police
+	print '<tr>';
+	print '<td class="titlefield"><label for="Sources">' . $form->textwithpicto($langs->trans("Sources"), $langs->trans('HowToSetDataRiskAssessmentDocument')) . '</label></td>';
+	print '<td>';
+	print '<textarea name="Sources" id="Sources" class="minwidth300" rows="'.ROWS_3.'">'.$conf->global->DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_SOURCES.'</textarea>';
+	print '</td></tr>';
 
-print '<tr>';
-print '<td class="titlefield">'.$form->textwithpicto($langs->trans("ImportantNote"), $langs->trans('HowToSetDataRiskAssessmentDocument')).'</td>';
-print '<td>';
-print $langs->trans($riskassessmentdocument->remarqueImportante);
-print '</td></tr>';
+// Remarque Importante
 
-// Urgences
+	print '<tr>';
+	print '<td class="titlefield"><label for="ImportantNote">' . $form->textwithpicto($langs->trans("ImportantNote"), $langs->trans('HowToSetDataRiskAssessmentDocument')) . '</label></td>';
+	print '<td>';
+	print '<textarea name="ImportantNote" id="ImportantNote" class="minwidth300" rows="'.ROWS_3.'">'.$conf->global->DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_IMPORTANT_NOTE.'</textarea>';
+	print '</td></tr>';
 
-print '<tr>';
-print '<td class="titlefield">'.$form->textwithpicto($langs->trans("SitePlans"), $langs->trans('HowToSetDataRiskAssessmentDocument')).'</td>';
-print '<td>';
-print $langs->trans($riskassessmentdocument->dispoDesPlans);
-print '</td></tr>';
+// Disponibilité des plans
 
+	print '<tr>';
+	print '<td class="titlefield"><label for="SitePlans">' . $form->textwithpicto($langs->trans("SitePlans"), $langs->trans('HowToSetDataRiskAssessmentDocument')) . '</label></td>';
+	print '<td>';
+	print '<textarea name="SitePlans" id="SitePlans" class="minwidth300" rows="'.ROWS_3.'">'.$conf->global->DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_SITE_PLANS.'</textarea>';
+	print '</td></tr>';
+
+} else {
+	print '<tr>';
+	print '<td class="titlefield">' . $form->textwithpicto($langs->trans("AuditStartDate"), $langs->trans('HowToSetDataRiskAssessmentDocument')) . '</td><td colspan="2">';
+	print dol_print_date(strtotime($conf->global->DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_AUDIT_START_DATE), '%d/%m/%Y');
+	print '</td></tr>';
+
+	print '<tr>';
+	print '<td class="titlefield">' . $form->textwithpicto($langs->trans("AuditEndDate"), $langs->trans('HowToSetDataRiskAssessmentDocument')) . '</td><td colspan="2">';
+	print dol_print_date(strtotime($conf->global->DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_AUDIT_END_DATE), '%d/%m/%Y');
+	print '</td></tr>';
+
+// Destinataire
+
+	print '<tr>';
+	print '<td class="titlefield">' . $form->textwithpicto($langs->trans("Recipient"), $langs->trans('HowToSetDataRiskAssessmentDocument')) . '</td><td colspan="2">';
+	$user->fetch($conf->global->DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_RECIPIENT);
+	print $user->lastname . ' ' . $user->firstname;
+	print '</td></tr>';
+
+// Méthodologie
+
+	print '<tr>';
+	print '<td class="titlefield">' . $form->textwithpicto($langs->trans("Method"), $langs->trans('HowToSetDataRiskAssessmentDocument')) . '</td>';
+	print '<td>';
+	print $conf->global->DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_METHOD;
+	print '</td></tr>';
+
+// Sources
+
+	print '<tr>';
+	print '<td class="titlefield">' . $form->textwithpicto($langs->trans("Sources"), $langs->trans('HowToSetDataRiskAssessmentDocument')) . '</td>';
+	print '<td>';
+	print $conf->global->DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_SOURCES;
+	print '</td></tr>';
+
+// Remarque Importante
+
+	print '<tr>';
+	print '<td class="titlefield">' . $form->textwithpicto($langs->trans("ImportantNote"), $langs->trans('HowToSetDataRiskAssessmentDocument')) . '</td>';
+	print '<td>';
+	print $conf->global->DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_IMPORTANT_NOTE;
+	print '</td></tr>';
+
+// Disponibilité des plans
+
+	print '<tr>';
+	print '<td class="titlefield">' . $form->textwithpicto($langs->trans("SitePlans"), $langs->trans('HowToSetDataRiskAssessmentDocument')) . '</td>';
+	print '<td>';
+	print $conf->global->DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_SITE_PLANS;
+	print '</td></tr>';
+}
 ?>
+
 <!-- END PHP TEMPLATE digiriskdolibarr_legaldisplayfields_view.tpl.php -->

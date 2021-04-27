@@ -98,10 +98,10 @@ class RiskAssessmentDocument extends DigiriskDocuments
 		$user->fetch($this->fk_user_creat);
 
 		// *** JSON FILLING ***
-		$json['RiskAssessmentDocument']['nomEntreprise'] = $conf->global->MAIN_INFO_SOCIETE_NOM;
-		$json['riskAssessmentDocument']['dateAudit']    = $conf->global->DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_AUDIT_START_DATE . ' - ' . $conf->global->DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_AUDIT_END_DATE;
-		$json['RiskAssessmentDocument']['emetteurDUER'] = $user->lastname . ' ' . $user->firstname;
-		$json['RiskAssessmentDocument']['dateGeneration'] = $this->date_creation;
+		$json['RiskAssessmentDocument']['nomEntreprise']  = $conf->global->MAIN_INFO_SOCIETE_NOM;
+		$json['RiskAssessmentDocument']['dateAudit']      = dol_print_date(strtotime($conf->global->DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_AUDIT_START_DATE), '%d/%m/%Y') . ' - ' . dol_print_date(strtotime($conf->global->DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_AUDIT_END_DATE), '%d/%m/%Y');
+		$json['RiskAssessmentDocument']['emetteurDUER']   = $user->lastname . ' ' . $user->firstname;
+		$json['RiskAssessmentDocument']['dateGeneration'] = dol_print_date(strtotime($this->date_creation), '%d/%m/%Y %H:%M:%S');
 
 		if ($conf->global->DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_RECIPIENT > 0) {
 			$user->fetch($conf->global->DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_RECIPIENT);
