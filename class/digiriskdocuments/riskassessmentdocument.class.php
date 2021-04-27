@@ -99,7 +99,7 @@ class RiskAssessmentDocument extends DigiriskDocuments
 
 		// *** JSON FILLING ***
 		$json['RiskAssessmentDocument']['nomEntreprise'] = $conf->global->MAIN_INFO_SOCIETE_NOM;
-		//$json['riskAssessmentDocument']['dateAudit']        = $conf->global->DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_AUDIT_START_DATE . ' - ' . $conf->global->DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_AUDIT_END_DATE;
+		$json['riskAssessmentDocument']['dateAudit']    = $conf->global->DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_AUDIT_START_DATE . ' - ' . $conf->global->DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_AUDIT_END_DATE;
 		$json['RiskAssessmentDocument']['emetteurDUER'] = $user->lastname . ' ' . $user->firstname;
 		$json['RiskAssessmentDocument']['dateGeneration'] = $this->date_creation;
 
