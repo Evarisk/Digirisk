@@ -256,7 +256,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			151 => array('DIGIRISKDOLIBARR_RISKSIGN_ADDON','chaine', 'mod_risksign_standard' ,'', 1),
 
 			// CONST TASK
-			160 => array('DIGIRISKDOLIBARR_PROJECT_LINKED','integer', 0,'', 1),
+			160 => array('DIGIRISKDOLIBARR_DU_PROJECT','integer', 0,'', 1),
 		);
 
 		if ( ! isset($conf->digiriskdolibarr ) || ! isset( $conf->digiriskdolibarr->enabled ) ) {
@@ -791,7 +791,7 @@ class modDigiriskdolibarr extends DolibarrModules
 		include_once DOL_DOCUMENT_ROOT.'/core/class/extrafields.class.php';
 		$extra_fields = new ExtraFields( $this->db );
 
-		$extra_fields->addExtraField( 'fk_risk', $langs->trans("fk_risk"), 'int', 1020, 10, 'task', 0, 0, '', '', '', '', 1);
+		$extra_fields->addExtraField( 'fk_risk', $langs->trans("fk_risk"), 'int', 1020, 10, 'projet_task', 0, 0, '', '', '', '', 1);
 
 		return $this->_init($sql, $options);
 	}
