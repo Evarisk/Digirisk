@@ -514,7 +514,7 @@ if (empty($reshook))
 			else  setEventMessages($evaluation->error, null, 'errors');
 		}
 	}
-	if (GETPOST('userfile') && !empty($conf->global->MAIN_UPLOAD_DOC)) {
+	if (!empty($_FILES) && !empty($conf->global->MAIN_UPLOAD_DOC)) {
 		// Define relativepath and upload_dir
 		$relativepath = 'digiriskdolibarr/medias';
 		$upload_dir = $conf->ecm->dir_output.'/'.$relativepath;
