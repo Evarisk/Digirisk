@@ -490,42 +490,38 @@ if (empty($reshook))
 			else  setEventMessages($evaluation->error, null, 'errors');
 		}
 	}
-
-	// Upload file (code similar but different than actions_linkedfiles.inc.php)
-	if (GETPOST("sendit", 'alphanohtml') && !empty($conf->global->MAIN_UPLOAD_DOC))
-	{
+	if (GETPOST('userfile') && !empty($conf->global->MAIN_UPLOAD_DOC)) {
 		// Define relativepath and upload_dir
 		$relativepath = 'digiriskdolibarr/medias';
 		$upload_dir = $conf->ecm->dir_output.'/'.$relativepath;
 
-//		$userfiles = GETPOST( 'userfile', 'array');
+		if (is_array($_FILES['userfile']['tmp_name'])) $userfiles = $_FILES['userfile']['tmp_name'];
+		else $userfiles = array($_FILES['userfile']['tmp_name']);
 
-//		if (is_array($_FILES['userfile']['tmp_name'])) $userfiles = $_FILES['userfile']['tmp_name'];
-//		else $userfiles = array($_FILES['userfile']['tmp_name']);
-//
-//		foreach ($userfiles as $key => $userfile)
-//		{
-//			if (empty($_FILES['userfile']['tmp_name'][$key]))
-//			{
-//				$error++;
-//				if ($_FILES['userfile']['error'][$key] == 1 || $_FILES['userfile']['error'][$key] == 2) {
-//					setEventMessages($langs->trans('ErrorFileSizeTooLarge'), null, 'errors');
-//				} else {
-//					setEventMessages($langs->trans("ErrorFieldRequired", $langs->transnoentitiesnoconv("File")), null, 'errors');
-//				}
-//			}
-//		}
+		foreach ($userfiles as $key => $userfile)
+		{
+			if (empty($_FILES['userfile']['tmp_name'][$key]))
+			{
+				$error++;
+				if ($_FILES['userfile']['error'][$key] == 1 || $_FILES['userfile']['error'][$key] == 2) {
+					setEventMessages($langs->trans('ErrorFileSizeTooLarge'), null, 'errors');
+				} else {
+					setEventMessages($langs->trans("ErrorFieldRequired", $langs->transnoentitiesnoconv("File")), null, 'errors');
+				}
+			}
+		}
 
 		if (!$error)
 		{
 			$generatethumbs = 0;
-			$res = digirisk_add_file_process($upload_dir, 0, 1, GETPOST('sendit'), '', null, '', $generatethumbs);
+			$res = dol_add_file_process($upload_dir, 0, 1, 'userfile', '', null, '', $generatethumbs);
 			if ($res > 0)
 			{
 				$result = $ecmdir->changeNbOfFiles('+');
 			}
 		}
 	}
+
 }
 
 /*

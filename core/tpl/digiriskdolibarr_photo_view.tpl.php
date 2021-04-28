@@ -84,7 +84,7 @@ print '<div class="inline-block toolbarbutton centpercent">'; ?>
 					// End "Add new file" area
 					?>
 					<div class="underbanner clearboth"></div>
-					<div class="wpeo-table table-row">
+					<div class="wpeo-table table-row ecm-photo-list">
 						<?php
 						$files =  dol_dir_list(DOL_DATA_ROOT . '/ecm/digiriskdolibarr/medias');
 						$relativepath = 'digiriskdolibarr/medias';

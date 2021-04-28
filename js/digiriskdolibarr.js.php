@@ -752,7 +752,7 @@ window.eoxiaJS.photo.event = function() {
 	// Photos
 	jQuery( document ).on( 'click', '.clickable-photo', window.eoxiaJS.photo.selectPhoto );
 	jQuery( document ).on( 'click', '.save-photo', window.eoxiaJS.photo.savePhoto );
-	jQuery( document ).on( 'click', '.formattachnewfile .button', window.eoxiaJS.photo.sendPhoto );
+	jQuery( document ).on( 'click', '.modal-content .formattachnewfile .button', window.eoxiaJS.photo.sendPhoto );
 	jQuery( document ).on( 'click', '.clicked-photo-preview', window.eoxiaJS.photo.previewPhoto );
 }
 
@@ -801,28 +801,23 @@ window.eoxiaJS.photo.savePhoto = function( event ) {
 window.eoxiaJS.photo.sendPhoto = function( event ) {
 
 	event.preventDefault()
-	let element = $(this).closest('.nowrap');
-	let files = element.find("input[name='userfile[]']").prop("files");
-	let userfile = []
-	let i = 0
-	console.log(files);
-	console.log($.type(files));
+	let element  = $(this).closest('.nowrap');
+	let files    = element.find("input[name='userfile[]']").prop("files");
+	let formdata = new FormData();
 
 	$.each(files, function(index, file) {
-		console.log(file.name)
-		userfile[i] = file.name
-		i++
+		formdata.append("userfile[]", file);
 	})
-	console.log(userfile);
+	$.ajax({
+		url: document.URL,
+		type: "POST",
+		data: formdata,
+		processData: false,
+		contentType: false
+	});
 
-	var photoPost = '';
-	if (userfile !== 0) {
-		photoPost = '&sendit=' + userfile;
-	}
+	$(this).closest('.modal-container').find('.ecm-photo-list').load( document.URL + ' .ecm-photo-list');
 
-	console.log(document.URL + photoPost);
-
-	$(this).closest('.digi-photo-list').load( document.URL + photoPost + ' .digi-photo-list');
 };
 
 /**
