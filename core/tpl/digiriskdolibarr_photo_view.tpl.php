@@ -69,29 +69,31 @@ if (empty($conf) || !is_object($conf))
 					?>
 					<div class="underbanner clearboth"></div>
 					<div class="wpeo-table table-row ecm-photo-list">
-						<?php
-						$files =  dol_dir_list(DOL_DATA_ROOT . '/ecm/digiriskdolibarr/medias');
-						$relativepath = 'digiriskdolibarr/medias';
-						$modulepart = 'ecm';
-						$path = DOL_URL_ROOT.'/document.php?modulepart=' . $modulepart  . '&attachment=0&file=' . str_replace('/', '%2F', $relativepath);
-						$j = 0;
+						<div class="ecm-photo-list-children">
+							<?php
+							$files =  dol_dir_list(DOL_DATA_ROOT . '/ecm/digiriskdolibarr/medias');
+							$relativepath = 'digiriskdolibarr/medias';
+							$modulepart = 'ecm';
+							$path = DOL_URL_ROOT.'/document.php?modulepart=' . $modulepart  . '&attachment=0&file=' . str_replace('/', '%2F', $relativepath);
+							$j = 0;
 
-						if ( !empty($files) ) :
-							foreach ($files as $file) :
-								print '<div class="table-cell center clickable-photo clickable-photo'. $j .'" value="'. $j .'" element="risk-evaluation">';
-								$urladvanced = getAdvancedPreviewUrl($modulepart, $relativepath . '/' . $file['relativename'], 0, 'entity='.$object->entity);
-								print '<a class="clicked-photo-preview" href="'.$urladvanced.'"><i class="fas fa-2x fa-search-plus"></i></a>';
-								if (image_format_supported($file['name']) >= 0) :
-									$fullpath = $path . '/' . $file['relativename'] . '&entity=' . $conf->entity; ?>
-									<input class="filename" type="hidden" value="<?php echo $file['name'] ?>">
-									<img class="photo photo<?php echo $j ?> maxwidth200" src="<?php echo $fullpath; ?>">
-								<?php else : print '&nbsp;';
-								endif;
-								print '<span class="title">'.$file['name'].'</span>';
-								print '</div>';
-								$j++;
-							endforeach;
-						endif; ?>
+							if ( !empty($files) ) :
+								foreach ($files as $file) :
+									print '<div class="table-cell center clickable-photo clickable-photo'. $j .'" value="'. $j .'" element="risk-evaluation">';
+									$urladvanced = getAdvancedPreviewUrl($modulepart, $relativepath . '/' . $file['relativename'], 0, 'entity='.$object->entity);
+									print '<a class="clicked-photo-preview" href="'.$urladvanced.'"><i class="fas fa-2x fa-search-plus"></i></a>';
+									if (image_format_supported($file['name']) >= 0) :
+										$fullpath = $path . '/' . $file['relativename'] . '&entity=' . $conf->entity; ?>
+										<input class="filename" type="hidden" value="<?php echo $file['name'] ?>">
+										<img class="photo photo<?php echo $j ?> maxwidth200" src="<?php echo $fullpath; ?>">
+									<?php else : print '&nbsp;';
+									endif;
+									print '<span class="title">'.$file['name'].'</span>';
+									print '</div>';
+									$j++;
+								endforeach;
+							endif; ?>
+						</div>
 					</div>
 				</div>
 				<!-- Modal-Footer -->

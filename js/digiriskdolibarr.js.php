@@ -809,15 +809,13 @@ window.eoxiaJS.photo.sendPhoto = function( event ) {
 		formdata.append("userfile[]", file);
 	})
 	$.ajax({
-		url: document.URL,
+		url: document.URL + "&action=uploadPhoto",
 		type: "POST",
 		data: formdata,
 		processData: false,
-		contentType: false
+		contentType: false,
+		success: $(this).closest('.modal-container').find('.ecm-photo-list').load( document.URL + ' .ecm-photo-list')
 	});
-
-	$(this).closest('.modal-container').find('.ecm-photo-list').load( document.URL + ' .ecm-photo-list');
-
 };
 
 /**
