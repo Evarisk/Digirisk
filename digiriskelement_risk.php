@@ -320,18 +320,18 @@ if (empty($reshook))
 
 				$result = $risk->delete($user);
 
-				if ($result > 0) {
-					// Delete risk OK
-					$urltogo = str_replace('__ID__', $result, $backtopage);
-					$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
-					header("Location: ".$urltogo);
-					exit;
-				} else {
+				if ($result < 0) {
 					// Delete risk KO
 					if (!empty($risk->errors)) setEventMessages(null, $risk->errors, 'errors');
 					else  setEventMessages($risk->error, null, 'errors');
 				}
 			}
+
+			// Delete risk OK
+			$urltogo = str_replace('__ID__', $result, $backtopage);
+			$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
+			header("Location: ".$urltogo);
+			exit;
 		}
 	}
 
@@ -514,7 +514,7 @@ if (empty($reshook))
 			else  setEventMessages($evaluation->error, null, 'errors');
 		}
 	}
-	if (!empty($_FILES) && !empty($conf->global->MAIN_UPLOAD_DOC)) {
+	if ($action == "uploadPhoto" && !empty($conf->global->MAIN_UPLOAD_DOC)) {
 		// Define relativepath and upload_dir
 		$relativepath = 'digiriskdolibarr/medias';
 		$upload_dir = $conf->ecm->dir_output.'/'.$relativepath;
