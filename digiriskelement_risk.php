@@ -31,6 +31,8 @@ require_once DOL_DOCUMENT_ROOT.'/core/lib/images.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/files.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/core/class/html.form.class.php';
 require_once DOL_DOCUMENT_ROOT.'/ecm/class/ecmdirectory.class.php';
+require_once DOL_DOCUMENT_ROOT.'/projet/class/task.class.php';
+require_once DOL_DOCUMENT_ROOT.'/core/modules/project/task/mod_task_simple.php';
 
 dol_include_once('/digiriskdolibarr/class/digiriskelement.class.php');
 dol_include_once('/digiriskdolibarr/class/riskanalysis/risk.class.php');
@@ -62,7 +64,9 @@ $evaluation        = new RiskAssessment($db);
 $extrafields       = new ExtraFields($db);
 $refRiskMod        = new $conf->global->DIGIRISKDOLIBARR_RISK_ADDON();
 $refEvaluationMod  = new $conf->global->DIGIRISKDOLIBARR_RISKASSESSMENT_ADDON();
+$refTaskMod        = new $conf->global->PROJECT_TASK_ADDON();
 $ecmdir            = new EcmDirectory($db);
+$task              = new Task($db);
 
 
 
@@ -198,28 +202,48 @@ if (empty($reshook))
 				}
 
 				//photo upload and thumbs generation
-				$pathToECMPhoto = DOL_DATA_ROOT . '/ecm/digiriskdolibarr/medias/' . $photo;
-				$pathToEvaluationPhoto = DOL_DATA_ROOT . '/digiriskdolibarr/riskassessment/' . $evaluation->ref;
+				if (!empty ($photo)) {
+					$pathToECMPhoto = DOL_DATA_ROOT . '/ecm/digiriskdolibarr/medias/' . $photo;
+					$pathToEvaluationPhoto = DOL_DATA_ROOT . '/digiriskdolibarr/riskassessment/' . $evaluation->ref;
 
-				mkdir($pathToEvaluationPhoto);
-				copy($pathToECMPhoto,$pathToEvaluationPhoto . '/' . $photo);
+					mkdir($pathToEvaluationPhoto);
+					copy($pathToECMPhoto, $pathToEvaluationPhoto . '/' . $photo);
 
-				global $maxwidthmini, $maxheightmini, $maxwidthsmall,$maxheightsmall ;
-				$destfull = $pathToEvaluationPhoto . '/' . $photo;
+					global $maxwidthmini, $maxheightmini, $maxwidthsmall, $maxheightsmall;
+					$destfull = $pathToEvaluationPhoto . '/' . $photo;
 
-				// Create thumbs
-				$imgThumbSmall = vignette($destfull, $maxwidthsmall, $maxheightsmall, '_small', 50, "thumbs");
-				// Create mini thumbs for image (Ratio is near 16/9)
-				$imgThumbMini = vignette($destfull, $maxwidthmini, $maxheightmini, '_mini', 50, "thumbs");
+					// Create thumbs
+					$imgThumbSmall = vignette($destfull, $maxwidthsmall, $maxheightsmall, '_small', 50, "thumbs");
+					// Create mini thumbs for image (Ratio is near 16/9)
+					$imgThumbMini = vignette($destfull, $maxwidthmini, $maxheightmini, '_mini', 50, "thumbs");
+				}
 
 				$result2 = $evaluation->create($user);
 
 				if ($result2 > 0) {
-					// Creation risk + evaluation OK
-					$urltogo = str_replace('__ID__', $result2, $backtopage);
-					$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
-					header("Location: ".$urltogo);
-					exit;
+					$tasktitle = GETPOST('tasktitle');
+
+					$extrafields->fetch_name_optionals_label($task->table_element);
+
+					$task->ref                              = $refTaskMod->getNextValue('', $task);
+					$task->label                            = $tasktitle;
+					$task->fk_project                       = $conf->global->DIGIRISKDOLIBARR_DU_PROJECT;
+					$task->date_c                           = dol_now();
+					$task->array_options['options_fk_risk'] = $risk->id;
+
+					$result3 = $task->create($user, true);
+
+					if ($result3 > 0) {
+						// Creation risk + evaluation + task OK
+						$urltogo = str_replace('__ID__', $result3, $backtopage);
+						$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
+						header("Location: ".$urltogo);
+						exit;
+					} else {
+						// Creation task KO
+						if (!empty($task->errors)) setEventMessages(null, $task->errors, 'errors');
+						else  setEventMessages($task->error, null, 'errors');
+					}
 				} else {
 					// Creation evaluation KO
 					if (!empty($evaluation->errors)) setEventMessages(null, $evaluation->errors, 'errors');
@@ -764,7 +788,7 @@ if ($object->id > 0) {
 						<hr>
 					</div>
 					<div class="risk-evaluation-container standard">
-						<span class="section-title"><?php echo ' ' . $langs->trans('Evaluation'); ?></span>
+						<span class="section-title"><?php echo ' ' . $langs->trans('RiskAssessment'); ?></span>
 						<div class="risk-evaluation-header">
 							<div class="wpeo-button evaluation-standard select-evaluation-method selected button-blue">
 								<span><?php echo $langs->trans('SimpleCotation') ?></span>
@@ -851,6 +875,11 @@ if ($object->id > 0) {
 								<?php print '<textarea name="evaluationComment'. $risk->id .'" class="minwidth150" rows="'.ROWS_2.'">'.('').'</textarea>'."\n"; ?>
 							</div>
 						</div>
+					</div>
+					<div class="riskassessment-task">
+						<span class="section-title"><?php echo $langs->trans('Action'); ?></span>
+						<span class="title"><?php echo $langs->trans('ActionTitle'); ?></span>
+						<?php print '<textarea name="riskAssessmentTask" rows="'.ROWS_2.'">'.('').'</textarea>'."\n"; ?>
 					</div>
 				</div>
 				<!-- Modal-Footer -->
@@ -1580,33 +1609,38 @@ if ($object->id > 0) {
 						</div>
 					<?php } ?>
 				<?php } elseif ($key == 'has_tasks') { ?>
-					<div class="table-cell cell-tasks" data-title="Tâches" class="padding">
-						<span class="cell-tasks-container">
-		<!--				VUE SI Y A DES TACHES   -->
-							<?php $related_tasks = $risk->get_related_tasks($risk);
-							if (($related_tasks !== -1) ) :
-								foreach ($related_tasks as $related_task) :
-									$related_task->fetchTimeSpent($related_task->id); ?>
-									<span class="ref"><?php echo $related_task->ref; ?></span>
-		<!--							// @todo truc sympa pour l'author.-->
-									<span class="author">
-										<div class="avatar" style="background-color: #50a1ed;">
-											<?php $user = new User($db); ?>
-											<?php $user->fetch($related_task->fk_user_creat); ?>
-											<span><?php echo $user->firstname[0] . $user->lastname[0]; ?></span>
+					<?php $related_tasks = $risk->get_related_tasks($risk);
+					if (!empty($related_tasks)) :
+						foreach ($related_tasks as $related_task) :
+							$related_task->fetchTimeSpent($related_task->id); ?>
+							<div class="riskassessment-task-container">
+								<div class="riskassessment-task-single">
+									<div class="riskassessment-task-content">
+										<div class="riskassessment-task-data">
+											<!-- BUTTON MODAL RISK Assessment Task LIST  -->
+											<span class="riskassessment-task-reference riskassessment-task-list modal-open" value="<?php echo $risk->id ?>"><?php echo $related_task->ref; ?></span>
+											<span class="riskassessment-task-author">
+												<?php $user->fetch($related_task->fk_user_creat); ?>
+												<?php echo $user->getNomUrl( 0, '', 0, 0, 2 ); ?>
+											</span>
+											<span class="riskassessment-task-date">
+												<i class="fas fa-calendar-alt"></i> <?php echo date('d/m/Y', $related_task->date_c); ?>
+											</span>
+											<span class="riskassessment-task-count"><i class="fas fa-comments"></i><?php echo count($related_tasks) ?></span>
 										</div>
-									</span>
-									<span class="date"><i class="fas fa-calendar-alt"></i><?php echo date("d/m/Y", $related_task->date_c) ?></span>
-									<span class="label"><?php echo $related_task->label; ?></span>
-									<!--													print '<a target="_blank" href="/dolibarr/htdocs/projet/tasks/time.php?id=' . $related_task->id . '&withproject=1">' . '&nbsp' .  gmdate('H:i', $related_task->duration_effective ) . '</a>';-->
-								<?php endforeach; ?>
-							<?php else : ?>
-								<span class="name"><?php echo $langs->trans('NoTaskLinked'); ?></span>
-							<?php endif; ?>
-						</span>
-						<!--									VUE SI Y EN A PAS   -->
-					</div>
-			<?php } else print $lastEvaluation->showOutputField($val, $key, $lastEvaluation->$key, '');
+										<div class="riskassessment-task-title"><?php echo $related_task->label; ?></div>
+									</div>
+									<!-- BUTTON MODAL RISK ASSESSMENT TASK ADD  -->
+									<div class="riskassessment-task-add wpeo-button button-square-40 button-primary modal-open" value="<?php echo $risk->id;?>">
+										<i class="fas fa-plus button-icon"></i>
+									</div>
+								</div>
+							</div>
+						<?php endforeach; ?>
+					<?php else : ?>
+						<span class="name"><?php echo $langs->trans('NoTaskLinked'); ?></span>
+					<?php endif; ?>
+				<?php } else print $lastEvaluation->showOutputField($val, $key, $lastEvaluation->$key, '');
 				print '</td>';
 				if (!$i) $totalarray['nbfield']++;
 				if (!empty($val['isameasure']))

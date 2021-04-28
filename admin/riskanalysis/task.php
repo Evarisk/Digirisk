@@ -53,10 +53,10 @@ $setupnotempty = 0;
  */
 if (($action == 'update' && !GETPOST("cancel", 'alpha')) || ($action == 'updateedit'))
 {
-	$projectLinked = GETPOST('projectLinked', 'none');
-	$projectLinked  = preg_split('/_/', $projectLinked);
+	$DUProject = GETPOST('DUProject', 'none');
+	$DUProject  = preg_split('/_/', $DUProject);
 
-	dolibarr_set_const($db, "DIGIRISKDOLIBARR_PROJECT_LINKED", $projectLinked[0], 'integer', 0, '', $conf->entity);
+	dolibarr_set_const($db, "DIGIRISKDOLIBARR_DU_PROJECT", $DUProject[0], 'integer', 0, '', $conf->entity);
 
 	if ($action != 'updateedit' && !$error)
 	{
@@ -101,8 +101,8 @@ print '</tr>'."\n";
 if (!empty($conf->projet->enabled))
 {
 	$langs->load("projects");
-	print '<tr class="oddeven"><td><label for="projectLinked">'.$langs->trans("ProjectLinked").'</label></td><td>';
-	$numprojet = $formproject->select_projects(0,  $conf->global->DIGIRISKDOLIBARR_PROJECT_LINKED, 'projectLinked', 0, 0, 0, 0, 0, 0, 0, '', 0, 0, 'maxwidth500');
+	print '<tr class="oddeven"><td><label for="DUProject">'.$langs->trans("DUProject").'</label></td><td>';
+	$numprojet = $formproject->select_projects(0,  $conf->global->DIGIRISKDOLIBARR_DU_PROJECT, 'DUProject', 0, 0, 0, 0, 0, 0, 0, '', 0, 0, 'maxwidth500');
 	print ' <a href="'.DOL_URL_ROOT.'/projet/card.php?socid='.$soc->id.'&action=create&status=1&backtopage='.urlencode($_SERVER["PHP_SELF"].'?action=create&socid='.$soc->id).'"><span class="fa fa-plus-circle valignmiddle" title="'.$langs->trans("AddProject").'"></span></a>';
 	print '<td><input type="submit" class="button" name="save" value="'.$langs->trans("Save").'">';
 	print '</td></tr>';

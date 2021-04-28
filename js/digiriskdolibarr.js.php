@@ -930,6 +930,7 @@ window.eoxiaJS.risk.haveDataInInput = function( elementParent ) {
 window.eoxiaJS.risk.createRisk = function ( event ) {
 	let elementRisk = $(this).closest('.fichecenter').find('.risk-content');
 	let elementEvaluation = $(this).closest('.fichecenter').find('.risk-evaluation-container');
+	let elementTask = $(this).closest('.fichecenter').find('.riskassessment-task');
 
 	var category = elementRisk.find('.risk-category input').val();
 	var categoryPost = '';
@@ -955,18 +956,6 @@ window.eoxiaJS.risk.createRisk = function ( event ) {
 		cotationPost = '&cotation=' + cotation;
 	}
 
-	var comment = elementEvaluation.find('.risk-evaluation-comment textarea').val();
-	var commentPost = '';
-	if (comment !== '') {
-		commentPost = '&evaluationComment=' + encodeURI(comment);
-	}
-
-	var photo = elementEvaluation.find('.risk-evaluation-photo-single .filename').val();
-	var photoPost = '';
-	if (photo !== 0) {
-		photoPost = '&photo=' + encodeURI(photo);
-	}
-
 	let criteres = '';
 	Object.values($('.table-cell.active.cell-0')).forEach(function(v) {
 		if ($(v).data( 'seuil' ) > -1) {
@@ -974,7 +963,25 @@ window.eoxiaJS.risk.createRisk = function ( event ) {
 		}
 	})
 
-	$('.fichecenter').load( document.URL + '&action=add' + categoryPost + descriptionPost + methodPost + cotationPost + criteres + photoPost + commentPost + ' .fichecenter');
+	var photo = elementEvaluation.find('.risk-evaluation-photo-single .filename').val();
+	var photoPost = '';
+	if (photo !== 0) {
+		photoPost = '&photo=' + encodeURI(photo);
+	}
+
+	var comment = elementEvaluation.find('.risk-evaluation-comment textarea').val();
+	var commentPost = '';
+	if (comment !== '') {
+		commentPost = '&evaluationComment=' + encodeURI(comment);
+	}
+
+	var task = elementTask.find('textarea').val();
+	var taskPost = '';
+	if (task !== '') {
+		taskPost = '&tasktitle=' + encodeURI(task);
+	}
+
+	$('.fichecenter').load( document.URL + '&action=add' + categoryPost + descriptionPost + methodPost + cotationPost + criteres + photoPost + commentPost + taskPost + ' .fichecenter');
 };
 
 /**

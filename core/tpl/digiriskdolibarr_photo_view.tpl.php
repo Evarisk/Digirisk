@@ -1,9 +1,9 @@
 <?php
-/* Copyright (C) 2017 Laurent Destailleur  <eldy@users.sourceforge.net>
+/* Copyright (C) 2021 EOXIA <dev@eoxia.com>
  *
- * This program is free software; you can redistribute it and/or modify
+ * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 3 of the License, or
+ * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
@@ -12,38 +12,22 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <https://www.gnu.org/licenses/>.
- *
- * Output code for the filemanager
- * $module must be defined ('ecm', 'medias', ...)
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+
 
 // Protection to avoid direct call of template
 if (empty($conf) || !is_object($conf))
 {
-	print "Error, template page filemanager.tpl.php can't be called as URL";
+	print "Error, template page digiriskdolibarr_photo_view.tpl.tpl.php can't be called as URL";
 	exit;
 }
 
 ?>
 
-<!-- BEGIN PHP TEMPLATE core/tpl/filemanager.tpl.php -->
+<!-- BEGIN PHP TEMPLATE core/tpl/digiriskdolibarr_photo_view.tpl.php -->
 
-<?php
-
-$permtoupload = $user->rights->ecm->upload;
-
-// Start container of all panels
-?>
-<!-- Begin div id="containerlayout" -->
-<div id="containerlayout">
-<div id="ecm-layout-north" class="toolbar largebutton">
-<?php
-
-// Start top panel, toolbar
-print '<div class="inline-block toolbarbutton centpercent">'; ?>
-</div>
-</div> <!-- End div id="containerlayout" -->
+<?php $permtoupload = $user->rights->ecm->upload; ?>
 
 <div class="risk-evaluation-photo">
 	<span class="title"><?php echo $langs->trans('Photo'); ?></span>
@@ -76,7 +60,7 @@ print '<div class="inline-block toolbarbutton centpercent">'; ?>
 					if ((!empty($conf->use_javascript_ajax) && empty($conf->global->MAIN_ECM_DISABLE_JS)) || !empty($section))
 					{
 						$sectiondir = GETPOST('file', 'alpha') ?GETPOST('file', 'alpha') : GETPOST('section_dir', 'alpha');
-						print '<!-- Start form to attach new file in filemanager.tpl.php sectionid='.$section.' sectiondir='.$sectiondir.' -->'."\n";
+						print '<!-- Start form to attach new file in digiriskdolibarr_photo_view.tpl.tpl.php sectionid='.$section.' sectiondir='.$sectiondir.' -->'."\n";
 						include_once DOL_DOCUMENT_ROOT.'/core/class/html.formfile.class.php';
 						$formfile = new FormFile($db);
 						$formfile->form_attach_new_file($_SERVER["PHP_SELF"], 'none', 0, ($section ? $section : -1), $permtoupload, 48, null, '', 0, '', 0, $nameforformuserfile, '', $sectiondir, 1);
@@ -97,7 +81,6 @@ print '<div class="inline-block toolbarbutton centpercent">'; ?>
 								print '<div class="table-cell center clickable-photo clickable-photo'. $j .'" value="'. $j .'" element="risk-evaluation">';
 								$urladvanced = getAdvancedPreviewUrl($modulepart, $relativepath . '/' . $file['relativename'], 0, 'entity='.$object->entity);
 								print '<a class="clicked-photo-preview" href="'.$urladvanced.'"><i class="fas fa-2x fa-search-plus"></i></a>';
-//								else $return .= '<a href="'.DOL_URL_ROOT.'/viewimage.php?modulepart='.$modulepart.'&entity='.$object->entity.'&file='.urlencode($pdir.$photo).'" class="aphoto" target="_blank">';
 								if (image_format_supported($file['name']) >= 0) :
 									$fullpath = $path . '/' . $file['relativename'] . '&entity=' . $conf->entity; ?>
 									<input class="filename" type="hidden" value="<?php echo $file['name'] ?>">
@@ -122,4 +105,4 @@ print '<div class="inline-block toolbarbutton centpercent">'; ?>
 	</div>
 </div>
 
-<!-- END PHP TEMPLATE core/tpl/filemanager.tpl.php -->
+<!-- END PHP TEMPLATE core/tpl/digiriskdolibarr_photo_view.tpl.php -->
