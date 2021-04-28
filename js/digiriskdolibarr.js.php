@@ -670,17 +670,30 @@ window.eoxiaJS.photo.savePhoto = function( event ) {
  * @return {void}
  */
 window.eoxiaJS.photo.sendPhoto = function( event ) {
-	let element = $(this).closest('.nowrap');
-	let userfile = element.find("input[name='userfile[]']").files;
-	console.log(element.find("input[name='userfile[]']"));
-	//var photoPost = '';
-	//if (photo !== 0) {
-	//	photoPost = '&sendit=' + encodeURI(photo);
-	//}
-	//
-	//console.log(document.URL + photoPost);
 
-	//$(this).closest('.fichecenter').load( document.URL + photoPost + ' .fichecenter');
+	event.preventDefault()
+	let element = $(this).closest('.nowrap');
+	let files = element.find("input[name='userfile[]']").prop("files");
+	let userfile = []
+	let i = 0
+	console.log(files);
+	console.log($.type(files));
+
+	$.each(files, function(index, file) {
+		console.log(file.name)
+		userfile[i] = file.name
+		i++
+	})
+	console.log(userfile);
+
+	var photoPost = '';
+	if (userfile !== 0) {
+		photoPost = '&sendit=' + userfile;
+	}
+
+	console.log(document.URL + photoPost);
+
+	$(this).closest('.digi-photo-list').load( document.URL + photoPost + ' .digi-photo-list');
 };
 
 /**

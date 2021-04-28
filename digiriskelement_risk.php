@@ -498,28 +498,28 @@ if (empty($reshook))
 		$relativepath = 'digiriskdolibarr/medias';
 		$upload_dir = $conf->ecm->dir_output.'/'.$relativepath;
 
-		$userfiles = GETPOST( 'userfile', 'array');
+//		$userfiles = GETPOST( 'userfile', 'array');
 
-		if (is_array($_FILES['userfile']['tmp_name'])) $userfiles = $_FILES['userfile']['tmp_name'];
-		else $userfiles = array($_FILES['userfile']['tmp_name']);
-
-		foreach ($userfiles as $key => $userfile)
-		{
-			if (empty($_FILES['userfile']['tmp_name'][$key]))
-			{
-				$error++;
-				if ($_FILES['userfile']['error'][$key] == 1 || $_FILES['userfile']['error'][$key] == 2) {
-					setEventMessages($langs->trans('ErrorFileSizeTooLarge'), null, 'errors');
-				} else {
-					setEventMessages($langs->trans("ErrorFieldRequired", $langs->transnoentitiesnoconv("File")), null, 'errors');
-				}
-			}
-		}
+//		if (is_array($_FILES['userfile']['tmp_name'])) $userfiles = $_FILES['userfile']['tmp_name'];
+//		else $userfiles = array($_FILES['userfile']['tmp_name']);
+//
+//		foreach ($userfiles as $key => $userfile)
+//		{
+//			if (empty($_FILES['userfile']['tmp_name'][$key]))
+//			{
+//				$error++;
+//				if ($_FILES['userfile']['error'][$key] == 1 || $_FILES['userfile']['error'][$key] == 2) {
+//					setEventMessages($langs->trans('ErrorFileSizeTooLarge'), null, 'errors');
+//				} else {
+//					setEventMessages($langs->trans("ErrorFieldRequired", $langs->transnoentitiesnoconv("File")), null, 'errors');
+//				}
+//			}
+//		}
 
 		if (!$error)
 		{
 			$generatethumbs = 0;
-			$res = dol_add_file_process($upload_dir, 0, 1, 'userfile', '', null, '', $generatethumbs);
+			$res = digirisk_add_file_process($upload_dir, 0, 1, GETPOST('sendit'), '', null, '', $generatethumbs);
 			if ($res > 0)
 			{
 				$result = $ecmdir->changeNbOfFiles('+');
@@ -1326,7 +1326,7 @@ if ($object->id > 0) {
 																												</div>
 																											</a>
 																										</div>
-																										<div class="wpeo-table table-row">
+																										<div class="wpeo-table table-row digi-photo-list">
 																											<?php
 																											$files =  dol_dir_list(DOL_DATA_ROOT . '/ecm/digiriskdolibarr/medias');
 																											$relativepath = 'digiriskdolibarr/medias';
