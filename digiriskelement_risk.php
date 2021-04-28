@@ -28,7 +28,10 @@ if (!$res && file_exists("../../main.inc.php")) $res = @include "../../main.inc.
 if (!$res) die("Include of main fails");
 
 require_once DOL_DOCUMENT_ROOT.'/core/lib/images.lib.php';
+require_once DOL_DOCUMENT_ROOT.'/core/lib/files.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/core/class/html.form.class.php';
+require_once DOL_DOCUMENT_ROOT.'/ecm/class/ecmdirectory.class.php';
+
 dol_include_once('/digiriskdolibarr/class/digiriskelement.class.php');
 dol_include_once('/digiriskdolibarr/class/riskanalysis/risk.class.php');
 dol_include_once('/digiriskdolibarr/class/riskanalysis/riskassessment.class.php');
@@ -59,6 +62,9 @@ $evaluation        = new RiskAssessment($db);
 $extrafields       = new ExtraFields($db);
 $refRiskMod        = new $conf->global->DIGIRISKDOLIBARR_RISK_ADDON();
 $refEvaluationMod  = new $conf->global->DIGIRISKDOLIBARR_RISKASSESSMENT_ADDON();
+$ecmdir            = new EcmDirectory($db);
+
+
 
 $hookmanager->initHooks(array('riskcard', 'globalcard')); // Note that conf->hooks_modules contains array
 
@@ -484,6 +490,42 @@ if (empty($reshook))
 			else  setEventMessages($evaluation->error, null, 'errors');
 		}
 	}
+
+	// Upload file (code similar but different than actions_linkedfiles.inc.php)
+	if (GETPOST("sendit", 'alphanohtml') && !empty($conf->global->MAIN_UPLOAD_DOC))
+	{
+		// Define relativepath and upload_dir
+		$relativepath = 'digiriskdolibarr/medias';
+		$upload_dir = $conf->ecm->dir_output.'/'.$relativepath;
+
+		$userfiles = GETPOST( 'userfile', 'array');
+
+		if (is_array($_FILES['userfile']['tmp_name'])) $userfiles = $_FILES['userfile']['tmp_name'];
+		else $userfiles = array($_FILES['userfile']['tmp_name']);
+
+		foreach ($userfiles as $key => $userfile)
+		{
+			if (empty($_FILES['userfile']['tmp_name'][$key]))
+			{
+				$error++;
+				if ($_FILES['userfile']['error'][$key] == 1 || $_FILES['userfile']['error'][$key] == 2) {
+					setEventMessages($langs->trans('ErrorFileSizeTooLarge'), null, 'errors');
+				} else {
+					setEventMessages($langs->trans("ErrorFieldRequired", $langs->transnoentitiesnoconv("File")), null, 'errors');
+				}
+			}
+		}
+
+		if (!$error)
+		{
+			$generatethumbs = 0;
+			$res = dol_add_file_process($upload_dir, 0, 1, 'userfile', '', null, '', $generatethumbs);
+			if ($res > 0)
+			{
+				$result = $ecmdir->changeNbOfFiles('+');
+			}
+		}
+	}
 }
 
 /*
@@ -513,7 +555,7 @@ if ($object->id > 0) {
 	digirisk_banner_tab($object, 'ref', '', 0, 'ref', 'ref', $morehtmlref, '', 0, $morehtmlleft);
 
 	print '<div class="fichecenter wpeo-wrap">';
-	print '<form method="POST" id="searchFormList" action="'.$_SERVER["PHP_SELF"].'?id='.$object->id.'">'."\n";
+	print '<form method="POST" id="searchFormList" enctype="multipart/form-data" action="'.$_SERVER["PHP_SELF"].'?id='.$object->id.'">'."\n";
 	print '<input type="hidden" name="token" value="'.newToken().'">';
 	print '<input type="hidden" name="formfilteraction" id="formfilteraction" value="list">';
 	print '<input type="hidden" name="action" value="list">';
@@ -799,75 +841,9 @@ if ($object->id > 0) {
 									</div>
 								</div>
 							</div>
-							<div class="risk-evaluation-photo">
-								<span class="title"><?php echo $langs->trans('Photo'); ?></span>
-								<div class="risk-evaluation-photo-container wpeo-modal-event tooltip hover">
-									<?php
-									$relativepath = 'digiriskdolibarr/medias';
-									$modulepart = 'ecm';
-									$path = DOL_URL_ROOT.'/document.php?modulepart=' . $modulepart  . '&attachment=0&file=' . str_replace('/', '%2F', $relativepath) . '/';
-									$nophoto = '/public/theme/common/nophoto.png'; ?>
-									<!-- BUTTON RISK EVALUATION PHOTO MODAL -->
-									<div class="action risk-evaluation-photo default-photo modal-open" value="<?php echo $object->id ?>">
-										<span class="floatleft inline-block valignmiddle divphotoref risk-evaluation-photo-single">
-											<input type="hidden" value="<?php echo $path ?>">
-											<input class="filename" type="hidden" value="">
-											<img class="photo maxwidth50"  src="<?php echo DOL_URL_ROOT.'/public/theme/common/nophoto.png' ?>">
-										</span>
-									</div>
-									<!-- RISK EVALUATION PHOTO MODAL -->
-									<div class="wpeo-modal modal-photo" id="risk_evaluation_photo<?php echo $object->id ?>">
-										<div class="modal-container wpeo-modal-event">
-											<!-- Modal-Header -->
-											<div class="modal-header">
-												<h2 class="modal-title"><?php echo $langs->trans('AddPhoto') ?></h2>
-												<div class="modal-close"><i class="fas fa-times"></i></div>
-											</div>
-											<!-- Modal-Content -->
-											<div class="modal-content" id="#modalContent<?php echo $object->id ?>">
-												<div class="action">
-													<a href="<?php echo '../../ecm/index.php' ?>" target="_blank">
-														<div class="wpeo-button button-square-50 button-blue">
-															<i class="button-icon fas fa-plus"></i>
-														</div>
-													</a>
-												</div>
-												<div class="wpeo-table table-row">
-													<?php
-													$files =  dol_dir_list(DOL_DATA_ROOT . '/ecm/digiriskdolibarr/medias');
-													$relativepath = 'digiriskdolibarr/medias';
-													$modulepart = 'ecm';
-													$path = DOL_URL_ROOT.'/document.php?modulepart=' . $modulepart  . '&attachment=0&file=' . str_replace('/', '%2F', $relativepath);
-													$j = 0;
 
-													if ( !empty($files) ) :
-														foreach ($files as $file) :
-															print '<div class="table-cell center clickable-photo clickable-photo'. $j .'" value="'. $j .'" element="risk-evaluation">';
-															if (image_format_supported($file['name']) >= 0) :
-																$fullpath = $path . '/' . $file['relativename'] . '&entity=' . $conf->entity; ?>
-																<input class="filename" type="hidden" value="<?php echo $file['name'] ?>">
-																<img class="photo photo<?php echo $j ?> maxwidth200" src="<?php echo $fullpath; ?>">
-															<?php else : print '&nbsp;';
-															endif;
-															$j++;
-															print '</div>';
-														endforeach;
-													endif; ?>
-												</div>
-											</div>
-											<!-- Modal-Footer -->
-											<div class="modal-footer">
-												<div class="save-photo wpeo-button button-blue">
-													<span><?php echo $langs->trans('SavePhoto'); ?></span>
-												</div>
-												<div class="wpeo-button button-grey modal-close">
-													<span><?php echo $langs->trans('CloseModal'); ?></span>
-												</div>
-											</div>
-										</div>
-									</div>
-								</div>
-							</div>
+							<?php include DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/core/tpl/digiriskdolibarr_photo_view.tpl.php'; ?>
+
 							<div class="risk-evaluation-calculated-cotation" style="display: none">
 								<span class="title"><i class="fas fa-chart-line"></i> <?php echo $langs->trans('CalculatedCotation'); ?><required>*</required></span>
 								<div data-scale="1" class="risk-evaluation-cotation cotation">

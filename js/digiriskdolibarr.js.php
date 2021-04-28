@@ -623,6 +623,8 @@ window.eoxiaJS.photo.event = function() {
 	// Photos
 	jQuery( document ).on( 'click', '.clickable-photo', window.eoxiaJS.photo.selectPhoto );
 	jQuery( document ).on( 'click', '.save-photo', window.eoxiaJS.photo.savePhoto );
+	jQuery( document ).on( 'click', '.formattachnewfile .button', window.eoxiaJS.photo.sendPhoto );
+	jQuery( document ).on( 'click', '.clicked-photo-preview', window.eoxiaJS.photo.previewPhoto );
 }
 
 /**
@@ -637,10 +639,10 @@ window.eoxiaJS.photo.selectPhoto = function( event ) {
 	let photoID = $(this).attr('value');
 	let element = $(this).attr('element');
 
-	$('.clicked-photo').children('img.photo').attr('style', 'none !important');
+	$('.clicked-photo').attr('style', 'none !important');
 	$('.clicked-photo').removeClass('clicked-photo');
 
-	$('.clickable-photo'+photoID).children('img.photo'+photoID).attr('style', 'border: 5px solid #555 !important');
+	$('.clickable-photo'+photoID).attr('style', 'border: 5px solid #0d8aff !important');
 	$('.clickable-photo'+photoID).addClass('clicked-photo');
 
 	$(this).closest('.'+element+'-photo-container').find('.'+element+'-photo-single .filename').val($('.clicked-photo .filename').val());
@@ -657,6 +659,42 @@ window.eoxiaJS.photo.selectPhoto = function( event ) {
  */
 window.eoxiaJS.photo.savePhoto = function( event ) {
 	$('.wpeo-modal.modal-photo.modal-active').removeClass('modal-active');
+};
+
+/**
+ * Action send photo.
+ *
+ * @since   1.0.0
+ * @version 1.0.0
+ *
+ * @return {void}
+ */
+window.eoxiaJS.photo.sendPhoto = function( event ) {
+	let element = $(this).closest('.nowrap');
+	let userfile = element.find("input[name='userfile[]']").files;
+	console.log(element.find("input[name='userfile[]']"));
+	//var photoPost = '';
+	//if (photo !== 0) {
+	//	photoPost = '&sendit=' + encodeURI(photo);
+	//}
+	//
+	//console.log(document.URL + photoPost);
+
+	//$(this).closest('.fichecenter').load( document.URL + photoPost + ' .fichecenter');
+};
+
+/**
+ * Action preview photo.
+ *
+ * @since   1.0.0
+ * @version 1.0.0
+ *
+ * @return {void}
+ */
+window.eoxiaJS.photo.previewPhoto = function( event ) {
+	setTimeout(function(){
+		jQuery( document ).find('.ui-dialog').addClass('preview-photo');
+	}, 200);
 };
 
 /**
@@ -1093,39 +1131,6 @@ window.eoxiaJS.evaluation.saveEvaluation = function ( event ) {
 
 	element.load( document.URL + '&action=saveEvaluation&evaluationID=' + evaluationID +  methodPost + cotationPost + criteres + photoPost + commentPost + ' .risk-evaluation'+evaluationID);
 	element.find('#risk_evaluation_edit'+evaluationID).removeClass('modal-active');
-};
-
-/**
- * Select photo to add on evaluation.
- *
- * @since   1.0.0
- * @version 1.0.0
- *
- * @return {void}
- */
-window.eoxiaJS.evaluation.selectPhoto = function( event ) {
-	let photoID = $(this).attr('value');
-
-	$('.clicked-photo').children('img.photo').attr('style', 'none !important');
-	$('.clicked-photo').removeClass('clicked-photo');
-
-	$('.clickable-photo'+photoID).children('img.photo'+photoID).attr('style', 'border: 5px solid #555 !important');
-	$('.clickable-photo'+photoID).addClass('clicked-photo');
-
-	$(this).closest('.risk-evaluation-photo-container').find('.risk-evaluation-photo-single .filename').val($('.clicked-photo .filename').val());
-	$(this).closest('.risk-evaluation-photo-container').find('.risk-evaluation-photo-single img').attr('src' , $('.clicked-photo img').attr('src'));
-};
-
-/**
- * Action save photo.
- *
- * @since   1.0.0
- * @version 1.0.0
- *
- * @return {void}
- */
-window.eoxiaJS.evaluation.savePhoto = function( event ) {
-	$('.wpeo-modal.modal-photo.modal-active').removeClass('modal-active');
 };
 
 /**

@@ -1,0 +1,125 @@
+<?php
+/* Copyright (C) 2017 Laurent Destailleur  <eldy@users.sourceforge.net>
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ *
+ * Output code for the filemanager
+ * $module must be defined ('ecm', 'medias', ...)
+ */
+
+// Protection to avoid direct call of template
+if (empty($conf) || !is_object($conf))
+{
+	print "Error, template page filemanager.tpl.php can't be called as URL";
+	exit;
+}
+
+?>
+
+<!-- BEGIN PHP TEMPLATE core/tpl/filemanager.tpl.php -->
+
+<?php
+
+$permtoupload = $user->rights->ecm->upload;
+
+// Start container of all panels
+?>
+<!-- Begin div id="containerlayout" -->
+<div id="containerlayout">
+<div id="ecm-layout-north" class="toolbar largebutton">
+<?php
+
+// Start top panel, toolbar
+print '<div class="inline-block toolbarbutton centpercent">'; ?>
+</div>
+</div> <!-- End div id="containerlayout" -->
+
+<div class="risk-evaluation-photo">
+	<span class="title"><?php echo $langs->trans('Photo'); ?></span>
+	<div class="risk-evaluation-photo-container wpeo-modal-event tooltip hover">
+		<?php
+		$relativepath = 'digiriskdolibarr/medias';
+		$modulepart = 'ecm';
+		$path = DOL_URL_ROOT.'/document.php?modulepart=' . $modulepart  . '&attachment=0&file=' . str_replace('/', '%2F', $relativepath) . '/';
+		$nophoto = '/public/theme/common/nophoto.png'; ?>
+		<!-- BUTTON RISK EVALUATION PHOTO MODAL -->
+		<div class="action risk-evaluation-photo default-photo modal-open" value="<?php echo $object->id ?>">
+			<span class="floatleft inline-block valignmiddle divphotoref risk-evaluation-photo-single">
+				<input type="hidden" value="<?php echo $path ?>">
+				<input class="filename" type="hidden" value="">
+				<img class="photo maxwidth50"  src="<?php echo DOL_URL_ROOT.'/public/theme/common/nophoto.png' ?>">
+			</span>
+		</div>
+		<!-- RISK EVALUATION PHOTO MODAL -->
+		<div class="wpeo-modal modal-photo" id="risk_evaluation_photo<?php echo $object->id ?>">
+			<div class="modal-container wpeo-modal-event">
+				<!-- Modal-Header -->
+				<div class="modal-header">
+					<h2 class="modal-title"><?php echo $langs->trans('ModalAddPhoto') ?></h2>
+					<div class="modal-close"><i class="fas fa-2x fa-times"></i></div>
+				</div>
+				<!-- Modal-Content -->
+				<div class="modal-content" id="#modalContent<?php echo $object->id ?>">
+					<?php
+					// To attach new file
+					if ((!empty($conf->use_javascript_ajax) && empty($conf->global->MAIN_ECM_DISABLE_JS)) || !empty($section))
+					{
+						$sectiondir = GETPOST('file', 'alpha') ?GETPOST('file', 'alpha') : GETPOST('section_dir', 'alpha');
+						print '<!-- Start form to attach new file in filemanager.tpl.php sectionid='.$section.' sectiondir='.$sectiondir.' -->'."\n";
+						include_once DOL_DOCUMENT_ROOT.'/core/class/html.formfile.class.php';
+						$formfile = new FormFile($db);
+						$formfile->form_attach_new_file($_SERVER["PHP_SELF"], 'none', 0, ($section ? $section : -1), $permtoupload, 48, null, '', 0, '', 0, $nameforformuserfile, '', $sectiondir, 1);
+					} else print '&nbsp;';
+					// End "Add new file" area
+					?>
+					<div class="underbanner clearboth"></div>
+					<div class="wpeo-table table-row">
+						<?php
+						$files =  dol_dir_list(DOL_DATA_ROOT . '/ecm/digiriskdolibarr/medias');
+						$relativepath = 'digiriskdolibarr/medias';
+						$modulepart = 'ecm';
+						$path = DOL_URL_ROOT.'/document.php?modulepart=' . $modulepart  . '&attachment=0&file=' . str_replace('/', '%2F', $relativepath);
+						$j = 0;
+
+						if ( !empty($files) ) :
+							foreach ($files as $file) :
+								print '<div class="table-cell center clickable-photo clickable-photo'. $j .'" value="'. $j .'" element="risk-evaluation">';
+								$urladvanced = getAdvancedPreviewUrl($modulepart, $relativepath . '/' . $file['relativename'], 0, 'entity='.$object->entity);
+								print '<a class="clicked-photo-preview" href="'.$urladvanced.'"><i class="fas fa-2x fa-search-plus"></i></a>';
+//								else $return .= '<a href="'.DOL_URL_ROOT.'/viewimage.php?modulepart='.$modulepart.'&entity='.$object->entity.'&file='.urlencode($pdir.$photo).'" class="aphoto" target="_blank">';
+								if (image_format_supported($file['name']) >= 0) :
+									$fullpath = $path . '/' . $file['relativename'] . '&entity=' . $conf->entity; ?>
+									<input class="filename" type="hidden" value="<?php echo $file['name'] ?>">
+									<img class="photo photo<?php echo $j ?> maxwidth200" src="<?php echo $fullpath; ?>">
+								<?php else : print '&nbsp;';
+								endif;
+								print '<span class="title">'.$file['name'].'</span>';
+								print '</div>';
+								$j++;
+							endforeach;
+						endif; ?>
+					</div>
+				</div>
+				<!-- Modal-Footer -->
+				<div class="modal-footer">
+					<div class="save-photo wpeo-button button-blue">
+						<span><?php echo $langs->trans('Add'); ?></span>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<!-- END PHP TEMPLATE core/tpl/filemanager.tpl.php -->

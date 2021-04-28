@@ -5,3 +5,7 @@
 @import "page/page";
 @import "table/table";
 @import "modal/modal";
+
+.preview-photo {
+  z-index: 1003 !important;
+}
