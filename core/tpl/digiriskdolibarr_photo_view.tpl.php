@@ -46,12 +46,12 @@ if (empty($conf) || !is_object($conf))
 			</span>
 		</div>
 		<!-- RISK EVALUATION PHOTO MODAL -->
-		<div class="wpeo-modal modal-photo" id="risk_evaluation_photo<?php echo $object->id ?>">
+		<div class="wpeo-modal modal-photo" id="risk_evaluation_photo<?php echo $object->id ?>" data-id="<?php echo $object->id ?>">
 			<div class="modal-container wpeo-modal-event">
 				<!-- Modal-Header -->
 				<div class="modal-header">
 					<h2 class="modal-title"><?php echo $langs->trans('ModalAddPhoto') ?></h2>
-					<div class="modal-close"><i class="fas fa-2x fa-times"></i></div>
+					<div class="modal-close modal-refresh"><i class="fas fa-2x fa-times"></i></div>
 				</div>
 				<!-- Modal-Content -->
 				<div class="modal-content" id="#modalContent<?php echo $object->id ?>">
@@ -68,32 +68,30 @@ if (empty($conf) || !is_object($conf))
 					// End "Add new file" area
 					?>
 					<div class="underbanner clearboth"></div>
-					<div class="wpeo-table table-row ecm-photo-list">
-						<div class="ecm-photo-list-children">
-							<?php
-							$files =  dol_dir_list(DOL_DATA_ROOT . '/ecm/digiriskdolibarr/medias');
-							$relativepath = 'digiriskdolibarr/medias';
-							$modulepart = 'ecm';
-							$path = DOL_URL_ROOT.'/document.php?modulepart=' . $modulepart  . '&attachment=0&file=' . str_replace('/', '%2F', $relativepath);
-							$j = 0;
+					<div class="wpeo-table table-row ecm-photo-list ecm-photo-list-<?php echo $risk->id ?>">
+						<?php
+						$files =  dol_dir_list(DOL_DATA_ROOT . '/ecm/digiriskdolibarr/medias');
+						$relativepath = 'digiriskdolibarr/medias';
+						$modulepart = 'ecm';
+						$path = DOL_URL_ROOT.'/document.php?modulepart=' . $modulepart  . '&attachment=0&file=' . str_replace('/', '%2F', $relativepath);
+						$j = 0;
 
-							if ( !empty($files) ) :
-								foreach ($files as $file) :
-									print '<div class="table-cell center clickable-photo clickable-photo'. $j .'" value="'. $j .'" element="risk-evaluation">';
-									$urladvanced = getAdvancedPreviewUrl($modulepart, $relativepath . '/' . $file['relativename'], 0, 'entity='.$object->entity);
-									print '<a class="clicked-photo-preview" href="'.$urladvanced.'"><i class="fas fa-2x fa-search-plus"></i></a>';
-									if (image_format_supported($file['name']) >= 0) :
-										$fullpath = $path . '/' . $file['relativename'] . '&entity=' . $conf->entity; ?>
-										<input class="filename" type="hidden" value="<?php echo $file['name'] ?>">
-										<img class="photo photo<?php echo $j ?> maxwidth200" src="<?php echo $fullpath; ?>">
-									<?php else : print '&nbsp;';
-									endif;
-									print '<span class="title">'.$file['name'].'</span>';
-									print '</div>';
-									$j++;
-								endforeach;
-							endif; ?>
-						</div>
+						if ( !empty($files) ) :
+							foreach ($files as $file) :
+								print '<div class="table-cell center clickable-photo clickable-photo'. $j .'" value="'. $j .'" element="risk-evaluation">';
+								$urladvanced = getAdvancedPreviewUrl($modulepart, $relativepath . '/' . $file['relativename'], 0, 'entity='.$object->entity);
+								print '<a class="clicked-photo-preview" href="'.$urladvanced.'"><i class="fas fa-2x fa-search-plus"></i></a>';
+								if (image_format_supported($file['name']) >= 0) :
+									$fullpath = $path . '/' . $file['relativename'] . '&entity=' . $conf->entity; ?>
+									<input class="filename" type="hidden" value="<?php echo $file['name'] ?>">
+									<img class="photo photo<?php echo $j ?> maxwidth200" src="<?php echo $fullpath; ?>">
+								<?php else : print '&nbsp;';
+								endif;
+								print '<span class="title">'.$file['name'].'</span>';
+								print '</div>';
+								$j++;
+							endforeach;
+						endif; ?>
 					</div>
 				</div>
 				<!-- Modal-Footer -->
