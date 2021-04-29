@@ -973,7 +973,7 @@ window.eoxiaJS.risk.createRisk = function ( event ) {
 		commentPost = '&evaluationComment=' + encodeURI(comment);
 	}
 
-	var task = elementTask.find('textarea').val();
+	var task = elementTask.find('input').val();
 	var taskPost = '';
 	if (task !== '') {
 		taskPost = '&tasktitle=' + encodeURI(task);
