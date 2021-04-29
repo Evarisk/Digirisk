@@ -67,7 +67,6 @@ class RiskSign extends CommonObject
 		'import_key'    => array('type' => 'varchar(14)', 'label' => 'ImportId', 'enabled' => '1', 'position' => 60, 'notnull' => -1, 'visible' => 0,),
 		'status'        => array('type'=>'smallint', 'label'=>'Status', 'enabled'=>'1', 'position'=>70, 'notnull'=>0, 'visible'=>0,),
 		'category'      => array('type' => 'integer', 'label' => 'RiskSignCategory', 'enabled' => '1', 'position' => 80, 'notnull' => 0, 'visible' => 1,),
-		'photo'         => array('type' => 'varchar(255)', 'label' => 'Photo', 'enabled' => '1', 'position' => 90, 'notnull' => 0, 'visible' => 1,),
 		'description'   => array('type' => 'text', 'label' => 'Description', 'enabled' => '1', 'position' => 100, 'notnull' => 0, 'visible' => 1,),
 		'fk_user_creat' => array('type' => 'integer:User:user/class/user.class.php', 'label' => 'UserAuthor', 'enabled' => '1', 'position' => 110, 'notnull' => 1, 'visible' => 0, 'foreignkey' => 'user.rowid',),
 		'fk_user_modif' => array('type' => 'integer:User:user/class/user.class.php', 'label' => 'UserModif', 'enabled' => '1', 'position' => 120, 'notnull' => -1, 'visible' => 0,),
@@ -83,7 +82,6 @@ class RiskSign extends CommonObject
 	public $import_key;
 	public $status;
 	public $category;
-	public $photo;
 	public $description;
 	public $fk_user_creat;
 	public $fk_user_modif;

@@ -137,30 +137,13 @@ if (empty($reshook))
 	if (!$error && $action == 'add' && $permissiontoadd) {
 		$riskSignCategory    = GETPOST('riskSignCategory');
 		$riskSignDescription = GETPOST('riskSignDescription');
-		$photo               = GETPOST('photo');
 		$fk_element          = GETPOST('id');
 
 		$risksign->ref         = $refRiskSignMod->getNextValue($risksign);
 		$risksign->category    = $riskSignCategory;
-		$risksign->photo       = $photo;
 		$risksign->description = $riskSignDescription;
 
 		$risksign->fk_element  = $fk_element ? $fk_element : 0;
-
-		//photo upload and thumbs generation
-		$pathToECMPhoto = DOL_DATA_ROOT . '/ecm/digiriskdolibarr/medias/' . $photo;
-		$pathToRiskSignPhoto = DOL_DATA_ROOT . '/digiriskdolibarr/risksign/' . $risksign->ref;
-
-		mkdir($pathToRiskSignPhoto);
-		copy($pathToECMPhoto,$pathToRiskSignPhoto . '/' . $photo);
-
-		global $maxwidthmini, $maxheightmini, $maxwidthsmall,$maxheightsmall ;
-		$destfull = $pathToRiskSignPhoto . '/' . $photo;
-
-		// Create thumbs
-		$imgThumbSmall = vignette($destfull, $maxwidthsmall, $maxheightsmall, '_small', 50, "thumbs");
-		// Create mini thumbs for image (Ratio is near 16/9)
-		$imgThumbMini = vignette($destfull, $maxwidthmini, $maxheightmini, '_mini', 50, "thumbs");
 
 		if (!$error) {
 			$result = $risksign->create($user, true);
@@ -181,41 +164,15 @@ if (empty($reshook))
 	}
 
 	if (!$error && $action == 'saveRiskSign' && $permissiontoadd) {
-		$riskSignID      = GETPOST('riskSignID');
+
+		$riskSignID          = GETPOST('riskSignID');
 		$riskSignCategory    = GETPOST('riskSignCategory');
 		$riskSignDescription = GETPOST('riskSignDescription');
-		$photo               = GETPOST('photo');
 
 		$risksign->fetch($riskSignID);
 
 		$risksign->category    = $riskSignCategory;
-		$risksign->photo       = $photo;
 		$risksign->description = $db->escape($riskSignDescription);
-
-		$pathToECMPhoto        = DOL_DATA_ROOT . '/ecm/digiriskdolibarr/medias/' . $photo;
-		$pathToRiskSignPhoto = DOL_DATA_ROOT . '/digiriskdolibarr/risksign/' . $risksign->ref;
-
-		$files = dol_dir_list($pathToRiskSignPhoto);
-		foreach ($files as $file) {
-			if (is_file($file['fullname'])) {
-				unlink($file['fullname']);
-			}
-		}
-
-		$files = dol_dir_list($pathToRiskSignPhoto . '/thumbs');
-		foreach ($files as $file) {
-			unlink($file['fullname']);
-		}
-
-		copy($pathToECMPhoto,$pathToRiskSignPhoto . '/' . $photo);
-
-		global $maxwidthmini, $maxheightmini, $maxwidthsmall,$maxheightsmall ;
-		$destfull = $pathToRiskSignPhoto . '/' . $photo;
-
-		// Create thumbs
-		$imgThumbSmall = vignette($destfull, $maxwidthsmall, $maxheightsmall, '_small', 50, "thumbs");
-		// Create mini thumbs for image (Ratio is near 16/9)
-		$imgThumbMini = vignette($destfull, $maxwidthmini, $maxheightmini, '_mini', 50, "thumbs");
 
 		$result = $risksign->update($user);
 
@@ -236,32 +193,6 @@ if (empty($reshook))
 		if (!empty($toselect)) {
 			foreach ($toselect as $toselectedid) {
 				$risksign->fetch($toselectedid);
-
-				if (!empty ($risksign) && $risksign > 0) {
-					//photo upload and thumbs generation
-					$pathToRiskSignPhoto = DOL_DATA_ROOT . '/digiriskdolibarr/risksign/' . $risksign->ref;
-
-					if ( file_exists( $pathToRiskSignPhoto ) && !(empty($risksign->ref))) {
-						$files = dol_dir_list($pathToRiskSignPhoto);
-						if (!empty($files)) {
-							foreach ($files as $file) {
-								if (is_file($file['fullname'])) {
-									unlink($file['fullname']);
-								}
-							}
-						}
-
-						$files = dol_dir_list($pathToRiskSignPhoto . '/thumbs');
-						if (!empty($files)) {
-							foreach ($files as $file) {
-								unlink($file['fullname']);
-							}
-						}
-						dol_delete_dir($pathToRiskSignPhoto. '/thumbs');
-						dol_delete_dir($pathToRiskSignPhoto);
-					}
-				}
-
 				$result = $risksign->delete($user);
 
 				if ($result > 0) {
@@ -456,75 +387,6 @@ if ($object->id > 0) {
 								</ul>
 							</div>
 						</div>
-						<div class="risksign-photo">
-							<span class="title"><?php echo $langs->trans('Photo'); ?></span>
-							<div class="risksign-photo-container wpeo-modal-event tooltip hover">
-								<?php
-								$relativepath = 'digiriskdolibarr/medias';
-								$modulepart = 'ecm';
-								$path = DOL_URL_ROOT.'/document.php?modulepart=' . $modulepart  . '&attachment=0&file=' . str_replace('/', '%2F', $relativepath) . '/';
-								$nophoto = '/public/theme/common/nophoto.png'; ?>
-								<!-- BUTTON RISK SIGN PHOTO MODAL -->
-								<div class="action risksign-photo default-photo modal-open" value="<?php echo $object->id ?>">
-										<span class="floatleft inline-block valignmiddle divphotoref risksign-photo-single">
-											<input type="hidden" value="<?php echo $path ?>">
-											<input class="filename" type="hidden" value="">
-											<img class="photo maxwidth50"  src="<?php echo DOL_URL_ROOT.'/public/theme/common/nophoto.png' ?>">
-										</span>
-								</div>
-								<!-- RISK SIGN PHOTO MODAL -->
-								<div class="wpeo-modal modal-photo" id="risksign_photo<?php echo $object->id ?>">
-									<div class="modal-container wpeo-modal-event">
-										<!-- Modal-Header -->
-										<div class="modal-header">
-											<h2 class="modal-title"><?php echo $langs->trans('AddPhoto') ?></h2>
-											<div class="modal-close"><i class="fas fa-times"></i></div>
-										</div>
-										<!-- Modal-Content -->
-										<div class="modal-content" id="#modalContent<?php echo $object->id ?>">
-											<div class="action">
-												<a href="<?php echo '../../ecm/index.php' ?>" target="_blank">
-													<div class="wpeo-button button-square-50 button-blue">
-														<i class="button-icon fas fa-plus"></i>
-													</div>
-												</a>
-											</div>
-											<div class="wpeo-table table-row">
-												<?php
-												$files =  dol_dir_list(DOL_DATA_ROOT . '/ecm/digiriskdolibarr/medias');
-												$relativepath = 'digiriskdolibarr/medias';
-												$modulepart = 'ecm';
-												$path = DOL_URL_ROOT.'/document.php?modulepart=' . $modulepart  . '&attachment=0&file=' . str_replace('/', '%2F', $relativepath);
-												$j = 0;
-
-												if ( !empty($files) ) :
-													foreach ($files as $file) :
-														print '<div class="table-cell center clickable-photo clickable-photo'. $j .'" value="'. $j .'" element="'.$risksign->element.'">';
-														if (image_format_supported($file['name']) >= 0) :
-															$fullpath = $path . '/' . $file['relativename'] . '&entity=' . $conf->entity; ?>
-															<input class="filename" type="hidden" value="<?php echo $file['name'] ?>">
-															<img class="photo photo<?php echo $j ?> maxwidth200" src="<?php echo $fullpath; ?>">
-														<?php else : print '&nbsp;';
-														endif;
-														$j++;
-														print '</div>';
-													endforeach;
-												endif; ?>
-											</div>
-										</div>
-										<!-- Modal-Footer -->
-										<div class="modal-footer">
-											<div class="save-photo wpeo-button button-blue">
-												<span><?php echo $langs->trans('SavePhoto'); ?></span>
-											</div>
-											<div class="wpeo-button button-grey modal-close">
-												<span><?php echo $langs->trans('CloseModal'); ?></span>
-											</div>
-										</div>
-									</div>
-								</div>
-							</div>
-						</div>
 						<div class="risksign-description">
 							<span class="title"><?php echo $langs->trans('Description'); ?></span>
 							<?php print '<textarea name="risksignDescription" rows="'.ROWS_2.'">'.('').'</textarea>'."\n"; ?>
@@ -703,79 +565,6 @@ if ($object->id > 0) {
 													<?php endforeach;
 												endif; ?>
 											</ul>
-										</div>
-									</div>
-									<div class="risksign-photo">
-										<span class="title"><?php echo $langs->trans('Photo'); ?></span>
-										<div class="risksign-photo-container wpeo-modal-event tooltip hover">
-											<?php
-											$relativepath = 'digiriskdolibarr/medias';
-											$modulepart = 'ecm';
-											$path = DOL_URL_ROOT.'/document.php?modulepart=' . $modulepart  . '&attachment=0&file=' . str_replace('/', '%2F', $relativepath) . '/';
-											$nophoto = '/public/theme/common/nophoto.png'; ?>
-											<!-- BUTTON RISK SIGN PHOTO MODAL -->
-											<div class="action risksign-photo default-photo modal-open" value="<?php echo $risksign->id ?>">
-												<?php $filearray = dol_dir_list($conf->digiriskdolibarr->multidir_output[$conf->entity].'/'.$risksign->element.'/'.$risksign->ref, "files", 0, '', '(\.odt|_preview.*\.png)$', 'position_name', 'asc', 1);
-												if (count($filearray)) {
-													print '<span class="floatleft inline-block valignmiddle divphotoref risksign-photo-single">'.digirisk_show_photos('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity].'/'.$risksign->element, 'small', 1, 0, 0, 0, 40, 0, 1, 0, 0, $risksign->element, $risksign).'<input class="filename" type="hidden" value="'.$risksign->photo.'"/>'.'</span>';
-												} else {
-													$nophoto = '/public/theme/common/nophoto.png'; ?>
-													<span class="floatleft inline-block valignmiddle divphotoref risksign-photo-single"><img class="photodigiriskdolibarr" alt="No photo" src="<?php echo DOL_URL_ROOT.$nophoto ?>">
-														<input class="filename" type="hidden" value="<?php echo $risksign->photo ?>">
-													</span>
-												<?php } ?>
-											</div>
-											<!-- RISK SIGN PHOTO MODAL -->
-											<div class="wpeo-modal modal-photo" id="risksign_photo<?php echo $risksign->id ?>">
-												<div class="modal-container wpeo-modal-event">
-													<!-- Modal-Header -->
-													<div class="modal-header">
-														<h2 class="modal-title"><?php echo $langs->trans('AddPhoto') ?></h2>
-														<div class="modal-close"><i class="fas fa-times"></i></div>
-													</div>
-													<!-- Modal-Content -->
-													<div class="modal-content" id="#modalContent<?php echo $risksign->id ?>">
-														<div class="action">
-															<a href="<?php echo '../../ecm/index.php' ?>" target="_blank">
-																<div class="wpeo-button button-square-50 button-blue">
-																	<i class="button-icon fas fa-plus"></i>
-																</div>
-															</a>
-														</div>
-														<div class="wpeo-table table-row">
-															<?php
-															$files =  dol_dir_list(DOL_DATA_ROOT . '/ecm/digiriskdolibarr/medias');
-															$relativepath = 'digiriskdolibarr/medias';
-															$modulepart = 'ecm';
-															$path = DOL_URL_ROOT.'/document.php?modulepart=' . $modulepart  . '&attachment=0&file=' . str_replace('/', '%2F', $relativepath);
-															$j = 0;
-
-															if ( !empty($files) ) :
-																foreach ($files as $file) :
-																	print '<div class="table-cell center clickable-photo clickable-photo'. $j .'" value="'. $j .'" element="'.$risksign->element.'">';
-																	if (image_format_supported($file['name']) >= 0) :
-																		$fullpath = $path . '/' . $file['relativename'] . '&entity=' . $conf->entity; ?>
-																		<input class="filename" type="hidden" value="<?php echo $file['name'] ?>">
-																		<img class="photo photo<?php echo $j ?> maxwidth200" src="<?php echo $fullpath; ?>">
-																	<?php else : print '&nbsp;';
-																	endif;
-																	$j++;
-																	print '</div>';
-																endforeach;
-															endif; ?>
-														</div>
-													</div>
-													<!-- Modal-Footer -->
-													<div class="modal-footer">
-														<div class="save-photo wpeo-button button-blue">
-															<span><?php echo $langs->trans('SavePhoto'); ?></span>
-														</div>
-														<div class="wpeo-button button-grey modal-close">
-															<span><?php echo $langs->trans('CloseModal'); ?></span>
-														</div>
-													</div>
-												</div>
-											</div>
 										</div>
 									</div>
 									<div class="risksign-description">

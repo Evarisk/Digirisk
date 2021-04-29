@@ -113,7 +113,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			"/ecm/digiriskdolibarr/workunitdocument",
 			"/ecm/digiriskdolibarr/listingrisksaction",
 			"/ecm/digiriskdolibarr/listingrisksphoto",
-			"/ecm/digiriskdolibarr/signalisation",
+			"/ecm/digiriskdolibarr/risksign",
 			"/ecm/digiriskdolibarr/medias"
 		);
 

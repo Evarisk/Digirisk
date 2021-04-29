@@ -23,7 +23,6 @@ CREATE TABLE llx_digiriskdolibarr_risksign(
 	import_key    varchar(14),
 	status        smallint,
 	category      integer,
-	photo         varchar(255),
     description   text,
 	fk_user_creat integer NOT NULL,
 	fk_user_modif integer,
