@@ -1039,7 +1039,7 @@ while ($i < ($limit ? min($num, $limit) : $num))
 									<!-- Modal-Header -->
 									<div class="modal-header">
 										<h2 class="modal-title"><?php echo $langs->trans('EvaluationCreate') . ' ' . $refEvaluationMod->getNextValue($evaluation)?></h2>
-										<div class="modal-close"><i class="fas fa-times"></i></div>
+										<div class="modal-close modal-refresh"><i class="fas fa-times"></i></div>
 									</div>
 									<!-- Modal-ADD Evaluation Content-->
 									<div class="modal-content" id="#modalContent<?php echo $risk->id?>">
