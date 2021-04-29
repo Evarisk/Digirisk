@@ -1032,7 +1032,7 @@ if ($object->id > 0) {
 
 		// Show here line of result
 		print '<tr class="oddeven risk-row risk_row_'. $risk->id .'" id="risk_row_'. $risk->id .'">';
-
+		print '<tr class="risk-row-content-'. $risk->id . '">';
 		foreach ($risk->fields as $key => $val)
 		{
 			$cssforfield = (empty($val['css']) ? '' : $val['css']);
@@ -1175,8 +1175,8 @@ if ($object->id > 0) {
 											<div class="modal-refresh modal-close"><i class="fas fa-times"></i></div>
 										</div>
 										<!-- MODAL RISK EVALUATION LIST CONTENT -->
-										<div class="modal-content" id="#modalContent">
-											<ul class="risk-evaluations-list">
+										<div class="modal-content" id="#modalContent" value="<?php echo $risk->id ?>">
+											<ul class="risk-evaluations-list risk-evaluations-list-<?php echo $risk->id ?>">
 												<?php if (!empty($cotationList)) :
 													foreach ($cotationList as $cotation) : ?>
 														<li class="risk-evaluation risk-evaluation<?php echo $cotation->id ?>" value="<?php echo $cotation->id ?>">
@@ -1535,6 +1535,7 @@ if ($object->id > 0) {
 
 		print '</td>';
 		if (!$i) $totalarray['nbfield']++;
+		print '</tr>';
 		print '</tr>'."\n";
 		$i++;
 	}
