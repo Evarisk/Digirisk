@@ -131,12 +131,12 @@ if (empty($reshook))
 
 		if ( ! empty( $digiriskelementlist ) ) {
 			foreach ($digiriskelementlist as $digiriskelementsingle) {
-				if ($digiriskelementsingle->element_type == 'groupment') {
+				if ($digiriskelementsingle['object']->element_type == 'groupment') {
 					$digiriskelementdocument = new GroupmentDocument($db);
-				} elseif ($digiriskelementsingle->element_type == 'workunit') {
+				} elseif ($digiriskelementsingle['object']->element_type == 'workunit') {
 					$digiriskelementdocument = new WorkUnitDocument($db);
 				}
-				$moreparams = $digiriskelementsingle;
+				$moreparams = $digiriskelementsingle['object'];
 				$digiriskelementdocumentmodel = 'DIGIRISKDOLIBARR_'.strtoupper($digiriskelementdocument->element).'_DEFAULT_MODEL';
 
 				$digiriskelementdocument->generateDocument($conf->global->$digiriskelementdocumentmodel, $outputlangs, $hidedetails, $hidedesc, $hideref, $moreparams);

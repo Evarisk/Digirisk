@@ -296,13 +296,18 @@ class doc_riskassessmentdocument_odt extends ModeleODTRiskAssessmentDocument
 						$listlines = $odfHandler->setSegment('elementParHierarchie');
 
 						foreach ($digiriskelementlist as $line) {
-							$tmparray['nomElement'] = $line->ref .' '. $line->label;
+
+							$depthHyphens = '';
+							for ($k = 0; $k < $line['depth']; $k++) {
+								$depthHyphens .= '- ';
+							}
+							$tmparray['nomElement'] = $depthHyphens . $line['object']->ref .' '. $line['object']->label;
 
 							unset($tmparray['object_fields']);
 
-							complete_substitutions_array($tmparray, $outputlangs, $object, $line, "completesubstitutionarray_lines");
+							complete_substitutions_array($tmparray, $outputlangs, $object, $line['object'], "completesubstitutionarray_lines");
 							// Call the ODTSubstitutionLine hook
-							$parameters = array('odfHandler' => &$odfHandler, 'file' => $file, 'object' => $object, 'outputlangs' => $outputlangs, 'substitutionarray' => &$tmparray, 'line' => $line);
+							$parameters = array('odfHandler' => &$odfHandler, 'file' => $file, 'object' => $object, 'outputlangs' => $outputlangs, 'substitutionarray' => &$tmparray, 'line' => $line['object']);
 							$reshook = $hookmanager->executeHooks('ODTSubstitutionLine', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
 							foreach ($tmparray as $key => $val) {
 								try {
@@ -324,7 +329,7 @@ class doc_riskassessmentdocument_odt extends ModeleODTRiskAssessmentDocument
 						$listlines = $odfHandler->setSegment('risqueFiche');
 
 						foreach ($digiriskelementlist as $digiriskelementsingle) {
-							$digiriskelementrisks = $risk->fetchFromParent($digiriskelementsingle->id);
+							$digiriskelementrisks = $risk->fetchFromParent($digiriskelementsingle['object']->id);
 							if ($digiriskelementrisks > 0 && !empty($digiriskelementrisks)) {
 								foreach ($digiriskelementrisks as $line) {
 									$evaluation = new RiskAssessment($this->db);
@@ -333,8 +338,12 @@ class doc_riskassessmentdocument_odt extends ModeleODTRiskAssessmentDocument
 									$cotationtotale += $lastEvaluation->cotation;
 								}
 							}
+							$depthHyphens = '';
+							for ($k = 0; $k < $digiriskelementsingle['depth']; $k++) {
+								$depthHyphens .= '- ';
+							}
+							$tmparray['nomElement'] = $depthHyphens . $digiriskelementsingle['object']->ref .' '. $digiriskelementsingle['object']->label;
 
-							$tmparray['nomElement']      = $digiriskelementsingle->ref . ' ' . $digiriskelementsingle->label;
 							$tmparray['quotationTotale'] = $cotationtotale;
 							$cotationtotale = 0;
 							unset($tmparray['object_fields']);

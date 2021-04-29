@@ -263,7 +263,10 @@ class DigiriskElement extends CommonObject
 					$object = new DigiriskElement($this->db);
 					$result = $object->fetch($id);
 					if (!empty ($result)) {
-						$digiriskelementlist[$id] = $object;
+						$depth = 'depth' . $id;
+
+						$digiriskelementlist[$id]['object'] = $object;
+						$digiriskelementlist[$id]['depth'] = array_shift($element[$depth]);
 					}
 				}
 			}

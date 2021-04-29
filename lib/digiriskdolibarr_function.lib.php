@@ -682,6 +682,7 @@ function recurse_tree($parent, $niveau, $array) {
 		if ($parent == $noeud->fk_parent) {
 			$result[$noeud->id] = array(
 				'id'       => $noeud->id,
+				'depth'    => array('depth'.$noeud->id => $niveau),
 				'object'   => $noeud,
 				'children' => recurse_tree($noeud->id, ($niveau + 1), $array),
 			);
