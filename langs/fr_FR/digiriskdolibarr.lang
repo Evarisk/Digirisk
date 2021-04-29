@@ -315,6 +315,7 @@ RiskAssessmentSitePlans = Plan du site
 # Right - Droit
 
 # Trigger - Déclencheur
+GroupmentDocumentGeneratedWithDolibarr = Fiche de groupement générée avec Dolibarr
 
 # Mod Numbering - Modèle de numérotation
 DigiriskGroupmentDocumentNumberingModule = Modèle de numérotation des fiches de groupement de Digirisk
@@ -337,6 +338,7 @@ GroupmentDocument = Fiche de Groupement
 # Right - Droit
 
 # Trigger - Déclencheur
+WorkUnitDocumentGeneratedWithDolibarr = Fiche d'Unité de travail générée avec Dolibarr
 
 # Mod Numbering - Modèle de numérotation
 DigiriskWorkUnitDocumentNumberingModule = Modèle de numérotation des fiches d'unité de travail de Digirisk
@@ -364,7 +366,7 @@ DeleteDigiriskElement = Supprimer un element digirisk
 # Data - Donnée
 NewDigiriskElement = Nouveau element digirisk
 GPUTOrganisation = Organisation des GP/UT
-DigiriskElement = Élement Digirisk
+DigiriskElement = Élément Digirisk
 
 ElementType = Type d'élément
 ParentElement = Élément parent
@@ -377,7 +379,6 @@ ParentElement = Élément parent
 # Trigger - Déclencheur
 GROUPMENT_CREATEInDolibarr = Groupement créé dans Dolibarr
 ActionsOnGroupment = Événements liés au groupement
-GroupmentGeneratedWithDolibarr = Fiche groupement générée avec Dolibarr
 
 # Mod Numbering - Modèle de numérotation
 DigiriskGroupmentNumberingModule = Modèle de numérotation des groupements de Digirisk
@@ -397,7 +398,6 @@ ModifyGroupment = Modifier groupement
 # Trigger - Déclencheur
 WORKUNIT_CREATEInDolibarr = Unité de travail créée dans Dolibarr
 ActionsOnWorkUnit = Événements liés au unité de travail
-WorkUnitGeneratedWithDolibarr = Fiche Unité de travail générée avec Dolibarr
 
 # Mod Numbering - Modèle de numérotation
 DigiriskWorkUnitNumberingModule = Modèle de numérotation des unités de travail de Digirisk
@@ -431,7 +431,7 @@ UserAssigned = Utilisateur assigné
 
 DigiriskEvaluatorData = Données des Évaluateurs
 EvaluatorDuration = Durée de l'évalution par l'évaluateur
-EvaluatorDurationDescription = Le temps que met l'evaluateur a réaliser son évaluation des risques
+EvaluatorDurationDescription = Le temps que met l'évaluateur à réaliser son évaluation des risques
 
 
 
@@ -495,6 +495,7 @@ UpdateEvaluation = Mettre à jour
 EvaluationMethod = Méthode d'évaluation
 lastEvaluationOn = Dernière évaluation le
 EvaluatedOn = le
+EvaluationCreate = Ajout
 
 DigiriskRiskAssessmentData = Donnée configurable des évaluations
 MultipleRiskAssessmentMethodName = Méthode d'évaluation multiple
