@@ -467,7 +467,7 @@ RiskList = Listing de risques
 RisksList = Liste de risques
 AddRiskTitle = Ajout du risque
 AddRiskButton = Ajouter le risque
-EditRisk = Edition du risque
+EditRisk = Édition du risque
 UpdateRisk = Mettre à jour
 RiskListDolibarr = Listing de risques Doli
 hasPhoto = Photo
@@ -490,12 +490,12 @@ DigiriskRiskAssessmentNumberingModule = Modèle de numérotation des évaluation
 
 # Data - Donnée
 RiskAssessment = Évaluation
-EvalautionCreate = Ajout de l'évaluation
+EvaluationCreate = Ajout de l'évaluation
+EvaluationEdit = Édition de l'évaluation
 UpdateEvaluation = Mettre à jour
 EvaluationMethod = Méthode d'évaluation
 lastEvaluationOn = Dernière évaluation le
 EvaluatedOn = le
-EvaluationCreate = Ajout
 
 DigiriskRiskAssessmentData = Donnée configurable des évaluations
 MultipleRiskAssessmentMethodName = Méthode d'évaluation multiple
