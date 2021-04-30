@@ -28,7 +28,6 @@ if (!$res) die("Include of main fails");
 
 require_once DOL_DOCUMENT_ROOT.'/core/lib/admin.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/core/class/html.formfile.class.php';
-require_once DOL_DOCUMENT_ROOT.'/includes/odtphp/odf.php';
 
 dol_include_once('/digiriskdolibarr/class/digiriskstandard.class.php');
 dol_include_once('/digiriskdolibarr/class/digiriskelement.class.php');
@@ -109,7 +108,6 @@ if (empty($reshook))
 
 	// Action to build doc
 	if ($action == 'builddoc' && $permissiontoadd) {
-
 
 		$outputlangs = $langs;
 		$newlang = '';
