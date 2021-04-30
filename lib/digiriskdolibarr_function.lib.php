@@ -48,8 +48,8 @@ function digirisk_show_photos($modulepart, $sdir, $size = 0, $nbmax = 0, $nbbyro
 	$sortfield = 'position_name';
 	$sortorder = 'desc';
 
-	$dir = $sdir.'/' . $object->ref . '/' ;
-	$pdir = $subdir . '/'. $object->ref . '/';
+	$dir = $sdir.'/';
+	$pdir = $subdir . '/';
 
 	$dir .= get_exdir(0, 0, 0, 0, $object, $modulepart);
 	$pdir .= get_exdir(0, 0, 0, 0, $object, $modulepart);
