@@ -203,8 +203,10 @@ if (empty($reshook))
 
 				//photo upload and thumbs generation
 				if (!empty ($photo)) {
-					$pathToECMPhoto = DOL_DATA_ROOT . '/ecm/digiriskdolibarr/medias/' . $photo;
-					$pathToEvaluationPhoto = DOL_DATA_ROOT . '/digiriskdolibarr/riskassessment/' . $evaluation->ref;
+					$entity =($conf->entity > 1) ? '/' . $conf->entity : '';
+					$pathToECMPhoto =  DOL_DATA_ROOT .$entity. '/ecm/digiriskdolibarr/medias/' . $photo;
+
+					$pathToEvaluationPhoto = DOL_DATA_ROOT . $entity . '/digiriskdolibarr/riskassessment/' . $evaluation->ref;
 
 					mkdir($pathToEvaluationPhoto);
 					copy($pathToECMPhoto, $pathToEvaluationPhoto . '/' . $photo);
@@ -345,8 +347,10 @@ if (empty($reshook))
 		$risk->fetch($riskID);
 		//photo upload and thumbs generation
 		if ( !empty ($photo) ) {
-			$pathToECMPhoto = DOL_DATA_ROOT . '/ecm/digiriskdolibarr/medias/' . $photo;
-			$pathToEvaluationPhoto = DOL_DATA_ROOT . '/digiriskdolibarr/riskassessment/' . $refEvaluationMod->getNextValue($evaluation);
+			$entity =($conf->entity > 1) ? '/' . $conf->entity : '';
+			$pathToECMPhoto =  DOL_DATA_ROOT .$entity. '/ecm/digiriskdolibarr/medias/' . $photo;
+
+			$pathToEvaluationPhoto = DOL_DATA_ROOT . $entity . '/digiriskdolibarr/riskassessment/' . $evaluation->ref;
 
 			mkdir($pathToEvaluationPhoto);
 			copy($pathToECMPhoto,$pathToEvaluationPhoto . '/' . $photo);
@@ -430,9 +434,10 @@ if (empty($reshook))
 			$evaluation->gravite    = $gravite;
 			$evaluation->exposition = $exposition;
 		}
+		$entity =($conf->entity > 1) ? '/' . $conf->entity : '';
+		$pathToECMPhoto =  DOL_DATA_ROOT .$entity. '/ecm/digiriskdolibarr/medias/' . $photo;
 
-		$pathToECMPhoto        = DOL_DATA_ROOT . '/ecm/digiriskdolibarr/medias/' . $photo;
-		$pathToEvaluationPhoto = DOL_DATA_ROOT . '/digiriskdolibarr/riskassessment/' . $evaluation->ref;
+		$pathToEvaluationPhoto = DOL_DATA_ROOT . $entity . '/digiriskdolibarr/riskassessment/' . $evaluation->ref;
 
 		$files = dol_dir_list($pathToEvaluationPhoto);
 		foreach ($files as $file) {
@@ -598,9 +603,9 @@ if ($object->id > 0) {
 			$sql .= 't.'.$key.', ';
 		}
 		// Add fields from extrafields
-			if (!empty($extrafields->attributes[$risk->table_element]['label'])) {
-				foreach ($extrafields->attributes[$risk->table_element]['label'] as $key => $val) $sql .= ($extrafields->attributes[$risk->table_element]['type'][$key] != 'separate' ? "ef.".$key.' as options_'.$key.', ' : '');
-			}
+		if (!empty($extrafields->attributes[$risk->table_element]['label'])) {
+			foreach ($extrafields->attributes[$risk->table_element]['label'] as $key => $val) $sql .= ($extrafields->attributes[$risk->table_element]['type'][$key] != 'separate' ? "ef.".$key.' as options_'.$key.', ' : '');
+		}
 		// Add fields from hooks
 		$parameters = array();
 		$reshook = $hookmanager->executeHooks('printFieldListSelect', $parameters, $risk); // Note that $action and $risk may have been modified by hook
@@ -674,55 +679,55 @@ if ($object->id > 0) {
 		}
 	} else {
 
-	$sql = 'SELECT ';
-	foreach ($evaluation->fields as $key => $val)
-	{
-		$sql .= 'evaluation.'.$key.', ';
-	}
-	// Add fields from extrafields
-	if (!empty($extrafields->attributes[$evaluation->table_element]['label'])) {
-		foreach ($extrafields->attributes[$evaluation->table_element]['label'] as $key => $val) $sql .= ($extrafields->attributes[$evaluation->table_element]['type'][$key] != 'separate' ? "ef.".$key.' as options_'.$key.', ' : '');
-	}
-	// Add fields from hooks
-	$parameters = array();
-	$reshook = $hookmanager->executeHooks('printFieldListSelect', $parameters, $evaluation); // Note that $action and $evaluation may have been modified by hook
-	$sql .= preg_replace('/^,/', '', $hookmanager->resPrint);
-	$sql = preg_replace('/,\s*$/', '', $sql);
-	$sql .= " FROM ".MAIN_DB_PREFIX.$evaluation->table_element." as evaluation";
-	$sql .= " LEFT JOIN ".MAIN_DB_PREFIX.$risk->table_element." as r on (evaluation.fk_risk = r.rowid)";
-	if (is_array($extrafields->attributes[$evaluation->table_element]['label']) && count($extrafields->attributes[$evaluation->table_element]['label'])) $sql .= " LEFT JOIN ".MAIN_DB_PREFIX.$evaluation->table_element."_extrafields as ef on (evaluation.rowid = ef.fk_object)";
-	if ($evaluation->ismultientitymanaged == 1) $sql .= " WHERE evaluation.entity IN (".getEntity($evaluation->element).")";
-	else $sql .= " WHERE 1 = 1";
-	$sql .= " AND evaluation.status = 1";
-	$sql .= " AND r.fk_element =".$id;
-	foreach ($search as $key => $val)
-	{
-		if ($key == 'status' && $search[$key] == -1) continue;
-		$mode_search = (($evaluation->isInt($evaluation->fields[$key]) || $evaluation->isFloat($evaluation->fields[$key])) ? 1 : 0);
-		if (strpos($evaluation->fields[$key]['type'], 'integer:') === 0) {
-			if ($search[$key] == '-1') $search[$key] = '';
-			$mode_search = 2;
+		$sql = 'SELECT ';
+		foreach ($evaluation->fields as $key => $val)
+		{
+			$sql .= 'evaluation.'.$key.', ';
 		}
-		if ($search[$key] != '') $sql .= natural_search($key, $search[$key], (($key == 'status') ? 2 : $mode_search));
-	}
-	if ($search_all) $sql .= natural_search(array_keys($fieldstosearchall), $search_all);
-	// Add where from extra fields
-	include DOL_DOCUMENT_ROOT.'/core/tpl/extrafields_list_search_sql.tpl.php';
-	// Add where from hooks
-	$parameters = array();
-	$reshook = $hookmanager->executeHooks('printFieldListWhere', $parameters, $evaluation); // Note that $action and $evaluation may have been modified by hook
-	$sql .= $hookmanager->resPrint;
+		// Add fields from extrafields
+		if (!empty($extrafields->attributes[$evaluation->table_element]['label'])) {
+			foreach ($extrafields->attributes[$evaluation->table_element]['label'] as $key => $val) $sql .= ($extrafields->attributes[$evaluation->table_element]['type'][$key] != 'separate' ? "ef.".$key.' as options_'.$key.', ' : '');
+		}
+		// Add fields from hooks
+		$parameters = array();
+		$reshook = $hookmanager->executeHooks('printFieldListSelect', $parameters, $evaluation); // Note that $action and $evaluation may have been modified by hook
+		$sql .= preg_replace('/^,/', '', $hookmanager->resPrint);
+		$sql = preg_replace('/,\s*$/', '', $sql);
+		$sql .= " FROM ".MAIN_DB_PREFIX.$evaluation->table_element." as evaluation";
+		$sql .= " LEFT JOIN ".MAIN_DB_PREFIX.$risk->table_element." as r on (evaluation.fk_risk = r.rowid)";
+		if (is_array($extrafields->attributes[$evaluation->table_element]['label']) && count($extrafields->attributes[$evaluation->table_element]['label'])) $sql .= " LEFT JOIN ".MAIN_DB_PREFIX.$evaluation->table_element."_extrafields as ef on (evaluation.rowid = ef.fk_object)";
+		if ($evaluation->ismultientitymanaged == 1) $sql .= " WHERE evaluation.entity IN (".getEntity($evaluation->element).")";
+		else $sql .= " WHERE 1 = 1";
+		$sql .= " AND evaluation.status = 1";
+		$sql .= " AND r.fk_element =".$id;
+		foreach ($search as $key => $val)
+		{
+			if ($key == 'status' && $search[$key] == -1) continue;
+			$mode_search = (($evaluation->isInt($evaluation->fields[$key]) || $evaluation->isFloat($evaluation->fields[$key])) ? 1 : 0);
+			if (strpos($evaluation->fields[$key]['type'], 'integer:') === 0) {
+				if ($search[$key] == '-1') $search[$key] = '';
+				$mode_search = 2;
+			}
+			if ($search[$key] != '') $sql .= natural_search($key, $search[$key], (($key == 'status') ? 2 : $mode_search));
+		}
+		if ($search_all) $sql .= natural_search(array_keys($fieldstosearchall), $search_all);
+		// Add where from extra fields
+		include DOL_DOCUMENT_ROOT.'/core/tpl/extrafields_list_search_sql.tpl.php';
+		// Add where from hooks
+		$parameters = array();
+		$reshook = $hookmanager->executeHooks('printFieldListWhere', $parameters, $evaluation); // Note that $action and $evaluation may have been modified by hook
+		$sql .= $hookmanager->resPrint;
 
-	$sql .= $db->order($sortfield, $sortorder);
+		$sql .= $db->order($sortfield, $sortorder);
 
-	if ($limit) $sql .= $db->plimit($limit + 1, $offset);
+		if ($limit) $sql .= $db->plimit($limit + 1, $offset);
 
-	$resql = $db->query($sql);
-	if (!$resql)
-	{
-		dol_print_error($db);
-		exit;
-	}
+		$resql = $db->query($sql);
+		if (!$resql)
+		{
+			dol_print_error($db);
+			exit;
+		}
 		$num = $db->num_rows($resql);
 	}
 
@@ -842,21 +847,21 @@ if ($object->id > 0) {
 											</div>
 											<?php $l = 0; ?>
 											<?php foreach($evaluation_method_survey as $critere) :
-											$name = strtolower($critere['name']); ?>
-											<div class="table-row">
-												<div class="table-cell"><?php echo $critere['name'] ; ?></div>
-												<?php foreach($critere['option']['survey']['request'] as $request) : ?>
-													<div class="table-cell can-select cell-<?php echo  $risk->id ? $risk->id : 0 ; ?>"
-														 data-type="<?php echo $name ?>"
-														 data-id="<?php echo  $risk->id ? $risk->id : 0 ; ?>"
-														 data-evaluation-id="<?php echo $evaluation_id ? $evaluation_id : 0 ; ?>"
-														 data-variable-id="<?php echo $l ; ?>"
-														 data-seuil="<?php echo  $request['seuil']; ?>">
-														<?php echo  $request['question'] ; ?>
-													</div>
-												<?php endforeach; $l++; ?>
-											</div>
-										<?php endforeach; ?>
+												$name = strtolower($critere['name']); ?>
+												<div class="table-row">
+													<div class="table-cell"><?php echo $critere['name'] ; ?></div>
+													<?php foreach($critere['option']['survey']['request'] as $request) : ?>
+														<div class="table-cell can-select cell-<?php echo  $risk->id ? $risk->id : 0 ; ?>"
+															 data-type="<?php echo $name ?>"
+															 data-id="<?php echo  $risk->id ? $risk->id : 0 ; ?>"
+															 data-evaluation-id="<?php echo $evaluation_id ? $evaluation_id : 0 ; ?>"
+															 data-variable-id="<?php echo $l ; ?>"
+															 data-seuil="<?php echo  $request['seuil']; ?>">
+															<?php echo  $request['question'] ; ?>
+														</div>
+													<?php endforeach; $l++; ?>
+												</div>
+											<?php endforeach; ?>
 										</div>
 									</div>
 								</div>
@@ -893,7 +898,7 @@ if ($object->id > 0) {
 	</div>
 
 	<?php $title = $langs->trans('DigiriskElementRisksList');
- 	print_barre_liste($title, $page, $_SERVER["PHP_SELF"], $param, $sortfield, $sortorder, $massactionbutton, $num, $nbtotalofrecords, '', 0, $newcardbutton, '', $limit, 0, 0, 1);
+	print_barre_liste($title, $page, $_SERVER["PHP_SELF"], $param, $sortfield, $sortorder, $massactionbutton, $num, $nbtotalofrecords, '', 0, $newcardbutton, '', $limit, 0, 0, 1);
 
 	include DOL_DOCUMENT_ROOT.'/core/tpl/massactions_pre.tpl.php';
 
@@ -1048,13 +1053,13 @@ if ($object->id > 0) {
 							<img class="danger-category-pic hover" src="<?php echo DOL_URL_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $risk->get_danger_category($risk) . '.png' ; ?>"/>
 						</div>
 					</div>
-				</div>
-				<?php
-			}
+					</div>
+					<?php
+				}
 
-			elseif ($key == 'ref') {
-				?>
-				<div class="risk-container" value="<?php echo $risk->id ?>">
+				elseif ($key == 'ref') {
+					?>
+					<div class="risk-container" value="<?php echo $risk->id ?>">
 					<!-- BUTTON MODAL RISK EDIT -->
 					<div class="risk-edit modal-open" value="<?php echo $risk->id ?>"><i class="fas fa-exclamation-triangle"></i><?php echo ' ' . $risk->ref; ?></div>
 					<!-- RISK EDIT MODAL -->
@@ -1250,24 +1255,24 @@ if ($object->id > 0) {
 																						<div class="cotation-container">
 																							<?php if ( $cotation->method == "standard" || $conf->global->DIGIRISKDOLIBARR_MULTIPLE_RISKASSESSMENT_METHOD) : ?>
 																								<div class="cotation-standard" style="<?php echo ($cotation->method == "standard") ? " display:block" : " display:none" ?>">
-																								<span class="title"><i class="fas fa-chart-line"></i><?php echo ' ' . $langs->trans('Cotation'); ?></span>
-																								<div class="cotation-listing wpeo-gridlayout grid-4 grid-gap-0">
-																									<?php
-																									$defaultCotation = array(0, 48, 51, 100);
-																									if ( ! empty( $defaultCotation )) :
-																										foreach ( $defaultCotation as $request ) :
-																											$evaluation->cotation = $request; ?>
-																											<div data-id="<?php echo 0; ?>"
-																												 data-evaluation-method="standard"
-																												 data-evaluation-id="<?php echo $request; ?>"
-																												 data-variable-id="<?php echo 152+$request; ?>"
-																												 data-seuil="<?php echo  $evaluation->get_evaluation_scale(); ?>"
-																												 data-scale="<?php echo  $evaluation->get_evaluation_scale(); ?>"
-																												 class="risk-evaluation-cotation cotation<?php echo ($cotation->cotation == $request) ? " selected-cotation" : "" ?>"><?php echo $request; ?></div>
-																										<?php endforeach;
-																									endif; ?>
+																									<span class="title"><i class="fas fa-chart-line"></i><?php echo ' ' . $langs->trans('Cotation'); ?></span>
+																									<div class="cotation-listing wpeo-gridlayout grid-4 grid-gap-0">
+																										<?php
+																										$defaultCotation = array(0, 48, 51, 100);
+																										if ( ! empty( $defaultCotation )) :
+																											foreach ( $defaultCotation as $request ) :
+																												$evaluation->cotation = $request; ?>
+																												<div data-id="<?php echo 0; ?>"
+																													 data-evaluation-method="standard"
+																													 data-evaluation-id="<?php echo $request; ?>"
+																													 data-variable-id="<?php echo 152+$request; ?>"
+																													 data-seuil="<?php echo  $evaluation->get_evaluation_scale(); ?>"
+																													 data-scale="<?php echo  $evaluation->get_evaluation_scale(); ?>"
+																													 class="risk-evaluation-cotation cotation<?php echo ($cotation->cotation == $request) ? " selected-cotation" : "" ?>"><?php echo $request; ?></div>
+																											<?php endforeach;
+																										endif; ?>
+																									</div>
 																								</div>
-																							</div>
 																							<?php endif; ?>
 																							<input class="risk-evaluation-seuil" type="hidden" value="<?php echo $cotation->cotation ?>">
 																							<?php if ( $cotation->method == "advanced" || $conf->global->DIGIRISKDOLIBARR_MULTIPLE_RISKASSESSMENT_METHOD) : ?>
@@ -1374,98 +1379,98 @@ if ($object->id > 0) {
 														</div>
 													<?php endif; ?>
 													<?php if ($cotation->method == 'advanced' || $conf->global->DIGIRISKDOLIBARR_MULTIPLE_RISKASSESSMENT_METHOD) : ?>
-														<div class="wpeo-button evaluation-advanced select-evaluation-method<?php echo ($cotation->method == "advanced") ? " selected button-blue" : " button-grey" ?> button-radius-2"">
-															<span><?php echo $langs->trans('AdvancedCotation') ?></span>
-														</div>
-													<?php endif; ?>
-													<input class="risk-evaluation-method" type="hidden" value="standard">
+													<div class="wpeo-button evaluation-advanced select-evaluation-method<?php echo ($cotation->method == "advanced") ? " selected button-blue" : " button-grey" ?> button-radius-2"">
+													<span><?php echo $langs->trans('AdvancedCotation') ?></span>
 												</div>
-												<div class="risk-evaluation-content-wrapper">
-													<div class="risk-evaluation-content">
-														<div class="cotation-container">
-															<div class="cotation-standard" style="<?php echo ($cotation->method == "standard") ? " display:block" : " display:none" ?>">
-																<span class="title"><i class="fas fa-chart-line"></i><?php echo ' ' . $langs->trans('Cotation'); ?><required>*</required></span>
-																<div class="cotation-listing wpeo-gridlayout grid-4 grid-gap-0">
-																	<?php
-																	$defaultCotation = array(0, 48, 51, 100);
-																	if ( ! empty( $defaultCotation )) :
-																		foreach ( $defaultCotation as $request ) :
-																			$evaluation->cotation = $request; ?>
-																			<div data-id="<?php echo 0; ?>"
-																				 data-evaluation-method="standard"
-																				 data-evaluation-id="<?php echo $request; ?>"
-																				 data-variable-id="<?php echo 152+$request; ?>"
-																				 data-seuil="<?php echo  $evaluation->get_evaluation_scale(); ?>"
-																				 data-scale="<?php echo  $evaluation->get_evaluation_scale(); ?>"
-																				 class="risk-evaluation-cotation cotation"><?php echo $request; ?></div>
-																		<?php endforeach;
-																	endif; ?>
-																</div>
+												<?php endif; ?>
+												<input class="risk-evaluation-method" type="hidden" value="standard">
+											</div>
+											<div class="risk-evaluation-content-wrapper">
+												<div class="risk-evaluation-content">
+													<div class="cotation-container">
+														<div class="cotation-standard" style="<?php echo ($cotation->method == "standard") ? " display:block" : " display:none" ?>">
+															<span class="title"><i class="fas fa-chart-line"></i><?php echo ' ' . $langs->trans('Cotation'); ?><required>*</required></span>
+															<div class="cotation-listing wpeo-gridlayout grid-4 grid-gap-0">
+																<?php
+																$defaultCotation = array(0, 48, 51, 100);
+																if ( ! empty( $defaultCotation )) :
+																	foreach ( $defaultCotation as $request ) :
+																		$evaluation->cotation = $request; ?>
+																		<div data-id="<?php echo 0; ?>"
+																			 data-evaluation-method="standard"
+																			 data-evaluation-id="<?php echo $request; ?>"
+																			 data-variable-id="<?php echo 152+$request; ?>"
+																			 data-seuil="<?php echo  $evaluation->get_evaluation_scale(); ?>"
+																			 data-scale="<?php echo  $evaluation->get_evaluation_scale(); ?>"
+																			 class="risk-evaluation-cotation cotation"><?php echo $request; ?></div>
+																	<?php endforeach;
+																endif; ?>
 															</div>
-															<input class="risk-evaluation-seuil" type="hidden">
-															<?php $evaluation_method = $advanced_method_cotation_array[0];
-															$evaluation_method_survey = $evaluation_method['option']['variable']; ?>
-															<div class="wpeo-gridlayout cotation-advanced" style="<?php echo ($cotation->method == "advanced") ? " display:block" : " display:none" ?>">
-																<input type="hidden" class="digi-method-evaluation-id" value="<?php echo $risk->id ; ?>" />
-																<textarea style="display: none" name="evaluation_variables" class="tmp_evaluation_variable"><?php echo '{}'; ?></textarea>
-																<p><i class="fas fa-info-circle"></i> <?php echo $langs->trans('SelectCotation') ?></p>
-																<div class="wpeo-table evaluation-method table-flex table-<?php echo count($evaluation_method_survey) + 1; ?>">
-																	<div class="table-row table-header">
-																		<div class="table-cell">
-																			<span></span>
-																		</div>
-																		<?php for ( $l = 0; $l < count($evaluation_method_survey); $l++ ) : ?>
-																			<div class="table-cell">
-																				<span><?php echo $l; ?></span>
-																			</div>
-																		<?php endfor; ?>
+														</div>
+														<input class="risk-evaluation-seuil" type="hidden">
+														<?php $evaluation_method = $advanced_method_cotation_array[0];
+														$evaluation_method_survey = $evaluation_method['option']['variable']; ?>
+														<div class="wpeo-gridlayout cotation-advanced" style="<?php echo ($cotation->method == "advanced") ? " display:block" : " display:none" ?>">
+															<input type="hidden" class="digi-method-evaluation-id" value="<?php echo $risk->id ; ?>" />
+															<textarea style="display: none" name="evaluation_variables" class="tmp_evaluation_variable"><?php echo '{}'; ?></textarea>
+															<p><i class="fas fa-info-circle"></i> <?php echo $langs->trans('SelectCotation') ?></p>
+															<div class="wpeo-table evaluation-method table-flex table-<?php echo count($evaluation_method_survey) + 1; ?>">
+																<div class="table-row table-header">
+																	<div class="table-cell">
+																		<span></span>
 																	</div>
-																	<?php $l = 0; ?>
-																	<?php foreach($evaluation_method_survey as $critere) :
-																		$name = strtolower($critere['name']); ?>
-																		<div class="table-row">
-																			<div class="table-cell"><?php echo $critere['name'] ; ?></div>
-																			<?php foreach($critere['option']['survey']['request'] as $request) : ?>
-																				<div class="table-cell can-select cell-<?php echo  $evaluation_id ? $evaluation_id : 0 ; ?>"
-																					 data-type="<?php echo $name ?>"
-																					 data-id="<?php echo  $risk->id ? $risk->id : 0 ; ?>"
-																					 data-evaluation-id="<?php echo $evaluation_id ? $evaluation_id : 0 ; ?>"
-																					 data-variable-id="<?php echo $l ; ?>"
-																					 data-seuil="<?php echo  $request['seuil']; ?>">
-																					<?php echo  $request['question'] ; ?>
-																				</div>
-																			<?php endforeach; $l++; ?>
+																	<?php for ( $l = 0; $l < count($evaluation_method_survey); $l++ ) : ?>
+																		<div class="table-cell">
+																			<span><?php echo $l; ?></span>
 																		</div>
-																	<?php endforeach; ?>
+																	<?php endfor; ?>
 																</div>
+																<?php $l = 0; ?>
+																<?php foreach($evaluation_method_survey as $critere) :
+																	$name = strtolower($critere['name']); ?>
+																	<div class="table-row">
+																		<div class="table-cell"><?php echo $critere['name'] ; ?></div>
+																		<?php foreach($critere['option']['survey']['request'] as $request) : ?>
+																			<div class="table-cell can-select cell-<?php echo  $evaluation_id ? $evaluation_id : 0 ; ?>"
+																				 data-type="<?php echo $name ?>"
+																				 data-id="<?php echo  $risk->id ? $risk->id : 0 ; ?>"
+																				 data-evaluation-id="<?php echo $evaluation_id ? $evaluation_id : 0 ; ?>"
+																				 data-variable-id="<?php echo $l ; ?>"
+																				 data-seuil="<?php echo  $request['seuil']; ?>">
+																				<?php echo  $request['question'] ; ?>
+																			</div>
+																		<?php endforeach; $l++; ?>
+																	</div>
+																<?php endforeach; ?>
 															</div>
 														</div>
 													</div>
+												</div>
 
-													<?php include DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/core/tpl/digiriskdolibarr_photo_view.tpl.php'; ?>
+												<?php include DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/core/tpl/digiriskdolibarr_photo_view.tpl.php'; ?>
 
-													<div class="risk-evaluation-calculated-cotation" style="<?php echo ($cotation->method == "advanced") ? " display:block" : " display:none" ?>">
-														<span class="title"><i class="fas fa-chart-line"></i> <?php echo $langs->trans('CalculatedCotation'); ?><required>*</required></span>
-														<div data-scale="1" class="risk-evaluation-cotation cotation">
-															<span><?php echo 0 ?></span>
-														</div>
+												<div class="risk-evaluation-calculated-cotation" style="<?php echo ($cotation->method == "advanced") ? " display:block" : " display:none" ?>">
+													<span class="title"><i class="fas fa-chart-line"></i> <?php echo $langs->trans('CalculatedCotation'); ?><required>*</required></span>
+													<div data-scale="1" class="risk-evaluation-cotation cotation">
+														<span><?php echo 0 ?></span>
 													</div>
-													<div class="risk-evaluation-comment">
-														<span class="title"><i class="fas fa-comment-dots"></i> <?php echo $langs->trans('Comment'); ?></span>
-														<?php print '<textarea name="evaluationComment'. $risk->id .'" rows="'.ROWS_2.'">'.('').'</textarea>'."\n"; ?>
-													</div>
+												</div>
+												<div class="risk-evaluation-comment">
+													<span class="title"><i class="fas fa-comment-dots"></i> <?php echo $langs->trans('Comment'); ?></span>
+													<?php print '<textarea name="evaluationComment'. $risk->id .'" rows="'.ROWS_2.'">'.('').'</textarea>'."\n"; ?>
 												</div>
 											</div>
 										</div>
-										<!-- Modal-Footer -->
-										<div class="modal-footer">
-											<div class="risk-evaluation-create wpeo-button button-blue button-disable modal-close" value="<?php echo $risk->id ?>">
-												<i class="fas fa-plus"></i> <?php echo $langs->trans('Add'); ?>
-											</div>
+									</div>
+									<!-- Modal-Footer -->
+									<div class="modal-footer">
+										<div class="risk-evaluation-create wpeo-button button-blue button-disable modal-close" value="<?php echo $risk->id ?>">
+											<i class="fas fa-plus"></i> <?php echo $langs->trans('Add'); ?>
 										</div>
 									</div>
 								</div>
 							</div>
+						</div>
 						</div>
 					<?php } else { ?>
 						<div class="risk-evaluation-container">
