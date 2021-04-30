@@ -37,33 +37,33 @@ function digiriskelementPrepareHead($object)
 	$head = array();
 	if ($object->id > 0) {
 		$head[$h][0] = dol_buildpath("/digiriskdolibarr/digiriskelement_risk.php", 1) . '?id=' . $object->id;
-		$head[$h][1] = $langs->trans("Risks");
+		$head[$h][1] = '<i class="fas fa-exclamation-triangle"></i> ' . $langs->trans("Risks");
 		$head[$h][2] = 'elementRisk';
 		$h++;
 
 		$head[$h][0] = dol_buildpath("/digiriskdolibarr/digiriskelement_evaluator.php", 1) . '?id=' . $object->id;
-		$head[$h][1] = $langs->trans("Evaluator");
+		$head[$h][1] = '<i class="fas fa-user-check"></i> ' . $langs->trans("Evaluator");
 		$head[$h][2] = 'elementEvaluator';
 		$h++;
 
 		$head[$h][0] = dol_buildpath("/digiriskdolibarr/digiriskelement_risksign.php", 1) . '?id=' . $object->id;
-		$head[$h][1] = $langs->trans("RiskSign");
+		$head[$h][1] = '<i class="fas fa-map-signs"></i> ' . $langs->trans("RiskSign");
 		$head[$h][2] = 'elementRiskSign';
 		$h++;
 
 		$head[$h][0] = dol_buildpath("/digiriskdolibarr/digiriskelement_card.php", 1) . '?id=' . $object->id;
-		$head[$h][1] = $langs->trans("Card") . ' ' . $object->ref;
+		$head[$h][1] = '<i class="fas fa-info-circle"></i> ' . $langs->trans("Card") . ' ' . $object->ref;
 		$head[$h][2] = 'elementCard';
 		$h++;
 
 		if ($object->element_type == 'groupment') {
 			$head[$h][0] = dol_buildpath("/digiriskdolibarr/digiriskelement_listingrisksaction.php", 1) . '?id=' . $object->id;
-			$head[$h][1] = $langs->trans("ListingRisksAction");
+			$head[$h][1] = '<i class="fas fa-exclamation"></i> ' . $langs->trans("ListingRisksAction");
 			$head[$h][2] = 'elementListingRisksAction';
 			$h++;
 
 			$head[$h][0] = dol_buildpath("/digiriskdolibarr/digiriskelement_listingrisksphoto.php", 1) . '?id=' . $object->id;
-			$head[$h][1] = $langs->trans("ListingRisksPhoto");
+			$head[$h][1] = '<i class="fas fa-images"></i> ' . $langs->trans("ListingRisksPhoto");
 			$head[$h][2] = 'elementListingRisksPhoto';
 			$h++;
 		}
@@ -74,13 +74,13 @@ function digiriskelementPrepareHead($object)
 		$nbFiles = count(dol_dir_list($upload_dir, 'files', 0, '', '(\.meta|_preview.*\.png)$'));
 		$nbLinks = Link::count($db, $object->element, $object->id);
 		$head[$h][0] = dol_buildpath("/digiriskdolibarr/digiriskelement_document.php", 1) . '?id=' . $object->id;
-		$head[$h][1] = $langs->trans('Documents');
+		$head[$h][1] = '<i class="fas fa-file"></i> ' . $langs->trans('Documents');
 		if (($nbFiles + $nbLinks) > 0) $head[$h][1] .= '<span class="badge marginleftonlyshort">' . ($nbFiles + $nbLinks) . '</span>';
 		$head[$h][2] = 'elementDocument';
 		$h++;
 
 		$head[$h][0] = dol_buildpath("/digiriskdolibarr/digiriskelement_agenda.php", 1) . '?id=' . $object->id;
-		$head[$h][1] = $langs->trans("Events");
+		$head[$h][1] = '<i class="fas fa-calendar"></i> ' . $langs->trans("Events");
 		$head[$h][2] = 'elementAgenda';
 		$h++;
 

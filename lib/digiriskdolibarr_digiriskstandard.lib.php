@@ -37,37 +37,37 @@ function digiriskstandardPrepareHead($object)
 	$head = array();
 
 	$head[$h][0] = dol_buildpath("/digiriskdolibarr/digiriskstandard_card.php", 1). '?id=' . $object->id;
-	$head[$h][1] = $langs->trans("Informations");
+	$head[$h][1] = '<i class="fas fa-info-circle"></i> ' . $langs->trans("Informations");
 	$head[$h][2] = 'standardCard';
 	$h++;
 
 	$head[$h][0] = dol_buildpath("/digiriskdolibarr/digiriskstandard_legaldisplay.php", 1);
-	$head[$h][1] = $langs->trans("LegalDisplay");
+	$head[$h][1] = '<i class="fas fa-file"></i> ' . $langs->trans("LegalDisplay");
 	$head[$h][2] = 'standardLegalDisplay';
 	$h++;
 
 	$head[$h][0] = dol_buildpath("/digiriskdolibarr/digiriskstandard_informationssharing.php", 1);
-	$head[$h][1] = $langs->trans("InformationsSharing");
+	$head[$h][1] = '<i class="fas fa-comment-dots"></i> ' . $langs->trans("InformationsSharing");
 	$head[$h][2] = 'standardInformationsSharing';
 	$h++;
 
 	$head[$h][0] = dol_buildpath("/digiriskdolibarr/digiriskelement_listingrisksaction.php", 1);
-	$head[$h][1] = $langs->trans("ListingRisksAction");
+	$head[$h][1] = '<i class="fas fa-exclamation"></i> ' . $langs->trans("ListingRisksAction");
 	$head[$h][2] = 'elementListingRisksAction';
 	$h++;
 
 	$head[$h][0] = dol_buildpath("/digiriskdolibarr/digiriskelement_listingrisksphoto.php", 1);
-	$head[$h][1] = $langs->trans("ListingRisksPhoto");
+	$head[$h][1] = '<i class="fas fa-images"></i> ' . $langs->trans("ListingRisksPhoto");
 	$head[$h][2] = 'elementListingRisksPhoto';
 	$h++;
 
 	$head[$h][0] = dol_buildpath("/digiriskdolibarr/digiriskstandard_riskassessmentdocument.php", 1);
-	$head[$h][1] = $langs->trans("RiskAssessmentDocument");
+	$head[$h][1] = '<i class="fas fa-file-alt"></i> ' . $langs->trans("RiskAssessmentDocument");
 	$head[$h][2] = 'standardRiskAssessmentDocument';
 	$h++;
 
 	$head[$h][0] = dol_buildpath("/digiriskdolibarr/digiriskstandard_agenda.php", 1);
-	$head[$h][1] = $langs->trans("Events");
+	$head[$h][1] = '<i class="fas fa-calendar"></i> ' . $langs->trans("Events");
 	$head[$h][2] = 'standardAgenda';
 	$h++;
 
