@@ -118,7 +118,7 @@ elseif ($action == 'setdoc')
 $form            = new Form($db);
 $object_document = new DigiriskDocuments($db);
 
-$help_url  = 'FR:Module_DigiriskDolibarr#L.27onglet_Permis_de_feu';
+$help_url  = 'FR:Module_DigiriskDolibarr#L.27onglet_Document_Digirisk';
 $page_name = "DigiriskdolibarrSetup";
 
 llxHeader('', $langs->trans($page_name), $help_url);

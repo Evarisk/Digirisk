@@ -79,7 +79,7 @@ if ($action == 'setmod')
  */
 $form            = new Form($db);
 
-$help_url  = 'FR:Module_DigiriskDolibarr#L.27onglet_Risque';
+$help_url  = 'FR:Module_DigiriskDolibarr#L.27onglet_Analyse_des_risques';
 $page_name = "DigiriskdolibarrSetup";
 
 llxHeader('', $langs->trans($page_name), $help_url);
