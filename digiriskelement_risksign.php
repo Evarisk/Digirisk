@@ -379,7 +379,7 @@ if ($object->id > 0) {
 									$risksignCategories = $risksign->get_risksign_categories();
 									if ( ! empty( $risksignCategories ) ) :
 										foreach ( $risksignCategories as $risksignCategory ) : ?>
-											<li class="item dropdown-item wpeo-tooltip-event classfortooltip" data-is-preset="<?php echo ''; ?>" data-id="<?php echo $risksignCategory['position'] ?>">
+											<li class="item dropdown-item wpeo-tooltip-event" data-is-preset="<?php echo ''; ?>" data-id="<?php echo $risksignCategory['position'] ?>" aria-label="<?php echo $risksignCategory["name"] ?>">
 												<img src="<?php echo DOL_URL_ROOT . '/custom/digiriskdolibarr/img/' . $risksignCategory['name_thumbnail'] ?>" class="attachment-thumbail size-thumbnail photo photowithmargin" alt="" loading="lazy" width="48" height="48">
 											</li>
 										<?php endforeach;
@@ -524,7 +524,7 @@ if ($object->id > 0) {
 				if ($key == 'status') print $risksign->getLibStatut(5);
 				elseif ($key == 'category') { ?>
 					<div class="table-cell table-50 cell-risksign-category">
-						<div class="wpeo-dropdown dropdown-large risksign-category-danger padding">
+						<div class="wpeo-dropdown dropdown-large risksign-category-danger padding wpeo-tooltip-event" aria-label="<?php echo $risksign->get_risksign_category_name($risksign); ?>">
 							<img class="danger-category-pic hover" src="<?php echo DOL_URL_ROOT . '/custom/digiriskdolibarr/img/' . $risksign->get_risksign_category($risksign) ?>"/>
 						</div>
 					</div>
@@ -551,15 +551,15 @@ if ($object->id > 0) {
 										<span class="title"><?php echo $langs->trans('RiskSign'); ?></span>
 										<input class="input-hidden-danger" type="hidden" name="risksign_category_id" value=<?php echo $risksign->category ?> />
 										<div class="wpeo-dropdown dropdown-large dropdown-grid risksign-category-danger padding">
-											<div class="dropdown-toggle dropdown-add-button button-cotation">
-												<img class="danger-category-pic tooltip hover" src="<?php echo DOL_URL_ROOT . '/custom/digiriskdolibarr/img/' . $risksign->get_risksign_category($risksign) ?>"/>
+											<div class="dropdown-toggle dropdown-add-button button-cotation wpeo-tooltip-event" aria-label="<?php echo $risksign->get_risksign_category_name($risksign); ?>">
+												<img class="danger-category-pic hover" src="<?php echo DOL_URL_ROOT . '/custom/digiriskdolibarr/img/' . $risksign->get_risksign_category($risksign) ?>"/>
 											</div>
 											<ul class="dropdown-content wpeo-gridlayout grid-5 grid-gap-0">
 												<?php
 												$risksignCategories = $risksign->get_risksign_categories();
 												if ( ! empty( $risksignCategories ) ) :
 													foreach ( $risksignCategories as $risksignCategory ) : ?>
-														<li class="item dropdown-item wpeo-tooltip-event classfortooltip" data-is-preset="<?php echo ''; ?>" data-id="<?php echo $risksignCategory['position'] ?>">
+														<li class="item dropdown-item wpeo-tooltip-event" data-is-preset="<?php echo ''; ?>" data-id="<?php echo $risksignCategory['position'] ?>" aria-label="<?php echo $risksignCategory['name'] ?>">
 															<img src="<?php echo DOL_URL_ROOT . '/custom/digiriskdolibarr/img/' . $risksignCategory['name_thumbnail'] ?>" class="attachment-thumbail size-thumbnail photo photowithmargin" alt="" loading="lazy" width="48" height="48">
 														</li>
 													<?php endforeach;
@@ -580,19 +580,6 @@ if ($object->id > 0) {
 								</div>
 							</div>
 						</div>
-					</div>
-					<?php
-				}
-
-				elseif ($key == 'photo') { ?>
-					<div class="risksign-photo">
-						<?php $filearray = dol_dir_list($conf->digiriskdolibarr->multidir_output[$conf->entity].'/'.$risksign->element.'/'.$risksign->ref, "files", 0, '', '(\.odt|_preview.*\.png)$', 'position_name', 'asc', 1);
-						if (count($filearray)) {
-							print '<span class="floatleft inline-block valignmiddle divphotoref">'.digirisk_show_photos('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity].'/'.$risksign->element, 'small', 1, 0, 0, 0, 40, 0, 0, 0, 0, $risksign->element, $risksign).'</span>';
-						} else {
-							$nophoto = '/public/theme/common/nophoto.png'; ?>
-							<span class="floatleft inline-block valignmiddle divphotoref"><img class="photodigiriskdolibarr" alt="No photo" src="<?php echo DOL_URL_ROOT.$nophoto ?>"></span>
-						<?php } ?>
 					</div>
 					<?php
 				}
