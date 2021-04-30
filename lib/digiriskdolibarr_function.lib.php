@@ -48,11 +48,8 @@ function digirisk_show_photos($modulepart, $sdir, $size = 0, $nbmax = 0, $nbbyro
 	$sortfield = 'position_name';
 	$sortorder = 'desc';
 
-	$dir = $sdir.'/';
-	$pdir = $subdir . '/';
-
-	$dir .= get_exdir(0, 0, 0, 0, $object, $modulepart);
-	$pdir .= get_exdir(0, 0, 0, 0, $object, $modulepart);
+	$dir = $sdir.'/'.$object->ref.'/';
+	$pdir = $subdir . '/'.$object->ref.'/';
 
 	// Defined relative dir to DOL_DATA_ROOT
 	$relativedir = '';
