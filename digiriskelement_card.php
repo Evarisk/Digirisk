@@ -97,6 +97,9 @@ if (empty($reshook))
 		}
 	}
 
+	// Action to add record
+	include DOL_DOCUMENT_ROOT.'/core/actions_addupdatedelete.inc.php';
+
 	if ($action == 'add' && $permissiontoadd) { ?>
 		<script>
 			jQuery( '.digirisk-wrap .navigation-container .unit.active' ).removeClass( 'active' );
@@ -109,9 +112,8 @@ if (empty($reshook))
 
 			jQuery( this ).closest( '.unit' ).attr( 'value', id );
 		</script>
-	<?php }
-	// Action to add record
-	include DOL_DOCUMENT_ROOT.'/core/actions_addupdatedelete.inc.php';
+		<?php
+	}
 
 	// Action to build doc
 	if ($action == 'builddoc' && $permissiontoadd) {
@@ -206,7 +208,7 @@ $morejs   = array("/digiriskdolibarr/js/digiriskdolibarr.js.php");
 
 digiriskHeader('', $title, $help_url, '', '', '', $morejs); ?>
 
-<div id="cardContent" value="">
+	<div id="cardContent" value="">
 
 <?php // Part to create
 if ($action == 'create')
@@ -215,6 +217,7 @@ if ($action == 'create')
 
 	print '<form method="POST" action="'.$_SERVER["PHP_SELF"].'">';
 	print '<input type="hidden" name="token" value="'.newToken().'">';
+	print '<input type="hidden" name="backtopage" value="'.$backtopage.'">';
 	print '<input type="hidden" name="action" value="add">';
 
 	if ($backtopage) print '<input type="hidden" name="backtopage" value="'.$backtopage.'">';
