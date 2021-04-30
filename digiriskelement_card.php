@@ -287,7 +287,7 @@ if (($id || $ref) && $action == 'edit')
 
 	unset($object->fields['status']);
 	unset($object->fields['element_type']);
-	unset($object->fields['fk_parent']);
+	//unset($object->fields['fk_parent']);
 	unset($object->fields['last_main_doc']);
 	unset($object->fields['entity']);
 
