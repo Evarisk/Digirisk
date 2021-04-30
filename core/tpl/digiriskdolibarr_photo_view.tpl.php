@@ -70,7 +70,8 @@ if (empty($conf) || !is_object($conf))
 					<div class="underbanner clearboth"></div>
 					<div class="wpeo-gridlayout grid-5 grid-gap-3 grid-margin-2 ecm-photo-list ecm-photo-list-<?php echo $risk->id ?>">
 						<?php
-						$files =  dol_dir_list(DOL_DATA_ROOT . '/ecm/digiriskdolibarr/medias');
+						$entity =($conf->entity > 1) ? '/' . $conf->entity : '';
+						$files =  dol_dir_list(DOL_DATA_ROOT .$entity. '/ecm/digiriskdolibarr/medias');
 						$relativepath = 'digiriskdolibarr/medias';
 						$modulepart = 'ecm';
 						$path = DOL_URL_ROOT.'/document.php?modulepart=' . $modulepart  . '&attachment=0&file=' . str_replace('/', '%2F', $relativepath);
