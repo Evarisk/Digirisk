@@ -256,7 +256,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			151 => array('DIGIRISKDOLIBARR_RISKSIGN_ADDON','chaine', 'mod_risksign_standard' ,'', 1),
 
 			// CONST TASK
-			160 => array('DIGIRISKDOLIBARR_DU_PROJECT','integer', 0,'', 1),
+//			160 => array('DIGIRISKDOLIBARR_DU_PROJECT','integer', 0,'', 1),
 		);
 
 		if ( ! isset($conf->digiriskdolibarr ) || ! isset( $conf->digiriskdolibarr->enabled ) ) {
@@ -754,24 +754,20 @@ class modDigiriskdolibarr extends DolibarrModules
 			require_once DOL_DOCUMENT_ROOT . '/societe/class/societe.class.php';
 			require_once DOL_DOCUMENT_ROOT . '/core/modules/project/mod_project_simple.php';
 
-			if ($conf->global->MAIN_MODULE_PROJET == 1) {
-				$project     = new Project($this->db);
-				$third_party = new Societe($this->db);
-				$projectRef  = new $conf->global->PROJECT_ADDON();
+			$project     = new Project($this->db);
+			$third_party = new Societe($this->db);
+			$projectRef  = new $conf->global->PROJECT_ADDON();
 
-				$project->ref         = $projectRef->getNextValue($third_party, $project);
-				$project->title       = $langs->trans('RiskAssessmentDocument');
-				$project->description = $langs->trans('RiskAssessmentDocumentDescription');
-				$project->date_c      = dol_now();
-				//$project->date_start = dol_now(); -> option
-				$project->usage_task  = 1;
-				//$project->date_end = dol_now(); -> option
-				$project->statut      = 1;
-
-				$project_id = $project->create($user);
-
-				dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_DU_PROJECT', $project_id);
-			}
+			$project->ref         = $projectRef->getNextValue($third_party, $project);
+			$project->title       = $langs->trans('RiskAssessmentDocument');
+			$project->description = $langs->trans('RiskAssessmentDocumentDescription');
+			$project->date_c      = dol_now();
+			//$project->date_start = dol_now(); -> option
+			$project->usage_task  = 1;
+			//$project->date_end = dol_now(); -> option
+			$project->statut      = 1;
+			$project_id = $project->create($user);
+			dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_DU_PROJECT', $project_id, 'integer', 1, '',$conf->entity);
 
 		}
 		if ( $conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD ==  0 ) {
