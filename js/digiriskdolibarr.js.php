@@ -1592,19 +1592,13 @@ window.eoxiaJS.risksign.createRiskSign = function ( event ) {
 		categoryPost = '&riskSignCategory=' + category;
 	}
 
-	var photo = elementRiskSign.find('.risksign-photo-single .filename').val();
-	var photoPost = '';
-	if (photo !== 0) {
-		photoPost = '&photo=' + encodeURI(photo);
-	}
-
 	var description = elementRiskSign.find('.risksign-description textarea').val();
 	var descriptionPost = '';
 	if (description !== '') {
 		descriptionPost = '&riskSignDescription=' + encodeURI(description);
 	}
 	$.ajax({
-		url: document.URL + '&action=add' + categoryPost + photoPost + descriptionPost,
+		url: document.URL + '&action=add' + categoryPost + descriptionPost,
 		type: "POST",
 		processData: false,
 		contentType: false
@@ -1659,12 +1653,6 @@ window.eoxiaJS.risksign.saveRiskSign = function ( event ) {
 		categoryPost = '&riskSignCategory=' + category;
 	}
 
-	var photo = elementRiskSign.find('.risksign-photo-single .filename').val();
-	var photoPost = '';
-	if (photo !== 0) {
-		photoPost = '&photo=' + encodeURI(photo);
-	}
-
 	var description = elementRiskSign.find('.risksign-description textarea').val();
 	var descriptionPost = '';
 	if (description !== '') {
@@ -1672,7 +1660,7 @@ window.eoxiaJS.risksign.saveRiskSign = function ( event ) {
 	}
 
 	$.ajax({
-		url: document.URL + '&action=saveRiskSign&riskSignID=' + editedRiskSignId + categoryPost + photoPost + descriptionPost,
+		url: document.URL + '&action=saveRiskSign&riskSignID=' + editedRiskSignId + categoryPost + descriptionPost,
 		type: "POST",
 		processData: false,
 		contentType: false
@@ -1687,7 +1675,7 @@ window.eoxiaJS.risksign.saveRiskSign = function ( event ) {
 		elementParent.load( document.URL + ' .div-table-responsive');
 		elementRiskSign.removeClass('wpeo-loader');
 	}, 800);
-	$(this).closest('.div-table-responsive').load( document.URL + '&action=saveRiskSign&riskSignID=' + editedRiskSignId + categoryPost + photoPost + descriptionPost + ' .div-table-responsive');
+	$(this).closest('.div-table-responsive').load( document.URL + '&action=saveRiskSign&riskSignID=' + editedRiskSignId + categoryPost + descriptionPost + ' .div-table-responsive');
 };
 
 /**
