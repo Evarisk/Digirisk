@@ -68,7 +68,7 @@ if (empty($conf) || !is_object($conf))
 					// End "Add new file" area
 					?>
 					<div class="underbanner clearboth"></div>
-					<div class="wpeo-table table-row ecm-photo-list ecm-photo-list-<?php echo $risk->id ?>">
+					<div class="wpeo-gridlayout grid-5 grid-gap-3 grid-margin-2 ecm-photo-list ecm-photo-list-<?php echo $risk->id ?>">
 						<?php
 						$files =  dol_dir_list(DOL_DATA_ROOT . '/ecm/digiriskdolibarr/medias');
 						$relativepath = 'digiriskdolibarr/medias';
@@ -78,17 +78,20 @@ if (empty($conf) || !is_object($conf))
 
 						if ( !empty($files) ) :
 							foreach ($files as $file) :
-								print '<div class="table-cell center clickable-photo clickable-photo'. $j .'" value="'. $j .'" element="risk-evaluation">';
-								$urladvanced = getAdvancedPreviewUrl($modulepart, $relativepath . '/' . $file['relativename'], 0, 'entity='.$object->entity);
-								print '<a class="clicked-photo-preview" href="'.$urladvanced.'"><i class="fas fa-2x fa-search-plus"></i></a>';
-								if (image_format_supported($file['name']) >= 0) :
-									$fullpath = $path . '/' . $file['relativename'] . '&entity=' . $conf->entity; ?>
-									<input class="filename" type="hidden" value="<?php echo $file['name'] ?>">
-									<img class="photo photo<?php echo $j ?> maxwidth200" src="<?php echo $fullpath; ?>">
-								<?php else : print '&nbsp;';
-								endif;
-								print '<span class="title">'.$file['name'].'</span>';
-								print '</div>';
+								?>
+								<div class="center clickable-photo clickable-photo<?php echo $j; ?>" value="<?php echo $j; ?>" element="risk-evaluation">
+									<figure class="photo-image">
+										<?php $urladvanced = getAdvancedPreviewUrl($modulepart, $relativepath . '/' . $file['relativename'], 0, 'entity='.$object->entity); ?>
+										<a class="clicked-photo-preview" href="<?php echo $urladvanced; ?>"><i class="fas fa-2x fa-search-plus"></i></a>
+										<?php if (image_format_supported($file['name']) >= 0) : ?>
+											<?php $fullpath = $path . '/' . $file['relativename'] . '&entity=' . $conf->entity; ?>
+											<input class="filename" type="hidden" value="<?php echo $file['name'] ?>">
+											<img class="photo photo<?php echo $j ?> maxwidth200" src="<?php echo $fullpath; ?>">
+										<?php endif; ?>
+									</figure>
+									<div class="title"><?php echo $file['name']; ?></div>
+								</div>
+								<?php
 								$j++;
 							endforeach;
 						endif; ?>

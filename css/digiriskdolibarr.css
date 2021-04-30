@@ -2335,6 +2335,76 @@
   width: 100%;
 }
 
+.wpeo-modal.modal-photo .clickable-photo {
+  border: 5px solid #fff;
+  -webkit-transition: all 0.2s ease-out;
+  transition: all 0.2s ease-out;
+}
+
+.wpeo-modal.modal-photo .clickable-photo:hover {
+  cursor: pointer;
+}
+
+.wpeo-modal.modal-photo .clickable-photo:hover .photo-image .photo {
+  opacity: 0.8;
+}
+
+.wpeo-modal.modal-photo .clickable-photo .photo-image {
+  position: relative;
+  width: 100%;
+  max-width: 120px;
+  height: 120px;
+  margin: auto;
+  background: #000;
+}
+
+.wpeo-modal.modal-photo .clickable-photo .photo-image .photo {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  -o-object-fit: cover;
+  object-fit: cover;
+  max-width: none !important;
+  -webkit-transition: all 0.2s ease-out;
+  transition: all 0.2s ease-out;
+}
+
+.wpeo-modal.modal-photo .clickable-photo .photo-image .clicked-photo-preview {
+  position: absolute;
+  display: inline-block;
+  top: 1em;
+  right: 1em;
+  z-index: 900;
+  width: 25px;
+  height: 25px;
+  line-height: 25px;
+  background: #fff;
+  border-radius: 50%;
+  color: #0d8aff;
+  -webkit-transition: all 0.2s ease-out;
+  transition: all 0.2s ease-out;
+}
+
+.wpeo-modal.modal-photo .clickable-photo .photo-image .clicked-photo-preview:hover {
+  -webkit-transform: scale(1.1);
+  transform: scale(1.1);
+}
+
+.wpeo-modal.modal-photo .clickable-photo .photo-image .clicked-photo-preview i {
+  line-height: 25px;
+  font-size: 14px;
+}
+
+.wpeo-modal.modal-photo .formattachnewfile {
+  padding-bottom: 0.5em;
+}
+
+.wpeo-modal.modal-photo input[type="file"] {
+  border-bottom: 0 !important;
+}
+
 .wpeo-modal .modal-container ul, .wpeo-modal .modal-container li {
   margin: 0;
   list-style-type: none;
