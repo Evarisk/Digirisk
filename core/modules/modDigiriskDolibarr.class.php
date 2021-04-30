@@ -445,12 +445,12 @@ class modDigiriskdolibarr extends DolibarrModules
 		$this->rights[$r][5] = 'read';
 		$r++;
 		$this->rights[$r][0] = $this->numero.$r;
-		$this->rights[$r][1] = $langs->trans('CreateReadListingRisksAction');
+		$this->rights[$r][1] = $langs->trans('CreateListingRisksAction');
 		$this->rights[$r][4] = 'listingrisksaction';
 		$this->rights[$r][5] = 'write';
 		$r++;
 		$this->rights[$r][0] = $this->numero.$r;
-		$this->rights[$r][1] = $langs->trans('DeleteReadListingRisksAction');
+		$this->rights[$r][1] = $langs->trans('DeleteListingRisksAction');
 		$this->rights[$r][4] = 'listingrisksaction';
 		$this->rights[$r][5] = 'delete';
 		$r++;
@@ -463,12 +463,12 @@ class modDigiriskdolibarr extends DolibarrModules
 		$this->rights[$r][5] = 'read';
 		$r++;
 		$this->rights[$r][0] = $this->numero.$r;
-		$this->rights[$r][1] = $langs->trans('CreateReadListingRisksPhoto');
+		$this->rights[$r][1] = $langs->trans('CreateListingRisksPhoto');
 		$this->rights[$r][4] = 'listingrisksphoto';
 		$this->rights[$r][5] = 'write';
 		$r++;
 		$this->rights[$r][0] = $this->numero.$r;
-		$this->rights[$r][1] = $langs->trans('DeleteReadListingRisksPhoto');
+		$this->rights[$r][1] = $langs->trans('DeleteListingRisksPhoto');
 		$this->rights[$r][4] = 'listingrisksphoto';
 		$this->rights[$r][5] = 'delete';
 		$r++;
@@ -499,12 +499,12 @@ class modDigiriskdolibarr extends DolibarrModules
 		$this->rights[$r][5] = 'read';
 		$r++;
 		$this->rights[$r][0] = $this->numero.$r;
-		$this->rights[$r][1] = $langs->trans('CreateReadEvaluator');
+		$this->rights[$r][1] = $langs->trans('CreateEvaluator');
 		$this->rights[$r][4] = 'evaluator';
 		$this->rights[$r][5] = 'write';
 		$r++;
 		$this->rights[$r][0] = $this->numero.$r;
-		$this->rights[$r][1] = $langs->trans('DeleteReadEvaluator');
+		$this->rights[$r][1] = $langs->trans('DeleteEvaluator');
 		$this->rights[$r][4] = 'evaluator';
 		$this->rights[$r][5] = 'delete';
 
@@ -601,11 +601,12 @@ class modDigiriskdolibarr extends DolibarrModules
 //			'target'=>'',
 //			'user'=>2,				                // 0=Menu for internal users, 1=external users, 2=both
 //		);
+		$langs->load("digiriskdolibarr@digiriskdolibarr");
 
 		$this->menu[$r++]=array(
 			'fk_menu'=>'fk_mainmenu=digiriskdolibarr',	    		// '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
 			'type'=>'left', 										// This is a Left menu entry
-			'titre'=>$langs->trans('RiskAssessmentDocument'),
+			'titre'=>'<i class="fas fa-exclamation-triangle"></i>  ' . $langs->trans('RiskAssessmentDocument'),
 			'mainmenu'=>'digiriskdolibarr',
 			'leftmenu'=>'digiriskstandard',
 			'url'=>'/digiriskdolibarr/digiriskstandard_card.php?id='.$conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD,
@@ -620,7 +621,7 @@ class modDigiriskdolibarr extends DolibarrModules
 		$this->menu[$r++]=array(
 			'fk_menu'=>'fk_mainmenu=digiriskdolibarr',	    // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
 			'type'=>'left',			                // This is a Left menu entry
-			'titre'=>$langs->trans('RiskList'),
+			'titre'=>'<i class="fas fa-list"></i>  ' . $langs->trans('RiskList'),
 			'mainmenu'=>'digiriskdolibarr',
 			'leftmenu'=>'digirisklistingrisk',
 			'url'=>'/digiriskdolibarr/risk_list.php',
@@ -635,7 +636,7 @@ class modDigiriskdolibarr extends DolibarrModules
 		$this->menu[$r++]=array(
 			'fk_menu'=>'fk_mainmenu=digiriskdolibarr',	    // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
 			'type'=>'left',			                // This is a Left menu entry
-			'titre'=>$langs->trans('Users'),
+			'titre'=>'<i class="fas fa-user"></i>  ' . $langs->trans('Users'),
 			'mainmenu'=>'digiriskdolibarr',
 			'leftmenu'=>'digiriskusers',
 			'url'=>'/digiriskdolibarr/digiriskusers.php',
@@ -650,7 +651,7 @@ class modDigiriskdolibarr extends DolibarrModules
 		$this->menu[$r++]=array(
 			'fk_menu'=>'fk_mainmenu=digiriskdolibarr',	    // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
 			'type'=>'left',			                // This is a Left menu entry
-			'titre'=>$langs->trans('DigiriskConfig'),
+			'titre'=>'<i class="fas fa-cog"></i>  ' . $langs->trans('DigiriskConfig'),
 			'mainmenu'=>'digiriskdolibarr',
 			'leftmenu'=>'digiriskdocumentmodels',
 			'url'=>'/digiriskdolibarr/admin/setup.php',
@@ -665,7 +666,7 @@ class modDigiriskdolibarr extends DolibarrModules
 		$this->menu[$r++]=array(
 			'fk_menu'=>'fk_mainmenu=digiriskdolibarr',	    // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
 			'type'=>'left',			                // This is a Left menu entry
-			'titre'=>$langs->trans('DigiriskConfigSociety'),
+			'titre'=>'<i class="fas fa-building"></i>  ' . $langs->trans('DigiriskConfigSociety'),
 			'mainmenu'=>'digiriskdolibarr',
 			'leftmenu'=>'digiriskdocumentmodels',
 			'url'=>'/admin/company.php',
