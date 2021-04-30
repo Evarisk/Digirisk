@@ -755,7 +755,7 @@ if ($object->id > 0) {
 				<!-- Modal-Header -->
 				<div class="modal-header">
 					<h2 class="modal-title"><?php echo $langs->trans('AddRiskTitle') . ' ' . $refRiskMod->getNextValue($risk);  ?></h2>
-					<div class="modal-refresh modal-close"><i class="fas fa-times"></i></div>
+					<div class="modal-close"><i class="fas fa-times"></i></div>
 				</div>
 				<!-- Modal-ADD Risk Content-->
 				<div class="modal-content" id="#modalContent">
@@ -1172,7 +1172,7 @@ if ($object->id > 0) {
 										<!-- Modal-Header -->
 										<div class="modal-header">
 											<h2 class="modal-title"><?php echo $langs->trans('EvaluationList')  . ' R' . $risk->id ?></h2>
-											<div class="modal-refresh modal-close"><i class="fas fa-times"></i></div>
+											<div class="modal-close"><i class="fas fa-times"></i></div>
 										</div>
 										<!-- MODAL RISK EVALUATION LIST CONTENT -->
 										<div class="modal-content" id="#modalContent" value="<?php echo $risk->id ?>">
@@ -1226,7 +1226,7 @@ if ($object->id > 0) {
 																		<!-- Modal-Header -->
 																		<div class="modal-header">
 																			<h2 class="modal-title"><?php echo $langs->trans('EvaluationEdit') . ' ' . $cotation->id ?></h2>
-																			<div class="modal-refresh modal-close"><i class="fas fa-times"></i></div>
+																			<div class="modal-close"><i class="fas fa-times"></i></div>
 																		</div>
 																		<!-- Modal EDIT Evaluation Content-->
 																		<div class="modal-content" id="#modalContent<?php echo $cotation->id ?>">
@@ -1242,6 +1242,7 @@ if ($object->id > 0) {
 																							<span><?php echo $langs->trans('AdvancedCotation') ?></span>
 																						</div>
 																					<?php endif; ?>
+																					<span class="classfortooltip"><?php echo $langs->trans('TooltipEvaluationMethod') ?> </span>
 																					<input class="risk-evaluation-method" type="hidden" value="<?php echo $cotation->method ?>" />
 																				</div>
 																				<div class="risk-evaluation-content-wrapper">
@@ -1347,7 +1348,7 @@ if ($object->id > 0) {
 										</div>
 										<!-- Modal-Footer -->
 										<div class="modal-footer">
-											<div class="wpeo-button button-grey modal-refresh modal-close">
+											<div class="wpeo-button button-grey modal-close">
 												<span><?php echo $langs->trans('CloseModal'); ?></span>
 											</div>
 										</div>
@@ -1361,7 +1362,7 @@ if ($object->id > 0) {
 										<!-- Modal-Header -->
 										<div class="modal-header">
 											<h2 class="modal-title"><?php echo $langs->trans('EvaluationCreate') . ' ' . $refEvaluationMod->getNextValue($evaluation)?></h2>
-											<div class="modal-close modal-refresh"><i class="fas fa-times"></i></div>
+											<div class="modal-close"><i class="fas fa-times"></i></div>
 										</div>
 										<!-- Modal-ADD Evaluation Content-->
 										<div class="modal-content" id="#modalContent<?php echo $risk->id?>">
