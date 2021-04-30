@@ -395,15 +395,16 @@ class Risk extends CommonObject
 	 *
 	 * @return	array	$records or -1 if error
 	 */
-	public function get_related_tasks($risk, $limit = 1)
+	public function get_related_tasks($risk)
 	{
 		$sql = "SELECT * FROM " . MAIN_DB_PREFIX.'projet_task_extrafields' . ' WHERE fk_risk =' . $risk->id;
+
 		$resql = $this->db->query($sql);
 
 		if ($resql) {
 			$num = $this->db->num_rows($resql);
 			$i = 0;
-			while ($i < ($limit ? min($limit, $num) : $num))
+			while ($i < $num)
 			{
 				$obj = $this->db->fetch_object($resql);
 

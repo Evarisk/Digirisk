@@ -519,6 +519,7 @@ if (empty($reshook))
 			else  setEventMessages($evaluation->error, null, 'errors');
 		}
 	}
+
 	if ($action == "uploadPhoto" && !empty($conf->global->MAIN_UPLOAD_DOC)) {
 		// Define relativepath and upload_dir
 		$relativepath = 'digiriskdolibarr/medias';
@@ -551,6 +552,78 @@ if (empty($reshook))
 		}
 	}
 
+	if (!$error && $action == 'addRiskAssessmentTask' && $permissiontoadd) {
+		$riskID    = GETPOST('riskToAssign');
+		$tasktitle = GETPOST('tasktitle');
+
+		$extrafields->fetch_name_optionals_label($task->table_element);
+
+		$task->ref                              = $refTaskMod->getNextValue('', $task);
+		$task->label                            = $tasktitle;
+		$task->fk_project                       = $conf->global->DIGIRISKDOLIBARR_DU_PROJECT;
+		$task->date_c                           = dol_now();
+		$task->array_options['options_fk_risk'] = $riskID;
+
+		$result = $task->create($user, true);
+
+		if ($result > 0) {
+			// Creation task OK
+			$urltogo = str_replace('__ID__', $result, $backtopage);
+			$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
+			header("Location: ".$urltogo);
+			exit;
+		} else {
+			// Creation task KO
+			if (!empty($task->errors)) setEventMessages(null, $task->errors, 'errors');
+			else  setEventMessages($task->error, null, 'errors');
+		}
+	}
+
+	if (!$error && $action == 'saveRiskAssessmentTask' && $permissiontoadd) {
+		$riskAssessmentTaskID  = GETPOST('riskAssessmentTaskID');
+		$tasktitle             = GETPOST('tasktitle');
+
+		$task->fetch($riskAssessmentTaskID);
+
+		$task->label = $tasktitle;
+
+		$result = $task->update($user);
+
+		if ($result > 0) {
+			// Update task OK
+			$urltogo = str_replace('__ID__', $result, $backtopage);
+			$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
+			header("Location: ".$urltogo);
+			exit;
+		} else {
+			// Update task KO
+			if (!empty($task->errors)) setEventMessages(null, $task->errors, 'errors');
+			else  setEventMessages($task->error, null, 'errors');
+		}
+	}
+
+	if (!$error && $action == "deleteRiskAssessmentTask" && $permissiontodelete) {
+		$deleteRiskAssessmentTaskId = GETPOST('deletedRiskAssessmentTaskId');
+
+		$task->fetch($deleteRiskAssessmentTaskId);
+
+		$result = $task->delete($user);
+
+		if ($result > 0)
+		{
+			// Delete task OK
+			$urltogo = str_replace('__ID__', $result, $backtopage);
+			$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
+			header("Location: ".$urltogo);
+			exit;
+		}
+		else
+		{
+			// Delete $task KO
+			if (!empty($task->errors)) setEventMessages(null, $task->errors, 'errors');
+			else  setEventMessages($task->error, null, 'errors');
+		}
+	}
 }
 
 /*
@@ -884,7 +957,6 @@ if ($object->id > 0) {
 					<div class="riskassessment-task">
 						<span class="section-title"><?php echo $langs->trans('Task'); ?></span>
 						<span class="title"><?php echo $langs->trans('Label'); ?> <input class="" name="label" value=""></span>
-
 					</div>
 				</div>
 				<!-- Modal-Footer -->
@@ -1247,7 +1319,6 @@ if ($object->id > 0) {
 																							<span><?php echo $langs->trans('AdvancedCotation') ?></span>
 																						</div>
 																					<?php endif; ?>
-																					<span class="classfortooltip"><?php echo $langs->trans('TooltipEvaluationMethod') ?> </span>
 																					<input class="risk-evaluation-method" type="hidden" value="<?php echo $cotation->method ?>" />
 																				</div>
 																				<div class="risk-evaluation-content-wrapper">
@@ -1489,7 +1560,7 @@ if ($object->id > 0) {
 									<div class="riskassessment-task-content">
 										<div class="riskassessment-task-data">
 											<!-- BUTTON MODAL RISK Assessment Task LIST  -->
-											<span class="riskassessment-task-reference" value="<?php echo $risk->id ?>"><?php echo $related_task->getNomUrl(); ?></span>
+											<span class="riskassessment-task-reference riskassessment-task-list modal-open" value="<?php echo $risk->id ?>"><?php echo $related_task->ref; ?></span>
 											<span class="riskassessment-task-author">
 												<?php $user->fetch($related_task->fk_user_creat); ?>
 												<?php echo $user->getNomUrl( 0, '', 0, 0, 2 ); ?>
@@ -1504,6 +1575,116 @@ if ($object->id > 0) {
 									<!-- BUTTON MODAL RISK ASSESSMENT TASK ADD  -->
 									<div class="riskassessment-task-add wpeo-button button-square-40 button-primary modal-open" value="<?php echo $risk->id;?>">
 										<i class="fas fa-plus button-icon"></i>
+									</div>
+								</div>
+								<!--RISK ASSESSMENT TASK LIST MODAL -->
+								<div class="riskassessment-task-list-modal">
+									<div class="wpeo-modal" id="risk_assessment_task_list<?php echo $risk->id ?>">
+										<div class="modal-container wpeo-modal-event">
+											<!-- Modal-Header -->
+											<div class="modal-header">
+												<h2 class="modal-title"><?php echo $langs->trans('TaskList')  . ' R' . $risk->id ?></h2>
+												<div class="modal-close"><i class="fas fa-times"></i></div>
+											</div>
+											<!-- MODAL RISK ASSESSMENT TASK LIST CONTENT -->
+											<div class="modal-content" id="#modalContent" value="<?php echo $risk->id ?>">
+												<ul class="riskassessment-task-list riskassessment-task-list-<?php echo $risk->id ?>">
+													<?php $related_tasks = $risk->get_related_tasks($risk); ?>
+													<?php if (!empty($related_tasks)) :
+														foreach ($related_tasks as $related_task) : ?>
+															<li class="riskassessment-task riskassessment-task<?php echo $related_task->id ?>" value="<?php echo $related_task->id ?>">
+																<div class="riskassessment-task-container">
+																	<div class="riskassessment-task-single">
+																		<div class="riskassessment-task-content">
+																			<div class="riskassessment-task-data">
+																				<span class="riskassessment-task-reference" value="<?php echo $risk->id ?>"><?php echo $related_task->getNomUrl(); ?></span>
+																				<span class="riskassessment-task-author">
+																					<?php $user->fetch($related_task->fk_user_creat); ?>
+																					<?php echo $user->getNomUrl( 0, '', 0, 0, 2 ); ?>
+																				</span>
+																				<span class="riskassessment-task-date">
+																					<i class="fas fa-calendar-alt"></i> <?php echo date('d/m/Y', $related_task->date_c); ?>
+																				</span>
+																				<span class="riskassessment-task-count"><i class="fas fa-comments"></i><?php echo count($related_tasks) ?></span>
+																			</div>
+																			<div class="riskassessment-task-title"><?php echo $related_task->label; ?></div>
+																		</div>
+																	</div>
+																	<!-- BUTTON MODAL RISK ASSESSMENT TASK EDIT  -->
+																	<div class="riskassessment-task-actions wpeo-gridlayout grid-2 grid-gap-0">
+																		<div class="riskassessment-task-edit wpeo-button button-square-50 button-grey modal-open" value="<?php echo $related_task->id ?>">
+																			<i class="fas fa-pencil-alt button-icon"></i>
+																		</div>
+																		<div class="riskassessment-task-delete wpeo-button button-square-50 button-transparent">
+																			<i class="fas fa-trash button-icon"></i>
+																		</div>
+																	</div>
+																</div>
+																<!-- RISK ASSESSMENT TASK EDIT MODAL-->
+																<div class="riskassessment-task-edit-modal">
+																	<div class="wpeo-modal modal-risk" id="risk_assessment_task_edit<?php echo $related_task->id ?>">
+																		<div class="modal-container wpeo-modal-event">
+																			<!-- Modal-Header -->
+																			<div class="modal-header">
+																				<h2 class="modal-title"><?php echo $langs->trans('TaskEdit') . ' ' .  $related_task->ref ?></h2>
+																				<div class="modal-close"><i class="fas fa-times"></i></div>
+																			</div>
+																			<!-- Modal EDIT RISK ASSESSMENT TASK Content-->
+																			<div class="modal-content" id="#modalContent<?php echo $related_task->id ?>">
+																				<div class="riskassessment-task-container">
+																					<div class="riskassessment-task">
+																						<span class="title"><?php echo $langs->trans('Label'); ?> <input class="" name="label" value="<?php echo $related_task->label ?>"></span>
+																					</div>
+																				</div>
+																			</div>
+																			<!-- Modal-Footer -->
+																			<div class="modal-footer">
+																				<div class="wpeo-button riskassessment-task-save button-green" value="<?php echo $related_task->id ?>">
+																					<i class="fas fa-save"></i> <?php echo $langs->trans('UpdateTask'); ?>
+																				</div>
+																			</div>
+																		</div>
+																	</div>
+																	<hr>
+																</div>
+															</li>
+														<?php endforeach; ?>
+													<?php endif; ?>
+												</ul>
+											</div>
+											<!-- Modal-Footer -->
+											<div class="modal-footer">
+												<div class="wpeo-button button-grey modal-close">
+													<span><?php echo $langs->trans('CloseModal'); ?></span>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+								<!-- RISK EVALUATION ADD MODAL-->
+								<div class="riskassessment-task-add-modal">
+									<div class="wpeo-modal modal-risk" id="risk_assessment_task_add<?php echo $risk->id?>">
+										<div class="modal-container wpeo-modal-event">
+											<!-- Modal-Header -->
+											<div class="modal-header">
+												<h2 class="modal-title"><?php echo $langs->trans('TaskCreate') . ' ' .  $refTaskMod->getNextValue('', $task) ?></h2>
+												<div class="modal-close"><i class="fas fa-times"></i></div>
+											</div>
+											<!-- Modal ADD RISK ASSESSMENT TASK Content-->
+											<div class="modal-content" id="#modalContent<?php echo $risk->id ?>">
+												<div class="riskassessment-task-container">
+													<div class="riskassessment-task">
+														<span class="title"><?php echo $langs->trans('Label'); ?> <input class="" name="label" value=""></span>
+													</div>
+												</div>
+											</div>
+											<!-- Modal-Footer -->
+											<div class="modal-footer">
+												<div class="wpeo-button riskassessment-task-create button-blue" value="<?php echo $risk->id ?>">
+													<i class="fas fa-plus"></i> <?php echo $langs->trans('Add'); ?>
+												</div>
+											</div>
+										</div>
 									</div>
 								</div>
 							</div>

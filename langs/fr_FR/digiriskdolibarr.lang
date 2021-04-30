@@ -521,6 +521,7 @@ RiskSign = Signalisation
 RiskSignCategory = Catégorie
 AddRiskSignTitle = Ajout d'une signalisation
 AddRiskSignButton = Ajouter la signalisation
+EditRiskSign = Édition d'une signalisation
 UpdateRiskSign = Mettre à jour
 
 DigiriskElementRiskSignList = Liste des signalisations

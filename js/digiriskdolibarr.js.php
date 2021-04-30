@@ -394,8 +394,16 @@ window.eoxiaJS.modal.openModal = function ( event ) {
 	if ($(this).hasClass('risk-edit')) {
 		$('#risk_edit' + idSelected).addClass('modal-active');
 	}
-	if ($(this).hasClass('evaluator-add')) {
-		$('#risk_edit' + idSelected).addClass('modal-active');
+
+	// Open modal riskassessment task.
+	if ($(this).hasClass('riskassessment-task-add')) {
+		$('#risk_assessment_task_add' + idSelected).addClass('modal-active');
+	}
+	if ($(this).hasClass('riskassessment-task-list')) {
+		$('#risk_assessment_task_list' + idSelected).addClass('modal-active');
+	}
+	if ($(this).hasClass('riskassessment-task-edit')) {
+		$('#risk_assessment_task_edit' + idSelected).addClass('modal-active');
 	}
 
 	// Open modal risksign.
@@ -1493,6 +1501,139 @@ window.eoxiaJS.evaluationMethodEvarisk.selectSeuil = function( event ) {
 			window.eoxiaJS.risk.haveDataInInput(elementParent);
 		})
 	}
+};
+
+/**
+ * Initialise l'objet "riskassessmenttask" ainsi que la méthode "init" obligatoire pour la bibliothèque EoxiaJS.
+ *
+ * @since   1.0.0
+ * @version 1.0.0
+ */
+window.eoxiaJS.riskassessmenttask = {};
+
+/**
+ * La méthode appelée automatiquement par la bibliothèque EoxiaJS.
+ *
+ * @since   1.0.0
+ * @version 1.0.0
+ *
+ * @return {void}
+ */
+window.eoxiaJS.riskassessmenttask.init = function() {
+	window.eoxiaJS.riskassessmenttask.event();
+};
+
+/**
+ * La méthode contenant tous les évènements pour le riskassessment-task.
+ *
+ * @since   1.0.0
+ * @version 1.0.0
+ *
+ * @return {void}
+ */
+window.eoxiaJS.riskassessmenttask.event = function() {
+	jQuery( document ).on( 'click', '.riskassessment-task-create', window.eoxiaJS.riskassessmenttask.createRiskAssessmentTask);
+	jQuery( document ).on( 'click', '.riskassessment-task-save', window.eoxiaJS.riskassessmenttask.saveRiskAssessmentTask);
+	jQuery( document ).on( 'click', '.riskassessment-task-delete', window.eoxiaJS.riskassessmenttask.deleteRiskAssessmentTask );
+};
+
+/**
+ * Action create task.
+ *
+ * @since   1.0.0
+ * @version 1.0.0
+ *
+ * @return {void}
+ */
+window.eoxiaJS.riskassessmenttask.createRiskAssessmentTask = function ( event ) {
+	var riskToAssign = $(this).attr('value');
+	let element = $(this).closest('.riskassessment-task-add-modal');
+	let single = element.find('.riskassessment-task-container');
+
+	var riskToAssignPost = '';
+	if (riskToAssign !== '') {
+		riskToAssignPost = '&riskToAssign=' + riskToAssign;
+	}
+
+	var task = single.find('.riskassessment-task input').val();
+	var taskPost = '';
+	if (task !== '') {
+		taskPost = '&tasktitle=' + encodeURI(task);
+	}
+
+	$.ajax({
+		url: document.URL + '&action=addRiskAssessmentTask' + riskToAssignPost + taskPost,
+		type: "POST",
+		processData: false,
+		contentType: false
+	});
+
+	let elementParent = $('.fichecenter');
+
+	window.eoxiaJS.loader.display($(this).closest('.risk-row-content-' + riskToAssign));
+
+	setTimeout(function(){
+		elementParent.empty()
+		elementParent.load( document.URL + ' .fichecenter');
+		$(this).closest('.risk-row-content-' + riskToAssign).removeClass('wpeo-loader');
+	}, 800);
+};
+
+/**
+ * Action delete riskassessmenttask.
+ *
+ * @since   1.0.0
+ * @version 1.0.0
+ *
+ * @return {void}
+ */
+window.eoxiaJS.riskassessmenttask.deleteRiskAssessmentTask = function ( event ) {
+	let element = $(this).closest('.riskassessment-task');
+	let deletedRiskAssessmentTaskId = element.attr('value');
+	var r = confirm('Are you sure you want to delete this risk ?');
+	if (r == true) {
+		element.empty();
+		element.load( document.URL + '&action=deleteRiskAssessmentTask&deletedRiskAssessmentTaskId=' + deletedRiskAssessmentTaskId + ' ' + element);
+	} else {
+		return false;
+	}
+};
+
+/**
+ * Action save riskassessmenttask.
+ *
+ * @since   1.0.0
+ * @version 1.0.0
+ *
+ * @return {void}
+ */
+window.eoxiaJS.riskassessmenttask.saveRiskAssessmentTask = function ( event ) {
+	let editedRiskAssessmentTaskId = $(this).attr('value');
+	let elementRiskAssessmentTask = $(this).closest('.riskassessment-task-container');
+
+	var task = elementRiskAssessmentTask.find('.riskassessment-task input').val();
+	var taskPost = '';
+	if (task !== '') {
+		taskPost = '&tasktitle=' + encodeURI(task);
+	}
+
+	$.ajax({
+		url: document.URL + '&action=saveRiskAssessmentTask&riskAssessmentTaskID=' + editedRiskAssessmentTaskId + taskPost,
+		type: "POST",
+		processData: false,
+		contentType: false
+	});
+
+	let elementParent = $('.div-table-responsive:not(.list-titre)');
+
+	window.eoxiaJS.loader.display(elementRiskAssessmentTask);
+
+	setTimeout(function(){
+		elementParent.empty()
+		elementParent.load( document.URL + ' .div-table-responsive');
+		elementRiskAssessmentTask.removeClass('wpeo-loader');
+	}, 800);
+	$(this).closest('.div-table-responsive').load( document.URL + '&action=saveRiskAssessmentTask&riskAssessmentTaskID=' + editedRiskAssessmentTaskId + taskPost + ' .div-table-responsive');
 };
 
 /**
