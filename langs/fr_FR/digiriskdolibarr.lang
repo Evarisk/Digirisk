@@ -450,6 +450,7 @@ ActionsOnDigiriskStandard = Événements liés au standard de Digirisk
 
 # Data - Donnée
 RiskAnalysis = Analyse des risques
+UpdateData = Mettre à jour
 
 
 #
@@ -468,15 +469,18 @@ RisksList = Liste de risques
 AddRiskTitle = Ajout du risque
 AddRiskButton = Ajouter le risque
 EditRisk = Édition du risque
-UpdateRisk = Mettre à jour
-RiskListDolibarr = Listing de risques Doli
 hasPhoto = Photo
 RiskCategory = Catégorie
-DigiriskElementRisksList = Liste de risques
+DigiriskElementRisksList = Liste des risques
 DigiriskElementRisk = Risques
 
 TasksManagement = Gestion des tâches
-ProjectLinked = Projet lié aux tâches des risques
+SelectProject = Choix du projet
+DUProject = Projet lié aux tâches des risques
+NoTaskLinked = Pas de tâche en cours
+TaskList = Liste des tâches du risque
+TaskCreate = Ajout de la tâche
+TaskEdit = Édition de la tâche
 
 
 
@@ -492,7 +496,6 @@ DigiriskRiskAssessmentNumberingModule = Modèle de numérotation des évaluation
 RiskAssessment = Évaluation
 EvaluationCreate = Ajout de l'évaluation
 EvaluationEdit = Édition de l'évaluation
-UpdateEvaluation = Mettre à jour
 EvaluationMethod = Méthode d'évaluation
 lastEvaluationOn = Dernière évaluation le
 EvaluatedOn = le
@@ -522,10 +525,10 @@ RiskSignCategory = Catégorie
 AddRiskSignTitle = Ajout d'une signalisation
 AddRiskSignButton = Ajouter la signalisation
 EditRiskSign = Édition d'une signalisation
-UpdateRiskSign = Mettre à jour
 
 DigiriskElementRiskSignList = Liste des signalisations
 DigiriskElementRiskSign = Signalisation
+
 
 
 #
@@ -535,7 +538,6 @@ DigiriskElementRiskSign = Signalisation
 # Data - Donnée
 CloseModal = Fermer
 
-SelectProject = Choix du projet
 ModalAddPhoto = Ajout Photo
 
 
