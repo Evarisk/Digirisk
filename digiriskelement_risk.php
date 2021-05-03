@@ -1559,7 +1559,7 @@ if ($object->id > 0) {
 					<?php } ?>
 				<?php } elseif ($key == 'has_tasks') { ?>
 					<?php $related_tasks = $risk->get_related_tasks($risk);
-					if (!empty($related_tasks)) :
+					if (!empty($related_tasks) && $related_tasks > 0) :
 						$related_task = array_pop($related_tasks); ?>
 						<div class="riskassessment-task-container">
 							<div class="riskassessment-task-single">
