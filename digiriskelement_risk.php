@@ -1145,49 +1145,50 @@ if ($object->id > 0) {
 				elseif ($key == 'ref') {
 					?>
 					<div class="risk-container" value="<?php echo $risk->id ?>">
-					<!-- BUTTON MODAL RISK EDIT -->
-					<div class="risk-edit modal-open" value="<?php echo $risk->id ?>"><i class="fas fa-exclamation-triangle"></i><?php echo ' ' . $risk->ref; ?></div>
-					<!-- RISK EDIT MODAL -->
-					<div id="risk_edit<?php echo $risk->id ?>" class="wpeo-modal modal-risk-<?php echo $risk->id ?>">
-						<div class="modal-container wpeo-modal-event">
-							<!-- Modal-Header -->
-							<div class="modal-header">
-								<h2 class="modal-title"><?php echo $langs->trans('EditRisk') . ' ' . $risk->ref ?></h2>
-								<div class="modal-close"><i class="fas fa-times"></i></div>
-							</div>
-							<!-- MODAL RISK EDIT CONTENT -->
-							<div class="modal-content" id="#modalContent">
-								<div class="risk-content">
-									<div class="risk-category">
-										<span class="title"><?php echo $langs->trans('Risk'); ?></span>
-										<input class="input-hidden-danger" type="hidden" name="risk_category_id" value=<?php echo $risk->category ?> />
-										<div class="wpeo-dropdown dropdown-large dropdown-grid category-danger padding">
-											<div class="dropdown-toggle dropdown-add-button button-cotation wpeo-tooltip-event" aria-label="<?php echo $risk->get_danger_category_name($risk) ?>">
-												<img class="danger-category-pic tooltip hover" src="<?php echo DOL_URL_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $risk->get_danger_category($risk) . '.png'?>"" />
+						<!-- BUTTON MODAL RISK EDIT -->
+						<div class="risk-edit modal-open" value="<?php echo $risk->id ?>"><i class="fas fa-exclamation-triangle"></i><?php echo ' ' . $risk->ref; ?></div>
+						<!-- RISK EDIT MODAL -->
+						<div id="risk_edit<?php echo $risk->id ?>" class="wpeo-modal modal-risk-<?php echo $risk->id ?>">
+							<div class="modal-container wpeo-modal-event">
+								<!-- Modal-Header -->
+								<div class="modal-header">
+									<h2 class="modal-title"><?php echo $langs->trans('EditRisk') . ' ' . $risk->ref ?></h2>
+									<div class="modal-close"><i class="fas fa-times"></i></div>
+								</div>
+								<!-- MODAL RISK EDIT CONTENT -->
+								<div class="modal-content" id="#modalContent">
+									<div class="risk-content">
+										<div class="risk-category">
+											<span class="title"><?php echo $langs->trans('Risk'); ?></span>
+											<input class="input-hidden-danger" type="hidden" name="risk_category_id" value=<?php echo $risk->category ?> />
+											<div class="wpeo-dropdown dropdown-large dropdown-grid category-danger padding">
+												<div class="dropdown-toggle dropdown-add-button button-cotation wpeo-tooltip-event" aria-label="<?php echo $risk->get_danger_category_name($risk) ?>">
+													<img class="danger-category-pic tooltip hover" src="<?php echo DOL_URL_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $risk->get_danger_category($risk) . '.png'?>"" />
+												</div>
+												<ul class="dropdown-content wpeo-gridlayout grid-5 grid-gap-0">
+													<?php
+													$dangerCategories = $risk->get_danger_categories();
+													if ( ! empty( $dangerCategories ) ) :
+														foreach ( $dangerCategories as $dangerCategory ) : ?>
+															<li class="item dropdown-item wpeo-tooltip-event classfortooltip" data-is-preset="<?php echo ''; ?>" data-id="<?php echo $dangerCategory['position'] ?>" aria-label="<?php echo $dangerCategory['name'] ?>">
+																<img src="<?php echo DOL_URL_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $dangerCategory['thumbnail_name'] . '.png'?>" class="attachment-thumbail size-thumbnail photo photowithmargin" alt="" loading="lazy" width="48" height="48">
+															</li>
+														<?php endforeach;
+													endif; ?>
+												</ul>
 											</div>
-											<ul class="dropdown-content wpeo-gridlayout grid-5 grid-gap-0">
-												<?php
-												$dangerCategories = $risk->get_danger_categories();
-												if ( ! empty( $dangerCategories ) ) :
-													foreach ( $dangerCategories as $dangerCategory ) : ?>
-														<li class="item dropdown-item wpeo-tooltip-event classfortooltip" data-is-preset="<?php echo ''; ?>" data-id="<?php echo $dangerCategory['position'] ?>" aria-label="<?php echo $dangerCategory['name'] ?>">
-															<img src="<?php echo DOL_URL_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $dangerCategory['thumbnail_name'] . '.png'?>" class="attachment-thumbail size-thumbnail photo photowithmargin" alt="" loading="lazy" width="48" height="48">
-														</li>
-													<?php endforeach;
-												endif; ?>
-											</ul>
+										</div>
+										<div class="risk-description">
+											<span class="title"><?php echo $langs->trans('Description'); ?></span>
+											<?php print '<textarea name="riskComment" rows="'.ROWS_2.'">'.$risk->description.'</textarea>'."\n"; ?>
 										</div>
 									</div>
-									<div class="risk-description">
-										<span class="title"><?php echo $langs->trans('Description'); ?></span>
-										<?php print '<textarea name="riskComment" rows="'.ROWS_2.'">'.$risk->description.'</textarea>'."\n"; ?>
-									</div>
 								</div>
-							</div>
-							<!-- Modal-Footer -->
-							<div class="modal-footer">
-								<div class="risk-save wpeo-button button-green save modal-close" value="<?php echo $risk->id ?>">
-									<span><i class="fas fa-save"></i>  <?php echo $langs->trans('UpdateData'); ?></span>
+								<!-- Modal-Footer -->
+								<div class="modal-footer">
+									<div class="risk-save wpeo-button button-green save modal-close" value="<?php echo $risk->id ?>">
+										<span><i class="fas fa-save"></i>  <?php echo $langs->trans('UpdateData'); ?></span>
+									</div>
 								</div>
 							</div>
 						</div>
@@ -1211,6 +1212,7 @@ if ($object->id > 0) {
 			$cssforfield = (empty($val['css']) ? '' : $val['css']);
 			if ($key == 'status') $cssforfield .= ($cssforfield ? ' ' : '').'center';
 			elseif ($key == 'ref') $cssforfield .= ($cssforfield ? ' ' : '').'nowrap';
+			elseif ($key == 'cotation') $cssforfield .= ($cssforfield ? ' ' : '').'nowrap';
 			if (!empty($arrayfields['evaluation.'.$key]['checked']))
 			{
 				$cssforfield = '';
