@@ -481,6 +481,7 @@ NoTaskLinked = Pas de tâche en cours
 TaskList = Liste des tâches du risque
 TaskCreate = Ajout de la tâche
 TaskEdit = Édition de la tâche
+HowToSetDUProject = Pour configurer le choix du projet, aller dans Configuration du module - Analyse des risques - Tâche
 
 
 
@@ -537,6 +538,7 @@ DigiriskElementRiskSign = Signalisation
 
 # Data - Donnée
 CloseModal = Fermer
+AT = au
 
 ModalAddPhoto = Ajout Photo
 

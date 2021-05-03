@@ -31,7 +31,9 @@ require_once DOL_DOCUMENT_ROOT.'/core/lib/images.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/files.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/core/class/html.form.class.php';
 require_once DOL_DOCUMENT_ROOT.'/ecm/class/ecmdirectory.class.php';
+require_once DOL_DOCUMENT_ROOT.'/projet/class/project.class.php';
 require_once DOL_DOCUMENT_ROOT.'/projet/class/task.class.php';
+require_once DOL_DOCUMENT_ROOT.'/core/modules/project/mod_project_simple.php';
 require_once DOL_DOCUMENT_ROOT.'/core/modules/project/task/mod_task_simple.php';
 
 dol_include_once('/digiriskdolibarr/class/digiriskelement.class.php');
@@ -61,12 +63,16 @@ $sortorder           = GETPOST('sortorder', 'alpha');
 $object            = new DigiriskElement($db);
 $risk              = new Risk($db);
 $evaluation        = new RiskAssessment($db);
+$ecmdir            = new EcmDirectory($db);
+$project           = new Project($db);
+$task              = new Task($db);
 $extrafields       = new ExtraFields($db);
 $refRiskMod        = new $conf->global->DIGIRISKDOLIBARR_RISK_ADDON();
 $refEvaluationMod  = new $conf->global->DIGIRISKDOLIBARR_RISKASSESSMENT_ADDON();
+$refProjectMod     = new $conf->global->PROJECT_ADDON();
 $refTaskMod        = new $conf->global->PROJECT_TASK_ADDON();
-$ecmdir            = new EcmDirectory($db);
-$task              = new Task($db);
+
+
 
 
 
@@ -1613,7 +1619,7 @@ if ($object->id > 0) {
 																			<span class="riskassessment-task-date">
 																				<i class="fas fa-calendar-alt"></i> <?php echo date('d/m/Y', $related_task->date_c); ?>
 																			</span>
-																			<span class="riskassessment-task-count"><i class="fas fa-comments"></i><?php echo count($related_tasks) ?></span>
+																			<span class="riskassessment-task-count"><i class="fas fa-comments"></i><?php echo $related_task->fetchTimeSpent($related_task->id) ?></span>
 																		</div>
 																		<div class="riskassessment-task-title">
 																			<span class="riskassessment-task-author">
@@ -1681,7 +1687,8 @@ if ($object->id > 0) {
 									<div class="modal-container wpeo-modal-event">
 										<!-- Modal-Header -->
 										<div class="modal-header">
-											<h2 class="modal-title"><?php echo $langs->trans('TaskCreate') . ' ' .  $refTaskMod->getNextValue('', $task) ?></h2>
+											<?php $project->fetch($related_task->fk_project); ?>
+											<h2 class="modal-title"><?php echo $langs->trans('TaskCreate') . ' ' .  $refTaskMod->getNextValue('', $task) . '  ' . $langs->trans('AT') . '  ' . $langs->trans('Project') . '  ' . $project->getNomUrl() ?><i class="fas fa-info-circle wpeo-tooltip-event" aria-label="<?php echo $langs->trans('HowToSetDUProject'); ?>"></i></h2>
 											<div class="modal-close"><i class="fas fa-times"></i></div>
 										</div>
 										<!-- Modal ADD RISK ASSESSMENT TASK Content-->
@@ -1721,7 +1728,8 @@ if ($object->id > 0) {
 									<div class="modal-container wpeo-modal-event">
 										<!-- Modal-Header -->
 										<div class="modal-header">
-											<h2 class="modal-title"><?php echo $langs->trans('TaskCreate') . ' ' .  $refTaskMod->getNextValue('', $task) ?></h2>
+											<?php $project->fetch($related_task->fk_project); ?>
+											<h2 class="modal-title"><?php echo $langs->trans('TaskCreate') . ' ' .  $refTaskMod->getNextValue('', $task) . '  ' . $langs->trans('AT') . '  ' . $langs->trans('Project') . '  ' . $project->getNomUrl() ?><i class="fas fa-info-circle wpeo-tooltip-event" aria-label="<?php echo $langs->trans('HowToSetDUProject'); ?>"></i></h2>
 											<div class="modal-close"><i class="fas fa-times"></i></div>
 										</div>
 										<!-- Modal ADD RISK ASSESSMENT TASK Content-->
