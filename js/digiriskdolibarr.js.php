@@ -908,7 +908,7 @@ window.eoxiaJS.photo.sendPhoto = function( event ) {
 		contentType: false,
 	});
 
-	let elementParent = $(this).closest('.modal-container').find('.ecm-photo-list');
+	let elementParent = $(this).closest('.modal-container').find('.ecm-photo-list-content');
 
 	elementParent.empty();
 	window.eoxiaJS.loader.display(elementParent);

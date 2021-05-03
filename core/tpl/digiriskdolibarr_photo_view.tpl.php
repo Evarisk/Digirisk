@@ -68,34 +68,36 @@ if (empty($conf) || !is_object($conf))
 					// End "Add new file" area
 					?>
 					<div class="underbanner clearboth"></div>
-					<div class="wpeo-gridlayout grid-5 grid-gap-3 grid-margin-2 ecm-photo-list ecm-photo-list-<?php echo $risk->id ?>">
-						<?php
-						$entity =($conf->entity > 1) ? '/' . $conf->entity : '';
-						$files =  dol_dir_list(DOL_DATA_ROOT .$entity. '/ecm/digiriskdolibarr/medias');
-						$relativepath = 'digiriskdolibarr/medias';
-						$modulepart = 'ecm';
-						$path = DOL_URL_ROOT.'/document.php?modulepart=' . $modulepart  . '&attachment=0&file=' . str_replace('/', '%2F', $relativepath);
-						$j = 0;
+					<div class="ecm-photo-list-content">
+						<div class="wpeo-gridlayout grid-4 grid-gap-3 grid-margin-2 ecm-photo-list ecm-photo-list-<?php echo $risk->id ?>">
+							<?php
+							$entity =($conf->entity > 1) ? '/' . $conf->entity : '';
+							$files =  dol_dir_list(DOL_DATA_ROOT .$entity. '/ecm/digiriskdolibarr/medias');
+							$relativepath = 'digiriskdolibarr/medias';
+							$modulepart = 'ecm';
+							$path = DOL_URL_ROOT.'/document.php?modulepart=' . $modulepart  . '&attachment=0&file=' . str_replace('/', '%2F', $relativepath);
+							$j = 0;
 
-						if ( !empty($files) ) :
-							foreach ($files as $file) :
-								?>
-								<div class="center clickable-photo clickable-photo<?php echo $j; ?>" value="<?php echo $j; ?>" element="risk-evaluation">
-									<figure class="photo-image">
-										<?php $urladvanced = getAdvancedPreviewUrl($modulepart, $relativepath . '/' . $file['relativename'], 0, 'entity='.$object->entity); ?>
-										<a class="clicked-photo-preview" href="<?php echo $urladvanced; ?>"><i class="fas fa-2x fa-search-plus"></i></a>
-										<?php if (image_format_supported($file['name']) >= 0) : ?>
-											<?php $fullpath = $path . '/' . $file['relativename'] . '&entity=' . $conf->entity; ?>
-											<input class="filename" type="hidden" value="<?php echo $file['name'] ?>">
-											<img class="photo photo<?php echo $j ?> maxwidth200" src="<?php echo $fullpath; ?>">
-										<?php endif; ?>
-									</figure>
-									<div class="title"><?php echo $file['name']; ?></div>
-								</div>
-								<?php
-								$j++;
-							endforeach;
-						endif; ?>
+							if ( !empty($files) ) :
+								foreach ($files as $file) :
+									?>
+									<div class="center clickable-photo clickable-photo<?php echo $j; ?>" value="<?php echo $j; ?>" element="risk-evaluation">
+										<figure class="photo-image">
+											<?php $urladvanced = getAdvancedPreviewUrl($modulepart, $relativepath . '/' . $file['relativename'], 0, 'entity='.$object->entity); ?>
+											<a class="clicked-photo-preview" href="<?php echo $urladvanced; ?>"><i class="fas fa-2x fa-search-plus"></i></a>
+											<?php if (image_format_supported($file['name']) >= 0) : ?>
+												<?php $fullpath = $path . '/' . $file['relativename'] . '&entity=' . $conf->entity; ?>
+												<input class="filename" type="hidden" value="<?php echo $file['name'] ?>">
+												<img class="photo photo<?php echo $j ?> maxwidth200" src="<?php echo $fullpath; ?>">
+											<?php endif; ?>
+										</figure>
+										<div class="title"><?php echo $file['name']; ?></div>
+									</div>
+									<?php
+									$j++;
+								endforeach;
+							endif; ?>
+						</div>
 					</div>
 				</div>
 				<!-- Modal-Footer -->
