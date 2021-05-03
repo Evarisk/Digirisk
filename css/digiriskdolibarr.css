@@ -1876,18 +1876,13 @@
   text-decoration: underline;
 }
 
-.risksign-photo {
-  width: 50px;
-  min-width: 50px;
-  height: 50px;
-  background: #ececec;
-  margin-right: 0.5em;
+.risksign-container .risksign-edit {
+  color: #263C5C;
 }
 
-.risksign-photo .photodigiriskdolibarr {
-  width: 100%;
-  height: auto;
-  background: #fff;
+.risksign-container .risksign-edit:hover {
+  cursor: pointer;
+  text-decoration: underline;
 }
 
 .risksign-content {
@@ -2321,10 +2316,6 @@
   display: none;
 }
 
-.wpeo-modal[class*="modal-risksign"] .modal-container .risksign-content .risksign-photo img {
-  max-width: 50px;
-}
-
 .wpeo-modal[class*="modal-risksign"] .modal-container .risksign-content .risksign-description {
   -webkit-box-flex: 1;
   -ms-flex-positive: 1;
@@ -2333,6 +2324,63 @@
 
 .wpeo-modal[class*="modal-risksign"] .modal-container .risksign-content .risksign-description textarea {
   width: 100%;
+}
+
+.wpeo-modal[class*="modal-riskassessment-task"] .modal-container .title {
+  display: block;
+  font-weight: 600;
+  font-size: 13px;
+  margin-bottom: 0.6em;
+  color: rgba(0, 0, 0, 0.8);
+}
+
+.wpeo-modal[class*="modal-riskassessment-task"] .modal-container .title required {
+  font-size: 18px;
+  color: #0d8aff;
+  vertical-align: text-top;
+  line-height: 0.9;
+}
+
+.wpeo-modal[class*="modal-riskassessment-task"] .modal-container .section-title {
+  font-size: 16px;
+  color: rgba(0, 0, 0, 0.8);
+  font-weight: 600;
+  margin-bottom: 0.6em;
+  display: block;
+}
+
+.wpeo-modal[class*="modal-riskassessment-task"] .modal-container .riskassessment-task-container {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  padding-bottom: 1em;
+  margin-bottom: 1em;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+}
+
+.wpeo-modal[class*="modal-riskassessment-task"] .modal-container .riskassessment-task-container .riskassessment-task {
+  -webkit-box-flex: 1;
+  -ms-flex-positive: 1;
+  flex-grow: 1;
+}
+
+.wpeo-modal[class*="modal-riskassessment-task"] .modal-container .riskassessment-task-container .riskassessment-task input {
+  width: 100%;
+}
+
+/** Listing */
+.wpeo-modal .modal-container .riskassessment-task-list .riskassessment-task > .riskassessment-task-container {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+}
+
+.wpeo-modal .modal-container .riskassessment-task-list .riskassessment-task > .riskassessment-task-container .riskassessment-task-single {
+  width: 100%;
+}
+
+.wpeo-modal .modal-container .riskassessment-task-list .riskassessment-task > .riskassessment-task-container .riskassessment-task-actions {
+  margin-left: auto;
 }
 
 .wpeo-modal.modal-photo .clickable-photo {
