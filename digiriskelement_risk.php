@@ -210,7 +210,7 @@ if (empty($reshook))
 				//photo upload and thumbs generation
 				if (!empty ($photo)) {
 					$entity = ($conf->entity > 1) ? '/' . $conf->entity : '';
-					$pathToECMPhoto =  DOL_DATA_ROOT .$entity. '/ecm/digiriskdolibarr/medias/' . $photo;
+					$pathToECMPhoto =  DOL_DATA_ROOT . $entity . '/ecm/digiriskdolibarr/medias/' . $photo;
 
 					$pathToEvaluationPhoto = DOL_DATA_ROOT . $entity . '/digiriskdolibarr/riskassessment/' . $evaluation->ref;
 
