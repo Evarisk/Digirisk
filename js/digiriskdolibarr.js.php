@@ -1208,29 +1208,33 @@ window.eoxiaJS.evaluation.event = function() {
  */
 window.eoxiaJS.evaluation.selectEvaluationMethod = function ( event ) {
 	var elementParent = jQuery(this).closest('.modal-container');
-	elementParent.find('.select-evaluation-method.selected').removeClass('selected');
+	var multiple_method = elementParent.find('.risk-evaluation-multiple-method').val();
+	if (multiple_method > 0) {
+		elementParent.find('.select-evaluation-method.selected').removeClass('selected');
 
-	$(this).addClass('selected');
-	$(this).removeClass('button-grey');
-	$(this).addClass('button-blue');
 
-	elementParent.find('.select-evaluation-method:not(.selected)').removeClass('button-blue');
-	elementParent.find('.select-evaluation-method:not(.selected)').addClass('button-grey');
+		$(this).addClass('selected');
+		$(this).removeClass('button-grey');
+		$(this).addClass('button-blue');
 
-	if($(this).hasClass('evaluation-standard')) {
-		$('.cotation-advanced').attr('style', 'display:none');
-		$('.cotation-standard').attr('style', 'display:block');
-		$('.risk-evaluation-calculated-cotation').attr('style', 'display:none')
-		$('.risk-evaluation-method').val('standard');
-		$(this).closest('.risk-evaluation-container').removeClass('advanced');
-		$(this).closest('.risk-evaluation-container').addClass('standard');
-	} else {
-		$('.cotation-standard').attr('style', 'display:none');
-		$('.cotation-advanced').attr('style', 'display:block');
-		$('.risk-evaluation-calculated-cotation').attr('style', 'display:block');
-		$('.risk-evaluation-method').val('advanced');
-		$(this).closest('.risk-evaluation-container').addClass('advanced');
-		$(this).closest('.risk-evaluation-container').removeClass('standard');
+		elementParent.find('.select-evaluation-method:not(.selected)').removeClass('button-blue');
+		elementParent.find('.select-evaluation-method:not(.selected)').addClass('button-grey');
+
+		if ($(this).hasClass('evaluation-standard')) {
+			$('.cotation-advanced').attr('style', 'display:none');
+			$('.cotation-standard').attr('style', 'display:block');
+			$('.risk-evaluation-calculated-cotation').attr('style', 'display:none')
+			$('.risk-evaluation-method').val('standard');
+			$(this).closest('.risk-evaluation-container').removeClass('advanced');
+			$(this).closest('.risk-evaluation-container').addClass('standard');
+		} else {
+			$('.cotation-standard').attr('style', 'display:none');
+			$('.cotation-advanced').attr('style', 'display:block');
+			$('.risk-evaluation-calculated-cotation').attr('style', 'display:block');
+			$('.risk-evaluation-method').val('advanced');
+			$(this).closest('.risk-evaluation-container').addClass('advanced');
+			$(this).closest('.risk-evaluation-container').removeClass('standard');
+		}
 	}
 };
 
