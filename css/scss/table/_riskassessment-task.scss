@@ -12,6 +12,25 @@
 
   .riskassessment-task-content {
     width: 100%;
+
+    .riskassessment-task-author {
+      display: inline-block;
+      width: 25px;
+      min-width: 25px;
+      height: 25px;
+      line-height: 25px;
+      background: rgba(0,0,0,0.5);
+      overflow: hidden;
+      text-transform: uppercase;
+      font-size: 14px;
+      font-weight: 600;
+      border-radius: 50%;
+      vertical-align: sub;
+
+      a {
+        color: #fff !important;
+      }
+    }
   }
   .riskassessment-task-content .riskassessment-task-data {
     display: flex;
@@ -28,23 +47,6 @@
       &:hover {
         text-decoration: underline;
         cursor: pointer;
-      }
-    }
-    .riskassessment-task-author {
-      display: inline-block;
-      width: 25px;
-      min-width: 25px;
-      height: 25px;
-      line-height: 25px;
-      background: rgba(0,0,0,0.5);
-      overflow: hidden;
-      text-transform: uppercase;
-      font-size: 14px;
-      font-weight: 600;
-      border-radius: 50%;
-
-      a {
-        color: #fff !important;
       }
     }
     .riskassessment-task-count {

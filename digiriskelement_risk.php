@@ -390,7 +390,7 @@ if (empty($reshook))
 			// Used on menu or for setup page for example
 			$imgThumbMini = vignette($destfull, $maxwidthmini, $maxheightmini, '_mini', 50, "thumbs");
 		}
-		
+
 		$result = $evaluation->create($user);
 
 		if ($result > 0)
@@ -1233,16 +1233,18 @@ if ($object->id > 0) {
 									<div class="risk-evaluation-data">
 										<!-- BUTTON MODAL RISK EVALUATION LIST  -->
 										<span class="risk-evaluation-reference risk-evaluation-list modal-open" value="<?php echo $risk->id ?>"><?php echo $lastEvaluation->ref; ?></span>
-										<span class="risk-evaluation-author">
-											<?php $user->fetch($lastEvaluation->fk_user_creat); ?>
-											<?php echo $user->getNomUrl( 0, '', 0, 0, 2 ); ?>
-										</span>
 										<span class="risk-evaluation-date">
 											<i class="fas fa-calendar-alt"></i> <?php echo date('d/m/Y', $lastEvaluation->date_creation); ?>
 										</span>
 										<span class="risk-evaluation-count"><i class="fas fa-comments"></i><?php echo count($cotationList) ?></span>
 									</div>
-									<div class="risk-evaluation-comment"><?php echo $lastEvaluation->comment; ?></div>
+									<div class="risk-evaluation-comment">
+										<span class="risk-evaluation-author">
+											<?php $user->fetch($lastEvaluation->fk_user_creat); ?>
+											<?php echo $user->getNomUrl( 0, '', 0, 0, 2 ); ?>
+										</span>
+										<?php echo $lastEvaluation->comment; ?>
+									</div>
 								</div>
 								<!-- BUTTON MODAL RISK EVALUATION ADD  -->
 								<div class="risk-evaluation-add wpeo-button button-square-40 button-primary modal-open" value="<?php echo $risk->id;?>">
@@ -1281,16 +1283,18 @@ if ($object->id > 0) {
 																	<div class="risk-evaluation-content">
 																		<div class="risk-evaluation-data">
 																			<span class="risk-evaluation-reference"><?php echo $cotation->ref; ?></span>
-																			<span class="risk-evaluation-author">
-																				<?php $user->fetch($cotation->fk_user_creat); ?>
-																				<?php echo $user->getNomUrl( 0, '', 0, 0, 2 ); ?>
-																			</span>
 																			<span class="risk-evaluation-date">
 																				<i class="fas fa-calendar-alt"></i> <?php echo date('d/m/Y', $cotation->date_creation); ?>
 																			</span>
 																			<span class="risk-evaluation-count"><i class="fas fa-comments"></i><?php echo count($cotationList) ?></span>
 																		</div>
-																		<div class="risk-evaluation-comment"><?php echo $cotation->comment; ?></div>
+																		<div class="risk-evaluation-comment">
+																			<span class="risk-evaluation-author">
+																				<?php $user->fetch($cotation->fk_user_creat); ?>
+																				<?php echo $user->getNomUrl( 0, '', 0, 0, 2 ); ?>
+																			</span>
+																			<?php echo $cotation->comment; ?>
+																		</div>
 																	</div>
 																</div>
 																<!-- BUTTON MODAL RISK EVALUATION EDIT  -->
@@ -1567,16 +1571,18 @@ if ($object->id > 0) {
 									<div class="riskassessment-task-data">
 										<!-- BUTTON MODAL RISK Assessment Task LIST  -->
 										<span class="riskassessment-task-reference riskassessment-task-list modal-open" value="<?php echo $risk->id ?>"><?php echo $related_task->ref; ?></span>
-										<span class="riskassessment-task-author">
-											<?php $user->fetch($related_task->fk_user_creat); ?>
-											<?php echo $user->getNomUrl( 0, '', 0, 0, 2 ); ?>
-										</span>
 										<span class="riskassessment-task-date">
 											<i class="fas fa-calendar-alt"></i> <?php echo date('d/m/Y', $related_task->date_c); ?>
 										</span>
 										<span class="riskassessment-task-count"><i class="fas fa-comments"></i><?php echo count($risk->get_related_tasks($risk)) ?></span>
 									</div>
-									<div class="riskassessment-task-title"><?php echo $related_task->label; ?></div>
+									<div class="riskassessment-task-title">
+										<span class="riskassessment-task-author">
+											<?php $user->fetch($related_task->fk_user_creat); ?>
+											<?php echo $user->getNomUrl( 0, '', 0, 0, 2 ); ?>
+										</span>
+										<?php echo $related_task->label; ?>
+									</div>
 								</div>
 								<!-- BUTTON MODAL RISK ASSESSMENT TASK ADD  -->
 								<div class="riskassessment-task-add wpeo-button button-square-40 button-primary modal-open" value="<?php echo $risk->id;?>">
@@ -1604,16 +1610,18 @@ if ($object->id > 0) {
 																	<div class="riskassessment-task-content">
 																		<div class="riskassessment-task-data">
 																			<span class="riskassessment-task-reference" value="<?php echo $risk->id ?>"><?php echo $related_task->getNomUrl(); ?></span>
-																			<span class="riskassessment-task-author">
-																				<?php $user->fetch($related_task->fk_user_creat); ?>
-																				<?php echo $user->getNomUrl( 0, '', 0, 0, 2 ); ?>
-																			</span>
 																			<span class="riskassessment-task-date">
 																				<i class="fas fa-calendar-alt"></i> <?php echo date('d/m/Y', $related_task->date_c); ?>
 																			</span>
 																			<span class="riskassessment-task-count"><i class="fas fa-comments"></i><?php echo count($related_tasks) ?></span>
 																		</div>
-																		<div class="riskassessment-task-title"><?php echo $related_task->label; ?></div>
+																		<div class="riskassessment-task-title">
+																			<span class="riskassessment-task-author">
+																				<?php $user->fetch($related_task->fk_user_creat); ?>
+																				<?php echo $user->getNomUrl( 0, '', 0, 0, 2 ); ?>
+																			</span>
+																			<?php echo $related_task->label; ?>
+																		</div>
 																	</div>
 																</div>
 																<!-- BUTTON MODAL RISK ASSESSMENT TASK EDIT  -->

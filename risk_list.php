@@ -837,16 +837,18 @@ while ($i < ($limit ? min($num, $limit) : $num))
 								<div class="risk-evaluation-data">
 									<!-- BUTTON MODAL RISK EVALUATION LIST  -->
 									<span class="risk-evaluation-reference risk-evaluation-list modal-open" value="<?php echo $risk->id ?>"><?php echo $lastEvaluation->ref; ?></span>
-									<span class="risk-evaluation-author">
-										<?php $user->fetch($lastEvaluation->fk_user_creat); ?>
-										<?php echo $user->getNomUrl( 0, '', 0, 0, 2 ); ?>
-									</span>
 									<span class="risk-evaluation-date">
 										<i class="fas fa-calendar-alt"></i> <?php echo date('d/m/Y', $lastEvaluation->date_creation); ?>
 									</span>
 									<span class="risk-evaluation-count"><i class="fas fa-comments"></i><?php echo count($cotationList) ?></span>
 								</div>
-								<div class="risk-evaluation-comment"><?php echo $lastEvaluation->comment; ?></div>
+								<div class="risk-evaluation-comment">
+									<span class="risk-evaluation-author">
+										<?php $user->fetch($lastEvaluation->fk_user_creat); ?>
+										<?php echo $user->getNomUrl( 0, '', 0, 0, 2 ); ?>
+									</span>
+									<?php echo $lastEvaluation->comment; ?>
+								</div>
 							</div>
 							<!-- BUTTON MODAL RISK EVALUATION ADD  -->
 							<div class="risk-evaluation-add wpeo-button button-square-40 button-primary modal-open" value="<?php echo $risk->id ?>">
@@ -1162,16 +1164,18 @@ while ($i < ($limit ? min($num, $limit) : $num))
 									<div class="riskassessment-task-data">
 										<!-- BUTTON MODAL RISK Assessment Task LIST  -->
 										<span class="riskassessment-task-reference riskassessment-task-list modal-open" value="<?php echo $risk->id ?>"><?php echo $related_task->getNomUrl(); ?></span>
-										<span class="riskassessment-task-author">
-												<?php $user->fetch($related_task->fk_user_creat); ?>
-												<?php echo $user->getNomUrl( 0, '', 0, 0, 2 ); ?>
-											</span>
 										<span class="riskassessment-task-date">
 												<i class="fas fa-calendar-alt"></i> <?php echo date('d/m/Y', $related_task->date_c); ?>
 											</span>
 										<span class="riskassessment-task-count"><i class="fas fa-comments"></i><?php echo count($related_tasks) ?></span>
 									</div>
-									<div class="riskassessment-task-title"><?php echo $related_task->label; ?></div>
+									<div class="riskassessment-task-title">
+										<span class="riskassessment-task-author">
+											<?php $user->fetch($related_task->fk_user_creat); ?>
+											<?php echo $user->getNomUrl( 0, '', 0, 0, 2 ); ?>
+										</span>
+										<?php echo $related_task->label; ?>
+									</div>
 								</div>
 								<!-- BUTTON MODAL RISK ASSESSMENT TASK ADD  -->
 								<div class="riskassessment-task-add wpeo-button button-square-40 button-primary modal-open" value="<?php echo $risk->id;?>">
