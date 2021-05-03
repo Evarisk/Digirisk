@@ -129,12 +129,14 @@ if (empty($reshook))
 		$result = $riskassessmentdocument->generateDocument($model, $outputlangs, $hidedetails, $hidedesc, $hideref, $moreparams);
 
 		//Création du dossier à zipper
-		$pathToZip = DOL_DATA_ROOT . '/digiriskdolibarr/riskassessmentdocument/' . $riskassessmentdocument->ref;
+		$entity = ($conf->entity > 1) ? '/' . $conf->entity : '';
+
+		$pathToZip = DOL_DATA_ROOT . $entity . '/digiriskdolibarr/riskassessmentdocument/' . $riskassessmentdocument->ref;
 		dol_mkdir($pathToZip);
 
 		// Ajout du fichier au dossier à zipper
 
-		copy(DOL_DATA_ROOT . '/digiriskdolibarr/riskassessmentdocument/' . $riskassessmentdocument->last_main_doc, $pathToZip . '/' . $riskassessmentdocument->last_main_doc);
+		copy(DOL_DATA_ROOT . $entity . '/digiriskdolibarr/riskassessmentdocument/' . $riskassessmentdocument->last_main_doc, $pathToZip . '/' . $riskassessmentdocument->last_main_doc);
 
 		$digiriskelementlist = $digiriskelement->fetchDigiriskElementFlat(0);
 
@@ -154,7 +156,7 @@ if (empty($reshook))
 				$digiriskelementdocument->generateDocument($conf->global->$digiriskelementdocumentmodel, $outputlangs, $hidedetails, $hidedesc, $hideref, $moreparams);
 
 				// Ajout du fichier au dossier à zipper
-				$sourceFilePath = DOL_DATA_ROOT . '/digiriskdolibarr/' . $subFolder . '/' . $digiriskelementsingle['object']->ref . '/';
+				$sourceFilePath = DOL_DATA_ROOT . $entity . '/digiriskdolibarr/' . $subFolder . '/' . $digiriskelementsingle['object']->ref . '/';
 
 				copy($sourceFilePath . $digiriskelementdocument->last_main_doc, $pathToZip . '/'  . $digiriskelementdocument->last_main_doc);
 			}
