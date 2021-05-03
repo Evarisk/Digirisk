@@ -135,6 +135,7 @@ class modDigiriskdolibarr extends DolibarrModules
 
 		// Constants
 		//TODO ranger les const correctement
+		// TODO insert l'entity avec $conf->entity our mieux gérer le multientity
 		$this->const = array(
 			// CONST CONFIGURATION
 			1 => array('DIGIRISK_GENERAL_MEANS','chaine','','General means', 1),
@@ -781,7 +782,7 @@ class modDigiriskdolibarr extends DolibarrModules
 
 			$standard_id = $digiriskstandard->create($user);
 
-			dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_ACTIVE_STANDARD', $standard_id, 'integer', 0, '', $digiriskstandard->entity);
+			dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_ACTIVE_STANDARD', $standard_id, 'integer', 0, '', $conf->entity);
 		}
 
 		// Create extrafields during init
