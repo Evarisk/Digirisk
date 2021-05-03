@@ -345,27 +345,7 @@ if (empty($reshook))
 		$photo             = GETPOST('photo');
 
 		$risk->fetch($riskID);
-		//photo upload and thumbs generation
-		if ( !empty ($photo) ) {
-			$entity = ($conf->entity > 1) ? '/' . $conf->entity : '';
-			$pathToECMPhoto =  DOL_DATA_ROOT . $entity . '/ecm/digiriskdolibarr/medias/' . $photo;
 
-			$pathToEvaluationPhoto = DOL_DATA_ROOT . $entity . '/digiriskdolibarr/riskassessment/' . $evaluation->ref;
-
-			mkdir($pathToEvaluationPhoto);
-			copy($pathToECMPhoto,$pathToEvaluationPhoto . '/' . $photo);
-
-			global $maxwidthmini, $maxheightmini, $maxwidthsmall,$maxheightsmall ;
-			$destfull = $pathToEvaluationPhoto . '/' . $photo;
-
-			// Create thumbs
-			// We can't use $object->addThumbs here because there is no $object known
-			// Used on logon for example
-			$imgThumbSmall = vignette($destfull, $maxwidthsmall, $maxheightsmall, '_small', 50, "thumbs");
-			// Create mini thumbs for image (Ratio is near 16/9)
-			// Used on menu or for setup page for example
-			$imgThumbMini = vignette($destfull, $maxwidthmini, $maxheightmini, '_mini', 50, "thumbs");
-		}
 
 		$evaluation->photo      = $photo;
 		$evaluation->cotation   = $cotation;
@@ -389,6 +369,28 @@ if (empty($reshook))
 			$evaluation->exposition = $exposition;
 		}
 
+		//photo upload and thumbs generation
+		if ( !empty ($photo) ) {
+			$entity = ($conf->entity > 1) ? '/' . $conf->entity : '';
+			$pathToECMPhoto =  DOL_DATA_ROOT . $entity . '/ecm/digiriskdolibarr/medias/' . $photo;
+
+			$pathToEvaluationPhoto = DOL_DATA_ROOT . $entity . '/digiriskdolibarr/riskassessment/' . $evaluation->ref;
+
+			mkdir($pathToEvaluationPhoto);
+			copy($pathToECMPhoto,$pathToEvaluationPhoto . '/' . $photo);
+
+			global $maxwidthmini, $maxheightmini, $maxwidthsmall,$maxheightsmall ;
+			$destfull = $pathToEvaluationPhoto . '/' . $photo;
+
+			// Create thumbs
+			// We can't use $object->addThumbs here because there is no $object known
+			// Used on logon for example
+			$imgThumbSmall = vignette($destfull, $maxwidthsmall, $maxheightsmall, '_small', 50, "thumbs");
+			// Create mini thumbs for image (Ratio is near 16/9)
+			// Used on menu or for setup page for example
+			$imgThumbMini = vignette($destfull, $maxwidthmini, $maxheightmini, '_mini', 50, "thumbs");
+		}
+		
 		$result = $evaluation->create($user);
 
 		if ($result > 0)
@@ -438,7 +440,7 @@ if (empty($reshook))
 		$pathToECMPhoto =  DOL_DATA_ROOT .$entity. '/ecm/digiriskdolibarr/medias/' . $photo;
 
 		$pathToEvaluationPhoto = DOL_DATA_ROOT . $entity . '/digiriskdolibarr/riskassessment/' . $evaluation->ref;
-		
+
 		if (is_dir($pathToEvaluationPhoto)) {
 			$files = dol_dir_list($pathToEvaluationPhoto);
 			foreach ($files as $file) {
