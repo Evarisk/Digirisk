@@ -1590,7 +1590,7 @@ window.eoxiaJS.riskassessmenttask.createRiskAssessmentTask = function ( event ) 
 window.eoxiaJS.riskassessmenttask.deleteRiskAssessmentTask = function ( event ) {
 	let element = $(this).closest('.riskassessment-task');
 	let deletedRiskAssessmentTaskId = element.attr('value');
-	var r = confirm('Are you sure you want to delete this risk ?');
+	var r = confirm('Are you sure you want to delete this task ?');
 	if (r == true) {
 		element.empty();
 		element.load( document.URL + '&action=deleteRiskAssessmentTask&deletedRiskAssessmentTaskId=' + deletedRiskAssessmentTaskId + ' ' + element);
