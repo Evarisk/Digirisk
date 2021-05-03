@@ -2445,6 +2445,10 @@
   font-size: 14px;
 }
 
+.wpeo-modal.modal-photo .clickable-photo .title {
+  word-break: break-all;
+}
+
 .wpeo-modal.modal-photo .formattachnewfile {
   padding-bottom: 0.5em;
 }
