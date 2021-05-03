@@ -2387,6 +2387,7 @@
   border: 5px solid #fff;
   -webkit-transition: all 0.2s ease-out;
   transition: all 0.2s ease-out;
+  width: 100%;
 }
 
 .wpeo-modal.modal-photo .clickable-photo:hover {

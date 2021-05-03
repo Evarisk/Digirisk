@@ -2,6 +2,7 @@
   .clickable-photo {
     border: 5px solid #fff;
     transition: all 0.2s ease-out;
+    width: 100%;
 
     &:hover {
       cursor: pointer;
