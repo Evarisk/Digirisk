@@ -576,7 +576,7 @@ if ($object->id > 0) {
 							<!-- Modal-Footer -->
 							<div class="modal-footer">
 								<div class="risksign-save wpeo-button button-green save modal-close" value="<?php echo $risksign->id ?>">
-									<span><i class="fas fa-save"></i>  <?php echo $langs->trans('UpdateRiskSign'); ?></span>
+									<span><i class="fas fa-save"></i>  <?php echo $langs->trans('UpdateData'); ?></span>
 								</div>
 							</div>
 						</div>
