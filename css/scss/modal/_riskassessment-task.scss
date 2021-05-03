@@ -1,0 +1,52 @@
+.wpeo-modal[class*="modal-riskassessment-task"] .modal-container {
+  .title {
+    display: block;
+    font-weight: 600;
+    font-size: 13px;
+    margin-bottom: 0.6em;
+    color: rgba(0,0,0,0.8);
+
+    required {
+      font-size: 18px;
+      color: $color__primary;
+      vertical-align: text-top;
+      line-height: 0.9;
+    }
+  }
+  .section-title {
+    font-size: 16px;
+    color: rgba(0,0,0,0.8);
+    font-weight: 600;
+    margin-bottom: 0.6em;
+    display: block;
+  }
+}
+
+.wpeo-modal[class*="modal-riskassessment-task"] .modal-container .riskassessment-task-container {
+  display: flex;
+  padding-bottom: 1em;
+  margin-bottom: 1em;
+  border-bottom: 1px solid rgba(0,0,0,0.2);
+
+  .riskassessment-task {
+    flex-grow: 1;
+
+    input {
+      width: 100%;
+    }
+  }
+}
+
+/** Listing */
+.wpeo-modal .modal-container .riskassessment-task-list {
+  .riskassessment-task > .riskassessment-task-container {
+    display: flex;
+
+    .riskassessment-task-single {
+      width: 100%;
+    }
+    .riskassessment-task-actions {
+      margin-left: auto;
+    }
+  }
+}
