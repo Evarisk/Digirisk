@@ -203,7 +203,7 @@ if (empty($reshook))
 
 				//photo upload and thumbs generation
 				if (!empty ($photo)) {
-					$entity =($conf->entity > 1) ? '/' . $conf->entity : '';
+					$entity = ($conf->entity > 1) ? '/' . $conf->entity : '';
 					$pathToECMPhoto =  DOL_DATA_ROOT .$entity. '/ecm/digiriskdolibarr/medias/' . $photo;
 
 					$pathToEvaluationPhoto = DOL_DATA_ROOT . $entity . '/digiriskdolibarr/riskassessment/' . $evaluation->ref;
@@ -347,8 +347,8 @@ if (empty($reshook))
 		$risk->fetch($riskID);
 		//photo upload and thumbs generation
 		if ( !empty ($photo) ) {
-			$entity =($conf->entity > 1) ? '/' . $conf->entity : '';
-			$pathToECMPhoto =  DOL_DATA_ROOT .$entity. '/ecm/digiriskdolibarr/medias/' . $photo;
+			$entity = ($conf->entity > 1) ? '/' . $conf->entity : '';
+			$pathToECMPhoto =  DOL_DATA_ROOT . $entity . '/ecm/digiriskdolibarr/medias/' . $photo;
 
 			$pathToEvaluationPhoto = DOL_DATA_ROOT . $entity . '/digiriskdolibarr/riskassessment/' . $evaluation->ref;
 
@@ -434,24 +434,29 @@ if (empty($reshook))
 			$evaluation->gravite    = $gravite;
 			$evaluation->exposition = $exposition;
 		}
-		$entity =($conf->entity > 1) ? '/' . $conf->entity : '';
+		$entity = ($conf->entity > 1) ? '/' . $conf->entity : '';
 		$pathToECMPhoto =  DOL_DATA_ROOT .$entity. '/ecm/digiriskdolibarr/medias/' . $photo;
 
 		$pathToEvaluationPhoto = DOL_DATA_ROOT . $entity . '/digiriskdolibarr/riskassessment/' . $evaluation->ref;
+		
+		if (is_dir($pathToEvaluationPhoto)) {
+			$files = dol_dir_list($pathToEvaluationPhoto);
+			foreach ($files as $file) {
+				if (is_file($file['fullname'])) {
+					unlink($file['fullname']);
+				}
+			}
 
-		$files = dol_dir_list($pathToEvaluationPhoto);
-		foreach ($files as $file) {
-			if (is_file($file['fullname'])) {
+			$files = dol_dir_list($pathToEvaluationPhoto . '/thumbs');
+			foreach ($files as $file) {
 				unlink($file['fullname']);
 			}
-		}
 
-		$files = dol_dir_list($pathToEvaluationPhoto . '/thumbs');
-		foreach ($files as $file) {
-			unlink($file['fullname']);
+			copy($pathToECMPhoto,$pathToEvaluationPhoto . '/' . $photo);
+		} else {
+			mkdir($pathToEvaluationPhoto);
+			copy($pathToECMPhoto,$pathToEvaluationPhoto . '/' . $photo);
 		}
-
-		copy($pathToECMPhoto,$pathToEvaluationPhoto . '/' . $photo);
 
 		global $maxwidthmini, $maxheightmini, $maxwidthsmall,$maxheightsmall ;
 		$destfull = $pathToEvaluationPhoto . '/' . $photo;
