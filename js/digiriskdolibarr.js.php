@@ -1536,9 +1536,48 @@ window.eoxiaJS.riskassessmenttask.init = function() {
  * @return {void}
  */
 window.eoxiaJS.riskassessmenttask.event = function() {
+	jQuery( document ).on( 'change', '.riskassessment-task-label', window.eoxiaJS.riskassessmenttask.fillRiskAssessmentTaskLabel);
 	jQuery( document ).on( 'click', '.riskassessment-task-create', window.eoxiaJS.riskassessmenttask.createRiskAssessmentTask);
 	jQuery( document ).on( 'click', '.riskassessment-task-save', window.eoxiaJS.riskassessmenttask.saveRiskAssessmentTask);
 	jQuery( document ).on( 'click', '.riskassessment-task-delete', window.eoxiaJS.riskassessmenttask.deleteRiskAssessmentTask );
+};
+
+/**
+ * Fill riskassessmenttask label
+ *
+ * @since   1.0.0
+ * @version 1.0.0
+ *
+ * @param  {MouseEvent} event [description]
+ * @return {void}
+ */
+window.eoxiaJS.riskassessmenttask.fillRiskAssessmentTaskLabel = function( event ) {
+	var elementParent = jQuery(this).closest('.modal-container');
+
+	// Rend le bouton "active".
+	window.eoxiaJS.riskassessmenttask.haveDataInInput(elementParent);
+};
+
+
+
+/**
+ * Check value on riskAssementTask.
+ *
+ * @since   1.0.0
+ * @version 1.0.0
+ *
+ * @param  elementParent --- Parent element
+ * @return {void}
+ */
+window.eoxiaJS.riskassessmenttask.haveDataInInput = function( elementParent ) {
+	var element = elementParent.parent().parent();
+
+	if (element.hasClass('riskassessment-task-add-modal')) {
+		var riskassessmenttasklabel = element.find('input[name="label"]').val();
+		if ( riskassessmenttasklabel.length ) {
+			element.find('.button-disable').removeClass('button-disable');
+		}
+	}
 };
 
 /**
