@@ -1246,7 +1246,7 @@ if ($object->id > 0) {
 									<div class="risk-evaluation-comment">
 										<span class="risk-evaluation-author">
 											<?php $user->fetch($lastEvaluation->fk_user_creat); ?>
-											<?php echo $user->getNomUrl( 0, '', 0, 0, 2 ); ?>
+											<?php echo getNomUrl( 0, '', 0, 0, 2 , 0,'','',-1, $user); ?>
 										</span>
 										<?php echo $lastEvaluation->comment; ?>
 									</div>
@@ -1296,7 +1296,7 @@ if ($object->id > 0) {
 																		<div class="risk-evaluation-comment">
 																			<span class="risk-evaluation-author">
 																				<?php $user->fetch($cotation->fk_user_creat); ?>
-																				<?php echo $user->getNomUrl( 0, '', 0, 0, 2 ); ?>
+																				<?php echo getNomUrl( 0, '', 0, 0, 2 ,0,'','',-1,$user); ?>
 																			</span>
 																			<?php echo $cotation->comment; ?>
 																		</div>
@@ -1582,7 +1582,7 @@ if ($object->id > 0) {
 									<div class="riskassessment-task-title">
 										<span class="riskassessment-task-author">
 											<?php $user->fetch($related_task->fk_user_creat); ?>
-											<?php echo $user->getNomUrl( 0, '', 0, 0, 2 ); ?>
+											<?php echo getNomUrl( 0, '', 0, 0, 2 ,0,'','',-1,$user); ?>
 										</span>
 										<?php echo $related_task->label; ?>
 									</div>
@@ -1621,7 +1621,7 @@ if ($object->id > 0) {
 																		<div class="riskassessment-task-title">
 																			<span class="riskassessment-task-author">
 																				<?php $user->fetch($related_task->fk_user_creat); ?>
-																				<?php echo $user->getNomUrl( 0, '', 0, 0, 2 ); ?>
+																				<?php echo getNomUrl( 0, '', 0, 0, 2 ,0,'','',-1,$user); ?>
 																			</span>
 																			<?php echo $related_task->label; ?>
 																		</div>
