@@ -1119,8 +1119,7 @@ if ($object->id > 0) {
 		}
 
 		// Show here line of result
-		print '<tr class="oddeven risk-row risk_row_'. $risk->id .'" id="risk_row_'. $risk->id .'">';
-		print '<tr class="risk-row-content-'. $risk->id . '">';
+		print '<tr class="oddeven risk-row risk_row_'. $risk->id .' risk-row-content-'. $risk->id . '" id="risk_row_'. $risk->id .'">';
 		foreach ($risk->fields as $key => $val)
 		{
 			$cssforfield = (empty($val['css']) ? '' : $val['css']);
@@ -1779,7 +1778,6 @@ if ($object->id > 0) {
 
 		print '</td>';
 		if (!$i) $totalarray['nbfield']++;
-		print '</tr>';
 		print '</tr>'."\n";
 		$i++;
 	}
