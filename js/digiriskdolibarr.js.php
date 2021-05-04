@@ -158,9 +158,6 @@ window.eoxiaJS.navigation.event = function() {
 	jQuery( document ).on( 'click', '#slider', window.eoxiaJS.navigation.setUnitActive );
 	jQuery( document ).on( 'click', '#newGroupment', window.eoxiaJS.navigation.redirect );
 	jQuery( document ).on( 'click', '#newWorkunit', window.eoxiaJS.navigation.redirect );
-
-	// Action Button
-	jQuery( document ).on( 'click', '#actionButtonCancelCreate', window.eoxiaJS.navigation.redirectAfterCancelCreate );
 };
 
 /**
@@ -282,42 +279,6 @@ window.eoxiaJS.navigation.redirect = function( event ) {
 
 	//empty and fill object card
 	$('#cardContent').load( URLToGo + ' #cardContent' , id);
-	return false;
-};
-
-/**
- * Redirection après le cancel de l'action create (GP/UT).
- *
- * @since   1.0.0
- * @version 1.0.0
- *
- * @param  {MouseEvent} event Les attributs lors du clic.
- * @return {booleen}
- */
-window.eoxiaJS.navigation.redirectAfterCancelCreate = function( event ) {
-	var params = new window.URLSearchParams(window.location.search);
-	let id = $(params.get('id'));
-
-	//id of parent object if cancel create
-	var parentID = document.URL.split("fk_parent=")[1];
-	var URL = document.URL.split("?action")[0];
-	if (parentID > 0) {
-		//get ID from div selected in left menu
-		history.pushState({ path:  document.URL}, '', URL  + '?id=' + parentID);
-		//change URL without refresh
-	} else {
-		history.pushState({ path:  document.URL}, '', URL);
-	}
-
-	jQuery( '.digirisk-wrap .navigation-container .unit.active' ).removeClass( 'active' );
-	jQuery( `#scores[value="${parentID}"]` ).closest( '.unit' ).addClass( 'active' );
-	jQuery( '#scores' ).closest( '.unit' ).attr( 'value', parentID );
-
-	//empty and fill object card
-	$('#cardContent').empty();
-	$('#cardContent').attr('value', id);
-	$('#cardContent').load( document.URL + ' #cardContent' , id);
-
 	return false;
 };
 

@@ -88,12 +88,12 @@ if (empty($reshook))
 {
 	$error = 0;
 
-	$backurlforlist = dol_buildpath('/digiriskdolibarr/digiriskelement_card.php', 1);
+	$backurlforlist = dol_buildpath('/digiriskdolibarr/digiriskstandard_card.php?id=1', 1);
 
 	if (empty($backtopage) || ($cancel && empty($id))) {
 		if (empty($backtopage) || ($cancel && strpos($backtopage, '__ID__'))) {
-			if (empty($id) && (($action != 'add' && $action != 'create') || $cancel)) $backtopage = $backurlforlist;
-			else $backtopage = dol_buildpath('/digiriskdolibarr/digiriskelement_card.php', 1).'?id='.($id > 0 ? $id : '__ID__');
+			if (empty($fk_parent) && (($action != 'add' && $action != 'create') || $cancel)) $backtopage = $backurlforlist;
+			else $backtopage = dol_buildpath('/digiriskdolibarr/digiriskelement_card.php', 1).'?id='.($fk_parent > 0 ? $fk_parent : '__ID__');
 		}
 	}
 
@@ -200,7 +200,12 @@ if ( $object->element_type == 'groupment' ) {
 	$title_edit    = $langs->trans("ModifyWorkUnit");
 	$object->picto = 'workunit@digiriskdolibarr';
 } else {
-	$title_create = $langs->trans("NewDigiriskElement");
+	$element_type = GETPOST('element_type', 'alpha');
+	if ( $element_type == 'groupment' ){
+		$title_create = $langs->trans("NewGroupment");
+	}else {
+		$title_create  = $langs->trans("NewWorkUnit");
+	}
 }
 
 $help_url = 'FR:Module_DigiriskDolibarr';
@@ -217,10 +222,8 @@ if ($action == 'create')
 
 	print '<form method="POST" action="'.$_SERVER["PHP_SELF"].'">';
 	print '<input type="hidden" name="token" value="'.newToken().'">';
-	print '<input type="hidden" name="backtopage" value="'.$backtopage.'">';
 	print '<input type="hidden" name="action" value="add">';
-
-	if ($backtopage) print '<input type="hidden" name="backtopage" value="'.$backtopage.'">';
+	print '<input type="hidden" name="backtopage" value="'.$backtopage.'">';
 
 	if ($backtopageforcancel) print '<input type="hidden" name="backtopageforcancel" value="'.$backtopageforcancel.'">';
 
@@ -266,8 +269,7 @@ if ($action == 'create')
 	print '<div class="center">';
 	print '<input type="submit" class="button" id ="actionButtonCreate" name="add" value="'.dol_escape_htmltag($langs->trans("Create")).'">';
 	print '&nbsp; ';
-
-	print '<input type="'.($backtopage ? "submit" : "button").'" id ="actionButtonCancelCreate" class="button" name="cancel" value="'.dol_escape_htmltag($langs->trans("Cancel")).'"'.($backtopage ? '' : ' onclick="javascript:history.go(-1)"').'>'; // Cancel for create does not post form if we don't know the backtopage
+	print ' &nbsp; <input type="submit" id ="actionButtonCancelCreate" class="button" name="cancel" value="'.$langs->trans("Cancel").'">';
 	print '</div>';
 
 	print '</form>';
