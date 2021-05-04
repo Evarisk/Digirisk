@@ -54,7 +54,7 @@ $hookmanager->initHooks(array('digiriskelementlistingrisksaction', 'globalcard')
 $object->fetch($id);
 $standard->fetch($conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD);
 
-$upload_dir         = $conf->digiriskdolibarr->multidir_output[isset($object->entity) ? $object->entity : 1];
+$upload_dir         = $conf->digiriskdolibarr->multidir_output[isset($conf->entity) ? $conf->entity : 1];
 $permissiontoread   = $user->rights->digiriskdolibarr->listingrisksaction->read;
 $permissiontoadd    = $user->rights->digiriskdolibarr->listingrisksaction->write;
 $permissiontodelete = $user->rights->digiriskdolibarr->listingrisksaction->delete;
@@ -213,7 +213,7 @@ if ($includedocgeneration) {
 	if ($object->id > 0) {
 		$objref = dol_sanitizeFileName($object->ref);
 		$dir_files = 'listingrisksaction/' . $objref;
-		$filedir = $conf->digiriskdolibarr->dir_output . '/' . $dir_files;
+		$filedir = $upload_dir . '/' . $dir_files;
 		$urlsource = $_SERVER["PHP_SELF"] . '?id=' . $object->id;
 	} else {
 		$dir_files = 'listingrisksaction';
