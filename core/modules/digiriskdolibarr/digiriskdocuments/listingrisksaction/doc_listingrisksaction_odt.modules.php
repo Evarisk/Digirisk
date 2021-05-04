@@ -191,7 +191,7 @@ class doc_listingrisksaction_odt extends ModeleODTListingRisksAction
 		$ref = $mod->getNextValue($object);
 
 		$object->ref = $ref;
-		$id = $object->create($user, false, $digiriskelement);
+		$id = $object->create($user, true, $digiriskelement);
 
 		$object->fetch($id);
 
@@ -304,41 +304,40 @@ class doc_listingrisksaction_odt extends ModeleODTListingRisksAction
 								foreach ($risks as $line) {
 									$evaluation = new RiskAssessment($this->db);
 									$lastEvaluation = $evaluation->fetchFromParent($line->id, 1);
-									if ( !empty ($lastEvaluation) ) {
+									if ( !empty ($lastEvaluation) && $lastEvaluation > 0 ) {
 										$lastEvaluation = array_shift($lastEvaluation);
 										$scale = $lastEvaluation->get_evaluation_scale();
-									}
 
-									if ( $scale == $i ) {
-										$element = new DigiriskElement($this->db);
-										$element->fetch($line->fk_element);
-										$tmparray['nomElement']        = $element->ref . ' - ' . $element->label;
-										$tmparray['nomDanger']         = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $line->get_danger_category($line) . '.png';
-										$tmparray['identifiantRisque'] = $line->ref . ' - ' . $lastEvaluation->ref;
-										$tmparray['quotationRisque']    = $lastEvaluation->cotation ? $lastEvaluation->cotation : '0' ;
-										$tmparray['commentaireRisque'] = dol_print_date( $lastEvaluation->date_creation, '%A %e %B %G %H:%M' ) . ': ' . $lastEvaluation->comment;
+										if ($scale == $i) {
+											$element = new DigiriskElement($this->db);
+											$element->fetch($line->fk_element);
+											$tmparray['nomElement'] = $element->ref . ' - ' . $element->label;
+											$tmparray['nomDanger'] = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $line->get_danger_category($line) . '.png';
+											$tmparray['identifiantRisque'] = $line->ref . ' - ' . $lastEvaluation->ref;
+											$tmparray['quotationRisque'] = $lastEvaluation->cotation ? $lastEvaluation->cotation : '0';
+											$tmparray['commentaireRisque'] = dol_print_date($lastEvaluation->date_creation, '%A %e %B %G %H:%M') . ': ' . $lastEvaluation->comment;
 
-										unset($tmparray['object_fields']);
+											unset($tmparray['object_fields']);
 
-										complete_substitutions_array($tmparray, $outputlangs, $object, $line, "completesubstitutionarray_lines");
-										// Call the ODTSubstitutionLine hook
-										$parameters = array('odfHandler' => &$odfHandler, 'file' => $file, 'object' => $object, 'outputlangs' => $outputlangs, 'substitutionarray' => &$tmparray, 'line' => $line);
-										$reshook = $hookmanager->executeHooks('ODTSubstitutionLine', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
-										foreach ($tmparray as $key => $val) {
-											try {
-												if ( $val == $tmparray['nomDanger'] ) {
-													$listlines->setImage($key, $val);
+											complete_substitutions_array($tmparray, $outputlangs, $object, $line, "completesubstitutionarray_lines");
+											// Call the ODTSubstitutionLine hook
+											$parameters = array('odfHandler' => &$odfHandler, 'file' => $file, 'object' => $object, 'outputlangs' => $outputlangs, 'substitutionarray' => &$tmparray, 'line' => $line);
+											$reshook = $hookmanager->executeHooks('ODTSubstitutionLine', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
+											foreach ($tmparray as $key => $val) {
+												try {
+													if ($val == $tmparray['nomDanger']) {
+														$listlines->setImage($key, $val);
+													} else {
+														$listlines->setVars($key, $val, true, 'UTF-8');
+													}
+												} catch (OdfException $e) {
+													dol_syslog($e->getMessage(), LOG_INFO);
+												} catch (SegmentException $e) {
+													dol_syslog($e->getMessage(), LOG_INFO);
 												}
-												else {
-													$listlines->setVars($key, $val, true, 'UTF-8');
-												}
-											} catch (OdfException $e) {
-												dol_syslog($e->getMessage(), LOG_INFO);
-											} catch (SegmentException $e) {
-												dol_syslog($e->getMessage(), LOG_INFO);
 											}
+											$listlines->merge();
 										}
-										$listlines->merge();
 									}
 								}
 								$odfHandler->mergeSegment($listlines);

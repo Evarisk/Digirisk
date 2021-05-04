@@ -196,7 +196,7 @@ class doc_riskassessmentdocument_odt extends ModeleODTRiskAssessmentDocument
 		$ref = $mod->getNextValue($object);
 
 		$object->ref = $ref;
-		$id = $object->create($user, false, $digiriskelement);
+		$id = $object->create($user, true, $digiriskelement);
 
 		$object->fetch($id);
 
@@ -373,8 +373,11 @@ class doc_riskassessmentdocument_odt extends ModeleODTRiskAssessmentDocument
 							foreach ($risks as $line) {
 								$evaluation = new RiskAssessment($this->db);
 								$lastEvaluation = $evaluation->fetchFromParent($line->id, 1);
-								$lastEvaluation = array_shift($lastEvaluation);
-								$scale = $lastEvaluation->get_evaluation_scale();
+
+								if ( $lastEvaluation > 0 && !empty($lastEvaluation)) {
+									$lastEvaluation = array_shift($lastEvaluation);
+									$scale = $lastEvaluation->get_evaluation_scale();
+								}
 
 								if ( $scale == $i ) {
 									$element = new DigiriskElement($this->db);

@@ -195,7 +195,7 @@ class doc_workunitdocument_odt extends ModeleODTWorkUnitDocument
 		$ref = $mod->getNextValue($object);
 
 		$object->ref = $ref;
-		$id = $object->create($user, false, $digiriskelement);
+		$id = $object->create($user, true, $digiriskelement);
 
 		$object->fetch($id);
 
@@ -299,14 +299,16 @@ class doc_workunitdocument_odt extends ModeleODTWorkUnitDocument
 								foreach ($risks as $line) {
 									$evaluation = new RiskAssessment($this->db);
 									$lastEvaluation = $evaluation->fetchFromParent($line->id, 1);
-									$lastEvaluation = array_shift($lastEvaluation);
-									$scale = $lastEvaluation->get_evaluation_scale();
 
-									if ( $scale == $i ) {
-										$tmparray['nomDanger']         = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $line->get_danger_category($line) . '.png';
+									if ($lastEvaluation > 0 && !empty($lastEvaluation)) {
+										$lastEvaluation = array_shift($lastEvaluation);
+										$scale = $lastEvaluation->get_evaluation_scale();
+
+										if ($scale == $i) {
+										$tmparray['nomDanger'] = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $line->get_danger_category($line) . '.png';
 										$tmparray['identifiantRisque'] = $line->ref . ' - ' . $lastEvaluation->ref;
-										$tmparray['quotationRisque']    = $lastEvaluation->cotation ? $lastEvaluation->cotation : '0' ;
-										$tmparray['commentaireRisque'] = dol_print_date( $lastEvaluation->date_creation, '%A %e %B %G %H:%M' ) . ': ' . $lastEvaluation->comment;
+										$tmparray['quotationRisque'] = $lastEvaluation->cotation ? $lastEvaluation->cotation : '0';
+										$tmparray['commentaireRisque'] = dol_print_date($lastEvaluation->date_creation, '%A %e %B %G %H:%M') . ': ' . $lastEvaluation->comment;
 
 										unset($tmparray['object_fields']);
 
@@ -316,10 +318,9 @@ class doc_workunitdocument_odt extends ModeleODTWorkUnitDocument
 										$reshook = $hookmanager->executeHooks('ODTSubstitutionLine', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
 										foreach ($tmparray as $key => $val) {
 											try {
-												if ( $val == $tmparray['nomDanger'] ) {
+												if ($val == $tmparray['nomDanger']) {
 													$listlines->setImage($key, $val);
-												}
-												else {
+												} else {
 													$listlines->setVars($key, $val, true, 'UTF-8');
 												}
 											} catch (OdfException $e) {
@@ -329,6 +330,7 @@ class doc_workunitdocument_odt extends ModeleODTWorkUnitDocument
 											}
 										}
 										$listlines->merge();
+									}
 									}
 								}
 								$odfHandler->mergeSegment($listlines);
