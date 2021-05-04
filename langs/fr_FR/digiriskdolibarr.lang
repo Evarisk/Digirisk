@@ -295,7 +295,8 @@ RiskAssessmentDocument = Document unique
 RiskAssessmentDocumentDU = Plan d'action Document Unique
 RiskAssessmentDocumentDUDescription = Description du plan d'action Document Unique
 
-AuditDate = Date d'audit
+AuditStartDate = Date de début d'audit
+AuditEndDate = Date de fin d'audit
 Recipient = Destinataire
 Sources = Sources
 ImportantNote = Remarque importante
@@ -428,6 +429,8 @@ EvaluatorList = Liste des évaluateurs
 AssignmentDate = Date d'affectation
 EvaluationDuration = Durée
 UserAssigned = Utilisateur assigné
+AddEvaluatorTitle = Ajout d'un évaluateur
+AddEvaluatorButton = Ajouter l'évaluateur
 
 DigiriskEvaluatorData = Données des Évaluateurs
 EvaluatorDuration = Durée de l'évalution par l'évaluateur

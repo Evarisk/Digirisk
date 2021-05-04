@@ -894,7 +894,7 @@ while ($i < ($limit ? min($num, $limit) : $num))
 						<!-- Modal-Footer -->
 						<div class="modal-footer">
 							<div class="risk-save wpeo-button button-green save modal-close" value="<?php echo $risk->id ?>">
-								<span><i class="fas fa-save"></i>  <?php echo $langs->trans('UpdateRisk'); ?></span>
+								<span><i class="fas fa-save"></i>  <?php echo $langs->trans('UpdateData'); ?></span>
 							</div>
 						</div>
 					</div>
@@ -1124,7 +1124,7 @@ while ($i < ($limit ? min($num, $limit) : $num))
 																	<!-- Modal-Footer -->
 																	<div class="modal-footer">
 																		<div class="wpeo-button risk-evaluation-save button-green">
-																			<i class="fas fa-save"></i> <?php echo $langs->trans('UpdateEvaluation'); ?>
+																			<i class="fas fa-save"></i> <?php echo $langs->trans('UpdateData'); ?>
 																		</div>
 																	</div>
 																</div>
