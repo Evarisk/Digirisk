@@ -147,7 +147,7 @@ if (empty($reshook)) {
 		$evaluator->fk_user         = $evaluatorID;
 		$evaluator->fk_parent       = $object->id;
 
-		$evaluator->create($user);
+		$evaluator->create($user, true);
 	}
 
 	if (!$error && ($massaction == 'delete' || ($action == 'delete' && $confirm == 'yes')) && $permissiontodelete) {
@@ -156,7 +156,7 @@ if (empty($reshook)) {
 				$evaluator->fetch($toselectedid);
 
 
-				$result = $evaluator->delete($user);
+				$result = $evaluator->delete($user, true);
 
 				if ($result > 0) {
 					// Delete evaluator OK

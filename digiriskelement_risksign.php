@@ -174,7 +174,7 @@ if (empty($reshook))
 		$risksign->category    = $riskSignCategory;
 		$risksign->description = $db->escape($riskSignDescription);
 
-		$result = $risksign->update($user);
+		$result = $risksign->update($user, true);
 
 		if ($result > 0) {
 			// Update risksign OK
@@ -193,7 +193,7 @@ if (empty($reshook))
 		if (!empty($toselect)) {
 			foreach ($toselect as $toselectedid) {
 				$risksign->fetch($toselectedid);
-				$result = $risksign->delete($user);
+				$result = $risksign->delete($user, true);
 
 				if ($result > 0) {
 //					// Delete risksign OK
