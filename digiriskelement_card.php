@@ -435,13 +435,6 @@ if ((empty($action) || ($action != 'edit' && $action != 'create')))
 			} else {
 				print '<a class="butActionRefused classfortooltip" href="#" title="' . dol_escape_htmltag($langs->trans("NotEnoughPermissions")) . '">' . $langs->trans('Modify') . '</a>' . "\n";
 			}
-
-			// Delete (need delete permission, or if draft, just need create/modify permission)
-			if ($permissiontodelete) {
-				print '<a class="butActionDelete" href="' . $_SERVER["PHP_SELF"] . '?id=' . $object->id . '&amp;action=delete">' . $langs->trans('Delete') . '</a>' . "\n";
-			} else {
-				print '<a class="butActionRefused classfortooltip" href="#" title="' . dol_escape_htmltag($langs->trans("NotEnoughPermissions")) . '">' . $langs->trans('Delete') . '</a>' . "\n";
-			}
 		}
 		print '</div>' . "\n";
 
