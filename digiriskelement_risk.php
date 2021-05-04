@@ -222,7 +222,7 @@ if (empty($reshook))
 					$imgThumbMini = vignette($destfull, $maxwidthmini, $maxheightmini, '_mini', 50, "thumbs");
 				}
 
-				$result2 = $evaluation->create($user);
+				$result2 = $evaluation->create($user, true);
 
 				if ($result2 > 0) {
 					$tasktitle = GETPOST('tasktitle');
@@ -1263,7 +1263,7 @@ if ($object->id > 0) {
 										<!-- Modal-Header -->
 										<div class="modal-header">
 											<h2 class="modal-title"><?php echo $langs->trans('EvaluationList')  . ' R' . $risk->id ?></h2>
-											<div class="modal-close"><i class="fas fa-times"></i></div>
+											<div class="modal-close modal-refresh"><i class="fas fa-times"></i></div>
 										</div>
 										<!-- MODAL RISK EVALUATION LIST CONTENT -->
 										<div class="modal-content" id="#modalContent" value="<?php echo $risk->id ?>">
@@ -1438,7 +1438,7 @@ if ($object->id > 0) {
 										</div>
 										<!-- Modal-Footer -->
 										<div class="modal-footer">
-											<div class="wpeo-button button-grey modal-close">
+											<div class="wpeo-button button-grey modal-close modal-refresh">
 												<span><?php echo $langs->trans('CloseModal'); ?></span>
 											</div>
 										</div>
