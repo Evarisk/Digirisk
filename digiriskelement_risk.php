@@ -226,27 +226,28 @@ if (empty($reshook))
 
 				if ($result2 > 0) {
 					$tasktitle = GETPOST('tasktitle');
+					if (!empty($tasktitle)) {
+						$extrafields->fetch_name_optionals_label($task->table_element);
 
-					$extrafields->fetch_name_optionals_label($task->table_element);
+						$task->ref = $refTaskMod->getNextValue('', $task);
+						$task->label = $tasktitle;
+						$task->fk_project = $conf->global->DIGIRISKDOLIBARR_DU_PROJECT;
+						$task->date_c = dol_now();
+						$task->array_options['options_fk_risk'] = $risk->id;
 
-					$task->ref                              = $refTaskMod->getNextValue('', $task);
-					$task->label                            = $tasktitle;
-					$task->fk_project                       = $conf->global->DIGIRISKDOLIBARR_DU_PROJECT;
-					$task->date_c                           = dol_now();
-					$task->array_options['options_fk_risk'] = $risk->id;
+						$result3 = $task->create($user, true);
 
-					$result3 = $task->create($user, true);
-
-					if ($result3 > 0) {
-						// Creation risk + evaluation + task OK
-						$urltogo = str_replace('__ID__', $result3, $backtopage);
-						$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
-						header("Location: ".$urltogo);
-						exit;
-					} else {
-						// Creation task KO
-						if (!empty($task->errors)) setEventMessages(null, $task->errors, 'errors');
-						else  setEventMessages($task->error, null, 'errors');
+						if ($result3 > 0) {
+							// Creation risk + evaluation + task OK
+							$urltogo = str_replace('__ID__', $result3, $backtopage);
+							$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
+							header("Location: " . $urltogo);
+							exit;
+						} else {
+							// Creation task KO
+							if (!empty($task->errors)) setEventMessages(null, $task->errors, 'errors');
+							else  setEventMessages($task->error, null, 'errors');
+						}
 					}
 				} else {
 					// Creation evaluation KO
@@ -1690,13 +1691,13 @@ if ($object->id > 0) {
 										<div class="modal-content" id="#modalContent<?php echo $risk->id ?>">
 											<div class="riskassessment-task-container">
 												<div class="riskassessment-task">
-													<span class="title"><?php echo $langs->trans('Label'); ?> <input class="" name="label" value=""></span>
+													<span class="title"><?php echo $langs->trans('Label'); ?> <input type="text" class="riskassessment-task-label" name="label" value=""></span>
 												</div>
 											</div>
 										</div>
 										<!-- Modal-Footer -->
 										<div class="modal-footer">
-											<div class="wpeo-button riskassessment-task-create button-blue" value="<?php echo $risk->id ?>">
+											<div class="wpeo-button riskassessment-task-create button-blue button-disable" value="<?php echo $risk->id ?>">
 												<i class="fas fa-plus"></i> <?php echo $langs->trans('Add'); ?>
 											</div>
 										</div>
@@ -1731,13 +1732,13 @@ if ($object->id > 0) {
 										<div class="modal-content" id="#modalContent<?php echo $risk->id ?>">
 											<div class="riskassessment-task-container">
 												<div class="riskassessment-task">
-													<span class="title"><?php echo $langs->trans('Label'); ?> <input class="" name="label" value=""></span>
+													<span class="title"><?php echo $langs->trans('Label'); ?> <input type="text" class="riskassessment-task-label" name="label" value=""></span>
 												</div>
 											</div>
 										</div>
 										<!-- Modal-Footer -->
 										<div class="modal-footer">
-											<div class="wpeo-button riskassessment-task-create button-blue" value="<?php echo $risk->id ?>">
+											<div class="wpeo-button riskassessment-task-create button-blue button-disable" value="<?php echo $risk->id ?>">
 												<i class="fas fa-plus"></i> <?php echo $langs->trans('Add'); ?>
 											</div>
 										</div>
