@@ -235,15 +235,26 @@ if (empty($reshook)) {
 		$photo = GETPOST('photo');
 
 		$risk->fetch($riskID);
+
+		$evaluation->photo = $photo;
+		$evaluation->cotation = $cotation;
+		$evaluation->fk_risk = $risk->id;
+		$evaluation->status = 1;
+		$evaluation->method = $method;
+		$evaluation->ref = $refEvaluationMod->getNextValue($evaluation);
+		$evaluation->comment = $db->escape($evaluationComment);
+
 		//photo upload and thumbs generation
-		if (!empty ($photo)) {
-			$pathToECMPhoto = DOL_DATA_ROOT . '/ecm/digiriskdolibarr/medias/' . $photo;
-			$pathToEvaluationPhoto = DOL_DATA_ROOT . '/digiriskdolibarr/riskassessment/' . $refEvaluationMod->getNextValue($evaluation);
+		if ( !empty ($photo) ) {
+			$entity = ($conf->entity > 1) ? '/' . $conf->entity : '';
+			$pathToECMPhoto =  DOL_DATA_ROOT . $entity . '/ecm/digiriskdolibarr/medias/' . $photo;
+
+			$pathToEvaluationPhoto = DOL_DATA_ROOT . $entity . '/digiriskdolibarr/riskassessment/' . $evaluation->ref;
 
 			mkdir($pathToEvaluationPhoto);
-			copy($pathToECMPhoto, $pathToEvaluationPhoto . '/' . $photo);
+			copy($pathToECMPhoto,$pathToEvaluationPhoto . '/' . $photo);
 
-			global $maxwidthmini, $maxheightmini, $maxwidthsmall, $maxheightsmall;
+			global $maxwidthmini, $maxheightmini, $maxwidthsmall,$maxheightsmall ;
 			$destfull = $pathToEvaluationPhoto . '/' . $photo;
 
 			// Create thumbs
@@ -254,14 +265,6 @@ if (empty($reshook)) {
 			// Used on menu or for setup page for example
 			$imgThumbMini = vignette($destfull, $maxwidthmini, $maxheightmini, '_mini', 50, "thumbs");
 		}
-
-		$evaluation->photo = $photo;
-		$evaluation->cotation = $cotation;
-		$evaluation->fk_risk = $risk->id;
-		$evaluation->status = 1;
-		$evaluation->method = $method;
-		$evaluation->ref = $refEvaluationMod->getNextValue($evaluation);
-		$evaluation->comment = $db->escape($evaluationComment);
 
 		if ($method == 'advanced') {
 			$formation = GETPOST('formation');
@@ -320,22 +323,27 @@ if (empty($reshook)) {
 			$evaluation->exposition = $exposition;
 		}
 
-		$pathToECMPhoto = DOL_DATA_ROOT . '/ecm/digiriskdolibarr/medias/' . $photo;
-		$pathToEvaluationPhoto = DOL_DATA_ROOT . '/digiriskdolibarr/riskassessment/' . $evaluation->ref;
+		$entity = ($conf->entity > 1) ? '/' . $conf->entity : '';
+		$pathToECMPhoto =  DOL_DATA_ROOT .$entity. '/ecm/digiriskdolibarr/medias/' . $photo;
 
-		$files = dol_dir_list($pathToEvaluationPhoto);
-		foreach ($files as $file) {
-			if (is_file($file['fullname'])) {
+		$pathToEvaluationPhoto = DOL_DATA_ROOT . $entity . '/digiriskdolibarr/riskassessment/' . $evaluation->ref;
+
+		if (is_dir($pathToEvaluationPhoto)) {
+			$files = dol_dir_list($pathToEvaluationPhoto);
+			foreach ($files as $file) {
+				if (is_file($file['fullname'])) {
+					unlink($file['fullname']);
+				}
+			}
+			$files = dol_dir_list($pathToEvaluationPhoto . '/thumbs');
+			foreach ($files as $file) {
 				unlink($file['fullname']);
 			}
+			copy($pathToECMPhoto,$pathToEvaluationPhoto . '/' . $photo);
+		} else {
+			mkdir($pathToEvaluationPhoto);
+			copy($pathToECMPhoto,$pathToEvaluationPhoto . '/' . $photo);
 		}
-
-		$files = dol_dir_list($pathToEvaluationPhoto . '/thumbs');
-		foreach ($files as $file) {
-			unlink($file['fullname']);
-		}
-
-		copy($pathToECMPhoto, $pathToEvaluationPhoto . '/' . $photo);
 
 		global $maxwidthmini, $maxheightmini, $maxwidthsmall, $maxheightsmall;
 		$destfull = $pathToEvaluationPhoto . '/' . $photo;
@@ -522,7 +530,11 @@ print '<input type="hidden" name="sortorder" value="'.$sortorder.'">';
 print '<input type="hidden" name="contextpage" value="'.$contextpage.'">';
 
 $advanced_method_cotation_json  = file_get_contents(DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/js/json/default.json');
-$advanced_method_cotation_array = json_decode($advanced_method_cotation_json, true);
+$advanced_method_cotation_array = json_decode($advanced_method_cotation_json, true); ?>
+
+<div style="display:none">
+<?php include DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/core/tpl/digiriskdolibarr_photo_view.tpl.php'; ?>
+</div> <?php
 
 // Build and execute select
 // --------------------------------------------------------------------
@@ -1133,6 +1145,8 @@ while ($i < ($limit ? min($num, $limit) : $num))
 								</div>
 							</div>
 						</div>
+						<?php $cotation = new RiskAssessment($db);
+						$cotation->method = $lastEvaluation->method; ?>
 						<!-- RISK EVALUATION ADD MODAL-->
 						<div class="risk-evaluation-add-modal">
 							<div class="wpeo-modal modal-risk" id="risk_evaluation_add<?php echo $risk->id?>">
