@@ -1013,7 +1013,7 @@ window.eoxiaJS.risk.haveDataInInput = function( elementParent ) {
 		}
 	} else if (element.hasClass('risk-evaluation-add-modal')) {
 		if ( cotation.val() >= 0 ) {
-			element.find('.button-disable').removeClass('button-disable');
+			element.find('.risk-evaluation-create.button-disable').removeClass('button-disable');
 		}
 	}
 };
