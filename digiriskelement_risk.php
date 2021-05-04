@@ -853,14 +853,14 @@ if ($object->id > 0) {
 							<div class="wpeo-dropdown dropdown-large dropdown-grid category-danger padding">
 								<div class="dropdown-toggle dropdown-add-button button-cotation">
 									<span class="wpeo-button button-square-50 button-grey"><i class="fas fa-exclamation-triangle button-icon"></i><i class="fas fa-plus-circle button-add"></i></span>
-									<img class="danger-category-pic hidden tooltip hover" src="" />
+									<img class="danger-category-pic wpeo-tooltip-event hidden" src="" aria-label=""/>
 								</div>
 								<ul class="dropdown-content wpeo-gridlayout grid-5 grid-gap-0">
 									<?php
 									$dangerCategories = $risk->get_danger_categories();
 									if ( ! empty( $dangerCategories ) ) :
 										foreach ( $dangerCategories as $dangerCategory ) : ?>
-											<li class="item dropdown-item wpeo-tooltip-event classfortooltip" data-is-preset="<?php echo ''; ?>" data-id="<?php echo $dangerCategory['position'] ?>" aria-label="<?php echo $dangerCategory['name'] ?>">
+											<li class="item dropdown-item wpeo-tooltip-event" data-is-preset="<?php echo ''; ?>" data-id="<?php echo $dangerCategory['position'] ?>" aria-label="<?php echo $dangerCategory['name'] ?>">
 												<img src="<?php echo DOL_URL_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $dangerCategory['thumbnail_name'] . '.png'?>" class="attachment-thumbail size-thumbnail photo photowithmargin" alt="" loading="lazy" width="48" height="48">
 											</li>
 										<?php endforeach;

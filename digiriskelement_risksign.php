@@ -372,7 +372,7 @@ if ($object->id > 0) {
 							<div class="wpeo-dropdown dropdown-large dropdown-grid risksign-category-danger padding">
 								<div class="dropdown-toggle dropdown-add-button button-cotation">
 									<span class="wpeo-button button-square-50 button-grey"><i class="fas fa-map-signs button-icon"></i><i class="fas fa-plus-circle button-add"></i></span>
-									<img class="danger-category-pic hidden tooltip hover" src="" />
+									<img class="danger-category-pic wpeo-tooltip-event hidden" src=""  aria-label=""/>
 								</div>
 								<ul class="dropdown-content wpeo-gridlayout grid-5 grid-gap-0">
 									<?php
