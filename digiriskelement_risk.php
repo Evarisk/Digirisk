@@ -1445,6 +1445,8 @@ if ($object->id > 0) {
 									</div>
 								</div>
 							</div>
+							<?php $cotation = new RiskAssessment($db);
+							      $cotation->method = $lastEvaluation->method; ?>
 							<!-- RISK EVALUATION ADD MODAL-->
 							<div class="risk-evaluation-add-modal">
 								<div class="wpeo-modal modal-risk" id="risk_evaluation_add<?php echo $risk->id?>">
