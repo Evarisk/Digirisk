@@ -164,7 +164,7 @@ if (!$object->id) {
 }
 
 // Part to show record
-dol_fiche_head($head, 'elementListingRisksAction', '', -1, $object->picto);
+dol_fiche_head($head, 'elementListingRisksAction', $title, -1, "digiriskdolibarr@digiriskdolibarr");
 
 // Object card
 // ------------------------------------------------------------

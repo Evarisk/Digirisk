@@ -327,7 +327,7 @@ if ((empty($action) || ($action != 'edit' && $action != 'create')))
 
 	$head = digiriskelementPrepareHead($object);
 
-	dol_fiche_head($head, 'elementCard', $langs->trans("DigiriskElement"), -1, $object->picto);
+	dol_fiche_head($head, 'elementCard', $title, -1, "digiriskdolibarr@digiriskdolibarr");
 
 	$formconfirm = '';
 	// Confirmation to delete

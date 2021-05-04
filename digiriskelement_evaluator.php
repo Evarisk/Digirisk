@@ -192,7 +192,7 @@ if ($object->id > 0) {
 	$res = $object->fetch_optionals();
 
 	$head = digiriskelementPrepareHead($object);
-	dol_fiche_head($head, 'elementEvaluator', $langs->trans("Evaluator"), -1, 'digiriskdolibarr@digiriskdolibarr');
+	dol_fiche_head($head, 'elementEvaluator', $title, -1, "digiriskdolibarr@digiriskdolibarr");
 
 	// Object card
 	// ------------------------------------------------------------
