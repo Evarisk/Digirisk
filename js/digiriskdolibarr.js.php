@@ -983,7 +983,7 @@ window.eoxiaJS.risk.selectDanger = function( event ) {
 	element.closest('.wpeo-dropdown').find('.dropdown-toggle span').hide();
 	element.closest('.wpeo-dropdown').find('.dropdown-toggle img').show();
 	element.closest('.wpeo-dropdown').find('.dropdown-toggle img').attr('src', element.find('img').attr('src'));
-	element.closest('.wpeo-dropdown').find('.dropdown-toggle img').attr('aria-label', element.closest('.tooltip').attr('aria-label'));
+	element.closest('.wpeo-dropdown').find('.dropdown-toggle img').attr('aria-label', element.closest('.wpeo-tooltip-event').attr('aria-label'));
 
 	element.closest('.fichecenter').find('.input-hidden-danger').val(element.data('id'));
 
@@ -1690,7 +1690,7 @@ window.eoxiaJS.risksign.selectRiskSign = function( event ) {
 	element.closest('.wpeo-dropdown').find('.dropdown-toggle span').hide();
 	element.closest('.wpeo-dropdown').find('.dropdown-toggle img').show();
 	element.closest('.wpeo-dropdown').find('.dropdown-toggle img').attr('src', element.find('img').attr('src'));
-	element.closest('.wpeo-dropdown').find('.dropdown-toggle img').attr('aria-label', element.closest('.tooltip').attr('aria-label'));
+	element.closest('.wpeo-dropdown').find('.dropdown-toggle img').attr('aria-label', element.closest('.wpeo-tooltip-event').attr('aria-label'));
 
 	element.closest('.fichecenter').find('.input-hidden-danger').val(element.data('id'));
 

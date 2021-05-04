@@ -587,6 +587,7 @@
   background: #ececec !important;
   border-color: #ececec !important;
   color: rgba(0, 0, 0, 0.4) !important;
+  pointer-events: none;
 }
 
 .wpeo-button.button-disable:hover {
