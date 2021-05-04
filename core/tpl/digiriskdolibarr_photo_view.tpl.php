@@ -33,17 +33,29 @@ if (empty($conf) || !is_object($conf))
 	<span class="title"><?php echo $langs->trans('Photo'); ?></span>
 	<div class="risk-evaluation-photo-container wpeo-modal-event tooltip hover">
 		<?php
+		$entity = ($conf->entity > 1) ? $conf->entity . '/'  : '';
+
 		$relativepath = 'digiriskdolibarr/medias';
-		$modulepart = 'ecm';
+		$modulepart = $entity . 'ecm';
 		$path = DOL_URL_ROOT.'/document.php?modulepart=' . $modulepart  . '&attachment=0&file=' . str_replace('/', '%2F', $relativepath) . '/';
 		$nophoto = '/public/theme/common/nophoto.png'; ?>
 		<!-- BUTTON RISK EVALUATION PHOTO MODAL -->
 		<div class="action risk-evaluation-photo default-photo modal-open" value="<?php echo $object->id ?>">
+			<?php if ($cotation->id > 0) {
+				$filearray = dol_dir_list($conf->digiriskdolibarr->multidir_output[$conf->entity].'/'.$lastEvaluation->element.'/'.$lastEvaluation->ref, "files", 0, '', '(\.odt|_preview.*\.png)$', 'position_name', 'asc', 1);
+				if (count($filearray)) {
+					print '<span class="floatleft inline-block valignmiddle divphotoref">'.digirisk_show_photos('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity].'/'.$lastEvaluation->element, 'small', 1, 0, 0, 0, 40, 0, 0, 0, 0, $lastEvaluation->element, $lastEvaluation).'</span>';
+				} else {
+					$nophoto = '/public/theme/common/nophoto.png'; ?>
+					<span class="floatleft inline-block valignmiddle divphotoref"><img class="photodigiriskdolibarr" alt="No photo" src="<?php echo DOL_URL_ROOT.$nophoto ?>"></span>
+				<?php }
+			} else { ?>
 			<span class="floatleft inline-block valignmiddle divphotoref risk-evaluation-photo-single">
 				<input type="hidden" value="<?php echo $path ?>">
 				<input class="filename" type="hidden" value="">
 				<img class="photo maxwidth50"  src="<?php echo DOL_URL_ROOT.'/public/theme/common/nophoto.png' ?>">
 			</span>
+			<?php } ?>
 		</div>
 		<!-- RISK EVALUATION PHOTO MODAL -->
 		<div class="wpeo-modal modal-photo" id="risk_evaluation_photo<?php echo $object->id ?>" data-id="<?php echo $object->id ?>">
