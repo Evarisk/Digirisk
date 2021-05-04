@@ -63,7 +63,7 @@ if (empty($conf) || !is_object($conf))
 				<!-- Modal-Header -->
 				<div class="modal-header">
 					<h2 class="modal-title"><?php echo $langs->trans('ModalAddPhoto') ?></h2>
-					<div class="modal-close modal-refresh"><i class="fas fa-2x fa-times"></i></div>
+					<div class="modal-close"><i class="fas fa-2x fa-times"></i></div>
 				</div>
 				<!-- Modal-Content -->
 				<div class="modal-content" id="#modalContent<?php echo $object->id ?>">
