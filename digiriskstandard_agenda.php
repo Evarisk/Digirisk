@@ -139,7 +139,7 @@ if (true)
 	$head = digiriskstandardPrepareHead($object);
 
 
-	dol_fiche_head($head, 'standardAgenda', $langs->trans("DigiriskStandard"), -1, 'object_'.$object->picto);
+	dol_fiche_head($head, 'standardAgenda', $title, -1, "digiriskdolibarr@digiriskdolibarr");
 
 	// Object card
 	// ------------------------------------------------------------

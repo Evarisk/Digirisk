@@ -152,7 +152,7 @@ digiriskHeader('', $title, $help_url, '', '', '', $morejs); ?>
 $res  = $object->fetch_optionals();
 $head = digiriskstandardPrepareHead($object);
 
-dol_fiche_head($head, 'standardLegalDisplay', '', -1, $object->picto);
+dol_fiche_head($head, 'standardLegalDisplay', $title, -1, "digiriskdolibarr@digiriskdolibarr");
 
 // Object card
 // ------------------------------------------------------------

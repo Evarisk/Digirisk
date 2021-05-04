@@ -2486,3 +2486,7 @@
 .preview-photo {
   z-index: 1003 !important;
 }
+
+.imgTabTitle {
+  max-height: 32px !important;
+}

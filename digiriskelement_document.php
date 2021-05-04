@@ -116,7 +116,7 @@ if (true)
 
 	$head = digiriskelementPrepareHead($object);
 
-	dol_fiche_head($head, 'elementDocument', $langs->trans("DigiriskElement"), -1, $object->picto);
+	dol_fiche_head($head, 'elementDocument', $title, -1, "digiriskdolibarr@digiriskdolibarr");
 
 
 	// Build file list

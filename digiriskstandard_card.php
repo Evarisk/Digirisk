@@ -63,7 +63,7 @@ if ((empty($action) || ($action != 'edit' && $action != 'create')))
 {
 	$head = digiriskstandardPrepareHead($object);
 
-	dol_fiche_head($head, 'standardCard', $langs->trans("Information"), -1, $object->picto);
+	dol_fiche_head($head, 'standardCard', $langs->trans("Information"), -1, "digiriskdolibarr@digiriskdolibarr");
 
 	// Object card
 	$width = 80; $cssclass = 'photoref';

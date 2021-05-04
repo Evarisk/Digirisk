@@ -135,7 +135,7 @@ if (true)
 	$head = digiriskelementPrepareHead($object);
 
 
-	dol_fiche_head($head, 'elementAgenda', $langs->trans("DigiriskElement"), -1, 'object_'.$object->picto);
+	dol_fiche_head($head, 'elementAgenda', $title, -1, "digiriskdolibarr@digiriskdolibarr");
 
 	// Object card
 	// ------------------------------------------------------------
