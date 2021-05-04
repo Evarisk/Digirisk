@@ -1680,7 +1680,7 @@ if ($object->id > 0) {
 									<div class="modal-container wpeo-modal-event">
 										<!-- Modal-Header -->
 										<div class="modal-header">
-											<?php $project->fetch($related_task->fk_project); ?>
+											<?php $project->fetch($conf->global->DIGIRISKDOLIBARR_DU_PROJECT); ?>
 											<h2 class="modal-title"><?php echo $langs->trans('TaskCreate') . ' ' .  $refTaskMod->getNextValue('', $task) . '  ' . $langs->trans('AT') . '  ' . $langs->trans('Project') . '  ' . $project->getNomUrl() ?><i class="fas fa-info-circle wpeo-tooltip-event" aria-label="<?php echo $langs->trans('HowToSetDUProject'); ?>"></i></h2>
 											<div class="modal-close"><i class="fas fa-times"></i></div>
 										</div>
@@ -1721,7 +1721,7 @@ if ($object->id > 0) {
 									<div class="modal-container wpeo-modal-event">
 										<!-- Modal-Header -->
 										<div class="modal-header">
-											<?php $project->fetch($related_task->fk_project); ?>
+											<?php $project->fetch($conf->global->DIGIRISKDOLIBARR_DU_PROJECT); ?>
 											<h2 class="modal-title"><?php echo $langs->trans('TaskCreate') . ' ' .  $refTaskMod->getNextValue('', $task) . '  ' . $langs->trans('AT') . '  ' . $langs->trans('Project') . '  ' . $project->getNomUrl() ?><i class="fas fa-info-circle wpeo-tooltip-event" aria-label="<?php echo $langs->trans('HowToSetDUProject'); ?>"></i></h2>
 											<div class="modal-close"><i class="fas fa-times"></i></div>
 										</div>
