@@ -817,7 +817,7 @@ while ($i < ($limit ? min($num, $limit) : $num))
 
 	// Show here line of result
 	print '<tr class="oddeven risk-row risk_row_'. $risk->id .'" id="risk_row_'. $risk->id .'">';
-
+	print '<tr class="risk-row-content-'. $risk->id . '">';
 	foreach ($risk->fields as $key => $val)
 	{
 		$cssforfield = (empty($val['css']) ? '' : $val['css']);
@@ -1462,6 +1462,7 @@ while ($i < ($limit ? min($num, $limit) : $num))
 
 	print '</td>';
 	if (!$i) $totalarray['nbfield']++;
+	print '</tr>'."\n";
 	print '</tr>'."\n";
 	$i++;
 }
