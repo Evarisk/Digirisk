@@ -572,6 +572,7 @@ if (empty($reshook))
 		$task->label                            = $tasktitle;
 		$task->fk_project                       = $conf->global->DIGIRISKDOLIBARR_DU_PROJECT;
 		$task->date_c                           = dol_now();
+		$task->fk_task_parent                           = 0;
 		$task->array_options['options_fk_risk'] = $riskID;
 
 		$result = $task->create($user, true);
@@ -1503,7 +1504,7 @@ if ($object->id > 0) {
 									<div class="modal-container wpeo-modal-event">
 										<!-- Modal-Header -->
 										<div class="modal-header">
-											<h2 class="modal-title"><?php echo $langs->trans('TaskList') . ' ' . $risk->ref ?></h2>
+											<h2 class="modal-title"><?php echo $langs->trans('TaskList') . ' ' . $risk->ref . '  ' . $langs->trans('AT') . '  ' . $langs->trans('Project') . '  ' . $project->getNomUrl()  ?></h2>
 											<div class="modal-close modal-refresh"><i class="fas fa-times"></i></div>
 										</div>
 										<!-- MODAL RISK ASSESSMENT TASK LIST CONTENT -->
