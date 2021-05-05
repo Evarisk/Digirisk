@@ -42,12 +42,22 @@ if (empty($conf) || !is_object($conf))
 		<!-- BUTTON RISK EVALUATION PHOTO MODAL -->
 		<div class="action risk-evaluation-photo default-photo modal-open" value="<?php echo $object->id ?>">
 			<?php if (isset($cotation->photo)) {
-				$filearray = dol_dir_list($conf->digiriskdolibarr->multidir_output[$conf->entity].'/'.$lastEvaluation->element.'/'.$lastEvaluation->ref, "files", 0, '', '(\.odt|_preview.*\.png)$', 'position_name', 'asc', 1);
+				$filearray = dol_dir_list($conf->digiriskdolibarr->multidir_output[$conf->entity].'/'.$cotation->element.'/'.$cotation->ref, "files", 0, '', '(\.odt|_preview.*\.png)$', 'position_name', 'asc', 1);
 				if (count($filearray)) {
-					print '<span class="floatleft inline-block valignmiddle divphotoref">'.digirisk_show_photos('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity].'/'.$lastEvaluation->element, 'small', 1, 0, 0, 0, 40, 0, 1, 0, 0, $lastEvaluation->element, $lastEvaluation).'</span>';
+					?>
+					<span class="floatleft inline-block valignmiddle divphotoref risk-evaluation-photo-single">
+						<input type="hidden" value="<?php echo $path ?>">
+						<input class="filename" type="hidden" value="">
+						 <?php print digirisk_show_photos('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity].'/'.$cotation->element, 'small', 1, 0, 0, 0, 40, 0, 1, 0, 0, $cotation->element, $cotation); ?>
+					</span>
+					<?php
 				} else {
 					$nophoto = '/public/theme/common/nophoto.png'; ?>
-					<span class="floatleft inline-block valignmiddle divphotoref"><img class="photodigiriskdolibarr" alt="No photo" src="<?php echo DOL_URL_ROOT.$nophoto ?>"></span>
+					<span class="floatleft inline-block valignmiddle divphotoref risk-evaluation-photo-single">
+						<input type="hidden" value="<?php echo $path ?>">
+						<input class="filename" type="hidden" value="">
+						<img class="photodigiriskdolibarr" alt="No photo" src="<?php echo DOL_URL_ROOT.$nophoto ?>">
+					</span>
 				<?php }
 			} else { ?>
 			<span class="floatleft inline-block valignmiddle divphotoref risk-evaluation-photo-single">

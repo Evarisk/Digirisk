@@ -1262,7 +1262,7 @@ if ($object->id > 0) {
 									<div class="modal-container wpeo-modal-event">
 										<!-- Modal-Header -->
 										<div class="modal-header">
-											<h2 class="modal-title"><?php echo $langs->trans('EvaluationList') . $risk->ref ?></h2>
+											<h2 class="modal-title"><?php echo $langs->trans('EvaluationList') . ' ' . $risk->ref ?></h2>
 											<div class="modal-close modal-refresh"><i class="fas fa-times"></i></div>
 										</div>
 										<!-- MODAL RISK EVALUATION LIST CONTENT -->
@@ -1503,7 +1503,7 @@ if ($object->id > 0) {
 									<div class="modal-container wpeo-modal-event">
 										<!-- Modal-Header -->
 										<div class="modal-header">
-											<h2 class="modal-title"><?php echo $langs->trans('TaskList') . $risk->ref ?></h2>
+											<h2 class="modal-title"><?php echo $langs->trans('TaskList') . ' ' . $risk->ref ?></h2>
 											<div class="modal-close modal-refresh"><i class="fas fa-times"></i></div>
 										</div>
 										<!-- MODAL RISK ASSESSMENT TASK LIST CONTENT -->
