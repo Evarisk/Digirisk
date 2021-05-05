@@ -246,6 +246,9 @@ ListingRisksPhotoDigiriskTemplate = ODT par défaut des listing des risques phot
 
 # Data - Donnée
 ListingRisksPhoto = Listing des risques photo
+ReadListingRisksPhoto = Voir les listing des risques avec photos
+CreateListingRisksPhoto = Créer des listing des risques avec photos
+DeleteListingRisksPhoto = Supprimer des listing des risques avec photos
 
 
 
@@ -269,7 +272,9 @@ ListingRisksActionDigiriskTemplate = ODT par défaut des listing des actions cor
 
 # Data - Donnée
 ListingRisksAction = Listing des actions correctives
-
+ReadListingRisksAction = Voir les listing des risques avec actions correctives
+CreateListingRisksAction = Créer des listing des risques avec actions correctives
+DeleteListingRisksAction = Supprimer des listing des risques avec actions correctives
 
 
 #
@@ -356,16 +361,16 @@ WorkUnitDocument = Fiche d'Unité de travail
 
 
 #
-# DigirskElement - Element Digirisk
+# DigiriskElement - Element Digirisk
 #
 
 # Rights  - Droits
-ReadDigiriskElement = Lire un element digirisk
-CreateDigiriskElement = Créer un element digirisk
-DeleteDigiriskElement = Supprimer un element digirisk
+ReadDigiriskElement = Lire un élément digirisk
+CreateDigiriskElement = Créer un élément digirisk
+DeleteDigiriskElement = Supprimer un élément digirisk
 
 # Data - Donnée
-NewDigiriskElement = Nouveau element digirisk
+NewDigiriskElement = Nouveau élément digirisk
 GPUTOrganisation = Organisation des GP/UT
 DigiriskElement = Élément Digirisk
 
@@ -435,7 +440,9 @@ AddEvaluatorButton = Ajouter l'évaluateur
 DigiriskEvaluatorData = Données des Évaluateurs
 EvaluatorDuration = Durée de l'évalution par l'évaluateur
 EvaluatorDurationDescription = Le temps que met l'évaluateur à réaliser son évaluation des risques
-
+ReadEvaluator = Voir les évaluateurs
+CreateEvaluator = Créer des évaluateurs
+DeleteEvaluator = Supprimer des évaluateurs
 
 
 #
@@ -476,6 +483,10 @@ hasPhoto = Photo
 RiskCategory = Catégorie
 DigiriskElementRisksList = Liste des risques
 DigiriskElementRisk = Risques
+
+ReadDigiriskRisk = Voir les risques
+CreateDigiriskRisk = Créer des risques
+DeleteDigiriskRisk = Supprimer des risques
 
 TasksManagement = Gestion des tâches
 SelectProject = Choix du projet
@@ -533,6 +544,10 @@ EditRiskSign = Édition d'une signalisation
 
 DigiriskElementRiskSignList = Liste des signalisations
 DigiriskElementRiskSign = Signalisation
+ReadDigiriskRiskSign = Voir les signalisations
+CreateDigiriskRiskSign = Créer des signalisations
+DeleteDigiriskRiskSign = Supprimer des signalisations
+
 
 
 
