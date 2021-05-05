@@ -344,7 +344,7 @@ if ($object->id > 0) {
 				<!-- Modal-Header -->
 				<div class="modal-header">
 					<h2 class="modal-title"><?php echo $langs->trans('AddEvaluatorTitle') . ' ' . $refEvaluatorMod->getNextValue($evaluator);  ?></h2>
-					<div class="modal-refresh modal-close"><i class="fas fa-times"></i></div>
+					<div class="modal-close"><i class="fas fa-times"></i></div>
 				</div>
 				<!-- Modal-ADD Evaluator Content-->
 				<div class="modal-content" id="#modalContent">
@@ -376,9 +376,15 @@ if ($object->id > 0) {
 				</div>
 				<!-- Modal-Footer -->
 				<div class="modal-footer">
-					<div class="evaluator-create wpeo-button button-primary modal-close">
-						<span><i class="fas fa-plus"></i>  <?php echo $langs->trans('AddEvaluatorButton'); ?></span>
-					</div>
+					<?php if ($permissiontoadd) : ?>
+						<div class="evaluator-create wpeo-button button-primary modal-close">
+							<span><i class="fas fa-plus"></i>  <?php echo $langs->trans('AddEvaluatorButton'); ?></span>
+						</div>
+					<?php else : ?>
+						<div class="wpeo-button button-grey wpeo-tooltip-event" aria-label="<?php echo $langs->trans('PermissionDenied') ?>">
+							<i class="fas fa-plus"></i> <?php echo $langs->trans('AddEvaluatorButton'); ?>
+						</div>
+					<?php endif; ?>
 				</div>
 			</div>
 		</div>

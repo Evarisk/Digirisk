@@ -970,7 +970,7 @@ window.eoxiaJS.risk.haveDataInInput = function( elementParent ) {
 	if (element.hasClass('risk-add-modal')) {
 		var category = element.find('input[name="risk_category_id"]')
 		if ( category.val() >= 0  && cotation.val() >= 0  ) {
-			element.find('.button-disable').removeClass('button-disable');
+			element.find('.risk-create.button-disable').removeClass('button-disable');
 		}
 	} else if (element.hasClass('risk-evaluation-add-modal')) {
 		if ( cotation.val() >= 0 ) {

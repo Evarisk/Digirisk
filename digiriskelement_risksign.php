@@ -361,7 +361,7 @@ if ($object->id > 0) {
 				<!-- Modal-Header -->
 				<div class="modal-header">
 					<h2 class="modal-title"><?php echo $langs->trans('AddRiskSignTitle') . ' ' . $refRiskSignMod->getNextValue($risksign);  ?></h2>
-					<div class="modal-refresh modal-close"><i class="fas fa-times"></i></div>
+					<div class="modal-close"><i class="fas fa-times"></i></div>
 				</div>
 				<!-- Modal-ADD RiskSign Content-->
 				<div class="modal-content" id="#modalContent">
@@ -395,9 +395,15 @@ if ($object->id > 0) {
 				</div>
 				<!-- Modal-Footer -->
 				<div class="modal-footer">
-					<div class="risksign-create wpeo-button button-primary button-disable modal-close">
-						<span><i class="fas fa-plus"></i>  <?php echo $langs->trans('AddRiskSignButton'); ?></span>
-					</div>
+					<?php if ($permissiontoadd) : ?>
+						<div class="risksign-create wpeo-button button-primary button-disable modal-close">
+							<span><i class="fas fa-plus"></i>  <?php echo $langs->trans('AddRiskSignButton'); ?></span>
+						</div>
+					<?php else : ?>
+						<div class="wpeo-button button-grey wpeo-tooltip-event" aria-label="<?php echo $langs->trans('PermissionDenied') ?>">
+							<i class="fas fa-plus"></i> <?php echo $langs->trans('AddRiskSignButton'); ?>
+						</div>
+					<?php endif; ?>
 				</div>
 			</div>
 		</div>
