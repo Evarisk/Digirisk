@@ -145,9 +145,9 @@ class modDigiriskdolibarr extends DolibarrModules
 			165 => array('DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_AUDIT_START_DATE','date','','', $conf->entity),
 			166 => array('DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_AUDIT_END_DATE','date','','', $conf->entity),
 			170 => array('DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_RECIPIENT','integer',0,'', $conf->entity),
-			171 => array('DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_METHOD','chaine','RiskAssessmentMethod','', $conf->entity),
-			172 => array('DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_SOURCES','chaine','RiskAssessmentSources','', $conf->entity),
-			173 => array('DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_IMPORTANT_NOTE','chaine','RiskAssessmentImportantNote','', $conf->entity),
+			171 => array('DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_METHOD','chaine','','', $conf->entity),
+			172 => array('DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_SOURCES','chaine','','', $conf->entity),
+			173 => array('DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_IMPORTANT_NOTE','chaine','','', $conf->entity),
 			174 => array('DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_SITE_PLANS','chaine','','', $conf->entity),
 
 			4 => array('MAIN_AGENDA_ACTIONAUTO_RISKASSESSMENTDOCUMENT_CREATE','chaine',1,'', $conf->entity),
