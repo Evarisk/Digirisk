@@ -954,7 +954,7 @@ while ($i < ($limit ? min($num, $limit) : $num))
 								<div class="risk-evaluation-comment">
 									<span class="risk-evaluation-author">
 										<?php $user->fetch($lastEvaluation->fk_user_creat); ?>
-										<?php echo $user->getNomUrl( 0, '', 0, 0, 2 ); ?>
+										<?php echo getNomUrl( 0, '', 0, 0, 2 , 0,'','',-1, $user); ?>
 									</span>
 									<?php echo $lastEvaluation->comment; ?>
 								</div>
@@ -998,7 +998,7 @@ while ($i < ($limit ? min($num, $limit) : $num))
 																		<span class="risk-evaluation-reference"><?php echo $cotation->ref; ?></span>
 																		<span class="risk-evaluation-author">
 																			<?php $user->fetch($cotation->fk_user_creat); ?>
-																			<?php echo $user->getNomUrl( 0, '', 0, 0, 2 ); ?>
+																			<?php echo getNomUrl( 0, '', 0, 0, 2 , 0,'','',-1, $user); ?>
 																		</span>
 																		<span class="risk-evaluation-date">
 																			<i class="fas fa-calendar-alt"></i> <?php echo date('d/m/Y', $cotation->date_creation); ?>
@@ -1282,7 +1282,7 @@ while ($i < ($limit ? min($num, $limit) : $num))
 								<div class="riskassessment-task-title">
 										<span class="riskassessment-task-author">
 											<?php $user->fetch($related_task->fk_user_creat); ?>
-											<?php echo $user->getNomUrl( 0, '', 0, 0, 2 ); ?>
+											<?php echo getNomUrl( 0, '', 0, 0, 2 , 0,'','',-1, $user); ?>
 										</span>
 									<?php echo $related_task->label; ?>
 								</div>
@@ -1321,7 +1321,7 @@ while ($i < ($limit ? min($num, $limit) : $num))
 																	<div class="riskassessment-task-title">
 																			<span class="riskassessment-task-author">
 																				<?php $user->fetch($related_task->fk_user_creat); ?>
-																				<?php echo $user->getNomUrl( 0, '', 0, 0, 2 ); ?>
+																				<?php echo getNomUrl( 0, '', 0, 0, 2 , 0,'','',-1, $user); ?>
 																			</span>
 																		<?php echo $related_task->label; ?>
 																	</div>
