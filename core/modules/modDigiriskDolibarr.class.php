@@ -308,17 +308,17 @@ class modDigiriskdolibarr extends DolibarrModules
 
 		/* RISK ASSESSMENT DOCUMENT PERMISSIONS */
 		$this->rights[$r][0] = $this->numero.$r;
-		$this->rights[$r][1] = $langs->trans('ReadActionPlan');
+		$this->rights[$r][1] = $langs->trans('ReadRiskAssessmentDocument');
 		$this->rights[$r][4] = 'riskassessmentdocument';
 		$this->rights[$r][5] = 'read';
 		$r++;
 		$this->rights[$r][0] = $this->numero.$r;
-		$this->rights[$r][1] = $langs->trans('CreateActionPlan');
+		$this->rights[$r][1] = $langs->trans('CreateRiskAssessmentDocument');
 		$this->rights[$r][4] = 'riskassessmentdocument';
 		$this->rights[$r][5] = 'write';
 		$r++;
 		$this->rights[$r][0] = $this->numero.$r;
-		$this->rights[$r][1] = $langs->trans('DeleteActionPlan');
+		$this->rights[$r][1] = $langs->trans('DeleteRiskAssessmentDocument');
 		$this->rights[$r][4] = 'riskassessmentdocument';
 		$this->rights[$r][5] = 'delete';
 		$r++;

@@ -58,6 +58,7 @@ DigiriskDocumentsNumberingModule = Modèle de numérotation des documents de Dig
 DigiriskNumberOfModelFilesFound = Nombre de modèles par défaut
 DigiriskConfig = Configuration du module
 DigiriskConfigSociety = Configuration société
+PermissionDenied = Permission refusée
 
 DigiriskDolibarrArea = Page d'index de Digirisk Dolibarr
 
@@ -282,6 +283,10 @@ DeleteListingRisksAction = Supprimer des listing des risques avec actions correc
 #
 
 # Right - Droit
+
+ReadRiskAssessmentDocument = Voir le document unique
+CreateRiskAssessmentDocument = Créer le document unique
+DeleteRiskAssessmentDocument = Supprimer le document unique
 
 # Trigger - Déclencheur
 RiskAssessmentDocumentGeneratedWithDolibarr = Document unique généré avec Dolibarr
