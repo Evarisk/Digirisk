@@ -92,8 +92,8 @@ if (empty($reshook))
 
 	if (empty($backtopage) || ($cancel && empty($id))) {
 		if (empty($backtopage) || ($cancel && strpos($backtopage, '__ID__'))) {
-			if (empty($fk_parent) && (($action != 'add' && $action != 'create') || $cancel)) $backtopage = $backurlforlist;
-			else $backtopage = dol_buildpath('/digiriskdolibarr/digiriskelement_card.php', 1).'?id='.($fk_parent > 0 ? $fk_parent : '__ID__');
+			if (empty($object->id) && (($action != 'add' && $action != 'create') || $cancel)) $backtopage = $backurlforlist;
+			else $backtopage = dol_buildpath('/digiriskdolibarr/digiriskelement_card.php', 1).'?id='.($object->id > 0 ? $object->id : '__ID__');
 		}
 	}
 

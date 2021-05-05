@@ -639,6 +639,12 @@ function digiriskHeader($head = '', $title = '', $help_url = '', $target = '', $
 									jQuery( '#unit'+id ).addClass( 'toggled' );
 								});
 
+								<?php $object->fetch(GETPOST('id')); ?>;
+								var idParent = <?php echo json_encode($object->fk_parent) ;?> ;
+
+								jQuery( '#menu'+idParent).removeClass( 'fa-chevron-right').addClass( 'fa-chevron-down' );
+								jQuery( '#unit'+idParent ).addClass( 'toggled' );
+
 								// Set active unit active
 								jQuery( '.digirisk-wrap .navigation-container .unit.active' ).removeClass( 'active' );
 
@@ -648,6 +654,7 @@ function digiriskHeader($head = '', $title = '', $help_url = '', $target = '', $
 									jQuery( '#unit'  + id ).addClass( 'active' );
 									jQuery( '#unit'  +id  ).closest( '.unit' ).attr( 'value', id );
                                 };
+
 								</script>
 							</ul>
 					</div>
