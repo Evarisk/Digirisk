@@ -255,7 +255,9 @@ class modDigiriskdolibarr extends DolibarrModules
 
 			// CONST TASK
 			160 => array('DIGIRISKDOLIBARR_DU_PROJECT','integer', 0,'', $conf->entity),
-			161 => array('DIGIRISKDOLIBARR_ACTIVE_STANDARD','integer', 0,'', $conf->entity)
+			161 => array('DIGIRISKDOLIBARR_ACTIVE_STANDARD','integer', 0,'', $conf->entity),
+			162 => array('DIGIRISKDOLIBARR_DOCUMENT_MODELS_SET','integer', 0,'', $conf->entity)
+
 		);
 
 		if ( ! isset($conf->digiriskdolibarr ) || ! isset( $conf->digiriskdolibarr->enabled ) ) {
@@ -265,7 +267,6 @@ class modDigiriskdolibarr extends DolibarrModules
 
 		// Array to add new pages in new tabs
 		$this->tabs = array();
-		// Rajouter les onglets ici
 		// Example:
 		$this->tabs[] = array('data'=>'mycompany_admin:+security:Sécurité:@digiriskdolibarr:1:/custom/digiriskdolibarr/admin/securityconf.php');  					// To add a new tab identified by code tabname1
 		$this->tabs[] = array('data'=>'mycompany_admin:+social:Social:@digiriskdolibarr:1:/custom/digiriskdolibarr/admin/socialconf.php');  					// To add a new tab identified by code tabname1
@@ -296,14 +297,7 @@ class modDigiriskdolibarr extends DolibarrModules
 		);
 
 		// Boxes/Widgets
-		$this->boxes = array(
-			//  0 => array(
-			//      'file' => 'digiriskdolibarrwidget1.php@digiriskdolibarr',
-			//      'note' => 'Widget provided by DigiriskDolibarr',
-			//      'enabledbydefaulton' => 'Home',
-			//  ),
-			//  ...
-		);
+		$this->boxes = array();
 
 		// Cronjobs (List of cron jobs entries to add when module is enabled)
 		$this->cronjobs = array();
@@ -510,7 +504,6 @@ class modDigiriskdolibarr extends DolibarrModules
 		// Main menu entries to add
 		$this->menu = array();
 		$r          = 0;
-		/* BEGIN MODULEBUILDER TOPMENU */
 		$this->menu[$r++] = array(
 			'fk_menu'  => '', // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
 			'type'     => 'top', // This is a Top menu entry
@@ -525,81 +518,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			'target'   => '',
 			'user'     => 2, // 0=Menu for internal users, 1=external users, 2=both
 		);
-		/* END MODULEBUILDER TOPMENU */
 
-//		$this->menu[$r++]=array(
-//			'fk_menu'=>'fk_mainmenu=digiriskdolibarr',	    // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
-//			'type'=>'left',			                // This is a Left menu entry
-//			'titre'=>'Documents Légaux',
-//			'mainmenu'=>'digiriskdolibarr',
-//			'leftmenu'=>'documents',
-//			'url'=>'/digiriskdolibarr/legaldocuments_list.php',
-//			'langs'=>'digiriskdolibarr@digiriskdolibarr',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
-//			'position'=>48520+$r,
-//			'enabled'=>'$conf->digiriskdolibarr->enabled',  // Define condition to show or hide menu entry. Use '$conf->digiriskdolibarr->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
-//			'perms'=>'1',			                // Use 'perms'=>'$user->rights->digiriskdolibarr->level1->level2' if you want your menu with a permission rules
-//			'target'=>'',
-//			'user'=>2,				                // 0=Menu for internal users, 1=external users, 2=both
-//		);
-//		$this->menu[$r++]=array(
-//			'fk_menu'=>'fk_mainmenu=digiriskdolibarr,fk_leftmenu=documents',      // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
-//			'type'=>'left',                          // This is a Top menu entry
-//			'titre'=>$langs->trans('LegalDisplay'),
-//			'mainmenu'=>'digiriskdolibarr',
-//			'leftmenu'=>'legaldisplay',
-//			'url'=>'/digiriskdolibarr/legaldisplay_list.php',
-//			'langs'=>'digiriskdolibarr@digiriskdolibarr',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
-//			'position'=>48520+$r,
-//			'enabled'=>'$conf->digiriskdolibarr->enabled',  // Define condition to show or hide menu entry. Use '$conf->digiriskdolibarr->enabled' if entry must be visible if module is enabled.
-//			'perms'=>'1',			                // Use 'perms'=>'$user->rights->digiriskdolibarr->level1->level2' if you want your menu with a permission rules
-//			'target'=>'',
-//			'user'=>2,				                // 0=Menu for internal users, 1=external users, 2=both
-//		);
-//		$this->menu[$r++]=array(
-//			'fk_menu'=>'fk_mainmenu=digiriskdolibarr,fk_leftmenu=documents',      // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
-//			'type'=>'left',			                // This is a Left menu entry
-//			'titre'=>$langs->trans('InformationsSharing'),
-//			'mainmenu'=>'digiriskdolibarr',
-//			'leftmenu'=>'informations',
-//			'url'=>'/digiriskdolibarr/informationssharing_list.php',
-//			'langs'=>'digiriskdolibarr@digiriskdolibarr',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
-//			'position'=>48520+$r,
-//			'enabled'=>'$conf->digiriskdolibarr->enabled',  // Define condition to show or hide menu entry. Use '$conf->digiriskdolibarr->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
-//			'perms'=>'1',			                // Use 'perms'=>'$user->rights->digiriskdolibarr->level1->level2' if you want your menu with a permission rules
-//			'target'=>'',
-//			'user'=>2,				                // 0=Menu for internal users, 1=external users, 2=both
-//		);
-
-
-//		$this->menu[$r++]=array(
-//			'fk_menu'=>'fk_mainmenu=digiriskdolibarr,fk_leftmenu=documents',      // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
-//			'type'=>'left',			                // This is a Left menu entry
-//			'titre'=>$langs->trans('FirePermit'),
-//			'mainmenu'=>'digiriskdolibarr',
-//			'leftmenu'=>'firepermit',
-//			'url'=>'/digiriskdolibarr/firepermit_list.php',
-//			'langs'=>'digiriskdolibarr@digiriskdolibarr',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
-//			'position'=>48520+$r,
-//			'enabled'=>'$conf->digiriskdolibarr->enabled',  // Define condition to show or hide menu entry. Use '$conf->digiriskdolibarr->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
-//			'perms'=>'1',			                // Use 'perms'=>'$user->rights->digiriskdolibarr->level1->level2' if you want your menu with a permission rules
-//			'target'=>'',
-//			'user'=>2,				                // 0=Menu for internal users, 1=external users, 2=both
-//		);
-//
-//		$this->menu[$r++]=array(
-//			'fk_menu'=>'fk_mainmenu=digiriskdolibarr,fk_leftmenu=documents',      // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
-//			'type'=>'left',			                // This is a Left menu entry
-//			'titre'=>$langs->trans('PreventionPlan'),
-//			'mainmenu'=>'digiriskdolibarr',
-//			'leftmenu'=>'preventionplan',
-//			'url'=>'/digiriskdolibarr/preventionplan_list.php',
-//			'langs'=>'digiriskdolibarr@digiriskdolibarr',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
-//			'position'=>48520+$r,
-//			'enabled'=>'$conf->digiriskdolibarr->enabled',  // Define condition to show or hide menu entry. Use '$conf->digiriskdolibarr->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
-//			'perms'=>'1',			                // Use 'perms'=>'$user->rights->digiriskdolibarr->level1->level2' if you want your menu with a permission rules
-//			'target'=>'',
-//			'user'=>2,				                // 0=Menu for internal users, 1=external users, 2=both
-//		);
 		$langs->load("digiriskdolibarr@digiriskdolibarr");
 
 		$this->menu[$r++]=array(
@@ -677,54 +596,6 @@ class modDigiriskdolibarr extends DolibarrModules
 			'user'=>0,				                // 0=Menu for internal users, 1=external users, 2=both
 		);
 
-		// Exports profiles provided by this module
-		/* BEGIN MODULEBUILDER EXPORT DIGIRISKCONST */
-		/*
-		$langs->load("digiriskdolibarr@digiriskdolibarr");
-		$this->export_code[$r]=$this->rights_class.'_'.$r;
-		$this->export_label[$r]='DigiriskConstLines';	// Translation key (used only if key ExportDataset_xxx_z not found)
-		$this->export_icon[$r]='digiriskconst@digiriskdolibarr';
-		// Define $this->export_fields_array, $this->export_TypeFields_array and $this->export_entities_array
-		$keyforclass = 'DigiriskConst'; $keyforclassfile='/digiriskdolibarr/class/digiriskconst.class.php'; $keyforelement='digiriskconst@digiriskdolibarr';
-		include DOL_DOCUMENT_ROOT.'/core/commonfieldsinexport.inc.php';
-		//$this->export_fields_array[$r]['t.fieldtoadd']='FieldToAdd'; $this->export_TypeFields_array[$r]['t.fieldtoadd']='Text';
-		//unset($this->export_fields_array[$r]['t.fieldtoremove']);
-		//$keyforclass = 'DigiriskConstLine'; $keyforclassfile='/digiriskdolibarr/class/digiriskconst.class.php'; $keyforelement='digiriskconstline@digiriskdolibarr'; $keyforalias='tl';
-		//include DOL_DOCUMENT_ROOT.'/core/commonfieldsinexport.inc.php';
-		$keyforselect='digiriskconst'; $keyforaliasextra='extra'; $keyforelement='digiriskconst@digiriskdolibarr';
-		include DOL_DOCUMENT_ROOT.'/core/extrafieldsinexport.inc.php';
-		//$keyforselect='digiriskconstline'; $keyforaliasextra='extraline'; $keyforelement='digiriskconstline@digiriskdolibarr';
-		//include DOL_DOCUMENT_ROOT.'/core/extrafieldsinexport.inc.php';
-		//$this->export_dependencies_array[$r] = array('digiriskconstline'=>array('tl.rowid','tl.ref')); // To force to activate one or several fields if we select some fields that need same (like to select a unique key if we ask a field of a child to avoid the DISTINCT to discard them, or for computed field than need several other fields)
-		//$this->export_special_array[$r] = array('t.field'=>'...');
-		//$this->export_examplevalues_array[$r] = array('t.field'=>'Example');
-		//$this->export_help_array[$r] = array('t.field'=>'FieldDescHelp');
-		$this->export_sql_start[$r]='SELECT DISTINCT ';
-		$this->export_sql_end[$r]  =' FROM '.MAIN_DB_PREFIX.'digiriskconst as t';
-		//$this->export_sql_end[$r]  =' LEFT JOIN '.MAIN_DB_PREFIX.'digiriskconst_line as tl ON tl.fk_digiriskconst = t.rowid';
-		$this->export_sql_end[$r] .=' WHERE 1 = 1';
-		$this->export_sql_end[$r] .=' AND t.entity IN ('.getEntity('digiriskconst').')';
-		$r++; */
-		/* END MODULEBUILDER EXPORT DIGIRISKCONST */
-
-		// Imports profiles provided by this module
-		/* BEGIN MODULEBUILDER IMPORT DIGIRISKCONST */
-		/*
-		 $langs->load("digiriskdolibarr@digiriskdolibarr");
-		 $this->export_code[$r]=$this->rights_class.'_'.$r;
-		 $this->export_label[$r]='DigiriskConstLines';	// Translation key (used only if key ExportDataset_xxx_z not found)
-		 $this->export_icon[$r]='digiriskconst@digiriskdolibarr';
-		 $keyforclass = 'DigiriskConst'; $keyforclassfile='/digiriskdolibarr/class/digiriskconst.class.php'; $keyforelement='digiriskconst@digiriskdolibarr';
-		 include DOL_DOCUMENT_ROOT.'/core/commonfieldsinexport.inc.php';
-		 $keyforselect='digiriskconst'; $keyforaliasextra='extra'; $keyforelement='digiriskconst@digiriskdolibarr';
-		 include DOL_DOCUMENT_ROOT.'/core/extrafieldsinexport.inc.php';
-		 //$this->export_dependencies_array[$r]=array('mysubobject'=>'ts.rowid', 't.myfield'=>array('t.myfield2','t.myfield3')); // To force to activate one or several fields if we select some fields that need same (like to select a unique key if we ask a field of a child to avoid the DISTINCT to discard them, or for computed field than need several other fields)
-		 $this->export_sql_start[$r]='SELECT DISTINCT ';
-		 $this->export_sql_end[$r]  =' FROM '.MAIN_DB_PREFIX.'digiriskconst as t';
-		 $this->export_sql_end[$r] .=' WHERE 1 = 1';
-		 $this->export_sql_end[$r] .=' AND t.entity IN ('.getEntity('digiriskconst').')';
-		 $r++; */
-		/* END MODULEBUILDER IMPORT DIGIRISKCONST */
 	}
 
 	/**
@@ -748,15 +619,20 @@ class modDigiriskdolibarr extends DolibarrModules
 		$this->_load_tables('/digiriskdolibarr/sql/digiriskelement/');
 		$this->_load_tables('/digiriskdolibarr/sql/riskanalysis/');
 
-		addDocumentModel('informationssharing_odt'   ,'informationssharing'   ,'ODT templates','DIGIRISKDOLIBARR_INFORMATIONSSHARING_ADDON_ODT_PATH');
-		addDocumentModel('legaldisplay_odt'          ,'legaldisplay'          ,'ODT templates','DIGIRISKDOLIBARR_LEGALDISPLAY_ADDON_ODT_PATH');
-		addDocumentModel('firepermit_odt'            ,'firepermit'            ,'ODT templates','DIGIRISKDOLIBARR_FIREPERMIT_ADDON_ODT_PATH');
-		addDocumentModel('preventionplan_odt'        ,'preventionplan'        ,'ODT templates','DIGIRISKDOLIBARR_PREVENTIONPLAN_ADDON_ODT_PATH');
-		addDocumentModel('groupmentdocument_odt'     ,'groupmentdocument'     ,'ODT templates','DIGIRISKDOLIBARR_GROUPMENTDOCUMENT_ADDON_ODT_PATH');
-		addDocumentModel('workunitdocument_odt'      ,'workunitdocument'      ,'ODT templates','DIGIRISKDOLIBARR_WORKUNITDOCUMENT_ADDON_ODT_PATH');
-		addDocumentModel('listingrisksaction_odt'    ,'listingrisksaction'    ,'ODT templates','DIGIRISKDOLIBARR_LISTINGRISKSACTION_ADDON_ODT_PATH');
-		addDocumentModel('listingrisksphoto_odt'     ,'listingrisksphoto'     ,'ODT templates','DIGIRISKDOLIBARR_LISTINGRISKSPHOTO_ADDON_ODT_PATH');
-		addDocumentModel('riskassessmentdocument_odt','riskassessmentdocument','ODT templates','DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_ADDON_ODT_PATH');
+		if ( $conf->global->DIGIRISKDOLIBARR_DOCUMENT_MODELS_SET ==  0 ) {
+			addDocumentModel('informationssharing_odt'   ,'informationssharing'   ,'ODT templates','DIGIRISKDOLIBARR_INFORMATIONSSHARING_ADDON_ODT_PATH');
+			addDocumentModel('legaldisplay_odt'          ,'legaldisplay'          ,'ODT templates','DIGIRISKDOLIBARR_LEGALDISPLAY_ADDON_ODT_PATH');
+			addDocumentModel('firepermit_odt'            ,'firepermit'            ,'ODT templates','DIGIRISKDOLIBARR_FIREPERMIT_ADDON_ODT_PATH');
+			addDocumentModel('preventionplan_odt'        ,'preventionplan'        ,'ODT templates','DIGIRISKDOLIBARR_PREVENTIONPLAN_ADDON_ODT_PATH');
+			addDocumentModel('groupmentdocument_odt'     ,'groupmentdocument'     ,'ODT templates','DIGIRISKDOLIBARR_GROUPMENTDOCUMENT_ADDON_ODT_PATH');
+			addDocumentModel('workunitdocument_odt'      ,'workunitdocument'      ,'ODT templates','DIGIRISKDOLIBARR_WORKUNITDOCUMENT_ADDON_ODT_PATH');
+			addDocumentModel('listingrisksaction_odt'    ,'listingrisksaction'    ,'ODT templates','DIGIRISKDOLIBARR_LISTINGRISKSACTION_ADDON_ODT_PATH');
+			addDocumentModel('listingrisksphoto_odt'     ,'listingrisksphoto'     ,'ODT templates','DIGIRISKDOLIBARR_LISTINGRISKSPHOTO_ADDON_ODT_PATH');
+			addDocumentModel('riskassessmentdocument_odt','riskassessmentdocument','ODT templates','DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_ADDON_ODT_PATH');
+
+			dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_DOCUMENT_MODELS_SET', 1, 'integer', 0, '', $conf->entity);
+		}
+
 
 		if ( $conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD ==  0 ) {
 			dol_include_once('/digiriskdolibarr/class/digiriskstandard.class.php');
