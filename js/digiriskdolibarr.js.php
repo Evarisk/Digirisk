@@ -1867,7 +1867,7 @@ window.eoxiaJS.evaluator.event = function() {
  * @return {void}
  */
 window.eoxiaJS.evaluator.selectUser = function( event ) {
-	$('.user-selected').val(this.value)
+	$(this).closest('.evaluator-user').find('.user-selected').val(this.value)
 };
 /**
  * Action create evaluator.
@@ -1899,8 +1899,22 @@ window.eoxiaJS.evaluator.createEvaluator = function ( event ) {
 	if (duration !== 0) {
 		durationPost = '&duration=' + duration;
 	}
+	$.ajax({
+		url: document.URL + '&action=add' + durationPost + datePost + userPost,
+		type: "POST",
+		processData: false,
+		contentType: false
+	});
 
-	$('.fichecenter').load( document.URL + '&action=add' + durationPost + datePost + userPost + ' .fichecenter');
+	let elementParent = $(this).closest('.fichecenter');
+
+	elementParent.empty();
+	window.eoxiaJS.loader.display(elementParent);
+
+	setTimeout(function(){
+		elementParent.load( document.URL + ' .fichecenter');
+		elementParent.removeClass('wpeo-loader');
+	}, 800);
 };
 
 /**

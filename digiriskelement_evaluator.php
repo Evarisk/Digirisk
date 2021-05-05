@@ -163,13 +163,14 @@ if (empty($reshook)) {
 					$urltogo = str_replace('__ID__', $result, $backtopage);
 					$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
 					header("Location: ".$urltogo);
-					exit;
 				} else {
 					// Delete evaluator KO
 					if (!empty($evaluator->errors)) setEventMessages(null, $evaluator->errors, 'errors');
 					else  setEventMessages($evaluator->error, null, 'errors');
 				}
 			}
+			header("Location: ".$urltogo);
+			exit;
 		}
 	}
 }
@@ -351,7 +352,14 @@ if ($object->id > 0) {
 						<div class="evaluator-user">
 							<span class="title"><?php echo $langs->trans('SelectUser'); ?><required>*</required></span>
 							<input type="hidden" class="user-selected" value="<?php echo $user->id ?>">
-							<?php print $form->select_dolusers(); ?>
+							<select class="minwidth200" id="userid" name="userid" data-select2-id="userid">
+								<?php
+								$userlist = $form->select_dolusers('','userid',0 , null, 0,'','','0',0,0,'',0, '','',0,1,false);
+
+								foreach ($userlist as $key => $userselect) { ?>
+									<option value="<?php echo $key; ?>" data-select2-id="<?php echo $key.$userselect; ?>"><?php echo $userselect; ?></option>
+								<?php } ?>
+							</select>
 						</div>
 						<div class="evaluator-assignment">
 							<div class="evaluator-duration">
@@ -500,7 +508,9 @@ if ($object->id > 0) {
 
 
 				}  elseif ($key == 'fk_user') {
-					print '<td style="width:2%">' .$user->getNomUrl($evaluator->$key );
+
+					$user->fetch($evaluator->$key);
+					print '<td style="width:2%">' .$user->getNomUrl(1 );
 
 
 				}  elseif ($key == 'fk_parent') {
