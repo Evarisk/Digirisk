@@ -23,6 +23,7 @@
  */
 
 require_once DOL_DOCUMENT_ROOT . '/core/lib/files.lib.php';
+require_once DOL_DOCUMENT_ROOT . '/core/lib/images.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/company.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/doc.lib.php';
 dol_include_once('/custom/digiriskdolibarr/lib/files.lib.php');
@@ -295,6 +296,7 @@ class doc_listingrisksaction_odt extends ModeleODTListingRisksAction
 				if ($foundtagforlines)
 				{
 					$risk = new Risk($this->db);
+
 					if ( ! empty( $digiriskelement ) ) {
 						$risks = $risk->fetchRisksOrderedByCotation($digiriskelement->id, true);
 						if ($risks > 0 && !empty($risks)) {
@@ -302,6 +304,10 @@ class doc_listingrisksaction_odt extends ModeleODTListingRisksAction
 								$listlines = $odfHandler->setSegment('risk' . $i);
 
 								foreach ($risks as $line) {
+
+									$tmparray['actionPreventionUncompleted'] = "";
+									$tmparray['actionPreventionCompleted'] = "";
+
 									$evaluation = new RiskAssessment($this->db);
 									$lastEvaluation = $evaluation->fetchFromParent($line->id, 1);
 									if ( !empty ($lastEvaluation) && $lastEvaluation > 0 ) {
@@ -317,6 +323,21 @@ class doc_listingrisksaction_odt extends ModeleODTListingRisksAction
 											$tmparray['quotationRisque'] = $lastEvaluation->cotation ? $lastEvaluation->cotation : '0';
 											$tmparray['commentaireRisque'] = dol_print_date($lastEvaluation->date_creation, '%A %e %B %G %H:%M') . ': ' . $lastEvaluation->comment;
 
+											$related_tasks = $line->get_related_tasks($line);
+
+											if (!empty($related_tasks)) {
+												foreach ($related_tasks as $related_task) {
+													if ($related_task->progress == 100) {
+														$tmparray['actionPreventionCompleted'] .= $related_task->label . "\n";
+													} else {
+														$tmparray['actionPreventionUncompleted'] .= $related_task->label . "\n";
+													}
+												}
+											} else {
+												$tmparray['actionPreventionUncompleted'] = "";
+												$tmparray['actionPreventionCompleted'] = "";
+											}
+
 											unset($tmparray['object_fields']);
 
 											complete_substitutions_array($tmparray, $outputlangs, $object, $line, "completesubstitutionarray_lines");
@@ -326,6 +347,13 @@ class doc_listingrisksaction_odt extends ModeleODTListingRisksAction
 											foreach ($tmparray as $key => $val) {
 												try {
 													if ($val == $tmparray['nomDanger']) {
+														$list = getimagesize($val);
+														$newWidth = 50;
+														if ($list[0]) {
+															$ratio = $newWidth / $list[0];
+															$newHeight = $ratio * $list[1];
+															dol_imageResizeOrCrop($val, 0, $newWidth, $newHeight);
+														}
 														$listlines->setImage($key, $val);
 													} else {
 														$listlines->setVars($key, $val, true, 'UTF-8');
@@ -351,42 +379,68 @@ class doc_listingrisksaction_odt extends ModeleODTListingRisksAction
 								$listlines = $odfHandler->setSegment('risk' . $i);
 
 								foreach ($risks as $line) {
+
+									$tmparray['actionPreventionUncompleted'] = "";
+									$tmparray['actionPreventionCompleted'] = "";
+
 									$evaluation = new RiskAssessment($this->db);
 									$lastEvaluation = $evaluation->fetchFromParent($line->id, 1);
-									$lastEvaluation = array_shift($lastEvaluation);
-									$scale = $lastEvaluation->get_evaluation_scale();
+									if ( !empty ($lastEvaluation) && $lastEvaluation > 0 ) {
+										$lastEvaluation = array_shift($lastEvaluation);
+										$scale = $lastEvaluation->get_evaluation_scale();
 
-									if ( $scale == $i ) {
-										$element = new DigiriskElement($this->db);
-										$element->fetch($line->fk_element);
-										$tmparray['nomElement']        = $element->ref . ' - ' . $element->label;
-										$tmparray['nomDanger']         = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $line->get_danger_category($line) . '.png';
-										$tmparray['identifiantRisque'] = $line->ref . ' - ' . $lastEvaluation->ref;
-										$tmparray['quotationRisque']    = $lastEvaluation->cotation ? $lastEvaluation->cotation : '0' ;
-										$tmparray['commentaireRisque'] = dol_print_date( $lastEvaluation->date_creation, '%A %e %B %G %H:%M' ) . ': ' . $lastEvaluation->comment;
+										if ($scale == $i) {
+											$element = new DigiriskElement($this->db);
+											$element->fetch($line->fk_element);
+											$tmparray['nomElement'] = $element->ref . ' - ' . $element->label;
+											$tmparray['nomDanger'] = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $line->get_danger_category($line) . '.png';
+											$tmparray['identifiantRisque'] = $line->ref . ' - ' . $lastEvaluation->ref;
+											$tmparray['quotationRisque'] = $lastEvaluation->cotation ? $lastEvaluation->cotation : '0';
+											$tmparray['commentaireRisque'] = dol_print_date($lastEvaluation->date_creation, '%A %e %B %G %H:%M') . ': ' . $lastEvaluation->comment;
 
-										unset($tmparray['object_fields']);
+											$related_tasks = $line->get_related_tasks($line);
 
-										complete_substitutions_array($tmparray, $outputlangs, $object, $line, "completesubstitutionarray_lines");
-										// Call the ODTSubstitutionLine hook
-										$parameters = array('odfHandler' => &$odfHandler, 'file' => $file, 'object' => $object, 'outputlangs' => $outputlangs, 'substitutionarray' => &$tmparray, 'line' => $line);
-										$reshook = $hookmanager->executeHooks('ODTSubstitutionLine', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
-										foreach ($tmparray as $key => $val) {
-											try {
-												if (file_exists($val)) {
-													dol_imageResizeOrCrop($val, 0, 200, 200);
-													$listlines->setImage($key, $val);
-												} else {
-													$listlines->setVars($key, $val, true, 'UTF-8');
+											if (!empty($related_tasks)) {
+												foreach ($related_tasks as $related_task) {
+													if ($related_task->progress == 100) {
+														$tmparray['actionPreventionCompleted'] .= $related_task->label . "\n";
+													} else {
+														$tmparray['actionPreventionUncompleted'] .= $related_task->label . "\n";
+													}
 												}
-
-											} catch (OdfException $e) {
-												dol_syslog($e->getMessage(), LOG_INFO);
-											} catch (SegmentException $e) {
-												dol_syslog($e->getMessage(), LOG_INFO);
+											} else {
+												$tmparray['actionPreventionUncompleted'] = "";
+												$tmparray['actionPreventionCompleted'] = "";
 											}
+
+											unset($tmparray['object_fields']);
+
+											complete_substitutions_array($tmparray, $outputlangs, $object, $line, "completesubstitutionarray_lines");
+											// Call the ODTSubstitutionLine hook
+											$parameters = array('odfHandler' => &$odfHandler, 'file' => $file, 'object' => $object, 'outputlangs' => $outputlangs, 'substitutionarray' => &$tmparray, 'line' => $line);
+											$reshook = $hookmanager->executeHooks('ODTSubstitutionLine', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
+											foreach ($tmparray as $key => $val) {
+												try {
+													if ($val == $tmparray['nomDanger']) {
+														$list = getimagesize($val);
+														$newWidth = 50;
+														if ($list[0]) {
+															$ratio = $newWidth / $list[0];
+															$newHeight = $ratio * $list[1];
+															dol_imageResizeOrCrop($val, 0, $newWidth, $newHeight);
+														}
+														$listlines->setImage($key, $val);
+													} else {
+														$listlines->setVars($key, $val, true, 'UTF-8');
+													}
+												} catch (OdfException $e) {
+													dol_syslog($e->getMessage(), LOG_INFO);
+												} catch (SegmentException $e) {
+													dol_syslog($e->getMessage(), LOG_INFO);
+												}
+											}
+											$listlines->merge();
 										}
-										$listlines->merge();
 									}
 								}
 								$odfHandler->mergeSegment($listlines);

@@ -92,7 +92,11 @@ if (empty($reshook))
 
 		$model      = GETPOST('model', 'alpha');
 
-		$moreparams = $object;
+		if ( $id > 0 ) {
+			$moreparams = $object;
+		} else {
+			$moreparams = "";
+		}
 
 		$result = $listingrisksphoto->generateDocument($model, $outputlangs, $hidedetails, $hidedesc, $hideref, $moreparams);
 		if ($result <= 0) {

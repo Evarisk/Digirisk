@@ -23,6 +23,7 @@
  */
 
 require_once DOL_DOCUMENT_ROOT . '/core/lib/files.lib.php';
+require_once DOL_DOCUMENT_ROOT . '/core/lib/images.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/company.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/doc.lib.php';
 dol_include_once('/custom/digiriskdolibarr/lib/files.lib.php');
@@ -371,6 +372,9 @@ class doc_riskassessmentdocument_odt extends ModeleODTRiskAssessmentDocument
 							$listlines = $odfHandler->setSegment('risq' . $i);
 
 							foreach ($risks as $line) {
+								$tmparray['actionPreventionUncompleted'] = "";
+								$tmparray['actionPreventionCompleted'] = "";
+
 								$evaluation = new RiskAssessment($this->db);
 								$lastEvaluation = $evaluation->fetchFromParent($line->id, 1);
 
@@ -388,6 +392,21 @@ class doc_riskassessmentdocument_odt extends ModeleODTRiskAssessmentDocument
 									$tmparray['quotationRisque']    = $lastEvaluation->cotation ? $lastEvaluation->cotation : '0' ;
 									$tmparray['commentaireRisque'] = dol_print_date( $lastEvaluation->date_creation, '%A %e %B %G %H:%M' ) . ': ' . $lastEvaluation->comment;
 
+									$related_tasks = $line->get_related_tasks($line);
+
+									if (!empty($related_tasks)) {
+										foreach ($related_tasks as $related_task) {
+											if ($related_task->progress == 100) {
+												$tmparray['actionPreventionCompleted'] .= $related_task->label . "\n";
+											} else {
+												$tmparray['actionPreventionUncompleted'] .= $related_task->label . "\n";
+											}
+										}
+									} else {
+										$tmparray['actionPreventionUncompleted'] = "";
+										$tmparray['actionPreventionCompleted'] = "";
+									}
+
 									unset($tmparray['object_fields']);
 
 									complete_substitutions_array($tmparray, $outputlangs, $object, $line, "completesubstitutionarray_lines");
@@ -396,7 +415,14 @@ class doc_riskassessmentdocument_odt extends ModeleODTRiskAssessmentDocument
 									$reshook = $hookmanager->executeHooks('ODTSubstitutionLine', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
 									foreach ($tmparray as $key => $val) {
 										try {
-											if (file_exists($val)) {
+											if ($val == $tmparray['nomDanger']) {
+												$list = getimagesize($tmparray['nomDanger']);
+												$newWidth = 50;
+												if ($list[0]) {
+													$ratio = $newWidth / $list[0];
+													$newHeight = $ratio * $list[1];
+													dol_imageResizeOrCrop($val, 0, $newWidth, $newHeight);
+												}
 												$listlines->setImage($key, $val);
 											} else {
 												$listlines->setVars($key, $val, true, 'UTF-8');
