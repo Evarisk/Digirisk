@@ -335,8 +335,11 @@ if ($object->id > 0) {
 	?>
 
 	<!-- BUTTON MODAL EVALUATOR ADD -->
-	<?php $newcardbutton = '<div class="evaluator-add wpeo-button button-square-40 button-blue modal-open" value="'.$object->id.'"><i class="fas fa-user-check button-icon"></i><i class="fas fa-plus-circle button-add animated"></i></div>' ?>
-
+	<?php if ($permissiontoadd) {
+		$newcardbutton = '<div class="evaluator-add wpeo-button button-square-40 button-blue modal-open" value="'.$object->id.'"><i class="fas fa-user-check button-icon"></i><i class="fas fa-plus-circle button-add animated"></i></div>';
+	} else {
+		$newcardbutton = '<div class="wpeo-button button-square-40 button-grey" value="'.$object->id.'"><i class="fas fa-user-check button-icon wpeo-tooltip-event" aria-label="'. $langs->trans('PermissionDenied').'"></i><i class="fas fa-plus-circle button-add animated"></i></div>';
+	} ?>
 	<!-- EVALUATOR ADD MODAL-->
 	<div class="evaluator-add-modal" value="<?php echo $object->id ?>">
 		<div class="wpeo-modal modal-evaluator-0" id="evaluator_add<?php echo $object->id ?>">

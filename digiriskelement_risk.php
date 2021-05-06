@@ -835,8 +835,11 @@ if ($object->id > 0) {
 	$massactionbutton = $form->selectMassAction('', $arrayofmassactions); ?>
 
 	<!-- BUTTON MODAL RISK ADD -->
-	<?php $newcardbutton = '<div class="risk-add wpeo-button button-square-40 button-blue modal-open" value="'.$object->id.'"><i class="fas fa-exclamation-triangle button-icon"></i><i class="fas fa-plus-circle button-add animated"></i></div>' ?>
-
+	<?php if ($permissiontoadd) {
+		$newcardbutton = '<div class="risk-add wpeo-button button-square-40 button-blue modal-open" value="'.$object->id.'"><i class="fas fa-exclamation-triangle button-icon"></i><i class="fas fa-plus-circle button-add animated"></i></div>';
+	} else {
+		$newcardbutton = '<div class="wpeo-button button-square-40 button-grey" value="'.$object->id.'"><i class="fas fa-exclamation-triangle button-icon wpeo-tooltip-event" aria-label="'. $langs->trans('PermissionDenied').'"></i><i class="fas fa-plus-circle button-add animated"></i></div>';
+	} ?>
 	<!-- RISK ADD MODAL-->
 	<div class="risk-add-modal" value="<?php echo $object->id ?>">
 		<div class="wpeo-modal modal-risk-0" id="risk_add<?php echo $object->id ?>">
