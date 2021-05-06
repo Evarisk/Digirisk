@@ -225,23 +225,42 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				break;
 
 			case 'LISTINGRISKSACTION_GENERATE' :
-			dol_syslog("Trigger '".$this->name."' for action '$action' launched by ".__FILE__.". id=".$object->id);
-			require_once DOL_DOCUMENT_ROOT.'/comm/action/class/actioncomm.class.php';
-			$now = dol_now();
-			$actioncomm = new ActionComm($this->db);
+				dol_syslog("Trigger '".$this->name."' for action '$action' launched by ".__FILE__.". id=".$object->id);
+				require_once DOL_DOCUMENT_ROOT.'/comm/action/class/actioncomm.class.php';
+				$now = dol_now();
+				$actioncomm = new ActionComm($this->db);
 
-			$actioncomm->elementtype = $object->parent_type . '@digiriskdolibarr';
-			$actioncomm->elementid   = $object->parent_id;
-			$actioncomm->code        = 'AC_LISTINGRISKSACTION_GENERATE';
-			$actioncomm->type_code   = 'AC_OTH_AUTO';
-			$actioncomm->label       = $langs->trans('ListingRisksActionGeneratedWithDolibarr');
-			$actioncomm->datep       = $now;
-			$actioncomm->fk_element  = $object->parent_id;
-			$actioncomm->userownerid = $user->id;
-			$actioncomm->percentage  = -1;
+				$actioncomm->elementtype = $object->parent_type . '@digiriskdolibarr';
+				$actioncomm->elementid   = $object->parent_id;
+				$actioncomm->code        = 'AC_LISTINGRISKSACTION_GENERATE';
+				$actioncomm->type_code   = 'AC_OTH_AUTO';
+				$actioncomm->label       = $langs->trans('ListingRisksActionGeneratedWithDolibarr');
+				$actioncomm->datep       = $now;
+				$actioncomm->fk_element  = $object->parent_id;
+				$actioncomm->userownerid = $user->id;
+				$actioncomm->percentage  = -1;
 
-			$actioncomm->create($user);
+				$actioncomm->create($user);
 			break;
+
+			case 'RISKASSESSMENTDOCUMENT_GENERATE' :
+				dol_syslog("Trigger '".$this->name."' for action '$action' launched by ".__FILE__.". id=".$object->id);
+				require_once DOL_DOCUMENT_ROOT.'/comm/action/class/actioncomm.class.php';
+				$now = dol_now();
+				$actioncomm = new ActionComm($this->db);
+
+				$actioncomm->elementtype = $object->parent_type . '@digiriskdolibarr';
+				$actioncomm->elementid   = $object->parent_id;
+				$actioncomm->code        = 'AC_RISKASSESSMENTDOCUMENT_GENERATE';
+				$actioncomm->type_code   = 'AC_OTH_AUTO';
+				$actioncomm->label       = $langs->trans('RiskAssessmentDocumentGeneratedWithDolibarr');
+				$actioncomm->datep       = $now;
+				$actioncomm->fk_element  = $object->parent_id;
+				$actioncomm->userownerid = $user->id;
+				$actioncomm->percentage  = -1;
+
+				$actioncomm->create($user);
+				break;
 
 			default:
 				dol_syslog("Trigger '".$this->name."' for action '$action' launched by ".__FILE__.". id=".$object->id);
