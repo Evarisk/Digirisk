@@ -515,7 +515,7 @@ EvaluationEdit = Édition de l'évaluation
 EvaluationMethod = Méthode d'évaluation
 lastEvaluationOn = Dernière évaluation le
 EvaluatedOn = le
-
+DeleteEvaluation = Êtes-vous sûr(e) de vouloir supprimer l'évaluation
 DigiriskRiskAssessmentData = Donnée configurable des évaluations
 MultipleRiskAssessmentMethodName = Méthodes d'évaluations
 MultipleRiskAssessmentMethodDescription = Activer le changement de méthode d'évaluation
@@ -566,7 +566,7 @@ TaskList = Liste des tâches du risque
 TaskCreate = Ajout de la tâche
 TaskEdit = Édition de la tâche
 HowToSetDUProject = Pour configurer le choix du projet, aller dans Configuration du module - Analyse des risques - Tâche
-
+DeleteTask = Êtes-vous sûr(e) de vouloir supprimer la tâche
 DigiriskTaskData = Donnée configurable des tâches
 TaskManagementDescription = Activer la gestion des tâches
 TaskManagementNotActivated = Veuillez activer la gestion des tâches dans Configuration du module / Analyse des risques / Tâche
