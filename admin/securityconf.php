@@ -414,7 +414,7 @@ if ($conf->societe->enabled)
 *** Safety instructions -- Consignes de sécurité ***
 */
 
-print '<tr class="liste_titre"><th class="titlefield wordbreak">'.$langs->trans("SafetyInstructions").'</th><th>'.$langs->trans("Value").'</th></tr>'."\n";
+print '<tr class="liste_titre"><th class="titlefield wordbreak">'.$langs->trans("SafetyInstructions").'</th><th></th></tr>'."\n";
 
 // * Responsible to notify - Responsable à prévenir *
 
@@ -457,7 +457,7 @@ print '<textarea name="emplacementCD" id="emplacementCD" class="minwidth300" row
 *** Society additional details -- Informations complémentaires de la société ***
 */
 
-print '<tr class="liste_titre"><th class="titlefield">'.$langs->trans("SocietyAdditionalDetails").'</th><th>'.$langs->trans("Value").'</th></tr>'."\n";
+print '<tr class="liste_titre"><th class="titlefield">'.$langs->trans("SocietyAdditionalDetails").'</th><th></th></tr>'."\n";
 
 // * Description - Emplacement de la consigne détaillée *
 
