@@ -94,6 +94,15 @@
 
     .risk-evaluation-single {
       width: 100%;
+
+      .risk-evaluation-reference {
+        color: $color__text-main;
+
+        &:hover {
+          cursor: auto;
+          text-decoration: none;
+        }
+      }
     }
     .risk-evaluation-actions {
       margin-left: auto;
