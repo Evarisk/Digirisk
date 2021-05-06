@@ -23,6 +23,7 @@
  */
 
 require_once DOL_DOCUMENT_ROOT . '/core/lib/files.lib.php';
+require_once DOL_DOCUMENT_ROOT . '/core/lib/images.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/company.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/doc.lib.php';
 dol_include_once('/custom/digiriskdolibarr/lib/files.lib.php');
@@ -271,6 +272,13 @@ class doc_workunitdocument_odt extends ModeleODTWorkUnitDocument
 				try {
 					if ($key == 'photoDefault') // Image
 					{
+						$list = getimagesize($value);
+						$newWidth = 350;
+						if ($list[0]) {
+							$ratio = $newWidth / $list[0];
+							$newHeight = $ratio * $list[1];
+							dol_imageResizeOrCrop($value, 0, $newWidth, $newHeight);
+						}
 						$odfHandler->setImage($key, $value);
 					}
 					else    // Text
