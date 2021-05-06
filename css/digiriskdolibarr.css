@@ -47,6 +47,58 @@
   opacity: 0.8;
 }
 
+.wpeo-modal .title {
+  display: block;
+  font-weight: 600;
+  font-size: 13px;
+  margin-bottom: 0.6em;
+  color: rgba(0, 0, 0, 0.8);
+}
+
+.wpeo-modal input,
+.wpeo-modal input[type="text"],
+.wpeo-modal input[type="email"],
+.wpeo-modal input[type="url"],
+.wpeo-modal input[type="password"],
+.wpeo-modal input[type="search"],
+.wpeo-modal input[type="number"],
+.wpeo-modal input[type="tel"],
+.wpeo-modal input[type="range"],
+.wpeo-modal input[type="date"],
+.wpeo-modal input[type="month"],
+.wpeo-modal input[type="week"],
+.wpeo-modal input[type="time"],
+.wpeo-modal input[type="datetime"],
+.wpeo-modal input[type="datetime-local"],
+.wpeo-modal input[type="color"],
+.wpeo-modal select,
+.wpeo-modal textarea {
+  width: 100%;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  padding: 1em;
+}
+
+.wpeo-modal input:focus,
+.wpeo-modal input[type="text"]:focus,
+.wpeo-modal input[type="email"]:focus,
+.wpeo-modal input[type="url"]:focus,
+.wpeo-modal input[type="password"]:focus,
+.wpeo-modal input[type="search"]:focus,
+.wpeo-modal input[type="number"]:focus,
+.wpeo-modal input[type="tel"]:focus,
+.wpeo-modal input[type="range"]:focus,
+.wpeo-modal input[type="date"]:focus,
+.wpeo-modal input[type="month"]:focus,
+.wpeo-modal input[type="week"]:focus,
+.wpeo-modal input[type="time"]:focus,
+.wpeo-modal input[type="datetime"]:focus,
+.wpeo-modal input[type="datetime-local"]:focus,
+.wpeo-modal input[type="color"]:focus,
+.wpeo-modal select:focus,
+.wpeo-modal textarea:focus {
+  border: 1px solid rgba(0, 0, 0, 0.6);
+}
+
 /*--------------------------------------------------------------
 	Module : Dropdown
 	Version : 1.0.0
@@ -3012,6 +3064,15 @@
 
 .wpeo-modal.modal-photo input[type="file"] {
   border-bottom: 0 !important;
+}
+
+.evaluator-add-modal .time {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
 }
 
 .wpeo-modal .modal-container ul, .wpeo-modal .modal-container li {

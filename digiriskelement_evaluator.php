@@ -353,7 +353,7 @@ if ($object->id > 0) {
 				</div>
 				<!-- Modal-ADD Evaluator Content-->
 				<div class="modal-content" id="#modalContent">
-					<div class="evaluator-content">
+					<div class="evaluator-content wpeo-gridlayout grid-2">
 						<div class="evaluator-user">
 							<span class="title"><?php echo $langs->trans('SelectUser'); ?><required>*</required></span>
 							<input type="hidden" class="user-selected" value="<?php echo $user->id ?>">
@@ -366,17 +366,16 @@ if ($object->id > 0) {
 								<?php } ?>
 							</select>
 						</div>
-						<div class="evaluator-assignment">
+						<div class="evaluator-assignment wpeo-gridlayout grid-2">
 							<div class="evaluator-duration">
 								<span class="title"><?php echo $langs->trans('Duration'); ?></span>
-								<?php print '<input type="number" class="duration" name="evaluatorDuration" rows="'.ROWS_2.'" value="'.$conf->global->DIGIRISKDOLIBARR_EVALUATOR_DURATION.'"> min'; ?>
+								<span class="time"><?php print '<input type="number" class="duration" name="evaluatorDuration" rows="'.ROWS_2.'" value="'.$conf->global->DIGIRISKDOLIBARR_EVALUATOR_DURATION.'"> min'; ?></span>
 							</div>
 							<div class="evaluator-date">
 								<span class="title"><?php echo $langs->trans('Date'); ?></span>
 								<?php print $form->selectDate(-1, 'EvaluatorDate', 0, 0, 0, 'evaluator_form', 1, 1); ?>
 							</div>
 						</div>
-						<hr>
 					</div>
 				</div>
 				<!-- Modal-Footer -->
