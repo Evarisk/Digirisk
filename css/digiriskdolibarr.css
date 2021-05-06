@@ -2803,6 +2803,15 @@
   width: 100%;
 }
 
+.wpeo-modal .modal-container .risk-evaluations-list .risk-evaluation > .risk-evaluation-container .risk-evaluation-single .risk-evaluation-reference {
+  color: #333333;
+}
+
+.wpeo-modal .modal-container .risk-evaluations-list .risk-evaluation > .risk-evaluation-container .risk-evaluation-single .risk-evaluation-reference:hover {
+  cursor: auto;
+  text-decoration: none;
+}
+
 .wpeo-modal .modal-container .risk-evaluations-list .risk-evaluation > .risk-evaluation-container .risk-evaluation-actions {
   margin-left: auto;
 }
