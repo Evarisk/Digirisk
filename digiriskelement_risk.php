@@ -1471,8 +1471,8 @@ if ($object->id > 0) {
 																			<i class="fas fa-pencil-alt button-icon"></i>
 																		</div>
 																	<?php else : ?>
-																		<div class="wpeo-button button-square-50 button-grey" value="<?php echo $cotation->id ?>">
-																			<i class="fas fa-pencil-alt button-icon wpeo-tooltip-event" aria-label="<?php echo $langs->trans('PermissionDenied'); ?>"></i>
+																		<div class="wpeo-button button-square-50 button-grey wpeo-tooltip-event"  aria-label="<?php echo $langs->trans('PermissionDenied'); ?>" value="<?php echo $cotation->id ?>">
+																			<i class="fas fa-pencil-alt button-icon"></i>
 																		</div>
 																	<?php endif; ?>
 																	<?php if ($permissiontodelete) : ?>
@@ -1847,8 +1847,8 @@ if ($object->id > 0) {
 																			<i class="fas fa-pencil-alt button-icon"></i>
 																		</div>
 																	<?php else : ?>
-																		<div class="wpeo-button button-square-50 button-grey" value="<?php echo $related_task->id ?>">
-																			<i class="fas fa-pencil-alt button-icon wpeo-tooltip-event" aria-label="<?php echo $langs->trans('PermissionDenied'); ?>"></i>
+																		<div class="wpeo-button button-square-50 button-grey wpeo-tooltip-event" aria-label="<?php echo $langs->trans('PermissionDenied'); ?>" value="<?php echo $related_task->id ?>">
+																			<i class="fas fa-pencil-alt button-icon"></i>
 																		</div>
 																	<?php endif; ?>
 																	<?php if ($permissiontodelete) : ?>
