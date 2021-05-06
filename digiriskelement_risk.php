@@ -1157,6 +1157,19 @@ if ($object->id > 0) {
 	}
 
 	$varpage = empty($contextpage) ? $_SERVER["PHP_SELF"] : $contextpage;
+
+	if (!preg_match('/t.description/', $user->conf->MAINSELECTEDFIELDS_riskcard)) {
+		$user->conf->MAIN_SELECTEDFIELDS_riskcard .= 't.description,';
+	} else {
+		preg_replace('/t.description/', '', $user->conf->MAINSELECTEDFIELDS_riskcard);
+	}
+
+	if (!preg_match('/evaluation.has_tasks/', $user->conf->MAINSELECTEDFIELDS_riskcard)) {
+		$user->conf->MAIN_SELECTEDFIELDS_riskcard .= 'evaluation.has_tasks,';
+	} else {
+		preg_replace('/evaluation.has_tasks/', '', $user->conf->MAINSELECTEDFIELDS_riskcard);
+	}
+
 	$selectedfields = $form->multiSelectArrayWithCheckbox('selectedfields', $arrayfields, $varpage); // This also change content of $arrayfields
 	$selectedfields .= (count($arrayofmassactions) ? $form->showCheckAddButtons('checkforselect', 1) : '');
 
