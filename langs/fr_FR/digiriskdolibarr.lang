@@ -521,8 +521,17 @@ lastEvaluationOn = Dernière évaluation le
 EvaluatedOn = le
 
 DigiriskRiskAssessmentData = Donnée configurable des évaluations
-MultipleRiskAssessmentMethodName = Méthode d'évaluation multiple
-MultipleRiskAssessmentMethodDescription = Utilisation multiple des méthodes d'évaluation
+MultipleRiskAssessmentMethodName = Méthodes d'évaluations
+MultipleRiskAssessmentMethodDescription = Activer le changement de méthode d'évaluation
+AdvancedRiskAssessmentMethod = Méthode d'évaluation avancée
+AdvancedRiskAssessmentMethodDescription = Activer la méthode d'évaluation avancée
+TaskManagement = Gestion des tâches
+TaskManagementDescription = Activer la gestion des tâches
+TaskManagementNotActivated = Veuillez activer la gestion des tâches dans Configuration du module / Analyse des risques / Evaluation
+RiskDescription = Description du risque
+RiskDescriptionDescription = Activer le champ description du risque
+RiskDescriptionNotActivated = Veuillez activer le champ description du risque dans Configuration du module / Analyse des risques / Evaluation
+
 
 SimpleCotation = Cotation simple
 AdvancedCotation = Cotation avancée

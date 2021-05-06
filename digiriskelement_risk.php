@@ -1324,10 +1324,12 @@ if ($object->id > 0) {
 												</ul>
 											</div>
 										</div>
-										<div class="risk-description">
+										<?php if ($conf->global->DIGIRISKDOLIBARR_RISK_DESCRIPTION) : ?>
+											<div class="risk-description">
 											<span class="title"><?php echo $langs->trans('Description'); ?></span>
 											<?php print '<textarea name="riskComment" rows="'.ROWS_2.'">'.$risk->description.'</textarea>'."\n"; ?>
 										</div>
+										<?php endif; ?>
 									</div>
 								</div>
 								<!-- Modal-Footer -->
@@ -1628,6 +1630,132 @@ if ($object->id > 0) {
 								</div>
 							</div>
 						</div>
+						<!-- RISK EVALUATION ADD MODAL-->
+						<div class="risk-evaluation-add-modal">
+							<div class="wpeo-modal modal-risk" id="risk_evaluation_add<?php echo $risk->id?>">
+								<div class="modal-container wpeo-modal-event">
+									<!-- Modal-Header -->
+									<div class="modal-header">
+										<h2 class="modal-title"><?php echo $langs->trans('EvaluationCreate') . ' ' . $refEvaluationMod->getNextValue($evaluation)?></h2>
+										<div class="modal-close"><i class="fas fa-times"></i></div>
+									</div>
+									<!-- Modal-ADD Evaluation Content-->
+									<div class="modal-content" id="#modalContent<?php echo $risk->id?>">
+										<div class="risk-evaluation-container <?php echo $cotation->method; ?>">
+											<div class="risk-evaluation-header">
+												<?php if ($conf->global->DIGIRISKDOLIBARR_ADVANCED_RISKASSESSMENT_METHOD) : ?>
+													<?php if ( $conf->global->DIGIRISKDOLIBARR_MULTIPLE_RISKASSESSMENT_METHOD == 1 ) : ?>
+														<div class="wpeo-button evaluation-standard select-evaluation-method<?php echo ($cotation->method == "standard") ? " selected button-blue" : " button-grey" ?> button-radius-2">
+															<span><?php echo $langs->trans('SimpleCotation') ?></span>
+														</div>
+														<div class="wpeo-button evaluation-advanced select-evaluation-method<?php echo ($cotation->method == "advanced") ? " selected button-blue" : " button-grey" ?> button-radius-2">
+															<span><?php echo $langs->trans('AdvancedCotation') ?></span>
+														</div>
+													<?php else : ?>
+														<div class="wpeo-button evaluation-standard select-evaluation-method<?php echo ($cotation->method == "standard") ? " selected button-blue" : " button-grey button-disable" ?> button-radius-2">
+															<span><?php echo $langs->trans('SimpleCotation') ?></span>
+														</div>
+														<div class="wpeo-button evaluation-advanced select-evaluation-method<?php echo ($cotation->method == "advanced") ? " selected button-blue" : " button-grey button-disable" ?> button-radius-2">
+															<span><?php echo $langs->trans('AdvancedCotation') ?></span>
+														</div>
+													<?php endif; ?>
+													<i class="fas fa-info-circle wpeo-tooltip-event" aria-label="<?php echo $langs->trans("HowToSetMultipleRiskAssessmentMethod") ?>"></i>
+													<input class="risk-evaluation-method" type="hidden" value="standard">
+													<input class="risk-evaluation-multiple-method" type="hidden" value="<?php echo $conf->global->DIGIRISKDOLIBARR_MULTIPLE_RISKASSESSMENT_METHOD ?>">
+												<?php endif; ?>
+											</div>
+											<div class="risk-evaluation-content-wrapper">
+												<div class="risk-evaluation-content">
+													<div class="cotation-container">
+														<div class="cotation-standard" style="<?php echo ($cotation->method == "standard") ? " display:block" : " display:none" ?>">
+															<span class="title"><i class="fas fa-chart-line"></i><?php echo ' ' . $langs->trans('Cotation'); ?><required>*</required></span>
+															<div class="cotation-listing wpeo-gridlayout grid-4 grid-gap-0">
+																<?php
+																$defaultCotation = array(0, 48, 51, 100);
+																if ( ! empty( $defaultCotation )) :
+																	foreach ( $defaultCotation as $request ) :
+																		$evaluation->cotation = $request; ?>
+																		<div data-id="<?php echo 0; ?>"
+																			 data-evaluation-method="standard"
+																			 data-evaluation-id="<?php echo $request; ?>"
+																			 data-variable-id="<?php echo 152+$request; ?>"
+																			 data-seuil="<?php echo  $evaluation->get_evaluation_scale(); ?>"
+																			 data-scale="<?php echo  $evaluation->get_evaluation_scale(); ?>"
+																			 class="risk-evaluation-cotation cotation"><?php echo $request; ?></div>
+																	<?php endforeach;
+																endif; ?>
+															</div>
+														</div>
+														<input class="risk-evaluation-seuil" type="hidden">
+														<?php $evaluation_method = $advanced_method_cotation_array[0];
+														$evaluation_method_survey = $evaluation_method['option']['variable']; ?>
+														<div class="wpeo-gridlayout cotation-advanced" style="<?php echo ($cotation->method == "advanced") ? " display:block" : " display:none" ?>">
+															<input type="hidden" class="digi-method-evaluation-id" value="<?php echo $risk->id ; ?>" />
+															<textarea style="display: none" name="evaluation_variables" class="tmp_evaluation_variable"><?php echo '{}'; ?></textarea>
+															<p><i class="fas fa-info-circle"></i> <?php echo $langs->trans('SelectCotation') ?></p>
+															<div class="wpeo-table evaluation-method table-flex table-<?php echo count($evaluation_method_survey) + 1; ?>">
+																<div class="table-row table-header">
+																	<div class="table-cell">
+																		<span></span>
+																	</div>
+																	<?php for ( $l = 0; $l < count($evaluation_method_survey); $l++ ) : ?>
+																		<div class="table-cell">
+																			<span><?php echo $l; ?></span>
+																		</div>
+																	<?php endfor; ?>
+																</div>
+																<?php $l = 0; ?>
+																<?php foreach($evaluation_method_survey as $critere) :
+																	$name = strtolower($critere['name']); ?>
+																	<div class="table-row">
+																		<div class="table-cell"><?php echo $critere['name'] ; ?></div>
+																		<?php foreach($critere['option']['survey']['request'] as $request) : ?>
+																			<div class="table-cell can-select cell-<?php echo  $evaluation_id ? $evaluation_id : 0 ; ?>"
+																				 data-type="<?php echo $name ?>"
+																				 data-id="<?php echo  $risk->id ? $risk->id : 0 ; ?>"
+																				 data-evaluation-id="<?php echo $evaluation_id ? $evaluation_id : 0 ; ?>"
+																				 data-variable-id="<?php echo $l ; ?>"
+																				 data-seuil="<?php echo  $request['seuil']; ?>">
+																				<?php echo  $request['question'] ; ?>
+																			</div>
+																		<?php endforeach; $l++; ?>
+																	</div>
+																<?php endforeach; ?>
+															</div>
+														</div>
+													</div>
+												</div>
+
+												<?php include DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/core/tpl/digiriskdolibarr_photo_view.tpl.php'; ?>
+
+												<div class="risk-evaluation-calculated-cotation" style="<?php echo ($cotation->method == "advanced") ? " display:block" : " display:none" ?>">
+													<span class="title"><i class="fas fa-chart-line"></i> <?php echo $langs->trans('CalculatedCotation'); ?><required>*</required></span>
+													<div data-scale="1" class="risk-evaluation-cotation cotation">
+														<span><?php echo 0 ?></span>
+													</div>
+												</div>
+												<div class="risk-evaluation-comment">
+													<span class="title"><i class="fas fa-comment-dots"></i> <?php echo $langs->trans('Comment'); ?></span>
+													<?php print '<textarea name="evaluationComment'. $risk->id .'" rows="'.ROWS_2.'">'.('').'</textarea>'."\n"; ?>
+												</div>
+											</div>
+										</div>
+									</div>
+									<!-- Modal-Footer -->
+									<div class="modal-footer">
+										<?php if ($permissiontoadd) : ?>
+											<div class="risk-evaluation-create wpeo-button button-blue button-disable modal-close" value="<?php echo $risk->id ?>">
+												<i class="fas fa-plus"></i> <?php echo $langs->trans('Add'); ?>
+											</div>
+										<?php else : ?>
+											<div class="wpeo-button button-grey wpeo-tooltip-event" aria-label="<?php echo $langs->trans('PermissionDenied') ?>">
+												<i class="fas fa-plus"></i> <?php echo $langs->trans('Add'); ?>
+											</div>
+										<?php endif; ?>
+									</div>
+								</div>
+							</div>
+						</div>
 					<?php } else { ?>
 						<div class="risk-evaluation-container">
 							<div class="risk-evaluation-single">
@@ -1793,130 +1921,7 @@ if ($object->id > 0) {
 					<?php endif; ?>
 					<?php $cotation = new RiskAssessment($db);
 					$cotation->method = $lastEvaluation->method ? $lastEvaluation->method : "standard" ; ?>
-					<!-- RISK EVALUATION ADD MODAL-->
-					<div class="risk-evaluation-add-modal">
-						<div class="wpeo-modal modal-risk" id="risk_evaluation_add<?php echo $risk->id?>">
-							<div class="modal-container wpeo-modal-event">
-								<!-- Modal-Header -->
-								<div class="modal-header">
-									<h2 class="modal-title"><?php echo $langs->trans('EvaluationCreate') . ' ' . $refEvaluationMod->getNextValue($evaluation)?></h2>
-									<div class="modal-close"><i class="fas fa-times"></i></div>
-								</div>
-								<!-- Modal-ADD Evaluation Content-->
-								<div class="modal-content" id="#modalContent<?php echo $risk->id?>">
-									<div class="risk-evaluation-container <?php echo $cotation->method; ?>">
-										<div class="risk-evaluation-header">
-											<?php if ( $conf->global->DIGIRISKDOLIBARR_MULTIPLE_RISKASSESSMENT_METHOD == 1 ) : ?>
-												<div class="wpeo-button evaluation-standard select-evaluation-method<?php echo ($cotation->method == "standard") ? " selected button-blue" : " button-grey" ?> button-radius-2">
-													<span><?php echo $langs->trans('SimpleCotation') ?></span>
-												</div>
-												<div class="wpeo-button evaluation-advanced select-evaluation-method<?php echo ($cotation->method == "advanced") ? " selected button-blue" : " button-grey" ?> button-radius-2">
-													<span><?php echo $langs->trans('AdvancedCotation') ?></span>
-												</div>
-											<?php else : ?>
-												<div class="wpeo-button evaluation-standard select-evaluation-method<?php echo ($cotation->method == "standard") ? " selected button-blue" : " button-grey button-disable" ?> button-radius-2">
-													<span><?php echo $langs->trans('SimpleCotation') ?></span>
-												</div>
-												<div class="wpeo-button evaluation-advanced select-evaluation-method<?php echo ($cotation->method == "advanced") ? " selected button-blue" : " button-grey button-disable" ?> button-radius-2">
-													<span><?php echo $langs->trans('AdvancedCotation') ?></span>
-												</div>
-											<?php endif; ?>
-											<i class="fas fa-info-circle wpeo-tooltip-event" aria-label="<?php echo $langs->trans("HowToSetMultipleRiskAssessmentMethod") ?>"></i>
-											<input class="risk-evaluation-method" type="hidden" value="standard">
-											<input class="risk-evaluation-multiple-method" type="hidden" value="<?php echo $conf->global->DIGIRISKDOLIBARR_MULTIPLE_RISKASSESSMENT_METHOD ?>">
-										</div>
-										<div class="risk-evaluation-content-wrapper">
-											<div class="risk-evaluation-content">
-												<div class="cotation-container">
-													<div class="cotation-standard" style="<?php echo ($cotation->method == "standard") ? " display:block" : " display:none" ?>">
-														<span class="title"><i class="fas fa-chart-line"></i><?php echo ' ' . $langs->trans('Cotation'); ?><required>*</required></span>
-														<div class="cotation-listing wpeo-gridlayout grid-4 grid-gap-0">
-															<?php
-															$defaultCotation = array(0, 48, 51, 100);
-															if ( ! empty( $defaultCotation )) :
-																foreach ( $defaultCotation as $request ) :
-																	$evaluation->cotation = $request; ?>
-																	<div data-id="<?php echo 0; ?>"
-																		 data-evaluation-method="standard"
-																		 data-evaluation-id="<?php echo $request; ?>"
-																		 data-variable-id="<?php echo 152+$request; ?>"
-																		 data-seuil="<?php echo  $evaluation->get_evaluation_scale(); ?>"
-																		 data-scale="<?php echo  $evaluation->get_evaluation_scale(); ?>"
-																		 class="risk-evaluation-cotation cotation"><?php echo $request; ?></div>
-																<?php endforeach;
-															endif; ?>
-														</div>
-													</div>
-													<input class="risk-evaluation-seuil" type="hidden">
-													<?php $evaluation_method = $advanced_method_cotation_array[0];
-													$evaluation_method_survey = $evaluation_method['option']['variable']; ?>
-													<div class="wpeo-gridlayout cotation-advanced" style="<?php echo ($cotation->method == "advanced") ? " display:block" : " display:none" ?>">
-														<input type="hidden" class="digi-method-evaluation-id" value="<?php echo $risk->id ; ?>" />
-														<textarea style="display: none" name="evaluation_variables" class="tmp_evaluation_variable"><?php echo '{}'; ?></textarea>
-														<p><i class="fas fa-info-circle"></i> <?php echo $langs->trans('SelectCotation') ?></p>
-														<div class="wpeo-table evaluation-method table-flex table-<?php echo count($evaluation_method_survey) + 1; ?>">
-															<div class="table-row table-header">
-																<div class="table-cell">
-																	<span></span>
-																</div>
-																<?php for ( $l = 0; $l < count($evaluation_method_survey); $l++ ) : ?>
-																	<div class="table-cell">
-																		<span><?php echo $l; ?></span>
-																	</div>
-																<?php endfor; ?>
-															</div>
-															<?php $l = 0; ?>
-															<?php foreach($evaluation_method_survey as $critere) :
-																$name = strtolower($critere['name']); ?>
-																<div class="table-row">
-																	<div class="table-cell"><?php echo $critere['name'] ; ?></div>
-																	<?php foreach($critere['option']['survey']['request'] as $request) : ?>
-																		<div class="table-cell can-select cell-<?php echo  $evaluation_id ? $evaluation_id : 0 ; ?>"
-																			 data-type="<?php echo $name ?>"
-																			 data-id="<?php echo  $risk->id ? $risk->id : 0 ; ?>"
-																			 data-evaluation-id="<?php echo $evaluation_id ? $evaluation_id : 0 ; ?>"
-																			 data-variable-id="<?php echo $l ; ?>"
-																			 data-seuil="<?php echo  $request['seuil']; ?>">
-																			<?php echo  $request['question'] ; ?>
-																		</div>
-																	<?php endforeach; $l++; ?>
-																</div>
-															<?php endforeach; ?>
-														</div>
-													</div>
-												</div>
-											</div>
 
-											<?php include DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/core/tpl/digiriskdolibarr_photo_view.tpl.php'; ?>
-
-											<div class="risk-evaluation-calculated-cotation" style="<?php echo ($cotation->method == "advanced") ? " display:block" : " display:none" ?>">
-												<span class="title"><i class="fas fa-chart-line"></i> <?php echo $langs->trans('CalculatedCotation'); ?><required>*</required></span>
-												<div data-scale="1" class="risk-evaluation-cotation cotation">
-													<span><?php echo 0 ?></span>
-												</div>
-											</div>
-											<div class="risk-evaluation-comment">
-												<span class="title"><i class="fas fa-comment-dots"></i> <?php echo $langs->trans('Comment'); ?></span>
-												<?php print '<textarea name="evaluationComment'. $risk->id .'" rows="'.ROWS_2.'">'.('').'</textarea>'."\n"; ?>
-											</div>
-										</div>
-									</div>
-								</div>
-								<!-- Modal-Footer -->
-								<div class="modal-footer">
-									<?php if ($permissiontoadd) : ?>
-										<div class="risk-evaluation-create wpeo-button button-blue button-disable modal-close" value="<?php echo $risk->id ?>">
-											<i class="fas fa-plus"></i> <?php echo $langs->trans('Add'); ?>
-										</div>
-									<?php else : ?>
-										<div class="wpeo-button button-grey wpeo-tooltip-event" aria-label="<?php echo $langs->trans('PermissionDenied') ?>">
-											<i class="fas fa-plus"></i> <?php echo $langs->trans('Add'); ?>
-										</div>
-									<?php endif; ?>
-								</div>
-							</div>
-						</div>
-					</div>
 					<!-- RISK ASSESSMENT TASK ADD MODAL-->
 					<div class="riskassessment-task-add-modal">
 						<div class="wpeo-modal modal-risk" id="risk_assessment_task_add<?php echo $risk->id?>">
