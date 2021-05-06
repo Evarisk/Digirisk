@@ -841,7 +841,138 @@ if ($object->id > 0) {
 		$newcardbutton = '<div class="wpeo-button button-square-40 button-grey" value="'.$object->id.'"><i class="fas fa-exclamation-triangle button-icon wpeo-tooltip-event" aria-label="'. $langs->trans('PermissionDenied').'"></i><i class="fas fa-plus-circle button-add animated"></i></div>';
 	} ?>
 	<!-- RISK ADD MODAL-->
-	<div class="risk-add-modal" value="<?php echo $object->id ?>">
+	<?php if ($conf->global->DIGIRISKDOLIBARR_TASK_MANAGEMENT == 0 && $conf->global->DIGIRISKDOLIBARR_RISK_DESCRIPTION == 0 && $conf->global->DIGIRISKDOLIBARR_MULTIPLE_RISKASSESSMENT_METHOD ==0 ) : ?>
+		<div class="risk-add-modal" value="<?php echo $object->id ?>">
+			<div class="wpeo-modal modal-risk-0" id="risk_add<?php echo $object->id ?>">
+				<div class="modal-container wpeo-modal-event">
+					<!-- Modal-Header -->
+					<div class="modal-header">
+						<h2 class="modal-title"><?php echo $langs->trans('AddRiskTitle') . ' ' . $refRiskMod->getNextValue($risk);  ?></h2>
+						<div class="modal-close"><i class="fas fa-times"></i></div>
+					</div>
+					<!-- Modal-ADD Risk Content-->
+					<div class="modal-content" id="#modalContent">
+						<div class="risk-content">
+							<div class="risk-category">
+								<span class="title"><?php echo $langs->trans('Risk'); ?><required>*</required></span>
+								<input class="input-hidden-danger" type="hidden" name="risk_category_id" value="undefined" />
+								<div class="wpeo-dropdown dropdown-large dropdown-grid category-danger padding">
+									<div class="dropdown-toggle dropdown-add-button button-cotation">
+										<span class="wpeo-button button-square-50 button-grey"><i class="fas fa-exclamation-triangle button-icon"></i><i class="fas fa-plus-circle button-add"></i></span>
+										<img class="danger-category-pic wpeo-tooltip-event hidden" src="" aria-label=""/>
+									</div>
+									<ul class="dropdown-content wpeo-gridlayout grid-5 grid-gap-0">
+										<?php
+										$dangerCategories = $risk->get_danger_categories();
+										if ( ! empty( $dangerCategories ) ) :
+											foreach ( $dangerCategories as $dangerCategory ) : ?>
+												<li class="item dropdown-item wpeo-tooltip-event" data-is-preset="<?php echo ''; ?>" data-id="<?php echo $dangerCategory['position'] ?>" aria-label="<?php echo $dangerCategory['name'] ?>">
+													<img src="<?php echo DOL_URL_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $dangerCategory['thumbnail_name'] . '.png'?>" class="attachment-thumbail size-thumbnail photo photowithmargin" alt="" loading="lazy" width="48" height="48">
+												</li>
+											<?php endforeach;
+										endif; ?>
+									</ul>
+								</div>
+							</div>
+							<div class="risk-evaluation-container standard">
+								<span class="section-title"><?php echo ' ' . $langs->trans('RiskAssessment'); ?></span>
+								<div class="risk-evaluation-content-wrapper">
+									<div class="risk-evaluation-content">
+										<div class="cotation-container">
+											<div class="cotation-standard">
+												<span class="title"><i class="fas fa-chart-line"></i><?php echo ' ' . $langs->trans('Cotation'); ?><required>*</required></span>
+												<div class="cotation-listing wpeo-gridlayout grid-4 grid-gap-0">
+													<?php
+													$defaultCotation = array(0, 48, 51, 100);
+													if ( ! empty( $defaultCotation )) :
+														foreach ( $defaultCotation as $request ) :
+															$evaluation->cotation = $request; ?>
+															<div data-id="<?php echo 0; ?>"
+																 data-evaluation-method="standard"
+																 data-evaluation-id="<?php echo $request; ?>"
+																 data-variable-id="<?php echo 152+$request; ?>"
+																 data-seuil="<?php echo  $evaluation->get_evaluation_scale(); ?>"
+																 data-scale="<?php echo  $evaluation->get_evaluation_scale(); ?>"
+																 class="risk-evaluation-cotation cotation"><?php echo $request; ?></div>
+														<?php endforeach;
+													endif; ?>
+												</div>
+											</div>
+											<input class="risk-evaluation-seuil" type="hidden" value="undefined">
+											<?php
+											$evaluation_method = $advanced_method_cotation_array[0];
+											$evaluation_method_survey = $evaluation_method['option']['variable'];
+											?>
+											<div class="wpeo-gridlayout cotation-advanced" style="display:none">
+												<input type="hidden" class="digi-method-evaluation-id" value="<?php echo $risk->id ; ?>" />
+												<textarea style="display: none" name="evaluation_variables" class="tmp_evaluation_variable"><?php echo '{}'; ?></textarea>
+												<span class="title"><i class="fas fa-info-circle"></i> <?php echo $langs->trans('SelectCotation') ?><required>*</required></span>
+												<div class="wpeo-table evaluation-method table-flex table-<?php echo count($evaluation_method_survey) + 1; ?>">
+													<div class="table-row table-header">
+														<div class="table-cell">
+															<span></span>
+														</div>
+														<?php for ( $l = 0; $l < count($evaluation_method_survey); $l++ ) : ?>
+															<div class="table-cell">
+																<span><?php echo $l; ?></span>
+															</div>
+														<?php endfor; ?>
+													</div>
+													<?php $l = 0; ?>
+													<?php foreach($evaluation_method_survey as $critere) :
+														$name = strtolower($critere['name']); ?>
+														<div class="table-row">
+															<div class="table-cell"><?php echo $critere['name'] ; ?></div>
+															<?php foreach($critere['option']['survey']['request'] as $request) : ?>
+																<div class="table-cell can-select cell-<?php echo  $risk->id ? $risk->id : 0 ; ?>"
+																	 data-type="<?php echo $name ?>"
+																	 data-id="<?php echo  $risk->id ? $risk->id : 0 ; ?>"
+																	 data-evaluation-id="<?php echo $evaluation_id ? $evaluation_id : 0 ; ?>"
+																	 data-variable-id="<?php echo $l ; ?>"
+																	 data-seuil="<?php echo  $request['seuil']; ?>">
+																	<?php echo  $request['question'] ; ?>
+																</div>
+															<?php endforeach; $l++; ?>
+														</div>
+													<?php endforeach; ?>
+												</div>
+											</div>
+										</div>
+									</div>
+
+									<?php include DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/core/tpl/digiriskdolibarr_photo_view.tpl.php'; ?>
+
+									<div class="risk-evaluation-calculated-cotation" style="display: none">
+										<span class="title"><i class="fas fa-chart-line"></i> <?php echo $langs->trans('CalculatedCotation'); ?><required>*</required></span>
+										<div data-scale="1" class="risk-evaluation-cotation cotation">
+											<span><?php echo 0 ?></span>
+										</div>
+									</div>
+									<div class="risk-evaluation-comment">
+										<span class="title"><i class="fas fa-comment-dots"></i> <?php echo $langs->trans('Comment'); ?></span>
+										<?php print '<textarea name="evaluationComment'. $risk->id .'" class="minwidth150" rows="'.ROWS_2.'">'.('').'</textarea>'."\n"; ?>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<!-- Modal-Footer -->
+					<div class="modal-footer">
+						<?php if ($permissiontoadd) : ?>
+							<div class="risk-create wpeo-button button-primary button-disable modal-close">
+								<span><i class="fas fa-plus"></i>  <?php echo $langs->trans('AddRiskButton'); ?></span>
+							</div>
+						<?php else : ?>
+							<div class="wpeo-button button-grey wpeo-tooltip-event" aria-label="<?php echo $langs->trans('PermissionDenied') ?>">
+								<span><i class="fas fa-plus"></i>  <?php echo $langs->trans('AddRiskButton'); ?></span>
+							</div>
+						<?php endif;?>
+					</div>
+				</div>
+			</div>
+		</div>
+	<?php else : ?>
+		<div class="risk-add-modal" value="<?php echo $object->id ?>">
 		<div class="wpeo-modal modal-risk-0" id="risk_add<?php echo $object->id ?>">
 			<div class="modal-container wpeo-modal-event">
 				<!-- Modal-Header -->
@@ -873,23 +1004,27 @@ if ($object->id > 0) {
 								</ul>
 							</div>
 						</div>
-						<div class="risk-description">
-							<span class="title"><?php echo $langs->trans('Description'); ?></span>
-							<?php print '<textarea name="riskComment" rows="'.ROWS_2.'">'.('').'</textarea>'."\n"; ?>
-						</div>
+						<?php if ($conf->global->DIGIRISKDOLIBARR_RISK_DESCRIPTION) : ?>
+							<div class="risk-description">
+								<span class="title"><?php echo $langs->trans('Description'); ?></span>
+								<?php print '<textarea name="riskComment" rows="'.ROWS_2.'">'.('').'</textarea>'."\n"; ?>
+							</div>
+						<?php endif; ?>
 						<hr>
 					</div>
 					<div class="risk-evaluation-container standard">
 						<span class="section-title"><?php echo ' ' . $langs->trans('RiskAssessment'); ?></span>
 						<div class="risk-evaluation-header">
-							<div class="wpeo-button evaluation-standard select-evaluation-method selected button-blue">
-								<span><?php echo $langs->trans('SimpleCotation') ?></span>
-							</div>
-							<div class="wpeo-button evaluation-advanced select-evaluation-method button-grey">
-								<span><?php echo $langs->trans('AdvancedCotation') ?></span>
-							</div>
-							<input class="risk-evaluation-method" type="hidden" value="standard">
-							<input class="risk-evaluation-multiple-method" type="hidden" value="1">
+							<?php if ($conf->global->DIGIRISKDOLIBARR_ADVANCED_RISKASSESSMENT_METHOD) : ?>
+								<div class="wpeo-button evaluation-standard select-evaluation-method selected button-blue">
+									<span><?php echo $langs->trans('SimpleCotation') ?></span>
+								</div>
+								<div class="wpeo-button evaluation-advanced select-evaluation-method button-grey">
+									<span><?php echo $langs->trans('AdvancedCotation') ?></span>
+								</div>
+								<input class="risk-evaluation-method" type="hidden" value="standard">
+								<input class="risk-evaluation-multiple-method" type="hidden" value="1">
+							<?php endif; ?>
 						</div>
 						<div class="risk-evaluation-content-wrapper">
 							<div class="risk-evaluation-content">
@@ -969,10 +1104,12 @@ if ($object->id > 0) {
 							</div>
 						</div>
 					</div>
-					<div class="riskassessment-task">
-						<span class="section-title"><?php echo $langs->trans('Task'); ?></span>
-						<span class="title"><?php echo $langs->trans('Label'); ?> <input class="" name="label" value=""></span>
-					</div>
+					<?php if ($conf->global->DIGIRISKDOLIBARR_TASK_MANAGEMENT) : ?>
+						<div class="riskassessment-task">
+							<span class="section-title"><?php echo $langs->trans('Task'); ?></span>
+							<span class="title"><?php echo $langs->trans('Label'); ?> <input class="" name="label" value=""></span>
+						</div>
+					<?php endif; ?>
 				</div>
 				<!-- Modal-Footer -->
 				<div class="modal-footer">
@@ -989,7 +1126,7 @@ if ($object->id > 0) {
 			</div>
 		</div>
 	</div>
-
+	<?php endif; ?>
 	<?php $title = $langs->trans('DigiriskElementRisksList');
 	print_barre_liste($title, $page, $_SERVER["PHP_SELF"], $param, $sortfield, $sortorder, $massactionbutton, $num, $nbtotalofrecords, '', 0, $newcardbutton, '', $limit, 0, 0, 1);
 
@@ -1206,6 +1343,9 @@ if ($object->id > 0) {
 						</div>
 					</div>
 					<?php
+				}
+				elseif ($key == 'description' && $conf->global->DIGIRISKDOLIBARR_RISK_DESCRIPTION == 0) {
+					print $langs->trans('RiskDescriptionNotActivated');
 				}
 				else print $risk->showOutputField($val, $key, $risk->$key, '');
 				print '</td>';
@@ -1499,7 +1639,9 @@ if ($object->id > 0) {
 							</div>
 						</div>
 					<?php } ?>
-				<?php } elseif ($key == 'has_tasks') { ?>
+				<?php }
+
+				elseif ($key == 'has_tasks' && $conf->global->DIGIRISKDOLIBARR_TASK_MANAGEMENT) { ?>
 					<?php $related_tasks = $risk->get_related_tasks($risk);
 					if (!empty($related_tasks) && $related_tasks > 0) :
 						$related_task = array_pop($related_tasks); ?>
@@ -1804,7 +1946,11 @@ if ($object->id > 0) {
 							</div>
 						</div>
 					</div>
-				<?php } else print $lastEvaluation->showOutputField($val, $key, $lastEvaluation->$key, '');
+				<?php }
+				elseif ($conf->global->DIGIRISKDOLIBARR_TASK_MANAGEMENT == 0) {
+					print $langs->trans('TaskManagementNotActivated');
+				}
+				else print $lastEvaluation->showOutputField($val, $key, $lastEvaluation->$key, '');
 				print '</td>';
 				if (!$i) $totalarray['nbfield']++;
 				if (!empty($val['isameasure']))

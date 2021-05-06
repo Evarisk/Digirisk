@@ -80,6 +80,24 @@ if ($action == 'setmethod')
 	dolibarr_set_const($db, $constforval, $value, 'integer', 0, '', $conf->entity);
 }
 
+if ($action == 'setadvancedmethod')
+{
+	$constforval = 'DIGIRISKDOLIBARR_ADVANCED_RISKASSESSMENT_METHOD';
+	dolibarr_set_const($db, $constforval, $value, 'integer', 0, '', $conf->entity);
+}
+
+if ($action == 'settaskmanagement')
+{
+	$constforval = 'DIGIRISKDOLIBARR_TASK_MANAGEMENT';
+	dolibarr_set_const($db, $constforval, $value, 'integer', 0, '', $conf->entity);
+}
+
+if ($action == 'setriskdescription')
+{
+	$constforval = 'DIGIRISKDOLIBARR_RISK_DESCRIPTION';
+	dolibarr_set_const($db, $constforval, $value, 'integer', 0, '', $conf->entity);
+}
+
 /*
  * View
  */
@@ -224,6 +242,57 @@ if ($conf->global->DIGIRISKDOLIBARR_MULTIPLE_RISKASSESSMENT_METHOD)
 else
 {
 	print '<a class="reposition" href="'.$_SERVER["PHP_SELF"].'?action=setmethod&value=1" alt="'.$langs->trans("Default").'">'.img_picto($langs->trans("Disabled"), 'switch_off').'</a>';
+}
+print '</td>';
+
+print '<tr class="oddeven"><td>';
+print $langs->trans('AdvancedRiskAssessmentMethod');
+print "</td><td>\n";
+print $langs->trans('AdvancedRiskAssessmentMethodDescription');
+print '</td>';
+
+print '<td class="center">';
+if ($conf->global->DIGIRISKDOLIBARR_ADVANCED_RISKASSESSMENT_METHOD)
+{
+	print '<a class="reposition" href="'.$_SERVER["PHP_SELF"].'?action=setadvancedmethod&value=0" alt="'.$langs->trans("Default").'">'.img_picto($langs->trans("Activated"), 'switch_on');
+}
+else
+{
+	print '<a class="reposition" href="'.$_SERVER["PHP_SELF"].'?action=setadvancedmethod&value=1" alt="'.$langs->trans("Default").'">'.img_picto($langs->trans("Disabled"), 'switch_off').'</a>';
+}
+print '</td>';
+
+print '<tr class="oddeven"><td>';
+print $langs->trans('TaskManagement');
+print "</td><td>\n";
+print $langs->trans('TaskManagementDescription');
+print '</td>';
+
+print '<td class="center">';
+if ($conf->global->DIGIRISKDOLIBARR_TASK_MANAGEMENT)
+{
+	print '<a class="reposition" href="'.$_SERVER["PHP_SELF"].'?action=settaskmanagement&value=0" alt="'.$langs->trans("Default").'">'.img_picto($langs->trans("Activated"), 'switch_on');
+}
+else
+{
+	print '<a class="reposition" href="'.$_SERVER["PHP_SELF"].'?action=settaskmanagement&value=1" alt="'.$langs->trans("Default").'">'.img_picto($langs->trans("Disabled"), 'switch_off').'</a>';
+}
+print '</td>';
+
+print '<tr class="oddeven"><td>';
+print $langs->trans('RiskDescription');
+print "</td><td>\n";
+print $langs->trans('RiskDescriptionDescription');
+print '</td>';
+
+print '<td class="center">';
+if ($conf->global->DIGIRISKDOLIBARR_RISK_DESCRIPTION)
+{
+	print '<a class="reposition" href="'.$_SERVER["PHP_SELF"].'?action=setriskdescription&value=0" alt="'.$langs->trans("Default").'">'.img_picto($langs->trans("Activated"), 'switch_on');
+}
+else
+{
+	print '<a class="reposition" href="'.$_SERVER["PHP_SELF"].'?action=setriskdescription&value=1" alt="'.$langs->trans("Default").'">'.img_picto($langs->trans("Disabled"), 'switch_off').'</a>';
 }
 print '</td>';
 
