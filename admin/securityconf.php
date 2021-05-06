@@ -485,7 +485,7 @@ print '<textarea name="emplacementRI" id="emplacementRI" class="minwidth300" row
 
 // * Risks evaluation - Document Unique *
 
-print '<tr class="liste_titre"><th class="titlefield wordbreak">'.$langs->trans("RisksEvaluationDocument").'</th><th>'.$langs->trans("").'</th></tr>'."\n";
+print '<tr class="liste_titre"><th class="titlefield wordbreak">'.$langs->trans("RiskAssessmentDocument").'</th><th>'.$langs->trans("").'</th></tr>'."\n";
 
 // * Risks evaluation location - Emplacement du Document Unique *
 
