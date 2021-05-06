@@ -597,6 +597,9 @@ if ($object->id > 0) {
 					<?php
 				}
 
+				elseif ($key == 'description') {
+					print dol_trunc($risksign->description);
+				}
 				else print $risksign->showOutputField($val, $key, $risksign->$key, '');
 				print '</td>';
 				if (!$i) $totalarray['nbfield']++;

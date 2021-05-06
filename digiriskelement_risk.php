@@ -162,7 +162,7 @@ if (empty($reshook))
 	$backtopage = dol_buildpath('/digiriskdolibarr/digiriskelement_risk.php', 1).'?id='.($id > 0 ? $id : '__ID__');
 
 	if (!$error && $action == 'add' && $permissiontoadd) {
-		$riskComment = GETPOST('riskComment');
+		$riskComment = GETPOST('riskComment', 'restricthtml');
 		$fk_element  = GETPOST('id');
 		$ref         = GETPOST('ref');
 		$cotation    = GETPOST('cotation');
@@ -271,7 +271,7 @@ if (empty($reshook))
 
 		$risk->fetch($riskID);
 
-		$risk->description = $description;
+		$risk->description =  $description;
 		$risk->category    = $category;
 
 		$result = $risk->update($user, true);
@@ -1290,6 +1290,8 @@ if ($object->id > 0) {
 			$cssforfield = (empty($val['css']) ? '' : $val['css']);
 			if ($key == 'status') $cssforfield .= ($cssforfield ? ' ' : '').'center';
 			elseif ($key == 'ref') $cssforfield .= ($cssforfield ? ' ' : '').'nowrap';
+			elseif ($key == 'category') $cssforfield .= ($cssforfield ? ' ' : '').'risk-category';
+			elseif ($key == 'description') $cssforfield .= ($cssforfield ? ' ' : '').'risk-description';
 			if (!empty($arrayfields['t.'.$key]['checked']))
 			{
 				print '<td'.($cssforfield ? ' class="'.$cssforfield.'"' : '').' style="width:2%">';
@@ -1307,7 +1309,11 @@ if ($object->id > 0) {
 					?>
 					<div class="risk-container" value="<?php echo $risk->id ?>">
 						<!-- BUTTON MODAL RISK EDIT -->
-							<div class="risk-edit<?php if ($permissiontoadd) { echo ' modal-open'; }; ?>" value="<?php echo $risk->id ?>"><i class="fas fa-exclamation-triangle"></i><?php echo ' ' . $risk->ref; ?></div>
+						<?php if ($permissiontoadd) : ?>
+							<div class="risk-edit modal-open" value="<?php echo $risk->id ?>"><i class="fas fa-exclamation-triangle"></i><?php echo ' ' . $risk->ref; ?></div>
+						<?php else : ?>
+							<div class="risk-edit-no-perm" value="<?php echo $risk->id ?>"><i class="fas fa-exclamation-triangle"></i><?php echo ' ' . $risk->ref; ?></div>
+						<?php endif; ?>
 						<!-- RISK EDIT MODAL -->
 						<div id="risk_edit<?php echo $risk->id ?>" class="wpeo-modal modal-risk-<?php echo $risk->id ?>">
 							<div class="modal-container wpeo-modal-event">
@@ -1364,8 +1370,13 @@ if ($object->id > 0) {
 					</div>
 					<?php
 				}
-				elseif ($key == 'description' && $conf->global->DIGIRISKDOLIBARR_RISK_DESCRIPTION == 0) {
-					print $langs->trans('RiskDescriptionNotActivated');
+
+				elseif ($key == 'description') {
+					if ($conf->global->DIGIRISKDOLIBARR_RISK_DESCRIPTION == 0 ) {
+						print $langs->trans('RiskDescriptionNotActivated');
+					} else {
+						print dol_trunc($risk->description);
+					}
 				}
 				else print $risk->showOutputField($val, $key, $risk->$key, '');
 				print '</td>';
@@ -1423,7 +1434,7 @@ if ($object->id > 0) {
 											<?php $user->fetch($lastEvaluation->fk_user_creat); ?>
 											<?php echo getNomUrl( 0, '', 0, 0, 2 , 0,'','',-1, $user); ?>
 										</span>
-										<?php echo $lastEvaluation->comment; ?>
+										<?php echo dol_trunc($lastEvaluation->comment); ?>
 									</div>
 								</div>
 								<!-- BUTTON MODAL RISK EVALUATION ADD  -->
@@ -1474,7 +1485,7 @@ if ($object->id > 0) {
 																				<?php $user->fetch($cotation->fk_user_creat); ?>
 																				<?php echo getNomUrl( 0, '', 0, 0, 2 ,0,'','',-1,$user); ?>
 																			</span>
-																			<?php echo $cotation->comment; ?>
+																			<?php echo dol_trunc($cotation->comment); ?>
 																		</div>
 																	</div>
 																</div>
@@ -1809,7 +1820,7 @@ if ($object->id > 0) {
 											<?php $user->fetch($related_task->fk_user_creat); ?>
 											<?php echo getNomUrl( 0, '', 0, 0, 2 ,0,'','',-1,$user); ?>
 										</span>
-										<?php echo $related_task->label; ?>
+										<?php echo dol_trunc($related_task->label); ?>
 									</div>
 								</div>
 								<!-- BUTTON MODAL RISK ASSESSMENT TASK ADD  -->
@@ -1851,7 +1862,7 @@ if ($object->id > 0) {
 																				<?php $user->fetch($related_task->fk_user_creat); ?>
 																				<?php echo getNomUrl( 0, '', 0, 0, 2 ,0,'','',-1,$user); ?>
 																			</span>
-																			<?php echo $related_task->label; ?>
+																			<?php echo dol_trunc($related_task->label); ?>
 																		</div>
 																	</div>
 																</div>
