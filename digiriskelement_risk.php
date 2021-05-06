@@ -440,37 +440,39 @@ if (empty($reshook))
 			$evaluation->exposition = $exposition;
 		}
 		$entity = ($conf->entity > 1) ? '/' . $conf->entity : '';
-		$pathToECMPhoto =  DOL_DATA_ROOT .$entity. '/ecm/digiriskdolibarr/medias/' . $photo;
+		if ( !(empty($photo))) {
+			$pathToECMPhoto =  DOL_DATA_ROOT .$entity. '/ecm/digiriskdolibarr/medias/' . $photo;
 
-		$pathToEvaluationPhoto = DOL_DATA_ROOT . $entity . '/digiriskdolibarr/riskassessment/' . $evaluation->ref;
+			$pathToEvaluationPhoto = DOL_DATA_ROOT . $entity . '/digiriskdolibarr/riskassessment/' . $evaluation->ref;
 
-		if (is_dir($pathToEvaluationPhoto)) {
-			$files = dol_dir_list($pathToEvaluationPhoto);
-			foreach ($files as $file) {
-				if (is_file($file['fullname'])) {
+			if (is_dir($pathToEvaluationPhoto)) {
+				$files = dol_dir_list($pathToEvaluationPhoto);
+				foreach ($files as $file) {
+					if (is_file($file['fullname'])) {
+						unlink($file['fullname']);
+					}
+				}
+
+				$files = dol_dir_list($pathToEvaluationPhoto . '/thumbs');
+				foreach ($files as $file) {
 					unlink($file['fullname']);
 				}
+
+				copy($pathToECMPhoto,$pathToEvaluationPhoto . '/' . $photo);
+			} else {
+				mkdir($pathToEvaluationPhoto);
+				copy($pathToECMPhoto,$pathToEvaluationPhoto . '/' . $photo);
 			}
 
-			$files = dol_dir_list($pathToEvaluationPhoto . '/thumbs');
-			foreach ($files as $file) {
-				unlink($file['fullname']);
-			}
+			global $maxwidthmini, $maxheightmini, $maxwidthsmall,$maxheightsmall ;
+			$destfull = $pathToEvaluationPhoto . '/' . $photo;
 
-			copy($pathToECMPhoto,$pathToEvaluationPhoto . '/' . $photo);
-		} else {
-			mkdir($pathToEvaluationPhoto);
-			copy($pathToECMPhoto,$pathToEvaluationPhoto . '/' . $photo);
+			// Create thumbs
+			$imgThumbSmall = vignette($destfull, $maxwidthsmall, $maxheightsmall, '_small', 50, "thumbs");
+			// Create mini thumbs for image (Ratio is near 16/9)
+			$imgThumbMini = vignette($destfull, $maxwidthmini, $maxheightmini, '_mini', 50, "thumbs");
+
 		}
-
-		global $maxwidthmini, $maxheightmini, $maxwidthsmall,$maxheightsmall ;
-		$destfull = $pathToEvaluationPhoto . '/' . $photo;
-
-		// Create thumbs
-		$imgThumbSmall = vignette($destfull, $maxwidthsmall, $maxheightsmall, '_small', 50, "thumbs");
-		// Create mini thumbs for image (Ratio is near 16/9)
-		$imgThumbMini = vignette($destfull, $maxwidthmini, $maxheightmini, '_mini', 50, "thumbs");
-
 		$result = $evaluation->update($user, true);
 
 		if ($result > 0)
@@ -1025,9 +1027,9 @@ if ($object->id > 0) {
 								<div class="wpeo-button evaluation-advanced select-evaluation-method button-grey">
 									<span><?php echo $langs->trans('AdvancedCotation') ?></span>
 								</div>
-								<input class="risk-evaluation-method" type="hidden" value="standard">
-								<input class="risk-evaluation-multiple-method" type="hidden" value="1">
 							<?php endif; ?>
+							<input class="risk-evaluation-method" type="hidden" value="standard">
+							<input class="risk-evaluation-multiple-method" type="hidden" value="1">
 						</div>
 						<div class="risk-evaluation-content-wrapper">
 							<div class="risk-evaluation-content">
@@ -1426,8 +1428,8 @@ if ($object->id > 0) {
 											<div class="modal-close modal-refresh"><i class="fas fa-times"></i></div>
 										</div>
 										<!-- MODAL RISK EVALUATION LIST CONTENT -->
-										<div class="modal-content" id="#modalContent" value="<?php echo $risk->id ?>">
-											<ul class="risk-evaluations-list risk-evaluations-list-<?php echo $risk->id ?>">
+										<div class="modal-content" id="#modalContent" value="<?php echo $cotation->id ?>">
+											<ul class="risk-evaluations-list risk-evaluations-list-<?php echo $cotation->id ?>">
 												<?php if (!empty($cotationList)) :
 													foreach ($cotationList as $cotation) : ?>
 														<div class="risk-evaluation risk-evaluation<?php echo $cotation->id ?>" value="<?php echo $cotation->id ?>">
@@ -1482,7 +1484,7 @@ if ($object->id > 0) {
 																</div>
 															</div>
 															<!-- RISK EVALUATION EDIT MODAL-->
-															<div class="risk-evaluation-edit-modal">
+															<div class="risk-evaluation-edit-modal" value="<?php echo $cotation->id ?>">
 																<div class="wpeo-modal modal-risk" id="risk_evaluation_edit<?php echo $cotation->id ?>">
 																	<div class="modal-container wpeo-modal-event">
 																		<!-- Modal-Header -->

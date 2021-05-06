@@ -1343,29 +1343,27 @@ window.eoxiaJS.evaluation.deleteEvaluation = function ( event ) {
  * @return {void}
  */
 window.eoxiaJS.evaluation.saveEvaluation = function ( event ) {
-	let element = $(this).closest('.risk-evaluation');
+	let element = $(this).closest('.risk-evaluation-edit-modal');
 	let evaluationID = element.attr('value');
-	let single = element.find('#risk_evaluation_edit'+evaluationID);
-
-	var method = single.find('.risk-evaluation-method').val();
+	var method = element.find('.risk-evaluation-method').val();
 	var methodPost = '';
 	if (method !== '') {
 		methodPost = '&cotationMethod=' + method;
 	}
 
-	var cotation = single.find('.risk-evaluation-seuil').val();
+	var cotation = element.find('.risk-evaluation-seuil').val();
 	var cotationPost = '';
 	if (cotation !== 0) {
 		cotationPost = '&cotation=' + cotation;
 	}
 
-	var comment = single.find('.risk-evaluation-comment textarea').val();
+	var comment = element.find('.risk-evaluation-comment textarea').val();
 	var commentPost = '';
 	if (comment !== '') {
 		commentPost = '&evaluationComment=' + encodeURI(comment);
 	}
 
-	var photo = single.find('.risk-evaluation-photo-single .filename').val();
+	var photo = element.find('.risk-evaluation-photo .filename').val();
 	var photoPost = '';
 	if (photo !== 0) {
 		photoPost = '&photo=' + encodeURI(photo);
