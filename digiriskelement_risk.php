@@ -843,7 +843,7 @@ if ($object->id > 0) {
 	<?php if ($permissiontoadd) {
 		$newcardbutton = '<div class="risk-add wpeo-button button-square-40 button-blue modal-open" value="'.$object->id.'"><i class="fas fa-exclamation-triangle button-icon"></i><i class="fas fa-plus-circle button-add animated"></i></div>';
 	} else {
-		$newcardbutton = '<div class="wpeo-button button-square-40 button-grey" value="'.$object->id.'"><i class="fas fa-exclamation-triangle button-icon wpeo-tooltip-event" aria-label="'. $langs->trans('PermissionDenied').'"></i><i class="fas fa-plus-circle button-add animated"></i></div>';
+		$newcardbutton = '<div class="wpeo-button button-square-40 button-grey wpeo-tooltip-event" aria-label="'. $langs->trans('PermissionDenied').'" data-direction="left" value="'.$object->id.'"><i class="fas fa-exclamation-triangle button-icon"></i><i class="fas fa-plus-circle button-add animated"></i></div>';
 	} ?>
 	<!-- RISK ADD MODAL-->
 	<?php if ($conf->global->DIGIRISKDOLIBARR_TASK_MANAGEMENT == 0 && $conf->global->DIGIRISKDOLIBARR_RISK_DESCRIPTION == 0 && $conf->global->DIGIRISKDOLIBARR_MULTIPLE_RISKASSESSMENT_METHOD ==0 ) : ?>
