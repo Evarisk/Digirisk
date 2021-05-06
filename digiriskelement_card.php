@@ -115,6 +115,10 @@ if (empty($reshook))
 		<?php
 	}
 
+	if ($action == 'view' && $permissiontoadd) {
+		header('Location: ' . $backtopage);
+	}
+
 	// Action to build doc
 	if ($action == 'builddoc' && $permissiontoadd) {
 		$outputlangs = $langs;
