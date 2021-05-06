@@ -1387,11 +1387,14 @@ window.eoxiaJS.evaluation.saveEvaluation = function ( event ) {
 
 	let elementParent = $(this).closest('.modal-content');
 	let riskId = elementParent.attr('value');
+	let evaluationSingle = $(this).closest('.risk-evaluation-container').find('.risk-evaluation-single-content');
 	window.eoxiaJS.loader.display(elementParent);
 	elementParent.empty()
+	evaluationSingle.empty()
 
 	setTimeout(function(){
 		elementParent.load( document.URL + ' .risk-evaluations-list-'+riskId);
+		evaluationSingle.load( document.URL + ' .risk-evaluation-single-'+riskId);
 		elementParent.removeClass('wpeo-loader');
 	}, 800);
 
@@ -1559,12 +1562,11 @@ window.eoxiaJS.riskassessmenttask.createRiskAssessmentTask = function ( event ) 
 		riskToAssignPost = '&riskToAssign=' + riskToAssign;
 	}
 
-	var task = single.find('.riskassessment-task input').val();
+	var task = single.find('.riskassessment-task-label').val();
 	var taskPost = '';
 	if (task !== '') {
 		taskPost = '&tasktitle=' + encodeURI(task);
 	}
-
 	$.ajax({
 		url: document.URL + '&action=addRiskAssessmentTask' + riskToAssignPost + taskPost,
 		type: "POST",
@@ -1616,7 +1618,7 @@ window.eoxiaJS.riskassessmenttask.saveRiskAssessmentTask = function ( event ) {
 	let editedRiskAssessmentTaskId = $(this).attr('value');
 	let elementRiskAssessmentTask = $(this).closest('.riskassessment-task-container');
 
-	var task = elementRiskAssessmentTask.find('.riskassessment-task input').val();
+	var task = elementRiskAssessmentTask.find('.riskassessment-task-label').val();
 	var taskPost = '';
 	if (task !== '') {
 		taskPost = '&tasktitle=' + encodeURI(task);
@@ -1629,13 +1631,18 @@ window.eoxiaJS.riskassessmenttask.saveRiskAssessmentTask = function ( event ) {
 		contentType: false
 	});
 
-	let elementParent = $('.div-table-responsive:not(.list-titre)');
+	let elementParent = $(this).closest('.modal-content');
+	let riskId = elementParent.attr('value');
+	let taskSingle = $(this).closest('.riskassessment-task-container').find('.riskassessment-task-content');
 
 	window.eoxiaJS.loader.display(elementRiskAssessmentTask);
+	elementParent.empty()
+	taskSingle.empty()
 
 	setTimeout(function(){
 		elementParent.empty()
-		elementParent.load( document.URL + ' .div-table-responsive');
+		elementParent.load( document.URL + ' .riskassessment-task-list-'+riskId);
+		taskSingle.load( document.URL + ' .riskassessment-task-single-'+riskId);
 		elementRiskAssessmentTask.removeClass('wpeo-loader');
 	}, 800);
 	$(this).closest('.div-table-responsive').load( document.URL + '&action=saveRiskAssessmentTask&riskAssessmentTaskID=' + editedRiskAssessmentTaskId + taskPost + ' .div-table-responsive');
