@@ -527,7 +527,7 @@ AdvancedCotation = Cotation avancée
 SelectCotation = Sélectionnez les cases pour calculer votre cotation
 EvaluationList = Liste des évaluations du risque
 HowToSetMultipleRiskAssessmentMethod = Pour configurer l'utilisation multiple des méthodes d'évaluation, aller dans Configuration du module - Analyse des risques - Évaluation
-NoFileLinked = Pas de photo liée à l'évaluation
+NoFileLinked = Pas de photo liee
 
 
 #
