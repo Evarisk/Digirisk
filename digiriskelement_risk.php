@@ -1495,7 +1495,7 @@ if ($object->id > 0) {
 											<i class="fas fa-calendar-alt"></i> <?php echo date('d/m/Y', $related_task->date_c); ?>
 										</span>
 										<span class="riskassessment-task-count"><i class="fas fa-comments"></i><?php echo count($risk->get_related_tasks($risk)) ?></span>
-										<span class="riskassessment-task-progress"><?php echo $related_task->progress ? $related_task->progress . " %" : 0 . " %" ?></span>
+										<span class="riskassessment-task-progress progress-<?php echo $related_task->progress ? $related_task->progress : 0 ?>"><?php echo $related_task->progress ? $related_task->progress . " %" : 0 . " %" ?></span>
 									</div>
 									<div class="riskassessment-task-title">
 										<span class="riskassessment-task-author">
@@ -1536,7 +1536,7 @@ if ($object->id > 0) {
 																				<i class="fas fa-calendar-alt"></i> <?php echo date('d/m/Y', $related_task->date_c); ?>
 																			</span>
 																			<span class="riskassessment-task-count"><i class="fas fa-comments"></i><?php echo count($risk->get_related_tasks($risk)) ?></span>
-																			<span class="riskassessment-task-progress"><?php echo $related_task->progress ? $related_task->progress . " %" : 0 . " %" ?></span>
+																			<span class="riskassessment-task-progress progress-<?php echo $related_task->progress ? $related_task->progress : 0 ?>"><?php echo $related_task->progress ? $related_task->progress . " %" : 0 . " %" ?></span>
 																		</div>
 																		<div class="riskassessment-task-title">
 																			<span class="riskassessment-task-author">
