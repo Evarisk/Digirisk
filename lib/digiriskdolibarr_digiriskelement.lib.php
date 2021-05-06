@@ -29,27 +29,34 @@
  */
 function digiriskelementPrepareHead($object)
 {
-	global $db, $langs, $conf;
+	global $db, $langs, $conf, $user;
 
 	$langs->load("digiriskdolibarr@digiriskdolibarr");
 
 	$h = 0;
 	$head = array();
 	if ($object->id > 0) {
-		$head[$h][0] = dol_buildpath("/digiriskdolibarr/digiriskelement_risk.php", 1) . '?id=' . $object->id;
-		$head[$h][1] = '<i class="fas fa-exclamation-triangle"></i> ' . $langs->trans("Risks");
-		$head[$h][2] = 'elementRisk';
-		$h++;
 
-		$head[$h][0] = dol_buildpath("/digiriskdolibarr/digiriskelement_evaluator.php", 1) . '?id=' . $object->id;
-		$head[$h][1] = '<i class="fas fa-user-check"></i> ' . $langs->trans("Evaluator");
-		$head[$h][2] = 'elementEvaluator';
-		$h++;
+		if ($user->rights->digiriskdolibarr->risk->read) {
+			$head[$h][0] = dol_buildpath("/digiriskdolibarr/digiriskelement_risk.php", 1) . '?id=' . $object->id;
+			$head[$h][1] = '<i class="fas fa-exclamation-triangle"></i> ' . $langs->trans("Risks");
+			$head[$h][2] = 'elementRisk';
+			$h++;
+		}
 
-		$head[$h][0] = dol_buildpath("/digiriskdolibarr/digiriskelement_risksign.php", 1) . '?id=' . $object->id;
-		$head[$h][1] = '<i class="fas fa-map-signs"></i> ' . $langs->trans("RiskSign");
-		$head[$h][2] = 'elementRiskSign';
-		$h++;
+		if ($user->rights->digiriskdolibarr->evaluator->read) {
+			$head[$h][0] = dol_buildpath("/digiriskdolibarr/digiriskelement_evaluator.php", 1) . '?id=' . $object->id;
+			$head[$h][1] = '<i class="fas fa-user-check"></i> ' . $langs->trans("Evaluator");
+			$head[$h][2] = 'elementEvaluator';
+			$h++;
+		}
+
+		if ($user->rights->digiriskdolibarr->risksign->read) {
+			$head[$h][0] = dol_buildpath("/digiriskdolibarr/digiriskelement_risksign.php", 1) . '?id=' . $object->id;
+			$head[$h][1] = '<i class="fas fa-map-signs"></i> ' . $langs->trans("RiskSign");
+			$head[$h][2] = 'elementRiskSign';
+			$h++;
+		}
 
 		$head[$h][0] = dol_buildpath("/digiriskdolibarr/digiriskelement_card.php", 1) . '?id=' . $object->id;
 		$head[$h][1] = '<i class="fas fa-info-circle"></i> ' . $langs->trans("Card") . ' ' . $object->ref;
@@ -57,15 +64,19 @@ function digiriskelementPrepareHead($object)
 		$h++;
 
 		if ($object->element_type == 'groupment') {
-			$head[$h][0] = dol_buildpath("/digiriskdolibarr/digiriskelement_listingrisksaction.php", 1) . '?id=' . $object->id;
-			$head[$h][1] = '<i class="fas fa-exclamation"></i> ' . $langs->trans("ListingRisksAction");
-			$head[$h][2] = 'elementListingRisksAction';
-			$h++;
+			if ($user->rights->digiriskdolibarr->listingrisksaction->read) {
+				$head[$h][0] = dol_buildpath("/digiriskdolibarr/digiriskelement_listingrisksaction.php", 1) . '?id=' . $object->id;
+				$head[$h][1] = '<i class="fas fa-exclamation"></i> ' . $langs->trans("ListingRisksAction");
+				$head[$h][2] = 'elementListingRisksAction';
+				$h++;
+			}
 
-			$head[$h][0] = dol_buildpath("/digiriskdolibarr/digiriskelement_listingrisksphoto.php", 1) . '?id=' . $object->id;
-			$head[$h][1] = '<i class="fas fa-images"></i> ' . $langs->trans("ListingRisksPhoto");
-			$head[$h][2] = 'elementListingRisksPhoto';
-			$h++;
+			if ($user->rights->digiriskdolibarr->listingrisksphoto->read) {
+				$head[$h][0] = dol_buildpath("/digiriskdolibarr/digiriskelement_listingrisksphoto.php", 1) . '?id=' . $object->id;
+				$head[$h][1] = '<i class="fas fa-images"></i> ' . $langs->trans("ListingRisksPhoto");
+				$head[$h][2] = 'elementListingRisksPhoto';
+				$h++;
+			}
 		}
 
 		require_once DOL_DOCUMENT_ROOT . '/core/lib/files.lib.php';

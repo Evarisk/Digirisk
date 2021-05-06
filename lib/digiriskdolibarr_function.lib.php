@@ -728,13 +728,23 @@ function display_recurse_tree($results) {
 						$nophoto = '/public/theme/common/nophoto.png'; ?>
 						<span class="floatleft inline-block valignmiddle divphotoref"><img class="photodigiriskdolibarr" alt="No photo" src="<?php echo DOL_URL_ROOT.$nophoto ?>"></span>
 					<?php } ?>
-					<div class="title" id="scores" value="<?php echo $element['object']->id ?>" >
+					<div class="title" id="scores" value="<?php echo $element['object']->id ?>">
+					<?php global $user;
+						if ($user->rights->digiriskdolibarr->risk->read) : ?>
 							<a id="slider" class="linkElement id<?php echo $element['object']->id;?>" href="../digiriskdolibarr/digiriskelement_risk.php?id=<?php echo $element['object']->id; ?>">
 								<span class="title-container">
 									<span class="ref"><?php echo $element['object']->ref; ?></span>
 									<span class="name"><?php echo $element['object']->label; ?></span>
 								</span>
 							</a>
+						<?php else : ?>
+							<a id="slider" class="linkElement id<?php echo $element['object']->id;?>" href="../digiriskdolibarr/digiriskelement_card.php?id=<?php echo $element['object']->id; ?>">
+								<span class="title-container">
+									<span class="ref"><?php echo $element['object']->ref; ?></span>
+									<span class="name"><?php echo $element['object']->label; ?></span>
+								</span>
+							</a>
+						<?php endif; ?>
 					</div>
 					<?php if ($element['object']->element_type == 'groupment') { ?>
 						<div class="add-container">
