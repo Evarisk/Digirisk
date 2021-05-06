@@ -1458,8 +1458,8 @@ if ($object->id > 0) {
 											<div class="modal-close modal-refresh"><i class="fas fa-times"></i></div>
 										</div>
 										<!-- MODAL RISK EVALUATION LIST CONTENT -->
-										<div class="modal-content" id="#modalContent" value="<?php echo $cotation->id ?>">
-											<ul class="risk-evaluations-list risk-evaluations-list-<?php echo $cotation->id ?>">
+										<div class="modal-content" id="#modalContent" value="<?php echo $risk->id ?>">
+											<ul class="risk-evaluations-list risk-evaluations-list-<?php echo $risk->id ?>">
 												<?php if (!empty($cotationList)) :
 													foreach ($cotationList as $cotation) : ?>
 														<div class="risk-evaluation risk-evaluation<?php echo $cotation->id ?>" value="<?php echo $cotation->id ?>">
