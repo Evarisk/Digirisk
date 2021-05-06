@@ -319,10 +319,14 @@ class doc_listingrisksphoto_odt extends ModeleODTListingRisksPhoto
 											$tmparray['quotationRisque'] = $lastEvaluation->cotation ? $lastEvaluation->cotation : '0';
 											$tmparray['commentaireRisque'] = dol_print_date($lastEvaluation->date_creation, '%A %e %B %G %H:%M') . ': ' . $lastEvaluation->comment;
 
-											$entity = ($conf->entity > 1) ? '/' . $conf->entity : '';
-											$path = DOL_DATA_ROOT . $entity . '/digiriskdolibarr/riskassessment/' . $lastEvaluation->ref;
-											$image = $path . '/' . $lastEvaluation->photo;
-											$tmparray['photoAssociee'] = $image;
+											if (dol_strlen($lastEvaluation->photo) && $lastEvaluation !== 'undefined') {
+												$entity = ($conf->entity > 1) ? '/' . $conf->entity : '';
+												$path = DOL_DATA_ROOT . $entity . '/digiriskdolibarr/riskassessment/' . $lastEvaluation->ref;
+												$image = $path . '/' . $lastEvaluation->photo;
+												$tmparray['photoAssociee'] = $image;
+											} else {
+												$tmparray['photoAssociee'] = $langs->trans('NoFileLinked');
+											}
 											unset($tmparray['object_fields']);
 
 											complete_substitutions_array($tmparray, $outputlangs, $object, $line, "completesubstitutionarray_lines");
@@ -388,10 +392,14 @@ class doc_listingrisksphoto_odt extends ModeleODTListingRisksPhoto
 											$tmparray['quotationRisque'] = $lastEvaluation->cotation ? $lastEvaluation->cotation : '0';
 											$tmparray['commentaireRisque'] = dol_print_date($lastEvaluation->date_creation, '%A %e %B %G %H:%M') . ': ' . $lastEvaluation->comment;
 
-											$entity = ($conf->entity > 1) ? '/' . $conf->entity : '';
-											$path = DOL_DATA_ROOT . $entity . '/digiriskdolibarr/riskassessment/' . $lastEvaluation->ref;
-											$image = $path . '/' . $lastEvaluation->photo;
-											$tmparray['photoAssociee'] = $image;
+											if (dol_strlen($lastEvaluation->photo) && $lastEvaluation !== 'undefined') {
+												$entity = ($conf->entity > 1) ? '/' . $conf->entity : '';
+												$path = DOL_DATA_ROOT . $entity . '/digiriskdolibarr/riskassessment/' . $lastEvaluation->ref;
+												$image = $path . '/' . $lastEvaluation->photo;
+												$tmparray['photoAssociee'] = $image;
+											} else {
+												$tmparray['photoAssociee'] = $langs->trans('NoFileLinked');
+											}
 
 											unset($tmparray['object_fields']);
 
