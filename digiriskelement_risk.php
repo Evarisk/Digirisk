@@ -1527,22 +1527,24 @@ if ($object->id > 0) {
 																		<div class="modal-content" id="#modalContent<?php echo $cotation->id ?>">
 																			<div class="risk-evaluation-container <?php echo $cotation->method; ?>">
 																				<div class="risk-evaluation-header">
-																					<?php if ( $conf->global->DIGIRISKDOLIBARR_MULTIPLE_RISKASSESSMENT_METHOD == 1 ) : ?>
-																						<div class="wpeo-button evaluation-standard select-evaluation-method<?php echo ($cotation->method == "standard") ? " selected button-blue" : " button-grey" ?> button-radius-2">
-																							<span><?php echo $langs->trans('SimpleCotation') ?></span>
-																						</div>
-																						<div class="wpeo-button evaluation-advanced select-evaluation-method<?php echo ($cotation->method == "advanced") ? " selected button-blue" : " button-grey" ?> button-radius-2">
-																							<span><?php echo $langs->trans('AdvancedCotation') ?></span>
-																						</div>
-																					<?php else : ?>
-																						<div class="wpeo-button evaluation-standard select-evaluation-method<?php echo ($cotation->method == "standard") ? " selected button-blue" : " button-grey button-disable" ?> button-radius-2">
-																							<span><?php echo $langs->trans('SimpleCotation') ?></span>
-																						</div>
-																						<div class="wpeo-button evaluation-advanced select-evaluation-method<?php echo ($cotation->method == "advanced") ? " selected button-blue" : " button-grey button-disable" ?> button-radius-2">
-																							<span><?php echo $langs->trans('AdvancedCotation') ?></span>
-																						</div>
+																					<?php if ($conf->global->DIGIRISKDOLIBARR_ADVANCED_RISKASSESSMENT_METHOD) : ?>
+																						<?php if ( $conf->global->DIGIRISKDOLIBARR_MULTIPLE_RISKASSESSMENT_METHOD == 1 ) : ?>
+																							<div class="wpeo-button evaluation-standard select-evaluation-method<?php echo ($cotation->method == "standard") ? " selected button-blue" : " button-grey" ?> button-radius-2">
+																								<span><?php echo $langs->trans('SimpleCotation') ?></span>
+																							</div>
+																							<div class="wpeo-button evaluation-advanced select-evaluation-method<?php echo ($cotation->method == "advanced") ? " selected button-blue" : " button-grey" ?> button-radius-2">
+																								<span><?php echo $langs->trans('AdvancedCotation') ?></span>
+																							</div>
+																						<?php else : ?>
+																							<div class="wpeo-button evaluation-standard select-evaluation-method<?php echo ($cotation->method == "standard") ? " selected button-blue" : " button-grey button-disable" ?> button-radius-2">
+																								<span><?php echo $langs->trans('SimpleCotation') ?></span>
+																							</div>
+																							<div class="wpeo-button evaluation-advanced select-evaluation-method<?php echo ($cotation->method == "advanced") ? " selected button-blue" : " button-grey button-disable" ?> button-radius-2">
+																								<span><?php echo $langs->trans('AdvancedCotation') ?></span>
+																							</div>
+																						<?php endif; ?>
+																						<i class="fas fa-info-circle wpeo-tooltip-event" aria-label="<?php echo $langs->trans("HowToSetMultipleRiskAssessmentMethod") ?>"></i>
 																					<?php endif; ?>
-																					<i class="fas fa-info-circle wpeo-tooltip-event" aria-label="<?php echo $langs->trans("HowToSetMultipleRiskAssessmentMethod") ?>"></i>
 																					<input class="risk-evaluation-method" type="hidden" value="<?php echo $cotation->method ?>" />
 																					<input class="risk-evaluation-multiple-method" type="hidden" value="<?php echo $conf->global->DIGIRISKDOLIBARR_MULTIPLE_RISKASSESSMENT_METHOD ?>">
 																				</div>
@@ -1693,10 +1695,11 @@ if ($object->id > 0) {
 														</div>
 													<?php endif; ?>
 													<i class="fas fa-info-circle wpeo-tooltip-event" aria-label="<?php echo $langs->trans("HowToSetMultipleRiskAssessmentMethod") ?>"></i>
-													<input class="risk-evaluation-method" type="hidden" value="standard">
-													<input class="risk-evaluation-multiple-method" type="hidden" value="<?php echo $conf->global->DIGIRISKDOLIBARR_MULTIPLE_RISKASSESSMENT_METHOD ?>">
 												<?php endif; ?>
+												<input class="risk-evaluation-method" type="hidden" value="standard">
+												<input class="risk-evaluation-multiple-method" type="hidden" value="<?php echo $conf->global->DIGIRISKDOLIBARR_MULTIPLE_RISKASSESSMENT_METHOD ?>">
 											</div>
+
 											<div class="risk-evaluation-content-wrapper">
 												<div class="risk-evaluation-content">
 													<div class="cotation-container">
