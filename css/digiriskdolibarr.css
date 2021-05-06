@@ -1876,6 +1876,15 @@
   text-decoration: underline;
 }
 
+.risk-container .risk-edit-no-perm {
+  color: #333333;
+}
+
+.risk-container .risk-edit-no-perm:hover {
+  cursor: auto;
+  text-decoration: none;
+}
+
 .risksign-container .risksign-edit {
   color: #263C5C;
 }

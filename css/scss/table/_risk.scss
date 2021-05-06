@@ -6,3 +6,12 @@
     text-decoration: underline;
   }
 }
+
+.risk-container .risk-edit-no-perm {
+  color: $color__text-main;
+
+  &:hover {
+    cursor: auto;
+    text-decoration: none;
+  }
+}

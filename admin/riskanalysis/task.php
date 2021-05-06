@@ -127,7 +127,7 @@ print '<td class="center" width="60">'.$langs->trans("Status").'</td>';
 print '</tr>'."\n";
 
 print '<tr class="oddeven"><td>';
-print $langs->trans('TaskManagement');
+print $langs->trans('TasksManagement');
 print "</td><td>\n";
 print $langs->trans('TaskManagementDescription');
 print '</td>';
