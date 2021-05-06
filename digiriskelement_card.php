@@ -138,7 +138,8 @@ if (empty($reshook))
 
 		$model      = GETPOST('model', 'alpha');
 
-		$moreparams = $object;
+		$moreparams['object'] = $object;
+		$moreparams['user']   = $user;
 
 		$result = $digiriskelementdocument->generateDocument($model, $outputlangs, $hidedetails, $hidedesc, $hideref, $moreparams);
 		if ($result <= 0) {

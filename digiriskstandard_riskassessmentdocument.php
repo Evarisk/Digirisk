@@ -126,6 +126,9 @@ if (empty($reshook))
 
 		$model      = GETPOST('model', 'alpha');
 
+		$moreparams['object'] = "";
+		$moreparams['user']   = $user;
+
 		$result = $riskassessmentdocument->generateDocument($model, $outputlangs, $hidedetails, $hidedesc, $hideref, $moreparams);
 
 		//Création du dossier à zipper
@@ -150,7 +153,9 @@ if (empty($reshook))
 				}
 				$subFolder = $digiriskelementdocument->element;
 
-				$moreparams = $digiriskelementsingle['object'];
+				$moreparams['object'] = $digiriskelementsingle['object'];
+				$moreparams['user']   = $user;
+
 				$digiriskelementdocumentmodel = 'DIGIRISKDOLIBARR_'.strtoupper($digiriskelementdocument->element).'_DEFAULT_MODEL';
 
 				$digiriskelementdocument->generateDocument($conf->global->$digiriskelementdocumentmodel, $outputlangs, $hidedetails, $hidedesc, $hideref, $moreparams);

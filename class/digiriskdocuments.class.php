@@ -375,7 +375,7 @@ class DigiriskDocuments extends CommonObject
 	 */
 	public function generateDocument($modele, $outputlangs, $hidedetails = 0, $hidedesc = 0, $hideref = 0, $moreparams = null)
 	{
-		global $langs, $user;
+		global $langs;
 		$result = 0;
 		$includedocgeneration = 1;
 		$langs->load("digiriskdolibarr@digiriskdolibarr");
@@ -383,10 +383,10 @@ class DigiriskDocuments extends CommonObject
 		$modelpath = "core/modules/digiriskdolibarr/digiriskdocuments/".$this->element."/";
 
 		if ($includedocgeneration) {
-			$result = $this->commonGenerateDocument($modelpath, $modele, $outputlangs, $hidedetails, $hidedesc, $hideref, $moreparams);
+			$result = $this->commonGenerateDocument($modelpath, $modele, $outputlangs, $hidedetails, $hidedesc, $hideref, $moreparams['object']);
 		}
 
-		$this->call_trigger(strtoupper($this->type).'_GENERATE', $user, $parent);
+		$this->call_trigger(strtoupper($this->type).'_GENERATE', $moreparams['user'], $parent);
 
 		return $result;
 	}
