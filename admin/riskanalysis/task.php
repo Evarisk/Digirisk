@@ -65,6 +65,12 @@ if (($action == 'update' && !GETPOST("cancel", 'alpha')) || ($action == 'updatee
 	}
 }
 
+if ($action == 'settaskmanagement')
+{
+	$constforval = 'DIGIRISKDOLIBARR_TASK_MANAGEMENT';
+	dolibarr_set_const($db, $constforval, $value, 'integer', 0, '', $conf->entity);
+}
+
 /*
  * View
  */
@@ -110,6 +116,34 @@ if (!empty($conf->projet->enabled))
 
 print '</table>';
 print '</form>';
+
+print load_fiche_titre($langs->trans("DigiriskTaskData"), '', '');
+
+print '<table class="noborder centpercent">';
+print '<tr class="liste_titre">';
+print '<td>'.$langs->trans("Name").'</td>';
+print '<td>'.$langs->trans("Description").'</td>';
+print '<td class="center" width="60">'.$langs->trans("Status").'</td>';
+print '</tr>'."\n";
+
+print '<tr class="oddeven"><td>';
+print $langs->trans('TaskManagement');
+print "</td><td>\n";
+print $langs->trans('TaskManagementDescription');
+print '</td>';
+
+print '<td class="center">';
+if ($conf->global->DIGIRISKDOLIBARR_TASK_MANAGEMENT)
+{
+	print '<a class="reposition" href="'.$_SERVER["PHP_SELF"].'?action=settaskmanagement&value=0" alt="'.$langs->trans("Default").'">'.img_picto($langs->trans("Activated"), 'switch_on').'</a>';
+}
+else
+{
+	print '<a class="reposition" href="'.$_SERVER["PHP_SELF"].'?action=settaskmanagement&value=1" alt="'.$langs->trans("Default").'">'.img_picto($langs->trans("Disabled"), 'switch_off').'</a>';
+}
+print '</td>';
+print '</tr>';
+print '</table>';
 
 // Page end
 dol_fiche_end();

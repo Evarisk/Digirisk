@@ -469,7 +469,7 @@ UpdateData = Mettre à jour
 
 
 #
-# Risks
+# Risks - Risques
 #
 
 # Mod Numbering - Modèle de numérotation
@@ -493,14 +493,10 @@ ReadDigiriskRisk = Voir les risques
 CreateDigiriskRisk = Créer des risques
 DeleteDigiriskRisk = Supprimer des risques
 
-TasksManagement = Gestion des tâches
-SelectProject = Choix du projet
-DUProject = Projet lié aux tâches des risques
-NoTaskLinked = Pas de tâche en cours
-TaskList = Liste des tâches du risque
-TaskCreate = Ajout de la tâche
-TaskEdit = Édition de la tâche
-HowToSetDUProject = Pour configurer le choix du projet, aller dans Configuration du module - Analyse des risques - Tâche
+DigiriskRiskData = Donnée configurable des risques
+RiskDescription = Description du risque
+RiskDescriptionDescription = Activer le champ description du risque
+RiskDescriptionNotActivated = Veuillez activer le champ description du risque dans Configuration du module / Analyse des risques / Risques
 
 
 
@@ -525,13 +521,6 @@ MultipleRiskAssessmentMethodName = Méthodes d'évaluations
 MultipleRiskAssessmentMethodDescription = Activer le changement de méthode d'évaluation
 AdvancedRiskAssessmentMethod = Méthode d'évaluation avancée
 AdvancedRiskAssessmentMethodDescription = Activer la méthode d'évaluation avancée
-TaskManagement = Gestion des tâches
-TaskManagementDescription = Activer la gestion des tâches
-TaskManagementNotActivated = Veuillez activer la gestion des tâches dans Configuration du module / Analyse des risques / Evaluation
-RiskDescription = Description du risque
-RiskDescriptionDescription = Activer le champ description du risque
-RiskDescriptionNotActivated = Veuillez activer le champ description du risque dans Configuration du module / Analyse des risques / Evaluation
-
 
 SimpleCotation = Cotation simple
 AdvancedCotation = Cotation avancée
@@ -564,6 +553,23 @@ DeleteDigiriskRiskSign = Supprimer des signalisations
 
 
 
+#
+# Tasks - Tâche
+#
+
+# Data - Donnée
+TasksManagement = Gestion des tâches
+SelectProject = Choix du projet
+DUProject = Projet lié aux tâches des risques
+NoTaskLinked = Pas de tâche en cours
+TaskList = Liste des tâches du risque
+TaskCreate = Ajout de la tâche
+TaskEdit = Édition de la tâche
+HowToSetDUProject = Pour configurer le choix du projet, aller dans Configuration du module - Analyse des risques - Tâche
+
+DigiriskTaskData = Donnée configurable des tâches
+TaskManagementDescription = Activer la gestion des tâches
+TaskManagementNotActivated = Veuillez activer la gestion des tâches dans Configuration du module / Analyse des risques / Tâche
 
 #
 # Other

@@ -74,10 +74,16 @@ if ($action == 'setmod')
 	dolibarr_set_const($db, $constforval, $value, 'chaine', 0, '', $conf->entity);
 }
 
+if ($action == 'setriskdescription')
+{
+	$constforval = 'DIGIRISKDOLIBARR_RISK_DESCRIPTION';
+	dolibarr_set_const($db, $constforval, $value, 'integer', 0, '', $conf->entity);
+}
+
 /*
  * View
  */
-$form            = new Form($db);
+$form = new Form($db);
 
 $help_url  = 'FR:Module_DigiriskDolibarr#L.27onglet_Analyse_des_risques';
 $page_name = "DigiriskdolibarrSetup";
@@ -191,6 +197,34 @@ if (is_dir($dir))
 	}
 }
 
+print '</table>';
+
+print load_fiche_titre($langs->trans("DigiriskRiskData"), '', '');
+
+print '<table class="noborder centpercent">';
+print '<tr class="liste_titre">';
+print '<td>'.$langs->trans("Name").'</td>';
+print '<td>'.$langs->trans("Description").'</td>';
+print '<td class="center" width="60">'.$langs->trans("Status").'</td>';
+print '</tr>'."\n";
+
+print '<tr class="oddeven"><td>';
+print $langs->trans('RiskDescription');
+print "</td><td>\n";
+print $langs->trans('RiskDescriptionDescription');
+print '</td>';
+
+print '<td class="center">';
+if ($conf->global->DIGIRISKDOLIBARR_RISK_DESCRIPTION)
+{
+	print '<a class="reposition" href="'.$_SERVER["PHP_SELF"].'?action=setriskdescription&value=0" alt="'.$langs->trans("Default").'">'.img_picto($langs->trans("Activated"), 'switch_on').'</a>';
+}
+else
+{
+	print '<a class="reposition" href="'.$_SERVER["PHP_SELF"].'?action=setriskdescription&value=1" alt="'.$langs->trans("Default").'">'.img_picto($langs->trans("Disabled"), 'switch_off').'</a>';
+}
+print '</td>';
+print '</tr>';
 print '</table>';
 
 // Page end
