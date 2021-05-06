@@ -1228,7 +1228,7 @@ if ($object->id > 0) {
 						<div class="risk-evaluation-container" value="<?php echo $risk->id ?>">
 							<!-- RISK EVALUATION SINGLE -->
 							<div class="risk-evaluation-single">
-								<div class="risk-evaluation-cotation" data-scale="<?php echo $lastEvaluation->get_evaluation_scale() ?>">
+								<div class="risk-evaluation-cotation risk-evaluation-list modal-open" value="<?php echo $risk->id ?>" data-scale="<?php echo $lastEvaluation->get_evaluation_scale() ?>">
 									<span><?php echo $lastEvaluation->cotation; ?></span>
 								</div>
 								<div class="risk-evaluation-photo">
