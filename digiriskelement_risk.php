@@ -179,7 +179,7 @@ if (empty($reshook))
 		if (!$error) {
 			$result = $risk->create($user, true);
 			if ($result > 0) {
-				$evaluationComment 	= GETPOST('evaluationComment');
+				$evaluationComment 	= GETPOST('evaluationComment',  'restricthtml');
 
 				$evaluation->photo       = $photo;
 				$evaluation->cotation    = $cotation;
@@ -266,7 +266,7 @@ if (empty($reshook))
 
 	if (!$error && $action == 'saveRisk' && $permissiontoadd) {
 		$riskID      = GETPOST('riskID');
-		$description = GETPOST('riskComment');
+		$description = GETPOST('riskComment', 'restricthtml');
 		$category    = GETPOST('riskCategory');
 
 		$risk->fetch($riskID);
@@ -341,7 +341,7 @@ if (empty($reshook))
 	}
 
 	if (!$error && $action == 'addEvaluation' && $permissiontoadd) {
-		$evaluationComment = GETPOST('evaluationComment');
+		$evaluationComment = GETPOST('evaluationComment', 'restricthtml');
 		$riskID            = GETPOST('riskToAssign');
 		$cotation          = GETPOST('cotation');
 		$method            = GETPOST('cotationMethod');
@@ -416,7 +416,7 @@ if (empty($reshook))
 		$evaluationID      = GETPOST('evaluationID');
 		$cotation          = GETPOST('cotation');
 		$method            = GETPOST('cotationMethod');
-		$evaluationComment = GETPOST('evaluationComment');
+		$evaluationComment = GETPOST('evaluationComment', 'restricthtml');
 		$photo             = GETPOST('photo');
 
 		$evaluation->fetch($evaluationID);

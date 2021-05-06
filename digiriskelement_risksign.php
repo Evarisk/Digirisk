@@ -136,7 +136,7 @@ if (empty($reshook))
 
 	if (!$error && $action == 'add' && $permissiontoadd) {
 		$riskSignCategory    = GETPOST('riskSignCategory');
-		$riskSignDescription = GETPOST('riskSignDescription');
+		$riskSignDescription = GETPOST('riskSignDescription', 'restricthtml');
 		$fk_element          = GETPOST('id');
 
 		$risksign->ref         = $refRiskSignMod->getNextValue($risksign);
@@ -167,7 +167,7 @@ if (empty($reshook))
 
 		$riskSignID          = GETPOST('riskSignID');
 		$riskSignCategory    = GETPOST('riskSignCategory');
-		$riskSignDescription = GETPOST('riskSignDescription');
+		$riskSignDescription = GETPOST('riskSignDescription', 'restricthtml');
 
 		$risksign->fetch($riskSignID);
 
