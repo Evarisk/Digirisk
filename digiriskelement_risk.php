@@ -1433,6 +1433,7 @@ if ($object->id > 0) {
 												<?php if (!empty($cotationList)) :
 													foreach ($cotationList as $cotation) : ?>
 														<div class="risk-evaluation risk-evaluation<?php echo $cotation->id ?>" value="<?php echo $cotation->id ?>">
+															<input type="hidden" class="labelForDelete" value="<?php echo $langs->trans('DeleteEvaluation') . ' ' . $cotation->ref . ' ?'; ?>">
 															<div class="risk-evaluation-container">
 																<div class="risk-evaluation-single">
 																	<div class="risk-evaluation-cotation" data-scale="<?php echo $cotation->get_evaluation_scale() ?>">
@@ -1820,6 +1821,7 @@ if ($object->id > 0) {
 												<?php if (!empty($related_tasks)) :
 													foreach ($related_tasks as $related_task) : ?>
 														<li class="riskassessment-task riskassessment-task<?php echo $related_task->id ?>" value="<?php echo $related_task->id ?>">
+															<input type="hidden" class="labelForDelete" value="<?php echo $langs->trans('DeleteTask') . ' ' . $related_task->ref . ' ?'; ?>">
 															<div class="riskassessment-task-container">
 																<div class="riskassessment-task-single">
 																	<div class="riskassessment-task-content">
@@ -1930,6 +1932,7 @@ if ($object->id > 0) {
 							<div class="modal-container wpeo-modal-event">
 								<!-- Modal-Header -->
 								<div class="modal-header">
+									<?php $project->fetch($conf->global->DIGIRISKDOLIBARR_DU_PROJECT); ?>
 									<h2 class="modal-title"><?php echo $langs->trans('TaskCreate') . ' ' .  $refTaskMod->getNextValue('', $task) . '  ' . $langs->trans('AT') . '  ' . $langs->trans('Project') . '  ' . $project->getNomUrl() ?><i class="fas fa-info-circle wpeo-tooltip-event" aria-label="<?php echo $langs->trans('HowToSetDUProject'); ?>"></i></h2>
 									<div class="modal-close"><i class="fas fa-times"></i></div>
 								</div>

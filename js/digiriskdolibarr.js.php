@@ -1325,7 +1325,9 @@ window.eoxiaJS.evaluation.createEvaluation = function ( event ) {
 window.eoxiaJS.evaluation.deleteEvaluation = function ( event ) {
 	let element = $(this).closest('.risk-evaluation');
 	let deletedEvaluationId = element.attr('value');
-	var r = confirm('Are you sure you want to delete this risk ?');
+	let textToShow = element.find('.labelForDelete').val();
+
+	var r = confirm(textToShow);
 	if (r == true) {
 		element.empty();
 		element.load( document.URL + '&action=deleteEvaluation&deletedEvaluationId=' + deletedEvaluationId + ' ' + element);
@@ -1592,7 +1594,8 @@ window.eoxiaJS.riskassessmenttask.createRiskAssessmentTask = function ( event ) 
 window.eoxiaJS.riskassessmenttask.deleteRiskAssessmentTask = function ( event ) {
 	let element = $(this).closest('.riskassessment-task');
 	let deletedRiskAssessmentTaskId = element.attr('value');
-	var r = confirm('Are you sure you want to delete this task ?');
+	let textToShow = element.find('.labelForDelete').val()
+	var r = confirm(textToShow);
 	if (r == true) {
 		element.empty();
 		element.load( document.URL + '&action=deleteRiskAssessmentTask&deletedRiskAssessmentTaskId=' + deletedRiskAssessmentTaskId + ' ' + element);
