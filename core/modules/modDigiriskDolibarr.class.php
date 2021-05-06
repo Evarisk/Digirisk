@@ -154,7 +154,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			5 => array('DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_ADDON','chaine', 'mod_riskassessmentdocument_standard' ,'', $conf->entity),
 			6 => array('DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_ADDON_ODT_PATH','chaine', DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/documents/doctemplates/riskassessmentdocument/' ,'', $conf->entity),
 			7 => array('DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_CUSTOM_ADDON_ODT_PATH','chaine', DOL_DATA_ROOT . '/ecm/digiriskdolibarr/riskassessmentdocument/' ,'', $conf->entity),
-			8 => array('DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT__DEFAULT_MODEL','chaine', 'riskassessmentdocument_odt' ,'', $conf->entity),
+			8 => array('DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_DEFAULT_MODEL','chaine', 'riskassessmentdocument_odt' ,'', $conf->entity),
 
 			// CONST LEGAL DISPLAY
 			10 => array('DIGIRISK_LOCATION_OF_DETAILED_INSTRUCTION','chaine','','Location of detailed instruction', $conf->entity),
@@ -170,7 +170,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			19 => array('DIGIRISKDOLIBARR_LEGALDISPLAY_ADDON','chaine', 'mod_legaldisplay_standard' ,'', $conf->entity),
 			20 => array('DIGIRISKDOLIBARR_LEGALDISPLAY_ADDON_ODT_PATH','chaine', DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/documents/doctemplates/legaldisplay/' ,'', $conf->entity),
 			21 => array('DIGIRISKDOLIBARR_LEGALDISPLAY_CUSTOM_ADDON_ODT_PATH','chaine', DOL_DATA_ROOT . '/ecm/digiriskdolibarr/legaldisplay/' ,'', $conf->entity),
-			22 => array('DIGIRISKDOLIBARR_LEGALDISPLAY__DEFAULT_MODEL','chaine', 'legaldisplay_odt' ,'', $conf->entity),
+			22 => array('DIGIRISKDOLIBARR_LEGALDISPLAY_DEFAULT_MODEL','chaine', 'legaldisplay_odt' ,'', $conf->entity),
 
 			// CONST INFORMATIONS SHARING
 			30 => array('MAIN_AGENDA_ACTIONAUTO_INFORMATIONSSHARING_CREATE','chaine',1,'', $conf->entity),
