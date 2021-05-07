@@ -170,7 +170,9 @@ if (empty($reshook))
 		$category    = GETPOST('category');
 		$photo       = GETPOST('photo');
 
-		$risk->description = $riskComment;
+		if ($riskComment !== 'undefined') {
+			$risk->description = $riskComment;
+		}
 		$risk->fk_element  = $fk_element ? $fk_element : 0;
 		$risk->fk_projet   = $conf->global->DIGIRISKDOLIBARR_DU_PROJECT;
 		$risk->category    = $category;
@@ -226,7 +228,7 @@ if (empty($reshook))
 
 				if ($result2 > 0) {
 					$tasktitle = GETPOST('tasktitle');
-					if (!empty($tasktitle)) {
+					if (!empty($tasktitle) && $tasktitle !== 'undefined') {
 						$extrafields->fetch_name_optionals_label($task->table_element);
 
 						$task->ref = $refTaskMod->getNextValue('', $task);
@@ -882,6 +884,10 @@ if ($object->id > 0) {
 							<div class="risk-evaluation-container standard">
 								<span class="section-title"><?php echo ' ' . $langs->trans('RiskAssessment'); ?></span>
 								<div class="risk-evaluation-content-wrapper">
+									<div class="risk-evaluation-header">
+										<input class="risk-evaluation-method" type="hidden" value="standard">
+										<input class="risk-evaluation-multiple-method" type="hidden" value="1">
+									</div>
 									<div class="risk-evaluation-content">
 										<div class="cotation-container">
 											<div class="cotation-standard">
