@@ -59,6 +59,7 @@ DigiriskNumberOfModelFilesFound = Nombre de modèles par défaut
 DigiriskConfig = Configuration du module
 DigiriskConfigSociety = Configuration société
 PermissionDenied = Permission refusée
+NoPhoneNumber = Pas de numéro de téléphone
 
 DigiriskDolibarrArea = Page d'index de Digirisk Dolibarr
 

@@ -433,7 +433,13 @@ if ($responsible_resources->ref == 'Responsible' && $responsible_resources->id[0
 	// * Phone number - Numéro de téléphone *
 
 	print '<tr class="oddeven"><td><label for="name">'.$langs->trans("Phone").'</label></td><td>';
-	print $user->office_phone;
+	if ($user->phone > 0) {
+		print $user->office_phone;
+	} else { ?>
+		<a href="<?php echo DOL_URL_ROOT . '/' ?>user/card.php?id=<?php echo $user->id ?>" target="_blank">
+			<i class="fas fa-plus"></i><?php print ' ' . $langs->trans('NoPhoneNumber'); ?>
+		</a>
+	<?php }
 	print '</td></tr>';
 
 }
