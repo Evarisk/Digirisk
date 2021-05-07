@@ -259,7 +259,8 @@ class modDigiriskdolibarr extends DolibarrModules
 			// CONST TASK
 			160 => array('DIGIRISKDOLIBARR_DU_PROJECT','integer', 0,'', $conf->entity),
 			161 => array('DIGIRISKDOLIBARR_ACTIVE_STANDARD','integer', 0,'', $conf->entity),
-			162 => array('DIGIRISKDOLIBARR_DOCUMENT_MODELS_SET','integer', 0,'', $conf->entity)
+			162 => array('DIGIRISKDOLIBARR_DOCUMENT_MODELS_SET','integer', 0,'', $conf->entity),
+			162 => array('DIGIRISKDOLIBARR_THIRDPARTY_SET','integer', 0,'', $conf->entity)
 
 		);
 
@@ -649,6 +650,38 @@ class modDigiriskdolibarr extends DolibarrModules
 			$standard_id = $digiriskstandard->create($user);
 
 			dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_ACTIVE_STANDARD', $standard_id, 'integer', 0, '', $conf->entity);
+		}
+
+		if ( $conf->global->DIGIRISKDOLIBARR_THIRDPARTY_SET ==  0 ) {
+			dol_include_once('/societe/class/societe.class.php');
+			dol_include_once('/digiriskdolibarr/class/digiriskresources.class.php');
+
+			$societe = new Societe($this->db);
+			$resources = new DigiriskResources($this->db);
+
+			$police = $societe;
+			$police->name = $langs->trans('Police');
+			$police->client = 0;
+			$police->phone = '17';
+			$policeID = $police->create($user);
+
+			$samu = $societe;
+			$samu->name = $langs->trans('SAMU');
+			$samu->client = 0;
+			$samu->phone = '15';
+			$samuID = $samu->create($user);
+
+			$pompiers = $societe;
+			$pompiers->name = $langs->trans('Pompiers');
+			$pompiers->client = 0;
+			$pompiers->phone = '18';
+			$pompiersID = $pompiers->create($user);
+
+			$resources->digirisk_dolibarr_set_resources($this->db,1,  'Police',  'societe', array($policeID), $conf->entity);
+			$resources->digirisk_dolibarr_set_resources($this->db,1,  'SAMU',  'societe', array($samuID), $conf->entity);
+			$resources->digirisk_dolibarr_set_resources($this->db,1,  'Pompiers',  'societe', array($pompiersID), $conf->entity);
+
+			dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_THIRDPARTY_SET', 1, 'integer', 0, '', $conf->entity);
 		}
 
 		// Create extrafields during init
