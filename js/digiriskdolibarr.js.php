@@ -1506,7 +1506,7 @@ window.eoxiaJS.riskassessmenttask.init = function() {
  * @return {void}
  */
 window.eoxiaJS.riskassessmenttask.event = function() {
-	jQuery( document ).on( 'change', '.riskassessment-task-label', window.eoxiaJS.riskassessmenttask.fillRiskAssessmentTaskLabel);
+	jQuery( document ).on( 'input', '.riskassessment-task-label', window.eoxiaJS.riskassessmenttask.fillRiskAssessmentTaskLabel);
 	jQuery( document ).on( 'click', '.riskassessment-task-create', window.eoxiaJS.riskassessmenttask.createRiskAssessmentTask);
 	jQuery( document ).on( 'click', '.riskassessment-task-save', window.eoxiaJS.riskassessmenttask.saveRiskAssessmentTask);
 	jQuery( document ).on( 'click', '.riskassessment-task-delete', window.eoxiaJS.riskassessmenttask.deleteRiskAssessmentTask );
@@ -1531,7 +1531,7 @@ window.eoxiaJS.riskassessmenttask.fillRiskAssessmentTaskLabel = function( event 
 
 
 /**
- * Check value on riskAssementTask.
+ * Check value on riskAssessmentTask.
  *
  * @since   1.0.0
  * @version 1.0.0
