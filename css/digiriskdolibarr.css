@@ -55,7 +55,6 @@
   color: rgba(0, 0, 0, 0.8);
 }
 
-.wpeo-modal input,
 .wpeo-modal input[type="text"],
 .wpeo-modal input[type="email"],
 .wpeo-modal input[type="url"],
@@ -78,7 +77,6 @@
   padding: 1em;
 }
 
-.wpeo-modal input:focus,
 .wpeo-modal input[type="text"]:focus,
 .wpeo-modal input[type="email"]:focus,
 .wpeo-modal input[type="url"]:focus,
@@ -1963,6 +1961,10 @@
   margin-left: 0.5em;
 }
 
+td > .riskassessment-task-container {
+  min-width: 330px;
+}
+
 .riskassessment-task-container .riskassessment-task-single {
   display: -webkit-box;
   display: -ms-flexbox;
@@ -2546,6 +2548,10 @@
 .riskassessment-task-container .riskassessment-task-single .riskassessment-task-add {
   min-width: 40px;
   margin-left: 0.5em;
+}
+
+td > .risk-evaluation-container {
+  min-width: 330px;
 }
 
 .risk-evaluation-container .risk-evaluation-single {
