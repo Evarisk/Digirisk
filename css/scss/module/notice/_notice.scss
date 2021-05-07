@@ -1,0 +1,56 @@
+/*--------------------------------------------------------------
+	Module : Notice
+	Version : 1.0.0
+
+	.wpeo-notice -> classe de base du mobule
+--------------------------------------------------------------*/
+
+/* General */
+.wpeo-notice {
+  position: relative;
+  font-size: 1em;
+  padding: 1em;
+  overflow: hidden;
+  border-radius: 3px;
+  border: solid #eee 1px;
+  margin: 1em 0;
+  display: flex;
+  transition: all 0.2s ease-out;
+  align-items: center;
+
+  &::before {
+    display: block;
+    font-family: 'Font Awesome 5 Free';
+    font-weight: 900;
+    font-size: 24px;
+  }
+  .notice-content {
+    width: 100%;
+    padding: 0 1em;
+    color: rgba(0,0,0,0.6);
+  }
+  .notice-title {
+    font-size: 20px;
+    font-weight: 600;
+    color: rgba(0,0,0,0.9);
+  }
+  .notice-subtitle {
+    font-size: 14px;
+  }
+  .notice-close {
+    color: rgba(0,0,0,0.3);
+    transition: all 0.2s ease-out;
+
+    &:hover {
+      color: $color__primary;
+      cursor: pointer;
+    }
+  }
+  ul {
+    padding: 0 0 0 1.4em;
+    margin: 0.4em 0;
+  }
+}
+
+/** Status */
+@import "status";
