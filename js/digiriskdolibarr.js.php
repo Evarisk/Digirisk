@@ -1048,15 +1048,20 @@ window.eoxiaJS.risk.createRisk = function ( event ) {
 		contentType: false
 	});
 
-	let elementParent = $('.fichecenter');
+	let elementParent = $('.fichecenter').find('.div-table-responsive');
 
 	elementParent.empty();
 	window.eoxiaJS.loader.display($('.fichecenter'));
-	elementParent.load( document.URL + ' .fichecenter');
-	elementParent.find('.titre.inlineblock').load( document.URL + ' .opacitymedium.colorblack.paddingleft');
+	elementParent.load( document.URL + ' .tagtable.liste')
 	setTimeout(function(){
 		$('.fichecenter').removeClass('wpeo-loader');
-	}, 800);
+
+    }, 800);
+
+    let numberOfRisks = $('.valignmiddle.col-title');
+    numberOfRisks.load( document.URL + ' .table-fiche-title .titre.inline-block');
+    let modalRisk = $('.risk-add-modal');
+    modalRisk.load( document.URL + ' .modal-risk-0');
 
 };
 
@@ -1110,13 +1115,13 @@ window.eoxiaJS.risk.saveRisk = function ( event ) {
 		contentType: false
 	});
 
-	let elementParent = $('.fichecenter');
+	let elementParent = $('.fichecenter').find('.div-table-responsive');
 
 	window.eoxiaJS.loader.display($(this).closest('.risk-row-content-' + editedRiskId));
 
 	setTimeout(function(){
 		elementParent.empty()
-		elementParent.load( document.URL + ' .fichecenter');
+		elementParent.load( document.URL + ' .tagtable.liste');
 		$(this).closest('.risk-row-content-' + editedRiskId).removeClass('wpeo-loader');
 	}, 800);
 
@@ -1303,15 +1308,16 @@ window.eoxiaJS.evaluation.createEvaluation = function ( event ) {
 		contentType: false
 	});
 
-	let elementParent = $('.fichecenter');
+	let elementParent = $('.fichecenter').find('.div-table-responsive');
 
 	window.eoxiaJS.loader.display($(this).closest('.risk-row-content-' + riskToAssign));
 
 	setTimeout(function(){
 		elementParent.empty()
-		elementParent.load( document.URL + ' .fichecenter');
+		elementParent.load( document.URL + ' .tagtable.liste');
 		$(this).closest('.risk-row-content-' + riskToAssign).removeClass('wpeo-loader');
 	}, 800);
+
 };
 
 /**
@@ -1574,15 +1580,16 @@ window.eoxiaJS.riskassessmenttask.createRiskAssessmentTask = function ( event ) 
 		contentType: false
 	});
 
-	let elementParent = $('.fichecenter');
+	let elementParent = $('.fichecenter').find('.div-table-responsive');
 
 	window.eoxiaJS.loader.display($(this).closest('.risk-row-content-' + riskToAssign));
 
 	setTimeout(function(){
 		elementParent.empty()
-		elementParent.load( document.URL + ' .fichecenter');
+		elementParent.load( document.URL + ' .tagtable.liste');
 		$(this).closest('.risk-row-content-' + riskToAssign).removeClass('wpeo-loader');
 	}, 800);
+
 };
 
 /**
