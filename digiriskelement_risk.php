@@ -668,6 +668,17 @@ if ($object->id > 0) {
 	digirisk_banner_tab($object, 'ref', '', 0, 'ref', 'ref', $morehtmlref, '', 0, $morehtmlleft);
 
 	print '<div class="fichecenter wpeo-wrap">';
+	?>
+	<div class="messageSuccessEvaluationCreate hidden">
+		<div class="wpeo-notice notice-success">
+			<div class="notice-content">
+				<div class="notice-title">Titre de la notice</div>
+				<div class="notice-subtitle">La classe à utiliser : .notice-success</div>
+			</div>
+			<div class="notice-close"><i class="fas fa-times"></i></div>
+		</div>
+	</div>
+	<?php
 	print '<form method="POST" id="searchFormList" enctype="multipart/form-data" action="'.$_SERVER["PHP_SELF"].'?id='.$object->id.'">'."\n";
 	print '<input type="hidden" name="token" value="'.newToken().'">';
 	print '<input type="hidden" name="formfilteraction" id="formfilteraction" value="list">';
@@ -1673,6 +1684,8 @@ if ($object->id > 0) {
 								</div>
 							</div>
 						</div>
+						<?php $cotation = new RiskAssessment($db);
+						$cotation->method = $lastEvaluation->method ? $lastEvaluation->method : "standard" ; ?>
 						<!-- RISK EVALUATION ADD MODAL-->
 						<div class="risk-evaluation-add-modal">
 							<div class="wpeo-modal modal-risk" id="risk_evaluation_add<?php echo $risk->id?>">
@@ -1827,35 +1840,37 @@ if ($object->id > 0) {
 					if (!empty($related_tasks) && $related_tasks > 0) :
 						$related_task = array_pop($related_tasks); ?>
 						<div class="riskassessment-task-container">
-							<div class="riskassessment-task-single">
-								<div class="riskassessment-task-content">
-									<div class="riskassessment-task-data">
-										<!-- BUTTON MODAL RISK Assessment Task LIST  -->
-										<span class="riskassessment-task-reference riskassessment-task-list modal-open" value="<?php echo $risk->id ?>"><?php echo $related_task->ref; ?></span>
-										<span class="riskassessment-task-date">
-											<i class="fas fa-calendar-alt"></i> <?php echo date('d/m/Y', $related_task->date_c); ?>
-										</span>
-										<span class="riskassessment-task-count"><i class="fas fa-comments"></i><?php echo count($risk->get_related_tasks($risk)) ?></span>
-										<span class="riskassessment-task-progress progress-<?php echo $related_task->progress ? $related_task->progress : 0 ?>"><?php echo $related_task->progress ? $related_task->progress . " %" : 0 . " %" ?></span>
+							<div class="riskassessment-task-single-content riskassessment-task-single-content-<?php echo $risk->id ?>">
+								<div class="riskassessment-task-single riskassessment-task-single-<?php echo $risk->id ?>">
+									<div class="riskassessment-task-content">
+										<div class="riskassessment-task-data">
+											<!-- BUTTON MODAL RISK Assessment Task LIST  -->
+											<span class="riskassessment-task-reference riskassessment-task-list modal-open" value="<?php echo $risk->id ?>"><?php echo $related_task->ref; ?></span>
+											<span class="riskassessment-task-date">
+												<i class="fas fa-calendar-alt"></i> <?php echo date('d/m/Y', $related_task->date_c); ?>
+											</span>
+											<span class="riskassessment-task-count"><i class="fas fa-comments"></i><?php echo count($risk->get_related_tasks($risk)) ?></span>
+											<span class="riskassessment-task-progress progress-<?php echo $related_task->progress ? $related_task->progress : 0 ?>"><?php echo $related_task->progress ? $related_task->progress . " %" : 0 . " %" ?></span>
+										</div>
+										<div class="riskassessment-task-title">
+											<span class="riskassessment-task-author">
+												<?php $user->fetch($related_task->fk_user_creat); ?>
+												<?php echo getNomUrl( 0, '', 0, 0, 2 ,0,'','',-1,$user); ?>
+											</span>
+											<?php echo dol_trunc($related_task->label); ?>
+										</div>
 									</div>
-									<div class="riskassessment-task-title">
-										<span class="riskassessment-task-author">
-											<?php $user->fetch($related_task->fk_user_creat); ?>
-											<?php echo getNomUrl( 0, '', 0, 0, 2 ,0,'','',-1,$user); ?>
-										</span>
-										<?php echo dol_trunc($related_task->label); ?>
-									</div>
+									<!-- BUTTON MODAL RISK ASSESSMENT TASK ADD  -->
+									<?php if ($permissiontoadd) : ?>
+										<div class="riskassessment-task-add wpeo-button button-square-40 button-primary modal-open" value="<?php echo $risk->id;?>">
+											<i class="fas fa-plus button-icon"></i>
+										</div>
+									<?php else : ?>
+										<div class="wpeo-button button-square-40 button-grey wpeo-tooltip-event" aria-label="<?php echo $langs->trans('PermissionDenied') ?>" value="<?php echo $risk->id;?>">
+											<i class="fas fa-plus button-icon"></i>
+										</div>
+									<?php endif; ?>
 								</div>
-								<!-- BUTTON MODAL RISK ASSESSMENT TASK ADD  -->
-								<?php if ($permissiontoadd) : ?>
-									<div class="riskassessment-task-add wpeo-button button-square-40 button-primary modal-open" value="<?php echo $risk->id;?>">
-										<i class="fas fa-plus button-icon"></i>
-									</div>
-								<?php else : ?>
-									<div class="wpeo-button button-square-40 button-grey wpeo-tooltip-event" aria-label="<?php echo $langs->trans('PermissionDenied') ?>" value="<?php echo $risk->id;?>">
-										<i class="fas fa-plus button-icon"></i>
-									</div>
-								<?php endif; ?>
 							</div>
 							<!--RISK ASSESSMENT TASK LIST MODAL -->
 							<div class="riskassessment-task-list-modal">
@@ -1875,27 +1890,27 @@ if ($object->id > 0) {
 													foreach ($related_tasks as $related_task) : ?>
 														<li class="riskassessment-task riskassessment-task<?php echo $related_task->id ?>" value="<?php echo $related_task->id ?>">
 															<input type="hidden" class="labelForDelete" value="<?php echo $langs->trans('DeleteTask') . ' ' . $related_task->ref . ' ?'; ?>">
-															<div class="riskassessment-task-container riskassessment-task-container-<?php echo $risk->id ?>">
-																<div class="riskassessment-task-content rriskassessment-task-content-<?php echo $risk->id ?>"">
-																	<div class="riskassessment-task-single  riskassessment-task-single-<?php echo $risk->id ?>">
-																	<div class="riskassessment-task-content">
-																		<div class="riskassessment-task-data">
-																			<span class="riskassessment-task-reference" value="<?php echo $risk->id ?>"><?php echo $related_task->getNomUrl(); ?></span>
-																			<span class="riskassessment-task-date">
-																				<i class="fas fa-calendar-alt"></i> <?php echo date('d/m/Y', $related_task->date_c); ?>
-																			</span>
-																			<span class="riskassessment-task-count"><i class="fas fa-comments"></i><?php echo count($risk->get_related_tasks($risk)) ?></span>
-																			<span class="riskassessment-task-progress progress-<?php echo $related_task->progress ? $related_task->progress : 0 ?>"><?php echo $related_task->progress ? $related_task->progress . " %" : 0 . " %" ?></span>
-																		</div>
-																		<div class="riskassessment-task-title">
-																			<span class="riskassessment-task-author">
-																				<?php $user->fetch($related_task->fk_user_creat); ?>
-																				<?php echo getNomUrl( 0, '', 0, 0, 2 ,0,'','',-1,$user); ?>
-																			</span>
-																			<?php echo dol_trunc($related_task->label); ?>
+															<div class="riskassessment-task-container">
+																<div class="riskassessment-task-content">
+																	<div class="riskassessment-task-single">
+																		<div class="riskassessment-task-content">
+																			<div class="riskassessment-task-data">
+																				<span class="riskassessment-task-reference" value="<?php echo $risk->id ?>"><?php echo $related_task->getNomUrl(); ?></span>
+																				<span class="riskassessment-task-date">
+																					<i class="fas fa-calendar-alt"></i> <?php echo date('d/m/Y', $related_task->date_c); ?>
+																				</span>
+																				<span class="riskassessment-task-count"><i class="fas fa-comments"></i><?php echo count($risk->get_related_tasks($risk)) ?></span>
+																				<span class="riskassessment-task-progress progress-<?php echo $related_task->progress ? $related_task->progress : 0 ?>"><?php echo $related_task->progress ? $related_task->progress . " %" : 0 . " %" ?></span>
+																			</div>
+																			<div class="riskassessment-task-title">
+																				<span class="riskassessment-task-author">
+																					<?php $user->fetch($related_task->fk_user_creat); ?>
+																					<?php echo getNomUrl( 0, '', 0, 0, 2 ,0,'','',-1,$user); ?>
+																				</span>
+																				<?php echo dol_trunc($related_task->label); ?>
+																			</div>
 																		</div>
 																	</div>
-																</div>
 																</div>
 																<!-- BUTTON MODAL RISK ASSESSMENT TASK EDIT  -->
 																<div class="riskassessment-task-actions wpeo-gridlayout grid-2 grid-gap-0">

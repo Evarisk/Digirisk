@@ -1316,7 +1316,9 @@ window.eoxiaJS.evaluation.createEvaluation = function ( event ) {
 		elementParent.empty()
 		elementParent.load( document.URL + ' .tagtable.liste');
 		$(this).closest('.risk-row-content-' + riskToAssign).removeClass('wpeo-loader');
-	}, 800);
+        $('.messageSuccessEvaluationCreate').removeClass('hidden');
+
+    }, 800);
 
 };
 
@@ -1394,12 +1396,12 @@ window.eoxiaJS.evaluation.saveEvaluation = function ( event ) {
 	let elementParent = $(this).closest('.modal-content');
 	let riskId = elementParent.attr('value');
 	let evaluationSingle = $(this).closest('.risk-evaluation-container').find('.risk-evaluation-single-content');
-	window.eoxiaJS.loader.display(elementParent);
-	elementParent.empty()
-	evaluationSingle.empty()
+	window.eoxiaJS.loader.display($(this));
+    evaluationSingle.empty()
 
 	setTimeout(function(){
-		elementParent.load( document.URL + ' .risk-evaluations-list-'+riskId);
+        elementParent.empty()
+        elementParent.load( document.URL + ' .risk-evaluations-list-'+riskId);
 		evaluationSingle.load( document.URL + ' .risk-evaluation-single-'+riskId);
 		elementParent.removeClass('wpeo-loader');
 	}, 800);
@@ -1582,7 +1584,7 @@ window.eoxiaJS.riskassessmenttask.createRiskAssessmentTask = function ( event ) 
 
 	let elementParent = $('.fichecenter').find('.div-table-responsive');
 
-	window.eoxiaJS.loader.display($(this).closest('.risk-row-content-' + riskToAssign));
+    window.eoxiaJS.loader.display($(this));
 
 	setTimeout(function(){
 		elementParent.empty()
@@ -1640,14 +1642,13 @@ window.eoxiaJS.riskassessmenttask.saveRiskAssessmentTask = function ( event ) {
 
 	let elementParent = $(this).closest('.modal-content');
 	let riskId = elementParent.attr('value');
-	let taskSingle = $(this).closest('.riskassessment-task-container').find('.riskassessment-task-content');
+	let taskSingle = $(this).closest('.riskassessment-task-container').find('.riskassessment-task-single-content');
 
-	window.eoxiaJS.loader.display(elementRiskAssessmentTask);
-	elementParent.empty()
-	taskSingle.empty()
+    window.eoxiaJS.loader.display($(this));
+    taskSingle.empty()
 
 	setTimeout(function(){
-		elementParent.empty()
+        elementParent.empty()
 		elementParent.load( document.URL + ' .riskassessment-task-list-'+riskId);
 		taskSingle.load( document.URL + ' .riskassessment-task-single-'+riskId);
 		elementRiskAssessmentTask.removeClass('wpeo-loader');
