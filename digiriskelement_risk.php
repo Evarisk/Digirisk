@@ -180,7 +180,10 @@ if (empty($reshook))
 
 		if (!$error) {
 			$result = $risk->create($user, true);
+
 			if ($result > 0) {
+				$lastRiskAdded = $risk->ref;
+
 				$evaluationComment 	= GETPOST('evaluationComment',  'restricthtml');
 
 				$evaluation->photo       = $photo;
@@ -668,17 +671,6 @@ if ($object->id > 0) {
 	digirisk_banner_tab($object, 'ref', '', 0, 'ref', 'ref', $morehtmlref, '', 0, $morehtmlleft);
 
 	print '<div class="fichecenter wpeo-wrap">';
-	?>
-	<div class="messageSuccessEvaluationCreate hidden">
-		<div class="wpeo-notice notice-success">
-			<div class="notice-content">
-				<div class="notice-title">Titre de la notice</div>
-				<div class="notice-subtitle">La classe à utiliser : .notice-success</div>
-			</div>
-			<div class="notice-close"><i class="fas fa-times"></i></div>
-		</div>
-	</div>
-	<?php
 	print '<form method="POST" id="searchFormList" enctype="multipart/form-data" action="'.$_SERVER["PHP_SELF"].'?id='.$object->id.'">'."\n";
 	print '<input type="hidden" name="token" value="'.newToken().'">';
 	print '<input type="hidden" name="formfilteraction" id="formfilteraction" value="list">';
@@ -689,6 +681,98 @@ if ($object->id > 0) {
 	//print '<input type="hidden" name="page" value="'.$page.'">';
 	print '<input type="hidden" name="contextpage" value="'.$contextpage.'">';
 	print '<div class="underbanner clearboth"></div>';
+
+	// NOTICES FOR ACTIONS
+	?>
+<!--	RISK ASSESSMENT-->
+	<div class="messageSuccessEvaluationCreate notice hidden">
+		<div class="wpeo-notice notice-success riskassessment-create-success-notice">
+			<div class="notice-content">
+				<div class="notice-title"><?php echo $langs->trans('RiskAssessmentWellCreated') ?></div>
+				<div class="notice-subtitle"><?php echo $langs->trans('TheRiskAssessment') . ' ' . $refEvaluationMod->getLastValue($evaluation) . ' ' . $langs->trans('HasBeenCreatedF') ?></div>
+			</div>
+			<div class="notice-close"><i class="fas fa-times"></i></div>
+		</div>
+	</div>
+	<div class="messageErrorEvaluationCreate notice hidden">
+		<div class="wpeo-notice notice-warning riskassessment-create-error-notice">
+			<div class="notice-content">
+				<div class="notice-title"><?php echo $langs->trans('RiskAssessmentNotCreated') ?></div>
+				<div class="notice-subtitle"><?php echo $langs->trans('TheRiskAssessment') . ' ' . $refEvaluationMod->getLastValue($evaluation) . ' ' . $langs->trans('HasNotBeenCreatedF') ?></div>
+			</div>
+			<div class="notice-close"><i class="fas fa-times"></i></div>
+		</div>
+	</div>
+
+	<!--	RISK -->
+	<div class="messageSuccessRiskCreate notice hidden">
+		<div class="wpeo-notice notice-success risk-create-success-notice">
+			<div class="notice-content">
+				<div class="notice-title"><?php echo $langs->trans('RiskWellCreated') ?></div>
+				<div class="notice-subtitle">
+					<a href="#<?php echo $refRiskMod->getLastValue($evaluation) ?>">
+						<?php echo $langs->trans('TheRisk') . ' ' . $refRiskMod->getLastValue($risk) . ' ' . $langs->trans('HasBeenCreatedM') ?>
+					</a>
+				</div>
+			</div>
+			<div class="notice-close"><i class="fas fa-times"></i></div>
+		</div>
+	</div>
+	<div class="messageErrorRiskCreate notice hidden">
+		<div class="wpeo-notice notice-warning risk-create-error-notice">
+			<div class="notice-content">
+				<div class="notice-title"><?php echo $langs->trans('RiskNotCreated') ?></div>
+				<div class="notice-subtitle"><?php echo $langs->trans('TheRisk') . ' ' . $refRiskMod->getLastValue($risk) . ' ' . $langs->trans('HasNotBeenCreatedM') ?></div>
+			</div>
+			<div class="notice-close"><i class="fas fa-times"></i></div>
+		</div>
+	</div>
+
+	<div class="messageSuccessRiskEdit notice hidden">
+		<div class="wpeo-notice notice-success risk-edit-success-notice">
+			<div class="notice-content">
+				<div class="notice-title"><?php echo $langs->trans('RiskWellEdited') ?></div>
+				<div class="notice-subtitle">
+					<a href="#<?php echo $refRiskMod->getLastValue($evaluation) ?>">
+						<?php echo $langs->trans('TheRisk') . ' ' . $refRiskMod->getLastValue($risk) . ' ' . $langs->trans('HasBeenEditedM') ?>
+					</a>
+				</div>
+			</div>
+			<div class="notice-close"><i class="fas fa-times"></i></div>
+		</div>
+	</div>
+	<div class="messageErrorRiskEdit notice hidden">
+		<div class="wpeo-notice notice-warning risk-edit-error-notice">
+			<div class="notice-content">
+				<div class="notice-title"><?php echo $langs->trans('RiskNotEdited') ?></div>
+				<div class="notice-subtitle"><?php echo $langs->trans('TheRisk') . ' ' . $refRiskMod->getLastValue($risk) . ' ' . $langs->trans('HasNotBeenEditedM') ?></div>
+			</div>
+			<div class="notice-close"><i class="fas fa-times"></i></div>
+		</div>
+	</div>
+
+	<!--	TASKS -->
+	<div class="messageSuccessTaskCreate notice hidden">
+		<div class="wpeo-notice notice-success task-create-success-notice">
+			<div class="notice-content">
+				<div class="notice-title"><?php echo $langs->trans('TaskWellCreated') ?></div>
+				<div class="notice-subtitle">
+						<?php echo $langs->trans('TheTask') . ' ' . $langs->trans('HasBeenCreatedF') ?>
+				</div>
+			</div>
+			<div class="notice-close"><i class="fas fa-times"></i></div>
+		</div>
+	</div>
+	<div class="messageErrorTaskCreate notice hidden">
+		<div class="wpeo-notice notice-warning task-create-error-notice">
+			<div class="notice-content">
+				<div class="notice-title"><?php echo $langs->trans('TaskNotCreated') ?></div>
+				<div class="notice-subtitle"><?php echo $langs->trans('TheTask') . ' ' . $langs->trans('HasNotBeenCreatedF') ?></div>
+			</div>
+			<div class="notice-close"><i class="fas fa-times"></i></div>
+		</div>
+	</div>
+	<?php
 
 	$advanced_method_cotation_json  = file_get_contents(DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/js/json/default.json');
 	$advanced_method_cotation_array = json_decode($advanced_method_cotation_json, true);
@@ -776,7 +860,8 @@ if ($object->id > 0) {
 			header("Location: ".dol_buildpath('/digiriskdolibarr/digiriskelement_risk.php', 1).'?id='.$id);
 			exit;
 		}
-	} else {
+	}
+	else {
 
 		$sql = 'SELECT ';
 		foreach ($evaluation->fields as $key => $val)
@@ -1327,7 +1412,7 @@ if ($object->id > 0) {
 					<div class="risk-container" value="<?php echo $risk->id ?>">
 						<!-- BUTTON MODAL RISK EDIT -->
 						<?php if ($permissiontoadd) : ?>
-							<div class="risk-edit modal-open" value="<?php echo $risk->id ?>"><i class="fas fa-exclamation-triangle"></i><?php echo ' ' . $risk->ref; ?></div>
+							<div class="risk-edit modal-open" value="<?php echo $risk->id ?>" id="<?php echo $risk->ref ?>"><i class="fas fa-exclamation-triangle"></i><?php echo ' ' . $risk->ref; ?></div>
 						<?php else : ?>
 							<div class="risk-edit-no-perm" value="<?php echo $risk->id ?>"><i class="fas fa-exclamation-triangle"></i><?php echo ' ' . $risk->ref; ?></div>
 						<?php endif; ?>
@@ -1478,34 +1563,59 @@ if ($object->id > 0) {
 										</div>
 										<!-- MODAL RISK EVALUATION LIST CONTENT -->
 										<div class="modal-content" id="#modalContent" value="<?php echo $risk->id ?>">
-											<ul class="risk-evaluations-list risk-evaluations-list-<?php echo $risk->id ?>">
-												<?php if (!empty($cotationList)) :
-													foreach ($cotationList as $cotation) : ?>
-														<div class="risk-evaluation risk-evaluation<?php echo $cotation->id ?>" value="<?php echo $cotation->id ?>">
-															<input type="hidden" class="labelForDelete" value="<?php echo $langs->trans('DeleteEvaluation') . ' ' . $cotation->ref . ' ?'; ?>">
-															<div class="risk-evaluation-container">
-																<div class="risk-evaluation-single">
-																	<div class="risk-evaluation-cotation" data-scale="<?php echo $cotation->get_evaluation_scale() ?>">
-																		<span><?php echo $cotation->cotation; ?></span>
-																	</div>
-																	<div class="risk-evaluation-photo">
-																		<?php $filearray = dol_dir_list($conf->digiriskdolibarr->multidir_output[$conf->entity].'/'.$cotation->element.'/'.$cotation->ref, "files", 0, '', '(\.odt|_preview.*\.png)$', 'position_name', 'asc', 1);
-																		if (count($filearray)) {
-																			print '<span class="floatleft inline-block valignmiddle divphotoref">'.digirisk_show_photos('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity].'/'.$cotation->element, 'small', 1, 0, 0, 0, 40, 0, 1, 0, 0, $cotation->element, $cotation).'</span>';
-																		} else {
-																			$nophoto = '/public/theme/common/nophoto.png'; ?>
-																			<span class="floatleft inline-block valignmiddle divphotoref"><img class="photodigiriskdolibarr" alt="No photo" src="<?php echo DOL_URL_ROOT.$nophoto ?>"></span>
-																		<?php } ?>
-																	</div>
-																	<div class="risk-evaluation-content">
-																		<div class="risk-evaluation-data">
-																			<span class="risk-evaluation-reference"><?php echo $cotation->ref; ?></span>
-																			<span class="risk-evaluation-date">
+											<!--	RISK ASSESSMENT-->
+											<div class="messageSuccessEvaluationEdit notice hidden">
+												<input type="hidden" class="valueForEditEvaluation1" value="<?php echo $langs->trans('TheRiskAssessment') . ' ' ?>">
+												<input type="hidden" class="valueForEditEvaluation2" value="<?php echo ' ' . $langs->trans('HasBeenEdited') ?>">
+												<div class="wpeo-notice notice-success riskassessment-edit-success-notice">
+													<div class="notice-content">
+														<div class="notice-title"><?php echo $langs->trans('RiskAssessmentWellEdited') ?></div>
+														<div class="notice-subtitle">
+															<span class="text"></span>
+														</div>
+													</div>
+													<div class="notice-close"><i class="fas fa-times"></i></div>
+												</div>
+											</div>
+											<div class="messageErrorEvaluationEdit notice hidden">
+												<input type="hidden" class="valueForEditEvaluation1" value="<?php echo $langs->trans('TheRiskAssessment') . ' ' ?>">
+												<input type="hidden" class="valueForEditEvaluation2" value="<?php echo ' ' . $langs->trans('HasNotBeenEditedF') ?>">
+												<div class="wpeo-notice notice-warning riskassessment-edit-error-notice">
+													<div class="notice-content">
+														<div class="notice-title"><?php echo $langs->trans('RiskAssessmentNotEdited') ?></div>
+													</div>
+													<div class="notice-close"><i class="fas fa-times"></i></div>
+												</div>
+											</div>
+											<div class="risk-evaluations-list-content" value="<?php echo $risk->id ?>">
+												<ul class="risk-evaluations-list risk-evaluations-list-<?php echo $risk->id ?>">
+													<?php if (!empty($cotationList)) :
+														foreach ($cotationList as $cotation) : ?>
+															<div class="risk-evaluation risk-evaluation<?php echo $cotation->id ?>" value="<?php echo $cotation->id ?>">
+																<input type="hidden" class="labelForDelete" value="<?php echo $langs->trans('DeleteEvaluation') . ' ' . $cotation->ref . ' ?'; ?>">
+																<div class="risk-evaluation-container risk-evaluation-ref-<?php echo $cotation->id ?>" value="<?php echo $cotation->ref ?>">
+																	<div class="risk-evaluation-single">
+																		<div class="risk-evaluation-cotation" data-scale="<?php echo $cotation->get_evaluation_scale() ?>">
+																			<span><?php echo $cotation->cotation; ?></span>
+																		</div>
+																		<div class="risk-evaluation-photo">
+																			<?php $filearray = dol_dir_list($conf->digiriskdolibarr->multidir_output[$conf->entity].'/'.$cotation->element.'/'.$cotation->ref, "files", 0, '', '(\.odt|_preview.*\.png)$', 'position_name', 'asc', 1);
+																			if (count($filearray)) {
+																				print '<span class="floatleft inline-block valignmiddle divphotoref">'.digirisk_show_photos('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity].'/'.$cotation->element, 'small', 1, 0, 0, 0, 40, 0, 1, 0, 0, $cotation->element, $cotation).'</span>';
+																			} else {
+																				$nophoto = '/public/theme/common/nophoto.png'; ?>
+																				<span class="floatleft inline-block valignmiddle divphotoref"><img class="photodigiriskdolibarr" alt="No photo" src="<?php echo DOL_URL_ROOT.$nophoto ?>"></span>
+																			<?php } ?>
+																		</div>
+																		<div class="risk-evaluation-content">
+																			<div class="risk-evaluation-data">
+																				<span class="risk-evaluation-reference"><?php echo $cotation->ref; ?></span>
+																				<span class="risk-evaluation-date">
 																				<i class="fas fa-calendar-alt"></i> <?php echo date('d/m/Y', $cotation->date_creation); ?>
 																			</span>
-																			<span class="risk-evaluation-count"><i class="fas fa-comments"></i><?php echo count($cotationList) ?></span>
-																		</div>
-																		<div class="risk-evaluation-comment">
+																				<span class="risk-evaluation-count"><i class="fas fa-comments"></i><?php echo count($cotationList) ?></span>
+																			</div>
+																			<div class="risk-evaluation-comment">
 																			<span class="risk-evaluation-author">
 																				<?php $user->fetch($cotation->fk_user_creat); ?>
 																				<?php echo getNomUrl( 0, '', 0, 0, 2 ,0,'','',-1,$user); ?>
@@ -1513,23 +1623,22 @@ if ($object->id > 0) {
 																			<?php echo dol_trunc($cotation->comment, 120); ?>
 																		</div>
 																	</div>
-																</div>
-																<!-- BUTTON MODAL RISK EVALUATION EDIT  -->
-																<div class="risk-evaluation-actions wpeo-gridlayout grid-2 grid-gap-0">
-																	<?php if ($permissiontoadd) : ?>
-																		<div class="risk-evaluation-edit wpeo-button button-square-50 button-grey modal-open" value="<?php echo $cotation->id ?>">
-																			<i class="fas fa-pencil-alt button-icon"></i>
-																		</div>
-																	<?php else : ?>
-																		<div class="wpeo-button button-square-50 button-grey wpeo-tooltip-event"  aria-label="<?php echo $langs->trans('PermissionDenied'); ?>" value="<?php echo $cotation->id ?>">
-																			<i class="fas fa-pencil-alt button-icon"></i>
-																		</div>
-																	<?php endif; ?>
-																	<?php if ($permissiontodelete) : ?>
-																		<div class="risk-evaluation-delete wpeo-button button-square-50 button-transparent">
-																			<i class="fas fa-trash button-icon"></i>
-																		</div>
-																	<?php endif; ?>
+																	<!-- BUTTON MODAL RISK EVALUATION EDIT  -->
+																	<div class="risk-evaluation-actions wpeo-gridlayout grid-2 grid-gap-0">
+																		<?php if ($permissiontoadd) : ?>
+																			<div class="risk-evaluation-edit wpeo-button button-square-50 button-grey modal-open" value="<?php echo $cotation->id ?>">
+																				<i class="fas fa-pencil-alt button-icon"></i>
+																			</div>
+																		<?php else : ?>
+																			<div class="wpeo-button button-square-50 button-grey wpeo-tooltip-event"  aria-label="<?php echo $langs->trans('PermissionDenied'); ?>" value="<?php echo $cotation->id ?>">
+																				<i class="fas fa-pencil-alt button-icon"></i>
+																			</div>
+																		<?php endif; ?>
+																		<?php if ($permissiontodelete) : ?>
+																			<div class="risk-evaluation-delete wpeo-button button-square-50 button-transparent">
+																				<i class="fas fa-trash button-icon"></i>
+																			</div>
+																		<?php endif; ?>
 																	</div>
 																</div>
 															</div>
@@ -1669,10 +1778,12 @@ if ($object->id > 0) {
 																</div>
 																<hr>
 															</div>
-														</li>
-													<?php endforeach; ?>
-												<?php endif; ?>
-											</ul>
+															</li>
+														<?php endforeach; ?>
+													<?php endif; ?>
+												</ul>
+											</div>
+
 										</div>
 										<!-- Modal-Footer -->
 										<div class="modal-footer">
@@ -1884,13 +1995,38 @@ if ($object->id > 0) {
 										</div>
 										<!-- MODAL RISK ASSESSMENT TASK LIST CONTENT -->
 										<div class="modal-content" id="#modalContent" value="<?php echo $risk->id ?>">
-											<ul class="riskassessment-task-list riskassessment-task-list-<?php echo $risk->id ?>">
+											<!--	RISKASSESSMENT TASK-->
+											<div class="messageSuccessTaskEdit notice hidden">
+												<input type="hidden" class="valueForEditTask1" value="<?php echo $langs->trans('TheTask') . ' ' ?>">
+												<input type="hidden" class="valueForEditTask2" value="<?php echo ' ' . $langs->trans('HasBeenEditedF') ?>">
+												<div class="wpeo-notice notice-success riskassessment-task-edit-success-notice">
+													<div class="notice-content">
+														<div class="notice-title"><?php echo $langs->trans('TaskWellEdited') ?></div>
+														<div class="notice-subtitle">
+															<span class="text"></span>
+														</div>
+													</div>
+													<div class="notice-close"><i class="fas fa-times"></i></div>
+												</div>
+											</div>
+											<div class="messageErrorTaskEdit notice hidden">
+												<input type="hidden" class="valueForEditTask1" value="<?php echo $langs->trans('TheTask') . ' ' ?>">
+												<input type="hidden" class="valueForEditTask2" value="<?php echo ' ' . $langs->trans('HasNotBeenEditedF') ?>">
+												<div class="wpeo-notice notice-warning riskassessment-task-edit-error-notice">
+													<div class="notice-content">
+														<div class="notice-title"><?php echo $langs->trans('TaskNotEdited') ?></div>
+													</div>
+													<div class="notice-close"><i class="fas fa-times"></i></div>
+												</div>
+											</div>
+											<div class="riskassessment-task-list-content" value="<?php echo $risk->id ?>">
+												<ul class="riskassessment-task-list riskassessment-task-list-<?php echo $risk->id ?>">
 												<?php $related_tasks = $risk->get_related_tasks($risk); ?>
 												<?php if (!empty($related_tasks)) :
 													foreach ($related_tasks as $related_task) : ?>
 														<li class="riskassessment-task riskassessment-task<?php echo $related_task->id ?>" value="<?php echo $related_task->id ?>">
 															<input type="hidden" class="labelForDelete" value="<?php echo $langs->trans('DeleteTask') . ' ' . $related_task->ref . ' ?'; ?>">
-															<div class="riskassessment-task-container">
+															<div class="riskassessment-task-container riskassessment-task-ref-<?php echo $related_task->id ?>" value="<?php echo $related_task->ref ?>">
 																<div class="riskassessment-task-content">
 																	<div class="riskassessment-task-single">
 																		<div class="riskassessment-task-content">
@@ -1967,6 +2103,7 @@ if ($object->id > 0) {
 													<?php endforeach; ?>
 												<?php endif; ?>
 											</ul>
+											</div>
 										</div>
 										<!-- Modal-Footer -->
 										<div class="modal-footer">

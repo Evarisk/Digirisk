@@ -991,6 +991,8 @@ window.eoxiaJS.risk.createRisk = function ( event ) {
 	let elementRisk = $(this).closest('.fichecenter').find('.risk-content');
 	let elementEvaluation = $(this).closest('.fichecenter').find('.risk-evaluation-container');
 	let elementTask = $(this).closest('.fichecenter').find('.riskassessment-task');
+	let actionContainerSuccess = $('.messageSuccessRiskCreate');
+	let actionContainerError = $('.messageErrorRiskCreate');
 
 	var category = elementRisk.find('.risk-category input').val();
 	var categoryPost = '';
@@ -1041,27 +1043,42 @@ window.eoxiaJS.risk.createRisk = function ( event ) {
 		taskPost = '&tasktitle=' + encodeURI(task);
 	}
 
+	let elementParent = $('.fichecenter').find('.div-table-responsive');
+	window.eoxiaJS.loader.display($('.fichecenter'));
+
 	$.ajax({
 		url: document.URL + '&action=add' + categoryPost + descriptionPost + methodPost + cotationPost + criteres + photoPost + commentPost + taskPost,
 		type: "POST",
 		processData: false,
-		contentType: false
+		contentType: false,
+		success: function ( ) {
+
+			let numberOfRisks = $('.valignmiddle.col-title');
+			numberOfRisks.load( document.URL + ' .table-fiche-title .titre.inline-block');
+
+			let modalRisk = $('.risk-add-modal');
+			modalRisk.load( document.URL + ' .modal-risk-0');
+
+			actionContainerSuccess.empty()
+			actionContainerSuccess.load(' .risk-create-success-notice')
+			actionContainerSuccess.removeClass('hidden');
+
+			elementParent.empty();
+			elementParent.load( document.URL + ' .tagtable.liste')
+
+			$('.fichecenter').removeClass('wpeo-loader');
+
+		},
+		error: function ( ) {
+
+			actionContainerError.empty()
+			actionContainerError.load(' .risk-create-error-notice')
+			actionContainerError.removeClass('hidden');
+
+			$('.fichecenter').removeClass('wpeo-loader');
+
+		}
 	});
-
-	let elementParent = $('.fichecenter').find('.div-table-responsive');
-
-	elementParent.empty();
-	window.eoxiaJS.loader.display($('.fichecenter'));
-	elementParent.load( document.URL + ' .tagtable.liste')
-	setTimeout(function(){
-		$('.fichecenter').removeClass('wpeo-loader');
-
-    }, 800);
-
-    let numberOfRisks = $('.valignmiddle.col-title');
-    numberOfRisks.load( document.URL + ' .table-fiche-title .titre.inline-block');
-    let modalRisk = $('.risk-add-modal');
-    modalRisk.load( document.URL + ' .modal-risk-0');
 
 };
 
@@ -1095,6 +1112,8 @@ window.eoxiaJS.risk.deleteRisk = function ( event ) {
 window.eoxiaJS.risk.saveRisk = function ( event ) {
 	let editedRiskId = $(this).attr('value');
 	let elementRisk = $(this).closest('.risk-container').find('.risk-content');
+	let actionContainerSuccess = $('.messageSuccessRiskEdit');
+	let actionContainerError = $('.messageErrorRiskEdit');
 
 	var category = elementRisk.find('.risk-category input').val();
 	var categoryPost = '';
@@ -1108,24 +1127,30 @@ window.eoxiaJS.risk.saveRisk = function ( event ) {
 		descriptionPost = '&riskComment=' + encodeURI(description);
 	}
 
+	let elementParent = $('.fichecenter').find('.div-table-responsive');
+	window.eoxiaJS.loader.display($(this).closest('.risk-row-content-' + editedRiskId));
+
 	$.ajax({
 		url: document.URL + '&action=saveRisk&riskID=' + editedRiskId + categoryPost + descriptionPost,
 		type: "POST",
 		processData: false,
-		contentType: false
+		contentType: false,
+		success: function ( ) {
+
+			elementParent.empty()
+			elementParent.load( document.URL + ' .tagtable.liste');
+			$(this).closest('.risk-row-content-' + editedRiskId).removeClass('wpeo-loader');
+
+			actionContainerSuccess.empty()
+			actionContainerSuccess.load(' .risk-edit-success-notice')
+			actionContainerSuccess.removeClass('hidden');
+		},
+		error: function ( ) {
+			actionContainerError.empty()
+			actionContainerError.load(' .risk-edit-error-notice')
+			actionContainerError.removeClass('hidden');
+		}
 	});
-
-	let elementParent = $('.fichecenter').find('.div-table-responsive');
-
-	window.eoxiaJS.loader.display($(this).closest('.risk-row-content-' + editedRiskId));
-
-	setTimeout(function(){
-		elementParent.empty()
-		elementParent.load( document.URL + ' .tagtable.liste');
-		$(this).closest('.risk-row-content-' + editedRiskId).removeClass('wpeo-loader');
-	}, 800);
-
-	//$(this).closest('.div-table-responsive').load( document.URL + '&action=saveRisk&riskID=' + editedRiskId + categoryPost + descriptionPost + ' .div-table-responsive');
 };
 
 /**
@@ -1264,6 +1289,8 @@ window.eoxiaJS.evaluation.createEvaluation = function ( event ) {
 	var riskToAssign = $(this).attr('value');
 	let element = $(this).closest('.risk-evaluation-add-modal');
 	let single = element.find('.risk-evaluation-container');
+	let actionContainerSuccess = $('.messageSuccessEvaluationCreate');
+	let actionContainerError = $('.messageErrorEvaluationCreate');
 
 	var riskToAssignPost = '';
 	if (riskToAssign !== '') {
@@ -1301,26 +1328,35 @@ window.eoxiaJS.evaluation.createEvaluation = function ( event ) {
 		}
 	})
 
+	let elementParent = $('.fichecenter').find('.div-table-responsive');
+	window.eoxiaJS.loader.display($('.risk-row-content-' + riskToAssign));
+
 	$.ajax({
 		url: document.URL + '&action=addEvaluation' + riskToAssignPost + methodPost + cotationPost + criteres + photoPost + commentPost,
 		type: "POST",
 		processData: false,
-		contentType: false
+		contentType: false,
+		success: function( ) {
+				elementParent.empty()
+				elementParent.load( document.URL + ' .tagtable.liste');
+
+				$(this).closest('.risk-row-content-' + riskToAssign).removeClass('wpeo-loader');
+
+				actionContainerSuccess.empty()
+				actionContainerSuccess.load(' .riskassessment-create-success-notice')
+				actionContainerSuccess.removeClass('hidden');
+		},
+		error: function ( ) {
+
+			$(this).closest('.risk-row-content-' + riskToAssign).removeClass('wpeo-loader');
+
+			actionContainerError.empty()
+			actionContainerError.load(' .riskassessment-create-error-notice')
+			actionContainerError.removeClass('hidden');
+		}
 	});
-
-	let elementParent = $('.fichecenter').find('.div-table-responsive');
-
-	window.eoxiaJS.loader.display($(this).closest('.risk-row-content-' + riskToAssign));
-
-	setTimeout(function(){
-		elementParent.empty()
-		elementParent.load( document.URL + ' .tagtable.liste');
-		$(this).closest('.risk-row-content-' + riskToAssign).removeClass('wpeo-loader');
-        $('.messageSuccessEvaluationCreate').removeClass('hidden');
-
-    }, 800);
-
 };
+
 
 /**
  * Action delete evaluation.
@@ -1355,6 +1391,9 @@ window.eoxiaJS.evaluation.deleteEvaluation = function ( event ) {
 window.eoxiaJS.evaluation.saveEvaluation = function ( event ) {
 	let element = $(this).closest('.risk-evaluation-edit-modal');
 	let evaluationID = element.attr('value');
+	let actionContainerSuccess = $('.messageSuccessEvaluationEdit');
+	let actionContainerError = $('.messageErrorEvaluationEdit');
+
 	var method = element.find('.risk-evaluation-method').val();
 	var methodPost = '';
 	if (method !== '') {
@@ -1386,27 +1425,48 @@ window.eoxiaJS.evaluation.saveEvaluation = function ( event ) {
 		}
 	})
 
+	let elementParent = $(this).closest('.risk-evaluations-list-content');
+	let riskId = elementParent.attr('value');
+	let evaluationSingle = $(this).closest('.risk-evaluation-container').find('.risk-evaluation-single-content');
+	let evaluationRef =  $('.risk-evaluation-ref-'+evaluationID).attr('value');
+
+	window.eoxiaJS.loader.display($(this));
+	evaluationSingle.empty()
+
 	$.ajax({
 		url: document.URL + '&action=saveEvaluation&evaluationID=' + evaluationID +  methodPost + cotationPost + criteres + photoPost + commentPost,
 		type: "POST",
 		processData: false,
-		contentType: false
+		contentType: false,
+		success: function ( ) {
+			elementParent.empty()
+
+			elementParent.load( document.URL + ' .risk-evaluations-list-'+riskId);
+			evaluationSingle.load( document.URL + ' .risk-evaluation-single-'+riskId);
+
+			elementParent.removeClass('wpeo-loader');
+			element.find('#risk_evaluation_edit'+evaluationID).removeClass('modal-active');
+
+			let textToShow = '';
+			textToShow += actionContainerSuccess.find('.valueForEditEvaluation1').val()
+			textToShow += evaluationRef
+			textToShow += actionContainerSuccess.find('.valueForEditEvaluation2').val()
+
+			actionContainerSuccess.find('.notice-subtitle .text').text(textToShow)
+			actionContainerSuccess.removeClass('hidden');
+		},
+		error: function ( ) {
+
+			let textToShow = '';
+			textToShow += actionContainerError.find('.valueForEditEvaluation1').val()
+			textToShow += evaluationRef
+			textToShow += actionContainerError.find('.valueForEditEvaluation2').val()
+
+			actionContainerError.find('.notice-subtitle .text').text(textToShow);
+			actionContainerError.removeClass('hidden');
+		}
 	});
 
-	let elementParent = $(this).closest('.modal-content');
-	let riskId = elementParent.attr('value');
-	let evaluationSingle = $(this).closest('.risk-evaluation-container').find('.risk-evaluation-single-content');
-	window.eoxiaJS.loader.display($(this));
-    evaluationSingle.empty()
-
-	setTimeout(function(){
-        elementParent.empty()
-        elementParent.load( document.URL + ' .risk-evaluations-list-'+riskId);
-		evaluationSingle.load( document.URL + ' .risk-evaluation-single-'+riskId);
-		elementParent.removeClass('wpeo-loader');
-	}, 800);
-
-	element.find('#risk_evaluation_edit'+evaluationID).removeClass('modal-active');
 };
 
 /**
@@ -1564,6 +1624,8 @@ window.eoxiaJS.riskassessmenttask.createRiskAssessmentTask = function ( event ) 
 	var riskToAssign = $(this).attr('value');
 	let element = $(this).closest('.riskassessment-task-add-modal');
 	let single = element.find('.riskassessment-task-container');
+	let actionContainerSuccess = $('.messageSuccessTaskCreate');
+	let actionContainerError = $('.messageErrorTaskCreate');
 
 	var riskToAssignPost = '';
 	if (riskToAssign !== '') {
@@ -1575,23 +1637,32 @@ window.eoxiaJS.riskassessmenttask.createRiskAssessmentTask = function ( event ) 
 	if (task !== '') {
 		taskPost = '&tasktitle=' + encodeURI(task);
 	}
+
+	let elementParent = $('.fichecenter').find('.div-table-responsive');
+	window.eoxiaJS.loader.display($(this));
+
 	$.ajax({
 		url: document.URL + '&action=addRiskAssessmentTask' + riskToAssignPost + taskPost,
 		type: "POST",
 		processData: false,
-		contentType: false
+		contentType: false,
+		success: function ( ) {
+			elementParent.empty()
+			elementParent.load( document.URL + ' .tagtable.liste');
+			$(this).closest('.risk-row-content-' + riskToAssign).removeClass('wpeo-loader');
+
+			actionContainerSuccess.empty()
+			actionContainerSuccess.load(' .task-create-success-notice')
+			actionContainerSuccess.removeClass('hidden');
+		},
+		error: function ( ) {
+			$(this).closest('.risk-row-content-' + riskToAssign).removeClass('wpeo-loader');
+
+			actionContainerError.empty()
+			actionContainerError.load(' .task-create-error-notice')
+			actionContainerError.removeClass('hidden');
+		}
 	});
-
-	let elementParent = $('.fichecenter').find('.div-table-responsive');
-
-    window.eoxiaJS.loader.display($(this));
-
-	setTimeout(function(){
-		elementParent.empty()
-		elementParent.load( document.URL + ' .tagtable.liste');
-		$(this).closest('.risk-row-content-' + riskToAssign).removeClass('wpeo-loader');
-	}, 800);
-
 };
 
 /**
@@ -1626,6 +1697,8 @@ window.eoxiaJS.riskassessmenttask.deleteRiskAssessmentTask = function ( event ) 
 window.eoxiaJS.riskassessmenttask.saveRiskAssessmentTask = function ( event ) {
 	let editedRiskAssessmentTaskId = $(this).attr('value');
 	let elementRiskAssessmentTask = $(this).closest('.riskassessment-task-container');
+	let actionContainerSuccess = $('.messageSuccessTaskEdit');
+	let actionContainerError = $('.messageErrorTaskEdit');
 
 	var task = elementRiskAssessmentTask.find('.riskassessment-task-label').val();
 	var taskPost = '';
@@ -1633,27 +1706,43 @@ window.eoxiaJS.riskassessmenttask.saveRiskAssessmentTask = function ( event ) {
 		taskPost = '&tasktitle=' + encodeURI(task);
 	}
 
+	let elementParent = $(this).closest('.riskassessment-task-list-content');
+	let riskId = elementParent.attr('value');
+	let taskSingle = $(this).closest('.riskassessment-task-container').find('.riskassessment-task-single-content');
+	let taskRef =  $('.riskassessment-task-ref-'+editedRiskAssessmentTaskId).attr('value');
+
+	taskSingle.empty()
+	window.eoxiaJS.loader.display($(this));
+
 	$.ajax({
 		url: document.URL + '&action=saveRiskAssessmentTask&riskAssessmentTaskID=' + editedRiskAssessmentTaskId + taskPost,
 		type: "POST",
 		processData: false,
-		contentType: false
+		contentType: false,
+		success: function ( ) {
+			elementParent.empty()
+			elementParent.load( document.URL + ' .riskassessment-task-list-'+riskId);
+			taskSingle.load( document.URL + ' .riskassessment-task-single-'+riskId);
+			elementRiskAssessmentTask.removeClass('wpeo-loader');
+
+			let textToShow = '';
+			textToShow += actionContainerSuccess.find('.valueForEditTask1').val()
+			textToShow += taskRef
+			textToShow += actionContainerSuccess.find('.valueForEditTask2').val()
+
+			actionContainerSuccess.find('.notice-subtitle .text').text(textToShow)
+			actionContainerSuccess.removeClass('hidden');
+		},
+		error: function ( ) {
+			let textToShow = '';
+			textToShow += actionContainerError.find('.valueForEditTask1').val()
+			textToShow += taskRef
+			textToShow += actionContainerError.find('.valueForEditTask2').val()
+
+			actionContainerError.find('.notice-subtitle .text').text(textToShow);
+			actionContainerError.removeClass('hidden');
+		}
 	});
-
-	let elementParent = $(this).closest('.modal-content');
-	let riskId = elementParent.attr('value');
-	let taskSingle = $(this).closest('.riskassessment-task-container').find('.riskassessment-task-single-content');
-
-    window.eoxiaJS.loader.display($(this));
-    taskSingle.empty()
-
-	setTimeout(function(){
-        elementParent.empty()
-		elementParent.load( document.URL + ' .riskassessment-task-list-'+riskId);
-		taskSingle.load( document.URL + ' .riskassessment-task-single-'+riskId);
-		elementRiskAssessmentTask.removeClass('wpeo-loader');
-	}, 800);
-	$(this).closest('.div-table-responsive').load( document.URL + '&action=saveRiskAssessmentTask&riskAssessmentTaskID=' + editedRiskAssessmentTaskId + taskPost + ' .div-table-responsive');
 };
 
 /**
@@ -2028,4 +2117,50 @@ window.eoxiaJS.digiriskusers.removeDiacritics = function( input ) {
 	}
 
 	return output;
+};
+
+
+/**
+ * Initialise l'objet "notice" ainsi que la méthode "init" obligatoire pour la bibliothèque EoxiaJS.
+ *
+ * @since   1.0.0
+ * @version 1.0.0
+ */
+window.eoxiaJS.notice = {};
+
+/**
+ * La méthode appelée automatiquement par la bibliothèque EoxiaJS.
+ *
+ * @since   1.0.0
+ * @version 1.0.0
+ *
+ * @return {void}
+ */
+window.eoxiaJS.notice.init = function() {
+	window.eoxiaJS.notice.event();
+};
+
+/**
+ * La méthode contenant tous les évènements pour l'évaluateur.
+ *
+ * @since   1.0.0
+ * @version 1.0.0
+ *
+ * @return {void}
+ */
+window.eoxiaJS.notice.event = function() {
+	jQuery( document ).on( 'click', '.notice-close', window.eoxiaJS.notice.closeNotice );
+};
+
+/**
+ * Clique sur une des user de la liste.
+ *
+ * @since   1.0.0
+ * @version 1.0.0
+ *
+ * @param  {ClickEvent} event L'état du clic.
+ * @return {void}
+ */
+window.eoxiaJS.notice.closeNotice = function( event ) {
+	$(this).closest('.notice').addClass("hidden");
 };

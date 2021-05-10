@@ -60,6 +60,20 @@ DigiriskConfig = Configuration du module
 DigiriskConfigSociety = Configuration société
 PermissionDenied = Permission refusée
 NoPhoneNumber = Pas de numéro de téléphone
+HasBeenCreatedF = a été créée
+HasBeenCreatedM = a été créé
+HasNotBeenCreatedF = n'a pas été créée
+HasNotBeenCreatedM = n'a pas été créé
+
+HasBeenEditedF = a été éditée
+HasBeenEditedM = a été édité
+HasNotBeenEditedF = n'a pas été éditée
+HasNotBeenEditedM = n'a pas été édité
+
+HasBeenDeletedF = a été supprimée
+HasBeenDeletedM = a été supprimé
+HasNotBeenDeletedF = n'a pas été supprimée
+HasNotBeenDeletedM = n'a pas été supprimé
 
 DigiriskDolibarrArea = Page d'index de Digirisk Dolibarr
 
@@ -480,6 +494,11 @@ DigiriskRiskStandardModel = Renvoie le numéro sous la forme RKn où n est un co
 # Data - Donnée
 Risks = Risques
 Risk = Risque
+TheRisk = Le risque
+RiskWellCreated = Risque créé
+RiskNotCreated = Erreur lors de la création du risque
+RiskWellEdited = Risque édité
+RiskNotEdited = Erreur lors de l'édition du risque
 RiskList = Listing de risques
 RisksList = Liste de risques
 AddRiskTitle = Ajout du risque
@@ -511,6 +530,13 @@ DigiriskRiskAssessmentNumberingModule = Modèle de numérotation des évaluation
 
 # Data - Donnée
 RiskAssessment = Évaluation
+TheRiskAssessment = L'évaluation
+RiskAssessmentWellCreated = Évaluation créée
+RiskAssessmentNotCreated = Erreur lors de la création de l'évaluation
+RiskAssessmentWellEdited = Évaluation éditée
+RiskAssessmentNotEdited = Erreur lors de l'édition de l'évaluation
+RiskAssessmentWellDeleted = Évaluation supprimée
+RiskAssessmentNotDeleted = Erreur lors de la suppression de l'évaluation
 EvaluationCreate = Ajout de l'évaluation
 EvaluationEdit = Édition de l'évaluation
 EvaluationMethod = Méthode d'évaluation
@@ -559,6 +585,14 @@ DeleteDigiriskRiskSign = Supprimer des signalisations
 #
 
 # Data - Donnée
+
+TheTask = La tâche
+TaskWellCreated = Tâche créée
+TaskNotCreated = Erreur lors de la création de la tâche$
+TaskWellEdited = Tâche éditée
+TaskNotEdited = Erreur lors de l'édition de la tâche
+TaskWellDeleted = Tâche supprimée
+TaskNotDeleted = Erreur lors de la suppression de la tâche
 TasksManagement = Gestion des tâches
 SelectProject = Choix du projet
 DUProject = Projet lié aux tâches des risques
