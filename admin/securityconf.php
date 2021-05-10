@@ -29,6 +29,7 @@ if (!$res) die("Include of main fails");
 require_once DOL_DOCUMENT_ROOT.'/core/lib/admin.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/company.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/functions2.lib.php';
+require_once DOL_DOCUMENT_ROOT.'/core/class/doleditor.class.php';
 require_once DOL_DOCUMENT_ROOT.'/core/class/html.formother.class.php';
 require_once DOL_DOCUMENT_ROOT.'/core/class/html.formactions.class.php';
 require_once DOL_DOCUMENT_ROOT.'/core/class/html.form.class.php';
@@ -457,7 +458,9 @@ print '</td></tr>';
 // * Location of detailed instructions - Emplacement de la consigne détaillée *
 
 print '<tr class="oddeven"><td><label for="emplacementCD">'.$langs->trans("LocationOfDetailedInstructions").'</label></td><td>';
-print '<textarea name="emplacementCD" id="emplacementCD" class="minwidth300" rows="'.ROWS_3.'">'.($conf->global->DIGIRISK_LOCATION_OF_DETAILED_INSTRUCTION ? $conf->global->DIGIRISK_LOCATION_OF_DETAILED_INSTRUCTION : '').'</textarea></td></tr>'."\n";
+$doleditor = new DolEditor('emplacementCD', $conf->global->DIGIRISK_LOCATION_OF_DETAILED_INSTRUCTION ? $conf->global->DIGIRISK_LOCATION_OF_DETAILED_INSTRUCTION : '', '', 90, 'dolibarr_notes', '', false, true, $conf->global->FCKEDITOR_ENABLE_SOCIETE, ROWS_3, '90%');
+$doleditor->Create();
+print '</td></tr>';
 
 /*
 *** Society additional details -- Informations complémentaires de la société ***
@@ -468,17 +471,23 @@ print '<tr class="liste_titre"><th class="titlefield">'.$langs->trans("SocietyAd
 // * Description - Emplacement de la consigne détaillée *
 
 print '<tr class="oddeven"><td><label for="description">'.$langs->trans("Description").'</label></td><td>';
-print '<textarea name="description" id="description" class="minwidth300" rows="'.ROWS_3.'">'.($conf->global->DIGIRISK_SOCIETY_DESCRIPTION ? $conf->global->DIGIRISK_SOCIETY_DESCRIPTION : '').'</textarea></td></tr>'."\n";
+$doleditor = new DolEditor('description', $conf->global->DIGIRISK_SOCIETY_DESCRIPTION ? $conf->global->DIGIRISK_SOCIETY_DESCRIPTION : '', '', 90, 'dolibarr_notes', '', false, true, $conf->global->FCKEDITOR_ENABLE_SOCIETE, ROWS_3, '90%');
+$doleditor->Create();
+print '</td></tr>';
 
 // * General means at disposal - Moyens généraux mis à disposition *
 
 print '<tr class="oddeven"><td><label for="moyensgeneraux">'.$langs->trans("GeneralMeansAtDisposal").'</label></td><td>';
-print '<textarea name="moyensgeneraux" id="moyensgeneraux" class="minwidth300" rows="'.ROWS_3.'">'.($conf->global->DIGIRISK_GENERAL_MEANS ? $conf->global->DIGIRISK_GENERAL_MEANS : '').'</textarea></td></tr>'."\n";
+$doleditor = new DolEditor('moyensgeneraux', $conf->global->DIGIRISK_GENERAL_MEANS ? $conf->global->DIGIRISK_GENERAL_MEANS : '', '', 90, 'dolibarr_notes', '', false, true, $conf->global->FCKEDITOR_ENABLE_SOCIETE, ROWS_3, '90%');
+$doleditor->Create();
+print '</td></tr>';
 
 // * General instructions - Consignes générales *
 
 print '<tr class="oddeven"><td><label for="consignesgenerales">'.$langs->trans("GeneralInstructions").'</label></td><td>';
-print '<textarea name="consignesgenerales" id="consignesgenerales" class="minwidth300" rows="'.ROWS_3.'">'.($conf->global->DIGIRISK_GENERAL_RULES ? $conf->global->DIGIRISK_GENERAL_RULES : '').'</textarea></td></tr>'."\n";
+$doleditor = new DolEditor('consignesgenerales', $conf->global->DIGIRISK_GENERAL_RULES ? $conf->global->DIGIRISK_GENERAL_RULES : '', '', 90, 'dolibarr_notes', '', false, true, $conf->global->FCKEDITOR_ENABLE_SOCIETE, ROWS_3, '90%');
+$doleditor->Create();
+print '</td></tr>';
 
 // * Rules of procedure - Règlement intérieur *
 
@@ -487,7 +496,9 @@ print '<tr class="liste_titre"><th class="titlefield wordbreak">'.$langs->trans(
 // * Rules of procedure location - Emplacement du règlement intérieur *
 
 print '<tr class="oddeven"><td><label for="emplacementRI">'.$langs->trans("Location").'</label></td><td>';
-print '<textarea name="emplacementRI" id="emplacementRI" class="minwidth300" rows="'.ROWS_3.'">'.($conf->global->DIGIRISK_RULES_LOCATION ? $conf->global->DIGIRISK_RULES_LOCATION : '').'</textarea></td></tr>'."\n";
+$doleditor = new DolEditor('emplacementRI', $conf->global->DIGIRISK_RULES_LOCATION ? $conf->global->DIGIRISK_RULES_LOCATION : '', '', 90, 'dolibarr_notes', '', false, true, $conf->global->FCKEDITOR_ENABLE_SOCIETE, ROWS_3, '90%');
+$doleditor->Create();
+print '</td></tr>';
 
 // * Risks evaluation - Document Unique *
 
@@ -496,8 +507,9 @@ print '<tr class="liste_titre"><th class="titlefield wordbreak">'.$langs->trans(
 // * Risks evaluation location - Emplacement du Document Unique *
 
 print '<tr class="oddeven"><td><label for="emplacementDU">'.$langs->trans("Location").'</label></td><td>';
-print '<textarea name="emplacementDU" id="emplacementDU" class="minwidth300" rows="'.ROWS_3.'">'.($conf->global->DIGIRISK_DUER_LOCATION ? $conf->global->DIGIRISK_DUER_LOCATION : '').'</textarea></td></tr>'."\n";
-
+$doleditor = new DolEditor('emplacementDU', $conf->global->DIGIRISK_DUER_LOCATION ? $conf->global->DIGIRISK_DUER_LOCATION : '', '', 90, 'dolibarr_notes', '', false, true, $conf->global->FCKEDITOR_ENABLE_SOCIETE, ROWS_3, '90%');
+$doleditor->Create();
+print '</td></tr>';
 
 // * Collective Agreement - Convention collective *
 
@@ -506,8 +518,9 @@ print '<tr class="liste_titre"><th class="titlefield wordbreak">'.$langs->trans(
 // * Collective Agreement location - Emplacement de la Convention collective *
 
 print '<tr class="oddeven"><td><label for="emplacementCC">'.$langs->trans("Location").'</label></td><td>';
-print '<textarea name="emplacementCC" id="emplacementCC" class="minwidth300" rows="'.ROWS_3.'">'.($conf->global->DIGIRISK_COLLECTIVE_AGREEMENT_LOCATION ? $conf->global->DIGIRISK_COLLECTIVE_AGREEMENT_LOCATION : '').'</textarea></td></tr>'."\n";
-
+$doleditor = new DolEditor('emplacementCC', $conf->global->DIGIRISK_COLLECTIVE_AGREEMENT_LOCATION ? $conf->global->DIGIRISK_COLLECTIVE_AGREEMENT_LOCATION : '', '', 90, 'dolibarr_notes', '', false, true, $conf->global->FCKEDITOR_ENABLE_SOCIETE, ROWS_3, '90%');
+$doleditor->Create();
+print '</td></tr>';
 print '</table>';
 
 print '<br><div class="center">';

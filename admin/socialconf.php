@@ -29,6 +29,7 @@ if (!$res) die("Include of main fails");
 require_once DOL_DOCUMENT_ROOT.'/core/lib/admin.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/company.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/functions2.lib.php';
+require_once DOL_DOCUMENT_ROOT.'/core/class/doleditor.class.php';
 require_once DOL_DOCUMENT_ROOT.'/core/class/html.formother.class.php';
 require_once DOL_DOCUMENT_ROOT.'/core/class/html.formactions.class.php';
 require_once DOL_DOCUMENT_ROOT.'/core/class/html.form.class.php';
@@ -140,7 +141,9 @@ print '<tr class="liste_titre"><th class="titlefield wordbreak">'.$langs->trans(
 // * Terms And Conditions - Modalités *
 
 print '<tr class="oddeven"><td><label for="modalites">'.$langs->trans("TermsAndConditions").'</label></td><td>';
-print '<textarea name="modalites" id="modalites" class="minwidth300" rows="'.ROWS_3.'">'.($conf->global->DIGIRISK_PARTICIPATION_AGREEMENT_INFORMATION_PROCEDURE ? $conf->global->DIGIRISK_PARTICIPATION_AGREEMENT_INFORMATION_PROCEDURE : '').'</textarea></td></tr>'."\n";
+$doleditor = new DolEditor('modalites', $conf->global->DIGIRISK_PARTICIPATION_AGREEMENT_INFORMATION_PROCEDURE ? $conf->global->DIGIRISK_PARTICIPATION_AGREEMENT_INFORMATION_PROCEDURE : '', '', 90, 'dolibarr_notes', '', false, true, $conf->global->FCKEDITOR_ENABLE_SOCIETE, ROWS_3, '90%');
+$doleditor->Create();
+print '</td></tr>';
 
 /*
 *** Exceptions to working hours -- Dérogations aux horaires de travail ***
@@ -153,12 +156,16 @@ print '<tr class="liste_titre"><th class="titlefield wordbreak">'.$langs->trans(
 // * Permanent - Permanentes *
 
 print '<tr class="oddeven"><td><label for="permanent">'.$langs->trans("PermanentDerogation").'</label></td><td>';
-print '<textarea name="permanent" id="permanent" class="minwidth300" rows="'.ROWS_3.'">'.($conf->global->DIGIRISK_DEROGATION_SCHEDULE_PERMANENT ? $conf->global->DIGIRISK_DEROGATION_SCHEDULE_PERMANENT : '').'</textarea></td></tr>'."\n";
+$doleditor = new DolEditor('permanent', $conf->global->DIGIRISK_DEROGATION_SCHEDULE_PERMANENT ? $conf->global->DIGIRISK_DEROGATION_SCHEDULE_PERMANENT : '', '', 90, 'dolibarr_notes', '', false, true, $conf->global->FCKEDITOR_ENABLE_SOCIETE, ROWS_3, '90%');
+$doleditor->Create();
+print '</td></tr>';
 
 // * Permanent - Permanentes *
 
 print '<tr class="oddeven"><td><label for="occasional">'.$langs->trans("OccasionalDerogation").'</label></td><td>';
-print '<textarea name="occasional" id="occasional" class="minwidth300" rows="'.ROWS_3.'">'.($conf->global->DIGIRISK_DEROGATION_SCHEDULE_OCCASIONAL ? $conf->global->DIGIRISK_DEROGATION_SCHEDULE_OCCASIONAL : '').'</textarea></td></tr>'."\n";
+$doleditor = new DolEditor('occasional', $conf->global->DIGIRISK_DEROGATION_SCHEDULE_OCCASIONAL ? $conf->global->DIGIRISK_DEROGATION_SCHEDULE_OCCASIONAL : '', '', 90, 'dolibarr_notes', '', false, true, $conf->global->FCKEDITOR_ENABLE_SOCIETE, ROWS_3, '90%');
+$doleditor->Create();
+print '</td></tr>';
 
 /*
 *** ESC -- CSE ***
