@@ -18,7 +18,7 @@
 #
 
 # Module label 'ModuleDigiriskdolibarrName'
-ModuleDigiriskdolibarrName = Digiriskdolibarr
+ModuleDigiriskdolibarrName = Digirisk
 
 # Module description 'ModuleDigiriskdolibarrDesc'
 ModuleDigiriskdolibarrDesc = Digirisk pour Dolibarr
@@ -28,9 +28,9 @@ ModuleDigiriskdolibarrDesc = Digirisk pour Dolibarr
 #
 
 # Data - Donnée
-DigiriskdolibarrSetup = Configuration du module DigiriskDolibarr
+DigiriskdolibarrSetup = Configuration du module Digirisk
 Settings = Réglages
-DigiriskdolibarrSetupPage = Page de configuration du module Digiriskdolibarr
+DigiriskdolibarrSetupPage = Page de configuration du module Digirisk
 AgendaModuleRequired = Pour assurer la traçabilité des actions dans Digirisk, assurez-vous que le module Agenda est bien activé
 DigiriskDolibarrDescription = Digirisk pour Dolibarr
 
@@ -40,8 +40,8 @@ DigiriskDolibarrDescription = Digirisk pour Dolibarr
 
 # Data - Donnée
 About = À propos
-DigiriskdolibarrAbout = À propos de Digiriskdolibarr
-DigiriskdolibarrAboutPage = Page à propos de Digiriskdolibarr
+DigiriskdolibarrAbout = À propos de Digirisk
+DigiriskdolibarrAboutPage = Page à propos de Digirisk
 
 #
 # DigiriskDolibarr
@@ -75,7 +75,7 @@ HasBeenDeletedM = a été supprimé
 HasNotBeenDeletedF = n'a pas été supprimée
 HasNotBeenDeletedM = n'a pas été supprimé
 
-DigiriskDolibarrArea = Page d'index de Digirisk Dolibarr
+DigiriskDolibarrArea = Page d'index de Digirisk
 
 #
 # Horaires d'ouverture
