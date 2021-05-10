@@ -373,7 +373,7 @@ if ($object->id > 0) {
 							</div>
 							<div class="evaluator-date">
 								<span class="title"><?php echo $langs->trans('Date'); ?></span>
-								<?php print $form->selectDate(-1, 'EvaluatorDate', 0, 0, 0, 'evaluator_form', 1, 1); ?>
+								<?php print $form->selectDate('', 'EvaluatorDate', 0, 0, 0, 'evaluator_form', 1, 1); ?>
 							</div>
 						</div>
 					</div>
