@@ -65,6 +65,28 @@ if (empty($setupnotempty)) {
 	print '<br>'.$langs->trans("AgendaModuleRequired");
 }
 
+if ( $conf->global->DIGIRISKDOLIBARR_DU_PROJECT == 0 ) {
+	require_once DOL_DOCUMENT_ROOT . '/projet/class/project.class.php';
+	require_once DOL_DOCUMENT_ROOT . '/societe/class/societe.class.php';
+	require_once DOL_DOCUMENT_ROOT . '/core/modules/project/mod_project_simple.php';
+
+	$project     = new Project($db);
+	$third_party = new Societe($db);
+	$projectRef  = new $conf->global->PROJECT_ADDON();
+
+	$project->ref         = $projectRef->getNextValue($third_party, $project);
+	$project->title       = $langs->trans('RiskAssessmentDocument');
+	$project->description = $langs->trans('RiskAssessmentDocumentDescription');
+	$project->date_c      = dol_now();
+	//$project->date_start = dol_now(); -> option
+	$project->usage_task  = 1;
+	//$project->date_end = dol_now(); -> option
+	$project->statut      = 1;
+	$project_id = $project->create($user);
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_DU_PROJECT', $project_id, 'integer', 1, '',$conf->entity);
+
+}
+
 // Page end
 dol_fiche_end();
 
