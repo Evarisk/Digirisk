@@ -304,7 +304,7 @@ RiskAssessmentDocumentDigiriskTemplate = ODT par défaut des documents unique
 # Data - Donnée
 RiskAssessmentDocument = Document unique
 RiskAssessmentDocumentDU = Plan d'action Document Unique
-RiskAssessmentDocumentDUDescription = Description du plan d'action Document Unique
+RiskAssessmentDocumentDescription = Description du plan d'action Document Unique
 
 AuditStartDate = Date de début d'audit
 AuditEndDate = Date de fin d'audit
