@@ -217,24 +217,6 @@ print '<td class="center" width="60">'.$langs->trans("Status").'</td>';
 print '</tr>'."\n";
 
 print '<tr class="oddeven"><td>';
-print $langs->trans('MultipleRiskAssessmentMethodName');
-print "</td><td>\n";
-print $langs->trans('MultipleRiskAssessmentMethodDescription');
-print '</td>';
-
-print '<td class="center">';
-if ($conf->global->DIGIRISKDOLIBARR_MULTIPLE_RISKASSESSMENT_METHOD)
-{
-	print '<a class="reposition" href="'.$_SERVER["PHP_SELF"].'?action=setmethod&value=0" alt="'.$langs->trans("Default").'">'.img_picto($langs->trans("Activated"), 'switch_on').'</a>';
-}
-else
-{
-	print '<a class="reposition" href="'.$_SERVER["PHP_SELF"].'?action=setmethod&value=1" alt="'.$langs->trans("Default").'">'.img_picto($langs->trans("Disabled"), 'switch_off').'</a>';
-}
-print '</td>';
-print '</tr>';
-
-print '<tr class="oddeven"><td>';
 print $langs->trans('AdvancedRiskAssessmentMethod');
 print "</td><td>\n";
 print $langs->trans('AdvancedRiskAssessmentMethodDescription');
@@ -248,6 +230,24 @@ if ($conf->global->DIGIRISKDOLIBARR_ADVANCED_RISKASSESSMENT_METHOD)
 else
 {
 	print '<a class="reposition" href="'.$_SERVER["PHP_SELF"].'?action=setadvancedmethod&value=1" alt="'.$langs->trans("Default").'">'.img_picto($langs->trans("Disabled"), 'switch_off').'</a>';
+}
+print '</td>';
+print '</tr>';
+
+print '<tr class="oddeven"><td>';
+print $langs->trans('MultipleRiskAssessmentMethodName');
+print "</td><td>\n";
+print $langs->trans('MultipleRiskAssessmentMethodDescription');
+print '</td>';
+
+print '<td class="center">';
+if ($conf->global->DIGIRISKDOLIBARR_MULTIPLE_RISKASSESSMENT_METHOD)
+{
+	print '<a class="reposition" href="'.$_SERVER["PHP_SELF"].'?action=setmethod&value=0" alt="'.$langs->trans("Default").'">'.img_picto($langs->trans("Activated"), 'switch_on').'</a>';
+}
+else
+{
+	print '<a class="reposition" href="'.$_SERVER["PHP_SELF"].'?action=setmethod&value=1" alt="'.$langs->trans("Default").'">'.img_picto($langs->trans("Disabled"), 'switch_off').'</a>';
 }
 print '</td>';
 print '</tr>';
