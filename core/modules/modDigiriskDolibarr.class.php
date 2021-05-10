@@ -677,9 +677,16 @@ class modDigiriskdolibarr extends DolibarrModules
 			$pompiers->phone = '18';
 			$pompiersID = $pompiers->create($user);
 
+			$emergency = $societe;
+			$emergency->name = $langs->trans('AllEmergencies');
+			$emergency->client = 0;
+			$emergency->phone = '112';
+			$emergencyID = $emergency->create($user);
+
 			$resources->digirisk_dolibarr_set_resources($this->db,1,  'Police',  'societe', array($policeID), $conf->entity);
 			$resources->digirisk_dolibarr_set_resources($this->db,1,  'SAMU',  'societe', array($samuID), $conf->entity);
 			$resources->digirisk_dolibarr_set_resources($this->db,1,  'Pompiers',  'societe', array($pompiersID), $conf->entity);
+			$resources->digirisk_dolibarr_set_resources($this->db,1,  'AllEmergencies',  'societe', array($emergencyID), $conf->entity);
 
 			dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_THIRDPARTY_SET', 1, 'integer', 0, '', $conf->entity);
 		}
