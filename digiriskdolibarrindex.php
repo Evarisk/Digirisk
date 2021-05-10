@@ -44,9 +44,13 @@ if ( $conf->global->DIGIRISKDOLIBARR_DU_PROJECT == 0 ) {
 	$project->title       = $langs->trans('RiskAssessmentDocument');
 	$project->description = $langs->trans('RiskAssessmentDocumentDescription');
 	$project->date_c      = dol_now();
-	//$project->date_start = dol_now(); -> option
+	$currentYear = date('Y');
+	$fiscalMonthStart = date('m', strtotime($conf->global->SOCIETE_FISCAL_MONTH_START));
+	$startdate = $currentYear . '-' . $test . '-01';
+	$project->date_start = $startdate;
 	$project->usage_task  = 1;
-	//$project->date_end = dol_now(); -> option
+	$enddate = date('Y-m-d', strtotime(date("Y-m-d", strtotime($startdate)) . " + 1 year"));
+	$project->date_end = $enddate;
 	$project->statut      = 1;
 	$project_id = $project->create($user);
 	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_DU_PROJECT', $project_id, 'integer', 1, '',$conf->entity);
