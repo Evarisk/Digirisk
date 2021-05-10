@@ -327,13 +327,6 @@ Sources = Sources
 ImportantNote = Remarque importante
 SitePlans = Localisation des plans
 
-RiskAssessmentMethod = * Etape 1 : Recuperation des informations\n- Visite des locaux\n- Recuperation des donnees du personnel\n\n * Etape 2 : Definition de la methodologie et de document\n- Validation des fiches d'unite de travail standard\n- Validation de l'arborescence des unites\n\n* Etape 3 : Realisation de l etude de risques\n- Sensibilisation des personnels aux risques et aux dangers\n- Creation des unites de travail avec le personnel et le ou les responsables\n- Evaluations des risques par unites de travail avec le personnel\n\n* Etape 4\n- Traitement et redaction du document unique
-RiskAssessmentSources = La sensibilisation des risques est definie dans l ed840 edite par l INRS.\nDans ce document vous trouverez:\n- La definition d un risque, d un danger et un schema explicatif\n- Les explications concernant les differentes methodes d evaluation\n
-RiskAssessmentMethodCard = * Étape 1 : Récuperation des informations<br>- Visite des locaux<br>- Recuperation des données du personnel<br> * Étape 2 : Définition de la méthodologie et de document<br>- Validation des fiches d'unité de travail standard<br>- Validation de l'arborescence des unités<br>* Étape 3 : Réalisation de l'etude de risques<br>- Sensibilisation des personnels aux risques et aux dangers<br>- Création des unités de travail avec le personnel et le ou les responsables<br>- Évaluations des risques par unités de travail avec le personnel<br>* Étape 4<br>- Traitement et rédaction du document unique
-RiskAssessmentSourcesCard = La sensibilisation des risques est définie dans l'ed840 édité par l INRS.<br>Dans ce document vous trouverez:<br>- La définition d'un risque, d'un danger et un schema explicatif<br>- Les explications concernant les différentes méthodes d'évaluation<br>
-RiskAssessmentImportantNote = Notes importantes
-RiskAssessmentSitePlans = Plan du site
-
 #
 # GroupmentDocument - Fiche Groupement
 #

@@ -64,7 +64,8 @@ if ( $action == "edit" && $permissiontoadd ) {
 	print '<tr>';
 	print '<td class="titlefield"><label for="Method">' . $langs->trans("Method") . '</label></td>';
 	print '<td>';
-	print '<textarea name="Method" id="Method" class="minwidth300" rows="'.ROWS_3.'">'.$conf->global->DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_METHOD.'</textarea>';
+	$doleditor = new DolEditor('Method', $conf->global->DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_METHOD ? $conf->global->DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_METHOD : '', '', 90, 'dolibarr_notes', '', false, true, $conf->global->FCKEDITOR_ENABLE_SOCIETE, ROWS_3, '90%');
+	$doleditor->Create();
 	print '</td></tr>';
 
 // Sources
@@ -72,7 +73,8 @@ if ( $action == "edit" && $permissiontoadd ) {
 	print '<tr>';
 	print '<td class="titlefield"><label for="Sources">' . $langs->trans("Sources") . '</label></td>';
 	print '<td>';
-	print '<textarea name="Sources" id="Sources" class="minwidth300" rows="'.ROWS_3.'">'.$conf->global->DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_SOURCES.'</textarea>';
+	$doleditor = new DolEditor('Sources', $conf->global->DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_SOURCES ? $conf->global->DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_SOURCES : '', '', 90, 'dolibarr_notes', '', false, true, $conf->global->FCKEDITOR_ENABLE_SOCIETE, ROWS_3, '90%');
+	$doleditor->Create();
 	print '</td></tr>';
 
 // Remarque Importante
@@ -80,7 +82,8 @@ if ( $action == "edit" && $permissiontoadd ) {
 	print '<tr>';
 	print '<td class="titlefield"><label for="ImportantNote">' . $langs->trans("ImportantNote") . '</label></td>';
 	print '<td>';
-	print '<textarea name="ImportantNote" id="ImportantNote" class="minwidth300" rows="'.ROWS_3.'">'.$conf->global->DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_IMPORTANT_NOTE.'</textarea>';
+	$doleditor = new DolEditor('ImportantNote', $conf->global->DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_IMPORTANT_NOTES ? $conf->global->DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_IMPORTANT_NOTES : '', '', 90, 'dolibarr_notes', '', false, true, $conf->global->FCKEDITOR_ENABLE_SOCIETE, ROWS_3, '90%');
+	$doleditor->Create();
 	print '</td></tr>';
 
 // Disponibilité des plans
@@ -88,7 +91,8 @@ if ( $action == "edit" && $permissiontoadd ) {
 	print '<tr>';
 	print '<td class="titlefield"><label for="SitePlans">' . $langs->trans("SitePlans") . '</label></td>';
 	print '<td>';
-	print '<textarea name="SitePlans" id="SitePlans" class="minwidth300" rows="'.ROWS_3.'">'.$conf->global->DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_SITE_PLANS.'</textarea>';
+	$doleditor = new DolEditor('SitePlans', $conf->global->DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_SITE_PLANS ? $conf->global->DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_SITE_PLANS : '', '', 90, 'dolibarr_notes', '', false, true, $conf->global->FCKEDITOR_ENABLE_SOCIETE, ROWS_3, '90%');
+	$doleditor->Create();
 	print '</td></tr>';
 
 } else {
