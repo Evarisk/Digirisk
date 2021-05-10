@@ -61,8 +61,8 @@ if ( $conf->global->DIGIRISKDOLIBARR_DU_PROJECT == 0 || $project->statut == 2 ) 
 	$project->description = $langs->trans('RiskAssessmentDocumentDescription');
 	$project->date_c      = dol_now();
 	$currentYear = date('Y');
-	$fiscalMonthStart = date('m', strtotime($conf->global->SOCIETE_FISCAL_MONTH_START));
-	$startdate = $currentYear . '-' . $test . '-01';
+	$fiscalMonthStart = $conf->global->SOCIETE_FISCAL_MONTH_START;
+	$startdate = $currentYear . '-' . $fiscalMonthStart . '-01';
 	$project->date_start = $startdate;
 	$project->usage_task  = 1;
 	$enddate = date('Y-m-d', strtotime(date("Y-m-d", strtotime($startdate)) . " + 1 year"));
