@@ -450,6 +450,13 @@ DigiriskEvaluatorStandardModel = Renvoie le numéro sous la forme EVn où n est 
 
 # Data - Donnée
 Evaluator = Évaluateur
+TheEvaluator = L'évaluateur
+EvaluatorWellCreated = Évaluateur créé
+EvaluatorNotCreated = Erreur lors de la création de l'évaluateur
+EvaluatorWellEdited = Évaluateur édité
+EvaluatorNotEdited = Erreur lors de l'édition de l'évaluateur
+EvaluatorWellDeleted = Évaluateur supprimé
+EvaluatorNotDeleted = Erreur lors de la suppression de l'évaluateur
 EvaluatorList = Liste des évaluateurs
 AssignmentDate = Date d'affectation
 EvaluationDuration = Durée
@@ -567,6 +574,13 @@ DigiriskRiskSignNumberingModule = Modèle de numérotation des signalisation des
 
 # Data - Donnée
 RiskSign = Signalisation
+TheRiskSign = La signalisation
+RiskSignWellCreated = Signalisation créée
+RiskSignNotCreated = Erreur lors de la création de la signalisation
+RiskSignWellEdited = Signalisation éditée
+RiskSignNotEdited = Erreur lors de l'édition de la signalisation
+RiskSignWellDeleted = Signalisation supprimée
+RiskSignNotDeleted = Erreur lors de la suppression de la signalisation
 RiskSignCategory = Catégorie
 AddRiskSignTitle = Ajout d'une signalisation
 AddRiskSignButton = Ajouter la signalisation
@@ -588,7 +602,7 @@ DeleteDigiriskRiskSign = Supprimer des signalisations
 
 TheTask = La tâche
 TaskWellCreated = Tâche créée
-TaskNotCreated = Erreur lors de la création de la tâche$
+TaskNotCreated = Erreur lors de la création de la tâche
 TaskWellEdited = Tâche éditée
 TaskNotEdited = Erreur lors de l'édition de la tâche
 TaskWellDeleted = Tâche supprimée

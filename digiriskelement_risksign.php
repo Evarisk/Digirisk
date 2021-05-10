@@ -249,7 +249,29 @@ if ($object->id > 0) {
 	print '<input type="hidden" name="contextpage" value="'.$contextpage.'">';
 	print '<div class="underbanner clearboth"></div>';
 
-	// Build and execute select
+	// NOTICES FOR ACTIONS
+	?>
+	<!--	RISK SIGN-->
+	<div class="messageSuccessRiskSignCreate notice hidden">
+		<div class="wpeo-notice notice-success risksign-create-success-notice">
+			<div class="notice-content">
+				<div class="notice-title"><?php echo $langs->trans('RiskSignWellCreated') ?></div>
+				<div class="notice-subtitle"><?php echo $langs->trans('TheRiskSign') . ' ' . $refRiskSignMod->getLastValue($risksign) . ' ' . $langs->trans('HasBeenCreatedF') ?></div>
+			</div>
+			<div class="notice-close"><i class="fas fa-times"></i></div>
+		</div>
+	</div>
+	<div class="messageErrorRiskSignCreate notice hidden">
+		<div class="wpeo-notice notice-warning risksign-create-error-notice">
+			<div class="notice-content">
+				<div class="notice-title"><?php echo $langs->trans('RiskSignNotCreated') ?></div>
+				<div class="notice-subtitle"><?php echo $langs->trans('TheRiskSign') . ' ' . $refRiskSignMod->getLastValue($risksign) . ' ' . $langs->trans('HasNotBeenCreatedF') ?></div>
+			</div>
+			<div class="notice-close"><i class="fas fa-times"></i></div>
+		</div>
+	</div>
+<?php
+// Build and execute select
 	// --------------------------------------------------------------------
 	$sql = 'SELECT ';
 	foreach ($risksign->fields as $key => $val)

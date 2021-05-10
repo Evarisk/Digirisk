@@ -377,6 +377,8 @@ window.eoxiaJS.modal.openModal = function ( event ) {
 	if ($(this).hasClass('risksign-photo')) {
 		$(this).closest('.risksign-photo-container').find('#risksign_photo' + idSelected).addClass('modal-active');
 	}
+
+	$('.notice').addClass('hidden');
 };
 
 /**
@@ -390,6 +392,7 @@ window.eoxiaJS.modal.openModal = function ( event ) {
  */
 window.eoxiaJS.modal.closeModal = function ( event ) {
 	$('.modal-active').removeClass('modal-active')
+	$('.notice').addClass('hidden');
 };
 
 /**
@@ -1777,7 +1780,6 @@ window.eoxiaJS.risksign.event = function() {
 	jQuery( document ).on( 'click', '.risksign-category-danger .item, .wpeo-table .risksign-category-danger .item', window.eoxiaJS.risksign.selectRiskSign );
 	jQuery( document ).on( 'click', '.risksign-create:not(.button-disable)', window.eoxiaJS.risksign.createRiskSign );
 	jQuery( document ).on( 'click', '.risksign-save', window.eoxiaJS.risksign.saveRiskSign );
-	jQuery( document ).on( 'click', '.risksign-delete', window.eoxiaJS.risksign.deleteRiskSign );
 };
 
 /**
@@ -1835,6 +1837,8 @@ window.eoxiaJS.risksign.haveDataInInput = function( elementParent ) {
  */
 window.eoxiaJS.risksign.createRiskSign = function ( event ) {
 	let elementRiskSign = $(this).closest('.fichecenter').find('.risksign-content');
+	let actionContainerSuccess = $('.messageSuccessRiskSignCreate');
+	let actionContainerError = $('.messageErrorRiskCreate');
 
 	var category = elementRiskSign.find('.risksign-category input').val();
 	var categoryPost = '';
@@ -1847,42 +1851,37 @@ window.eoxiaJS.risksign.createRiskSign = function ( event ) {
 	if (description !== '') {
 		descriptionPost = '&riskSignDescription=' + encodeURI(description);
 	}
+
+	let elementParent = $('.fichecenter').find('.div-table-responsive');
+	window.eoxiaJS.loader.display($('.fichecenter'));
+
 	$.ajax({
 		url: document.URL + '&action=add' + categoryPost + descriptionPost,
 		type: "POST",
 		processData: false,
-		contentType: false
+		contentType: false,
+		success: function ( ) {
+			let numberOfRiskSigns = $('.valignmiddle.col-title');
+			numberOfRiskSigns.load( document.URL + ' .table-fiche-title .titre.inline-block');
+
+			let modalRiskSign = $('.risksign-add-modal');
+			modalRiskSign.load( document.URL + ' .modal-risksign-0');
+
+			elementParent.empty()
+			elementParent.load( document.URL + ' .tagtable.liste');
+			$('.fichecenter').removeClass('wpeo-loader');
+
+			actionContainerSuccess.empty()
+			actionContainerSuccess.load(' .risksign-create-success-notice')
+			actionContainerSuccess.removeClass('hidden');
+		},
+		error: function ( ) {
+			actionContainerError.empty()
+			actionContainerError.load(' .risksign-create-error-notice')
+			actionContainerError.removeClass('hidden');
+		}
 	});
 
-	let elementParent = $('.fichecenter');
-
-	window.eoxiaJS.loader.display($('.fichecenter'));
-
-	setTimeout(function(){
-		elementParent.empty()
-		elementParent.load( document.URL + ' .fichecenter');
-		$('.fichecenter').removeClass('wpeo-loader');
-	}, 800);
-};
-
-
-/**
- * Action delete risksign.
- *
- * @since   1.0.0
- * @version 1.0.0
- *
- * @return {void}
- */
-window.eoxiaJS.risksign.deleteRiskSign = function ( event ) {
-	let deletedRiskSignId = $(this).attr('value')
-	var r = confirm('Are you sure you want to delete this risksign ?')
-	if (r == true) {
-		$('#risksign_row_'+deletedRiskSignId).empty()
-		$('#risksign_row_'+deletedRiskSignId).load( document.URL + '&action=deleteRiskSign&deletedRiskSignId=' + deletedRiskSignId + ' #risksign_row_'+deletedRiskSignId+' > div')
-	} else {
-		return false
-	}
 };
 
 /**
@@ -1958,7 +1957,6 @@ window.eoxiaJS.evaluator.init = function() {
  */
 window.eoxiaJS.evaluator.event = function() {
 	jQuery( document ).on( 'click', '.evaluator-create', window.eoxiaJS.evaluator.createEvaluator );
-	jQuery( document ).on( 'click', '.evaluator-delete', window.eoxiaJS.evaluator.deleteEvaluator );
 	jQuery( document ).on( 'click', '#userid'          , window.eoxiaJS.evaluator.selectUser );
 };
 
@@ -1984,8 +1982,8 @@ window.eoxiaJS.evaluator.selectUser = function( event ) {
  */
 window.eoxiaJS.evaluator.createEvaluator = function ( event ) {
 	let elementEvaluator = $(this).closest('.fichecenter').find('.evaluator-content');
-
-
+	let actionContainerSuccess = $('.messageSuccessEvaluatorCreate');
+	let actionContainerError = $('.messageErrorEvaluatorCreate');
 
 	var user = $('.user-selected').val()
 	var userPost = '';
@@ -2004,43 +2002,39 @@ window.eoxiaJS.evaluator.createEvaluator = function ( event ) {
 	if (duration !== 0) {
 		durationPost = '&duration=' + duration;
 	}
+
+	let elementParent = $(this).closest('.fichecenter').find('.div-table-responsive');
+
+	window.eoxiaJS.loader.display(elementParent);
+
 	$.ajax({
 		url: document.URL + '&action=add' + durationPost + datePost + userPost,
 		type: "POST",
 		processData: false,
-		contentType: false
+		contentType: false,
+		success: function ( ) {
+			let numberOfEvaluators = $('.valignmiddle.col-title');
+			numberOfEvaluators.load( document.URL + ' .table-fiche-title .titre.inline-block');
+
+			let modalEvaluator = $('.risksign-add-modal');
+			modalEvaluator.load( document.URL + ' .modal-evaluator-0');
+
+			elementParent.empty();
+			elementParent.load( document.URL + ' .tagtable.liste');
+			elementParent.removeClass('wpeo-loader');
+
+			actionContainerSuccess.empty()
+			actionContainerSuccess.load(' .evaluator-create-success-notice')
+			actionContainerSuccess.removeClass('hidden');
+		},
+		error: function ( ) {
+			actionContainerError.empty()
+			actionContainerError.load(' .evaluator-create-error-notice')
+			actionContainerError.removeClass('hidden');
+		}
 	});
 
-	let elementParent = $(this).closest('.fichecenter');
-
-	elementParent.empty();
-	window.eoxiaJS.loader.display(elementParent);
-
-	setTimeout(function(){
-		elementParent.load( document.URL + ' .fichecenter');
-		elementParent.removeClass('wpeo-loader');
-	}, 800);
 };
-
-/**
- * Action delete evaluator.
- *
- * @since   1.0.0
- * @version 1.0.0
- *
- * @return {boolean}
- */
-window.eoxiaJS.evaluator.deleteEvaluator = function ( event ) {
-	let deletedEvaluatorId = $(this).attr('value');
-	var r = confirm('Are you sure you want to delete this evaluator ?');
-	if (r == true) {
-		$('#evaluator_row_'+deletedEvaluatorId).empty();
-		$('#evaluator_row_'+deletedEvaluatorId).load( document.URL + '&action=deleteEvaluator&deletedEvaluatorId=' + deletedEvaluatorId + ' #evaluator_row_'+deletedEvaluatorId+' > div');
-	} else {
-		return false;
-	}
-};
-
 
 /**
  * Initialise l'objet "digiriskusers" ainsi que la méthode "init" obligatoire pour la bibliothèque EoxiaJS.

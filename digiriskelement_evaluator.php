@@ -213,6 +213,28 @@ if ($object->id > 0) {
 	print '<input type="hidden" name="contextpage" value="'.$contextpage.'">';
 	print '<div class="underbanner clearboth"></div>';
 
+	// NOTICES FOR ACTIONS
+	?>
+	<!--	EVALUATOR-->
+	<div class="messageSuccessEvaluatorCreate notice hidden">
+		<div class="wpeo-notice notice-success evaluator-create-success-notice">
+			<div class="notice-content">
+				<div class="notice-title"><?php echo $langs->trans('EvaluatorWellCreated') ?></div>
+				<div class="notice-subtitle"><?php echo $langs->trans('TheEvaluator') . ' ' . $refEvaluatorMod->getLastValue($evaluator) . ' ' . $langs->trans('HasBeenCreatedM') ?></div>
+			</div>
+			<div class="notice-close"><i class="fas fa-times"></i></div>
+		</div>
+	</div>
+	<div class="messageErrorEvaluatorCreate notice hidden">
+		<div class="wpeo-notice notice-warning evaluator-create-error-notice">
+			<div class="notice-content">
+				<div class="notice-title"><?php echo $langs->trans('EvaluatorNotCreated') ?></div>
+				<div class="notice-subtitle"><?php echo $langs->trans('TheEvaluator') . ' ' . $refEvaluatorMod->getLastValue($evaluator) . ' ' . $langs->trans('HasNotBeenCreatedM') ?></div>
+			</div>
+			<div class="notice-close"><i class="fas fa-times"></i></div>
+		</div>
+	</div>
+	<?php
 	// Build and execute select
 	// --------------------------------------------------------------------
 	$sql = 'SELECT ';

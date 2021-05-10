@@ -1566,7 +1566,7 @@ if ($object->id > 0) {
 											<!--	RISK ASSESSMENT-->
 											<div class="messageSuccessEvaluationEdit notice hidden">
 												<input type="hidden" class="valueForEditEvaluation1" value="<?php echo $langs->trans('TheRiskAssessment') . ' ' ?>">
-												<input type="hidden" class="valueForEditEvaluation2" value="<?php echo ' ' . $langs->trans('HasBeenEdited') ?>">
+												<input type="hidden" class="valueForEditEvaluation2" value="<?php echo ' ' . $langs->trans('HasBeenEditedF') ?>">
 												<div class="wpeo-notice notice-success riskassessment-edit-success-notice">
 													<div class="notice-content">
 														<div class="notice-title"><?php echo $langs->trans('RiskAssessmentWellEdited') ?></div>
