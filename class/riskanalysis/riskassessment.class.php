@@ -75,7 +75,7 @@ class RiskAssessment extends CommonObject
 		'exposition'    => array('type'=>'integer', 'label'=>'Exposition', 'enabled'=>'1', 'position'=>140, 'notnull'=>0, 'visible'=>0,),
 		'comment'       => array('type'=>'text', 'label'=>'Comment', 'enabled'=>'1', 'position'=>150, 'notnull'=>0, 'visible'=>0,),
 		'photo'         => array('type'=>'varchar(255)', 'label'=>'Photo', 'enabled'=>'1', 'position'=>160, 'notnull'=>0, 'visible'=>0,),
-		'has_tasks'     => array('type'=>'integer', 'label'=>'Tasks', 'enabled'=>'1', 'position'=>170, 'notnull'=>0, 'visible'=>4,),
+		'has_tasks'     => array('type'=>'integer', 'label'=>'Tasks', 'enabled'=>'1', 'position'=>170, 'notnull'=>0, 'visible'=>-1,),
 		'fk_user_creat' => array('type'=>'integer:User:user/class/user.class.php', 'label'=>'UserAuthor', 'enabled'=>'1', 'position'=>180, 'notnull'=>1, 'visible'=>0, 'foreignkey'=>'user.rowid',),
 		'fk_user_modif' => array('type'=>'integer:User:user/class/user.class.php', 'label'=>'UserModif', 'enabled'=>'1', 'position'=>190, 'notnull'=>-1, 'visible'=>0,),
 		'fk_risk'       => array('type'=>'integer', 'label'=>'ParentRisk', 'enabled'=>'1', 'position'=>200, 'notnull'=>1, 'visible'=>0,),

@@ -1260,16 +1260,18 @@ if ($object->id > 0) {
 
 	$varpage = empty($contextpage) ? $_SERVER["PHP_SELF"] : $contextpage;
 
-	if (!preg_match('/t.description/', $user->conf->MAINSELECTEDFIELDS_riskcard) && $conf->global->DIGIRISKDOLIBARR_RISK_DESCRIPTION) {
-		$user->conf->MAIN_SELECTEDFIELDS_riskcard .= 't.description,';
-	} else {
-		preg_replace('/t.description/', '', $user->conf->MAINSELECTEDFIELDS_riskcard);
+	if (!preg_match('/t.description/', $user->conf->MAIN_SELECTEDFIELDS_riskcard) && $conf->global->DIGIRISKDOLIBARR_RISK_DESCRIPTION) {
+		$user->conf->MAIN_SELECTEDFIELDS_riskcard = $user->conf->MAIN_SELECTEDFIELDS_riskcard . 't.description,';
+
+	} elseif (!$conf->global->DIGIRISKDOLIBARR_RISK_DESCRIPTION) {
+		$user->conf->MAIN_SELECTEDFIELDS_riskcard = preg_replace('/t.description,/', '', $user->conf->MAIN_SELECTEDFIELDS_riskcard);
 	}
 
-	if (!preg_match('/evaluation.has_tasks/', $user->conf->MAINSELECTEDFIELDS_riskcard) && $conf->global->DIGIRISKDOLIBARR_TASK_MANAGEMENT) {
+	if (!preg_match('/evaluation.has_tasks/', $user->conf->MAIN_SELECTEDFIELDS_riskcard) && $conf->global->DIGIRISKDOLIBARR_TASK_MANAGEMENT) {
 		$user->conf->MAIN_SELECTEDFIELDS_riskcard .= 'evaluation.has_tasks,';
-	} else {
-		preg_replace('/evaluation.has_tasks/', '', $user->conf->MAINSELECTEDFIELDS_riskcard);
+
+	} elseif (!$conf->global->DIGIRISKDOLIBARR_TASK_MANAGEMENT) {
+		$user->conf->MAIN_SELECTEDFIELDS_riskcard = preg_replace('/evaluation.has_tasks,/', '', $user->conf->MAIN_SELECTEDFIELDS_riskcard);
 	}
 
 	$selectedfields = $form->multiSelectArrayWithCheckbox('selectedfields', $arrayfields, $varpage); // This also change content of $arrayfields
