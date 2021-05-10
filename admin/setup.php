@@ -30,10 +30,18 @@ global $langs, $user;
 
 // Libraries
 require_once DOL_DOCUMENT_ROOT."/core/lib/admin.lib.php";
+require_once DOL_DOCUMENT_ROOT.'/projet/class/project.class.php';
+require_once DOL_DOCUMENT_ROOT.'/societe/class/societe.class.php';
+require_once DOL_DOCUMENT_ROOT.'/core/modules/project/mod_project_simple.php';
 dol_include_once('/custom/digiriskdolibarr/lib/digiriskdolibarr.lib.php');
 
 // Translations
 $langs->loadLangs(array("admin", "digiriskdolibarr@digiriskdolibarr"));
+
+// Initialize technical objects
+$project     = new Project($db);
+$third_party = new Societe($db);
+$projectRef  = new $conf->global->PROJECT_ADDON();
 
 // Access control
 if (!$user->admin) accessforbidden();
@@ -65,26 +73,24 @@ if (empty($setupnotempty)) {
 	print '<br>'.$langs->trans("AgendaModuleRequired");
 }
 
-if ( $conf->global->DIGIRISKDOLIBARR_DU_PROJECT == 0 ) {
-	require_once DOL_DOCUMENT_ROOT . '/projet/class/project.class.php';
-	require_once DOL_DOCUMENT_ROOT . '/societe/class/societe.class.php';
-	require_once DOL_DOCUMENT_ROOT . '/core/modules/project/mod_project_simple.php';
+//Check projet
+$project->fetch($conf->global->DIGIRISKDOLIBARR_DU_PROJECT);
 
-	$project     = new Project($db);
-	$third_party = new Societe($db);
-	$projectRef  = new $conf->global->PROJECT_ADDON();
-
+if ( $conf->global->DIGIRISKDOLIBARR_DU_PROJECT == 0 || $project->statut == 2 ) {
 	$project->ref         = $projectRef->getNextValue($third_party, $project);
 	$project->title       = $langs->trans('RiskAssessmentDocument');
 	$project->description = $langs->trans('RiskAssessmentDocumentDescription');
 	$project->date_c      = dol_now();
-	//$project->date_start = dol_now(); -> option
+	$currentYear = date('Y');
+	$fiscalMonthStart = date('m', strtotime($conf->global->SOCIETE_FISCAL_MONTH_START));
+	$startdate = $currentYear . '-' . $test . '-01';
+	$project->date_start = $startdate;
 	$project->usage_task  = 1;
-	//$project->date_end = dol_now(); -> option
+	$enddate = date('Y-m-d', strtotime(date("Y-m-d", strtotime($startdate)) . " + 1 year"));
+	$project->date_end = $enddate;
 	$project->statut      = 1;
 	$project_id = $project->create($user);
 	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_DU_PROJECT', $project_id, 'integer', 1, '',$conf->entity);
-
 }
 
 // Page end
