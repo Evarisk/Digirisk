@@ -86,7 +86,7 @@ if ( $conf->global->DIGIRISKDOLIBARR_DU_PROJECT == 0 || $project->statut == 2 ) 
 	$startdate = $currentYear . '-' . $fiscalMonthStart . '-01';
 	$project->date_start = $startdate;
 	$project->usage_task  = 1;
-	$enddate = date('Y-m-d', strtotime(date("Y-m-d", strtotime($startdate)) . " + 1 year"));
+	$enddate = date('Y-m-d', strtotime(date("Y-m-d", strtotime($startdate)) . " + 1 year - 1 days"));
 	$project->date_end = $enddate;
 	$project->statut      = 1;
 	$project_id = $project->create($user);
