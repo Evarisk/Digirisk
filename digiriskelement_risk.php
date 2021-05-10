@@ -1392,7 +1392,7 @@ if ($object->id > 0) {
 					if ($conf->global->DIGIRISKDOLIBARR_RISK_DESCRIPTION == 0 ) {
 						print $langs->trans('RiskDescriptionNotActivated');
 					} else {
-						print dol_trunc($risk->description);
+						print dol_trunc($risk->description, 120);
 					}
 				}
 				else print $risk->showOutputField($val, $key, $risk->$key, '');
@@ -1452,7 +1452,7 @@ if ($object->id > 0) {
 												<?php $user->fetch($lastEvaluation->fk_user_creat); ?>
 												<?php echo getNomUrl( 0, '', 0, 0, 2 , 0,'','',-1, $user); ?>
 											</span>
-												<?php echo dol_trunc($lastEvaluation->comment); ?>
+												<?php echo dol_trunc($lastEvaluation->comment, 120); ?>
 											</div>
 										</div>
 									<!-- BUTTON MODAL RISK EVALUATION ADD  -->
@@ -1510,7 +1510,7 @@ if ($object->id > 0) {
 																				<?php $user->fetch($cotation->fk_user_creat); ?>
 																				<?php echo getNomUrl( 0, '', 0, 0, 2 ,0,'','',-1,$user); ?>
 																			</span>
-																			<?php echo dol_trunc($cotation->comment); ?>
+																			<?php echo dol_trunc($cotation->comment, 120); ?>
 																		</div>
 																	</div>
 																</div>
