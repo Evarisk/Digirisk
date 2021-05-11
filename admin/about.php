@@ -29,6 +29,7 @@ if (!$res) die("Include of main fails");
 // Libraries
 require_once DOL_DOCUMENT_ROOT.'/core/lib/admin.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/functions2.lib.php';
+require_once DOL_DOCUMENT_ROOT.'/includes/parsedown/Parsedown.php';
 require_once '../lib/digiriskdolibarr.lib.php';
 
 // Translations
@@ -58,8 +59,10 @@ $head = digiriskdolibarrAdminPrepareHead();
 dol_fiche_head($head, 'about', '', 0, 'digiriskdolibarr@digiriskdolibarr');
 
 dol_include_once('/digiriskdolibarr/core/modules/modDigiriskdolibarr.class.php');
-$tmpmodule = new modDigiriskdolibarr($db);
-print $tmpmodule->getDescLong();
+
+$contents = file_get_contents(DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/README.md');
+$Parsedown = new Parsedown();
+echo $Parsedown->text($contents);
 
 // Page end
 dol_fiche_end();
