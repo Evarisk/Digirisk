@@ -1,0 +1,45 @@
+.wpeo-modal[class*="modal-risksign"] .modal-container {
+  .title {
+    display: block;
+    font-weight: 600;
+    font-size: 13px;
+    margin-bottom: 0.6em;
+    color: rgba(0,0,0,0.8);
+
+    required {
+      font-size: 18px;
+      color: $color__primary;
+      vertical-align: text-top;
+      line-height: 0.9;
+    }
+  }
+  .section-title {
+    font-size: 16px;
+    color: rgba(0,0,0,0.8);
+    font-weight: 600;
+    margin-bottom: 0.6em;
+    display: block;
+  }
+}
+
+.wpeo-modal[class*="modal-risksign"] .modal-container .risksign-content {
+  display: flex;
+  padding-bottom: 1em;
+  margin-bottom: 1em;
+  border-bottom: 1px solid rgba(0,0,0,0.2);
+
+  .risksign-category {
+    margin-right: 1.5em;
+
+    .dropdown-toggle::after {
+      display: none;
+    }
+  }
+  .risksign-description {
+    flex-grow: 1;
+
+    textarea {
+      width: 100%;
+    }
+  }
+}

@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2020 SuperAdmin
+/* Copyright (C) 2021 EOXIA <dev@eoxia.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,9 +16,9 @@
  */
 
 /**
- * \file    digiriskdolibarr/lib/digiriskdolibarr.lib.php
+ * \file    lib/digiriskdolibarr.lib.php
  * \ingroup digiriskdolibarr
- * \brief   Library files with common functions for DigiriskDolibarr
+ * \brief   Library files with common functions for Digiriskdolibarr
  */
 
 /**
@@ -35,268 +35,169 @@ function digiriskdolibarrAdminPrepareHead()
 	$h = 0;
 	$head = array();
 
-	$head[$h][0] = dol_buildpath("/custom/digiriskdolibarr/admin/digiriskdolibarr.php", 1);
+	$head[$h][0] = dol_buildpath("/digiriskdolibarr/admin/setup.php", 1);
 	$head[$h][1] = $langs->trans("Settings");
 	$head[$h][2] = 'settings';
 	$h++;
-
-	/*
-	$head[$h][0] = dol_buildpath("/digiriskdolibarr/admin/myobject_extrafields.php", 1);
-	$head[$h][1] = $langs->trans("ExtraFields");
-	$head[$h][2] = 'myobject_extrafields';
-	$h++;
-	*/
 
 	$head[$h][0] = dol_buildpath("/digiriskdolibarr/admin/about.php", 1);
 	$head[$h][1] = $langs->trans("About");
 	$head[$h][2] = 'about';
 	$h++;
 
-	$head[$h][0] = dol_buildpath("/digiriskdolibarr/admin/accronym.php", 1);
-	$head[$h][1] = $langs->trans("Accronym");
-	$head[$h][2] = 'accronym';
+	$head[$h][0] = dol_buildpath("/digiriskdolibarr/admin/digiriskdocuments/digiriskdocuments.php", 1);
+	$head[$h][1] = $langs->trans("DigiriskDocuments");
+	$head[$h][2] = 'digiriskdocuments';
 	$h++;
 
-	// Show more tabs from modules
-	// Entries must be declared in modules descriptor with line
-	//$this->tabs = array(
-	//	'entity:+tabname:Title:@digiriskdolibarr:/digiriskdolibarr/mypage.php?id=__ID__'
-	//); // to add new tab
-	//$this->tabs = array(
-	//	'entity:-tabname:Title:@digiriskdolibarr:/digiriskdolibarr/mypage.php?id=__ID__'
-	//); // to remove a tab
+	$head[$h][0] = dol_buildpath("/digiriskdolibarr/admin/digiriskelement/digiriskelement.php", 1);
+	$head[$h][1] = $langs->trans("DigiriskElement");
+	$head[$h][2] = 'digiriskelement';
+	$h++;
+
+	$head[$h][0] = dol_buildpath("/digiriskdolibarr/admin/riskanalysis/riskanalysis.php", 1);
+	$head[$h][1] = $langs->trans("RiskAnalysis");
+	$head[$h][2] = 'riskanalysis';
+	$h++;
+
 	complete_head_from_modules($conf, $langs, null, $head, $h, 'digiriskdolibarr');
 
 	return $head;
 }
 
-function digirisk_dolibarr_set_const($db, $name, $value, $type = 'chaine', $visible = 0, $note = '', $entity = 1)
+/**
+ * Prepare admin pages subheader documents
+ *
+ * @return array
+ */
+function digiriskdolibarrAdminDigiriskDocumentsPrepareHead()
 {
-	global $conf;
+	global $langs, $conf;
 
-	// Clean parameters
-	$name = trim($name);
+	$langs->load("digiriskdolibarr@digiriskdolibarr");
 
-	// Check parameters
-	if (empty($name)) {
-		dol_print_error($db, "Error: Call to function dolibarr_set_const with wrong parameters", LOG_ERR);
-		exit;
-	}
+	$h = 0;
+	$head = array();
 
-	//dol_syslog("dolibarr_set_const name=$name, value=$value type=$type, visible=$visible, note=$note entity=$entity");
+	$head[$h][0] = dol_buildpath("/digiriskdolibarr/admin/digiriskdocuments/legaldisplay.php", 1);
+	$head[$h][1] = $langs->trans("LegalDisplay");
+	$head[$h][2] = 'legaldisplay';
+	$h++;
 
-	$db->begin();
+	$head[$h][0] = dol_buildpath("/digiriskdolibarr/admin/digiriskdocuments/informationssharing.php", 1);
+	$head[$h][1] = $langs->trans("InformationsSharing");
+	$head[$h][2] = 'informationssharing';
+	$h++;
 
-	$sql = "DELETE FROM " . MAIN_DB_PREFIX . "digirisk_const";
-	$sql .= " WHERE name = " . $db->encrypt($name, 1);
-	if ($entity >= 0) $sql .= " AND entity = " . $entity;
+	$head[$h][0] = dol_buildpath("/digiriskdolibarr/admin/digiriskdocuments/listingrisksaction.php", 1);
+	$head[$h][1] = $langs->trans("ListingRisksAction");
+	$head[$h][2] = 'listingrisksaction';
+	$h++;
 
-	dol_syslog("admin.lib::digirisk_dolibarr_set_const", LOG_DEBUG);
-	$resql = $db->query($sql);
+	$head[$h][0] = dol_buildpath("/digiriskdolibarr/admin/digiriskdocuments/listingrisksphoto.php", 1);
+	$head[$h][1] = $langs->trans("ListingRisksPhoto");
+	$head[$h][2] = 'listingrisksphoto';
+	$h++;
 
-	if (strcmp($value, ''))    // true if different. Must work for $value='0' or $value=0
-	{
-		$sql = "INSERT INTO " . MAIN_DB_PREFIX . "digirisk_const(name,value,type,visible,note,entity)";
-		$sql .= " VALUES (";
-		$sql .= $db->encrypt($name, 1);
-		$sql .= ", " . $db->encrypt($value, 1);
-		$sql .= ",'" . $db->escape($type) . "'," . $visible . ",'" . $db->escape($note) . "'," . $entity . ")";
+	$head[$h][0] = dol_buildpath("/digiriskdolibarr/admin/digiriskdocuments/riskassessmentdocument.php", 1);
+	$head[$h][1] = $langs->trans("RiskAssessmentDocument");
+	$head[$h][2] = 'riskassessmentdocument';
+	$h++;
 
-		//print "sql".$value."-".pg_escape_string($value)."-".$sql;exit;
-		//print "xx".$db->escape($value);
-		dol_syslog("admin.lib::dolibarr_set_const", LOG_DEBUG);
-		$resql = $db->query($sql);
-	}
+	$head[$h][0] = dol_buildpath("/digiriskdolibarr/admin/digiriskdocuments/groupmentdocument.php", 1);
+	$head[$h][1] = $langs->trans("GroupmentDocument");
+	$head[$h][2] = 'groupmentdocument';
+	$h++;
 
-	if ($resql) {
-		$db->commit();
-		$conf->global->$name = $value;
-		return 1;
-	} else {
-		$error = $db->lasterror();
-		$db->rollback();
-		return -1;
-	}
+	$head[$h][0] = dol_buildpath("/digiriskdolibarr/admin/digiriskdocuments/workunitdocument.php", 1);
+	$head[$h][1] = $langs->trans("WorkUnitDocument");
+	$head[$h][2] = 'workunitdocument';
+	$h++;
+
+	$head[$h][0] = dol_buildpath("/digiriskdolibarr/admin/digiriskdocuments/preventionplan.php", 1);
+	$head[$h][1] = $langs->trans("PreventionPlan");
+	$head[$h][2] = 'preventionplan';
+	$h++;
+
+	$head[$h][0] = dol_buildpath("/digiriskdolibarr/admin/digiriskdocuments/firepermit.php", 1);
+	$head[$h][1] = $langs->trans("FirePermit");
+	$head[$h][2] = 'firepermit';
+	$h++;
+
+	complete_head_from_modules($conf, $langs, null, $head, $h, 'digiriskdolibarr');
+
+	return $head;
 }
 
-function digirisk_dolibarr_fetch_const($db, $type = 'chaine', $visible = 0, $note = '', $entity = 1)
+/**
+ * Prepare admin pages subheader elements
+ *
+ * @return array
+ */
+function digiriskdolibarrAdminDigiriskElementPrepareHead()
 {
-	global $conf;
+	global $langs, $conf;
 
+	$langs->load("digiriskdolibarr@digiriskdolibarr");
 
-	$db->begin();
+	$h = 0;
+	$head = array();
 
-	$sql = "SELECT * FROM " . MAIN_DB_PREFIX . "digirisk_const";
+	$head[$h][0] = dol_buildpath("/digiriskdolibarr/admin/digiriskelement/groupment.php", 1);
+	$head[$h][1] = $langs->trans("Groupment");
+	$head[$h][2] = 'groupment';
+	$h++;
 
-	$resql = $db->query($sql);
+	$head[$h][0] = dol_buildpath("/digiriskdolibarr/admin/digiriskelement/workunit.php", 1);
+	$head[$h][1] = $langs->trans("WorkUnit");
+	$head[$h][2] = 'workunit';
+	$h++;
 
-	if ($resql->num_rows > 0) {
-		for ($i = 0; $i < $resql->num_rows; $i++) {
-			$obj = $db->fetch_object($resql);
-			$key = $obj->name;
-			$objects[$key] = $obj->value;
-		}
-		$objects = (object) $objects;
-		if ($resql) {
-			$db->commit();
-			return $objects;
+	$head[$h][0] = dol_buildpath("/digiriskdolibarr/admin/digiriskelement/evaluator.php", 1);
+	$head[$h][1] = $langs->trans("Evaluator");
+	$head[$h][2] = 'evaluator';
+	$h++;
 
-		} else {
-			$error = $db->lasterror();
-			$db->rollback();
-			return -1;
-		}
-	}
+	complete_head_from_modules($conf, $langs, null, $head, $h, 'digiriskdolibarr');
+
+	return $head;
 }
 
-function digirisk_dolibarr_set_links($db, $name, $fk_user_author, $fk_soc, $contact_list, $fk_user, $entity = 1)
+/**
+ * Prepare admin pages subheader risk analysis
+ *
+ * @return array
+ */
+function digiriskdolibarrAdminRiskAnalysisPrepareHead()
 {
-	global $conf;
+	global $langs, $conf;
 
-	// Clean parameters
-	$name = trim($name);
-		// Check parameters
-	if (empty($name))
-	{
-		dol_print_error($db, "Error: Call to function digirisk_dolibarr_set_links with wrong parameters", LOG_ERR);
-		exit;
-	}
-		//dol_syslog("dolibarr_set_const name=$name, value=$value type=$type, visible=$visible, note=$note entity=$entity");
-	$db->begin();
+	$langs->load("digiriskdolibarr@digiriskdolibarr");
 
-	$sql = "DELETE FROM ".MAIN_DB_PREFIX."digirisk_links";
-	$sql .= " WHERE ref = ".$db->encrypt($name, 1);
-	if ($entity >= 0) $sql .= " AND entity = ".$entity;
+	$h = 0;
+	$head = array();
 
-	dol_syslog("admin.lib::digirisk_dolibarr_set_links", LOG_DEBUG);
-	$resql = $db->query($sql);
+	$head[$h][0] = dol_buildpath("/digiriskdolibarr/admin/riskanalysis/risk.php", 1);
+	$head[$h][1] = $langs->trans("Risk");
+	$head[$h][2] = 'risk';
+	$h++;
 
-	if (!is_array($contact_list)) {
+	$head[$h][0] = dol_buildpath("/digiriskdolibarr/admin/riskanalysis/riskassessment.php", 1);
+	$head[$h][1] = $langs->trans("RiskAssessment");
+	$head[$h][2] = 'riskassessment';
+	$h++;
 
-		$sql = "INSERT INTO ".MAIN_DB_PREFIX."digirisk_links(ref, entity, fk_user_author, fk_soc, fk_contact, fk_user)";
-		$sql .= " VALUES (";
-		$sql .= $db->encrypt($name, 1);
-		$sql .= ", ".$entity;
-		$sql .= ", ".(is_numeric($fk_user_author) ? $fk_user_author : '0');
-		$sql .= ", ".(is_numeric($fk_soc) ? $fk_soc : '0');
-		$sql .= ", ".(is_numeric($contact_list) ? $contact_list : '0') . ", ";
+	$head[$h][0] = dol_buildpath("/digiriskdolibarr/admin/riskanalysis/risksign.php", 1);
+	$head[$h][1] = $langs->trans("RiskSign");
+	$head[$h][2] = 'risksign';
+	$h++;
 
-		if (!empty($fk_user)) {
-			foreach ($fk_user as $user) {
-				$users[$user] = is_numeric($user) ? $user : '0';
-			}
-			$sql .= implode("",$users);
-		}
-		else
-		{
-			$sql.= "0";
-		}
+	$head[$h][0] = dol_buildpath("/digiriskdolibarr/admin/riskanalysis/task.php", 1);
+	$head[$h][1] = $langs->trans("Task");
+	$head[$h][2] = 'task';
+	$h++;
 
-		$sql .= ")";
-		//print "sql".$value."-".pg_escape_string($value)."-".$sql;exit;
-		//print "xx".$db->escape($value);
-		dol_syslog("admin.lib::digirisk_dolibarr_set_links", LOG_DEBUG);
-		$resql = $db->query($sql);
+	complete_head_from_modules($conf, $langs, null, $head, $h, 'digiriskdolibarr');
 
-	}
-	else
-	{
-		foreach ($contact_list as $fk_contact) {
-
-			if (strcmp($fk_user_author, ''))    // true if different. Must work for $value='0' or $value=0
-			{
-				$sql = "INSERT INTO " . MAIN_DB_PREFIX . "digirisk_links(ref, entity, fk_user_author, fk_soc, fk_contact, fk_user)";
-				$sql .= " VALUES (";
-				$sql .= $db->encrypt($name, 1);
-				$sql .= ", " . $entity;
-				$sql .= ", " . (is_numeric($fk_user_author) ? $fk_user_author : '0');
-				$sql .= ", " . (is_numeric($fk_soc) ? $fk_soc : '0');
-				$sql .= ", " . (is_numeric($fk_contact) ? $fk_contact : '0');
-				foreach ($fk_user as $user) {
-					$sql .= ", ".(is_numeric($user) ? $user : '0');
-				}
-				$sql .= ")";
-				//print "sql".$value."-".pg_escape_string($value)."-".$sql;exit;
-				//print "xx".$db->escape($value);
-				dol_syslog("admin.lib::digirisk_dolibarr_set_links", LOG_DEBUG);
-				$resql = $db->query($sql);
-			}
-		}
-	}
-
-	if ($resql)
-	{
-		$db->commit();
-		return $name;
-
-	}
-	else
-	{
-		$error = $db->lasterror();
-		$db->rollback();
-		return -1;
-	}
-}
-
-function digirisk_dolibarr_fetch_links($db, $name)
-{
-	global $conf;
-
-	//dol_syslog("dolibarr_set_const name=$name, value=$value type=$type, visible=$visible, note=$note entity=$entity");
-	$db->begin();
-
-	if ($name == 'all') {
-		$sql = "SELECT * FROM llx_digirisk_links";
-
-	}
-	else
-	{
-		$sql = "SELECT ";
-		$sql .= "ref, fk_user_author, fk_soc, fk_contact, fk_user ";
-		$sql .= "FROM ".MAIN_DB_PREFIX."digirisk_links";
-		$sql .= " WHERE ref = '".$name . "'";
-	}
-
-
-	dol_syslog("admin.lib::digirisk_dolibarr_fetch_links", LOG_DEBUG);
-	$resql = $db->query($sql);
-	if ($resql->num_rows > 1) {
-		for ($i = 0; $i < $resql->num_rows; $i++) {
-			$obj = $db->fetch_object($resql);
-			$key = $obj->ref;
-			if ($key !== 'fk_user') {
-				$objects[$key] = $obj;
-			}
-			else
-			{
-				$objects[$key] = array($obj);
-			}
-		}
-
-		if ($resql) {
-			$db->commit();
-			return $objects;
-
-		} else {
-			$error = $db->lasterror();
-			$db->rollback();
-			return -1;
-		}
-	}
-	else
-	{
-		$obj = $db->fetch_object($resql);
-		if (!empty($obj)) {
-			$obj->fk_user = array($obj->fk_user);
-		}
-		if ($resql) {
-			$db->commit();
-			return $obj;
-
-		} else {
-			$error = $db->lasterror();
-			$db->rollback();
-			return -1;
-		}
-	}
+	return $head;
 }

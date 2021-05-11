@@ -1,6 +1,6 @@
 <?php
 /* Copyright (C) 2007-2017 Laurent Destailleur  <eldy@users.sourceforge.net>
- * Copyright (C) 2020 SuperAdmin
+ * Copyright (C) 2021 SuperAdmin
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@
  */
 
 /**
- * \file    test/phpunit/DigiriskDolibarrFunctionalTest.php
+ * \file    test/phpunit/DigiriskdolibarrFunctionalTest.php
  * \ingroup digiriskdolibarr
  * \brief   Example Selenium test.
  *
@@ -29,7 +29,7 @@ namespace test\functional;
 use PHPUnit_Extensions_Selenium2TestCase_WebDriverException;
 
 /**
- * Class DigiriskDolibarrFunctionalTest
+ * Class DigiriskdolibarrFunctionalTest
  *
  * Requires chromedriver for Google Chrome
  * Requires geckodriver for Mozilla Firefox
@@ -41,7 +41,7 @@ use PHPUnit_Extensions_Selenium2TestCase_WebDriverException;
  *
  * @package Testdigiriskdolibarr
  */
-class DigiriskDolibarrFunctionalTest extends \PHPUnit_Extensions_Selenium2TestCase
+class DigiriskdolibarrFunctionalTest extends \PHPUnit_Extensions_Selenium2TestCase
 {
 	// TODO: move to a global configuration file?
 	/** @var string Base URL of the webserver under test */
@@ -176,12 +176,12 @@ class DigiriskDolibarrFunctionalTest extends \PHPUnit_Extensions_Selenium2TestCa
 		$module_status_image = $this->byXPath($module_status_image_path);
 		if (strstr($module_status_image->attribute('src'), 'switch_off.png')) {
 			// Enable the module
-			$this->byHref('modDigiriskDolibarr')->click();
+			$this->byHref('modDigiriskdolibarr')->click();
 		} else {
 			// Disable the module
-			$this->byHref('modDigiriskDolibarr')->click();
+			$this->byHref('modDigiriskdolibarr')->click();
 			// Reenable the module
-			$this->byHref('modDigiriskDolibarr')->click();
+			$this->byHref('modDigiriskdolibarr')->click();
 		}
 		// Page reloaded, we need a new Xpath
 		$module_status_image = $this->byXPath($module_status_image_path);
@@ -196,9 +196,9 @@ class DigiriskDolibarrFunctionalTest extends \PHPUnit_Extensions_Selenium2TestCa
 	 */
 	public function testConfigurationPage()
 	{
-		$this->url('/custom/digiriskdolibarr/admin/digriskdolibarr.php');
+		$this->url('/custom/digiriskdolibarr/admin/setup.php');
 		$this->authenticate();
-		return $this->assertContains('digiriskdolibarr/admin/digriskdolibarr.php', $this->url(), 'Configuration page');
+		return $this->assertContains('digiriskdolibarr/admin/setup.php', $this->url(), 'Configuration page');
 	}
 
 	/**
@@ -255,7 +255,7 @@ class DigiriskDolibarrFunctionalTest extends \PHPUnit_Extensions_Selenium2TestCa
 		$this->url('/admin/triggers.php');
 		$this->authenticate();
 		return $this->assertContains(
-			'interface_99_modDigiriskDolibarr_DigiriskDolibarrTriggers.class.php',
+			'interface_99_modDigiriskdolibarr_DigiriskdolibarrTriggers.class.php',
 			$this->byTag('body')->text(),
 			"Trigger declared"
 		);
@@ -273,7 +273,7 @@ class DigiriskDolibarrFunctionalTest extends \PHPUnit_Extensions_Selenium2TestCa
 		$this->authenticate();
 		return $this->assertContains(
 			'tick.png',
-			$this->byXPath('//td[text()="interface_99_modDigiriskDolibarr_MyTrigger.class.php"]/following::img')->attribute('src'),
+			$this->byXPath('//td[text()="interface_99_modDigiriskdolibarr_MyTrigger.class.php"]/following::img')->attribute('src'),
 			"Trigger enabled"
 		);
 	}

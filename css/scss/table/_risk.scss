@@ -1,0 +1,25 @@
+.risk-container .risk-edit {
+  color: $color__secondary;
+
+  &:hover {
+    cursor: pointer;
+    text-decoration: underline;
+  }
+}
+
+.risk-container .risk-edit-no-perm {
+  color: $color__text-main;
+
+  &:hover {
+    cursor: auto;
+    text-decoration: none;
+  }
+}
+
+.risk-category {
+  text-align: center;
+}
+
+.risk-description {
+  width: 25% !important;
+}

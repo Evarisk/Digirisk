@@ -1,104 +1,134 @@
 <?php
+/* Copyright (C) 2021 EOXIA <dev@eoxia.com>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 
-class ActionsDigiriskDolibarr
-{
 /**
-* Overloading the doActions function : replacing the parent's function with the one below
-*
-* @param   array()         $parameters     Hook metadatas (context, etc...)
-* @param   CommonObject    &$object        The object to process (an invoice if you are in invoice module, a propale in propale's module, etc...)
-* @param   string          &$action        Current action (if set). Generally create or edit or null
-* @param   HookManager     $hookmanager    Hook manager propagated to allow calling another hook
-* @return  int                             < 0 on error, 0 on success, 1 to replace standard code
-*/
-	function completeTabsHead($parameters, &$object, &$action)
+ * \file    digiriskdolibarr/class/actions_digiriskdolibarr.class.php
+ * \ingroup digiriskdolibarr
+ * \brief   Example hook overload.
+ */
+
+/**
+ * Class ActionsDigiriskdolibarr
+ */
+class ActionsDigiriskdolibarr
+{
+	/**
+	 * @var DoliDB Database handler.
+	 */
+	public $db;
+
+	/**
+	 * @var string Error code (or message)
+	 */
+	public $error = '';
+
+	/**
+	 * @var array Errors
+	 */
+	public $errors = array();
+
+	/**
+	 * @var array Hook results. Propagated to $hookmanager->resArray for later reuse
+	 */
+	public $results = array();
+
+	/**
+	 * @var string String displayed by executeHook() immediately after return
+	 */
+	public $resprints;
+
+	/**
+	 * Constructor
+	 *
+	 *  @param		DoliDB		$db      Database handler
+	 */
+	public function __construct($db)
 	{
-		global $hookmanager, $langs, $conf;
-		$error = 0;
+		$this->db = $db;
+	}
 
-		$h = 0;
-		$head = array();
+	/**
+	 * Overloading the doActions function : replacing the parent's function with the one below
+	 *
+	 * @param   array           $parameters     Hook metadatas (context, etc...)
+	 * @param   CommonObject    $object         The object to process (an invoice if you are in invoice module, a propale in propale's module, etc...)
+	 * @param   string          $action         Current action (if set). Generally create or edit or null
+	 * @param   HookManager     $hookmanager    Hook manager propagated to allow calling another hook
+	 * @return  int                             < 0 on error, 0 on success, 1 to replace standard code
+	 */
+	public function printCommonFooter($parameters, &$object, &$action, $hookmanager)
+	{
+		global $db, $conf, $user, $langs;
 
-		$head[$h][0] = DOL_URL_ROOT."/admin/company.php";
-		$head[$h][1] = $langs->trans("Company");
-		$head[$h][2] = 'company';
-		$h++;
+		$error = 0; // Error counter
 
-		$head[$h][0] = DOL_URL_ROOT."/admin/openinghours.php";
-		$head[$h][1] = $langs->trans("OpeningHours");
-		$head[$h][2] = 'openinghours';
-		$h++;
-
-		$head[$h][0] = DOL_URL_ROOT."/admin/accountant.php";
-		$head[$h][1] = $langs->trans("Accountant");
-		$head[$h][2] = 'accountant';
-		$h++;
-
-		$head[$h][0] = DOL_URL_ROOT."/custom/digiriskdolibarr/admin/securityconf.php";
-		$head[$h][1] = $langs->trans("Security");
-		$head[$h][2] = 'security';
-		$h++;
-
-		$head[$h][0] = DOL_URL_ROOT."/custom/digiriskdolibarr/admin/socialconf.php";
-		$head[$h][1] = $langs->trans("Social");
-		$head[$h][2] = 'social';
-		$h++;
-		//if (in_array('admincompany', explode(':', $parameters['context'])))
-
-
-		if (! $error)
+		/* print_r($parameters); print_r($object); echo "action: " . $action; */
+		if (in_array($parameters['currentcontext'], array('admincompany')))	    // do something only for the context 'somecontext1' or 'somecontext2'
 		{
-			$this->results = $head;
-			$this->resprints = 'A text to show';
-			return 1; // or return 1 to replace standard code
+			if ($conf->global->MAIN_INFO_SOCIETE_COUNTRY == '1:FR:France') {
+				$formother = new FormOther($db);
+				$form = new Form($db);
+				?>
+				<script>
+					IDCC_form = '<?php $formother->select_dictionary('DIGIRISK_COLLECTIVE_AGREEMENT_TITLE','c_conventions_collectives', 'code', 'libelle', $conf->global->DIGIRISK_COLLECTIVE_AGREEMENT_TITLE );?>';
+
+					let $tr = $('<tr class="oddeven"><td><label for="selectidcc_id"><?php print $form->textwithpicto($langs->trans('IDCC'), 'Ce champ provient du module Digirisk pour Dolibarr </br> La nomenclature des conventions collectives provient de travail-emploi.gouv.fr ');?></label></td>');
+					$tr.append('<td>' + IDCC_form + '</td></tr>');
+
+					let currElement = $('table:nth-child(7) .oddeven:last-child');
+					currElement.after($tr);
+				</script>
+				<?php
+			}
 		}
-		else
-		{
+
+		print ajax_combobox('selectDIGIRISK_COLLECTIVE_AGREEMENT_TITLE');
+
+		if (!$error) {
+			$this->results = array('myreturn' => 999);
+			$this->resprints = 'A text to show';
+			return 0; // or return 1 to replace standard code
+		} else {
 			$this->errors[] = 'Error message';
 			return -1;
 		}
 	}
-/*
-	function doActions($parameters, &$object, &$action)
+
+	public function doActions($parameters, &$object, &$action, $hookmanager)
 	{
-		global $hookmanager, $langs, $conf;
-		$error = 0;
+		global $db, $conf, $user, $langs;
 
-		$h = 0;
-		$head = array();
+		$error = 0; // Error counter
 
-		$head[$h][0] = DOL_URL_ROOT."/admin/company.php";
-		$head[$h][1] = $langs->trans("Company");
-		$head[$h][2] = 'company';
-		$h++;
-
-		$head[$h][0] = DOL_URL_ROOT."/admin/openinghours.php";
-		$head[$h][1] = $langs->trans("OpeningHours");
-		$head[$h][2] = 'openinghours';
-		$h++;
-
-		$head[$h][0] = DOL_URL_ROOT."/admin/accountant.php";
-		$head[$h][1] = $langs->trans("Accountant");
-		$head[$h][2] = 'accountant';
-		$h++;
-
-		$head[$h][0] = DOL_URL_ROOT."/admin/accountant.php";
-		$head[$h][1] = $langs->trans("HSE");
-		$head[$h][2] = 'HSE';
-		$h++;
-		//if (in_array('admincompany', explode(':', $parameters['context'])))
-
-
-		if (! $error)
+		/* print_r($parameters); print_r($object); echo "action: " . $action; */
+		if (in_array($parameters['currentcontext'], array('admincompany')))	    // do something only for the context 'somecontext1' or 'somecontext2'
 		{
-			$this->results = $head;
-			$this->resprints = 'A text to show';
-			return 1; // or return 1 to replace standard code
+			if ($action == 'updateedit' || $action == 'update') {
+				dolibarr_set_const($db, "DIGIRISK_COLLECTIVE_AGREEMENT_TITLE", GETPOST("DIGIRISK_COLLECTIVE_AGREEMENT_TITLE", 'nohtml'), 'chaine', 0, '', $conf->entity);
+			}
 		}
-		else
-		{
+
+		if (!$error) {
+			$this->results = array('myreturn' => 999);
+			$this->resprints = 'A text to show';
+			return 0; // or return 1 to replace standard code
+		} else {
 			$this->errors[] = 'Error message';
 			return -1;
 		}
-	} */
+	}
 }

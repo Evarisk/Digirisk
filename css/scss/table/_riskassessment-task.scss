@@ -1,0 +1,93 @@
+td > .riskassessment-task-container {
+  min-width: 330px;
+}
+.riskassessment-task-container .riskassessment-task-single {
+  display: flex;
+  box-sizing: border-box;
+
+  * {
+    box-sizing: border-box;
+  }
+  > * {
+    margin-top: auto;
+    margin-bottom: auto;
+  }
+
+  .riskassessment-task-content {
+    width: 100%;
+
+    .riskassessment-task-author {
+      display: inline-block;
+      width: 25px;
+      min-width: 25px;
+      height: 25px;
+      line-height: 25px;
+      background: rgba(0,0,0,0.5);
+      overflow: hidden;
+      text-transform: uppercase;
+      font-size: 14px;
+      font-weight: 600;
+      border-radius: 50%;
+      vertical-align: sub;
+      text-align: center;
+
+      a {
+        color: #fff !important;
+      }
+    }
+  }
+  .riskassessment-task-content .riskassessment-task-data {
+    display: flex;
+    flex-wrap: wrap;
+
+    > * {
+      margin: auto 0.2em;
+    }
+
+    .riskassessment-task-reference {
+      color: $color__secondary;
+      font-weight: 600;
+
+      &:hover {
+        text-decoration: underline;
+        cursor: pointer;
+      }
+    }
+    .riskassessment-task-count {
+      background: rgba(0,0,0,0.2);
+      font-size: 12px;
+      border-radius: 4px;
+      padding: 0.2em 0.4em;
+    }
+    .riskassessment-task-progress {
+      background: rgba(0, 0, 0, 0.2);
+      font-size: 12px;
+      border-radius: 4px;
+      padding: 0.2em 0.4em;
+      font-weight: 700;
+      color: rgba(0,0,0,0.6);
+
+      @for $i from 1 through 50 {
+        &.progress-#{$i} {
+          background: $color__red;
+          color: #fff;
+        }
+      }
+      @for $i from 51 through 99 {
+        &.progress-#{$i} {
+          background: $color__yellow;
+          color: #fff;
+        }
+      }
+      &.progress-100 {
+        background: $color__green;
+        color: #fff;
+      }
+    }
+  }
+
+  .riskassessment-task-add {
+    min-width: 40px;
+    margin-left: 0.5em;
+  }
+}

@@ -1,0 +1,87 @@
+/**
+ * .cotation -> classe de base
+ * .default-cotation -> par défaut
+ * .level1 -> cotaiton 0
+ * .level2 -> cotation 48
+ * .level4 -> cotation 51
+ * .level5 -> cotation 80
+ * .method -> cotation personnalisée
+ */
+.wpeo-table.evaluation-method {
+  background: none !important;
+
+  .table-row.table-header {
+    @media ( max-width: $media__small ) {
+      display: none;
+    }
+  }
+  .table-cell {
+    margin: 0;
+    text-align: center;
+    border: 1px solid rgba(0,0,0,0.1);
+    padding: 0.8em 0.4em;
+    position: relative;
+
+    @media ( max-width: $media__small ) {
+      width: 100% !important;
+    }
+
+    &.can-select {
+      &::after {
+        display: block;
+        content: '';
+        position: absolute;
+        top: 0.4em;
+        right: 0.4em;
+        bottom: 0.4em;
+        left: 0.4em;
+        background: rgba(0,0,0,0.1);
+        transform: scale(0);
+        opacity: 0;
+        transition: all 0.2s ease-out;
+      }
+      &:hover {
+        cursor: pointer;
+        &::after {
+          transform: scale(1);
+          opacity: 1;
+        }
+      }
+      &.active {
+        color: #fff;
+
+        &::after {
+          transform: scale(1) !important;
+          opacity: 1 !important;
+          background: $color__primary;
+          z-index: -1;
+        }
+      }
+    }
+  }
+  .table-row > .table-cell:first-child {
+    background: $color__secondary;
+    color: #fff;
+
+    @media ( max-width: $media__small ) {
+      background: $color__secondary;
+    }
+  }
+  .table-row:not(.header) {
+    .table-cell:nth-of-type(2).active::after {
+      background: darken($color__primary, 0);
+    }
+    .table-cell:nth-of-type(3).active::after {
+      background: darken($color__primary, 15%);
+    }
+    .table-cell:nth-of-type(4).active::after {
+      background: darken($color__primary, 30%);
+    }
+    .table-cell:nth-of-type(5).active::after {
+      background: darken($color__primary, 45%);
+    }
+    .table-cell:nth-of-type(6).active::after {
+      background: darken($color__primary, 60%);
+    }
+  }
+}

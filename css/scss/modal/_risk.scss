@@ -1,0 +1,111 @@
+.wpeo-modal[class*="modal-risk"] .modal-container {
+  .title {
+    display: block;
+    font-weight: 600;
+    font-size: 13px;
+    margin-bottom: 0.6em;
+    color: rgba(0,0,0,0.8);
+
+    required {
+      font-size: 18px;
+      color: $color__primary;
+      vertical-align: text-top;
+      line-height: 0.9;
+    }
+  }
+  .section-title {
+    font-size: 16px;
+    color: rgba(0,0,0,0.8);
+    font-weight: 600;
+    margin-bottom: 0.6em;
+    display: block;
+  }
+}
+
+.wpeo-modal[class*="modal-risk"] .modal-container .risk-content {
+  display: flex;
+  padding-bottom: 1em;
+  margin-bottom: 1em;
+  border-bottom: 1px solid rgba(0,0,0,0.2);
+
+  .risk-category {
+    margin-right: 1.5em;
+
+    .dropdown-toggle::after {
+      display: none;
+    }
+  }
+  .risk-description {
+    flex-grow: 1;
+
+    textarea {
+      width: 100%;
+    }
+  }
+}
+
+.wpeo-modal[class*="modal-risk"] .modal-container .risk-evaluation-container {
+  .risk-evaluation-header {
+    margin-bottom: 1em;
+  }
+  .risk-evaluation-content-wrapper {
+    display: flex;
+
+    .cotation-standard {
+      margin-right: 1em;
+
+      .risk-evaluation-cotation {
+        @extend .can-select;
+      }
+    }
+    .risk-evaluation-photo {
+      img {
+        max-width: 50px;
+      }
+    }
+    .risk-evaluation-comment {
+      flex-grow: 1;
+      margin-left: 1em;
+
+      textarea {
+        width: 100%;
+      }
+    }
+  }
+
+  &.advanced {
+    .risk-evaluation-content-wrapper {
+      flex-wrap: wrap;
+    }
+    .risk-evaluation-content {
+      width: 100%;
+      margin-bottom: 1em;
+    }
+    .risk-evaluation-photo {
+      margin-right: 1em;
+    }
+  }
+}
+
+/** Listing */
+.wpeo-modal .modal-container .risk-evaluations-list {
+  .risk-evaluation > .risk-evaluation-container {
+    display: flex;
+
+    .risk-evaluation-single {
+      width: 100%;
+
+      .risk-evaluation-reference {
+        color: $color__text-main;
+
+        &:hover {
+          cursor: auto;
+          text-decoration: none;
+        }
+      }
+    }
+    .risk-evaluation-actions {
+      margin-left: auto;
+    }
+  }
+}

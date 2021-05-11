@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2018       Alexandre Spangaro      <aspangaro@open-dsi.fr>
+/* Copyright (C) 2021 EOXIA <dev@eoxia.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,73 +16,54 @@
  */
 
 /**
- *	\file       htdocs/admin/accountant.php
- *	\ingroup    accountant
- *	\brief      Setup page to configure accountant / auditor
+ * \file    digiriskdolibarr/admin/securityconf.php
+ * \ingroup digiriskdolibarr
+ * \brief   Digiriskdolibarr setup page for security data configuration.
  */
 
-require '../../../main.inc.php';
+// Load Dolibarr environment
+$res = 0;
+if (!$res && file_exists("../../../main.inc.php")) $res = @include "../../../main.inc.php";
+if (!$res) die("Include of main fails");
+
 require_once DOL_DOCUMENT_ROOT.'/core/lib/admin.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/company.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/functions2.lib.php';
+require_once DOL_DOCUMENT_ROOT.'/core/class/doleditor.class.php';
 require_once DOL_DOCUMENT_ROOT.'/core/class/html.formother.class.php';
-require_once DOL_DOCUMENT_ROOT.'/core/class/html.formcompany.class.php';
 require_once DOL_DOCUMENT_ROOT.'/core/class/html.formactions.class.php';
-require_once DOL_DOCUMENT_ROOT.'/core/class/html.formfile.class.php';
 require_once DOL_DOCUMENT_ROOT.'/core/class/html.form.class.php';
-
-require_once DOL_DOCUMENT_ROOT.'/custom/digiriskdolibarr/class/links.class.php';
-require_once DOL_DOCUMENT_ROOT.'/custom/digiriskdolibarr/lib/digiriskdolibarr.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/contact/class/contact.class.php';
 require_once DOL_DOCUMENT_ROOT.'/user/class/user.class.php';
 
-$action = GETPOST('action', 'aZ09');
-$contextpage = GETPOST('contextpage', 'aZ') ?GETPOST('contextpage', 'aZ') : 'adminsecurity'; // To manage different context of search
+dol_include_once('/custom/digiriskdolibarr/class/digiriskresources.class.php');
 
-$labourdoctor_id 				= GETPOST('labourdoctor_socid', 'int');
-$labourdoctor_contactid 		= GETPOST('labourdoctor_contactid', 'int');
-$labourdoctor_socpeopleassigned = GETPOST('labourdoctor_socpeopleassigned', 'array');
+global $langs, $user, $conf, $db;
 
-$labourinspector_id					= GETPOST('labourinspector_socid', 'int');
-$labourinspector_contactid 			= GETPOST('labourinspector_contactid', 'int');
-$labourinspector_socpeopleassigned 	= GETPOST('labourinspector_socpeopleassigned', 'array');
+// Translations
+$langs->loadLangs(array('admin', 'companies', "digiriskdolibarr@digiriskdolibarr"));
 
-$samu_id		 	= GETPOST('samu_socid', 'int');
-$pompiers_id 		= GETPOST('pompiers_socid', 'int');
-$police_id 			= GETPOST('police_socid', 'int');
-$touteurgence_id 	= GETPOST('touteurgence_socid', 'int');
-$defenseur_id 		= GETPOST('defenseur_socid', 'int');
-$antipoison_id 		= GETPOST('antipoison_socid', 'int');
-$responsible_id 	= GETPOST('responsible_socid', 'int');
-
-$id = GETPOST('id', 'int');
-
-$origin = GETPOST('origin', 'alpha');
-$originid = GETPOST('originid', 'int');
-$confirm = GETPOST('confirm', 'alpha');
-
-$fulldayevent = GETPOST('fullday');
-
-$aphour = GETPOST('aphour');
-$apmin = GETPOST('apmin');
-$p2hour = GETPOST('p2hour');
-$p2min = GETPOST('p2min');
-// Load translation files required by the page
-$langs->loadLangs(array('admin', 'companies'));
-
-$contact = new Contact($db);
-
-
+// Access control
 if (!$user->admin) accessforbidden();
 
-$error = 0;
-$hookmanager->initHooks(array('admincompany', 'globaladmin'));
+// Parameters
+$action = GETPOST('action', 'aZ09');
+$error  = 0;
 
+// Initialize technical objects
+$contact   = new Contact($db);
+$societe   = new Societe($db);
+$resources = new DigiriskResources($db);
+
+
+$allLinks = $resources->digirisk_dolibarr_fetch_resources();
+
+$hookmanager->initHooks(array('admincompany', 'globaladmin'));
 
 /*
  * Actions
  */
-global $conf;
+
 $parameters = array();
 $reshook = $hookmanager->executeHooks('doActions', $parameters, $object, $action); // Note that $action and $object may have been modified by some hooks
 if ($reshook < 0) setEventMessages($hookmanager->error, $hookmanager->errors, 'errors');
@@ -90,39 +71,41 @@ if ($reshook < 0) setEventMessages($hookmanager->error, $hookmanager->errors, 'e
 if (($action == 'update' && !GETPOST("cancel", 'alpha'))
 	|| ($action == 'updateedit'))
 {
-	$allLinks = digirisk_dolibarr_fetch_links($db, 'all');
+	$labourdoctor_id[0]    = GETPOST('labourdoctor_socid', 'int') > 0 ? GETPOST('labourdoctor_socid', 'int') : 0 ;
+	$labourinspector_id[0] = GETPOST('labourinspector_socid', 'int') > 0 ? GETPOST('labourinspector_socid','int') : 0;
 
-	$labourdoctor_id 					= GETPOST('labourdoctor_socid', 'int') ? GETPOST('labourdoctor_socid', 'int') : $allLinks['LabourDoctor']->fk_soc ;
-	$labourdoctor_socpeopleassigned 	= !empty(GETPOST('labourdoctor_socpeopleassigned', 'array')) ? GETPOST('labourdoctor_socpeopleassigned', 'array') : (GETPOST('labourdoctor_contactid', 'int') ? GETPOST('labourdoctor_contactid', 'int') : $allLinks['LabourDoctor']->fk_contact);
+	$labourdoctor_socpeopleassigned 	= !empty(GETPOST('labourdoctor_contactid', 'array')) ? GETPOST('labourdoctor_contactid', 'array') : (GETPOST('labourdoctor_contactid', 'int') > 0 ? GETPOST('labourdoctor_contactid', 'int') : 0);
+	$labourinspector_socpeopleassigned 	= !empty(GETPOST('labourinspector_contactid', 'array')) ? GETPOST('labourinspector_contactid','array') : (GETPOST('labourinspector_contactid', 'int') > 0 ? GETPOST('labourinspector_contactid', 'int') : 0);
 
-	$labourinspector_id					= GETPOST('labourinspector_socid', 'int') ? GETPOST('labourinspector_socid','int') : $allLinks['LabourInspector']->fk_soc;
-	$labourinspector_socpeopleassigned 	= !empty(GETPOST('labourinspector_contactid', 'int')) ? GETPOST('labourinspector_contactid','int') : (GETPOST('labourinspector_contactid', 'int') ? GETPOST('labourinspector_contactid', 'int') : $allLinks['LabourInspector']->fk_contact);
+	$resources->digirisk_dolibarr_set_resources($db,$user->id,  'LabourDoctorSociety',  'societe', $labourdoctor_id, $conf->entity);
+	$resources->digirisk_dolibarr_set_resources($db,$user->id,  'LabourInspectorSociety',  'societe', $labourinspector_id, $conf->entity);
 
-	digirisk_dolibarr_set_links($db, 'LabourDoctor',  1, $labourdoctor_id,$labourdoctor_socpeopleassigned, $conf->entity);
-	digirisk_dolibarr_set_links($db, 'LabourInspector',  1, $labourinspector_id,$labourinspector_socpeopleassigned, $conf->entity);
+	$resources->digirisk_dolibarr_set_resources($db,$user->id,  'LabourDoctorContact',  'socpeople', $labourdoctor_socpeopleassigned, $conf->entity);
+	$resources->digirisk_dolibarr_set_resources($db,$user->id,  'LabourInspectorContact',  'socpeople', $labourinspector_socpeopleassigned, $conf->entity);
 
-	$samu_id		 	= GETPOST('samu_socid', 'int') ? GETPOST('samu_socid', 'int') : $allLinks['SAMU']->fk_soc ;
-	$pompiers_id 		= GETPOST('pompiers_socid', 'int') ? GETPOST('pompiers_socid','int') : $allLinks['Pompiers']->fk_soc;
-	$police_id 			= GETPOST('police_socid', 'int') ? GETPOST('police_socid', 'int') : $allLinks['Police']->fk_soc ;
-	$touteurgence_id 	= GETPOST('touteurgence_socid', 'int') ? GETPOST('touteurgence_socid','int') : $allLinks['AllEmergencies']->fk_soc;
-	$defenseur_id 		= GETPOST('defenseur_socid', 'int') ? GETPOST('defenseur_socid', 'int') : $allLinks['RightsDefender']->fk_soc ;
-	$antipoison_id 		= GETPOST('antipoison_socid', 'int') ? GETPOST('antipoison_socid','int') : $allLinks['Antipoison']->fk_soc;
-	$responsible_id 	= GETPOST('responsible_socid', 'int') ? GETPOST('responsible_socid','int') : $allLinks['Responsible']->fk_soc;
+	$samu_id[0]		 	= GETPOST('samu_socid', 'int') ? GETPOST('samu_socid', 'int') : $allLinks['SAMU']->id[0];
+	$pompiers_id[0] 	= GETPOST('pompiers_socid', 'int') ? GETPOST('pompiers_socid','int') : $allLinks['Pompiers']->id[0];
+	$police_id[0] 		= GETPOST('police_socid', 'int') ? GETPOST('police_socid', 'int') : $allLinks['Police']->id[0] ;
+	$touteurgence_id[0] = GETPOST('touteurgence_socid', 'int') ? GETPOST('touteurgence_socid','int') : $allLinks['AllEmergencies']->id[0];
+	$defenseur_id[0] 	= GETPOST('defenseur_socid', 'int') ? GETPOST('defenseur_socid', 'int') : $allLinks['RightsDefender']->id[0] ;
+	$antipoison_id[0] 	= GETPOST('antipoison_socid', 'int') ? GETPOST('antipoison_socid','int') : $allLinks['Antipoison']->id[0];
+	$responsible_id[0]	= GETPOST('responsible_socid', 'int') ? GETPOST('responsible_socid','int') : $allLinks['Responsible']->id[0];
 
-	digirisk_dolibarr_set_links($db, 'SAMU',  1, $samu_id,0, 0, $conf->entity);
-	digirisk_dolibarr_set_links($db, 'Pompiers',  1, $pompiers_id,0,0, $conf->entity);
-	digirisk_dolibarr_set_links($db, 'Police',  1, $police_id,0,0, $conf->entity);
-	digirisk_dolibarr_set_links($db, 'AllEmergencies',  1, $touteurgence_id,0, 0, $conf->entity);
-	digirisk_dolibarr_set_links($db, 'RightsDefender',  1, $defenseur_id,0,0, $conf->entity);
-	digirisk_dolibarr_set_links($db, 'Antipoison',  1, $antipoison_id,0, 0,$conf->entity);
-	digirisk_dolibarr_set_links($db, 'Responsible',  1, $responsible_id,0, 0,$conf->entity);
+	$resources->digirisk_dolibarr_set_resources($db,$user->id,  'SAMU',  'societe', $samu_id, $conf->entity);
+	$resources->digirisk_dolibarr_set_resources($db,$user->id,  'Pompiers',  'societe', $pompiers_id, $conf->entity);
+	$resources->digirisk_dolibarr_set_resources($db,$user->id,  'Police',  'societe', $police_id, $conf->entity);
+	$resources->digirisk_dolibarr_set_resources($db,$user->id,  'AllEmergencies',  'societe', $touteurgence_id, $conf->entity);
+	$resources->digirisk_dolibarr_set_resources($db,$user->id,  'RightsDefender',  'societe', $defenseur_id, $conf->entity);
+	$resources->digirisk_dolibarr_set_resources($db,$user->id,  'Antipoison',  'societe', $antipoison_id, $conf->entity);
+	$resources->digirisk_dolibarr_set_resources($db,$user->id,  'Responsible',  'societe', $responsible_id, $conf->entity);
 
-	digirisk_dolibarr_set_const($db, "CONSIGNE_DETAILLEE_EMPLACEMENT", GETPOST("emplacementCD", 'none'), 'chaine', 0, '', $conf->entity);
-	digirisk_dolibarr_set_const($db, "DESCRIPTION", GETPOST("description", 'none'), 'chaine', 0, '', $conf->entity);
-	digirisk_dolibarr_set_const($db, "MOYENS_GENERAUX", GETPOST("moyensgeneraux", 'none'), 'chaine', 0, '', $conf->entity);
-	digirisk_dolibarr_set_const($db, "CONSIGNES_GENERALES", GETPOST("consignesgenerales", 'none'), 'chaine', 0, '', $conf->entity);
-	digirisk_dolibarr_set_const($db, "REGLEMENT_INTERIEUR_EMPLACEMENT", GETPOST("emplacementRI", 'none'), 'chaine', 0, '', $conf->entity);
-	digirisk_dolibarr_set_const($db, "DOCUMENT_UNIQUE_EMPLACEMENT", GETPOST("emplacementDU", 'none'), 'chaine', 0, '', $conf->entity);
+	dolibarr_set_const($db, "DIGIRISK_LOCATION_OF_DETAILED_INSTRUCTION", GETPOST("emplacementCD", 'none'), 'chaine', 0, '', $conf->entity);
+	dolibarr_set_const($db, "DIGIRISK_SOCIETY_DESCRIPTION", GETPOST("description", 'none'), 'chaine', 0, '', $conf->entity);
+	dolibarr_set_const($db, "DIGIRISK_GENERAL_MEANS", GETPOST("moyensgeneraux", 'none'), 'chaine', 0, '', $conf->entity);
+	dolibarr_set_const($db, "DIGIRISK_GENERAL_RULES", GETPOST("consignesgenerales", 'none'), 'chaine', 0, '', $conf->entity);
+	dolibarr_set_const($db, "DIGIRISK_RULES_LOCATION", GETPOST("emplacementRI", 'none'), 'chaine', 0, '', $conf->entity);
+	dolibarr_set_const($db, "DIGIRISK_DUER_LOCATION", GETPOST("emplacementDU", 'none'), 'chaine', 0, '', $conf->entity);
+	dolibarr_set_const($db, "DIGIRISK_COLLECTIVE_AGREEMENT_LOCATION", GETPOST("emplacementCC", 'none'), 'chaine', 0, '', $conf->entity);
 
 	if ($action != 'updateedit' && !$error)
 	{
@@ -130,11 +113,14 @@ if (($action == 'update' && !GETPOST("cancel", 'alpha'))
 		exit;
 	}
 }
+
 /*
  * View
  */
 
-$help_url = '';
+$form = new Form($db);
+
+$help_url = 'FR:Module_DigiriskDolibarr#L.27onglet_S.C3.A9curit.C3.A9';
 llxHeader('', $langs->trans("CompanyFoundation"), $help_url);
 
 print load_fiche_titre($langs->trans("CompanyFoundation"), '', 'title_setup');
@@ -143,25 +129,8 @@ $head = company_admin_prepare_head();
 
 dol_fiche_head($head, 'security', $langs->trans("Company"), -1, 'company');
 
-$form = new Form($db);
-$formother = new FormOther($db);
-$formcompany = new FormCompany($db);
-$object = new DigiriskLink($db);
-
-$countrynotdefined = '<font class="error">'.$langs->trans("ErrorSetACountryFirst").' ('.$langs->trans("SeeAbove").')</font>';
-print '<span class="opacitymedium">'.$langs->trans("AccountantDesc")."</span><br>\n";
+print '<span class="opacitymedium">'.$langs->trans("DigiriskMenu")."</span><br>\n";
 print "<br>\n";
-/**
- * Edit parameters
- */
-print "\n".'<script type="text/javascript" language="javascript">';
-print '$(document).ready(function () {
-		  $("#selectcountry_id").change(function() {
-			document.form_index.action.value="updateedit";
-			document.form_index.submit();
-		  });
-	  });';
-print '</script>'."\n";
 
 print '<form method="POST" action="'.$_SERVER["PHP_SELF"].'" name="form_index">';
 print '<input type="hidden" name="token" value="'.newToken().'">';
@@ -171,27 +140,30 @@ print '<table class="noborder centpercent editmode">';
 
 if ($conf->societe->enabled)
 {
-	// MEDECIN DU TRAVAIL
+	/*
+	*** Labour Doctor -- Médecin du travail ***
+	*/
+
 	print '<tr class="liste_titre"><th class="titlefield wordbreak">'.$langs->trans("LabourDoctor").'</th><th>.<i class="fas fa-briefcase-medical"></i></th></tr>'."\n";
-
 	print '<tr class="oddeven"><td class="titlefieldcreate nowrap">'.$langs->trans("ActionOnCompany").'</td><td>';
-	$labourdoctor_links = digirisk_dolibarr_fetch_links($db, 'LabourDoctor');
 
-	// Tiers
-	if ($labourdoctor_links->ref == 'LabourDoctor')
+	$labour_doctor_society = $allLinks['LabourDoctorSociety'];
+
+	// * Third party concerned - Tiers concerné *
+
+	if ($labour_doctor_society->ref == 'LabourDoctorSociety')
 	{
-		$events = array();
+		$events   = array();
 		$events[] = array('method' => 'getContacts', 'url' => dol_buildpath('/core/ajax/contacts.php?showempty=1', 1), 'htmlname' => 'labourdoctor_contactid', 'params' => array('add-customer-contact' => 'disabled'));
+		$societe->fetch($labour_doctor_society->id);
 
-		$societe = new Societe($db);
-		$societe->fetch($labourdoctor_links->fk_soc);
-		print $form->select_company($labourdoctor_links->fk_soc, 'labourdoctor_socid', '', 'SelectThirdParty', 1, 0, $events, 0, 'minwidth300');
-
+		print $form->select_company($labour_doctor_society->id, 'labourdoctor_socid', '', 'SelectThirdParty', 1, 0, $events, 0, 'minwidth300');
 	}
 	else
 	{
-		$events = array();
-		$events[] = array('method' => 'getContacts', 'url' => dol_buildpath('/core/ajax/contacts.php?showempty=1', 1), 'htmlname' => 'labourdoctor_contactid', 'params' => array('add-customer-contact' => 'disabled'));
+		$events 	= array();
+		$events[] 	= array('method' => 'getContacts', 'url' => dol_buildpath('/core/ajax/contacts.php?showempty=1', 1), 'htmlname' => 'labourdoctor_contactid', 'params' => array('add-customer-contact' => 'disabled'));
+
 		//For external user force the company to user company
 		if (!empty($user->socid)) {
 			print $form->select_company($user->socid, 'labourdoctor_socid', '', 1, 1, 0, $events, 0, 'minwidth300');
@@ -199,38 +171,45 @@ if ($conf->societe->enabled)
 			print $form->select_company('', 'labourdoctor_socid', '', 'SelectThirdParty', 1, 0, $events, 0, 'minwidth300');
 		}
 	}
+	if (!GETPOSTISSET('backtopage')) print ' <a href="'.DOL_URL_ROOT.'/societe/card.php?action=create&backtopage='.urlencode($_SERVER["PHP_SELF"].'?action=create').'"><span class="fa fa-plus-circle valignmiddle paddingleft" title="'.$langs->trans("AddThirdParty").'"></span></a>';
 	print '</td></tr>';
 
-	// Related contact
-	print '<tr class="oddeven"><td class="nowrap">'.$langs->trans("ActionOnContact").'</td><td>';
-	$labourdoctorpreselectedids = $labourdoctor_links->fk_contact;
+	// * Related contacts - Contacts associés *
 
-	if ($labourdoctor_links->fk_contact) {
-		print $form->selectcontacts($labourdoctor_links->fk_soc, $labourdoctor_links->fk_contact, 'labourdoctor_contactid', 1, '', '', 0, 'quatrevingtpercent', false, 0, array(), false, 'multiple', 'labourdoctor_contactid');
+	print '<tr class="oddeven"><td class="nowrap">'.$langs->trans("ActionOnContact").'</td><td>';
+
+	$labour_doctor_contact 		= $allLinks['LabourDoctorContact'];
+	$labourdoctorpreselectedids = $labour_doctor_contact->id;
+
+	if ($labour_doctor_contact->id) {
+		print $form->selectcontacts($labour_doctor_society->id[0], $labour_doctor_contact->id, 'labourdoctor_contactid[]', 1, '', '', 0, 'quatrevingtpercent', false, 0, array(), false, 'multiple', 'labourdoctor_contactid');
 	}
 	else
 	{
-		$labourdoctorpreselectedids = GETPOST('labourdoctor_contactid', 'int');
-		if (GETPOST('labourdoctor_contactid', 'int')) $labourdoctorpreselectedids[GETPOST('labourdoctor_contactid', 'int')] = GETPOST('labourdoctor_contactid', 'int');
-		print $form->selectcontacts(GETPOST('labourdoctor_socid', 'int'), $labourdoctorpreselectedids, 'labourdoctor_contactid', 1, '', '', 0, 'quatrevingtpercent', false, 0, array(), false, 'multiple', 'labourdoctor_contactid');
+		$labourdoctorpreselectedids = GETPOST('labourdoctor_contactid', 'array');
+		if (GETPOST('labourdoctor_contactid', 'array')) $labourdoctorpreselectedids[GETPOST('labourdoctor_contactid', 'array')] = GETPOST('labourdoctor_contactid', 'array');
+		print $form->selectcontacts(GETPOST('labourdoctor_socid', 'int'), $labourdoctorpreselectedids, 'labourdoctor_contactid[]', 1, '', '', 0, 'quatrevingtpercent', false, 0, array(), false, 'multiple', 'labourdoctor_contactid');
 	}
 	print '</td></tr>';
 
-	// INSPECTEUR DU TRAVAIL
+	/*
+	 *** Labour Inspector -- Inspecteur du travail ***
+	*/
+
 	print '<tr class="liste_titre"><th class="titlefield wordbreak">'.$langs->trans("LabourInspector").'</th><th>.<i class="fas fa-search"></i></th></tr>'."\n";
 	print '<tr class="oddeven"><td class="titlefieldcreate nowrap">'.$langs->trans("ActionOnCompany").'</td><td>';
-	$labourinspector_links = digirisk_dolibarr_fetch_links($db, 'LabourInspector');
 
-	// Tiers
-	if ($labourinspector_links->ref == 'LabourInspector')
+	$labour_inspector_societe = $allLinks['LabourInspectorSociety'];
+
+	// * Third party concerned - Tiers concerné *
+
+	if ($labour_inspector_societe->ref == 'LabourInspectorSociety')
 	{
-		$events = array();
+		$events   = array();
 		$events[] = array('method' => 'getContacts', 'url' => dol_buildpath('/core/ajax/contacts.php?showempty=1', 1), 'htmlname' => 'labourinspector_contactid', 'params' => array('add-customer-contact' => 'disabled'));
+		$societe->fetch($labour_inspector_societe->id[0]);
 
-		$societe = new Societe($db);
-		$societe->fetch($labourinspector_links->fk_soc);
-		print $form->select_company($labourinspector_links->fk_soc, 'labourinspector_socid', '', 'SelectThirdParty', 1, 0, $events, 0, 'minwidth300');
-
+		print $form->select_company($labour_inspector_societe->id[0], 'labourinspector_socid', '', 'SelectThirdParty', 1, 0, $events, 0, 'minwidth300');
 	}
 	else
 	{
@@ -243,59 +222,72 @@ if ($conf->societe->enabled)
 			print $form->select_company('', 'labourinspector_socid', '', 'SelectThirdParty', 1, 0, $events, 0, 'minwidth300');
 		}
 	}
+	if (!GETPOSTISSET('backtopage')) print ' <a href="'.DOL_URL_ROOT.'/societe/card.php?action=create&backtopage='.urlencode($_SERVER["PHP_SELF"].'?action=create').'"><span class="fa fa-plus-circle valignmiddle paddingleft" title="'.$langs->trans("AddThirdParty").'"></span></a>';
 	print '</td></tr>';
 
-	// Related contacts
+	// * Related contacts - Contacts associés *
+
 	print '<tr class="oddeven"><td class="nowrap">'.$langs->trans("ActionOnContact").'</td><td>';
-	$preselectedids = $labourinspector_links->fk_contact;
-	if ($labourinspector_links->fk_contact) {
-		print $form->selectcontacts($labourinspector_links->fk_soc, $labourinspector_links->fk_contact , 'labourinspector_contactid', 1, '', '', 0, 'quatrevingtpercent', false, 0, array(), false, 'multiple', 'labourinspector_contactid');
+
+	$labour_inspector_contact =  $allLinks['LabourInspectorContact'];
+	$preselectedids 		  = $labour_inspector_contact->id;
+
+	if ($labour_inspector_contact->id) {
+		print $form->selectcontacts($labour_inspector_societe->id[0], $labour_inspector_contact->id , 'labourinspector_contactid[]', 1, '', '', 0, 'quatrevingtpercent', false, 0, array(), false, 'multiple', 'labourinspector_contactid');
 	}
 	else
 	{
-		$preselectedids = GETPOST('labourinspector_contactid', 'int');
-		if (GETPOST('labourinspector_contactid', 'int')) $preselectedids[GETPOST('labourinspector_contactid', 'int')] = GETPOST('labourinspector_contactid', 'int');
-		print $form->selectcontacts(GETPOST('labourinspector_socid', 'int'), $preselectedids, 'labourinspector_contactid', 1, '', '', 0, 'quatrevingtpercent', false, 0, array(), false, 'multiple', 'labourinspector_contactid');
+		$preselectedids = GETPOST('labourinspector_contactid', 'array');
+		if (GETPOST('labourinspector_contactid', 'array')) $preselectedids[GETPOST('labourinspector_contactid', 'array')] = GETPOST('labourinspector_contactid', 'array');
+		print $form->selectcontacts(GETPOST('labourinspector_socid', 'int'), $preselectedids, 'labourinspector_contactid[]', 1, '', '', 0, 'quatrevingtpercent', false, 0, array(), false, 'multiple', 'labourinspector_contactid');
 	}
 	print '</td></tr>';
 
-	// SAMU
+	/*
+	*** Emergencies -- SAMU ***
+	*/
+
 	print '<tr class="liste_titre"><th class="titlefield wordbreak">'.$langs->trans("SAMU").'</th><th>.<i class="fas fa-hospital-alt"></i></th></tr>'."\n";
-
 	print '<tr class="oddeven"><td class="titlefieldcreate nowrap">'.$langs->trans("ActionOnCompany").'</td><td>';
-	$samu_links = digirisk_dolibarr_fetch_links($db, 'SAMU');
 
-	// Tiers
-	if ($samu_links->ref == 'SAMU')
+	$samu_resources =  $allLinks['SAMU'];
+
+	// * Third party concerned - Tiers concerné *
+
+	if ($samu_resources->ref == 'SAMU')
 	{
-		$societe = new Societe($db);
-		$societe->fetch($samu_links->fk_soc);
-		print $form->select_company($samu_links->fk_soc, 'samu_socid', '', 'SelectThirdParty', 1, 0, 0, 0, 'minwidth300');
+		$societe->fetch($samu_resources->id[0]);
+
+		print $form->select_company($samu_resources->id[0], 'samu_socid', '', 'SelectThirdParty', 1, 0, 0, 0, 'minwidth300');
 
 	}
 	else
 	{
-	//For external user force the company to user company
+		//For external user force the company to user company
 		if (!empty($user->socid)) {
 			print $form->select_company($user->socid, 'samu_socid', '', 1, 1, 0, 0, 0, 'minwidth300');
 		} else {
 			print $form->select_company('', 'samu_socid', '', 'SelectThirdParty', 1, 0, 0 , 0, 'minwidth300');
 		}
 	}
+	if (!GETPOSTISSET('backtopage')) print ' <a href="'.DOL_URL_ROOT.'/societe/card.php?action=create&backtopage='.urlencode($_SERVER["PHP_SELF"].'?action=create').'"><span class="fa fa-plus-circle valignmiddle paddingleft" title="'.$langs->trans("AddThirdParty").'"></span></a>';
 	print '</td></tr>';
 
-	// Pompiers
-	print '<tr class="liste_titre"><th class="titlefield wordbreak">'.$langs->trans("Pompiers").'</th><th>.<i class="fas fa-ambulance"></i></th></tr>'."\n";
+	/*
+	*** Fire Brigade -- Pompiers ***
+	*/
 
+	print '<tr class="liste_titre"><th class="titlefield wordbreak">'.$langs->trans("FireBrigade").'</th><th>.<i class="fas fa-ambulance"></i></th></tr>'."\n";
 	print '<tr class="oddeven"><td class="titlefieldcreate nowrap">'.$langs->trans("ActionOnCompany").'</td><td>';
-	$pompiers_links = digirisk_dolibarr_fetch_links($db, 'Pompiers');
 
-	// Tiers
-	if ($pompiers_links->ref == 'Pompiers')
+	$pompiers_resources = $allLinks['Pompiers'];
+
+	// * Third party concerned - Tiers concerné *
+
+	if ($pompiers_resources->ref == 'Pompiers')
 	{
-		$societe = new Societe($db);
-		$societe->fetch($pompiers_links->fk_soc);
-		print $form->select_company($pompiers_links->fk_soc, 'pompiers_socid', '', 'SelectThirdParty', 1, 0, 0, 0, 'minwidth300');
+		$societe->fetch($pompiers_resources->id[0]);
+		print $form->select_company($pompiers_resources->id[0], 'pompiers_socid', '', 'SelectThirdParty', 1, 0, 0, 0, 'minwidth300');
 
 	}
 	else
@@ -307,20 +299,24 @@ if ($conf->societe->enabled)
 			print $form->select_company('', 'pompiers_socid', '', 'SelectThirdParty', 1, 0, 0 , 0, 'minwidth300');
 		}
 	}
+	if (!GETPOSTISSET('backtopage')) print ' <a href="'.DOL_URL_ROOT.'/societe/card.php?action=create&backtopage='.urlencode($_SERVER["PHP_SELF"].'?action=create').'"><span class="fa fa-plus-circle valignmiddle paddingleft" title="'.$langs->trans("AddThirdParty").'"></span></a>';
 	print '</td></tr>';
 
-	// Police
+	/*
+	*** Police -- Police ***
+	*/
+
 	print '<tr class="liste_titre"><th class="titlefield wordbreak">'.$langs->trans("Police").'</th><th>.<i class="fas fa-car"></i></th></tr>'."\n";
-
 	print '<tr class="oddeven"><td class="titlefieldcreate nowrap">'.$langs->trans("ActionOnCompany").'</td><td>';
-	$police_links = digirisk_dolibarr_fetch_links($db, 'Police');
 
-	// Tiers
-	if ($police_links->ref == 'Police')
+	$police_resources = $allLinks['Police'];
+
+	// * Third party concerned - Tiers concerné *
+
+	if ($police_resources->ref == 'Police')
 	{
-		$societe = new Societe($db);
-		$societe->fetch($police_links->fk_soc);
-		print $form->select_company($police_links->fk_soc, 'police_socid', '', 'SelectThirdParty', 1, 0, 0, 0, 'minwidth300');
+		$societe->fetch($police_resources->id[0]);
+		print $form->select_company($police_resources->id[0], 'police_socid', '', 'SelectThirdParty', 1, 0, 0, 0, 'minwidth300');
 
 	}
 	else
@@ -332,20 +328,24 @@ if ($conf->societe->enabled)
 			print $form->select_company('', 'police_socid', '', 'SelectThirdParty', 1, 0, 0 , 0, 'minwidth300');
 		}
 	}
+	if (!GETPOSTISSET('backtopage')) print ' <a href="'.DOL_URL_ROOT.'/societe/card.php?action=create&backtopage='.urlencode($_SERVER["PHP_SELF"].'?action=create').'"><span class="fa fa-plus-circle valignmiddle paddingleft" title="'.$langs->trans("AddThirdParty").'"></span></a>';
 	print '</td></tr>';
 
-	// Toute Urgence
+	/*
+	*** For any emergency -- Pour toute urgence ***
+	*/
+
 	print '<tr class="liste_titre"><th class="titlefield wordbreak">'.$langs->trans("AllEmergencies").'</th><th>.<i class="fas fa-phone"></i></th></tr>'."\n";
-
 	print '<tr class="oddeven"><td class="titlefieldcreate nowrap">'.$langs->trans("ActionOnCompany").'</td><td>';
-	$touteurgence_links = digirisk_dolibarr_fetch_links($db, 'AllEmergencies');
 
-	// Tiers
-	if ($touteurgence_links->ref == 'AllEmergencies')
+	$touteurgence_resources = $allLinks['AllEmergencies'];
+
+	// * Third party concerned - Tiers concerné *
+
+	if ($touteurgence_resources->ref == 'AllEmergencies')
 	{
-		$societe = new Societe($db);
-		$societe->fetch($touteurgence_links->fk_soc);
-		print $form->select_company($touteurgence_links->fk_soc, 'touteurgence_socid', '', 'SelectThirdParty', 1, 0, 0, 0, 'minwidth300');
+		$societe->fetch($touteurgence_resources->id[0]);
+		print $form->select_company($touteurgence_resources->id[0], 'touteurgence_socid', '', 'SelectThirdParty', 1, 0, 0, 0, 'minwidth300');
 
 	}
 	else
@@ -357,20 +357,24 @@ if ($conf->societe->enabled)
 			print $form->select_company('', 'touteurgence_socid', '', 'SelectThirdParty', 1, 0, 0 , 0, 'minwidth300');
 		}
 	}
+	if (!GETPOSTISSET('backtopage')) print ' <a href="'.DOL_URL_ROOT.'/societe/card.php?action=create&backtopage='.urlencode($_SERVER["PHP_SELF"].'?action=create').'"><span class="fa fa-plus-circle valignmiddle paddingleft" title="'.$langs->trans("AddThirdParty").'"></span></a>';
 	print '</td></tr>';
 
-	// Défenseur des droits
+	/*
+	*** Rights defender -- Défenseur des droits ***
+	*/
+
 	print '<tr class="liste_titre"><th class="titlefield wordbreak">'.$langs->trans("RightsDefender").'</th><th>.<i class="fas fa-gavel"></i></th></tr>'."\n";
-
 	print '<tr class="oddeven"><td class="titlefieldcreate nowrap">'.$langs->trans("ActionOnCompany").'</td><td>';
-	$defenseur_links = digirisk_dolibarr_fetch_links($db, 'RightsDefender');
 
-	// Tiers
-	if ($defenseur_links->ref == 'RightsDefender')
+	$defenseur_resources = $allLinks['RightsDefender'];
+
+	// * Third party concerned - Tiers concerné *
+
+	if ($defenseur_resources->ref == 'RightsDefender')
 	{
-		$societe = new Societe($db);
-		$societe->fetch($defenseur_links->fk_soc);
-		print $form->select_company($defenseur_links->fk_soc, 'defenseur_socid', '', 'SelectThirdParty', 1, 0, 0, 0, 'minwidth300');
+		$societe->fetch($defenseur_resources->id[0]);
+		print $form->select_company($defenseur_resources->id[0], 'defenseur_socid', '', 'SelectThirdParty', 1, 0, 0, 0, 'minwidth300');
 
 	}
 	else
@@ -382,20 +386,24 @@ if ($conf->societe->enabled)
 			print $form->select_company('', 'defenseur_socid', '', 'SelectThirdParty', 1, 0, 0 , 0, 'minwidth300');
 		}
 	}
+	if (!GETPOSTISSET('backtopage')) print ' <a href="'.DOL_URL_ROOT.'/societe/card.php?action=create&backtopage='.urlencode($_SERVER["PHP_SELF"].'?action=create').'"><span class="fa fa-plus-circle valignmiddle paddingleft" title="'.$langs->trans("AddThirdParty").'"></span></a>';
 	print '</td></tr>';
 
-	// Antipoison
-	print '<tr class="liste_titre"><th class="titlefield wordbreak">'.$langs->trans("Antipoison").'</th><th>.<i class="fas fa-skull-crossbones"></i></th></tr>'."\n";
+	/*
+	*** Poison control center -- Centre antipoison ***
+	*/
+
+	print '<tr class="liste_titre"><th class="titlefield wordbreak">'.$langs->trans("PoisonControlCenter").'</th><th>.<i class="fas fa-skull-crossbones"></i></th></tr>'."\n";
 
 	print '<tr class="oddeven"><td class="titlefieldcreate nowrap">'.$langs->trans("ActionOnCompany").'</td><td>';
-	$antipoison_links = digirisk_dolibarr_fetch_links($db, 'Antipoison');
+	$antipoison_resources = $allLinks['Antipoison'];
 
-	// Tiers
-	if ($antipoison_links->ref == 'Antipoison')
+	// * Third party concerned - Tiers concerné *
+
+	if ($antipoison_resources->ref == 'Antipoison')
 	{
-		$societe = new Societe($db);
-		$societe->fetch($antipoison_links->fk_soc);
-		print $form->select_company($antipoison_links->fk_soc, 'antipoison_socid', '', 'SelectThirdParty', 1, 0, 0, 0, 'minwidth300');
+		$societe->fetch($antipoison_resources->id[0]);
+		print $form->select_company($antipoison_resources->id[0], 'antipoison_socid', '', 'SelectThirdParty', 1, 0, 0, 0, 'minwidth300');
 
 	}
 	else
@@ -407,91 +415,129 @@ if ($conf->societe->enabled)
 			print $form->select_company('', 'antipoison_socid', '', 'SelectThirdParty', 1, 0, 0 , 0, 'minwidth300');
 		}
 	}
+	if (!GETPOSTISSET('backtopage')) print ' <a href="'.DOL_URL_ROOT.'/societe/card.php?action=create&backtopage='.urlencode($_SERVER["PHP_SELF"].'?action=create').'"><span class="fa fa-plus-circle valignmiddle paddingleft" title="'.$langs->trans("AddThirdParty").'"></span></a>';
 	print '</td></tr>';
 }
 
-// Consignes de sécurité
-print '<table class="noborder centpercent editmode">';
-print '<tr class="liste_titre"><th class="titlefield wordbreak">'.$langs->trans("Consignes de sécurité").'</th><th>'.$langs->trans("Value").'</th></tr>'."\n";
+/*
+*** Safety instructions -- Consignes de sécurité ***
+*/
 
-// Responsable à prévenir
+print '<tr class="liste_titre"><th class="titlefield wordbreak">'.$langs->trans("SafetyInstructions").'</th><th></th></tr>'."\n";
 
-print '<tr><td class="titlefieldcreate nowrap">'.$langs->trans("Responsable à prévenir").'</td><td>';
-$responsible_links = digirisk_dolibarr_fetch_links($db, 'Responsible');
+// * Responsible to notify - Responsable à prévenir *
 
-// Tiers
-if ($responsible_links->ref == 'Responsible' && $responsible_links->fk_soc > 0)
+print '<tr><td class="titlefieldcreate nowrap">'.$langs->trans("ResponsibleToNotify").'</td><td>';
+$responsible_resources = $allLinks['Responsible'];
+
+// * Third party concerned - Tiers concerné *
+
+if ($responsible_resources->ref == 'Responsible' && $responsible_resources->id[0] > 0)
 {
-	$societe = new Societe($db);
-	$societe->fetch($responsible_links->fk_soc);
 
-	print $form->select_company($responsible_links->fk_soc, 'responsible_socid', '', 'SelectThirdParty', 1, 0, 0, 0, 'minwidth300');
-// Téléphone
-	print '<tr class="oddeven"><td><label for="name">'.$langs->trans("Téléphone").'</label></td><td>';
-	print $societe->phone;
+	$user->fetch($responsible_resources->id[0]);
+	if (!GETPOSTISSET('backtopage')) print ' <a href="'.DOL_URL_ROOT.'/user/card.php?action=create&backtopage='.urlencode($_SERVER["PHP_SELF"].'?action=create').'"><span class="fa fa-plus-circle valignmiddle paddingleft" title="'.$langs->trans("AddThirdParty").'"></span></a>';
+
+	print $form->select_dolusers($responsible_resources->id[0], 'responsible_socid', 0, null, 0, 0, 0, 0, 'minwidth300');
+
+	// * Phone number - Numéro de téléphone *
+
+	print '<tr class="oddeven"><td><label for="name">'.$langs->trans("Phone").'</label></td><td>';
+	if ($user->phone > 0) {
+		print $user->office_phone;
+	} else { ?>
+		<a href="<?php echo DOL_URL_ROOT . '/' ?>user/card.php?id=<?php echo $user->id ?>" target="_blank">
+			<i class="fas fa-plus"></i><?php print ' ' . $langs->trans('NoPhoneNumber'); ?>
+		</a>
+	<?php }
+
+	print '</td></tr>';
 
 }
-else
+else //id = 0
 {
 	//For external user force the company to user company
 	if (!empty($user->socid)) {
-		print $form->select_company($user->socid, 'responsible_socid', '', 1, 1, 0, 0, 0, 'minwidth300');
+		print $form->select_dolusers($user->socid, 'responsible_socid', '', 1, 0, 0, 0, 0, 'minwidth300');
 	} else {
-		print $form->select_company('', 'responsible_socid', '', 'SelectThirdParty', 1, 0, 0 , 0, 'minwidth300');
+		print $form->select_dolusers('', 'responsible_socid', '', '', 0, 0, 0 , 0, 'minwidth300');
 	}
 }
+
 print '</td></tr>';
 
-$digiriskconst = digirisk_dolibarr_fetch_const($db);
+// * Location of detailed instructions - Emplacement de la consigne détaillée *
 
-// Emplacement de la consigne détaillée
-print '<tr class="oddeven"><td><label for="emplacementCD">'.$langs->trans("Emplacement de la consigne détaillée").'</label></td><td>';
-print '<input name="emplacementCD" id="emplacementCD" class="minwidth200" value="'.($digiriskconst->CONSIGNE_DETAILLEE_EMPLACEMENT ? $digiriskconst->CONSIGNE_DETAILLEE_EMPLACEMENT : GETPOST("emplacementCD", 'none')).'"'.(empty($digiriskconst->MAIN_OPTIMIZEFORTEXTBROWSER) ? '' : ' autofocus="autofocus"').'></td></tr>'."\n";
+print '<tr class="oddeven"><td><label for="emplacementCD">'.$langs->trans("LocationOfDetailedInstructions").'</label></td><td>';
+$doleditor = new DolEditor('emplacementCD', $conf->global->DIGIRISK_LOCATION_OF_DETAILED_INSTRUCTION ? $conf->global->DIGIRISK_LOCATION_OF_DETAILED_INSTRUCTION : '', '', 90, 'dolibarr_notes', '', false, true, $conf->global->FCKEDITOR_ENABLE_SOCIETE, ROWS_3, '90%');
+$doleditor->Create();
+print '</td></tr>';
 
+/*
+*** Society additional details -- Informations complémentaires de la société ***
+*/
 
-print '<table class="noborder centpercent editmode">';
-print '<tr class="liste_titre"><th class="titlefield">'.$langs->trans("Informations complémentaires de la société").'</th><th>'.$langs->trans("Value").'</th></tr>'."\n";
+print '<tr class="liste_titre"><th class="titlefield">'.$langs->trans("SocietyAdditionalDetails").'</th><th></th></tr>'."\n";
 
-// Description
+// * Description - Emplacement de la consigne détaillée *
+
 print '<tr class="oddeven"><td><label for="description">'.$langs->trans("Description").'</label></td><td>';
-print '<input name="description" id="description" class="minwidth200" value="'.($digiriskconst->DESCRIPTION ? $digiriskconst->DESCRIPTION : GETPOST("description", 'none')).'"'.(empty($digiriskconst->MAIN_OPTIMIZEFORTEXTBROWSER) ? '' : ' autofocus="autofocus"').'></td></tr>'."\n";
-
-// Moyens généraux mis à disposition
-print '<tr class="oddeven"><td><label for="moyensgeneraux">'.$langs->trans("Moyens généraux mis à disposition").'</label></td><td>';
-print '<input name="moyensgeneraux" id="moyensgeneraux" class="minwidth200" value="'.($digiriskconst->MOYENS_GENERAUX ? $digiriskconst->MOYENS_GENERAUX : GETPOST("moyensgeneraux", 'none')).'"'.(empty($digiriskconst->MAIN_OPTIMIZEFORTEXTBROWSER) ? '' : ' autofocus="autofocus"').'></td></tr>'."\n";
-
-// Consignes générales
-print '<tr class="oddeven"><td><label for="consignesgenerales">'.$langs->trans(" Consignes générales").'</label></td><td>';
-print '<input name="consignesgenerales" id="consignesgenerales" class="minwidth200" value="'.($digiriskconst->CONSIGNES_GENERALES ? $digiriskconst->CONSIGNES_GENERALES : GETPOST("consignesgenerales", 'none')).'"'.(empty($digiriskconst->MAIN_OPTIMIZEFORTEXTBROWSER) ? '' : ' autofocus="autofocus"').'></td></tr>'."\n";
-
-// RI
-print '<table class="noborder centpercent editmode">';
-print '<tr class="liste_titre"><th class="titlefield wordbreak">'.$langs->trans("Règlement intérieur").'</th><th>'.$langs->trans("").'</th></tr>'."\n";
-// Emplacement
-print '<tr class="oddeven"><td><label for="emplacementRI">'.$langs->trans("Emplacement").'</label></td><td>';
-print '<input name="emplacementRI" id="emplacementRI" class="minwidth200" value="'.($digiriskconst->REGLEMENT_INTERIEUR_EMPLACEMENT ? $digiriskconst->REGLEMENT_INTERIEUR_EMPLACEMENT : GETPOST("emplacementRI", 'none')).'"'.(empty($digiriskconst->MAIN_OPTIMIZEFORTEXTBROWSER) ? '' : ' autofocus="autofocus"').'></td></tr>'."\n";
-
-// DU
-print '<table class="noborder centpercent editmode">';
-print '<tr class="liste_titre"><th class="titlefield wordbreak">'.$langs->trans("Document Unique").'</th><th>'.$langs->trans("").'</th></tr>'."\n";
-// Emplacement
-print '<tr class="oddeven"><td><label for="emplacementDU">'.$langs->trans("Emplacement").'</label></td><td>';
-print '<input name="emplacementDU" id="emplacementDU" class="minwidth200" value="'.($digiriskconst->DOCUMENT_UNIQUE_EMPLACEMENT ? $digiriskconst->DOCUMENT_UNIQUE_EMPLACEMENT : GETPOST("emplacementDU", 'none')).'"'.(empty($digiriskconst->MAIN_OPTIMIZEFORTEXTBROWSER) ? '' : ' autofocus="autofocus"').'></td></tr>'."\n";
-
+$doleditor = new DolEditor('description', $conf->global->DIGIRISK_SOCIETY_DESCRIPTION ? $conf->global->DIGIRISK_SOCIETY_DESCRIPTION : '', '', 90, 'dolibarr_notes', '', false, true, $conf->global->FCKEDITOR_ENABLE_SOCIETE, ROWS_3, '90%');
+$doleditor->Create();
 print '</td></tr>';
 
+// * General means at disposal - Moyens généraux mis à disposition *
+
+print '<tr class="oddeven"><td><label for="moyensgeneraux">'.$langs->trans("GeneralMeansAtDisposal").'</label></td><td>';
+$doleditor = new DolEditor('moyensgeneraux', $conf->global->DIGIRISK_GENERAL_MEANS ? $conf->global->DIGIRISK_GENERAL_MEANS : '', '', 90, 'dolibarr_notes', '', false, true, $conf->global->FCKEDITOR_ENABLE_SOCIETE, ROWS_3, '90%');
+$doleditor->Create();
+print '</td></tr>';
+
+// * General instructions - Consignes générales *
+
+print '<tr class="oddeven"><td><label for="consignesgenerales">'.$langs->trans("GeneralInstructions").'</label></td><td>';
+$doleditor = new DolEditor('consignesgenerales', $conf->global->DIGIRISK_GENERAL_RULES ? $conf->global->DIGIRISK_GENERAL_RULES : '', '', 90, 'dolibarr_notes', '', false, true, $conf->global->FCKEDITOR_ENABLE_SOCIETE, ROWS_3, '90%');
+$doleditor->Create();
+print '</td></tr>';
+
+// * Rules of procedure - Règlement intérieur *
+
+print '<tr class="liste_titre"><th class="titlefield wordbreak">'.$langs->trans("RulesOfProcedure").'</th><th>'.$langs->trans("").'</th></tr>'."\n";
+
+// * Rules of procedure location - Emplacement du règlement intérieur *
+
+print '<tr class="oddeven"><td><label for="emplacementRI">'.$langs->trans("Location").'</label></td><td>';
+$doleditor = new DolEditor('emplacementRI', $conf->global->DIGIRISK_RULES_LOCATION ? $conf->global->DIGIRISK_RULES_LOCATION : '', '', 90, 'dolibarr_notes', '', false, true, $conf->global->FCKEDITOR_ENABLE_SOCIETE, ROWS_3, '90%');
+$doleditor->Create();
+print '</td></tr>';
+
+// * Risks evaluation - Document Unique *
+
+print '<tr class="liste_titre"><th class="titlefield wordbreak">'.$langs->trans("RiskAssessmentDocument").'</th><th>'.$langs->trans("").'</th></tr>'."\n";
+
+// * Risks evaluation location - Emplacement du Document Unique *
+
+print '<tr class="oddeven"><td><label for="emplacementDU">'.$langs->trans("Location").'</label></td><td>';
+$doleditor = new DolEditor('emplacementDU', $conf->global->DIGIRISK_DUER_LOCATION ? $conf->global->DIGIRISK_DUER_LOCATION : '', '', 90, 'dolibarr_notes', '', false, true, $conf->global->FCKEDITOR_ENABLE_SOCIETE, ROWS_3, '90%');
+$doleditor->Create();
+print '</td></tr>';
+
+// * Collective Agreement - Convention collective *
+
+print '<tr class="liste_titre"><th class="titlefield wordbreak">'.$langs->trans("CollectiveAgreement").'</th><th>'.$langs->trans("").'</th></tr>'."\n";
+
+// * Collective Agreement location - Emplacement de la Convention collective *
+
+print '<tr class="oddeven"><td><label for="emplacementCC">'.$langs->trans("Location").'</label></td><td>';
+$doleditor = new DolEditor('emplacementCC', $conf->global->DIGIRISK_COLLECTIVE_AGREEMENT_LOCATION ? $conf->global->DIGIRISK_COLLECTIVE_AGREEMENT_LOCATION : '', '', 90, 'dolibarr_notes', '', false, true, $conf->global->FCKEDITOR_ENABLE_SOCIETE, ROWS_3, '90%');
+$doleditor->Create();
+print '</td></tr>';
 print '</table>';
 
 print '<br><div class="center">';
 print '<input type="submit" class="button" name="save" value="'.$langs->trans("Save").'">';
-//print '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
-//print '<input type="submit" class="button" name="cancel" value="'.$langs->trans("Cancel").'">';
 print '</div>';
-//print '<br>';
-
 print '</form>';
 
-
 llxFooter();
-
 $db->close();

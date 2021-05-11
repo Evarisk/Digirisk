@@ -1,0 +1,361 @@
+[ {
+	"name": "Evarisk",
+	"slug": "evarisk",
+	"option": {
+		"is_default": true,
+		"matrix": {
+			"0": 0,
+			"1": 1,
+			"2": 2,
+			"3": 3,
+			"4": 4,
+			"5": 5,
+			"6": 6,
+			"8": 7,
+			"9": 8,
+			"12": 10,
+			"16": 12,
+			"18": 14,
+			"24": 17,
+			"27": 20,
+			"32": 25,
+			"36": 27,
+			"48": 31,
+			"54": 35,
+			"64": 40,
+			"72": 42,
+			"81": 44,
+			"96": 46,
+			"108": 48,
+			"128": 50,
+			"144": 55,
+			"162": 60,
+			"192": 66,
+			"216": 70,
+			"243": 77,
+			"256": 80,
+			"288": 84,
+			"324": 87,
+			"384": 90,
+			"432": 92,
+			"512": 95,
+			"576": 96,
+			"768": 98,
+			"1024": 100
+		},
+		"variable": [
+		{
+			"name": "Gravite",
+			"description": "0 : Pas de blessure possible 1 : Blessure légère 2 : ITT5 < jours ou effet irréversible 4 : Menace sur la vie",
+			"option": {
+				"display_type": "slide",
+				"range": [
+					"0",
+					"4"
+				],
+				"survey": {
+					"titre": "",
+					"request": [
+					{
+						"question": "Pas de blessure possible",
+						"seuil": "0"
+						},
+						{
+						"question": "Blessure légère",
+						"seuil": "1"
+						},
+						{
+						"question": "ITT<5 jours ou effet réversible",
+						"seuil": "2"
+						},
+						{
+						"question": "ITT>5jours ou effet irréversible",
+						"seuil": "3"
+						},
+						{
+						"question": "Menace sur la vie",
+						"seuil": "4"
+					}
+					]
+				}
+			}
+		},
+		{
+			"name": "Exposition",
+			"description": "0 : Jamais en contact 1 : Rare, 1 fois par an 2 : Inhabituelle, 1 fois par mois 3 : Occasionnelle, 1 fois par semaine 4 : Fréquente, 1 fois par jour",
+			"option": {
+				"display_type": "slide",
+				"range": [
+					"0",
+					"4"
+				],
+				"survey": {
+					"titre": "",
+					"request": [
+						{
+							"question": "Jamais en contact",
+							"seuil": "0"
+						},
+						{
+							"question": "Rare, 1 fois par an",
+							"seuil": "1"
+						},
+						{
+							"question": "Inhabituelle, 1 fois par mois",
+							"seuil": "2"
+						},
+						{
+							"question": "Occasionnelle, 1 fois par semaine",
+							"seuil": "3"
+						},
+						{
+							"question": "Fréquente, 1 fois par jour",
+							"seuil": "4"
+						}
+					]
+				}
+			}
+		},
+		{
+			"name": "Occurrence",
+			"description": "1 : Jamais arrivé 2 : Est déjà arrivé dans des circonstances exeptionnelles 3 : D&eacute;j&agrave; produit 2 fois 4 : Se produit tous les mois",
+			"option": {
+				"display_type": "slide",
+				"range": [
+					"1",
+					"4"
+				],
+				"survey": {
+					"titre": "",
+					"request": [
+						{
+							"question": null,
+							"seuil": null
+							},
+							{
+							"question": "Jamais arrivé",
+							"seuil": "1"
+							},
+							{
+							"question": "Est déjà arrivé dans des circonstances exeptionnelles",
+							"seuil": "2"
+							},
+							{
+							"question": "S'est produit 2 fois",
+							"seuil": "3"
+							},
+							{
+							"question": "Se produit tous les mois",
+							"seuil": "4"
+							}
+					]
+				}
+			}
+		},
+		{
+			"name": "Formation",
+			"description": "1 : Pr&eacute;vention r&eacute;guli&egrave;re 2 : Formation individuelle obligatoire 3 : Formation obligatoire non r&eacute;alis&eacute;e 4 : Pas de formation ni de pr&eacute;vention",
+			"option": {
+				"display_type": "slide",
+				"range": [
+					"1",
+					"4"
+				],
+				"survey": {
+					"titre": "",
+					"request": [
+						{
+							"question": null,
+							"seuil": null
+							},
+							{
+							"question": "Prévention régulière",
+							"seuil": "1"
+							},
+							{
+							"question": "Formation individuelle obligatoire",
+							"seuil": "2"
+							},
+							{
+							"question": "Formation obligatoire non réalisée",
+							"seuil": "3"
+							},
+							{
+							"question": "Pas de formation ni de prévention",
+							"seuil": "4"
+							}
+					]
+				}
+			}
+		},
+		{
+			"name": "Protection",
+			"description": "1 : Intrins&egrave;que 2 : Collective 3 : Individuelle 4 : Rien",
+			"option": {
+				"display_type": "slide",
+				"range": [
+					"1",
+					"4"
+				],
+				"survey": {
+					"titre": "",
+					"request": [
+						{
+						"question": null,
+						"seuil": null
+						},
+						{
+						"question": "Intrinsèque",
+						"seuil": "1"
+						},
+						{
+						"question": "Collective",
+						"seuil": "2"
+						},
+						{
+						"question": "Individuelle",
+						"seuil": "3"
+						},
+						{
+						"question": "Rien",
+						"seuil": "4"
+						}
+					]
+				}
+			}
+		}
+		]
+	}
+},
+{
+	"name": "Evarisk simplified",
+	"slug": "evarisk-simplified",
+	"option": {
+		"is_default": true,
+		"matrix": {
+			"1": 0,
+			"2": 48,
+			"3": 51,
+			"4": 100
+		},
+		"variable": [
+			{
+				"name": "Evarisk",
+				"description": "",
+				"option": {
+				"display_type": "list",
+				"range": [
+					0,
+					4
+				],
+				"survey": {
+					"titre": "Evarisk",
+					"request": [
+						{
+							"question": "",
+							"seuil": 1
+						},
+						{
+							"question": "",
+							"seuil": 2
+						},
+						{
+							"question": "",
+							"seuil": 3
+						},
+						{
+							"question": "",
+							"seuil": 4
+						}
+					]
+				}
+			}
+		} ]
+	}
+},
+{
+	"name": "Amiante",
+	"slug": "amiante",
+	"option": {
+		"is_default": false,
+		"matrix": [
+			0, 48, 51, 100
+		],
+		"variable": [
+			{
+				"name": "Amiante",
+				"description": "Risque noir si exposition entre 6000 et 25000 Fibres/litresnRisque rouge si exposition entre 100 et 6000 Fibres/litresnRisque orange si exposition inférieur à 100 FIbrers/litresnRisque blanc si aucune exposition",
+				"option": {
+				"display_type": "checkbox",
+				"range": [
+					0,
+					3
+				],
+				"survey": {
+					"titre": "Exposition u00e0 l'amiante",
+					"request": [
+						{
+							"question": "Aucune exposition",
+							"seuil": 0
+						},
+						{
+							"question": "Exposition niveau 1: Infu00e9rieur u00e0 100 Fibres/litres",
+							"seuil": 48
+						},
+						{
+							"question": "Exposition niveau 2u00a0: Entre 100 et 6000 Fibres/litres",
+							"seuil": 51
+						},
+						{
+							"question": "Exposition niveau 3u00a0: Entre 6000 et 25000Fibres/litres",
+							"seuil": 80
+						}
+					]
+				}
+			}
+		} ]
+	}
+},
+{
+	"name": "Résultats Seirich",
+	"slug": "resultats-seirich",
+	"option": {
+		"is_default": false,
+		"matrix": [
+			0, 48, 51, 100
+		],
+		"variable": [
+			{
+				"name": "Résultats Seirich",
+				"description": "Risque faible 0. Risque modéré entre 1 et 99. Risque préoccupant entre 100 et 9999. Risque sérieux entre 10000 et 999999",
+				"option": {
+				"display_type": "checkbox",
+				"range": [
+					0,
+					3
+				],
+				"survey": {
+					"titre": "Echelle de notation Seirich",
+					"request": [
+						{
+							"question": "Faible ( 0 )",
+							"seuil": 0
+						},
+						{
+							"question": "Modu00e9ru00e9 ( Entre 1 et 99 )",
+							"seuil": 48
+						},
+						{
+							"question": "Pru00e9occupant ( Entre 100 et 9999 )",
+							"seuil": 51
+						},
+						{
+							"question": "Su00e9rieux ( Entre 10000 et 999999 )",
+							"seuil": 80
+						}
+					]
+				}
+			}
+		} ]
+	}
+}  ]

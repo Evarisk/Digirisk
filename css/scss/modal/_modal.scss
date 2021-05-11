@@ -1,0 +1,13 @@
+@import "risk";
+@import "risksign";
+@import "riskassessment-task";
+@import "photo";
+@import "evaluator";
+
+.wpeo-modal .modal-container {
+  ul, li {
+    margin: 0;
+    list-style-type: none;
+    padding: 0;
+  }
+}

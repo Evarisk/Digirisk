@@ -1,0 +1,17 @@
+.risksign-container .risksign-edit {
+  color: $color__secondary;
+
+  &:hover {
+    cursor: pointer;
+    text-decoration: underline;
+  }
+}
+
+.risksign-content {
+  width: 100%;
+}
+
+.risksign-add {
+  min-width: 40px;
+  margin-left: 0.5em;
+}

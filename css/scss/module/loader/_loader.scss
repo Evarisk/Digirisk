@@ -1,0 +1,35 @@
+/*--------------------------------------------------------------
+	Module : Loader
+	Version : 1.0.0
+
+	.wpeo-loader => classe de base pour le module
+	.loader-spin => icone de chargement
+--------------------------------------------------------------*/
+
+.wpeo-loader {
+	transition: all 0.2s ease-out;
+	pointer-events: none;
+	opacity: 0.5;
+	position: relative;
+
+	.loader-spin {
+		position: absolute;
+		border: 3px solid #a7a7a7;
+		border-top: 3px solid darken($color__primary, 40%);
+		border-radius: 50%;
+		width: 20px;
+		height: 20px;
+		z-index: 99;
+		left: 50%;
+		top: 50%;
+		margin: 0 !important;
+		padding: 0 !important;
+		animation: loader-spin 1s ease-out infinite;
+	}
+}
+
+
+ @keyframes loader-spin {
+ 		0% { transform: translate(-50%, -50%) rotate(0deg); }
+ 		100% { transform: translate(-50%, -50%) rotate(360deg); }
+ }
