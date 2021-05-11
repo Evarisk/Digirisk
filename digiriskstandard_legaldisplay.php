@@ -146,8 +146,9 @@ $emptyobject = new stdClass($db);
 $title    = $langs->trans('LegalDisplay');
 $help_url = 'FR:Module_DigiriskDolibarr#Affichage_l.C3.A9gal';
 $morejs   = array("/digiriskdolibarr/js/digiriskdolibarr.js.php");
+$morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");
 
-digiriskHeader('', $title, $help_url, '', '', '', $morejs); ?>
+digiriskHeader('', $title, $help_url, '', '', '', $morejs, $morecss); ?>
 
 <div id="cardContent" value="">
 

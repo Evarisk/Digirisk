@@ -416,7 +416,14 @@ if ($num == 1 && !empty($conf->global->MAIN_SEARCH_DIRECT_OPEN_IF_ONLY_ONE) && $
 	exit;
 }
 
-llxHeader('', $langs->trans("ListOfUsers"));
+dol_include_once('/digiriskdolibarr/lib/digiriskdolibarr_function.lib.php');
+
+$title    = $langs->trans("ListOfUsers");
+$help_url = '';
+$morejs   = array("/digiriskdolibarr/js/digiriskdolibarr.js.php");
+$morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");
+
+llxHeader('', $title, $help_url, '','','',$morejs,$morecss);
 
 $param = '';
 if (!empty($contextpage) && $contextpage != $_SERVER["PHP_SELF"]) $param .= '&amp;contextpage='.urlencode($contextpage);

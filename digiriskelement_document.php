@@ -95,9 +95,10 @@ $emptyobject = new stdClass($db);
 $title = $langs->trans("DigiriskElement").' - '.$langs->trans("Files");
 $help_url = '';
 //$help_url='EN:Module_Third_Parties|FR:Module_Tiers|ES:Empresas';
-$morejs = array("/digiriskdolibarr/js/digiriskdolibarr.js.php");
+$morejs  = array("/digiriskdolibarr/js/digiriskdolibarr.js.php");
+$morecss = array("/digiriskdolibarr/css/digiriskdolibarr.css");
 
-digiriskHeader('', $title, $help_url, '', '', '', $morejs);
+digiriskHeader('', $title, $help_url, '', '', '', $morejs, $morecss);
 if (!$object->id) {
 
 	$object->ref = $conf->global->MAIN_INFO_SOCIETE_NOM;

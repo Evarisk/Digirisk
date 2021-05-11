@@ -156,8 +156,9 @@ $emptyobject = new stdClass($db);
 $title    = $langs->trans('ListingRisksAction');
 $help_url = 'FR:Module_DigiriskDolibarr#Listing_des_actions_correctives';
 $morejs   = array("/digiriskdolibarr/js/digiriskdolibarr.js.php");
+$morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");
 
-digiriskHeader('', $title, $help_url, '', '', '', $morejs); ?>
+digiriskHeader('', $title, $help_url, '', '', '', $morejs, $morecss); ?>
 
 <div id="cardContent" value="">
 

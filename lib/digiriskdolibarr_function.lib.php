@@ -593,7 +593,7 @@ function digiriskHeader($head = '', $title = '', $help_url = '', $target = '', $
 
 	print '<body id="mainbody" class="'.$tmpcsstouse.'">'."\n";
 
-	llxHeader('', $title, $help_url);
+	llxHeader('', $title, $help_url, '','','',$arrayofjs,$arrayofcss);
 
 	//Body navigation digirisk
 	$object  = new DigiriskElement($db);
