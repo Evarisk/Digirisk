@@ -260,7 +260,11 @@ class modDigiriskdolibarr extends DolibarrModules
 			160 => array('DIGIRISKDOLIBARR_DU_PROJECT','integer', 0,'', $conf->entity),
 			161 => array('DIGIRISKDOLIBARR_ACTIVE_STANDARD','integer', 0,'', $conf->entity),
 			162 => array('DIGIRISKDOLIBARR_DOCUMENT_MODELS_SET','integer', 0,'', $conf->entity),
-			162 => array('DIGIRISKDOLIBARR_THIRDPARTY_SET','integer', 0,'', $conf->entity)
+			163 => array('DIGIRISKDOLIBARR_THIRDPARTY_SET','integer', 0,'', $conf->entity),
+
+			// MODULE
+			200 => array('DIGIRISKDOLIBARR_VERSION','chaine', $this->version,'', $conf->entity),
+			201 => array('DIGIRISKDOLIBARR_SUBPERMCATEGORY_FOR_DOCUMENTS','integer', 1,'', $conf->entity),
 
 		);
 
@@ -309,6 +313,13 @@ class modDigiriskdolibarr extends DolibarrModules
 		// Permissions provided by this module
 		$this->rights = array();
 		$r            = 0;
+
+		/* module PERMISSIONS */
+		$this->rights[$r][0] = $this->numero.$r;
+		$this->rights[$r][1] = $langs->trans('ReadDigirisk');
+		$this->rights[$r][4] = 'lire';
+		$this->rights[$r][5] = 1;
+		$r++;
 
 		/* RISK ASSESSMENT DOCUMENT PERMISSIONS */
 		$this->rights[$r][0] = $this->numero.$r;
