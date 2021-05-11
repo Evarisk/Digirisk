@@ -1246,8 +1246,8 @@
 										<div class="risk-evaluation-container risk-evaluation-container-<?php echo $risk->ref ?>">
 											<h2><?php echo $langs->trans('LastRiskAssessment') . ' ' . $risk->ref; ?></h2>
 											<div class="risk-evaluation-single-content risk-evaluation-single-content-<?php echo $risk->id ?>">
-												<div class="risk-evaluation-single risk-evaluation-single-<?php echo $risk->id ?>">
-													<div class="risk-evaluation-cotation risk-evaluation-list modal-open" value="<?php echo $risk->id ?>" data-scale="<?php echo $lastEvaluation->get_evaluation_scale() ?>">
+												<div class="risk-evaluation-single">
+													<div class="risk-evaluation-cotation risk-evaluation-list" value="<?php echo $risk->id ?>" data-scale="<?php echo $lastEvaluation->get_evaluation_scale() ?>">
 														<span><?php echo $lastEvaluation->cotation; ?></span>
 													</div>
 													<div class="risk-evaluation-photo">
