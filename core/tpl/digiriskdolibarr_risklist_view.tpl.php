@@ -844,7 +844,7 @@
 						$cotationList = $evaluation->fetchFromParent($risk->id); ?>
 						<div class="risk-evaluation-container risk-evaluation-container-<?php echo $risk->id ?>" value="<?php echo $risk->id ?>">
 							<!-- RISK EVALUATION SINGLE -->
-							<div class="risk-evaluation-single-content risk-evaluation-single-content-<?php echo $risk->id ?>"">
+							<div class="risk-evaluation-single-content risk-evaluation-single-content-<?php echo $risk->id ?>">
 								<div class="risk-evaluation-single risk-evaluation-single-<?php echo $risk->id ?>">
 									<div class="risk-evaluation-cotation risk-evaluation-list modal-open" value="<?php echo $risk->id ?>" data-scale="<?php echo $lastEvaluation->get_evaluation_scale() ?>">
 											<span><?php echo $lastEvaluation->cotation; ?></span>
@@ -1166,7 +1166,6 @@
 												<input class="risk-evaluation-method" type="hidden" value="standard">
 												<input class="risk-evaluation-multiple-method" type="hidden" value="<?php echo $conf->global->DIGIRISKDOLIBARR_MULTIPLE_RISKASSESSMENT_METHOD ?>">
 											</div>
-
 											<div class="risk-evaluation-content-wrapper">
 												<div class="risk-evaluation-content">
 													<div class="cotation-container">
@@ -1240,6 +1239,43 @@
 												<div class="risk-evaluation-comment">
 													<span class="title"><i class="fas fa-comment-dots"></i> <?php echo $langs->trans('Comment'); ?></span>
 													<?php print '<textarea name="evaluationComment'. $risk->id .'" rows="'.ROWS_2.'">'.('').'</textarea>'."\n"; ?>
+												</div>
+											</div>
+										</div>
+										<!-- RISK EVALUATION SINGLE -->
+										<div class="risk-evaluation-container risk-evaluation-container-<?php echo $risk->ref ?>">
+											<h2><?php echo $langs->trans('LastRiskAssessment') . ' ' . $risk->ref; ?></h2>
+											<div class="risk-evaluation-single-content risk-evaluation-single-content-<?php echo $risk->id ?>">
+												<div class="risk-evaluation-single risk-evaluation-single-<?php echo $risk->id ?>">
+													<div class="risk-evaluation-cotation risk-evaluation-list modal-open" value="<?php echo $risk->id ?>" data-scale="<?php echo $lastEvaluation->get_evaluation_scale() ?>">
+														<span><?php echo $lastEvaluation->cotation; ?></span>
+													</div>
+													<div class="risk-evaluation-photo">
+														<?php $filearray = dol_dir_list($conf->digiriskdolibarr->multidir_output[$conf->entity].'/'.$lastEvaluation->element.'/'.$lastEvaluation->ref, "files", 0, '', '(\.odt|_preview.*\.png)$', 'position_name', 'asc', 1);
+														if (count($filearray)) {
+															print '<span class="floatleft inline-block valignmiddle divphotoref">'.digirisk_show_photos('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity].'/'.$lastEvaluation->element, 'small', 1, 0, 0, 0, 40, 0, 0, 0, 0, $lastEvaluation->element, $lastEvaluation).'</span>';
+														} else {
+															$nophoto = '/public/theme/common/nophoto.png'; ?>
+															<span class="floatleft inline-block valignmiddle divphotoref"><img class="photodigiriskdolibarr" alt="No photo" src="<?php echo DOL_URL_ROOT.$nophoto ?>"></span>
+														<?php } ?>
+													</div>
+													<div class="risk-evaluation-content">
+														<div class="risk-evaluation-data">
+															<!-- BUTTON MODAL RISK EVALUATION LIST  -->
+															<span class="risk-evaluation-reference risk-evaluation-list" value="<?php echo $risk->id ?>"><?php echo $lastEvaluation->ref; ?></span>
+															<span class="risk-evaluation-date">
+																<i class="fas fa-calendar-alt"></i> <?php echo date('d/m/Y', $lastEvaluation->date_creation); ?>
+															</span>
+															<span class="risk-evaluation-count"><i class="fas fa-comments"></i><?php echo count($cotationList) ?></span>
+														</div>
+														<div class="risk-evaluation-comment">
+															<span class="risk-evaluation-author">
+																<?php $user->fetch($lastEvaluation->fk_user_creat); ?>
+																<?php echo getNomUrl( 0, '', 0, 0, 2 , 0,'','',-1, $user); ?>
+															</span>
+															<?php echo dol_trunc($lastEvaluation->comment, 120); ?>
+														</div>
+													</div>
 												</div>
 											</div>
 										</div>

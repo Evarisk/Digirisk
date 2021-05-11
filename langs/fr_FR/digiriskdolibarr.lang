@@ -531,6 +531,7 @@ DigiriskRiskAssessmentNumberingModule = Modèle de numérotation des évaluation
 # Data - Donnée
 RiskAssessment = Évaluation
 TheRiskAssessment = L'évaluation
+LastRiskAssessment = Dernière évaluation du risque
 RiskAssessmentWellCreated = Évaluation créée
 RiskAssessmentNotCreated = Erreur lors de la création de l'évaluation
 RiskAssessmentWellEdited = Évaluation éditée
