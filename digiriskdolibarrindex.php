@@ -27,6 +27,7 @@ if (!$res && file_exists("../../main.inc.php")) $res = @include "../../main.inc.
 if (!$res) die("Include of main fails");
 
 require_once DOL_DOCUMENT_ROOT.'/core/lib/admin.lib.php';
+require_once DOL_DOCUMENT_ROOT.'/core/lib/date.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/projet/class/project.class.php';
 require_once DOL_DOCUMENT_ROOT.'/societe/class/societe.class.php';
 require_once DOL_DOCUMENT_ROOT.'/core/modules/project/mod_project_simple.php';
@@ -40,7 +41,66 @@ $third_party = new Societe($db);
 $projectRef  = new $conf->global->PROJECT_ADDON();
 
 // Security check
-//if (!$user->rights->digiriskdolibarr->read) accessforbidden();
+if (!$user->rights->digiriskdolibarr->lire) accessforbidden();
+
+// Parameters
+$action     = GETPOST('action', 'alpha');
+$backtopage = GETPOST('backtopage', 'alpha');
+$value      = GETPOST('value', 'alpha');
+
+$error         = 0;
+$setupnotempty = 0;
+
+//Check projet
+$project->fetch($conf->global->DIGIRISKDOLIBARR_DU_PROJECT);
+
+if ( $conf->global->DIGIRISKDOLIBARR_DU_PROJECT == 0 || $project->statut == 2 ) {
+	$project->ref         = $projectRef->getNextValue($third_party, $project);
+	$project->title       = $langs->trans('RiskAssessmentDocument');
+	$project->description = $langs->trans('RiskAssessmentDocumentDescription');
+	$project->date_c      = dol_now();
+	$currentYear          = dol_print_date(dol_now(),'%Y');
+	$fiscalMonthStart     = $conf->global->SOCIETE_FISCAL_MONTH_START;
+	$startdate            = dol_mktime('0','0','0',$fiscalMonthStart ? $fiscalMonthStart : '1', '1', $currentYear);
+	$project->date_start  = $startdate;
+
+	$project->usage_task = 1;
+
+	$startdateAddYear      = dol_time_plus_duree($startdate, 1,'y');
+	$startdateAddYearMonth = dol_time_plus_duree($startdateAddYear, -1,'d');
+	$enddate               = dol_print_date($startdateAddYearMonth, 'dayrfc');
+	$project->date_end     = $enddate;
+	$project->statut      = 1;
+	$project_id = $project->create($user);
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_DU_PROJECT', $project_id, 'integer', 1, '',$conf->entity);
+}
+
+/*
+ * Actions
+ */
+
+if ($action == 'settaskmanagement')
+{
+	$constforval = 'DIGIRISKDOLIBARR_TASK_MANAGEMENT';
+	dolibarr_set_const($db, $constforval, $value, 'integer', 0, '', $conf->entity);
+}
+if ($action == 'setmethod')
+{
+	$constforval = 'DIGIRISKDOLIBARR_MULTIPLE_RISKASSESSMENT_METHOD';
+	dolibarr_set_const($db, $constforval, $value, 'integer', 0, '', $conf->entity);
+}
+
+if ($action == 'setadvancedmethod')
+{
+	$constforval = 'DIGIRISKDOLIBARR_ADVANCED_RISKASSESSMENT_METHOD';
+	dolibarr_set_const($db, $constforval, $value, 'integer', 0, '', $conf->entity);
+}
+
+if ($action == 'setriskdescription')
+{
+	$constforval = 'DIGIRISKDOLIBARR_RISK_DESCRIPTION';
+	dolibarr_set_const($db, $constforval, $value, 'integer', 0, '', $conf->entity);
+}
 
 /*
  * View
@@ -54,6 +114,12 @@ llxHeader("", $langs->trans("DigiriskDolibarrArea"), $help_url, '', '', '', $mor
 
 print load_fiche_titre($langs->trans("DigiriskDolibarrArea"), '', 'digiriskdolibarr32px.png@digiriskdolibarr');
 ?>
+
+<div class="wpeo-notice notice-info">
+	<div class="notice-content">
+		<div class="notice-subtitle"><?php echo $langs->trans("DigiriskIndexNotice1"); ?></div>
+	</div>
+</div>
 <div class="wpeo-carousel">
 	<div class="slide-element bloc-1">
 		<div class="wpeo-gridlayout grid-gap-0 padding grid-2">
@@ -206,37 +272,111 @@ print load_fiche_titre($langs->trans("DigiriskDolibarrArea"), '', 'digiriskdolib
 	</div>
 </div>
 
-<div class="wpeo-notice notice-info">
-	<div class="notice-content">
-		<div class="notice-subtitle"><?php echo $langs->trans("DigiriskIndexNotice1"); ?></div>
-	</div>
-</div>
 <?php
 
-//Check projet
-$project->fetch($conf->global->DIGIRISKDOLIBARR_DU_PROJECT);
+print load_fiche_titre($langs->trans("DigiriskTaskData"), '', '');
 
-if ( $conf->global->DIGIRISKDOLIBARR_DU_PROJECT == 0 || $project->statut == 2 ) {
-	$project->ref         = $projectRef->getNextValue($third_party, $project);
-	$project->title       = $langs->trans('RiskAssessmentDocument');
-	$project->description = $langs->trans('RiskAssessmentDocumentDescription');
-	$project->date_c      = dol_now();
-	$currentYear          = dol_print_date(dol_now(),'%Y');
-	$fiscalMonthStart     = $conf->global->SOCIETE_FISCAL_MONTH_START;
-	$startdate            = dol_mktime('0','0','0',$fiscalMonthStart ? $fiscalMonthStart : '1', '1', $currentYear);
-	$project->date_start  = $startdate;
+print '<table class="noborder centpercent">';
+print '<tr class="liste_titre">';
+print '<td>'.$langs->trans("Name").'</td>';
+print '<td>'.$langs->trans("Description").'</td>';
+print '<td class="center" width="60">'.$langs->trans("Status").'</td>';
+print '</tr>'."\n";
 
-	$project->usage_task = 1;
+print '<tr class="oddeven"><td>';
+print $langs->trans('TasksManagement');
+print "</td><td>\n";
+print $langs->trans('TaskManagementDescription');
+print '</td>';
 
-	$startdateAddYear      = dol_time_plus_duree($startdate, 1,'y');
-	$startdateAddYearMonth = dol_time_plus_duree($startdateAddYear, -1,'d');
-	$enddate               = dol_print_date($startdateAddYearMonth, 'dayrfc');
-	$project->date_end     = $enddate;
-	$project->statut      = 1;
-	$project_id = $project->create($user);
-	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_DU_PROJECT', $project_id, 'integer', 1, '',$conf->entity);
+print '<td class="center">';
+if ($conf->global->DIGIRISKDOLIBARR_TASK_MANAGEMENT)
+{
+	print '<a class="reposition" href="'.$_SERVER["PHP_SELF"].'?action=settaskmanagement&value=0" alt="'.$langs->trans("Default").'">'.img_picto($langs->trans("Activated"), 'switch_on').'</a>';
 }
+else
+{
+	print '<a class="reposition" href="'.$_SERVER["PHP_SELF"].'?action=settaskmanagement&value=1" alt="'.$langs->trans("Default").'">'.img_picto($langs->trans("Disabled"), 'switch_off').'</a>';
+}
+print '</td>';
+print '</tr>';
+print '</table>';
+
+print load_fiche_titre($langs->trans("DigiriskRiskData"), '', '');
+
+print '<table class="noborder centpercent">';
+print '<tr class="liste_titre">';
+print '<td>'.$langs->trans("Name").'</td>';
+print '<td>'.$langs->trans("Description").'</td>';
+print '<td class="center" width="60">'.$langs->trans("Status").'</td>';
+print '</tr>'."\n";
+
+print '<tr class="oddeven"><td>';
+print $langs->trans('RiskDescription');
+print "</td><td>\n";
+print $langs->trans('RiskDescriptionDescription');
+print '</td>';
+
+print '<td class="center">';
+if ($conf->global->DIGIRISKDOLIBARR_RISK_DESCRIPTION)
+{
+	print '<a class="reposition" href="'.$_SERVER["PHP_SELF"].'?action=setriskdescription&value=0" alt="'.$langs->trans("Default").'">'.img_picto($langs->trans("Activated"), 'switch_on').'</a>';
+}
+else
+{
+	print '<a class="reposition" href="'.$_SERVER["PHP_SELF"].'?action=setriskdescription&value=1" alt="'.$langs->trans("Default").'">'.img_picto($langs->trans("Disabled"), 'switch_off').'</a>';
+}
+print '</td>';
+print '</tr>';
+print '</table>';
+
+print load_fiche_titre($langs->trans("DigiriskRiskAssessmentData"), '', '');
+
+print '<table class="noborder centpercent">';
+print '<tr class="liste_titre">';
+print '<td>'.$langs->trans("Name").'</td>';
+print '<td>'.$langs->trans("Description").'</td>';
+print '<td class="center" width="60">'.$langs->trans("Status").'</td>';
+print '</tr>'."\n";
+
+print '<tr class="oddeven"><td>';
+print $langs->trans('AdvancedRiskAssessmentMethod');
+print "</td><td>\n";
+print $langs->trans('AdvancedRiskAssessmentMethodDescription');
+print '</td>';
+
+print '<td class="center">';
+if ($conf->global->DIGIRISKDOLIBARR_ADVANCED_RISKASSESSMENT_METHOD)
+{
+	print '<a class="reposition" href="'.$_SERVER["PHP_SELF"].'?action=setadvancedmethod&value=0" alt="'.$langs->trans("Default").'">'.img_picto($langs->trans("Activated"), 'switch_on').'</a>';
+}
+else
+{
+	print '<a class="reposition" href="'.$_SERVER["PHP_SELF"].'?action=setadvancedmethod&value=1" alt="'.$langs->trans("Default").'">'.img_picto($langs->trans("Disabled"), 'switch_off').'</a>';
+}
+print '</td>';
+print '</tr>';
+
+print '<tr class="oddeven"><td>';
+print $langs->trans('MultipleRiskAssessmentMethodName');
+print "</td><td>\n";
+print $langs->trans('MultipleRiskAssessmentMethodDescription');
+print '</td>';
+
+print '<td class="center">';
+if ($conf->global->DIGIRISKDOLIBARR_MULTIPLE_RISKASSESSMENT_METHOD)
+{
+	print '<a class="reposition" href="'.$_SERVER["PHP_SELF"].'?action=setmethod&value=0" alt="'.$langs->trans("Default").'">'.img_picto($langs->trans("Activated"), 'switch_on').'</a>';
+}
+else
+{
+	print '<a class="reposition" href="'.$_SERVER["PHP_SELF"].'?action=setmethod&value=1" alt="'.$langs->trans("Default").'">'.img_picto($langs->trans("Disabled"), 'switch_off').'</a>';
+}
+print '</td>';
+print '</tr>';
+print '</table>';
 
 // End of page
+//dolibarr_set_const()
 llxFooter();
 $db->close();

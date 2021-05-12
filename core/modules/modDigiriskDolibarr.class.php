@@ -315,6 +315,11 @@ class modDigiriskdolibarr extends DolibarrModules
 		$this->rights[$r][4] = 'lire';
 		$this->rights[$r][5] = 1;
 		$r++;
+		$this->rights[$r][0] = $this->numero.$r;
+		$this->rights[$r][1] = $langs->trans('ReadDigirisk');
+		$this->rights[$r][4] = 'read';
+		$this->rights[$r][5] = 1;
+		$r++;
 
 		/* RISK ASSESSMENT DOCUMENT PERMISSIONS */
 		$this->rights[$r][0] = $this->numero.$r;
@@ -703,7 +708,15 @@ class modDigiriskdolibarr extends DolibarrModules
 
 		$extra_fields->addExtraField( 'fk_risk', $langs->trans("fk_risk"), 'int', 1020, 10, 'projet_task', 0, 0, '', '', '', '', 5);
 
-		return $this->_init($sql, $options);
+		$result = $this->_init($sql, $options);
+
+		if ($result) {
+			$urltogo = DOL_URL_ROOT . '/custom/digiriskdolibarr/digiriskdolibarrindex.php?mainmenu=digiriskdolibarr';
+			header('Location:' . $urltogo);
+			exit;
+		} else {
+			return 0;
+		}
 	}
 
 	/**
