@@ -283,7 +283,7 @@ print '<td>'.$langs->trans("Description").'</td>';
 print '<td class="center" width="60">'.$langs->trans("Status").'</td>';
 print '</tr>'."\n";
 
-print '<tr class="oddeven"><td>';
+print '<tr class="oddeven"><td style="width:40%">';
 print $langs->trans('TasksManagement');
 print "</td><td>\n";
 print $langs->trans('TaskManagementDescription');
@@ -311,7 +311,7 @@ print '<td>'.$langs->trans("Description").'</td>';
 print '<td class="center" width="60">'.$langs->trans("Status").'</td>';
 print '</tr>'."\n";
 
-print '<tr class="oddeven"><td>';
+print '<tr class="oddeven""><td style="width:40%">';
 print $langs->trans('RiskDescription');
 print "</td><td>\n";
 print $langs->trans('RiskDescriptionDescription');
@@ -339,7 +339,7 @@ print '<td>'.$langs->trans("Description").'</td>';
 print '<td class="center" width="60">'.$langs->trans("Status").'</td>';
 print '</tr>'."\n";
 
-print '<tr class="oddeven"><td>';
+print '<tr class="oddeven"><td style="width:40%">';
 print $langs->trans('AdvancedRiskAssessmentMethod');
 print "</td><td>\n";
 print $langs->trans('AdvancedRiskAssessmentMethodDescription');
