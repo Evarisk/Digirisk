@@ -1,0 +1,26 @@
+.wpeo-carousel {
+  box-sizing: border-box;
+
+  .wpeo-gridlayout {
+    display: flex !important;
+
+    > * {
+      width: 50%;
+    }
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  img {
+    max-width: 100%;
+    display: block;
+    margin: auto;
+    border-radius: 6px;
+  }
+
+  .content {
+    margin: auto 0;
+  }
+}

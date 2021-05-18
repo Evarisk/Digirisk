@@ -2158,3 +2158,40 @@ window.eoxiaJS.notice.event = function() {
 window.eoxiaJS.notice.closeNotice = function( event ) {
 	$(this).closest('.notice').addClass("hidden");
 };
+
+/**
+ * Initialise l'objet "slider" ainsi que la méthode "init" obligatoire pour la bibliothèque EoxiaJS.
+ *
+ * @since   1.0.0
+ * @version 1.0.0
+ */
+window.eoxiaJS.slider = {};
+
+/**
+ * La méthode appelée automatiquement par la bibliothèque EoxiaJS.
+ *
+ * @since   1.0.0
+ * @version 1.0.0
+ *
+ * @return {void}
+ */
+window.eoxiaJS.slider.init = function() {
+	var slider = tns({
+		container: '.wpeo-carousel',
+		items                : 1,
+		gutter               : 0,
+		controls             : true,
+		controlsPosition     : 'bottom',
+		controlsText         : ['<i class="fas fa-angle-left icon"></i>', '<i class="fas fa-angle-right icon"></i>'],
+		nav                  : true,
+		navPosition          : 'bottom',
+		speed                : 600,
+		autoplay             : false,
+		autoplayTimeout      : 4000,
+		autoplayButtonOutput : false,
+		rewind               : true,
+		loop                 : false,
+		autoHeight           : true,
+		mouseDrag            : false
+	});
+};

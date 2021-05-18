@@ -315,6 +315,11 @@ class modDigiriskdolibarr extends DolibarrModules
 		$this->rights[$r][4] = 'lire';
 		$this->rights[$r][5] = 1;
 		$r++;
+		$this->rights[$r][0] = $this->numero.$r;
+		$this->rights[$r][1] = $langs->trans('ReadDigirisk');
+		$this->rights[$r][4] = 'read';
+		$this->rights[$r][5] = 1;
+		$r++;
 
 		/* RISK ASSESSMENT DOCUMENT PERMISSIONS */
 		$this->rights[$r][0] = $this->numero.$r;
@@ -564,6 +569,21 @@ class modDigiriskdolibarr extends DolibarrModules
 		$this->menu[$r++]=array(
 			'fk_menu'=>'fk_mainmenu=digiriskdolibarr',	    // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
 			'type'=>'left',			                // This is a Left menu entry
+			'titre'=>'<i class="fas fa-file"></i>  ' . $langs->trans('PreventionPlan'),
+			'mainmenu'=>'digiriskdolibarr',
+			'leftmenu'=>'digiriskpreventionplan',
+			'url'=>'/digiriskdolibarr/preventionplan_list.php',
+			'langs'=>'digiriskdolibarr@digiriskdolibarr',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
+			'position'=>48520+$r,
+			'enabled'=>'$conf->digiriskdolibarr->enabled',  // Define condition to show or hide menu entry. Use '$conf->digiriskdolibarr->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
+			'perms'=>'1',			                // Use 'perms'=>'$user->rights->digiriskdolibarr->level1->level2' if you want your menu with a permission rules
+			'target'=>'',
+			'user'=>0,				                // 0=Menu for internal users, 1=external users, 2=both
+		);
+
+		$this->menu[$r++]=array(
+			'fk_menu'=>'fk_mainmenu=digiriskdolibarr',	    // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
+			'type'=>'left',			                // This is a Left menu entry
 			'titre'=>'<i class="fas fa-user"></i>  ' . $langs->trans('Users'),
 			'mainmenu'=>'digiriskdolibarr',
 			'leftmenu'=>'digiriskusers',
@@ -704,6 +724,7 @@ class modDigiriskdolibarr extends DolibarrModules
 		$extra_fields->addExtraField( 'fk_risk', $langs->trans("fk_risk"), 'int', 1020, 10, 'projet_task', 0, 0, '', '', '', '', 5);
 
 		return $this->_init($sql, $options);
+
 	}
 
 	/**

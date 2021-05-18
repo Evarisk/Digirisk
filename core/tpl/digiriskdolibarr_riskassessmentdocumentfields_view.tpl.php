@@ -135,7 +135,7 @@ if ( $action == "edit" && $permissiontoadd ) {
 	print '<tr>';
 	print '<td class="titlefield">' . $langs->trans("ImportantNote") . '</td>';
 	print '<td>';
-	print $conf->global->DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_IMPORTANT_NOTE;
+	print $conf->global->DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_IMPORTANT_NOTES;
 	print '</td></tr>';
 
 // Disponibilité des plans

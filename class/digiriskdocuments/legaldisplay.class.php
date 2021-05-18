@@ -94,7 +94,7 @@ class LegalDisplay extends DigiriskDocuments
 		}
 	}
 
-	public function LegaldisplayFillJSON($object) {
+	public function LegalDisplayFillJSON($object) {
 		global $conf;
 
 		$resources               = new DigiriskResources($this->db);

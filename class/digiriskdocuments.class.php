@@ -62,7 +62,7 @@ class DigiriskDocuments extends CommonObject
 		'ref'           => array('type'=>'varchar(128)', 'label'=>'Ref', 'enabled'=>'1', 'position'=>10, 'notnull'=>1, 'visible'=>4, 'noteditable'=>'1', 'default'=>'(PROV)', 'index'=>1, 'searchall'=>1, 'showoncombobox'=>'1', 'comment'=>"Reference of object"),
 		'ref_ext'       => array('type'=>'varchar(128)', 'label'=>'RefExt', 'enabled'=>'1', 'position'=>20, 'notnull'=>0, 'visible'=>-1,),
 		'entity'        => array('type'=>'integer', 'label'=>'Entity', 'enabled'=>'1', 'position'=>30, 'notnull'=>1, 'visible'=>-1,),
-		'date_creation' => array('type'=>'datetime', 'label'=>'DateCreation', 'enabled'=>'1', 'position'=>40, 'notnull'=>1, 'visible'=>-2,),
+		'date_creation' => array('type'=>'datetime', 'label'=>'DateCreation', 'enabled'=>'1', 'position'=>40, 'notnull'=>1, 'visible'=>1,),
 		'tms'           => array('type'=>'timestamp', 'label'=>'DateModification', 'enabled'=>'1', 'position'=>50, 'notnull'=>0, 'visible'=>-2,),
 		'import_key'    => array('type'=>'integer', 'label'=>'ImportKey', 'enabled'=>'1', 'position'=>60, 'notnull'=>1, 'visible'=>-1,),
 		'status'        => array('type'=>'smallint', 'label'=>'Status', 'enabled'=>'1', 'position'=>70, 'notnull'=>0, 'visible'=>-1,),
@@ -71,7 +71,7 @@ class DigiriskDocuments extends CommonObject
 		'model_pdf'     => array('type'=>'varchar(255)', 'label'=>'Model pdf', 'enabled'=>'1', 'position'=>100, 'notnull'=>-1, 'visible'=>0,),
 		'model_odt'     => array('type'=>'varchar(255)', 'label'=>'Model ODT', 'enabled'=>'1', 'position'=>110, 'notnull'=>0, 'visible'=>-1,),
 		'last_main_doc' => array('type'=>'varchar(128)', 'label'=>'LastMainDoc', 'enabled'=>'1', 'position'=>120, 'notnull'=>0, 'visible'=>-1,),
-		'fk_user_creat' => array('type'=>'integer:User:user/class/user.class.php', 'label'=>'UserAuthor', 'enabled'=>'1', 'position'=>130, 'notnull'=>1, 'visible'=>-2, 'foreignkey'=>'user.rowid',),
+		'fk_user_creat' => array('type'=>'integer:User:user/class/user.class.php', 'label'=>'UserAuthor', 'enabled'=>'1', 'position'=>130, 'notnull'=>1, 'visible'=>1, 'foreignkey'=>'user.rowid',),
 		'parent_type'   => array('type'=>'varchar(255)', 'label'=>'Parent_type', 'enabled'=>'1', 'position'=>140, 'notnull'=>1, 'visible'=>0, 'default'=>1,),
 		'parent_id'     => array('type'=>'integer', 'label'=>'Parent_id', 'enabled'=>'1', 'position'=>150, 'notnull'=>1, 'visible'=>0, 'default'=>1,),
 	);

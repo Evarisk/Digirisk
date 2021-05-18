@@ -91,7 +91,7 @@ class InformationsSharing extends DigiriskDocuments
 		}
 	}
 
-	public function InformationssharingFillJSON($object) {
+	public function InformationsSharingFillJSON($object) {
 
 		global $langs, $conf;
 

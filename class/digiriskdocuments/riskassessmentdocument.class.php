@@ -90,7 +90,7 @@ class RiskAssessmentDocument extends DigiriskDocuments
 		}
 	}
 
-	public function riskAssessmentDocumentFillJSON($object)
+	public function RiskAssessmentDocumentFillJSON($object)
 	{
 		global $conf, $langs;
 

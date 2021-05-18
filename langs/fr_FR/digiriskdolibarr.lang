@@ -75,7 +75,69 @@ HasBeenDeletedM = a été supprimé
 HasNotBeenDeletedF = n'a pas été supprimée
 HasNotBeenDeletedM = n'a pas été supprimé
 
-DigiriskDolibarrArea = Page d'index de Digirisk
+DigiriskDolibarrArea = Bienvenue sur DigiRisk
+
+#
+# Diaporama page index
+#
+PresentationSlide1Content1 = Le Document Unique est obligatoire depuis le 5 Novembre 2001
+PresentationSlide1Content2 = Le décret du 5 Novembre 2001
+PresentationSlide1Content3 = Avec DigiRisk cela devient simple !
+
+PresentationSlide2Content1 = Comment définir vos Unités de Travail ?
+PresentationSlide2Content2 = En regroupement par géographie, métiers, postes, activités
+PresentationSlide2Content3 = basé sur des contextes homogènes d’expositions
+PresentationSlide2Content4 = Assurant la traçabilité
+PresentationSlide2Content5 = de l’évaluation des risques.
+PresentationSlide2Content6 = Guide pour le DUER de l’INRS : ED887.pdf
+PresentationSlide2Content7 = Définition des Unités de Travail Ministère du travail
+
+PresentationSlide3Content1 = Le risque, c'est le Danger et l'Homme dans le même espace
+PresentationSlide3Content2 = Définition du Larousse
+
+PresentationSlide4Content1 = La méthode simplifiée
+PresentationSlide4Content2 = 4 Priorités ! Gris, Orange, Rouge et Noir
+PresentationSlide4Content3 = La méthode avancée
+PresentationSlide4Content4 = Basée sur la méthode de Kinney
+PresentationSlide4Content5 = Risque  = Gravité * Exposition * Probabilité
+
+PresentationSlide5Content1 = La méthode simplifiée
+PresentationSlide5Content2 = Cette méthode permet cependant de noter les résultats d’autres méthodes plus complexes comme
+PresentationSlide5Content3 = Les risques chimiques
+PresentationSlide5Content4 = Le niveau d'empoussièrement pour l'amiante
+PresentationSlide5Content5 = Les résultats du questionnaire de Karasek
+
+PresentationSlide6Content1 = La méthode avancée
+PresentationSlide6Content2 = Elle est basée sur le modèle de classement de KINNEY
+PresentationSlide6Content3 = Risque = Gravité * Exposition * Probabilité
+PresentationSlide6Content4 = Mais avec 5 critères
+PresentationSlide6Content5 = Gravité de 0 à 4
+PresentationSlide6Content6 = Exposition de 0 à 4
+PresentationSlide6Content7 = Occurrence de 1 à 4
+PresentationSlide6Content8 = Formation de 1 à 4
+PresentationSlide6Content9 = Protection de 1 à 4
+PresentationSlide6Content10 = *P : La probabilité intègre 3 critères
+
+PresentationSlide7Content1 = Basées sur
+PresentationSlide7Content2 = ED 840 de l'INRS
+PresentationSlide7Content3 = Digirisk contient quelques familles de risques complémentaires :
+PresentationSlide7Content4 = Amiante
+PresentationSlide7Content5 = Les risques présents pour la pénibilité
+PresentationSlide7Content6 = Certains anciens risques de l'ED 840
+PresentationSlide7Content7 = S'il vous en manque il y a toujours la catégorie “autres”
+
+PresentationSlide8Content1 = L'INRS met à votre disposition 2 guides pour la signalisation :
+PresentationSlide8Content2 = ED 777 : Signalisation de santé et de sécurité au travail. Réglementation
+PresentationSlide8Content3 = ED 885 : La signalisation de santé et de sécurité au travail
+PresentationSlide8Content4 = Les pictogrammes originaux sont aussi disponibles sur leur site
+
+PresentationSlide9Content1 = DigiRisk génère aussi l'affichage légal !
+PresentationSlide9Content2 = Remplissez les champs, téléchargez votre affichage légal gratuitement au format libreoffice A3 ou A4
+PresentationSlide9Content3 = Libre Office
+PresentationSlide9Content4 = pour lire tous les documents de DigiRisk
+PresentationSlide9Content5 = Site du gouvernement sur affichage légal
+
+DigiriskIndexNotice1 = À venir, le Dashboard de DigiRisk
 
 #
 # Horaires d'ouverture

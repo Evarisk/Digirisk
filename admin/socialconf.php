@@ -177,6 +177,7 @@ print '<tr class="liste_titre"><th class="titlefield wordbreak">'.$langs->trans(
 
 print '<tr class="oddeven"><td><label for="ElectionDateCSE">'.$langs->trans("ElectionDate").'</label></td><td>';
 print $form->selectDate(strtotime($electionDateCSE) ? $electionDateCSE : -1, 'ElectionDateCSE', 0, 0, 0, 'social_form', 1, 1);
+print '</td></tr>';
 
 // * ESC Titulars - Titulaires CSE *
 
