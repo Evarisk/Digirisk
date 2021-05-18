@@ -708,15 +708,8 @@ class modDigiriskdolibarr extends DolibarrModules
 
 		$extra_fields->addExtraField( 'fk_risk', $langs->trans("fk_risk"), 'int', 1020, 10, 'projet_task', 0, 0, '', '', '', '', 5);
 
-		$result = $this->_init($sql, $options);
+		return $this->_init($sql, $options);
 
-		if ($result) {
-			$urltogo = DOL_URL_ROOT . '/custom/digiriskdolibarr/digiriskdolibarrindex.php?mainmenu=digiriskdolibarr';
-			header('Location:' . $urltogo);
-			exit;
-		} else {
-			return 0;
-		}
 	}
 
 	/**
