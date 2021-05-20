@@ -30,8 +30,10 @@ require_once DOL_DOCUMENT_ROOT.'/core/class/html.formfile.class.php';
 
 dol_include_once('/digiriskdolibarr/class/digiriskdocuments.class.php');
 dol_include_once('/digiriskdolibarr/class/digiriskelement.class.php');
+dol_include_once('/digiriskdolibarr/class/digiriskresources.class.php');
 dol_include_once('/digiriskdolibarr/class/digiriskdocuments/preventionplan.class.php');
 dol_include_once('/digiriskdolibarr/lib/digiriskdolibarr_function.lib.php');
+dol_include_once('/digiriskdolibarr/lib/digiriskdolibarr_preventionplan.lib.php');
 dol_include_once('/digiriskdolibarr/core/modules/digiriskdolibarr/digiriskdocuments/preventionplan/mod_preventionplan_standard.php');
 dol_include_once('/digiriskdolibarr/core/modules/digiriskdolibarr/digiriskdocuments/preventionplan/modules_preventionplan.php');
 
@@ -58,7 +60,10 @@ $object->fetch($id);
 
 $preventionplan = new PreventionPlan($db);
 $digiriskelement = new DigiriskElement($db);
+$digiriskresources = new DigiriskResources($db);
+
 $refPreventionPlanMod = new $conf->global->DIGIRISKDOLIBARR_PREVENTIONPLAN_ADDON($db);
+
 $hookmanager->initHooks(array('preventionplancard', 'globalcard')); // Note that conf->hooks_modules contains array
 
 $upload_dir         = $conf->digiriskdolibarr->multidir_output[isset($object->entity) ? $object->entity : 1];
@@ -92,15 +97,15 @@ if (empty($reshook))
 	// Action to add record
 	if ($action == 'add' && $permissiontoadd) {
 
-		$former_id	            = GETPOST('former');
 		$maitre_oeuvre_id       = GETPOST('maitre_oeuvre');
+		$extsociety_id          = GETPOST('ext_society');
+		$extresponsible_id      = GETPOST('ext_society_responsible');
 		$extintervenant_ids     = GETPOST('ext_intervenants');
-		$intervenants_ids       = GETPOST('intervenants_ids');
+
 		$morethan400hours       = GETPOST('morethan400hours');
 		$imminentdanger         = GETPOST('imminent_danger');
-		$extsociety_id          = GETPOST('ext_society');
-		$location               = GETPOST('location');
-		$prevention_ids         = GETPOST('prevention_ids');
+		$labour_inspector_id    = GETPOST('labour_inspector');
+		$location_id            = GETPOST('location');
 		$date_debut             = GETPOST('date_debut');
 		$date_fin               = GETPOST('date_fin');
 
@@ -117,22 +122,13 @@ if (empty($reshook))
 		$preventionplan->fk_user_creat = $user->id ? $user->id : 1;
 
 		$digiriskelement = new DigiriskElement($db);
-		$digiriskelement->fetch($location);
+		$digiriskelement->fetch($location_id);
 		$preventionplan->parent_id     = $digiriskelement->id;
 		$preventionplan->parent_type   = $digiriskelement->element_type;
 
-//		if (!empty($prevention_ids)) {
-//			foreach ($prevention_ids as $prevention_id) {
-//				$prevention = $prevention->fetch($prevention_id);
-//				$preventions[$prevention_id]['moyen_prevention'] = $prevention->moyen;
-//				$preventions[$prevention_id]['action'] = $prevention->moyen;
-//
-//				$preventions[$prevention_id]['location'] = $prevention->moyen;
-//			}
-//		}
-//
+		//@todo interventions et intervenants
 
-		$preventionplan->json          = $preventionplan->PreventionPlanFillJSON($intervenants_ids, $preventions_ids, $former_id,$maitre_oeuvre_id,$extintervenant_ids,$morethan400hours,$imminentdanger,$extsociety_id,$date_debut,$date_fin,$location);
+		$preventionplan->json          = $preventionplan-> PreventionPlanFillJSON($intervenants_ids, $interventions_ids,$maitre_oeuvre_id ,$extsociety_id, $extresponsible_id,$extintervenant_ids,$morethan400hours,$imminentdanger,$date_debut,$date_fin,$location_id, $labour_inspector_id);
 
 		if (!$error) {
 			$result = $preventionplan->createCommon($user, true);
@@ -252,19 +248,6 @@ if ($action == 'create')
 	print '</td></tr>';
 //	$intervenants, $preventions, $former_id,$maitre_oeuvre_id,$extintervenant,$intervenants_ids,$morethan400hours,$imminentdanger,$extsociety_id
 
-	//Former -- Formateur
-	$userlist 	  = $form->select_dolusers('', '', 0, null, 0, '', '', 0, 0, 0, 'AND u.statut = 1', 0, '', '', 0, 1);
-
-	print '<tr>';
-	print '<td style="width:10%">'.$form->editfieldkey('Former', 'former_id', '', $object, 0).'</td>';
-	print '<td class="maxwidthonsmartphone">';
-
-	if (!GETPOSTISSET('backtopage')) print ' <a href="'.DOL_URL_ROOT.'/user/card.php?action=create&backtopage='.urlencode($_SERVER["PHP_SELF"].'?action=create').'"><span class="fa fa-plus-circle valignmiddle paddingleft" title="'.$langs->trans("AddThirdParty").'"></span></a>';
-	//@todo enlever le multiselect
-	print $form->selectarray('former', $userlist, 0, null, null, null, null, "40%");
-
-	print '</td></tr>';
-
 	//Maitre d'oeuvre
 	$userlist 	  = $form->select_dolusers('', '', 0, null, 0, '', '', 0, 0, 0, 'AND u.statut = 1', 0, '', '', 0, 1);
 
@@ -274,27 +257,44 @@ if ($action == 'create')
 
 	if (!GETPOSTISSET('backtopage')) print ' <a href="'.DOL_URL_ROOT.'/user/card.php?action=create&backtopage='.urlencode($_SERVER["PHP_SELF"].'?action=create').'"><span class="fa fa-plus-circle valignmiddle paddingleft" title="'.$langs->trans("AddThirdParty").'"></span></a>';
 
-	//@todo enlever le multiselect
 	print $form->selectarray('maitre_oeuvre', $userlist, 0, null, null, null, null, "40%");
 
 	print '</td></tr>';
 
+	//External society -- Société extérieure
+	print '<tr><td class="tdtop">';
+	print $langs->trans("ExternalSociety");
+	print '</td>';
+
+	print '<td>';
+	if (!GETPOSTISSET('backtopage')) print ' <a href="'.DOL_URL_ROOT.'/societe/card.php?action=create&backtopage='.urlencode($_SERVER["PHP_SELF"].'?action=create').'"><span class="fa fa-plus-circle valignmiddle paddingleft" title="'.$langs->trans("AddThirdParty").'"></span></a>';
+
+	$events = array();
+	$events[1] = array('method' => 'getContacts', 'url' => dol_buildpath('/core/ajax/contacts.php?showempty=1', 1), 'htmlname' => 'ext_society_responsible', 'params' => array('add-customer-contact' => 'disabled'));
+	$events[2] = array('method' => 'getContacts', 'url' => dol_buildpath('/core/ajax/contacts.php?showempty=1', 1), 'htmlname' => 'ext_intervenants', 'params' => array('add-customer-contact' => 'disabled'));
+	//For external user force the company to user company
+	if (!empty($user->socid)) {
+		print $form->select_company($user->socid, 'ext_society', '', 1, 1, 0, $events, 0, 'minwidth300');
+	} else {
+		print $form->select_company('', 'ext_society', '', 'SelectThirdParty', 1, 0, $events, 0, 'minwidth300');
+	}	print '<br>';
+
+	print '</td></tr>';
+
+	//External responsible -- Responsable de la société extérieure
+	print '<tr class="oddeven"><td>'.$langs->trans("ExternalSocietyResponsible").'</td><td>';
+	print $form->selectcontacts(GETPOST('ext_society', 'int'), '', 'ext_society_responsible[]', 1, '', '', 0, 'quatrevingtpercent', false, 0, array(), false, '', 'ext_society_responsible');
+
+	print '</td></tr>';
+
 	//Intervenants extérieurs
-	$userlist 	  = $form->select_dolusers('', '', 0, null, 0, '', '', 0, 0, 0, 'AND u.statut = 1', 0, '', '', 0, 1);
-
-	print '<tr>';
-	print '<td style="width:10%">'.$form->editfieldkey('ExtIntervenants', 'TitularsCSE_id', '', $object, 0).'</td>';
-	print '<td class="maxwidthonsmartphone">';
-
-	if (!GETPOSTISSET('backtopage')) print ' <a href="'.DOL_URL_ROOT.'/user/card.php?action=create&backtopage='.urlencode($_SERVER["PHP_SELF"].'?action=create').'"><span class="fa fa-plus-circle valignmiddle paddingleft" title="'.$langs->trans("AddThirdParty").'"></span></a>';
-
-	//@todo enlever le multiselect
-	print $form->selectarray('ext_intervenants', $userlist, 0, 0, null, null, null, "40%");
+	print '<tr class="oddeven"><td>'.$langs->trans("ExternalIntervenants").'</td><td>';
+	print $form->selectcontacts(GETPOST('ext_society', 'int'), '', 'ext_intervenants[]', 1, '', '', 0, 'quatrevingtpercent', false, 0, array(), false, 'multiple', 'ext_intervenants');
 
 	print '</td></tr>';
 
 	//@todo preventions et intervenants
-	$prevention_ids         = GETPOST('prevention_ids');
+	$intervention_ids         = GETPOST('prevention_ids');
 	$intervenants_ids       = GETPOST('intervenants_ids');
 
 	//Location
@@ -324,7 +324,7 @@ if ($action == 'create')
 
 	//End Date -- Date fin
 	print '<tr class="oddeven"><td><label for="date_fin">'.$langs->trans("EndDate").'</label></td><td>';
-	print $form->selectDate('', 'date_fin', 0, 0, 0);
+	print $form->selectDate(dol_time_plus_duree(dol_now(),1,'y'), 'date_fin', 0, 0, 0);
 	print '</td></tr>';
 
 	//Imminent danger -- Danger imminent
@@ -338,13 +338,20 @@ if ($action == 'create')
 	print '<br>';
 	print '</td></tr>';
 
-	//External society -- Société extérieure
+	//Labour inspector -- Inspecteur du travail
 	print '<tr><td class="tdtop">';
-	print $langs->trans("ExternalSociety");
+	print $langs->trans("LabourInspector");
 	print '</td>';
 	print '<td>';
-	print $form->select_thirdparty_list('', 'ext_society');
-	print '<br>';
+
+	//For external user force the company to user company
+	if (!empty($user->socid)) {
+		print $form->select_company($user->socid, 'labour_inspector', '', 1, 1, 0, $events, 0, 'minwidth300');
+	} else {
+
+		print $form->select_company($digiriskresources->digirisk_dolibarr_fetch_resource('SAMU'), 'labour_inspector', '', 'SelectThirdParty', 1, 0, $events, 0, 'minwidth300');
+	}	print '<br>';
+
 	print '</td></tr>';
 
 	// Other attributes
@@ -410,7 +417,7 @@ if ((empty($action) || ($action != 'edit' && $action != 'create')))
 
 	$head = preventionplanPrepareHead($object);
 
-	dol_fiche_head($head, 'elementCard', $title, -1, "digiriskdolibarr@digiriskdolibarr");
+	dol_fiche_head($head, 'preventionplanCard', $title, -1, "digiriskdolibarr@digiriskdolibarr");
 
 	$formconfirm = '';
 	// Confirmation to delete
@@ -431,78 +438,24 @@ if ((empty($action) || ($action != 'edit' && $action != 'create')))
 
 	$morehtmlref = '<div class="refidno">';
 	$morehtmlref .= '</div>';
-	if (isset($object->element_type)) {
-		$morehtmlleft .= '<div class="floatleft inline-block valignmiddle divphotoref">'.digirisk_show_photos('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$entity].'/'.$object->element_type, 'small', 5, 0, 0, 0, $width,0, 0, 0, 0, $object->element_type, $object).'</div>';
-	} else {
-		$morehtmlleft .= '<div class="floatleft inline-block valignmiddle divphotoref">'.digirisk_show_photos('mycompany', $conf->mycompany->dir_output . '/logos', 'small', 5, 0, 0, 0, $width,0, 0, 0, 0, 'logos', $emptyobject).'</div>';
-	}
+	$morehtmlleft .= '<div class="floatleft inline-block valignmiddle divphotoref"></div>';
 
-	digirisk_banner_tab($object, 'ref', '', 0, 'ref', 'ref', $morehtmlref, '', 0, $morehtmlleft);
-
-	unset($object->fields['element_type']);
-	unset($object->fields['fk_parent']);
-	unset($object->fields['last_main_doc']);
-	unset($object->fields['entity']);
+	dol_banner_tab($object, 'ref', '', 0, 'ref', 'ref', $morehtmlref, '', 0, $morehtmlleft);
 
 	print '<div class="fichecenter">';
 	print '<div class="fichehalfleft">';
 	print '<div class="underbanner clearboth"></div>';
-	print '<table class="border centpercent tableforfield">'."\n";
+	print '<table class="border centpercent tableforfield">' . "\n";
 
-	if ($object->id) {
-
-		print '<tr><td class="titlefield">' . $langs->trans("ElementType") . '</td><td>';
-		print $langs->trans($object->element_type);
-		print '</td></tr>';
-
-		print '<div class="titlefield hidden elementID" id="elementID" value="'.$object->id.'">'.$langs->trans("ID").'</div>';
-		print '<tr><td class="titlefield">'.$langs->trans("ParentElement").'</td><td>';
-		$parent_element = new PreventionPlan($db);
-		$result = $parent_element->fetch($object->fk_parent);
-		if ($result > 0) {
-			print $parent_element->ref . ( !empty($parent_element->description) ?  ' - ' . $parent_element->description : '');
-		}
-		else
-		{
-			print $conf->global->MAIN_INFO_SOCIETE_NOM;
-		}
-
-		print '</td></tr>';
-
-	}
-
-	//Show common fields
-//	include DOL_DOCUMENT_ROOT.'/core/tpl/commonfields_view.tpl.php';
-
-	// Other attributes. Fields from hook formObjectOptions and Extrafields.
-	include DOL_DOCUMENT_ROOT.'/core/tpl/extrafields_view.tpl.php';
-
-	print '</table>';
-	print '</div>';
-
-	print '<div class="fichehalfright">';
-	print '<div class="ficheaddleft">';
-	print '<div class="underbanner clearboth"></div>';
-
-	print '<table class="border tableforfield" width="100%">';
-
-	// label
-	print '<td class="titlefield tdtop">'.$langs->trans("label").'</td><td>';
-	print dol_htmlentitiesbr($object->label);
-	print '</td></tr>';
-
-	// Description
-	print '<td class="titlefield tdtop">'.$langs->trans("Description").'</td><td>';
-	print dol_htmlentitiesbr($object->description);
-	print '</td></tr>';
+	//JSON Decode and show fields
+	include DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/core/tpl/digiriskdolibarr_preventionplanfields_view.tpl.php';
 
 	print '</table>';
 	print '</div>';
 	print '</div>';
-
-	print '<div class="clearboth"></div>';
 
 	dol_fiche_end();
+
 
 	if ($object->id > 0) {
 		// Buttons for actions
@@ -527,11 +480,12 @@ if ((empty($action) || ($action != 'edit' && $action != 'create')))
 			print '<div class="fichecenter"><div class="fichehalfleft elementDocument">';
 
 			$objref = dol_sanitizeFileName($object->ref);
-			$dir_files = $preventionplan->element . '/' . $objref;
+			$dir_files = $object->element . '/' . $objref;
 			$filedir = $upload_dir . '/' . $dir_files;
 			$urlsource = $_SERVER["PHP_SELF"] . '?id='. $id;
+			$modulepart = 'digiriskdolibarr:PreventionPlan';
 
-			print digiriskshowdocuments($modulepart, $dir_files, $filedir, $urlsource, $permissiontoadd, $permissiontodelete, $defaultmodel, 1, 0, 28, 0, '', $title, '', $langs->defaultlang, '', $preventionplan);
+			print digiriskshowdocuments($modulepart, $dir_files, $filedir, $urlsource, $permissiontoadd, $permissiontodelete, $conf->global->DIGIRISKDOLIBARR_PREVENTIONPLAN_DEFAULT_MODEL, 1, 0, 28, 0, '', $title, '', $langs->defaultlang, '', $preventionplan);
 		}
 
 

@@ -191,7 +191,17 @@ class DigiriskResources extends CommonObject
 		exit;
 
 	}
+	public function digirisk_dolibarr_fetch_resource($ref)
+	{
+		global $langs;
+		$allLinks = $this->digirisk_dolibarr_fetch_resources();
 
+		if(!empty($allLinks[$ref])) {
+			$id = array_shift($allLinks[$ref]->id);
+			return $id;
+		}
+		return $langs->trans('NoLabourInspectorAssigned');
+	}
 
 	public function digirisk_dolibarr_fetch_resources()
 	{

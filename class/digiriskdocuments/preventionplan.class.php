@@ -21,10 +21,11 @@
  * \brief       This file is a class file for PreventionPlan
  */
 
-dol_include_once('/digiriskdolibarr/class/digiriskdocuments.class.php');
-dol_include_once('/user/class/user.class.php');
-dol_include_once('/societe/class/societe.class.php');
+require_once DOL_DOCUMENT_ROOT.'/user/class/user.class.php';
+require_once DOL_DOCUMENT_ROOT.'/contact/class/contact.class.php';
+require_once DOL_DOCUMENT_ROOT.'/societe/class/societe.class.php';
 
+dol_include_once('/digiriskdolibarr/class/digiriskdocuments.class.php');
 
 /**
  * Class for PreventionPlan
@@ -92,59 +93,89 @@ class PreventionPlan extends DigiriskDocuments
 			}
 		}
 	}
-	public function PreventionPlanFillJSON($intervenants_ids, $preventions_ids, $former_id,$maitre_oeuvre_id,$extintervenant_ids,$morethan400hours,$imminentdanger,$extsociety_id,$date_debut,$date_fin,$location) {
+	public function PreventionPlanFillJSON($intervenants_ids, $interventions_ids,$maitre_oeuvre_id ,$extsociety_id, $extresponsible_id,$extintervenant_ids,$morethan400hours,$imminentdanger,$date_debut,$date_fin,$location_id, $labour_inspector_id) {
 
-		$usertmp = new User($this->db);
-		$societetmp = new Societe($this->db);
+		$maitre_oeuvre   = new User($this->db);
+		$extsociety      = new Societe($this->db);
+		$contacttmp      = new Contact($this->db);
+		$digiriskelement = new DigiriskElement($this->db);
 
-		$former = $usertmp;
-		$maitre_oeuvre = $usertmp;
-		$extintervenant = $usertmp;
+		$extresponsible = $contacttmp;
+		$extintervenant = $contacttmp;
 
-		$extsociety = $societetmp;
+		if (!empty ($maitre_oeuvre_id) && $maitre_oeuvre_id > 0) {
 
-		$former->fetch($former_id);
+			$maitre_oeuvre->fetch($maitre_oeuvre_id);
 
-		$json['PreventionPlan']['former']['user_id']        = $former->id;
-		$json['PreventionPlan']['former']['signature_id']   = '';
-		$json['PreventionPlan']['former']['signature_date'] = '';
+			$json['PreventionPlan']['maitre_oeuvre']['user_id'] = $maitre_oeuvre->id;
+			$json['PreventionPlan']['maitre_oeuvre']['phone'] = $maitre_oeuvre->office_phone;
+			$json['PreventionPlan']['maitre_oeuvre']['signature_id'] = '';
+			$json['PreventionPlan']['maitre_oeuvre']['signature_date'] = '';
+		}
 
-		$maitre_oeuvre->fetch($maitre_oeuvre_id);
+		if (!empty ($extsociety_id) && $extsociety_id > 0) {
 
-		$json['PreventionPlan']['maitre_oeuvre']['user_id']        = $maitre_oeuvre->id;
-		$json['PreventionPlan']['maitre_oeuvre']['phone']          = $maitre_oeuvre->office_phone;
-		$json['PreventionPlan']['maitre_oeuvre']['signature_id']   = '';
-		$json['PreventionPlan']['maitre_oeuvre']['signature_date'] = '';
+			$extsociety->fetch($extsociety_id);
 
-		$extintervenant->fetch($extintervenant_ids);
+			$json['PreventionPlan']['society_outside']['id']      = $extsociety->id;
+			$json['PreventionPlan']['society_outside']['name']    = $extsociety->name;
+			$json['PreventionPlan']['society_outside']['siret']   = $extsociety->siret;
+			$json['PreventionPlan']['society_outside']['address'] = $extsociety->address;
+			$json['PreventionPlan']['society_outside']['postal']  = $extsociety->zip;
+			$json['PreventionPlan']['society_outside']['town']    = $extsociety->town;
+		}
 
-		$json['PreventionPlan']['intervenant_exterieur']['firstname']      = $extintervenant->firstname;
-		$json['PreventionPlan']['intervenant_exterieur']['lastname']       = $extintervenant->lastname;
-		$json['PreventionPlan']['intervenant_exterieur']['phone']          = $extintervenant->office_phone;
-		$json['PreventionPlan']['intervenant_exterieur']['email']          = $extintervenant->email;
-		$json['PreventionPlan']['intervenant_exterieur']['signature_id']   = '';
-		$json['PreventionPlan']['intervenant_exterieur']['signature_date'] = '';
+		if (!empty ($extresponsible_id) && $extresponsible_id > 0) {
+			$extresponsible_id = array_shift($extresponsible_id);
+			$extresponsible->fetch($extresponsible_id);
 
-		$json['PreventionPlan']['more_than_400_hours']  = $morethan400hours;
+			$json['PreventionPlan']['responsable_exterieur']['id']             = $extresponsible->id;
+			$json['PreventionPlan']['responsable_exterieur']['firstname']      = $extresponsible->firstname;
+			$json['PreventionPlan']['responsable_exterieur']['lastname']       = $extresponsible->lastname;
+			$json['PreventionPlan']['responsable_exterieur']['phone']          = $extresponsible->phone_pro;
+			$json['PreventionPlan']['responsable_exterieur']['email']          = $extresponsible->email;
+			$json['PreventionPlan']['responsable_exterieur']['signature_id']   = '';
+			$json['PreventionPlan']['responsable_exterieur']['signature_date'] = '';
+		}
 
-		$json['PreventionPlan']['imminent_danger']   = $imminentdanger;
+		if (!empty ($extintervenant_ids) && $extintervenant_ids > 0) {
+			foreach ($extintervenant_ids as $extintervenant_id) {
+				$extintervenant->fetch($extintervenant_id);
 
-		$json['PreventionPlan']['location']   = $location;
+				$json['PreventionPlan']['intervenant_exterieur'][$extintervenant->id]['firstname']      = $extintervenant->firstname;
+				$json['PreventionPlan']['intervenant_exterieur'][$extintervenant->id]['lastname']       = $extintervenant->lastname;
+				$json['PreventionPlan']['intervenant_exterieur'][$extintervenant->id]['phone']          = $extintervenant->phone_pro;
+				$json['PreventionPlan']['intervenant_exterieur'][$extintervenant->id]['email']          = $extintervenant->email;
+				$json['PreventionPlan']['intervenant_exterieur'][$extintervenant->id]['signature_id']   = '';
+				$json['PreventionPlan']['intervenant_exterieur'][$extintervenant->id]['signature_date'] = '';
+			}
+		}
 
-		$extsociety->fetch($extsociety_id);
+		$json['PreventionPlan']['date']['debut']       = $date_debut;
+		$json['PreventionPlan']['date']['fin']         = $date_fin;
+		$json['PreventionPlan']['more_than_400_hours'] = $morethan400hours;
+		$json['PreventionPlan']['imminent_danger']     = $imminentdanger;
+		$json['PreventionPlan']['labour_inspector']    = $imminentdanger;
 
-		$json['PreventionPlan']['society_outside']['name']   = $extsociety->name;
-		$json['PreventionPlan']['society_outside']['siret']   = $extsociety->siret;
-		$json['PreventionPlan']['society_outside']['address']   = $extsociety->address;
-		$json['PreventionPlan']['society_outside']['postal']   = $extsociety->zip;
-		$json['PreventionPlan']['society_outside']['town']   = $extsociety->town;
+		if ($location_id > 0) {
+			$digiriskelement->fetch($location_id);
+			$json['PreventionPlan']['location']['id']  = $digiriskelement->id;
+			$json['PreventionPlan']['location']['name'] = $digiriskelement->ref . ' - ' . $digiriskelement->label;
+		}
 
-		$json['PreventionPlan']['intervenants']   = $intervenants;
+	//@todo interventions et intervenants
 
-		$json['PreventionPlan']['preventions']   = $preventions;
-		$json['PreventionPlan']['date']['debut']   = $date_debut;
-		$json['PreventionPlan']['date']['fin']   = $date_fin;
-	
 		return json_encode($json, JSON_UNESCAPED_UNICODE);
+	}
+
+	/**
+	 *	Return label of contact status
+	 *
+	 *	@param      int		$mode       0=Long label, 1=Short label, 2=Picto + Short label, 3=Picto, 4=Picto + Long label, 5=Short label + Picto, 6=Long label + Picto
+	 * 	@return 	string				Label of contact status
+	 */
+	public function getLibStatut($mode)
+	{
+		return '';
 	}
 }

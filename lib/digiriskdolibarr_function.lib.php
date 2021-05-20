@@ -833,7 +833,7 @@ function digirisk_banner_tab($object, $paramid, $morehtml = '', $shownav = 1, $f
 *  @param  int     $save_lastsearch_value    	-1=Auto, 0=No save of lastsearch_values when clicking, 1=Save lastsearch_values whenclicking
 *	@return	string								String with URL
 */
-function getNomUrl($withpictoimg = 0, $option = '', $infologin = 0, $notooltip = 0, $maxlen = 24, $hidethirdpartylogo = 0, $mode = '', $morecss = '', $save_lastsearch_value = -1, $user)
+function getNomUrl($withpictoimg = 0, $option = '', $infologin = 0, $notooltip = 0, $maxlen = 24, $hidethirdpartylogo = 0, $mode = '', $morecss = '', $save_lastsearch_value = -1, $object)
 {
 	global $langs, $conf, $db, $hookmanager, $user;
 	global $dolibarr_main_authentication, $dolibarr_main_demo;

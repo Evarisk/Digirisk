@@ -163,7 +163,7 @@ class doc_preventionplan_odt extends ModeleODTPreventionPlan
 	 * @return int         1 if OK, <=0 if KO
 	 * @throws Exception
 	 */
-	public function write_file($object, $outputlangs, $srctemplatepath, $hidedetails = 0, $hidedesc = 0, $hideref = 0)
+	public function write_file($object, $outputlangs, $srctemplatepath, $hidedetails = 0, $hidedesc = 0, $hideref = 0, $preventionplan)
 	{
 		// phpcs:enable
 		global $user, $langs, $conf, $hookmanager, $action;
@@ -186,14 +186,10 @@ class doc_preventionplan_odt extends ModeleODTPreventionPlan
 		$outputlangs->charset_output = 'UTF-8';
 		$outputlangs->loadLangs(array("main", "dict", "companies", "digiriskdolibarr@digiriskdolibarr"));
 
-		$mod = new $conf->global->DIGIRISKDOLIBARR_PREVENTIONPLAN_ADDON($this->db);
-		$ref = $mod->getNextValue($object);
+		$objectref = dol_sanitizeFileName($preventionplan->ref);
 
-		$object->ref = $ref;
-		$object->create($user);
+		$dir = $conf->digiriskdolibarr->multidir_output[isset($object->entity) ? $object->entity : 1] . '/preventionplan/' . $objectref;
 
-		$dir = $conf->digiriskdolibarr->multidir_output[isset($object->entity) ? $object->entity : 1] . '/preventionplan';
-		$objectref = dol_sanitizeFileName($ref);
 		if (preg_match('/specimen/i', $objectref)) $dir .= '/specimen';
 		if (!file_exists($dir))
 		{

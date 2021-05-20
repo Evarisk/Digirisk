@@ -32,7 +32,12 @@ require '../../main.inc.php';
 require_once DOL_DOCUMENT_ROOT.'/projet/class/project.class.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/date.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/core/class/html.formother.class.php';
+require_once DOL_DOCUMENT_ROOT.'/user/class/user.class.php';
+require_once DOL_DOCUMENT_ROOT.'/contact/class/contact.class.php';
+require_once DOL_DOCUMENT_ROOT.'/societe/class/societe.class.php';
+
 dol_include_once('/custom/digiriskdolibarr/class/digiriskdocuments/preventionplan.class.php');
+
 // Load translation files required by the page
 $langs->loadLangs(array('projects', 'companies', 'commercial'));
 global $conf, $db;
@@ -46,6 +51,9 @@ $contextpage = GETPOST('contextpage', 'aZ') ?GETPOST('contextpage', 'aZ') : 'pro
 $title = $langs->trans("PreventionPlan");
 
 $preventionplan = new PreventionPlan($db);
+$societe        = new Societe($db);
+$contact        = new Contact($db);
+$usertmp        = new User($db);
 
 $limit     = GETPOST('limit', 'int') ?GETPOST('limit', 'int') : $conf->liste_limit;
 $sortfield = GETPOST("sortfield", "alpha");
@@ -78,11 +86,52 @@ foreach ($preventionplan->fields as $key => $val)
 
 // Definition of fields for list
 $arrayfields = array();
+
 foreach ($preventionplan->fields as $key => $val)
 {
 	// If $val['visible']==0, then we never show the field
 	if (!empty($val['visible'])) $arrayfields['t.'.$key] = array('label'=>$val['label'], 'checked'=>(($val['visible'] < 0) ? 0 : 1), 'enabled'=>($val['enabled'] && ($val['visible'] != 3)), 'position'=>$val['position']);
 }
+
+$arrayfields['t.date_debut']['label'] = 'StartDate';
+$arrayfields['t.date_debut']['checked'] = 1;
+$arrayfields['t.date_debut']['enabled'] = 1;
+$arrayfields['t.date_debut']['position'] = 12;
+
+$arrayfields['t.date_fin']['label'] = 'EndDate';
+$arrayfields['t.date_fin']['checked'] = 1;
+$arrayfields['t.date_fin']['enabled'] = 1;
+$arrayfields['t.date_fin']['position'] = 14;
+
+$arrayfields['t.maitre_oeuvre']['label'] = 'MaitreOeuvre';
+$arrayfields['t.maitre_oeuvre']['checked'] = 1;
+$arrayfields['t.maitre_oeuvre']['enabled'] = 1;
+$arrayfields['t.maitre_oeuvre']['position'] = 15;
+
+$arrayfields['t.ext_society']['label'] = 'ExtSociety';
+$arrayfields['t.ext_society']['checked'] = 1;
+$arrayfields['t.ext_society']['enabled'] = 1;
+$arrayfields['t.ext_society']['position'] = 16;
+
+$arrayfields['t.ext_society_responsible']['label'] = 'ExtSocietyResponsible';
+$arrayfields['t.ext_society_responsible']['checked'] = 1;
+$arrayfields['t.ext_society_responsible']['enabled'] = 1;
+$arrayfields['t.ext_society_responsible']['position'] = 17;
+
+$arrayfields['t.nb_intervenants']['label'] = 'NbIntervenants';
+$arrayfields['t.nb_intervenants']['checked'] = 1;
+$arrayfields['t.nb_intervenants']['enabled'] = 1;
+$arrayfields['t.nb_intervenants']['position'] = 18;
+
+$arrayfields['t.nb_interventions']['label'] = 'NbInterventions';
+$arrayfields['t.nb_interventions']['checked'] = 1;
+$arrayfields['t.nb_interventions']['enabled'] = 1;
+$arrayfields['t.nb_interventions']['position'] = 19;
+
+$arrayfields['t.location']['label'] = 'Location';
+$arrayfields['t.location']['checked'] = 1;
+$arrayfields['t.location']['enabled'] = 1;
+$arrayfields['t.location']['position'] = 21;
 
 // Load Digipreventionplan_element object
 include DOL_DOCUMENT_ROOT.'/core/actions_fetchobject.inc.php'; // Must be include, not include_once.
@@ -111,6 +160,8 @@ if (empty($reshook))
 	// Selection of new fields
 	include DOL_DOCUMENT_ROOT . '/core/actions_changeselectedfields.inc.php';
 
+	$backtopage = dol_buildpath('/digiriskdolibarr/preventionplan_list.php', 1);
+
 	// Purge search criteria
 	if (GETPOST('button_removefilter_x', 'alpha') || GETPOST('button_removefilter.x', 'alpha') || GETPOST('button_removefilter', 'alpha')) // All tests are required to be compatible with all browsers
 	{
@@ -127,8 +178,31 @@ if (empty($reshook))
 	}
 
 	$error = 0;
+	if (!$error && ($massaction == 'delete' || ($action == 'delete' && $confirm == 'yes')) && $permissiontodelete) {
+		if (!empty($toselect)) {
+			foreach ($toselect as $toselectedid) {
 
-	$backtopage = dol_buildpath('/digiriskdolibarr/preventionplan_list.php', 1);
+				$preventionplantodelete = $preventionplan;
+				$preventionplantodelete->fetch($toselectedid);
+
+				$preventionplantodelete->status = 0;
+				$result = $preventionplantodelete->update($user, true);
+
+				if ($result < 0) {
+					// Delete risk KO
+					if (!empty($risk->errors)) setEventMessages(null, $risk->errors, 'errors');
+					else  setEventMessages($risk->error, null, 'errors');
+				}
+			}
+
+			// Delete risk OK
+			$urltogo = str_replace('__ID__', $result, $backtopage);
+			$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
+			header("Location: ".$_SERVER["PHP_SELF"]);
+			exit;
+		}
+	}
+
 
 }
 
@@ -175,6 +249,8 @@ print '<input type="hidden" name="contextpage" value="'.$contextpage.'">';
 
 print_barre_liste($form->textwithpicto($title, $texthelp), $page, $_SERVER["PHP_SELF"], $param, $sortfield, $sortorder, $massactionbutton, $num, $nbtotalofrecords, 'preventionplan', 0, $newcardbutton, '', $limit, 0, 0, 1);
 
+include DOL_DOCUMENT_ROOT.'/core/tpl/massactions_pre.tpl.php';
+
 // Build and execute select
 // --------------------------------------------------------------------
 
@@ -198,6 +274,7 @@ print_barre_liste($form->textwithpicto($title, $texthelp), $page, $_SERVER["PHP_
 	if ($preventionplan->ismultientitymanaged == 1) $sql .= " WHERE t.entity IN (".getEntity($preventionplan->element).")";
 	else $sql .= " WHERE 1 = 1";
 	$sql .= " AND t.type = '".$preventionplan->element . "'";
+	$sql .= " AND t.status = 1";
 
 
 foreach ($search as $key => $val)
@@ -277,6 +354,15 @@ print '<div class="div-table-responsive">';
 print '<table class="tagtable nobottomiftotal liste'.($moreforfilter ? " listwithfilterbefore" : "").'">'."\n";
 print '<tr class="liste_titre">';
 
+$preventionplan->fields['date_debut'] = '';
+$preventionplan->fields['date_fin'] = '';
+$preventionplan->fields['maitre_oeuvre'] = '';
+$preventionplan->fields['ext_society'] = '';
+$preventionplan->fields['ext_society_responsible'] = '';
+$preventionplan->fields['nb_intervenants'] = '';
+$preventionplan->fields['nb_interventions'] = '';
+$preventionplan->fields['location'] = '';
+
 foreach ($preventionplan->fields as $key => $val)
 {
 	$cssforfield = (empty($val['css']) ? '' : $val['css']);
@@ -284,7 +370,24 @@ foreach ($preventionplan->fields as $key => $val)
 	if (!empty($arrayfields['t.'.$key]['checked']))
 	{
 		print '<td class="liste_titre'.($cssforfield ? ' '.$cssforfield : '').'">';
-		if (is_array($val['arrayofkeyval'])) print $form->selectarray('search_'.$key, $val['arrayofkeyval'], $search[$key], $val['notnull'], 0, 0, '', 1, 0, 0, '', 'maxwidth75');
+		if ($key == 'maitre_oeuvre') {
+			print '';
+		} elseif ($key == 'date_debut') {
+			print '';
+		} elseif ($key == 'date_fin') {
+			print '';
+		} elseif ($key == 'ext_society') {
+			print '';
+		}  elseif ($key == 'ext_society_responsible') {
+			print '';
+		} elseif ($key == 'nb_intervenants') {
+			print '';
+		} elseif ($key == 'nb_interventions') {
+			print '';
+		} elseif ($key == 'location') {
+			print '';
+		}
+		elseif (is_array($val['arrayofkeyval'])) print $form->selectarray('search_'.$key, $val['arrayofkeyval'], $search[$key], $val['notnull'], 0, 0, '', 1, 0, 0, '', 'maxwidth75');
 		elseif (strpos($val['type'], 'integer:') === 0) {
 			print $preventionplan->showInputField($val, $key, $search[$key], '', '', 'search_', 'maxwidth150', 1);
 		}
@@ -311,13 +414,20 @@ print '</tr>'."\n";
 // Fields title label
 // --------------------------------------------------------------------
 print '<tr class="liste_titre">';
+
 foreach ($preventionplan->fields as $key => $val)
 {
 	$cssforfield = (empty($val['css']) ? '' : $val['css']);
 	if ($key == 'status') $cssforfield .= ($cssforfield ? ' ' : '').'center';
-	if (!empty($arrayfields['t.'.$key]['checked']))
-	{
-		print getTitleFieldOfList($arrayfields['t.'.$key]['label'], 0, $_SERVER['PHP_SELF'], 't.'.$key, '', $param, ($cssforfield ? 'class="'.$cssforfield.'"' : ''), $sortfield, $sortorder, ($cssforfield ? $cssforfield.' ' : ''))."\n";
+	if (!empty($arrayfields['t.'.$key]['checked'])) {
+		if (preg_match('/MaitreOeuvre/', $arrayfields['t.'.$key]['label']) || preg_match('/StartDate/', $arrayfields['t.'.$key]['label']) || preg_match('/EndDate/', $arrayfields['t.'.$key]['label']) || preg_match('/ExtSociety/', $arrayfields['t.'.$key]['label']) || preg_match('/NbIntervenants/', $arrayfields['t.'.$key]['label']) || preg_match('/NbInterventions/', $arrayfields['t.'.$key]['label']) || preg_match('/Location/', $arrayfields['t.'.$key]['label'])) {
+			$disablesort = 1;
+		}
+		else {
+			$disablesort = 0;
+		}
+		print getTitleFieldOfList($arrayfields['t.'.$key]['label'], 0, $_SERVER['PHP_SELF'], 't.'.$key, '', $param, ($cssforfield ? 'class="'.$cssforfield.'"' : ''), $sortfield, $sortorder, ($cssforfield ? $cssforfield.' ' : ''), $disablesort)."\n";
+
 	}
 
 }
@@ -334,6 +444,7 @@ print $hookmanager->resPrint;
 print getTitleFieldOfList($selectedfields, 0, $_SERVER["PHP_SELF"], '', '', '', '', $sortfield, $sortorder, 'center maxwidthsearch ')."\n";
 print '</tr>'."\n";
 
+$arrayofselected = is_array($toselect) ? $toselect : array();
 
 // Loop on record
 // --------------------------------------------------------------------
@@ -343,6 +454,7 @@ $i = 0;
 $totalarray = array();
 
 while ($i < ($limit ? min($num, $limit) : $num)) {
+
 	$obj = $db->fetch_object($resql);
 
 	if (empty($obj)) break; // Should not happen
@@ -350,7 +462,10 @@ while ($i < ($limit ? min($num, $limit) : $num)) {
 
 	// Store properties in $preventionplan
 	$preventionplan->setVarsFromFetchObj($obj);
-// Show here line of result
+
+	$json = json_decode($preventionplan->json, false, 512, JSON_UNESCAPED_UNICODE)->PreventionPlan;
+
+	// Show here line of result
 	print '<tr class="oddeven preventionplan-row preventionplan_row_'. $preventionplan->id .' preventionplan-row-content-'. $preventionplan->id . '" id="preventionplan_row_'. $preventionplan->id .'">';
 	foreach ($preventionplan->fields as $key => $val) {
 		$cssforfield = (empty($val['css']) ? '' : $val['css']);
@@ -361,8 +476,27 @@ while ($i < ($limit ? min($num, $limit) : $num)) {
 		if (!empty($arrayfields['t.' . $key]['checked'])) {
 			print '<td' . ($cssforfield ? ' class="' . $cssforfield . '"' : '') . ' style="width:2%">';
 			if ($key == 'status') print $preventionplan->getLibStatut(5);
-
-			else print $preventionplan->showOutputField($val, $key, $preventionplan->$key, '');
+			elseif($key == 'maitre_oeuvre') {
+				$usertmp->fetch($json->maitre_oeuvre->user_id);
+				print $usertmp->getNomUrl();
+			} elseif ($key == 'date_debut') {
+				print $json->date->debut;
+			} elseif ($key == 'date_fin') {
+				print $json->date->fin;
+			} elseif ($key == 'ext_society') {
+				$societe->fetch($json->society_outside->id);
+				print $societe->getNomUrl();
+			} elseif ($key == 'ext_society_responsible') {
+				$contact->fetch($json->responsable_exterieur->id);
+				print $contact->getNomUrl();
+			} elseif ($key == 'nb_intervenants') {
+				print count((array)$json->intervenant_exterieur);
+			} elseif ($key == 'nb_interventions') {
+				print 0;
+			} elseif ($key == 'location') {
+				print $json->location->name;
+			}
+		else print $preventionplan->showOutputField($val, $key, $preventionplan->$key, '');
 			print '</td>';
 			if (!$i) $totalarray['nbfield']++;
 			if (!empty($val['isameasure'])) {
@@ -371,7 +505,32 @@ while ($i < ($limit ? min($num, $limit) : $num)) {
 			}
 		}
 	}
+	// Action column
+	print '<td class="nowrap center">';
+	if ($massactionbutton || $massaction)   // If we are in select mode (massactionbutton defined) or if we have already selected and sent an action ($massaction) defined
+	{
+		$selected = 0;
+		if (in_array($preventionplan->id, $arrayofselected)) $selected = 1;
+		print '<input id="cb'.$preventionplan->id.'" class="flat checkforselect" type="checkbox" name="toselect[]" value="'.$preventionplan->id.'"'.($selected ? ' checked="checked"' : '').'>';
+	}
+
+	print '</td>';
+	if (!$i) $totalarray['nbfield']++;
+	print '</tr>'."\n";
+	$i++;
 }
+// If no record found
+if ($num == 0)
+{
+	$colspan = 1;
+	foreach ($arrayfields as $key => $val) { if (!empty($val['checked'])) $colspan++; }
+	print '<tr><td colspan="'.$colspan.'" class="opacitymedium">'.$langs->trans("NoRecordFound").'</td></tr>';
+}
+$db->free($resql);
+
+$parameters = array('arrayfields'=>$arrayfields, 'sql'=>$sql);
+$reshook = $hookmanager->executeHooks('printFieldListFooter', $parameters, $risk); // Note that $action and $risk may have been modified by hook
+print $hookmanager->resPrint;
 
 print "</table>\n";
 print '</div>';
