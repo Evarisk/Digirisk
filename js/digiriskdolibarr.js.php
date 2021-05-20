@@ -158,6 +158,7 @@ window.eoxiaJS.navigation.event = function() {
 	jQuery( document ).on( 'click', '#slider', window.eoxiaJS.navigation.setUnitActive );
 	jQuery( document ).on( 'click', '#newGroupment', window.eoxiaJS.navigation.redirect );
 	jQuery( document ).on( 'click', '#newWorkunit', window.eoxiaJS.navigation.redirect );
+	jQuery( document ).on( 'click', '.side-nav-responsive', window.eoxiaJS.navigation.toggleMobileNav );
 };
 
 /**
@@ -281,6 +282,16 @@ window.eoxiaJS.navigation.redirect = function( event ) {
 	$('#cardContent').load( URLToGo + ' #cardContent' , id);
 	return false;
 };
+
+/**
+ * Toggle la classe "active" sur le menu des GP/UT en mobile.
+ *
+ * @since   1.1.0
+ * @version 1.1.0
+ */
+window.eoxiaJS.navigation.toggleMobileNav = function( event ) {
+	$( this ).closest( '.side-nav' ).find( '#id-left' ).toggleClass( 'active' );
+}
 
 /**
  * Initialise l'objet "modal" ainsi que la méthode "init" obligatoire pour la bibliothèque EoxiaJS.

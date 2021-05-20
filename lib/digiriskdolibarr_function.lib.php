@@ -601,6 +601,7 @@ function digiriskHeader($head = '', $title = '', $help_url = '', $target = '', $
 	$results = recurse_tree(0,0,$objects); ?>
 	<div id="id-container" class="id-container page-ut-gp-list">
 		<div class="side-nav">
+			<div class="side-nav-responsive"><i class="fas fa-bars"></i> <?php echo "Navigation UT/GP"; ?></div>
 			<div id="id-left">
 				<div class="digirisk-wrap wpeo-wrap">
 					<div class="navigation-container">

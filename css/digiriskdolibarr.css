@@ -1943,6 +1943,10 @@
   box-shadow: none;
 }
 
+.page-ut-gp-list .side-nav .side-nav-responsive {
+  display: none;
+}
+
 .page-ut-gp-list .side-nav #id-left {
   width: 300px;
   padding-top: 0;
@@ -3335,6 +3339,86 @@ td > .risk-evaluation-container {
   margin: 0;
   list-style-type: none;
   padding: 0;
+}
+
+@media (max-width: 1200px) {
+  #id-container .side-nav .vmenu {
+    width: 30px;
+    padding-right: 0 !important;
+    overflow: hidden;
+  }
+  #id-container .side-nav .vmenu .menu_titre .vmenu i {
+    margin-right: 2em;
+  }
+  #id-container .side-nav .vmenu #blockvmenusearch .select2-container--default .select2-selection--single .select2-selection__placeholder::before {
+    display: inline-block;
+    content: '\f002';
+    font-family: 'Font Awesome 5 Free';
+    font-weight: 600;
+    margin-right: 2em;
+  }
+}
+
+@media (max-width: 1200px) {
+  #id-container.page-ut-gp-list .side-nav {
+    position: static;
+    height: auto;
+    padding: 0 2em;
+    background: none;
+    border: 0;
+  }
+  #id-container.page-ut-gp-list .side-nav .side-nav-responsive {
+    display: block;
+    background: #263C5C;
+    color: #fff;
+    border-radius: 6px;
+    padding: 0.6em 1em;
+    font-weight: 600;
+    font-size: 14px;
+    -webkit-transition: all 0.2s ease-out;
+    transition: all 0.2s ease-out;
+  }
+  #id-container.page-ut-gp-list .side-nav .side-nav-responsive:hover {
+    cursor: pointer;
+    background: #446ba4;
+  }
+  #id-container.page-ut-gp-list .side-nav #id-left {
+    opacity: 0;
+    pointer-events: none;
+    position: absolute;
+    z-index: 999;
+    background: #efefef;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    -webkit-box-shadow: 0 0 40px 0 rgba(0, 0, 0, 0.1);
+    box-shadow: 0 0 40px 0 rgba(0, 0, 0, 0.1);
+    -webkit-transition: all 0.2s ease-out;
+    transition: all 0.2s ease-out;
+    -webkit-transform: translateY(-10px);
+    transform: translateY(-10px);
+    max-height: 500px;
+    overflow-y: auto;
+  }
+  #id-container.page-ut-gp-list .side-nav #id-left.active {
+    opacity: 1;
+    pointer-events: auto;
+    -webkit-transform: translateY(0px);
+    transform: translateY(0px);
+  }
+  #id-container.page-ut-gp-list #id-right {
+    padding-left: 0;
+  }
+}
+
+@media (max-width: 1200px) {
+  td > .riskassessment-task-container {
+    min-width: 0;
+  }
+}
+
+@media (max-width: 1200px) {
+  td > .risk-evaluation-container {
+    min-width: 0;
+  }
 }
 
 .preview-photo {

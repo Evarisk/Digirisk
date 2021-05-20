@@ -1,0 +1,21 @@
+@media ( max-width: $media__large ) {
+  #id-container .side-nav {
+    .vmenu {
+      width: 30px;
+      padding-right: 0 !important;
+      overflow: hidden;
+
+      .menu_titre .vmenu i {
+        margin-right: 2em;
+      }
+      #blockvmenusearch .select2-container--default .select2-selection--single .select2-selection__placeholder::before {
+        display: inline-block;
+        content: '\f002';
+        font-family: 'Font Awesome 5 Free';
+        font-weight: 600;
+        margin-right: 2em;
+      }
+    }
+  }
+}
+

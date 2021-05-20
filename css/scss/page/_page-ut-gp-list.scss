@@ -29,6 +29,9 @@
   box-sizing: border-box;
   box-shadow: none;
 
+  .side-nav-responsive {
+    display: none;
+  }
   #id-left {
     width: 300px;
     padding-top: 0;
