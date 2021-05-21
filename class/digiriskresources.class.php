@@ -68,6 +68,8 @@ class DigiriskResources extends CommonObject
 		'element_type'  => array('type' => 'varchar(50)', 'label' => 'ElementType', 'enabled' => '1', 'position' => 70, 'notnull' => 0, 'visible' => -1,),
 		'element_id'    => array('type' => 'integer', 'label' => 'ElementID', 'enabled' => '1', 'position' => 80, 'notnull' => 1, 'visible' => -1,),
 		'fk_user_creat' => array('type' => 'integer:User:user/class/user.class.php', 'label' => 'UserAuthor', 'enabled' => '1', 'position' => 90, 'notnull' => 1, 'visible' => -2, 'foreignkey' => 'user.rowid',),
+		'object_type'   => array('type' => 'varchar(50)', 'label' => 'ObjectType', 'enabled' => '1', 'position' => 70, 'notnull' => 0, 'visible' => -1,),
+		'object_id'     => array('type' => 'integer', 'label' => 'ObjectID', 'enabled' => '1', 'position' => 80, 'notnull' => 0, 'visible' => -1,),
 	);
 
 	public $rowid;
@@ -188,7 +190,6 @@ class DigiriskResources extends CommonObject
 			$db->rollback();
 			return -1;
 		}
-		exit;
 
 	}
 	public function digirisk_dolibarr_fetch_resource($ref)
