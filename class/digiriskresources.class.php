@@ -135,7 +135,7 @@ class DigiriskResources extends CommonObject
 	 * @param varchar $element_type type of resource
 	 * @param int $element_id Id of resource
 	 */
-	function digirisk_dolibarr_set_resources($db, $user_creat, $ref, $element_type, $element_id, $entity = 1)
+	function digirisk_dolibarr_set_resources($db, $user_creat, $ref, $element_type, $element_id, $entity = 1, $object_type = '', $object_id = 0, $noupdate = 0)
 	{
 		global $conf;
 		$now = dol_now();
@@ -151,19 +151,21 @@ class DigiriskResources extends CommonObject
 
 		$db->begin();
 
-		// Change le statut des ressources précédentes à 0
-		$sql = "UPDATE " . MAIN_DB_PREFIX . "digiriskdolibarr_digiriskresources";
-		$sql .= " SET status = 0";
-		$sql .= " WHERE ref = " . $db->encrypt($ref, 1);
-		if ($entity >= 0) $sql .= " AND entity = " . $entity;
-		//RAJOUTER LIGNE POUR LE SELECT ENTITY
+		if (!$noupdate) {
+			// Change le statut des ressources précédentes à 0
+			$sql = "UPDATE " . MAIN_DB_PREFIX . "digiriskdolibarr_digiriskresources";
+			$sql .= " SET status = 0";
+			$sql .= " WHERE ref = " . $db->encrypt($ref, 1);
+			if ($entity >= 0) $sql .= " AND entity = " . $entity;
+			//RAJOUTER LIGNE POUR LE SELECT ENTITY
+		}
 
 		dol_syslog("admin.lib::digirisk_dolibarr_set_resources", LOG_DEBUG);
 		$resql = $db->query($sql);
 
 		if (strcmp($element_type, '') && !empty($element_id))    // true if different. Must work for $value='0' or $value=0
 		{
-			$sql = "INSERT INTO " . MAIN_DB_PREFIX . "digiriskdolibarr_digiriskresources(ref,fk_user_creat,date_creation, element_type,element_id,status,entity)";
+			$sql = "INSERT INTO " . MAIN_DB_PREFIX . "digiriskdolibarr_digiriskresources(ref,fk_user_creat,date_creation, element_type,element_id,status,entity, object_type, object_id)";
 			$sql .= " VALUES ";
 			foreach ($element_id as $id) {
 				$sql .= "(" . $db->encrypt($ref, 1);
@@ -172,7 +174,9 @@ class DigiriskResources extends CommonObject
 				$sql .= "', " . $db->encrypt($element_type, 1);
 				$sql .= ", " . $id;
 				$sql .= ", 1";
-				$sql .= ", " . $entity . "),";
+				$sql .= ", " . $entity ;
+				$sql .=  ", '" . $object_type . "'";
+				$sql .=  ", " . $object_id. "),";
 			}
 			$sql = substr($sql, 0, -1);
 			//print "sql".$value."-".pg_escape_string($value)."-".$sql;exit;
@@ -192,7 +196,7 @@ class DigiriskResources extends CommonObject
 		}
 
 	}
-	public function digirisk_dolibarr_fetch_resource($ref)
+	public function digirisk_dolibarr_fetch_resource($ref )
 	{
 		global $langs;
 		$allLinks = $this->digirisk_dolibarr_fetch_resources();
@@ -202,6 +206,84 @@ class DigiriskResources extends CommonObject
 			return $id;
 		}
 		return $langs->trans('NoLabourInspectorAssigned');
+	}
+
+	public function fetchResourcesFromObject($ref, $object )
+	{
+
+		$sql = 'SELECT '.$this->getFieldList();
+		$sql .= ' FROM '.MAIN_DB_PREFIX.$this->table_element;
+		$sql .= ' WHERE ref = '. "'" . $ref . "'";
+		$sql .= ' AND object_type = '. "'" . $object->element . "'";
+		$sql .= ' AND object_id = '.$object->id;
+		if (empty($id) && isset($this->ismultientitymanaged) && $this->ismultientitymanaged == 1) $sql .= ' AND entity IN ('.getEntity($this->table_element).')';
+
+		$res = $this->db->query($sql);
+
+		if ($res)
+		{
+
+			if ($res->num_rows > 1) {
+				$limit = 5;
+				$num = $this->db->num_rows($res);
+				$i = 0;
+				while ($i < ($limit ? min($limit, $num) : $num)) {
+					$obj = $this->db->fetch_object($res);
+
+					$record = new self($this->db);
+					$record->setVarsFromFetchObj($obj);
+
+					if ($record->element_type == 'user') {
+						$resourcetmp = new User($this->db);
+					} elseif ($record->element_type == 'socpeople') {
+						$resourcetmp = new Contact($this->db);
+					} elseif ($record->element_type == 'societe') {
+						$resourcetmp = new Societe($this->db);
+					}
+
+					$resourcetmp->fetch($record->element_id);
+
+					$records[$record->id] = $resourcetmp;
+
+					$i++;
+				}
+				$this->db->free($res);
+
+				return $records;
+			} else {
+				$obj = $this->db->fetch_object($res);
+				if ($obj)
+				{
+					$this->setVarsFromFetchObj($obj);
+
+					// Retreive all extrafield
+					// fetch optionals attributes and labels
+					$this->fetch_optionals();
+
+					if ($this->element_type == 'user') {
+
+						$resourcetmp = new User($this->db);
+					} elseif ($this->element_type == 'socpeople') {
+						$resourcetmp = new Contact($this->db);
+					} elseif ($this->element_type == 'societe') {
+						$resourcetmp = new Societe($this->db);
+					}
+					$resourcetmp->fetch($this->element_id);
+					return $resourcetmp;
+				}
+				else
+				{
+					return 0;
+				}
+			}
+
+		}
+		else
+		{
+			$this->error = $this->db->lasterror();
+			$this->errors[] = $this->error;
+			return -1;
+		}
 	}
 
 	public function digirisk_dolibarr_fetch_resources()

@@ -16,6 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+require_once DOL_DOCUMENT_ROOT.'/core/lib/date.lib.php';
 
 //Check projet
 if ($conf->global->DIGIRISKDOLIBARR_DU_PROJECT > 0) {

@@ -16,15 +16,16 @@
  */
 
 /**
- * \file    digiriskdolibarr/admin/preventionplan.php
+ * \file    digiriskdolibarr/admin/preventionplandocument.php
  * \ingroup digiriskdolibarr
- * \brief   Digiriskdolibarr preventionplan page.
+ * \brief   Digiriskdolibarr preventionplandocument page.
  */
 
 // Load Dolibarr environment
 $res = 0;
 if (!$res && file_exists("../../../../main.inc.php")) $res = @include "../../../../main.inc.php";
 if (!$res) die("Include of main fails");
+
 
 global $langs, $user;
 
@@ -44,15 +45,13 @@ $action     = GETPOST('action', 'alpha');
 $backtopage = GETPOST('backtopage', 'alpha');
 $value      = GETPOST('value', 'alpha');
 
-$type          = 'preventionplan';
+$type          = 'preventionplandocument';
 $error         = 0;
 $setupnotempty = 0;
 
 /*
  * Actions
  */
-include DOL_DOCUMENT_ROOT.'/core/actions_setmoduleoptions.inc.php';
-
 if ($action == 'updateMask')
 {
 	$maskconstpreventionplan = GETPOST('maskconstpreventionplan', 'alpha');
@@ -70,55 +69,20 @@ if ($action == 'updateMask')
 	}
 }
 
-// Activate a model
-elseif ($action == 'set')
-{
-	$label = GETPOST('label', 'alpha');
-
-	if ( $value == 'preventionplan_odt' ) {
-		$description = "DIGIRISKDOLIBARR_".strtoupper($type)."_ADDON_ODT_PATH";
-	} elseif ( $value == 'preventionplan_custom_odt' ) {
-		$description = "DIGIRISKDOLIBARR_".strtoupper($type)."_CUSTOM_ADDON_ODT_PATH";
-	}
-
-	addDocumentModel($value, $type, $label, $description);
-} elseif ($action == 'del')
-{
-	delDocumentModel($value, $type);
-}
-
-// Set default model
-elseif ($action == 'setdoc')
-{
-	$constforval = "DIGIRISKDOLIBARR_".strtoupper($type)."_DEFAULT_MODEL";
-	$label       = '';
-
-	if (dolibarr_set_const($db, $constforval, $value, 'chaine', 0, '', $conf->entity))
-	{
-		$conf->global->$constforval = $value;
-	}
-
-	// On active le modele
-	$ret = delDocumentModel($value, $type);
-
-	if ($ret > 0)
-	{
-		$ret = addDocumentModel($value, $type, $label);
-	}
-} elseif ($action == 'setmod')
+if ($action == 'setmod')
 {
 	$constforval = 'DIGIRISKDOLIBARR_'.strtoupper($type)."_ADDON";
 	dolibarr_set_const($db, $constforval, $value, 'chaine', 0, '', $conf->entity);
 }
+
 
 /*
  * View
  */
 
 $form            = new Form($db);
-$object_document = new DigiriskDocuments($db);
 
-$help_url  = 'FR:Module_DigiriskDolibarr#L.27onglet_Document_Digirisk';
+$help_url  = 'FR:Module_DigiriskDolibarr#L.27onglet_.C3.89l.C3.A9ment_Digirisk';
 $page_name = "DigiriskdolibarrSetup";
 
 llxHeader('', $langs->trans($page_name), $help_url);
@@ -130,9 +94,9 @@ print load_fiche_titre($langs->trans($page_name), $linkback, 'object_digiriskdol
 
 // Configuration header
 $head = digiriskdolibarrAdminPrepareHead();
-dol_fiche_head($head, 'digiriskdocuments', '', -1, "digiriskdolibarr@digiriskdolibarr");
-$head = digiriskdolibarrAdminDigiriskDocumentsPrepareHead();
-dol_fiche_head($head, 'preventionplan', '', -1, "digiriskdolibarr@digiriskdolibarr");
+dol_fiche_head($head, 'digiriskelement', '', -1, "digiriskdolibarr@digiriskdolibarr");
+$head = digiriskdolibarrAdminDigiriskElementPrepareHead();
+dol_fiche_head($head, 'preventionplandocument', '', -1, "digiriskdolibarr@digiriskdolibarr");
 
 /*
  *  Numbering module
@@ -151,7 +115,7 @@ print '</tr>'."\n";
 
 clearstatcache();
 
-$dir = dol_buildpath("/custom/digiriskdolibarr/core/modules/digiriskdolibarr/digiriskdocuments/".$type."/");
+$dir = dol_buildpath("/custom/digiriskdolibarr/core/modules/digiriskdolibarr/digiriskelement/".$type."/");
 if (is_dir($dir))
 {
 	$handle = opendir($dir);
@@ -228,143 +192,6 @@ if (is_dir($dir))
 			}
 		}
 		closedir($handle);
-	}
-}
-
-/*
-*  Documents models for Listing Risks Action
-*/
-
-print load_fiche_titre($langs->trans("DigiriskTemplateDocumentPreventionPlan"), '', '');
-
-// Defini tableau def des modeles
-$def = array();
-$sql = "SELECT nom";
-$sql .= " FROM ".MAIN_DB_PREFIX."document_model";
-$sql .= " WHERE type = '".$type."'";
-$sql .= " AND entity = ".$conf->entity;
-$resql = $db->query($sql);
-if ($resql)
-{
-	$i = 0;
-	$num_rows = $db->num_rows($resql);
-	while ($i < $num_rows)
-	{
-		$array = $db->fetch_array($resql);
-		array_push($def, $array[0]);
-		$i++;
-	}
-}
-else
-{
-	dol_print_error($db);
-}
-
-print '<table class="noborder centpercent">';
-print '<tr class="liste_titre">';
-print '<td>'.$langs->trans("Name").'</td>';
-print '<td>'.$langs->trans("Description").'</td>';
-print '<td class="center" width="60">'.$langs->trans("Status")."</td>\n";
-print '<td class="center" width="60">'.$langs->trans("Default")."</td>\n";
-print '<td class="center" width="80">'.$langs->trans("ShortInfo").'</td>';
-print '<td class="center" width="80">'.$langs->trans("Preview").'</td>';
-print "</tr>\n";
-
-clearstatcache();
-
-$dir = dol_buildpath("/custom/digiriskdolibarr/core/modules/digiriskdolibarr/digiriskdocuments/".$type."/");
-if (is_dir($dir))
-{
-	$handle = opendir($dir);
-	if (is_resource($handle))
-	{
-		while (($file = readdir($handle)) !== false)
-		{
-			$filelist[] = $file;
-		}
-		closedir($handle);
-		arsort($filelist);
-
-		foreach ($filelist as $file)
-		{
-			if (preg_match('/\.modules\.php$/i', $file) && preg_match('/^(pdf_|doc_)/', $file) && preg_match('/preventionplan/i', $file) && preg_match('/odt/i', $file))
-			{
-				if (file_exists($dir.'/'.$file))
-				{
-					$name = substr($file, 4, dol_strlen($file) - 16);
-					$classname = substr($file, 0, dol_strlen($file) - 12);
-
-					require_once $dir.'/'.$file;
-					$module = new $classname($db);
-
-					$modulequalified = 1;
-					if ($module->version == 'development' && $conf->global->MAIN_FEATURES_LEVEL < 2) $modulequalified = 0;
-					if ($module->version == 'experimental' && $conf->global->MAIN_FEATURES_LEVEL < 1) $modulequalified = 0;
-
-					if ($modulequalified)
-					{
-						print '<tr class="oddeven"><td width="100">';
-						print (empty($module->name) ? $name : $module->name);
-						print "</td><td>\n";
-						if (method_exists($module, 'info')) print $module->info($langs);
-						else print $module->description;
-						print '</td>';
-
-						// Active
-						if (in_array($name, $def))
-						{
-							print '<td class="center">'."\n";
-							print '<a href="'.$_SERVER["PHP_SELF"].'?action=del&amp;value='.$name.'&amp;scan_dir='.$module->scandir.'&amp;label='.urlencode($module->name).'">';
-							print img_picto($langs->trans("Enabled"), 'switch_on');
-							print '</a>';
-							print "</td>";
-						}
-						else
-						{
-							print '<td class="center">'."\n";
-							print '<a href="'.$_SERVER["PHP_SELF"].'?action=set&amp;value='.$name.'&amp;scan_dir='.$module->scandir.'&amp;label='.urlencode($module->name).'">'.img_picto($langs->trans("Disabled"), 'switch_off').'</a>';
-							print "</td>";
-						}
-
-						// Default
-						print '<td class="center">';
-						if ($conf->global->DIGIRISKDOLIBARR_PREVENTIONPLAN_DEFAULT_MODEL == $name)
-						{
-							print img_picto($langs->trans("Default"), 'on');
-						}
-						else
-						{
-							print '<a href="'.$_SERVER["PHP_SELF"].'?action=setdoc&amp;value='.$name.'&amp;scan_dir='.$module->scandir.'&amp;label='.urlencode($module->name).'" alt="'.$langs->trans("Default").'">'.img_picto($langs->trans("Disabled"), 'off').'</a>';
-						}
-						print '</td>';
-
-						// Info
-						$htmltooltip = ''.$langs->trans("Name").': '.$module->name;
-						$htmltooltip .= '<br>'.$langs->trans("Type").': '.($module->type ? $module->type : $langs->trans("Unknown"));
-						$htmltooltip .= '<br>'.$langs->trans("Width").'/'.$langs->trans("Height").': '.$module->page_largeur.'/'.$module->page_hauteur;
-						$htmltooltip .= '<br><br><u>'.$langs->trans("FeaturesSupported").':</u>';
-						$htmltooltip .= '<br>'.$langs->trans("Logo").': '.yn($module->option_logo, 1, 1);
-						print '<td class="center">';
-						print $form->textwithpicto('', $htmltooltip, -1, 0);
-						print '</td>';
-
-						// Preview
-						print '<td class="center">';
-						if ($module->type == 'pdf')
-						{
-							print '<a href="'.$_SERVER["PHP_SELF"].'?action=specimen&module='.$name.'">'.img_object($langs->trans("Preview"), 'intervention').'</a>';
-						}
-						else
-						{
-							print img_object($langs->trans("PreviewNotAvailable"), 'generic');
-						}
-						print '</td>';
-
-						print '</tr>';
-					}
-				}
-			}
-		}
 	}
 }
 

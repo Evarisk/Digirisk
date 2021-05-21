@@ -16,28 +16,28 @@
  */
 
 /**
- * \file        class/preventionplan.class.php
+ * \file        class/preventionplandocument.class.php
  * \ingroup     digiriskdolibarr
- * \brief       This file is a class file for PreventionPlan
+ * \brief       This file is a class file for PreventionPlanDocument
  */
 
-require_once DOL_DOCUMENT_ROOT.'/user/class/user.class.php';
 require_once DOL_DOCUMENT_ROOT.'/contact/class/contact.class.php';
-require_once DOL_DOCUMENT_ROOT.'/societe/class/societe.class.php';
 
 dol_include_once('/digiriskdolibarr/class/digiriskdocuments.class.php');
+dol_include_once('/digiriskdolibarr/class/digiriskresources.class.php');
+dol_include_once('/digiriskdolibarr/class/openinghours.class.php');
 
 /**
- * Class for PreventionPlan
+ * Class for PreventionPlanDocument
  */
-class PreventionPlan extends DigiriskDocuments
+class PreventionPlanDocument extends DigiriskDocuments
 {
 
 	/**
 	 * @var int  Does this object support multicompany module ?
 	 * 0=No test on entity, 1=Test with field entity, 'field@table'=Test with link by field@table
 	 */
-	public $element = 'preventionplan';
+	public $element = 'preventionplandocument';
 
 	/**
 	 * @var int  Does this object support multicompany module ?
@@ -51,9 +51,9 @@ class PreventionPlan extends DigiriskDocuments
 	public $isextrafieldmanaged = 1;
 
 	/**
-	 * @var string String with name of icon for preventionplan. Must be the part after the 'object_' into object_preventionplan.png
+	 * @var string String with name of icon for preventionplandocument. Must be the part after the 'object_' into object_preventionplandocument.png
 	 */
-	public $picto = 'preventionplan@digiriskdolibarr';
+	public $picto = 'preventionplandocument@digiriskdolibarr';
 
 	/**
 	 * Constructor
@@ -93,19 +93,27 @@ class PreventionPlan extends DigiriskDocuments
 			}
 		}
 	}
-	public function PreventionPlanFillJSON($intervenants_ids, $interventions_ids,$maitre_oeuvre_id ,$extsociety_id, $extresponsible_id,$extintervenant_ids,$morethan400hours,$imminentdanger,$date_debut,$date_fin,$location_id, $labour_inspector_id) {
+
+	public function PreventionPlanDocumentFillJSON($object) {
 
 		$maitre_oeuvre   = new User($this->db);
 		$extsociety      = new Societe($this->db);
 		$contacttmp      = new Contact($this->db);
 		$digiriskelement = new DigiriskElement($this->db);
+		$digiriskresources = new DigiriskResources($this->db);
+		$preventionplan = new PreventionPlan($this->db);
+		$id = GETPOST('id');
+		if ($id > 0) {
+			$preventionplan->fetch($id);
+		}
 
-		$extresponsible = $contacttmp;
-		$extintervenant = $contacttmp;
+		$maitre_oeuvre = $digiriskresources->fetchResourcesFromObject('PP_MAITRE_OEUVRE', $preventionplan);
 
-		if (!empty ($maitre_oeuvre_id) && $maitre_oeuvre_id > 0) {
+		$extsociety = $digiriskresources->fetchResourcesFromObject('PP_EXT_SOCIETY', $preventionplan);
+		$extresponsible = $digiriskresources->fetchResourcesFromObject('PP_EXT_SOCIETY_RESPONSIBLE', $preventionplan);
+		$extintervenants = 	$digiriskresources->fetchResourcesFromObject('PP_EXT_SOCIETY_INTERVENANTS', $preventionplan);
 
-			$maitre_oeuvre->fetch($maitre_oeuvre_id);
+		if ($maitre_oeuvre->id > 0) {
 
 			$json['PreventionPlan']['maitre_oeuvre']['user_id'] = $maitre_oeuvre->id;
 			$json['PreventionPlan']['maitre_oeuvre']['phone'] = $maitre_oeuvre->office_phone;
@@ -113,9 +121,7 @@ class PreventionPlan extends DigiriskDocuments
 			$json['PreventionPlan']['maitre_oeuvre']['signature_date'] = '';
 		}
 
-		if (!empty ($extsociety_id) && $extsociety_id > 0) {
-
-			$extsociety->fetch($extsociety_id);
+		if ($extsociety->id > 0) {
 
 			$json['PreventionPlan']['society_outside']['id']      = $extsociety->id;
 			$json['PreventionPlan']['society_outside']['name']    = $extsociety->name;
@@ -125,9 +131,7 @@ class PreventionPlan extends DigiriskDocuments
 			$json['PreventionPlan']['society_outside']['town']    = $extsociety->town;
 		}
 
-		if (!empty ($extresponsible_id) && $extresponsible_id > 0) {
-			$extresponsible_id = array_shift($extresponsible_id);
-			$extresponsible->fetch($extresponsible_id);
+		if ($extresponsible->id > 0) {
 
 			$json['PreventionPlan']['responsable_exterieur']['id']             = $extresponsible->id;
 			$json['PreventionPlan']['responsable_exterieur']['firstname']      = $extresponsible->firstname;
@@ -138,9 +142,8 @@ class PreventionPlan extends DigiriskDocuments
 			$json['PreventionPlan']['responsable_exterieur']['signature_date'] = '';
 		}
 
-		if (!empty ($extintervenant_ids) && $extintervenant_ids > 0) {
-			foreach ($extintervenant_ids as $extintervenant_id) {
-				$extintervenant->fetch($extintervenant_id);
+		if (!empty ($extintervenants) && $extintervenants > 0) {
+			foreach ($extintervenants as $extintervenant) {
 
 				$json['PreventionPlan']['intervenant_exterieur'][$extintervenant->id]['firstname']      = $extintervenant->firstname;
 				$json['PreventionPlan']['intervenant_exterieur'][$extintervenant->id]['lastname']       = $extintervenant->lastname;
@@ -151,31 +154,21 @@ class PreventionPlan extends DigiriskDocuments
 			}
 		}
 
-		$json['PreventionPlan']['date']['debut']       = $date_debut;
-		$json['PreventionPlan']['date']['fin']         = $date_fin;
-		$json['PreventionPlan']['more_than_400_hours'] = $morethan400hours;
-		$json['PreventionPlan']['imminent_danger']     = $imminentdanger;
-		$json['PreventionPlan']['labour_inspector']    = $imminentdanger;
+		$json['PreventionPlan']['date']['debut']       = $preventionplan->date_debut;
+		$json['PreventionPlan']['date']['fin']         = $preventionplan->date_fin;
+		$json['PreventionPlan']['more_than_400_hours'] = $preventionplan->morethan400hours;
+		$json['PreventionPlan']['imminent_danger']     = $preventionplan->imminentdanger;
+		$json['PreventionPlan']['labour_inspector']    = $preventionplan->imminentdanger;
 
-		if ($location_id > 0) {
-			$digiriskelement->fetch($location_id);
+		if ($preventionplan->fk_element > 0) {
+			$digiriskelement->fetch($object->fk_element);
 			$json['PreventionPlan']['location']['id']  = $digiriskelement->id;
 			$json['PreventionPlan']['location']['name'] = $digiriskelement->ref . ' - ' . $digiriskelement->label;
 		}
 
-	//@todo interventions et intervenants
+		//@todo interventions et intervenants
 
 		return json_encode($json, JSON_UNESCAPED_UNICODE);
 	}
 
-	/**
-	 *	Return label of contact status
-	 *
-	 *	@param      int		$mode       0=Long label, 1=Short label, 2=Picto + Short label, 3=Picto, 4=Picto + Long label, 5=Short label + Picto, 6=Long label + Picto
-	 * 	@return 	string				Label of contact status
-	 */
-	public function getLibStatut($mode)
-	{
-		return '';
-	}
 }

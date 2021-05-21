@@ -182,6 +182,9 @@ class DigiriskDocuments extends CommonObject
 			case "riskassessmentdocument":
 				$this->json = $this->RiskAssessmentDocumentFillJSON($object);
 				break;
+			case "preventionplandocument":
+				$this->json = $this->PreventionPlanDocumentFillJSON($object);
+				break;
 		}
 	}
 

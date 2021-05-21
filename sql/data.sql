@@ -2,7 +2,7 @@
 INSERT INTO llx_c_action_trigger (elementtype, code, label, description) VALUES ('informationssharing', 'INFORMATIONSSHARING_GENERATE', 'Informations Sharing Document Generated', 'Executed when a informations sharing document is generated');
 INSERT INTO llx_c_action_trigger (elementtype, code, label, description) VALUES ('firepermit', 'FIREPERMIT_GENERATE', 'Fire Permit Document Generated', 'Executed when a fire permit document is generated');
 INSERT INTO llx_c_action_trigger (elementtype, code, label, description) VALUES ('legaldisplay', 'LEGALDISPLAY_GENERATE', 'Legal Display Document Generated', 'Executed when a legal display document is generated');
-INSERT INTO llx_c_action_trigger (elementtype, code, label, description) VALUES ('preventionplan', 'PREVENTIONPLAN_GENERATE', 'Prevention Plan Document Generated', 'Executed when a prevention plan document is generated');
+INSERT INTO llx_c_action_trigger (elementtype, code, label, description) VALUES ('preventionplandocument', 'PREVENTIONPLAN_GENERATE', 'Prevention Plan Document Generated', 'Executed when a prevention plan document is generated');
 INSERT INTO llx_c_action_trigger (elementtype, code, label, description) VALUES ('groupmentdocument', 'GROUPMENTDOCUMENT_GENERATE', 'Groupment Document Generated', 'Executed when a groupment document is generated');
 INSERT INTO llx_c_action_trigger (elementtype, code, label, description) VALUES ('workunitdocument', 'WORKUNITDOCUMENT_GENERATE', 'Work Unit Document Generated', 'Executed when a work unit document is generated');
 INSERT INTO llx_c_action_trigger (elementtype, code, label, description) VALUES ('listingrisksphoto', 'LISTINGRISKSPHOTO_GENERATE', 'Listing risks photos Generated', 'Executed when a listing risks photos is generated');

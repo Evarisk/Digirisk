@@ -114,9 +114,9 @@ function digiriskdolibarrAdminDigiriskDocumentsPrepareHead()
 	$head[$h][2] = 'workunitdocument';
 	$h++;
 
-	$head[$h][0] = dol_buildpath("/digiriskdolibarr/admin/digiriskdocuments/preventionplan.php", 1);
-	$head[$h][1] = $langs->trans("PreventionPlan");
-	$head[$h][2] = 'preventionplan';
+	$head[$h][0] = dol_buildpath("/digiriskdolibarr/admin/digiriskdocuments/preventionplandocument.php", 1);
+	$head[$h][1] = $langs->trans("PreventionPlanDocument");
+	$head[$h][2] = 'preventionplandocument';
 	$h++;
 
 	$head[$h][0] = dol_buildpath("/digiriskdolibarr/admin/digiriskdocuments/firepermit.php", 1);
@@ -158,6 +158,10 @@ function digiriskdolibarrAdminDigiriskElementPrepareHead()
 	$head[$h][2] = 'evaluator';
 	$h++;
 
+	$head[$h][0] = dol_buildpath("/digiriskdolibarr/admin/digiriskelement/preventionplandocument.php", 1);
+	$head[$h][1] = $langs->trans("PreventionPlan");
+	$head[$h][2] = 'preventionplandocument';
+	$h++;
 	complete_head_from_modules($conf, $langs, null, $head, $h, 'digiriskdolibarr');
 
 	return $head;

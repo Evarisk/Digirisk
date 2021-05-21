@@ -50,7 +50,7 @@ function preventionplanPrepareHead($object)
 		$h++;
 	}
 
-	complete_head_from_modules($conf, $langs, $object, $head, $h, 'preventionplan@digiriskdolibarr');
+	complete_head_from_modules($conf, $langs, $object, $head, $h, 'preventionplandocument@digiriskdolibarr');
 
 	return $head;
 }

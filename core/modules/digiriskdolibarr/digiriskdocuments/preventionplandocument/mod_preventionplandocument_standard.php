@@ -17,7 +17,7 @@
  */
 
 /**
- *	\file       htdocs/custom/digiriskdolibarr/core/modules/digiriskdolibarr/mod_prevenetionplan_standard.php
+ *	\file       htdocs/custom/digiriskdolibarr/core/modules/digiriskdolibarr/mod_preventionplan_standard.php
  * \ingroup     digiriskdolibarr
  *	\brief      File containing class for numbering module Standard
  */
@@ -25,9 +25,9 @@
 dol_include_once('/custom/digiriskdolibarr/core/modules/digiriskdolibarr/digiriskdocuments/modules_digiriskdocuments.php');
 
 /**
- * 	Class to manage prevenetionplan numbering rules Standard
+ * 	Class to manage preventionplandocument numbering rules Standard
  */
-class mod_preventionplan_standard extends ModeleNumRefDigiriskDocuments
+class mod_preventionplandocument_standard extends ModeleNumRefDigiriskDocuments
 {
 	/**
 	 * Dolibarr version of the loaded document
@@ -38,12 +38,12 @@ class mod_preventionplan_standard extends ModeleNumRefDigiriskDocuments
 	/**
 	 * @var string document prefix
 	 */
-	public $prefix = 'PP';
+	public $prefix = 'PPD';
 
 	/**
 	 * @var string model name
 	 */
-	public $name = 'Japet';
+	public $name = 'Kiviuq';
 
 	/**
 	 * @var string Error code (or message)
@@ -59,7 +59,7 @@ class mod_preventionplan_standard extends ModeleNumRefDigiriskDocuments
 	{
 		global $langs;
 		$langs->load("digiriskdolibarr@digiriskdolibarr");
-		return $langs->trans('DigiriskPreventionPlanStandardModel', $this->prefix);
+		return $langs->trans('DigiriskPreventionPlanDocumentStandardModel', $this->prefix);
 	}
 
 	/**
@@ -100,14 +100,14 @@ class mod_preventionplan_standard extends ModeleNumRefDigiriskDocuments
 		}
 		else
 		{
-			dol_syslog("mod_prevenetionplan_standard::getNextValue", LOG_DEBUG);
+			dol_syslog("mod_preventionplan_standard::getNextValue", LOG_DEBUG);
 			return -1;
 		}
 
 		if ($max >= (pow(10, 4) - 1)) $num = $max + 1; // If counter > 9999, we do not format on 4 chars, we take number as it is
 		else $num = sprintf("%s", $max + 1);
 
-		dol_syslog("mod_prevenetionplan_standard::getNextValue return ".$this->prefix.$num);
+		dol_syslog("mod_preventionplan_standard::getNextValue return ".$this->prefix.$num);
 		return $this->prefix.$num;
 	}
 }

@@ -57,7 +57,7 @@ class modDigiriskdolibarr extends DolibarrModules
 		$this->descriptionlong = "Digirisk";
 		$this->editor_name     = 'Evarisk';
 		$this->editor_url      = 'https://evarisk.com';
-		$this->version         = '1.0.0';
+		$this->version         = '1.1.0';
 		$this->const_name      = 'MAIN_MODULE_'.strtoupper($this->name);
 		$this->picto           ='digiriskdolibarr@digiriskdolibarr';
 
@@ -101,8 +101,8 @@ class modDigiriskdolibarr extends DolibarrModules
 			"/ecm/digiriskdolibarr/riskassessmentdocument",
 			"/ecm/digiriskdolibarr/legaldisplay",
 			"/ecm/digiriskdolibarr/informationssharing",
-			"/ecm/digiriskdolibarr/firepermit",
-			"/ecm/digiriskdolibarr/preventionplan",
+			"/ecm/digiriskdolibarr/firepermitdocument",
+			"/ecm/digiriskdolibarr/preventionplandocument",
 			"/ecm/digiriskdolibarr/groupmentdocument",
 			"/ecm/digiriskdolibarr/workunitdocument",
 			"/ecm/digiriskdolibarr/listingrisksaction",
@@ -205,9 +205,14 @@ class modDigiriskdolibarr extends DolibarrModules
 			// CONST PREVENTION PLAN
 			80 => array('MAIN_AGENDA_ACTIONAUTO_PREVENTIONPLAN_CREATE','chaine',1,'', $conf->entity),
 			81 => array('DIGIRISKDOLIBARR_PREVENTIONPLAN_ADDON','chaine', 'mod_preventionplan_standard' ,'', $conf->entity),
-			82 => array('DIGIRISKDOLIBARR_PREVENTIONPLAN_ADDON_ODT_PATH','chaine', DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/documents/doctemplates/preventionplan/' ,'', $conf->entity),
-			83 => array('DIGIRISKDOLIBARR_PREVENTIONPLAN_CUSTOM_ADDON_ODT_PATH','chaine', DOL_DATA_ROOT . '/ecm/digiriskdolibarr/preventionplan/' ,'', $conf->entity),
-			84 => array('DIGIRISKDOLIBARR_PREVENTIONPLAN_DEFAULT_MODEL','chaine', 'preventionplan_odt' ,'', $conf->entity),
+
+
+			// CONST PREVENTION PLAN DOCUMENT
+			82 => array('MAIN_AGENDA_ACTIONAUTO_PREVENTIONPLANDOCUMENT_CREATE','chaine',1,'', $conf->entity),
+			83 => array('DIGIRISKDOLIBARR_PREVENTIONPLANDOCUMENT_ADDON','chaine', 'mod_preventionplandocument_standard' ,'', $conf->entity),
+			84 => array('DIGIRISKDOLIBARR_PREVENTIONPLANDOCUMENT_ADDON_ODT_PATH','chaine', DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/documents/doctemplates/preventionplandocument/' ,'', $conf->entity),
+			85 => array('DIGIRISKDOLIBARR_PREVENTIONPLANDOCUMENT_CUSTOM_ADDON_ODT_PATH','chaine', DOL_DATA_ROOT . '/ecm/digiriskdolibarr/preventionplandocument/' ,'', $conf->entity),
+			86 => array('DIGIRISKDOLIBARR_PREVENTIONPLANDOCUMENT_DEFAULT_MODEL','chaine', 'preventionplandocument_odt' ,'', $conf->entity),
 
 			// CONST FIREPERMIT
 			90 => array('MAIN_AGENDA_ACTIONAUTO_FIREPERMIT_CREATE','chaine',1,'', $conf->entity),
@@ -395,17 +400,17 @@ class modDigiriskdolibarr extends DolibarrModules
 
 		$this->rights[$r][0] = $this->numero.$r;
 		$this->rights[$r][1] = $langs->trans('ReadPreventionPlan');
-		$this->rights[$r][4] = 'preventionplan';
+		$this->rights[$r][4] = 'preventionplandocument';
 		$this->rights[$r][5] = 'read';
 		$r++;
 		$this->rights[$r][0] = $this->numero.$r;
 		$this->rights[$r][1] = $langs->trans('CreatePreventionPlan');
-		$this->rights[$r][4] = 'preventionplan';
+		$this->rights[$r][4] = 'preventionplandocument';
 		$this->rights[$r][5] = 'write';
 		$r++;
 		$this->rights[$r][0] = $this->numero.$r;
 		$this->rights[$r][1] = $langs->trans('DeletePreventionPlan');
-		$this->rights[$r][4] = 'preventionplan';
+		$this->rights[$r][4] = 'preventionplandocument';
 		$this->rights[$r][5] = 'delete';
 		$r++;
 
@@ -648,12 +653,14 @@ class modDigiriskdolibarr extends DolibarrModules
 		$this->_load_tables('/digiriskdolibarr/sql/digiriskdocuments/');
 		$this->_load_tables('/digiriskdolibarr/sql/digiriskelement/');
 		$this->_load_tables('/digiriskdolibarr/sql/riskanalysis/');
+		$this->_load_tables('/digiriskdolibarr/sql/preventionplandocument/');
+//		$this->_load_tables('/digiriskdolibarr/sql/firepermit/');
 
 		if ( $conf->global->DIGIRISKDOLIBARR_DOCUMENT_MODELS_SET ==  0 ) {
 			addDocumentModel('informationssharing_odt'   ,'informationssharing'   ,'ODT templates','DIGIRISKDOLIBARR_INFORMATIONSSHARING_ADDON_ODT_PATH');
 			addDocumentModel('legaldisplay_odt'          ,'legaldisplay'          ,'ODT templates','DIGIRISKDOLIBARR_LEGALDISPLAY_ADDON_ODT_PATH');
 			addDocumentModel('firepermit_odt'            ,'firepermit'            ,'ODT templates','DIGIRISKDOLIBARR_FIREPERMIT_ADDON_ODT_PATH');
-			addDocumentModel('preventionplan_odt'        ,'preventionplan'        ,'ODT templates','DIGIRISKDOLIBARR_PREVENTIONPLAN_ADDON_ODT_PATH');
+			addDocumentModel('preventionplandocument_odt','preventionplandocument'        ,'ODT templates','DIGIRISKDOLIBARR_PREVENTIONPLANDOCUMENT_ADDON_ODT_PATH');
 			addDocumentModel('groupmentdocument_odt'     ,'groupmentdocument'     ,'ODT templates','DIGIRISKDOLIBARR_GROUPMENTDOCUMENT_ADDON_ODT_PATH');
 			addDocumentModel('workunitdocument_odt'      ,'workunitdocument'      ,'ODT templates','DIGIRISKDOLIBARR_WORKUNITDOCUMENT_ADDON_ODT_PATH');
 			addDocumentModel('listingrisksaction_odt'    ,'listingrisksaction'    ,'ODT templates','DIGIRISKDOLIBARR_LISTINGRISKSACTION_ADDON_ODT_PATH');

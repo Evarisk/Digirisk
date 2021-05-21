@@ -18,7 +18,7 @@
 /**
  *   	\file       preventionplan_card.php
  *		\ingroup    digiriskdolibarr
- *		\brief      Page to create/edit/view preventionplan
+ *		\brief      Page to create/edit/view preventionplandocument
  */
 
 // Load Dolibarr environment
@@ -31,11 +31,13 @@ require_once DOL_DOCUMENT_ROOT.'/core/class/html.formfile.class.php';
 dol_include_once('/digiriskdolibarr/class/digiriskdocuments.class.php');
 dol_include_once('/digiriskdolibarr/class/digiriskelement.class.php');
 dol_include_once('/digiriskdolibarr/class/digiriskresources.class.php');
-dol_include_once('/digiriskdolibarr/class/digiriskdocuments/preventionplan.class.php');
+dol_include_once('/digiriskdolibarr/class/digiriskelement/preventionplan.class.php');
+dol_include_once('/digiriskdolibarr/class/digiriskdocuments/preventionplandocument.class.php');
 dol_include_once('/digiriskdolibarr/lib/digiriskdolibarr_function.lib.php');
 dol_include_once('/digiriskdolibarr/lib/digiriskdolibarr_preventionplan.lib.php');
-dol_include_once('/digiriskdolibarr/core/modules/digiriskdolibarr/digiriskdocuments/preventionplan/mod_preventionplan_standard.php');
-dol_include_once('/digiriskdolibarr/core/modules/digiriskdolibarr/digiriskdocuments/preventionplan/modules_preventionplan.php');
+dol_include_once('/digiriskdolibarr/core/modules/digiriskdolibarr/digiriskelement/preventionplan/mod_preventionplan_standard.php');
+dol_include_once('/digiriskdolibarr/core/modules/digiriskdolibarr/digiriskdocuments/preventionplandocument/mod_preventionplandocument_standard.php');
+dol_include_once('/digiriskdolibarr/core/modules/digiriskdolibarr/digiriskdocuments/preventionplandocument/modules_preventionplandocument.php');
 
 global $db, $conf, $langs;
 
@@ -55,10 +57,10 @@ $fk_parent           = GETPOST('fk_parent', 'int');
 
 // Initialize technical objects
 $object = new PreventionPlan($db);
+$preventionplandocument = new PreventionPlanDocument($db);
 
 $object->fetch($id);
 
-$preventionplan = new PreventionPlan($db);
 $digiriskelement = new DigiriskElement($db);
 $digiriskresources = new DigiriskResources($db);
 
@@ -101,39 +103,46 @@ if (empty($reshook))
 		$extsociety_id          = GETPOST('ext_society');
 		$extresponsible_id      = GETPOST('ext_society_responsible');
 		$extintervenant_ids     = GETPOST('ext_intervenants');
+		$labour_inspector_id    = GETPOST('labour_inspector');
 
+		$label                  = GETPOST('label');
 		$morethan400hours       = GETPOST('morethan400hours');
 		$imminentdanger         = GETPOST('imminent_danger');
-		$labour_inspector_id    = GETPOST('labour_inspector');
-		$location_id            = GETPOST('location');
 		$date_debut             = GETPOST('date_debut');
 		$date_fin               = GETPOST('date_fin');
+		$description 			= GETPOST('description');
 
 		$now = dol_now();
-		$preventionplan->ref           = $refPreventionPlanMod->getNextValue($preventionplan);
-		$preventionplan->ref_ext       = 'digirisk_' . $preventionplan->ref;
-		$preventionplan->date_creation = $preventionplan->db->idate($now);
-		$preventionplan->tms           = $now;
-		$preventionplan->import_key    = "";
-		$preventionplan->status        = 1;
-		$preventionplan->type          = $preventionplan->element;
-		$preventionplan->element       = $preventionplan->element . '@digiriskdolibarr';
+		$object->ref           = $refPreventionPlanMod->getNextValue($object);
+		$object->ref_ext       = 'digirisk_' . $object->ref;
+		$object->date_creation = $object->db->idate($now);
+		$object->tms           = $now;
+		$object->import_key    = "";
+		$object->status        = 1;
+		$object->label         = $label;
 
-		$preventionplan->fk_user_creat = $user->id ? $user->id : 1;
+		$date_debut = DateTime::createFromFormat('d/m/Y',$date_debut);
+		$date_fin = DateTime::createFromFormat('d/m/Y',$date_fin);
 
-		$digiriskelement = new DigiriskElement($db);
-		$digiriskelement->fetch($location_id);
-		$preventionplan->parent_id     = $digiriskelement->id;
-		$preventionplan->parent_type   = $digiriskelement->element_type;
+		$object->description   = $description;
+		$object->date_start    = dol_print_date($date_debut->getTimestamp(), 'dayhourrfc');
+		$object->date_end      = dol_print_date($date_fin->getTimestamp(), 'dayhourrfc');
+		$object->imminent_danger      = $imminentdanger;
+		$object->more_than_400_hours      = $morethan400hours;
 
-		//@todo interventions et intervenants
-
-		$preventionplan->json          = $preventionplan-> PreventionPlanFillJSON($intervenants_ids, $interventions_ids,$maitre_oeuvre_id ,$extsociety_id, $extresponsible_id,$extintervenant_ids,$morethan400hours,$imminentdanger,$date_debut,$date_fin,$location_id, $labour_inspector_id);
+		$object->fk_user_creat = $user->id ? $user->id : 1;
 
 		if (!$error) {
-			$result = $preventionplan->createCommon($user, true);
+			$result = $object->create($user, true);
 
 			if ($result > 0) {
+
+				$digiriskresources->digirisk_dolibarr_set_resources($db, $user->id, 'PP_MAITRE_OEUVRE', 'user', array($maitre_oeuvre_id), $conf->entity, 'preventionplan', $object->id, 1);
+				$digiriskresources->digirisk_dolibarr_set_resources($db, $user->id, 'PP_EXT_SOCIETY', 'societe', array($extsociety_id), $conf->entity, 'preventionplan', $object->id, 1);
+				$digiriskresources->digirisk_dolibarr_set_resources($db, $user->id, 'PP_EXT_SOCIETY_RESPONSIBLE', 'socpeople', $extresponsible_id, $conf->entity, 'preventionplan', $object->id, 1);
+				$digiriskresources->digirisk_dolibarr_set_resources($db, $user->id, 'PP_LABOUR_DOCTOR_ASSIGNED', 'societe', array($labour_inspector_id), $conf->entity, 'preventionplan', $object->id, 1);
+				$digiriskresources->digirisk_dolibarr_set_resources($db, $user->id, 'PP_EXT_SOCIETY_INTERVENANTS', 'socpeople', $extintervenant_ids, $conf->entity, 'preventionplan', $object->id, 1);
+
 				// Creation risk + evaluation + task OK
 				$urltogo = str_replace('__ID__', $result, $backtopage);
 				$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
@@ -143,8 +152,8 @@ if (empty($reshook))
 			else
 			{
 				// Creation risk KO
-				if (!empty($preventionplan->errors)) setEventMessages(null, $preventionplan->errors, 'errors');
-				else  setEventMessages($preventionplan->error, null, 'errors');
+				if (!empty($object->errors)) setEventMessages(null, $object->errors, 'errors');
+				else  setEventMessages($object->error, null, 'errors');
 			}
 		}
 	}
@@ -183,14 +192,14 @@ if (empty($reshook))
 		$moreparams['object'] = $object;
 		$moreparams['user']   = $user;
 
-		$result = $preventionplan->generateDocument($model, $outputlangs, $hidedetails, $hidedesc, $hideref, $moreparams);
+		$result = $preventionplandocument->generateDocument($model, $outputlangs, $hidedetails, $hidedesc, $hideref, $moreparams);
 		if ($result <= 0) {
 			setEventMessages($object->error, $object->errors, 'errors');
 			$action = '';
 		} else {
 			if (empty($donotredirect))
 			{
-				setEventMessages($langs->trans("FileGenerated") . ' - ' . $preventionplan->last_main_doc, null);
+				setEventMessages($langs->trans("FileGenerated") . ' - ' . $object->last_main_doc, null);
 
 				$urltoredirect = $_SERVER['REQUEST_URI'];
 				$urltoredirect = preg_replace('/#builddoc$/', '', $urltoredirect);
@@ -214,7 +223,7 @@ $emptyobject = new stdClass($db);
 $title        = $langs->trans("PreventionPlan");
 $title_create = $langs->trans("NewPreventionPlan");
 $title_edit   = $langs->trans("ModifyPreventionPlan");
-$object->picto = 'preventionplan@digiriskdolibarr';
+$object->picto = 'preventionplandocument@digiriskdolibarr';
 
 $help_url = 'FR:Module_DigiriskDolibarr';
 $morejs   = array("/digiriskdolibarr/js/digiriskdolibarr.js.php");
@@ -238,7 +247,7 @@ if ($action == 'create')
 
 	print '<table class="border centpercent tableforfieldcreate">'."\n";
 
-	$type = 'DIGIRISKDOLIBARR_'.strtoupper($preventionplan->element).'_ADDON';
+	$type = 'DIGIRISKDOLIBARR_'.strtoupper($object->element).'_ADDON';
 	$digirisk_addon = $conf->global->$type;
 	$modele = new $digirisk_addon($db);
 
@@ -246,7 +255,11 @@ if ($action == 'create')
 	print '<input hidden class="flat" type="text" size="36" name="ref" id="ref" value="'.$modele->getNextValue($object).'">';
 	print $modele->getNextValue($object);
 	print '</td></tr>';
-//	$intervenants, $preventions, $former_id,$maitre_oeuvre_id,$extintervenant,$intervenants_ids,$morethan400hours,$imminentdanger,$extsociety_id
+
+
+	print '<tr><td class="fieldrequired">'.$langs->trans("Label").'</td><td>';
+	print '<input class="flat" type="text" size="36" name="label" id="label" value="">';
+	print '</td></tr>';
 
 	//Maitre d'oeuvre
 	$userlist 	  = $form->select_dolusers('', '', 0, null, 0, '', '', 0, 0, 0, 'AND u.statut = 1', 0, '', '', 0, 1);
@@ -319,12 +332,12 @@ if ($action == 'create')
 
 	//Start Date -- Date début
 	print '<tr class="oddeven"><td><label for="date_debut">'.$langs->trans("StartDate").'</label></td><td>';
-	print $form->selectDate('', 'date_debut', 0, 0, 0);
+	print $form->selectDate('', 'date_debut', 1, 1, 0);
 	print '</td></tr>';
 
 	//End Date -- Date fin
 	print '<tr class="oddeven"><td><label for="date_fin">'.$langs->trans("EndDate").'</label></td><td>';
-	print $form->selectDate(dol_time_plus_duree(dol_now(),1,'y'), 'date_fin', 0, 0, 0);
+	print $form->selectDate(dol_time_plus_duree(dol_now(),1,'y'), 'date_fin', 1, 1, 0);
 	print '</td></tr>';
 
 	//Imminent danger -- Danger imminent
@@ -447,8 +460,59 @@ if ((empty($action) || ($action != 'edit' && $action != 'create')))
 	print '<div class="underbanner clearboth"></div>';
 	print '<table class="border centpercent tableforfield">' . "\n";
 
-	//JSON Decode and show fields
-	include DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/core/tpl/digiriskdolibarr_preventionplanfields_view.tpl.php';
+	unset($object->fields['element_type']);
+	unset($object->fields['fk_parent']);
+	unset($object->fields['last_main_doc']);
+	unset($object->fields['entity']);
+
+	//Creation User
+	include DOL_DOCUMENT_ROOT.'/core/tpl/commonfields_view.tpl.php';
+
+	//Master builder -- Maitre Oeuvre
+	print '<tr><td class="tdtop">';
+	print $langs->trans("MaitreOeuvre");
+	print '</td>';
+	print '<td>';
+	print $digiriskresources->fetchResourcesFromObject('PP_MAITRE_OEUVRE', $object)->getNomUrl(1);
+	print '<br>';
+	print '</td></tr>';
+
+	//External Society -- Société extérieure
+	print '<tr><td class="tdtop">';
+	print $langs->trans("ExtSociety");
+	print '</td>';
+	print '<td>';
+	print $digiriskresources->fetchResourcesFromObject('PP_EXT_SOCIETY', $object)->getNomUrl(1);
+	print '<br>';
+	print '</td></tr>';
+
+	//External Society Responsible -- Responsable Société extérieure
+	print '<tr><td class="tdtop">';
+	print $langs->trans("ExtSocietyResponsible");
+	print '</td>';
+	print '<td>';
+	print $digiriskresources->fetchResourcesFromObject('PP_EXT_SOCIETY_RESPONSIBLE', $object)->getNomUrl(1);
+	print '<br>';
+	print '</td></tr>';
+
+	//External Society Intervenants -- Intervenants Société extérieure
+	print '<tr><td class="tdtop">';
+	print $langs->trans("ExtSocietyIntervenants");
+	print '</td>';
+	print '<td>';
+	$contactList = 	$digiriskresources->fetchResourcesFromObject('PP_EXT_SOCIETY_INTERVENANTS', $object);
+
+	if (is_array($contactList) && !empty ($contactList) && $contactList > 0) {
+		foreach($contactList as $item) {
+			print $item->getNomUrl(1);
+			print '<br>';
+		}
+	} elseif (!empty ($contactList) && $contactList > 0){
+		print $contactList->getNomUrl(1);
+	}
+
+	print '<br>';
+	print '</td></tr>';
 
 	print '</table>';
 	print '</div>';
@@ -458,6 +522,7 @@ if ((empty($action) || ($action != 'edit' && $action != 'create')))
 
 
 	if ($object->id > 0) {
+		//@todo voler le showdocuments des digiriskelement
 		// Buttons for actions
 		print '<div class="tabsAction" >' . "\n";
 		$parameters = array();
@@ -477,15 +542,18 @@ if ((empty($action) || ($action != 'edit' && $action != 'create')))
 		// Document Generation -- Génération des documents
 		$includedocgeneration = 1;
 		if ($includedocgeneration) {
-			print '<div class="fichecenter"><div class="fichehalfleft elementDocument">';
+			print '<div class="fichecenter"><div class="fichehalfleft preventionplanDocument">';
 
 			$objref = dol_sanitizeFileName($object->ref);
-			$dir_files = $object->element . '/' . $objref;
+			$dir_files = $preventionplandocument->element . '/' . $objref;
 			$filedir = $upload_dir . '/' . $dir_files;
 			$urlsource = $_SERVER["PHP_SELF"] . '?id='. $id;
-			$modulepart = 'digiriskdolibarr:PreventionPlan';
 
-			print digiriskshowdocuments($modulepart, $dir_files, $filedir, $urlsource, $permissiontoadd, $permissiontodelete, $conf->global->DIGIRISKDOLIBARR_PREVENTIONPLAN_DEFAULT_MODEL, 1, 0, 28, 0, '', $title, '', $langs->defaultlang, '', $preventionplan);
+			$modulepart = 'digiriskdolibarr:PreventionPlanDocument';
+			$defaultmodel = $conf->global->DIGIRISKDOLIBARR_PREVENTIONPLANDOCUMENT_DEFAULT_MODEL;
+			$title = $langs->trans('PreventionPlanDocument');
+
+			print digiriskshowdocuments($modulepart, $dir_files, $filedir, $urlsource, $permissiontoadd, $permissiontodelete, $defaultmodel, 1, 0, 28, 0, '', $title, '', $langs->defaultlang, '', $preventionplandocument);
 		}
 
 

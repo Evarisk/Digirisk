@@ -17,7 +17,7 @@
  */
 
 /**
- *  \file			htdocs/core/modules/digiriskdolibarr/modules_preventionplan.php
+ *  \file			htdocs/core/modules/digiriskdolibarr/modules_preventionplandocument.php
  *  \ingroup		digiriskdolibarr
  *  \brief			File that contains parent class for preventionplans document models
  */
@@ -27,7 +27,7 @@ require_once DOL_DOCUMENT_ROOT . '/core/class/commondocgenerator.class.php';
 /**
  *	Parent class for documents models
  */
-abstract class ModeleODTPreventionPlan extends CommonDocGenerator
+abstract class ModeleODTPreventionPlanDocument extends CommonDocGenerator
 {
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
@@ -40,7 +40,7 @@ abstract class ModeleODTPreventionPlan extends CommonDocGenerator
 	 */
 	public static function liste_modeles($db, $maxfilenamelength = 0)
 	{
-		$type = 'preventionplan';
+		$type = 'preventionplandocument';
 		$list = array();
 
 		include_once DOL_DOCUMENT_ROOT . '/core/lib/functions2.lib.php';
