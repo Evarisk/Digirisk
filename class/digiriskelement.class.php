@@ -396,6 +396,9 @@ class DigiriskElement extends CommonObject
 
 		$sql .= " WHERE s.entity IN (".getEntity($this->table_element).")";
 		if ($filter) $sql .= " AND (".$filter.")";
+		if ($moreparam > 0 ) {
+			$sql .= " AND NOT s.rowid =" . $moreparam;
+		}
 		$sql .= $this->db->order("rowid", "ASC");
 		$sql .= $this->db->plimit($limit, 0);
 
