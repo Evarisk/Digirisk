@@ -389,7 +389,6 @@ class DigiriskElement extends CommonObject
 				$filter = '';
 			}
 		}
-
 		// On recherche les societes
 		$sql = "SELECT *";
 		$sql .= " FROM ".MAIN_DB_PREFIX."digiriskdolibarr_digiriskelement as s";
@@ -397,6 +396,12 @@ class DigiriskElement extends CommonObject
 		$sql .= " WHERE s.entity IN (".getEntity($this->table_element).")";
 		if ($filter) $sql .= " AND (".$filter.")";
 		if ($moreparam > 0 ) {
+			$children = $this->fetchDigiriskElementFlat($moreparam);
+			if (! empty($children) && $children > 0) {
+				foreach ($children as $key => $value) {
+					$sql .= " AND NOT s.rowid =" . $key;
+				}
+			}
 			$sql .= " AND NOT s.rowid =" . $moreparam;
 		}
 		$sql .= $this->db->order("rowid", "ASC");
