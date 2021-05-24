@@ -402,7 +402,7 @@ window.eoxiaJS.modal.openModal = function ( event ) {
  * @return {void}
  */
 window.eoxiaJS.modal.closeModal = function ( event ) {
-	$('.modal-active').removeClass('modal-active')
+	$(this).closest('.modal-active').removeClass('modal-active')
 	$('.notice').addClass('hidden');
 };
 

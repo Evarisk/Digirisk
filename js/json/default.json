@@ -118,7 +118,7 @@
 		},
 		{
 			"name": "Occurrence",
-			"description": "1 : Jamais arrivé 2 : Est déjà arrivé dans des circonstances exeptionnelles 3 : D&eacute;j&agrave; produit 2 fois 4 : Se produit tous les mois",
+			"description": "1 : Jamais arrivé 2 : Est déjà arrivé dans des circonstances exceptionnelles 3 : D&eacute;j&agrave; produit 2 fois 4 : Se produit tous les mois",
 			"option": {
 				"display_type": "slide",
 				"range": [
@@ -137,7 +137,7 @@
 							"seuil": "1"
 							},
 							{
-							"question": "Est déjà arrivé dans des circonstances exeptionnelles",
+							"question": "Est déjà arrivé dans des circonstances exceptionnelles",
 							"seuil": "2"
 							},
 							{
