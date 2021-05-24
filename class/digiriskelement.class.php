@@ -350,4 +350,112 @@ class DigiriskElement extends CommonObject
 			dol_print_error($this->db);
 		}
 	}
+
+	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+	/**
+	 *  Output html form to select a third party.
+	 *  Note, you must use the select_company to get the component to select a third party. This function must only be called by select_company.
+	 *
+	 *	@param	string	$selected       Preselected type
+	 *	@param  string	$htmlname       Name of field in form
+	 *  @param  string	$filter         Optional filters criteras (example: 's.rowid <> x', 's.client in (1,3)')
+	 *	@param	string	$showempty		Add an empty field (Can be '1' or text to use on empty line like 'SelectThirdParty')
+	 * 	@param	int		$showtype		Show third party type in combolist (customer, prospect or supplier)
+	 * 	@param	int		$forcecombo		Force to use standard HTML select component without beautification
+	 *  @param	array	$events			Event options. Example: array(array('method'=>'getContacts', 'url'=>dol_buildpath('/core/ajax/contacts.php',1), 'htmlname'=>'contactid', 'params'=>array('add-customer-contact'=>'disabled')))
+	 *  @param	string	$filterkey		Filter on key value
+	 *  @param	int		$outputmode		0=HTML select string, 1=Array
+	 *  @param	int		$limit			Limit number of answers
+	 *  @param	string	$morecss		Add more css styles to the SELECT component
+	 *	@param  string	$moreparam      Add more parameters onto the select tag. For example 'style="width: 95%"' to avoid select2 component to go over parent container
+	 *	@param  bool	$multiple       add [] in the name of element and add 'multiple' attribut
+	 * 	@return	string					HTML string with
+	 */
+	public function select_digiriskelement_list($selected = '', $htmlname = 'socid', $filter = '', $showempty = '', $showtype = 0, $forcecombo = 0, $events = array(), $filterkey = '', $outputmode = 0, $limit = 0, $morecss = 'minwidth100', $moreparam = '', $multiple = false)
+	{
+		// phpcs:enable
+		global $conf, $user, $langs;
+
+		$out = '';
+		$num = 0;
+		$outarray = array();
+
+		if ($selected === '') $selected = array();
+		elseif (!is_array($selected)) $selected = array($selected);
+
+		// Clean $filter that may contains sql conditions so sql code
+		if (function_exists('testSqlAndScriptInject')) {
+			if (testSqlAndScriptInject($filter, 3) > 0) {
+				$filter = '';
+			}
+		}
+
+		// On recherche les societes
+		$sql = "SELECT *";
+		$sql .= " FROM ".MAIN_DB_PREFIX."digiriskdolibarr_digiriskelement as s";
+
+		$sql .= " WHERE s.entity IN (".getEntity($this->table_element).")";
+		if ($filter) $sql .= " AND (".$filter.")";
+		$sql .= $this->db->order("rowid", "ASC");
+		$sql .= $this->db->plimit($limit, 0);
+
+		// Build output string
+		dol_syslog(get_class($this)."::select_digiriskelement_list", LOG_DEBUG);
+		$resql = $this->db->query($sql);
+		if ($resql)
+		{
+			if (!$forcecombo)
+			{
+				include_once DOL_DOCUMENT_ROOT.'/core/lib/ajax.lib.php';
+				$out .= ajax_combobox($htmlname, $events, 0);
+			}
+
+			// Construct $out and $outarray
+			$out .= '<select id="'.$htmlname.'" class="flat'.($morecss ? ' '.$morecss : '').'"'.($moreparam ? ' '.$moreparam : '').' name="'.$htmlname.($multiple ? '[]' : '').'" '.($multiple ? 'multiple' : '').'>'."\n";
+
+			$textifempty = (($showempty && !is_numeric($showempty)) ? $langs->trans($showempty) : '');
+			if ($showempty) $out .= '<option value="-1">'.$textifempty.'</option>'."\n";
+
+			$num = $this->db->num_rows($resql);
+			$i = 0;
+			if ($num)
+			{
+				while ($i < $num)
+				{
+					$obj = $this->db->fetch_object($resql);
+					$label = $obj->ref . ' - ' . $obj->label;
+
+
+					if (empty($outputmode))
+					{
+						if (in_array($obj->rowid, $selected))
+						{
+							$out .= '<option value="'.$obj->rowid.'" selected>'.$label.'</option>';
+						}
+						else
+						{
+							$out .= '<option value="'.$obj->rowid.'">'.$label.'</option>';
+						}
+					}
+					else
+					{
+						array_push($outarray, array('key'=>$obj->rowid, 'value'=>$label, 'label'=>$label));
+					}
+
+					$i++;
+					if (($i % 10) == 0) $out .= "\n";
+				}
+			}
+			$out .= '</select>'."\n";
+		}
+		else
+		{
+			dol_print_error($this->db);
+		}
+
+		$this->result = array('nbofdigiriskelement'=>$num);
+
+		if ($outputmode) return $outarray;
+		return $out;
+	}
 }

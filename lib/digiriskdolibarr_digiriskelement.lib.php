@@ -59,7 +59,7 @@ function digiriskelementPrepareHead($object)
 		}
 
 		$head[$h][0] = dol_buildpath("/digiriskdolibarr/digiriskelement_card.php", 1) . '?id=' . $object->id;
-		$head[$h][1] = '<i class="fas fa-info-circle"></i> ' . $langs->trans("Card") . ' ' . $object->ref;
+		$head[$h][1] = '<i class="fas fa-info-circle"></i> ' . $langs->trans("Card");
 		$head[$h][2] = 'elementCard';
 		$h++;
 

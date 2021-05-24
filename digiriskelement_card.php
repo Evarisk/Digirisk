@@ -298,7 +298,7 @@ if (($id || $ref) && $action == 'edit')
 
 	unset($object->fields['status']);
 	unset($object->fields['element_type']);
-	//unset($object->fields['fk_parent']);
+	unset($object->fields['fk_parent']);
 	unset($object->fields['last_main_doc']);
 	unset($object->fields['entity']);
 
@@ -309,6 +309,11 @@ if (($id || $ref) && $action == 'edit')
 
 	// Other attributes
 	include DOL_DOCUMENT_ROOT.'/core/tpl/extrafields_edit.tpl.php';
+
+	print '<tr><td>'.$langs->trans("ParentElement").'</td><td>';
+
+	print $object->select_digiriskelement_list('', 'fk_parent', 'element_type="groupment"', '',  0, 0, array(), '',  0,  0,  'minwidth100',  GETPOST('id'),  false);
+	print '</td></tr>';
 
 	print '</table>';
 
