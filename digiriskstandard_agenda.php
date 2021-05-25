@@ -69,6 +69,8 @@ if (!$sortorder) $sortorder = 'DESC,DESC';
 
 // Initialize technical objects
 $object = new DigiriskStandard($db);
+$emptyobject = new stdClass($db);
+
 $extrafields = new ExtraFields($db);
 
 $object->fetch($conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD);
@@ -147,7 +149,7 @@ if (true)
 	$morehtmlref = '<div class="refidno">';
 	$morehtmlref .= '</div>';
 	$width = 80; $cssclass = 'photoref';
-	$morehtmlleft = '<div class="floatleft inline-block valignmiddle divphotoref">'.digirisk_show_photos('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$entity].'/'.$object->element_type, 'small', 5, 0, 0, 0, $width,0, 0, 0, 0, $object->element_type, $object).'</div>';
+	$morehtmlleft .= '<div class="floatleft inline-block valignmiddle divphotoref">'.digirisk_show_photos('mycompany', $conf->mycompany->dir_output . '/logos', 'small', 1, 0, 0, 0, $width,0, 0, 0, 0, 'logos', $emptyobject).'</div>';
 
 	digirisk_banner_tab($object, 'ref', '', 0, 'ref', 'ref', $morehtmlref, '', 0, $morehtmlleft);
 

@@ -1384,12 +1384,55 @@ window.eoxiaJS.evaluation.deleteEvaluation = function ( event ) {
 	let element = $(this).closest('.risk-evaluation');
 	let deletedEvaluationId = element.attr('value');
 	let textToShow = element.find('.labelForDelete').val();
+	let actionContainerSuccess = $('.messageSuccessEvaluationDelete');
+	let actionContainerError = $('.messageErrorEvaluationDelete');
+	let evaluationID = element.attr('value');
 
 	var r = confirm(textToShow);
 	if (r == true) {
-		element.empty();
-		element.load( document.URL + '&action=deleteEvaluation&deletedEvaluationId=' + deletedEvaluationId + ' ' + element);
-	} else {
+
+		let elementParent = $(this).closest('.risk-evaluations-list-content');
+		let riskId = elementParent.attr('value');
+		let evaluationSingle = $('.risk-evaluation-single-content-'+riskId);
+		let evaluationRef =  $('.risk-evaluation-ref-'+evaluationID).attr('value');
+
+		window.eoxiaJS.loader.display($(this));
+		evaluationSingle.empty()
+
+		$.ajax({
+			url:document.URL + '&action=deleteEvaluation&deletedEvaluationId=' + deletedEvaluationId,
+			type: "POST",
+			processData: false,
+			contentType: false,
+			success: function ( ) {
+				elementParent.empty()
+
+				elementParent.load( document.URL + ' .risk-evaluations-list-'+riskId);
+				evaluationSingle.load( document.URL + ' .risk-evaluation-single-'+riskId);
+
+				elementParent.removeClass('wpeo-loader');
+
+				let textToShow = '';
+				textToShow += actionContainerSuccess.find('.valueForDeleteEvaluation1').val()
+				textToShow += evaluationRef
+				textToShow += actionContainerSuccess.find('.valueForDeleteEvaluation2').val()
+
+				actionContainerSuccess.find('.notice-subtitle .text').text(textToShow)
+				actionContainerSuccess.removeClass('hidden');
+			},
+			error: function ( ) {
+
+				let textToShow = '';
+				textToShow += actionContainerError.find('.valueForDeleteEvaluation1').val()
+				textToShow += evaluationRef
+				textToShow += actionContainerError.find('.valueForDeleteEvaluation2').val()
+
+				actionContainerError.find('.notice-subtitle .text').text(textToShow);
+				actionContainerError.removeClass('hidden');
+				}
+			});
+
+		} else {
 		return false;
 	}
 }
@@ -1690,11 +1733,55 @@ window.eoxiaJS.riskassessmenttask.createRiskAssessmentTask = function ( event ) 
 window.eoxiaJS.riskassessmenttask.deleteRiskAssessmentTask = function ( event ) {
 	let element = $(this).closest('.riskassessment-task');
 	let deletedRiskAssessmentTaskId = element.attr('value');
-	let textToShow = element.find('.labelForDelete').val()
+	let textToShow = element.find('.labelForDelete').val();
+	let actionContainerSuccess = $('.messageSuccessTaskDelete');
+	let actionContainerError = $('.messageErrorTaskDelete');
+	let evaluationID = element.attr('value');
+
 	var r = confirm(textToShow);
 	if (r == true) {
-		element.empty();
-		element.load( document.URL + '&action=deleteRiskAssessmentTask&deletedRiskAssessmentTaskId=' + deletedRiskAssessmentTaskId + ' ' + element);
+
+		let elementParent = $(this).closest('.riskassessment-task-list-content');
+		let riskId = elementParent.attr('value');
+		let evaluationSingle = $('.riskassessment-task-single-content-'+riskId);
+		let evaluationRef =  $('.riskassessment-task-ref-'+evaluationID).attr('value');
+
+		window.eoxiaJS.loader.display($(this));
+		evaluationSingle.empty()
+
+		$.ajax({
+			url: document.URL + '&action=deleteRiskAssessmentTask&deletedRiskAssessmentTaskId=' + deletedRiskAssessmentTaskId,
+			type: "POST",
+			processData: false,
+			contentType: false,
+			success: function ( ) {
+				elementParent.empty()
+
+				elementParent.load( document.URL + ' .riskassessment-task-list-'+riskId);
+				evaluationSingle.load( document.URL + ' .riskassessment-task-single-'+riskId);
+
+				elementParent.removeClass('wpeo-loader');
+
+				let textToShow = '';
+				textToShow += actionContainerSuccess.find('.valueForDeleteTask1').val()
+				textToShow += evaluationRef
+				textToShow += actionContainerSuccess.find('.valueForDeleteTask2').val()
+
+				actionContainerSuccess.find('.notice-subtitle .text').text(textToShow)
+				actionContainerSuccess.removeClass('hidden');
+			},
+			error: function ( ) {
+
+				let textToShow = '';
+				textToShow += actionContainerError.find('.valueForDeleteTask1').val()
+				textToShow += evaluationRef
+				textToShow += actionContainerError.find('.valueForDeleteTask2').val()
+
+				actionContainerError.find('.notice-subtitle .text').text(textToShow);
+				actionContainerError.removeClass('hidden');
+			}
+		});
+
 	} else {
 		return false;
 	}

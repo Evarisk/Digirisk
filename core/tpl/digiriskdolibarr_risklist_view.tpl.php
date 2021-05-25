@@ -922,6 +922,29 @@
 													<div class="notice-close"><i class="fas fa-times"></i></div>
 												</div>
 											</div>
+											<div class="messageSuccessEvaluationDelete notice hidden">
+												<input type="hidden" class="valueForDeleteEvaluation1" value="<?php echo $langs->trans('TheRiskAssessment') . ' ' ?>">
+												<input type="hidden" class="valueForDeleteEvaluation2" value="<?php echo ' ' . $langs->trans('HasBeenDeletedF') ?>">
+												<div class="wpeo-notice notice-success riskassessment-delete-success-notice">
+													<div class="notice-content">
+														<div class="notice-title"><?php echo $langs->trans('RiskAssessmentWellDeleted') ?></div>
+														<div class="notice-subtitle">
+															<span class="text"></span>
+														</div>
+													</div>
+													<div class="notice-close"><i class="fas fa-times"></i></div>
+												</div>
+											</div>
+											<div class="messageErrorEvaluationDelete notice hidden">
+												<input type="hidden" class="valueForDeleteEvaluation1" value="<?php echo $langs->trans('TheRiskAssessment') . ' ' ?>">
+												<input type="hidden" class="valueForDeleteEvaluation2" value="<?php echo ' ' . $langs->trans('HasNotBeenDeletedF') ?>">
+												<div class="wpeo-notice notice-warning riskassessment-delete-error-notice">
+													<div class="notice-content">
+														<div class="notice-title"><?php echo $langs->trans('RiskAssessmentNotDeleted') ?></div>
+													</div>
+													<div class="notice-close"><i class="fas fa-times"></i></div>
+												</div>
+											</div>
 											<div class="risk-evaluations-list-content" value="<?php echo $risk->id ?>">
 												<ul class="risk-evaluations-list risk-evaluations-list-<?php echo $risk->id ?>">
 													<?php if (!empty($cotationList)) :
@@ -1132,8 +1155,31 @@
 						</div>
 						<?php $cotation = new RiskAssessment($db);
 						$cotation->method = $lastEvaluation->method ? $lastEvaluation->method : "standard" ; ?>
-						<!-- RISK EVALUATION ADD MODAL-->
-						<div class="risk-evaluation-add-modal">
+
+					<?php } else { ?>
+						<div class="risk-evaluation-container">
+							<div class="risk-evaluation-single-content risk-evaluation-single-content-<?php echo $risk->id ?>">
+								<div class="risk-evaluation-single risk-evaluation-single-<?php echo $risk->id ?>">
+									<div class="risk-evaluation-content">
+										<div class="risk-evaluation-data">
+											<span class="name"><?php echo $langs->trans('NoRiskAssessment'); ?></span>
+										</div>
+									</div>
+									<?php if ($permissiontoadd) : ?>
+										<div class="risk-evaluation-add wpeo-button button-square-40 button-primary modal-open" value="<?php echo $risk->id ?>">
+											<i class="fas fa-plus button-icon"></i>
+										</div>
+									<?php else : ?>
+										<div class="wpeo-button button-square-40 button-grey wpeo-tooltip-event" aria-label="<?php echo $langs->trans('PermissionDenied') ?>" value="<?php echo $risk->id;?>">
+											<i class="fas fa-plus button-icon"></i>
+										</div>
+									<?php endif; ?>
+								</div>
+							</div>
+						</div>
+					<?php } ?>
+					<!-- RISK EVALUATION ADD MODAL-->
+					<div class="risk-evaluation-add-modal">
 							<div class="wpeo-modal modal-risk" id="risk_evaluation_add<?php echo $risk->id?>">
 								<div class="modal-container wpeo-modal-event">
 									<!-- Modal-Header -->
@@ -1169,7 +1215,7 @@
 											<div class="risk-evaluation-content-wrapper">
 												<div class="risk-evaluation-content">
 													<div class="cotation-container">
-														<div class="cotation-standard" style="<?php echo ($cotation->method == "standard") ? " display:block" : " display:none" ?>">
+														<div class="cotation-standard" style="<?php echo ($cotation->method !== "advanced") ? " display:block" : " display:none" ?>">
 															<span class="title"><i class="fas fa-chart-line"></i><?php echo ' ' . $langs->trans('Cotation'); ?><required>*</required></span>
 															<div class="cotation-listing wpeo-gridlayout grid-4 grid-gap-0">
 																<?php
@@ -1243,7 +1289,8 @@
 											</div>
 										</div>
 										<!-- RISK EVALUATION SINGLE -->
-										<div class="risk-evaluation-container risk-evaluation-container-<?php echo $risk->ref ?>">
+										<?php if (!empty($lastEvaluation) && $lastEvaluation > 0) : ?>
+											<div class="risk-evaluation-container risk-evaluation-container-<?php echo $risk->ref ?>">
 											<h2><?php echo $langs->trans('LastRiskAssessment') . ' ' . $risk->ref; ?></h2>
 											<div class="risk-evaluation-single-content risk-evaluation-single-content-<?php echo $risk->id ?>">
 												<div class="risk-evaluation-single">
@@ -1279,6 +1326,7 @@
 												</div>
 											</div>
 										</div>
+										<?php endif; ?>
 									</div>
 									<!-- Modal-Footer -->
 									<div class="modal-footer">
@@ -1295,26 +1343,6 @@
 								</div>
 							</div>
 						</div>
-					<?php } else { ?>
-						<div class="risk-evaluation-container">
-							<div class="risk-evaluation-single">
-								<div class="risk-evaluation-content">
-									<div class="risk-evaluation-data">
-										<span class="name"><?php echo $langs->trans('NoRiskAssessment'); ?></span>
-									</div>
-								</div>
-								<?php if ($permissiontoadd) : ?>
-									<div class="risk-evaluation-add wpeo-button button-square-40 button-primary modal-open" value="<?php echo $risk->id ?>">
-										<i class="fas fa-plus button-icon"></i>
-									</div>
-								<?php else : ?>
-									<div class="wpeo-button button-square-40 button-grey wpeo-tooltip-event" aria-label="<?php echo $langs->trans('PermissionDenied') ?>" value="<?php echo $risk->id;?>">
-										<i class="fas fa-plus button-icon"></i>
-									</div>
-								<?php endif; ?>
-							</div>
-						</div>
-					<?php } ?>
 				<?php }
 
 				elseif ($key == 'has_tasks' && $conf->global->DIGIRISKDOLIBARR_TASK_MANAGEMENT) { ?>
@@ -1386,6 +1414,29 @@
 												<div class="wpeo-notice notice-warning riskassessment-task-edit-error-notice">
 													<div class="notice-content">
 														<div class="notice-title"><?php echo $langs->trans('TaskNotEdited') ?></div>
+													</div>
+													<div class="notice-close"><i class="fas fa-times"></i></div>
+												</div>
+											</div>
+											<div class="messageSuccessTaskDelete notice hidden">
+												<input type="hidden" class="valueForDeleteTask1" value="<?php echo $langs->trans('TheTask') . ' ' ?>">
+												<input type="hidden" class="valueForDeleteTask2" value="<?php echo ' ' . $langs->trans('HasBeenDeletedF') ?>">
+												<div class="wpeo-notice notice-success riskassessment-task-delete-success-notice">
+													<div class="notice-content">
+														<div class="notice-title"><?php echo $langs->trans('TaskWellDeleted') ?></div>
+														<div class="notice-subtitle">
+															<span class="text"></span>
+														</div>
+													</div>
+													<div class="notice-close"><i class="fas fa-times"></i></div>
+												</div>
+											</div>
+											<div class="messageErrorTaskDelete notice hidden">
+												<input type="hidden" class="valueForDeleteTask1" value="<?php echo $langs->trans('TheTask') . ' ' ?>">
+												<input type="hidden" class="valueForDeleteTask2" value="<?php echo ' ' . $langs->trans('HasNotBeenDeletedF') ?>">
+												<div class="wpeo-notice notice-warning riskassessment-task-delete-error-notice">
+													<div class="notice-content">
+														<div class="notice-title"><?php echo $langs->trans('TaskNotDeleted') ?></div>
 													</div>
 													<div class="notice-close"><i class="fas fa-times"></i></div>
 												</div>
@@ -1488,22 +1539,24 @@
 						</div>
 					<?php else : ?>
 						<div class="riskassessment-task-container">
-							<div class="riskassessment-task-single">
-								<div class="riskassessment-task-content">
-									<div class="riskassessment-task-data">
-										<span class="name"><?php echo $langs->trans('NoTaskLinked'); ?></span>
+							<div class="riskassessment-task-single-content riskassessment-task-single-content-<?php echo $risk->id ?>">
+								<div class="riskassessment-task-single riskassessment-task-single-<?php echo $risk->id ?>">
+									<div class="riskassessment-task-content">
+										<div class="riskassessment-task-data">
+											<span class="name"><?php echo $langs->trans('NoTaskLinked'); ?></span>
+										</div>
 									</div>
+									<!-- BUTTON MODAL RISK ASSESSMENT TASK ADD  -->
+									<?php if ($permissiontoadd) : ?>
+										<div class="riskassessment-task-add wpeo-button button-square-40 button-primary modal-open" value="<?php echo $risk->id;?>">
+											<i class="fas fa-plus button-icon"></i>
+										</div>
+									<?php else : ?>
+										<div class="wpeo-button button-square-40 button-grey wpeo-tooltip-event" aria-label="<?php echo $langs->trans('PermissionDenied') ?>" value="<?php echo $risk->id;?>">
+											<i class="fas fa-plus button-icon"></i>
+										</div>
+									<?php endif; ?>
 								</div>
-								<!-- BUTTON MODAL RISK ASSESSMENT TASK ADD  -->
-								<?php if ($permissiontoadd) : ?>
-									<div class="riskassessment-task-add wpeo-button button-square-40 button-primary modal-open" value="<?php echo $risk->id;?>">
-										<i class="fas fa-plus button-icon"></i>
-									</div>
-								<?php else : ?>
-									<div class="wpeo-button button-square-40 button-grey wpeo-tooltip-event" aria-label="<?php echo $langs->trans('PermissionDenied') ?>" value="<?php echo $risk->id;?>">
-										<i class="fas fa-plus button-icon"></i>
-									</div>
-								<?php endif; ?>
 							</div>
 						</div>
 					<?php endif; ?>
