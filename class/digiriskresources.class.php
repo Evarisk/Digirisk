@@ -157,6 +157,8 @@ class DigiriskResources extends CommonObject
 			$sql .= " SET status = 0";
 			$sql .= " WHERE ref = " . $db->encrypt($ref, 1);
 			if ($entity >= 0) $sql .= " AND entity = " . $entity;
+			$sql .= ' AND object_type = '. "'" . $object_type . "'";
+			$sql .= ' AND object_id = '.$object_id;
 			//RAJOUTER LIGNE POUR LE SELECT ENTITY
 		}
 
@@ -213,9 +215,14 @@ class DigiriskResources extends CommonObject
 
 		$sql = 'SELECT '.$this->getFieldList();
 		$sql .= ' FROM '.MAIN_DB_PREFIX.$this->table_element;
-		$sql .= ' WHERE ref = '. "'" . $ref . "'";
+		if (dol_strlen($ref)) {
+			$sql .= ' WHERE ref = '. "'" . $ref . "'";
+		} else {
+			$sql .= ' WHERE 1 = 1';
+		}
 		$sql .= ' AND object_type = '. "'" . $object->element . "'";
 		$sql .= ' AND object_id = '.$object->id;
+		$sql .= ' AND status = 1';
 		if (empty($id) && isset($this->ismultientitymanaged) && $this->ismultientitymanaged == 1) $sql .= ' AND entity IN ('.getEntity($this->table_element).')';
 
 		$res = $this->db->query($sql);
@@ -224,7 +231,6 @@ class DigiriskResources extends CommonObject
 		{
 
 			if ($res->num_rows > 1) {
-				$limit = 5;
 				$num = $this->db->num_rows($res);
 				$i = 0;
 				while ($i < ($limit ? min($limit, $num) : $num)) {
@@ -243,7 +249,7 @@ class DigiriskResources extends CommonObject
 
 					$resourcetmp->fetch($record->element_id);
 
-					$records[$record->id] = $resourcetmp;
+					$records[$record->ref][$record->id] = $resourcetmp;
 
 					$i++;
 				}

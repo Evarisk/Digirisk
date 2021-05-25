@@ -160,8 +160,60 @@ if (empty($reshook))
 
 	// Action to add record
 	if ($action == 'update' && $permissiontoadd) {
-//		GETPOST machin
-//		appel de digiriskfilljson
+
+		$maitre_oeuvre_id       = GETPOST('maitre_oeuvre');
+		$extsociety_id          = GETPOST('ext_society');
+		$extresponsible_id      = GETPOST('ext_society_responsible');
+		$extintervenant_ids     = GETPOST('ext_intervenants');
+		$labour_inspector_id    = GETPOST('labour_inspector');
+
+		$label                  = GETPOST('label');
+		$morethan400hours       = GETPOST('morethan400hours');
+		$imminentdanger         = GETPOST('imminent_danger');
+		$date_debut             = GETPOST('date_debut');
+		$date_fin               = GETPOST('date_fin');
+		$description 			= GETPOST('description');
+
+		$now = dol_now();
+		$object->ref           = $refPreventionPlanMod->getNextValue($object);
+		$object->tms           = $now;
+		$object->label         = $label;
+
+		$date_debut = DateTime::createFromFormat('d/m/Y',$date_debut);
+		$date_fin = DateTime::createFromFormat('d/m/Y',$date_fin);
+
+		$object->description   = $description;
+		$object->date_start    = dol_print_date($date_debut->getTimestamp(), 'dayhourrfc');
+		$object->date_end      = dol_print_date($date_fin->getTimestamp(), 'dayhourrfc');
+		$object->imminent_danger      = $imminentdanger;
+		$object->more_than_400_hours      = $morethan400hours;
+
+		$object->fk_user_creat = $user->id ? $user->id : 1;
+
+		if (!$error) {
+			$result = $object->update($user, true);
+
+			if ($result > 0) {
+
+				$digiriskresources->digirisk_dolibarr_set_resources($db, $user->id, 'PP_MAITRE_OEUVRE', 'user', array($maitre_oeuvre_id), $conf->entity, 'preventionplan', $object->id, 0);
+				$digiriskresources->digirisk_dolibarr_set_resources($db, $user->id, 'PP_EXT_SOCIETY', 'societe', array($extsociety_id), $conf->entity, 'preventionplan', $object->id, 0);
+				$digiriskresources->digirisk_dolibarr_set_resources($db, $user->id, 'PP_EXT_SOCIETY_RESPONSIBLE', 'socpeople', $extresponsible_id, $conf->entity, 'preventionplan', $object->id, 0);
+				$digiriskresources->digirisk_dolibarr_set_resources($db, $user->id, 'PP_LABOUR_DOCTOR_ASSIGNED', 'societe', array($labour_inspector_id), $conf->entity, 'preventionplan', $object->id, 0);
+				$digiriskresources->digirisk_dolibarr_set_resources($db, $user->id, 'PP_EXT_SOCIETY_INTERVENANTS', 'socpeople', $extintervenant_ids, $conf->entity, 'preventionplan', $object->id, 0);
+
+				// Creation risk + evaluation + task OK
+				$urltogo = str_replace('__ID__', $result, $backtopage);
+				$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
+				header("Location: " . $urltogo);
+				exit;
+			}
+			else
+			{
+				// Creation risk KO
+				if (!empty($object->errors)) setEventMessages(null, $object->errors, 'errors');
+				else  setEventMessages($object->error, null, 'errors');
+			}
+		}
 	}
 
 	// Action to add record
@@ -310,14 +362,6 @@ if ($action == 'create')
 	$intervention_ids         = GETPOST('prevention_ids');
 	$intervenants_ids       = GETPOST('intervenants_ids');
 
-	//Location
-	print '<tr><td class="tdtop">';
-	print $langs->trans("Location");
-	print '</td>';
-	print '<td>';
-	print $digiriskelement->select_digiriskelement_list('', 'location');
-	print '<br>';
-	print '</td></tr>';
 
 	// Duration
 	print '<tr><td class="tdtop">';
@@ -404,14 +448,124 @@ if (($id || $ref) && $action == 'edit')
 	unset($object->fields['last_main_doc']);
 	unset($object->fields['entity']);
 
+	$object_resources = $digiriskresources->fetchResourcesFromObject('', $object);
+
 	print '<table class="border centpercent tableforfieldedit">'."\n";
 
-	// Common attributes
-	include DOL_DOCUMENT_ROOT.'/core/tpl/commonfields_edit.tpl.php';
+	print '<tr><td class="fieldrequired">'.$langs->trans("Ref").'</td><td>';
+	print $object->ref;
+	print '</td></tr>';
+
+
+	print '<tr><td class="fieldrequired">'.$langs->trans("Label").'</td><td>';
+	print '<input class="flat" type="text" size="36" name="label" id="label" value="'.$object->label.'">';
+	print '</td></tr>';
+
+	//Maitre d'oeuvre
+	$userlist 	  = $form->select_dolusers(is_array($object_resources) ? array_shift($object_resources['PP_MAITRE_OEUVRE'])->id : '', '', 0, null, 0, '', '', 0, 0, 0, 'AND u.statut = 1', 0, '', '', 0, 1);
+
+	print '<tr>';
+	print '<td style="width:10%">'.$form->editfieldkey('MaitreOeuvre', 'MaitreOeuvre_id', '', $object, 0).'</td>';
+	print '<td class="maxwidthonsmartphone">';
+
+	if (!GETPOSTISSET('backtopage')) print ' <a href="'.DOL_URL_ROOT.'/user/card.php?action=create&backtopage='.urlencode($_SERVER["PHP_SELF"].'?action=create').'"><span class="fa fa-plus-circle valignmiddle paddingleft" title="'.$langs->trans("AddThirdParty").'"></span></a>';
+
+	print $form->selectarray('maitre_oeuvre', $userlist, 0, null, null, null, null, "40%");
+
+	print '</td></tr>';
+
+	//External society -- Société extérieure
+	print '<tr><td class="tdtop">';
+	print $langs->trans("ExternalSociety");
+	print '</td>';
+
+	print '<td>';
+	if (!GETPOSTISSET('backtopage')) print ' <a href="'.DOL_URL_ROOT.'/societe/card.php?action=create&backtopage='.urlencode($_SERVER["PHP_SELF"].'?action=create').'"><span class="fa fa-plus-circle valignmiddle paddingleft" title="'.$langs->trans("AddThirdParty").'"></span></a>';
+
+	$events = array();
+	$events[1] = array('method' => 'getContacts', 'url' => dol_buildpath('/core/ajax/contacts.php?showempty=1', 1), 'htmlname' => 'ext_society_responsible', 'params' => array('add-customer-contact' => 'disabled'));
+	$events[2] = array('method' => 'getContacts', 'url' => dol_buildpath('/core/ajax/contacts.php?showempty=1', 1), 'htmlname' => 'ext_intervenants', 'params' => array('add-customer-contact' => 'disabled'));
+	//For external user force the company to user company
+	if (!empty($user->socid)) {
+		print $form->select_company($user->socid, 'ext_society', '', 1, 1, 0, $events, 0, 'minwidth300');
+	} else {
+		$ext_society_id = is_array($object_resources) ? array_shift($object_resources['PP_EXT_SOCIETY'])->id : '';
+
+		print $form->select_company($ext_society_id, 'ext_society', '', 'SelectThirdParty', 1, 0, $events, 0, 'minwidth300');
+	}	print '<br>';
+
+	print '</td></tr>';
+
+	//External responsible -- Responsable de la société extérieure
+	$ext_society_responsible_id = is_array($object_resources) ? array_shift($object_resources['PP_EXT_SOCIETY_RESPONSIBLE'])->id : '';
+	print '<tr class="oddeven"><td>'.$langs->trans("ExternalSocietyResponsible").'</td><td>';
+	print $form->selectcontacts(GETPOST('ext_society', 'int'), $ext_society_responsible_id, 'ext_society_responsible[]', 1, '', '', 0, 'quatrevingtpercent', false, 0, array(), false, '', 'ext_society_responsible');
+
+	print '</td></tr>';
+
+	//Intervenants extérieurs
+	$resources_ids = array();
+
+	if (!empty ($object_resources['PP_EXT_SOCIETY_INTERVENANTS']) && $object_resources['PP_EXT_SOCIETY_INTERVENANTS'] > 0) {
+		foreach ($object_resources['PP_EXT_SOCIETY_INTERVENANTS'] as $resource) {
+			$resources_ids[] = $resource->id;
+		}
+	}
+	print '<tr class="oddeven"><td>'.$langs->trans("ExternalIntervenants").'</td><td>';
+	print $form->selectcontacts(GETPOST('ext_society', 'int'),$resources_ids, 'ext_intervenants[]', 1, '', '', 0, 'quatrevingtpercent', false, 0, array(), false, 'multiple', 'ext_intervenants');
+
+	print '</td></tr>';
+
+	// Duration
+	print '<tr><td class="tdtop">';
+	print $langs->trans("Durée");
+	print '</td>';
+	print '<td>';
+	print '<input type="checkbox" id="morethan400hours" name="morethan400hours"'.($object->more_than_400_hours ? ' checked=""' : '').'"> ';
+	$htmltext = $langs->trans("PreventionPlanLastsMoreThan400Hours");
+	print $form->textwithpicto($langs->trans("MoreThan400Hours"), $htmltext);
+	print '<br>';
+	print '</td></tr>';
+
+	//Start Date -- Date début
+	print '<tr class="oddeven"><td><label for="date_debut">'.$langs->trans("StartDate").'</label></td><td>';
+	print $form->selectDate('', 'date_debut', 1, 1, 0);
+	print '</td></tr>';
+
+	//End Date -- Date fin
+	print '<tr class="oddeven"><td><label for="date_fin">'.$langs->trans("EndDate").'</label></td><td>';
+	print $form->selectDate(dol_time_plus_duree(dol_now(),1,'y'), 'date_fin', 1, 1, 0);
+	print '</td></tr>';
+
+	//Imminent danger -- Danger imminent
+	print '<tr><td class="tdtop">';
+	print $langs->trans("ImminentDanger");
+	print '</td>';
+	print '<td>';
+	print '<input type="checkbox" id="imminent_danger" name="imminent_danger" '.($object->imminent_danger ? ' checked=""' : '').'"> ';
+	$htmltext = $langs->trans("ImminentDanger");
+	print $form->textwithpicto('', $htmltext);
+	print '<br>';
+	print '</td></tr>';
+
+	//Labour inspector -- Inspecteur du travail
+	print '<tr><td class="tdtop">';
+	print $langs->trans("LabourInspector");
+	print '</td>';
+	print '<td>';
+
+	//For external user force the company to user company
+	if (!empty($user->socid)) {
+		print $form->select_company($user->socid, 'labour_inspector', '', 1, 1, 0, $events, 0, 'minwidth300');
+	} else {
+
+		print $form->select_company($digiriskresources->digirisk_dolibarr_fetch_resource('SAMU'), 'labour_inspector', '', 'SelectThirdParty', 1, 0, $events, 0, 'minwidth300');
+	}	print '<br>';
+
+	print '</td></tr>';
 
 	// Other attributes
-	include DOL_DOCUMENT_ROOT.'/core/tpl/extrafields_edit.tpl.php';
-
+	include DOL_DOCUMENT_ROOT.'/core/tpl/extrafields_add.tpl.php';
 	print '</table>';
 
 	dol_fiche_end();
@@ -473,7 +627,12 @@ if ((empty($action) || ($action != 'edit' && $action != 'create')))
 	print $langs->trans("MaitreOeuvre");
 	print '</td>';
 	print '<td>';
-	print $digiriskresources->fetchResourcesFromObject('PP_MAITRE_OEUVRE', $object)->getNomUrl(1);
+	$master_builder = $digiriskresources->fetchResourcesFromObject('PP_MAITRE_OEUVRE', $object);
+
+	if ($master_builder > 0) {
+
+		print $master_builder->getNomUrl(1);
+	}
 	print '<br>';
 	print '</td></tr>';
 
@@ -482,7 +641,10 @@ if ((empty($action) || ($action != 'edit' && $action != 'create')))
 	print $langs->trans("ExtSociety");
 	print '</td>';
 	print '<td>';
-	print $digiriskresources->fetchResourcesFromObject('PP_EXT_SOCIETY', $object)->getNomUrl(1);
+	$ext_society = $digiriskresources->fetchResourcesFromObject('PP_EXT_SOCIETY', $object);
+	if ($ext_society > 0) {
+		print $digiriskresources->fetchResourcesFromObject('PP_EXT_SOCIETY', $object)->getNomUrl(1);
+	}
 	print '<br>';
 	print '</td></tr>';
 
@@ -491,7 +653,10 @@ if ((empty($action) || ($action != 'edit' && $action != 'create')))
 	print $langs->trans("ExtSocietyResponsible");
 	print '</td>';
 	print '<td>';
-	print $digiriskresources->fetchResourcesFromObject('PP_EXT_SOCIETY_RESPONSIBLE', $object)->getNomUrl(1);
+	$ext_society_responsible = $digiriskresources->fetchResourcesFromObject('PP_EXT_SOCIETY_RESPONSIBLE', $object);
+	if ($ext_society_responsible > 0) {
+		print $ext_society_responsible->getNomUrl(1);
+	}
 	print '<br>';
 	print '</td></tr>';
 
@@ -500,15 +665,16 @@ if ((empty($action) || ($action != 'edit' && $action != 'create')))
 	print $langs->trans("ExtSocietyIntervenants");
 	print '</td>';
 	print '<td>';
-	$contactList = 	$digiriskresources->fetchResourcesFromObject('PP_EXT_SOCIETY_INTERVENANTS', $object);
+	$ext_society_intervenants = $digiriskresources->fetchResourcesFromObject('PP_EXT_SOCIETY_INTERVENANTS', $object);
 
-	if (is_array($contactList) && !empty ($contactList) && $contactList > 0) {
-		foreach($contactList as $item) {
-			print $item->getNomUrl(1);
+	if (is_array($ext_society_intervenants) && !empty ($ext_society_intervenants) && $ext_society_intervenants > 0) {
+		$ext_society_intervenants = array_shift($ext_society_intervenants);
+		foreach($ext_society_intervenants as $ext_society_intervenant) {
+			print $ext_society_intervenant->getNomUrl(1);
 			print '<br>';
 		}
-	} elseif (!empty ($contactList) && $contactList > 0){
-		print $contactList->getNomUrl(1);
+	} elseif (!empty ($ext_society_intervenants) && $ext_society_intervenants > 0){
+		print $ext_society_intervenants->getNomUrl(1);
 	}
 
 	print '<br>';
@@ -522,7 +688,6 @@ if ((empty($action) || ($action != 'edit' && $action != 'create')))
 
 
 	if ($object->id > 0) {
-		//@todo voler le showdocuments des digiriskelement
 		// Buttons for actions
 		print '<div class="tabsAction" >' . "\n";
 		$parameters = array();
