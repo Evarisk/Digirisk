@@ -427,14 +427,15 @@ class PreventionPlanLine extends CommonObjectLine
 	 */
 	public function fetch($rowid)
 	{
-		$sql = 'SELECT * ';
-		$sql .= ' FROM '.MAIN_DB_PREFIX.'preventionplandet as t';
-		$sql .= ' WHERE t.rowid = '.$rowid;
+		global $db;
 
-		$result = $this->db->query($sql);
+		$sql = 'SELECT * ';
+		$sql .= ' FROM '.MAIN_DB_PREFIX.'digiriskdolibarr_preventionplandet as t';
+		$sql .= ' WHERE t.rowid = '.$rowid;
+		$result = $db->query($sql);
 		if ($result)
 		{
-			$objp = $this->db->fetch_object($result);
+			$objp = $db->fetch_object($result);
 
 			$this->id                = $objp->rowid;
 			$this->date_creation     = $objp->date_creation;
@@ -444,13 +445,63 @@ class PreventionPlanLine extends CommonObjectLine
 			$this->fk_preventionplan = $objp->fk_preventionplan;
 			$this->fk_element        = $objp->fk_element;
 
-			$this->db->free($result);
+			$db->free($result);
 
 			return 1;
 		}
 		else
 		{
-			$this->error = $this->db->lasterror();
+			$this->error = $db->lasterror();
+			return -1;
+		}
+	}
+
+	/**
+	 *	Load preventionplan line line from database
+	 *
+	 *	@param	int		$rowid      id of preventionplan line line to get
+	 *	@return	int					<0 if KO, >0 if OK
+	 */
+	public function fetchAll($parent_id = 0, $limit = 0)
+	{
+		global $db;
+		$sql = 'SELECT * ';
+		$sql .= ' FROM '.MAIN_DB_PREFIX.'digiriskdolibarr_preventionplandet as t';
+		if ($parent_id > 0) $sql .= ' WHERE t.fk_preventionplan = '.$parent_id;
+
+		$result = $db->query($sql);
+
+		if ($result)
+		{
+			$num = $db->num_rows($result);
+
+			$i = 0;
+			while ($i < ($limit ? min($limit, $num) : $num))
+			{
+				$obj = $db->fetch_object($result);
+
+				$record = new self($db);
+
+				$record->id                = $obj->rowid;
+				$record->date_creation     = $obj->date_creation;
+				$record->description       = $obj->description;
+				$record->category          = $obj->category;
+				$record->prevention_method = $obj->prevention_method;
+				$record->fk_preventionplan = $obj->fk_preventionplan;
+				$record->fk_element        = $obj->fk_element;
+
+				$records[$record->id] = $record;
+
+				$i++;
+			}
+
+			$db->free($result);
+
+			return $records;
+		}
+		else
+		{
+			$this->error = $db->lasterror();
 			return -1;
 		}
 	}
@@ -464,162 +515,47 @@ class PreventionPlanLine extends CommonObjectLine
 	 */
 	public function insert($notrigger = 0, $noerrorifdiscountalreadylinked = 0)
 	{
-		global $langs, $user, $conf;
+		global $db, $user;
 
 		$error = 0;
 
 
 		// Clean parameters
-		$this->desc = trim($this->desc);
-		if (empty($this->tva_tx)) $this->tva_tx = 0;
+		$this->description = trim($this->description);
 
-		if (!empty($this->fk_product))
-		{
-			// Check product exists
-			$result = Product::isExistingObject('product', $this->fk_product);
-			if ($result <= 0)
-			{
-				$this->error = 'ErrorProductIdDoesNotExists';
-				dol_syslog(get_class($this)."::insert Error ".$this->error, LOG_ERR);
-				return -1;
-			}
-		}
-
-		$this->db->begin();
+		$db->begin();
+		$now = dol_now();
 
 		// Insertion dans base de la ligne
-		$sql = 'INSERT INTO '.MAIN_DB_PREFIX.'preventionplandet';
-		$sql .= ' (fk_facture, fk_parent_line, label, description, qty,';
-
+		$sql = 'INSERT INTO '.MAIN_DB_PREFIX.'digiriskdolibarr_preventionplandet';
+		$sql .= ' (entity, date_creation, description, category, prevention_method, fk_preventionplan, fk_element';
 		$sql .= ')';
-		$sql .= " VALUES (".$this->fk_facture.",";
-		$sql .= " ".($this->fk_parent_line > 0 ? $this->fk_parent_line : "null").",";
-		$sql .= " ".(!empty($this->label) ? "'".$this->db->escape($this->label)."'" : "null").",";
-		$sql .= " '".$this->db->escape($this->desc)."',";
-		$sql .= " ".price2num($this->qty).",";
-		$sql .= " ".(empty($this->vat_src_code) ? "''" : "'".$this->db->escape($this->vat_src_code)."'").",";
-		$sql .= " ".price2num($this->tva_tx).",";
-		$sql .= " ".price2num($this->localtax1_tx).",";
-		$sql .= " ".price2num($this->localtax2_tx).",";
-		$sql .= " '".$this->db->escape($this->localtax1_type)."',";
-		$sql .= " '".$this->db->escape($this->localtax2_type)."',";
-		$sql .= ' '.(!empty($this->fk_product) ? $this->fk_product : "null").',';
-		$sql .= " ".((int) $this->product_type).",";
-		$sql .= " ".price2num($this->remise_percent).",";
-		$sql .= " ".price2num($this->subprice).",";
-		$sql .= ' '.(!empty($this->fk_remise_except) ? $this->fk_remise_except : "null").',';
-		$sql .= " ".(!empty($this->date_start) ? "'".$this->db->idate($this->date_start)."'" : "null").",";
-		$sql .= " ".(!empty($this->date_end) ? "'".$this->db->idate($this->date_end)."'" : "null").",";
-		$sql .= ' '.$this->fk_code_ventilation.',';
-		$sql .= ' '.$this->rang.',';
-		$sql .= ' '.$this->special_code.',';
-		$sql .= ' '.(!empty($this->fk_fournprice) ? $this->fk_fournprice : "null").',';
-		$sql .= ' '.price2num($this->pa_ht).',';
-		$sql .= " '".$this->db->escape($this->info_bits)."',";
-		$sql .= " ".price2num($this->total_ht).",";
-		$sql .= " ".price2num($this->total_tva).",";
-		$sql .= " ".price2num($this->total_ttc).",";
-		$sql .= " ".price2num($this->total_localtax1).",";
-		$sql .= " ".price2num($this->total_localtax2);
-		$sql .= ", ".$this->situation_percent;
-		$sql .= ", ".(!empty($this->fk_prev_id) ? $this->fk_prev_id : "null");
-		$sql .= ", ".(!$this->fk_unit ? 'NULL' : $this->fk_unit);
-		$sql .= ", ".$user->id;
-		$sql .= ", ".$user->id;
-		$sql .= ", ".(int) $this->fk_multicurrency;
-		$sql .= ", '".$this->db->escape($this->multicurrency_code)."'";
-		$sql .= ", ".price2num($this->multicurrency_subprice);
-		$sql .= ", ".price2num($this->multicurrency_total_ht);
-		$sql .= ", ".price2num($this->multicurrency_total_tva);
-		$sql .= ", ".price2num($this->multicurrency_total_ttc);
+		$sql .= " VALUES (";
+		$sql .= $this->entity . ", ";
+		$sql .= "'" . $db->idate($now) . "'" . ", ";
+		$sql .= "'" . $this->description . "'" . ", ";
+		$sql .= $this->category . ", ";
+		$sql .= "'" . $this->prevention_method . "'" . ", ";
+		$sql .= $this->fk_preventionplan . ", ";
+		$sql .= $this->fk_element ;
+
 		$sql .= ')';
 
 		dol_syslog(get_class($this)."::insert", LOG_DEBUG);
-		$resql = $this->db->query($sql);
+		$resql = $db->query($sql);
+
 		if ($resql)
 		{
-			$this->id = $this->db->last_insert_id(MAIN_DB_PREFIX.'preventionplandet');
+			$this->id = $db->last_insert_id(MAIN_DB_PREFIX.'preventionplandet');
 			$this->rowid = $this->id; // For backward compatibility
 
-			if (!$error)
-			{
-				$result = $this->insertExtraFields();
-				if ($result < 0)
-				{
-					$error++;
-				}
-			}
-
-			// Si fk_remise_except defini, on lie la remise a la facture
-			// ce qui la flague comme "consommee".
-			if ($this->fk_remise_except)
-			{
-				$discount = new DiscountAbsolute($this->db);
-				$result = $discount->fetch($this->fk_remise_except);
-				if ($result >= 0)
-				{
-					// Check if discount was found
-					if ($result > 0)
-					{
-						// Check if discount not already affected to another invoice
-						if ($discount->fk_facture_line > 0)
-						{
-							if (empty($noerrorifdiscountalreadylinked))
-							{
-								$this->error = $langs->trans("ErrorDiscountAlreadyUsed", $discount->id);
-								dol_syslog(get_class($this)."::insert Error ".$this->error, LOG_ERR);
-								$this->db->rollback();
-								return -3;
-							}
-						}
-						else
-						{
-							$result = $discount->link_to_invoice($this->rowid, 0);
-							if ($result < 0)
-							{
-								$this->error = $discount->error;
-								dol_syslog(get_class($this)."::insert Error ".$this->error, LOG_ERR);
-								$this->db->rollback();
-								return -3;
-							}
-						}
-					}
-					else
-					{
-						$this->error = $langs->trans("ErrorADiscountThatHasBeenRemovedIsIncluded");
-						dol_syslog(get_class($this)."::insert Error ".$this->error, LOG_ERR);
-						$this->db->rollback();
-						return -3;
-					}
-				}
-				else
-				{
-					$this->error = $discount->error;
-					dol_syslog(get_class($this)."::insert Error ".$this->error, LOG_ERR);
-					$this->db->rollback();
-					return -3;
-				}
-			}
-
-			if (!$notrigger)
-			{
-				// Call trigger
-				$result = $this->call_trigger('LINEBILL_INSERT', $user);
-				if ($result < 0)
-				{
-					$this->db->rollback();
-					return -2;
-				}
-				// End call triggers
-			}
-
-			$this->db->commit();
+			$db->commit();
 			return $this->id;
 		}
 		else
 		{
-			$this->error = $this->db->lasterror();
-			$this->db->rollback();
+			$this->error = $db->lasterror();
+			$db->rollback();
 			return -2;
 		}
 	}
@@ -633,119 +569,62 @@ class PreventionPlanLine extends CommonObjectLine
 	 */
 	public function update($user = '', $notrigger = 0)
 	{
-		global $user, $conf;
+		global $user, $conf, $db;
 
 		$error = 0;
 
-		$pa_ht_isemptystring = (empty($this->pa_ht) && $this->pa_ht == ''); // If true, we can use a default value. If this->pa_ht = '0', we must use '0'.
-
 		// Clean parameters
-		$this->desc = trim($this->desc);
-		if (empty($this->tva_tx)) $this->tva_tx = 0;
-		if (empty($this->localtax1_tx)) $this->localtax1_tx = 0;
+		$this->description = trim($this->description);
 
-		// Check parameters
-		if ($this->product_type < 0) return -1;
-
-		// if buy price not defined, define buyprice as configured in margin admin
-		if ($this->pa_ht == 0 && $pa_ht_isemptystring)
-		{
-			if (($result = $this->defineBuyPrice($this->subprice, $this->remise_percent, $this->fk_product)) < 0)
-			{
-				return $result;
-			}
-			else
-			{
-				$this->pa_ht = $result;
-			}
-		}
-
-		$this->db->begin();
+		$db->begin();
 
 		// Mise a jour ligne en base
-		$sql = "UPDATE ".MAIN_DB_PREFIX."preventionplandet SET";
-		$sql .= " description='".$this->db->escape($this->desc)."'";
+		$sql = "UPDATE ".MAIN_DB_PREFIX."digiriskdolibarr_preventionplandet SET";
+		$sql .= " description='".$db->escape($this->description)."'";
+		$sql .= " category='".$db->escape($this->category)."'";
+		$sql .= " prevention_method='".$db->escape($this->prevention_method)."'";
+		$sql .= " fk_preventionplan='".$db->escape($this->fk_preventionplan)."'";
+		$sql .= " fk_element='".$db->escape($this->fk_element)."'";
 
-		$sql .= ", special_code='".$this->db->escape($this->special_code)."'";
-
-		$sql .= " WHERE rowid = ".$this->rowid;
+		$sql .= " WHERE rowid = ".$this->id;
 
 		dol_syslog(get_class($this)."::update", LOG_DEBUG);
-		$resql = $this->db->query($sql);
+		$resql = $db->query($sql);
 		if ($resql)
 		{
-			if (!$error)
-			{
-				$this->id = $this->rowid;
-				$result = $this->insertExtraFields();
-				if ($result < 0)
-				{
-					$error++;
-				}
-			}
-
-			if (!$error && !$notrigger)
-			{
-				// Call trigger
-				$result = $this->call_trigger('LINEBILL_UPDATE', $user);
-				if ($result < 0)
-				{
-					$this->db->rollback();
-					return -2;
-				}
-				// End call triggers
-			}
-			$this->db->commit();
+			$db->commit();
 			return 1;
 		}
 		else
 		{
-			$this->error = $this->db->error();
-			$this->db->rollback();
+			$this->error = $db->error();
+			$db->rollback();
 			return -2;
 		}
 	}
 
 	/**
 	 * 	Delete line in database
-	 *  TODO Add param User $user and notrigger (see skeleton)
 	 *
 	 *	@return	    int		           <0 if KO, >0 if OK
 	 */
 	public function delete()
 	{
-		global $user;
+		global $user, $db;
 
-		$this->db->begin();
+		$db->begin();
 
-		// Call trigger
-		$result = $this->call_trigger('LINEBILL_DELETE', $user);
-		if ($result < 0)
-		{
-			$this->db->rollback();
-			return -1;
-		}
-		// End call triggers
-
-		// extrafields
-		$result = $this->deleteExtraFields();
-		if ($result < 0)
-		{
-			$this->db->rollback();
-			return -1;
-		}
-
-		$sql = "DELETE FROM ".MAIN_DB_PREFIX."preventionplandet WHERE rowid = ".$this->rowid;
+		$sql = "DELETE FROM ".MAIN_DB_PREFIX."digiriskdolibarr_preventionplandet WHERE rowid = ".$this->id;
 		dol_syslog(get_class($this)."::delete", LOG_DEBUG);
-		if ($this->db->query($sql))
+		if ($db->query($sql))
 		{
-			$this->db->commit();
+			$db->commit();
 			return 1;
 		}
 		else
 		{
-			$this->error = $this->db->error()." sql=".$sql;
-			$this->db->rollback();
+			$this->error = $db->error()." sql=".$sql;
+			$db->rollback();
 			return -1;
 		}
 	}

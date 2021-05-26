@@ -960,8 +960,7 @@ window.eoxiaJS.risk.selectDanger = function( event ) {
 	element.closest('.wpeo-dropdown').find('.dropdown-toggle img').attr('src', element.find('img').attr('src'));
 	element.closest('.wpeo-dropdown').find('.dropdown-toggle img').attr('aria-label', element.closest('.wpeo-tooltip-event').attr('aria-label'));
 
-	element.closest('.fichecenter').find('.input-hidden-danger').val(element.data('id'));
-
+	element.closest('.wpeo-dropdown').find('.input-hidden-danger').val(element.data('id'));
 	var elementParent = jQuery(this).closest('.modal-container');
 
 	// Rend le bouton "active".

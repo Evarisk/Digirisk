@@ -361,11 +361,11 @@ class Risk extends CommonObject
 	 *
 	 * @return	string $category['thumbnail_name']     path to danger category picto, -1 if don't exist
 	 */
-	public function get_danger_category($risk)
+	public function get_danger_category($object)
 	{
 		$risk_categories = $this->get_danger_categories();
 		foreach ($risk_categories as $category) {
-			if ($category['position'] == $risk->category) {
+			if ($category['position'] == $object->category) {
 				return $category['thumbnail_name'];
 			}
 		}
@@ -378,11 +378,11 @@ class Risk extends CommonObject
 	 *
 	 * @return	string $category['name']     name to danger category picto, -1 if don't exist
 	 */
-	public function get_danger_category_name($risk)
+	public function get_danger_category_name($object)
 	{
 		$risk_categories = $this->get_danger_categories();
 		foreach ($risk_categories as $category) {
-			if ($category['position'] == $risk->category) {
+			if ($category['position'] == $object->category) {
 				return $category['name'];
 			}
 		}

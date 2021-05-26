@@ -291,8 +291,8 @@
 						<div class="risk-content">
 							<div class="risk-category">
 								<span class="title"><?php echo $langs->trans('Risk'); ?><required>*</required></span>
-								<input class="input-hidden-danger" type="hidden" name="risk_category_id" value="undefined" />
 								<div class="wpeo-dropdown dropdown-large dropdown-grid category-danger padding">
+									<input class="input-hidden-danger" type="hidden" name="risk_category_id" value="undefined" />
 									<div class="dropdown-toggle dropdown-add-button button-cotation">
 										<span class="wpeo-button button-square-50 button-grey"><i class="fas fa-exclamation-triangle button-icon"></i><i class="fas fa-plus-circle button-add"></i></span>
 										<img class="danger-category-pic wpeo-tooltip-event hidden" src="" aria-label=""/>
@@ -425,8 +425,8 @@
 					<div class="risk-content">
 						<div class="risk-category">
 							<span class="title"><?php echo $langs->trans('Risk'); ?><required>*</required></span>
-							<input class="input-hidden-danger" type="hidden" name="risk_category_id" value="undefined" />
 							<div class="wpeo-dropdown dropdown-large dropdown-grid category-danger padding">
+								<input class="input-hidden-danger" type="hidden" name="risk_category_id" value="undefined" />
 								<div class="dropdown-toggle dropdown-add-button button-cotation">
 									<span class="wpeo-button button-square-50 button-grey"><i class="fas fa-exclamation-triangle button-icon"></i><i class="fas fa-plus-circle button-add"></i></span>
 									<img class="danger-category-pic wpeo-tooltip-event hidden" src="" aria-label=""/>
@@ -764,8 +764,8 @@
 									<div class="risk-content">
 										<div class="risk-category">
 											<span class="title"><?php echo $langs->trans('Risk'); ?></span>
-											<input class="input-hidden-danger" type="hidden" name="risk_category_id" value=<?php echo $risk->category ?> />
 											<div class="wpeo-dropdown dropdown-large dropdown-grid category-danger padding">
+												<input class="input-hidden-danger" type="hidden" name="risk_category_id" value=<?php echo $risk->category ?> />
 												<div class="dropdown-toggle dropdown-add-button button-cotation wpeo-tooltip-event" aria-label="<?php echo $risk->get_danger_category_name($risk) ?>">
 													<img class="danger-category-pic tooltip hover" src="<?php echo DOL_URL_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $risk->get_danger_category($risk) . '.png'?>"" />
 												</div>

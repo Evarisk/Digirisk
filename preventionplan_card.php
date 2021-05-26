@@ -18,7 +18,7 @@
 /**
  *   	\file       preventionplan_card.php
  *		\ingroup    digiriskdolibarr
- *		\brief      Page to create/edit/view preventionplandocument
+ *		\brief      Page to create/edit/view preventionplan
  */
 
 // Load Dolibarr environment
@@ -32,6 +32,7 @@ dol_include_once('/digiriskdolibarr/class/digiriskdocuments.class.php');
 dol_include_once('/digiriskdolibarr/class/digiriskelement.class.php');
 dol_include_once('/digiriskdolibarr/class/digiriskresources.class.php');
 dol_include_once('/digiriskdolibarr/class/digiriskelement/preventionplan.class.php');
+dol_include_once('/digiriskdolibarr/class/riskanalysis/risk.class.php');
 dol_include_once('/digiriskdolibarr/class/digiriskdocuments/preventionplandocument.class.php');
 dol_include_once('/digiriskdolibarr/lib/digiriskdolibarr_function.lib.php');
 dol_include_once('/digiriskdolibarr/lib/digiriskdolibarr_preventionplan.lib.php');
@@ -46,6 +47,7 @@ $langs->loadLangs(array("digiriskdolibarr@digiriskdolibarr", "other"));
 
 // Get parameters
 $id                  = GETPOST('id', 'int');
+$lineid                  = GETPOST('lineid', 'int');
 $ref                 = GETPOST('ref', 'alpha');
 $action              = GETPOST('action', 'aZ09');
 $confirm             = GETPOST('confirm', 'alpha');
@@ -56,12 +58,14 @@ $backtopageforcancel = GETPOST('backtopageforcancel', 'alpha');
 $fk_parent           = GETPOST('fk_parent', 'int');
 
 // Initialize technical objects
-$object = new PreventionPlan($db);
+$object                 = new PreventionPlan($db);
+$objectline             = new PreventionPlanLine($db);
 $preventionplandocument = new PreventionPlanDocument($db);
+$risk                   = new Risk($db);
 
 $object->fetch($id);
 
-$digiriskelement = new DigiriskElement($db);
+$digiriskelement   = new DigiriskElement($db);
 $digiriskresources = new DigiriskResources($db);
 
 $refPreventionPlanMod = new $conf->global->DIGIRISKDOLIBARR_PREVENTIONPLAN_ADDON($db);
@@ -218,8 +222,103 @@ if (empty($reshook))
 
 	// Action to add record
 	if ($action == 'delete' && $permissiontoadd) {
-//		GETPOST machin
-//		appel de digiriskfilljson
+
+	}
+
+	// Action to add line
+	if ($action == 'addLine' && $permissiontoadd) {
+
+		$actions_description = GETPOST('actionsdescription');
+		$prevention_method   = GETPOST('preventionmethod');
+		$location            = GETPOST('fk_element');
+		$risk_category_id    = GETPOST('risk_category_id');
+		$parent_id           = GETPOST('parent_id');
+
+//		$objectline->ref           = $refPreventionPlanLineMod->getNextValue($object);
+		$objectline->date_creation      = $object->db->idate($now);
+		$objectline->entity             = $conf->entity;
+		$objectline->description        = $actions_description;
+		$objectline->category           = $risk_category_id;
+		$objectline->prevention_method  = $prevention_method;
+		$objectline->fk_preventionplan  = $parent_id;
+		$objectline->fk_element         = $location;
+		$objectline->db                 = $db;
+
+		if (!$error) {
+			$result = $objectline->insert(1);
+
+			if ($result > 0) {
+
+				$urltogo = str_replace('__ID__', $result, $backtopage);
+				$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
+				header("Location: " . $urltogo);
+				exit;
+			}
+			else
+			{
+				if (!empty($object->errors)) setEventMessages(null, $object->errors, 'errors');
+				else  setEventMessages($object->error, null, 'errors');
+			}
+		}
+	}
+
+	// Action to add record
+	if ($action == 'updateLine' && $permissiontoadd) {
+
+		$actions_description = GETPOST('actionsdescription');
+		$prevention_method   = GETPOST('preventionmethod');
+		$location            = GETPOST('fk_element');
+		$risk_category_id    = GETPOST('risk_category_id');
+		$parent_id           = GETPOST('parent_id');
+
+		$objectline = new PreventionPlanLine($db);
+		$objectline->fetch($lineid);
+
+//		$objectline->ref           = $refPreventionPlanLineMod->getNextValue($object);
+		$objectline->description        = $actions_description;
+		$objectline->category           = $risk_category_id;
+		$objectline->prevention_method  = $prevention_method;
+		$objectline->fk_preventionplan  = $parent_id;
+		$objectline->fk_element         = $location;
+
+		if (!$error) {
+			$result = $objectline->update(1);
+
+			if ($result > 0) {
+
+				// Creation risk + evaluation + task OK
+				$urltogo = str_replace('__ID__', $result, $backtopage);
+				$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $parent_id, $urltogo); // New method to autoselect project after a New on another form object creation
+				header("Location: " . $urltogo);
+				exit;
+			}
+			else
+			{
+				// Creation risk KO
+				if (!empty($object->errors)) setEventMessages(null, $object->errors, 'errors');
+				else  setEventMessages($object->error, null, 'errors');
+			}
+		}
+	}
+
+	// Action to add record
+	if ($action == 'deleteline' && $permissiontodelete) {
+
+		$objectline = new PreventionPlanLine($db);
+		$result = $objectline->fetch($lineid);
+
+		if ($result > 0) {
+			$objectline->delete();
+			// Creation risk + evaluation + task OK
+			$urltogo = str_replace('__ID__', $result, $backtopage);
+			$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $parent_id, $urltogo); // New method to autoselect project after a New on another form object creation
+			header("Location: " . $urltogo);
+			exit;
+		} else {
+			// Creation risk KO
+			if (!empty($object->errors)) setEventMessages(null, $object->errors, 'errors');
+			else  setEventMessages($object->error, null, 'errors');
+		}
 	}
 
 	// Action to build doc
@@ -406,7 +505,7 @@ if ($action == 'create')
 		print $form->select_company($user->socid, 'labour_inspector', '', 1, 1, 0, $events, 0, 'minwidth300');
 	} else {
 
-		print $form->select_company($digiriskresources->digirisk_dolibarr_fetch_resource('SAMU'), 'labour_inspector', '', 'SelectThirdParty', 1, 0, $events, 0, 'minwidth300');
+		print $form->select_company($digiriskresources->digirisk_dolibarr_fetch_resource('SAMU'), 'labour_inspector', '', 'SelectThirdParty', 1, 0, '', 0, 'minwidth300');
 	}	print '<br>';
 
 	print '</td></tr>';
@@ -578,7 +677,7 @@ if (($id || $ref) && $action == 'edit')
 }
 
 // Part to show record
-if ((empty($action) || ($action != 'edit' && $action != 'create')))
+if ((empty($action) || ($action != 'create')))
 {
 	$res = $object->fetch_optionals();
 
@@ -688,6 +787,7 @@ if ((empty($action) || ($action != 'edit' && $action != 'create')))
 
 
 	if ($object->id > 0) {
+
 		// Buttons for actions
 		print '<div class="tabsAction" >' . "\n";
 		$parameters = array();
@@ -704,6 +804,270 @@ if ((empty($action) || ($action != 'edit' && $action != 'create')))
 		}
 		print '</div>' . "\n";
 
+		// PREVENTIONPLAN LINES
+		print '<div class="div-table-responsive-no-min" style="overflow-x: unset !important">' . "\n";
+		print '<table id="tablelines" class="noborder noshadow" width="100%">';
+
+		global $forceall, $forcetoshowtitlelines;
+
+		if (empty($forceall)) $forceall = 0;
+
+		// Define colspan for the button 'Add'
+		$colspan = 3; // Columns: total ht + col edit + col delete
+		//print $object->element;
+
+		// Lines for extrafield
+		$preventionplanline = new PreventionPlanLine($db);
+		$preventionplanline->db = $db;
+		$preventionplanlines = $preventionplanline->fetchAll(GETPOST('id'));
+
+		print '<tr class="liste_titre nodrag nodrop">';
+		if (!empty($conf->global->MAIN_VIEW_LINE_NUMBER)) {
+			print '<td class="linecolnum center"></td>';
+		}
+		print '<td class="linecoldescription">';
+		print '<div id="add"></div><span class="hideonsmartphone">'.$langs->trans('AddNewRiskEvaluation').'</span>';
+		print '</td>';
+		print '<td class="linecollocation">'.$langs->trans('Location').'</td>';
+		print '<td class="linecolactionsdescription">'.$form->textwithpicto($langs->trans('ActionsDescription'), $langs->trans("ActionsDescriptionTooltip")).'</td>';
+		print '<td class="linecolriskcategory">'.$form->textwithpicto($langs->trans('INRSRisk'), $langs->trans('INRSRiskTooltip')).'</td>';
+		print '<td class="linecolpreventionmethod">'.$form->textwithpicto($langs->trans('PreventionMethod'), $langs->trans('PreventionMethodTooltip')).'</td>';
+		print '<td class="linecoledit" colspan="'.$colspan.'">&nbsp;</td>';
+		print '</tr>';
+
+		if (! empty($preventionplanlines) && $preventionplanlines > 0) {
+			print '<tr>';
+			foreach($preventionplanlines as $key => $item) {
+				if ($action == 'editline' && $lineid == $key) {
+
+					print '<form method="POST" action="'.$_SERVER["PHP_SELF"].'">';
+					print '<input type="hidden" name="token" value="'.newToken().'">';
+					print '<input type="hidden" name="action" value="updateLine">';
+					print '<input type="hidden" name="backtopage" value="'.$backtopage.'">';
+					print '<input type="hidden" name="lineid" value="'.$item->id.'">';
+					print '<input type="hidden" name="parent_id" value="'.$object->id.'">';
+
+					print '<tr class="pair nodrag nodrop nohoverpair'.(($nolinesbefore || $object->element == 'contrat') ? '' : ' liste_titre_create').'">';
+
+					print '<td class="bordertop nobottom linecoldescription minwidth500imp">';
+
+					print '<td class="bordertop nobottom linecollocation">';
+					print $digiriskelement->select_digiriskelement_list($item->fk_element, 'fk_element', '', '',  0, 0, array(), '',  0,  0,  'minwidth100',  GETPOST('id'),  false);
+					print '</td>';
+
+					$coldisplay++;
+					print '<td class="bordertop nobottom linecolactionsdescription">';
+					print '<textarea name="actionsdescription" class="minwidth150" cols="50" rows="' . ROWS_2 . '">' . $item->description . '</textarea>' . "\n";
+					print '</td>';
+
+					$coldisplay++;
+					print '<td class="bordertop nobottom linecolriskcategory">'; ?>
+					<span class="title"><?php echo $langs->trans('Risk'); ?><required>*</required></span>
+					<div class="wpeo-dropdown dropdown-large dropdown-grid category-danger padding">
+						<div class="dropdown-toggle dropdown-add-button button-cotation">
+							<input class="input-hidden-danger" type="hidden" name="risk_category_id" value="<?php echo $item->category ?>" />
+							<div class="wpeo-dropdown dropdown-large category-danger padding wpeo-tooltip-event" aria-label="<?php echo $risk->get_danger_category_name($item) ?>">
+								<img class="danger-category-pic hover" src="<?php echo DOL_URL_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $risk->get_danger_category($item) . '.png' ; ?>"/>
+							</div>
+						</div>
+
+						<ul class="dropdown-content wpeo-gridlayout grid-5 grid-gap-0">
+							<?php
+							$dangerCategories = $risk->get_danger_categories();
+							if ( ! empty( $dangerCategories ) ) :
+								foreach ( $dangerCategories as $dangerCategory ) : ?>
+									<li class="item dropdown-item wpeo-tooltip-event" data-is-preset="<?php echo ''; ?>" data-id="<?php echo $dangerCategory['position'] ?>" aria-label="<?php echo $dangerCategory['name'] ?>">
+										<img src="<?php echo DOL_URL_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $dangerCategory['thumbnail_name'] . '.png'?>" class="attachment-thumbail size-thumbnail photo photowithmargin" alt="" loading="lazy" width="48" height="48">
+									</li>
+								<?php endforeach;
+							endif; ?>
+						</ul>
+					</div>
+					<?php
+					print '</td>';
+
+					$coldisplay++;
+					print '<td class="bordertop nobottom linecolpreventionmethod">';
+					print '<textarea name="preventionmethod" class="minwidth150" cols="50" rows="' . ROWS_2 . '">' . $item->prevention_method . '</textarea>' . "\n";
+					print '</td>';
+
+					$coldisplay += $colspan;
+					print '<td class="bordertop nobottom linecoledit center valignmiddle" colspan="'.$colspan.'">';
+					print '<input type="submit" class="button" value="'.$langs->trans('Save').'" name="updateLine" id="updateLine">';
+					print '</td>';
+					print '</tr>';
+
+					if (is_object($objectline)) {
+						print $objectline->showOptionals($extrafields, 'edit', array('style'=>$bcnd[$var], 'colspan'=>$coldisplay), '', '', 1);
+					}
+					print '</form>';
+					?>
+					<script>
+						/* JQuery for product free or predefined select */
+						jQuery(document).ready(function() {
+							/* When changing predefined product, we reload list of supplier prices required for margin combo */
+							$("#idprod").change(function()
+							{
+								console.log("#idprod change triggered");
+
+								/* To set focus */
+								if (jQuery('#idprod').val() > 0)
+								{
+									/* focus work on a standard textarea but not if field was replaced with CKEDITOR */
+									jQuery('#dp_desc').focus();
+									/* focus if CKEDITOR */
+									if (typeof CKEDITOR == "object" && typeof CKEDITOR.instances != "undefined")
+									{
+										var editor = CKEDITOR.instances['dp_desc'];
+										if (editor) { editor.focus(); }
+									}
+								}
+							});
+						});
+					</script> <?php
+				} else {
+					print '<td class="bordertop nobottom linecoldescription minwidth500imp">';
+
+					print '<td class="bordertop nobottom linecollocation">';
+					$digiriskelement->fetch($item->fk_element);
+					print $digiriskelement->ref . " - " . $digiriskelement->label;
+					print '</td>';
+
+					$coldisplay++;
+					print '<td class="bordertop nobottom linecolactionsdescription">';
+					print $item->description;
+					print '</td>';
+
+					$coldisplay++;
+					print '<td class="bordertop nobottom linecolriskcategory">'; ?>
+					<div class="table-cell table-50 cell-risk" data-title="Risque">
+						<div class="wpeo-dropdown dropdown-large category-danger padding wpeo-tooltip-event" aria-label="<?php echo $risk->get_danger_category_name($item) ?>">
+							<img class="danger-category-pic hover" src="<?php echo DOL_URL_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $risk->get_danger_category($item) . '.png' ; ?>"/>
+						</div>
+					</div>
+					<?php
+					print '</td>';
+
+					$coldisplay++;
+					print '<td class="bordertop nobottom linecolpreventionmethod">';
+					print $item->prevention_method;
+					print '</td>';
+
+					$coldisplay += $colspan;
+
+					//Actions buttons
+					print '<td class="linecoledit center">';
+					$coldisplay++;
+					if (($item->info_bits & 2) == 2 || !empty($disableedit)) {
+					} else {
+						print '<a class="editfielda reposition" href="'.$_SERVER["PHP_SELF"].'?id='.$id.'&amp;action=editline&amp;lineid='.$item->id.'">'.img_edit().'</a>';
+					}
+					print '</td>';
+
+					print '<td class="linecoldelete center">';
+					$coldisplay++;
+
+					//La suppression n'est autorisée que si il n'y a pas de ligne dans une précédente situation
+					print '<a class="reposition" href="'.$_SERVER["PHP_SELF"].'?id='.$id.'&amp;action=deleteline&amp;lineid='.$item->id.'">';
+					print img_delete();
+					print '</a>';
+					print '</td>';
+
+					print '</tr>';
+
+					if (is_object($objectline)) {
+						print $objectline->showOptionals($extrafields, 'edit', array('style'=>$bcnd[$var], 'colspan'=>$coldisplay), '', '', 1);
+					}
+				}
+			}
+			print '</tr>';
+		}
+
+		print '<form method="POST" action="'.$_SERVER["PHP_SELF"].'">';
+		print '<input type="hidden" name="token" value="'.newToken().'">';
+		print '<input type="hidden" name="action" value="addLine">';
+		print '<input type="hidden" name="backtopage" value="'.$backtopage.'">';
+		print '<input type="hidden" name="parent_id" value="'.$object->id.'">';
+
+		print '<tr class="pair nodrag nodrop nohoverpair'.(($nolinesbefore || $object->element == 'contrat') ? '' : ' liste_titre_create').'">';
+
+		print '<td class="bordertop nobottom linecoldescription minwidth500imp">';
+
+		print '<td class="bordertop nobottom linecollocation">';
+		print $digiriskelement->select_digiriskelement_list('', 'fk_element', '', '',  0, 0, array(), '',  0,  0,  'minwidth100',  GETPOST('id'),  false);
+		print '</td>';
+
+		$coldisplay++;
+		print '<td class="bordertop nobottom linecolactionsdescription">';
+		print '<textarea name="actionsdescription" class="minwidth150" cols="50" rows="' . ROWS_2 . '">' . ('') . '</textarea>' . "\n";
+		print '</td>';
+
+		$coldisplay++;
+		print '<td class="bordertop nobottom linecolriskcategory">'; ?>
+			<span class="title"><?php echo $langs->trans('Risk'); ?><required>*</required></span>
+			<div class="wpeo-dropdown dropdown-large dropdown-grid category-danger padding">
+				<input class="input-hidden-danger" type="hidden" name="risk_category_id" value="undefined" />
+				<div class="dropdown-toggle dropdown-add-button button-cotation">
+					<span class="wpeo-button button-square-50 button-grey"><i class="fas fa-exclamation-triangle button-icon"></i><i class="fas fa-plus-circle button-add"></i></span>
+					<img class="danger-category-pic wpeo-tooltip-event hidden" src="" aria-label=""/>
+				</div>
+				<ul class="dropdown-content wpeo-gridlayout grid-5 grid-gap-0">
+					<?php
+					$dangerCategories = $risk->get_danger_categories();
+					if ( ! empty( $dangerCategories ) ) :
+						foreach ( $dangerCategories as $dangerCategory ) : ?>
+							<li class="item dropdown-item wpeo-tooltip-event" data-is-preset="<?php echo ''; ?>" data-id="<?php echo $dangerCategory['position'] ?>" aria-label="<?php echo $dangerCategory['name'] ?>">
+								<img src="<?php echo DOL_URL_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $dangerCategory['thumbnail_name'] . '.png'?>" class="attachment-thumbail size-thumbnail photo photowithmargin" alt="" loading="lazy" width="48" height="48">
+							</li>
+						<?php endforeach;
+					endif; ?>
+				</ul>
+			</div>
+		<?php
+		print '</td>';
+
+		$coldisplay++;
+		print '<td class="bordertop nobottom linecolpreventionmethod">';
+		print '<textarea name="preventionmethod" class="minwidth150" cols="50" rows="' . ROWS_2 . '">' . ('') . '</textarea>' . "\n";
+		print '</td>';
+
+		$coldisplay += $colspan;
+		print '<td class="bordertop nobottom linecoledit center valignmiddle" colspan="'.$colspan.'">';
+		print '<input type="submit" class="button" value="'.$langs->trans('Add').'" name="addline" id="addline">';
+		print '</td>';
+		print '</tr>';
+
+		if (is_object($objectline)) {
+			print $objectline->showOptionals($extrafields, 'edit', array('style'=>$bcnd[$var], 'colspan'=>$coldisplay), '', '', 1);
+		}
+		?>
+		<script>
+			/* JQuery for product free or predefined select */
+			jQuery(document).ready(function() {
+				/* When changing predefined product, we reload list of supplier prices required for margin combo */
+				$("#idprod").change(function()
+				{
+					console.log("#idprod change triggered");
+
+					/* To set focus */
+					if (jQuery('#idprod').val() > 0)
+					{
+						/* focus work on a standard textarea but not if field was replaced with CKEDITOR */
+						jQuery('#dp_desc').focus();
+						/* focus if CKEDITOR */
+						if (typeof CKEDITOR == "object" && typeof CKEDITOR.instances != "undefined")
+						{
+							var editor = CKEDITOR.instances['dp_desc'];
+							if (editor) { editor.focus(); }
+						}
+					}
+				});
+			});
+		</script> <?php
+		print '</form>';
+		print '</table>';
+
+		print '</div>';
 		// Document Generation -- Génération des documents
 		$includedocgeneration = 1;
 		if ($includedocgeneration) {
