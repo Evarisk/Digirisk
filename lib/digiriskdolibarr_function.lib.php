@@ -67,7 +67,7 @@ function digirisk_show_photos($modulepart, $sdir, $size = 0, $nbmax = 0, $nbbyro
 	$nbphoto = 0;
 
 	$filearray = dol_dir_list($dir, "files", 0, '', '(\.meta|_preview.*\.png)$', $sortfield, (strtolower($sortorder) == 'desc' ?SORT_DESC:SORT_ASC), 1);
-	completeFileArrayWithDatabaseInfo($filearray, $relativedir);
+
 	if (count($filearray))
 	{
 
