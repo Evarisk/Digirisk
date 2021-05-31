@@ -427,6 +427,16 @@ if ($action == 'create')
 	print '<input class="flat" type="text" size="36" name="label" id="label" value="">';
 	print '</td></tr>';
 
+	//Start Date -- Date début
+	print '<tr class="oddeven"><td><label for="date_debut">'.$langs->trans("StartDate").'</label></td><td>';
+	print $form->selectDate('', 'date_debut', 1, 1, 0);
+	print '</td></tr>';
+
+	//End Date -- Date fin
+	print '<tr class="oddeven"><td><label for="date_fin">'.$langs->trans("EndDate").'</label></td><td>';
+	print $form->selectDate(dol_time_plus_duree(dol_now(),1,'y'), 'date_fin', 1, 1, 0);
+	print '</td></tr>';
+
 	//Maitre d'oeuvre
 	$userlist 	  = $form->select_dolusers('', '', 0, null, 0, '', '', 0, 0, 0, 'AND u.statut = 1', 0, '', '', 0, 1);
 
@@ -474,11 +484,6 @@ if ($action == 'create')
 
 	print '</td></tr>';
 
-	//@todo preventions et intervenants
-	$intervention_ids         = GETPOST('prevention_ids');
-	$intervenants_ids       = GETPOST('intervenants_ids');
-
-
 	// Duration
 	print '<tr><td class="tdtop">';
 	print $langs->trans("Durée");
@@ -488,16 +493,6 @@ if ($action == 'create')
 	$htmltext = $langs->trans("PreventionPlanLastsMoreThan400Hours");
 	print $form->textwithpicto($langs->trans("MoreThan400Hours"), $htmltext);
 	print '<br>';
-	print '</td></tr>';
-
-	//Start Date -- Date début
-	print '<tr class="oddeven"><td><label for="date_debut">'.$langs->trans("StartDate").'</label></td><td>';
-	print $form->selectDate('', 'date_debut', 1, 1, 0);
-	print '</td></tr>';
-
-	//End Date -- Date fin
-	print '<tr class="oddeven"><td><label for="date_fin">'.$langs->trans("EndDate").'</label></td><td>';
-	print $form->selectDate(dol_time_plus_duree(dol_now(),1,'y'), 'date_fin', 1, 1, 0);
 	print '</td></tr>';
 
 	//Imminent danger -- Danger imminent
