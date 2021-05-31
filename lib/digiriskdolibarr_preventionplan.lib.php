@@ -43,13 +43,6 @@ function preventionplanPrepareHead($object)
 		$h++;
 	}
 
-	if ($user->rights->digiriskdolibarr->preventionplan->read) {
-		$head[$h][0] = dol_buildpath("/digiriskdolibarr/preventionplan_interventions.php", 1) . '?id=' . $object->id;
-		$head[$h][1] = '<i class="fas fa-exclamation-triangle"></i> ' . $langs->trans("Interventions");
-		$head[$h][2] = 'preventionplanInterventions';
-		$h++;
-	}
-
 	complete_head_from_modules($conf, $langs, $object, $head, $h, 'preventionplandocument@digiriskdolibarr');
 
 	return $head;

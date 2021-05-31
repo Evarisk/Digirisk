@@ -653,7 +653,7 @@ class modDigiriskdolibarr extends DolibarrModules
 		$this->_load_tables('/digiriskdolibarr/sql/digiriskdocuments/');
 		$this->_load_tables('/digiriskdolibarr/sql/digiriskelement/');
 		$this->_load_tables('/digiriskdolibarr/sql/riskanalysis/');
-		$this->_load_tables('/digiriskdolibarr/sql/preventionplandocument/');
+		$this->_load_tables('/digiriskdolibarr/sql/preventionplan/');
 //		$this->_load_tables('/digiriskdolibarr/sql/firepermit/');
 
 		if ( $conf->global->DIGIRISKDOLIBARR_DOCUMENT_MODELS_SET ==  0 ) {

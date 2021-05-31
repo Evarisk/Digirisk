@@ -297,16 +297,18 @@ class DigiriskResources extends CommonObject
 		$resources = new DigiriskResources($this->db);
 
 		$links = $resources->fetchAll();
-		$allLinks = array();
 
-		foreach ($links as $link) {
-			if ($allLinks[$link->ref]->ref == $link->ref) {
-				array_push($allLinks[$link->ref]->id, $link->element_id);
-			} else {
-				$allLinks[$link->ref] = new stdClass;
-				$allLinks[$link->ref]->id[] = $link->element_id;
-				$allLinks[$link->ref]->type = $link->element_type;
-				$allLinks[$link->ref]->ref = $link->ref;
+		$allLinks = array();
+		if (!empty ($links) && $links > 0) {
+			foreach ($links as $link) {
+				if ($allLinks[$link->ref]->ref == $link->ref) {
+					array_push($allLinks[$link->ref]->id, $link->element_id);
+				} else {
+					$allLinks[$link->ref] = new stdClass;
+					$allLinks[$link->ref]->id[] = $link->element_id;
+					$allLinks[$link->ref]->type = $link->element_type;
+					$allLinks[$link->ref]->ref = $link->ref;
+				}
 			}
 		}
 
@@ -375,6 +377,7 @@ class DigiriskResources extends CommonObject
 		}
 
 		$resql = $this->db->query($sql);
+
 		if ($resql) {
 			$num = $this->db->num_rows($resql);
 			$i = 0;
