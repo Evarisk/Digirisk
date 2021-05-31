@@ -179,18 +179,17 @@ if (empty($reshook))
 		$description 			= GETPOST('description');
 
 		$now = dol_now();
-		$object->ref           = $refPreventionPlanMod->getNextValue($object);
 		$object->tms           = $now;
 		$object->label         = $label;
 
 		$date_debut = DateTime::createFromFormat('d/m/Y',$date_debut);
 		$date_fin = DateTime::createFromFormat('d/m/Y',$date_fin);
 
-		$object->description   = $description;
-		$object->date_start    = dol_print_date($date_debut->getTimestamp(), 'dayhourrfc');
-		$object->date_end      = dol_print_date($date_fin->getTimestamp(), 'dayhourrfc');
-		$object->imminent_danger      = $imminentdanger;
-		$object->more_than_400_hours      = $morethan400hours;
+		$object->description         = $description;
+		$object->date_start          = dol_print_date($date_debut->getTimestamp(), 'dayhourrfc');
+		$object->date_end            = dol_print_date($date_fin->getTimestamp(), 'dayhourrfc');
+		$object->imminent_danger     = $imminentdanger;
+		$object->more_than_400_hours = $morethan400hours;
 
 		$object->fk_user_creat = $user->id ? $user->id : 1;
 
@@ -437,7 +436,7 @@ if ($action == 'create')
 
 	if (!GETPOSTISSET('backtopage')) print ' <a href="'.DOL_URL_ROOT.'/user/card.php?action=create&backtopage='.urlencode($_SERVER["PHP_SELF"].'?action=create').'"><span class="fa fa-plus-circle valignmiddle paddingleft" title="'.$langs->trans("AddThirdParty").'"></span></a>';
 
-	print $form->selectarray('maitre_oeuvre', $userlist, 0, null, null, null, null, "40%");
+	print $form->selectarray('maitre_oeuvre', $userlist, 0, null, null, null, null, "40%", 0,0,'','',1);
 
 	print '</td></tr>';
 
@@ -577,7 +576,7 @@ if (($id || $ref) && $action == 'edit')
 	print '</td></tr>';
 
 	//Maitre d'oeuvre
-	$userlist 	  = $form->select_dolusers(is_array($object_resources) ? array_shift($object_resources['PP_MAITRE_OEUVRE'])->id : '', '', 0, null, 0, '', '', 0, 0, 0, 'AND u.statut = 1', 0, '', '', 0, 1);
+	$userlist 	  = $form->select_dolusers(is_array($object_resources['PP_MAITRE_OEUVRE']) ? array_shift($object_resources['PP_MAITRE_OEUVRE'])->id : '', '', 0, null, 0, '', '', 0, 0, 0, 'AND u.statut = 1', 0, '', '', 0, 1);
 
 	print '<tr>';
 	print '<td style="width:10%">'.$form->editfieldkey('MaitreOeuvre', 'MaitreOeuvre_id', '', $object, 0).'</td>';
@@ -604,7 +603,7 @@ if (($id || $ref) && $action == 'edit')
 	if (!empty($user->socid)) {
 		print $form->select_company($user->socid, 'ext_society', '', 1, 1, 0, $events, 0, 'minwidth300');
 	} else {
-		$ext_society_id = is_array($object_resources) ? array_shift($object_resources['PP_EXT_SOCIETY'])->id : '';
+		$ext_society_id = is_array($object_resources['PP_EXT_SOCIETY']) ? array_shift($object_resources['PP_EXT_SOCIETY'])->id : '';
 
 		print $form->select_company($ext_society_id, 'ext_society', '', 'SelectThirdParty', 1, 0, $events, 0, 'minwidth300');
 	}	print '<br>';
@@ -612,7 +611,7 @@ if (($id || $ref) && $action == 'edit')
 	print '</td></tr>';
 
 	//External responsible -- Responsable de la société extérieure
-	$ext_society_responsible_id = is_array($object_resources) ? array_shift($object_resources['PP_EXT_SOCIETY_RESPONSIBLE'])->id : '';
+	$ext_society_responsible_id = is_array($object_resources['PP_EXT_SOCIETY_RESPONSIBLE']) ? array_shift($object_resources['PP_EXT_SOCIETY_RESPONSIBLE'])->id : '';
 	print '<tr class="oddeven"><td>'.$langs->trans("ExternalSocietyResponsible").'</td><td>';
 	print $form->selectcontacts(GETPOST('ext_society', 'int'), $ext_society_responsible_id, 'ext_society_responsible[]', 1, '', '', 0, 'quatrevingtpercent', false, 0, array(), false, '', 'ext_society_responsible');
 
@@ -693,7 +692,7 @@ if (($id || $ref) && $action == 'edit')
 }
 
 // Part to show record
-if ((empty($action) || ($action != 'create')))
+if ((empty($action) || ($action != 'create' && $action != 'edit')))
 {
 	$res = $object->fetch_optionals();
 
