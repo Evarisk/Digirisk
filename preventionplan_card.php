@@ -435,7 +435,7 @@ if ($action == 'create')
 	print '<td class="maxwidthonsmartphone">';
 
 
-	print $form->selectarray('maitre_oeuvre', $userlist, 0, null, null, null, null, "40%", 0,0,'','',1);
+	print $form->selectarray('maitre_oeuvre', $userlist, '', $langs->trans('SelectUser'), null, null, null, "40%", 0,0,'','',1);
 	if (!GETPOSTISSET('backtopage')) print ' <a href="'.DOL_URL_ROOT.'/user/card.php?action=create&backtopage='.urlencode($_SERVER["PHP_SELF"].'?action=create').'"><span class="fa fa-plus-circle valignmiddle paddingleft" title="'.$langs->trans("AddThirdParty").'"></span></a>';
 
 	print '</td></tr>';
