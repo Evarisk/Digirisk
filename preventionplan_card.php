@@ -242,7 +242,15 @@ if (empty($reshook))
 		$objectline->prevention_method  = $prevention_method;
 		$objectline->fk_preventionplan  = $parent_id;
 		$objectline->fk_element         = $location;
-		$objectline->db                 = $db;
+
+		if ($parent_id < 1) {
+			setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv('Location')), null, 'errors');
+			$error++;
+		}
+		if ($risk_category_id < 0) {
+			setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv('INRSRisk')), null, 'errors');
+			$error++;
+		}
 
 		if (!$error) {
 			$result = $objectline->insert(1);
@@ -256,8 +264,7 @@ if (empty($reshook))
 			}
 			else
 			{
-				if (!empty($object->errors)) setEventMessages(null, $object->errors, 'errors');
-				else  setEventMessages($object->error, null, 'errors');
+				setEventMessages($objectline->error, $objectline->errors, 'errors');
 			}
 		}
 	}
@@ -280,6 +287,15 @@ if (empty($reshook))
 		$objectline->prevention_method  = $prevention_method;
 		$objectline->fk_preventionplan  = $parent_id;
 		$objectline->fk_element         = $location;
+
+		if ($parent_id < 1) {
+			setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv('Location')), null, 'errors');
+			$error++;
+		}
+		if ($risk_category_id < 0) {
+			setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv('INRSRisk')), null, 'errors');
+			$error++;
+		}
 
 		if (!$error) {
 			$result = $objectline->update(1);
@@ -840,7 +856,7 @@ if ((empty($action) || ($action != 'create')))
 			foreach($preventionplanlines as $key => $item) {
 				if ($action == 'editline' && $lineid == $key) {
 
-					print '<form method="POST" action="'.$_SERVER["PHP_SELF"].'">';
+					print '<form method="POST" action="'.$_SERVER["PHP_SELF"] . '?id=' . $object->id .'">';
 					print '<input type="hidden" name="token" value="'.newToken().'">';
 					print '<input type="hidden" name="action" value="updateLine">';
 					print '<input type="hidden" name="backtopage" value="'.$backtopage.'">';
@@ -983,7 +999,7 @@ if ((empty($action) || ($action != 'create')))
 			print '</tr>';
 		}
 
-		print '<form method="POST" action="'.$_SERVER["PHP_SELF"].'">';
+		print '<form method="POST" action="'.$_SERVER["PHP_SELF"] . '?id=' . $object->id .'">';
 		print '<input type="hidden" name="token" value="'.newToken().'">';
 		print '<input type="hidden" name="action" value="addLine">';
 		print '<input type="hidden" name="backtopage" value="'.$backtopage.'">';

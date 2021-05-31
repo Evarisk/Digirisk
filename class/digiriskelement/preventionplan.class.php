@@ -580,11 +580,11 @@ class PreventionPlanLine extends CommonObjectLine
 
 		// Mise a jour ligne en base
 		$sql = "UPDATE ".MAIN_DB_PREFIX."digiriskdolibarr_preventionplandet SET";
-		$sql .= " description='".$db->escape($this->description)."'";
-		$sql .= " category='".$db->escape($this->category)."'";
-		$sql .= " prevention_method='".$db->escape($this->prevention_method)."'";
-		$sql .= " fk_preventionplan='".$db->escape($this->fk_preventionplan)."'";
-		$sql .= " fk_element='".$db->escape($this->fk_element)."'";
+		$sql .= " description='".$db->escape($this->description)."',";
+		$sql .= " category=".$db->escape($this->category) . ",";
+		$sql .= " prevention_method='".$db->escape($this->prevention_method)."'" . ",";
+		$sql .= " fk_preventionplan=".$db->escape($this->fk_preventionplan) . ",";
+		$sql .= " fk_element=".$db->escape($this->fk_element);
 
 		$sql .= " WHERE rowid = ".$this->id;
 
