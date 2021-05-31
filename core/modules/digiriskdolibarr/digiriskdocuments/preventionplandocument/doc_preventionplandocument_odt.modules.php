@@ -168,7 +168,7 @@ class doc_preventionplandocument_odt extends ModeleODTPreventionPlanDocument
 	 *  @param		int			$hideref			Do not show ref
 	 *	@return		int         					1 if OK, <=0 if KO
 	 */
-	public function write_file($object, $outputlangs, $srctemplatepath, $hidedetails = 0, $hidedesc = 0, $hideref = 0, $digiriskelement)
+	public function write_file($object, $outputlangs, $srctemplatepath, $hidedetails = 0, $hidedesc = 0, $hideref = 0, $preventionplan)
 	{
 		// phpcs:enable
 		global $user, $langs, $conf, $hookmanager, $action;
@@ -196,11 +196,11 @@ class doc_preventionplandocument_odt extends ModeleODTPreventionPlanDocument
 		$ref = $mod->getNextValue($object);
 
 		$object->ref = $ref;
-		$id = $object->create($user, true);
+		$id = $object->create($user, true, $preventionplan);
 
 		$object->fetch($id);
 
-		$dir = $conf->digiriskdolibarr->multidir_output[isset($object->entity) ? $object->entity : 1] . '/preventionplandocument/'. $digiriskelement->ref;
+		$dir = $conf->digiriskdolibarr->multidir_output[isset($object->entity) ? $object->entity : 1] . '/preventionplandocument/'. $preventionplan->ref;
 		$objectref = dol_sanitizeFileName($ref);
 		if (preg_match('/specimen/i', $objectref)) $dir .= '/specimen';
 
@@ -234,10 +234,10 @@ class doc_preventionplandocument_odt extends ModeleODTPreventionPlanDocument
 
 			// Make substitution
 			$substitutionarray = array();
-			complete_substitutions_array($substitutionarray, $langs, $digiriskelement);
+			complete_substitutions_array($substitutionarray, $langs, $preventionplan);
 			// Call the ODTSubstitution hook
-			$parameters = array('file'=>$file, 'object'=>$digiriskelement, 'outputlangs'=>$outputlangs, 'substitutionarray'=>&$substitutionarray);
-			$reshook = $hookmanager->executeHooks('ODTSubstitution', $parameters, $this, $action); // Note that $action and $digiriskelement may have been modified by some hooks
+			$parameters = array('file'=>$file, 'object'=>$preventionplan, 'outputlangs'=>$outputlangs, 'substitutionarray'=>&$substitutionarray);
+			$reshook = $hookmanager->executeHooks('ODTSubstitution', $parameters, $this, $action); // Note that $action and $preventionplan may have been modified by some hooks
 
 			// Open and load template
 			require_once ODTPHP_PATH.'odf.php';
@@ -261,7 +261,7 @@ class doc_preventionplandocument_odt extends ModeleODTPreventionPlanDocument
 
 			$tmparray = $substitutionarray;
 
-			$filearray = dol_dir_list($conf->digiriskdolibarr->multidir_output[$conf->entity] . '/' . $digiriskelement->element_type . '/' . $digiriskelement->ref, "files", 0, '', '(\.odt|_preview.*\.png)$', 'position_name', 'desc', 1);
+			$filearray = dol_dir_list($conf->digiriskdolibarr->multidir_output[$conf->entity] . '/' . $preventionplan->element_type . '/' . $preventionplan->ref, "files", 0, '', '(\.odt|_preview.*\.png)$', 'position_name', 'desc', 1);
 			if (count($filearray)) {
 				$image = array_shift($filearray);
 				$tmparray['photoDefault'] = $image['fullname'];

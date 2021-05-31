@@ -147,7 +147,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->create($user);
 				break;
 
-			case 'PREVENTIONPLAN_GENERATE' :
+			case 'PREVENTIONPLANDOCUMENT_GENERATE' :
 				dol_syslog("Trigger '".$this->name."' for action '$action' launched by ".__FILE__.". id=".$object->id);
 				require_once DOL_DOCUMENT_ROOT.'/comm/action/class/actioncomm.class.php';
 				$now = dol_now();
@@ -155,9 +155,10 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 
 				$actioncomm->elementtype = $object->parent_type . '@digiriskdolibarr';
 				$actioncomm->elementid   = $object->parent_id;
-				$actioncomm->code        = 'AC_PREVENTIONPLAN_GENERATE';
+
+				$actioncomm->code        = 'AC_PREVENTIONPLANDOCUMENT_GENERATE';
 				$actioncomm->type_code   = 'AC_OTH_AUTO';
-				$actioncomm->label       = $langs->trans('PreventionPlanGeneratedWithDolibarr');
+				$actioncomm->label       = $langs->trans('PreventionPlanDocumentGeneratedWithDolibarr');
 				$actioncomm->datep       = $now;
 				$actioncomm->fk_element  = $object->parent_id;
 				$actioncomm->userownerid = $user->id;
@@ -277,6 +278,29 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				}
 
 				break;
+			case 'PREVENTIONPLANLINE_CREATE' :
+
+				dol_syslog("Trigger '".$this->name."' for action '$action' launched by ".__FILE__.". id=".$object->id);
+				require_once DOL_DOCUMENT_ROOT.'/comm/action/class/actioncomm.class.php';
+				$now = dol_now();
+				$actioncomm = new ActionComm($this->db);
+
+				$actioncomm->elementtype = 'preventionplan@digiriskdolibarr';
+				$actioncomm->elementid   = $object->fk_preventionplan;
+
+				$actioncomm->code        = 'AC_PREVENTIONPLANLINE_CREATE';
+				$actioncomm->type_code   = 'AC_OTH_AUTO';
+				$actioncomm->label       = $langs->trans('PreventionPlanLineCreatedWithDolibarr');
+				$actioncomm->datep       = $now;
+				$actioncomm->fk_element  = $object->fk_preventionplan;
+				$actioncomm->userownerid = $user->id;
+				$actioncomm->percentage  = -1;
+
+				$actioncomm->create($user);
+				break;
+
+				break;
+
 		}
 
 		return 0;

@@ -36,7 +36,7 @@ require_once DOL_DOCUMENT_ROOT.'/user/class/user.class.php';
 require_once DOL_DOCUMENT_ROOT.'/contact/class/contact.class.php';
 require_once DOL_DOCUMENT_ROOT.'/societe/class/societe.class.php';
 
-dol_include_once('/custom/digiriskdolibarr/class/digiriskelement/preventionplan.class.php');
+dol_include_once('/custom/digiriskdolibarr/class/preventionplan.class.php');
 
 // Load translation files required by the page
 $langs->loadLangs(array('projects', 'companies', 'commercial'));

@@ -155,7 +155,7 @@ class DigiriskDocuments extends CommonObject
 
 		if ($parentObject->id > 0) {
 			$this->parent_id     = $parentObject->id;
-			$this->parent_type   = $parentObject->element_type;
+			$this->parent_type   = $parentObject->element_type ? $parentObject->element_type : $parentObject->element;
 		} else {
 			$this->parent_id    = $conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD;
 			$this->parent_type  = 'digiriskstandard';

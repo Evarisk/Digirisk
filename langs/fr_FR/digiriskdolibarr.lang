@@ -286,9 +286,9 @@ CreatePreventionPlan = Créer un plan de prévention
 DeletePreventionPlan = Supprimer un plan de prévention
 
 # Trigger - Déclencheur
-PREVENTIONPLAN_CREATEInDolibarr = Plan de prévention créée dans Dolibarr
+PREVENTIONPLAN_CREATEInDolibarr = Plan de prévention créé dans Dolibarr
 ActionsOnPreventionPlan = Événements liés au plan de prévention
-PreventionPlanGeneratedWithDolibarr = Plan de prévention générée avec Dolibarr
+PreventionPlanGeneratedWithDolibarr = Plan de prévention généré avec Dolibarr
 
 # Mod Numbering - Modèle de numérotation
 DigiriskPreventionPlanNumberingModule = Modèle de numérotation des plans de prévention de Digirisk

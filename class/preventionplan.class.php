@@ -129,7 +129,7 @@ class PreventionPlan extends CommonObject
 	 */
 	public function create(User $user, $notrigger = false)
 	{
-		$this->element = $this->element_type . '@digiriskdolibarr';
+		$this->element = $this->element . '@digiriskdolibarr';
 		return $this->createCommon($user, $notrigger);
 	}
 

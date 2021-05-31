@@ -31,7 +31,7 @@ require_once DOL_DOCUMENT_ROOT.'/core/class/html.formfile.class.php';
 dol_include_once('/digiriskdolibarr/class/digiriskdocuments.class.php');
 dol_include_once('/digiriskdolibarr/class/digiriskelement.class.php');
 dol_include_once('/digiriskdolibarr/class/digiriskresources.class.php');
-dol_include_once('/digiriskdolibarr/class/digiriskelement/preventionplan.class.php');
+dol_include_once('/digiriskdolibarr/class/preventionplan.class.php');
 dol_include_once('/digiriskdolibarr/class/riskanalysis/risk.class.php');
 dol_include_once('/digiriskdolibarr/class/digiriskdocuments/preventionplandocument.class.php');
 dol_include_once('/digiriskdolibarr/lib/digiriskdolibarr_function.lib.php');
@@ -137,7 +137,7 @@ if (empty($reshook))
 		$object->fk_user_creat = $user->id ? $user->id : 1;
 
 		if (!$error) {
-			$result = $object->create($user, true);
+			$result = $object->create($user, false);
 
 			if ($result > 0) {
 
@@ -194,7 +194,7 @@ if (empty($reshook))
 		$object->fk_user_creat = $user->id ? $user->id : 1;
 
 		if (!$error) {
-			$result = $object->update($user, true);
+			$result = $object->update($user, false);
 
 			if ($result > 0) {
 
@@ -246,15 +246,17 @@ if (empty($reshook))
 			setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv('Location')), null, 'errors');
 			$error++;
 		}
-		if ($risk_category_id < 0) {
+
+		if ($risk_category_id < 0 || $risk_category_id == 'undefined') {
 			setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv('INRSRisk')), null, 'errors');
 			$error++;
 		}
 
 		if (!$error) {
-			$result = $objectline->insert(1);
+			$result = $objectline->insert(0);
 
 			if ($result > 0) {
+				$objectline->call_trigger('PREVENTIONPLANLINE_CREATE', $user);
 
 				$urltogo = str_replace('__ID__', $result, $backtopage);
 				$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
@@ -1109,7 +1111,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit')))
 		// List of actions on element
 		include_once DOL_DOCUMENT_ROOT . '/core/class/html.formactions.class.php';
 		$formactions = new FormActions($db);
-		$somethingshown = $formactions->showactions($object, $object->element_type . '@digiriskdolibarr', (is_object($object->thirdparty) ? $object->thirdparty->id : 0), 1, '', $MAXEVENT, '', $morehtmlright);
+		$somethingshown = $formactions->showactions($object, $object->element . '@digiriskdolibarr', (is_object($object->thirdparty) ? $object->thirdparty->id : 0), 1, '', $MAXEVENT, '', $morehtmlright);
 
 		print '</div></div></div>';
 	}

@@ -107,7 +107,6 @@ class modDigiriskdolibarr extends DolibarrModules
 			"/ecm/digiriskdolibarr/workunitdocument",
 			"/ecm/digiriskdolibarr/listingrisksaction",
 			"/ecm/digiriskdolibarr/listingrisksphoto",
-			"/ecm/digiriskdolibarr/risksign",
 			"/ecm/digiriskdolibarr/medias"
 		);
 
@@ -128,8 +127,6 @@ class modDigiriskdolibarr extends DolibarrModules
 		//$this->always_enabled = true;								// If true, can't be disabled
 
 		// Constants
-		//TODO ranger les const correctement
-		// TODO insert l'entity avec $conf->entity our mieux gérer le multientity
 		$this->const = array(
 			// CONST CONFIGURATION
 			1 => array('DIGIRISK_GENERAL_MEANS','chaine','','General means', $conf->entity),
@@ -209,10 +206,14 @@ class modDigiriskdolibarr extends DolibarrModules
 
 			// CONST PREVENTION PLAN DOCUMENT
 			82 => array('MAIN_AGENDA_ACTIONAUTO_PREVENTIONPLANDOCUMENT_CREATE','chaine',1,'', $conf->entity),
-			83 => array('DIGIRISKDOLIBARR_PREVENTIONPLANDOCUMENT_ADDON','chaine', 'mod_preventionplandocument_standard' ,'', $conf->entity),
-			84 => array('DIGIRISKDOLIBARR_PREVENTIONPLANDOCUMENT_ADDON_ODT_PATH','chaine', DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/documents/doctemplates/preventionplandocument/' ,'', $conf->entity),
-			85 => array('DIGIRISKDOLIBARR_PREVENTIONPLANDOCUMENT_CUSTOM_ADDON_ODT_PATH','chaine', DOL_DATA_ROOT . '/ecm/digiriskdolibarr/preventionplandocument/' ,'', $conf->entity),
-			86 => array('DIGIRISKDOLIBARR_PREVENTIONPLANDOCUMENT_DEFAULT_MODEL','chaine', 'preventionplandocument_odt' ,'', $conf->entity),
+			83 => array('MAIN_AGENDA_ACTIONAUTO_PREVENTIONPLAN_CREATE','chaine',1,'', $conf->entity),
+			84 => array('MAIN_AGENDA_ACTIONAUTO_PREVENTIONPLAN_EDIT','chaine',1,'', $conf->entity),
+			85 => array('MAIN_AGENDA_ACTIONAUTO_PREVENTIONPLANLINE_CREATE','chaine',1,'', $conf->entity),
+
+			86 => array('DIGIRISKDOLIBARR_PREVENTIONPLANDOCUMENT_ADDON','chaine', 'mod_preventionplandocument_standard' ,'', $conf->entity),
+			87 => array('DIGIRISKDOLIBARR_PREVENTIONPLANDOCUMENT_ADDON_ODT_PATH','chaine', DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/documents/doctemplates/preventionplandocument/' ,'', $conf->entity),
+			88 => array('DIGIRISKDOLIBARR_PREVENTIONPLANDOCUMENT_CUSTOM_ADDON_ODT_PATH','chaine', DOL_DATA_ROOT . '/ecm/digiriskdolibarr/preventionplandocument/' ,'', $conf->entity),
+			89 => array('DIGIRISKDOLIBARR_PREVENTIONPLANDOCUMENT_DEFAULT_MODEL','chaine', 'preventionplandocument_odt' ,'', $conf->entity),
 
 			// CONST FIREPERMIT
 			90 => array('MAIN_AGENDA_ACTIONAUTO_FIREPERMIT_CREATE','chaine',1,'', $conf->entity),
