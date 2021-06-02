@@ -255,10 +255,10 @@ if (empty($reshook))
 		}
 
 		if (!$error) {
-			$result = $objectline->insert(0);
+			$result = $objectline->insert(1);
 
 			if ($result > 0) {
-				$objectline->call_trigger('PREVENTIONPLANLINE_CREATE', $user);
+				$objectline->call_trigger('PREVENTIONPLANDET_CREATE', $user);
 
 				$urltogo = str_replace('__ID__', $result, $backtopage);
 				$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation

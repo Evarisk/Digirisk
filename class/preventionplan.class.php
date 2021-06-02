@@ -550,12 +550,12 @@ class PreventionPlanLine extends CommonObjectLine
 		$sql .= ' (ref, entity, date_creation, description, category, prevention_method, fk_preventionplan, fk_element';
 		$sql .= ')';
 		$sql .= " VALUES (";
-		$sql .= "'" . $this->ref . "'" . ", ";
+		$sql .= "'" . $db->escape($this->ref) . "'" . ", ";
 		$sql .= $this->entity . ", ";
-		$sql .= "'" . $db->idate($now) . "'" . ", ";
-		$sql .= "'" . $this->description . "'" . ", ";
+		$sql .= "'" . $db->escape($db->idate($now)) . "'" . ", ";
+		$sql .= "'" . $db->escape($this->description) . "'" . ", ";
 		$sql .= $this->category . ", ";
-		$sql .= "'" . $this->prevention_method . "'" . ", ";
+		$sql .= "'" . $db->escape($this->prevention_method) . "'" . ", ";
 		$sql .= $this->fk_preventionplan . ", ";
 		$sql .= $this->fk_element ;
 

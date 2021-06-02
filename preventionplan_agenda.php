@@ -16,9 +16,9 @@
  */
 
 /**
- *  \file       digiriskelement_agenda.php
+ *  \file       preventionplan_agenda.php
  *  \ingroup    digiriskdolibarr
- *  \brief      Page of DigiriskElement events
+ *  \brief      Page of PreventionPlan events
  */
 
 // Load Dolibarr environment
@@ -29,8 +29,8 @@ if (!$res) die("Include of main fails");
 require_once DOL_DOCUMENT_ROOT.'/contact/class/contact.class.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/company.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/functions2.lib.php';
-dol_include_once('/digiriskdolibarr/class/digiriskelement.class.php');
-dol_include_once('/digiriskdolibarr/lib/digiriskdolibarr_digiriskelement.lib.php');
+dol_include_once('/digiriskdolibarr/class/preventionplan.class.php');
+dol_include_once('/digiriskdolibarr/lib/digiriskdolibarr_preventionplan.lib.php');
 dol_include_once('/digiriskdolibarr/lib/digiriskdolibarr_function.lib.php');
 
 
@@ -67,10 +67,10 @@ if (!$sortfield) $sortfield = 'a.datep,a.id';
 if (!$sortorder) $sortorder = 'DESC,DESC';
 
 // Initialize technical objects
-$object = new DigiriskElement($db);
+$object = new PreventionPlan($db);
 $extrafields = new ExtraFields($db);
 $diroutputmassaction = $conf->digiriskdolibarr->dir_output.'/temp/massgeneration/'.$user->id;
-$hookmanager->initHooks(array('digiriskelementagenda', 'globalcard')); // Note that conf->hooks_modules contains array
+$hookmanager->initHooks(array('preventionplanagenda', 'globalcard')); // Note that conf->hooks_modules contains array
 // Fetch optionals attributes and labels
 $extrafields->fetch_name_optionals_label($object->table_element);
 
@@ -83,7 +83,7 @@ if ($id > 0 || !empty($ref)) $upload_dir = $conf->digiriskdolibarr->multidir_out
 //if ($user->socid > 0) $socid = $user->socid;
 //$result = restrictedArea($user, 'digiriskdolibarr', $object->id);
 
-$permissiontoadd = $user->rights->digiriskdolibarr->digiriskelement->write; // Used by the include of actions_addupdatedelete.inc.php
+$permissiontoadd = $user->rights->digiriskdolibarr->preventionplan->write; // Used by the include of actions_addupdatedelete.inc.php
 
 
 /*
@@ -129,14 +129,14 @@ if (true)
 	$morejs = array("/digiriskdolibarr/js/digiriskdolibarr.js.php");
 	$morecss   = array("/digiriskdolibarr/css/digiriskdolibarr.css");
 
-	digiriskHeader('', $title, $help_url, '', '', '', $morejs, $morecss);
+	llxHeader('', $title, $help_url, '', '', '', $morejs, $morecss);
 	print '<div id="cardContent" value="">';
 
 	if (!empty($conf->notification->enabled)) $langs->load("mails");
-	$head = digiriskelementPrepareHead($object);
+	$head = preventionplanPrepareHead($object);
 
 
-	dol_fiche_head($head, 'elementAgenda', $title, -1, "digiriskdolibarr@digiriskdolibarr");
+	dol_fiche_head($head, 'preventionplanAgenda', $title, -1, "digiriskdolibarr@digiriskdolibarr");
 
 	// Object card
 	// ------------------------------------------------------------

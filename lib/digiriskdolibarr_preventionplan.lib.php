@@ -41,6 +41,11 @@ function preventionplanPrepareHead($object)
 		$head[$h][1] = '<i class="fas fa-address-card"></i> ' . $langs->trans("Card");
 		$head[$h][2] = 'preventionplanCard';
 		$h++;
+
+		$head[$h][0] = dol_buildpath("/digiriskdolibarr/preventionplan_agenda.php", 1) . '?id=' . $object->id;
+		$head[$h][1] = '<i class="fas fa-calendar"></i> ' . $langs->trans("Events");
+		$head[$h][2] = 'preventionplanAgenda';
+		$h++;
 	}
 
 	complete_head_from_modules($conf, $langs, $object, $head, $h, 'preventionplandocument@digiriskdolibarr');

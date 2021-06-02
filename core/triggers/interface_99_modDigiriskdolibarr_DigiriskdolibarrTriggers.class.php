@@ -278,7 +278,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				}
 
 				break;
-			case 'PREVENTIONPLANLINE_CREATE' :
+			case 'PREVENTIONPLANDET_CREATE' :
 
 				dol_syslog("Trigger '".$this->name."' for action '$action' launched by ".__FILE__.". id=".$object->id);
 				require_once DOL_DOCUMENT_ROOT.'/comm/action/class/actioncomm.class.php';
@@ -299,9 +299,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->create($user);
 				break;
 
-				break;
-
-		}
+ 		}
 
 		return 0;
 	}
