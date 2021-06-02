@@ -262,8 +262,8 @@ class modDigiriskdolibarr extends DolibarrModules
 			163 => array('DIGIRISKDOLIBARR_THIRDPARTY_SET','integer', 0,'', $conf->entity),
 
 			// CONST PREVENTION PLAN LINE
-			85 => array('MAIN_AGENDA_ACTIONAUTO_PREVENTIONPLANLINE_CREATE','chaine',1,'', $conf->entity),
-			86 => array('DIGIRISKDOLIBARR_PREVENTIONPLANDET_ADDON','chaine', 'mod_preventionplandet_standard' ,'', $conf->entity),
+			180 => array('MAIN_AGENDA_ACTIONAUTO_PREVENTIONPLANDET_CREATE','chaine',1,'', $conf->entity),
+			181 => array('DIGIRISKDOLIBARR_PREVENTIONPLANDET_ADDON','chaine', 'mod_preventionplandet_standard' ,'', $conf->entity),
 
 			// MODULE
 			200 => array('DIGIRISKDOLIBARR_VERSION','chaine', $this->version,'', $conf->entity),

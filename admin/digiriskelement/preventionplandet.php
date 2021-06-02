@@ -16,9 +16,9 @@
  */
 
 /**
- * \file    digiriskdolibarr/admin/preventionplan.php
+ * \file    digiriskdolibarr/admin/preventionplandet.php
  * \ingroup digiriskdolibarr
- * \brief   Digiriskdolibarr preventionplan page.
+ * \brief   Digiriskdolibarr preventionplandet page.
  */
 
 // Load Dolibarr environment
@@ -45,7 +45,7 @@ $action     = GETPOST('action', 'alpha');
 $backtopage = GETPOST('backtopage', 'alpha');
 $value      = GETPOST('value', 'alpha');
 
-$type          = 'preventionplan';
+$type          = 'preventionplandet';
 $error         = 0;
 $setupnotempty = 0;
 
@@ -54,10 +54,10 @@ $setupnotempty = 0;
  */
 if ($action == 'updateMask')
 {
-	$maskconstpreventionplan = GETPOST('maskconstpreventionplan', 'alpha');
-	$maskpreventionplan      = GETPOST('maskpreventionplan', 'alpha');
+	$maskconstpreventionplandet = GETPOST('maskconstpreventionplandet', 'alpha');
+	$maskpreventionplandet      = GETPOST('maskpreventionplandet', 'alpha');
 
-	if ($maskconstpreventionplan) $res = dolibarr_set_const($db, $maskconstpreventionplan, $maskpreventionplan, 'chaine', 0, '', $conf->entity);
+	if ($maskconstpreventionplandet) $res = dolibarr_set_const($db, $maskconstpreventionplandet, $maskpreventionplandet, 'chaine', 0, '', $conf->entity);
 
 	if (!$res > 0) $error++;
 
@@ -96,13 +96,13 @@ print load_fiche_titre($langs->trans($page_name), $linkback, 'object_digiriskdol
 $head = digiriskdolibarrAdminPrepareHead();
 dol_fiche_head($head, 'digiriskelement', '', -1, "digiriskdolibarr@digiriskdolibarr");
 $head = digiriskdolibarrAdminDigiriskElementPrepareHead();
-dol_fiche_head($head, 'preventionplan', '', -1, "digiriskdolibarr@digiriskdolibarr");
+dol_fiche_head($head, 'preventionplandet', '', -1, "digiriskdolibarr@digiriskdolibarr");
 
 /*
  *  Numbering module
  */
 
-print load_fiche_titre($langs->trans("DigiriskPreventionPlanNumberingModule"), '', '');
+print load_fiche_titre($langs->trans("DigiriskPreventionPlanDetNumberingModule"), '', '');
 
 print '<table class="noborder centpercent">';
 print '<tr class="liste_titre">';
@@ -153,7 +153,7 @@ if (is_dir($dir))
 						print '</td>'."\n";
 
 						print '<td class="center">';
-						if ($conf->global->DIGIRISKDOLIBARR_PREVENTIONPLAN_ADDON == $file || $conf->global->DIGIRISKDOLIBARR_PREVENTIONPLAN_ADDON.'.php' == $file)
+						if ($conf->global->DIGIRISKDOLIBARR_PREVENTIONPLANDET_ADDON == $file || $conf->global->DIGIRISKDOLIBARR_PREVENTIONPLANDET_ADDON.'.php' == $file)
 						{
 							print img_picto($langs->trans("Activated"), 'switch_on');
 						}
@@ -180,7 +180,7 @@ if (is_dir($dir))
 
 						print '<td class="center">';
 						print $form->textwithpicto('', $htmltooltip, 1, 0);
-						if ($conf->global->DIGIRISKDOLIBARR_PREVENTIONPLAN_ADDON.'.php' == $file)  // If module is the one used, we show existing errors
+						if ($conf->global->DIGIRISKDOLIBARR_PREVENTIONPLANDET_ADDON.'.php' == $file)  // If module is the one used, we show existing errors
 						{
 							if (!empty($module->error)) dol_htmloutput_mesg($module->error, '', 'error', 1);
 						}

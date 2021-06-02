@@ -158,9 +158,14 @@ function digiriskdolibarrAdminDigiriskElementPrepareHead()
 	$head[$h][2] = 'evaluator';
 	$h++;
 
-	$head[$h][0] = dol_buildpath("/digiriskdolibarr/admin/digiriskelement/preventionplandocument.php", 1);
+	$head[$h][0] = dol_buildpath("/digiriskdolibarr/admin/digiriskelement/preventionplan.php", 1);
 	$head[$h][1] = $langs->trans("PreventionPlan");
-	$head[$h][2] = 'preventionplandocument';
+	$head[$h][2] = 'preventionplan';
+	$h++;
+
+	$head[$h][0] = dol_buildpath("/digiriskdolibarr/admin/digiriskelement/preventionplandet.php", 1);
+	$head[$h][1] = $langs->trans("PreventionPlanDet");
+	$head[$h][2] = 'preventionplandet';
 	$h++;
 	complete_head_from_modules($conf, $langs, null, $head, $h, 'digiriskdolibarr');
 
