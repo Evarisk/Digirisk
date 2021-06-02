@@ -24,8 +24,9 @@ CREATE TABLE llx_digiriskdolibarr_preventionplan(
 	label               varchar(255) NOT NULL,
     date_start          datetime NOT NULL,
 	date_end            datetime,
-	imminent_danger     boolean,
-	more_than_400_hours boolean,
+	prior_visit_bool    boolean,
+	prior_visit_text    text,
+	cssct_intervention  boolean,
 	fk_user_creat       integer NOT NULL,
 	fk_user_modif       integer
 ) ENGINE=innodb;

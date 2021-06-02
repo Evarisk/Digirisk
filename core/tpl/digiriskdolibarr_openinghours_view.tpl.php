@@ -34,21 +34,14 @@ if (!is_object($form)) $form = new Form($db);
 ?>
 <!-- BEGIN PHP TEMPLATE digiriskdolibarr_legaldisplayfields_view.tpl.php -->
 <?php
-
-print '<form method="POST" action="'.$_SERVER["PHP_SELF"].'?id='.$societe->id.'" >';
+print '<form method="POST" action="'.$_SERVER["PHP_SELF"].'?id='.GETPOST('id').'" >';
 print '<input type="hidden" name="token" value="'.newToken().'">';
 print '<input type="hidden" name="action" value="update">';
+print '<input type="hidden" name="id" value="'.GETPOST('id').'">';
 
 print '<table class="noborder centpercent editmode">';
 
 print '<tr class="liste_titre"><th class="titlefield wordbreak">'.$langs->trans("Day").'</th><th>'.$langs->trans("Value").'</th></tr>'."\n";
-
-
-
-
-
-
-
 
 print '<tr class="oddeven"><td>';
 print $form->textwithpicto($langs->trans("Monday"), $langs->trans("OpeningHoursFormatDesc"));

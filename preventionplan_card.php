@@ -112,8 +112,9 @@ if (empty($reshook))
 		$labour_inspector_id    = GETPOST('labour_inspector');
 
 		$label                  = GETPOST('label');
-		$morethan400hours       = GETPOST('morethan400hours');
-		$imminentdanger         = GETPOST('imminent_danger');
+		$prior_visit_bool       = GETPOST('prior_visit_bool');
+		$prior_visit_text       = GETPOST('prior_visit_text');
+		$cssct_intervention     = GETPOST('cssct_intervention');
 		$date_debut             = GETPOST('date_debut');
 		$date_fin               = GETPOST('date_fin');
 		$description 			= GETPOST('description');
@@ -133,8 +134,10 @@ if (empty($reshook))
 		$object->description   = $description;
 		$object->date_start    = dol_print_date($date_debut->getTimestamp(), 'dayhourrfc');
 		$object->date_end      = dol_print_date($date_fin->getTimestamp(), 'dayhourrfc');
-		$object->imminent_danger      = $imminentdanger;
-		$object->more_than_400_hours      = $morethan400hours;
+
+		$object->prior_visit_bool      = $prior_visit_bool;
+		$object->prior_visit_text      = $prior_visit_text;
+		$object->cssct_intervention    = $cssct_intervention;
 
 		$object->fk_user_creat = $user->id ? $user->id : 1;
 
@@ -174,8 +177,9 @@ if (empty($reshook))
 		$labour_inspector_id    = GETPOST('labour_inspector');
 
 		$label                  = GETPOST('label');
-		$morethan400hours       = GETPOST('morethan400hours');
-		$imminentdanger         = GETPOST('imminent_danger');
+		$prior_visit_bool       = GETPOST('prior_visit_bool');
+		$prior_visit_text       = GETPOST('prior_visit_text');
+		$cssct_intervention     = GETPOST('cssct_intervention');
 		$date_debut             = GETPOST('date_debut');
 		$date_fin               = GETPOST('date_fin');
 		$description 			= GETPOST('description');
@@ -190,8 +194,9 @@ if (empty($reshook))
 		$object->description         = $description;
 		$object->date_start          = dol_print_date($date_debut->getTimestamp(), 'dayhourrfc');
 		$object->date_end            = dol_print_date($date_fin->getTimestamp(), 'dayhourrfc');
-		$object->imminent_danger     = $imminentdanger;
-		$object->more_than_400_hours = $morethan400hours;
+		$object->prior_visit_bool    = $prior_visit_bool;
+		$object->prior_visit_text    = $prior_visit_text;
+		$object->cssct_intervention  = $cssct_intervention;
 
 		$object->fk_user_creat = $user->id ? $user->id : 1;
 
@@ -487,26 +492,27 @@ if ($action == 'create')
 
 	print '</td></tr>';
 
-	// Duration
+	// CSSCT Intervention
 	print '<tr><td class="tdtop">';
-	print $langs->trans("Durée");
+	print $langs->trans("CSSCTIntervention");
 	print '</td>';
 	print '<td>';
-	print '<input type="checkbox" id="morethan400hours" name="morethan400hours"'.(GETPOSTISSET('morethan400hours') ? (GETPOST('morethan400hours', 'alpha') != '' ? ' checked=""' : '') : ' checked=""').'"> ';
-	$htmltext = $langs->trans("PreventionPlanLastsMoreThan400Hours");
-	print $form->textwithpicto($langs->trans("MoreThan400Hours"), $htmltext);
+	print '<input type="checkbox" id="cssct_intervention" name="cssct_intervention"'.(GETPOSTISSET('cssct_intervention') ? (GETPOST('cssct_intervention', 'alpha') != '' ? ' checked=""' : '') : ' checked=""').'"> ';
+	$htmltext = $langs->trans("CSSCTInterventionText");
+	print $form->textwithpicto('', $htmltext);
 	print '<br>';
 	print '</td></tr>';
 
-	//Imminent danger -- Danger imminent
+	//Prior Visit -- Visite préalable
 	print '<tr><td class="tdtop">';
-	print $langs->trans("ImminentDanger");
+	print $langs->trans("PriorVisit");
 	print '</td>';
 	print '<td>';
-	print '<input type="checkbox" id="imminent_danger" name="imminent_danger"'.(GETPOSTISSET('imminent_danger') ? (GETPOST('imminent_danger', 'alpha') != '' ? ' checked=""' : '') : ' checked=""').'"> ';
-	$htmltext = $langs->trans("ImminentDanger");
+	print '<input type="checkbox" id="prior_visit_bool" name="prior_visit_bool"'.(GETPOSTISSET('prior_visit_bool') ? (GETPOST('prior_visit_bool', 'alpha') != '' ? ' checked=""' : '') : ' checked=""').'"> ';
+	$htmltext = $langs->trans("PriorVisitText");
 	print $form->textwithpicto('', $htmltext);
-	print '<br>';
+
+	print '<input class="flat" type="text" size="36" name="prior_visit_text" id="prior_visit_text" value="">';
 	print '</td></tr>';
 
 	//Labour inspector -- Inspecteur du travail
@@ -575,6 +581,16 @@ if (($id || $ref) && $action == 'edit')
 	print '<input class="flat" type="text" size="36" name="label" id="label" value="'.$object->label.'">';
 	print '</td></tr>';
 
+	//Start Date -- Date début
+	print '<tr class="oddeven"><td><label for="date_debut">'.$langs->trans("StartDate").'</label></td><td>';
+	print $form->selectDate('', 'date_debut', 1, 1, 0);
+	print '</td></tr>';
+
+	//End Date -- Date fin
+	print '<tr class="oddeven"><td><label for="date_fin">'.$langs->trans("EndDate").'</label></td><td>';
+	print $form->selectDate(dol_time_plus_duree(dol_now(),1,'y'), 'date_fin', 1, 1, 0);
+	print '</td></tr>';
+
 	//Maitre d'oeuvre
 	$userlist 	  = $form->select_dolusers(is_array($object_resources['PP_MAITRE_OEUVRE']) ? array_shift($object_resources['PP_MAITRE_OEUVRE'])->id : '', '', 0, null, 0, '', '', 0, 0, 0, 'AND u.statut = 1', 0, '', '', 0, 1);
 
@@ -630,36 +646,27 @@ if (($id || $ref) && $action == 'edit')
 
 	print '</td></tr>';
 
-	// Duration
+	// CSSCT Intervention
 	print '<tr><td class="tdtop">';
-	print $langs->trans("Durée");
+	print $langs->trans("CSSCTIntervention");
 	print '</td>';
 	print '<td>';
-	print '<input type="checkbox" id="morethan400hours" name="morethan400hours"'.($object->more_than_400_hours ? ' checked=""' : '').'"> ';
-	$htmltext = $langs->trans("PreventionPlanLastsMoreThan400Hours");
-	print $form->textwithpicto($langs->trans("MoreThan400Hours"), $htmltext);
-	print '<br>';
-	print '</td></tr>';
-
-	//Start Date -- Date début
-	print '<tr class="oddeven"><td><label for="date_debut">'.$langs->trans("StartDate").'</label></td><td>';
-	print $form->selectDate('', 'date_debut', 1, 1, 0);
-	print '</td></tr>';
-
-	//End Date -- Date fin
-	print '<tr class="oddeven"><td><label for="date_fin">'.$langs->trans("EndDate").'</label></td><td>';
-	print $form->selectDate(dol_time_plus_duree(dol_now(),1,'y'), 'date_fin', 1, 1, 0);
-	print '</td></tr>';
-
-	//Imminent danger -- Danger imminent
-	print '<tr><td class="tdtop">';
-	print $langs->trans("ImminentDanger");
-	print '</td>';
-	print '<td>';
-	print '<input type="checkbox" id="imminent_danger" name="imminent_danger" '.($object->imminent_danger ? ' checked=""' : '').'"> ';
-	$htmltext = $langs->trans("ImminentDanger");
+	print '<input type="checkbox" id="cssct_intervention" name="cssct_intervention"'.($object->cssct_intervention? ' checked=""' : '').'"> ';
+	$htmltext = $langs->trans("CSSCTInterventionText");
 	print $form->textwithpicto('', $htmltext);
 	print '<br>';
+	print '</td></tr>';
+
+	//Prior Visit -- Visite préalable
+	print '<tr><td class="tdtop">';
+	print $langs->trans("PriorVisit");
+	print '</td>';
+	print '<td>';
+	print '<input type="checkbox" id="prior_visit_bool" name="prior_visit_bool"'.($object->prior_visit_bool? ' checked=""' : '').'"> ';
+	$htmltext = $langs->trans("PriorVisitText");
+	print $form->textwithpicto('', $htmltext);
+
+	print '<input class="flat" type="text" size="36" name="prior_visit_text" id="prior_visit_text" value="'.$object->prior_visit_text.'">';
 	print '</td></tr>';
 
 	//Labour inspector -- Inspecteur du travail
@@ -733,7 +740,6 @@ if ((empty($action) || ($action != 'create' && $action != 'edit')))
 	unset($object->fields['last_main_doc']);
 	unset($object->fields['entity']);
 
-	//Creation User
 	include DOL_DOCUMENT_ROOT.'/core/tpl/commonfields_view.tpl.php';
 
 	//Master builder -- Maitre Oeuvre

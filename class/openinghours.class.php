@@ -158,4 +158,16 @@ class Openinghours extends CommonObject
 	{
 		return $this->fetchCommon($id, $ref, $morewhere);
 	}
+
+	/**
+	 *	Return label of contact status
+	 *
+	 *	@param      int		$mode       0=Long label, 1=Short label, 2=Picto + Short label, 3=Picto, 4=Picto + Long label, 5=Short label + Picto, 6=Long label + Picto
+	 * 	@return 	string				Label of contact status
+	 */
+	public function getLibStatut($mode)
+	{
+		return '';
+	}
+
 }
