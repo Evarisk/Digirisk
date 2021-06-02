@@ -267,6 +267,67 @@ class doc_preventionplandocument_odt extends ModeleODTPreventionPlanDocument
 				$tmparray['photoDefault'] = $image['fullname'];
 			}
 
+			$resources = new DigiriskResources($this->db);
+			$societe   = new Societe($this->db);
+
+
+			$tmparray['titre_prevention'] = $preventionplan->ref;
+			$tmparray['unique_identifier'] = $preventionplan->label;
+			$tmparray['raison_du_plan_de_prevention'] = $preventionplan->raison;
+
+			$tmparray['moyen_generaux_mis_disposition'] = $conf->global->DIGIRISK_GENERAL_MEANS;
+			$tmparray['consigne_generale'] = $conf->global->DIGIRISK_GENERAL_RULES;
+			$tmparray['premiers_secours'] = $conf->global->DIGIRISK_FIRST_AID;
+
+			$tmparray['date_start_intervention_PPP'] = $preventionplan->date_start;
+			$tmparray['date_end_intervention_PPP'] = $preventionplan->date_end;
+			$tmparray['interventions_info'] = count($preventionplanlines) . " " . $langs->trans('PreventionPlanLine');
+
+			$digirisk_resources      = $resources->digirisk_dolibarr_fetch_resources();
+
+			$openinghours = new Openinghours($this->db);
+
+			$morewhere = ' AND element_id = ' . $preventionplan->id;
+			$morewhere .= ' AND element_type = ' . "'" . $preventionplan->element . "'";
+			$morewhere .= ' AND status = 1';
+
+			$openinghours->fetch(0, '', $morewhere);
+
+			$opening_hours_monday    = explode(' ', $openinghours->monday);
+			$opening_hours_tuesday   = explode(' ', $openinghours->tuesday);
+			$opening_hours_wednesday = explode(' ', $openinghours->wednesday);
+			$opening_hours_thursday  = explode(' ', $openinghours->thursday);
+			$opening_hours_friday    = explode(' ', $openinghours->friday);
+			$opening_hours_saturday  = explode(' ', $openinghours->saturday);
+			$opening_hours_sunday    = explode(' ', $openinghours->sunday);
+
+			$tmparray['lundi_matin']    = $opening_hours_monday[0];
+			$tmparray['lundi_aprem']    = $opening_hours_monday[1];
+			$tmparray['mardi_matin']    = $opening_hours_tuesday[0];
+			$tmparray['mardi_aprem']    = $opening_hours_tuesday[1];
+			$tmparray['mercredi_matin'] = $opening_hours_wednesday[0];
+			$tmparray['mercredi_aprem'] = $opening_hours_wednesday[1];
+			$tmparray['jeudi_matin']    = $opening_hours_thursday[0];
+			$tmparray['jeudi_aprem']    = $opening_hours_thursday[1];
+			$tmparray['vendredi_matin'] = $opening_hours_friday[0];
+			$tmparray['vendredi_aprem'] = $opening_hours_friday[1];
+			$tmparray['samedi_matin']   = $opening_hours_saturday[0];
+			$tmparray['samedi_aprem']   = $opening_hours_saturday[1];
+			$tmparray['dimanche_matin'] = $opening_hours_sunday[0];
+			$tmparray['dimanche_aprem'] = $opening_hours_sunday[1];
+
+			// *** JSON FILLING ***
+			if (!empty ($digirisk_resources )) {
+				$societe->fetch($digirisk_resources['Pompiers']->id[0]);
+				$tmparray['pompier_number'] = $societe->phone;
+				$societe->fetch($digirisk_resources['SAMU']->id[0]);
+				$tmparray['samu_number'] = $societe->phone;
+				$societe->fetch($digirisk_resources['AllEmergencies']->id[0]);
+				$tmparray['emergency_number'] = $societe->phone;
+				$societe->fetch($digirisk_resources['Police']->id[0]);
+				$tmparray['police_number'] = $societe->phone;
+			}
+
 			foreach ($tmparray as $key=>$value)
 			{
 				try {
@@ -292,9 +353,50 @@ class doc_preventionplandocument_odt extends ModeleODTPreventionPlanDocument
 				}
 			}
 			// Replace tags of lines
-			try
-			{
+			try {
 				$foundtagforlines = 1;
+				if ($foundtagforlines) {
+
+					$preventionplanline = new PreventionPlanLine($this->db);
+					$risk = new Risk($this->db);
+					$preventionplanlines = $preventionplanline->fetchAll(GETPOST('id'));
+
+					if (!empty($preventionplanlines) && $preventionplanlines > 0) {
+						$listlines = $odfHandler->setSegment('interventions');
+
+						foreach ($preventionplanlines as $line) {
+
+							$tmparray['key_unique'] = $line->ref;
+							$tmparray['unite_travail'] = $line->location;
+							$tmparray['action'] = $line->description;
+							$tmparray['risk'] = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $risk->get_danger_category($line) . '.png';
+							$tmparray['prevention'] = $line->prevention_method;
+
+							foreach ($tmparray as $key => $val) {
+								try {
+									if ($val == $tmparray['risk']) {
+										$list = getimagesize($tmparray['risk']);
+										$newWidth = 50;
+										if ($list[0]) {
+											$ratio = $newWidth / $list[0];
+											$newHeight = $ratio * $list[1];
+											dol_imageResizeOrCrop($val, 0, $newWidth, $newHeight);
+										}
+										$listlines->setImage($key, $val);
+									} else {
+										$listlines->setVars($key, $val, true, 'UTF-8');
+									}
+								} catch (OdfException $e) {
+									dol_syslog($e->getMessage(), LOG_INFO);
+								} catch (SegmentException $e) {
+									dol_syslog($e->getMessage(), LOG_INFO);
+								}
+							}
+							$listlines->merge();
+						}
+						$odfHandler->mergeSegment($listlines);
+					}
+				}
 			}
 			catch (OdfException $e)
 			{
