@@ -406,6 +406,8 @@ class PreventionPlanLine extends CommonObjectLine
 	 */
 	public $table_element = 'preventionplandet';
 
+	public $ref = '';
+
 	public $date_creation = '';
 
 	public $description = '';
@@ -418,6 +420,22 @@ class PreventionPlanLine extends CommonObjectLine
 
 	public $fk_element = '';
 
+
+	/**
+	 * Constructor
+	 *
+	 * @param DoliDb $db Database handler
+	 */
+	public function __construct(DoliDB $db)
+	{
+		global $conf, $langs;
+
+		$this->db = $db;
+
+		if (empty($conf->global->MAIN_SHOW_TECHNICAL_ID) && isset($this->fields['rowid'])) $this->fields['rowid']['visible'] = 0;
+		if (empty($conf->multicompany->enabled) && isset($this->fields['entity'])) $this->fields['entity']['enabled'] = 0;
+
+	}
 
 	/**
 	 *	Load invoice line from database
@@ -483,6 +501,7 @@ class PreventionPlanLine extends CommonObjectLine
 				$record = new self($db);
 
 				$record->id                = $obj->rowid;
+				$record->ref               = $obj->ref;
 				$record->date_creation     = $obj->date_creation;
 				$record->description       = $obj->description;
 				$record->category          = $obj->category;
@@ -528,9 +547,10 @@ class PreventionPlanLine extends CommonObjectLine
 
 		// Insertion dans base de la ligne
 		$sql = 'INSERT INTO '.MAIN_DB_PREFIX.'digiriskdolibarr_preventionplandet';
-		$sql .= ' (entity, date_creation, description, category, prevention_method, fk_preventionplan, fk_element';
+		$sql .= ' (ref, entity, date_creation, description, category, prevention_method, fk_preventionplan, fk_element';
 		$sql .= ')';
 		$sql .= " VALUES (";
+		$sql .= "'" . $this->ref . "'" . ", ";
 		$sql .= $this->entity . ", ";
 		$sql .= "'" . $db->idate($now) . "'" . ", ";
 		$sql .= "'" . $this->description . "'" . ", ";
@@ -567,7 +587,7 @@ class PreventionPlanLine extends CommonObjectLine
 	 *	@param		int		$notrigger	Disable triggers
 	 *	@return		int					<0 if KO, >0 if OK
 	 */
-	public function update($user = '', $notrigger = 0)
+	public function update($user = '', $notrigger = 1)
 	{
 		global $user, $conf, $db;
 
@@ -580,6 +600,7 @@ class PreventionPlanLine extends CommonObjectLine
 
 		// Mise a jour ligne en base
 		$sql = "UPDATE ".MAIN_DB_PREFIX."digiriskdolibarr_preventionplandet SET";
+		$sql .= " ref='".$db->escape($this->ref)."',";
 		$sql .= " description='".$db->escape($this->description)."',";
 		$sql .= " category=".$db->escape($this->category) . ",";
 		$sql .= " prevention_method='".$db->escape($this->prevention_method)."'" . ",";

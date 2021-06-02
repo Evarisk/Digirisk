@@ -15,6 +15,8 @@
 
 CREATE TABLE llx_digiriskdolibarr_preventionplandet(
 	rowid             integer AUTO_INCREMENT PRIMARY KEY NOT NULL,
+	ref               varchar(128) NOT NULL,
+	ref_ext           varchar(128),
 	entity            integer DEFAULT 1 NOT NULL,
 	date_creation     datetime NOT NULL,
 	tms               timestamp,

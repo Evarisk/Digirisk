@@ -37,6 +37,7 @@ dol_include_once('/digiriskdolibarr/class/digiriskdocuments/preventionplandocume
 dol_include_once('/digiriskdolibarr/lib/digiriskdolibarr_function.lib.php');
 dol_include_once('/digiriskdolibarr/lib/digiriskdolibarr_preventionplan.lib.php');
 dol_include_once('/digiriskdolibarr/core/modules/digiriskdolibarr/digiriskelement/preventionplan/mod_preventionplan_standard.php');
+dol_include_once('/digiriskdolibarr/core/modules/digiriskdolibarr/digiriskelement/preventionplandet/mod_preventionplandet_standard.php');
 dol_include_once('/digiriskdolibarr/core/modules/digiriskdolibarr/digiriskdocuments/preventionplandocument/mod_preventionplandocument_standard.php');
 dol_include_once('/digiriskdolibarr/core/modules/digiriskdolibarr/digiriskdocuments/preventionplandocument/modules_preventionplandocument.php');
 
@@ -69,6 +70,7 @@ $digiriskelement   = new DigiriskElement($db);
 $digiriskresources = new DigiriskResources($db);
 
 $refPreventionPlanMod = new $conf->global->DIGIRISKDOLIBARR_PREVENTIONPLAN_ADDON($db);
+$refPreventionPlanDetMod = new  $conf->global->DIGIRISKDOLIBARR_PREVENTIONPLANDET_ADDON($db);
 
 $hookmanager->initHooks(array('preventionplancard', 'globalcard')); // Note that conf->hooks_modules contains array
 
@@ -233,8 +235,8 @@ if (empty($reshook))
 		$risk_category_id    = GETPOST('risk_category_id');
 		$parent_id           = GETPOST('parent_id');
 
-//		$objectline->ref           = $refPreventionPlanLineMod->getNextValue($object);
 		$objectline->date_creation      = $object->db->idate($now);
+		$objectline->ref                = $refPreventionPlanDetMod->getNextValue($objectline);
 		$objectline->entity             = $conf->entity;
 		$objectline->description        = $actions_description;
 		$objectline->category           = $risk_category_id;
@@ -282,7 +284,6 @@ if (empty($reshook))
 		$objectline = new PreventionPlanLine($db);
 		$objectline->fetch($lineid);
 
-//		$objectline->ref           = $refPreventionPlanLineMod->getNextValue($object);
 		$objectline->description        = $actions_description;
 		$objectline->category           = $risk_category_id;
 		$objectline->prevention_method  = $prevention_method;
@@ -830,7 +831,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit')))
 		$colspan = 3; // Columns: total ht + col edit + col delete
 		//print $object->element;
 
-		// Lines for extrafield
+		// Lines
 		$preventionplanline = new PreventionPlanLine($db);
 		$preventionplanline->db = $db;
 		$preventionplanlines = $preventionplanline->fetchAll(GETPOST('id'));
@@ -840,7 +841,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit')))
 			print '<td class="linecolnum center"></td>';
 		}
 		print '<td class="linecoldescription">';
-		print '<div id="add"></div><span class="hideonsmartphone">'.$langs->trans('AddNewRiskEvaluation').'</span>';
+		print '<div id="add"></div><span class="hideonsmartphone">'.$langs->trans('Ref.').'</span>';
 		print '</td>';
 		print '<td class="linecollocation">'.$langs->trans('Location').'</td>';
 		print '<td class="linecolactionsdescription">'.$form->textwithpicto($langs->trans('ActionsDescription'), $langs->trans("ActionsDescriptionTooltip")).'</td>';
@@ -863,7 +864,9 @@ if ((empty($action) || ($action != 'create' && $action != 'edit')))
 
 					print '<tr class="pair nodrag nodrop nohoverpair'.(($nolinesbefore || $object->element == 'contrat') ? '' : ' liste_titre_create').'">';
 
-					print '<td class="bordertop nobottom linecoldescription minwidth500imp">';
+					print '<td class="bordertop nobottom linecolref minwidth500imp">';
+					print $item->ref;
+					print '</td>';
 
 					print '<td class="bordertop nobottom linecollocation">';
 					print $digiriskelement->select_digiriskelement_list($item->fk_element, 'fk_element', '', '',  0, 0, array(), '',  0,  0,  'minwidth100',  GETPOST('id'),  false);
@@ -940,7 +943,9 @@ if ((empty($action) || ($action != 'create' && $action != 'edit')))
 						});
 					</script> <?php
 				} else {
-					print '<td class="bordertop nobottom linecoldescription minwidth500imp">';
+					print '<td class="bordertop nobottom linecolref minwidth500imp">';
+					print $item->ref;
+					print '</td>';
 
 					print '<td class="bordertop nobottom linecollocation">';
 					$digiriskelement->fetch($item->fk_element);
@@ -1005,8 +1010,9 @@ if ((empty($action) || ($action != 'create' && $action != 'edit')))
 
 		print '<tr class="pair nodrag nodrop nohoverpair'.(($nolinesbefore || $object->element == 'contrat') ? '' : ' liste_titre_create').'">';
 
-		print '<td class="bordertop nobottom linecoldescription minwidth500imp">';
-
+		print '<td class="bordertop nobottom linecolref minwidth500imp">';
+		print $refPreventionPlanDetMod->getNextValue($preventionplanline);
+		print '</td>';
 		print '<td class="bordertop nobottom linecollocation">';
 		print $digiriskelement->select_digiriskelement_list('', 'fk_element', '', '',  0, 0, array(), '',  0,  0,  'minwidth100',  GETPOST('id'),  false);
 		print '</td>';
