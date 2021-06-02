@@ -157,6 +157,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			15 => array('DIGIRISK_DUER_LOCATION','chaine','','Location of risks evaluation', $conf->entity),
 			16 => array('DIGIRISK_RULES_LOCATION','chaine','','Location of rules of procedure', $conf->entity),
 			17 => array('DIGIRISK_PARTICIPATION_AGREEMENT_INFORMATION_PROCEDURE','chaine','','Information procedure of participation agreement', $conf->entity),
+			23 => array('DIGIRISK_FIRST_AID','chaine','','', $conf->entity),
 
 			18 => array('MAIN_AGENDA_ACTIONAUTO_LEGALDISPLAY_CREATE','chaine',1,'', $conf->entity),
 			19 => array('DIGIRISKDOLIBARR_LEGALDISPLAY_ADDON','chaine', 'mod_legaldisplay_standard' ,'', $conf->entity),

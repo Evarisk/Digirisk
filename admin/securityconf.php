@@ -103,6 +103,7 @@ if (($action == 'update' && !GETPOST("cancel", 'alpha'))
 	dolibarr_set_const($db, "DIGIRISK_SOCIETY_DESCRIPTION", GETPOST("description", 'none'), 'chaine', 0, '', $conf->entity);
 	dolibarr_set_const($db, "DIGIRISK_GENERAL_MEANS", GETPOST("moyensgeneraux", 'none'), 'chaine', 0, '', $conf->entity);
 	dolibarr_set_const($db, "DIGIRISK_GENERAL_RULES", GETPOST("consignesgenerales", 'none'), 'chaine', 0, '', $conf->entity);
+	dolibarr_set_const($db, "DIGIRISK_FIRST_AID", GETPOST("firstaid", 'none'), 'chaine', 0, '', $conf->entity);
 	dolibarr_set_const($db, "DIGIRISK_RULES_LOCATION", GETPOST("emplacementRI", 'none'), 'chaine', 0, '', $conf->entity);
 	dolibarr_set_const($db, "DIGIRISK_DUER_LOCATION", GETPOST("emplacementDU", 'none'), 'chaine', 0, '', $conf->entity);
 	dolibarr_set_const($db, "DIGIRISK_COLLECTIVE_AGREEMENT_LOCATION", GETPOST("emplacementCC", 'none'), 'chaine', 0, '', $conf->entity);
@@ -447,7 +448,7 @@ if ($responsible_resources->ref == 'Responsible' && $responsible_resources->id[0
 		print $user->office_phone;
 	} else { ?>
 		<a href="<?php echo DOL_URL_ROOT . '/' ?>user/card.php?id=<?php echo $user->id ?>" target="_blank">
-			<i class="fas fa-plus"></i><?php print ' ' . $langs->trans('NoPhoneNumber'); ?>
+			<i class="fas fa-plus"></i><?php print ' ' . $langs->trans('AddPhoneNumber'); ?>
 		</a>
 	<?php }
 
@@ -497,6 +498,13 @@ print '</td></tr>';
 
 print '<tr class="oddeven"><td><label for="consignesgenerales">'.$langs->trans("GeneralInstructions").'</label></td><td>';
 $doleditor = new DolEditor('consignesgenerales', $conf->global->DIGIRISK_GENERAL_RULES ? $conf->global->DIGIRISK_GENERAL_RULES : '', '', 90, 'dolibarr_notes', '', false, true, $conf->global->FCKEDITOR_ENABLE_SOCIETE, ROWS_3, '90%');
+$doleditor->Create();
+print '</td></tr>';
+
+// * General instructions - Consignes générales *
+
+print '<tr class="oddeven"><td><label for="firstaid">'.$langs->trans("FirstAid").'</label></td><td>';
+$doleditor = new DolEditor('firstaid', $conf->global->DIGIRISK_FIRST_AID ? $conf->global->DIGIRISK_FIRST_AID : '', '', 90, 'dolibarr_notes', '', false, true, $conf->global->FCKEDITOR_ENABLE_SOCIETE, ROWS_3, '90%');
 $doleditor->Create();
 print '</td></tr>';
 
