@@ -1,202 +1,382 @@
 [
 	{
 		"name": "Basse température",
-		"name_thumbnail": "avertissements/dangerBasseTemperature_s.png",
-		"position": 0
+		"name_thumbnail": "AVERTISSEMENT_DANGER/DANGER-froid-gel.jpg",
+		"position" : 0
 	},
 	{
 		"name": "Champ magnétique important",
-		"name_thumbnail": "avertissements/dangerChampMagnetiqueImportant_s.png",
-		"position": 1
+		"name_thumbnail": "AVERTISSEMENT_DANGER/DANGER-champ-magnetique.jpg",
+		"position" : 1
 	},
 	{
 		"name": "Charges suspendues",
-		"name_thumbnail": "avertissements/dangerChargesSuspendues_s.png",
-		"position": 2
+		"name_thumbnail": "AVERTISSEMENT_DANGER/DANGER-charge-suspendue.jpg",
+		"position" : 2
 	},
 	{
 		"name": "Danger électrique",
-		"name_thumbnail": "avertissements/dangerElectrique_s.png",
-		"position": 3
+		"name_thumbnail": "AVERTISSEMENT_DANGER/DANGER-electricite.jpg",
+		"position" : 3
 	},
 	{
 		"name": "Emplacement où une atmosphère explosible peut se présenter",
-		"name_thumbnail": "avertissements/dangerEX_s.png",
-		"position": 4
+		"name_thumbnail": "AVERTISSEMENT_DANGER/DANGER-atmosphere-explosive.jpg",
+		"position" : 4
 	},
 	{
 		"name": "Matières comburantes",
-		"name_thumbnail": "avertissements/dangerMatieresComburantes_s.png",
-		"position": 5
+		"name_thumbnail": "AVERTISSEMENT_DANGER/DANGER-comburant.jpg",
+		"position" : 5
 	},
 	{
 		"name": "Matières corrosives",
-		"name_thumbnail": "avertissements/dangerMatieresCorrosives_s.png",
-		"position": 6
+		"name_thumbnail": "AVERTISSEMENT_DANGER/DANGER-produit-corrosif.jpg",
+		"position" : 6
+	},
+	{
+		"name": "Matières explosives",
+		"name_thumbnail": "AVERTISSEMENT_DANGER/DANGER-produit-explosif.jpg",
+		"position" : 7
 	},
 	{
 		"name": "Matières inflammables ou haute température",
-		"name_thumbnail": "avertissements/dangerMatieresInflammables_s.png",
-		"position": 7
+		"name_thumbnail": "AVERTISSEMENT_DANGER/DANGER-produit-inflammable.jpg",
+		"position" : 8
 	},
 	{
 		"name": "Matières nocives ou irritantes",
-		"name_thumbnail": "avertissements/dangerMatieresNocivesIrritantes_s.png",
-		"position": 8
+		"name_thumbnail": "AVERTISSEMENT_DANGER/DANGER-produit-nocif.jpg",
+		"position" : 9
 	},
 	{
 		"name": "Matières radioactives radiations ionisantes",
-		"name_thumbnail": "avertissements/dangerRayonnementIonisantes_s.png",
-		"position": 9
+		"name_thumbnail": "AVERTISSEMENT_DANGER/DANGER-radioactivite.jpg",
+		"position" : 10
 	},
 	{
 		"name": "Matières toxiques",
-		"name_thumbnail": "avertissements/dangerMatieresToxiques_s.png",
-		"position": 10
+		"name_thumbnail": "AVERTISSEMENT_DANGER/DANGER-produit-toxique.jpg",
+		"position" : 11
 	},
 	{
 		"name": "Radiations non ionisantes",
-		"name_thumbnail": "avertissements/dangerRayonnementNonIonisantes_s.png",
-		"position": 11
+		"name_thumbnail": "AVERTISSEMENT_DANGER/DANGER-radiations-non-ionisantes.jpg",
+		"position" : 12
 	},
 	{
 		"name": "Rayonnement laser",
-		"name_thumbnail": "avertissements/dangerRayonnementLaser_s.png",
-		"position": 12
+		"name_thumbnail": "AVERTISSEMENT_DANGER/DANGER-laser.jpg",
+		"position" : 13
 	},
 	{
 		"name": "Risque biologique",
-		"name_thumbnail": "avertissements/dangerRisqueBiologique_s.png",
-		"position": 13
+		"name_thumbnail": "AVERTISSEMENT_DANGER/DANGER-risque-biologique.jpg",
+		"position" : 14
+	},
+	{
+		"name": "Chute",
+		"name_thumbnail": "AVERTISSEMENT_DANGER/DANGER-chute.jpg",
+		"position" : 15
 	},
 	{
 		"name": "Trébuchement",
-		"name_thumbnail": "avertissements/dangerTrebuchement_s.png",
-		"position": 14
+		"name_thumbnail": "AVERTISSEMENT_DANGER/DANGER-trebuchement.jpg",
+		"position" : 16
 	},
 	{
 		"name": "Véhicules de manutention",
-		"name_thumbnail": "avertissements/dangerVehiculeManutention_s.png",
-		"position": 15
+		"name_thumbnail": "AVERTISSEMENT_DANGER/DANGER-chariot.jpg",
+		"position" : 17
 	},
 	{
 		"name": "Divers danger",
-		"name_thumbnail": "avertissements/dangerGeneral_s.png",
-		"position": 16
-	},
-	{
-		"name": "Divers équipement de protection collective",
-		"name_thumbnail": "epc/preconisations_epc_s.png",
-		"position": 17
-	},
-	{
-		"name": "Protection individuelle obligatoire contre les chutes",
-		"name_thumbnail": "obligations/obligationChute_s.png",
-		"position": 18
-	},
-	{
-		"name": "Protection obligatoire de l'ouïe",
-		"name_thumbnail": "obligations/obligationOuie_s.png",
-		"position": 19
-	},
-	{
-		"name": "Protection obligatoire de la figure",
-		"name_thumbnail": "obligations/obligationFigure_s.png",
-		"position": 20
-	},
-	{
-		"name": "Protection obligatoire de la tête",
-		"name_thumbnail": "obligations/obligationTete_s.png",
-		"position": 21
-	},
-	{
-		"name": "Protection obligatoire de la vue",
-		"name_thumbnail": "obligations/obligationVue_s.png",
-		"position": 22
-	},
-	{
-		"name": "Protection obligatoire des mains",
-		"name_thumbnail": "obligations/obligationMains_s.png",
-		"position": 23
-	},
-	{
-		"name": "Protection obligatoire des pieds",
-		"name_thumbnail": "obligations/obligationPieds_s.png",
-		"position": 24
-	},
-	{
-		"name": "Protection obligatoire des voies respiratoires",
-		"name_thumbnail": "obligations/obligationVoiesRespiratoires_s.png",
-		"position": 25
-	},
-	{
-		"name": "Protection obligatoire du corps",
-		"name_thumbnail": "obligations/obligationCorps_s.png",
-		"position": 26
-	},
-	{
-		"name": "Protection obligatoire pour piétons",
-		"name_thumbnail": "obligations/obligationPietons_s.png",
-		"position": 27
-	},
-	{
-		"name": "Divers équipement de protection individuelle",
-		"name_thumbnail": "obligations/preconisationEPI_s.png",
-		"position": 28
-	},
-	{
-		"name": "Défense d'éteindre avec de l'eau",
-		"name_thumbnail": "interdictions/interdictionEteindreAvecEau_s.png",
-		"position": 29
-	},
-	{
-		"name": "Défense de fumer",
-		"name_thumbnail": "interdictions/interdictionFumer_s.png",
-		"position": 30
-	},
-	{
-		"name": "Eau non potable",
-		"name_thumbnail": "interdictions/interdictionEauNonPotable_s.png",
-		"position": 31
-	},
-	{
-		"name": "Entrée interdite aux personnes non autorisées",
-		"name_thumbnail": "interdictions/interdictionPersonnesNonAutorisees_s.png",
-		"position": 32
-	},
-	{
-		"name": "Flamme nue interdite et défense de fumer",
-		"name_thumbnail": "interdictions/interdictionFlammeNue_s.png",
-		"position": 33
-	},
-	{
-		"name": "Interdit aux piétons",
-		"name_thumbnail": "interdictions/interdictionPietons_s.png",
-		"position": 34
-	},
-	{
-		"name": "Interdit aux véhicules de manutention",
-		"name_thumbnail": "interdictions/interdictionVehiculesManutention_s.png",
-		"position": 35
-	},
-	{
-		"name": "Ne pas toucher",
-		"name_thumbnail": "interdictions/interdictionToucher_s.png",
-		"position": 36
-	},
-	{
-		"name": "Divers interdiction",
-		"name_thumbnail": "interdictions/interdictionGenerale_s.png",
-		"position": 37
-	},
-	{
-		"name": "Divers obligation",
-		"name_thumbnail": "obligations/obligationGenerale_s.png",
-		"position": 38
+		"name_thumbnail": "AVERTISSEMENT_DANGER/DANGER-general.jpg",
+		"position" : 18
 	},
 	{
 		"name": "Divers recommandations",
 		"name_thumbnail": "recommandations/recommandationsGenerale_s.png",
-		"position": 39
+		"position" : 19
+	},
+	{
+		"name": "Bande signalisation",
+		"name_thumbnail": "AVERTISSEMENT_DANGER/DANGER-bande-signalisation.jpg",
+		"position" : 20
+	},
+	{
+		"name": "Divers équipement de protection collective",
+		"name_thumbnail": "epc/preconisations_epc_s.png",
+		"position" : 21
+	},
+	{
+		"name": "Protection individuelle obligatoire contre les chutes",
+		"name_thumbnail": "OBLIGATION/OBLIGATION-harnais.jpg",
+		"position" : 22
+	},
+	{
+		"name": "Protection obligatoire de l'ouïe",
+		"name_thumbnail": "OBLIGATION/OBLIGATION-casque-antibruit.jpg",
+		"position" : 23
+	},
+	{
+		"name": "Protection obligatoire de la figure",
+		"name_thumbnail": "OBLIGATION/OBLIGATION-visiere.jpg",
+		"position" : 24
+	},
+	{
+		"name": "Protection obligatoire de la tête",
+		"name_thumbnail": "OBLIGATION/OBLIGATION-casque.jpg",
+		"position" : 25
+	},
+	{
+		"name": "Protection obligatoire de la vue",
+		"name_thumbnail": "OBLIGATION/OBLIGATION-lunettes.jpg",
+		"position" : 26
+	},
+	{
+		"name": "Protection obligatoire des mains",
+		"name_thumbnail": "OBLIGATION/OBLIGATION-gants.jpg",
+		"position" : 27
+	},
+	{
+		"name": "Protection obligatoire des pieds",
+		"name_thumbnail": "OBLIGATION/OBLIGATION-chaussures.jpg",
+		"position" : 28
+	},
+	{
+		"name": "Protection obligatoire des voies respiratoires",
+		"name_thumbnail": "OBLIGATION/OBLIGATION-protection-voies-espiratoires.jpg",
+		"position" : 29
+	},
+	{
+		"name": "Protection obligatoire du corps",
+		"name_thumbnail": "OBLIGATION/OBLIGATION-combinaison.jpg",
+		"position" : 30
+	},
+	{
+		"name": "Protection obligatoire pour piétons",
+		"name_thumbnail": "OBLIGATION/OBLIGATION-pieton.jpg",
+		"position" : 31
+	},
+	{
+		"name": "Obligation de consulter la notice",
+		"name_thumbnail": "OBLIGATION/OBLIGATION-consulter-notice.jpg",
+		"position" : 32
+	},
+	{
+		"name": "Divers obligation",
+		"name_thumbnail": "OBLIGATION/OBLIGATION-general.jpg",
+		"position" : 33
+	},
+	{
+		"name": "Divers équipement de protection individuelle",
+		"name_thumbnail": "OBLIGATION/preconisationEPI_s.png",
+		"position" : 34
+	},
+	{
+		"name": "Défense d'éteindre avec de l'eau",
+		"name_thumbnail": "INTERDICTION/INTERDIT-seau-eau.jpg",
+		"position" : 35
+	},
+	{
+		"name": "Défense de fumer",
+		"name_thumbnail": "INTERDICTION/INTERDIT-fumer.jpg",
+		"position" : 36
+	},
+	{
+		"name": "Eau non potable",
+		"name_thumbnail": "INTERDICTION/INTERDIT-boire.jpg",
+		"position" : 37
+	},
+	{
+		"name": "Entrée interdite aux personnes non autorisées",
+		"name_thumbnail": "INTERDICTION/INTERDIT-entrer.jpg",
+		"position" : 38
+	},
+	{
+		"name": "Flamme nue interdite et défense de fumer",
+		"name_thumbnail": "INTERDICTION/INTERDIT-flamme.jpg",
+		"position" : 39
+	},
+	{
+		"name": "Interdit aux piétons",
+		"name_thumbnail": "INTERDICTION/INTERDIT-pietons.jpg",
+		"position" : 40
+	},
+	{
+		"name": "Interdit aux véhicules de manutention",
+		"name_thumbnail": "INTERDICTION/INTERDIT-chariot.jpg",
+		"position" : 41
+	},
+	{
+		"name": "Ne pas toucher",
+		"name_thumbnail": "INTERDICTION/INTERDIT-toucher.jpg",
+		"position" : 42
+	},
+	{
+		"name": "Divers interdiction",
+		"name_thumbnail": "INTERDICTION/interdictionGenerale_s.png",
+		"position" : 43
+	},
+	{
+		"name": "Emplacement alarme à incendie",
+		"name_thumbnail": "INCENDIE/INCENDIE-alarme.jpg",
+		"position" : 44
+	},
+	{
+		"name": "Emplacement échelle incendie",
+		"name_thumbnail": "INCENDIE/INCENDIE-echelle.jpg",
+		"position" : 45
+	},
+	{
+		"name": "Emplacement équipement incendie",
+		"name_thumbnail": "INCENDIE/INCENDIE-equipement.jpg",
+		"position" : 46
+	},
+	{
+		"name": "Emplacement extincteur incendie",
+		"name_thumbnail": "INCENDIE/INCENDIE-extincteur.jpg",
+		"position" : 47
+	},
+	{
+		"name": "Emplacement lance à incendie",
+		"name_thumbnail": "INCENDIE/INCENDIE-lance.jpg",
+		"position" : 48
+	},
+	{
+		"name": "Emplacement téléphone",
+		"name_thumbnail": "INCENDIE/INCENDIE-telephone.jpg",
+		"position" : 49
+	},
+	{
+		"name": "Direction flèche bas",
+		"name_thumbnail": "INCENDIE/INCENDIE-fleche-bas.jpg",
+		"position" : 50
+	},
+	{
+		"name": "Direction flèche bas droit",
+		"name_thumbnail": "INCENDIE/INCENDIE-fleche-bas-droit.jpg",
+		"position" : 51
+	},
+	{
+		"name": "Direction flèche bas gauche",
+		"name_thumbnail": "INCENDIE/INCENDIE-fleche-bas-gauche.jpg",
+		"position" : 52
+	},
+	{
+		"name": "Direction flèche droite",
+		"name_thumbnail": "INCENDIE/INCENDIE-fleche-droite.jpg",
+		"position" : 53
+	},
+	{
+		"name": "Direction flèche gauche",
+		"name_thumbnail": "INCENDIE/INCENDIE-fleche-gauche.jpg",
+		"position" : 54
+	},
+	{
+		"name": "Direction flèche haut",
+		"name_thumbnail": "INCENDIE/INCENDIE-fleche-haut.jpg",
+		"position" : 55
+	},
+	{
+		"name": "Direction flèche bas ",
+		"name_thumbnail": "INCENDIE/INCENDIE-fleche-haut-droit.jpg",
+		"position" : 56
+	},
+	{
+		"name": "Direction flèche haut gauche",
+		"name_thumbnail": "INCENDIE/INCENDIE-fleche-haut-gauche.jpg",
+		"position" : 57
+	},
+	{
+		"name": "Emplacement civière",
+		"name_thumbnail": "SECOURS/SECOURS-civiere.jpg",
+		"position" : 58
+	},
+	{
+		"name": "Secours",
+		"name_thumbnail": "SECOURS/SECOURS-croix.jpg",
+		"position" : 59
+	},
+	{
+		"name": "Emplacement défibrillateur",
+		"name_thumbnail": "SECOURS/SECOURS-defibrillateur.jpg",
+		"position" : 60
+	},
+	{
+		"name": "Emplacement douche oeil",
+		"name_thumbnail": "SECOURS/SECOURS-douche-oeil.jpg",
+		"position" : 61
+	},
+	{
+		"name": "Emplacement douche sécurité",
+		"name_thumbnail": "SECOURS/SECOURS-douche-securite.jpg",
+		"position" : 62
+	},
+	{
+		"name": "Emplacement point de rassablement",
+		"name_thumbnail": "SECOURS/SECOURS-point-rassemblement.jpg",
+		"position" : 63
+	},
+	{
+		"name": "Emplacement refuge temporaire d'évacuation",
+		"name_thumbnail": "SECOURS/SECOURS-refuge-temporaire-evacuation.jpg",
+		"position" : 64
+	},
+	{
+		"name": "Emplacement sortie de secours droit",
+		"name_thumbnail": "SECOURS/SECOURS-sortie-vers-droite.jpg",
+		"position" : 65
+	},
+	{
+		"name": "Emplacement sortie de secours gauche",
+		"name_thumbnail": "SECOURS/SECOURS-sortie-vers-gauche.jpg",
+		"position" : 66
+	},
+	{
+		"name": "Emplacement téléphone secours",
+		"name_thumbnail": "SECOURS/SECOURS-telephone-urgence.jpg",
+		"position" : 67
+	},
+	{
+		"name": "Direction secours flèche bas",
+		"name_thumbnail": "SECOURS/SECOURS-fleche-bas.jpg",
+		"position" : 68
+	},
+	{
+		"name": "Direction secours flèche bas droit",
+		"name_thumbnail": "SECOURS/SECOURS-fleche-bas-droit.jpg",
+		"position" : 69
+	},
+	{
+		"name": "Direction secours flèche bas gauche",
+		"name_thumbnail": "SECOURS/SECOURS-fleche-bas-gauche.jpg",
+		"position" : 70
+	},
+	{
+		"name": "Direction secours flèche droite",
+		"name_thumbnail": "SECOURS/SECOURS-fleche-droite.jpg",
+		"position" : 71
+	},
+	{
+		"name": "Direction secours flèche gauche",
+		"name_thumbnail": "SECOURS/SECOURS-fleche-gauche.jpg",
+		"position" : 72
+	},
+	{
+		"name": "Direction secours flèche haut",
+		"name_thumbnail": "SECOURS/SECOURS-fleche-haut.jpg",
+		"position" : 73
+	},
+	{
+		"name": "Direction secours flèche bas ",
+		"name_thumbnail": "SECOURS/SECOURS-fleche-haut-droit.jpg",
+		"position" : 74
+	},
+	{
+		"name": "Direction secours flèche haut gauche",
+		"name_thumbnail": "SECOURS/SECOURS-fleche-haut-gauche.jpg",
+		"position" : 75
 	}
 ]
