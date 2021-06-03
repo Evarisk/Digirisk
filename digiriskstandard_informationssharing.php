@@ -23,7 +23,11 @@
 
 // Load Dolibarr environment
 $res = 0;
-if (!$res && file_exists("../../main.inc.php")) $res = @include "../../main.inc.php";
+if (!$res && file_exists("/main.inc.php")) $res = @include "../../../../main.inc.php";
+if (!$res && file_exists("/../main.inc.php")) $res = @include "../../../../main.inc.php";
+if (!$res && file_exists("../../main.inc.php")) $res = @include "../../../../main.inc.php";
+if (!$res && file_exists("../../../main.inc.php")) $res = @include "../../../../main.inc.php";
+if (!$res && file_exists("../../../../main.inc.php")) $res = @include "../../../../main.inc.php";
 if (!$res) die("Include of main fails");
 
 require_once DOL_DOCUMENT_ROOT.'/core/class/html.formfile.class.php';
@@ -174,7 +178,7 @@ print '<div class="underbanner clearboth"></div>';
 print '<table class="border centpercent tableforfield">' . "\n";
 
 //JSON Decode and show fields
-include DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/core/tpl/digiriskdolibarr_informationssharingfields_view.tpl.php';
+dol_include_once('/custom/digiriskdolibarr/core/tpl/digiriskdolibarr_informationssharingfields_view.tpl.php');
 
 print '</table>';
 print '</div>';
