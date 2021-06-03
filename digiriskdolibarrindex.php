@@ -51,7 +51,7 @@ $value      = GETPOST('value', 'alpha');
 $error         = 0;
 $setupnotempty = 0;
 
-require_once DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/core/tpl/digiriskdolibarr_projectcreation_action.tpl.php';
+dol_include_once('/custom/digiriskdolibarr/core/tpl/digiriskdolibarr_projectcreation_action.tpl.php');
 
 /*
  * Actions
