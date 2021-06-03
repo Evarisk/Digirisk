@@ -24,7 +24,11 @@
 
 // Load Dolibarr environment
 $res = 0;
-if (!$res && file_exists("../../main.inc.php")) $res = @include "../../main.inc.php";
+if (!$res && file_exists("/main.inc.php")) $res = @include "../../../../main.inc.php";
+if (!$res && file_exists("/../main.inc.php")) $res = @include "../../../../main.inc.php";
+if (!$res && file_exists("../../main.inc.php")) $res = @include "../../../../main.inc.php";
+if (!$res && file_exists("../../../main.inc.php")) $res = @include "../../../../main.inc.php";
+if (!$res && file_exists("../../../../main.inc.php")) $res = @include "../../../../main.inc.php";
 if (!$res) die("Include of main fails");
 
 require_once DOL_DOCUMENT_ROOT.'/core/lib/images.lib.php';
@@ -550,7 +554,7 @@ llxHeader('', $title, $help_url, '', '', '', $morejs, $morecss);
 // Object card
 // ------------------------------------------------------------
 $allRisks = 1;
-require_once DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/core/tpl/digiriskdolibarr_risklist_view.tpl.php';
+dol_include_once('/custom/digiriskdolibarr/core/tpl/digiriskdolibarr_risklist_view.tpl.php');
 
 // End of page
 llxFooter();

@@ -23,7 +23,11 @@
 
 // Load Dolibarr environment
 $res = 0;
-if (!$res && file_exists("../../main.inc.php")) $res = @include "../../main.inc.php";
+if (!$res && file_exists("/main.inc.php")) $res = @include "../../../../main.inc.php";
+if (!$res && file_exists("/../main.inc.php")) $res = @include "../../../../main.inc.php";
+if (!$res && file_exists("../../main.inc.php")) $res = @include "../../../../main.inc.php";
+if (!$res && file_exists("../../../main.inc.php")) $res = @include "../../../../main.inc.php";
+if (!$res && file_exists("../../../../main.inc.php")) $res = @include "../../../../main.inc.php";
 if (!$res) die("Include of main fails");
 
 require_once DOL_DOCUMENT_ROOT.'/core/lib/company.lib.php';
@@ -128,7 +132,7 @@ dol_banner_tab($societe, 'socid', $linkback, ($user->socid ? 0 : 1), 'rowid', 'n
 print '<span class="opacitymedium">'.$langs->trans("ThirdPartyOpeningHours")."</span>\n";
 
 //Show common fields
-include DOL_DOCUMENT_ROOT.'/custom/digiriskdolibarr/core/tpl/digiriskdolibarr_openinghours_view.tpl.php';
+dol_include_once('/custom/digiriskdolibarr/core/tpl/digiriskdolibarr_openinghours_view.tpl.php');
 
 dol_fiche_end();
 // End of page
