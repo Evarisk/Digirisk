@@ -23,6 +23,7 @@ if ($conf->global->DIGIRISKDOLIBARR_DU_PROJECT > 0) {
 }
 
 if ( $conf->global->DIGIRISKDOLIBARR_DU_PROJECT == 0 || $project->statut == 2 ) {
+
 	$project->ref         = $projectRef->getNextValue($third_party, $project);
 	$project->title       = $langs->trans('RiskAssessmentDocument');
 	$project->description = $langs->trans('RiskAssessmentDocumentDescription');
