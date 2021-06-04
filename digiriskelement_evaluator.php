@@ -38,11 +38,11 @@ if (!$res) die("Include of main fails");
 
 require_once DOL_DOCUMENT_ROOT.'/core/lib/images.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/core/class/html.form.class.php';
-dol_include_once('/digiriskdolibarr/class/digiriskelement.class.php');
-dol_include_once('/digiriskdolibarr/class/evaluator.class.php');
-dol_include_once('/digiriskdolibarr/core/modules/digiriskdolibarr/digiriskelement/evaluator/mod_evaluator_standard.php');
-dol_include_once('/digiriskdolibarr/lib/digiriskdolibarr_digiriskelement.lib.php');
-dol_include_once('/digiriskdolibarr/lib/digiriskdolibarr_function.lib.php');
+require_once './class/digiriskelement.class.php';
+require_once './class/evaluator.class.php';
+require_once './core/modules/digiriskdolibarr/digiriskelement/evaluator/mod_evaluator_standard.php';
+require_once './lib/digiriskdolibarr_digiriskelement.lib.php';
+require_once './lib/digiriskdolibarr_function.lib.php';
 
 global $langs, $conf, $db, $user;
 // Load translation files required by the page

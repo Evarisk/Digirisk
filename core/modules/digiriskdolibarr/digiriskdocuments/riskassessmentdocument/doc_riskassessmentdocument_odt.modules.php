@@ -26,14 +26,13 @@ require_once DOL_DOCUMENT_ROOT . '/core/lib/files.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/images.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/company.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/doc.lib.php';
-dol_include_once('/custom/digiriskdolibarr/lib/files.lib.php');
-dol_include_once('/custom/digiriskdolibarr/class/digiriskelement.class.php');
-dol_include_once('/custom/digiriskdolibarr/class/evaluator.class.php');
-dol_include_once('/custom/digiriskdolibarr/class/riskanalysis/risk.class.php');
-dol_include_once('/custom/digiriskdolibarr/class/riskanalysis/riskassessment.class.php');
-dol_include_once('/custom/digiriskdolibarr/class/riskanalysis/risksign.class.php');
-dol_include_once('/custom/digiriskdolibarr/core/modules/digiriskdolibarr/digiriskdocuments/riskassessmentdocument/mod_riskassessmentdocument_standard.php');
-dol_include_once('/custom/digiriskdolibarr/core/modules/digiriskdolibarr/digiriskdocuments/riskassessmentdocument/modules_riskassessmentdocument.php');
+require_once __DIR__ . '/../../../../../class/digiriskelement.class.php';
+require_once __DIR__ . '/../../../../../class/evaluator.class.php';
+require_once __DIR__ . '/../../../../../class/riskanalysis/risk.class.php';
+require_once __DIR__ . '/../../../../../class/riskanalysis/riskassessment.class.php';
+require_once __DIR__ . '/../../../../../class/riskanalysis/risksign.class.php';
+require_once __DIR__ . '/mod_riskassessmentdocument_standard.php';
+require_once __DIR__ . '/modules_riskassessmentdocument.php';
 /**
  *	Class to build documents using ODF templates generator
  */

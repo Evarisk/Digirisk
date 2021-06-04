@@ -33,6 +33,7 @@ if (!$res && $i > 0 && file_exists(dirname(substr($tmp, 0, ($i + 1)))."/main.inc
 // Try main.inc.php using relative path
 if (!$res && file_exists("../../main.inc.php")) $res = @include "../../main.inc.php";
 if (!$res && file_exists("../../../main.inc.php")) $res = @include "../../../main.inc.php";
+if (!$res && file_exists("../../../../main.inc.php")) $res = @include "../../../../main.inc.php";
 if (!$res) die("Include of main fails");
 
 global $langs, $user, $conf, $db;
@@ -42,7 +43,7 @@ require_once DOL_DOCUMENT_ROOT."/core/lib/admin.lib.php";
 require_once DOL_DOCUMENT_ROOT.'/projet/class/project.class.php';
 require_once DOL_DOCUMENT_ROOT.'/societe/class/societe.class.php';
 require_once DOL_DOCUMENT_ROOT.'/core/modules/project/mod_project_simple.php';
-dol_include_once('/custom/digiriskdolibarr/lib/digiriskdolibarr.lib.php');
+require_once '../lib/digiriskdolibarr.lib.php';
 
 // Translations
 $langs->loadLangs(array("admin", "digiriskdolibarr@digiriskdolibarr"));
@@ -60,7 +61,7 @@ $backtopage = GETPOST('backtopage', 'alpha');
 
 $setupnotempty = 0;
 
-require_once DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/core/tpl/digiriskdolibarr_projectcreation_action.tpl.php';
+require_once '../core/tpl/digiriskdolibarr_projectcreation_action.tpl.php';
 
 /*
  * View

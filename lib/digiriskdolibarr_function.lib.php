@@ -571,9 +571,9 @@ function digiriskHeader($head = '', $title = '', $help_url = '', $target = '', $
 {
 	global $conf, $langs, $db;
 
-	dol_include_once('/digiriskdolibarr/class/digiriskelement.class.php');
-	dol_include_once('/custom/digiriskdolibarr/core/modules/digiriskdolibarr/digiriskelement/groupment/mod_groupment_standard.php');
-	dol_include_once('/custom/digiriskdolibarr/core/modules/digiriskdolibarr/digiriskelement/workunit/mod_workunit_standard.php');
+	require_once __DIR__ . '/../class/digiriskelement.class.php';
+	require_once __DIR__ . '/../core/modules/digiriskdolibarr/digiriskelement/groupment/mod_groupment_standard.php';
+	require_once __DIR__ . '/../core/modules/digiriskdolibarr/digiriskelement/workunit/mod_workunit_standard.php';
 
 	$mod_groupment = new $conf->global->DIGIRISKDOLIBARR_GROUPMENT_ADDON();
 	$mod_workunit = new $conf->global->DIGIRISKDOLIBARR_WORKUNIT_ADDON();
@@ -717,8 +717,8 @@ function recurse_tree($parent, $niveau, $array) {
 function display_recurse_tree($results) {
 	global $conf, $langs;
 
-	dol_include_once('/custom/digiriskdolibarr/core/modules/digiriskdolibarr/digiriskelement/groupment/mod_groupment_standard.php');
-	dol_include_once('/custom/digiriskdolibarr/core/modules/digiriskdolibarr/digiriskelement/workunit/mod_workunit_standard.php');
+	require_once __DIR__ . '/../core/modules/digiriskdolibarr/digiriskelement/groupment/mod_groupment_standard.php';
+	require_once __DIR__ . '/../core/modules/digiriskdolibarr/digiriskelement/workunit/mod_workunit_standard.php';
 
 	$mod_groupment = new $conf->global->DIGIRISKDOLIBARR_GROUPMENT_ADDON();
 	$mod_workunit = new $conf->global->DIGIRISKDOLIBARR_WORKUNIT_ADDON();

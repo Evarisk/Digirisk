@@ -38,9 +38,9 @@ if (!$res) die("Include of main fails");
 require_once DOL_DOCUMENT_ROOT.'/contact/class/contact.class.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/company.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/functions2.lib.php';
-dol_include_once('/digiriskdolibarr/class/digiriskstandard.class.php');
-dol_include_once('/digiriskdolibarr/lib/digiriskdolibarr_digiriskstandard.lib.php');
-dol_include_once('/digiriskdolibarr/lib/digiriskdolibarr_function.lib.php');
+require_once './class/digiriskstandard.class.php';
+require_once './lib/digiriskdolibarr_digiriskstandard.lib.php';
+require_once './lib/digiriskdolibarr_function.lib.php';
 
 global $conf, $db, $langs;
 

@@ -33,6 +33,7 @@ if (!$res && $i > 0 && file_exists(dirname(substr($tmp, 0, ($i + 1)))."/main.inc
 // Try main.inc.php using relative path
 if (!$res && file_exists("../../main.inc.php")) $res = @include "../../main.inc.php";
 if (!$res && file_exists("../../../main.inc.php")) $res = @include "../../../main.inc.php";
+if (!$res && file_exists("../../../../main.inc.php")) $res = @include "../../../../main.inc.php";
 if (!$res) die("Include of main fails");
 
 // Libraries
@@ -67,7 +68,7 @@ print load_fiche_titre($langs->trans($page_name), $linkback, 'object_digiriskdol
 $head = digiriskdolibarrAdminPrepareHead();
 dol_fiche_head($head, 'about', '', 0, 'digiriskdolibarr@digiriskdolibarr');
 
-dol_include_once('/digiriskdolibarr/core/modules/modDigiriskdolibarr.class.php');
+require_once '../core/modules/modDigiriskdolibarr.class.php';
 
 $contents = file_get_contents(DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/README.md');
 $Parsedown = new Parsedown();

@@ -25,9 +25,8 @@
 require_once DOL_DOCUMENT_ROOT . '/core/lib/files.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/company.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/doc.lib.php';
-dol_include_once('/custom/digiriskdolibarr/lib/files.lib.php');
-dol_include_once('/custom/digiriskdolibarr/core/modules/digiriskdolibarr/digiriskdocuments/informationssharing/mod_informationssharing_standard.php');
-dol_include_once('/custom/digiriskdolibarr/core/modules/digiriskdolibarr/digiriskdocuments/informationssharing/modules_informationssharing.php');
+require_once __DIR__ . '/mod_informationssharing_standard.php';
+require_once __DIR__ . '/modules_informationssharing.php';
 
 /**
  *	Class to build documents using ODF templates generator

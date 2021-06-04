@@ -21,7 +21,7 @@
  * \brief       This file is a class file for FirePermit
  */
 
-dol_include_once('/digiriskdolibarr/class/digiriskdocuments.class.php');
+require_once __DIR__ . '/../digiriskdocuments.class.php';
 
 /**
  * Class for FirePermit

@@ -425,7 +425,7 @@ if ($num == 1 && !empty($conf->global->MAIN_SEARCH_DIRECT_OPEN_IF_ONLY_ONE) && $
 	exit;
 }
 
-dol_include_once('/digiriskdolibarr/lib/digiriskdolibarr_function.lib.php');
+require_once './lib/digiriskdolibarr_function.lib.php';
 
 $title    = $langs->trans("ListOfUsers");
 $help_url = '';

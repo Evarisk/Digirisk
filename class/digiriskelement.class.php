@@ -24,8 +24,8 @@
 // Put here all includes required by your class file
 require_once DOL_DOCUMENT_ROOT.'/core/class/commonobject.class.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/files.lib.php';
-dol_include_once('/digiriskdolibarr/class/risk.class.php');
-dol_include_once('/digiriskdolibarr/class/riskassessment.class.php');
+require_once __DIR__ . '/riskanalysis/risk.class.php';
+require_once __DIR__ . '/riskanalysis/riskassessment.class.php';
 
 /**
  * Class for DigiriskElement

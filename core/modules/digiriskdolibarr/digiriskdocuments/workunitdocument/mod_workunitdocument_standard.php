@@ -22,7 +22,7 @@
  *	\brief      File containing class for numbering module Standard
  */
 
-dol_include_once('/custom/digiriskdolibarr/core/modules/digiriskdolibarr/digiriskdocuments/modules_digiriskdocuments.php');
+require_once __DIR__ . '/../modules_digiriskdocuments.php';
 
 /**
  * 	Class to manage workunitdocument numbering rules Standard

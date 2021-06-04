@@ -21,7 +21,7 @@
  * \brief       This file is a class file for Groupment
  */
 
-dol_include_once('/digiriskdolibarr/class/digiriskelement.class.php');
+require_once __DIR__ . '/../digiriskelement.class.php';
 
 /**
  * Class for Groupment
