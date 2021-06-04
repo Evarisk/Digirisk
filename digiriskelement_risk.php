@@ -679,7 +679,7 @@ if ($object->id > 0) {
 	$morehtmlleft .= '<div class="floatleft inline-block valignmiddle divphotoref">'.digirisk_show_photos('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$entity].'/'.$object->element_type, 'small', 5, 0, 0, 0, $width,0, 0, 0, 0, $object->element_type, $object).'</div>';
 	digirisk_banner_tab($object, 'ref', '', 0, 'ref', 'ref', $morehtmlref, '', 0, $morehtmlleft);
 
-	dol_include_once('/custom/digiriskdolibarr/core/tpl/digiriskdolibarr_risklist_view.tpl.php');
+	require_once DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/core/tpl/digiriskdolibarr_risklist_view.tpl.php';
 }
 
 print '</div>'."\n";

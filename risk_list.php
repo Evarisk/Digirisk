@@ -558,7 +558,7 @@ llxHeader('', $title, $help_url, '', '', '', $morejs, $morecss);
 // Object card
 // ------------------------------------------------------------
 $allRisks = 1;
-dol_include_once('/custom/digiriskdolibarr/core/tpl/digiriskdolibarr_risklist_view.tpl.php');
+require_once DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/core/tpl/digiriskdolibarr_risklist_view.tpl.php';
 
 // End of page
 llxFooter();
