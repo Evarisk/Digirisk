@@ -23,9 +23,9 @@
 
 require_once DOL_DOCUMENT_ROOT.'/contact/class/contact.class.php';
 
-dol_include_once('/digiriskdolibarr/class/digiriskdocuments.class.php');
-dol_include_once('/digiriskdolibarr/class/digiriskresources.class.php');
-dol_include_once('/digiriskdolibarr/class/openinghours.class.php');
+require_once __DIR__ . '/../digiriskdocuments.class.php';
+require_once __DIR__ . '/../digiriskresources.class.php';
+require_once __DIR__ . '/../openinghours.class.php';
 
 /**
  * Class for PreventionPlanDocument
