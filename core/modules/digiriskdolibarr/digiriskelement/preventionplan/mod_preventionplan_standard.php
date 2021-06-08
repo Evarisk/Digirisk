@@ -22,7 +22,7 @@
  *	\brief      File containing class for numbering module Standard
  */
 
-require_once __DIR__ . '/../modules_digiriskdocuments.php';
+require_once __DIR__ . '/../../digiriskdocuments/modules_digiriskdocuments.php';
 
 /**
  * 	Class to manage prevenetionplan numbering rules Standard

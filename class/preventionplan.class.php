@@ -25,7 +25,7 @@ require_once DOL_DOCUMENT_ROOT.'/user/class/user.class.php';
 require_once DOL_DOCUMENT_ROOT.'/contact/class/contact.class.php';
 require_once DOL_DOCUMENT_ROOT.'/societe/class/societe.class.php';
 
-require_once __DIR__ . './digiriskdocuments.class.php';
+require_once __DIR__ . '/digiriskdocuments.class.php';
 
 /**
  * Class for PreventionPlan
