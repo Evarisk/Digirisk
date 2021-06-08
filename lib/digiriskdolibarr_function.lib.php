@@ -339,7 +339,6 @@ function digiriskshowdocuments($modulepart, $modulesubdir, $filedir, $urlsource,
 		$colspan = (3 + ($addcolumforpicto ? 1 : 0)); $colspanmore = 0;
 
 		$out .= '<th colspan="'.$colspan.'" class="formdoc liste_titre maxwidthonsmartphone center">';
-
 		// Model
 		if (!empty($modellist))
 		{

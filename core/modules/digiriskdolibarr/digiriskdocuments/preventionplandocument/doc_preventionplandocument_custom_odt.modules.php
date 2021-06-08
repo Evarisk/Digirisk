@@ -26,8 +26,8 @@ require_once DOL_DOCUMENT_ROOT . '/core/lib/files.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/company.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/doc.lib.php';
 
-require_once __DIR__ . './mod_preventionplandocument_standard.php';
-require_once __DIR__ . './modules_preventionplandocument.php';
+require_once __DIR__ . '/mod_preventionplandocument_standard.php';
+require_once __DIR__ . '/modules_preventionplandocument.php';
 
 /**
  *	Class to build documents using ODF templates generator

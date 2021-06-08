@@ -676,7 +676,7 @@ class modDigiriskdolibarr extends DolibarrModules
 
 
 		if ( $conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD ==  0 ) {
-			require_once '../../class/digiriskstandard.class.php';
+			require_once __DIR__ . '/../../class/digiriskstandard.class.php';
 
 			$digiriskstandard = new DigiriskStandard($this->db);
 			$digiriskstandard->ref = 'DU';
@@ -691,7 +691,7 @@ class modDigiriskdolibarr extends DolibarrModules
 
 		if ( $conf->global->DIGIRISKDOLIBARR_THIRDPARTY_SET ==  0 ) {
 			require_once DOL_DOCUMENT_ROOT . '/societe/class/societe.class.php';
-			require_once '../../class/digiriskresources.class.php';
+			require_once __DIR__ . '/../../class/digiriskresources.class.php';
 
 			$societe = new Societe($this->db);
 			$resources = new DigiriskResources($this->db);
