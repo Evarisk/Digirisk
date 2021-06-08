@@ -44,14 +44,14 @@ require_once DOL_DOCUMENT_ROOT.'/projet/class/task.class.php';
 require_once DOL_DOCUMENT_ROOT.'/core/modules/project/mod_project_simple.php';
 require_once DOL_DOCUMENT_ROOT.'/core/modules/project/task/mod_task_simple.php';
 
-dol_include_once('/digiriskdolibarr/class/digiriskelement.class.php');
-dol_include_once('/digiriskdolibarr/class/digiriskstandard.class.php');
-dol_include_once('/digiriskdolibarr/class/riskanalysis/risk.class.php');
-dol_include_once('/digiriskdolibarr/class/riskanalysis/riskassessment.class.php');
-dol_include_once('/digiriskdolibarr/core/modules/digiriskdolibarr/riskanalysis/risk/mod_risk_standard.php');
-dol_include_once('/digiriskdolibarr/core/modules/digiriskdolibarr/riskanalysis/riskassessment/mod_riskassessment_standard.php');
-dol_include_once('/digiriskdolibarr/lib/digiriskdolibarr_digiriskstandard.lib.php');
-dol_include_once('/digiriskdolibarr/lib/digiriskdolibarr_function.lib.php');
+require_once './class/digiriskelement.class.php';
+require_once './class/digiriskstandard.class.php';
+require_once './class/riskanalysis/risk.class.php';
+require_once './class/riskanalysis/riskassessment.class.php';
+require_once './core/modules/digiriskdolibarr/riskanalysis/risk/mod_risk_standard.php';
+require_once './core/modules/digiriskdolibarr/riskanalysis/riskassessment/mod_riskassessment_standard.php';
+require_once './lib/digiriskdolibarr_digiriskstandard.lib.php';
+require_once './lib/digiriskdolibarr_function.lib.php';
 
 // Load translation files required by the page
 $langs->loadLangs(array("digiriskdolibarr@digiriskdolibarr", "other"));
@@ -558,7 +558,7 @@ llxHeader('', $title, $help_url, '', '', '', $morejs, $morecss);
 // Object card
 // ------------------------------------------------------------
 $allRisks = 1;
-require_once DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/core/tpl/digiriskdolibarr_risklist_view.tpl.php';
+require_once './core/tpl/digiriskdolibarr_risklist_view.tpl.php';
 
 // End of page
 llxFooter();

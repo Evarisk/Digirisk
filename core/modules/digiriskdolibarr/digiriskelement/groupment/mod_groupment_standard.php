@@ -22,7 +22,7 @@
  *	\brief      File containing class for numbering module Standard
  */
 
-dol_include_once('/custom/digiriskdolibarr/core/modules/digiriskdolibarr/digiriskelement/modules_digiriskelement.php');
+require_once __DIR__ . '/../modules_digiriskelement.php';
 
 /**
  * 	Class to manage groupment numbering rules Standard

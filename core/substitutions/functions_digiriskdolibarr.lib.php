@@ -31,7 +31,7 @@
  *		@param	Object		$object			Object to use to get values
  * 		@return	void					The entry parameter $substitutionarray is modified
  */
-dol_include_once('/custom/digiriskdolibarr/class/digiriskresources.class.php');
+require_once __DIR__ . '/../../class/digiriskresources.class.php';
 
 function digiriskdolibarr_completesubstitutionarray(&$substitutionarray,$langs,$object)
 {

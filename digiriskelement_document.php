@@ -39,9 +39,9 @@ require_once DOL_DOCUMENT_ROOT.'/core/lib/company.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/files.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/images.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/core/class/html.formfile.class.php';
-dol_include_once('/digiriskdolibarr/class/digiriskelement.class.php');
-dol_include_once('/digiriskdolibarr/lib/digiriskdolibarr_digiriskelement.lib.php');
-dol_include_once('/digiriskdolibarr/lib/digiriskdolibarr_function.lib.php');
+require_once './class/digiriskelement.class.php';
+require_once './lib/digiriskdolibarr_digiriskelement.lib.php';
+require_once './lib/digiriskdolibarr_function.lib.php';
 
 // Load translation files required by the page
 $langs->loadLangs(array("digiriskdolibarr@digiriskdolibarr", "companies", "other", "mails"));

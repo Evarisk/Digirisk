@@ -22,7 +22,7 @@
  *	\brief      File containing class for numbering module Standard
  */
 
-dol_include_once('/custom/digiriskdolibarr/core/modules/digiriskdolibarr/riskanalysis/modules_riskanalysis.php');
+require_once __DIR__ . '/../modules_riskanalysis.php';
 
 /**
  * 	Class to manage risk numbering rules Standard

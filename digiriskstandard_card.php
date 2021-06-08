@@ -35,9 +35,9 @@ if (!$res && file_exists("../../main.inc.php")) $res = @include "../../main.inc.
 if (!$res && file_exists("../../../main.inc.php")) $res = @include "../../../main.inc.php";
 if (!$res) die("Include of main fails");
 
-dol_include_once('/digiriskdolibarr/class/digiriskstandard.class.php');
-dol_include_once('/digiriskdolibarr/lib/digiriskdolibarr_digiriskstandard.lib.php');
-dol_include_once('/digiriskdolibarr/lib/digiriskdolibarr_function.lib.php');
+require_once './class/digiriskstandard.class.php';
+require_once './lib/digiriskdolibarr_digiriskstandard.lib.php';
+require_once './lib/digiriskdolibarr_function.lib.php';
 
 global $db, $conf, $langs;
 

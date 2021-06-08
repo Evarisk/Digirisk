@@ -36,7 +36,7 @@ if (!$res && file_exists("../../../main.inc.php")) $res = @include "../../../mai
 if (!$res) die("Include of main fails");
 
 require_once DOL_DOCUMENT_ROOT.'/core/lib/company.lib.php';
-dol_include_once('/digiriskdolibarr/class/openinghours.class.php');
+require_once './class/openinghours.class.php';
 
 $langs->loadLangs(array("digiriskdolibarr@digiriskdolibarr"));
 
@@ -137,7 +137,7 @@ dol_banner_tab($societe, 'socid', $linkback, ($user->socid ? 0 : 1), 'rowid', 'n
 print '<span class="opacitymedium">'.$langs->trans("ThirdPartyOpeningHours")."</span>\n";
 
 //Show common fields
-dol_include_once('/custom/digiriskdolibarr/core/tpl/digiriskdolibarr_openinghours_view.tpl.php');
+require_once __DIR__ . '/core/tpl/digiriskdolibarr_openinghours_view.tpl.php';
 
 dol_fiche_end();
 // End of page

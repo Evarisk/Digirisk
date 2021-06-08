@@ -37,11 +37,11 @@ if (!$res) die("Include of main fails");
 
 require_once DOL_DOCUMENT_ROOT.'/core/class/html.formfile.class.php';
 
-dol_include_once('/digiriskdolibarr/class/digiriskstandard.class.php');
-dol_include_once('/digiriskdolibarr/class/digiriskdocuments/informationssharing.class.php');
-dol_include_once('/digiriskdolibarr/lib/digiriskdolibarr_digiriskstandard.lib.php');
-dol_include_once('/digiriskdolibarr/lib/digiriskdolibarr_function.lib.php');
-dol_include_once('/digiriskdolibarr/core/modules/digiriskdolibarr/digiriskdocuments/informationssharing/modules_informationssharing.php');
+require_once './class/digiriskstandard.class.php';
+require_once './class/digiriskdocuments/informationssharing.class.php';
+require_once './lib/digiriskdolibarr_digiriskstandard.lib.php';
+require_once './lib/digiriskdolibarr_function.lib.php';
+require_once './core/modules/digiriskdolibarr/digiriskdocuments/informationssharing/modules_informationssharing.php';
 
 global $db, $conf, $langs;
 
@@ -183,7 +183,7 @@ print '<div class="underbanner clearboth"></div>';
 print '<table class="border centpercent tableforfield">' . "\n";
 
 //JSON Decode and show fields
-dol_include_once('/custom/digiriskdolibarr/core/tpl/digiriskdolibarr_informationssharingfields_view.tpl.php');
+require_once './core/tpl/digiriskdolibarr_informationssharingfields_view.tpl.php';
 
 print '</table>';
 print '</div>';

@@ -23,7 +23,7 @@
 
 require_once DOL_DOCUMENT_ROOT . '/core/class/commonobject.class.php';
 require_once DOL_DOCUMENT_ROOT . '/projet/class/task.class.php';
-dol_include_once('/custom/digiriskdolibarr/lib/digiriskdolibarr_function.lib.php');
+require_once __DIR__ . '/../../lib/digiriskdolibarr_function.lib.php';
 
 /**
  * Class for Risk

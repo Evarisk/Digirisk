@@ -21,8 +21,8 @@
  * \brief       This file is a class file for InformationsSharing
  */
 
-dol_include_once('/digiriskdolibarr/class/digiriskdocuments.class.php');
-dol_include_once('/digiriskdolibarr/class/digiriskresources.class.php');
+require_once __DIR__ . '/../digiriskdocuments.class.php';
+require_once __DIR__ . '/../digiriskresources.class.php';
 
 /**
  * Class for InformationsSharing

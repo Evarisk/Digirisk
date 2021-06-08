@@ -44,13 +44,13 @@ require_once DOL_DOCUMENT_ROOT.'/projet/class/task.class.php';
 require_once DOL_DOCUMENT_ROOT.'/core/modules/project/mod_project_simple.php';
 require_once DOL_DOCUMENT_ROOT.'/core/modules/project/task/mod_task_simple.php';
 
-dol_include_once('/digiriskdolibarr/class/digiriskelement.class.php');
-dol_include_once('/digiriskdolibarr/class/riskanalysis/risk.class.php');
-dol_include_once('/digiriskdolibarr/class/riskanalysis/riskassessment.class.php');
-dol_include_once('/digiriskdolibarr/core/modules/digiriskdolibarr/riskanalysis/risk/mod_risk_standard.php');
-dol_include_once('/digiriskdolibarr/core/modules/digiriskdolibarr/riskanalysis/riskassessment/mod_riskassessment_standard.php');
-dol_include_once('/digiriskdolibarr/lib/digiriskdolibarr_digiriskelement.lib.php');
-dol_include_once('/digiriskdolibarr/lib/digiriskdolibarr_function.lib.php');
+require_once './class/digiriskelement.class.php';
+require_once './class/riskanalysis/risk.class.php';
+require_once './class/riskanalysis/riskassessment.class.php';
+require_once './core/modules/digiriskdolibarr/riskanalysis/risk/mod_risk_standard.php';
+require_once './core/modules/digiriskdolibarr/riskanalysis/riskassessment/mod_riskassessment_standard.php';
+require_once './lib/digiriskdolibarr_digiriskelement.lib.php';
+require_once './lib/digiriskdolibarr_function.lib.php';
 
 // Load translation files required by the page
 $langs->loadLangs(array("digiriskdolibarr@digiriskdolibarr", "other"));
@@ -679,7 +679,7 @@ if ($object->id > 0) {
 	$morehtmlleft .= '<div class="floatleft inline-block valignmiddle divphotoref">'.digirisk_show_photos('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$entity].'/'.$object->element_type, 'small', 5, 0, 0, 0, $width,0, 0, 0, 0, $object->element_type, $object).'</div>';
 	digirisk_banner_tab($object, 'ref', '', 0, 'ref', 'ref', $morehtmlref, '', 0, $morehtmlleft);
 
-	require_once DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/core/tpl/digiriskdolibarr_risklist_view.tpl.php';
+	require_once './core/tpl/digiriskdolibarr_risklist_view.tpl.php';
 }
 
 print '</div>'."\n";
