@@ -270,7 +270,15 @@ class doc_preventionplandocument_odt extends ModeleODTPreventionPlanDocument
 
 			$resources = new DigiriskResources($this->db);
 			$societe   = new Societe($this->db);
+			$preventionplanline = new PreventionPlanLine($this->db);
+			$risk = new Risk($this->db);
+			$preventionplanlines = $preventionplanline->fetchAll(GETPOST('id'));
 
+			$digirisk_resources      = $resources->digirisk_dolibarr_fetch_resources();
+			$extsociety = $resources->fetchResourcesFromObject('PP_EXT_SOCIETY', $preventionplan);
+			$extsocietyintervenants = $resources->fetchResourcesFromObject('PP_EXT_SOCIETY_INTERVENANTS', $preventionplan);
+			$maitreoeuvre = $resources->fetchResourcesFromObject('PP_MAITRE_OEUVRE', $preventionplan);
+			$extsocietyresponsible = $resources->fetchResourcesFromObject('PP_EXT_SOCIETY_RESPONSIBLE', $preventionplan);
 
 			$tmparray['titre_prevention'] = $preventionplan->ref;
 			$tmparray['unique_identifier'] = $preventionplan->label;
@@ -284,7 +292,6 @@ class doc_preventionplandocument_odt extends ModeleODTPreventionPlanDocument
 			$tmparray['date_end_intervention_PPP'] = $preventionplan->date_end;
 			$tmparray['interventions_info'] = count($preventionplanlines) . " " . $langs->trans('PreventionPlanLine');
 
-			$digirisk_resources      = $resources->digirisk_dolibarr_fetch_resources();
 
 			$openinghours = new Openinghours($this->db);
 
@@ -317,7 +324,6 @@ class doc_preventionplandocument_odt extends ModeleODTPreventionPlanDocument
 			$tmparray['dimanche_matin'] = $opening_hours_sunday[0];
 			$tmparray['dimanche_aprem'] = $opening_hours_sunday[1];
 
-			// *** JSON FILLING ***
 			if (!empty ($digirisk_resources )) {
 				$societe->fetch($digirisk_resources['Pompiers']->id[0]);
 				$tmparray['pompier_number'] = $societe->phone;
@@ -327,6 +333,40 @@ class doc_preventionplandocument_odt extends ModeleODTPreventionPlanDocument
 				$tmparray['emergency_number'] = $societe->phone;
 				$societe->fetch($digirisk_resources['Police']->id[0]);
 				$tmparray['police_number'] = $societe->phone;
+			}
+
+			//Informations entreprise extérieure
+
+			if (!empty( $extsociety) && $extsociety > 0) {
+				$tmparray['society_title'] = $extsociety->name;
+				$tmparray['society_siret_id'] = $extsociety->siret;
+				$tmparray['society_address'] = $extsociety->address;
+				$tmparray['society_postcode'] = $extsociety->zip;
+				$tmparray['society_town'] = $extsociety->town;
+			}
+
+			if (!empty( $extsocietyintervenants) && $extsocietyintervenants > 0) {
+				$extsocietyintervenants = array_shift($extsocietyintervenants);
+				$tmparray['intervenants_info'] = count($extsocietyintervenants);
+			}
+
+			//Signatures
+			if (!empty( $maitreoeuvre) && $maitreoeuvre > 0) {
+				$tmparray['maitre_oeuvre_lname'] = $maitreoeuvre->lastname;
+				$tmparray['maitre_oeuvre_fname'] = $maitreoeuvre->firstname;
+				$tmparray['maitre_oeuvre_email'] = $maitreoeuvre->email;
+				$tmparray['maitre_oeuvre_phone'] = $maitreoeuvre->phone;
+				$tmparray['maitre_oeuvre_signature_date'] = '';
+				$tmparray['maitre_oeuvre_signature'] = '';
+			}
+
+			if (!empty( $extsocietyresponsible) && $extsocietyresponsible > 0) {
+				$tmparray['intervenant_exterieur_lname'] = $extsocietyresponsible->lastname;
+				$tmparray['intervenant_exterieur_fname'] = $extsocietyresponsible->firstname;
+				$tmparray['intervenant_exterieur_email'] = $extsocietyresponsible->email;
+				$tmparray['intervenant_exterieur_phone'] = $extsocietyresponsible->phone;
+				$tmparray['intervenant_exterieur_signature_date'] = '';
+				$tmparray['intervenant_exterieur_signature'] = '';
 			}
 
 			foreach ($tmparray as $key=>$value)
@@ -358,10 +398,6 @@ class doc_preventionplandocument_odt extends ModeleODTPreventionPlanDocument
 				$foundtagforlines = 1;
 				if ($foundtagforlines) {
 
-					$preventionplanline = new PreventionPlanLine($this->db);
-					$risk = new Risk($this->db);
-					$preventionplanlines = $preventionplanline->fetchAll(GETPOST('id'));
-
 					if (!empty($preventionplanlines) && $preventionplanlines > 0) {
 						$listlines = $odfHandler->setSegment('interventions');
 
@@ -387,6 +423,31 @@ class doc_preventionplandocument_odt extends ModeleODTPreventionPlanDocument
 									} else {
 										$listlines->setVars($key, $val, true, 'UTF-8');
 									}
+								} catch (OdfException $e) {
+									dol_syslog($e->getMessage(), LOG_INFO);
+								} catch (SegmentException $e) {
+									dol_syslog($e->getMessage(), LOG_INFO);
+								}
+							}
+							$listlines->merge();
+						}
+						$odfHandler->mergeSegment($listlines);
+					}
+
+					if (!empty($extsocietyintervenants) && $extsocietyintervenants > 0) {
+						$listlines = $odfHandler->setSegment('intervenants');
+
+						foreach ($extsocietyintervenants as $line) {
+
+							$tmparray['id'] = $line->id;
+							$tmparray['name'] = $line->firstname;
+							$tmparray['lastname'] = $line->lastname;
+							$tmparray['phone'] = $line->phone;
+							$tmparray['mail'] = $line->mail;
+
+							foreach ($tmparray as $key => $val) {
+								try {
+									$listlines->setVars($key, $val, true, 'UTF-8');
 								} catch (OdfException $e) {
 									dol_syslog($e->getMessage(), LOG_INFO);
 								} catch (SegmentException $e) {
