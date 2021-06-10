@@ -268,25 +268,26 @@ class doc_preventionplandocument_odt extends ModeleODTPreventionPlanDocument
 				$tmparray['photoDefault'] = $image['fullname'];
 			}
 
-			$resources = new DigiriskResources($this->db);
-			$societe   = new Societe($this->db);
+			$resources          = new DigiriskResources($this->db);
+			$societe            = new Societe($this->db);
 			$preventionplanline = new PreventionPlanLine($this->db);
-			$risk = new Risk($this->db);
+			$risk               = new Risk($this->db);
+			
 			$preventionplanlines = $preventionplanline->fetchAll(GETPOST('id'));
 
 			$digirisk_resources      = $resources->digirisk_dolibarr_fetch_resources();
-			$extsociety = $resources->fetchResourcesFromObject('PP_EXT_SOCIETY', $preventionplan);
-			$extsocietyintervenants = $resources->fetchResourcesFromObject('PP_EXT_SOCIETY_INTERVENANTS', $preventionplan);
-			$maitreoeuvre = $resources->fetchResourcesFromObject('PP_MAITRE_OEUVRE', $preventionplan);
-			$extsocietyresponsible = $resources->fetchResourcesFromObject('PP_EXT_SOCIETY_RESPONSIBLE', $preventionplan);
+			$extsociety              = $resources->fetchResourcesFromObject('PP_EXT_SOCIETY', $preventionplan);
+			$extsocietyintervenants  = $resources->fetchResourcesFromObject('PP_EXT_SOCIETY_INTERVENANTS', $preventionplan);
+			$maitreoeuvre            = $resources->fetchResourcesFromObject('PP_MAITRE_OEUVRE', $preventionplan);
+			$extsocietyresponsible   = $resources->fetchResourcesFromObject('PP_EXT_SOCIETY_RESPONSIBLE', $preventionplan);
 
-			$tmparray['titre_prevention'] = $preventionplan->ref;
-			$tmparray['unique_identifier'] = $preventionplan->label;
+			$tmparray['titre_prevention']             = $preventionplan->ref;
+			$tmparray['unique_identifier']            = $preventionplan->label;
 			$tmparray['raison_du_plan_de_prevention'] = $preventionplan->raison;
 
 			$tmparray['moyen_generaux_mis_disposition'] = $conf->global->DIGIRISK_GENERAL_MEANS;
-			$tmparray['consigne_generale'] = $conf->global->DIGIRISK_GENERAL_RULES;
-			$tmparray['premiers_secours'] = $conf->global->DIGIRISK_FIRST_AID;
+			$tmparray['consigne_generale']              = $conf->global->DIGIRISK_GENERAL_RULES;
+			$tmparray['premiers_secours']               = $conf->global->DIGIRISK_FIRST_AID;
 
 			$tmparray['date_start_intervention_PPP'] = $preventionplan->date_start;
 			$tmparray['date_end_intervention_PPP'] = $preventionplan->date_end;
@@ -327,10 +328,13 @@ class doc_preventionplandocument_odt extends ModeleODTPreventionPlanDocument
 			if (!empty ($digirisk_resources )) {
 				$societe->fetch($digirisk_resources['Pompiers']->id[0]);
 				$tmparray['pompier_number'] = $societe->phone;
+
 				$societe->fetch($digirisk_resources['SAMU']->id[0]);
 				$tmparray['samu_number'] = $societe->phone;
+
 				$societe->fetch($digirisk_resources['AllEmergencies']->id[0]);
 				$tmparray['emergency_number'] = $societe->phone;
+
 				$societe->fetch($digirisk_resources['Police']->id[0]);
 				$tmparray['police_number'] = $societe->phone;
 			}
@@ -338,11 +342,11 @@ class doc_preventionplandocument_odt extends ModeleODTPreventionPlanDocument
 			//Informations entreprise extérieure
 
 			if (!empty( $extsociety) && $extsociety > 0) {
-				$tmparray['society_title'] = $extsociety->name;
+				$tmparray['society_title']    = $extsociety->name;
 				$tmparray['society_siret_id'] = $extsociety->siret;
-				$tmparray['society_address'] = $extsociety->address;
+				$tmparray['society_address']  = $extsociety->address;
 				$tmparray['society_postcode'] = $extsociety->zip;
-				$tmparray['society_town'] = $extsociety->town;
+				$tmparray['society_town']     = $extsociety->town;
 			}
 
 			if (!empty( $extsocietyintervenants) && $extsocietyintervenants > 0) {
@@ -356,8 +360,10 @@ class doc_preventionplandocument_odt extends ModeleODTPreventionPlanDocument
 				$tmparray['maitre_oeuvre_fname'] = $maitreoeuvre->firstname;
 				$tmparray['maitre_oeuvre_email'] = $maitreoeuvre->email;
 				$tmparray['maitre_oeuvre_phone'] = $maitreoeuvre->phone;
+
+				//@todo when attendance will be created
 				$tmparray['maitre_oeuvre_signature_date'] = '';
-				$tmparray['maitre_oeuvre_signature'] = '';
+				$tmparray['maitre_oeuvre_signature']      = '';
 			}
 
 			if (!empty( $extsocietyresponsible) && $extsocietyresponsible > 0) {
@@ -365,8 +371,10 @@ class doc_preventionplandocument_odt extends ModeleODTPreventionPlanDocument
 				$tmparray['intervenant_exterieur_fname'] = $extsocietyresponsible->firstname;
 				$tmparray['intervenant_exterieur_email'] = $extsocietyresponsible->email;
 				$tmparray['intervenant_exterieur_phone'] = $extsocietyresponsible->phone;
+
+				//@todo when attendance will be created
 				$tmparray['intervenant_exterieur_signature_date'] = '';
-				$tmparray['intervenant_exterieur_signature'] = '';
+				$tmparray['intervenant_exterieur_signature']      = '';
 			}
 
 			foreach ($tmparray as $key=>$value)
@@ -403,11 +411,11 @@ class doc_preventionplandocument_odt extends ModeleODTPreventionPlanDocument
 
 						foreach ($preventionplanlines as $line) {
 
-							$tmparray['key_unique'] = $line->ref;
+							$tmparray['key_unique']    = $line->ref;
 							$tmparray['unite_travail'] = $line->location;
-							$tmparray['action'] = $line->description;
-							$tmparray['risk'] = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $risk->get_danger_category($line) . '.png';
-							$tmparray['prevention'] = $line->prevention_method;
+							$tmparray['action']        = $line->description;
+							$tmparray['risk']          = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $risk->get_danger_category($line) . '.png';
+							$tmparray['prevention']    = $line->prevention_method;
 
 							foreach ($tmparray as $key => $val) {
 								try {
@@ -439,11 +447,11 @@ class doc_preventionplandocument_odt extends ModeleODTPreventionPlanDocument
 
 						foreach ($extsocietyintervenants as $line) {
 
-							$tmparray['id'] = $line->id;
-							$tmparray['name'] = $line->firstname;
+							$tmparray['id']       = $line->id;
+							$tmparray['name']     = $line->firstname;
 							$tmparray['lastname'] = $line->lastname;
-							$tmparray['phone'] = $line->phone;
-							$tmparray['mail'] = $line->mail;
+							$tmparray['phone']    = $line->phone;
+							$tmparray['mail']     = $line->mail;
 
 							foreach ($tmparray as $key => $val) {
 								try {
