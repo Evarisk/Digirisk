@@ -16,9 +16,9 @@
  */
 
 /**
- * \file        class/preventionplandocument.class.php
+ * \file        class/firepermitdocument.class.php
  * \ingroup     digiriskdolibarr
- * \brief       This file is a class file for PreventionPlan
+ * \brief       This file is a class file for FirePermit
  */
 
 require_once DOL_DOCUMENT_ROOT.'/user/class/user.class.php';
@@ -28,21 +28,21 @@ require_once DOL_DOCUMENT_ROOT.'/societe/class/societe.class.php';
 require_once __DIR__ . '/digiriskdocuments.class.php';
 
 /**
- * Class for PreventionPlan
+ * Class for FirePermit
  */
-class PreventionPlan extends CommonObject
+class FirePermit extends CommonObject
 {
 
 	/**
 	 * @var int  Does this object support multicompany module ?
 	 * 0=No test on entity, 1=Test with field entity, 'field@table'=Test with link by field@table
 	 */
-	public $element = 'preventionplan';
+	public $element = 'firepermit';
 
 	/**
 	 * @var string Name of table without prefix where object is stored. This is also the key used for extrafields management.
 	 */
-	public $table_element = 'digiriskdolibarr_preventionplan';
+	public $table_element = 'digiriskdolibarr_firepermit';
 
 	/**
 	 * @var int  Does this object support multicompany module ?
@@ -58,7 +58,7 @@ class PreventionPlan extends CommonObject
 	/**
 	 * @var string String with name of icon for digiriskelement. Must be the part after the 'object_' into object_digiriskelement.png
 	 */
-	public $picto = 'preventionplandocument@digiriskdolibarr';
+	public $picto = 'firepermitdocument@digiriskdolibarr';
 
 	/**
 	 * @var array  Array with all fields and their property. Do not use it as a static var. It may be modified by constructor.
@@ -74,11 +74,9 @@ class PreventionPlan extends CommonObject
 		'label'              => array('type'=>'varchar(255)', 'label'=>'Label', 'enabled'=>'1', 'position'=>80, 'notnull'=>0, 'visible'=>1, 'searchall'=>1, 'css'=>'minwidth200', 'help'=>"Help text", 'showoncombobox'=>'1',),
 		'date_start'         => array('type'=>'datetime', 'label'=>'StartDate', 'enabled'=>'1', 'position'=>100, 'notnull'=>-1, 'visible'=>1,),
 		'date_end'           => array('type'=>'datetime', 'label'=>'EndDate', 'enabled'=>'1', 'position'=>130, 'notnull'=>-1, 'visible'=>1,),
-		'prior_visit_bool'   => array('type'=>'boolean', 'label'=>'PriorVisitYesNo', 'enabled'=>'1', 'position'=>140, 'notnull'=>-1, 'visible'=>1,),
-		'prior_visit_text'   => array('type'=>'text', 'label'=>'PriorVisitText', 'enabled'=>'1', 'position'=>150, 'notnull'=>-1, 'visible'=>1,),
-		'cssct_intervention' => array('type'=>'boolean', 'label'=>'CSSCTIntervention', 'enabled'=>'1', 'position'=>160, 'notnull'=>-1, 'visible'=>1,),
 		'fk_user_creat'      => array('type'=>'integer:User:user/class/user.class.php', 'label'=>'UserAuthor', 'enabled'=>'1', 'position'=>110, 'notnull'=>1, 'visible'=>-2, 'foreignkey'=>'user.rowid',),
 		'fk_user_modif'      => array('type'=>'integer:User:user/class/user.class.php', 'label'=>'UserModif', 'enabled'=>'1', 'position'=>120, 'notnull'=>-1, 'visible'=>-2,),
+		'fk_preventionplan'  => array('type'=>'integer', 'label'=>'PreventionPlan', 'enabled'=>'1', 'position'=>130, 'notnull'=>-1, 'visible'=>-2,),
 	);
 
 	/**
@@ -353,8 +351,8 @@ class PreventionPlan extends CommonObject
 		// By default
 		if (empty($linkstart))
 		{
-			$label .= '<u>'.$langs->trans("PreventionPlan").'</u>';
-			$linkstart = '<a href="'.DOL_URL_ROOT.'/custom/digiriskdolibarr/preventionplan_card.php?id='.$this->id;
+			$label .= '<u>'.$langs->trans("FirePermit").'</u>';
+			$linkstart = '<a href="'.DOL_URL_ROOT.'/custom/digiriskdolibarr/firepermit_card.php?id='.$this->id;
 		}
 
 		if (!empty($this->ref))
@@ -393,19 +391,19 @@ class PreventionPlan extends CommonObject
 }
 /**
  *	Class to manage invoice lines.
- *  Saved into database table llx_preventionplandet
+ *  Saved into database table llx_firepermitdet
  */
-class PreventionPlanLine extends CommonObjectLine
+class FirePermitLine extends CommonObjectLine
 {
 	/**
 	 * @var string ID to identify managed object
 	 */
-	public $element = 'preventionplandet';
+	public $element = 'firepermitdet';
 
 	/**
 	 * @var string Name of table without prefix where object is stored
 	 */
-	public $table_element = 'preventionplandet';
+	public $table_element = 'firepermitdet';
 
 	public $ref = '';
 
@@ -415,9 +413,9 @@ class PreventionPlanLine extends CommonObjectLine
 
 	public $category = '';
 
-	public $prevention_method = '';
+	public $used_material = '';
 
-	public $fk_preventionplan = '';
+	public $fk_firepermit = '';
 
 	public $fk_element = '';
 
@@ -439,7 +437,7 @@ class PreventionPlanLine extends CommonObjectLine
 	}
 
 	/**
-	 *	Load prevention plan line from database
+	 *	Load invoice line from database
 	 *
 	 *	@param	int		$rowid      id of invoice line to get
 	 *	@return	int					<0 if KO, >0 if OK
@@ -449,7 +447,7 @@ class PreventionPlanLine extends CommonObjectLine
 		global $db;
 
 		$sql = 'SELECT * ';
-		$sql .= ' FROM '.MAIN_DB_PREFIX.'digiriskdolibarr_preventionplandet as t';
+		$sql .= ' FROM '.MAIN_DB_PREFIX.'digiriskdolibarr_firepermitdet as t';
 		$sql .= ' WHERE t.rowid = '.$rowid;
 		$sql .= ' AND entity IN ('.getEntity($this->table_element).')';
 
@@ -459,12 +457,11 @@ class PreventionPlanLine extends CommonObjectLine
 			$objp = $db->fetch_object($result);
 
 			$this->id                = $objp->rowid;
-			$this->ref               = $objp->ref;
 			$this->date_creation     = $objp->date_creation;
 			$this->description       = $objp->description;
 			$this->category          = $objp->category;
-			$this->prevention_method = $objp->prevention_method;
-			$this->fk_preventionplan = $objp->fk_preventionplan;
+			$this->used_material     = $objp->used_material;
+			$this->fk_firepermit     = $objp->fk_firepermit;
 			$this->fk_element        = $objp->fk_element;
 
 			$db->free($result);
@@ -479,19 +476,19 @@ class PreventionPlanLine extends CommonObjectLine
 	}
 
 	/**
-	 *	Load preventionplan line line from database
+	 *	Load firepermit line line from database
 	 *
-	 *	@param	int		$rowid      id of preventionplan line line to get
+	 *	@param	int		$rowid      id of firepermit line line to get
 	 *	@return	int					<0 if KO, >0 if OK
 	 */
 	public function fetchAll($parent_id = 0, $limit = 0)
 	{
 		global $db;
 		$sql = 'SELECT * ';
-		$sql .= ' FROM '.MAIN_DB_PREFIX.'digiriskdolibarr_preventionplandet as t';
+		$sql .= ' FROM '.MAIN_DB_PREFIX.'digiriskdolibarr_firepermitdet as t';
+		if ($parent_id > 0) $sql .= ' WHERE t.fk_firepermit = '.$parent_id;
 		$sql .= ' AND entity IN ('.getEntity($this->table_element).')';
 
-		if ($parent_id > 0) $sql .= ' WHERE t.fk_preventionplan = '.$parent_id;
 
 		$result = $db->query($sql);
 
@@ -511,8 +508,8 @@ class PreventionPlanLine extends CommonObjectLine
 				$record->date_creation     = $obj->date_creation;
 				$record->description       = $obj->description;
 				$record->category          = $obj->category;
-				$record->prevention_method = $obj->prevention_method;
-				$record->fk_preventionplan = $obj->fk_preventionplan;
+				$record->used_material     = $obj->used_material;
+				$record->fk_firepermit     = $obj->fk_firepermit;
 				$record->fk_element        = $obj->fk_element;
 
 				$records[$record->id] = $record;
@@ -552,8 +549,8 @@ class PreventionPlanLine extends CommonObjectLine
 		$now = dol_now();
 
 		// Insertion dans base de la ligne
-		$sql = 'INSERT INTO '.MAIN_DB_PREFIX.'digiriskdolibarr_preventionplandet';
-		$sql .= ' (ref, entity, date_creation, description, category, prevention_method, fk_preventionplan, fk_element';
+		$sql = 'INSERT INTO '.MAIN_DB_PREFIX.'digiriskdolibarr_firepermitdet';
+		$sql .= ' (ref, entity, date_creation, description, category, use_material, fk_firepermit, fk_element';
 		$sql .= ')';
 		$sql .= " VALUES (";
 		$sql .= "'" . $db->escape($this->ref) . "'" . ", ";
@@ -561,8 +558,8 @@ class PreventionPlanLine extends CommonObjectLine
 		$sql .= "'" . $db->escape($db->idate($now)) . "'" . ", ";
 		$sql .= "'" . $db->escape($this->description) . "'" . ", ";
 		$sql .= $this->category . ", ";
-		$sql .= "'" . $db->escape($this->prevention_method) . "'" . ", ";
-		$sql .= $this->fk_preventionplan . ", ";
+		$sql .= "'" . $db->escape($this->used_material) . "'" . ", ";
+		$sql .= $this->fk_firepermit . ", ";
 		$sql .= $this->fk_element ;
 
 		$sql .= ')';
@@ -572,7 +569,7 @@ class PreventionPlanLine extends CommonObjectLine
 
 		if ($resql)
 		{
-			$this->id = $db->last_insert_id(MAIN_DB_PREFIX.'preventionplandet');
+			$this->id = $db->last_insert_id(MAIN_DB_PREFIX.'firepermitdet');
 			$this->rowid = $this->id; // For backward compatibility
 
 			$db->commit();
@@ -605,12 +602,12 @@ class PreventionPlanLine extends CommonObjectLine
 		$db->begin();
 
 		// Mise a jour ligne en base
-		$sql = "UPDATE ".MAIN_DB_PREFIX."digiriskdolibarr_preventionplandet SET";
+		$sql = "UPDATE ".MAIN_DB_PREFIX."digiriskdolibarr_firepermitdet SET";
 		$sql .= " ref='".$db->escape($this->ref)."',";
 		$sql .= " description='".$db->escape($this->description)."',";
 		$sql .= " category=".$db->escape($this->category) . ",";
 		$sql .= " prevention_method='".$db->escape($this->prevention_method)."'" . ",";
-		$sql .= " fk_preventionplan=".$db->escape($this->fk_preventionplan) . ",";
+		$sql .= " fk_firepermit=".$db->escape($this->fk_firepermit) . ",";
 		$sql .= " fk_element=".$db->escape($this->fk_element);
 
 		$sql .= " WHERE rowid = ".$this->id;
@@ -641,7 +638,7 @@ class PreventionPlanLine extends CommonObjectLine
 
 		$db->begin();
 
-		$sql = "DELETE FROM ".MAIN_DB_PREFIX."digiriskdolibarr_preventionplandet WHERE rowid = ".$this->id;
+		$sql = "DELETE FROM ".MAIN_DB_PREFIX."digiriskdolibarr_firepermitdet WHERE rowid = ".$this->id;
 		dol_syslog(get_class($this)."::delete", LOG_DEBUG);
 		if ($db->query($sql))
 		{

@@ -16,9 +16,9 @@
  */
 
 /**
- * \file    digiriskdolibarr/admin/preventionplandet.php
+ * \file    digiriskdolibarr/admin/firepermit.php
  * \ingroup digiriskdolibarr
- * \brief   Digiriskdolibarr preventionplandet page.
+ * \brief   Digiriskdolibarr firepermit page.
  */
 
 // Load Dolibarr environment
@@ -54,7 +54,7 @@ $action     = GETPOST('action', 'alpha');
 $backtopage = GETPOST('backtopage', 'alpha');
 $value      = GETPOST('value', 'alpha');
 
-$type          = 'preventionplandet';
+$type          = 'firepermit';
 $error         = 0;
 $setupnotempty = 0;
 
@@ -63,10 +63,10 @@ $setupnotempty = 0;
  */
 if ($action == 'updateMask')
 {
-	$maskconstpreventionplandet = GETPOST('maskconstpreventionplandet', 'alpha');
-	$maskpreventionplandet      = GETPOST('maskpreventionplandet', 'alpha');
+	$maskconstfirepermit = GETPOST('maskconstfirepermit', 'alpha');
+	$maskfirepermit      = GETPOST('maskfirepermit', 'alpha');
 
-	if ($maskconstpreventionplandet) $res = dolibarr_set_const($db, $maskconstpreventionplandet, $maskpreventionplandet, 'chaine', 0, '', $conf->entity);
+	if ($maskconstfirepermit) $res = dolibarr_set_const($db, $maskconstfirepermit, $maskfirepermit, 'chaine', 0, '', $conf->entity);
 
 	if (!$res > 0) $error++;
 
@@ -105,13 +105,13 @@ print load_fiche_titre($langs->trans($page_name), $linkback, 'object_digiriskdol
 $head = digiriskdolibarrAdminPrepareHead();
 dol_fiche_head($head, 'digiriskelement', '', -1, "digiriskdolibarr@digiriskdolibarr");
 $head = digiriskdolibarrAdminDigiriskElementPrepareHead();
-dol_fiche_head($head, 'preventionplandet', '', -1, "digiriskdolibarr@digiriskdolibarr");
+dol_fiche_head($head, 'firepermit', '', -1, "digiriskdolibarr@digiriskdolibarr");
 
 /*
  *  Numbering module
  */
 
-print load_fiche_titre($langs->trans("DigiriskPreventionPlanDetNumberingModule"), '', '');
+print load_fiche_titre($langs->trans("DigiriskFirePermitNumberingModule"), '', '');
 
 print '<table class="noborder centpercent">';
 print '<tr class="liste_titre">';
@@ -162,7 +162,7 @@ if (is_dir($dir))
 						print '</td>'."\n";
 
 						print '<td class="center">';
-						if ($conf->global->DIGIRISKDOLIBARR_PREVENTIONPLANDET_ADDON == $file || $conf->global->DIGIRISKDOLIBARR_PREVENTIONPLANDET_ADDON.'.php' == $file)
+						if ($conf->global->DIGIRISKDOLIBARR_FIREPERMIT_ADDON == $file || $conf->global->DIGIRISKDOLIBARR_FIREPERMIT_ADDON.'.php' == $file)
 						{
 							print img_picto($langs->trans("Activated"), 'switch_on');
 						}
@@ -189,7 +189,7 @@ if (is_dir($dir))
 
 						print '<td class="center">';
 						print $form->textwithpicto('', $htmltooltip, 1, 0);
-						if ($conf->global->DIGIRISKDOLIBARR_PREVENTIONPLANDET_ADDON.'.php' == $file)  // If module is the one used, we show existing errors
+						if ($conf->global->DIGIRISKDOLIBARR_FIREPERMIT_ADDON.'.php' == $file)  // If module is the one used, we show existing errors
 						{
 							if (!empty($module->error)) dol_htmloutput_mesg($module->error, '', 'error', 1);
 						}

@@ -16,9 +16,9 @@
  */
 
 /**
- *   	\file       preventionplan_card.php
+ *   	\file       firepermit_card.php
  *		\ingroup    digiriskdolibarr
- *		\brief      Page to create/edit/view preventionplan
+ *		\brief      Page to create/edit/view firepermit
  */
 
 // Load Dolibarr environment
@@ -40,15 +40,15 @@ require_once DOL_DOCUMENT_ROOT.'/core/class/html.formfile.class.php';
 require_once __DIR__ . '/class/digiriskdocuments.class.php';
 require_once __DIR__ . '/class/digiriskelement.class.php';
 require_once __DIR__ . '/class/digiriskresources.class.php';
-require_once __DIR__ . '/class/preventionplan.class.php';
+require_once __DIR__ . '/class/firepermit.class.php';
 require_once __DIR__ . '/class/riskanalysis/risk.class.php';
-require_once __DIR__ . '/class/digiriskdocuments/preventionplandocument.class.php';
+require_once __DIR__ . '/class/digiriskdocuments/firepermitdocument.class.php';
 require_once __DIR__ . '/lib/digiriskdolibarr_function.lib.php';
-require_once __DIR__ . '/lib/digiriskdolibarr_preventionplan.lib.php';
-require_once __DIR__ . '/core/modules/digiriskdolibarr/digiriskelement/preventionplan/mod_preventionplan_standard.php';
-require_once __DIR__ . '/core/modules/digiriskdolibarr/digiriskelement/preventionplandet/mod_preventionplandet_standard.php';
-require_once __DIR__ . '/core/modules/digiriskdolibarr/digiriskdocuments/preventionplandocument/mod_preventionplandocument_standard.php';
-require_once __DIR__ . '/core/modules/digiriskdolibarr/digiriskdocuments/preventionplandocument/modules_preventionplandocument.php';
+require_once __DIR__ . '/lib/digiriskdolibarr_firepermit.lib.php';
+require_once __DIR__ . '/core/modules/digiriskdolibarr/digiriskelement/firepermit/mod_firepermit_standard.php';
+require_once __DIR__ . '/core/modules/digiriskdolibarr/digiriskelement/firepermitdet/mod_firepermitdet_standard.php';
+require_once __DIR__ . '/core/modules/digiriskdolibarr/digiriskdocuments/firepermitdocument/mod_firepermitdocument_standard.php';
+require_once __DIR__ . '/core/modules/digiriskdolibarr/digiriskdocuments/firepermitdocument/modules_firepermitdocument.php';
 
 global $db, $conf, $langs;
 
@@ -62,32 +62,32 @@ $ref                 = GETPOST('ref', 'alpha');
 $action              = GETPOST('action', 'aZ09');
 $confirm             = GETPOST('confirm', 'alpha');
 $cancel              = GETPOST('cancel', 'aZ09');
-$contextpage         = GETPOST('contextpage', 'aZ') ?GETPOST('contextpage', 'aZ') : 'preventionplancard'; // To manage different context of search
+$contextpage         = GETPOST('contextpage', 'aZ') ?GETPOST('contextpage', 'aZ') : 'firepermitcard'; // To manage different context of search
 $backtopage          = GETPOST('backtopage', 'alpha');
 $backtopageforcancel = GETPOST('backtopageforcancel', 'alpha');
 $fk_parent           = GETPOST('fk_parent', 'int');
 
 // Initialize technical objects
-$preventionplan                 = new PreventionPlan($db);
+$firepermit                 = new FirePermit($db);
 $object = new Openinghours($db);
 
-$preventionplan->fetch($id);
+$firepermit->fetch($id);
 
 $digiriskelement   = new DigiriskElement($db);
 $digiriskresources = new DigiriskResources($db);
 
-$refPreventionPlanMod = new $conf->global->DIGIRISKDOLIBARR_PREVENTIONPLAN_ADDON($db);
-$refPreventionPlanDetMod = new  $conf->global->DIGIRISKDOLIBARR_PREVENTIONPLANDET_ADDON($db);
+$refFirePermitMod = new $conf->global->DIGIRISKDOLIBARR_FIREPERMIT_ADDON($db);
+$refFirePermitDetMod = new  $conf->global->DIGIRISKDOLIBARR_FIREPERMITDET_ADDON($db);
 
-$hookmanager->initHooks(array('preventionplancard', 'globalcard')); // Note that conf->hooks_modules contains array
+$hookmanager->initHooks(array('firepermitcard', 'globalcard')); // Note that conf->hooks_modules contains array
 
-$upload_dir         = $conf->digiriskdolibarr->multidir_output[isset($preventionplan->entity) ? $preventionplan->entity : 1];
-$permissiontoread   = $user->rights->digiriskdolibarr->preventionplandocument->read;
-$permissiontoadd    = $user->rights->digiriskdolibarr->preventionplandocument->write;
-$permissiontodelete = $user->rights->digiriskdolibarr->preventionplandocument->delete;
+$upload_dir         = $conf->digiriskdolibarr->multidir_output[isset($firepermit->entity) ? $firepermit->entity : 1];
+$permissiontoread   = $user->rights->digiriskdolibarr->firepermitdocument->read;
+$permissiontoadd    = $user->rights->digiriskdolibarr->firepermitdocument->write;
+$permissiontodelete = $user->rights->digiriskdolibarr->firepermitdocument->delete;
 
 $morewhere = ' AND element_id = ' . GETPOST('id');
-$morewhere .= ' AND element_type = ' . "'" . $preventionplan->element . "'";
+$morewhere .= ' AND element_type = ' . "'" . $firepermit->element . "'";
 $morewhere .= ' AND status = 1';
 
 $object->fetch(0, '', $morewhere);
@@ -99,13 +99,13 @@ if (!$permissiontoread) accessforbidden();
  */
 
 $parameters = array();
-$reshook = $hookmanager->executeHooks('doActions', $parameters, $preventionplan, $action); // Note that $action and $preventionplan may have been modified by some hooks
+$reshook = $hookmanager->executeHooks('doActions', $parameters, $firepermit, $action); // Note that $action and $firepermit may have been modified by some hooks
 if ($reshook < 0) setEventMessages($hookmanager->error, $hookmanager->errors, 'errors');
 
 if (($action == 'update' && !GETPOST("cancel", 'alpha'))
 	|| ($action == 'updateedit'))
 {
-	$object->element_type = $preventionplan->element;
+	$object->element_type = $firepermit->element;
 	$object->element_id = GETPOST('id');
 	$object->status = 1;
 	$object->monday = GETPOST('monday', 'string');
@@ -123,22 +123,22 @@ if (($action == 'update' && !GETPOST("cancel", 'alpha'))
  *  View
  */
 
-$title = $langs->trans("PreventionPlan");
+$title = $langs->trans("FirePermit");
 $help_url = 'EN:Module_Third_Parties|FR:Module_DigiriskDolibarr#L.27onglet_Horaire_de_travail|ES:Empresas';
 llxHeader('', $title, $help_url);
 
-if (!empty($preventionplan->id)) $res = $preventionplan->fetch_optionals();
+if (!empty($firepermit->id)) $res = $firepermit->fetch_optionals();
 
 // Object card
 // ------------------------------------------------------------
 $morehtmlref = '<div class="refidno">';
 $morehtmlref .= '</div>';
 
-$head = preventionplanPrepareHead($preventionplan);
-dol_fiche_head($head, 'preventionplanSchedule', $langs->trans("PreventionPlan"), 0, '');
-dol_banner_tab($preventionplan, 'ref', '', ($user->socid ? 0 : 1), 'rowid', 'nom', '', '', 0, '', '', 'arearefnobottom');
+$head = firepermitPrepareHead($firepermit);
+dol_fiche_head($head, 'firepermitSchedule', $langs->trans("FirePermit"), 0, '');
+dol_banner_tab($firepermit, 'ref', '', ($user->socid ? 0 : 1), 'rowid', 'nom', '', '', 0, '', '', 'arearefnobottom');
 
-print '<span class="opacitymedium">'.$langs->trans("PreventionPlanSchedule")."</span>\n";
+print '<span class="opacitymedium">'.$langs->trans("FirePermitSchedule")."</span>\n";
 
 //Show common fields
 include DOL_DOCUMENT_ROOT.'/custom/digiriskdolibarr/core/tpl/digiriskdolibarr_openinghours_view.tpl.php';

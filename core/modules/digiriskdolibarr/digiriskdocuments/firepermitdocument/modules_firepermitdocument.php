@@ -17,7 +17,7 @@
  */
 
 /**
- *  \file			htdocs/core/modules/digiriskdolibarr/modules_firepermit.php
+ *  \file			htdocs/core/modules/digiriskdolibarr/modules_firepermitdocument.php
  *  \ingroup		digiriskdolibarr
  *  \brief			File that contains parent class for firepermits document models
  */
@@ -27,7 +27,7 @@ require_once DOL_DOCUMENT_ROOT . '/core/class/commondocgenerator.class.php';
 /**
  *	Parent class for documents models
  */
-abstract class ModeleODTFirePermit extends CommonDocGenerator
+abstract class ModeleODTFirePermitDocument extends CommonDocGenerator
 {
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
@@ -40,7 +40,7 @@ abstract class ModeleODTFirePermit extends CommonDocGenerator
 	 */
 	public static function liste_modeles($db, $maxfilenamelength = 0)
 	{
-		$type = 'firepermit';
+		$type = 'firepermitdocument';
 		$list = array();
 
 		include_once DOL_DOCUMENT_ROOT . '/core/lib/functions2.lib.php';

@@ -17,7 +17,7 @@
  */
 
 /**
- *	\file       htdocs/core/modules/digiriskdolibarr/digiriskdocuments/preventionplandocument/doc_preventionplandocument_odt.modules.php
+ *	\file       htdocs/core/modules/digiriskdolibarr/digiriskdocuments/firepermitdocument/doc_firepermitdocument_odt.modules.php
  *	\ingroup    digiriskdolibarr
  *	\brief      File of class to build ODT documents for digiriskdolibarr
  */
@@ -27,8 +27,8 @@ require_once DOL_DOCUMENT_ROOT . '/core/lib/images.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/company.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/doc.lib.php';
 
-require_once __DIR__ . '/modules_preventionplandocument.php';
-require_once __DIR__ . '/mod_preventionplandocument_standard.php';
+require_once __DIR__ . '/modules_firepermitdocument.php';
+require_once __DIR__ . '/mod_firepermitdocument_standard.php';
 require_once __DIR__ . '/../../../../../class/evaluator.class.php';
 require_once __DIR__ . '/../../../../../class/riskanalysis/risk.class.php';
 require_once __DIR__ . '/../../../../../class/riskanalysis/riskassessment.class.php';
@@ -37,7 +37,7 @@ require_once __DIR__ . '/../../../../../class/riskanalysis/risksign.class.php';
 /**
  *	Class to build documents using ODF templates generator
  */
-class doc_preventionplandocument_odt extends ModeleODTPreventionPlanDocument
+class doc_firepermitdocument_odt extends ModeleODTFirePermitDocument
 {
 	/**
 	 * Issuer
@@ -69,9 +69,9 @@ class doc_preventionplandocument_odt extends ModeleODTPreventionPlanDocument
 		$langs->loadLangs(array("main", "companies"));
 
 		$this->db = $db;
-		$this->name = $langs->trans('PreventionPlanDocumentDigiriskTemplate');
+		$this->name = $langs->trans('FirePermitDocumentDigiriskTemplate');
 		$this->description = $langs->trans("DocumentModelOdt");
-		$this->scandir = 'DIGIRISKDOLIBARR_PREVENTIONPLANDOCUMENT_ADDON_ODT_PATH'; // Name of constant that is used to save list of directories to scan
+		$this->scandir = 'DIGIRISKDOLIBARR_FIREPERMITDOCUMENT_ADDON_ODT_PATH'; // Name of constant that is used to save list of directories to scan
 
 		// Page size for A4 format
 		$this->type = 'odt';
@@ -106,13 +106,13 @@ class doc_preventionplandocument_odt extends ModeleODTPreventionPlanDocument
 		$texte .= '<form action="'.$_SERVER["PHP_SELF"].'" method="POST">';
 		$texte .= '<input type="hidden" name="token" value="'.newToken().'">';
 		$texte .= '<input type="hidden" name="action" value="setModuleOptions">';
-		$texte .= '<input type="hidden" name="param1" value="DIGIRISKDOLIBARR_PREVENTIONPLANDOCUMENT_ADDON_ODT_PATH">';
+		$texte .= '<input type="hidden" name="param1" value="DIGIRISKDOLIBARR_FIREPERMITDOCUMENT_ADDON_ODT_PATH">';
 		$texte .= '<table class="nobordernopadding" width="100%">';
 
 		// List of directories area
 		$texte .= '<tr><td>';
 		$texttitle = $langs->trans("ListOfDirectories");
-		$listofdir = explode(',', preg_replace('/[\r\n]+/', ',', trim($conf->global->DIGIRISKDOLIBARR_PREVENTIONPLANDOCUMENT_ADDON_ODT_PATH)));
+		$listofdir = explode(',', preg_replace('/[\r\n]+/', ',', trim($conf->global->DIGIRISKDOLIBARR_FIREPERMITDOCUMENT_ADDON_ODT_PATH)));
 		$listoffiles = array();
 		foreach ($listofdir as $key=>$tmpdir)
 		{
@@ -131,7 +131,7 @@ class doc_preventionplandocument_odt extends ModeleODTPreventionPlanDocument
 
 		// Scan directories
 		$nbofiles = count($listoffiles);
-		if (!empty($conf->global->DIGIRISKDOLIBARR_PREVENTIONPLANDOCUMENT_ADDON_ODT_PATH))
+		if (!empty($conf->global->DIGIRISKDOLIBARR_FIREPERMITDOCUMENT_ADDON_ODT_PATH))
 		{
 			$texte .= $langs->trans("DigiriskNumberOfModelFilesFound").': <b>';
 			//$texte.=$nbofiles?'<a id="a_'.get_class($this).'" href="#">':'';
@@ -161,7 +161,7 @@ class doc_preventionplandocument_odt extends ModeleODTPreventionPlanDocument
 	/**
 	 *  Function to build a document on disk using the generic odt module.
 	 *
-	 *	@param		PreventionPlanDocument	$object				Object source to build document
+	 *	@param		FirePermitDocument	$object				Object source to build document
 	 *	@param		Translate	$outputlangs		Lang output object
 	 * 	@param		string		$srctemplatepath	Full path of source filename for generator using a template file
 	 *  @param		int			$hidedetails		Do not show line details
@@ -169,14 +169,14 @@ class doc_preventionplandocument_odt extends ModeleODTPreventionPlanDocument
 	 *  @param		int			$hideref			Do not show ref
 	 *	@return		int         					1 if OK, <=0 if KO
 	 */
-	public function write_file($object, $outputlangs, $srctemplatepath, $hidedetails = 0, $hidedesc = 0, $hideref = 0, $preventionplan)
+	public function write_file($object, $outputlangs, $srctemplatepath, $hidedetails = 0, $hidedesc = 0, $hideref = 0, $firepermit)
 	{
 		// phpcs:enable
 		global $user, $langs, $conf, $hookmanager, $action;
 
 		if (empty($srctemplatepath))
 		{
-			dol_syslog("doc_preventionplandocument_odt::write_file parameter srctemplatepath empty", LOG_WARNING);
+			dol_syslog("doc_firepermitdocument_odt::write_file parameter srctemplatepath empty", LOG_WARNING);
 			return -1;
 		}
 
@@ -193,15 +193,15 @@ class doc_preventionplandocument_odt extends ModeleODTPreventionPlanDocument
 
 		$outputlangs->loadLangs(array("main", "dict", "companies", "digiriskdolibarr@digiriskdolibarr"));
 
-		$mod = new $conf->global->DIGIRISKDOLIBARR_PREVENTIONPLANDOCUMENT_ADDON($this->db);
+		$mod = new $conf->global->DIGIRISKDOLIBARR_FIREPERMITDOCUMENT_ADDON($this->db);
 		$ref = $mod->getNextValue($object);
 
 		$object->ref = $ref;
-		$id = $object->create($user, true, $preventionplan);
+		$id = $object->create($user, true, $firepermit);
 
 		$object->fetch($id);
 
-		$dir = $conf->digiriskdolibarr->multidir_output[isset($object->entity) ? $object->entity : 1] . '/preventionplandocument/'. $preventionplan->ref;
+		$dir = $conf->digiriskdolibarr->multidir_output[isset($object->entity) ? $object->entity : 1] . '/firepermitdocument/'. $firepermit->ref;
 		$objectref = dol_sanitizeFileName($ref);
 		if (preg_match('/specimen/i', $objectref)) $dir .= '/specimen';
 
@@ -216,7 +216,7 @@ class doc_preventionplandocument_odt extends ModeleODTPreventionPlanDocument
 
 		if (file_exists($dir))
 		{
-			$filename = preg_split('/preventionplandocument\//' , $srctemplatepath);
+			$filename = preg_split('/firepermitdocument\//' , $srctemplatepath);
 			$filename = preg_replace('/template_/','', $filename[1]);
 
 			$filename = $objectref . '_'. $filename;
@@ -235,10 +235,10 @@ class doc_preventionplandocument_odt extends ModeleODTPreventionPlanDocument
 
 			// Make substitution
 			$substitutionarray = array();
-			complete_substitutions_array($substitutionarray, $langs, $preventionplan);
+			complete_substitutions_array($substitutionarray, $langs, $firepermit);
 			// Call the ODTSubstitution hook
-			$parameters = array('file'=>$file, 'object'=>$preventionplan, 'outputlangs'=>$outputlangs, 'substitutionarray'=>&$substitutionarray);
-			$reshook = $hookmanager->executeHooks('ODTSubstitution', $parameters, $this, $action); // Note that $action and $preventionplan may have been modified by some hooks
+			$parameters = array('file'=>$file, 'object'=>$firepermit, 'outputlangs'=>$outputlangs, 'substitutionarray'=>&$substitutionarray);
+			$reshook = $hookmanager->executeHooks('ODTSubstitution', $parameters, $this, $action); // Note that $action and $firepermit may have been modified by some hooks
 
 			// Open and load template
 			require_once ODTPHP_PATH.'odf.php';
@@ -262,7 +262,7 @@ class doc_preventionplandocument_odt extends ModeleODTPreventionPlanDocument
 
 			$tmparray = $substitutionarray;
 
-			$filearray = dol_dir_list($conf->digiriskdolibarr->multidir_output[$conf->entity] . '/' . $preventionplan->element_type . '/' . $preventionplan->ref, "files", 0, '', '(\.odt|_preview.*\.png)$', 'position_name', 'desc', 1);
+			$filearray = dol_dir_list($conf->digiriskdolibarr->multidir_output[$conf->entity] . '/' . $firepermit->element_type . '/' . $firepermit->ref, "files", 0, '', '(\.odt|_preview.*\.png)$', 'position_name', 'desc', 1);
 			if (count($filearray)) {
 				$image = array_shift($filearray);
 				$tmparray['photoDefault'] = $image['fullname'];
@@ -270,34 +270,34 @@ class doc_preventionplandocument_odt extends ModeleODTPreventionPlanDocument
 
 			$resources          = new DigiriskResources($this->db);
 			$societe            = new Societe($this->db);
-			$preventionplanline = new PreventionPlanLine($this->db);
+			$firepermitline = new FirePermitLine($this->db);
 			$risk               = new Risk($this->db);
 
-			$preventionplanlines = $preventionplanline->fetchAll(GETPOST('id'));
+			$firepermitlines = $firepermitline->fetchAll(GETPOST('id'));
 
 			$digirisk_resources      = $resources->digirisk_dolibarr_fetch_resources();
-			$extsociety              = $resources->fetchResourcesFromObject('PP_EXT_SOCIETY', $preventionplan);
-			$extsocietyintervenants  = $resources->fetchResourcesFromObject('PP_EXT_SOCIETY_INTERVENANTS', $preventionplan);
-			$maitreoeuvre            = $resources->fetchResourcesFromObject('PP_MAITRE_OEUVRE', $preventionplan);
-			$extsocietyresponsible   = $resources->fetchResourcesFromObject('PP_EXT_SOCIETY_RESPONSIBLE', $preventionplan);
+			$extsociety              = $resources->fetchResourcesFromObject('PP_EXT_SOCIETY', $firepermit);
+			$extsocietyintervenants  = $resources->fetchResourcesFromObject('PP_EXT_SOCIETY_INTERVENANTS', $firepermit);
+			$maitreoeuvre            = $resources->fetchResourcesFromObject('PP_MAITRE_OEUVRE', $firepermit);
+			$extsocietyresponsible   = $resources->fetchResourcesFromObject('PP_EXT_SOCIETY_RESPONSIBLE', $firepermit);
 
-			$tmparray['titre_prevention']             = $preventionplan->ref;
-			$tmparray['unique_identifier']            = $preventionplan->label;
-			$tmparray['raison_du_plan_de_prevention'] = $preventionplan->raison;
+			$tmparray['titre_prevention']             = $firepermit->ref;
+			$tmparray['unique_identifier']            = $firepermit->label;
+			$tmparray['raison_du_plan_de_prevention'] = $firepermit->raison;
 
 			$tmparray['moyen_generaux_mis_disposition'] = $conf->global->DIGIRISK_GENERAL_MEANS;
 			$tmparray['consigne_generale']              = $conf->global->DIGIRISK_GENERAL_RULES;
 			$tmparray['premiers_secours']               = $conf->global->DIGIRISK_FIRST_AID;
 
-			$tmparray['date_start_intervention_PPP'] = $preventionplan->date_start;
-			$tmparray['date_end_intervention_PPP'] = $preventionplan->date_end;
-			$tmparray['interventions_info'] = count($preventionplanlines) . " " . $langs->trans('PreventionPlanLine');
+			$tmparray['date_start_intervention_PPP'] = $firepermit->date_start;
+			$tmparray['date_end_intervention_PPP'] = $firepermit->date_end;
+			$tmparray['interventions_info'] = count($firepermitlines) . " " . $langs->trans('FirePermitLine');
 
 
 			$openinghours = new Openinghours($this->db);
 
-			$morewhere = ' AND element_id = ' . $preventionplan->id;
-			$morewhere .= ' AND element_type = ' . "'" . $preventionplan->element . "'";
+			$morewhere = ' AND element_id = ' . $firepermit->id;
+			$morewhere .= ' AND element_type = ' . "'" . $firepermit->element . "'";
 			$morewhere .= ' AND status = 1';
 
 			$openinghours->fetch(0, '', $morewhere);
@@ -406,10 +406,10 @@ class doc_preventionplandocument_odt extends ModeleODTPreventionPlanDocument
 				$foundtagforlines = 1;
 				if ($foundtagforlines) {
 
-					if (!empty($preventionplanlines) && $preventionplanlines > 0) {
+					if (!empty($firepermitlines) && $firepermitlines > 0) {
 						$listlines = $odfHandler->setSegment('interventions');
 
-						foreach ($preventionplanlines as $line) {
+						foreach ($firepermitlines as $line) {
 
 							$tmparray['key_unique']    = $line->ref;
 							$tmparray['unite_travail'] = $line->location;

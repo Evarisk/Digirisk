@@ -16,9 +16,9 @@
  */
 
 /**
- * \file    digiriskdolibarr/admin/firepermit.php
+ * \file    digiriskdolibarr/admin/firepermitdocument.php
  * \ingroup digiriskdolibarr
- * \brief   Digiriskdolibarr firepermit page.
+ * \brief   Digiriskdolibarr firepermitdocument page.
  */
 
 // Load Dolibarr environment
@@ -54,7 +54,7 @@ $action     = GETPOST('action', 'alpha');
 $backtopage = GETPOST('backtopage', 'alpha');
 $value      = GETPOST('value', 'alpha');
 
-$type          = 'firepermit';
+$type          = 'firepermitdocument';
 $error         = 0;
 $setupnotempty = 0;
 
@@ -65,10 +65,10 @@ include DOL_DOCUMENT_ROOT.'/core/actions_setmoduleoptions.inc.php';
 
 if ($action == 'updateMask')
 {
-	$maskconstfirepermit = GETPOST('maskconstfirepermit', 'alpha');
-	$maskfirepermit      = GETPOST('maskfirepermit', 'alpha');
+	$maskconstfirepermitdocument = GETPOST('maskconstfirepermitdocument', 'alpha');
+	$maskfirepermitdocument      = GETPOST('maskfirepermitdocument', 'alpha');
 
-	if ($maskconstfirepermit) $res = dolibarr_set_const($db, $maskconstfirepermit, $maskfirepermit, 'chaine', 0, '', $conf->entity);
+	if ($maskconstfirepermitdocument) $res = dolibarr_set_const($db, $maskconstfirepermitdocument, $maskfirepermitdocument, 'chaine', 0, '', $conf->entity);
 
 	if (!$res > 0) $error++;
 
@@ -85,9 +85,9 @@ elseif ($action == 'set')
 {
 	$label = GETPOST('label', 'alpha');
 
-	if ( $value == 'firepermit_odt' ) {
+	if ( $value == 'firepermitdocument_odt' ) {
 		$description = "DIGIRISKDOLIBARR_".strtoupper($type)."_ADDON_ODT_PATH";
-	} elseif ( $value == 'firepermit_custom_odt' ) {
+	} elseif ( $value == 'firepermitdocument_custom_odt' ) {
 		$description = "DIGIRISKDOLIBARR_".strtoupper($type)."_CUSTOM_ADDON_ODT_PATH";
 	}
 
@@ -142,13 +142,13 @@ print load_fiche_titre($langs->trans($page_name), $linkback, 'object_digiriskdol
 $head = digiriskdolibarrAdminPrepareHead();
 dol_fiche_head($head, 'digiriskdocuments', '', -1, "digiriskdolibarr@digiriskdolibarr");
 $head = digiriskdolibarrAdminDigiriskDocumentsPrepareHead();
-dol_fiche_head($head, 'firepermit', '', -1, "digiriskdolibarr@digiriskdolibarr");
+dol_fiche_head($head, 'firepermitdocument', '', -1, "digiriskdolibarr@digiriskdolibarr");
 
 /*
  *  Numbering module
  */
 
-print load_fiche_titre($langs->trans("DigiriskFirePermitNumberingModule"), '', '');
+print load_fiche_titre($langs->trans("DigiriskFirePermitDocumentNumberingModule"), '', '');
 
 print '<table class="noborder centpercent">';
 print '<tr class="liste_titre">';
@@ -200,7 +200,7 @@ if (is_dir($dir))
 						print '</td>'."\n";
 
 						print '<td class="center">';
-						if ($conf->global->DIGIRISKDOLIBARR_FIREPERMIT_ADDON == $file || $conf->global->DIGIRISKDOLIBARR_FIREPERMIT_ADDON.'.php' == $file)
+						if ($conf->global->DIGIRISKDOLIBARR_FIREPERMITDOCUMENT_ADDON == $file || $conf->global->DIGIRISKDOLIBARR_FIREPERMITDOCUMENT_ADDON.'.php' == $file)
 						{
 							print img_picto($langs->trans("Activated"), 'switch_on');
 						}
@@ -227,7 +227,7 @@ if (is_dir($dir))
 
 						print '<td class="center">';
 						print $form->textwithpicto('', $htmltooltip, 1, 0);
-						if ($conf->global->DIGIRISKDOLIBARR_FIREPERMIT_ADDON.'.php' == $file)  // If module is the one used, we show existing errors
+						if ($conf->global->DIGIRISKDOLIBARR_FIREPERMITDOCUMENT_ADDON.'.php' == $file)  // If module is the one used, we show existing errors
 						{
 							if (!empty($module->error)) dol_htmloutput_mesg($module->error, '', 'error', 1);
 						}
@@ -297,7 +297,7 @@ if (is_dir($dir))
 
 		foreach ($filelist as $file)
 		{
-			if (preg_match('/\.modules\.php$/i', $file) && preg_match('/^(pdf_|doc_)/', $file) && preg_match('/firepermit/i', $file) && preg_match('/odt/i', $file))
+			if (preg_match('/\.modules\.php$/i', $file) && preg_match('/^(pdf_|doc_)/', $file) && preg_match('/firepermitdocument/i', $file) && preg_match('/odt/i', $file))
 			{
 				if (file_exists($dir.'/'.$file))
 				{
@@ -338,7 +338,7 @@ if (is_dir($dir))
 
 						// Default
 						print '<td class="center">';
-						if ($conf->global->DIGIRISKDOLIBARR_FIREPERMIT_DEFAULT_MODEL == $name)
+						if ($conf->global->DIGIRISKDOLIBARR_FIREPERMITDOCUMENT_DEFAULT_MODEL == $name)
 						{
 							print img_picto($langs->trans("Default"), 'on');
 						}

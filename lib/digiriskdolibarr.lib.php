@@ -120,8 +120,8 @@ function digiriskdolibarrAdminDigiriskDocumentsPrepareHead()
 	$h++;
 
 	$head[$h][0] = dol_buildpath("/digiriskdolibarr/admin/digiriskdocuments/firepermit.php", 1);
-	$head[$h][1] = $langs->trans("FirePermit");
-	$head[$h][2] = 'firepermit';
+	$head[$h][1] = $langs->trans("FirePermitDocument");
+	$head[$h][2] = 'firepermitdocument';
 	$h++;
 
 	complete_head_from_modules($conf, $langs, null, $head, $h, 'digiriskdolibarr');

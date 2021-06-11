@@ -96,22 +96,23 @@ class PreventionPlanDocument extends DigiriskDocuments
 
 	public function PreventionPlanDocumentFillJSON($object) {
 
-		$maitre_oeuvre   = new User($this->db);
-		$extsociety      = new Societe($this->db);
-		$contacttmp      = new Contact($this->db);
-		$digiriskelement = new DigiriskElement($this->db);
+		$contacttmp        = new Contact($this->db);
+		$digiriskelement   = new DigiriskElement($this->db);
 		$digiriskresources = new DigiriskResources($this->db);
-		$preventionplan = new PreventionPlan($this->db);
+		$preventionplan    = new PreventionPlan($this->db);
+
 		$id = GETPOST('id');
 		if ($id > 0) {
 			$preventionplan->fetch($id);
 		}
 
-		$maitre_oeuvre = $digiriskresources->fetchResourcesFromObject('PP_MAITRE_OEUVRE', $preventionplan);
+		$resources = $digiriskresources->fetchAll();
 
-		$extsociety = $digiriskresources->fetchResourcesFromObject('PP_EXT_SOCIETY', $preventionplan);
-		$extresponsible = $digiriskresources->fetchResourcesFromObject('PP_EXT_SOCIETY_RESPONSIBLE', $preventionplan);
-		$extintervenants = 	$digiriskresources->fetchResourcesFromObject('PP_EXT_SOCIETY_INTERVENANTS', $preventionplan);
+		$maitre_oeuvre   = $digiriskresources->fetchResourcesFromObject('PP_MAITRE_OEUVRE', $preventionplan);
+		$extsociety      = $digiriskresources->fetchResourcesFromObject('PP_EXT_SOCIETY', $preventionplan);
+		$extresponsible  = $digiriskresources->fetchResourcesFromObject('PP_EXT_SOCIETY_RESPONSIBLE', $preventionplan);
+		$extintervenants = $digiriskresources->fetchResourcesFromObject('PP_EXT_SOCIETY_INTERVENANTS', $preventionplan);
+		$labourinspector = $digiriskresources->fetchResourcesFromObject('PP_LABOUR_INSPECTOR_ASSIGNED', $preventionplan);
 
 		if ($maitre_oeuvre->id > 0) {
 
@@ -156,9 +157,10 @@ class PreventionPlanDocument extends DigiriskDocuments
 
 		$json['PreventionPlan']['date']['debut']       = $preventionplan->date_debut;
 		$json['PreventionPlan']['date']['fin']         = $preventionplan->date_fin;
-		$json['PreventionPlan']['more_than_400_hours'] = $preventionplan->morethan400hours;
-		$json['PreventionPlan']['imminent_danger']     = $preventionplan->imminentdanger;
-		$json['PreventionPlan']['labour_inspector']    = $preventionplan->imminentdanger;
+		$json['PreventionPlan']['cssct_intervention']  = $preventionplan->cssct_intervention;
+		$json['PreventionPlan']['prior_visit_bool']    = $preventionplan->prior_visit_bool;
+		$json['PreventionPlan']['prior_visit_text']    = $preventionplan->prior_visit_text;
+		$json['PreventionPlan']['labour_inspector']    = $labourinspector->firstname . ' ' . $labourinspector->lastname;
 
 		if ($preventionplan->fk_element > 0) {
 			$digiriskelement->fetch($object->fk_element);
@@ -166,7 +168,6 @@ class PreventionPlanDocument extends DigiriskDocuments
 			$json['PreventionPlan']['location']['name'] = $digiriskelement->ref . ' - ' . $digiriskelement->label;
 		}
 
-		//@todo interventions et intervenants
 
 		return json_encode($json, JSON_UNESCAPED_UNICODE);
 	}

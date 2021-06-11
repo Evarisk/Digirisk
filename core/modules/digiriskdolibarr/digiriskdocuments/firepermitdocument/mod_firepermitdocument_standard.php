@@ -25,9 +25,9 @@
 require_once __DIR__ . '/../modules_digiriskdocuments.php';
 
 /**
- * 	Class to manage firepermit numbering rules Standard
+ * 	Class to manage firepermitdocument numbering rules Standard
  */
-class mod_firepermit_standard extends ModeleNumRefDigiriskDocuments
+class mod_firepermitdocument_standard extends ModeleNumRefDigiriskDocuments
 {
 	/**
 	 * Dolibarr version of the loaded document
@@ -38,12 +38,12 @@ class mod_firepermit_standard extends ModeleNumRefDigiriskDocuments
 	/**
 	 * @var string document prefix
 	 */
-	public $prefix = 'FP';
+	public $prefix = 'FPD';
 
 	/**
 	 * @var string model name
 	 */
-	public $name = 'Hypérion';
+	public $name = 'Bergelmir';
 
 	/**
 	 * @var string Error code (or message)
@@ -59,7 +59,7 @@ class mod_firepermit_standard extends ModeleNumRefDigiriskDocuments
 	{
 		global $langs;
 		$langs->load("digiriskdolibarr@digiriskdolibarr");
-		return $langs->trans('DigiriskFirePermitStandardModel', $this->prefix);
+		return $langs->trans('DigiriskFirePermitDocumentStandardModel', $this->prefix);
 	}
 
 	/**
@@ -73,14 +73,12 @@ class mod_firepermit_standard extends ModeleNumRefDigiriskDocuments
 	}
 
 	/**
-	 *    Return next free value
+	 * 	Return next free value
 	 *
-	 * @param Object $object Object we need next value for
-	 *
-	 * @return string                Value if KO, <0 if OK prefix+num
-	 * @throws Exception
+	 *  @param  Object		$object		Object we need next value for
+	 *  @return string      			Value if KO, <0 if KO
 	 */
-	public function getNextValue($object)
+	public function getNextValue($object, $version = 0)
 	{
 		global $db, $conf;
 

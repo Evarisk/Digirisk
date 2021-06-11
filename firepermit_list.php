@@ -23,7 +23,7 @@
  */
 
 /**
- *   	\file       preventionplan_list.php
+ *   	\file       firepermit_list.php
  *		\ingroup    digiriskdolibarr
  *		\brief      List page for prevention plan
  */
@@ -49,7 +49,7 @@ require_once DOL_DOCUMENT_ROOT.'/user/class/user.class.php';
 require_once DOL_DOCUMENT_ROOT.'/contact/class/contact.class.php';
 require_once DOL_DOCUMENT_ROOT.'/societe/class/societe.class.php';
 
-require_once __DIR__ . '/class/preventionplan.class.php';
+require_once __DIR__ . '/class/firepermit.class.php';
 
 // Load translation files required by the page
 $langs->loadLangs(array('projects', 'companies', 'commercial'));
@@ -61,9 +61,9 @@ $confirm     = GETPOST('confirm', 'alpha');
 $toselect    = GETPOST('toselect', 'array');
 $contextpage = GETPOST('contextpage', 'aZ') ?GETPOST('contextpage', 'aZ') : 'projectlist';
 
-$title = $langs->trans("PreventionPlan");
+$title = $langs->trans("FirePermit");
 
-$preventionplan = new PreventionPlan($db);
+$firepermit = new FirePermit($db);
 $societe        = new Societe($db);
 $contact        = new Contact($db);
 $usertmp        = new User($db);
@@ -85,14 +85,14 @@ $pagenext = $page + 1;
 // Initialize array of search criterias
 $search_all = GETPOST('search_all', 'alphanohtml') ? trim(GETPOST('search_all', 'alphanohtml')) : trim(GETPOST('sall', 'alphanohtml'));
 $search = array();
-foreach ($preventionplan->fields as $key => $val)
+foreach ($firepermit->fields as $key => $val)
 {
 	if (GETPOST('search_'.$key, 'alpha') !== '') $search[$key] = GETPOST('search_'.$key, 'alpha');
 }
 
 // List of fields to search into when doing a "search in all"
 $fieldstosearchall = array();
-foreach ($preventionplan->fields as $key => $val)
+foreach ($firepermit->fields as $key => $val)
 {
 	if ($val['searchall']) $fieldstosearchall['t.'.$key] = $val['label'];
 }
@@ -100,19 +100,19 @@ foreach ($preventionplan->fields as $key => $val)
 // Definition of fields for list
 $arrayfields = array();
 
-foreach ($preventionplan->fields as $key => $val)
+foreach ($firepermit->fields as $key => $val)
 {
 	// If $val['visible']==0, then we never show the field
 	if (!empty($val['visible'])) $arrayfields['t.'.$key] = array('label'=>$val['label'], 'checked'=>(($val['visible'] < 0) ? 0 : 1), 'enabled'=>($val['enabled'] && ($val['visible'] != 3)), 'position'=>$val['position']);
 }
 
-// Load Digipreventionplan_element object
+// Load Digifirepermit_element object
 include DOL_DOCUMENT_ROOT.'/core/actions_fetchobject.inc.php'; // Must be include, not include_once.
 
-//Permission for digiriskelement_preventionplan
-$permissiontoread = $user->rights->digiriskdolibarr->preventionplan->read;
-$permissiontoadd = $user->rights->digiriskdolibarr->preventionplan->write;
-$permissiontodelete = $user->rights->digiriskdolibarr->preventionplan->delete;
+//Permission for digiriskelement_firepermit
+$permissiontoread = $user->rights->digiriskdolibarr->firepermit->read;
+$permissiontoadd = $user->rights->digiriskdolibarr->firepermit->write;
+$permissiontodelete = $user->rights->digiriskdolibarr->firepermit->delete;
 
 // Security check - Protection if external user
 if (!$user->rights->digiriskdolibarr->lire) accessforbidden();
@@ -133,12 +133,12 @@ if (empty($reshook))
 	// Selection of new fields
 	include DOL_DOCUMENT_ROOT . '/core/actions_changeselectedfields.inc.php';
 
-	$backtopage = dol_buildpath('/digiriskdolibarr/preventionplan_list.php', 1);
+	$backtopage = dol_buildpath('/digiriskdolibarr/firepermit_list.php', 1);
 
 	// Purge search criteria
 	if (GETPOST('button_removefilter_x', 'alpha') || GETPOST('button_removefilter.x', 'alpha') || GETPOST('button_removefilter', 'alpha')) // All tests are required to be compatible with all browsers
 	{
-		foreach ($preventionplan->fields as $key => $val) {
+		foreach ($firepermit->fields as $key => $val) {
 			$search[$key] = '';
 		}
 
@@ -155,11 +155,11 @@ if (empty($reshook))
 		if (!empty($toselect)) {
 			foreach ($toselect as $toselectedid) {
 
-				$preventionplantodelete = $preventionplan;
-				$preventionplantodelete->fetch($toselectedid);
+				$firepermittodelete = $firepermit;
+				$firepermittodelete->fetch($toselectedid);
 
-				$preventionplantodelete->status = 0;
-				$result = $preventionplantodelete->update($user, true);
+				$firepermittodelete->status = 0;
+				$result = $firepermittodelete->update($user, true);
 
 				if ($result < 0) {
 					// Delete risk KO
@@ -187,8 +187,8 @@ if (empty($reshook))
 $form = new Form($db);
 $formother = new FormOther($db);
 
-$title = $langs->trans("PreventionPlan");
-$help_url = 'FR:Module_DigipreventionplanDolibarr';
+$title = $langs->trans("FirePermit");
+$help_url = 'FR:Module_DigifirepermitDolibarr';
 
 llxHeader("", $title, $help_url);
 
@@ -207,7 +207,7 @@ $massactionbutton = $form->selectMassAction('', $arrayofmassactions);
 $newcardbutton = '';
 if ($user->rights->projet->creer)
 {
-	$newcardbutton .= dolGetButtonTitle($langs->trans('NewPreventionPlan'), '', 'fa fa-plus-circle', DOL_URL_ROOT.'/custom/digiriskdolibarr/preventionplan_card.php?action=create');
+	$newcardbutton .= dolGetButtonTitle($langs->trans('NewFirePermit'), '', 'fa fa-plus-circle', DOL_URL_ROOT.'/custom/digiriskdolibarr/firepermit_card.php?action=create');
 }
 
 print '<form method="POST" id="searchFormList" action="'.$_SERVER["PHP_SELF"].'">';
@@ -220,7 +220,7 @@ print '<input type="hidden" name="sortorder" value="'.$sortorder.'">';
 print '<input type="hidden" name="type" value="'.$type.'">';
 print '<input type="hidden" name="contextpage" value="'.$contextpage.'">';
 
-print_barre_liste($form->textwithpicto($title, $texthelp), $page, $_SERVER["PHP_SELF"], $param, $sortfield, $sortorder, $massactionbutton, $num, $nbtotalofrecords, 'preventionplandocument', 0, $newcardbutton, '', $limit, 0, 0, 1);
+print_barre_liste($form->textwithpicto($title, $texthelp), $page, $_SERVER["PHP_SELF"], $param, $sortfield, $sortorder, $massactionbutton, $num, $nbtotalofrecords, 'firepermitdocument', 0, $newcardbutton, '', $limit, 0, 0, 1);
 
 include DOL_DOCUMENT_ROOT.'/core/tpl/massactions_pre.tpl.php';
 
@@ -228,31 +228,31 @@ include DOL_DOCUMENT_ROOT.'/core/tpl/massactions_pre.tpl.php';
 // --------------------------------------------------------------------
 
 	$sql = 'SELECT ';
-	foreach ($preventionplan->fields as $key => $val)
+	foreach ($firepermit->fields as $key => $val)
 	{
 		$sql .= 't.'.$key.', ';
 	}
 	// Add fields from extrafields
-	if (!empty($extrafields->attributes[$preventionplan->table_element]['label'])) {
-		foreach ($extrafields->attributes[$preventionplan->table_element]['label'] as $key => $val) $sql .= ($extrafields->attributes[$preventionplan->table_element]['type'][$key] != 'separate' ? "ef.".$key.' as options_'.$key.', ' : '');
+	if (!empty($extrafields->attributes[$firepermit->table_element]['label'])) {
+		foreach ($extrafields->attributes[$firepermit->table_element]['label'] as $key => $val) $sql .= ($extrafields->attributes[$firepermit->table_element]['type'][$key] != 'separate' ? "ef.".$key.' as options_'.$key.', ' : '');
 	}
 	// Add fields from hooks
 	$parameters = array();
-	$reshook = $hookmanager->executeHooks('printFieldListSelect', $parameters, $preventionplan); // Note that $action and $preventionplandocument may have been modified by hook
+	$reshook = $hookmanager->executeHooks('printFieldListSelect', $parameters, $firepermit); // Note that $action and $firepermitdocument may have been modified by hook
 	$sql .= preg_replace('/^,/', '', $hookmanager->resPrint);
 	$sql = preg_replace('/,\s*$/', '', $sql);
-	$sql .= " FROM ".MAIN_DB_PREFIX.$preventionplan->table_element." as t";
+	$sql .= " FROM ".MAIN_DB_PREFIX.$firepermit->table_element." as t";
 
-	if (is_array($extrafields->attributes[$preventionplan->table_element]['label']) && count($extrafields->attributes[$preventionplan->table_element]['label'])) $sql .= " LEFT JOIN ".MAIN_DB_PREFIX.$preventionplan->table_element."_extrafields as ef on (t.rowid = ef.fk_object)";
-	if ($preventionplan->ismultientitymanaged == 1) $sql .= " WHERE t.entity IN (".getEntity($preventionplan->element).")";
+	if (is_array($extrafields->attributes[$firepermit->table_element]['label']) && count($extrafields->attributes[$firepermit->table_element]['label'])) $sql .= " LEFT JOIN ".MAIN_DB_PREFIX.$firepermit->table_element."_extrafields as ef on (t.rowid = ef.fk_object)";
+	if ($firepermit->ismultientitymanaged == 1) $sql .= " WHERE t.entity IN (".getEntity($firepermit->element).")";
 	else $sql .= " WHERE 1 = 1";
 
 
 foreach ($search as $key => $val)
 	{
 		if ($key == 'status' && $search[$key] == -1) continue;
-		$mode_search = (($preventionplan->isInt($preventionplan->fields[$key]) || $preventionplan->isFloat($preventionplan->fields[$key])) ? 1 : 0);
-		if (strpos($preventionplan->fields[$key]['type'], 'integer:') === 0) {
+		$mode_search = (($firepermit->isInt($firepermit->fields[$key]) || $firepermit->isFloat($firepermit->fields[$key])) ? 1 : 0);
+		if (strpos($firepermit->fields[$key]['type'], 'integer:') === 0) {
 			if ($search[$key] == '-1') $search[$key] = '';
 			$mode_search = 2;
 		}
@@ -263,7 +263,7 @@ foreach ($search as $key => $val)
 	include DOL_DOCUMENT_ROOT.'/core/tpl/extrafields_list_search_sql.tpl.php';
 	// Add where from hooks
 	$parameters = array();
-	$reshook = $hookmanager->executeHooks('printFieldListWhere', $parameters, $preventionplan); // Note that $action and $preventionplandocument may have been modified by hook
+	$reshook = $hookmanager->executeHooks('printFieldListWhere', $parameters, $firepermit); // Note that $action and $firepermitdocument may have been modified by hook
 	$sql .= $hookmanager->resPrint;
 
 	$sql .= $db->order($sortfield, $sortorder);
@@ -305,7 +305,7 @@ foreach ($search as $key => $val)
 	{
 		$obj = $db->fetch_object($resql);
 		$id = $obj->rowid;
-		header("Location: ".dol_buildpath('/digiriskdolibarr/digiriskelement_preventionplan.php', 1).'?id='.$id);
+		header("Location: ".dol_buildpath('/digiriskdolibarr/digiriskelement_firepermit.php', 1).'?id='.$id);
 		exit;
 	}
 
@@ -326,7 +326,7 @@ print '<table class="tagtable nobottomiftotal liste'.($moreforfilter ? " listwit
 print '<tr class="liste_titre">';
 
 
-foreach ($preventionplan->fields as $key => $val)
+foreach ($firepermit->fields as $key => $val)
 {
 	$cssforfield = (empty($val['css']) ? '' : $val['css']);
 	if ($key == 'status') $cssforfield .= ($cssforfield ? ' ' : '').'center';
@@ -336,7 +336,7 @@ foreach ($preventionplan->fields as $key => $val)
 
 		if (is_array($val['arrayofkeyval'])) print $form->selectarray('search_'.$key, $val['arrayofkeyval'], $search[$key], $val['notnull'], 0, 0, '', 1, 0, 0, '', 'maxwidth75');
 		elseif (strpos($val['type'], 'integer:') === 0) {
-			print $preventionplan->showInputField($val, $key, $search[$key], '', '', 'search_', 'maxwidth150', 1);
+			print $firepermit->showInputField($val, $key, $search[$key], '', '', 'search_', 'maxwidth150', 1);
 		}
 		elseif (!preg_match('/^(date|timestamp)/', $val['type'])) print '<input type="text" class="flat maxwidth75" name="search_'.$key.'" value="'.dol_escape_htmltag($search[$key]).'">';
 		print '</td>';
@@ -348,7 +348,7 @@ include DOL_DOCUMENT_ROOT.'/core/tpl/extrafields_list_search_input.tpl.php';
 
 // Fields from hook
 $parameters = array('arrayfields'=>$arrayfields);
-$reshook = $hookmanager->executeHooks('printFieldListOption', $parameters, $preventionplan); // Note that $action and $preventionplandocument may have been modified by hook
+$reshook = $hookmanager->executeHooks('printFieldListOption', $parameters, $firepermit); // Note that $action and $firepermitdocument may have been modified by hook
 print $hookmanager->resPrint;
 
 // Action column
@@ -362,7 +362,7 @@ print '</tr>'."\n";
 // --------------------------------------------------------------------
 print '<tr class="liste_titre">';
 
-foreach ($preventionplan->fields as $key => $val)
+foreach ($firepermit->fields as $key => $val)
 {
 	$cssforfield = (empty($val['css']) ? '' : $val['css']);
 	if ($key == 'status') $cssforfield .= ($cssforfield ? ' ' : '').'center';
@@ -384,7 +384,7 @@ include DOL_DOCUMENT_ROOT.'/core/tpl/extrafields_list_search_title.tpl.php';
 
 // Hook fields
 $parameters = array('arrayfields'=>$arrayfields, 'param'=>$param, 'sortfield'=>$sortfield, 'sortorder'=>$sortorder);
-$reshook = $hookmanager->executeHooks('printFieldListTitle', $parameters, $preventionplan); // Note that $action and $preventionplandocument may have been modified by hook
+$reshook = $hookmanager->executeHooks('printFieldListTitle', $parameters, $firepermit); // Note that $action and $firepermitdocument may have been modified by hook
 print $hookmanager->resPrint;
 
 // Action column
@@ -407,31 +407,31 @@ while ($i < ($limit ? min($num, $limit) : $num)) {
 	if (empty($obj)) break; // Should not happen
 
 
-	// Store properties in $preventionplandocument
-	$preventionplan->setVarsFromFetchObj($obj);
+	// Store properties in $firepermitdocument
+	$firepermit->setVarsFromFetchObj($obj);
 
-	$json = json_decode($preventionplan->json, false, 512, JSON_UNESCAPED_UNICODE)->PreventionPlan;
+	$json = json_decode($firepermit->json, false, 512, JSON_UNESCAPED_UNICODE)->FirePermit;
 
 	// Show here line of result
-	print '<tr class="oddeven preventionplandocument-row preventionplan_row_'. $preventionplan->id .' preventionplandocument-row-content-'. $preventionplan->id . '" id="preventionplan_row_'. $preventionplan->id .'">';
-	foreach ($preventionplan->fields as $key => $val) {
+	print '<tr class="oddeven firepermitdocument-row firepermit_row_'. $firepermit->id .' firepermitdocument-row-content-'. $firepermit->id . '" id="firepermit_row_'. $firepermit->id .'">';
+	foreach ($firepermit->fields as $key => $val) {
 		$cssforfield = (empty($val['css']) ? '' : $val['css']);
 		if ($key == 'status') $cssforfield .= ($cssforfield ? ' ' : '') . 'center';
 		elseif ($key == 'ref') $cssforfield .= ($cssforfield ? ' ' : '') . 'nowrap';
-		elseif ($key == 'category') $cssforfield .= ($cssforfield ? ' ' : '') . 'preventionplandocument-category';
-		elseif ($key == 'description') $cssforfield .= ($cssforfield ? ' ' : '') . 'preventionplandocument-description';
+		elseif ($key == 'category') $cssforfield .= ($cssforfield ? ' ' : '') . 'firepermitdocument-category';
+		elseif ($key == 'description') $cssforfield .= ($cssforfield ? ' ' : '') . 'firepermitdocument-description';
 		if (!empty($arrayfields['t.' . $key]['checked'])) {
 			print '<td' . ($cssforfield ? ' class="' . $cssforfield . '"' : '') . ' style="width:2%">';
-			if ($key == 'status') print $preventionplan->getLibStatut(5);
+			if ($key == 'status') print $firepermit->getLibStatut(5);
 			elseif ($key == 'ref') {
-				print $preventionplan->getNomUrl();
+				print $firepermit->getNomUrl();
 			}
-			else print $preventionplan->showOutputField($val, $key, $preventionplan->$key, '');
+			else print $firepermit->showOutputField($val, $key, $firepermit->$key, '');
 			print '</td>';
 			if (!$i) $totalarray['nbfield']++;
 			if (!empty($val['isameasure'])) {
 				if (!$i) $totalarray['pos'][$totalarray['nbfield']] = 't.' . $key;
-				$totalarray['val']['t.' . $key] += $preventionplan->$key;
+				$totalarray['val']['t.' . $key] += $firepermit->$key;
 			}
 		}
 	}
@@ -440,8 +440,8 @@ while ($i < ($limit ? min($num, $limit) : $num)) {
 	if ($massactionbutton || $massaction)   // If we are in select mode (massactionbutton defined) or if we have already selected and sent an action ($massaction) defined
 	{
 		$selected = 0;
-		if (in_array($preventionplan->id, $arrayofselected)) $selected = 1;
-		print '<input id="cb'.$preventionplan->id.'" class="flat checkforselect" type="checkbox" name="toselect[]" value="'.$preventionplan->id.'"'.($selected ? ' checked="checked"' : '').'>';
+		if (in_array($firepermit->id, $arrayofselected)) $selected = 1;
+		print '<input id="cb'.$firepermit->id.'" class="flat checkforselect" type="checkbox" name="toselect[]" value="'.$firepermit->id.'"'.($selected ? ' checked="checked"' : '').'>';
 	}
 
 	print '</td>';

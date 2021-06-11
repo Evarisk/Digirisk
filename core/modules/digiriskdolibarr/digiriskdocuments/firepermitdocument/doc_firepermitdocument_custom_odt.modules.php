@@ -17,7 +17,7 @@
  */
 
 /**
- *	\file       htdocs/core/modules/digiriskdolibarr/digiriskdocuments/firepermit/doc_firepermit_custom_odt.modules.php
+ *	\file       htdocs/core/modules/digiriskdolibarr/digiriskdocuments/firepermitdocument/doc_firepermitdocument_custom_odt.modules.php
  *	\ingroup    digiriskdolibarr
  *	\brief      File of class to build ODT documents for digiriskdolibarr
  */
@@ -25,13 +25,14 @@
 require_once DOL_DOCUMENT_ROOT . '/core/lib/files.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/company.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/doc.lib.php';
-require_once __DIR__ . '/mod_firepermit_standard.php';
-require_once __DIR__ . '/modules_firepermit.php';
+
+require_once __DIR__ . '/mod_firepermitdocument_standard.php';
+require_once __DIR__ . '/modules_firepermitdocument.php';
 
 /**
  *	Class to build documents using ODF templates generator
  */
-class doc_firepermit_custom_odt extends ModeleODTFirePermit
+class doc_firepermitdocument_custom_odt extends ModeleODTFirePermitDocument
 {
 	/**
 	 * Issuer
@@ -63,9 +64,9 @@ class doc_firepermit_custom_odt extends ModeleODTFirePermit
 		$langs->loadLangs(array("main", "companies"));
 
 		$this->db = $db;
-		$this->name = $langs->trans('FirePermitCustomDigiriskTemplate');
+		$this->name = $langs->trans('FirePermitDocumentCustomDigiriskTemplate');
 		$this->description = $langs->trans("DocumentModelOdt");
-		$this->scandir = 'DIGIRISKDOLIBARR_FIREPERMIT_CUSTOM_ADDON_ODT_PATH'; // Name of constant that is used to save list of directories to scan
+		$this->scandir = 'DIGIRISKDOLIBARR_FIREPERMITDOCUMENT_CUSTOM_ADDON_ODT_PATH'; // Name of constant that is used to save list of directories to scan
 
 		// Page size for A4 format
 		$this->type = 'odt';
@@ -101,14 +102,14 @@ class doc_firepermit_custom_odt extends ModeleODTFirePermit
 		$texte .= '<form action="'.$_SERVER["PHP_SELF"].'" method="POST" enctype="multipart/form-data">';
 		$texte .= '<input type="hidden" name="token" value="'.newToken().'">';
 		$texte .= '<input type="hidden" name="action" value="setModuleOptions">';
-		$texte .= '<input type="hidden" name="param1" value="DIGIRISKDOLIBARR_FIREPERMIT_CUSTOM_ADDON_ODT_PATH">';
-		$texte .= '<input type="hidden" name="value1" value="'.$conf->global->DIGIRISKDOLIBARR_FIREPERMIT_CUSTOM_ADDON_ODT_PATH.'">';
+		$texte .= '<input type="hidden" name="param1" value="DIGIRISKDOLIBARR_FIREPERMITDOCUMENT_CUSTOM_ADDON_ODT_PATH">';
+		$texte .= '<input type="hidden" name="value1" value="'.$conf->global->DIGIRISKDOLIBARR_FIREPERMITDOCUMENT_CUSTOM_ADDON_ODT_PATH.'">';
 		$texte .= '<table class="nobordernopadding" width="100%">';
 
 		// List of directories area
 		$texte .= '<tr><td valign="middle">';
 		$texttitle = $langs->trans("ListOfDirectories");
-		$listofdir = explode(',', preg_replace('/[\r\n]+/', ',', trim($conf->global->DIGIRISKDOLIBARR_FIREPERMIT_CUSTOM_ADDON_ODT_PATH)));
+		$listofdir = explode(',', preg_replace('/[\r\n]+/', ',', trim($conf->global->DIGIRISKDOLIBARR_FIREPERMITDOCUMENT_CUSTOM_ADDON_ODT_PATH)));
 		$listoffiles = array();
 
 		foreach ($listofdir as $key=>$tmpdir)
@@ -133,14 +134,14 @@ class doc_firepermit_custom_odt extends ModeleODTFirePermit
 		$texte .= $form->textwithpicto($texttitle, $texthelp, 1, 'help', '', 1);
 		$texte .= '<div><div style="display: inline-block; min-width: 100px; vertical-align: middle;">';
 		$texte .= '<span class="flat" cols="60" name="value1" style="font-weight: bold">';
-		$texte .= $conf->global->DIGIRISKDOLIBARR_FIREPERMIT_CUSTOM_ADDON_ODT_PATH;
+		$texte .= $conf->global->DIGIRISKDOLIBARR_FIREPERMITDOCUMENT_CUSTOM_ADDON_ODT_PATH;
 		$texte .= '</span>';
 		$texte .= '</div><div style="display: inline-block; vertical-align: middle;">';
 		$texte .= '<br></div></div>';
 
 		// Scan directories
 		$nbofiles = count($listoffiles);
-		if (!empty($conf->global->DIGIRISKDOLIBARR_FIREPERMIT_CUSTOM_ADDON_ODT_PATH))
+		if (!empty($conf->global->DIGIRISKDOLIBARR_FIREPERMITDOCUMENT_CUSTOM_ADDON_ODT_PATH))
 		{
 			$texte .= $langs->trans("NumberOfModelFilesFound").': <b>';
 			$texte .= count($listoffiles);
@@ -157,7 +158,7 @@ class doc_firepermit_custom_odt extends ModeleODTFirePermit
 		}
 		// Add input to upload a new template file.
 		$texte .= '<div>'.$langs->trans("UploadNewTemplate").' <input type="file" name="uploadfile">';
-		$texte .= '<input type="hidden" value="DIGIRISKDOLIBARR_FIREPERMIT_CUSTOM_ADDON_ODT_PATH" name="keyforuploaddir">';
+		$texte .= '<input type="hidden" value="DIGIRISKDOLIBARR_FIREPERMITDOCUMENT_CUSTOM_ADDON_ODT_PATH" name="keyforuploaddir">';
 		$texte .= '<input type="submit" class="button" value="'.dol_escape_htmltag($langs->trans("Upload")).'" name="upload">';
 		$texte .= '</div>';
 		$texte .= '</td>';
@@ -178,7 +179,7 @@ class doc_firepermit_custom_odt extends ModeleODTFirePermit
 	/**
 	 *  Function to build a document on disk using the generic odt module.
 	 *
-	 * @param FirePermit $object Object source to build document
+	 * @param FirePermitDocument $object Object source to build document
 	 * @param Translate $outputlangs Lang output object
 	 * @param string $srctemplatepath Full path of source filename for generator using a template file
 	 * @param int $hidedetails Do not show line details
@@ -194,7 +195,7 @@ class doc_firepermit_custom_odt extends ModeleODTFirePermit
 
 		if (empty($srctemplatepath))
 		{
-			dol_syslog("doc_firepermit_custom_odt::write_file parameter srctemplatepath empty", LOG_WARNING);
+			dol_syslog("doc_firepermitdocument_custom_odt::write_file parameter srctemplatepath empty", LOG_WARNING);
 			return -1;
 		}
 
@@ -210,13 +211,13 @@ class doc_firepermit_custom_odt extends ModeleODTFirePermit
 		$outputlangs->charset_output = 'UTF-8';
 		$outputlangs->loadLangs(array("main", "dict", "companies", "digiriskdolibarr@digiriskdolibarr"));
 
-		$mod = new $conf->global->DIGIRISKDOLIBARR_FIREPERMIT_ADDON($this->db);
+		$mod = new $conf->global->DIGIRISKDOLIBARR_FIREPERMITDOCUMENT_ADDON($this->db);
 		$ref = $mod->getNextValue($object);
 
 		$object->ref = $ref;
 		$object->create($user);
 
-		$dir = $conf->digiriskdolibarr->multidir_output[isset($object->entity) ? $object->entity : 1] . '/firepermit';
+		$dir = $conf->digiriskdolibarr->multidir_output[isset($object->entity) ? $object->entity : 1] . '/firepermitdocument';
 		$objectref = dol_sanitizeFileName($ref);
 		if (preg_match('/specimen/i', $objectref)) $dir .= '/specimen';
 		if (!file_exists($dir))
@@ -230,7 +231,7 @@ class doc_firepermit_custom_odt extends ModeleODTFirePermit
 
 		if (file_exists($dir))
 		{
-			$filename = preg_split('/firepermit\//' , $srctemplatepath);
+			$filename = preg_split('/firepermitdocument\//' , $srctemplatepath);
 			$filename = preg_replace('/template_/','', $filename[1]);
 
 			$filename = $objectref . '_'. $filename;

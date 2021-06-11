@@ -16,9 +16,9 @@
  */
 
 /**
- *  \file       preventionplan_agenda.php
+ *  \file       firepermit_agenda.php
  *  \ingroup    digiriskdolibarr
- *  \brief      Page of PreventionPlan events
+ *  \brief      Page of FirePermit events
  */
 
 // Load Dolibarr environment
@@ -39,8 +39,8 @@ require_once DOL_DOCUMENT_ROOT.'/contact/class/contact.class.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/company.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/functions2.lib.php';
 
-require_once __DIR__ . '/class/preventionplan.class.php';
-require_once __DIR__ . '/lib/digiriskdolibarr_preventionplan.lib.php';
+require_once __DIR__ . '/class/firepermit.class.php';
+require_once __DIR__ . '/lib/digiriskdolibarr_firepermit.lib.php';
 require_once __DIR__ . '/lib/digiriskdolibarr_function.lib.php';
 
 
@@ -77,10 +77,10 @@ if (!$sortfield) $sortfield = 'a.datep,a.id';
 if (!$sortorder) $sortorder = 'DESC,DESC';
 
 // Initialize technical objects
-$object = new PreventionPlan($db);
+$object = new FirePermit($db);
 $extrafields = new ExtraFields($db);
 $diroutputmassaction = $conf->digiriskdolibarr->dir_output.'/temp/massgeneration/'.$user->id;
-$hookmanager->initHooks(array('preventionplanagenda', 'globalcard')); // Note that conf->hooks_modules contains array
+$hookmanager->initHooks(array('firepermitagenda', 'globalcard')); // Note that conf->hooks_modules contains array
 // Fetch optionals attributes and labels
 $extrafields->fetch_name_optionals_label($object->table_element);
 
@@ -93,7 +93,7 @@ if ($id > 0 || !empty($ref)) $upload_dir = $conf->digiriskdolibarr->multidir_out
 //if ($user->socid > 0) $socid = $user->socid;
 //$result = restrictedArea($user, 'digiriskdolibarr', $object->id);
 
-$permissiontoadd = $user->rights->digiriskdolibarr->preventionplan->write; // Used by the include of actions_addupdatedelete.inc.php
+$permissiontoadd = $user->rights->digiriskdolibarr->firepermit->write; // Used by the include of actions_addupdatedelete.inc.php
 
 
 /*
@@ -143,10 +143,10 @@ if (true)
 	print '<div id="cardContent" value="">';
 
 	if (!empty($conf->notification->enabled)) $langs->load("mails");
-	$head = preventionplanPrepareHead($object);
+	$head = firepermitPrepareHead($object);
 
 
-	dol_fiche_head($head, 'preventionplanAgenda', $title, -1, "digiriskdolibarr@digiriskdolibarr");
+	dol_fiche_head($head, 'firepermitAgenda', $title, -1, "digiriskdolibarr@digiriskdolibarr");
 
 	// Object card
 	// ------------------------------------------------------------
@@ -200,7 +200,7 @@ if (true)
 		if (!empty($contextpage) && $contextpage != $_SERVER["PHP_SELF"]) $param .= '&contextpage='.urlencode($contextpage);
 		if ($limit > 0 && $limit != $conf->liste_limit) $param .= '&limit='.urlencode($limit);
 
-		print_barre_liste($langs->trans("ActionsOnPreventionPlan"), 0, $_SERVER["PHP_SELF"], '', $sortfield, $sortorder, '', 0, -1, '', 0, $morehtmlcenter, '', 0, 1, 1);
+		print_barre_liste($langs->trans("ActionsOnFirePermit"), 0, $_SERVER["PHP_SELF"], '', $sortfield, $sortorder, '', 0, -1, '', 0, $morehtmlcenter, '', 0, 1, 1);
 
 		// List of all actions
 		$filters = array();

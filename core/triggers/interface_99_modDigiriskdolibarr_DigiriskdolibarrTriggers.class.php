@@ -167,6 +167,26 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->create($user);
 				break;
 
+			case 'FIREPERMITDOCUMENT_GENERATE' :
+				dol_syslog("Trigger '".$this->name."' for action '$action' launched by ".__FILE__.". id=".$object->id);
+				require_once DOL_DOCUMENT_ROOT.'/comm/action/class/actioncomm.class.php';
+				$now = dol_now();
+				$actioncomm = new ActionComm($this->db);
+
+				$actioncomm->elementtype = $object->parent_type . '@digiriskdolibarr';
+				$actioncomm->elementid   = $object->parent_id;
+
+				$actioncomm->code        = 'AC_FIREPERMITDOCUMENT_GENERATE';
+				$actioncomm->type_code   = 'AC_OTH_AUTO';
+				$actioncomm->label       = $langs->trans('FirePermitDocumentGeneratedWithDolibarr');
+				$actioncomm->datep       = $now;
+				$actioncomm->fk_element  = $object->parent_id;
+				$actioncomm->userownerid = $user->id;
+				$actioncomm->percentage  = -1;
+
+				$actioncomm->create($user);
+				break;
+
 			case 'GROUPMENTDOCUMENT_GENERATE' :
 				dol_syslog("Trigger '".$this->name."' for action '$action' launched by ".__FILE__.". id=".$object->id);
 				require_once DOL_DOCUMENT_ROOT.'/comm/action/class/actioncomm.class.php';
@@ -299,7 +319,28 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->create($user);
 				break;
 
- 		}
+			case 'FIREPERMITDET_CREATE' :
+
+				dol_syslog("Trigger '".$this->name."' for action '$action' launched by ".__FILE__.". id=".$object->id);
+				require_once DOL_DOCUMENT_ROOT.'/comm/action/class/actioncomm.class.php';
+				$now = dol_now();
+				$actioncomm = new ActionComm($this->db);
+
+				$actioncomm->elementtype = 'firepermit@digiriskdolibarr';
+				$actioncomm->elementid   = $object->fk_preventionplan;
+
+				$actioncomm->code        = 'AC_FIREPERMITLINE_CREATE';
+				$actioncomm->type_code   = 'AC_OTH_AUTO';
+				$actioncomm->label       = $langs->trans('FirePermitLineCreatedWithDolibarr');
+				$actioncomm->datep       = $now;
+				$actioncomm->fk_element  = $object->fk_firepermit;
+				$actioncomm->userownerid = $user->id;
+				$actioncomm->percentage  = -1;
+
+				$actioncomm->create($user);
+				break;
+
+		}
 
 		return 0;
 	}
