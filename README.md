@@ -28,7 +28,7 @@ git clone https://github.com/Evarisk/digiriskdolibarr.git
 
 ## Licenses
 
-Ce module est publié sous licence AGPLv3.
+Ce module est publié sous licence GPLv3.
 
 ### Documentation
 
