@@ -469,7 +469,7 @@ if ($action == 'create')
 
 	//External society -- Société extérieure
 	print '<tr><td class="tdtop">';
-	print $langs->trans("ExternalSociety");
+	print $langs->trans("ExtSociety");
 	print '</td>';
 
 	print '<td>';
@@ -490,13 +490,13 @@ if ($action == 'create')
 	print '</td></tr>';
 
 	//External responsible -- Responsable de la société extérieure
-	print '<tr class="oddeven"><td>'.$langs->trans("ExternalSocietyResponsible").'</td><td>';
+	print '<tr class="oddeven"><td>'.$langs->trans("ExtSocietyResponsible").'</td><td>';
 	print $form->selectcontacts(GETPOST('ext_society', 'int'), '', 'ext_society_responsible[]', 1, '', '', 0, 'quatrevingtpercent', false, 0, array(), false, '', 'ext_society_responsible');
 
 	print '</td></tr>';
 
 	//Intervenants extérieurs
-	print '<tr class="oddeven"><td>'.$langs->trans("ExternalIntervenants").'</td><td>';
+	print '<tr class="oddeven"><td>'.$langs->trans("ExtSocietyIntervenants").'</td><td>';
 	print $form->selectcontacts(GETPOST('ext_society', 'int'), '', 'ext_intervenants[]', 1, '', '', 0, 'quatrevingtpercent', false, 0, array(), false, 'multiple', 'ext_intervenants');
 
 	print '</td></tr>';
@@ -615,7 +615,7 @@ if (($id || $ref) && $action == 'edit')
 
 	//External society -- Société extérieure
 	print '<tr><td class="tdtop">';
-	print $langs->trans("ExternalSociety");
+	print $langs->trans("ExtSociety");
 	print '</td>';
 
 	print '<td>';
@@ -637,7 +637,7 @@ if (($id || $ref) && $action == 'edit')
 
 	//External responsible -- Responsable de la société extérieure
 	$ext_society_responsible_id = is_array($object_resources['PP_EXT_SOCIETY_RESPONSIBLE']) ? array_shift($object_resources['PP_EXT_SOCIETY_RESPONSIBLE'])->id : '';
-	print '<tr class="oddeven"><td>'.$langs->trans("ExternalSocietyResponsible").'</td><td>';
+	print '<tr class="oddeven"><td>'.$langs->trans("ExtSocietyResponsible").'</td><td>';
 	print $form->selectcontacts(GETPOST('ext_society', 'int'), $ext_society_responsible_id, 'ext_society_responsible[]', 1, '', '', 0, 'quatrevingtpercent', false, 0, array(), false, '', 'ext_society_responsible');
 
 	print '</td></tr>';
@@ -650,7 +650,7 @@ if (($id || $ref) && $action == 'edit')
 			$resources_ids[] = $resource->id;
 		}
 	}
-	print '<tr class="oddeven"><td>'.$langs->trans("ExternalIntervenants").'</td><td>';
+	print '<tr class="oddeven"><td>'.$langs->trans("ExtSocietyIntervenants").'</td><td>';
 	print $form->selectcontacts(GETPOST('ext_society', 'int'),$resources_ids, 'ext_intervenants[]', 1, '', '', 0, 'quatrevingtpercent', false, 0, array(), false, 'multiple', 'ext_intervenants');
 
 	print '</td></tr>';
