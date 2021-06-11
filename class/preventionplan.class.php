@@ -457,6 +457,7 @@ class PreventionPlanLine extends CommonObjectLine
 			$objp = $db->fetch_object($result);
 
 			$this->id                = $objp->rowid;
+			$this->ref               = $objp->ref;
 			$this->date_creation     = $objp->date_creation;
 			$this->description       = $objp->description;
 			$this->category          = $objp->category;
