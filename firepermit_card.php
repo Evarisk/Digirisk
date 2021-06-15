@@ -70,6 +70,7 @@ $fk_parent           = GETPOST('fk_parent', 'int');
 
 // Initialize technical objects
 $object                 = new FirePermit($db);
+$preventionplan         = new PreventionPlan($db);
 $objectline             = new FirePermitLine($db);
 $firepermitdocument     = new FirePermitDocument($db);
 $risk                   = new Risk($db);
@@ -511,7 +512,7 @@ if ($action == 'create')
 
 	//FK PREVENTION PLAN
 	print '<tr class="oddeven"><td>'.$langs->trans("PreventionPlanLinked").'</td><td>';
-
+	print $preventionplan->select_preventionplan_list();
 	print '</td></tr>';
 
 	// Other attributes
@@ -837,164 +838,171 @@ if ((empty($action) || ($action != 'create' && $action != 'edit')))
 		print '<td class="linecolpreventionmethod">'.$form->textwithpicto($langs->trans('PreventionMethod'), $langs->trans('PreventionMethodTooltip')).'</td>';
 		print '<td class="linecoledit" colspan="'.$colspan.'">&nbsp;</td>';
 		print '</tr>';
+		
+		if ($object->fk_preventionplan > 0) {
+			if (! empty($preventionplanlines) && $preventionplanlines > 0) {
+				print '<tr>';
+				foreach($preventionplanlines as $key => $item) {
+					if ($action == 'editline' && $lineid == $key) {
 
-		if (! empty($preventionplanlines) && $preventionplanlines > 0) {
-			print '<tr>';
-			foreach($preventionplanlines as $key => $item) {
-				if ($action == 'editline' && $lineid == $key) {
+						print '<form method="POST" action="'.$_SERVER["PHP_SELF"] . '?id=' . $object->id .'">';
+						print '<input type="hidden" name="token" value="'.newToken().'">';
+						print '<input type="hidden" name="action" value="updateLine">';
+						print '<input type="hidden" name="backtopage" value="'.$backtopage.'">';
+						print '<input type="hidden" name="lineid" value="'.$item->id.'">';
+						print '<input type="hidden" name="parent_id" value="'.$object->id.'">';
 
-					print '<form method="POST" action="'.$_SERVER["PHP_SELF"] . '?id=' . $object->id .'">';
-					print '<input type="hidden" name="token" value="'.newToken().'">';
-					print '<input type="hidden" name="action" value="updateLine">';
-					print '<input type="hidden" name="backtopage" value="'.$backtopage.'">';
-					print '<input type="hidden" name="lineid" value="'.$item->id.'">';
-					print '<input type="hidden" name="parent_id" value="'.$object->id.'">';
+						print '<tr class="pair nodrag nodrop nohoverpair'.(($nolinesbefore || $object->element == 'contrat') ? '' : ' liste_titre_create').'">';
 
-					print '<tr class="pair nodrag nodrop nohoverpair'.(($nolinesbefore || $object->element == 'contrat') ? '' : ' liste_titre_create').'">';
+						print '<td class="bordertop nobottom linecolref minwidth500imp">';
+						print $item->ref;
+						print '</td>';
 
-					print '<td class="bordertop nobottom linecolref minwidth500imp">';
-					print $item->ref;
-					print '</td>';
+						print '<td class="bordertop nobottom linecollocation">';
+						print $digiriskelement->select_digiriskelement_list($item->fk_element, 'fk_element', '', '',  0, 0, array(), '',  0,  0,  'minwidth100',  GETPOST('id'),  false);
+						print '</td>';
 
-					print '<td class="bordertop nobottom linecollocation">';
-					print $digiriskelement->select_digiriskelement_list($item->fk_element, 'fk_element', '', '',  0, 0, array(), '',  0,  0,  'minwidth100',  GETPOST('id'),  false);
-					print '</td>';
+						$coldisplay++;
+						print '<td class="bordertop nobottom linecolactionsdescription">';
+						print '<textarea name="actionsdescription" class="minwidth150" cols="50" rows="' . ROWS_2 . '">' . $item->description . '</textarea>' . "\n";
+						print '</td>';
 
-					$coldisplay++;
-					print '<td class="bordertop nobottom linecolactionsdescription">';
-					print '<textarea name="actionsdescription" class="minwidth150" cols="50" rows="' . ROWS_2 . '">' . $item->description . '</textarea>' . "\n";
-					print '</td>';
+						$coldisplay++;
+						print '<td class="bordertop nobottom linecolriskcategory">'; ?>
+						<span class="title"><?php echo $langs->trans('Risk'); ?><required>*</required></span>
+						<div class="wpeo-dropdown dropdown-large dropdown-grid category-danger padding">
+							<div class="dropdown-toggle dropdown-add-button button-cotation">
+								<input class="input-hidden-danger" type="hidden" name="risk_category_id" value="<?php echo $item->category ?>" />
+								<div class="wpeo-dropdown dropdown-large category-danger padding wpeo-tooltip-event" aria-label="<?php echo $risk->get_danger_category_name($item) ?>">
+									<img class="danger-category-pic hover" src="<?php echo DOL_URL_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $risk->get_danger_category($item) . '.png' ; ?>"/>
+								</div>
+							</div>
 
-					$coldisplay++;
-					print '<td class="bordertop nobottom linecolriskcategory">'; ?>
-					<span class="title"><?php echo $langs->trans('Risk'); ?><required>*</required></span>
-					<div class="wpeo-dropdown dropdown-large dropdown-grid category-danger padding">
-						<div class="dropdown-toggle dropdown-add-button button-cotation">
-							<input class="input-hidden-danger" type="hidden" name="risk_category_id" value="<?php echo $item->category ?>" />
+							<ul class="dropdown-content wpeo-gridlayout grid-5 grid-gap-0">
+								<?php
+								$dangerCategories = $risk->get_danger_categories();
+								if ( ! empty( $dangerCategories ) ) :
+									foreach ( $dangerCategories as $dangerCategory ) : ?>
+										<li class="item dropdown-item wpeo-tooltip-event" data-is-preset="<?php echo ''; ?>" data-id="<?php echo $dangerCategory['position'] ?>" aria-label="<?php echo $dangerCategory['name'] ?>">
+											<img src="<?php echo DOL_URL_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $dangerCategory['thumbnail_name'] . '.png'?>" class="attachment-thumbail size-thumbnail photo photowithmargin" alt="" loading="lazy" width="48" height="48">
+										</li>
+									<?php endforeach;
+								endif; ?>
+							</ul>
+						</div>
+						<?php
+						print '</td>';
+
+						$coldisplay++;
+						print '<td class="bordertop nobottom linecolpreventionmethod">';
+						print '<textarea name="preventionmethod" class="minwidth150" cols="50" rows="' . ROWS_2 . '">' . $item->prevention_method . '</textarea>' . "\n";
+						print '</td>';
+
+						$coldisplay += $colspan;
+						print '<td class="bordertop nobottom linecoledit center valignmiddle" colspan="'.$colspan.'">';
+						print '<input type="submit" class="button" value="'.$langs->trans('Save').'" name="updateLine" id="updateLine">';
+						print '</td>';
+						print '</tr>';
+
+						if (is_object($objectline)) {
+							print $objectline->showOptionals($extrafields, 'edit', array('style'=>$bcnd[$var], 'colspan'=>$coldisplay), '', '', 1);
+						}
+						print '</form>';
+						?>
+						<script>
+							/* JQuery for product free or predefined select */
+							jQuery(document).ready(function() {
+								/* When changing predefined product, we reload list of supplier prices required for margin combo */
+								$("#idprod").change(function()
+								{
+									console.log("#idprod change triggered");
+
+									/* To set focus */
+									if (jQuery('#idprod').val() > 0)
+									{
+										/* focus work on a standard textarea but not if field was replaced with CKEDITOR */
+										jQuery('#dp_desc').focus();
+										/* focus if CKEDITOR */
+										if (typeof CKEDITOR == "object" && typeof CKEDITOR.instances != "undefined")
+										{
+											var editor = CKEDITOR.instances['dp_desc'];
+											if (editor) { editor.focus(); }
+										}
+									}
+								});
+							});
+						</script> <?php
+					} else {
+						print '<td class="bordertop nobottom linecolref minwidth500imp">';
+						print $item->ref;
+						print '</td>';
+
+						print '<td class="bordertop nobottom linecollocation">';
+						$digiriskelement->fetch($item->fk_element);
+						print $digiriskelement->ref . " - " . $digiriskelement->label;
+						print '</td>';
+
+						$coldisplay++;
+						print '<td class="bordertop nobottom linecolactionsdescription">';
+						print $item->description;
+						print '</td>';
+
+						$coldisplay++;
+						print '<td class="bordertop nobottom linecolriskcategory">'; ?>
+						<div class="table-cell table-50 cell-risk" data-title="Risque">
 							<div class="wpeo-dropdown dropdown-large category-danger padding wpeo-tooltip-event" aria-label="<?php echo $risk->get_danger_category_name($item) ?>">
 								<img class="danger-category-pic hover" src="<?php echo DOL_URL_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $risk->get_danger_category($item) . '.png' ; ?>"/>
 							</div>
 						</div>
+						<?php
+						print '</td>';
 
-						<ul class="dropdown-content wpeo-gridlayout grid-5 grid-gap-0">
-							<?php
-							$dangerCategories = $risk->get_danger_categories();
-							if ( ! empty( $dangerCategories ) ) :
-								foreach ( $dangerCategories as $dangerCategory ) : ?>
-									<li class="item dropdown-item wpeo-tooltip-event" data-is-preset="<?php echo ''; ?>" data-id="<?php echo $dangerCategory['position'] ?>" aria-label="<?php echo $dangerCategory['name'] ?>">
-										<img src="<?php echo DOL_URL_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $dangerCategory['thumbnail_name'] . '.png'?>" class="attachment-thumbail size-thumbnail photo photowithmargin" alt="" loading="lazy" width="48" height="48">
-									</li>
-								<?php endforeach;
-							endif; ?>
-						</ul>
-					</div>
-					<?php
-					print '</td>';
+						$coldisplay++;
+						print '<td class="bordertop nobottom linecolpreventionmethod">';
+						print $item->prevention_method;
+						print '</td>';
 
-					$coldisplay++;
-					print '<td class="bordertop nobottom linecolpreventionmethod">';
-					print '<textarea name="preventionmethod" class="minwidth150" cols="50" rows="' . ROWS_2 . '">' . $item->prevention_method . '</textarea>' . "\n";
-					print '</td>';
+						$coldisplay += $colspan;
 
-					$coldisplay += $colspan;
-					print '<td class="bordertop nobottom linecoledit center valignmiddle" colspan="'.$colspan.'">';
-					print '<input type="submit" class="button" value="'.$langs->trans('Save').'" name="updateLine" id="updateLine">';
-					print '</td>';
-					print '</tr>';
+						//Actions buttons
+						print '<td class="linecoledit center">';
+						$coldisplay++;
+						if (($item->info_bits & 2) == 2 || !empty($disableedit)) {
+						} else {
+							print '<a class="editfielda reposition" href="'.$_SERVER["PHP_SELF"].'?id='.$id.'&amp;action=editline&amp;lineid='.$item->id.'">'.img_edit().'</a>';
+						}
+						print '</td>';
 
-					if (is_object($objectline)) {
-						print $objectline->showOptionals($extrafields, 'edit', array('style'=>$bcnd[$var], 'colspan'=>$coldisplay), '', '', 1);
-					}
-					print '</form>';
-					?>
-					<script>
-						/* JQuery for product free or predefined select */
-						jQuery(document).ready(function() {
-							/* When changing predefined product, we reload list of supplier prices required for margin combo */
-							$("#idprod").change(function()
-							{
-								console.log("#idprod change triggered");
+						print '<td class="linecoldelete center">';
+						$coldisplay++;
 
-								/* To set focus */
-								if (jQuery('#idprod').val() > 0)
-								{
-									/* focus work on a standard textarea but not if field was replaced with CKEDITOR */
-									jQuery('#dp_desc').focus();
-									/* focus if CKEDITOR */
-									if (typeof CKEDITOR == "object" && typeof CKEDITOR.instances != "undefined")
-									{
-										var editor = CKEDITOR.instances['dp_desc'];
-										if (editor) { editor.focus(); }
-									}
-								}
-							});
-						});
-					</script> <?php
-				} else {
-					print '<td class="bordertop nobottom linecolref minwidth500imp">';
-					print $item->ref;
-					print '</td>';
+						//La suppression n'est autorisée que si il n'y a pas de ligne dans une précédente situation
+						print '<a class="reposition" href="'.$_SERVER["PHP_SELF"].'?id='.$id.'&amp;action=deleteline&amp;lineid='.$item->id.'">';
+						print img_delete();
+						print '</a>';
+						print '</td>';
 
-					print '<td class="bordertop nobottom linecollocation">';
-					$digiriskelement->fetch($item->fk_element);
-					print $digiriskelement->ref . " - " . $digiriskelement->label;
-					print '</td>';
+						print '</tr>';
 
-					$coldisplay++;
-					print '<td class="bordertop nobottom linecolactionsdescription">';
-					print $item->description;
-					print '</td>';
-
-					$coldisplay++;
-					print '<td class="bordertop nobottom linecolriskcategory">'; ?>
-					<div class="table-cell table-50 cell-risk" data-title="Risque">
-						<div class="wpeo-dropdown dropdown-large category-danger padding wpeo-tooltip-event" aria-label="<?php echo $risk->get_danger_category_name($item) ?>">
-							<img class="danger-category-pic hover" src="<?php echo DOL_URL_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $risk->get_danger_category($item) . '.png' ; ?>"/>
-						</div>
-					</div>
-					<?php
-					print '</td>';
-
-					$coldisplay++;
-					print '<td class="bordertop nobottom linecolpreventionmethod">';
-					print $item->prevention_method;
-					print '</td>';
-
-					$coldisplay += $colspan;
-
-					//Actions buttons
-					print '<td class="linecoledit center">';
-					$coldisplay++;
-					if (($item->info_bits & 2) == 2 || !empty($disableedit)) {
-					} else {
-						print '<a class="editfielda reposition" href="'.$_SERVER["PHP_SELF"].'?id='.$id.'&amp;action=editline&amp;lineid='.$item->id.'">'.img_edit().'</a>';
-					}
-					print '</td>';
-
-					print '<td class="linecoldelete center">';
-					$coldisplay++;
-
-					//La suppression n'est autorisée que si il n'y a pas de ligne dans une précédente situation
-					print '<a class="reposition" href="'.$_SERVER["PHP_SELF"].'?id='.$id.'&amp;action=deleteline&amp;lineid='.$item->id.'">';
-					print img_delete();
-					print '</a>';
-					print '</td>';
-
-					print '</tr>';
-
-					if (is_object($objectline)) {
-						print $objectline->showOptionals($extrafields, 'edit', array('style'=>$bcnd[$var], 'colspan'=>$coldisplay), '', '', 1);
+						if (is_object($objectline)) {
+							print $objectline->showOptionals($extrafields, 'edit', array('style'=>$bcnd[$var], 'colspan'=>$coldisplay), '', '', 1);
+						}
 					}
 				}
+				print '</tr>';
+			} else {
+				print '<tr>';
+				print '<td class="bordertop nobottom ">';
+				print $langs->trans('NoPreventionPlanRisk');
+				print '</td></tr>';
 			}
-			print '</tr>';
-		} else {
+		}  else {
 			print '<tr>';
 			print '<td class="bordertop nobottom ">';
-			print $langs->trans('NoPreventionPlanRisk');
+			print $langs->trans('NoPreventionPlanLinked');
 			print '</td></tr>';
-
 		}
+
 		print '</table></div>';
 
 		// FIREPERMIT LINES
