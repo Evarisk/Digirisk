@@ -236,7 +236,7 @@ if (empty($reshook))
 	if ($action == 'addLine' && $permissiontoadd) {
 
 		$actions_description = GETPOST('actionsdescription');
-		$used_material       = GETPOST('used_material');
+		$use_equipment       = GETPOST('use_equipment');
 		$location            = GETPOST('fk_element');
 		$risk_category_id    = GETPOST('risk_category_id');
 		$parent_id           = GETPOST('parent_id');
@@ -246,7 +246,7 @@ if (empty($reshook))
 		$objectline->entity             = $conf->entity;
 		$objectline->description        = $actions_description;
 		$objectline->category           = $risk_category_id;
-		$objectline->used_material      = $used_material;
+		$objectline->use_equipment      = $use_equipment;
 		$objectline->fk_firepermit      = $parent_id;
 		$objectline->fk_element         = $location;
 
@@ -282,7 +282,7 @@ if (empty($reshook))
 	if ($action == 'updateLine' && $permissiontoadd) {
 
 		$actions_description = GETPOST('actionsdescription');
-		$used_material       = GETPOST('used_material');
+		$use_equipment       = GETPOST('use_equipment');
 		$location            = GETPOST('fk_element');
 		$risk_category_id    = GETPOST('risk_category_id');
 		$parent_id           = GETPOST('parent_id');
@@ -292,7 +292,7 @@ if (empty($reshook))
 
 		$objectline->description        = $actions_description;
 		$objectline->category           = $risk_category_id;
-		$objectline->used_material      = $used_material;
+		$objectline->use_equipment      = $use_equipment;
 		$objectline->fk_firepermit      = $parent_id;
 		$objectline->fk_element         = $location;
 
@@ -1027,9 +1027,9 @@ if ((empty($action) || ($action != 'create' && $action != 'edit')))
 		print '<td class="linecolpreventionmethod">'.$form->textwithpicto($langs->trans('UsedMaterial'), $langs->trans('UsedMaterialTooltip')).'</td>';
 		print '<td class="linecoledit" colspan="'.$colspan.'">&nbsp;</td>';
 		print '</tr>';
+		print '<tr>';
 
 		if (! empty($firepermitlines) && $firepermitlines > 0) {
-			print '<tr>';
 			foreach($firepermitlines as $key => $item) {
 				if ($action == 'editline' && $lineid == $key) {
 

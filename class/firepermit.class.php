@@ -413,7 +413,7 @@ class FirePermitLine extends CommonObjectLine
 
 	public $category = '';
 
-	public $used_material = '';
+	public $use_equipment = '';
 
 	public $fk_firepermit = '';
 
@@ -446,7 +446,7 @@ class FirePermitLine extends CommonObjectLine
 	{
 		global $db;
 
-		$sql = 'SELECT * ';
+		$sql = 'SELECT t.ref, t.date_creation, t.description, t.category, t.use_equipment, t.fk_firepermit, t.fk_element ';
 		$sql .= ' FROM '.MAIN_DB_PREFIX.'digiriskdolibarr_firepermitdet as t';
 		$sql .= ' WHERE t.rowid = '.$rowid;
 		$sql .= ' AND entity IN ('.getEntity($this->table_element).')';
@@ -460,7 +460,7 @@ class FirePermitLine extends CommonObjectLine
 			$this->date_creation     = $objp->date_creation;
 			$this->description       = $objp->description;
 			$this->category          = $objp->category;
-			$this->used_material     = $objp->used_material;
+			$this->use_equipment     = $objp->use_equipment;
 			$this->fk_firepermit     = $objp->fk_firepermit;
 			$this->fk_element        = $objp->fk_element;
 
@@ -484,9 +484,13 @@ class FirePermitLine extends CommonObjectLine
 	public function fetchAll($parent_id = 0, $limit = 0)
 	{
 		global $db;
-		$sql = 'SELECT * ';
+		$sql = 'SELECT t.ref, t.date_creation, t.description, t.category, t.use_equipment, t.fk_element ';
 		$sql .= ' FROM '.MAIN_DB_PREFIX.'digiriskdolibarr_firepermitdet as t';
-		if ($parent_id > 0) $sql .= ' WHERE t.fk_firepermit = '.$parent_id;
+		if ($parent_id > 0) {
+			$sql .= ' WHERE t.fk_firepermit = '.$parent_id;
+		} else {
+			$sql .= ' WHERE 1=1';
+		}
 		$sql .= ' AND entity IN ('.getEntity($this->table_element).')';
 
 
@@ -508,11 +512,11 @@ class FirePermitLine extends CommonObjectLine
 				$record->date_creation     = $obj->date_creation;
 				$record->description       = $obj->description;
 				$record->category          = $obj->category;
-				$record->used_material     = $obj->used_material;
+				$record->use_equipment     = $obj->use_equipment;
 				$record->fk_firepermit     = $obj->fk_firepermit;
 				$record->fk_element        = $obj->fk_element;
 
-				$records[$record->id] = $record;
+				$records[$record->ref] = $record;
 
 				$i++;
 			}
@@ -550,7 +554,7 @@ class FirePermitLine extends CommonObjectLine
 
 		// Insertion dans base de la ligne
 		$sql = 'INSERT INTO '.MAIN_DB_PREFIX.'digiriskdolibarr_firepermitdet';
-		$sql .= ' (ref, entity, date_creation, description, category, use_material, fk_firepermit, fk_element';
+		$sql .= ' (ref, entity, date_creation, description, category, use_equipment, fk_firepermit, fk_element';
 		$sql .= ')';
 		$sql .= " VALUES (";
 		$sql .= "'" . $db->escape($this->ref) . "'" . ", ";
@@ -558,7 +562,7 @@ class FirePermitLine extends CommonObjectLine
 		$sql .= "'" . $db->escape($db->idate($now)) . "'" . ", ";
 		$sql .= "'" . $db->escape($this->description) . "'" . ", ";
 		$sql .= $this->category . ", ";
-		$sql .= "'" . $db->escape($this->used_material) . "'" . ", ";
+		$sql .= "'" . $db->escape($this->use_equipment) . "'" . ", ";
 		$sql .= $this->fk_firepermit . ", ";
 		$sql .= $this->fk_element ;
 

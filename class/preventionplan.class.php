@@ -448,7 +448,7 @@ class PreventionPlanLine extends CommonObjectLine
 	{
 		global $db;
 
-		$sql = 'SELECT * ';
+		$sql = 'SELECT t.ref, t.date_creation, t.description, t.category, t.prevention_method, t.fk_preventionplan, t.fk_element ';
 		$sql .= ' FROM '.MAIN_DB_PREFIX.'digiriskdolibarr_preventionplandet as t';
 		$sql .= ' WHERE t.rowid = '.$rowid;
 		$sql .= ' AND entity IN ('.getEntity($this->table_element).')';
@@ -487,11 +487,15 @@ class PreventionPlanLine extends CommonObjectLine
 	public function fetchAll($parent_id = 0, $limit = 0)
 	{
 		global $db;
-		$sql = 'SELECT * ';
+		$sql = 'SELECT t.ref, t.date_creation, t.description, t.category, t.prevention_method, t.fk_element';
 		$sql .= ' FROM '.MAIN_DB_PREFIX.'digiriskdolibarr_preventionplandet as t';
+		if ($parent_id > 0) {
+			$sql .= ' WHERE t.fk_preventionplan = '.$parent_id;
+		} else {
+			$sql .= ' WHERE 1=1';
+		}
 		$sql .= ' AND entity IN ('.getEntity($this->table_element).')';
 
-		if ($parent_id > 0) $sql .= ' WHERE t.fk_preventionplan = '.$parent_id;
 
 		$result = $db->query($sql);
 
@@ -515,7 +519,7 @@ class PreventionPlanLine extends CommonObjectLine
 				$record->fk_preventionplan = $obj->fk_preventionplan;
 				$record->fk_element        = $obj->fk_element;
 
-				$records[$record->id] = $record;
+				$records[$record->ref] = $record;
 
 				$i++;
 			}

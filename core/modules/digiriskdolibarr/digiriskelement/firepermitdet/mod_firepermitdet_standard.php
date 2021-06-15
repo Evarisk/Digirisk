@@ -85,7 +85,7 @@ class mod_firepermitdet_standard extends ModeleNumRefDigiriskDocuments
 		// first we get the max value
 		$posindice = strlen($this->prefix) + 1;
 		$sql = "SELECT MAX(CAST(SUBSTRING(ref FROM ".$posindice.") AS SIGNED)) as max";
-		$sql .= " FROM ".MAIN_DB_PREFIX."digiriskdolibarr_preventionplandet";
+		$sql .= " FROM ".MAIN_DB_PREFIX."digiriskdolibarr_firepermitdet";
 		$sql .= " WHERE ref LIKE '".$db->escape($this->prefix)."%'";
 		if ($object->ismultientitymanaged == 1) {
 			$sql .= " AND entity = ".$conf->entity;
