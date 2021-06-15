@@ -669,6 +669,11 @@ if (($id || $ref) && $action == 'edit')
 
 	print '</td></tr>';
 
+	//FK PREVENTION PLAN
+	print '<tr class="oddeven"><td>'.$langs->trans("PreventionPlanLinked").'</td><td>';
+	print $preventionplan->select_preventionplan_list($object->fk_preventionplan);
+	print '</td></tr>';
+
 	// Other attributes
 	include DOL_DOCUMENT_ROOT.'/core/tpl/extrafields_add.tpl.php';
 	print '</table>';
@@ -780,6 +785,12 @@ if ((empty($action) || ($action != 'create' && $action != 'edit')))
 	} elseif (!empty ($ext_society_intervenants) && $ext_society_intervenants > 0){
 		print $ext_society_intervenants->getNomUrl(1);
 	}
+
+	//FK PREVENTION PLAN
+	$preventionplan->fetch($object->fk_preventionplan);
+	print '<tr class="oddeven"><td>'.$langs->trans("PreventionPlanLinked").'</td><td>';
+	print $preventionplan->ref;
+	print '</td></tr>';
 
 	print '<br>';
 	print '</td></tr>';
