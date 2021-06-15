@@ -446,7 +446,7 @@ class FirePermitLine extends CommonObjectLine
 	{
 		global $db;
 
-		$sql = 'SELECT t.ref, t.date_creation, t.description, t.category, t.use_equipment, t.fk_firepermit, t.fk_element ';
+		$sql = 'SELECT t.rowid, t.ref, t.date_creation, t.description, t.category, t.use_equipment, t.fk_firepermit, t.fk_element ';
 		$sql .= ' FROM '.MAIN_DB_PREFIX.'digiriskdolibarr_firepermitdet as t';
 		$sql .= ' WHERE t.rowid = '.$rowid;
 		$sql .= ' AND entity IN ('.getEntity($this->table_element).')';
@@ -457,6 +457,7 @@ class FirePermitLine extends CommonObjectLine
 			$objp = $db->fetch_object($result);
 
 			$this->id                = $objp->rowid;
+			$this->ref               = $objp->ref;
 			$this->date_creation     = $objp->date_creation;
 			$this->description       = $objp->description;
 			$this->category          = $objp->category;
@@ -484,7 +485,7 @@ class FirePermitLine extends CommonObjectLine
 	public function fetchAll($parent_id = 0, $limit = 0)
 	{
 		global $db;
-		$sql = 'SELECT t.ref, t.date_creation, t.description, t.category, t.use_equipment, t.fk_element ';
+		$sql = 'SELECT t.rowid, t.ref, t.date_creation, t.description, t.category, t.use_equipment, t.fk_element ';
 		$sql .= ' FROM '.MAIN_DB_PREFIX.'digiriskdolibarr_firepermitdet as t';
 		if ($parent_id > 0) {
 			$sql .= ' WHERE t.fk_firepermit = '.$parent_id;
@@ -516,7 +517,7 @@ class FirePermitLine extends CommonObjectLine
 				$record->fk_firepermit     = $obj->fk_firepermit;
 				$record->fk_element        = $obj->fk_element;
 
-				$records[$record->ref] = $record;
+				$records[$record->id] = $record;
 
 				$i++;
 			}
@@ -604,20 +605,19 @@ class FirePermitLine extends CommonObjectLine
 		$this->description = trim($this->description);
 
 		$db->begin();
-
 		// Mise a jour ligne en base
 		$sql = "UPDATE ".MAIN_DB_PREFIX."digiriskdolibarr_firepermitdet SET";
 		$sql .= " ref='".$db->escape($this->ref)."',";
 		$sql .= " description='".$db->escape($this->description)."',";
 		$sql .= " category=".$db->escape($this->category) . ",";
-		$sql .= " prevention_method='".$db->escape($this->prevention_method)."'" . ",";
+		$sql .= " use_equipment='".$db->escape($this->use_equipment)."'" . ",";
 		$sql .= " fk_firepermit=".$db->escape($this->fk_firepermit) . ",";
 		$sql .= " fk_element=".$db->escape($this->fk_element);
-
 		$sql .= " WHERE rowid = ".$this->id;
 
 		dol_syslog(get_class($this)."::update", LOG_DEBUG);
 		$resql = $db->query($sql);
+
 		if ($resql)
 		{
 			$db->commit();
