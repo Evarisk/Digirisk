@@ -50,6 +50,8 @@ require_once DOL_DOCUMENT_ROOT.'/contact/class/contact.class.php';
 require_once DOL_DOCUMENT_ROOT.'/societe/class/societe.class.php';
 
 require_once __DIR__ . '/class/firepermit.class.php';
+require_once __DIR__ . '/class/preventionplan.class.php';
+require_once __DIR__ . '/class/digiriskresources.class.php';
 
 // Load translation files required by the page
 $langs->loadLangs(array('projects', 'companies', 'commercial'));
@@ -63,10 +65,12 @@ $contextpage = GETPOST('contextpage', 'aZ') ?GETPOST('contextpage', 'aZ') : 'pro
 
 $title = $langs->trans("FirePermit");
 
-$firepermit = new FirePermit($db);
-$societe        = new Societe($db);
-$contact        = new Contact($db);
-$usertmp        = new User($db);
+$firepermit         = new FirePermit($db);
+$preventionplan     = new PreventionPlan($db);
+$societe            = new Societe($db);
+$contact            = new Contact($db);
+$usertmp            = new User($db);
+$digiriskresources  = new DigiriskResources($db);
 
 $limit     = GETPOST('limit', 'int') ?GETPOST('limit', 'int') : $conf->liste_limit;
 $sortfield = GETPOST("sortfield", "alpha");
@@ -227,25 +231,25 @@ include DOL_DOCUMENT_ROOT.'/core/tpl/massactions_pre.tpl.php';
 // Build and execute select
 // --------------------------------------------------------------------
 
-	$sql = 'SELECT ';
-	foreach ($firepermit->fields as $key => $val)
+$sql = 'SELECT ';
+foreach ($firepermit->fields as $key => $val)
 	{
 		$sql .= 't.'.$key.', ';
 	}
-	// Add fields from extrafields
-	if (!empty($extrafields->attributes[$firepermit->table_element]['label'])) {
+// Add fields from extrafields
+if (!empty($extrafields->attributes[$firepermit->table_element]['label'])) {
 		foreach ($extrafields->attributes[$firepermit->table_element]['label'] as $key => $val) $sql .= ($extrafields->attributes[$firepermit->table_element]['type'][$key] != 'separate' ? "ef.".$key.' as options_'.$key.', ' : '');
 	}
-	// Add fields from hooks
-	$parameters = array();
-	$reshook = $hookmanager->executeHooks('printFieldListSelect', $parameters, $firepermit); // Note that $action and $firepermitdocument may have been modified by hook
-	$sql .= preg_replace('/^,/', '', $hookmanager->resPrint);
-	$sql = preg_replace('/,\s*$/', '', $sql);
-	$sql .= " FROM ".MAIN_DB_PREFIX.$firepermit->table_element." as t";
+// Add fields from hooks
+$parameters = array();
+$reshook = $hookmanager->executeHooks('printFieldListSelect', $parameters, $firepermit); // Note that $action and $firepermitdocument may have been modified by hook
+$sql .= preg_replace('/^,/', '', $hookmanager->resPrint);
+$sql = preg_replace('/,\s*$/', '', $sql);
+$sql .= " FROM ".MAIN_DB_PREFIX.$firepermit->table_element." as t";
 
-	if (is_array($extrafields->attributes[$firepermit->table_element]['label']) && count($extrafields->attributes[$firepermit->table_element]['label'])) $sql .= " LEFT JOIN ".MAIN_DB_PREFIX.$firepermit->table_element."_extrafields as ef on (t.rowid = ef.fk_object)";
-	if ($firepermit->ismultientitymanaged == 1) $sql .= " WHERE t.entity IN (".getEntity($firepermit->element).")";
-	else $sql .= " WHERE 1 = 1";
+if (is_array($extrafields->attributes[$firepermit->table_element]['label']) && count($extrafields->attributes[$firepermit->table_element]['label'])) $sql .= " LEFT JOIN ".MAIN_DB_PREFIX.$firepermit->table_element."_extrafields as ef on (t.rowid = ef.fk_object)";
+if ($firepermit->ismultientitymanaged == 1) $sql .= " WHERE t.entity IN (".getEntity($firepermit->element).")";
+else $sql .= " WHERE 1 = 1";
 
 
 foreach ($search as $key => $val)
@@ -318,6 +322,12 @@ if ($search_all)
 $moreforfilter = '';
 
 $varpage = empty($contextpage) ? $_SERVER["PHP_SELF"] : $contextpage;
+
+$arrayfields['MaitreOeuvre'] = array('label'=>'MaitreOeuvre');
+$arrayfields['ExtSociety'] = array('label'=>'ExtSociety');
+$arrayfields['ExtSocietyResponsible'] = array('label'=>'ExtSocietyResponsible');
+$arrayfields['ExtSocietyIntervenants'] = array('label'=>'ExtSocietyIntervenants');
+
 $selectedfields = $form->multiSelectArrayWithCheckbox('selectedfields', $arrayfields, $varpage); // This also change content of $arrayfields
 if ($massactionbutton) $selectedfields .= $form->showCheckAddButtons('checkforselect', 1);
 
@@ -325,21 +335,29 @@ print '<div class="div-table-responsive">';
 print '<table class="tagtable nobottomiftotal liste'.($moreforfilter ? " listwithfilterbefore" : "").'">'."\n";
 print '<tr class="liste_titre">';
 
+$firepermit->fields['Custom']['FP_MAITRE_OEUVRE'] = 'MaitreOeuvre';
+$firepermit->fields['Custom']['FP_EXT_SOCIETY'] = 'ExtSociety';
+$firepermit->fields['Custom']['FP_EXT_SOCIETY_RESPONSIBLE'] = 'ExtSocietyResponsible';
+$firepermit->fields['Custom']['FP_EXT_SOCIETY_INTERVENANTS'] = 'ExtSocietyIntervenants';
 
-foreach ($firepermit->fields as $key => $val)
-{
+foreach ($firepermit->fields as $key => $val) {
 	$cssforfield = (empty($val['css']) ? '' : $val['css']);
-	if ($key == 'status') $cssforfield .= ($cssforfield ? ' ' : '').'center';
-	if (!empty($arrayfields['t.'.$key]['checked']))
-	{
-		print '<td class="liste_titre'.($cssforfield ? ' '.$cssforfield : '').'">';
+	if ($key == 'status') $cssforfield .= ($cssforfield ? ' ' : '') . 'center';
+	if (!empty($arrayfields['t.' . $key]['checked'])) {
+		print '<td class="liste_titre' . ($cssforfield ? ' ' . $cssforfield : '') . '">';
 
-		if (is_array($val['arrayofkeyval'])) print $form->selectarray('search_'.$key, $val['arrayofkeyval'], $search[$key], $val['notnull'], 0, 0, '', 1, 0, 0, '', 'maxwidth75');
+		if (is_array($val['arrayofkeyval'])) print $form->selectarray('search_' . $key, $val['arrayofkeyval'], $search[$key], $val['notnull'], 0, 0, '', 1, 0, 0, '', 'maxwidth75');
 		elseif (strpos($val['type'], 'integer:') === 0) {
 			print $firepermit->showInputField($val, $key, $search[$key], '', '', 'search_', 'maxwidth150', 1);
-		}
-		elseif (!preg_match('/^(date|timestamp)/', $val['type'])) print '<input type="text" class="flat maxwidth75" name="search_'.$key.'" value="'.dol_escape_htmltag($search[$key]).'">';
+		} elseif (!preg_match('/^(date|timestamp)/', $val['type'])) print '<input type="text" class="flat maxwidth75" name="search_' . $key . '" value="' . dol_escape_htmltag($search[$key]) . '">';
 		print '</td>';
+	}
+	if ($key == 'Custom') {
+		foreach ($val as $resource) {
+			print '<td>';
+			print '';
+			print '</td>';
+		}
 	}
 }
 
@@ -376,7 +394,13 @@ foreach ($firepermit->fields as $key => $val)
 		print getTitleFieldOfList($arrayfields['t.'.$key]['label'], 0, $_SERVER['PHP_SELF'], 't.'.$key, '', $param, ($cssforfield ? 'class="'.$cssforfield.'"' : ''), $sortfield, $sortorder, ($cssforfield ? $cssforfield.' ' : ''), $disablesort)."\n";
 
 	}
-
+	if ($key == 'Custom') {
+		foreach ($val as $resource) {
+			print '<td>';
+			print $langs->trans($resource);
+			print '</td>';
+		}
+	}
 }
 
 // Extra fields
@@ -423,6 +447,12 @@ while ($i < ($limit ? min($num, $limit) : $num)) {
 		if (!empty($arrayfields['t.' . $key]['checked'])) {
 			print '<td' . ($cssforfield ? ' class="' . $cssforfield . '"' : '') . ' style="width:2%">';
 			if ($key == 'status') print $firepermit->getLibStatut(5);
+			elseif ($key == 'fk_preventionplan') {
+				if ($obj->fk_preventionplan > 0) {
+					$preventionplan->fetch($obj->fk_preventionplan);
+					print $preventionplan->getNomUrl(1);
+				}
+			}
 			elseif ($key == 'ref') {
 				print $firepermit->getNomUrl();
 			}
@@ -432,6 +462,24 @@ while ($i < ($limit ? min($num, $limit) : $num)) {
 			if (!empty($val['isameasure'])) {
 				if (!$i) $totalarray['pos'][$totalarray['nbfield']] = 't.' . $key;
 				$totalarray['val']['t.' . $key] += $firepermit->$key;
+			}
+		}
+		if ($key == 'Custom') {
+			foreach ($val as $name => $resource) {
+				$resourceLinked = $digiriskresources->fetchResourcesFromObject($name, $firepermit);
+				print '<td>';
+				if ($resourceLinked > 0) {
+					if ($resource == 'ExtSocietyIntervenants') {
+						$resourcesLinked = array_shift($resourceLinked);
+						foreach($resourcesLinked as $resourceLinkedSingle) {
+							print $resourceLinkedSingle->getNomUrl(1);
+							print '<br>';
+						}
+					} else {
+						print $resourceLinked->getNomUrl(1);
+					}
+				}
+				print '</td>';
 			}
 		}
 	}
