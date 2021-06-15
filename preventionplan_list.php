@@ -50,6 +50,7 @@ require_once DOL_DOCUMENT_ROOT.'/contact/class/contact.class.php';
 require_once DOL_DOCUMENT_ROOT.'/societe/class/societe.class.php';
 
 require_once __DIR__ . '/class/preventionplan.class.php';
+require_once __DIR__ . '/class/digiriskresources.class.php';
 
 // Load translation files required by the page
 $langs->loadLangs(array('projects', 'companies', 'commercial'));
@@ -63,10 +64,11 @@ $contextpage = GETPOST('contextpage', 'aZ') ?GETPOST('contextpage', 'aZ') : 'pro
 
 $title = $langs->trans("PreventionPlan");
 
-$preventionplan = new PreventionPlan($db);
-$societe        = new Societe($db);
-$contact        = new Contact($db);
-$usertmp        = new User($db);
+$preventionplan    = new PreventionPlan($db);
+$digiriskresources = new DigiriskResources($db);
+$societe           = new Societe($db);
+$contact           = new Contact($db);
+$usertmp           = new User($db);
 
 $limit     = GETPOST('limit', 'int') ?GETPOST('limit', 'int') : $conf->liste_limit;
 $sortfield = GETPOST("sortfield", "alpha");
@@ -318,6 +320,12 @@ if ($search_all)
 $moreforfilter = '';
 
 $varpage = empty($contextpage) ? $_SERVER["PHP_SELF"] : $contextpage;
+
+$arrayfields['MaitreOeuvre'] = array('label'=>'MaitreOeuvre');
+$arrayfields['ExtSociety'] = array('label'=>'ExtSociety');
+$arrayfields['ExtSocietyResponsible'] = array('label'=>'ExtSocietyResponsible');
+$arrayfields['ExtSocietyIntervenants'] = array('label'=>'ExtSocietyIntervenants');
+
 $selectedfields = $form->multiSelectArrayWithCheckbox('selectedfields', $arrayfields, $varpage); // This also change content of $arrayfields
 if ($massactionbutton) $selectedfields .= $form->showCheckAddButtons('checkforselect', 1);
 
@@ -325,6 +333,10 @@ print '<div class="div-table-responsive">';
 print '<table class="tagtable nobottomiftotal liste'.($moreforfilter ? " listwithfilterbefore" : "").'">'."\n";
 print '<tr class="liste_titre">';
 
+$preventionplan->fields['Custom']['PP_MAITRE_OEUVRE'] = 'MaitreOeuvre';
+$preventionplan->fields['Custom']['PP_EXT_SOCIETY'] = 'ExtSociety';
+$preventionplan->fields['Custom']['PP_EXT_SOCIETY_RESPONSIBLE'] = 'ExtSocietyResponsible';
+$preventionplan->fields['Custom']['PP_EXT_SOCIETY_INTERVENANTS'] = 'ExtSocietyIntervenants';
 
 foreach ($preventionplan->fields as $key => $val)
 {
@@ -340,6 +352,13 @@ foreach ($preventionplan->fields as $key => $val)
 		}
 		elseif (!preg_match('/^(date|timestamp)/', $val['type'])) print '<input type="text" class="flat maxwidth75" name="search_'.$key.'" value="'.dol_escape_htmltag($search[$key]).'">';
 		print '</td>';
+	}
+	if ($key == 'Custom') {
+		foreach ($val as $resource) {
+			print '<td>';
+			print '';
+			print '</td>';
+		}
 	}
 }
 
@@ -375,6 +394,13 @@ foreach ($preventionplan->fields as $key => $val)
 		}
 		print getTitleFieldOfList($arrayfields['t.'.$key]['label'], 0, $_SERVER['PHP_SELF'], 't.'.$key, '', $param, ($cssforfield ? 'class="'.$cssforfield.'"' : ''), $sortfield, $sortorder, ($cssforfield ? $cssforfield.' ' : ''), $disablesort)."\n";
 
+	}
+	if ($key == 'Custom') {
+		foreach ($val as $resource) {
+			print '<td>';
+			print $langs->trans($resource);
+			print '</td>';
+		}
 	}
 
 }
@@ -432,6 +458,26 @@ while ($i < ($limit ? min($num, $limit) : $num)) {
 			if (!empty($val['isameasure'])) {
 				if (!$i) $totalarray['pos'][$totalarray['nbfield']] = 't.' . $key;
 				$totalarray['val']['t.' . $key] += $preventionplan->$key;
+			}
+		}
+		if ($key == 'Custom') {
+
+			foreach ($val as $name => $resource) {
+				$resourceLinked = $digiriskresources->fetchResourcesFromObject($name, $preventionplan);
+
+				print '<td>';
+				if ($resourceLinked > 0) {
+					if ($resource == 'ExtSocietyIntervenants') {
+						$resourcesLinked = array_shift($resourceLinked);
+						foreach($resourcesLinked as $resourceLinkedSingle) {
+							print $resourceLinkedSingle->getNomUrl(1);
+							print '<br>';
+						}
+					} else {
+						print $resourceLinked->getNomUrl(1);
+					}
+				}
+				print '</td>';
 			}
 		}
 	}
