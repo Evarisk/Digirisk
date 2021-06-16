@@ -60,7 +60,7 @@ $massaction  = GETPOST('massaction', 'alpha');
 $show_files  = GETPOST('show_files', 'int');
 $confirm     = GETPOST('confirm', 'alpha');
 $toselect    = GETPOST('toselect', 'array');
-$contextpage = GETPOST('contextpage', 'aZ') ?GETPOST('contextpage', 'aZ') : 'projectlist';
+$contextpage = GETPOST('contextpage', 'aZ') ?GETPOST('contextpage', 'aZ') : 'preventionplanlist';
 
 $title = $langs->trans("PreventionPlan");
 
@@ -112,9 +112,9 @@ foreach ($preventionplan->fields as $key => $val)
 include DOL_DOCUMENT_ROOT.'/core/actions_fetchobject.inc.php'; // Must be include, not include_once.
 
 //Permission for digiriskelement_preventionplan
-$permissiontoread = $user->rights->digiriskdolibarr->preventionplan->read;
-$permissiontoadd = $user->rights->digiriskdolibarr->preventionplan->write;
-$permissiontodelete = $user->rights->digiriskdolibarr->preventionplan->delete;
+$permissiontoread = $user->rights->digiriskdolibarr->preventionplandocument->read;
+$permissiontoadd = $user->rights->digiriskdolibarr->preventionplandocument->write;
+$permissiontodelete = $user->rights->digiriskdolibarr->preventionplandocument->delete;
 
 // Security check - Protection if external user
 if (!$user->rights->digiriskdolibarr->lire) accessforbidden();
@@ -154,6 +154,7 @@ if (empty($reshook))
 
 	$error = 0;
 	if (!$error && ($massaction == 'delete' || ($action == 'delete' && $confirm == 'yes')) && $permissiontodelete) {
+
 		if (!empty($toselect)) {
 			foreach ($toselect as $toselectedid) {
 
@@ -229,25 +230,26 @@ include DOL_DOCUMENT_ROOT.'/core/tpl/massactions_pre.tpl.php';
 // Build and execute select
 // --------------------------------------------------------------------
 
-	$sql = 'SELECT ';
-	foreach ($preventionplan->fields as $key => $val)
-	{
-		$sql .= 't.'.$key.', ';
-	}
-	// Add fields from extrafields
-	if (!empty($extrafields->attributes[$preventionplan->table_element]['label'])) {
-		foreach ($extrafields->attributes[$preventionplan->table_element]['label'] as $key => $val) $sql .= ($extrafields->attributes[$preventionplan->table_element]['type'][$key] != 'separate' ? "ef.".$key.' as options_'.$key.', ' : '');
-	}
-	// Add fields from hooks
-	$parameters = array();
-	$reshook = $hookmanager->executeHooks('printFieldListSelect', $parameters, $preventionplan); // Note that $action and $preventionplandocument may have been modified by hook
-	$sql .= preg_replace('/^,/', '', $hookmanager->resPrint);
-	$sql = preg_replace('/,\s*$/', '', $sql);
-	$sql .= " FROM ".MAIN_DB_PREFIX.$preventionplan->table_element." as t";
+$sql = 'SELECT ';
+foreach ($preventionplan->fields as $key => $val)
+{
+	$sql .= 't.'.$key.', ';
+}
+// Add fields from extrafields
+if (!empty($extrafields->attributes[$preventionplan->table_element]['label'])) {
+	foreach ($extrafields->attributes[$preventionplan->table_element]['label'] as $key => $val) $sql .= ($extrafields->attributes[$preventionplan->table_element]['type'][$key] != 'separate' ? "ef.".$key.' as options_'.$key.', ' : '');
+}
+// Add fields from hooks
+$parameters = array();
+$reshook = $hookmanager->executeHooks('printFieldListSelect', $parameters, $preventionplan); // Note that $action and $preventionplandocument may have been modified by hook
+$sql .= preg_replace('/^,/', '', $hookmanager->resPrint);
+$sql = preg_replace('/,\s*$/', '', $sql);
+$sql .= " FROM ".MAIN_DB_PREFIX.$preventionplan->table_element." as t";
 
-	if (is_array($extrafields->attributes[$preventionplan->table_element]['label']) && count($extrafields->attributes[$preventionplan->table_element]['label'])) $sql .= " LEFT JOIN ".MAIN_DB_PREFIX.$preventionplan->table_element."_extrafields as ef on (t.rowid = ef.fk_object)";
-	if ($preventionplan->ismultientitymanaged == 1) $sql .= " WHERE t.entity IN (".getEntity($preventionplan->element).")";
-	else $sql .= " WHERE 1 = 1";
+if (is_array($extrafields->attributes[$preventionplan->table_element]['label']) && count($extrafields->attributes[$preventionplan->table_element]['label'])) $sql .= " LEFT JOIN ".MAIN_DB_PREFIX.$preventionplan->table_element."_extrafields as ef on (t.rowid = ef.fk_object)";
+if ($preventionplan->ismultientitymanaged == 1) $sql .= " WHERE t.entity IN (".getEntity($preventionplan->element).")";
+else $sql .= " WHERE 1 = 1";
+$sql .= ' AND status = 1';
 
 
 foreach ($search as $key => $val)
