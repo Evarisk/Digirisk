@@ -289,9 +289,9 @@ class doc_preventionplandocument_odt extends ModeleODTPreventionPlanDocument
 			$tmparray['consigne_generale']              = $conf->global->DIGIRISK_GENERAL_RULES;
 			$tmparray['premiers_secours']               = $conf->global->DIGIRISK_FIRST_AID;
 
-			$tmparray['date_start_intervention_PPP'] = $preventionplan->date_start;
-			$tmparray['date_end_intervention_PPP'] = $preventionplan->date_end;
-			$tmparray['interventions_info'] = count($preventionplanlines) . " " . $langs->trans('PreventionPlanLine');
+			$tmparray['date_start_intervention_PPP'] = dol_print_date($preventionplan->date_start, 'dayrfc');
+			$tmparray['date_end_intervention_PPP']   = dol_print_date($preventionplan->date_end, 'dayrfc');
+			$tmparray['interventions_info']          = count($preventionplanlines) . " " . $langs->trans('PreventionPlanLine');
 
 
 			$openinghours = new Openinghours($this->db);
@@ -349,7 +349,7 @@ class doc_preventionplandocument_odt extends ModeleODTPreventionPlanDocument
 				$tmparray['society_town']     = $extsociety->town;
 			}
 
-			if (!empty( $extsocietyintervenants) && $extsocietyintervenants > 0) {
+			if (!empty( $extsocietyintervenants) && $extsocietyintervenants > 0 && is_array($extsocietyintervenants)) {
 				$extsocietyintervenants = array_shift($extsocietyintervenants);
 				$tmparray['intervenants_info'] = count($extsocietyintervenants);
 			}

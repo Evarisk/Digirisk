@@ -485,7 +485,7 @@ class FirePermitLine extends CommonObjectLine
 	public function fetchAll($parent_id = 0, $limit = 0)
 	{
 		global $db;
-		$sql = 'SELECT t.rowid, t.ref, t.date_creation, t.description, t.category, t.use_equipment, t.fk_element ';
+		$sql = 'SELECT t.rowid, t.ref, t.date_creation, t.description, t.category, t.use_equipment, t.fk_element';
 		$sql .= ' FROM '.MAIN_DB_PREFIX.'digiriskdolibarr_firepermitdet as t';
 		if ($parent_id > 0) {
 			$sql .= ' WHERE t.fk_firepermit = '.$parent_id;
@@ -521,6 +521,7 @@ class FirePermitLine extends CommonObjectLine
 
 				$i++;
 			}
+
 
 			$db->free($result);
 

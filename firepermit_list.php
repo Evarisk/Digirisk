@@ -469,7 +469,7 @@ while ($i < ($limit ? min($num, $limit) : $num)) {
 				$resourceLinked = $digiriskresources->fetchResourcesFromObject($name, $firepermit);
 				print '<td>';
 				if ($resourceLinked > 0) {
-					if ($resource == 'ExtSocietyIntervenants') {
+					if ($resource == 'ExtSocietyIntervenants' && is_array($resourceLinked)) {
 						$resourcesLinked = array_shift($resourceLinked);
 						foreach($resourcesLinked as $resourceLinkedSingle) {
 							print $resourceLinkedSingle->getNomUrl(1);
