@@ -273,11 +273,12 @@ DigiriskPreventionPlanStandardModel = Renvoie le numéro sous la forme PPn où n
 DigiriskTemplateDocumentPreventionPlan = Modèle de documents des plans de prévention de Digirisk
 PreventionPlanCustomDigiriskTemplate = ODT custom des plans de prévention
 PreventionPlanDigiriskTemplate = ODT par défaut des plans de prévention
-PreventionPlanDocument = Fiche de plan de prévention
+PreventionPlanDocument = Fiche de Plan de Prévention
 PreventionPlanDocumentGeneratedWithDolibarr = Plan de prévention généré avec Dolibarr
 
 # Data - Donnée
 PreventionPlan = Plan de prévention
+PreventionPlanLine = risque(s)
 PriorVisit = Visite préliminaire
 PriorVisitYesNo = Visite préliminaire effectuée
 PriorVisitText = Note de la visite
@@ -315,11 +316,12 @@ DigiriskFirePermitStandardModel = Renvoie le numéro sous la forme PPn où n est
 DigiriskTemplateDocumentFirePermit = Modèle de documents des permis de feu de Digirisk
 FirePermitCustomDigiriskTemplate = ODT custom des permis de feu
 FirePermitDigiriskTemplate = ODT par défaut des permis de feu
-FirePermitDocument = Fiche de permis de feu
+FirePermitDocument = Fiche de Permis de Feu
 FirePermitDocumentGeneratedWithDolibarr = Permis de feu généré avec Dolibarr
 
 # Data - Donnée
 FirePermit = Permis de feu
+FirePermitLine = risque(s)
 MaitreOeuvre = Responsable de l'Entreprise Utilisatrice
 ExtSociety = Entreprise extérieure
 ExtSocietyResponsible = Responsable de l'Entreprise Extérieure
