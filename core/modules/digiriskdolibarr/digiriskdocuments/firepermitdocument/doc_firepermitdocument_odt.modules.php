@@ -434,13 +434,6 @@ class doc_firepermitdocument_odt extends ModeleODTFirePermitDocument
 							foreach ($tmparray as $key => $val) {
 								try {
 									if ($val == $tmparray['risk']) {
-										$list = getimagesize($tmparray['risk']);
-										$newWidth = 50;
-										if ($list[0]) {
-											$ratio = $newWidth / $list[0];
-											$newHeight = $ratio * $list[1];
-											dol_imageResizeOrCrop($val, 0, $newWidth, $newHeight);
-										}
 										$listlines->setImage($key, $val);
 									} else {
 										$listlines->setVars($key, $val, true, 'UTF-8');
@@ -470,13 +463,6 @@ class doc_firepermitdocument_odt extends ModeleODTFirePermitDocument
 							foreach ($tmparray as $key => $val) {
 								try {
 									if ($val == $tmparray['type_de_travaux']) {
-										$list = getimagesize($tmparray['type_de_travaux']);
-										$newWidth = 50;
-										if ($list[0]) {
-											$ratio = $newWidth / $list[0];
-											$newHeight = $ratio * $list[1];
-											dol_imageResizeOrCrop($val, 0, $newWidth, $newHeight);
-										}
 										$listlines->setImage($key, $val);
 									} else {
 										$listlines->setVars($key, $val, true, 'UTF-8');

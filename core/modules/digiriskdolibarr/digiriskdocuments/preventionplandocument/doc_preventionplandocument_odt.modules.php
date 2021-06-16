@@ -420,13 +420,6 @@ class doc_preventionplandocument_odt extends ModeleODTPreventionPlanDocument
 							foreach ($tmparray as $key => $val) {
 								try {
 									if ($val == $tmparray['risk']) {
-										$list = getimagesize($tmparray['risk']);
-										$newWidth = 50;
-										if ($list[0]) {
-											$ratio = $newWidth / $list[0];
-											$newHeight = $ratio * $list[1];
-											dol_imageResizeOrCrop($val, 0, $newWidth, $newHeight);
-										}
 										$listlines->setImage($key, $val);
 									} else {
 										$listlines->setVars($key, $val, true, 'UTF-8');
