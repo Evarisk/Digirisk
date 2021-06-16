@@ -258,6 +258,7 @@ Alternates = Suppléants
 ReadPreventionPlan = Lire un plan de prévention
 CreatePreventionPlan = Créer un plan de prévention
 DeletePreventionPlan = Supprimer un plan de prévention
+NewPreventionPlan = Nouveau plan de prévention
 
 # Trigger - Déclencheur
 PREVENTIONPLAN_CREATEInDolibarr = Plan de prévention créé dans Dolibarr
@@ -290,6 +291,7 @@ INRSRisk = Risque (INRS)
 PreventionMethod = Moyens de prévention
 Schedule = Horaires
 PreventionPlanSchedule = Horaires du plan de prévention
+SelectUser = Sélectionner un utilisateur
 
 #
 # FirePermit - Permis de feu
