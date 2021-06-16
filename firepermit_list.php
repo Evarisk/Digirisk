@@ -61,7 +61,7 @@ $massaction  = GETPOST('massaction', 'alpha');
 $show_files  = GETPOST('show_files', 'int');
 $confirm     = GETPOST('confirm', 'alpha');
 $toselect    = GETPOST('toselect', 'array');
-$contextpage = GETPOST('contextpage', 'aZ') ?GETPOST('contextpage', 'aZ') : 'projectlist';
+$contextpage = GETPOST('contextpage', 'aZ') ?GETPOST('contextpage', 'aZ') : 'firepermitlist';
 
 $title = $langs->trans("FirePermit");
 
@@ -114,9 +114,9 @@ foreach ($firepermit->fields as $key => $val)
 include DOL_DOCUMENT_ROOT.'/core/actions_fetchobject.inc.php'; // Must be include, not include_once.
 
 //Permission for digiriskelement_firepermit
-$permissiontoread = $user->rights->digiriskdolibarr->firepermit->read;
-$permissiontoadd = $user->rights->digiriskdolibarr->firepermit->write;
-$permissiontodelete = $user->rights->digiriskdolibarr->firepermit->delete;
+$permissiontoread = $user->rights->digiriskdolibarr->firepermitdocument->read;
+$permissiontoadd = $user->rights->digiriskdolibarr->firepermitdocument->write;
+$permissiontodelete = $user->rights->digiriskdolibarr->firepermitdocument->delete;
 
 // Security check - Protection if external user
 if (!$user->rights->digiriskdolibarr->lire) accessforbidden();
@@ -166,13 +166,13 @@ if (empty($reshook))
 				$result = $firepermittodelete->update($user, true);
 
 				if ($result < 0) {
-					// Delete risk KO
-					if (!empty($risk->errors)) setEventMessages(null, $risk->errors, 'errors');
-					else  setEventMessages($risk->error, null, 'errors');
+					// Delete firepermit KO
+					if (!empty($firepermit->errors)) setEventMessages(null, $firepermit->errors, 'errors');
+					else  setEventMessages($firepermit->error, null, 'errors');
 				}
 			}
 
-			// Delete risk OK
+			// Delete firepermit OK
 			$urltogo = str_replace('__ID__', $result, $backtopage);
 			$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
 			header("Location: ".$_SERVER["PHP_SELF"]);
@@ -250,6 +250,7 @@ $sql .= " FROM ".MAIN_DB_PREFIX.$firepermit->table_element." as t";
 if (is_array($extrafields->attributes[$firepermit->table_element]['label']) && count($extrafields->attributes[$firepermit->table_element]['label'])) $sql .= " LEFT JOIN ".MAIN_DB_PREFIX.$firepermit->table_element."_extrafields as ef on (t.rowid = ef.fk_object)";
 if ($firepermit->ismultientitymanaged == 1) $sql .= " WHERE t.entity IN (".getEntity($firepermit->element).")";
 else $sql .= " WHERE 1 = 1";
+$sql .= ' AND status = 1';
 
 
 foreach ($search as $key => $val)
