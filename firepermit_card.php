@@ -576,7 +576,7 @@ if (($id || $ref) && $action == 'edit')
 	print '</td></tr>';
 
 	//Maitre d'oeuvre
-	$userlist 	  = $form->select_dolusers(is_array($object_resources['PP_MAITRE_OEUVRE']) ? array_shift($object_resources['PP_MAITRE_OEUVRE'])->id : '', '', 0, null, 0, '', '', 0, 0, 0, 'AND u.statut = 1', 0, '', '', 0, 1);
+	$userlist 	  = $form->select_dolusers(is_array($object_resources['FP_MAITRE_OEUVRE']) ? array_shift($object_resources['FP_MAITRE_OEUVRE'])->id : '', '', 0, null, 0, '', '', 0, 0, 0, 'AND u.statut = 1', 0, '', '', 0, 1);
 
 	print '<tr>';
 	print '<td style="width:10%">'.$form->editfieldkey('MaitreOeuvre', 'MaitreOeuvre_id', '', $object, 0).'</td>';
@@ -603,7 +603,7 @@ if (($id || $ref) && $action == 'edit')
 	if (!empty($user->socid)) {
 		print $form->select_company($user->socid, 'ext_society', '', 1, 1, 0, $events, 0, 'minwidth300');
 	} else {
-		$ext_society_id = is_array($object_resources['PP_EXT_SOCIETY']) ? array_shift($object_resources['PP_EXT_SOCIETY'])->id : '';
+		$ext_society_id = is_array($object_resources['FP_EXT_SOCIETY']) ? array_shift($object_resources['FP_EXT_SOCIETY'])->id : '';
 
 		print $form->select_company($ext_society_id, 'ext_society', '', 'SelectThirdParty', 1, 0, $events, 0, 'minwidth300');
 	}	print '<br>';
@@ -611,7 +611,7 @@ if (($id || $ref) && $action == 'edit')
 	print '</td></tr>';
 
 	//External responsible -- Responsable de la société extérieure
-	$ext_society_responsible_id = is_array($object_resources['PP_EXT_SOCIETY_RESPONSIBLE']) ? array_shift($object_resources['PP_EXT_SOCIETY_RESPONSIBLE'])->id : '';
+	$ext_society_responsible_id = is_array($object_resources['FP_EXT_SOCIETY_RESPONSIBLE']) ? array_shift($object_resources['FP_EXT_SOCIETY_RESPONSIBLE'])->id : '';
 	print '<tr class="oddeven"><td>'.$langs->trans("ExternalSocietyResponsible").'</td><td>';
 	print $form->selectcontacts(GETPOST('ext_society', 'int'), $ext_society_responsible_id, 'ext_society_responsible[]', 1, '', '', 0, 'quatrevingtpercent', false, 0, array(), false, '', 'ext_society_responsible');
 
@@ -620,8 +620,8 @@ if (($id || $ref) && $action == 'edit')
 	//Intervenants extérieurs
 	$resources_ids = array();
 
-	if (!empty ($object_resources['PP_EXT_SOCIETY_INTERVENANTS']) && $object_resources['PP_EXT_SOCIETY_INTERVENANTS'] > 0) {
-		foreach ($object_resources['PP_EXT_SOCIETY_INTERVENANTS'] as $resource) {
+	if (!empty ($object_resources['FP_EXT_SOCIETY_INTERVENANTS']) && $object_resources['FP_EXT_SOCIETY_INTERVENANTS'] > 0) {
+		foreach ($object_resources['FP_EXT_SOCIETY_INTERVENANTS'] as $resource) {
 			$resources_ids[] = $resource->id;
 		}
 	}
