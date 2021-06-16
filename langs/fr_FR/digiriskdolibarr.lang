@@ -264,6 +264,7 @@ NewPreventionPlan = Nouveau plan de prévention
 PREVENTIONPLAN_CREATEInDolibarr = Plan de prévention créé dans Dolibarr
 ActionsOnPreventionPlan = Événements liés au plan de prévention
 PreventionPlanGeneratedWithDolibarr = Plan de prévention généré avec Dolibarr
+PreventionPlanLineCreatedWithDolibarr = Ligne de Permis de Feu créée avec Dolibarr
 
 # Mod Numbering - Modèle de numérotation
 DigiriskPreventionPlanNumberingModule = Modèle de numérotation des plans de prévention de Digirisk
@@ -307,10 +308,11 @@ DeleteFirePermit = Supprimer un permis de feu
 FIREPERMIT_CREATEInDolibarr = Permis de feu créé dans Dolibarr
 ActionsOnFirePermit = Événements liés au permis de feu
 FirePermitGeneratedWithDolibarr = Permis de feu généré avec Dolibarr
+FirePermitLineCreatedWithDolibarr = Ligne de Permis de Feu créée avec Dolibarr
 
 # Mod Numbering - Modèle de numérotation
 DigiriskFirePermitNumberingModule = Modèle de numérotation des permis de feu de Digirisk
-DigiriskFirePermitStandardModel = Renvoie le numéro sous la forme PPn où n est un compteur séquentiel sans rupture et sans remise à 0.
+DigiriskFirePermitStandardModel = Renvoie le numéro sous la forme FPn où n est un compteur séquentiel sans rupture et sans remise à 0.
 
 # ODT Template - Template ODT
 DigiriskTemplateDocumentFirePermit = Modèle de documents des permis de feu de Digirisk
