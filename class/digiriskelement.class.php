@@ -426,6 +426,8 @@ class DigiriskElement extends CommonObject
 
 			$num = $this->db->num_rows($resql);
 			$i = 0;
+			$out .= '<option value="0" selected>'.$langs->trans('Root') . ' : ' . $conf->global->MAIN_INFO_SOCIETE_NOM . '</option>';
+
 			if ($num)
 			{
 				while ($i < $num)
