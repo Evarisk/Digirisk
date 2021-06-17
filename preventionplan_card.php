@@ -446,7 +446,7 @@ if ($action == 'create')
 
 	//Start Date -- Date début
 	print '<tr class="oddeven"><td><label for="date_debut">'.$langs->trans("StartDate").'</label></td><td>';
-	print $form->selectDate('', 'date_debut', 1, 1, 0);
+	print $form->selectDate(dol_now(), 'date_debut', 1, 1, 0);
 	print '</td></tr>';
 
 	//End Date -- Date fin
@@ -463,7 +463,7 @@ if ($action == 'create')
 
 
 	print $form->selectarray('maitre_oeuvre', $userlist, '', $langs->trans('SelectUser'), null, null, null, "40%", 0,0,'','',1);
-	if (!GETPOSTISSET('backtopage')) print ' <a href="'.DOL_URL_ROOT.'/user/card.php?action=create&backtopage='.urlencode($_SERVER["PHP_SELF"].'?action=create').'"><span class="fa fa-plus-circle valignmiddle paddingleft" title="'.$langs->trans("AddThirdParty").'"></span></a>';
+	if (!GETPOSTISSET('backtopage')) print ' <a href="'.DOL_URL_ROOT.'/user/card.php?action=create&backtopage='.urlencode($_SERVER["PHP_SELF"].'?action=create').'" target="_blank"><span class="fa fa-plus-circle valignmiddle paddingleft" title="'.$langs->trans("AddUser").'"></span></a>';
 
 	print '</td></tr>';
 
