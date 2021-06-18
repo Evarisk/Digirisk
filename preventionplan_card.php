@@ -161,7 +161,7 @@ if (empty($reshook))
 				$digiriskresources->digirisk_dolibarr_set_resources($db, $user->id, 'PP_LABOUR_INSPECTOR_ASSIGNED', 'societe', array($labour_inspector_id), $conf->entity, 'preventionplan', $object->id, 1);
 				$digiriskresources->digirisk_dolibarr_set_resources($db, $user->id, 'PP_EXT_SOCIETY_INTERVENANTS', 'socpeople', $extintervenant_ids, $conf->entity, 'preventionplan', $object->id, 1);
 
-				// Creation risk + evaluation + task OK
+				// Creation prevention plan OK
 				$urltogo = str_replace('__ID__', $result, $backtopage);
 				$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
 				header("Location: " . $urltogo);
@@ -169,14 +169,14 @@ if (empty($reshook))
 			}
 			else
 			{
-				// Creation risk KO
+				// Creation prevention plan KO
 				if (!empty($object->errors)) setEventMessages(null, $object->errors, 'errors');
 				else  setEventMessages($object->error, null, 'errors');
 			}
 		}
 	}
 
-	// Action to add record
+	// Action to update record
 	if ($action == 'update' && $permissiontoadd) {
 
 		$maitre_oeuvre_id       = GETPOST('maitre_oeuvre');
@@ -220,7 +220,7 @@ if (empty($reshook))
 				$digiriskresources->digirisk_dolibarr_set_resources($db, $user->id, 'PP_LABOUR_DOCTOR_ASSIGNED', 'societe', array($labour_inspector_id), $conf->entity, 'preventionplan', $object->id, 0);
 				$digiriskresources->digirisk_dolibarr_set_resources($db, $user->id, 'PP_EXT_SOCIETY_INTERVENANTS', 'socpeople', $extintervenant_ids, $conf->entity, 'preventionplan', $object->id, 0);
 
-				// Creation risk + evaluation + task OK
+				// Creation prevention plan OK
 				$urltogo = str_replace('__ID__', $result, $backtopage);
 				$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
 				header("Location: " . $urltogo);
@@ -228,14 +228,14 @@ if (empty($reshook))
 			}
 			else
 			{
-				// Creation risk KO
+				// Creation prevention plan KO
 				if (!empty($object->errors)) setEventMessages(null, $object->errors, 'errors');
 				else  setEventMessages($object->error, null, 'errors');
 			}
 		}
 	}
 
-	// Action to add record
+	// Action to delete record
 	if ($action == 'delete' && $permissiontoadd) {
 
 	}
@@ -286,7 +286,7 @@ if (empty($reshook))
 		}
 	}
 
-	// Action to add record
+	// Action to update line
 	if ($action == 'updateLine' && $permissiontoadd) {
 
 		$actions_description = GETPOST('actionsdescription');
@@ -318,7 +318,7 @@ if (empty($reshook))
 
 			if ($result > 0) {
 
-				// Creation risk + evaluation + task OK
+				// Creation prevention plan OK
 				$urltogo = str_replace('__ID__', $result, $backtopage);
 				$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $parent_id, $urltogo); // New method to autoselect project after a New on another form object creation
 				header("Location: " . $urltogo);
@@ -326,14 +326,14 @@ if (empty($reshook))
 			}
 			else
 			{
-				// Creation risk KO
+				// Creation prevention plan KO
 				if (!empty($object->errors)) setEventMessages(null, $object->errors, 'errors');
 				else  setEventMessages($object->error, null, 'errors');
 			}
 		}
 	}
 
-	// Action to add record
+	// Action to delete line
 	if ($action == 'deleteline' && $permissiontodelete) {
 
 		$objectline = new PreventionPlanLine($db);
@@ -341,13 +341,13 @@ if (empty($reshook))
 
 		if ($result > 0) {
 			$objectline->delete();
-			// Creation risk + evaluation + task OK
+			// Creation prevention plan OK
 			$urltogo = str_replace('__ID__', $result, $backtopage);
 			$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $parent_id, $urltogo); // New method to autoselect project after a New on another form object creation
 			header("Location: " . $urltogo);
 			exit;
 		} else {
-			// Creation risk KO
+			// Creation prevention plan KO
 			if (!empty($object->errors)) setEventMessages(null, $object->errors, 'errors');
 			else  setEventMessages($object->error, null, 'errors');
 		}
@@ -549,8 +549,7 @@ if ($action == 'create')
 
 	print '<div class="center">';
 	print '<input type="submit" class="button" id ="actionButtonCreate" name="add" value="'.dol_escape_htmltag($langs->trans("Create")).'">';
-	print '&nbsp; ';
-	print ' &nbsp; <input type="submit" id ="actionButtonCancelCreate" class="button" name="cancel" value="'.$langs->trans("Cancel").'">';
+	print ' &nbsp; <input type="submit" id ="actionButtonCancelCreate" class="button" name="cancel" value="'.$langs->trans("Cancel").'"  onClick="javascript:history.go(-1)">';
 	print '</div>';
 
 	print '</form>';
@@ -701,7 +700,7 @@ if (($id || $ref) && $action == 'edit')
 	dol_fiche_end();
 
 	print '<div class="center"><input type="submit" id ="actionButtonSave" class="button" name="save" value="'.$langs->trans("Save").'">';
-	print ' &nbsp; <input type="submit" id ="actionButtonCancelEdit" class="button" name="cancel" value="'.$langs->trans("Cancel").'">';
+	print ' &nbsp; <input type="submit" id ="actionButtonCancelEdit" class="button" name="cancel" value="'.$langs->trans("Cancel").'"  onClick="javascript:history.go(-1)">';
 	print '</div>';
 
 	print '</form>';
