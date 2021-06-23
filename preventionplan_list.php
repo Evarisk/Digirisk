@@ -468,7 +468,7 @@ while ($i < ($limit ? min($num, $limit) : $num)) {
 				$resourceLinked = $digiriskresources->fetchResourcesFromObject($name, $preventionplan);
 
 				print '<td>';
-				if ($resourceLinked > 0) {
+				if (!empty($resourceLinked) &&  $resourceLinked > 0) {
 					if ($resource == 'ExtSocietyIntervenants') {
 						$resourcesLinked = array_shift($resourceLinked);
 						foreach($resourcesLinked as $resourceLinkedSingle) {

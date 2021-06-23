@@ -755,20 +755,6 @@ if ((empty($action) || ($action != 'create' && $action != 'edit')))
 
 	include DOL_DOCUMENT_ROOT.'/core/tpl/commonfields_view.tpl.php';
 
-	//Master builder -- Maitre Oeuvre
-	print '<tr><td class="tdtop">';
-	print $langs->trans("MaitreOeuvre");
-	print '</td>';
-	print '<td>';
-	$master_builder = $digiriskresources->fetchResourcesFromObject('PP_MAITRE_OEUVRE', $object);
-
-	if ($master_builder > 0) {
-
-		print $master_builder->getNomUrl(1);
-	}
-	print '<br>';
-	print '</td></tr>';
-
 	//External Society -- Société extérieure
 	print '<tr><td class="tdtop">';
 	print $langs->trans("ExtSociety");
@@ -779,38 +765,6 @@ if ((empty($action) || ($action != 'create' && $action != 'edit')))
 		$ext_society = array_shift($ext_society['PP_EXT_SOCIETY']);
 		print $ext_society->getNomUrl(1);
 	}
-	print '<br>';
-	print '</td></tr>';
-
-	//External Society Responsible -- Responsable Société extérieure
-	print '<tr><td class="tdtop">';
-	print $langs->trans("ExtSocietyResponsible");
-	print '</td>';
-	print '<td>';
-	$ext_society_responsible = $digiriskresources->fetchResourcesFromObject('PP_EXT_SOCIETY_RESPONSIBLE', $object);
-	if ($ext_society_responsible > 0) {
-		print $ext_society_responsible->getNomUrl(1);
-	}
-	print '<br>';
-	print '</td></tr>';
-
-	//External Society Intervenants -- Intervenants Société extérieure
-	print '<tr><td class="tdtop">';
-	print $langs->trans("ExtSocietyIntervenants");
-	print '</td>';
-	print '<td>';
-	$ext_society_intervenants = $digiriskresources->fetchResourcesFromObject('PP_EXT_SOCIETY_INTERVENANTS', $object);
-
-	if (is_array($ext_society_intervenants) && !empty ($ext_society_intervenants) && $ext_society_intervenants > 0) {
-		$ext_society_intervenants = array_shift($ext_society_intervenants);
-		foreach($ext_society_intervenants as $ext_society_intervenant) {
-			print $ext_society_intervenant->getNomUrl(1);
-			print '<br>';
-		}
-	} elseif (!empty ($ext_society_intervenants) && $ext_society_intervenants > 0){
-		print $ext_society_intervenants->getNomUrl(1);
-	}
-
 	print '<br>';
 	print '</td></tr>';
 
