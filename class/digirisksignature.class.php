@@ -67,9 +67,10 @@ class DigiriskSignature extends CommonObject
 	const STATUS_SIGNATURE_REQUEST = 1;
 	const STATUS_PENDING_SIGNATURE = 2;
 	const STATUS_DENIED = 3;
-	const STATUS_UNSIGNED = 4;
-	const STATUS_ABSENT = 5;
-	const STATUS_JUSTIFIED_ABSENT = 6;
+	const STATUS_SIGNED = 4;
+	const STATUS_UNSIGNED = 5;
+	const STATUS_ABSENT = 6;
+	const STATUS_JUSTIFIED_ABSENT = 7;
 
 	/**
 	 * @var array  Array with all fields and their property. Do not use it as a static var. It may be modified by constructor.
@@ -297,22 +298,9 @@ class DigiriskSignature extends CommonObject
 	 *  @param	int		$notrigger		1=Does not execute triggers, 0=Execute triggers
 	 *	@return	int						<0 if KO, >0 if OK
 	 */
-	public function setDraft($user, $notrigger = 0)
+	public function setSigned($user, $notrigger = 0)
 	{
-		// Protection
-		if ($this->status <= self::STATUS_DRAFT)
-		{
-			return 0;
-		}
-
-		/*if (! ((empty($conf->global->MAIN_USE_ADVANCED_PERMS) && ! empty($user->rights->digiriskdolibarr->write))
-		 || (! empty($conf->global->MAIN_USE_ADVANCED_PERMS) && ! empty($user->rights->digiriskdolibarr->digiriskdolibarr_advance->validate))))
-		 {
-		 $this->error='Permission denied';
-		 return -1;
-		 }*/
-
-		return $this->setStatusCommon($user, self::STATUS_DRAFT, $notrigger, 'DIGIRISKSIGNATURE_UNVALIDATE');
+		return $this->setStatusCommon($user, self::STATUS_SIGNED, $notrigger, 'DIGIRISKSIGNATURE_SIGNED');
 	}
 
 	/**
@@ -387,22 +375,23 @@ class DigiriskSignature extends CommonObject
 	 */
 	public function LibStatut($status, $mode = 0)
 	{
+
 		// phpcs:enable
 		if (empty($this->labelStatus) || empty($this->labelStatusShort))
 		{
 			global $langs;
 			//$langs->load("digiriskdolibarr@digiriskdolibarr");
-			$this->labelStatus[self::STATUS_DRAFT] = $langs->trans('Draft');
-			$this->labelStatus[self::STATUS_VALIDATED] = $langs->trans('Enabled');
-			$this->labelStatus[self::STATUS_CANCELED] = $langs->trans('Disabled');
-			$this->labelStatusShort[self::STATUS_DRAFT] = $langs->trans('Draft');
-			$this->labelStatusShort[self::STATUS_VALIDATED] = $langs->trans('Enabled');
-			$this->labelStatusShort[self::STATUS_CANCELED] = $langs->trans('Disabled');
+			$this->labelStatus[self::STATUS_REGISTERED] = $langs->trans('Registered');
+			$this->labelStatus[self::STATUS_SIGNATURE_REQUEST] = $langs->trans('SignatureRequest');
+			$this->labelStatus[self::STATUS_PENDING_SIGNATURE] = $langs->trans('PendingSignature');
+			$this->labelStatusShort[self::STATUS_DENIED] = $langs->trans('Denied');
+			$this->labelStatusShort[self::STATUS_SIGNED] = $langs->trans('Signed');
+			$this->labelStatusShort[self::STATUS_UNSIGNED] = $langs->trans('Unsigned');
+			$this->labelStatusShort[self::STATUS_ABSENT] = $langs->trans('Absent');
+			$this->labelStatusShort[self::STATUS_JUSTIFIED_ABSENT] = $langs->trans('JustifiedAbsent');
 		}
 
 		$statusType = 'status'.$status;
-		//if ($status == self::STATUS_VALIDATED) $statusType = 'status1';
-		if ($status == self::STATUS_CANCELED) $statusType = 'status6';
 
 		return dolGetStatus($this->labelStatus[$status], $this->labelStatusShort[$status], '', $statusType, $mode);
 	}
@@ -445,6 +434,8 @@ class DigiriskSignature extends CommonObject
 				$this->society_name = $society->name;
 				$this->phone = $signatory_data->phone_pro;
 			}
+
+			$this->status = self::STATUS_REGISTERED;
 
 			$this->firstname = $signatory_data->firstname;
 			$this->lastname = $signatory_data->lastname;
