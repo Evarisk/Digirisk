@@ -53,7 +53,7 @@ function preventionplanPrepareHead($object)
 		$h++;
 
 		$head[$h][0] = dol_buildpath("/digiriskdolibarr/preventionplan_attendants.php", 1) . '?id=' . $object->id;
-		$head[$h][1] = '<i class="fas fa-calendar-times"></i> ' . $langs->trans("Attendants");
+		$head[$h][1] = '<i class="fas fa-file-signature"></i> ' . $langs->trans("Attendants");
 		$head[$h][2] = 'preventionplanAttendants';
 		$h++;
 	}
