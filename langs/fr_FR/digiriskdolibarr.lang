@@ -296,6 +296,7 @@ PreventionMethod = Moyens de prévention
 Schedule = Horaires
 PreventionPlanSchedule = Horaires du plan de prévention
 SelectUser = Sélectionner un utilisateur
+Attendants = Participants
 
 #
 # FirePermit - Permis de feu
@@ -709,6 +710,29 @@ DeleteTask = Êtes-vous sûr(e) de vouloir supprimer la tâche
 DigiriskTaskData = Donnée configurable des tâches
 TaskManagementDescription = Activer la gestion des tâches
 TaskManagementNotActivated = Veuillez activer la gestion des tâches dans Configuration du module / Analyse des risques / Tâche
+
+
+
+#
+# DigiriskSignature - Signature
+#
+
+# Data - Donnée
+SignatureResponsibles = Signatures des responsables
+SignatureIntervenants = Signatures des intervenants
+Sign = Signer
+Erase = Effacer
+DisclaimerSignatureTitle = Attention
+DisclaimerSignature = Dès qu'un responsable aura signé vous ne pourrez plus créer/modifier des risques, ni modifier les responsables du plan de prévention.<br>Vous pourrez toujours rajouter des intervenants.
+Registered = Inscrit
+SignatureRequest = Demande de signature
+PendingSignature = En attente de signature
+Denied = Refusé
+Signed = Signé
+Unsigned = Non signé
+Absent = Absent
+JustifiedAbsent = Absence justifiée
+
 
 #
 # Other
