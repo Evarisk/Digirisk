@@ -70,6 +70,7 @@ $fk_parent           = GETPOST('fk_parent', 'int');
 // Initialize technical objects
 $object                 = new PreventionPlan($db);
 $objectline             = new PreventionPlanLine($db);
+$signatory              = new PreventionPlanSignature($db);
 $preventionplandocument = new PreventionPlanDocument($db);
 $risk                   = new Risk($db);
 
@@ -155,11 +156,15 @@ if (empty($reshook))
 
 			if ($result > 0) {
 
-				$digiriskresources->digirisk_dolibarr_set_resources($db, $user->id, 'PP_MAITRE_OEUVRE', 'user', array($maitre_oeuvre_id), $conf->entity, 'preventionplan', $object->id, 1);
-				$digiriskresources->digirisk_dolibarr_set_resources($db, $user->id, 'PP_EXT_SOCIETY', 'societe', array($extsociety_id), $conf->entity, 'preventionplan', $object->id, 1);
-				$digiriskresources->digirisk_dolibarr_set_resources($db, $user->id, 'PP_EXT_SOCIETY_RESPONSIBLE', 'socpeople', $extresponsible_id, $conf->entity, 'preventionplan', $object->id, 1);
-				$digiriskresources->digirisk_dolibarr_set_resources($db, $user->id, 'PP_LABOUR_INSPECTOR_ASSIGNED', 'societe', array($labour_inspector_id), $conf->entity, 'preventionplan', $object->id, 1);
-				$digiriskresources->digirisk_dolibarr_set_resources($db, $user->id, 'PP_EXT_SOCIETY_INTERVENANTS', 'socpeople', $extintervenant_ids, $conf->entity, 'preventionplan', $object->id, 1);
+//				$digiriskresources->digirisk_dolibarr_set_resources($db, $user->id, 'PP_MAITRE_OEUVRE', 'user', array($maitre_oeuvre_id), $conf->entity, 'preventionplan', $object->id, 1);
+			$digiriskresources->digirisk_dolibarr_set_resources($db, $user->id, 'PP_EXT_SOCIETY', 'societe', array($extsociety_id), $conf->entity, 'preventionplan', $object->id, 1);
+//				$digiriskresources->digirisk_dolibarr_set_resources($db, $user->id, 'PP_EXT_SOCIETY_RESPONSIBLE', 'socpeople', $extresponsible_id, $conf->entity, 'preventionplan', $object->id, 1);
+			$digiriskresources->digirisk_dolibarr_set_resources($db, $user->id, 'PP_LABOUR_INSPECTOR_ASSIGNED', 'societe', array($labour_inspector_id), $conf->entity, 'preventionplan', $object->id, 1);
+//				$digiriskresources->digirisk_dolibarr_set_resources($db, $user->id, 'PP_EXT_SOCIETY_INTERVENANTS', 'socpeople', $extintervenant_ids, $conf->entity, 'preventionplan', $object->id, 1);
+
+				$signatory->setSignatory($object->id,'user', array($maitre_oeuvre_id), 'PP_MAITRE_OEUVRE');
+				$signatory->setSignatory($object->id,'socpeople', array($extresponsible_id), 'PP_EXT_SOCIETY_RESPONSIBLE');
+				$signatory->setSignatory($object->id,'socpeople', $extintervenant_ids, 'PP_EXT_SOCIETY_INTERVENANTS');
 
 				// Creation prevention plan OK
 				$urltogo = str_replace('__ID__', $result, $backtopage);
@@ -771,7 +776,8 @@ if ((empty($action) || ($action != 'create' && $action != 'edit')))
 	print '<td>';
 	$ext_society = $digiriskresources->fetchResourcesFromObject('PP_EXT_SOCIETY', $object);
 	if ($ext_society > 0) {
-		print $digiriskresources->fetchResourcesFromObject('PP_EXT_SOCIETY', $object)->getNomUrl(1);
+		$ext_society = array_shift($ext_society['PP_EXT_SOCIETY']);
+		print $ext_society->getNomUrl(1);
 	}
 	print '<br>';
 	print '</td></tr>';

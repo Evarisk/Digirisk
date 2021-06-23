@@ -389,6 +389,12 @@ window.eoxiaJS.modal.openModal = function ( event ) {
 		$(this).closest('.risksign-photo-container').find('#risksign_photo' + idSelected).addClass('modal-active');
 	}
 
+	// Open modal signature.
+	if ($(this).hasClass('modal-signature-open')) {
+		$('#modal-signature' + idSelected).addClass('modal-active');
+		window.eoxiaJS.signature.modalSignatureOpened( $(this) );
+	}
+
 	$('.notice').addClass('hidden');
 };
 
@@ -784,6 +790,103 @@ if ( ! window.eoxiaJS.loader ) {
 		}
 	};
 }
+
+/**
+ * Initialise l'objet "signature" ainsi que la méthode "init" obligatoire pour la bibliothèque EoxiaJS.
+ *
+ * @since   1.1.0
+ * @version 1.1.0
+ */
+window.eoxiaJS.signature = {};
+
+/**
+ * Initialise le canvas signature
+ *
+ * @since   1.1.0
+ * @version 1.1.0
+ */
+window.eoxiaJS.signature.canvas;
+
+/**
+ * Initialise le boutton signature
+ *
+ * @since   1.1.0
+ * @version 1.1.0
+ */
+window.eoxiaJS.signature.buttonSignature;
+
+/**
+ * La méthode appelée automatiquement par la bibliothèque EoxiaJS.
+ *
+ * @since   1.1.0
+ * @version 1.1.0
+ *
+ * @return {void}
+ */
+window.eoxiaJS.signature.init = function() {
+	window.eoxiaJS.signature.event();
+};
+
+window.eoxiaJS.signature.event = function() {
+	jQuery( document ).on( 'click', '.signature-erase', window.eoxiaJS.signature.clearCanvas );
+	jQuery( document ).on( 'click', '.signature-validate', window.eoxiaJS.signature.createSignature );
+};
+
+window.eoxiaJS.signature.modalSignatureOpened = function( triggeredElement ) {
+	window.eoxiaJS.signature.buttonSignature = triggeredElement;
+
+	console.log(triggeredElement.attr('value'));
+
+	var ratio =  Math.max( window.devicePixelRatio || 1, 1 );
+
+	window.eoxiaJS.signature.canvas = document.querySelector('#modal-signature' + triggeredElement.attr('value') + ' canvas' );
+
+	console.log(window.eoxiaJS.signature.canvas);
+
+	window.eoxiaJS.signature.canvas.signaturePad = new SignaturePad( window.eoxiaJS.signature.canvas, {
+		penColor: "rgb(0, 0, 0)"
+	} );
+
+	window.eoxiaJS.signature.canvas.width = window.eoxiaJS.signature.canvas.offsetWidth * ratio;
+	window.eoxiaJS.signature.canvas.height = window.eoxiaJS.signature.canvas.offsetHeight * ratio;
+	window.eoxiaJS.signature.canvas.getContext( "2d" ).scale( ratio, ratio );
+	window.eoxiaJS.signature.canvas.signaturePad.clear();
+
+	var signature_data = jQuery( '#signature_data' + triggeredElement.attr('value') ).val();
+	console.log(signature_data);
+	window.eoxiaJS.signature.canvas.signaturePad.fromDataURL(signature_data);
+};
+
+window.eoxiaJS.signature.clearCanvas = function( event ) {
+	var canvas = jQuery( this ).closest( '.modal-signature' ).find( 'canvas' );
+	canvas[0].signaturePad.clear();
+};
+
+window.eoxiaJS.signature.createSignature = function() {
+	let elementSignatory       = $(this).attr('value');
+
+	var signatoryIDPost = '';
+	if (elementSignatory !== 0) {
+		signatoryIDPost = '&signatoryID=' + elementSignatory;
+	}
+
+	if ( ! $(this).closest( '.wpeo-modal' ).find( 'canvas' )[0].signaturePad.isEmpty() ) {
+		var signature = $(this).closest( '.wpeo-modal' ).find( 'canvas' )[0].toDataURL();
+	}
+
+	$.ajax({
+		url: document.URL + '&action=addSignature' + signatoryIDPost,
+		type: "POST",
+		processData: false,
+		contentType: 'application/octet-stream',
+		data: signature,
+		complete: function() {
+			window.location.reload();
+		},
+		error: function ( ) {
+		}
+	});
+};
 
 /**
  * Initialise l'objet "photo" ainsi que la méthode "init" obligatoire pour la bibliothèque EoxiaJS.
