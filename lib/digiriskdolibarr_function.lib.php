@@ -48,8 +48,6 @@ function digirisk_show_photos($modulepart, $sdir, $size = 0, $nbmax = 0, $nbbyro
 	$sortfield = 'position_name';
 	$sortorder = 'desc';
 
-	$dir = $sdir.'/'.$object->ref.'/';
-	$pdir = $subdir . '/'.$object->ref.'/';
 
 	// Defined relative dir to DOL_DATA_ROOT
 	$relativedir = '';
@@ -65,9 +63,7 @@ function digirisk_show_photos($modulepart, $sdir, $size = 0, $nbmax = 0, $nbbyro
 
 	$return = '<!-- Photo -->'."\n";
 	$nbphoto = 0;
-
 	$filearray = dol_dir_list($dir, "files", 0, '', '(\.meta|_preview.*\.png)$', $sortfield, (strtolower($sortorder) == 'desc' ?SORT_DESC:SORT_ASC), 1);
-
 	if (count($filearray))
 	{
 
@@ -228,7 +224,6 @@ function digirisk_show_photos($modulepart, $sdir, $size = 0, $nbmax = 0, $nbbyro
 			}
 		}
 	}
-
 	$object->nbphoto = $nbphoto;
 	return $return;
 }
@@ -968,4 +963,72 @@ function getNomUrl($withpictoimg = 0, $option = '', $infologin = 0, $notooltip =
 	else $result .= $hookmanager->resPrint;
 
 	return $result;
+}
+
+function show_category_image($object, $upload_dir) {
+
+	global $langs;
+	$nbphoto = 0;
+	$nbbyrow = 5;
+
+	$maxWidth = 160;
+	$maxHeight = 120;
+
+	$pdir = get_exdir($object->id, 2, 0, 0, $object, 'category').$object->id."/photos/";
+	$dir = $upload_dir.'/'.$pdir;
+
+	$listofphoto = $object->liste_photos($dir);
+
+	if (is_array($listofphoto) && count($listofphoto))
+	{
+		print '<br>';
+		print '<table width="100%" valign="top" align="center">';
+
+		foreach ($listofphoto as $key => $obj)
+		{
+			$nbphoto++;
+
+			if ($nbbyrow && ($nbphoto % $nbbyrow == 1)) print '<tr align=center valign=middle border=1>';
+			if ($nbbyrow) print '<td width="'.ceil(100 / $nbbyrow).'%" class="">';
+
+
+			// Si fichier vignette disponible, on l'utilise, sinon on utilise photo origine
+			if ($obj['photo_vignette'])
+			{
+				$filename = $obj['photo_vignette'];
+			} else {
+				$filename = $obj['photo'];
+			}
+
+			// Nom affiche
+			$viewfilename = $obj['photo'];
+
+			// Taille de l'image
+			$object->get_image_size($dir.$filename);
+			$imgWidth = ($object->imgWidth < $maxWidth) ? $object->imgWidth : $maxWidth;
+			$imgHeight = ($object->imgHeight < $maxHeight) ? $object->imgHeight : $maxHeight;
+
+			print '<img border="0" width="'.$imgWidth.'" height="'.$imgHeight.'" src="'.DOL_URL_ROOT.'/viewimage.php?modulepart=category&entity='.$object->entity.'&file='.urlencode($pdir.$filename).'">';
+
+			print '<br>';
+
+			if ($nbbyrow) print '</td>';
+			if ($nbbyrow && ($nbphoto % $nbbyrow == 0)) print '</tr>';
+		}
+
+		// Ferme tableau
+		while ($nbphoto % $nbbyrow)
+		{
+			print '<td width="'.ceil(100 / $nbbyrow).'%">&nbsp;</td>';
+			$nbphoto++;
+		}
+
+		print '</table>';
+	}
+
+	if ($nbphoto < 1)
+	{
+		print '<div class="opacitymedium">'.$langs->trans("NoPhotoYet")."</div>";
+	}
+
 }
