@@ -56,6 +56,7 @@ require_once DOL_DOCUMENT_ROOT.'/core/class/extrafields.class.php';
 require_once DOL_DOCUMENT_ROOT.'/user/class/user.class.php';
 require_once DOL_DOCUMENT_ROOT.'/core/class/doleditor.class.php';
 require_once DOL_DOCUMENT_ROOT.'/categories/class/categorie.class.php';
+require_once DOL_DOCUMENT_ROOT.'/core/modules/ticket/mod_ticket_simple.php';
 require_once '../../lib/digiriskdolibarr_function.lib.php';
 
 global $langs;
@@ -74,6 +75,8 @@ $hookmanager->initHooks(array('publicnewticketcard', 'globalcard'));
 $object = new Ticket($db);
 $extrafields = new ExtraFields($db);
 $category = new Categorie($db);
+$modTicket = new mod_ticket_simple($db);
+
 $extrafields->fetch_name_optionals_label($object->table_element);
 
 $upload_dir         = $conf->categorie->multidir_output[isset($object->entity) ? $object->entity : 1];
@@ -92,6 +95,7 @@ if ($reshook < 0) {
 }
 
 if ($action == 'add') {
+
 	$register = GETPOST('register');
 	$pertinence = GETPOST('pertinence');
 	$service = GETPOST('service');
@@ -99,8 +103,8 @@ if ($action == 'add') {
 	$lastname = GETPOST('lastname');
 	$message = GETPOST('message');
 
-	$object->ref = 'tesddAZsdasdaddZt';
-	$object->subject = 'teddzzadzastddAZAZA';
+	$object->ref = $modTicket->getNextValue($thirdparty,$object);
+
 	$object->message = $firstname . ' ' . $lastname . ' ' . $message;
 
 	$result = $object->create($user);
@@ -384,7 +388,7 @@ $formticket = new FormTicket($db);
 //	exit();
 //}
 
-$arrayofjs = array();
+$arrayofjs =  array("/digiriskdolibarr/js/digiriskdolibarr.js.php");
 $arrayofcss = array('/opensurvey/css/style.css', '/ticket/css/styles.css.php');
 
 llxHeaderTicket($langs->trans("CreateTicket"), "", 0, 0, $arrayofjs, $arrayofcss);
@@ -397,18 +401,17 @@ print load_fiche_titre($title_edit, '', "digiriskdolibarr32px@digiriskdolibarr")
 print '<form method="POST" action="'.$_SERVER["PHP_SELF"].'">';
 print '<input type="hidden" name="token" value="'.newToken().'">';
 print '<input type="hidden" name="action" value="add">';
-print '<input type="hidden" name="register" value="'.GETPOST('register').'">';
-print '<input type="hidden" name="pertinence" value="'.GETPOST('pertinence').'">';
-print '<input type="hidden" name="service" value="'.GETPOST('service').'">';
+print '<input type="hidden" id="register" name="register" value="'.GETPOST('register').'">';
+print '<input type="hidden" id="pertinence" name="pertinence" value="'.GETPOST('pertinence').'">';
+print '<input type="hidden" id="service" name="service" value="'.GETPOST('service').'">';
 print '<input type="hidden" name="id" value="'.$object->id.'">';
 if ($backtopage) print '<input type="hidden" name="backtopage" value="'.$backtopage.'">';
 if ($backtopageforcancel) print '<input type="hidden" name="backtopageforcancel" value="'.$backtopageforcancel.'">';
 
-dol_fiche_head();
+dol_fiche_head(array(), '0', '', 1);
 
-
-print '<table class="border centpercent tableforfieldedit">'."\n";
-
+print '<div class="img-fields-container">';
+print '<table class="border centpercent tableforimgfields">'."\n";
 //// Common attributes
 //include DOL_DOCUMENT_ROOT.'/core/tpl/commonfields_edit.tpl.php';
 //
@@ -419,15 +422,15 @@ print '<tr><td>'.$langs->trans("Register").'</td><td>';
 // @ todo afficher la categorie qui a été enregistrée comme la catégorie racine du champ registre (dans une conf $conf->global->DIGIRISKDOLIBARR_TICKET_CATEGORY_REGISTRE_ID)
 $registerCategory = $category->rechercher(0,'Registre','ticket', true);
 $registerChildren = $registerCategory[0]->get_filles();
-foreach ($registerChildren as $element) {
-	if ($element->id == GETPOST('register')) {
-		print '<td style="border: solid">';
+foreach ($registerChildren as $register) {
+	if ($register->id == GETPOST('register')) {
+		print '<td class="ticket-register" id="'.$register->id.'" style="border: solid">';
 	} else {
-		print '<td>';
+		print '<td class="ticket-register" id="'.$register->id.'">';
 	}
-	print '<a href="'.$_SERVER['REQUEST_URI'].'?register='.$element->id.'">';
-	show_category_image($element, $upload_dir);
-	print '</a></td>';
+//	print '<a href="'.$_SERVER['REQUEST_URI'].'?register='.$element->id.'">';
+	show_category_image($register, $upload_dir);
+	print '</td>';
 }
 
 print '</td></tr>';
@@ -440,13 +443,13 @@ if (GETPOST('register')) {
 
 	foreach ($selectedRegisterChildren as $pertinence) {
 		if ($pertinence->id == GETPOST('pertinence')) {
-			print '<td style="border: solid">';
+			print '<td class="ticket-pertinence" id="'.$pertinence->id.'" style="border: solid">';
 		} else {
-			print '<td>';
+			print '<td class="ticket-pertinence" id="'.$pertinence->id.'">';
 		}
-		print '<a href="'.$_SERVER['REQUEST_URI'].'&pertinence='.$pertinence->id.'">';
+//		print '<a href="'.$_SERVER['REQUEST_URI'].'&pertinence='.$pertinence->id.'">';
 		show_category_image($pertinence, $upload_dir);
-		print '</a></td>';
+		print '</td>';
 	}
 
 } else {
@@ -462,15 +465,19 @@ $serviceChildren = $serviceCategory[0]->get_filles();
 
 foreach ($serviceChildren as $service) {
 	if ($service->id == GETPOST('service')) {
-		print '<td style="border: solid">';
+		print '<td class="ticket-service" id="'.$service->id.'" style="border: solid">';
 	} else {
-		print '<td>';
+		print '<td class="ticket-service" id="'.$service->id.'">';
 	}
-	print '<a href="'.$_SERVER['REQUEST_URI'].'&service='.$service->id.'">';
+//	print '<a href="'.$_SERVER['REQUEST_URI'].'&service='.$service->id.'">';
 	show_category_image($service, $upload_dir);
-	print '</a></td>';
+	print '</td>';
 }
 print '</td></tr>';
+print '</table>';
+print '<br>';
+print '</div>';
+print '<table class="border centpercent tableforinputfields">'."\n";
 
 print '<tr><td>'.$langs->trans("Firstname").'</td><td>';
 print '<input name="firstname" "type=text value="">';
