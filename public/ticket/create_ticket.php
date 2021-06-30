@@ -61,7 +61,7 @@ require_once '../../lib/digiriskdolibarr_function.lib.php';
 
 global $langs;
 // Load translation files required by the page
-$langs->loadLangs(array('companies', 'other', 'mails', 'ticket'));
+$langs->loadLangs(array('companies', 'other', 'mails', 'ticket', 'digiriskdolibarr@digiriskdolibarr'));
 
 // Get parameters
 $id = GETPOST('id', 'int');
@@ -81,7 +81,6 @@ $extrafields->fetch_name_optionals_label($object->table_element);
 
 $upload_dir         = $conf->categorie->multidir_output[isset($object->entity) ? $object->entity : 1];
 
-$params = '?register=' . GETPOST('register') . '&pertinence=' . GETPOST('pertinence') . '&service=' . GETPOST('service') . '&firstname=' . GETPOST('firstname') . '&lastname' . GETPOST('lastname') . '&message' . GETPOST('message');
 /*
  * Actions
  */
