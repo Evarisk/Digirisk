@@ -733,6 +733,14 @@ Unsigned = Non signé
 Absent = Absent
 JustifiedAbsent = Absence justifiée
 
+#
+# Ticket - Interface publique ticket
+#
+
+# Data - Donnée
+Register = Registre
+Send = Envoyer
+TicketSend = Ticket envoyé
 
 #
 # Other

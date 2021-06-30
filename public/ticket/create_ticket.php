@@ -122,6 +122,12 @@ if ($action == 'add') {
 		$serviceCat = $category;
 		$serviceCat->fetch($service);
 		$serviceCat->add_type($object, Categorie::TYPE_TICKET);
+
+		// Creation OK
+		$urltogo = $_SERVER['PHP_SELF'];
+		setEventMessages($langs->trans("TicketSend", ''), null);
+		header("Location: ".$urltogo);
+		exit;
 	}
 
 }
