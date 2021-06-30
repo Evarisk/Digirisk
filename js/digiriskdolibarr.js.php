@@ -2359,6 +2359,153 @@ window.eoxiaJS.notice.closeNotice = function( event ) {
 	$(this).closest('.notice').addClass("hidden");
 };
 
+
+/**
+ * Initialise l'objet "ticket" ainsi que la méthode "init" obligatoire pour la bibliothèque EoxiaJS.
+ *
+ * @since   1.1.0
+ * @version 1.1.0
+ */
+window.eoxiaJS.ticket = {};
+
+/**
+ * La méthode appelée automatiquement par la bibliothèque EoxiaJS.
+ *
+ * @since   1.1.0
+ * @version 1.1.0
+ *
+ * @return {void}
+ */
+window.eoxiaJS.ticket.init = function() {
+	window.eoxiaJS.ticket.event();
+};
+
+/**
+ * La méthode contenant tous les évènements pour les tickets.
+ *
+ * @since   1.1.0
+ * @version 1.1.0
+ *
+ * @return {void}
+ */
+window.eoxiaJS.ticket.event = function() {
+	jQuery( document ).on( 'click', '.ticket-register', window.eoxiaJS.ticket.selectRegister );
+	jQuery( document ).on( 'click', '.ticket-pertinence', window.eoxiaJS.ticket.selectPertinence );
+	jQuery( document ).on( 'click', '.ticket-service', window.eoxiaJS.ticket.selectService );
+};
+
+/**
+ * Mets à jour les input du formulaire
+ *
+ * @since   1.1.0
+ * @version 1.1.0
+ *
+ * @return {void}
+ */
+window.eoxiaJS.ticket.updateFormData = function( ) {
+
+	let requestParams = '?'
+
+	let register = window.eoxiaJS.ticket.getRegister()
+	if (register > 0) {
+		requestParams += 'register=' + register + '&'
+	}
+
+	let pertinence = window.eoxiaJS.ticket.getPertinence()
+	if (pertinence > 0) {
+		requestParams += 'pertinence=' + pertinence  + '&'
+	}
+
+	let service = window.eoxiaJS.ticket.getService()
+	if (service > 0) {
+		requestParams += 'service=' + service
+	}
+
+	$('.img-fields-container').load(document.URL + requestParams + ' .tableforimgfields');
+};
+
+/**
+ * Clique sur un des registres de la liste.
+ *
+ * @since   1.1.0
+ * @version 1.1.0
+ *
+ * @return {void}
+ */
+window.eoxiaJS.ticket.selectRegister = function( ) {
+	let registerInput = $('.ticketpublicarea').find("#register");
+	registerInput.val($(this).attr('id'))
+
+	window.eoxiaJS.ticket.updateFormData()
+};
+
+/**
+ * Récupère la valeur du registre sélectionné
+ *
+ * @since   1.1.0
+ * @version 1.1.0
+ *
+ * @return {void}
+ */
+window.eoxiaJS.ticket.getRegister = function( ) {
+	return $('.ticketpublicarea').find("#register").val()
+};
+
+/**
+ * Clique sur une des pertinences de la liste.
+ *
+ * @since   1.1.0
+ * @version 1.1.0
+ *
+ * @return {void}
+ */
+window.eoxiaJS.ticket.selectPertinence = function( ) {
+	let pertinenceInput = $('.ticketpublicarea').find("#pertinence");
+	pertinenceInput.val($(this).attr('id'))
+
+	window.eoxiaJS.ticket.updateFormData()
+};
+
+/**
+ * Récupère la valeur de la pertinence sélectionnée
+ *
+ * @since   1.1.0
+ * @version 1.1.0
+ *
+ * @return {void}
+ */
+
+window.eoxiaJS.ticket.getPertinence = function(  ) {
+	return $('.ticketpublicarea').find("#pertinence").val()
+};
+
+/**
+ * Clique sur un des services de la liste.
+ *
+ * @since   1.1.0
+ * @version 1.1.0
+ *
+ * @return {void}
+ */
+window.eoxiaJS.ticket.selectService = function( ) {
+	let serviceInput = $('.ticketpublicarea').find("#service");
+	serviceInput.val($(this).attr('id'))
+
+	window.eoxiaJS.ticket.updateFormData()
+};
+
+/**
+ * Récupère la valeur du service sélectionné
+ *
+ * @since   1.1.0
+ * @version 1.1.0
+ *
+ * @return {void}
+ */
+window.eoxiaJS.ticket.getService = function( ) {
+	return $('.ticketpublicarea').find("#service").val()
+};
+
 /**
  * Initialise l'objet "slider" ainsi que la méthode "init" obligatoire pour la bibliothèque EoxiaJS.
  *
