@@ -61,6 +61,15 @@ class PreventionPlan extends CommonObject
 	 */
 	public $picto = 'preventionplandocument@digiriskdolibarr';
 
+//	const STATUS_REGISTERED = 0;
+//	const STATUS_SIGNATURE_REQUEST = 1;
+//	const STATUS_PENDING_SIGNATURE = 2;
+//	const STATUS_DENIED = 3;
+//	const STATUS_SIGNED = 4;
+//	const STATUS_UNSIGNED = 5;
+//	const STATUS_ABSENT = 6;
+//	const STATUS_JUSTIFIED_ABSENT = 7;
+
 	/**
 	 * @var array  Array with all fields and their property. Do not use it as a static var. It may be modified by constructor.
 	 */

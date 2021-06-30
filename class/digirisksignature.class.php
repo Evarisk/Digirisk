@@ -24,6 +24,7 @@
 
 // Put here all includes required by your class file
 require_once DOL_DOCUMENT_ROOT.'/core/class/commonobject.class.php';
+require_once DOL_DOCUMENT_ROOT.'/core/lib/ticket.lib.php';
 //require_once DOL_DOCUMENT_ROOT . '/societe/class/societe.class.php';
 //require_once DOL_DOCUMENT_ROOT . '/product/class/product.class.php';
 
@@ -88,7 +89,7 @@ class DigiriskSignature extends CommonObject
 		'email'             => array('type'=>'varchar(255)', 'label'=>'Email', 'enabled'=>'1', 'position'=>90, 'notnull'=>0, 'visible'=>3,),
 		'phone'             => array('type'=>'varchar(255)', 'label'=>'Phone', 'enabled'=>'1', 'position'=>100, 'notnull'=>0, 'visible'=>3,),
 		'society_name'      => array('type'=>'varchar(255)', 'label'=>'SocietyName', 'enabled'=>'1', 'position'=>110, 'notnull'=>0, 'visible'=>3,),
-		'signature_date'    => array('type'=>'varchar(255)', 'label'=>'SignatureDate', 'enabled'=>'1', 'position'=>120, 'notnull'=>0, 'visible'=>3,),
+		'signature_date'    => array('type'=>'datetime', 'label'=>'SignatureDate', 'enabled'=>'1', 'position'=>120, 'notnull'=>0, 'visible'=>3,),
 		'signature_comment' => array('type'=>'varchar(255)', 'label'=>'SignatureComment', 'enabled'=>'1', 'position'=>130, 'notnull'=>0, 'visible'=>3,),
 		'element_id'        => array('type'=>'integer', 'label'=>'ElementType', 'enabled'=>'1', 'position'=>140, 'notnull'=>1, 'visible'=>1,),
 		'element_type'      => array('type'=>'varchar(50)', 'label'=>'ElementType', 'enabled'=>'1', 'position'=>150, 'notnull'=>0, 'visible'=>1,),
@@ -444,6 +445,8 @@ class DigiriskSignature extends CommonObject
 
 			$this->element_type = $element_type;
 			$this->element_id = $element_id;
+
+			$this->signature_url = generate_random_id(16);
 
 			$this->fk_object = $fk_object;
 

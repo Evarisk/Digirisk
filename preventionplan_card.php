@@ -762,7 +762,6 @@ if ((empty($action) || ($action != 'create' && $action != 'edit')))
 	print '<td>';
 	$ext_society = $digiriskresources->fetchResourcesFromObject('PP_EXT_SOCIETY', $object);
 	if ($ext_society > 0) {
-		$ext_society = array_shift($ext_society['PP_EXT_SOCIETY']);
 		print $ext_society->getNomUrl(1);
 	}
 	print '<br>';

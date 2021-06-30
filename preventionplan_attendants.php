@@ -82,6 +82,7 @@ if ($action == 'addSignature') {
 
 	$signatory->fetch($signatoryID);
 	$signatory->signature = $request_body;
+	$signatory->signature_date = dol_now();
 
 	if (!$error) {
 		$result = $signatory->update($user, false);
@@ -141,21 +142,27 @@ print '<div class="div-table-responsive">'; ?>
 print '<table class="border centpercent tableforfield">';
 print '<tr class="liste_titre">';
 print '<td>'.$langs->trans("Role").'</td>';
+print '<td>'.$langs->trans("SignatureDate").'</td>';
+print '<td>'.$langs->trans("PublicID").'</td>';
 print '<td>'.$langs->trans("Name").'</td>';
 print '<td class="center">'.$langs->trans("Action").'</td>';
 print '<td>'.$langs->trans("Status").'</td>';
 print '</tr>'."\n";
 
 //Master builder -- Maitre Oeuvre
-print '<tr class="oddeven"><td>';
-print $langs->trans("MaitreOeuvre");
-print '</td><td>';
 $element = $signatory->fetchSignatory('PP_MAITRE_OEUVRE', $id);
 if ($element > 0) {
 	$element = array_shift($element);
 	$usertmp->fetch($element->element_id);
-	print $usertmp->getNomUrl(1);
 }
+print '<tr class="oddeven"><td>';
+print $langs->trans("MaitreOeuvre");
+print '</td><td>';
+print dol_print_date($element->signature_date,'dayhour');
+print '</td><td>';
+print $element->signature_url;
+print '</td><td>';
+print $usertmp->getNomUrl(1);
 print '</td><td class="center">';
 require __DIR__ . "/core/tpl/digiriskdolibarr_signature_view.tpl.php";
 print '</td><td>';
@@ -163,15 +170,20 @@ print $element->getLibStatut(5);
 print '</td></tr>';
 
 //External Society Responsible -- Responsable Société extérieure
-print '<tr class="oddeven"><td>';
-print $langs->trans("ExtSocietyResponsible");
-print '</td><td>';
 $element = $signatory->fetchSignatory('PP_EXT_SOCIETY_RESPONSIBLE', $id);
 if ($element > 0) {
 	$element = array_shift($element);
 	$contact->fetch($element->element_id);
 	print $contact->getNomUrl(1);
 }
+print '<tr class="oddeven"><td>';
+print $langs->trans("ExtSocietyResponsible");
+print '</td><td>';
+print dol_print_date($element->signature_date,'dayhour');
+print '</td><td>';
+print $element->signature_url;
+print '</td><td>';
+print $usertmp->getNomUrl(1);
 print '</td><td class="center">';
 require __DIR__ . "/core/tpl/digiriskdolibarr_signature_view.tpl.php";
 print '</td><td>';
@@ -187,6 +199,8 @@ print load_fiche_titre($langs->trans("SignatureIntervenants"), '', '');
 print '<table class="border centpercent tableforfield">';
 print '<tr class="liste_titre">';
 print '<td>'.$langs->trans("Role").'</td>';
+print '<td>'.$langs->trans("SignatureDate").'</td>';
+print '<td>'.$langs->trans("PublicID").'</td>';
 print '<td>'.$langs->trans("Name").'</td>';
 print '<td class="center">'.$langs->trans("Action").'</td>';
 print '<td>'.$langs->trans("Status").'</td>';
@@ -200,6 +214,10 @@ if (is_array($ext_society_intervenants) && !empty ($ext_society_intervenants) &&
 		print '<tr class="oddeven"><td>';
 		print $langs->trans("ExtSocietyIntervenants") . ' ' . $j;
 		print '</td><td>';
+		print dol_print_date($element->signature_date,'dayhour');
+		print '</td><td>';
+		print $element->signature_url;
+		print '</td><td>';
 		$contact->fetch($element->element_id);
 		print $contact->getNomUrl(1);
 		print '</td><td class="center">';
@@ -210,8 +228,79 @@ if (is_array($ext_society_intervenants) && !empty ($ext_society_intervenants) &&
 		$j++;
 	}
 }else {
-	print '<td></td>';
+	print '<td></td>'; ?>
+	<?php if (!isset($_POST['send'])) : ?>
+		<form action="" method="post" class="form-file" enctype="multipart/form-data">
+			<div class="form-file">
+				<label for="form_id">ID entrée</label>
+				<input type="text" name="form_id" id="form_id" required>
+			</div>
+			<div class="form-file">
+				<label for="upload">Multi upload fichiers</label>
+				<input type="file" name="upload[]" id="upload" multiple>
+			</div>
+			<div class="form-file">
+				<input type="submit" name="send" value="Envoyer">
+			</div>
+		</form>
+	<?php else : ?>
+		<?php
+		$wp_upload_dir = wp_upload_dir();
+		$entry_id = $_POST['form_id'];
+
+		$entry_to_edit = GFAPI::get_entry( $entry_id ); // On récupère l'entrée.
+//		if (is_a($entry_to_edit, 'WP_Error')) {
+//			echo "<p class='message'>'Entrée' . $entry_id . n'existe pas</p>";
+//		} else {
+			$form = GFAPI::get_form($entry_to_edit['form_id']); // On récupère le formulaire associé à l'entrée.
+			$field_type = GFAPI::get_fields_by_type($form, 'fileupload', true); // On récupère le champs fileupload du formulaire avec son identifiant.
+
+			// On transforme la chaine string contenant les fichiers en tableau fonctionnel.
+			$files_array = $entry_to_edit[$field_type[0]['id']];
+			$files_array = preg_replace('/\[/', '', $files_array);
+			$files_array = preg_replace('/\]/', '', $files_array);
+			$files_array = preg_replace('/"/', '', $files_array);
+			$new_array = preg_split('/,/', $files_array);
+
+			// Count # of uploaded files in array
+			$total = count($_FILES['upload']['name']);
+
+			// Loop through each file
+			for ($i = 0; $i < $total; $i++) {
+
+				//Get the temp file path
+				$tmpFilePath = $_FILES['upload']['tmp_name'][$i];
+
+				//Make sure we have a file path
+				if ($tmpFilePath != "") {
+					//Setup our new file path
+					$newFilePath = $wp_upload_dir['basedir'] . '/beflex-documents/' . $_FILES['upload']['name'][$i];
+					//Upload the file into the temp dir
+					move_uploaded_file($tmpFilePath, $newFilePath);
+				}
+
+				// On ajoute l'URL du ou des média dans l'array total.
+				array_push($new_array, $wp_upload_dir['baseurl'] . '/beflex-documents/' . $_FILES['upload']['name'][$i]);
+			}
+
+			// On retransforme l'array en chaine string pour GF.
+			foreach ($new_array as $link) {
+				$final_array[] = '"' . $link . '"';
+			}
+			$final_string = implode(',', $final_array);
+			$final_string = '[' . $final_string . ']';
+
+			// On modifie la valeure dans l'entrée
+			$entry_to_edit[$field_type[0]['id']] = $final_string;
+
+			$result = GFAPI::update_entry($entry_to_edit); // Met à jour l'entrée GF.
+			if ($result > 0) {
+				echo "<p class='messagesucces'>'Entrée' . $entry_id . 'a été mise à jour' </p>";
+			}
+		?>
+	<?php endif; ?>
 }
+
 
 print '</tr>';
 print '</table>';

@@ -269,6 +269,7 @@ class doc_preventionplandocument_odt extends ModeleODTPreventionPlanDocument
 			}
 
 			$resources          = new DigiriskResources($this->db);
+			$signatory         = new PreventionPlanSignature($this->db);
 			$societe            = new Societe($this->db);
 			$preventionplanline = new PreventionPlanLine($this->db);
 			$risk               = new Risk($this->db);
@@ -278,8 +279,8 @@ class doc_preventionplandocument_odt extends ModeleODTPreventionPlanDocument
 			$digirisk_resources      = $resources->digirisk_dolibarr_fetch_resources();
 			$extsociety              = $resources->fetchResourcesFromObject('PP_EXT_SOCIETY', $preventionplan);
 			$extsocietyintervenants  = $resources->fetchResourcesFromObject('PP_EXT_SOCIETY_INTERVENANTS', $preventionplan);
-			$maitreoeuvre            = $resources->fetchResourcesFromObject('PP_MAITRE_OEUVRE', $preventionplan);
-			$extsocietyresponsible   = $resources->fetchResourcesFromObject('PP_EXT_SOCIETY_RESPONSIBLE', $preventionplan);
+			$maitreoeuvre            = array_shift($signatory->fetchSignatory('PP_MAITRE_OEUVRE', $preventionplan->id));
+			$extsocietyresponsible   = array_shift($signatory->fetchSignatory('PP_EXT_SOCIETY_RESPONSIBLE', $preventionplan->id));
 
 			$tmparray['titre_prevention']             = $preventionplan->ref;
 			$tmparray['unique_identifier']            = $preventionplan->label;
@@ -354,6 +355,8 @@ class doc_preventionplandocument_odt extends ModeleODTPreventionPlanDocument
 				$tmparray['intervenants_info'] = count($extsocietyintervenants);
 			}
 
+			$tempdir = $conf->digiriskdolibarr->multidir_output[isset($object->entity) ? $object->entity : 1] . '/temp/';
+
 			//Signatures
 			if (!empty( $maitreoeuvre) && $maitreoeuvre > 0) {
 				$tmparray['maitre_oeuvre_lname'] = $maitreoeuvre->lastname;
@@ -361,9 +364,11 @@ class doc_preventionplandocument_odt extends ModeleODTPreventionPlanDocument
 				$tmparray['maitre_oeuvre_email'] = $maitreoeuvre->email;
 				$tmparray['maitre_oeuvre_phone'] = $maitreoeuvre->phone;
 
-				//@todo when attendance will be created
-				$tmparray['maitre_oeuvre_signature_date'] = '';
-				$tmparray['maitre_oeuvre_signature']      = '';
+				$tmparray['maitre_oeuvre_signature_date'] = $maitreoeuvre->signature_date;
+				$encoded_image = explode(",",  $maitreoeuvre->signature)[1];
+				$decoded_image = base64_decode($encoded_image);
+				file_put_contents($tempdir."signature.png", $decoded_image);
+				$tmparray['maitre_oeuvre_signature'] = $tempdir."signature.png";
 			}
 
 			if (!empty( $extsocietyresponsible) && $extsocietyresponsible > 0) {
@@ -373,14 +378,17 @@ class doc_preventionplandocument_odt extends ModeleODTPreventionPlanDocument
 				$tmparray['intervenant_exterieur_phone'] = $extsocietyresponsible->phone;
 
 				//@todo when attendance will be created
-				$tmparray['intervenant_exterieur_signature_date'] = '';
-				$tmparray['intervenant_exterieur_signature']      = '';
+				$tmparray['intervenant_exterieur_signature_date'] = $extsocietyresponsible->signature_date;
+				$encoded_image = explode(",",  $extsocietyresponsible->signature)[1];
+				$decoded_image = base64_decode($encoded_image);
+				file_put_contents($tempdir."signature2.png", $decoded_image);
+				$tmparray['intervenant_exterieur_signature']      = $tempdir."signature2.png";
 			}
 
 			foreach ($tmparray as $key=>$value)
 			{
 				try {
-					if ($key == 'photoDefault') // Image
+					if ($key == 'photoDefault' || $key == 'maitre_oeuvre_signature' || $key == 'intervenant_exterieur_signature') // Image
 					{
 						$list = getimagesize($value);
 						$newWidth = 350;
@@ -512,6 +520,9 @@ class doc_preventionplandocument_odt extends ModeleODTPreventionPlanDocument
 				@chmod($file, octdec($conf->global->MAIN_UMASK));
 
 			$odfHandler = null; // Destroy object
+
+			dol_delete_file($tempdir."signature.png");
+			dol_delete_file($tempdir."signature2.png");
 
 			$this->result = array('fullpath'=>$file);
 
