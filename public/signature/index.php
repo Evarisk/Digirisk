@@ -22,17 +22,14 @@
  *       \brief      Public page to add and manage ticket
  */
 
-if (!defined('NOCSRFCHECK'))   define('NOCSRFCHECK', '1');
-if (!defined('NOREQUIREMENU')) define('NOREQUIREMENU', '1');
-if (!defined("NOLOGIN"))       define("NOLOGIN", '1'); // If this page is public (can be called outside logged session)
+if (!defined('NOREQUIREUSER'))  define('NOREQUIREUSER', '1');
+if (!defined('NOTOKENRENEWAL')) define('NOTOKENRENEWAL', '1');
+if (!defined('NOREQUIREMENU'))  define('NOREQUIREMENU', '1');
+if (!defined('NOREQUIREHTML'))  define('NOREQUIREHTML', '1');
+if (!defined('NOLOGIN'))        define("NOLOGIN", 1); // This means this output page does not require to be logged.
+if (!defined('NOCSRFCHECK'))    define("NOCSRFCHECK", 1); // We accept to go on this page from external web site.
 if (!defined('NOIPCHECK'))		define('NOIPCHECK', '1'); // Do not check IP defined into conf $dolibarr_main_restrict_ip
 if (!defined('NOBROWSERNOTIF')) define('NOBROWSERNOTIF', '1');
-
-// For MultiCompany module.
-// Do not use GETPOST here, function is not defined and define must be done before including main.inc.php
-// TODO This should be useless. Because entity must be retrieve from object ref and not from url.
-$entity = (!empty($_GET['entity']) ? (int) $_GET['entity'] : (!empty($_POST['entity']) ? (int) $_POST['entity'] : 1));
-if (is_numeric($entity)) define("DOLENTITY", $entity);
 
 // Load Dolibarr environment
 $res = 0;
@@ -55,9 +52,10 @@ require_once DOL_DOCUMENT_ROOT.'/core/lib/ticket.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/security.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/company.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/payments.lib.php';
+require_once '../../lib/digiriskdolibarr_function.lib.php';
 
 // Load translation files required by the page
-$langs->loadLangs(array('companies', 'other', 'ticket', 'errors'));
+$langs->loadLangs(array("digiriskdolibarr@digiriskdolibarr", "other", "errors"));
 
 // Get parameters
 $track_id = GETPOST('track_id', 'alpha');
@@ -77,10 +75,10 @@ if (empty($conf->global->TICKET_ENABLE_PUBLIC_INTERFACE))
 	exit;
 }
 
-$arrayofjs = array();
-$arrayofcss = array('/ticket/css/styles.css.php');
+$morejs   = array("/digiriskdolibarr/js/signature-pad.min.js", "/digiriskdolibarr/js/digiriskdolibarr.js.php");
+$morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");
 
-llxHeaderTicket($langs->trans("Tickets"), "", 0, 0, $arrayofjs, $arrayofcss);
+llxHeaderSignature($langs->trans("Tickets"), "", 0, 0, $morejs, $morecss);
 
 print '<div class="ticketpublicarea">';
 print '<p style="text-align: center">'.($conf->global->TICKET_PUBLIC_TEXT_HOME ? $conf->global->TICKET_PUBLIC_TEXT_HOME : $langs->trans("TicketPublicDesc")).'</p>';
@@ -90,8 +88,46 @@ print '<a href="list.php" rel="nofollow noopener" class="butAction marginbottomo
 print '<a href="view.php" rel="nofollow noopener" class="butAction marginbottomonly"><div class="index_display bigrounded">'.img_picto('', 'ticket').'<br>'.dol_escape_htmltag($langs->trans("ShowTicketWithTrackId")).'</div></a>';
 print '<div style="clear:both;"></div>';
 print '</div>';
-print '</div>';
+print '</div>'; ?>
 
+<?php if (empty($element->signature)) : ?>
+	<div class="wpeo-button button-blue wpeo-modal-event modal-signature-open modal-open" value="<?php echo $element->id ?>">
+		<span><?php echo $langs->trans('Sign'); ?></span>
+	</div>
+<?php else : ?>
+	<img class="wpeo-modal-event modal-signature-open modal-open" value="<?php echo $element->id ?>" src='<?php echo $element->signature ?>' width="100px" height="100px" style="border: #0b419b solid 2px">
+<?php endif; ?>
+
+<div class="modal-signature" value="<?php echo $element->id ?>">
+	<div class="wpeo-modal modal-signature" id="modal-signature<?php echo $element->id ?>">
+		<div class="modal-container wpeo-modal-event">
+			<!-- Modal-Header-->
+			<div class="modal-header">
+				<h2 class="modal-title"><?php echo $langs->trans('Signature'); ?></h2>
+				<div class="modal-close"><i class="fas fa-times"></i></div>
+			</div>
+			<!-- Modal-ADD Signature Content-->
+			<div class="modal-content" id="#modalContent">
+				<input type="hidden" id="signature_data<?php echo $element->id ?>" value="<?php echo $element->signature ?>">
+				<canvas style="height: 95%; width: 95%; border: #0b419b solid 2px"></canvas>
+			</div>
+			<!-- Modal-Footer-->
+			<div class="modal-footer">
+				<div class="signature-erase wpeo-button button-grey">
+					<span><i class="fas fa-eraser"></i> <?php echo $langs->trans('Erase'); ?></span>
+				</div>
+				<div class="wpeo-button button-grey modal-close">
+					<span><?php echo $langs->trans('Cancel'); ?></span>
+				</div>
+				<div class="signature-validate wpeo-button button-primary" value="<?php echo $element->id ?>">
+					<span><?php echo $langs->trans('Validate'); ?></span>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<?php
 // End of page
 htmlPrintOnlinePaymentFooter($mysoc, $langs, 0, $suffix, $object);
 

@@ -1032,3 +1032,64 @@ function show_category_image($object, $upload_dir) {
 	}
 
 }
+
+/**
+ * Show header for public page signature
+ *
+ * @param  string $title       Title
+ * @param  string $head        Head array
+ * @param  int    $disablejs   More content into html header
+ * @param  int    $disablehead More content into html header
+ * @param  array  $arrayofjs   Array of complementary js files
+ * @param  array  $arrayofcss  Array of complementary css files
+ * @return void
+ */
+function llxHeaderSignature($title, $head = "", $disablejs = 0, $disablehead = 0, $arrayofjs = '', $arrayofcss = '')
+{
+	global $user, $conf, $langs, $mysoc;
+
+	top_htmlhead($head, $title, $disablejs, $disablehead, $arrayofjs, $arrayofcss, 0, 1); // Show html headers
+
+	print '<body id="mainbody" class="publicnewsignatureform">';
+	print '<div class="center">';
+
+	// Define urllogo
+	if (!empty($conf->global->TICKET_SHOW_COMPANY_LOGO) || !empty($conf->global->TICKET_PUBLIC_INTERFACE_TOPIC)) {
+		// Print logo
+		if (!empty($conf->global->TICKET_SHOW_COMPANY_LOGO)) {
+			$urllogo = DOL_URL_ROOT.'/theme/common/login_logo.png';
+
+			if (!empty($mysoc->logo_small) && is_readable($conf->mycompany->dir_output.'/logos/thumbs/'.$mysoc->logo_small)) {
+				$urllogo = DOL_URL_ROOT.'/viewimage.php?modulepart=mycompany&amp;entity='.$conf->entity.'&amp;file='.urlencode('logos/thumbs/'.$mysoc->logo_small);
+			} elseif (!empty($mysoc->logo) && is_readable($conf->mycompany->dir_output.'/logos/'.$mysoc->logo)) {
+				$urllogo = DOL_URL_ROOT.'/viewimage.php?modulepart=mycompany&amp;entity='.$conf->entity.'&amp;file='.urlencode('logos/'.$mysoc->logo);
+			} elseif (is_readable(DOL_DOCUMENT_ROOT.'/theme/dolibarr_logo.svg')) {
+				$urllogo = DOL_URL_ROOT.'/theme/dolibarr_logo.svg';
+			}
+		}
+	}
+
+	// Output html code for logo
+	if ($urllogo || !empty($conf->global->TICKET_PUBLIC_INTERFACE_TOPIC)) {
+		print '<div class="backgreypublicpayment">';
+		print '<div class="logopublicpayment">';
+		if ($urllogo) {
+			print '<a href="'.($conf->global->TICKET_URL_PUBLIC_INTERFACE ? $conf->global->TICKET_URL_PUBLIC_INTERFACE : dol_buildpath('/public/ticket/index.php', 1)).'">';
+			print '<img id="dolpaymentlogo" src="'.$urllogo.'"';
+			print '>';
+			print '</a>';
+		}
+		if (!empty($conf->global->TICKET_PUBLIC_INTERFACE_TOPIC)) {
+			print '<div class="clearboth"></div><strong>'.($conf->global->TICKET_PUBLIC_INTERFACE_TOPIC ? $conf->global->TICKET_PUBLIC_INTERFACE_TOPIC : $langs->trans("TicketSystem")).'</strong>';
+		}
+		print '</div>';
+		if (empty($conf->global->MAIN_HIDE_POWERED_BY)) {
+			print '<div class="poweredbypublicpayment opacitymedium right"><a class="poweredbyhref?utm_medium=website&utm_source=poweredby" href="https://www.dolibarr.org" target="dolibarr" rel="noopener">'.$langs->trans("PoweredBy").'<br><img src="'.DOL_URL_ROOT.'/theme/dolibarr_logo.svg" width="80px"></a></div>';
+		}
+		print '</div>';
+	}
+
+	print '</div>';
+
+	print '<div class="ticketlargemargin">';
+}
