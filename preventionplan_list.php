@@ -77,7 +77,7 @@ $page      = GETPOSTISSET('pageplusone') ? (GETPOST('pageplusone') - 1) : GETPOS
 $page      = is_numeric($page) ? $page : 0;
 $page      = $page == -1 ? 0 : $page;
 
-if (!$sortfield) $sortfield = "t.ref";
+if (!$sortfield) $sortfield = "t.rowid";
 if (!$sortorder) $sortorder = "ASC";
 
 $offset = $limit * $page;
