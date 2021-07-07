@@ -36,6 +36,7 @@ if (!$res && file_exists("../../../main.inc.php")) $res = @include "../../../mai
 if (!$res) die("Include of main fails");
 
 require_once DOL_DOCUMENT_ROOT.'/core/class/html.formfile.class.php';
+require_once DOL_DOCUMENT_ROOT.'/core/class/doleditor.class.php';
 
 require_once __DIR__ . '/class/digiriskdocuments.class.php';
 require_once __DIR__ . '/class/digiriskelement.class.php';
@@ -156,11 +157,8 @@ if (empty($reshook))
 
 			if ($result > 0) {
 
-//				$digiriskresources->digirisk_dolibarr_set_resources($db, $user->id, 'PP_MAITRE_OEUVRE', 'user', array($maitre_oeuvre_id), $conf->entity, 'preventionplan', $object->id, 1);
-			$digiriskresources->digirisk_dolibarr_set_resources($db, $user->id, 'PP_EXT_SOCIETY', 'societe', array($extsociety_id), $conf->entity, 'preventionplan', $object->id, 1);
-//				$digiriskresources->digirisk_dolibarr_set_resources($db, $user->id, 'PP_EXT_SOCIETY_RESPONSIBLE', 'socpeople', $extresponsible_id, $conf->entity, 'preventionplan', $object->id, 1);
-			$digiriskresources->digirisk_dolibarr_set_resources($db, $user->id, 'PP_LABOUR_INSPECTOR_ASSIGNED', 'societe', array($labour_inspector_id), $conf->entity, 'preventionplan', $object->id, 1);
-//				$digiriskresources->digirisk_dolibarr_set_resources($db, $user->id, 'PP_EXT_SOCIETY_INTERVENANTS', 'socpeople', $extintervenant_ids, $conf->entity, 'preventionplan', $object->id, 1);
+				$digiriskresources->digirisk_dolibarr_set_resources($db, $user->id, 'PP_EXT_SOCIETY', 'societe', array($extsociety_id), $conf->entity, 'preventionplan', $object->id, 1);
+				$digiriskresources->digirisk_dolibarr_set_resources($db, $user->id, 'PP_LABOUR_INSPECTOR_ASSIGNED', 'societe', array($labour_inspector_id), $conf->entity, 'preventionplan', $object->id, 1);
 
 				$signatory->setSignatory($object->id,'user', array($maitre_oeuvre_id), 'PP_MAITRE_OEUVRE');
 				$signatory->setSignatory($object->id,'socpeople', array($extresponsible_id), 'PP_EXT_SOCIETY_RESPONSIBLE');
@@ -219,11 +217,12 @@ if (empty($reshook))
 
 			if ($result > 0) {
 
-				$digiriskresources->digirisk_dolibarr_set_resources($db, $user->id, 'PP_MAITRE_OEUVRE', 'user', array($maitre_oeuvre_id), $conf->entity, 'preventionplan', $object->id, 0);
 				$digiriskresources->digirisk_dolibarr_set_resources($db, $user->id, 'PP_EXT_SOCIETY', 'societe', array($extsociety_id), $conf->entity, 'preventionplan', $object->id, 0);
-				$digiriskresources->digirisk_dolibarr_set_resources($db, $user->id, 'PP_EXT_SOCIETY_RESPONSIBLE', 'socpeople', $extresponsible_id, $conf->entity, 'preventionplan', $object->id, 0);
-				$digiriskresources->digirisk_dolibarr_set_resources($db, $user->id, 'PP_LABOUR_DOCTOR_ASSIGNED', 'societe', array($labour_inspector_id), $conf->entity, 'preventionplan', $object->id, 0);
-				$digiriskresources->digirisk_dolibarr_set_resources($db, $user->id, 'PP_EXT_SOCIETY_INTERVENANTS', 'socpeople', $extintervenant_ids, $conf->entity, 'preventionplan', $object->id, 0);
+				$digiriskresources->digirisk_dolibarr_set_resources($db, $user->id, 'PP_LABOUR_INSPECTOR_ASSIGNED', 'societe', array($labour_inspector_id), $conf->entity, 'preventionplan', $object->id, 0);
+
+				$signatory->setSignatory($object->id,'user', array($maitre_oeuvre_id), 'PP_MAITRE_OEUVRE');
+				$signatory->setSignatory($object->id,'socpeople', array($extresponsible_id), 'PP_EXT_SOCIETY_RESPONSIBLE');
+				$signatory->setSignatory($object->id,'socpeople', $extintervenant_ids, 'PP_EXT_SOCIETY_INTERVENANTS');
 
 				// Creation prevention plan OK
 				$urltogo = str_replace('__ID__', $result, $backtopage);
@@ -523,10 +522,11 @@ if ($action == 'create')
 	print '</td>';
 	print '<td>';
 	print '<input type="checkbox" id="prior_visit_bool" name="prior_visit_bool"'.(GETPOSTISSET('prior_visit_bool') ? (GETPOST('prior_visit_bool', 'alpha') != '' ? ' checked=""' : '') : ' checked=""').'"> ';
-	$htmltext = $langs->trans("PriorVisitText");
-	print $form->textwithpicto('', $htmltext);
+	print '</td></tr>';
 
-	print '<input class="flat" type="text" size="36" name="prior_visit_text" id="prior_visit_text" value="">';
+	print '<tr class="oddeven"><td><label for="prior_visit_text">'.$langs->trans("PriorVisitText").'</label></td><td>';
+	$doleditor = new DolEditor('prior_visit_text', '', '', 90, 'dolibarr_notes', '', false, true, $conf->global->FCKEDITOR_ENABLE_SOCIETE, ROWS_3, '90%');
+	$doleditor->Create();
 	print '</td></tr>';
 
 	//Labour inspector -- Inspecteur du travail
@@ -577,11 +577,11 @@ if (($id || $ref) && $action == 'edit')
 
 	unset($object->fields['status']);
 	unset($object->fields['element_type']);
-	//unset($object->fields['fk_parent']);
 	unset($object->fields['last_main_doc']);
 	unset($object->fields['entity']);
 
 	$object_resources = $digiriskresources->fetchResourcesFromObject('', $object);
+	$object_signatories = $signatory->fetchSignatory('',$object->id);
 
 	print '<table class="border centpercent tableforfieldedit">'."\n";
 
@@ -604,16 +604,18 @@ if (($id || $ref) && $action == 'edit')
 	print $form->selectDate(dol_time_plus_duree(dol_now(),1,'y'), 'date_fin', 1, 1, 0);
 	print '</td></tr>';
 
+	$maitre_oeuvre = is_array($object_signatories['PP_MAITRE_OEUVRE']) ? array_shift($object_signatories['PP_MAITRE_OEUVRE'])->element_id : '';
+
 	//Maitre d'oeuvre
-	$userlist 	  = $form->select_dolusers(is_array($object_resources['PP_MAITRE_OEUVRE']) ? array_shift($object_resources['PP_MAITRE_OEUVRE'])->id : '', '', 0, null, 0, '', '', 0, 0, 0, 'AND u.statut = 1', 0, '', '', 0, 1);
+	$userlist 	  = $form->select_dolusers($maitre_oeuvre, '', 0, null, 0, '', '', 0, 0, 0, 'AND u.statut = 1', 0, '', '', 0, 1);
 
 	print '<tr>';
 	print '<td style="width:10%">'.$form->editfieldkey('MaitreOeuvre', 'MaitreOeuvre_id', '', $object, 0).'</td>';
 	print '<td class="maxwidthonsmartphone">';
 
-	if (!GETPOSTISSET('backtopage')) print ' <a href="'.DOL_URL_ROOT.'/user/card.php?action=create&backtopage='.urlencode($_SERVER["PHP_SELF"].'?action=create').'"><span class="fa fa-plus-circle valignmiddle paddingleft" title="'.$langs->trans("AddThirdParty").'"></span></a>';
+	print $form->selectarray('maitre_oeuvre', $userlist,$maitre_oeuvre, null, null, null, null, "40%", 0, 0, 0, '',1);
 
-	print $form->selectarray('maitre_oeuvre', $userlist, 0, null, null, null, null, "40%");
+	if (!GETPOSTISSET('backtopage')) print ' <a href="'.DOL_URL_ROOT.'/user/card.php?action=create&backtopage='.urlencode($_SERVER["PHP_SELF"].'?action=create').'" target="_blank"><span class="fa fa-plus-circle valignmiddle paddingleft" title="'.$langs->trans("AddUser").'"></span></a>';
 
 	print '</td></tr>';
 
@@ -623,7 +625,6 @@ if (($id || $ref) && $action == 'edit')
 	print '</td>';
 
 	print '<td>';
-	if (!GETPOSTISSET('backtopage')) print ' <a href="'.DOL_URL_ROOT.'/societe/card.php?action=create&backtopage='.urlencode($_SERVER["PHP_SELF"].'?action=create').'"><span class="fa fa-plus-circle valignmiddle paddingleft" title="'.$langs->trans("AddThirdParty").'"></span></a>';
 
 	$events = array();
 	$events[1] = array('method' => 'getContacts', 'url' => dol_buildpath('/core/ajax/contacts.php?showempty=1', 1), 'htmlname' => 'ext_society_responsible', 'params' => array('add-customer-contact' => 'disabled'));
@@ -635,12 +636,13 @@ if (($id || $ref) && $action == 'edit')
 		$ext_society_id = is_array($object_resources['PP_EXT_SOCIETY']) ? array_shift($object_resources['PP_EXT_SOCIETY'])->id : '';
 
 		print $form->select_company($ext_society_id, 'ext_society', '', 'SelectThirdParty', 1, 0, $events, 0, 'minwidth300');
-	}	print '<br>';
+	}
+	if (!GETPOSTISSET('backtopage')) print ' <a href="'.DOL_URL_ROOT.'/societe/card.php?action=create&backtopage='.urlencode($_SERVER["PHP_SELF"].'?action=create').'" target="_blank"><span class="fa fa-plus-circle valignmiddle paddingleft" title="'.$langs->trans("AddThirdParty").'"></span></a>';
 
 	print '</td></tr>';
 
 	//External responsible -- Responsable de la société extérieure
-	$ext_society_responsible_id = is_array($object_resources['PP_EXT_SOCIETY_RESPONSIBLE']) ? array_shift($object_resources['PP_EXT_SOCIETY_RESPONSIBLE'])->id : '';
+	$ext_society_responsible_id = is_array($object_signatories['PP_EXT_SOCIETY_RESPONSIBLE']) ? array_shift($object_signatories['PP_EXT_SOCIETY_RESPONSIBLE'])->id : '';
 	print '<tr class="oddeven"><td>'.$langs->trans("ExtSocietyResponsible").'</td><td>';
 	print $form->selectcontacts(GETPOST('ext_society', 'int'), $ext_society_responsible_id, 'ext_society_responsible[]', 1, '', '', 0, 'quatrevingtpercent', false, 0, array(), false, '', 'ext_society_responsible');
 
@@ -649,8 +651,8 @@ if (($id || $ref) && $action == 'edit')
 	//Intervenants extérieurs
 	$resources_ids = array();
 
-	if (!empty ($object_resources['PP_EXT_SOCIETY_INTERVENANTS']) && $object_resources['PP_EXT_SOCIETY_INTERVENANTS'] > 0) {
-		foreach ($object_resources['PP_EXT_SOCIETY_INTERVENANTS'] as $resource) {
+	if (!empty ($object_signatories['PP_EXT_SOCIETY_INTERVENANTS']) && $object_signatories['PP_EXT_SOCIETY_INTERVENANTS'] > 0) {
+		foreach ($object_signatories['PP_EXT_SOCIETY_INTERVENANTS'] as $resource) {
 			$resources_ids[] = $resource->id;
 		}
 	}
@@ -664,22 +666,23 @@ if (($id || $ref) && $action == 'edit')
 	print $langs->trans("CSSCTIntervention");
 	print '</td>';
 	print '<td>';
-	print '<input type="checkbox" id="cssct_intervention" name="cssct_intervention"'.($object->cssct_intervention? ' checked=""' : '').'"> ';
+	print '<input type="checkbox" id="cssct_intervention" name="cssct_intervention"'.($object->cssct_intervention ? ' checked=""' : '').'"> ';
 	$htmltext = $langs->trans("CSSCTInterventionText");
 	print $form->textwithpicto('', $htmltext);
 	print '<br>';
 	print '</td></tr>';
 
 	//Prior Visit -- Visite préalable
-	print '<tr><td class="tdtop">';
+	print '<tr class="oddeven"><td class="tdtop">';
 	print $langs->trans("PriorVisit");
 	print '</td>';
 	print '<td>';
 	print '<input type="checkbox" id="prior_visit_bool" name="prior_visit_bool"'.($object->prior_visit_bool? ' checked=""' : '').'"> ';
-	$htmltext = $langs->trans("PriorVisitText");
-	print $form->textwithpicto('', $htmltext);
+	print '</td></tr>';
 
-	print '<input class="flat" type="text" size="36" name="prior_visit_text" id="prior_visit_text" value="'.$object->prior_visit_text.'">';
+	print '<tr class="oddeven"><td><label for="prior_visit_text">'.$langs->trans("PriorVisitText").'</label></td><td>';
+	$doleditor = new DolEditor('prior_visit_text', $object->prior_visit_text, '', 90, 'dolibarr_notes', '', false, true, $conf->global->FCKEDITOR_ENABLE_SOCIETE, ROWS_3, '90%');
+	$doleditor->Create();
 	print '</td></tr>';
 
 	//Labour inspector -- Inspecteur du travail

@@ -46,7 +46,7 @@ class DigiriskSignature extends CommonObject
 	/**
 	 * @var string Name of table without prefix where object is stored. This is also the key used for extrafields management.
 	 */
-	public $table_element = 'digiriskdolibarr_digirisksignature';
+	public $table_element = 'digiriskdolibarr_preventionplan_signature';
 
 	/**
 	 * @var int  Does this object support multicompany module ?
@@ -64,14 +64,15 @@ class DigiriskSignature extends CommonObject
 	 */
 	public $picto = 'digirisksignature@digiriskdolibarr';
 
-	const STATUS_REGISTERED = 0;
-	const STATUS_SIGNATURE_REQUEST = 1;
-	const STATUS_PENDING_SIGNATURE = 2;
-	const STATUS_DENIED = 3;
-	const STATUS_SIGNED = 4;
-	const STATUS_UNSIGNED = 5;
-	const STATUS_ABSENT = 6;
-	const STATUS_JUSTIFIED_ABSENT = 7;
+	const STATUS_DELETED = 0;
+	const STATUS_REGISTERED = 1;
+	const STATUS_SIGNATURE_REQUEST = 2;
+	const STATUS_PENDING_SIGNATURE = 3;
+	const STATUS_DENIED = 4;
+	const STATUS_SIGNED = 5;
+	const STATUS_UNSIGNED = 6;
+	const STATUS_ABSENT = 7;
+	const STATUS_JUSTIFIED_ABSENT = 8;
 
 	/**
 	 * @var array  Array with all fields and their property. Do not use it as a static var. It may be modified by constructor.
@@ -242,6 +243,7 @@ class DigiriskSignature extends CommonObject
 		}
 
 		$resql = $this->db->query($sql);
+
 		if ($resql) {
 			$num = $this->db->num_rows($resql);
 			$i = 0;
@@ -398,19 +400,22 @@ class DigiriskSignature extends CommonObject
 	}
 
 	/**
-	 * Clone an object into another one
+	 * Create signatory in database
 	 *
-	 * @param varchar $ref name of resource
-	 * @param varchar $element_type type of resource
-	 * @param int $element_id Id of resource
+	 * @param int     $fk_object    ID of object linked
+	 * @param varchar $element_type Type of resource
+	 * @param int     $element_id   Id of resource
+	 * @param varchar $role         Role of resource
 	 */
 	function setSignatory($fk_object, $element_type, $element_ids, $role = "")
 	{
 		global $conf, $user;
 
 		$society = new Societe($this->db);
+		$this->deletePreviousSignatories($role, $fk_object);
 
 		foreach ( $element_ids as $element_id ) {
+
 			if ($element_type == 'user') {
 				$signatory_data = new User($this->db);
 
@@ -460,15 +465,54 @@ class DigiriskSignature extends CommonObject
 	}
 
 	/**
-	 * Clone an object into another one
+	 * Fetch signatory from database
 	 *
-	 * @param varchar $ref name of resource
-	 * @param varchar $element_type type of resource
-	 * @param int $element_id Id of resource
+	 * @param varchar $role      Role of resource
+	 * @param int     $fk_object ID of object linked
 	 */
 	function fetchSignatory($role = "", $fk_object)
 	{
-		return $this->fetchAll('', '', 0, 0, array('customsql' => 'fk_object = '.$fk_object .' AND '.'role = '.'"'.$role.'"'), 'AND');
+		$filter = array('fk_object' => $fk_object, 'status' => 1);
+		if (strlen($role)) {
+			$filter['role'] = $role;
+
+			return $this->fetchAll('', '', 0, 0, $filter, 'AND');
+		} else {
+
+			$signatories = $this->fetchAll('', '', 0, 0, $filter, 'AND');
+			if (!empty ($signatories) && $signatories > 0) {
+				foreach($signatories as $signatory) {
+					$signatoriesArray[$signatory->role][$signatory->id] = $signatory;
+				}
+
+				return $signatoriesArray;
+			} else {
+				return 0;
+			}
+		}
+	}
+
+	/**
+	 * Set previous signatories status to 0
+	 *
+	 * @param varchar $role      Role of resource
+	 * @param int     $fk_object ID of object linked
+	 */
+	function deletePreviousSignatories($role = "", $fk_object)
+	{
+		global $user;
+		$filter = array('customsql' => ' role="' . $role . '" AND fk_object=' . $fk_object . ' AND status=1');
+		$signatoriesToDelete = $this->fetchAll('', '', 0, 0, $filter, 'AND');
+
+		if ( ! empty($signatoriesToDelete) && $signatoriesToDelete > 0) {
+
+			foreach($signatoriesToDelete as $signatoryToDelete) {
+
+				$signatoryToDelete->status = 0;
+				$signatoryToDelete->update($user);
+
+			}
+		}
 	}
 }
 
