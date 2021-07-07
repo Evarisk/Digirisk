@@ -445,7 +445,7 @@ if ($action == 'create')
 	print '</td></tr>';
 
 
-	print '<tr class="oddeven"><td class="fieldrequired">'.$langs->trans("Label").'</td><td>';
+	print '<tr class="oddeven"><td>'.$langs->trans("Label").'</td><td>';
 	print '<input class="flat" type="text" size="36" name="label" id="label" value="">';
 	print '</td></tr>';
 
@@ -590,7 +590,7 @@ if (($id || $ref) && $action == 'edit')
 	print '</td></tr>';
 
 
-	print '<tr><td class="fieldrequired">'.$langs->trans("Label").'</td><td>';
+	print '<tr><td>'.$langs->trans("Label").'</td><td>';
 	print '<input class="flat" type="text" size="36" name="label" id="label" value="'.$object->label.'">';
 	print '</td></tr>';
 
