@@ -824,6 +824,9 @@ function digirisk_banner_tab($object, $paramid, $morehtml = '', $shownav = 1, $f
 
 	print '<div class="'.($onlybanner ? 'arearefnobottom ' : 'arearef ').'heightref valignmiddle centpercent">';
 	print $form->showrefnav($object, $paramid, $morehtml, $shownav, $fieldid, $fieldref, $morehtmlref, $moreparam, $nodbprefix, $morehtmlleft, $morehtmlstatus, $morehtmlright);
+	print '<div style="margin-left:40;">';
+	print $object->label;
+	print '</div>';
 	print '</div>';
 	print '<div class="underrefbanner clearboth"></div>';
 }
