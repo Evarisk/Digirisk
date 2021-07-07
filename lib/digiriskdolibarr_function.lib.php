@@ -254,7 +254,7 @@ function digirisk_show_photos($modulepart, $sdir, $size = 0, $nbmax = 0, $nbbyro
  *      @param      string              $removeaction       (optional) The action to remove a file
  * 		@return		string              					Output string with HTML array of documents (might be empty string)
  */
-function digiriskshowdocuments($modulepart, $modulesubdir, $filedir, $urlsource, $genallowed, $delallowed = 0, $modelselected = '', $allowgenifempty = 1, $forcenomultilang = 0, $notused = 0, $noform = 0, $param = '', $title = '', $buttonlabel = '', $codelang = '', $morepicto = '', $object = null, $hideifempty = 0, $removeaction = 'remove_file')
+function digiriskshowdocuments($modulepart, $modulesubdir, $filedir, $urlsource, $genallowed, $delallowed = 0, $modelselected = '', $allowgenifempty = 1, $forcenomultilang = 0, $notused = 0, $noform = 0, $param = '', $title = '', $buttonlabel = '', $codelang = '', $morepicto = '', $object = null, $hideifempty = 0, $removeaction = 'remove_file', $active = 1)
 {
 	global $db, $langs, $conf, $user, $hookmanager, $form;
 
@@ -373,8 +373,14 @@ function digiriskshowdocuments($modulepart, $modulesubdir, $filedir, $urlsource,
 		}
 
 		// Button
-		$genbutton = '<input class="button buttongen" id="'.$forname.'_generatebutton" name="'.$forname.'_generatebutton"';
-		$genbutton .= ' type="submit" value="'.$buttonlabel.'"';
+		if ($active) {
+			$genbutton = '<input class="button buttongen" id="'.$forname.'_generatebutton" name="'.$forname.'_generatebutton"';
+			$genbutton .= ' type="submit" value="'.$buttonlabel.'"';
+		} else {
+			$genbutton = '<input class="button disabled" style="pointer-events:none" id="'.$forname.'_generatebutton" name="'.$forname.'_generatebutton"';
+			$genbutton .= '  value="'.$buttonlabel.'"';
+		}
+
 		if (!$allowgenifempty && !is_array($modellist) && empty($modellist)) $genbutton .= ' disabled';
 		$genbutton .= '>';
 		if ($allowgenifempty && !is_array($modellist) && empty($modellist) && empty($conf->dol_no_mouse_hover) && $modulepart != 'unpaid')
@@ -385,6 +391,15 @@ function digiriskshowdocuments($modulepart, $modulesubdir, $filedir, $urlsource,
 		if (!$allowgenifempty && !is_array($modellist) && empty($modellist) && empty($conf->dol_no_mouse_hover) && $modulepart != 'unpaid') $genbutton = '';
 		if (empty($modellist) && !$showempty && $modulepart != 'unpaid') $genbutton = '';
 		$out .= $genbutton;
+		if (!$active) {
+			$htmltooltip = '';
+			$htmltooltip .= $langs->trans("SetStartEndDateBefore");
+
+			$out .= '<span class="center">';
+			$out .= $form->textwithpicto($langs->trans('Help'), $htmltooltip, 1, 0);
+			$out .= '</span>';
+		}
+
 		$out .= '</th>';
 
 		if (!empty($hookmanager->hooks['formfile']))

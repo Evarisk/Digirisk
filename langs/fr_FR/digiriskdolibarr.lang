@@ -422,7 +422,7 @@ Recipient = Destinataire
 Sources = Sources
 ImportantNote = Remarque importante
 SitePlans = Localisation des plans
-
+SetStartEndDateBefore = Définissez la date de début et la date de fin d'audit sur cette page pour générer ce document
 #
 # GroupmentDocument - Fiche Groupement
 #
