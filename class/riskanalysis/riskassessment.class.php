@@ -181,12 +181,12 @@ class RiskAssessment extends CommonObject
 	 * @param int    $parent_id   Id parent object
 	 * @return int         <0 if KO, 0 if not found, >0 if OK
 	 */
-	public function fetchFromParent($parent_id, $active = 0)
+	public function fetchFromParent($parent_id, $active = 0, $desc = '')
 	{
 		$filter = array('customsql' => 'fk_risk=' . $this->db->escape($parent_id));
 		if ($active) $filter['status'] = 1;
 
-		return $this->fetchAll('', '', 0, 0, $filter, 'AND');
+		return $this->fetchAll($desc, 'rowid', 0, 0, $filter, 'AND');
 	}
 
 	/**

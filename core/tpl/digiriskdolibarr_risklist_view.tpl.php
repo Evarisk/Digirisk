@@ -872,7 +872,7 @@
 					$lastEvaluation = $evaluation->fetchFromParent($risk->id, 1);
 					if (!empty ($lastEvaluation) && $lastEvaluation > 0) {
 						$lastEvaluation = array_shift($lastEvaluation);
-						$cotationList = $evaluation->fetchFromParent($risk->id); ?>
+						$cotationList = $evaluation->fetchFromParent($risk->id, 0, 'DESC'); ?>
 						<div class="risk-evaluation-container risk-evaluation-container-<?php echo $risk->id ?>" value="<?php echo $risk->id ?>">
 							<!-- RISK EVALUATION SINGLE -->
 							<div class="risk-evaluation-single-content risk-evaluation-single-content-<?php echo $risk->id ?>">
