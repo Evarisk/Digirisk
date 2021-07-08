@@ -745,6 +745,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit')))
 
 	dol_banner_tab($object, 'ref', '', 0, 'ref', 'ref', $morehtmlref, '', 0, $morehtmlleft);
 
+	print '<div class="div-table-responsive">';
 	print '<div class="fichecenter">';
 	print '<div class="fichehalfleft">';
 	print '<div class="underbanner clearboth"></div>';
