@@ -642,10 +642,10 @@ if (($id || $ref) && $action == 'edit')
 	print '</td></tr>';
 
 	//External responsible -- Responsable de la société extérieure
-	$ext_society_responsible_id = is_array($object_signatories['PP_EXT_SOCIETY_RESPONSIBLE']) ? array_shift($object_signatories['PP_EXT_SOCIETY_RESPONSIBLE'])->id : '';
-	print '<tr class="oddeven"><td>'.$langs->trans("ExtSocietyResponsible").'</td><td>';
-	print $form->selectcontacts(GETPOST('ext_society', 'int'), $ext_society_responsible_id, 'ext_society_responsible[]', 1, '', '', 0, 'quatrevingtpercent', false, 0, array(), false, '', 'ext_society_responsible');
+	$ext_society_responsible_id = is_array($object_signatories['PP_EXT_SOCIETY_RESPONSIBLE']) ? array_shift($object_signatories['PP_EXT_SOCIETY_RESPONSIBLE'])->element_id : '';
 
+	print '<tr class="oddeven"><td>'.$langs->trans("ExtSocietyResponsible").'</td><td>';
+	print $form->selectcontacts(GETPOST('ext_society', 'int'), $ext_society_responsible_id, 'ext_society_responsible', 0, '', '', 0, 'quatrevingtpercent', false, 0, array(), false, '', 'ext_society_responsible');
 	print '</td></tr>';
 
 	//Intervenants extérieurs
@@ -653,12 +653,11 @@ if (($id || $ref) && $action == 'edit')
 
 	if (!empty ($object_signatories['PP_EXT_SOCIETY_INTERVENANTS']) && $object_signatories['PP_EXT_SOCIETY_INTERVENANTS'] > 0) {
 		foreach ($object_signatories['PP_EXT_SOCIETY_INTERVENANTS'] as $resource) {
-			$resources_ids[] = $resource->id;
+			$resources_ids[] = $resource->element_id;
 		}
 	}
 	print '<tr class="oddeven"><td>'.$langs->trans("ExtSocietyIntervenants").'</td><td>';
-	print $form->selectcontacts(GETPOST('ext_society', 'int'),$resources_ids, 'ext_intervenants[]', 1, '', '', 0, 'quatrevingtpercent', false, 0, array(), false, 'multiple', 'ext_intervenants');
-
+	print $form->selectcontacts(GETPOST('ext_society', 'int'),$resources_ids, 'ext_intervenants[]', 0, '', '', 0, 'quatrevingtpercent', false, 0, array(), false, 'multiple', 'ext_intervenants');
 	print '</td></tr>';
 
 	// CSSCT Intervention
