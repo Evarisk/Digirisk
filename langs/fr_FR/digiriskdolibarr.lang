@@ -260,7 +260,7 @@ ReadPreventionPlan = Lire un plan de prévention
 CreatePreventionPlan = Créer un plan de prévention
 DeletePreventionPlan = Supprimer un plan de prévention
 NewPreventionPlan = Nouveau plan de prévention
-
+PreventionPlanDet = Lignes des plans de prévention
 # Trigger - Déclencheur
 PREVENTIONPLAN_CREATEInDolibarr = Plan de prévention créé dans Dolibarr
 ActionsOnPreventionPlan = Événements liés au plan de prévention
@@ -270,15 +270,20 @@ PreventionPlanLineCreatedWithDolibarr = Ligne de Permis de Feu créée avec Doli
 # Mod Numbering - Modèle de numérotation
 DigiriskPreventionPlanNumberingModule = Modèle de numérotation des plans de prévention de Digirisk
 DigiriskPreventionPlanStandardModel = Renvoie le numéro sous la forme PPn où n est un compteur séquentiel sans rupture et sans remise à 0.
+DigiriskPreventionPlanDetNumberingModule = Modèle de numérotation des lignes de plan de prévention de Digirisk
+DigiriskPreventionPlanDetStandardModel = Renvoie le numéro sous la forme PPRn où n est un compteur séquentiel sans rupture et sans remise à 0.
+DigiriskPreventionPlanDocumentNumberingModule = Module de numérotation des fiches de plan de prévention
+DigiriskPreventionPlanDocumentStandardModel = Renvoie le numéro sous la forme PPDn où n est un compteur séquentiel sans rupture et sans remise à 0.
 
 # ODT Template - Template ODT
 DigiriskTemplateDocumentPreventionPlan = Modèle de documents des plans de prévention de Digirisk
-PreventionPlanCustomDigiriskTemplate = ODT custom des plans de prévention
-PreventionPlanDigiriskTemplate = ODT par défaut des plans de prévention
+PreventionPlanDocumentCustomDigiriskTemplate = ODT custom des plans de prévention
+PreventionPlanDocumentDigiriskTemplate = ODT par défaut des plans de prévention
 PreventionPlanDocument = Fiche de Plan de Prévention
 PreventionPlanDocumentGeneratedWithDolibarr = Plan de prévention généré avec Dolibarr
 
 # Data - Donnée
+
 PreventionPlan = Plan de prévention
 PreventionPlanLine = risque(s)
 PriorVisit = Visite préliminaire
