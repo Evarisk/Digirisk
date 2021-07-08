@@ -1319,7 +1319,6 @@ window.eoxiaJS.evaluation.selectEvaluationMethod = function ( event ) {
 	if (multiple_method > 0) {
 		elementParent.find('.select-evaluation-method.selected').removeClass('selected');
 
-
 		$(this).addClass('selected');
 		$(this).removeClass('button-grey');
 		$(this).addClass('button-blue');
@@ -1328,19 +1327,19 @@ window.eoxiaJS.evaluation.selectEvaluationMethod = function ( event ) {
 		elementParent.find('.select-evaluation-method:not(.selected)').addClass('button-grey');
 
 		if ($(this).hasClass('evaluation-standard')) {
-			$('.cotation-advanced').attr('style', 'display:none');
-			$('.cotation-standard').attr('style', 'display:block');
-			$('.risk-evaluation-calculated-cotation').attr('style', 'display:none')
-			$('.risk-evaluation-method').val('standard');
-			$(this).closest('.risk-evaluation-container').removeClass('advanced');
-			$(this).closest('.risk-evaluation-container').addClass('standard');
+			elementParent.find('.cotation-advanced').attr('style', 'display:none');
+			elementParent.find('.cotation-standard').attr('style', 'display:block');
+			elementParent.find('.risk-evaluation-calculated-cotation').attr('style', 'display:none')
+			elementParent.find('.risk-evaluation-method').val('standard');
+			elementParent.find(this).closest('.risk-evaluation-container').removeClass('advanced');
+			elementParent.find(this).closest('.risk-evaluation-container').addClass('standard');
 		} else {
-			$('.cotation-standard').attr('style', 'display:none');
-			$('.cotation-advanced').attr('style', 'display:block');
-			$('.risk-evaluation-calculated-cotation').attr('style', 'display:block');
-			$('.risk-evaluation-method').val('advanced');
-			$(this).closest('.risk-evaluation-container').addClass('advanced');
-			$(this).closest('.risk-evaluation-container').removeClass('standard');
+			elementParent.find('.cotation-standard').attr('style', 'display:none');
+			elementParent.find('.cotation-advanced').attr('style', 'display:block');
+			elementParent.find('.risk-evaluation-calculated-cotation').attr('style', 'display:block');
+			elementParent.find('.risk-evaluation-method').val('advanced');
+			elementParent.find(this).closest('.risk-evaluation-container').addClass('advanced');
+			elementParent.find(this).closest('.risk-evaluation-container').removeClass('standard');
 		}
 	}
 };
@@ -1690,9 +1689,9 @@ window.eoxiaJS.evaluationMethodEvarisk.selectSeuil = function( event ) {
 
 		fetch('js/json/default.json').then(response => response.json()).then(data => {
 			let cotationAfterAdapt = data[0].option.matrix[cotationBeforeAdapt];
-			$('.risk-evaluation-calculated-cotation').find('.risk-evaluation-cotation').attr('data-scale', window.eoxiaJS.evaluation.getDynamicScale(cotationAfterAdapt));
-			$('.risk-evaluation-calculated-cotation').find('.risk-evaluation-cotation span').text(cotationAfterAdapt);
-			$('.risk-evaluation-content').find('.risk-evaluation-seuil').val(cotationAfterAdapt);
+			elementParent.find('.risk-evaluation-calculated-cotation').find('.risk-evaluation-cotation').attr('data-scale', window.eoxiaJS.evaluation.getDynamicScale(cotationAfterAdapt));
+			elementParent.find('.risk-evaluation-calculated-cotation').find('.risk-evaluation-cotation span').text(cotationAfterAdapt);
+			elementParent.find('.risk-evaluation-content').find('.risk-evaluation-seuil').val(cotationAfterAdapt);
 			window.eoxiaJS.risk.haveDataInInput(elementParent);
 		})
 	}
