@@ -61,6 +61,48 @@ $langs->loadLangs(array("digiriskdolibarr@digiriskdolibarr", "other", "errors"))
 $track_id = GETPOST('track_id', 'alpha');
 $action = GETPOST('action', 'aZ09');
 
+/*
+/*
+ * Actions
+ */
+
+$parameters = array();
+$reshook = $hookmanager->executeHooks('doActions', $parameters, $object, $action); // Note that $action and $object may have been modified by some hooks
+if ($reshook < 0) setEventMessages($hookmanager->error, $hookmanager->errors, 'errors');
+
+// Action to add record
+if ($action == 'addSignature') {
+	$signatoryID = GETPOST('signatoryID');
+	$signature = GETPOST('signature');
+	$request_body = file_get_contents('php://input');
+
+	echo '<pre>';
+	print_r('test');
+	echo '</pre>';
+	exit;
+
+	$signatory->fetch($signatoryID);
+	$signatory->signature = $request_body;
+	$signatory->signature_date = dol_now();
+
+	if (!$error) {
+		$result = $signatory->update($user, false);
+		if ($result > 0) {
+			$signatory->setSigned($user, false);
+			// Creation signature OK
+			$urltogo = str_replace('__ID__', $result, $backtopage);
+			$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
+			header("Location: " . $urltogo);
+			exit;
+		}
+		else
+		{
+			// Creation signature KO
+			if (!empty($signatory->errors)) setEventMessages(null, $signatory->errors, 'errors');
+			else  setEventMessages($signatory->error, null, 'errors');
+		}
+	}
+}
 
 /*
  * View
@@ -78,56 +120,34 @@ if (empty($conf->global->TICKET_ENABLE_PUBLIC_INTERFACE))
 $morejs   = array("/digiriskdolibarr/js/signature-pad.min.js", "/digiriskdolibarr/js/digiriskdolibarr.js.php");
 $morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");
 
-llxHeaderSignature($langs->trans("Tickets"), "", 0, 0, $morejs, $morecss);
+llxHeaderSignature($langs->trans("Signature"), "", 0, 0, $morejs, $morecss);
 
 print '<div class="ticketpublicarea">';
 print '<p style="text-align: center">'.($conf->global->TICKET_PUBLIC_TEXT_HOME ? $conf->global->TICKET_PUBLIC_TEXT_HOME : $langs->trans("TicketPublicDesc")).'</p>';
 print '<div class="ticketform">';
-print '<a href="create_ticket.php" rel="nofollow noopener" class="butAction marginbottomonly"><div class="index_create bigrounded"><span class="fa fa-plus-circle valignmiddle btnTitle-icon"></span><br>'.dol_escape_htmltag($langs->trans("CreateTicket")).'</div></a>';
-print '<a href="list.php" rel="nofollow noopener" class="butAction marginbottomonly"><div class="index_display bigrounded"><span class="fa fa-list-alt valignmiddle btnTitle-icon"></span><br>'.dol_escape_htmltag($langs->trans("ViewMyTicketList")).'</div></a>';
-print '<a href="view.php" rel="nofollow noopener" class="butAction marginbottomonly"><div class="index_display bigrounded">'.img_picto('', 'ticket').'<br>'.dol_escape_htmltag($langs->trans("ShowTicketWithTrackId")).'</div></a>';
 print '<div style="clear:both;"></div>';
 print '</div>';
-print '</div>'; ?>
+print '</div>';
 
-<?php if (empty($element->signature)) : ?>
-	<div class="wpeo-button button-blue wpeo-modal-event modal-signature-open modal-open" value="<?php echo $element->id ?>">
-		<span><?php echo $langs->trans('Sign'); ?></span>
-	</div>
-<?php else : ?>
-	<img class="wpeo-modal-event modal-signature-open modal-open" value="<?php echo $element->id ?>" src='<?php echo $element->signature ?>' width="100px" height="100px" style="border: #0b419b solid 2px">
-<?php endif; ?>
+$url = dirname($_SERVER['PHP_SELF']) . '/add_signature.php';
 
-<div class="modal-signature" value="<?php echo $element->id ?>">
-	<div class="wpeo-modal modal-signature" id="modal-signature<?php echo $element->id ?>">
-		<div class="modal-container wpeo-modal-event">
-			<!-- Modal-Header-->
-			<div class="modal-header">
-				<h2 class="modal-title"><?php echo $langs->trans('Signature'); ?></h2>
-				<div class="modal-close"><i class="fas fa-times"></i></div>
-			</div>
-			<!-- Modal-ADD Signature Content-->
-			<div class="modal-content" id="#modalContent">
-				<input type="hidden" id="signature_data<?php echo $element->id ?>" value="<?php echo $element->signature ?>">
-				<canvas style="height: 95%; width: 95%; border: #0b419b solid 2px"></canvas>
-			</div>
-			<!-- Modal-Footer-->
-			<div class="modal-footer">
-				<div class="signature-erase wpeo-button button-grey">
-					<span><i class="fas fa-eraser"></i> <?php echo $langs->trans('Erase'); ?></span>
-				</div>
-				<div class="wpeo-button button-grey modal-close">
-					<span><?php echo $langs->trans('Cancel'); ?></span>
-				</div>
-				<div class="signature-validate wpeo-button button-primary" value="<?php echo $element->id ?>">
-					<span><?php echo $langs->trans('Validate'); ?></span>
-				</div>
-			</div>
-		</div>
-	</div>
-</div>
+print '<div id="form_view_ticket">';
+print '<form method="post" name="form_view_ticket"  enctype="multipart/form-data" action="'.$url.'">';
+print '<input type="hidden" name="token" value="'.newToken().'">';
+print '<input type="hidden" name="action" value="index">';
 
-<?php
+print '<p><label for="track_id" style="display: inline-block; width: 30%; "><span class="fieldrequired">'.$langs->trans("SignatureTrackId").'</span></label>';
+print '<input size="30" id="track_id" name="track_id" value="'.(GETPOST('track_id', 'alpha') ? GETPOST('track_id', 'alpha') : '').'" />';
+print '</p>';
+
+print '<p style="text-align: center; margin-top: 1.5em;">';
+print '<input class="button" type="submit" name="btn_view_ticket" value="'.$langs->trans('Signed').'" />';
+print "</p>\n";
+
+print "</form>\n";
+print "</div>\n";
+
+
 // End of page
 htmlPrintOnlinePaymentFooter($mysoc, $langs, 0, $suffix, $object);
 
