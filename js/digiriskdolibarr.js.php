@@ -830,6 +830,7 @@ window.eoxiaJS.signature.init = function() {
 window.eoxiaJS.signature.event = function() {
 	jQuery( document ).on( 'click', '.signature-erase', window.eoxiaJS.signature.clearCanvas );
 	jQuery( document ).on( 'click', '.signature-validate', window.eoxiaJS.signature.createSignature );
+	jQuery( document ).on( 'click', '.signature-absent', window.eoxiaJS.signature.setAbsent );
 };
 
 window.eoxiaJS.signature.modalSignatureOpened = function( triggeredElement ) {
@@ -863,7 +864,8 @@ window.eoxiaJS.signature.clearCanvas = function( event ) {
 };
 
 window.eoxiaJS.signature.createSignature = function() {
-	let elementSignatory       = $(this).attr('value');
+	let elementSignatory = $(this).attr('value');
+	let elementRedirect  = $(this).find('#redirect' + elementSignatory).attr('value');
 
 	var signatoryIDPost = '';
 	if (elementSignatory !== 0) {
@@ -875,13 +877,34 @@ window.eoxiaJS.signature.createSignature = function() {
 	}
 
 	$.ajax({
-		url: document.URL + '&action=addSignature' + signatoryIDPost,
+		url: document.URL + '?action=addSignature' + signatoryIDPost,
 		type: "POST",
 		processData: false,
 		contentType: 'application/octet-stream',
 		data: signature,
 		complete: function() {
-			window.location.reload();
+			window.location.replace(elementRedirect);
+		},
+		error: function ( ) {
+		}
+	});
+};
+
+window.eoxiaJS.signature.setAbsent = function() {
+	let elementSignatory = $(this).attr('value');
+
+	var signatoryIDPost = '';
+	if (elementSignatory !== 0) {
+		signatoryIDPost = '&signatoryID=' + elementSignatory;
+	}
+
+	$.ajax({
+		url: document.URL + '&action=setAbsent' + signatoryIDPost,
+		type: "POST",
+		processData: false,
+		contentType: false,
+		success: function() {
+			//window.location.reload();
 		},
 		error: function ( ) {
 		}

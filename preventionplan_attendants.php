@@ -103,6 +103,60 @@ if ($action == 'addSignature') {
 	}
 }
 
+// Action to set status STATUS_ABSENT
+if ($action == 'setAbsent') {
+	$signatoryID = GETPOST('signatoryID');
+
+	$signatory->fetch($signatoryID);
+
+	if (!$error) {
+		$result = $signatory->setAbsent($user, false);
+		if ($result > 0) {
+			// Creation signature OK
+			$urltogo = str_replace('__ID__', $result, $backtopage);
+			$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
+			header("Location: " . $urltogo);
+			exit;
+		}
+		else
+		{
+			// Creation signature KO
+			if (!empty($signatory->errors)) setEventMessages(null, $signatory->errors, 'errors');
+			else  setEventMessages($signatory->error, null, 'errors');
+		}
+	}
+}
+
+// Action to send Email
+if ($action == 'sendEmail') {
+	$signatoryID = GETPOST('signatoryID');
+
+	$signatory->fetch($signatoryID);
+
+	if (!$error) {
+		$result = $signatory->setAbsent($user, false);
+		if ($result > 0) {
+			// Creation signature OK
+			$urltogo = str_replace('__ID__', $result, $backtopage);
+			$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
+			header("Location: " . $urltogo);
+			exit;
+		}
+		else
+		{
+			// Creation signature KO
+			if (!empty($signatory->errors)) setEventMessages(null, $signatory->errors, 'errors');
+			else  setEventMessages($signatory->error, null, 'errors');
+		}
+	}
+
+	// Actions to send emails
+	$triggersendname = 'MYMODULE_MYOBJECT_SENTBYMAIL';
+	$autocopy = 'MAIN_MAIL_AUTOCOPY_MYOBJECT_TO';
+	$trackid = 'myobject'.$object->id;
+	include DOL_DOCUMENT_ROOT.'/core/actions_sendmails.inc.php';
+}
+
 /*
  *  View
  */

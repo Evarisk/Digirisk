@@ -1,3 +1,22 @@
+<div class="wpeo-dropdown">
+	<div class="dropdown-toggle wpeo-button button-main"><span>Label</span><i class="button-icon fas fa-caret-down"></i></div>
+	<ul class="dropdown-content">
+		<li class="dropdown-item">envoyer mail
+
+		</li>
+		<li class="dropdown-item">
+			<div class="signature-absent wpeo-button button-primary" value="<?php echo $element->id ?>">
+				<span><?php echo $langs->trans('Absent'); ?></span>
+			</div>
+		</li>
+		<li class="dropdown-item">
+			<div class="signature-email wpeo-button button-primary" value="<?php echo $element->id ?>">
+				<span><?php echo $langs->trans('SendEmail'); ?></span>
+			</div>
+		</li>
+	</ul>
+</div>
+
 <?php if (empty($element->signature)) : ?>
 	<div class="wpeo-button button-blue wpeo-modal-event modal-signature-open modal-open" value="<?php echo $element->id ?>">
 		<span><?php echo $langs->trans('Sign'); ?></span>
@@ -34,5 +53,7 @@
 		</div>
 	</div>
 </div>
+
+
 
 

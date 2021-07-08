@@ -183,11 +183,12 @@ class DigiriskSignature extends CommonObject
 	 *
 	 * @param int    $id   Id object
 	 * @param string $ref  Ref
+	 * @param string $morewhere  More SQL filters (' AND ...')
 	 * @return int         <0 if KO, 0 if not found, >0 if OK
 	 */
-	public function fetch($id, $ref = null)
+	public function fetch($id, $ref = null, $morewhere = '')
 	{
-		return $this->fetchCommon($id, $ref);
+		return $this->fetchCommon($id, $ref, $morewhere);
 	}
 
 	/**
@@ -307,6 +308,18 @@ class DigiriskSignature extends CommonObject
 	}
 
 	/**
+	 *	Set draft status
+	 *
+	 *	@param	User	$user			Object user that modify
+	 *  @param	int		$notrigger		1=Does not execute triggers, 0=Execute triggers
+	 *	@return	int						<0 if KO, >0 if OK
+	 */
+	public function setAbsent($user, $notrigger = 0)
+	{
+		return $this->setStatusCommon($user, self::STATUS_ABSENT, $notrigger, 'DIGIRISKSIGNATURE_ABSENT');
+	}
+
+	/**
 	 *	Set cancel status
 	 *
 	 *	@param	User	$user			Object user that modify
@@ -395,6 +408,7 @@ class DigiriskSignature extends CommonObject
 		}
 
 		$statusType = 'status'.$status;
+		if ($status == self::STATUS_ABSENT) $statusType = 'status8';
 
 		return dolGetStatus($this->labelStatus[$status], $this->labelStatusShort[$status], '', $statusType, $mode);
 	}

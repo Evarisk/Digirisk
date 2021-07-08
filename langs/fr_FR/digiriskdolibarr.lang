@@ -743,6 +743,8 @@ Signed = Signé
 Unsigned = Non signé
 Absent = Absent
 JustifiedAbsent = Absence justifiée
+WelcomeOnOnlineSignaturePage = Bienvenue sur la page de signature des documents
+ThisIsInformationOnDocumentToSign = Voici les informations sur le document a signé
 
 #
 # Ticket - Interface publique ticket
