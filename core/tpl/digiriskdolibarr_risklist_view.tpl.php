@@ -765,35 +765,40 @@
 									<div class="risk-content">
 										<div class="risk-category">
 											<span class="title">
-												<?php
+											<?php if (!$conf->global->DIGIRISKDOLIBARR_RISK_CATEGORY_EDIT) {
 												$htmltooltip = '';
 												$htmltooltip .= $langs->trans("HowToEnableRiskCategoryEdit");
-
-												print '<span class="center">';
-												print $form->textwithpicto($langs->trans('Risk'), $htmltooltip, 1, 0);
-												print '</span>';
-												?>
+											} else {
+												$htmltooltip = '';
+												$htmltooltip .= $langs->trans("HowToEditRiskCategory");
+											}
+											print '<span class="center">';
+											print $form->textwithpicto($langs->trans('Risk'), $htmltooltip, 1, 0);
+											print '</span>';
+											?>
 											</span>
-											<div class="wpeo-dropdown dropdown-large dropdown-grid category-danger padding">
+												<div class="wpeo-dropdown dropdown-large dropdown-grid category-danger padding">
 
-												<input class="input-hidden-danger" type="hidden" name="risk_category_id" value=<?php echo $risk->category ?> />
-												<div class="dropdown-toggle dropdown-add-button button-cotation wpeo-tooltip-event" aria-label="<?php echo $risk->get_danger_category_name($risk) ?>">
-													<img class="danger-category-pic tooltip hover" src="<?php echo DOL_URL_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $risk->get_danger_category($risk) . '.png'?>"" />
+													<input class="input-hidden-danger" type="hidden" name="risk_category_id" value=<?php echo $risk->category ?> />
+													<div class="dropdown-toggle dropdown-add-button button-cotation wpeo-tooltip-event" aria-label="<?php echo $risk->get_danger_category_name($risk) ?>">
+														<img class="danger-category-pic tooltip hover" src="<?php echo DOL_URL_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $risk->get_danger_category($risk) . '.png'?>"" />
+													</div>
+
+													<?php if ($conf->global->DIGIRISKDOLIBARR_RISK_CATEGORY_EDIT) : ?>
+
+													<ul class="dropdown-content wpeo-gridlayout grid-5 grid-gap-0">
+														<?php
+														$dangerCategories = $risk->get_danger_categories();
+														if ( ! empty( $dangerCategories ) ) :
+															foreach ( $dangerCategories as $dangerCategory ) : ?>
+																<li class="item dropdown-item wpeo-tooltip-event classfortooltip" data-is-preset="<?php echo ''; ?>" data-id="<?php echo $dangerCategory['position'] ?>" aria-label="<?php echo $dangerCategory['name'] ?>">
+																	<img src="<?php echo DOL_URL_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $dangerCategory['thumbnail_name'] . '.png'?>" class="attachment-thumbail size-thumbnail photo photowithmargin" alt="" loading="lazy" width="48" height="48">
+																</li>
+															<?php endforeach;
+														endif; ?>
+													</ul>
+													<?php endif; ?>
 												</div>
-
-
-												<ul class="dropdown-content wpeo-gridlayout grid-5 grid-gap-0">
-													<?php
-													$dangerCategories = $risk->get_danger_categories();
-													if ( ! empty( $dangerCategories ) ) :
-														foreach ( $dangerCategories as $dangerCategory ) : ?>
-															<li class="item dropdown-item wpeo-tooltip-event classfortooltip" data-is-preset="<?php echo ''; ?>" data-id="<?php echo $dangerCategory['position'] ?>" aria-label="<?php echo $dangerCategory['name'] ?>">
-																<img src="<?php echo DOL_URL_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $dangerCategory['thumbnail_name'] . '.png'?>" class="attachment-thumbail size-thumbnail photo photowithmargin" alt="" loading="lazy" width="48" height="48">
-															</li>
-														<?php endforeach;
-													endif; ?>
-												</ul>
-											</div>
 										</div>
 										<?php if ($conf->global->DIGIRISKDOLIBARR_RISK_DESCRIPTION) : ?>
 											<div class="risk-description">

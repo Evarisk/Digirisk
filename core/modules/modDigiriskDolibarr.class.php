@@ -247,6 +247,8 @@ class modDigiriskdolibarr extends DolibarrModules
 			// CONST RISK
 			130 => array('MAIN_AGENDA_ACTIONAUTO_RISK_CREATE','chaine',1,'', $conf->entity),
 			131 => array('DIGIRISKDOLIBARR_RISK_ADDON','chaine', 'mod_risk_standard' ,'', $conf->entity),
+			132 => array('DIGIRISKDOLIBARR_RISK_DESCRIPTION','integer', 0 ,'', $conf->entity),
+			133 => array('DIGIRISKDOLIBARR_RISK_CATEGORY_EDIT','integer', 0 ,'', $conf->entity),
 
 			// CONST RISK ASSESSMENT
 			140 => array('MAIN_AGENDA_ACTIONAUTO_RISKASSESSMENT_CREATE','chaine',1,'', $conf->entity),
@@ -254,8 +256,6 @@ class modDigiriskdolibarr extends DolibarrModules
 
 			142 => array('DIGIRISKDOLIBARR_MULTIPLE_RISKASSESSMENT_METHOD','integer', 0 ,'', $conf->entity),
 			143 => array('DIGIRISKDOLIBARR_ADVANCED_RISKASSESSMENT_METHOD','integer', 0 ,'', $conf->entity),
-			144 => array('DIGIRISKDOLIBARR_TASK_MANAGEMENT','integer', 0 ,'', $conf->entity),
-			145 => array('DIGIRISKDOLIBARR_RISK_DESCRIPTION','integer', 0 ,'', $conf->entity),
 
 			// CONST RISK SIGN
 			150 => array('MAIN_AGENDA_ACTIONAUTO_RISKSIGN_CREATE','chaine',1,'', $conf->entity),
@@ -266,6 +266,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			161 => array('DIGIRISKDOLIBARR_ACTIVE_STANDARD','integer', 0,'', $conf->entity),
 			162 => array('DIGIRISKDOLIBARR_DOCUMENT_MODELS_SET','integer', 0,'', $conf->entity),
 			163 => array('DIGIRISKDOLIBARR_THIRDPARTY_SET','integer', 0,'', $conf->entity),
+			164 => array('DIGIRISKDOLIBARR_TASK_MANAGEMENT','integer', 0 ,'', $conf->entity),
 
 			// CONST PREVENTION PLAN LINE
 			180 => array('MAIN_AGENDA_ACTIONAUTO_PREVENTIONPLANDET_CREATE','chaine',1,'', $conf->entity),
