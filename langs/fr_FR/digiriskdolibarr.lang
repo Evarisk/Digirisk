@@ -609,6 +609,9 @@ hasPhoto = Photo
 RiskCategory = Cat.
 DigiriskElementRisksList = Liste des risques
 DigiriskElementRisk = Risques
+RiskDescriptionNotEnabled = Le champ description du risque n'est pas activé
+HowToEnableRiskDescription = Pour activer le champ description du risque, allez dans "Configuration du module -> Analyse de risque -> Risque"
+HowToEnableRiskCategoryEdit = Pour activer la modification de la catégorie de risque, allez dans "Configuration du module -> Analyse de risque -> Risque"
 
 ReadDigiriskRisk = Voir les risques
 CreateDigiriskRisk = Créer des risques

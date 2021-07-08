@@ -764,12 +764,24 @@
 								<div class="modal-content" id="#modalContent">
 									<div class="risk-content">
 										<div class="risk-category">
-											<span class="title"><?php echo $langs->trans('Risk'); ?></span>
+											<span class="title">
+												<?php
+												$htmltooltip = '';
+												$htmltooltip .= $langs->trans("HowToEnableRiskCategoryEdit");
+
+												print '<span class="center">';
+												print $form->textwithpicto($langs->trans('Risk'), $htmltooltip, 1, 0);
+												print '</span>';
+												?>
+											</span>
 											<div class="wpeo-dropdown dropdown-large dropdown-grid category-danger padding">
+
 												<input class="input-hidden-danger" type="hidden" name="risk_category_id" value=<?php echo $risk->category ?> />
 												<div class="dropdown-toggle dropdown-add-button button-cotation wpeo-tooltip-event" aria-label="<?php echo $risk->get_danger_category_name($risk) ?>">
 													<img class="danger-category-pic tooltip hover" src="<?php echo DOL_URL_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $risk->get_danger_category($risk) . '.png'?>"" />
 												</div>
+
+
 												<ul class="dropdown-content wpeo-gridlayout grid-5 grid-gap-0">
 													<?php
 													$dangerCategories = $risk->get_danger_categories();
@@ -785,9 +797,22 @@
 										</div>
 										<?php if ($conf->global->DIGIRISKDOLIBARR_RISK_DESCRIPTION) : ?>
 											<div class="risk-description">
-											<span class="title"><?php echo $langs->trans('Description'); ?></span>
-											<?php print '<textarea name="riskComment" rows="'.ROWS_2.'">'.$risk->description.'</textarea>'."\n"; ?>
-										</div>
+												<span class="title"><?php echo $langs->trans('Description'); ?></span>
+												<?php print '<textarea name="riskComment" rows="'.ROWS_2.'">'.$risk->description.'</textarea>'."\n"; ?>
+											</div>
+										<?php else : ?>
+											<div class="risk-description">
+												<span class="title">
+													<?php
+													$htmltooltip = '';
+													$htmltooltip .= $langs->trans("HowToEnableRiskDescription");
+
+													print '<span class="center">';
+													print $form->textwithpicto($langs->trans('Description'), $htmltooltip, 1, 0);
+													print '</span>'; ?>
+												</span>
+												<?php echo $langs->trans('RiskDescriptionNotEnabled'); ?>
+											</div>
 										<?php endif; ?>
 									</div>
 								</div>
