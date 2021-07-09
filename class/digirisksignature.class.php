@@ -296,7 +296,7 @@ class DigiriskSignature extends CommonObject
 	}
 
 	/**
-	 *	Set draft status
+	 *	Set signed status
 	 *
 	 *	@param	User	$user			Object user that modify
 	 *  @param	int		$notrigger		1=Does not execute triggers, 0=Execute triggers
@@ -308,7 +308,7 @@ class DigiriskSignature extends CommonObject
 	}
 
 	/**
-	 *	Set draft status
+	 *	Set absent status
 	 *
 	 *	@param	User	$user			Object user that modify
 	 *  @param	int		$notrigger		1=Does not execute triggers, 0=Execute triggers
@@ -317,6 +317,18 @@ class DigiriskSignature extends CommonObject
 	public function setAbsent($user, $notrigger = 0)
 	{
 		return $this->setStatusCommon($user, self::STATUS_ABSENT, $notrigger, 'DIGIRISKSIGNATURE_ABSENT');
+	}
+
+	/**
+	 *	Set deleted status
+	 *
+	 *	@param	User	$user			Object user that modify
+	 *  @param	int		$notrigger		1=Does not execute triggers, 0=Execute triggers
+	 *	@return	int						<0 if KO, >0 if OK
+	 */
+	public function setDeleted($user, $notrigger = 0)
+	{
+		return $this->setStatusCommon($user, self::STATUS_DELETED, $notrigger, 'DIGIRISKSIGNATURE_DELETED');
 	}
 
 	/**
@@ -524,8 +536,7 @@ class DigiriskSignature extends CommonObject
 
 			foreach($signatoriesToDelete as $signatoryToDelete) {
 
-				$signatoryToDelete->status = 0;
-				$signatoryToDelete->update($user);
+				$signatoryToDelete->setDeleted($user);
 
 			}
 		}
