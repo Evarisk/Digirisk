@@ -371,7 +371,7 @@ class DigiriskElement extends CommonObject
 	 *	@param  bool	$multiple       add [] in the name of element and add 'multiple' attribut
 	 * 	@return	string					HTML string with
 	 */
-	public function select_digiriskelement_list($selected = '', $htmlname = 'socid', $filter = '', $showempty = '1', $showtype = 0, $forcecombo = 0, $events = array(), $filterkey = '', $outputmode = 0, $limit = 0, $morecss = 'minwidth100', $moreparam = '', $multiple = false)
+	public function select_digiriskelement_list($selected = '', $htmlname = 'socid', $filter = '', $showempty = '1', $showtype = 0, $forcecombo = 0, $events = array(), $filterkey = '', $outputmode = 0, $limit = 0, $morecss = 'minwidth100', $moreparam = '', $multiple = false, $noroot = 0)
 	{
 		// phpcs:enable
 		global $conf, $user, $langs;
@@ -426,7 +426,7 @@ class DigiriskElement extends CommonObject
 
 			$num = $this->db->num_rows($resql);
 			$i = 0;
-			$out .= '<option value="0" selected>'.$langs->trans('Root') . ' : ' . $conf->global->MAIN_INFO_SOCIETE_NOM . '</option>';
+			if (!$noroot) $out .= '<option value="0" selected>'.$langs->trans('Root') . ' : ' . $conf->global->MAIN_INFO_SOCIETE_NOM . '</option>';
 
 			if ($num)
 			{

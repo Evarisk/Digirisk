@@ -259,7 +259,7 @@ if (empty($reshook))
 		$objectline->fk_preventionplan  = $parent_id;
 		$objectline->fk_element         = $location;
 
-		if ($parent_id < 1) {
+		if ($location < 1) {
 			setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv('Location')), null, 'errors');
 			$error++;
 		}
@@ -1005,7 +1005,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit')))
 		print $refPreventionPlanDetMod->getNextValue($preventionplanline);
 		print '</td>';
 		print '<td class="bordertop nobottom linecollocation">';
-		print $digiriskelement->select_digiriskelement_list('', 'fk_element', '', '',  0, 0, array(), '',  0,  0,  'minwidth100',  '',  false);
+		print $digiriskelement->select_digiriskelement_list('', 'fk_element', '', '1',  0, 0, array(), '',  0,  0,  'minwidth100',  '',  false,1);
 		print '</td>';
 
 		$coldisplay++;
