@@ -312,11 +312,20 @@
 							</div>
 							<div class="risk-evaluation-container standard">
 								<span class="section-title"><?php echo ' ' . $langs->trans('RiskAssessment'); ?></span>
+								<div class="risk-evaluation-header">
+									<?php if ($conf->global->DIGIRISKDOLIBARR_ADVANCED_RISKASSESSMENT_METHOD) : ?>
+										<div class="wpeo-button evaluation-standard select-evaluation-method selected button-blue button-radius-2">
+											<span><?php echo $langs->trans('SimpleCotation') ?></span>
+										</div>
+										<div class="wpeo-button evaluation-advanced select-evaluation-method button-grey button-radius-2">
+											<span><?php echo $langs->trans('AdvancedCotation') ?></span>
+										</div>
+										<i class="fas fa-info-circle wpeo-tooltip-event" aria-label="<?php echo $langs->trans("HowToSetMultipleRiskAssessmentMethod") ?>"></i>
+									<?php endif; ?>
+									<input class="risk-evaluation-method" type="hidden" value="standard">
+									<input class="risk-evaluation-multiple-method" type="hidden" value="1">
+								</div>
 								<div class="risk-evaluation-content-wrapper">
-									<div class="risk-evaluation-header">
-										<input class="risk-evaluation-method" type="hidden" value="standard">
-										<input class="risk-evaluation-multiple-method" type="hidden" value="1">
-									</div>
 									<div class="risk-evaluation-content">
 										<div class="cotation-container">
 											<div class="cotation-standard">
