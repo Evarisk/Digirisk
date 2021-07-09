@@ -127,8 +127,6 @@ if (empty($reshook))
 		$prior_visit_text       = GETPOST('prior_visit_text');
 		$cssct_intervention     = GETPOST('cssct_intervention');
 		$date_debut             = GETPOST('date_debut');
-		$date_fin               = GETPOST('date_fin');
-		$description 			= GETPOST('description');
 
 		$now = dol_now();
 		$object->ref           = $refPreventionPlanMod->getNextValue($object);
@@ -139,12 +137,12 @@ if (empty($reshook))
 		$object->status        = 1;
 		$object->label         = $label;
 
-		$date_debut = DateTime::createFromFormat('d/m/Y',$date_debut);
-		$date_fin = DateTime::createFromFormat('d/m/Y',$date_fin);
+		$date_start = dol_mktime(GETPOST('dateohour', 'int'), GETPOST('dateomin', 'int'), 0, GETPOST('dateomonth', 'int'), GETPOST('dateoday', 'int'), GETPOST('dateoyear', 'int'));
+		$date_end = dol_mktime(GETPOST('dateehour', 'int'), GETPOST('dateemin', 'int'), 0, GETPOST('dateemonth', 'int'), GETPOST('dateeday', 'int'), GETPOST('dateeyear', 'int'));
 
 		$object->description   = $description;
-		$object->date_start    = dol_print_date($date_debut->getTimestamp(), 'dayhourrfc');
-		$object->date_end      = dol_print_date($date_fin->getTimestamp(), 'dayhourrfc');
+		$object->date_start    = $date_start;
+		$object->date_end      = $date_end;
 
 		$object->prior_visit_bool      = $prior_visit_bool;
 		$object->prior_visit_text      = $prior_visit_text;
@@ -192,20 +190,19 @@ if (empty($reshook))
 		$prior_visit_bool       = GETPOST('prior_visit_bool');
 		$prior_visit_text       = GETPOST('prior_visit_text');
 		$cssct_intervention     = GETPOST('cssct_intervention');
-		$date_debut             = GETPOST('date_debut');
-		$date_fin               = GETPOST('date_fin');
 		$description 			= GETPOST('description');
 
 		$now = dol_now();
 		$object->tms           = $now;
 		$object->label         = $label;
 
-		$date_debut = DateTime::createFromFormat('d/m/Y',$date_debut);
-		$date_fin = DateTime::createFromFormat('d/m/Y',$date_fin);
+		$date_start = dol_mktime(GETPOST('dateohour', 'int'), GETPOST('dateomin', 'int'), 0, GETPOST('dateomonth', 'int'), GETPOST('dateoday', 'int'), GETPOST('dateoyear', 'int'));
+		$date_end = dol_mktime(GETPOST('dateehour', 'int'), GETPOST('dateemin', 'int'), 0, GETPOST('dateemonth', 'int'), GETPOST('dateeday', 'int'), GETPOST('dateeyear', 'int'));
 
-		$object->description         = $description;
-		$object->date_start          = dol_print_date($date_debut->getTimestamp(), 'dayhourrfc');
-		$object->date_end            = dol_print_date($date_fin->getTimestamp(), 'dayhourrfc');
+		$object->description   = $description;
+		$object->date_start    = $date_start;
+		$object->date_end      = $date_end;
+
 		$object->prior_visit_bool    = $prior_visit_bool;
 		$object->prior_visit_text    = $prior_visit_text;
 		$object->cssct_intervention  = $cssct_intervention;
@@ -450,12 +447,12 @@ if ($action == 'create')
 
 	//Start Date -- Date début
 	print '<tr class="oddeven"><td><label for="date_debut">'.$langs->trans("StartDate").'</label></td><td>';
-	print $form->selectDate(dol_now(), 'date_debut', 1, 1, 0);
+	print $form->selectDate(dol_now('tzuser'), 'dateo', 1, 1, 0, '', 1);
 	print '</td></tr>';
 
 	//End Date -- Date fin
 	print '<tr class="oddeven"><td><label for="date_fin">'.$langs->trans("EndDate").'</label></td><td>';
-	print $form->selectDate(dol_time_plus_duree(dol_now(),1,'y'), 'date_fin', 1, 1, 0);
+	print $form->selectDate(dol_time_plus_duree(dol_now('tzuser'),1,'y'), 'datee', 1, 1, 0, '', 1);
 	print '</td></tr>';
 
 	//Maitre d'oeuvre
@@ -596,12 +593,12 @@ if (($id || $ref) && $action == 'edit')
 
 	//Start Date -- Date début
 	print '<tr class="oddeven"><td><label for="date_debut">'.$langs->trans("StartDate").'</label></td><td>';
-	print $form->selectDate('', 'date_debut', 1, 1, 0);
+	print $form->selectDate($object->date_start,'dateo', 1, 1, 0, '', 1);
 	print '</td></tr>';
 
 	//End Date -- Date fin
 	print '<tr class="oddeven"><td><label for="date_fin">'.$langs->trans("EndDate").'</label></td><td>';
-	print $form->selectDate(dol_time_plus_duree(dol_now(),1,'y'), 'date_fin', 1, 1, 0);
+	print $form->selectDate($object->date_end, 'datee', 1, 1, 0, '', 1);
 	print '</td></tr>';
 
 	$maitre_oeuvre = is_array($object_signatories['PP_MAITRE_OEUVRE']) ? array_shift($object_signatories['PP_MAITRE_OEUVRE'])->element_id : '';
@@ -755,6 +752,24 @@ if ((empty($action) || ($action != 'create' && $action != 'edit')))
 	unset($object->fields['fk_parent']);
 	unset($object->fields['last_main_doc']);
 	unset($object->fields['entity']);
+	unset($object->fields['date_start']);
+	unset($object->fields['date_end']);
+
+	print '<tr><td class="tdtop">';
+	print $langs->trans("StartDate");
+	print '</td>';
+	print '<td>';
+	print dol_print_date($object->date_start, 'dayhoursec');
+	print '<br>';
+	print '</td></tr>';
+
+	print '<tr><td class="tdtop">';
+	print $langs->trans("EndDate");
+	print '</td>';
+	print '<td>';
+	print dol_print_date($object->date_end, 'dayhoursec');
+	print '<br>';
+	print '</td></tr>';
 
 	include DOL_DOCUMENT_ROOT.'/core/tpl/commonfields_view.tpl.php';
 
