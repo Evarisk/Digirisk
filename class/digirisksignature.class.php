@@ -46,7 +46,7 @@ class DigiriskSignature extends CommonObject
 	/**
 	 * @var string Name of table without prefix where object is stored. This is also the key used for extrafields management.
 	 */
-	public $table_element = 'digiriskdolibarr_preventionplan_signature';
+	public $table_element = 'digiriskdolibarr_digirisksignature';
 
 	/**
 	 * @var int  Does this object support multicompany module ?
@@ -533,11 +533,8 @@ class DigiriskSignature extends CommonObject
 		$signatoriesToDelete = $this->fetchAll('', '', 0, 0, $filter, 'AND');
 
 		if ( ! empty($signatoriesToDelete) && $signatoriesToDelete > 0) {
-
 			foreach($signatoriesToDelete as $signatoryToDelete) {
-
 				$signatoryToDelete->setDeleted($user);
-
 			}
 		}
 	}
