@@ -159,7 +159,7 @@ if (empty($reshook))
 				$digiriskresources->digirisk_dolibarr_set_resources($db, $user->id, 'PP_LABOUR_INSPECTOR_ASSIGNED', 'societe', array($labour_inspector_id), $conf->entity, 'preventionplan', $object->id, 1);
 
 				$signatory->setSignatory($object->id,'user', array($maitre_oeuvre_id), 'PP_MAITRE_OEUVRE');
-				$signatory->setSignatory($object->id,'socpeople', array($extresponsible_id), 'PP_EXT_SOCIETY_RESPONSIBLE');
+				$signatory->setSignatory($object->id,'socpeople', $extresponsible_id, 'PP_EXT_SOCIETY_RESPONSIBLE');
 				$signatory->setSignatory($object->id,'socpeople', $extintervenant_ids, 'PP_EXT_SOCIETY_INTERVENANTS');
 
 				// Creation prevention plan OK
@@ -604,13 +604,13 @@ if (($id || $ref) && $action == 'edit')
 	$maitre_oeuvre = is_array($object_signatories['PP_MAITRE_OEUVRE']) ? array_shift($object_signatories['PP_MAITRE_OEUVRE'])->element_id : '';
 
 	//Maitre d'oeuvre
-	$userlist 	  = $form->select_dolusers($maitre_oeuvre, '', 0, null, 0, '', '', 0, 0, 0, 'AND u.statut = 1', 0, '', '', 0, 1);
+	$userlist = $form->select_dolusers($maitre_oeuvre, '', 1, null, 0, '', '', 0, 0, 0, 'AND u.statut = 1', 0, '', '', 0, 1);
 
 	print '<tr>';
 	print '<td style="width:10%">'.$form->editfieldkey('MaitreOeuvre', 'MaitreOeuvre_id', '', $object, 0).'</td>';
 	print '<td class="maxwidthonsmartphone">';
 
-	print $form->selectarray('maitre_oeuvre', $userlist,$maitre_oeuvre, null, null, null, null, "40%", 0, 0, 0, '',1);
+	print $form->selectarray('maitre_oeuvre', $userlist,$maitre_oeuvre, 1, null, null, null, "40%", 0, 0, 0, '',1);
 
 	if (!GETPOSTISSET('backtopage')) print ' <a href="'.DOL_URL_ROOT.'/user/card.php?action=create&backtopage='.urlencode($_SERVER["PHP_SELF"].'?action=create').'" target="_blank"><span class="fa fa-plus-circle valignmiddle paddingleft" title="'.$langs->trans("AddUser").'"></span></a>';
 
@@ -642,7 +642,7 @@ if (($id || $ref) && $action == 'edit')
 	$ext_society_responsible_id = is_array($object_signatories['PP_EXT_SOCIETY_RESPONSIBLE']) ? array_shift($object_signatories['PP_EXT_SOCIETY_RESPONSIBLE'])->element_id : '';
 
 	print '<tr class="oddeven"><td>'.$langs->trans("ExtSocietyResponsible").'</td><td>';
-	print $form->selectcontacts(GETPOST('ext_society', 'int'), $ext_society_responsible_id, 'ext_society_responsible', 0, '', '', 0, 'quatrevingtpercent', false, 0, array(), false, '', 'ext_society_responsible');
+	print $form->selectcontacts(GETPOST('ext_society', 'int'), $ext_society_responsible_id, 'ext_society_responsible', 1, '', '', 0, 'quatrevingtpercent', false, 0, array(), false, '', 'ext_society_responsible');
 	print '</td></tr>';
 
 	//Intervenants extérieurs

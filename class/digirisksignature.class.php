@@ -426,50 +426,52 @@ class DigiriskSignature extends CommonObject
 		global $conf, $user;
 
 		$society = new Societe($this->db);
-		$this->deletePreviousSignatories($role, $fk_object);
+		if (!empty($element_ids) && $element_ids > 0) {
+			$this->deletePreviousSignatories($role, $fk_object);
+			foreach ( $element_ids as $element_id ) {
+				if ($element_id > 0) {
+					if ($element_type == 'user') {
+						$signatory_data = new User($this->db);
 
-		foreach ( $element_ids as $element_id ) {
+						$signatory_data->fetch($element_id);
 
-			if ($element_type == 'user') {
-				$signatory_data = new User($this->db);
+						if ($signatory_data->socid > 0) {
+							$society->fetch($signatory_data->socid);
+							$this->society_name = $society->name;
+						} else {
+							$this->society_name = $conf->global->MAIN_INFO_SOCIETE_NOM;
+						}
 
-				$signatory_data->fetch($element_id);
+						$this->phone = $signatory_data->user_mobile;
 
-				if ($signatory_data->socid > 0) {
-					$society->fetch($signatory_data->socid);
-					$this->society_name = $society->name;
-				} else {
-					$this->society_name = $conf->global->MAIN_INFO_SOCIETE_NOM;
+					} elseif ($element_type == 'socpeople') {
+						$signatory_data = new Contact($this->db);
+
+						$signatory_data->fetch($element_id);
+
+						$society->fetch($signatory_data->fk_soc);
+
+						$this->society_name = $society->name;
+						$this->phone = $signatory_data->phone_pro;
+					}
+
+					$this->status = self::STATUS_REGISTERED;
+
+					$this->firstname = $signatory_data->firstname;
+					$this->lastname = $signatory_data->lastname;
+					$this->email = $signatory_data->email;
+					$this->role = $role;
+
+					$this->element_type = $element_type;
+					$this->element_id = $element_id;
+
+					$this->signature_url = generate_random_id(16);
+
+					$this->fk_object = $fk_object;
+
+					$result = $this->create($user, false);
 				}
-
-				$this->phone = $signatory_data->user_mobile;
-
-			} elseif ($element_type == 'socpeople') {
-				$signatory_data = new Contact($this->db);
-
-				$signatory_data->fetch($element_id);
-
-				$society->fetch($signatory_data->fk_soc);
-
-				$this->society_name = $society->name;
-				$this->phone = $signatory_data->phone_pro;
 			}
-
-			$this->status = self::STATUS_REGISTERED;
-
-			$this->firstname = $signatory_data->firstname;
-			$this->lastname = $signatory_data->lastname;
-			$this->email = $signatory_data->email;
-			$this->role = $role;
-
-			$this->element_type = $element_type;
-			$this->element_id = $element_id;
-
-			$this->signature_url = generate_random_id(16);
-
-			$this->fk_object = $fk_object;
-
-			$result = $this->create($user, false);
 		}
 		if ($result > 0 ) {
 			return 1;
