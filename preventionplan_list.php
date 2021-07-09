@@ -321,10 +321,10 @@ $moreforfilter = '';
 
 $varpage = empty($contextpage) ? $_SERVER["PHP_SELF"] : $contextpage;
 
-$arrayfields['MaitreOeuvre'] = array('label'=>'MaitreOeuvre');
-$arrayfields['ExtSociety'] = array('label'=>'ExtSociety');
-$arrayfields['ExtSocietyResponsible'] = array('label'=>'ExtSocietyResponsible');
-$arrayfields['ExtSocietyIntervenants'] = array('label'=>'ExtSocietyIntervenants');
+$arrayfields['MaitreOeuvre'] = array('label'=>'MaitreOeuvre', 'checked' => 1);
+$arrayfields['ExtSociety'] = array('label'=>'ExtSociety', 'checked' => 1);
+$arrayfields['ExtSocietyResponsible'] = array('label'=>'ExtSocietyResponsible', 'checked' => 1);
+$arrayfields['ExtSocietyIntervenants'] = array('label'=>'ExtSocietyIntervenants', 'checked' => 1);
 
 $selectedfields = $form->multiSelectArrayWithCheckbox('selectedfields', $arrayfields, $varpage); // This also change content of $arrayfields
 if ($massactionbutton) $selectedfields .= $form->showCheckAddButtons('checkforselect', 1);
@@ -333,10 +333,10 @@ print '<div class="div-table-responsive">';
 print '<table class="tagtable nobottomiftotal liste'.($moreforfilter ? " listwithfilterbefore" : "").'">'."\n";
 print '<tr class="liste_titre">';
 
-$preventionplan->fields['Custom']['PP_MAITRE_OEUVRE'] = 'MaitreOeuvre';
-$preventionplan->fields['Custom']['PP_EXT_SOCIETY'] = 'ExtSociety';
-$preventionplan->fields['Custom']['PP_EXT_SOCIETY_RESPONSIBLE'] = 'ExtSocietyResponsible';
-$preventionplan->fields['Custom']['PP_EXT_SOCIETY_INTERVENANTS'] = 'ExtSocietyIntervenants';
+$preventionplan->fields['Custom']['PP_MAITRE_OEUVRE'] = $arrayfields['MaitreOeuvre'] ;
+$preventionplan->fields['Custom']['PP_EXT_SOCIETY'] = $arrayfields['ExtSociety'];
+$preventionplan->fields['Custom']['PP_EXT_SOCIETY_RESPONSIBLE'] = $arrayfields['ExtSocietyResponsible'];
+$preventionplan->fields['Custom']['PP_EXT_SOCIETY_INTERVENANTS'] = $arrayfields['ExtSocietyIntervenants'] ;
 
 foreach ($preventionplan->fields as $key => $val)
 {
@@ -355,9 +355,10 @@ foreach ($preventionplan->fields as $key => $val)
 	}
 	if ($key == 'Custom') {
 		foreach ($val as $resource) {
-			print '<td>';
-			print '';
-			print '</td>';
+			if ($resource['checked']) {
+				print '<td>';
+				print '</td>';
+			}
 		}
 	}
 }
@@ -397,9 +398,11 @@ foreach ($preventionplan->fields as $key => $val)
 	}
 	if ($key == 'Custom') {
 		foreach ($val as $resource) {
-			print '<td>';
-			print $langs->trans($resource);
-			print '</td>';
+			if ($resource['checked']) {
+				print '<td>';
+				print $langs->trans($resource['label']);
+				print '</td>';
+			}
 		}
 	}
 
@@ -463,21 +466,23 @@ while ($i < ($limit ? min($num, $limit) : $num)) {
 		if ($key == 'Custom') {
 
 			foreach ($val as $name => $resource) {
-				$resourceLinked = $digiriskresources->fetchResourcesFromObject($name, $preventionplan);
+				if ($resource['checked']) {
+					$resourceLinked = $digiriskresources->fetchResourcesFromObject($name, $preventionplan);
 
-				print '<td>';
-				if (!empty($resourceLinked) &&  $resourceLinked > 0) {
-					if ($resource == 'ExtSocietyIntervenants') {
-						$resourcesLinked = array_shift($resourceLinked);
-						foreach($resourcesLinked as $resourceLinkedSingle) {
-							print $resourceLinkedSingle->getNomUrl(1);
-							print '<br>';
+					print '<td>';
+					if (!empty($resourceLinked) && $resourceLinked > 0) {
+						if ($resource == 'ExtSocietyIntervenants') {
+							$resourcesLinked = array_shift($resourceLinked);
+							foreach ($resourcesLinked as $resourceLinkedSingle) {
+								print $resourceLinkedSingle->getNomUrl(1);
+								print '<br>';
+							}
+						} else {
+							print $resourceLinked->getNomUrl(1);
 						}
-					} else {
-						print $resourceLinked->getNomUrl(1);
 					}
+					print '</td>';
 				}
-				print '</td>';
 			}
 		}
 	}
