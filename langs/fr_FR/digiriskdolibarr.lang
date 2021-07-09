@@ -660,6 +660,7 @@ NoRiskAssessment = Pas d'évaluation assignée au risque
 
 SimpleCotation = Cotation simple
 AdvancedCotation = Cotation avancée
+CalculatedCotation = Cotation calculée
 SelectCotation = Sélectionnez les cases pour calculer votre cotation
 EvaluationList = Liste des évaluations du risque
 HowToSetMultipleRiskAssessmentMethod = Pour configurer l'utilisation multiple des méthodes d'évaluation, aller dans Configuration du module - Analyse des risques - Évaluation
