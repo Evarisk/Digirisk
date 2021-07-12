@@ -304,6 +304,9 @@ PreventionPlanSchedule = Horaires du plan de prévention
 SelectUser = Sélectionner un utilisateur
 Attendants = Participants
 ModifyPreventionPlan = Modifier le plan de prévention
+ActionsDescriptionTooltip = Description des actions réalisées par l'intervenant
+INRSRiskTooltip = Liste des catégories de risques proposée dans le référentiel de l'INRS
+PreventionMethodTooltip = Moyen de prévention à mettre en place pour limiter le risque
 
 #
 # FirePermit - Permis de feu

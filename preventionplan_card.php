@@ -909,7 +909,6 @@ if ((empty($action) || ($action != 'create' && $action != 'edit')))
 
 					$coldisplay++;
 					print '<td class="bordertop nobottom linecolriskcategory">'; ?>
-					<span class="title"><?php echo $langs->trans('Risk'); ?><required>*</required></span>
 					<div class="wpeo-dropdown dropdown-large dropdown-grid category-danger padding">
 						<div class="dropdown-toggle dropdown-add-button button-cotation">
 							<input class="input-hidden-danger" type="hidden" name="risk_category_id" value="<?php echo $item->category ?>" />
@@ -1054,7 +1053,6 @@ if ((empty($action) || ($action != 'create' && $action != 'edit')))
 
 		$coldisplay++;
 		print '<td class="bordertop nobottom linecolriskcategory">'; ?>
-			<span class="title"><?php echo $langs->trans('Risk'); ?><required>*</required></span>
 			<div class="wpeo-dropdown dropdown-large dropdown-grid category-danger padding">
 				<input class="input-hidden-danger" type="hidden" name="risk_category_id" value="undefined" />
 				<div class="dropdown-toggle dropdown-add-button button-cotation">
