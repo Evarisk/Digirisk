@@ -150,6 +150,11 @@ if (empty($reshook))
 
 		$object->fk_user_creat = $user->id ? $user->id : 1;
 
+		if (empty($maitre_oeuvre_id) || $maitre_oeuvre_id == -1 || empty(array_filter($extresponsible_id))) {
+			$error++;
+			$object->error = $langs->trans("ErrorFieldRequired");
+		}
+
 		if (!$error) {
 			$result = $object->create($user, false);
 
@@ -158,8 +163,14 @@ if (empty($reshook))
 				$digiriskresources->digirisk_dolibarr_set_resources($db, $user->id, 'PP_EXT_SOCIETY', 'societe', array($extsociety_id), $conf->entity, 'preventionplan', $object->id, 1);
 				$digiriskresources->digirisk_dolibarr_set_resources($db, $user->id, 'PP_LABOUR_INSPECTOR_ASSIGNED', 'societe', array($labour_inspector_id), $conf->entity, 'preventionplan', $object->id, 1);
 
-				$signatory->setSignatory($object->id,'user', array($maitre_oeuvre_id), 'PP_MAITRE_OEUVRE');
-				$signatory->setSignatory($object->id,'socpeople', $extresponsible_id, 'PP_EXT_SOCIETY_RESPONSIBLE');
+				if (!empty($maitre_oeuvre_id) || $maitre_oeuvre_id > 0){
+					$signatory->setSignatory($object->id,'user', array($maitre_oeuvre_id), 'PP_MAITRE_OEUVRE');
+				}
+
+				if (!empty(array_filter($extresponsible_id))) {
+					$signatory->setSignatory($object->id,'socpeople', $extresponsible_id, 'PP_EXT_SOCIETY_RESPONSIBLE');
+				}
+
 				$signatory->setSignatory($object->id,'socpeople', $extintervenant_ids, 'PP_EXT_SOCIETY_INTERVENANTS');
 
 				// Creation prevention plan OK
@@ -174,6 +185,9 @@ if (empty($reshook))
 				if (!empty($object->errors)) setEventMessages(null, $object->errors, 'errors');
 				else  setEventMessages($object->error, null, 'errors');
 			}
+		} else {
+			if (!empty($object->errors)) setEventMessages(null, $object->errors, 'errors');
+			else  setEventMessages($object->error, null, 'errors');
 		}
 	}
 
@@ -831,6 +845,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit')))
 			} else {
 				print '<a class="butActionRefused classfortooltip" href="#" title="' . dol_escape_htmltag($langs->trans("NotEnoughPermissions")) . '">' . $langs->trans('Modify') . '</a>' . "\n";
 			}
+			print '<a class="butAction" id="actionButtonLock" href="' . $_SERVER["PHP_SELF"] . '?id=' . $object->id . '&action=lock">' . $langs->trans("Lock") . '</a>' . "\n";
 		}
 		print '</div>' . "\n";
 

@@ -348,7 +348,7 @@ print dol_print_date($element->signature_date,'dayhour');
 print '</td><td>';
 print $element->signature_url;
 print '</td><td>';
-print $usertmp->getNomUrl(1);
+print $contact->getNomUrl(1);
 print '</td><td class="center">';
 require __DIR__ . "/core/tpl/digiriskdolibarr_signature_action_view.tpl.php";
 print '</td><td class="center">';
