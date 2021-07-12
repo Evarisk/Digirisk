@@ -799,6 +799,16 @@ if ((empty($action) || ($action != 'create' && $action != 'edit')))
 	print '<br>';
 	print '</td></tr>';
 
+	//Labour inspector -- Inspecteur du travail
+	print '<tr><td class="tdtop">';
+	print $langs->trans("Attendants");
+	print '</td>';
+	print '<td>';
+	$ext_society_intervenants = $signatory->fetchSignatory('PP_EXT_SOCIETY_INTERVENANTS', $object->id);
+	$url = dol_buildpath('/custom/digiriskdolibarr/preventionplan_attendants.php?id='.$object->id, 3);
+	print '<a href="'.$url.'" target="_blank">'.count($ext_society_intervenants).'</a>';
+	print '</td></tr>';
+
 	print '</table>';
 	print '</div>';
 	print '</div>';
