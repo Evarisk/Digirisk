@@ -116,19 +116,19 @@ if (empty($reshook))
 	// Action to add record
 	if ($action == 'add' && $permissiontoadd) {
 
-		$maitre_oeuvre_id       = GETPOST('maitre_oeuvre');
-		$extsociety_id          = GETPOST('ext_society');
-		$extresponsible_id      = GETPOST('ext_society_responsible');
-		$extintervenant_ids     = GETPOST('ext_intervenants');
-		$labour_inspector_id    = GETPOST('labour_inspector');
+		$maitre_oeuvre_id    = GETPOST('maitre_oeuvre');
+		$extsociety_id       = GETPOST('ext_society');
+		$extresponsible_id   = GETPOST('ext_society_responsible');
+		$extintervenant_ids  = GETPOST('ext_intervenants');
+		$labour_inspector_id = GETPOST('labour_inspector');
 
-		$label                  = GETPOST('label');
-		$prior_visit_bool       = GETPOST('prior_visit_bool');
-		$prior_visit_text       = GETPOST('prior_visit_text');
-		$cssct_intervention     = GETPOST('cssct_intervention');
-		$date_debut             = GETPOST('date_debut');
+		$label              = GETPOST('label');
+		$prior_visit_bool   = GETPOST('prior_visit_bool');
+		$prior_visit_text   = GETPOST('prior_visit_text');
+		$cssct_intervention = GETPOST('cssct_intervention');
+		$date_debut         = GETPOST('date_debut');
 
-		$now = dol_now();
+		$now                   = dol_now();
 		$object->ref           = $refPreventionPlanMod->getNextValue($object);
 		$object->ref_ext       = 'digirisk_' . $object->ref;
 		$object->date_creation = $object->db->idate($now);
@@ -138,21 +138,36 @@ if (empty($reshook))
 		$object->label         = $label;
 
 		$date_start = dol_mktime(GETPOST('dateohour', 'int'), GETPOST('dateomin', 'int'), 0, GETPOST('dateomonth', 'int'), GETPOST('dateoday', 'int'), GETPOST('dateoyear', 'int'));
-		$date_end = dol_mktime(GETPOST('dateehour', 'int'), GETPOST('dateemin', 'int'), 0, GETPOST('dateemonth', 'int'), GETPOST('dateeday', 'int'), GETPOST('dateeyear', 'int'));
+		$date_end   = dol_mktime(GETPOST('dateehour', 'int'), GETPOST('dateemin', 'int'), 0, GETPOST('dateemonth', 'int'), GETPOST('dateeday', 'int'), GETPOST('dateeyear', 'int'));
 
-		$object->description   = $description;
-		$object->date_start    = $date_start;
-		$object->date_end      = $date_end;
+		$object->description = $description;
+		$object->date_start  = $date_start;
+		$object->date_end    = $date_end;
 
-		$object->prior_visit_bool      = $prior_visit_bool;
-		$object->prior_visit_text      = $prior_visit_text;
-		$object->cssct_intervention    = $cssct_intervention;
+		$object->prior_visit_bool   = $prior_visit_bool;
+		$object->prior_visit_text   = $prior_visit_text;
+		$object->cssct_intervention = $cssct_intervention;
 
 		$object->fk_user_creat = $user->id ? $user->id : 1;
 
-		if (empty($maitre_oeuvre_id) || $maitre_oeuvre_id == -1 || empty(array_filter($extresponsible_id))) {
+		if ($maitre_oeuvre_id < 0) {
+			setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv('MaitreOeuvre')), null, 'errors');
 			$error++;
-			$object->error = $langs->trans("ErrorFieldRequired");
+		}
+
+		if ($extsociety_id < 0) {
+			setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv('ExtSociety')), null, 'errors');
+			$error++;
+		}
+
+		if (is_array($extresponsible_id)) {
+			if (empty(array_filter($extresponsible_id))) {
+				setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv('ExtSocietyResponsible')), null, 'errors');
+				$error++;
+			}
+		} elseif (empty($extresponsible_id)) {
+			setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv('ExtSocietyResponsible')), null, 'errors');
+			$error++;
 		}
 
 		if (!$error) {
@@ -186,8 +201,7 @@ if (empty($reshook))
 				else  setEventMessages($object->error, null, 'errors');
 			}
 		} else {
-			if (!empty($object->errors)) setEventMessages(null, $object->errors, 'errors');
-			else  setEventMessages($object->error, null, 'errors');
+			$action = 'create';
 		}
 	}
 
@@ -409,6 +423,29 @@ if (empty($reshook))
 		}
 	}
 
+	// Action to set status STATUS_ABSENT
+	if ($action == 'setLock') {
+		$signatoryID = GETPOST('signatoryID');
+
+		$signatory->fetch($signatoryID);
+
+		if (!$error) {
+			$result = $signatory->setAbsent($user, false);
+			if ($result > 0) {
+				// Creation signature OK
+				$urltogo = str_replace('__ID__', $result, $backtopage);
+				$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
+				header("Location: " . $urltogo);
+				exit;
+			}
+			else
+			{
+				// Creation signature KO
+				if (!empty($signatory->errors)) setEventMessages(null, $signatory->errors, 'errors');
+				else  setEventMessages($signatory->error, null, 'errors');
+			}
+		}
+	}
 }
 
 /*
@@ -483,7 +520,7 @@ if ($action == 'create')
 	print '</td></tr>';
 
 	//External society -- Société extérieure
-	print '<tr><td class="tdtop">';
+	print '<tr><td class="fieldrequired">';
 	print $langs->trans("ExtSociety");
 	print '</td>';
 
@@ -774,7 +811,6 @@ if ((empty($action) || ($action != 'create' && $action != 'edit')))
 	print '</td>';
 	print '<td>';
 	print dol_print_date($object->date_start, 'dayhoursec');
-	print '<br>';
 	print '</td></tr>';
 
 	print '<tr><td class="tdtop">';
@@ -782,7 +818,6 @@ if ((empty($action) || ($action != 'create' && $action != 'edit')))
 	print '</td>';
 	print '<td>';
 	print dol_print_date($object->date_end, 'dayhoursec');
-	print '<br>';
 	print '</td></tr>';
 
 	include DOL_DOCUMENT_ROOT.'/core/tpl/commonfields_view.tpl.php';
@@ -796,7 +831,6 @@ if ((empty($action) || ($action != 'create' && $action != 'edit')))
 	if ($ext_society > 0) {
 		print $ext_society->getNomUrl(1);
 	}
-	print '<br>';
 	print '</td></tr>';
 
 	//Labour inspector -- Inspecteur du travail
@@ -804,13 +838,10 @@ if ((empty($action) || ($action != 'create' && $action != 'edit')))
 	print $langs->trans("LabourInspector");
 	print '</td>';
 	print '<td>';
-	//For external user force the company to user company
-	if (!empty($user->socid)) {
-		print $form->select_company($user->socid, 'labour_inspector', '', 1, 1, 0, $events, 0, 'minwidth300');
-	} else {
-		print $form->select_company($digiriskresources->digirisk_dolibarr_fetch_resource('SAMU'), 'labour_inspector', '', 'SelectThirdParty', 1, 0, $events, 0, 'minwidth300');
+	$labour_inspector= $digiriskresources->fetchResourcesFromObject('PP_LABOUR_INSPECTOR_ASSIGNED', $object);
+	if ($labour_inspector > 0) {
+		print $labour_inspector->getNomUrl(1);
 	}
-	print '<br>';
 	print '</td></tr>';
 
 	//Labour inspector -- Inspecteur du travail
@@ -820,7 +851,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit')))
 	print '<td>';
 	$ext_society_intervenants = $signatory->fetchSignatory('PP_EXT_SOCIETY_INTERVENANTS', $object->id);
 	$url = dol_buildpath('/custom/digiriskdolibarr/preventionplan_attendants.php?id='.$object->id, 3);
-	print '<a href="'.$url.'" target="_blank">'.count($ext_society_intervenants).'</a>';
+	print '<a href="'.$url.'">'.count($ext_society_intervenants).'</a>';
 	print '</td></tr>';
 
 	print '</table>';
@@ -845,7 +876,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit')))
 			} else {
 				print '<a class="butActionRefused classfortooltip" href="#" title="' . dol_escape_htmltag($langs->trans("NotEnoughPermissions")) . '">' . $langs->trans('Modify') . '</a>' . "\n";
 			}
-			print '<a class="butAction" id="actionButtonLock" href="' . $_SERVER["PHP_SELF"] . '?id=' . $object->id . '&action=lock">' . $langs->trans("Lock") . '</a>' . "\n";
+			print '<a class="butAction" id="actionButtonLock" href="' . $_SERVER["PHP_SELF"] . '?id=' . $object->id . '&action=setLock">' . $langs->trans("Lock") . '</a>' . "\n";
 		}
 		print '</div>' . "\n";
 
