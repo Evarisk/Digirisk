@@ -58,7 +58,7 @@ $langs->loadLangs(array("digiriskdolibarr@digiriskdolibarr", "other"));
 
 // Get parameters
 $id                  = GETPOST('id', 'int');
-$lineid                  = GETPOST('lineid', 'int');
+$lineid              = GETPOST('lineid', 'int');
 $ref                 = GETPOST('ref', 'alpha');
 $action              = GETPOST('action', 'aZ09');
 $confirm             = GETPOST('confirm', 'alpha');
@@ -459,7 +459,7 @@ if ($action == 'create')
 	$userlist 	  = $form->select_dolusers('', '', 0, null, 0, '', '', 0, 0, 0, 'AND u.statut = 1', 0, '', '', 0, 1);
 
 	print '<tr class="oddeven">';
-	print '<td style="width:10%">'.$form->editfieldkey('MaitreOeuvre', 'MaitreOeuvre_id', '', $object, 0).'</td>';
+	print '<td class="fieldrequired" style="width:10%">'.$form->editfieldkey('MaitreOeuvre', 'MaitreOeuvre_id', '', $object, 0).'</td>';
 	print '<td class="maxwidthonsmartphone">';
 
 
@@ -491,7 +491,7 @@ if ($action == 'create')
 	print '</td></tr>';
 
 	//External responsible -- Responsable de la société extérieure
-	print '<tr class="oddeven"><td>'.$langs->trans("ExtSocietyResponsible").'</td><td>';
+	print '<tr class="oddeven"><td class="fieldrequired">'.$langs->trans("ExtSocietyResponsible").'</td><td>';
 	print $form->selectcontacts(GETPOST('ext_society', 'int'), '', 'ext_society_responsible[]', 1, '', '', 0, 'quatrevingtpercent', false, 0, array(), false, '', 'ext_society_responsible');
 
 	print '</td></tr>';
@@ -607,7 +607,7 @@ if (($id || $ref) && $action == 'edit')
 	$userlist = $form->select_dolusers($maitre_oeuvre, '', 1, null, 0, '', '', 0, 0, 0, 'AND u.statut = 1', 0, '', '', 0, 1);
 
 	print '<tr>';
-	print '<td style="width:10%">'.$form->editfieldkey('MaitreOeuvre', 'MaitreOeuvre_id', '', $object, 0).'</td>';
+	print '<td class="fieldrequired" style="width:10%">'.$form->editfieldkey('MaitreOeuvre', 'MaitreOeuvre_id', '', $object, 0).'</td>';
 	print '<td class="maxwidthonsmartphone">';
 
 	print $form->selectarray('maitre_oeuvre', $userlist,$maitre_oeuvre, 1, null, null, null, "40%", 0, 0, 0, '',1);
@@ -641,8 +641,8 @@ if (($id || $ref) && $action == 'edit')
 	//External responsible -- Responsable de la société extérieure
 	$ext_society_responsible_id = is_array($object_signatories['PP_EXT_SOCIETY_RESPONSIBLE']) ? array_shift($object_signatories['PP_EXT_SOCIETY_RESPONSIBLE'])->element_id : '';
 
-	print '<tr class="oddeven"><td>'.$langs->trans("ExtSocietyResponsible").'</td><td>';
-	print $form->selectcontacts(GETPOST('ext_society', 'int'), $ext_society_responsible_id, 'ext_society_responsible', 1, '', '', 0, 'quatrevingtpercent', false, 0, array(), false, '', 'ext_society_responsible');
+	print '<tr class="oddeven"><td class="fieldrequired">'.$langs->trans("ExtSocietyResponsible").'</td><td>';
+	print $form->selectcontacts(GETPOST('ext_society', 'int'), $ext_society_responsible_id, 'ext_society_responsible', 0, '', '', 0, 'quatrevingtpercent', false, 0, array(), false, '', 'ext_society_responsible');
 	print '</td></tr>';
 
 	//Intervenants extérieurs
@@ -781,6 +781,20 @@ if ((empty($action) || ($action != 'create' && $action != 'edit')))
 	$ext_society = $digiriskresources->fetchResourcesFromObject('PP_EXT_SOCIETY', $object);
 	if ($ext_society > 0) {
 		print $ext_society->getNomUrl(1);
+	}
+	print '<br>';
+	print '</td></tr>';
+
+	//Labour inspector -- Inspecteur du travail
+	print '<tr><td class="tdtop">';
+	print $langs->trans("LabourInspector");
+	print '</td>';
+	print '<td>';
+	//For external user force the company to user company
+	if (!empty($user->socid)) {
+		print $form->select_company($user->socid, 'labour_inspector', '', 1, 1, 0, $events, 0, 'minwidth300');
+	} else {
+		print $form->select_company($digiriskresources->digirisk_dolibarr_fetch_resource('SAMU'), 'labour_inspector', '', 'SelectThirdParty', 1, 0, $events, 0, 'minwidth300');
 	}
 	print '<br>';
 	print '</td></tr>';
