@@ -302,6 +302,18 @@ class DigiriskSignature extends CommonObject
 	 *  @param	int		$notrigger		1=Does not execute triggers, 0=Execute triggers
 	 *	@return	int						<0 if KO, >0 if OK
 	 */
+	public function setPendingSignature($user, $notrigger = 0)
+	{
+		return $this->setStatusCommon($user, self::STATUS_PENDING_SIGNATURE, $notrigger, 'DIGIRISKSIGNATURE_PENDING_SIGNATURE');
+	}
+
+	/**
+	 *	Set draft status
+	 *
+	 *	@param	User	$user			Object user that modify
+	 *  @param	int		$notrigger		1=Does not execute triggers, 0=Execute triggers
+	 *	@return	int						<0 if KO, >0 if OK
+	 */
 	public function setSigned($user, $notrigger = 0)
 	{
 		return $this->setStatusCommon($user, self::STATUS_SIGNED, $notrigger, 'DIGIRISKSIGNATURE_SIGNED');
@@ -409,17 +421,19 @@ class DigiriskSignature extends CommonObject
 		{
 			global $langs;
 			//$langs->load("digiriskdolibarr@digiriskdolibarr");
+			$this->labelStatus[self::STATUS_DELETED] = $langs->trans('Deleted');
 			$this->labelStatus[self::STATUS_REGISTERED] = $langs->trans('Registered');
 			$this->labelStatus[self::STATUS_SIGNATURE_REQUEST] = $langs->trans('SignatureRequest');
 			$this->labelStatus[self::STATUS_PENDING_SIGNATURE] = $langs->trans('PendingSignature');
-			$this->labelStatusShort[self::STATUS_DENIED] = $langs->trans('Denied');
-			$this->labelStatusShort[self::STATUS_SIGNED] = $langs->trans('Signed');
-			$this->labelStatusShort[self::STATUS_UNSIGNED] = $langs->trans('Unsigned');
-			$this->labelStatusShort[self::STATUS_ABSENT] = $langs->trans('Absent');
-			$this->labelStatusShort[self::STATUS_JUSTIFIED_ABSENT] = $langs->trans('JustifiedAbsent');
+			$this->labelStatus[self::STATUS_DENIED] = $langs->trans('Denied');
+			$this->labelStatus[self::STATUS_SIGNED] = $langs->trans('Signed');
+			$this->labelStatus[self::STATUS_UNSIGNED] = $langs->trans('Unsigned');
+			$this->labelStatus[self::STATUS_ABSENT] = $langs->trans('Absent');
+			$this->labelStatus[self::STATUS_JUSTIFIED_ABSENT] = $langs->trans('JustifiedAbsent');
 		}
 
 		$statusType = 'status'.$status;
+		if ($status == self::STATUS_SIGNED) $statusType = 'status4';
 		if ($status == self::STATUS_ABSENT) $statusType = 'status8';
 
 		return dolGetStatus($this->labelStatus[$status], $this->labelStatusShort[$status], '', $statusType, $mode);
@@ -500,19 +514,15 @@ class DigiriskSignature extends CommonObject
 	 */
 	function fetchSignatory($role = "", $fk_object)
 	{
-		$filter = array('fk_object' => $fk_object, 'status' => 1);
+		$filter = array('customsql' => ' role="' . $role . '" AND fk_object=' . $fk_object . ' AND status!=0');
 		if (strlen($role)) {
-			$filter['role'] = $role;
-
 			return $this->fetchAll('', '', 0, 0, $filter, 'AND');
 		} else {
-
 			$signatories = $this->fetchAll('', '', 0, 0, $filter, 'AND');
 			if (!empty ($signatories) && $signatories > 0) {
 				foreach($signatories as $signatory) {
 					$signatoriesArray[$signatory->role][$signatory->id] = $signatory;
 				}
-
 				return $signatoriesArray;
 			} else {
 				return 0;

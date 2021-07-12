@@ -1112,3 +1112,26 @@ function llxHeaderSignature($title, $head = "", $disablejs = 0, $disablehead = 0
 
 	print '</div>';
 }
+
+/**
+ * Return string with full Url. The file qualified is the one defined by relative path in $object->last_main_doc
+ *
+ * @param   Object	$object				Object
+ * @return	string						Url string
+ */
+function showDirectPublicLinkSignature($object)
+{
+	global $conf, $langs;
+
+	$url = dol_buildpath('/custom/digiriskdolibarr/public/signature/index.php', 3);
+
+	$out = '';
+	if (empty($conf->global->DIGIRISKDOLIBARR_SIGNATURE_ENABLE_PUBLIC_INTERFACE)) {
+		$out .= '<span class="opacitymedium">'.$langs->trans("PublicInterfaceNotEnabled").'</span>';
+	} else {
+		$out .= img_picto('', 'object_globe.png').' '.$langs->trans("SignaturePublicAccess").' :<br>';
+		$out .= '<a href="'.$url.'" target="_blank">'.$url.'</a>';
+	}
+
+	return $out;
+}

@@ -1,25 +1,6 @@
-<div class="wpeo-dropdown">
-	<div class="dropdown-toggle wpeo-button button-main"><span>Label</span><i class="button-icon fas fa-caret-down"></i></div>
-	<ul class="dropdown-content">
-		<li class="dropdown-item">envoyer mail
-
-		</li>
-		<li class="dropdown-item">
-			<div class="signature-absent wpeo-button button-primary" value="<?php echo $element->id ?>">
-				<span><?php echo $langs->trans('Absent'); ?></span>
-			</div>
-		</li>
-		<li class="dropdown-item">
-			<div class="signature-email wpeo-button button-primary" value="<?php echo $element->id ?>">
-				<span><?php echo $langs->trans('SendEmail'); ?></span>
-			</div>
-		</li>
-	</ul>
-</div>
-
 <?php if (empty($element->signature)) : ?>
 	<div class="wpeo-button button-blue wpeo-modal-event modal-signature-open modal-open" value="<?php echo $element->id ?>">
-		<span><?php echo $langs->trans('Sign'); ?></span>
+		<span><i class="fas fa-signature"></i> <?php echo $langs->trans('Sign'); ?></span>
 	</div>
 <?php else : ?>
 	<img class="wpeo-modal-event modal-signature-open modal-open" value="<?php echo $element->id ?>" src='<?php echo $element->signature ?>' width="100px" height="100px" style="border: #0b419b solid 2px">
@@ -47,6 +28,8 @@
 					<span><?php echo $langs->trans('Cancel'); ?></span>
 				</div>
 				<div class="signature-validate wpeo-button button-primary" value="<?php echo $element->id ?>">
+					<input type="hidden" id="redirect<?php echo $element->id ?>" value="<?php echo $url ?>">
+					<input type="hidden" id="zone<?php echo $element->id ?>" value="<?php echo $zone ?>">
 					<span><?php echo $langs->trans('Validate'); ?></span>
 				</div>
 			</div>

@@ -831,6 +831,7 @@ window.eoxiaJS.signature.event = function() {
 	jQuery( document ).on( 'click', '.signature-erase', window.eoxiaJS.signature.clearCanvas );
 	jQuery( document ).on( 'click', '.signature-validate', window.eoxiaJS.signature.createSignature );
 	jQuery( document ).on( 'click', '.signature-absent', window.eoxiaJS.signature.setAbsent );
+	jQuery( document ).on( 'click', '.signature-email', window.eoxiaJS.signature.sendEmail );
 };
 
 window.eoxiaJS.signature.modalSignatureOpened = function( triggeredElement ) {
@@ -866,6 +867,7 @@ window.eoxiaJS.signature.clearCanvas = function( event ) {
 window.eoxiaJS.signature.createSignature = function() {
 	let elementSignatory = $(this).attr('value');
 	let elementRedirect  = $(this).find('#redirect' + elementSignatory).attr('value');
+	let elementZone  = $(this).find('#zone' + elementSignatory).attr('value');
 
 	var signatoryIDPost = '';
 	if (elementSignatory !== 0) {
@@ -876,9 +878,19 @@ window.eoxiaJS.signature.createSignature = function() {
 		var signature = $(this).closest( '.wpeo-modal' ).find( 'canvas' )[0].toDataURL();
 	}
 
+	var url = '';
+	var type = '';
+	if (elementZone == "private") {
+		url = document.URL + '&action=addSignature' + signatoryIDPost;
+		type = "POST"
+	} else {
+		url = document.URL + '?action=addSignature' + signatoryIDPost;
+		type = "GET";
+	}
+
 	$.ajax({
-		url: document.URL + '?action=addSignature' + signatoryIDPost,
-		type: "POST",
+		url: url,
+		type: type,
 		processData: false,
 		contentType: 'application/octet-stream',
 		data: signature,
@@ -900,6 +912,27 @@ window.eoxiaJS.signature.setAbsent = function() {
 
 	$.ajax({
 		url: document.URL + '&action=setAbsent' + signatoryIDPost,
+		type: "POST",
+		processData: false,
+		contentType: false,
+		success: function() {
+			window.location.reload();
+		},
+		error: function ( ) {
+		}
+	});
+};
+
+window.eoxiaJS.signature.sendEmail = function() {
+	let elementSignatory = $(this).attr('value');
+
+	var signatoryIDPost = '';
+	if (elementSignatory !== 0) {
+		signatoryIDPost = '&signatoryID=' + elementSignatory;
+	}
+
+	$.ajax({
+		url: document.URL + '&action=send' + signatoryIDPost,
 		type: "POST",
 		processData: false,
 		contentType: false,

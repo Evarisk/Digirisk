@@ -285,6 +285,7 @@ PreventionPlanDocumentGeneratedWithDolibarr = Plan de prévention généré avec
 # Data - Donnée
 
 PreventionPlan = Plan de prévention
+PreventionPlanList = Liste des plans de prévention
 PreventionPlanLine = risque(s)
 PriorVisit = Visite préliminaire
 PriorVisitYesNo = Visite préliminaire effectuée
@@ -302,6 +303,7 @@ Schedule = Horaires
 PreventionPlanSchedule = Horaires du plan de prévention
 SelectUser = Sélectionner un utilisateur
 Attendants = Participants
+ModifyPreventionPlan = Modifier le plan de prévention
 
 #
 # FirePermit - Permis de feu
@@ -744,8 +746,17 @@ Signed = Signé
 Unsigned = Non signé
 Absent = Absent
 JustifiedAbsent = Absence justifiée
+SignatureDate = Date de signature
+PublicID = ID pubic
+ActionsSignature = Actions
+SendEmail = Envoyer un email
 WelcomeOnOnlineSignaturePage = Bienvenue sur la page de signature des documents
 ThisIsInformationOnDocumentToSign = Voici les informations sur le document a signé
+DigiriskSignature = Signature Digirisk
+SignaturePublicAccess = Une interface publique ne nécessitant aucune identification est disponible à l'url suivante
+SignatureActivatePublicInterface = Activer l'interface publique
+SignatureShowCompanyLogo = Afficher le logo de la société dans l'interface publique
+SignatureShowCompanyLogoHelp = Activez cette option pour masquer le logo de la société dans les pages de l'interface publique
 
 #
 # Ticket - Interface publique ticket

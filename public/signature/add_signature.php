@@ -192,10 +192,7 @@ if ( $signatory->role == 'PP_EXT_SOCIETY_INTERVENANTS') {
 	$element = $signatory->fetchSignatory($signatory->role, $signatory->fk_object);
 	$element = array_shift($element);
 }
-$host  = $_SERVER['HTTP_HOST'];
-$uri   = rtrim(dirname($_SERVER['PHP_SELF']), '/\\');
-$extra = 'index.php';
-$url = "http://".$host.$uri."/".$extra; ?>
+$url = dirname($_SERVER['PHP_SELF']) . '/index.php'; ?>
 <?php if (empty($element->signature)) : ?>
 	<div class="wpeo-button button-blue wpeo-modal-event modal-signature-open modal-open" value="<?php echo $element->id ?>">
 		<span><?php echo $langs->trans('Sign'); ?></span>

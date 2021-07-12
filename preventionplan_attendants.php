@@ -38,6 +38,7 @@ if (!$res) die("Include of main fails");
 require_once __DIR__ . '/class/digiriskresources.class.php';
 require_once __DIR__ . '/class/preventionplan.class.php';
 require_once __DIR__ . '/lib/digiriskdolibarr_preventionplan.lib.php';
+require_once __DIR__ . '/lib/digiriskdolibarr_function.lib.php';
 
 global $db, $langs;
 
@@ -128,33 +129,131 @@ if ($action == 'setAbsent') {
 }
 
 // Action to send Email
-if ($action == 'sendEmail') {
+if ($action == 'send') {
 	$signatoryID = GETPOST('signatoryID');
 
 	$signatory->fetch($signatoryID);
 
 	if (!$error) {
-		$result = $signatory->setAbsent($user, false);
+		$result = $signatory->setPendingSignature($user, false);
 		if ($result > 0) {
-			// Creation signature OK
-			$urltogo = str_replace('__ID__', $result, $backtopage);
-			$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
-			header("Location: " . $urltogo);
-			exit;
-		}
-		else
-		{
+			// Actions to send emails
+			$langs->load('mails');
+
+			$triggersendname = 'DIGIRISkDOLIBARR_SIGNATURE_SENTBYMAIL';
+			$trackid = 'PreventionPlanSignature'.$element->id;
+			$url = dol_buildpath('/custom/digiriskdolibarr/public/signature/add_signature.php', 3);
+			$subject = ''; $actionmsg = ''; $actionmsg2 = '';
+			$sendto = $signatory->email;
+			$sendtoid = array();
+
+			if (dol_strlen($sendto))
+			{
+				require_once DOL_DOCUMENT_ROOT.'/core/class/CMailFile.class.php';
+
+				//$from = dol_string_nospecial($conf->global->MAIN_INFO_SOCIETE_NOM, ' ', array(",")).' <'.$conf->global->MAIN_INFO_SOCIETE_MAIL.'>';
+				$from = $conf->global->DIGIRISKDOLIBARR_SIGNATURE_EMAIL;
+				$message = $langs->trans('SignatureEmailMessage');
+				$message .= $url;
+				$subject = $langs->trans('SignatureEmailSubject');
+
+				$actionmsg2 = $langs->transnoentities('MailSentBy').' '.CMailFile::getValidAddress($from, 4, 0, 1).' '.$langs->transnoentities('at').' '.CMailFile::getValidAddress($sendto, 4, 0, 1);
+				if ($message)
+				{
+					$actionmsg = $langs->transnoentities('MailFrom').': '.dol_escape_htmltag($from);
+					$actionmsg = dol_concatdesc($actionmsg, $langs->transnoentities('MailTo').': '.dol_escape_htmltag($sendto));
+					$actionmsg = dol_concatdesc($actionmsg, $langs->transnoentities('MailTopic').": ".$subject);
+					$actionmsg = dol_concatdesc($actionmsg, $langs->transnoentities('TextUsedInTheMessageBody').":");
+					$actionmsg = dol_concatdesc($actionmsg, $message);
+				}
+
+				// Create form object
+				// Send mail (substitutionarray must be done just before this)
+				if (empty($sendcontext)) $sendcontext = 'mail';
+				$mailfile = new CMailFile($subject, $sendto, $from, $message, array(), array(), array(), "", "", 0, -1, '', '', $trackid, '', $sendcontext);
+
+				if ($mailfile->error)
+				{
+					setEventMessages($mailfile->error, $mailfile->errors, 'errors');
+					$action = 'presend';
+				} else {
+					$result = $mailfile->sendfile();
+					if ($result)
+					{
+						// Initialisation of datas of object to call trigger
+						if (is_object($object))
+						{
+							if (empty($actiontypecode)) $actiontypecode = 'AC_OTH_AUTO'; // Event insert into agenda automatically
+
+							$object->socid          = $sendtosocid; // To link to a company
+							$object->sendtoid       = $sendtoid; // To link to contact-addresses. This is an array.
+							$object->actiontypecode = $actiontypecode; // Type of event ('AC_OTH', 'AC_OTH_AUTO', 'AC_XXX'...)
+							$object->actionmsg      = $actionmsg; // Long text (@todo Replace this with $message, we already have details of email in dedicated properties)
+							$object->actionmsg2     = $actionmsg2; // Short text ($langs->transnoentities('MailSentBy')...);
+							$object->trackid        = $trackid;
+							$object->fk_element     = $object->id;
+							$object->elementtype    = $object->element;
+							$object->email_from     = $from;
+							$object->email_subject  = $subject;
+							$object->email_to       = $sendto;
+							$object->email_subject  = $subject;
+							$object->email_msgid    = $mailfile->msgid;
+
+							// Call of triggers (you should have set $triggersendname to execute trigger)
+							if (!empty($triggersendname))
+							{
+								// Call trigger
+								$result = $object->call_trigger($triggersendname, $user);
+								if ($result < 0) $error++;
+								// End call triggers
+								if ($error) {
+									setEventMessages($object->error, $object->errors, 'errors');
+								}
+							}
+							// End call of triggers
+						}
+
+						// Redirect here
+						// This avoid sending mail twice if going out and then back to page
+						$mesg = $langs->trans('MailSuccessfulySent', $mailfile->getValidAddress($from, 2), $mailfile->getValidAddress($sendto, 2));
+						setEventMessages($mesg, null, 'mesgs');
+
+						$moreparam = '';
+						if (isset($paramname2) || isset($paramval2)) $moreparam .= '&'.($paramname2 ? $paramname2 : 'mid').'='.$paramval2;
+						header('Location: '.$_SERVER["PHP_SELF"].'?'.($paramname ? $paramname : 'id').'='.(is_object($object) ? $object->id : '').$moreparam);
+						exit;
+					} else {
+						$langs->load("other");
+						$mesg = '<div class="error">';
+						if ($mailfile->error) {
+							$mesg .= $langs->transnoentities('ErrorFailedToSendMail', dol_escape_htmltag($from), dol_escape_htmltag($sendto));
+							$mesg .= '<br>'.$mailfile->error;
+						} else {
+							$mesg .= $langs->transnoentities('ErrorFailedToSendMail', dol_escape_htmltag($from), dol_escape_htmltag($sendto));
+							if (!empty($conf->global->MAIN_DISABLE_ALL_MAILS)) {
+								$mesg .= '<br>Feature is disabled by option MAIN_DISABLE_ALL_MAILS';
+							} else {
+								$mesg .= '<br>Unkown Error, please refers to your administrator';
+							}
+						}
+						$mesg .= '</div>';
+
+						setEventMessages($mesg, null, 'warnings');
+						$action = 'presend';
+					}
+				}
+			} else {
+				$langs->load("errors");
+				setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv("MailTo")), null, 'warnings');
+				dol_syslog('Try to send email with no recipient defined', LOG_WARNING);
+				$action = 'presend';
+			}
+		} else {
 			// Creation signature KO
 			if (!empty($signatory->errors)) setEventMessages(null, $signatory->errors, 'errors');
 			else  setEventMessages($signatory->error, null, 'errors');
 		}
 	}
-
-	// Actions to send emails
-	$triggersendname = 'MYMODULE_MYOBJECT_SENTBYMAIL';
-	$autocopy = 'MAIN_MAIL_AUTOCOPY_MYOBJECT_TO';
-	$trackid = 'myobject'.$object->id;
-	include DOL_DOCUMENT_ROOT.'/core/actions_sendmails.inc.php';
 }
 
 /*
@@ -191,7 +290,13 @@ print '<div class="div-table-responsive">'; ?>
 	</div>
 </div>
 
-<?php print load_fiche_titre($langs->trans("SignatureResponsibles"), '', '');
+<?php
+// Show direct link to public interface
+print '<br><!-- Link to public interface -->'."\n";
+print showDirectPublicLinkSignature($signatory).'<br>';
+print '</div>';
+
+print load_fiche_titre($langs->trans("SignatureResponsibles"), '', '');
 
 print '<table class="border centpercent tableforfield">';
 print '<tr class="liste_titre">';
@@ -199,8 +304,9 @@ print '<td>'.$langs->trans("Role").'</td>';
 print '<td>'.$langs->trans("SignatureDate").'</td>';
 print '<td>'.$langs->trans("PublicID").'</td>';
 print '<td>'.$langs->trans("Name").'</td>';
-print '<td class="center">'.$langs->trans("Action").'</td>';
-print '<td>'.$langs->trans("Status").'</td>';
+print '<td class="center">'.$langs->trans("ActionsSignature").'</td>';
+print '<td class="center">'.$langs->trans("Signature").'</td>';
+print '<td class="center">'.$langs->trans("Status").'</td>';
 print '</tr>'."\n";
 
 //Master builder -- Maitre Oeuvre
@@ -209,6 +315,10 @@ if ($element > 0) {
 	$element = array_shift($element);
 	$usertmp->fetch($element->element_id);
 }
+
+$url = $_SERVER['REQUEST_URI'];
+$zone = "private";
+
 print '<tr class="oddeven"><td>';
 print $langs->trans("MaitreOeuvre");
 print '</td><td>';
@@ -218,8 +328,10 @@ print $element->signature_url;
 print '</td><td>';
 print $usertmp->getNomUrl(1);
 print '</td><td class="center">';
+require __DIR__ . "/core/tpl/digiriskdolibarr_signature_action_view.tpl.php";
+print '</td><td class="center">';
 require __DIR__ . "/core/tpl/digiriskdolibarr_signature_view.tpl.php";
-print '</td><td>';
+print '</td><td class="center">';
 print $element->getLibStatut(5);
 print '</td></tr>';
 
@@ -238,8 +350,10 @@ print $element->signature_url;
 print '</td><td>';
 print $usertmp->getNomUrl(1);
 print '</td><td class="center">';
+require __DIR__ . "/core/tpl/digiriskdolibarr_signature_action_view.tpl.php";
+print '</td><td class="center">';
 require __DIR__ . "/core/tpl/digiriskdolibarr_signature_view.tpl.php";
-print '</td><td>';
+print '</td><td class="center">';
 print $element->getLibStatut(5);
 print '</td></tr>';
 
@@ -255,8 +369,9 @@ print '<td>'.$langs->trans("Role").'</td>';
 print '<td>'.$langs->trans("SignatureDate").'</td>';
 print '<td>'.$langs->trans("PublicID").'</td>';
 print '<td>'.$langs->trans("Name").'</td>';
-print '<td class="center">'.$langs->trans("Action").'</td>';
-print '<td>'.$langs->trans("Status").'</td>';
+print '<td class="center">'.$langs->trans("ActionsSignature").'</td>';
+print '<td class="center">'.$langs->trans("Signature").'</td>';
+print '<td class="center">'.$langs->trans("Status").'</td>';
 print '</tr>'."\n";
 
 //External Society Intervenants -- Intervenants Société extérieure
@@ -274,8 +389,10 @@ if (is_array($ext_society_intervenants) && !empty ($ext_society_intervenants) &&
 		$contact->fetch($element->element_id);
 		print $contact->getNomUrl(1);
 		print '</td><td class="center">';
+		require __DIR__ . "/core/tpl/digiriskdolibarr_signature_action_view.tpl.php";
+		print '</td><td class="center">';
 		require __DIR__ . "/core/tpl/digiriskdolibarr_signature_view.tpl.php";
-		print '</td><td>';
+		print '</td><td class="center">';
 		print $element->getLibStatut(5);
 		print '</td></tr>';
 		$j++;
