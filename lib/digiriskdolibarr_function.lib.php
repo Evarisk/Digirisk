@@ -48,6 +48,8 @@ function digirisk_show_photos($modulepart, $sdir, $size = 0, $nbmax = 0, $nbbyro
 	$sortfield = 'position_name';
 	$sortorder = 'desc';
 
+	$dir = $sdir.'/'.$object->ref.'/';
+	$pdir = $subdir . '/'.$object->ref.'/';
 
 	// Defined relative dir to DOL_DATA_ROOT
 	$relativedir = '';
@@ -63,10 +65,10 @@ function digirisk_show_photos($modulepart, $sdir, $size = 0, $nbmax = 0, $nbbyro
 
 	$return = '<!-- Photo -->'."\n";
 	$nbphoto = 0;
+
 	$filearray = dol_dir_list($dir, "files", 0, '', '(\.meta|_preview.*\.png)$', $sortfield, (strtolower($sortorder) == 'desc' ?SORT_DESC:SORT_ASC), 1);
 	if (count($filearray))
 	{
-
 		if ($sortfield && $sortorder)
 		{
 			$filearray = dol_sort_array($filearray, $sortfield, $sortorder);
@@ -154,7 +156,6 @@ function digirisk_show_photos($modulepart, $sdir, $size = 0, $nbmax = 0, $nbbyro
 
 					if (empty($nolink)) $return .= '</a>';
 					$return .= "\n";
-
 					if ($showfilename) $return .= '<br>'.$viewfilename;
 					if ($showaction)
 					{
