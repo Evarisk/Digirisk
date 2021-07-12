@@ -260,7 +260,7 @@ if ($action == 'send') {
  *  View
  */
 
-$title    = $langs->trans("PreventionPlan");
+$title    = $langs->trans("PreventionPlanAttendants");
 $help_url = '';
 $morejs   = array("/digiriskdolibarr/js/signature-pad.min.js", "/digiriskdolibarr/js/digiriskdolibarr.js.php");
 $morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");
@@ -273,7 +273,7 @@ if (!empty($object->id)) $res = $object->fetch_optionals();
 // ------------------------------------------------------------
 
 $head = preventionplanPrepareHead($object);
-print dol_get_fiche_head($head, 'preventionplanAttendants', $langs->trans("PreventionPlan"), -1, '');
+print dol_get_fiche_head($head, 'preventionplanAttendants', $langs->trans("PreventionPlan"), -1, "digiriskdolibarr@digiriskdolibarr");
 dol_banner_tab($object, 'ref', '', 0, 'rowid', 'ref');
 
 print '<div class="fichecenter"></div>';

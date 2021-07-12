@@ -16,9 +16,9 @@
  */
 
 /**
- *   	\file       preventionplan_card.php
+ *   	\file       preventionplan_schedule.php
  *		\ingroup    digiriskdolibarr
- *		\brief      Page to create/edit/view preventionplan
+ *		\brief      Page to create/edit/view Prevention Plan Schedule
  */
 
 // Load Dolibarr environment
@@ -35,20 +35,9 @@ if (!$res && file_exists("../../main.inc.php")) $res = @include "../../main.inc.
 if (!$res && file_exists("../../../main.inc.php")) $res = @include "../../../main.inc.php";
 if (!$res) die("Include of main fails");
 
-require_once DOL_DOCUMENT_ROOT.'/core/class/html.formfile.class.php';
-
-require_once __DIR__ . '/class/digiriskdocuments.class.php';
-require_once __DIR__ . '/class/digiriskelement.class.php';
-require_once __DIR__ . '/class/digiriskresources.class.php';
 require_once __DIR__ . '/class/preventionplan.class.php';
-require_once __DIR__ . '/class/riskanalysis/risk.class.php';
-require_once __DIR__ . '/class/digiriskdocuments/preventionplandocument.class.php';
-require_once __DIR__ . '/lib/digiriskdolibarr_function.lib.php';
+require_once __DIR__ . '/class/openinghours.class.php';
 require_once __DIR__ . '/lib/digiriskdolibarr_preventionplan.lib.php';
-require_once __DIR__ . '/core/modules/digiriskdolibarr/digiriskelement/preventionplan/mod_preventionplan_standard.php';
-require_once __DIR__ . '/core/modules/digiriskdolibarr/digiriskelement/preventionplandet/mod_preventionplandet_standard.php';
-require_once __DIR__ . '/core/modules/digiriskdolibarr/digiriskdocuments/preventionplandocument/mod_preventionplandocument_standard.php';
-require_once __DIR__ . '/core/modules/digiriskdolibarr/digiriskdocuments/preventionplandocument/modules_preventionplandocument.php';
 
 global $db, $conf, $langs;
 
@@ -56,44 +45,31 @@ global $db, $conf, $langs;
 $langs->loadLangs(array("digiriskdolibarr@digiriskdolibarr", "other"));
 
 // Get parameters
-$id                  = GETPOST('id', 'int');
-$lineid                  = GETPOST('lineid', 'int');
-$ref                 = GETPOST('ref', 'alpha');
-$action              = GETPOST('action', 'aZ09');
-$confirm             = GETPOST('confirm', 'alpha');
-$cancel              = GETPOST('cancel', 'aZ09');
-$contextpage         = GETPOST('contextpage', 'aZ') ?GETPOST('contextpage', 'aZ') : 'preventionplancard'; // To manage different context of search
-$backtopage          = GETPOST('backtopage', 'alpha');
-$backtopageforcancel = GETPOST('backtopageforcancel', 'alpha');
-$fk_parent           = GETPOST('fk_parent', 'int');
+$id          = GETPOST('id', 'int');
+$ref         = GETPOST('ref', 'alpha');
+$action      = GETPOST('action', 'aZ09');
+$cancel      = GETPOST('cancel', 'aZ09');
+$contextpage = GETPOST('contextpage', 'aZ') ?GETPOST('contextpage', 'aZ') : 'preventionplanschedule'; // To manage different context of search
 
 // Initialize technical objects
-$preventionplan                 = new PreventionPlan($db);
-$object = new Openinghours($db);
+$preventionplan = new PreventionPlan($db);
+$object         = new Openinghours($db);
 
 $preventionplan->fetch($id);
 
-$digiriskelement   = new DigiriskElement($db);
-$digiriskresources = new DigiriskResources($db);
+$hookmanager->initHooks(array('preventionplanschedule', 'globalcard')); // Note that conf->hooks_modules contains array
 
-$refPreventionPlanMod = new $conf->global->DIGIRISKDOLIBARR_PREVENTIONPLAN_ADDON($db);
-$refPreventionPlanDetMod = new  $conf->global->DIGIRISKDOLIBARR_PREVENTIONPLANDET_ADDON($db);
-
-$hookmanager->initHooks(array('preventionplancard', 'globalcard')); // Note that conf->hooks_modules contains array
-
-$upload_dir         = $conf->digiriskdolibarr->multidir_output[isset($preventionplan->entity) ? $preventionplan->entity : 1];
 $permissiontoread   = $user->rights->digiriskdolibarr->preventionplandocument->read;
 $permissiontoadd    = $user->rights->digiriskdolibarr->preventionplandocument->write;
-$permissiontodelete = $user->rights->digiriskdolibarr->preventionplandocument->delete;
 
-$morewhere = ' AND element_id = ' . GETPOST('id');
+$morewhere = ' AND element_id = ' . $id;
 $morewhere .= ' AND element_type = ' . "'" . $preventionplan->element . "'";
 $morewhere .= ' AND status = 1';
 
 $object->fetch(0, '', $morewhere);
 
 if (!$permissiontoread) accessforbidden();
-/*
+
 /*
  * Actions
  */
@@ -106,7 +82,7 @@ if (($action == 'update' && !GETPOST("cancel", 'alpha'))
 	|| ($action == 'updateedit'))
 {
 	$object->element_type = $preventionplan->element;
-	$object->element_id = GETPOST('id');
+	$object->element_id = $id;
 	$object->status = 1;
 	$object->monday = GETPOST('monday', 'string');
 	$object->tuesday = GETPOST('tuesday', 'string');
@@ -118,27 +94,29 @@ if (($action == 'update' && !GETPOST("cancel", 'alpha'))
 	$object->create($user);
 }
 
-
 /*
  *  View
  */
 
-$title = $langs->trans("PreventionPlan");
-$help_url = 'EN:Module_Third_Parties|FR:Module_DigiriskDolibarr#L.27onglet_Horaire_de_travail|ES:Empresas';
+$title = $langs->trans("PreventionPlanSchedule");
+$help_url = '';
 llxHeader('', $title, $help_url);
 
 if (!empty($preventionplan->id)) $res = $preventionplan->fetch_optionals();
 
 // Object card
 // ------------------------------------------------------------
-$morehtmlref = '<div class="refidno">';
-$morehtmlref .= '</div>';
 
 $head = preventionplanPrepareHead($preventionplan);
-dol_fiche_head($head, 'preventionplanSchedule', $langs->trans("PreventionPlan"), 0, '');
-dol_banner_tab($preventionplan, 'ref', '', ($user->socid ? 0 : 1), 'rowid', 'nom', '', '', 0, '', '', 'arearefnobottom');
+print dol_get_fiche_head($head, 'preventionplanSchedule', $langs->trans("PreventionPlan"), -1, "digiriskdolibarr@digiriskdolibarr");
+dol_banner_tab($preventionplan, 'ref', '', 0, 'rowid', 'ref');
 
-print '<span class="opacitymedium">'.$langs->trans("PreventionPlanSchedule")."</span>\n";
+print '<div class="fichecenter"></div>';
+print '<div class="underbanner clearboth"></div>';
+
+print dol_get_fiche_end();
+
+print load_fiche_titre($langs->trans("PreventionPlanSchedule"), '', '');
 
 //Show common fields
 include DOL_DOCUMENT_ROOT.'/custom/digiriskdolibarr/core/tpl/digiriskdolibarr_openinghours_view.tpl.php';
