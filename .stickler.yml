@@ -1,0 +1,12 @@
+linters:
+  phpcs:
+    standard: PSR2
+    fixer: true
+  csslint: {  }
+files:
+  ignore:
+    - 'vendor/*'
+    - 'bower_components/*'
+    - 'node_modules/*'
+fixers:
+  enable: true
