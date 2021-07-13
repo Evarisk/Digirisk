@@ -113,6 +113,14 @@ if (empty($reshook))
 		}
 	}
 
+	if ($action == 'add' && GETPOST('cancel')) {
+		// Creation prevention plan OK
+		$urltogo = str_replace('__ID__', $result, $backurlforlist);
+		$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
+		header("Location: " . $urltogo);
+		exit;
+	}
+
 	// Action to add record
 	if ($action == 'add' && $permissiontoadd) {
 
@@ -602,7 +610,7 @@ if ($action == 'create')
 
 	print '<div class="center">';
 	print '<input type="submit" class="button" id ="actionButtonCreate" name="add" value="'.dol_escape_htmltag($langs->trans("Create")).'">';
-	print ' &nbsp; <input type="submit" id ="actionButtonCancelCreate" class="button" name="cancel" value="'.$langs->trans("Cancel").'"  onClick="javascript:history.go(-1)">';
+	print ' &nbsp; <input type="submit" id ="actionButtonCancelCreate" class="button" name="cancel" value="'.$langs->trans("Cancel").'">';
 	print '</div>';
 
 	print '</form>';
@@ -755,7 +763,7 @@ if (($id || $ref) && $action == 'edit')
 	dol_fiche_end();
 
 	print '<div class="center"><input type="submit" id ="actionButtonSave" class="button" name="save" value="'.$langs->trans("Save").'">';
-	print ' &nbsp; <input type="submit" id ="actionButtonCancelEdit" class="button" name="cancel" value="'.$langs->trans("Cancel").'"  onClick="javascript:history.go(-1)">';
+	print ' &nbsp; <input type="submit" id ="actionButtonCancelEdit" class="button" name="cancel" value="'.$langs->trans("Cancel").'">';
 	print '</div>';
 
 	print '</form>';
