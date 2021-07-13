@@ -61,10 +61,10 @@ class PreventionPlan extends CommonObject
 	 */
 	public $picto = 'preventionplandocument@digiriskdolibarr';
 
-//	const STATUS_REGISTERED = 0;
-//	const STATUS_SIGNATURE_REQUEST = 1;
-//	const STATUS_PENDING_SIGNATURE = 2;
-//	const STATUS_DENIED = 3;
+	const STATUS_REGISTERED = 0;
+	const STATUS_SIGNATURE_REQUEST = 1;
+	const STATUS_LOCK = 2;
+	const STATUS_UNLOCK = 3;
 //	const STATUS_SIGNED = 4;
 //	const STATUS_UNSIGNED = 5;
 //	const STATUS_ABSENT = 6;
@@ -309,17 +309,59 @@ class PreventionPlan extends CommonObject
 			dol_print_error($this->db);
 		}
 	}
+
+
 	/**
-	 *	Return label of contact status
+	 *	Set lock status
 	 *
-	 *	@param      int		$mode       0=Long label, 1=Short label, 2=Picto + Short label, 3=Picto, 4=Picto + Long label, 5=Short label + Picto, 6=Long label + Picto
-	 * 	@return 	string				Label of contact status
+	 *	@param	User	$user			Object user that modify
+	 *  @param	int		$notrigger		1=Does not execute triggers, 0=Execute triggers
+	 *	@return	int						<0 if KO, >0 if OK
 	 */
-	public function getLibStatut($mode)
+	public function setLock($user, $notrigger = 0)
 	{
-		return '';
+		return $this->setStatusCommon($user, self::STATUS_LOCK, $notrigger, 'DIGIRISKSIGNATURE_LOCK');
 	}
 
+	/**
+	 *  Return the label of the status
+	 *
+	 *  @param  int		$mode          0=long label, 1=short label, 2=Picto + short label, 3=Picto, 4=Picto + long label, 5=Short label + Picto, 6=Long label + Picto
+	 *  @return	string 			       Label of status
+	 */
+	public function getLibStatut($mode = 0)
+	{
+		return $this->LibStatut($this->status, $mode);
+	}
+
+	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+	/**
+	 *  Return the status
+	 *
+	 *  @param	int		$status        Id status
+	 *  @param  int		$mode          0=long label, 1=short label, 2=Picto + short label, 3=Picto, 4=Picto + long label, 5=Short label + Picto, 6=Long label + Picto
+	 *  @return string 			       Label of status
+	 */
+	public function LibStatut($status, $mode = 0)
+	{
+
+		// phpcs:enable
+		if (empty($this->labelStatus) || empty($this->labelStatusShort))
+		{
+			global $langs;
+			//$langs->load("digiriskdolibarr@digiriskdolibarr");
+			//$this->labelStatus[self::STATUS_DELETED] = $langs->trans('Deleted');
+			//$this->labelStatus[self::STATUS_REGISTERED] = $langs->trans('Registered');
+			$this->labelStatus[self::STATUS_LOCK] = $langs->trans('Lock');
+			$this->labelStatus[self::STATUS_UNLOCK] = $langs->trans('Unlock');
+		}
+
+		$statusType = 'status'.$status;
+		if ($status == self::STATUS_UNLOCK) $statusType = 'status4';
+		if ($status == self::STATUS_LOCK) $statusType = 'status8';
+
+		return dolGetStatus($this->labelStatus[$status], $this->labelStatusShort[$status], '', $statusType, $mode);
+	}
 
 	/**
 	 *    	Return a link on thirdparty (with picto)
