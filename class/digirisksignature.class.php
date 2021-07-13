@@ -514,8 +514,9 @@ class DigiriskSignature extends CommonObject
 	 */
 	function fetchSignatory($role = "", $fk_object)
 	{
-		$filter = array('customsql' => ' role="' . $role . '" AND fk_object=' . $fk_object . ' AND status!=0');
+		$filter = array('customsql' => 'fk_object=' . $fk_object . ' AND status!=0');
 		if (strlen($role)) {
+			$filter['customsql'] .= ' AND role = "' . $role . '"';
 			return $this->fetchAll('', '', 0, 0, $filter, 'AND');
 		} else {
 			$signatories = $this->fetchAll('', '', 0, 0, $filter, 'AND');
