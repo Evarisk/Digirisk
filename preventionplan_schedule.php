@@ -38,6 +38,7 @@ if (!$res) die("Include of main fails");
 require_once __DIR__ . '/class/preventionplan.class.php';
 require_once __DIR__ . '/class/openinghours.class.php';
 require_once __DIR__ . '/lib/digiriskdolibarr_preventionplan.lib.php';
+require_once __DIR__ . '/lib/digiriskdolibarr_function.lib.php';
 
 global $db, $conf, $langs;
 
@@ -109,8 +110,10 @@ if (!empty($preventionplan->id)) $res = $preventionplan->fetch_optionals();
 
 $head = preventionplanPrepareHead($preventionplan);
 print dol_get_fiche_head($head, 'preventionplanSchedule', $langs->trans("PreventionPlan"), -1, "digiriskdolibarr@digiriskdolibarr");
-dol_banner_tab($preventionplan, 'ref', '', 0, 'rowid', 'ref');
+$morehtmlref = ' - ' . $preventionplan->label;
+$morehtmlleft .= '<div class="floatleft inline-block valignmiddle divphotoref">'.digirisk_show_photos('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$entity].'/'.$object->element_type, 'small', 5, 0, 0, 0, $width,0, 0, 0, 0, $object->element_type, $object).'</div>';
 
+digirisk_banner_tab($preventionplan, 'ref', '', 0, 'ref', 'ref', $morehtmlref, '', 0, $morehtmlleft);
 print '<div class="fichecenter"></div>';
 print '<div class="underbanner clearboth"></div>';
 

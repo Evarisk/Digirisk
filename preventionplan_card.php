@@ -787,11 +787,10 @@ if ((empty($action) || ($action != 'create' && $action != 'edit')))
 	// ------------------------------------------------------------
 	$width = 80; $cssclass = 'photoref';
 
-	$morehtmlref = '<div class="refidno">';
-	$morehtmlref .= '</div>';
-	$morehtmlleft .= '<div class="floatleft inline-block valignmiddle divphotoref"></div>';
+	$morehtmlref = ' - ' . $object->label;
+	$morehtmlleft .= '<div class="floatleft inline-block valignmiddle divphotoref">'.digirisk_show_photos('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$entity].'/'.$object->element_type, 'small', 5, 0, 0, 0, $width,0, 0, 0, 0, $object->element_type, $object).'</div>';
 
-	dol_banner_tab($object, 'ref', '', 0, 'ref', 'ref', $morehtmlref, '', 0, $morehtmlleft);
+	digirisk_banner_tab($object, 'ref', '', 0, 'ref', 'ref', $morehtmlref, '', 0, $morehtmlleft);
 
 	print '<div class="div-table-responsive">';
 	print '<div class="fichecenter">';
