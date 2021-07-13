@@ -454,6 +454,10 @@ while ($i < ($limit ? min($num, $limit) : $num)) {
 			if ($key == 'status') print $preventionplan->getLibStatut(5);
 			elseif ($key == 'ref') {
 				print $preventionplan->getNomUrl();
+			} elseif ($key == 'date_start') {
+				print dol_print_date($preventionplan->date_start, 'dayhour', 'tzserver');	// We suppose dates without time are always gmt (storage of course + output)
+			} elseif ($key == 'date_end') {
+				print dol_print_date($preventionplan->date_end, 'dayhour', 'tzserver');	// We suppose dates without time are always gmt (storage of course + output)
 			}
 			else print $preventionplan->showOutputField($val, $key, $preventionplan->$key, '');
 			print '</td>';
