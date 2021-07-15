@@ -156,7 +156,9 @@ if (empty($reshook))
 		//Création du dossier à zipper
 		$entity = ($conf->entity > 1) ? '/' . $conf->entity : '';
 
-		$pathToZip = DOL_DATA_ROOT . $entity . '/digiriskdolibarr/riskassessmentdocument/' . $riskassessmentdocument->ref;
+		$date = dol_print_date(dol_now(),'dayxcard');
+
+		$pathToZip = DOL_DATA_ROOT . $entity . '/digiriskdolibarr/riskassessmentdocument/' . $date . '_' . $riskassessmentdocument->ref;
 		dol_mkdir($pathToZip);
 
 		// Ajout du fichier au dossier à zipper

@@ -307,7 +307,7 @@ function digiriskshowdocuments($modulepart, $modulesubdir, $filedir, $urlsource,
 
 		if (class_exists($class))
 		{
-			$modellist = call_user_func($class.'::liste_modeles', $db);
+			$modellist = call_user_func($class.'::liste_modeles', $db, 100);
 		}
 		else
 		{
@@ -343,11 +343,14 @@ function digiriskshowdocuments($modulepart, $modulesubdir, $filedir, $urlsource,
 			if (is_array($modellist) && count($modellist) == 1)    // If there is only one element
 			{
 				$arraykeys = array_keys($modellist);
+				$arrayvalues = preg_replace('/template_/','', array_values($modellist)[0]);
+				$modellist[$arraykeys[0]] = $arrayvalues;
 				$modelselected = $arraykeys[0];
 			}
 			$morecss = 'maxwidth200';
 			if ($conf->browser->layout == 'phone') $morecss = 'maxwidth100';
 			$out .= $form->selectarray('model', $modellist, $modelselected, $showempty, 0, 0, '', 0, 0, 0, '', $morecss);
+
 			if ($conf->use_javascript_ajax)
 			{
 				$out .= ajax_combobox('model');
