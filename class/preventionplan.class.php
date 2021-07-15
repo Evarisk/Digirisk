@@ -310,7 +310,6 @@ class PreventionPlan extends CommonObject
 		}
 	}
 
-
 	/**
 	 *	Set lock status
 	 *
@@ -321,6 +320,18 @@ class PreventionPlan extends CommonObject
 	public function setLock($user, $notrigger = 0)
 	{
 		return $this->setStatusCommon($user, self::STATUS_LOCK, $notrigger, 'DIGIRISKSIGNATURE_LOCK');
+	}
+
+	/**
+	 *	Set unlock status
+	 *
+	 *	@param	User	$user			Object user that modify
+	 *  @param	int		$notrigger		1=Does not execute triggers, 0=Execute triggers
+	 *	@return	int						<0 if KO, >0 if OK
+	 */
+	public function setUnlock($user, $notrigger = 0)
+	{
+		return $this->setStatusCommon($user, self::STATUS_UNLOCK, $notrigger, 'DIGIRISKSIGNATURE_UNLOCK');
 	}
 
 	/**

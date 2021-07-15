@@ -142,7 +142,6 @@ if (empty($reshook))
 		$object->date_creation = $object->db->idate($now);
 		$object->tms           = $now;
 		$object->import_key    = "";
-		$object->status        = 1;
 		$object->label         = $label;
 
 		$date_start = dol_mktime(GETPOST('dateohour', 'int'), GETPOST('dateomin', 'int'), 0, GETPOST('dateomonth', 'int'), GETPOST('dateoday', 'int'), GETPOST('dateoyear', 'int'));
@@ -182,6 +181,8 @@ if (empty($reshook))
 			$result = $object->create($user, false);
 
 			if ($result > 0) {
+
+				$object->setUnlock($user, false);
 
 				$digiriskresources->digirisk_dolibarr_set_resources($db, $user->id, 'PP_EXT_SOCIETY', 'societe', array($extsociety_id), $conf->entity, 'preventionplan', $object->id, 1);
 				$digiriskresources->digirisk_dolibarr_set_resources($db, $user->id, 'PP_LABOUR_INSPECTOR_ASSIGNED', 'societe', array($labour_inspector_id), $conf->entity, 'preventionplan', $object->id, 1);
@@ -431,14 +432,13 @@ if (empty($reshook))
 		}
 	}
 
-	// Action to set status STATUS_ABSENT
+	// Action to set status STATUS_LOCK
 	if ($action == 'setLock') {
-		$signatoryID = GETPOST('signatoryID');
 
-		$signatory->fetch($signatoryID);
+		$object->fetch($id);
 
 		if (!$error) {
-			$result = $signatory->setAbsent($user, false);
+			$result = $object->setLock($user, false);
 			if ($result > 0) {
 				// Creation signature OK
 				$urltogo = str_replace('__ID__', $result, $backtopage);
@@ -449,8 +449,31 @@ if (empty($reshook))
 			else
 			{
 				// Creation signature KO
-				if (!empty($signatory->errors)) setEventMessages(null, $signatory->errors, 'errors');
-				else  setEventMessages($signatory->error, null, 'errors');
+				if (!empty($object->errors)) setEventMessages(null, $object->errors, 'errors');
+				else  setEventMessages($object->error, null, 'errors');
+			}
+		}
+	}
+
+	// Action to set status STATUS_UNLOCK
+	if ($action == 'setUnlock') {
+
+		$object->fetch($id);
+
+		if (!$error) {
+			$result = $object->setUnlock($user, false);
+			if ($result > 0) {
+				// Creation signature OK
+				$urltogo = str_replace('__ID__', $result, $backtopage);
+				$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
+				header("Location: " . $urltogo);
+				exit;
+			}
+			else
+			{
+				// Creation signature KO
+				if (!empty($object->errors)) setEventMessages(null, $object->errors, 'errors');
+				else  setEventMessages($object->error, null, 'errors');
 			}
 		}
 	}
@@ -798,7 +821,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit')))
 	$morehtmlref = ' - ' . $object->label;
 	$morehtmlleft .= '<div class="floatleft inline-block valignmiddle divphotoref">'.digirisk_show_photos('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$entity].'/'.$object->element_type, 'small', 5, 0, 0, 0, $width,0, 0, 0, 0, $object->element_type, $object).'</div>';
 
-	digirisk_banner_tab($object, 'ref', '', 0, 'ref', 'ref', $morehtmlref, '', 0, $morehtmlleft);
+	digirisk_banner_tab($object, 'ref', '', 0, 'ref', 'ref', $morehtmlref, '', 0, $morehtmlleft, $object->getLibStatut(5));
 
 	print '<div class="div-table-responsive">';
 	print '<div class="fichecenter">';
@@ -851,14 +874,16 @@ if ((empty($action) || ($action != 'create' && $action != 'edit')))
 	}
 	print '</td></tr>';
 
-	//Labour inspector -- Inspecteur du travail
+	//Attendants -- Participants
 	print '<tr><td class="tdtop">';
 	print $langs->trans("Attendants");
 	print '</td>';
 	print '<td>';
-	$ext_society_intervenants = $signatory->fetchSignatory('PP_EXT_SOCIETY_INTERVENANTS', $object->id);
+	$attendants = count($signatory->fetchSignatory('PP_MAITRE_OEUVRE', $object->id));
+	$attendants += count($signatory->fetchSignatory('PP_EXT_SOCIETY_RESPONSIBLE', $object->id));
+	$attendants += count($signatory->fetchSignatory('PP_EXT_SOCIETY_INTERVENANTS', $object->id));
 	$url = dol_buildpath('/custom/digiriskdolibarr/preventionplan_attendants.php?id='.$object->id, 3);
-	print '<a href="'.$url.'">'.count($ext_society_intervenants).'</a>';
+	print '<a href="'.$url.'">'.$attendants.'</a>';
 	print '</td></tr>';
 
 	print '</table>';
@@ -883,7 +908,11 @@ if ((empty($action) || ($action != 'create' && $action != 'edit')))
 			} else {
 				print '<a class="butActionRefused classfortooltip" href="#" title="' . dol_escape_htmltag($langs->trans("NotEnoughPermissions")) . '">' . $langs->trans('Modify') . '</a>' . "\n";
 			}
-			print '<a class="butAction" id="actionButtonLock" href="' . $_SERVER["PHP_SELF"] . '?id=' . $object->id . '&action=setLock">' . $langs->trans("Lock") . '</a>' . "\n";
+			if ($object->status == 2) {
+				print '<a class="butAction" id="actionButtonUnlock" href="' . $_SERVER["PHP_SELF"] . '?id=' . $object->id . '&action=setUnlock">' . $langs->trans("Unlock") . '</a>' . "\n";
+			} elseif ($object->status == 3) {
+				print '<a class="butAction" id="actionButtonLock" href="' . $_SERVER["PHP_SELF"] . '?id=' . $object->id . '&action=setLock">' . $langs->trans("Lock") . '</a>' . "\n";
+			}
 		}
 		print '</div>' . "\n";
 
