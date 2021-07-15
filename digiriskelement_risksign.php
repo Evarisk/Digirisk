@@ -55,8 +55,12 @@ $cancel              = GETPOST('cancel', 'aZ09');
 $contextpage         = GETPOST('contextpage', 'aZ') ?GETPOST('contextpage', 'aZ') : 'risksigncard'; // To manage different context of search
 $backtopage          = GETPOST('backtopage', 'alpha');
 $toselect            = GETPOST('toselect', 'array'); // Array of ids of elements selected into a list
+$limit               = GETPOST('limit', 'int') ?GETPOST('limit', 'int') : $conf->liste_limit;
 $sortfield           = GETPOST('sortfield', 'alpha');
 $sortorder           = GETPOST('sortorder', 'alpha');
+$page                = GETPOSTISSET('pageplusone') ? (GETPOST('pageplusone') - 1) : GETPOST("page", 'int');
+$page                = is_numeric($page) ? $page : 0;
+$page                = $page == -1 ? 0 : $page;
 
 // Initialize technical objects
 $object            = new DigiriskElement($db);
@@ -81,6 +85,10 @@ foreach ($risksign->fields as $key => $val)
 {
 	if (GETPOST('search_'.$key, 'alpha') !== '') $search[$key] = GETPOST('search_'.$key, 'alpha');
 }
+
+$offset   = $limit * $page;
+$pageprev = $page - 1;
+$pagenext = $page + 1;
 
 // List of fields to search into when doing a "search in all"
 $fieldstosearchall = array();

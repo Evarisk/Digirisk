@@ -65,8 +65,12 @@ $cancel              = GETPOST('cancel', 'aZ09');
 $contextpage         = GETPOST('contextpage', 'aZ') ?GETPOST('contextpage', 'aZ') : 'riskcard'; // To manage different context of search
 $backtopage          = GETPOST('backtopage', 'alpha');
 $toselect            = GETPOST('toselect', 'array'); // Array of ids of elements selected into a list
+$limit               = GETPOST('limit', 'int') ?GETPOST('limit', 'int') : $conf->liste_limit;
 $sortfield           = GETPOST('sortfield', 'alpha');
 $sortorder           = GETPOST('sortorder', 'alpha');
+$page                = GETPOSTISSET('pageplusone') ? (GETPOST('pageplusone') - 1) : GETPOST("page", 'int');
+$page                = is_numeric($page) ? $page : 0;
+$page                = $page == -1 ? 0 : $page;
 
 // Initialize technical objects
 $object            = new DigiriskStandard($db);
@@ -92,6 +96,10 @@ $search_array_options = $extrafields->getOptionalsFromPost($risk->table_element,
 if (!$sortfield) $sortfield = "t.".key($risk->fields); // Set here default search field. By default 1st field in definition.
 if (!$sortorder) $sortorder = "ASC";
 if (!$evalsortfield) $evalsortfield = "evaluation.".key($evaluation->fields);
+
+$offset   = $limit * $page;
+$pageprev = $page - 1;
+$pagenext = $page + 1;
 
 // Initialize array of search criterias
 $search_all = GETPOST('search_all', 'alphanohtml') ? trim(GETPOST('search_all', 'alphanohtml')) : trim(GETPOST('sall', 'alphanohtml'));
