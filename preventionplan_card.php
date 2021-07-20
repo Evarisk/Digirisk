@@ -134,7 +134,6 @@ if (empty($reshook))
 		$prior_visit_bool   = GETPOST('prior_visit_bool');
 		$prior_visit_text   = GETPOST('prior_visit_text');
 		$cssct_intervention = GETPOST('cssct_intervention');
-		$date_debut         = GETPOST('date_debut');
 
 		$now                   = dol_now();
 		$object->ref           = $refPreventionPlanMod->getNextValue($object);
