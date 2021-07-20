@@ -48,11 +48,13 @@ if (!$res && file_exists("../../../../../main.inc.php")) $res = @include "../../
 if (!$res) die("Include of main fails");require_once DOL_DOCUMENT_ROOT.'/ticket/class/actions_ticket.class.php';
 
 require_once DOL_DOCUMENT_ROOT.'/core/class/html.formticket.class.php';
+require_once DOL_DOCUMENT_ROOT.'/core/lib/images.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/ticket.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/security.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/company.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/payments.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/core/class/extrafields.class.php';
+require_once DOL_DOCUMENT_ROOT.'/core/class/html.formfile.class.php';
 require_once DOL_DOCUMENT_ROOT.'/user/class/user.class.php';
 require_once DOL_DOCUMENT_ROOT.'/core/class/doleditor.class.php';
 require_once DOL_DOCUMENT_ROOT.'/categories/class/categorie.class.php';
@@ -69,17 +71,24 @@ $msg_id = GETPOST('msg_id', 'int');
 
 $action = GETPOST('action', 'aZ09');
 
+$ticket_tmp_id = GETPOST('ticket_id');
+
+if (!dol_strlen($ticket_tmp_id)) {
+	$ticket_tmp_id = generate_random_id(16);
+}
+
 // Initialize technical object to manage hooks of page. Note that conf->hooks_modules contains array of hook context
 $hookmanager->initHooks(array('publicnewticketcard', 'globalcard'));
 
 $object = new Ticket($db);
+$formfile = new FormFile($db);
 $extrafields = new ExtraFields($db);
 $category = new Categorie($db);
 $modTicket = new mod_ticket_simple($db);
 
 $extrafields->fetch_name_optionals_label($object->table_element);
 
-$upload_dir         = $conf->categorie->multidir_output[isset($object->entity) ? $object->entity : 1];
+$upload_dir         = $conf->categorie->multidir_output[isset($conf->entity) ? $conf->entity : 1];
 
 /*
  * Actions
@@ -101,15 +110,32 @@ if ($action == 'add') {
 	$firstname = GETPOST('firstname');
 	$lastname = GETPOST('lastname');
 	$message = GETPOST('message');
+	$location = GETPOST('location');
+	$phone = GETPOST('phone');
+	$ticket_tmp_id = GETPOST('ticket_id');
 
 	$object->ref = $modTicket->getNextValue($thirdparty,$object);
 
-	$object->message = $firstname . ' ' . $lastname . ' ' . $message;
+	$dateandhour = dol_mktime(GETPOST('dateohour', 'int'), GETPOST('dateomin', 'int'), 0, GETPOST('dateomonth', 'int'), GETPOST('dateoday', 'int'), GETPOST('dateoyear', 'int'));
+	$dateandhour = dol_print_date($dateandhour, 'dayhoursec');
+
+	$fullMessage = '';
+	if ($firstname) $fullMessage .= $langs->trans('Firstname') . ' : ' . $firstname . ' ';
+	if ($lastname)  $fullMessage .= $langs->trans('Lastname') . ' : ' .$lastname . ' ';
+	if ($location) $fullMessage .= $langs->trans('Location') . ' : ' .$location . ' ';
+	if ($phone) $fullMessage .= $langs->trans('Phone') . ' : ' .$phone . ' ';
+	if ($service) $fullMessage .= $langs->trans('Service') . ' : ' .$service . ' ';
+	if ($dateandhour) $fullMessage .= $langs->trans('Date') . ' : ' .$dateandhour . ' ';
+
+	$fullMessage .= $langs->trans('Message') . ' : ' . $message;
+
+	$object->message = html_entity_decode($fullMessage);
 
 	$result = $object->create($user);
 
 	if ($result > 0) {
 
+		//Add categories linked
 		$registerCat = $category;
 		$registerCat->fetch($register);
 		$registerCat->add_type($object, Categorie::TYPE_TICKET);
@@ -122,7 +148,44 @@ if ($action == 'add') {
 		$serviceCat->fetch($service);
 		$serviceCat->add_type($object, Categorie::TYPE_TICKET);
 
+		//Add files linked
+		$ticket_upload_dir = $conf->digiriskdolibarr->multidir_output[isset($conf->entity) ? $conf->entity : 1].'/temp';
+		$fileList          = dol_dir_list($ticket_upload_dir . '/ticket/' . $ticket_tmp_id . '/');
+		$thumbsList        = dol_dir_list($ticket_upload_dir . '/ticket/' . $ticket_tmp_id . '/thumbs/');
+		$ticketDirPath     = $conf->ticket->multidir_output[isset($conf->entity) ? $conf->entity : 1] . '/';
+		$fullTicketPath    = $ticketDirPath . $object->ref . '/';
+		$thumbsTicketPath  = $ticketDirPath . $object->ref . '/thumbs/';
+
+		if (!is_dir($ticketDirPath)) {
+			dol_mkdir($ticketDirPath);
+		}
+
+		if (!is_dir($fullTicketPath)) {
+			dol_mkdir($fullTicketPath);
+		}
+
+		if (!is_dir($thumbsTicketPath)) {
+			dol_mkdir($thumbsTicketPath);
+		}
+
+		if (!empty($fileList)) {
+			foreach ($fileList as $fileToCopy) {
+				if (is_file($fileToCopy['fullname'])) {
+					rename($fileToCopy['fullname'],$fullTicketPath . $fileToCopy['name']);
+				}
+			}
+		}
+
+		if (!empty($thumbsList)) {
+			foreach ($thumbsList as $thumbsToCopy) {
+				if (is_file($thumbsToCopy['fullname'])) {
+					rename($thumbsToCopy['fullname'],$fullTicketPath . '/thumbs/' . $thumbsToCopy['name']);
+				}
+			}
+		}
+
 		// Creation OK
+		dol_delete_dir_recursive($ticket_upload_dir . '/ticket/' . $ticket_tmp_id . '/');
 		$urltogo = $_SERVER['PHP_SELF'];
 		setEventMessages($langs->trans("TicketSend", ''), null);
 		header("Location: ".$urltogo);
@@ -130,254 +193,51 @@ if ($action == 'add') {
 	}
 
 }
-// Add file in email form
-if (empty($reshook) && GETPOST('addfile', 'alpha') && !GETPOST('add', 'alpha')) {
-	////$res = $object->fetch('','',GETPOST('track_id'));
-	////if($res > 0)
-	////{
+
+// Add file in ticket form
+if ($action == 'sendfile') {
 	include_once DOL_DOCUMENT_ROOT.'/core/lib/files.lib.php';
 
-	// Set tmp directory TODO Use a dedicated directory for temp mails files
-	$vardir = $conf->ticket->dir_output;
-	$upload_dir_tmp = $vardir.'/temp/'.session_id();
-	if (!dol_is_dir($upload_dir_tmp)) {
-		dol_mkdir($upload_dir_tmp);
+	$ticket_upload_dir = $conf->digiriskdolibarr->multidir_output[isset($conf->entity) ? $conf->entity : 1].'/temp';
+	if (!is_dir($ticket_upload_dir . '/ticket')) {
+		dol_mkdir($ticket_upload_dir . '/ticket');
 	}
+	$fullTicketTmpPath = $ticket_upload_dir . '/ticket/' . $ticket_tmp_id . '/';
+	dol_mkdir($fullTicketTmpPath);
 
-	dol_add_file_process($upload_dir_tmp, 0, 0, 'addedfile', '', null, '', 0);
-	$action = 'create_ticket';
-	////}
+	for ($k = 0; $k < count($_FILES['files']['name']); $k++) {
+		if (($_FILES['files']['name'][$k]!="")){
+
+			// Where the file is going to be stored
+			$target_dir = $fullTicketTmpPath;
+			$file = $_FILES['files']['name'][$k];
+			$path = pathinfo($file);
+			$filename = $path['filename'];
+			$ext = $path['extension'];
+			$temp_name = $_FILES['files']['tmp_name'][$k];
+			$path_filename_ext = $target_dir.$filename.".".$ext;
+
+			if (file_exists($path_filename_ext)) {
+				echo "Sorry, file already exists.";
+			} else {
+				echo $temp_name;
+				echo $path_filename_ext;
+				move_uploaded_file($temp_name,$path_filename_ext);
+				echo "Congratulations! File Uploaded Successfully.";
+
+				global $maxwidthmini, $maxheightmini, $maxwidthsmall, $maxheightsmall;
+
+				// Create thumbs
+				$imgThumbSmall = vignette($path_filename_ext, $maxwidthsmall, $maxheightsmall, '_small', 50, "thumbs");
+				// Create mini thumbs for image (Ratio is near 16/9)
+				$imgThumbMini = vignette($path_filename_ext, 30, 30, '_mini', 50, "thumbs");
+			}
+		}
+	} $action = '';
+
 }
 
 // Remove file
-if (empty($reshook) && GETPOST('removedfile', 'alpha') && !GETPOST('add', 'alpha')) {
-	include_once DOL_DOCUMENT_ROOT.'/core/lib/files.lib.php';
-
-	// Set tmp directory
-	$vardir = $conf->ticket->dir_output.'/';
-	$upload_dir_tmp = $vardir.'/temp/'.session_id();
-
-	// TODO Delete only files that was uploaded from email form
-	dol_remove_file_process($_POST['removedfile'], 0, 0);
-	$action = 'create_ticket';
-}
-
-if (empty($reshook) && $action == 'create_ticket' && GETPOST('add', 'alpha')) {
-	$error = 0;
-	$origin_email = GETPOST('email', 'alpha');
-	if (empty($origin_email)) {
-		$error++;
-		array_push($object->errors, $langs->trans("ErrorFieldRequired", $langs->transnoentities("Email")));
-		$action = '';
-	} else {
-		// Search company saved with email
-		$searched_companies = $object->searchSocidByEmail($origin_email, '0');
-
-		// Chercher un contact existant avec cette adresse email
-		// Le premier contact trouvé est utilisé pour déterminer le contact suivi
-		$contacts = $object->searchContactByEmail($origin_email);
-
-		// Option to require email exists to create ticket
-		if (!empty($conf->global->TICKET_EMAIL_MUST_EXISTS) && !$contacts[0]->socid) {
-			$error++;
-			array_push($object->errors, $langs->trans("ErrorEmailMustExistToCreateTicket"));
-			$action = '';
-		}
-	}
-
-	if (!GETPOST("subject", "restricthtml")) {
-		$error++;
-		array_push($object->errors, $langs->trans("ErrorFieldRequired", $langs->transnoentities("Subject")));
-		$action = '';
-	} elseif (!GETPOST("message", "restricthtml")) {
-		$error++;
-		array_push($object->errors, $langs->trans("ErrorFieldRequired", $langs->transnoentities("message")));
-		$action = '';
-	}
-
-	// Check email address
-	if (!isValidEmail($origin_email)) {
-		$error++;
-		array_push($object->errors, $langs->trans("ErrorBadEmailAddress", $langs->transnoentities("email")));
-		$action = '';
-	}
-
-	if (!$error) {
-		$object->db->begin();
-
-		$object->track_id = generate_random_id(16);
-
-		$object->subject = GETPOST("subject", "restricthtml");
-		$object->message = GETPOST("message", "restricthtml");
-		$object->origin_email = $origin_email;
-
-		$object->type_code = GETPOST("type_code", 'aZ09');
-		$object->category_code = GETPOST("category_code", 'aZ09');
-		$object->severity_code = GETPOST("severity_code", 'aZ09');
-		if (is_array($searched_companies)) {
-			$object->fk_soc = $searched_companies[0]->id;
-		}
-
-		if (is_array($contacts) and count($contacts) > 0) {
-			$object->fk_soc = $contacts[0]->socid;
-			$usertoassign = $contacts[0]->id;
-		}
-
-		$ret = $extrafields->setOptionalsFromPost(null, $object);
-
-		// Generate new ref
-		$object->ref = $object->getDefaultRef();
-		if (!is_object($user)) {
-			$user = new User($db);
-		}
-
-		$object->context['disableticketemail'] = 1; // Disable emails sent by ticket trigger when creation is done from this page, emails are already sent later
-
-		$id = $object->create($user);
-		if ($id <= 0) {
-			$error++;
-			$errors = ($object->error ? array($object->error) : $object->errors);
-			array_push($object->errors, $object->error ? array($object->error) : $object->errors);
-			$action = 'create_ticket';
-		}
-
-		if (!$error && $id > 0) {
-			if ($usertoassign > 0) {
-				$object->add_contact($usertoassign, "SUPPORTCLI", 'external', 0);
-			}
-		}
-
-		if (!$error) {
-			$object->db->commit();
-			$action = "infos_success";
-		} else {
-			$object->db->rollback();
-			setEventMessages($object->error, $object->errors, 'errors');
-			$action = 'create_ticket';
-		}
-
-		if (!$error) {
-			$res = $object->fetch($id);
-			if ($res) {
-				// Create form object
-				include_once DOL_DOCUMENT_ROOT.'/core/class/html.formmail.class.php';
-				include_once DOL_DOCUMENT_ROOT.'/core/lib/files.lib.php';
-				$formmail = new FormMail($db);
-
-				// Init to avoid errors
-				$filepath = array();
-				$filename = array();
-				$mimetype = array();
-
-				$attachedfiles = $formmail->get_attached_files();
-				$filepath = $attachedfiles['paths'];
-				$filename = $attachedfiles['names'];
-				$mimetype = $attachedfiles['mimes'];
-
-				// Send email to customer
-
-				$subject = '['.$conf->global->MAIN_INFO_SOCIETE_NOM.'] '.$langs->transnoentities('TicketNewEmailSubject', $object->ref, $object->track_id);
-				$message  = ($conf->global->TICKET_MESSAGE_MAIL_NEW ? $conf->global->TICKET_MESSAGE_MAIL_NEW : $langs->transnoentities('TicketNewEmailBody')).'<br><br>';
-				$message .= $langs->transnoentities('TicketNewEmailBodyInfosTicket').'<br>';
-
-				$url_public_ticket = ($conf->global->TICKET_URL_PUBLIC_INTERFACE ? $conf->global->TICKET_URL_PUBLIC_INTERFACE.'/' : dol_buildpath('/public/ticket/view.php', 2)).'?track_id='.$object->track_id;
-				$infos_new_ticket = $langs->transnoentities('TicketNewEmailBodyInfosTrackId', '<a href="'.$url_public_ticket.'" rel="nofollow noopener">'.$object->track_id.'</a>').'<br>';
-				$infos_new_ticket .= $langs->transnoentities('TicketNewEmailBodyInfosTrackUrl').'<br><br>';
-
-				$message .= $infos_new_ticket;
-				$message .= $conf->global->TICKET_MESSAGE_MAIL_SIGNATURE ? $conf->global->TICKET_MESSAGE_MAIL_SIGNATURE : $langs->transnoentities('TicketMessageMailSignatureText');
-
-				$sendto = GETPOST('email', 'alpha');
-
-				$from = $conf->global->MAIN_INFO_SOCIETE_NOM.'<'.$conf->global->TICKET_NOTIFICATION_EMAIL_FROM.'>';
-				$replyto = $from;
-				$sendtocc = '';
-				$deliveryreceipt = 0;
-
-				if (!empty($conf->global->TICKET_DISABLE_MAIL_AUTOCOPY_TO)) {
-					$old_MAIN_MAIL_AUTOCOPY_TO = $conf->global->MAIN_MAIL_AUTOCOPY_TO;
-					$conf->global->MAIN_MAIL_AUTOCOPY_TO = '';
-				}
-				include_once DOL_DOCUMENT_ROOT.'/core/class/CMailFile.class.php';
-				$mailfile = new CMailFile($subject, $sendto, $from, $message, $filepath, $mimetype, $filename, $sendtocc, '', $deliveryreceipt, -1, '', '', 'tic'.$object->id, '', 'ticket');
-				if ($mailfile->error || $mailfile->errors) {
-					setEventMessages($mailfile->error, $mailfile->errors, 'errors');
-				} else {
-					$result = $mailfile->sendfile();
-				}
-				if (!empty($conf->global->TICKET_DISABLE_MAIL_AUTOCOPY_TO)) {
-					$conf->global->MAIN_MAIL_AUTOCOPY_TO = $old_MAIN_MAIL_AUTOCOPY_TO;
-				}
-
-				// Send email to TICKET_NOTIFICATION_EMAIL_TO
-				$sendto = $conf->global->TICKET_NOTIFICATION_EMAIL_TO;
-				if ($sendto) {
-					$subject = '['.$conf->global->MAIN_INFO_SOCIETE_NOM.'] '.$langs->transnoentities('TicketNewEmailSubjectAdmin', $object->ref, $object->track_id);
-					$message_admin = $langs->transnoentities('TicketNewEmailBodyAdmin', $object->track_id).'<br><br>';
-					$message_admin .= '<ul><li>'.$langs->trans('Title').' : '.$object->subject.'</li>';
-					$message_admin .= '<li>'.$langs->trans('Type').' : '.$object->type_label.'</li>';
-					$message_admin .= '<li>'.$langs->trans('Category').' : '.$object->category_label.'</li>';
-					$message_admin .= '<li>'.$langs->trans('Severity').' : '.$object->severity_label.'</li>';
-					$message_admin .= '<li>'.$langs->trans('From').' : '.$object->origin_email.'</li>';
-					// Extrafields
-					$extrafields->fetch_name_optionals_label($object->table_element);
-					if (is_array($object->array_options) && count($object->array_options) > 0) {
-						foreach ($object->array_options as $key => $value) {
-							$key = substr($key, 8); // remove "options_"
-							$message_admin .= '<li>'.$langs->trans($extrafields->attributes[$object->element]['label'][$key]).' : '.$extrafields->showOutputField($key, $value).'</li>';
-						}
-					}
-					$message_admin .= '</ul>';
-
-					$message_admin .= '</ul>';
-					$message_admin .= '<p>'.$langs->trans('Message').' : <br>'.$object->message.'</p>';
-					$message_admin .= '<p><a href="'.dol_buildpath('/ticket/card.php', 2).'?track_id='.$object->track_id.'" rel="nofollow noopener">'.$langs->trans('SeeThisTicketIntomanagementInterface').'</a></p>';
-
-					$from = $conf->global->MAIN_INFO_SOCIETE_NOM.' <'.$conf->global->TICKET_NOTIFICATION_EMAIL_FROM.'>';
-					$replyto = $from;
-
-					if (!empty($conf->global->TICKET_DISABLE_MAIL_AUTOCOPY_TO)) {
-						$old_MAIN_MAIL_AUTOCOPY_TO = $conf->global->MAIN_MAIL_AUTOCOPY_TO;
-						$conf->global->MAIN_MAIL_AUTOCOPY_TO = '';
-					}
-					include_once DOL_DOCUMENT_ROOT.'/core/class/CMailFile.class.php';
-					$mailfile = new CMailFile($subject, $sendto, $from, $message_admin, $filepath, $mimetype, $filename, $sendtocc, '', $deliveryreceipt, -1, '', '', 'tic'.$object->id, '', 'ticket');
-					if ($mailfile->error || $mailfile->errors) {
-						setEventMessages($mailfile->error, $mailfile->errors, 'errors');
-					} else {
-						$result = $mailfile->sendfile();
-					}
-					if (!empty($conf->global->TICKET_DISABLE_MAIL_AUTOCOPY_TO)) {
-						$conf->global->MAIN_MAIL_AUTOCOPY_TO = $old_MAIN_MAIL_AUTOCOPY_TO;
-					}
-				}
-			}
-
-			// Copy files into ticket directory
-			$destdir = $conf->ticket->dir_output.'/'.$object->ref;
-			if (!dol_is_dir($destdir)) {
-				dol_mkdir($destdir);
-			}
-			foreach ($filename as $i => $val) {
-				dol_move($filepath[$i], $destdir.'/'.$filename[$i], 0, 1);
-				$formmail->remove_attached_files($i);
-			}
-
-			//setEventMessages($langs->trans('YourTicketSuccessfullySaved'), null, 'mesgs');
-
-			// Make a redirect to avoid to have ticket submitted twice if we make back
-			$messagetoshow = $langs->trans('MesgInfosPublicTicketCreatedWithTrackId', '{s1}', '{s2}');
-			$messagetoshow = str_replace(array('{s1}', '{s2}'), array('<strong>'.$object->track_id.'</strong>', '<strong>'.$object->ref.'</strong>'), $messagetoshow);
-			setEventMessages($messagetoshow, null, 'warnings');
-			setEventMessages($langs->trans('PleaseRememberThisId'), null, 'warnings');
-			header("Location: index.php");
-			exit;
-		}
-	} else {
-		setEventMessages($object->error, $object->errors, 'errors');
-	}
-}
-
 
 
 /*
@@ -394,21 +254,21 @@ $formticket = new FormTicket($db);
 //}
 
 $arrayofjs =  array("/digiriskdolibarr/js/digiriskdolibarr.js.php");
-$arrayofcss = array('/opensurvey/css/style.css', '/ticket/css/styles.css.php');
+$arrayofcss = array('/opensurvey/css/style.css', '/ticket/css/styles.css.php', "/digiriskdolibarr/css/digiriskdolibarr.css");
 
 llxHeaderTicket($langs->trans("CreateTicket"), "", 0, 0, $arrayofjs, $arrayofcss);
-
 
 print '<div class="ticketpublicarea">';
 
 print load_fiche_titre($title_edit, '', "digiriskdolibarr32px@digiriskdolibarr");
 
-print '<form method="POST" action="'.$_SERVER["PHP_SELF"].'">';
+print '<form method="POST" action="'.$_SERVER["PHP_SELF"].'" id="sendTicketForm">';
 print '<input type="hidden" name="token" value="'.newToken().'">';
 print '<input type="hidden" name="action" value="add">';
 print '<input type="hidden" id="register" name="register" value="'.GETPOST('register').'">';
 print '<input type="hidden" id="pertinence" name="pertinence" value="'.GETPOST('pertinence').'">';
 print '<input type="hidden" id="service" name="service" value="'.GETPOST('service').'">';
+print '<input type="hidden" id="ticket_id" name="ticket_id" value="'.$ticket_tmp_id.'">';
 print '<input type="hidden" name="id" value="'.$object->id.'">';
 if ($backtopage) print '<input type="hidden" name="backtopage" value="'.$backtopage.'">';
 if ($backtopageforcancel) print '<input type="hidden" name="backtopageforcancel" value="'.$backtopageforcancel.'">';
@@ -417,97 +277,157 @@ dol_fiche_head(array(), '0', '', 1);
 
 print '<div class="img-fields-container">';
 print '<table class="border centpercent tableforimgfields">'."\n";
-//// Common attributes
-//include DOL_DOCUMENT_ROOT.'/core/tpl/commonfields_edit.tpl.php';
-//
-//// Other attributes
-//include DOL_DOCUMENT_ROOT.'/core/tpl/extrafields_edit.tpl.php';
 
-print '<tr><td>'.$langs->trans("Register").'</td><td>';
-// @ todo afficher la categorie qui a été enregistrée comme la catégorie racine du champ registre (dans une conf $conf->global->DIGIRISKDOLIBARR_TICKET_CATEGORY_REGISTRE_ID)
+print '<tr><td>'.$langs->trans("Register").'</td></tr>';
+print '<tr>';
 $registerCategory = $category->rechercher(0,'Registre','ticket', true);
 $registerChildren = $registerCategory[0]->get_filles();
 foreach ($registerChildren as $register) {
 	if ($register->id == GETPOST('register')) {
-		print '<td class="ticket-register" id="'.$register->id.'" style="border: solid">';
+		print '<td class="ticket-register center" id="'.$register->id.'" style="border: solid">';
 	} else {
-		print '<td class="ticket-register" id="'.$register->id.'">';
+		print '<td class="ticket-register center" id="'.$register->id.'">';
 	}
-//	print '<a href="'.$_SERVER['REQUEST_URI'].'?register='.$element->id.'">';
-	show_category_image($register, $upload_dir);
+
+	if ($register->label == 'Santé & Sécurité au Travail') {
+		print '<div class="wpeo-button button-blue">';
+		print '<i class="fas fa-shield-alt"></i>    ';
+		print $register->label;
+		print '</div>';
+	} elseif ($register->label == 'Accidents') {
+		print '<div class="wpeo-button button-yellow">';
+		print '<i class="fas fa-user-injured"></i>    ';
+		print $register->label;
+		print '</div>';
+	} elseif ($register->label == 'Danger Grave et Imminent') {
+		print '<div class="wpeo-button button-red">';
+		print '<i class="fas fa-exclamation-triangle"></i>    ';
+		print $register->label;
+		print '</div>';
+	} else {
+		show_category_image($register, $upload_dir);
+	}
 	print '</td>';
+
 }
 
-print '</td></tr>';
+print '</tr>';
+print '</table>';
 
-print '<tr><td>'.$langs->trans("Pertinence").'</td><td>';
+print '<table class="border centpercent tableforimgfields">'."\n";
+
 if (GETPOST('register')) {
 	$selectedRegister = $category;
 	$selectedRegister->fetch(GETPOST('register'));
 	$selectedRegisterChildren = $selectedRegister->get_filles();
-
-	foreach ($selectedRegisterChildren as $pertinence) {
-		if ($pertinence->id == GETPOST('pertinence')) {
-			print '<td class="ticket-pertinence" id="'.$pertinence->id.'" style="border: solid">';
-		} else {
-			print '<td class="ticket-pertinence" id="'.$pertinence->id.'">';
+	if (!empty($selectedRegisterChildren)) {
+		print '<tr><td>' . $langs->trans("Pertinence") . '</td></tr>';
+		foreach ($selectedRegisterChildren as $pertinence) {
+			if ($pertinence->id == GETPOST('pertinence')) {
+				print '<td class="ticket-pertinence center" id="' . $pertinence->id . '" style="border: solid">';
+			} else {
+				print '<td class="ticket-pertinence center" id="' . $pertinence->id . '">';
+			}
+			show_category_image($pertinence, $upload_dir);
+			print '</td>';
 		}
-//		print '<a href="'.$_SERVER['REQUEST_URI'].'&pertinence='.$pertinence->id.'">';
-		show_category_image($pertinence, $upload_dir);
-		print '</td>';
-	}
 
-} else {
-	print '<td>';
-	print '</td>';
+	}
 }
 
-print '</td></tr>';
 
-print '<tr><td>'.$langs->trans("Service").'</td><td>';
-$serviceCategory = $category->rechercher(0,'Service','ticket', true);
-$serviceChildren = $serviceCategory[0]->get_filles();
-
-foreach ($serviceChildren as $service) {
-	if ($service->id == GETPOST('service')) {
-		print '<td class="ticket-service" id="'.$service->id.'" style="border: solid">';
-	} else {
-		print '<td class="ticket-service" id="'.$service->id.'">';
-	}
-//	print '<a href="'.$_SERVER['REQUEST_URI'].'&service='.$service->id.'">';
-	show_category_image($service, $upload_dir);
-	print '</td>';
-}
-print '</td></tr>';
 print '</table>';
 print '<br>';
+
 print '</div>';
 print '<table class="border centpercent tableforinputfields">'."\n";
 
-print '<tr><td>'.$langs->trans("Firstname").'</td><td>';
-print '<input name="firstname" "type=text value="">';
-print '</td></tr>';
+print '<tr><td>'.$langs->trans("Message").'</td>';
+print '<td>'.$langs->trans("FilesLinked").'</td>';
+print '<td>';
 
-print '<tr><td>'.$langs->trans("Lastname").'</td><td>';
-print '<input name="lastname" type=text value="">';
-print '</td></tr>';
+print '<label class="wpeo-button button-blue" for="sendfile">';
+print '<i class="fas fa-image button-icon"></i>';
+print $langs->trans('AddDocument');
+print '<input type="file" name="userfile[]" multiple="multiple" id="sendfile" onchange="window.eoxiaJS.ticket.tmpStockFile()"  style="display: none"/>';
+print '</label>';
+print '</td>';
 
-print '<tr><td>'.$langs->trans("Message").'</td><td>';
-
+print '<tr><td>';
 $doleditor = new DolEditor('message', $conf->global->DIGIRISK_DEROGATION_SCHEDULE_OCCASIONAL ? $conf->global->DIGIRISK_DEROGATION_SCHEDULE_OCCASIONAL : '', '', 90, 'dolibarr_notes', '', false, true, $conf->global->FCKEDITOR_ENABLE_SOCIETE, ROWS_3, '90%');
 $doleditor->Create();
 
+print '</td><td><div id="sendFileForm">';
+print '<table class="border centpercent tableforinputfields" id="fileLinkedTable">'."\n";
+
+$fileLinkedList = dol_dir_list($conf->digiriskdolibarr->multidir_output[isset($conf->entity) ? $conf->entity : 1].'/temp/ticket/'.$ticket_tmp_id.'/thumbs/');
+
+if (!empty($fileLinkedList)){
+	foreach ($fileLinkedList as $fileLinked) {
+		if (preg_match('/mini/', $fileLinked['name'])) {
+			print '<tr><td>';
+			print '<img class="photo"  width="'.$maxHeight.'" src="'.DOL_URL_ROOT.'/viewimage.php?modulepart=digiriskdolibarr&entity='.$conf->entity.'&file='.urlencode('/temp/ticket/'.$ticket_tmp_id.'/thumbs/' . $fileLinked['name']).'" title="'.dol_escape_htmltag($alt).'">';
+
+			print '</td><td>';
+			print $fileLinked['name'];
+			print '</td><td>';
+
+			print '<div class="linked-file-delete wpeo-button button-square-50 button-transparent"><i class="fas fa-trash button-icon"></i></div>';
+			print '</td></tr>';
+		}
+	}
+} else {
+	print '<td>';
+	print $langs->trans('NoFileLinked');
+	print '</td>';
+}
+
+print '</table>';
+print '</div></div></td></tr>';
+
+print '<tr><td>'.$langs->trans("Lastname").'</td>';
+print '<td style="width:20%" >' . $langs->trans("Firstname").'</td>';
+print '<td>' . $langs->trans("Phone").'</td></tr>';
+
+print '<tr><td><input name="lastname" type=text value="" placeholder="'.$langs->trans('LastnamePlaceholder').'">';
+print '</td>';
+
+print '<td><input name="firstname" type=text value="" placeholder="'.$langs->trans('FirstnamePlaceholder').'">';
+print '</td>';
+
+print '<td><input name="phone" type=text value="" placeholder="'.$langs->trans('PhonePlaceholder').'">';
 print '</td></tr>';
+
+print '<tr><td>'.$langs->trans("DateAndHour").'</td>';
+print '<td style="width:20%" >' . $langs->trans("Location").'</td>';
+print '<td>' . $langs->trans("Service").'</td></tr>';
+
+print '<tr><td>';
+print $form->selectDate(dol_now('tzuser'), 'dateo', 1, 1, 0, '', 1);
+print '</td>';
+//Start Date -- Date début
+//print '<tr class="oddeven"><td><label for="date_debut">'.$langs->trans("StartDate").'</label></td><td>';
+//print $form->selectDate(dol_now('tzuser'), 'dateo', 1, 1, 0, '', 1);
+//print '</td></tr>';
+
+print '<td><input name="location" type=text value="" placeholder="'.$langs->trans('LocationPlaceholder').'">';
+print '</td>';
+
+print '<td><input name="service" type=text value="" placeholder="'.$langs->trans('ServicePlaceholder').'">';
+print '</td></tr>';
+
+print '</form>';
+
+print '</td></tr>';
+
 
 print '</table>';
 
 dol_fiche_end();
 
-print '<div class="center"><input type="submit" id ="actionButtonSave" class="button" name="save" value="'.$langs->trans("Send").'">';
-//print ' &nbsp; <input type="submit" id ="actionButtonCancelEdit" class="button" name="cancel" value="'.$langs->trans("Cancel").'"  onClick="javascript:history.go(-1)">';
+print '<div class="center"><button form="sendTicketForm" type="submit" id ="actionButtonSave" class="wpeo-button" name="add">'.'<i class="fas fa-paper-plane"></i>    '.$langs->trans("Send") . '</button>';
 print '</div>';
 
-print '</form>';
 print '</div>';
 
 // End of page
