@@ -2446,7 +2446,7 @@ window.eoxiaJS.ticket.init = function() {
 window.eoxiaJS.ticket.event = function() {
 	jQuery( document ).on( 'click', '.ticket-register', window.eoxiaJS.ticket.selectRegister );
 	jQuery( document ).on( 'click', '.ticket-pertinence', window.eoxiaJS.ticket.selectPertinence );
-	jQuery( document ).on( 'click', '.ticket-service', window.eoxiaJS.ticket.selectService );
+	jQuery( document ).on( 'submit', '#sendFile', window.eoxiaJS.ticket.tmpStockFile );
 };
 
 /**
@@ -2469,11 +2469,6 @@ window.eoxiaJS.ticket.updateFormData = function( ) {
 	let pertinence = window.eoxiaJS.ticket.getPertinence()
 	if (pertinence > 0) {
 		requestParams += 'pertinence=' + pertinence  + '&'
-	}
-
-	let service = window.eoxiaJS.ticket.getService()
-	if (service > 0) {
-		requestParams += 'service=' + service
 	}
 
 	$('.img-fields-container').load(document.URL + requestParams + ' .tableforimgfields');
@@ -2535,30 +2530,34 @@ window.eoxiaJS.ticket.getPertinence = function(  ) {
 };
 
 /**
- * Clique sur un des services de la liste.
+ * Upload automatiquement le(s) fichier(s) séelectionnés dans ecm/digiriskdolibarr/ticket/tmp/__REF__
  *
  * @since   1.1.0
  * @version 1.1.0
  *
  * @return {void}
  */
-window.eoxiaJS.ticket.selectService = function( ) {
-	let serviceInput = $('.ticketpublicarea').find("#service");
-	serviceInput.val($(this).attr('id'))
 
-	window.eoxiaJS.ticket.updateFormData()
-};
+window.eoxiaJS.ticket.tmpStockFile = function( ) {
+	event.preventDefault()
 
-/**
- * Récupère la valeur du service sélectionné
- *
- * @since   1.1.0
- * @version 1.1.0
- *
- * @return {void}
- */
-window.eoxiaJS.ticket.getService = function( ) {
-	return $('.ticketpublicarea').find("#service").val()
+	var files = $('#sendfile').prop('files');
+
+	const formData = new FormData();
+	for (let i = 0; i < files.length; i++) {
+		let file = files[i]
+		formData.append('files[]', file)
+	}
+	var ticket_id = $('#ticket_id').val()
+
+	fetch(document.URL + '?action=sendfile&ticket_id='+ticket_id, {
+		method: 'POST',
+		body: formData,
+	}).then((response) => {
+		setTimeout(function(){
+			$('#sendFileForm').load(document.URL+ '?ticket_id='+ticket_id + ' #fileLinkedTable')
+		}, 800);
+	})
 };
 
 /**
