@@ -997,18 +997,17 @@ function show_category_image($object, $upload_dir) {
 	$dir = $upload_dir.'/'.$pdir;
 
 	$listofphoto = $object->liste_photos($dir);
-
 	if (is_array($listofphoto) && count($listofphoto))
 	{
-		print '<br>';
-		print '<table width="100%" valign="top" align="center">';
+//		print '<br>';
+//		print '<table width="100%" valign="top" align="center">';
 
 		foreach ($listofphoto as $key => $obj)
 		{
 			$nbphoto++;
 
-			if ($nbbyrow && ($nbphoto % $nbbyrow == 1)) print '<tr align=center valign=middle border=1>';
-			if ($nbbyrow) print '<td width="'.ceil(100 / $nbbyrow).'%" class="">';
+//			if ($nbbyrow && ($nbphoto % $nbbyrow == 1)) print '<tr align=center valign=middle border=1>';
+//			if ($nbbyrow) print '<td width="'.ceil(100 / $nbbyrow).'%" class="">';
 
 
 			// Si fichier vignette disponible, on l'utilise, sinon on utilise photo origine
@@ -1029,20 +1028,17 @@ function show_category_image($object, $upload_dir) {
 
 			print '<img border="0" width="'.$imgWidth.'" height="'.$imgHeight.'" src="'.DOL_URL_ROOT.'/viewimage.php?modulepart=category&entity='.$object->entity.'&file='.urlencode($pdir.$filename).'">';
 
-			print '<br>';
-
-			if ($nbbyrow) print '</td>';
-			if ($nbbyrow && ($nbphoto % $nbbyrow == 0)) print '</tr>';
+//			if ($nbbyrow) print '</td>';
+//			if ($nbbyrow && ($nbphoto % $nbbyrow == 0)) print '</tr>';
 		}
 
 		// Ferme tableau
 		while ($nbphoto % $nbbyrow)
 		{
-			print '<td width="'.ceil(100 / $nbbyrow).'%">&nbsp;</td>';
 			$nbphoto++;
 		}
 
-		print '</table>';
+//		print '</table>';
 	}
 
 	if ($nbphoto < 1)
