@@ -671,7 +671,7 @@ CalculatedCotation = Cotation calculée
 SelectCotation = Sélectionnez les cases pour calculer votre cotation
 EvaluationList = Liste des évaluations du risque
 HowToSetMultipleRiskAssessmentMethod = Pour configurer l'utilisation multiple des méthodes d'évaluation, aller dans Configuration du module - Analyse des risques - Évaluation
-NoFileLinked = Pas de photo liee
+NoFileLinked = Pas de photo liée
 
 
 #
@@ -771,7 +771,14 @@ SignatureShowCompanyLogoHelp = Activez cette option pour masquer le logo de la s
 Register = Registre
 Send = Envoyer
 TicketSend = Ticket envoyé
-
+FilesLinked = Photos / Pièces jointes
+AddDocument = Ajouter document
+LastnamePlaceholder = Exemple : Dupont
+FirstnamePlaceholder = Exemple : Jean
+PhonePlaceholder = 00.00.00.00.00
+LocationPlaceholder = Exemple : Bureau A
+ServicePlaceholder = Exemple : Ripeur
+Location = Lieu
 #
 # Other
 #
