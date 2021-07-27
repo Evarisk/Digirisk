@@ -123,12 +123,12 @@ if (empty($reshook))
 
 	// Action to add record
 	if ($action == 'add' && $permissiontoadd) {
-
-		$maitre_oeuvre_id    = GETPOST('maitre_oeuvre');
-		$extsociety_id       = GETPOST('ext_society');
-		$extresponsible_id   = GETPOST('ext_society_responsible');
-		$extintervenant_ids  = GETPOST('ext_intervenants');
-		$labour_inspector_id = GETPOST('labour_inspector');
+		$maitre_oeuvre_id            = GETPOST('maitre_oeuvre');
+		$extsociety_id               = GETPOST('ext_society');
+		$extresponsible_id           = GETPOST('ext_society_responsible');
+		$extintervenant_ids          = GETPOST('ext_intervenants');
+		$labour_inspector_id         = GETPOST('labour_inspector');
+		$labour_inspector_contact_id = GETPOST('labour_inspector_contact');
 
 		$label              = GETPOST('label');
 		$prior_visit_bool   = GETPOST('prior_visit_bool');
@@ -181,10 +181,11 @@ if (empty($reshook))
 
 			if ($result > 0) {
 
-				$object->setUnlock($user, false);
+				$object->setInProgress($user, false);
 
-				$digiriskresources->digirisk_dolibarr_set_resources($db, $user->id, 'PP_EXT_SOCIETY', 'societe', array($extsociety_id), $conf->entity, 'preventionplan', $object->id, 1);
-				$digiriskresources->digirisk_dolibarr_set_resources($db, $user->id, 'PP_LABOUR_INSPECTOR_ASSIGNED', 'societe', array($labour_inspector_id), $conf->entity, 'preventionplan', $object->id, 1);
+				$digiriskresources->digirisk_dolibarr_set_resources($db, $user->id, 'PP_EXT_SOCIETY', 'societe', array($extsociety_id), $conf->entity, 'preventionplan', $object->id, 0);
+				$digiriskresources->digirisk_dolibarr_set_resources($db, $user->id, 'PP_LABOUR_INSPECTOR', 'societe', array($labour_inspector_id), $conf->entity, 'preventionplan', $object->id, 0);
+				$digiriskresources->digirisk_dolibarr_set_resources($db, $user->id, 'PP_LABOUR_INSPECTOR_ASSIGNED', 'socpeople', array(array_shift($labour_inspector_contact_id)), $conf->entity, 'preventionplan', $object->id, 0);
 
 				if (!empty($maitre_oeuvre_id) || $maitre_oeuvre_id > 0){
 					$signatory->setSignatory($object->id,'user', array($maitre_oeuvre_id), 'PP_MAITRE_OEUVRE');
@@ -193,8 +194,6 @@ if (empty($reshook))
 				if (!empty(array_filter($extresponsible_id))) {
 					$signatory->setSignatory($object->id,'socpeople', $extresponsible_id, 'PP_EXT_SOCIETY_RESPONSIBLE');
 				}
-
-				$signatory->setSignatory($object->id,'socpeople', $extintervenant_ids, 'PP_EXT_SOCIETY_INTERVENANTS');
 
 				// Creation prevention plan OK
 				$urltogo = str_replace('__ID__', $result, $backtopage);
@@ -216,11 +215,12 @@ if (empty($reshook))
 	// Action to update record
 	if ($action == 'update' && $permissiontoadd) {
 
-		$maitre_oeuvre_id       = GETPOST('maitre_oeuvre');
-		$extsociety_id          = GETPOST('ext_society');
-		$extresponsible_id      = GETPOST('ext_society_responsible');
-		$extintervenant_ids     = GETPOST('ext_intervenants');
-		$labour_inspector_id    = GETPOST('labour_inspector');
+		$maitre_oeuvre_id            = GETPOST('maitre_oeuvre');
+		$extsociety_id               = GETPOST('ext_society');
+		$extresponsible_id           = GETPOST('ext_society_responsible');
+		$extintervenant_ids          = GETPOST('ext_intervenants');
+		$labour_inspector_id         = GETPOST('labour_inspector');
+		$labour_inspector_contact_id = GETPOST('labour_inspector_contact');
 
 		$label                  = GETPOST('label');
 		$prior_visit_bool       = GETPOST('prior_visit_bool');
@@ -251,11 +251,11 @@ if (empty($reshook))
 			if ($result > 0) {
 
 				$digiriskresources->digirisk_dolibarr_set_resources($db, $user->id, 'PP_EXT_SOCIETY', 'societe', array($extsociety_id), $conf->entity, 'preventionplan', $object->id, 0);
-				$digiriskresources->digirisk_dolibarr_set_resources($db, $user->id, 'PP_LABOUR_INSPECTOR_ASSIGNED', 'societe', array($labour_inspector_id), $conf->entity, 'preventionplan', $object->id, 0);
+				$digiriskresources->digirisk_dolibarr_set_resources($db, $user->id, 'PP_LABOUR_INSPECTOR', 'societe', array($labour_inspector_id), $conf->entity, 'preventionplan', $object->id, 0);
+				$digiriskresources->digirisk_dolibarr_set_resources($db, $user->id, 'PP_LABOUR_INSPECTOR_ASSIGNED', 'socpeople', array($labour_inspector_contact_id), $conf->entity, 'preventionplan', $object->id, 0);
 
 				$signatory->setSignatory($object->id,'user', array($maitre_oeuvre_id), 'PP_MAITRE_OEUVRE');
 				$signatory->setSignatory($object->id,'socpeople', array($extresponsible_id), 'PP_EXT_SOCIETY_RESPONSIBLE');
-				$signatory->setSignatory($object->id,'socpeople', $extintervenant_ids, 'PP_EXT_SOCIETY_INTERVENANTS');
 
 				// Creation prevention plan OK
 				$urltogo = str_replace('__ID__', $result, $backtopage);
@@ -431,6 +431,29 @@ if (empty($reshook))
 		}
 	}
 
+	// Action to set status STATUS_PENDING_SIGNATURE
+	if ($action == 'setPendingSignature') {
+
+		$object->fetch($id);
+
+		if (!$error) {
+			$result = $object->setPendingSignature($user, false);
+			if ($result > 0) {
+				// Creation signature OK
+				$urltogo = str_replace('__ID__', $result, $backtopage);
+				$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
+				header("Location: " . $urltogo);
+				exit;
+			}
+			else
+			{
+				// Creation signature KO
+				if (!empty($object->errors)) setEventMessages(null, $object->errors, 'errors');
+				else  setEventMessages($object->error, null, 'errors');
+			}
+		}
+	}
+
 	// Action to set status STATUS_LOCK
 	if ($action == 'setLock') {
 
@@ -461,6 +484,29 @@ if (empty($reshook))
 
 		if (!$error) {
 			$result = $object->setUnlock($user, false);
+			if ($result > 0) {
+				// Creation signature OK
+				$urltogo = str_replace('__ID__', $result, $backtopage);
+				$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
+				header("Location: " . $urltogo);
+				exit;
+			}
+			else
+			{
+				// Creation signature KO
+				if (!empty($object->errors)) setEventMessages(null, $object->errors, 'errors');
+				else  setEventMessages($object->error, null, 'errors');
+			}
+		}
+	}
+
+	// Action to set status STATUS_CLOSE
+	if ($action == 'setClose') {
+
+		$object->fetch($id);
+
+		if (!$error) {
+			$result = $object->setClose($user, false);
 			if ($result > 0) {
 				// Creation signature OK
 				$urltogo = str_replace('__ID__', $result, $backtopage);
@@ -553,34 +599,16 @@ if ($action == 'create')
 	print '<tr><td class="fieldrequired">';
 	print $langs->trans("ExtSociety");
 	print '</td>';
-
 	print '<td>';
-
 	$events = array();
 	$events[1] = array('method' => 'getContacts', 'url' => dol_buildpath('/core/ajax/contacts.php?showempty=1', 1), 'htmlname' => 'ext_society_responsible', 'params' => array('add-customer-contact' => 'disabled'));
-	$events[2] = array('method' => 'getContacts', 'url' => dol_buildpath('/core/ajax/contacts.php?showempty=1', 1), 'htmlname' => 'ext_intervenants', 'params' => array('add-customer-contact' => 'disabled'));
-	//For external user force the company to user company
-	if (!empty($user->socid)) {
-		print $form->select_company($user->socid, 'ext_society', '', 1, 1, 0, $events, 0, 'minwidth300');
-	} else {
-		print $form->select_company('', 'ext_society', '', 'SelectThirdParty', 1, 0, $events, 0, 'minwidth300');
-	}
+	print $form->select_company('', 'ext_society', '', 'SelectThirdParty', 1, 0, $events, 0, 'minwidth300');
 	if (!GETPOSTISSET('backtopage')) print ' <a href="'.DOL_URL_ROOT.'/societe/card.php?action=create&backtopage='.urlencode($_SERVER["PHP_SELF"].'?action=create').'" target="_blank"><span class="fa fa-plus-circle valignmiddle paddingleft" title="'.$langs->trans("AddThirdParty").'"></span></a>';
-
-	print '<br>';
-
 	print '</td></tr>';
 
 	//External responsible -- Responsable de la société extérieure
 	print '<tr class="oddeven"><td class="fieldrequired">'.$langs->trans("ExtSocietyResponsible").'</td><td>';
-	print $form->selectcontacts(GETPOST('ext_society', 'int'), '', 'ext_society_responsible[]', 1, '', '', 0, 'quatrevingtpercent', false, 0, array(), false, '', 'ext_society_responsible');
-
-	print '</td></tr>';
-
-	//Intervenants extérieurs
-	print '<tr class="oddeven"><td>'.$langs->trans("ExtSocietyIntervenants").'</td><td>';
-	print $form->selectcontacts(GETPOST('ext_society', 'int'), '', 'ext_intervenants[]', 1, '', '', 0, 'quatrevingtpercent', false, 0, array(), false, 'multiple', 'ext_intervenants');
-
+	print $form->selectcontacts(GETPOST('ext_society', 'int'), '', 'ext_society_responsible', 1, '', '', 0, 'quatrevingtpercent', false, 0, array(), false, '', 'ext_society_responsible');
 	print '</td></tr>';
 
 	// CSSCT Intervention
@@ -589,9 +617,6 @@ if ($action == 'create')
 	print '</td>';
 	print '<td>';
 	print '<input type="checkbox" id="cssct_intervention" name="cssct_intervention"'.(GETPOSTISSET('cssct_intervention') ? (GETPOST('cssct_intervention', 'alpha') != '' ? ' checked=""' : '') : ' checked=""').'"> ';
-	$htmltext = $langs->trans("CSSCTInterventionText");
-	print $form->textwithpicto('', $htmltext);
-	print '<br>';
 	print '</td></tr>';
 
 	//Prior Visit -- Visite préalable
@@ -607,20 +632,21 @@ if ($action == 'create')
 	$doleditor->Create();
 	print '</td></tr>';
 
-	//Labour inspector -- Inspecteur du travail
-	print '<tr class="oddeven"><td class="tdtop">';
-	print $langs->trans("LabourInspector");
+	//Labour inspector Society -- Entreprise Inspecteur du travail
+	print '<tr class="oddeven"><td class="fieldrequired">';
+	print $langs->trans("LabourInspectorSociety");
 	print '</td>';
 	print '<td>';
+	$events = array();
+	$events[1] = array('method' => 'getContacts', 'url' => dol_buildpath('/core/ajax/contacts.php?showempty=1', 1), 'htmlname' => 'labour_inspector_contact', 'params' => array('add-customer-contact' => 'disabled'));
+	//print $form->select_company($digiriskresources->digirisk_dolibarr_fetch_resource('SAMU'), 'labour_inspector', '', 'SelectThirdParty', 1, 0, '', 0, 'minwidth300');
+	print $form->select_company('', 'labour_inspector', '', 'SelectThirdParty', 1, 0, $events, 0, 'minwidth300');
+	if (!GETPOSTISSET('backtopage')) print ' <a href="'.DOL_URL_ROOT.'/societe/card.php?action=create&backtopage='.urlencode($_SERVER["PHP_SELF"].'?action=create').'" target="_blank"><span class="fa fa-plus-circle valignmiddle paddingleft" title="'.$langs->trans("AddThirdParty").'"></span></a>';
+	print '</td></tr>';
 
-	//For external user force the company to user company
-	if (!empty($user->socid)) {
-		print $form->select_company($user->socid, 'labour_inspector', '', 1, 1, 0, $events, 0, 'minwidth300');
-	} else {
-
-		print $form->select_company($digiriskresources->digirisk_dolibarr_fetch_resource('SAMU'), 'labour_inspector', '', 'SelectThirdParty', 1, 0, '', 0, 'minwidth300');
-	}	print '<br>';
-
+	//Labour inspector -- Inspecteur du travail
+	print '<tr class="oddeven"><td class="fieldrequired">'.$langs->trans("LabourInspector").'</td><td>';
+	print $form->selectcontacts(GETPOST('labour_inspector', 'int'), '', 'labour_inspector_contact', 1, '', '', 0, 'quatrevingtpercent', false, 0, array(), false, '', 'labour_inspector_contact');
 	print '</td></tr>';
 
 	// Other attributes
@@ -636,7 +662,6 @@ if ($action == 'create')
 	print '</div>';
 
 	print '</form>';
-
 }
 
 // Part to edit record
@@ -698,7 +723,7 @@ if (($id || $ref) && $action == 'edit')
 	print '</td></tr>';
 
 	//External society -- Société extérieure
-	print '<tr><td class="tdtop">';
+	print '<tr><td class="fieldrequired">';
 	print $langs->trans("ExtSociety");
 	print '</td>';
 
@@ -724,18 +749,6 @@ if (($id || $ref) && $action == 'edit')
 
 	print '<tr class="oddeven"><td class="fieldrequired">'.$langs->trans("ExtSocietyResponsible").'</td><td>';
 	print $form->selectcontacts(GETPOST('ext_society', 'int'), $ext_society_responsible_id, 'ext_society_responsible', 0, '', '', 0, 'quatrevingtpercent', false, 0, array(), false, '', 'ext_society_responsible');
-	print '</td></tr>';
-
-	//Intervenants extérieurs
-	$resources_ids = array();
-
-	if (!empty ($object_signatories['PP_EXT_SOCIETY_INTERVENANTS']) && $object_signatories['PP_EXT_SOCIETY_INTERVENANTS'] > 0) {
-		foreach ($object_signatories['PP_EXT_SOCIETY_INTERVENANTS'] as $resource) {
-			$resources_ids[] = $resource->element_id;
-		}
-	}
-	print '<tr class="oddeven"><td>'.$langs->trans("ExtSocietyIntervenants").'</td><td>';
-	print $form->selectcontacts(GETPOST('ext_society', 'int'),$resources_ids, 'ext_intervenants[]', 0, '', '', 0, 'quatrevingtpercent', false, 0, array(), false, 'multiple', 'ext_intervenants');
 	print '</td></tr>';
 
 	// CSSCT Intervention
@@ -776,6 +789,13 @@ if (($id || $ref) && $action == 'edit')
 		print $form->select_company($digiriskresources->digirisk_dolibarr_fetch_resource('SAMU'), 'labour_inspector', '', 'SelectThirdParty', 1, 0, $events, 0, 'minwidth300');
 	}	print '<br>';
 
+	print '</td></tr>';
+
+	//External responsible -- Responsable de la société extérieure
+	$labour_inspector_id = is_array($object_signatories['PP_EXT_SOCIETY_RESPONSIBLE']) ? array_shift($object_signatories['PP_EXT_SOCIETY_RESPONSIBLE'])->element_id : '';
+
+	print '<tr class="oddeven"><td class="fieldrequired">'.$langs->trans("ExtSocietyResponsible").'</td><td>';
+	print $form->selectcontacts(GETPOST('ext_society', 'int'), $ext_society_responsible_id, 'ext_society_responsible', 0, '', '', 0, 'quatrevingtpercent', false, 0, array(), false, '', 'ext_society_responsible');
 	print '</td></tr>';
 
 	// Other attributes
@@ -835,14 +855,14 @@ if ((empty($action) || ($action != 'create' && $action != 'edit')))
 	unset($object->fields['date_start']);
 	unset($object->fields['date_end']);
 
-	print '<tr><td class="tdtop">';
+	print '<tr><td class="titlefield">';
 	print $langs->trans("StartDate");
 	print '</td>';
 	print '<td>';
 	print dol_print_date($object->date_start, 'dayhoursec');
 	print '</td></tr>';
 
-	print '<tr><td class="tdtop">';
+	print '<tr><td class="titlefield">';
 	print $langs->trans("EndDate");
 	print '</td>';
 	print '<td>';
@@ -852,7 +872,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit')))
 	include DOL_DOCUMENT_ROOT.'/core/tpl/commonfields_view.tpl.php';
 
 	//External Society -- Société extérieure
-	print '<tr><td class="tdtop">';
+	print '<tr><td class="titlefield">';
 	print $langs->trans("ExtSociety");
 	print '</td>';
 	print '<td>';
@@ -863,18 +883,29 @@ if ((empty($action) || ($action != 'create' && $action != 'edit')))
 	print '</td></tr>';
 
 	//Labour inspector -- Inspecteur du travail
-	print '<tr><td class="tdtop">';
-	print $langs->trans("LabourInspector");
+	print '<tr><td class="titlefield">';
+	print $langs->trans("LabourInspectorSociety");
 	print '</td>';
 	print '<td>';
-	$labour_inspector= $digiriskresources->fetchResourcesFromObject('PP_LABOUR_INSPECTOR_ASSIGNED', $object);
+	$labour_inspector = $digiriskresources->fetchResourcesFromObject('PP_LABOUR_INSPECTOR', $object);
 	if ($labour_inspector > 0) {
 		print $labour_inspector->getNomUrl(1);
 	}
 	print '</td></tr>';
 
+	//Labour inspector -- Inspecteur du travail
+	print '<tr><td class="titlefield">';
+	print $langs->trans("LabourInspector");
+	print '</td>';
+	print '<td>';
+	$labour_inspector_contact = $digiriskresources->fetchResourcesFromObject('PP_LABOUR_INSPECTOR_ASSIGNED', $object);
+	if ($labour_inspector_contact > 0) {
+		print $labour_inspector_contact->getNomUrl(1);
+	}
+	print '</td></tr>';
+
 	//Attendants -- Participants
-	print '<tr><td class="tdtop">';
+	print '<tr><td class="titlefield">';
 	print $langs->trans("Attendants");
 	print '</td>';
 	print '<td>';
@@ -902,51 +933,59 @@ if ((empty($action) || ($action != 'create' && $action != 'edit')))
 
 		if (empty($reshook)) {
 			// Modify
-			if ($permissiontoadd) {
+			if ($permissiontoadd && $object->status != 3) {
 				print '<a class="butAction" id="actionButtonEdit" href="' . $_SERVER["PHP_SELF"] . '?id=' . $object->id . '&action=edit">' . $langs->trans("Modify") . '</a>' . "\n";
 			} else {
 				print '<a class="butActionRefused classfortooltip" href="#" title="' . dol_escape_htmltag($langs->trans("NotEnoughPermissions")) . '">' . $langs->trans('Modify') . '</a>' . "\n";
 			}
-			if ($object->status == 2) {
-				print '<a class="butAction" id="actionButtonUnlock" href="' . $_SERVER["PHP_SELF"] . '?id=' . $object->id . '&action=setUnlock">' . $langs->trans("Unlock") . '</a>' . "\n";
-			} elseif ($object->status == 3) {
+			if ($object->status == 1) {
+				print '<a class="butAction" id="actionButtonPendingSignature" href="' . $_SERVER["PHP_SELF"] . '?id=' . $object->id . '&action=setPendingSignature">' . $langs->trans("PendingSignature") . '</a>' . "\n";
+			} elseif ($object->status == 2) {
 				print '<a class="butAction" id="actionButtonLock" href="' . $_SERVER["PHP_SELF"] . '?id=' . $object->id . '&action=setLock">' . $langs->trans("Lock") . '</a>' . "\n";
+			} elseif ($object->status == 3) {
+				print '<a class="butAction" id="actionButtonUnlock" href="' . $_SERVER["PHP_SELF"] . '?id=' . $object->id . '&action=setUnlock">' . $langs->trans("Unlock") . '</a>' . "\n";
+			} elseif ($object->status == 4) {
+				print '<a class="butAction" id="actionButtonClose" href="' . $_SERVER["PHP_SELF"] . '?id=' . $object->id . '&action=setClose">' . $langs->trans("Close") . '</a>' . "\n";
+			}
+			if ($object->date_end == dol_now()){
+				$object->setClose($user, false);
 			}
 		}
 		print '</div>' . "\n";
 
 		// PREVENTIONPLAN LINES
-		print '<div class="div-table-responsive-no-min" style="overflow-x: unset !important">' . "\n";
-		print '<table id="tablelines" class="noborder noshadow" width="100%">';
+		if ($object->status == 1) {
+			print '<div class="div-table-responsive-no-min" style="overflow-x: unset !important">' . "\n";
+			print '<table id="tablelines" class="noborder noshadow" width="100%">';
 
-		global $forceall, $forcetoshowtitlelines;
+			global $forceall, $forcetoshowtitlelines;
 
-		if (empty($forceall)) $forceall = 0;
+			if (empty($forceall)) $forceall = 0;
 
-		// Define colspan for the button 'Add'
-		$colspan = 3; // Columns: total ht + col edit + col delete
-		//print $object->element;
+			// Define colspan for the button 'Add'
+			$colspan = 3; // Columns: total ht + col edit + col delete
+			//print $object->element;
 
-		// Lines
-		$preventionplanline = new PreventionPlanLine($db);
-		$preventionplanline->db = $db;
-		$preventionplanlines = $preventionplanline->fetchAll(GETPOST('id'));
+			// Lines
+			$preventionplanline = new PreventionPlanLine($db);
+			$preventionplanline->db = $db;
+			$preventionplanlines = $preventionplanline->fetchAll(GETPOST('id'));
 
-		print '<tr class="liste_titre nodrag nodrop">';
-		if (!empty($conf->global->MAIN_VIEW_LINE_NUMBER)) {
-			print '<td class="linecolnum center"></td>';
-		}
-		print '<td class="linecoldescription">';
-		print '<div id="add"></div><span class="hideonsmartphone">'.$langs->trans('Ref.').'</span>';
-		print '</td>';
-		print '<td class="linecollocation">'.$langs->trans('Location').'</td>';
-		print '<td class="linecolactionsdescription">'.$form->textwithpicto($langs->trans('ActionsDescription'), $langs->trans("ActionsDescriptionTooltip")).'</td>';
-		print '<td class="linecolriskcategory">'.$form->textwithpicto($langs->trans('INRSRisk'), $langs->trans('INRSRiskTooltip')).'</td>';
-		print '<td class="linecolpreventionmethod">'.$form->textwithpicto($langs->trans('PreventionMethod'), $langs->trans('PreventionMethodTooltip')).'</td>';
-		print '<td class="linecoledit" colspan="'.$colspan.'">&nbsp;</td>';
-		print '</tr>';
+			print '<tr class="liste_titre nodrag nodrop">';
+			if (!empty($conf->global->MAIN_VIEW_LINE_NUMBER)) {
+				print '<td class="linecolnum center"></td>';
+			}
+			print '<td class="linecoldescription">';
+			print '<div id="add"></div><span class="hideonsmartphone">'.$langs->trans('Ref.').'</span>';
+			print '</td>';
+			print '<td class="linecollocation">'.$langs->trans('Location').'</td>';
+			print '<td class="linecolactionsdescription">'.$form->textwithpicto($langs->trans('ActionsDescription'), $langs->trans("ActionsDescriptionTooltip")).'</td>';
+			print '<td class="linecolriskcategory">'.$form->textwithpicto($langs->trans('INRSRisk'), $langs->trans('INRSRiskTooltip')).'</td>';
+			print '<td class="linecolpreventionmethod">'.$form->textwithpicto($langs->trans('PreventionMethod'), $langs->trans('PreventionMethodTooltip')).'</td>';
+			print '<td class="linecoledit" colspan="'.$colspan.'">&nbsp;</td>';
+			print '</tr>';
 
-		if (! empty($preventionplanlines) && $preventionplanlines > 0) {
+			if (! empty($preventionplanlines) && $preventionplanlines > 0) {
 			print '<tr>';
 			foreach($preventionplanlines as $key => $item) {
 				if ($action == 'editline' && $lineid == $key) {
@@ -1096,92 +1135,97 @@ if ((empty($action) || ($action != 'create' && $action != 'edit')))
 			}
 			print '</tr>';
 		}
+			print '<form method="POST" action="' . $_SERVER["PHP_SELF"] . '?id=' . $object->id . '">';
+			print '<input type="hidden" name="token" value="' . newToken() . '">';
+			print '<input type="hidden" name="action" value="addLine">';
+			print '<input type="hidden" name="backtopage" value="' . $backtopage . '">';
+			print '<input type="hidden" name="parent_id" value="' . $object->id . '">';
 
-		print '<form method="POST" action="'.$_SERVER["PHP_SELF"] . '?id=' . $object->id .'">';
-		print '<input type="hidden" name="token" value="'.newToken().'">';
-		print '<input type="hidden" name="action" value="addLine">';
-		print '<input type="hidden" name="backtopage" value="'.$backtopage.'">';
-		print '<input type="hidden" name="parent_id" value="'.$object->id.'">';
+			print '<tr class="pair nodrag nodrop nohoverpair' . (($nolinesbefore || $object->element == 'contrat') ? '' : ' liste_titre_create') . '">';
 
-		print '<tr class="pair nodrag nodrop nohoverpair'.(($nolinesbefore || $object->element == 'contrat') ? '' : ' liste_titre_create').'">';
+			print '<td class="bordertop nobottom linecolref minwidth500imp">';
+			print $refPreventionPlanDetMod->getNextValue($preventionplanline);
+			print '</td>';
+			print '<td class="bordertop nobottom linecollocation">';
+			print $digiriskelement->select_digiriskelement_list('', 'fk_element', '', '1', 0, 0, array(), '', 0, 0, 'minwidth100', '', false, 1);
+			print '</td>';
 
-		print '<td class="bordertop nobottom linecolref minwidth500imp">';
-		print $refPreventionPlanDetMod->getNextValue($preventionplanline);
-		print '</td>';
-		print '<td class="bordertop nobottom linecollocation">';
-		print $digiriskelement->select_digiriskelement_list('', 'fk_element', '', '1',  0, 0, array(), '',  0,  0,  'minwidth100',  '',  false,1);
-		print '</td>';
+			$coldisplay++;
+			print '<td class="bordertop nobottom linecolactionsdescription">';
+			print '<textarea name="actionsdescription" class="minwidth150" cols="50" rows="' . ROWS_2 . '">' . ('') . '</textarea>' . "\n";
+			print '</td>';
 
-		$coldisplay++;
-		print '<td class="bordertop nobottom linecolactionsdescription">';
-		print '<textarea name="actionsdescription" class="minwidth150" cols="50" rows="' . ROWS_2 . '">' . ('') . '</textarea>' . "\n";
-		print '</td>';
-
-		$coldisplay++;
-		print '<td class="bordertop nobottom linecolriskcategory">'; ?>
+			$coldisplay++;
+			print '<td class="bordertop nobottom linecolriskcategory">'; ?>
 			<div class="wpeo-dropdown dropdown-large dropdown-grid category-danger padding">
-				<input class="input-hidden-danger" type="hidden" name="risk_category_id" value="undefined" />
+				<input class="input-hidden-danger" type="hidden" name="risk_category_id" value="undefined"/>
 				<div class="dropdown-toggle dropdown-add-button button-cotation">
-					<span class="wpeo-button button-square-50 button-grey"><i class="fas fa-exclamation-triangle button-icon"></i><i class="fas fa-plus-circle button-add"></i></span>
+					<span class="wpeo-button button-square-50 button-grey"><i
+							class="fas fa-exclamation-triangle button-icon"></i><i
+							class="fas fa-plus-circle button-add"></i></span>
 					<img class="danger-category-pic wpeo-tooltip-event hidden" src="" aria-label=""/>
 				</div>
 				<ul class="dropdown-content wpeo-gridlayout grid-5 grid-gap-0">
 					<?php
 					$dangerCategories = $risk->get_danger_categories();
-					if ( ! empty( $dangerCategories ) ) :
-						foreach ( $dangerCategories as $dangerCategory ) : ?>
-							<li class="item dropdown-item wpeo-tooltip-event" data-is-preset="<?php echo ''; ?>" data-id="<?php echo $dangerCategory['position'] ?>" aria-label="<?php echo $dangerCategory['name'] ?>">
-								<img src="<?php echo DOL_URL_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $dangerCategory['thumbnail_name'] . '.png'?>" class="attachment-thumbail size-thumbnail photo photowithmargin" alt="" loading="lazy" width="48" height="48">
+					if (!empty($dangerCategories)) :
+						foreach ($dangerCategories as $dangerCategory) : ?>
+							<li class="item dropdown-item wpeo-tooltip-event" data-is-preset="<?php echo ''; ?>"
+								data-id="<?php echo $dangerCategory['position'] ?>"
+								aria-label="<?php echo $dangerCategory['name'] ?>">
+								<img
+									src="<?php echo DOL_URL_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $dangerCategory['thumbnail_name'] . '.png' ?>"
+									class="attachment-thumbail size-thumbnail photo photowithmargin" alt=""
+									loading="lazy" width="48" height="48">
 							</li>
 						<?php endforeach;
 					endif; ?>
 				</ul>
 			</div>
-		<?php
-		print '</td>';
+			<?php
+			print '</td>';
 
-		$coldisplay++;
-		print '<td class="bordertop nobottom linecolpreventionmethod">';
-		print '<textarea name="preventionmethod" class="minwidth150" cols="50" rows="' . ROWS_2 . '">' . ('') . '</textarea>' . "\n";
-		print '</td>';
+			$coldisplay++;
+			print '<td class="bordertop nobottom linecolpreventionmethod">';
+			print '<textarea name="preventionmethod" class="minwidth150" cols="50" rows="' . ROWS_2 . '">' . ('') . '</textarea>' . "\n";
+			print '</td>';
 
-		$coldisplay += $colspan;
-		print '<td class="bordertop nobottom linecoledit center valignmiddle" colspan="'.$colspan.'">';
-		print '<input type="submit" class="button" value="'.$langs->trans('Add').'" name="addline" id="addline">';
-		print '</td>';
-		print '</tr>';
+			$coldisplay += $colspan;
+			print '<td class="bordertop nobottom linecoledit center valignmiddle" colspan="' . $colspan . '">';
+			print '<input type="submit" class="button" value="' . $langs->trans('Add') . '" name="addline" id="addline">';
+			print '</td>';
+			print '</tr>';
 
-		if (is_object($objectline)) {
-			print $objectline->showOptionals($extrafields, 'edit', array('style'=>$bcnd[$var], 'colspan'=>$coldisplay), '', '', 1);
-		}
-		?>
-		<script>
-			/* JQuery for product free or predefined select */
-			jQuery(document).ready(function() {
-				/* When changing predefined product, we reload list of supplier prices required for margin combo */
-				$("#idprod").change(function()
-				{
-					console.log("#idprod change triggered");
+			if (is_object($objectline)) {
+				print $objectline->showOptionals($extrafields, 'edit', array('style' => $bcnd[$var], 'colspan' => $coldisplay), '', '', 1);
+			}
+			?>
+			<script>
+				/* JQuery for product free or predefined select */
+				jQuery(document).ready(function () {
+					/* When changing predefined product, we reload list of supplier prices required for margin combo */
+					$("#idprod").change(function () {
+						console.log("#idprod change triggered");
 
-					/* To set focus */
-					if (jQuery('#idprod').val() > 0)
-					{
-						/* focus work on a standard textarea but not if field was replaced with CKEDITOR */
-						jQuery('#dp_desc').focus();
-						/* focus if CKEDITOR */
-						if (typeof CKEDITOR == "object" && typeof CKEDITOR.instances != "undefined")
-						{
-							var editor = CKEDITOR.instances['dp_desc'];
-							if (editor) { editor.focus(); }
+						/* To set focus */
+						if (jQuery('#idprod').val() > 0) {
+							/* focus work on a standard textarea but not if field was replaced with CKEDITOR */
+							jQuery('#dp_desc').focus();
+							/* focus if CKEDITOR */
+							if (typeof CKEDITOR == "object" && typeof CKEDITOR.instances != "undefined") {
+								var editor = CKEDITOR.instances['dp_desc'];
+								if (editor) {
+									editor.focus();
+								}
+							}
 						}
-					}
+					});
 				});
-			});
-		</script> <?php
-		print '</form>';
-		print '</table>';
-
-		print '</div>';
+			</script> <?php
+			print '</form>';
+			print '</table>';
+			print '</div>';
+		}
 		// Document Generation -- Génération des documents
 		$includedocgeneration = 1;
 		if ($includedocgeneration) {
@@ -1196,7 +1240,27 @@ if ((empty($action) || ($action != 'create' && $action != 'edit')))
 			$defaultmodel = $conf->global->DIGIRISKDOLIBARR_PREVENTIONPLANDOCUMENT_DEFAULT_MODEL;
 			$title = $langs->trans('PreventionPlanDocument');
 
-			print digiriskshowdocuments($modulepart, $dir_files, $filedir, $urlsource, $permissiontoadd, $permissiontodelete, $defaultmodel, 1, 0, 28, 0, '', $title, '', $langs->defaultlang, '', $preventionplandocument);
+			$signatories = $signatory->fetchSignatory("",$object->id);
+
+			$arrayRole = array( 'PP_MAITRE_OEUVRE', 'PP_EXT_SOCIETY_RESPONSIBLE', 'PP_EXT_SOCIETY_INTERVENANTS');
+
+			if (!empty ($signatories) && $signatories > 0) {
+				foreach ($signatories as $arrayRole) {
+					foreach ($arrayRole as $signatory) {
+						$signatoriesStatusArray[$signatory->role][] = $signatory->status;
+						if ($signatory->status >= 5 ) {
+							$active = 1;
+						} else {
+							$active = 0;
+							break 2;
+						}
+					}
+				}
+			}
+
+			if ($object->status == 3) {
+				print digiriskshowdocuments($modulepart, $dir_files, $filedir, $urlsource, $permissiontoadd, $permissiontodelete, $defaultmodel, 1, 0, 28, 0, '', $title, '', $langs->defaultlang, '', $preventionplandocument, 0, '', $active);
+			}
 		}
 
 
