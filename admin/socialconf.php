@@ -198,9 +198,10 @@ print '<tr>';
 print '<td>'.$form->editfieldkey('Titulars', 'TitularsCSE_id', '', $object, 0).'</td>';
 print '<td colspan="3" class="maxwidthonsmartphone">';
 
-if (!GETPOSTISSET('backtopage')) print ' <a href="'.DOL_URL_ROOT.'/user/card.php?action=create&backtopage='.urlencode($_SERVER["PHP_SELF"].'?action=create').'"><span class="fa fa-plus-circle valignmiddle paddingleft" title="'.$langs->trans("AddThirdParty").'"></span></a>';
 
-print $form->multiselectarray('TitularsCSE', $userlist, $titulars_cse->id, null, null, null, null, "90%");
+print $form->multiselectarray('TitularsCSE', $userlist, $titulars_cse->id, null, null, null, null, "minwidth300");
+
+if (!GETPOSTISSET('backtopage')) print ' <a href="'.DOL_URL_ROOT.'/user/card.php?action=create&backtopage='.urlencode($_SERVER["PHP_SELF"].'?action=create').'"><span class="fa fa-plus-circle valignmiddle paddingleft" title="'.$langs->trans("AddUser").'"></span></a>';
 
 print '</td></tr>';
 
@@ -213,9 +214,9 @@ print '<tr>';
 print '<td>'.$form->editfieldkey('Alternates', 'AlternatesCSE_id', '', $object, 0).'</td>';
 print '<td colspan="3" class="maxwidthonsmartphone">';
 
-if (!GETPOSTISSET('backtopage')) print ' <a href="'.DOL_URL_ROOT.'/user/card.php?action=create&backtopage='.urlencode($_SERVER["PHP_SELF"].'?action=create').'"><span class="fa fa-plus-circle valignmiddle paddingleft" title="'.$langs->trans("AddThirdParty").'"></span></a>';
+print $form->multiselectarray('AlternatesCSE', $userlist, $alternates_cse->id, null, null, null, null, "minwidth300");
 
-print $form->multiselectarray('AlternatesCSE', $userlist, $alternates_cse->id, null, null, null, null, "90%");
+if (!GETPOSTISSET('backtopage')) print ' <a href="'.DOL_URL_ROOT.'/user/card.php?action=create&backtopage='.urlencode($_SERVER["PHP_SELF"].'?action=create').'"><span class="fa fa-plus-circle valignmiddle paddingleft" title="'.$langs->trans("AddUser").'"></span></a>';
 
 print '</td></tr>';
 
@@ -224,7 +225,7 @@ print '</td></tr>';
 */
 
 print '<table class="noborder centpercent editmode">';
-print '<tr class="liste_titre"><th class="titlefield wordbreak">'.$langs->trans("StaffRepresentatives").'</th><th>'.$langs->trans("Value").'</th></tr>'."\n";
+print '<tr class="liste_titre"><th class="titlefield wordbreak">'.$langs->trans("StaffRepresentatives").'</th><th>'.$langs->trans("").'</th></tr>'."\n";
 
 print '<tr class="oddeven"><td><label for="ElectionDateDP">'.$langs->trans("ElectionDate").'</label></td><td>';
 print $form->selectDate(strtotime($electionDateDP) ? $electionDateDP : -1, 'ElectionDateDP', 0, 0, 0, 'social_form', 1, 1);
@@ -238,9 +239,9 @@ print '<tr>';
 print '<td>'.$form->editfieldkey('Titulars', 'TitularsDP_id', '', $object, 0).'</td>';
 print '<td colspan="3" class="maxwidthonsmartphone">';
 
-if (!GETPOSTISSET('backtopage')) print ' <a href="'.DOL_URL_ROOT.'/user/card.php?action=create&backtopage='.urlencode($_SERVER["PHP_SELF"].'?action=create').'"><span class="fa fa-plus-circle valignmiddle paddingleft" title="'.$langs->trans("AddThirdParty").'"></span></a>';
+print $form->multiselectarray('TitularsDP', $userlist, $titulars_dp->id, null, null, null, null, "minwidth300");
 
-print $form->multiselectarray('TitularsDP', $userlist, $titulars_dp->id, null, null, null, null, "90%");
+if (!GETPOSTISSET('backtopage')) print ' <a href="'.DOL_URL_ROOT.'/user/card.php?action=create&backtopage='.urlencode($_SERVER["PHP_SELF"].'?action=create').'"><span class="fa fa-plus-circle valignmiddle paddingleft" title="'.$langs->trans("AddUser").'"></span></a>';
 
 print '</td></tr>';
 
@@ -253,9 +254,9 @@ print '<tr>';
 print '<td>'.$form->editfieldkey('Alternates', 'AlternatesDP', '', $object, 0).'</td>';
 print '<td colspan="3" class="maxwidthonsmartphone">';
 
-if (!GETPOSTISSET('backtopage')) print ' <a href="'.DOL_URL_ROOT.'/user/card.php?action=create&backtopage='.urlencode($_SERVER["PHP_SELF"].'?action=create').'"><span class="fa fa-plus-circle valignmiddle paddingleft" title="'.$langs->trans("AddThirdParty").'"></span></a>';
+print $form->multiselectarray('AlternatesDP', $userlist, $alternates_dp->id, null, null, null, null, "minwidth300");
 
-print $form->multiselectarray('AlternatesDP', $userlist, $alternates_dp->id, null, null, null, null, "90%");
+if (!GETPOSTISSET('backtopage')) print ' <a href="'.DOL_URL_ROOT.'/user/card.php?action=create&backtopage='.urlencode($_SERVER["PHP_SELF"].'?action=create').'"><span class="fa fa-plus-circle valignmiddle paddingleft" title="'.$langs->trans("AddUser").'"></span></a>';
 
 print '</td></tr>';
 
