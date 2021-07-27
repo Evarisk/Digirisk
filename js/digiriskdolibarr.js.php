@@ -884,8 +884,8 @@ window.eoxiaJS.signature.createSignature = function() {
 		url = document.URL + '&action=addSignature' + signatoryIDPost;
 		type = "POST"
 	} else {
-		url = document.URL + '?action=addSignature' + signatoryIDPost;
-		type = "GET";
+		url = document.URL + '&action=addSignature' + signatoryIDPost;
+		type = "POST";
 	}
 
 	$.ajax({
