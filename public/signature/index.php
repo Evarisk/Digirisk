@@ -76,11 +76,6 @@ if ($action == 'addSignature') {
 	$signature = GETPOST('signature');
 	$request_body = file_get_contents('php://input');
 
-	echo '<pre>';
-	print_r('test');
-	echo '</pre>';
-	exit;
-
 	$signatory->fetch($signatoryID);
 	$signatory->signature = $request_body;
 	$signatory->signature_date = dol_now();
@@ -132,16 +127,14 @@ print '</div>';
 $url = dirname($_SERVER['PHP_SELF']) . '/add_signature.php';
 
 print '<div id="form_view_ticket">';
-print '<form method="post" name="form_view_ticket"  enctype="multipart/form-data" action="'.$url.'">';
-print '<input type="hidden" name="token" value="'.newToken().'">';
-print '<input type="hidden" name="action" value="index">';
+print '<form method="get" name="form_view_ticket"  enctype="multipart/form-data" action="'.$url.'">';
 
 print '<p><label for="track_id" style="display: inline-block; width: 30%; "><span class="fieldrequired">'.$langs->trans("SignatureTrackId").'</span></label>';
-print '<input size="30" id="track_id" name="track_id" value="'.(GETPOST('track_id', 'alpha') ? GETPOST('track_id', 'alpha') : '').'" />';
+print '<input size="30" id="track_id" name="track_id" value="'.(GETPOST('track_id') ? GETPOST('track_id') : '').'" />';
 print '</p>';
 
 print '<p style="text-align: center; margin-top: 1.5em;">';
-print '<input class="button" type="submit" name="btn_view_ticket" value="'.$langs->trans('Signed').'" />';
+print '<input class="button" type="submit" value="'.$langs->trans('Signed').'" />';
 print "</p>\n";
 
 print "</form>\n";
