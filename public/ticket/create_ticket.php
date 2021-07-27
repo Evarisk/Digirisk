@@ -238,6 +238,30 @@ if ($action == 'sendfile') {
 }
 
 // Remove file
+if ($action == 'removefile') {
+	include_once DOL_DOCUMENT_ROOT.'/core/lib/files.lib.php';
+	$filetodelete = GETPOST('filetodelete');
+
+	$ticket_upload_dir = $conf->digiriskdolibarr->multidir_output[isset($conf->entity) ? $conf->entity : 1].'/temp';
+	//Add files linked
+	$ticket_upload_dir = $conf->digiriskdolibarr->multidir_output[isset($conf->entity) ? $conf->entity : 1].'/temp/ticket/' . $ticket_tmp_id . '/';
+	$fileList          = dol_dir_list($ticket_upload_dir);
+
+	if (is_file($ticket_upload_dir . $filetodelete)) {
+		dol_delete_file($ticket_upload_dir . $filetodelete);
+
+		$thumbsList = dol_dir_list($ticket_upload_dir . 'thumbs/');
+		if (!empty($thumbsList)) {
+			foreach ($thumbsList as $thumb) {
+				dol_delete_file($ticket_upload_dir . 'thumbs/' . $thumb['name'] );
+			}
+			dol_delete_dir($ticket_upload_dir . 'thumbs/');
+		}
+	}
+
+	$action = '';
+
+}
 
 
 /*
@@ -331,10 +355,8 @@ if (GETPOST('register')) {
 			show_category_image($pertinence, $upload_dir);
 			print '</td>';
 		}
-
 	}
 }
-
 
 print '</table>';
 print '<br>';
@@ -369,10 +391,10 @@ if (!empty($fileLinkedList)){
 			print '<img class="photo"  width="'.$maxHeight.'" src="'.DOL_URL_ROOT.'/viewimage.php?modulepart=digiriskdolibarr&entity='.$conf->entity.'&file='.urlencode('/temp/ticket/'.$ticket_tmp_id.'/thumbs/' . $fileLinked['name']).'" title="'.dol_escape_htmltag($alt).'">';
 
 			print '</td><td>';
-			print $fileLinked['name'];
+			print preg_replace('/_mini/','', $fileLinked['name']);
 			print '</td><td>';
 
-			print '<div class="linked-file-delete wpeo-button button-square-50 button-transparent"><i class="fas fa-trash button-icon"></i></div>';
+			print '<div class="linked-file-delete wpeo-button button-square-50 button-transparent" value="'. $fileLinked['name'] .'"><i class="fas fa-trash button-icon"></i></div>';
 			print '</td></tr>';
 		}
 	}

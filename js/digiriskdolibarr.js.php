@@ -2447,6 +2447,7 @@ window.eoxiaJS.ticket.event = function() {
 	jQuery( document ).on( 'click', '.ticket-register', window.eoxiaJS.ticket.selectRegister );
 	jQuery( document ).on( 'click', '.ticket-pertinence', window.eoxiaJS.ticket.selectPertinence );
 	jQuery( document ).on( 'submit', '#sendFile', window.eoxiaJS.ticket.tmpStockFile );
+	jQuery( document ).on( 'click', '.linked-file-delete', window.eoxiaJS.ticket.removeFile );
 };
 
 /**
@@ -2553,6 +2554,29 @@ window.eoxiaJS.ticket.tmpStockFile = function( ) {
 	fetch(document.URL + '?action=sendfile&ticket_id='+ticket_id, {
 		method: 'POST',
 		body: formData,
+	}).then((response) => {
+		setTimeout(function(){
+			$('#sendFileForm').load(document.URL+ '?ticket_id='+ticket_id + ' #fileLinkedTable')
+		}, 800);
+	})
+};
+
+/**
+ * Upload automatiquement le(s) fichier(s) séelectionnés dans ecm/digiriskdolibarr/ticket/tmp/__REF__
+ *
+ * @since   1.1.0
+ * @version 1.1.0
+ *
+ * @return {void}
+ */
+
+window.eoxiaJS.ticket.removeFile = function( event ) {
+	let filetodelete = $(this).attr('value');
+	filetodelete = filetodelete.replace('_mini', '')
+	let ticket_id = $('#ticket_id').val()
+
+	fetch(document.URL + '?action=removefile&filetodelete='+filetodelete+'&ticket_id='+ticket_id, {
+		method: 'POST',
 	}).then((response) => {
 		setTimeout(function(){
 			$('#sendFileForm').load(document.URL+ '?ticket_id='+ticket_id + ' #fileLinkedTable')
