@@ -309,6 +309,11 @@ INRSRiskTooltip = Liste des catégories de risques proposée dans le référenti
 PreventionMethodTooltip = Moyen de prévention à mettre en place pour limiter le risque
 Unlock = Déverouiller
 Lock = Verouiller
+GenerateDocumentTitle = Génération du document disponible
+GenerateDocument = Vous pouvez vous rendre sur cette adresse url pour générer votre document<br>
+LabourInspectorSociety = Entreprise Inspecteur du travail
+
+
 
 #
 # FirePermit - Permis de feu
@@ -762,6 +767,9 @@ SignaturePublicAccess = Une interface publique ne nécessitant aucune identifica
 SignatureActivatePublicInterface = Activer l'interface publique
 SignatureShowCompanyLogo = Afficher le logo de la société dans l'interface publique
 SignatureShowCompanyLogoHelp = Activez cette option pour masquer le logo de la société dans les pages de l'interface publique
+SignatureMaitreOeuvre = Signature du responsable de l'entreprise utilisatrice
+SignatureResponsibleExtSociety = Signature du responsable de l'entreprise extérieure
+Role = Rôle
 
 #
 # Ticket - Interface publique ticket
