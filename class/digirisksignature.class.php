@@ -443,9 +443,9 @@ class DigiriskSignature extends CommonObject
 	 * Create signatory in database
 	 *
 	 * @param int     $fk_object    ID of object linked
-	 * @param varchar $element_type Type of resource
+	 * @param string  $element_type Type of resource
 	 * @param int     $element_id   Id of resource
-	 * @param varchar $role         Role of resource
+	 * @param string  $role         Role of resource
 	 */
 	function setSignatory($fk_object, $element_type, $element_ids, $role = "")
 	{

@@ -131,8 +131,8 @@ class DigiriskResources extends CommonObject
 	/**
 	 * Clone an object into another one
 	 *
-	 * @param varchar $ref name of resource
-	 * @param varchar $element_type type of resource
+	 * @param string $ref name of resource
+	 * @param string $element_type type of resource
 	 * @param int $element_id Id of resource
 	 */
 	function digirisk_dolibarr_set_resources($db, $user_creat, $ref, $element_type, $element_id, $entity = 1, $object_type = '', $object_id = 0, $noupdate = 0)
@@ -227,6 +227,8 @@ class DigiriskResources extends CommonObject
 
 		$res = $this->db->query($sql);
 
+
+
 		if ($res)
 		{
 
@@ -275,6 +277,7 @@ class DigiriskResources extends CommonObject
 						$resourcetmp = new Societe($this->db);
 					}
 					$resourcetmp->fetch($this->element_id);
+
 					return $resourcetmp;
 				}
 				else

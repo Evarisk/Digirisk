@@ -61,14 +61,11 @@ class PreventionPlan extends CommonObject
 	 */
 	public $picto = 'preventionplandocument@digiriskdolibarr';
 
-	const STATUS_REGISTERED = 0;
-	const STATUS_SIGNATURE_REQUEST = 1;
-	const STATUS_LOCK = 2;
-	const STATUS_UNLOCK = 3;
-//	const STATUS_SIGNED = 4;
-//	const STATUS_UNSIGNED = 5;
-//	const STATUS_ABSENT = 6;
-//	const STATUS_JUSTIFIED_ABSENT = 7;
+	const STATUS_IN_PROGRESS = 1;
+	const STATUS_PENDING_SIGNATURE = 2;
+	const STATUS_LOCK = 3;
+	const STATUS_UNLOCK = 4;
+	const STATUS_CLOSE = 5;
 
 	/**
 	 * @var array  Array with all fields and their property. Do not use it as a static var. It may be modified by constructor.
@@ -311,6 +308,29 @@ class PreventionPlan extends CommonObject
 	}
 
 	/**
+	 *	Set in progress status
+	 *
+	 *	@param	User	$user			Object user that modify
+	 *  @param	int		$notrigger		1=Does not execute triggers, 0=Execute triggers
+	 *	@return	int						<0 if KO, >0 if OK
+	 */
+	public function setInProgress($user, $notrigger = 0)
+	{
+		return $this->setStatusCommon($user, self::STATUS_IN_PROGRESS, $notrigger, 'DIGIRISKSIGNATURE_INPROGRESS');
+	}
+	/**
+	 *	Set pending signature status
+	 *
+	 *	@param	User	$user			Object user that modify
+	 *  @param	int		$notrigger		1=Does not execute triggers, 0=Execute triggers
+	 *	@return	int						<0 if KO, >0 if OK
+	 */
+	public function setPendingSignature($user, $notrigger = 0)
+	{
+		return $this->setStatusCommon($user, self::STATUS_PENDING_SIGNATURE, $notrigger, 'DIGIRISKSIGNATURE_PENDINGSIGNATURE');
+	}
+
+	/**
 	 *	Set lock status
 	 *
 	 *	@param	User	$user			Object user that modify
@@ -332,6 +352,18 @@ class PreventionPlan extends CommonObject
 	public function setUnlock($user, $notrigger = 0)
 	{
 		return $this->setStatusCommon($user, self::STATUS_UNLOCK, $notrigger, 'DIGIRISKSIGNATURE_UNLOCK');
+	}
+
+	/**
+	 *	Set close status
+	 *
+	 *	@param	User	$user			Object user that modify
+	 *  @param	int		$notrigger		1=Does not execute triggers, 0=Execute triggers
+	 *	@return	int						<0 if KO, >0 if OK
+	 */
+	public function setClose($user, $notrigger = 0)
+	{
+		return $this->setStatusCommon($user, self::STATUS_CLOSE, $notrigger, 'DIGIRISKSIGNATURE_CLOSE');
 	}
 
 	/**
@@ -360,16 +392,20 @@ class PreventionPlan extends CommonObject
 		if (empty($this->labelStatus) || empty($this->labelStatusShort))
 		{
 			global $langs;
-			//$langs->load("digiriskdolibarr@digiriskdolibarr");
-			//$this->labelStatus[self::STATUS_DELETED] = $langs->trans('Deleted');
-			//$this->labelStatus[self::STATUS_REGISTERED] = $langs->trans('Registered');
+			$langs->load("digiriskdolibarr@digiriskdolibarr");
+
+			$this->labelStatus[self::STATUS_IN_PROGRESS] = $langs->trans('InProgress');
+			$this->labelStatus[self::STATUS_PENDING_SIGNATURE] = $langs->trans('PendingSignature');
 			$this->labelStatus[self::STATUS_LOCK] = $langs->trans('Lock');
 			$this->labelStatus[self::STATUS_UNLOCK] = $langs->trans('Unlock');
+			$this->labelStatus[self::STATUS_CLOSE] = $langs->trans('Close');
 		}
 
 		$statusType = 'status'.$status;
+		if ($status == self::STATUS_PENDING_SIGNATURE) $statusType = 'status3';
 		if ($status == self::STATUS_UNLOCK) $statusType = 'status4';
 		if ($status == self::STATUS_LOCK) $statusType = 'status8';
+		if ($status == self::STATUS_CLOSE) $statusType = 'status8';
 
 		return dolGetStatus($this->labelStatus[$status], $this->labelStatusShort[$status], '', $statusType, $mode);
 	}
