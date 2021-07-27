@@ -501,12 +501,12 @@ if (empty($reshook))
 	}
 
 	// Action to set status STATUS_CLOSE
-	if ($action == 'setClose') {
+	if ($action == 'setArchive') {
 
 		$object->fetch($id);
 
 		if (!$error) {
-			$result = $object->setClose($user, false);
+			$result = $object->setArchive($user, false);
 			if ($result > 0) {
 				// Creation signature OK
 				$urltogo = str_replace('__ID__', $result, $backtopage);
@@ -945,10 +945,10 @@ if ((empty($action) || ($action != 'create' && $action != 'edit')))
 			} elseif ($object->status == 3) {
 				print '<a class="butAction" id="actionButtonUnlock" href="' . $_SERVER["PHP_SELF"] . '?id=' . $object->id . '&action=setUnlock">' . $langs->trans("Unlock") . '</a>' . "\n";
 			} elseif ($object->status == 4) {
-				print '<a class="butAction" id="actionButtonClose" href="' . $_SERVER["PHP_SELF"] . '?id=' . $object->id . '&action=setClose">' . $langs->trans("Close") . '</a>' . "\n";
+				print '<a class="butAction" id="actionButtonClose" href="' . $_SERVER["PHP_SELF"] . '?id=' . $object->id . '&action=setArchive">' . $langs->trans("Close") . '</a>' . "\n";
 			}
 			if ($object->date_end == dol_now()){
-				$object->setClose($user, false);
+				$object->setArchive($user, false);
 			}
 		}
 		print '</div>' . "\n";

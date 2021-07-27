@@ -65,7 +65,7 @@ class PreventionPlan extends CommonObject
 	const STATUS_PENDING_SIGNATURE = 2;
 	const STATUS_LOCK = 3;
 	const STATUS_UNLOCK = 4;
-	const STATUS_CLOSE = 5;
+	const STATUS_ARCHIVE = 5;
 
 	/**
 	 * @var array  Array with all fields and their property. Do not use it as a static var. It may be modified by constructor.
@@ -361,9 +361,9 @@ class PreventionPlan extends CommonObject
 	 *  @param	int		$notrigger		1=Does not execute triggers, 0=Execute triggers
 	 *	@return	int						<0 if KO, >0 if OK
 	 */
-	public function setClose($user, $notrigger = 0)
+	public function setArchive($user, $notrigger = 0)
 	{
-		return $this->setStatusCommon($user, self::STATUS_CLOSE, $notrigger, 'DIGIRISKSIGNATURE_CLOSE');
+		return $this->setStatusCommon($user, self::STATUS_ARCHIVE, $notrigger, 'DIGIRISKSIGNATURE_ARCHIVE');
 	}
 
 	/**
@@ -398,14 +398,14 @@ class PreventionPlan extends CommonObject
 			$this->labelStatus[self::STATUS_PENDING_SIGNATURE] = $langs->trans('PendingSignature');
 			$this->labelStatus[self::STATUS_LOCK] = $langs->trans('Lock');
 			$this->labelStatus[self::STATUS_UNLOCK] = $langs->trans('Unlock');
-			$this->labelStatus[self::STATUS_CLOSE] = $langs->trans('Close');
+			$this->labelStatus[self::STATUS_ARCHIVE] = $langs->trans('Archive');
 		}
 
 		$statusType = 'status'.$status;
 		if ($status == self::STATUS_PENDING_SIGNATURE) $statusType = 'status3';
 		if ($status == self::STATUS_UNLOCK) $statusType = 'status4';
 		if ($status == self::STATUS_LOCK) $statusType = 'status8';
-		if ($status == self::STATUS_CLOSE) $statusType = 'status8';
+		if ($status == self::STATUS_ARCHIVE) $statusType = 'status8';
 
 		return dolGetStatus($this->labelStatus[$status], $this->labelStatusShort[$status], '', $statusType, $mode);
 	}
