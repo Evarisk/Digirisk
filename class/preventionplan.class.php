@@ -395,7 +395,7 @@ class PreventionPlan extends CommonObject
 			$langs->load("digiriskdolibarr@digiriskdolibarr");
 
 			$this->labelStatus[self::STATUS_IN_PROGRESS] = $langs->trans('InProgress');
-			$this->labelStatus[self::STATUS_PENDING_SIGNATURE] = $langs->trans('PendingSignature');
+			$this->labelStatus[self::STATUS_PENDING_SIGNATURE] = $langs->trans('ValidatePendingSignature');
 			$this->labelStatus[self::STATUS_LOCK] = $langs->trans('Lock');
 			$this->labelStatus[self::STATUS_UNLOCK] = $langs->trans('Unlock');
 			$this->labelStatus[self::STATUS_ARCHIVE] = $langs->trans('Archive');
