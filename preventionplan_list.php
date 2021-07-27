@@ -245,7 +245,7 @@ $sql .= " FROM ".MAIN_DB_PREFIX.$preventionplan->table_element." as t";
 if (is_array($extrafields->attributes[$preventionplan->table_element]['label']) && count($extrafields->attributes[$preventionplan->table_element]['label'])) $sql .= " LEFT JOIN ".MAIN_DB_PREFIX.$preventionplan->table_element."_extrafields as ef on (t.rowid = ef.fk_object)";
 if ($preventionplan->ismultientitymanaged == 1) $sql .= " WHERE t.entity IN (".getEntity($preventionplan->element).")";
 else $sql .= " WHERE 1 = 1";
-$sql .= ' AND status = 1';
+$sql .= ' AND status !=0';
 
 
 foreach ($search as $key => $val)

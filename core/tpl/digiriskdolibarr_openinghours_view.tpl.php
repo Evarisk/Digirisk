@@ -80,9 +80,11 @@ print '<input name="sunday" id="sunday" class="minwidth100" value="'.($object->s
 
 print '</table>';
 
-print '<br><div class="center">';
-print '<input type="submit" class="button" name="save" value="'.$langs->trans("Save").'">';
-print '</div>';
+if ($preventionplan->status != 3 ){
+	print '<br><div class="center">';
+	print '<input type="submit" class="button" name="save" value="'.$langs->trans("Save").'">';
+	print '</div>';
+}
 print '<br>';
 
 print '</form>';
