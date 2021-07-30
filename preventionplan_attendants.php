@@ -83,6 +83,12 @@ if ($reshook < 0) setEventMessages($hookmanager->error, $hookmanager->errors, 'e
 //	exit;
 //}
 
+if (empty($backtopage) || ($cancel && empty($id))) {
+	if (empty($backtopage) || ($cancel && strpos($backtopage, '__ID__'))) {
+		$backtopage = dol_buildpath('/digiriskdolibarr/preventionplan_attendants.php', 1).'?id='.($object->id > 0 ? $object->id : '__ID__');
+	}
+}
+
 // Action to add record
 if ($action == 'addAttendants') {
 
@@ -411,20 +417,8 @@ if ($action == 'create')
 
 // Part to show record
 if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
-	print load_fiche_titre($langs->trans("SignatureMaitreOeuvre"), '', '');
-
-	print '<table class="border centpercent tableforfield">';
-	print '<tr class="liste_titre">';
-	print '<td>' . $langs->trans("Role") . '</td>';
-	print '<td>' . $langs->trans("SignatureDate") . '</td>';
-	print '<td>' . $langs->trans("PublicID") . '</td>';
-	print '<td>' . $langs->trans("Name") . '</td>';
-	print '<td class="center">' . $langs->trans("Status") . '</td>';
-	if ($object->status != 3) {
-		print '<td class="center">' . $langs->trans("ActionsSignature") . '</td>';
-	}
-	print '<td class="center">' . $langs->trans("Signature") . '</td>';
-	print '</tr>' . "\n";
+	$url = $_SERVER['REQUEST_URI'];
+	$zone = "private";
 
 	//Master builder -- Maitre Oeuvre
 	$element = $signatory->fetchSignatory('PP_MAITRE_OEUVRE', $id);
@@ -433,47 +427,50 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 		$usertmp->fetch($element->element_id);
 	}
 
-	$url = $_SERVER['REQUEST_URI'];
-	$zone = "private";
+	print load_fiche_titre($langs->trans("SignatureMaitreOeuvre"), '', '');
 
-	print '<tr class="oddeven"><td>';
+	print '<table class="border centpercent tableforfield">';
+	print '<tr class="liste_titre">';
+	print '<td>' . $langs->trans("Name") . '</td>';
+	print '<td>' . $langs->trans("Role") . '</td>';
+	print '<td>' . $langs->trans("SignatureLink") . '</td>';
+	print '<td class="center">' . $langs->trans("Status") . '</td>';
+	print '<td>' . $langs->trans("SendMailDate") . '</td>';
+	print '<td>' . $langs->trans("SignatureDate") . '</td>';
+	if ($object->status != 3) {
+		print '<td class="center">' . $langs->trans("ActionsSignature") . '</td>';
+	}
+	if ($element->signature != $langs->trans("FileGenerated")) {
+		print '<td class="center">' . $langs->trans("Signature") . '</td>';
+	}
+	print '</tr>';
+
+	print '<tr class="oddeven"><td class="minwidth200">';
+	print $usertmp->getNomUrl(1);
+	print '</td><td>';
 	print $langs->trans("MaitreOeuvre");
 	print '</td><td>';
-	print dol_print_date($element->signature_date, 'dayhour');
-	print '</td><td>';
 	print $element->signature_url;
-	print '</td><td>';
-	print $usertmp->getNomUrl(1);
 	print '</td><td class="center">';
 	print $element->getLibStatut(5);
+	print '</td><td>';
+	print 'test';
+	print '</td><td>';
+	print dol_print_date($element->signature_date, 'dayhour');
 	print '</td>';
 	if ($object->status != 3) {
 		print '<td class="center">';
 		require __DIR__ . "/core/tpl/digiriskdolibarr_signature_action_view.tpl.php";
 		print '</td>';
 	}
-	print '<td class="center">';
-	require __DIR__ . "/core/tpl/digiriskdolibarr_signature_view.tpl.php";
-	print '</td></tr>';
-
+	if ($element->signature != $langs->trans("FileGenerated")) {
+		print '<td class="center">';
+		require __DIR__ . "/core/tpl/digiriskdolibarr_signature_view.tpl.php";
+		print '</td>';
+	}
 	print '</tr>';
 	print '</table>';
 	print '<br>';
-
-	print load_fiche_titre($langs->trans("SignatureResponsibleExtSociety"), '', '');
-
-	print '<table class="border centpercent tableforfield">';
-	print '<tr class="liste_titre">';
-	print '<td>' . $langs->trans("Role") . '</td>';
-	print '<td>' . $langs->trans("SignatureDate") . '</td>';
-	print '<td>' . $langs->trans("PublicID") . '</td>';
-	print '<td>' . $langs->trans("Name") . '</td>';
-	print '<td class="center">' . $langs->trans("Status") . '</td>';
-	if ($object->status != 3) {
-		print '<td class="center">' . $langs->trans("ActionsSignature") . '</td>';
-	}
-	print '<td class="center">' . $langs->trans("Signature") . '</td>';
-	print '</tr>' . "\n";
 
 	//External Society Responsible -- Responsable Société extérieure
 	$element = $signatory->fetchSignatory('PP_EXT_SOCIETY_RESPONSIBLE', $id);
@@ -481,82 +478,116 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 		$element = array_shift($element);
 		$contact->fetch($element->element_id);
 	}
-	print '<tr class="oddeven"><td>';
+
+	print load_fiche_titre($langs->trans("SignatureResponsibleExtSociety"), '', '');
+
+	print '<table class="border centpercent tableforfield">';
+	print '<tr class="liste_titre">';
+	print '<td>' . $langs->trans("Name") . '</td>';
+	print '<td>' . $langs->trans("Role") . '</td>';
+	print '<td>' . $langs->trans("SignatureLink") . '</td>';
+	print '<td class="center">' . $langs->trans("Status") . '</td>';
+	print '<td>' . $langs->trans("SendMailDate") . '</td>';
+	print '<td>' . $langs->trans("SignatureDate") . '</td>';
+	if ($object->status != 3) {
+		print '<td class="center">' . $langs->trans("ActionsSignature") . '</td>';
+	}
+	if ($element->signature != $langs->trans("FileGenerated")) {
+		print '<td class="center">' . $langs->trans("Signature") . '</td>';
+	}
+	print '</tr>';
+
+	print '<tr class="oddeven"><td class="minwidth200">';
+	print $contact->getNomUrl(1);
+	print '</td><td>';
 	print $langs->trans("ExtSocietyResponsible");
 	print '</td><td>';
-	print dol_print_date($element->signature_date, 'dayhour');
-	print '</td><td>';
 	print $element->signature_url;
-	print '</td><td>';
-	print $contact->getNomUrl(1);
 	print '</td><td class="center">';
 	print $element->getLibStatut(5);
+	print '</td><td>';
+	print 'test';
+	print '</td><td>';
+	print dol_print_date($element->signature_date, 'dayhour');
 	print '</td>';
 	if ($object->status != 3) {
 		print '<td class="center">';
 		require __DIR__ . "/core/tpl/digiriskdolibarr_signature_action_view.tpl.php";
 		print '</td>';
 	}
-	print '<td class="center">';
-	require __DIR__ . "/core/tpl/digiriskdolibarr_signature_view.tpl.php";
-	print '</td></tr>';
-
+	if ($element->signature != $langs->trans("FileGenerated")) {
+		print '<td class="center">';
+		require __DIR__ . "/core/tpl/digiriskdolibarr_signature_view.tpl.php";
+		print '</td>';
+	}
 	print '</tr>';
 	print '</table>';
 	print '<br>';
 
+	//External Society Interventants -- Intervenants Société extérieure
+	$ext_society_intervenants = $signatory->fetchSignatory('PP_EXT_SOCIETY_INTERVENANTS', $id);
+
 	$newcardbutton = '';
 	if ($object->status != 3) {
-		$newcardbutton .= dolGetButtonTitle($langs->trans('NewAttendants'), '', 'fa fa-plus-circle', DOL_URL_ROOT . '/custom/digiriskdolibarr/preventionplan_attendants.php?id='. $id . '&action=create');
+		$newcardbutton .= dolGetButtonTitle($langs->trans('NewIntervenants'), '', 'fa fa-plus-circle', DOL_URL_ROOT . '/custom/digiriskdolibarr/preventionplan_attendants.php?id='. $id . '&action=create');
 	}
 
 	print load_fiche_titre($langs->trans("SignatureIntervenants"), $newcardbutton, '');
 
 	print '<table class="border centpercent tableforfield">';
 	print '<tr class="liste_titre">';
-	print '<td>' . $langs->trans("Role") . '</td>';
-	print '<td>' . $langs->trans("SignatureDate") . '</td>';
-	print '<td>' . $langs->trans("PublicID") . '</td>';
 	print '<td>' . $langs->trans("Name") . '</td>';
+	print '<td>' . $langs->trans("Role") . '</td>';
+	print '<td>' . $langs->trans("SignatureLink") . '</td>';
 	print '<td class="center">' . $langs->trans("Status") . '</td>';
+	print '<td>' . $langs->trans("SendMailDate") . '</td>';
+	print '<td>' . $langs->trans("SignatureDate") . '</td>';
 	if ($object->status != 3) {
 		print '<td class="center">' . $langs->trans("ActionsSignature") . '</td>';
 	}
-	print '<td class="center">' . $langs->trans("Signature") . '</td>';
-	print '</tr>' . "\n";
-
-	//External Society Intervenants -- Intervenants Société extérieure
-	$j = 1;
-	$ext_society_intervenants = $signatory->fetchSignatory('PP_EXT_SOCIETY_INTERVENANTS', $id);
 	if (is_array($ext_society_intervenants) && !empty ($ext_society_intervenants) && $ext_society_intervenants > 0) {
 		foreach ($ext_society_intervenants as $element) {
-			print '<tr class="oddeven"><td>';
-			print $langs->trans("ExtSocietyIntervenants") . ' ' . $j;
+			if ($element->signature != $langs->trans("FileGenerated")) {
+				print '<td class="center">' . $langs->trans("Signature") . '</td>';
+				break 1;
+			}
+		}
+	}
+	print '</tr>';
+
+	$j = 1;
+	if (is_array($ext_society_intervenants) && !empty ($ext_society_intervenants) && $ext_society_intervenants > 0) {
+		foreach ($ext_society_intervenants as $element) {
+			$contact->fetch($element->element_id);
+			print '<tr class="oddeven"><td class="minwidth200">';
+			print $contact->getNomUrl(1);
 			print '</td><td>';
-			print dol_print_date($element->signature_date, 'dayhour');
+			print $langs->trans("ExtSocietyIntervenant") . ' ' . $j;
 			print '</td><td>';
 			print $element->signature_url;
-			print '</td><td>';
-			$contact->fetch($element->element_id);
-			print $contact->getNomUrl(1);
 			print '</td><td class="center">';
 			print $element->getLibStatut(5);
+			print '</td><td>';
+			print 'test';
+			print '</td><td>';
+			print dol_print_date($element->signature_date, 'dayhour');
 			print '</td>';
 			if ($object->status != 3) {
 				print '<td class="center">';
 				require __DIR__ . "/core/tpl/digiriskdolibarr_signature_action_view.tpl.php";
 				print '</td>';
 			}
-			print '<td class="center">';
-			require __DIR__ . "/core/tpl/digiriskdolibarr_signature_view.tpl.php";
-			print '</td></tr>';
+			if ($element->signature != $langs->trans("FileGenerated")) {
+				print '<td class="center">';
+				require __DIR__ . "/core/tpl/digiriskdolibarr_signature_view.tpl.php";
+				print '</td>';
+			}
+			print '</tr>';
 			$j++;
 		}
 	} else {
 		print '<td></td>';
 	}
-
-	print '</tr>';
 	print '</table>';
 }
 
