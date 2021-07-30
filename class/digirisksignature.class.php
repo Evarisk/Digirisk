@@ -302,6 +302,18 @@ class DigiriskSignature extends CommonObject
 	 *  @param	int		$notrigger		1=Does not execute triggers, 0=Execute triggers
 	 *	@return	int						<0 if KO, >0 if OK
 	 */
+	public function setRegistered($user, $notrigger = 0)
+	{
+		return $this->setStatusCommon($user, self::STATUS_REGISTERED, $notrigger, 'DIGIRISKSIGNATURE_REGISTERED');
+	}
+
+	/**
+	 *	Set signed status
+	 *
+	 *	@param	User	$user			Object user that modify
+	 *  @param	int		$notrigger		1=Does not execute triggers, 0=Execute triggers
+	 *	@return	int						<0 if KO, >0 if OK
+	 */
 	public function setPendingSignature($user, $notrigger = 0)
 	{
 		return $this->setStatusCommon($user, self::STATUS_PENDING_SIGNATURE, $notrigger, 'DIGIRISKSIGNATURE_PENDING_SIGNATURE');
