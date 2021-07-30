@@ -937,7 +937,7 @@ window.eoxiaJS.signature.sendEmail = function() {
 		processData: false,
 		contentType: false,
 		success: function() {
-			//window.location.reload();
+			window.location.reload();
 		},
 		error: function ( ) {
 		}

@@ -261,6 +261,7 @@ CreatePreventionPlan = Créer un plan de prévention
 DeletePreventionPlan = Supprimer un plan de prévention
 NewPreventionPlan = Nouveau plan de prévention
 PreventionPlanDet = Lignes des plans de prévention
+
 # Trigger - Déclencheur
 PREVENTIONPLAN_CREATEInDolibarr = Plan de prévention créé dans Dolibarr
 ActionsOnPreventionPlan = Événements liés au plan de prévention
@@ -287,7 +288,7 @@ PreventionPlanDocumentGeneratedWithDolibarr = Plan de prévention généré avec
 PreventionPlan = Plan de prévention
 PreventionPlanList = Liste des plans de prévention
 PreventionPlanLine = risque(s)
-PriorVisit = Visite préliminaire
+PriorVisit = Inspection commune préalable
 PriorVisitYesNo = Visite préliminaire effectuée
 PriorVisitText = Note de la visite
 CSSCTIntervention = Intervention du CSSCT
@@ -296,6 +297,7 @@ MaitreOeuvre = Responsable de l'Entreprise Utilisatrice
 ExtSociety = Entreprise Extérieure
 ExtSocietyResponsible = Responsable de l'Entreprise Extérieure
 ExtSocietyIntervenants = Intervenants de l'Entreprise Extérieure
+ExtSocietyIntervenant = Intervenant de l'Entreprise Extérieure
 ActionsDescription = Description des actions
 INRSRisk = Risque (INRS)
 PreventionMethod = Moyens de prévention
@@ -771,6 +773,9 @@ SignatureShowCompanyLogoHelp = Activez cette option pour masquer le logo de la s
 SignatureMaitreOeuvre = Signature du responsable de l'entreprise utilisatrice
 SignatureResponsibleExtSociety = Signature du responsable de l'entreprise extérieure
 Role = Rôle
+NewIntervenants = Ajouter un nouveau intervenant
+SignatureLink = Lien signature
+SendMailDate = Date d'envoie d'email
 
 #
 # Ticket - Interface publique ticket
