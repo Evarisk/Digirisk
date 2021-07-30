@@ -88,6 +88,22 @@ class PreventionPlan extends CommonObject
 		'fk_user_modif'      => array('type'=>'integer:User:user/class/user.class.php', 'label'=>'UserModif', 'enabled'=>'1', 'position'=>120, 'notnull'=>-1, 'visible'=>-2,),
 	);
 
+	public $rowid;
+	public $ref;
+	public $ref_ext;
+	public $entity;
+	public $date_creation;
+	public $tms;
+	public $status;
+	public $label;
+	public $date_start;
+	public $date_end;
+	public $prior_visit_bool;
+	public $prior_visit_text;
+	public $cssct_intervention;
+	public $fk_user_creat;
+	public $fk_user_modif;
+
 	/**
 	 * Constructor
 	 *
@@ -139,6 +155,128 @@ class PreventionPlan extends CommonObject
 	{
 		$this->element = $this->element . '@digiriskdolibarr';
 		return $this->createCommon($user, $notrigger);
+	}
+
+	/**
+	 * Clone an object into another one
+	 *
+	 * @param  	User 	$user      	User that creates
+	 * @param  	int 	$fromid     Id of object to clone
+	 * @return 	mixed 				New object created, <0 if KO
+	 */
+	public function createFromClone(User $user, $fromid)
+	{
+		global $conf, $langs, $extrafields;
+		$error = 0;
+
+		$signatory         = new PreventionPlanSignature($this->db);
+		$digiriskresources = new DigiriskResources($this->db);
+
+		$refPreventionPlanMod = new $conf->global->DIGIRISKDOLIBARR_PREVENTIONPLAN_ADDON($this->db);
+
+		dol_syslog(__METHOD__, LOG_DEBUG);
+
+		$object = new self($this->db);
+
+		$this->db->begin();
+
+		// Load source object
+		$result = $object->fetchCommon($fromid);
+		if ($result > 0 && !empty($object->table_element_line)) {
+			$object->fetchLines();
+		}
+
+		// Load signatory and ressources form source object
+		$signatories      = $signatory->fetchSignatory("", $fromid);
+		$object_resources = $digiriskresources->fetchResourcesFromObject('', $object);
+
+		if (!empty ($signatories) && $signatories > 0) {
+			foreach ($signatories as $arrayRole) {
+				foreach ($arrayRole as $signatory) {
+					$signatoriesID[$signatory->role] = $signatory->element_id;
+				}
+			}
+		}
+
+		if (!empty ($object_resources) && $object_resources > 0) {
+			foreach ($object_resources as $arrayRole) {
+				foreach ($arrayRole as $object_resource) {
+					$ressources[] = $object_resource->id;
+				}
+			}
+		}
+
+		$arrayRole = array( 'PP_EXT_SOCIETY', 'PP_LABOUR_INSPECTOR', 'PP_LABOUR_INSPECTOR_ASSIGNED');
+		$ArrayRessources = array_flip($arrayRole);
+		$ArrayRessources['PP_EXT_SOCIETY'] = $ressources[0];
+		$ArrayRessources['PP_LABOUR_INSPECTOR'] = $ressources[1];
+		$ArrayRessources['PP_LABOUR_INSPECTOR_ASSIGNED'] = $ressources[2];
+
+		// get lines so they will be clone
+		//foreach($this->lines as $line)
+		//	$line->fetch_optionals();
+
+		// Reset some properties
+		unset($object->id);
+		unset($object->fk_user_creat);
+		unset($object->import_key);
+
+		// Clear fields
+		if (property_exists($object, 'ref')) {
+			$object->ref = $refPreventionPlanMod->getNextValue($object);
+		}
+		if (property_exists($object, 'ref_ext')) {
+			$object->ref_ext = 'digirisk_' . $object->ref;
+		}
+		if (property_exists($object, 'label')) {
+			$object->label = empty($this->fields['label']['default']) ? $langs->trans("CopyOf")." ".$object->label : $this->fields['label']['default'];
+		}
+		if (property_exists($object, 'status')) {
+			$object->status = self::STATUS_IN_PROGRESS;
+		}
+		if (property_exists($object, 'date_creation')) {
+			$object->date_creation = dol_now();
+		}
+
+		// ...
+//		// Clear extrafields that are unique
+////		if (is_array($object->array_options) && count($object->array_options) > 0) {
+////			$extrafields->fetch_name_optionals_label($this->table_element);
+////			foreach ($object->array_options as $key => $option) {
+////				$shortkey = preg_replace('/options_/', '', $key);
+////				if (!empty($extrafields->attributes[$this->table_element]['unique'][$shortkey])) {
+////					//var_dump($key); var_dump($clonedObj->array_options[$key]); exit;
+////					unset($object->array_options[$key]);
+////				}
+////			}
+////		}
+
+		// Create clone
+		$object->context['createfromclone'] = 'createfromclone';
+		$result = $object->createCommon($user);
+
+		if ($result > 0) {
+			$digiriskresources->digirisk_dolibarr_set_resources($this->db, $user->id, 'PP_EXT_SOCIETY', 'societe', array($ArrayRessources['PP_EXT_SOCIETY']), $conf->entity, 'preventionplan', $result, 0);
+			$digiriskresources->digirisk_dolibarr_set_resources($this->db, $user->id, 'PP_LABOUR_INSPECTOR', 'societe', array($ArrayRessources['PP_LABOUR_INSPECTOR']), $conf->entity, 'preventionplan', $result, 0);
+			$digiriskresources->digirisk_dolibarr_set_resources($this->db, $user->id, 'PP_LABOUR_INSPECTOR_ASSIGNED', 'socpeople', array($ArrayRessources['PP_LABOUR_INSPECTOR_ASSIGNED']), $conf->entity, 'preventionplan', $result, 0);
+			$signatory->setSignatory($result, 'user', array($signatoriesID['PP_MAITRE_OEUVRE']), 'PP_MAITRE_OEUVRE');
+			$signatory->setSignatory($result, 'socpeople', array($signatoriesID['PP_EXT_SOCIETY_RESPONSIBLE']), 'PP_EXT_SOCIETY_RESPONSIBLE');
+		} else {
+			$error++;
+			$this->error = $object->error;
+			$this->errors = $object->errors;
+		}
+
+		unset($object->context['createfromclone']);
+
+		// End
+		if (!$error) {
+			$this->db->commit();
+			return $result;
+		} else {
+			$this->db->rollback();
+			return -1;
+		}
 	}
 
 	/**
@@ -316,7 +454,7 @@ class PreventionPlan extends CommonObject
 	 */
 	public function setInProgress($user, $notrigger = 0)
 	{
-		return $this->setStatusCommon($user, self::STATUS_IN_PROGRESS, $notrigger, 'DIGIRISKSIGNATURE_INPROGRESS');
+		return $this->setStatusCommon($user, self::STATUS_IN_PROGRESS, $notrigger, 'PREVENTIONPLAN_INPROGRESS');
 	}
 	/**
 	 *	Set pending signature status
@@ -327,7 +465,7 @@ class PreventionPlan extends CommonObject
 	 */
 	public function setPendingSignature($user, $notrigger = 0)
 	{
-		return $this->setStatusCommon($user, self::STATUS_PENDING_SIGNATURE, $notrigger, 'DIGIRISKSIGNATURE_PENDINGSIGNATURE');
+		return $this->setStatusCommon($user, self::STATUS_PENDING_SIGNATURE, $notrigger, 'PREVENTIONPLAN_PENDINGSIGNATURE');
 	}
 
 	/**
@@ -339,7 +477,7 @@ class PreventionPlan extends CommonObject
 	 */
 	public function setLock($user, $notrigger = 0)
 	{
-		return $this->setStatusCommon($user, self::STATUS_LOCK, $notrigger, 'DIGIRISKSIGNATURE_LOCK');
+		return $this->setStatusCommon($user, self::STATUS_LOCK, $notrigger, 'PREVENTIONPLAN_LOCK');
 	}
 
 	/**
@@ -351,7 +489,7 @@ class PreventionPlan extends CommonObject
 	 */
 	public function setUnlock($user, $notrigger = 0)
 	{
-		return $this->setStatusCommon($user, self::STATUS_UNLOCK, $notrigger, 'DIGIRISKSIGNATURE_UNLOCK');
+		return $this->setStatusCommon($user, self::STATUS_UNLOCK, $notrigger, 'PREVENTIONPLAN_UNLOCK');
 	}
 
 	/**
@@ -363,7 +501,7 @@ class PreventionPlan extends CommonObject
 	 */
 	public function setArchive($user, $notrigger = 0)
 	{
-		return $this->setStatusCommon($user, self::STATUS_ARCHIVE, $notrigger, 'DIGIRISKSIGNATURE_ARCHIVE');
+		return $this->setStatusCommon($user, self::STATUS_ARCHIVE, $notrigger, 'PREVENTIONPLAN_ARCHIVE');
 	}
 
 	/**
