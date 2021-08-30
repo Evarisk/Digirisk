@@ -367,7 +367,6 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm = new ActionComm($this->db);
 
 				$actioncomm->elementtype = 'preventionplan@digiriskdolibarr';
-
 				$actioncomm->code        = 'AC_PREVENTIONPLAN_PENDINGSIGNATURE';
 				$actioncomm->type_code   = 'AC_OTH_AUTO';
 				$actioncomm->label       = $langs->trans('PreventionPlanPendingSignatureTrigger');
@@ -377,8 +376,6 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->percentage  = -1;
 
 				$actioncomm->create($user);
-
-
 				break;
 
 			case 'PREVENTIONPLAN_LOCK' :
@@ -398,8 +395,86 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->percentage  = -1;
 
 				$actioncomm->create($user);
-
 				break;
+
+			case 'DIGIRISKSIGNATURE_SIGNED' :
+
+				dol_syslog("Trigger '".$this->name."' for action '$action' launched by ".__FILE__.". id=".$object->id);
+				require_once DOL_DOCUMENT_ROOT.'/comm/action/class/actioncomm.class.php';
+				$now = dol_now();
+				$actioncomm = new ActionComm($this->db);
+
+				$actioncomm->elementtype = 'preventionplan@digiriskdolibarr';
+				$actioncomm->code        = 'AC_DIGIRISKSIGNATURE_SIGNED';
+				$actioncomm->type_code   = 'AC_OTH_AUTO';
+				$actioncomm->label       = $langs->trans('DigiriskSignatureSignedTrigger');
+				$actioncomm->datep       = $now;
+				$actioncomm->fk_element  = $object->fk_object;
+				$actioncomm->contact_id  = $object->element_id;
+				$actioncomm->userownerid = $user->id;
+				$actioncomm->percentage  = -1;
+
+				$actioncomm->create($user);
+				break;
+
+			case 'DIGIRISKSIGNATURE_PENDING_SIGNATURE' :
+
+				dol_syslog("Trigger '".$this->name."' for action '$action' launched by ".__FILE__.". id=".$object->id);
+				require_once DOL_DOCUMENT_ROOT.'/comm/action/class/actioncomm.class.php';
+				$now = dol_now();
+				$actioncomm = new ActionComm($this->db);
+
+				$actioncomm->elementtype = 'preventionplan@digiriskdolibarr';
+				$actioncomm->code        = 'AC_DIGIRISKSIGNATURE_PENDING_SIGNATURE';
+				$actioncomm->type_code   = 'AC_OTH_AUTO';
+				$actioncomm->label       = $langs->trans('DigiriskSignaturePendingSignatureTrigger');
+				$actioncomm->datep       = $now;
+				$actioncomm->fk_element  = $object->fk_object;
+				$actioncomm->contact_id  = $object->element_id;
+				$actioncomm->userownerid = $user->id;
+				$actioncomm->percentage  = -1;
+
+				$actioncomm->create($user);
+				break;
+
+			case 'DIGIRISKSIGNATURE_ABSENT' :
+
+				dol_syslog("Trigger '".$this->name."' for action '$action' launched by ".__FILE__.". id=".$object->id);
+				require_once DOL_DOCUMENT_ROOT.'/comm/action/class/actioncomm.class.php';
+				$now = dol_now();
+				$actioncomm = new ActionComm($this->db);
+
+				$actioncomm->elementtype = 'preventionplan@digiriskdolibarr';
+				$actioncomm->code        = 'AC_DIGIRISKSIGNATURE_ABSENT';
+				$actioncomm->type_code   = 'AC_OTH_AUTO';
+				$actioncomm->label       = $langs->trans('DigiriskSignatureAbsentTrigger');
+				$actioncomm->datep       = $now;
+				$actioncomm->fk_element  = $object->fk_object;
+				$actioncomm->contact_id  = $object->element_id;
+				$actioncomm->userownerid = $user->id;
+				$actioncomm->percentage  = -1;
+
+				$actioncomm->create($user);
+				break;
+
+//			case 'PREVENTIONPLAN_LOCK' :
+//
+//				dol_syslog("Trigger '".$this->name."' for action '$action' launched by ".__FILE__.". id=".$object->id);
+//				require_once DOL_DOCUMENT_ROOT.'/comm/action/class/actioncomm.class.php';
+//				$now = dol_now();
+//				$actioncomm = new ActionComm($this->db);
+//
+//				$actioncomm->elementtype = 'digirisksignature@digiriskdolibarr';
+//				$actioncomm->code        = 'AC_PREVENTIONPLAN_LOCK';
+//				$actioncomm->type_code   = 'AC_OTH_AUTO';
+//				$actioncomm->label       = $langs->trans('PreventionPlanLockTrigger');
+//				$actioncomm->datep       = $now;
+//				$actioncomm->fk_element  = $object->id;
+//				$actioncomm->userownerid = $user->id;
+//				$actioncomm->percentage  = -1;
+//
+//				$actioncomm->create($user);
+//				break;
 		}
 
 		return 0;

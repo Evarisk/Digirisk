@@ -131,7 +131,7 @@ if ($action == 'addSignature') {
 		$result = $signatory->update($user, false);
 
 		if ($result > 0) {
-			$signatory->setSigned($user, false);
+			$signatory->setSigned($user);
 			//$object->call_trigger('SIGNATURE_GENERATE', $user);
 			// Creation signature OK
 			$urltogo = str_replace('__ID__', $result, $backtopage);
