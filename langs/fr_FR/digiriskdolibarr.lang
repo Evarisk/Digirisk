@@ -267,6 +267,8 @@ PREVENTIONPLAN_CREATEInDolibarr = Plan de prévention créé dans Dolibarr
 ActionsOnPreventionPlan = Événements liés au plan de prévention
 PreventionPlanGeneratedWithDolibarr = Plan de prévention généré avec Dolibarr
 PreventionPlanLineCreatedWithDolibarr = Ligne de Permis de Feu créée avec Dolibarr
+PreventionPlanPendingSignatureTrigger = Plan de prévention en attente de signature des participants
+PreventionPlanLockTrigger = Plan de prévention verrouiller - Prêt pour la génération du documuent
 
 # Mod Numbering - Modèle de numérotation
 DigiriskPreventionPlanNumberingModule = Modèle de numérotation des plans de prévention de Digirisk
@@ -316,6 +318,9 @@ GenerateDocument = Vous pouvez vous rendre sur cette adresse url pour générer 
 LabourInspectorSociety = Entreprise Inspecteur du travail
 Archive = Archiver
 ValidatePendingSignature = Validé (en attente de signature)
+LockPreventionPlan = Verrouiller le plan de prévention
+ConfirmLockPreventionPlan = Êtes-vous sûr de vouloir verrouiller le plan de prévention ?<br>Ce verrouillage permet la génération du document mais empêche l'ajout de nouveaux participants ou la modification du plan de prévention.
+
 
 
 #
@@ -743,6 +748,12 @@ TaskManagementNotActivated = Veuillez activer la gestion des tâches dans Config
 #
 # DigiriskSignature - Signature
 #
+
+# Trigger - Déclencheur
+DigiriskSignatureSignedTrigger = Signature du participant effectuée
+DigiriskSignaturePendingSignatureTrigger = En attente de la signature du participant
+DigiriskSignatureAbsentTrigger = Participant absent
+
 
 # Data - Donnée
 SignatureResponsibles = Signatures des responsables

@@ -492,7 +492,7 @@ if (empty($reshook))
 	}
 
 	// Action to set status STATUS_LOCK
-	if ($action == 'setLock') {
+	if ($action == 'confirm_setLock') {
 
 		$object->fetch($id);
 
@@ -690,7 +690,7 @@ if ($action == 'create')
 
 	//Labour inspector -- Inspecteur du travail
 	print '<tr><td class="fieldrequired">'.$langs->trans("LabourInspector").'</td><td>';
-	print $form->selectcontacts(GETPOST('labour_inspector', 'int'), '', 'labour_inspector_contact', 1, '', '', 0, 'quatrevingtpercent', false, 0, array(), false, '', 'labour_inspector_contact');
+	print $form->selectcontacts(GETPOST('labour_inspector', 'int'), '', 'labour_inspector_contact', 1, '', '', 0, 'minwidth300', false, 0, array(), false, '', 'labour_inspector_contact');
 	print '</td></tr>';
 
 	// Other attributes
@@ -857,6 +857,13 @@ if (($id || $ref) && $action == 'edit')
 
 $formconfirm = '';
 
+// SetLock confirmation
+if (($action == 'setLock' && (empty($conf->use_javascript_ajax) || !empty($conf->dol_use_jmobile)))		// Output when action = clone if jmobile or no js
+	|| (!empty($conf->use_javascript_ajax) && empty($conf->dol_use_jmobile)))							// Always output when not jmobile nor js
+{
+	$formconfirm .= $form->formconfirm($_SERVER["PHP_SELF"].'?id='.$object->id, $langs->trans('LockPreventionPlan'), $langs->trans('ConfirmLockPreventionPlan', $object->ref), 'confirm_setLock', '', 'yes', 'actionButtonLock', 350, 600);
+}
+
 // Clone confirmation
 if (($action == 'clone' && (empty($conf->use_javascript_ajax) || !empty($conf->dol_use_jmobile)))		// Output when action = clone if jmobile or no js
 	|| (!empty($conf->use_javascript_ajax) && empty($conf->dol_use_jmobile)))							// Always output when not jmobile nor js
@@ -992,16 +999,16 @@ if ((empty($action) || ($action != 'create' && $action != 'edit')))
 		if (empty($reshook)) {
 			// Modify
 			if ($permissiontoadd && $object->status < 2) {
-				print '<a class="butAction" id="actionButtonEdit" href="' . $_SERVER["PHP_SELF"] . '?id=' . $object->id . '&action=edit">' . $langs->trans("Modify") . '</a>' . "\n";
+				print '<a class="butAction" id="actionButtonEdit" href="' . $_SERVER["PHP_SELF"] . '?id=' . $object->id . '&action=edit">' . $langs->trans("Modify") . '</a>';
 			}
 			if ($object->status == 1) {
-				print '<a class="butAction" id="actionButtonPendingSignature" href="' . $_SERVER["PHP_SELF"] . '?id=' . $object->id . '&action=setPendingSignature">' . $langs->trans("PendingSignature") . '</a>' . "\n";
+				print '<a class="butAction" id="actionButtonPendingSignature" href="' . $_SERVER["PHP_SELF"] . '?id=' . $object->id . '&action=setPendingSignature">' . $langs->trans("PendingSignature") . '</a>';
 			} elseif ($object->status == 2) {
-				print '<a class="butAction" id="actionButtonInProgress" href="' . $_SERVER["PHP_SELF"] . '?id=' . $object->id . '&action=setInProgress">' . $langs->trans("ReOpen") . '</a>' . "\n";
-				print '<a class="butAction" id="actionButtonLock" href="' . $_SERVER["PHP_SELF"] . '?id=' . $object->id . '&action=setLock">' . $langs->trans("Lock") . '</a>' . "\n";
+				print '<a class="butAction" id="actionButtonInProgress" href="' . $_SERVER["PHP_SELF"] . '?id=' . $object->id . '&action=setInProgress">' . $langs->trans("ReOpen") . '</a>';
+				print '<span class="butAction" id="actionButtonLock">' . $langs->trans("Lock") . '</span>';
 			} elseif ($object->status == 3) {
-				print '<span class="butAction" id="actionButtonClone">' . $langs->trans("ToClone") . '</span>' . "\n";
-				print '<a class="butAction" id="actionButtonClose" href="' . $_SERVER["PHP_SELF"] . '?id=' . $object->id . '&action=setArchive">' . $langs->trans("Close") . '</a>' . "\n";
+				print '<span class="butAction" id="actionButtonClone">' . $langs->trans("ToClone") . '</span>';
+				print '<a class="butAction" id="actionButtonClose" href="' . $_SERVER["PHP_SELF"] . '?id=' . $object->id . '&action=setArchive">' . $langs->trans("Close") . '</a>';
 			}
 			if ($object->date_end == dol_now()){
 				$object->setArchive($user, false);
