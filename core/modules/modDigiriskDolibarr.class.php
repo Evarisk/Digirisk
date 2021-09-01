@@ -706,7 +706,7 @@ class modDigiriskdolibarr extends DolibarrModules
 		include_once DOL_DOCUMENT_ROOT.'/core/class/extrafields.class.php';
 		$extra_fields = new ExtraFields( $this->db );
 
-		$extra_fields->addExtraField( 'fk_risk', $langs->trans("fk_risk"), 'int', 1020, 10, 'projet_task', 0, 0, '', '', '', '', 5);
+		$extra_fields->addExtraField( 'fk_risk', $langs->trans("fk_risk"), 'int', 1020, 10, 'projet_task', 0, 0, '', '', '', '', 1);
 
 		return $this->_init($sql, $options);
 
