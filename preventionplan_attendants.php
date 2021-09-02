@@ -507,6 +507,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	print $element->getLibStatut(5);
 	print '</td><td>';
 	print 'test';
+	//print dol_print_date($element->last_email_sent_date, 'dayhour');
 	print '</td><td>';
 	print dol_print_date($element->signature_date, 'dayhour');
 	print '</td>';
@@ -569,6 +570,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 			print $element->getLibStatut(5);
 			print '</td><td>';
 			print 'test';
+			//print dol_print_date($element->last_email_sent_date, 'dayhour');
 			print '</td><td>';
 			print dol_print_date($element->signature_date, 'dayhour');
 			print '</td>';
@@ -586,7 +588,9 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 			$j++;
 		}
 	} else {
-		print '<td></td>';
+		print '<td>';
+		print $langs->trans('NoIntervenantsYet');
+		print '</td>';
 	}
 	print '</table>';
 }

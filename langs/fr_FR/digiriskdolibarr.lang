@@ -323,7 +323,7 @@ Archive = Archiver
 ValidatePendingSignature = Validé (en attente de signature)
 LockPreventionPlan = Verrouiller le plan de prévention
 ConfirmLockPreventionPlan = Êtes-vous sûr de vouloir verrouiller le plan de prévention ?<br>Ce verrouillage permet la génération du document mais empêche l'ajout de nouveaux participants ou la modification du plan de prévention.
-
+NoIntervenantsYet = Il n'y a aucun intervenant pour le moment, vous pouvez en ajouter à l'aide du "+" situé en haut à droite de ce tableau
 
 
 #
