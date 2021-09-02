@@ -789,7 +789,7 @@ SignatureResponsibleExtSociety = Signature du responsable de l'entreprise extér
 Role = Rôle
 NewIntervenants = Ajouter un nouveau intervenant
 SignatureLink = Lien signature
-SendMailDate = Date d'envoie d'email
+SendMailDate = Date d'envoi d'email
 
 #
 # Ticket - Interface publique ticket
