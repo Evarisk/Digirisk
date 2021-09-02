@@ -63,9 +63,9 @@ class PreventionPlan extends CommonObject
 
 	const STATUS_IN_PROGRESS = 1;
 	const STATUS_PENDING_SIGNATURE = 2;
-	const STATUS_LOCK = 3;
-	const STATUS_UNLOCK = 4;
-	const STATUS_ARCHIVE = 5;
+	const STATUS_LOCKED = 3;
+	const STATUS_UNLOCKED = 4;
+	const STATUS_ARCHIVED = 5;
 
 	/**
 	 * @var array  Array with all fields and their property. Do not use it as a static var. It may be modified by constructor.
@@ -475,9 +475,9 @@ class PreventionPlan extends CommonObject
 	 *  @param	int		$notrigger		1=Does not execute triggers, 0=Execute triggers
 	 *	@return	int						<0 if KO, >0 if OK
 	 */
-	public function setLock($user, $notrigger = 0)
+	public function setLocked($user, $notrigger = 0)
 	{
-		return $this->setStatusCommon($user, self::STATUS_LOCK, $notrigger, 'PREVENTIONPLAN_LOCK');
+		return $this->setStatusCommon($user, self::STATUS_LOCKED, $notrigger, 'PREVENTIONPLAN_LOCKED');
 	}
 
 	/**
@@ -487,9 +487,9 @@ class PreventionPlan extends CommonObject
 	 *  @param	int		$notrigger		1=Does not execute triggers, 0=Execute triggers
 	 *	@return	int						<0 if KO, >0 if OK
 	 */
-	public function setUnlock($user, $notrigger = 0)
+	public function setUnlocked($user, $notrigger = 0)
 	{
-		return $this->setStatusCommon($user, self::STATUS_UNLOCK, $notrigger, 'PREVENTIONPLAN_UNLOCK');
+		return $this->setStatusCommon($user, self::STATUS_UNLOCKED, $notrigger, 'PREVENTIONPLAN_UNLOCKED');
 	}
 
 	/**
@@ -499,9 +499,9 @@ class PreventionPlan extends CommonObject
 	 *  @param	int		$notrigger		1=Does not execute triggers, 0=Execute triggers
 	 *	@return	int						<0 if KO, >0 if OK
 	 */
-	public function setArchive($user, $notrigger = 0)
+	public function setArchived($user, $notrigger = 0)
 	{
-		return $this->setStatusCommon($user, self::STATUS_ARCHIVE, $notrigger, 'PREVENTIONPLAN_ARCHIVE');
+		return $this->setStatusCommon($user, self::STATUS_ARCHIVED, $notrigger, 'PREVENTIONPLAN_ARCHIVED');
 	}
 
 	/**
@@ -534,16 +534,16 @@ class PreventionPlan extends CommonObject
 
 			$this->labelStatus[self::STATUS_IN_PROGRESS] = $langs->trans('InProgress');
 			$this->labelStatus[self::STATUS_PENDING_SIGNATURE] = $langs->trans('ValidatePendingSignature');
-			$this->labelStatus[self::STATUS_LOCK] = $langs->trans('Lock');
-			$this->labelStatus[self::STATUS_UNLOCK] = $langs->trans('Unlock');
-			$this->labelStatus[self::STATUS_ARCHIVE] = $langs->trans('Archive');
+			$this->labelStatus[self::STATUS_LOCKED] = $langs->trans('Locked');
+			$this->labelStatus[self::STATUS_UNLOCKED] = $langs->trans('Unlocked');
+			$this->labelStatus[self::STATUS_ARCHIVED] = $langs->trans('Archived');
 		}
 
 		$statusType = 'status'.$status;
 		if ($status == self::STATUS_PENDING_SIGNATURE) $statusType = 'status3';
-		if ($status == self::STATUS_UNLOCK) $statusType = 'status4';
-		if ($status == self::STATUS_LOCK) $statusType = 'status8';
-		if ($status == self::STATUS_ARCHIVE) $statusType = 'status8';
+		if ($status == self::STATUS_UNLOCKED) $statusType = 'status4';
+		if ($status == self::STATUS_LOCKED) $statusType = 'status8';
+		if ($status == self::STATUS_ARCHIVED) $statusType = 'status8';
 
 		return dolGetStatus($this->labelStatus[$status], $this->labelStatusShort[$status], '', $statusType, $mode);
 	}

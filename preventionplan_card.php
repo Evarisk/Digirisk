@@ -491,8 +491,8 @@ if (empty($reshook))
 		}
 	}
 
-	// Action to set status STATUS_LOCK
-	if ($action == 'confirm_setLock') {
+	// Action to set status STATUS_LOCKED
+	if ($action == 'confirm_setLocked') {
 
 		$object->fetch($id);
 
@@ -515,12 +515,12 @@ if (empty($reshook))
 	}
 
 	// Action to set status STATUS_UNLOCK
-	if ($action == 'setUnlock') {
+	if ($action == 'setUnlocked') {
 
 		$object->fetch($id);
 
 		if (!$error) {
-			$result = $object->setUnlock($user, false);
+			$result = $object->setUnlocked($user, false);
 			if ($result > 0) {
 				// Creation signature OK
 				$urltogo = str_replace('__ID__', $result, $backtopage);
@@ -861,7 +861,7 @@ $formconfirm = '';
 if (($action == 'setLock' && (empty($conf->use_javascript_ajax) || !empty($conf->dol_use_jmobile)))		// Output when action = clone if jmobile or no js
 	|| (!empty($conf->use_javascript_ajax) && empty($conf->dol_use_jmobile)))							// Always output when not jmobile nor js
 {
-	$formconfirm .= $form->formconfirm($_SERVER["PHP_SELF"].'?id='.$object->id, $langs->trans('LockPreventionPlan'), $langs->trans('ConfirmLockPreventionPlan', $object->ref), 'confirm_setLock', '', 'yes', 'actionButtonLock', 350, 600);
+	$formconfirm .= $form->formconfirm($_SERVER["PHP_SELF"].'?id='.$object->id, $langs->trans('LockPreventionPlan'), $langs->trans('ConfirmLockPreventionPlan', $object->ref), 'confirm_setLocked', '', 'yes', 'actionButtonLock', 350, 600);
 }
 
 // Clone confirmation
