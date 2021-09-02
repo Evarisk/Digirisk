@@ -22,9 +22,8 @@ La traduction de ce module peut être définie manuellement en éditant les fich
 
 - Dans le dossier "dolibarr/htdocs/custom" copier la ligne suivante :
 ```
-git clone https://github.com/Evarisk/digiriskdolibarr.git
+git clone https://github.com/Evarisk/digiriskdolibarr.git digiriskdolibarr
 ```
-- Renommer le dossier 'digirisk' créé en 'digiriskdolibarr'
 
 ## Licenses
 
