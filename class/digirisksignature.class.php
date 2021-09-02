@@ -402,7 +402,7 @@ class DigiriskSignature extends CommonObject
 		 return -1;
 		 }*/
 
-		return $this->setStatusCommon($user, self::STATUS_VALIDATED, $notrigger, 'DIGIRISKSIGNATURE_REOPEN');
+		return $this->setStatusCommon($user, self::STATUS_VALIDATED, $notrigger, 'DIGIRISKSIGNATURE_REOPENED');
 	}
 
 

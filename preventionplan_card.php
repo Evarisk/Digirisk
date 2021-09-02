@@ -1004,7 +1004,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit')))
 			if ($object->status == 1) {
 				print '<a class="butAction" id="actionButtonPendingSignature" href="' . $_SERVER["PHP_SELF"] . '?id=' . $object->id . '&action=setPendingSignature">' . $langs->trans("PendingSignature") . '</a>';
 			} elseif ($object->status == 2) {
-				print '<a class="butAction" id="actionButtonInProgress" href="' . $_SERVER["PHP_SELF"] . '?id=' . $object->id . '&action=setInProgress">' . $langs->trans("ReOpen") . '</a>';
+				print '<a class="butAction" id="actionButtonInProgress" href="' . $_SERVER["PHP_SELF"] . '?id=' . $object->id . '&action=setInProgress">' . $langs->trans("ReOpenDigi") . '</a>';
 				print '<span class="butAction" id="actionButtonLock">' . $langs->trans("Lock") . '</span>';
 			} elseif ($object->status == 3) {
 				print '<span class="butAction" id="actionButtonClone">' . $langs->trans("ToClone") . '</span>';
