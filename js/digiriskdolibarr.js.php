@@ -887,17 +887,19 @@ window.eoxiaJS.signature.createSignature = function() {
 		url = document.URL + '&action=addSignature' + signatoryIDPost;
 		type = "POST";
 	}
-
 	$.ajax({
 		url: url,
 		type: type,
 		processData: false,
 		contentType: 'application/octet-stream',
 		data: signature,
-		complete: function() {
-			window.location.replace(elementRedirect);
+		success: function() {
+            setTimeout(function(){
+                window.location.replace(elementRedirect);
+            }, 800);
 		},
 		error: function ( ) {
+		    alert('Error')
 		}
 	});
 };
