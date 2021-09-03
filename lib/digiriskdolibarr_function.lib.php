@@ -340,6 +340,7 @@ function digiriskshowdocuments($modulepart, $modulesubdir, $filedir, $urlsource,
 		{
 			asort($modellist);
 			$out .= '<span class="hideonsmartphone">'.$langs->trans('Model').' </span>';
+			$modellist = array_filter($modellist, 'remove_index');
 			if (is_array($modellist) && count($modellist) == 1)    // If there is only one element
 			{
 				$arraykeys = array_keys($modellist);
@@ -560,6 +561,20 @@ function digiriskshowdocuments($modulepart, $modulesubdir, $filedir, $urlsource,
 	$out .= '<!-- End show_document -->'."\n";
 
 	return $out;
+}
+
+/**
+ *	Exclude index.php files from list of models for document generation
+ *
+ * @param   string $model
+ * @return  '' or $model
+ */
+function remove_index($model) {
+	if (preg_match('/index.php/',$model)) {
+		return '';
+	} else {
+		return $model;
+	}
 }
 
 /**
