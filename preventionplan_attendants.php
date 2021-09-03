@@ -437,12 +437,8 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	print '<td class="center">' . $langs->trans("Status") . '</td>';
 	print '<td>' . $langs->trans("SendMailDate") . '</td>';
 	print '<td>' . $langs->trans("SignatureDate") . '</td>';
-	if ($object->status != 3) {
-		print '<td class="center">' . $langs->trans("ActionsSignature") . '</td>';
-	}
-	if ($element->signature != $langs->trans("FileGenerated")) {
-		print '<td class="center">' . $langs->trans("Signature") . '</td>';
-	}
+	print '<td class="center">' . $langs->trans("ActionsSignature") . '</td>';
+	print '<td class="center">' . $langs->trans("Signature") . '</td>';
 	print '</tr>';
 
 	print '<tr class="oddeven"><td class="minwidth200">';
@@ -499,10 +495,8 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	print '<td>' . $langs->trans("SendMailDate") . '</td>';
 	print '<td>' . $langs->trans("SignatureDate") . '</td>';
 	print '<td class="center">' . $langs->trans("ActionsSignature") . '</td>';
+	print '<td class="center">' . $langs->trans("Signature") . '</td>';
 
-	if ($element->signature != $langs->trans("FileGenerated")) {
-		print '<td class="center">' . $langs->trans("Signature") . '</td>';
-	}
 	print '</tr>';
 
 	print '<tr class="oddeven"><td class="minwidth200">';
@@ -560,7 +554,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 
 	print '</tr>';
 
-	$already_selected_intervenants = array();
+	$already_selected_intervenants[$contact->id] = $contact->id;
 	$j = 1;
 	if (is_array($ext_society_intervenants) && !empty ($ext_society_intervenants) && $ext_society_intervenants > 0) {
 		foreach ($ext_society_intervenants as $element) {
