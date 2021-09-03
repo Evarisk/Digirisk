@@ -61,11 +61,11 @@ class PreventionPlan extends CommonObject
 	 */
 	public $picto = 'preventionplandocument@digiriskdolibarr';
 
-	const STATUS_IN_PROGRESS = 1;
+	const STATUS_IN_PROGRESS       = 1;
 	const STATUS_PENDING_SIGNATURE = 2;
-	const STATUS_LOCKED = 3;
-	const STATUS_UNLOCKED = 4;
-	const STATUS_ARCHIVED = 5;
+	const STATUS_LOCKED            = 3;
+	const STATUS_UNLOCKED          = 4;
+	const STATUS_ARCHIVED          = 5;
 
 	/**
 	 * @var array  Array with all fields and their property. Do not use it as a static var. It may be modified by constructor.
@@ -84,8 +84,9 @@ class PreventionPlan extends CommonObject
 		'prior_visit_bool'   => array('type'=>'boolean', 'label'=>'PriorVisitYesNo', 'enabled'=>'1', 'position'=>140, 'notnull'=>-1, 'visible'=>1,),
 		'prior_visit_text'   => array('type'=>'text', 'label'=>'PriorVisitText', 'enabled'=>'1', 'position'=>150, 'notnull'=>-1, 'visible'=>1,),
 		'cssct_intervention' => array('type'=>'boolean', 'label'=>'CSSCTIntervention', 'enabled'=>'1', 'position'=>160, 'notnull'=>-1, 'visible'=>1,),
-		'fk_user_creat'      => array('type'=>'integer:User:user/class/user.class.php', 'label'=>'UserAuthor', 'enabled'=>'1', 'position'=>110, 'notnull'=>1, 'visible'=>-2, 'foreignkey'=>'user.rowid',),
-		'fk_user_modif'      => array('type'=>'integer:User:user/class/user.class.php', 'label'=>'UserModif', 'enabled'=>'1', 'position'=>120, 'notnull'=>-1, 'visible'=>-2,),
+		'fk_project'         => array('type'=>'integer:Project:projet/class/project.class.php', 'label'=>'Projet', 'enabled'=>'1', 'position'=>170, 'notnull'=>1, 'visible'=>1,),
+		'fk_user_creat'      => array('type'=>'integer:User:user/class/user.class.php', 'label'=>'UserAuthor', 'enabled'=>'1', 'position'=>180, 'notnull'=>1, 'visible'=>-2, 'foreignkey'=>'user.rowid',),
+		'fk_user_modif'      => array('type'=>'integer:User:user/class/user.class.php', 'label'=>'UserModif', 'enabled'=>'1', 'position'=>190, 'notnull'=>-1, 'visible'=>-2,),
 	);
 
 	public $rowid;
@@ -101,6 +102,7 @@ class PreventionPlan extends CommonObject
 	public $prior_visit_bool;
 	public $prior_visit_text;
 	public $cssct_intervention;
+	public $fk_project;
 	public $fk_user_creat;
 	public $fk_user_modif;
 

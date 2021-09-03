@@ -27,6 +27,7 @@ CREATE TABLE llx_digiriskdolibarr_preventionplan(
 	prior_visit_bool    boolean,
 	prior_visit_text    text,
 	cssct_intervention  boolean,
+	fk_project          integer,
 	fk_user_creat       integer NOT NULL,
 	fk_user_modif       integer
 ) ENGINE=innodb;
