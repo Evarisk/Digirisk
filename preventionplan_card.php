@@ -1067,7 +1067,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit')))
 		print '</div>';
 
 		// PREVENTIONPLAN LINES
-		if ($object->status < 3 && $object->status > 1) {
+		if ($object->status < 3) {
 			print '<div class="div-table-responsive-no-min" style="overflow-x: unset !important">' . "\n";
 			print '<table id="tablelines" class="noborder noshadow" width="100%">';
 
@@ -1176,29 +1176,6 @@ if ((empty($action) || ($action != 'create' && $action != 'edit')))
 							print $objectline->showOptionals($extrafields, 'edit', array('style' => $bcnd[$var], 'colspan' => $coldisplay), '', '', 1);
 						}
 						print '</form>';
-						?>
-						<script>
-							/* JQuery for product free or predefined select */
-							jQuery(document).ready(function () {
-								/* When changing predefined product, we reload list of supplier prices required for margin combo */
-								$("#idprod").change(function () {
-									console.log("#idprod change triggered");
-
-									/* To set focus */
-									if (jQuery('#idprod').val() > 0) {
-										/* focus work on a standard textarea but not if field was replaced with CKEDITOR */
-										jQuery('#dp_desc').focus();
-										/* focus if CKEDITOR */
-										if (typeof CKEDITOR == "object" && typeof CKEDITOR.instances != "undefined") {
-											var editor = CKEDITOR.instances['dp_desc'];
-											if (editor) {
-												editor.focus();
-											}
-										}
-									}
-								});
-							});
-						</script> <?php
 					} else {
 						print '<td class="bordertop nobottom linecolref minwidth500imp">';
 						print $item->ref;
@@ -1234,24 +1211,26 @@ if ((empty($action) || ($action != 'create' && $action != 'edit')))
 						$coldisplay += $colspan;
 
 						//Actions buttons
-						print '<td class="linecoledit center">';
-						$coldisplay++;
-						if (($item->info_bits & 2) == 2 || !empty($disableedit)) {
-						} else {
-							print '<a class="editfielda reposition" href="' . $_SERVER["PHP_SELF"] . '?id=' . $id . '&amp;action=editline&amp;lineid=' . $item->id . '">' . img_edit() . '</a>';
+						if ($object->status == 1) {
+							print '<td class="linecoledit center">';
+							$coldisplay++;
+							if (($item->info_bits & 2) == 2 || !empty($disableedit)) {
+							} else {
+								print '<a class="editfielda reposition" href="' . $_SERVER["PHP_SELF"] . '?id=' . $id . '&amp;action=editline&amp;lineid=' . $item->id . '">' . img_edit() . '</a>';
+							}
+							print '</td>';
+
+							print '<td class="linecoldelete center">';
+							$coldisplay++;
+							//La suppression n'est autorisée que si il n'y a pas de ligne dans une précédente situation
+							print '<a class="reposition" href="' . $_SERVER["PHP_SELF"] . '?id=' . $id . '&amp;action=deleteline&amp;lineid=' . $item->id . '">';
+							print img_delete();
+							print '</a>';
+							print '</td>';
+
+							print '</tr>';
 						}
-						print '</td>';
 
-						print '<td class="linecoldelete center">';
-						$coldisplay++;
-
-						//La suppression n'est autorisée que si il n'y a pas de ligne dans une précédente situation
-						print '<a class="reposition" href="' . $_SERVER["PHP_SELF"] . '?id=' . $id . '&amp;action=deleteline&amp;lineid=' . $item->id . '">';
-						print img_delete();
-						print '</a>';
-						print '</td>';
-
-						print '</tr>';
 
 						if (is_object($objectline)) {
 							print $objectline->showOptionals($extrafields, 'edit', array('style' => $bcnd[$var], 'colspan' => $coldisplay), '', '', 1);
@@ -1327,28 +1306,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit')))
 					print $objectline->showOptionals($extrafields, 'edit', array('style' => $bcnd[$var], 'colspan' => $coldisplay), '', '', 1);
 				}
 				?>
-				<script>
-					/* JQuery for product free or predefined select */
-					jQuery(document).ready(function () {
-						/* When changing predefined product, we reload list of supplier prices required for margin combo */
-						$("#idprod").change(function () {
-							console.log("#idprod change triggered");
-
-							/* To set focus */
-							if (jQuery('#idprod').val() > 0) {
-								/* focus work on a standard textarea but not if field was replaced with CKEDITOR */
-								jQuery('#dp_desc').focus();
-								/* focus if CKEDITOR */
-								if (typeof CKEDITOR == "object" && typeof CKEDITOR.instances != "undefined") {
-									var editor = CKEDITOR.instances['dp_desc'];
-									if (editor) {
-										editor.focus();
-									}
-								}
-							}
-						});
-					});
-				</script> <?php
+				<?php
 				print '</form>';
 				print '</table>';
 				print '</div>';
