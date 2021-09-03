@@ -315,6 +315,7 @@ Unlock = Déverouiller
 Unlocked = Déverrouillé
 Lock = Verrouiller
 Locked = Verrouillé
+InProgress = En cours
 ReOpenDigi = Rouvrir
 GenerateDocumentTitle = Génération du document disponible
 GenerateDocument = Vous pouvez vous rendre sur cette adresse url pour générer votre document<br>
