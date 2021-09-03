@@ -421,9 +421,6 @@ class DigiriskElement extends CommonObject
 			// Construct $out and $outarray
 			$out .= '<select id="'.$htmlname.'" class="flat'.($morecss ? ' '.$morecss : '').'"'.($moreparam ? ' '.$moreparam : '').' name="'.$htmlname.($multiple ? '[]' : '').'" '.($multiple ? 'multiple' : '').'>'."\n";
 
-			$textifempty = (($showempty && !is_numeric($showempty)) ? $langs->trans($showempty) : '');
-			if ($showempty) $out .= '<option value="-1">'.$textifempty.'</option>'."\n";
-
 			$num = $this->db->num_rows($resql);
 			$i = 0;
 			if (!$noroot) $out .= '<option value="0" selected>'.$langs->trans('Root') . ' : ' . $conf->global->MAIN_INFO_SOCIETE_NOM . '</option>';
