@@ -456,16 +456,19 @@ class DigiriskSignature extends CommonObject
 	 *
 	 * @param int     $fk_object    ID of object linked
 	 * @param string  $element_type Type of resource
-	 * @param int     $element_id   Id of resource
+	 * @param int     $element_ids   Id of resource
 	 * @param string  $role         Role of resource
+	 * @param string  $noupdate     Update previous signatories
 	 */
-	function setSignatory($fk_object, $element_type, $element_ids, $role = "")
+	function setSignatory($fk_object, $element_type, $element_ids, $role = "", $noupdate = 0)
 	{
 		global $conf, $user;
 
 		$society = new Societe($this->db);
 		if (!empty($element_ids) && $element_ids > 0) {
-			$this->deletePreviousSignatories($role, $fk_object);
+			if (!$noupdate) {
+				$this->deletePreviousSignatories($role, $fk_object);
+			}
 			foreach ( $element_ids as $element_id ) {
 				if ($element_id > 0) {
 					if ($element_type == 'user') {

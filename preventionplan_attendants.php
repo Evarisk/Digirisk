@@ -96,7 +96,7 @@ if ($action == 'addAttendants') {
 	$extintervenant_ids  = GETPOST('ext_intervenants');
 
 	if (!$error) {
-		$result = $signatory->setSignatory($object->id,'socpeople', $extintervenant_ids, 'PP_EXT_SOCIETY_INTERVENANTS');
+		$result = $signatory->setSignatory($object->id,'socpeople', $extintervenant_ids, 'PP_EXT_SOCIETY_INTERVENANTS', 1);
 		if ($result > 0) {
 			// Creation prevention plan OK
 			$urltogo = str_replace('__ID__', $result, $backtopage);
@@ -458,16 +458,25 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	print '</td><td>';
 	print dol_print_date($element->signature_date, 'dayhour');
 	print '</td>';
-	if ($object->status != 3) {
+
+	if ($object->status == 2) {
 		print '<td class="center">';
 		require __DIR__ . "/core/tpl/digiriskdolibarr_signature_action_view.tpl.php";
 		print '</td>';
-	}
-	if ($element->signature != $langs->trans("FileGenerated")) {
+		if ($element->signature != $langs->trans("FileGenerated")) {
+			print '<td class="center">';
+			require __DIR__ . "/core/tpl/digiriskdolibarr_signature_view.tpl.php";
+			print '</td>';
+		}
+	} else {
 		print '<td class="center">';
-		require __DIR__ . "/core/tpl/digiriskdolibarr_signature_view.tpl.php";
+		print '-';
+		print '</td>';
+		print '<td class="center">';
+		print '-';
 		print '</td>';
 	}
+
 	print '</tr>';
 	print '</table>';
 	print '<br>';
@@ -489,9 +498,8 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	print '<td class="center">' . $langs->trans("Status") . '</td>';
 	print '<td>' . $langs->trans("SendMailDate") . '</td>';
 	print '<td>' . $langs->trans("SignatureDate") . '</td>';
-	if ($object->status != 3) {
-		print '<td class="center">' . $langs->trans("ActionsSignature") . '</td>';
-	}
+	print '<td class="center">' . $langs->trans("ActionsSignature") . '</td>';
+
 	if ($element->signature != $langs->trans("FileGenerated")) {
 		print '<td class="center">' . $langs->trans("Signature") . '</td>';
 	}
@@ -511,16 +519,24 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	print '</td><td>';
 	print dol_print_date($element->signature_date, 'dayhour');
 	print '</td>';
-	if ($object->status != 3) {
+	if ($object->status == 2) {
 		print '<td class="center">';
 		require __DIR__ . "/core/tpl/digiriskdolibarr_signature_action_view.tpl.php";
 		print '</td>';
-	}
-	if ($element->signature != $langs->trans("FileGenerated")) {
+		if ($element->signature != $langs->trans("FileGenerated")) {
+			print '<td class="center">';
+			require __DIR__ . "/core/tpl/digiriskdolibarr_signature_view.tpl.php";
+			print '</td>';
+		}
+	} else {
 		print '<td class="center">';
-		require __DIR__ . "/core/tpl/digiriskdolibarr_signature_view.tpl.php";
+		print '-';
+		print '</td>';
+		print '<td class="center">';
+		print '-';
 		print '</td>';
 	}
+
 	print '</tr>';
 	print '</table>';
 	print '<br>';
@@ -532,13 +548,13 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 
 	print '<table class="border centpercent tableforfield">';
 	print '<tr class="liste_titre">';
-	
+
 	print '<td>' . $langs->trans("Name") . '</td>';
 	print '<td>' . $langs->trans("Role") . '</td>';
-	print '<td>' . $langs->trans("SignatureLink") . '</td>';
+	print '<td class="center">' . $langs->trans("SignatureLink") . '</td>';
 	print '<td class="center">' . $langs->trans("Status") . '</td>';
-	print '<td>' . $langs->trans("SendMailDate") . '</td>';
-	print '<td>' . $langs->trans("SignatureDate") . '</td>';
+	print '<td class="center">' . $langs->trans("SendMailDate") . '</td>';
+	print '<td class="center">' . $langs->trans("SignatureDate") . '</td>';
 	print '<td class="center">' . $langs->trans("ActionsSignature") . '</td>';
 	print '<td class="center">' . $langs->trans("Signature") . '</td>';
 
@@ -563,14 +579,21 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 			print '</td><td>';
 			print dol_print_date($element->signature_date, 'dayhour');
 			print '</td>';
-			if ($object->status != 3) {
+			if ($object->status == 2) {
 				print '<td class="center">';
 				require __DIR__ . "/core/tpl/digiriskdolibarr_signature_action_view.tpl.php";
 				print '</td>';
-			}
-			if ($element->signature != $langs->trans("FileGenerated")) {
+				if ($element->signature != $langs->trans("FileGenerated")) {
+					print '<td class="center">';
+					require __DIR__ . "/core/tpl/digiriskdolibarr_signature_view.tpl.php";
+					print '</td>';
+				}
+			} else {
 				print '<td class="center">';
-				require __DIR__ . "/core/tpl/digiriskdolibarr_signature_view.tpl.php";
+				print '-';
+				print '</td>';
+				print '<td class="center">';
+				print '-';
 				print '</td>';
 			}
 			print '</tr>';
@@ -592,7 +615,8 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	print '<tr class="oddeven"><td style="width:300px">';
 	print $form->selectcontacts(GETPOST('ext_society', 'int'), '', 'ext_intervenants[]', 1, $already_selected_intervenants, '', 0, 'width200', false, 0, array(), false, 'multiple', 'ext_intervenants');
 	print '</td>';
-	print '<td class="maxwidth200">'.$langs->trans("ExtSocietyIntervenants").'</td><td>';
+	print '<td class="maxwidth200">'.$langs->trans("ExtSocietyIntervenants").'</td>';
+	print '<td class="center">';
 	print '-';
 	print '</td><td class="center">';
 	print '-';
