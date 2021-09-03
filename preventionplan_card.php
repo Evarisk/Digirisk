@@ -872,9 +872,12 @@ if (($id || $ref) && $action == 'edit')
 	print '</td></tr>';
 
 
-	$labour_inspector_society  = array_shift($object_resources['PP_LABOUR_INSPECTOR']);
-	$labour_inspector_assigned = array_shift($object_resources['PP_LABOUR_INSPECTOR_ASSIGNED']);
-
+	if (is_array($object_resources['PP_LABOUR_INSPECTOR']) && $object_resources['PP_LABOUR_INSPECTOR'] > 0) {
+		$labour_inspector_society  = array_shift($object_resources['PP_LABOUR_INSPECTOR']);
+	}
+	if (is_array($object_resources['PP_LABOUR_INSPECTOR_ASSIGNED']) && $object_resources['PP_LABOUR_INSPECTOR_ASSIGNED'] > 0) {
+		$labour_inspector_assigned = array_shift($object_resources['PP_LABOUR_INSPECTOR_ASSIGNED']);
+	}
 	//Labour inspector Society -- Entreprise Inspecteur du travail
 	print '<tr><td class="fieldrequired">';
 	print $langs->trans("LabourInspectorSociety");
