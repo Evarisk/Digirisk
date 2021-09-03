@@ -176,6 +176,21 @@ if (empty($reshook))
 			$error++;
 		}
 
+		if ($labour_inspector_id < 0) {
+			setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv('LabourInspectorSociety')), null, 'errors');
+			$error++;
+		}
+
+		if (is_array($labour_inspector_contact_id)) {
+			if (empty(array_filter($labour_inspector_contact_id))) {
+				setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv('LabourInspecto')), null, 'errors');
+				$error++;
+			}
+		} elseif (empty($labour_inspector_contact_id)) {
+			setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv('LabourInspector')), null, 'errors');
+			$error++;
+		}
+
 		if (!$error) {
 			$result = $object->create($user, false);
 
@@ -220,7 +235,7 @@ if (empty($reshook))
 		$extresponsible_id           = GETPOST('ext_society_responsible');
 		$extintervenant_ids          = GETPOST('ext_intervenants');
 		$labour_inspector_id         = GETPOST('labour_inspector');
-		$labour_inspector_contact_id = GETPOST('labour_inspector_contact');
+		$labour_inspector_contact_id = GETPOST('labour_inspector_contact') ? GETPOST('labour_inspector_contact') : 0;
 
 		$label                  = GETPOST('label');
 		$prior_visit_bool       = GETPOST('prior_visit_bool');
@@ -244,6 +259,41 @@ if (empty($reshook))
 		$object->cssct_intervention  = $cssct_intervention;
 
 		$object->fk_user_creat = $user->id ? $user->id : 1;
+
+		if ($maitre_oeuvre_id < 0) {
+			setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv('MaitreOeuvre')), null, 'errors');
+			$error++;
+		}
+
+		if ($extsociety_id < 0) {
+			setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv('ExtSociety')), null, 'errors');
+			$error++;
+		}
+
+		if (is_array($extresponsible_id)) {
+			if (empty(array_filter($extresponsible_id))) {
+				setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv('ExtSocietyResponsible')), null, 'errors');
+				$error++;
+			}
+		} elseif (empty($extresponsible_id)) {
+			setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv('ExtSocietyResponsible')), null, 'errors');
+			$error++;
+		}
+
+		if ($labour_inspector_id < 0) {
+			setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv('LabourInspectorSociety')), null, 'errors');
+			$error++;
+		}
+
+		if (is_array($labour_inspector_contact_id)) {
+			if (empty(array_filter($labour_inspector_contact_id))) {
+				setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv('LabourInspecto')), null, 'errors');
+				$error++;
+			}
+		} elseif (empty($labour_inspector_contact_id)) {
+			setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv('LabourInspector')), null, 'errors');
+			$error++;
+		}
 
 		if (!$error) {
 			$result = $object->update($user, false);
@@ -269,6 +319,8 @@ if (empty($reshook))
 				if (!empty($object->errors)) setEventMessages(null, $object->errors, 'errors');
 				else  setEventMessages($object->error, null, 'errors');
 			}
+		}  else {
+			$action = 'edit';
 		}
 	}
 
@@ -819,27 +871,25 @@ if (($id || $ref) && $action == 'edit')
 	$doleditor->Create();
 	print '</td></tr>';
 
-	//Labour inspector -- Inspecteur du travail
-	print '<tr><td class="tdtop">';
-	print $langs->trans("LabourInspector");
+
+	$labour_inspector_society  = array_shift($object_resources['PP_LABOUR_INSPECTOR']);
+	$labour_inspector_assigned = array_shift($object_resources['PP_LABOUR_INSPECTOR_ASSIGNED']);
+
+	//Labour inspector Society -- Entreprise Inspecteur du travail
+	print '<tr><td class="fieldrequired">';
+	print $langs->trans("LabourInspectorSociety");
 	print '</td>';
 	print '<td>';
-
-	//For external user force the company to user company
-	if (!empty($user->socid)) {
-		print $form->select_company($user->socid, 'labour_inspector', '', 1, 1, 0, $events, 0, 'minwidth300');
-	} else {
-
-		print $form->select_company($digiriskresources->digirisk_dolibarr_fetch_resource('SAMU'), 'labour_inspector', '', 'SelectThirdParty', 1, 0, $events, 0, 'minwidth300');
-	}	print '<br>';
-
+	$events = array();
+	$events[1] = array('method' => 'getContacts', 'url' => dol_buildpath('/core/ajax/contacts.php?showempty=1', 1), 'htmlname' => 'labour_inspector_contact', 'params' => array('add-customer-contact' => 'disabled'));
+	//print $form->select_company($digiriskresources->digirisk_dolibarr_fetch_resource('SAMU'), 'labour_inspector', '', 'SelectThirdParty', 1, 0, '', 0, 'minwidth300');
+	print $form->select_company($labour_inspector_society->id, 'labour_inspector', '', 'SelectThirdParty', 1, 0, $events, 0, 'minwidth300');
+	if (!GETPOSTISSET('backtopage')) print ' <a href="'.DOL_URL_ROOT.'/societe/card.php?action=create&backtopage='.urlencode($_SERVER["PHP_SELF"].'?action=create').'" target="_blank"><span class="fa fa-plus-circle valignmiddle paddingleft" title="'.$langs->trans("AddThirdParty").'"></span></a>';
 	print '</td></tr>';
 
-	//External responsible -- Responsable de la société extérieure
-	$labour_inspector_id = is_array($object_signatories['PP_EXT_SOCIETY_RESPONSIBLE']) ? array_shift($object_signatories['PP_EXT_SOCIETY_RESPONSIBLE'])->element_id : '';
-
-	print '<tr class="oddeven"><td class="fieldrequired">'.$langs->trans("ExtSocietyResponsible").'</td><td>';
-	print $form->selectcontacts(GETPOST('ext_society', 'int'), $ext_society_responsible_id, 'ext_society_responsible', 0, '', '', 0, 'quatrevingtpercent', false, 0, array(), false, '', 'ext_society_responsible');
+	//Labour inspector -- Inspecteur du travail
+	print '<tr><td class="fieldrequired">'.$langs->trans("LabourInspector").'</td><td>';
+	print $form->selectcontacts(GETPOST('labour_inspector', 'int'), $labour_inspector_assigned->id, 'labour_inspector_contact', 1, '', '', 0, 'minwidth300', false, 0, array(), false, '', 'labour_inspector_contact');
 	print '</td></tr>';
 
 	// Other attributes
