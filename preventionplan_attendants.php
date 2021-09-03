@@ -528,34 +528,23 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	//External Society Interventants -- Intervenants Société extérieure
 	$ext_society_intervenants = $signatory->fetchSignatory('PP_EXT_SOCIETY_INTERVENANTS', $id);
 
-	$newcardbutton = '';
-	if ($object->status != 3) {
-		$newcardbutton .= dolGetButtonTitle($langs->trans('NewIntervenants'), '', 'fa fa-plus-circle', DOL_URL_ROOT . '/custom/digiriskdolibarr/preventionplan_attendants.php?id='. $id . '&action=create');
-	}
-
 	print load_fiche_titre($langs->trans("SignatureIntervenants"), $newcardbutton, '');
 
 	print '<table class="border centpercent tableforfield">';
 	print '<tr class="liste_titre">';
+	
 	print '<td>' . $langs->trans("Name") . '</td>';
 	print '<td>' . $langs->trans("Role") . '</td>';
 	print '<td>' . $langs->trans("SignatureLink") . '</td>';
 	print '<td class="center">' . $langs->trans("Status") . '</td>';
 	print '<td>' . $langs->trans("SendMailDate") . '</td>';
 	print '<td>' . $langs->trans("SignatureDate") . '</td>';
-	if ($object->status != 3) {
-		print '<td class="center">' . $langs->trans("ActionsSignature") . '</td>';
-	}
-	if (is_array($ext_society_intervenants) && !empty ($ext_society_intervenants) && $ext_society_intervenants > 0) {
-		foreach ($ext_society_intervenants as $element) {
-			if ($element->signature != $langs->trans("FileGenerated")) {
-				print '<td class="center">' . $langs->trans("Signature") . '</td>';
-				break 1;
-			}
-		}
-	}
+	print '<td class="center">' . $langs->trans("ActionsSignature") . '</td>';
+	print '<td class="center">' . $langs->trans("Signature") . '</td>';
+
 	print '</tr>';
 
+	$already_selected_intervenants = array();
 	$j = 1;
 	if (is_array($ext_society_intervenants) && !empty ($ext_society_intervenants) && $ext_society_intervenants > 0) {
 		foreach ($ext_society_intervenants as $element) {
@@ -585,14 +574,42 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 				print '</td>';
 			}
 			print '</tr>';
+			$already_selected_intervenants[$element->element_id] = $element->element_id;
 			$j++;
 		}
-	} else {
-		print '<td>';
-		print $langs->trans('NoIntervenantsYet');
-		print '</td>';
 	}
-	print '</table>';
+
+	print '<form method="POST" action="'.$_SERVER["PHP_SELF"].'">';
+	print '<input type="hidden" name="token" value="'.newToken().'">';
+	print '<input type="hidden" name="action" value="addAttendants">';
+	print '<input type="hidden" name="id" value="'.$id.'">';
+	print '<input type="hidden" name="backtopage" value="'.$backtopage.'">';
+
+	if ($backtopageforcancel) print '<input type="hidden" name="backtopageforcancel" value="'.$backtopageforcancel.'">';
+
+
+	//Intervenants extérieurs
+	print '<tr class="oddeven"><td style="width:300px">';
+	print $form->selectcontacts(GETPOST('ext_society', 'int'), '', 'ext_intervenants[]', 1, $already_selected_intervenants, '', 0, 'width200', false, 0, array(), false, 'multiple', 'ext_intervenants');
+	print '</td>';
+	print '<td class="maxwidth200">'.$langs->trans("ExtSocietyIntervenants").'</td><td>';
+	print '-';
+	print '</td><td class="center">';
+	print '-';
+	print '</td><td class="center">';
+	print '-';
+	print '</td><td class="center">';
+	print '-';
+	print '</td><td class="center">';
+	print '-';
+	print '<td class="center" colspan="' . $colspan . '">';
+	print '<button type="submit" class="wpeo-button button-blue " name="addline" id="addline"><i class="fas fa-plus"></i>  '. $langs->trans('Add').'</button>';
+	print '</td>';
+	print '</tr>';
+	print '</table>'."\n";
+	print '</form>';
+
+
 }
 
 // End of page
