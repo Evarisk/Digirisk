@@ -113,9 +113,9 @@ if (empty($reshook))
 		}
 	}
 
-	if ($action == 'add' && GETPOST('cancel')) {
+	if (GETPOST('cancel')) {
 		// Creation prevention plan OK
-		$urltogo = str_replace('__ID__', $result, $backurlforlist);
+		$urltogo = str_replace('__ID__', $result, $backtopage);
 		$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
 		header("Location: " . $urltogo);
 		exit;
@@ -538,7 +538,7 @@ if (empty($reshook))
 	}
 
 	// Action to set status STATUS_CLOSE
-	if ($action == 'setArchive') {
+	if ($action == 'setArchived') {
 
 		$object->fetch($id);
 
