@@ -78,26 +78,27 @@ class DigiriskSignature extends CommonObject
 	 * @var array  Array with all fields and their property. Do not use it as a static var. It may be modified by constructor.
 	 */
 	public $fields=array(
-		'rowid'             => array('type'=>'integer', 'label'=>'TechnicalID', 'enabled'=>'1', 'position'=>1, 'notnull'=>1, 'visible'=>0, 'noteditable'=>'1', 'index'=>1, 'comment'=>"Id"),
-		'entity'            => array('type'=>'integer', 'label'=>'Entity', 'enabled'=>'1', 'position'=>10, 'notnull'=>1, 'visible'=>-1,),
-		'date_creation'     => array('type'=>'datetime', 'label'=>'DateCreation', 'enabled'=>'1', 'position'=>20, 'notnull'=>1, 'visible'=>-2,),
-		'tms'               => array('type'=>'timestamp', 'label'=>'DateModification', 'enabled'=>'1', 'position'=>30, 'notnull'=>0, 'visible'=>-2,),
-		'import_key'        => array('type'=>'integer', 'label'=>'ImportId', 'enabled'=>'1', 'position'=>40, 'notnull'=>1, 'visible'=>-2,),
-		'status'            => array('type'=>'smallint', 'label'=>'Status', 'enabled'=>'1', 'position'=>50, 'notnull'=>0, 'visible'=>1, 'index'=>1,),
-		'role'              => array('type'=>'varchar(255)', 'label'=>'Role', 'enabled'=>'1', 'position'=>60, 'notnull'=>0, 'visible'=>3,),
-		'firstname'         => array('type'=>'varchar(255)', 'label'=>'Firstname', 'enabled'=>'1', 'position'=>70, 'notnull'=>0, 'visible'=>3,),
-		'lastname'          => array('type'=>'varchar(255)', 'label'=>'Lastname', 'enabled'=>'1', 'position'=>80, 'notnull'=>0, 'visible'=>3,),
-		'email'             => array('type'=>'varchar(255)', 'label'=>'Email', 'enabled'=>'1', 'position'=>90, 'notnull'=>0, 'visible'=>3,),
-		'phone'             => array('type'=>'varchar(255)', 'label'=>'Phone', 'enabled'=>'1', 'position'=>100, 'notnull'=>0, 'visible'=>3,),
-		'society_name'      => array('type'=>'varchar(255)', 'label'=>'SocietyName', 'enabled'=>'1', 'position'=>110, 'notnull'=>0, 'visible'=>3,),
-		'signature_date'    => array('type'=>'datetime', 'label'=>'SignatureDate', 'enabled'=>'1', 'position'=>120, 'notnull'=>0, 'visible'=>3,),
-		'signature_comment' => array('type'=>'varchar(255)', 'label'=>'SignatureComment', 'enabled'=>'1', 'position'=>130, 'notnull'=>0, 'visible'=>3,),
-		'element_id'        => array('type'=>'integer', 'label'=>'ElementType', 'enabled'=>'1', 'position'=>140, 'notnull'=>1, 'visible'=>1,),
-		'element_type'      => array('type'=>'varchar(50)', 'label'=>'ElementType', 'enabled'=>'1', 'position'=>150, 'notnull'=>0, 'visible'=>1,),
-		'signature'         => array('type'=>'varchar(255)', 'label'=>'Signature', 'enabled'=>'1', 'position'=>160, 'notnull'=>0, 'visible'=>3,),
-		'signature_url'     => array('type'=>'varchar(50)', 'label'=>'SignatureUrl', 'enabled'=>'1', 'position'=>170, 'notnull'=>0, 'visible'=>1, 'default'=>NULL,),
-		'transaction_url'   => array('type'=>'varchar(50)', 'label'=>'TransactionUrl', 'enabled'=>'1', 'position'=>180, 'notnull'=>0, 'visible'=>1,'default'=>NULL,),
-		'fk_object'         => array('type'=>'integer', 'label'=>'FKObject', 'enabled'=>'1', 'position'=>190, 'notnull'=>1, 'visible'=>0,),
+		'rowid'                => array('type'=>'integer', 'label'=>'TechnicalID', 'enabled'=>'1', 'position'=>1, 'notnull'=>1, 'visible'=>0, 'noteditable'=>'1', 'index'=>1, 'comment'=>"Id"),
+		'entity'               => array('type'=>'integer', 'label'=>'Entity', 'enabled'=>'1', 'position'=>10, 'notnull'=>1, 'visible'=>-1,),
+		'date_creation'        => array('type'=>'datetime', 'label'=>'DateCreation', 'enabled'=>'1', 'position'=>20, 'notnull'=>1, 'visible'=>-2,),
+		'tms'                  => array('type'=>'timestamp', 'label'=>'DateModification', 'enabled'=>'1', 'position'=>30, 'notnull'=>0, 'visible'=>-2,),
+		'import_key'           => array('type'=>'integer', 'label'=>'ImportId', 'enabled'=>'1', 'position'=>40, 'notnull'=>1, 'visible'=>-2,),
+		'status'               => array('type'=>'smallint', 'label'=>'Status', 'enabled'=>'1', 'position'=>50, 'notnull'=>0, 'visible'=>1, 'index'=>1,),
+		'role'                 => array('type'=>'varchar(255)', 'label'=>'Role', 'enabled'=>'1', 'position'=>60, 'notnull'=>0, 'visible'=>3,),
+		'firstname'            => array('type'=>'varchar(255)', 'label'=>'Firstname', 'enabled'=>'1', 'position'=>70, 'notnull'=>0, 'visible'=>3,),
+		'lastname'             => array('type'=>'varchar(255)', 'label'=>'Lastname', 'enabled'=>'1', 'position'=>80, 'notnull'=>0, 'visible'=>3,),
+		'email'                => array('type'=>'varchar(255)', 'label'=>'Email', 'enabled'=>'1', 'position'=>90, 'notnull'=>0, 'visible'=>3,),
+		'phone'                => array('type'=>'varchar(255)', 'label'=>'Phone', 'enabled'=>'1', 'position'=>100, 'notnull'=>0, 'visible'=>3,),
+		'society_name'         => array('type'=>'varchar(255)', 'label'=>'SocietyName', 'enabled'=>'1', 'position'=>110, 'notnull'=>0, 'visible'=>3,),
+		'signature_date'       => array('type'=>'datetime', 'label'=>'SignatureDate', 'enabled'=>'1', 'position'=>120, 'notnull'=>0, 'visible'=>3,),
+		'signature_comment'    => array('type'=>'varchar(255)', 'label'=>'SignatureComment', 'enabled'=>'1', 'position'=>130, 'notnull'=>0, 'visible'=>3,),
+		'element_id'           => array('type'=>'integer', 'label'=>'ElementType', 'enabled'=>'1', 'position'=>140, 'notnull'=>1, 'visible'=>1,),
+		'element_type'         => array('type'=>'varchar(50)', 'label'=>'ElementType', 'enabled'=>'1', 'position'=>150, 'notnull'=>0, 'visible'=>1,),
+		'signature'            => array('type'=>'varchar(255)', 'label'=>'Signature', 'enabled'=>'1', 'position'=>160, 'notnull'=>0, 'visible'=>3,),
+		'signature_url'        => array('type'=>'varchar(50)', 'label'=>'SignatureUrl', 'enabled'=>'1', 'position'=>170, 'notnull'=>0, 'visible'=>1, 'default'=>NULL,),
+		'transaction_url'      => array('type'=>'varchar(50)', 'label'=>'TransactionUrl', 'enabled'=>'1', 'position'=>180, 'notnull'=>0, 'visible'=>1,'default'=>NULL,),
+		'last_email_sent_date' => array('type'=>'datetime', 'label'=>'LastEmailSentDate', 'enabled'=>'1', 'position'=>190, 'notnull'=>0, 'visible'=>3,),
+		'fk_object'            => array('type'=>'integer', 'label'=>'FKObject', 'enabled'=>'1', 'position'=>200, 'notnull'=>1, 'visible'=>0,),
 	);
 
 	public $rowid;
@@ -119,6 +120,7 @@ class DigiriskSignature extends CommonObject
 	public $signature;
 	public $signature_url;
 	public $transaction_url;
+	public $last_email_sent_date;
 	public $fk_object;
 
 	/**

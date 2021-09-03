@@ -31,7 +31,7 @@ CREATE TABLE llx_digiriskdolibarr_preventionplan_signature(
 	element_id           integer NOT NULL,
 	element_type         varchar(255),
 	signature            text,
-	last_email_sent_date datetime,
+	last_email_sent_date datetime DEFAULT NULL,
 	signature_url        varchar(255),
 	transaction_url      varchar(255),
 	fk_object            integer NOT NULL
