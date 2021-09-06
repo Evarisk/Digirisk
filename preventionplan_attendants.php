@@ -369,7 +369,7 @@ print dol_get_fiche_end(); ?>
 <div class="wpeo-notice notice-warning">
 	<div class="notice-content">
 		<div class="notice-title"><?php echo $langs->trans('DisclaimerSignatureTitle') ?></div>
-		<div class="notice-subtitle"><?php echo $langs->trans("DisclaimerSignature") ?></div>
+		<div class="notice-subtitle"><?php echo $langs->trans("PreventionPlanMustBeValidated") ?></div>
 	</div>
 </div>
 
@@ -377,19 +377,19 @@ print dol_get_fiche_end(); ?>
 
 $arrayRole = array('PP_MAITRE_OEUVRE', 'PP_EXT_SOCIETY_RESPONSIBLE', 'PP_EXT_SOCIETY_INTERVENANTS');
 
-if (!empty ($signatories) && $signatories > 0) {
-	foreach ($signatories as $arrayRole) {
-		foreach ($arrayRole as $signatory) {
-			$signatoriesStatusArray[$signatory->role][] = $signatory->status;
-			if ($signatory->status >= 5 ) {
-				$active = 1;
-			} else {
-				$active = 0;
-				break 2;
-			}
-		}
-	}
-} ?>
+//if (!empty ($signatories) && $signatories > 0) {
+//	foreach ($signatories as $arrayRole) {
+//		foreach ($arrayRole as $signatory) {
+//			$signatoriesStatusArray[$signatory->role][] = $signatory->status;
+//			if ($signatory->status >= 5 ) {
+//				$active = 1;
+//			} else {
+//				$active = 0;
+//				break 2;
+//			}
+//		}
+//	}
+//} ?>
 
 <?php if ($active == 1 ) : ?>
 <div class="wpeo-notice notice-success">
@@ -477,7 +477,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	print '</td><td class="center">';
 	print $element->getLibStatut(5);
 	print '</td><td>';
-	print 'test';
+	print '';
 	print '</td><td>';
 	print dol_print_date($element->signature_date, 'dayhour');
 	print '</td>';
@@ -535,7 +535,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	print '</td><td class="center">';
 	print $element->getLibStatut(5);
 	print '</td><td>';
-	print 'test';
+	print '';
 	//print dol_print_date($element->last_email_sent_date, 'dayhour');
 	print '</td><td>';
 	print dol_print_date($element->signature_date, 'dayhour');
@@ -641,9 +641,9 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 		print '</td><td class="center">';
 		print '-';
 		print '</td><td class="center">';
-		print '-';
-		print '<td class="center" colspan="' . $colspan . '">';
 		print '<button type="submit" class="wpeo-button button-blue " name="addline" id="addline"><i class="fas fa-plus"></i>  '. $langs->trans('Add').'</button>';
+		print '<td class="center" colspan="' . $colspan . '">';
+		print '-';
 		print '</td>';
 		print '</tr>';
 		print '</table>'."\n";

@@ -456,6 +456,7 @@ class PreventionPlan extends CommonObject
 	 */
 	public function setInProgress($user, $notrigger = 0)
 	{
+		$this->deleteSignatoriesSignatures();
 		return $this->setStatusCommon($user, self::STATUS_IN_PROGRESS, $notrigger, 'PREVENTIONPLAN_INPROGRESS');
 	}
 	/**
@@ -737,9 +738,15 @@ class PreventionPlan extends CommonObject
 		return $out;
 	}
 
-	public function checkSignatoriesSignatures() {
+	public function fetchSignatories($morefilter = '1 = 1') {
 		$signatoryObj = new PreventionPlanSignature($this->db);
-		$signatories = $signatoryObj->fetchAll('','', 0, 0, array('fk_object' => $this->id, 'status' => '> 0'),'AND');
+		$signatories = $signatoryObj->fetchAll('','', 0, 0, array('fk_object' => $this->id, 'customsql' => $morefilter),'AND');
+		return $signatories;
+	}
+
+	public function checkSignatoriesSignatures() {
+		$morefilter = 'status != 0';
+		$signatories = $this->fetchSignatories($morefilter);
 
 		if (!empty($signatories) && $signatories > 0) {
 			foreach ($signatories as $signatory) {
@@ -747,6 +754,24 @@ class PreventionPlan extends CommonObject
 					continue;
 				} else {
 					return 0;
+				}
+			}
+			return 1;
+		}
+	}
+
+	public function deleteSignatoriesSignatures() {
+		global $user;
+
+		$signatories = $this->fetchSignatories();
+
+		if (!empty($signatories) && $signatories > 0) {
+			foreach ($signatories as $signatory) {
+				if (dol_strlen($signatory->signature)) {
+					$signatory->signature = '';
+					$signatory->signature_date = '';
+					$signatory->status = 1;
+					$signatory->update($user);
 				}
 			}
 			return 1;
@@ -1104,8 +1129,6 @@ class PreventionPlanSignature extends DigiriskSignature
 					$sqlwhere[] = $key.' = \''.$this->db->idate($value).'\'';
 				} elseif ($key == 'customsql') {
 					$sqlwhere[] = $value;
-				} elseif ($key == 'status') {
-					$sqlwhere[] = $key. ' ' . $value;
 				} elseif (strpos($value, '%') === false) {
 					$sqlwhere[] = $key.' IN ('.$this->db->sanitize($this->db->escape($value)).')';
 				} else {

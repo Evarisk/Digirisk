@@ -323,10 +323,15 @@ LabourInspectorSociety = Entreprise Inspecteur du travail
 Archive = Archiver
 ValidatePendingSignature = Validé (en attente de signature)
 LockPreventionPlan = Verrouiller le plan de prévention
-ConfirmLockPreventionPlan = Êtes-vous sûr de vouloir verrouiller le plan de prévention ?<br>Ce verrouillage permet la génération du document mais empêche l'ajout de nouveaux participants ou la modification du plan de prévention.
+ConfirmLockPreventionPlan = Êtes-vous sûr de vouloir verrouiller le plan de prévention ?<br>Ce verrouillage permet de figer les données et la génération du document.
 NoIntervenantsYet = Il n'y a aucun intervenant pour le moment, vous pouvez en ajouter à l'aide du "+" situé en haut à droite de ce tableau
 PreventionPlanMustBeLocked = Le plan de prévention doit être verrouillé pour accéder à cette fonctionnalité
 AllSignatoriesMustHaveSigned = Tous les participants doivent avoir signé pour verrouiller l'objet
+ValidatePreventionPlan = Valider le plan de prévention
+ConfirmValidatePreventionPlan = Êtes-vous sûr de vouloir valider le plan de prévention ? <br> La validation permet aux participants de signer le document mais <b> empêche l'ajout de nouveaux participants ou la modification du plan de prévention </b>.
+ReOpenPreventionPlan = Ouvrir à nouveau le plan de prévention
+ConfirmReOpenPreventionPlan = Êtes-vous sûr de vouloir rouvrir le plan de prévention ? La réouverture permet la modification du plan de prévention et l'ajout de nouveaux participants mais <b>toutes les signatures du document seront perdues</b>.
+PreventionPlanMustBeValidated = Le plan de prévention doit être validé pour que les participants puissent signer
 #
 # FirePermit - Permis de feu
 #

@@ -498,7 +498,7 @@ if (empty($reshook))
 	}
 
 	// Action to set status STATUS_PENDING_SIGNATURE
-	if ($action == 'setInProgress') {
+	if ($action == 'confirm_setInProgress') {
 
 		$object->fetch($id);
 
@@ -521,7 +521,7 @@ if (empty($reshook))
 	}
 
 	// Action to set status STATUS_PENDING_SIGNATURE
-	if ($action == 'setPendingSignature') {
+	if ($action == 'confirm_setPendingSignature') {
 
 		$object->fetch($id);
 
@@ -917,6 +917,20 @@ if (($action == 'setLocked' && (empty($conf->use_javascript_ajax) || !empty($con
 	$formconfirm .= $form->formconfirm($_SERVER["PHP_SELF"].'?id='.$object->id, $langs->trans('LockPreventionPlan'), $langs->trans('ConfirmLockPreventionPlan', $object->ref), 'confirm_setLocked', '', 'yes', 'actionButtonLock', 350, 600);
 }
 
+// setPendingSignature confirmation
+if (($action == 'setPendingSignature' && (empty($conf->use_javascript_ajax) || !empty($conf->dol_use_jmobile)))		// Output when action = clone if jmobile or no js
+	|| (!empty($conf->use_javascript_ajax) && empty($conf->dol_use_jmobile)))							// Always output when not jmobile nor js
+{
+	$formconfirm .= $form->formconfirm($_SERVER["PHP_SELF"].'?id='.$object->id, $langs->trans('ValidatePreventionPlan'), $langs->trans('ConfirmValidatePreventionPlan', $object->ref), 'confirm_setPendingSignature', '', 'yes', 'actionButtonPendingSignature', 350, 600);
+}
+
+// setInProgress confirmation
+if (($action == 'setInProgress' && (empty($conf->use_javascript_ajax) || !empty($conf->dol_use_jmobile)))		// Output when action = clone if jmobile or no js
+	|| (!empty($conf->use_javascript_ajax) && empty($conf->dol_use_jmobile)))							// Always output when not jmobile nor js
+{
+	$formconfirm .= $form->formconfirm($_SERVER["PHP_SELF"].'?id='.$object->id, $langs->trans('ReOpenPreventionPlan'), $langs->trans('ConfirmReOpenPreventionPlan', $object->ref), 'confirm_setInProgress', '', 'yes', 'actionButtonInProgress', 350, 600);
+}
+
 // Clone confirmation
 if (($action == 'clone' && (empty($conf->use_javascript_ajax) || !empty($conf->dol_use_jmobile)))		// Output when action = clone if jmobile or no js
 	|| (!empty($conf->use_javascript_ajax) && empty($conf->dol_use_jmobile)))							// Always output when not jmobile nor js
@@ -1055,9 +1069,9 @@ if ((empty($action) || ($action != 'create' && $action != 'edit')))
 				print '<a class="butAction" id="actionButtonEdit" href="' . $_SERVER["PHP_SELF"] . '?id=' . $object->id . '&action=edit">' . $langs->trans("Modify") . '</a>';
 			}
 			if ($object->status == 1) {
-				print '<a class="butAction" id="actionButtonPendingSignature" href="' . $_SERVER["PHP_SELF"] . '?id=' . $object->id . '&action=setPendingSignature">' . $langs->trans("Validate") . '</a>';
+				print '<span class="butAction" id="actionButtonPendingSignature" href="' . $_SERVER["PHP_SELF"] . '?id=' . $object->id . '&action=setPendingSignature">' . $langs->trans("Validate") . '</a>';
 			} elseif ($object->status == 2) {
-				print '<a class="butAction" id="actionButtonInProgress" href="' . $_SERVER["PHP_SELF"] . '?id=' . $object->id . '&action=setInProgress">' . $langs->trans("ReOpenDigi") . '</a>';
+				print '<span class="butAction" id="actionButtonInProgress" href="' . $_SERVER["PHP_SELF"] . '?id=' . $object->id . '&action=setInProgress">' . $langs->trans("ReOpenDigi") . '</span>';
 
 				if (!$object->checkSignatoriesSignatures()) {
 					print '<a class="butActionRefused classfortooltip" href="#" title="'.dol_escape_htmltag($langs->trans("AllSignatoriesMustHaveSigned")).'">'.$langs->trans('Lock').'</a>';
