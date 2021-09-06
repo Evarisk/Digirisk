@@ -737,6 +737,21 @@ class PreventionPlan extends CommonObject
 		return $out;
 	}
 
+	public function checkSignatoriesSignatures() {
+		$signatoryObj = new PreventionPlanSignature($this->db);
+		$signatories = $signatoryObj->fetchAll('','', 0, 0, array('fk_object' => $this->id, 'status' => '> 0'),'AND');
+
+		if (!empty($signatories) && $signatories > 0) {
+			foreach ($signatories as $signatory) {
+				if (dol_strlen($signatory->signature)) {
+					continue;
+				} else {
+					return 0;
+				}
+			}
+			return 1;
+		}
+	}
 }
 /**
  *	Class to manage invoice lines.
@@ -1089,6 +1104,8 @@ class PreventionPlanSignature extends DigiriskSignature
 					$sqlwhere[] = $key.' = \''.$this->db->idate($value).'\'';
 				} elseif ($key == 'customsql') {
 					$sqlwhere[] = $value;
+				} elseif ($key == 'status') {
+					$sqlwhere[] = $key. ' ' . $value;
 				} elseif (strpos($value, '%') === false) {
 					$sqlwhere[] = $key.' IN ('.$this->db->sanitize($this->db->escape($value)).')';
 				} else {

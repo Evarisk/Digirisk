@@ -618,38 +618,37 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 		}
 	}
 
-	print '<form method="POST" action="'.$_SERVER["PHP_SELF"].'">';
-	print '<input type="hidden" name="token" value="'.newToken().'">';
-	print '<input type="hidden" name="action" value="addAttendant">';
-	print '<input type="hidden" name="id" value="'.$id.'">';
-	print '<input type="hidden" name="backtopage" value="'.$backtopage.'">';
+	if ($object->status == 1) {
+		print '<form method="POST" action="'.$_SERVER["PHP_SELF"].'">';
+		print '<input type="hidden" name="token" value="'.newToken().'">';
+		print '<input type="hidden" name="action" value="addAttendant">';
+		print '<input type="hidden" name="id" value="'.$id.'">';
+		print '<input type="hidden" name="backtopage" value="'.$backtopage.'">';
 
-	if ($backtopageforcancel) print '<input type="hidden" name="backtopageforcancel" value="'.$backtopageforcancel.'">';
+		if ($backtopageforcancel) print '<input type="hidden" name="backtopageforcancel" value="'.$backtopageforcancel.'">';
 
-
-	//Intervenants extérieurs
-	print '<tr class="oddeven"><td style="width:300px">';
-	print $form->selectcontacts(GETPOST('ext_society', 'int'), '', 'ext_intervenants[]', 1, $already_selected_intervenants, '', 0, 'width200', false, 0, array(), false, 'multiple', 'ext_intervenants');
-	print '</td>';
-	print '<td class="maxwidth200">'.$langs->trans("ExtSocietyIntervenants").'</td>';
-	print '<td class="center">';
-	print '-';
-	print '</td><td class="center">';
-	print '-';
-	print '</td><td class="center">';
-	print '-';
-	print '</td><td class="center">';
-	print '-';
-	print '</td><td class="center">';
-	print '-';
-	print '<td class="center" colspan="' . $colspan . '">';
-	print '<button type="submit" class="wpeo-button button-blue " name="addline" id="addline"><i class="fas fa-plus"></i>  '. $langs->trans('Add').'</button>';
-	print '</td>';
-	print '</tr>';
-	print '</table>'."\n";
-	print '</form>';
-
-
+		//Intervenants extérieurs
+		print '<tr class="oddeven"><td style="width:300px">';
+		print $form->selectcontacts(GETPOST('ext_society', 'int'), '', 'ext_intervenants[]', 1, $already_selected_intervenants, '', 0, 'width200', false, 0, array(), false, 'multiple', 'ext_intervenants');
+		print '</td>';
+		print '<td class="maxwidth200">'.$langs->trans("ExtSocietyIntervenants").'</td>';
+		print '<td class="center">';
+		print '-';
+		print '</td><td class="center">';
+		print '-';
+		print '</td><td class="center">';
+		print '-';
+		print '</td><td class="center">';
+		print '-';
+		print '</td><td class="center">';
+		print '-';
+		print '<td class="center" colspan="' . $colspan . '">';
+		print '<button type="submit" class="wpeo-button button-blue " name="addline" id="addline"><i class="fas fa-plus"></i>  '. $langs->trans('Add').'</button>';
+		print '</td>';
+		print '</tr>';
+		print '</table>'."\n";
+		print '</form>';
+	}
 }
 
 // End of page

@@ -253,9 +253,11 @@ function digirisk_show_photos($modulepart, $sdir, $size = 0, $nbmax = 0, $nbbyro
  *      @param      Object              $object             Object when method is called from an object card.
  *      @param		int					$hideifempty		Hide section of generated files if there is no file
  *      @param      string              $removeaction       (optional) The action to remove a file
+ *      @param      int                 $active             (optional) To show gen button disabled
+ *      @param      string              $tooltiptext       (optional) Tooltip text when gen button disabled
  * 		@return		string              					Output string with HTML array of documents (might be empty string)
  */
-function digiriskshowdocuments($modulepart, $modulesubdir, $filedir, $urlsource, $genallowed, $delallowed = 0, $modelselected = '', $allowgenifempty = 1, $forcenomultilang = 0, $notused = 0, $noform = 0, $param = '', $title = '', $buttonlabel = '', $codelang = '', $morepicto = '', $object = null, $hideifempty = 0, $removeaction = 'remove_file', $active = 1)
+function digiriskshowdocuments($modulepart, $modulesubdir, $filedir, $urlsource, $genallowed, $delallowed = 0, $modelselected = '', $allowgenifempty = 1, $forcenomultilang = 0, $notused = 0, $noform = 0, $param = '', $title = '', $buttonlabel = '', $codelang = '', $morepicto = '', $object = null, $hideifempty = 0, $removeaction = 'remove_file', $active = 1, $tooltiptext = '')
 {
 	global $db, $langs, $conf, $user, $hookmanager, $form;
 
@@ -382,7 +384,7 @@ function digiriskshowdocuments($modulepart, $modulesubdir, $filedir, $urlsource,
 			$genbutton = '<input class="button buttongen" id="'.$forname.'_generatebutton" name="'.$forname.'_generatebutton"';
 			$genbutton .= ' type="submit" value="'.$buttonlabel.'"';
 		} else {
-			$genbutton = '<input class="button disabled" style="pointer-events:none" id="'.$forname.'_generatebutton" name="'.$forname.'_generatebutton"';
+			$genbutton = '<input class="button buttongen disabled" id="'.$forname.'_generatebutton" name="'.$forname.'_generatebutton"';
 			$genbutton .= '  value="'.$buttonlabel.'"';
 		}
 
@@ -398,7 +400,7 @@ function digiriskshowdocuments($modulepart, $modulesubdir, $filedir, $urlsource,
 		$out .= $genbutton;
 		if (!$active) {
 			$htmltooltip = '';
-			$htmltooltip .= $langs->trans("SetStartEndDateBefore");
+			$htmltooltip .= $tooltiptext;
 
 			$out .= '<span class="center">';
 			$out .= $form->textwithpicto($langs->trans('Help'), $htmltooltip, 1, 0);

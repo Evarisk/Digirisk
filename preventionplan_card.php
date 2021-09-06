@@ -1058,7 +1058,13 @@ if ((empty($action) || ($action != 'create' && $action != 'edit')))
 				print '<a class="butAction" id="actionButtonPendingSignature" href="' . $_SERVER["PHP_SELF"] . '?id=' . $object->id . '&action=setPendingSignature">' . $langs->trans("Validate") . '</a>';
 			} elseif ($object->status == 2) {
 				print '<a class="butAction" id="actionButtonInProgress" href="' . $_SERVER["PHP_SELF"] . '?id=' . $object->id . '&action=setInProgress">' . $langs->trans("ReOpenDigi") . '</a>';
-				print '<span class="butAction" id="actionButtonLock">' . $langs->trans("Lock") . '</span>';
+
+				if (!$object->checkSignatoriesSignatures()) {
+					print '<a class="butActionRefused classfortooltip" href="#" title="'.dol_escape_htmltag($langs->trans("AllSignatoriesMustHaveSigned")).'">'.$langs->trans('Lock').'</a>';
+				} else {
+					print '<span class="butAction" id="actionButtonLock">' . $langs->trans("Lock") . '</span>';
+				}
+
 			} elseif ($object->status == 3) {
 				print '<span class="butAction" id="actionButtonClone">' . $langs->trans("ToClone") . '</span>';
 				print '<a class="butAction" id="actionButtonClose" href="' . $_SERVER["PHP_SELF"] . '?id=' . $object->id . '&action=setArchive">' . $langs->trans("Close") . '</a>';
@@ -1333,27 +1339,26 @@ if ((empty($action) || ($action != 'create' && $action != 'edit')))
 
 			$arrayRole = array( 'PP_MAITRE_OEUVRE', 'PP_EXT_SOCIETY_RESPONSIBLE', 'PP_EXT_SOCIETY_INTERVENANTS');
 
-			if (!empty ($signatories) && $signatories > 0) {
-				foreach ($signatories as $arrayRole) {
-					foreach ($arrayRole as $signatory) {
-						$signatoriesStatusArray[$signatory->role][] = $signatory->status;
-						if ($signatory->status >= 5 ) {
-							$active = 1;
-						} else {
-							$active = 0;
-							break 2;
-						}
-					}
-				}
-			}
+//			if (!empty ($signatories) && $signatories > 0) {
+////				foreach ($signatories as $arrayRole) {
+////					foreach ($arrayRole as $signatory) {
+////						$signatoriesStatusArray[$signatory->role][] = $signatory->status;
+////						if ($signatory->status >= 5 ) {
+////							$active = 1;
+////						} else {
+////							$active = 0;
+////							break 2;
+////						}
+////					}
+////				}
+////			}
 
-			if ($object->status == 3) {
-				print digiriskshowdocuments($modulepart, $dir_files, $filedir, $urlsource, $permissiontoadd, $permissiontodelete, $defaultmodel, 1, 0, 28, 0, '', $title, '', $langs->defaultlang, '', $preventionplandocument, 0, '', $active);
-			}
+				print digiriskshowdocuments($modulepart, $dir_files, $filedir, $urlsource, $permissiontoadd, $permissiontodelete, $defaultmodel, 1, 0, 28, 0, '', $title, '', $langs->defaultlang, '', $preventionplandocument, 0, '', $object->status == 3, $langs->trans('PreventionPlanMustBeLocked') );
+
 		}
 
 
-		print '</div><div class="fichehalfright">';
+		print '</div><div>';
 
 		$MAXEVENT = 10;
 

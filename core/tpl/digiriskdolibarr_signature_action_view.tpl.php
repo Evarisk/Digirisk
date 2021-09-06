@@ -21,13 +21,14 @@
 		print '<input type="hidden" name="action" value="deleteAttendant">';
 		print '<input type="hidden" name="signatoryToDeleteID" value="'.$element->id.'">';
 		print '<input type="hidden" name="backtopage" value="'.$backtopage.'">';
-		?>
-		<li class="dropdown-item">
-			<button type="submit" name="deleteAttendant" id="deleteAttendant" class="attendant-delete wpeo-button button-primary" value="<?php echo $element->id ?>">
-				<span><i class="fas fa-trash"></i> <?php echo $langs->trans('DeleteAttendant'); ?></span>
-			</button>
-		</li>
-		<?php print '</form>'; ?>
+		if ($element->role == 'PP_EXT_SOCIETY_INTERVENANTS') : ?>
+			<li class="dropdown-item">
+				<button type="submit" name="deleteAttendant" id="deleteAttendant" class="attendant-delete wpeo-button button-primary" value="<?php echo $element->id ?>">
+					<span><i class="fas fa-trash"></i> <?php echo $langs->trans('DeleteAttendant'); ?></span>
+				</button>
+			</li>
+		<?php endif; ?>
+		</form>
 	</ul>
 </div>
 
