@@ -57,6 +57,7 @@ $signatory         = new PreventionPlanSignature($db);
 $digiriskresources = new DigiriskResources($db);
 $usertmp           = new User($db);
 $contact           = new Contact($db);
+$form              = new Form($db);
 
 $object->fetch($id);
 
@@ -90,7 +91,7 @@ if (empty($backtopage) || ($cancel && empty($id))) {
 }
 
 // Action to add record
-if ($action == 'addAttendants') {
+if ($action == 'addAttendant') {
 
 	$object->fetch($id);
 	$extintervenant_ids  = GETPOST('ext_intervenants');
@@ -98,7 +99,7 @@ if ($action == 'addAttendants') {
 	if (!$error) {
 		$result = $signatory->setSignatory($object->id,'socpeople', $extintervenant_ids, 'PP_EXT_SOCIETY_INTERVENANTS', 1);
 		if ($result > 0) {
-			// Creation prevention plan OK
+				// Creation attendant OK
 			$urltogo = str_replace('__ID__', $result, $backtopage);
 			$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
 			header("Location: " . $urltogo);
@@ -106,7 +107,7 @@ if ($action == 'addAttendants') {
 		}
 		else
 		{
-			// Creation prevention plan KO
+			// Creation attendant KO
 			if (!empty($object->errors)) setEventMessages(null, $object->errors, 'errors');
 			else  setEventMessages($object->error, null, 'errors');
 		}
@@ -157,7 +158,7 @@ if ($action == 'setAbsent') {
 	if (!$error) {
 		$result = $signatory->setAbsent($user, false);
 		if ($result > 0) {
-			// Creation signature OK
+			// set absent OK
 			$urltogo = str_replace('__ID__', $result, $backtopage);
 			$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
 			header("Location: " . $urltogo);
@@ -165,7 +166,7 @@ if ($action == 'setAbsent') {
 		}
 		else
 		{
-			// Creation signature KO
+			// set absent KO
 			if (!empty($signatory->errors)) setEventMessages(null, $signatory->errors, 'errors');
 			else  setEventMessages($signatory->error, null, 'errors');
 		}
@@ -304,10 +305,36 @@ if ($action == 'send') {
 				$action = 'presend';
 			}
 		} else {
-			// Creation signature KO
+			// Mail sent KO
 			if (!empty($signatory->errors)) setEventMessages(null, $signatory->errors, 'errors');
 			else  setEventMessages($signatory->error, null, 'errors');
 		}
+	}
+}
+
+////// Action to delete attendant
+if ($action == 'deleteAttendant') {
+
+	$signatoryToDeleteID = GETPOST('signatoryToDeleteID');
+	$signatory->fetch($signatoryToDeleteID);
+
+	if (!$error) {
+		$result = $signatory->setDeleted($user);
+		if ($result > 0) {
+			// Deletion attendant OK
+			$urltogo = str_replace('__ID__', $result, $backtopage);
+			$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
+			header("Location: " . $urltogo);
+			exit;
+		}
+		else
+		{
+			// Deletion attendant KO
+			if (!empty($object->errors)) setEventMessages(null, $object->errors, 'errors');
+			else  setEventMessages($object->error, null, 'errors');
+		}
+	} else {
+		$action = 'create';
 	}
 }
 
@@ -389,7 +416,7 @@ if ($action == 'create')
 
 	print '<form method="POST" action="'.$_SERVER["HTTP_REFERER"].'">';
 	print '<input type="hidden" name="token" value="'.newToken().'">';
-	print '<input type="hidden" name="action" value="addAttendants">';
+	print '<input type="hidden" name="action" value="addAttendant">';
 	print '<input type="hidden" name="backtopage" value="'.$backtopage.'">';
 
 	if ($backtopageforcancel) print '<input type="hidden" name="backtopageforcancel" value="'.$backtopageforcancel.'">';
@@ -407,7 +434,7 @@ if ($action == 'create')
 	dol_fiche_end();
 
 	print '<div class="center">';
-	print '<input type="submit" class="button" id ="actionButtonCreate" name="addAttendants" value="'.dol_escape_htmltag($langs->trans("Create")).'">';
+	print '<input type="submit" class="button" id ="actionButtonCreate" name="addAttendant" value="'.dol_escape_htmltag($langs->trans("Create")).'">';
 	print ' &nbsp; <input type="submit" id ="actionButtonCancelCreate" class="button" name="cancel" value="'.$langs->trans("Cancel").'">';
 	print '</div>';
 
@@ -567,25 +594,20 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 			print $element->signature_url;
 			print '</td><td class="center">';
 			print $element->getLibStatut(5);
-			print '</td><td>';
-			print 'test';
+			print '</td><td class="center">';
+			print '';
 			//print dol_print_date($element->last_email_sent_date, 'dayhour');
 			print '</td><td>';
 			print dol_print_date($element->signature_date, 'dayhour');
 			print '</td>';
+			print '<td class="center">';
+			require __DIR__ . "/core/tpl/digiriskdolibarr_signature_action_view.tpl.php";
+			print '</td>';
 			if ($object->status == 2) {
 				print '<td class="center">';
-				require __DIR__ . "/core/tpl/digiriskdolibarr_signature_action_view.tpl.php";
+				require __DIR__ . "/core/tpl/digiriskdolibarr_signature_view.tpl.php";
 				print '</td>';
-				if ($element->signature != $langs->trans("FileGenerated")) {
-					print '<td class="center">';
-					require __DIR__ . "/core/tpl/digiriskdolibarr_signature_view.tpl.php";
-					print '</td>';
-				}
 			} else {
-				print '<td class="center">';
-				print '-';
-				print '</td>';
 				print '<td class="center">';
 				print '-';
 				print '</td>';
@@ -598,7 +620,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 
 	print '<form method="POST" action="'.$_SERVER["PHP_SELF"].'">';
 	print '<input type="hidden" name="token" value="'.newToken().'">';
-	print '<input type="hidden" name="action" value="addAttendants">';
+	print '<input type="hidden" name="action" value="addAttendant">';
 	print '<input type="hidden" name="id" value="'.$id.'">';
 	print '<input type="hidden" name="backtopage" value="'.$backtopage.'">';
 
