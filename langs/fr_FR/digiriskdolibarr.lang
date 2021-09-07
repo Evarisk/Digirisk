@@ -357,6 +357,9 @@ ErrorNoEmailForLabourInspector = Erreur : l'Inspecteur du travail n'a pas d'emai
 ErrorNoEmailForExtResponsible = Erreur : Le responsable de l'Entreprise Extérieure n'a pas d'email
 ErrorNoEmailForMaitreOeuvre = Erreur : Le responsable de l'Entreprise Utilisatrice n'a pas d'email
 ErrorNoEmailForExtIntervenant = Erreur : Le (ou les) intervenant(s) ne possède(nt) pas d'email
+
+
+
 #
 # FirePermit - Permis de feu
 #
@@ -825,6 +828,7 @@ SendMailDate = Date d'envoi d'email
 DeleteAttendant = Supprimer l'intervenant
 AddAttendantMessage = Ajout de l'intervenant :
 DeleteAttendantMessage = Suppression de l'intervenant :
+SignaturePublicInterfaceForbidden = Accès interdit à l'interface publique de signature
 
 #
 # Ticket - Interface publique ticket
