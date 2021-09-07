@@ -335,7 +335,7 @@ PreventionPlanMustBeValidated = Le plan de prévention doit être validé pour q
 PreventionPlanRiskList = Liste des risques du plan de prévention
 PreventionPlanAttendants = Plan de prévention - Participants
 ActionsPreventionPlanRisk = Actions
-
+PreventionPlanDescription = Projet des plans de prévention
 
 
 #

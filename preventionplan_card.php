@@ -142,6 +142,7 @@ if (empty($reshook))
 		$object->tms           = $now;
 		$object->import_key    = "";
 		$object->label         = $label;
+		$object->fk_project    = $conf->global->DIGIRISKDOLIBARR_PREVENTIONPLAN_PROJECT;
 
 		$date_start = dol_mktime(GETPOST('dateohour', 'int'), GETPOST('dateomin', 'int'), 0, GETPOST('dateomonth', 'int'), GETPOST('dateoday', 'int'), GETPOST('dateoyear', 'int'));
 		$date_end   = dol_mktime(GETPOST('dateehour', 'int'), GETPOST('dateemin', 'int'), 0, GETPOST('dateemonth', 'int'), GETPOST('dateeday', 'int'), GETPOST('dateeyear', 'int'));
@@ -873,7 +874,6 @@ if (($id || $ref) && $action == 'edit')
 	$doleditor->Create();
 	print '</td></tr>';
 
-
 	if (is_array($object_resources['PP_LABOUR_INSPECTOR']) && $object_resources['PP_LABOUR_INSPECTOR'] > 0) {
 		$labour_inspector_society  = array_shift($object_resources['PP_LABOUR_INSPECTOR']);
 	}
@@ -990,6 +990,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit')))
 	unset($object->fields['entity']);
 	unset($object->fields['date_start']);
 	unset($object->fields['date_end']);
+	unset($object->fields['fk_project']);
 
 	print '<tr><td class="titlefield">';
 	print $langs->trans("StartDate");
