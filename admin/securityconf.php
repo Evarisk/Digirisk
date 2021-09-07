@@ -66,7 +66,6 @@ $societe   = new Societe($db);
 $usertmp   = new User($db);
 $resources = new DigiriskResources($db);
 
-
 $allLinks = $resources->digirisk_dolibarr_fetch_resources();
 
 $hookmanager->initHooks(array('admincompany', 'globaladmin'));
@@ -472,9 +471,9 @@ else //id = 0
 {
 	//For external user force the company to user company
 	if (!empty($user->socid)) {
-		print $form->select_dolusers($user->socid, 'responsible_socid', '', 1, 0, 0, 0, 0, 'minwidth300');
+		print $form->select_dolusers($user->socid, 'responsible_socid', 1, 1, 0, 0, 0, 0, 'minwidth300');
 	} else {
-		print $form->select_dolusers('', 'responsible_socid', '', '', 0, 0, 0 , 0, 'minwidth300');
+		print $form->select_dolusers('', 'responsible_socid', 1, '', 0, 0, 0 , 0, 'minwidth300');
 	}
 }
 
