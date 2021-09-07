@@ -530,6 +530,23 @@ class modDigiriskdolibarr extends DolibarrModules
 		$this->rights[$r][1] = $langs->trans('DeleteEvaluator');
 		$this->rights[$r][4] = 'evaluator';
 		$this->rights[$r][5] = 'delete';
+		$r++;
+
+		/* ADMINPAGE PANEL ACCESS PERMISSIONS */
+		$this->rights[$r][0] = $this->numero.$r;
+		$this->rights[$r][1] = $langs->trans('ReadAdminPage');
+		$this->rights[$r][4] = 'adminpage';
+		$this->rights[$r][5] = 'read';
+		$r++;
+		$this->rights[$r][0] = $this->numero.$r;
+		$this->rights[$r][1] = $langs->trans('CreateAdminPage');
+		$this->rights[$r][4] = 'adminpage';
+		$this->rights[$r][5] = 'write';
+		$r++;
+		$this->rights[$r][0] = $this->numero.$r;
+		$this->rights[$r][1] = $langs->trans('DeleteAdminPage');
+		$this->rights[$r][4] = 'adminpage';
+		$this->rights[$r][5] = 'delete';
 
 		// Main menu entries to add
 		$this->menu = array();
@@ -651,7 +668,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			'langs'=>'digiriskdolibarr@digiriskdolibarr',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
 			'position'=>48520+$r,
 			'enabled'=>'$conf->digiriskdolibarr->enabled',  // Define condition to show or hide menu entry. Use '$conf->digiriskdolibarr->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
-			'perms'=>'1',			                // Use 'perms'=>'$user->rights->digiriskdolibarr->level1->level2' if you want your menu with a permission rules
+			'perms'=>'$user->rights->digiriskdolibarr->adminpage->read',			                // Use 'perms'=>'$user->rights->digiriskdolibarr->level1->level2' if you want your menu with a permission rules
 			'target'=>'',
 			'user'=>0,				                // 0=Menu for internal users, 1=external users, 2=both
 		);
