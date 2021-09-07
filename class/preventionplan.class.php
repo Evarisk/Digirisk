@@ -456,7 +456,8 @@ class PreventionPlan extends CommonObject
 	 */
 	public function setInProgress($user, $notrigger = 0)
 	{
-		$this->deleteSignatoriesSignatures();
+		$signatory = new PreventionPlanSignature($this->db);
+		$signatory->deleteSignatoriesSignatures($this->id);
 		return $this->setStatusCommon($user, self::STATUS_IN_PROGRESS, $notrigger, 'PREVENTIONPLAN_INPROGRESS');
 	}
 	/**
@@ -738,45 +739,6 @@ class PreventionPlan extends CommonObject
 		return $out;
 	}
 
-	public function fetchSignatories($morefilter = '1 = 1') {
-		$signatoryObj = new PreventionPlanSignature($this->db);
-		$signatories = $signatoryObj->fetchAll('','', 0, 0, array('fk_object' => $this->id, 'customsql' => $morefilter),'AND');
-		return $signatories;
-	}
-
-	public function checkSignatoriesSignatures() {
-		$morefilter = 'status != 0';
-		$signatories = $this->fetchSignatories($morefilter);
-
-		if (!empty($signatories) && $signatories > 0) {
-			foreach ($signatories as $signatory) {
-				if ($signatory->status == 5 || $signatory->status == 7) {
-					continue;
-				} else {
-					return 0;
-				}
-			}
-			return 1;
-		}
-	}
-
-	public function deleteSignatoriesSignatures() {
-		global $user;
-
-		$signatories = $this->fetchSignatories();
-
-		if (!empty($signatories) && $signatories > 0) {
-			foreach ($signatories as $signatory) {
-				if (dol_strlen($signatory->signature)) {
-					$signatory->signature = '';
-					$signatory->signature_date = '';
-					$signatory->status = 1;
-					$signatory->update($user);
-				}
-			}
-			return 1;
-		}
-	}
 }
 /**
  *	Class to manage invoice lines.

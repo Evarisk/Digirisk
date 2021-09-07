@@ -1075,7 +1075,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit')))
 			} elseif ($object->status == 2) {
 				print '<span class="butAction" id="actionButtonInProgress" href="' . $_SERVER["PHP_SELF"] . '?id=' . $object->id . '&action=setInProgress">' . $langs->trans("ReOpenDigi") . '</span>';
 
-				if (!$object->checkSignatoriesSignatures()) {
+				if (!$signatory->checkSignatoriesSignatures($object->id)) {
 					print '<a class="butActionRefused classfortooltip" href="#" title="'.dol_escape_htmltag($langs->trans("AllSignatoriesMustHaveSigned")).'">'.$langs->trans('Lock').'</a>';
 				} else {
 					print '<span class="butAction" id="actionButtonLock">' . $langs->trans("Lock") . '</span>';

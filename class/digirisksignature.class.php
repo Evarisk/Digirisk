@@ -548,6 +548,45 @@ class DigiriskSignature extends CommonObject
 		}
 	}
 
+	public function fetchSignatories($fk_object, $morefilter = '1 = 1') {
+		$signatories = $this->fetchAll('','', 0, 0, array('fk_object' => $fk_object, 'customsql' => $morefilter),'AND');
+		return $signatories;
+	}
+
+	public function checkSignatoriesSignatures($fk_object) {
+		$morefilter = 'status != 0';
+		$signatories = $this->fetchSignatories($fk_object, $morefilter);
+
+		if (!empty($signatories) && $signatories > 0) {
+			foreach ($signatories as $signatory) {
+				if ($signatory->status == 5 || $signatory->status == 7) {
+					continue;
+				} else {
+					return 0;
+				}
+			}
+			return 1;
+		}
+	}
+
+	public function deleteSignatoriesSignatures($fk_object) {
+		global $user;
+
+		$signatories = $this->fetchSignatories($fk_object);
+
+		if (!empty($signatories) && $signatories > 0) {
+			foreach ($signatories as $signatory) {
+				if (dol_strlen($signatory->signature)) {
+					$signatory->signature = '';
+					$signatory->signature_date = '';
+					$signatory->status = 1;
+					$signatory->update($user);
+				}
+			}
+			return 1;
+		}
+	}
+
 	/**
 	 * Set previous signatories status to 0
 	 *
