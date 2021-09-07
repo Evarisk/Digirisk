@@ -358,7 +358,7 @@ if (!empty($object->id)) $res = $object->fetch_optionals();
 
 $head = preventionplanPrepareHead($object);
 print dol_get_fiche_head($head, 'preventionplanAttendants', $langs->trans("PreventionPlan"), -1, "digiriskdolibarr@digiriskdolibarr");
-$morehtmlref = ' - ' . $object->label;
+dol_strlen($object->label) ? $morehtmlref = ' - ' . $object->label : '';
 $morehtmlleft .= '<div class="floatleft inline-block valignmiddle divphotoref">'.digirisk_show_photos('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$entity].'/'.$object->element_type, 'small', 5, 0, 0, 0, $width,0, 0, 0, 0, $object->element_type, $object).'</div>';
 
 digirisk_banner_tab($object, 'ref', '', 0, 'ref', 'ref', $morehtmlref, '', 0, $morehtmlleft, $object->getLibStatut(5));
