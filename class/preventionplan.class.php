@@ -81,7 +81,7 @@ class PreventionPlan extends CommonObject
 		'label'              => array('type'=>'varchar(255)', 'label'=>'Label', 'enabled'=>'1', 'position'=>80, 'notnull'=>0, 'visible'=>1, 'searchall'=>1, 'css'=>'minwidth200', 'help'=>"Help text", 'showoncombobox'=>'1',),
 		'date_start'         => array('type'=>'datetime', 'label'=>'StartDate', 'enabled'=>'1', 'position'=>100, 'notnull'=>-1, 'visible'=>1,),
 		'date_end'           => array('type'=>'datetime', 'label'=>'EndDate', 'enabled'=>'1', 'position'=>130, 'notnull'=>-1, 'visible'=>1,),
-		'prior_visit_bool'   => array('type'=>'boolean', 'label'=>'PriorVisitYesNo', 'enabled'=>'1', 'position'=>140, 'notnull'=>-1, 'visible'=>1,),
+		'prior_visit_bool'   => array('type'=>'boolean', 'label'=>'PriorVisit', 'enabled'=>'1', 'position'=>140, 'notnull'=>-1, 'visible'=>1,),
 		'prior_visit_text'   => array('type'=>'text', 'label'=>'PriorVisitText', 'enabled'=>'1', 'position'=>150, 'notnull'=>-1, 'visible'=>1,),
 		'cssct_intervention' => array('type'=>'boolean', 'label'=>'CSSCTIntervention', 'enabled'=>'1', 'position'=>160, 'notnull'=>-1, 'visible'=>1,),
 		'fk_project'         => array('type'=>'integer:Project:projet/class/project.class.php', 'label'=>'Projet', 'enabled'=>'1', 'position'=>170, 'notnull'=>1, 'visible'=>1,),

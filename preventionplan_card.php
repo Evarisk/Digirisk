@@ -858,7 +858,7 @@ if (($id || $ref) && $action == 'edit')
 	print '<br>';
 	print '</td></tr>';
 
-	//Prior Visit -- Visite préalable
+	//Prior Visit -- Inspection commune préalable
 	print '<tr class="oddeven"><td class="tdtop">';
 	print $langs->trans("PriorVisit");
 	print '</td>';
