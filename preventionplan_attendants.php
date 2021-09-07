@@ -185,11 +185,11 @@ if ($action == 'setAbsent') {
 // Action to send Email
 if ($action == 'send') {
 	$signatoryID = GETPOST('signatoryID');
-
 	$signatory->fetch($signatoryID);
 
 	if (!$error) {
 		$result = $signatory->setPendingSignature($user, false);
+		setEventMessages($langs->trans('test'),array());
 		$signatory->last_email_sent_date = dol_now('tzuser');
 		$signatory->update($user, true);
 
@@ -326,7 +326,7 @@ if ($action == 'send') {
 ////// Action to delete attendant
 if ($action == 'deleteAttendant') {
 
-	$signatoryToDeleteID = GETPOST('signatoryToDeleteID');
+	$signatoryToDeleteID = GETPOST('signatoryID');
 	$signatory->fetch($signatoryToDeleteID);
 
 	if (!$error) {
@@ -389,8 +389,9 @@ print dol_get_fiche_end(); ?>
 
 <?php
 // Show direct link to public interface
-print '<br><!-- Link to public interface -->'."\n";
-print showDirectPublicLinkSignature($signatory).'<br>';
+if (!empty($conf->global->DIGIRISKDOLIBARR_SIGNATURE_ENABLE_PUBLIC_INTERFACE)) {
+	print showDirectPublicLinkSignature($signatory);
+}
 
 // Part to create
 if ($action == 'create')
