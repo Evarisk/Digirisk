@@ -99,8 +99,9 @@ if ($action == 'addAttendant') {
 	if (!empty($extintervenant_ids) && $extintervenant_ids > 0) {
 		foreach ($extintervenant_ids as $extintervenant_id) {
 			$contact->fetch($extintervenant_id);
-			if (!dol_strlen($extintervenant_id->email)) {
+			if (!dol_strlen($contact->email)) {
 				setEventMessages($langs->trans('ErrorNoEmailForExtIntervenant', $langs->transnoentitiesnoconv('ExtIntervenant')), null, 'errors');
+				$error++;
 			}
 		}
 	}
