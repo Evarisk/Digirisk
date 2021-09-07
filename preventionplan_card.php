@@ -298,7 +298,7 @@ if (empty($reshook))
 			setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv('MaitreOeuvre')), null, 'errors');
 			$error++;
 		}   else {
-			$usertmp->fetch($extresponsible_id);
+			$usertmp->fetch($maitre_oeuvre_id);
 			if (!dol_strlen($usertmp->email)) {
 				setEventMessages($langs->trans('ErrorNoEmailForMaitreOeuvre', $langs->transnoentitiesnoconv('MaitreOeuvre')), null, 'errors');
 				$error++;
