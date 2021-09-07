@@ -224,6 +224,8 @@ if (empty($reshook))
 			}
 		} else {
 			$action = 'create';
+			$urltogo = dol_buildpath('/digiriskdolibarr/preventionplan_card.php', 1).'?action=create';
+			header("Location: " . $urltogo);
 		}
 	}
 
