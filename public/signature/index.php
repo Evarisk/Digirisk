@@ -1,6 +1,5 @@
 <?php
-/* Copyright (C) - 2013-2016	Jean-François FERRY    <hello@librethic.io>
- * Copyright (C) - 2019     	Laurent Destailleur    <eldy@users.sourceforge.net>
+/* Copyright (C) 2021 EOXIA <dev@eoxia.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,9 +16,9 @@
  */
 
 /**
- *       \file       htdocs/public/ticket/index.php
- *       \ingroup    ticket
- *       \brief      Public page to add and manage ticket
+ *       \file       public/signature/index.php
+ *       \ingroup    digiriskdolibarr
+ *       \brief      Public page to manage signature
  */
 
 if (!defined('NOREQUIREUSER'))  define('NOREQUIREUSER', '1');
@@ -70,35 +69,6 @@ $parameters = array();
 $reshook = $hookmanager->executeHooks('doActions', $parameters, $object, $action); // Note that $action and $object may have been modified by some hooks
 if ($reshook < 0) setEventMessages($hookmanager->error, $hookmanager->errors, 'errors');
 
-// Action to add record
-if ($action == 'addSignature') {
-	$signatoryID = GETPOST('signatoryID');
-	$signature = GETPOST('signature');
-	$request_body = file_get_contents('php://input');
-
-	$signatory->fetch($signatoryID);
-	$signatory->signature = $request_body;
-	$signatory->signature_date = dol_now();
-
-	if (!$error) {
-		$result = $signatory->update($user, false);
-		if ($result > 0) {
-			$signatory->setSigned($user, false);
-			// Creation signature OK
-			$urltogo = str_replace('__ID__', $result, $backtopage);
-			$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
-			header("Location: " . $urltogo);
-			exit;
-		}
-		else
-		{
-			// Creation signature KO
-			if (!empty($signatory->errors)) setEventMessages(null, $signatory->errors, 'errors');
-			else  setEventMessages($signatory->error, null, 'errors');
-		}
-	}
-}
-
 /*
  * View
  */
@@ -106,9 +76,9 @@ if ($action == 'addSignature') {
 $form = new Form($db);
 $formticket = new FormTicket($db);
 
-if (empty($conf->global->TICKET_ENABLE_PUBLIC_INTERFACE))
+if (empty($conf->global->DIGIRISKDOLIBARR_SIGNATURE_ENABLE_PUBLIC_INTERFACE))
 {
-	print $langs->trans('TicketPublicInterfaceForbidden');
+	print $langs->trans('SignaturePublicInterfaceForbidden');
 	exit;
 }
 

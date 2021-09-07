@@ -83,6 +83,7 @@ class PreventionPlan extends CommonObject
 		'date_end'           => array('type'=>'datetime', 'label'=>'EndDate', 'enabled'=>'1', 'position'=>130, 'notnull'=>-1, 'visible'=>1,),
 		'prior_visit_bool'   => array('type'=>'boolean', 'label'=>'PriorVisit', 'enabled'=>'1', 'position'=>140, 'notnull'=>-1, 'visible'=>1,),
 		'prior_visit_text'   => array('type'=>'text', 'label'=>'PriorVisitText', 'enabled'=>'1', 'position'=>150, 'notnull'=>-1, 'visible'=>1,),
+		'prior_visit_date'   => array('type'=>'datetime', 'label'=>'PriorVisitDate', 'enabled'=>'1', 'position'=>200, 'notnull'=>-1, 'visible'=>1,),
 		'cssct_intervention' => array('type'=>'boolean', 'label'=>'CSSCTIntervention', 'enabled'=>'1', 'position'=>160, 'notnull'=>-1, 'visible'=>1,),
 		'fk_project'         => array('type'=>'integer:Project:projet/class/project.class.php', 'label'=>'Projet', 'enabled'=>'1', 'position'=>170, 'notnull'=>1, 'visible'=>1,),
 		'fk_user_creat'      => array('type'=>'integer:User:user/class/user.class.php', 'label'=>'UserAuthor', 'enabled'=>'1', 'position'=>180, 'notnull'=>1, 'visible'=>-2, 'foreignkey'=>'user.rowid',),
@@ -101,6 +102,7 @@ class PreventionPlan extends CommonObject
 	public $date_end;
 	public $prior_visit_bool;
 	public $prior_visit_text;
+	public $prior_visit_date;
 	public $cssct_intervention;
 	public $fk_project;
 	public $fk_user_creat;
@@ -456,7 +458,8 @@ class PreventionPlan extends CommonObject
 	 */
 	public function setInProgress($user, $notrigger = 0)
 	{
-		$this->deleteSignatoriesSignatures();
+		$signatory = new PreventionPlanSignature($this->db);
+		$signatory->deleteSignatoriesSignatures($this->id);
 		return $this->setStatusCommon($user, self::STATUS_IN_PROGRESS, $notrigger, 'PREVENTIONPLAN_INPROGRESS');
 	}
 	/**
@@ -738,45 +741,6 @@ class PreventionPlan extends CommonObject
 		return $out;
 	}
 
-	public function fetchSignatories($morefilter = '1 = 1') {
-		$signatoryObj = new PreventionPlanSignature($this->db);
-		$signatories = $signatoryObj->fetchAll('','', 0, 0, array('fk_object' => $this->id, 'customsql' => $morefilter),'AND');
-		return $signatories;
-	}
-
-	public function checkSignatoriesSignatures() {
-		$morefilter = 'status != 0';
-		$signatories = $this->fetchSignatories($morefilter);
-
-		if (!empty($signatories) && $signatories > 0) {
-			foreach ($signatories as $signatory) {
-				if (dol_strlen($signatory->signature)) {
-					continue;
-				} else {
-					return 0;
-				}
-			}
-			return 1;
-		}
-	}
-
-	public function deleteSignatoriesSignatures() {
-		global $user;
-
-		$signatories = $this->fetchSignatories();
-
-		if (!empty($signatories) && $signatories > 0) {
-			foreach ($signatories as $signatory) {
-				if (dol_strlen($signatory->signature)) {
-					$signatory->signature = '';
-					$signatory->signature_date = '';
-					$signatory->status = 1;
-					$signatory->update($user);
-				}
-			}
-			return 1;
-		}
-	}
 }
 /**
  *	Class to manage invoice lines.

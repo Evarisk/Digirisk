@@ -99,6 +99,7 @@ if ($action == 'addAttendant') {
 	if (!$error) {
 		$result = $signatory->setSignatory($object->id,'socpeople', $extintervenant_ids, 'PP_EXT_SOCIETY_INTERVENANTS', 1);
 		if ($result > 0) {
+			setEventMessages($langs->trans('AddAttendantMessage').' '.$signatory->lastname,array());
 				// Creation attendant OK
 			$urltogo = str_replace('__ID__', $result, $backtopage);
 			$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
@@ -323,6 +324,7 @@ if ($action == 'deleteAttendant') {
 	if (!$error) {
 		$result = $signatory->setDeleted($user);
 		if ($result > 0) {
+			setEventMessages($langs->trans('DeleteAttendantMessage').' '.$signatory->lastname,array());
 			// Deletion attendant OK
 			$urltogo = str_replace('__ID__', $result, $backtopage);
 			$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
@@ -358,7 +360,7 @@ if (!empty($object->id)) $res = $object->fetch_optionals();
 
 $head = preventionplanPrepareHead($object);
 print dol_get_fiche_head($head, 'preventionplanAttendants', $langs->trans("PreventionPlan"), -1, "digiriskdolibarr@digiriskdolibarr");
-$morehtmlref = ' - ' . $object->label;
+dol_strlen($object->label) ? $morehtmlref = ' - ' . $object->label : '';
 $morehtmlleft .= '<div class="floatleft inline-block valignmiddle divphotoref">'.digirisk_show_photos('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$entity].'/'.$object->element_type, 'small', 5, 0, 0, 0, $width,0, 0, 0, 0, $object->element_type, $object).'</div>';
 
 digirisk_banner_tab($object, 'ref', '', 0, 'ref', 'ref', $morehtmlref, '', 0, $morehtmlleft, $object->getLibStatut(5));
@@ -433,10 +435,10 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	print '<tr class="liste_titre">';
 	print '<td>' . $langs->trans("Name") . '</td>';
 	print '<td>' . $langs->trans("Role") . '</td>';
-	print '<td>' . $langs->trans("SignatureLink") . '</td>';
+	print '<td class="center">' . $langs->trans("SignatureLink") . '</td>';
 	print '<td class="center">' . $langs->trans("Status") . '</td>';
-	print '<td>' . $langs->trans("SendMailDate") . '</td>';
-	print '<td>' . $langs->trans("SignatureDate") . '</td>';
+	print '<td class="center">' . $langs->trans("SendMailDate") . '</td>';
+	print '<td class="center">' . $langs->trans("SignatureDate") . '</td>';
 	print '<td class="center">' . $langs->trans("ActionsSignature") . '</td>';
 	print '<td class="center">' . $langs->trans("Signature") . '</td>';
 	print '</tr>';
@@ -445,13 +447,18 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	print $usertmp->getNomUrl(1);
 	print '</td><td>';
 	print $langs->trans("MaitreOeuvre");
-	print '</td><td>';
-	print $element->signature_url;
+	print '</td><td class="center">';
+	if ($object->status == 2) {
+		$signatureUrl = dol_buildpath('/custom/digiriskdolibarr/public/signature/add_signature.php?track_id='.$element->signature_url, 3);
+		print '<a href='.$signatureUrl.' target="_blank"><i class="fas fa-external-link-alt"></i></a>';
+	} else {
+		print '-';
+	}
 	print '</td><td class="center">';
 	print $element->getLibStatut(5);
-	print '</td><td>';
+	print '</td><td class="center">';
 	print dol_print_date($element->last_email_sent_date, 'dayhour');
-	print '</td><td>';
+	print '</td><td class="center">';
 	print dol_print_date($element->signature_date, 'dayhour');
 	print '</td>';
 
@@ -490,10 +497,10 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	print '<tr class="liste_titre">';
 	print '<td>' . $langs->trans("Name") . '</td>';
 	print '<td>' . $langs->trans("Role") . '</td>';
-	print '<td>' . $langs->trans("SignatureLink") . '</td>';
+	print '<td class="center">' . $langs->trans("SignatureLink") . '</td>';
 	print '<td class="center">' . $langs->trans("Status") . '</td>';
-	print '<td>' . $langs->trans("SendMailDate") . '</td>';
-	print '<td>' . $langs->trans("SignatureDate") . '</td>';
+	print '<td class="center">' . $langs->trans("SendMailDate") . '</td>';
+	print '<td class="center">' . $langs->trans("SignatureDate") . '</td>';
 	print '<td class="center">' . $langs->trans("ActionsSignature") . '</td>';
 	print '<td class="center">' . $langs->trans("Signature") . '</td>';
 
@@ -503,13 +510,18 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	print $contact->getNomUrl(1);
 	print '</td><td>';
 	print $langs->trans("ExtSocietyResponsible");
-	print '</td><td>';
-	print $element->signature_url;
+	print '</td><td class="center">';
+	if ($object->status == 2) {
+		$signatureUrl = dol_buildpath('/custom/digiriskdolibarr/public/signature/add_signature.php?track_id='.$element->signature_url, 3);
+		print '<a href='.$signatureUrl.' target="_blank"><i class="fas fa-external-link-alt"></i></a>';
+	} else {
+		print '-';
+	}
 	print '</td><td class="center">';
 	print $element->getLibStatut(5);
-	print '</td><td>';
+	print '</td><td class="center">';
 	print dol_print_date($element->last_email_sent_date, 'dayhour');
-	print '</td><td>';
+	print '</td><td class="center">';
 	print dol_print_date($element->signature_date, 'dayhour');
 	print '</td>';
 	if ($object->status == 2) {
@@ -562,13 +574,18 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 			print $contact->getNomUrl(1);
 			print '</td><td>';
 			print $langs->trans("ExtSocietyIntervenant") . ' ' . $j;
-			print '</td><td>';
-			print $element->signature_url;
+			print '</td><td class="center">';
+			if ($object->status == 2) {
+				$signatureUrl = dol_buildpath('/custom/digiriskdolibarr/public/signature/add_signature.php?track_id='.$element->signature_url, 3);
+				print '<a href='.$signatureUrl.' target="_blank"><i class="fas fa-external-link-alt"></i></a>';
+			} else {
+				print '-';
+			}
 			print '</td><td class="center">';
 			print $element->getLibStatut(5);
 			print '</td><td class="center">';
 			print dol_print_date($element->last_email_sent_date, 'dayhour');
-			print '</td><td>';
+			print '</td><td class="center">';
 			print dol_print_date($element->signature_date, 'dayhour');
 			print '</td>';
 			print '<td class="center">';

@@ -1,7 +1,5 @@
 <?php
-
-/* Copyright (C) - 2013-2016	Jean-François FERRY    <hello@librethic.io>
- * Copyright (C) - 2019     	Laurent Destailleur    <eldy@users.sourceforge.net>
+/* Copyright (C) 2021 EOXIA <dev@eoxia.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,9 +16,9 @@
  */
 
 /**
- *       \file       htdocs/public/ticket/index.php
- *       \ingroup    ticket
- *       \brief      Public page to add and manage ticket
+ *       \file      public/signature/add_signature.php
+ *       \ingroup    digiriskdolibarr
+ *       \brief      Public page to add signature
  */
 
 if (!defined('NOREQUIREUSER'))  define('NOREQUIREUSER', '1');
@@ -121,9 +119,9 @@ if ($action == 'addSignature') {
 $form = new Form($db);
 $formticket = new FormTicket($db);
 
-if (empty($conf->global->TICKET_ENABLE_PUBLIC_INTERFACE))
+if (empty($conf->global->DIGIRISKDOLIBARR_SIGNATURE_ENABLE_PUBLIC_INTERFACE))
 {
-	print $langs->trans('TicketPublicInterfaceForbidden');
+	print $langs->trans('SignaturePublicInterfaceForbidden');
 	exit;
 }
 
