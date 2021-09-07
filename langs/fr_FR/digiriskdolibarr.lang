@@ -334,6 +334,10 @@ ConfirmReOpenPreventionPlan = Êtes-vous sûr de vouloir rouvrir le plan de pré
 PreventionPlanMustBeValidated = Le plan de prévention doit être validé pour que les participants puissent signer
 PreventionPlanRiskList = Liste des risques du plan de prévention
 PreventionPlanAttendants = Plan de prévention - Participants
+ActionsPreventionPlanRisk = Actions
+
+
+
 #
 # FirePermit - Permis de feu
 #

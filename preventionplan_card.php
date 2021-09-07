@@ -1113,14 +1113,14 @@ if ((empty($action) || ($action != 'create' && $action != 'edit')))
 			if (!empty($conf->global->MAIN_VIEW_LINE_NUMBER)) {
 				print '<td class="linecolnum center"></td>';
 			}
-			print '<td class="linecoldescription">';
-			print '<div id="add"></div><span class="hideonsmartphone">' . $langs->trans('Ref.') . '</span>';
+			print '<td>';
+			print '<span>' . $langs->trans('Ref.') . '</span>';
 			print '</td>';
-			print '<td class="linecollocation">' . $langs->trans('Location') . '</td>';
-			print '<td class="linecolactionsdescription">' . $form->textwithpicto($langs->trans('ActionsDescription'), $langs->trans("ActionsDescriptionTooltip")) . '</td>';
-			print '<td class="linecolriskcategory">' . $form->textwithpicto($langs->trans('INRSRisk'), $langs->trans('INRSRiskTooltip')) . '</td>';
-			print '<td class="linecolpreventionmethod">' . $form->textwithpicto($langs->trans('PreventionMethod'), $langs->trans('PreventionMethodTooltip')) . '</td>';
-			print '<td class="linecoledit" colspan="' . $colspan . '">&nbsp;</td>';
+			print '<td>' . $langs->trans('Location') . '</td>';
+			print '<td>' . $form->textwithpicto($langs->trans('ActionsDescription'), $langs->trans("ActionsDescriptionTooltip")) . '</td>';
+			print '<td>' . $form->textwithpicto($langs->trans('INRSRisk'), $langs->trans('INRSRiskTooltip')) . '</td>';
+			print '<td>' . $form->textwithpicto($langs->trans('PreventionMethod'), $langs->trans('PreventionMethodTooltip')) . '</td>';
+			print '<td class="center" colspan="' . $colspan . '">'.$langs->trans('ActionsPreventionPlanRisk').'</td>';
 			print '</tr>';
 
 			if (!empty($preventionplanlines) && $preventionplanlines > 0) {
@@ -1135,23 +1135,22 @@ if ((empty($action) || ($action != 'create' && $action != 'edit')))
 						print '<input type="hidden" name="lineid" value="' . $item->id . '">';
 						print '<input type="hidden" name="parent_id" value="' . $object->id . '">';
 
-						print '<tr class="pair nodrag nodrop nohoverpair' . (($nolinesbefore || $object->element == 'contrat') ? '' : ' liste_titre_create') . '">';
-
-						print '<td class="bordertop nobottom linecolref minwidth500imp">';
+						print '<tr>';
+						print '<td>';
 						print $item->ref;
 						print '</td>';
 
-						print '<td class="bordertop nobottom linecollocation">';
+						print '<td>';
 						print $digiriskelement->select_digiriskelement_list($item->fk_element, 'fk_element', '', '', 0, 0, array(), '', 0, 0, 'minwidth100', GETPOST('id'), false, 1);
 						print '</td>';
 
 						$coldisplay++;
-						print '<td class="bordertop nobottom linecolactionsdescription">';
+						print '<td>';
 						print '<textarea name="actionsdescription" class="minwidth150" cols="50" rows="' . ROWS_2 . '">' . $item->description . '</textarea>' . "\n";
 						print '</td>';
 
 						$coldisplay++;
-						print '<td class="bordertop nobottom linecolriskcategory">'; ?>
+						print '<td>'; ?>
 						<div class="wpeo-dropdown dropdown-large dropdown-grid category-danger padding">
 							<div class="dropdown-toggle dropdown-add-button button-cotation">
 								<input class="input-hidden-danger" type="hidden" name="risk_category_id"
@@ -1185,12 +1184,12 @@ if ((empty($action) || ($action != 'create' && $action != 'edit')))
 						print '</td>';
 
 						$coldisplay++;
-						print '<td class="bordertop nobottom linecolpreventionmethod">';
+						print '<td>';
 						print '<textarea name="preventionmethod" class="minwidth150" cols="50" rows="' . ROWS_2 . '">' . $item->prevention_method . '</textarea>' . "\n";
 						print '</td>';
 
 						$coldisplay += $colspan;
-						print '<td class="bordertop nobottom linecoledit center valignmiddle" colspan="' . $colspan . '">';
+						print '<td class="center" colspan="' . $colspan . '">';
 						print '<input type="submit" class="button" value="' . $langs->trans('Save') . '" name="updateLine" id="updateLine">';
 						print '</td>';
 						print '</tr>';
@@ -1200,22 +1199,22 @@ if ((empty($action) || ($action != 'create' && $action != 'edit')))
 						}
 						print '</form>';
 					} else {
-						print '<td class="bordertop nobottom linecolref minwidth500imp">';
+						print '<td>';
 						print $item->ref;
 						print '</td>';
 
-						print '<td class="bordertop nobottom linecollocation">';
+						print '<td>';
 						$digiriskelement->fetch($item->fk_element);
 						print $digiriskelement->ref . " - " . $digiriskelement->label;
 						print '</td>';
 
 						$coldisplay++;
-						print '<td class="bordertop nobottom linecolactionsdescription">';
+						print '<td>';
 						print $item->description;
 						print '</td>';
 
 						$coldisplay++;
-						print '<td class="bordertop nobottom linecolriskcategory">'; ?>
+						print '<td>'; ?>
 						<div class="table-cell table-50 cell-risk" data-title="Risque">
 							<div class="wpeo-dropdown dropdown-large category-danger padding wpeo-tooltip-event"
 								 aria-label="<?php echo $risk->get_danger_category_name($item) ?>">
@@ -1227,7 +1226,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit')))
 						print '</td>';
 
 						$coldisplay++;
-						print '<td class="bordertop nobottom linecolpreventionmethod">';
+						print '<td>';
 						print $item->prevention_method;
 						print '</td>';
 
@@ -1235,18 +1234,10 @@ if ((empty($action) || ($action != 'create' && $action != 'edit')))
 
 						//Actions buttons
 						if ($object->status == 1) {
-							print '<td class="linecoledit center">';
+							print '<td class="center">';
 							$coldisplay++;
-							if (($item->info_bits & 2) == 2 || !empty($disableedit)) {
-							} else {
-								print '<a class="editfielda reposition" href="' . $_SERVER["PHP_SELF"] . '?id=' . $id . '&amp;action=editline&amp;lineid=' . $item->id . '">' . img_edit() . '</a>';
-							}
-							print '</td>';
-
-							print '<td class="linecoldelete center">';
-							$coldisplay++;
-							//La suppression n'est autorisée que si il n'y a pas de ligne dans une précédente situation
-							print '<a class="reposition" href="' . $_SERVER["PHP_SELF"] . '?id=' . $id . '&amp;action=deleteline&amp;lineid=' . $item->id . '">';
+							print '<a href="' . $_SERVER["PHP_SELF"] . '?id=' . $id . '&amp;action=editline&amp;lineid=' . $item->id . '" style="padding-right: 20px"><i class="fas fa-pencil-alt" style="color: #666"></i></a>';
+							print '<a href="' . $_SERVER["PHP_SELF"] . '?id=' . $id . '&amp;action=deleteline&amp;lineid=' . $item->id . '">';
 							print img_delete();
 							print '</a>';
 							print '</td>';
@@ -1270,22 +1261,21 @@ if ((empty($action) || ($action != 'create' && $action != 'edit')))
 				print '<input type="hidden" name="backtopage" value="' . $backtopage . '">';
 				print '<input type="hidden" name="parent_id" value="' . $object->id . '">';
 
-				print '<tr class="pair nodrag nodrop nohoverpair' . (($nolinesbefore || $object->element == 'contrat') ? '' : ' liste_titre_create') . '">';
-
-				print '<td class="bordertop nobottom linecolref minwidth500imp">';
+				print '<tr>';
+				print '<td>';
 				print $refPreventionPlanDetMod->getNextValue($preventionplanline);
 				print '</td>';
-				print '<td class="bordertop nobottom linecollocation">';
+				print '<td>';
 				print $digiriskelement->select_digiriskelement_list('', 'fk_element', '', '1', 0, 0, array(), '', 0, 0, 'minwidth100', '', false, 1);
 				print '</td>';
 
 				$coldisplay++;
-				print '<td class="bordertop nobottom linecolactionsdescription">';
+				print '<td>';
 				print '<textarea name="actionsdescription" class="minwidth150" cols="50" rows="' . ROWS_2 . '">' . ('') . '</textarea>' . "\n";
 				print '</td>';
 
 				$coldisplay++;
-				print '<td class="bordertop nobottom linecolriskcategory">'; ?>
+				print '<td>'; ?>
 				<div class="wpeo-dropdown dropdown-large dropdown-grid category-danger padding">
 					<input class="input-hidden-danger" type="hidden" name="risk_category_id" value="undefined"/>
 					<div class="dropdown-toggle dropdown-add-button button-cotation">
@@ -1315,12 +1305,12 @@ if ((empty($action) || ($action != 'create' && $action != 'edit')))
 				print '</td>';
 
 				$coldisplay++;
-				print '<td class="bordertop nobottom linecolpreventionmethod">';
+				print '<td>';
 				print '<textarea name="preventionmethod" class="minwidth150" cols="50" rows="' . ROWS_2 . '">' . ('') . '</textarea>' . "\n";
 				print '</td>';
 
 				$coldisplay += $colspan;
-				print '<td class="bordertop nobottom linecoledit center valignmiddle" colspan="' . $colspan . '">';
+				print '<td class="center" colspan="' . $colspan . '">';
 				print '<input type="submit" class="button" value="' . $langs->trans('Add') . '" name="addline" id="addline">';
 				print '</td>';
 				print '</tr>';
