@@ -1328,17 +1328,15 @@ if ((empty($action) || ($action != 'create' && $action != 'edit')))
 				if (is_object($objectline)) {
 					print $objectline->showOptionals($extrafields, 'edit', array('style' => $bcnd[$var], 'colspan' => $coldisplay), '', '', 1);
 				}
-				?>
-				<?php
-				print '</form>';
-				print '</table>';
-				print '</div>';
 			}
+			print '</form>';
+			print '</table>';
+			print '</div>';
 		}
 		// Document Generation -- Génération des documents
 		$includedocgeneration = 1;
 		if ($includedocgeneration) {
-			print '<div class="fichecenter"><div class="fichehalfleft preventionplanDocument">';
+			print '<div class=""><div class="preventionplanDocument fichehalfleft">';
 
 			$objref = dol_sanitizeFileName($object->ref);
 			$dir_files = $preventionplandocument->element . '/' . $objref;
@@ -1352,7 +1350,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit')))
 			print digiriskshowdocuments($modulepart, $dir_files, $filedir, $urlsource, $permissiontoadd, $permissiontodelete, $defaultmodel, 1, 0, 28, 0, '', $title, '', $langs->defaultlang, '', $preventionplandocument, 0, '', $object->status == 3, $langs->trans('PreventionPlanMustBeLocked') );
 		}
 
-		print '</div><div>';
+		print '</div><div class="fichehalfright">';
 
 		$MAXEVENT = 10;
 
