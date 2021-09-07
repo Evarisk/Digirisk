@@ -75,6 +75,9 @@ $signatory              = new PreventionPlanSignature($db);
 $preventionplandocument = new PreventionPlanDocument($db);
 $risk                   = new Risk($db);
 
+$contact = new Contact($db);
+$usertmp = new User($db);
+
 $object->fetch($id);
 
 $digiriskelement   = new DigiriskElement($db);
@@ -166,6 +169,12 @@ if (empty($reshook))
 		if ($maitre_oeuvre_id < 0) {
 			setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv('MaitreOeuvre')), null, 'errors');
 			$error++;
+		} else {
+			$usertmp->fetch($maitre_oeuvre_id);
+			if (!dol_strlen($usertmp->email)) {
+				setEventMessages($langs->trans('ErrorNoEmailForMaitreOeuvre', $langs->transnoentitiesnoconv('MaitreOeuvre')), null, 'errors');
+				$error++;
+			}
 		}
 
 		if ($extsociety_id < 0) {
@@ -181,6 +190,12 @@ if (empty($reshook))
 		} elseif (empty($extresponsible_id)) {
 			setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv('ExtSocietyResponsible')), null, 'errors');
 			$error++;
+		}  else {
+			$contact->fetch($extresponsible_id);
+			if (!dol_strlen($contact->email)) {
+				setEventMessages($langs->trans('ErrorNoEmailForExtResponsible', $langs->transnoentitiesnoconv('ExtSocietyResponsible')), null, 'errors');
+				$error++;
+			}
 		}
 
 		if ($labour_inspector_id < 0) {
@@ -190,12 +205,18 @@ if (empty($reshook))
 
 		if (is_array($labour_inspector_contact_id)) {
 			if (empty(array_filter($labour_inspector_contact_id))) {
-				setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv('LabourInspecto')), null, 'errors');
+				setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv('LabourInspector')), null, 'errors');
 				$error++;
 			}
 		} elseif (empty($labour_inspector_contact_id)) {
 			setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv('LabourInspector')), null, 'errors');
 			$error++;
+		}  else {
+			$contact->fetch($labour_inspector_contact_id);
+			if (!dol_strlen($contact->email)) {
+				setEventMessages($langs->trans('ErrorNoEmailForLabourInspector', $langs->transnoentitiesnoconv('LabourInspectorContact')), null, 'errors');
+				$error++;
+			}
 		}
 
 		if (!$error) {
@@ -276,6 +297,12 @@ if (empty($reshook))
 		if ($maitre_oeuvre_id < 0) {
 			setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv('MaitreOeuvre')), null, 'errors');
 			$error++;
+		}   else {
+			$usertmp->fetch($extresponsible_id);
+			if (!dol_strlen($usertmp->email)) {
+				setEventMessages($langs->trans('ErrorNoEmailForMaitreOeuvre', $langs->transnoentitiesnoconv('MaitreOeuvre')), null, 'errors');
+				$error++;
+			}
 		}
 
 		if ($extsociety_id < 0) {
@@ -291,6 +318,12 @@ if (empty($reshook))
 		} elseif (empty($extresponsible_id)) {
 			setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv('ExtSocietyResponsible')), null, 'errors');
 			$error++;
+		} else {
+			$contact->fetch($extresponsible_id);
+			if (!dol_strlen($contact->email)) {
+				setEventMessages($langs->trans('ErrorNoEmailForExtResponsible', $langs->transnoentitiesnoconv('ExtSocietyResponsible')), null, 'errors');
+				$error++;
+			}
 		}
 
 		if ($labour_inspector_id < 0) {
@@ -306,6 +339,12 @@ if (empty($reshook))
 		} elseif (empty($labour_inspector_contact_id)) {
 			setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv('LabourInspector')), null, 'errors');
 			$error++;
+		} else {
+			$contact->fetch($labour_inspector_contact_id);
+			if (!dol_strlen($contact->email)) {
+				setEventMessages($langs->trans('ErrorNoEmailForLabourInspector', $langs->transnoentitiesnoconv('LabourInspectorContact')), null, 'errors');
+				$error++;
+			}
 		}
 
 		if (!$error) {
