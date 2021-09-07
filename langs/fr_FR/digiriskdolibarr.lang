@@ -336,6 +336,7 @@ PreventionPlanRiskList = Liste des risques du plan de prévention
 PreventionPlanAttendants = Plan de prévention - Participants
 ActionsPreventionPlanRisk = Actions
 PreventionPlanDescription = Projet des plans de prévention
+PriorVisitDate = Date de l'inspection commune préalable
 AddPreventionPlanLine = Ajout du risque
 UpdatePreventionPlanLine = Mise à jour du risque
 DeletePreventionPlanLine = Suppression du risque

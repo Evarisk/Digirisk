@@ -144,8 +144,9 @@ if (empty($reshook))
 		$object->label         = $label;
 		$object->fk_project    = $conf->global->DIGIRISKDOLIBARR_PREVENTIONPLAN_PROJECT;
 
-		$date_start = dol_mktime(GETPOST('dateohour', 'int'), GETPOST('dateomin', 'int'), 0, GETPOST('dateomonth', 'int'), GETPOST('dateoday', 'int'), GETPOST('dateoyear', 'int'));
-		$date_end   = dol_mktime(GETPOST('dateehour', 'int'), GETPOST('dateemin', 'int'), 0, GETPOST('dateemonth', 'int'), GETPOST('dateeday', 'int'), GETPOST('dateeyear', 'int'));
+		$date_start       = dol_mktime(GETPOST('dateohour', 'int'), GETPOST('dateomin', 'int'), 0, GETPOST('dateomonth', 'int'), GETPOST('dateoday', 'int'), GETPOST('dateoyear', 'int'));
+		$date_end         = dol_mktime(GETPOST('dateehour', 'int'), GETPOST('dateemin', 'int'), 0, GETPOST('dateemonth', 'int'), GETPOST('dateeday', 'int'), GETPOST('dateeyear', 'int'));
+		$prior_visit_date = dol_mktime(GETPOST('dateihour', 'int'), GETPOST('dateimin', 'int'), 0, GETPOST('dateimonth', 'int'), GETPOST('dateiday', 'int'), GETPOST('dateiyear', 'int'));
 
 		$object->description = $description;
 		$object->date_start  = $date_start;
@@ -153,6 +154,7 @@ if (empty($reshook))
 
 		$object->prior_visit_bool   = $prior_visit_bool;
 		$object->prior_visit_text   = $prior_visit_text;
+		$object->prior_visit_date   = $prior_visit_date;
 		$object->cssct_intervention = $cssct_intervention;
 
 		$object->fk_user_creat = $user->id ? $user->id : 1;
@@ -252,6 +254,7 @@ if (empty($reshook))
 
 		$date_start = dol_mktime(GETPOST('dateohour', 'int'), GETPOST('dateomin', 'int'), 0, GETPOST('dateomonth', 'int'), GETPOST('dateoday', 'int'), GETPOST('dateoyear', 'int'));
 		$date_end = dol_mktime(GETPOST('dateehour', 'int'), GETPOST('dateemin', 'int'), 0, GETPOST('dateemonth', 'int'), GETPOST('dateeday', 'int'), GETPOST('dateeyear', 'int'));
+		$prior_visit_date = dol_mktime(GETPOST('dateihour', 'int'), GETPOST('dateimin', 'int'), 0, GETPOST('dateimonth', 'int'), GETPOST('dateiday', 'int'), GETPOST('dateiyear', 'int'));
 
 		$object->description   = $description;
 		$object->date_start    = $date_start;
@@ -259,6 +262,7 @@ if (empty($reshook))
 
 		$object->prior_visit_bool    = $prior_visit_bool;
 		$object->prior_visit_text    = $prior_visit_text;
+		$object->prior_visit_date    = $prior_visit_date;
 		$object->cssct_intervention  = $cssct_intervention;
 
 		$object->fk_user_creat = $user->id ? $user->id : 1;
@@ -726,6 +730,11 @@ if ($action == 'create')
 	print '<input type="checkbox" id="prior_visit_bool" name="prior_visit_bool">';
 	print '</td></tr>';
 
+	//Prior Visit -- Inspection commune préalable
+	print '<tr><td><label for="prior_visit_date">'.$langs->trans("PriorVisitDate").'</label></td><td>';
+	print $form->selectDate(dol_now('tzuser'), 'datei', 1, 1, 0, '', 1);
+	print '</td></tr>';
+
 	//Prior Visit Texte -- Note de la visite
 	print '<tr><td><label for="prior_visit_text">'.$langs->trans("PriorVisitText").'</label></td><td>';
 	$doleditor = new DolEditor('prior_visit_text', '', '', 90, 'dolibarr_notes', '', false, true, $conf->global->FCKEDITOR_ENABLE_SOCIETE, ROWS_3, '90%');
@@ -875,6 +884,11 @@ if (($id || $ref) && $action == 'edit')
 	$doleditor->Create();
 	print '</td></tr>';
 
+	//Start Date -- Date début
+	print '<tr class="oddeven"><td><label for="prior_visit_date">'.$langs->trans("PriorVisitDate").'</label></td><td>';
+	print $form->selectDate($object->date_start,'datei', 1, 1, 0, '', 1);
+	print '</td></tr>';
+
 	if (is_array($object_resources['PP_LABOUR_INSPECTOR']) && $object_resources['PP_LABOUR_INSPECTOR'] > 0) {
 		$labour_inspector_society  = array_shift($object_resources['PP_LABOUR_INSPECTOR']);
 	}
@@ -992,6 +1006,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit')))
 	unset($object->fields['date_start']);
 	unset($object->fields['date_end']);
 	unset($object->fields['fk_project']);
+	unset($object->fields['prior_visit_date']);
 
 	print '<tr><td class="titlefield">';
 	print $langs->trans("StartDate");
@@ -1005,6 +1020,13 @@ if ((empty($action) || ($action != 'create' && $action != 'edit')))
 	print '</td>';
 	print '<td>';
 	print dol_print_date($object->date_end, 'dayhoursec');
+	print '</td></tr>';
+
+	print '<tr><td class="titlefield">';
+	print $langs->trans("PriorVisitDate");
+	print '</td>';
+	print '<td>';
+	print dol_print_date($object->prior_visit_date, 'dayhoursec');
 	print '</td></tr>';
 
 	include DOL_DOCUMENT_ROOT.'/core/tpl/commonfields_view.tpl.php';
