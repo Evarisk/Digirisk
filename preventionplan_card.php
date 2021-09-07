@@ -1094,6 +1094,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit')))
 		// PREVENTIONPLAN LINES
 		if ($object->status < 3) {
 			print '<div class="div-table-responsive-no-min" style="overflow-x: unset !important">' . "\n";
+			print load_fiche_titre($langs->trans("PreventionPlanRiskList"), '', '');
 			print '<table id="tablelines" class="noborder noshadow" width="100%">';
 
 			global $forceall, $forcetoshowtitlelines;
@@ -1102,14 +1103,11 @@ if ((empty($action) || ($action != 'create' && $action != 'edit')))
 
 			// Define colspan for the button 'Add'
 			$colspan = 3; // Columns: total ht + col edit + col delete
-			//print $object->element;
 
 			// Lines
 			$preventionplanline = new PreventionPlanLine($db);
 			$preventionplanline->db = $db;
 			$preventionplanlines = $preventionplanline->fetchAll(GETPOST('id'));
-
-			//print load_fiche_titre($langs->trans("InterventionsList"), '', '');
 
 			print '<tr class="liste_titre nodrag nodrop">';
 			if (!empty($conf->global->MAIN_VIEW_LINE_NUMBER)) {

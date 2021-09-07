@@ -332,6 +332,7 @@ ConfirmValidatePreventionPlan = Êtes-vous sûr de vouloir valider le plan de pr
 ReOpenPreventionPlan = Ouvrir à nouveau le plan de prévention
 ConfirmReOpenPreventionPlan = Êtes-vous sûr de vouloir rouvrir le plan de prévention ? La réouverture permet la modification du plan de prévention et l'ajout de nouveaux participants mais <b>toutes les signatures du document seront perdues</b>.
 PreventionPlanMustBeValidated = Le plan de prévention doit être validé pour que les participants puissent signer
+PreventionPlanRiskList = Liste des risques du plan de prévention
 #
 # FirePermit - Permis de feu
 #
