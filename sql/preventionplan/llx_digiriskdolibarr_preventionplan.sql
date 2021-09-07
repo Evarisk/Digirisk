@@ -25,6 +25,7 @@ CREATE TABLE llx_digiriskdolibarr_preventionplan(
     date_start          datetime NOT NULL,
 	date_end            datetime,
 	prior_visit_bool    boolean,
+	prior_visit_date    datetime,
 	prior_visit_text    text,
 	cssct_intervention  boolean,
 	fk_project          integer,
