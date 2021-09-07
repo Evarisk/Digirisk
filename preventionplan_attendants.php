@@ -125,7 +125,7 @@ if ($action == 'addSignature') {
 
 	$signatory->fetch($signatoryID);
 	$signatory->signature = $request_body;
-	$signatory->signature_date = dol_now();
+	$signatory->signature_date = dol_now('tzuser');
 
 	if (!$error) {
 
@@ -181,6 +181,8 @@ if ($action == 'send') {
 
 	if (!$error) {
 		$result = $signatory->setPendingSignature($user, false);
+		$signatory->last_email_sent_date = dol_now('tzuser');
+		$signatory->update($user, true);
 
 //		$to       = 'nicolas.domenech34@laposte.net';
 //		$subject  = 'Testing sendmail.exe';
@@ -366,40 +368,11 @@ print '<div class="underbanner clearboth"></div>';
 
 print dol_get_fiche_end(); ?>
 
+<?php if ( $object->status == 1 ) : ?>
 <div class="wpeo-notice notice-warning">
 	<div class="notice-content">
 		<div class="notice-title"><?php echo $langs->trans('DisclaimerSignatureTitle') ?></div>
 		<div class="notice-subtitle"><?php echo $langs->trans("PreventionPlanMustBeValidated") ?></div>
-	</div>
-</div>
-
-<?php $signatories = $signatory->fetchSignatory("",$object->id);
-
-$arrayRole = array('PP_MAITRE_OEUVRE', 'PP_EXT_SOCIETY_RESPONSIBLE', 'PP_EXT_SOCIETY_INTERVENANTS');
-
-//if (!empty ($signatories) && $signatories > 0) {
-//	foreach ($signatories as $arrayRole) {
-//		foreach ($arrayRole as $signatory) {
-//			$signatoriesStatusArray[$signatory->role][] = $signatory->status;
-//			if ($signatory->status >= 5 ) {
-//				$active = 1;
-//			} else {
-//				$active = 0;
-//				break 2;
-//			}
-//		}
-//	}
-//} ?>
-
-<?php if ($active == 1 ) : ?>
-<div class="wpeo-notice notice-success">
-	<div class="notice-content">
-		<div class="notice-title"><?php echo $langs->trans('GenerateDocumentTitle') ?></div>
-		<div class="notice-subtitle">
-			<?php echo $langs->trans("GenerateDocument");
-			$url = dol_buildpath('/custom/digiriskdolibarr/preventionplan_card?id='.$object->id, 3);
-			print '<a href="'.$url.'">'.$url.'</a>'; ?>
-		</div>
 	</div>
 </div>
 <?php endif; ?>
@@ -477,7 +450,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	print '</td><td class="center">';
 	print $element->getLibStatut(5);
 	print '</td><td>';
-	print '';
+	print dol_print_date($element->last_email_sent_date, 'dayhour');
 	print '</td><td>';
 	print dol_print_date($element->signature_date, 'dayhour');
 	print '</td>';
@@ -535,8 +508,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	print '</td><td class="center">';
 	print $element->getLibStatut(5);
 	print '</td><td>';
-	print '';
-	//print dol_print_date($element->last_email_sent_date, 'dayhour');
+	print dol_print_date($element->last_email_sent_date, 'dayhour');
 	print '</td><td>';
 	print dol_print_date($element->signature_date, 'dayhour');
 	print '</td>';
@@ -595,8 +567,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 			print '</td><td class="center">';
 			print $element->getLibStatut(5);
 			print '</td><td class="center">';
-			print '';
-			//print dol_print_date($element->last_email_sent_date, 'dayhour');
+			print dol_print_date($element->last_email_sent_date, 'dayhour');
 			print '</td><td>';
 			print dol_print_date($element->signature_date, 'dayhour');
 			print '</td>';
