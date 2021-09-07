@@ -2587,6 +2587,56 @@ window.eoxiaJS.ticket.removeFile = function( event ) {
 };
 
 /**
+ * Initialise l'objet "preventionplan" ainsi que la méthode "init" obligatoire pour la bibliothèque EoxiaJS.
+ *
+ * @since   1.1.0
+ * @version 1.1.0
+ */
+window.eoxiaJS.preventionplan = {};
+
+/**
+ * La méthode appelée automatiquement par la bibliothèque EoxiaJS.
+ *
+ * @since   1.1.0
+ * @version 1.1.0
+ *
+ * @return {void}
+ */
+window.eoxiaJS.preventionplan.init = function() {
+    window.eoxiaJS.preventionplan.event();
+};
+
+/**
+ * La méthode contenant tous les évènements pour les preventionplans.
+ *
+ * @since   1.1.0
+ * @version 1.1.0
+ *
+ * @return {void}
+ */
+window.eoxiaJS.preventionplan.event = function() {
+    jQuery( document ).on( 'click', '#prior_visit_bool', window.eoxiaJS.preventionplan.showDateAndText );
+};
+
+window.eoxiaJS.preventionplan.showDateAndText = function() {
+    let dateField = $(this).closest('.preventionplan-table').find('.prior_visit_date_field')
+    let textField = $(this).closest('.preventionplan-table').find('.prior_visit_text_field')
+
+	if (dateField.hasClass('hidden')) {
+        dateField.attr('style', '')
+        textField.attr('style', '')
+        dateField.removeClass('hidden')
+        textField.removeClass('hidden')
+	} else {
+        dateField.attr('style', 'display:none')
+        textField.attr('style', 'display:none')
+        dateField.addClass('hidden')
+        textField.addClass('hidden')
+    }
+
+};
+
+/**
  * Initialise l'objet "slider" ainsi que la méthode "init" obligatoire pour la bibliothèque EoxiaJS.
  *
  * @since   1.0.0

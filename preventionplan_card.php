@@ -153,8 +153,12 @@ if (empty($reshook))
 		$object->date_end    = $date_end;
 
 		$object->prior_visit_bool   = $prior_visit_bool;
-		$object->prior_visit_text   = $prior_visit_text;
-		$object->prior_visit_date   = $prior_visit_date;
+
+		if ($prior_visit_bool) {
+			$object->prior_visit_text   = $prior_visit_text;
+			$object->prior_visit_date   = $prior_visit_date;
+		}
+
 		$object->cssct_intervention = $cssct_intervention;
 
 		$object->fk_user_creat = $user->id ? $user->id : 1;
@@ -261,8 +265,10 @@ if (empty($reshook))
 		$object->date_end      = $date_end;
 
 		$object->prior_visit_bool    = $prior_visit_bool;
-		$object->prior_visit_text    = $prior_visit_text;
-		$object->prior_visit_date    = $prior_visit_date;
+		if ($prior_visit_bool) {
+			$object->prior_visit_text   = $prior_visit_text;
+			$object->prior_visit_date   = $prior_visit_date;
+		}
 		$object->cssct_intervention  = $cssct_intervention;
 
 		$object->fk_user_creat = $user->id ? $user->id : 1;
@@ -671,7 +677,7 @@ if ($action == 'create')
 
 	if ($backtopageforcancel) print '<input type="hidden" name="backtopageforcancel" value="'.$backtopageforcancel.'">';
 
-	print '<table class="border centpercent tableforfieldcreate">'."\n";
+	print '<table class="border centpercent tableforfieldcreate preventionplan-table">'."\n";
 
 	$type = 'DIGIRISKDOLIBARR_'.strtoupper($object->element).'_ADDON';
 	$digirisk_addon = $conf->global->$type;
@@ -731,12 +737,12 @@ if ($action == 'create')
 	print '</td></tr>';
 
 	//Prior Visit -- Inspection commune préalable
-	print '<tr><td><label for="prior_visit_date">'.$langs->trans("PriorVisitDate").'</label></td><td>';
+	print '<tr class="prior_visit_date_field hidden" style="display:none"><td><label for="prior_visit_date">'.$langs->trans("PriorVisitDate").'</label></td><td>';
 	print $form->selectDate(dol_now('tzuser'), 'datei', 1, 1, 0, '', 1);
 	print '</td></tr>';
 
 	//Prior Visit Texte -- Note de la visite
-	print '<tr><td><label for="prior_visit_text">'.$langs->trans("PriorVisitText").'</label></td><td>';
+	print '<tr  class="prior_visit_text_field hidden" style="display:none"><td><label for="prior_visit_text">'.$langs->trans("PriorVisitText").'</label></td><td>';
 	$doleditor = new DolEditor('prior_visit_text', '', '', 90, 'dolibarr_notes', '', false, true, $conf->global->FCKEDITOR_ENABLE_SOCIETE, ROWS_3, '90%');
 	$doleditor->Create();
 	print '</td></tr>';
@@ -1007,6 +1013,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit')))
 	unset($object->fields['date_end']);
 	unset($object->fields['fk_project']);
 	unset($object->fields['prior_visit_date']);
+	unset($object->fields['prior_visit_text']);
 
 	print '<tr><td class="titlefield">';
 	print $langs->trans("StartDate");
@@ -1022,12 +1029,21 @@ if ((empty($action) || ($action != 'create' && $action != 'edit')))
 	print dol_print_date($object->date_end, 'dayhoursec');
 	print '</td></tr>';
 
-	print '<tr><td class="titlefield">';
-	print $langs->trans("PriorVisitDate");
-	print '</td>';
-	print '<td>';
-	print dol_print_date($object->prior_visit_date, 'dayhoursec');
-	print '</td></tr>';
+	if ($object->prior_visit_bool) {
+		print '<tr><td class="titlefield">';
+		print $langs->trans("PriorVisitDate");
+		print '</td>';
+		print '<td>';
+		print dol_print_date($object->prior_visit_date, 'dayhoursec');
+		print '</td></tr>';
+
+		print '<tr><td class="titlefield">';
+		print $langs->trans("PriorVisitText");
+		print '</td>';
+		print '<td>';
+		print $object->prior_visit_text;
+		print '</td></tr>';
+	}
 
 	include DOL_DOCUMENT_ROOT.'/core/tpl/commonfields_view.tpl.php';
 
