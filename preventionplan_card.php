@@ -1022,7 +1022,6 @@ if ((empty($action) || ($action != 'create' && $action != 'edit')))
 	unset($object->fields['entity']);
 	unset($object->fields['date_start']);
 	unset($object->fields['date_end']);
-	unset($object->fields['fk_project']);
 	unset($object->fields['prior_visit_date']);
 	unset($object->fields['prior_visit_text']);
 
