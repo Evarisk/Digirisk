@@ -341,10 +341,11 @@ AddPreventionPlanLine = Ajout du risque
 UpdatePreventionPlanLine = Mise à jour du risque
 DeletePreventionPlanLine = Suppression du risque
 PreventionPlanMessage = au plan de prévention
+ExtIntervenant = Intervenant extérieur
 ErrorNoEmailForLabourInspector = Erreur : l'Inspecteur du travail n'a pas d'email
 ErrorNoEmailForExtResponsible = Erreur : Le responsable de l'Entreprise Extérieure n'a pas d'email
 ErrorNoEmailForMaitreOeuvre = Erreur : Le responsable de l'Entreprise Utilisatrice n'a pas d'email
-
+ErrorNoEmailForExtIntervenant = Erreur : Le (ou les) intervenant(s) ne possède(nt) pas d'email
 #
 # FirePermit - Permis de feu
 #

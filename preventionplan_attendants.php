@@ -96,6 +96,14 @@ if ($action == 'addAttendant') {
 	$object->fetch($id);
 	$extintervenant_ids  = GETPOST('ext_intervenants');
 
+	if (!empty($extintervenant_ids) && $extintervenant_ids > 0) {
+		foreach ($extintervenant_ids as $extintervenant_id) {
+			$contact->fetch($extintervenant_id);
+			if (!dol_strlen($extintervenant_id->email)) {
+				setEventMessages($langs->trans('ErrorNoEmailForExtIntervenant', $langs->transnoentitiesnoconv('ExtIntervenant')), null, 'errors');
+			}
+		}
+	}
 	if (!$error) {
 		$result = $signatory->setSignatory($object->id,'socpeople', $extintervenant_ids, 'PP_EXT_SOCIETY_INTERVENANTS', 1);
 		if ($result > 0) {

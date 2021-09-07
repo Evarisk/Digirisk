@@ -190,7 +190,7 @@ if (empty($reshook))
 		} elseif (empty($extresponsible_id)) {
 			setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv('ExtSocietyResponsible')), null, 'errors');
 			$error++;
-		}  else {
+		} else {
 			$contact->fetch($extresponsible_id);
 			if (!dol_strlen($contact->email)) {
 				setEventMessages($langs->trans('ErrorNoEmailForExtResponsible', $langs->transnoentitiesnoconv('ExtSocietyResponsible')), null, 'errors');
@@ -211,7 +211,7 @@ if (empty($reshook))
 		} elseif (empty($labour_inspector_contact_id)) {
 			setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv('LabourInspector')), null, 'errors');
 			$error++;
-		}  else {
+		} else {
 			$contact->fetch($labour_inspector_contact_id);
 			if (!dol_strlen($contact->email)) {
 				setEventMessages($langs->trans('ErrorNoEmailForLabourInspector', $langs->transnoentitiesnoconv('LabourInspectorContact')), null, 'errors');
