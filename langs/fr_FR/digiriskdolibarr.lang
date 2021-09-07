@@ -47,6 +47,12 @@ DigiriskdolibarrAboutPage = Page à propos de Digirisk
 # DigiriskDolibarr
 #
 
+# Right - Droit
+LireDigirisk = Lire Digirisk
+ReadDigirisk = Lire Digirisk (read)
+ReadAdminPage = Accéder à la configuration du module Digirisk
+
+
 # Data - Donnée
 Create = Créer
 CreatedOn = Créé le

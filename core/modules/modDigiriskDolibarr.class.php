@@ -335,7 +335,7 @@ class modDigiriskdolibarr extends DolibarrModules
 
 		/* module PERMISSIONS */
 		$this->rights[$r][0] = $this->numero.$r;
-		$this->rights[$r][1] = $langs->trans('ReadDigirisk');
+		$this->rights[$r][1] = $langs->trans('LireDigirisk');
 		$this->rights[$r][4] = 'lire';
 		$this->rights[$r][5] = 1;
 		$r++;
@@ -537,16 +537,6 @@ class modDigiriskdolibarr extends DolibarrModules
 		$this->rights[$r][1] = $langs->trans('ReadAdminPage');
 		$this->rights[$r][4] = 'adminpage';
 		$this->rights[$r][5] = 'read';
-		$r++;
-		$this->rights[$r][0] = $this->numero.$r;
-		$this->rights[$r][1] = $langs->trans('CreateAdminPage');
-		$this->rights[$r][4] = 'adminpage';
-		$this->rights[$r][5] = 'write';
-		$r++;
-		$this->rights[$r][0] = $this->numero.$r;
-		$this->rights[$r][1] = $langs->trans('DeleteAdminPage');
-		$this->rights[$r][4] = 'adminpage';
-		$this->rights[$r][5] = 'delete';
 
 		// Main menu entries to add
 		$this->menu = array();
