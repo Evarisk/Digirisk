@@ -269,8 +269,11 @@ PREVENTIONPLAN_CREATEInDolibarr = Plan de prévention créé dans Dolibarr
 ActionsOnPreventionPlan = Événements liés au plan de prévention
 PreventionPlanGeneratedWithDolibarr = Plan de prévention généré avec Dolibarr
 PreventionPlanLineCreatedWithDolibarr = Ligne de Permis de Feu créée avec Dolibarr
+PreventionPlanModifyTrigger = Modification du plan de prévention
+PreventionPlanInprogressTrigger = Plan de prévention rouvert
 PreventionPlanPendingSignatureTrigger = Plan de prévention en attente de signature des participants
 PreventionPlanLockTrigger = Plan de prévention verrouiller - Prêt pour la génération du documuent
+PreventionPlanArchivedTrigger = Plan de prévention archivé
 
 # Mod Numbering - Modèle de numérotation
 DigiriskPreventionPlanNumberingModule = Modèle de numérotation des plans de prévention de Digirisk
@@ -778,6 +781,7 @@ TaskManagementNotActivated = Veuillez activer la gestion des tâches dans Config
 DigiriskSignatureSignedTrigger = Signature du participant effectuée
 DigiriskSignaturePendingSignatureTrigger = En attente de la signature du participant
 DigiriskSignatureAbsentTrigger = Participant absent
+DigiriskSignatureDeletedTrigger = Participant supprimé
 
 
 # Data - Donnée

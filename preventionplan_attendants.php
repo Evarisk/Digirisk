@@ -141,9 +141,8 @@ if ($action == 'addSignature') {
 		$result = $signatory->update($user, false);
 
 		if ($result > 0) {
-			$signatory->setSigned($user);
-			//$object->call_trigger('SIGNATURE_GENERATE', $user);
 			// Creation signature OK
+			$signatory->setSigned($user, false);
 			$urltogo = str_replace('__ID__', $result, $backtopage);
 			$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
 			header("Location: " . $urltogo);
@@ -330,7 +329,7 @@ if ($action == 'deleteAttendant') {
 	$signatory->fetch($signatoryToDeleteID);
 
 	if (!$error) {
-		$result = $signatory->setDeleted($user);
+		$result = $signatory->setDeleted($user, false);
 		if ($result > 0) {
 			setEventMessages($langs->trans('DeleteAttendantMessage').' '.$signatory->lastname,array());
 			// Deletion attendant OK

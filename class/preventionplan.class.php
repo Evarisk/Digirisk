@@ -64,8 +64,7 @@ class PreventionPlan extends CommonObject
 	const STATUS_IN_PROGRESS       = 1;
 	const STATUS_PENDING_SIGNATURE = 2;
 	const STATUS_LOCKED            = 3;
-	const STATUS_UNLOCKED          = 4;
-	const STATUS_ARCHIVED          = 5;
+	const STATUS_ARCHIVED          = 4;
 
 	/**
 	 * @var array  Array with all fields and their property. Do not use it as a static var. It may be modified by constructor.
@@ -487,18 +486,6 @@ class PreventionPlan extends CommonObject
 	}
 
 	/**
-	 *	Set unlock status
-	 *
-	 *	@param	User	$user			Object user that modify
-	 *  @param	int		$notrigger		1=Does not execute triggers, 0=Execute triggers
-	 *	@return	int						<0 if KO, >0 if OK
-	 */
-	public function setUnlocked($user, $notrigger = 0)
-	{
-		return $this->setStatusCommon($user, self::STATUS_UNLOCKED, $notrigger, 'PREVENTIONPLAN_UNLOCKED');
-	}
-
-	/**
 	 *	Set close status
 	 *
 	 *	@param	User	$user			Object user that modify
@@ -541,13 +528,11 @@ class PreventionPlan extends CommonObject
 			$this->labelStatus[self::STATUS_IN_PROGRESS] = $langs->trans('InProgress');
 			$this->labelStatus[self::STATUS_PENDING_SIGNATURE] = $langs->trans('ValidatePendingSignature');
 			$this->labelStatus[self::STATUS_LOCKED] = $langs->trans('Locked');
-			$this->labelStatus[self::STATUS_UNLOCKED] = $langs->trans('Unlocked');
 			$this->labelStatus[self::STATUS_ARCHIVED] = $langs->trans('Archived');
 		}
 
 		$statusType = 'status'.$status;
 		if ($status == self::STATUS_PENDING_SIGNATURE) $statusType = 'status3';
-		if ($status == self::STATUS_UNLOCKED) $statusType = 'status4';
 		if ($status == self::STATUS_LOCKED) $statusType = 'status8';
 		if ($status == self::STATUS_ARCHIVED) $statusType = 'status8';
 
