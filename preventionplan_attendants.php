@@ -99,6 +99,7 @@ if ($action == 'addAttendant') {
 	if (!$error) {
 		$result = $signatory->setSignatory($object->id,'socpeople', $extintervenant_ids, 'PP_EXT_SOCIETY_INTERVENANTS', 1);
 		if ($result > 0) {
+			setEventMessages($langs->trans('AddAttendantMessage').' '.$signatory->lastname,array());
 				// Creation attendant OK
 			$urltogo = str_replace('__ID__', $result, $backtopage);
 			$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
@@ -323,6 +324,7 @@ if ($action == 'deleteAttendant') {
 	if (!$error) {
 		$result = $signatory->setDeleted($user);
 		if ($result > 0) {
+			setEventMessages($langs->trans('DeleteAttendantMessage').' '.$signatory->lastname,array());
 			// Deletion attendant OK
 			$urltogo = str_replace('__ID__', $result, $backtopage);
 			$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
@@ -447,8 +449,8 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	print $langs->trans("MaitreOeuvre");
 	print '</td><td class="center">';
 	if ($object->status == 2) {
-		$url = dol_buildpath('/custom/digiriskdolibarr/public/signature/add_signature.php?track_id='.$element->signature_url, 3);
-		print '<a href='.$url.' target="_blank"><i class="fas fa-external-link-alt"></i></a>';
+		$signatureUrl = dol_buildpath('/custom/digiriskdolibarr/public/signature/add_signature.php?track_id='.$element->signature_url, 3);
+		print '<a href='.$signatureUrl.' target="_blank"><i class="fas fa-external-link-alt"></i></a>';
 	} else {
 		print '-';
 	}
@@ -510,8 +512,8 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	print $langs->trans("ExtSocietyResponsible");
 	print '</td><td class="center">';
 	if ($object->status == 2) {
-		$url = dol_buildpath('/custom/digiriskdolibarr/public/signature/add_signature.php?track_id='.$element->signature_url, 3);
-		print '<a href='.$url.' target="_blank"><i class="fas fa-external-link-alt"></i></a>';
+		$signatureUrl = dol_buildpath('/custom/digiriskdolibarr/public/signature/add_signature.php?track_id='.$element->signature_url, 3);
+		print '<a href='.$signatureUrl.' target="_blank"><i class="fas fa-external-link-alt"></i></a>';
 	} else {
 		print '-';
 	}
@@ -574,8 +576,8 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 			print $langs->trans("ExtSocietyIntervenant") . ' ' . $j;
 			print '</td><td class="center">';
 			if ($object->status == 2) {
-				$url = dol_buildpath('/custom/digiriskdolibarr/public/signature/add_signature.php?track_id='.$element->signature_url, 3);
-				print '<a href='.$url.' target="_blank"><i class="fas fa-external-link-alt"></i></a>';
+				$signatureUrl = dol_buildpath('/custom/digiriskdolibarr/public/signature/add_signature.php?track_id='.$element->signature_url, 3);
+				print '<a href='.$signatureUrl.' target="_blank"><i class="fas fa-external-link-alt"></i></a>';
 			} else {
 				print '-';
 			}

@@ -336,6 +336,11 @@ PreventionPlanRiskList = Liste des risques du plan de prévention
 PreventionPlanAttendants = Plan de prévention - Participants
 ActionsPreventionPlanRisk = Actions
 PreventionPlanDescription = Projet des plans de prévention
+AddPreventionPlanLine = Ajout du risque
+UpdatePreventionPlanLine = Mise à jour du risque
+DeletePreventionPlanLine = Suppression du risque
+PreventionPlanMessage = au plan de prévention
+
 
 
 #
@@ -803,6 +808,8 @@ NewIntervenants = Ajouter un nouveau intervenant
 SignatureLink = Lien signature
 SendMailDate = Date d'envoi d'email
 DeleteAttendant = Supprimer l'intervenant
+AddAttendantMessage = Ajout de l'intervenant :
+DeleteAttendantMessage = Suppression de l'intervenant :
 
 #
 # Ticket - Interface publique ticket

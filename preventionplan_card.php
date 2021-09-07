@@ -364,6 +364,7 @@ if (empty($reshook))
 			$result = $objectline->insert(1);
 
 			if ($result > 0) {
+				setEventMessages($langs->trans('AddPreventionPlanLine').' '.$objectline->ref.' '.$langs->trans('PreventionPlanMessage'), array());
 				$objectline->call_trigger('PREVENTIONPLANDET_CREATE', $user);
 
 				$urltogo = str_replace('__ID__', $result, $backtopage);
@@ -409,7 +410,7 @@ if (empty($reshook))
 			$result = $objectline->update(1);
 
 			if ($result > 0) {
-
+				setEventMessages($langs->trans('UpdatePreventionPlanLine').' '.$objectline->ref.' '.$langs->trans('PreventionPlanMessage'), array());
 				// Creation prevention plan OK
 				$urltogo = str_replace('__ID__', $result, $backtopage);
 				$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $parent_id, $urltogo); // New method to autoselect project after a New on another form object creation
@@ -427,19 +428,19 @@ if (empty($reshook))
 
 	// Action to delete line
 	if ($action == 'deleteline' && $permissiontodelete) {
-
 		$objectline = new PreventionPlanLine($db);
-		$result = $objectline->fetch($lineid);
+		$objectline->fetch($lineid);
+		$result = $objectline->delete();
 
 		if ($result > 0) {
-			$objectline->delete();
-			// Creation prevention plan OK
+			// Delete prevention plan OK
+			setEventMessages($langs->trans('DeletePreventionPlanLine').' '.$objectline->ref.' '.$langs->trans('PreventionPlanMessage'), array());
 			$urltogo = str_replace('__ID__', $result, $backtopage);
 			$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $parent_id, $urltogo); // New method to autoselect project after a New on another form object creation
 			header("Location: " . $urltogo);
 			exit;
 		} else {
-			// Creation prevention plan KO
+			// Delete prevention plan KO
 			if (!empty($object->errors)) setEventMessages(null, $object->errors, 'errors');
 			else  setEventMessages($object->error, null, 'errors');
 		}
