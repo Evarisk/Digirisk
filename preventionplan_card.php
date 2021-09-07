@@ -199,7 +199,7 @@ if (empty($reshook))
 
 			if ($result > 0) {
 
-				$object->setInProgress($user);
+				$object->setInProgress($user, true);
 
 				$digiriskresources->digirisk_dolibarr_set_resources($db, $user->id, 'PP_EXT_SOCIETY', 'societe', array($extsociety_id), $conf->entity, 'preventionplan', $object->id, 0);
 				$digiriskresources->digirisk_dolibarr_set_resources($db, $user->id, 'PP_LABOUR_INSPECTOR', 'societe', array($labour_inspector_id), $conf->entity, 'preventionplan', $object->id, 0);
@@ -331,11 +331,6 @@ if (empty($reshook))
 		}
 	}
 
-	// Action to delete record
-	if ($action == 'delete' && $permissiontoadd) {
-
-	}
-
 	// Action to add line
 	if ($action == 'addLine' && $permissiontoadd) {
 
@@ -365,7 +360,7 @@ if (empty($reshook))
 		}
 
 		if (!$error) {
-			$result = $objectline->insert(1);
+			$result = $objectline->insert(0);
 
 			if ($result > 0) {
 				setEventMessages($langs->trans('AddPreventionPlanLine').' '.$objectline->ref.' '.$langs->trans('PreventionPlanMessage'), array());
@@ -411,7 +406,7 @@ if (empty($reshook))
 		}
 
 		if (!$error) {
-			$result = $objectline->update(1);
+			$result = $objectline->update($user, true);
 
 			if ($result > 0) {
 				setEventMessages($langs->trans('UpdatePreventionPlanLine').' '.$objectline->ref.' '.$langs->trans('PreventionPlanMessage'), array());
@@ -511,7 +506,7 @@ if (empty($reshook))
 		$object->fetch($id);
 
 		if (!$error) {
-			$result = $object->setInProgress($user);
+			$result = $object->setInProgress($user, false);
 			if ($result > 0) {
 				// Creation signature OK
 				$urltogo = str_replace('__ID__', $result, $backtopage);
@@ -534,7 +529,7 @@ if (empty($reshook))
 		$object->fetch($id);
 
 		if (!$error) {
-			$result = $object->setPendingSignature($user);
+			$result = $object->setPendingSignature($user, false);
 			if ($result > 0) {
 				// Creation signature OK
 				$urltogo = str_replace('__ID__', $result, $backtopage);
@@ -557,30 +552,7 @@ if (empty($reshook))
 		$object->fetch($id);
 
 		if (!$error) {
-			$result = $object->setLocked($user);
-			if ($result > 0) {
-				// Creation signature OK
-				$urltogo = str_replace('__ID__', $result, $backtopage);
-				$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
-				header("Location: " . $urltogo);
-				exit;
-			}
-			else
-			{
-				// Creation signature KO
-				if (!empty($object->errors)) setEventMessages(null, $object->errors, 'errors');
-				else  setEventMessages($object->error, null, 'errors');
-			}
-		}
-	}
-
-	// Action to set status STATUS_UNLOCK
-	if ($action == 'setUnlocked') {
-
-		$object->fetch($id);
-
-		if (!$error) {
-			$result = $object->setUnlocked($user, false);
+			$result = $object->setLocked($user, false);
 			if ($result > 0) {
 				// Creation signature OK
 				$urltogo = str_replace('__ID__', $result, $backtopage);
@@ -603,7 +575,7 @@ if (empty($reshook))
 		$object->fetch($id);
 
 		if (!$error) {
-			$result = $object->setArchive($user, false);
+			$result = $object->setArchived($user, false);
 			if ($result > 0) {
 				// Creation signature OK
 				$urltogo = str_replace('__ID__', $result, $backtopage);
