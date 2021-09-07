@@ -364,21 +364,6 @@ function digiriskshowdocuments($modulepart, $modulesubdir, $filedir, $urlsource,
 			$out .= '<div class="float">'.$langs->trans("Files").'</div>';
 		}
 
-		// Language code (if multilang)
-		if (($allowgenifempty || (is_array($modellist) && count($modellist) > 0)) && $conf->global->MAIN_MULTILANGS && !$forcenomultilang && (!empty($modellist) || $showempty))
-		{
-			include_once DOL_DOCUMENT_ROOT.'/core/class/html.formadmin.class.php';
-			$formadmin = new FormAdmin($this->db);
-			$defaultlang = $codelang ? $codelang : $langs->getDefaultLang();
-			$morecss = 'maxwidth150';
-			if ($conf->browser->layout == 'phone') $morecss = 'maxwidth100';
-			$out .= $formadmin->select_language($defaultlang, 'lang_id', 0, null, 0, 0, 0, $morecss);
-		}
-		else
-		{
-			$out .= '&nbsp;';
-		}
-
 		// Button
 		if ($active) {
 			$genbutton = '<input class="button buttongen" id="'.$forname.'_generatebutton" name="'.$forname.'_generatebutton"';

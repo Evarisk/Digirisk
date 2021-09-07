@@ -1292,8 +1292,8 @@ if ((empty($action) || ($action != 'create' && $action != 'edit')))
 					<input class="input-hidden-danger" type="hidden" name="risk_category_id" value="undefined"/>
 					<div class="dropdown-toggle dropdown-add-button button-cotation">
 						<span class="wpeo-button button-square-50 button-grey"><i
-								class="fas fa-exclamation-triangle button-icon"></i><i
-								class="fas fa-plus-circle button-add"></i></span>
+							class="fas fa-exclamation-triangle button-icon"></i><i
+							class="fas fa-plus-circle button-add"></i></span>
 						<img class="danger-category-pic wpeo-tooltip-event hidden" src="" aria-label=""/>
 					</div>
 					<ul class="dropdown-content wpeo-gridlayout grid-5 grid-gap-0">
@@ -1351,28 +1351,8 @@ if ((empty($action) || ($action != 'create' && $action != 'edit')))
 			$defaultmodel = $conf->global->DIGIRISKDOLIBARR_PREVENTIONPLANDOCUMENT_DEFAULT_MODEL;
 			$title = $langs->trans('PreventionPlanDocument');
 
-			$signatories = $signatory->fetchSignatory("",$object->id);
-
-			$arrayRole = array( 'PP_MAITRE_OEUVRE', 'PP_EXT_SOCIETY_RESPONSIBLE', 'PP_EXT_SOCIETY_INTERVENANTS');
-
-//			if (!empty ($signatories) && $signatories > 0) {
-////				foreach ($signatories as $arrayRole) {
-////					foreach ($arrayRole as $signatory) {
-////						$signatoriesStatusArray[$signatory->role][] = $signatory->status;
-////						if ($signatory->status >= 5 ) {
-////							$active = 1;
-////						} else {
-////							$active = 0;
-////							break 2;
-////						}
-////					}
-////				}
-////			}
-
-				print digiriskshowdocuments($modulepart, $dir_files, $filedir, $urlsource, $permissiontoadd, $permissiontodelete, $defaultmodel, 1, 0, 28, 0, '', $title, '', $langs->defaultlang, '', $preventionplandocument, 0, '', $object->status == 3, $langs->trans('PreventionPlanMustBeLocked') );
-
+			print digiriskshowdocuments($modulepart, $dir_files, $filedir, $urlsource, $permissiontoadd, $permissiontodelete, $defaultmodel, 1, 0, 28, 0, '', $title, '', $langs->defaultlang, '', $preventionplandocument, 0, '', $object->status == 3, $langs->trans('PreventionPlanMustBeLocked') );
 		}
-
 
 		print '</div><div>';
 
