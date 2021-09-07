@@ -750,7 +750,7 @@ class PreventionPlan extends CommonObject
 
 		if (!empty($signatories) && $signatories > 0) {
 			foreach ($signatories as $signatory) {
-				if (dol_strlen($signatory->signature)) {
+				if ($signatory->status == 5 || $signatory->status == 7) {
 					continue;
 				} else {
 					return 0;
