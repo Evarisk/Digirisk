@@ -798,6 +798,7 @@ Role = Rôle
 NewIntervenants = Ajouter un nouveau intervenant
 SignatureLink = Lien signature
 SendMailDate = Date d'envoi d'email
+DeleteAttendant = Supprimer l'intervenant
 
 #
 # Ticket - Interface publique ticket
