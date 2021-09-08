@@ -188,106 +188,36 @@ if ($action == 'send') {
 	$signatory->fetch($signatoryID);
 
 	if (!$error) {
-		$result = $signatory->setPendingSignature($user, false);
-		setEventMessages($langs->trans('SendEmailAt').' '.$signatory->email,array());
 		$signatory->last_email_sent_date = dol_now('tzuser');
-		$signatory->update($user, true);
+		$result = $signatory->update($user, true);
 
-//		$to       = 'nicolas.domenech34@laposte.net';
-//		$subject  = 'Testing sendmail.exe';
-//		$message  = 'Hi, you just received an email using sendmail!';
-//		$headers  = 'From: email.test1254@gmail.com' . "\r\n" .
-//			'MIME-Version: 1.0' . "\r\n" .
-//			'Content-type: text/html; charset=utf-8';
-//		if(mail($to, $subject, $message, $headers))
-//			echo "Email sent";
-//		else
-//			echo "Email sending failed";
 		if ($result > 0) {
-			// Actions to send emails
 			$langs->load('mails');
-
-			$triggersendname = 'DIGIRISkDOLIBARR_SIGNATURE_SENTBYMAIL';
-			$trackid = 'PreventionPlanSignature'.$element->id;
-			$url = dol_buildpath('/custom/digiriskdolibarr/public/signature/add_signature.php?track_id='.$signatory->signature_url, 3);
-			$subject = ''; $actionmsg = ''; $actionmsg2 = '';
+			//$trackid = 'PreventionPlanSignature'.$element->id;
 			$sendto = $signatory->email;
-			$sendtoid = array();
 
-			if (dol_strlen($sendto))
-			{
+			if (dol_strlen($sendto) && (!empty($conf->global->DIGIRISKDOLIBARR_SENDMAIL_SIGNATURE))) {
 				require_once DOL_DOCUMENT_ROOT.'/core/class/CMailFile.class.php';
 
-				//$from = dol_string_nospecial($conf->global->MAIN_INFO_SOCIETE_NOM, ' ', array(",")).' <'.$conf->global->MAIN_INFO_SOCIETE_MAIL.'>';
-				$from = "email.test1254@gmail.com";
-				$message = $langs->trans('SignatureEmailMessage');
-				$message .= $url;
-				$subject = $langs->trans('SignatureEmailSubject');
+				$from = $conf->global->DIGIRISKDOLIBARR_SENDMAIL_SIGNATURE;
+				$url = dol_buildpath('/custom/digiriskdolibarr/public/signature/add_signature.php?track_id='.$signatory->signature_url, 3);
 
-				$actionmsg2 = $langs->transnoentities('MailSentBy').' '.CMailFile::getValidAddress($from, 4, 0, 1).' '.$langs->transnoentities('at').' '.CMailFile::getValidAddress($sendto, 4, 0, 1);
-				if ($message)
-				{
-					$actionmsg = $langs->transnoentities('MailFrom').': '.dol_escape_htmltag($from);
-					$actionmsg = dol_concatdesc($actionmsg, $langs->transnoentities('MailTo').': '.dol_escape_htmltag($sendto));
-					$actionmsg = dol_concatdesc($actionmsg, $langs->transnoentities('MailTopic').": ".$subject);
-					$actionmsg = dol_concatdesc($actionmsg, $langs->transnoentities('TextUsedInTheMessageBody').":");
-					$actionmsg = dol_concatdesc($actionmsg, $message);
-				}
+				$message = $langs->trans('SignatureEmailMessage') . ' ' . $url;
+				$subject = $langs->trans('SignatureEmailSubject') . ' ' . $object->ref;
 
 				// Create form object
 				// Send mail (substitutionarray must be done just before this)
-				if (empty($sendcontext)) $sendcontext = 'mail';
-				$mailfile = new CMailFile($subject, $sendto, $from, $message, array(), array(), array(), "", "", 0, -1, '', '', $trackid, '', $sendcontext);
+				$mailfile = new CMailFile($subject, $sendto, $from, $message, array(), array(), array(), "", "", 0, -1, '', '', '', '', 'mail');
 
-				if ($mailfile->error)
-				{
+				if ($mailfile->error) {
 					setEventMessages($mailfile->error, $mailfile->errors, 'errors');
-					$action = 'presend';
 				} else {
 					$result = $mailfile->sendfile();
-					if ($result)
-					{
-						// Initialisation of datas of object to call trigger
-						if (is_object($object))
-						{
-							if (empty($actiontypecode)) $actiontypecode = 'AC_OTH_AUTO'; // Event insert into agenda automatically
-
-							$object->socid          = $sendtosocid; // To link to a company
-							$object->sendtoid       = $sendtoid; // To link to contact-addresses. This is an array.
-							$object->actiontypecode = $actiontypecode; // Type of event ('AC_OTH', 'AC_OTH_AUTO', 'AC_XXX'...)
-							$object->actionmsg      = $actionmsg; // Long text (@todo Replace this with $message, we already have details of email in dedicated properties)
-							$object->actionmsg2     = $actionmsg2; // Short text ($langs->transnoentities('MailSentBy')...);
-							$object->trackid        = $trackid;
-							$object->fk_element     = $object->id;
-							$object->elementtype    = $object->element;
-							$object->email_from     = $from;
-							$object->email_subject  = $subject;
-							$object->email_to       = $sendto;
-							$object->email_subject  = $subject;
-							$object->email_msgid    = $mailfile->msgid;
-
-							// Call of triggers (you should have set $triggersendname to execute trigger)
-							if (!empty($triggersendname))
-							{
-								// Call trigger
-								$result = $object->call_trigger($triggersendname, $user);
-								if ($result < 0) $error++;
-								// End call triggers
-								if ($error) {
-									setEventMessages($object->error, $object->errors, 'errors');
-								}
-							}
-							// End call of triggers
-						}
-
-						// Redirect here
+					if ($result) {
+						$signatory->setPendingSignature($user, false);
+						setEventMessages($langs->trans('SendEmailAt').' '.$signatory->email,array());
 						// This avoid sending mail twice if going out and then back to page
-						$mesg = $langs->trans('MailSuccessfulySent', $mailfile->getValidAddress($from, 2), $mailfile->getValidAddress($sendto, 2));
-						setEventMessages($mesg, null, 'mesgs');
-
-						$moreparam = '';
-						if (isset($paramname2) || isset($paramval2)) $moreparam .= '&'.($paramname2 ? $paramname2 : 'mid').'='.$paramval2;
-						header('Location: '.$_SERVER["PHP_SELF"].'?'.($paramname ? $paramname : 'id').'='.(is_object($object) ? $object->id : '').$moreparam);
+						header('Location: '.$_SERVER["PHP_SELF"].'?id='.$object->id);
 						exit;
 					} else {
 						$langs->load("other");
@@ -297,23 +227,15 @@ if ($action == 'send') {
 							$mesg .= '<br>'.$mailfile->error;
 						} else {
 							$mesg .= $langs->transnoentities('ErrorFailedToSendMail', dol_escape_htmltag($from), dol_escape_htmltag($sendto));
-							if (!empty($conf->global->MAIN_DISABLE_ALL_MAILS)) {
-								$mesg .= '<br>Feature is disabled by option MAIN_DISABLE_ALL_MAILS';
-							} else {
-								$mesg .= '<br>Unkown Error, please refers to your administrator';
-							}
 						}
 						$mesg .= '</div>';
-
 						setEventMessages($mesg, null, 'warnings');
-						$action = 'presend';
 					}
 				}
 			} else {
 				$langs->load("errors");
 				setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv("MailTo")), null, 'warnings');
 				dol_syslog('Try to send email with no recipient defined', LOG_WARNING);
-				$action = 'presend';
 			}
 		} else {
 			// Mail sent KO

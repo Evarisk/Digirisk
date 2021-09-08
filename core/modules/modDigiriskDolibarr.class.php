@@ -284,6 +284,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			// CONST SIGNATURE
 			210 => array('DIGIRISKDOLIBARR_SIGNATURE_ENABLE_PUBLIC_INTERFACE','integer', 1,'', $conf->entity),
 			211 => array('DIGIRISKDOLIBARR_SIGNATURE_SHOW_COMPANY_LOGO','integer', 1,'', $conf->entity),
+			212 => array('DIGIRISKDOLIBARR_SENDMAIL_SIGNATURE','chaine', 1,'', $conf->entity),
 
 		);
 

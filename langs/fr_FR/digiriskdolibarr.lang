@@ -360,6 +360,9 @@ ErrorNoEmailForLabourInspector = Erreur : l'Inspecteur du travail n'a pas d'emai
 ErrorNoEmailForExtResponsible = Erreur : Le responsable de l'Entreprise Extérieure n'a pas d'email
 ErrorNoEmailForMaitreOeuvre = Erreur : Le responsable de l'Entreprise Utilisatrice n'a pas d'email
 ErrorNoEmailForExtIntervenant = Erreur : Le (ou les) intervenant(s) ne possède(nt) pas d'email
+SignatureEmailSubject = Signature du plan de prevention
+SignatureEmailMessage = Bonjour, <br> Veuillez trouver ci-joint le lien de signature du plan de prévention.<br>
+SendMailSignature = Email émetteur utilisé pour envoyer les liens de signature
 
 
 
@@ -791,7 +794,7 @@ TaskManagementNotActivated = Veuillez activer la gestion des tâches dans Config
 
 # Trigger - Déclencheur
 DigiriskSignatureSignedTrigger = Signature du participant effectuée
-DigiriskSignaturePendingSignatureTrigger = En attente de la signature du participant
+DigiriskSignaturePendingSignatureTrigger = Email envoyé, en attente de la signature du participant
 DigiriskSignatureAbsentTrigger = Participant absent
 DigiriskSignatureDeletedTrigger = Participant supprimé
 
