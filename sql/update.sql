@@ -1,0 +1,9 @@
+UPDATE llx_c_action_trigger SET elementtype = 'informationssharing@digiriskdolibarr'    WHERE elementtype = 'informationssharing';
+UPDATE llx_c_action_trigger SET elementtype = 'legaldisplay@digiriskdolibarr'           WHERE elementtype = 'legaldisplay';
+UPDATE llx_c_action_trigger SET elementtype = 'preventionplandocument@digiriskdolibarr' WHERE elementtype = 'preventionplandocument';
+UPDATE llx_c_action_trigger SET elementtype = 'firepermitdocument@digiriskdolibarr'     WHERE elementtype = 'firepermitdocument';
+UPDATE llx_c_action_trigger SET elementtype = 'groupmentdocument@digiriskdolibarr'      WHERE elementtype = 'groupmentdocument';
+UPDATE llx_c_action_trigger SET elementtype = 'workunitdocument@digiriskdolibarr'       WHERE elementtype = 'workunitdocument';
+UPDATE llx_c_action_trigger SET elementtype = 'listingrisksphoto@digiriskdolibarr'      WHERE elementtype = 'listingrisksphoto';
+UPDATE llx_c_action_trigger SET elementtype = 'listingrisksaction@digiriskdolibarr'     WHERE elementtype = 'listingrisksaction';
+UPDATE llx_c_action_trigger SET elementtype = 'riskassessmentdocument@digiriskdolibarr' WHERE elementtype = 'riskassessmentdocument';
