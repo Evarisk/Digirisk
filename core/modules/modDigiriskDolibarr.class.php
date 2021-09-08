@@ -790,7 +790,10 @@ class modDigiriskdolibarr extends DolibarrModules
 		include_once DOL_DOCUMENT_ROOT.'/core/class/extrafields.class.php';
 		$extra_fields = new ExtraFields( $this->db );
 
-		$extra_fields->addExtraField( 'fk_risk', $langs->trans("fk_risk"), 'int', 1020, 10, 'projet_task', 0, 0, '', '', '', '', 1);
+		$extra_fields->addExtraField( 'fk_risk', $langs->trans("fk_risk"), 'sellist', 1020, '', 'projet_task', 0, 0, '', 'a:1:{s:7:"options";a:1:{s:25:"digiriskdolibarr_risk:ref";N;}}', '', '', 1);
+		if ($conf->global->MAIN_EXTRAFIELDS_USE_SELECT2 == 0) {
+			dolibarr_set_const($this->db, 'MAIN_EXTRAFIELDS_USE_SELECT2', 1, 'integer', 0, '', $conf->entity);
+		}
 
 		return $this->_init($sql, $options);
 
