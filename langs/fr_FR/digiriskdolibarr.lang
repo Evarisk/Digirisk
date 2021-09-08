@@ -278,7 +278,7 @@ PreventionPlanLineCreatedWithDolibarr = Ligne de Permis de Feu créée avec Doli
 PreventionPlanModifyTrigger = Modification du plan de prévention
 PreventionPlanInprogressTrigger = Plan de prévention rouvert
 PreventionPlanPendingSignatureTrigger = Plan de prévention en attente de signature des participants
-PreventionPlanLockTrigger = Plan de prévention verrouiller - Prêt pour la génération du documuent
+PreventionPlanLockTrigger = Plan de prévention verrouillé - Prêt pour la génération du documuent
 PreventionPlanArchivedTrigger = Plan de prévention archivé
 
 # Mod Numbering - Modèle de numérotation
