@@ -862,7 +862,8 @@ CloseModal = Fermer
 AT = au
 
 ModalAddPhoto = Ajout Photo
-SendEmailAt = Envoi de l'email à 
+SendEmailAt = Envoi de l'email à
+StatusDigirisk = Statut
 
 
 

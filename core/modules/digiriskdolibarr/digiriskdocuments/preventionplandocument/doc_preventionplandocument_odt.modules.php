@@ -453,7 +453,7 @@ class doc_preventionplandocument_odt extends ModeleODTPreventionPlanDocument
 							$tmparray['lastname'] = $line->lastname;
 							$tmparray['phone']    = $line->phone;
 							$tmparray['mail']     = $line->mail;
-							$tmparray['status']   = $langs->trans("Status") . ' : ' . $line->getLibStatut(5);
+							$tmparray['status']   = $langs->trans("StatusDigirisk") . ' : ' . $line->getLibStatut(1);
 
 							foreach ($tmparray as $key => $val) {
 								try {
