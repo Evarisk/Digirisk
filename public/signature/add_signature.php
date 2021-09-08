@@ -45,13 +45,12 @@ if (!$res && file_exists("../../../main.inc.php")) $res = @include "../../../mai
 if (!$res && file_exists("../../../../main.inc.php")) $res = @include "../../../../main.inc.php";
 if (!$res) die("Include of main fails");
 
-require_once DOL_DOCUMENT_ROOT.'/ticket/class/actions_ticket.class.php';
-require_once DOL_DOCUMENT_ROOT.'/core/class/html.formticket.class.php';
-require_once DOL_DOCUMENT_ROOT.'/core/lib/ticket.lib.php';
+require_once DOL_DOCUMENT_ROOT.'/core/class/html.form.class.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/security.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/company.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/payments.lib.php';
 require_once '../../class/preventionplan.class.php';
+require_once '../../class/digiriskdocuments/preventionplandocument.class.php';
 require_once '../../lib/digiriskdolibarr_function.lib.php';
 
 // Load translation files required by the page
@@ -60,12 +59,18 @@ $langs->loadLangs(array("digiriskdolibarr@digiriskdolibarr", "other", "errors"))
 // Get parameters
 $track_id = GETPOST('track_id', 'alpha');
 $action = GETPOST('action', 'aZ09');
+$url = dirname($_SERVER['PHP_SELF']) . '/signature_success.php';
 
 // Initialize technical objects
-$signatory = new PreventionPlanSignature($db);
 $user      = new User($db);
-$signatory->fetch('',''," AND signature_url ="."'".$track_id."'");
+$object    = new PreventionPlan($db);
+$signatory = new PreventionPlanSignature($db);
+$preventionplandocument = new PreventionPlanDocument($db);
 
+$signatory->fetch('',''," AND signature_url ="."'".$track_id."'");
+$object->fetch($signatory->fk_object);
+
+$upload_dir         = $conf->digiriskdolibarr->multidir_output[isset($object->entity) ? $object->entity : 1];
 /*
 /*
  * Actions
@@ -90,17 +95,6 @@ if ($action == 'addSignature') {
 		if ($result > 0) {
 			$signatory->setSigned($user, false);
 			// Creation signature OK
-			//$urltogo = str_replace('__ID__', $result, $backtopage);
-			//$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
-			$host  = $_SERVER['HTTP_HOST'];
-			$uri   = rtrim(dirname($_SERVER['PHP_SELF']), '/\\');
-			$extra = 'index.php';
-			$url = "http://".$host.$uri."/".$extra;
-			echo '<pre>';
-			print_r("Location: http://$host$uri/$extra");
-			echo '</pre>';
-			exit;
-			header("Location: http://$host$uri/$extra");
 			exit;
 		}
 		else
@@ -112,12 +106,49 @@ if ($action == 'addSignature') {
 	}
 }
 
+if ($action == 'builddoc') {
+	$outputlangs = $langs;
+	$newlang = '';
+
+	if ($conf->global->MAIN_MULTILANGS && empty($newlang) && GETPOST('lang_id', 'aZ09')) $newlang = GETPOST('lang_id', 'aZ09');
+	if (!empty($newlang)) {
+		$outputlangs = new Translate("", $conf);
+		$outputlangs->setDefaultLang($newlang);
+	}
+
+	// To be sure vars is defined
+	if (empty($hidedetails)) $hidedetails = 0;
+	if (empty($hidedesc)) $hidedesc = 0;
+	if (empty($hideref)) $hideref = 0;
+	if (empty($moreparams)) $moreparams = null;
+
+	$model = GETPOST('model', 'alpha');
+
+	$moreparams['object'] = $object;
+	$moreparams['user'] = $user;
+
+	$result = $preventionplandocument->generateDocument($model, $outputlangs, $hidedetails, $hidedesc, $hideref, $moreparams);
+	if ($result <= 0) {
+		setEventMessages($object->error, $object->errors, 'errors');
+		$action = '';
+	} else {
+		if (empty($donotredirect)) {
+			setEventMessages($langs->trans("FileGenerated") . ' - ' . $object->last_main_doc, null);
+
+			$urltoredirect = $_SERVER['REQUEST_URI'];
+			$urltoredirect = preg_replace('/#builddoc$/', '', $urltoredirect);
+			$urltoredirect = preg_replace('/action=builddoc&?/', '', $urltoredirect); // To avoid infinite loop
+
+			header('Location: ' . $urltoredirect . '#builddoc');
+			exit;
+		}
+	}
+}
 /*
  * View
  */
 
 $form = new Form($db);
-$formticket = new FormTicket($db);
 
 if (empty($conf->global->DIGIRISKDOLIBARR_SIGNATURE_ENABLE_PUBLIC_INTERFACE))
 {
@@ -130,32 +161,12 @@ $morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");
 
 llxHeaderSignature($langs->trans("Signature"), "", 0, 0, $morejs, $morecss);
 
-//print '<div class="ticketpublicarea">';
-//print '<p style="text-align: center">'.($conf->global->TICKET_PUBLIC_TEXT_HOME ? $conf->global->TICKET_PUBLIC_TEXT_HOME : $langs->trans("TicketPublicDesc")).'</p>';
-//print '<div class="ticketform">';
-//print '<a href="create_ticket.php" rel="nofollow noopener" class="butAction marginbottomonly"><div class="index_create bigrounded"><span class="fa fa-plus-circle valignmiddle btnTitle-icon"></span><br>'.dol_escape_htmltag($langs->trans("CreateTicket")).'</div></a>';
-//print '<a href="list.php" rel="nofollow noopener" class="butAction marginbottomonly"><div class="index_display bigrounded"><span class="fa fa-list-alt valignmiddle btnTitle-icon"></span><br>'.dol_escape_htmltag($langs->trans("ViewMyTicketList")).'</div></a>';
-//print '<a href="view.php" rel="nofollow noopener" class="butAction marginbottomonly"><div class="index_display bigrounded">'.img_picto('', 'ticket').'<br>'.dol_escape_htmltag($langs->trans("ShowTicketWithTrackId")).'</div></a>';
-//print '<div style="clear:both;"></div>';
-//print '</div>';
-//print '</div>';
-
 print '<div class="center">'."\n";
 print '<table with="100%" id="tablepublicpayment">';
 print '<tr><td colspan="2" class="opacitymedium">'.$langs->trans("ThisIsInformationOnDocumentToSign").' :</td></tr>'."\n";
 
-$found = false;
-$error = 0;
-$var = false;
 
-// Payment on customer order
-$found = true;
-$object = new PreventionPlan($db);
-$result = $object->fetch($signatory->fk_object);
-if ($result <= 0) {
-	$mesg = $object->error;
-	$error++;
-}
+
 
 // Creditor
 
@@ -178,7 +189,36 @@ print '<input type="hidden" name="source" value="'.GETPOST("source", 'alpha').'"
 print '<input type="hidden" name="ref" value="'.$object->ref.'">';
 print '</td></tr>'."\n";
 
-if (!$found && !$mesg) $mesg = $langs->transnoentitiesnoconv("ErrorBadParameters");
+//print '<tr><td class="showdocument">'.$langs->trans('ShowDocument');
+//print '</td><td>';
+//
+//print '<form method="POST" action="' . $_SERVER["PHP_SELF"] . '?track_id=' . $track_id . '&action=showdocument' . '">';
+//print '<input type="hidden" name="token" value="' . newToken() . '">';
+//print '<input type="hidden" name="action" value="showdocument">';
+//print '<input type="hidden" name="backtopage" value="' . $backtopage . '">';
+//
+//print '<button type="submit" class="button wpeo-button button-blue">';
+//print $langs->trans('ShowDocument');
+//print '</button>';
+//print '</form>';
+//print '</td></tr>'."\n";
+
+print '<div class=""><div class="preventionplanDocument fichehalfleft">';
+
+$objref = dol_sanitizeFileName($object->ref);
+
+$dir_files = $preventionplandocument->element . '/' . $objref . '/specimen';
+
+$filedir = $upload_dir . '/' . $dir_files;
+$urlsource = $_SERVER["PHP_SELF"] . '?track_id='. $track_id;
+
+$modulepart = 'digiriskdolibarr:PreventionPlanDocument';
+
+$title = $langs->trans('PreventionPlanDocument');
+
+print digiriskshowdocuments($modulepart, $dir_files, $filedir, $urlsource, 1, $permissiontodelete, $defaultmodel, 1, 0, 28, 0, '', $title, '', $langs->defaultlang, '', $preventionplandocument, 0, '', 1 );
+
+
 if ($mesg) print '<tr><td align="center" colspan="2"><br><div class="warning">'.dol_escape_htmltag($mesg).'</div></td></tr>'."\n";
 
 print '</table>'."\n";
@@ -190,8 +230,7 @@ if ( $signatory->role == 'PP_EXT_SOCIETY_INTERVENANTS') {
 	$element = $signatory->fetchSignatory($signatory->role, $signatory->fk_object);
 	$element = array_shift($element);
 }
-$url = dirname($_SERVER['PHP_SELF']) . '/index.php'; ?>
-<?php if (empty($element->signature)) : ?>
+if (empty($element->signature)) : ?>
 	<div class="wpeo-button button-blue wpeo-modal-event modal-signature-open modal-open" value="<?php echo $element->id ?>">
 		<span><?php echo $langs->trans('Sign'); ?></span>
 	</div>

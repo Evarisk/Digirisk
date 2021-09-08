@@ -85,23 +85,8 @@ $morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");
 llxHeaderSignature($langs->trans("Signature"), "", 0, 0, $morejs, $morecss);
 
 print '<div class="signaturepublicarea">';
-print '<p style="text-align: center">'.$langs->trans("SignaturePublicDesc").'</p>';
+print '<p style="text-align: center">'.$langs->trans("SignatureSuccess").'</p>';
 print '</div>';
-
-$url = dirname($_SERVER['PHP_SELF']) . '/add_signature.php';
-
-print '<div id="form_view_signature">';
-print '<form method="get" name="form_view_signature"  enctype="multipart/form-data" action="'.$url.'">';
-print '<label for="track_id" style="display: inline-block; width: 30%; "><span class="fieldrequired">'.$langs->trans("SignatureTrackId").'</span></label>';
-print '<input size="30" id="track_id" name="track_id" value="'.(GETPOST('track_id') ? GETPOST('track_id') : '').'" />';
-
-print '<div style="text-align: center; margin-top: 1.5em;">';
-print '<input class="button" type="submit" value="'.$langs->trans('Sign').'" />';
-print "</div>";
-
-print "</form>";
-print "</div>";
-
 
 // End of page
 
