@@ -121,8 +121,6 @@ if ($action == 'addAttendant') {
 			if (!empty($object->errors)) setEventMessages(null, $object->errors, 'errors');
 			else  setEventMessages($object->error, null, 'errors');
 		}
-	} else {
-		$action = 'create';
 	}
 }
 
