@@ -458,15 +458,15 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$now = dol_now();
 				$actioncomm = new ActionComm($this->db);
 
-				$actioncomm->elementtype = 'preventionplan@digiriskdolibarr';
-				$actioncomm->code        = 'AC_DIGIRISKSIGNATURE_SIGNED';
-				$actioncomm->type_code   = 'AC_OTH_AUTO';
-				$actioncomm->label       = $langs->trans('DigiriskSignatureSignedTrigger');
-				$actioncomm->datep       = $now;
-				$actioncomm->fk_element  = $object->fk_object;
-				$actioncomm->contact_id  = $object->element_id;
-				$actioncomm->userownerid = $user->id;
-				$actioncomm->percentage  = -1;
+				$actioncomm->elementtype        = 'preventionplan@digiriskdolibarr';
+				$actioncomm->code               = 'AC_DIGIRISKSIGNATURE_SIGNED';
+				$actioncomm->type_code          = 'AC_OTH_AUTO';
+				$actioncomm->label              = $langs->trans('DigiriskSignatureSignedTrigger');
+				$actioncomm->datep              = $now;
+				$actioncomm->fk_element         = $object->fk_object;
+				$actioncomm->socpeopleassigned  = array($object->element_id => $object->element_id);
+				$actioncomm->userownerid        = $user->id;
+				$actioncomm->percentage         = -1;
 
 				$actioncomm->create($user);
 				break;
@@ -478,15 +478,15 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$now = dol_now();
 				$actioncomm = new ActionComm($this->db);
 
-				$actioncomm->elementtype = 'preventionplan@digiriskdolibarr';
-				$actioncomm->code        = 'AC_DIGIRISKSIGNATURE_PENDING_SIGNATURE';
-				$actioncomm->type_code   = 'AC_OTH_AUTO';
-				$actioncomm->label       = $langs->trans('DigiriskSignaturePendingSignatureTrigger');
-				$actioncomm->datep       = $now;
-				$actioncomm->fk_element  = $object->fk_object;
-				$actioncomm->contact_id  = $object->element_id;
-				$actioncomm->userownerid = $user->id;
-				$actioncomm->percentage  = -1;
+				$actioncomm->elementtype        = 'preventionplan@digiriskdolibarr';
+				$actioncomm->code               = 'AC_DIGIRISKSIGNATURE_PENDING_SIGNATURE';
+				$actioncomm->type_code          = 'AC_OTH_AUTO';
+				$actioncomm->label              = $langs->trans('DigiriskSignaturePendingSignatureTrigger');
+				$actioncomm->datep              = $now;
+				$actioncomm->fk_element         = $object->fk_object;
+				$actioncomm->socpeopleassigned  = array($object->element_id => $object->element_id);
+				$actioncomm->userownerid        = $user->id;
+				$actioncomm->percentage         = -1;
 
 				$actioncomm->create($user);
 				break;
@@ -498,15 +498,15 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$now = dol_now();
 				$actioncomm = new ActionComm($this->db);
 
-				$actioncomm->elementtype = 'preventionplan@digiriskdolibarr';
-				$actioncomm->code        = 'AC_DIGIRISKSIGNATURE_ABSENT';
-				$actioncomm->type_code   = 'AC_OTH_AUTO';
-				$actioncomm->label       = $langs->trans('DigiriskSignatureAbsentTrigger');
-				$actioncomm->datep       = $now;
-				$actioncomm->fk_element  = $object->fk_object;
-				$actioncomm->contact_id  = $object->element_id;
-				$actioncomm->userownerid = $user->id;
-				$actioncomm->percentage  = -1;
+				$actioncomm->elementtype        = 'preventionplan@digiriskdolibarr';
+				$actioncomm->code               = 'AC_DIGIRISKSIGNATURE_ABSENT';
+				$actioncomm->type_code          = 'AC_OTH_AUTO';
+				$actioncomm->label              = $langs->trans('DigiriskSignatureAbsentTrigger');
+				$actioncomm->datep              = $now;
+				$actioncomm->fk_element         = $object->fk_object;
+				$actioncomm->socpeopleassigned  = array($object->element_id => $object->element_id);
+				$actioncomm->userownerid        = $user->id;
+				$actioncomm->percentage         = -1;
 
 				$actioncomm->create($user);
 				break;
@@ -524,7 +524,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->label       = $langs->trans('DigiriskSignatureDeletedTrigger');
 				$actioncomm->datep       = $now;
 				$actioncomm->fk_element  = $object->fk_object;
-				$actioncomm->contact_id  = $object->element_id;
+				$actioncomm->socpeopleassigned  = array($object->element_id => $object->element_id);
 				$actioncomm->userownerid = $user->id;
 				$actioncomm->percentage  = -1;
 
