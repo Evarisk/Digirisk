@@ -269,7 +269,7 @@ class doc_preventionplandocument_odt extends ModeleODTPreventionPlanDocument
 			}
 
 			$resources          = new DigiriskResources($this->db);
-			$signatory         = new PreventionPlanSignature($this->db);
+			$signatory          = new PreventionPlanSignature($this->db);
 			$societe            = new Societe($this->db);
 			$preventionplanline = new PreventionPlanLine($this->db);
 			$risk               = new Risk($this->db);
@@ -281,6 +281,7 @@ class doc_preventionplandocument_odt extends ModeleODTPreventionPlanDocument
 			$extsocietyintervenants  = $resources->fetchResourcesFromObject('PP_EXT_SOCIETY_INTERVENANTS', $preventionplan);
 			$maitreoeuvre            = array_shift($signatory->fetchSignatory('PP_MAITRE_OEUVRE', $preventionplan->id));
 			$extsocietyresponsible   = array_shift($signatory->fetchSignatory('PP_EXT_SOCIETY_RESPONSIBLE', $preventionplan->id));
+			$extsocietyintervenants  = $signatory->fetchSignatory('PP_EXT_SOCIETY_INTERVENANTS', $preventionplan->id);
 
 			$tmparray['titre_prevention']             = $preventionplan->ref;
 			$tmparray['unique_identifier']            = $preventionplan->label;
@@ -351,7 +352,6 @@ class doc_preventionplandocument_odt extends ModeleODTPreventionPlanDocument
 			}
 
 			if (!empty( $extsocietyintervenants) && $extsocietyintervenants > 0 && is_array($extsocietyintervenants)) {
-				$extsocietyintervenants = array_shift($extsocietyintervenants);
 				$tmparray['intervenants_info'] = count($extsocietyintervenants);
 			}
 
@@ -453,6 +453,7 @@ class doc_preventionplandocument_odt extends ModeleODTPreventionPlanDocument
 							$tmparray['lastname'] = $line->lastname;
 							$tmparray['phone']    = $line->phone;
 							$tmparray['mail']     = $line->mail;
+							$tmparray['status']   = $langs->trans("Status") . ' : ' . $line->getLibStatut(5);
 
 							foreach ($tmparray as $key => $val) {
 								try {
