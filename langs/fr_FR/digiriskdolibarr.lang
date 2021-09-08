@@ -274,12 +274,15 @@ PreventionPlanDet = Lignes des plans de prévention
 PREVENTIONPLAN_CREATEInDolibarr = Plan de prévention créé dans Dolibarr
 ActionsOnPreventionPlan = Événements liés au plan de prévention
 PreventionPlanGeneratedWithDolibarr = Plan de prévention généré avec Dolibarr
-PreventionPlanLineCreatedWithDolibarr = Ligne de Permis de Feu créée avec Dolibarr
+PreventionPlanLineCreateTrigger = Ligne de plan de prévention créée
+PreventionPlanLineModifyTrigger = Ligne de plan de prévention modifiée
+PreventionPlanLineDeleteTrigger = Ligne de plan de prévention supprimée
 PreventionPlanModifyTrigger = Modification du plan de prévention
 PreventionPlanInprogressTrigger = Plan de prévention rouvert
 PreventionPlanPendingSignatureTrigger = Plan de prévention en attente de signature des participants
 PreventionPlanLockTrigger = Plan de prévention verrouillé - Prêt pour la génération du documuent
 PreventionPlanArchivedTrigger = Plan de prévention archivé
+PreventionPlanAddAttedantTrigger = Ajout d'un participant au plan de prévention
 
 # Mod Numbering - Modèle de numérotation
 DigiriskPreventionPlanNumberingModule = Modèle de numérotation des plans de prévention de Digirisk

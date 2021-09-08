@@ -405,7 +405,7 @@ if (empty($reshook))
 		}
 
 		if (!$error) {
-			$result = $objectline->insert(0);
+			$result = $objectline->insert($user, false);
 
 			if ($result > 0) {
 				setEventMessages($langs->trans('AddPreventionPlanLine').' '.$objectline->ref.' '.$langs->trans('PreventionPlanMessage'), array());
@@ -451,7 +451,7 @@ if (empty($reshook))
 		}
 
 		if (!$error) {
-			$result = $objectline->update($user, true);
+			$result = $objectline->update($user, false);
 
 			if ($result > 0) {
 				setEventMessages($langs->trans('UpdatePreventionPlanLine').' '.$objectline->ref.' '.$langs->trans('PreventionPlanMessage'), array());
@@ -474,7 +474,7 @@ if (empty($reshook))
 	if ($action == 'deleteline' && $permissiontodelete) {
 		$objectline = new PreventionPlanLine($db);
 		$objectline->fetch($lineid);
-		$result = $objectline->delete();
+		$result = $objectline->delete($user, false);
 
 		if ($result > 0) {
 			// Delete prevention plan OK

@@ -109,6 +109,7 @@ if ($action == 'addAttendant') {
 		$result = $signatory->setSignatory($object->id,'socpeople', $extintervenant_ids, 'PP_EXT_SOCIETY_INTERVENANTS', 1);
 		if ($result > 0) {
 			setEventMessages($langs->trans('AddAttendantMessage').' '.$signatory->lastname,array());
+			$signatory->call_trigger(strtoupper(get_class($signatory)).'_ADDATTENDANT', $user);
 				// Creation attendant OK
 			$urltogo = str_replace('__ID__', $result, $backtopage);
 			$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation

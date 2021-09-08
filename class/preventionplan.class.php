@@ -872,18 +872,16 @@ class PreventionPlanLine extends CommonObjectLine
 	}
 
 	/**
-	 *	Insert line into database
+	 *    Insert line into database
 	 *
-	 *	@param      int		$notrigger		                 1 no triggers
-	 *  @param      int     $noerrorifdiscountalreadylinked  1=Do not make error if lines is linked to a discount and discount already linked to another
-	 *	@return		int						                 <0 if KO, >0 if OK
+	 * @param User $user
+	 * @param bool $notrigger 1 no triggers
+	 * @return        int                                         <0 if KO, >0 if OK
+	 * @throws Exception
 	 */
-	public function insert($notrigger = 0, $noerrorifdiscountalreadylinked = 0)
+	public function insert(User $user, $notrigger = false)
 	{
 		global $db, $user;
-
-		$error = 0;
-
 
 		// Clean parameters
 		$this->description = trim($this->description);
@@ -916,6 +914,13 @@ class PreventionPlanLine extends CommonObjectLine
 			$this->rowid = $this->id; // For backward compatibility
 
 			$db->commit();
+			// Triggers
+			if (!$notrigger)
+			{
+				// Call triggers
+				$this->call_trigger(strtoupper(get_class($this)).'_CREATE', $user);
+				// End call triggers
+			}
 			return $this->id;
 		}
 		else
@@ -933,9 +938,9 @@ class PreventionPlanLine extends CommonObjectLine
 	 *	@param		int		$notrigger	Disable triggers
 	 *	@return		int					<0 if KO, >0 if OK
 	 */
-	public function update($user = '', $notrigger = 1)
+	public function update(User $user, $notrigger = false)
 	{
-		global $user, $conf, $db;
+		global $user, $db;
 
 		$error = 0;
 
@@ -957,9 +962,17 @@ class PreventionPlanLine extends CommonObjectLine
 
 		dol_syslog(get_class($this)."::update", LOG_DEBUG);
 		$resql = $db->query($sql);
+
 		if ($resql)
 		{
 			$db->commit();
+			// Triggers
+			if (!$notrigger)
+			{
+				// Call triggers
+				$this->call_trigger(strtoupper(get_class($this)).'_MODIFY', $user);
+				// End call triggers
+			}
 			return 1;
 		}
 		else
@@ -975,7 +988,7 @@ class PreventionPlanLine extends CommonObjectLine
 	 *
 	 *	@return	    int		           <0 if KO, >0 if OK
 	 */
-	public function delete()
+	public function delete(User $user, $notrigger = false)
 	{
 		global $user, $db;
 
@@ -986,6 +999,13 @@ class PreventionPlanLine extends CommonObjectLine
 		if ($db->query($sql))
 		{
 			$db->commit();
+			// Triggers
+			if (!$notrigger)
+			{
+				// Call trigger
+				$this->call_trigger(strtoupper(get_class($this)).'_DELETE', $user);
+				// End call triggers
+			}
 			return 1;
 		}
 		else
@@ -994,6 +1014,9 @@ class PreventionPlanLine extends CommonObjectLine
 			$db->rollback();
 			return -1;
 		}
+
+
+
 	}
 
 }
