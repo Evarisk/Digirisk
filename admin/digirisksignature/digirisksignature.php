@@ -63,6 +63,12 @@ if ($action == 'setPublicInterface')
 	else dolibarr_set_const($db, 'DIGIRISKDOLIBARR_SIGNATURE_ENABLE_PUBLIC_INTERFACE', 0, 'chaine', 0, '', $conf->entity);
 }
 
+if ($action == 'update')
+{
+	if (GETPOST('DIGIRISKDOLIBARR_SENDMAIL_SIGNATURE')) dolibarr_set_const($db, 'DIGIRISKDOLIBARR_SENDMAIL_SIGNATURE', GETPOST('DIGIRISKDOLIBARR_SENDMAIL_SIGNATURE'), 'chaine', 0, '', $conf->entity);
+	else dolibarr_set_const($db, 'DIGIRISKDOLIBARR_SENDMAIL_SIGNATURE', '', 'chaine', 0, '', $conf->entity);
+}
+
 /*
  * View
  */
@@ -105,6 +111,9 @@ print '<br><br>';
 
 if (!empty($conf->global->DIGIRISKDOLIBARR_SIGNATURE_ENABLE_PUBLIC_INTERFACE))
 {
+	print '<form method="POST" action="'.$_SERVER["PHP_SELF"].'" name=signature_form">';
+	print '<input type="hidden" name="token" value="'.newToken().'">';
+	print '<input type="hidden" name="action" value="update">';
 	print '<div class="div-table-responsive-no-min">';
 	print '<table class="noborder centpercent">';
 	print '<tr class="liste_titre">';
@@ -123,8 +132,15 @@ if (!empty($conf->global->DIGIRISKDOLIBARR_SIGNATURE_ENABLE_PUBLIC_INTERFACE))
 	print '</td>';
 	print '</tr>';
 
+	print '<tr class="oddeven"><td>';
+	print $langs->trans("SendMailSignature").'</td><td>';
+	print '<input class="minwidth300" type="email" name="DIGIRISKDOLIBARR_SENDMAIL_SIGNATURE" value="'.$conf->global->DIGIRISKDOLIBARR_SENDMAIL_SIGNATURE.'">';
+	print '<td><input type="submit" class="button" name="save" value="'.$langs->trans("Save").'">';
+	print '</td></tr>';
+
 	print '</table>';
 	print '</div>';
+	print '</form>';
 	print '<br>';
 }
 
