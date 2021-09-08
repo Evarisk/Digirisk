@@ -166,6 +166,7 @@ if ($action == 'setAbsent') {
 		$result = $signatory->setAbsent($user, false);
 		if ($result > 0) {
 			// set absent OK
+			setEventMessages($langs->trans('Attendant').' '.$signatory->lastname.' '.$langs->trans('SetAbsentAttendant'),array());
 			$urltogo = str_replace('__ID__', $result, $backtopage);
 			$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
 			header("Location: " . $urltogo);
@@ -187,7 +188,7 @@ if ($action == 'send') {
 
 	if (!$error) {
 		$result = $signatory->setPendingSignature($user, false);
-		setEventMessages($langs->trans('test'),array());
+		setEventMessages($langs->trans('SendEmailAt').' '.$signatory->email,array());
 		$signatory->last_email_sent_date = dol_now('tzuser');
 		$signatory->update($user, true);
 
