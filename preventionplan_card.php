@@ -1049,8 +1049,17 @@ if ((empty($action) || ($action != 'create' && $action != 'edit')))
 	unset($object->fields['entity']);
 	unset($object->fields['date_start']);
 	unset($object->fields['date_end']);
+	unset($object->fields['prior_visit_bool']);
 	unset($object->fields['prior_visit_date']);
 	unset($object->fields['prior_visit_text']);
+	unset($object->fields['label']);
+
+	print '<tr><td class="titlefield">';
+	print $langs->trans("Label");
+	print '</td>';
+	print '<td>';
+	print $object->label;
+	print '</td></tr>';
 
 	print '<tr><td class="titlefield">';
 	print $langs->trans("StartDate");
@@ -1064,6 +1073,14 @@ if ((empty($action) || ($action != 'create' && $action != 'edit')))
 	print '</td>';
 	print '<td>';
 	print dol_print_date($object->date_end, 'dayhoursec');
+	print '</td></tr>';
+
+	//Prior Visit -- Inspection commune préalable
+	print '<tr><td class="titlefield">';
+	print $langs->trans("PriorVisit");
+	print '</td>';
+	print '<td>';
+	print '<input type="checkbox" id="prior_visit_bool" name="prior_visit_bool"'.($object->prior_visit_bool? ' checked=""' : '').'" disabled> ';
 	print '</td></tr>';
 
 	if ($object->prior_visit_bool) {
