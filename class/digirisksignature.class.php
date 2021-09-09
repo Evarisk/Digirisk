@@ -444,7 +444,7 @@ class DigiriskSignature extends CommonObject
 						$society->fetch($signatory_data->fk_soc);
 
 						$this->society_name = $society->name;
-						$this->phone = $signatory_data->phone_pro;
+						$this->phone = $signatory_data->phone_mobile;
 					}
 
 					$this->status = self::STATUS_REGISTERED;

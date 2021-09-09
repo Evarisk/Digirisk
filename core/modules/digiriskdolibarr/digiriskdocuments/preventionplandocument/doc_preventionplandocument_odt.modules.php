@@ -367,7 +367,7 @@ class doc_preventionplandocument_odt extends ModeleODTPreventionPlanDocument
 				$tmparray['maitre_oeuvre_email'] = $maitreoeuvre->email;
 				$tmparray['maitre_oeuvre_phone'] = $maitreoeuvre->phone;
 
-				$tmparray['maitre_oeuvre_signature_date'] = $maitreoeuvre->signature_date;
+				$tmparray['maitre_oeuvre_signature_date'] = dol_print_date($maitreoeuvre->signature_date, '%A %e %B %G %H:%M');
 				$encoded_image = explode(",",  $maitreoeuvre->signature)[1];
 				$decoded_image = base64_decode($encoded_image);
 				file_put_contents($tempdir."signature.png", $decoded_image);
@@ -381,7 +381,7 @@ class doc_preventionplandocument_odt extends ModeleODTPreventionPlanDocument
 				$tmparray['intervenant_exterieur_phone'] = $extsocietyresponsible->phone;
 
 				//@todo when attendance will be created
-				$tmparray['intervenant_exterieur_signature_date'] = $extsocietyresponsible->signature_date;
+				$tmparray['intervenant_exterieur_signature_date'] = dol_print_date($extsocietyresponsible->signature_date, '%A %e %B %G %H:%M');
 				$encoded_image = explode(",",  $extsocietyresponsible->signature)[1];
 				$decoded_image = base64_decode($encoded_image);
 				file_put_contents($tempdir."signature2.png", $decoded_image);
@@ -423,7 +423,7 @@ class doc_preventionplandocument_odt extends ModeleODTPreventionPlanDocument
 						foreach ($preventionplanlines as $line) {
 
 							$tmparray['key_unique']    = $line->ref;
-							$tmparray['unite_travail'] = $line->location;
+							$tmparray['unite_travail'] = $line->fk_element;
 							$tmparray['action']        = $line->description;
 							$tmparray['risk']          = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $risk->get_danger_category($line) . '.png';
 							$tmparray['prevention']    = $line->prevention_method;
@@ -455,7 +455,7 @@ class doc_preventionplandocument_odt extends ModeleODTPreventionPlanDocument
 							$tmparray['name']     = $line->firstname;
 							$tmparray['lastname'] = $line->lastname;
 							$tmparray['phone']    = $line->phone;
-							$tmparray['mail']     = $line->mail;
+							$tmparray['mail']     = $line->email;
 							$tmparray['status']   = $langs->trans("StatusDigirisk") . ' : ' . $line->getLibStatut(1);
 
 							foreach ($tmparray as $key => $val) {
