@@ -747,12 +747,12 @@ if ($action == 'create')
 	print '<input type="checkbox" id="prior_visit_bool" name="prior_visit_bool">';
 	print '</td></tr>';
 
-	//Prior Visit -- Inspection commune préalable
+	//Prior Visit Date -- Date de l'inspection commune préalable
 	print '<tr class="prior_visit_date_field hidden" style="display:none"><td><label for="prior_visit_date">'.$langs->trans("PriorVisitDate").'</label></td><td>';
 	print $form->selectDate(dol_now('tzuser'), 'datei', 1, 1, 0, '', 1);
 	print '</td></tr>';
 
-	//Prior Visit Texte -- Note de la visite
+	//Prior Visit Texte -- Note de l'inspection
 	print '<tr  class="prior_visit_text_field hidden" style="display:none"><td><label for="prior_visit_text">'.$langs->trans("PriorVisitText").'</label></td><td>';
 	$doleditor = new DolEditor('prior_visit_text', '', '', 90, 'dolibarr_notes', '', false, true, $conf->global->FCKEDITOR_ENABLE_SOCIETE, ROWS_3, '90%');
 	$doleditor->Create();
@@ -812,7 +812,7 @@ if (($id || $ref) && $action == 'edit')
 	$object_resources = $digiriskresources->fetchResourcesFromObject('', $object);
 	$object_signatories = $signatory->fetchSignatory('',$object->id);
 
-	print '<table class="border centpercent tableforfieldedit">'."\n";
+	print '<table class="border centpercent tableforfieldedit  preventionplan-table">'."\n";
 
 	print '<tr><td class="fieldrequired">'.$langs->trans("Ref").'</td><td>';
 	print $object->ref;
@@ -896,14 +896,15 @@ if (($id || $ref) && $action == 'edit')
 	print '<input type="checkbox" id="prior_visit_bool" name="prior_visit_bool"'.($object->prior_visit_bool? ' checked=""' : '').'"> ';
 	print '</td></tr>';
 
-	print '<tr class="oddeven"><td><label for="prior_visit_text">'.$langs->trans("PriorVisitText").'</label></td><td>';
-	$doleditor = new DolEditor('prior_visit_text', $object->prior_visit_text, '', 90, 'dolibarr_notes', '', false, true, $conf->global->FCKEDITOR_ENABLE_SOCIETE, ROWS_3, '90%');
-	$doleditor->Create();
+	//Prior Visit Date -- Date de l'inspection commune préalable
+	print '<tr class="'.($object->prior_visit_bool ?  ' prior_visit_date_field' : ' prior_visit_date_field hidden' ).'" style="'.($object->prior_visit_bool ? ' ' : ' display:none').'"><td><label for="prior_visit_date">'.$langs->trans("PriorVisitDate").'</label></td><td>';
+	print $form->selectDate($object->date_start,'datei', 1, 1, 0, '', 1);
 	print '</td></tr>';
 
-	//Start Date -- Date début
-	print '<tr class="oddeven"><td><label for="prior_visit_date">'.$langs->trans("PriorVisitDate").'</label></td><td>';
-	print $form->selectDate($object->date_start,'datei', 1, 1, 0, '', 1);
+	//Prior Visit Text -- Note de l'inspection
+	print '<tr class="'.($object->prior_visit_bool ?  ' prior_visit_date_field' : ' prior_visit_date_field hidden' ).'" style="'.($object->prior_visit_bool ? ' ' : ' display:none').'"><td><label for="prior_visit_text">'.$langs->trans("PriorVisitText").'</label></td><td>';
+	$doleditor = new DolEditor('prior_visit_text', $object->prior_visit_text, '', 90, 'dolibarr_notes', '', false, true, $conf->global->FCKEDITOR_ENABLE_SOCIETE, ROWS_3, '90%');
+	$doleditor->Create();
 	print '</td></tr>';
 
 	if (is_array($object_resources['PP_LABOUR_INSPECTOR']) && $object_resources['PP_LABOUR_INSPECTOR'] > 0) {
