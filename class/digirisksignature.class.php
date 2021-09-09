@@ -384,15 +384,15 @@ class DigiriskSignature extends CommonObject
 		{
 			global $langs;
 			//$langs->load("digiriskdolibarr@digiriskdolibarr");
-			$this->labelStatus[self::STATUS_DELETED] = $langs->trans('Deleted');
-			$this->labelStatus[self::STATUS_REGISTERED] = $langs->trans('Registered');
-			$this->labelStatus[self::STATUS_SIGNATURE_REQUEST] = $langs->trans('SignatureRequest');
-			$this->labelStatus[self::STATUS_PENDING_SIGNATURE] = $langs->trans('PendingSignature');
-			$this->labelStatus[self::STATUS_DENIED] = $langs->trans('Denied');
-			$this->labelStatus[self::STATUS_SIGNED] = $langs->trans('Signed');
-			$this->labelStatus[self::STATUS_UNSIGNED] = $langs->trans('Unsigned');
-			$this->labelStatus[self::STATUS_ABSENT] = $langs->trans('Absent');
-			$this->labelStatus[self::STATUS_JUSTIFIED_ABSENT] = $langs->trans('JustifiedAbsent');
+			$this->labelStatus[self::STATUS_DELETED] = $langs->transnoentities('Deleted');
+			$this->labelStatus[self::STATUS_REGISTERED] = $langs->transnoentities('Registered');
+			$this->labelStatus[self::STATUS_SIGNATURE_REQUEST] = $langs->transnoentities('SignatureRequest');
+			$this->labelStatus[self::STATUS_PENDING_SIGNATURE] = $langs->transnoentities('PendingSignature');
+			$this->labelStatus[self::STATUS_DENIED] = $langs->transnoentities('Denied');
+			$this->labelStatus[self::STATUS_SIGNED] = $langs->transnoentities('Signed');
+			$this->labelStatus[self::STATUS_UNSIGNED] = $langs->transnoentities('Unsigned');
+			$this->labelStatus[self::STATUS_ABSENT] = $langs->transnoentities('Absent');
+			$this->labelStatus[self::STATUS_JUSTIFIED_ABSENT] = $langs->transnoentities('JustifiedAbsent');
 		}
 
 		$statusType = 'status'.$status;
