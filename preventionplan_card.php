@@ -519,7 +519,7 @@ if (empty($reshook))
 		} else {
 			if (empty($donotredirect))
 			{
-				setEventMessages($langs->trans("FileGenerated") . ' - ' . $object->last_main_doc, null);
+				setEventMessages($langs->trans("FileGenerated") . ' - ' . $preventionplandocument->last_main_doc, null);
 
 				$signatories = $signatory->fetchSignatory("",$object->id);
 
