@@ -545,6 +545,32 @@ if (empty($reshook))
 		}
 	}
 
+	// Delete file in doc form
+	if ($action == 'remove_file' && $permissiontodelete)
+	{
+		if (!empty($upload_dir)) {
+			require_once DOL_DOCUMENT_ROOT.'/core/lib/files.lib.php';
+
+			$langs->load("other");
+			$filetodelete = GETPOST('file', 'alpha');
+			$file = $upload_dir.'/'.$filetodelete;
+			$ret = dol_delete_file($file, 0, 0, 0, $object);
+			if ($ret) setEventMessages($langs->trans("FileWasRemoved", $filetodelete), null, 'mesgs');
+			else setEventMessages($langs->trans("ErrorFailToDeleteFile", $filetodelete), null, 'errors');
+
+			// Make a redirect to avoid to keep the remove_file into the url that create side effects
+			$urltoredirect = $_SERVER['REQUEST_URI'];
+			$urltoredirect = preg_replace('/#builddoc$/', '', $urltoredirect);
+			$urltoredirect = preg_replace('/action=remove_file&?/', '', $urltoredirect);
+
+			header('Location: '.$urltoredirect);
+			exit;
+		}
+		else {
+			setEventMessages('BugFoundVarUploaddirnotDefined', null, 'errors');
+		}
+	}
+
 	// Action to set status STATUS_PENDING_SIGNATURE
 	if ($action == 'confirm_setInProgress') {
 
@@ -1391,7 +1417,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit')))
 			$defaultmodel = $conf->global->DIGIRISKDOLIBARR_PREVENTIONPLANDOCUMENT_DEFAULT_MODEL;
 			$title = $langs->trans('PreventionPlanDocument');
 
-			print digiriskshowdocuments($modulepart, $dir_files, $filedir, $urlsource, $permissiontoadd, $permissiontodelete, $defaultmodel, 1, 0, 28, 0, '', $title, '', $langs->defaultlang, '', $preventionplandocument, 0, '', $object->status == 3, $langs->trans('PreventionPlanMustBeLocked') );
+			print digiriskshowdocuments($modulepart, $dir_files, $filedir, $urlsource, $permissiontoadd, $permissiontodelete, $defaultmodel, 1, 0, 28, 0, '', $title, '', $langs->defaultlang, '', $preventionplandocument, 0, 'remove_file', $object->status == 3, $langs->trans('PreventionPlanMustBeLocked') );
 		}
 
 		print '</div><div class="fichehalfright">';
