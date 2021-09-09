@@ -1169,7 +1169,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit')))
 			print '</td>';
 			print '<td>' . $langs->trans('Location') . '</td>';
 			print '<td>' . $form->textwithpicto($langs->trans('ActionsDescription'), $langs->trans("ActionsDescriptionTooltip")) . '</td>';
-			print '<td>' . $form->textwithpicto($langs->trans('INRSRisk'), $langs->trans('INRSRiskTooltip')) . '</td>';
+			print '<td class="center">' . $form->textwithpicto($langs->trans('INRSRisk'), $langs->trans('INRSRiskTooltip')) . '</td>';
 			print '<td>' . $form->textwithpicto($langs->trans('PreventionMethod'), $langs->trans('PreventionMethodTooltip')) . '</td>';
 			print '<td class="center" colspan="' . $colspan . '">'.$langs->trans('ActionsPreventionPlanRisk').'</td>';
 			print '</tr>';
@@ -1201,7 +1201,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit')))
 						print '</td>';
 
 						$coldisplay++;
-						print '<td>'; ?>
+						print '<td class="center">'; ?>
 						<div class="wpeo-dropdown dropdown-large dropdown-grid category-danger padding">
 							<div class="dropdown-toggle dropdown-add-button button-cotation">
 								<input class="input-hidden-danger" type="hidden" name="risk_category_id"
@@ -1250,6 +1250,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit')))
 						}
 						print '</form>';
 					} else {
+						print '<tr>';
 						print '<td>';
 						print $item->ref;
 						print '</td>';
@@ -1265,7 +1266,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit')))
 						print '</td>';
 
 						$coldisplay++;
-						print '<td>'; ?>
+						print '<td class="center">'; ?>
 						<div class="table-cell table-50 cell-risk" data-title="Risque">
 							<div class="wpeo-dropdown dropdown-large category-danger padding wpeo-tooltip-event"
 								 aria-label="<?php echo $risk->get_danger_category_name($item) ?>">
@@ -1292,14 +1293,16 @@ if ((empty($action) || ($action != 'create' && $action != 'edit')))
 							print img_delete();
 							print '</a>';
 							print '</td>';
-
-							print '</tr>';
+						} else {
+							print '<td class="center">';
+							print '-';
+							print '</td>';
 						}
-
 
 						if (is_object($objectline)) {
 							print $objectline->showOptionals($extrafields, 'edit', array('style' => $bcnd[$var], 'colspan' => $coldisplay), '', '', 1);
 						}
+						print '</tr>';
 					}
 				}
 				print '</tr>';
@@ -1326,7 +1329,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit')))
 				print '</td>';
 
 				$coldisplay++;
-				print '<td>'; ?>
+				print '<td class="center">'; ?>
 				<div class="wpeo-dropdown dropdown-large dropdown-grid category-danger padding">
 					<input class="input-hidden-danger" type="hidden" name="risk_category_id" value="undefined"/>
 					<div class="dropdown-toggle dropdown-add-button button-cotation">
