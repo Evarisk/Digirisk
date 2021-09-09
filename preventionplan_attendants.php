@@ -556,7 +556,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 
 		//Intervenants extérieurs
 		print '<tr class="oddeven"><td class="maxwidth200">';
-		print $form->selectcontacts(GETPOST('ext_society', 'int'), '', 'ext_intervenants[]', 1, $already_selected_intervenants, '', 0, 'width200', false, 0, array(), false, 'multiple', 'ext_intervenants');
+		print $form->selectcontacts(GETPOST('ext_society', 'int'), '', 'ext_intervenants[]', 0, $already_selected_intervenants, '', 0, 'width200', false, 0, array(), false, 'multiple', 'ext_intervenants');
 		print '</td>';
 		print '<td>'.$langs->trans("ExtSocietyIntervenants").'</td>';
 		print '<td class="center">';
