@@ -448,19 +448,39 @@ class doc_preventionplandocument_odt extends ModeleODTPreventionPlanDocument
 
 					if (!empty($extsocietyintervenants) && $extsocietyintervenants > 0) {
 						$listlines = $odfHandler->setSegment('intervenants');
-
+						$k = 3;
 						foreach ($extsocietyintervenants as $line) {
-
-							$tmparray['id']       = $line->id;
+							if ($line->status == 5) {
+								$encoded_image = explode(",", $line->signature)[1];
+								$decoded_image = base64_decode($encoded_image);
+								file_put_contents($tempdir."signature".$k.".png", $decoded_image);
+								$tmparray['id'] = $tempdir."signature".$k.".png";
+							}else {
+								$tmparray['id'] = '';
+							}
 							$tmparray['name']     = $line->firstname;
 							$tmparray['lastname'] = $line->lastname;
 							$tmparray['phone']    = $line->phone;
 							$tmparray['mail']     = $line->email;
 							$tmparray['status']   = $langs->trans("StatusDigirisk") . ' : ' . $line->getLibStatut(1);
 
-							foreach ($tmparray as $key => $val) {
+							$k++;
+
+							foreach ($tmparray as $key => $value) {
 								try {
-									$listlines->setVars($key, $val, true, 'UTF-8');
+									if ($key == 'id' && $line->status == 5) { // Image
+										$list = getimagesize($value);
+										$newWidth = 200;
+										if ($list[0]) {
+											$ratio = $newWidth / $list[0];
+											$newHeight = $ratio * $list[1];
+											dol_imageResizeOrCrop($value, 0, $newWidth, $newHeight);
+										}
+										$listlines->setImage($key, $value);
+									}
+									else {  // Text
+										$listlines->setVars($key, $value, true, 'UTF-8');
+									}
 								} catch (OdfException $e) {
 									dol_syslog($e->getMessage(), LOG_INFO);
 								} catch (SegmentException $e) {
@@ -468,6 +488,8 @@ class doc_preventionplandocument_odt extends ModeleODTPreventionPlanDocument
 								}
 							}
 							$listlines->merge();
+
+							dol_delete_file($tempdir."signature".$k.".png");
 						}
 						$odfHandler->mergeSegment($listlines);
 					}
