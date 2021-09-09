@@ -363,6 +363,7 @@ ErrorNoEmailForExtIntervenant = Erreur : Le (ou les) intervenant(s) ne possède(
 SignatureEmailSubject = Signature du plan de prevention
 SignatureEmailMessage = Bonjour, <br> Veuillez trouver ci-joint le lien de signature du plan de prévention.<br>
 SendMailSignature = Email émetteur utilisé pour envoyer les liens de signature
+SignatureSuccess = Document signé avec succès
 
 
 
