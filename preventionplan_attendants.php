@@ -108,9 +108,12 @@ if ($action == 'addAttendant') {
 	if (!$error) {
 		$result = $signatory->setSignatory($object->id,'socpeople', $extintervenant_ids, 'PP_EXT_SOCIETY_INTERVENANTS', 1);
 		if ($result > 0) {
-			setEventMessages($langs->trans('AddAttendantMessage').' '.$signatory->lastname,array());
-			$signatory->call_trigger(strtoupper(get_class($signatory)).'_ADDATTENDANT', $user);
-				// Creation attendant OK
+			foreach ($extintervenant_ids as $extintervenant_id) {
+				$contact->fetch($extintervenant_id);
+				setEventMessages($langs->trans('AddAttendantMessage') . ' ' . $contact->firstname . ' ' . $contact->lastname, array());
+				$signatory->call_trigger(strtoupper(get_class($signatory)) . '_ADDATTENDANT', $user);
+			}
+			// Creation attendant OK
 			$urltogo = str_replace('__ID__', $result, $backtopage);
 			$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
 			header("Location: " . $urltogo);
@@ -167,7 +170,7 @@ if ($action == 'setAbsent') {
 		$result = $signatory->setAbsent($user, false);
 		if ($result > 0) {
 			// set absent OK
-			setEventMessages($langs->trans('Attendant').' '.$signatory->lastname.' '.$langs->trans('SetAbsentAttendant'),array());
+			setEventMessages($langs->trans('Attendant').' '.$signatory->firstname.' '.$signatory->lastname.' '.$langs->trans('SetAbsentAttendant'),array());
 			$urltogo = str_replace('__ID__', $result, $backtopage);
 			$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
 			header("Location: " . $urltogo);
@@ -254,7 +257,7 @@ if ($action == 'deleteAttendant') {
 	if (!$error) {
 		$result = $signatory->setDeleted($user, false);
 		if ($result > 0) {
-			setEventMessages($langs->trans('DeleteAttendantMessage').' '.$signatory->lastname,array());
+			setEventMessages($langs->trans('DeleteAttendantMessage').' '.$signatory->firstname.' '.$signatory->lastname,array());
 			// Deletion attendant OK
 			$urltogo = str_replace('__ID__', $result, $backtopage);
 			$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
