@@ -522,14 +522,19 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 			print '</td><td class="center">';
 			print dol_print_date($element->signature_date, 'dayhour');
 			print '</td>';
-			print '<td class="center">';
-			require __DIR__ . "/core/tpl/digiriskdolibarr_signature_action_view.tpl.php";
-			print '</td>';
 			if ($object->status == 2) {
 				print '<td class="center">';
-				require __DIR__ . "/core/tpl/digiriskdolibarr_signature_view.tpl.php";
+				require __DIR__ . "/core/tpl/digiriskdolibarr_signature_action_view.tpl.php";
 				print '</td>';
+				if ($element->signature != $langs->trans("FileGenerated")) {
+					print '<td class="center">';
+					require __DIR__ . "/core/tpl/digiriskdolibarr_signature_view.tpl.php";
+					print '</td>';
+				}
 			} else {
+				print '<td class="center">';
+				print '-';
+				print '</td>';
 				print '<td class="center">';
 				print '-';
 				print '</td>';
@@ -550,10 +555,10 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 		if ($backtopageforcancel) print '<input type="hidden" name="backtopageforcancel" value="'.$backtopageforcancel.'">';
 
 		//Intervenants extérieurs
-		print '<tr class="oddeven"><td style="width:300px">';
+		print '<tr class="oddeven"><td class="maxwidth200">';
 		print $form->selectcontacts(GETPOST('ext_society', 'int'), '', 'ext_intervenants[]', 1, $already_selected_intervenants, '', 0, 'width200', false, 0, array(), false, 'multiple', 'ext_intervenants');
 		print '</td>';
-		print '<td class="maxwidth200">'.$langs->trans("ExtSocietyIntervenants").'</td>';
+		print '<td>'.$langs->trans("ExtSocietyIntervenants").'</td>';
 		print '<td class="center">';
 		print '-';
 		print '</td><td class="center">';
@@ -564,7 +569,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 		print '-';
 		print '</td><td class="center">';
 		print '<button type="submit" class="wpeo-button button-blue " name="addline" id="addline"><i class="fas fa-plus"></i>  '. $langs->trans('Add').'</button>';
-		print '<td class="center" colspan="' . $colspan . '">';
+		print '<td class="center">';
 		print '-';
 		print '</td>';
 		print '</tr>';
