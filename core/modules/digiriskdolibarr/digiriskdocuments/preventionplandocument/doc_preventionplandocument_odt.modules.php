@@ -284,8 +284,7 @@ class doc_preventionplandocument_odt extends ModeleODTPreventionPlanDocument
 			$extsocietyintervenants  = $signatory->fetchSignatory('PP_EXT_SOCIETY_INTERVENANTS', $preventionplan->id);
 
 			$tmparray['titre_prevention']             = $preventionplan->ref;
-			$tmparray['unique_identifier']            = $preventionplan->label;
-			$tmparray['raison_du_plan_de_prevention'] = $preventionplan->raison;
+			$tmparray['raison_du_plan_de_prevention'] = $preventionplan->label;
 
 			$tmparray['moyen_generaux_mis_disposition'] = $conf->global->DIGIRISK_GENERAL_MEANS;
 			$tmparray['consigne_generale']              = $conf->global->DIGIRISK_GENERAL_RULES;
@@ -454,21 +453,21 @@ class doc_preventionplandocument_odt extends ModeleODTPreventionPlanDocument
 								$encoded_image = explode(",", $line->signature)[1];
 								$decoded_image = base64_decode($encoded_image);
 								file_put_contents($tempdir."signature".$k.".png", $decoded_image);
-								$tmparray['id'] = $tempdir."signature".$k.".png";
+								$tmparray['intervenants_signature'] = $tempdir."signature".$k.".png";
 							}else {
-								$tmparray['id'] = '';
+								$tmparray['intervenants_signature'] = '';
 							}
 							$tmparray['name']     = $line->firstname;
 							$tmparray['lastname'] = $line->lastname;
 							$tmparray['phone']    = $line->phone;
 							$tmparray['mail']     = $line->email;
-							$tmparray['status']   = $langs->trans("StatusDigirisk") . ' : ' . $line->getLibStatut(1);
+							$tmparray['status']   = $line->getLibStatut(1);
 
 							$k++;
 
 							foreach ($tmparray as $key => $value) {
 								try {
-									if ($key == 'id' && $line->status == 5) { // Image
+									if ($key == 'intervenants_signature' && $line->status == 5) { // Image
 										$list = getimagesize($value);
 										$newWidth = 200;
 										if ($list[0]) {
