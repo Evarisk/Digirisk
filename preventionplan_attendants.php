@@ -404,6 +404,15 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 			require __DIR__ . "/core/tpl/digiriskdolibarr_signature_view.tpl.php";
 			print '</td>';
 		}
+	} elseif ($object->status == 3) {
+		print '<td class="center">';
+		print '';
+		print '</td>';
+		if ($element->signature != $langs->trans("FileGenerated")) {
+			print '<td class="center">';
+			require __DIR__ . "/core/tpl/digiriskdolibarr_signature_view.tpl.php";
+			print '</td>';
+		}
 	} else {
 		print '<td class="center">';
 		print '-';
@@ -460,6 +469,15 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	if ($object->status == 2) {
 		print '<td class="center">';
 		require __DIR__ . "/core/tpl/digiriskdolibarr_signature_action_view.tpl.php";
+		print '</td>';
+		if ($element->signature != $langs->trans("FileGenerated")) {
+			print '<td class="center">';
+			require __DIR__ . "/core/tpl/digiriskdolibarr_signature_view.tpl.php";
+			print '</td>';
+		}
+	} elseif ($object->status == 3) {
+		print '<td class="center">';
+		print '';
 		print '</td>';
 		if ($element->signature != $langs->trans("FileGenerated")) {
 			print '<td class="center">';
@@ -524,6 +542,15 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 			if ($object->status == 2) {
 				print '<td class="center">';
 				require __DIR__ . "/core/tpl/digiriskdolibarr_signature_action_view.tpl.php";
+				print '</td>';
+				if ($element->signature != $langs->trans("FileGenerated")) {
+					print '<td class="center">';
+					require __DIR__ . "/core/tpl/digiriskdolibarr_signature_view.tpl.php";
+					print '</td>';
+				}
+			} elseif ($object->status == 3) {
+				print '<td class="center">';
+				print '';
 				print '</td>';
 				if ($element->signature != $langs->trans("FileGenerated")) {
 					print '<td class="center">';
