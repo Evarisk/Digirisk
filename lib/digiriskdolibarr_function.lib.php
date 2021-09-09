@@ -1061,54 +1061,34 @@ function show_category_image($object, $upload_dir) {
  * @param  array  $arrayofcss  Array of complementary css files
  * @return void
  */
-function llxHeaderSignature($title, $head = "", $disablejs = 0, $disablehead = 0, $arrayofjs = '', $arrayofcss = '')
-{
-	global $user, $conf, $langs, $mysoc;
+function llxHeaderSignature($title, $head = "", $disablejs = 0, $disablehead = 0, $arrayofjs = '', $arrayofcss = '') {
+	global $conf, $langs, $mysoc;
 
 	top_htmlhead($head, $title, $disablejs, $disablehead, $arrayofjs, $arrayofcss, 0, 1); // Show html headers
 
 	print '<div class="center">';
 
-	// Show logo (search order: logo defined by ONLINE_SIGN_LOGO_suffix, then ONLINE_SIGN_LOGO_, then small company logo, large company logo, theme logo, common logo)
-	// Define logo and logosmall
-	$logosmall = $mysoc->logo_small;
-	$logo = $mysoc->logo;
-	$paramlogo = 'ONLINE_SIGN_LOGO_'.$suffix;
-	if (!empty($conf->global->$paramlogo)) $logosmall = $conf->global->$paramlogo;
-	elseif (!empty($conf->global->ONLINE_SIGN_LOGO)) $logosmall = $conf->global->ONLINE_SIGN_LOGO;
-	//print '<!-- Show logo (logosmall='.$logosmall.' logo='.$logo.') -->'."\n";
-	// Define urllogo
-	$urllogo = '';
-	if (!empty($logosmall) && is_readable($conf->mycompany->dir_output.'/logos/thumbs/'.$logosmall)) {
-		$urllogo = DOL_URL_ROOT.'/viewimage.php?modulepart=mycompany&amp;entity='.$conf->entity.'&amp;file='.urlencode('logos/thumbs/'.$logosmall);
-	} elseif (!empty($logo) && is_readable($conf->mycompany->dir_output.'/logos/'.$logo)) {
-		$urllogo = DOL_URL_ROOT.'/viewimage.php?modulepart=mycompany&amp;entity='.$conf->entity.'&amp;file='.urlencode('logos/'.$logo);
-	}
-	// Output html code for logo
-	if ($urllogo)
-	{
-		print '<div class="backgreypublicpayment">';
-		print '<div class="logopublicpayment">';
-		print '<img id="dolpaymentlogo" src="'.$urllogo.'"';
-		print '>';
-		print '</div>';
-		print '</div>';
+	if (!empty($conf->global->DIGIRISKDOLIBARR_SIGNATURE_SHOW_COMPANY_LOGO)){
+		// Define logo and logosmall
+		$logosmall = $mysoc->logo_small;
+		$logo = $mysoc->logo;
+		// Define urllogo
+		$urllogo = '';
+		if (!empty($logosmall) && is_readable($conf->mycompany->dir_output.'/logos/thumbs/'.$logosmall)) {
+			$urllogo = DOL_URL_ROOT.'/viewimage.php?modulepart=mycompany&amp;entity='.$conf->entity.'&amp;file='.urlencode('logos/thumbs/'.$logosmall);
+		} elseif (!empty($logo) && is_readable($conf->mycompany->dir_output.'/logos/'.$logo)) {
+			$urllogo = DOL_URL_ROOT.'/viewimage.php?modulepart=mycompany&amp;entity='.$conf->entity.'&amp;file='.urlencode('logos/'.$logo);
+		}
+		// Output html code for logo
+		if ($urllogo) {
+			print '<div class="">';
+			print '<img src="'.$urllogo.'">';
+			print '</div>';
+		}
 	}
 
 	// Output introduction text
-	$text = '';
-//	if (!empty($conf->global->ONLINE_SIGN_NEWFORM_TEXT))
-//	{
-//		$langs->load("members");
-//		$reg = array();
-//		if (preg_match('/^\((.*)\)$/', $conf->global->ONLINE_SIGN_NEWFORM_TEXT, $reg)) $text .= $langs->trans($reg[1])."<br>\n";
-//		else $text .= $conf->global->ONLINE_SIGN_NEWFORM_TEXT."<br>\n";
-//		$text = '<tr><td align="center"><br>'.$text.'<br></td></tr>'."\n";
-//	}
-	if (empty($text))
-	{
-		$text .= '<div class="textpublicpayment"><br><strong>'.$langs->trans("WelcomeOnOnlineSignaturePage", $mysoc->name).'</strong></div>'."\n";
-	}
+	$text = '<div class=""><br><strong>'.$langs->trans("WelcomeOnOnlineSignaturePage", $mysoc->name).'</strong></div>'."\n";
 	print $text;
 
 	print '</div>';
@@ -1120,14 +1100,12 @@ function llxHeaderSignature($title, $head = "", $disablejs = 0, $disablehead = 0
  * @param   Object	$object				Object
  * @return	string						Url string
  */
-function showDirectPublicLinkSignature($object)
-{
-	global $conf, $langs;
+function showDirectPublicLinkSignature() {
+	global $langs;
 
 	$url = dol_buildpath('/custom/digiriskdolibarr/public/signature/index.php', 3);
 
-	$out = '';
-	$out .= img_picto('', 'object_globe.png').' '.$langs->trans("SignaturePublicAccess").' :<br>';
+	$out = img_picto('', 'object_globe.png').' '.$langs->trans("SignaturePublicAccess").' :<br>';
 	$out .= '<a href="'.$url.'" target="_blank">'.$url.'</a>';
 
 	return $out;
