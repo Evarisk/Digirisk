@@ -16,7 +16,7 @@
  */
 
 /**
- *       \file
+ *       \file       public/signature/index.php
  *       \ingroup    digiriskdolibarr
  *       \brief      Public page to manage signature
  */
@@ -25,9 +25,9 @@ if (!defined('NOREQUIREUSER'))  define('NOREQUIREUSER', '1');
 if (!defined('NOTOKENRENEWAL')) define('NOTOKENRENEWAL', '1');
 if (!defined('NOREQUIREMENU'))  define('NOREQUIREMENU', '1');
 if (!defined('NOREQUIREHTML'))  define('NOREQUIREHTML', '1');
-if (!defined('NOLOGIN'))        define("NOLOGIN", 1); // This means this output page does not require to be logged.
-if (!defined('NOCSRFCHECK'))    define("NOCSRFCHECK", 1); // We accept to go on this page from external web site.
-if (!defined('NOIPCHECK'))		define('NOIPCHECK', '1'); // Do not check IP defined into conf $dolibarr_main_restrict_ip
+if (!defined('NOLOGIN'))        define("NOLOGIN", 1);           // This means this output page does not require to be logged.
+if (!defined('NOCSRFCHECK'))    define("NOCSRFCHECK", 1);       // We accept to go on this page from external web site.
+if (!defined('NOIPCHECK'))		define('NOIPCHECK', '1');     // Do not check IP defined into conf $dolibarr_main_restrict_ip
 if (!defined('NOBROWSERNOTIF')) define('NOBROWSERNOTIF', '1');
 
 // Load Dolibarr environment
@@ -46,9 +46,6 @@ if (!$res && file_exists("../../../../main.inc.php")) $res = @include "../../../
 if (!$res) die("Include of main fails");
 
 require_once DOL_DOCUMENT_ROOT.'/core/class/html.form.class.php';
-require_once DOL_DOCUMENT_ROOT.'/core/lib/security.lib.php';
-require_once DOL_DOCUMENT_ROOT.'/core/lib/company.lib.php';
-require_once DOL_DOCUMENT_ROOT.'/core/lib/payments.lib.php';
 require_once '../../lib/digiriskdolibarr_function.lib.php';
 
 // Load translation files required by the page
@@ -56,16 +53,6 @@ $langs->loadLangs(array("digiriskdolibarr@digiriskdolibarr", "other", "errors"))
 
 // Get parameters
 $track_id = GETPOST('track_id', 'alpha');
-$action = GETPOST('action', 'aZ09');
-
-/*
-/*
- * Actions
- */
-
-$parameters = array();
-$reshook = $hookmanager->executeHooks('doActions', $parameters, $object, $action); // Note that $action and $object may have been modified by some hooks
-if ($reshook < 0) setEventMessages($hookmanager->error, $hookmanager->errors, 'errors');
 
 /*
  * View
@@ -84,28 +71,21 @@ $morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");
 
 llxHeaderSignature($langs->trans("Signature"), "", 0, 0, $morejs, $morecss);
 
-print '<div class="signaturepublicarea">';
-print '<p style="text-align: center">'.$langs->trans("SignaturePublicDesc").'</p>';
-print '</div>';
-
 $url = dirname($_SERVER['PHP_SELF']) . '/add_signature.php';
 
 print '<div id="form_view_signature">';
 print '<form method="get" name="form_view_signature"  enctype="multipart/form-data" action="'.$url.'">';
-print '<label for="track_id" style="display: inline-block; width: 30%; "><span class="fieldrequired">'.$langs->trans("SignatureTrackId").'</span></label>';
-print '<input size="30" id="track_id" name="track_id" value="'.(GETPOST('track_id') ? GETPOST('track_id') : '').'" />';
+print '<label for="track_id"><span class="fieldrequired">'.$langs->trans("SignatureTrackId").'</span></label>';
+print '<input size="30" id="track_id" name="track_id" value="'.(!empty($track_id) ? $track_id : '').'" />';
 
-print '<div style="text-align: center; margin-top: 1.5em;">';
+print '<div>';
 print '<input class="button" type="submit" value="'.$langs->trans('Sign').'" />';
 print "</div>";
 
 print "</form>";
 print "</div>";
 
-
 // End of page
-
 llxFooter('', 'public');
-
 $db->close();
 

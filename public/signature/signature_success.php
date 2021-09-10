@@ -16,9 +16,9 @@
  */
 
 /**
- *       \file
+ *       \file       public/signature/signature_success.php
  *       \ingroup    digiriskdolibarr
- *       \brief      Public page to manage signature
+ *       \brief      Public page to view success on signature
  */
 
 if (!defined('NOREQUIREUSER'))  define('NOREQUIREUSER', '1');
@@ -45,33 +45,14 @@ if (!$res && file_exists("../../../main.inc.php")) $res = @include "../../../mai
 if (!$res && file_exists("../../../../main.inc.php")) $res = @include "../../../../main.inc.php";
 if (!$res) die("Include of main fails");
 
-require_once DOL_DOCUMENT_ROOT.'/core/class/html.form.class.php';
-require_once DOL_DOCUMENT_ROOT.'/core/lib/security.lib.php';
-require_once DOL_DOCUMENT_ROOT.'/core/lib/company.lib.php';
-require_once DOL_DOCUMENT_ROOT.'/core/lib/payments.lib.php';
 require_once '../../lib/digiriskdolibarr_function.lib.php';
 
 // Load translation files required by the page
 $langs->loadLangs(array("digiriskdolibarr@digiriskdolibarr", "other", "errors"));
 
-// Get parameters
-$track_id = GETPOST('track_id', 'alpha');
-$action = GETPOST('action', 'aZ09');
-
-/*
-/*
- * Actions
- */
-
-$parameters = array();
-$reshook = $hookmanager->executeHooks('doActions', $parameters, $object, $action); // Note that $action and $object may have been modified by some hooks
-if ($reshook < 0) setEventMessages($hookmanager->error, $hookmanager->errors, 'errors');
-
 /*
  * View
  */
-
-$form = new Form($db);
 
 if (empty($conf->global->DIGIRISKDOLIBARR_SIGNATURE_ENABLE_PUBLIC_INTERFACE))
 {
@@ -84,13 +65,11 @@ $morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");
 
 llxHeaderSignature($langs->trans("Signature"), "", 0, 0, $morejs, $morecss);
 
-print '<div class="signaturepublicarea">';
-print '<p style="text-align: center">'.$langs->trans("SignatureSuccess").'</p>';
+print '<div>';
+print '<p>'.$langs->trans("SignatureSuccess").'</p>';
 print '</div>';
 
 // End of page
-
 llxFooter('', 'public');
-
 $db->close();
 
