@@ -193,10 +193,10 @@ if ($action == 'send') {
 		//$trackid = 'PreventionPlanSignature'.$element->id;
 		$sendto = $signatory->email;
 
-		if (dol_strlen($sendto) && (!empty($conf->global->DIGIRISKDOLIBARR_SENDMAIL_SIGNATURE))) {
+		if (dol_strlen($sendto) && (!empty($conf->global->MAIN_MAIL_EMAIL_FROM))) {
 			require_once DOL_DOCUMENT_ROOT.'/core/class/CMailFile.class.php';
 
-			$from = $conf->global->DIGIRISKDOLIBARR_SENDMAIL_SIGNATURE;
+			$from = $conf->global->MAIN_MAIL_EMAIL_FROM;
 			$url = dol_buildpath('/custom/digiriskdolibarr/public/signature/add_signature.php?track_id='.$signatory->signature_url, 3);
 
 			$message = $langs->trans('SignatureEmailMessage') . ' ' . $url;
