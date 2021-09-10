@@ -205,7 +205,7 @@ if ( $signatory->role == 'PP_EXT_SOCIETY_INTERVENANTS') {
 //	$modulepart = 'digiriskdolibarr:PreventionPlanDocument';
 //	$title = $langs->trans('PreventionPlanDocument');
 //
-//	print digiriskshowdocuments($modulepart, $dir_files, $filedir, $urlsource, 1, $permissiontodelete, $defaultmodel, 1, 0, 28, 0, '', $title, '', $langs->defaultlang, '', $preventionplandocument, 0, '', 1 );
+//	print digiriskshowdocuments($modulepart, $dir_files, $filedir, $urlsource, 1, $permissiontodelete, $defaultmodel, 1, 0, 28, 0, 'specimen', $title, '', $langs->defaultlang, '', $preventionplandocument, 0, '', 1 );
 
 	//	require  "../../core/tpl/digiriskdolibarr_signature_view.tpl.php";
 

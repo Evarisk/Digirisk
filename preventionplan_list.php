@@ -65,6 +65,7 @@ $contextpage = GETPOST('contextpage', 'aZ') ?GETPOST('contextpage', 'aZ') : 'pre
 $title = $langs->trans("PreventionPlan");
 
 $preventionplan    = new PreventionPlan($db);
+$signatory         = new PreventionPlanSignature($db);
 $digiriskresources = new DigiriskResources($db);
 $societe           = new Societe($db);
 $contact           = new Contact($db);
@@ -473,18 +474,39 @@ while ($i < ($limit ? min($num, $limit) : $num)) {
 
 			foreach ($val as $name => $resource) {
 				if ($resource['checked']) {
-					$resourceLinked = $digiriskresources->fetchResourcesFromObject($name, $preventionplan);
-
 					print '<td>';
-					if (!empty($resourceLinked) && $resourceLinked > 0) {
-						if ($resource == 'ExtSocietyIntervenants') {
-							$resourcesLinked = array_shift($resourceLinked);
-							foreach ($resourcesLinked as $resourceLinkedSingle) {
-								print $resourceLinkedSingle->getNomUrl(1);
-								print '<br>';
+					if ($resource['label'] == 'MaitreOeuvre') {
+						$element = $signatory->fetchSignatory('PP_MAITRE_OEUVRE', $preventionplan->id);
+						if ($element > 0) {
+							$element = array_shift($element);
+							$usertmp->fetch($element->element_id);
+							print $usertmp->getNomUrl(1);
+						}
+					}
+					elseif ($resource['label'] == 'ExtSociety') {
+						$ext_society = $digiriskresources->fetchResourcesFromObject('PP_EXT_SOCIETY', $preventionplan);
+						if ($ext_society > 0) {
+							print $ext_society->getNomUrl(1);
+						}
+					}
+					if ($resource['label'] == 'ExtSocietyResponsible') {
+						$element = $signatory->fetchSignatory('PP_EXT_SOCIETY_RESPONSIBLE', $preventionplan->id);
+						if ($element > 0) {
+							$element = array_shift($element);
+							$contact->fetch($element->element_id);
+							print $contact->getNomUrl(1);
+						}
+					}
+					if ($resource['label'] == 'ExtSocietyIntervenants') {
+						$ext_society_intervenants = $signatory->fetchSignatory('PP_EXT_SOCIETY_INTERVENANTS', $preventionplan->id);
+						if (is_array($ext_society_intervenants) && !empty ($ext_society_intervenants) && $ext_society_intervenants > 0) {
+							foreach ($ext_society_intervenants as $element) {
+								if ($element > 0) {
+									$contact->fetch($element->element_id);
+									print $contact->getNomUrl(1);
+									print '<br>';
+								}
 							}
-						} else {
-							print $resourceLinked->getNomUrl(1);
 						}
 					}
 					print '</td>';

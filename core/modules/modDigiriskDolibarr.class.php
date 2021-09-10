@@ -214,7 +214,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			87 => array('DIGIRISKDOLIBARR_PREVENTIONPLANDOCUMENT_ADDON_ODT_PATH','chaine', DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/documents/doctemplates/preventionplandocument/' ,'', $conf->entity),
 			88 => array('DIGIRISKDOLIBARR_PREVENTIONPLANDOCUMENT_CUSTOM_ADDON_ODT_PATH','chaine', DOL_DATA_ROOT . '/ecm/digiriskdolibarr/preventionplandocument/' ,'', $conf->entity),
 			89 => array('DIGIRISKDOLIBARR_PREVENTIONPLANDOCUMENT_DEFAULT_MODEL','chaine', 'preventionplandocument_odt' ,'', $conf->entity),
-			260 =>array('DIGIRISKDOLIBARR_PREVENTIONPLANDOCUMENT_SPECIMEN_ADDON_ODT_PATH','chaine', DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/documents/doctemplates/preventionplandocument/specimen' ,'', $conf->entity),
+			260 =>array('DIGIRISKDOLIBARR_PREVENTIONPLANDOCUMENT_SPECIMEN_ADDON_ODT_PATH','chaine', DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/documents/doctemplates/preventionplandocument/specimen/' ,'', $conf->entity),
 
 			// CONST FIRE PERMIT
 			90 => array('MAIN_AGENDA_ACTIONAUTO_FIREPERMIT_CREATE','chaine',1,'', $conf->entity),
@@ -720,16 +720,16 @@ class modDigiriskdolibarr extends DolibarrModules
 		$this->_load_tables('/digiriskdolibarr/sql/firepermit/');
 
 		if ( $conf->global->DIGIRISKDOLIBARR_DOCUMENT_MODELS_SET ==  0 ) {
-			addDocumentModel('informationssharing_odt'            ,'informationssharing'   ,'ODT templates','DIGIRISKDOLIBARR_INFORMATIONSSHARING_ADDON_ODT_PATH');
-			addDocumentModel('legaldisplay_odt'                   ,'legaldisplay'          ,'ODT templates','DIGIRISKDOLIBARR_LEGALDISPLAY_ADDON_ODT_PATH');
-			addDocumentModel('firepermitdocument_odt'             ,'firepermitdocument'    ,'ODT templates','DIGIRISKDOLIBARR_FIREPERMITDOCUMENT_ADDON_ODT_PATH');
-			addDocumentModel('preventionplandocument_odt'         ,'preventionplandocument','ODT templates','DIGIRISKDOLIBARR_PREVENTIONPLANDOCUMENT_ADDON_ODT_PATH');
-			addDocumentModel('preventionplandocument_specimen_odt','preventionplandocument','ODT templates','DIGIRISKDOLIBARR_PREVENTIONPLANDOCUMENT_SPECIMEN_ADDON_ODT_PATH');
-			addDocumentModel('groupmentdocument_odt'              ,'groupmentdocument'     ,'ODT templates','DIGIRISKDOLIBARR_GROUPMENTDOCUMENT_ADDON_ODT_PATH');
-			addDocumentModel('workunitdocument_odt'               ,'workunitdocument'      ,'ODT templates','DIGIRISKDOLIBARR_WORKUNITDOCUMENT_ADDON_ODT_PATH');
-			addDocumentModel('listingrisksaction_odt'             ,'listingrisksaction'    ,'ODT templates','DIGIRISKDOLIBARR_LISTINGRISKSACTION_ADDON_ODT_PATH');
-			addDocumentModel('listingrisksphoto_odt'              ,'listingrisksphoto'     ,'ODT templates','DIGIRISKDOLIBARR_LISTINGRISKSPHOTO_ADDON_ODT_PATH');
-			addDocumentModel('riskassessmentdocument_odt'         ,'riskassessmentdocument','ODT templates','DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_ADDON_ODT_PATH');
+			addDocumentModel('informationssharing_odt'            ,'informationssharing'           ,'ODT templates','DIGIRISKDOLIBARR_INFORMATIONSSHARING_ADDON_ODT_PATH');
+			addDocumentModel('legaldisplay_odt'                   ,'legaldisplay'                  ,'ODT templates','DIGIRISKDOLIBARR_LEGALDISPLAY_ADDON_ODT_PATH');
+			addDocumentModel('firepermitdocument_odt'             ,'firepermitdocument'            ,'ODT templates','DIGIRISKDOLIBARR_FIREPERMITDOCUMENT_ADDON_ODT_PATH');
+			addDocumentModel('preventionplandocument_odt'         ,'preventionplandocument'        ,'ODT templates','DIGIRISKDOLIBARR_PREVENTIONPLANDOCUMENT_ADDON_ODT_PATH');
+			addDocumentModel('preventionplandocument_specimen_odt','preventionplandocumentspecimen','ODT templates','DIGIRISKDOLIBARR_PREVENTIONPLANDOCUMENT_SPECIMEN_ADDON_ODT_PATH');
+			addDocumentModel('groupmentdocument_odt'              ,'groupmentdocument'             ,'ODT templates','DIGIRISKDOLIBARR_GROUPMENTDOCUMENT_ADDON_ODT_PATH');
+			addDocumentModel('workunitdocument_odt'               ,'workunitdocument'              ,'ODT templates','DIGIRISKDOLIBARR_WORKUNITDOCUMENT_ADDON_ODT_PATH');
+			addDocumentModel('listingrisksaction_odt'             ,'listingrisksaction'            ,'ODT templates','DIGIRISKDOLIBARR_LISTINGRISKSACTION_ADDON_ODT_PATH');
+			addDocumentModel('listingrisksphoto_odt'              ,'listingrisksphoto'             ,'ODT templates','DIGIRISKDOLIBARR_LISTINGRISKSPHOTO_ADDON_ODT_PATH');
+			addDocumentModel('riskassessmentdocument_odt'         ,'riskassessmentdocument'        ,'ODT templates','DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_ADDON_ODT_PATH');
 
 			dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_DOCUMENT_MODELS_SET', 1, 'integer', 0, '', $conf->entity);
 		}
