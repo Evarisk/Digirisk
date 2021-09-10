@@ -892,9 +892,7 @@ window.eoxiaJS.signature.createSignature = function() {
 		contentType: 'application/octet-stream',
 		data: signature,
 		success: function() {
-            setTimeout(function(){
-                window.location.replace(elementRedirect);
-            }, 800);
+        	window.location.replace(elementRedirect);
 		},
 		error: function ( ) {
 		    alert('Error')

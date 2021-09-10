@@ -132,7 +132,6 @@ if ($action == 'addAttendant') {
 if ($action == 'addSignature') {
 
 	$signatoryID = GETPOST('signatoryID');
-	$signature = GETPOST('signature');
 	$request_body = file_get_contents('php://input');
 
 	$signatory->fetch($signatoryID);

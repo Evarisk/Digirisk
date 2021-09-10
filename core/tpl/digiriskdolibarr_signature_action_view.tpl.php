@@ -38,7 +38,7 @@
 					<button type="submit" name="deleteAttendant" id="deleteAttendant" class="attendant-delete wpeo-button button-primary" value="<?php echo $element->id ?>">
 						<span><i class="fas fa-trash"></i> <?php echo $langs->trans('DeleteAttendant'); ?></span>
 					</button>
-					</form>
+					<?php print '</form>'; ?>
 				</li>
 			<?php endif; ?>
 		<?php endif; ?>
