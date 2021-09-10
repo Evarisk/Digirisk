@@ -892,11 +892,13 @@ window.eoxiaJS.signature.createSignature = function() {
 		contentType: 'application/octet-stream',
 		data: signature,
 		success: function() {
+            f (elementZone == "private") {
+                actionContainerSuccess.removeClass('hidden');
+                $('.signatures-container').load( document.URL + ' .signatures-container');
+            } else {
+                window.location.replace(elementRedirect);
+            }
 
-            actionContainerSuccess.removeClass('hidden');
-            $('.signatures-container').load( document.URL + ' .signatures-container');
-
-            //window.location.replace(elementRedirect);
 		},
 		error: function ( ) {
 		    alert('Error')
