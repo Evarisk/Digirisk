@@ -574,7 +574,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->elementtype = 'preventionplan@digiriskdolibarr';
 				$actioncomm->code        = 'AC_PREVENTIONPLANSIGNATURE_ADDATTENDANT';
 				$actioncomm->type_code   = 'AC_OTH_AUTO';
-				$actioncomm->label       = $langs->trans('PreventionPlanAddAttedantTrigger');
+				$actioncomm->label       = $langs->trans('PreventionPlanAddAttendantTrigger');
 				$actioncomm->datep       = $now;
 				$actioncomm->fk_element  = $object->fk_object;
 				$actioncomm->socpeopleassigned  = array($object->element_id => $object->element_id);

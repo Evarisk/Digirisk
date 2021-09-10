@@ -282,7 +282,7 @@ PreventionPlanInprogressTrigger = Plan de prévention rouvert
 PreventionPlanPendingSignatureTrigger = Plan de prévention en attente de signature des participants
 PreventionPlanLockTrigger = Plan de prévention verrouillé - Prêt pour la génération du documuent
 PreventionPlanArchivedTrigger = Plan de prévention archivé
-PreventionPlanAddAttedantTrigger = Ajout d'un participant au plan de prévention
+PreventionPlanAddAttendantTrigger = Ajout d'un participant au plan de prévention
 
 # Mod Numbering - Modèle de numérotation
 DigiriskPreventionPlanNumberingModule = Modèle de numérotation des plans de prévention de Digirisk

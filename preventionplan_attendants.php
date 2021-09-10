@@ -111,7 +111,6 @@ if ($action == 'addAttendant') {
 			foreach ($extintervenant_ids as $extintervenant_id) {
 				$contact->fetch($extintervenant_id);
 				setEventMessages($langs->trans('AddAttendantMessage') . ' ' . $contact->firstname . ' ' . $contact->lastname, array());
-				$signatory->call_trigger(strtoupper(get_class($signatory)) . '_ADDATTENDANT', $user);
 			}
 			// Creation attendant OK
 			$urltogo = str_replace('__ID__', $result, $backtopage);
@@ -541,6 +540,15 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 			print '</td><td class="center">';
 			print $element->getLibStatut(5);
 			print '</td>';
+			if ($object->status == 1) {
+				print '<td class="center">';
+				require __DIR__ . "/core/tpl/digiriskdolibarr_signature_action_view.tpl.php";
+				print '</td>';
+				print '<td class="center">';
+				print '';
+				print '</td>';
+
+			}
 			if ($object->status == 2) {
 				print '<td class="center">';
 				require __DIR__ . "/core/tpl/digiriskdolibarr_signature_action_view.tpl.php";
