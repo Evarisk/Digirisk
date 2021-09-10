@@ -268,6 +268,7 @@ class doc_preventionplandocument_odt extends ModeleODTPreventionPlanDocument
 				$tmparray['photoDefault'] = $image['fullname'];
 			}
 
+			$digiriskelement    = new DigiriskElement($this->db);
 			$resources          = new DigiriskResources($this->db);
 			$signatory          = new PreventionPlanSignature($this->db);
 			$societe            = new Societe($this->db);
@@ -421,8 +422,10 @@ class doc_preventionplandocument_odt extends ModeleODTPreventionPlanDocument
 
 						foreach ($preventionplanlines as $line) {
 
+							$digiriskelement->fetch($line->fk_element);
+
 							$tmparray['key_unique']    = $line->ref;
-							$tmparray['unite_travail'] = $line->fk_element;
+							$tmparray['unite_travail'] = $digiriskelement->ref . " - " . $digiriskelement->label;
 							$tmparray['action']        = $line->description;
 							$tmparray['risk']          = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $risk->get_danger_category($line) . '.png';
 							$tmparray['prevention']    = $line->prevention_method;
