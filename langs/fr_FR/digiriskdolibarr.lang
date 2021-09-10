@@ -296,6 +296,7 @@ DigiriskPreventionPlanDocumentStandardModel = Renvoie le numéro sous la forme P
 DigiriskTemplateDocumentPreventionPlan = Modèle de documents des plans de prévention de Digirisk
 PreventionPlanDocumentCustomDigiriskTemplate = ODT custom des plans de prévention
 PreventionPlanDocumentDigiriskTemplate = ODT par défaut des plans de prévention
+PreventionPlanDocumentSpecimenDigiriskTemplate = ODT par défaut des specimen plans de prévention
 PreventionPlanDocument = Fiche de Plan de Prévention
 PreventionPlanDocumentGeneratedWithDolibarr = Plan de prévention généré avec Dolibarr
 

@@ -131,7 +131,7 @@ class doc_preventionplandocument_specimen_odt extends ModeleODTPreventionPlanDoc
 
 		// Scan directories
 		$nbofiles = count($listoffiles);
-		if (!empty($conf->global->DIGIRISKDOLIBARR_PREVENTIONPLANDOCUMENT_ADDON_ODT_PATH))
+		if (!empty($conf->global->DIGIRISKDOLIBARR_PREVENTIONPLANDOCUMENT_SPECIMEN_ADDON_ODT_PATH))
 		{
 			$texte .= $langs->trans("DigiriskNumberOfModelFilesFound").': <b>';
 			//$texte.=$nbofiles?'<a id="a_'.get_class($this).'" href="#">':'';

@@ -309,7 +309,15 @@ function digiriskshowdocuments($modulepart, $modulesubdir, $filedir, $urlsource,
 
 		if (class_exists($class))
 		{
-			$modellist = call_user_func($class.'::liste_modeles', $db, 100);
+			if (preg_match('/specimen/', $param)) {
+				$type = strtolower($class) . 'specimen';
+				$modellist = array();
+
+				include_once DOL_DOCUMENT_ROOT . '/core/lib/functions2.lib.php';
+				$modellist = getListOfModels($db, $type, 0);
+			} else {
+				$modellist = call_user_func($class.'::liste_modeles', $db, 100);
+			}
 		}
 		else
 		{
