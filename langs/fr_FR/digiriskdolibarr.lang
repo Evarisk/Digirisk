@@ -361,9 +361,7 @@ ErrorNoEmailForExtResponsible = Erreur : Le responsable de l'Entreprise Extérie
 ErrorNoEmailForMaitreOeuvre = Erreur : Le responsable de l'Entreprise Utilisatrice n'a pas d'email
 ErrorNoEmailForExtIntervenant = Erreur : Le (ou les) intervenant(s) ne possède(nt) pas d'email
 SignatureEmailSubject = Signature du plan de prevention
-SignatureEmailMessage = Bonjour, <br> Veuillez trouver ci-joint le lien de signature du plan de prévention.<br>
-SendMailSignature = Email émetteur utilisé pour envoyer les liens de signature
-SignatureSuccess = Document signé avec succès
+
 
 
 
@@ -838,8 +836,11 @@ DeleteAttendantMessage = Suppression de l'intervenant :
 SignaturePublicInterfaceForbidden = Accès interdit à l'interface publique de signature
 Attendant = Le participant
 SetAbsentAttendant = est absent
-
-
+SendMailSignature = Email émetteur utilisé pour envoyer les liens de signature
+SignatureSuccess = Document signé avec succès
+SignatureEmailMessage = Bonjour, <br> Veuillez trouver ci-joint le lien de signature du document.<br>
+AddSignatureSuccess = Signature du document réussie
+AddSignatureSuccessText = La signature a bien été enregistrée pour le document
 
 #
 # Ticket - Interface publique ticket

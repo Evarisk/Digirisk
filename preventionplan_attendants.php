@@ -307,7 +307,12 @@ print dol_get_fiche_end(); ?>
 	</div>
 </div>
 <?php endif; ?>
-
+<div class="noticeSignatureSuccess wpeo-notice notice-success hidden">
+	<div class="notice-content">
+		<div class="notice-title"><?php echo $langs->trans('AddSignatureSuccess') ?></div>
+		<div class="notice-subtitle"><?php echo $langs->trans("AddSignatureSuccessText") . GETPOST('signature_id')?></div>
+	</div>
+</div>
 <?php
 // Show direct link to public interface
 if (!empty($conf->global->DIGIRISKDOLIBARR_SIGNATURE_ENABLE_PUBLIC_INTERFACE)) {
@@ -361,6 +366,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 
 	print load_fiche_titre($langs->trans("SignatureMaitreOeuvre"), '', '');
 
+	print '<div class="signatures-container">';
 	print '<table class="border centpercent tableforfield">';
 	print '<tr class="liste_titre">';
 	print '<td>' . $langs->trans("Name") . '</td>';
@@ -598,6 +604,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 		print '</tr>';
 		print '</table>'."\n";
 		print '</form>';
+		print '</div>';
 	}
 }
 

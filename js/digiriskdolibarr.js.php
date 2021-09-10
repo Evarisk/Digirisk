@@ -866,7 +866,7 @@ window.eoxiaJS.signature.createSignature = function() {
 	let elementSignatory = $(this).attr('value');
 	let elementRedirect  = $(this).find('#redirect' + elementSignatory).attr('value');
 	let elementZone  = $(this).find('#zone' + elementSignatory).attr('value');
-
+    let actionContainerSuccess = $('.noticeSignatureSuccess');
 	var signatoryIDPost = '';
 	if (elementSignatory !== 0) {
 		signatoryIDPost = '&signatoryID=' + elementSignatory;
@@ -892,7 +892,11 @@ window.eoxiaJS.signature.createSignature = function() {
 		contentType: 'application/octet-stream',
 		data: signature,
 		success: function() {
-        	window.location.replace(elementRedirect);
+
+            actionContainerSuccess.removeClass('hidden');
+            $('.signatures-container').load( document.URL + ' .signatures-container');
+
+            //window.location.replace(elementRedirect);
 		},
 		error: function ( ) {
 		    alert('Error')
