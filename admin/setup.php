@@ -70,7 +70,9 @@ require_once '../core/tpl/digiriskdolibarr_projectcreation_action.tpl.php';
 $page_name = "DigiriskdolibarrSetup";
 $help_url = 'FR:Module_DigiriskDolibarr#Configuration';
 
-llxHeader('', $langs->trans($page_name), $help_url);
+$morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");
+
+llxHeader('', $langs->trans($page_name), $help_url, '', '', '', '', $morecss);
 
 // Subheader
 $linkback = '<a href="'.($backtopage ? $backtopage : DOL_URL_ROOT.'/admin/modules.php?restore_lastsearch_values=1').'">'.$langs->trans("BackToModuleList").'</a>';

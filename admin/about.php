@@ -57,7 +57,10 @@ $backtopage = GETPOST('backtopage', 'alpha');
 
 $page_name = "DigiriskdolibarrAbout";
 $help_url = 'FR:Module_DigiriskDolibarr';
-llxHeader('', $langs->trans($page_name), $help_url);
+
+$morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");
+
+llxHeader('', $langs->trans($page_name), $help_url, '', '', '', '', $morecss);
 
 // Subheader
 $linkback = '<a href="'.($backtopage ? $backtopage : DOL_URL_ROOT.'/admin/modules.php?restore_lastsearch_values=1').'">'.$langs->trans("BackToModuleList").'</a>';

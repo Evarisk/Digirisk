@@ -117,7 +117,10 @@ if (($action == 'update' && !GETPOST("cancel", 'alpha'))
  */
 
 $help_url = 'FR:Module_DigiriskDolibarr#L.27onglet_Social';
-llxHeader('', $langs->trans("CompanyFoundation"), $help_url);
+
+$morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");
+
+llxHeader('', $langs->trans("CompanyFoundation"), $help_url, '', '', '', '', $morecss);
 
 print load_fiche_titre($langs->trans("CompanyFoundation"), '', 'title_setup');
 

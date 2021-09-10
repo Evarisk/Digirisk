@@ -193,7 +193,9 @@ $formother = new FormOther($db);
 $title = $langs->trans("PreventionPlanList");
 $help_url = 'FR:Module_DigipreventionplanDolibarr';
 
-llxHeader("", $title, $help_url);
+$morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");
+
+llxHeader("", $title, $help_url, '', '', '', '', $morecss);
 
 // Add $param from extra fields
 include DOL_DOCUMENT_ROOT.'/core/tpl/extrafields_list_search_param.tpl.php';

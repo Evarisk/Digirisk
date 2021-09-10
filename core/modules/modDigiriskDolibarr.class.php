@@ -563,7 +563,7 @@ class modDigiriskdolibarr extends DolibarrModules
 		$this->menu[$r++] = array(
 			'fk_menu'  => 'fk_mainmenu=digiriskdolibarr', // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
 			'type'     => 'left', // This is a Top menu entry
-			'titre'    => 'Digirisk',
+			'titre'    => '<i class="fas fa-home"></i> Digirisk',
 			'mainmenu' => 'digiriskdolibarr',
 			'leftmenu' => '',
 			'url'      => '/digiriskdolibarr/digiriskdolibarrindex.php',
