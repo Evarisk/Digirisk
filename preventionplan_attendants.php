@@ -191,60 +191,57 @@ if ($action == 'send') {
 	$signatory->fetch($signatoryID);
 
 	if (!$error) {
-		$signatory->last_email_sent_date = dol_now('tzuser');
-		$result = $signatory->update($user, true);
+		$langs->load('mails');
+		//$trackid = 'PreventionPlanSignature'.$element->id;
+		$sendto = $signatory->email;
 
-		if ($result > 0) {
-			$langs->load('mails');
-			//$trackid = 'PreventionPlanSignature'.$element->id;
-			$sendto = $signatory->email;
+		if (dol_strlen($sendto) && (!empty($conf->global->DIGIRISKDOLIBARR_SENDMAIL_SIGNATURE))) {
+			require_once DOL_DOCUMENT_ROOT.'/core/class/CMailFile.class.php';
 
-			if (dol_strlen($sendto) && (!empty($conf->global->DIGIRISKDOLIBARR_SENDMAIL_SIGNATURE))) {
-				require_once DOL_DOCUMENT_ROOT.'/core/class/CMailFile.class.php';
+			$from = $conf->global->DIGIRISKDOLIBARR_SENDMAIL_SIGNATURE;
+			$url = dol_buildpath('/custom/digiriskdolibarr/public/signature/add_signature.php?track_id='.$signatory->signature_url, 3);
 
-				$from = $conf->global->DIGIRISKDOLIBARR_SENDMAIL_SIGNATURE;
-				$url = dol_buildpath('/custom/digiriskdolibarr/public/signature/add_signature.php?track_id='.$signatory->signature_url, 3);
+			$message = $langs->trans('SignatureEmailMessage') . ' ' . $url;
+			$subject = $langs->trans('SignatureEmailSubject') . ' ' . $object->ref;
 
-				$message = $langs->trans('SignatureEmailMessage') . ' ' . $url;
-				$subject = $langs->trans('SignatureEmailSubject') . ' ' . $object->ref;
+			// Create form object
+			// Send mail (substitutionarray must be done just before this)
+			$mailfile = new CMailFile($subject, $sendto, $from, $message, array(), array(), array(), "", "", 0, -1, '', '', '', '', 'mail');
 
-				// Create form object
-				// Send mail (substitutionarray must be done just before this)
-				$mailfile = new CMailFile($subject, $sendto, $from, $message, array(), array(), array(), "", "", 0, -1, '', '', '', '', 'mail');
-
-				if ($mailfile->error) {
-					setEventMessages($mailfile->error, $mailfile->errors, 'errors');
-				} else {
-					$result = $mailfile->sendfile();
-					if ($result) {
-						$signatory->setPendingSignature($user, false);
-						setEventMessages($langs->trans('SendEmailAt').' '.$signatory->email,array());
-						// This avoid sending mail twice if going out and then back to page
-						header('Location: '.$_SERVER["PHP_SELF"].'?id='.$object->id);
-						exit;
-					} else {
-						$langs->load("other");
-						$mesg = '<div class="error">';
-						if ($mailfile->error) {
-							$mesg .= $langs->transnoentities('ErrorFailedToSendMail', dol_escape_htmltag($from), dol_escape_htmltag($sendto));
-							$mesg .= '<br>'.$mailfile->error;
-						} else {
-							$mesg .= $langs->transnoentities('ErrorFailedToSendMail', dol_escape_htmltag($from), dol_escape_htmltag($sendto));
-						}
-						$mesg .= '</div>';
-						setEventMessages($mesg, null, 'warnings');
-					}
-				}
+			if ($mailfile->error) {
+				setEventMessages($mailfile->error, $mailfile->errors, 'errors');
 			} else {
-				$langs->load("errors");
-				setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv("MailTo")), null, 'warnings');
-				dol_syslog('Try to send email with no recipient defined', LOG_WARNING);
+				$result = $mailfile->sendfile();
+				if ($result) {
+					$signatory->last_email_sent_date = dol_now('tzuser');
+					$signatory->update($user, true);
+					$signatory->setPendingSignature($user, false);
+					setEventMessages($langs->trans('SendEmailAt').' '.$signatory->email,array());
+					// This avoid sending mail twice if going out and then back to page
+					header('Location: '.$_SERVER["PHP_SELF"].'?id='.$object->id);
+					exit;
+				} else {
+					$langs->load("other");
+					$mesg = '<div class="error">';
+					if ($mailfile->error) {
+						$mesg .= $langs->transnoentities('ErrorFailedToSendMail', dol_escape_htmltag($from), dol_escape_htmltag($sendto));
+						$mesg .= '<br>'.$mailfile->error;
+					} else {
+						$mesg .= $langs->transnoentities('ErrorFailedToSendMail', dol_escape_htmltag($from), dol_escape_htmltag($sendto));
+					}
+					$mesg .= '</div>';
+					setEventMessages($mesg, null, 'warnings');
+				}
 			}
 		} else {
-			// Mail sent KO
-			if (!empty($signatory->errors)) setEventMessages(null, $signatory->errors, 'errors');
-			else  setEventMessages($signatory->error, null, 'errors');
+			$langs->load("errors");
+			setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv("MailTo")), null, 'warnings');
+			dol_syslog('Try to send email with no recipient defined', LOG_WARNING);
 		}
+	} else {
+		// Mail sent KO
+		if (!empty($signatory->errors)) setEventMessages(null, $signatory->errors, 'errors');
+		else  setEventMessages($signatory->error, null, 'errors');
 	}
 }
 
