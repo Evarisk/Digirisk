@@ -892,7 +892,7 @@ window.eoxiaJS.signature.createSignature = function() {
 		contentType: 'application/octet-stream',
 		data: signature,
 		success: function() {
-            f (elementZone == "private") {
+            if (elementZone == "private") {
                 actionContainerSuccess.removeClass('hidden');
                 $('.signatures-container').load( document.URL + ' .signatures-container');
             } else {
