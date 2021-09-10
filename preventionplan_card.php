@@ -714,6 +714,8 @@ if ($action == 'create')
 
 	if ($backtopageforcancel) print '<input type="hidden" name="backtopageforcancel" value="'.$backtopageforcancel.'">';
 
+	print dol_get_fiche_head();
+
 	print '<table class="border centpercent tableforfieldcreate preventionplan-table">'."\n";
 
 	$type = 'DIGIRISKDOLIBARR_'.strtoupper($object->element).'_ADDON';
@@ -805,7 +807,7 @@ if ($action == 'create')
 
 	print '</table>'."\n";
 
-	dol_fiche_end();
+	print dol_get_fiche_end();
 
 	print '<div class="center">';
 	print '<input type="submit" class="button" id ="actionButtonCreate" name="add" value="'.dol_escape_htmltag($langs->trans("Create")).'">';
@@ -827,7 +829,7 @@ if (($id || $ref) && $action == 'edit')
 	if ($backtopage) print '<input type="hidden" name="backtopage" value="'.$backtopage.'">';
 	if ($backtopageforcancel) print '<input type="hidden" name="backtopageforcancel" value="'.$backtopageforcancel.'">';
 
-	dol_fiche_head();
+	print dol_get_fiche_head();
 
 	unset($object->fields['status']);
 	unset($object->fields['element_type']);
@@ -958,7 +960,7 @@ if (($id || $ref) && $action == 'edit')
 	include DOL_DOCUMENT_ROOT.'/core/tpl/extrafields_add.tpl.php';
 	print '</table>';
 
-	dol_fiche_end();
+	print dol_get_fiche_end();
 
 	print '<div class="center"><input type="submit" id ="actionButtonSave" class="button" name="save" value="'.$langs->trans("Save").'">';
 	print ' &nbsp; <input type="submit" id ="actionButtonCancelEdit" class="button" name="cancel" value="'.$langs->trans("Cancel").'">';
@@ -1169,16 +1171,16 @@ if ((empty($action) || ($action != 'create' && $action != 'edit')))
 
 				if (!$signatory->checkSignatoriesSignatures($object->id)) {
 					print '<a class="butActionRefused classfortooltip" href="#" title="'.dol_escape_htmltag($langs->trans("AllSignatoriesMustHaveSigned")).'">'.$langs->trans('Lock').'</a>';
+					print '<a class="butAction" href="'.$url.'">'. $langs->trans("Sign").'</a>';
 				} else {
 					print '<span class="butAction" id="actionButtonLock">' . $langs->trans("Lock") . '</span>';
 				}
-				print '<a class="butAction" href="'.$url.'">'. $langs->trans("Sign").'</a>';
 			} elseif ($object->status == 3) {
 				print '<span class="butAction" id="actionButtonClone">' . $langs->trans("ToClone") . '</span>';
 				print '<a class="butAction" id="actionButtonClose" href="' . $_SERVER["PHP_SELF"] . '?id=' . $object->id . '&action=setArchive">' . $langs->trans("Close") . '</a>';
 			}
 			if ($object->date_end == dol_now()){
-				$object->setArchive($user, false);
+				$object->setArchived($user, false);
 			}
 		}
 		print '</div>';
