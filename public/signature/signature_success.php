@@ -65,9 +65,12 @@ $morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");
 
 llxHeaderSignature($langs->trans("Signature"), "", 0, 0, $morejs, $morecss);
 
-print '<div>';
-print '<p>'.$langs->trans("SignatureSuccess").'</p>';
-print '</div>';
+?>
+<div class="digirisk-signature-container">
+	<p class="center"><?php echo $langs->trans("SignatureSuccess"); ?> <a href="#" class="wpeo-button button-radius-2 button-primary"><i class="button-icon fas fa-file-pdf"></i> <?php echo $langs->trans("SignatureSeeDocument"); ?></a></p>
+</div>
+<?php
+
 
 // End of page
 llxFooter('', 'public');

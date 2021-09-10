@@ -157,41 +157,62 @@ $morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");
 
 llxHeaderSignature($langs->trans("Signature"), "", 0, 0, $morejs, $morecss);
 
-print '<div class="center">';
-print '<table with="100%">';
-print '<tr><td>'.$langs->trans("ThisIsInformationOnDocumentToSign").' :</td></tr>';
-
-// Name
-print '<tr><td>'.$langs->trans("Name").'</td>';
-print '<td>'.$signatory->firstname.' '.$signatory->lastname.'</td>';
-print '</tr>';
-
-// DocumentName
-print '<tr><td>'.$langs->trans("DocumentName").'</td>';
-print '<td>'.$object->ref .' '.$object->label.'</td>';
-print '</tr>';
-
-$objref = dol_sanitizeFileName($object->ref);
-$dir_files = $preventionplandocument->element . '/' . $objref . '/specimen';
-$filedir = $upload_dir . '/' . $dir_files;
-$urlsource = $_SERVER["PHP_SELF"] . '?track_id='. $track_id;
-$modulepart = 'digiriskdolibarr:PreventionPlanDocument';
-$title = $langs->trans('PreventionPlanDocument');
-
-print digiriskshowdocuments($modulepart, $dir_files, $filedir, $urlsource, 1, $permissiontodelete, $defaultmodel, 1, 0, 28, 0, '', $title, '', $langs->defaultlang, '', $preventionplandocument, 0, '', 1 );
-
-print '</table>';
-
 if ( $signatory->role == 'PP_EXT_SOCIETY_INTERVENANTS') {
 	$element = $signatory;
 } else {
 	$element = $signatory->fetchSignatory($signatory->role, $signatory->fk_object);
 	$element = array_shift($element);
 }
+?>
+<div class="digirisk-signature-container">
+	<div class="wpeo-gridlayout grid-2">
+		<div class="informations">
+			<div class="wpeo-gridlayout grid-2">
+				<strong class="grid-align-middle"><?php echo $langs->trans("ThisIsInformationOnDocumentToSign"); ?></strong>
+				<a href="" target="_blank" class="wpeo-button button-primary button-square-40 button-radius-2 grid-align-right"><i class="button-icon fas fa-file-pdf"></i></a>
+			</div>
+			<br>
+			<div class="wpeo-table table-flex table-2">
+				<div class="table-row">
+					<div class="table-cell"><?php echo $langs->trans("Name"); ?></div>
+					<div class="table-cell table-end"><?php echo $signatory->firstname . ' ' . $signatory->lastname; ?></div>
+				</div>
+				<div class="table-row">
+					<div class="table-cell"><?php echo $langs->trans("DocumentName"); ?></div>
+					<div class="table-cell table-end"><?php echo $object->ref . ' ' . $object->label; ?></div>
+				</div>
+			</div>
+		</div>
+		<div class="signature">
+			<div class="wpeo-gridlayout grid-2">
+				<strong class="grid-align-middle"><?php echo $langs->trans("DigiriskSignature"); ?></strong>
+				<div class="wpeo-button button-primary button-square-40 button-radius-2 grid-align-right wpeo-modal-event modal-signature-open modal-open" value="<?php echo $element->id ?>">
+					<span><i class="fas fa-pen-nib"></i> <?php echo $langs->trans('Sign'); ?></span>
+				</div>
+			</div>
+			<br>
+			<div class="signature-element">
+				<?php require  "../../core/tpl/digiriskdolibarr_signature_view.tpl.php"; ?>
+			</div>
+		</div>
+	</div>
+	<?php
 
-require  "../../core/tpl/digiriskdolibarr_signature_view.tpl.php";
+//	$objref = dol_sanitizeFileName($object->ref);
+//	$dir_files = $preventionplandocument->element . '/' . $objref . '/specimen';
+//	$filedir = $upload_dir . '/' . $dir_files;
+//	$urlsource = $_SERVER["PHP_SELF"] . '?track_id='. $track_id;
+//	$modulepart = 'digiriskdolibarr:PreventionPlanDocument';
+//	$title = $langs->trans('PreventionPlanDocument');
+//
+//	print digiriskshowdocuments($modulepart, $dir_files, $filedir, $urlsource, 1, $permissiontodelete, $defaultmodel, 1, 0, 28, 0, '', $title, '', $langs->defaultlang, '', $preventionplandocument, 0, '', 1 );
 
-// End of page
-llxFooter('', 'public');
+	//	require  "../../core/tpl/digiriskdolibarr_signature_view.tpl.php";
+
+	// End of page
+	llxFooter('', 'public');
+	?>
+</div>
+<?php
 $db->close();
 

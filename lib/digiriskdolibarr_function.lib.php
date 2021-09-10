@@ -1066,8 +1066,6 @@ function llxHeaderSignature($title, $head = "", $disablejs = 0, $disablehead = 0
 
 	top_htmlhead($head, $title, $disablejs, $disablehead, $arrayofjs, $arrayofcss, 0, 1); // Show html headers
 
-	print '<div class="center">';
-
 	if (!empty($conf->global->DIGIRISKDOLIBARR_SIGNATURE_SHOW_COMPANY_LOGO)){
 		// Define logo and logosmall
 		$logosmall = $mysoc->logo_small;
@@ -1081,17 +1079,11 @@ function llxHeaderSignature($title, $head = "", $disablejs = 0, $disablehead = 0
 		}
 		// Output html code for logo
 		if ($urllogo) {
-			print '<div class="">';
+			print '<div class="center signature-logo">';
 			print '<img src="'.$urllogo.'">';
 			print '</div>';
 		}
 	}
-
-	// Output introduction text
-	$text = '<div class=""><br><strong>'.$langs->trans("WelcomeOnOnlineSignaturePage", $mysoc->name).'</strong></div>'."\n";
-	print $text;
-
-	print '</div>';
 }
 
 /**
