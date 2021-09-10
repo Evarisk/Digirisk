@@ -1172,7 +1172,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit')))
 				} else {
 					print '<span class="butAction" id="actionButtonLock">' . $langs->trans("Lock") . '</span>';
 				}
-				print '<a class="butAction" id="actionButtonGoToAttendants" href="/dolibarr/htdocs/custom/digiriskdolibarr/preventionplan_attendants.php?id=' . $object->id . '">' . $langs->trans("Sign") . '</a>';
+				print '<a class="butAction" href="'.$url.'">'. $langs->trans("Sign").'</a>';
 			} elseif ($object->status == 3) {
 				print '<span class="butAction" id="actionButtonClone">' . $langs->trans("ToClone") . '</span>';
 				print '<a class="butAction" id="actionButtonClose" href="' . $_SERVER["PHP_SELF"] . '?id=' . $object->id . '&action=setArchive">' . $langs->trans("Close") . '</a>';
