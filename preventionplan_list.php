@@ -114,7 +114,7 @@ $permissiontoread = $user->rights->digiriskdolibarr->preventionplan->read;
 $permissiontoadd = $user->rights->digiriskdolibarr->preventionplan->write;
 
 // Security check - Protection if external user
-if ($permissiontoread) accessforbidden();
+if (!$permissiontoread) accessforbidden();
 
 /*
  * Actions

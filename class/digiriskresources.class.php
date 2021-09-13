@@ -131,9 +131,16 @@ class DigiriskResources extends CommonObject
 	/**
 	 * Clone an object into another one
 	 *
+	 * @param $db
+	 * @param $user_creat
 	 * @param string $ref name of resource
 	 * @param string $element_type type of resource
-	 * @param int $element_id Id of resource
+	 * @param array $element_id Id of resource
+	 * @param int $entity
+	 * @param string $object_type
+	 * @param int $object_id
+	 * @param int $noupdate
+	 * @return int
 	 */
 	function digirisk_dolibarr_set_resources($db, $user_creat, $ref, $element_type, $element_id, $entity = 1, $object_type = '', $object_id = 0, $noupdate = 0)
 	{

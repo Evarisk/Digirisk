@@ -73,25 +73,25 @@ $object                 = new PreventionPlan($db);
 $objectline             = new PreventionPlanLine($db);
 $signatory              = new PreventionPlanSignature($db);
 $preventionplandocument = new PreventionPlanDocument($db);
+$digiriskelement        = new DigiriskElement($db);
+$digiriskresources      = new DigiriskResources($db);
 $risk                   = new Risk($db);
+$contact                = new Contact($db);
+$usertmp                = new User($db);
 
-$contact = new Contact($db);
-$usertmp = new User($db);
-
-$object->fetch($id);
-
-$digiriskelement   = new DigiriskElement($db);
-$digiriskresources = new DigiriskResources($db);
-
-$refPreventionPlanMod = new $conf->global->DIGIRISKDOLIBARR_PREVENTIONPLAN_ADDON($db);
+$refPreventionPlanMod    = new $conf->global->DIGIRISKDOLIBARR_PREVENTIONPLAN_ADDON($db);
 $refPreventionPlanDetMod = new  $conf->global->DIGIRISKDOLIBARR_PREVENTIONPLANDET_ADDON($db);
+
+// Load object
+$object->fetch($id);
 
 $hookmanager->initHooks(array('preventionplancard', 'globalcard')); // Note that conf->hooks_modules contains array
 
 $upload_dir         = $conf->digiriskdolibarr->multidir_output[isset($object->entity) ? $object->entity : 1];
-$permissiontoread   = $user->rights->digiriskdolibarr->preventionplandocument->read;
-$permissiontoadd    = $user->rights->digiriskdolibarr->preventionplandocument->write;
-$permissiontodelete = $user->rights->digiriskdolibarr->preventionplandocument->delete;
+// Security check - Protection if external user
+$permissiontoread   = $user->rights->digiriskdolibarr->preventionplan->read;
+$permissiontoadd    = $user->rights->digiriskdolibarr->preventionplan->write;
+$permissiontodelete = $user->rights->digiriskdolibarr->preventionplan->delete;
 
 if (!$permissiontoread) accessforbidden();
 
@@ -103,8 +103,7 @@ $parameters = array();
 $reshook = $hookmanager->executeHooks('doActions', $parameters, $object, $action); // Note that $action and $object may have been modified by some hooks
 if ($reshook < 0) setEventMessages($hookmanager->error, $hookmanager->errors, 'errors');
 
-if (empty($reshook))
-{
+if (empty($reshook)) {
 	$error = 0;
 
 	$backurlforlist = dol_buildpath('/digiriskdolibarr/preventionplan_list.php', 1);
@@ -117,7 +116,7 @@ if (empty($reshook))
 	}
 
 	if (GETPOST('cancel')) {
-		// Creation prevention plan OK
+		// Cancel prevention plan
 		$urltogo = str_replace('__ID__', $result, $backtopage);
 		$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
 		header("Location: " . $urltogo);
@@ -126,18 +125,19 @@ if (empty($reshook))
 
 	// Action to add record
 	if ($action == 'add' && $permissiontoadd) {
+		// Get parameters
 		$maitre_oeuvre_id            = GETPOST('maitre_oeuvre');
 		$extsociety_id               = GETPOST('ext_society');
 		$extresponsible_id           = GETPOST('ext_society_responsible');
 		$extintervenant_ids          = GETPOST('ext_intervenants');
 		$labour_inspector_id         = GETPOST('labour_inspector');
 		$labour_inspector_contact_id = GETPOST('labour_inspector_contact');
+		$label                       = GETPOST('label');
+		$prior_visit_bool            = GETPOST('prior_visit_bool');
+		$prior_visit_text            = GETPOST('prior_visit_text');
+		$cssct_intervention          = GETPOST('cssct_intervention');
 
-		$label              = GETPOST('label');
-		$prior_visit_bool   = GETPOST('prior_visit_bool');
-		$prior_visit_text   = GETPOST('prior_visit_text');
-		$cssct_intervention = GETPOST('cssct_intervention');
-
+		// Initialize object preventionplan
 		$now                   = dol_now();
 		$object->ref           = $refPreventionPlanMod->getNextValue($object);
 		$object->ref_ext       = 'digirisk_' . $object->ref;
@@ -151,21 +151,20 @@ if (empty($reshook))
 		$date_end         = dol_mktime(GETPOST('dateehour', 'int'), GETPOST('dateemin', 'int'), 0, GETPOST('dateemonth', 'int'), GETPOST('dateeday', 'int'), GETPOST('dateeyear', 'int'));
 		$prior_visit_date = dol_mktime(GETPOST('dateihour', 'int'), GETPOST('dateimin', 'int'), 0, GETPOST('dateimonth', 'int'), GETPOST('dateiday', 'int'), GETPOST('dateiyear', 'int'));
 
-		$object->description = $description;
 		$object->date_start  = $date_start;
 		$object->date_end    = $date_end;
 
-		$object->prior_visit_bool   = $prior_visit_bool;
-
+		$object->prior_visit_bool = $prior_visit_bool;
 		if ($prior_visit_bool) {
-			$object->prior_visit_text   = $prior_visit_text;
-			$object->prior_visit_date   = $prior_visit_date;
+			$object->prior_visit_text = $prior_visit_text;
+			$object->prior_visit_date = $prior_visit_date;
 		}
 
 		$object->cssct_intervention = $cssct_intervention;
 
 		$object->fk_user_creat = $user->id ? $user->id : 1;
 
+		// Check parameters
 		if ($maitre_oeuvre_id < 0) {
 			setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv('MaitreOeuvre')), null, 'errors');
 			$error++;
@@ -221,16 +220,13 @@ if (empty($reshook))
 
 		if (!$error) {
 			$result = $object->create($user, false);
-
 			if ($result > 0) {
-
 				$object->setInProgress($user, true);
-
 				$digiriskresources->digirisk_dolibarr_set_resources($db, $user->id, 'PP_EXT_SOCIETY', 'societe', array($extsociety_id), $conf->entity, 'preventionplan', $object->id, 0);
 				$digiriskresources->digirisk_dolibarr_set_resources($db, $user->id, 'PP_LABOUR_INSPECTOR', 'societe', array($labour_inspector_id), $conf->entity, 'preventionplan', $object->id, 0);
 				$digiriskresources->digirisk_dolibarr_set_resources($db, $user->id, 'PP_LABOUR_INSPECTOR_ASSIGNED', 'socpeople', array($labour_inspector_contact_id), $conf->entity, 'preventionplan', $object->id, 0);
 
-				if (!empty($maitre_oeuvre_id) || $maitre_oeuvre_id > 0){
+				if ($maitre_oeuvre_id > 0) {
 					$signatory->setSignatory($object->id,'user', array($maitre_oeuvre_id), 'PP_MAITRE_OEUVRE');
 				}
 
@@ -244,8 +240,7 @@ if (empty($reshook))
 				header("Location: " . $urltogo);
 				exit;
 			}
-			else
-			{
+			else {
 				// Creation prevention plan KO
 				if (!empty($object->errors)) setEventMessages(null, $object->errors, 'errors');
 				else  setEventMessages($object->error, null, 'errors');
@@ -259,41 +254,40 @@ if (empty($reshook))
 
 	// Action to update record
 	if ($action == 'update' && $permissiontoadd) {
-
+		// Get parameters
 		$maitre_oeuvre_id            = GETPOST('maitre_oeuvre');
 		$extsociety_id               = GETPOST('ext_society');
 		$extresponsible_id           = GETPOST('ext_society_responsible');
 		$extintervenant_ids          = GETPOST('ext_intervenants');
 		$labour_inspector_id         = GETPOST('labour_inspector');
 		$labour_inspector_contact_id = GETPOST('labour_inspector_contact') ? GETPOST('labour_inspector_contact') : 0;
+		$label                       = GETPOST('label');
+		$prior_visit_bool            = GETPOST('prior_visit_bool');
+		$prior_visit_text            = GETPOST('prior_visit_text');
+		$cssct_intervention          = GETPOST('cssct_intervention');
 
-		$label                  = GETPOST('label');
-		$prior_visit_bool       = GETPOST('prior_visit_bool');
-		$prior_visit_text       = GETPOST('prior_visit_text');
-		$cssct_intervention     = GETPOST('cssct_intervention');
-		$description 			= GETPOST('description');
-
-		$now = dol_now();
-		$object->tms           = $now;
-		$object->label         = $label;
+		// Initialize object preventionplan
+		$now           = dol_now();
+		$object->tms   = $now;
+		$object->label = $label;
 
 		$date_start = dol_mktime(GETPOST('dateohour', 'int'), GETPOST('dateomin', 'int'), 0, GETPOST('dateomonth', 'int'), GETPOST('dateoday', 'int'), GETPOST('dateoyear', 'int'));
 		$date_end = dol_mktime(GETPOST('dateehour', 'int'), GETPOST('dateemin', 'int'), 0, GETPOST('dateemonth', 'int'), GETPOST('dateeday', 'int'), GETPOST('dateeyear', 'int'));
 		$prior_visit_date = dol_mktime(GETPOST('dateihour', 'int'), GETPOST('dateimin', 'int'), 0, GETPOST('dateimonth', 'int'), GETPOST('dateiday', 'int'), GETPOST('dateiyear', 'int'));
 
-		$object->description   = $description;
-		$object->date_start    = $date_start;
-		$object->date_end      = $date_end;
+		$object->date_start = $date_start;
+		$object->date_end   = $date_end;
 
-		$object->prior_visit_bool    = $prior_visit_bool;
+		$object->prior_visit_bool = $prior_visit_bool;
 		if ($prior_visit_bool) {
 			$object->prior_visit_text   = $prior_visit_text;
 			$object->prior_visit_date   = $prior_visit_date;
 		}
-		$object->cssct_intervention  = $cssct_intervention;
+		$object->cssct_intervention = $cssct_intervention;
 
 		$object->fk_user_creat = $user->id ? $user->id : 1;
 
+		// Check parameters
 		if ($maitre_oeuvre_id < 0) {
 			setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv('MaitreOeuvre')), null, 'errors');
 			$error++;
@@ -349,9 +343,7 @@ if (empty($reshook))
 
 		if (!$error) {
 			$result = $object->update($user, false);
-
 			if ($result > 0) {
-
 				$digiriskresources->digirisk_dolibarr_set_resources($db, $user->id, 'PP_EXT_SOCIETY', 'societe', array($extsociety_id), $conf->entity, 'preventionplan', $object->id, 0);
 				$digiriskresources->digirisk_dolibarr_set_resources($db, $user->id, 'PP_LABOUR_INSPECTOR', 'societe', array($labour_inspector_id), $conf->entity, 'preventionplan', $object->id, 0);
 				$digiriskresources->digirisk_dolibarr_set_resources($db, $user->id, 'PP_LABOUR_INSPECTOR_ASSIGNED', 'socpeople', array($labour_inspector_contact_id), $conf->entity, 'preventionplan', $object->id, 0);
@@ -359,7 +351,7 @@ if (empty($reshook))
 				$signatory->setSignatory($object->id,'user', array($maitre_oeuvre_id), 'PP_MAITRE_OEUVRE');
 				$signatory->setSignatory($object->id,'socpeople', array($extresponsible_id), 'PP_EXT_SOCIETY_RESPONSIBLE');
 
-				// Creation prevention plan OK
+				// Update prevention plan OK
 				$urltogo = str_replace('__ID__', $result, $backtopage);
 				$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
 				header("Location: " . $urltogo);
@@ -367,7 +359,7 @@ if (empty($reshook))
 			}
 			else
 			{
-				// Creation prevention plan KO
+				// Update prevention plan KO
 				if (!empty($object->errors)) setEventMessages(null, $object->errors, 'errors');
 				else  setEventMessages($object->error, null, 'errors');
 			}
@@ -378,13 +370,14 @@ if (empty($reshook))
 
 	// Action to add line
 	if ($action == 'addLine' && $permissiontoadd) {
-
+		// Get parameters
 		$actions_description = GETPOST('actionsdescription');
 		$prevention_method   = GETPOST('preventionmethod');
 		$location            = GETPOST('fk_element');
 		$risk_category_id    = GETPOST('risk_category_id');
 		$parent_id           = GETPOST('parent_id');
 
+		// Initialize object preventionplan line
 		$objectline->date_creation      = $object->db->idate($now);
 		$objectline->ref                = $refPreventionPlanDetMod->getNextValue($objectline);
 		$objectline->entity             = $conf->entity;
@@ -394,6 +387,7 @@ if (empty($reshook))
 		$objectline->fk_preventionplan  = $parent_id;
 		$objectline->fk_element         = $location;
 
+		// Check parameters
 		if ($location < 1) {
 			setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv('Location')), null, 'errors');
 			$error++;
@@ -406,41 +400,42 @@ if (empty($reshook))
 
 		if (!$error) {
 			$result = $objectline->insert($user, false);
-
 			if ($result > 0) {
+				// Creation prevention plan line OK
 				setEventMessages($langs->trans('AddPreventionPlanLine').' '.$objectline->ref.' '.$langs->trans('PreventionPlanMessage'), array());
 				$objectline->call_trigger('PREVENTIONPLANDET_CREATE', $user);
-
 				$urltogo = str_replace('__ID__', $result, $backtopage);
 				$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
 				header("Location: " . $urltogo);
 				exit;
 			}
-			else
-			{
-				setEventMessages($objectline->error, $objectline->errors, 'errors');
+			else {
+				// Creation prevention plan line KO
+				if (!empty($objectline->errors)) setEventMessages(null, $objectline->errors, 'errors');
+				else  setEventMessages($objectline->error, null, 'errors');
 			}
 		}
 	}
 
 	// Action to update line
 	if ($action == 'updateLine' && $permissiontoadd) {
-
+		// Get parameters
 		$actions_description = GETPOST('actionsdescription');
 		$prevention_method   = GETPOST('preventionmethod');
 		$location            = GETPOST('fk_element');
 		$risk_category_id    = GETPOST('risk_category_id');
 		$parent_id           = GETPOST('parent_id');
 
-		$objectline = new PreventionPlanLine($db);
 		$objectline->fetch($lineid);
 
+		// Initialize object prevention plan line
 		$objectline->description        = $actions_description;
 		$objectline->category           = $risk_category_id;
 		$objectline->prevention_method  = $prevention_method;
 		$objectline->fk_preventionplan  = $parent_id;
 		$objectline->fk_element         = $location;
 
+		// Check parameters
 		if ($parent_id < 1) {
 			setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv('Location')), null, 'errors');
 			$error++;
@@ -452,10 +447,9 @@ if (empty($reshook))
 
 		if (!$error) {
 			$result = $objectline->update($user, false);
-
 			if ($result > 0) {
+				// Update prevention plan line OK
 				setEventMessages($langs->trans('UpdatePreventionPlanLine').' '.$objectline->ref.' '.$langs->trans('PreventionPlanMessage'), array());
-				// Creation prevention plan OK
 				$urltogo = str_replace('__ID__', $result, $backtopage);
 				$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $parent_id, $urltogo); // New method to autoselect project after a New on another form object creation
 				header("Location: " . $urltogo);
@@ -463,30 +457,28 @@ if (empty($reshook))
 			}
 			else
 			{
-				// Creation prevention plan KO
-				if (!empty($object->errors)) setEventMessages(null, $object->errors, 'errors');
-				else  setEventMessages($object->error, null, 'errors');
+				// Update prevention plan line KO
+				if (!empty($objectline->errors)) setEventMessages(null, $objectline->errors, 'errors');
+				else  setEventMessages($objectline->error, null, 'errors');
 			}
 		}
 	}
 
 	// Action to delete line
 	if ($action == 'deleteline' && $permissiontodelete) {
-		$objectline = new PreventionPlanLine($db);
 		$objectline->fetch($lineid);
 		$result = $objectline->delete($user, false);
-
 		if ($result > 0) {
-			// Delete prevention plan OK
+			// Delete prevention plan line OK
 			setEventMessages($langs->trans('DeletePreventionPlanLine').' '.$objectline->ref.' '.$langs->trans('PreventionPlanMessage'), array());
 			$urltogo = str_replace('__ID__', $result, $backtopage);
 			$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $parent_id, $urltogo); // New method to autoselect project after a New on another form object creation
 			header("Location: " . $urltogo);
 			exit;
 		} else {
-			// Delete prevention plan KO
-			if (!empty($object->errors)) setEventMessages(null, $object->errors, 'errors');
-			else  setEventMessages($object->error, null, 'errors');
+			// Delete prevention plan line KO
+			if (!empty($objectline->errors)) setEventMessages(null, $objectline->errors, 'errors');
+			else  setEventMessages($objectline->error, null, 'errors');
 		}
 	}
 
@@ -507,7 +499,7 @@ if (empty($reshook))
 		if (empty($hideref)) $hideref = 0;
 		if (empty($moreparams)) $moreparams = null;
 
-		$model      = GETPOST('model', 'alpha');
+		$model = GETPOST('model', 'alpha');
 
 		$moreparams['object'] = $object;
 		$moreparams['user']   = $user;
@@ -517,37 +509,30 @@ if (empty($reshook))
 			setEventMessages($object->error, $object->errors, 'errors');
 			$action = '';
 		} else {
-			if (empty($donotredirect))
-			{
-				setEventMessages($langs->trans("FileGenerated") . ' - ' . $preventionplandocument->last_main_doc, null);
+			setEventMessages($langs->trans("FileGenerated") . ' - ' . $preventionplandocument->last_main_doc, null);
 
-				$signatories = $signatory->fetchSignatory("",$object->id);
+			$signatories = $signatory->fetchSignatory("",$object->id);
 
-				$arrayRole = array( 'PP_MAITRE_OEUVRE', 'PP_EXT_SOCIETY_RESPONSIBLE', 'PP_EXT_SOCIETY_INTERVENANTS');
-
-				if (!empty ($signatories) && $signatories > 0) {
-					foreach ($signatories as $arrayRole) {
-						foreach ($arrayRole as $signatory) {
-							$signatory->signature = $langs->trans("FileGenerated");
-							//$signatory->setSigned($user, false);
-							$signatory->update($user, false);
-						}
+			if (!empty ($signatories) && $signatories > 0) {
+				foreach ($signatories as $arrayRole) {
+					foreach ($arrayRole as $signatory) {
+						$signatory->signature = $langs->trans("FileGenerated");
+						$signatory->update($user, false);
 					}
 				}
-
-				$urltoredirect = $_SERVER['REQUEST_URI'];
-				$urltoredirect = preg_replace('/#builddoc$/', '', $urltoredirect);
-				$urltoredirect = preg_replace('/action=builddoc&?/', '', $urltoredirect); // To avoid infinite loop
-
-				header('Location: ' . $urltoredirect . '#builddoc');
-				exit;
 			}
+
+			$urltoredirect = $_SERVER['REQUEST_URI'];
+			$urltoredirect = preg_replace('/#builddoc$/', '', $urltoredirect);
+			$urltoredirect = preg_replace('/action=builddoc&?/', '', $urltoredirect); // To avoid infinite loop
+
+			header('Location: ' . $urltoredirect . '#builddoc');
+			exit;
 		}
 	}
 
 	// Delete file in doc form
-	if ($action == 'remove_file' && $permissiontodelete)
-	{
+	if ($action == 'remove_file' && $permissiontodelete) {
 		if (!empty($upload_dir)) {
 			require_once DOL_DOCUMENT_ROOT.'/core/lib/files.lib.php';
 
@@ -571,23 +556,20 @@ if (empty($reshook))
 		}
 	}
 
-	// Action to set status STATUS_PENDING_SIGNATURE
+	// Action to set status STATUS_INPROGRESS
 	if ($action == 'confirm_setInProgress') {
-
 		$object->fetch($id);
-
 		if (!$error) {
 			$result = $object->setInProgress($user, false);
 			if ($result > 0) {
-				// Creation signature OK
+				// Set In progress OK
 				$urltogo = str_replace('__ID__', $result, $backtopage);
 				$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
 				header("Location: " . $urltogo);
 				exit;
 			}
-			else
-			{
-				// Creation signature KO
+			else {
+				// Set In progress KO
 				if (!empty($object->errors)) setEventMessages(null, $object->errors, 'errors');
 				else  setEventMessages($object->error, null, 'errors');
 			}
@@ -596,13 +578,11 @@ if (empty($reshook))
 
 	// Action to set status STATUS_PENDING_SIGNATURE
 	if ($action == 'confirm_setPendingSignature') {
-
 		$object->fetch($id);
-
 		if (!$error) {
 			$result = $object->setPendingSignature($user, false);
 			if ($result > 0) {
-				// Creation signature OK
+				// Set pending signature OK
 				$urltogo = str_replace('__ID__', $result, $backtopage);
 				$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
 				header("Location: " . $urltogo);
@@ -610,7 +590,7 @@ if (empty($reshook))
 			}
 			else
 			{
-				// Creation signature KO
+				// Set pending signature KO
 				if (!empty($object->errors)) setEventMessages(null, $object->errors, 'errors');
 				else  setEventMessages($object->error, null, 'errors');
 			}
@@ -619,44 +599,38 @@ if (empty($reshook))
 
 	// Action to set status STATUS_LOCKED
 	if ($action == 'confirm_setLocked') {
-
 		$object->fetch($id);
-
 		if (!$error) {
 			$result = $object->setLocked($user, false);
 			if ($result > 0) {
-				// Creation signature OK
+				// Set locked OK
 				$urltogo = str_replace('__ID__', $result, $backtopage);
 				$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
 				header("Location: " . $urltogo);
 				exit;
 			}
-			else
-			{
-				// Creation signature KO
+			else {
+				// Set locked KO
 				if (!empty($object->errors)) setEventMessages(null, $object->errors, 'errors');
 				else  setEventMessages($object->error, null, 'errors');
 			}
 		}
 	}
 
-	// Action to set status STATUS_CLOSE
+	// Action to set status STATUS_ARCHIVED
 	if ($action == 'setArchived') {
-
 		$object->fetch($id);
-
 		if (!$error) {
 			$result = $object->setArchived($user, false);
 			if ($result > 0) {
-				// Creation signature OK
+				// Set Archived OK
 				$urltogo = str_replace('__ID__', $result, $backtopage);
 				$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
 				header("Location: " . $urltogo);
 				exit;
 			}
-			else
-			{
-				// Creation signature KO
+			else {
+				// Set Archived KO
 				if (!empty($object->errors)) setEventMessages(null, $object->errors, 'errors');
 				else  setEventMessages($object->error, null, 'errors');
 			}
@@ -664,36 +638,35 @@ if (empty($reshook))
 	}
 
 	// Action clone object
-	if ($action == 'confirm_clone' && $confirm == 'yes')
-	{
-		if (1 == 0 && !GETPOST('clone_content') && !GETPOST('clone_receivers'))
-		{
-			setEventMessages($langs->trans("NoCloneOptionsSpecified"), null, 'errors');
-		} else {
-			if ($object->id > 0) {
-				$result = $object->createFromClone($user, $object->id);
-				if ($result > 0) {
-					header("Location: ".$_SERVER['PHP_SELF'].'?id='.$result);
-					exit();
-				} else {
-					setEventMessages($object->error, $object->errors, 'errors');
-					$action = '';
-				}
-			}
-		}
-	}
+//	if ($action == 'confirm_clone' && $confirm == 'yes')
+//	{
+//		if (1 == 0 && !GETPOST('clone_content') && !GETPOST('clone_receivers'))
+//		{
+//			setEventMessages($langs->trans("NoCloneOptionsSpecified"), null, 'errors');
+//		} else {
+//			if ($object->id > 0) {
+//				$result = $object->createFromClone($user, $object->id);
+//				if ($result > 0) {
+//					header("Location: ".$_SERVER['PHP_SELF'].'?id='.$result);
+//					exit();
+//				} else {
+//					setEventMessages($object->error, $object->errors, 'errors');
+//					$action = '';
+//				}
+//			}
+//		}
+//	}
 }
 
 /*
  * View
  */
 
-$form        = new Form($db);
-$emptyobject = new stdClass($db);
+$form = new Form($db);
 
-$title        = $langs->trans("PreventionPlan");
-$title_create = $langs->trans("NewPreventionPlan");
-$title_edit   = $langs->trans("ModifyPreventionPlan");
+$title         = $langs->trans("PreventionPlan");
+$title_create  = $langs->trans("NewPreventionPlan");
+$title_edit    = $langs->trans("ModifyPreventionPlan");
 $object->picto = 'preventionplandocument@digiriskdolibarr';
 
 $help_url = 'FR:Module_DigiriskDolibarr';
@@ -703,8 +676,7 @@ $morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");
 llxHeader('', $title, $help_url, '', '', '', $morejs, $morecss);
 
 // Part to create
-if ($action == 'create')
-{
+if ($action == 'create') {
 	print load_fiche_titre($title_create, '', "digiriskdolibarr32px@digiriskdolibarr");
 
 	print '<form method="POST" action="'.$_SERVER["PHP_SELF"].'">';
@@ -716,16 +688,12 @@ if ($action == 'create')
 
 	print dol_get_fiche_head();
 
-	print '<table class="border centpercent tableforfieldcreate preventionplan-table">'."\n";
-
-	$type = 'DIGIRISKDOLIBARR_'.strtoupper($object->element).'_ADDON';
-	$digirisk_addon = $conf->global->$type;
-	$modele = new $digirisk_addon($db);
+	print '<table class="border centpercent tableforfieldcreate preventionplan-table">';
 
 	//Ref -- Ref
 	print '<tr><td class="fieldrequired">'.$langs->trans("Ref").'</td><td>';
-	print '<input hidden class="flat" type="text" size="36" name="ref" id="ref" value="'.$modele->getNextValue($object).'">';
-	print $modele->getNextValue($object);
+	print '<input hidden class="flat" type="text" size="36" name="ref" id="ref" value="'.$refPreventionPlanMod->getNextValue($object).'">';
+	print $refPreventionPlanMod->getNextValue($object);
 	print '</td></tr>';
 
 	//Label -- Libellé
@@ -747,7 +715,7 @@ if ($action == 'create')
 	$userlist = $form->select_dolusers('', '', 0, null, 0, '', '', 0, 0, 0, 'AND u.statut = 1', 0, '', 'minwidth300', 0, 1);
 	print '<tr>';
 	print '<td class="fieldrequired" style="width:10%">'.$form->editfieldkey('MaitreOeuvre', 'MaitreOeuvre_id', '', $object, 0).'</td>';
-	print '<td class="maxwidthonsmartphone">';
+	print '<td>';
 	print $form->selectarray('maitre_oeuvre', $userlist, '', $langs->trans('SelectUser'), null, null, null, "40%", 0,0,'','minwidth300',1);
 	if (!GETPOSTISSET('backtopage')) print ' <a href="'.DOL_URL_ROOT.'/user/card.php?action=create&backtopage='.urlencode($_SERVER["PHP_SELF"].'?action=create').'" target="_blank"><span class="fa fa-plus-circle valignmiddle paddingleft" title="'.$langs->trans("AddUser").'"></span></a>';
 	print '</td></tr>';
@@ -805,7 +773,7 @@ if ($action == 'create')
 	// Other attributes
 	include DOL_DOCUMENT_ROOT.'/core/tpl/extrafields_add.tpl.php';
 
-	print '</table>'."\n";
+	print '</table>';
 
 	print dol_get_fiche_end();
 
@@ -818,8 +786,7 @@ if ($action == 'create')
 }
 
 // Part to edit record
-if (($id || $ref) && $action == 'edit')
-{
+if (($id || $ref) && $action == 'edit') {
 	print load_fiche_titre($title_edit, '', "digiriskdolibarr32px@digiriskdolibarr");
 
 	print '<form method="POST" action="'.$_SERVER["PHP_SELF"].'">';
@@ -831,21 +798,17 @@ if (($id || $ref) && $action == 'edit')
 
 	print dol_get_fiche_head();
 
-	unset($object->fields['status']);
-	unset($object->fields['element_type']);
-	unset($object->fields['last_main_doc']);
-	unset($object->fields['entity']);
-
 	$object_resources = $digiriskresources->fetchResourcesFromObject('', $object);
 	$object_signatories = $signatory->fetchSignatory('',$object->id);
 
 	print '<table class="border centpercent tableforfieldedit  preventionplan-table">'."\n";
 
+	//Ref -- Ref
 	print '<tr><td class="fieldrequired">'.$langs->trans("Ref").'</td><td>';
 	print $object->ref;
 	print '</td></tr>';
 
-
+	//Label -- Libellé
 	print '<tr><td>'.$langs->trans("Label").'</td><td>';
 	print '<input class="flat" type="text" size="36" name="label" id="label" value="'.$object->label.'">';
 	print '</td></tr>';
@@ -860,46 +823,35 @@ if (($id || $ref) && $action == 'edit')
 	print $form->selectDate($object->date_end, 'datee', 1, 1, 0, '', 1);
 	print '</td></tr>';
 
-	$maitre_oeuvre = is_array($object_signatories['PP_MAITRE_OEUVRE']) ? array_shift($object_signatories['PP_MAITRE_OEUVRE'])->element_id : '';
-
 	//Maitre d'oeuvre
+	$maitre_oeuvre = is_array($object_signatories['PP_MAITRE_OEUVRE']) ? array_shift($object_signatories['PP_MAITRE_OEUVRE'])->element_id : '';
 	$userlist = $form->select_dolusers($maitre_oeuvre, '', 1, null, 0, '', '', 0, 0, 0, 'AND u.statut = 1', 0, '', 'minwidth300', 0, 1);
-
 	print '<tr>';
 	print '<td class="fieldrequired" style="width:10%">'.$form->editfieldkey('MaitreOeuvre', 'MaitreOeuvre_id', '', $object, 0).'</td>';
-	print '<td class="maxwidthonsmartphone">';
-
+	print '<td>';
 	print $form->selectarray('maitre_oeuvre', $userlist,$maitre_oeuvre, 1, null, null, null, "40%", 0, 0, 0, 'minwidth300',1);
-
 	if (!GETPOSTISSET('backtopage')) print ' <a href="'.DOL_URL_ROOT.'/user/card.php?action=create&backtopage='.urlencode($_SERVER["PHP_SELF"].'?action=create').'" target="_blank"><span class="fa fa-plus-circle valignmiddle paddingleft" title="'.$langs->trans("AddUser").'"></span></a>';
-
 	print '</td></tr>';
 
 	//External society -- Société extérieure
 	print '<tr><td class="fieldrequired">';
 	print $langs->trans("ExtSociety");
 	print '</td>';
-
 	print '<td>';
-
 	$events = array();
 	$events[1] = array('method' => 'getContacts', 'url' => dol_buildpath('/core/ajax/contacts.php?showempty=1', 1), 'htmlname' => 'ext_society_responsible', 'params' => array('add-customer-contact' => 'disabled'));
-	$events[2] = array('method' => 'getContacts', 'url' => dol_buildpath('/core/ajax/contacts.php?showempty=1', 1), 'htmlname' => 'ext_intervenants', 'params' => array('add-customer-contact' => 'disabled'));
 	//For external user force the company to user company
 	if (!empty($user->socid)) {
 		print $form->select_company($user->socid, 'ext_society', '', 1, 1, 0, $events, 0, 'minwidth300');
 	} else {
 		$ext_society_id = is_array($object_resources['PP_EXT_SOCIETY']) ? array_shift($object_resources['PP_EXT_SOCIETY'])->id : '';
-
 		print $form->select_company($ext_society_id, 'ext_society', '', 'SelectThirdParty', 1, 0, $events, 0, 'minwidth300');
 	}
 	if (!GETPOSTISSET('backtopage')) print ' <a href="'.DOL_URL_ROOT.'/societe/card.php?action=create&backtopage='.urlencode($_SERVER["PHP_SELF"].'?action=create').'" target="_blank"><span class="fa fa-plus-circle valignmiddle paddingleft" title="'.$langs->trans("AddThirdParty").'"></span></a>';
-
 	print '</td></tr>';
 
 	//External responsible -- Responsable de la société extérieure
 	$ext_society_responsible_id = is_array($object_signatories['PP_EXT_SOCIETY_RESPONSIBLE']) ? array_shift($object_signatories['PP_EXT_SOCIETY_RESPONSIBLE'])->element_id : '';
-
 	print '<tr class="oddeven"><td class="fieldrequired">'.$langs->trans("ExtSocietyResponsible").'</td><td>';
 	print $form->selectcontacts(GETPOST('ext_society', 'int'), $ext_society_responsible_id, 'ext_society_responsible', 0, '', '', 0, 'minwidth300', false, 0, array(), false, '', 'ext_society_responsible');
 	print '</td></tr>';
@@ -992,27 +944,27 @@ if (($action == 'setInProgress' && (empty($conf->use_javascript_ajax) || !empty(
 	$formconfirm .= $form->formconfirm($_SERVER["PHP_SELF"].'?id='.$object->id, $langs->trans('ReOpenPreventionPlan'), $langs->trans('ConfirmReOpenPreventionPlan', $object->ref), 'confirm_setInProgress', '', 'yes', 'actionButtonInProgress', 350, 600);
 }
 
-// Clone confirmation
-if (($action == 'clone' && (empty($conf->use_javascript_ajax) || !empty($conf->dol_use_jmobile)))		// Output when action = clone if jmobile or no js
-	|| (!empty($conf->use_javascript_ajax) && empty($conf->dol_use_jmobile)))							// Always output when not jmobile nor js
-{
-	// Define confirmation messages
-	$formquestionclone = array(
-		'text' => $langs->trans("ConfirmClone"),
-		array('type' => 'text', 'name' => 'clone_ref', 'label' => $langs->trans("NewRefForClone"), 'value' => empty($tmpcode) ? $langs->trans("CopyOf").' '.$object->ref : $tmpcode, 'size'=>24),
-		array('type' => 'checkbox', 'name' => 'clone_content', 'label' => $langs->trans("CloneContentProduct"), 'value' => 1),
-		array('type' => 'checkbox', 'name' => 'clone_categories', 'label' => $langs->trans("CloneCategoriesProduct"), 'value' => 1),
-	);
-//	if (!empty($conf->global->PRODUIT_MULTIPRICES)) {
-//		$formquestionclone[] = array('type' => 'checkbox', 'name' => 'clone_prices', 'label' => $langs->trans("ClonePricesProduct").' ('.$langs->trans("CustomerPrices").')', 'value' => 0);
-//	}
-//	if (!empty($conf->global->PRODUIT_SOUSPRODUITS))
-//	{
-//		$formquestionclone[] = array('type' => 'checkbox', 'name' => 'clone_composition', 'label' => $langs->trans('CloneCompositionProduct'), 'value' => 1);
-//	}
-
-	$formconfirm .= $form->formconfirm($_SERVER["PHP_SELF"].'?id='.$object->id, $langs->trans('ToClone'), $langs->trans('ConfirmClonePreventionPlan', $object->ref), 'confirm_clone', $formquestionclone, 'yes', 'actionButtonClone', 350, 600);
-}
+//// Clone confirmation
+//if (($action == 'clone' && (empty($conf->use_javascript_ajax) || !empty($conf->dol_use_jmobile)))		// Output when action = clone if jmobile or no js
+//	|| (!empty($conf->use_javascript_ajax) && empty($conf->dol_use_jmobile)))							// Always output when not jmobile nor js
+//{
+//	// Define confirmation messages
+//	$formquestionclone = array(
+//		'text' => $langs->trans("ConfirmClone"),
+//		array('type' => 'text', 'name' => 'clone_ref', 'label' => $langs->trans("NewRefForClone"), 'value' => empty($tmpcode) ? $langs->trans("CopyOf").' '.$object->ref : $tmpcode, 'size'=>24),
+//		array('type' => 'checkbox', 'name' => 'clone_content', 'label' => $langs->trans("CloneContentProduct"), 'value' => 1),
+//		array('type' => 'checkbox', 'name' => 'clone_categories', 'label' => $langs->trans("CloneCategoriesProduct"), 'value' => 1),
+//	);
+////	if (!empty($conf->global->PRODUIT_MULTIPRICES)) {
+////		$formquestionclone[] = array('type' => 'checkbox', 'name' => 'clone_prices', 'label' => $langs->trans("ClonePricesProduct").' ('.$langs->trans("CustomerPrices").')', 'value' => 0);
+////	}
+////	if (!empty($conf->global->PRODUIT_SOUSPRODUITS))
+////	{
+////		$formquestionclone[] = array('type' => 'checkbox', 'name' => 'clone_composition', 'label' => $langs->trans('CloneCompositionProduct'), 'value' => 1);
+////	}
+//
+//	$formconfirm .= $form->formconfirm($_SERVER["PHP_SELF"].'?id='.$object->id, $langs->trans('ToClone'), $langs->trans('ConfirmClonePreventionPlan', $object->ref), 'confirm_clone', $formquestionclone, 'yes', 'actionButtonClone', 350, 600);
+//}
 
 // Call Hook formConfirm
 $parameters = array('formConfirm' => $formconfirm, 'object' => $object);
@@ -1024,12 +976,11 @@ elseif ($reshook > 0) $formconfirm = $hookmanager->resPrint;
 print $formconfirm;
 
 // Part to show record
-if ((empty($action) || ($action != 'create' && $action != 'edit')))
-{
+if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	// Object card
 	// ------------------------------------------------------------
 
-	$res = $object->fetch_optionals();
+	$object->fetch_optionals();
 
 	$head = preventionplanPrepareHead($object);
 	print dol_get_fiche_head($head, 'preventionplanCard', $title, -1, "digiriskdolibarr@digiriskdolibarr");
@@ -1043,10 +994,9 @@ if ((empty($action) || ($action != 'create' && $action != 'edit')))
 	print '<div class="div-table-responsive">';
 	print '<div class="fichecenter">';
 	print '<div class="fichehalfleft">';
-	print '<div class="underbanner clearboth"></div>';
 	print '<table class="border centpercent tableforfield">';
 
-	unset($object->fields['entity']);
+	//Unset for order
 	unset($object->fields['date_start']);
 	unset($object->fields['date_end']);
 	unset($object->fields['prior_visit_bool']);
@@ -1176,8 +1126,8 @@ if ((empty($action) || ($action != 'create' && $action != 'edit')))
 					print '<span class="butAction" id="actionButtonLock">' . $langs->trans("Lock") . '</span>';
 				}
 			} elseif ($object->status == 3) {
-				print '<span class="butAction" id="actionButtonClone">' . $langs->trans("ToClone") . '</span>';
-				print '<a class="butAction" id="actionButtonClose" href="' . $_SERVER["PHP_SELF"] . '?id=' . $object->id . '&action=setArchive">' . $langs->trans("Close") . '</a>';
+				//print '<span class="butAction" id="actionButtonClone">' . $langs->trans("ToClone") . '</span>';
+				print '<a class="butAction" id="actionButtonClose" href="' . $_SERVER["PHP_SELF"] . '?id=' . $object->id . '&action=setArchived">' . $langs->trans("Close") . '</a>';
 			}
 			if ($object->date_end == dol_now()){
 				$object->setArchived($user, false);
@@ -1196,20 +1146,13 @@ if ((empty($action) || ($action != 'create' && $action != 'edit')))
 			if (empty($forceall)) $forceall = 0;
 
 			// Define colspan for the button 'Add'
-			$colspan = 3; // Columns: total ht + col edit + col delete
+			$colspan = 3;
 
 			// Lines
-			$preventionplanline = new PreventionPlanLine($db);
-			$preventionplanline->db = $db;
-			$preventionplanlines = $preventionplanline->fetchAll(GETPOST('id'));
+			$objectlines = $objectline->fetchAll(GETPOST('id'));
 
-			print '<tr class="liste_titre nodrag nodrop">';
-			if (!empty($conf->global->MAIN_VIEW_LINE_NUMBER)) {
-				print '<td class="linecolnum center"></td>';
-			}
-			print '<td>';
-			print '<span>' . $langs->trans('Ref.') . '</span>';
-			print '</td>';
+			print '<tr class="liste_titre">';
+			print '<td><span>' . $langs->trans('Ref.') . '</span></td>';
 			print '<td>' . $langs->trans('Location') . '</td>';
 			print '<td>' . $form->textwithpicto($langs->trans('ActionsDescription'), $langs->trans("ActionsDescriptionTooltip")) . '</td>';
 			print '<td class="center">' . $form->textwithpicto($langs->trans('INRSRisk'), $langs->trans('INRSRiskTooltip')) . '</td>';
@@ -1217,9 +1160,9 @@ if ((empty($action) || ($action != 'create' && $action != 'edit')))
 			print '<td class="center" colspan="' . $colspan . '">'.$langs->trans('ActionsPreventionPlanRisk').'</td>';
 			print '</tr>';
 
-			if (!empty($preventionplanlines) && $preventionplanlines > 0) {
+			if (!empty($objectlines) && $objectlines > 0) {
 				print '<tr>';
-				foreach ($preventionplanlines as $key => $item) {
+				foreach ($objectlines as $key => $item) {
 					if ($action == 'editline' && $lineid == $key) {
 
 						print '<form method="POST" action="' . $_SERVER["PHP_SELF"] . '?id=' . $object->id . '">';
@@ -1265,10 +1208,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit')))
 											data-is-preset="<?php echo ''; ?>"
 											data-id="<?php echo $dangerCategory['position'] ?>"
 											aria-label="<?php echo $dangerCategory['name'] ?>">
-											<img
-												src="<?php echo DOL_URL_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $dangerCategory['thumbnail_name'] . '.png' ?>"
-												class="attachment-thumbail size-thumbnail photo photowithmargin" alt=""
-												loading="lazy" width="48" height="48">
+											<img src="<?php echo DOL_URL_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $dangerCategory['thumbnail_name'] . '.png' ?>" class="attachment-thumbail size-thumbnail photo photowithmargin" alt="">
 										</li>
 									<?php endforeach;
 								endif; ?>
@@ -1314,7 +1254,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit')))
 							<div class="wpeo-dropdown dropdown-large category-danger padding wpeo-tooltip-event"
 								 aria-label="<?php echo $risk->get_danger_category_name($item) ?>">
 								<img class="danger-category-pic hover"
-									 src="<?php echo DOL_URL_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $risk->get_danger_category($item) . '.png'; ?>"/>
+									 src="<?php echo DOL_URL_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $risk->get_danger_category($item) . '.png'; ?>" alt=""/>
 							</div>
 						</div>
 						<?php
@@ -1360,7 +1300,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit')))
 
 				print '<tr>';
 				print '<td>';
-				print $refPreventionPlanDetMod->getNextValue($preventionplanline);
+				print $refPreventionPlanDetMod->getNextValue($objectline);
 				print '</td>';
 				print '<td>';
 				print $digiriskelement->select_digiriskelement_list('', 'fk_element', '', '1', 0, 0, array(), '', 0, 0, 'minwidth100', '', false, 1);
@@ -1391,8 +1331,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit')))
 									aria-label="<?php echo $dangerCategory['name'] ?>">
 									<img
 										src="<?php echo DOL_URL_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $dangerCategory['thumbnail_name'] . '.png' ?>"
-										class="attachment-thumbail size-thumbnail photo photowithmargin" alt=""
-										loading="lazy" width="48" height="48">
+										class="attachment-thumbail size-thumbnail photo photowithmargin" alt="">
 								</li>
 							<?php endforeach;
 						endif; ?>
@@ -1425,14 +1364,14 @@ if ((empty($action) || ($action != 'create' && $action != 'edit')))
 		if ($includedocgeneration) {
 			print '<div class=""><div class="preventionplanDocument fichehalfleft">';
 
-			$objref = dol_sanitizeFileName($object->ref);
+			$objref    = dol_sanitizeFileName($object->ref);
 			$dir_files = $preventionplandocument->element . '/' . $objref;
-			$filedir = $upload_dir . '/' . $dir_files;
+			$filedir   = $upload_dir . '/' . $dir_files;
 			$urlsource = $_SERVER["PHP_SELF"] . '?id='. $id;
 
-			$modulepart = 'digiriskdolibarr:PreventionPlanDocument';
+			$modulepart   = 'digiriskdolibarr:PreventionPlanDocument';
 			$defaultmodel = $conf->global->DIGIRISKDOLIBARR_PREVENTIONPLANDOCUMENT_DEFAULT_MODEL;
-			$title = $langs->trans('PreventionPlanDocument');
+			$title        = $langs->trans('PreventionPlanDocument');
 
 			print digiriskshowdocuments($modulepart, $dir_files, $filedir, $urlsource, $permissiontoadd, $permissiontodelete, $defaultmodel, 1, 0, 28, 0, '', $title, '', $langs->defaultlang, '', $preventionplandocument, 0, 'remove_file', $object->status == 3, $langs->trans('PreventionPlanMustBeLocked') );
 		}

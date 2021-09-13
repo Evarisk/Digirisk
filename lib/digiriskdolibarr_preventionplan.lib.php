@@ -24,7 +24,7 @@
 /**
  * Prepare array of tabs for DigiriskElement
  *
- * @param	DigiriskElement $object DigiriskElement
+ * @param	PreventionPlan $object PreventionPlan
  * @return 	array					Array of tabs
  */
 function preventionplanPrepareHead($object)

@@ -56,12 +56,10 @@ $contextpage = GETPOST('contextpage', 'aZ') ?GETPOST('contextpage', 'aZ') : 'pre
 $preventionplan = new PreventionPlan($db);
 $object         = new Openinghours($db);
 
-$preventionplan->fetch($id);
-
 $hookmanager->initHooks(array('preventionplanschedule', 'globalcard')); // Note that conf->hooks_modules contains array
 
-$permissiontoread   = $user->rights->digiriskdolibarr->preventionplandocument->read;
-$permissiontoadd    = $user->rights->digiriskdolibarr->preventionplandocument->write;
+// Load object
+$preventionplan->fetch($id);
 
 $morewhere = ' AND element_id = ' . $id;
 $morewhere .= ' AND element_type = ' . "'" . $preventionplan->element . "'";
@@ -69,6 +67,9 @@ $morewhere .= ' AND status = 1';
 
 $object->fetch(0, '', $morewhere);
 
+// Security check - Protection if external user
+$permissiontoread = $user->rights->digiriskdolibarr->preventionplandocument->read;
+$permissiontoadd  = $user->rights->digiriskdolibarr->preventionplandocument->write;
 if (!$permissiontoread) accessforbidden();
 
 /*
@@ -79,27 +80,29 @@ $parameters = array();
 $reshook = $hookmanager->executeHooks('doActions', $parameters, $preventionplan, $action); // Note that $action and $preventionplan may have been modified by some hooks
 if ($reshook < 0) setEventMessages($hookmanager->error, $hookmanager->errors, 'errors');
 
-if (($action == 'update' && !GETPOST("cancel", 'alpha'))
-	|| ($action == 'updateedit'))
-{
-	$object->element_type = $preventionplan->element;
-	$object->element_id = $id;
-	$object->status = 1;
-	$object->monday = GETPOST('monday', 'string');
-	$object->tuesday = GETPOST('tuesday', 'string');
-	$object->wednesday = GETPOST('wednesday', 'string');
-	$object->thursday = GETPOST('thursday', 'string');
-	$object->friday = GETPOST('friday', 'string');
-	$object->saturday = GETPOST('saturday', 'string');
-	$object->sunday = GETPOST('sunday', 'string');
-	$object->create($user);
+if (empty($reshook)) {
+	if (($action == 'update' && !GETPOST("cancel", 'alpha')) || ($action == 'updateedit')) {
+		$object->element_type = $preventionplan->element;
+		$object->element_id = $id;
+		$object->status = 1;
+
+		$object->monday = GETPOST('monday', 'string');
+		$object->tuesday = GETPOST('tuesday', 'string');
+		$object->wednesday = GETPOST('wednesday', 'string');
+		$object->thursday = GETPOST('thursday', 'string');
+		$object->friday = GETPOST('friday', 'string');
+		$object->saturday = GETPOST('saturday', 'string');
+		$object->sunday = GETPOST('sunday', 'string');
+
+		$object->create($user);
+	}
 }
 
 /*
  *  View
  */
 
-$title = $langs->trans("PreventionPlanSchedule");
+$title    = $langs->trans("PreventionPlanSchedule");
 $help_url = '';
 llxHeader('', $title, $help_url);
 
@@ -110,12 +113,10 @@ if (!empty($preventionplan->id)) $res = $preventionplan->fetch_optionals();
 
 $head = preventionplanPrepareHead($preventionplan);
 print dol_get_fiche_head($head, 'preventionplanSchedule', $langs->trans("PreventionPlan"), -1, "digiriskdolibarr@digiriskdolibarr");
-$morehtmlref = ' - ' . $preventionplan->label;
-$morehtmlleft .= '<div class="floatleft inline-block valignmiddle divphotoref">'.digirisk_show_photos('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$entity].'/'.$object->element_type, 'small', 5, 0, 0, 0, $width,0, 0, 0, 0, $object->element_type, $object).'</div>';
+dol_strlen($preventionplan->label) ? $morehtmlref = ' - ' . $preventionplan->label : '';
+//$morehtmlleft .= '<div class="floatleft inline-block valignmiddle divphotoref">'.digirisk_show_photos('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$entity].'/'.$object->element_type, 'small', 5, 0, 0, 0, $width,0, 0, 0, 0, $object->element_type, $object).'</div>';
 
 digirisk_banner_tab($preventionplan, 'ref', '', 0, 'ref', 'ref', $morehtmlref, '', 0, $morehtmlleft);
-print '<div class="fichecenter"></div>';
-print '<div class="underbanner clearboth"></div>';
 
 print dol_get_fiche_end();
 
@@ -124,7 +125,6 @@ print load_fiche_titre($langs->trans("PreventionPlanSchedule"), '', '');
 //Show common fields
 include DOL_DOCUMENT_ROOT.'/custom/digiriskdolibarr/core/tpl/digiriskdolibarr_openinghours_view.tpl.php';
 
-dol_fiche_end();
 // End of page
 llxFooter();
 $db->close();

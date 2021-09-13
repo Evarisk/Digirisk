@@ -812,7 +812,7 @@ class PreventionPlanLine extends CommonObjectLine
 	 *	Load preventionplan line line from database
 	 *
 	 *	@param	int		$rowid      id of preventionplan line line to get
-	 *	@return	int					<0 if KO, >0 if OK
+	 *	@return	array					<0 if KO, >0 if OK
 	 */
 	public function fetchAll($parent_id = 0, $limit = 0)
 	{

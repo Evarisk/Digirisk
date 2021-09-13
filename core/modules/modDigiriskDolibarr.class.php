@@ -400,34 +400,34 @@ class modDigiriskdolibarr extends DolibarrModules
 		/* FIRE PERMIT PERMISSIONS */
 		$this->rights[$r][0] = $this->numero.$r;
 		$this->rights[$r][1] = $langs->trans('ReadFirePermit');
-		$this->rights[$r][4] = 'firepermitdocument';
+		$this->rights[$r][4] = 'firepermit';
 		$this->rights[$r][5] = 'read';
 		$r++;
 		$this->rights[$r][0] = $this->numero.$r;
 		$this->rights[$r][1] = $langs->trans('CreateFirePermit');
-		$this->rights[$r][4] = 'firepermitdocument';
+		$this->rights[$r][4] = 'firepermit';
 		$this->rights[$r][5] = 'write';
 		$r++;
 		$this->rights[$r][0] = $this->numero.$r;
 		$this->rights[$r][1] = $langs->trans('DeleteFirePermit');
-		$this->rights[$r][4] = 'firepermitdocument';
+		$this->rights[$r][4] = 'firepermit';
 		$this->rights[$r][5] = 'delete';
 		$r++;
 
 		/* PREVENTION PLAN PERMISSIONS */
 		$this->rights[$r][0] = $this->numero.$r;
 		$this->rights[$r][1] = $langs->trans('ReadPreventionPlan');
-		$this->rights[$r][4] = 'preventionplandocument';
+		$this->rights[$r][4] = 'preventionplan';
 		$this->rights[$r][5] = 'read';
 		$r++;
 		$this->rights[$r][0] = $this->numero.$r;
 		$this->rights[$r][1] = $langs->trans('CreatePreventionPlan');
-		$this->rights[$r][4] = 'preventionplandocument';
+		$this->rights[$r][4] = 'preventionplan';
 		$this->rights[$r][5] = 'write';
 		$r++;
 		$this->rights[$r][0] = $this->numero.$r;
 		$this->rights[$r][1] = $langs->trans('DeletePreventionPlan');
-		$this->rights[$r][4] = 'preventionplandocument';
+		$this->rights[$r][4] = 'preventionplan';
 		$this->rights[$r][5] = 'delete';
 		$r++;
 
