@@ -18,7 +18,7 @@
 /**
  *   	\file       preventionplan_attendants.php
  *		\ingroup    digiriskdolibarr
- *		\brief      Page to create/edit/view preventionplan_signature
+ *		\brief      Page to add/edit/view preventionplan_signature
  */
 
 // Load Dolibarr environment
@@ -63,8 +63,8 @@ $object->fetch($id);
 
 $hookmanager->initHooks(array('preventionplansignature', 'globalcard')); // Note that conf->hooks_modules contains array
 
+//Security check
 $permissiontoread   = $user->rights->digiriskdolibarr->preventionplandocument->read;
-
 if (!$permissiontoread) accessforbidden();
 
 /*
@@ -75,14 +75,6 @@ if (!$permissiontoread) accessforbidden();
 $parameters = array();
 $reshook = $hookmanager->executeHooks('doActions', $parameters, $object, $action); // Note that $action and $object may have been modified by some hooks
 if ($reshook < 0) setEventMessages($hookmanager->error, $hookmanager->errors, 'errors');
-
-//if ($action == 'add' && GETPOST('cancel')) {
-//	// Creation prevention plan OK
-//	$urltogo = str_replace('__ID__', $result, $backurlforlist);
-//	$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
-//	header("Location: " . $urltogo);
-//	exit;
-//}
 
 if (empty($backtopage) || ($cancel && empty($id))) {
 	if (empty($backtopage) || ($cancel && strpos($backtopage, '__ID__'))) {
@@ -96,6 +88,7 @@ if ($action == 'addAttendant') {
 	$object->fetch($id);
 	$extintervenant_ids  = GETPOST('ext_intervenants');
 
+	//Check email of intervenants
 	if (!empty($extintervenant_ids) && $extintervenant_ids > 0) {
 		foreach ($extintervenant_ids as $extintervenant_id) {
 			$contact->fetch($extintervenant_id);
@@ -105,6 +98,7 @@ if ($action == 'addAttendant') {
 			}
 		}
 	}
+
 	if (!$error) {
 		$result = $signatory->setSignatory($object->id,'socpeople', $extintervenant_ids, 'PP_EXT_SOCIETY_INTERVENANTS', 1);
 		if ($result > 0) {
@@ -130,7 +124,7 @@ if ($action == 'addAttendant') {
 // Action to add record
 if ($action == 'addSignature') {
 
-	$signatoryID = GETPOST('signatoryID');
+	$signatoryID  = GETPOST('signatoryID');
 	$request_body = file_get_contents('php://input');
 
 	$signatory->fetch($signatoryID);
@@ -190,7 +184,6 @@ if ($action == 'send') {
 
 	if (!$error) {
 		$langs->load('mails');
-		//$trackid = 'PreventionPlanSignature'.$element->id;
 		$sendto = $signatory->email;
 
 		if (dol_strlen($sendto) && (!empty($conf->global->MAIN_MAIL_EMAIL_FROM))) {
@@ -243,7 +236,7 @@ if ($action == 'send') {
 	}
 }
 
-////// Action to delete attendant
+// Action to delete attendant
 if ($action == 'deleteAttendant') {
 
 	$signatoryToDeleteID = GETPOST('signatoryID');
@@ -289,12 +282,9 @@ if (!empty($object->id)) $res = $object->fetch_optionals();
 $head = preventionplanPrepareHead($object);
 print dol_get_fiche_head($head, 'preventionplanAttendants', $langs->trans("PreventionPlan"), -1, "digiriskdolibarr@digiriskdolibarr");
 dol_strlen($object->label) ? $morehtmlref = ' - ' . $object->label : '';
-$morehtmlleft .= '<div class="floatleft inline-block valignmiddle divphotoref">'.digirisk_show_photos('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$entity].'/'.$object->element_type, 'small', 5, 0, 0, 0, $width,0, 0, 0, 0, $object->element_type, $object).'</div>';
+//$morehtmlleft .= '<div class="floatleft inline-block valignmiddle divphotoref">'.digirisk_show_photos('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$entity].'/'.$object->element_type, 'small', 5, 0, 0, 0, $width,0, 0, 0, 0, $object->element_type, $object).'</div>';
 
 digirisk_banner_tab($object, 'ref', '', 0, 'ref', 'ref', $morehtmlref, '', 0, $morehtmlleft, $object->getLibStatut(5));
-
-print '<div class="fichecenter"></div>';
-print '<div class="underbanner clearboth"></div>';
 
 print dol_get_fiche_end(); ?>
 
@@ -330,7 +320,7 @@ if ($action == 'create')
 
 	if ($backtopageforcancel) print '<input type="hidden" name="backtopageforcancel" value="'.$backtopageforcancel.'">';
 
-	dol_fiche_head(array(), '');
+	print dol_get_fiche_head(array(), '');
 
 	print '<table class="border centpercent tableforfieldcreate">'."\n";
 
@@ -340,7 +330,7 @@ if ($action == 'create')
 	print '</td></tr>';
 	print '</table>'."\n";
 
-	dol_fiche_end();
+	print dol_get_fiche_end();
 
 	print '<div class="center">';
 	print '<input type="submit" class="button" id ="actionButtonCreate" name="addAttendant" value="'.dol_escape_htmltag($langs->trans("Create")).'">';
@@ -396,33 +386,17 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	print '</td><td class="center">';
 	print $element->getLibStatut(5);
 	print '</td>';
+
+	print '<td class="center">';
 	if ($object->status == 2) {
-		print '<td class="center">';
 		require __DIR__ . "/core/tpl/digiriskdolibarr_signature_action_view.tpl.php";
-		print '</td>';
-		if ($element->signature != $langs->trans("FileGenerated")) {
-			print '<td class="center">';
-			require __DIR__ . "/core/tpl/digiriskdolibarr_signature_view.tpl.php";
-			print '</td>';
-		}
-	} elseif ($object->status == 3) {
+	}
+	print '</td>';
+	if ($element->signature != $langs->trans("FileGenerated")) {
 		print '<td class="center">';
-		print '';
-		print '</td>';
-		if ($element->signature != $langs->trans("FileGenerated")) {
-			print '<td class="center">';
-			require __DIR__ . "/core/tpl/digiriskdolibarr_signature_view.tpl.php";
-			print '</td>';
-		}
-	} else {
-		print '<td class="center">';
-		print '-';
-		print '</td>';
-		print '<td class="center">';
-		print '-';
+		require __DIR__ . "/core/tpl/digiriskdolibarr_signature_view.tpl.php";
 		print '</td>';
 	}
-
 	print '</tr>';
 	print '</table>';
 	print '<br>';
@@ -437,6 +411,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	print load_fiche_titre($langs->trans("SignatureResponsibleExtSociety"), '', '');
 
 	print '<table class="border centpercent tableforfield">';
+
 	print '<tr class="liste_titre">';
 	print '<td>' . $langs->trans("Name") . '</td>';
 	print '<td>' . $langs->trans("Role") . '</td>';
@@ -446,7 +421,6 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	print '<td class="center">' . $langs->trans("Status") . '</td>';
 	print '<td class="center">' . $langs->trans("ActionsSignature") . '</td>';
 	print '<td class="center">' . $langs->trans("Signature") . '</td>';
-
 	print '</tr>';
 
 	print '<tr class="oddeven"><td class="minwidth200">';
@@ -467,33 +441,15 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	print '</td><td class="center">';
 	print $element->getLibStatut(5);
 	print '</td>';
+	print '<td class="center">';
 	if ($object->status == 2) {
-		print '<td class="center">';
 		require __DIR__ . "/core/tpl/digiriskdolibarr_signature_action_view.tpl.php";
-		print '</td>';
-		if ($element->signature != $langs->trans("FileGenerated")) {
-			print '<td class="center">';
-			require __DIR__ . "/core/tpl/digiriskdolibarr_signature_view.tpl.php";
-			print '</td>';
-		}
-	} elseif ($object->status == 3) {
+	}	print '</td>';
+	if ($element->signature != $langs->trans("FileGenerated")) {
 		print '<td class="center">';
-		print '';
-		print '</td>';
-		if ($element->signature != $langs->trans("FileGenerated")) {
-			print '<td class="center">';
-			require __DIR__ . "/core/tpl/digiriskdolibarr_signature_view.tpl.php";
-			print '</td>';
-		}
-	} else {
-		print '<td class="center">';
-		print '-';
-		print '</td>';
-		print '<td class="center">';
-		print '-';
+		require __DIR__ . "/core/tpl/digiriskdolibarr_signature_view.tpl.php";
 		print '</td>';
 	}
-
 	print '</tr>';
 	print '</table>';
 	print '<br>';
@@ -504,8 +460,8 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	print load_fiche_titre($langs->trans("SignatureIntervenants"), $newcardbutton, '');
 
 	print '<table class="border centpercent tableforfield">';
-	print '<tr class="liste_titre">';
 
+	print '<tr class="liste_titre">';
 	print '<td>' . $langs->trans("Name") . '</td>';
 	print '<td>' . $langs->trans("Role") . '</td>';
 	print '<td class="center">' . $langs->trans("SignatureLink") . '</td>';
@@ -514,7 +470,6 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	print '<td class="center">' . $langs->trans("Status") . '</td>';
 	print '<td class="center">' . $langs->trans("ActionsSignature") . '</td>';
 	print '<td class="center">' . $langs->trans("Signature") . '</td>';
-
 	print '</tr>';
 
 	$already_selected_intervenants[$contact->id] = $contact->id;
@@ -533,6 +488,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 			} else {
 				print '-';
 			}
+
 			print '</td><td class="center">';
 			print dol_print_date($element->last_email_sent_date, 'dayhour');
 			print '</td><td class="center">';
@@ -540,39 +496,14 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 			print '</td><td class="center">';
 			print $element->getLibStatut(5);
 			print '</td>';
-			if ($object->status == 1) {
-				print '<td class="center">';
+			print '<td class="center">';
+			if ($object->status < 3) {
 				require __DIR__ . "/core/tpl/digiriskdolibarr_signature_action_view.tpl.php";
-				print '</td>';
-				print '<td class="center">';
-				print '';
-				print '</td>';
-
 			}
-			if ($object->status == 2) {
+			print '</td>';
+			if ($element->signature != $langs->trans("FileGenerated")) {
 				print '<td class="center">';
-				require __DIR__ . "/core/tpl/digiriskdolibarr_signature_action_view.tpl.php";
-				print '</td>';
-				if ($element->signature != $langs->trans("FileGenerated")) {
-					print '<td class="center">';
-					require __DIR__ . "/core/tpl/digiriskdolibarr_signature_view.tpl.php";
-					print '</td>';
-				}
-			} elseif ($object->status == 3) {
-				print '<td class="center">';
-				print '';
-				print '</td>';
-				if ($element->signature != $langs->trans("FileGenerated")) {
-					print '<td class="center">';
-					require __DIR__ . "/core/tpl/digiriskdolibarr_signature_view.tpl.php";
-					print '</td>';
-				}
-			} else {
-				print '<td class="center">';
-				print '-';
-				print '</td>';
-				print '<td class="center">';
-				print '-';
+				require __DIR__ . "/core/tpl/digiriskdolibarr_signature_view.tpl.php";
 				print '</td>';
 			}
 			print '</tr>';
