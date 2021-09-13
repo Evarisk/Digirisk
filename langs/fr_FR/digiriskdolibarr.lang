@@ -362,7 +362,7 @@ ErrorNoEmailForExtResponsible = Erreur : Le responsable de l'Entreprise Extérie
 ErrorNoEmailForMaitreOeuvre = Erreur : Le responsable de l'Entreprise Utilisatrice n'a pas d'email
 ErrorNoEmailForExtIntervenant = Erreur : Le (ou les) intervenant(s) ne possède(nt) pas d'email
 SignatureEmailSubject = Signature du plan de prevention
-
+DocumentName = Référence du document
 
 
 
@@ -843,6 +843,7 @@ SignatureEmailMessage = Bonjour, <br> Veuillez trouver ci-joint le lien de signa
 AddSignatureSuccess = Signature du document réussie
 AddSignatureSuccessText = La signature a bien été enregistrée pour le document
 SignatureSeeDocument = Voir
+ShowDocument = Voir le document
 
 #
 # Ticket - Interface publique ticket

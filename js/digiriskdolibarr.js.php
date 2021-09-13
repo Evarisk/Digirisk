@@ -829,7 +829,8 @@ window.eoxiaJS.signature.init = function() {
 
 window.eoxiaJS.signature.event = function() {
 	jQuery( document ).on( 'click', '.signature-erase', window.eoxiaJS.signature.clearCanvas );
-	jQuery( document ).on( 'click', '.signature-validate', window.eoxiaJS.signature.createSignature );
+    jQuery( document ).on( 'click', '.signature-validate', window.eoxiaJS.signature.createSignature );
+    jQuery( document ).on( 'click', '.auto-download', window.eoxiaJS.signature.autoDownloadSpecimen );
 };
 
 window.eoxiaJS.signature.modalSignatureOpened = function( triggeredElement ) {
@@ -905,6 +906,40 @@ window.eoxiaJS.signature.createSignature = function() {
 		}
 	});
 };
+
+window.eoxiaJS.signature.download = function(fileUrl, filename) {
+    var a = document.createElement("a");
+    a.href = fileUrl;
+    a.setAttribute("download", filename);
+    a.click();
+}
+
+window.eoxiaJS.signature.autoDownloadSpecimen = function( event ) {
+    let element = $(this).closest('.file-generation')
+	let url = document.URL + '&action=builddoc'
+
+    $.ajax({
+        url: url,
+        type: "POST",
+        success: function ( ) {
+            let filename = element.find('.specimen-name').attr('value')
+            let path = element.find('.specimen-path').attr('value')
+
+            window.eoxiaJS.signature.download(path + filename, filename);
+            $.ajax({
+                url: document.URL + '&action=remove_file',
+                type: "POST",
+                success: function ( ) {
+                },
+                error: function ( ) {
+                }
+            });
+        },
+        error: function ( ) {
+        }
+    });
+};
+
 
 /**
  * Initialise l'objet "photo" ainsi que la méthode "init" obligatoire pour la bibliothèque EoxiaJS.
