@@ -167,120 +167,116 @@ class PreventionPlan extends CommonObject
 	 * @param  	int 	$fromid     Id of object to clone
 	 * @return 	mixed 				New object created, <0 if KO
 	 */
-	public function createFromClone(User $user, $fromid)
-	{
-		global $conf, $langs, $extrafields;
-		$error = 0;
-
-		$signatory         = new PreventionPlanSignature($this->db);
-		$digiriskresources = new DigiriskResources($this->db);
-
-		$refPreventionPlanMod = new $conf->global->DIGIRISKDOLIBARR_PREVENTIONPLAN_ADDON($this->db);
-
-		dol_syslog(__METHOD__, LOG_DEBUG);
-
-		$object = new self($this->db);
-
-		$this->db->begin();
-
-		// Load source object
-		$result = $object->fetchCommon($fromid);
-		if ($result > 0 && !empty($object->table_element_line)) {
-			$object->fetchLines();
-		}
-
-		// Load signatory and ressources form source object
-		$signatories      = $signatory->fetchSignatory("", $fromid);
-		$object_resources = $digiriskresources->fetchResourcesFromObject('', $object);
-
-		if (!empty ($signatories) && $signatories > 0) {
-			foreach ($signatories as $arrayRole) {
-				foreach ($arrayRole as $signatory) {
-					$signatoriesID[$signatory->role] = $signatory->element_id;
-				}
-			}
-		}
-
-		if (!empty ($object_resources) && $object_resources > 0) {
-			foreach ($object_resources as $arrayRole) {
-				foreach ($arrayRole as $object_resource) {
-					$ressources[] = $object_resource->id;
-				}
-			}
-		}
-
-		$arrayRole = array( 'PP_EXT_SOCIETY', 'PP_LABOUR_INSPECTOR', 'PP_LABOUR_INSPECTOR_ASSIGNED');
-		$ArrayRessources = array_flip($arrayRole);
-		$ArrayRessources['PP_EXT_SOCIETY'] = $ressources[0];
-		$ArrayRessources['PP_LABOUR_INSPECTOR'] = $ressources[1];
-		$ArrayRessources['PP_LABOUR_INSPECTOR_ASSIGNED'] = $ressources[2];
-
-		// get lines so they will be clone
-		//foreach($this->lines as $line)
-		//	$line->fetch_optionals();
-
-		// Reset some properties
-		unset($object->id);
-		unset($object->fk_user_creat);
-		unset($object->import_key);
-
-		// Clear fields
-		if (property_exists($object, 'ref')) {
-			$object->ref = $refPreventionPlanMod->getNextValue($object);
-		}
-		if (property_exists($object, 'ref_ext')) {
-			$object->ref_ext = 'digirisk_' . $object->ref;
-		}
-		if (property_exists($object, 'label')) {
-			$object->label = empty($this->fields['label']['default']) ? $langs->trans("CopyOf")." ".$object->label : $this->fields['label']['default'];
-		}
-		if (property_exists($object, 'status')) {
-			$object->status = self::STATUS_IN_PROGRESS;
-		}
-		if (property_exists($object, 'date_creation')) {
-			$object->date_creation = dol_now();
-		}
-
-		// ...
-//		// Clear extrafields that are unique
-////		if (is_array($object->array_options) && count($object->array_options) > 0) {
-////			$extrafields->fetch_name_optionals_label($this->table_element);
-////			foreach ($object->array_options as $key => $option) {
-////				$shortkey = preg_replace('/options_/', '', $key);
-////				if (!empty($extrafields->attributes[$this->table_element]['unique'][$shortkey])) {
-////					//var_dump($key); var_dump($clonedObj->array_options[$key]); exit;
-////					unset($object->array_options[$key]);
-////				}
-////			}
-////		}
-
-		// Create clone
-		$object->context['createfromclone'] = 'createfromclone';
-		$result = $object->createCommon($user);
-
-		if ($result > 0) {
-			$digiriskresources->digirisk_dolibarr_set_resources($this->db, $user->id, 'PP_EXT_SOCIETY', 'societe', array($ArrayRessources['PP_EXT_SOCIETY']), $conf->entity, 'preventionplan', $result, 0);
-			$digiriskresources->digirisk_dolibarr_set_resources($this->db, $user->id, 'PP_LABOUR_INSPECTOR', 'societe', array($ArrayRessources['PP_LABOUR_INSPECTOR']), $conf->entity, 'preventionplan', $result, 0);
-			$digiriskresources->digirisk_dolibarr_set_resources($this->db, $user->id, 'PP_LABOUR_INSPECTOR_ASSIGNED', 'socpeople', array($ArrayRessources['PP_LABOUR_INSPECTOR_ASSIGNED']), $conf->entity, 'preventionplan', $result, 0);
-			$signatory->setSignatory($result, 'user', array($signatoriesID['PP_MAITRE_OEUVRE']), 'PP_MAITRE_OEUVRE');
-			$signatory->setSignatory($result, 'socpeople', array($signatoriesID['PP_EXT_SOCIETY_RESPONSIBLE']), 'PP_EXT_SOCIETY_RESPONSIBLE');
-		} else {
-			$error++;
-			$this->error = $object->error;
-			$this->errors = $object->errors;
-		}
-
-		unset($object->context['createfromclone']);
-
-		// End
-		if (!$error) {
-			$this->db->commit();
-			return $result;
-		} else {
-			$this->db->rollback();
-			return -1;
-		}
-	}
+//	public function createFromClone(User $user, $fromid)
+//	{
+//		global $conf, $langs, $extrafields;
+//		$error = 0;
+//
+//		$signatory         = new PreventionPlanSignature($this->db);
+//		$digiriskresources = new DigiriskResources($this->db);
+//
+//		$refPreventionPlanMod = new $conf->global->DIGIRISKDOLIBARR_PREVENTIONPLAN_ADDON($this->db);
+//
+//		dol_syslog(__METHOD__, LOG_DEBUG);
+//
+//		$object = new self($this->db);
+//
+//		$this->db->begin();
+//
+//		// Load source object
+//		$result = $object->fetchCommon($fromid);
+//		if ($result > 0 && !empty($object->table_element_line)) {
+//			$object->fetchLines();
+//		}
+//
+//		// Load signatory and ressources form source object
+//		$signatories      = $signatory->fetchSignatory("", $fromid);
+//		$object_resources = $digiriskresources->fetchResourcesFromObject('', $object);
+//
+//		if (!empty ($signatories) && $signatories > 0) {
+//			foreach ($signatories as $arrayRole) {
+//				foreach ($arrayRole as $signatory) {
+//					$signatoriesID[$signatory->role] = $signatory->element_id;
+//				}
+//			}
+//		}
+//
+//		if (!empty ($object_resources) && $object_resources > 0) {
+//			foreach ($object_resources as $arrayRole) {
+//				foreach ($arrayRole as $object_resource) {
+//					$ressources[] = $object_resource->id;
+//				}
+//			}
+//		}
+//
+//		$arrayRole = array( 'PP_EXT_SOCIETY', 'PP_LABOUR_INSPECTOR', 'PP_LABOUR_INSPECTOR_ASSIGNED');
+//		$ArrayRessources = array_flip($arrayRole);
+//		$ArrayRessources['PP_EXT_SOCIETY'] = $ressources[0];
+//		$ArrayRessources['PP_LABOUR_INSPECTOR'] = $ressources[1];
+//		$ArrayRessources['PP_LABOUR_INSPECTOR_ASSIGNED'] = $ressources[2];
+//
+//		// Reset some properties
+//		unset($object->id);
+//		unset($object->fk_user_creat);
+//		unset($object->import_key);
+//
+//		// Clear fields
+//		if (property_exists($object, 'ref')) {
+//			$object->ref = $refPreventionPlanMod->getNextValue($object);
+//		}
+//		if (property_exists($object, 'ref_ext')) {
+//			$object->ref_ext = 'digirisk_' . $object->ref;
+//		}
+//		if (property_exists($object, 'label')) {
+//			$object->label = empty($this->fields['label']['default']) ? $langs->trans("CopyOf")." ".$object->label : $this->fields['label']['default'];
+//		}
+//		if (property_exists($object, 'status')) {
+//			$object->status = self::STATUS_IN_PROGRESS;
+//		}
+//		if (property_exists($object, 'date_creation')) {
+//			$object->date_creation = dol_now();
+//		}
+//
+//		// ...
+////		// Clear extrafields that are unique
+//////		if (is_array($object->array_options) && count($object->array_options) > 0) {
+//////			$extrafields->fetch_name_optionals_label($this->table_element);
+//////			foreach ($object->array_options as $key => $option) {
+//////				$shortkey = preg_replace('/options_/', '', $key);
+//////				if (!empty($extrafields->attributes[$this->table_element]['unique'][$shortkey])) {
+//////					//var_dump($key); var_dump($clonedObj->array_options[$key]); exit;
+//////					unset($object->array_options[$key]);
+//////				}
+//////			}
+//////		}
+//
+//		// Create clone
+//		$object->context['createfromclone'] = 'createfromclone';
+//		$result = $object->createCommon($user);
+//
+//		if ($result > 0) {
+//			$digiriskresources->digirisk_dolibarr_set_resources($this->db, $user->id, 'PP_EXT_SOCIETY', 'societe', array($ArrayRessources['PP_EXT_SOCIETY']), $conf->entity, 'preventionplan', $result, 0);
+//			$digiriskresources->digirisk_dolibarr_set_resources($this->db, $user->id, 'PP_LABOUR_INSPECTOR', 'societe', array($ArrayRessources['PP_LABOUR_INSPECTOR']), $conf->entity, 'preventionplan', $result, 0);
+//			$digiriskresources->digirisk_dolibarr_set_resources($this->db, $user->id, 'PP_LABOUR_INSPECTOR_ASSIGNED', 'socpeople', array($ArrayRessources['PP_LABOUR_INSPECTOR_ASSIGNED']), $conf->entity, 'preventionplan', $result, 0);
+//			$signatory->setSignatory($result, 'user', array($signatoriesID['PP_MAITRE_OEUVRE']), 'PP_MAITRE_OEUVRE');
+//			$signatory->setSignatory($result, 'socpeople', array($signatoriesID['PP_EXT_SOCIETY_RESPONSIBLE']), 'PP_EXT_SOCIETY_RESPONSIBLE');
+//		} else {
+//			$error++;
+//			$this->error = $object->error;
+//			$this->errors = $object->errors;
+//		}
+//
+//		unset($object->context['createfromclone']);
+//
+//		// End
+//		if (!$error) {
+//			$this->db->commit();
+//			return $result;
+//		} else {
+//			$this->db->rollback();
+//			return -1;
+//		}
+//	}
 
 	/**
 	 * Load object in memory from the database
@@ -692,7 +688,6 @@ class PreventionPlan extends CommonObject
 					$obj = $this->db->fetch_object($resql);
 					$label = $obj->ref;
 
-
 					if (empty($outputmode))
 					{
 						if (in_array($obj->rowid, $selected))
@@ -756,7 +751,6 @@ class PreventionPlanLine extends CommonObjectLine
 	public $fk_preventionplan = '';
 
 	public $fk_element = '';
-
 
 	/**
 	 * Constructor
