@@ -843,6 +843,7 @@ SignatureEmailMessage = Bonjour, <br> Veuillez trouver ci-joint le lien de signa
 AddSignatureSuccess = Signature du document réussie
 AddSignatureSuccessText = La signature a bien été enregistrée pour le document
 SignatureSeeDocument = Voir
+ShowDocument = Voir le document
 
 #
 # Ticket - Interface publique ticket
