@@ -7,3 +7,5 @@ UPDATE llx_c_action_trigger SET elementtype = 'workunitdocument@digiriskdolibarr
 UPDATE llx_c_action_trigger SET elementtype = 'listingrisksphoto@digiriskdolibarr'      WHERE elementtype = 'listingrisksphoto';
 UPDATE llx_c_action_trigger SET elementtype = 'listingrisksaction@digiriskdolibarr'     WHERE elementtype = 'listingrisksaction';
 UPDATE llx_c_action_trigger SET elementtype = 'riskassessmentdocument@digiriskdolibarr' WHERE elementtype = 'riskassessmentdocument';
+
+UPDATE llx_extrafields SET type='sellist', param = 'a:1:{s:7:"options";a:1:{s:25:"digiriskdolibarr_risk:ref";N;}}', list='1' WHERE label='fk_risk';
