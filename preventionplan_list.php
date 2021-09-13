@@ -390,7 +390,7 @@ foreach ($preventionplan->fields as $key => $val)
 	$cssforfield = (empty($val['css']) ? '' : $val['css']);
 	if ($key == 'status') $cssforfield .= ($cssforfield ? ' ' : '').'center';
 	if (!empty($arrayfields['t.'.$key]['checked'])) {
-		if (preg_match('/MaitreOeuvre/', $arrayfields['t.'.$key]['label']) || preg_match('/StartDate/', $arrayfields['t.'.$key]['label']) || preg_match('/EndDate/', $arrayfields['t.'.$key]['label']) || preg_match('/ExtSociety/', $arrayfields['t.'.$key]['label']) || preg_match('/NbIntervenants/', $arrayfields['t.'.$key]['label']) || preg_match('/NbInterventions/', $arrayfields['t.'.$key]['label']) || preg_match('/Location/', $arrayfields['t.'.$key]['label'])) {
+		if (preg_match('/MaitreOeuvre/', $arrayfields['t.'.$key]['label']) || preg_match('/ExtSociety/', $arrayfields['t.'.$key]['label']) || preg_match('/NbIntervenants/', $arrayfields['t.'.$key]['label']) || preg_match('/NbInterventions/', $arrayfields['t.'.$key]['label']) || preg_match('/Location/', $arrayfields['t.'.$key]['label'])) {
 			$disablesort = 1;
 		}
 		else {
@@ -437,7 +437,6 @@ while ($i < ($limit ? min($num, $limit) : $num)) {
 	$obj = $db->fetch_object($resql);
 
 	if (empty($obj)) break; // Should not happen
-
 
 	// Store properties in $preventionplandocument
 	$preventionplan->setVarsFromFetchObj($obj);
