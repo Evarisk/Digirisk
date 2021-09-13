@@ -216,23 +216,8 @@ if ( $signatory->role == 'PP_EXT_SOCIETY_INTERVENANTS') {
 			</div>
 		</div>
 	</div>
-	<?php
-
-//	$objref = dol_sanitizeFileName($object->ref);
-//	$dir_files = $preventionplandocument->element . '/' . $objref . '/specimen';
-//	$filedir = $upload_dir . '/' . $dir_files;
-//	$urlsource = $_SERVER["PHP_SELF"] . '?track_id='. $track_id;
-//	$modulepart = 'digiriskdolibarr:PreventionPlanDocument';
-//	$title = $langs->trans('PreventionPlanDocument');
-//
-//	print digiriskshowdocuments($modulepart, $dir_files, $filedir, $urlsource, 1, $permissiontodelete, $defaultmodel, 1, 0, 28, 0, 'specimen', $title, '', $langs->defaultlang, '', $preventionplandocument, 0, '', 1 );
-
-	//	require  "../../core/tpl/digiriskdolibarr_signature_view.tpl.php";
-
-	// End of page
-	llxFooter('', 'public');
-	?>
-</div>
 <?php
+
+llxFooter('', 'public');
 $db->close();
 
