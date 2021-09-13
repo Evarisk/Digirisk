@@ -42,12 +42,8 @@ if (!$res && file_exists("../../main.inc.php")) $res = @include "../../main.inc.
 if (!$res && file_exists("../../../main.inc.php")) $res = @include "../../../main.inc.php";
 if (!$res) die("Include of main fails");
 
-require_once DOL_DOCUMENT_ROOT.'/projet/class/project.class.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/date.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/core/class/html.formother.class.php';
-require_once DOL_DOCUMENT_ROOT.'/user/class/user.class.php';
-require_once DOL_DOCUMENT_ROOT.'/contact/class/contact.class.php';
-require_once DOL_DOCUMENT_ROOT.'/societe/class/societe.class.php';
 
 require_once __DIR__ . '/class/preventionplan.class.php';
 require_once __DIR__ . '/class/digiriskresources.class.php';
@@ -55,12 +51,20 @@ require_once __DIR__ . '/class/digiriskresources.class.php';
 // Load translation files required by the page
 $langs->loadLangs(array('projects', 'companies', 'commercial'));
 global $conf, $db;
+
 $action      = GETPOST('action', 'alpha');
 $massaction  = GETPOST('massaction', 'alpha');
 $show_files  = GETPOST('show_files', 'int');
 $confirm     = GETPOST('confirm', 'alpha');
 $toselect    = GETPOST('toselect', 'array');
 $contextpage = GETPOST('contextpage', 'aZ') ?GETPOST('contextpage', 'aZ') : 'preventionplanlist';
+
+$limit     = GETPOST('limit', 'int') ?GETPOST('limit', 'int') : $conf->liste_limit;
+$sortfield = GETPOST("sortfield", "alpha");
+$sortorder = GETPOST("sortorder", 'alpha');
+$page      = GETPOSTISSET('pageplusone') ? (GETPOST('pageplusone') - 1) : GETPOST("page", 'int');
+$page      = is_numeric($page) ? $page : 0;
+$page      = $page == -1 ? 0 : $page;
 
 $title = $langs->trans("PreventionPlan");
 
@@ -70,13 +74,6 @@ $digiriskresources = new DigiriskResources($db);
 $societe           = new Societe($db);
 $contact           = new Contact($db);
 $usertmp           = new User($db);
-
-$limit     = GETPOST('limit', 'int') ?GETPOST('limit', 'int') : $conf->liste_limit;
-$sortfield = GETPOST("sortfield", "alpha");
-$sortorder = GETPOST("sortorder", 'alpha');
-$page      = GETPOSTISSET('pageplusone') ? (GETPOST('pageplusone') - 1) : GETPOST("page", 'int');
-$page      = is_numeric($page) ? $page : 0;
-$page      = $page == -1 ? 0 : $page;
 
 if (!$sortfield) $sortfield = "t.rowid";
 if (!$sortorder) $sortorder = "ASC";
@@ -112,13 +109,12 @@ foreach ($preventionplan->fields as $key => $val)
 // Load Digipreventionplan_element object
 include DOL_DOCUMENT_ROOT.'/core/actions_fetchobject.inc.php'; // Must be include, not include_once.
 
-//Permission for digiriskelement_preventionplan
-$permissiontoread = $user->rights->digiriskdolibarr->preventionplandocument->read;
-$permissiontoadd = $user->rights->digiriskdolibarr->preventionplandocument->write;
-$permissiontodelete = $user->rights->digiriskdolibarr->preventionplandocument->delete;
+//Permission for preventionplan
+$permissiontoread = $user->rights->digiriskdolibarr->preventionplan->read;
+$permissiontoadd = $user->rights->digiriskdolibarr->preventionplan->write;
 
 // Security check - Protection if external user
-if (!$user->rights->digiriskdolibarr->lire) accessforbidden();
+if ($permissiontoread) accessforbidden();
 
 /*
  * Actions
@@ -179,8 +175,6 @@ if (empty($reshook))
 			exit;
 		}
 	}
-
-
 }
 
 
@@ -209,7 +203,7 @@ if (in_array($massaction, array('presend', 'predelete'))) $arrayofmassactions = 
 $massactionbutton = $form->selectMassAction('', $arrayofmassactions);
 
 $newcardbutton = '';
-if ($user->rights->projet->creer)
+if ($permissiontoadd)
 {
 	$newcardbutton .= dolGetButtonTitle($langs->trans('NewPreventionPlan'), '', 'fa fa-plus-circle', DOL_URL_ROOT.'/custom/digiriskdolibarr/preventionplan_card.php?action=create');
 }
