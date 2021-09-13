@@ -57,6 +57,7 @@ $langs->loadLangs(array("digiriskdolibarr@digiriskdolibarr", "other", "errors"))
 $track_id = GETPOST('track_id', 'alpha');
 $action   = GETPOST('action', 'aZ09');
 $url      = dirname($_SERVER['PHP_SELF']) . '/signature_success.php';
+$source   = GETPOST('source', 'aZ09');
 
 // Initialize technical objects
 $user                   = new User($db);
@@ -117,7 +118,7 @@ if ($action == 'builddoc') {
 	if (empty($hideref)) $hideref = 0;
 	if (empty($moreparams)) $moreparams = null;
 
-	$model = GETPOST('model', 'alpha');
+	$model = 'preventionplandocument_specimen_odt';
 
 	$moreparams['object'] = $object;
 	$moreparams['user'] = $user;
@@ -125,10 +126,15 @@ if ($action == 'builddoc') {
 	$result = $preventionplandocument->generateDocument($model, $outputlangs, $hidedetails, $hidedesc, $hideref, $moreparams);
 	if ($result <= 0) {
 		setEventMessages($object->error, $object->errors, 'errors');
+
 		$action = '';
 	} else {
 		if (empty($donotredirect)) {
-			setEventMessages($langs->trans("FileGenerated") . ' - ' . $object->last_main_doc, null);
+			$document_name = $preventionplandocument->last_main_doc;
+
+			copy($conf->digiriskdolibarr->multidir_output[isset($object->entity) ? $object->entity : 1] . '/preventionplandocument/' . $object->ref . '/specimen/' . $document_name, DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/documents/temp/preventionplandocument_specimen_' . $track_id . '.odt');
+
+			setEventMessages($langs->trans("FileGenerated") . ' - ' . $document_name, null);
 
 			$urltoredirect = $_SERVER['REQUEST_URI'];
 			$urltoredirect = preg_replace('/#builddoc$/', '', $urltoredirect);
@@ -140,6 +146,16 @@ if ($action == 'builddoc') {
 	}
 }
 
+if ($action == 'remove_file') {
+
+	$files = dol_dir_list(DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/documents/temp/'); // get all file names
+
+	foreach($files as $file){
+		if(is_file($file['fullname'])) {
+			dol_delete_file($file['fullname']);
+		}
+	}
+}
 /*
  * View
  */
@@ -167,9 +183,13 @@ if ( $signatory->role == 'PP_EXT_SOCIETY_INTERVENANTS') {
 <div class="digirisk-signature-container">
 	<div class="wpeo-gridlayout grid-2">
 		<div class="informations">
-			<div class="wpeo-gridlayout grid-2">
+			<div class="wpeo-gridlayout grid-2 file-generation">
+				<?php $path = DOL_MAIN_URL_ROOT . '/custom/digiriskdolibarr/documents/temp/';	?>
 				<strong class="grid-align-middle"><?php echo $langs->trans("ThisIsInformationOnDocumentToSign"); ?></strong>
-				<a href="" target="_blank" class="wpeo-button button-primary button-square-40 button-radius-2 grid-align-right"><i class="button-icon fas fa-file-pdf"></i></a>
+				<input type="hidden" class="specimen-name" value="<?php echo 'preventionplandocument_specimen_' . $track_id . '.odt' ?>">
+				<input type="hidden" class="specimen-path" value="<?php echo $path ?>">
+				<input type="hidden" class="track-id" value="<?php echo $track_id ?>">
+				<span class="wpeo-button button-primary  button-radius-2 grid-align-right auto-download"><i class="button-icon fas fa-file-pdf"></i><?php echo '  ' . $langs->trans('ShowDocument'); ?></span>
 			</div>
 			<br>
 			<div class="wpeo-table table-flex table-2">
@@ -185,7 +205,7 @@ if ( $signatory->role == 'PP_EXT_SOCIETY_INTERVENANTS') {
 		</div>
 		<div class="signature">
 			<div class="wpeo-gridlayout grid-2">
-				<strong class="grid-align-middle"><?php echo $langs->trans("DigiriskSignature"); ?></strong>
+				<strong class="grid-align-middle"><?php echo $langs->trans("Signature"); ?></strong>
 				<div class="wpeo-button button-primary button-square-40 button-radius-2 grid-align-right wpeo-modal-event modal-signature-open modal-open" value="<?php echo $element->id ?>">
 					<span><i class="fas fa-pen-nib"></i> <?php echo $langs->trans('Sign'); ?></span>
 				</div>
