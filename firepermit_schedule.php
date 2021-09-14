@@ -141,7 +141,7 @@ dol_banner_tab($firepermit, 'ref', '', ($user->socid ? 0 : 1), 'rowid', 'nom', '
 print '<span class="opacitymedium">'.$langs->trans("FirePermitSchedule")."</span>\n";
 
 //Show common fields
-include DOL_DOCUMENT_ROOT.'/custom/digiriskdolibarr/core/tpl/digiriskdolibarr_openinghours_view.tpl.php';
+require_once './core/tpl/digiriskdolibarr_openinghours_view.tpl.php';
 
 dol_fiche_end();
 // End of page
