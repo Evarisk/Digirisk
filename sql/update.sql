@@ -9,3 +9,6 @@ UPDATE llx_c_action_trigger SET elementtype = 'listingrisksaction@digiriskdoliba
 UPDATE llx_c_action_trigger SET elementtype = 'riskassessmentdocument@digiriskdolibarr' WHERE elementtype = 'riskassessmentdocument';
 
 UPDATE llx_extrafields SET type='sellist', param = 'a:1:{s:7:"options";a:1:{s:25:"digiriskdolibarr_risk:ref";N;}}', list='1' WHERE label='fk_risk';
+
+ALTER TABLE llx_digiriskdolibarr_preventionplan ADD prior_visit_date datetime;
+ALTER TABLE llx_digiriskdolibarr_preventionplan ADD fk_project integer;
