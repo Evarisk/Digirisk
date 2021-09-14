@@ -64,7 +64,7 @@ $object->fetch($id);
 $hookmanager->initHooks(array('preventionplansignature', 'globalcard')); // Note that conf->hooks_modules contains array
 
 //Security check
-$permissiontoread   = $user->rights->digiriskdolibarr->preventionplandocument->read;
+$permissiontoread   = $user->rights->digiriskdolibarr->preventionplan->read;
 if (!$permissiontoread) accessforbidden();
 
 /*

@@ -68,8 +68,8 @@ $morewhere .= ' AND status = 1';
 $object->fetch(0, '', $morewhere);
 
 // Security check - Protection if external user
-$permissiontoread = $user->rights->digiriskdolibarr->preventionplandocument->read;
-$permissiontoadd  = $user->rights->digiriskdolibarr->preventionplandocument->write;
+$permissiontoread = $user->rights->digiriskdolibarr->preventionplan->read;
+$permissiontoadd  = $user->rights->digiriskdolibarr->preventionplan->write;
 if (!$permissiontoread) accessforbidden();
 
 /*

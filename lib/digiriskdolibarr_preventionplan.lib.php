@@ -36,7 +36,7 @@ function preventionplanPrepareHead($object)
 	$h = 0;
 	$head = array();
 
-	if ($user->rights->digiriskdolibarr->preventionplandocument->read) {
+	if ($user->rights->digiriskdolibarr->preventionplan->read) {
 		$head[$h][0] = dol_buildpath("/digiriskdolibarr/preventionplan_card.php", 1) . '?id=' . $object->id;
 		$head[$h][1] = '<i class="fas fa-address-card"></i> ' . $langs->trans("Card");
 		$head[$h][2] = 'preventionplanCard';
