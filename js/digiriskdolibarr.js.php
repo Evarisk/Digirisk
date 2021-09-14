@@ -389,6 +389,12 @@ window.eoxiaJS.modal.openModal = function ( event ) {
 		$(this).closest('.risksign-photo-container').find('#risksign_photo' + idSelected).addClass('modal-active');
 	}
 
+	// Open modal signature.
+	if ($(this).hasClass('modal-signature-open')) {
+		$('#modal-signature' + idSelected).addClass('modal-active');
+		window.eoxiaJS.signature.modalSignatureOpened( $(this) );
+	}
+
 	$('.notice').addClass('hidden');
 };
 
@@ -786,6 +792,156 @@ if ( ! window.eoxiaJS.loader ) {
 }
 
 /**
+ * Initialise l'objet "signature" ainsi que la méthode "init" obligatoire pour la bibliothèque EoxiaJS.
+ *
+ * @since   1.1.0
+ * @version 1.1.0
+ */
+window.eoxiaJS.signature = {};
+
+/**
+ * Initialise le canvas signature
+ *
+ * @since   1.1.0
+ * @version 1.1.0
+ */
+window.eoxiaJS.signature.canvas;
+
+/**
+ * Initialise le boutton signature
+ *
+ * @since   1.1.0
+ * @version 1.1.0
+ */
+window.eoxiaJS.signature.buttonSignature;
+
+/**
+ * La méthode appelée automatiquement par la bibliothèque EoxiaJS.
+ *
+ * @since   1.1.0
+ * @version 1.1.0
+ *
+ * @return {void}
+ */
+window.eoxiaJS.signature.init = function() {
+	window.eoxiaJS.signature.event();
+};
+
+window.eoxiaJS.signature.event = function() {
+	jQuery( document ).on( 'click', '.signature-erase', window.eoxiaJS.signature.clearCanvas );
+    jQuery( document ).on( 'click', '.signature-validate', window.eoxiaJS.signature.createSignature );
+    jQuery( document ).on( 'click', '.auto-download', window.eoxiaJS.signature.autoDownloadSpecimen );
+};
+
+window.eoxiaJS.signature.modalSignatureOpened = function( triggeredElement ) {
+	window.eoxiaJS.signature.buttonSignature = triggeredElement;
+
+	console.log(triggeredElement.attr('value'));
+
+	var ratio =  Math.max( window.devicePixelRatio || 1, 1 );
+
+	window.eoxiaJS.signature.canvas = document.querySelector('#modal-signature' + triggeredElement.attr('value') + ' canvas' );
+
+	console.log(window.eoxiaJS.signature.canvas);
+
+	window.eoxiaJS.signature.canvas.signaturePad = new SignaturePad( window.eoxiaJS.signature.canvas, {
+		penColor: "rgb(0, 0, 0)"
+	} );
+
+	window.eoxiaJS.signature.canvas.width = window.eoxiaJS.signature.canvas.offsetWidth * ratio;
+	window.eoxiaJS.signature.canvas.height = window.eoxiaJS.signature.canvas.offsetHeight * ratio;
+	window.eoxiaJS.signature.canvas.getContext( "2d" ).scale( ratio, ratio );
+	window.eoxiaJS.signature.canvas.signaturePad.clear();
+
+	var signature_data = jQuery( '#signature_data' + triggeredElement.attr('value') ).val();
+	console.log(signature_data);
+	window.eoxiaJS.signature.canvas.signaturePad.fromDataURL(signature_data);
+};
+
+window.eoxiaJS.signature.clearCanvas = function( event ) {
+	var canvas = jQuery( this ).closest( '.modal-signature' ).find( 'canvas' );
+	canvas[0].signaturePad.clear();
+};
+
+window.eoxiaJS.signature.createSignature = function() {
+	let elementSignatory = $(this).attr('value');
+	let elementRedirect  = $(this).find('#redirect' + elementSignatory).attr('value');
+	let elementZone  = $(this).find('#zone' + elementSignatory).attr('value');
+    let actionContainerSuccess = $('.noticeSignatureSuccess');
+	var signatoryIDPost = '';
+	if (elementSignatory !== 0) {
+		signatoryIDPost = '&signatoryID=' + elementSignatory;
+	}
+
+	if ( ! $(this).closest( '.wpeo-modal' ).find( 'canvas' )[0].signaturePad.isEmpty() ) {
+		var signature = $(this).closest( '.wpeo-modal' ).find( 'canvas' )[0].toDataURL();
+	}
+
+	var url = '';
+	var type = '';
+	if (elementZone == "private") {
+		url = document.URL + '&action=addSignature' + signatoryIDPost;
+		type = "POST"
+	} else {
+		url = document.URL + '&action=addSignature' + signatoryIDPost;
+		type = "POST";
+	}
+	$.ajax({
+		url: url,
+		type: type,
+		processData: false,
+		contentType: 'application/octet-stream',
+		data: signature,
+		success: function() {
+            if (elementZone == "private") {
+                actionContainerSuccess.removeClass('hidden');
+                $('.signatures-container').load( document.URL + ' .signatures-container');
+            } else {
+                window.location.replace(elementRedirect);
+            }
+
+		},
+		error: function ( ) {
+		    alert('Error')
+		}
+	});
+};
+
+window.eoxiaJS.signature.download = function(fileUrl, filename) {
+    var a = document.createElement("a");
+    a.href = fileUrl;
+    a.setAttribute("download", filename);
+    a.click();
+}
+
+window.eoxiaJS.signature.autoDownloadSpecimen = function( event ) {
+    let element = $(this).closest('.file-generation')
+	let url = document.URL + '&action=builddoc'
+
+    $.ajax({
+        url: url,
+        type: "POST",
+        success: function ( ) {
+            let filename = element.find('.specimen-name').attr('value')
+            let path = element.find('.specimen-path').attr('value')
+
+            window.eoxiaJS.signature.download(path + filename, filename);
+            $.ajax({
+                url: document.URL + '&action=remove_file',
+                type: "POST",
+                success: function ( ) {
+                },
+                error: function ( ) {
+                }
+            });
+        },
+        error: function ( ) {
+        }
+    });
+};
+
+
+/**
  * Initialise l'objet "photo" ainsi que la méthode "init" obligatoire pour la bibliothèque EoxiaJS.
  *
  * @since   1.0.0
@@ -960,8 +1116,7 @@ window.eoxiaJS.risk.selectDanger = function( event ) {
 	element.closest('.wpeo-dropdown').find('.dropdown-toggle img').attr('src', element.find('img').attr('src'));
 	element.closest('.wpeo-dropdown').find('.dropdown-toggle img').attr('aria-label', element.closest('.wpeo-tooltip-event').attr('aria-label'));
 
-	element.closest('.fichecenter').find('.input-hidden-danger').val(element.data('id'));
-
+	element.closest('.wpeo-dropdown').find('.input-hidden-danger').val(element.data('id'));
 	var elementParent = jQuery(this).closest('.modal-container');
 
 	// Rend le bouton "active".
@@ -1217,7 +1372,6 @@ window.eoxiaJS.evaluation.selectEvaluationMethod = function ( event ) {
 	if (multiple_method > 0) {
 		elementParent.find('.select-evaluation-method.selected').removeClass('selected');
 
-
 		$(this).addClass('selected');
 		$(this).removeClass('button-grey');
 		$(this).addClass('button-blue');
@@ -1226,19 +1380,19 @@ window.eoxiaJS.evaluation.selectEvaluationMethod = function ( event ) {
 		elementParent.find('.select-evaluation-method:not(.selected)').addClass('button-grey');
 
 		if ($(this).hasClass('evaluation-standard')) {
-			$('.cotation-advanced').attr('style', 'display:none');
-			$('.cotation-standard').attr('style', 'display:block');
-			$('.risk-evaluation-calculated-cotation').attr('style', 'display:none')
-			$('.risk-evaluation-method').val('standard');
-			$(this).closest('.risk-evaluation-container').removeClass('advanced');
-			$(this).closest('.risk-evaluation-container').addClass('standard');
+			elementParent.find('.cotation-advanced').attr('style', 'display:none');
+			elementParent.find('.cotation-standard').attr('style', 'display:block');
+			elementParent.find('.risk-evaluation-calculated-cotation').attr('style', 'display:none')
+			elementParent.find('.risk-evaluation-method').val('standard');
+			elementParent.find(this).closest('.risk-evaluation-container').removeClass('advanced');
+			elementParent.find(this).closest('.risk-evaluation-container').addClass('standard');
 		} else {
-			$('.cotation-standard').attr('style', 'display:none');
-			$('.cotation-advanced').attr('style', 'display:block');
-			$('.risk-evaluation-calculated-cotation').attr('style', 'display:block');
-			$('.risk-evaluation-method').val('advanced');
-			$(this).closest('.risk-evaluation-container').addClass('advanced');
-			$(this).closest('.risk-evaluation-container').removeClass('standard');
+			elementParent.find('.cotation-standard').attr('style', 'display:none');
+			elementParent.find('.cotation-advanced').attr('style', 'display:block');
+			elementParent.find('.risk-evaluation-calculated-cotation').attr('style', 'display:block');
+			elementParent.find('.risk-evaluation-method').val('advanced');
+			elementParent.find(this).closest('.risk-evaluation-container').addClass('advanced');
+			elementParent.find(this).closest('.risk-evaluation-container').removeClass('standard');
 		}
 	}
 };
@@ -1588,9 +1742,9 @@ window.eoxiaJS.evaluationMethodEvarisk.selectSeuil = function( event ) {
 
 		fetch('js/json/default.json').then(response => response.json()).then(data => {
 			let cotationAfterAdapt = data[0].option.matrix[cotationBeforeAdapt];
-			$('.risk-evaluation-calculated-cotation').find('.risk-evaluation-cotation').attr('data-scale', window.eoxiaJS.evaluation.getDynamicScale(cotationAfterAdapt));
-			$('.risk-evaluation-calculated-cotation').find('.risk-evaluation-cotation span').text(cotationAfterAdapt);
-			$('.risk-evaluation-content').find('.risk-evaluation-seuil').val(cotationAfterAdapt);
+			elementParent.find('.risk-evaluation-calculated-cotation').find('.risk-evaluation-cotation').attr('data-scale', window.eoxiaJS.evaluation.getDynamicScale(cotationAfterAdapt));
+			elementParent.find('.risk-evaluation-calculated-cotation').find('.risk-evaluation-cotation span').text(cotationAfterAdapt);
+			elementParent.find('.risk-evaluation-content').find('.risk-evaluation-seuil').val(cotationAfterAdapt);
 			window.eoxiaJS.risk.haveDataInInput(elementParent);
 		})
 	}
@@ -2255,6 +2409,226 @@ window.eoxiaJS.notice.event = function() {
  */
 window.eoxiaJS.notice.closeNotice = function( event ) {
 	$(this).closest('.notice').addClass("hidden");
+};
+
+
+/**
+ * Initialise l'objet "ticket" ainsi que la méthode "init" obligatoire pour la bibliothèque EoxiaJS.
+ *
+ * @since   1.1.0
+ * @version 1.1.0
+ */
+window.eoxiaJS.ticket = {};
+
+/**
+ * La méthode appelée automatiquement par la bibliothèque EoxiaJS.
+ *
+ * @since   1.1.0
+ * @version 1.1.0
+ *
+ * @return {void}
+ */
+window.eoxiaJS.ticket.init = function() {
+	window.eoxiaJS.ticket.event();
+};
+
+/**
+ * La méthode contenant tous les évènements pour les tickets.
+ *
+ * @since   1.1.0
+ * @version 1.1.0
+ *
+ * @return {void}
+ */
+window.eoxiaJS.ticket.event = function() {
+	jQuery( document ).on( 'click', '.ticket-register', window.eoxiaJS.ticket.selectRegister );
+	jQuery( document ).on( 'click', '.ticket-pertinence', window.eoxiaJS.ticket.selectPertinence );
+	jQuery( document ).on( 'submit', '#sendFile', window.eoxiaJS.ticket.tmpStockFile );
+	jQuery( document ).on( 'click', '.linked-file-delete', window.eoxiaJS.ticket.removeFile );
+};
+
+/**
+ * Mets à jour les input du formulaire
+ *
+ * @since   1.1.0
+ * @version 1.1.0
+ *
+ * @return {void}
+ */
+window.eoxiaJS.ticket.updateFormData = function( ) {
+
+	let requestParams = '?'
+
+	let register = window.eoxiaJS.ticket.getRegister()
+	if (register > 0) {
+		requestParams += 'register=' + register + '&'
+	}
+
+	let pertinence = window.eoxiaJS.ticket.getPertinence()
+	if (pertinence > 0) {
+		requestParams += 'pertinence=' + pertinence  + '&'
+	}
+
+	$('.img-fields-container').load(document.URL + requestParams + ' .tableforimgfields');
+};
+
+/**
+ * Clique sur un des registres de la liste.
+ *
+ * @since   1.1.0
+ * @version 1.1.0
+ *
+ * @return {void}
+ */
+window.eoxiaJS.ticket.selectRegister = function( ) {
+	let registerInput = $('.ticketpublicarea').find("#register");
+	registerInput.val($(this).attr('id'))
+
+	window.eoxiaJS.ticket.updateFormData()
+};
+
+/**
+ * Récupère la valeur du registre sélectionné
+ *
+ * @since   1.1.0
+ * @version 1.1.0
+ *
+ * @return {void}
+ */
+window.eoxiaJS.ticket.getRegister = function( ) {
+	return $('.ticketpublicarea').find("#register").val()
+};
+
+/**
+ * Clique sur une des pertinences de la liste.
+ *
+ * @since   1.1.0
+ * @version 1.1.0
+ *
+ * @return {void}
+ */
+window.eoxiaJS.ticket.selectPertinence = function( ) {
+	let pertinenceInput = $('.ticketpublicarea').find("#pertinence");
+	pertinenceInput.val($(this).attr('id'))
+
+	window.eoxiaJS.ticket.updateFormData()
+};
+
+/**
+ * Récupère la valeur de la pertinence sélectionnée
+ *
+ * @since   1.1.0
+ * @version 1.1.0
+ *
+ * @return {void}
+ */
+
+window.eoxiaJS.ticket.getPertinence = function(  ) {
+	return $('.ticketpublicarea').find("#pertinence").val()
+};
+
+/**
+ * Upload automatiquement le(s) fichier(s) séelectionnés dans ecm/digiriskdolibarr/ticket/tmp/__REF__
+ *
+ * @since   1.1.0
+ * @version 1.1.0
+ *
+ * @return {void}
+ */
+
+window.eoxiaJS.ticket.tmpStockFile = function( ) {
+	event.preventDefault()
+
+	var files = $('#sendfile').prop('files');
+
+	const formData = new FormData();
+	for (let i = 0; i < files.length; i++) {
+		let file = files[i]
+		formData.append('files[]', file)
+	}
+	var ticket_id = $('#ticket_id').val()
+
+	fetch(document.URL + '?action=sendfile&ticket_id='+ticket_id, {
+		method: 'POST',
+		body: formData,
+	}).then((response) => {
+		setTimeout(function(){
+			$('#sendFileForm').load(document.URL+ '?ticket_id='+ticket_id + ' #fileLinkedTable')
+		}, 800);
+	})
+};
+
+/**
+ * Upload automatiquement le(s) fichier(s) séelectionnés dans ecm/digiriskdolibarr/ticket/tmp/__REF__
+ *
+ * @since   1.1.0
+ * @version 1.1.0
+ *
+ * @return {void}
+ */
+
+window.eoxiaJS.ticket.removeFile = function( event ) {
+	let filetodelete = $(this).attr('value');
+	filetodelete = filetodelete.replace('_mini', '')
+	let ticket_id = $('#ticket_id').val()
+
+	fetch(document.URL + '?action=removefile&filetodelete='+filetodelete+'&ticket_id='+ticket_id, {
+		method: 'POST',
+	}).then((response) => {
+		setTimeout(function(){
+			$('#sendFileForm').load(document.URL+ '?ticket_id='+ticket_id + ' #fileLinkedTable')
+		}, 800);
+	})
+};
+
+/**
+ * Initialise l'objet "preventionplan" ainsi que la méthode "init" obligatoire pour la bibliothèque EoxiaJS.
+ *
+ * @since   1.1.0
+ * @version 1.1.0
+ */
+window.eoxiaJS.preventionplan = {};
+
+/**
+ * La méthode appelée automatiquement par la bibliothèque EoxiaJS.
+ *
+ * @since   1.1.0
+ * @version 1.1.0
+ *
+ * @return {void}
+ */
+window.eoxiaJS.preventionplan.init = function() {
+    window.eoxiaJS.preventionplan.event();
+};
+
+/**
+ * La méthode contenant tous les évènements pour les preventionplans.
+ *
+ * @since   1.1.0
+ * @version 1.1.0
+ *
+ * @return {void}
+ */
+window.eoxiaJS.preventionplan.event = function() {
+    jQuery( document ).on( 'click', '#prior_visit_bool', window.eoxiaJS.preventionplan.showDateAndText );
+};
+
+window.eoxiaJS.preventionplan.showDateAndText = function() {
+    let dateField = $(this).closest('.preventionplan-table').find('.prior_visit_date_field')
+    let textField = $(this).closest('.preventionplan-table').find('.prior_visit_text_field')
+
+	if (dateField.hasClass('hidden')) {
+        dateField.attr('style', '')
+        textField.attr('style', '')
+        dateField.removeClass('hidden')
+        textField.removeClass('hidden')
+	} else {
+        dateField.attr('style', 'display:none')
+        textField.attr('style', 'display:none')
+        dateField.addClass('hidden')
+        textField.addClass('hidden')
+    }
+
 };
 
 /**

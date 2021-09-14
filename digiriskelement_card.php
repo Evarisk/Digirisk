@@ -284,7 +284,7 @@ if ($action == 'create')
 	print '<div class="center">';
 	print '<input type="submit" class="button" id ="actionButtonCreate" name="add" value="'.dol_escape_htmltag($langs->trans("Create")).'">';
 	print '&nbsp; ';
-	print ' &nbsp; <input type="submit" id ="actionButtonCancelCreate" class="button" name="cancel" value="'.$langs->trans("Cancel").'">';
+	print ' &nbsp; <input type="submit" id ="actionButtonCancelCreate" class="button" name="cancel" value="'.$langs->trans("Cancel").'" onClick="javascript:history.go(-1)">';
 	print '</div>';
 
 	print '</form>';
@@ -321,7 +321,7 @@ if (($id || $ref) && $action == 'edit')
 
 	print '<tr><td>'.$langs->trans("ParentElement").'</td><td>';
 
-	print $object->select_digiriskelement_list('', 'fk_parent', 'element_type="groupment"', '',  0, 0, array(), '',  0,  0,  'minwidth100',  GETPOST('id'),  false);
+	print $object->select_digiriskelement_list($object->fk_parent, 'fk_parent', 'element_type="groupment"', '',  0, 0, array(), '',  0,  0,  'minwidth100',  GETPOST('id'),  false);
 	print '</td></tr>';
 
 	print '</table>';
@@ -329,7 +329,7 @@ if (($id || $ref) && $action == 'edit')
 	dol_fiche_end();
 
 	print '<div class="center"><input type="submit" id ="actionButtonSave" class="button" name="save" value="'.$langs->trans("Save").'">';
-	print ' &nbsp; <input type="submit" id ="actionButtonCancelEdit" class="button" name="cancel" value="'.$langs->trans("Cancel").'">';
+	print ' &nbsp; <input type="submit" id ="actionButtonCancelEdit" class="button" name="cancel" value="'.$langs->trans("Cancel").'"  onClick="javascript:history.go(-1)">';
 	print '</div>';
 
 	print '</form>';
@@ -368,8 +368,7 @@ if ((empty($action) || ($action != 'edit' && $action != 'create')))
 	// ------------------------------------------------------------
 	$width = 80; $cssclass = 'photoref';
 
-	$morehtmlref = '<div class="refidno">';
-	$morehtmlref .= '</div>';
+	dol_strlen($object->label) ? $morehtmlref = ' - ' . $object->label : '';
 	if (isset($object->element_type)) {
 		$morehtmlleft .= '<div class="floatleft inline-block valignmiddle divphotoref">'.digirisk_show_photos('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$entity].'/'.$object->element_type, 'small', 5, 0, 0, 0, $width,0, 0, 0, 0, $object->element_type, $object).'</div>';
 	} else {

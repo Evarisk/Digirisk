@@ -47,7 +47,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 		$this->name = preg_replace('/^Interface/i', '', get_class($this));
 		$this->family = "demo";
 		$this->description = "Digiriskdolibarr triggers.";
-		$this->version = '1.0.1';
+		$this->version = '8.1.0';
 		$this->picto = 'digiriskdolibarr@digiriskdolibarr';
 	}
 
@@ -128,7 +128,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->create($user);
 				break;
 
-			case 'FIREPERMIT_GENERATE' :
+			case 'PREVENTIONPLANDOCUMENT_GENERATE' :
 				dol_syslog("Trigger '".$this->name."' for action '$action' launched by ".__FILE__.". id=".$object->id);
 				require_once DOL_DOCUMENT_ROOT.'/comm/action/class/actioncomm.class.php';
 				$now = dol_now();
@@ -136,9 +136,10 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 
 				$actioncomm->elementtype = $object->parent_type . '@digiriskdolibarr';
 				$actioncomm->elementid   = $object->parent_id;
-				$actioncomm->code        = 'AC_FIREPERMIT_GENERATE';
+
+				$actioncomm->code        = 'AC_PREVENTIONPLANDOCUMENT_GENERATE';
 				$actioncomm->type_code   = 'AC_OTH_AUTO';
-				$actioncomm->label       = $langs->trans('FirePermitGeneratedWithDolibarr');
+				$actioncomm->label       = $langs->trans('PreventionPlanDocumentGeneratedWithDolibarr');
 				$actioncomm->datep       = $now;
 				$actioncomm->fk_element  = $object->parent_id;
 				$actioncomm->userownerid = $user->id;
@@ -147,7 +148,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->create($user);
 				break;
 
-			case 'PREVENTIONPLAN_GENERATE' :
+			case 'FIREPERMITDOCUMENT_GENERATE' :
 				dol_syslog("Trigger '".$this->name."' for action '$action' launched by ".__FILE__.". id=".$object->id);
 				require_once DOL_DOCUMENT_ROOT.'/comm/action/class/actioncomm.class.php';
 				$now = dol_now();
@@ -155,9 +156,10 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 
 				$actioncomm->elementtype = $object->parent_type . '@digiriskdolibarr';
 				$actioncomm->elementid   = $object->parent_id;
-				$actioncomm->code        = 'AC_PREVENTIONPLAN_GENERATE';
+
+				$actioncomm->code        = 'AC_FIREPERMITDOCUMENT_GENERATE';
 				$actioncomm->type_code   = 'AC_OTH_AUTO';
-				$actioncomm->label       = $langs->trans('PreventionPlanGeneratedWithDolibarr');
+				$actioncomm->label       = $langs->trans('FirePermitDocumentGeneratedWithDolibarr');
 				$actioncomm->datep       = $now;
 				$actioncomm->fk_element  = $object->parent_id;
 				$actioncomm->userownerid = $user->id;
@@ -262,10 +264,6 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->create($user);
 				break;
 
-			default:
-				dol_syslog("Trigger '".$this->name."' for action '$action' launched by ".__FILE__.". id=".$object->id);
-				break;
-
 			case 'DIGIRISKELEMENT_CREATE' :
 
 				if ( $object->element_type == 'groupment' ) {
@@ -277,7 +275,320 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				}
 
 				break;
+
+			case 'FIREPERMITDET_CREATE' :
+
+				dol_syslog("Trigger '".$this->name."' for action '$action' launched by ".__FILE__.". id=".$object->id);
+				require_once DOL_DOCUMENT_ROOT.'/comm/action/class/actioncomm.class.php';
+				$now = dol_now();
+				$actioncomm = new ActionComm($this->db);
+
+				$actioncomm->elementtype = 'firepermit@digiriskdolibarr';
+				$actioncomm->elementid   = $object->fk_preventionplan;
+
+				$actioncomm->code        = 'AC_FIREPERMITLINE_CREATE';
+				$actioncomm->type_code   = 'AC_OTH_AUTO';
+				$actioncomm->label       = $langs->trans('FirePermitLineCreatedWithDolibarr');
+				$actioncomm->datep       = $now;
+				$actioncomm->fk_element  = $object->fk_firepermit;
+				$actioncomm->userownerid = $user->id;
+				$actioncomm->percentage  = -1;
+
+				$actioncomm->create($user);
+				break;
+
+			case 'SIGNATURE_GENERATE' :
+				dol_syslog("Trigger '".$this->name."' for action '$action' launched by ".__FILE__.". id=".$object->id);
+				require_once DOL_DOCUMENT_ROOT.'/comm/action/class/actioncomm.class.php';
+				$now = dol_now();
+				$actioncomm = new ActionComm($this->db);
+
+				$actioncomm->elementtype = 'digirisksignature@digiriskdolibarr';
+				$actioncomm->elementid   = $object->fk_preventionplan;
+
+				$actioncomm->code        = 'AC_SIGNATURE_GENERATE';
+				$actioncomm->type_code   = 'AC_OTH_AUTO';
+				$actioncomm->label       = $langs->trans('SignatureGeneratedWithDolibarr');
+				$actioncomm->datep       = $now;
+				$actioncomm->fk_element  = $object->fk_preventionplan;
+				$actioncomm->userownerid = $user->id;
+				$actioncomm->percentage  = -1;
+
+				$actioncomm->create($user);
+				break;
+
+			case 'PREVENTIONPLAN_MODIFY' :
+
+				dol_syslog("Trigger '".$this->name."' for action '$action' launched by ".__FILE__.". id=".$object->id);
+				require_once DOL_DOCUMENT_ROOT.'/comm/action/class/actioncomm.class.php';
+				$now = dol_now();
+				$actioncomm = new ActionComm($this->db);
+
+				$actioncomm->elementtype = 'preventionplan@digiriskdolibarr';
+				$actioncomm->code        = 'AC_PREVENTIONPLAN_MODIFY';
+				$actioncomm->type_code   = 'AC_OTH_AUTO';
+				$actioncomm->label       = $langs->trans('PreventionPlanModifyTrigger');
+				$actioncomm->datep       = $now;
+				$actioncomm->fk_element  = $object->id;
+				$actioncomm->userownerid = $user->id;
+				$actioncomm->percentage  = -1;
+
+				$actioncomm->create($user);
+				break;
+
+			case 'PREVENTIONPLAN_INPROGRESS' :
+
+				dol_syslog("Trigger '".$this->name."' for action '$action' launched by ".__FILE__.". id=".$object->id);
+				require_once DOL_DOCUMENT_ROOT.'/comm/action/class/actioncomm.class.php';
+				$now = dol_now();
+				$actioncomm = new ActionComm($this->db);
+
+				$actioncomm->elementtype = 'preventionplan@digiriskdolibarr';
+				$actioncomm->code        = 'AC_PREVENTIONPLAN_INPROGRESS';
+				$actioncomm->type_code   = 'AC_OTH_AUTO';
+				$actioncomm->label       = $langs->trans('PreventionPlanInprogressTrigger');
+				$actioncomm->datep       = $now;
+				$actioncomm->fk_element  = $object->id;
+				$actioncomm->userownerid = $user->id;
+				$actioncomm->percentage  = -1;
+
+				$actioncomm->create($user);
+				break;
+
+			case 'PREVENTIONPLAN_PENDINGSIGNATURE' :
+				dol_syslog("Trigger '".$this->name."' for action '$action' launched by ".__FILE__.". id=".$object->id);
+				require_once DOL_DOCUMENT_ROOT.'/comm/action/class/actioncomm.class.php';
+				$now = dol_now();
+				$actioncomm = new ActionComm($this->db);
+
+				$actioncomm->elementtype = 'preventionplan@digiriskdolibarr';
+				$actioncomm->code        = 'AC_PREVENTIONPLAN_PENDINGSIGNATURE';
+				$actioncomm->type_code   = 'AC_OTH_AUTO';
+				$actioncomm->label       = $langs->trans('PreventionPlanPendingSignatureTrigger');
+				$actioncomm->datep       = $now;
+				$actioncomm->fk_element  = $object->id;
+				$actioncomm->userownerid = $user->id;
+				$actioncomm->percentage  = -1;
+
+				$actioncomm->create($user);
+				break;
+
+			case 'PREVENTIONPLAN_LOCKED' :
+
+				dol_syslog("Trigger '".$this->name."' for action '$action' launched by ".__FILE__.". id=".$object->id);
+				require_once DOL_DOCUMENT_ROOT.'/comm/action/class/actioncomm.class.php';
+				$now = dol_now();
+				$actioncomm = new ActionComm($this->db);
+
+				$actioncomm->elementtype = 'preventionplan@digiriskdolibarr';
+				$actioncomm->code        = 'AC_PREVENTIONPLAN_LOCKED';
+				$actioncomm->type_code   = 'AC_OTH_AUTO';
+				$actioncomm->label       = $langs->trans('PreventionPlanLockTrigger');
+				$actioncomm->datep       = $now;
+				$actioncomm->fk_element  = $object->id;
+				$actioncomm->userownerid = $user->id;
+				$actioncomm->percentage  = -1;
+
+				$actioncomm->create($user);
+				break;
+
+			case 'PREVENTIONPLAN_ARCHIVED' :
+
+				dol_syslog("Trigger '".$this->name."' for action '$action' launched by ".__FILE__.". id=".$object->id);
+				require_once DOL_DOCUMENT_ROOT.'/comm/action/class/actioncomm.class.php';
+				$now = dol_now();
+				$actioncomm = new ActionComm($this->db);
+
+				$actioncomm->elementtype = 'preventionplan@digiriskdolibarr';
+				$actioncomm->code        = 'AC_PREVENTIONPLAN_ARCHIVED';
+				$actioncomm->type_code   = 'AC_OTH_AUTO';
+				$actioncomm->label       = $langs->trans('PreventionPlanArchivedTrigger');
+				$actioncomm->datep       = $now;
+				$actioncomm->fk_element  = $object->id;
+				$actioncomm->userownerid = $user->id;
+				$actioncomm->percentage  = -1;
+
+				$actioncomm->create($user);
+				break;
+
+			case 'PREVENTIONPLANLINE_CREATE' :
+
+				dol_syslog("Trigger '".$this->name."' for action '$action' launched by ".__FILE__.". id=".$object->id);
+				require_once DOL_DOCUMENT_ROOT.'/comm/action/class/actioncomm.class.php';
+				$now = dol_now();
+				$actioncomm = new ActionComm($this->db);
+
+				$actioncomm->elementtype = 'preventionplan@digiriskdolibarr';
+				$actioncomm->code        = 'AC_PREVENTIONPLANLINE_CREATE';
+				$actioncomm->type_code   = 'AC_OTH_AUTO';
+				$actioncomm->label       = $langs->trans('PreventionPlanLineCreateTrigger');
+				$actioncomm->datep       = $now;
+				$actioncomm->fk_element  = $object->fk_preventionplan;
+				$actioncomm->userownerid = $user->id;
+				$actioncomm->percentage  = -1;
+
+				$actioncomm->create($user);
+				break;
+
+			case 'PREVENTIONPLANLINE_MODIFY' :
+
+				dol_syslog("Trigger '".$this->name."' for action '$action' launched by ".__FILE__.". id=".$object->id);
+				require_once DOL_DOCUMENT_ROOT.'/comm/action/class/actioncomm.class.php';
+				$now = dol_now();
+				$actioncomm = new ActionComm($this->db);
+
+				$actioncomm->elementtype = 'preventionplan@digiriskdolibarr';
+				$actioncomm->code        = 'AC_PREVENTIONPLANLINE_MODIFY';
+				$actioncomm->type_code   = 'AC_OTH_AUTO';
+				$actioncomm->label       = $langs->trans('PreventionPlanLineModifyTrigger');
+				$actioncomm->datep       = $now;
+				$actioncomm->fk_element  = $object->fk_preventionplan;
+				$actioncomm->userownerid = $user->id;
+				$actioncomm->percentage  = -1;
+
+				$actioncomm->create($user);
+				break;
+
+			case 'PREVENTIONPLANLINE_DELETE' :
+
+				dol_syslog("Trigger '".$this->name."' for action '$action' launched by ".__FILE__.". id=".$object->id);
+				require_once DOL_DOCUMENT_ROOT.'/comm/action/class/actioncomm.class.php';
+				$now = dol_now();
+				$actioncomm = new ActionComm($this->db);
+
+				$actioncomm->elementtype = 'preventionplan@digiriskdolibarr';
+				$actioncomm->code        = 'AC_PREVENTIONPLANLINE_DELETE';
+				$actioncomm->type_code   = 'AC_OTH_AUTO';
+				$actioncomm->label       = $langs->trans('PreventionPlanLineDeleteTrigger');
+				$actioncomm->datep       = $now;
+				$actioncomm->fk_element  = $object->fk_preventionplan;
+				$actioncomm->userownerid = $user->id;
+				$actioncomm->percentage  = -1;
+
+				$actioncomm->create($user);
+				break;
+
+			case 'DIGIRISKSIGNATURE_SIGNED' :
+
+				dol_syslog("Trigger '".$this->name."' for action '$action' launched by ".__FILE__.". id=".$object->id);
+				require_once DOL_DOCUMENT_ROOT.'/comm/action/class/actioncomm.class.php';
+				$now = dol_now();
+				$actioncomm = new ActionComm($this->db);
+
+				$object_type = $object->table_element;
+				$object_type = preg_replace('/digiriskdolibarr_/', '', $object_type);
+				$object_type = preg_replace('/_signature/', '', $object_type);
+
+				$actioncomm->elementtype        = $object_type.'@digiriskdolibarr';
+				$actioncomm->code               = 'AC_DIGIRISKSIGNATURE_SIGNED';
+				$actioncomm->type_code          = 'AC_OTH_AUTO';
+				$actioncomm->label              = $langs->trans('DigiriskSignatureSignedTrigger');
+				$actioncomm->datep              = $now;
+				$actioncomm->fk_element         = $object->fk_object;
+				$actioncomm->socpeopleassigned  = array($object->element_id => $object->element_id);
+				$actioncomm->userownerid        = $user->id;
+				$actioncomm->percentage         = -1;
+
+				$actioncomm->create($user);
+				break;
+
+			case 'DIGIRISKSIGNATURE_PENDING_SIGNATURE' :
+
+				dol_syslog("Trigger '".$this->name."' for action '$action' launched by ".__FILE__.". id=".$object->id);
+				require_once DOL_DOCUMENT_ROOT.'/comm/action/class/actioncomm.class.php';
+				$now = dol_now();
+				$actioncomm = new ActionComm($this->db);
+
+				$object_type = $object->table_element;
+				$object_type = preg_replace('/digiriskdolibarr_/', '', $object_type);
+				$object_type = preg_replace('/_signature/', '', $object_type);
+
+				$actioncomm->elementtype        = $object_type.'@digiriskdolibarr';
+				$actioncomm->code               = 'AC_DIGIRISKSIGNATURE_PENDING_SIGNATURE';
+				$actioncomm->type_code          = 'AC_OTH_AUTO';
+				$actioncomm->label              = $langs->trans('DigiriskSignaturePendingSignatureTrigger');
+				$actioncomm->datep              = $now;
+				$actioncomm->fk_element         = $object->fk_object;
+				$actioncomm->socpeopleassigned  = array($object->element_id => $object->element_id);
+				$actioncomm->userownerid        = $user->id;
+				$actioncomm->percentage         = -1;
+
+				$actioncomm->create($user);
+				break;
+
+			case 'DIGIRISKSIGNATURE_ABSENT' :
+
+				dol_syslog("Trigger '".$this->name."' for action '$action' launched by ".__FILE__.". id=".$object->id);
+				require_once DOL_DOCUMENT_ROOT.'/comm/action/class/actioncomm.class.php';
+				$now = dol_now();
+				$actioncomm = new ActionComm($this->db);
+
+				$object_type = $object->table_element;
+				$object_type = preg_replace('/digiriskdolibarr_/', '', $object_type);
+				$object_type = preg_replace('/_signature/', '', $object_type);
+
+				$actioncomm->elementtype        = $object_type.'@digiriskdolibarr';
+				$actioncomm->code               = 'AC_DIGIRISKSIGNATURE_ABSENT';
+				$actioncomm->type_code          = 'AC_OTH_AUTO';
+				$actioncomm->label              = $langs->trans('DigiriskSignatureAbsentTrigger');
+				$actioncomm->datep              = $now;
+				$actioncomm->fk_element         = $object->fk_object;
+				$actioncomm->socpeopleassigned  = array($object->element_id => $object->element_id);
+				$actioncomm->userownerid        = $user->id;
+				$actioncomm->percentage         = -1;
+
+				$actioncomm->create($user);
+				break;
+
+			case 'DIGIRISKSIGNATURE_DELETED' :
+
+				dol_syslog("Trigger '".$this->name."' for action '$action' launched by ".__FILE__.". id=".$object->id);
+				require_once DOL_DOCUMENT_ROOT.'/comm/action/class/actioncomm.class.php';
+				$now = dol_now();
+				$actioncomm = new ActionComm($this->db);
+
+				$object_type = $object->table_element;
+				$object_type = preg_replace('/digiriskdolibarr_/', '', $object_type);
+				$object_type = preg_replace('/_signature/', '', $object_type);
+
+				$actioncomm->elementtype = $object_type.'@digiriskdolibarr';
+				$actioncomm->code        = 'AC_DIGIRISKSIGNATURE_DELETED';
+				$actioncomm->type_code   = 'AC_OTH_AUTO';
+				$actioncomm->label       = $langs->trans('DigiriskSignatureDeletedTrigger');
+				$actioncomm->datep       = $now;
+				$actioncomm->fk_element  = $object->fk_object;
+				$actioncomm->socpeopleassigned  = array($object->element_id => $object->element_id);
+				$actioncomm->userownerid = $user->id;
+				$actioncomm->percentage  = -1;
+
+				$actioncomm->create($user);
+				break;
+
+			case 'PREVENTIONPLANSIGNATURE_ADDATTENDANT' :
+
+				dol_syslog("Trigger '".$this->name."' for action '$action' launched by ".__FILE__.". id=".$object->id);
+				require_once DOL_DOCUMENT_ROOT.'/comm/action/class/actioncomm.class.php';
+				$now = dol_now();
+				$actioncomm = new ActionComm($this->db);
+
+				$actioncomm->elementtype = 'preventionplan@digiriskdolibarr';
+				$actioncomm->code        = 'AC_PREVENTIONPLANSIGNATURE_ADDATTENDANT';
+				$actioncomm->type_code   = 'AC_OTH_AUTO';
+				$actioncomm->label       = $langs->trans('PreventionPlanAddAttendantTrigger');
+				$actioncomm->datep       = $now;
+				$actioncomm->fk_element  = $object->fk_object;
+				$actioncomm->socpeopleassigned  = array($object->element_id => $object->element_id);
+				$actioncomm->userownerid = $user->id;
+				$actioncomm->percentage  = -1;
+
+				$actioncomm->create($user);
+				break;
+
+			default:
+				dol_syslog("Trigger '".$this->name."' for action '$action' launched by ".__FILE__.". id=".$object->id);
+				break;
 		}
+
 
 		return 0;
 	}

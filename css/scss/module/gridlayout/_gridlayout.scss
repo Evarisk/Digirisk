@@ -57,7 +57,7 @@
   }
 }
 
-/** Mages */
+/** Marges */
 .wpeo-gridlayout {
   @for $i from 0 through 6 {
     &.grid-margin-#{$i} {
@@ -72,6 +72,24 @@
     &.grid-gap-#{$i} {
       grid-gap: #{$i}em  #{$i}em;
     }
+  }
+}
+
+/** Alignements */
+.wpeo-gridlayout {
+  .grid-align-center {
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .grid-align-right {
+    margin-left: auto;
+  }
+  .grid-align-middle {
+    margin-top: auto;
+    margin-bottom: auto;
+  }
+  .grid-align-bottom {
+    margin-top: auto;
   }
 }
 

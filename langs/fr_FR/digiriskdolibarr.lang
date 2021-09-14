@@ -47,6 +47,12 @@ DigiriskdolibarrAboutPage = Page à propos de Digirisk
 # DigiriskDolibarr
 #
 
+# Right - Droit
+LireDigirisk = Lire Digirisk
+ReadDigirisk = Lire Digirisk (read)
+ReadAdminPage = Accéder à la configuration du module Digirisk
+
+
 # Data - Donnée
 Create = Créer
 CreatedOn = Créé le
@@ -59,11 +65,15 @@ DigiriskNumberOfModelFilesFound = Nombre de modèles par défaut
 DigiriskConfig = Configuration du module
 DigiriskConfigSociety = Configuration société
 PermissionDenied = Permission refusée
+AddUser = Créer un utilisateur
+StartDate = Date de début
+EndDate = Date de fin
 NoPhoneNumber = Pas de numéro de téléphone
 HasBeenCreatedF = a été créée
 HasBeenCreatedM = a été créé
 HasNotBeenCreatedF = n'a pas été créée
 HasNotBeenCreatedM = n'a pas été créé
+YourDocuments = Vos documents
 
 HasBeenEditedF = a été éditée
 HasBeenEditedM = a été édité
@@ -199,6 +209,8 @@ Police = Police secours
 SafetyInstructions = Consignes de sécurité
 ResponsibleToNotify = Responsable à prévenir
 LocationOfDetailedInstructions = Emplacement de la consigne détaillée
+FirstAid = Premiers secours
+AddPhoneNumber = Ajouter un numéro de téléphone à l'utilisateur
 
 SocietyAdditionalDetails = Informations complémentaires de la société
 GeneralMeansAtDisposal = Moyens généraux mis à disposition
@@ -249,6 +261,113 @@ Titulars = Titulaires
 Alternates = Suppléants
 
 #
+# PreventionPlan - Plan de prévention
+#
+
+# Right - Droit
+ReadPreventionPlan = Lire un plan de prévention
+CreatePreventionPlan = Créer un plan de prévention
+DeletePreventionPlan = Supprimer un plan de prévention
+NewPreventionPlan = Nouveau plan de prévention
+PreventionPlanDet = Lignes des plans de prévention
+
+# Trigger - Déclencheur
+PREVENTIONPLAN_CREATEInDolibarr = Plan de prévention créé dans Dolibarr
+ActionsOnPreventionPlan = Événements liés au plan de prévention
+PreventionPlanGeneratedWithDolibarr = Plan de prévention généré avec Dolibarr
+PreventionPlanLineCreateTrigger = Ligne de plan de prévention créée
+PreventionPlanLineModifyTrigger = Ligne de plan de prévention modifiée
+PreventionPlanLineDeleteTrigger = Ligne de plan de prévention supprimée
+PreventionPlanModifyTrigger = Modification du plan de prévention
+PreventionPlanInprogressTrigger = Plan de prévention rouvert
+PreventionPlanPendingSignatureTrigger = Plan de prévention en attente de signature des participants
+PreventionPlanLockTrigger = Plan de prévention verrouillé - Prêt pour la génération du documuent
+PreventionPlanArchivedTrigger = Plan de prévention archivé
+PreventionPlanAddAttendantTrigger = Ajout d'un participant au plan de prévention
+
+# Mod Numbering - Modèle de numérotation
+DigiriskPreventionPlanNumberingModule = Modèle de numérotation des plans de prévention de Digirisk
+DigiriskPreventionPlanStandardModel = Renvoie le numéro sous la forme PPn où n est un compteur séquentiel sans rupture et sans remise à 0.
+DigiriskPreventionPlanDetNumberingModule = Modèle de numérotation des lignes de plan de prévention de Digirisk
+DigiriskPreventionPlanDetStandardModel = Renvoie le numéro sous la forme PPRn où n est un compteur séquentiel sans rupture et sans remise à 0.
+DigiriskPreventionPlanDocumentNumberingModule = Module de numérotation des fiches de plan de prévention
+DigiriskPreventionPlanDocumentStandardModel = Renvoie le numéro sous la forme PPDn où n est un compteur séquentiel sans rupture et sans remise à 0.
+
+# ODT Template - Template ODT
+DigiriskTemplateDocumentPreventionPlan = Modèle de documents des plans de prévention de Digirisk
+PreventionPlanDocumentCustomDigiriskTemplate = ODT custom des plans de prévention
+PreventionPlanDocumentDigiriskTemplate = ODT par défaut des plans de prévention
+PreventionPlanDocumentSpecimenDigiriskTemplate = ODT par défaut des specimen plans de prévention
+PreventionPlanDocument = Fiche de Plan de Prévention
+PreventionPlanDocumentGeneratedWithDolibarr = Plan de prévention généré avec Dolibarr
+
+# Data - Donnée
+
+PreventionPlan = Plan de prévention
+PreventionPlanList = Liste des plans de prévention
+PreventionPlanLine = risque(s)
+PriorVisit = Inspection commune préalable
+PriorVisitYesNo = Visite préliminaire effectuée
+PriorVisitText = Note de l'inspection
+CSSCTIntervention = Intervention du CSSCT
+CSSCTInterventionText = Intervention du CSSCT ?
+MaitreOeuvre = Responsable de l'Entreprise Utilisatrice
+ExtSociety = Entreprise Extérieure
+ExtSocietyResponsible = Responsable de l'Entreprise Extérieure
+ExtSocietyIntervenants = Intervenants de l'Entreprise Extérieure
+ExtSocietyIntervenant = Intervenant de l'Entreprise Extérieure
+ActionsDescription = Description des actions
+INRSRisk = Risque (INRS)
+PreventionMethod = Moyens de prévention
+Schedule = Horaires
+PreventionPlanSchedule = Horaires du plan de prévention
+SelectUser = Sélectionner un utilisateur
+Attendants = Participants
+ModifyPreventionPlan = Modifier le plan de prévention
+ActionsDescriptionTooltip = Description des actions réalisées par l'intervenant
+INRSRiskTooltip = Liste des catégories de risques proposée dans le référentiel de l'INRS
+PreventionMethodTooltip = Moyen de prévention à mettre en place pour limiter le risque
+Unlock = Déverouiller
+Unlocked = Déverrouillé
+Lock = Verrouiller
+Locked = Verrouillé
+InProgress = En cours
+ReOpenDigi = Rouvrir
+GenerateDocumentTitle = Génération du document disponible
+GenerateDocument = Vous pouvez vous rendre sur cette adresse url pour générer votre document<br>
+LabourInspectorSociety = Entreprise Inspecteur du travail
+Archive = Archiver
+ValidatePendingSignature = Validé (en attente de signature)
+LockPreventionPlan = Verrouiller le plan de prévention
+ConfirmLockPreventionPlan = Êtes-vous sûr de vouloir verrouiller le plan de prévention ?<br>Ce verrouillage permet de figer les données et la génération du document.
+NoIntervenantsYet = Il n'y a aucun intervenant pour le moment, vous pouvez en ajouter à l'aide du "+" situé en haut à droite de ce tableau
+PreventionPlanMustBeLocked = Le plan de prévention doit être verrouillé pour accéder à cette fonctionnalité
+AllSignatoriesMustHaveSigned = Tous les participants doivent avoir signé pour verrouiller l'objet
+ValidatePreventionPlan = Valider le plan de prévention
+ConfirmValidatePreventionPlan = Êtes-vous sûr de vouloir valider le plan de prévention ? <br> La validation permet aux participants de signer le document mais <b> empêche l'ajout de nouveaux participants ou la modification du plan de prévention </b>.
+ReOpenPreventionPlan = Ouvrir à nouveau le plan de prévention
+ConfirmReOpenPreventionPlan = Êtes-vous sûr de vouloir rouvrir le plan de prévention ? La réouverture permet la modification du plan de prévention et l'ajout de nouveaux participants mais <b>toutes les signatures du document seront perdues</b>.
+PreventionPlanMustBeValidated = Le plan de prévention doit être validé pour que les participants puissent signer
+PreventionPlanRiskList = Liste des risques du plan de prévention
+PreventionPlanAttendants = Plan de prévention - Participants
+ActionsPreventionPlanRisk = Actions
+PreventionPlanDescription = Projet des plans de prévention
+PriorVisitDate = Date de l'inspection commune préalable
+AddPreventionPlanLine = Ajout du risque
+UpdatePreventionPlanLine = Mise à jour du risque
+DeletePreventionPlanLine = Suppression du risque
+PreventionPlanMessage = au plan de prévention
+ExtIntervenant = Intervenant extérieur
+ErrorNoEmailForLabourInspector = Erreur : l'Inspecteur du travail n'a pas d'email
+ErrorNoEmailForExtResponsible = Erreur : Le responsable de l'Entreprise Extérieure n'a pas d'email
+ErrorNoEmailForMaitreOeuvre = Erreur : Le responsable de l'Entreprise Utilisatrice n'a pas d'email
+ErrorNoEmailForExtIntervenant = Erreur : Le (ou les) intervenant(s) ne possède(nt) pas d'email
+SignatureEmailSubject = Signature du plan de prevention
+DocumentName = Référence du document
+
+
+
+#
 # FirePermit - Permis de feu
 #
 
@@ -258,9 +377,10 @@ CreateFirePermit = Créer un permis de feu
 DeleteFirePermit = Supprimer un permis de feu
 
 # Trigger - Déclencheur
-FIREPERMIT_CREATEInDolibarr = Permis de feu créée dans Dolibarr
+FIREPERMIT_CREATEInDolibarr = Permis de feu créé dans Dolibarr
 ActionsOnFirePermit = Événements liés au permis de feu
-FirePermitGeneratedWithDolibarr = Permis de feu générée avec Dolibarr
+FirePermitGeneratedWithDolibarr = Permis de feu généré avec Dolibarr
+FirePermitLineCreatedWithDolibarr = Ligne de Permis de Feu créée avec Dolibarr
 
 # Mod Numbering - Modèle de numérotation
 DigiriskFirePermitNumberingModule = Modèle de numérotation des permis de feu de Digirisk
@@ -270,38 +390,21 @@ DigiriskFirePermitStandardModel = Renvoie le numéro sous la forme FPn où n est
 DigiriskTemplateDocumentFirePermit = Modèle de documents des permis de feu de Digirisk
 FirePermitCustomDigiriskTemplate = ODT custom des permis de feu
 FirePermitDigiriskTemplate = ODT par défaut des permis de feu
+FirePermitDocument = Fiche de Permis de Feu
+FirePermitDocumentGeneratedWithDolibarr = Permis de feu généré avec Dolibarr
 
 # Data - Donnée
 FirePermit = Permis de feu
-
-
-
-#
-# PreventionPlan - Plan de prévention
-#
-
-# Right - Droit
-ReadPreventionPlan = Lire un plan de prévention
-CreatePreventionPlan = Créer un plan de prévention
-DeletePreventionPlan = Supprimer un plan de prévention
-
-# Trigger - Déclencheur
-PREVENTIONPLAN_CREATEInDolibarr = Plan de prévention créée dans Dolibarr
-ActionsOnPreventionPlan = Événements liés au plan de prévention
-PreventionPlanGeneratedWithDolibarr = Plan de prévention générée avec Dolibarr
-
-# Mod Numbering - Modèle de numérotation
-DigiriskPreventionPlanNumberingModule = Modèle de numérotation des plans de prévention de Digirisk
-DigiriskPreventionPlanStandardModel = Renvoie le numéro sous la forme PPn où n est un compteur séquentiel sans rupture et sans remise à 0.
-
-# ODT Template - Template ODT
-DigiriskTemplateDocumentPreventionPlan = Modèle de documents des plans de prévention de Digirisk
-PreventionPlanCustomDigiriskTemplate = ODT custom des plans de prévention
-PreventionPlanDigiriskTemplate = ODT par défaut des plans de prévention
-
-# Data - Donnée
-PreventionPlan = Plan de prévention
-
+FirePermitLine = risque(s)
+MaitreOeuvre = Responsable de l'Entreprise Utilisatrice
+ExtSociety = Entreprise extérieure
+ExtSocietyResponsible = Responsable de l'Entreprise Extérieure
+ExtSocietyIntervenants = Intervenants de l'Entreprise Extérieure
+ActionsDescription = Description des actions
+INRSRisk = Risque (INRS)
+PreventionMethod = Moyens de prévention
+Schedule = Horaires
+FirePermitSchedule = Horaires du permis de feu
 
 
 #
@@ -388,7 +491,7 @@ Recipient = Destinataire
 Sources = Sources
 ImportantNote = Remarque importante
 SitePlans = Localisation des plans
-
+SetStartEndDateBefore = Définissez la date de début et la date de fin d'audit sur cette page pour générer ce document
 #
 # GroupmentDocument - Fiche Groupement
 #
@@ -568,8 +671,14 @@ AddRiskButton = Ajouter le risque
 EditRisk = Édition du risque
 hasPhoto = Photo
 RiskCategory = Cat.
+RiskCategoryEdit = Catégorie de risque
+RiskCategoryEditDescription = Activer la modification de la catégorie d'un risque existant
+HowToEditRiskCategory = Pour modifier la catégorie du risque, cliquez sur le picto de la catégorie
 DigiriskElementRisksList = Liste des risques
 DigiriskElementRisk = Risques
+RiskDescriptionNotEnabled = Le champ description du risque n'est pas activé
+HowToEnableRiskDescription = Pour activer le champ description du risque, allez dans "Configuration du module -> Analyse de risque -> Risque"
+HowToEnableRiskCategoryEdit = Pour activer la modification de la catégorie de risque, allez dans "Configuration du module -> Analyse de risque -> Risque"
 
 ReadDigiriskRisk = Voir les risques
 CreateDigiriskRisk = Créer des risques
@@ -615,10 +724,11 @@ NoRiskAssessment = Pas d'évaluation assignée au risque
 
 SimpleCotation = Cotation simple
 AdvancedCotation = Cotation avancée
+CalculatedCotation = Cotation calculée
 SelectCotation = Sélectionnez les cases pour calculer votre cotation
 EvaluationList = Liste des évaluations du risque
 HowToSetMultipleRiskAssessmentMethod = Pour configurer l'utilisation multiple des méthodes d'évaluation, aller dans Configuration du module - Analyse des risques - Évaluation
-NoFileLinked = Pas de photo liee
+NoFileLinked = Pas de photo liée
 
 
 #
@@ -677,6 +787,84 @@ DigiriskTaskData = Donnée configurable des tâches
 TaskManagementDescription = Activer la gestion des tâches
 TaskManagementNotActivated = Veuillez activer la gestion des tâches dans Configuration du module / Analyse des risques / Tâche
 
+
+
+#
+# DigiriskSignature - Signature
+#
+
+# Trigger - Déclencheur
+DigiriskSignatureSignedTrigger = Signature du participant effectuée
+DigiriskSignaturePendingSignatureTrigger = Email envoyé, en attente de la signature du participant
+DigiriskSignatureAbsentTrigger = Participant absent
+DigiriskSignatureDeletedTrigger = Participant supprimé
+
+
+# Data - Donnée
+SignatureResponsibles = Signatures des responsables
+SignatureIntervenants = Signatures des intervenants
+Sign = Signer
+Erase = Effacer
+DisclaimerSignatureTitle = Attention
+DisclaimerSignature = Dès qu'un responsable aura signé vous ne pourrez plus créer/modifier des risques, ni modifier les responsables du plan de prévention.<br>Vous pourrez toujours rajouter des intervenants.
+Registered = Inscrit
+SignatureRequest = Demande de signature
+PendingSignature = En attente de signature
+Denied = Refusé
+Signed = Signé
+Unsigned = Non signé
+Absent = Absent
+JustifiedAbsent = Absence justifiée
+SignatureDate = Date de signature
+PublicID = ID pubic
+ActionsSignature = Actions
+SendEmail = Envoyer un email
+# WelcomeOnOnlineSignaturePage = Bienvenue sur la page de signature des documents
+ThisIsInformationOnDocumentToSign = Informations
+DigiriskSignature = Signature Digirisk
+SignaturePublicAccess = Une interface publique ne nécessitant aucune identification est disponible à l'url suivante
+SignatureActivatePublicInterface = Activer l'interface publique
+SignatureShowCompanyLogo = Afficher le logo de la société dans l'interface publique
+SignatureShowCompanyLogoHelp = Activez cette option pour masquer le logo de la société dans les pages de l'interface publique
+SignatureMaitreOeuvre = Signature du responsable de l'entreprise utilisatrice
+SignatureResponsibleExtSociety = Signature du responsable de l'entreprise extérieure
+Role = Rôle
+NewIntervenants = Ajouter un nouveau intervenant
+SignatureLink = Lien signature
+SendMailDate = Date d'envoi d'email
+DeleteAttendant = Supprimer l'intervenant
+AddAttendantMessage = Ajout de l'intervenant :
+DeleteAttendantMessage = Suppression de l'intervenant :
+SignaturePublicInterfaceForbidden = Accès interdit à l'interface publique de signature
+Attendant = Le participant
+SetAbsentAttendant = est absent
+SendMailSignature = Email émetteur utilisé pour envoyer les liens de signature
+SignatureSuccess = Document signé avec succès
+SignatureEmailMessage = Bonjour, <br> Veuillez trouver ci-joint le lien de signature du document.<br>
+AddSignatureSuccess = Signature du document réussie
+AddSignatureSuccessText = La signature a bien été enregistrée pour le document
+SignatureSeeDocument = Voir
+ShowDocument = Voir le document
+
+#
+# Ticket - Interface publique ticket
+#
+
+# Data - Donnée
+Register = Registre
+Send = Envoyer
+TicketSend = Ticket envoyé
+FilesLinked = Photos / Pièces jointes
+AddDocument = Ajouter document
+LastnamePlaceholder = Exemple : Dupont
+FirstnamePlaceholder = Exemple : Jean
+PhonePlaceholder = 00.00.00.00.00
+LocationPlaceholder = Exemple : Bureau A
+ServicePlaceholder = Exemple : Ripeur
+Location = Lieu
+
+
+
 #
 # Other
 #
@@ -686,6 +874,7 @@ CloseModal = Fermer
 AT = au
 
 ModalAddPhoto = Ajout Photo
+SendEmailAt = Envoi de l'email à
 
 
 

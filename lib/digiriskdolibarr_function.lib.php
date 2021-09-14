@@ -67,10 +67,8 @@ function digirisk_show_photos($modulepart, $sdir, $size = 0, $nbmax = 0, $nbbyro
 	$nbphoto = 0;
 
 	$filearray = dol_dir_list($dir, "files", 0, '', '(\.meta|_preview.*\.png)$', $sortfield, (strtolower($sortorder) == 'desc' ?SORT_DESC:SORT_ASC), 1);
-
 	if (count($filearray))
 	{
-
 		if ($sortfield && $sortorder)
 		{
 			$filearray = dol_sort_array($filearray, $sortfield, $sortorder);
@@ -158,7 +156,6 @@ function digirisk_show_photos($modulepart, $sdir, $size = 0, $nbmax = 0, $nbbyro
 
 					if (empty($nolink)) $return .= '</a>';
 					$return .= "\n";
-
 					if ($showfilename) $return .= '<br>'.$viewfilename;
 					if ($showaction)
 					{
@@ -228,7 +225,6 @@ function digirisk_show_photos($modulepart, $sdir, $size = 0, $nbmax = 0, $nbbyro
 			}
 		}
 	}
-
 	$object->nbphoto = $nbphoto;
 	return $return;
 }
@@ -257,9 +253,11 @@ function digirisk_show_photos($modulepart, $sdir, $size = 0, $nbmax = 0, $nbbyro
  *      @param      Object              $object             Object when method is called from an object card.
  *      @param		int					$hideifempty		Hide section of generated files if there is no file
  *      @param      string              $removeaction       (optional) The action to remove a file
+ *      @param      int                 $active             (optional) To show gen button disabled
+ *      @param      string              $tooltiptext       (optional) Tooltip text when gen button disabled
  * 		@return		string              					Output string with HTML array of documents (might be empty string)
  */
-function digiriskshowdocuments($modulepart, $modulesubdir, $filedir, $urlsource, $genallowed, $delallowed = 0, $modelselected = '', $allowgenifempty = 1, $forcenomultilang = 0, $notused = 0, $noform = 0, $param = '', $title = '', $buttonlabel = '', $codelang = '', $morepicto = '', $object = null, $hideifempty = 0, $removeaction = 'remove_file')
+function digiriskshowdocuments($modulepart, $modulesubdir, $filedir, $urlsource, $genallowed, $delallowed = 0, $modelselected = '', $allowgenifempty = 1, $forcenomultilang = 0, $notused = 0, $noform = 0, $param = '', $title = '', $buttonlabel = '', $codelang = '', $morepicto = '', $object = null, $hideifempty = 0, $removeaction = 'remove_file', $active = 1, $tooltiptext = '')
 {
 	global $db, $langs, $conf, $user, $hookmanager, $form;
 
@@ -311,7 +309,15 @@ function digiriskshowdocuments($modulepart, $modulesubdir, $filedir, $urlsource,
 
 		if (class_exists($class))
 		{
-			$modellist = call_user_func($class.'::liste_modeles', $db);
+			if (preg_match('/specimen/', $param)) {
+				$type = strtolower($class) . 'specimen';
+				$modellist = array();
+
+				include_once DOL_DOCUMENT_ROOT . '/core/lib/functions2.lib.php';
+				$modellist = getListOfModels($db, $type, 0);
+			} else {
+				$modellist = call_user_func($class.'::liste_modeles', $db, 100);
+			}
 		}
 		else
 		{
@@ -339,20 +345,23 @@ function digiriskshowdocuments($modulepart, $modulesubdir, $filedir, $urlsource,
 		$colspan = (3 + ($addcolumforpicto ? 1 : 0)); $colspanmore = 0;
 
 		$out .= '<th colspan="'.$colspan.'" class="formdoc liste_titre maxwidthonsmartphone center">';
-
 		// Model
 		if (!empty($modellist))
 		{
 			asort($modellist);
 			$out .= '<span class="hideonsmartphone">'.$langs->trans('Model').' </span>';
+			$modellist = array_filter($modellist, 'remove_index');
 			if (is_array($modellist) && count($modellist) == 1)    // If there is only one element
 			{
 				$arraykeys = array_keys($modellist);
+				$arrayvalues = preg_replace('/template_/','', array_values($modellist)[0]);
+				$modellist[$arraykeys[0]] = $arrayvalues;
 				$modelselected = $arraykeys[0];
 			}
 			$morecss = 'maxwidth200';
 			if ($conf->browser->layout == 'phone') $morecss = 'maxwidth100';
 			$out .= $form->selectarray('model', $modellist, $modelselected, $showempty, 0, 0, '', 0, 0, 0, '', $morecss);
+
 			if ($conf->use_javascript_ajax)
 			{
 				$out .= ajax_combobox('model');
@@ -363,24 +372,15 @@ function digiriskshowdocuments($modulepart, $modulesubdir, $filedir, $urlsource,
 			$out .= '<div class="float">'.$langs->trans("Files").'</div>';
 		}
 
-		// Language code (if multilang)
-		if (($allowgenifempty || (is_array($modellist) && count($modellist) > 0)) && $conf->global->MAIN_MULTILANGS && !$forcenomultilang && (!empty($modellist) || $showempty))
-		{
-			include_once DOL_DOCUMENT_ROOT.'/core/class/html.formadmin.class.php';
-			$formadmin = new FormAdmin($this->db);
-			$defaultlang = $codelang ? $codelang : $langs->getDefaultLang();
-			$morecss = 'maxwidth150';
-			if ($conf->browser->layout == 'phone') $morecss = 'maxwidth100';
-			$out .= $formadmin->select_language($defaultlang, 'lang_id', 0, null, 0, 0, 0, $morecss);
-		}
-		else
-		{
-			$out .= '&nbsp;';
+		// Button
+		if ($active) {
+			$genbutton = '<input class="button buttongen" id="'.$forname.'_generatebutton" name="'.$forname.'_generatebutton"';
+			$genbutton .= ' type="submit" value="'.$buttonlabel.'"';
+		} else {
+			$genbutton = '<input class="button buttongen disabled" id="'.$forname.'_generatebutton" name="'.$forname.'_generatebutton"';
+			$genbutton .= '  value="'.$buttonlabel.'"';
 		}
 
-		// Button
-		$genbutton = '<input class="button buttongen" id="'.$forname.'_generatebutton" name="'.$forname.'_generatebutton"';
-		$genbutton .= ' type="submit" value="'.$buttonlabel.'"';
 		if (!$allowgenifempty && !is_array($modellist) && empty($modellist)) $genbutton .= ' disabled';
 		$genbutton .= '>';
 		if ($allowgenifempty && !is_array($modellist) && empty($modellist) && empty($conf->dol_no_mouse_hover) && $modulepart != 'unpaid')
@@ -391,6 +391,15 @@ function digiriskshowdocuments($modulepart, $modulesubdir, $filedir, $urlsource,
 		if (!$allowgenifempty && !is_array($modellist) && empty($modellist) && empty($conf->dol_no_mouse_hover) && $modulepart != 'unpaid') $genbutton = '';
 		if (empty($modellist) && !$showempty && $modulepart != 'unpaid') $genbutton = '';
 		$out .= $genbutton;
+		if (!$active) {
+			$htmltooltip = '';
+			$htmltooltip .= $tooltiptext;
+
+			$out .= '<span class="center">';
+			$out .= $form->textwithpicto($langs->trans('Help'), $htmltooltip, 1, 0);
+			$out .= '</span>';
+		}
+
 		$out .= '</th>';
 
 		if (!empty($hookmanager->hooks['formfile']))
@@ -547,6 +556,20 @@ function digiriskshowdocuments($modulepart, $modulesubdir, $filedir, $urlsource,
 	$out .= '<!-- End show_document -->'."\n";
 
 	return $out;
+}
+
+/**
+ *	Exclude index.php files from list of models for document generation
+ *
+ * @param   string $model
+ * @return  '' or $model
+ */
+function remove_index($model) {
+	if (preg_match('/index.php/',$model)) {
+		return '';
+	} else {
+		return $model;
+	}
 }
 
 /**
@@ -816,15 +839,15 @@ function digirisk_banner_tab($object, $paramid, $morehtml = '', $shownav = 1, $f
 	print '<div class="'.($onlybanner ? 'arearefnobottom ' : 'arearef ').'heightref valignmiddle centpercent">';
 	print $form->showrefnav($object, $paramid, $morehtml, $shownav, $fieldid, $fieldref, $morehtmlref, $moreparam, $nodbprefix, $morehtmlleft, $morehtmlstatus, $morehtmlright);
 	print '</div>';
-	print '<div class="underrefbanner clearboth"></div>';
+	print '<div class="underbanner clearboth"></div>';
 }
 
 /**
 *  Return a link to the user card (with optionaly the picto)
-* 	Use this->id,this->lastname, this->firstname
+*  Use this->id,this->lastname, this->firstname
 *
-*	@param	int		$withpictoimg				Include picto in link (0=No picto, 1=Include picto into link, 2=Only picto, -1=Include photo into link, -2=Only picto photo, -3=Only photo very small)
-*	@param	string	$option						On what the link point to ('leave', 'nolink', )
+*  @param	int		$withpictoimg				Include picto in link (0=No picto, 1=Include picto into link, 2=Only picto, -1=Include photo into link, -2=Only picto photo, -3=Only photo very small)
+*  @param	string	$option						On what the link point to ('leave', 'nolink', )
 *  @param  integer $infologin      			0=Add default info tooltip, 1=Add complete info tooltip, -1=No info tooltip
 *  @param	integer	$notooltip					1=Disable tooltip on picto and name
 *  @param	int		$maxlen						Max length of visible user name
@@ -832,9 +855,9 @@ function digirisk_banner_tab($object, $paramid, $morehtml = '', $shownav = 1, $f
 *  @param  string  $mode               		''=Show firstname and lastname, 'firstname'=Show only firstname, 'firstelselast'=Show firstname or lastname if not defined, 'login'=Show login
 *  @param  string  $morecss            		Add more css on link
 *  @param  int     $save_lastsearch_value    	-1=Auto, 0=No save of lastsearch_values when clicking, 1=Save lastsearch_values whenclicking
-*	@return	string								String with URL
+*  @return	string								String with URL
 */
-function getNomUrl($withpictoimg = 0, $option = '', $infologin = 0, $notooltip = 0, $maxlen = 24, $hidethirdpartylogo = 0, $mode = '', $morecss = '', $save_lastsearch_value = -1, $user)
+function getNomUrl($withpictoimg = 0, $option = '', $infologin = 0, $notooltip = 0, $maxlen = 24, $hidethirdpartylogo = 0, $mode = '', $morecss = '', $save_lastsearch_value = -1, $object)
 {
 	global $langs, $conf, $db, $hookmanager, $user;
 	global $dolibarr_main_authentication, $dolibarr_main_demo;
@@ -969,4 +992,121 @@ function getNomUrl($withpictoimg = 0, $option = '', $infologin = 0, $notooltip =
 	else $result .= $hookmanager->resPrint;
 
 	return $result;
+}
+
+function show_category_image($object, $upload_dir) {
+
+	global $langs;
+	$nbphoto = 0;
+	$nbbyrow = 5;
+
+	$maxWidth = 160;
+	$maxHeight = 120;
+
+	$pdir = get_exdir($object->id, 2, 0, 0, $object, 'category').$object->id."/photos/";
+	$dir = $upload_dir.'/'.$pdir;
+
+	$listofphoto = $object->liste_photos($dir);
+	if (is_array($listofphoto) && count($listofphoto))
+	{
+//		print '<br>';
+//		print '<table width="100%" valign="top" align="center">';
+
+		foreach ($listofphoto as $key => $obj)
+		{
+			$nbphoto++;
+
+//			if ($nbbyrow && ($nbphoto % $nbbyrow == 1)) print '<tr align=center valign=middle border=1>';
+//			if ($nbbyrow) print '<td width="'.ceil(100 / $nbbyrow).'%" class="">';
+
+
+			// Si fichier vignette disponible, on l'utilise, sinon on utilise photo origine
+			if ($obj['photo_vignette'])
+			{
+				$filename = $obj['photo_vignette'];
+			} else {
+				$filename = $obj['photo'];
+			}
+
+			// Nom affiche
+			$viewfilename = $obj['photo'];
+
+			// Taille de l'image
+			$object->get_image_size($dir.$filename);
+			$imgWidth = ($object->imgWidth < $maxWidth) ? $object->imgWidth : $maxWidth;
+			$imgHeight = ($object->imgHeight < $maxHeight) ? $object->imgHeight : $maxHeight;
+
+			print '<img border="0" width="'.$imgWidth.'" height="'.$imgHeight.'" src="'.DOL_URL_ROOT.'/viewimage.php?modulepart=category&entity='.$object->entity.'&file='.urlencode($pdir.$filename).'">';
+
+//			if ($nbbyrow) print '</td>';
+//			if ($nbbyrow && ($nbphoto % $nbbyrow == 0)) print '</tr>';
+		}
+
+		// Ferme tableau
+		while ($nbphoto % $nbbyrow)
+		{
+			$nbphoto++;
+		}
+
+//		print '</table>';
+	}
+
+	if ($nbphoto < 1)
+	{
+		print '<div class="opacitymedium">'.$langs->trans("NoPhotoYet")."</div>";
+	}
+
+}
+
+/**
+* Show header for public page signature
+*
+* @param  string $title       Title
+* @param  string $head        Head array
+* @param  int    $disablejs   More content into html header
+* @param  int    $disablehead More content into html header
+* @param string $arrayofjs Array of complementary js files
+* @param string $arrayofcss Array of complementary css files
+* @return void
+*/
+function llxHeaderSignature($title, $head = "", $disablejs = 0, $disablehead = 0, $arrayofjs = '', $arrayofcss = '') {
+	global $conf, $mysoc;
+
+	top_htmlhead($head, $title, $disablejs, $disablehead, $arrayofjs, $arrayofcss, 0, 1); // Show html headers
+
+	if (!empty($conf->global->DIGIRISKDOLIBARR_SIGNATURE_SHOW_COMPANY_LOGO)){
+		// Define logo and logosmall
+		$logosmall = $mysoc->logo_small;
+		$logo = $mysoc->logo;
+		// Define urllogo
+		$urllogo = '';
+		if (!empty($logosmall) && is_readable($conf->mycompany->dir_output.'/logos/thumbs/'.$logosmall)) {
+			$urllogo = DOL_URL_ROOT.'/viewimage.php?modulepart=mycompany&amp;entity='.$conf->entity.'&amp;file='.urlencode('logos/thumbs/'.$logosmall);
+		} elseif (!empty($logo) && is_readable($conf->mycompany->dir_output.'/logos/'.$logo)) {
+			$urllogo = DOL_URL_ROOT.'/viewimage.php?modulepart=mycompany&amp;entity='.$conf->entity.'&amp;file='.urlencode('logos/'.$logo);
+		}
+		// Output html code for logo
+		if ($urllogo) {
+			print '<div class="center signature-logo">';
+			print '<img src="'.$urllogo.'">';
+			print '</div>';
+		}
+		print '<div class="underbanner clearboth"></div>';
+	}
+}
+
+/**
+ * Return string with full Url. The file qualified is the one defined by relative path in $object->last_main_doc
+ *
+ * @return	string						Url string
+ */
+function showDirectPublicLinkSignature() {
+	global $langs;
+
+	$url = dol_buildpath('/custom/digiriskdolibarr/public/signature/index.php', 3);
+
+	$out = img_picto('', 'object_globe.png').' '.$langs->trans("SignaturePublicAccess").' :<br>';
+	$out .= '<a href="'.$url.'" target="_blank">'.$url.'</a>';
+
+	return $out;
 }

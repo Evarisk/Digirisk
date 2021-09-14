@@ -16,7 +16,7 @@
  */
 
 /**
- * \file    digiriskdolibarr/admin/securityconf.php
+ * \file    admin/securityconf.php
  * \ingroup digiriskdolibarr
  * \brief   Digiriskdolibarr setup page for security data configuration.
  */
@@ -63,8 +63,8 @@ $error  = 0;
 // Initialize technical objects
 $contact   = new Contact($db);
 $societe   = new Societe($db);
+$usertmp   = new User($db);
 $resources = new DigiriskResources($db);
-
 
 $allLinks = $resources->digirisk_dolibarr_fetch_resources();
 
@@ -78,9 +78,7 @@ $parameters = array();
 $reshook = $hookmanager->executeHooks('doActions', $parameters, $object, $action); // Note that $action and $object may have been modified by some hooks
 if ($reshook < 0) setEventMessages($hookmanager->error, $hookmanager->errors, 'errors');
 
-if (($action == 'update' && !GETPOST("cancel", 'alpha'))
-	|| ($action == 'updateedit'))
-{
+if (($action == 'update' && !GETPOST("cancel", 'alpha')) || ($action == 'updateedit')) {
 	$labourdoctor_id[0]    = GETPOST('labourdoctor_socid', 'int') > 0 ? GETPOST('labourdoctor_socid', 'int') : 0 ;
 	$labourinspector_id[0] = GETPOST('labourinspector_socid', 'int') > 0 ? GETPOST('labourinspector_socid','int') : 0;
 
@@ -113,12 +111,12 @@ if (($action == 'update' && !GETPOST("cancel", 'alpha'))
 	dolibarr_set_const($db, "DIGIRISK_SOCIETY_DESCRIPTION", GETPOST("description", 'none'), 'chaine', 0, '', $conf->entity);
 	dolibarr_set_const($db, "DIGIRISK_GENERAL_MEANS", GETPOST("moyensgeneraux", 'none'), 'chaine', 0, '', $conf->entity);
 	dolibarr_set_const($db, "DIGIRISK_GENERAL_RULES", GETPOST("consignesgenerales", 'none'), 'chaine', 0, '', $conf->entity);
+	dolibarr_set_const($db, "DIGIRISK_FIRST_AID", GETPOST("firstaid", 'none'), 'chaine', 0, '', $conf->entity);
 	dolibarr_set_const($db, "DIGIRISK_RULES_LOCATION", GETPOST("emplacementRI", 'none'), 'chaine', 0, '', $conf->entity);
 	dolibarr_set_const($db, "DIGIRISK_DUER_LOCATION", GETPOST("emplacementDU", 'none'), 'chaine', 0, '', $conf->entity);
 	dolibarr_set_const($db, "DIGIRISK_COLLECTIVE_AGREEMENT_LOCATION", GETPOST("emplacementCC", 'none'), 'chaine', 0, '', $conf->entity);
 
-	if ($action != 'updateedit' && !$error)
-	{
+	if ($action != 'updateedit' && !$error) {
 		header("Location: ".$_SERVER["PHP_SELF"]);
 		exit;
 	}
@@ -131,16 +129,18 @@ if (($action == 'update' && !GETPOST("cancel", 'alpha'))
 $form = new Form($db);
 
 $help_url = 'FR:Module_DigiriskDolibarr#L.27onglet_S.C3.A9curit.C3.A9';
-llxHeader('', $langs->trans("CompanyFoundation"), $help_url);
+$morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");
+
+llxHeader('', $langs->trans("CompanyFoundation"), $help_url, '', '', '', '', $morecss);
 
 print load_fiche_titre($langs->trans("CompanyFoundation"), '', 'title_setup');
 
 $head = company_admin_prepare_head();
 
-dol_fiche_head($head, 'security', $langs->trans("Company"), -1, 'company');
+print dol_get_fiche_head($head, 'security', $langs->trans("Company"), -1, 'company');
 
 print '<span class="opacitymedium">'.$langs->trans("DigiriskMenu")."</span><br>\n";
-print "<br>\n";
+print "<br>";
 
 print '<form method="POST" action="'.$_SERVER["PHP_SELF"].'" name="form_index">';
 print '<input type="hidden" name="token" value="'.newToken().'">';
@@ -148,8 +148,7 @@ print '<input type="hidden" name="action" value="update">';
 
 print '<table class="noborder centpercent editmode">';
 
-if ($conf->societe->enabled)
-{
+if ($conf->societe->enabled) {
 	/*
 	*** Labour Doctor -- Médecin du travail ***
 	*/
@@ -161,16 +160,14 @@ if ($conf->societe->enabled)
 
 	// * Third party concerned - Tiers concerné *
 
-	if ($labour_doctor_society->ref == 'LabourDoctorSociety')
-	{
+	if ($labour_doctor_society->ref == 'LabourDoctorSociety') {
 		$events   = array();
 		$events[] = array('method' => 'getContacts', 'url' => dol_buildpath('/core/ajax/contacts.php?showempty=1', 1), 'htmlname' => 'labourdoctor_contactid', 'params' => array('add-customer-contact' => 'disabled'));
 		$societe->fetch($labour_doctor_society->id);
 
 		print $form->select_company($labour_doctor_society->id, 'labourdoctor_socid', '', 'SelectThirdParty', 1, 0, $events, 0, 'minwidth300');
 	}
-	else
-	{
+	else {
 		$events 	= array();
 		$events[] 	= array('method' => 'getContacts', 'url' => dol_buildpath('/core/ajax/contacts.php?showempty=1', 1), 'htmlname' => 'labourdoctor_contactid', 'params' => array('add-customer-contact' => 'disabled'));
 
@@ -194,8 +191,7 @@ if ($conf->societe->enabled)
 	if ($labour_doctor_contact->id) {
 		print $form->selectcontacts($labour_doctor_society->id[0], $labour_doctor_contact->id, 'labourdoctor_contactid[]', 1, '', '', 0, 'quatrevingtpercent', false, 0, array(), false, 'multiple', 'labourdoctor_contactid');
 	}
-	else
-	{
+	else {
 		$labourdoctorpreselectedids = GETPOST('labourdoctor_contactid', 'array');
 		if (GETPOST('labourdoctor_contactid', 'array')) $labourdoctorpreselectedids[GETPOST('labourdoctor_contactid', 'array')] = GETPOST('labourdoctor_contactid', 'array');
 		print $form->selectcontacts(GETPOST('labourdoctor_socid', 'int'), $labourdoctorpreselectedids, 'labourdoctor_contactid[]', 1, '', '', 0, 'quatrevingtpercent', false, 0, array(), false, 'multiple', 'labourdoctor_contactid');
@@ -213,16 +209,14 @@ if ($conf->societe->enabled)
 
 	// * Third party concerned - Tiers concerné *
 
-	if ($labour_inspector_societe->ref == 'LabourInspectorSociety')
-	{
+	if ($labour_inspector_societe->ref == 'LabourInspectorSociety') {
 		$events   = array();
 		$events[] = array('method' => 'getContacts', 'url' => dol_buildpath('/core/ajax/contacts.php?showempty=1', 1), 'htmlname' => 'labourinspector_contactid', 'params' => array('add-customer-contact' => 'disabled'));
 		$societe->fetch($labour_inspector_societe->id[0]);
 
 		print $form->select_company($labour_inspector_societe->id[0], 'labourinspector_socid', '', 'SelectThirdParty', 1, 0, $events, 0, 'minwidth300');
 	}
-	else
-	{
+	else {
 		$events = array();
 		$events[] = array('method' => 'getContacts', 'url' => dol_buildpath('/core/ajax/contacts.php?showempty=1', 1), 'htmlname' => 'labourinspector_contactid', 'params' => array('add-customer-contact' => 'disabled'));
 		//For external user force the company to user company
@@ -245,8 +239,7 @@ if ($conf->societe->enabled)
 	if ($labour_inspector_contact->id) {
 		print $form->selectcontacts($labour_inspector_societe->id[0], $labour_inspector_contact->id , 'labourinspector_contactid[]', 1, '', '', 0, 'quatrevingtpercent', false, 0, array(), false, 'multiple', 'labourinspector_contactid');
 	}
-	else
-	{
+	else {
 		$preselectedids = GETPOST('labourinspector_contactid', 'array');
 		if (GETPOST('labourinspector_contactid', 'array')) $preselectedids[GETPOST('labourinspector_contactid', 'array')] = GETPOST('labourinspector_contactid', 'array');
 		print $form->selectcontacts(GETPOST('labourinspector_socid', 'int'), $preselectedids, 'labourinspector_contactid[]', 1, '', '', 0, 'quatrevingtpercent', false, 0, array(), false, 'multiple', 'labourinspector_contactid');
@@ -264,15 +257,13 @@ if ($conf->societe->enabled)
 
 	// * Third party concerned - Tiers concerné *
 
-	if ($samu_resources->ref == 'SAMU')
-	{
+	if ($samu_resources->ref == 'SAMU') {
 		$societe->fetch($samu_resources->id[0]);
 
 		print $form->select_company($samu_resources->id[0], 'samu_socid', '', 'SelectThirdParty', 1, 0, 0, 0, 'minwidth300');
 
 	}
-	else
-	{
+	else {
 		//For external user force the company to user company
 		if (!empty($user->socid)) {
 			print $form->select_company($user->socid, 'samu_socid', '', 1, 1, 0, 0, 0, 'minwidth300');
@@ -294,14 +285,12 @@ if ($conf->societe->enabled)
 
 	// * Third party concerned - Tiers concerné *
 
-	if ($pompiers_resources->ref == 'Pompiers')
-	{
+	if ($pompiers_resources->ref == 'Pompiers') {
 		$societe->fetch($pompiers_resources->id[0]);
 		print $form->select_company($pompiers_resources->id[0], 'pompiers_socid', '', 'SelectThirdParty', 1, 0, 0, 0, 'minwidth300');
 
 	}
-	else
-	{
+	else {
 		//For external user force the company to user company
 		if (!empty($user->socid)) {
 			print $form->select_company($user->socid, 'pompiers_socid', '', 1, 1, 0, 0, 0, 'minwidth300');
@@ -323,14 +312,12 @@ if ($conf->societe->enabled)
 
 	// * Third party concerned - Tiers concerné *
 
-	if ($police_resources->ref == 'Police')
-	{
+	if ($police_resources->ref == 'Police') {
 		$societe->fetch($police_resources->id[0]);
 		print $form->select_company($police_resources->id[0], 'police_socid', '', 'SelectThirdParty', 1, 0, 0, 0, 'minwidth300');
 
 	}
-	else
-	{
+	else {
 		//For external user force the company to user company
 		if (!empty($user->socid)) {
 			print $form->select_company($user->socid, 'police_socid', '', 1, 1, 0, 0, 0, 'minwidth300');
@@ -352,14 +339,12 @@ if ($conf->societe->enabled)
 
 	// * Third party concerned - Tiers concerné *
 
-	if ($touteurgence_resources->ref == 'AllEmergencies')
-	{
+	if ($touteurgence_resources->ref == 'AllEmergencies') {
 		$societe->fetch($touteurgence_resources->id[0]);
 		print $form->select_company($touteurgence_resources->id[0], 'touteurgence_socid', '', 'SelectThirdParty', 1, 0, 0, 0, 'minwidth300');
 
 	}
-	else
-	{
+	else {
 		//For external user force the company to user company
 		if (!empty($user->socid)) {
 			print $form->select_company($user->socid, 'touteurgence_socid', '', 1, 1, 0, 0, 0, 'minwidth300');
@@ -381,8 +366,7 @@ if ($conf->societe->enabled)
 
 	// * Third party concerned - Tiers concerné *
 
-	if ($defenseur_resources->ref == 'RightsDefender')
-	{
+	if ($defenseur_resources->ref == 'RightsDefender') {
 		$societe->fetch($defenseur_resources->id[0]);
 		print $form->select_company($defenseur_resources->id[0], 'defenseur_socid', '', 'SelectThirdParty', 1, 0, 0, 0, 'minwidth300');
 
@@ -410,14 +394,12 @@ if ($conf->societe->enabled)
 
 	// * Third party concerned - Tiers concerné *
 
-	if ($antipoison_resources->ref == 'Antipoison')
-	{
+	if ($antipoison_resources->ref == 'Antipoison') {
 		$societe->fetch($antipoison_resources->id[0]);
 		print $form->select_company($antipoison_resources->id[0], 'antipoison_socid', '', 'SelectThirdParty', 1, 0, 0, 0, 'minwidth300');
 
 	}
-	else
-	{
+	else {
 		//For external user force the company to user company
 		if (!empty($user->socid)) {
 			print $form->select_company($user->socid, 'antipoison_socid', '', 1, 1, 0, 0, 0, 'minwidth300');
@@ -442,35 +424,35 @@ $responsible_resources = $allLinks['Responsible'];
 
 // * Third party concerned - Tiers concerné *
 
-if ($responsible_resources->ref == 'Responsible' && $responsible_resources->id[0] > 0)
-{
+if ($responsible_resources->ref == 'Responsible' && $responsible_resources->id[0] > 0) {
 
-	$user->fetch($responsible_resources->id[0]);
-	if (!GETPOSTISSET('backtopage')) print ' <a href="'.DOL_URL_ROOT.'/user/card.php?action=create&backtopage='.urlencode($_SERVER["PHP_SELF"].'?action=create').'"><span class="fa fa-plus-circle valignmiddle paddingleft" title="'.$langs->trans("AddThirdParty").'"></span></a>';
+	$usertmp->fetch($responsible_resources->id[0]);
 
 	print $form->select_dolusers($responsible_resources->id[0], 'responsible_socid', 0, null, 0, 0, 0, 0, 'minwidth300');
+
+	if (!GETPOSTISSET('backtopage')) print ' <a href="'.DOL_URL_ROOT.'/user/card.php?action=create&backtopage='.urlencode($_SERVER["PHP_SELF"].'?action=create').'"><span class="fa fa-plus-circle valignmiddle paddingleft" title="'.$langs->trans("AddUser").'"></span></a>';
 
 	// * Phone number - Numéro de téléphone *
 
 	print '<tr class="oddeven"><td><label for="name">'.$langs->trans("Phone").'</label></td><td>';
-	if ($user->phone > 0) {
-		print $user->office_phone;
+
+	if ($usertmp->office_phone > 0) {
+		print $usertmp->office_phone;
 	} else { ?>
-		<a href="<?php echo DOL_URL_ROOT . '/' ?>user/card.php?id=<?php echo $user->id ?>" target="_blank">
-			<i class="fas fa-plus"></i><?php print ' ' . $langs->trans('NoPhoneNumber'); ?>
+		<a href="<?php echo DOL_URL_ROOT . '/' ?>user/card.php?id=<?php echo $usertmp->id ?>" target="_blank">
+			<i class="fas fa-plus"></i><?php print ' ' . $langs->trans('AddPhoneNumber'); ?>
 		</a>
 	<?php }
 
 	print '</td></tr>';
 
 }
-else //id = 0
-{
+else { //id = 0
 	//For external user force the company to user company
 	if (!empty($user->socid)) {
-		print $form->select_dolusers($user->socid, 'responsible_socid', '', 1, 0, 0, 0, 0, 'minwidth300');
+		print $form->select_dolusers($user->socid, 'responsible_socid', 1, 1, 0, 0, 0, 0, 'minwidth300');
 	} else {
-		print $form->select_dolusers('', 'responsible_socid', '', '', 0, 0, 0 , 0, 'minwidth300');
+		print $form->select_dolusers('', 'responsible_socid', 1, '', 0, 0, 0 , 0, 'minwidth300');
 	}
 }
 
@@ -507,6 +489,13 @@ print '</td></tr>';
 
 print '<tr class="oddeven"><td><label for="consignesgenerales">'.$langs->trans("GeneralInstructions").'</label></td><td>';
 $doleditor = new DolEditor('consignesgenerales', $conf->global->DIGIRISK_GENERAL_RULES ? $conf->global->DIGIRISK_GENERAL_RULES : '', '', 90, 'dolibarr_notes', '', false, true, $conf->global->FCKEDITOR_ENABLE_SOCIETE, ROWS_3, '90%');
+$doleditor->Create();
+print '</td></tr>';
+
+// * General instructions - Consignes générales *
+
+print '<tr class="oddeven"><td><label for="firstaid">'.$langs->trans("FirstAid").'</label></td><td>';
+$doleditor = new DolEditor('firstaid', $conf->global->DIGIRISK_FIRST_AID ? $conf->global->DIGIRISK_FIRST_AID : '', '', 90, 'dolibarr_notes', '', false, true, $conf->global->FCKEDITOR_ENABLE_SOCIETE, ROWS_3, '90%');
 $doleditor->Create();
 print '</td></tr>';
 

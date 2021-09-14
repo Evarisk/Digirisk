@@ -16,7 +16,7 @@
  */
 
 /**
- * \file    digiriskdolibarr/admin/socialconf.php
+ * \file    admin/socialconf.php
  * \ingroup digiriskdolibarr
  * \brief   Digiriskdolibarr setup page for social data configuration.
  */
@@ -77,38 +77,36 @@ $parameters = array();
 $reshook = $hookmanager->executeHooks('doActions', $parameters, $object, $action);
 if ($reshook < 0) setEventMessages($hookmanager->error, $hookmanager->errors, 'errors');
 
-if (($action == 'update' && !GETPOST("cancel", 'alpha'))
-	|| ($action == 'updateedit'))
-{
+if (empty($reshook)) {
+	if (($action == 'update' && !GETPOST("cancel", 'alpha')) || ($action == 'updateedit')) {
+		$electionDateCSE = GETPOST('ElectionDateCSE', 'none');
+		$electionDateCSE = explode('/', $electionDateCSE);
+		$electionDateCSE = $electionDateCSE[2] . '-' . $electionDateCSE[1] . '-' . $electionDateCSE[0];
 
-	$electionDateCSE = GETPOST('ElectionDateCSE', 'none');
-	$electionDateCSE = explode('/',$electionDateCSE);
-	$electionDateCSE = $electionDateCSE[2] . '-' . $electionDateCSE[1] . '-' . $electionDateCSE[0];
+		$electionDateDP = GETPOST('ElectionDateDP', 'none');
+		$electionDateDP = explode('/', $electionDateDP);
+		$electionDateDP = $electionDateDP[2] . '-' . $electionDateDP[1] . '-' . $electionDateDP[0];
 
-	$electionDateDP = GETPOST('ElectionDateDP', 'none');
-	$electionDateDP = explode('/',$electionDateDP);
-	$electionDateDP = $electionDateDP[2] . '-' . $electionDateDP[1] . '-' . $electionDateDP[0];
+		dolibarr_set_const($db, "DIGIRISK_PARTICIPATION_AGREEMENT_INFORMATION_PROCEDURE", GETPOST("modalites", 'none'), 'chaine', 0, '', $conf->entity);
+		dolibarr_set_const($db, "DIGIRISK_DEROGATION_SCHEDULE_PERMANENT", GETPOST("permanent", 'none'), 'chaine', 0, '', $conf->entity);
+		dolibarr_set_const($db, "DIGIRISK_DEROGATION_SCHEDULE_OCCASIONAL", GETPOST("occasional", 'none'), 'chaine', 0, '', $conf->entity);
+		dolibarr_set_const($db, "DIGIRISK_CSE_ELECTION_DATE", $electionDateCSE, 'date', 0, '', $conf->entity);
+		dolibarr_set_const($db, "DIGIRISK_DP_ELECTION_DATE", $electionDateDP, 'date', 0, '', $conf->entity);
 
-	dolibarr_set_const($db, "DIGIRISK_PARTICIPATION_AGREEMENT_INFORMATION_PROCEDURE", GETPOST("modalites", 'none'), 'chaine', 0, '', $conf->entity);
-	dolibarr_set_const($db, "DIGIRISK_DEROGATION_SCHEDULE_PERMANENT", GETPOST("permanent", 'none'), 'chaine', 0, '', $conf->entity);
-	dolibarr_set_const($db, "DIGIRISK_DEROGATION_SCHEDULE_OCCASIONAL", GETPOST("occasional", 'none'), 'chaine', 0, '', $conf->entity);
-	dolibarr_set_const($db, "DIGIRISK_CSE_ELECTION_DATE", $electionDateCSE, 'date', 0, '', $conf->entity);
-	dolibarr_set_const($db, "DIGIRISK_DP_ELECTION_DATE", $electionDateDP, 'date', 0, '', $conf->entity);
+		$CSEtitulaires = !empty(GETPOST('TitularsCSE', 'array')) ? GETPOST('TitularsCSE', 'array') : (GETPOST('TitularsCSE', 'int') > 0 ? GETPOST('TitularsCSE', 'int') : 0);
+		$CSEsuppleants = !empty(GETPOST('AlternatesCSE', 'array')) ? GETPOST('AlternatesCSE', 'array') : (GETPOST('AlternatesCSE', 'int') > 0 ? GETPOST('AlternatesCSE', 'int') : 0);
+		$TitularsDP = !empty(GETPOST('TitularsDP', 'array')) ? GETPOST('TitularsDP', 'array') : (GETPOST('TitularsDP', 'int') > 0 ? GETPOST('TitularsDP', 'int') : 0);
+		$AlternatesDP = !empty(GETPOST('AlternatesDP', 'array')) ? GETPOST('AlternatesDP', 'array') : (GETPOST('AlternatesDP', 'int') > 0 ? GETPOST('AlternatesDP', 'int') : 0);
 
-	$CSEtitulaires 	= !empty(GETPOST('TitularsCSE', 'array')) ? GETPOST('TitularsCSE','array') : (GETPOST('TitularsCSE', 'int') > 0 ? GETPOST('TitularsCSE', 'int') : 0);
-	$CSEsuppleants 	= !empty(GETPOST('AlternatesCSE', 'array')) ? GETPOST('AlternatesCSE','array') : (GETPOST('AlternatesCSE', 'int') > 0 ? GETPOST('AlternatesCSE', 'int') : 0);
-	$TitularsDP 	= !empty(GETPOST('TitularsDP', 'array')) ? GETPOST('TitularsDP','array') : (GETPOST('TitularsDP', 'int') > 0 ? GETPOST('TitularsDP', 'int') : 0);
-	$AlternatesDP 	= !empty(GETPOST('AlternatesDP', 'array')) ? GETPOST('AlternatesDP','array') : (GETPOST('AlternatesDP', 'int') > 0 ? GETPOST('AlternatesDP', 'int') : 0);
+		$resources->digirisk_dolibarr_set_resources($db, $user->id, 'TitularsCSE', 'societe', $CSEtitulaires, $conf->entity);
+		$resources->digirisk_dolibarr_set_resources($db, $user->id, 'AlternatesCSE', 'societe', $CSEsuppleants, $conf->entity);
+		$resources->digirisk_dolibarr_set_resources($db, $user->id, 'TitularsDP', 'societe', $TitularsDP, $conf->entity);
+		$resources->digirisk_dolibarr_set_resources($db, $user->id, 'AlternatesDP', 'societe', $AlternatesDP, $conf->entity);
 
-	$resources->digirisk_dolibarr_set_resources($db,$user->id,  'TitularsCSE',  'societe', $CSEtitulaires, $conf->entity);
-	$resources->digirisk_dolibarr_set_resources($db,$user->id,  'AlternatesCSE',  'societe', $CSEsuppleants, $conf->entity);
-	$resources->digirisk_dolibarr_set_resources($db,$user->id,  'TitularsDP',  'societe', $TitularsDP, $conf->entity);
-	$resources->digirisk_dolibarr_set_resources($db,$user->id,  'AlternatesDP',  'societe', $AlternatesDP, $conf->entity);
-
-	if ($action != 'updateedit' && !$error)
-	{
-		header("Location: ".$_SERVER["PHP_SELF"]);
-		exit;
+		if ($action != 'updateedit' && !$error) {
+			header("Location: " . $_SERVER["PHP_SELF"]);
+			exit;
+		}
 	}
 }
 
@@ -117,24 +115,26 @@ if (($action == 'update' && !GETPOST("cancel", 'alpha'))
  */
 
 $help_url = 'FR:Module_DigiriskDolibarr#L.27onglet_Social';
-llxHeader('', $langs->trans("CompanyFoundation"), $help_url);
+$morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");
+
+llxHeader('', $langs->trans("CompanyFoundation"), $help_url, '', '', '', '', $morecss);
 
 print load_fiche_titre($langs->trans("CompanyFoundation"), '', 'title_setup');
 
 $head = company_admin_prepare_head();
 
-dol_fiche_head($head, 'social', $langs->trans("Company"), -1, 'company');
+print dol_get_fiche_head($head, 'social', $langs->trans("Company"), -1, 'company');
 
-$form 		 = new Form($db);
-$resources 	 = new DigiriskResources($db);
+$form      = new Form($db);
+$resources = new DigiriskResources($db);
 
 $allLinks = $resources->digirisk_dolibarr_fetch_resources();
 
-$electionDateCSE 	= $conf->global->DIGIRISK_CSE_ELECTION_DATE;
-$electionDateDP 	= $conf->global->DIGIRISK_DP_ELECTION_DATE;
+$electionDateCSE = $conf->global->DIGIRISK_CSE_ELECTION_DATE;
+$electionDateDP  = $conf->global->DIGIRISK_DP_ELECTION_DATE;
 
 print '<span class="opacitymedium">'.$langs->trans("DigiriskMenu")."</span><br>\n";
-print "<br>\n";
+print "<br>";
 
 print '<form method="POST" action="'.$_SERVER["PHP_SELF"].'" name="social_form">';
 print '<input type="hidden" name="token" value="'.newToken().'">';
@@ -187,6 +187,7 @@ print '<tr class="liste_titre"><th class="titlefield wordbreak">'.$langs->trans(
 
 print '<tr class="oddeven"><td><label for="ElectionDateCSE">'.$langs->trans("ElectionDate").'</label></td><td>';
 print $form->selectDate(strtotime($electionDateCSE) ? $electionDateCSE : -1, 'ElectionDateCSE', 0, 0, 0, 'social_form', 1, 1);
+print '</td></tr>';
 
 // * ESC Titulars - Titulaires CSE *
 
@@ -197,9 +198,10 @@ print '<tr>';
 print '<td>'.$form->editfieldkey('Titulars', 'TitularsCSE_id', '', $object, 0).'</td>';
 print '<td colspan="3" class="maxwidthonsmartphone">';
 
-if (!GETPOSTISSET('backtopage')) print ' <a href="'.DOL_URL_ROOT.'/user/card.php?action=create&backtopage='.urlencode($_SERVER["PHP_SELF"].'?action=create').'"><span class="fa fa-plus-circle valignmiddle paddingleft" title="'.$langs->trans("AddThirdParty").'"></span></a>';
 
-print $form->multiselectarray('TitularsCSE', $userlist, $titulars_cse->id, null, null, null, null, "90%");
+print $form->multiselectarray('TitularsCSE', $userlist, $titulars_cse->id, null, null, null, null, "minwidth300");
+
+if (!GETPOSTISSET('backtopage')) print ' <a href="'.DOL_URL_ROOT.'/user/card.php?action=create&backtopage='.urlencode($_SERVER["PHP_SELF"].'?action=create').'"><span class="fa fa-plus-circle valignmiddle paddingleft" title="'.$langs->trans("AddUser").'"></span></a>';
 
 print '</td></tr>';
 
@@ -212,9 +214,9 @@ print '<tr>';
 print '<td>'.$form->editfieldkey('Alternates', 'AlternatesCSE_id', '', $object, 0).'</td>';
 print '<td colspan="3" class="maxwidthonsmartphone">';
 
-if (!GETPOSTISSET('backtopage')) print ' <a href="'.DOL_URL_ROOT.'/user/card.php?action=create&backtopage='.urlencode($_SERVER["PHP_SELF"].'?action=create').'"><span class="fa fa-plus-circle valignmiddle paddingleft" title="'.$langs->trans("AddThirdParty").'"></span></a>';
+print $form->multiselectarray('AlternatesCSE', $userlist, $alternates_cse->id, null, null, null, null, "minwidth300");
 
-print $form->multiselectarray('AlternatesCSE', $userlist, $alternates_cse->id, null, null, null, null, "90%");
+if (!GETPOSTISSET('backtopage')) print ' <a href="'.DOL_URL_ROOT.'/user/card.php?action=create&backtopage='.urlencode($_SERVER["PHP_SELF"].'?action=create').'"><span class="fa fa-plus-circle valignmiddle paddingleft" title="'.$langs->trans("AddUser").'"></span></a>';
 
 print '</td></tr>';
 
@@ -223,7 +225,7 @@ print '</td></tr>';
 */
 
 print '<table class="noborder centpercent editmode">';
-print '<tr class="liste_titre"><th class="titlefield wordbreak">'.$langs->trans("StaffRepresentatives").'</th><th>'.$langs->trans("Value").'</th></tr>'."\n";
+print '<tr class="liste_titre"><th class="titlefield wordbreak">'.$langs->trans("StaffRepresentatives").'</th><th>'.$langs->trans("").'</th></tr>'."\n";
 
 print '<tr class="oddeven"><td><label for="ElectionDateDP">'.$langs->trans("ElectionDate").'</label></td><td>';
 print $form->selectDate(strtotime($electionDateDP) ? $electionDateDP : -1, 'ElectionDateDP', 0, 0, 0, 'social_form', 1, 1);
@@ -237,9 +239,9 @@ print '<tr>';
 print '<td>'.$form->editfieldkey('Titulars', 'TitularsDP_id', '', $object, 0).'</td>';
 print '<td colspan="3" class="maxwidthonsmartphone">';
 
-if (!GETPOSTISSET('backtopage')) print ' <a href="'.DOL_URL_ROOT.'/user/card.php?action=create&backtopage='.urlencode($_SERVER["PHP_SELF"].'?action=create').'"><span class="fa fa-plus-circle valignmiddle paddingleft" title="'.$langs->trans("AddThirdParty").'"></span></a>';
+print $form->multiselectarray('TitularsDP', $userlist, $titulars_dp->id, null, null, null, null, "minwidth300");
 
-print $form->multiselectarray('TitularsDP', $userlist, $titulars_dp->id, null, null, null, null, "90%");
+if (!GETPOSTISSET('backtopage')) print ' <a href="'.DOL_URL_ROOT.'/user/card.php?action=create&backtopage='.urlencode($_SERVER["PHP_SELF"].'?action=create').'"><span class="fa fa-plus-circle valignmiddle paddingleft" title="'.$langs->trans("AddUser").'"></span></a>';
 
 print '</td></tr>';
 
@@ -252,9 +254,9 @@ print '<tr>';
 print '<td>'.$form->editfieldkey('Alternates', 'AlternatesDP', '', $object, 0).'</td>';
 print '<td colspan="3" class="maxwidthonsmartphone">';
 
-if (!GETPOSTISSET('backtopage')) print ' <a href="'.DOL_URL_ROOT.'/user/card.php?action=create&backtopage='.urlencode($_SERVER["PHP_SELF"].'?action=create').'"><span class="fa fa-plus-circle valignmiddle paddingleft" title="'.$langs->trans("AddThirdParty").'"></span></a>';
+print $form->multiselectarray('AlternatesDP', $userlist, $alternates_dp->id, null, null, null, null, "minwidth300");
 
-print $form->multiselectarray('AlternatesDP', $userlist, $alternates_dp->id, null, null, null, null, "90%");
+if (!GETPOSTISSET('backtopage')) print ' <a href="'.DOL_URL_ROOT.'/user/card.php?action=create&backtopage='.urlencode($_SERVER["PHP_SELF"].'?action=create').'"><span class="fa fa-plus-circle valignmiddle paddingleft" title="'.$langs->trans("AddUser").'"></span></a>';
 
 print '</td></tr>';
 

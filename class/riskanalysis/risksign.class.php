@@ -158,8 +158,10 @@ class RiskSign extends CommonObject
 	}
 
 	/**
-	 * Get risksign category picto name
+	 * Get risksign category picto path
 	 *
+	 * @param $risksign
+	 * @param string $param
 	 * @return    string $risksign['thumbnail_name']     path to risksign picto, -1 if don't exist
 	 */
 	public function get_risksign_category($risksign, $param = 'name_thumbnail')
@@ -177,6 +179,7 @@ class RiskSign extends CommonObject
 	/**
 	 * Get risksign category picto name
 	 *
+	 * @param $risksign
 	 * @return    string $risksign['name']     name to risksign picto, -1 if don't exist
 	 */
 	public function get_risksign_category_name($risksign)

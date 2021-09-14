@@ -176,17 +176,17 @@ class RiskAssessment extends CommonObject
 	}
 
 	/**
-	 * Load object in memory from the database
+	 * Load object in memory from the database with Parent ID
 	 *
 	 * @param int    $parent_id   Id parent object
 	 * @return int         <0 if KO, 0 if not found, >0 if OK
 	 */
-	public function fetchFromParent($parent_id, $active = 0)
+	public function fetchFromParent($parent_id, $active = 0, $desc = '')
 	{
 		$filter = array('customsql' => 'fk_risk=' . $this->db->escape($parent_id));
 		if ($active) $filter['status'] = 1;
 
-		return $this->fetchAll('', '', 0, 0, $filter, 'AND');
+		return $this->fetchAll($desc, 'rowid', 0, 0, $filter, 'AND');
 	}
 
 	/**
@@ -280,10 +280,12 @@ class RiskAssessment extends CommonObject
 	}
 
 	/**
-	 * Update object into database
+	 * Update risk assessment status into database
 	 *
-	 * @param  User $user      User that modifies
+	 * @param User $user User that modifies
+	 * @param $risk_id
 	 * @return int             <0 if KO, >0 if OK
+	 * @throws Exception
 	 */
 	public function updateEvaluationStatus(User $user, $risk_id)
 	{
@@ -328,7 +330,7 @@ class RiskAssessment extends CommonObject
 	}
 
 	/**
-	 * Return scale level for risk evaluation
+	 * Return scale level for risk assessment
 	 *
 	 * @return	int			between 1 and 4
 	 */
@@ -349,9 +351,10 @@ class RiskAssessment extends CommonObject
 	}
 
 	/**
-	 * Return scale level for risk evaluation
+	 * Return photo for risk assessment
 	 *
-	 * @return	int			between 1 and 4
+	 * @param $element
+	 * @return void between 1 and 4
 	 */
 	public function show_photo_evaluation($element) {
 		global $conf;

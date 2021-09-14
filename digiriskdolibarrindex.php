@@ -89,6 +89,11 @@ if ($action == 'setriskdescription')
 	dolibarr_set_const($db, $constforval, $value, 'integer', 0, '', $conf->entity);
 }
 
+if ($action == 'setriskcategoryedit')
+{
+	$constforval = 'DIGIRISKDOLIBARR_RISK_CATEGORY_EDIT';
+	dolibarr_set_const($db, $constforval, $value, 'integer', 0, '', $conf->entity);
+}
 /*
  * View
  */
@@ -315,6 +320,25 @@ else
 }
 print '</td>';
 print '</tr>';
+
+print '<tr class="oddeven"><td>';
+print $langs->trans('RiskCategoryEdit');
+print "</td><td>\n";
+print $langs->trans('RiskCategoryEditDescription');
+print '</td>';
+
+print '<td class="center">';
+if ($conf->global->DIGIRISKDOLIBARR_RISK_CATEGORY_EDIT)
+{
+	print '<a class="reposition" href="'.$_SERVER["PHP_SELF"].'?action=setriskcategoryedit&value=0" alt="'.$langs->trans("Default").'">'.img_picto($langs->trans("Activated"), 'switch_on').'</a>';
+}
+else
+{
+	print '<a class="reposition" href="'.$_SERVER["PHP_SELF"].'?action=setriskcategoryedit&value=1" alt="'.$langs->trans("Default").'">'.img_picto($langs->trans("Disabled"), 'switch_off').'</a>';
+}
+print '</td>';
+print '</tr>';
+
 print '</table>';
 
 print load_fiche_titre($langs->trans("DigiriskRiskAssessmentData"), '', '');

@@ -60,18 +60,18 @@ class DigiriskDocuments extends CommonObject
 	public $fields=array(
 		'rowid'         => array('type'=>'integer', 'label'=>'TechnicalID', 'enabled'=>'1', 'position'=>1, 'notnull'=>1, 'visible'=>0, 'noteditable'=>'1', 'index'=>1, 'comment'=>"Id"),
 		'ref'           => array('type'=>'varchar(128)', 'label'=>'Ref', 'enabled'=>'1', 'position'=>10, 'notnull'=>1, 'visible'=>4, 'noteditable'=>'1', 'default'=>'(PROV)', 'index'=>1, 'searchall'=>1, 'showoncombobox'=>'1', 'comment'=>"Reference of object"),
-		'ref_ext'       => array('type'=>'varchar(128)', 'label'=>'RefExt', 'enabled'=>'1', 'position'=>20, 'notnull'=>0, 'visible'=>-1,),
-		'entity'        => array('type'=>'integer', 'label'=>'Entity', 'enabled'=>'1', 'position'=>30, 'notnull'=>1, 'visible'=>-1,),
-		'date_creation' => array('type'=>'datetime', 'label'=>'DateCreation', 'enabled'=>'1', 'position'=>40, 'notnull'=>1, 'visible'=>-2,),
-		'tms'           => array('type'=>'timestamp', 'label'=>'DateModification', 'enabled'=>'1', 'position'=>50, 'notnull'=>0, 'visible'=>-2,),
-		'import_key'    => array('type'=>'integer', 'label'=>'ImportKey', 'enabled'=>'1', 'position'=>60, 'notnull'=>1, 'visible'=>-1,),
-		'status'        => array('type'=>'smallint', 'label'=>'Status', 'enabled'=>'1', 'position'=>70, 'notnull'=>0, 'visible'=>-1,),
-		'type'          => array('type'=>'varchar(128)', 'label'=>'Type', 'enabled'=>'1', 'position'=>80, 'notnull'=>0, 'visible'=>-1,),
-		'json'          => array('type'=>'text', 'label'=>'JSON', 'enabled'=>'1', 'position'=>90, 'notnull'=>0, 'visible'=>-1,),
+		'ref_ext'       => array('type'=>'varchar(128)', 'label'=>'RefExt', 'enabled'=>'1', 'position'=>20, 'notnull'=>0, 'visible'=>0,),
+		'entity'        => array('type'=>'integer', 'label'=>'Entity', 'enabled'=>'1', 'position'=>30, 'notnull'=>1, 'visible'=>0,),
+		'date_creation' => array('type'=>'datetime', 'label'=>'DateCreation', 'enabled'=>'1', 'position'=>40, 'notnull'=>1, 'visible'=>0,),
+		'tms'           => array('type'=>'timestamp', 'label'=>'DateModification', 'enabled'=>'1', 'position'=>50, 'notnull'=>0, 'visible'=>0,),
+		'import_key'    => array('type'=>'integer', 'label'=>'ImportKey', 'enabled'=>'1', 'position'=>60, 'notnull'=>1, 'visible'=>0,),
+		'status'        => array('type'=>'smallint', 'label'=>'Status', 'enabled'=>'1', 'position'=>70, 'notnull'=>0, 'visible'=>0,),
+		'type'          => array('type'=>'varchar(128)', 'label'=>'Type', 'enabled'=>'1', 'position'=>80, 'notnull'=>0, 'visible'=>0,),
+		'json'          => array('type'=>'text', 'label'=>'JSON', 'enabled'=>'1', 'position'=>90, 'notnull'=>0, 'visible'=>0,),
 		'model_pdf'     => array('type'=>'varchar(255)', 'label'=>'Model pdf', 'enabled'=>'1', 'position'=>100, 'notnull'=>-1, 'visible'=>0,),
-		'model_odt'     => array('type'=>'varchar(255)', 'label'=>'Model ODT', 'enabled'=>'1', 'position'=>110, 'notnull'=>0, 'visible'=>-1,),
-		'last_main_doc' => array('type'=>'varchar(128)', 'label'=>'LastMainDoc', 'enabled'=>'1', 'position'=>120, 'notnull'=>0, 'visible'=>-1,),
-		'fk_user_creat' => array('type'=>'integer:User:user/class/user.class.php', 'label'=>'UserAuthor', 'enabled'=>'1', 'position'=>130, 'notnull'=>1, 'visible'=>-2, 'foreignkey'=>'user.rowid',),
+		'model_odt'     => array('type'=>'varchar(255)', 'label'=>'Model ODT', 'enabled'=>'1', 'position'=>110, 'notnull'=>0, 'visible'=>0,),
+		'last_main_doc' => array('type'=>'varchar(128)', 'label'=>'LastMainDoc', 'enabled'=>'1', 'position'=>120, 'notnull'=>0, 'visible'=>0,),
+		'fk_user_creat' => array('type'=>'integer:User:user/class/user.class.php', 'label'=>'UserAuthor', 'enabled'=>'1', 'position'=>130, 'notnull'=>1, 'visible'=>0, 'foreignkey'=>'user.rowid',),
 		'parent_type'   => array('type'=>'varchar(255)', 'label'=>'Parent_type', 'enabled'=>'1', 'position'=>140, 'notnull'=>1, 'visible'=>0, 'default'=>1,),
 		'parent_id'     => array('type'=>'integer', 'label'=>'Parent_id', 'enabled'=>'1', 'position'=>150, 'notnull'=>1, 'visible'=>0, 'default'=>1,),
 	);
@@ -155,7 +155,7 @@ class DigiriskDocuments extends CommonObject
 
 		if ($parentObject->id > 0) {
 			$this->parent_id     = $parentObject->id;
-			$this->parent_type   = $parentObject->element_type;
+			$this->parent_type   = $parentObject->element_type ? $parentObject->element_type : $parentObject->element;
 		} else {
 			$this->parent_id    = $conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD;
 			$this->parent_type  = 'digiriskstandard';
@@ -165,11 +165,11 @@ class DigiriskDocuments extends CommonObject
 		$this->element = $this->element . '@digiriskdolibarr';
 		return $this->createCommon($user, $notrigger);
 	}
-
 	/**
-	 * Create object into database
+	 * Function for JSON filling before saving in database
 	 *
-	 * @param  DigiriskDocuments $object  DigiriskDocuments object
+	 * @param $object
+	 * @return false|string
 	 */
 	public function DigiriskFillJSON($object) {
 		switch ($object->element) {
@@ -181,6 +181,9 @@ class DigiriskDocuments extends CommonObject
 				break;
 			case "riskassessmentdocument":
 				$this->json = $this->RiskAssessmentDocumentFillJSON($object);
+				break;
+			case "preventionplandocument":
+				$this->json = $this->PreventionPlanDocumentFillJSON($object);
 				break;
 		}
 	}
@@ -299,7 +302,7 @@ class DigiriskDocuments extends CommonObject
 	}
 
 	/**
-	 *	Load the info information in the object
+	 *	Load the info information of the object
 	 *
 	 *	@param  int		$id       Id of object
 	 *	@return	void

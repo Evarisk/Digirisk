@@ -325,7 +325,7 @@ class doc_riskassessmentdocument_odt extends ModeleODTRiskAssessmentDocument
 
 					if ( ! empty( $digiriskelementlist ) ) {
 
-						$cotationtotale = 0;
+						$totalQuotation = 0;
 						$listlines = $odfHandler->setSegment('risqueFiche');
 
 						foreach ($digiriskelementlist as $digiriskelementsingle) {
@@ -335,34 +335,39 @@ class doc_riskassessmentdocument_odt extends ModeleODTRiskAssessmentDocument
 									$evaluation = new RiskAssessment($this->db);
 									$lastEvaluation = $evaluation->fetchFromParent($line->id, 1);
 									$lastEvaluation = array_shift($lastEvaluation);
-									$cotationtotale += $lastEvaluation->cotation;
+									$totalQuotation += $lastEvaluation->cotation;
 								}
 							}
 							$depthHyphens = '';
 							for ($k = 0; $k < $digiriskelementsingle['depth']; $k++) {
 								$depthHyphens .= '- ';
 							}
-							$tmparray['nomElement'] = $depthHyphens . $digiriskelementsingle['object']->ref .' '. $digiriskelementsingle['object']->label;
+							$elementName = $depthHyphens . $digiriskelementsingle['object']->ref .' '. $digiriskelementsingle['object']->label;
 
-							$tmparray['quotationTotale'] = $cotationtotale;
-							$cotationtotale = 0;
+							$cotationarray[$elementName] = $totalQuotation;
+
+							$totalQuotation = 0;
 							unset($tmparray['object_fields']);
 
-							complete_substitutions_array($tmparray, $outputlangs, $object, $line, "completesubstitutionarray_lines");
-							// Call the ODTSubstitutionLine hook
-							$parameters = array('odfHandler' => &$odfHandler, 'file' => $file, 'object' => $object, 'outputlangs' => $outputlangs, 'substitutionarray' => &$tmparray, 'line' => $line);
-							$reshook = $hookmanager->executeHooks('ODTSubstitutionLine', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
-							foreach ($tmparray as $key => $val) {
+						}
+						//use arsort to sort array according to value
+						arsort($cotationarray);
+
+						complete_substitutions_array($tmparray, $outputlangs, $object, $line, "completesubstitutionarray_lines");
+						// Call the ODTSubstitutionLine hook
+						$parameters = array('odfHandler' => &$odfHandler, 'file' => $file, 'object' => $object, 'outputlangs' => $outputlangs, 'substitutionarray' => &$tmparray, 'line' => $line);
+						$reshook = $hookmanager->executeHooks('ODTSubstitutionLine', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
+							foreach ($cotationarray as $key => $val) {
 								try {
-									$listlines->setVars($key, $val, true, 'UTF-8');
+									$listlines->setVars('nomElement', $key, true, 'UTF-8');
+									$listlines->setVars('quotationTotale', $val, true, 'UTF-8');
 								} catch (OdfException $e) {
 									dol_syslog($e->getMessage(), LOG_INFO);
 								} catch (SegmentException $e) {
 									dol_syslog($e->getMessage(), LOG_INFO);
 								}
+								$listlines->merge();
 							}
-							$listlines->merge();
-						}
 						$odfHandler->mergeSegment($listlines);
 					}
 
@@ -415,13 +420,6 @@ class doc_riskassessmentdocument_odt extends ModeleODTRiskAssessmentDocument
 									foreach ($tmparray as $key => $val) {
 										try {
 											if ($val == $tmparray['nomDanger']) {
-												$list = getimagesize($tmparray['nomDanger']);
-												$newWidth = 50;
-												if ($list[0]) {
-													$ratio = $newWidth / $list[0];
-													$newHeight = $ratio * $list[1];
-													dol_imageResizeOrCrop($val, 0, $newWidth, $newHeight);
-												}
 												$listlines->setImage($key, $val);
 											} else {
 												$listlines->setVars($key, $val, true, 'UTF-8');

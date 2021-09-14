@@ -258,6 +258,14 @@ class doc_legaldisplay_odt extends ModeleODTLegalDisplay
 			$tmparray = array_merge($substitutionarray, $array_object_from_properties, $array_object);
 			complete_substitutions_array($tmparray, $outputlangs, $object);
 
+			$companyLogoThumbs = dol_dir_list($conf->mycompany->dir_output . '/logos/thumbs/');
+			if (!empty($companyLogoThumbs)) {
+				foreach($companyLogoThumbs as $companyLogoThumb) {
+
+				}
+			}
+			$tmparray['mycompany_logo'] = $conf->mycompany->dir_output . '/logos/thumbs/b.png';
+
 			// Call the ODTSubstitution hook
 			$parameters = array('odfHandler'=>&$odfHandler, 'file'=>$file, 'object'=>$object, 'outputlangs'=>$outputlangs, 'substitutionarray'=>&$tmparray);
 			$reshook = $hookmanager->executeHooks('ODTSubstitution', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks

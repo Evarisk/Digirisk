@@ -269,15 +269,15 @@
 	if ($action != 'list') {
 		$massactionbutton = $form->selectMassAction('', $arrayofmassactions);
 	} ?>
-
-	<!-- BUTTON MODAL RISK ADD -->
-	<?php if ($permissiontoadd) {
+	<?php if (!$allRisks) : ?>
+		<!-- BUTTON MODAL RISK ADD -->
+		<?php if ($permissiontoadd) {
 		$newcardbutton = '<div class="risk-add wpeo-button button-square-40 button-blue modal-open" value="'.$object->id.'"><i class="fas fa-exclamation-triangle button-icon"></i><i class="fas fa-plus-circle button-add animated"></i></div>';
 	} else {
 		$newcardbutton = '<div class="wpeo-button button-square-40 button-grey wpeo-tooltip-event" aria-label="'. $langs->trans('PermissionDenied').'" data-direction="left" value="'.$object->id.'"><i class="fas fa-exclamation-triangle button-icon"></i><i class="fas fa-plus-circle button-add animated"></i></div>';
 	} ?>
-	<!-- RISK ADD MODAL-->
-	<?php if ($conf->global->DIGIRISKDOLIBARR_TASK_MANAGEMENT == 0 && $conf->global->DIGIRISKDOLIBARR_RISK_DESCRIPTION == 0 && $conf->global->DIGIRISKDOLIBARR_MULTIPLE_RISKASSESSMENT_METHOD ==0 ) : ?>
+		<!-- RISK ADD MODAL-->
+		<?php if ($conf->global->DIGIRISKDOLIBARR_TASK_MANAGEMENT == 0 && $conf->global->DIGIRISKDOLIBARR_RISK_DESCRIPTION == 0 && $conf->global->DIGIRISKDOLIBARR_MULTIPLE_RISKASSESSMENT_METHOD ==0 ) : ?>
 		<div class="risk-add-modal" value="<?php echo $object->id ?>">
 			<div class="wpeo-modal modal-risk-0" id="risk_add<?php echo $object->id ?>">
 				<div class="modal-container wpeo-modal-event">
@@ -291,8 +291,8 @@
 						<div class="risk-content">
 							<div class="risk-category">
 								<span class="title"><?php echo $langs->trans('Risk'); ?><required>*</required></span>
-								<input class="input-hidden-danger" type="hidden" name="risk_category_id" value="undefined" />
 								<div class="wpeo-dropdown dropdown-large dropdown-grid category-danger padding">
+									<input class="input-hidden-danger" type="hidden" name="risk_category_id" value="undefined" />
 									<div class="dropdown-toggle dropdown-add-button button-cotation">
 										<span class="wpeo-button button-square-50 button-grey"><i class="fas fa-exclamation-triangle button-icon"></i><i class="fas fa-plus-circle button-add"></i></span>
 										<img class="danger-category-pic wpeo-tooltip-event hidden" src="" aria-label=""/>
@@ -312,11 +312,20 @@
 							</div>
 							<div class="risk-evaluation-container standard">
 								<span class="section-title"><?php echo ' ' . $langs->trans('RiskAssessment'); ?></span>
+								<div class="risk-evaluation-header">
+									<?php if ($conf->global->DIGIRISKDOLIBARR_ADVANCED_RISKASSESSMENT_METHOD) : ?>
+										<div class="wpeo-button evaluation-standard select-evaluation-method selected button-blue button-radius-2">
+											<span><?php echo $langs->trans('SimpleCotation') ?></span>
+										</div>
+										<div class="wpeo-button evaluation-advanced select-evaluation-method button-grey button-radius-2">
+											<span><?php echo $langs->trans('AdvancedCotation') ?></span>
+										</div>
+										<i class="fas fa-info-circle wpeo-tooltip-event" aria-label="<?php echo $langs->trans("HowToSetMultipleRiskAssessmentMethod") ?>"></i>
+									<?php endif; ?>
+									<input class="risk-evaluation-method" type="hidden" value="standard">
+									<input class="risk-evaluation-multiple-method" type="hidden" value="1">
+								</div>
 								<div class="risk-evaluation-content-wrapper">
-									<div class="risk-evaluation-header">
-										<input class="risk-evaluation-method" type="hidden" value="standard">
-										<input class="risk-evaluation-multiple-method" type="hidden" value="1">
-									</div>
 									<div class="risk-evaluation-content">
 										<div class="cotation-container">
 											<div class="cotation-standard">
@@ -425,8 +434,8 @@
 					<div class="risk-content">
 						<div class="risk-category">
 							<span class="title"><?php echo $langs->trans('Risk'); ?><required>*</required></span>
-							<input class="input-hidden-danger" type="hidden" name="risk_category_id" value="undefined" />
 							<div class="wpeo-dropdown dropdown-large dropdown-grid category-danger padding">
+								<input class="input-hidden-danger" type="hidden" name="risk_category_id" value="undefined" />
 								<div class="dropdown-toggle dropdown-add-button button-cotation">
 									<span class="wpeo-button button-square-50 button-grey"><i class="fas fa-exclamation-triangle button-icon"></i><i class="fas fa-plus-circle button-add"></i></span>
 									<img class="danger-category-pic wpeo-tooltip-event hidden" src="" aria-label=""/>
@@ -566,6 +575,7 @@
 			</div>
 		</div>
 	</div>
+	<?php endif; ?>
 	<?php endif; ?>
 	<?php $title = $langs->trans('DigiriskElementRisksList');
 	print_barre_liste($title, $page, $_SERVER["PHP_SELF"], $param, $sortfield, $sortorder, $massactionbutton, $num, $nbtotalofrecords, '', 0, $newcardbutton, '', $limit, 0, 0, 1);
@@ -763,30 +773,60 @@
 								<div class="modal-content" id="#modalContent">
 									<div class="risk-content">
 										<div class="risk-category">
-											<span class="title"><?php echo $langs->trans('Risk'); ?></span>
-											<input class="input-hidden-danger" type="hidden" name="risk_category_id" value=<?php echo $risk->category ?> />
-											<div class="wpeo-dropdown dropdown-large dropdown-grid category-danger padding">
-												<div class="dropdown-toggle dropdown-add-button button-cotation wpeo-tooltip-event" aria-label="<?php echo $risk->get_danger_category_name($risk) ?>">
-													<img class="danger-category-pic tooltip hover" src="<?php echo DOL_URL_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $risk->get_danger_category($risk) . '.png'?>"" />
+											<span class="title">
+											<?php if (!$conf->global->DIGIRISKDOLIBARR_RISK_CATEGORY_EDIT) {
+												$htmltooltip = '';
+												$htmltooltip .= $langs->trans("HowToEnableRiskCategoryEdit");
+											} else {
+												$htmltooltip = '';
+												$htmltooltip .= $langs->trans("HowToEditRiskCategory");
+											}
+											print '<span class="center">';
+											print $form->textwithpicto($langs->trans('Risk'), $htmltooltip, 1, 0);
+											print '</span>';
+											?>
+											</span>
+												<div class="wpeo-dropdown dropdown-large dropdown-grid category-danger padding">
+
+													<input class="input-hidden-danger" type="hidden" name="risk_category_id" value=<?php echo $risk->category ?> />
+													<div class="dropdown-toggle dropdown-add-button button-cotation wpeo-tooltip-event" aria-label="<?php echo $risk->get_danger_category_name($risk) ?>">
+														<img class="danger-category-pic tooltip hover" src="<?php echo DOL_URL_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $risk->get_danger_category($risk) . '.png'?>"" />
+													</div>
+
+													<?php if ($conf->global->DIGIRISKDOLIBARR_RISK_CATEGORY_EDIT) : ?>
+
+													<ul class="dropdown-content wpeo-gridlayout grid-5 grid-gap-0">
+														<?php
+														$dangerCategories = $risk->get_danger_categories();
+														if ( ! empty( $dangerCategories ) ) :
+															foreach ( $dangerCategories as $dangerCategory ) : ?>
+																<li class="item dropdown-item wpeo-tooltip-event classfortooltip" data-is-preset="<?php echo ''; ?>" data-id="<?php echo $dangerCategory['position'] ?>" aria-label="<?php echo $dangerCategory['name'] ?>">
+																	<img src="<?php echo DOL_URL_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $dangerCategory['thumbnail_name'] . '.png'?>" class="attachment-thumbail size-thumbnail photo photowithmargin" alt="" loading="lazy" width="48" height="48">
+																</li>
+															<?php endforeach;
+														endif; ?>
+													</ul>
+													<?php endif; ?>
 												</div>
-												<ul class="dropdown-content wpeo-gridlayout grid-5 grid-gap-0">
-													<?php
-													$dangerCategories = $risk->get_danger_categories();
-													if ( ! empty( $dangerCategories ) ) :
-														foreach ( $dangerCategories as $dangerCategory ) : ?>
-															<li class="item dropdown-item wpeo-tooltip-event classfortooltip" data-is-preset="<?php echo ''; ?>" data-id="<?php echo $dangerCategory['position'] ?>" aria-label="<?php echo $dangerCategory['name'] ?>">
-																<img src="<?php echo DOL_URL_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $dangerCategory['thumbnail_name'] . '.png'?>" class="attachment-thumbail size-thumbnail photo photowithmargin" alt="" loading="lazy" width="48" height="48">
-															</li>
-														<?php endforeach;
-													endif; ?>
-												</ul>
-											</div>
 										</div>
 										<?php if ($conf->global->DIGIRISKDOLIBARR_RISK_DESCRIPTION) : ?>
 											<div class="risk-description">
-											<span class="title"><?php echo $langs->trans('Description'); ?></span>
-											<?php print '<textarea name="riskComment" rows="'.ROWS_2.'">'.$risk->description.'</textarea>'."\n"; ?>
-										</div>
+												<span class="title"><?php echo $langs->trans('Description'); ?></span>
+												<?php print '<textarea name="riskComment" rows="'.ROWS_2.'">'.$risk->description.'</textarea>'."\n"; ?>
+											</div>
+										<?php else : ?>
+											<div class="risk-description">
+												<span class="title">
+													<?php
+													$htmltooltip = '';
+													$htmltooltip .= $langs->trans("HowToEnableRiskDescription");
+
+													print '<span class="center">';
+													print $form->textwithpicto($langs->trans('Description'), $htmltooltip, 1, 0);
+													print '</span>'; ?>
+												</span>
+												<?php echo $langs->trans('RiskDescriptionNotEnabled'); ?>
+											</div>
 										<?php endif; ?>
 									</div>
 								</div>
@@ -841,7 +881,7 @@
 					$lastEvaluation = $evaluation->fetchFromParent($risk->id, 1);
 					if (!empty ($lastEvaluation) && $lastEvaluation > 0) {
 						$lastEvaluation = array_shift($lastEvaluation);
-						$cotationList = $evaluation->fetchFromParent($risk->id); ?>
+						$cotationList = $evaluation->fetchFromParent($risk->id, 0, 'DESC'); ?>
 						<div class="risk-evaluation-container risk-evaluation-container-<?php echo $risk->id ?>" value="<?php echo $risk->id ?>">
 							<!-- RISK EVALUATION SINGLE -->
 							<div class="risk-evaluation-single-content risk-evaluation-single-content-<?php echo $risk->id ?>">

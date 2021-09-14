@@ -91,7 +91,13 @@ class InformationsSharing extends DigiriskDocuments
 		}
 	}
 
-	public function InformationssharingFillJSON($object) {
+	/**
+	 * Function for JSON filling before saving in database
+	 *
+	 * @param $object
+	 * @return false|string
+	 */
+	public function InformationsSharingFillJSON($object) {
 
 		global $langs, $conf;
 

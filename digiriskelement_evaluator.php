@@ -57,8 +57,12 @@ $cancel              = GETPOST('cancel', 'aZ09');
 $contextpage         = GETPOST('contextpage', 'aZ') ?GETPOST('contextpage', 'aZ') : 'evaluatorcard'; // To manage different context of search
 $backtopage          = GETPOST('backtopage', 'alpha');
 $toselect            = GETPOST('toselect', 'array'); // Array of ids of elements selected into a list
+$limit               = GETPOST('limit', 'int') ?GETPOST('limit', 'int') : $conf->liste_limit;
 $sortfield           = GETPOST('sortfield', 'alpha');
 $sortorder           = GETPOST('sortorder', 'alpha');
+$page                = GETPOSTISSET('pageplusone') ? (GETPOST('pageplusone') - 1) : GETPOST("page", 'int');
+$page                = is_numeric($page) ? $page : 0;
+$page                = $page == -1 ? 0 : $page;
 
 // Initialize technical objects
 $object            = new DigiriskElement($db);
@@ -83,6 +87,10 @@ foreach ($evaluator->fields as $key => $val)
 {
 	if (GETPOST('search_'.$key, 'alpha') !== '') $search[$key] = GETPOST('search_'.$key, 'alpha');
 }
+
+$offset   = $limit * $page;
+$pageprev = $page - 1;
+$pagenext = $page + 1;
 
 // List of fields to search into when doing a "search in all"
 $fieldstosearchall = array();
@@ -208,6 +216,7 @@ if ($object->id > 0) {
 	// Object card
 	// ------------------------------------------------------------
 	$width = 80;
+	dol_strlen($object->label) ? $morehtmlref = ' - ' . $object->label : '';
 	$morehtmlleft .= '<div class="floatleft inline-block valignmiddle divphotoref">'.digirisk_show_photos('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$entity].'/'.$object->element_type, 'small', 5, 0, 0, 0, $width,0, 0, 0, 0, $object->element_type, $object).'</div>';
 	digirisk_banner_tab($object, 'ref', '', 0, 'ref', 'ref', $morehtmlref, '', 0, $morehtmlleft);
 

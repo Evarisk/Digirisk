@@ -186,10 +186,9 @@ dol_fiche_head($head, 'elementListingRisksPhoto', $title, -1, "digiriskdolibarr@
 // ------------------------------------------------------------
 $width = 80; $cssclass = 'photoref';
 
-$morehtmlref = '<div class="refidno">';
-$morehtmlref .= '</div>';
 
 if (isset($object->element_type)) {
+	dol_strlen($object->label) ? $morehtmlref = ' - ' . $object->label : '';
 	$morehtmlleft .= '<div class="floatleft inline-block valignmiddle divphotoref">'.digirisk_show_photos('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$entity].'/'.$object->element_type, 'small', 5, 0, 0, 0, $width,0, 0, 0, 0, $object->element_type, $object).'</div>';
 	digirisk_banner_tab($object, 'ref', '', 0, 'ref', 'ref', $morehtmlref, '', 0, $morehtmlleft);
 } else {

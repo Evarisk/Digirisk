@@ -94,7 +94,13 @@ class LegalDisplay extends DigiriskDocuments
 		}
 	}
 
-	public function LegaldisplayFillJSON($object) {
+	/**
+	 * Function for JSON filling before saving in database
+	 *
+	 * @param $object
+	 * @return false|string
+	 */
+	public function LegalDisplayFillJSON($object) {
 		global $conf;
 
 		$resources               = new DigiriskResources($this->db);
@@ -240,6 +246,12 @@ class LegalDisplay extends DigiriskDocuments
 		}
 	}
 
+	/**
+	 * Get Collective Convention label with code
+	 *
+	 * @param $code
+	 * @return Object|string
+	 */
 	public function getIDCCByCode($code) {
 		if (isset($code) && $code !== '') {
 			$sql = "SELECT rowid, libelle";

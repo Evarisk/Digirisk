@@ -57,7 +57,7 @@ class modDigiriskdolibarr extends DolibarrModules
 		$this->descriptionlong = "Digirisk";
 		$this->editor_name     = 'Evarisk';
 		$this->editor_url      = 'https://evarisk.com';
-		$this->version         = '1.0.1';
+		$this->version         = '8.1.0';
 		$this->const_name      = 'MAIN_MODULE_'.strtoupper($this->name);
 		$this->picto           ='digiriskdolibarr@digiriskdolibarr';
 
@@ -101,13 +101,12 @@ class modDigiriskdolibarr extends DolibarrModules
 			"/ecm/digiriskdolibarr/riskassessmentdocument",
 			"/ecm/digiriskdolibarr/legaldisplay",
 			"/ecm/digiriskdolibarr/informationssharing",
-			"/ecm/digiriskdolibarr/firepermit",
-			"/ecm/digiriskdolibarr/preventionplan",
+			"/ecm/digiriskdolibarr/firepermitdocument",
+			"/ecm/digiriskdolibarr/preventionplandocument",
 			"/ecm/digiriskdolibarr/groupmentdocument",
 			"/ecm/digiriskdolibarr/workunitdocument",
 			"/ecm/digiriskdolibarr/listingrisksaction",
 			"/ecm/digiriskdolibarr/listingrisksphoto",
-			"/ecm/digiriskdolibarr/risksign",
 			"/ecm/digiriskdolibarr/medias"
 		);
 
@@ -116,20 +115,18 @@ class modDigiriskdolibarr extends DolibarrModules
 		// Dependencies
 
 		$this->hidden                  = false;
-		$this->depends                 = array('modAgenda', 'modECM', 'modProjet', 'modSociete');
+		$this->depends                 = array('modAgenda', 'modECM', 'modProjet', 'modSociete', 'modFournisseur');
 		$this->requiredby              = array();
 		$this->conflictwith            = array();
 		$this->langfiles               = array("digiriskdolibarr@digiriskdolibarr");
 		$this->phpmin                  = array(5, 5); // Minimum version of PHP required by module
-		$this->need_dolibarr_version   = array(11, -3); // Minimum version of Dolibarr required by module
+		$this->need_dolibarr_version   = array(13, -3); // Minimum version of Dolibarr required by module
 		$this->warnings_activation     = array(); // Warning to show when we activate module. array('always'='text') or array('FR'='textfr','ES'='textes'...)
 		$this->warnings_activation_ext = array(); // Warning to show when we activate an external module. array('always'='text') or array('FR'='textfr','ES'='textes'...)
 		//$this->automatic_activation = array('FR'=>'DigiriskDolibarrWasAutomaticallyActivatedBecauseOfYourCountryChoice');
 		//$this->always_enabled = true;								// If true, can't be disabled
 
 		// Constants
-		//TODO ranger les const correctement
-		// TODO insert l'entity avec $conf->entity our mieux gérer le multientity
 		$this->const = array(
 			// CONST CONFIGURATION
 			1 => array('DIGIRISK_GENERAL_MEANS','chaine','','General means', $conf->entity),
@@ -160,6 +157,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			15 => array('DIGIRISK_DUER_LOCATION','chaine','','Location of risks evaluation', $conf->entity),
 			16 => array('DIGIRISK_RULES_LOCATION','chaine','','Location of rules of procedure', $conf->entity),
 			17 => array('DIGIRISK_PARTICIPATION_AGREEMENT_INFORMATION_PROCEDURE','chaine','','Information procedure of participation agreement', $conf->entity),
+			23 => array('DIGIRISK_FIRST_AID','chaine','','', $conf->entity),
 
 			18 => array('MAIN_AGENDA_ACTIONAUTO_LEGALDISPLAY_CREATE','chaine',1,'', $conf->entity),
 			19 => array('DIGIRISKDOLIBARR_LEGALDISPLAY_ADDON','chaine', 'mod_legaldisplay_standard' ,'', $conf->entity),
@@ -205,18 +203,32 @@ class modDigiriskdolibarr extends DolibarrModules
 			// CONST PREVENTION PLAN
 			80 => array('MAIN_AGENDA_ACTIONAUTO_PREVENTIONPLAN_CREATE','chaine',1,'', $conf->entity),
 			81 => array('DIGIRISKDOLIBARR_PREVENTIONPLAN_ADDON','chaine', 'mod_preventionplan_standard' ,'', $conf->entity),
-			82 => array('DIGIRISKDOLIBARR_PREVENTIONPLAN_ADDON_ODT_PATH','chaine', DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/documents/doctemplates/preventionplan/' ,'', $conf->entity),
-			83 => array('DIGIRISKDOLIBARR_PREVENTIONPLAN_CUSTOM_ADDON_ODT_PATH','chaine', DOL_DATA_ROOT . '/ecm/digiriskdolibarr/preventionplan/' ,'', $conf->entity),
-			84 => array('DIGIRISKDOLIBARR_PREVENTIONPLAN_DEFAULT_MODEL','chaine', 'preventionplan_odt' ,'', $conf->entity),
+			83 => array('MAIN_AGENDA_ACTIONAUTO_PREVENTIONPLAN_CREATE','chaine',1,'', $conf->entity),
+			84 => array('MAIN_AGENDA_ACTIONAUTO_PREVENTIONPLAN_EDIT','chaine',1,'', $conf->entity),
+			250 => array('DIGIRISKDOLIBARR_PREVENTIONPLAN_PROJECT','integer', 0,'', $conf->entity),
 
-			// CONST FIREPERMIT
+			// CONST PREVENTION PLAN DOCUMENT
+			85 => array('MAIN_AGENDA_ACTIONAUTO_PREVENTIONPLANDOCUMENT_CREATE','chaine',1,'', $conf->entity),
+
+			86 => array('DIGIRISKDOLIBARR_PREVENTIONPLANDOCUMENT_ADDON','chaine', 'mod_preventionplandocument_standard' ,'', $conf->entity),
+			87 => array('DIGIRISKDOLIBARR_PREVENTIONPLANDOCUMENT_ADDON_ODT_PATH','chaine', DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/documents/doctemplates/preventionplandocument/' ,'', $conf->entity),
+			88 => array('DIGIRISKDOLIBARR_PREVENTIONPLANDOCUMENT_CUSTOM_ADDON_ODT_PATH','chaine', DOL_DATA_ROOT . '/ecm/digiriskdolibarr/preventionplandocument/' ,'', $conf->entity),
+			89 => array('DIGIRISKDOLIBARR_PREVENTIONPLANDOCUMENT_DEFAULT_MODEL','chaine', 'preventionplandocument_odt' ,'', $conf->entity),
+			260 =>array('DIGIRISKDOLIBARR_PREVENTIONPLANDOCUMENT_SPECIMEN_ADDON_ODT_PATH','chaine', DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/documents/doctemplates/preventionplandocument/specimen/' ,'', $conf->entity),
+
+			// CONST FIRE PERMIT
 			90 => array('MAIN_AGENDA_ACTIONAUTO_FIREPERMIT_CREATE','chaine',1,'', $conf->entity),
 			91 => array('DIGIRISKDOLIBARR_FIREPERMIT_ADDON','chaine', 'mod_firepermit_standard' ,'', $conf->entity),
-			92 => array('DIGIRISKDOLIBARR_FIREPERMIT_ADDON_ODT_PATH','chaine', DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/documents/doctemplates/firepermit/' ,'', $conf->entity),
-			93 => array('DIGIRISKDOLIBARR_FIREPERMIT_CUSTOM_ADDON_ODT_PATH','chaine', DOL_DATA_ROOT . '/ecm/digiriskdolibarr/firepermit/' ,'', $conf->entity),
-			94 => array('DIGIRISKDOLIBARR_FIREPERMIT_DEFAULT_MODEL','chaine', 'firepermit_odt' ,'', $conf->entity),
+			92 => array('MAIN_AGENDA_ACTIONAUTO_FIREPERMIT_CREATE','chaine',1,'', $conf->entity),
+			93 => array('MAIN_AGENDA_ACTIONAUTO_FIREPERMIT_EDIT','chaine',1,'', $conf->entity),
 
-			// CONST DIGIRISK ELEMENT
+			// CONST FIRE PERMIT DOCUMENT
+			94 => array('MAIN_AGENDA_ACTIONAUTO_FIREPERMITDOCUMENT_CREATE','chaine',1,'', $conf->entity),
+
+			95 => array('DIGIRISKDOLIBARR_FIREPERMITDOCUMENT_ADDON','chaine', 'mod_firepermitdocument_standard' ,'', $conf->entity),
+			96 => array('DIGIRISKDOLIBARR_FIREPERMITDOCUMENT_ADDON_ODT_PATH','chaine', DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/documents/doctemplates/firepermitdocument/' ,'', $conf->entity),
+			97 => array('DIGIRISKDOLIBARR_FIREPERMITDOCUMENT_CUSTOM_ADDON_ODT_PATH','chaine', DOL_DATA_ROOT . '/ecm/digiriskdolibarr/firepermitdocument/' ,'', $conf->entity),
+			98 => array('DIGIRISKDOLIBARR_FIREPERMITDOCUMENT_DEFAULT_MODEL','chaine', 'firepermitdocument_odt' ,'', $conf->entity),
 
 			// CONST GROUPMENT
 			100 => array('MAIN_AGENDA_ACTIONAUTO_GROUPMENT_CREATE','chaine',1,'', $conf->entity),
@@ -237,6 +249,8 @@ class modDigiriskdolibarr extends DolibarrModules
 			// CONST RISK
 			130 => array('MAIN_AGENDA_ACTIONAUTO_RISK_CREATE','chaine',1,'', $conf->entity),
 			131 => array('DIGIRISKDOLIBARR_RISK_ADDON','chaine', 'mod_risk_standard' ,'', $conf->entity),
+			132 => array('DIGIRISKDOLIBARR_RISK_DESCRIPTION','integer', 0 ,'', $conf->entity),
+			133 => array('DIGIRISKDOLIBARR_RISK_CATEGORY_EDIT','integer', 0 ,'', $conf->entity),
 
 			// CONST RISK ASSESSMENT
 			140 => array('MAIN_AGENDA_ACTIONAUTO_RISKASSESSMENT_CREATE','chaine',1,'', $conf->entity),
@@ -244,8 +258,6 @@ class modDigiriskdolibarr extends DolibarrModules
 
 			142 => array('DIGIRISKDOLIBARR_MULTIPLE_RISKASSESSMENT_METHOD','integer', 0 ,'', $conf->entity),
 			143 => array('DIGIRISKDOLIBARR_ADVANCED_RISKASSESSMENT_METHOD','integer', 0 ,'', $conf->entity),
-			144 => array('DIGIRISKDOLIBARR_TASK_MANAGEMENT','integer', 0 ,'', $conf->entity),
-			145 => array('DIGIRISKDOLIBARR_RISK_DESCRIPTION','integer', 0 ,'', $conf->entity),
 
 			// CONST RISK SIGN
 			150 => array('MAIN_AGENDA_ACTIONAUTO_RISKSIGN_CREATE','chaine',1,'', $conf->entity),
@@ -256,10 +268,23 @@ class modDigiriskdolibarr extends DolibarrModules
 			161 => array('DIGIRISKDOLIBARR_ACTIVE_STANDARD','integer', 0,'', $conf->entity),
 			162 => array('DIGIRISKDOLIBARR_DOCUMENT_MODELS_SET','integer', 0,'', $conf->entity),
 			163 => array('DIGIRISKDOLIBARR_THIRDPARTY_SET','integer', 0,'', $conf->entity),
+			164 => array('DIGIRISKDOLIBARR_TASK_MANAGEMENT','integer', 0 ,'', $conf->entity),
+
+			// CONST PREVENTION PLAN LINE
+			180 => array('MAIN_AGENDA_ACTIONAUTO_PREVENTIONPLANDET_CREATE','chaine',1,'', $conf->entity),
+			181 => array('DIGIRISKDOLIBARR_PREVENTIONPLANDET_ADDON','chaine', 'mod_preventionplandet_standard','', $conf->entity),
+
+			// CONST FIRE PERMIT LINE
+			190 => array('MAIN_AGENDA_ACTIONAUTO_FIREPERMITDET_CREATE','chaine',1,'', $conf->entity),
+			191 => array('DIGIRISKDOLIBARR_FIREPERMITDET_ADDON','chaine', 'mod_firepermitdet_standard' ,'', $conf->entity),
 
 			// MODULE
 			200 => array('DIGIRISKDOLIBARR_VERSION','chaine', $this->version,'', $conf->entity),
 			201 => array('DIGIRISKDOLIBARR_SUBPERMCATEGORY_FOR_DOCUMENTS','integer', 1,'', $conf->entity),
+
+			// CONST SIGNATURE
+			210 => array('DIGIRISKDOLIBARR_SIGNATURE_ENABLE_PUBLIC_INTERFACE','integer', 1,'', $conf->entity),
+			211 => array('DIGIRISKDOLIBARR_SIGNATURE_SHOW_COMPANY_LOGO','integer', 1,'', $conf->entity),
 
 		);
 
@@ -311,7 +336,7 @@ class modDigiriskdolibarr extends DolibarrModules
 
 		/* module PERMISSIONS */
 		$this->rights[$r][0] = $this->numero.$r;
-		$this->rights[$r][1] = $langs->trans('ReadDigirisk');
+		$this->rights[$r][1] = $langs->trans('LireDigirisk');
 		$this->rights[$r][4] = 'lire';
 		$this->rights[$r][5] = 1;
 		$r++;
@@ -356,7 +381,6 @@ class modDigiriskdolibarr extends DolibarrModules
 		$r++;
 
 		/* INFORMATIONS SHARING PERMISSIONS */
-
 		$this->rights[$r][0] = $this->numero.$r;
 		$this->rights[$r][1] = $langs->trans('ReadInformationsSharing');
 		$this->rights[$r][4] = 'informationssharing';
@@ -374,7 +398,6 @@ class modDigiriskdolibarr extends DolibarrModules
 		$r++;
 
 		/* FIRE PERMIT PERMISSIONS */
-
 		$this->rights[$r][0] = $this->numero.$r;
 		$this->rights[$r][1] = $langs->trans('ReadFirePermit');
 		$this->rights[$r][4] = 'firepermit';
@@ -392,7 +415,6 @@ class modDigiriskdolibarr extends DolibarrModules
 		$r++;
 
 		/* PREVENTION PLAN PERMISSIONS */
-
 		$this->rights[$r][0] = $this->numero.$r;
 		$this->rights[$r][1] = $langs->trans('ReadPreventionPlan');
 		$this->rights[$r][4] = 'preventionplan';
@@ -410,7 +432,6 @@ class modDigiriskdolibarr extends DolibarrModules
 		$r++;
 
 		/* GP/UT ORGANISATION PERMISSIONS */
-
 		$this->rights[$r][0] = $this->numero.$r;
 		$this->rights[$r][1] = $langs->trans('ReadDigiriskElement');
 		$this->rights[$r][4] = 'digiriskelement';
@@ -428,7 +449,6 @@ class modDigiriskdolibarr extends DolibarrModules
 		$r++;
 
 		/* RISKS PERMISSIONS */
-
 		$this->rights[$r][0] = $this->numero.$r;
 		$this->rights[$r][1] = $langs->trans('ReadDigiriskRisk');
 		$this->rights[$r][4] = 'risk';
@@ -446,7 +466,6 @@ class modDigiriskdolibarr extends DolibarrModules
 		$r++;
 
 		/* LISTING RISKS ACTION PERMISSIONS */
-
 		$this->rights[$r][0] = $this->numero.$r;
 		$this->rights[$r][1] = $langs->trans('ReadListingRisksAction');
 		$this->rights[$r][4] = 'listingrisksaction';
@@ -464,7 +483,6 @@ class modDigiriskdolibarr extends DolibarrModules
 		$r++;
 
 		/* LISTING RISKS PHOTO PERMISSIONS */
-
 		$this->rights[$r][0] = $this->numero.$r;
 		$this->rights[$r][1] = $langs->trans('ReadListingRisksPhoto');
 		$this->rights[$r][4] = 'listingrisksphoto';
@@ -482,7 +500,6 @@ class modDigiriskdolibarr extends DolibarrModules
 		$r++;
 
 		/* RISK SIGN PERMISSIONS */
-
 		$this->rights[$r][0] = $this->numero.$r;
 		$this->rights[$r][1] = $langs->trans('ReadDigiriskRiskSign');
 		$this->rights[$r][4] = 'risksign';
@@ -500,7 +517,6 @@ class modDigiriskdolibarr extends DolibarrModules
 		$r++;
 
 		/* EVALUATOR PERMISSIONS */
-
 		$this->rights[$r][0] = $this->numero.$r;
 		$this->rights[$r][1] = $langs->trans('ReadEvaluator');
 		$this->rights[$r][4] = 'evaluator';
@@ -515,6 +531,13 @@ class modDigiriskdolibarr extends DolibarrModules
 		$this->rights[$r][1] = $langs->trans('DeleteEvaluator');
 		$this->rights[$r][4] = 'evaluator';
 		$this->rights[$r][5] = 'delete';
+		$r++;
+
+		/* ADMINPAGE PANEL ACCESS PERMISSIONS */
+		$this->rights[$r][0] = $this->numero.$r;
+		$this->rights[$r][1] = $langs->trans('ReadAdminPage');
+		$this->rights[$r][4] = 'adminpage';
+		$this->rights[$r][5] = 'read';
 
 		// Main menu entries to add
 		$this->menu = array();
@@ -535,6 +558,21 @@ class modDigiriskdolibarr extends DolibarrModules
 		);
 
 		$langs->load("digiriskdolibarr@digiriskdolibarr");
+
+		$this->menu[$r++] = array(
+			'fk_menu'  => 'fk_mainmenu=digiriskdolibarr', // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
+			'type'     => 'left', // This is a Top menu entry
+			'titre'    => '<i class="fas fa-home"></i> Digirisk',
+			'mainmenu' => 'digiriskdolibarr',
+			'leftmenu' => '',
+			'url'      => '/digiriskdolibarr/digiriskdolibarrindex.php',
+			'langs'    => 'digiriskdolibarr@digiriskdolibarr', // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
+			'position' => 48520 + $r,
+			'enabled'  => '$conf->digiriskdolibarr->enabled', // Define condition to show or hide menu entry. Use '$conf->digiriskdolibarr->enabled' if entry must be visible if module is enabled.
+			'perms'    => '1', // Use 'perms'=>'$user->rights->digiriskdolibarr->digiriskconst->read' if you want your menu with a permission rules
+			'target'   => '',
+			'user'     => 2, // 0=Menu for internal users, 1=external users, 2=both
+		);
 
 		$this->menu[$r++]=array(
 			'fk_menu'=>'fk_mainmenu=digiriskdolibarr',	    		// '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
@@ -569,6 +607,36 @@ class modDigiriskdolibarr extends DolibarrModules
 		$this->menu[$r++]=array(
 			'fk_menu'=>'fk_mainmenu=digiriskdolibarr',	    // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
 			'type'=>'left',			                // This is a Left menu entry
+			'titre'=>'<i class="fas fa-info"></i>  ' . $langs->trans('PreventionPlan'),
+			'mainmenu'=>'digiriskdolibarr',
+			'leftmenu'=>'digiriskpreventionplan',
+			'url'=>'/digiriskdolibarr/preventionplan_list.php',
+			'langs'=>'digiriskdolibarr@digiriskdolibarr',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
+			'position'=>48520+$r,
+			'enabled'=>'$conf->digiriskdolibarr->enabled',  // Define condition to show or hide menu entry. Use '$conf->digiriskdolibarr->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
+			'perms'=>'1',			                // Use 'perms'=>'$user->rights->digiriskdolibarr->level1->level2' if you want your menu with a permission rules
+			'target'=>'',
+			'user'=>0,				                // 0=Menu for internal users, 1=external users, 2=both
+		);
+
+//		$this->menu[$r++]=array(
+//			'fk_menu'=>'fk_mainmenu=digiriskdolibarr',	    // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
+//			'type'=>'left',			                // This is a Left menu entry
+//			'titre'=>'<i class="fas fa-file"></i>  ' . $langs->trans('FirePermit'),
+//			'mainmenu'=>'digiriskdolibarr',
+//			'leftmenu'=>'digiriskfirepermit',
+//			'url'=>'/digiriskdolibarr/firepermit_list.php',
+//			'langs'=>'digiriskdolibarr@digiriskdolibarr',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
+//			'position'=>48520+$r,
+//			'enabled'=>'$conf->digiriskdolibarr->enabled',  // Define condition to show or hide menu entry. Use '$conf->digiriskdolibarr->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
+//			'perms'=>'1',			                // Use 'perms'=>'$user->rights->digiriskdolibarr->level1->level2' if you want your menu with a permission rules
+//			'target'=>'',
+//			'user'=>0,				                // 0=Menu for internal users, 1=external users, 2=both
+//		);
+
+		$this->menu[$r++]=array(
+			'fk_menu'=>'fk_mainmenu=digiriskdolibarr',	    // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
+			'type'=>'left',			                // This is a Left menu entry
 			'titre'=>'<i class="fas fa-user"></i>  ' . $langs->trans('Users'),
 			'mainmenu'=>'digiriskdolibarr',
 			'leftmenu'=>'digiriskusers',
@@ -591,7 +659,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			'langs'=>'digiriskdolibarr@digiriskdolibarr',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
 			'position'=>48520+$r,
 			'enabled'=>'$conf->digiriskdolibarr->enabled',  // Define condition to show or hide menu entry. Use '$conf->digiriskdolibarr->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
-			'perms'=>'1',			                // Use 'perms'=>'$user->rights->digiriskdolibarr->level1->level2' if you want your menu with a permission rules
+			'perms'=>'$user->rights->digiriskdolibarr->adminpage->read',			                // Use 'perms'=>'$user->rights->digiriskdolibarr->level1->level2' if you want your menu with a permission rules
 			'target'=>'',
 			'user'=>0,				                // 0=Menu for internal users, 1=external users, 2=both
 		);
@@ -607,6 +675,21 @@ class modDigiriskdolibarr extends DolibarrModules
 			'position'=>48520+$r,
 			'enabled'=>'$conf->digiriskdolibarr->enabled && $user->admin',  // Define condition to show or hide menu entry. Use '$conf->digiriskdolibarr->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
 			'perms'=>'$user->admin',			                // Use 'perms'=>'$user->rights->digiriskdolibarr->level1->level2' if you want your menu with a permission rules
+			'target'=>'',
+			'user'=>0,				                // 0=Menu for internal users, 1=external users, 2=both
+		);
+
+		$this->menu[$r++]=array(
+			'fk_menu'=>'fk_mainmenu=ticket',	    // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
+			'type'=>'left',			                // This is a Left menu entry
+			'titre'=>$langs->trans('Tag/Category'),
+			'mainmenu'=>'ticket',
+			'leftmenu'=>'ticketcat',
+			'url'=>'../htdocs/categories/index.php?type=12',
+			'langs'=>'digiriskdolibarr@digiriskdolibarr',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
+			'position'=>48520+$r,
+			'enabled'=>'$conf->digiriskdolibarr->enabled',  // Define condition to show or hide menu entry. Use '$conf->digiriskdolibarr->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
+			'perms'=>'1',			                // Use 'perms'=>'$user->rights->digiriskdolibarr->level1->level2' if you want your menu with a permission rules
 			'target'=>'',
 			'user'=>0,				                // 0=Menu for internal users, 1=external users, 2=both
 		);
@@ -633,17 +716,20 @@ class modDigiriskdolibarr extends DolibarrModules
 		$this->_load_tables('/digiriskdolibarr/sql/digiriskdocuments/');
 		$this->_load_tables('/digiriskdolibarr/sql/digiriskelement/');
 		$this->_load_tables('/digiriskdolibarr/sql/riskanalysis/');
+		$this->_load_tables('/digiriskdolibarr/sql/preventionplan/');
+		$this->_load_tables('/digiriskdolibarr/sql/firepermit/');
 
 		if ( $conf->global->DIGIRISKDOLIBARR_DOCUMENT_MODELS_SET ==  0 ) {
-			addDocumentModel('informationssharing_odt'   ,'informationssharing'   ,'ODT templates','DIGIRISKDOLIBARR_INFORMATIONSSHARING_ADDON_ODT_PATH');
-			addDocumentModel('legaldisplay_odt'          ,'legaldisplay'          ,'ODT templates','DIGIRISKDOLIBARR_LEGALDISPLAY_ADDON_ODT_PATH');
-			addDocumentModel('firepermit_odt'            ,'firepermit'            ,'ODT templates','DIGIRISKDOLIBARR_FIREPERMIT_ADDON_ODT_PATH');
-			addDocumentModel('preventionplan_odt'        ,'preventionplan'        ,'ODT templates','DIGIRISKDOLIBARR_PREVENTIONPLAN_ADDON_ODT_PATH');
-			addDocumentModel('groupmentdocument_odt'     ,'groupmentdocument'     ,'ODT templates','DIGIRISKDOLIBARR_GROUPMENTDOCUMENT_ADDON_ODT_PATH');
-			addDocumentModel('workunitdocument_odt'      ,'workunitdocument'      ,'ODT templates','DIGIRISKDOLIBARR_WORKUNITDOCUMENT_ADDON_ODT_PATH');
-			addDocumentModel('listingrisksaction_odt'    ,'listingrisksaction'    ,'ODT templates','DIGIRISKDOLIBARR_LISTINGRISKSACTION_ADDON_ODT_PATH');
-			addDocumentModel('listingrisksphoto_odt'     ,'listingrisksphoto'     ,'ODT templates','DIGIRISKDOLIBARR_LISTINGRISKSPHOTO_ADDON_ODT_PATH');
-			addDocumentModel('riskassessmentdocument_odt','riskassessmentdocument','ODT templates','DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_ADDON_ODT_PATH');
+			addDocumentModel('informationssharing_odt'            ,'informationssharing'           ,'ODT templates','DIGIRISKDOLIBARR_INFORMATIONSSHARING_ADDON_ODT_PATH');
+			addDocumentModel('legaldisplay_odt'                   ,'legaldisplay'                  ,'ODT templates','DIGIRISKDOLIBARR_LEGALDISPLAY_ADDON_ODT_PATH');
+			addDocumentModel('firepermitdocument_odt'             ,'firepermitdocument'            ,'ODT templates','DIGIRISKDOLIBARR_FIREPERMITDOCUMENT_ADDON_ODT_PATH');
+			addDocumentModel('preventionplandocument_odt'         ,'preventionplandocument'        ,'ODT templates','DIGIRISKDOLIBARR_PREVENTIONPLANDOCUMENT_ADDON_ODT_PATH');
+			addDocumentModel('preventionplandocument_specimen_odt','preventionplandocumentspecimen','ODT templates','DIGIRISKDOLIBARR_PREVENTIONPLANDOCUMENT_SPECIMEN_ADDON_ODT_PATH');
+			addDocumentModel('groupmentdocument_odt'              ,'groupmentdocument'             ,'ODT templates','DIGIRISKDOLIBARR_GROUPMENTDOCUMENT_ADDON_ODT_PATH');
+			addDocumentModel('workunitdocument_odt'               ,'workunitdocument'              ,'ODT templates','DIGIRISKDOLIBARR_WORKUNITDOCUMENT_ADDON_ODT_PATH');
+			addDocumentModel('listingrisksaction_odt'             ,'listingrisksaction'            ,'ODT templates','DIGIRISKDOLIBARR_LISTINGRISKSACTION_ADDON_ODT_PATH');
+			addDocumentModel('listingrisksphoto_odt'              ,'listingrisksphoto'             ,'ODT templates','DIGIRISKDOLIBARR_LISTINGRISKSPHOTO_ADDON_ODT_PATH');
+			addDocumentModel('riskassessmentdocument_odt'         ,'riskassessmentdocument'        ,'ODT templates','DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_ADDON_ODT_PATH');
 
 			dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_DOCUMENT_MODELS_SET', 1, 'integer', 0, '', $conf->entity);
 		}
@@ -706,7 +792,10 @@ class modDigiriskdolibarr extends DolibarrModules
 		include_once DOL_DOCUMENT_ROOT.'/core/class/extrafields.class.php';
 		$extra_fields = new ExtraFields( $this->db );
 
-		$extra_fields->addExtraField( 'fk_risk', $langs->trans("fk_risk"), 'int', 1020, 10, 'projet_task', 0, 0, '', '', '', '', 1);
+		$extra_fields->addExtraField( 'fk_risk', $langs->trans("fk_risk"), 'sellist', 1020, '', 'projet_task', 0, 0, '', 'a:1:{s:7:"options";a:1:{s:25:"digiriskdolibarr_risk:ref";N;}}', '', '', 1);
+		if ($conf->global->MAIN_EXTRAFIELDS_USE_SELECT2 == 0) {
+			dolibarr_set_const($this->db, 'MAIN_EXTRAFIELDS_USE_SELECT2', 1, 'integer', 0, '', $conf->entity);
+		}
 
 		return $this->_init($sql, $options);
 
