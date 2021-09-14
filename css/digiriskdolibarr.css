@@ -415,7 +415,7 @@
 .wpeo-button.button-grey {
   background: #ececec;
   border-color: #ececec;
-  color: #333333;
+  color: #333333 !important;
 }
 
 .wpeo-button.button-grey:hover {
@@ -3475,4 +3475,8 @@ td > .risk-evaluation-container {
 
 .imgTabTitle {
   max-height: 32px !important;
+}
+
+.dropdown-toggle::after {
+	display:none;
 }

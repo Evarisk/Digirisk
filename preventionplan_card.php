@@ -1139,261 +1139,261 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 		print '</div>';
 
 		// PREVENTIONPLAN LINES
-		if ($object->status < 3) {
-			print '<div class="div-table-responsive-no-min" style="overflow-x: unset !important">' . "\n";
-			print load_fiche_titre($langs->trans("PreventionPlanRiskList"), '', '');
-			print '<table id="tablelines" class="noborder noshadow" width="100%">';
+		print '<div class="div-table-responsive-no-min" style="overflow-x: unset !important">';
+		print load_fiche_titre($langs->trans("PreventionPlanRiskList"), '', '');
+		print '<table id="tablelines" class="noborder noshadow" width="100%">';
 
-			global $forceall, $forcetoshowtitlelines;
+		global $forceall, $forcetoshowtitlelines;
 
-			if (empty($forceall)) $forceall = 0;
+		if (empty($forceall)) $forceall = 0;
 
-			// Define colspan for the button 'Add'
-			$colspan = 3;
+		// Define colspan for the button 'Add'
+		$colspan = 3;
 
-			// Lines
-			$objectlines = $objectline->fetchAll(GETPOST('id'));
+		// Lines
+		$objectlines = $objectline->fetchAll(GETPOST('id'));
 
-			print '<tr class="liste_titre">';
-			print '<td><span>' . $langs->trans('Ref.') . '</span></td>';
-			print '<td>' . $langs->trans('Location') . '</td>';
-			print '<td>' . $form->textwithpicto($langs->trans('ActionsDescription'), $langs->trans("ActionsDescriptionTooltip")) . '</td>';
-			print '<td class="center">' . $form->textwithpicto($langs->trans('INRSRisk'), $langs->trans('INRSRiskTooltip')) . '</td>';
-			print '<td>' . $form->textwithpicto($langs->trans('PreventionMethod'), $langs->trans('PreventionMethodTooltip')) . '</td>';
-			print '<td class="center" colspan="' . $colspan . '">'.$langs->trans('ActionsPreventionPlanRisk').'</td>';
-			print '</tr>';
+		print '<tr class="liste_titre">';
+		print '<td><span>' . $langs->trans('Ref.') . '</span></td>';
+		print '<td>' . $langs->trans('Location') . '</td>';
+		print '<td>' . $form->textwithpicto($langs->trans('ActionsDescription'), $langs->trans("ActionsDescriptionTooltip")) . '</td>';
+		print '<td class="center">' . $form->textwithpicto($langs->trans('INRSRisk'), $langs->trans('INRSRiskTooltip')) . '</td>';
+		print '<td>' . $form->textwithpicto($langs->trans('PreventionMethod'), $langs->trans('PreventionMethodTooltip')) . '</td>';
+		print '<td class="center" colspan="' . $colspan . '">'.$langs->trans('ActionsPreventionPlanRisk').'</td>';
+		print '</tr>';
 
-			if (!empty($objectlines) && $objectlines > 0) {
-				print '<tr>';
-				foreach ($objectlines as $key => $item) {
-					if ($action == 'editline' && $lineid == $key) {
+		if (!empty($objectlines) && $objectlines > 0) {
+			print '<tr>';
+			foreach ($objectlines as $key => $item) {
+				if ($action == 'editline' && $lineid == $key) {
 
-						print '<form method="POST" action="' . $_SERVER["PHP_SELF"] . '?id=' . $object->id . '">';
-						print '<input type="hidden" name="token" value="' . newToken() . '">';
-						print '<input type="hidden" name="action" value="updateLine">';
-						print '<input type="hidden" name="backtopage" value="' . $backtopage . '">';
-						print '<input type="hidden" name="lineid" value="' . $item->id . '">';
-						print '<input type="hidden" name="parent_id" value="' . $object->id . '">';
+					print '<form method="POST" action="' . $_SERVER["PHP_SELF"] . '?id=' . $object->id . '">';
+					print '<input type="hidden" name="token" value="' . newToken() . '">';
+					print '<input type="hidden" name="action" value="updateLine">';
+					print '<input type="hidden" name="backtopage" value="' . $backtopage . '">';
+					print '<input type="hidden" name="lineid" value="' . $item->id . '">';
+					print '<input type="hidden" name="parent_id" value="' . $object->id . '">';
 
-						print '<tr>';
-						print '<td>';
-						print $item->ref;
-						print '</td>';
+					print '<tr>';
+					print '<td>';
+					print $item->ref;
+					print '</td>';
 
-						print '<td>';
-						print $digiriskelement->select_digiriskelement_list($item->fk_element, 'fk_element', '', '', 0, 0, array(), '', 0, 0, 'minwidth100', GETPOST('id'), false, 1);
-						print '</td>';
+					print '<td>';
+					print $digiriskelement->select_digiriskelement_list($item->fk_element, 'fk_element', '', '', 0, 0, array(), '', 0, 0, 'minwidth100', GETPOST('id'), false, 1);
+					print '</td>';
 
-						$coldisplay++;
-						print '<td>';
-						print '<textarea name="actionsdescription" class="minwidth150" cols="50" rows="' . ROWS_2 . '">' . $item->description . '</textarea>' . "\n";
-						print '</td>';
+					$coldisplay++;
+					print '<td>';
+					print '<textarea name="actionsdescription" class="minwidth150" cols="50" rows="' . ROWS_2 . '">' . $item->description . '</textarea>' . "\n";
+					print '</td>';
 
-						$coldisplay++;
-						print '<td class="center">'; ?>
-						<div class="wpeo-dropdown dropdown-large dropdown-grid category-danger padding">
-							<div class="dropdown-toggle dropdown-add-button button-cotation">
-								<input class="input-hidden-danger" type="hidden" name="risk_category_id"
-									   value="<?php echo $item->category ?>"/>
-								<div class="wpeo-dropdown dropdown-large category-danger padding wpeo-tooltip-event"
-									 aria-label="<?php echo $risk->get_danger_category_name($item) ?>">
-									<img class="danger-category-pic hover"
-										 src="<?php echo DOL_URL_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $risk->get_danger_category($item) . '.png'; ?>"/>
-								</div>
-							</div>
-
-							<ul class="dropdown-content wpeo-gridlayout grid-5 grid-gap-0">
-								<?php
-								$dangerCategories = $risk->get_danger_categories();
-								if (!empty($dangerCategories)) :
-									foreach ($dangerCategories as $dangerCategory) : ?>
-										<li class="item dropdown-item wpeo-tooltip-event"
-											data-is-preset="<?php echo ''; ?>"
-											data-id="<?php echo $dangerCategory['position'] ?>"
-											aria-label="<?php echo $dangerCategory['name'] ?>">
-											<img src="<?php echo DOL_URL_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $dangerCategory['thumbnail_name'] . '.png' ?>" class="attachment-thumbail size-thumbnail photo photowithmargin" alt="">
-										</li>
-									<?php endforeach;
-								endif; ?>
-							</ul>
-						</div>
-						<?php
-						print '</td>';
-
-						$coldisplay++;
-						print '<td>';
-						print '<textarea name="preventionmethod" class="minwidth150" cols="50" rows="' . ROWS_2 . '">' . $item->prevention_method . '</textarea>' . "\n";
-						print '</td>';
-
-						$coldisplay += $colspan;
-						print '<td class="center" colspan="' . $colspan . '">';
-						print '<input type="submit" class="button" value="' . $langs->trans('Save') . '" name="updateLine" id="updateLine">';
-						print '</td>';
-						print '</tr>';
-
-						if (is_object($objectline)) {
-							print $objectline->showOptionals($extrafields, 'edit', array('style' => $bcnd[$var], 'colspan' => $coldisplay), '', '', 1);
-						}
-						print '</form>';
-					} else {
-						print '<tr>';
-						print '<td>';
-						print $item->ref;
-						print '</td>';
-
-						print '<td>';
-						$digiriskelement->fetch($item->fk_element);
-						print $digiriskelement->ref . " - " . $digiriskelement->label;
-						print '</td>';
-
-						$coldisplay++;
-						print '<td>';
-						print $item->description;
-						print '</td>';
-
-						$coldisplay++;
-						print '<td class="center">'; ?>
-						<div class="table-cell table-50 cell-risk" data-title="Risque">
+					$coldisplay++;
+					print '<td class="center">'; ?>
+					<div class="wpeo-dropdown dropdown-large dropdown-grid category-danger padding">
+						<div class="dropdown-toggle dropdown-add-button button-cotation">
+							<input class="input-hidden-danger" type="hidden" name="risk_category_id"
+								   value="<?php echo $item->category ?>"/>
 							<div class="wpeo-dropdown dropdown-large category-danger padding wpeo-tooltip-event"
 								 aria-label="<?php echo $risk->get_danger_category_name($item) ?>">
 								<img class="danger-category-pic hover"
-									 src="<?php echo DOL_URL_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $risk->get_danger_category($item) . '.png'; ?>" alt=""/>
+									 src="<?php echo DOL_URL_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $risk->get_danger_category($item) . '.png'; ?>"/>
 							</div>
 						</div>
-						<?php
-						print '</td>';
 
-						$coldisplay++;
-						print '<td>';
-						print $item->prevention_method;
-						print '</td>';
-
-						$coldisplay += $colspan;
-
-						//Actions buttons
-						if ($object->status == 1) {
-							print '<td class="center">';
-							$coldisplay++;
-							print '<a href="' . $_SERVER["PHP_SELF"] . '?id=' . $id . '&amp;action=editline&amp;lineid=' . $item->id . '" style="padding-right: 20px"><i class="fas fa-pencil-alt" style="color: #666"></i></a>';
-							print '<a href="' . $_SERVER["PHP_SELF"] . '?id=' . $id . '&amp;action=deleteline&amp;lineid=' . $item->id . '">';
-							print img_delete();
-							print '</a>';
-							print '</td>';
-						} else {
-							print '<td class="center">';
-							print '-';
-							print '</td>';
-						}
-
-						if (is_object($objectline)) {
-							print $objectline->showOptionals($extrafields, 'edit', array('style' => $bcnd[$var], 'colspan' => $coldisplay), '', '', 1);
-						}
-						print '</tr>';
-					}
-				}
-				print '</tr>';
-			}
-
-			if ($object->status == 1) {
-				print '<form method="POST" action="' . $_SERVER["PHP_SELF"] . '?id=' . $object->id . '">';
-				print '<input type="hidden" name="token" value="' . newToken() . '">';
-				print '<input type="hidden" name="action" value="addLine">';
-				print '<input type="hidden" name="backtopage" value="' . $backtopage . '">';
-				print '<input type="hidden" name="parent_id" value="' . $object->id . '">';
-
-				print '<tr>';
-				print '<td>';
-				print $refPreventionPlanDetMod->getNextValue($objectline);
-				print '</td>';
-				print '<td>';
-				print $digiriskelement->select_digiriskelement_list('', 'fk_element', '', '1', 0, 0, array(), '', 0, 0, 'minwidth100', '', false, 1);
-				print '</td>';
-
-				$coldisplay++;
-				print '<td>';
-				print '<textarea name="actionsdescription" class="minwidth150" cols="50" rows="' . ROWS_2 . '">' . ('') . '</textarea>' . "\n";
-				print '</td>';
-
-				$coldisplay++;
-				print '<td class="center">'; ?>
-				<div class="wpeo-dropdown dropdown-large dropdown-grid category-danger padding">
-					<input class="input-hidden-danger" type="hidden" name="risk_category_id" value="undefined"/>
-					<div class="dropdown-toggle dropdown-add-button button-cotation">
-						<span class="wpeo-button button-square-50 button-grey"><i
-							class="fas fa-exclamation-triangle button-icon"></i><i
-							class="fas fa-plus-circle button-add"></i></span>
-						<img class="danger-category-pic wpeo-tooltip-event hidden" src="" aria-label=""/>
+						<ul class="dropdown-content wpeo-gridlayout grid-5 grid-gap-0">
+							<?php
+							$dangerCategories = $risk->get_danger_categories();
+							if (!empty($dangerCategories)) :
+								foreach ($dangerCategories as $dangerCategory) : ?>
+									<li class="item dropdown-item wpeo-tooltip-event"
+										data-is-preset="<?php echo ''; ?>"
+										data-id="<?php echo $dangerCategory['position'] ?>"
+										aria-label="<?php echo $dangerCategory['name'] ?>">
+										<img
+											src="<?php echo DOL_URL_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $dangerCategory['thumbnail_name'] . '.png' ?>"
+											class="attachment-thumbail size-thumbnail photo photowithmargin" alt="">
+									</li>
+								<?php endforeach;
+							endif; ?>
+						</ul>
 					</div>
-					<ul class="dropdown-content wpeo-gridlayout grid-5 grid-gap-0">
-						<?php
-						$dangerCategories = $risk->get_danger_categories();
-						if (!empty($dangerCategories)) :
-							foreach ($dangerCategories as $dangerCategory) : ?>
-								<li class="item dropdown-item wpeo-tooltip-event" data-is-preset="<?php echo ''; ?>"
-									data-id="<?php echo $dangerCategory['position'] ?>"
-									aria-label="<?php echo $dangerCategory['name'] ?>">
-									<img
-										src="<?php echo DOL_URL_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $dangerCategory['thumbnail_name'] . '.png' ?>"
-										class="attachment-thumbail size-thumbnail photo photowithmargin" alt="">
-								</li>
-							<?php endforeach;
-						endif; ?>
-					</ul>
-				</div>
-				<?php
-				print '</td>';
+					<?php
+					print '</td>';
 
-				$coldisplay++;
-				print '<td>';
-				print '<textarea name="preventionmethod" class="minwidth150" cols="50" rows="' . ROWS_2 . '">' . ('') . '</textarea>' . "\n";
-				print '</td>';
+					$coldisplay++;
+					print '<td>';
+					print '<textarea name="preventionmethod" class="minwidth150" cols="50" rows="' . ROWS_2 . '">' . $item->prevention_method . '</textarea>' . "\n";
+					print '</td>';
 
-				$coldisplay += $colspan;
-				print '<td class="center" colspan="' . $colspan . '">';
-				print '<input type="submit" class="button" value="' . $langs->trans('Add') . '" name="addline" id="addline">';
-				print '</td>';
-				print '</tr>';
+					$coldisplay += $colspan;
+					print '<td class="center" colspan="' . $colspan . '">';
+					print '<input type="submit" class="button" value="' . $langs->trans('Save') . '" name="updateLine" id="updateLine">';
+					print '</td>';
+					print '</tr>';
 
-				if (is_object($objectline)) {
-					print $objectline->showOptionals($extrafields, 'edit', array('style' => $bcnd[$var], 'colspan' => $coldisplay), '', '', 1);
+					if (is_object($objectline)) {
+						print $objectline->showOptionals($extrafields, 'edit', array('style' => $bcnd[$var], 'colspan' => $coldisplay), '', '', 1);
+					}
+					print '</form>';
+				} else {
+					print '<tr>';
+					print '<td>';
+					print $item->ref;
+					print '</td>';
+
+					print '<td>';
+					$digiriskelement->fetch($item->fk_element);
+					print $digiriskelement->ref . " - " . $digiriskelement->label;
+					print '</td>';
+
+					$coldisplay++;
+					print '<td>';
+					print $item->description;
+					print '</td>';
+
+					$coldisplay++;
+					print '<td class="center">'; ?>
+					<div class="table-cell table-50 cell-risk" data-title="Risque">
+						<div class="wpeo-dropdown dropdown-large category-danger padding wpeo-tooltip-event"
+							 aria-label="<?php echo $risk->get_danger_category_name($item) ?>">
+							<img class="danger-category-pic hover"
+								 src="<?php echo DOL_URL_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $risk->get_danger_category($item) . '.png'; ?>"
+								 alt=""/>
+						</div>
+					</div>
+					<?php
+					print '</td>';
+
+					$coldisplay++;
+					print '<td>';
+					print $item->prevention_method;
+					print '</td>';
+
+					$coldisplay += $colspan;
+
+					//Actions buttons
+					if ($object->status == 1) {
+						print '<td class="center">';
+						$coldisplay++;
+						print '<a href="' . $_SERVER["PHP_SELF"] . '?id=' . $id . '&amp;action=editline&amp;lineid=' . $item->id . '" style="padding-right: 20px"><i class="fas fa-pencil-alt" style="color: #666"></i></a>';
+						print '<a href="' . $_SERVER["PHP_SELF"] . '?id=' . $id . '&amp;action=deleteline&amp;lineid=' . $item->id . '">';
+						print img_delete();
+						print '</a>';
+						print '</td>';
+					} else {
+						print '<td class="center">';
+						print '-';
+						print '</td>';
+					}
+
+					if (is_object($objectline)) {
+						print $objectline->showOptionals($extrafields, 'edit', array('style' => $bcnd[$var], 'colspan' => $coldisplay), '', '', 1);
+					}
+					print '</tr>';
 				}
+			}
+			print '</tr>';
+		}
+		if ($object->status == 1) {
+			print '<form method="POST" action="' . $_SERVER["PHP_SELF"] . '?id=' . $object->id . '">';
+			print '<input type="hidden" name="token" value="' . newToken() . '">';
+			print '<input type="hidden" name="action" value="addLine">';
+			print '<input type="hidden" name="backtopage" value="' . $backtopage . '">';
+			print '<input type="hidden" name="parent_id" value="' . $object->id . '">';
+
+			print '<tr>';
+			print '<td>';
+			print $refPreventionPlanDetMod->getNextValue($objectline);
+			print '</td>';
+			print '<td>';
+			print $digiriskelement->select_digiriskelement_list('', 'fk_element', '', '1', 0, 0, array(), '', 0, 0, 'minwidth100', '', false, 1);
+			print '</td>';
+
+			$coldisplay++;
+			print '<td>';
+			print '<textarea name="actionsdescription" class="minwidth150" cols="50" rows="' . ROWS_2 . '">' . ('') . '</textarea>' . "\n";
+			print '</td>';
+
+			$coldisplay++;
+			print '<td class="center">'; ?>
+			<div class="wpeo-dropdown dropdown-large dropdown-grid category-danger padding">
+				<input class="input-hidden-danger" type="hidden" name="risk_category_id" value="undefined"/>
+				<div class="dropdown-toggle dropdown-add-button button-cotation">
+					<span class="wpeo-button button-square-50 button-grey"><i
+						class="fas fa-exclamation-triangle button-icon"></i><i
+						class="fas fa-plus-circle button-add"></i></span>
+					<img class="danger-category-pic wpeo-tooltip-event hidden" src="" aria-label=""/>
+				</div>
+				<ul class="dropdown-content wpeo-gridlayout grid-5 grid-gap-0">
+					<?php
+					$dangerCategories = $risk->get_danger_categories();
+					if (!empty($dangerCategories)) :
+						foreach ($dangerCategories as $dangerCategory) : ?>
+							<li class="item dropdown-item wpeo-tooltip-event" data-is-preset="<?php echo ''; ?>"
+								data-id="<?php echo $dangerCategory['position'] ?>"
+								aria-label="<?php echo $dangerCategory['name'] ?>">
+								<img
+									src="<?php echo DOL_URL_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $dangerCategory['thumbnail_name'] . '.png' ?>"
+									class="attachment-thumbail size-thumbnail photo photowithmargin" alt="">
+							</li>
+						<?php endforeach;
+					endif; ?>
+				</ul>
+			</div>
+			<?php
+			print '</td>';
+
+			$coldisplay++;
+			print '<td>';
+			print '<textarea name="preventionmethod" class="minwidth150" cols="50" rows="' . ROWS_2 . '">' . ('') . '</textarea>' . "\n";
+			print '</td>';
+
+			$coldisplay += $colspan;
+			print '<td class="center" colspan="' . $colspan . '">';
+			print '<input type="submit" class="button" value="' . $langs->trans('Add') . '" name="addline" id="addline">';
+			print '</td>';
+			print '</tr>';
+
+			if (is_object($objectline)) {
+				print $objectline->showOptionals($extrafields, 'edit', array('style' => $bcnd[$var], 'colspan' => $coldisplay), '', '', 1);
 			}
 			print '</form>';
-			print '</table>';
-			print '</div>';
 		}
-		// Document Generation -- Génération des documents
-		$includedocgeneration = 1;
-		if ($includedocgeneration) {
-			print '<div class=""><div class="preventionplanDocument fichehalfleft">';
-
-			$objref    = dol_sanitizeFileName($object->ref);
-			$dir_files = $preventionplandocument->element . '/' . $objref;
-			$filedir   = $upload_dir . '/' . $dir_files;
-			$urlsource = $_SERVER["PHP_SELF"] . '?id='. $id;
-
-			$modulepart   = 'digiriskdolibarr:PreventionPlanDocument';
-			$defaultmodel = $conf->global->DIGIRISKDOLIBARR_PREVENTIONPLANDOCUMENT_DEFAULT_MODEL;
-			$title        = $langs->trans('PreventionPlanDocument');
-
-			print digiriskshowdocuments($modulepart, $dir_files, $filedir, $urlsource, $permissiontoadd, $permissiontodelete, $defaultmodel, 1, 0, 28, 0, '', $title, '', $langs->defaultlang, '', $preventionplandocument, 0, 'remove_file', $object->status == 3, $langs->trans('PreventionPlanMustBeLocked') );
-		}
-
-		print '</div><div class="fichehalfright">';
-
-		$MAXEVENT = 10;
-
-		$morehtmlright = '<a href="' . dol_buildpath('/digiriskdolibarr/preventionplan_agenda.php', 1) . '?id=' . $object->id . '">';
-		$morehtmlright .= $langs->trans("SeeAll");
-		$morehtmlright .= '</a>';
-
-		// List of actions on element
-		include_once DOL_DOCUMENT_ROOT . '/core/class/html.formactions.class.php';
-		$formactions = new FormActions($db);
-		$somethingshown = $formactions->showactions($object, $object->element . '@digiriskdolibarr', (is_object($object->thirdparty) ? $object->thirdparty->id : 0), 1, '', $MAXEVENT, '', $morehtmlright);
-
-		print '</div></div></div>';
+		print '</table>';
+		print '</div>';
 	}
+	// Document Generation -- Génération des documents
+	$includedocgeneration = 1;
+	if ($includedocgeneration) {
+		print '<div class=""><div class="preventionplanDocument fichehalfleft">';
+
+		$objref    = dol_sanitizeFileName($object->ref);
+		$dir_files = $preventionplandocument->element . '/' . $objref;
+		$filedir   = $upload_dir . '/' . $dir_files;
+		$urlsource = $_SERVER["PHP_SELF"] . '?id='. $id;
+
+		$modulepart   = 'digiriskdolibarr:PreventionPlanDocument';
+		$defaultmodel = $conf->global->DIGIRISKDOLIBARR_PREVENTIONPLANDOCUMENT_DEFAULT_MODEL;
+		$title        = $langs->trans('PreventionPlanDocument');
+
+		print digiriskshowdocuments($modulepart, $dir_files, $filedir, $urlsource, $permissiontoadd, $permissiontodelete, $defaultmodel, 1, 0, 28, 0, '', $title, '', $langs->defaultlang, '', $preventionplandocument, 0, 'remove_file', $object->status == 3, $langs->trans('PreventionPlanMustBeLocked') );
+	}
+
+	print '</div><div class="fichehalfright">';
+
+	$MAXEVENT = 10;
+
+	$morehtmlright = '<a href="' . dol_buildpath('/digiriskdolibarr/preventionplan_agenda.php', 1) . '?id=' . $object->id . '">';
+	$morehtmlright .= $langs->trans("SeeAll");
+	$morehtmlright .= '</a>';
+
+	// List of actions on element
+	include_once DOL_DOCUMENT_ROOT . '/core/class/html.formactions.class.php';
+	$formactions = new FormActions($db);
+	$somethingshown = $formactions->showactions($object, $object->element . '@digiriskdolibarr', (is_object($object->thirdparty) ? $object->thirdparty->id : 0), 1, '', $MAXEVENT, '', $morehtmlright);
+
+	print '</div></div></div>';
 }
 
 // End of page
