@@ -844,10 +844,10 @@ function digirisk_banner_tab($object, $paramid, $morehtml = '', $shownav = 1, $f
 
 /**
 *  Return a link to the user card (with optionaly the picto)
-* 	Use this->id,this->lastname, this->firstname
+*  Use this->id,this->lastname, this->firstname
 *
-*	@param	int		$withpictoimg				Include picto in link (0=No picto, 1=Include picto into link, 2=Only picto, -1=Include photo into link, -2=Only picto photo, -3=Only photo very small)
-*	@param	string	$option						On what the link point to ('leave', 'nolink', )
+*  @param	int		$withpictoimg				Include picto in link (0=No picto, 1=Include picto into link, 2=Only picto, -1=Include photo into link, -2=Only picto photo, -3=Only photo very small)
+*  @param	string	$option						On what the link point to ('leave', 'nolink', )
 *  @param  integer $infologin      			0=Add default info tooltip, 1=Add complete info tooltip, -1=No info tooltip
 *  @param	integer	$notooltip					1=Disable tooltip on picto and name
 *  @param	int		$maxlen						Max length of visible user name
@@ -855,7 +855,7 @@ function digirisk_banner_tab($object, $paramid, $morehtml = '', $shownav = 1, $f
 *  @param  string  $mode               		''=Show firstname and lastname, 'firstname'=Show only firstname, 'firstelselast'=Show firstname or lastname if not defined, 'login'=Show login
 *  @param  string  $morecss            		Add more css on link
 *  @param  int     $save_lastsearch_value    	-1=Auto, 0=No save of lastsearch_values when clicking, 1=Save lastsearch_values whenclicking
-*	@return	string								String with URL
+*  @return	string								String with URL
 */
 function getNomUrl($withpictoimg = 0, $option = '', $infologin = 0, $notooltip = 0, $maxlen = 24, $hidethirdpartylogo = 0, $mode = '', $morecss = '', $save_lastsearch_value = -1, $object)
 {
@@ -1059,18 +1059,18 @@ function show_category_image($object, $upload_dir) {
 }
 
 /**
- * Show header for public page signature
- *
- * @param  string $title       Title
- * @param  string $head        Head array
- * @param  int    $disablejs   More content into html header
- * @param  int    $disablehead More content into html header
- * @param  array  $arrayofjs   Array of complementary js files
- * @param  array  $arrayofcss  Array of complementary css files
- * @return void
- */
+* Show header for public page signature
+*
+* @param  string $title       Title
+* @param  string $head        Head array
+* @param  int    $disablejs   More content into html header
+* @param  int    $disablehead More content into html header
+* @param string $arrayofjs Array of complementary js files
+* @param string $arrayofcss Array of complementary css files
+* @return void
+*/
 function llxHeaderSignature($title, $head = "", $disablejs = 0, $disablehead = 0, $arrayofjs = '', $arrayofcss = '') {
-	global $conf, $langs, $mysoc;
+	global $conf, $mysoc;
 
 	top_htmlhead($head, $title, $disablejs, $disablehead, $arrayofjs, $arrayofcss, 0, 1); // Show html headers
 
@@ -1098,7 +1098,6 @@ function llxHeaderSignature($title, $head = "", $disablejs = 0, $disablehead = 0
 /**
  * Return string with full Url. The file qualified is the one defined by relative path in $object->last_main_doc
  *
- * @param   Object	$object				Object
  * @return	string						Url string
  */
 function showDirectPublicLinkSignature() {
