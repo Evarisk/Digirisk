@@ -165,11 +165,11 @@ class DigiriskDocuments extends CommonObject
 		$this->element = $this->element . '@digiriskdolibarr';
 		return $this->createCommon($user, $notrigger);
 	}
-
 	/**
-	 * Create object into database
+	 * Function for JSON filling before saving in database
 	 *
-	 * @param  DigiriskDocuments $object  DigiriskDocuments object
+	 * @param $object
+	 * @return false|string
 	 */
 	public function DigiriskFillJSON($object) {
 		switch ($object->element) {
@@ -302,7 +302,7 @@ class DigiriskDocuments extends CommonObject
 	}
 
 	/**
-	 *	Load the info information in the object
+	 *	Load the info information of the object
 	 *
 	 *	@param  int		$id       Id of object
 	 *	@return	void

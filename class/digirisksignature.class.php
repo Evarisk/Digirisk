@@ -25,8 +25,6 @@
 // Put here all includes required by your class file
 require_once DOL_DOCUMENT_ROOT.'/core/class/commonobject.class.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/ticket.lib.php';
-//require_once DOL_DOCUMENT_ROOT . '/societe/class/societe.class.php';
-//require_once DOL_DOCUMENT_ROOT . '/product/class/product.class.php';
 
 /**
  * Class for DigiriskSignature
@@ -298,7 +296,7 @@ class DigiriskSignature extends CommonObject
 	}
 
 	/**
-	 *	Set signed status
+	 *	Set registered status
 	 *
 	 *	@param	User	$user			Object user that modify
 	 *  @param	int		$notrigger		1=Does not execute triggers, 0=Execute triggers
@@ -310,19 +308,19 @@ class DigiriskSignature extends CommonObject
 	}
 
 	/**
-	 *	Set signed status
+	 *	Set pending status
 	 *
 	 *	@param	User	$user			Object user that modify
 	 *  @param	int		$notrigger		1=Does not execute triggers, 0=Execute triggers
 	 *	@return	int						<0 if KO, >0 if OK
 	 */
-	public function setPendingSignature($user, $notrigger = 0)
+	public function setPending($user, $notrigger = 0)
 	{
 		return $this->setStatusCommon($user, self::STATUS_PENDING_SIGNATURE, $notrigger, 'DIGIRISKSIGNATURE_PENDING_SIGNATURE');
 	}
 
 	/**
-	 *	Set draft status
+	 *	Set signed status
 	 *
 	 *	@param	User	$user			Object user that modify
 	 *  @param	int		$notrigger		1=Does not execute triggers, 0=Execute triggers
@@ -368,7 +366,6 @@ class DigiriskSignature extends CommonObject
 		return $this->LibStatut($this->status, $mode);
 	}
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 	/**
 	 *  Return the status
 	 *
@@ -378,12 +375,9 @@ class DigiriskSignature extends CommonObject
 	 */
 	public function LibStatut($status, $mode = 0)
 	{
-
-		// phpcs:enable
 		if (empty($this->labelStatus) || empty($this->labelStatusShort))
 		{
 			global $langs;
-			//$langs->load("digiriskdolibarr@digiriskdolibarr");
 			$this->labelStatus[self::STATUS_DELETED] = $langs->transnoentities('Deleted');
 			$this->labelStatus[self::STATUS_REGISTERED] = $langs->transnoentities('Registered');
 			$this->labelStatus[self::STATUS_SIGNATURE_REQUEST] = $langs->transnoentities('SignatureRequest');
@@ -405,11 +399,12 @@ class DigiriskSignature extends CommonObject
 	/**
 	 * Create signatory in database
 	 *
-	 * @param int     $fk_object    ID of object linked
-	 * @param string  $element_type Type of resource
-	 * @param array     $element_ids   Id of resource
-	 * @param string  $role         Role of resource
-	 * @param string  $noupdate     Update previous signatories
+	 * @param int $fk_object ID of object linked
+	 * @param string $element_type Type of resource
+	 * @param array $element_ids Id of resource
+	 * @param string $role Role of resource
+	 * @param int $noupdate Update previous signatories
+	 * @return int
 	 */
 	function setSignatory($fk_object, $element_type, $element_ids, $role = "", $noupdate = 0)
 	{
@@ -480,8 +475,9 @@ class DigiriskSignature extends CommonObject
 	/**
 	 * Fetch signatory from database
 	 *
-	 * @param varchar $role      Role of resource
-	 * @param int     $fk_object ID of object linked
+	 * @param string $role Role of resource
+	 * @param int $fk_object ID of object linked
+	 * @return array|int
 	 */
 	function fetchSignatory($role = "", $fk_object)
 	{
@@ -502,11 +498,24 @@ class DigiriskSignature extends CommonObject
 		}
 	}
 
+	/**
+	 * Fetch signatories in database with parent ID
+	 *
+	 * @param $fk_object
+	 * @param string $morefilter
+	 * @return int
+	 */
 	public function fetchSignatories($fk_object, $morefilter = '1 = 1') {
 		$signatories = $this->fetchAll('','', 0, 0, array('fk_object' => $fk_object, 'customsql' => $morefilter),'AND');
 		return $signatories;
 	}
 
+	/**
+	 * Check if signatories signed
+	 *
+	 * @param $fk_object
+	 * @return int
+	 */
 	public function checkSignatoriesSignatures($fk_object) {
 		$morefilter = 'status != 0';
 		$signatories = $this->fetchSignatories($fk_object, $morefilter);
@@ -523,6 +532,12 @@ class DigiriskSignature extends CommonObject
 		}
 	}
 
+	/**
+	 * Delete signatories signatures
+	 *
+	 * @param $fk_object
+	 * @return int
+	 */
 	public function deleteSignatoriesSignatures($fk_object) {
 		global $user;
 
@@ -544,8 +559,8 @@ class DigiriskSignature extends CommonObject
 	/**
 	 * Set previous signatories status to 0
 	 *
-	 * @param varchar $role      Role of resource
-	 * @param int     $fk_object ID of object linked
+	 * @param string $role Role of resource
+	 * @param int $fk_object ID of object linked
 	 */
 	function deletePreviousSignatories($role = "", $fk_object)
 	{

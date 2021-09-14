@@ -293,13 +293,14 @@ class PreventionPlan extends CommonObject
 	/**
 	 * Load list of objects in memory from the database.
 	 *
-	 * @param  string      $sortorder    Sort Order
-	 * @param  string      $sortfield    Sort field
-	 * @param  int         $limit        limit
-	 * @param  int         $offset       Offset
-	 * @param  array       $filter       Filter array. Example array('field'=>'valueforlike', 'customurl'=>...)
-	 * @param  string      $filtermode   Filter mode (AND or OR)
+	 * @param string $sortorder Sort Order
+	 * @param string $sortfield Sort field
+	 * @param int $limit limit
+	 * @param int $offset Offset
+	 * @param array $filter Filter array. Example array('field'=>'valueforlike', 'customurl'=>...)
+	 * @param string $filtermode Filter mode (AND or OR)
 	 * @return array|int                 int <0 if KO, array of pages if OK
+	 * @throws Exception
 	 */
 	public function fetchAll($sortorder = '', $sortfield = '', $limit = 0, $offset = 0, array $filter = array(), $filtermode = 'AND')
 	{
@@ -504,7 +505,6 @@ class PreventionPlan extends CommonObject
 		return $this->LibStatut($this->status, $mode);
 	}
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 	/**
 	 *  Return the status
 	 *
@@ -573,7 +573,6 @@ class PreventionPlan extends CommonObject
 
 		$label .= '<div class="centpercent">';
 
-
 		// By default
 		if (empty($linkstart))
 		{
@@ -613,29 +612,29 @@ class PreventionPlan extends CommonObject
 
 		return $result;
 	}
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
 	/**
 	 *  Output html form to select a third party.
 	 *  Note, you must use the select_company to get the component to select a third party. This function must only be called by select_company.
 	 *
-	 *	@param	string	$selected       Preselected type
-	 *	@param  string	$htmlname       Name of field in form
-	 *  @param  string	$filter         Optional filters criteras (example: 's.rowid <> x', 's.client in (1,3)')
-	 *	@param	string	$showempty		Add an empty field (Can be '1' or text to use on empty line like 'SelectThirdParty')
-	 * 	@param	int		$showtype		Show third party type in combolist (customer, prospect or supplier)
-	 * 	@param	int		$forcecombo		Force to use standard HTML select component without beautification
-	 *  @param	array	$events			Event options. Example: array(array('method'=>'getContacts', 'url'=>dol_buildpath('/core/ajax/contacts.php',1), 'htmlname'=>'contactid', 'params'=>array('add-customer-contact'=>'disabled')))
-	 *  @param	string	$filterkey		Filter on key value
-	 *  @param	int		$outputmode		0=HTML select string, 1=Array
-	 *  @param	int		$limit			Limit number of answers
-	 *  @param	string	$morecss		Add more css styles to the SELECT component
-	 *	@param  string	$moreparam      Add more parameters onto the select tag. For example 'style="width: 95%"' to avoid select2 component to go over parent container
-	 *	@param  bool	$multiple       add [] in the name of element and add 'multiple' attribut
-	 * 	@return	string					HTML string with
+	 * @param string $selected Preselected type
+	 * @param string $htmlname Name of field in form
+	 * @param string $filter Optional filters criteras (example: 's.rowid <> x', 's.client in (1,3)')
+	 * @param string $showempty Add an empty field (Can be '1' or text to use on empty line like 'SelectThirdParty')
+	 * @param int $showtype Show third party type in combolist (customer, prospect or supplier)
+	 * @param int $forcecombo Force to use standard HTML select component without beautification
+	 * @param array $events Event options. Example: array(array('method'=>'getContacts', 'url'=>dol_buildpath('/core/ajax/contacts.php',1), 'htmlname'=>'contactid', 'params'=>array('add-customer-contact'=>'disabled')))
+	 * @param string $filterkey Filter on key value
+	 * @param int $outputmode 0=HTML select string, 1=Array
+	 * @param int $limit Limit number of answers
+	 * @param string $morecss Add more css styles to the SELECT component
+	 * @param string $moreparam Add more parameters onto the select tag. For example 'style="width: 95%"' to avoid select2 component to go over parent container
+	 * @param bool $multiple add [] in the name of element and add 'multiple' attribut
+	 * @return    string                    HTML string with
+	 * @throws Exception
 	 */
 	public function select_preventionplan_list($selected = '', $htmlname = 'fk_preventionplan', $filter = '', $showempty = '1', $showtype = 0, $forcecombo = 0, $events = array(), $filterkey = '', $outputmode = 0, $limit = 0, $morecss = 'minwidth100', $moreparam = '', $multiple = false)
 	{
-		// phpcs:enable
 		global $conf, $user, $langs;
 
 		$out = '';
@@ -809,10 +808,11 @@ class PreventionPlanLine extends CommonObjectLine
 	}
 
 	/**
-	 *	Load preventionplan line line from database
+	 *    Load preventionplan line line from database
 	 *
-	 *	@param	int		$rowid      id of preventionplan line line to get
-	 *	@return	array					<0 if KO, >0 if OK
+	 * @param int $parent_id
+	 * @param int $limit
+	 * @return int <0 if KO, >0 if OK
 	 */
 	public function fetchAll($parent_id = 0, $limit = 0)
 	{
@@ -926,11 +926,12 @@ class PreventionPlanLine extends CommonObjectLine
 	}
 
 	/**
-	 *	Update line into database
+	 *    Update line into database
 	 *
-	 *	@param		User	$user		User object
-	 *	@param		int		$notrigger	Disable triggers
-	 *	@return		int					<0 if KO, >0 if OK
+	 * @param User $user User object
+	 * @param int $notrigger Disable triggers
+	 * @return        int                    <0 if KO, >0 if OK
+	 * @throws Exception
 	 */
 	public function update(User $user, $notrigger = false)
 	{
@@ -978,9 +979,10 @@ class PreventionPlanLine extends CommonObjectLine
 	}
 
 	/**
-	 * 	Delete line in database
+	 *    Delete line in database
 	 *
-	 *	@return	    int		           <0 if KO, >0 if OK
+	 * @return        int                   <0 if KO, >0 if OK
+	 * @throws Exception
 	 */
 	public function delete(User $user, $notrigger = false)
 	{
@@ -1064,13 +1066,14 @@ class PreventionPlanSignature extends DigiriskSignature
 	/**
 	 * Load list of objects in memory from the database.
 	 *
-	 * @param  string      $sortorder    Sort Order
-	 * @param  string      $sortfield    Sort field
-	 * @param  int         $limit        limit
-	 * @param  int         $offset       Offset
-	 * @param  array       $filter       Filter array. Example array('field'=>'valueforlike', 'customurl'=>...)
-	 * @param  string      $filtermode   Filter mode (AND or OR)
+	 * @param string $sortorder Sort Order
+	 * @param string $sortfield Sort field
+	 * @param int $limit limit
+	 * @param int $offset Offset
+	 * @param array $filter Filter array. Example array('field'=>'valueforlike', 'customurl'=>...)
+	 * @param string $filtermode Filter mode (AND or OR)
 	 * @return array|int                 int <0 if KO, array of pages if OK
+	 * @throws Exception
 	 */
 	public function fetchAll($sortorder = '', $sortfield = '', $limit = 0, $offset = 0, array $filter = array(), $filtermode = 'AND')
 	{

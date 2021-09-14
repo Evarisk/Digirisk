@@ -95,6 +95,12 @@ class PreventionPlanDocument extends DigiriskDocuments
 		}
 	}
 
+	/**
+	 * Function for JSON filling before saving in database
+	 *
+	 * @param $object
+	 * @return false|string
+	 */
 	public function PreventionPlanDocumentFillJSON($object) {
 
 		$contacttmp        = new Contact($this->db);

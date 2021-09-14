@@ -129,7 +129,7 @@ class DigiriskResources extends CommonObject
 	}
 
 	/**
-	 * Clone an object into another one
+	 * Set resources in database
 	 *
 	 * @param $db
 	 * @param $user_creat
@@ -141,8 +141,9 @@ class DigiriskResources extends CommonObject
 	 * @param int $object_id
 	 * @param int $noupdate
 	 * @return int
+	 * @throws Exception
 	 */
-	function digirisk_dolibarr_set_resources($db, $user_creat, $ref, $element_type, $element_id, $entity = 1, $object_type = '', $object_id = 0, $noupdate = 0)
+	public function digirisk_dolibarr_set_resources($db, $user_creat, $ref, $element_type, $element_id, $entity = 1, $object_type = '', $object_id = 0, $noupdate = 0)
 	{
 		global $conf;
 		$now = dol_now();
@@ -205,7 +206,14 @@ class DigiriskResources extends CommonObject
 		}
 
 	}
-	public function digirisk_dolibarr_fetch_resource($ref )
+
+	/**
+	 * Fetch resource in database
+	 *
+	 * @param string $ref name of resource
+	 * @return int
+	 */
+	public function digirisk_dolibarr_fetch_resource($ref)
 	{
 		global $langs;
 		$allLinks = $this->digirisk_dolibarr_fetch_resources();
@@ -217,6 +225,13 @@ class DigiriskResources extends CommonObject
 		return $langs->trans('NoLabourInspectorAssigned');
 	}
 
+	/**
+	 * Fetch resources in database with parent object
+	 *
+	 * @param string $ref name of resource
+	 * @param $object
+	 * @return int
+	 */
 	public function fetchResourcesFromObject($ref, $object )
 	{
 
@@ -302,6 +317,11 @@ class DigiriskResources extends CommonObject
 		}
 	}
 
+	/**
+	 * Fetch all resources in database
+	 *
+	 * @return array
+	 */
 	public function digirisk_dolibarr_fetch_resources()
 	{
 		$resources = new DigiriskResources($this->db);
@@ -347,6 +367,7 @@ class DigiriskResources extends CommonObject
 	 * @param array $filter Filter array. Example array('field'=>'valueforlike', 'customurl'=>...)
 	 * @param string $filtermode Filter mode (AND or OR)
 	 * @return array|int                 int <0 if KO, array of pages if OK
+	 * @throws Exception
 	 */
 	public function fetchAll($sortorder = '', $sortfield = '', $limit = 0, $offset = 0, array $filter = array(), $filtermode = 'AND')
 	{

@@ -94,6 +94,12 @@ class FirePermitDocument extends DigiriskDocuments
 		}
 	}
 
+	/**
+	 * Function for JSON filling before saving in database
+	 *
+	 * @param $object
+	 * @return false|string
+	 */
 	public function FirePermitDocumentFillJSON($object) {
 
 		$contacttmp        = new Contact($this->db);

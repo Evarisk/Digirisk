@@ -236,10 +236,9 @@ class DigiriskElement extends CommonObject
 	}
 
 	/**
-	 * Load object in memory from the database
+	 * Load ordered flat list of DigiriskElement in memory from the database
 	 *
-	 * @param int        $parent_id   Id parent object
-	 * @param boolean    $recursive   Recursive Mode
+	 * @param int $parent_id Id parent object
 	 * @return int         <0 if KO, 0 if not found, >0 if OK
 	 */
 	public function fetchDigiriskElementFlat($parent_id)
@@ -351,25 +350,25 @@ class DigiriskElement extends CommonObject
 		}
 	}
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 	/**
 	 *  Output html form to select a third party.
 	 *  Note, you must use the select_company to get the component to select a third party. This function must only be called by select_company.
 	 *
-	 *	@param	string	$selected       Preselected type
-	 *	@param  string	$htmlname       Name of field in form
-	 *  @param  string	$filter         Optional filters criteras (example: 's.rowid <> x', 's.client in (1,3)')
-	 *	@param	string	$showempty		Add an empty field (Can be '1' or text to use on empty line like 'SelectThirdParty')
-	 * 	@param	int		$showtype		Show third party type in combolist (customer, prospect or supplier)
-	 * 	@param	int		$forcecombo		Force to use standard HTML select component without beautification
-	 *  @param	array	$events			Event options. Example: array(array('method'=>'getContacts', 'url'=>dol_buildpath('/core/ajax/contacts.php',1), 'htmlname'=>'contactid', 'params'=>array('add-customer-contact'=>'disabled')))
-	 *  @param	string	$filterkey		Filter on key value
-	 *  @param	int		$outputmode		0=HTML select string, 1=Array
-	 *  @param	int		$limit			Limit number of answers
-	 *  @param	string	$morecss		Add more css styles to the SELECT component
-	 *	@param  string	$moreparam      Add more parameters onto the select tag. For example 'style="width: 95%"' to avoid select2 component to go over parent container
-	 *	@param  bool	$multiple       add [] in the name of element and add 'multiple' attribut
-	 * 	@return	string					HTML string with
+	 * @param string $selected   Preselected type
+	 * @param string $htmlname   Name of field in form
+	 * @param string $filter     Optional filters criteras (example: 's.rowid <> x', 's.client in (1,3)')
+	 * @param string $showempty  Add an empty field (Can be '1' or text to use on empty line like 'SelectThirdParty')
+	 * @param int    $showtype   Show third party type in combolist (customer, prospect or supplier)
+	 * @param int    $forcecombo Force to use standard HTML select component without beautification
+	 * @param array  $events     Event options. Example: array(array('method'=>'getContacts', 'url'=>dol_buildpath('/core/ajax/contacts.php',1), 'htmlname'=>'contactid', 'params'=>array('add-customer-contact'=>'disabled')))
+	 * @param string $filterkey  Filter on key value
+	 * @param int    $outputmode 0=HTML select string, 1=Array
+	 * @param int    $limit      Limit number of answers
+	 * @param string $morecss    Add more css styles to the SELECT component
+	 * @param string $moreparam  Add more parameters onto the select tag. For example 'style="width: 95%"' to avoid select2 component to go over parent container
+	 * @param bool   $multiple   add [] in the name of element and add 'multiple' attribut
+	 * @return       string      HTML string with
+	 * @throws Exception
 	 */
 	public function select_digiriskelement_list($selected = '', $htmlname = 'socid', $filter = '', $showempty = '1', $showtype = 0, $forcecombo = 0, $events = array(), $filterkey = '', $outputmode = 0, $limit = 0, $morecss = 'minwidth100', $moreparam = '', $multiple = false, $noroot = 0)
 	{

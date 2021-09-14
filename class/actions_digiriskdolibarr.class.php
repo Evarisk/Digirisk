@@ -62,7 +62,7 @@ class ActionsDigiriskdolibarr
 	}
 
 	/**
-	 * Overloading the doActions function : replacing the parent's function with the one below
+	 * Overloading the printCommonFooter function : replacing the parent's function with the one below
 	 *
 	 * @param   array           $parameters     Hook metadatas (context, etc...)
 	 * @param   CommonObject    $object         The object to process (an invoice if you are in invoice module, a propale in propale's module, etc...)
@@ -108,6 +108,15 @@ class ActionsDigiriskdolibarr
 		}
 	}
 
+	/**
+	 *  Overloading the doActions function : replacing the parent's function with the one below
+	 *
+	 * @param $parameters
+	 * @param $object
+	 * @param $action
+	 * @param $hookmanager
+	 * @return int
+	 */
 	public function doActions($parameters, &$object, &$action, $hookmanager)
 	{
 		global $db, $conf, $user, $langs;
