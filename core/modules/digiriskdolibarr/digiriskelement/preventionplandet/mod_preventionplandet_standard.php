@@ -17,7 +17,7 @@
  */
 
 /**
- *	\file       htdocs/custom/digiriskdolibarr/core/modules/digiriskdolibarr/mod_prevenetionplan_standard.php
+ *	\file       htdocs/custom/digiriskdolibarr/core/modules/digiriskdolibarr/mod_preventionplan_standard.php
  * \ingroup     digiriskdolibarr
  *	\brief      File containing class for numbering module Standard
  */
@@ -100,14 +100,14 @@ class mod_preventionplandet_standard extends ModeleNumRefDigiriskDocuments
 		}
 		else
 		{
-			dol_syslog("mod_prevenetionplan_standard::getNextValue", LOG_DEBUG);
+			dol_syslog("mod_preventionplan_standard::getNextValue", LOG_DEBUG);
 			return -1;
 		}
 
 		if ($max >= (pow(10, 4) - 1)) $num = $max + 1; // If counter > 9999, we do not format on 4 chars, we take number as it is
 		else $num = sprintf("%s", $max + 1);
 
-		dol_syslog("mod_prevenetionplan_standard::getNextValue return ".$this->prefix.$num);
+		dol_syslog("mod_preventionplan_standard::getNextValue return ".$this->prefix.$num);
 		return $this->prefix.$num;
 	}
 }
