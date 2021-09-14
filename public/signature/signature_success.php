@@ -67,7 +67,7 @@ llxHeaderSignature($langs->trans("Signature"), "", 0, 0, $morejs, $morecss);
 
 ?>
 <div class="digirisk-signature-container">
-	<p class="center"><?php echo $langs->trans("SignatureSuccess"); ?> <a href="#" class="wpeo-button button-radius-2 button-primary"><i class="button-icon fas fa-file-pdf"></i> <?php echo $langs->trans("SignatureSeeDocument"); ?></a></p>
+	<p class="center"><?php echo $langs->trans("SignatureSuccess"); ?> </p>
 </div>
 <?php
 
