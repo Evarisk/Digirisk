@@ -1004,6 +1004,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	unset($object->fields['prior_visit_text']);
 	unset($object->fields['label']);
 
+	//Label -- Libellé
 	print '<tr><td class="titlefield">';
 	print $langs->trans("Label");
 	print '</td>';
@@ -1011,6 +1012,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	print $object->label;
 	print '</td></tr>';
 
+	//StartDate -- Date de début
 	print '<tr><td class="titlefield">';
 	print $langs->trans("StartDate");
 	print '</td>';
@@ -1018,6 +1020,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	print dol_print_date($object->date_start, 'dayhoursec');
 	print '</td></tr>';
 
+	//EndDate -- Date de fin
 	print '<tr><td class="titlefield">';
 	print $langs->trans("EndDate");
 	print '</td>';

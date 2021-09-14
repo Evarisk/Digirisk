@@ -46,7 +46,7 @@ function digiriskdolibarrAdminPrepareHead()
 	$h++;
 
 	$head[$h][0] = dol_buildpath("/digiriskdolibarr/admin/digiriskdocuments/digiriskdocuments.php", 1);
-	$head[$h][1] = $langs->trans("DigiriskDocuments");
+	$head[$h][1] = $langs->trans("YourDocuments");
 	$head[$h][2] = 'digiriskdocuments';
 	$h++;
 

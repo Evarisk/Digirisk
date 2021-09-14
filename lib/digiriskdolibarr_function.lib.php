@@ -1091,6 +1091,7 @@ function llxHeaderSignature($title, $head = "", $disablejs = 0, $disablehead = 0
 			print '<img src="'.$urllogo.'">';
 			print '</div>';
 		}
+		print '<div class="underbanner clearboth"></div>';
 	}
 }
 
