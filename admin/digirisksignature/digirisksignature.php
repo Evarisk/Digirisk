@@ -16,7 +16,7 @@
 */
 
 /**
- *     \file        digiriskdolibarr/admin/digirisksignature.php
+ *     \file        admin/digirisksignature.php
  *     \ingroup     digiriskdolibarr
  *     \brief       Page to public interface of module DigiriskDolibarr for signature
  */
@@ -57,8 +57,7 @@ $value      = GETPOST('value', 'alpha');
  * Actions
  */
 
-if ($action == 'setPublicInterface')
-{
+if ($action == 'setPublicInterface') {
 	if (GETPOST('value')) dolibarr_set_const($db, 'DIGIRISKDOLIBARR_SIGNATURE_ENABLE_PUBLIC_INTERFACE', 1, 'chaine', 0, '', $conf->entity);
 	else dolibarr_set_const($db, 'DIGIRISKDOLIBARR_SIGNATURE_ENABLE_PUBLIC_INTERFACE', 0, 'chaine', 0, '', $conf->entity);
 }
@@ -71,8 +70,7 @@ $form = new Form($db);
 
 $help_url  = '';
 $page_name = "DigiriskdolibarrSetup";
-
-$morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");
+$morecss   = array("/digiriskdolibarr/css/digiriskdolibarr.css");
 
 llxHeader('', $langs->trans($page_name), $help_url, '', '', '', '', $morecss);
 
@@ -88,8 +86,7 @@ print '<span class="opacitymedium">'.$langs->trans("SignaturePublicAccess").'</s
 print dol_get_fiche_end();
 
 $enabledisablehtml = $langs->trans("SignatureActivatePublicInterface").' ';
-if (empty($conf->global->DIGIRISKDOLIBARR_SIGNATURE_ENABLE_PUBLIC_INTERFACE))
-{
+if (empty($conf->global->DIGIRISKDOLIBARR_SIGNATURE_ENABLE_PUBLIC_INTERFACE)) {
 	// Button off, click to enable
 	$enabledisablehtml .= '<a class="reposition valignmiddle" href="'.$_SERVER["PHP_SELF"].'?action=setPublicInterface&token='.newToken().'&value=1'.$param.'">';
 	$enabledisablehtml .= img_picto($langs->trans("Disabled"), 'switch_off');
@@ -105,15 +102,14 @@ print '<input type="hidden" id="DIGIRISKDOLIBARR_SIGNATURE_ENABLE_PUBLIC_INTERFA
 
 print '<br><br>';
 
-if (!empty($conf->global->DIGIRISKDOLIBARR_SIGNATURE_ENABLE_PUBLIC_INTERFACE))
-{
+if (!empty($conf->global->DIGIRISKDOLIBARR_SIGNATURE_ENABLE_PUBLIC_INTERFACE)) {
 	print '<div class="div-table-responsive-no-min">';
 	print '<table class="noborder centpercent">';
 	print '<tr class="liste_titre">';
 	print '<td>'.$langs->trans("Parameters").'</td>';
 	print '<td class="center">'.$langs->trans("Status").'</td>';
 	print '<td class="center">'.$langs->trans("ShortInfo").'</td>';
-	print '</tr>'."\n";
+	print '</tr>';
 
 	// Show logo for company
 	print '<tr class="oddeven"><td>'.$langs->trans("SignatureShowCompanyLogo").'</td>';

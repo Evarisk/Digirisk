@@ -16,7 +16,7 @@
  */
 
 /**
- * \file    digiriskdolibarr/admin/setup.php
+ * \file    admin/setup.php
  * \ingroup digiriskdolibarr
  * \brief   Digiriskdolibarr setup page.
  */
@@ -68,9 +68,8 @@ require_once '../core/tpl/digiriskdolibarr_projectcreation_action.tpl.php';
  */
 
 $page_name = "DigiriskdolibarrSetup";
-$help_url = 'FR:Module_DigiriskDolibarr#Configuration';
-
-$morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");
+$help_url  = 'FR:Module_DigiriskDolibarr#Configuration';
+$morecss   = array("/digiriskdolibarr/css/digiriskdolibarr.css");
 
 llxHeader('', $langs->trans($page_name), $help_url, '', '', '', '', $morecss);
 
@@ -81,14 +80,13 @@ print load_fiche_titre($langs->trans($page_name), $linkback, 'object_digiriskdol
 
 // Configuration header
 $head = digiriskdolibarrAdminPrepareHead();
-dol_fiche_head($head, 'settings', '', -1, "digiriskdolibarr@digiriskdolibarr");
+print dol_get_fiche_head($head, 'settings', '', -1, "digiriskdolibarr@digiriskdolibarr");
 
 if (empty($setupnotempty)) {
 	print '<br>'.$langs->trans("AgendaModuleRequired");
 }
 
 // Page end
-dol_fiche_end();
-
+print dol_get_fiche_end();
 llxFooter();
 $db->close();

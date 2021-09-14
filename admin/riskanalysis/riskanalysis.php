@@ -16,7 +16,7 @@
  */
 
 /**
- * \file    digiriskdolibarr/admin/riskanalysis.php
+ * \file    admin/riskanalysis.php
  * \ingroup digiriskdolibarr
  * \brief   Digiriskdolibarr riskanalysis page.
  */
@@ -57,8 +57,7 @@ $backtopage = GETPOST('backtopage', 'alpha');
 
 $help_url  = 'FR:Module_DigiriskDolibarr#L.27onglet_Analyse_des_risques';
 $page_name = "DigiriskdolibarrSetup";
-
-$morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");
+$morecss   = array("/digiriskdolibarr/css/digiriskdolibarr.css");
 
 llxHeader('', $langs->trans($page_name), $help_url, '', '', '', '', $morecss);
 
@@ -69,13 +68,12 @@ print load_fiche_titre($langs->trans($page_name), $linkback, 'object_digiriskdol
 
 // Configuration header
 $head = digiriskdolibarrAdminPrepareHead();
-dol_fiche_head($head, 'riskanalysis', '', -1, "digiriskdolibarr@digiriskdolibarr");
+print dol_get_fiche_head($head, 'riskanalysis', '', -1, "digiriskdolibarr@digiriskdolibarr");
 $head = digiriskdolibarrAdminRiskAnalysisPrepareHead();
-dol_fiche_head($head, '', '', -1, "digiriskdolibarr@digiriskdolibarr");
+print dol_get_fiche_head($head, '', '', -1, "digiriskdolibarr@digiriskdolibarr");
 
 // Page end
-dol_fiche_end();
-
+print dol_get_fiche_end();
 llxFooter();
 $db->close();
 

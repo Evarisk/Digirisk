@@ -16,7 +16,7 @@
  */
 
 /**
- * \file    digiriskdolibarr/admin/digiriskdocuments/digiriskdocuments.php
+ * \file    admin/digiriskdocuments/digiriskdocuments.php
  * \ingroup digiriskdolibarr
  * \brief   Digiriskdolibarr digiriskdocuments page.
  */
@@ -57,8 +57,7 @@ $backtopage = GETPOST('backtopage', 'alpha');
 
 $help_url  = 'FR:Module_DigiriskDolibarr#L.27onglet_Document_Digirisk';
 $page_name = "DigiriskdolibarrSetup";
-
-$morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");
+$morecss   = array("/digiriskdolibarr/css/digiriskdolibarr.css");
 
 llxHeader('', $langs->trans($page_name), $help_url, '', '', '', '', $morecss);
 
@@ -69,13 +68,12 @@ print load_fiche_titre($langs->trans($page_name), $linkback, 'object_digiriskdol
 
 // Configuration header
 $head = digiriskdolibarrAdminPrepareHead();
-dol_fiche_head($head, 'digiriskdocuments', '', -1, "digiriskdolibarr@digiriskdolibarr");
+print dol_get_fiche_head($head, 'digiriskdocuments', '', -1, "digiriskdolibarr@digiriskdolibarr");
 $head = digiriskdolibarrAdminDigiriskDocumentsPrepareHead();
-dol_fiche_head($head, '', '', -1, "digiriskdolibarr@digiriskdolibarr");
+print dol_get_fiche_head($head, '', '', -1, "digiriskdolibarr@digiriskdolibarr");
 
 // Page end
-dol_fiche_end();
-
+print dol_get_fiche_end();
 llxFooter();
 $db->close();
 

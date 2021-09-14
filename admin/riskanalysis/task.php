@@ -16,7 +16,7 @@
  */
 
 /**
- * \file    digiriskdolibarr/admin/task.php
+ * \file    admin/task.php
  * \ingroup digiriskdolibarr
  * \brief   Digiriskdolibarr task page.
  */
@@ -55,14 +55,13 @@ $action     = GETPOST('action', 'alpha');
 $backtopage = GETPOST('backtopage', 'alpha');
 $value      = GETPOST('value', 'alpha');
 
-$error         = 0;
-$setupnotempty = 0;
+$error = 0;
 
 /*
  * Actions
  */
-if (($action == 'update' && !GETPOST("cancel", 'alpha')) || ($action == 'updateedit'))
-{
+
+if (($action == 'update' && !GETPOST("cancel", 'alpha')) || ($action == 'updateedit')) {
 	$DUProject = GETPOST('DUProject', 'none');
 	$DUProject  = preg_split('/_/', $DUProject);
 
@@ -75,8 +74,7 @@ if (($action == 'update' && !GETPOST("cancel", 'alpha')) || ($action == 'updatee
 	}
 }
 
-if ($action == 'settaskmanagement')
-{
+if ($action == 'settaskmanagement') {
 	$constforval = 'DIGIRISKDOLIBARR_TASK_MANAGEMENT';
 	dolibarr_set_const($db, $constforval, $value, 'integer', 0, '', $conf->entity);
 }
@@ -84,12 +82,12 @@ if ($action == 'settaskmanagement')
 /*
  * View
  */
+
 if (!empty($conf->projet->enabled)) { $formproject = new FormProjets($db); }
 
 $help_url  = 'FR:Module_DigiriskDolibarr#L.27onglet_T.C3.A2che';
 $page_name = "DigiriskdolibarrSetup";
-
-$morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");
+$morecss   = array("/digiriskdolibarr/css/digiriskdolibarr.css");
 
 llxHeader('', $langs->trans($page_name), $help_url, '', '', '', '', $morecss);
 
@@ -99,9 +97,9 @@ $linkback = '<a href="'.($backtopage ? $backtopage : DOL_URL_ROOT.'/admin/module
 print load_fiche_titre($langs->trans($page_name), $linkback, 'object_digiriskdolibarr@digiriskdolibarr');
 
 $head = digiriskdolibarrAdminPrepareHead();
-dol_fiche_head($head, 'riskanalysis', '', -1, "digiriskdolibarr@digiriskdolibarr");
+print dol_get_fiche_head($head, 'riskanalysis', '', -1, "digiriskdolibarr@digiriskdolibarr");
 $head = digiriskdolibarrAdminRiskAnalysisPrepareHead();
-dol_fiche_head($head, 'task', '', -1, "digiriskdolibarr@digiriskdolibarr");
+print dol_get_fiche_head($head, 'task', '', -1, "digiriskdolibarr@digiriskdolibarr");
 
 print load_fiche_titre($langs->trans("TasksManagement"), '', '');
 
@@ -113,11 +111,10 @@ print '<tr class="liste_titre">';
 print '<td>'.$langs->trans("Name").'</td>';
 print '<td>'.$langs->trans("SelectProject").'</td>';
 print '<td>'.$langs->trans("Action").'</td>';
-print '</tr>'."\n";
+print '</tr>';
 
 // Project
-if (!empty($conf->projet->enabled))
-{
+if (!empty($conf->projet->enabled)) {
 	$langs->load("projects");
 	print '<tr class="oddeven"><td><label for="DUProject">'.$langs->trans("DUProject").'</label></td><td>';
 	$numprojet = $formproject->select_projects(0,  $conf->global->DIGIRISKDOLIBARR_DU_PROJECT, 'DUProject', 0, 0, 0, 0, 0, 0, 0, '', 0, 0, 'maxwidth500');
@@ -135,22 +132,20 @@ print '<table class="noborder centpercent">';
 print '<tr class="liste_titre">';
 print '<td>'.$langs->trans("Name").'</td>';
 print '<td>'.$langs->trans("Description").'</td>';
-print '<td class="center" width="60">'.$langs->trans("Status").'</td>';
-print '</tr>'."\n";
+print '<td class="center">'.$langs->trans("Status").'</td>';
+print '</tr>';
 
 print '<tr class="oddeven"><td>';
 print $langs->trans('TasksManagement');
-print "</td><td>\n";
+print "</td><td>";
 print $langs->trans('TaskManagementDescription');
 print '</td>';
 
 print '<td class="center">';
-if ($conf->global->DIGIRISKDOLIBARR_TASK_MANAGEMENT)
-{
+if ($conf->global->DIGIRISKDOLIBARR_TASK_MANAGEMENT) {
 	print '<a class="reposition" href="'.$_SERVER["PHP_SELF"].'?action=settaskmanagement&value=0" alt="'.$langs->trans("Default").'">'.img_picto($langs->trans("Activated"), 'switch_on').'</a>';
 }
-else
-{
+else {
 	print '<a class="reposition" href="'.$_SERVER["PHP_SELF"].'?action=settaskmanagement&value=1" alt="'.$langs->trans("Default").'">'.img_picto($langs->trans("Disabled"), 'switch_off').'</a>';
 }
 print '</td>';
@@ -158,7 +153,6 @@ print '</tr>';
 print '</table>';
 
 // Page end
-dol_fiche_end();
-
+print dol_get_fiche_end();
 llxFooter();
 $db->close();

@@ -16,7 +16,7 @@
  */
 
 /**
- * \file    digiriskdolibarr/admin/about.php
+ * \file    admin/about.php
  * \ingroup digiriskdolibarr
  * \brief   About page of module Digiriskdolibarr.
  */
@@ -56,9 +56,8 @@ $backtopage = GETPOST('backtopage', 'alpha');
  */
 
 $page_name = "DigiriskdolibarrAbout";
-$help_url = 'FR:Module_DigiriskDolibarr';
-
-$morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");
+$help_url  = 'FR:Module_DigiriskDolibarr';
+$morecss   = array("/digiriskdolibarr/css/digiriskdolibarr.css");
 
 llxHeader('', $langs->trans($page_name), $help_url, '', '', '', '', $morecss);
 
@@ -69,7 +68,7 @@ print load_fiche_titre($langs->trans($page_name), $linkback, 'object_digiriskdol
 
 // Configuration header
 $head = digiriskdolibarrAdminPrepareHead();
-dol_fiche_head($head, 'about', '', 0, 'digiriskdolibarr@digiriskdolibarr');
+print dol_get_fiche_head($head, 'about', '', 0, 'digiriskdolibarr@digiriskdolibarr');
 
 require_once '../core/modules/modDigiriskdolibarr.class.php';
 
@@ -78,6 +77,6 @@ $Parsedown = new Parsedown();
 echo $Parsedown->text($contents);
 
 // Page end
-dol_fiche_end();
+print dol_get_fiche_end();
 llxFooter();
 $db->close();

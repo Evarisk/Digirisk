@@ -16,7 +16,7 @@
  */
 
 /**
- * \file    digiriskdolibarr/admin/risk.php
+ * \file    admin/risk.php
  * \ingroup digiriskdolibarr
  * \brief   Digiriskdolibarr risk page.
  */
@@ -56,13 +56,11 @@ $value      = GETPOST('value', 'alpha');
 
 $type          = 'risk';
 $error         = 0;
-$setupnotempty = 0;
 
 /*
  * Actions
  */
-if ($action == 'updateMask')
-{
+if ($action == 'updateMask') {
 	$maskconstrisk = GETPOST('maskconstrisk', 'alpha');
 	$maskrisk      = GETPOST('maskrisk', 'alpha');
 
@@ -78,20 +76,17 @@ if ($action == 'updateMask')
 	}
 }
 
-if ($action == 'setmod')
-{
+if ($action == 'setmod') {
 	$constforval = 'DIGIRISKDOLIBARR_'.strtoupper($type)."_ADDON";
 	dolibarr_set_const($db, $constforval, $value, 'chaine', 0, '', $conf->entity);
 }
 
-if ($action == 'setriskdescription')
-{
+if ($action == 'setriskdescription') {
 	$constforval = 'DIGIRISKDOLIBARR_RISK_DESCRIPTION';
 	dolibarr_set_const($db, $constforval, $value, 'integer', 0, '', $conf->entity);
 }
 
-if ($action == 'setriskcategoryedit')
-{
+if ($action == 'setriskcategoryedit') {
 	$constforval = 'DIGIRISKDOLIBARR_RISK_CATEGORY_EDIT';
 	dolibarr_set_const($db, $constforval, $value, 'integer', 0, '', $conf->entity);
 }
@@ -103,8 +98,7 @@ $form = new Form($db);
 
 $help_url  = 'FR:Module_DigiriskDolibarr#L.27onglet_Analyse_des_risques';
 $page_name = "DigiriskdolibarrSetup";
-
-$morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");
+$morecss   = array("/digiriskdolibarr/css/digiriskdolibarr.css");
 
 llxHeader('', $langs->trans($page_name), $help_url, '', '', '', '', $morecss);
 
@@ -114,9 +108,9 @@ $linkback = '<a href="'.($backtopage ? $backtopage : DOL_URL_ROOT.'/admin/module
 print load_fiche_titre($langs->trans($page_name), $linkback, 'object_digiriskdolibarr@digiriskdolibarr');
 
 $head = digiriskdolibarrAdminPrepareHead();
-dol_fiche_head($head, 'riskanalysis', '', -1, "digiriskdolibarr@digiriskdolibarr");
+print dol_get_fiche_head($head, 'riskanalysis', '', -1, "digiriskdolibarr@digiriskdolibarr");
 $head = digiriskdolibarrAdminRiskAnalysisPrepareHead();
-dol_fiche_head($head, 'risk', '', -1, "digiriskdolibarr@digiriskdolibarr");
+print dol_get_fiche_head($head, 'risk', '', -1, "digiriskdolibarr@digiriskdolibarr");
 
 /*
  *  Numbering module
@@ -129,37 +123,31 @@ print '<tr class="liste_titre">';
 print '<td>'.$langs->trans("Name").'</td>';
 print '<td>'.$langs->trans("Description").'</td>';
 print '<td class="nowrap">'.$langs->trans("Example").'</td>';
-print '<td class="center" width="60">'.$langs->trans("Status").'</td>';
-print '<td class="center" width="16">'.$langs->trans("ShortInfo").'</td>';
-print '</tr>'."\n";
+print '<td class="center">'.$langs->trans("Status").'</td>';
+print '<td class="center">'.$langs->trans("ShortInfo").'</td>';
+print '</tr>';
 
 clearstatcache();
 
 $dir = dol_buildpath("/custom/digiriskdolibarr/core/modules/digiriskdolibarr/riskanalysis/".$type."/");
-if (is_dir($dir))
-{
+if (is_dir($dir)) {
 	$handle = opendir($dir);
-	if (is_resource($handle))
-	{
-		while (($file = readdir($handle)) !== false )
-		{
-			if (!is_dir($dir.$file) || (substr($file, 0, 1) <> '.' && substr($file, 0, 3) <> 'CVS'))
-			{
+	if (is_resource($handle)) {
+		while (($file = readdir($handle)) !== false ) {
+			if (!is_dir($dir.$file) || (substr($file, 0, 1) <> '.' && substr($file, 0, 3) <> 'CVS')) {
 				$filebis = $file;
 
 				$classname = preg_replace('/\.php$/', '', $file);
 				$classname = preg_replace('/\-.*$/', '', $classname);
 
-				if (!class_exists($classname) && is_readable($dir.$filebis) && (preg_match('/mod_/', $filebis) || preg_match('/mod_/', $classname)) && substr($filebis, dol_strlen($filebis) - 3, 3) == 'php')
-				{
+				if (!class_exists($classname) && is_readable($dir.$filebis) && (preg_match('/mod_/', $filebis) || preg_match('/mod_/', $classname)) && substr($filebis, dol_strlen($filebis) - 3, 3) == 'php') {
 					// Charging the numbering class
 					require_once $dir.$filebis;
 
 					$module = new $classname($db);
 
-					if ($module->isEnabled())
-					{
-						print '<tr class="oddeven"><td width="100">';
+					if ($module->isEnabled()) {
+						print '<tr class="oddeven"><td>';
 						print $langs->trans($module->name);
 						print "</td><td>\n";
 						print $module->info();
@@ -174,12 +162,10 @@ if (is_dir($dir))
 						print '</td>'."\n";
 
 						print '<td class="center">';
-						if ($conf->global->DIGIRISKDOLIBARR_RISK_ADDON == $file || $conf->global->DIGIRISKDOLIBARR_RISK_ADDON.'.php' == $file)
-						{
+						if ($conf->global->DIGIRISKDOLIBARR_RISK_ADDON == $file || $conf->global->DIGIRISKDOLIBARR_RISK_ADDON.'.php' == $file) {
 							print img_picto($langs->trans("Activated"), 'switch_on');
 						}
-						else
-						{
+						else {
 							print '<a class="reposition" href="'.$_SERVER["PHP_SELF"].'?action=setmod&value='.preg_replace('/\.php$/', '', $file).'&scan_dir='.$module->scandir.'&label='.urlencode($module->name).'" alt="'.$langs->trans("Default").'">'.img_picto($langs->trans("Disabled"), 'switch_off').'</a>';
 						}
 						print '</td>';
@@ -201,8 +187,7 @@ if (is_dir($dir))
 
 						print '<td class="center">';
 						print $form->textwithpicto('', $htmltooltip, 1, 0);
-						if ($conf->global->DIGIRISKDOLIBARR_RISK_ADDON.'.php' == $file)  // If module is the one used, we show existing errors
-						{
+						if ($conf->global->DIGIRISKDOLIBARR_RISK_ADDON.'.php' == $file) { // If module is the one used, we show existing errors
 							if (!empty($module->error)) dol_htmloutput_mesg($module->error, '', 'error', 1);
 						}
 						print '</td>';
@@ -223,22 +208,20 @@ print '<table class="noborder centpercent">';
 print '<tr class="liste_titre">';
 print '<td>'.$langs->trans("Name").'</td>';
 print '<td>'.$langs->trans("Description").'</td>';
-print '<td class="center" width="60">'.$langs->trans("Status").'</td>';
-print '</tr>'."\n";
+print '<td class="center">'.$langs->trans("Status").'</td>';
+print '</tr>';
 
 print '<tr class="oddeven"><td>';
 print $langs->trans('RiskDescription');
-print "</td><td>\n";
+print "</td><td>";
 print $langs->trans('RiskDescriptionDescription');
 print '</td>';
 
 print '<td class="center">';
-if ($conf->global->DIGIRISKDOLIBARR_RISK_DESCRIPTION)
-{
+if ($conf->global->DIGIRISKDOLIBARR_RISK_DESCRIPTION) {
 	print '<a class="reposition" href="'.$_SERVER["PHP_SELF"].'?action=setriskdescription&value=0" alt="'.$langs->trans("Default").'">'.img_picto($langs->trans("Activated"), 'switch_on').'</a>';
 }
-else
-{
+else {
 	print '<a class="reposition" href="'.$_SERVER["PHP_SELF"].'?action=setriskdescription&value=1" alt="'.$langs->trans("Default").'">'.img_picto($langs->trans("Disabled"), 'switch_off').'</a>';
 }
 print '</td>';
@@ -247,17 +230,15 @@ print '</tr>';
 
 print '<tr class="oddeven"><td>';
 print $langs->trans('RiskCategoryEdit');
-print "</td><td>\n";
+print "</td><td>";
 print $langs->trans('RiskCategoryEditDescription');
 print '</td>';
 
 print '<td class="center">';
-if ($conf->global->DIGIRISKDOLIBARR_RISK_CATEGORY_EDIT)
-{
+if ($conf->global->DIGIRISKDOLIBARR_RISK_CATEGORY_EDIT) {
 	print '<a class="reposition" href="'.$_SERVER["PHP_SELF"].'?action=setriskcategoryedit&value=0" alt="'.$langs->trans("Default").'">'.img_picto($langs->trans("Activated"), 'switch_on').'</a>';
 }
-else
-{
+else {
 	print '<a class="reposition" href="'.$_SERVER["PHP_SELF"].'?action=setriskcategoryedit&value=1" alt="'.$langs->trans("Default").'">'.img_picto($langs->trans("Disabled"), 'switch_off').'</a>';
 }
 print '</td>';
@@ -267,7 +248,6 @@ print '</table>';
 
 
 // Page end
-dol_fiche_end();
-
+print dol_get_fiche_end();
 llxFooter();
 $db->close();
