@@ -869,8 +869,12 @@ DGI = Danger grave et imminent
 SST = Santé et sécurité au travail
 PresquAccident = PresquAccident
 Accident = Accident
-
-
+EnhancementSuggestion = Suggestion d'amélioration
+MaterialProblem = Problème matériel
+HumanProblem = Problème humain
+Others = Autre
+AccidentWithoutDIAT = Accident sans DIAT
+AccidentWithDIAT = Accident avec DIAT
 
 #
 # Other
