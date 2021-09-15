@@ -1541,7 +1541,7 @@
 																		<div class="modal-content" id="#modalContent<?php echo $related_task->id ?>">
 																			<div class="riskassessment-task-container">
 																				<div class="riskassessment-task">
-																					<span class="title"><?php echo $langs->trans('Label'); ?> <input type="text" class="riskassessment-task-label" name="label" value="<?php echo $related_task->label ?>"></span>
+																					<span class="title"><?php echo $langs->trans('Label'); ?> <input type="text" class="riskassessment-task-label<?php echo $related_task->id ?>" name="label" value="<?php echo $related_task->label ?>"></span>
 																				</div>
 																			</div>
 																		</div>

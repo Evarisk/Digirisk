@@ -1956,6 +1956,7 @@ window.eoxiaJS.riskassessmenttask.saveRiskAssessmentTask = function ( event ) {
 	let actionContainerError = $('.messageErrorTaskEdit');
 
 	var task = elementRiskAssessmentTask.find('.riskassessment-task-label').val();
+	var task = elementRiskAssessmentTask.find('.riskassessment-task-label' + editedRiskAssessmentTaskId).val();
 	var taskPost = '';
 	if (task !== '') {
 		taskPost = '&tasktitle=' + encodeURI(task);
