@@ -875,6 +875,11 @@ HumanProblem = Problème humain
 Others = Autre
 AccidentWithoutDIAT = Accident sans DIAT
 AccidentWithDIAT = Accident avec DIAT
+FirstName = Prénom
+LastName = Nom
+Phone = Téléphone
+
+
 
 #
 # Other
