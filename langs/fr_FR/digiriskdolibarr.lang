@@ -688,6 +688,7 @@ DigiriskRiskData = Donnée configurable des risques
 RiskDescription = Description du risque
 RiskDescriptionDescription = Activer le champ description du risque
 RiskDescriptionNotActivated = Veuillez activer le champ description du risque dans Configuration du module / Analyse des risques / Risques
+AddRisk = Ajouter un risque
 
 
 
@@ -729,6 +730,9 @@ SelectCotation = Sélectionnez les cases pour calculer votre cotation
 EvaluationList = Liste des évaluations du risque
 HowToSetMultipleRiskAssessmentMethod = Pour configurer l'utilisation multiple des méthodes d'évaluation, aller dans Configuration du module - Analyse des risques - Évaluation
 NoFileLinked = Pas de photo liée
+AddRiskAssessment = Ajouter une évaluation du risque
+AddRiskAssessmentTask = Ajouter une tâche au risque
+
 
 
 #
@@ -845,6 +849,9 @@ AddSignatureSuccess = Signature du document réussie
 AddSignatureSuccessText = La signature a bien été enregistrée pour le document
 SignatureSeeDocument = Voir
 ShowDocument = Voir le document
+
+
+
 
 #
 # Ticket - Interface publique ticket

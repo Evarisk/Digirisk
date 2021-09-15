@@ -272,7 +272,7 @@
 	<?php if (!$allRisks) : ?>
 		<!-- BUTTON MODAL RISK ADD -->
 		<?php if ($permissiontoadd) {
-		$newcardbutton = '<div class="risk-add wpeo-button button-square-40 button-blue modal-open" value="'.$object->id.'"><i class="fas fa-exclamation-triangle button-icon"></i><i class="fas fa-plus-circle button-add animated"></i></div>';
+		$newcardbutton = '<div class="risk-add wpeo-button button-square-40 button-blue wpeo-tooltip-event modal-open" aria-label="'. $langs->trans('AddRisk').'" value="'.$object->id.'"><i class="fas fa-exclamation-triangle button-icon"></i><i class="fas fa-plus-circle button-add animated"></i></div>';
 	} else {
 		$newcardbutton = '<div class="wpeo-button button-square-40 button-grey wpeo-tooltip-event" aria-label="'. $langs->trans('PermissionDenied').'" data-direction="left" value="'.$object->id.'"><i class="fas fa-exclamation-triangle button-icon"></i><i class="fas fa-plus-circle button-add animated"></i></div>';
 	} ?>
@@ -917,7 +917,7 @@
 										</div>
 									<!-- BUTTON MODAL RISK EVALUATION ADD  -->
 									<?php if ($permissiontoadd) : ?>
-										<div class="risk-evaluation-add wpeo-button button-square-40 button-primary modal-open" value="<?php echo $risk->id;?>">
+										<div class="risk-evaluation-add wpeo-button button-square-40 button-primary wpeo-tooltip-event modal-open" aria-label="<?php echo $langs->trans('AddRiskAssessment') ?>" value="<?php echo $risk->id;?>">
 											<i class="fas fa-plus button-icon"></i>
 										</div>
 									<?php else : ?>
@@ -1206,7 +1206,7 @@
 										</div>
 									</div>
 									<?php if ($permissiontoadd) : ?>
-										<div class="risk-evaluation-add wpeo-button button-square-40 button-primary modal-open" value="<?php echo $risk->id ?>">
+										<div class="risk-evaluation-add wpeo-button button-square-40 button-primary wpeo-tooltip-event modal-open" aria-label="<?php echo $langs->trans('AddRiskAssessment') ?>" value="<?php echo $risk->id ?>">
 											<i class="fas fa-plus button-icon"></i>
 										</div>
 									<?php else : ?>
@@ -1412,7 +1412,7 @@
 									</div>
 									<!-- BUTTON MODAL RISK ASSESSMENT TASK ADD  -->
 									<?php if ($permissiontoadd) : ?>
-										<div class="riskassessment-task-add wpeo-button button-square-40 button-primary modal-open" value="<?php echo $risk->id;?>">
+										<div class="riskassessment-task-add wpeo-button button-square-40 button-primary wpeo-tooltip-event modal-open" aria-label="<?php echo $langs->trans('AddRiskAssessmentTask') ?>" value="<?php echo $risk->id;?>">
 											<i class="fas fa-plus button-icon"></i>
 										</div>
 									<?php else : ?>
@@ -1588,7 +1588,7 @@
 									</div>
 									<!-- BUTTON MODAL RISK ASSESSMENT TASK ADD  -->
 									<?php if ($permissiontoadd) : ?>
-										<div class="riskassessment-task-add wpeo-button button-square-40 button-primary modal-open" value="<?php echo $risk->id;?>">
+										<div class="riskassessment-task-add wpeo-button button-square-40 button-primary wpeo-tooltip-event modal-open" aria-label="<?php echo $langs->trans('AddRiskAssessmentTask') ?>" value="<?php echo $risk->id;?>">
 											<i class="fas fa-plus button-icon"></i>
 										</div>
 									<?php else : ?>
