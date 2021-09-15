@@ -888,6 +888,8 @@ ExtrafieldsGeneration = Cette option permet la génération des extrafields lié
 CategoriesGeneration = Cette option permet la génération des catégories liées au ticket
 TicketSuccess = Voici votre Id de suivi de ticket :
 TicketPublicAccess = Lien vers l'interface publique des tickets :
+TicketShowCompanyLogo = Afficher le logo de la société dans l'interface publique
+TicketShowCompanyLogoHelp = Activez cette option pour masquer le logo de la société dans les pages de l'interface publique
 
 
 

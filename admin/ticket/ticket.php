@@ -250,6 +250,16 @@ if (!empty($conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE)) {
 	print '<td class="center">' . $langs->trans("ShortInfo") . '</td>';
 	print '</tr>';
 
+	// Show logo for company
+	print '<tr class="oddeven"><td>'.$langs->trans("TicketShowCompanyLogo").'</td>';
+	print '<td class="center">';
+	print ajax_constantonoff('DIGIRISKDOLIBARR_TICKET_SHOW_COMPANY_LOGO');
+	print '</td>';
+	print '<td class="center">';
+	print $form->textwithpicto('', $langs->trans("TicketShowCompanyLogoHelp"), 1, 'help');
+	print '</td>';
+	print '</tr>';
+
 // Extrafields generation
 
 	print '<form method="POST" action="' . $_SERVER["PHP_SELF"] . '">';

@@ -177,7 +177,7 @@ if ($action == 'add') {
 
 		// Creation OK
 		dol_delete_dir_recursive($ticket_upload_dir . '/ticket/' . $ticket_tmp_id . '/');
-		$urltogo = $_SERVER['PHP_SELF'] . '/../create_success.php?track_id=' . $track_id ;
+		$urltogo = $_SERVER['PHP_SELF'] . '/../ticket_success.php?track_id=' . $track_id ;
 		setEventMessages($langs->trans("TicketSend", ''), null);
 		header("Location: ".$urltogo);
 		exit;
@@ -268,7 +268,7 @@ if (!$conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE) {
 $arrayofjs  =  array("/digiriskdolibarr/js/digiriskdolibarr.js.php");
 $arrayofcss = array('/opensurvey/css/style.css', '/ticket/css/styles.css.php', "/digiriskdolibarr/css/digiriskdolibarr.css");
 
-llxHeaderTicket($langs->trans("CreateTicket"), "", 0, 0, $arrayofjs, $arrayofcss);
+llxHeaderTicketDigirisk($langs->trans("CreateTicket"), "", 0, 0, $arrayofjs, $arrayofcss);
 
 print '<div class="ticketpublicarea">';
 

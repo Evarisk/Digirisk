@@ -1094,3 +1094,40 @@ function llxHeaderSignature($title, $head = "", $disablejs = 0, $disablehead = 0
 		print '<div class="underbanner clearboth"></div>';
 	}
 }
+
+/**
+* Show header for public page ticket
+*
+* @param  string $title       Title
+* @param  string $head        Head array
+* @param  int    $disablejs   More content into html header
+* @param  int    $disablehead More content into html header
+* @param string $arrayofjs Array of complementary js files
+* @param string $arrayofcss Array of complementary css files
+* @return void
+*/
+function llxHeaderTicketDigirisk($title, $head = "", $disablejs = 0, $disablehead = 0, $arrayofjs = '', $arrayofcss = '') {
+	global $conf, $mysoc;
+
+	top_htmlhead($head, $title, $disablejs, $disablehead, $arrayofjs, $arrayofcss, 0, 1); // Show html headers
+
+	if (!empty($conf->global->DIGIRISKDOLIBARR_TICKET_SHOW_COMPANY_LOGO)){
+		// Define logo and logosmall
+		$logosmall = $mysoc->logo_small;
+		$logo = $mysoc->logo;
+		// Define urllogo
+		$urllogo = '';
+		if (!empty($logosmall) && is_readable($conf->mycompany->dir_output.'/logos/thumbs/'.$logosmall)) {
+			$urllogo = DOL_URL_ROOT.'/viewimage.php?modulepart=mycompany&amp;entity='.$conf->entity.'&amp;file='.urlencode('logos/thumbs/'.$logosmall);
+		} elseif (!empty($logo) && is_readable($conf->mycompany->dir_output.'/logos/'.$logo)) {
+			$urllogo = DOL_URL_ROOT.'/viewimage.php?modulepart=mycompany&amp;entity='.$conf->entity.'&amp;file='.urlencode('logos/'.$logo);
+		}
+		// Output html code for logo
+		if ($urllogo) {
+			print '<div class="center signature-logo">';
+			print '<img src="'.$urllogo.'">';
+			print '</div>';
+		}
+		print '<div class="underbanner clearboth"></div>';
+	}
+}

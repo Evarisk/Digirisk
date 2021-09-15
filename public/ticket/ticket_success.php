@@ -48,10 +48,13 @@ if (!$res) die("Include of main fails");
 require_once '../../lib/digiriskdolibarr_function.lib.php';
 
 global $langs, $mysoc;
+
 // Load translation files required by the page
 $langs->loadLangs(array("digiriskdolibarr@digiriskdolibarr", "other", "errors"));
 
+// Get parameters
 $track_id = GETPOST('track_id');
+
 /*
  * View
  */
@@ -62,36 +65,16 @@ if (empty($conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE))
 	exit;
 }
 
-$morejs   = array("/digiriskdolibarr/js/ticket-pad.min.js", "/digiriskdolibarr/js/digiriskdolibarr.js.php");
-$morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");
+$morejs  = array("/digiriskdolibarr/js/ticket-pad.min.js", "/digiriskdolibarr/js/digiriskdolibarr.js.php");
+$morecss = array("/digiriskdolibarr/css/digiriskdolibarr.css");
 
-top_htmlhead('', $langs->trans("CreateTicket"), 0, 0, $morejs, $morecss, 0, 1); // Show html headers
-
-// Define logo and logosmall
-$logosmall = $mysoc->logo_small;
-$logo = $mysoc->logo;
-// Define urllogo
-$urllogo = '';
-if (!empty($logosmall) && is_readable($conf->mycompany->dir_output.'/logos/thumbs/'.$logosmall)) {
-	$urllogo = DOL_URL_ROOT.'/viewimage.php?modulepart=mycompany&amp;entity='.$conf->entity.'&amp;file='.urlencode('logos/thumbs/'.$logosmall);
-} elseif (!empty($logo) && is_readable($conf->mycompany->dir_output.'/logos/'.$logo)) {
-	$urllogo = DOL_URL_ROOT.'/viewimage.php?modulepart=mycompany&amp;entity='.$conf->entity.'&amp;file='.urlencode('logos/'.$logo);
-}
-// Output html code for logo
-if ($urllogo) {
-	print '<div class="center signature-logo">';
-	print '<img src="'.$urllogo.'">';
-	print '</div>';
-}
-print '<div class="underbanner clearboth"></div>';
+llxHeaderTicketDigirisk($langs->trans("CreateTicket"), "", 0, 0, $morejs, $morecss);
 ?>
-	<div class="digirisk-signature-container">
-		<p class="center"><?php echo $langs->trans("TicketSuccess") . $track_id; ?> </p>
-		<p class="opacitymedium center"><?php echo $langs->trans("TicketPublicAccess") . '  '?><a class="wordbreak" href="<?php echo dol_buildpath('/public/ticket/index.php', 2) ?>" target="_blank" ><?php echo dol_buildpath('/public/ticket/index.php', 2) ?></a></p>;
-
-	</div>
+<div class="digirisk-signature-container">
+	<p class="center"><?php echo $langs->trans("TicketSuccess") . ' ' . $track_id; ?> </p>
+	<p class="center"><?php echo $langs->trans("TicketPublicAccess") . '  '?><a class="wordbreak" href="<?php echo dol_buildpath('/public/ticket/index.php', 2) ?>" target="_blank" ><?php echo dol_buildpath('/public/ticket/index.php', 2) ?></a></p>
+</div>
 <?php
-
 
 // End of page
 llxFooter('', 'public');
