@@ -303,10 +303,6 @@ print dol_get_fiche_end(); ?>
 	</div>
 </div>
 <?php
-// Show direct link to public interface
-if (!empty($conf->global->DIGIRISKDOLIBARR_SIGNATURE_ENABLE_PUBLIC_INTERFACE)) {
-	print showDirectPublicLinkSignature();
-}
 
 // Part to create
 if ($action == 'create')
