@@ -66,7 +66,8 @@ $element_type        = GETPOST('element_type', 'alpha');
 $fk_parent           = GETPOST('fk_parent', 'int');
 
 // Initialize technical objects
-$object = new DigiriskElement($db);
+$object      = new DigiriskElement($db);
+$extrafields = new ExtraFields($db);
 
 $object->fetch($id);
 
@@ -75,6 +76,9 @@ if ( $object->element_type == 'groupment') {
 } elseif (  $object->element_type == 'workunit' ) {
 	$digiriskelementdocument = new WorkUnitDocument($db);
 }
+
+// Fetch optionals attributes and labels
+$extrafields->fetch_name_optionals_label($object->table_element);
 
 $hookmanager->initHooks(array('digiriskelementcard', 'globalcard')); // Note that conf->hooks_modules contains array
 

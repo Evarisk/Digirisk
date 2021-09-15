@@ -78,12 +78,17 @@ $digiriskresources      = new DigiriskResources($db);
 $risk                   = new Risk($db);
 $contact                = new Contact($db);
 $usertmp                = new User($db);
+$extrafields            = new ExtraFields($db);
 
 $refPreventionPlanMod    = new $conf->global->DIGIRISKDOLIBARR_PREVENTIONPLAN_ADDON($db);
 $refPreventionPlanDetMod = new  $conf->global->DIGIRISKDOLIBARR_PREVENTIONPLANDET_ADDON($db);
 
 // Load object
 $object->fetch($id);
+
+// Fetch optionals attributes and labels
+$extrafields->fetch_name_optionals_label($object->table_element);
+$extrafields->fetch_name_optionals_label($objectline->table_element);
 
 $hookmanager->initHooks(array('preventionplancard', 'globalcard')); // Note that conf->hooks_modules contains array
 
