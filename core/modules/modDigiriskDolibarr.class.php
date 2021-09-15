@@ -286,6 +286,10 @@ class modDigiriskdolibarr extends DolibarrModules
 			210 => array('DIGIRISKDOLIBARR_SIGNATURE_ENABLE_PUBLIC_INTERFACE','integer', 1,'', $conf->entity),
 			211 => array('DIGIRISKDOLIBARR_SIGNATURE_SHOW_COMPANY_LOGO','integer', 1,'', $conf->entity),
 
+			//CONST TICKET & REGISTERS
+			300 => array('DIGIRISKDOLIBARR_TICKET_EXTRAFIELDS', 'integer', 1, '', $conf->entity),
+			301 => array('DIGIRISKDOLIBARR_TICKET_CATEGORIES_CREATED', 'integer', 1, '', $conf->entity)
+
 		);
 
 		if ( ! isset($conf->digiriskdolibarr ) || ! isset( $conf->digiriskdolibarr->enabled ) ) {

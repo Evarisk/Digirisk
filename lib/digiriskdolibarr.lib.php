@@ -65,6 +65,11 @@ function digiriskdolibarrAdminPrepareHead()
 	$head[$h][2] = 'digirisksignature';
 	$h++;
 
+	$head[$h][0] = dol_buildpath("/digiriskdolibarr/admin/ticket/ticket.php", 1);
+	$head[$h][1] = $langs->trans("Tickets");
+	$head[$h][2] = 'ticket';
+	$h++;
+
 	complete_head_from_modules($conf, $langs, null, $head, $h, 'digiriskdolibarr');
 
 	return $head;
