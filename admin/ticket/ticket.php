@@ -61,18 +61,18 @@ $value      = GETPOST('value', 'alpha');
  */
 
 if ($action == 'generateExtrafields') {
-	$extra_fields->addExtraField( 'digiriskdolibarr_ticket_lastname', $langs->trans("LastName"), 'varchar', 2000, '', 'ticket', 0, 0, '', 'a:1:{s:7:"options";a:1:{s:0:"";N;}}', 1, '', 1);
-	$extra_fields->addExtraField( 'digiriskdolibarr_ticket_firstname', $langs->trans("FirstName"), 'varchar', 2100, '', 'ticket', 0, 0, '', 'a:1:{s:7:"options";a:1:{s:0:"";N;}}', 1, '', 1);
-	$extra_fields->addExtraField( 'digiriskdolibarr_ticket_phone', $langs->trans("Phone"), 'phone', 2200, '', 'ticket', 0, 0, '', 'a:1:{s:7:"options";a:1:{s:0:"";N;}}', 1, '', 1);
-	$extra_fields->addExtraField( 'digiriskdolibarr_ticket_service', $langs->trans("Service"), 'varchar', 2300, '', 'ticket', 0, 0, '', 'a:1:{s:7:"options";a:1:{s:0:"";N;}}', 1, '', 1);
-	$extra_fields->addExtraField( 'digiriskdolibarr_ticket_location', $langs->trans("Location"), 'varchar', 2400, '', 'ticket', 0, 0, '', 'a:1:{s:7:"options";a:1:{s:0:"";N;}}', 1, '', 1);
-	$extra_fields->addExtraField( 'digiriskdolibarr_ticket_date', $langs->trans("Date"), 'datetime', 2500, '', 'ticket', 0, 0, '', 'a:1:{s:7:"options";a:1:{s:0:"";N;}}', 1, '', 1);
+	$extra_fields->addExtraField( 'digiriskdolibarr_ticket_lastname', $langs->trans("LastName"), 'varchar', 2000, 255, 'ticket', 0, 0, '', '', 1, '', 1);
+	$extra_fields->addExtraField( 'digiriskdolibarr_ticket_firstname', $langs->trans("FirstName"), 'varchar', 2100, 255, 'ticket', 0, 0, '', '', 1, '', 1);
+	$extra_fields->addExtraField( 'digiriskdolibarr_ticket_phone', $langs->trans("Phone"), 'phone', 2200, '', 'ticket', 0, 0, '', '', 1, '', 1);
+	$extra_fields->addExtraField( 'digiriskdolibarr_ticket_service', $langs->trans("Service"), 'varchar', 2300, 255, 'ticket', 0, 0, '', '', 1, '', 1);
+	$extra_fields->addExtraField( 'digiriskdolibarr_ticket_location', $langs->trans("Location"), 'varchar', 2400, 255, 'ticket', 0, 0, '', '', 1, '', 1);
+	$extra_fields->addExtraField( 'digiriskdolibarr_ticket_date', $langs->trans("Date"), 'datetime', 2500, '', 'ticket', 0, 0, '', '', 1, '', 1);
 //@todo add size et virer params
 	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_TICKET_EXTRAFIELDS', 1, 'integer', 0, '', $conf->entity);
 }
 
 if ($action == 'generateCategories') {
-	
+
 	$category->label = $langs->trans('Register');
 	$category->description = '';
 	$category->color = '';
@@ -80,6 +80,7 @@ if ($action == 'generateCategories') {
 
 	$result = $category->create($user);
 	if ($result > 0) {
+
 		$category->label = $langs->trans('Accident');
 		$category->description = '';
 		$category->color = '';
@@ -94,7 +95,8 @@ if ($action == 'generateCategories') {
 			$category->visible = 1;
 			$category->fk_parent = $result2;
 			$category->create($user);
-
+		} else {
+			setEventMessages($category->error, null, 'errors');
 		}
 
 		$category->label = $langs->trans('SST');
@@ -111,8 +113,9 @@ if ($action == 'generateCategories') {
 			$category->color = '';
 			$category->visible = 1;
 			$category->fk_parent = $result3;
-			$category->create($user);
-
+			$oui = $category->create($user);
+		} else {
+			setEventMessages($category->error, null, 'errors');
 		}
 
 		$category->label = $langs->trans('DGI');
@@ -121,11 +124,17 @@ if ($action == 'generateCategories') {
 		$category->visible = 1;
 		$category->fk_parent = $result;
 		$category->create($user);
-		$result3 = $category->create($user);
+		$result4 = $category->create($user);
 
+		if ($result2 > 0 && $result3 > 0 && $result4 > 0) {
+			dolibarr_set_const($db, 'DIGIRISKDOLIBARR_TICKET_CATEGORIES_CREATED', 1, 'integer', 0, '', $conf->entity);
+			setEventMessages($langs->trans('CategoriesCreated'), array());
+		}
+
+	} else {
+	  setEventMessages($category->error, null, 'errors');
 	}
 
-	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_TICKET_CATEGORIES_CREATED', 1, 'integer', 0, '', $conf->entity);
 }
 
 /*
@@ -148,7 +157,7 @@ print load_fiche_titre($langs->trans($page_name), $linkback, 'object_digiriskdol
 // Configuration header
 $head = digiriskdolibarrAdminPrepareHead();
 print dol_get_fiche_head($head, 'ticket', '', -1, "digiriskdolibarr@digiriskdolibarr");
-print '<span class="opacitymedium">'.$langs->trans("SignaturePublicAccess").'</span> : <a class="wordbreak" href="'.dol_buildpath('/custom/digiriskdolibarr/public/signature/index.php', 1).'" target="_blank" >'.dol_buildpath('/custom/digiriskdolibarr/public/signature/index.php', 2).'</a>';
+print '<span class="opacitymedium">'.$langs->trans("DigiriskTicketPublicAccess").'</span> : <a class="wordbreak" href="'.dol_buildpath('/custom/digiriskdolibarr/public/ticket/create_ticket.php', 1).'" target="_blank" >'.dol_buildpath('/custom/digiriskdolibarr/public/ticket/create_ticket.php', 2).'</a>';
 print dol_get_fiche_end();
 
 print '<br><br>';
