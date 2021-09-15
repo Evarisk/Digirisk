@@ -3,7 +3,7 @@
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
+ * the Free Software Foundation; either version 3 of the License, or
  * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
@@ -16,9 +16,9 @@
  */
 
 /**
- *       \file       public/ticket/create_ticket.php
+ *       \file       public/ticket/ticket_success.php
  *       \ingroup    digiriskdolibarr
- *       \brief      Display public form to add new ticket
+ *       \brief      Public page to view success on ticket
  */
 
 if (!defined('NOREQUIREUSER'))  define('NOREQUIREUSER', '1');
@@ -27,7 +27,7 @@ if (!defined('NOREQUIREMENU'))  define('NOREQUIREMENU', '1');
 if (!defined('NOREQUIREHTML'))  define('NOREQUIREHTML', '1');
 if (!defined('NOLOGIN'))        define("NOLOGIN", 1); // This means this output page does not require to be logged.
 if (!defined('NOCSRFCHECK'))    define("NOCSRFCHECK", 1); // We accept to go on this page from external web site.
-if (!defined('NOIPCHECK'))      define('NOIPCHECK', '1'); // Do not check IP defined into conf $dolibarr_main_restrict_ip
+if (!defined('NOIPCHECK'))		define('NOIPCHECK', '1'); // Do not check IP defined into conf $dolibarr_main_restrict_ip
 if (!defined('NOBROWSERNOTIF')) define('NOBROWSERNOTIF', '1');
 
 // Load Dolibarr environment
@@ -43,87 +43,54 @@ if (!$res && $i > 0 && file_exists(dirname(substr($tmp, 0, ($i + 1)))."/main.inc
 if (!$res && file_exists("../../main.inc.php")) $res = @include "../../main.inc.php";
 if (!$res && file_exists("../../../main.inc.php")) $res = @include "../../../main.inc.php";
 if (!$res && file_exists("../../../../main.inc.php")) $res = @include "../../../../main.inc.php";
-if (!$res && file_exists("../../../../../main.inc.php")) $res = @include "../../../../../main.inc.php";
-if (!$res) die("Include of main fails");require_once DOL_DOCUMENT_ROOT.'/ticket/class/actions_ticket.class.php';
-
-require_once DOL_DOCUMENT_ROOT.'/core/class/html.formticket.class.php';
-require_once DOL_DOCUMENT_ROOT.'/core/lib/images.lib.php';
-require_once DOL_DOCUMENT_ROOT.'/core/lib/ticket.lib.php';
-require_once DOL_DOCUMENT_ROOT.'/core/lib/security.lib.php';
-require_once DOL_DOCUMENT_ROOT.'/core/lib/company.lib.php';
-require_once DOL_DOCUMENT_ROOT.'/core/lib/payments.lib.php';
-require_once DOL_DOCUMENT_ROOT.'/core/class/extrafields.class.php';
-require_once DOL_DOCUMENT_ROOT.'/core/class/html.formfile.class.php';
-require_once DOL_DOCUMENT_ROOT.'/user/class/user.class.php';
-require_once DOL_DOCUMENT_ROOT.'/core/class/doleditor.class.php';
-require_once DOL_DOCUMENT_ROOT.'/categories/class/categorie.class.php';
-require_once DOL_DOCUMENT_ROOT.'/core/modules/ticket/mod_ticket_simple.php';
+if (!$res) die("Include of main fails");
 
 require_once '../../lib/digiriskdolibarr_function.lib.php';
 
-global $langs;
+global $langs, $mysoc;
 // Load translation files required by the page
-$langs->loadLangs(array('companies', 'other', 'mails', 'ticket', 'digiriskdolibarr@digiriskdolibarr'));
-
-// Get parameters
-$id            = GETPOST('id', 'int');
-$msg_id        = GETPOST('msg_id', 'int');
-$action        = GETPOST('action', 'aZ09');
-$ticket_tmp_id = GETPOST('ticket_id');
-
-if (!dol_strlen($ticket_tmp_id)) {
-	$ticket_tmp_id = generate_random_id(16);
-}
-
-// Initialize technical object to manage hooks of page. Note that conf->hooks_modules contains array of hook context
-$hookmanager->initHooks(array('publicnewticketcard', 'globalcard'));
-
-$object      = new Ticket($db);
-$formfile    = new FormFile($db);
-$extrafields = new ExtraFields($db);
-$category    = new Categorie($db);
-$modTicket   = new mod_ticket_simple($db);
-
-$extrafields->fetch_name_optionals_label($object->table_element);
-
-$upload_dir = $conf->categorie->multidir_output[isset($conf->entity) ? $conf->entity : 1];
-
-/*
- * Actions
- */
-
-$parameters = array(
-	'id' => $id,
-);
-// Note that $action and $object may have been modified by some hooks
-$reshook = $hookmanager->executeHooks('doActions', $parameters, $object, $action);
-if ($reshook < 0) {
-	setEventMessages($hookmanager->error, $hookmanager->errors, 'errors');
-}
-
+$langs->loadLangs(array("digiriskdolibarr@digiriskdolibarr", "other", "errors"));
 
 /*
  * View
  */
 
-$form = new Form($db);
-$formticket = new FormTicket($db);
-
-if (!$conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE) {
-	print '<div class="error">'.$langs->trans('TicketPublicInterfaceForbidden').'</div>';
-	$db->close();
-	exit();
+if (empty($conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE))
+{
+	print $langs->trans('TicketPublicInterfaceForbidden');
+	exit;
 }
 
-$arrayofjs  =  array("/digiriskdolibarr/js/digiriskdolibarr.js.php");
-$arrayofcss = array('/opensurvey/css/style.css', '/ticket/css/styles.css.php', "/digiriskdolibarr/css/digiriskdolibarr.css");
+$morejs   = array("/digiriskdolibarr/js/ticket-pad.min.js", "/digiriskdolibarr/js/digiriskdolibarr.js.php");
+$morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");
 
-llxHeaderTicket($langs->trans("CreateTicket"), "", 0, 0, $arrayofjs, $arrayofcss);
+top_htmlhead('', $langs->trans("CreateTicket"), 0, 0, $morejs, $morecss, 0, 1); // Show html headers
 
-print '<div class="ticketpublicarea">';
+// Define logo and logosmall
+$logosmall = $mysoc->logo_small;
+$logo = $mysoc->logo;
+// Define urllogo
+$urllogo = '';
+if (!empty($logosmall) && is_readable($conf->mycompany->dir_output.'/logos/thumbs/'.$logosmall)) {
+	$urllogo = DOL_URL_ROOT.'/viewimage.php?modulepart=mycompany&amp;entity='.$conf->entity.'&amp;file='.urlencode('logos/thumbs/'.$logosmall);
+} elseif (!empty($logo) && is_readable($conf->mycompany->dir_output.'/logos/'.$logo)) {
+	$urllogo = DOL_URL_ROOT.'/viewimage.php?modulepart=mycompany&amp;entity='.$conf->entity.'&amp;file='.urlencode('logos/'.$logo);
+}
+// Output html code for logo
+if ($urllogo) {
+	print '<div class="center signature-logo">';
+	print '<img src="'.$urllogo.'">';
+	print '</div>';
+}
+print '<div class="underbanner clearboth"></div>';
+?>
+	<div class="digirisk-ticket-container">
+		<p class="center"><?php echo $langs->trans("TicketSuccess"); ?> </p>
+	</div>
+<?php
 
-print 'BRAVO';
 
 // End of page
 llxFooter('', 'public');
 $db->close();
+
