@@ -300,19 +300,19 @@ foreach ($registerChildren as $register) {
 		print '<td class="ticket-register center" id="'.$register->id.'">';
 	}
 
-	if ($register->label == 'Santé & Sécurité au Travail') {
+	if ($register->label == $langs->trans('SST')) {
 		print '<div class="wpeo-button button-blue">';
-		print '<i class="fas fa-shield-alt"></i>';
+		show_category_image($register, $upload_dir);
 		print $register->label;
 		print '</div>';
-	} elseif ($register->label == 'Accidents') {
+	} elseif ($register->label == $langs->trans('Accident')) {
 		print '<div class="wpeo-button button-yellow">';
-		print '<i class="fas fa-user-injured"></i>';
+		show_category_image($register, $upload_dir);
 		print $register->label;
 		print '</div>';
-	} elseif ($register->label == 'Danger Grave et Imminent') {
+	} elseif ($register->label == $langs->trans('DGI')) {
 		print '<div class="wpeo-button button-red">';
-		print '<i class="fas fa-exclamation-triangle"></i>';
+		show_category_image($register, $upload_dir);
 		print $register->label;
 		print '</div>';
 	} else {
