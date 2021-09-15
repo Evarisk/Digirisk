@@ -104,12 +104,7 @@ if ($reshook < 0) {
 if ($action == 'add') {
 	$register      = GETPOST('register');
 	$pertinence    = GETPOST('pertinence');
-	$service       = GETPOST('service');
-	$firstname     = GETPOST('firstname');
-	$lastname      = GETPOST('lastname');
 	$message       = GETPOST('message');
-	$location      = GETPOST('location');
-	$phone         = GETPOST('phone');
 	$ticket_tmp_id = GETPOST('ticket_id');
 
 	$object->ref = $modTicket->getNextValue($thirdparty,$object);
@@ -126,20 +121,9 @@ if ($action == 'add') {
 	$label_severity         = ($langs->trans("TicketSeverityShort".$object->severity_code) != ("TicketSeverityShort".$object->severity_code) ? $langs->trans("TicketSeverityShort".$object->severity_code) : ($object->severity_label != '-' ? $object->severity_label : ''));
 	$object->severity_label = $label_severity;
 
-	$dateandhour = dol_mktime(GETPOST('dateohour', 'int'), GETPOST('dateomin', 'int'), 0, GETPOST('dateomonth', 'int'), GETPOST('dateoday', 'int'), GETPOST('dateoyear', 'int'));
-	$dateandhour = dol_print_date($dateandhour, 'dayhoursec');
+	$object->message = html_entity_decode($message);
 
-	$fullMessage = '';
-	if ($firstname) $fullMessage .= $langs->trans('Firstname') . ' : ' . $firstname . ' ';
-	if ($lastname)  $fullMessage .= $langs->trans('Lastname') . ' : ' .$lastname . ' ';
-	if ($location) $fullMessage .= $langs->trans('Location') . ' : ' .$location . ' ';
-	if ($phone) $fullMessage .= $langs->trans('Phone') . ' : ' .$phone . ' ';
-	if ($service) $fullMessage .= $langs->trans('Service') . ' : ' .$service . ' ';
-	if ($dateandhour) $fullMessage .= $langs->trans('Date') . ' : ' .$dateandhour . ' ';
-
-	$fullMessage .= $langs->trans('Message') . ' : ' . $message;
-
-	$object->message = html_entity_decode($fullMessage);
+	$extrafields->setOptionalsFromPost(null, $object);
 
 	$result = $object->create($user);
 
@@ -152,10 +136,6 @@ if ($action == 'add') {
 		$pertinenceCat = $category;
 		$pertinenceCat->fetch($pertinence);
 		$pertinenceCat->add_type($object, Categorie::TYPE_TICKET);
-
-		$serviceCat = $category;
-		$serviceCat->fetch($service);
-		$serviceCat->add_type($object, Categorie::TYPE_TICKET);
 
 		//Add files linked
 		$ticket_upload_dir = $conf->digiriskdolibarr->multidir_output[isset($conf->entity) ? $conf->entity : 1].'/temp';
@@ -277,7 +257,7 @@ if ($action == 'removefile') {
 $form = new Form($db);
 $formticket = new FormTicket($db);
 
-if (!$conf->global->TICKET_ENABLE_PUBLIC_INTERFACE) {
+if (!$conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE) {
 	print '<div class="error">'.$langs->trans('TicketPublicInterfaceForbidden').'</div>';
 	$db->close();
 	exit();
@@ -297,7 +277,6 @@ print '<input type="hidden" name="token" value="'.newToken().'">';
 print '<input type="hidden" name="action" value="add">';
 print '<input type="hidden" id="register" name="register" value="'.GETPOST('register').'">';
 print '<input type="hidden" id="pertinence" name="pertinence" value="'.GETPOST('pertinence').'">';
-print '<input type="hidden" id="service" name="service" value="'.GETPOST('service').'">';
 print '<input type="hidden" id="ticket_id" name="ticket_id" value="'.$ticket_tmp_id.'">';
 print '<input type="hidden" name="id" value="'.$object->id.'">';
 if ($backtopage) print '<input type="hidden" name="backtopage" value="'.$backtopage.'">';
@@ -413,32 +392,7 @@ if (!empty($fileLinkedList)){
 print '</table>';
 print '</div></div></td></tr>';
 
-print '<tr><td>'.$langs->trans("Lastname").'</td>';
-print '<td style="width:20%" >' . $langs->trans("Firstname").'</td>';
-print '<td>' . $langs->trans("Phone").'</td></tr>';
-
-print '<tr><td><input name="lastname" type=text value="" placeholder="'.$langs->trans('LastnamePlaceholder').'">';
-print '</td>';
-
-print '<td><input name="firstname" type=text value="" placeholder="'.$langs->trans('FirstnamePlaceholder').'">';
-print '</td>';
-
-print '<td><input name="phone" type=text value="" placeholder="'.$langs->trans('PhonePlaceholder').'">';
-print '</td></tr>';
-
-print '<tr><td>'.$langs->trans("DateAndHour").'</td>';
-print '<td style="width:20%" >' . $langs->trans("Location").'</td>';
-print '<td>' . $langs->trans("Service").'</td></tr>';
-
-print '<tr><td>';
-print $form->selectDate(dol_now('tzuser'), 'dateo', 1, 1, 0, '', 1);
-print '</td>';
-
-print '<td><input name="location" type=text value="" placeholder="'.$langs->trans('LocationPlaceholder').'">';
-print '</td>';
-
-print '<td><input name="service" type=text value="" placeholder="'.$langs->trans('ServicePlaceholder').'">';
-print '</td></tr>';
+include DOL_DOCUMENT_ROOT . '/core/tpl/extrafields_add.tpl.php';
 
 print '</form>';
 print '</td></tr>';
