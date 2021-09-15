@@ -287,8 +287,8 @@ class modDigiriskdolibarr extends DolibarrModules
 			211 => array('DIGIRISKDOLIBARR_SIGNATURE_SHOW_COMPANY_LOGO','integer', 1,'', $conf->entity),
 
 			//CONST TICKET & REGISTERS
-			300 => array('DIGIRISKDOLIBARR_TICKET_EXTRAFIELDS', 'integer', 1, '', $conf->entity),
-			301 => array('DIGIRISKDOLIBARR_TICKET_CATEGORIES_CREATED', 'integer', 1, '', $conf->entity),
+			300 => array('DIGIRISKDOLIBARR_TICKET_EXTRAFIELDS', 'integer', 0, '', $conf->entity),
+			301 => array('DIGIRISKDOLIBARR_TICKET_CATEGORIES_CREATED', 'integer', 0, '', $conf->entity),
 			302 => array('DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE','integer', 1,'', $conf->entity)
 
 		);
