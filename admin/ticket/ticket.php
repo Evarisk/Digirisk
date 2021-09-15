@@ -104,6 +104,22 @@ if ($action == 'generateCategories') {
 			$category->type = 'ticket';
 			$category->fk_parent = $result2;
 			$category->create($user);
+
+			$category->label = $langs->trans('AccidentWithDIAT');
+			$category->description = '';
+			$category->color = '';
+			$category->visible = 1;
+			$category->type = 'ticket';
+			$category->fk_parent = $result2;
+			$category->create($user);
+
+			$category->label = $langs->trans('AccidentWithoutDIAT');
+			$category->description = '';
+			$category->color = '';
+			$category->visible = 1;
+			$category->type = 'ticket';
+			$category->fk_parent = $result2;
+			$category->create($user);
 		} else {
 			setEventMessages($category->error, null, 'errors');
 		}
@@ -124,7 +140,40 @@ if ($action == 'generateCategories') {
 			$category->visible = 1;
 			$category->type = 'ticket';
 			$category->fk_parent = $result3;
-			$oui = $category->create($user);
+			$category->create($user);
+
+			$category->label = $langs->trans('Others');
+			$category->description = '';
+			$category->color = '';
+			$category->visible = 1;
+			$category->type = 'ticket';
+			$category->fk_parent = $result3;
+			$category->create($user);
+
+			$category->label = $langs->trans('HumanProblem');
+			$category->description = '';
+			$category->color = '';
+			$category->visible = 1;
+			$category->type = 'ticket';
+			$category->fk_parent = $result3;
+			$category->create($user);
+
+			$category->label = $langs->trans('MaterialProblem');
+			$category->description = '';
+			$category->color = '';
+			$category->visible = 1;
+			$category->type = 'ticket';
+			$category->fk_parent = $result3;
+			$category->create($user);
+
+			$category->label = $langs->trans('EnhancementSuggestion');
+			$category->description = '';
+			$category->color = '';
+			$category->visible = 1;
+			$category->type = 'ticket';
+			$category->fk_parent = $result3;
+			$category->create($user);
+
 		} else {
 			setEventMessages($category->error, null, 'errors');
 		}
