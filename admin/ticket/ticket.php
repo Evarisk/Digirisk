@@ -61,20 +61,24 @@ $value      = GETPOST('value', 'alpha');
  */
 
 if ($action == 'setPublicInterface') {
-	if (GETPOST('value')) dolibarr_set_const($db, 'DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE', 1, 'chaine', 0, '', $conf->entity);
-	else dolibarr_set_const($db, 'DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE', 0, 'chaine', 0, '', $conf->entity);
+	if (GETPOST('value')) dolibarr_set_const($db, 'DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE', 1, 'integer', 0, '', $conf->entity);
+	else dolibarr_set_const($db, 'DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE', 0, 'integer', 0, '', $conf->entity);
 }
 
 
 if ($action == 'generateExtrafields') {
-	$extra_fields->addExtraField( 'digiriskdolibarr_ticket_lastname', $langs->trans("LastName"), 'varchar', 2000, 255, 'ticket', 0, 0, '', '', 1, '', 1);
-	$extra_fields->addExtraField( 'digiriskdolibarr_ticket_firstname', $langs->trans("FirstName"), 'varchar', 2100, 255, 'ticket', 0, 0, '', '', 1, '', 1);
-	$extra_fields->addExtraField( 'digiriskdolibarr_ticket_phone', $langs->trans("Phone"), 'phone', 2200, '', 'ticket', 0, 0, '', '', 1, '', 1);
-	$extra_fields->addExtraField( 'digiriskdolibarr_ticket_service', $langs->trans("Service"), 'varchar', 2300, 255, 'ticket', 0, 0, '', '', 1, '', 1);
-	$extra_fields->addExtraField( 'digiriskdolibarr_ticket_location', $langs->trans("Location"), 'varchar', 2400, 255, 'ticket', 0, 0, '', '', 1, '', 1);
-	$extra_fields->addExtraField( 'digiriskdolibarr_ticket_date', $langs->trans("Date"), 'datetime', 2500, '', 'ticket', 0, 0, '', '', 1, '', 1);
-
-	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_TICKET_EXTRAFIELDS', 1, 'integer', 0, '', $conf->entity);
+	$ret1 = $extra_fields->addExtraField( 'digiriskdolibarr_ticket_lastname', $langs->trans("LastName"), 'varchar', 2000, 255, 'ticket', 0, 0, '', '', 1, '', 1);
+	$ret2 = $extra_fields->addExtraField( 'digiriskdolibarr_ticket_firstname', $langs->trans("FirstName"), 'varchar', 2100, 255, 'ticket', 0, 0, '', '', 1, '', 1);
+	$ret3 = $extra_fields->addExtraField( 'digiriskdolibarr_ticket_phone', $langs->trans("Phone"), 'phone', 2200, '', 'ticket', 0, 0, '', '', 1, '', 1);
+	$ret4 = $extra_fields->addExtraField( 'digiriskdolibarr_ticket_service', $langs->trans("Service"), 'varchar', 2300, 255, 'ticket', 0, 0, '', '', 1, '', 1);
+	$ret5 = $extra_fields->addExtraField( 'digiriskdolibarr_ticket_location', $langs->trans("Location"), 'varchar', 2400, 255, 'ticket', 0, 0, '', '', 1, '', 1);
+	$ret6 = $extra_fields->addExtraField( 'digiriskdolibarr_ticket_date', $langs->trans("Date"), 'datetime', 2500, '', 'ticket', 0, 0, '', '', 1, '', 1);
+	if ($ret1 > 0 && $ret2 >  0 && $ret3 >  0 && $ret4 > 0 && $ret5 >  0 && $ret6 > 0) {
+		dolibarr_set_const($db, 'DIGIRISKDOLIBARR_TICKET_EXTRAFIELDS', 1, 'integer', 0, '', $conf->entity);
+		setEventMessages($langs->trans('ExtrafieldsCreated'), array());
+	} else {
+		setEventMessages($extra_fields->error, null, 'errors');
+	}
 }
 
 if ($action == 'generateCategories') {

@@ -862,6 +862,13 @@ PhonePlaceholder = 00.00.00.00.00
 LocationPlaceholder = Exemple : Bureau A
 ServicePlaceholder = Exemple : Ripeur
 Location = Lieu
+CategoriesCreated = Création des catégories de ticket
+ExtrafieldsCreated = Création des extrafields de ticket
+AnticipatedLeave = Départ anticipé
+DGI = Danger grave et imminent
+SST = Santé et sécurité au travail
+PresquAccident = PresquAccident
+Accident = Accident
 
 
 
