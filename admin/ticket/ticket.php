@@ -134,7 +134,6 @@ if ($action == 'generateCategories') {
 		$category->visible = 1;
 		$category->type = 'ticket';
 		$category->fk_parent = $result;
-		$category->create($user);
 		$result3 = $category->create($user);
 
 		if ($result3 > 0) {
@@ -188,7 +187,6 @@ if ($action == 'generateCategories') {
 		$category->visible = 1;
 		$category->type = 'ticket';
 		$category->fk_parent = $result;
-		$category->create($user);
 		$result4 = $category->create($user);
 
 		if ($result2 > 0 && $result3 > 0 && $result4 > 0) {
