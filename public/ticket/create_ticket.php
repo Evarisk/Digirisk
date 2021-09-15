@@ -370,7 +370,7 @@ print '<td>';
 
 print '<label class="wpeo-button button-blue" for="sendfile">';
 print '<i class="fas fa-image button-icon"></i>';
-print $langs->trans('AddDocument');
+print ' '.$langs->trans('AddDocument');
 print '<input type="file" name="userfile[]" multiple="multiple" id="sendfile" onchange="window.eoxiaJS.ticket.tmpStockFile()"  style="display: none"/>';
 print '</label>';
 print '</td>';
