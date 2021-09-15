@@ -126,6 +126,8 @@ if ($action == 'add') {
 	$extrafields->setOptionalsFromPost(null, $object);
 
 	$result = $object->create($user);
+	$object->fetch($result);
+	$track_id = $object->track_id;
 
 	if ($result > 0) {
 		//Add categories linked
@@ -175,7 +177,7 @@ if ($action == 'add') {
 
 		// Creation OK
 		dol_delete_dir_recursive($ticket_upload_dir . '/ticket/' . $ticket_tmp_id . '/');
-		$urltogo = $_SERVER['PHP_SELF'] . '/../create_success.php';
+		$urltogo = $_SERVER['PHP_SELF'] . '/../create_success.php?track_id=' . $track_id ;
 		setEventMessages($langs->trans("TicketSend", ''), null);
 		header("Location: ".$urltogo);
 		exit;
