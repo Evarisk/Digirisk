@@ -116,6 +116,20 @@ if ($action == 'add') {
 
 	$object->ref = $modTicket->getNextValue($thirdparty,$object);
 
+	$object->type_code = 'OTHER';
+	// Si traduction existe, on l'utilise, sinon on prend le libelle par defaut
+	$label_type = ($langs->trans("TicketTypeShort".$object->type_code) != ("TicketTypeShort".$object->type_code) ? $langs->trans("TicketTypeShort".$object->type_code) : ($object->type_label != '-' ? $object->type_label : ''));
+	$object->type_label = $label_type;
+
+	$object->category_code = 'OTHER';
+	// Si traduction existe, on l'utilise, sinon on prend le libelle par defaut
+	$label_category = ($langs->trans("TicketCategoryShort".$object->category_code) != ("TicketCategoryShort".$object->category_code) ? $langs->trans("TicketCategoryShort".$object->category_code) : ($object->category_label != '-' ? $object->category_label : ''));
+	$object->category_label = $label_category;
+
+	$object->severity_code = 'NORMAL';
+	$label_severity = ($langs->trans("TicketSeverityShort".$object->severity_code) != ("TicketSeverityShort".$object->severity_code) ? $langs->trans("TicketSeverityShort".$object->severity_code) : ($object->severity_label != '-' ? $object->severity_label : ''));
+	$object->severity_label = $label_severity;
+
 	$dateandhour = dol_mktime(GETPOST('dateohour', 'int'), GETPOST('dateomin', 'int'), 0, GETPOST('dateomonth', 'int'), GETPOST('dateoday', 'int'), GETPOST('dateoyear', 'int'));
 	$dateandhour = dol_print_date($dateandhour, 'dayhoursec');
 
