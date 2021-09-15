@@ -175,7 +175,7 @@ if ($action == 'add') {
 
 		// Creation OK
 		dol_delete_dir_recursive($ticket_upload_dir . '/ticket/' . $ticket_tmp_id . '/');
-		$urltogo = $_SERVER['PHP_SELF'];
+		$urltogo = $_SERVER['PHP_SELF'] . '/../create_success.php';
 		setEventMessages($langs->trans("TicketSend", ''), null);
 		header("Location: ".$urltogo);
 		exit;
