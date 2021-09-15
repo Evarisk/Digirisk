@@ -696,7 +696,7 @@ if ($action == 'create') {
 
 	//Label -- Libellé
 	print '<tr><td>'.$langs->trans("Label").'</td><td>';
-	print '<input class="flat" type="text" size="36" name="label" id="label" value="">';
+	print '<input class="flat" type="text" size="36" name="label" id="label" value="'.GETPOST('label').'">';
 	print '</td></tr>';
 
 	//Start Date -- Date début
@@ -710,11 +710,11 @@ if ($action == 'create') {
 	print '</td></tr>';
 
 	//Maitre d'oeuvre
-	$userlist = $form->select_dolusers('', '', 0, null, 0, '', '', 0, 0, 0, 'AND u.statut = 1', 0, '', 'minwidth300', 0, 1);
+	$userlist = $form->select_dolusers(GETPOST('maitre_oeuvre'), '', 0, null, 0, '', '', 0, 0, 0, 'AND u.statut = 1', 0, '', 'minwidth300', 0, 1);
 	print '<tr>';
 	print '<td class="fieldrequired" style="width:10%">'.$form->editfieldkey('MaitreOeuvre', 'MaitreOeuvre_id', '', $object, 0).'</td>';
 	print '<td>';
-	print $form->selectarray('maitre_oeuvre', $userlist, '', $langs->trans('SelectUser'), null, null, null, "40%", 0,0,'','minwidth300',1);
+	print $form->selectarray('maitre_oeuvre', $userlist, GETPOST('maitre_oeuvre'), $langs->trans('SelectUser'), null, null, null, "40%", 0,0,'','minwidth300',1);
 	print ' <a href="'.DOL_URL_ROOT.'/user/card.php?action=create&backtopage='.urlencode($_SERVER["PHP_SELF"].'?action=create').'" target="_blank"><span class="fa fa-plus-circle valignmiddle paddingleft" title="'.$langs->trans("AddUser").'"></span></a>';
 	print '</td></tr>';
 
@@ -722,33 +722,33 @@ if ($action == 'create') {
 	print '<tr><td class="fieldrequired">'.$langs->trans("ExtSociety").'</td><td>';
 	$events = array();
 	$events[1] = array('method' => 'getContacts', 'url' => dol_buildpath('/core/ajax/contacts.php?showempty=1', 1), 'htmlname' => 'ext_society_responsible', 'params' => array('add-customer-contact' => 'disabled'));
-	print $form->select_company('', 'ext_society', '', 'SelectThirdParty', 1, 0, $events, 0, 'minwidth300');
+	print $form->select_company(GETPOST('ext_society'), 'ext_society', '', 'SelectThirdParty', 1, 0, $events, 0, 'minwidth300');
 	print ' <a href="'.DOL_URL_ROOT.'/societe/card.php?action=create&backtopage='.urlencode($_SERVER["PHP_SELF"].'?action=create').'" target="_blank"><span class="fa fa-plus-circle valignmiddle paddingleft" title="'.$langs->trans("AddThirdParty").'"></span></a>';
 	print '</td></tr>';
 
 	//External responsible -- Responsable de la société extérieure
 	print '<tr><td class="fieldrequired">'.$langs->trans("ExtSocietyResponsible").'</td><td>';
-	print $form->selectcontacts(GETPOST('ext_society', 'int'), '', 'ext_society_responsible', 1, '', '', 0, 'minwidth300', false, 0, array(), false, '', 'ext_society_responsible');
+	print $form->selectcontacts(GETPOST('ext_society', 'int'), GETPOST('ext_society_responsible'), 'ext_society_responsible', 1, '', '', 0, 'minwidth300', false, 0, array(), false, '', 'ext_society_responsible');
 	print '</td></tr>';
 
 	// CSSCT Intervention
 	print '<tr><td>'.$langs->trans("CSSCTIntervention").'</td><td>';
-	print '<input type="checkbox" id="cssct_intervention" name="cssct_intervention">';
+	print '<input type="checkbox" id="cssct_intervention" name="cssct_intervention" '.(GETPOST('cssct_intervention') ? ' checked=""' : '').'>';
 	print '</td></tr>';
 
 	//Prior Visit -- Inspection commune préalable
 	print '<tr><td>'.$langs->trans("PriorVisit").'</td><td>';
-	print '<input type="checkbox" id="prior_visit_bool" name="prior_visit_bool">';
+	print '<input type="checkbox" id="prior_visit_bool" name="prior_visit_bool"'.(GETPOST('prior_visit_bool') ? ' checked=""' : '').'>';
 	print '</td></tr>';
 
 	//Prior Visit Date -- Date de l'inspection commune préalable
-	print '<tr class="prior_visit_date_field hidden" style="display:none"><td><label for="prior_visit_date">'.$langs->trans("PriorVisitDate").'</label></td><td>';
+	print '<tr class="prior_visit_date_field hidden" '. (GETPOST('prior_visit_bool') ?  '' : 'style="display:none"') .'><td><label for="prior_visit_date">'.$langs->trans("PriorVisitDate").'</label></td><td>';
 	print $form->selectDate(dol_now('tzuser'), 'datei', 1, 1, 0, '', 1);
 	print '</td></tr>';
 
 	//Prior Visit Texte -- Note de l'inspection
-	print '<tr  class="prior_visit_text_field hidden" style="display:none"><td><label for="prior_visit_text">'.$langs->trans("PriorVisitText").'</label></td><td>';
-	$doleditor = new DolEditor('prior_visit_text', '', '', 90, 'dolibarr_notes', '', false, true, $conf->global->FCKEDITOR_ENABLE_SOCIETE, ROWS_3, '90%');
+	print '<tr  class="prior_visit_text_field hidden"'. (GETPOST('prior_visit_bool') ?  '' : 'style="display:none"') .'><td><label for="prior_visit_text">'.$langs->trans("PriorVisitText").'</label></td><td>';
+	$doleditor = new DolEditor('prior_visit_text', GETPOST('prior_visit_text'), '', 90, 'dolibarr_notes', '', false, true, $conf->global->FCKEDITOR_ENABLE_SOCIETE, ROWS_3, '90%');
 	$doleditor->Create();
 	print '</td></tr>';
 
@@ -759,13 +759,13 @@ if ($action == 'create') {
 	print '<td>';
 	$events = array();
 	$events[1] = array('method' => 'getContacts', 'url' => dol_buildpath('/core/ajax/contacts.php?showempty=1', 1), 'htmlname' => 'labour_inspector_contact', 'params' => array('add-customer-contact' => 'disabled'));
-	print $form->select_company('', 'labour_inspector', '', 'SelectThirdParty', 1, 0, $events, 0, 'minwidth300');
+	print $form->select_company(GETPOST('labour_inspector'), 'labour_inspector', '', 'SelectThirdParty', 1, 0, $events, 0, 'minwidth300');
 	print ' <a href="'.DOL_URL_ROOT.'/societe/card.php?action=create&backtopage='.urlencode($_SERVER["PHP_SELF"].'?action=create').'" target="_blank"><span class="fa fa-plus-circle valignmiddle paddingleft" title="'.$langs->trans("AddThirdParty").'"></span></a>';
 	print '</td></tr>';
 
 	//Labour inspector -- Inspecteur du travail
 	print '<tr><td class="fieldrequired">'.$langs->trans("LabourInspector").'</td><td>';
-	print $form->selectcontacts(GETPOST('labour_inspector', 'int'), '', 'labour_inspector_contact', 1, '', '', 0, 'minwidth300', false, 0, array(), false, '', 'labour_inspector_contact');
+	print $form->selectcontacts(GETPOST('labour_inspector', 'int'), GETPOST('labour_inspector_contact'), 'labour_inspector_contact', 1, '', '', 0, 'minwidth300', false, 0, array(), false, '', 'labour_inspector_contact');
 	print '</td></tr>';
 
 	// Other attributes
