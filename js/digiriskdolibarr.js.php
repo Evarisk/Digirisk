@@ -2457,7 +2457,12 @@ window.eoxiaJS.ticket.event = function() {
  */
 window.eoxiaJS.ticket.updateFormData = function( ) {
 
-	let requestParams = '?'
+	let requestParams = ''
+	if (document.URL.match(/\?/)) {
+		requestParams = '&'
+	} else {
+		requestParams = '?'
+	}
 
 	let register = window.eoxiaJS.ticket.getRegister()
 	if (register > 0) {
