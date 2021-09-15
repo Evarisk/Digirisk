@@ -1,6 +1,5 @@
 <?php
-/* Copyright (C) 2013-2016    Jean-François FERRY <hello@librethic.io>
- * Copyright (C) 2016         Christophe Battarel <christophe@altairis.fr>
+/* Copyright (C) 2021 EOXIA <dev@eoxia.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,8 +16,8 @@
  */
 
 /**
- *       \file       htdocs/public/ticket/create_ticket.php
- *       \ingroup    ticket
+ *       \file       public/ticket/create_ticket.php
+ *       \ingroup    digiriskdolibarr
  *       \brief      Display public form to add new ticket
  */
 
@@ -28,7 +27,7 @@ if (!defined('NOREQUIREMENU'))  define('NOREQUIREMENU', '1');
 if (!defined('NOREQUIREHTML'))  define('NOREQUIREHTML', '1');
 if (!defined('NOLOGIN'))        define("NOLOGIN", 1); // This means this output page does not require to be logged.
 if (!defined('NOCSRFCHECK'))    define("NOCSRFCHECK", 1); // We accept to go on this page from external web site.
-if (!defined('NOIPCHECK'))		define('NOIPCHECK', '1'); // Do not check IP defined into conf $dolibarr_main_restrict_ip
+if (!defined('NOIPCHECK'))      define('NOIPCHECK', '1'); // Do not check IP defined into conf $dolibarr_main_restrict_ip
 if (!defined('NOBROWSERNOTIF')) define('NOBROWSERNOTIF', '1');
 
 // Load Dolibarr environment
@@ -59,6 +58,7 @@ require_once DOL_DOCUMENT_ROOT.'/user/class/user.class.php';
 require_once DOL_DOCUMENT_ROOT.'/core/class/doleditor.class.php';
 require_once DOL_DOCUMENT_ROOT.'/categories/class/categorie.class.php';
 require_once DOL_DOCUMENT_ROOT.'/core/modules/ticket/mod_ticket_simple.php';
+
 require_once '../../lib/digiriskdolibarr_function.lib.php';
 
 global $langs;
@@ -66,11 +66,9 @@ global $langs;
 $langs->loadLangs(array('companies', 'other', 'mails', 'ticket', 'digiriskdolibarr@digiriskdolibarr'));
 
 // Get parameters
-$id = GETPOST('id', 'int');
-$msg_id = GETPOST('msg_id', 'int');
-
-$action = GETPOST('action', 'aZ09');
-
+$id            = GETPOST('id', 'int');
+$msg_id        = GETPOST('msg_id', 'int');
+$action        = GETPOST('action', 'aZ09');
 $ticket_tmp_id = GETPOST('ticket_id');
 
 if (!dol_strlen($ticket_tmp_id)) {
@@ -80,19 +78,20 @@ if (!dol_strlen($ticket_tmp_id)) {
 // Initialize technical object to manage hooks of page. Note that conf->hooks_modules contains array of hook context
 $hookmanager->initHooks(array('publicnewticketcard', 'globalcard'));
 
-$object = new Ticket($db);
-$formfile = new FormFile($db);
+$object      = new Ticket($db);
+$formfile    = new FormFile($db);
 $extrafields = new ExtraFields($db);
-$category = new Categorie($db);
-$modTicket = new mod_ticket_simple($db);
+$category    = new Categorie($db);
+$modTicket   = new mod_ticket_simple($db);
 
 $extrafields->fetch_name_optionals_label($object->table_element);
 
-$upload_dir         = $conf->categorie->multidir_output[isset($conf->entity) ? $conf->entity : 1];
+$upload_dir = $conf->categorie->multidir_output[isset($conf->entity) ? $conf->entity : 1];
 
 /*
  * Actions
  */
+
 $parameters = array(
 	'id' => $id,
 );
@@ -103,31 +102,28 @@ if ($reshook < 0) {
 }
 
 if ($action == 'add') {
-
-	$register = GETPOST('register');
-	$pertinence = GETPOST('pertinence');
-	$service = GETPOST('service');
-	$firstname = GETPOST('firstname');
-	$lastname = GETPOST('lastname');
-	$message = GETPOST('message');
-	$location = GETPOST('location');
-	$phone = GETPOST('phone');
+	$register      = GETPOST('register');
+	$pertinence    = GETPOST('pertinence');
+	$service       = GETPOST('service');
+	$firstname     = GETPOST('firstname');
+	$lastname      = GETPOST('lastname');
+	$message       = GETPOST('message');
+	$location      = GETPOST('location');
+	$phone         = GETPOST('phone');
 	$ticket_tmp_id = GETPOST('ticket_id');
 
 	$object->ref = $modTicket->getNextValue($thirdparty,$object);
 
-	$object->type_code = 'OTHER';
-	// Si traduction existe, on l'utilise, sinon on prend le libelle par defaut
-	$label_type = ($langs->trans("TicketTypeShort".$object->type_code) != ("TicketTypeShort".$object->type_code) ? $langs->trans("TicketTypeShort".$object->type_code) : ($object->type_label != '-' ? $object->type_label : ''));
+	$object->type_code  = 'OTHER';
+	$label_type         = ($langs->trans("TicketTypeShort".$object->type_code) != ("TicketTypeShort".$object->type_code) ? $langs->trans("TicketTypeShort".$object->type_code) : ($object->type_label != '-' ? $object->type_label : ''));
 	$object->type_label = $label_type;
 
-	$object->category_code = 'OTHER';
-	// Si traduction existe, on l'utilise, sinon on prend le libelle par defaut
-	$label_category = ($langs->trans("TicketCategoryShort".$object->category_code) != ("TicketCategoryShort".$object->category_code) ? $langs->trans("TicketCategoryShort".$object->category_code) : ($object->category_label != '-' ? $object->category_label : ''));
+	$object->category_code  = 'OTHER';
+	$label_category         = ($langs->trans("TicketCategoryShort".$object->category_code) != ("TicketCategoryShort".$object->category_code) ? $langs->trans("TicketCategoryShort".$object->category_code) : ($object->category_label != '-' ? $object->category_label : ''));
 	$object->category_label = $label_category;
 
-	$object->severity_code = 'NORMAL';
-	$label_severity = ($langs->trans("TicketSeverityShort".$object->severity_code) != ("TicketSeverityShort".$object->severity_code) ? $langs->trans("TicketSeverityShort".$object->severity_code) : ($object->severity_label != '-' ? $object->severity_label : ''));
+	$object->severity_code  = 'NORMAL';
+	$label_severity         = ($langs->trans("TicketSeverityShort".$object->severity_code) != ("TicketSeverityShort".$object->severity_code) ? $langs->trans("TicketSeverityShort".$object->severity_code) : ($object->severity_label != '-' ? $object->severity_label : ''));
 	$object->severity_label = $label_severity;
 
 	$dateandhour = dol_mktime(GETPOST('dateohour', 'int'), GETPOST('dateomin', 'int'), 0, GETPOST('dateomonth', 'int'), GETPOST('dateoday', 'int'), GETPOST('dateoyear', 'int'));
@@ -148,7 +144,6 @@ if ($action == 'add') {
 	$result = $object->create($user);
 
 	if ($result > 0) {
-
 		//Add categories linked
 		$registerCat = $category;
 		$registerCat->fetch($register);
@@ -248,7 +243,6 @@ if ($action == 'sendfile') {
 			}
 		}
 	} $action = '';
-
 }
 
 // Remove file
@@ -272,9 +266,7 @@ if ($action == 'removefile') {
 			dol_delete_dir($ticket_upload_dir . 'thumbs/');
 		}
 	}
-
 	$action = '';
-
 }
 
 
@@ -285,13 +277,13 @@ if ($action == 'removefile') {
 $form = new Form($db);
 $formticket = new FormTicket($db);
 
-//if (!$conf->global->TICKET_ENABLE_PUBLIC_INTERFACE) {
-//	print '<div class="error">'.$langs->trans('TicketPublicInterfaceForbidden').'</div>';
-//	$db->close();
-//	exit();
-//}
+if (!$conf->global->TICKET_ENABLE_PUBLIC_INTERFACE) {
+	print '<div class="error">'.$langs->trans('TicketPublicInterfaceForbidden').'</div>';
+	$db->close();
+	exit();
+}
 
-$arrayofjs =  array("/digiriskdolibarr/js/digiriskdolibarr.js.php");
+$arrayofjs  =  array("/digiriskdolibarr/js/digiriskdolibarr.js.php");
 $arrayofcss = array('/opensurvey/css/style.css', '/ticket/css/styles.css.php', "/digiriskdolibarr/css/digiriskdolibarr.css");
 
 llxHeaderTicket($langs->trans("CreateTicket"), "", 0, 0, $arrayofjs, $arrayofcss);
@@ -311,7 +303,7 @@ print '<input type="hidden" name="id" value="'.$object->id.'">';
 if ($backtopage) print '<input type="hidden" name="backtopage" value="'.$backtopage.'">';
 if ($backtopageforcancel) print '<input type="hidden" name="backtopageforcancel" value="'.$backtopageforcancel.'">';
 
-dol_fiche_head(array(), '0', '', 1);
+print dol_get_fiche_head(array(), '0', '', 1);
 
 print '<div class="img-fields-container">';
 print '<table class="border centpercent tableforimgfields">'."\n";
@@ -329,17 +321,17 @@ foreach ($registerChildren as $register) {
 
 	if ($register->label == 'Santé & Sécurité au Travail') {
 		print '<div class="wpeo-button button-blue">';
-		print '<i class="fas fa-shield-alt"></i>    ';
+		print '<i class="fas fa-shield-alt"></i>';
 		print $register->label;
 		print '</div>';
 	} elseif ($register->label == 'Accidents') {
 		print '<div class="wpeo-button button-yellow">';
-		print '<i class="fas fa-user-injured"></i>    ';
+		print '<i class="fas fa-user-injured"></i>';
 		print $register->label;
 		print '</div>';
 	} elseif ($register->label == 'Danger Grave et Imminent') {
 		print '<div class="wpeo-button button-red">';
-		print '<i class="fas fa-exclamation-triangle"></i>    ';
+		print '<i class="fas fa-exclamation-triangle"></i>';
 		print $register->label;
 		print '</div>';
 	} else {
@@ -441,10 +433,6 @@ print '<td>' . $langs->trans("Service").'</td></tr>';
 print '<tr><td>';
 print $form->selectDate(dol_now('tzuser'), 'dateo', 1, 1, 0, '', 1);
 print '</td>';
-//Start Date -- Date début
-//print '<tr class="oddeven"><td><label for="date_debut">'.$langs->trans("StartDate").'</label></td><td>';
-//print $form->selectDate(dol_now('tzuser'), 'dateo', 1, 1, 0, '', 1);
-//print '</td></tr>';
 
 print '<td><input name="location" type=text value="" placeholder="'.$langs->trans('LocationPlaceholder').'">';
 print '</td>';
@@ -453,13 +441,10 @@ print '<td><input name="service" type=text value="" placeholder="'.$langs->trans
 print '</td></tr>';
 
 print '</form>';
-
 print '</td></tr>';
-
-
 print '</table>';
 
-dol_fiche_end();
+print dol_get_fiche_end();
 
 print '<div class="center"><button form="sendTicketForm" type="submit" id ="actionButtonSave" class="wpeo-button" name="add">'.'<i class="fas fa-paper-plane"></i>    '.$langs->trans("Send") . '</button>';
 print '</div>';
@@ -467,8 +452,5 @@ print '</div>';
 print '</div>';
 
 // End of page
-htmlPrintOnlinePaymentFooter($mysoc, $langs, 1, $suffix, $object);
-
 llxFooter('', 'public');
-
 $db->close();
