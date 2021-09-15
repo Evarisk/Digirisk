@@ -85,7 +85,7 @@ if ($urllogo) {
 }
 print '<div class="underbanner clearboth"></div>';
 ?>
-	<div class="digirisk-ticket-container">
+	<div class="digirisk-signature-container">
 		<p class="center"><?php echo $langs->trans("TicketSuccess") . $track_id; ?> </p>
 		<p class="opacitymedium center"><?php echo $langs->trans("TicketPublicAccess") . '  '?><a class="wordbreak" href="<?php echo dol_buildpath('/public/ticket/index.php', 2) ?>" target="_blank" ><?php echo dol_buildpath('/public/ticket/index.php', 2) ?></a></p>;
 
