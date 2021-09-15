@@ -60,6 +60,12 @@ $value      = GETPOST('value', 'alpha');
  * Actions
  */
 
+if ($action == 'setPublicInterface') {
+	if (GETPOST('value')) dolibarr_set_const($db, 'DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE', 1, 'chaine', 0, '', $conf->entity);
+	else dolibarr_set_const($db, 'DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE', 0, 'chaine', 0, '', $conf->entity);
+}
+
+
 if ($action == 'generateExtrafields') {
 	$extra_fields->addExtraField( 'digiriskdolibarr_ticket_lastname', $langs->trans("LastName"), 'varchar', 2000, 255, 'ticket', 0, 0, '', '', 1, '', 1);
 	$extra_fields->addExtraField( 'digiriskdolibarr_ticket_firstname', $langs->trans("FirstName"), 'varchar', 2100, 255, 'ticket', 0, 0, '', '', 1, '', 1);
@@ -160,61 +166,78 @@ print dol_get_fiche_head($head, 'ticket', '', -1, "digiriskdolibarr@digiriskdoli
 print '<span class="opacitymedium">'.$langs->trans("DigiriskTicketPublicAccess").'</span> : <a class="wordbreak" href="'.dol_buildpath('/custom/digiriskdolibarr/public/ticket/create_ticket.php', 1).'" target="_blank" >'.dol_buildpath('/custom/digiriskdolibarr/public/ticket/create_ticket.php', 2).'</a>';
 print dol_get_fiche_end();
 
+$enabledisablehtml = $langs->trans("TicketActivatePublicInterface").' ';
+if (empty($conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE)) {
+	// Button off, click to enable
+	$enabledisablehtml .= '<a class="reposition valignmiddle" href="'.$_SERVER["PHP_SELF"].'?action=setPublicInterface&token='.newToken().'&value=1'.$param.'">';
+	$enabledisablehtml .= img_picto($langs->trans("Disabled"), 'switch_off');
+	$enabledisablehtml .= '</a>';
+} else {
+	// Button on, click to disable
+	$enabledisablehtml .= '<a class="reposition valignmiddle" href="'.$_SERVER["PHP_SELF"].'?action=setPublicInterface&token='.newToken().'&value=0'.$param.'">';
+	$enabledisablehtml .= img_picto($langs->trans("Activated"), 'switch_on');
+	$enabledisablehtml .= '</a>';
+}
+print $enabledisablehtml;
+print '<input type="hidden" id="DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE" name="DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE" value="'.(empty($conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE) ? 0 : 1).'">';
+
 print '<br><br>';
 
-print '<div class="div-table-responsive-no-min">';
-print '<table class="noborder centpercent">';
-print '<tr class="liste_titre">';
-print '<td>'.$langs->trans("Parameters").'</td>';
-print '<td class="center">'.$langs->trans("Status").'</td>';
-print '<td class="center">'.$langs->trans("Action").'</td>';
-print '<td class="center">'.$langs->trans("ShortInfo").'</td>';
-print '</tr>';
+if (!empty($conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE)) {
+	print '<div class="div-table-responsive-no-min">';
+	print '<table class="noborder centpercent">';
+	print '<tr class="liste_titre">';
+	print '<td>' . $langs->trans("Parameters") . '</td>';
+	print '<td class="center">' . $langs->trans("Status") . '</td>';
+	print '<td class="center">' . $langs->trans("Action") . '</td>';
+	print '<td class="center">' . $langs->trans("ShortInfo") . '</td>';
+	print '</tr>';
 
 // Extrafields generation
 
-print '<form method="POST" action="'.$_SERVER["PHP_SELF"].'">';
-print '<input type="hidden" name="token" value="'.newToken().'">';
-print '<input type="hidden" name="action" value="generateExtrafields">';
-print '<input type="hidden" name="backtopage" value="'.$backtopage.'">';
+	print '<form method="POST" action="' . $_SERVER["PHP_SELF"] . '">';
+	print '<input type="hidden" name="token" value="' . newToken() . '">';
+	print '<input type="hidden" name="action" value="generateExtrafields">';
+	print '<input type="hidden" name="backtopage" value="' . $backtopage . '">';
 
-print '<tr class="oddeven"><td>'.$langs->trans("GenerateExtrafields").'</td>';
-print '<td class="center">';
-print $conf->global->DIGIRISKDOLIBARR_TICKET_EXTRAFIELDS ? $langs->trans('AlreadyGenerated') : $langs->trans('NotCreated');
-print '</td>';
-print '<td class="center">';
-print $conf->global->DIGIRISKDOLIBARR_TICKET_EXTRAFIELDS ? '<button type="submit" class="wpeo-button button-disable">'.$langs->trans('Create').'</button> ' : '<button type="submit" class="wpeo-button button-blue">'.$langs->trans('Create').'</button>' ;
-print '</td>';
+	print '<tr class="oddeven"><td>' . $langs->trans("GenerateExtrafields") . '</td>';
+	print '<td class="center">';
+	print $conf->global->DIGIRISKDOLIBARR_TICKET_EXTRAFIELDS ? $langs->trans('AlreadyGenerated') : $langs->trans('NotCreated');
+	print '</td>';
+	print '<td class="center">';
+	print $conf->global->DIGIRISKDOLIBARR_TICKET_EXTRAFIELDS ? '<button type="submit" class="wpeo-button button-disable">' . $langs->trans('Create') . '</button> ' : '<button type="submit" class="wpeo-button button-blue">' . $langs->trans('Create') . '</button>';
+	print '</td>';
 
-print '<td class="center">';
-print $form->textwithpicto('', $langs->trans("ExtrafieldsGeneration"), 1, 'help');
-print '</td>';
-print '</tr>';
-print '</form>';
+	print '<td class="center">';
+	print $form->textwithpicto('', $langs->trans("ExtrafieldsGeneration"), 1, 'help');
+	print '</td>';
+	print '</tr>';
+	print '</form>';
 
 //Categories generation
 
-print '<form method="POST" action="'.$_SERVER["PHP_SELF"].'">';
-print '<input type="hidden" name="token" value="'.newToken().'">';
-print '<input type="hidden" name="action" value="generateCategories">';
-print '<input type="hidden" name="backtopage" value="'.$backtopage.'">';
+	print '<form method="POST" action="' . $_SERVER["PHP_SELF"] . '">';
+	print '<input type="hidden" name="token" value="' . newToken() . '">';
+	print '<input type="hidden" name="action" value="generateCategories">';
+	print '<input type="hidden" name="backtopage" value="' . $backtopage . '">';
 
-print '<tr class="oddeven"><td>'.$langs->trans("GenerateCategories").'</td>';
-print '<td class="center">';
-print $conf->global->DIGIRISKDOLIBARR_TICKET_CATEGORIES_CREATED ? $langs->trans('AlreadyGenerated') : $langs->trans('NotCreated');
-print '</td>';
-print '<td class="center">';
-print $conf->global->DIGIRISKDOLIBARR_TICKET_CATEGORIES_CREATED ? '<button type="submit" class="wpeo-button button-disable">'.$langs->trans('Create').'</button> ' : '<button type="submit" class="wpeo-button button-blue">'.$langs->trans('Create').'</button>' ;
-print '</td>';
+	print '<tr class="oddeven"><td>' . $langs->trans("GenerateCategories") . '</td>';
+	print '<td class="center">';
+	print $conf->global->DIGIRISKDOLIBARR_TICKET_CATEGORIES_CREATED ? $langs->trans('AlreadyGenerated') : $langs->trans('NotCreated');
+	print '</td>';
+	print '<td class="center">';
+	print $conf->global->DIGIRISKDOLIBARR_TICKET_CATEGORIES_CREATED ? '<button type="submit" class="wpeo-button button-disable">' . $langs->trans('Create') . '</button> ' : '<button type="submit" class="wpeo-button button-blue">' . $langs->trans('Create') . '</button>';
+	print '</td>';
 
-print '<td class="center">';
-print $form->textwithpicto('', $langs->trans("CategoriesGeneration"), 1, 'help');
-print '</td>';
-print '</tr>';
-print '</form>';
+	print '<td class="center">';
+	print $form->textwithpicto('', $langs->trans("CategoriesGeneration"), 1, 'help');
+	print '</td>';
+	print '</tr>';
+	print '</form>';
 
-print '</table>';
-print '</div>';
+	print '</table>';
+	print '</div>';
+}
 
 
 // End of page
