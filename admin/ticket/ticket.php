@@ -73,7 +73,7 @@ if ($action == 'generateExtrafields') {
 	$extra_fields->addExtraField( 'digiriskdolibarr_ticket_service', $langs->trans("Service"), 'varchar', 2300, 255, 'ticket', 0, 0, '', '', 1, '', 1);
 	$extra_fields->addExtraField( 'digiriskdolibarr_ticket_location', $langs->trans("Location"), 'varchar', 2400, 255, 'ticket', 0, 0, '', '', 1, '', 1);
 	$extra_fields->addExtraField( 'digiriskdolibarr_ticket_date', $langs->trans("Date"), 'datetime', 2500, '', 'ticket', 0, 0, '', '', 1, '', 1);
-//@todo add size et virer params
+
 	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_TICKET_EXTRAFIELDS', 1, 'integer', 0, '', $conf->entity);
 }
 
@@ -83,6 +83,7 @@ if ($action == 'generateCategories') {
 	$category->description = '';
 	$category->color = '';
 	$category->visible = 1;
+	$category->type = 'ticket';
 
 	$result = $category->create($user);
 	if ($result > 0) {
@@ -91,6 +92,7 @@ if ($action == 'generateCategories') {
 		$category->description = '';
 		$category->color = '';
 		$category->visible = 1;
+		$category->type = 'ticket';
 		$category->fk_parent = $result;
 		$result2 = $category->create($user);
 
@@ -99,6 +101,7 @@ if ($action == 'generateCategories') {
 			$category->description = '';
 			$category->color = '';
 			$category->visible = 1;
+			$category->type = 'ticket';
 			$category->fk_parent = $result2;
 			$category->create($user);
 		} else {
@@ -109,6 +112,7 @@ if ($action == 'generateCategories') {
 		$category->description = '';
 		$category->color = '';
 		$category->visible = 1;
+		$category->type = 'ticket';
 		$category->fk_parent = $result;
 		$category->create($user);
 		$result3 = $category->create($user);
@@ -118,6 +122,7 @@ if ($action == 'generateCategories') {
 			$category->description = '';
 			$category->color = '';
 			$category->visible = 1;
+			$category->type = 'ticket';
 			$category->fk_parent = $result3;
 			$oui = $category->create($user);
 		} else {
@@ -128,6 +133,7 @@ if ($action == 'generateCategories') {
 		$category->description = '';
 		$category->color = '';
 		$category->visible = 1;
+		$category->type = 'ticket';
 		$category->fk_parent = $result;
 		$category->create($user);
 		$result4 = $category->create($user);
