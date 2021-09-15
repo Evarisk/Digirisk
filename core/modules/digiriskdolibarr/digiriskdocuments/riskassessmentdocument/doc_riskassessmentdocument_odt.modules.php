@@ -403,7 +403,7 @@ class doc_riskassessmentdocument_odt extends ModeleODTRiskAssessmentDocument
 											if ($related_task->progress == 100) {
 												$tmparray['actionPreventionCompleted'] .= dol_print_date($related_task->date_c, '%A %e %B %G %H:%M') . ': ' . $related_task->label . "\n";
 											} else {
-												$tmparray['actionPreventionUncompleted'] .= dol_print_date($related_task->date_c, '%A %e %B %G %H:%M') . ': ' . $related_task->label . "\n";
+												$tmparray['actionPreventionUncompleted'] .= dol_print_date($related_task->date_c, '%A %e %B %G %H:%M') . ': ' . $related_task->label . ' ' . ($related_task->progress ?  $related_task->progress : 0) . '%'. "\n";
 											}
 										}
 									} else {
