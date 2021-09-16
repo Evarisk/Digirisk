@@ -39,7 +39,7 @@ require_once './class/digiriskstandard.class.php';
 require_once './lib/digiriskdolibarr_digiriskstandard.lib.php';
 require_once './lib/digiriskdolibarr_function.lib.php';
 
-global $db, $conf, $langs;
+global $db, $conf, $langs, $user;
 
 // Load translation files required by the page
 $langs->loadLangs(array("digiriskdolibarr@digiriskdolibarr"));
@@ -49,7 +49,7 @@ $object = new DigiriskStandard($db);
 
 $object->fetch($conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD);
 
-$permissiontoread = $user->rights->digiriskdolibarr->digiriskelement->read;
+$permissiontoread = $user->rights->digiriskdolibarr->riskassessmentdocument->read;
 
 if (!$permissiontoread) accessforbidden();
 

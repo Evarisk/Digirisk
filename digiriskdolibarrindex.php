@@ -41,6 +41,7 @@ require_once DOL_DOCUMENT_ROOT.'/projet/class/project.class.php';
 require_once DOL_DOCUMENT_ROOT.'/societe/class/societe.class.php';
 require_once DOL_DOCUMENT_ROOT.'/core/modules/project/mod_project_simple.php';
 
+global $user, $langs, $conf;
 // Load translation files required by the page
 $langs->loadLangs(array("digiriskdolibarr@digiriskdolibarr"));
 
@@ -266,126 +267,128 @@ print load_fiche_titre($langs->trans("DigiriskDolibarrArea"), '', 'digiriskdolib
 
 <?php
 
-print load_fiche_titre($langs->trans("DigiriskTaskData"), '', '');
+if ($user->rights->digiriskdolibarr->adminpage->read) {
+	print load_fiche_titre($langs->trans("DigiriskTaskData"), '', '');
 
-print '<table class="noborder centpercent">';
-print '<tr class="liste_titre">';
-print '<td>'.$langs->trans("Name").'</td>';
-print '<td>'.$langs->trans("Description").'</td>';
-print '<td class="center" width="60">'.$langs->trans("Status").'</td>';
-print '</tr>'."\n";
+	print '<table class="noborder centpercent">';
+	print '<tr class="liste_titre">';
+	print '<td>'.$langs->trans("Name").'</td>';
+	print '<td>'.$langs->trans("Description").'</td>';
+	print '<td class="center" width="60">'.$langs->trans("Status").'</td>';
+	print '</tr>'."\n";
 
-print '<tr class="oddeven"><td style="width:40%">';
-print $langs->trans('TasksManagement');
-print "</td><td>\n";
-print $langs->trans('TaskManagementDescription');
-print '</td>';
+	print '<tr class="oddeven"><td style="width:40%">';
+	print $langs->trans('TasksManagement');
+	print "</td><td>\n";
+	print $langs->trans('TaskManagementDescription');
+	print '</td>';
 
-print '<td class="center">';
-if ($conf->global->DIGIRISKDOLIBARR_TASK_MANAGEMENT)
-{
-	print '<a class="reposition" href="'.$_SERVER["PHP_SELF"].'?action=settaskmanagement&value=0" alt="'.$langs->trans("Default").'">'.img_picto($langs->trans("Activated"), 'switch_on').'</a>';
+	print '<td class="center">';
+	if ($conf->global->DIGIRISKDOLIBARR_TASK_MANAGEMENT)
+	{
+		print '<a class="reposition" href="'.$_SERVER["PHP_SELF"].'?action=settaskmanagement&value=0" alt="'.$langs->trans("Default").'">'.img_picto($langs->trans("Activated"), 'switch_on').'</a>';
+	}
+	else
+	{
+		print '<a class="reposition" href="'.$_SERVER["PHP_SELF"].'?action=settaskmanagement&value=1" alt="'.$langs->trans("Default").'">'.img_picto($langs->trans("Disabled"), 'switch_off').'</a>';
+	}
+	print '</td>';
+	print '</tr>';
+	print '</table>';
+
+	print load_fiche_titre($langs->trans("DigiriskRiskData"), '', '');
+
+	print '<table class="noborder centpercent">';
+	print '<tr class="liste_titre">';
+	print '<td>'.$langs->trans("Name").'</td>';
+	print '<td>'.$langs->trans("Description").'</td>';
+	print '<td class="center" width="60">'.$langs->trans("Status").'</td>';
+	print '</tr>'."\n";
+
+	print '<tr class="oddeven""><td style="width:40%">';
+	print $langs->trans('RiskDescription');
+	print "</td><td>\n";
+	print $langs->trans('RiskDescriptionDescription');
+	print '</td>';
+
+	print '<td class="center">';
+	if ($conf->global->DIGIRISKDOLIBARR_RISK_DESCRIPTION)
+	{
+		print '<a class="reposition" href="'.$_SERVER["PHP_SELF"].'?action=setriskdescription&value=0" alt="'.$langs->trans("Default").'">'.img_picto($langs->trans("Activated"), 'switch_on').'</a>';
+	}
+	else
+	{
+		print '<a class="reposition" href="'.$_SERVER["PHP_SELF"].'?action=setriskdescription&value=1" alt="'.$langs->trans("Default").'">'.img_picto($langs->trans("Disabled"), 'switch_off').'</a>';
+	}
+	print '</td>';
+	print '</tr>';
+
+	print '<tr class="oddeven"><td>';
+	print $langs->trans('RiskCategoryEdit');
+	print "</td><td>\n";
+	print $langs->trans('RiskCategoryEditDescription');
+	print '</td>';
+
+	print '<td class="center">';
+	if ($conf->global->DIGIRISKDOLIBARR_RISK_CATEGORY_EDIT)
+	{
+		print '<a class="reposition" href="'.$_SERVER["PHP_SELF"].'?action=setriskcategoryedit&value=0" alt="'.$langs->trans("Default").'">'.img_picto($langs->trans("Activated"), 'switch_on').'</a>';
+	}
+	else
+	{
+		print '<a class="reposition" href="'.$_SERVER["PHP_SELF"].'?action=setriskcategoryedit&value=1" alt="'.$langs->trans("Default").'">'.img_picto($langs->trans("Disabled"), 'switch_off').'</a>';
+	}
+	print '</td>';
+	print '</tr>';
+
+	print '</table>';
+
+	print load_fiche_titre($langs->trans("DigiriskRiskAssessmentData"), '', '');
+
+	print '<table class="noborder centpercent">';
+	print '<tr class="liste_titre">';
+	print '<td>'.$langs->trans("Name").'</td>';
+	print '<td>'.$langs->trans("Description").'</td>';
+	print '<td class="center" width="60">'.$langs->trans("Status").'</td>';
+	print '</tr>'."\n";
+
+	print '<tr class="oddeven"><td style="width:40%">';
+	print $langs->trans('AdvancedRiskAssessmentMethod');
+	print "</td><td>\n";
+	print $langs->trans('AdvancedRiskAssessmentMethodDescription');
+	print '</td>';
+
+	print '<td class="center">';
+	if ($conf->global->DIGIRISKDOLIBARR_ADVANCED_RISKASSESSMENT_METHOD)
+	{
+		print '<a class="reposition" href="'.$_SERVER["PHP_SELF"].'?action=setadvancedmethod&value=0" alt="'.$langs->trans("Default").'">'.img_picto($langs->trans("Activated"), 'switch_on').'</a>';
+	}
+	else
+	{
+		print '<a class="reposition" href="'.$_SERVER["PHP_SELF"].'?action=setadvancedmethod&value=1" alt="'.$langs->trans("Default").'">'.img_picto($langs->trans("Disabled"), 'switch_off').'</a>';
+	}
+	print '</td>';
+	print '</tr>';
+
+	print '<tr class="oddeven"><td>';
+	print $langs->trans('MultipleRiskAssessmentMethodName');
+	print "</td><td>\n";
+	print $langs->trans('MultipleRiskAssessmentMethodDescription');
+	print '</td>';
+
+	print '<td class="center">';
+	if ($conf->global->DIGIRISKDOLIBARR_MULTIPLE_RISKASSESSMENT_METHOD)
+	{
+		print '<a class="reposition" href="'.$_SERVER["PHP_SELF"].'?action=setmethod&value=0" alt="'.$langs->trans("Default").'">'.img_picto($langs->trans("Activated"), 'switch_on').'</a>';
+	}
+	else
+	{
+		print '<a class="reposition" href="'.$_SERVER["PHP_SELF"].'?action=setmethod&value=1" alt="'.$langs->trans("Default").'">'.img_picto($langs->trans("Disabled"), 'switch_off').'</a>';
+	}
+	print '</td>';
+	print '</tr>';
+	print '</table>';
 }
-else
-{
-	print '<a class="reposition" href="'.$_SERVER["PHP_SELF"].'?action=settaskmanagement&value=1" alt="'.$langs->trans("Default").'">'.img_picto($langs->trans("Disabled"), 'switch_off').'</a>';
-}
-print '</td>';
-print '</tr>';
-print '</table>';
-
-print load_fiche_titre($langs->trans("DigiriskRiskData"), '', '');
-
-print '<table class="noborder centpercent">';
-print '<tr class="liste_titre">';
-print '<td>'.$langs->trans("Name").'</td>';
-print '<td>'.$langs->trans("Description").'</td>';
-print '<td class="center" width="60">'.$langs->trans("Status").'</td>';
-print '</tr>'."\n";
-
-print '<tr class="oddeven""><td style="width:40%">';
-print $langs->trans('RiskDescription');
-print "</td><td>\n";
-print $langs->trans('RiskDescriptionDescription');
-print '</td>';
-
-print '<td class="center">';
-if ($conf->global->DIGIRISKDOLIBARR_RISK_DESCRIPTION)
-{
-	print '<a class="reposition" href="'.$_SERVER["PHP_SELF"].'?action=setriskdescription&value=0" alt="'.$langs->trans("Default").'">'.img_picto($langs->trans("Activated"), 'switch_on').'</a>';
-}
-else
-{
-	print '<a class="reposition" href="'.$_SERVER["PHP_SELF"].'?action=setriskdescription&value=1" alt="'.$langs->trans("Default").'">'.img_picto($langs->trans("Disabled"), 'switch_off').'</a>';
-}
-print '</td>';
-print '</tr>';
-
-print '<tr class="oddeven"><td>';
-print $langs->trans('RiskCategoryEdit');
-print "</td><td>\n";
-print $langs->trans('RiskCategoryEditDescription');
-print '</td>';
-
-print '<td class="center">';
-if ($conf->global->DIGIRISKDOLIBARR_RISK_CATEGORY_EDIT)
-{
-	print '<a class="reposition" href="'.$_SERVER["PHP_SELF"].'?action=setriskcategoryedit&value=0" alt="'.$langs->trans("Default").'">'.img_picto($langs->trans("Activated"), 'switch_on').'</a>';
-}
-else
-{
-	print '<a class="reposition" href="'.$_SERVER["PHP_SELF"].'?action=setriskcategoryedit&value=1" alt="'.$langs->trans("Default").'">'.img_picto($langs->trans("Disabled"), 'switch_off').'</a>';
-}
-print '</td>';
-print '</tr>';
-
-print '</table>';
-
-print load_fiche_titre($langs->trans("DigiriskRiskAssessmentData"), '', '');
-
-print '<table class="noborder centpercent">';
-print '<tr class="liste_titre">';
-print '<td>'.$langs->trans("Name").'</td>';
-print '<td>'.$langs->trans("Description").'</td>';
-print '<td class="center" width="60">'.$langs->trans("Status").'</td>';
-print '</tr>'."\n";
-
-print '<tr class="oddeven"><td style="width:40%">';
-print $langs->trans('AdvancedRiskAssessmentMethod');
-print "</td><td>\n";
-print $langs->trans('AdvancedRiskAssessmentMethodDescription');
-print '</td>';
-
-print '<td class="center">';
-if ($conf->global->DIGIRISKDOLIBARR_ADVANCED_RISKASSESSMENT_METHOD)
-{
-	print '<a class="reposition" href="'.$_SERVER["PHP_SELF"].'?action=setadvancedmethod&value=0" alt="'.$langs->trans("Default").'">'.img_picto($langs->trans("Activated"), 'switch_on').'</a>';
-}
-else
-{
-	print '<a class="reposition" href="'.$_SERVER["PHP_SELF"].'?action=setadvancedmethod&value=1" alt="'.$langs->trans("Default").'">'.img_picto($langs->trans("Disabled"), 'switch_off').'</a>';
-}
-print '</td>';
-print '</tr>';
-
-print '<tr class="oddeven"><td>';
-print $langs->trans('MultipleRiskAssessmentMethodName');
-print "</td><td>\n";
-print $langs->trans('MultipleRiskAssessmentMethodDescription');
-print '</td>';
-
-print '<td class="center">';
-if ($conf->global->DIGIRISKDOLIBARR_MULTIPLE_RISKASSESSMENT_METHOD)
-{
-	print '<a class="reposition" href="'.$_SERVER["PHP_SELF"].'?action=setmethod&value=0" alt="'.$langs->trans("Default").'">'.img_picto($langs->trans("Activated"), 'switch_on').'</a>';
-}
-else
-{
-	print '<a class="reposition" href="'.$_SERVER["PHP_SELF"].'?action=setmethod&value=1" alt="'.$langs->trans("Default").'">'.img_picto($langs->trans("Disabled"), 'switch_off').'</a>';
-}
-print '</td>';
-print '</tr>';
-print '</table>';
 
 // End of page
 //dolibarr_set_const()

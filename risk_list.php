@@ -53,6 +53,8 @@ require_once './core/modules/digiriskdolibarr/riskanalysis/riskassessment/mod_ri
 require_once './lib/digiriskdolibarr_digiriskstandard.lib.php';
 require_once './lib/digiriskdolibarr_function.lib.php';
 
+global $langs, $user, $conf, $db;
+
 // Load translation files required by the page
 $langs->loadLangs(array("digiriskdolibarr@digiriskdolibarr", "other"));
 
