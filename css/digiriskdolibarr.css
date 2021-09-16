@@ -2360,6 +2360,13 @@ td > .riskassessment-tasks .riskassessment-task-container {
   padding: 0.5em;
 }
 
+td > .riskassessment-task-container {
+  min-width: 330px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  background: rgba(0, 0, 0, 0.05);
+  padding: 0.5em;
+}
+
 .riskassessment-task-container .riskassessment-task-single {
   display: -webkit-box;
   display: -ms-flexbox;
