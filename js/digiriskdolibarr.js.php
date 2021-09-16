@@ -1897,7 +1897,7 @@ window.eoxiaJS.riskassessmenttask.deleteRiskAssessmentTask = function ( event ) 
 
 		let elementParent = $(this).closest('.riskassessment-task-list-content');
 		let riskId = elementParent.attr('value');
-		let evaluationSingle = $('.riskassessment-task-single-content-'+riskId);
+		let evaluationSingle = $('.riskassessment-task-single-'+deletedRiskAssessmentTaskId);
 		let evaluationRef =  $('.riskassessment-task-ref-'+evaluationID).attr('value');
 
 		window.eoxiaJS.loader.display($(this));
@@ -1911,8 +1911,8 @@ window.eoxiaJS.riskassessmenttask.deleteRiskAssessmentTask = function ( event ) 
 			success: function ( ) {
 				elementParent.empty()
 
-				elementParent.load( document.URL + ' .riskassessment-task-list-'+riskId);
-				evaluationSingle.load( document.URL + ' .riskassessment-task-single-'+riskId);
+				elementParent.load( document.URL + ' .riskassessment-task-list-'+deletedRiskAssessmentTaskId);
+				evaluationSingle.load( document.URL + ' .riskassessment-tasks-'+riskId);
 
 				elementParent.removeClass('wpeo-loader');
 
@@ -1977,8 +1977,8 @@ window.eoxiaJS.riskassessmenttask.saveRiskAssessmentTask = function ( event ) {
 		contentType: false,
 		success: function ( ) {
 			elementParent.empty()
-			elementParent.load( document.URL + ' .riskassessment-task-list-'+riskId);
-			taskSingle.load( document.URL + ' .riskassessment-task-single-'+riskId);
+			elementParent.load( document.URL + ' .riskassessment-task-list-'+editedRiskAssessmentTaskId);
+			taskSingle.load( document.URL + ' .riskassessment-task-single-'+editedRiskAssessmentTaskId);
 			elementRiskAssessmentTask.removeClass('wpeo-loader');
 
 			let textToShow = '';
