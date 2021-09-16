@@ -2355,6 +2355,9 @@
 
 td > .riskassessment-task-container {
   min-width: 330px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  background: rgba(0, 0, 0, 0.05);
+  padding: 0.5em;
 }
 
 .riskassessment-task-container .riskassessment-task-single {
@@ -2831,7 +2834,10 @@ td > .riskassessment-task-container {
 }
 
 td > .risk-evaluation-container {
-  min-width: 330px;
+  min-width: 340px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  background: rgba(0, 0, 0, 0.05);
+  padding: 0.5em;
 }
 
 .risk-evaluation-container .risk-evaluation-single {
