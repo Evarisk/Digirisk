@@ -2487,7 +2487,10 @@ window.eoxiaJS.ticket.updateFormData = function( ) {
  * @return {void}
  */
 window.eoxiaJS.ticket.selectRegister = function( ) {
+	let pertinenceInput = $('.ticketpublicarea').find("#pertinence");
 	let registerInput = $('.ticketpublicarea').find("#register");
+
+	pertinenceInput.val(0)
 	registerInput.val($(this).attr('id'))
 
 	window.eoxiaJS.ticket.updateFormData()
