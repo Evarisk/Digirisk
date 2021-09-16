@@ -94,7 +94,7 @@
 }
 
 /** Media queries */
-.wpeo-gridlayout {
+.wpeo-gridlayout:not(.dropdown-content) {
   @for $i from 1 through 6 {
     @if ( $i > 2 ) {
       @media ( max-width: $media__medium ) {
