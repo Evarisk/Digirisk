@@ -1,0 +1,52 @@
+/** Général */
+.wpeo-form .form-element {
+  input[type="checkbox"].form-field {
+    display: inline-block;
+    width: auto;
+  }
+}
+
+/** Design */
+.wpeo-form .form-element {
+  input[type="checkbox"].form-field {
+    width: auto;
+    visibility: hidden;
+    display: none;
+
+    & + label {
+      text-transform: none;
+      font-weight: 400;
+      font-size: 14px;
+      display: inline-block;
+      margin-right: 1em;
+      position: relative;
+
+      &:hover {
+        cursor: pointer;
+      }
+      &:active {
+        outline: none;
+      }
+      &::before {
+        display: inline-block;
+        content: '';
+        width: 14px;
+        height: 14px;
+        background: transparent;
+        box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.4);
+        border: 2px solid #fff;
+        transition: all 0.2s ease-out;
+        margin-right: 0.6em;
+      }
+    }
+    &:not(:checked) + label:hover::before {
+      box-shadow: 0 0 0 2px $color__primary;
+    }
+    &:checked + label {
+      &::before {
+        box-shadow: 0 0 0 2px $color__primary;
+        background: $color__primary;
+      }
+    }
+  }
+}

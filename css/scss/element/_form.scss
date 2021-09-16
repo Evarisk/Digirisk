@@ -33,3 +33,16 @@
     }
   }
 }
+
+.form-label-required {
+  &::after {
+    display: inline-block;
+    content: '*';
+    color: $color__red;
+    font-size:22px;
+    line-height: 0;
+    position: relative;
+    top: 4px;
+    left: 4px;
+  }
+}

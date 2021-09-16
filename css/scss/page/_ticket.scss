@@ -1,0 +1,50 @@
+.ticketpublicarea {
+  .ticket-register {
+    width: 100%;
+    height: 100%;
+
+    .wpeo-button {
+      width: 100%;
+      height: 100%;
+    }
+    &.active .wpeo-button {
+      border-color: #000 !important;
+    }
+  }
+  .ticket-pertinence {
+    border: 1px solid rgba(0,0,0,0.2);
+    padding: 1em;
+    text-align: center;
+    width: 100%;
+    transition: all 0.2s ease-out;
+
+    &:hover {
+      cursor: pointer;
+      background: rgba(0,0,0,0.1);
+    }
+    &.active {
+      box-shadow: inset 0 0 0px 3px #0d8aff;
+    }
+    .button-label {
+      display: block;
+      margin-top: 0.5em;
+    }
+  }
+
+  .form-registre .wpeo-button {
+    display: flex;
+    justify-content: center;
+
+    > * {
+      margin-top: auto;
+      margin-bottom: auto;
+    }
+    .button-label {
+      margin-left: 0.5em;
+    }
+  }
+
+  .tableforinputfields {
+    margin-top: 1em;
+  }
+}

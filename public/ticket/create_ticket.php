@@ -270,7 +270,7 @@ $arrayofcss = array('/opensurvey/css/style.css', '/ticket/css/styles.css.php', "
 
 llxHeaderTicketDigirisk($langs->trans("CreateTicket"), "", 0, 0, $arrayofjs, $arrayofcss);
 
-print '<div class="ticketpublicarea">';
+print '<div class="ticketpublicarea digirisk-page-container">';
 
 print load_fiche_titre($title_edit, '', "digiriskdolibarr32px@digiriskdolibarr");
 
@@ -287,125 +287,140 @@ if ($backtopageforcancel) print '<input type="hidden" name="backtopageforcancel"
 print dol_get_fiche_head(array(), '0', '', 1);
 
 print '<div class="img-fields-container">';
-print '<table class="border centpercent tableforimgfields">'."\n";
+print '<div class="centpercent tableforimgfields form-registre">'."\n";
 
-print '<tr><td>'.$langs->trans("Register").'</td></tr>';
-print '<tr>';
+print '<p><strong>' . $langs->trans("Register") . '</strong></p>';
+print '';
+
 $registerCategory = $category->rechercher(0,'Registre','ticket', true);
 $registerChildren = $registerCategory[0]->get_filles();
+
+print '<div class="wpeo-gridlayout grid-3">';
 foreach ($registerChildren as $register) {
 	if ($register->id == GETPOST('register')) {
-		print '<td class="ticket-register center" id="'.$register->id.'" style="border: solid">';
+		print '<div class="ticket-register active" id="'.$register->id.'">';
 	} else {
-		print '<td class="ticket-register center" id="'.$register->id.'">';
+		print '<div class="ticket-register" id="'.$register->id.'">';
 	}
 
 	if ($register->label == $langs->trans('SST')) {
 		print '<div class="wpeo-button button-blue">';
 		show_category_image($register, $upload_dir);
-		print $register->label;
+		print '<span class="button-label">' . $register->label . '</span>';
 		print '</div>';
 	} elseif ($register->label == $langs->trans('Accident')) {
 		print '<div class="wpeo-button button-yellow">';
 		show_category_image($register, $upload_dir);
-		print $register->label;
+		print '<span class="button-label">' . $register->label . '</span>';
 		print '</div>';
 	} elseif ($register->label == $langs->trans('DGI')) {
 		print '<div class="wpeo-button button-red">';
 		show_category_image($register, $upload_dir);
-		print $register->label;
+		print '<span class="button-label">' . $register->label . '</span>';
 		print '</div>';
 	} else {
 		show_category_image($register, $upload_dir);
 	}
-	print '</td>';
+	print '</div>';
 
 }
+print '</div>';
 
-print '</tr>';
-print '</table>';
+print '</div>';
 
-print '<table class="border centpercent tableforimgfields">'."\n";
+print '<div class="centpercent tableforimgfields">'."\n";
 
 if (GETPOST('register')) {
 	$selectedRegister = $category;
 	$selectedRegister->fetch(GETPOST('register'));
 	$selectedRegisterChildren = $selectedRegister->get_filles();
 	if (!empty($selectedRegisterChildren)) {
-		print '<tr><td>' . $langs->trans("Pertinence") . '</td></tr>';
+		print '<p><strong>' . $langs->trans("Pertinence") . '</strong></p>';
+
+		print '<div class="wpeo-gridlayout grid-5">';
 		foreach ($selectedRegisterChildren as $pertinence) {
 			if ($pertinence->id == GETPOST('pertinence')) {
-				print '<td class="ticket-pertinence center" id="' . $pertinence->id . '" style="border: solid">';
+				print '<div class="ticket-pertinence center active" id="' . $pertinence->id . '">';
 			} else {
-				print '<td class="ticket-pertinence center" id="' . $pertinence->id . '">';
+				print '<div class="ticket-pertinence center" id="' . $pertinence->id . '">';
 			}
 			show_category_image($pertinence, $upload_dir);
-			print '</td>';
+			print '<span class="button-label">' . $pertinence->label . '</span>';
+			print '</div>';
 		}
+		print '</div>';
 	}
 }
-
-print '</table>';
-print '<br>';
 
 print '</div>';
-print '<table class="border centpercent tableforinputfields">'."\n";
 
-print '<tr><td>'.$langs->trans("Message").'</td>';
-print '<td>'.$langs->trans("FilesLinked").'</td>';
-print '<td>';
+print '</div>';
 
-print '<label class="wpeo-button button-blue" for="sendfile">';
-print '<i class="fas fa-image button-icon"></i>';
-print ' '.$langs->trans('AddDocument');
-print '<input type="file" name="userfile[]" multiple="multiple" id="sendfile" onchange="window.eoxiaJS.ticket.tmpStockFile()"  style="display: none"/>';
-print '</label>';
-print '</td>';
+?>
+<div class="wpeo-form tableforinputfields">
+	<div class="wpeo-gridlayout grid-2">
+		<div class="form-element">
+			<span class="form-label"><?php print $langs->trans("Message"); ?></span>
+			<label class="form-field-container">
+				<?php
+				$doleditor = new DolEditor('message', $conf->global->DIGIRISK_DEROGATION_SCHEDULE_OCCASIONAL ? $conf->global->DIGIRISK_DEROGATION_SCHEDULE_OCCASIONAL : '', '', 90, 'dolibarr_notes', '', false, true, $conf->global->FCKEDITOR_ENABLE_SOCIETE, ROWS_3, '90%');
+				$doleditor->Create();
+				?>
+			</label>
+		</div>
+		<div class="form-element">
+			<div class="wpeo-gridlayout grid-2">
+				<span class="form-label"><?php print $langs->trans("FilesLinked"); ?></span>
+				<label class="wpeo-button button-blue" for="sendfile">
+					<i class="fas fa-image button-icon"></i>
+					<span class="button-label"><?php print $langs->trans('AddDocument'); ?></span>
+					<input type="file" name="userfile[]" multiple="multiple" id="sendfile" onchange="window.eoxiaJS.ticket.tmpStockFile()"  style="display: none"/>
+				</label>
+			</div>
 
-print '<tr><td>';
-$doleditor = new DolEditor('message', $conf->global->DIGIRISK_DEROGATION_SCHEDULE_OCCASIONAL ? $conf->global->DIGIRISK_DEROGATION_SCHEDULE_OCCASIONAL : '', '', 90, 'dolibarr_notes', '', false, true, $conf->global->FCKEDITOR_ENABLE_SOCIETE, ROWS_3, '90%');
-$doleditor->Create();
+			<div id="sendFileForm">
+				<div id="fileLinkedTable" class="tableforinputfields">
+					<?php $fileLinkedList = dol_dir_list($conf->digiriskdolibarr->multidir_output[isset($conf->entity) ? $conf->entity : 1].'/temp/ticket/'.$ticket_tmp_id.'/thumbs/'); ?>
+					<div class="wpeo-table table-flex table-3">
+						<?php
+						if (!empty($fileLinkedList)) {
+							foreach ($fileLinkedList as $fileLinked) {
+								if (preg_match('/mini/', $fileLinked['name'])) { ?>
+									<div class="table-row">
+										<div class="table-cell table-50 table-padding-0">
+											<?php print '<img class="photo"  width="'.$maxHeight.'" src="'.DOL_URL_ROOT.'/viewimage.php?modulepart=digiriskdolibarr&entity='.$conf->entity.'&file='.urlencode('/temp/ticket/'.$ticket_tmp_id.'/thumbs/' . $fileLinked['name']).'" title="'.dol_escape_htmltag($alt).'">'; ?>
+										</div>
+										<div class="table-cell">
+											<?php print preg_replace('/_mini/','', $fileLinked['name']); ?>
+										</div>
+										<div class="table-cell table-50 table-end table-padding-0">
+											<?php print '<div class="linked-file-delete wpeo-button button-square-50 button-transparent" value="'. $fileLinked['name'] .'"><i class="fas fa-trash button-icon"></i></div>'; ?>
+										</div>
+									</div> <?php
+								}
+							}
+						} else {
+							?>
+							<div class="table-row">
+								<div class="table-cell"><?php print $langs->trans('NoFileLinked'); ?></div>
+							</div>
+							<?php
+						}
+						?>
+					</div>
+				</div>
+			</div>
 
-print '</td><td><div id="sendFileForm">';
-print '<table class="border centpercent tableforinputfields" id="fileLinkedTable">'."\n";
+		</div>
+	</div>
 
-$fileLinkedList = dol_dir_list($conf->digiriskdolibarr->multidir_output[isset($conf->entity) ? $conf->entity : 1].'/temp/ticket/'.$ticket_tmp_id.'/thumbs/');
+	<?php include DOL_DOCUMENT_ROOT . '/core/tpl/extrafields_add.tpl.php'; ?>
 
-if (!empty($fileLinkedList)){
-	foreach ($fileLinkedList as $fileLinked) {
-		if (preg_match('/mini/', $fileLinked['name'])) {
-			print '<tr><td>';
-			print '<img class="photo"  width="'.$maxHeight.'" src="'.DOL_URL_ROOT.'/viewimage.php?modulepart=digiriskdolibarr&entity='.$conf->entity.'&file='.urlencode('/temp/ticket/'.$ticket_tmp_id.'/thumbs/' . $fileLinked['name']).'" title="'.dol_escape_htmltag($alt).'">';
-
-			print '</td><td>';
-			print preg_replace('/_mini/','', $fileLinked['name']);
-			print '</td><td>';
-
-			print '<div class="linked-file-delete wpeo-button button-square-50 button-transparent" value="'. $fileLinked['name'] .'"><i class="fas fa-trash button-icon"></i></div>';
-			print '</td></tr>';
-		}
-	}
-} else {
-	print '<td>';
-	print $langs->trans('NoFileLinked');
-	print '</td>';
-}
-
-print '</table>';
-print '</div></div></td></tr>';
-
-include DOL_DOCUMENT_ROOT . '/core/tpl/extrafields_add.tpl.php';
-
-print '</form>';
-print '</td></tr>';
-print '</table>';
+	<?php print '<div class="center"><button form="sendTicketForm" type="submit" id ="actionButtonSave" class="wpeo-button" name="add">'.'<i class="fas fa-paper-plane"></i>    '.$langs->trans("Send") . '</button>'; ?>
+</div>
+<?php
 
 print dol_get_fiche_end();
-
-print '<div class="center"><button form="sendTicketForm" type="submit" id ="actionButtonSave" class="wpeo-button" name="add">'.'<i class="fas fa-paper-plane"></i>    '.$langs->trans("Send") . '</button>';
-print '</div>';
-
-print '</div>';
 
 // End of page
 llxFooter('', 'public');
