@@ -1388,7 +1388,7 @@
 				elseif ($key == 'has_tasks' && $conf->global->DIGIRISKDOLIBARR_TASK_MANAGEMENT) { ?>
 					<?php $related_tasks = $risk->get_related_tasks($risk);
 					if (!empty($related_tasks) && $related_tasks > 0) : ?>
-						<div class="riskassessment-tasks<?php echo $risk->id ?>">
+						<div class="riskassessment-tasks riskassessment-tasks<?php echo $risk->id ?>">
 							<?php foreach ($related_tasks as $related_task) : ?>
 								<div class="riskassessment-task-container riskassessment-task-container-<?php echo $related_task->id ?>">
 									<div class="riskassessment-task-single-content riskassessment-task-single-content-<?php echo $risk->id ?>">
