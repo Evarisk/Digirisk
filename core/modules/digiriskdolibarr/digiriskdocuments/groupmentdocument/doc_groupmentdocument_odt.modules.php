@@ -313,7 +313,7 @@ class doc_groupmentdocument_odt extends ModeleODTGroupmentDocument
 											$tmparray['nomDanger'] = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $line->get_danger_category($line) . '.png';
 											$tmparray['identifiantRisque'] = $line->ref . ' - ' . $lastEvaluation->ref;
 											$tmparray['quotationRisque'] = $lastEvaluation->cotation ? $lastEvaluation->cotation : '0';
-											$tmparray['commentaireRisque'] = dol_print_date($lastEvaluation->date_creation, '%A %e %B %G %H:%M') . ': ' . $lastEvaluation->comment;
+											$tmparray['commentaireRisque'] = dol_print_date($lastEvaluation->date_creation, 'dayhoursec') . ': ' . $lastEvaluation->comment;
 
 											unset($tmparray['object_fields']);
 
@@ -356,7 +356,7 @@ class doc_groupmentdocument_odt extends ModeleODTGroupmentDocument
 								$user->fetch($line->fk_user);
 
 								$tmparray['idUtilisateur']               = $line->ref;
-								$tmparray['dateAffectationUtilisateur']  = dol_print_date( $line->assignment_date, '%A %e %B %G' );
+								$tmparray['dateAffectationUtilisateur']  = dol_print_date( $line->assignment_date, 'dayhour' );
 								$tmparray['dureeEntretien']              = $line->duration;
 								$tmparray['nomUtilisateur']              = $user->lastname;
 								$tmparray['prenomUtilisateur']           = $user->firstname;

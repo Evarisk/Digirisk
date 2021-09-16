@@ -394,16 +394,16 @@ class doc_riskassessmentdocument_odt extends ModeleODTRiskAssessmentDocument
 									$tmparray['nomDanger']         = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $line->get_danger_category($line) . '.png';
 									$tmparray['identifiantRisque'] = $line->ref . ' - ' . $lastEvaluation->ref;
 									$tmparray['quotationRisque']    = $lastEvaluation->cotation ? $lastEvaluation->cotation : '0' ;
-									$tmparray['commentaireRisque'] = dol_print_date( $lastEvaluation->date_creation, '%A %e %B %G %H:%M' ) . ': ' . $lastEvaluation->comment;
+									$tmparray['commentaireRisque'] = dol_print_date( $lastEvaluation->date_creation, 'dayhoursec' ) . ': ' . $lastEvaluation->comment;
 
 									$related_tasks = $line->get_related_tasks($line);
 
 									if (!empty($related_tasks)) {
 										foreach ($related_tasks as $related_task) {
 											if ($related_task->progress == 100) {
-												$tmparray['actionPreventionCompleted'] .= dol_print_date($related_task->date_c, '%A %e %B %G %H:%M') . ': ' . $related_task->label . "\n";
+												$tmparray['actionPreventionCompleted'] .= dol_print_date($related_task->date_c, 'dayhoursec') . ': ' . $related_task->label . "\n";
 											} else {
-												$tmparray['actionPreventionUncompleted'] .= dol_print_date($related_task->date_c, '%A %e %B %G %H:%M') . ': ' . $related_task->label . ' ' . ($related_task->progress ?  $related_task->progress : 0) . '%'. "\n";
+												$tmparray['actionPreventionUncompleted'] .= dol_print_date($related_task->date_c, 'dayhoursec') . ': ' . $related_task->label . ' ' . ($related_task->progress ?  $related_task->progress : 0) . '%'. "\n";
 											}
 										}
 									} else {
