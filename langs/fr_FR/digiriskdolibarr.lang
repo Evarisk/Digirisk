@@ -33,6 +33,8 @@ Settings = Réglages
 DigiriskdolibarrSetupPage = Page de configuration du module Digirisk
 AgendaModuleRequired = Pour assurer la traçabilité des actions dans Digirisk, assurez-vous que le module Agenda est bien activé
 DigiriskDolibarrDescription = Digirisk pour Dolibarr
+HowToSetupOtherModules = Pour plus de fonctionnalités sur Digirisk, vous pouvez activer de nombreux modules (Gestion des fournisseurs, des factures, etc.) sur ce lien :
+ConfigMyModules = Configuration des modules
 
 #
 # Page À propos

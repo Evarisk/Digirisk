@@ -83,7 +83,9 @@ $head = digiriskdolibarrAdminPrepareHead();
 print dol_get_fiche_head($head, 'settings', '', -1, "digiriskdolibarr@digiriskdolibarr");
 
 if (empty($setupnotempty)) {
-	print '<br>'.$langs->trans("AgendaModuleRequired");
+	print '<br>'.$langs->trans("AgendaModuleRequired") . '<br>';
+	print '<br>'.$langs->trans("HowToSetupOtherModules") . '  ' . '<a href="./../../../admin/modules.php' .'">' . $langs->trans('ConfigMyModules') . '</a>'  ;
+
 }
 
 // Page end
