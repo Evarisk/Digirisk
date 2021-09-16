@@ -686,7 +686,7 @@
   height: 100%;
   max-height: 560px;
   background: #fff;
-  padding: 2em;
+  padding: 1em 0;
   margin: auto;
   top: 50%;
   left: 50%;
@@ -703,12 +703,15 @@
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
+  padding: 0 2em;
 }
 .wpeo-modal .modal-container .modal-content {
   height: 78%;
+  padding: 0 2em;
 }
 .wpeo-modal .modal-container .modal-footer {
   height: 12%;
+  padding: 0 2em;
 }
 .wpeo-modal .modal-container .modal-header .modal-title, .wpeo-modal .modal-container .modal-header .modal-close {
   margin: auto 0;
