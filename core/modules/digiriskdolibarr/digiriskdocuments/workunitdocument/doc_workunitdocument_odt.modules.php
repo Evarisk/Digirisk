@@ -315,7 +315,7 @@ class doc_workunitdocument_odt extends ModeleODTWorkUnitDocument
 										$tmparray['nomDanger'] = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $line->get_danger_category($line) . '.png';
 										$tmparray['identifiantRisque'] = $line->ref . ' - ' . $lastEvaluation->ref;
 										$tmparray['quotationRisque'] = $lastEvaluation->cotation ? $lastEvaluation->cotation : '0';
-										$tmparray['commentaireRisque'] = dol_print_date($lastEvaluation->date_creation, 'dayhoursec') . ': ' . $lastEvaluation->comment;
+										$tmparray['commentaireRisque'] = dol_print_date($lastEvaluation->date_creation, 'dayhoursec', 'tzuser') . ': ' . $lastEvaluation->comment;
 
 										unset($tmparray['object_fields']);
 

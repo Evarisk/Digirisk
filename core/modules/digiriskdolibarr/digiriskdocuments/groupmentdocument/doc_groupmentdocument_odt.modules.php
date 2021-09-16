@@ -313,7 +313,7 @@ class doc_groupmentdocument_odt extends ModeleODTGroupmentDocument
 											$tmparray['nomDanger'] = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $line->get_danger_category($line) . '.png';
 											$tmparray['identifiantRisque'] = $line->ref . ' - ' . $lastEvaluation->ref;
 											$tmparray['quotationRisque'] = $lastEvaluation->cotation ? $lastEvaluation->cotation : '0';
-											$tmparray['commentaireRisque'] = dol_print_date($lastEvaluation->date_creation, 'dayhoursec') . ': ' . $lastEvaluation->comment;
+											$tmparray['commentaireRisque'] = dol_print_date($lastEvaluation->date_creation, 'dayhoursec', 'tzuser') . ': ' . $lastEvaluation->comment;
 
 											unset($tmparray['object_fields']);
 
@@ -355,11 +355,11 @@ class doc_groupmentdocument_odt extends ModeleODTGroupmentDocument
 
 								$user->fetch($line->fk_user);
 
-								$tmparray['idUtilisateur']               = $line->ref;
-								$tmparray['dateAffectationUtilisateur']  = dol_print_date( $line->assignment_date, '%d/%m/%Y' );
-								$tmparray['dureeEntretien']              = $line->duration;
-								$tmparray['nomUtilisateur']              = $user->lastname;
-								$tmparray['prenomUtilisateur']           = $user->firstname;
+								$tmparray['idUtilisateur']              = $line->ref;
+								$tmparray['dateAffectationUtilisateur'] = dol_print_date($line->assignment_date, '%d/%m/%Y');
+								$tmparray['dureeEntretien']             = $line->duration;
+								$tmparray['nomUtilisateur']             = $user->lastname;
+								$tmparray['prenomUtilisateur']          = $user->firstname;
 
 								unset($tmparray['object_fields']);
 
@@ -395,10 +395,10 @@ class doc_groupmentdocument_odt extends ModeleODTGroupmentDocument
 							foreach ($risksigns as $line) {
 								$path             = DOL_DOCUMENT_ROOT .'/custom/digiriskdolibarr/img/';
 
-								$tmparray['recommandationIcon']         = $path . '/' . $risksign->get_risksign_category($line);
-								$tmparray['identifiantRecommandation']  = $line->ref;
-								$tmparray['recommandationName']         = $line->get_risksign_category($line, 'name');
-								$tmparray['recommandationComment']      = $line->description;
+								$tmparray['recommandationIcon']        = $path . '/' . $risksign->get_risksign_category($line);
+								$tmparray['identifiantRecommandation'] = $line->ref;
+								$tmparray['recommandationName']        = $line->get_risksign_category($line, 'name');
+								$tmparray['recommandationComment']     = $line->description;
 
 								unset($tmparray['object_fields']);
 
