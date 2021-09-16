@@ -243,9 +243,10 @@ if ($action == 'removefile') {
 		$thumbsList = dol_dir_list($ticket_upload_dir . 'thumbs/');
 		if (!empty($thumbsList)) {
 			foreach ($thumbsList as $thumb) {
-				dol_delete_file($ticket_upload_dir . 'thumbs/' . $thumb['name'] );
+				if (preg_match('/'. preg_split('/\./', $filetodelete)[0] . '/', $thumb['name'])) {
+					dol_delete_file($ticket_upload_dir . 'thumbs/' . $thumb['name'] );
+				}
 			}
-			dol_delete_dir($ticket_upload_dir . 'thumbs/');
 		}
 	}
 	$action = '';
