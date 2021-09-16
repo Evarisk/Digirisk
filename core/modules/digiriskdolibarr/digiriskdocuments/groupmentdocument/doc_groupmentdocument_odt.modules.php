@@ -356,7 +356,7 @@ class doc_groupmentdocument_odt extends ModeleODTGroupmentDocument
 								$user->fetch($line->fk_user);
 
 								$tmparray['idUtilisateur']               = $line->ref;
-								$tmparray['dateAffectationUtilisateur']  = dol_print_date( $line->assignment_date, 'dayhour' );
+								$tmparray['dateAffectationUtilisateur']  = dol_print_date( $line->assignment_date, '%d/%m/%Y' );
 								$tmparray['dureeEntretien']              = $line->duration;
 								$tmparray['nomUtilisateur']              = $user->lastname;
 								$tmparray['prenomUtilisateur']           = $user->firstname;

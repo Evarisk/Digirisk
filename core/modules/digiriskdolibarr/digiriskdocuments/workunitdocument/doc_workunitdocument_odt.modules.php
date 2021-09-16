@@ -358,7 +358,7 @@ class doc_workunitdocument_odt extends ModeleODTWorkUnitDocument
 								$user->fetch($line->fk_user);
 
 								$tmparray['idUtilisateur']               = $line->ref;
-								$tmparray['dateAffectationUtilisateur']  = dol_print_date( $line->assignment_date, 'dayhour' );
+								$tmparray['dateAffectationUtilisateur']  = dol_print_date( $line->assignment_date, '%d/%m/%Y' );
 								$tmparray['dureeEntretien']              = $line->duration;
 								$tmparray['nomUtilisateur']              = $user->lastname;
 								$tmparray['prenomUtilisateur']           = $user->firstname;
