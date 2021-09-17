@@ -1834,7 +1834,7 @@ window.eoxiaJS.riskassessmenttask.createRiskAssessmentTask = function ( event ) 
 	let single = element.find('.riskassessment-task-container');
 	let actionContainerSuccess = $('.messageSuccessTaskCreate');
 	let actionContainerError = $('.messageErrorTaskCreate');
-
+    let elementToRefresh = $(this).closest('.riskassessment-tasks');
 	var riskToAssignPost = '';
 	if (riskToAssign !== '') {
 		riskToAssignPost = '&riskToAssign=' + riskToAssign;
@@ -1846,8 +1846,6 @@ window.eoxiaJS.riskassessmenttask.createRiskAssessmentTask = function ( event ) 
 		taskPost = '&tasktitle=' + encodeURI(task);
 	}
 
-	let elementParent = $('.fichecenter').find('.div-table-responsive');
-	window.eoxiaJS.loader.display($(this));
 
 	$.ajax({
 		url: document.URL + '&action=addRiskAssessmentTask' + riskToAssignPost + taskPost,
@@ -1855,9 +1853,9 @@ window.eoxiaJS.riskassessmenttask.createRiskAssessmentTask = function ( event ) 
 		processData: false,
 		contentType: false,
 		success: function ( ) {
-			elementParent.empty()
-			elementParent.load( document.URL + ' .tagtable.liste');
 			$(this).closest('.risk-row-content-' + riskToAssign).removeClass('wpeo-loader');
+            elementToRefresh.load( document.URL + ' .riskassessment-tasks'+riskToAssign);
+
 
 			actionContainerSuccess.empty()
 			actionContainerSuccess.load(' .task-create-success-notice')
