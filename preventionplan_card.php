@@ -35,7 +35,7 @@ if (!$res && file_exists("../../main.inc.php")) $res = @include "../../main.inc.
 if (!$res && file_exists("../../../main.inc.php")) $res = @include "../../../main.inc.php";
 if (!$res) die("Include of main fails");
 
-require_once DOL_DOCUMENT_ROOT.'/core/class/html.formfile.class.php';
+require_once DOL_DOCUMENT_ROOT.'/core/class/html.form.class.php';
 require_once DOL_DOCUMENT_ROOT.'/core/class/doleditor.class.php';
 
 require_once __DIR__ . '/class/digiriskdocuments.class.php';
