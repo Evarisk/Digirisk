@@ -1436,11 +1436,11 @@
 					<div class="riskassessment-tasks riskassessment-tasks<?php echo $risk->id ?>" value="<?php echo $risk->id ?>">
 						<?php if (!empty($related_tasks) && $related_tasks > 0) : ?>
 								<?php foreach ($related_tasks as $related_task) : ?>
-									<div class="riskassessment-task-container riskassessment-task-container-<?php echo $related_task->id ?>" value="<?php echo $related_task->ref ?>">
+									<div class="table-cell riskassessment-task-container riskassessment-task-container-<?php echo $related_task->id ?>" value="<?php echo $related_task->ref ?>">
 										<input type="hidden" class="labelForDelete" value="<?php echo $langs->trans('DeleteTask') . ' ' . $related_task->ref . ' ?'; ?>">
 										<div class="riskassessment-task-single-content riskassessment-task-single-content-<?php echo $risk->id ?>">
-											<div class="riskassessment-task-single riskassessment-task-single-<?php echo $related_task->id ?>">
-												<div class="riskassessment-task-content">
+											<div class="riskassessment-task-single riskassessment-task-single-<?php echo $related_task->id ?>   wpeo-table table-row">
+												<div class="riskassessment-task-content table-cell">
 													<div class="riskassessment-task-data">
 														<span class="riskassessment-task-reference" value="<?php echo $related_task->id ?>"><?php echo $related_task->getNomUrl(); ?></span>
 														<span class="riskassessment-task-date">
@@ -1455,23 +1455,23 @@
 														</span>
 														<?php echo dol_trunc($related_task->label); ?>
 													</div>
-													<!-- BUTTON MODAL RISK ASSESSMENT TASK EDIT  -->
-													<div class="riskassessment-task-actions wpeo-gridlayout grid-2 grid-gap-0">
-														<?php if ($permissiontoadd) : ?>
-															<div class="riskassessment-task-edit wpeo-button button-square-50 button-grey modal-open" value="<?php echo $related_task->id ?>">
-																<i class="fas fa-pencil-alt button-icon"></i>
-															</div>
-														<?php else : ?>
-															<div class="wpeo-button button-square-50 button-grey wpeo-tooltip-event" aria-label="<?php echo $langs->trans('PermissionDenied'); ?>" value="<?php echo $related_task->id ?>">
-																<i class="fas fa-pencil-alt button-icon"></i>
-															</div>
-														<?php endif; ?>
-														<?php if ($permissiontodelete) : ?>
-															<div class="riskassessment-task-delete wpeo-button button-square-50 button-transparent" value="<?php echo $related_task->id ?>">
-																<i class="fas fa-trash button-icon"></i>
-															</div>
-														<?php endif; ?>
-													</div>
+												</div>
+												<!-- BUTTON MODAL RISK ASSESSMENT TASK EDIT  -->
+												<div class="table-cell riskassessment-task-actions wpeo-gridlayout grid-2 grid-gap-0">
+													<?php if ($permissiontoadd) : ?>
+														<div class="riskassessment-task-edit wpeo-button button-square-50 button-grey modal-open" value="<?php echo $related_task->id ?>">
+															<i class="fas fa-pencil-alt button-icon"></i>
+														</div>
+													<?php else : ?>
+														<div class="wpeo-button button-square-50 button-grey wpeo-tooltip-event" aria-label="<?php echo $langs->trans('PermissionDenied'); ?>" value="<?php echo $related_task->id ?>">
+															<i class="fas fa-pencil-alt button-icon"></i>
+														</div>
+													<?php endif; ?>
+													<?php if ($permissiontodelete) : ?>
+														<div class="riskassessment-task-delete wpeo-button button-square-50 button-transparent" value="<?php echo $related_task->id ?>">
+															<i class="fas fa-trash button-icon"></i>
+														</div>
+													<?php endif; ?>
 												</div>
 											</div>
 											<!-- RISK ASSESSMENT TASK EDIT MODAL-->
@@ -1512,11 +1512,11 @@
 								<?php endforeach; ?>
 							<!-- BUTTON MODAL RISK ASSESSMENT TASK ADD  -->
 							<?php if ($permissiontoadd) : ?>
-								<div class="riskassessment-task-add wpeo-button button-square-40 button-primary wpeo-tooltip-event modal-open" aria-label="<?php echo $langs->trans('AddRiskAssessmentTask') ?>" value="<?php echo $risk->id;?>">
+								<div class="table-cell riskassessment-task-add wpeo-button button-square-40 button-primary wpeo-tooltip-event modal-open" aria-label="<?php echo $langs->trans('AddRiskAssessmentTask') ?>" value="<?php echo $risk->id;?>">
 									<i class="fas fa-plus button-icon"></i>
 								</div>
 							<?php else : ?>
-								<div class="wpeo-button button-square-40 button-grey wpeo-tooltip-event" aria-label="<?php echo $langs->trans('PermissionDenied') ?>" value="<?php echo $risk->id;?>">
+								<div class="table-cell wpeo-button button-square-40 button-grey wpeo-tooltip-event" aria-label="<?php echo $langs->trans('PermissionDenied') ?>" value="<?php echo $risk->id;?>">
 									<i class="fas fa-plus button-icon"></i>
 								</div>
 							<?php endif; ?>
