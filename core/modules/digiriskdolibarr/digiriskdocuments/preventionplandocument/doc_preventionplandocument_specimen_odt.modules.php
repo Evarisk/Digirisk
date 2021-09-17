@@ -271,6 +271,7 @@ class doc_preventionplandocument_specimen_odt extends ModeleODTPreventionPlanDoc
 				$tmparray['photoDefault'] = $image['fullname'];
 			}
 
+			$digiriskelement    = new DigiriskElement($this->db);
 			$resources          = new DigiriskResources($this->db);
 			$signatory          = new PreventionPlanSignature($this->db);
 			$societe            = new Societe($this->db);
@@ -368,10 +369,6 @@ class doc_preventionplandocument_specimen_odt extends ModeleODTPreventionPlanDoc
 				$tmparray['maitre_oeuvre_phone'] = $maitreoeuvre->phone;
 
 				$tmparray['maitre_oeuvre_signature_date'] = dol_print_date($maitreoeuvre->signature_date, 'dayhoursec', 'tzuser');
-				$encoded_image = explode(",",  $maitreoeuvre->signature)[1];
-				$decoded_image = base64_decode($encoded_image);
-				file_put_contents($tempdir."signature.png", $decoded_image);
-				$tmparray['maitre_oeuvre_signature'] = $tempdir."signature.png";
 			}
 
 			if (!empty( $extsocietyresponsible) && $extsocietyresponsible > 0) {
@@ -382,16 +379,12 @@ class doc_preventionplandocument_specimen_odt extends ModeleODTPreventionPlanDoc
 
 				//@todo when attendance will be created
 				$tmparray['intervenant_exterieur_signature_date'] = dol_print_date($extsocietyresponsible->signature_date, 'dayhoursec', 'tzuser');
-				$encoded_image = explode(",",  $extsocietyresponsible->signature)[1];
-				$decoded_image = base64_decode($encoded_image);
-				file_put_contents($tempdir."signature2.png", $decoded_image);
-				$tmparray['intervenant_exterieur_signature']      = $tempdir."signature2.png";
 			}
 
 			foreach ($tmparray as $key=>$value)
 			{
 				try {
-					if ($key == 'photoDefault' || $key == 'maitre_oeuvre_signature' || $key == 'intervenant_exterieur_signature') // Image
+					if ($key == 'photoDefault') // Image
 					{
 						$list = getimagesize($value);
 						$newWidth = 350;
@@ -452,14 +445,6 @@ class doc_preventionplandocument_specimen_odt extends ModeleODTPreventionPlanDoc
 						$listlines = $odfHandler->setSegment('intervenants');
 						$k = 3;
 						foreach ($extsocietyintervenants as $line) {
-							if ($line->status == 5) {
-								$encoded_image = explode(",", $line->signature)[1];
-								$decoded_image = base64_decode($encoded_image);
-								file_put_contents($tempdir."signature".$k.".png", $decoded_image);
-								$tmparray['intervenants_signature'] = $tempdir."signature".$k.".png";
-							}else {
-								$tmparray['intervenants_signature'] = '';
-							}
 							$tmparray['name']     = $line->firstname;
 							$tmparray['lastname'] = $line->lastname;
 							$tmparray['phone']    = $line->phone;
@@ -470,19 +455,7 @@ class doc_preventionplandocument_specimen_odt extends ModeleODTPreventionPlanDoc
 
 							foreach ($tmparray as $key => $value) {
 								try {
-									if ($key == 'intervenants_signature' && $line->status == 5) { // Image
-										$list = getimagesize($value);
-										$newWidth = 200;
-										if ($list[0]) {
-											$ratio = $newWidth / $list[0];
-											$newHeight = $ratio * $list[1];
-											dol_imageResizeOrCrop($value, 0, $newWidth, $newHeight);
-										}
-										$listlines->setImage($key, $value);
-									}
-									else {  // Text
-										$listlines->setVars($key, $value, true, 'UTF-8');
-									}
+									$listlines->setVars($key, $value, true, 'UTF-8');
 								} catch (OdfException $e) {
 									dol_syslog($e->getMessage(), LOG_INFO);
 								} catch (SegmentException $e) {
@@ -490,8 +463,6 @@ class doc_preventionplandocument_specimen_odt extends ModeleODTPreventionPlanDoc
 								}
 							}
 							$listlines->merge();
-
-							dol_delete_file($tempdir."signature".$k.".png");
 						}
 						$odfHandler->mergeSegment($listlines);
 					}
@@ -548,9 +519,6 @@ class doc_preventionplandocument_specimen_odt extends ModeleODTPreventionPlanDoc
 				@chmod($file, octdec($conf->global->MAIN_UMASK));
 
 			$odfHandler = null; // Destroy object
-
-			dol_delete_file($tempdir."signature.png");
-			dol_delete_file($tempdir."signature2.png");
 
 			$this->result = array('fullpath'=>$file);
 
