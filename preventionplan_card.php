@@ -1115,9 +1115,9 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 		$reshook = $hookmanager->executeHooks('addMoreActionsButtons', $parameters, $object, $action); // Note that $action and $object may have been modified by hook
 		if ($reshook < 0) setEventMessages($hookmanager->error, $hookmanager->errors, 'errors');
 
-		if (empty($reshook)) {
+		if (empty($reshook) && $permissiontoadd) {
 			// Modify
-			if ($permissiontoadd && $object->status < 2) {
+			if ($object->status < 2) {
 				print '<a class="butAction" id="actionButtonEdit" href="' . $_SERVER["PHP_SELF"] . '?id=' . $object->id . '&action=edit">' . $langs->trans("Modify") . '</a>';
 			}
 			if ($object->status == 1) {
@@ -1298,7 +1298,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 			}
 			print '</tr>';
 		}
-		if ($object->status == 1) {
+		if ($object->status == 1 && $permissiontoadd) {
 			print '<form method="POST" action="' . $_SERVER["PHP_SELF"] . '?id=' . $object->id . '">';
 			print '<input type="hidden" name="token" value="' . newToken() . '">';
 			print '<input type="hidden" name="action" value="addLine">';
@@ -1368,7 +1368,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	}
 	// Document Generation -- Génération des documents
 	$includedocgeneration = 1;
-	if ($includedocgeneration) {
+	if ($includedocgeneration && $permissiontoadd) {
 		print '<div class=""><div class="preventionplanDocument fichehalfleft">';
 
 		$objref    = dol_sanitizeFileName($object->ref);
@@ -1383,7 +1383,11 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 		print digiriskshowdocuments($modulepart, $dir_files, $filedir, $urlsource, $permissiontoadd, $permissiontodelete, $defaultmodel, 1, 0, 28, 0, '', $title, '', $langs->defaultlang, '', $preventionplandocument, 0, 'remove_file', $object->status == 3, $langs->trans('PreventionPlanMustBeLocked') );
 	}
 
-	print '</div><div class="fichehalfright">';
+	if ($permissiontoadd) {
+		print '</div><div class="fichehalfright">';
+	} else {
+		print '</div><div class="">';
+	}
 
 	$MAXEVENT = 10;
 
