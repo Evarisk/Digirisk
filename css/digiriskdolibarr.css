@@ -348,7 +348,7 @@
   box-sizing: border-box;
   background: #0d8aff;
   border-color: #0d8aff;
-  color: #fff !important;
+  color: #fff;
 }
 .wpeo-button:focus, .wpeo-button:visited {
   color: #fff;
