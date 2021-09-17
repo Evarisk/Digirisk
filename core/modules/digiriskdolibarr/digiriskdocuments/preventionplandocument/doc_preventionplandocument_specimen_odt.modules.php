@@ -294,8 +294,8 @@ class doc_preventionplandocument_specimen_odt extends ModeleODTPreventionPlanDoc
 			$tmparray['consigne_generale']              = $conf->global->DIGIRISK_GENERAL_RULES;
 			$tmparray['premiers_secours']               = $conf->global->DIGIRISK_FIRST_AID;
 
-			$tmparray['date_start_intervention_PPP'] = dol_print_date($preventionplan->date_start, 'dayhoursec');
-			$tmparray['date_end_intervention_PPP']   = dol_print_date($preventionplan->date_end, 'dayhoursec');
+			$tmparray['date_start_intervention_PPP'] = dol_print_date($preventionplan->date_start, 'dayhoursec', 'tzuser');
+			$tmparray['date_end_intervention_PPP']   = dol_print_date($preventionplan->date_end, 'dayhoursec', 'tzuser');
 			$tmparray['interventions_info']          = count($preventionplanlines) . " " . $langs->trans('PreventionPlanLine');
 
 
@@ -367,7 +367,11 @@ class doc_preventionplandocument_specimen_odt extends ModeleODTPreventionPlanDoc
 				$tmparray['maitre_oeuvre_email'] = $maitreoeuvre->email;
 				$tmparray['maitre_oeuvre_phone'] = $maitreoeuvre->phone;
 
-				$tmparray['maitre_oeuvre_signature_date'] = $maitreoeuvre->signature_date;
+				$tmparray['maitre_oeuvre_signature_date'] = dol_print_date($maitreoeuvre->signature_date, 'dayhoursec', 'tzuser');
+				$encoded_image = explode(",",  $maitreoeuvre->signature)[1];
+				$decoded_image = base64_decode($encoded_image);
+				file_put_contents($tempdir."signature.png", $decoded_image);
+				$tmparray['maitre_oeuvre_signature'] = $tempdir."signature.png";
 			}
 
 			if (!empty( $extsocietyresponsible) && $extsocietyresponsible > 0) {
@@ -377,13 +381,17 @@ class doc_preventionplandocument_specimen_odt extends ModeleODTPreventionPlanDoc
 				$tmparray['intervenant_exterieur_phone'] = $extsocietyresponsible->phone;
 
 				//@todo when attendance will be created
-				$tmparray['intervenant_exterieur_signature_date'] = $extsocietyresponsible->signature_date;
+				$tmparray['intervenant_exterieur_signature_date'] = dol_print_date($extsocietyresponsible->signature_date, 'dayhoursec', 'tzuser');
+				$encoded_image = explode(",",  $extsocietyresponsible->signature)[1];
+				$decoded_image = base64_decode($encoded_image);
+				file_put_contents($tempdir."signature2.png", $decoded_image);
+				$tmparray['intervenant_exterieur_signature']      = $tempdir."signature2.png";
 			}
 
 			foreach ($tmparray as $key=>$value)
 			{
 				try {
-					if ($key == 'photoDefault') // Image
+					if ($key == 'photoDefault' || $key == 'maitre_oeuvre_signature' || $key == 'intervenant_exterieur_signature') // Image
 					{
 						$list = getimagesize($value);
 						$newWidth = 350;
@@ -414,8 +422,10 @@ class doc_preventionplandocument_specimen_odt extends ModeleODTPreventionPlanDoc
 
 						foreach ($preventionplanlines as $line) {
 
+							$digiriskelement->fetch($line->fk_element);
+
 							$tmparray['key_unique']    = $line->ref;
-							$tmparray['unite_travail'] = $line->location;
+							$tmparray['unite_travail'] = $digiriskelement->ref . " - " . $digiriskelement->label;
 							$tmparray['action']        = $line->description;
 							$tmparray['risk']          = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $risk->get_danger_category($line) . '.png';
 							$tmparray['prevention']    = $line->prevention_method;
@@ -440,19 +450,39 @@ class doc_preventionplandocument_specimen_odt extends ModeleODTPreventionPlanDoc
 
 					if (!empty($extsocietyintervenants) && $extsocietyintervenants > 0) {
 						$listlines = $odfHandler->setSegment('intervenants');
-
+						$k = 3;
 						foreach ($extsocietyintervenants as $line) {
-
-							$tmparray['id']       = $line->id;
+							if ($line->status == 5) {
+								$encoded_image = explode(",", $line->signature)[1];
+								$decoded_image = base64_decode($encoded_image);
+								file_put_contents($tempdir."signature".$k.".png", $decoded_image);
+								$tmparray['intervenants_signature'] = $tempdir."signature".$k.".png";
+							}else {
+								$tmparray['intervenants_signature'] = '';
+							}
 							$tmparray['name']     = $line->firstname;
 							$tmparray['lastname'] = $line->lastname;
 							$tmparray['phone']    = $line->phone;
-							$tmparray['mail']     = $line->mail;
-							$tmparray['status']   = $langs->trans("StatusDigirisk") . ' : ' . $line->getLibStatut(1);
+							$tmparray['mail']     = $line->email;
+							$tmparray['status']   = $line->getLibStatut(1);
 
-							foreach ($tmparray as $key => $val) {
+							$k++;
+
+							foreach ($tmparray as $key => $value) {
 								try {
-									$listlines->setVars($key, $val, true, 'UTF-8');
+									if ($key == 'intervenants_signature' && $line->status == 5) { // Image
+										$list = getimagesize($value);
+										$newWidth = 200;
+										if ($list[0]) {
+											$ratio = $newWidth / $list[0];
+											$newHeight = $ratio * $list[1];
+											dol_imageResizeOrCrop($value, 0, $newWidth, $newHeight);
+										}
+										$listlines->setImage($key, $value);
+									}
+									else {  // Text
+										$listlines->setVars($key, $value, true, 'UTF-8');
+									}
 								} catch (OdfException $e) {
 									dol_syslog($e->getMessage(), LOG_INFO);
 								} catch (SegmentException $e) {
@@ -460,6 +490,8 @@ class doc_preventionplandocument_specimen_odt extends ModeleODTPreventionPlanDoc
 								}
 							}
 							$listlines->merge();
+
+							dol_delete_file($tempdir."signature".$k.".png");
 						}
 						$odfHandler->mergeSegment($listlines);
 					}
@@ -516,6 +548,9 @@ class doc_preventionplandocument_specimen_odt extends ModeleODTPreventionPlanDoc
 				@chmod($file, octdec($conf->global->MAIN_UMASK));
 
 			$odfHandler = null; // Destroy object
+
+			dol_delete_file($tempdir."signature.png");
+			dol_delete_file($tempdir."signature2.png");
 
 			$this->result = array('fullpath'=>$file);
 
