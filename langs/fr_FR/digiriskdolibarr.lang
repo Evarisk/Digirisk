@@ -53,7 +53,7 @@ DigiriskdolibarrAboutPage = Page à propos de Digirisk
 LireDigirisk = Consulter le tableau de bord Digirisk
 ReadDigirisk = Consulter le tableau de bord Digirisk (read)
 ReadAdminPage = Accéder à la configuration du module Digirisk
-
+YouDontHaveTheRightToSeeThis = Vous n'avez pas le droit de voir les groupements et unités de travail
 
 # Data - Donnée
 Create = Créer
