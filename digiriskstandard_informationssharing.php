@@ -165,7 +165,7 @@ digiriskHeader('', $title, $help_url, '', '', '', $morejs, $morecss); ?>
 $res  = $object->fetch_optionals();
 $head = digiriskstandardPrepareHead($object);
 
-dol_fiche_head($head, 'standardInformationsSharing', $title, -1, "digiriskdolibarr@digiriskdolibarr");
+print dol_get_fiche_head($head, 'standardInformationsSharing', $title, -1, "digiriskdolibarr@digiriskdolibarr");
 
 // Object card
 // ------------------------------------------------------------
@@ -178,8 +178,6 @@ $morehtmlleft .= '<div class="floatleft inline-block valignmiddle divphotoref">'
 digirisk_banner_tab($object, 'ref', '', 0, 'ref', 'ref', $morehtmlref, '', 0, $morehtmlleft);
 
 print '<div class="fichecenter">';
-print '<div class="fichehalfleft">';
-print '<div class="underbanner clearboth"></div>';
 print '<table class="border centpercent tableforfield">' . "\n";
 
 //JSON Decode and show fields
@@ -187,9 +185,8 @@ require_once './core/tpl/digiriskdolibarr_informationssharingfields_view.tpl.php
 
 print '</table>';
 print '</div>';
-print '</div>';
 
-dol_fiche_end();
+print dol_get_fiche_end();
 
 // Document Generation -- Génération des documents
 $includedocgeneration = 1;
