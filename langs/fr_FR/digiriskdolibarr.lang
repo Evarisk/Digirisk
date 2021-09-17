@@ -50,8 +50,8 @@ DigiriskdolibarrAboutPage = Page à propos de Digirisk
 #
 
 # Right - Droit
-LireDigirisk = Lire Digirisk
-ReadDigirisk = Lire Digirisk (read)
+LireDigirisk = Consulter le tableau de bord Digirisk
+ReadDigirisk = Consulter le tableau de bord Digirisk (read)
 ReadAdminPage = Accéder à la configuration du module Digirisk
 
 
@@ -178,9 +178,9 @@ DigiriskDocuments = Document Digirisk
 #
 
 # Right - Droit
-ReadLegalDisplay = Afficher un affichage légal
-CreateLegalDisplay = Créer un affichage légal
-DeleteLegalDisplay = Supprimer un affichage légal
+ReadLegalDisplay = Consulter l'affichage légal
+CreateLegalDisplay = Créer/Modifier l'affichage légal
+DeleteLegalDisplay = Supprimer l'affichage légal
 
 # Trigger - Déclencheur
 LEGALDISPLAY_CREATEInDolibarr = Affichage légal créé dans Dolibarr
@@ -228,9 +228,9 @@ CollectiveAgreement = Conventions collectives
 #
 
 # Right - Droit
-ReadInformationsSharing = Lire une diffusion d'informations
-CreateInformationsSharing = Créer une diffusion d'informations
-DeleteInformationsSharing = Supprimer une diffusion d'informations
+ReadInformationsSharing = Consulter la diffusion d'informations
+CreateInformationsSharing = Créer/Modifier une diffusion d'informations
+DeleteInformationsSharing = Supprimer la diffusion d'informations
 
 # Trigger - Déclencheur
 INFORMATIONSSHARING_CREATEInDolibarr = Diffusion d'informations créée dans Dolibarr
@@ -267,9 +267,9 @@ Alternates = Suppléants
 #
 
 # Right - Droit
-ReadPreventionPlan = Lire un plan de prévention
-CreatePreventionPlan = Créer un plan de prévention
-DeletePreventionPlan = Supprimer un plan de prévention
+ReadPreventionPlan = Consulter le plan de prévention
+CreatePreventionPlan = Créer/Modifier le plan de prévention
+DeletePreventionPlan = Supprimer le plan de prévention
 NewPreventionPlan = Nouveau plan de prévention
 PreventionPlanDet = Lignes des plans de prévention
 
@@ -374,9 +374,9 @@ DocumentName = Référence du document
 #
 
 # Right - Droit
-ReadFirePermit = Lire un permis de feu
-CreateFirePermit = Créer un permis de feu
-DeleteFirePermit = Supprimer un permis de feu
+ReadFirePermit = Consulter le permis de feu
+CreateFirePermit = Créer/Modifier le permis de feu
+DeleteFirePermit = Supprimer le permis de feu
 
 # Trigger - Déclencheur
 FIREPERMIT_CREATEInDolibarr = Permis de feu créé dans Dolibarr
@@ -414,6 +414,9 @@ FirePermitSchedule = Horaires du permis de feu
 #
 
 # Right - Droit
+ReadListingRisksPhoto = Consulter les listing des risques avec photos
+CreateListingRisksPhoto = Créer/Modifier les listing des risques avec photos
+DeleteListingRisksPhoto = Supprimer les listing des risques avec photos
 
 # Trigger - Déclencheur
 ListingRisksPhotoGeneratedWithDolibarr = Listing de risques photo généré avec Dolibarr
@@ -429,9 +432,6 @@ ListingRisksPhotoDigiriskTemplate = ODT par défaut des listing des risques phot
 
 # Data - Donnée
 ListingRisksPhoto = Listing des risques photo
-ReadListingRisksPhoto = Voir les listing des risques avec photos
-CreateListingRisksPhoto = Créer des listing des risques avec photos
-DeleteListingRisksPhoto = Supprimer des listing des risques avec photos
 
 
 
@@ -440,6 +440,9 @@ DeleteListingRisksPhoto = Supprimer des listing des risques avec photos
 #
 
 # Right - Droit
+ReadListingRisksAction = Consulter les listing des risques avec actions correctives
+CreateListingRisksAction = Créer/Modifier les listing des risques avec actions correctives
+DeleteListingRisksAction = Supprimer les listing des risques avec actions correctives
 
 # Trigger - Déclencheur
 ListingRisksActionGeneratedWithDolibarr = Listing de risques actions correctives généré avec Dolibarr
@@ -455,9 +458,7 @@ ListingRisksActionDigiriskTemplate = ODT par défaut des listing des actions cor
 
 # Data - Donnée
 ListingRisksAction = Listing des actions correctives
-ReadListingRisksAction = Voir les listing des risques avec actions correctives
-CreateListingRisksAction = Créer des listing des risques avec actions correctives
-DeleteListingRisksAction = Supprimer des listing des risques avec actions correctives
+
 
 
 #
@@ -466,8 +467,8 @@ DeleteListingRisksAction = Supprimer des listing des risques avec actions correc
 
 # Right - Droit
 
-ReadRiskAssessmentDocument = Voir le document unique
-CreateRiskAssessmentDocument = Créer le document unique
+ReadRiskAssessmentDocument = Consulter le document unique
+CreateRiskAssessmentDocument = Créer/Modifier le document unique
 DeleteRiskAssessmentDocument = Supprimer le document unique
 
 # Trigger - Déclencheur
@@ -545,9 +546,9 @@ WorkUnitDocument = Fiche d'Unité de travail
 #
 
 # Rights  - Droits
-ReadDigiriskElement = Lire un élément digirisk
-CreateDigiriskElement = Créer un élément digirisk
-DeleteDigiriskElement = Supprimer un élément digirisk
+ReadDigiriskElement = Consulter les éléments digirisk
+CreateDigiriskElement = Créer/Modifier les éléments digirisk
+DeleteDigiriskElement = Supprimer les éléments digirisk
 
 # Data - Donnée
 NewDigiriskElement = Nouveau élément digirisk
@@ -600,6 +601,11 @@ ModifyWorkUnit = Modifier unité de travail
 # Evaluator - Évaluateur
 #
 
+# Rights  - Droits
+ReadEvaluator = Consulter les évaluateurs
+CreateEvaluator = Créer/Modifer les évaluateurs
+DeleteEvaluator = Supprimer les évaluateurs
+
 # Trigger - Déclencheur
 EVALUATOR_CREATEInDolibarr = Évaluateur créée dans Dolibarr
 ActionsOnÉvaluateur = Événements liés au évaluateur
@@ -627,9 +633,7 @@ AddEvaluatorButton = Ajouter l'évaluateur
 DigiriskEvaluatorData = Données des Évaluateurs
 EvaluatorDuration = Durée de l'évalution par l'évaluateur
 EvaluatorDurationDescription = Le temps que met l'évaluateur à réaliser son évaluation des risques
-ReadEvaluator = Voir les évaluateurs
-CreateEvaluator = Créer des évaluateurs
-DeleteEvaluator = Supprimer des évaluateurs
+
 
 
 #
@@ -653,6 +657,11 @@ UpdateData = Mettre à jour
 #
 # Risks - Risques
 #
+
+# Rights  - Droits
+ReadDigiriskRisk = Consulter les risques
+CreateDigiriskRisk = Créer/Modifier les risques
+DeleteDigiriskRisk = Supprimer les risques
 
 # Mod Numbering - Modèle de numérotation
 DigiriskRiskNumberingModule = Modèle de numérotation des risques de Digirisk
@@ -681,10 +690,6 @@ DigiriskElementRisk = Risques
 RiskDescriptionNotEnabled = Le champ description du risque n'est pas activé
 HowToEnableRiskDescription = Pour activer le champ description du risque, allez dans "Configuration du module -> Analyse de risque -> Risque"
 HowToEnableRiskCategoryEdit = Pour activer la modification de la catégorie de risque, allez dans "Configuration du module -> Analyse de risque -> Risque"
-
-ReadDigiriskRisk = Voir les risques
-CreateDigiriskRisk = Créer des risques
-DeleteDigiriskRisk = Supprimer des risques
 
 DigiriskRiskData = Donnée configurable des risques
 RiskDescription = Description du risque
@@ -741,6 +746,12 @@ AddRiskAssessmentTask = Ajouter une tâche au risque
 # RiskSign - Signalisation
 #
 
+# Rights  - Droits
+ReadDigiriskRiskSign = Consulter les signalisations
+CreateDigiriskRiskSign = Créer/Modifier les signalisations
+DeleteDigiriskRiskSign = Supprimer les signalisations
+
+
 # Mod Numbering - Modèle de numérotation
 DigiriskRiskSignStandardModel = Renvoie le numéro sous la forme RSn où n est un compteur séquentiel sans rupture et sans remise à 0.
 DigiriskRiskSignNumberingModule = Modèle de numérotation des signalisation des risques de Digirisk
@@ -761,9 +772,6 @@ EditRiskSign = Édition d'une signalisation
 
 DigiriskElementRiskSignList = Liste des signalisations
 DigiriskElementRiskSign = Signalisation
-ReadDigiriskRiskSign = Voir les signalisations
-CreateDigiriskRiskSign = Créer des signalisations
-DeleteDigiriskRiskSign = Supprimer des signalisations
 
 
 
