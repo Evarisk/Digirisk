@@ -91,8 +91,8 @@ $extrafields->fetch_name_optionals_label($risk->table_element);
 $search_array_options = $extrafields->getOptionalsFromPost($risk->table_element, '', 'search_');
 
 // Default sort order (if not yet defined by previous GETPOST)
-if (!$sortfield) $sortfield = "t.".key($risk->fields); // Set here default search field. By default 1st field in definition.
-if (!$sortorder) $sortorder = "ASC";
+if (!$sortfield) $sortfield = "evaluation.cotation"; // Set here default search field. By default 1st field in definition.
+if (!$sortorder) $sortorder = "DESC";
 if (!$evalsortfield) $evalsortfield = "evaluation.".key($evaluation->fields);
 
 $offset   = $limit * $page;
