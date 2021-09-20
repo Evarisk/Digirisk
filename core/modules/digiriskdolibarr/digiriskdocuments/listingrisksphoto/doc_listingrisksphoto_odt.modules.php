@@ -335,22 +335,8 @@ class doc_listingrisksphoto_odt extends ModeleODTListingRisksPhoto
 											foreach ($tmparray as $key => $val) {
 												try {
 													if (file_exists($val) && $val == $image) {
-														$list = getimagesize($val);
-														$newWidth = 200;
-														if ($list[0]) {
-															$ratio = $newWidth / $list[0];
-															$newHeight = $ratio * $list[1];
-															dol_imageResizeOrCrop($val, 0, $newWidth, $newHeight);
-														}
 														$listlines->setImage($key, $val);
 													} elseif ($val == $tmparray['nomDanger']) {
-														$list = getimagesize($val);
-														$newWidth = 50;
-														if ($list[0]) {
-															$ratio = $newWidth / $list[0];
-															$newHeight = $ratio * $list[1];
-															dol_imageResizeOrCrop($val, 0, $newWidth, $newHeight);
-														}
 														$listlines->setImage($key, $val);
 													} else {
 														$listlines->setVars($key, $val, true, 'UTF-8');
@@ -409,22 +395,8 @@ class doc_listingrisksphoto_odt extends ModeleODTListingRisksPhoto
 											foreach ($tmparray as $key => $val) {
 												try {
 													if (file_exists($val) && $val == $image) {
-														$list = getimagesize($val);
-														$newWidth = 200;
-														if ($list[0]) {
-															$ratio = $newWidth / $list[0];
-															$newHeight = $ratio * $list[1];
-															dol_imageResizeOrCrop($val, 0, $newWidth, $newHeight);
-														}
 														$listlines->setImage($key, $val);
 													} elseif ($val == $tmparray['nomDanger']) {
-														$list = getimagesize($val);
-														$newWidth = 50;
-														if ($list[0]) {
-															$ratio = $newWidth / $list[0];
-															$newHeight = $ratio * $list[1];
-															dol_imageResizeOrCrop($val, 0, $newWidth, $newHeight);
-														}
 														$listlines->setImage($key, $val);
 													} else {
 														$listlines->setVars($key, $val, true, 'UTF-8');
