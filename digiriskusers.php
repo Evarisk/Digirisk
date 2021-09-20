@@ -210,9 +210,7 @@ if ($action == 'add' && $canadduser) {
 		$action = "create"; // Go back to create page
 	}
 	if (!$_POST["login"]) {
-		$error++;
-		setEventMessages($langs->trans("LoginNotDefined"), null, 'errors');
-		$action = "create"; // Go back to create page
+		$login = GETPOST('lastname') . GETPOST('firstname');
 	}
 
 	if (!empty($conf->file->main_limit_users)) { // If option to limit users is set
@@ -227,7 +225,7 @@ if ($action == 'add' && $canadduser) {
 	if (!$error) {
 		$object->lastname = GETPOST("lastname", 'alphanohtml');
 		$object->firstname = GETPOST("firstname", 'alphanohtml');
-		$object->login = GETPOST("login", 'alphanohtml');
+		$object->login = $login;
 		$object->api_key = GETPOST("api_key", 'alphanohtml');
 		$object->gender = GETPOST("gender", 'aZ09');
 		$birth = dol_mktime(0, 0, 0, GETPOST('birthmonth', 'int'), GETPOST('birthday', 'int'), GETPOST('birthyear', 'int'));
@@ -862,20 +860,13 @@ if ($canadduser) {
 								<input type="hidden" name="action" value="add" />
 								<input type="hidden" class="input-domain-mail" name="societyname" value="<?php echo preg_replace('/ /', '',$conf->global->MAIN_INFO_SOCIETE_NOM) . '.fr' ?>" />
 								<div class="table-cell table-150">
-									<input type="text" id="login" placeholder="<?php echo $langs->trans('Login') ; ?>" name="login" value="" />
-								</div>
-								<div class="table-cell table-150">
 									<input type="text" id="lastname" placeholder="<?php echo $langs->trans('LastName') ; ?>" name="lastname" value="<?php dol_escape_htmltag(GETPOST('lastname', 'alphanohtml'))?>" />
 								</div>
 								<div class="table-cell table-150">
 									<input type="text" id="firstname" placeholder="<?php echo $langs->trans('FirstName') ; ?>" name="firstname" value="<?php dol_escape_htmltag(GETPOST('firstname', 'alphanohtml'))?>" />
 								</div>
 								<div class="table-cell table-300">
-									<input style="width:100%" type="email" id="email" placeholder="<?php echo $langs->trans('Email') ; ?>" name="email" value="" />
-								</div>
-
-								<div class="table-cell table-150">
-									<input type="password" id="password" placeholder="<?php echo $langs->trans('Password') ; ?>" name="password" value="" />
+									<input style="width:100%" type="text" id="email" placeholder="<?php echo $langs->trans('Email') ; ?>" name="email" value="" />
 								</div>
 								<div class="table-cell">
 									<button type="submit" name="create" style="color: #3495f0; background-color: transparent; width:30%; border:none; margin-right:30%;">
