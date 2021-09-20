@@ -2325,9 +2325,9 @@
 }
 .ticketpublicarea .tableforinputfields .inline-block input {
   display: inline-block;
-  max-width: -webkit-max-content;
-  max-width: -moz-max-content;
-  max-width: max-content;
+}
+.ticketpublicarea .tableforinputfields .inline-block #options_digiriskdolibarr_ticket_date {
+  max-width: 80px;
 }
 
 .risk-container .risk-edit {
