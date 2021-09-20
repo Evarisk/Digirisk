@@ -168,7 +168,7 @@ class doc_listingrisksphoto_odt extends ModeleODTListingRisksPhoto
 	public function write_file($object, $outputlangs, $srctemplatepath, $hidedetails = 0, $hidedesc = 0, $hideref = 0, $digiriskelement)
 	{
 		// phpcs:enable
-		global $user, $langs, $conf, $mysoc, $hookmanager, $action;
+		global $user, $langs, $conf, $mysoc, $hookmanager, $action, $mysoc;
 
 		if (empty($srctemplatepath))
 		{
@@ -264,7 +264,10 @@ class doc_listingrisksphoto_odt extends ModeleODTListingRisksPhoto
 			$substitutionarray = getCommonSubstitutionArray($outputlangs, 0, null, $object);
 			$array_object_from_properties = $this->get_substitutionarray_each_var_object($object, $outputlangs);
 			$array_object = $this->get_substitutionarray_object($object, $outputlangs);
-			$tmparray = array_merge($substitutionarray, $array_object_from_properties, $array_object);
+			$array_soc = $this->get_substitutionarray_mysoc($mysoc, $outputlangs);
+
+			$tmparray = array_merge($substitutionarray, $array_object_from_properties, $array_object, $array_soc);
+
 			complete_substitutions_array($tmparray, $outputlangs, $object);
 
 			// Call the ODTSubstitution hook
