@@ -275,9 +275,10 @@ class doc_groupmentdocument_odt extends ModeleODTGroupmentDocument
 			foreach ($tmparray as $key=>$value)
 			{
 				try {
-					if ($key == 'photoDefault' || $key == 'mycompany_logo') // Image
+					if ($key == 'photoDefault' || preg_match('/logo$/', $key)) // Image
 					{
-						$odfHandler->setImage($key, $value);
+						if (file_exists($value)) $odfHandler->setImage($key, $value);
+						else $odfHandler->setVars($key, 'ErrorFileNotFound', true, 'UTF-8');
 					}
 					else    // Text
 					{

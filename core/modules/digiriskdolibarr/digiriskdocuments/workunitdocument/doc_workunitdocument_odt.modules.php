@@ -276,9 +276,10 @@ class doc_workunitdocument_odt extends ModeleODTWorkUnitDocument
 			foreach ($tmparray as $key=>$value)
 			{
 				try {
-					if ($key == 'photoDefault' && $tmparray['mycompany_logo']) // Image
+					if ($key == 'photoDefault' && preg_match('/logo$/', $key)) // Image
 					{
-						$odfHandler->setImage($key, $value);
+						if (file_exists($value)) $odfHandler->setImage($key, $value);
+						else $odfHandler->setVars($key, 'ErrorFileNotFound', true, 'UTF-8');
 					}
 					else    // Text
 					{

@@ -408,8 +408,9 @@ class doc_preventionplandocument_odt extends ModeleODTPreventionPlanDocument
 							dol_imageResizeOrCrop($value, 0, $newWidth, $newHeight);
 						}
 						$odfHandler->setImage($key, $value);
-					} elseif ($key == 'photoDefault' && $key == 'mycompany_logo') {
-						$odfHandler->setImage($key, $value);
+					} elseif ($key == 'photoDefault' && preg_match('/logo$/', $key)) {
+						if (file_exists($value)) $odfHandler->setImage($key, $value);
+						else $odfHandler->setVars($key, 'ErrorFileNotFound', true, 'UTF-8');
 					}
 					else    // Text
 					{
