@@ -365,10 +365,7 @@ print '</div>';
 		<div class="form-element">
 			<span class="form-label"><?php print $langs->trans("Message"); ?></span>
 			<label class="form-field-container">
-				<?php
-				$doleditor = new DolEditor('message', $conf->global->DIGIRISK_DEROGATION_SCHEDULE_OCCASIONAL ? $conf->global->DIGIRISK_DEROGATION_SCHEDULE_OCCASIONAL : '', '', 90, 'dolibarr_notes', '', false, true, $conf->global->FCKEDITOR_ENABLE_SOCIETE, ROWS_3, '90%');
-				$doleditor->Create();
-				?>
+				<textarea name="message" id="message"></textarea>
 			</label>
 		</div>
 		<div class="form-element">
