@@ -36,15 +36,13 @@ if (!$res && file_exists("../../../main.inc.php")) $res = @include "../../../mai
 if (!$res && file_exists("../../../../main.inc.php")) $res = @include "../../../../main.inc.php";
 if (!$res) die("Include of main fails");
 
-require_once DOL_DOCUMENT_ROOT.'/core/class/html.formfile.class.php';
-
 require_once './class/digiriskstandard.class.php';
 require_once './class/digiriskdocuments/legaldisplay.class.php';
 require_once './lib/digiriskdolibarr_digiriskstandard.lib.php';
 require_once './lib/digiriskdolibarr_function.lib.php';
 require_once './core/modules/digiriskdolibarr/digiriskdocuments/legaldisplay/modules_legaldisplay.php';
 
-global $db, $conf, $langs;
+global $db, $conf, $langs, $user, $hookmanager;
 
 // Load translation files required by the page
 $langs->loadLangs(array("digiriskdolibarr@digiriskdolibarr", "other"));
@@ -59,7 +57,9 @@ $hookmanager->initHooks(array('digiriskelementlegaldisplay', 'globalcard')); // 
 
 $object->fetch($conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD);
 
-$upload_dir         = $conf->digiriskdolibarr->multidir_output[isset($object->entity) ? $object->entity : 1];
+$upload_dir = $conf->digiriskdolibarr->multidir_output[isset($object->entity) ? $object->entity : 1];
+
+//Security check
 $permissiontoread   = $user->rights->digiriskdolibarr->legaldisplay->read;
 $permissiontoadd    = $user->rights->digiriskdolibarr->legaldisplay->write;
 $permissiontodelete = $user->rights->digiriskdolibarr->legaldisplay->delete;
@@ -74,8 +74,7 @@ $parameters = array();
 $reshook = $hookmanager->executeHooks('doActions', $parameters, $object, $action); // Note that $action and $object may have been modified by some hooks
 if ($reshook < 0) setEventMessages($hookmanager->error, $hookmanager->errors, 'errors');
 
-if (empty($reshook))
-{
+if (empty($reshook)) {
 	$error = 0;
 
 	// Action to build doc
@@ -95,7 +94,7 @@ if (empty($reshook))
 		if (empty($hideref)) $hideref = 0;
 		if (empty($moreparams)) $moreparams = null;
 
-		$model      = GETPOST('model', 'alpha');
+		$model = GETPOST('model', 'alpha');
 
 		$moreparams['object'] = "";
 		$moreparams['user']   = $user;
@@ -121,8 +120,7 @@ if (empty($reshook))
 }
 
 // Delete file in doc form
-if ($action == 'remove_file' && $permissiontodelete)
-{
+if ($action == 'remove_file' && $permissiontodelete) {
 	if (!empty($upload_dir)) {
 		require_once DOL_DOCUMENT_ROOT.'/core/lib/files.lib.php';
 
@@ -150,7 +148,6 @@ if ($action == 'remove_file' && $permissiontodelete)
  * View
  */
 
-$formfile 	 = new FormFile($db);
 $emptyobject = new stdClass($db);
 
 $title    = $langs->trans('LegalDisplay');
@@ -174,7 +171,7 @@ $width = 80; $cssclass = 'photoref';
 
 $morehtmlref = '<div class="refidno">';
 $morehtmlref .= '</div>';
-$morehtmlleft .= '<div class="floatleft inline-block valignmiddle divphotoref">'.digirisk_show_photos('mycompany', $conf->mycompany->dir_output . '/logos', 'small', 1, 0, 0, 0, $width,0, 0, 0, 0, 'logos', $emptyobject).'</div>';
+$morehtmlleft = '<div class="floatleft inline-block valignmiddle divphotoref">'.digirisk_show_photos('mycompany', $conf->mycompany->dir_output . '/logos', 'small', 1, 0, 0, 0, $width,0, 0, 0, 0, 'logos', $emptyobject).'</div>';
 
 digirisk_banner_tab($object, 'ref', '', 0, 'ref', 'ref', $morehtmlref, '', 0, $morehtmlleft);
 

@@ -145,9 +145,6 @@ if ($object->id > 0) {
 	print dol_get_fiche_end();
 
 	// Actions buttons
-	$objthirdparty = $object;
-	$objcon = new stdClass();
-
 	$out = '&origin='.$object->element.'@digiriskdolibarr'.'&originid='.$object->id.'&backtopage=1&percentage=-1';
 
 	if (!empty($conf->agenda->enabled)) {

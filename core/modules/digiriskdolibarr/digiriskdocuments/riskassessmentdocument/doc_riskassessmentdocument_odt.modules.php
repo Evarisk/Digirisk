@@ -274,10 +274,14 @@ class doc_riskassessmentdocument_odt extends ModeleODTRiskAssessmentDocument
 
 			foreach ($tmparray as $key=>$value)
 			{
-				try{
-					if ($value == $tmparray['mycompany_logo']) {
-						$odfHandler->setImage($key, $value);
-					} else {
+				try {
+					if (preg_match('/logo$/', $key)) // Image
+					{
+						if (file_exists($value)) $odfHandler->setImage($key, $value);
+						else $odfHandler->setVars($key, 'ErrorFileNotFound', true, 'UTF-8');
+					}
+					else    // Text
+					{
 						$odfHandler->setVars($key, $value, true, 'UTF-8');
 					}
 				}

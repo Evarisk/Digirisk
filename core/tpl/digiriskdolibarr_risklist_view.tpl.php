@@ -9,7 +9,6 @@
 	print '<input type="hidden" name="sortorder" value="'.$sortorder.'">';
 	//print '<input type="hidden" name="page" value="'.$page.'">';
 	print '<input type="hidden" name="contextpage" value="'.$contextpage.'">';
-	print '<div class="underbanner clearboth"></div>';
 
 	// NOTICES FOR ACTIONS
 	?>

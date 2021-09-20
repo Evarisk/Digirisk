@@ -35,6 +35,8 @@ AgendaModuleRequired = Pour assurer la traçabilité des actions dans Digirisk, 
 DigiriskDolibarrDescription = Digirisk pour Dolibarr
 HowToSetupOtherModules = Pour plus de fonctionnalités sur Digirisk, vous pouvez activer de nombreux modules (Gestion des fournisseurs, des factures, etc.) sur ce lien :
 ConfigMyModules = Configuration des modules
+AvoidLogoProblems = Pour éviter tout problème lié aux logos dans les documents générés, veuillez vous référer à ces conseils de paramétrages :
+LogoHelpLink = https://wiki.dolibarr.org/index.php?title=Premiers_paramétrages
 
 #
 # Page À propos
@@ -642,6 +644,9 @@ EvaluatorDurationDescription = Le temps que met l'évaluateur à réaliser son �
 
 # Trigger - Déclencheur
 ActionsOnDigiriskStandard = Événements liés au standard de Digirisk
+
+# Data - Donnée
+DigiriskStandardInformation = Information
 
 
 

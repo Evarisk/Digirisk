@@ -42,32 +42,31 @@ require_once './class/digiriskelement.class.php';
 require_once './lib/digiriskdolibarr_digiriskelement.lib.php';
 require_once './lib/digiriskdolibarr_function.lib.php';
 
+global $langs, $hookmanager, $db;
 
 // Load translation files required by the page
 $langs->loadLangs(array("digiriskdolibarr@digiriskdolibarr", "other"));
 
 // Get parameters
-$id = GETPOST('id', 'int');
+$id         = GETPOST('id', 'int');
 $ref        = GETPOST('ref', 'alpha');
-$action = GETPOST('action', 'alpha');
+$action     = GETPOST('action', 'alpha');
 $cancel     = GETPOST('cancel', 'aZ09');
 $backtopage = GETPOST('backtopage', 'alpha');
 
-if (GETPOST('actioncode', 'array'))
-{
+if (GETPOST('actioncode', 'array')) {
 	$actioncode = GETPOST('actioncode', 'array', 3);
 	if (!count($actioncode)) $actioncode = '0';
 }
-else
-{
+else {
 	$actioncode = GETPOST("actioncode", "alpha", 3) ?GETPOST("actioncode", "alpha", 3) : (GETPOST("actioncode") == '0' ? '0' : (empty($conf->global->AGENDA_DEFAULT_FILTER_TYPE_FOR_OBJECT) ? '' : $conf->global->AGENDA_DEFAULT_FILTER_TYPE_FOR_OBJECT));
 }
 $search_agenda_label = GETPOST('search_agenda_label');
 
-$limit = GETPOST('limit', 'int') ?GETPOST('limit', 'int') : $conf->liste_limit;
+$limit     = GETPOST('limit', 'int') ?GETPOST('limit', 'int') : $conf->liste_limit;
 $sortfield = GETPOST("sortfield", 'alpha');
 $sortorder = GETPOST("sortorder", 'alpha');
-$page = GETPOSTISSET('pageplusone') ? (GETPOST('pageplusone') - 1) : GETPOST("page", 'int');
+$page      = GETPOSTISSET('pageplusone') ? (GETPOST('pageplusone') - 1) : GETPOST("page", 'int');
 if (empty($page) || $page == -1) { $page = 0; }     // If $page is not defined, or '' or -1
 $offset = $limit * $page;
 $pageprev = $page - 1;
@@ -76,9 +75,9 @@ if (!$sortfield) $sortfield = 'a.datep,a.id';
 if (!$sortorder) $sortorder = 'DESC,DESC';
 
 // Initialize technical objects
-$object = new DigiriskElement($db);
+$object      = new DigiriskElement($db);
 $extrafields = new ExtraFields($db);
-$diroutputmassaction = $conf->digiriskdolibarr->dir_output.'/temp/massgeneration/'.$user->id;
+
 $hookmanager->initHooks(array('digiriskelementagenda', 'globalcard')); // Note that conf->hooks_modules contains array
 // Fetch optionals attributes and labels
 $extrafields->fetch_name_optionals_label($object->table_element);
@@ -94,7 +93,6 @@ $permissiontodelete = $user->rights->digiriskdolibarr->digiriskelement->delete;
 
 if (!$permissiontoread) accessforbidden();
 
-
 /*
  *  Actions
  */
@@ -103,40 +101,29 @@ $parameters = array('id'=>$id);
 $reshook = $hookmanager->executeHooks('doActions', $parameters, $object, $action); // Note that $action and $object may have been modified by some hooks
 if ($reshook < 0) setEventMessages($hookmanager->error, $hookmanager->errors, 'errors');
 
-if (empty($reshook))
-{
+if (empty($reshook)) {
 	// Cancel
-	if (GETPOST('cancel', 'alpha') && !empty($backtopage))
-	{
+	if (GETPOST('cancel', 'alpha') && !empty($backtopage)) {
 		header("Location: ".$backtopage);
 		exit;
 	}
 
 	// Purge search criteria
-	if (GETPOST('button_removefilter_x', 'alpha') || GETPOST('button_removefilter.x', 'alpha') || GETPOST('button_removefilter', 'alpha')) // All tests are required to be compatible with all browsers
-	{
+	if (GETPOST('button_removefilter_x', 'alpha') || GETPOST('button_removefilter.x', 'alpha') || GETPOST('button_removefilter', 'alpha')) { // All tests are required to be compatible with all browsers
 		$actioncode = '';
 		$search_agenda_label = '';
 	}
 }
 
-
-
 /*
  *	View
  */
 
-$form = new Form($db);
-
-
-if (true)
-{
-
+if ($object->id > 0) {
 	$title = $langs->trans("Agenda");
-	//if (! empty($conf->global->MAIN_HTML_TITLE) && preg_match('/thirdpartynameonly/',$conf->global->MAIN_HTML_TITLE) && $object->name) $title=$object->name." - ".$title;
 	$help_url = 'FR:Module_DigiriskDolibarr';
 	$morejs = array("/digiriskdolibarr/js/digiriskdolibarr.js.php");
-	$morecss   = array("/digiriskdolibarr/css/digiriskdolibarr.css");
+	$morecss = array("/digiriskdolibarr/css/digiriskdolibarr.css");
 
 	digiriskHeader('', $title, $help_url, '', '', '', $morejs, $morecss);
 	print '<div id="cardContent" value="">';
@@ -144,59 +131,38 @@ if (true)
 	if (!empty($conf->notification->enabled)) $langs->load("mails");
 	$head = digiriskelementPrepareHead($object);
 
-
-	dol_fiche_head($head, 'elementAgenda', $title, -1, "digiriskdolibarr@digiriskdolibarr");
+	print dol_get_fiche_head($head, 'elementAgenda', $title, -1, "digiriskdolibarr@digiriskdolibarr");
 
 	// Object card
 	// ------------------------------------------------------------
 	dol_strlen($object->label) ? $morehtmlref = ' - ' . $object->label : '';
-	$width = 80; $cssclass = 'photoref';
-	$morehtmlleft .= '<div class="floatleft inline-block valignmiddle divphotoref">'.digirisk_show_photos('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$entity].'/'.$object->element_type, 'small', 5, 0, 0, 0, $width,0, 0, 0, 0, $object->element_type, $object).'</div>';
+	$width = 80;
+	$cssclass = 'photoref';
+	$morehtmlleft .= '<div class="floatleft inline-block valignmiddle divphotoref">' . digirisk_show_photos('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$entity] . '/' . $object->element_type, 'small', 5, 0, 0, 0, $width, 0, 0, 0, 0, $object->element_type, $object) . '</div>';
 
 	digirisk_banner_tab($object, 'ref', '', 0, 'ref', 'ref', $morehtmlref, '', 0, $morehtmlleft);
 
 	print '<div class="fichecenter">';
-	print '<div class="underbanner clearboth"></div>';
 
 	$object->info($object->id);
 	dol_print_object_info($object, 1);
 
 	print '</div>';
 
-	dol_fiche_end();
+	print dol_get_fiche_end();
 
 	// Actions buttons
+	$out = '&origin=' . $object->element . '@digiriskdolibarr' . '&originid=' . $object->id . '&backtopage=1&percentage=-1';
 
-	$objthirdparty = $object;
-	$objcon = new stdClass();
-
-	$out = '&origin='.$object->element.'@digiriskdolibarr'.'&originid='.$object->id;
-	$permok = $user->rights->agenda->myactions->create;
-	if ((!empty($objthirdparty->id) || !empty($objcon->id)) && $permok)
-	{
-		//$out.='<a href="'.DOL_URL_ROOT.'/comm/action/card.php?action=create';
-		if (get_class($objthirdparty) == 'Societe') $out .= '&amp;socid='.$objthirdparty->id;
-		$out .= (!empty($objcon->id) ? '&amp;contactid='.$objcon->id : '').'&amp;backtopage=1&amp;percentage=-1';
-		//$out.=$langs->trans("AddAnAction").' ';
-		//$out.=img_picto($langs->trans("AddAnAction"),'filenew');
-		//$out.="</a>";
-	}
-
-
-	$morehtmlcenter = '';
-
-	if (!empty($conf->agenda->enabled))
-	{
+	if (!empty($conf->agenda->enabled)) {
 		$linktocreatetimeBtnStatus = !empty($user->rights->agenda->myactions->create) || !empty($user->rights->agenda->allactions->create);
-
-		$morehtmlcenter = dolGetButtonTitle($langs->trans('AddAction'), '', 'fa fa-plus-circle', DOL_URL_ROOT.'/comm/action/card.php?action=create'.$out, '', $linktocreatetimeBtnStatus);
+		$morehtmlcenter = dolGetButtonTitle($langs->trans('AddAction'), '', 'fa fa-plus-circle', DOL_URL_ROOT . '/comm/action/card.php?action=create' . $out, '', $linktocreatetimeBtnStatus);
 	}
 
-	if (!empty($conf->agenda->enabled) && (!empty($user->rights->agenda->myactions->read) || !empty($user->rights->agenda->allactions->read)))
-	{
-		$param = '&id='.$object->id;
-		if (!empty($contextpage) && $contextpage != $_SERVER["PHP_SELF"]) $param .= '&contextpage='.urlencode($contextpage);
-		if ($limit > 0 && $limit != $conf->liste_limit) $param .= '&limit='.urlencode($limit);
+	if (!empty($conf->agenda->enabled) && (!empty($user->rights->agenda->myactions->read) || !empty($user->rights->agenda->allactions->read))) {
+		$param = '&id=' . $object->id;
+		if (!empty($contextpage) && $contextpage != $_SERVER["PHP_SELF"]) $param .= '&contextpage=' . urlencode($contextpage);
+		if ($limit > 0 && $limit != $conf->liste_limit) $param .= '&limit=' . urlencode($limit);
 
 		print_barre_liste($langs->trans("ActionsOnGroupment"), 0, $_SERVER["PHP_SELF"], '', $sortfield, $sortorder, '', 0, -1, '', 0, $morehtmlcenter, '', 0, 1, 1);
 

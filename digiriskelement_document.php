@@ -37,8 +37,8 @@ if (!$res) die("Include of main fails");
 
 require_once DOL_DOCUMENT_ROOT.'/core/lib/company.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/files.lib.php';
-require_once DOL_DOCUMENT_ROOT.'/core/lib/images.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/core/class/html.formfile.class.php';
+require_once DOL_DOCUMENT_ROOT.'/core/lib/images.lib.php';
 require_once './class/digiriskelement.class.php';
 require_once './lib/digiriskdolibarr_digiriskelement.lib.php';
 require_once './lib/digiriskdolibarr_function.lib.php';
@@ -65,9 +65,9 @@ if (!$sortfield) $sortfield = "name";
 //if (! $sortfield) $sortfield="position_name";
 
 // Initialize technical objects
-$object = new DigiriskElement($db);
+$object      = new DigiriskElement($db);
 $extrafields = new ExtraFields($db);
-$diroutputmassaction = $conf->digiriskdolibarr->dir_output.'/temp/massgeneration/'.$user->id;
+
 $hookmanager->initHooks(array('digiriskelementdocument', 'globalcard')); // Note that conf->hooks_modules contains array
 // Fetch optionals attributes and labels
 $extrafields->fetch_name_optionals_label($object->table_element);
@@ -78,13 +78,13 @@ include DOL_DOCUMENT_ROOT.'/core/actions_fetchobject.inc.php'; // Must be includ
 //if ($id > 0 || ! empty($ref)) $upload_dir = $conf->digiriskdolibarr->multidir_output[$object->entity?$object->entity:$conf->entity] . "/digiriskelement/" . dol_sanitizeFileName($object->id);
 if ($id > 0 || !empty($ref)) $upload_dir = $conf->digiriskdolibarr->multidir_output[$object->entity ? $object->entity : $conf->entity]."/".$object->element_type."/".dol_sanitizeFileName($object->ref);
 
-// Security check - Protection if external user
-//if ($user->socid > 0) accessforbidden();
-//if ($user->socid > 0) $socid = $user->socid;
-//$result = restrictedArea($user, 'digiriskdolibarr', $object->id);
+//Security check
+$permissiontoread = $user->rights->digiriskdolibarr->digiriskelement->read;
+
+if (!$permissiontoread) accessforbidden();
+
 
 $permissiontoadd = $user->rights->digiriskdolibarr->digiriskelement->write; // Used by the include of actions_addupdatedelete.inc.php
-
 
 
 /*
@@ -97,28 +97,22 @@ include_once DOL_DOCUMENT_ROOT.'/core/actions_linkedfiles.inc.php';
 /*
  * View
  */
-
-$form = new Form($db);
+$formfile    = new FormFile($db);
 $emptyobject = new stdClass($db);
 
-$title = $langs->trans("DigiriskElement").' - '.$langs->trans("Files");
+$title    = $langs->trans("DigiriskElement").' - '.$langs->trans("Files");
 $help_url = '';
-//$help_url='EN:Module_Third_Parties|FR:Module_Tiers|ES:Empresas';
-$morejs  = array("/digiriskdolibarr/js/digiriskdolibarr.js.php");
-$morecss = array("/digiriskdolibarr/css/digiriskdolibarr.css");
+$morejs   = array("/digiriskdolibarr/js/digiriskdolibarr.js.php");
+$morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");
 
 digiriskHeader('', $title, $help_url, '', '', '', $morejs, $morecss);
 if (!$object->id) {
-
 	$object->ref = $conf->global->MAIN_INFO_SOCIETE_NOM;
 	$object->label = 'Societe principale';
 	$object->entity = 2;
 	unset($object->fields['element_type']);
-
-
 }
-if (true)
-{
+if (true) {
 	/*
 	 * Show tabs
 	 */
@@ -126,14 +120,13 @@ if (true)
 
 	$head = digiriskelementPrepareHead($object);
 
-	dol_fiche_head($head, 'elementDocument', $title, -1, "digiriskdolibarr@digiriskdolibarr");
+	print dol_get_fiche_head($head, 'elementDocument', $title, -1, "digiriskdolibarr@digiriskdolibarr");
 
 
 	// Build file list
 	$filearray = dol_dir_list($upload_dir, "files", 0, '', '(\.meta|_preview.*\.png)$', $sortfield, (strtolower($sortorder) == 'desc' ?SORT_DESC:SORT_ASC), 1);
 	$totalsize = 0;
-	foreach ($filearray as $key => $file)
-	{
+	foreach ($filearray as $key => $file) {
 		$totalsize += $file['size'];
 	}
 
@@ -150,8 +143,6 @@ if (true)
 
 
 	print '<div class="fichecenter">';
-
-	print '<div class="underbanner clearboth"></div>';
 	print '<table class="border centpercent tableforfield">';
 
 	// Number of files
@@ -164,7 +155,7 @@ if (true)
 
 	print '</div>';
 
-	dol_fiche_end();
+	print dol_get_fiche_end();
 
 	$modulepart = 'digiriskdolibarr';
 	$permission = $user->rights->digiriskdolibarr->digiriskelement->write;
@@ -175,10 +166,8 @@ if (true)
 	$relativepathwithnofile = $object->element_type.'/'.dol_sanitizeFileName($object->ref).'/';
 	include_once DOL_DOCUMENT_ROOT.'/core/tpl/document_actions_post_headers.tpl.php';
 	print '</div>';
-
 }
-else
-{
+else {
 	accessforbidden('', 0, 1);
 }
 

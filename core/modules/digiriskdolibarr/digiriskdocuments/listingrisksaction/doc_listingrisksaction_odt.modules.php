@@ -166,7 +166,7 @@ class doc_listingrisksaction_odt extends ModeleODTListingRisksAction
 	public function write_file($object, $outputlangs, $srctemplatepath, $hidedetails = 0, $hidedesc = 0, $hideref = 0, $digiriskelement)
 	{
 		// phpcs:enable
-		global $user, $langs, $conf, $hookmanager, $action;
+		global $user, $langs, $conf, $hookmanager, $action, $mysoc;
 
 		if (empty($srctemplatepath))
 		{
@@ -263,12 +263,15 @@ class doc_listingrisksaction_odt extends ModeleODTListingRisksAction
 			$substitutionarray = getCommonSubstitutionArray($outputlangs, 0, null, $object);
 			$array_object_from_properties = $this->get_substitutionarray_each_var_object($object, $outputlangs);
 			$array_object = $this->get_substitutionarray_object($object, $outputlangs);
-			$tmparray = array_merge($substitutionarray, $array_object_from_properties, $array_object);
+			$array_soc = $this->get_substitutionarray_mysoc($mysoc, $outputlangs);
+	
+			$tmparray = array_merge($substitutionarray, $array_object_from_properties, $array_object, $array_soc);
 			complete_substitutions_array($tmparray, $outputlangs, $object);
 
 			// Call the ODTSubstitution hook
 			$parameters = array('odfHandler'=>&$odfHandler, 'file'=>$file, 'object'=>$object, 'outputlangs'=>$outputlangs, 'substitutionarray'=>&$tmparray);
 			$reshook = $hookmanager->executeHooks('ODTSubstitution', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
+			$tmparray['reference'] = $object->ref;
 
 			foreach ($tmparray as $key=>$value)
 			{
@@ -346,13 +349,6 @@ class doc_listingrisksaction_odt extends ModeleODTListingRisksAction
 											foreach ($tmparray as $key => $val) {
 												try {
 													if ($val == $tmparray['nomDanger']) {
-														$list = getimagesize($val);
-														$newWidth = 50;
-														if ($list[0]) {
-															$ratio = $newWidth / $list[0];
-															$newHeight = $ratio * $list[1];
-															dol_imageResizeOrCrop($val, 0, $newWidth, $newHeight);
-														}
 														$listlines->setImage($key, $val);
 													} else {
 														$listlines->setVars($key, $val, true, 'UTF-8');
@@ -421,13 +417,6 @@ class doc_listingrisksaction_odt extends ModeleODTListingRisksAction
 											foreach ($tmparray as $key => $val) {
 												try {
 													if ($val == $tmparray['nomDanger']) {
-														$list = getimagesize($val);
-														$newWidth = 50;
-														if ($list[0]) {
-															$ratio = $newWidth / $list[0];
-															$newHeight = $ratio * $list[1];
-															dol_imageResizeOrCrop($val, 0, $newWidth, $newHeight);
-														}
 														$listlines->setImage($key, $val);
 													} else {
 														$listlines->setVars($key, $val, true, 'UTF-8');
@@ -448,6 +437,7 @@ class doc_listingrisksaction_odt extends ModeleODTListingRisksAction
 					}
 				}
 			}
+
 			catch (OdfException $e)
 			{
 				$this->error = $e->getMessage();

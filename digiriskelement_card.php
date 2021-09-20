@@ -48,7 +48,7 @@ require_once './core/modules/digiriskdolibarr/digiriskelement/workunit/mod_worku
 require_once './core/modules/digiriskdolibarr/digiriskdocuments/groupmentdocument/modules_groupmentdocument.php';
 require_once './core/modules/digiriskdolibarr/digiriskdocuments/workunitdocument/modules_workunitdocument.php';
 
-global $db, $conf, $langs;
+global $db, $conf, $langs, $user;
 
 // Load translation files required by the page
 $langs->loadLangs(array("digiriskdolibarr@digiriskdolibarr", "other"));
@@ -99,8 +99,7 @@ $parameters = array();
 $reshook = $hookmanager->executeHooks('doActions', $parameters, $object, $action); // Note that $action and $object may have been modified by some hooks
 if ($reshook < 0) setEventMessages($hookmanager->error, $hookmanager->errors, 'errors');
 
-if (empty($reshook))
-{
+if (empty($reshook)) {
 	$error = 0;
 
 	$backurlforlist = dol_buildpath('/digiriskdolibarr/digiriskstandard_card.php?id=1', 1);
@@ -176,8 +175,7 @@ if (empty($reshook))
 	}
 
 	// Delete file in doc form
-	if ($action == 'remove_file' && $permissiontodelete)
-	{
+	if ($action == 'remove_file' && $permissiontodelete) {
 		if (!empty($upload_dir)) {
 			require_once DOL_DOCUMENT_ROOT.'/core/lib/files.lib.php';
 
@@ -237,8 +235,7 @@ digiriskHeader('', $title, $help_url, '', '', '', $morejs, $morecss); ?>
 	<div id="cardContent" value="">
 
 <?php // Part to create
-if ($action == 'create')
-{
+if ($action == 'create') {
 	print load_fiche_titre($title_create, '', "digiriskdolibarr32px@digiriskdolibarr");
 
 	print '<form method="POST" action="'.$_SERVER["PHP_SELF"].'">';
@@ -248,7 +245,7 @@ if ($action == 'create')
 
 	if ($backtopageforcancel) print '<input type="hidden" name="backtopageforcancel" value="'.$backtopageforcancel.'">';
 
-	dol_fiche_head(array(), '');
+	print dol_get_fiche_head(array(), '');
 
 	unset($object->fields['ref']);
 	unset($object->fields['status']);
@@ -285,7 +282,7 @@ if ($action == 'create')
 
 	print '</table>'."\n";
 
-	dol_fiche_end();
+	print dol_get_fiche_end();
 
 	print '<div class="center">';
 	print '<input type="submit" class="button" id ="actionButtonCreate" name="add" value="'.dol_escape_htmltag($langs->trans("Create")).'">';
@@ -298,8 +295,7 @@ if ($action == 'create')
 }
 
 // Part to edit record
-if (($id || $ref) && $action == 'edit')
-{
+if (($id || $ref) && $action == 'edit') {
 	print load_fiche_titre($title_edit, '', "digiriskdolibarr32px@digiriskdolibarr");
 
 	print '<form method="POST" action="'.$_SERVER["PHP_SELF"].'">';
@@ -309,7 +305,7 @@ if (($id || $ref) && $action == 'edit')
 	if ($backtopage) print '<input type="hidden" name="backtopage" value="'.$backtopage.'">';
 	if ($backtopageforcancel) print '<input type="hidden" name="backtopageforcancel" value="'.$backtopageforcancel.'">';
 
-	dol_fiche_head();
+	print dol_get-fiche_head();
 
 	unset($object->fields['status']);
 	unset($object->fields['element_type']);
@@ -332,7 +328,7 @@ if (($id || $ref) && $action == 'edit')
 
 	print '</table>';
 
-	dol_fiche_end();
+	print dol_get_fiche_end();
 
 	print '<div class="center"><input type="submit" id ="actionButtonSave" class="button" name="save" value="'.$langs->trans("Save").'">';
 	print ' &nbsp; <input type="submit" id ="actionButtonCancelEdit" class="button" name="cancel" value="'.$langs->trans("Cancel").'"  onClick="javascript:history.go(-1)">';
@@ -349,18 +345,16 @@ if (!$object->id) {
 }
 
 // Part to show record
-if ((empty($action) || ($action != 'edit' && $action != 'create')))
-{
+if ((empty($action) || ($action != 'edit' && $action != 'create'))) {
 	$res = $object->fetch_optionals();
 
 	$head = digiriskelementPrepareHead($object);
 
-	dol_fiche_head($head, 'elementCard', $title, -1, "digiriskdolibarr@digiriskdolibarr");
+	print dol_get_fiche_head($head, 'elementCard', $title, -1, "digiriskdolibarr@digiriskdolibarr");
 
 	$formconfirm = '';
 	// Confirmation to delete
-	if ($action == 'delete')
-	{
+	if ($action == 'delete') {
 		$formconfirm = $form->formconfirm($_SERVER["PHP_SELF"].'?id='.$object->id, $langs->trans('DeleteDigiriskElement'), $langs->trans('ConfirmDeleteObject'), 'confirm_delete', '', 0, 1);
 	}
 
@@ -390,11 +384,9 @@ if ((empty($action) || ($action != 'edit' && $action != 'create')))
 
 	print '<div class="fichecenter">';
 	print '<div class="fichehalfleft">';
-	print '<div class="underbanner clearboth"></div>';
 	print '<table class="border centpercent tableforfield">'."\n";
 
 	if ($object->id) {
-
 		print '<tr><td class="titlefield">' . $langs->trans("ElementType") . '</td><td>';
 		print $langs->trans($object->element_type);
 		print '</td></tr>';
@@ -406,13 +398,11 @@ if ((empty($action) || ($action != 'edit' && $action != 'create')))
 		if ($result > 0) {
 			print $parent_element->ref . ( !empty($parent_element->description) ?  ' - ' . $parent_element->description : '');
 		}
-		else
-		{
+		else {
 			print $conf->global->MAIN_INFO_SOCIETE_NOM;
 		}
 
 		print '</td></tr>';
-
 	}
 
 	//Show common fields
@@ -426,7 +416,6 @@ if ((empty($action) || ($action != 'edit' && $action != 'create')))
 
 	print '<div class="fichehalfright">';
 	print '<div class="ficheaddleft">';
-	print '<div class="underbanner clearboth"></div>';
 
 	print '<table class="border tableforfield" width="100%">';
 
@@ -446,7 +435,7 @@ if ((empty($action) || ($action != 'edit' && $action != 'create')))
 
 	print '<div class="clearboth"></div>';
 
-	dol_fiche_end();
+	print dol_get_fiche_end();
 
 	if ($object->id > 0) {
 		// Buttons for actions
