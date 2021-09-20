@@ -54,5 +54,14 @@
       max-width: none;
       margin-bottom: 1em;
     }
+    .inline-block {
+      @media ( max-width: $media__small ) {
+        display: block;
+      }
+      input {
+        display: inline-block;
+        max-width: max-content;
+      }
+    }
   }
 }

@@ -2318,6 +2318,17 @@
   max-width: none;
   margin-bottom: 1em;
 }
+@media (max-width: 480px) {
+  .ticketpublicarea .tableforinputfields .inline-block {
+    display: block;
+  }
+}
+.ticketpublicarea .tableforinputfields .inline-block input {
+  display: inline-block;
+  max-width: -webkit-max-content;
+  max-width: -moz-max-content;
+  max-width: max-content;
+}
 
 .risk-container .risk-edit {
   color: #263C5C;
