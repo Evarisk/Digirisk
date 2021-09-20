@@ -51,8 +51,7 @@ $societe = new Societe($db);
 // Initialize technical object to manage hooks of page. Note that conf->hooks_modules contains array of hook context
 $hookmanager->initHooks(array('thirdpartyopeninghours', 'globalcard'));
 
-if ($action == 'view' && $societe->fetch($socid) <= 0)
-{
+if ($action == 'view' && $societe->fetch($socid) <= 0) {
 	$langs->load("errors");
 	print($langs->trans('ErrorRecordNotFound'));
 	exit;
@@ -62,8 +61,7 @@ if ($action == 'view' && $societe->fetch($socid) <= 0)
 $societe->getCanvas($socid);
 $canvas = $societe->canvas ? $societe->canvas : GETPOST("canvas");
 $objcanvas = null;
-if (!empty($canvas))
-{
+if (!empty($canvas)) {
 	require_once DOL_DOCUMENT_ROOT.'/core/class/canvas.class.php';
 	$objcanvas = new Canvas($db, $action);
 	$objcanvas->getCanvas('thirdparty', 'card', $canvas);
@@ -81,9 +79,7 @@ $parameters = array();
 $reshook = $hookmanager->executeHooks('doActions', $parameters, $societe, $action); // Note that $action and $societe may have been modified by some hooks
 if ($reshook < 0) setEventMessages($hookmanager->error, $hookmanager->errors, 'errors');
 
-if (($action == 'update' && !GETPOST("cancel", 'alpha'))
-	|| ($action == 'updateedit'))
-{
+if (($action == 'update' && !GETPOST("cancel", 'alpha')) || ($action == 'updateedit')) {
 	$object = new Openinghours($db);
 	$object->element_type = $societe->element;
 	$object->element_id = GETPOST('id');
@@ -111,8 +107,7 @@ $morewhere .= ' AND status = 1';
 
 $object->fetch(0, '', $morewhere);
 
-if ($socid > 0 && empty($societe->id))
-{
+if ($socid > 0 && empty($societe->id)) {
 	$result = $societe->fetch($socid);
 	if ($result <= 0) dol_print_error('', $societe->error);
 }
@@ -130,7 +125,7 @@ $morehtmlref = '<div class="refidno">';
 $morehtmlref .= '</div>';
 
 $head = societe_prepare_head($societe);
-dol_fiche_head($head, 'openinghours', $langs->trans("ThirdParty"), 0, 'company');
+print dol_get_fiche_head($head, 'openinghours', $langs->trans("ThirdParty"), 0, 'company');
 $linkback = '<a href="'.DOL_URL_ROOT.'/societe/list.php?restore_lastsearch_values=1">'.$langs->trans("BackToList").'</a>';
 dol_banner_tab($societe, 'socid', $linkback, ($user->socid ? 0 : 1), 'rowid', 'nom', '', '', 0, '', '', 'arearefnobottom');
 
@@ -139,7 +134,7 @@ print '<span class="opacitymedium">'.$langs->trans("ThirdPartyOpeningHours")."</
 //Show common fields
 require_once __DIR__ . '/core/tpl/digiriskdolibarr_openinghours_view.tpl.php';
 
-dol_fiche_end();
+print dol_get_fiche_end();
 // End of page
 llxFooter();
 $db->close();

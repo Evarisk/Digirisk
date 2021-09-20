@@ -36,7 +36,6 @@ if (!$res && file_exists("../../../main.inc.php")) $res = @include "../../../mai
 if (!$res) die("Include of main fails");
 
 require_once DOL_DOCUMENT_ROOT.'/core/lib/admin.lib.php';
-require_once DOL_DOCUMENT_ROOT.'/core/class/html.formfile.class.php';
 require_once DOL_DOCUMENT_ROOT.'/core/class/doleditor.class.php';
 
 require_once './class/digiriskstandard.class.php';
@@ -47,7 +46,8 @@ require_once './class/digiriskdocuments/riskassessmentdocument.class.php';
 require_once './lib/digiriskdolibarr_digiriskstandard.lib.php';
 require_once './lib/digiriskdolibarr_function.lib.php';
 require_once './core/modules/digiriskdolibarr/digiriskdocuments/riskassessmentdocument/modules_riskassessmentdocument.php';
-global $db, $conf, $langs;
+
+global $db, $conf, $langs, $hookmanager, $user;
 
 // Load translation files required by the page
 $langs->loadLangs(array("digiriskdolibarr@digiriskdolibarr", "other"));
@@ -63,7 +63,9 @@ $hookmanager->initHooks(array('digiriskelementriskassessmentdocument', 'globalca
 
 $object->fetch($conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD);
 
-$upload_dir         = $conf->digiriskdolibarr->multidir_output[isset($object->entity) ? $object->entity : 1];
+$upload_dir = $conf->digiriskdolibarr->multidir_output[isset($object->entity) ? $object->entity : 1];
+
+//Security check
 $permissiontoread   = $user->rights->digiriskdolibarr->riskassessmentdocument->read;
 $permissiontoadd    = $user->rights->digiriskdolibarr->riskassessmentdocument->write;
 $permissiontodelete = $user->rights->digiriskdolibarr->riskassessmentdocument->delete;
@@ -78,14 +80,10 @@ $parameters = array();
 $reshook = $hookmanager->executeHooks('doActions', $parameters, $object, $action); // Note that $action and $object may have been modified by some hooks
 if ($reshook < 0) setEventMessages($hookmanager->error, $hookmanager->errors, 'errors');
 
-if (empty($reshook))
-{
+if (empty($reshook)) {
 	$error = 0;
 
-	if (($action == 'update' && !GETPOST("cancel", 'alpha'))
-		|| ($action == 'updateedit') && $permissiontoadd)
-	{
-
+	if (($action == 'update' && !GETPOST("cancel", 'alpha')) || ($action == 'updateedit') && $permissiontoadd) {
 		$auditStartDate = GETPOST('AuditStartDate', 'none');
 		$auditEndDate   = GETPOST('AuditEndDate', 'none');
 		$recipent       = GETPOST('Recipient', 'alpha');
@@ -121,8 +119,7 @@ if (empty($reshook))
 		dolibarr_set_const($db, "DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_IMPORTANT_NOTE", $importantNote, 'chaine', 0, '', $conf->entity);
 		dolibarr_set_const($db, "DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_SITE_PLANS", $sitePlans, 'chaine', 0, '', $conf->entity);
 
-		if ($action != 'updateedit' && !$error)
-		{
+		if ($action != 'updateedit' && !$error) {
 			header("Location: ".$_SERVER["PHP_SELF"]);
 			exit;
 		}
@@ -146,7 +143,7 @@ if (empty($reshook))
 		if (empty($hideref)) $hideref = 0;
 		if (empty($moreparams)) $moreparams = null;
 
-		$model      = GETPOST('model', 'alpha');
+		$model = GETPOST('model', 'alpha');
 
 		$moreparams['object'] = "";
 		$moreparams['user']   = $user;
@@ -168,7 +165,6 @@ if (empty($reshook))
 		$digiriskelementlist = $digiriskelement->fetchDigiriskElementFlat(0);
 
 		if ( ! empty( $digiriskelementlist ) ) {
-
 			foreach ($digiriskelementlist as $digiriskelementsingle) {
 				if ($digiriskelementsingle['object']->element_type == 'groupment') {
 					$digiriskelementdocument = new GroupmentDocument($db);
@@ -205,11 +201,9 @@ if (empty($reshook))
 				RecursiveIteratorIterator::LEAVES_ONLY
 			);
 
-			foreach ($files as $name => $file)
-			{
+			foreach ($files as $name => $file) {
 				// Skip directories (they would be added automatically)
-				if (!$file->isDir())
-				{
+				if (!$file->isDir()) {
 					// Get real and relative path for current file
 					$filePath = $file->getRealPath();
 					$relativePath = substr($filePath, strlen($rootPath) + 1);
@@ -224,7 +218,6 @@ if (empty($reshook))
 
 			//move archive to riskassessmentdocument folder
 			rename(DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/' . $riskassessmentdocument->ref . '.zip', $pathToZip . '.zip');
-
 		}
 		if ($result <= 0) {
 			setEventMessages($object->error, $object->errors, 'errors');
@@ -246,8 +239,7 @@ if (empty($reshook))
 }
 
 // Delete file in doc form
-if ($action == 'remove_file' && $permissiontodelete)
-{
+if ($action == 'remove_file' && $permissiontodelete) {
 	if (!empty($upload_dir)) {
 		require_once DOL_DOCUMENT_ROOT.'/core/lib/files.lib.php';
 
@@ -275,7 +267,6 @@ if ($action == 'remove_file' && $permissiontodelete)
  * View
  */
 
-$formfile 	 = new FormFile($db);
 $emptyobject = new stdClass($db);
 
 $title    = $langs->trans('RiskAssessmentDocument');
@@ -291,7 +282,7 @@ digiriskHeader('', $title, $help_url, '', '', '', $morejs, $morecss); ?>
 $res  = $object->fetch_optionals();
 $head = digiriskstandardPrepareHead($object);
 
-dol_fiche_head($head, 'standardRiskAssessmentDocument', $title, -1, "digiriskdolibarr@digiriskdolibarr");
+print dol_get_fiche_head($head, 'standardRiskAssessmentDocument', $title, -1, "digiriskdolibarr@digiriskdolibarr");
 
 // Object card
 // ------------------------------------------------------------
@@ -299,12 +290,11 @@ $width = 80; $cssclass = 'photoref';
 
 $morehtmlref = '<div class="refidno">';
 $morehtmlref .= '</div>';
-$morehtmlleft .= '<div class="floatleft inline-block valignmiddle divphotoref">'.digirisk_show_photos('mycompany', $conf->mycompany->dir_output . '/logos', 'small', 1, 0, 0, 0, $width,0, 0, 0, 0, 'logos', $emptyobject).'</div>';
+$morehtmlleft = '<div class="floatleft inline-block valignmiddle divphotoref">'.digirisk_show_photos('mycompany', $conf->mycompany->dir_output . '/logos', 'small', 1, 0, 0, 0, $width,0, 0, 0, 0, 'logos', $emptyobject).'</div>';
 
 digirisk_banner_tab($object, 'ref', '', 0, 'ref', 'ref', $morehtmlref, '', 0, $morehtmlleft);
 
 print '<div class="fichecenter">';
-print '<div class="underbanner clearboth"></div>';
 print '<table class="border centpercent tableforfield">' . "\n";
 
 //JSON Decode and show fields
@@ -339,7 +329,7 @@ if (empty($reshook)) {
 print '</div>';
 print '</form>';
 
-dol_fiche_end();
+print dol_get_fiche_end();
 
 // Document Generation -- Génération des documents
 $includedocgeneration = 1;
