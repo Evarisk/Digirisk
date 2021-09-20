@@ -294,37 +294,40 @@ print '<p><strong>' . $langs->trans("Register") . '</strong></p>';
 print '';
 
 $registerCategory = $category->rechercher(0,'Registre','ticket', true);
-$registerChildren = $registerCategory[0]->get_filles();
+
 
 print '<div class="wpeo-gridlayout grid-3">';
 if (!empty($registerCategory)) {
-	foreach ($registerChildren as $register) {
-		if ($register->id == GETPOST('register')) {
-			print '<div class="ticket-register active" id="' . $register->id . '">';
-		} else {
-			print '<div class="ticket-register" id="' . $register->id . '">';
-		}
+	$registerChildren = $registerCategory[0]->get_filles();
+	if (!empty($registerChildren)) {
+		foreach ($registerChildren as $register) {
+			if ($register->id == GETPOST('register')) {
+				print '<div class="ticket-register active" id="' . $register->id . '">';
+			} else {
+				print '<div class="ticket-register" id="' . $register->id . '">';
+			}
 
-		if ($register->label == $langs->trans('SST')) {
-			print '<div class="wpeo-button button-blue">';
-			show_category_image($register, $upload_dir);
-			print '<span class="button-label">' . $register->label . '</span>';
+			if ($register->label == $langs->trans('SST')) {
+				print '<div class="wpeo-button button-blue">';
+				show_category_image($register, $upload_dir);
+				print '<span class="button-label">' . $register->label . '</span>';
+				print '</div>';
+			} elseif ($register->label == $langs->trans('Accident')) {
+				print '<div class="wpeo-button button-yellow">';
+				show_category_image($register, $upload_dir);
+				print '<span class="button-label">' . $register->label . '</span>';
+				print '</div>';
+			} elseif ($register->label == $langs->trans('DGI')) {
+				print '<div class="wpeo-button button-red">';
+				show_category_image($register, $upload_dir);
+				print '<span class="button-label">' . $register->label . '</span>';
+				print '</div>';
+			} else {
+				show_category_image($register, $upload_dir);
+			}
 			print '</div>';
-		} elseif ($register->label == $langs->trans('Accident')) {
-			print '<div class="wpeo-button button-yellow">';
-			show_category_image($register, $upload_dir);
-			print '<span class="button-label">' . $register->label . '</span>';
-			print '</div>';
-		} elseif ($register->label == $langs->trans('DGI')) {
-			print '<div class="wpeo-button button-red">';
-			show_category_image($register, $upload_dir);
-			print '<span class="button-label">' . $register->label . '</span>';
-			print '</div>';
-		} else {
-			show_category_image($register, $upload_dir);
-		}
-		print '</div>';
 
+		}
 	}
 }
 print '</div>';
