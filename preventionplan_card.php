@@ -93,7 +93,7 @@ $extrafields->fetch_name_optionals_label($objectline->table_element);
 $hookmanager->initHooks(array('preventionplancard', 'globalcard')); // Note that conf->hooks_modules contains array
 
 $upload_dir         = $conf->digiriskdolibarr->multidir_output[isset($object->entity) ? $object->entity : 1];
-// Security check - Protection if external user
+// Security check
 $permissiontoread   = $user->rights->digiriskdolibarr->preventionplan->read;
 $permissiontoadd    = $user->rights->digiriskdolibarr->preventionplan->write;
 $permissiontodelete = $user->rights->digiriskdolibarr->preventionplan->delete;

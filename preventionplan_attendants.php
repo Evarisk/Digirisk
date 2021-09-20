@@ -390,7 +390,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 		require __DIR__ . "/core/tpl/digiriskdolibarr_signature_action_view.tpl.php";
 	}
 	print '</td>';
-	if ($element->signature != $langs->trans("FileGenerated")) {
+	if ($element->signature != $langs->trans("FileGenerated") && $permissiontoadd) {
 		print '<td class="center">';
 		require __DIR__ . "/core/tpl/digiriskdolibarr_signature_view.tpl.php";
 		print '</td>';
@@ -443,7 +443,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	if ($object->status == 2 && $permissiontoadd) {
 		require __DIR__ . "/core/tpl/digiriskdolibarr_signature_action_view.tpl.php";
 	}	print '</td>';
-	if ($element->signature != $langs->trans("FileGenerated")) {
+	if ($element->signature != $langs->trans("FileGenerated")  && $permissiontoadd) {
 		print '<td class="center">';
 		require __DIR__ . "/core/tpl/digiriskdolibarr_signature_view.tpl.php";
 		print '</td>';
@@ -499,7 +499,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 				require __DIR__ . "/core/tpl/digiriskdolibarr_signature_action_view.tpl.php";
 			}
 			print '</td>';
-			if ($element->signature != $langs->trans("FileGenerated")) {
+			if ($element->signature != $langs->trans("FileGenerated")  && $permissiontoadd) {
 				print '<td class="center">';
 				require __DIR__ . "/core/tpl/digiriskdolibarr_signature_view.tpl.php";
 				print '</td>';
