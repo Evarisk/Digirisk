@@ -2311,6 +2311,13 @@
 .ticketpublicarea .tableforinputfields {
   margin-top: 1em;
 }
+.ticketpublicarea .tableforinputfields input {
+  display: block;
+  clear: both;
+  width: 100%;
+  max-width: none;
+  margin-bottom: 1em;
+}
 
 .risk-container .risk-edit {
   color: #263C5C;

@@ -46,5 +46,13 @@
 
   .tableforinputfields {
     margin-top: 1em;
+
+    input {
+      display: block;
+      clear: both;
+      width: 100%;
+      max-width: none;
+      margin-bottom: 1em;
+    }
   }
 }
