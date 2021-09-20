@@ -53,37 +53,39 @@ require_once './core/modules/digiriskdolibarr/riskanalysis/riskassessment/mod_ri
 require_once './lib/digiriskdolibarr_digiriskstandard.lib.php';
 require_once './lib/digiriskdolibarr_function.lib.php';
 
+global $langs, $user, $conf, $db, $hookmanager;
+
 // Load translation files required by the page
 $langs->loadLangs(array("digiriskdolibarr@digiriskdolibarr", "other"));
 
 // Get parameters
-$id                  = GETPOST('id', 'int');
-$action              = GETPOST('action', 'aZ09');
-$massaction          = GETPOST('massaction', 'alpha'); // The bulk action (combo box choice into lists)
-$confirm             = GETPOST('confirm', 'alpha');
-$cancel              = GETPOST('cancel', 'aZ09');
-$contextpage         = GETPOST('contextpage', 'aZ') ?GETPOST('contextpage', 'aZ') : 'riskcard'; // To manage different context of search
-$backtopage          = GETPOST('backtopage', 'alpha');
-$toselect            = GETPOST('toselect', 'array'); // Array of ids of elements selected into a list
-$limit               = GETPOST('limit', 'int') ?GETPOST('limit', 'int') : $conf->liste_limit;
-$sortfield           = GETPOST('sortfield', 'alpha');
-$sortorder           = GETPOST('sortorder', 'alpha');
-$page                = GETPOSTISSET('pageplusone') ? (GETPOST('pageplusone') - 1) : GETPOST("page", 'int');
-$page                = is_numeric($page) ? $page : 0;
-$page                = $page == -1 ? 0 : $page;
+$id          = GETPOST('id', 'int');
+$action      = GETPOST('action', 'aZ09');
+$massaction  = GETPOST('massaction', 'alpha'); // The bulk action (combo box choice into lists)
+$confirm     = GETPOST('confirm', 'alpha');
+$cancel      = GETPOST('cancel', 'aZ09');
+$contextpage = GETPOST('contextpage', 'aZ') ?GETPOST('contextpage', 'aZ') : 'risklist'; // To manage different context of search
+$backtopage  = GETPOST('backtopage', 'alpha');
+$toselect    = GETPOST('toselect', 'array'); // Array of ids of elements selected into a list
+$limit       = GETPOST('limit', 'int') ?GETPOST('limit', 'int') : $conf->liste_limit;
+$sortfield   = GETPOST('sortfield', 'alpha');
+$sortorder   = GETPOST('sortorder', 'alpha');
+$page        = GETPOSTISSET('pageplusone') ? (GETPOST('pageplusone') - 1) : GETPOST("page", 'int');
+$page        = is_numeric($page) ? $page : 0;
+$page        = $page == -1 ? 0 : $page;
 
 // Initialize technical objects
-$object            = new DigiriskStandard($db);
-$risk              = new Risk($db);
-$evaluation        = new RiskAssessment($db);
-$ecmdir            = new EcmDirectory($db);
-$project           = new Project($db);
-$task              = new Task($db);
-$extrafields       = new ExtraFields($db);
-$refRiskMod        = new $conf->global->DIGIRISKDOLIBARR_RISK_ADDON();
-$refEvaluationMod  = new $conf->global->DIGIRISKDOLIBARR_RISKASSESSMENT_ADDON();
-$refProjectMod     = new $conf->global->PROJECT_ADDON();
-$refTaskMod        = new $conf->global->PROJECT_TASK_ADDON();
+$object           = new DigiriskStandard($db);
+$risk             = new Risk($db);
+$evaluation       = new RiskAssessment($db);
+$ecmdir           = new EcmDirectory($db);
+$project          = new Project($db);
+$task             = new Task($db);
+$extrafields      = new ExtraFields($db);
+$refRiskMod       = new $conf->global->DIGIRISKDOLIBARR_RISK_ADDON();
+$refEvaluationMod = new $conf->global->DIGIRISKDOLIBARR_RISKASSESSMENT_ADDON();
+$refProjectMod    = new $conf->global->PROJECT_ADDON();
+$refTaskMod       = new $conf->global->PROJECT_TASK_ADDON();
 
 $object->fetch($conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD);
 $hookmanager->initHooks(array('risklist', 'globalcard')); // Note that conf->hooks_modules contains array
@@ -93,8 +95,8 @@ $extrafields->fetch_name_optionals_label($risk->table_element);
 $search_array_options = $extrafields->getOptionalsFromPost($risk->table_element, '', 'search_');
 
 // Default sort order (if not yet defined by previous GETPOST)
-if (!$sortfield) $sortfield = "t.".key($risk->fields); // Set here default search field. By default 1st field in definition.
-if (!$sortorder) $sortorder = "ASC";
+if (!$sortfield) $sortfield = "evaluation.cotation"; // Set here default search field. By default 1st field in definition.
+if (!$sortorder) $sortorder = "DESC";
 if (!$evalsortfield) $evalsortfield = "evaluation.".key($evaluation->fields);
 
 $offset   = $limit * $page;
@@ -104,27 +106,23 @@ $pagenext = $page + 1;
 // Initialize array of search criterias
 $search_all = GETPOST('search_all', 'alphanohtml') ? trim(GETPOST('search_all', 'alphanohtml')) : trim(GETPOST('sall', 'alphanohtml'));
 $search = array();
-foreach ($risk->fields as $key => $val)
-{
+foreach ($risk->fields as $key => $val) {
 	if (GETPOST('search_'.$key, 'alpha') !== '') $search[$key] = GETPOST('search_'.$key, 'alpha');
 }
 
 // List of fields to search into when doing a "search in all"
 $fieldstosearchall = array();
-foreach ($risk->fields as $key => $val)
-{
+foreach ($risk->fields as $key => $val) {
 	if ($val['searchall']) $fieldstosearchall['t.'.$key] = $val['label'];
 }
 
 // Definition of fields for list
 $arrayfields = array();
-foreach ($risk->fields as $key => $val)
-{
+foreach ($risk->fields as $key => $val) {
 	// If $val['visible']==0, then we never show the field
 	if (!empty($val['visible'])) $arrayfields['t.'.$key] = array('label'=>$val['label'], 'checked'=>(($val['visible'] < 0) ? 0 : 1), 'enabled'=>($val['enabled'] && ($val['visible'] != 3)), 'position'=>$val['position']);
 }
-foreach ($evaluation->fields as $key => $val)
-{
+foreach ($evaluation->fields as $key => $val) {
 	// If $val['visible']==0, then we never show the field
 	if (!empty($val['visible'])) $arrayfields['evaluation.'.$key] = array('label'=>$val['label'], 'checked'=>(($val['visible'] < 0) ? 0 : 1), 'enabled'=>($val['enabled'] && ($val['visible'] != 3)), 'position'=>$val['position']);
 }
@@ -137,7 +135,7 @@ $permissiontoread = $user->rights->digiriskdolibarr->risk->read;
 $permissiontoadd = $user->rights->digiriskdolibarr->risk->write;
 $permissiontodelete = $user->rights->digiriskdolibarr->risk->delete;
 
-// Security check - Protection if external user
+// Security check
 if (!$permissiontoread) accessforbidden();
 
 /*
@@ -155,8 +153,7 @@ if (empty($reshook)) {
 	include DOL_DOCUMENT_ROOT . '/core/actions_changeselectedfields.inc.php';
 
 	// Purge search criteria
-	if (GETPOST('button_removefilter_x', 'alpha') || GETPOST('button_removefilter.x', 'alpha') || GETPOST('button_removefilter', 'alpha')) // All tests are required to be compatible with all browsers
-	{
+	if (GETPOST('button_removefilter_x', 'alpha') || GETPOST('button_removefilter.x', 'alpha') || GETPOST('button_removefilter', 'alpha')) { // All tests are required to be compatible with all browsers
 		foreach ($risk->fields as $key => $val) {
 			$search[$key] = '';
 		}
@@ -260,7 +257,6 @@ if (empty($reshook)) {
 
 		$risk->fetch($riskID);
 
-
 		$evaluation->photo      = $photo;
 		$evaluation->cotation   = $cotation;
 		$evaluation->fk_risk    = $risk->id;
@@ -307,8 +303,7 @@ if (empty($reshook)) {
 
 		$result = $evaluation->create($user, true);
 
-		if ($result > 0)
-		{
+		if ($result > 0) {
 			// Creation evaluation OK
 			$urltogo = str_replace('__ID__', $result, $backtopage);
 			$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
@@ -386,8 +381,7 @@ if (empty($reshook)) {
 		}
 		$result = $evaluation->update($user, true);
 
-		if ($result > 0)
-		{
+		if ($result > 0) {
 			// Update evaluation OK
 			$urltogo = str_replace('__ID__', $result, $backtopage);
 			$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
@@ -427,8 +421,7 @@ if (empty($reshook)) {
 		$result = $evaluation->delete($user, true);
 		$previousEvaluation->updateEvaluationStatus($user,$evaluation->fk_risk);
 
-		if ($result > 0)
-		{
+		if ($result > 0) {
 			// Delete evaluation OK
 			$urltogo = str_replace('__ID__', $result, $backtopage);
 			$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
@@ -451,10 +444,8 @@ if (empty($reshook)) {
 		if (is_array($_FILES['userfile']['tmp_name'])) $userfiles = $_FILES['userfile']['tmp_name'];
 		else $userfiles = array($_FILES['userfile']['tmp_name']);
 
-		foreach ($userfiles as $key => $userfile)
-		{
-			if (empty($_FILES['userfile']['tmp_name'][$key]))
-			{
+		foreach ($userfiles as $key => $userfile) {
+			if (empty($_FILES['userfile']['tmp_name'][$key])) {
 				$error++;
 				if ($_FILES['userfile']['error'][$key] == 1 || $_FILES['userfile']['error'][$key] == 2) {
 					setEventMessages($langs->trans('ErrorFileSizeTooLarge'), null, 'errors');
@@ -464,8 +455,7 @@ if (empty($reshook)) {
 			}
 		}
 
-		if (!$error)
-		{
+		if (!$error) {
 			$generatethumbs = 0;
 			$res = dol_add_file_process($upload_dir, 0, 1, 'userfile', '', null, '', $generatethumbs);
 			if ($res > 0)
@@ -533,8 +523,7 @@ if (empty($reshook)) {
 
 		$result = $task->delete($user, true);
 
-		if ($result > 0)
-		{
+		if ($result > 0) {
 			// Delete task OK
 			$urltogo = str_replace('__ID__', $result, $backtopage);
 			$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation

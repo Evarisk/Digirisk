@@ -65,6 +65,8 @@ $hookmanager->initHooks(array('preventionplansignature', 'globalcard')); // Note
 
 //Security check
 $permissiontoread   = $user->rights->digiriskdolibarr->preventionplan->read;
+$permissiontoadd    = $user->rights->digiriskdolibarr->preventionplan->write;
+$permissiontodelete = $user->rights->digiriskdolibarr->preventionplan->delete;
 if (!$permissiontoread) accessforbidden();
 
 /*
@@ -303,10 +305,6 @@ print dol_get_fiche_end(); ?>
 	</div>
 </div>
 <?php
-// Show direct link to public interface
-if (!empty($conf->global->DIGIRISKDOLIBARR_SIGNATURE_ENABLE_PUBLIC_INTERFACE)) {
-	print showDirectPublicLinkSignature();
-}
 
 // Part to create
 if ($action == 'create')
@@ -388,11 +386,11 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	print '</td>';
 
 	print '<td class="center">';
-	if ($object->status == 2) {
+	if ($object->status == 2  && $permissiontoadd) {
 		require __DIR__ . "/core/tpl/digiriskdolibarr_signature_action_view.tpl.php";
 	}
 	print '</td>';
-	if ($element->signature != $langs->trans("FileGenerated")) {
+	if ($element->signature != $langs->trans("FileGenerated") && $permissiontoadd) {
 		print '<td class="center">';
 		require __DIR__ . "/core/tpl/digiriskdolibarr_signature_view.tpl.php";
 		print '</td>';
@@ -442,10 +440,10 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	print $element->getLibStatut(5);
 	print '</td>';
 	print '<td class="center">';
-	if ($object->status == 2) {
+	if ($object->status == 2 && $permissiontoadd) {
 		require __DIR__ . "/core/tpl/digiriskdolibarr_signature_action_view.tpl.php";
 	}	print '</td>';
-	if ($element->signature != $langs->trans("FileGenerated")) {
+	if ($element->signature != $langs->trans("FileGenerated")  && $permissiontoadd) {
 		print '<td class="center">';
 		require __DIR__ . "/core/tpl/digiriskdolibarr_signature_view.tpl.php";
 		print '</td>';
@@ -497,11 +495,11 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 			print $element->getLibStatut(5);
 			print '</td>';
 			print '<td class="center">';
-			if ($object->status < 3) {
+			if ($object->status < 3  && $permissiontoadd) {
 				require __DIR__ . "/core/tpl/digiriskdolibarr_signature_action_view.tpl.php";
 			}
 			print '</td>';
-			if ($element->signature != $langs->trans("FileGenerated")) {
+			if ($element->signature != $langs->trans("FileGenerated")  && $permissiontoadd) {
 				print '<td class="center">';
 				require __DIR__ . "/core/tpl/digiriskdolibarr_signature_view.tpl.php";
 				print '</td>';
@@ -512,7 +510,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 		}
 	}
 
-	if ($object->status == 1) {
+	if ($object->status == 1 && $permissiontoadd) {
 		print '<form method="POST" action="'.$_SERVER["PHP_SELF"].'">';
 		print '<input type="hidden" name="token" value="'.newToken().'">';
 		print '<input type="hidden" name="action" value="addAttendant">';

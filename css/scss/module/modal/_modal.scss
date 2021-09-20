@@ -44,7 +44,7 @@
     height: 100%;
     max-height: 560px;
     background: #fff;
-    padding: 2em;
+    padding: 1em 0;
     margin: auto;
     top: 50%;
     left: 50%;
@@ -58,12 +58,15 @@
     .modal-header {
       height: 10%;
       display: flex;
+      padding: 0 2em;
     }
     .modal-content {
       height: 78%;
+      padding: 0 2em;
     }
     .modal-footer {
       height: 12%;
+      padding: 0 2em;
     }
   }
   .modal-container .modal-header {

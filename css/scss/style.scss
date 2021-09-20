@@ -15,3 +15,8 @@
 .imgTabTitle {
   max-height: 32px !important;
 }
+
+.dropdown-toggle::after {
+  display: none;
+}
+

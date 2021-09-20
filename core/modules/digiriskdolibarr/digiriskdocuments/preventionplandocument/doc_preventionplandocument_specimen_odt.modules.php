@@ -271,6 +271,7 @@ class doc_preventionplandocument_specimen_odt extends ModeleODTPreventionPlanDoc
 				$tmparray['photoDefault'] = $image['fullname'];
 			}
 
+			$digiriskelement    = new DigiriskElement($this->db);
 			$resources          = new DigiriskResources($this->db);
 			$signatory          = new PreventionPlanSignature($this->db);
 			$societe            = new Societe($this->db);
@@ -294,8 +295,8 @@ class doc_preventionplandocument_specimen_odt extends ModeleODTPreventionPlanDoc
 			$tmparray['consigne_generale']              = $conf->global->DIGIRISK_GENERAL_RULES;
 			$tmparray['premiers_secours']               = $conf->global->DIGIRISK_FIRST_AID;
 
-			$tmparray['date_start_intervention_PPP'] = dol_print_date($preventionplan->date_start, 'dayrfc');
-			$tmparray['date_end_intervention_PPP']   = dol_print_date($preventionplan->date_end, 'dayrfc');
+			$tmparray['date_start_intervention_PPP'] = dol_print_date($preventionplan->date_start, 'dayhoursec', 'tzuser');
+			$tmparray['date_end_intervention_PPP']   = dol_print_date($preventionplan->date_end, 'dayhoursec', 'tzuser');
 			$tmparray['interventions_info']          = count($preventionplanlines) . " " . $langs->trans('PreventionPlanLine');
 
 
@@ -367,7 +368,7 @@ class doc_preventionplandocument_specimen_odt extends ModeleODTPreventionPlanDoc
 				$tmparray['maitre_oeuvre_email'] = $maitreoeuvre->email;
 				$tmparray['maitre_oeuvre_phone'] = $maitreoeuvre->phone;
 
-				$tmparray['maitre_oeuvre_signature_date'] = $maitreoeuvre->signature_date;
+				$tmparray['maitre_oeuvre_signature_date'] = dol_print_date($maitreoeuvre->signature_date, 'dayhoursec', 'tzuser');
 			}
 
 			if (!empty( $extsocietyresponsible) && $extsocietyresponsible > 0) {
@@ -377,7 +378,7 @@ class doc_preventionplandocument_specimen_odt extends ModeleODTPreventionPlanDoc
 				$tmparray['intervenant_exterieur_phone'] = $extsocietyresponsible->phone;
 
 				//@todo when attendance will be created
-				$tmparray['intervenant_exterieur_signature_date'] = $extsocietyresponsible->signature_date;
+				$tmparray['intervenant_exterieur_signature_date'] = dol_print_date($extsocietyresponsible->signature_date, 'dayhoursec', 'tzuser');
 			}
 
 			foreach ($tmparray as $key=>$value)
@@ -414,8 +415,10 @@ class doc_preventionplandocument_specimen_odt extends ModeleODTPreventionPlanDoc
 
 						foreach ($preventionplanlines as $line) {
 
+							$digiriskelement->fetch($line->fk_element);
+
 							$tmparray['key_unique']    = $line->ref;
-							$tmparray['unite_travail'] = $line->location;
+							$tmparray['unite_travail'] = $digiriskelement->ref . " - " . $digiriskelement->label;
 							$tmparray['action']        = $line->description;
 							$tmparray['risk']          = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $risk->get_danger_category($line) . '.png';
 							$tmparray['prevention']    = $line->prevention_method;
@@ -440,19 +443,19 @@ class doc_preventionplandocument_specimen_odt extends ModeleODTPreventionPlanDoc
 
 					if (!empty($extsocietyintervenants) && $extsocietyintervenants > 0) {
 						$listlines = $odfHandler->setSegment('intervenants');
-
+						$k = 3;
 						foreach ($extsocietyintervenants as $line) {
-
-							$tmparray['id']       = $line->id;
 							$tmparray['name']     = $line->firstname;
 							$tmparray['lastname'] = $line->lastname;
 							$tmparray['phone']    = $line->phone;
-							$tmparray['mail']     = $line->mail;
-							$tmparray['status']   = $langs->trans("StatusDigirisk") . ' : ' . $line->getLibStatut(1);
+							$tmparray['mail']     = $line->email;
+							$tmparray['status']   = $line->getLibStatut(1);
 
-							foreach ($tmparray as $key => $val) {
+							$k++;
+
+							foreach ($tmparray as $key => $value) {
 								try {
-									$listlines->setVars($key, $val, true, 'UTF-8');
+									$listlines->setVars($key, $value, true, 'UTF-8');
 								} catch (OdfException $e) {
 									dol_syslog($e->getMessage(), LOG_INFO);
 								} catch (SegmentException $e) {

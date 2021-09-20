@@ -165,7 +165,7 @@ class doc_legaldisplay_odt extends ModeleODTLegalDisplay
 	public function write_file($object, $outputlangs, $srctemplatepath, $hidedetails = 0, $hidedesc = 0, $hideref = 0)
 	{
 		// phpcs:enable
-		global $user, $langs, $conf, $hookmanager, $action;
+		global $user, $langs, $conf, $hookmanager, $action, $mysoc;
 
 		if (empty($srctemplatepath))
 		{
@@ -254,17 +254,10 @@ class doc_legaldisplay_odt extends ModeleODTLegalDisplay
 			$substitutionarray = getCommonSubstitutionArray($outputlangs, 0, null, $object);
 			$array_object_from_properties = $this->get_substitutionarray_each_var_object($object, $outputlangs);
 			$array_object = $this->get_substitutionarray_object($object, $outputlangs);
+			$array_soc = $this->get_substitutionarray_mysoc($mysoc, $outputlangs);
 
-			$tmparray = array_merge($substitutionarray, $array_object_from_properties, $array_object);
+			$tmparray = array_merge($substitutionarray, $array_object_from_properties, $array_object, $array_soc);
 			complete_substitutions_array($tmparray, $outputlangs, $object);
-
-			$companyLogoThumbs = dol_dir_list($conf->mycompany->dir_output . '/logos/thumbs/');
-			if (!empty($companyLogoThumbs)) {
-				foreach($companyLogoThumbs as $companyLogoThumb) {
-
-				}
-			}
-			$tmparray['mycompany_logo'] = $conf->mycompany->dir_output . '/logos/thumbs/b.png';
 
 			// Call the ODTSubstitution hook
 			$parameters = array('odfHandler'=>&$odfHandler, 'file'=>$file, 'object'=>$object, 'outputlangs'=>$outputlangs, 'substitutionarray'=>&$tmparray);

@@ -39,7 +39,7 @@ require_once './class/digiriskstandard.class.php';
 require_once './lib/digiriskdolibarr_digiriskstandard.lib.php';
 require_once './lib/digiriskdolibarr_function.lib.php';
 
-global $db, $conf, $langs;
+global $db, $conf, $langs, $user;
 
 // Load translation files required by the page
 $langs->loadLangs(array("digiriskdolibarr@digiriskdolibarr"));
@@ -49,7 +49,8 @@ $object = new DigiriskStandard($db);
 
 $object->fetch($conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD);
 
-$permissiontoread = $user->rights->digiriskdolibarr->digiriskelement->read;
+// Security check
+$permissiontoread = $user->rights->digiriskdolibarr->riskassessmentdocument->read;
 
 if (!$permissiontoread) accessforbidden();
 
@@ -57,9 +58,9 @@ if (!$permissiontoread) accessforbidden();
  * View
  */
 
-$form        = new Form($db);
 $emptyobject = new stdClass($db);
 
+$title    = $langs->trans("DigiriskStandardInformation");
 $help_url = 'FR:Module_DigiriskDolibarr';
 $morejs   = array("/digiriskdolibarr/js/digiriskdolibarr.js.php");
 $morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");
@@ -69,23 +70,21 @@ digiriskHeader('', $title, $help_url, '', '', '', $morejs, $morecss); ?>
 <div id="cardContent" value="">
 
 <?php // Part to show record
-if ((empty($action) || ($action != 'edit' && $action != 'create')))
-{
+if ((empty($action) || ($action != 'edit' && $action != 'create'))) {
 	$head = digiriskstandardPrepareHead($object);
 
-	dol_fiche_head($head, 'standardCard', $langs->trans("Information"), -1, "digiriskdolibarr@digiriskdolibarr");
+	print dol_get_fiche_head($head, 'standardCard', $langs->trans("Information"), -1, "digiriskdolibarr@digiriskdolibarr");
 
 	// Object card
 	$width = 80; $cssclass = 'photoref';
 
 	$morehtmlref = '<div class="refidno">';
 	$morehtmlref .= '</div>';
-	$morehtmlleft .= '<div class="floatleft inline-block valignmiddle divphotoref">'.digirisk_show_photos('mycompany', $conf->mycompany->dir_output . '/logos', 'small', 1, 0, 0, 0, $width,0, 0, 0, 0, 'logos', $emptyobject).'</div>';
+	$morehtmlleft = '<div class="floatleft inline-block valignmiddle divphotoref">'.digirisk_show_photos('mycompany', $conf->mycompany->dir_output . '/logos', 'small', 1, 0, 0, 0, $width,0, 0, 0, 0, 'logos', $emptyobject).'</div>';
 
 	digirisk_banner_tab($object, 'ref', '', 0, 'ref', 'ref', $morehtmlref, '', 0, $morehtmlleft);
 
 	print '<div class="fichecenter">';
-	print '<div class="underbanner clearboth"></div>';
 	print '<table class="border centpercent tableforfield">'."\n";
 
 	print '</table>';
@@ -93,7 +92,7 @@ if ((empty($action) || ($action != 'edit' && $action != 'create')))
 
 	print '<div class="clearboth"></div>';
 
-	dol_fiche_end();
+	print dol_get_fiche_end();
 }
 
 // End of page

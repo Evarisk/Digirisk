@@ -168,7 +168,7 @@ class doc_listingrisksphoto_odt extends ModeleODTListingRisksPhoto
 	public function write_file($object, $outputlangs, $srctemplatepath, $hidedetails = 0, $hidedesc = 0, $hideref = 0, $digiriskelement)
 	{
 		// phpcs:enable
-		global $user, $langs, $conf, $mysoc, $hookmanager, $action;
+		global $user, $langs, $conf, $mysoc, $hookmanager, $action, $mysoc;
 
 		if (empty($srctemplatepath))
 		{
@@ -264,7 +264,10 @@ class doc_listingrisksphoto_odt extends ModeleODTListingRisksPhoto
 			$substitutionarray = getCommonSubstitutionArray($outputlangs, 0, null, $object);
 			$array_object_from_properties = $this->get_substitutionarray_each_var_object($object, $outputlangs);
 			$array_object = $this->get_substitutionarray_object($object, $outputlangs);
-			$tmparray = array_merge($substitutionarray, $array_object_from_properties, $array_object);
+			$array_soc = $this->get_substitutionarray_mysoc($mysoc, $outputlangs);
+
+			$tmparray = array_merge($substitutionarray, $array_object_from_properties, $array_object, $array_soc);
+
 			complete_substitutions_array($tmparray, $outputlangs, $object);
 
 			// Call the ODTSubstitution hook
@@ -316,7 +319,7 @@ class doc_listingrisksphoto_odt extends ModeleODTListingRisksPhoto
 											$tmparray['nomDanger'] = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $line->get_danger_category($line) . '.png';
 											$tmparray['identifiantRisque'] = $line->ref . ' - ' . $lastEvaluation->ref;
 											$tmparray['quotationRisque'] = $lastEvaluation->cotation ? $lastEvaluation->cotation : '0';
-											$tmparray['commentaireRisque'] = dol_print_date($lastEvaluation->date_creation, '%A %e %B %G %H:%M') . ': ' . $lastEvaluation->comment;
+											$tmparray['commentaireRisque'] = dol_print_date($lastEvaluation->date_creation, 'dayhoursec', 'tzuser') . ': ' . $lastEvaluation->comment;
 
 											if (dol_strlen($lastEvaluation->photo) && $lastEvaluation !== 'undefined') {
 												$entity = ($conf->entity > 1) ? '/' . $conf->entity : '';
@@ -335,22 +338,8 @@ class doc_listingrisksphoto_odt extends ModeleODTListingRisksPhoto
 											foreach ($tmparray as $key => $val) {
 												try {
 													if (file_exists($val) && $val == $image) {
-														$list = getimagesize($val);
-														$newWidth = 200;
-														if ($list[0]) {
-															$ratio = $newWidth / $list[0];
-															$newHeight = $ratio * $list[1];
-															dol_imageResizeOrCrop($val, 0, $newWidth, $newHeight);
-														}
 														$listlines->setImage($key, $val);
 													} elseif ($val == $tmparray['nomDanger']) {
-														$list = getimagesize($val);
-														$newWidth = 50;
-														if ($list[0]) {
-															$ratio = $newWidth / $list[0];
-															$newHeight = $ratio * $list[1];
-															dol_imageResizeOrCrop($val, 0, $newWidth, $newHeight);
-														}
 														$listlines->setImage($key, $val);
 													} else {
 														$listlines->setVars($key, $val, true, 'UTF-8');
@@ -389,7 +378,7 @@ class doc_listingrisksphoto_odt extends ModeleODTListingRisksPhoto
 											$tmparray['nomDanger'] = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $line->get_danger_category($line) . '.png';
 											$tmparray['identifiantRisque'] = $line->ref . ' - ' . $lastEvaluation->ref;
 											$tmparray['quotationRisque'] = $lastEvaluation->cotation ? $lastEvaluation->cotation : '0';
-											$tmparray['commentaireRisque'] = dol_print_date($lastEvaluation->date_creation, '%A %e %B %G %H:%M') . ': ' . $lastEvaluation->comment;
+											$tmparray['commentaireRisque'] = dol_print_date($lastEvaluation->date_creation, 'dayhoursec', 'tzuser') . ': ' . $lastEvaluation->comment;
 
 											if (dol_strlen($lastEvaluation->photo) && $lastEvaluation !== 'undefined') {
 												$entity = ($conf->entity > 1) ? '/' . $conf->entity : '';
@@ -409,22 +398,8 @@ class doc_listingrisksphoto_odt extends ModeleODTListingRisksPhoto
 											foreach ($tmparray as $key => $val) {
 												try {
 													if (file_exists($val) && $val == $image) {
-														$list = getimagesize($val);
-														$newWidth = 200;
-														if ($list[0]) {
-															$ratio = $newWidth / $list[0];
-															$newHeight = $ratio * $list[1];
-															dol_imageResizeOrCrop($val, 0, $newWidth, $newHeight);
-														}
 														$listlines->setImage($key, $val);
 													} elseif ($val == $tmparray['nomDanger']) {
-														$list = getimagesize($val);
-														$newWidth = 50;
-														if ($list[0]) {
-															$ratio = $newWidth / $list[0];
-															$newHeight = $ratio * $list[1];
-															dol_imageResizeOrCrop($val, 0, $newWidth, $newHeight);
-														}
 														$listlines->setImage($key, $val);
 													} else {
 														$listlines->setVars($key, $val, true, 'UTF-8');

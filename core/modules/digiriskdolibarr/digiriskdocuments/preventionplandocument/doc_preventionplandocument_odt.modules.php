@@ -172,7 +172,7 @@ class doc_preventionplandocument_odt extends ModeleODTPreventionPlanDocument
 	public function write_file($object, $outputlangs, $srctemplatepath, $hidedetails = 0, $hidedesc = 0, $hideref = 0, $preventionplan)
 	{
 		// phpcs:enable
-		global $user, $langs, $conf, $hookmanager, $action;
+		global $user, $langs, $conf, $hookmanager, $action, $mysoc;
 
 		if (empty($srctemplatepath))
 		{
@@ -235,9 +235,9 @@ class doc_preventionplandocument_odt extends ModeleODTPreventionPlanDocument
 
 			// Make substitution
 			$substitutionarray = array();
-			complete_substitutions_array($substitutionarray, $langs, $preventionplan);
+			complete_substitutions_array($substitutionarray, $langs, $object);
 			// Call the ODTSubstitution hook
-			$parameters = array('file'=>$file, 'object'=>$preventionplan, 'outputlangs'=>$outputlangs, 'substitutionarray'=>&$substitutionarray);
+			$parameters = array('file'=>$file, 'object'=>$object, 'outputlangs'=>$outputlangs, 'substitutionarray'=>&$substitutionarray);
 			$reshook = $hookmanager->executeHooks('ODTSubstitution', $parameters, $this, $action); // Note that $action and $preventionplan may have been modified by some hooks
 
 			// Open and load template
@@ -260,7 +260,14 @@ class doc_preventionplandocument_odt extends ModeleODTPreventionPlanDocument
 				return -1;
 			}
 
-			$tmparray = $substitutionarray;
+			// Define substitution array
+			$substitutionarray = getCommonSubstitutionArray($outputlangs, 0, null, $object);
+			$array_object_from_properties = $this->get_substitutionarray_each_var_object($object, $outputlangs);
+			$array_object = $this->get_substitutionarray_object($object, $outputlangs);
+			$array_soc = $this->get_substitutionarray_mysoc($mysoc, $outputlangs);
+
+			$tmparray = array_merge($substitutionarray, $array_object_from_properties, $array_object, $array_soc);
+			complete_substitutions_array($tmparray, $outputlangs, $object);
 
 			$filearray = dol_dir_list($conf->digiriskdolibarr->multidir_output[$conf->entity] . '/' . $preventionplan->element_type . '/' . $preventionplan->ref, "files", 0, '', '(\.odt|_preview.*\.png)$', 'position_name', 'desc', 1);
 			if (count($filearray)) {
@@ -291,11 +298,11 @@ class doc_preventionplandocument_odt extends ModeleODTPreventionPlanDocument
 			$tmparray['consigne_generale']              = $conf->global->DIGIRISK_GENERAL_RULES;
 			$tmparray['premiers_secours']               = $conf->global->DIGIRISK_FIRST_AID;
 
-			$tmparray['prior_visit_date']               =  dol_print_date($preventionplan->prior_visit_date, '%A %e %B %G %H:%M');
+			$tmparray['prior_visit_date']               =  dol_print_date($preventionplan->prior_visit_date, 'dayhoursec');
 			$tmparray['prior_visit_text']               = $preventionplan->prior_visit_text;
 
-			$tmparray['date_start_intervention_PPP'] = dol_print_date($preventionplan->date_start, '%A %e %B %G %H:%M');
-			$tmparray['date_end_intervention_PPP']   = dol_print_date($preventionplan->date_end, '%A %e %B %G %H:%M');
+			$tmparray['date_start_intervention_PPP'] = dol_print_date($preventionplan->date_start, 'dayhoursec', 'tzuser');
+			$tmparray['date_end_intervention_PPP']   = dol_print_date($preventionplan->date_end, 'dayhoursec', 'tzuser');
 			$tmparray['interventions_info']          = count($preventionplanlines) . " " . $langs->trans('PreventionPlanLine');
 
 
@@ -367,7 +374,7 @@ class doc_preventionplandocument_odt extends ModeleODTPreventionPlanDocument
 				$tmparray['maitre_oeuvre_email'] = $maitreoeuvre->email;
 				$tmparray['maitre_oeuvre_phone'] = $maitreoeuvre->phone;
 
-				$tmparray['maitre_oeuvre_signature_date'] = dol_print_date($maitreoeuvre->signature_date, '%A %e %B %G %H:%M');
+				$tmparray['maitre_oeuvre_signature_date'] = dol_print_date($maitreoeuvre->signature_date, 'dayhoursec', 'tzuser');
 				$encoded_image = explode(",",  $maitreoeuvre->signature)[1];
 				$decoded_image = base64_decode($encoded_image);
 				file_put_contents($tempdir."signature.png", $decoded_image);
@@ -381,7 +388,7 @@ class doc_preventionplandocument_odt extends ModeleODTPreventionPlanDocument
 				$tmparray['intervenant_exterieur_phone'] = $extsocietyresponsible->phone;
 
 				//@todo when attendance will be created
-				$tmparray['intervenant_exterieur_signature_date'] = dol_print_date($extsocietyresponsible->signature_date, '%A %e %B %G %H:%M');
+				$tmparray['intervenant_exterieur_signature_date'] = dol_print_date($extsocietyresponsible->signature_date, 'dayhoursec', 'tzuser');
 				$encoded_image = explode(",",  $extsocietyresponsible->signature)[1];
 				$decoded_image = base64_decode($encoded_image);
 				file_put_contents($tempdir."signature2.png", $decoded_image);
@@ -391,7 +398,7 @@ class doc_preventionplandocument_odt extends ModeleODTPreventionPlanDocument
 			foreach ($tmparray as $key=>$value)
 			{
 				try {
-					if ($key == 'photoDefault' || $key == 'maitre_oeuvre_signature' || $key == 'intervenant_exterieur_signature') // Image
+					if ($key == 'maitre_oeuvre_signature' || $key == 'intervenant_exterieur_signature') // Image
 					{
 						$list = getimagesize($value);
 						$newWidth = 350;
@@ -401,6 +408,9 @@ class doc_preventionplandocument_odt extends ModeleODTPreventionPlanDocument
 							dol_imageResizeOrCrop($value, 0, $newWidth, $newHeight);
 						}
 						$odfHandler->setImage($key, $value);
+					} elseif ($key == 'photoDefault' && preg_match('/logo$/', $key)) {
+						if (file_exists($value)) $odfHandler->setImage($key, $value);
+						else $odfHandler->setVars($key, 'ErrorFileNotFound', true, 'UTF-8');
 					}
 					else    // Text
 					{

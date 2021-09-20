@@ -592,7 +592,7 @@ function remove_index($model) {
  */
 function digiriskHeader($head = '', $title = '', $help_url = '', $target = '', $disablejs = 0, $disablehead = 0, $arrayofjs = '', $arrayofcss = '', $morequerystring = '', $morecssonbody = '', $replacemainareaby = '')
 {
-	global $conf, $langs, $db;
+	global $conf, $langs, $db, $user;
 
 	require_once __DIR__ . '/../class/digiriskelement.class.php';
 	require_once __DIR__ . '/../core/modules/digiriskdolibarr/digiriskelement/groupment/mod_groupment_standard.php';
@@ -632,14 +632,16 @@ function digiriskHeader($head = '', $title = '', $help_url = '', $target = '', $
 							<a class="linkElement" href="../digiriskdolibarr/digiriskstandard_card.php?id=<?php echo $conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD ?>">
 								<span class="icon fas fa-building fa-fw"></span>
 								<div class="title"><?php echo $conf->global->MAIN_INFO_SOCIETE_NOM ?></div>
-								<div class="add-container">
-									<a id="newGroupment" href="../digiriskdolibarr/digiriskelement_card.php?action=create&element_type=groupment&fk_parent=0">
-										<div class="wpeo-button button-square-40 button-secondary wpeo-tooltip-event" data-direction="bottom" data-color="light" aria-label="<?php echo $langs->trans('NewGroupment'); ?>"><strong><?php echo $mod_groupment->prefix; ?></strong><span class="button-add animated fas fa-plus-circle"></span></div>
-									</a>
-									<a id="newWorkunit" href="../digiriskdolibarr/digiriskelement_card.php?action=create&element_type=workunit&fk_parent=0">
-										<div class="wpeo-button button-square-40 wpeo-tooltip-event" data-direction="bottom" data-color="light" aria-label="<?php echo $langs->trans('NewWorkUnit'); ?>"><strong><?php echo $mod_workunit->prefix; ?></strong><span class="button-add animated fas fa-plus-circle"></span></div>
-									</a>
-								</div>
+								<?php if ($user->rights->digiriskdolibarr->digiriskelement->write) : ?>
+									<div class="add-container">
+										<a id="newGroupment" href="../digiriskdolibarr/digiriskelement_card.php?action=create&element_type=groupment&fk_parent=0">
+											<div class="wpeo-button button-square-40 button-secondary wpeo-tooltip-event" data-direction="bottom" data-color="light" aria-label="<?php echo $langs->trans('NewGroupment'); ?>"><strong><?php echo $mod_groupment->prefix; ?></strong><span class="button-add animated fas fa-plus-circle"></span></div>
+										</a>
+										<a id="newWorkunit" href="../digiriskdolibarr/digiriskelement_card.php?action=create&element_type=workunit&fk_parent=0">
+											<div class="wpeo-button button-square-40 wpeo-tooltip-event" data-direction="bottom" data-color="light" aria-label="<?php echo $langs->trans('NewWorkUnit'); ?>"><strong><?php echo $mod_workunit->prefix; ?></strong><span class="button-add animated fas fa-plus-circle"></span></div>
+										</a>
+									</div>
+								<?php endif; ?>
 							</a>
 						</div>
 						<?php if (!empty($objects) && $objects > 0) : ?>
@@ -738,7 +740,7 @@ function recurse_tree($parent, $niveau, $array) {
  * @return	void
  */
 function display_recurse_tree($results) {
-	global $conf, $langs;
+	global $conf, $langs, $user;
 
 	require_once __DIR__ . '/../core/modules/digiriskdolibarr/digiriskelement/groupment/mod_groupment_standard.php';
 	require_once __DIR__ . '/../core/modules/digiriskdolibarr/digiriskelement/workunit/mod_workunit_standard.php';
@@ -746,7 +748,8 @@ function display_recurse_tree($results) {
 	$mod_groupment = new $conf->global->DIGIRISKDOLIBARR_GROUPMENT_ADDON();
 	$mod_workunit = new $conf->global->DIGIRISKDOLIBARR_WORKUNIT_ADDON();
 
-	if ( !empty( $results ) ) {
+	if ($user->rights->digiriskdolibarr->digiriskelement->read) {
+		if ( !empty( $results )) {
 		foreach ($results as $element) { ?>
 			<li class="unit type-<?php echo $element['object']->element_type; ?>" id="unit<?php  echo $element['object']->id; ?>">
 				<div class="unit-container">
@@ -767,7 +770,7 @@ function display_recurse_tree($results) {
 						</a>
 					<?php } ?>
 					<div class="title" id="scores" value="<?php echo $element['object']->id ?>">
-					<?php global $user;
+					<?php
 						if ($user->rights->digiriskdolibarr->risk->read) : ?>
 							<a id="slider" class="linkElement id<?php echo $element['object']->id;?>" href="../digiriskdolibarr/digiriskelement_risk.php?id=<?php echo $element['object']->id; ?>">
 								<span class="title-container">
@@ -784,32 +787,37 @@ function display_recurse_tree($results) {
 							</a>
 						<?php endif; ?>
 					</div>
-					<?php if ($element['object']->element_type == 'groupment') { ?>
-						<div class="add-container">
-							<a id="newGroupment" href="../digiriskdolibarr/digiriskelement_card.php?action=create&element_type=groupment&fk_parent=<?php echo $element['object']->id; ?>">
-								<div
-									class="wpeo-button button-secondary button-square-40 wpeo-tooltip-event"
-									data-direction="bottom" data-color="light"
-									aria-label="<?php echo $langs->trans('NewGroupment'); ?>">
-									<strong><?php echo $mod_groupment->prefix; ?></strong>
-									<span class="button-add animated fas fa-plus-circle"></span>
-								</div>
-							</a>
-							<a id="newWorkunit" href="../digiriskdolibarr/digiriskelement_card.php?action=create&element_type=workunit&fk_parent=<?php echo $element['object']->id; ?>">
-								<div
-									class="wpeo-button button-square-40 wpeo-tooltip-event"
-									data-direction="bottom" data-color="light"
-									aria-label="<?php echo $langs->trans('NewWorkUnit'); ?>">
-									<strong><?php echo $mod_workunit->prefix; ?></strong>
-									<span class="button-add animated fas fa-plus-circle"></span>
-								</div>
-							</a>
-						</div>
-					<?php } ?>
+					<?php if ($user->rights->digiriskdolibarr->digiriskelement->write) : ?>
+						<?php if ($element['object']->element_type == 'groupment') : ?>
+							<div class="add-container">
+								<a id="newGroupment" href="../digiriskdolibarr/digiriskelement_card.php?action=create&element_type=groupment&fk_parent=<?php echo $element['object']->id; ?>">
+									<div
+										class="wpeo-button button-secondary button-square-40 wpeo-tooltip-event"
+										data-direction="bottom" data-color="light"
+										aria-label="<?php echo $langs->trans('NewGroupment'); ?>">
+										<strong><?php echo $mod_groupment->prefix; ?></strong>
+										<span class="button-add animated fas fa-plus-circle"></span>
+									</div>
+								</a>
+								<a id="newWorkunit" href="../digiriskdolibarr/digiriskelement_card.php?action=create&element_type=workunit&fk_parent=<?php echo $element['object']->id; ?>">
+									<div
+										class="wpeo-button button-square-40 wpeo-tooltip-event"
+										data-direction="bottom" data-color="light"
+										aria-label="<?php echo $langs->trans('NewWorkUnit'); ?>">
+										<strong><?php echo $mod_workunit->prefix; ?></strong>
+										<span class="button-add animated fas fa-plus-circle"></span>
+									</div>
+								</a>
+							</div>
+						<?php endif; ?>
+					<?php endif; ?>
 				</div>
 				<ul class="sub-list"><?php display_recurse_tree($element['children']) ?></ul>
 			</li>
 		<?php }
+	}
+	} else {
+		print $langs->trans('YouDontHaveTheRightToSeeThis');
 	}
 }
 
@@ -1096,17 +1104,38 @@ function llxHeaderSignature($title, $head = "", $disablejs = 0, $disablehead = 0
 }
 
 /**
- * Return string with full Url. The file qualified is the one defined by relative path in $object->last_main_doc
- *
- * @return	string						Url string
- */
-function showDirectPublicLinkSignature() {
-	global $langs;
+* Show header for public page ticket
+*
+* @param  string $title       Title
+* @param  string $head        Head array
+* @param  int    $disablejs   More content into html header
+* @param  int    $disablehead More content into html header
+* @param string $arrayofjs Array of complementary js files
+* @param string $arrayofcss Array of complementary css files
+* @return void
+*/
+function llxHeaderTicketDigirisk($title, $head = "", $disablejs = 0, $disablehead = 0, $arrayofjs = '', $arrayofcss = '') {
+	global $conf, $mysoc;
 
-	$url = dol_buildpath('/custom/digiriskdolibarr/public/signature/index.php', 3);
+	top_htmlhead($head, $title, $disablejs, $disablehead, $arrayofjs, $arrayofcss, 0, 1); // Show html headers
 
-	$out = img_picto('', 'object_globe.png').' '.$langs->trans("SignaturePublicAccess").' :<br>';
-	$out .= '<a href="'.$url.'" target="_blank">'.$url.'</a>';
-
-	return $out;
+	if (!empty($conf->global->DIGIRISKDOLIBARR_TICKET_SHOW_COMPANY_LOGO)){
+		// Define logo and logosmall
+		$logosmall = $mysoc->logo_small;
+		$logo = $mysoc->logo;
+		// Define urllogo
+		$urllogo = '';
+		if (!empty($logosmall) && is_readable($conf->mycompany->dir_output.'/logos/thumbs/'.$logosmall)) {
+			$urllogo = DOL_URL_ROOT.'/viewimage.php?modulepart=mycompany&amp;entity='.$conf->entity.'&amp;file='.urlencode('logos/thumbs/'.$logosmall);
+		} elseif (!empty($logo) && is_readable($conf->mycompany->dir_output.'/logos/'.$logo)) {
+			$urllogo = DOL_URL_ROOT.'/viewimage.php?modulepart=mycompany&amp;entity='.$conf->entity.'&amp;file='.urlencode('logos/'.$logo);
+		}
+		// Output html code for logo
+		if ($urllogo) {
+			print '<div class="center signature-logo">';
+			print '<img src="'.$urllogo.'">';
+			print '</div>';
+		}
+		print '<div class="underbanner clearboth"></div>';
+	}
 }

@@ -43,30 +43,32 @@ require_once './core/modules/digiriskdolibarr/riskanalysis/risksign/mod_risksign
 require_once './lib/digiriskdolibarr_digiriskelement.lib.php';
 require_once './lib/digiriskdolibarr_function.lib.php';
 
+global $db, $conf, $langs, $user, $hookmanager;
+
 // Load translation files required by the page
 $langs->loadLangs(array("digiriskdolibarr@digiriskdolibarr", "other"));
 
 // Get parameters
-$id                  = GETPOST('id', 'int');
-$action              = GETPOST('action', 'aZ09');
-$massaction          = GETPOST('massaction', 'alpha'); // The bulk action (combo box choice into lists)
-$confirm             = GETPOST('confirm', 'alpha');
-$cancel              = GETPOST('cancel', 'aZ09');
-$contextpage         = GETPOST('contextpage', 'aZ') ?GETPOST('contextpage', 'aZ') : 'risksigncard'; // To manage different context of search
-$backtopage          = GETPOST('backtopage', 'alpha');
-$toselect            = GETPOST('toselect', 'array'); // Array of ids of elements selected into a list
-$limit               = GETPOST('limit', 'int') ?GETPOST('limit', 'int') : $conf->liste_limit;
-$sortfield           = GETPOST('sortfield', 'alpha');
-$sortorder           = GETPOST('sortorder', 'alpha');
-$page                = GETPOSTISSET('pageplusone') ? (GETPOST('pageplusone') - 1) : GETPOST("page", 'int');
-$page                = is_numeric($page) ? $page : 0;
-$page                = $page == -1 ? 0 : $page;
+$id          = GETPOST('id', 'int');
+$action      = GETPOST('action', 'aZ09');
+$massaction  = GETPOST('massaction', 'alpha'); // The bulk action (combo box choice into lists)
+$confirm     = GETPOST('confirm', 'alpha');
+$cancel      = GETPOST('cancel', 'aZ09');
+$contextpage = GETPOST('contextpage', 'aZ') ?GETPOST('contextpage', 'aZ') : 'risksigncard'; // To manage different context of search
+$backtopage  = GETPOST('backtopage', 'alpha');
+$toselect    = GETPOST('toselect', 'array'); // Array of ids of elements selected into a list
+$limit       = GETPOST('limit', 'int') ?GETPOST('limit', 'int') : $conf->liste_limit;
+$sortfield   = GETPOST('sortfield', 'alpha');
+$sortorder   = GETPOST('sortorder', 'alpha');
+$page        = GETPOSTISSET('pageplusone') ? (GETPOST('pageplusone') - 1) : GETPOST("page", 'int');
+$page        = is_numeric($page) ? $page : 0;
+$page        = $page == -1 ? 0 : $page;
 
 // Initialize technical objects
-$object            = new DigiriskElement($db);
-$risksign          = new RiskSign($db);
-$extrafields       = new ExtraFields($db);
-$refRiskSignMod    = new $conf->global->DIGIRISKDOLIBARR_RISKSIGN_ADDON();
+$object         = new DigiriskElement($db);
+$risksign       = new RiskSign($db);
+$extrafields    = new ExtraFields($db);
+$refRiskSignMod = new $conf->global->DIGIRISKDOLIBARR_RISKSIGN_ADDON();
 
 $hookmanager->initHooks(array('risksigncard', 'globalcard')); // Note that conf->hooks_modules contains array
 
@@ -81,8 +83,7 @@ if (!$sortorder) $sortorder = "ASC";
 // Initialize array of search criterias
 $search_all = GETPOST('search_all', 'alphanohtml') ? trim(GETPOST('search_all', 'alphanohtml')) : trim(GETPOST('sall', 'alphanohtml'));
 $search = array();
-foreach ($risksign->fields as $key => $val)
-{
+foreach ($risksign->fields as $key => $val) {
 	if (GETPOST('search_'.$key, 'alpha') !== '') $search[$key] = GETPOST('search_'.$key, 'alpha');
 }
 
@@ -92,15 +93,13 @@ $pagenext = $page + 1;
 
 // List of fields to search into when doing a "search in all"
 $fieldstosearchall = array();
-foreach ($risksign->fields as $key => $val)
-{
+foreach ($risksign->fields as $key => $val) {
 	if ($val['searchall']) $fieldstosearchall['t.'.$key] = $val['label'];
 }
 
 // Definition of fields for list
 $arrayfields = array();
-foreach ($risksign->fields as $key => $val)
-{
+foreach ($risksign->fields as $key => $val) {
 	// If $val['visible']==0, then we never show the field
 	if (!empty($val['visible'])) $arrayfields['t.'.$key] = array('label'=>$val['label'], 'checked'=>(($val['visible'] < 0) ? 0 : 1), 'enabled'=>($val['enabled'] && ($val['visible'] != 3)), 'position'=>$val['position']);
 }
@@ -126,16 +125,13 @@ $parameters = array();
 $reshook = $hookmanager->executeHooks('doActions', $parameters, $risksign, $action); // Note that $action and $risk may have been modified by some hooks
 if ($reshook < 0) setEventMessages($hookmanager->error, $hookmanager->errors, 'errors');
 
-if (empty($reshook))
-{
+if (empty($reshook)) {
 	// Selection of new fields
 	include DOL_DOCUMENT_ROOT.'/core/actions_changeselectedfields.inc.php';
 
 	// Purge search criteria
-	if (GETPOST('button_removefilter_x', 'alpha') || GETPOST('button_removefilter.x', 'alpha') || GETPOST('button_removefilter', 'alpha')) // All tests are required to be compatible with all browsers
-	{
-		foreach ($risksign->fields as $key => $val)
-		{
+	if (GETPOST('button_removefilter_x', 'alpha') || GETPOST('button_removefilter.x', 'alpha') || GETPOST('button_removefilter', 'alpha')) { // All tests are required to be compatible with all browsers
+		foreach ($risksign->fields as $key => $val) {
 			$search[$key] = '';
 		}
 		$toselect = '';
@@ -181,7 +177,6 @@ if (empty($reshook))
 	}
 
 	if (!$error && $action == 'saveRiskSign' && $permissiontoadd) {
-
 		$riskSignID          = GETPOST('riskSignID');
 		$riskSignCategory    = GETPOST('riskSignCategory');
 		$riskSignDescription = GETPOST('riskSignDescription', 'restricthtml');
@@ -247,13 +242,13 @@ if ($object->id > 0) {
 	$res = $object->fetch_optionals();
 
 	$head = digiriskelementPrepareHead($object);
-	dol_fiche_head($head, 'elementRiskSign', $title, -1, "digiriskdolibarr@digiriskdolibarr");
+	print dol_get_fiche_head($head, 'elementRiskSign', $title, -1, "digiriskdolibarr@digiriskdolibarr");
 
 	// Object card
 	// ------------------------------------------------------------
 	$width = 80;
 	dol_strlen($object->label) ? $morehtmlref = ' - ' . $object->label : '';
-	$morehtmlleft .= '<div class="floatleft inline-block valignmiddle divphotoref">'.digirisk_show_photos('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$entity].'/'.$object->element_type, 'small', 5, 0, 0, 0, $width,0, 0, 0, 0, $object->element_type, $object).'</div>';
+	$morehtmlleft = '<div class="floatleft inline-block valignmiddle divphotoref">'.digirisk_show_photos('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$entity].'/'.$object->element_type, 'small', 5, 0, 0, 0, $width,0, 0, 0, 0, $object->element_type, $object).'</div>';
 	digirisk_banner_tab($object, 'ref', '', 0, 'ref', 'ref', $morehtmlref, '', 0, $morehtmlleft);
 
 	print '<div class="fichecenter wpeo-wrap">';
@@ -266,7 +261,6 @@ if ($object->id > 0) {
 	print '<input type="hidden" name="sortorder" value="'.$sortorder.'">';
 	//print '<input type="hidden" name="page" value="'.$page.'">';
 	print '<input type="hidden" name="contextpage" value="'.$contextpage.'">';
-	print '<div class="underbanner clearboth"></div>';
 
 	// NOTICES FOR ACTIONS
 	?>
@@ -293,8 +287,7 @@ if ($object->id > 0) {
 // Build and execute select
 	// --------------------------------------------------------------------
 	$sql = 'SELECT ';
-	foreach ($risksign->fields as $key => $val)
-	{
+	foreach ($risksign->fields as $key => $val) {
 		$sql .= 't.'.$key.', ';
 	}
 	// Add fields from extrafields
@@ -312,8 +305,7 @@ if ($object->id > 0) {
 	else $sql .= " WHERE 1 = 1";
 	$sql .= " AND fk_element = ".$id;
 
-	foreach ($search as $key => $val)
-	{
+	foreach ($search as $key => $val) {
 		if ($key == 'status' && $search[$key] == -1) continue;
 		$mode_search = (($risksign->isInt($risksign->fields[$key]) || $risksign->isFloat($risksign->fields[$key])) ? 1 : 0);
 		if (strpos($risksign->fields[$key]['type'], 'integer:') === 0) {
@@ -334,8 +326,7 @@ if ($object->id > 0) {
 
 	// Count total nb of records
 	$nbtotalofrecords = '';
-	if (empty($conf->global->MAIN_DISABLE_FULL_SCANLIST))
-	{
+	if (empty($conf->global->MAIN_DISABLE_FULL_SCANLIST)) {
 		$resql = $db->query($sql);
 
 		$nbtotalofrecords = $db->num_rows($resql);
@@ -346,27 +337,21 @@ if ($object->id > 0) {
 		}
 	}
 	// if total of record found is smaller than limit, no need to do paging and to restart another select with limits set.
-	if (is_numeric($nbtotalofrecords) && ($limit > $nbtotalofrecords || empty($limit)))
-	{
+	if (is_numeric($nbtotalofrecords) && ($limit > $nbtotalofrecords || empty($limit))) {
 		$num = $nbtotalofrecords;
 	}
-	else
-	{
+	else {
 		if ($limit) $sql .= $db->plimit($limit + 1, $offset);
-
 		$resql = $db->query($sql);
-		if (!$resql)
-		{
+		if (!$resql) {
 			dol_print_error($db);
 			exit;
 		}
-
 		$num = $db->num_rows($resql);
 	}
 
 	// Direct jump if only one record found
-	if ($num == 1 && !empty($conf->global->MAIN_SEARCH_DIRECT_OPEN_IF_ONLY_ONE) && $search_all && !$page)
-	{
+	if ($num == 1 && !empty($conf->global->MAIN_SEARCH_DIRECT_OPEN_IF_ONLY_ONE) && $search_all && !$page) {
 		$obj = $db->fetch_object($resql);
 		$id = $obj->rowid;
 		header("Location: ".dol_buildpath('/digiriskdolibarr/digiriskelement_risksign.php', 1).'?id='.$id);
@@ -379,8 +364,7 @@ if ($object->id > 0) {
 	if (!empty($contextpage) && $contextpage != $_SERVER["PHP_SELF"]) $param .= '&contextpage='.urlencode($contextpage);
 	$param .= '&id='.$id;
 	if ($limit > 0 && $limit != $conf->liste_limit) $param .= '&limit='.urlencode($limit);
-	foreach ($search as $key => $val)
-	{
+	foreach ($search as $key => $val) {
 		if (is_array($search[$key]) && count($search[$key])) foreach ($search[$key] as $skey) $param .= '&search_'.$key.'[]='.urlencode($skey);
 		else $param .= '&search_'.$key.'='.urlencode($search[$key]);
 	}
@@ -462,8 +446,7 @@ if ($object->id > 0) {
 
 	include DOL_DOCUMENT_ROOT.'/core/tpl/massactions_pre.tpl.php';
 
-	if ($search_all)
-	{
+	if ($search_all) {
 		foreach ($fieldstosearchall as $key => $val) $fieldstosearchall[$key] = $langs->trans($val);
 		print '<div class="divsearchfieldfilter">'.$langs->trans("FilterOnInto", $search_all).join(', ', $fieldstosearchall).'</div>';
 	}
@@ -474,8 +457,7 @@ if ($object->id > 0) {
 	if (empty($reshook)) $moreforfilter .= $hookmanager->resPrint;
 	else $moreforfilter = $hookmanager->resPrint;
 
-	if (!empty($moreforfilter))
-	{
+	if (!empty($moreforfilter)) {
 		print '<div class="liste_titre liste_titre_bydiv centpercent">';
 		print $moreforfilter;
 		print '</div>';
@@ -491,12 +473,10 @@ if ($object->id > 0) {
 	// Fields title search
 	// --------------------------------------------------------------------
 	print '<tr class="liste_titre_filter">';
-	foreach ($risksign->fields as $key => $val)
-	{
+	foreach ($risksign->fields as $key => $val) {
 		$cssforfield = (empty($val['css']) ? '' : $val['css']);
 		if ($key == 'status') $cssforfield .= ($cssforfield ? ' ' : '').'center';
-		if (!empty($arrayfields['t.'.$key]['checked']))
-		{
+		if (!empty($arrayfields['t.'.$key]['checked'])) {
 			print '<td class="liste_titre'.($cssforfield ? ' '.$cssforfield : '').'">';
 			if (is_array($val['arrayofkeyval'])) print $form->selectarray('search_'.$key, $val['arrayofkeyval'], $search[$key], $val['notnull'], 0, 0, '', 1, 0, 0, '', 'maxwidth75');
 			elseif (strpos($val['type'], 'integer:') === 0) {
@@ -525,15 +505,12 @@ if ($object->id > 0) {
 	// Fields title label
 	// --------------------------------------------------------------------
 	print '<tr class="liste_titre">';
-	foreach ($risksign->fields as $key => $val)
-	{
+	foreach ($risksign->fields as $key => $val) {
 		$cssforfield = (empty($val['css']) ? '' : $val['css']);
 		if ($key == 'status') $cssforfield .= ($cssforfield ? ' ' : '').'center';
-		if (!empty($arrayfields['t.'.$key]['checked']))
-		{
+		if (!empty($arrayfields['t.'.$key]['checked'])){
 			print getTitleFieldOfList($arrayfields['t.'.$key]['label'], 0, $_SERVER['PHP_SELF'], 't.'.$key, '', $param, ($cssforfield ? 'class="'.$cssforfield.'"' : ''), $sortfield, $sortorder, ($cssforfield ? $cssforfield.' ' : ''))."\n";
 		}
-
 	}
 
 	// Extra fields
@@ -555,8 +532,7 @@ if ($object->id > 0) {
 	$i = 0;
 	$totalarray = array();
 
-	while ($i < ($limit ? min($num, $limit) : $num))
-	{
+	while ($i < ($limit ? min($num, $limit) : $num)) {
 		$obj = $db->fetch_object($resql);
 
 		if (empty($obj)) break; // Should not happen
@@ -567,13 +543,11 @@ if ($object->id > 0) {
 		// Show here line of result
 		print '<tr class="oddeven risksign-row risksign_row_'. $risksign->id .'" id="risksign_row_'. $risksign->id .'">';
 
-		foreach ($risksign->fields as $key => $val)
-		{
+		foreach ($risksign->fields as $key => $val) {
 			$cssforfield = (empty($val['css']) ? '' : $val['css']);
 			if ($key == 'status') $cssforfield .= ($cssforfield ? ' ' : '').'center';
 			elseif ($key == 'ref') $cssforfield .= ($cssforfield ? ' ' : '').'nowrap';
-			if (!empty($arrayfields['t.'.$key]['checked']))
-			{
+			if (!empty($arrayfields['t.'.$key]['checked'])) {
 				print '<td'.($cssforfield ? ' class="'.$cssforfield.'"' : '').' style="width:2%">';
 				if ($key == 'status') print $risksign->getLibStatut(5);
 				elseif ($key == 'category') { ?>
@@ -644,8 +618,7 @@ if ($object->id > 0) {
 				else print $risksign->showOutputField($val, $key, $risksign->$key, '');
 				print '</td>';
 				if (!$i) $totalarray['nbfield']++;
-				if (!empty($val['isameasure']))
-				{
+				if (!empty($val['isameasure'])) {
 					if (!$i) $totalarray['pos'][$totalarray['nbfield']] = 't.'.$key;
 					$totalarray['val']['t.'.$key] += $risksign->$key;
 				}
@@ -662,13 +635,11 @@ if ($object->id > 0) {
 
 		// Action column
 		print '<td class="nowrap center">';
-		if ($massactionbutton || $massaction)   // If we are in select mode (massactionbutton defined) or if we have already selected and sent an action ($massaction) defined
-		{
+		if ($massactionbutton || $massaction) {   // If we are in select mode (massactionbutton defined) or if we have already selected and sent an action ($massaction) defined
 			$selected = 0;
 			if (in_array($risksign->id, $arrayofselected)) $selected = 1;
 			print '<input id="cb'.$risksign->id.'" class="flat checkforselect" type="checkbox" name="toselect[]" value="'.$risksign->id.'"'.($selected ? ' checked="checked"' : '').'>';
 		}
-
 		print '</td>';
 		if (!$i) $totalarray['nbfield']++;
 		print '</tr>'."\n";
@@ -676,8 +647,7 @@ if ($object->id > 0) {
 	}
 
 	// If no record found
-	if ($num == 0)
-	{
+	if ($num == 0) {
 		$colspan = 1;
 		foreach ($arrayfields as $key => $val) { if (!empty($val['checked'])) $colspan++; }
 		print '<tr><td colspan="'.$colspan.'" class="opacitymedium">'.$langs->trans("NoRecordFound").'</td></tr>';
@@ -698,7 +668,7 @@ if ($object->id > 0) {
 	print '</div>'."\n";
 	print '<!-- End div class="fichecenter" -->';
 
-	dol_fiche_end();
+	print dol_get_fiche_end();
 }
 
 print '</div>'."\n";

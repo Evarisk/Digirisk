@@ -35,8 +35,6 @@ if (!$res && file_exists("../../main.inc.php")) $res = @include "../../main.inc.
 if (!$res && file_exists("../../../main.inc.php")) $res = @include "../../../main.inc.php";
 if (!$res) die("Include of main fails");
 
-require_once DOL_DOCUMENT_ROOT.'/core/class/html.formfile.class.php';
-
 require_once './class/digiriskelement.class.php';
 require_once './class/digiriskstandard.class.php';
 require_once './class/digiriskdocuments/listingrisksaction.class.php';
@@ -45,7 +43,7 @@ require_once './lib/digiriskdolibarr_digiriskstandard.lib.php';
 require_once './lib/digiriskdolibarr_function.lib.php';
 require_once './core/modules/digiriskdolibarr/digiriskdocuments/listingrisksaction/modules_listingrisksaction.php';
 
-global $db, $conf, $langs;
+global $db, $conf, $langs, $hookmanager, $user;
 
 // Load translation files required by the page
 $langs->loadLangs(array("digiriskdolibarr@digiriskdolibarr", "other"));
@@ -78,8 +76,7 @@ $parameters = array();
 $reshook = $hookmanager->executeHooks('doActions', $parameters, $object, $action); // Note that $action and $object may have been modified by some hooks
 if ($reshook < 0) setEventMessages($hookmanager->error, $hookmanager->errors, 'errors');
 
-if (empty($reshook))
-{
+if (empty($reshook)) {
 	$error = 0;
 
 	// Action to build doc
@@ -130,8 +127,7 @@ if (empty($reshook))
 }
 
 // Delete file in doc form
-if ($action == 'remove_file' && $permissiontodelete)
-{
+if ($action == 'remove_file' && $permissiontodelete) {
 	if (!empty($upload_dir)) {
 		require_once DOL_DOCUMENT_ROOT.'/core/lib/files.lib.php';
 
@@ -159,7 +155,6 @@ if ($action == 'remove_file' && $permissiontodelete)
  * View
  */
 
-$formfile 	 = new FormFile($db);
 $emptyobject = new stdClass($db);
 
 $title    = $langs->trans('ListingRisksAction');
@@ -180,7 +175,7 @@ if (!$object->id) {
 }
 
 // Part to show record
-dol_fiche_head($head, 'elementListingRisksAction', $title, -1, "digiriskdolibarr@digiriskdolibarr");
+print dol_get_fiche_head($head, 'elementListingRisksAction', $title, -1, "digiriskdolibarr@digiriskdolibarr");
 
 // Object card
 // ------------------------------------------------------------
@@ -196,15 +191,12 @@ if (isset($object->element_type)) {
 	digirisk_banner_tab($standard, 'ref', '', 0, 'ref', 'ref', $morehtmlref, '', 0, $morehtmlleft);
 }
 
-
-
 unset($object->fields['element_type']);
 unset($object->fields['fk_parent']);
 unset($object->fields['last_main_doc']);
 unset($object->fields['entity']);
 
 print '<div class="fichecenter">';
-print '<div class="underbanner clearboth"></div>';
 print '<table class="border centpercent tableforfield">' . "\n";
 
 // Common attributes
@@ -220,7 +212,7 @@ unset($object->fields['description']);
 print '</table>';
 print '</div>';
 
-dol_fiche_end();
+print dol_get_fiche_end();
 
 // Document Generation -- Génération des documents
 $includedocgeneration = 1;

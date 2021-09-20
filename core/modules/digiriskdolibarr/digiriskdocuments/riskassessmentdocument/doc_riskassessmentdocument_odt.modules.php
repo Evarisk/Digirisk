@@ -171,7 +171,7 @@ class doc_riskassessmentdocument_odt extends ModeleODTRiskAssessmentDocument
 	public function write_file($object, $outputlangs, $srctemplatepath, $hidedetails = 0, $hidedesc = 0, $hideref = 0, $digiriskelement)
 	{
 		// phpcs:enable
-		global $user, $langs, $conf, $hookmanager, $action;
+		global $user, $langs, $conf, $hookmanager, $action, $mysoc;
 
 		if (empty($srctemplatepath))
 		{
@@ -263,8 +263,9 @@ class doc_riskassessmentdocument_odt extends ModeleODTRiskAssessmentDocument
 			$substitutionarray = getCommonSubstitutionArray($outputlangs, 0, null, $object);
 			$array_object_from_properties = $this->get_substitutionarray_each_var_object($object, $outputlangs);
 			$array_object = $this->get_substitutionarray_object($object, $outputlangs);
+			$array_soc = $this->get_substitutionarray_mysoc($mysoc, $outputlangs);
 
-			$tmparray = array_merge($substitutionarray, $array_object_from_properties, $array_object);
+			$tmparray = array_merge($substitutionarray, $array_object_from_properties, $array_object, $array_soc);
 			complete_substitutions_array($tmparray, $outputlangs, $object);
 
 			// Call the ODTSubstitution hook
@@ -274,7 +275,15 @@ class doc_riskassessmentdocument_odt extends ModeleODTRiskAssessmentDocument
 			foreach ($tmparray as $key=>$value)
 			{
 				try {
-					$odfHandler->setVars($key, $value, true, 'UTF-8');
+					if (preg_match('/logo$/', $key)) // Image
+					{
+						if (file_exists($value)) $odfHandler->setImage($key, $value);
+						else $odfHandler->setVars($key, 'ErrorFileNotFound', true, 'UTF-8');
+					}
+					else    // Text
+					{
+						$odfHandler->setVars($key, $value, true, 'UTF-8');
+					}
 				}
 				catch (OdfException $e)
 				{
@@ -394,16 +403,16 @@ class doc_riskassessmentdocument_odt extends ModeleODTRiskAssessmentDocument
 									$tmparray['nomDanger']         = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $line->get_danger_category($line) . '.png';
 									$tmparray['identifiantRisque'] = $line->ref . ' - ' . $lastEvaluation->ref;
 									$tmparray['quotationRisque']    = $lastEvaluation->cotation ? $lastEvaluation->cotation : '0' ;
-									$tmparray['commentaireRisque'] = dol_print_date( $lastEvaluation->date_creation, '%A %e %B %G %H:%M' ) . ': ' . $lastEvaluation->comment;
+									$tmparray['commentaireRisque'] = dol_print_date( $lastEvaluation->date_creation, 'dayhoursec', 'tzuser') . ': ' . $lastEvaluation->comment;
 
 									$related_tasks = $line->get_related_tasks($line);
 
 									if (!empty($related_tasks)) {
 										foreach ($related_tasks as $related_task) {
 											if ($related_task->progress == 100) {
-												$tmparray['actionPreventionCompleted'] .= dol_print_date($related_task->date_c, '%A %e %B %G %H:%M') . ': ' . $related_task->label . "\n";
+												$tmparray['actionPreventionCompleted'] .= dol_print_date($related_task->date_c, 'dayhoursec', 'tzuser') . ': ' . $related_task->label . "\n";
 											} else {
-												$tmparray['actionPreventionUncompleted'] .= dol_print_date($related_task->date_c, '%A %e %B %G %H:%M') . ': ' . $related_task->label . "\n";
+												$tmparray['actionPreventionUncompleted'] .= dol_print_date($related_task->date_c, 'dayhoursec', 'tzuser') . ': ' . $related_task->label . ' ' . ($related_task->progress ?  $related_task->progress : 0) . '%'. "\n";
 											}
 										}
 									} else {

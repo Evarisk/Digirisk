@@ -33,6 +33,10 @@ Settings = Réglages
 DigiriskdolibarrSetupPage = Page de configuration du module Digirisk
 AgendaModuleRequired = Pour assurer la traçabilité des actions dans Digirisk, assurez-vous que le module Agenda est bien activé
 DigiriskDolibarrDescription = Digirisk pour Dolibarr
+HowToSetupOtherModules = Pour plus de fonctionnalités sur Digirisk, vous pouvez activer de nombreux modules (Gestion des fournisseurs, des factures, etc.) sur ce lien :
+ConfigMyModules = Configuration des modules
+AvoidLogoProblems = Pour éviter tout problème lié aux logos dans les documents générés, veuillez vous référer à ces conseils de paramétrages :
+LogoHelpLink = https://wiki.dolibarr.org/index.php?title=Premiers_paramétrages
 
 #
 # Page À propos
@@ -48,10 +52,10 @@ DigiriskdolibarrAboutPage = Page à propos de Digirisk
 #
 
 # Right - Droit
-LireDigirisk = Lire Digirisk
-ReadDigirisk = Lire Digirisk (read)
+LireDigirisk = Consulter le tableau de bord Digirisk
+ReadDigirisk = Consulter le tableau de bord Digirisk (read)
 ReadAdminPage = Accéder à la configuration du module Digirisk
-
+YouDontHaveTheRightToSeeThis = Vous n'avez pas le droit de voir les groupements et unités de travail
 
 # Data - Donnée
 Create = Créer
@@ -176,9 +180,9 @@ DigiriskDocuments = Document Digirisk
 #
 
 # Right - Droit
-ReadLegalDisplay = Afficher un affichage légal
-CreateLegalDisplay = Créer un affichage légal
-DeleteLegalDisplay = Supprimer un affichage légal
+ReadLegalDisplay = Consulter l'affichage légal
+CreateLegalDisplay = Créer/Modifier l'affichage légal
+DeleteLegalDisplay = Supprimer l'affichage légal
 
 # Trigger - Déclencheur
 LEGALDISPLAY_CREATEInDolibarr = Affichage légal créé dans Dolibarr
@@ -226,9 +230,9 @@ CollectiveAgreement = Conventions collectives
 #
 
 # Right - Droit
-ReadInformationsSharing = Lire une diffusion d'informations
-CreateInformationsSharing = Créer une diffusion d'informations
-DeleteInformationsSharing = Supprimer une diffusion d'informations
+ReadInformationsSharing = Consulter la diffusion d'informations
+CreateInformationsSharing = Créer/Modifier une diffusion d'informations
+DeleteInformationsSharing = Supprimer la diffusion d'informations
 
 # Trigger - Déclencheur
 INFORMATIONSSHARING_CREATEInDolibarr = Diffusion d'informations créée dans Dolibarr
@@ -265,9 +269,9 @@ Alternates = Suppléants
 #
 
 # Right - Droit
-ReadPreventionPlan = Lire un plan de prévention
-CreatePreventionPlan = Créer un plan de prévention
-DeletePreventionPlan = Supprimer un plan de prévention
+ReadPreventionPlan = Consulter le plan de prévention
+CreatePreventionPlan = Créer/Modifier le plan de prévention
+DeletePreventionPlan = Supprimer le plan de prévention
 NewPreventionPlan = Nouveau plan de prévention
 PreventionPlanDet = Lignes des plans de prévention
 
@@ -372,9 +376,9 @@ DocumentName = Référence du document
 #
 
 # Right - Droit
-ReadFirePermit = Lire un permis de feu
-CreateFirePermit = Créer un permis de feu
-DeleteFirePermit = Supprimer un permis de feu
+ReadFirePermit = Consulter le permis de feu
+CreateFirePermit = Créer/Modifier le permis de feu
+DeleteFirePermit = Supprimer le permis de feu
 
 # Trigger - Déclencheur
 FIREPERMIT_CREATEInDolibarr = Permis de feu créé dans Dolibarr
@@ -412,6 +416,9 @@ FirePermitSchedule = Horaires du permis de feu
 #
 
 # Right - Droit
+ReadListingRisksPhoto = Consulter les listing des risques avec photos
+CreateListingRisksPhoto = Créer/Modifier les listing des risques avec photos
+DeleteListingRisksPhoto = Supprimer les listing des risques avec photos
 
 # Trigger - Déclencheur
 ListingRisksPhotoGeneratedWithDolibarr = Listing de risques photo généré avec Dolibarr
@@ -427,9 +434,6 @@ ListingRisksPhotoDigiriskTemplate = ODT par défaut des listing des risques phot
 
 # Data - Donnée
 ListingRisksPhoto = Listing des risques photo
-ReadListingRisksPhoto = Voir les listing des risques avec photos
-CreateListingRisksPhoto = Créer des listing des risques avec photos
-DeleteListingRisksPhoto = Supprimer des listing des risques avec photos
 
 
 
@@ -438,6 +442,9 @@ DeleteListingRisksPhoto = Supprimer des listing des risques avec photos
 #
 
 # Right - Droit
+ReadListingRisksAction = Consulter les listing des risques avec actions correctives
+CreateListingRisksAction = Créer/Modifier les listing des risques avec actions correctives
+DeleteListingRisksAction = Supprimer les listing des risques avec actions correctives
 
 # Trigger - Déclencheur
 ListingRisksActionGeneratedWithDolibarr = Listing de risques actions correctives généré avec Dolibarr
@@ -453,9 +460,7 @@ ListingRisksActionDigiriskTemplate = ODT par défaut des listing des actions cor
 
 # Data - Donnée
 ListingRisksAction = Listing des actions correctives
-ReadListingRisksAction = Voir les listing des risques avec actions correctives
-CreateListingRisksAction = Créer des listing des risques avec actions correctives
-DeleteListingRisksAction = Supprimer des listing des risques avec actions correctives
+
 
 
 #
@@ -464,8 +469,8 @@ DeleteListingRisksAction = Supprimer des listing des risques avec actions correc
 
 # Right - Droit
 
-ReadRiskAssessmentDocument = Voir le document unique
-CreateRiskAssessmentDocument = Créer le document unique
+ReadRiskAssessmentDocument = Consulter le document unique
+CreateRiskAssessmentDocument = Créer/Modifier le document unique
 DeleteRiskAssessmentDocument = Supprimer le document unique
 
 # Trigger - Déclencheur
@@ -543,9 +548,9 @@ WorkUnitDocument = Fiche d'Unité de travail
 #
 
 # Rights  - Droits
-ReadDigiriskElement = Lire un élément digirisk
-CreateDigiriskElement = Créer un élément digirisk
-DeleteDigiriskElement = Supprimer un élément digirisk
+ReadDigiriskElement = Consulter les éléments digirisk
+CreateDigiriskElement = Créer/Modifier les éléments digirisk
+DeleteDigiriskElement = Supprimer les éléments digirisk
 
 # Data - Donnée
 NewDigiriskElement = Nouveau élément digirisk
@@ -598,6 +603,11 @@ ModifyWorkUnit = Modifier unité de travail
 # Evaluator - Évaluateur
 #
 
+# Rights  - Droits
+ReadEvaluator = Consulter les évaluateurs
+CreateEvaluator = Créer/Modifer les évaluateurs
+DeleteEvaluator = Supprimer les évaluateurs
+
 # Trigger - Déclencheur
 EVALUATOR_CREATEInDolibarr = Évaluateur créée dans Dolibarr
 ActionsOnÉvaluateur = Événements liés au évaluateur
@@ -625,9 +635,7 @@ AddEvaluatorButton = Ajouter l'évaluateur
 DigiriskEvaluatorData = Données des Évaluateurs
 EvaluatorDuration = Durée de l'évalution par l'évaluateur
 EvaluatorDurationDescription = Le temps que met l'évaluateur à réaliser son évaluation des risques
-ReadEvaluator = Voir les évaluateurs
-CreateEvaluator = Créer des évaluateurs
-DeleteEvaluator = Supprimer des évaluateurs
+
 
 
 #
@@ -636,6 +644,9 @@ DeleteEvaluator = Supprimer des évaluateurs
 
 # Trigger - Déclencheur
 ActionsOnDigiriskStandard = Événements liés au standard de Digirisk
+
+# Data - Donnée
+DigiriskStandardInformation = Information
 
 
 
@@ -651,6 +662,11 @@ UpdateData = Mettre à jour
 #
 # Risks - Risques
 #
+
+# Rights  - Droits
+ReadDigiriskRisk = Consulter les risques
+CreateDigiriskRisk = Créer/Modifier les risques
+DeleteDigiriskRisk = Supprimer les risques
 
 # Mod Numbering - Modèle de numérotation
 DigiriskRiskNumberingModule = Modèle de numérotation des risques de Digirisk
@@ -680,14 +696,11 @@ RiskDescriptionNotEnabled = Le champ description du risque n'est pas activé
 HowToEnableRiskDescription = Pour activer le champ description du risque, allez dans "Configuration du module -> Analyse de risque -> Risque"
 HowToEnableRiskCategoryEdit = Pour activer la modification de la catégorie de risque, allez dans "Configuration du module -> Analyse de risque -> Risque"
 
-ReadDigiriskRisk = Voir les risques
-CreateDigiriskRisk = Créer des risques
-DeleteDigiriskRisk = Supprimer des risques
-
 DigiriskRiskData = Donnée configurable des risques
 RiskDescription = Description du risque
 RiskDescriptionDescription = Activer le champ description du risque
 RiskDescriptionNotActivated = Veuillez activer le champ description du risque dans Configuration du module / Analyse des risques / Risques
+AddRisk = Ajouter un risque
 
 
 
@@ -729,11 +742,20 @@ SelectCotation = Sélectionnez les cases pour calculer votre cotation
 EvaluationList = Liste des évaluations du risque
 HowToSetMultipleRiskAssessmentMethod = Pour configurer l'utilisation multiple des méthodes d'évaluation, aller dans Configuration du module - Analyse des risques - Évaluation
 NoFileLinked = Pas de photo liée
+AddRiskAssessment = Ajouter une évaluation du risque
+AddRiskAssessmentTask = Ajouter une tâche au risque
+
 
 
 #
 # RiskSign - Signalisation
 #
+
+# Rights  - Droits
+ReadDigiriskRiskSign = Consulter les signalisations
+CreateDigiriskRiskSign = Créer/Modifier les signalisations
+DeleteDigiriskRiskSign = Supprimer les signalisations
+
 
 # Mod Numbering - Modèle de numérotation
 DigiriskRiskSignStandardModel = Renvoie le numéro sous la forme RSn où n est un compteur séquentiel sans rupture et sans remise à 0.
@@ -755,9 +777,6 @@ EditRiskSign = Édition d'une signalisation
 
 DigiriskElementRiskSignList = Liste des signalisations
 DigiriskElementRiskSign = Signalisation
-ReadDigiriskRiskSign = Voir les signalisations
-CreateDigiriskRiskSign = Créer des signalisations
-DeleteDigiriskRiskSign = Supprimer des signalisations
 
 
 
@@ -846,6 +865,9 @@ AddSignatureSuccessText = La signature a bien été enregistrée pour le documen
 SignatureSeeDocument = Voir
 ShowDocument = Voir le document
 
+
+
+
 #
 # Ticket - Interface publique ticket
 #
@@ -862,6 +884,34 @@ PhonePlaceholder = 00.00.00.00.00
 LocationPlaceholder = Exemple : Bureau A
 ServicePlaceholder = Exemple : Ripeur
 Location = Lieu
+CategoriesCreated = Création des catégories de ticket
+ExtrafieldsCreated = Création des extrafields de ticket
+AnticipatedLeave = Départ anticipé
+DGI = Danger grave et imminent
+SST = Santé et sécurité au travail
+PresquAccident = PresquAccident
+Accident = Accident
+EnhancementSuggestion = Suggestion d'amélioration
+MaterialProblem = Problème matériel
+HumanProblem = Problème humain
+Others = Autre
+AccidentWithoutDIAT = Accident sans DIAT
+AccidentWithDIAT = Accident avec DIAT
+FirstName = Prénom
+LastName = Nom
+Phone = Téléphone
+DigiriskTicketPublicAccess = Une interface publique ne nécessitant aucune identification est disponible à l'url suivante
+TicketActivatePublicInterface = Activer l'interface publique
+GenerateExtrafields = Génération des extrafields liés au ticket
+GenerateCategories = Génération des catégories liées au ticket
+AlreadyGenerated = Déjà généré(e)s
+NotCreated = Pas encore créé(e)s
+ExtrafieldsGeneration = Cette option permet la génération des extrafields liés au ticket
+CategoriesGeneration = Cette option permet la génération des catégories liées au ticket
+TicketSuccess = Voici votre Id de suivi de ticket :
+TicketPublicAccess = Lien vers l'interface publique des tickets :
+TicketShowCompanyLogo = Afficher le logo de la société dans l'interface publique
+TicketShowCompanyLogoHelp = Activez cette option pour masquer le logo de la société dans les pages de l'interface publique
 
 
 
@@ -875,11 +925,3 @@ AT = au
 
 ModalAddPhoto = Ajout Photo
 SendEmailAt = Envoi de l'email à
-
-
-
-
-
-
-
-

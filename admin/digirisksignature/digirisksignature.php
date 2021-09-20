@@ -58,8 +58,8 @@ $value      = GETPOST('value', 'alpha');
  */
 
 if ($action == 'setPublicInterface') {
-	if (GETPOST('value')) dolibarr_set_const($db, 'DIGIRISKDOLIBARR_SIGNATURE_ENABLE_PUBLIC_INTERFACE', 1, 'chaine', 0, '', $conf->entity);
-	else dolibarr_set_const($db, 'DIGIRISKDOLIBARR_SIGNATURE_ENABLE_PUBLIC_INTERFACE', 0, 'chaine', 0, '', $conf->entity);
+	if (GETPOST('value')) dolibarr_set_const($db, 'DIGIRISKDOLIBARR_SIGNATURE_ENABLE_PUBLIC_INTERFACE', 1, 'integer', 0, '', $conf->entity);
+	else dolibarr_set_const($db, 'DIGIRISKDOLIBARR_SIGNATURE_ENABLE_PUBLIC_INTERFACE', 0, 'integer', 0, '', $conf->entity);
 }
 
 /*
@@ -82,8 +82,6 @@ print load_fiche_titre($langs->trans($page_name), $linkback, 'object_digiriskdol
 // Configuration header
 $head = digiriskdolibarrAdminPrepareHead();
 print dol_get_fiche_head($head, 'digirisksignature', '', -1, "digiriskdolibarr@digiriskdolibarr");
-print '<span class="opacitymedium">'.$langs->trans("SignaturePublicAccess").'</span> : <a class="wordbreak" href="'.dol_buildpath('/custom/digiriskdolibarr/public/signature/index.php', 1).'" target="_blank" >'.dol_buildpath('/custom/digiriskdolibarr/public/signature/index.php', 2).'</a>';
-print dol_get_fiche_end();
 
 $enabledisablehtml = $langs->trans("SignatureActivatePublicInterface").' ';
 if (empty($conf->global->DIGIRISKDOLIBARR_SIGNATURE_ENABLE_PUBLIC_INTERFACE)) {
@@ -126,5 +124,6 @@ if (!empty($conf->global->DIGIRISKDOLIBARR_SIGNATURE_ENABLE_PUBLIC_INTERFACE)) {
 }
 
 // End of page
+print dol_get_fiche_end();
 llxFooter();
 $db->close();

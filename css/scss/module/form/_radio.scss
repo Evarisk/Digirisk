@@ -1,0 +1,53 @@
+/** Général */
+.wpeo-form .form-element {
+  input[type="radio"].form-field {
+    display: inline-block;
+    width: auto;
+  }
+}
+
+/** Design */
+.wpeo-form .form-element {
+  input[type="radio"].form-field {
+    appearance: none;
+    border-radius: 50%;
+    width: 16px;
+    height: 16px;
+    padding: 0;
+    border: 0;
+    background: transparent !important;
+    border: 1px solid rgba(0,0,0,0.4);
+    transition: 0.2s all linear;
+    outline: none;
+    position: relative;
+    top: 2px;
+
+    &::before {
+      display: none !important;
+      content: '' !important;
+    }
+    &:hover {
+      cursor: pointer;
+      border: 1px solid $color__primary;
+      box-shadow: 0 0 0 1px $color__primary inset;
+      background: transparent !important;
+    }
+    &:checked {
+      border: 1px solid $color__primary;
+      box-shadow: 0 0 0 4px $color__primary inset;
+    }
+    & + label {
+      text-transform: none;
+      font-weight: 400;
+      font-size: 14px;
+      display: inline-block;
+      margin-right: 1em;
+      &:hover {
+        cursor: pointer;
+      }
+      &:active {
+        outline: none;
+      }
+    }
+  }
+}
