@@ -1459,7 +1459,7 @@
 												<!-- BUTTON MODAL RISK ASSESSMENT TASK EDIT  -->
 												<div class="table-cell riskassessment-task-actions wpeo-gridlayout grid-2 grid-gap-0">
 													<?php if ($permissiontoadd) : ?>
-														<div class="riskassessment-task-edit wpeo-button button-square-50 button-grey modal-open" value="<?php echo $related_task->id ?>">
+														<div class="riskassessment-task-edit wpeo-button button-square-50 button-transparent modal-open" value="<?php echo $related_task->id ?>">
 															<i class="fas fa-pencil-alt button-icon"></i>
 														</div>
 													<?php else : ?>
