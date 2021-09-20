@@ -172,7 +172,7 @@ class doc_preventionplandocument_odt extends ModeleODTPreventionPlanDocument
 	public function write_file($object, $outputlangs, $srctemplatepath, $hidedetails = 0, $hidedesc = 0, $hideref = 0, $preventionplan)
 	{
 		// phpcs:enable
-		global $user, $langs, $conf, $hookmanager, $action;
+		global $user, $langs, $conf, $hookmanager, $action, $mysoc;
 
 		if (empty($srctemplatepath))
 		{
@@ -235,9 +235,9 @@ class doc_preventionplandocument_odt extends ModeleODTPreventionPlanDocument
 
 			// Make substitution
 			$substitutionarray = array();
-			complete_substitutions_array($substitutionarray, $langs, $preventionplan);
+			complete_substitutions_array($substitutionarray, $langs, $object);
 			// Call the ODTSubstitution hook
-			$parameters = array('file'=>$file, 'object'=>$preventionplan, 'outputlangs'=>$outputlangs, 'substitutionarray'=>&$substitutionarray);
+			$parameters = array('file'=>$file, 'object'=>$object, 'outputlangs'=>$outputlangs, 'substitutionarray'=>&$substitutionarray);
 			$reshook = $hookmanager->executeHooks('ODTSubstitution', $parameters, $this, $action); // Note that $action and $preventionplan may have been modified by some hooks
 
 			// Open and load template
@@ -260,7 +260,14 @@ class doc_preventionplandocument_odt extends ModeleODTPreventionPlanDocument
 				return -1;
 			}
 
-			$tmparray = $substitutionarray;
+			// Define substitution array
+			$substitutionarray = getCommonSubstitutionArray($outputlangs, 0, null, $object);
+			$array_object_from_properties = $this->get_substitutionarray_each_var_object($object, $outputlangs);
+			$array_object = $this->get_substitutionarray_object($object, $outputlangs);
+			$array_soc = $this->get_substitutionarray_mysoc($mysoc, $outputlangs);
+
+			$tmparray = array_merge($substitutionarray, $array_object_from_properties, $array_object, $array_soc);
+			complete_substitutions_array($tmparray, $outputlangs, $object);
 
 			$filearray = dol_dir_list($conf->digiriskdolibarr->multidir_output[$conf->entity] . '/' . $preventionplan->element_type . '/' . $preventionplan->ref, "files", 0, '', '(\.odt|_preview.*\.png)$', 'position_name', 'desc', 1);
 			if (count($filearray)) {
@@ -391,7 +398,7 @@ class doc_preventionplandocument_odt extends ModeleODTPreventionPlanDocument
 			foreach ($tmparray as $key=>$value)
 			{
 				try {
-					if ($key == 'photoDefault' || $key == 'maitre_oeuvre_signature' || $key == 'intervenant_exterieur_signature') // Image
+					if ($key == 'maitre_oeuvre_signature' || $key == 'intervenant_exterieur_signature') // Image
 					{
 						$list = getimagesize($value);
 						$newWidth = 350;
@@ -400,6 +407,8 @@ class doc_preventionplandocument_odt extends ModeleODTPreventionPlanDocument
 							$newHeight = $ratio * $list[1];
 							dol_imageResizeOrCrop($value, 0, $newWidth, $newHeight);
 						}
+						$odfHandler->setImage($key, $value);
+					} elseif ($key == 'photoDefault' && $key == 'mycompany_logo') {
 						$odfHandler->setImage($key, $value);
 					}
 					else    // Text
