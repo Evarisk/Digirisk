@@ -297,9 +297,9 @@ $registerCategory = $category->rechercher(0,'Registre','ticket', true);
 
 
 print '<div class="wpeo-gridlayout grid-3">';
-if (!empty($registerCategory)) {
+if (!empty($registerCategory) && $registerCategory > 0) {
 	$registerChildren = $registerCategory[0]->get_filles();
-	if (!empty($registerChildren)) {
+	if (!empty($registerChildren)  && $registerChildren > 0) {
 		foreach ($registerChildren as $register) {
 			if ($register->id == GETPOST('register')) {
 				print '<div class="ticket-register active" id="' . $register->id . '">';
