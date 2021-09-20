@@ -38,7 +38,7 @@
  *  @param		int		$usesharelink	Use the public shared link of image (if not available, the 'nophoto' image will be shown instead)
  *  @return     string					Html code to show photo. Number of photos shown is saved in this->nbphoto
  */
-function digirisk_show_photos($modulepart, $sdir, $size = 0, $nbmax = 0, $nbbyrow = 5, $showfilename = 0, $showaction = 0, $maxHeight = 120, $maxWidth = 160, $nolink = 0, $notitle = 0, $usesharelink = 0, $subdir, $object)
+function digirisk_show_photos($modulepart, $sdir, $size = 0, $nbmax = 0, $nbbyrow = 5, $showfilename = 0, $showaction = 0, $maxHeight = 120, $maxWidth = 160, $nolink = 0, $notitle = 0, $usesharelink = 0, $subdir = "", $object = null)
 {
 	global $conf, $user, $langs;
 
@@ -48,8 +48,13 @@ function digirisk_show_photos($modulepart, $sdir, $size = 0, $nbmax = 0, $nbbyro
 	$sortfield = 'position_name';
 	$sortorder = 'desc';
 
-	$dir = $sdir.'/'.$object->ref.'/';
-	$pdir = $subdir . '/'.$object->ref.'/';
+	if (is_object($object)) {
+		$dir = $sdir.'/'.$object->ref.'/';
+		$pdir = $subdir . '/'.$object->ref.'/';
+	} else {
+		$dir = $sdir.'/';
+		$pdir = $subdir . '/';
+	}
 
 	// Defined relative dir to DOL_DATA_ROOT
 	$relativedir = '';
@@ -67,6 +72,7 @@ function digirisk_show_photos($modulepart, $sdir, $size = 0, $nbmax = 0, $nbbyro
 	$nbphoto = 0;
 
 	$filearray = dol_dir_list($dir, "files", 0, '', '(\.meta|_preview.*\.png)$', $sortfield, (strtolower($sortorder) == 'desc' ?SORT_DESC:SORT_ASC), 1);
+	//echo '<pre>'; print_r( $pdirthumb ); echo '</pre>';
 	if (count($filearray))
 	{
 		if ($sortfield && $sortorder)
@@ -110,9 +116,9 @@ function digirisk_show_photos($modulepart, $sdir, $size = 0, $nbmax = 0, $nbbyro
 					$relativefile = preg_replace('/^\//', '', $pdir.$photo);
 					if (empty($nolink))
 					{
-						$urladvanced = getAdvancedPreviewUrl($modulepart, $relativefile, 0, 'entity='.$object->entity);
+						$urladvanced = getAdvancedPreviewUrl($modulepart, $relativefile, 0, 'entity='.$conf->entity);
 						if ($urladvanced) $return .= '<a href="'.$urladvanced.'">';
-						else $return .= '<a href="'.DOL_URL_ROOT.'/viewimage.php?modulepart='.$modulepart.'&entity='.$object->entity.'&file='.urlencode($pdir.$photo).'" class="aphoto" target="_blank">';
+						else $return .= '<a href="'.DOL_URL_ROOT.'/viewimage.php?modulepart='.$modulepart.'&entity='.$conf->entity.'&file='.urlencode($pdir.$photo).'" class="aphoto" target="_blank">';
 					}
 
 					// Show image (width height=$maxHeight)
@@ -146,11 +152,11 @@ function digirisk_show_photos($modulepart, $sdir, $size = 0, $nbmax = 0, $nbbyro
 						if (empty($maxHeight) || $photo_vignette && $imgarray['height'] > $maxHeight)
 						{
 							$return .= '<!-- Show thumb -->';
-							$return .= '<img class="photo clicked-photo-preview"  width="'.$maxHeight.'" src="'.DOL_URL_ROOT.'/viewimage.php?modulepart='.$modulepart.'&entity='.$object->entity.'&file='.urlencode($pdirthumb.$photo_vignette).'" title="'.dol_escape_htmltag($alt).'">';
+							$return .= '<img class="photo clicked-photo-preview"  width="'.$maxHeight.'" src="'.DOL_URL_ROOT.'/viewimage.php?modulepart='.$modulepart.'&entity='.$conf->entity.'&file='.urlencode($pdirthumb.$photo_vignette).'" title="'.dol_escape_htmltag($alt).'">';
 						}
 						else {
 							$return .= '<!-- Show original file -->';
-							$return .= '<img class="photo photowithmargin  clicked-photo-preview" height="'.$maxHeight.'" src="'.DOL_URL_ROOT.'/viewimage.php?modulepart='.$modulepart.'&entity='.$object->entity.'&file='.urlencode($pdir.$photo).'" title="'.dol_escape_htmltag($alt).'">';
+							$return .= '<img class="photo photowithmargin  clicked-photo-preview" height="'.$maxHeight.'" src="'.DOL_URL_ROOT.'/viewimage.php?modulepart='.$modulepart.'&entity='.$conf->entity.'&file='.urlencode($pdir.$photo).'" title="'.dol_escape_htmltag($alt).'">';
 						}
 					}
 
@@ -165,16 +171,6 @@ function digirisk_show_photos($modulepart, $sdir, $size = 0, $nbmax = 0, $nbbyro
 						{
 							$return .= '<a href="'.$_SERVER["PHP_SELF"].'?id='.$object->id.'&amp;action=addthumb&amp;file='.urlencode($pdir.$viewfilename).'">'.img_picto($langs->trans('GenerateThumb'), 'refresh').'&nbsp;&nbsp;</a>';
 						}
-						// Special cas for product
-						if ($modulepart == 'product' && ($user->rights->produit->creer || $user->rights->service->creer))
-						{
-							// Link to resize
-							$return .= '<a href="'.DOL_URL_ROOT.'/core/photos_resize.php?modulepart='.urlencode('produit|service').'&id='.$object->id.'&amp;file='.urlencode($pdir.$viewfilename).'" title="'.dol_escape_htmltag($langs->trans("Resize")).'">'.img_picto($langs->trans("Resize"), 'resize', '').'</a> &nbsp; ';
-
-							// Link to delete
-							$return .= '<a href="'.$_SERVER["PHP_SELF"].'?id='.$object->id.'&amp;action=delete&amp;file='.urlencode($pdir.$viewfilename).'">';
-							$return .= img_delete().'</a>';
-						}
 					}
 					$return .= "\n";
 
@@ -187,22 +183,9 @@ function digirisk_show_photos($modulepart, $sdir, $size = 0, $nbmax = 0, $nbbyro
 				}
 
 				if (empty($size)) {     // Format origine
-					$return .= '<img class="photo photowithmargin" src="'.DOL_URL_ROOT.'/viewimage.php?modulepart='.$modulepart.'&entity='.$object->entity.'&file='.urlencode($pdir.$photo).'">';
+					$return .= '<img class="photo photowithmargin" src="'.DOL_URL_ROOT.'/viewimage.php?modulepart='.$modulepart.'&entity='.$conf->entity.'&file='.urlencode($pdir.$photo).'">';
 
 					if ($showfilename) $return .= '<br>'.$viewfilename;
-					if ($showaction)
-					{
-						// Special case for product
-						if ($modulepart == 'product' && ($user->rights->produit->creer || $user->rights->service->creer))
-						{
-							// Link to resize
-							$return .= '<a href="'.DOL_URL_ROOT.'/core/photos_resize.php?modulepart='.urlencode('produit|service').'&id='.$object->id.'&amp;file='.urlencode($pdir.$viewfilename).'" title="'.dol_escape_htmltag($langs->trans("Resize")).'">'.img_picto($langs->trans("Resize"), 'resize', '').'</a> &nbsp; ';
-
-							// Link to delete
-							$return .= '<a href="'.$_SERVER["PHP_SELF"].'?id='.$object->id.'&amp;action=delete&amp;file='.urlencode($pdir.$viewfilename).'">';
-							$return .= img_delete().'</a>';
-						}
-					}
 				}
 
 				// On continue ou on arrete de boucler ?
@@ -225,7 +208,9 @@ function digirisk_show_photos($modulepart, $sdir, $size = 0, $nbmax = 0, $nbbyro
 			}
 		}
 	}
-	$object->nbphoto = $nbphoto;
+	if (is_object($object)){
+		$object->nbphoto = $nbphoto;
+	}
 	return $return;
 }
 

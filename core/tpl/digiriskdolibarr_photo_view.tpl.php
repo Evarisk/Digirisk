@@ -35,7 +35,7 @@ if (empty($conf) || !is_object($conf))
 		<?php
 		$entity = ($conf->entity > 1) ? $conf->entity . '/'  : '';
 
-		$relativepath = 'digiriskdolibarr/medias';
+		$relativepath = 'digiriskdolibarr/medias/thumbs/';
 		$modulepart = $entity . 'ecm';
 		$path = DOL_URL_ROOT.'/document.php?modulepart=' . $modulepart  . '&attachment=0&file=' . str_replace('/', '%2F', $relativepath) . '/';
 		$nophoto = '/public/theme/common/nophoto.png'; ?>
@@ -85,7 +85,7 @@ if (empty($conf) || !is_object($conf))
 						print '<!-- Start form to attach new file in digiriskdolibarr_photo_view.tpl.tpl.php sectionid='.$section.' sectiondir='.$sectiondir.' -->'."\n";
 						include_once DOL_DOCUMENT_ROOT.'/core/class/html.formfile.class.php';
 						$formfile = new FormFile($db);
-						$formfile->form_attach_new_file($_SERVER["PHP_SELF"], 'none', 0, ($section ? $section : -1), $permtoupload, 48, null, '', 0, '', 0, $nameforformuserfile, '', $sectiondir, 1);
+						$formfile->form_attach_new_file($_SERVER["PHP_SELF"], 'none', 0, 0, $permtoupload, 48, null, '', 0, '', 0, $nameforformuserfile, '', $sectiondir, 1);
 					} else print '&nbsp;';
 					// End "Add new file" area
 					?>
@@ -94,23 +94,19 @@ if (empty($conf) || !is_object($conf))
 						<div class="wpeo-gridlayout grid-4 grid-gap-3 grid-margin-2 ecm-photo-list ecm-photo-list-<?php echo $risk->id ?>">
 							<?php
 							$entity =($conf->entity > 1) ? '/' . $conf->entity : '';
-							$files =  dol_dir_list(DOL_DATA_ROOT .$entity. '/ecm/digiriskdolibarr/medias');
+							$files =  dol_dir_list(DOL_DATA_ROOT .$entity. '/ecm/digiriskdolibarr/medias/', "files", 0, '', '_mini', 'position_name', 'asc', 1);
 							$relativepath = 'digiriskdolibarr/medias';
 							$modulepart = 'ecm';
-							$path = DOL_URL_ROOT.'/document.php?modulepart=' . $modulepart  . '&attachment=0&file=' . str_replace('/', '%2F', $relativepath);
-							$j = 0;
 
 							if ( !empty($files) ) :
-								foreach ($files as $file) :
-									?>
+								foreach ($files as $file) : ?>
 									<div class="center clickable-photo clickable-photo<?php echo $j; ?>" value="<?php echo $j; ?>" element="risk-evaluation">
 										<figure class="photo-image">
-											<?php $urladvanced = getAdvancedPreviewUrl($modulepart, $relativepath . '/' . $file['relativename'], 0, 'entity='.$object->entity); ?>
+											<?php $urladvanced = getAdvancedPreviewUrl($modulepart, $relativepath . '/' . $file['relativename'], 0, 'entity='.$conf->entity); ?>
 											<a class="clicked-photo-preview" href="<?php echo $urladvanced; ?>"><i class="fas fa-2x fa-search-plus"></i></a>
 											<?php if (image_format_supported($file['name']) >= 0) : ?>
-												<?php $fullpath = $path . '/' . $file['relativename'] . '&entity=' . $conf->entity; ?>
 												<input class="filename" type="hidden" value="<?php echo $file['name'] ?>">
-												<img class="photo photo<?php echo $j ?> maxwidth200" src="<?php echo $fullpath; ?>">
+												<?php print digirisk_show_photos('ecm', $file['path'], 'small', 1, 0, 0, 0, 50, 0, 1, 0, 0, $relativepath); ?>
 											<?php endif; ?>
 										</figure>
 										<div class="title"><?php echo $file['name']; ?></div>
