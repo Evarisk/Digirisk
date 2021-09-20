@@ -1435,6 +1435,7 @@
 					<?php $related_tasks = $risk->get_related_tasks($risk); ?>
 					<div class="riskassessment-tasks riskassessment-tasks<?php echo $risk->id ?>" value="<?php echo $risk->id ?>">
 						<?php if (!empty($related_tasks) && $related_tasks > 0) : ?>
+							<div class="riskassessment-task-listing-wrapper">
 								<?php foreach ($related_tasks as $related_task) : ?>
 									<div class="table-cell riskassessment-task-container riskassessment-task-container-<?php echo $related_task->id ?>" value="<?php echo $related_task->ref ?>">
 										<input type="hidden" class="labelForDelete" value="<?php echo $langs->trans('DeleteTask') . ' ' . $related_task->ref . ' ?'; ?>">
@@ -1510,18 +1511,22 @@
 										</div>
 									</div>
 								<?php endforeach; ?>
-							<!-- BUTTON MODAL RISK ASSESSMENT TASK ADD  -->
-							<?php if ($permissiontoadd) : ?>
-								<div class="table-cell riskassessment-task-add wpeo-button button-square-40 button-primary wpeo-tooltip-event modal-open" aria-label="<?php echo $langs->trans('AddRiskAssessmentTask') ?>" value="<?php echo $risk->id;?>">
-									<i class="fas fa-plus button-icon"></i>
-								</div>
-							<?php else : ?>
-								<div class="table-cell wpeo-button button-square-40 button-grey wpeo-tooltip-event" aria-label="<?php echo $langs->trans('PermissionDenied') ?>" value="<?php echo $risk->id;?>">
-									<i class="fas fa-plus button-icon"></i>
-								</div>
-							<?php endif; ?>
+							</div>
+							<div class="riskassessment-task-add-wrapper">
+								<!-- BUTTON MODAL RISK ASSESSMENT TASK ADD  -->
+								<?php if ($permissiontoadd) : ?>
+									<div class="table-cell riskassessment-task-add wpeo-button button-square-40 button-primary wpeo-tooltip-event modal-open" aria-label="<?php echo $langs->trans('AddRiskAssessmentTask') ?>" value="<?php echo $risk->id;?>">
+										<i class="fas fa-plus button-icon"></i>
+									</div>
+								<?php else : ?>
+									<div class="table-cell wpeo-button button-square-40 button-grey wpeo-tooltip-event" aria-label="<?php echo $langs->trans('PermissionDenied') ?>" value="<?php echo $risk->id;?>">
+										<i class="fas fa-plus button-icon"></i>
+									</div>
+								<?php endif; ?>
+							</div>
+
 						<?php else : ?>
-							<div class="riskassessment-task-container">
+							<div class="riskassessment-task-container riskassessment-no-task">
 								<div class="riskassessment-task-single-content riskassessment-task-single-content-<?php echo $risk->id ?>">
 									<div class="riskassessment-task-single riskassessment-task-single-<?php echo $risk->id ?>">
 										<div class="riskassessment-task-content">

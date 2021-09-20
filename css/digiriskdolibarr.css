@@ -2353,18 +2353,40 @@
   margin-left: 0.5em;
 }
 
-td > .riskassessment-tasks .riskassessment-task-container {
-  min-width: 330px;
+.riskassessment-tasks .riskassessment-task-container {
+  min-width: 360px;
   border: 1px solid rgba(0, 0, 0, 0.1);
   background: rgba(0, 0, 0, 0.05);
   padding: 0.5em;
 }
 
-td > .riskassessment-task-container {
-  min-width: 330px;
+.riskassessment-task-container {
+  min-width: 360px;
   border: 1px solid rgba(0, 0, 0, 0.1);
   background: rgba(0, 0, 0, 0.05);
   padding: 0.5em;
+}
+
+.riskassessment-tasks {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-wrap: nowrap;
+  flex-wrap: nowrap;
+}
+.riskassessment-tasks .riskassessment-task-container {
+  -webkit-box-flex: 1;
+  -ms-flex-positive: 1;
+  flex-grow: 1;
+}
+.riskassessment-tasks .riskassessment-task-add-wrapper {
+  min-width: calc(40px + 0.5em);
+  margin: auto 0;
+  text-align: right;
+}
+
+.riskassessment-task-listing-wrapper .riskassessment-task-container {
+  margin-bottom: 0.5em;
 }
 
 .riskassessment-task-container .riskassessment-task-single {
@@ -2838,6 +2860,9 @@ td > .riskassessment-task-container {
 .riskassessment-task-container .riskassessment-task-single .riskassessment-task-add {
   min-width: 40px;
   margin-left: 0.5em;
+}
+.riskassessment-task-container .riskassessment-task-single .riskassessment-task-delete {
+  margin-right: -0.5em;
 }
 
 td > .risk-evaluation-container {
