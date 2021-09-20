@@ -37,6 +37,7 @@ if (!$res) die("Include of main fails");
 
 require_once DOL_DOCUMENT_ROOT.'/core/lib/company.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/files.lib.php';
+require_once DOL_DOCUMENT_ROOT.'/core/class/html.formfile.class.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/images.lib.php';
 require_once './class/digiriskelement.class.php';
 require_once './lib/digiriskdolibarr_digiriskelement.lib.php';
@@ -96,7 +97,7 @@ include_once DOL_DOCUMENT_ROOT.'/core/actions_linkedfiles.inc.php';
 /*
  * View
  */
-
+$formfile    = new FormFile($db);
 $emptyobject = new stdClass($db);
 
 $title    = $langs->trans("DigiriskElement").' - '.$langs->trans("Files");

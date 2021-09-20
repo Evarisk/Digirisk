@@ -84,7 +84,8 @@ print dol_get_fiche_head($head, 'settings', '', -1, "digiriskdolibarr@digiriskdo
 
 if (empty($setupnotempty)) {
 	print '<br>'.$langs->trans("AgendaModuleRequired") . '<br>';
-	print '<br>'.$langs->trans("HowToSetupOtherModules") . '  ' . '<a href="./../../../admin/modules.php' .'">' . $langs->trans('ConfigMyModules') . '</a>'  ;
+	print '<br>'.$langs->trans("HowToSetupOtherModules") . '  ' . '<a href="./../../../admin/modules.php' .'">' . $langs->trans('ConfigMyModules') . '</a>'. '<br>'  ;
+	print '<br>'.$langs->trans("AvoidLogoProblems") . '  ' . '<a href="./../../../admin/modules.php' .'">' . $langs->trans('LogoHelpLink') . '</a>'. '<br>'  ;
 
 }
 

@@ -168,7 +168,7 @@ class doc_groupmentdocument_odt extends ModeleODTGroupmentDocument
 	public function write_file($object, $outputlangs, $srctemplatepath, $hidedetails = 0, $hidedesc = 0, $hideref = 0, $digiriskelement)
 	{
 		// phpcs:enable
-		global $user, $langs, $conf, $hookmanager, $action;
+		global $user, $langs, $conf, $hookmanager, $action, $mysoc;
 
 		if (empty($srctemplatepath))
 		{
@@ -232,9 +232,9 @@ class doc_groupmentdocument_odt extends ModeleODTGroupmentDocument
 
 			// Make substitution
 			$substitutionarray = array();
-			complete_substitutions_array($substitutionarray, $langs, $digiriskelement);
+			complete_substitutions_array($substitutionarray, $langs, $object);
 			// Call the ODTSubstitution hook
-			$parameters = array('file'=>$file, 'object'=>$digiriskelement, 'outputlangs'=>$outputlangs, 'substitutionarray'=>&$substitutionarray);
+			$parameters = array('file'=>$file, 'object'=>$object, 'outputlangs'=>$outputlangs, 'substitutionarray'=>&$substitutionarray);
 			$reshook = $hookmanager->executeHooks('ODTSubstitution', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
 
 			// Open and load template
@@ -257,9 +257,16 @@ class doc_groupmentdocument_odt extends ModeleODTGroupmentDocument
 				return -1;
 			}
 
-			$tmparray = $substitutionarray;
+			//Define substitution array
+			$substitutionarray = getCommonSubstitutionArray($outputlangs, 0, null, $object);
+			$array_object_from_properties = $this->get_substitutionarray_each_var_object($object, $outputlangs);
+			$array_object = $this->get_substitutionarray_object($object, $outputlangs);
+			$array_soc = $this->get_substitutionarray_mysoc($mysoc, $outputlangs);
 
-			$filearray = dol_dir_list($conf->digiriskdolibarr->multidir_output[$conf->entity] . '/' . $digiriskelement->element_type . '/' . $digiriskelement->ref, "files", 0, '', '(\.odt|_preview.*\.png)$', 'position_name', 'desc', 1);
+			$tmparray = array_merge($substitutionarray, $array_object_from_properties, $array_object, $array_soc);
+			complete_substitutions_array($tmparray, $outputlangs, $object);
+
+			$filearray = dol_dir_list($conf->digiriskdolibarr->multidir_output[$conf->entity] . '/' . $digiriskelement->element_type . '/' . $digiriskelement->ref . '/thumbs/', "files", 0, '', '(\.odt|_preview.*\.png)$', 'position_name', 'desc', 1);
 			if (count($filearray)) {
 				$image = array_shift($filearray);
 				$tmparray['photoDefault'] = $image['fullname'];
@@ -268,15 +275,8 @@ class doc_groupmentdocument_odt extends ModeleODTGroupmentDocument
 			foreach ($tmparray as $key=>$value)
 			{
 				try {
-					if ($key == 'photoDefault') // Image
+					if ($key == 'photoDefault' || $key == 'mycompany_logo') // Image
 					{
-						$list = getimagesize($value);
-						$newWidth = 350;
-						if ($list[0]) {
-							$ratio = $newWidth / $list[0];
-							$newHeight = $ratio * $list[1];
-							dol_imageResizeOrCrop($value, 0, $newWidth, $newHeight);
-						}
 						$odfHandler->setImage($key, $value);
 					}
 					else    // Text
