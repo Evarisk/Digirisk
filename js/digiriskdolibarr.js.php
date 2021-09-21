@@ -989,6 +989,7 @@ window.eoxiaJS.photo.selectPhoto = function( event ) {
 
 	parent.find('.clicked-photo').attr('style', 'none !important');
 	parent.find('.clicked-photo').removeClass('clicked-photo');
+	parent.closest('.modal-container').find('.save-photo').removeClass('button-disable');
 
 	parent.find('.clickable-photo'+photoID).attr('style', 'border: 5px solid #0d8aff !important');
 	parent.find('.clickable-photo'+photoID).addClass('clicked-photo');
@@ -1034,17 +1035,24 @@ window.eoxiaJS.photo.sendPhoto = function( event ) {
 		data: formdata,
 		processData: false,
 		contentType: false,
+		success: function ( ) {
+			let elementParent = $(this).closest('.modal-container').find('.ecm-photo-list-content');
+			elementParent.empty();
+			window.eoxiaJS.loader.display(elementParent);
+			elementParent.load( document.URL + ' .ecm-photo-list-');
+			elementParent.removeClass('wpeo-loader');
+		}
 	});
 
-	let elementParent = $(this).closest('.modal-container').find('.ecm-photo-list-content');
+	//let elementParent = $(this).closest('.modal-container').find('.ecm-photo-list-content');
+	//
+	//elementParent.empty();
+	//window.eoxiaJS.loader.display(elementParent);
 
-	elementParent.empty();
-	window.eoxiaJS.loader.display(elementParent);
-
-	setTimeout(function(){
-		elementParent.load( document.URL + ' .ecm-photo-list-');
-		elementParent.removeClass('wpeo-loader');
-	}, 800);
+	//setTimeout(function(){
+	//	elementParent.load( document.URL + ' .ecm-photo-list-');
+	//	elementParent.removeClass('wpeo-loader');
+	//}, 2000);
 };
 
 /**
