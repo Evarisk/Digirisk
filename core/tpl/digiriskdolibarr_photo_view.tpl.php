@@ -94,7 +94,7 @@ if (empty($conf) || !is_object($conf))
 						<div class="wpeo-gridlayout grid-4 grid-gap-3 grid-margin-2 ecm-photo-list ecm-photo-list-<?php echo $risk->id ?>">
 							<?php
 							$entity =($conf->entity > 1) ? '/' . $conf->entity : '';
-							$files =  dol_dir_list(DOL_DATA_ROOT .$entity. '/ecm/digiriskdolibarr/medias/', "files", 0, '', '_mini', 'date', SORT_DESC, 2);
+							$files =  dol_dir_list(DOL_DATA_ROOT .$entity. '/ecm/digiriskdolibarr/medias/', "files", 0, '', '_mini', 'date', SORT_ASC, 2);
 							$relativepath = 'digiriskdolibarr/medias';
 							$modulepart = 'ecm';
 
