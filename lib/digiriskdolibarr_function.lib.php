@@ -1124,3 +1124,70 @@ function llxHeaderTicketDigirisk($title, $head = "", $disablejs = 0, $disablehea
 		print '<div class="underbanner clearboth"></div>';
 	}
 }
+
+function digirisk_show_medias($modulepart = 'ecm', $sdir, $size = 0, $nbmax = 0, $nbbyrow = 5, $showfilename = 0, $showaction = 0, $maxHeight = 120, $maxWidth = 160, $nolink = 0, $notitle = 0, $usesharelink = 0,$subdir = "")
+{
+	global $conf, $user, $langs;
+
+	include_once DOL_DOCUMENT_ROOT.'/core/lib/files.lib.php';
+	include_once DOL_DOCUMENT_ROOT.'/core/lib/images.lib.php';
+
+	$sortfield = 'position_name';
+	$sortorder = 'desc';
+
+	$dir = $sdir.'/';
+	$pdir = $subdir . '/';
+
+
+	$return = '<!-- Photo -->'."\n";
+	$nbphoto = 0;
+
+	$filearray = dol_dir_list($dir, "files", 0, '', '(\.meta|_preview.*\.png)$', $sortfield, (strtolower($sortorder) == 'desc' ?SORT_DESC:SORT_ASC), 1);
+	$j = 0;
+
+	if (count($filearray))
+	{
+		if ($sortfield && $sortorder)
+		{
+			$filearray = dol_sort_array($filearray, $sortfield, $sortorder);
+		}
+		foreach ($filearray as $key => $val)
+		{
+			if(preg_match('/' . $size . '/', $val['name'])) {
+
+				$file = $val['name'];
+
+				if (image_format_supported($file) >= 0)
+				{
+					$nbphoto++;
+
+					if ($size == 1 || $size == 'small') {   // Format vignette
+
+						$relativepath = 'digiriskdolibarr/medias/thumbs';
+						$modulepart = 'ecm';
+						$path = DOL_URL_ROOT.'/document.php?modulepart=' . $modulepart  . '&attachment=0&file=' . str_replace('/', '%2F', $relativepath);
+						?>
+
+						<div class="center clickable-photo clickable-photo<?php echo $j; ?>" value="<?php echo $j; ?>" element="risk-evaluation">
+							<figure class="photo-image">
+								<?php
+
+								$urladvanced = getAdvancedPreviewUrl($modulepart, 'digiriskdolibarr/medias/' . preg_replace('/_' . $size . '/', '', $val['relativename']), 0, 'entity='.$conf->entity); ?>
+								<a class="clicked-photo-preview" href="<?php echo $urladvanced; ?>"><i class="fas fa-2x fa-search-plus"></i></a>
+								<?php if (image_format_supported($val['name']) >= 0) : ?>
+								<?php $fullpath = $path . '/' . $val['relativename'] . '&entity=' . $conf->entity; ?>
+								<input class="filename" type="hidden" value="<?php echo $val['name'] ?>">
+								<img class="photo photo<?php echo $j ?> maxwidth50" src="<?php echo $fullpath; ?>">
+								<?php endif; ?>
+							</figure>
+							<div class="title"><?php echo $val['name']; ?></div>
+						</div><?php
+						$j++;
+					}
+				}
+			}
+		}
+	}
+
+	return $return;
+}

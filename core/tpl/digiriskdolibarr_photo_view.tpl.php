@@ -93,28 +93,9 @@ if (empty($conf) || !is_object($conf))
 					<div class="ecm-photo-list-content">
 						<div class="wpeo-gridlayout grid-4 grid-gap-3 grid-margin-2 ecm-photo-list ecm-photo-list-<?php echo $risk->id . ($editModal ? '-edit' : '') ?>">
 							<?php
-							$entity =($conf->entity > 1) ? '/' . $conf->entity : '';
-							$files =  dol_dir_list(DOL_DATA_ROOT .$entity. '/ecm/digiriskdolibarr/medias/', "files", 0, '', '_mini', 'date', SORT_ASC, 2);
-							$relativepath = 'digiriskdolibarr/medias';
-							$modulepart = 'ecm';
-
-							if ( !empty($files) ) :
-								foreach ($files as $file) : ?>
-									<div class="center clickable-photo clickable-photo<?php echo $j; ?>" value="<?php echo $j; ?>" element="risk-evaluation">
-										<figure class="photo-image">
-											<?php $urladvanced = getAdvancedPreviewUrl($modulepart, $relativepath . '/' . $file['relativename'], 0, 'entity='.$conf->entity); ?>
-											<a class="clicked-photo-preview" href="<?php echo $urladvanced; ?>"><i class="fas fa-2x fa-search-plus"></i></a>
-											<?php if (image_format_supported($file['name']) >= 0) : ?>
-												<input class="filename" type="hidden" value="<?php echo $file['name'] ?>">
-												<?php print digirisk_show_photos('ecm', $file['path'], 'small', 1, 0, 0, 0, 50, 0, 1, 0, 0, $relativepath); ?>
-											<?php endif; ?>
-										</figure>
-										<div class="title"><?php echo $file['name']; ?></div>
-									</div>
-									<?php
-									$j++;
-								endforeach;
-							endif; ?>
+							$relativepath = 'digiriskdolibarr/medias/thumbs';
+							print digirisk_show_medias('ecm', DOL_DATA_ROOT .$entity. '/ecm/digiriskdolibarr/medias/thumbs', 'small');
+							?>
 						</div>
 					</div>
 				</div>
