@@ -269,12 +269,6 @@ class doc_preventionplandocument_odt extends ModeleODTPreventionPlanDocument
 			$tmparray = array_merge($substitutionarray, $array_object_from_properties, $array_object, $array_soc);
 			complete_substitutions_array($tmparray, $outputlangs, $object);
 
-			$filearray = dol_dir_list($conf->digiriskdolibarr->multidir_output[$conf->entity] . '/' . $preventionplan->element_type . '/' . $preventionplan->ref, "files", 0, '', '(\.odt|_preview.*\.png)$', 'position_name', 'desc', 1);
-			if (count($filearray)) {
-				$image = array_shift($filearray);
-				$tmparray['photoDefault'] = $image['fullname'];
-			}
-
 			$digiriskelement    = new DigiriskElement($this->db);
 			$resources          = new DigiriskResources($this->db);
 			$signatory          = new PreventionPlanSignature($this->db);
@@ -286,7 +280,6 @@ class doc_preventionplandocument_odt extends ModeleODTPreventionPlanDocument
 
 			$digirisk_resources      = $resources->digirisk_dolibarr_fetch_resources();
 			$extsociety              = $resources->fetchResourcesFromObject('PP_EXT_SOCIETY', $preventionplan);
-			$extsocietyintervenants  = $resources->fetchResourcesFromObject('PP_EXT_SOCIETY_INTERVENANTS', $preventionplan);
 			$maitreoeuvre            = array_shift($signatory->fetchSignatory('PP_MAITRE_OEUVRE', $preventionplan->id));
 			$extsocietyresponsible   = array_shift($signatory->fetchSignatory('PP_EXT_SOCIETY_RESPONSIBLE', $preventionplan->id));
 			$extsocietyintervenants  = $signatory->fetchSignatory('PP_EXT_SOCIETY_INTERVENANTS', $preventionplan->id);
@@ -408,7 +401,7 @@ class doc_preventionplandocument_odt extends ModeleODTPreventionPlanDocument
 							dol_imageResizeOrCrop($value, 0, $newWidth, $newHeight);
 						}
 						$odfHandler->setImage($key, $value);
-					} elseif ($key == 'photoDefault' && preg_match('/logo$/', $key)) {
+					} elseif (preg_match('/logo$/', $key)) {
 						if (file_exists($value)) $odfHandler->setImage($key, $value);
 						else $odfHandler->setVars($key, 'ErrorFileNotFound', true, 'UTF-8');
 					}
