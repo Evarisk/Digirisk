@@ -270,6 +270,9 @@ class doc_groupmentdocument_odt extends ModeleODTGroupmentDocument
 			if (count($filearray)) {
 				$image = array_shift($filearray);
 				$tmparray['photoDefault'] = $image['fullname'];
+			}else {
+				$nophoto = '/public/theme/common/nophoto.png';
+				$tmparray['photoDefault'] = DOL_DOCUMENT_ROOT.$nophoto;
 			}
 
 			foreach ($tmparray as $key=>$value)

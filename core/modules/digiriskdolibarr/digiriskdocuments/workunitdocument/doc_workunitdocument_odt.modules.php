@@ -271,12 +271,15 @@ class doc_workunitdocument_odt extends ModeleODTWorkUnitDocument
 			if (count($filearray)) {
 				$image = array_shift($filearray);
 				$tmparray['photoDefault'] = $image['fullname'];
+			}else {
+				$nophoto = '/public/theme/common/nophoto.png';
+				$tmparray['photoDefault'] = DOL_DOCUMENT_ROOT.$nophoto;
 			}
 
 			foreach ($tmparray as $key=>$value)
 			{
 				try {
-					if ($key == 'photoDefault' && preg_match('/logo$/', $key)) // Image
+					if ($key == 'photoDefault' || preg_match('/logo$/', $key)) // Image
 					{
 						if (file_exists($value)) $odfHandler->setImage($key, $value);
 						else $odfHandler->setVars($key, 'ErrorFileNotFound', true, 'UTF-8');
