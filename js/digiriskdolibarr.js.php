@@ -1026,7 +1026,8 @@ window.eoxiaJS.photo.sendPhoto = function( event ) {
 	let files    = element.find("input[name='userfile[]']").prop("files");
 	let formdata = new FormData();
     let elementParent = $(this).closest('.modal-container').find('.ecm-photo-list-content');
-
+	let modalID = $(this).closest('.risk-evaluation-photo').attr('value')
+	
 	$.each(files, function(index, file) {
 		formdata.append("userfile[]", file);
 	})
@@ -1039,7 +1040,7 @@ window.eoxiaJS.photo.sendPhoto = function( event ) {
 		success: function ( ) {
 			window.eoxiaJS.loader.display(elementParent);
 			elementParent.empty()
-			elementParent.load( document.URL + ' .ecm-photo-list-33');
+			elementParent.load( document.URL + ' .ecm-photo-list-'+modalID);
             elementParent.removeClass('wpeo-loader');
         }
 	});

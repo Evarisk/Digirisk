@@ -29,7 +29,7 @@ if (empty($conf) || !is_object($conf))
 
 <?php $permtoupload = $user->rights->ecm->upload; ?>
 
-<div class="risk-evaluation-photo">
+<div class="risk-evaluation-photo" value="<?php echo $risk->id ?>">
 	<span class="title"><?php echo $langs->trans('Photo'); ?></span>
 	<div class="risk-evaluation-photo-container wpeo-modal-event tooltip hover">
 		<?php
