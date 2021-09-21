@@ -91,7 +91,7 @@ if (empty($conf) || !is_object($conf))
 					?>
 					<div class="underbanner clearboth"></div>
 					<div class="ecm-photo-list-content">
-						<div class="wpeo-gridlayout grid-4 grid-gap-3 grid-margin-2 ecm-photo-list ecm-photo-list-<?php echo $risk->id ?>">
+						<div class="wpeo-gridlayout grid-4 grid-gap-3 grid-margin-2 ecm-photo-list ecm-photo-list-<?php echo $risk->id . ($editModal ? '-edit' : '') ?>">
 							<?php
 							$entity =($conf->entity > 1) ? '/' . $conf->entity : '';
 							$files =  dol_dir_list(DOL_DATA_ROOT .$entity. '/ecm/digiriskdolibarr/medias/', "files", 0, '', '_mini', 'date', SORT_ASC, 2);

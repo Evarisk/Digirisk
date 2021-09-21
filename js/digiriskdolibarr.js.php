@@ -1025,6 +1025,7 @@ window.eoxiaJS.photo.sendPhoto = function( event ) {
 	let element  = $(this).closest('.nowrap');
 	let files    = element.find("input[name='userfile[]']").prop("files");
 	let formdata = new FormData();
+    let elementParent = $(this).closest('.modal-container').find('.ecm-photo-list-content');
 
 	$.each(files, function(index, file) {
 		formdata.append("userfile[]", file);
@@ -1036,23 +1037,12 @@ window.eoxiaJS.photo.sendPhoto = function( event ) {
 		processData: false,
 		contentType: false,
 		success: function ( ) {
-			let elementParent = $(this).closest('.modal-container').find('.ecm-photo-list-content');
-			elementParent.empty();
 			window.eoxiaJS.loader.display(elementParent);
-			elementParent.load( document.URL + ' .ecm-photo-list-');
-			elementParent.removeClass('wpeo-loader');
-		}
+			elementParent.empty()
+			elementParent.load( document.URL + ' .ecm-photo-list-33');
+            elementParent.removeClass('wpeo-loader');
+        }
 	});
-
-	//let elementParent = $(this).closest('.modal-container').find('.ecm-photo-list-content');
-	//
-	//elementParent.empty();
-	//window.eoxiaJS.loader.display(elementParent);
-
-	//setTimeout(function(){
-	//	elementParent.load( document.URL + ' .ecm-photo-list-');
-	//	elementParent.removeClass('wpeo-loader');
-	//}, 2000);
 };
 
 /**
