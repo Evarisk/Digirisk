@@ -341,7 +341,7 @@ class doc_workunitdocument_odt extends ModeleODTWorkUnitDocument
 												if ($val == $tmparray['nomDanger']) {
 													$listlines->setImage($key, $val);
 												} else {
-													if (dol_strlen($val) == 0) {
+													if ($val == '') {
 														$listlines->setVars($key, $langs->trans('NoData'), true, 'UTF-8');
 													} else {
 														$listlines->setVars($key, $val, true, 'UTF-8');
@@ -390,7 +390,7 @@ class doc_workunitdocument_odt extends ModeleODTWorkUnitDocument
 										if (file_exists($val)) {
 											$listlines->setImage($key, $val);
 										} else {
-											if (dol_strlen($val) == 0) {
+											if ($val == '') {
 												$listlines->setVars($key, $langs->trans('NoData'), true, 'UTF-8');
 											} else {
 												$listlines->setVars($key, $val, true, 'UTF-8');
@@ -432,7 +432,7 @@ class doc_workunitdocument_odt extends ModeleODTWorkUnitDocument
 										if (file_exists($val)) {
 											$listlines->setImage($key, $val);
 										} else {
-											if (dol_strlen($val) == 0) {
+											if ($val == '') {
 												$listlines->setVars($key, $langs->trans('NoData'), true, 'UTF-8');
 											} else {
 												$listlines->setVars($key, $val, true, 'UTF-8');
