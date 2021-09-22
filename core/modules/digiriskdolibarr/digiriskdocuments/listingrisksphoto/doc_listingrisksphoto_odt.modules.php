@@ -284,7 +284,11 @@ class doc_listingrisksphoto_odt extends ModeleODTListingRisksPhoto
 					}
 					else    // Text
 					{
-						$odfHandler->setVars($key, $value, true, 'UTF-8');
+						if (dol_strlen($value) == 0) {
+							$odfHandler->setVars($key, $langs->trans('NoData'), true, 'UTF-8');
+						} else {
+							$odfHandler->setVars($key, $value, true, 'UTF-8');
+						}
 					}
 				}
 				catch (OdfException $e)
@@ -342,7 +346,11 @@ class doc_listingrisksphoto_odt extends ModeleODTListingRisksPhoto
 													} elseif ($val == $tmparray['nomDanger']) {
 														$listlines->setImage($key, $val);
 													} else {
-														$listlines->setVars($key, $val, true, 'UTF-8');
+														if (dol_strlen($val) == 0) {
+															$listlines->setVars($key, $langs->trans('NoData'), true, 'UTF-8');
+														} else {
+															$listlines->setVars($key, $val, true, 'UTF-8');
+														}
 													}
 												} catch (OdfException $e) {
 													dol_syslog($e->getMessage(), LOG_INFO);
@@ -402,7 +410,11 @@ class doc_listingrisksphoto_odt extends ModeleODTListingRisksPhoto
 													} elseif ($val == $tmparray['nomDanger']) {
 														$listlines->setImage($key, $val);
 													} else {
-														$listlines->setVars($key, $val, true, 'UTF-8');
+														if (dol_strlen($val) == 0) {
+															$listlines->setVars($key, $langs->trans('NoData'), true, 'UTF-8');
+														} else {
+															$listlines->setVars($key, $val, true, 'UTF-8');
+														}
 													}
 												} catch (OdfException $e) {
 													dol_syslog($e->getMessage(), LOG_INFO);

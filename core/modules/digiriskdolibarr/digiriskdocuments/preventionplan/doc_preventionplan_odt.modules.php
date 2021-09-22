@@ -271,7 +271,11 @@ class doc_preventionplan_odt extends ModeleODTPreventionPlan
 					}
 					else    // Text
 					{
-						$odfHandler->setVars($key, $value, true, 'UTF-8');
+						if (dol_strlen($value) == 0) {
+							$odfHandler->setVars($key, $langs->trans('NoData'), true, 'UTF-8');
+						} else {
+							$odfHandler->setVars($key, $value, true, 'UTF-8');
+						}
 					}
 				}
 				catch (OdfException $e)

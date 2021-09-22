@@ -282,8 +282,11 @@ class doc_riskassessmentdocument_odt extends ModeleODTRiskAssessmentDocument
 					}
 					else    // Text
 					{
-						$odfHandler->setVars($key, $value, true, 'UTF-8');
-					}
+						if (dol_strlen($value) == 0) {
+							$odfHandler->setVars($key, $langs->trans('NoData'), true, 'UTF-8');
+						} else {
+							$odfHandler->setVars($key, $value, true, 'UTF-8');
+						}					}
 				}
 				catch (OdfException $e)
 				{
@@ -320,7 +323,11 @@ class doc_riskassessmentdocument_odt extends ModeleODTRiskAssessmentDocument
 							$reshook = $hookmanager->executeHooks('ODTSubstitutionLine', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
 							foreach ($tmparray as $key => $val) {
 								try {
-									$listlines->setVars($key, $val, true, 'UTF-8');
+									if (dol_strlen($val) == 0) {
+										$listlines->setVars($key, $langs->trans('NoData'), true, 'UTF-8');
+									} else {
+										$listlines->setVars($key, $val, true, 'UTF-8');
+									}
 								} catch (OdfException $e) {
 									dol_syslog($e->getMessage(), LOG_INFO);
 								} catch (SegmentException $e) {
@@ -431,7 +438,11 @@ class doc_riskassessmentdocument_odt extends ModeleODTRiskAssessmentDocument
 											if ($val == $tmparray['nomDanger']) {
 												$listlines->setImage($key, $val);
 											} else {
-												$listlines->setVars($key, $val, true, 'UTF-8');
+												if (dol_strlen($val) == 0) {
+													$listlines->setVars($key, $langs->trans('NoData'), true, 'UTF-8');
+												} else {
+													$listlines->setVars($key, $val, true, 'UTF-8');
+												}
 											}
 										} catch (OdfException $e) {
 											dol_syslog($e->getMessage(), LOG_INFO);

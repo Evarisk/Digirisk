@@ -264,7 +264,7 @@ class doc_listingrisksaction_odt extends ModeleODTListingRisksAction
 			$array_object_from_properties = $this->get_substitutionarray_each_var_object($object, $outputlangs);
 			$array_object = $this->get_substitutionarray_object($object, $outputlangs);
 			$array_soc = $this->get_substitutionarray_mysoc($mysoc, $outputlangs);
-	
+
 			$tmparray = array_merge($substitutionarray, $array_object_from_properties, $array_object, $array_soc);
 			complete_substitutions_array($tmparray, $outputlangs, $object);
 
@@ -283,7 +283,11 @@ class doc_listingrisksaction_odt extends ModeleODTListingRisksAction
 					}
 					else    // Text
 					{
-						$odfHandler->setVars($key, $value, true, 'UTF-8');
+						if (dol_strlen($value) == 0) {
+							$odfHandler->setVars($key, $langs->trans('NoData'), true, 'UTF-8');
+						} else {
+							$odfHandler->setVars($key, $value, true, 'UTF-8');
+						}
 					}
 				}
 				catch (OdfException $e)
@@ -351,7 +355,11 @@ class doc_listingrisksaction_odt extends ModeleODTListingRisksAction
 													if ($val == $tmparray['nomDanger']) {
 														$listlines->setImage($key, $val);
 													} else {
-														$listlines->setVars($key, $val, true, 'UTF-8');
+														if (dol_strlen($val) == 0) {
+															$listlines->setVars($key, $langs->trans('NoData'), true, 'UTF-8');
+														} else {
+															$listlines->setVars($key, $val, true, 'UTF-8');
+														}
 													}
 												} catch (OdfException $e) {
 													dol_syslog($e->getMessage(), LOG_INFO);
@@ -419,7 +427,11 @@ class doc_listingrisksaction_odt extends ModeleODTListingRisksAction
 													if ($val == $tmparray['nomDanger']) {
 														$listlines->setImage($key, $val);
 													} else {
-														$listlines->setVars($key, $val, true, 'UTF-8');
+														if (dol_strlen($val) == 0) {
+															$listlines->setVars($key, $langs->trans('NoData'), true, 'UTF-8');
+														} else {
+															$listlines->setVars($key, $val, true, 'UTF-8');
+														}
 													}
 												} catch (OdfException $e) {
 													dol_syslog($e->getMessage(), LOG_INFO);
