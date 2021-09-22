@@ -735,7 +735,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			$digiriskelement = new Groupment($this->db);
 			$digiriskelement->ref = $trashRef;
 			$digiriskelement->label = 'TRASH';
-			$digiriskelement->type = 'groupment';
+			$digiriskelement->element_type = 'groupment';
 			$digiriskelement->description = $langs->trans('TrashGroupment');
 			$digiriskelement->status = 0;
 
