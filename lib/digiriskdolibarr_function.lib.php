@@ -605,7 +605,11 @@ function digiriskHeader($head = '', $title = '', $help_url = '', $target = '', $
 
 	//Body navigation digirisk
 	$object  = new DigiriskElement($db);
-	$objects = $object->fetchAll('',  '',  0,  0, array('customsql' => 'status > 0' ));
+	if ($conf->global->DIGIRISKDOLIBARR_SHOW_HIDDEN_DIGIRISKELEMENT) {
+		$objects = $object->fetchAll('',  '',  0,  0);
+	} else {
+		$objects = $object->fetchAll('',  '',  0,  0, array('customsql' => 'status > 0'));
+	}
 	$results = recurse_tree(0,0,$objects); ?>
 	<div id="id-container" class="id-container page-ut-gp-list">
 		<div class="side-nav">
@@ -646,8 +650,8 @@ function digiriskHeader($head = '', $title = '', $help_url = '', $target = '', $
 						<?php endif; ?>
 
 						<ul class="workunit-list">
-								<?php display_recurse_tree($results) ?>
-								<script>
+							<?php display_recurse_tree($results) ?>
+							<script>
 								// Get previous menu to display it
 								var MENU = localStorage.menu;
 								if (MENU == null || MENU == '') {
@@ -676,16 +680,15 @@ function digiriskHeader($head = '', $title = '', $help_url = '', $target = '', $
 								if (document.URL.match(/digiriskelement/)) {
 									jQuery( '#unit'  + id ).addClass( 'active' );
 									jQuery( '#unit'  +id  ).closest( '.unit' ).attr( 'value', id );
-                                };
-
-								</script>
-							</ul>
+								};
+							</script>
+						</ul>
 					</div>
 				</div>
 			</div>
 		</div>
 	<?php
-
+		// @todo SHOW TRASH
 	// main area
 	if ($replacemainareaby)
 	{

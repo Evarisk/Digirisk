@@ -180,6 +180,11 @@ function digiriskdolibarrAdminDigiriskElementPrepareHead()
 	$head[$h][2] = 'preventionplandet';
 	$h++;
 
+	$head[$h][0] = dol_buildpath("/digiriskdolibarr/admin/digiriskelement/deletedelements.php", 1);
+	$head[$h][1] = $langs->trans("DeletedElements");
+	$head[$h][2] = 'deletedelements';
+	$h++;
+
 //	$head[$h][0] = dol_buildpath("/digiriskdolibarr/admin/digiriskelement/firepermitdet.php", 1);
 //	$head[$h][1] = $langs->trans("FirePermit");
 //	$head[$h][2] = 'firepermit';

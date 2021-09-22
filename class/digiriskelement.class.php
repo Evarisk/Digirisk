@@ -143,7 +143,9 @@ class DigiriskElement extends CommonObject
 	 */
 	public function create(User $user, $notrigger = false)
 	{
+		global $conf;
 		$this->element = $this->element_type . '@digiriskdolibarr';
+		$this->fk_standard = $conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD;
 		return $this->createCommon($user, $notrigger);
 	}
 
@@ -294,7 +296,9 @@ class DigiriskElement extends CommonObject
 	 */
 	public function delete(User $user, $notrigger = false)
 	{
-		$this->status = 0;
+		global $conf;
+
+		$this->fk_parent = $conf->global->DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH;
 		return $this->update($user);
 	}
 

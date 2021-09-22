@@ -233,6 +233,8 @@ class modDigiriskdolibarr extends DolibarrModules
 			// CONST GROUPMENT
 			100 => array('MAIN_AGENDA_ACTIONAUTO_GROUPMENT_CREATE','chaine',1,'', $conf->entity),
 			101 => array('DIGIRISKDOLIBARR_GROUPMENT_ADDON','chaine', 'mod_groupment_standard' ,'', $conf->entity),
+			102 => array('DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH','integer', 0 ,'', $conf->entity),
+			103 => array('DIGIRISKDOLIBARR_SHOW_HIDDEN_DIGIRISKELEMENT','integer', 0 ,'', $conf->entity),
 
 			// CONST WORKUNIT
 			110 => array('MAIN_AGENDA_ACTIONAUTO_WORKUNIT_CREATE','chaine',1,'', $conf->entity),
@@ -725,6 +727,22 @@ class modDigiriskdolibarr extends DolibarrModules
 			dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_DOCUMENT_MODELS_SET', 1, 'integer', 0, '', $conf->entity);
 		}
 
+		if ( $conf->global->DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH ==  0 ) {
+			require_once __DIR__ . '/../../class/digiriskelement/groupment.class.php';
+
+
+			$trashRef = 'GP0';
+			$digiriskelement = new Groupment($this->db);
+			$digiriskelement->ref = $trashRef;
+			$digiriskelement->label = 'TRASH';
+			$digiriskelement->type = 'groupment';
+			$digiriskelement->description = $langs->trans('TrashGroupment');
+			$digiriskelement->status = 0;
+
+			$trash_id = $digiriskelement->create($user);
+
+			dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH', $trash_id, 'integer', 0, '', $conf->entity);
+		}
 
 		if ( $conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD ==  0 ) {
 			require_once __DIR__ . '/../../class/digiriskstandard.class.php';

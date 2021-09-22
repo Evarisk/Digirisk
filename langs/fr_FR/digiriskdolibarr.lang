@@ -577,8 +577,10 @@ DigiriskGroupmentStandardModel = Renvoie le numéro sous la forme GPn où n est 
 Groupment = Groupement
 NewGroupment = Nouveau groupement
 ModifyGroupment = Modifier groupement
-
-
+TrashGroupment = Groupement poubelle
+DeletedElements = Eléments masqués
+DeletedDigiriskElement = Groupements / Unités de travail masqués
+ShowDeletedDigiriskElement = Afficher les groupements / unités de travail masqués
 
 #
 # WorkUnit - Unité de travail
