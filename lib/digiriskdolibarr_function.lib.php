@@ -605,7 +605,7 @@ function digiriskHeader($head = '', $title = '', $help_url = '', $target = '', $
 
 	//Body navigation digirisk
 	$object  = new DigiriskElement($db);
-	$objects = $object->fetchAll('', '', 0,0,array('entity' => $conf->entity));
+	$objects = $object->fetchAll('',  '',  0,  0, array('customsql' => 'status > 0' ));
 	$results = recurse_tree(0,0,$objects); ?>
 	<div id="id-container" class="id-container page-ut-gp-list">
 		<div class="side-nav">

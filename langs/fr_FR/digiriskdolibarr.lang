@@ -56,6 +56,7 @@ LireDigirisk = Consulter le tableau de bord Digirisk
 ReadDigirisk = Consulter le tableau de bord Digirisk (read)
 ReadAdminPage = Accéder à la configuration du module Digirisk
 YouDontHaveTheRightToSeeThis = Vous n'avez pas le droit de voir les groupements et unités de travail
+CanNotDoThis = Vous n'avez pas le droit de faire cela
 
 # Data - Donnée
 Create = Créer
@@ -556,7 +557,6 @@ DeleteDigiriskElement = Supprimer les éléments digirisk
 NewDigiriskElement = Nouveau élément digirisk
 GPUTOrganisation = Organisation des GP/UT
 DigiriskElement = Élément Digirisk
-
 ElementType = Type d'élément
 ParentElement = Élément parent
 
