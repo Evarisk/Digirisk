@@ -1171,16 +1171,15 @@ function digirisk_show_medias($modulepart = 'ecm', $sdir, $size = 0, $nbmax = 0,
 						<div class="center clickable-photo clickable-photo<?php echo $j; ?>" value="<?php echo $j; ?>" element="risk-evaluation">
 							<figure class="photo-image">
 								<?php
-
 								$urladvanced = getAdvancedPreviewUrl($modulepart, 'digiriskdolibarr/medias/' . preg_replace('/_' . $size . '/', '', $val['relativename']), 0, 'entity='.$conf->entity); ?>
 								<a class="clicked-photo-preview" href="<?php echo $urladvanced; ?>"><i class="fas fa-2x fa-search-plus"></i></a>
 								<?php if (image_format_supported($val['name']) >= 0) : ?>
 								<?php $fullpath = $path . '/' . $val['relativename'] . '&entity=' . $conf->entity; ?>
-								<input class="filename" type="hidden" value="<?php echo $val['name'] ?>">
+								<input class="filename" type="hidden" value="<?php echo preg_replace('/_' . $size . '/', '', $val['name']) ?>">
 								<img class="photo photo<?php echo $j ?> maxwidth50" src="<?php echo $fullpath; ?>">
 								<?php endif; ?>
 							</figure>
-							<div class="title"><?php echo $val['name']; ?></div>
+							<div class="title"><?php echo preg_replace('/_' . $size . '/', '', $val['name']); ?></div>
 						</div><?php
 						$j++;
 					}
