@@ -267,6 +267,11 @@ class doc_workunitdocument_odt extends ModeleODTWorkUnitDocument
 			$tmparray = array_merge($substitutionarray, $array_object_from_properties, $array_object, $array_soc);
 			complete_substitutions_array($tmparray, $outputlangs, $object);
 
+
+			$tmparray['nom']         = $digiriskelement->label;
+			$tmparray['reference']   = $digiriskelement->ref;
+			$tmparray['description'] = $digiriskelement->description;
+
 			$filearray = dol_dir_list($conf->digiriskdolibarr->multidir_output[$conf->entity] . '/' . $digiriskelement->element_type . '/' . $digiriskelement->ref, "files", 0, '', '(\.odt|_preview.*\.png)$', 'position_name', 'desc', 1);
 			if (count($filearray)) {
 				$image = array_shift($filearray);
@@ -286,7 +291,11 @@ class doc_workunitdocument_odt extends ModeleODTWorkUnitDocument
 					}
 					else    // Text
 					{
-						$odfHandler->setVars($key, $value, true, 'UTF-8');
+						if (dol_strlen($value) == 0) {
+							$odfHandler->setVars($key, $langs->trans('NoData'), true, 'UTF-8');
+						} else {
+							$odfHandler->setVars($key, $value, true, 'UTF-8');
+						}
 					}
 				}
 				catch (OdfException $e)
@@ -332,8 +341,11 @@ class doc_workunitdocument_odt extends ModeleODTWorkUnitDocument
 												if ($val == $tmparray['nomDanger']) {
 													$listlines->setImage($key, $val);
 												} else {
-													$listlines->setVars($key, $val, true, 'UTF-8');
-												}
+													if (dol_strlen($val) == 0) {
+														$listlines->setVars($key, $langs->trans('NoData'), true, 'UTF-8');
+													} else {
+														$listlines->setVars($key, $val, true, 'UTF-8');
+													}												}
 											} catch (OdfException $e) {
 												dol_syslog($e->getMessage(), LOG_INFO);
 											} catch (SegmentException $e) {
@@ -378,8 +390,11 @@ class doc_workunitdocument_odt extends ModeleODTWorkUnitDocument
 										if (file_exists($val)) {
 											$listlines->setImage($key, $val);
 										} else {
-											$listlines->setVars($key, $val, true, 'UTF-8');
-										}
+											if (dol_strlen($val) == 0) {
+												$listlines->setVars($key, $langs->trans('NoData'), true, 'UTF-8');
+											} else {
+												$listlines->setVars($key, $val, true, 'UTF-8');
+											}										}
 									} catch (OdfException $e) {
 										dol_syslog($e->getMessage(), LOG_INFO);
 									} catch (SegmentException $e) {
@@ -417,7 +432,11 @@ class doc_workunitdocument_odt extends ModeleODTWorkUnitDocument
 										if (file_exists($val)) {
 											$listlines->setImage($key, $val);
 										} else {
-											$listlines->setVars($key, $val, true, 'UTF-8');
+											if (dol_strlen($val) == 0) {
+												$listlines->setVars($key, $langs->trans('NoData'), true, 'UTF-8');
+											} else {
+												$listlines->setVars($key, $val, true, 'UTF-8');
+											}
 										}
 									} catch (OdfException $e) {
 										dol_syslog($e->getMessage(), LOG_INFO);

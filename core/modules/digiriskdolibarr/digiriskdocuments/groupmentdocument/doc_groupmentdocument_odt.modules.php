@@ -275,6 +275,10 @@ class doc_groupmentdocument_odt extends ModeleODTGroupmentDocument
 				$tmparray['photoDefault'] = DOL_DOCUMENT_ROOT.$nophoto;
 			}
 
+			$tmparray['nom']         = $digiriskelement->label;
+			$tmparray['reference']   = $digiriskelement->ref;
+			$tmparray['description'] = $digiriskelement->description;
+
 			foreach ($tmparray as $key=>$value)
 			{
 				try {
@@ -285,7 +289,11 @@ class doc_groupmentdocument_odt extends ModeleODTGroupmentDocument
 					}
 					else    // Text
 					{
-						$odfHandler->setVars($key, $value, true, 'UTF-8');
+						if (dol_strlen($value) == 0) {
+							$odfHandler->setVars($key, $langs->trans('NoData'), true, 'UTF-8');
+						} else {
+							$odfHandler->setVars($key, $value, true, 'UTF-8');
+						}
 					}
 				}
 				catch (OdfException $e)
@@ -325,12 +333,17 @@ class doc_groupmentdocument_odt extends ModeleODTGroupmentDocument
 											// Call the ODTSubstitutionLine hook
 											$parameters = array('odfHandler' => &$odfHandler, 'file' => $file, 'object' => $object, 'outputlangs' => $outputlangs, 'substitutionarray' => &$tmparray, 'line' => $line);
 											$reshook = $hookmanager->executeHooks('ODTSubstitutionLine', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
+
 											foreach ($tmparray as $key => $val) {
 												try {
 													if ($val == $tmparray['nomDanger']) {
 														$listlines->setImage($key, $val);
 													} else {
-														$listlines->setVars($key, $val, true, 'UTF-8');
+														if (dol_strlen($value) == 0) {
+															$listlines->setVars($key, $langs->trans('NoData'), true, 'UTF-8');
+														} else {
+															$listlines->setVars($key, $val, true, 'UTF-8');
+														}
 													}
 												} catch (OdfException $e) {
 													dol_syslog($e->getMessage(), LOG_INFO);
@@ -371,12 +384,17 @@ class doc_groupmentdocument_odt extends ModeleODTGroupmentDocument
 								// Call the ODTSubstitutionLine hook
 								$parameters = array('odfHandler' => &$odfHandler, 'file' => $file, 'object' => $object, 'outputlangs' => $outputlangs, 'substitutionarray' => &$tmparray, 'line' => $line);
 								$reshook = $hookmanager->executeHooks('ODTSubstitutionLine', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
+
 								foreach ($tmparray as $key => $val) {
 									try {
 										if (file_exists($val)) {
 											$listlines->setImage($key, $val);
 										} else {
-											$listlines->setVars($key, $val, true, 'UTF-8');
+											if (dol_strlen($val) == 0) {
+												$listlines->setVars($key, $langs->trans('NoData'), true, 'UTF-8');
+											} else {
+												$listlines->setVars($key, $val, true, 'UTF-8');
+											}
 										}
 									} catch (OdfException $e) {
 										dol_syslog($e->getMessage(), LOG_INFO);
@@ -415,7 +433,11 @@ class doc_groupmentdocument_odt extends ModeleODTGroupmentDocument
 										if (file_exists($val)) {
 											$listlines->setImage($key, $val);
 										} else {
-											$listlines->setVars($key, $val, true, 'UTF-8');
+											if (dol_strlen($val) == 0) {
+												$listlines->setVars($key, $langs->trans('NoData'), true, 'UTF-8');
+											} else {
+												$listlines->setVars($key, $val, true, 'UTF-8');
+											}
 										}
 									} catch (OdfException $e) {
 										dol_syslog($e->getMessage(), LOG_INFO);
@@ -436,11 +458,12 @@ class doc_groupmentdocument_odt extends ModeleODTGroupmentDocument
 				dol_syslog($this->error, LOG_WARNING);
 				return -1;
 			}
-
 			// Replace labels translated
 			$tmparray = $outputlangs->get_translations_for_substitutions();
+
 			foreach ($tmparray as $key=>$value)
 			{
+
 				try {
 					$odfHandler->setVars($key, $value, true, 'UTF-8');
 				}
