@@ -37,8 +37,20 @@ $cotationList = $evaluation->fetchFromParent($risk->id, 0, 'DESC'); ?>
 				</div>
 			</div>
 			<!-- BUTTON MODAL RISK EVALUATION ADD  -->
+			<?php if ($permissiontoadd) : ?>
+				<div class="risk-evaluation-edit risk-evaluation-button wpeo-button button-square-50 button-grey wpeo-tooltip-event modal-open" aria-label="<?php echo $langs->trans('EditRiskAssessment') ?>" value="<?php echo $lastEvaluation->id;?>">
+					<i class="fas fa-pencil-alt button-icon"></i>
+				</div>
+				<div class="risk-evaluation-add risk-evaluation-button wpeo-button button-square-50 button-primary wpeo-tooltip-event modal-open" aria-label="<?php echo $langs->trans('AddRiskAssessment') ?>" value="<?php echo $risk->id;?>">
+					<i class="fas fa-plus button-icon"></i>
+				</div>
+			<?php else : ?>
+				<div class="wpeo-button risk-evaluation-button button-square-50 button-grey wpeo-tooltip-event" aria-label="<?php echo $langs->trans('PermissionDenied') ?>" value="<?php echo $risk->id;?>">
+					<i class="fas fa-plus button-icon"></i>
+				</div>
+			<?php endif; ?>
 			<?php if ($permissiontoread) : ?>
-				<div class="risk-evaluation-list wpeo-button button-square-50 button-primary wpeo-tooltip-event modal-open minwidth50" aria-label="<?php echo $langs->trans('RiskAssessmentList') ?>" value="<?php echo $risk->id ?>">
+				<div class="risk-evaluation-list risk-evaluation-button wpeo-button button-square-50 button-primary wpeo-tooltip-event modal-open" aria-label="<?php echo $langs->trans('RiskAssessmentList') ?>" value="<?php echo $risk->id ?>">
 					<i class="fas fa-list button-icon"></i>
 				</div>
 			<?php else : ?>
@@ -46,18 +58,7 @@ $cotationList = $evaluation->fetchFromParent($risk->id, 0, 'DESC'); ?>
 					<i class="fas fa-plus"></i> <?php echo $langs->trans('RiskAssessmentList'); ?>
 				</div>
 			<?php endif; ?>
-			<?php if ($permissiontoadd) : ?>
-				<div class="risk-evaluation-add risk-evaluation-button wpeo-button button-square-50 button-primary wpeo-tooltip-event modal-open" aria-label="<?php echo $langs->trans('AddRiskAssessment') ?>" value="<?php echo $risk->id;?>">
-					<i class="fas fa-plus button-icon"></i>
-				</div>
-				<div class="risk-evaluation-edit risk-evaluation-button wpeo-button button-square-50 button-grey wpeo-tooltip-event modal-open" aria-label="<?php echo $langs->trans('EditRiskAssessment') ?>" value="<?php echo $lastEvaluation->id;?>">
-					<i class="fas fa-pencil-alt button-icon"></i>
-				</div>
-			<?php else : ?>
-				<div class="wpeo-button risk-evaluation-button button-square-50 button-grey wpeo-tooltip-event" aria-label="<?php echo $langs->trans('PermissionDenied') ?>" value="<?php echo $risk->id;?>">
-					<i class="fas fa-plus button-icon"></i>
-				</div>
-			<?php endif; ?>
+
 		</div>
 	</div>
 	<?php if (!empty($cotationList)) :

@@ -289,7 +289,7 @@ class doc_groupmentdocument_odt extends ModeleODTGroupmentDocument
 					}
 					else    // Text
 					{
-						if (dol_strlen($val) == 0) {
+						if ($val == '') {
 							$odfHandler->setVars($key, $langs->trans('NoData'), true, 'UTF-8');
 						} else {
 							$odfHandler->setVars($key, $value, true, 'UTF-8');
@@ -339,7 +339,7 @@ class doc_groupmentdocument_odt extends ModeleODTGroupmentDocument
 													if ($val == $tmparray['nomDanger']) {
 														$listlines->setImage($key, $val);
 													} else {
-														if (dol_strlen($val) == 0) {
+														if ($val == '') {
 															$listlines->setVars($key, $langs->trans('NoData'), true, 'UTF-8');
 														} else {
 															$listlines->setVars($key, $val, true, 'UTF-8');
@@ -390,7 +390,7 @@ class doc_groupmentdocument_odt extends ModeleODTGroupmentDocument
 										if (file_exists($val)) {
 											$listlines->setImage($key, $val);
 										} else {
-											if (dol_strlen($val) == 0) {
+											if ($val == '') {
 												$listlines->setVars($key, $langs->trans('NoData'), true, 'UTF-8');
 											} else {
 												$listlines->setVars($key, $val, true, 'UTF-8');
@@ -433,7 +433,7 @@ class doc_groupmentdocument_odt extends ModeleODTGroupmentDocument
 										if (file_exists($val)) {
 											$listlines->setImage($key, $val);
 										} else {
-											if (dol_strlen($val) == 0) {
+											if ($val == '') {
 												$listlines->setVars($key, $langs->trans('NoData'), true, 'UTF-8');
 											} else {
 												$listlines->setVars($key, $val, true, 'UTF-8');

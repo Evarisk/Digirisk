@@ -328,7 +328,7 @@ if (($id || $ref) && $action == 'edit') {
 	if ($backtopage) print '<input type="hidden" name="backtopage" value="'.$backtopage.'">';
 	if ($backtopageforcancel) print '<input type="hidden" name="backtopageforcancel" value="'.$backtopageforcancel.'">';
 
-	print dol_get-fiche_head();
+	print dol_get_fiche_head();
 
 	unset($object->fields['status']);
 	unset($object->fields['element_type']);
@@ -477,7 +477,7 @@ if ((empty($action) || ($action != 'edit' && $action != 'create'))) {
 			} else {
 				print '<a class="butActionRefused classfortooltip" href="#" title="' . dol_escape_htmltag($langs->trans("NotEnoughPermissions")) . '">' . $langs->trans('Modify') . '</a>' . "\n";
 			}
-	
+
 			if ($permissiontodelete && !array_key_exists($object->id, $trash_list) && $object->id != $conf->global->DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH){
 				print '<a class="butActionDelete" href="' . $_SERVER["PHP_SELF"] . '?id=' . $object->id . '&action=delete">'.$langs->trans("Delete").'</a>';
 			} else {

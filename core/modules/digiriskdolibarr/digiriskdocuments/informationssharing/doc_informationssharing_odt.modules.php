@@ -274,7 +274,7 @@ class doc_informationssharing_odt extends ModeleODTInformationsSharing
 					}
 					else    // Text
 					{
-						if (dol_strlen($value) == 0) {
+						if ($value == '') {
 							$odfHandler->setVars($key, $langs->trans('NoData'), true, 'UTF-8');
 						} else {
 							$odfHandler->setVars($key, $value, true, 'UTF-8');

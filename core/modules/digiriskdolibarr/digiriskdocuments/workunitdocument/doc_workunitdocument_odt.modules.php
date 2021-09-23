@@ -291,7 +291,7 @@ class doc_workunitdocument_odt extends ModeleODTWorkUnitDocument
 					}
 					else    // Text
 					{
-						if (dol_strlen($value) == 0) {
+						if ($value == '') {
 							$odfHandler->setVars($key, $langs->trans('NoData'), true, 'UTF-8');
 						} else {
 							$odfHandler->setVars($key, $value, true, 'UTF-8');
