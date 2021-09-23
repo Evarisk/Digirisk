@@ -1594,6 +1594,7 @@ window.eoxiaJS.evaluation.saveEvaluation = function ( event ) {
 	let evaluationID = element.attr('value');
 	let actionContainerSuccess = $('.messageSuccessEvaluationEdit');
 	let actionContainerError = $('.messageErrorEvaluationEdit');
+	//let riskId = $(this).closest('.risk-evaluation-container').attr('value')
 
 	var method = element.find('.risk-evaluation-method').val();
 	var methodPost = '';
@@ -1631,7 +1632,8 @@ window.eoxiaJS.evaluation.saveEvaluation = function ( event ) {
 	let evaluationSingle = $(this).closest('.risk-evaluation-container').find('.risk-evaluation-single-content');
 	let evaluationRef =  $('.risk-evaluation-ref-'+evaluationID).attr('value');
 
-	window.eoxiaJS.loader.display($(this));
+    window.eoxiaJS.loader.display($(this));
+    window.eoxiaJS.loader.display($('.risk-evaluation-single-' + riskId));
 
 	$.ajax({
 		url: document.URL + '&action=saveEvaluation&evaluationID=' + evaluationID +  methodPost + cotationPost + criteres + photoPost + commentPost,
@@ -1639,13 +1641,11 @@ window.eoxiaJS.evaluation.saveEvaluation = function ( event ) {
 		processData: false,
 		contentType: false,
 		success: function ( ) {
+            $('.risk-evaluation-save').removeClass('wpeo-loader')
 
-			console.log(riskId)
-			elementParent.load( document.URL + ' .risk-evaluations-list-'+riskId);
-			evaluationSingle.load( document.URL + ' .risk-evaluation-single-'+riskId);
-
+            $('.div-table-responsive').load(document.URL + ' .div-table-responsive')
             elementParent.removeClass('wpeo-loader');
-            evaluationSingle.removeClass('wpeo-loader');
+            $(this).closest('.risk-evaluation-container').removeClass('wpeo-loader');
 
 			element.find('#risk_evaluation_edit'+evaluationID).removeClass('modal-active');
 
