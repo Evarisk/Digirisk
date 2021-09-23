@@ -739,6 +739,9 @@ function display_recurse_tree($results) {
 	if ($user->rights->digiriskdolibarr->digiriskelement->read) {
 		if ( !empty( $results )) {
 		foreach ($results as $element) { ?>
+			<?php if ($element['object']->id == $conf->global->DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH) : ?>
+				<hr>
+			<?php endif; ?>
 			<li class="unit type-<?php echo $element['object']->element_type; ?>" id="unit<?php  echo $element['object']->id; ?>">
 				<div class="unit-container">
 					<?php if ($element['object']->element_type == 'groupment' && count($element['children'])) { ?>
@@ -802,6 +805,9 @@ function display_recurse_tree($results) {
 				</div>
 				<ul class="sub-list"><?php display_recurse_tree($element['children']) ?></ul>
 			</li>
+			<?php if ($element['object']->id == $conf->global->DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH) : ?>
+				<hr>
+			<?php endif; ?>
 		<?php }
 	}
 	} else {
