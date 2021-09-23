@@ -57,7 +57,7 @@ class modDigiriskdolibarr extends DolibarrModules
 		$this->descriptionlong = "Digirisk";
 		$this->editor_name     = 'Evarisk';
 		$this->editor_url      = 'https://evarisk.com';
-		$this->version         = '8.1.1';
+		$this->version         = '8.1.2';
 		$this->const_name      = 'MAIN_MODULE_'.strtoupper($this->name);
 		$this->picto           ='digiriskdolibarr@digiriskdolibarr';
 
@@ -713,6 +713,7 @@ class modDigiriskdolibarr extends DolibarrModules
 		$this->_load_tables('/digiriskdolibarr/sql/firepermit/');
 
 		if ( $conf->global->DIGIRISKDOLIBARR_DOCUMENT_MODELS_SET ==  0 ) {
+			//Install by default
 			addDocumentModel('informationssharing_odt'            ,'informationssharing'           ,'ODT templates','DIGIRISKDOLIBARR_INFORMATIONSSHARING_ADDON_ODT_PATH');
 			addDocumentModel('legaldisplay_odt'                   ,'legaldisplay'                  ,'ODT templates','DIGIRISKDOLIBARR_LEGALDISPLAY_ADDON_ODT_PATH');
 			addDocumentModel('firepermitdocument_odt'             ,'firepermitdocument'            ,'ODT templates','DIGIRISKDOLIBARR_FIREPERMITDOCUMENT_ADDON_ODT_PATH');
@@ -724,7 +725,14 @@ class modDigiriskdolibarr extends DolibarrModules
 			addDocumentModel('listingrisksphoto_odt'              ,'listingrisksphoto'             ,'ODT templates','DIGIRISKDOLIBARR_LISTINGRISKSPHOTO_ADDON_ODT_PATH');
 			addDocumentModel('riskassessmentdocument_odt'         ,'riskassessmentdocument'        ,'ODT templates','DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_ADDON_ODT_PATH');
 
-			dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_DOCUMENT_MODELS_SET', 1, 'integer', 0, '', $conf->entity);
+			dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_DOCUMENT_MODELS_SET', 2, 'integer', 0, '', $conf->entity);
+		} elseif ($conf->global->DIGIRISKDOLIBARR_DOCUMENT_MODELS_SET == 1) {
+			//Install after 8.1.0
+
+			addDocumentModel('preventionplandocument_odt'         ,'preventionplandocument'        ,'ODT templates','DIGIRISKDOLIBARR_PREVENTIONPLANDOCUMENT_ADDON_ODT_PATH');
+			addDocumentModel('preventionplandocument_specimen_odt','preventionplandocumentspecimen','ODT templates','DIGIRISKDOLIBARR_PREVENTIONPLANDOCUMENT_SPECIMEN_ADDON_ODT_PATH');
+
+			dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_DOCUMENT_MODELS_SET', 2, 'integer', 0, '', $conf->entity);
 		}
 
 		if ( $conf->global->DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH ==  0 ) {
