@@ -374,6 +374,9 @@ window.eoxiaJS.modal.openModal = function ( event ) {
 	if ($(this).hasClass('riskassessment-task-edit')) {
 		$('#risk_assessment_task_edit' + idSelected).addClass('modal-active');
 	}
+	if ($(this).hasClass('riskassessment-task-list')) {
+		$('#risk_assessment_task_list' + idSelected).addClass('modal-active');
+	}
 
 	// Open modal risksign.
 	if ($(this).hasClass('risksign-add')) {
