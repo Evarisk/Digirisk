@@ -356,11 +356,8 @@ class doc_riskassessmentdocument_odt extends ModeleODTRiskAssessmentDocument
 									$totalQuotation += $lastEvaluation->cotation;
 								}
 							}
-							$depthHyphens = '';
-							for ($k = 0; $k < $digiriskelementsingle['depth']; $k++) {
-								$depthHyphens .= '- ';
-							}
-							$elementName = $depthHyphens . $digiriskelementsingle['object']->ref .' '. $digiriskelementsingle['object']->label;
+
+							$elementName = $digiriskelementsingle['object']->ref .' '. $digiriskelementsingle['object']->label;
 
 							$cotationarray[$elementName] = $totalQuotation;
 
