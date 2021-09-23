@@ -384,7 +384,11 @@ if ((empty($action) || ($action != 'edit' && $action != 'create'))) {
 
 	print dol_get_fiche_head($head, 'elementCard', $title, -1, "digiriskdolibarr@digiriskdolibarr");
 
+	$trash_list = $object->fetchDigiriskElementFlat($conf->global->DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH);
 
+	if ($trash_list < 0 || empty($trash_list)) {
+		$trash_list = array();
+	}
 
 	// Object card
 	// ------------------------------------------------------------
@@ -473,7 +477,8 @@ if ((empty($action) || ($action != 'edit' && $action != 'create'))) {
 			} else {
 				print '<a class="butActionRefused classfortooltip" href="#" title="' . dol_escape_htmltag($langs->trans("NotEnoughPermissions")) . '">' . $langs->trans('Modify') . '</a>' . "\n";
 			}
-			if ($permissiontodelete){
+	
+			if ($permissiontodelete && !array_key_exists($object->id, $trash_list) && $object->id != $conf->global->DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH){
 				print '<a class="butActionDelete" href="' . $_SERVER["PHP_SELF"] . '?id=' . $object->id . '&action=delete">'.$langs->trans("Delete").'</a>';
 			} else {
 				print '<a class="butActionRefused classfortooltip" href="#" title="'.$langs->trans("CanNotDoThis").'">'.$langs->trans('Delete').'</a>';
