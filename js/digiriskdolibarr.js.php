@@ -1488,7 +1488,7 @@ window.eoxiaJS.evaluation.createEvaluation = function ( event ) {
 	})
 
 	let elementParent = $('.fichecenter').find('.div-table-responsive');
-	window.eoxiaJS.loader.display($('.risk-row-content-' + riskToAssign));
+	window.eoxiaJS.loader.display($('.risk-evaluation-container-' + riskToAssign));
 
 	$.ajax({
 		url: document.URL + '&action=addEvaluation' + riskToAssignPost + methodPost + cotationPost + criteres + photoPost + commentPost,
@@ -1496,8 +1496,7 @@ window.eoxiaJS.evaluation.createEvaluation = function ( event ) {
 		processData: false,
 		contentType: false,
 		success: function( ) {
-				elementParent.empty()
-				elementParent.load( document.URL + ' .tagtable.liste');
+				elementParent.load( document.URL + ' .div-table-responsive');
 
 				$(this).closest('.risk-row-content-' + riskToAssign).removeClass('wpeo-loader');
 
@@ -1627,13 +1626,12 @@ window.eoxiaJS.evaluation.saveEvaluation = function ( event ) {
 		}
 	})
 
-	let elementParent = $(this).closest('.risk-evaluations-list-content');
+	let elementParent = $(this).closest('.risk-evaluation-container').find('.risk-evaluations-list-content');
 	let riskId = elementParent.attr('value');
 	let evaluationSingle = $(this).closest('.risk-evaluation-container').find('.risk-evaluation-single-content');
 	let evaluationRef =  $('.risk-evaluation-ref-'+evaluationID).attr('value');
 
 	window.eoxiaJS.loader.display($(this));
-	evaluationSingle.empty()
 
 	$.ajax({
 		url: document.URL + '&action=saveEvaluation&evaluationID=' + evaluationID +  methodPost + cotationPost + criteres + photoPost + commentPost,
@@ -1641,12 +1639,14 @@ window.eoxiaJS.evaluation.saveEvaluation = function ( event ) {
 		processData: false,
 		contentType: false,
 		success: function ( ) {
-			elementParent.empty()
 
+			console.log(riskId)
 			elementParent.load( document.URL + ' .risk-evaluations-list-'+riskId);
 			evaluationSingle.load( document.URL + ' .risk-evaluation-single-'+riskId);
 
-			elementParent.removeClass('wpeo-loader');
+            elementParent.removeClass('wpeo-loader');
+            evaluationSingle.removeClass('wpeo-loader');
+
 			element.find('#risk_evaluation_edit'+evaluationID).removeClass('modal-active');
 
 			let textToShow = '';

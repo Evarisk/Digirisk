@@ -317,8 +317,8 @@ $cotationList = $evaluation->fetchFromParent($risk->id, 0, 'DESC'); ?>
 											</div>
 										</div>
 									</div>
-
 								</li>
+								<hr>
 								<?php endforeach; ?>
 							<?php endif; ?>
 						</ul>
