@@ -33,7 +33,7 @@ if (empty($conf) || !is_object($conf))
 	<span class="title"><?php echo $langs->trans('Photo'); ?></span>
 	<div class="risk-evaluation-photo-container wpeo-modal-event tooltip hover">
 		<?php
-		$entity = ($conf->entity > 1) ? $conf->entity . '/'  : '';
+		$entity = ($conf->entity > 1) ? '/' . $conf->entity  : '';
 
 		$relativepath = 'digiriskdolibarr/medias/thumbs/';
 		$modulepart = $entity . 'ecm';
@@ -95,6 +95,7 @@ if (empty($conf) || !is_object($conf))
 							<?php
 							$relativepath = 'digiriskdolibarr/medias/thumbs';
 							print digirisk_show_medias('ecm', DOL_DATA_ROOT . '/' . $entity. '/ecm/digiriskdolibarr/medias/thumbs', 'small');
+							print digirisk_show_medias('ecm', DOL_DATA_ROOT  . $entity. '/ecm/digiriskdolibarr/medias/thumbs', 'small');
 							?>
 						</div>
 					</div>
