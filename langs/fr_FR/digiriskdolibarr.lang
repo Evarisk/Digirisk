@@ -736,6 +736,8 @@ MultipleRiskAssessmentMethodDescription = Activer le changement de méthode d'é
 AdvancedRiskAssessmentMethod = Méthode d'évaluation avancée
 AdvancedRiskAssessmentMethodDescription = Activer la méthode d'évaluation avancée
 NoRiskAssessment = Pas d'évaluation assignée au risque
+RiskAssessmentList = Liste des évaluations du risque
+EditRiskAssessment = Editer l'évaluation
 
 SimpleCotation = Cotation simple
 AdvancedCotation = Cotation avancée

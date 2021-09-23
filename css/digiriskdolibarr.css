@@ -2987,8 +2987,8 @@ td > .risk-evaluation-container {
   border-radius: 4px;
   padding: 0.2em 0.4em;
 }
-.risk-evaluation-container .risk-evaluation-single .risk-evaluation-add {
-  min-width: 40px;
+.risk-evaluation-container .risk-evaluation-single .risk-evaluation-button {
+  min-width: 50px;
   margin-left: 0.5em;
 }
 
