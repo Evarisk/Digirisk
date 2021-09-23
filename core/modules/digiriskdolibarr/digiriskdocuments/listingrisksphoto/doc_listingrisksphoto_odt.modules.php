@@ -333,10 +333,12 @@ class doc_listingrisksphoto_odt extends ModeleODTListingRisksPhoto
 											if (dol_strlen($lastEvaluation->photo) && $lastEvaluation !== 'undefined') {
 												$entity = ($conf->entity > 1) ? '/' . $conf->entity : '';
 												$path = DOL_DATA_ROOT . $entity . '/digiriskdolibarr/riskassessment/' . $lastEvaluation->ref;
-												$image = $path . '/' . $lastEvaluation->photo;
+												$file_small = preg_split('/\./', $lastEvaluation->photo);
+												$new_file = $file_small[0] . '_small.' . $file_small[1];
+												$image = $path . '/thumbs/' . $new_file;
 												$tmparray['photoAssociee'] = $image;
 											} else {
-												$tmparray['photoAssociee'] = $langs->trans('NoFileLinked');
+												$tmparray['photoAssociee'] = $langs->transnoentities('NoFileLinked');
 											}
 											unset($tmparray['object_fields']);
 
@@ -396,10 +398,12 @@ class doc_listingrisksphoto_odt extends ModeleODTListingRisksPhoto
 											if (dol_strlen($lastEvaluation->photo) && $lastEvaluation !== 'undefined') {
 												$entity = ($conf->entity > 1) ? '/' . $conf->entity : '';
 												$path = DOL_DATA_ROOT . $entity . '/digiriskdolibarr/riskassessment/' . $lastEvaluation->ref;
-												$image = $path . '/' . $lastEvaluation->photo;
+												$file_small = preg_split('/\./', $lastEvaluation->photo);
+												$new_file = $file_small[0] . '_small.' . $file_small[1];
+												$image = $path . '/thumbs/' . $new_file;
 												$tmparray['photoAssociee'] = $image;
 											} else {
-												$tmparray['photoAssociee'] = $langs->trans('NoFileLinked');
+												$tmparray['photoAssociee'] = $langs->transnoentities('NoFileLinked');
 											}
 
 											unset($tmparray['object_fields']);
