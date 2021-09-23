@@ -155,7 +155,7 @@ if (empty($reshook)) {
 
 		$date = dol_print_date(dol_now(),'dayxcard');
 
-		$pathToZip = DOL_DATA_ROOT . $entity . '/digiriskdolibarr/riskassessmentdocument/' . $date . '_' . $riskassessmentdocument->ref;
+		$pathToZip = DOL_DATA_ROOT . $entity . '/digiriskdolibarr/riskassessmentdocument/' . $riskassessmentdocument->ref.'_'.$conf->global->MAIN_INFO_SOCIETE_NOM.'_'.$date;
 		dol_mkdir($pathToZip);
 
 		// Ajout du fichier au dossier à zipper

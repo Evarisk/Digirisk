@@ -218,7 +218,12 @@ class doc_listingrisksaction_odt extends ModeleODTListingRisksAction
 			$filename = preg_split('/listingrisksaction\//' , $srctemplatepath);
 			$filename = preg_replace('/template_/','', $filename[1]);
 
-			$filename = $objectref . '_'. $filename;
+			$date = dol_print_date(dol_now(),'dayxcard');
+			if (!empty($digiriskelement)) {
+				$filename = $objectref.'_'.$digiriskelement->label.'_'.$date.'.odt';
+			} else {
+				$filename = $objectref.'_'.$conf->global->MAIN_INFO_SOCIETE_NOM.'_'.$date.'.odt';
+			}
 
 			$object->last_main_doc = $filename;
 

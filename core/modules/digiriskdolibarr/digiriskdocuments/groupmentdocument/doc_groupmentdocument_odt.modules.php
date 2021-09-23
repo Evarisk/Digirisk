@@ -216,7 +216,8 @@ class doc_groupmentdocument_odt extends ModeleODTGroupmentDocument
 			$filename = preg_split('/groupmentdocument\//' , $srctemplatepath);
 			$filename = preg_replace('/template_/','', $filename[1]);
 
-			$filename = $objectref . '_'. $filename;
+			$date = dol_print_date(dol_now(),'dayxcard');
+			$filename = $objectref.'_'.$digiriskelement->label.'_'.$date.'.odt';
 
 			$object->last_main_doc = $filename;
 

@@ -220,8 +220,8 @@ class doc_preventionplandocument_specimen_odt extends ModeleODTPreventionPlanDoc
 			$filename = preg_replace('/template_/','', $filename[1]);
 			$filename = preg_replace('/specimen\//','', $filename);
 
-
-			$filename = $objectref . '_'. $filename;
+			$date = dol_print_date(dol_now(),'dayxcard');
+			$filename = $objectref.'_'.$conf->global->MAIN_INFO_SOCIETE_NOM.'_'.$date.'.odt';
 
 			$object->last_main_doc = $filename;
 
