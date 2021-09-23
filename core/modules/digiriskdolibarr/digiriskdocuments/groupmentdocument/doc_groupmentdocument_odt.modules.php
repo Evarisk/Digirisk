@@ -341,11 +341,6 @@ class doc_groupmentdocument_odt extends ModeleODTGroupmentDocument
 														$listlines->setImage($key, $val);
 													} else {
 														if ($val == '') {
-															echo '<pre>';
-															print_r('oui');
-															print_r($val);
-															print_r('iou');
-															echo '</pre>';
 															$listlines->setVars($key, $langs->trans('NoData'), true, 'UTF-8');
 														} else {
 															$listlines->setVars($key, $val, true, 'UTF-8');
@@ -397,11 +392,6 @@ class doc_groupmentdocument_odt extends ModeleODTGroupmentDocument
 											$listlines->setImage($key, $val);
 										} else {
 											if ($val == '') {
-												echo '<pre>';
-												print_r('oui');
-												print_r($val);
-												print_r('iou');
-												echo '</pre>';
 												$listlines->setVars($key, $langs->trans('NoData'), true, 'UTF-8');
 											} else {
 												$listlines->setVars($key, $val, true, 'UTF-8');
@@ -445,11 +435,6 @@ class doc_groupmentdocument_odt extends ModeleODTGroupmentDocument
 											$listlines->setImage($key, $val);
 										} else {
 											if ($val == '') {
-												echo '<pre>';
-												print_r('oui');
-												print_r($val);
-												print_r('iou');
-												echo '</pre>';
 												$listlines->setVars($key, $langs->trans('NoData'), true, 'UTF-8');
 											} else {
 												$listlines->setVars($key, $val, true, 'UTF-8');
