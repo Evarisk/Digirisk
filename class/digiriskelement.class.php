@@ -408,6 +408,16 @@ class DigiriskElement extends CommonObject
 			}
 			$sql .= " AND NOT s.rowid =" . $moreparam;
 		}
+		if ($conf->global->DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH) {
+			$masked_content = $this->fetchDigiriskElementFlat($conf->global->DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH);
+			if (! empty($masked_content) && $masked_content > 0) {
+				foreach ($masked_content as $key => $value) {
+					$sql .= " AND NOT s.rowid =" . $key;
+				}
+			}
+			$sql .= " AND NOT s.rowid =" . $conf->global->DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH;
+
+		}
 		$sql .= $this->db->order("rowid", "ASC");
 		$sql .= $this->db->plimit($limit, 0);
 
