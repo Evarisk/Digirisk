@@ -94,7 +94,7 @@ if (empty($conf) || !is_object($conf))
 						<div class="wpeo-gridlayout grid-4 grid-gap-3 grid-margin-2 ecm-photo-list ecm-photo-list-<?php echo $risk->id . ($editModal ? '-edit' : '') ?>">
 							<?php
 							$relativepath = 'digiriskdolibarr/medias/thumbs';
-							print digirisk_show_medias('ecm', DOL_DATA_ROOT . '/' . $entity. '/ecm/digiriskdolibarr/medias/thumbs', 'small');
+
 							print digirisk_show_medias('ecm', DOL_DATA_ROOT  . $entity. '/ecm/digiriskdolibarr/medias/thumbs', 'small');
 							?>
 						</div>
