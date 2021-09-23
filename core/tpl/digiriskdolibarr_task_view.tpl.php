@@ -250,22 +250,22 @@ $related_tasks = $risk->get_related_tasks($risk); ?>
 												</div>
 											</div>
 											<!-- BUTTON MODAL RISK ASSESSMENT TASK EDIT  -->
-											<div class="riskassessment-task-actions wpeo-gridlayout grid-2 grid-gap-0">
-												<?php if ($permissiontoadd) : ?>
-													<div class="riskassessment-task-edit wpeo-button button-square-50 button-grey modal-open" value="<?php echo $related_task->id ?>">
-														<i class="fas fa-pencil-alt button-icon"></i>
-													</div>
-												<?php else : ?>
-													<div class="wpeo-button button-square-50 button-grey wpeo-tooltip-event" aria-label="<?php echo $langs->trans('PermissionDenied'); ?>" value="<?php echo $related_task->id ?>">
-														<i class="fas fa-pencil-alt button-icon"></i>
-													</div>
-												<?php endif; ?>
-												<?php if ($permissiontodelete) : ?>
-													<div class="riskassessment-task-delete wpeo-button button-square-50 button-transparent">
-														<i class="fas fa-trash button-icon"></i>
-													</div>
-												<?php endif; ?>
-											</div>
+<!--											<div class="riskassessment-task-actions wpeo-gridlayout grid-2 grid-gap-0">-->
+<!--												--><?php //if ($permissiontoadd) : ?>
+<!--													<div class="riskassessment-task-edit wpeo-button button-square-50 button-grey modal-open" value="--><?php //echo $related_task->id ?><!--">-->
+<!--														<i class="fas fa-pencil-alt button-icon"></i>-->
+<!--													</div>-->
+<!--												--><?php //else : ?>
+<!--													<div class="wpeo-button button-square-50 button-grey wpeo-tooltip-event" aria-label="--><?php //echo $langs->trans('PermissionDenied'); ?><!--" value="--><?php //echo $related_task->id ?><!--">-->
+<!--														<i class="fas fa-pencil-alt button-icon"></i>-->
+<!--													</div>-->
+<!--												--><?php //endif; ?>
+<!--												--><?php //if ($permissiontodelete) : ?>
+<!--													<div class="riskassessment-task-delete wpeo-button button-square-50 button-transparent">-->
+<!--														<i class="fas fa-trash button-icon"></i>-->
+<!--													</div>-->
+<!--												--><?php //endif; ?>
+<!--											</div>-->
 										</div>
 										<!-- RISK ASSESSMENT TASK EDIT MODAL-->
 										<div class="riskassessment-task-edit-modal">
@@ -300,6 +300,7 @@ $related_tasks = $risk->get_related_tasks($risk); ?>
 											</div>
 										</div>
 									</li>
+									<hr>
 								</ul>
 							</div>
 						<?php endforeach; ?>
