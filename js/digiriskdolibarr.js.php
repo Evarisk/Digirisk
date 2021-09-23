@@ -836,13 +836,9 @@ window.eoxiaJS.signature.event = function() {
 window.eoxiaJS.signature.modalSignatureOpened = function( triggeredElement ) {
 	window.eoxiaJS.signature.buttonSignature = triggeredElement;
 
-	console.log(triggeredElement.attr('value'));
-
 	var ratio =  Math.max( window.devicePixelRatio || 1, 1 );
 
 	window.eoxiaJS.signature.canvas = document.querySelector('#modal-signature' + triggeredElement.attr('value') + ' canvas' );
-
-	console.log(window.eoxiaJS.signature.canvas);
 
 	window.eoxiaJS.signature.canvas.signaturePad = new SignaturePad( window.eoxiaJS.signature.canvas, {
 		penColor: "rgb(0, 0, 0)"
@@ -854,7 +850,6 @@ window.eoxiaJS.signature.modalSignatureOpened = function( triggeredElement ) {
 	window.eoxiaJS.signature.canvas.signaturePad.clear();
 
 	var signature_data = jQuery( '#signature_data' + triggeredElement.attr('value') ).val();
-	console.log(signature_data);
 	window.eoxiaJS.signature.canvas.signaturePad.fromDataURL(signature_data);
 };
 
@@ -899,7 +894,6 @@ window.eoxiaJS.signature.createSignature = function() {
             } else {
                 window.location.replace(elementRedirect);
             }
-
 		},
 		error: function ( ) {
 		    alert('Error')
@@ -917,7 +911,6 @@ window.eoxiaJS.signature.download = function(fileUrl, filename) {
 window.eoxiaJS.signature.autoDownloadSpecimen = function( event ) {
     let element = $(this).closest('.file-generation')
 	let url = document.URL + '&action=builddoc'
-
     $.ajax({
         url: url,
         type: "POST",
@@ -939,7 +932,6 @@ window.eoxiaJS.signature.autoDownloadSpecimen = function( event ) {
         }
     });
 };
-
 
 /**
  * Initialise l'objet "photo" ainsi que la méthode "init" obligatoire pour la bibliothèque EoxiaJS.
@@ -1030,7 +1022,7 @@ window.eoxiaJS.photo.sendPhoto = function( event ) {
 	let formdata = new FormData();
     let elementParent = $(this).closest('.modal-container').find('.ecm-photo-list-content');
 	let modalID = $(this).closest('.risk-evaluation-photo').attr('value')
-	
+
 	$.each(files, function(index, file) {
 		formdata.append("userfile[]", file);
 	})
