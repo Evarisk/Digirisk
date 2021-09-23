@@ -279,7 +279,7 @@ class doc_listingrisksaction_odt extends ModeleODTListingRisksAction
 					if (preg_match('/logo$/', $key)) // Image
 					{
 						if (file_exists($value)) $odfHandler->setImage($key, $value);
-						else $odfHandler->setVars($key, 'ErrorFileNotFound', true, 'UTF-8');
+						else $odfHandler->setVars($key, $langs->transnoentities('ErrorFileNotFound'), true, 'UTF-8');
 					}
 					else    // Text
 					{
@@ -374,8 +374,7 @@ class doc_listingrisksaction_odt extends ModeleODTListingRisksAction
 								$odfHandler->mergeSegment($listlines);
 							}
 						}
-					}
-					else {
+					} else {
 						$risks = $risk->fetchRisksOrderedByCotation(0, true);
 						if ($risks > 0 && !empty($risks)) {
 							for ($i = 1; $i <= 4; $i++ ) {
@@ -422,6 +421,7 @@ class doc_listingrisksaction_odt extends ModeleODTListingRisksAction
 											// Call the ODTSubstitutionLine hook
 											$parameters = array('odfHandler' => &$odfHandler, 'file' => $file, 'object' => $object, 'outputlangs' => $outputlangs, 'substitutionarray' => &$tmparray, 'line' => $line);
 											$reshook = $hookmanager->executeHooks('ODTSubstitutionLine', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
+
 											foreach ($tmparray as $key => $val) {
 												try {
 													if ($val == $tmparray['nomDanger']) {

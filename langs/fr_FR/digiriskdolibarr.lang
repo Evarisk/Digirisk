@@ -929,3 +929,4 @@ AT = au
 
 ModalAddPhoto = Ajout Photo
 SendEmailAt = Envoi de l'email à
+ErrorFileNotFound = Aucun logo de la société renseigné
