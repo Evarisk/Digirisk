@@ -509,7 +509,7 @@ class doc_riskassessmentdocument_odt extends ModeleODTRiskAssessmentDocument
 											if ($related_task->progress == 100) {
 												$tmparray['actionPreventionCompleted'] .= dol_print_date($related_task->date_c, 'dayhourreduceformat', 'tzuser') . "\n" . $AllInitiales . "\n" .$related_task->label . "\n";
 											} else {
-												$tmparray['actionPreventionUncompleted'] .= dol_print_date($related_task->date_c, 'dayhourreduceformat', 'tzuser') . ' - '. $langs->trans('Progress') . ' : ' . ($related_task->progress ?: 0) . '%' . "\n" . $AllInitiales . "\n" .$related_task->label . "\n";
+												$tmparray['actionPreventionUncompleted'] .= dol_print_date($related_task->date_c, 'dayhourreduceformat', 'tzuser') . ' - '. $langs->trans('DigiriskProgress') . ' : ' . ($related_task->progress ?: 0) . '%' . "\n" . $AllInitiales . "\n" .$related_task->label . "\n";
 											}
 										}
 									} else {
