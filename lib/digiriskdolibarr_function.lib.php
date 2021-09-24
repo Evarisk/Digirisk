@@ -606,7 +606,7 @@ function digiriskHeader($head = '', $title = '', $help_url = '', $target = '', $
 	//Body navigation digirisk
 	$object  = new DigiriskElement($db);
 	if ($conf->global->DIGIRISKDOLIBARR_SHOW_HIDDEN_DIGIRISKELEMENT) {
-		$objects = $object->fetchAll('',  '',  0,  0);
+		$objects = $object->fetchAll('',  'ref',  0,  0);
 	} else {
 		$objects = $object->fetchAll('',  '',  0,  0, array('customsql' => 'status > 0'));
 	}
