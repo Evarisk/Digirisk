@@ -749,6 +749,7 @@ HowToSetMultipleRiskAssessmentMethod = Pour configurer l'utilisation multiple de
 NoFileLinked = Pas de photo liée
 AddRiskAssessment = Ajouter une évaluation du risque
 AddRiskAssessmentTask = Ajouter une tâche au risque
+ListRiskAssessmentTask = Liste des tâches du risque
 
 
 
@@ -810,7 +811,6 @@ DeleteTask = Êtes-vous sûr(e) de vouloir supprimer la tâche
 DigiriskTaskData = Donnée configurable des tâches
 TaskManagementDescription = Activer la gestion des tâches
 TaskManagementNotActivated = Veuillez activer la gestion des tâches dans Configuration du module / Analyse des risques / Tâche
-
 
 
 #
