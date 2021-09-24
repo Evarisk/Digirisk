@@ -261,7 +261,7 @@ function digiriskshowdocuments($modulepart, $modulesubdir, $filedir, $urlsource,
 	$file_list = null;
 	if (!empty($filedir))
 	{
-		$file_list = dol_dir_list($filedir, 'files', 0, '', '(\.meta|_preview.*.*\.png)$', 'date', SORT_DESC);
+		$file_list = dol_dir_list($filedir, 'files', 0, '', '', 'date', SORT_ASC, 1);
 	}
 	if ($hideifempty && empty($file_list)) return '';
 
