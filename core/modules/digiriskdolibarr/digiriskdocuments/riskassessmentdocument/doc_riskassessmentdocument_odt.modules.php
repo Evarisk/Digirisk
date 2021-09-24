@@ -287,6 +287,11 @@ class doc_riskassessmentdocument_odt extends ModeleODTRiskAssessmentDocument
 							$odfHandler->setVars($key, $langs->trans('NoData'), true, 'UTF-8');
 						} else {
 							$odfHandler->setVars($key, $value, true, 'UTF-8');
+							if (preg_match('/&#39;/', $value)) {
+
+								$value = str_replace("&#39;","'",$value);
+							}
+							$odfHandler->setVars($key, $langs->convToOutputCharset($value), true, 'UTF-8');
 						}
 					}
 				}
