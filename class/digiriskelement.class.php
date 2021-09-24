@@ -355,6 +355,29 @@ class DigiriskElement extends CommonObject
 		}
 	}
 
+	public function getRiskAssessmentCategoriesNumber() {
+		$riskassessment = new RiskAssessment($this->db);
+		$risk = new Risk($this->db);
+		$risks = $risk->fetchFromParent($this->id);
+		$scale_counter = array(
+			1 => 0,
+			2 => 0,
+			3 => 0,
+			4 => 0
+		);
+
+		foreach ($risks as $risk) {
+			$riskassessment = $riskassessment->fetchFromParent($risk->id, 1);
+			if (!empty($riskassessment) && $riskassessment > 0) {
+				$riskassessment = array_shift($riskassessment);
+				$scale = $riskassessment->get_evaluation_scale();
+				$scale_counter[$scale] += 1;
+			}
+
+		}
+		return $scale_counter;
+	}
+
 	/**
 	 *  Output html form to select a third party.
 	 *  Note, you must use the select_company to get the component to select a third party. This function must only be called by select_company.
