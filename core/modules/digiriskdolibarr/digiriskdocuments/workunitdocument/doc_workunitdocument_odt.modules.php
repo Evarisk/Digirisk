@@ -318,6 +318,9 @@ class doc_workunitdocument_odt extends ModeleODTWorkUnitDocument
 								$listlines = $odfHandler->setSegment('risq' . $i);
 
 								foreach ($risks as $line) {
+									$tmparray['actionPreventionUncompleted'] = "";
+									$tmparray['actionPreventionCompleted'] = "";
+
 									$evaluation = new RiskAssessment($this->db);
 									$lastEvaluation = $evaluation->fetchFromParent($line->id, 1);
 
@@ -330,6 +333,21 @@ class doc_workunitdocument_odt extends ModeleODTWorkUnitDocument
 										$tmparray['identifiantRisque'] = $line->ref . ' - ' . $lastEvaluation->ref;
 										$tmparray['quotationRisque'] = $lastEvaluation->cotation ? $lastEvaluation->cotation : '0';
 										$tmparray['commentaireRisque'] = dol_print_date($lastEvaluation->date_creation, 'dayhoursec', 'tzuser') . ': ' . $lastEvaluation->comment;
+
+										$related_tasks = $line->get_related_tasks($line);
+
+										if (!empty($related_tasks)) {
+											foreach ($related_tasks as $related_task) {
+												if ($related_task->progress == 100) {
+													$tmparray['actionPreventionCompleted'] .= dol_print_date($related_task->date_c, 'dayhoursec', 'tzuser') . ': ' . $related_task->label . "\n";
+												} else {
+													$tmparray['actionPreventionUncompleted'] .= dol_print_date($related_task->date_c, 'dayhoursec', 'tzuser') . ': ' . $related_task->label . ' ' . ($related_task->progress ?: 0) . '%' . "\n";
+												}
+											}
+										} else {
+											$tmparray['actionPreventionUncompleted'] = "";
+											$tmparray['actionPreventionCompleted'] = "";
+										}
 
 										unset($tmparray['object_fields']);
 
