@@ -413,7 +413,7 @@ function digiriskshowdocuments($modulepart, $modulesubdir, $filedir, $urlsource,
 	if (!empty($filedir))
 	{
 		$link_list = array();
-		if (is_object($object))
+		if (is_object($object) && $object->id > 0)
 		{
 			require_once DOL_DOCUMENT_ROOT.'/core/class/link.class.php';
 			$link = new Link($db);
@@ -502,25 +502,25 @@ function digiriskshowdocuments($modulepart, $modulesubdir, $filedir, $urlsource,
 			}
 		}
 		// Loop on each link found
-		if (is_array($link_list))
-		{
-			$colspan = 2;
-
-			foreach ($link_list as $file)
-			{
-				$out .= '<tr class="oddeven">';
-				$out .= '<td colspan="'.$colspan.'" class="maxwidhtonsmartphone">';
-				$out .= '<a data-ajax="false" href="'.$file->url.'" target="_blank">';
-				$out .= $file->label;
-				$out .= '</a>';
-				$out .= '</td>';
-				$out .= '<td class="right">';
-				$out .= dol_print_date($file->datea, 'dayhour');
-				$out .= '</td>';
-				if ($delallowed || $printer || $morepicto) $out .= '<td></td>';
-				$out .= '</tr>'."\n";
-			}
-		}
+//		if (is_array($link_list))
+//		{
+//			$colspan = 2;
+//
+//			foreach ($link_list as $file)
+//			{
+//				$out .= '<tr class="oddeven">';
+//				$out .= '<td colspan="'.$colspan.'" class="maxwidhtonsmartphone">';
+//				$out .= '<a data-ajax="false" href="'.$file->url.'" target="_blank">';
+//				$out .= $file->label;
+//				$out .= '</a>';
+//				$out .= '</td>';
+//				$out .= '<td class="right">';
+//				$out .= dol_print_date($file->datea, 'dayhour');
+//				$out .= '</td>';
+//				if ($delallowed || $printer || $morepicto) $out .= '<td></td>';
+//				$out .= '</tr>'."\n";
+//			}
+//		}
 
 		if (count($file_list) == 0 && count($link_list) == 0 && $headershown)
 		{
