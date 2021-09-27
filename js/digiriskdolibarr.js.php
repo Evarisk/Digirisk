@@ -1156,12 +1156,16 @@ window.eoxiaJS.risk.createRisk = function ( event ) {
 
 	let evaluationText = elementEvaluation.find('.risk-evaluation-comment textarea').val()
 	let riskCommentText = elementRisk.find('.risk-description textarea').val()
+	let taskText = elementTask.find('input').val()
 
 	if (evaluationText.match(/"/)) {
 		evaluationText = evaluationText.split(/"/).join('')
 	}
 	if (riskCommentText.match(/"/)) {
 		riskCommentText = riskCommentText.split(/"/).join('')
+	}
+	if (taskText.match(/"/)) {
+		taskText = taskText.split(/"/).join('')
 	}
 
 	var category = elementRisk.find('.risk-category input').val();
@@ -1207,7 +1211,7 @@ window.eoxiaJS.risk.createRisk = function ( event ) {
 		commentPost = '&evaluationComment=' + encodeURI(comment);
 	}
 
-	var task = elementTask.find('input').val();
+	var task = taskText;
 	var taskPost = '';
 	if (task !== '') {
 		taskPost = '&tasktitle=' + encodeURI(task);
