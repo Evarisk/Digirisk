@@ -95,7 +95,7 @@ $related_tasks = $risk->get_related_tasks($risk); ?>
 			<?php endif; ?>
 			<?php if ($permissiontoread) : ?>
 				<div class="riskassessment-task-list wpeo-button button-square-40 button-primary wpeo-tooltip-event modal-open" aria-label="<?php echo $langs->trans('ListRiskAssessmentTask') ?>" value="<?php echo $risk->id;?>">
-					<i class="fas fa-list button-icon"></i>
+					<i class="fas fa-list button-icon"> <?php echo count($related_tasks); ?></i>
 				</div>
 			<?php else : ?>
 				<div class="wpeo-button button-square-40 button-grey wpeo-tooltip-event" aria-label="<?php echo $langs->trans('PermissionDenied') ?>" value="<?php echo $risk->id;?>">
