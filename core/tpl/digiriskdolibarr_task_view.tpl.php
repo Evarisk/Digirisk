@@ -244,7 +244,7 @@ $related_tasks = $risk->get_related_tasks($risk); ?>
 																<?php $user->fetch($related_task->fk_user_creat); ?>
 																<?php echo getNomUrl( 0, '', 0, 0, 2 ,0,'','',-1,$user); ?>
 															</span>
-															<?php echo dol_trunc($related_task->label); ?>
+															<?php echo $related_task->label; ?>
 														</div>
 													</div>
 												</div>
