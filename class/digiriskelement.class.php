@@ -356,7 +356,6 @@ class DigiriskElement extends CommonObject
 	}
 
 	public function getRiskAssessmentCategoriesNumber() {
-		$riskassessment = new RiskAssessment($this->db);
 		$risk = new Risk($this->db);
 		$risks = $risk->fetchFromParent($this->id);
 		$scale_counter = array(
@@ -365,16 +364,18 @@ class DigiriskElement extends CommonObject
 			3 => 0,
 			4 => 0
 		);
-
-		foreach ($risks as $risk) {
-			$riskassessment = $riskassessment->fetchFromParent($risk->id, 1);
-			if (!empty($riskassessment) && $riskassessment > 0) {
-				$riskassessment = array_shift($riskassessment);
-				$scale = $riskassessment->get_evaluation_scale();
-				$scale_counter[$scale] += 1;
+		if(!empty($risks) && $risks > 0) {
+			foreach ($risks as $risk) {
+				$riskassessment = new RiskAssessment($this->db);
+				$riskassessment = $riskassessment->fetchFromParent($risk->id, 1);
+				if (!empty($riskassessment) && $riskassessment > 0) {
+					$riskassessment = array_shift($riskassessment);
+					$scale = $riskassessment->get_evaluation_scale();
+					$scale_counter[$scale] += 1;
+				}
 			}
-
 		}
+
 		return $scale_counter;
 	}
 
