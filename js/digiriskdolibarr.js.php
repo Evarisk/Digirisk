@@ -1163,14 +1163,16 @@ window.eoxiaJS.risk.createRisk = function ( event ) {
 			evaluationText = evaluationText.split(/"/).join('')
 		}
 	}
-
-	if (riskCommentText.match(/"/)) {
-		riskCommentText = riskCommentText.split(/"/).join('')
+	if (typeof riskCommentText == 'string') {
+		if (riskCommentText.match(/"/)) {
+			riskCommentText = riskCommentText.split(/"/).join('')
+		}
 	}
-	if (taskText.match(/"/)) {
-		taskText = taskText.split(/"/).join('')
+	if (typeof taskText == 'string') {
+		if (taskText.match(/"/)) {
+			taskText = taskText.split(/"/).join('')
+		}
 	}
-
 	var category = elementRisk.find('.risk-category input').val();
 	var categoryPost = '';
 	if (category !== 0) {
