@@ -1154,13 +1154,23 @@ window.eoxiaJS.risk.createRisk = function ( event ) {
 	let actionContainerSuccess = $('.messageSuccessRiskCreate');
 	let actionContainerError = $('.messageErrorRiskCreate');
 
+	let evaluationText = elementEvaluation.find('.risk-evaluation-comment textarea').val()
+	let riskCommentText = elementRisk.find('.risk-description textarea').val()
+
+	if (evaluationText.match(/"/)) {
+		evaluationText = evaluationText.split(/"/).join('')
+	}
+	if (riskCommentText.match(/"/)) {
+		riskCommentText = riskCommentText.split(/"/).join('')
+	}
+
 	var category = elementRisk.find('.risk-category input').val();
 	var categoryPost = '';
 	if (category !== 0) {
 		categoryPost = '&category=' + category;
 	}
 
-	var description = elementRisk.find('.risk-description textarea').val();
+	var description = riskCommentText;
 	var descriptionPost = '';
 	if (description !== '') {
 		descriptionPost = '&riskComment=' + encodeURI(description);
@@ -1191,7 +1201,7 @@ window.eoxiaJS.risk.createRisk = function ( event ) {
 		photoPost = '&photo=' + encodeURI(photo);
 	}
 
-	var comment = elementEvaluation.find('.risk-evaluation-comment textarea').val();
+	var comment = evaluationText;
 	var commentPost = '';
 	if (comment !== '') {
 		commentPost = '&evaluationComment=' + encodeURI(comment);
