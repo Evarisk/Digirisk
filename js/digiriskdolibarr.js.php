@@ -1138,7 +1138,14 @@ window.eoxiaJS.risk.haveDataInInput = function( elementParent ) {
 		}
 	}
 };
-
+window.eoxiaJS.risk.sanitizeBeforeRequest = function ( text ) {
+	if (typeof text == 'string') {
+		if (text.match(/"/)) {
+			return text.split(/"/).join('')
+		}
+	}
+	return text
+}
 /**
  * Action create risk.
  *
@@ -1158,21 +1165,10 @@ window.eoxiaJS.risk.createRisk = function ( event ) {
 	let riskCommentText = elementRisk.find('.risk-description textarea').val()
 	let taskText = elementTask.find('input').val()
 
-	if (typeof evaluationText == 'string') {
-		if (evaluationText.match(/"/)) {
-			evaluationText = evaluationText.split(/"/).join('')
-		}
-	}
-	if (typeof riskCommentText == 'string') {
-		if (riskCommentText.match(/"/)) {
-			riskCommentText = riskCommentText.split(/"/).join('')
-		}
-	}
-	if (typeof taskText == 'string') {
-		if (taskText.match(/"/)) {
-			taskText = taskText.split(/"/).join('')
-		}
-	}
+	evaluationText = window.eoxiaJS.risk.sanitizeBeforeRequest(evaluationText)
+	riskCommentText = window.eoxiaJS.risk.sanitizeBeforeRequest(riskCommentText)
+	taskText = window.eoxiaJS.risk.sanitizeBeforeRequest(taskText)
+
 	var category = elementRisk.find('.risk-category input').val();
 	var categoryPost = '';
 	if (category !== 0) {
@@ -1294,13 +1290,17 @@ window.eoxiaJS.risk.saveRisk = function ( event ) {
 	let actionContainerSuccess = $('.messageSuccessRiskEdit');
 	let actionContainerError = $('.messageErrorRiskEdit');
 
+	let riskCommentText = elementRisk.find('.risk-description textarea').val()
+
+	riskCommentText = window.eoxiaJS.risk.sanitizeBeforeRequest(riskCommentText)
+
 	var category = elementRisk.find('.risk-category input').val();
 	var categoryPost = '';
 	if (category !== 0) {
 		categoryPost = '&riskCategory=' + category;
 	}
 
-	var description = elementRisk.find('.risk-description textarea').val();
+	var description = riskCommentText;
 	var descriptionPost = '';
 	if (description !== '') {
 		descriptionPost = '&riskComment=' + encodeURI(description);
@@ -1470,6 +1470,10 @@ window.eoxiaJS.evaluation.createEvaluation = function ( event ) {
 	let actionContainerSuccess = $('.messageSuccessEvaluationCreate');
 	let actionContainerError = $('.messageErrorEvaluationCreate');
 
+	let evaluationText = single.find('.risk-evaluation-comment textarea').val()
+
+	evaluationText = window.eoxiaJS.risk.sanitizeBeforeRequest(evaluationText)
+
 	var riskToAssignPost = '';
 	if (riskToAssign !== '') {
 		riskToAssignPost = '&riskToAssign=' + riskToAssign;
@@ -1487,7 +1491,7 @@ window.eoxiaJS.evaluation.createEvaluation = function ( event ) {
 		cotationPost = '&cotation=' + cotation;
 	}
 
-	var comment = single.find('.risk-evaluation-comment textarea').val();
+	var comment = evaluationText
 	var commentPost = '';
 	if (comment !== '') {
 		commentPost = '&evaluationComment=' + encodeURI(comment);
@@ -1614,6 +1618,9 @@ window.eoxiaJS.evaluation.saveEvaluation = function ( event ) {
 	let actionContainerSuccess = $('.messageSuccessEvaluationEdit');
 	let actionContainerError = $('.messageErrorEvaluationEdit');
 	//let riskId = $(this).closest('.risk-evaluation-container').attr('value')
+	let evaluationText = element.find('.risk-evaluation-comment textarea').val()
+
+	evaluationText = window.eoxiaJS.risk.sanitizeBeforeRequest(evaluationText)
 
 	var method = element.find('.risk-evaluation-method').val();
 	var methodPost = '';
@@ -1627,7 +1634,7 @@ window.eoxiaJS.evaluation.saveEvaluation = function ( event ) {
 		cotationPost = '&cotation=' + cotation;
 	}
 
-	var comment = element.find('.risk-evaluation-comment textarea').val();
+	var comment = evaluationText;
 	var commentPost = '';
 	if (comment !== '') {
 		commentPost = '&evaluationComment=' + encodeURI(comment);
@@ -1848,12 +1855,17 @@ window.eoxiaJS.riskassessmenttask.createRiskAssessmentTask = function ( event ) 
 	let actionContainerSuccess = $('.messageSuccessTaskCreate');
 	let actionContainerError = $('.messageErrorTaskCreate');
     let elementToRefresh = $(this).closest('.riskassessment-tasks');
+
+	let taskText = single.find('.riskassessment-task-label').val()
+
+	taskText = window.eoxiaJS.risk.sanitizeBeforeRequest(taskText)
+
 	var riskToAssignPost = '';
 	if (riskToAssign !== '') {
 		riskToAssignPost = '&riskToAssign=' + riskToAssign;
 	}
 
-	var task = single.find('.riskassessment-task-label').val();
+	var task = taskText;
 	var taskPost = '';
 	if (task !== '') {
 		taskPost = '&tasktitle=' + encodeURI(task);
@@ -1958,7 +1970,11 @@ window.eoxiaJS.riskassessmenttask.saveRiskAssessmentTask = function ( event ) {
     let riskId = element.attr('value');
     let textToShow = '';
 
-	var task = elementRiskAssessmentTask.find('.riskassessment-task-label' + editedRiskAssessmentTaskId).val();
+	let taskText = elementRiskAssessmentTask.find('.riskassessment-task-label' + editedRiskAssessmentTaskId).val()
+
+	taskText = window.eoxiaJS.risk.sanitizeBeforeRequest(taskText)
+
+	var task = taskText
 	var taskPost = '';
 	if (task !== '') {
 		taskPost = '&tasktitle=' + encodeURI(task);
