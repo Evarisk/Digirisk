@@ -1158,9 +1158,12 @@ window.eoxiaJS.risk.createRisk = function ( event ) {
 	let riskCommentText = elementRisk.find('.risk-description textarea').val()
 	let taskText = elementTask.find('input').val()
 
-	if (evaluationText.match(/"/)) {
-		evaluationText = evaluationText.split(/"/).join('')
+	if (typeof evaluationText == 'string') {
+		if (evaluationText.match(/"/)) {
+			evaluationText = evaluationText.split(/"/).join('')
+		}
 	}
+
 	if (riskCommentText.match(/"/)) {
 		riskCommentText = riskCommentText.split(/"/).join('')
 	}
