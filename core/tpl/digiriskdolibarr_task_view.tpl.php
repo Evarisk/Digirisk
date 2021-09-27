@@ -6,8 +6,8 @@ $related_tasks = $risk->get_related_tasks($risk); ?>
 			<?php foreach ($related_tasks as $related_task) : ?>
 				<?php if ($related_task->progress < 100) : ?>
 					<div class="table-cell riskassessment-task-container riskassessment-task-container-<?php echo $related_task->id ?>" value="<?php echo $related_task->ref ?>">
-					<input type="hidden" class="labelForDelete" value="<?php echo $langs->trans('DeleteTask') . ' ' . $related_task->ref . ' ?'; ?>">
-					<div class="riskassessment-task-single-content riskassessment-task-single-content-<?php echo $risk->id ?>">
+						<input type="hidden" class="labelForDelete" value="<?php echo $langs->trans('DeleteTask') . ' ' . $related_task->ref . ' ?'; ?>">
+						<div class="riskassessment-task-single-content riskassessment-task-single-content-<?php echo $risk->id ?>">
 						<div class="riskassessment-task-single riskassessment-task-single-<?php echo $related_task->id ?>   wpeo-table table-row">
 							<div class="riskassessment-task-content table-cell">
 								<div class="riskassessment-task-data">
@@ -78,7 +78,29 @@ $related_tasks = $risk->get_related_tasks($risk); ?>
 						</div>
 						<!-- RISK ASSESSMENT TASK EDIT MODAL END -->
 					</div>
-				</div>
+					</div>
+				<?php elseif (count($related_tasks) == 1) : ?>
+					<div class="riskassessment-task-container riskassessment-no-task">
+						<div class="riskassessment-task-single-content riskassessment-task-single-content-<?php echo $risk->id ?>">
+							<div class="riskassessment-task-single riskassessment-task-single-<?php echo $risk->id ?>">
+								<div class="riskassessment-task-content">
+									<div class="riskassessment-task-data">
+										<span class="name"><?php echo $langs->trans('NoTaskLinked'); ?></span>
+									</div>
+								</div>
+								<!-- BUTTON MODAL RISK ASSESSMENT TASK ADD  -->
+								<?php if ($permissiontoadd) : ?>
+									<div class="riskassessment-task-add wpeo-button button-square-50 button-primary wpeo-tooltip-event modal-open" aria-label="<?php echo $langs->trans('AddRiskAssessmentTask') ?>" value="<?php echo $risk->id;?>">
+										<i class="fas fa-plus button-icon"></i>
+									</div>
+								<?php else : ?>
+									<div class="wpeo-button button-square-50 button-grey wpeo-tooltip-event" aria-label="<?php echo $langs->trans('PermissionDenied') ?>" value="<?php echo $risk->id;?>">
+										<i class="fas fa-plus button-icon"></i>
+									</div>
+								<?php endif; ?>
+							</div>
+						</div>
+					</div>
 				<?php endif; ?>
 			<?php endforeach; ?>
 		</div>

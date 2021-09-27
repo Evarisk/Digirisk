@@ -14,6 +14,7 @@
 .riskassessment-tasks {
   display: flex;
   flex-wrap: nowrap;
+  align-items: center;
 
   .riskassessment-task-container {
     flex-grow: 1;

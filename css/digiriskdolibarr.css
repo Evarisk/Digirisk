@@ -2391,6 +2391,9 @@
   display: flex;
   -ms-flex-wrap: nowrap;
   flex-wrap: nowrap;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
 }
 .riskassessment-tasks .riskassessment-task-container {
   -webkit-box-flex: 1;
