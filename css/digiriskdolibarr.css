@@ -2400,7 +2400,7 @@
 .riskassessment-tasks .riskassessment-task-add-wrapper {
   min-width: calc(40px + 0.5em);
   margin: auto 0;
-  text-align: right;
+  text-align: center;
 }
 
 .riskassessment-task-listing-wrapper .riskassessment-task-container {
@@ -2881,6 +2881,18 @@
 }
 .riskassessment-task-container .riskassessment-task-single .riskassessment-task-delete {
   margin-right: -0.5em;
+}
+
+.riskassessment-task-listing-wrapper {
+  width: 100%;
+}
+
+.riskassessment-task-add {
+  margin: 5px;
+}
+
+.riskassessment-task-list {
+  margin: 5px;
 }
 
 td > .risk-evaluation-container {
