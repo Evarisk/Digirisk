@@ -434,34 +434,39 @@ class doc_riskassessmentdocument_odt extends ModeleODTRiskAssessmentDocument
 									$tmparray['commentaireRisque'] = dol_print_date( $lastEvaluation->date_creation, 'dayhoursec', 'tzuser') . ': ' . $lastEvaluation->comment;
 
 									$related_tasks = $line->get_related_tasks($line);
-									$contact = new Contact($this->db);
+									$user = new User($this->db);
 
 									if (!empty($related_tasks) && is_array($related_tasks)) {
 										foreach ($related_tasks as $related_task) {
 											$related_task_contact_ids = $related_task->getListContactId();
 											if (!empty($related_task_contact_ids) && is_array($related_task_contact_ids)) {
 												foreach ($related_task_contact_ids as $related_task_contact_id) {
-													$contact->fetch($related_task_contact_id);
-													$contact_array[$related_task_contact_id] = $contact;
+													$user->fetch($related_task_contact_id);
+													$contact_array[$related_task_contact_id] = $user;
 												}
 											}
-										}
-									}
-
-									$AllInitiales = '';
-									if (!empty($contact_array) && is_array($contact_array)) {
-										foreach ($contact_array as $contact_array_single) {
-											$initiales = '';
-											if (dol_strlen($contact_array_single->firstname)) {
-												$initiales .= str_split($contact_array_single->firstname, 1)[0];
+											$AllInitiales = '';
+											if (!empty($contact_array) && is_array($contact_array)) {
+												foreach ($contact_array as $contact_array_single) {
+													$initiales = '';
+													if (dol_strlen($contact_array_single->firstname)) {
+														$initiales .= str_split($contact_array_single->firstname, 1)[0];
+													}
+													if (dol_strlen($contact_array_single->lastname)) {
+														$initiales .= str_split($contact_array_single->lastname, 1)[0];
+													}
+													$AllInitiales .= strtoupper($initiales) . ',';
+												}
 											}
-											if (dol_strlen($contact_array_single->lastname)) {
-												$initiales .= str_split($contact_array_single->lastname, 1)[0];
+											if ($related_task->progress == 100) {
+												$tmparray['actionPreventionCompleted'] .= dol_print_date($related_task->date_c, 'dayhourreduceformat', 'tzuser') . "\n" . ' '. $langs->trans('Contacts') . ' : ' . ($AllInitiales ?: $langs->trans('NoData')) . "\n" .$related_task->label . "\n\n";
+											} else {
+												$tmparray['actionPreventionUncompleted'] .= dol_print_date($related_task->date_c, 'dayhourreduceformat', 'tzuser') . ' - '. $langs->trans('DigiriskProgress') . ' : ' . ($related_task->progress ?: 0) . '%' . ' '. $langs->trans('Contacts') . ' : ' . ($AllInitiales ?: $langs->trans('NoData')) . "\n" .$related_task->label . "\n\n";
 											}
-											$AllInitiales .= strtoupper($initiales) . ',';
 										}
-
-
+									} else {
+										$tmparray['actionPreventionUncompleted'] = "";
+										$tmparray['actionPreventionCompleted'] = "";
 									}
 
 //									$listTask = $odfHandler->setSegment('UncompletedAction' . $i);
@@ -503,19 +508,6 @@ class doc_riskassessmentdocument_odt extends ModeleODTRiskAssessmentDocument
 //										$tmparray['actionPreventionCompletedContact'] = "";
 //										$tmparray['actionPreventionCompletedlabel'] = "";
 //									}
-
-									if (!empty($related_tasks)) {
-										foreach ($related_tasks as $related_task) {
-											if ($related_task->progress == 100) {
-												$tmparray['actionPreventionCompleted'] .= dol_print_date($related_task->date_c, 'dayhourreduceformat', 'tzuser') . "\n" . $AllInitiales . "\n" .$related_task->label . "\n";
-											} else {
-												$tmparray['actionPreventionUncompleted'] .= dol_print_date($related_task->date_c, 'dayhourreduceformat', 'tzuser') . ' - '. $langs->trans('DigiriskProgress') . ' : ' . ($related_task->progress ?: 0) . '%' . "\n" . $AllInitiales . "\n" .$related_task->label . "\n";
-											}
-										}
-									} else {
-										$tmparray['actionPreventionUncompleted'] = "";
-										$tmparray['actionPreventionCompleted'] = "";
-									}
 
 									unset($tmparray['object_fields']);
 
