@@ -204,27 +204,30 @@ if ($action == 'send') {
 			if ($mailfile->error) {
 				setEventMessages($mailfile->error, $mailfile->errors, 'errors');
 			} else {
-				$result = $mailfile->sendfile();
-				if ($result) {
-					$signatory->last_email_sent_date = dol_now('tzuser');
-					$signatory->update($user, true);
-					$signatory->setPendingSignature($user, false);
-					setEventMessages($langs->trans('SendEmailAt').' '.$signatory->email,array());
-					// This avoid sending mail twice if going out and then back to page
-					header('Location: '.$_SERVER["PHP_SELF"].'?id='.$object->id);
-					exit;
-				} else {
-					$langs->load("other");
-					$mesg = '<div class="error">';
-					if ($mailfile->error) {
-						$mesg .= $langs->transnoentities('ErrorFailedToSendMail', dol_escape_htmltag($from), dol_escape_htmltag($sendto));
-						$mesg .= '<br>'.$mailfile->error;
+				if (!empty($conf->global->MAIN_MAIL_SMTPS_ID)) {
+					$result = $mailfile->sendfile();
+					if ($result) {
+						$signatory->last_email_sent_date = dol_now('tzuser');
+						$signatory->update($user, true);
+						$signatory->setPendingSignature($user, false);
+						setEventMessages($langs->trans('SendEmailAt').' '.$signatory->email,array());
+						// This avoid sending mail twice if going out and then back to page
+						header('Location: '.$_SERVER["PHP_SELF"].'?id='.$object->id);
+						exit;
 					} else {
-						$mesg .= $langs->transnoentities('ErrorFailedToSendMail', dol_escape_htmltag($from), dol_escape_htmltag($sendto));
+						$langs->load("other");
+						$mesg = '<div class="error">';
+						if ($mailfile->error) {
+							$mesg .= $langs->transnoentities('ErrorFailedToSendMail', dol_escape_htmltag($from), dol_escape_htmltag($sendto));
+							$mesg .= '<br>'.$mailfile->error;
+						} else {
+							$mesg .= $langs->transnoentities('ErrorFailedToSendMail', dol_escape_htmltag($from), dol_escape_htmltag($sendto));
+						}
+						$mesg .= '</div>';
+						setEventMessages($mesg, null, 'warnings');
 					}
-					$mesg .= '</div>';
-					setEventMessages($mesg, null, 'warnings');
-					header('Location: '.$_SERVER["PHP_SELF"].'?id='.$object->id);
+				} else {
+					setEventMessages($langs->trans('ErrorSetupEmail'), '', 'errors');
 				}
 			}
 		} else {
