@@ -80,6 +80,10 @@ if ($action == 'setmod') {
 	dolibarr_set_const($db, $constforval, $value, 'chaine', 0, '', $conf->entity);
 }
 
+if ($action == 'setmodPreventionPlanDet') {
+	$constforval = 'DIGIRISKDOLIBARR_'.strtoupper('preventionplandet')."_ADDON";
+	dolibarr_set_const($db, $constforval, $value, 'chaine', 0, '', $conf->entity);
+}
 
 /*
  * View
@@ -105,7 +109,7 @@ $head = digiriskdolibarrAdminDigiriskElementPrepareHead();
 print dol_get_fiche_head($head, 'preventionplan', '', -1, "digiriskdolibarr@digiriskdolibarr");
 
 /*
- *  Numbering module
+ *  Numbering module Prevention Plan
  */
 
 print load_fiche_titre($langs->trans("DigiriskPreventionPlanNumberingModule"), '', '');
@@ -179,6 +183,95 @@ if (is_dir($dir)) {
 						print '<td class="center">';
 						print $form->textwithpicto('', $htmltooltip, 1, 0);
 						if ($conf->global->DIGIRISKDOLIBARR_PREVENTIONPLAN_ADDON.'.php' == $file) { // If module is the one used, we show existing errors
+							if (!empty($module->error)) dol_htmloutput_mesg($module->error, '', 'error', 1);
+						}
+						print '</td>';
+						print "</tr>";
+					}
+				}
+			}
+		}
+		closedir($handle);
+	}
+}
+
+print '</table>';
+
+/*
+ *  Numbering module Prevention Plan Det
+ */
+
+print load_fiche_titre($langs->trans("DigiriskPreventionPlanDetNumberingModule"), '', '');
+
+print '<table class="noborder centpercent">';
+print '<tr class="liste_titre">';
+print '<td>'.$langs->trans("Name").'</td>';
+print '<td>'.$langs->trans("Description").'</td>';
+print '<td class="nowrap">'.$langs->trans("Example").'</td>';
+print '<td class="center">'.$langs->trans("Status").'</td>';
+print '<td class="center">'.$langs->trans("ShortInfo").'</td>';
+print '</tr>';
+
+clearstatcache();
+$dir = dol_buildpath("/custom/digiriskdolibarr/core/modules/digiriskdolibarr/digiriskelement/preventionplandet/");
+if (is_dir($dir)) {
+	$handle = opendir($dir);
+	if (is_resource($handle)) {
+		while (($file = readdir($handle)) !== false ) {
+			if (!is_dir($dir.$file) || (substr($file, 0, 1) <> '.' && substr($file, 0, 3) <> 'CVS')) {
+				$filebis = $file;
+
+				$classname = preg_replace('/\.php$/', '', $file);
+				$classname = preg_replace('/\-.*$/', '', $classname);
+
+				if (!class_exists($classname) && is_readable($dir.$filebis) && (preg_match('/mod_/', $filebis) || preg_match('/mod_/', $classname)) && substr($filebis, dol_strlen($filebis) - 3, 3) == 'php') {
+					// Charging the numbering class
+					require_once $dir.$filebis;
+
+					$module = new $classname($db);
+
+					if ($module->isEnabled()) {
+						print '<tr class="oddeven"><td>';
+						print $langs->trans($module->name);
+						print "</td><td>";
+						print $module->info();
+						print '</td>';
+
+						// Show example of numbering module
+						print '<td class="nowrap">';
+						$tmp = $module->getExample();
+						if (preg_match('/^Error/', $tmp)) print '<div class="error">'.$langs->trans($tmp).'</div>';
+						elseif ($tmp == 'NotConfigured') print $langs->trans($tmp);
+						else print $tmp;
+						print '</td>';
+
+						print '<td class="center">';
+						if ($conf->global->DIGIRISKDOLIBARR_PREVENTIONPLANDET_ADDON == $file || $conf->global->DIGIRISKDOLIBARR_PREVENTIONPLANDET_ADDON.'.php' == $file) {
+							print img_picto($langs->trans("Activated"), 'switch_on');
+						}
+						else {
+							print '<a class="reposition" href="'.$_SERVER["PHP_SELF"].'?action=setmodPreventionPlanDet&value='.preg_replace('/\.php$/', '', $file).'&scan_dir='.$module->scandir.'&label='.urlencode($module->name).'" alt="'.$langs->trans("Default").'">'.img_picto($langs->trans("Disabled"), 'switch_off').'</a>';
+						}
+						print '</td>';
+
+						// Example for listing risks action
+						$htmltooltip = '';
+						$htmltooltip .= ''.$langs->trans("Version").': <b>'.$module->getVersion().'</b><br>';
+						$nextval = $module->getNextValue($object_document);
+						if ("$nextval" != $langs->trans("NotAvailable")) {  // Keep " on nextval
+							$htmltooltip .= $langs->trans("NextValue").': ';
+							if ($nextval) {
+								if (preg_match('/^Error/', $nextval) || $nextval == 'NotConfigured')
+									$nextval = $langs->trans($nextval);
+								$htmltooltip .= $nextval.'<br>';
+							} else {
+								$htmltooltip .= $langs->trans($module->error).'<br>';
+							}
+						}
+
+						print '<td class="center">';
+						print $form->textwithpicto('', $htmltooltip, 1, 0);
+						if ($conf->global->DIGIRISKDOLIBARR_PREVENTIONPLANDET_ADDON.'.php' == $file) {  // If module is the one used, we show existing errors
 							if (!empty($module->error)) dol_htmloutput_mesg($module->error, '', 'error', 1);
 						}
 						print '</td>';
