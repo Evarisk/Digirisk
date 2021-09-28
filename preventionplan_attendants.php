@@ -224,6 +224,7 @@ if ($action == 'send') {
 					}
 					$mesg .= '</div>';
 					setEventMessages($mesg, null, 'warnings');
+					header('Location: '.$_SERVER["PHP_SELF"].'?id='.$object->id);
 				}
 			}
 		} else {
