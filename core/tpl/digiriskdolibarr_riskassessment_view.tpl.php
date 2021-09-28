@@ -514,7 +514,7 @@ $cotation->method = $lastEvaluation->method ? $lastEvaluation->method : "standar
 			<!-- Modal-Footer -->
 			<div class="modal-footer">
 				<?php if ($permissiontoadd) : ?>
-					<div class="risk-evaluation-create wpeo-button button-blue button-disable modal-close" value="<?php echo $risk->id ?>">
+					<div class="risk-evaluation-create wpeo-button button-blue button-disable" value="<?php echo $risk->id ?>">
 						<i class="fas fa-plus"></i> <?php echo $langs->trans('Add'); ?>
 					</div>
 				<?php else : ?>

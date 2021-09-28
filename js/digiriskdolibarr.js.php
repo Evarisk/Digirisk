@@ -1307,7 +1307,8 @@ window.eoxiaJS.risk.saveRisk = function ( event ) {
 	}
 
 	let elementParent = $('.fichecenter').find('.div-table-responsive');
-	window.eoxiaJS.loader.display($(this).closest('.risk-row-content-' + editedRiskId));
+	window.eoxiaJS.loader.display($(this));
+	window.eoxiaJS.loader.display($(this).closest('.risk-row-content-' + editedRiskId).find('.risk-description-'+editedRiskId));
 
 	$.ajax({
 		url: document.URL + '&action=saveRisk&riskID=' + editedRiskId + categoryPost + descriptionPost,
@@ -1315,10 +1316,7 @@ window.eoxiaJS.risk.saveRisk = function ( event ) {
 		processData: false,
 		contentType: false,
 		success: function ( ) {
-
-			elementParent.empty()
-			elementParent.load( document.URL + ' .tagtable.liste');
-			$(this).closest('.risk-row-content-' + editedRiskId).removeClass('wpeo-loader');
+			elementParent.load(document.URL + ' .div-table-responsive')
 
 			actionContainerSuccess.empty()
 			actionContainerSuccess.load(' .risk-edit-success-notice')
@@ -1511,6 +1509,7 @@ window.eoxiaJS.evaluation.createEvaluation = function ( event ) {
 	})
 
 	let elementParent = $('.fichecenter').find('.div-table-responsive');
+	window.eoxiaJS.loader.display($(this));
 	window.eoxiaJS.loader.display($('.risk-evaluation-container-' + riskToAssign));
 
 	$.ajax({
@@ -1519,16 +1518,14 @@ window.eoxiaJS.evaluation.createEvaluation = function ( event ) {
 		processData: false,
 		contentType: false,
 		success: function( ) {
-				elementParent.load( document.URL + ' .div-table-responsive');
+			elementParent.load( document.URL + ' .div-table-responsive');
+			element.find('#risk_evaluation_add'+riskToAssign).removeClass('modal-active');
 
-				$(this).closest('.risk-row-content-' + riskToAssign).removeClass('wpeo-loader');
-
-				actionContainerSuccess.empty()
-				actionContainerSuccess.load(' .riskassessment-create-success-notice')
-				actionContainerSuccess.removeClass('hidden');
+			actionContainerSuccess.empty()
+			actionContainerSuccess.load(' .riskassessment-create-success-notice')
+			actionContainerSuccess.removeClass('hidden');
 		},
 		error: function ( ) {
-
 			$(this).closest('.risk-row-content-' + riskToAssign).removeClass('wpeo-loader');
 
 			actionContainerError.empty()
@@ -1658,8 +1655,8 @@ window.eoxiaJS.evaluation.saveEvaluation = function ( event ) {
 	let evaluationSingle = $(this).closest('.risk-evaluation-container').find('.risk-evaluation-single-content');
 	let evaluationRef =  $('.risk-evaluation-ref-'+evaluationID).attr('value');
 
-    window.eoxiaJS.loader.display($(this));
-    window.eoxiaJS.loader.display($('.risk-evaluation-single-' + riskId));
+	window.eoxiaJS.loader.display($(this));
+	window.eoxiaJS.loader.display($('.risk-evaluation-single-' + riskId));
 
 	$.ajax({
 		url: document.URL + '&action=saveEvaluation&evaluationID=' + evaluationID +  methodPost + cotationPost + criteres + photoPost + commentPost,
@@ -1667,8 +1664,6 @@ window.eoxiaJS.evaluation.saveEvaluation = function ( event ) {
 		processData: false,
 		contentType: false,
 		success: function ( ) {
-            $('.risk-evaluation-save').removeClass('wpeo-loader')
-
             $('.div-table-responsive').load(document.URL + ' .div-table-responsive')
             elementParent.removeClass('wpeo-loader');
             $(this).closest('.risk-evaluation-container').removeClass('wpeo-loader');
@@ -1871,6 +1866,8 @@ window.eoxiaJS.riskassessmenttask.createRiskAssessmentTask = function ( event ) 
 		taskPost = '&tasktitle=' + encodeURI(task);
 	}
 
+	window.eoxiaJS.loader.display($(this));
+	window.eoxiaJS.loader.display($('.riskassessment-task-listing-wrapper-'+ riskToAssign));
 
 	$.ajax({
 		url: document.URL + '&action=addRiskAssessmentTask' + riskToAssignPost + taskPost,
@@ -1878,9 +1875,7 @@ window.eoxiaJS.riskassessmenttask.createRiskAssessmentTask = function ( event ) 
 		processData: false,
 		contentType: false,
 		success: function ( ) {
-			$(this).closest('.risk-row-content-' + riskToAssign).removeClass('wpeo-loader');
-            elementToRefresh.load( document.URL + ' .riskassessment-tasks'+riskToAssign);
-
+			$('.div-table-responsive').load(document.URL + ' .div-table-responsive')
 
 			actionContainerSuccess.empty()
 			actionContainerSuccess.load(' .task-create-success-notice')
@@ -1925,8 +1920,8 @@ window.eoxiaJS.riskassessmenttask.deleteRiskAssessmentTask = function ( event ) 
 			processData: false,
 			contentType: false,
 			success: function ( ) {
-
-                element.load( document.URL + ' .riskassessment-tasks'+riskId);
+				$('.div-table-responsive').load(document.URL + ' .div-table-responsive')
+                //element.load( document.URL + ' .riskassessment-tasks'+riskId);
 
 				let textToShow = '';
 				textToShow += actionContainerSuccess.find('.valueForDeleteTask1').val()
@@ -1983,6 +1978,7 @@ window.eoxiaJS.riskassessmenttask.saveRiskAssessmentTask = function ( event ) {
 	let taskRef =  $('.riskassessment-task-ref-'+editedRiskAssessmentTaskId).attr('value');
 
 	window.eoxiaJS.loader.display($(this));
+	window.eoxiaJS.loader.display($('.riskassessment-task-single-'+ editedRiskAssessmentTaskId));
 
 	$.ajax({
 		url: document.URL + '&action=saveRiskAssessmentTask&riskAssessmentTaskID=' + editedRiskAssessmentTaskId + taskPost,
@@ -1990,9 +1986,7 @@ window.eoxiaJS.riskassessmenttask.saveRiskAssessmentTask = function ( event ) {
 		processData: false,
 		contentType: false,
 		success: function ( ) {
-
-            element.load( document.URL + ' .riskassessment-tasks'+riskId);
-            elementRiskAssessmentTask.removeClass('wpeo-loader');
+			$('.div-table-responsive').load(document.URL + ' .div-table-responsive')
 
 			textToShow += actionContainerSuccess.find('.valueForEditTask1').val()
 			textToShow += taskRef

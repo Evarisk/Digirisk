@@ -783,7 +783,7 @@
 			if ($key == 'status') $cssforfield .= ($cssforfield ? ' ' : '').'center';
 			elseif ($key == 'ref') $cssforfield .= ($cssforfield ? ' ' : '').'nowrap';
 			elseif ($key == 'category') $cssforfield .= ($cssforfield ? ' ' : '').'risk-category';
-			elseif ($key == 'description') $cssforfield .= ($cssforfield ? ' ' : '').'risk-description';
+			elseif ($key == 'description') $cssforfield .= ($cssforfield ? ' ' : '').'risk-description-'.$risk->id;
 			if (!empty($arrayfields['t.'.$key]['checked']))
 			{
 				print '<td'.($cssforfield ? ' class="'.$cssforfield.'"' : '').' style="width:2%">';
@@ -878,7 +878,7 @@
 								<!-- Modal-Footer -->
 								<div class="modal-footer">
 									<?php if ($permissiontoadd) : ?>
-										<div class="risk-save wpeo-button button-green save modal-close" value="<?php echo $risk->id ?>">
+										<div class="risk-save wpeo-button button-green save" value="<?php echo $risk->id ?>">
 											<span><i class="fas fa-save"></i>  <?php echo $langs->trans('UpdateData'); ?></span>
 										</div>
 									<?php else : ?>

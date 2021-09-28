@@ -2,7 +2,7 @@
 $related_tasks = $risk->get_related_tasks($risk); ?>
 <div class="riskassessment-tasks riskassessment-tasks<?php echo $risk->id ?>" value="<?php echo $risk->id ?>">
 	<?php if (!empty($related_tasks) && $related_tasks > 0) : ?>
-		<div class="riskassessment-task-listing-wrapper">
+		<div class="riskassessment-task-listing-wrapper riskassessment-task-listing-wrapper-<?php echo $risk->id ?>">
 			<?php foreach ($related_tasks as $related_task) : ?>
 				<?php if ($related_task->progress < 100) : ?>
 					<div class="table-cell riskassessment-task-container riskassessment-task-container-<?php echo $related_task->id ?>" value="<?php echo $related_task->ref ?>">
@@ -126,24 +126,26 @@ $related_tasks = $risk->get_related_tasks($risk); ?>
 			<?php endif; ?>
 		</div>
 	<?php else : ?>
-		<div class="riskassessment-task-container riskassessment-no-task">
-			<div class="riskassessment-task-single-content riskassessment-task-single-content-<?php echo $risk->id ?>">
-				<div class="riskassessment-task-single riskassessment-task-single-<?php echo $risk->id ?>">
-					<div class="riskassessment-task-content">
-						<div class="riskassessment-task-data">
-							<span class="name"><?php echo $langs->trans('NoTaskLinked'); ?></span>
+		<div class="riskassessment-task-listing-wrapper riskassessment-task-listing-wrapper-<?php echo $risk->id ?>">
+			<div class="riskassessment-task-container riskassessment-no-task">
+				<div class="riskassessment-task-single-content riskassessment-task-single-content-<?php echo $risk->id ?>">
+					<div class="riskassessment-task-single riskassessment-task-single-<?php echo $risk->id ?>">
+						<div class="riskassessment-task-content">
+							<div class="riskassessment-task-data">
+								<span class="name"><?php echo $langs->trans('NoTaskLinked'); ?></span>
+							</div>
 						</div>
+						<!-- BUTTON MODAL RISK ASSESSMENT TASK ADD  -->
+						<?php if ($permissiontoadd) : ?>
+							<div class="riskassessment-task-add wpeo-button button-square-50 button-primary wpeo-tooltip-event modal-open" aria-label="<?php echo $langs->trans('AddRiskAssessmentTask') ?>" value="<?php echo $risk->id;?>">
+								<i class="fas fa-plus button-icon"></i>
+							</div>
+						<?php else : ?>
+							<div class="wpeo-button button-square-50 button-grey wpeo-tooltip-event" aria-label="<?php echo $langs->trans('PermissionDenied') ?>" value="<?php echo $risk->id;?>">
+								<i class="fas fa-plus button-icon"></i>
+							</div>
+						<?php endif; ?>
 					</div>
-					<!-- BUTTON MODAL RISK ASSESSMENT TASK ADD  -->
-					<?php if ($permissiontoadd) : ?>
-						<div class="riskassessment-task-add wpeo-button button-square-50 button-primary wpeo-tooltip-event modal-open" aria-label="<?php echo $langs->trans('AddRiskAssessmentTask') ?>" value="<?php echo $risk->id;?>">
-							<i class="fas fa-plus button-icon"></i>
-						</div>
-					<?php else : ?>
-						<div class="wpeo-button button-square-50 button-grey wpeo-tooltip-event" aria-label="<?php echo $langs->trans('PermissionDenied') ?>" value="<?php echo $risk->id;?>">
-							<i class="fas fa-plus button-icon"></i>
-						</div>
-					<?php endif; ?>
 				</div>
 			</div>
 		</div>
