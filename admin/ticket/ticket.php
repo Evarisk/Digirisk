@@ -16,9 +16,9 @@
 */
 
 /**
- *     \file        admin/digirisksignature.php
+ *     \file        admin/ticket.php
  *     \ingroup     digiriskdolibarr
- *     \brief       Page to public interface of module DigiriskDolibarr for signature
+ *     \brief       Page to public interface of module DigiriskDolibarr for ticket
  */
 
 // Load Dolibarr environment
@@ -206,16 +206,16 @@ if ($action == 'generateCategories') {
 
 $form = new Form($db);
 
-$help_url  = '';
-$page_name = "DigiriskdolibarrSetup";
-$morecss   = array("/digiriskdolibarr/css/digiriskdolibarr.css");
+$help_url = '';
+$title    = $langs->trans("Ticket");
+$morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");
 
-llxHeader('', $langs->trans($page_name), $help_url, '', '', '', '', $morecss);
+llxHeader('', $title, $help_url, '', '', '', '', $morecss);
 
 // Subheader
 $linkback = '<a href="'.($backtopage ? $backtopage : DOL_URL_ROOT.'/admin/modules.php?restore_lastsearch_values=1').'">'.$langs->trans("BackToModuleList").'</a>';
 
-print load_fiche_titre($langs->trans($page_name), $linkback, 'object_digiriskdolibarr@digiriskdolibarr');
+print load_fiche_titre($title, $linkback, 'object_digiriskdolibarr@digiriskdolibarr');
 
 // Configuration header
 $head = digiriskdolibarrAdminPrepareHead();

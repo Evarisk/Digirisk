@@ -545,7 +545,7 @@ if (empty($reshook)) {
 
 $form = new Form($db);
 
-$title    = $langs->trans("DigiriskElementRisk");
+$title    = $langs->trans("RiskList");
 $help_url = 'FR:Module_DigiriskDolibarr';
 $morejs   = array("/digiriskdolibarr/js/digiriskdolibarr.js.php");
 $morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");

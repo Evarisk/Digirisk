@@ -42,6 +42,8 @@ require_once __DIR__ . '/class/preventionplan.class.php';
 require_once __DIR__ . '/lib/digiriskdolibarr_preventionplan.lib.php';
 require_once __DIR__ . '/lib/digiriskdolibarr_function.lib.php';
 
+global $conf, $db, $langs, $hookmanager, $user;
+
 
 // Load translation files required by the page
 $langs->loadLangs(array("digiriskdolibarr@digiriskdolibarr", "other"));
@@ -116,7 +118,7 @@ if (empty($reshook)) {
  */
 
 if ($object->id > 0) {
-	$title     = $langs->trans("Agenda");
+	$title     = $langs->trans("PreventionPlan") . ' - ' . $langs->trans("Agenda");
 	$help_url  = 'FR:Module_DigiriskDolibarr';
 	$morejs    = array("/digiriskdolibarr/js/digiriskdolibarr.js.php");
 	$morecss   = array("/digiriskdolibarr/css/digiriskdolibarr.css");
@@ -133,7 +135,7 @@ if ($object->id > 0) {
 	dol_strlen($object->label) ? $morehtmlref = ' - ' . $object->label : '';
 	//$morehtmlleft .= '<div class="floatleft inline-block valignmiddle divphotoref">'.digirisk_show_photos('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$entity].'/'.$object->element_type, 'small', 5, 0, 0, 0, $width,0, 0, 0, 0, $object->element_type, $object).'</div>';
 
-	digirisk_banner_tab($object, 'ref', '', 0, 'ref', 'ref', $morehtmlref, '', 0, $morehtmlleft);
+	digirisk_banner_tab($object, 'ref', '', 0, 'ref', 'ref', $morehtmlref);
 
 	print '<div class="fichecenter">';
 

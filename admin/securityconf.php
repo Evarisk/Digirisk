@@ -48,7 +48,7 @@ require_once DOL_DOCUMENT_ROOT.'/user/class/user.class.php';
 
 require_once '../class/digiriskresources.class.php';
 
-global $langs, $user, $conf, $db;
+global $langs, $user, $conf, $db, $hookmanager;
 
 // Translations
 $langs->loadLangs(array('admin', 'companies', "digiriskdolibarr@digiriskdolibarr"));
@@ -129,11 +129,12 @@ if (($action == 'update' && !GETPOST("cancel", 'alpha')) || ($action == 'updatee
 $form = new Form($db);
 
 $help_url = 'FR:Module_DigiriskDolibarr#L.27onglet_S.C3.A9curit.C3.A9';
+$title    = $langs->trans("CompanyFoundation") . ' - ' . $langs->trans("Security");
 $morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");
 
-llxHeader('', $langs->trans("CompanyFoundation"), $help_url, '', '', '', '', $morecss);
+llxHeader('', $title, $help_url, '', '', '', '', $morecss);
 
-print load_fiche_titre($langs->trans("CompanyFoundation"), '', 'title_setup');
+print load_fiche_titre($title, '', 'title_setup');
 
 $head = company_admin_prepare_head();
 

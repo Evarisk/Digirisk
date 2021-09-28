@@ -792,6 +792,7 @@ DigiriskElementRiskSign = Signalisation
 
 # Data - Donnée
 
+Task = Tâche
 TheTask = La tâche
 TaskWellCreated = Tâche créée
 TaskNotCreated = Erreur lors de la création de la tâche

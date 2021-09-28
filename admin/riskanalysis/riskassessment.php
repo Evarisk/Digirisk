@@ -95,16 +95,16 @@ if ($action == 'setadvancedmethod') {
 
 $form = new Form($db);
 
-$help_url  = 'FR:Module_DigiriskDolibarr#L.27onglet_Analyse_des_risques';
-$page_name = "DigiriskdolibarrSetup";
-$morecss   = array("/digiriskdolibarr/css/digiriskdolibarr.css");
+$help_url = 'FR:Module_DigiriskDolibarr#L.27onglet_Analyse_des_risques';
+$title    = $langs->trans("RiskAnalysis") . ' - ' . $langs->trans("RiskAssessment");
+$morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");
 
-llxHeader('', $langs->trans($page_name), $help_url, '', '', '', '', $morecss);
+llxHeader('', $title, $help_url, '', '', '', '', $morecss);
 
 // Subheader
 $linkback = '<a href="'.($backtopage ? $backtopage : DOL_URL_ROOT.'/admin/modules.php?restore_lastsearch_values=1').'">'.$langs->trans("BackToModuleList").'</a>';
 
-print load_fiche_titre($langs->trans($page_name), $linkback, 'object_digiriskdolibarr@digiriskdolibarr');
+print load_fiche_titre($title, $linkback, 'object_digiriskdolibarr@digiriskdolibarr');
 
 // Configuration header
 $head = digiriskdolibarrAdminPrepareHead();

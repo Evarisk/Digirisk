@@ -16,9 +16,9 @@
  */
 
 /**
- * \file    admin/groupment.php
+ * \file    admin/deletedelements.php
  * \ingroup digiriskdolibarr
- * \brief   Digiriskdolibarr groupment page.
+ * \brief   Digiriskdolibarr deletedelements page.
  */
 
 // Load Dolibarr environment
@@ -36,7 +36,7 @@ if (!$res && file_exists("../../../main.inc.php")) $res = @include "../../../mai
 if (!$res && file_exists("../../../../main.inc.php")) $res = @include "../../../../main.inc.php";
 if (!$res) die("Include of main fails");
 
-global $langs, $user;
+global $langs, $user, $conf, $db;
 
 // Libraries
 require_once DOL_DOCUMENT_ROOT . "/core/lib/admin.lib.php";
@@ -53,9 +53,6 @@ $action     = GETPOST('action', 'alpha');
 $backtopage = GETPOST('backtopage', 'alpha');
 $value      = GETPOST('value', 'alpha');
 
-$type          = 'groupment';
-$error         = 0;
-
 /*
  * Actions
  */
@@ -69,18 +66,16 @@ if ($action == 'setDeletedElements') {
  * View
  */
 
-$form = new Form($db);
+$help_url = 'FR:Module_DigiriskDolibarr#L.27onglet_.C3.89l.C3.A9ment_Digirisk';
+$title    = $langs->trans("DigiriskElement") . ' - ' . $langs->trans("DeletedElements");
+$morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");
 
-$help_url  = 'FR:Module_DigiriskDolibarr#L.27onglet_.C3.89l.C3.A9ment_Digirisk';
-$page_name = "DigiriskdolibarrSetup";
-$morecss   = array("/digiriskdolibarr/css/digiriskdolibarr.css");
-
-llxHeader('', $langs->trans($page_name), $help_url, '', '', '', '', $morecss);
+llxHeader('', $title, $help_url, '', '', '', '', $morecss);
 
 // Subheader
 $linkback = '<a href="'.($backtopage ? $backtopage : DOL_URL_ROOT.'/admin/modules.php?restore_lastsearch_values=1').'">'.$langs->trans("BackToModuleList").'</a>';
 
-print load_fiche_titre($langs->trans($page_name), $linkback, 'object_digiriskdolibarr@digiriskdolibarr');
+print load_fiche_titre($title, $linkback, 'object_digiriskdolibarr@digiriskdolibarr');
 
 // Configuration header
 $head = digiriskdolibarrAdminPrepareHead();
