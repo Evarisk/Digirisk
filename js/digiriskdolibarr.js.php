@@ -1227,31 +1227,27 @@ window.eoxiaJS.risk.createRisk = function ( event ) {
 		processData: false,
 		contentType: false,
 		success: function ( ) {
+			let modalRisk = $('.risk-add-modal');
+			modalRisk.load( document.URL + ' .modal-risk-0');
+
+			elementParent.empty();
+			elementParent.load( document.URL + ' .tagtable.liste')
 
 			let numberOfRisks = $('.valignmiddle.col-title');
 			numberOfRisks.load( document.URL + ' .table-fiche-title .titre.inline-block');
-
-			let modalRisk = $('.risk-add-modal');
-			modalRisk.load( document.URL + ' .modal-risk-0');
 
 			actionContainerSuccess.empty()
 			actionContainerSuccess.load(' .risk-create-success-notice')
 			actionContainerSuccess.removeClass('hidden');
 
-			elementParent.empty();
-			elementParent.load( document.URL + ' .tagtable.liste')
-
 			$('.fichecenter').removeClass('wpeo-loader');
-
 		},
 		error: function ( ) {
-
 			actionContainerError.empty()
 			actionContainerError.load(' .risk-create-error-notice')
 			actionContainerError.removeClass('hidden');
 
 			$('.fichecenter').removeClass('wpeo-loader');
-
 		}
 	});
 
