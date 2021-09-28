@@ -934,3 +934,5 @@ AT = au
 ModalAddPhoto = Ajout Photo
 SendEmailAt = Envoi de l'email à
 ErrorFileNotFound = Aucun logo de la société renseigné
+LabourInspectorName = DREETS
+UrlLabourInspector = https://travail-emploi.gouv.fr/ministere/organisation/article/dreets-directions-regionales-de-l-economie-de-l-emploi-du-travail-et-des

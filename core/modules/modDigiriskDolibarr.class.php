@@ -770,39 +770,88 @@ class modDigiriskdolibarr extends DolibarrModules
 			require_once DOL_DOCUMENT_ROOT . '/societe/class/societe.class.php';
 			require_once __DIR__ . '/../../class/digiriskresources.class.php';
 
-			$societe = new Societe($this->db);
+			$societe   = new Societe($this->db);
 			$resources = new DigiriskResources($this->db);
 
-			$police = $societe;
-			$police->name = $langs->trans('Police');
-			$police->client = 0;
-			$police->phone = '17';
-			$policeID = $police->create($user);
+			$labour_inspector         = $societe;
+			$labour_inspector->name   = $langs->trans('LabourInspectorName');
+			$labour_inspector->client = 0;
+			$labour_inspector->url    = $langs->trans('UrlLabourInspector');
+			$labour_inspectorID       = $labour_inspector->create($user);
 
-			$samu = $societe;
-			$samu->name = $langs->trans('SAMU');
+			$samu         = $societe;
+			$samu->name   = $langs->trans('SAMU');
 			$samu->client = 0;
-			$samu->phone = '15';
-			$samuID = $samu->create($user);
+			$samu->phone  = '15';
+			$samuID       = $samu->create($user);
 
-			$pompiers = $societe;
-			$pompiers->name = $langs->trans('Pompiers');
+			$pompiers         = $societe;
+			$pompiers->name   = $langs->trans('Pompiers');
 			$pompiers->client = 0;
-			$pompiers->phone = '18';
-			$pompiersID = $pompiers->create($user);
+			$pompiers->phone  = '18';
+			$pompiersID       = $pompiers->create($user);
 
-			$emergency = $societe;
-			$emergency->name = $langs->trans('AllEmergencies');
+			$police         = $societe;
+			$police->name   = $langs->trans('Police');
+			$police->client = 0;
+			$police->phone  = '17';
+			$policeID       = $police->create($user);
+
+			$emergency         = $societe;
+			$emergency->name   = $langs->trans('AllEmergencies');
 			$emergency->client = 0;
-			$emergency->phone = '112';
-			$emergencyID = $emergency->create($user);
+			$emergency->phone  = '112';
+			$emergencyID       = $emergency->create($user);
 
+			$rights_defender         = $societe;
+			$rights_defender->name   = $langs->trans('RightsDefender');
+			$rights_defender->client = 0;
+			$rights_defenderID       = $rights_defender->create($user);
+
+			$poison_control_center         = $societe;
+			$poison_control_center->name   = $langs->trans('PoisonControlCenter');
+			$poison_control_center->client = 0;
+			$poison_control_centerID       = $poison_control_center->create($user);
+
+			$resources->digirisk_dolibarr_set_resources($this->db,1,  'LabourInspector',  'societe', array($labour_inspectorID), $conf->entity);
 			$resources->digirisk_dolibarr_set_resources($this->db,1,  'Police',  'societe', array($policeID), $conf->entity);
 			$resources->digirisk_dolibarr_set_resources($this->db,1,  'SAMU',  'societe', array($samuID), $conf->entity);
 			$resources->digirisk_dolibarr_set_resources($this->db,1,  'Pompiers',  'societe', array($pompiersID), $conf->entity);
 			$resources->digirisk_dolibarr_set_resources($this->db,1,  'AllEmergencies',  'societe', array($emergencyID), $conf->entity);
+			$resources->digirisk_dolibarr_set_resources($this->db,1,  'RightsDefender',  'societe', array($rights_defenderID), $conf->entity);
+			$resources->digirisk_dolibarr_set_resources($this->db,1,  'PoisonControlCenter',  'societe', array($poison_control_centerID), $conf->entity);
 
-			dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_THIRDPARTY_SET', 1, 'integer', 0, '', $conf->entity);
+			dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_THIRDPARTY_SET', 2, 'integer', 0, '', $conf->entity);
+		} elseif ($conf->global->DIGIRISKDOLIBARR_THIRDPARTY_SET == 1) {
+			//Install after 8.1.2
+
+			require_once DOL_DOCUMENT_ROOT . '/societe/class/societe.class.php';
+			require_once __DIR__ . '/../../class/digiriskresources.class.php';
+
+			$societe   = new Societe($this->db);
+			$resources = new DigiriskResources($this->db);
+
+			$labour_inspector         = $societe;
+			$labour_inspector->name   = $langs->trans('LabourInspectorName');
+			$labour_inspector->client = 0;
+			$labour_inspector->url    = $langs->trans('UrlLabourInspector');
+			$labour_inspectorID       = $labour_inspector->create($user);
+
+			$rights_defender         = $societe;
+			$rights_defender->name   = $langs->trans('RightsDefender');
+			$rights_defender->client = 0;
+			$rights_defenderID       = $rights_defender->create($user);
+
+			$poison_control_center         = $societe;
+			$poison_control_center->name   = $langs->trans('PoisonControlCenter');
+			$poison_control_center->client = 0;
+			$poison_control_centerID       = $poison_control_center->create($user);
+
+			$resources->digirisk_dolibarr_set_resources($this->db,1,  'LabourInspector',  'societe', array($labour_inspectorID), $conf->entity);
+			$resources->digirisk_dolibarr_set_resources($this->db,1,  'RightsDefender',  'societe', array($rights_defenderID), $conf->entity);
+			$resources->digirisk_dolibarr_set_resources($this->db,1,  'PoisonControlCenter',  'societe', array($poison_control_centerID), $conf->entity);
+
+			dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_THIRDPARTY_SET', 2, 'integer', 0, '', $conf->entity);
 		}
 
 		// Create extrafields during init
