@@ -1624,6 +1624,14 @@ window.eoxiaJS.evaluation.saveEvaluation = function ( event ) {
 	//let riskId = $(this).closest('.risk-evaluation-container').attr('value')
 	let evaluationText = element.find('.risk-evaluation-comment textarea').val()
 
+	let elementParent = $(this).closest('.risk-evaluation-container').find('.risk-evaluations-list-content');
+	let riskId = elementParent.attr('value');
+	let evaluationSingle = $(this).closest('.risk-evaluation-container').find('.risk-evaluation-single-content');
+	let evaluationRef =  $('.risk-evaluation-ref-'+evaluationID).attr('value');
+	let listModalContainer = $('.risk-evaluation-list-modal-'+riskId)
+	let listModal = $('#risk_evaluation_list'+riskId)
+	let fromList = listModal.hasClass('modal-active');
+
 	evaluationText = window.eoxiaJS.risk.sanitizeBeforeRequest(evaluationText)
 
 	var method = element.find('.risk-evaluation-method').val();
@@ -1657,23 +1665,24 @@ window.eoxiaJS.evaluation.saveEvaluation = function ( event ) {
 		}
 	})
 
-	let elementParent = $(this).closest('.risk-evaluation-container').find('.risk-evaluations-list-content');
-	let riskId = elementParent.attr('value');
-	let evaluationSingle = $(this).closest('.risk-evaluation-container').find('.risk-evaluation-single-content');
-	let evaluationRef =  $('.risk-evaluation-ref-'+evaluationID).attr('value');
-
 	window.eoxiaJS.loader.display($(this));
-	window.eoxiaJS.loader.display($('.risk-evaluation-single-' + riskId));
-
+	window.eoxiaJS.loader.display(listModalContainer.find('.modal-content .risk-evaluations-list-content'))
 	$.ajax({
 		url: document.URL + '&action=saveEvaluation&evaluationID=' + evaluationID +  methodPost + cotationPost + criteres + photoPost + commentPost,
 		type: "POST",
 		processData: false,
 		contentType: false,
 		success: function ( ) {
-            $('.div-table-responsive').load(document.URL + ' .div-table-responsive')
-            elementParent.removeClass('wpeo-loader');
-            $(this).closest('.risk-evaluation-container').removeClass('wpeo-loader');
+			if (fromList) {
+				listModalContainer.find('.modal-content .risk-evaluations-list-content').load(document.URL + ' .risk-evaluations-list-'+riskId)
+				$('.risk-evaluation-single-content-'+riskId).load(document.URL + ' .risk-evaluation-single-'+riskId)
+			} else {
+				$('.div-table-responsive').load(document.URL + ' .div-table-responsive')
+			}
+			$('.wpeo-loader').removeClass('wpeo-loader')
+            //elementParent.removeClass('wpeo-loader');
+			//listModalContainer.find('.modal-content .risk-evaluations-list-content').removeClass('wpeo-loader');
+            //$(this).closest('.risk-evaluation-container').removeClass('wpeo-loader');
 
 			element.find('#risk_evaluation_edit'+evaluationID).removeClass('modal-active');
 
