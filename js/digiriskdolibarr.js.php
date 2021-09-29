@@ -1022,6 +1022,7 @@ window.eoxiaJS.photo.sendPhoto = function( event ) {
 	let formdata = new FormData();
     let elementParent = $(this).closest('.modal-container').find('.ecm-photo-list-content');
 	let modalID = $(this).closest('.risk-evaluation-photo').attr('value')
+	window.eoxiaJS.loader.display($(this).closest('.risk-evaluation-photo').find('.modal-content'));
 
 	$.each(files, function(index, file) {
 		formdata.append("userfile[]", file);
@@ -1033,6 +1034,7 @@ window.eoxiaJS.photo.sendPhoto = function( event ) {
 		processData: false,
 		contentType: false,
 		success: function ( ) {
+			$('.wpeo-loader').removeClass('wpeo-loader')
 			window.eoxiaJS.loader.display(elementParent);
 			elementParent.empty()
 			elementParent.load( document.URL + ' .ecm-photo-list-'+modalID);
