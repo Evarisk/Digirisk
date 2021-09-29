@@ -1296,18 +1296,29 @@ window.eoxiaJS.risk.saveRisk = function ( event ) {
 		categoryPost = '&riskCategory=' + category;
 	}
 
-	var description = riskCommentText;
-	var descriptionPost = '';
-	if (description !== '') {
-		descriptionPost = '&riskComment=' + encodeURI(description);
+	if (riskCommentText) {
+		var description = riskCommentText;
+		var descriptionPost = '';
+		if (description !== '') {
+			descriptionPost = '&riskComment=' + encodeURI(description);
+		}
 	}
 
 	let elementParent = $('.fichecenter').find('.div-table-responsive');
 	window.eoxiaJS.loader.display($(this));
-	window.eoxiaJS.loader.display($(this).closest('.risk-row-content-' + editedRiskId).find('.risk-description-'+editedRiskId));
+	if (riskCommentText) {
+		window.eoxiaJS.loader.display($(this).closest('.risk-row-content-' + editedRiskId).find('.risk-description-'+editedRiskId));
+	}
+
+	var request = "";
+	if (riskCommentText) {
+		request = document.URL + '&action=saveRisk&riskID=' + editedRiskId + categoryPost + descriptionPost
+	} else {
+		request = document.URL + '&action=saveRisk&riskID=' + editedRiskId + categoryPost
+	}
 
 	$.ajax({
-		url: document.URL + '&action=saveRisk&riskID=' + editedRiskId + categoryPost + descriptionPost,
+		url: request,
 		type: "POST",
 		processData: false,
 		contentType: false,
