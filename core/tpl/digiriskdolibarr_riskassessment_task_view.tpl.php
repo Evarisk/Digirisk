@@ -24,7 +24,9 @@ $related_tasks = $risk->get_related_tasks($risk); ?>
 											<?php $user->fetch($related_task->fk_user_creat); ?>
 											<?php echo getNomUrl( 0, '', 0, 0, 2 ,0,'','',-1,$user); ?>
 										</span>
-										<?php echo $related_task->label; ?>
+										<span class="riskassessment-task-author-label">
+											<?php echo $related_task->label; ?>
+										</span>
 									</div>
 								</div>
 								<!-- BUTTON MODAL RISK ASSESSMENT TASK EDIT  -->
@@ -253,7 +255,9 @@ $related_tasks = $risk->get_related_tasks($risk); ?>
 																<?php $user->fetch($related_task->fk_user_creat); ?>
 																<?php echo getNomUrl( 0, '', 0, 0, 2 ,0,'','',-1,$user); ?>
 															</span>
-															<?php echo $related_task->label; ?>
+															<span class="riskassessment-task-label">
+																<?php echo $related_task->label; ?>
+															</span>
 														</div>
 													</div>
 												</div>

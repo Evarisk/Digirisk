@@ -2446,6 +2446,9 @@
 .riskassessment-task-container .riskassessment-task-single .riskassessment-task-content .riskassessment-task-author a {
   color: #fff !important;
 }
+.riskassessment-task-container .riskassessment-task-single .riskassessment-task-content .riskassessment-task-author-label {
+  word-break: break-all;
+}
 .riskassessment-task-container .riskassessment-task-single .riskassessment-task-content .riskassessment-task-data {
   display: -webkit-box;
   display: -ms-flexbox;
@@ -3005,11 +3008,6 @@ td > .risk-evaluation-container {
 .risk-evaluation-container .risk-evaluation-single .risk-evaluation-button {
   min-width: 50px;
   margin-left: 0.5em;
-}
-
-.risk-list-button {
-	min-width: 50px;
-	margin-left: 0.5em;
 }
 
 /**
