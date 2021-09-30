@@ -926,7 +926,7 @@
 					require './core/tpl/digiriskdolibarr_riskassessment_view.tpl.php';
 				}
 				elseif ($key == 'has_tasks' && $conf->global->DIGIRISKDOLIBARR_TASK_MANAGEMENT) {
-					require './core/tpl/digiriskdolibarr_task_view.tpl.php';
+					require './core/tpl/digiriskdolibarr_riskassessment_task_view.tpl.php';
 				}
 				elseif ($conf->global->DIGIRISKDOLIBARR_TASK_MANAGEMENT == 0) {
 					print $langs->trans('TaskManagementNotActivated');
