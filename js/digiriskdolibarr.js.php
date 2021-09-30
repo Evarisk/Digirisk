@@ -979,7 +979,6 @@ window.eoxiaJS.photo.event = function() {
  */
 window.eoxiaJS.photo.selectPhoto = function( event ) {
 	let photoID = $(this).attr('value');
-	let element = $(this).attr('element');
 	let parent = $(this).closest('.modal-content')
 
 	parent.find('.clicked-photo').attr('style', 'none !important');
@@ -989,8 +988,6 @@ window.eoxiaJS.photo.selectPhoto = function( event ) {
 	parent.find('.clickable-photo'+photoID).attr('style', 'border: 5px solid #0d8aff !important');
 	parent.find('.clickable-photo'+photoID).addClass('clicked-photo');
 
-	$(this).closest('.'+element+'-photo-container').find('.'+element+'-photo-single .filename').val(parent.find('.clicked-photo .filename').val());
-	$(this).closest('.'+element+'-photo-container').find('.'+element+'-photo-single img').attr('src' , parent.find('.clicked-photo img').attr('src'));
 
 };
 
@@ -1003,7 +1000,13 @@ window.eoxiaJS.photo.selectPhoto = function( event ) {
  * @return {void}
  */
 window.eoxiaJS.photo.savePhoto = function( event ) {
-	$('.wpeo-modal.modal-photo.modal-active').removeClass('modal-active');
+    let parent = $(this).closest('.modal-content')
+
+    $('.wpeo-modal.modal-photo.modal-active').removeClass('modal-active');
+
+    $(this).closest('.risk-evaluation-photo-container').find('.risk-evaluation-photo-single .filename').val(parent.find('.clicked-photo .filename').val());
+    $(this).closest('.risk-evaluation-photo-container').find('.risk-evaluation-photo-single img').attr('src' , parent.find('.clicked-photo img').attr('src'));
+
 };
 
 /**
@@ -2661,6 +2664,52 @@ window.eoxiaJS.preventionplan.showDateAndText = function() {
         textField.addClass('hidden')
     }
 
+};
+
+
+/**
+ * Initialise l'objet "signature" ainsi que la méthode "init" obligatoire pour la bibliothèque EoxiaJS.
+ *
+ * @since   1.1.0
+ * @version 1.1.0
+ */
+window.eoxiaJS.document = {};
+
+/**
+ * Initialise le canvas document
+ *
+ * @since   8.1.2
+ * @version 8.1.2
+ */
+window.eoxiaJS.document.canvas;
+
+/**
+ * Initialise le boutton document
+ *
+ * @since   8.1.2
+ * @version 8.1.2
+ */
+window.eoxiaJS.document.buttonSignature;
+
+/**
+ * La méthode appelée automatiquement par la bibliothèque EoxiaJS.
+ *
+ * @since   8.1.2
+ * @version 8.1.2
+ *
+ * @return {void}
+ */
+window.eoxiaJS.document.init = function() {
+    window.eoxiaJS.document.event();
+};
+
+window.eoxiaJS.document.event = function() {
+    jQuery( document ).on( 'click', '#builddoc_generatebutton', window.eoxiaJS.document.displayLoader );
+};
+
+window.eoxiaJS.document.displayLoader = function(  ) {
+    window.eoxiaJS.loader.display($('#builddoc_generatebutton'));
+    window.eoxiaJS.loader.display($('.tabBar'));
 };
 
 /**
