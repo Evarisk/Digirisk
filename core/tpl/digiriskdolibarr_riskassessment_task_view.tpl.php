@@ -3,8 +3,10 @@ $related_tasks = $risk->get_related_tasks($risk); ?>
 <div class="wpeo-table riskassessment-tasks riskassessment-tasks<?php echo $risk->id ?>" value="<?php echo $risk->id ?>">
 	<?php if (!empty($related_tasks) && $related_tasks > 0) : ?>
 		<div class="table-cell riskassessment-task-listing-wrapper riskassessment-task-listing-wrapper-<?php echo $risk->id ?>">
+			<?php $nb_of_tasks_in_progress = 0 ?>
 			<?php foreach ($related_tasks as $related_task) : ?>
 				<?php if ($related_task->progress < 100) : ?>
+					<?php  $nb_of_tasks_in_progress++ ?>
 					<div class="table-cell riskassessment-task-container riskassessment-task-container-<?php echo $related_task->id ?>" value="<?php echo $related_task->ref ?>">
 						<input type="hidden" class="labelForDelete" value="<?php echo $langs->trans('DeleteTask') . ' ' . $related_task->ref . ' ?'; ?>">
 						<div class="riskassessment-task-single-content riskassessment-task-single-content-<?php echo $risk->id ?>">
@@ -79,20 +81,21 @@ $related_tasks = $risk->get_related_tasks($risk); ?>
 							<!-- RISK ASSESSMENT TASK EDIT MODAL END -->
 						</div>
 					</div>
-				<?php elseif (count($related_tasks) == 1) : ?>
-					<div class="riskassessment-task-container riskassessment-no-task">
-						<div class="riskassessment-task-single-content riskassessment-task-single-content-<?php echo $risk->id ?>">
-							<div class="riskassessment-task-single riskassessment-task-single-<?php echo $risk->id ?>">
-								<div class="riskassessment-task-content">
-									<div class="riskassessment-task-data">
-										<span class="name"><?php echo $langs->trans('NoTaskLinked'); ?></span>
-									</div>
+				<?php endif; ?>
+			<?php endforeach; ?>
+			<?php if ($nb_of_tasks_in_progress == 0) : ?>
+				<div class="riskassessment-task-container riskassessment-no-task">
+					<div class="riskassessment-task-single-content riskassessment-task-single-content-<?php echo $risk->id ?>">
+						<div class="riskassessment-task-single riskassessment-task-single-<?php echo $risk->id ?>">
+							<div class="riskassessment-task-content">
+								<div class="riskassessment-task-data">
+									<span class="name"><?php echo $langs->trans('NoTaskLinked'); ?></span>
 								</div>
 							</div>
 						</div>
 					</div>
-				<?php endif; ?>
-			<?php endforeach; ?>
+				</div>
+			<?php endif; ?>
 		</div>
 	<?php else : ?>
 		<div class="riskassessment-task-listing-wrapper riskassessment-task-listing-wrapper-<?php echo $risk->id ?>">
