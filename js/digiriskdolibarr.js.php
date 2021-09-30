@@ -625,7 +625,7 @@ if ( ! window.eoxiaJS.tooltip ) {
 	 */
 	window.eoxiaJS.tooltip.event = function() {
 		jQuery( document ).on( 'mouseenter touchstart', '.wpeo-tooltip-event:not([data-tooltip-persist="true"])', window.eoxiaJS.tooltip.onEnter );
-		jQuery( document ).on( 'mouseleave touchleave', '.wpeo-tooltip-event:not([data-tooltip-persist="true"])', window.eoxiaJS.tooltip.onOut );
+		jQuery( document ).on( 'mouseleave touchend', '.wpeo-tooltip-event:not([data-tooltip-persist="true"])', window.eoxiaJS.tooltip.onOut );
 	};
 
 	window.eoxiaJS.tooltip.onEnter = function( event ) {
