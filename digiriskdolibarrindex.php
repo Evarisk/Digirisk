@@ -40,12 +40,15 @@ require_once DOL_DOCUMENT_ROOT.'/core/lib/date.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/projet/class/project.class.php';
 require_once DOL_DOCUMENT_ROOT.'/societe/class/societe.class.php';
 require_once DOL_DOCUMENT_ROOT.'/core/modules/project/mod_project_simple.php';
+require_once './core/modules/modDigiriskDolibarr.class.php';
 
-global $user, $langs, $conf;
+global $user, $langs, $conf, $db;
+
 // Load translation files required by the page
 $langs->loadLangs(array("digiriskdolibarr@digiriskdolibarr"));
 
 // Initialize technical objects
+$digirisk    = new modDigiriskdolibarr($db);
 $project     = new Project($db);
 $third_party = new Societe($db);
 $projectRef  = new $conf->global->PROJECT_ADDON();
@@ -98,9 +101,9 @@ $help_url = 'FR:Module_DigiriskDolibarr';
 $morejs   = array("/digiriskdolibarr/js/tiny-slider.min.js", "/digiriskdolibarr/js/digiriskdolibarr.js.php");
 $morecss  = array("/digiriskdolibarr/css/tiny-slider.min.css", "/digiriskdolibarr/css/digiriskdolibarr.css");
 
-llxHeader("", $langs->trans("DigiriskDolibarrArea"), $help_url, '', '', '', $morejs, $morecss);
+llxHeader("", $langs->trans("DigiriskDolibarrArea") . ' ' . $digirisk->version, $help_url, '', '', '', $morejs, $morecss);
 
-print load_fiche_titre($langs->trans("DigiriskDolibarrArea"), '', 'digiriskdolibarr32px.png@digiriskdolibarr');
+print load_fiche_titre($langs->trans("DigiriskDolibarrArea") . ' ' . $digirisk->version, '', 'digiriskdolibarr32px.png@digiriskdolibarr');
 ?>
 
 <div class="wpeo-notice notice-info">
