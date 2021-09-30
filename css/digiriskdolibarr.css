@@ -3007,6 +3007,11 @@ td > .risk-evaluation-container {
   margin-left: 0.5em;
 }
 
+.risk-list-button {
+	min-width: 50px;
+	margin-left: 0.5em;
+}
+
 /**
  * .cotation -> classe de base
  * .default-cotation -> par défaut

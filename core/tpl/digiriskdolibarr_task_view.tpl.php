@@ -1,8 +1,8 @@
 <?php
 $related_tasks = $risk->get_related_tasks($risk); ?>
-<div class="riskassessment-tasks riskassessment-tasks<?php echo $risk->id ?>" value="<?php echo $risk->id ?>">
+<div class="wpeo-table riskassessment-tasks riskassessment-tasks<?php echo $risk->id ?>" value="<?php echo $risk->id ?>">
 	<?php if (!empty($related_tasks) && $related_tasks > 0) : ?>
-		<div class="riskassessment-task-listing-wrapper riskassessment-task-listing-wrapper-<?php echo $risk->id ?>">
+		<div class="table-cell riskassessment-task-listing-wrapper riskassessment-task-listing-wrapper-<?php echo $risk->id ?>">
 			<?php foreach ($related_tasks as $related_task) : ?>
 				<?php if ($related_task->progress < 100) : ?>
 					<div class="table-cell riskassessment-task-container riskassessment-task-container-<?php echo $related_task->id ?>" value="<?php echo $related_task->ref ?>">
@@ -22,7 +22,6 @@ $related_tasks = $risk->get_related_tasks($risk); ?>
 										<?php $user->fetch($related_task->fk_user_creat); ?>
 										<?php echo getNomUrl( 0, '', 0, 0, 2 ,0,'','',-1,$user); ?>
 									</span>
-									<?php echo $related_task->label; ?>
 								</div>
 							</div>
 							<!-- BUTTON MODAL RISK ASSESSMENT TASK EDIT  -->
@@ -104,27 +103,30 @@ $related_tasks = $risk->get_related_tasks($risk); ?>
 				<?php endif; ?>
 			<?php endforeach; ?>
 		</div>
-		<div class="riskassessment-task-add-wrapper">
+		<div class="table-cell riskassessment-task-add">
 			<!-- BUTTON MODAL RISK ASSESSMENT TASK ADD  -->
 			<?php if ($permissiontoadd) : ?>
-				<div class="table-cell riskassessment-task-add wpeo-button button-square-50 button-primary wpeo-tooltip-event modal-open" aria-label="<?php echo $langs->trans('AddRiskAssessmentTask') ?>" value="<?php echo $risk->id;?>">
+				<div class="table-cell riskassessment-task-add wpeo-button button-square-50 button-primary wpeo-tooltip-event modal-open risk-list-button" aria-label="<?php echo $langs->trans('AddRiskAssessmentTask') ?>" value="<?php echo $risk->id;?>">
 					<i class="fas fa-plus button-icon"></i>
 				</div>
 			<?php else : ?>
-				<div class="table-cell wpeo-button button-square-50 button-grey wpeo-tooltip-event" aria-label="<?php echo $langs->trans('PermissionDenied') ?>" value="<?php echo $risk->id;?>">
+				<div class="table-cell wpeo-button button-square-50 button-grey wpeo-tooltip-event risk-list-button" aria-label="<?php echo $langs->trans('PermissionDenied') ?>" value="<?php echo $risk->id;?>">
 					<i class="fas fa-plus button-icon"></i>
 				</div>
 			<?php endif; ?>
-			<?php if ($permissiontoread) : ?>
-				<div class="riskassessment-task-list wpeo-button button-square-50 button-primary wpeo-tooltip-event modal-open" aria-label="<?php echo $langs->trans('ListRiskAssessmentTask') ?>" value="<?php echo $risk->id;?>">
-					<i class="fas fa-list button-icon"> <?php echo count($related_tasks); ?></i>
-				</div>
-			<?php else : ?>
-				<div class="wpeo-button button-square-50 button-grey wpeo-tooltip-event" aria-label="<?php echo $langs->trans('PermissionDenied') ?>" value="<?php echo $risk->id;?>">
-					<i class="fas fa-list button-icon"></i>
-				</div>
-			<?php endif; ?>
+
 		</div>
+	<div class="table-cell riskassessment-task-list">
+	<?php if ($permissiontoread) : ?>
+			<div class="riskassessment-task-list wpeo-button button-square-50 button-primary wpeo-tooltip-event modal-open risk-list-button" aria-label="<?php echo $langs->trans('ListRiskAssessmentTask') ?>" value="<?php echo $risk->id;?>">
+				<i class="fas fa-list button-icon"> <?php echo count($related_tasks); ?></i>
+			</div>
+		<?php else : ?>
+			<div class="wpeo-button button-square-50 button-grey wpeo-tooltip-event risk-list-button" aria-label="<?php echo $langs->trans('PermissionDenied') ?>" value="<?php echo $risk->id;?>">
+				<i class="fas fa-list button-icon"></i>
+			</div>
+		<?php endif; ?>
+	</div>
 	<?php else : ?>
 		<div class="riskassessment-task-listing-wrapper riskassessment-task-listing-wrapper-<?php echo $risk->id ?>">
 			<div class="riskassessment-task-container riskassessment-no-task">
