@@ -550,7 +550,7 @@ $help_url = 'FR:Module_DigiriskDolibarr';
 $morejs   = array("/digiriskdolibarr/js/digiriskdolibarr.js.php");
 $morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");
 
-llxHeader('', $title, $help_url, '', '', '', $morejs, $morecss);
+llxHeader('', $title, $help_url, '', '', '', $morejs, $morecss, '', 'classforhorizontalscrolloftabs');
 
 // Object card
 // ------------------------------------------------------------

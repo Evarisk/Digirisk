@@ -190,7 +190,7 @@ $help_url = 'FR:Module_DigipreventionplanDolibarr';
 
 $morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");
 
-llxHeader("", $title, $help_url, '', '', '', '', $morecss);
+llxHeader("", $title, $help_url, '', '', '', '', $morecss, '', 'classforhorizontalscrolloftabs');
 
 // Add $param from extra fields
 include DOL_DOCUMENT_ROOT.'/core/tpl/extrafields_list_search_param.tpl.php';
