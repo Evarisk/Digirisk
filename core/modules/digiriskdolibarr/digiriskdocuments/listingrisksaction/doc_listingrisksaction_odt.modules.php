@@ -289,10 +289,10 @@ class doc_listingrisksaction_odt extends ModeleODTListingRisksAction
 					}
 					else    // Text
 					{
-						if ($value == '') {
+						if (empty($value)) {
 							$odfHandler->setVars($key, $langs->trans('NoData'), true, 'UTF-8');
 						} else {
-							$odfHandler->setVars($key, $value, true, 'UTF-8');
+							$odfHandler->setVars($key, html_entity_decode($value,ENT_QUOTES | ENT_HTML5), true, 'UTF-8');
 						}
 					}
 				}
@@ -361,10 +361,10 @@ class doc_listingrisksaction_odt extends ModeleODTListingRisksAction
 													if ($val == $tmparray['nomDanger']) {
 														$listlines->setImage($key, $val);
 													} else {
-														if ($val == '') {
+														if (empty($val)) {
 															$listlines->setVars($key, $langs->trans('NoData'), true, 'UTF-8');
 														} else {
-															$listlines->setVars($key, $val, true, 'UTF-8');
+															$listlines->setVars($key, html_entity_decode($val,ENT_QUOTES | ENT_HTML5), true, 'UTF-8');
 														}
 													}
 												} catch (OdfException $e) {
@@ -433,10 +433,10 @@ class doc_listingrisksaction_odt extends ModeleODTListingRisksAction
 													if ($val == $tmparray['nomDanger']) {
 														$listlines->setImage($key, $val);
 													} else {
-														if ($val == '') {
+														if (empty($val)) {
 															$listlines->setVars($key, $langs->trans('NoData'), true, 'UTF-8');
 														} else {
-															$listlines->setVars($key, $val, true, 'UTF-8');
+															$listlines->setVars($key, html_entity_decode($val,ENT_QUOTES | ENT_HTML5), true, 'UTF-8');
 														}
 													}
 												} catch (OdfException $e) {

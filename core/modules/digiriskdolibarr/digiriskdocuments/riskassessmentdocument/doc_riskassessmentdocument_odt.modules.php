@@ -285,16 +285,10 @@ class doc_riskassessmentdocument_odt extends ModeleODTRiskAssessmentDocument
 					}
 					else    // Text
 					{
-						if ($value == '') {
+						if (empty($value)) {
 							$odfHandler->setVars($key, $langs->trans('NoData'), true, 'UTF-8');
 						} else {
-							$odfHandler->setVars($key, $value, true, 'UTF-8');
-							if (is_string($value)) {
-								if (preg_match('/&#39;/', $value)) {
-									$value = str_replace("&#39;","'",$value);
-								}
-							}
-							$odfHandler->setVars($key, $value, true, 'UTF-8');
+							$odfHandler->setVars($key, html_entity_decode($value,ENT_QUOTES | ENT_HTML5), true, 'UTF-8');
 						}
 					}
 				}
@@ -333,10 +327,10 @@ class doc_riskassessmentdocument_odt extends ModeleODTRiskAssessmentDocument
 							$reshook = $hookmanager->executeHooks('ODTSubstitutionLine', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
 							foreach ($tmparray as $key => $val) {
 								try {
-									if ($val == '') {
+									if (empty($val)) {
 										$listlines->setVars($key, $langs->trans('NoData'), true, 'UTF-8');
 									} else {
-										$listlines->setVars($key, $val, true, 'UTF-8');
+										$listlines->setVars($key, html_entity_decode($val,ENT_QUOTES | ENT_HTML5), true, 'UTF-8');
 									}
 								} catch (OdfException $e) {
 									dol_syslog($e->getMessage(), LOG_INFO);
@@ -382,10 +376,9 @@ class doc_riskassessmentdocument_odt extends ModeleODTRiskAssessmentDocument
 						$reshook = $hookmanager->executeHooks('ODTSubstitutionLine', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
 							foreach ($cotationarray as $key => $val) {
 								try {
-									//	$cotationarray['description'] = $digiriskelementsingle->description;
-									$listlines->setVars('nomElement', $key, true, 'UTF-8');
+									$listlines->setVars('nomElement', html_entity_decode($key,ENT_QUOTES | ENT_HTML5), true, 'UTF-8');
 									$listlines->setVars('quotationTotale', $val[0], true, 'UTF-8');
-									$listlines->setVars('description', $val[1], true, 'UTF-8');
+									$listlines->setVars('description', html_entity_decode($val[1],ENT_QUOTES | ENT_HTML5), true, 'UTF-8');
 									$listlines->setVars('NbRiskBlack', $val[2][1], true, 'UTF-8');
 									$listlines->setVars('NbRiskRed', $val[2][2], true, 'UTF-8');
 									$listlines->setVars('NbRiskOrange', $val[2][3], true, 'UTF-8');
@@ -484,7 +477,7 @@ class doc_riskassessmentdocument_odt extends ModeleODTRiskAssessmentDocument
 //											}
 //											foreach ($tmparray as $key => $val) {
 //												try {
-//													if ($val == '') {
+//													if (empty($val)) {
 //														$listTask->setVars($key, $langs->trans('NoData'), true, 'UTF-8');
 //													} else {
 //														$listTask->setVars($key, $val, true, 'UTF-8');
@@ -520,10 +513,10 @@ class doc_riskassessmentdocument_odt extends ModeleODTRiskAssessmentDocument
 											if ($val == $tmparray['nomDanger']) {
 												$listlines->setImage($key, $val);
 											} else {
-												if ($val == '') {
+												if (empty($val)) {
 													$listlines->setVars($key, $langs->trans('NoData'), true, 'UTF-8');
 												} else {
-													$listlines->setVars($key, $val, true, 'UTF-8');
+													$listlines->setVars($key, html_entity_decode($val,ENT_QUOTES | ENT_HTML5), true, 'UTF-8');
 												}
 											}
 										} catch (OdfException $e) {

@@ -389,7 +389,11 @@ class doc_preventionplandocument_specimen_odt extends ModeleODTPreventionPlanDoc
 					}
 					else    // Text
 					{
-						$odfHandler->setVars($key, $value, true, 'UTF-8');
+						if (empty($value)) {
+							$odfHandler->setVars($key, $langs->trans('NoData'), true, 'UTF-8');
+						} else {
+							$odfHandler->setVars($key, html_entity_decode($value,ENT_QUOTES | ENT_HTML5), true, 'UTF-8');
+						}
 					}
 				}
 				catch (OdfException $e)
@@ -420,7 +424,11 @@ class doc_preventionplandocument_specimen_odt extends ModeleODTPreventionPlanDoc
 									if ($val == $tmparray['risk']) {
 										$listlines->setImage($key, $val);
 									} else {
-										$listlines->setVars($key, $val, true, 'UTF-8');
+										if (empty($val)) {
+											$listlines->setVars($key, $langs->trans('NoData'), true, 'UTF-8');
+										} else {
+											$listlines->setVars($key, html_entity_decode($val,ENT_QUOTES | ENT_HTML5), true, 'UTF-8');
+										}
 									}
 								} catch (OdfException $e) {
 									dol_syslog($e->getMessage(), LOG_INFO);
@@ -447,7 +455,11 @@ class doc_preventionplandocument_specimen_odt extends ModeleODTPreventionPlanDoc
 
 							foreach ($tmparray as $key => $value) {
 								try {
-									$listlines->setVars($key, $value, true, 'UTF-8');
+									if (empty($value)) {
+										$listlines->setVars($key, $langs->trans('NoData'), true, 'UTF-8');
+									} else {
+										$listlines->setVars($key, html_entity_decode($value,ENT_QUOTES | ENT_HTML5), true, 'UTF-8');
+									}
 								} catch (OdfException $e) {
 									dol_syslog($e->getMessage(), LOG_INFO);
 								} catch (SegmentException $e) {

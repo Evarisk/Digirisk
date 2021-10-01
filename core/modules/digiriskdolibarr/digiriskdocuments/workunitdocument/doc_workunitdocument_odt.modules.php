@@ -293,10 +293,10 @@ class doc_workunitdocument_odt extends ModeleODTWorkUnitDocument
 					}
 					else    // Text
 					{
-						if ($value == '') {
+						if (empty($value)) {
 							$odfHandler->setVars($key, $langs->trans('NoData'), true, 'UTF-8');
 						} else {
-							$odfHandler->setVars($key, $value, true, 'UTF-8');
+							$odfHandler->setVars($key, html_entity_decode($value,ENT_QUOTES | ENT_HTML5), true, 'UTF-8');
 						}
 					}
 				}
@@ -361,11 +361,12 @@ class doc_workunitdocument_odt extends ModeleODTWorkUnitDocument
 												if ($val == $tmparray['nomDanger']) {
 													$listlines->setImage($key, $val);
 												} else {
-													if ($val == '') {
+													if (empty($val)) {
 														$listlines->setVars($key, $langs->trans('NoData'), true, 'UTF-8');
 													} else {
-														$listlines->setVars($key, $val, true, 'UTF-8');
-													}												}
+														$listlines->setVars($key, html_entity_decode($val,ENT_QUOTES | ENT_HTML5), true, 'UTF-8');
+													}
+												}
 											} catch (OdfException $e) {
 												dol_syslog($e->getMessage(), LOG_INFO);
 											} catch (SegmentException $e) {
@@ -410,10 +411,10 @@ class doc_workunitdocument_odt extends ModeleODTWorkUnitDocument
 										if (file_exists($val)) {
 											$listlines->setImage($key, $val);
 										} else {
-											if ($val == '') {
+											if (empty($val)) {
 												$listlines->setVars($key, $langs->trans('NoData'), true, 'UTF-8');
 											} else {
-												$listlines->setVars($key, $val, true, 'UTF-8');
+												$listlines->setVars($key, html_entity_decode($val,ENT_QUOTES | ENT_HTML5), true, 'UTF-8');
 											}										}
 									} catch (OdfException $e) {
 										dol_syslog($e->getMessage(), LOG_INFO);
@@ -452,10 +453,10 @@ class doc_workunitdocument_odt extends ModeleODTWorkUnitDocument
 										if (file_exists($val)) {
 											$listlines->setImage($key, $val);
 										} else {
-											if ($val == '') {
+											if (empty($val)) {
 												$listlines->setVars($key, $langs->trans('NoData'), true, 'UTF-8');
 											} else {
-												$listlines->setVars($key, $val, true, 'UTF-8');
+												$listlines->setVars($key, html_entity_decode($val,ENT_QUOTES | ENT_HTML5), true, 'UTF-8');
 											}
 										}
 									} catch (OdfException $e) {
