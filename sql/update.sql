@@ -10,5 +10,15 @@ UPDATE llx_c_action_trigger SET elementtype = 'riskassessmentdocument@digiriskdo
 
 UPDATE llx_extrafields SET type='sellist', param = 'a:1:{s:7:"options";a:1:{s:25:"digiriskdolibarr_risk:ref";N;}}', list='1' WHERE label='fk_risk';
 
+UPDATE `llx_digiriskdolibarr_digiriskelement` SET `status`= 1 WHERE `status` IS NULL;
+UPDATE `llx_digiriskdolibarr_risksign` SET `status`= 1 WHERE `status` IS NULL;
+UPDATE `llx_digiriskdolibarr_evaluator` SET `status`= 1 WHERE `status` IS NULL;
+UPDATE `llx_digiriskdolibarr_risk` SET `status`= 1 WHERE `status` IS NULL;
+
 ALTER TABLE llx_digiriskdolibarr_preventionplan ADD prior_visit_date datetime;
 ALTER TABLE llx_digiriskdolibarr_preventionplan ADD fk_project integer;
+
+ALTER TABLE `llx_digiriskdolibarr_digiriskelement` CHANGE `status` `status` SMALLINT(6) NULL DEFAULT '1';
+ALTER TABLE `llx_digiriskdolibarr_risksign` CHANGE `status` `status` SMALLINT(6) NULL DEFAULT '1';
+ALTER TABLE `llx_digiriskdolibarr_evaluator` CHANGE `status` `status` SMALLINT(6) NULL DEFAULT '1';
+ALTER TABLE `llx_digiriskdolibarr_risk` CHANGE `status` `status` SMALLINT(6) NULL DEFAULT '1';

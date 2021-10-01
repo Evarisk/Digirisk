@@ -175,9 +175,9 @@ function digiriskdolibarrAdminDigiriskElementPrepareHead()
 	$head[$h][2] = 'preventionplan';
 	$h++;
 
-	$head[$h][0] = dol_buildpath("/digiriskdolibarr/admin/digiriskelement/preventionplandet.php", 1);
-	$head[$h][1] = $langs->trans("PreventionPlanDet");
-	$head[$h][2] = 'preventionplandet';
+	$head[$h][0] = dol_buildpath("/digiriskdolibarr/admin/digiriskelement/deletedelements.php", 1);
+	$head[$h][1] = $langs->trans("DeletedElements");
+	$head[$h][2] = 'deletedelements';
 	$h++;
 
 //	$head[$h][0] = dol_buildpath("/digiriskdolibarr/admin/digiriskelement/firepermitdet.php", 1);

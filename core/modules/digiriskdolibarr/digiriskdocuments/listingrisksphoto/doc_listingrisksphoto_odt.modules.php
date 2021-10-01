@@ -219,7 +219,13 @@ class doc_listingrisksphoto_odt extends ModeleODTListingRisksPhoto
 			$filename = preg_split('/listingrisksphoto\//' , $srctemplatepath);
 			$filename = preg_replace('/template_/','', $filename[1]);
 
-			$filename = $objectref . '_'. $filename;
+			$date = dol_print_date(dol_now(),'dayxcard');
+			if (!empty($digiriskelement)) {
+				$filename = $objectref.'_'.$digiriskelement->label.'_'.$date.'.odt';
+			} else {
+				$filename = $objectref.'_'.$conf->global->MAIN_INFO_SOCIETE_NOM.'_'.$date.'.odt';
+			}
+			$filename = str_replace(' ', '_', $filename);
 
 			$object->last_main_doc = $filename;
 
@@ -280,11 +286,15 @@ class doc_listingrisksphoto_odt extends ModeleODTListingRisksPhoto
 					if (preg_match('/logo$/', $key)) // Image
 					{
 						if (file_exists($value)) $odfHandler->setImage($key, $value);
-						else $odfHandler->setVars($key, 'ErrorFileNotFound', true, 'UTF-8');
+						else $odfHandler->setVars($key, $langs->transnoentities('ErrorFileNotFound'), true, 'UTF-8');
 					}
 					else    // Text
 					{
-						$odfHandler->setVars($key, $value, true, 'UTF-8');
+						if (empty($value)) {
+							$odfHandler->setVars($key, $langs->trans('NoData'), true, 'UTF-8');
+						} else {
+							$odfHandler->setVars($key, html_entity_decode($value,ENT_QUOTES | ENT_HTML5), true, 'UTF-8');
+						}
 					}
 				}
 				catch (OdfException $e)
@@ -324,10 +334,12 @@ class doc_listingrisksphoto_odt extends ModeleODTListingRisksPhoto
 											if (dol_strlen($lastEvaluation->photo) && $lastEvaluation !== 'undefined') {
 												$entity = ($conf->entity > 1) ? '/' . $conf->entity : '';
 												$path = DOL_DATA_ROOT . $entity . '/digiriskdolibarr/riskassessment/' . $lastEvaluation->ref;
-												$image = $path . '/' . $lastEvaluation->photo;
+												$file_small = preg_split('/\./', $lastEvaluation->photo);
+												$new_file = $file_small[0] . '_small.' . $file_small[1];
+												$image = $path . '/thumbs/' . $new_file;
 												$tmparray['photoAssociee'] = $image;
 											} else {
-												$tmparray['photoAssociee'] = $langs->trans('NoFileLinked');
+												$tmparray['photoAssociee'] = $langs->transnoentities('NoFileLinked');
 											}
 											unset($tmparray['object_fields']);
 
@@ -342,7 +354,11 @@ class doc_listingrisksphoto_odt extends ModeleODTListingRisksPhoto
 													} elseif ($val == $tmparray['nomDanger']) {
 														$listlines->setImage($key, $val);
 													} else {
-														$listlines->setVars($key, $val, true, 'UTF-8');
+														if (empty($val)) {
+															$listlines->setVars($key, $langs->trans('NoData'), true, 'UTF-8');
+														} else {
+															$listlines->setVars($key, html_entity_decode($val,ENT_QUOTES | ENT_HTML5), true, 'UTF-8');
+														}
 													}
 												} catch (OdfException $e) {
 													dol_syslog($e->getMessage(), LOG_INFO);
@@ -383,10 +399,12 @@ class doc_listingrisksphoto_odt extends ModeleODTListingRisksPhoto
 											if (dol_strlen($lastEvaluation->photo) && $lastEvaluation !== 'undefined') {
 												$entity = ($conf->entity > 1) ? '/' . $conf->entity : '';
 												$path = DOL_DATA_ROOT . $entity . '/digiriskdolibarr/riskassessment/' . $lastEvaluation->ref;
-												$image = $path . '/' . $lastEvaluation->photo;
+												$file_small = preg_split('/\./', $lastEvaluation->photo);
+												$new_file = $file_small[0] . '_small.' . $file_small[1];
+												$image = $path . '/thumbs/' . $new_file;
 												$tmparray['photoAssociee'] = $image;
 											} else {
-												$tmparray['photoAssociee'] = $langs->trans('NoFileLinked');
+												$tmparray['photoAssociee'] = $langs->transnoentities('NoFileLinked');
 											}
 
 											unset($tmparray['object_fields']);
@@ -402,7 +420,11 @@ class doc_listingrisksphoto_odt extends ModeleODTListingRisksPhoto
 													} elseif ($val == $tmparray['nomDanger']) {
 														$listlines->setImage($key, $val);
 													} else {
-														$listlines->setVars($key, $val, true, 'UTF-8');
+														if (empty($val)) {
+															$listlines->setVars($key, $langs->trans('NoData'), true, 'UTF-8');
+														} else {
+															$listlines->setVars($key, html_entity_decode($val,ENT_QUOTES | ENT_HTML5), true, 'UTF-8');
+														}
 													}
 												} catch (OdfException $e) {
 													dol_syslog($e->getMessage(), LOG_INFO);

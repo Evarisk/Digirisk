@@ -21,7 +21,7 @@ CREATE TABLE llx_digiriskdolibarr_evaluator(
 	date_creation   datetime NOT NULL,
 	tms             timestamp,
 	import_key      integer DEFAULT NULL,
-	status          smallint,
+	status          smallint DEFAULT 1,
 	duration        integer,
 	assignment_date datetime NOT NULL,
 	fk_user_creat   integer NOT NULL,

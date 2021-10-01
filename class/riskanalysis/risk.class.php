@@ -176,7 +176,7 @@ class Risk extends CommonObject
 	public function fetchRisksOrderedByCotation($parent_id, $recursive = false)
 	{
 		$object  = new DigiriskElement($this->db);
-		$objects = $object->fetchAll();
+		$objects = $object->fetchAll('',  '',  0,  0, array('customsql' => 'status > 0' ));
 		$risk    = new Risk($this->db);
 		$result  = $risk->fetchFromParent($parent_id);
 

@@ -46,5 +46,24 @@
 
   .tableforinputfields {
     margin-top: 1em;
+
+    input {
+      display: block;
+      clear: both;
+      width: 100%;
+      max-width: none;
+      margin-bottom: 1em;
+    }
+    .inline-block {
+      @media ( max-width: $media__small ) {
+        display: block;
+      }
+      input {
+        display: inline-block;
+      }
+      #options_digiriskdolibarr_ticket_date {
+        max-width: 80px;
+      }
+    }
   }
 }

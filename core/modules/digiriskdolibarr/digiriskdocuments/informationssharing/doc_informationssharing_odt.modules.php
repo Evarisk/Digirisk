@@ -210,7 +210,9 @@ class doc_informationssharing_odt extends ModeleODTInformationsSharing
 			$filename = preg_split('/informationssharing\//' , $srctemplatepath);
 			$filename = preg_replace('/template_/','', $filename[1]);
 
-			$filename = $objectref . '_'. $filename;
+			$date = dol_print_date(dol_now(),'dayxcard');
+			$filename = $objectref.'_'.$conf->global->MAIN_INFO_SOCIETE_NOM.'_'.$date.'.odt';
+			$filename = str_replace(' ', '_', $filename);
 
 			$object->last_main_doc = $filename;
 
@@ -270,11 +272,15 @@ class doc_informationssharing_odt extends ModeleODTInformationsSharing
 					if (preg_match('/logo$/', $key)) // Image
 					{
 						if (file_exists($value)) $odfHandler->setImage($key, $value);
-						else $odfHandler->setVars($key, 'ErrorFileNotFound', true, 'UTF-8');
+						else $odfHandler->setVars($key, $langs->transnoentities('ErrorFileNotFound'), true, 'UTF-8');
 					}
 					else    // Text
 					{
-						$odfHandler->setVars($key, $value, true, 'UTF-8');
+						if (empty($value)) {
+							$odfHandler->setVars($key, $langs->trans('NoData'), true, 'UTF-8');
+						} else {
+							$odfHandler->setVars($key, html_entity_decode($value,ENT_QUOTES | ENT_HTML5), true, 'UTF-8');
+						}
 					}
 				}
 				catch (OdfException $e)

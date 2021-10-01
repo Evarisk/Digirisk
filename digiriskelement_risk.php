@@ -93,8 +93,8 @@ $extrafields->fetch_name_optionals_label($risk->table_element);
 $search_array_options = $extrafields->getOptionalsFromPost($risk->table_element, '', 'search_');
 
 // Default sort order (if not yet defined by previous GETPOST)
-if (!$sortfield) $sortfield = "evaluation.cotation"; // Set here default search field. By default 1st field in definition.
-if (!$sortorder) $sortorder = "DESC";
+if (!$sortfield) $sortfield = "t.".key($risk->fields); // Set here default search field. By default 1st field in definition.
+if (!$sortorder) $sortorder = "ASC";
 if (!$evalsortfield) $evalsortfield = "evaluation.".key($evaluation->fields);
 
 $offset   = $limit * $page;
@@ -559,7 +559,7 @@ if (empty($reshook)) {
 		}
 
 		if (!$error) {
-			$generatethumbs = 0;
+			$generatethumbs = 1;
 			$res = dol_add_file_process($upload_dir, 0, 1, 'userfile', '', null, '', $generatethumbs);
 			if ($res > 0) {
 				$result = $ecmdir->changeNbOfFiles('+');

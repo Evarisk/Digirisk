@@ -21,7 +21,7 @@ CREATE TABLE llx_digiriskdolibarr_risksign(
 	date_creation datetime NOT NULL,
 	tms           timestamp,
 	import_key    varchar(14),
-	status        smallint,
+	status        smallint DEFAULT 1,
 	category      integer,
     description   text,
 	fk_user_creat integer NOT NULL,

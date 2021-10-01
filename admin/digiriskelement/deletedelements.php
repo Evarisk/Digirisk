@@ -16,9 +16,9 @@
  */
 
 /**
- * \file    admin/riskanalysis.php
+ * \file    admin/deletedelements.php
  * \ingroup digiriskdolibarr
- * \brief   Digiriskdolibarr riskanalysis page.
+ * \brief   Digiriskdolibarr deletedelements page.
  */
 
 // Load Dolibarr environment
@@ -36,7 +36,7 @@ if (!$res && file_exists("../../../main.inc.php")) $res = @include "../../../mai
 if (!$res && file_exists("../../../../main.inc.php")) $res = @include "../../../../main.inc.php";
 if (!$res) die("Include of main fails");
 
-global $langs, $user;
+global $langs, $user, $conf, $db;
 
 // Libraries
 require_once DOL_DOCUMENT_ROOT . "/core/lib/admin.lib.php";
@@ -49,14 +49,25 @@ $langs->loadLangs(array("admin", "digiriskdolibarr@digiriskdolibarr"));
 if (!$user->admin) accessforbidden();
 
 // Parameters
+$action     = GETPOST('action', 'alpha');
 $backtopage = GETPOST('backtopage', 'alpha');
+$value      = GETPOST('value', 'alpha');
+
+/*
+ * Actions
+ */
+
+if ($action == 'setDeletedElements') {
+	$constforval = 'DIGIRISKDOLIBARR_SHOW_HIDDEN_DIGIRISKELEMENT';
+	dolibarr_set_const($db, $constforval, $value, 'integer', 0, '', $conf->entity);
+}
 
 /*
  * View
  */
 
-$help_url = 'FR:Module_DigiriskDolibarr#L.27onglet_Analyse_des_risques';
-$title    = $langs->trans("RiskAnalysis");
+$help_url = 'FR:Module_DigiriskDolibarr#L.27onglet_.C3.89l.C3.A9ment_Digirisk';
+$title    = $langs->trans("DigiriskElement") . ' - ' . $langs->trans("DeletedElements");
 $morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");
 
 llxHeader('', $title, $help_url, '', '', '', '', $morecss);
@@ -68,12 +79,40 @@ print load_fiche_titre($title, $linkback, 'object_digiriskdolibarr@digiriskdolib
 
 // Configuration header
 $head = digiriskdolibarrAdminPrepareHead();
-print dol_get_fiche_head($head, 'riskanalysis', '', -1, "digiriskdolibarr@digiriskdolibarr");
-$head = digiriskdolibarrAdminRiskAnalysisPrepareHead();
-print dol_get_fiche_head($head, '', '', -1, "digiriskdolibarr@digiriskdolibarr");
+print dol_get_fiche_head($head, 'digiriskelement', '', -1, "digiriskdolibarr@digiriskdolibarr");
+$head = digiriskdolibarrAdminDigiriskElementPrepareHead();
+print dol_get_fiche_head($head, 'deletedelements', '', -1, "digiriskdolibarr@digiriskdolibarr");
 
+/*
+ *  Numbering module
+ */
+print load_fiche_titre($langs->trans("DeletedDigiriskElement"), '', '');
+
+print '<table class="noborder centpercent">';
+print '<tr class="liste_titre">';
+print '<td>'.$langs->trans("Name").'</td>';
+print '<td>'.$langs->trans("Description").'</td>';
+print '<td class="center">'.$langs->trans("Status").'</td>';
+print '</tr>';
+
+print '<tr class="oddeven"><td>';
+print $langs->trans('DeletedDigiriskElement');
+print "</td><td>";
+print $langs->trans('ShowDeletedDigiriskElement');
+print '</td>';
+
+print '<td class="center">';
+if ($conf->global->DIGIRISKDOLIBARR_SHOW_HIDDEN_DIGIRISKELEMENT) {
+	print '<a class="reposition" href="'.$_SERVER["PHP_SELF"].'?action=setDeletedElements&value=0" alt="'.$langs->trans("Default").'">'.img_picto($langs->trans("Activated"), 'switch_on').'</a>';
+}
+else {
+	print '<a class="reposition" href="'.$_SERVER["PHP_SELF"].'?action=setDeletedElements&value=1" alt="'.$langs->trans("Default").'">'.img_picto($langs->trans("Disabled"), 'switch_off').'</a>';
+}
+print '</td>';
+print '</tr>';
+
+print '</table>';
 // Page end
 print dol_get_fiche_end();
 llxFooter();
 $db->close();
-

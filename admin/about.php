@@ -36,6 +36,8 @@ if (!$res && file_exists("../../../main.inc.php")) $res = @include "../../../mai
 if (!$res && file_exists("../../../../main.inc.php")) $res = @include "../../../../main.inc.php";
 if (!$res) die("Include of main fails");
 
+global $langs, $user, $db;
+
 // Libraries
 require_once DOL_DOCUMENT_ROOT.'/core/lib/admin.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/functions2.lib.php';
@@ -69,8 +71,6 @@ print load_fiche_titre($langs->trans($page_name), $linkback, 'object_digiriskdol
 // Configuration header
 $head = digiriskdolibarrAdminPrepareHead();
 print dol_get_fiche_head($head, 'about', '', 0, 'digiriskdolibarr@digiriskdolibarr');
-
-require_once '../core/modules/modDigiriskdolibarr.class.php';
 
 $contents = file_get_contents(DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/README.md');
 $Parsedown = new Parsedown();

@@ -46,7 +46,7 @@ require_once DOL_DOCUMENT_ROOT.'/core/class/html.form.class.php';
 
 require_once '../class/digiriskresources.class.php';
 
-global $conf, $db;
+global $conf, $db, $langs, $user, $hookmanager;
 
 // Translations
 $langs->loadLangs(array('admin', 'companies', "digiriskdolibarr@digiriskdolibarr"));
@@ -115,11 +115,12 @@ if (empty($reshook)) {
  */
 
 $help_url = 'FR:Module_DigiriskDolibarr#L.27onglet_Social';
+$title    = $langs->trans("CompanyFoundation") . ' - ' . $langs->trans("Social");
 $morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");
 
-llxHeader('', $langs->trans("CompanyFoundation"), $help_url, '', '', '', '', $morecss);
+llxHeader('', $title, $help_url, '', '', '', '', $morecss);
 
-print load_fiche_titre($langs->trans("CompanyFoundation"), '', 'title_setup');
+print load_fiche_titre($title, '', 'title_setup');
 
 $head = company_admin_prepare_head();
 

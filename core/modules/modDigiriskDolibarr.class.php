@@ -53,11 +53,11 @@ class modDigiriskdolibarr extends DolibarrModules
 		$this->family          = "interface";
 		$this->module_position = '90';
 		$this->name            = preg_replace('/^mod/i', '', get_class($this));
-		$this->description     = $langs->trans('DigiriskDolibarrdDescription');
+		$this->description     = $langs->trans('DigiriskDolibarrDescription');
 		$this->descriptionlong = "Digirisk";
 		$this->editor_name     = 'Evarisk';
 		$this->editor_url      = 'https://evarisk.com';
-		$this->version         = '8.1.1';
+		$this->version         = '8.1.2';
 		$this->const_name      = 'MAIN_MODULE_'.strtoupper($this->name);
 		$this->picto           ='digiriskdolibarr@digiriskdolibarr';
 
@@ -137,8 +137,8 @@ class modDigiriskdolibarr extends DolibarrModules
 			165 => array('DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_AUDIT_START_DATE','date','','', $conf->entity),
 			166 => array('DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_AUDIT_END_DATE','date','','', $conf->entity),
 			170 => array('DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_RECIPIENT','integer',0,'', $conf->entity),
-			171 => array('DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_METHOD','chaine','* Etape 1 : Récupération des informations<br>- Visite des locaux<br>- Récupération des donnees du personnel<br><br> * Etape 2 : Définition de la méthodologie et de document<br>- Validation des fiches d\'unite de travail standard<br>- Validation de l\'arborescence des unités<br><br>* Etape 3 : Réalisation de l\'étude de risques<br>- Sensibilisation des personnels aux risques et aux dangers<br>- Création des unites de travail avec le personnel et le ou les responsables<br>- Evaluations des risques par unités de travail avec le personnel<br><br>* Etape 4<br>- Traitement et rédaction du document unique','', $conf->entity),
-			172 => array('DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_SOURCES','chaine','La sensibilisation des risques est définie dans l\'ED840 edite par l INRS.<br>Dans ce document vous trouverez:<br>- La définition d un risque, d\'un danger et un schéma explicatif<br>- Les explications concernant les différentes methodes d\'évaluation<br>','', $conf->entity),
+			171 => array('DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_METHOD','chaine','* Étape 1 : Récupération des informations<br>- Visite des locaux<br>- Récupération des données du personnel<br><br> * Étape 2 : Définition de la méthodologie et de document<br>- Validation des fiches d\'unité de travail standard<br>- Validation de l\'arborescence des unités<br><br>* Étape 3 : Réalisation de l\'étude de risques<br>- Sensibilisation des personnels aux risques et aux dangers<br>- Création des unités de travail avec le personnel et le ou les responsables<br>- Évaluations des risques par unités de travail avec le personnel<br><br>* Étape 4<br>- Traitement et rédaction du document unique','', $conf->entity),
+			172 => array('DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_SOURCES','chaine','La sensibilisation des risques est définie dans l\'ED840 édité par l\'INRS.<br>Dans ce document vous trouverez:<br>- La définition d\'un risque, d\'un danger et un schéma explicatif<br>- Les explications concernant les différentes methodes d\'évaluation<br>','', $conf->entity),
 			173 => array('DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_SITE_PLANS','chaine','Plan du site','', $conf->entity),
 			174 => array('DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_IMPORTANT_NOTES','chaine','Notes importantes','', $conf->entity),
 
@@ -233,6 +233,8 @@ class modDigiriskdolibarr extends DolibarrModules
 			// CONST GROUPMENT
 			100 => array('MAIN_AGENDA_ACTIONAUTO_GROUPMENT_CREATE','chaine',1,'', $conf->entity),
 			101 => array('DIGIRISKDOLIBARR_GROUPMENT_ADDON','chaine', 'mod_groupment_standard' ,'', $conf->entity),
+			102 => array('DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH','integer', 0 ,'', $conf->entity),
+			103 => array('DIGIRISKDOLIBARR_SHOW_HIDDEN_DIGIRISKELEMENT','integer', 0 ,'', $conf->entity),
 
 			// CONST WORKUNIT
 			110 => array('MAIN_AGENDA_ACTIONAUTO_WORKUNIT_CREATE','chaine',1,'', $conf->entity),
@@ -281,6 +283,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			// MODULE
 			200 => array('DIGIRISKDOLIBARR_VERSION','chaine', $this->version,'', $conf->entity),
 			201 => array('DIGIRISKDOLIBARR_SUBPERMCATEGORY_FOR_DOCUMENTS','integer', 1,'', $conf->entity),
+			202 => array('DIGIRISKDOLIBARR_DB_VERSION','chaine', $this->version,'', $conf->entity),
 
 			// CONST SIGNATURE
 			210 => array('DIGIRISKDOLIBARR_SIGNATURE_ENABLE_PUBLIC_INTERFACE','integer', 1,'', $conf->entity),
@@ -710,21 +713,44 @@ class modDigiriskdolibarr extends DolibarrModules
 		$this->_load_tables('/digiriskdolibarr/sql/preventionplan/');
 		$this->_load_tables('/digiriskdolibarr/sql/firepermit/');
 
-		if ( $conf->global->DIGIRISKDOLIBARR_DOCUMENT_MODELS_SET ==  0 ) {
-			addDocumentModel('informationssharing_odt'            ,'informationssharing'           ,'ODT templates','DIGIRISKDOLIBARR_INFORMATIONSSHARING_ADDON_ODT_PATH');
-			addDocumentModel('legaldisplay_odt'                   ,'legaldisplay'                  ,'ODT templates','DIGIRISKDOLIBARR_LEGALDISPLAY_ADDON_ODT_PATH');
-			addDocumentModel('firepermitdocument_odt'             ,'firepermitdocument'            ,'ODT templates','DIGIRISKDOLIBARR_FIREPERMITDOCUMENT_ADDON_ODT_PATH');
-			addDocumentModel('preventionplandocument_odt'         ,'preventionplandocument'        ,'ODT templates','DIGIRISKDOLIBARR_PREVENTIONPLANDOCUMENT_ADDON_ODT_PATH');
-			addDocumentModel('preventionplandocument_specimen_odt','preventionplandocumentspecimen','ODT templates','DIGIRISKDOLIBARR_PREVENTIONPLANDOCUMENT_SPECIMEN_ADDON_ODT_PATH');
-			addDocumentModel('groupmentdocument_odt'              ,'groupmentdocument'             ,'ODT templates','DIGIRISKDOLIBARR_GROUPMENTDOCUMENT_ADDON_ODT_PATH');
-			addDocumentModel('workunitdocument_odt'               ,'workunitdocument'              ,'ODT templates','DIGIRISKDOLIBARR_WORKUNITDOCUMENT_ADDON_ODT_PATH');
-			addDocumentModel('listingrisksaction_odt'             ,'listingrisksaction'            ,'ODT templates','DIGIRISKDOLIBARR_LISTINGRISKSACTION_ADDON_ODT_PATH');
-			addDocumentModel('listingrisksphoto_odt'              ,'listingrisksphoto'             ,'ODT templates','DIGIRISKDOLIBARR_LISTINGRISKSPHOTO_ADDON_ODT_PATH');
-			addDocumentModel('riskassessmentdocument_odt'         ,'riskassessmentdocument'        ,'ODT templates','DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_ADDON_ODT_PATH');
+		delDocumentModel('informationssharing_odt'            ,'informationssharing');
+		delDocumentModel('legaldisplay_odt'                   ,'legaldisplay');
+		delDocumentModel('firepermitdocument_odt'             ,'firepermitdocument');
+		delDocumentModel('preventionplandocument_odt'         ,'preventionplandocument');
+		delDocumentModel('preventionplandocument_specimen_odt','preventionplandocumentspecimen');
+		delDocumentModel('groupmentdocument_odt'              ,'groupmentdocument');
+		delDocumentModel('workunitdocument_odt'               ,'workunitdocument');
+		delDocumentModel('listingrisksaction_odt'             ,'listingrisksaction');
+		delDocumentModel('listingrisksphoto_odt'              ,'listingrisksphoto');
+		delDocumentModel('riskassessmentdocument_odt'         ,'riskassessmentdocument');
 
-			dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_DOCUMENT_MODELS_SET', 1, 'integer', 0, '', $conf->entity);
+		addDocumentModel('informationssharing_odt'            ,'informationssharing'           ,'ODT templates','DIGIRISKDOLIBARR_INFORMATIONSSHARING_ADDON_ODT_PATH');
+		addDocumentModel('legaldisplay_odt'                   ,'legaldisplay'                  ,'ODT templates','DIGIRISKDOLIBARR_LEGALDISPLAY_ADDON_ODT_PATH');
+		addDocumentModel('firepermitdocument_odt'             ,'firepermitdocument'            ,'ODT templates','DIGIRISKDOLIBARR_FIREPERMITDOCUMENT_ADDON_ODT_PATH');
+		addDocumentModel('preventionplandocument_odt'         ,'preventionplandocument'        ,'ODT templates','DIGIRISKDOLIBARR_PREVENTIONPLANDOCUMENT_ADDON_ODT_PATH');
+		addDocumentModel('preventionplandocument_specimen_odt','preventionplandocumentspecimen','ODT templates','DIGIRISKDOLIBARR_PREVENTIONPLANDOCUMENT_SPECIMEN_ADDON_ODT_PATH');
+		addDocumentModel('groupmentdocument_odt'              ,'groupmentdocument'             ,'ODT templates','DIGIRISKDOLIBARR_GROUPMENTDOCUMENT_ADDON_ODT_PATH');
+		addDocumentModel('workunitdocument_odt'               ,'workunitdocument'              ,'ODT templates','DIGIRISKDOLIBARR_WORKUNITDOCUMENT_ADDON_ODT_PATH');
+		addDocumentModel('listingrisksaction_odt'             ,'listingrisksaction'            ,'ODT templates','DIGIRISKDOLIBARR_LISTINGRISKSACTION_ADDON_ODT_PATH');
+		addDocumentModel('listingrisksphoto_odt'              ,'listingrisksphoto'             ,'ODT templates','DIGIRISKDOLIBARR_LISTINGRISKSPHOTO_ADDON_ODT_PATH');
+		addDocumentModel('riskassessmentdocument_odt'         ,'riskassessmentdocument'        ,'ODT templates','DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_ADDON_ODT_PATH');
+
+		if ( $conf->global->DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH ==  0 ) {
+			require_once __DIR__ . '/../../class/digiriskelement/groupment.class.php';
+
+
+			$trashRef = 'GP0';
+			$digiriskelement = new Groupment($this->db);
+			$digiriskelement->ref = $trashRef;
+			$digiriskelement->label = $langs->trans('HiddenElements');
+			$digiriskelement->element_type = 'groupment';
+			$digiriskelement->description = $langs->trans('TrashGroupment');
+			$digiriskelement->status = 0;
+
+			$trash_id = $digiriskelement->create($user);
+
+			dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH', $trash_id, 'integer', 0, '', $conf->entity);
 		}
-
 
 		if ( $conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD ==  0 ) {
 			require_once __DIR__ . '/../../class/digiriskstandard.class.php';
@@ -744,39 +770,88 @@ class modDigiriskdolibarr extends DolibarrModules
 			require_once DOL_DOCUMENT_ROOT . '/societe/class/societe.class.php';
 			require_once __DIR__ . '/../../class/digiriskresources.class.php';
 
-			$societe = new Societe($this->db);
+			$societe   = new Societe($this->db);
 			$resources = new DigiriskResources($this->db);
 
-			$police = $societe;
-			$police->name = $langs->trans('Police');
-			$police->client = 0;
-			$police->phone = '17';
-			$policeID = $police->create($user);
+			$labour_inspector         = $societe;
+			$labour_inspector->name   = $langs->trans('LabourInspectorName');
+			$labour_inspector->client = 0;
+			$labour_inspector->url    = $langs->trans('UrlLabourInspector');
+			$labour_inspectorID       = $labour_inspector->create($user);
 
-			$samu = $societe;
-			$samu->name = $langs->trans('SAMU');
+			$samu         = $societe;
+			$samu->name   = $langs->trans('SAMU');
 			$samu->client = 0;
-			$samu->phone = '15';
-			$samuID = $samu->create($user);
+			$samu->phone  = '15';
+			$samuID       = $samu->create($user);
 
-			$pompiers = $societe;
-			$pompiers->name = $langs->trans('Pompiers');
+			$pompiers         = $societe;
+			$pompiers->name   = $langs->trans('Pompiers');
 			$pompiers->client = 0;
-			$pompiers->phone = '18';
-			$pompiersID = $pompiers->create($user);
+			$pompiers->phone  = '18';
+			$pompiersID       = $pompiers->create($user);
 
-			$emergency = $societe;
-			$emergency->name = $langs->trans('AllEmergencies');
+			$police         = $societe;
+			$police->name   = $langs->trans('Police');
+			$police->client = 0;
+			$police->phone  = '17';
+			$policeID       = $police->create($user);
+
+			$emergency         = $societe;
+			$emergency->name   = $langs->trans('AllEmergencies');
 			$emergency->client = 0;
-			$emergency->phone = '112';
-			$emergencyID = $emergency->create($user);
+			$emergency->phone  = '112';
+			$emergencyID       = $emergency->create($user);
 
+			$rights_defender         = $societe;
+			$rights_defender->name   = $langs->trans('RightsDefender');
+			$rights_defender->client = 0;
+			$rights_defenderID       = $rights_defender->create($user);
+
+			$poison_control_center         = $societe;
+			$poison_control_center->name   = $langs->trans('PoisonControlCenter');
+			$poison_control_center->client = 0;
+			$poison_control_centerID       = $poison_control_center->create($user);
+
+			$resources->digirisk_dolibarr_set_resources($this->db,1,  'LabourInspector',  'societe', array($labour_inspectorID), $conf->entity);
 			$resources->digirisk_dolibarr_set_resources($this->db,1,  'Police',  'societe', array($policeID), $conf->entity);
 			$resources->digirisk_dolibarr_set_resources($this->db,1,  'SAMU',  'societe', array($samuID), $conf->entity);
 			$resources->digirisk_dolibarr_set_resources($this->db,1,  'Pompiers',  'societe', array($pompiersID), $conf->entity);
 			$resources->digirisk_dolibarr_set_resources($this->db,1,  'AllEmergencies',  'societe', array($emergencyID), $conf->entity);
+			$resources->digirisk_dolibarr_set_resources($this->db,1,  'RightsDefender',  'societe', array($rights_defenderID), $conf->entity);
+			$resources->digirisk_dolibarr_set_resources($this->db,1,  'PoisonControlCenter',  'societe', array($poison_control_centerID), $conf->entity);
 
-			dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_THIRDPARTY_SET', 1, 'integer', 0, '', $conf->entity);
+			dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_THIRDPARTY_SET', 2, 'integer', 0, '', $conf->entity);
+		} elseif ($conf->global->DIGIRISKDOLIBARR_THIRDPARTY_SET == 1) {
+			//Install after 8.1.2
+
+			require_once DOL_DOCUMENT_ROOT . '/societe/class/societe.class.php';
+			require_once __DIR__ . '/../../class/digiriskresources.class.php';
+
+			$societe   = new Societe($this->db);
+			$resources = new DigiriskResources($this->db);
+
+			$labour_inspector         = $societe;
+			$labour_inspector->name   = $langs->trans('LabourInspectorName');
+			$labour_inspector->client = 0;
+			$labour_inspector->url    = $langs->trans('UrlLabourInspector');
+			$labour_inspectorID       = $labour_inspector->create($user);
+
+			$rights_defender         = $societe;
+			$rights_defender->name   = $langs->trans('RightsDefender');
+			$rights_defender->client = 0;
+			$rights_defenderID       = $rights_defender->create($user);
+
+			$poison_control_center         = $societe;
+			$poison_control_center->name   = $langs->trans('PoisonControlCenter');
+			$poison_control_center->client = 0;
+			$poison_control_centerID       = $poison_control_center->create($user);
+
+			$resources->digirisk_dolibarr_set_resources($this->db,1,  'LabourInspector',  'societe', array($labour_inspectorID), $conf->entity);
+			$resources->digirisk_dolibarr_set_resources($this->db,1,  'RightsDefender',  'societe', array($rights_defenderID), $conf->entity);
+			$resources->digirisk_dolibarr_set_resources($this->db,1,  'PoisonControlCenter',  'societe', array($poison_control_centerID), $conf->entity);
+
+			dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_THIRDPARTY_SET', 2, 'integer', 0, '', $conf->entity);
 		}
 
 		// Create extrafields during init

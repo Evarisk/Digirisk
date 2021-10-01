@@ -95,8 +95,8 @@ $extrafields->fetch_name_optionals_label($risk->table_element);
 $search_array_options = $extrafields->getOptionalsFromPost($risk->table_element, '', 'search_');
 
 // Default sort order (if not yet defined by previous GETPOST)
-if (!$sortfield) $sortfield = "evaluation.cotation"; // Set here default search field. By default 1st field in definition.
-if (!$sortorder) $sortorder = "DESC";
+if (!$sortfield) $sortfield = "t.".key($risk->fields); // Set here default search field. By default 1st field in definition.
+if (!$sortorder) $sortorder = "ASC";
 if (!$evalsortfield) $evalsortfield = "evaluation.".key($evaluation->fields);
 
 $offset   = $limit * $page;
@@ -545,12 +545,12 @@ if (empty($reshook)) {
 
 $form = new Form($db);
 
-$title    = $langs->trans("DigiriskElementRisk");
+$title    = $langs->trans("RiskList");
 $help_url = 'FR:Module_DigiriskDolibarr';
 $morejs   = array("/digiriskdolibarr/js/digiriskdolibarr.js.php");
 $morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");
 
-llxHeader('', $title, $help_url, '', '', '', $morejs, $morecss);
+llxHeader('', $title, $help_url, '', '', '', $morejs, $morecss, '', 'classforhorizontalscrolloftabs');
 
 // Object card
 // ------------------------------------------------------------

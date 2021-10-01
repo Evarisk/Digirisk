@@ -68,6 +68,7 @@ if (!empty($canvas)) {
 }
 
 // Security check
+$permissiontoadd = $user->rights->societe->creer;
 restrictedArea($user, 'societe', $socid, '&societe', '', 'fk_soc', 'rowid', $objcanvas);
 
 /*

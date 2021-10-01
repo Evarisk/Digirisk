@@ -38,7 +38,7 @@
  *  @param		int		$usesharelink	Use the public shared link of image (if not available, the 'nophoto' image will be shown instead)
  *  @return     string					Html code to show photo. Number of photos shown is saved in this->nbphoto
  */
-function digirisk_show_photos($modulepart, $sdir, $size = 0, $nbmax = 0, $nbbyrow = 5, $showfilename = 0, $showaction = 0, $maxHeight = 120, $maxWidth = 160, $nolink = 0, $notitle = 0, $usesharelink = 0, $subdir, $object)
+function digirisk_show_photos($modulepart, $sdir, $size = 0, $nbmax = 0, $nbbyrow = 5, $showfilename = 0, $showaction = 0, $maxHeight = 120, $maxWidth = 160, $nolink = 0, $notitle = 0, $usesharelink = 0, $subdir = "", $object = null)
 {
 	global $conf, $user, $langs;
 
@@ -48,8 +48,13 @@ function digirisk_show_photos($modulepart, $sdir, $size = 0, $nbmax = 0, $nbbyro
 	$sortfield = 'position_name';
 	$sortorder = 'desc';
 
-	$dir = $sdir.'/'.$object->ref.'/';
-	$pdir = $subdir . '/'.$object->ref.'/';
+	if (is_object($object)) {
+		$dir = $sdir.'/'.$object->ref.'/';
+		$pdir = $subdir . '/'.$object->ref.'/';
+	} else {
+		$dir = $sdir.'/';
+		$pdir = $subdir . '/';
+	}
 
 	// Defined relative dir to DOL_DATA_ROOT
 	$relativedir = '';
@@ -67,6 +72,7 @@ function digirisk_show_photos($modulepart, $sdir, $size = 0, $nbmax = 0, $nbbyro
 	$nbphoto = 0;
 
 	$filearray = dol_dir_list($dir, "files", 0, '', '(\.meta|_preview.*\.png)$', $sortfield, (strtolower($sortorder) == 'desc' ?SORT_DESC:SORT_ASC), 1);
+	//echo '<pre>'; print_r( $pdirthumb ); echo '</pre>';
 	if (count($filearray))
 	{
 		if ($sortfield && $sortorder)
@@ -110,9 +116,9 @@ function digirisk_show_photos($modulepart, $sdir, $size = 0, $nbmax = 0, $nbbyro
 					$relativefile = preg_replace('/^\//', '', $pdir.$photo);
 					if (empty($nolink))
 					{
-						$urladvanced = getAdvancedPreviewUrl($modulepart, $relativefile, 0, 'entity='.$object->entity);
+						$urladvanced = getAdvancedPreviewUrl($modulepart, $relativefile, 0, 'entity='.$conf->entity);
 						if ($urladvanced) $return .= '<a href="'.$urladvanced.'">';
-						else $return .= '<a href="'.DOL_URL_ROOT.'/viewimage.php?modulepart='.$modulepart.'&entity='.$object->entity.'&file='.urlencode($pdir.$photo).'" class="aphoto" target="_blank">';
+						else $return .= '<a href="'.DOL_URL_ROOT.'/viewimage.php?modulepart='.$modulepart.'&entity='.$conf->entity.'&file='.urlencode($pdir.$photo).'" class="aphoto" target="_blank">';
 					}
 
 					// Show image (width height=$maxHeight)
@@ -146,11 +152,11 @@ function digirisk_show_photos($modulepart, $sdir, $size = 0, $nbmax = 0, $nbbyro
 						if (empty($maxHeight) || $photo_vignette && $imgarray['height'] > $maxHeight)
 						{
 							$return .= '<!-- Show thumb -->';
-							$return .= '<img class="photo clicked-photo-preview"  width="'.$maxHeight.'" src="'.DOL_URL_ROOT.'/viewimage.php?modulepart='.$modulepart.'&entity='.$object->entity.'&file='.urlencode($pdirthumb.$photo_vignette).'" title="'.dol_escape_htmltag($alt).'">';
+							$return .= '<img class="photo clicked-photo-preview"  width="'.$maxHeight.'" src="'.DOL_URL_ROOT.'/viewimage.php?modulepart='.$modulepart.'&entity='.$conf->entity.'&file='.urlencode($pdirthumb.$photo_vignette).'" title="'.dol_escape_htmltag($alt).'">';
 						}
 						else {
 							$return .= '<!-- Show original file -->';
-							$return .= '<img class="photo photowithmargin  clicked-photo-preview" height="'.$maxHeight.'" src="'.DOL_URL_ROOT.'/viewimage.php?modulepart='.$modulepart.'&entity='.$object->entity.'&file='.urlencode($pdir.$photo).'" title="'.dol_escape_htmltag($alt).'">';
+							$return .= '<img class="photo photowithmargin  clicked-photo-preview" height="'.$maxHeight.'" src="'.DOL_URL_ROOT.'/viewimage.php?modulepart='.$modulepart.'&entity='.$conf->entity.'&file='.urlencode($pdir.$photo).'" title="'.dol_escape_htmltag($alt).'">';
 						}
 					}
 
@@ -165,16 +171,6 @@ function digirisk_show_photos($modulepart, $sdir, $size = 0, $nbmax = 0, $nbbyro
 						{
 							$return .= '<a href="'.$_SERVER["PHP_SELF"].'?id='.$object->id.'&amp;action=addthumb&amp;file='.urlencode($pdir.$viewfilename).'">'.img_picto($langs->trans('GenerateThumb'), 'refresh').'&nbsp;&nbsp;</a>';
 						}
-						// Special cas for product
-						if ($modulepart == 'product' && ($user->rights->produit->creer || $user->rights->service->creer))
-						{
-							// Link to resize
-							$return .= '<a href="'.DOL_URL_ROOT.'/core/photos_resize.php?modulepart='.urlencode('produit|service').'&id='.$object->id.'&amp;file='.urlencode($pdir.$viewfilename).'" title="'.dol_escape_htmltag($langs->trans("Resize")).'">'.img_picto($langs->trans("Resize"), 'resize', '').'</a> &nbsp; ';
-
-							// Link to delete
-							$return .= '<a href="'.$_SERVER["PHP_SELF"].'?id='.$object->id.'&amp;action=delete&amp;file='.urlencode($pdir.$viewfilename).'">';
-							$return .= img_delete().'</a>';
-						}
 					}
 					$return .= "\n";
 
@@ -187,22 +183,9 @@ function digirisk_show_photos($modulepart, $sdir, $size = 0, $nbmax = 0, $nbbyro
 				}
 
 				if (empty($size)) {     // Format origine
-					$return .= '<img class="photo photowithmargin" src="'.DOL_URL_ROOT.'/viewimage.php?modulepart='.$modulepart.'&entity='.$object->entity.'&file='.urlencode($pdir.$photo).'">';
+					$return .= '<img class="photo photowithmargin" src="'.DOL_URL_ROOT.'/viewimage.php?modulepart='.$modulepart.'&entity='.$conf->entity.'&file='.urlencode($pdir.$photo).'">';
 
 					if ($showfilename) $return .= '<br>'.$viewfilename;
-					if ($showaction)
-					{
-						// Special case for product
-						if ($modulepart == 'product' && ($user->rights->produit->creer || $user->rights->service->creer))
-						{
-							// Link to resize
-							$return .= '<a href="'.DOL_URL_ROOT.'/core/photos_resize.php?modulepart='.urlencode('produit|service').'&id='.$object->id.'&amp;file='.urlencode($pdir.$viewfilename).'" title="'.dol_escape_htmltag($langs->trans("Resize")).'">'.img_picto($langs->trans("Resize"), 'resize', '').'</a> &nbsp; ';
-
-							// Link to delete
-							$return .= '<a href="'.$_SERVER["PHP_SELF"].'?id='.$object->id.'&amp;action=delete&amp;file='.urlencode($pdir.$viewfilename).'">';
-							$return .= img_delete().'</a>';
-						}
-					}
 				}
 
 				// On continue ou on arrete de boucler ?
@@ -225,7 +208,9 @@ function digirisk_show_photos($modulepart, $sdir, $size = 0, $nbmax = 0, $nbbyro
 			}
 		}
 	}
-	$object->nbphoto = $nbphoto;
+	if (is_object($object)){
+		$object->nbphoto = $nbphoto;
+	}
 	return $return;
 }
 
@@ -276,7 +261,7 @@ function digiriskshowdocuments($modulepart, $modulesubdir, $filedir, $urlsource,
 	$file_list = null;
 	if (!empty($filedir))
 	{
-		$file_list = dol_dir_list($filedir, 'files', 0, '', '(\.meta|_preview.*.*\.png)$', 'date', SORT_DESC);
+		$file_list = dol_dir_list($filedir, 'files', 0, '', '', 'date', SORT_DESC, 1);
 	}
 	if ($hideifempty && empty($file_list)) return '';
 
@@ -428,7 +413,7 @@ function digiriskshowdocuments($modulepart, $modulesubdir, $filedir, $urlsource,
 	if (!empty($filedir))
 	{
 		$link_list = array();
-		if (is_object($object))
+		if (is_object($object) && $object->id > 0)
 		{
 			require_once DOL_DOCUMENT_ROOT.'/core/class/link.class.php';
 			$link = new Link($db);
@@ -517,25 +502,25 @@ function digiriskshowdocuments($modulepart, $modulesubdir, $filedir, $urlsource,
 			}
 		}
 		// Loop on each link found
-		if (is_array($link_list))
-		{
-			$colspan = 2;
-
-			foreach ($link_list as $file)
-			{
-				$out .= '<tr class="oddeven">';
-				$out .= '<td colspan="'.$colspan.'" class="maxwidhtonsmartphone">';
-				$out .= '<a data-ajax="false" href="'.$file->url.'" target="_blank">';
-				$out .= $file->label;
-				$out .= '</a>';
-				$out .= '</td>';
-				$out .= '<td class="right">';
-				$out .= dol_print_date($file->datea, 'dayhour');
-				$out .= '</td>';
-				if ($delallowed || $printer || $morepicto) $out .= '<td></td>';
-				$out .= '</tr>'."\n";
-			}
-		}
+//		if (is_array($link_list))
+//		{
+//			$colspan = 2;
+//
+//			foreach ($link_list as $file)
+//			{
+//				$out .= '<tr class="oddeven">';
+//				$out .= '<td colspan="'.$colspan.'" class="maxwidhtonsmartphone">';
+//				$out .= '<a data-ajax="false" href="'.$file->url.'" target="_blank">';
+//				$out .= $file->label;
+//				$out .= '</a>';
+//				$out .= '</td>';
+//				$out .= '<td class="right">';
+//				$out .= dol_print_date($file->datea, 'dayhour');
+//				$out .= '</td>';
+//				if ($delallowed || $printer || $morepicto) $out .= '<td></td>';
+//				$out .= '</tr>'."\n";
+//			}
+//		}
 
 		if (count($file_list) == 0 && count($link_list) == 0 && $headershown)
 		{
@@ -620,7 +605,11 @@ function digiriskHeader($head = '', $title = '', $help_url = '', $target = '', $
 
 	//Body navigation digirisk
 	$object  = new DigiriskElement($db);
-	$objects = $object->fetchAll('', '', 0,0,array('entity' => $conf->entity));
+	if ($conf->global->DIGIRISKDOLIBARR_SHOW_HIDDEN_DIGIRISKELEMENT) {
+		$objects = $object->fetchAll('',  'ref',  0,  0);
+	} else {
+		$objects = $object->fetchAll('',  '',  0,  0, array('customsql' => 'status > 0'));
+	}
 	$results = recurse_tree(0,0,$objects); ?>
 	<div id="id-container" class="id-container page-ut-gp-list">
 		<div class="side-nav">
@@ -661,8 +650,8 @@ function digiriskHeader($head = '', $title = '', $help_url = '', $target = '', $
 						<?php endif; ?>
 
 						<ul class="workunit-list">
-								<?php display_recurse_tree($results) ?>
-								<script>
+							<?php display_recurse_tree($results) ?>
+							<script>
 								// Get previous menu to display it
 								var MENU = localStorage.menu;
 								if (MENU == null || MENU == '') {
@@ -691,16 +680,15 @@ function digiriskHeader($head = '', $title = '', $help_url = '', $target = '', $
 								if (document.URL.match(/digiriskelement/)) {
 									jQuery( '#unit'  + id ).addClass( 'active' );
 									jQuery( '#unit'  +id  ).closest( '.unit' ).attr( 'value', id );
-                                };
-
-								</script>
-							</ul>
+								};
+							</script>
+						</ul>
 					</div>
 				</div>
 			</div>
 		</div>
 	<?php
-
+		// @todo SHOW TRASH
 	// main area
 	if ($replacemainareaby)
 	{
@@ -751,6 +739,9 @@ function display_recurse_tree($results) {
 	if ($user->rights->digiriskdolibarr->digiriskelement->read) {
 		if ( !empty( $results )) {
 		foreach ($results as $element) { ?>
+			<?php if ($element['object']->id == $conf->global->DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH) : ?>
+				<hr>
+			<?php endif; ?>
 			<li class="unit type-<?php echo $element['object']->element_type; ?>" id="unit<?php  echo $element['object']->id; ?>">
 				<div class="unit-container">
 					<?php if ($element['object']->element_type == 'groupment' && count($element['children'])) { ?>
@@ -814,6 +805,9 @@ function display_recurse_tree($results) {
 				</div>
 				<ul class="sub-list"><?php display_recurse_tree($element['children']) ?></ul>
 			</li>
+			<?php if ($element['object']->id == $conf->global->DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH) : ?>
+				<hr>
+			<?php endif; ?>
 		<?php }
 	}
 	} else {
@@ -1002,6 +996,70 @@ function getNomUrl($withpictoimg = 0, $option = '', $infologin = 0, $notooltip =
 	return $result;
 }
 
+/**
+ *	Return clicable name (with picto eventually)
+ *
+ *	@param	int		$withpicto		0=No picto, 1=Include picto into link, 2=Only picto
+ *	@param	string	$option			'withproject' or ''
+ *  @param	string	$mode			Mode 'task', 'time', 'contact', 'note', document' define page to link to.
+ * 	@param	int		$addlabel		0=Default, 1=Add label into string, >1=Add first chars into string
+ *  @param	string	$sep			Separator between ref and label if option addlabel is set
+ *  @param	int   	$notooltip		1=Disable tooltip
+ *  @param  int     $save_lastsearch_value    -1=Auto, 0=No save of lastsearch_values when clicking, 1=Save lastsearch_values whenclicking
+ *	@return	string					Chaine avec URL
+ */
+function getNomUrlTask($task, $withpicto = 0, $option = '', $mode = 'task', $addlabel = 0, $sep = ' - ', $notooltip = 0, $save_lastsearch_value = -1)
+{
+	global $conf, $langs, $user;
+
+	if (!empty($conf->dol_no_mouse_hover)) $notooltip = 1; // Force disable tooltips
+
+	$result = '';
+	$label = img_picto('', $task->picto).' <u>'.$langs->trans("Task").'</u>';
+	if (!empty($task->ref))
+		$label .= '<br><b>'.$langs->trans('Ref').':</b> '.$task->ref;
+	if (!empty($task->label))
+		$label .= '<br><b>'.$langs->trans('LabelTask').':</b> '.$task->label;
+	if ($task->date_start || $task->date_end)
+	{
+		$label .= "<br>".get_date_range($task->date_start, $task->date_end, '', $langs, 0);
+	}
+
+	$url = DOL_URL_ROOT.'/projet/tasks/'.$mode.'.php?id='.$task->id.($option == 'withproject' ? '&withproject=1' : '');
+	// Add param to save lastsearch_values or not
+	$add_save_lastsearch_values = ($save_lastsearch_value == 1 ? 1 : 0);
+	if ($save_lastsearch_value == -1 && preg_match('/list\.php/', $_SERVER["PHP_SELF"])) $add_save_lastsearch_values = 1;
+	if ($add_save_lastsearch_values) $url .= '&save_lastsearch_values=1';
+
+	$linkclose = '';
+	if (empty($notooltip))
+	{
+		if (!empty($conf->global->MAIN_OPTIMIZEFORTEXTBROWSER))
+		{
+			$label = $langs->trans("ShowTask");
+			$linkclose .= ' alt="'.dol_escape_htmltag($label, 1).'"';
+		}
+		$linkclose .= ' title="'.dol_escape_htmltag($label, 1).'"';
+		$linkclose .= ' class="classfortooltip nowraponall"';
+	} else {
+		$linkclose .= ' class="nowraponall"';
+	}
+
+	$linkstart = '<a target="_blank" href="'.$url.'"';
+	$linkstart .= $linkclose.'>';
+	$linkend = '</a>';
+
+	$picto = 'projecttask';
+
+	$result .= $linkstart;
+	if ($withpicto) $result .= img_object(($notooltip ? '' : $label), $picto, ($notooltip ? (($withpicto != 2) ? 'class="paddingright"' : '') : 'class="'.(($withpicto != 2) ? 'paddingright ' : '').'classfortooltip"'), 0, 0, $notooltip ? 0 : 1);
+	if ($withpicto != 2) $result .= $task->ref;
+	$result .= $linkend;
+	if ($withpicto != 2) $result .= (($addlabel && $task->label) ? $sep.dol_trunc($task->label, ($addlabel > 1 ? $addlabel : 0)) : '');
+
+	return $result;
+}
+
 function show_category_image($object, $upload_dir) {
 
 	global $langs;
@@ -1138,4 +1196,70 @@ function llxHeaderTicketDigirisk($title, $head = "", $disablejs = 0, $disablehea
 		}
 		print '<div class="underbanner clearboth"></div>';
 	}
+}
+
+function digirisk_show_medias($modulepart = 'ecm', $sdir, $size = 0, $nbmax = 0, $nbbyrow = 5, $showfilename = 0, $showaction = 0, $maxHeight = 120, $maxWidth = 160, $nolink = 0, $notitle = 0, $usesharelink = 0,$subdir = "")
+{
+	global $conf, $user, $langs;
+
+	include_once DOL_DOCUMENT_ROOT.'/core/lib/files.lib.php';
+	include_once DOL_DOCUMENT_ROOT.'/core/lib/images.lib.php';
+
+	$sortfield = 'position_name';
+	$sortorder = 'desc';
+
+	$dir = $sdir.'/';
+	$pdir = $subdir . '/';
+
+
+	$return = '<!-- Photo -->'."\n";
+	$nbphoto = 0;
+
+	$filearray = dol_dir_list($dir, "files", 0, '', '(\.meta|_preview.*\.png)$', $sortfield, (strtolower($sortorder) == 'desc' ?SORT_DESC:SORT_ASC), 1);
+	$j = 0;
+
+	if (count($filearray))
+	{
+		if ($sortfield && $sortorder)
+		{
+			$filearray = dol_sort_array($filearray, $sortfield, $sortorder);
+		}
+		foreach ($filearray as $key => $val)
+		{
+			if(preg_match('/' . $size . '/', $val['name'])) {
+
+				$file = $val['name'];
+
+				if (image_format_supported($file) >= 0)
+				{
+					$nbphoto++;
+
+					if ($size == 1 || $size == 'small') {   // Format vignette
+
+						$relativepath = 'digiriskdolibarr/medias/thumbs';
+						$modulepart = 'ecm';
+						$path = DOL_URL_ROOT.'/document.php?modulepart=' . $modulepart  . '&attachment=0&file=' . str_replace('/', '%2F', $relativepath);
+						?>
+
+						<div class="center clickable-photo clickable-photo<?php echo $j; ?>" value="<?php echo $j; ?>" element="risk-evaluation">
+							<figure class="photo-image">
+								<?php
+								$urladvanced = getAdvancedPreviewUrl($modulepart, 'digiriskdolibarr/medias/' . preg_replace('/_' . $size . '/', '', $val['relativename']), 0, 'entity='.$conf->entity); ?>
+								<a class="clicked-photo-preview" href="<?php echo $urladvanced; ?>"><i class="fas fa-2x fa-search-plus"></i></a>
+								<?php if (image_format_supported($val['name']) >= 0) : ?>
+								<?php $fullpath = $path . '/' . $val['relativename'] . '&entity=' . $conf->entity; ?>
+								<input class="filename" type="hidden" value="<?php echo preg_replace('/_' . $size . '/', '', $val['name']) ?>">
+								<img class="photo photo<?php echo $j ?> maxwidth50" src="<?php echo $fullpath; ?>">
+								<?php endif; ?>
+							</figure>
+							<div class="title"><?php echo preg_replace('/_' . $size . '/', '', $val['name']); ?></div>
+						</div><?php
+						$j++;
+					}
+				}
+			}
+		}
+	}
+
+	return $return;
 }

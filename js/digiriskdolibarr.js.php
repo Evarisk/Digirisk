@@ -374,6 +374,9 @@ window.eoxiaJS.modal.openModal = function ( event ) {
 	if ($(this).hasClass('riskassessment-task-edit')) {
 		$('#risk_assessment_task_edit' + idSelected).addClass('modal-active');
 	}
+	if ($(this).hasClass('riskassessment-task-list')) {
+		$('#risk_assessment_task_list' + idSelected).addClass('modal-active');
+	}
 
 	// Open modal risksign.
 	if ($(this).hasClass('risksign-add')) {
@@ -621,8 +624,8 @@ if ( ! window.eoxiaJS.tooltip ) {
 	 * @returns {void} [description]
 	 */
 	window.eoxiaJS.tooltip.event = function() {
-		jQuery( document ).on( 'mouseenter', '.wpeo-tooltip-event:not([data-tooltip-persist="true"])', window.eoxiaJS.tooltip.onEnter );
-		jQuery( document ).on( 'mouseleave', '.wpeo-tooltip-event:not([data-tooltip-persist="true"])', window.eoxiaJS.tooltip.onOut );
+		jQuery( document ).on( 'mouseenter touchstart', '.wpeo-tooltip-event:not([data-tooltip-persist="true"])', window.eoxiaJS.tooltip.onEnter );
+		jQuery( document ).on( 'mouseleave touchend', '.wpeo-tooltip-event:not([data-tooltip-persist="true"])', window.eoxiaJS.tooltip.onOut );
 	};
 
 	window.eoxiaJS.tooltip.onEnter = function( event ) {
@@ -833,13 +836,9 @@ window.eoxiaJS.signature.event = function() {
 window.eoxiaJS.signature.modalSignatureOpened = function( triggeredElement ) {
 	window.eoxiaJS.signature.buttonSignature = triggeredElement;
 
-	console.log(triggeredElement.attr('value'));
-
 	var ratio =  Math.max( window.devicePixelRatio || 1, 1 );
 
 	window.eoxiaJS.signature.canvas = document.querySelector('#modal-signature' + triggeredElement.attr('value') + ' canvas' );
-
-	console.log(window.eoxiaJS.signature.canvas);
 
 	window.eoxiaJS.signature.canvas.signaturePad = new SignaturePad( window.eoxiaJS.signature.canvas, {
 		penColor: "rgb(0, 0, 0)"
@@ -851,7 +850,6 @@ window.eoxiaJS.signature.modalSignatureOpened = function( triggeredElement ) {
 	window.eoxiaJS.signature.canvas.signaturePad.clear();
 
 	var signature_data = jQuery( '#signature_data' + triggeredElement.attr('value') ).val();
-	console.log(signature_data);
 	window.eoxiaJS.signature.canvas.signaturePad.fromDataURL(signature_data);
 };
 
@@ -896,7 +894,6 @@ window.eoxiaJS.signature.createSignature = function() {
             } else {
                 window.location.replace(elementRedirect);
             }
-
 		},
 		error: function ( ) {
 		    alert('Error')
@@ -914,7 +911,6 @@ window.eoxiaJS.signature.download = function(fileUrl, filename) {
 window.eoxiaJS.signature.autoDownloadSpecimen = function( event ) {
     let element = $(this).closest('.file-generation')
 	let url = document.URL + '&action=builddoc'
-
     $.ajax({
         url: url,
         type: "POST",
@@ -936,7 +932,6 @@ window.eoxiaJS.signature.autoDownloadSpecimen = function( event ) {
         }
     });
 };
-
 
 /**
  * Initialise l'objet "photo" ainsi que la méthode "init" obligatoire pour la bibliothèque EoxiaJS.
@@ -984,17 +979,15 @@ window.eoxiaJS.photo.event = function() {
  */
 window.eoxiaJS.photo.selectPhoto = function( event ) {
 	let photoID = $(this).attr('value');
-	let element = $(this).attr('element');
 	let parent = $(this).closest('.modal-content')
 
 	parent.find('.clicked-photo').attr('style', 'none !important');
 	parent.find('.clicked-photo').removeClass('clicked-photo');
+	parent.closest('.modal-container').find('.save-photo').removeClass('button-disable');
 
 	parent.find('.clickable-photo'+photoID).attr('style', 'border: 5px solid #0d8aff !important');
 	parent.find('.clickable-photo'+photoID).addClass('clicked-photo');
 
-	$(this).closest('.'+element+'-photo-container').find('.'+element+'-photo-single .filename').val(parent.find('.clicked-photo .filename').val());
-	$(this).closest('.'+element+'-photo-container').find('.'+element+'-photo-single img').attr('src' , parent.find('.clicked-photo img').attr('src'));
 
 };
 
@@ -1007,7 +1000,13 @@ window.eoxiaJS.photo.selectPhoto = function( event ) {
  * @return {void}
  */
 window.eoxiaJS.photo.savePhoto = function( event ) {
-	$('.wpeo-modal.modal-photo.modal-active').removeClass('modal-active');
+    let parent = $(this).closest('.modal-content')
+
+    $('.wpeo-modal.modal-photo.modal-active').removeClass('modal-active');
+
+    $(this).closest('.risk-evaluation-photo-container').find('.risk-evaluation-photo-single .filename').val(parent.find('.clicked-photo .filename').val());
+    $(this).closest('.risk-evaluation-photo-container').find('.risk-evaluation-photo-single img').attr('src' , parent.find('.clicked-photo img').attr('src'));
+
 };
 
 /**
@@ -1024,6 +1023,9 @@ window.eoxiaJS.photo.sendPhoto = function( event ) {
 	let element  = $(this).closest('.nowrap');
 	let files    = element.find("input[name='userfile[]']").prop("files");
 	let formdata = new FormData();
+    let elementParent = $(this).closest('.modal-container').find('.ecm-photo-list-content');
+	let modalID = $(this).closest('.risk-evaluation-photo').attr('value')
+	window.eoxiaJS.loader.display($(this).closest('.risk-evaluation-photo').find('.modal-content'));
 
 	$.each(files, function(index, file) {
 		formdata.append("userfile[]", file);
@@ -1034,17 +1036,14 @@ window.eoxiaJS.photo.sendPhoto = function( event ) {
 		data: formdata,
 		processData: false,
 		contentType: false,
+		success: function ( ) {
+			$('.wpeo-loader').removeClass('wpeo-loader')
+			window.eoxiaJS.loader.display(elementParent);
+			elementParent.empty()
+			elementParent.load( document.URL + ' .ecm-photo-list-'+modalID);
+            elementParent.removeClass('wpeo-loader');
+        }
 	});
-
-	let elementParent = $(this).closest('.modal-container').find('.ecm-photo-list-content');
-
-	elementParent.empty();
-	window.eoxiaJS.loader.display(elementParent);
-
-	setTimeout(function(){
-		elementParent.load( document.URL + ' .ecm-photo-list-');
-		elementParent.removeClass('wpeo-loader');
-	}, 800);
 };
 
 /**
@@ -1144,7 +1143,14 @@ window.eoxiaJS.risk.haveDataInInput = function( elementParent ) {
 		}
 	}
 };
-
+window.eoxiaJS.risk.sanitizeBeforeRequest = function ( text ) {
+	if (typeof text == 'string') {
+		if (text.match(/"/)) {
+			return text.split(/"/).join('')
+		}
+	}
+	return text
+}
 /**
  * Action create risk.
  *
@@ -1160,13 +1166,21 @@ window.eoxiaJS.risk.createRisk = function ( event ) {
 	let actionContainerSuccess = $('.messageSuccessRiskCreate');
 	let actionContainerError = $('.messageErrorRiskCreate');
 
+	let evaluationText = elementEvaluation.find('.risk-evaluation-comment textarea').val()
+	let riskCommentText = elementRisk.find('.risk-description textarea').val()
+	let taskText = elementTask.find('input').val()
+
+	evaluationText = window.eoxiaJS.risk.sanitizeBeforeRequest(evaluationText)
+	riskCommentText = window.eoxiaJS.risk.sanitizeBeforeRequest(riskCommentText)
+	taskText = window.eoxiaJS.risk.sanitizeBeforeRequest(taskText)
+
 	var category = elementRisk.find('.risk-category input').val();
 	var categoryPost = '';
 	if (category !== 0) {
 		categoryPost = '&category=' + category;
 	}
 
-	var description = elementRisk.find('.risk-description textarea').val();
+	var description = riskCommentText;
 	var descriptionPost = '';
 	if (description !== '') {
 		descriptionPost = '&riskComment=' + encodeURI(description);
@@ -1197,13 +1211,13 @@ window.eoxiaJS.risk.createRisk = function ( event ) {
 		photoPost = '&photo=' + encodeURI(photo);
 	}
 
-	var comment = elementEvaluation.find('.risk-evaluation-comment textarea').val();
+	var comment = evaluationText;
 	var commentPost = '';
 	if (comment !== '') {
 		commentPost = '&evaluationComment=' + encodeURI(comment);
 	}
 
-	var task = elementTask.find('input').val();
+	var task = taskText;
 	var taskPost = '';
 	if (task !== '') {
 		taskPost = '&tasktitle=' + encodeURI(task);
@@ -1218,31 +1232,27 @@ window.eoxiaJS.risk.createRisk = function ( event ) {
 		processData: false,
 		contentType: false,
 		success: function ( ) {
+			let modalRisk = $('.risk-add-modal');
+			modalRisk.load( document.URL + ' .modal-risk-0');
+
+			elementParent.empty();
+			elementParent.load( document.URL + ' .tagtable.liste')
 
 			let numberOfRisks = $('.valignmiddle.col-title');
 			numberOfRisks.load( document.URL + ' .table-fiche-title .titre.inline-block');
-
-			let modalRisk = $('.risk-add-modal');
-			modalRisk.load( document.URL + ' .modal-risk-0');
 
 			actionContainerSuccess.empty()
 			actionContainerSuccess.load(' .risk-create-success-notice')
 			actionContainerSuccess.removeClass('hidden');
 
-			elementParent.empty();
-			elementParent.load( document.URL + ' .tagtable.liste')
-
 			$('.fichecenter').removeClass('wpeo-loader');
-
 		},
 		error: function ( ) {
-
 			actionContainerError.empty()
 			actionContainerError.load(' .risk-create-error-notice')
 			actionContainerError.removeClass('hidden');
 
 			$('.fichecenter').removeClass('wpeo-loader');
-
 		}
 	});
 
@@ -1281,31 +1291,44 @@ window.eoxiaJS.risk.saveRisk = function ( event ) {
 	let actionContainerSuccess = $('.messageSuccessRiskEdit');
 	let actionContainerError = $('.messageErrorRiskEdit');
 
+	let riskCommentText = elementRisk.find('.risk-description textarea').val()
+
+	riskCommentText = window.eoxiaJS.risk.sanitizeBeforeRequest(riskCommentText)
+
 	var category = elementRisk.find('.risk-category input').val();
 	var categoryPost = '';
 	if (category !== 0) {
 		categoryPost = '&riskCategory=' + category;
 	}
 
-	var description = elementRisk.find('.risk-description textarea').val();
-	var descriptionPost = '';
-	if (description !== '') {
-		descriptionPost = '&riskComment=' + encodeURI(description);
+	if (riskCommentText) {
+		var description = riskCommentText;
+		var descriptionPost = '';
+		if (description !== '') {
+			descriptionPost = '&riskComment=' + encodeURI(description);
+		}
 	}
 
 	let elementParent = $('.fichecenter').find('.div-table-responsive');
-	window.eoxiaJS.loader.display($(this).closest('.risk-row-content-' + editedRiskId));
+	window.eoxiaJS.loader.display($(this));
+	if (riskCommentText) {
+		window.eoxiaJS.loader.display($(this).closest('.risk-row-content-' + editedRiskId).find('.risk-description-'+editedRiskId));
+	}
+
+	var request = "";
+	if (riskCommentText) {
+		request = document.URL + '&action=saveRisk&riskID=' + editedRiskId + categoryPost + descriptionPost
+	} else {
+		request = document.URL + '&action=saveRisk&riskID=' + editedRiskId + categoryPost
+	}
 
 	$.ajax({
-		url: document.URL + '&action=saveRisk&riskID=' + editedRiskId + categoryPost + descriptionPost,
+		url: request,
 		type: "POST",
 		processData: false,
 		contentType: false,
 		success: function ( ) {
-
-			elementParent.empty()
-			elementParent.load( document.URL + ' .tagtable.liste');
-			$(this).closest('.risk-row-content-' + editedRiskId).removeClass('wpeo-loader');
+			elementParent.load(document.URL + ' .div-table-responsive')
 
 			actionContainerSuccess.empty()
 			actionContainerSuccess.load(' .risk-edit-success-notice')
@@ -1457,6 +1480,10 @@ window.eoxiaJS.evaluation.createEvaluation = function ( event ) {
 	let actionContainerSuccess = $('.messageSuccessEvaluationCreate');
 	let actionContainerError = $('.messageErrorEvaluationCreate');
 
+	let evaluationText = single.find('.risk-evaluation-comment textarea').val()
+
+	evaluationText = window.eoxiaJS.risk.sanitizeBeforeRequest(evaluationText)
+
 	var riskToAssignPost = '';
 	if (riskToAssign !== '') {
 		riskToAssignPost = '&riskToAssign=' + riskToAssign;
@@ -1474,7 +1501,7 @@ window.eoxiaJS.evaluation.createEvaluation = function ( event ) {
 		cotationPost = '&cotation=' + cotation;
 	}
 
-	var comment = single.find('.risk-evaluation-comment textarea').val();
+	var comment = evaluationText
 	var commentPost = '';
 	if (comment !== '') {
 		commentPost = '&evaluationComment=' + encodeURI(comment);
@@ -1494,7 +1521,8 @@ window.eoxiaJS.evaluation.createEvaluation = function ( event ) {
 	})
 
 	let elementParent = $('.fichecenter').find('.div-table-responsive');
-	window.eoxiaJS.loader.display($('.risk-row-content-' + riskToAssign));
+	window.eoxiaJS.loader.display($(this));
+	window.eoxiaJS.loader.display($('.risk-evaluation-container-' + riskToAssign));
 
 	$.ajax({
 		url: document.URL + '&action=addEvaluation' + riskToAssignPost + methodPost + cotationPost + criteres + photoPost + commentPost,
@@ -1502,17 +1530,14 @@ window.eoxiaJS.evaluation.createEvaluation = function ( event ) {
 		processData: false,
 		contentType: false,
 		success: function( ) {
-				elementParent.empty()
-				elementParent.load( document.URL + ' .tagtable.liste');
+			elementParent.load( document.URL + ' .div-table-responsive');
+			element.find('#risk_evaluation_add'+riskToAssign).removeClass('modal-active');
 
-				$(this).closest('.risk-row-content-' + riskToAssign).removeClass('wpeo-loader');
-
-				actionContainerSuccess.empty()
-				actionContainerSuccess.load(' .riskassessment-create-success-notice')
-				actionContainerSuccess.removeClass('hidden');
+			actionContainerSuccess.empty()
+			actionContainerSuccess.load(' .riskassessment-create-success-notice')
+			actionContainerSuccess.removeClass('hidden');
 		},
 		error: function ( ) {
-
 			$(this).closest('.risk-row-content-' + riskToAssign).removeClass('wpeo-loader');
 
 			actionContainerError.empty()
@@ -1601,6 +1626,18 @@ window.eoxiaJS.evaluation.saveEvaluation = function ( event ) {
 	let evaluationID = element.attr('value');
 	let actionContainerSuccess = $('.messageSuccessEvaluationEdit');
 	let actionContainerError = $('.messageErrorEvaluationEdit');
+	//let riskId = $(this).closest('.risk-evaluation-container').attr('value')
+	let evaluationText = element.find('.risk-evaluation-comment textarea').val()
+
+	let elementParent = $(this).closest('.risk-evaluation-container').find('.risk-evaluations-list-content');
+	let riskId = elementParent.attr('value');
+	let evaluationSingle = $(this).closest('.risk-evaluation-container').find('.risk-evaluation-single-content');
+	let evaluationRef =  $('.risk-evaluation-ref-'+evaluationID).attr('value');
+	let listModalContainer = $('.risk-evaluation-list-modal-'+riskId)
+	let listModal = $('#risk_evaluation_list'+riskId)
+	let fromList = listModal.hasClass('modal-active');
+
+	evaluationText = window.eoxiaJS.risk.sanitizeBeforeRequest(evaluationText)
 
 	var method = element.find('.risk-evaluation-method').val();
 	var methodPost = '';
@@ -1614,7 +1651,7 @@ window.eoxiaJS.evaluation.saveEvaluation = function ( event ) {
 		cotationPost = '&cotation=' + cotation;
 	}
 
-	var comment = element.find('.risk-evaluation-comment textarea').val();
+	var comment = evaluationText;
 	var commentPost = '';
 	if (comment !== '') {
 		commentPost = '&evaluationComment=' + encodeURI(comment);
@@ -1633,26 +1670,25 @@ window.eoxiaJS.evaluation.saveEvaluation = function ( event ) {
 		}
 	})
 
-	let elementParent = $(this).closest('.risk-evaluations-list-content');
-	let riskId = elementParent.attr('value');
-	let evaluationSingle = $(this).closest('.risk-evaluation-container').find('.risk-evaluation-single-content');
-	let evaluationRef =  $('.risk-evaluation-ref-'+evaluationID).attr('value');
-
 	window.eoxiaJS.loader.display($(this));
-	evaluationSingle.empty()
-
+	window.eoxiaJS.loader.display(listModalContainer.find('.modal-content .risk-evaluations-list-content'))
 	$.ajax({
 		url: document.URL + '&action=saveEvaluation&evaluationID=' + evaluationID +  methodPost + cotationPost + criteres + photoPost + commentPost,
 		type: "POST",
 		processData: false,
 		contentType: false,
 		success: function ( ) {
-			elementParent.empty()
+			if (fromList) {
+				listModalContainer.find('.modal-content .risk-evaluations-list-content').load(document.URL + ' .risk-evaluations-list-'+riskId)
+				$('.risk-evaluation-single-content-'+riskId).load(document.URL + ' .risk-evaluation-single-'+riskId)
+			} else {
+				$('.div-table-responsive').load(document.URL + ' .div-table-responsive')
+			}
+			$('.wpeo-loader').removeClass('wpeo-loader')
+            //elementParent.removeClass('wpeo-loader');
+			//listModalContainer.find('.modal-content .risk-evaluations-list-content').removeClass('wpeo-loader');
+            //$(this).closest('.risk-evaluation-container').removeClass('wpeo-loader');
 
-			elementParent.load( document.URL + ' .risk-evaluations-list-'+riskId);
-			evaluationSingle.load( document.URL + ' .risk-evaluation-single-'+riskId);
-
-			elementParent.removeClass('wpeo-loader');
 			element.find('#risk_evaluation_edit'+evaluationID).removeClass('modal-active');
 
 			let textToShow = '';
@@ -1835,17 +1871,24 @@ window.eoxiaJS.riskassessmenttask.createRiskAssessmentTask = function ( event ) 
 	let actionContainerSuccess = $('.messageSuccessTaskCreate');
 	let actionContainerError = $('.messageErrorTaskCreate');
     let elementToRefresh = $(this).closest('.riskassessment-tasks');
+
+	let taskText = single.find('.riskassessment-task-label').val()
+
+	taskText = window.eoxiaJS.risk.sanitizeBeforeRequest(taskText)
+
 	var riskToAssignPost = '';
 	if (riskToAssign !== '') {
 		riskToAssignPost = '&riskToAssign=' + riskToAssign;
 	}
 
-	var task = single.find('.riskassessment-task-label').val();
+	var task = taskText;
 	var taskPost = '';
 	if (task !== '') {
 		taskPost = '&tasktitle=' + encodeURI(task);
 	}
 
+	window.eoxiaJS.loader.display($(this));
+	window.eoxiaJS.loader.display($('.riskassessment-task-listing-wrapper-'+ riskToAssign));
 
 	$.ajax({
 		url: document.URL + '&action=addRiskAssessmentTask' + riskToAssignPost + taskPost,
@@ -1853,9 +1896,7 @@ window.eoxiaJS.riskassessmenttask.createRiskAssessmentTask = function ( event ) 
 		processData: false,
 		contentType: false,
 		success: function ( ) {
-			$(this).closest('.risk-row-content-' + riskToAssign).removeClass('wpeo-loader');
-            elementToRefresh.load( document.URL + ' .riskassessment-tasks'+riskToAssign);
-
+			$('.div-table-responsive').load(document.URL + ' .div-table-responsive')
 
 			actionContainerSuccess.empty()
 			actionContainerSuccess.load(' .task-create-success-notice')
@@ -1900,8 +1941,8 @@ window.eoxiaJS.riskassessmenttask.deleteRiskAssessmentTask = function ( event ) 
 			processData: false,
 			contentType: false,
 			success: function ( ) {
-
-                element.load( document.URL + ' .riskassessment-tasks'+riskId);
+				$('.div-table-responsive').load(document.URL + ' .div-table-responsive')
+                //element.load( document.URL + ' .riskassessment-tasks'+riskId);
 
 				let textToShow = '';
 				textToShow += actionContainerSuccess.find('.valueForDeleteTask1').val()
@@ -1945,7 +1986,11 @@ window.eoxiaJS.riskassessmenttask.saveRiskAssessmentTask = function ( event ) {
     let riskId = element.attr('value');
     let textToShow = '';
 
-	var task = elementRiskAssessmentTask.find('.riskassessment-task-label' + editedRiskAssessmentTaskId).val();
+	let taskText = elementRiskAssessmentTask.find('.riskassessment-task-label' + editedRiskAssessmentTaskId).val()
+
+	taskText = window.eoxiaJS.risk.sanitizeBeforeRequest(taskText)
+
+	var task = taskText
 	var taskPost = '';
 	if (task !== '') {
 		taskPost = '&tasktitle=' + encodeURI(task);
@@ -1954,6 +1999,7 @@ window.eoxiaJS.riskassessmenttask.saveRiskAssessmentTask = function ( event ) {
 	let taskRef =  $('.riskassessment-task-ref-'+editedRiskAssessmentTaskId).attr('value');
 
 	window.eoxiaJS.loader.display($(this));
+	window.eoxiaJS.loader.display($('.riskassessment-task-single-'+ editedRiskAssessmentTaskId));
 
 	$.ajax({
 		url: document.URL + '&action=saveRiskAssessmentTask&riskAssessmentTaskID=' + editedRiskAssessmentTaskId + taskPost,
@@ -1961,9 +2007,7 @@ window.eoxiaJS.riskassessmenttask.saveRiskAssessmentTask = function ( event ) {
 		processData: false,
 		contentType: false,
 		success: function ( ) {
-
-            element.load( document.URL + ' .riskassessment-tasks'+riskId);
-            elementRiskAssessmentTask.removeClass('wpeo-loader');
+			$('.div-table-responsive').load(document.URL + ' .div-table-responsive')
 
 			textToShow += actionContainerSuccess.find('.valueForEditTask1').val()
 			textToShow += taskRef
@@ -2221,6 +2265,7 @@ window.eoxiaJS.evaluator.createEvaluator = function ( event ) {
 	let actionContainerError = $('.messageErrorEvaluatorCreate');
 
 	var user = $('.user-selected').val()
+	alert(user);
 	var userPost = '';
 	if (user !== 0) {
 		userPost = '&evaluatorID=' + encodeURI(user);
@@ -2620,6 +2665,52 @@ window.eoxiaJS.preventionplan.showDateAndText = function() {
         textField.addClass('hidden')
     }
 
+};
+
+
+/**
+ * Initialise l'objet "signature" ainsi que la méthode "init" obligatoire pour la bibliothèque EoxiaJS.
+ *
+ * @since   1.1.0
+ * @version 1.1.0
+ */
+window.eoxiaJS.document = {};
+
+/**
+ * Initialise le canvas document
+ *
+ * @since   8.1.2
+ * @version 8.1.2
+ */
+window.eoxiaJS.document.canvas;
+
+/**
+ * Initialise le boutton document
+ *
+ * @since   8.1.2
+ * @version 8.1.2
+ */
+window.eoxiaJS.document.buttonSignature;
+
+/**
+ * La méthode appelée automatiquement par la bibliothèque EoxiaJS.
+ *
+ * @since   8.1.2
+ * @version 8.1.2
+ *
+ * @return {void}
+ */
+window.eoxiaJS.document.init = function() {
+    window.eoxiaJS.document.event();
+};
+
+window.eoxiaJS.document.event = function() {
+    jQuery( document ).on( 'click', '#builddoc_generatebutton', window.eoxiaJS.document.displayLoader );
+};
+
+window.eoxiaJS.document.displayLoader = function(  ) {
+    window.eoxiaJS.loader.display($('#builddoc_generatebutton'));
+    window.eoxiaJS.loader.display($('.tabBar'));
 };
 
 /**

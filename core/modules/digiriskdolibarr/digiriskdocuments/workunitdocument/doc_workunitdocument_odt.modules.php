@@ -217,7 +217,9 @@ class doc_workunitdocument_odt extends ModeleODTWorkUnitDocument
 			$filename = preg_split('/workunitdocument\//' , $srctemplatepath);
 			$filename = preg_replace('/template_/','', $filename[1]);
 
-			$filename = $objectref . '_'. $filename;
+			$date = dol_print_date(dol_now(),'dayxcard');
+			$filename = $objectref.'_'.$digiriskelement->label.'_'.$date.'.odt';
+			$filename = str_replace(' ', '_', $filename);
 
 			$object->last_main_doc = $filename;
 
@@ -261,29 +263,41 @@ class doc_workunitdocument_odt extends ModeleODTWorkUnitDocument
 			// Define substitution array
 			$substitutionarray = getCommonSubstitutionArray($outputlangs, 0, null, $object);
 			$array_object_from_properties = $this->get_substitutionarray_each_var_object($object, $outputlangs);
-			$array_object = $this->get_substitutionarray_object($object, $outputlangs);
+			//$array_object = $this->get_substitutionarray_object($object, $outputlangs);
 			$array_soc = $this->get_substitutionarray_mysoc($mysoc, $outputlangs);
 
-			$tmparray = array_merge($substitutionarray, $array_object_from_properties, $array_object, $array_soc);
+			$tmparray = array_merge($substitutionarray, $array_object_from_properties, $array_soc);
 			complete_substitutions_array($tmparray, $outputlangs, $object);
+
+
+			$tmparray['nom']         = $digiriskelement->label;
+			$tmparray['reference']   = $digiriskelement->ref;
+			$tmparray['description'] = $digiriskelement->description;
 
 			$filearray = dol_dir_list($conf->digiriskdolibarr->multidir_output[$conf->entity] . '/' . $digiriskelement->element_type . '/' . $digiriskelement->ref, "files", 0, '', '(\.odt|_preview.*\.png)$', 'position_name', 'desc', 1);
 			if (count($filearray)) {
 				$image = array_shift($filearray);
 				$tmparray['photoDefault'] = $image['fullname'];
+			}else {
+				$nophoto = '/public/theme/common/nophoto.png';
+				$tmparray['photoDefault'] = DOL_DOCUMENT_ROOT.$nophoto;
 			}
 
 			foreach ($tmparray as $key=>$value)
 			{
 				try {
-					if ($key == 'photoDefault' && preg_match('/logo$/', $key)) // Image
+					if ($key == 'photoDefault' || preg_match('/logo$/', $key)) // Image
 					{
 						if (file_exists($value)) $odfHandler->setImage($key, $value);
-						else $odfHandler->setVars($key, 'ErrorFileNotFound', true, 'UTF-8');
+						else $odfHandler->setVars($key, $langs->transnoentities('ErrorFileNotFound'), true, 'UTF-8');
 					}
 					else    // Text
 					{
-						$odfHandler->setVars($key, $value, true, 'UTF-8');
+						if (empty($value)) {
+							$odfHandler->setVars($key, $langs->trans('NoData'), true, 'UTF-8');
+						} else {
+							$odfHandler->setVars($key, html_entity_decode($value,ENT_QUOTES | ENT_HTML5), true, 'UTF-8');
+						}
 					}
 				}
 				catch (OdfException $e)
@@ -305,6 +319,9 @@ class doc_workunitdocument_odt extends ModeleODTWorkUnitDocument
 								$listlines = $odfHandler->setSegment('risq' . $i);
 
 								foreach ($risks as $line) {
+									$tmparray['actionPreventionUncompleted'] = "";
+									$tmparray['actionPreventionCompleted'] = "";
+
 									$evaluation = new RiskAssessment($this->db);
 									$lastEvaluation = $evaluation->fetchFromParent($line->id, 1);
 
@@ -318,6 +335,21 @@ class doc_workunitdocument_odt extends ModeleODTWorkUnitDocument
 										$tmparray['quotationRisque'] = $lastEvaluation->cotation ? $lastEvaluation->cotation : '0';
 										$tmparray['commentaireRisque'] = dol_print_date($lastEvaluation->date_creation, 'dayhoursec', 'tzuser') . ': ' . $lastEvaluation->comment;
 
+										$related_tasks = $line->get_related_tasks($line);
+
+										if (!empty($related_tasks)) {
+											foreach ($related_tasks as $related_task) {
+												if ($related_task->progress == 100) {
+													$tmparray['actionPreventionCompleted'] .= dol_print_date($related_task->date_c, 'dayhoursec', 'tzuser') . ': ' . $related_task->label . "\n";
+												} else {
+													$tmparray['actionPreventionUncompleted'] .= dol_print_date($related_task->date_c, 'dayhoursec', 'tzuser') . ': ' . $related_task->label . ' ' . ($related_task->progress ?: 0) . '%' . "\n";
+												}
+											}
+										} else {
+											$tmparray['actionPreventionUncompleted'] = "";
+											$tmparray['actionPreventionCompleted'] = "";
+										}
+
 										unset($tmparray['object_fields']);
 
 										complete_substitutions_array($tmparray, $outputlangs, $object, $line, "completesubstitutionarray_lines");
@@ -329,7 +361,11 @@ class doc_workunitdocument_odt extends ModeleODTWorkUnitDocument
 												if ($val == $tmparray['nomDanger']) {
 													$listlines->setImage($key, $val);
 												} else {
-													$listlines->setVars($key, $val, true, 'UTF-8');
+													if (empty($val)) {
+														$listlines->setVars($key, $langs->trans('NoData'), true, 'UTF-8');
+													} else {
+														$listlines->setVars($key, html_entity_decode($val,ENT_QUOTES | ENT_HTML5), true, 'UTF-8');
+													}
 												}
 											} catch (OdfException $e) {
 												dol_syslog($e->getMessage(), LOG_INFO);
@@ -375,8 +411,11 @@ class doc_workunitdocument_odt extends ModeleODTWorkUnitDocument
 										if (file_exists($val)) {
 											$listlines->setImage($key, $val);
 										} else {
-											$listlines->setVars($key, $val, true, 'UTF-8');
-										}
+											if (empty($val)) {
+												$listlines->setVars($key, $langs->trans('NoData'), true, 'UTF-8');
+											} else {
+												$listlines->setVars($key, html_entity_decode($val,ENT_QUOTES | ENT_HTML5), true, 'UTF-8');
+											}										}
 									} catch (OdfException $e) {
 										dol_syslog($e->getMessage(), LOG_INFO);
 									} catch (SegmentException $e) {
@@ -414,7 +453,11 @@ class doc_workunitdocument_odt extends ModeleODTWorkUnitDocument
 										if (file_exists($val)) {
 											$listlines->setImage($key, $val);
 										} else {
-											$listlines->setVars($key, $val, true, 'UTF-8');
+											if (empty($val)) {
+												$listlines->setVars($key, $langs->trans('NoData'), true, 'UTF-8');
+											} else {
+												$listlines->setVars($key, html_entity_decode($val,ENT_QUOTES | ENT_HTML5), true, 'UTF-8');
+											}
 										}
 									} catch (OdfException $e) {
 										dol_syslog($e->getMessage(), LOG_INFO);

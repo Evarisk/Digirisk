@@ -190,7 +190,7 @@ $help_url = 'FR:Module_DigipreventionplanDolibarr';
 
 $morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");
 
-llxHeader("", $title, $help_url, '', '', '', '', $morecss);
+llxHeader("", $title, $help_url, '', '', '', '', $morecss, '', 'classforhorizontalscrolloftabs');
 
 // Add $param from extra fields
 include DOL_DOCUMENT_ROOT.'/core/tpl/extrafields_list_search_param.tpl.php';
@@ -321,7 +321,7 @@ $arrayfields['ExtSociety'] = array('label'=>'ExtSociety', 'checked' => 1);
 $arrayfields['ExtSocietyResponsible'] = array('label'=>'ExtSocietyResponsible', 'checked' => 1);
 $arrayfields['ExtSocietyIntervenants'] = array('label'=>'ExtSocietyIntervenants', 'checked' => 1);
 
-print_barre_liste($form->textwithpicto($title, $texthelp), $page, $_SERVER["PHP_SELF"], $param, $sortfield, $sortorder, $massactionbutton, $num, $nbtotalofrecords, 'preventionplandocument', 0, $newcardbutton, '', $limit, 0, 0, 1);
+print_barre_liste($form->textwithpicto($title, $texthelp), $page, $_SERVER["PHP_SELF"], $param, $sortfield, $sortorder, $massactionbutton, $num, $nbtotalofrecords, 'digiriskdolibarr32px.png@digiriskdolibarr', 0, $newcardbutton, '', $limit, 0, 0, 1);
 
 $selectedfields = $form->multiSelectArrayWithCheckbox('selectedfields', $arrayfields, $varpage); // This also change content of $arrayfields
 if ($massactionbutton) $selectedfields .= $form->showCheckAddButtons('checkforselect', 1);

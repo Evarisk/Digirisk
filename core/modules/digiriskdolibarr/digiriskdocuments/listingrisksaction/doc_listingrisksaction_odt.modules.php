@@ -218,7 +218,13 @@ class doc_listingrisksaction_odt extends ModeleODTListingRisksAction
 			$filename = preg_split('/listingrisksaction\//' , $srctemplatepath);
 			$filename = preg_replace('/template_/','', $filename[1]);
 
-			$filename = $objectref . '_'. $filename;
+			$date = dol_print_date(dol_now(),'dayxcard');
+			if (!empty($digiriskelement)) {
+				$filename = $objectref.'_'.$digiriskelement->label.'_'.$date.'.odt';
+			} else {
+				$filename = $objectref.'_'.$conf->global->MAIN_INFO_SOCIETE_NOM.'_'.$date.'.odt';
+			}
+			$filename = str_replace(' ', '_', $filename);
 
 			$object->last_main_doc = $filename;
 
@@ -264,7 +270,7 @@ class doc_listingrisksaction_odt extends ModeleODTListingRisksAction
 			$array_object_from_properties = $this->get_substitutionarray_each_var_object($object, $outputlangs);
 			$array_object = $this->get_substitutionarray_object($object, $outputlangs);
 			$array_soc = $this->get_substitutionarray_mysoc($mysoc, $outputlangs);
-	
+
 			$tmparray = array_merge($substitutionarray, $array_object_from_properties, $array_object, $array_soc);
 			complete_substitutions_array($tmparray, $outputlangs, $object);
 
@@ -279,11 +285,15 @@ class doc_listingrisksaction_odt extends ModeleODTListingRisksAction
 					if (preg_match('/logo$/', $key)) // Image
 					{
 						if (file_exists($value)) $odfHandler->setImage($key, $value);
-						else $odfHandler->setVars($key, 'ErrorFileNotFound', true, 'UTF-8');
+						else $odfHandler->setVars($key, $langs->transnoentities('ErrorFileNotFound'), true, 'UTF-8');
 					}
 					else    // Text
 					{
-						$odfHandler->setVars($key, $value, true, 'UTF-8');
+						if (empty($value)) {
+							$odfHandler->setVars($key, $langs->trans('NoData'), true, 'UTF-8');
+						} else {
+							$odfHandler->setVars($key, html_entity_decode($value,ENT_QUOTES | ENT_HTML5), true, 'UTF-8');
+						}
 					}
 				}
 				catch (OdfException $e)
@@ -351,7 +361,11 @@ class doc_listingrisksaction_odt extends ModeleODTListingRisksAction
 													if ($val == $tmparray['nomDanger']) {
 														$listlines->setImage($key, $val);
 													} else {
-														$listlines->setVars($key, $val, true, 'UTF-8');
+														if (empty($val)) {
+															$listlines->setVars($key, $langs->trans('NoData'), true, 'UTF-8');
+														} else {
+															$listlines->setVars($key, html_entity_decode($val,ENT_QUOTES | ENT_HTML5), true, 'UTF-8');
+														}
 													}
 												} catch (OdfException $e) {
 													dol_syslog($e->getMessage(), LOG_INFO);
@@ -366,8 +380,7 @@ class doc_listingrisksaction_odt extends ModeleODTListingRisksAction
 								$odfHandler->mergeSegment($listlines);
 							}
 						}
-					}
-					else {
+					} else {
 						$risks = $risk->fetchRisksOrderedByCotation(0, true);
 						if ($risks > 0 && !empty($risks)) {
 							for ($i = 1; $i <= 4; $i++ ) {
@@ -414,12 +427,17 @@ class doc_listingrisksaction_odt extends ModeleODTListingRisksAction
 											// Call the ODTSubstitutionLine hook
 											$parameters = array('odfHandler' => &$odfHandler, 'file' => $file, 'object' => $object, 'outputlangs' => $outputlangs, 'substitutionarray' => &$tmparray, 'line' => $line);
 											$reshook = $hookmanager->executeHooks('ODTSubstitutionLine', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
+
 											foreach ($tmparray as $key => $val) {
 												try {
 													if ($val == $tmparray['nomDanger']) {
 														$listlines->setImage($key, $val);
 													} else {
-														$listlines->setVars($key, $val, true, 'UTF-8');
+														if (empty($val)) {
+															$listlines->setVars($key, $langs->trans('NoData'), true, 'UTF-8');
+														} else {
+															$listlines->setVars($key, html_entity_decode($val,ENT_QUOTES | ENT_HTML5), true, 'UTF-8');
+														}
 													}
 												} catch (OdfException $e) {
 													dol_syslog($e->getMessage(), LOG_INFO);

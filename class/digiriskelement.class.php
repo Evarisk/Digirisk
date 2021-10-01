@@ -69,14 +69,14 @@ class DigiriskElement extends CommonObject
 		'date_creation' => array('type'=>'datetime', 'label'=>'DateCreation', 'enabled'=>'1', 'position'=>40, 'notnull'=>1, 'visible'=>-2,),
 		'tms'           => array('type'=>'timestamp', 'label'=>'DateModification', 'enabled'=>'1', 'position'=>50, 'notnull'=>0, 'visible'=>-2,),
 		'import_key'    => array('type'=>'integer', 'label'=>'ImportId', 'enabled'=>'1', 'position'=>60, 'notnull'=>1, 'visible'=>-2,),
-		'status'        => array('type'=>'smallint', 'label'=>'Status', 'enabled'=>'1', 'position'=>70, 'notnull'=>0, 'visible'=>1, 'index'=>1,),
+		'status'        => array('type'=>'smallint', 'label'=>'Status', 'enabled'=>'1', 'position'=>70, 'notnull'=>1, 'default' => 1, 'visible'=>1, 'index'=>1,),
 		'label'         => array('type'=>'varchar(255)', 'label'=>'Label', 'enabled'=>'1', 'position'=>80, 'notnull'=>1, 'visible'=>1, 'searchall'=>1, 'css'=>'minwidth200', 'help'=>"Help text", 'showoncombobox'=>'1',),
 		'description'   => array('type'=>'textarea', 'label'=>'Description', 'enabled'=>'1', 'position'=>90, 'notnull'=>0, 'visible'=>3,),
 		'element_type'  => array('type'=>'varchar(50)', 'label'=>'ElementType', 'enabled'=>'1', 'position'=>100, 'notnull'=>-1, 'visible'=>1,),
 		'fk_user_creat' => array('type'=>'integer:User:user/class/user.class.php', 'label'=>'UserAuthor', 'enabled'=>'1', 'position'=>110, 'notnull'=>1, 'visible'=>-2, 'foreignkey'=>'user.rowid',),
 		'fk_user_modif' => array('type'=>'integer:User:user/class/user.class.php', 'label'=>'UserModif', 'enabled'=>'1', 'position'=>120, 'notnull'=>-1, 'visible'=>-2,),
 		'fk_parent'     => array('type'=>'integer', 'label'=>'ParentElement', 'enabled'=>'1', 'position'=>130, 'notnull'=>1, 'visible'=>1, 'default'=>0,),
-		'fk_standard'     => array('type'=>'integer', 'label'=>'Standard', 'enabled'=>'1', 'position'=>140, 'notnull'=>1, 'visible'=>0, 'default'=>1,),
+		'fk_standard'   => array('type'=>'integer', 'label'=>'Standard', 'enabled'=>'1', 'position'=>140, 'notnull'=>1, 'visible'=>0, 'default'=>1,),
 	);
 
 	public $rowid;
@@ -143,7 +143,9 @@ class DigiriskElement extends CommonObject
 	 */
 	public function create(User $user, $notrigger = false)
 	{
+		global $conf;
 		$this->element = $this->element_type . '@digiriskdolibarr';
+		$this->fk_standard = $conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD;
 		return $this->createCommon($user, $notrigger);
 	}
 
@@ -244,7 +246,7 @@ class DigiriskElement extends CommonObject
 	public function fetchDigiriskElementFlat($parent_id)
 	{
 		$object = new DigiriskElement($this->db);
-		$objects = $object->fetchAll();
+		$objects = $object->fetchAll('',  '',  0,  0, array('customsql' => 'status > 0' ));
 
 		$elements = recurse_tree($parent_id, 0, $objects);
 		if ($elements > 0 && !empty($elements)) {
@@ -294,7 +296,10 @@ class DigiriskElement extends CommonObject
 	 */
 	public function delete(User $user, $notrigger = false)
 	{
-		return $this->deleteCommon($user, $notrigger);
+		global $conf;
+
+		$this->fk_parent = $conf->global->DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH;
+		return $this->update($user);
 	}
 
 	/**
@@ -350,6 +355,30 @@ class DigiriskElement extends CommonObject
 		}
 	}
 
+	public function getRiskAssessmentCategoriesNumber() {
+		$risk = new Risk($this->db);
+		$risks = $risk->fetchFromParent($this->id);
+		$scale_counter = array(
+			1 => 0,
+			2 => 0,
+			3 => 0,
+			4 => 0
+		);
+		if(!empty($risks) && $risks > 0) {
+			foreach ($risks as $risk) {
+				$riskassessment = new RiskAssessment($this->db);
+				$riskassessment = $riskassessment->fetchFromParent($risk->id, 1);
+				if (!empty($riskassessment) && $riskassessment > 0) {
+					$riskassessment = array_shift($riskassessment);
+					$scale = $riskassessment->get_evaluation_scale();
+					$scale_counter[$scale] += 1;
+				}
+			}
+		}
+
+		return $scale_counter;
+	}
+
 	/**
 	 *  Output html form to select a third party.
 	 *  Note, you must use the select_company to get the component to select a third party. This function must only be called by select_company.
@@ -402,6 +431,16 @@ class DigiriskElement extends CommonObject
 				}
 			}
 			$sql .= " AND NOT s.rowid =" . $moreparam;
+		}
+		if ($conf->global->DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH) {
+			$masked_content = $this->fetchDigiriskElementFlat($conf->global->DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH);
+			if (! empty($masked_content) && $masked_content > 0) {
+				foreach ($masked_content as $key => $value) {
+					$sql .= " AND NOT s.rowid =" . $key;
+				}
+			}
+			$sql .= " AND NOT s.rowid =" . $conf->global->DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH;
+
 		}
 		$sql .= $this->db->order("rowid", "ASC");
 		$sql .= $this->db->plimit($limit, 0);

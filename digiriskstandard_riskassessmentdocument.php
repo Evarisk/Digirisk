@@ -63,7 +63,7 @@ $hookmanager->initHooks(array('digiriskelementriskassessmentdocument', 'globalca
 
 $object->fetch($conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD);
 
-$upload_dir = $conf->digiriskdolibarr->multidir_output[isset($object->entity) ? $object->entity : 1];
+$upload_dir = $conf->digiriskdolibarr->multidir_output[isset($conf->entity) ? $conf->entity : 1];
 
 //Security check
 $permissiontoread   = $user->rights->digiriskdolibarr->riskassessmentdocument->read;
@@ -154,13 +154,15 @@ if (empty($reshook)) {
 		$entity = ($conf->entity > 1) ? '/' . $conf->entity : '';
 
 		$date = dol_print_date(dol_now(),'dayxcard');
+		$nameSociety = str_replace(' ', '_', $conf->global->MAIN_INFO_SOCIETE_NOM);
 
-		$pathToZip = DOL_DATA_ROOT . $entity . '/digiriskdolibarr/riskassessmentdocument/' . $date . '_' . $riskassessmentdocument->ref;
+		$pathToZip = DOL_DATA_ROOT . $entity . '/digiriskdolibarr/riskassessmentdocument/' . $riskassessmentdocument->ref.'_'.$nameSociety.'_'.$date;
 		dol_mkdir($pathToZip);
 
 		// Ajout du fichier au dossier à zipper
-
-		copy(DOL_DATA_ROOT . $entity . '/digiriskdolibarr/riskassessmentdocument/' . $riskassessmentdocument->last_main_doc, $pathToZip . '/' . $riskassessmentdocument->last_main_doc);
+		$nameFile = $riskassessmentdocument->ref.'_'.$conf->global->MAIN_INFO_SOCIETE_NOM.'_'.$date.'.odt';
+		$nameFile = str_replace(' ', '_', $nameFile);
+		copy(DOL_DATA_ROOT . $entity . '/digiriskdolibarr/riskassessmentdocument/' . $riskassessmentdocument->last_main_doc, $pathToZip . '/' . $nameFile);
 
 		$digiriskelementlist = $digiriskelement->fetchDigiriskElementFlat(0);
 
@@ -182,8 +184,9 @@ if (empty($reshook)) {
 
 				// Ajout du fichier au dossier à zipper
 				$sourceFilePath = DOL_DATA_ROOT . $entity . '/digiriskdolibarr/' . $subFolder . '/' . $digiriskelementsingle['object']->ref . '/';
-
-				copy($sourceFilePath . $digiriskelementdocument->last_main_doc, $pathToZip . '/'  . $digiriskelementdocument->last_main_doc);
+				$nameFile = $digiriskelementdocument->ref.'_'.$digiriskelementsingle['object']->label.'_'.$riskassessmentdocument->ref.'-'.$date.'.odt';
+				$nameFile = str_replace(' ', '_', $nameFile);
+				copy($sourceFilePath . $digiriskelementdocument->last_main_doc, $pathToZip . '/'  . $nameFile);
 			}
 
 			// Get real path for our folder

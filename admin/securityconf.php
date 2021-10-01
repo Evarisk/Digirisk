@@ -48,7 +48,7 @@ require_once DOL_DOCUMENT_ROOT.'/user/class/user.class.php';
 
 require_once '../class/digiriskresources.class.php';
 
-global $langs, $user, $conf, $db;
+global $langs, $user, $conf, $db, $hookmanager;
 
 // Translations
 $langs->loadLangs(array('admin', 'companies', "digiriskdolibarr@digiriskdolibarr"));
@@ -129,11 +129,12 @@ if (($action == 'update' && !GETPOST("cancel", 'alpha')) || ($action == 'updatee
 $form = new Form($db);
 
 $help_url = 'FR:Module_DigiriskDolibarr#L.27onglet_S.C3.A9curit.C3.A9';
+$title    = $langs->trans("CompanyFoundation") . ' - ' . $langs->trans("Security");
 $morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");
 
-llxHeader('', $langs->trans("CompanyFoundation"), $help_url, '', '', '', '', $morecss);
+llxHeader('', $title, $help_url, '', '', '', '', $morecss);
 
-print load_fiche_titre($langs->trans("CompanyFoundation"), '', 'title_setup');
+print load_fiche_titre($title, '', 'title_setup');
 
 $head = company_admin_prepare_head();
 
@@ -419,7 +420,6 @@ print '<tr class="liste_titre"><th class="titlefield wordbreak">'.$langs->trans(
 
 // * Responsible to notify - Responsable à prévenir *
 
-print '<tr><td class="titlefieldcreate nowrap">'.$langs->trans("ResponsibleToNotify").'</td><td>';
 $responsible_resources = $allLinks['Responsible'];
 
 // * Third party concerned - Tiers concerné *
@@ -428,7 +428,13 @@ if ($responsible_resources->ref == 'Responsible' && $responsible_resources->id[0
 
 	$usertmp->fetch($responsible_resources->id[0]);
 
-	print $form->select_dolusers($responsible_resources->id[0], 'responsible_socid', 0, null, 0, 0, 0, 0, 'minwidth300');
+	$userlist = $form->select_dolusers(GETPOST('responsible_socid'), '', 0, null, 0, '', '', 0, 0, 0, 'AND u.statut = 1', 0, '', 'minwidth300', 0, 1);
+	print '<tr>';
+	print '<td class="" style="width:10%">'.$form->editfieldkey('ResponsibleToNotify', 'Responsible_id', '', $object, 0).'</td>';
+	print '<td>';
+	print $form->selectarray('responsible_socid', $userlist, $usertmp->id, $langs->trans('SelectUser'), null, null, null, "40%", 0,0,'','minwidth300',1);
+	print ' <a href="'.DOL_URL_ROOT.'/user/card.php?action=create&backtopage='.urlencode($_SERVER["PHP_SELF"].'?action=create').'" target="_blank"><span class="fa fa-plus-circle valignmiddle paddingleft" title="'.$langs->trans("AddUser").'"></span></a>';
+	print '</td></tr>';
 
 	if (!GETPOSTISSET('backtopage')) print ' <a href="'.DOL_URL_ROOT.'/user/card.php?action=create&backtopage='.urlencode($_SERVER["PHP_SELF"].'?action=create').'"><span class="fa fa-plus-circle valignmiddle paddingleft" title="'.$langs->trans("AddUser").'"></span></a>';
 
@@ -452,7 +458,13 @@ else { //id = 0
 	if (!empty($user->socid)) {
 		print $form->select_dolusers($user->socid, 'responsible_socid', 1, 1, 0, 0, 0, 0, 'minwidth300');
 	} else {
-		print $form->select_dolusers('', 'responsible_socid', 1, '', 0, 0, 0 , 0, 'minwidth300');
+		$userlist = $form->select_dolusers(GETPOST('responsible_socid'), '', 0, null, 0, '', '', 0, 0, 0, 'AND u.statut = 1', 0, '', 'minwidth300', 0, 1);
+		print '<tr>';
+		print '<td class="" style="width:10%">'.$form->editfieldkey('ResponsibleToNotify', 'Responsible_id', '', $object, 0).'</td>';
+		print '<td>';
+		print $form->selectarray('responsible_socid', $userlist, GETPOST('responsible_socid'), $langs->trans('SelectUser'), null, null, null, "40%", 0,0,'','minwidth300',1);
+		print ' <a href="'.DOL_URL_ROOT.'/user/card.php?action=create&backtopage='.urlencode($_SERVER["PHP_SELF"].'?action=create').'" target="_blank"><span class="fa fa-plus-circle valignmiddle paddingleft" title="'.$langs->trans("AddUser").'"></span></a>';
+		print '</td></tr>';
 	}
 }
 

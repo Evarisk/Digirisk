@@ -198,6 +198,22 @@ if (empty($reshook)) {
 			setEventMessages('BugFoundVarUploaddirnotDefined', null, 'errors');
 		}
 	}
+
+	if ($action == 'confirm_delete' && GETPOST("confirm") == "yes")
+	{
+		$object->fetch($id);
+		$result = $object->delete($user);
+
+		if ($result > 0)
+		{
+			setEventMessages($langs->trans("RecordDeleted"), null, 'mesgs');
+			header('Location: '.$backurlforlist);
+			exit;
+		} else {
+			dol_syslog($object->error, LOG_DEBUG);
+			setEventMessages($object->error, $object->errors, 'errors');
+		}
+	}
 }
 
 /*
@@ -206,6 +222,13 @@ if (empty($reshook)) {
 
 $form        = new Form($db);
 $emptyobject = new stdClass($db);
+$formconfirm = '';
+
+$parameters = array('formConfirm' => $formconfirm, 'object' => $object);
+$reshook = $hookmanager->executeHooks('formConfirm', $parameters, $object, $action); // Note that $action and $object may have been modified by hook
+if (empty($reshook)) $formconfirm .= $hookmanager->resPrint;
+elseif ($reshook > 0) $formconfirm = $hookmanager->resPrint;
+
 
 if ( $object->element_type == 'groupment' ) {
 	$title        = $langs->trans("Groupment");
@@ -305,7 +328,7 @@ if (($id || $ref) && $action == 'edit') {
 	if ($backtopage) print '<input type="hidden" name="backtopage" value="'.$backtopage.'">';
 	if ($backtopageforcancel) print '<input type="hidden" name="backtopageforcancel" value="'.$backtopageforcancel.'">';
 
-	print dol_get-fiche_head();
+	print dol_get_fiche_head();
 
 	unset($object->fields['status']);
 	unset($object->fields['element_type']);
@@ -321,9 +344,11 @@ if (($id || $ref) && $action == 'edit') {
 	// Other attributes
 	include DOL_DOCUMENT_ROOT.'/core/tpl/extrafields_edit.tpl.php';
 
-	print '<tr><td>'.$langs->trans("ParentElement").'</td><td>';
+	if ($id != $conf->global->DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH) {
+		print '<tr><td>'.$langs->trans("ParentElement").'</td><td>';
+		print $object->select_digiriskelement_list($object->fk_parent, 'fk_parent', 'element_type="groupment"', '',  0, 0, array(), '',  0,  0,  'minwidth100',  GETPOST('id'),  false);
+	}
 
-	print $object->select_digiriskelement_list($object->fk_parent, 'fk_parent', 'element_type="groupment"', '',  0, 0, array(), '',  0,  0,  'minwidth100',  GETPOST('id'),  false);
 	print '</td></tr>';
 
 	print '</table>';
@@ -346,11 +371,6 @@ if (!$object->id) {
 
 // Part to show record
 if ((empty($action) || ($action != 'edit' && $action != 'create'))) {
-	$res = $object->fetch_optionals();
-
-	$head = digiriskelementPrepareHead($object);
-
-	print dol_get_fiche_head($head, 'elementCard', $title, -1, "digiriskdolibarr@digiriskdolibarr");
 
 	$formconfirm = '';
 	// Confirmation to delete
@@ -358,11 +378,19 @@ if ((empty($action) || ($action != 'edit' && $action != 'create'))) {
 		$formconfirm = $form->formconfirm($_SERVER["PHP_SELF"].'?id='.$object->id, $langs->trans('DeleteDigiriskElement'), $langs->trans('ConfirmDeleteObject'), 'confirm_delete', '', 0, 1);
 	}
 
-	// Call Hook formConfirm
-	$parameters = array('formConfirm' => $formconfirm, 'lineid' => $lineid);
-	$reshook = $hookmanager->executeHooks('formConfirm', $parameters, $object, $action); // Note that $action and $object may have been modified by hook
-	if (empty($reshook)) $formconfirm .= $hookmanager->resPrint;
-	elseif ($reshook > 0) $formconfirm = $hookmanager->resPrint;
+
+	print $formconfirm;
+	$res = $object->fetch_optionals();
+
+	$head = digiriskelementPrepareHead($object);
+
+	print dol_get_fiche_head($head, 'elementCard', $title, -1, "digiriskdolibarr@digiriskdolibarr");
+
+	$trash_list = $object->fetchDigiriskElementFlat($conf->global->DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH);
+
+	if ($trash_list < 0 || empty($trash_list)) {
+		$trash_list = array();
+	}
 
 	// Object card
 	// ------------------------------------------------------------
@@ -451,6 +479,13 @@ if ((empty($action) || ($action != 'edit' && $action != 'create'))) {
 			} else {
 				print '<a class="butActionRefused classfortooltip" href="#" title="' . dol_escape_htmltag($langs->trans("NotEnoughPermissions")) . '">' . $langs->trans('Modify') . '</a>' . "\n";
 			}
+
+			if ($permissiontodelete && !array_key_exists($object->id, $trash_list) && $object->id != $conf->global->DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH){
+				print '<a class="butActionDelete" href="' . $_SERVER["PHP_SELF"] . '?id=' . $object->id . '&action=delete">'.$langs->trans("Delete").'</a>';
+			} else {
+				print '<a class="butActionRefused classfortooltip" href="#" title="'.$langs->trans("CanNotDoThis").'">'.$langs->trans('Delete').'</a>';
+			}
+
 		}
 		print '</div>' . "\n";
 

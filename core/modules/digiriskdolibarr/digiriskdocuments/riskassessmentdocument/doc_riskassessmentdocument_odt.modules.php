@@ -26,6 +26,7 @@ require_once DOL_DOCUMENT_ROOT . '/core/lib/files.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/images.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/company.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/doc.lib.php';
+require_once DOL_DOCUMENT_ROOT . '/contact/class/contact.class.php';
 require_once __DIR__ . '/../../../../../class/digiriskelement.class.php';
 require_once __DIR__ . '/../../../../../class/evaluator.class.php';
 require_once __DIR__ . '/../../../../../class/riskanalysis/risk.class.php';
@@ -218,7 +219,9 @@ class doc_riskassessmentdocument_odt extends ModeleODTRiskAssessmentDocument
 			$filename = preg_split('/riskassessmentdocument\//' , $srctemplatepath);
 			$filename = preg_replace('/template_/','', $filename[1]);
 
-			$filename = $objectref . '_'. $filename;
+			$date = dol_print_date(dol_now(),'dayxcard');
+			$filename = $objectref.'_'.$conf->global->MAIN_INFO_SOCIETE_NOM.'_'.$date.'.odt';
+			$filename = str_replace(' ', '_', $filename);
 
 			$object->last_main_doc = $filename;
 
@@ -262,10 +265,10 @@ class doc_riskassessmentdocument_odt extends ModeleODTRiskAssessmentDocument
 			// Define substitution array
 			$substitutionarray = getCommonSubstitutionArray($outputlangs, 0, null, $object);
 			$array_object_from_properties = $this->get_substitutionarray_each_var_object($object, $outputlangs);
-			$array_object = $this->get_substitutionarray_object($object, $outputlangs);
+			//$array_object = $this->get_substitutionarray_object($object, $outputlangs);
 			$array_soc = $this->get_substitutionarray_mysoc($mysoc, $outputlangs);
 
-			$tmparray = array_merge($substitutionarray, $array_object_from_properties, $array_object, $array_soc);
+			$tmparray = array_merge($substitutionarray, $array_object_from_properties, $array_soc);
 			complete_substitutions_array($tmparray, $outputlangs, $object);
 
 			// Call the ODTSubstitution hook
@@ -278,11 +281,15 @@ class doc_riskassessmentdocument_odt extends ModeleODTRiskAssessmentDocument
 					if (preg_match('/logo$/', $key)) // Image
 					{
 						if (file_exists($value)) $odfHandler->setImage($key, $value);
-						else $odfHandler->setVars($key, 'ErrorFileNotFound', true, 'UTF-8');
+						else $odfHandler->setVars($key, $langs->transnoentities('ErrorFileNotFound'), true, 'UTF-8');
 					}
 					else    // Text
 					{
-						$odfHandler->setVars($key, $value, true, 'UTF-8');
+						if (empty($value)) {
+							$odfHandler->setVars($key, $langs->trans('NoData'), true, 'UTF-8');
+						} else {
+							$odfHandler->setVars($key, html_entity_decode($value,ENT_QUOTES | ENT_HTML5), true, 'UTF-8');
+						}
 					}
 				}
 				catch (OdfException $e)
@@ -320,7 +327,11 @@ class doc_riskassessmentdocument_odt extends ModeleODTRiskAssessmentDocument
 							$reshook = $hookmanager->executeHooks('ODTSubstitutionLine', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
 							foreach ($tmparray as $key => $val) {
 								try {
-									$listlines->setVars($key, $val, true, 'UTF-8');
+									if (empty($val)) {
+										$listlines->setVars($key, $langs->trans('NoData'), true, 'UTF-8');
+									} else {
+										$listlines->setVars($key, html_entity_decode($val,ENT_QUOTES | ENT_HTML5), true, 'UTF-8');
+									}
 								} catch (OdfException $e) {
 									dol_syslog($e->getMessage(), LOG_INFO);
 								} catch (SegmentException $e) {
@@ -347,13 +358,10 @@ class doc_riskassessmentdocument_odt extends ModeleODTRiskAssessmentDocument
 									$totalQuotation += $lastEvaluation->cotation;
 								}
 							}
-							$depthHyphens = '';
-							for ($k = 0; $k < $digiriskelementsingle['depth']; $k++) {
-								$depthHyphens .= '- ';
-							}
-							$elementName = $depthHyphens . $digiriskelementsingle['object']->ref .' '. $digiriskelementsingle['object']->label;
 
-							$cotationarray[$elementName] = $totalQuotation;
+							$elementName = $digiriskelementsingle['object']->ref .' '. $digiriskelementsingle['object']->label;
+							$scale_counter = $digiriskelementsingle['object']->getRiskAssessmentCategoriesNumber();
+							$cotationarray[$elementName] = array($totalQuotation, $digiriskelementsingle['object']->description,$scale_counter);
 
 							$totalQuotation = 0;
 							unset($tmparray['object_fields']);
@@ -368,8 +376,13 @@ class doc_riskassessmentdocument_odt extends ModeleODTRiskAssessmentDocument
 						$reshook = $hookmanager->executeHooks('ODTSubstitutionLine', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
 							foreach ($cotationarray as $key => $val) {
 								try {
-									$listlines->setVars('nomElement', $key, true, 'UTF-8');
-									$listlines->setVars('quotationTotale', $val, true, 'UTF-8');
+									$listlines->setVars('nomElement', html_entity_decode($key,ENT_QUOTES | ENT_HTML5), true, 'UTF-8');
+									$listlines->setVars('quotationTotale', $val[0], true, 'UTF-8');
+									$listlines->setVars('description', html_entity_decode($val[1],ENT_QUOTES | ENT_HTML5), true, 'UTF-8');
+									$listlines->setVars('NbRiskBlack', $val[2][1], true, 'UTF-8');
+									$listlines->setVars('NbRiskRed', $val[2][2], true, 'UTF-8');
+									$listlines->setVars('NbRiskOrange', $val[2][3], true, 'UTF-8');
+									$listlines->setVars('NbRiskGrey', $val[2][4], true, 'UTF-8');
 								} catch (OdfException $e) {
 									dol_syslog($e->getMessage(), LOG_INFO);
 								} catch (SegmentException $e) {
@@ -385,6 +398,14 @@ class doc_riskassessmentdocument_odt extends ModeleODTRiskAssessmentDocument
 							$listlines = $odfHandler->setSegment('risq' . $i);
 
 							foreach ($risks as $line) {
+//								$tmparray['actionPreventionUncompletedDate'] = "";
+//								$tmparray['actionPreventionUncompletedProgress'] = "";
+//								$tmparray['actionPreventionUncompletedContact'] = "";
+//								$tmparray['actionPreventionUncompletedlabel'] = "";
+//								$tmparray['actionPreventionCompletedDate'] = "";
+//								$tmparray['actionPreventionCompletedProgress'] = "";
+//								$tmparray['actionPreventionCompletedContact'] = "";
+//								$tmparray['actionPreventionCompletedlabel'] = "";
 								$tmparray['actionPreventionUncompleted'] = "";
 								$tmparray['actionPreventionCompleted'] = "";
 
@@ -406,19 +427,80 @@ class doc_riskassessmentdocument_odt extends ModeleODTRiskAssessmentDocument
 									$tmparray['commentaireRisque'] = dol_print_date( $lastEvaluation->date_creation, 'dayhoursec', 'tzuser') . ': ' . $lastEvaluation->comment;
 
 									$related_tasks = $line->get_related_tasks($line);
+									$user = new User($this->db);
 
-									if (!empty($related_tasks)) {
+									if (!empty($related_tasks) && is_array($related_tasks)) {
 										foreach ($related_tasks as $related_task) {
+											$related_task_contact_ids = $related_task->getListContactId();
+											if (!empty($related_task_contact_ids) && is_array($related_task_contact_ids)) {
+												foreach ($related_task_contact_ids as $related_task_contact_id) {
+													$user->fetch($related_task_contact_id);
+													$contact_array[$related_task_contact_id] = $user;
+												}
+											}
+											$AllInitiales = '';
+											if (!empty($contact_array) && is_array($contact_array)) {
+												foreach ($contact_array as $contact_array_single) {
+													$initiales = '';
+													if (dol_strlen($contact_array_single->firstname)) {
+														$initiales .= str_split($contact_array_single->firstname, 1)[0];
+													}
+													if (dol_strlen($contact_array_single->lastname)) {
+														$initiales .= str_split($contact_array_single->lastname, 1)[0];
+													}
+													$AllInitiales .= strtoupper($initiales) . ',';
+												}
+											}
 											if ($related_task->progress == 100) {
-												$tmparray['actionPreventionCompleted'] .= dol_print_date($related_task->date_c, 'dayhoursec', 'tzuser') . ': ' . $related_task->label . "\n";
+												$tmparray['actionPreventionCompleted'] .= dol_print_date($related_task->date_c, 'dayhourreduceformat', 'tzuser') . "\n" . ' '. $langs->trans('Contacts') . ' : ' . ($AllInitiales ?: $langs->trans('NoData')) . "\n" .$related_task->label . "\n\n";
 											} else {
-												$tmparray['actionPreventionUncompleted'] .= dol_print_date($related_task->date_c, 'dayhoursec', 'tzuser') . ': ' . $related_task->label . ' ' . ($related_task->progress ?  $related_task->progress : 0) . '%'. "\n";
+												$tmparray['actionPreventionUncompleted'] .= dol_print_date($related_task->date_c, 'dayhourreduceformat', 'tzuser') . ' - '. $langs->trans('DigiriskProgress') . ' : ' . ($related_task->progress ?: 0) . '%' . ' '. $langs->trans('Contacts') . ' : ' . ($AllInitiales ?: $langs->trans('NoData')) . "\n" .$related_task->label . "\n\n";
 											}
 										}
 									} else {
 										$tmparray['actionPreventionUncompleted'] = "";
 										$tmparray['actionPreventionCompleted'] = "";
 									}
+
+//									$listTask = $odfHandler->setSegment('UncompletedAction' . $i);
+//									if (!empty($related_tasks)) {
+//										foreach ($related_tasks as $related_task) {
+//											if ($related_task->progress == 100) {
+//												$tmparray['actionPreventionCompletedDate'] .= dol_print_date($related_task->date_c, 'dayhourreduceformat', 'tzuser') . "\n";
+//												$tmparray['actionPreventionCompletedContact'] .= $AllInitiales . "\n";
+//												$tmparray['actionPreventionCompletedLabel'] .= $related_task->label . "\n";
+//											} else {
+//												$tmparray['actionPreventionUncompletedDate'] .= dol_print_date($related_task->date_c, 'dayhourreduceformat', 'tzuser') . "\n";
+//												$tmparray['actionPreventionUncompletedProgress'] .= $langs->trans('Progress') .' : '. ($related_task->progress ?: 0) . '%'. "\n";
+//												$tmparray['actionPreventionUncompletedContact'] .= $AllInitiales . "\n";
+//												$tmparray['actionPreventionUncompletedLabel'] .= $related_task->label . "\n";
+//											}
+//											foreach ($tmparray as $key => $val) {
+//												try {
+//													if (empty($val)) {
+//														$listTask->setVars($key, $langs->trans('NoData'), true, 'UTF-8');
+//													} else {
+//														$listTask->setVars($key, $val, true, 'UTF-8');
+//													}
+//												} catch (OdfException $e) {
+//													dol_syslog($e->getMessage(), LOG_INFO);
+//												} catch (SegmentException $e) {
+//													dol_syslog($e->getMessage(), LOG_INFO);
+//												}
+//											}
+//											$listTask->merge();
+//										}
+//										$odfHandler->mergeSegment($listTask);
+//									} else {
+//										$tmparray['actionPreventionUncompletedDate'] = "";
+//										$tmparray['actionPreventionUncompletedProgress'] = "";
+//										$tmparray['actionPreventionUncompletedContact'] = "";
+//										$tmparray['actionPreventionUncompletedlabel'] = "";
+//										$tmparray['actionPreventionCompletedDate'] = "";
+//										$tmparray['actionPreventionCompletedProgress'] = "";
+//										$tmparray['actionPreventionCompletedContact'] = "";
+//										$tmparray['actionPreventionCompletedlabel'] = "";
+//									}
 
 									unset($tmparray['object_fields']);
 
@@ -431,7 +513,11 @@ class doc_riskassessmentdocument_odt extends ModeleODTRiskAssessmentDocument
 											if ($val == $tmparray['nomDanger']) {
 												$listlines->setImage($key, $val);
 											} else {
-												$listlines->setVars($key, $val, true, 'UTF-8');
+												if (empty($val)) {
+													$listlines->setVars($key, $langs->trans('NoData'), true, 'UTF-8');
+												} else {
+													$listlines->setVars($key, html_entity_decode($val,ENT_QUOTES | ENT_HTML5), true, 'UTF-8');
+												}
 											}
 										} catch (OdfException $e) {
 											dol_syslog($e->getMessage(), LOG_INFO);
