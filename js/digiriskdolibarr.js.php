@@ -2265,6 +2265,7 @@ window.eoxiaJS.evaluator.createEvaluator = function ( event ) {
 	let actionContainerError = $('.messageErrorEvaluatorCreate');
 
 	var user = $('.user-selected').val()
+	alert(user);
 	var userPost = '';
 	if (user !== 0) {
 		userPost = '&evaluatorID=' + encodeURI(user);
