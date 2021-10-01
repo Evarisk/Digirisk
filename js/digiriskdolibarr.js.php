@@ -2236,7 +2236,7 @@ window.eoxiaJS.evaluator.init = function() {
  */
 window.eoxiaJS.evaluator.event = function() {
 	jQuery( document ).on( 'click', '.evaluator-create', window.eoxiaJS.evaluator.createEvaluator );
-	jQuery( document ).on( 'touchstart touchend touchcancel touchleave touchmove click', '#userid'          , window.eoxiaJS.evaluator.selectUser );
+	jQuery( document ).on( 'click', '#userid'          , window.eoxiaJS.evaluator.selectUser );
 };
 
 /**
