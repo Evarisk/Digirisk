@@ -279,7 +279,7 @@ class doc_legaldisplay_odt extends ModeleODTLegalDisplay
 						if ($value == '') {
 							$odfHandler->setVars($key, $langs->trans('NoData'), true, 'UTF-8');
 						} else {
-							$odfHandler->setVars($key, $value, true, 'UTF-8');
+							$odfHandler->setVars($key, html_entity_decode($str,ENT_QUOTES | ENT_HTML5), true, 'UTF-8');
 						}
 					}
 				}
