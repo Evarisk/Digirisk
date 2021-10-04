@@ -393,10 +393,9 @@ class doc_riskassessmentdocument_odt extends ModeleODTRiskAssessmentDocument
 						$odfHandler->mergeSegment($listlines);
 					}
 
-					if ($risks > 0 && !empty($risks)) {
-						for ($i = 1; $i <= 4; $i++ ) {
-							$listlines = $odfHandler->setSegment('risq' . $i);
-
+					for ($i = 1; $i <= 4; $i++ ) {
+						$listlines = $odfHandler->setSegment('risq' . $i);
+						if ($risks > 0 && !empty($risks)) {
 							foreach ($risks as $line) {
 //								$tmparray['actionPreventionUncompletedDate'] = "";
 //								$tmparray['actionPreventionUncompletedProgress'] = "";
@@ -412,19 +411,19 @@ class doc_riskassessmentdocument_odt extends ModeleODTRiskAssessmentDocument
 								$evaluation = new RiskAssessment($this->db);
 								$lastEvaluation = $evaluation->fetchFromParent($line->id, 1);
 
-								if ( $lastEvaluation > 0 && !empty($lastEvaluation)) {
+								if ($lastEvaluation > 0 && !empty($lastEvaluation)) {
 									$lastEvaluation = array_shift($lastEvaluation);
 									$scale = $lastEvaluation->get_evaluation_scale();
 								}
 
-								if ( $scale == $i ) {
+								if ($scale == $i) {
 									$element = new DigiriskElement($this->db);
 									$element->fetch($line->fk_element);
-									$tmparray['nomElement']        = $element->ref . ' - ' . $element->label;
-									$tmparray['nomDanger']         = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $line->get_danger_category($line) . '.png';
+									$tmparray['nomElement'] = $element->ref . ' - ' . $element->label;
+									$tmparray['nomDanger'] = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $line->get_danger_category($line) . '.png';
 									$tmparray['identifiantRisque'] = $line->ref . ' - ' . $lastEvaluation->ref;
-									$tmparray['quotationRisque']    = $lastEvaluation->cotation ? $lastEvaluation->cotation : '0' ;
-									$tmparray['commentaireRisque'] = dol_print_date( $lastEvaluation->date_creation, 'dayhoursec', 'tzuser') . ': ' . $lastEvaluation->comment;
+									$tmparray['quotationRisque'] = $lastEvaluation->cotation ? $lastEvaluation->cotation : '0';
+									$tmparray['commentaireRisque'] = dol_print_date($lastEvaluation->date_creation, 'dayhoursec', 'tzuser') . ': ' . $lastEvaluation->comment;
 
 									$related_tasks = $line->get_related_tasks($line);
 									$user = new User($this->db);
@@ -452,9 +451,9 @@ class doc_riskassessmentdocument_odt extends ModeleODTRiskAssessmentDocument
 												}
 											}
 											if ($related_task->progress == 100) {
-												$tmparray['actionPreventionCompleted'] .= dol_print_date($related_task->date_c, 'dayhourreduceformat', 'tzuser') . "\n" . ' '. $langs->trans('Contacts') . ' : ' . ($AllInitiales ?: $langs->trans('NoData')) . "\n" .$related_task->label . "\n\n";
+												$tmparray['actionPreventionCompleted'] .= dol_print_date($related_task->date_c, 'dayhourreduceformat', 'tzuser') . "\n" . ' ' . $langs->trans('Contacts') . ' : ' . ($AllInitiales ?: $langs->trans('NoData')) . "\n" . $related_task->label . "\n\n";
 											} else {
-												$tmparray['actionPreventionUncompleted'] .= dol_print_date($related_task->date_c, 'dayhourreduceformat', 'tzuser') . ' - '. $langs->trans('DigiriskProgress') . ' : ' . ($related_task->progress ?: 0) . '%' . ' '. $langs->trans('Contacts') . ' : ' . ($AllInitiales ?: $langs->trans('NoData')) . "\n" .$related_task->label . "\n\n";
+												$tmparray['actionPreventionUncompleted'] .= dol_print_date($related_task->date_c, 'dayhourreduceformat', 'tzuser') . ' - ' . $langs->trans('DigiriskProgress') . ' : ' . ($related_task->progress ?: 0) . '%' . ' ' . $langs->trans('Contacts') . ' : ' . ($AllInitiales ?: $langs->trans('NoData')) . "\n" . $related_task->label . "\n\n";
 											}
 										}
 									} else {
@@ -516,7 +515,7 @@ class doc_riskassessmentdocument_odt extends ModeleODTRiskAssessmentDocument
 												if (empty($val)) {
 													$listlines->setVars($key, $langs->trans('NoData'), true, 'UTF-8');
 												} else {
-													$listlines->setVars($key, html_entity_decode($val,ENT_QUOTES | ENT_HTML5), true, 'UTF-8');
+													$listlines->setVars($key, html_entity_decode($val, ENT_QUOTES | ENT_HTML5), true, 'UTF-8');
 												}
 											}
 										} catch (OdfException $e) {
@@ -528,8 +527,29 @@ class doc_riskassessmentdocument_odt extends ModeleODTRiskAssessmentDocument
 									$listlines->merge();
 								}
 							}
-							$odfHandler->mergeSegment($listlines);
+						} else {
+							$tmparray['nomDanger']                   = $langs->trans('NoData');
+							$tmparray['identifiantRisque']           = $langs->trans('NoData');
+							$tmparray['quotationRisque']             = $langs->trans('NoData');
+							$tmparray['commentaireRisque']           = $langs->trans('NoRiskThere');
+							$tmparray['actionPreventionUncompleted'] = $langs->trans('NoData');
+							$tmparray['actionPreventionCompleted']   = $langs->trans('NoData');
+							foreach ($tmparray as $key => $val) {
+								try {
+									if (empty($val)) {
+										$listlines->setVars($key, $langs->trans('NoData'), true, 'UTF-8');
+									} else {
+										$listlines->setVars($key, html_entity_decode($val, ENT_QUOTES | ENT_HTML5), true, 'UTF-8');
+									}
+								} catch (OdfException $e) {
+									dol_syslog($e->getMessage(), LOG_INFO);
+								} catch (SegmentException $e) {
+									dol_syslog($e->getMessage(), LOG_INFO);
+								}
+							}
+							$listlines->merge();
 						}
+						$odfHandler->mergeSegment($listlines);
 					}
 				}
 			}
