@@ -3370,6 +3370,11 @@ td > .risk-evaluation-container {
   align-items: center;
 }
 
+.risk-evaluation-add-modal .modal-container {
+  max-width: 1500px;
+  max-height: 750px;
+}
+
 .wpeo-modal .modal-container ul, .wpeo-modal .modal-container li {
   margin: 0;
   list-style-type: none;
