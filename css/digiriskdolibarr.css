@@ -2053,6 +2053,10 @@
 .page-ut-gp-list .side-nav .digirisk-wrap {
   padding: 0 !important;
 }
+.page-ut-gp-list .side-nav .navigation-container {
+  max-height: 1000px;
+  overflow-y: auto;
+}
 .page-ut-gp-list .side-nav .add-container {
   position: absolute;
   right: 0;

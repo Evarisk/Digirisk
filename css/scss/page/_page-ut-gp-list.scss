@@ -42,6 +42,8 @@
   .navigation-container {
     //padding-left: 10px;
     //padding-right: 10px;
+    max-height:1000px;
+    overflow-y: auto;
   }
 
   .add-container {
