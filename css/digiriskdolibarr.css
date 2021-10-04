@@ -2481,6 +2481,10 @@
   font-weight: 700;
   color: rgba(0, 0, 0, 0.6);
 }
+.riskassessment-task-container .riskassessment-task-single .riskassessment-task-content .riskassessment-task-data .riskassessment-task-progress.progress-0 {
+  background: #e05353;
+  color: #fff;
+}
 .riskassessment-task-container .riskassessment-task-single .riskassessment-task-content .riskassessment-task-data .riskassessment-task-progress.progress-1 {
   background: #e05353;
   color: #fff;

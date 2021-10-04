@@ -98,7 +98,7 @@
       font-weight: 700;
       color: rgba(0,0,0,0.6);
 
-      @for $i from 1 through 50 {
+      @for $i from 0 through 50 {
         &.progress-#{$i} {
           background: $color__red;
           color: #fff;
