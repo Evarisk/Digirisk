@@ -40,7 +40,7 @@ if (empty($conf) || !is_object($conf))
 		$path = DOL_URL_ROOT.'/document.php?modulepart=' . $modulepart  . '&attachment=0&file=' . str_replace('/', '%2F', $relativepath) . '/';
 		$nophoto = '/public/theme/common/nophoto.png'; ?>
 		<!-- BUTTON RISK EVALUATION PHOTO MODAL -->
-		<div class="action risk-evaluation-photo default-photo modal-open" value="<?php echo $object->id ?>">
+		<div class="action risk-evaluation-photo default-photo modal-open risk-evaluation-photo-<?php echo $cotation->id ?>" value="<?php echo $cotation->id ?>">
 			<?php if (isset($cotation->photo)) {
 				$filearray = dol_dir_list($conf->digiriskdolibarr->multidir_output[$conf->entity].'/'.$cotation->element.'/'.$cotation->ref, "files", 0, '', '(\.odt|_preview.*\.png)$', 'position_name', 'asc', 1);
 				if (count($filearray)) {
@@ -66,47 +66,6 @@ if (empty($conf) || !is_object($conf))
 				<img class="photo maxwidth50"  src="<?php echo DOL_URL_ROOT.$nophoto ?>">
 			</span>
 			<?php } ?>
-		</div>
-		<!-- RISK EVALUATION PHOTO MODAL -->
-		<div class="wpeo-modal modal-photo" id="risk_evaluation_photo<?php echo $object->id ?>" data-id="<?php echo $object->id ?>">
-			<div class="modal-container wpeo-modal-event">
-				<!-- Modal-Header -->
-				<div class="modal-header">
-					<h2 class="modal-title"><?php echo $langs->trans('ModalAddPhoto') ?></h2>
-					<div class="modal-close"><i class="fas fa-2x fa-times"></i></div>
-				</div>
-				<!-- Modal-Content -->
-				<div class="modal-content" id="#modalContent<?php echo $object->id ?>">
-					<?php
-					// To attach new file
-					if ((!empty($conf->use_javascript_ajax) && empty($conf->global->MAIN_ECM_DISABLE_JS)) || !empty($section))
-					{
-						$sectiondir = GETPOST('file', 'alpha') ?GETPOST('file', 'alpha') : GETPOST('section_dir', 'alpha');
-						print '<!-- Start form to attach new file in digiriskdolibarr_photo_view.tpl.tpl.php sectionid='.$section.' sectiondir='.$sectiondir.' -->'."\n";
-						include_once DOL_DOCUMENT_ROOT.'/core/class/html.formfile.class.php';
-						$formfile = new FormFile($db);
-						$formfile->form_attach_new_file($_SERVER["PHP_SELF"], 'none', 0, 0, $permtoupload, 48, null, '', 0, '', 0, $nameforformuserfile, '', $sectiondir, 1);
-					} else print '&nbsp;';
-					// End "Add new file" area
-					?>
-					<div class="underbanner clearboth"></div>
-					<div class="ecm-photo-list-content">
-						<div class="wpeo-gridlayout grid-4 grid-gap-3 grid-margin-2 ecm-photo-list ecm-photo-list-<?php echo $risk->id . ($editModal ? '-edit' : '') ?>">
-							<?php
-							$relativepath = 'digiriskdolibarr/medias/thumbs';
-
-							print digirisk_show_medias('ecm', DOL_DATA_ROOT  . $entity. '/ecm/digiriskdolibarr/medias/thumbs', 'small');
-							?>
-						</div>
-					</div>
-				</div>
-				<!-- Modal-Footer -->
-				<div class="modal-footer">
-					<div class="save-photo wpeo-button button-blue button-disable">
-						<span><?php echo $langs->trans('Add'); ?></span>
-					</div>
-				</div>
-			</div>
 		</div>
 	</div>
 </div>

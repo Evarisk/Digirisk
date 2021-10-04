@@ -352,7 +352,9 @@ window.eoxiaJS.modal.openModal = function ( event ) {
 	} else if ($(this).hasClass('risk-evaluation-list')) {
 		$('#risk_evaluation_list' + idSelected).addClass('modal-active');
 	} else if ($(this).hasClass('risk-evaluation-photo')) {
-		$(this).closest('.risk-evaluation-photo-container').find('#risk_evaluation_photo' + idSelected).addClass('modal-active');
+		$('#risk_evaluation_photo').addClass('modal-active');
+		$('#risk_evaluation_photo').attr('value', idSelected);
+		$('#risk_evaluation_photo').find('.wpeo-button').attr('value', idSelected);
 	} else if ($(this).hasClass('risk-evaluation-edit')) {
 		$('#risk_evaluation_edit' + idSelected).addClass('modal-active');
 	} else if ($(this).hasClass('evaluator-add')) {
@@ -409,6 +411,8 @@ window.eoxiaJS.modal.openModal = function ( event ) {
  */
 window.eoxiaJS.modal.closeModal = function ( event ) {
 	$(this).closest('.modal-active').removeClass('modal-active')
+	$('.clicked-photo').attr('style', '');
+	$('.clicked-photo').removeClass('clicked-photo');
 	$('.notice').addClass('hidden');
 };
 
@@ -1000,13 +1004,14 @@ window.eoxiaJS.photo.selectPhoto = function( event ) {
  * @return {void}
  */
 window.eoxiaJS.photo.savePhoto = function( event ) {
-    let parent = $(this).closest('.modal-content')
+    let parent = $('.ecm-photo-list-content')
+	let idToSave = $(this).attr('value')
 
     $('.wpeo-modal.modal-photo.modal-active').removeClass('modal-active');
-
-    $(this).closest('.risk-evaluation-photo-container').find('.risk-evaluation-photo-single .filename').val(parent.find('.clicked-photo .filename').val());
-    $(this).closest('.risk-evaluation-photo-container').find('.risk-evaluation-photo-single img').attr('src' , parent.find('.clicked-photo img').attr('src'));
-
+    $(".risk-evaluation-photo-"+idToSave).find('.risk-evaluation-photo-single .filename').val(parent.find('.clicked-photo .filename').val());
+	$(".risk-evaluation-photo-"+idToSave).find('.risk-evaluation-photo-single img').attr('src' , parent.find('.clicked-photo img').attr('src'));
+	$('.clicked-photo').attr('style', '');
+	$('.clicked-photo').removeClass('clicked-photo');
 };
 
 /**
@@ -1024,8 +1029,7 @@ window.eoxiaJS.photo.sendPhoto = function( event ) {
 	let files    = element.find("input[name='userfile[]']").prop("files");
 	let formdata = new FormData();
     let elementParent = $(this).closest('.modal-container').find('.ecm-photo-list-content');
-	let modalID = $(this).closest('.risk-evaluation-photo').attr('value')
-	window.eoxiaJS.loader.display($(this).closest('.risk-evaluation-photo').find('.modal-content'));
+	window.eoxiaJS.loader.display($('#risk_evaluation_photo').find('.modal-content'));
 
 	$.each(files, function(index, file) {
 		formdata.append("userfile[]", file);
@@ -1040,7 +1044,7 @@ window.eoxiaJS.photo.sendPhoto = function( event ) {
 			$('.wpeo-loader').removeClass('wpeo-loader')
 			window.eoxiaJS.loader.display(elementParent);
 			elementParent.empty()
-			elementParent.load( document.URL + ' .ecm-photo-list-'+modalID);
+			elementParent.load( document.URL + ' .ecm-photo-list');
             elementParent.removeClass('wpeo-loader');
         }
 	});
