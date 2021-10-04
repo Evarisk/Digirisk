@@ -971,6 +971,7 @@ window.eoxiaJS.photo.event = function() {
 	jQuery( document ).on( 'click', '.save-photo', window.eoxiaJS.photo.savePhoto );
 	jQuery( document ).on( 'click', '.modal-content .formattachnewfile .button', window.eoxiaJS.photo.sendPhoto );
 	jQuery( document ).on( 'click', '.clicked-photo-preview', window.eoxiaJS.photo.previewPhoto );
+	jQuery( document ).on( 'input', '.form-element #search_in_gallery', window.eoxiaJS.photo.handleSearch );
 }
 
 /**
@@ -1012,6 +1013,24 @@ window.eoxiaJS.photo.savePhoto = function( event ) {
 	$(".risk-evaluation-photo-"+idToSave).find('.risk-evaluation-photo-single img').attr('src' , parent.find('.clicked-photo img').attr('src'));
 	$('.clicked-photo').attr('style', '');
 	$('.clicked-photo').removeClass('clicked-photo');
+};
+
+/**
+ * Action save photo.
+ *
+ * @since   1.0.0
+ * @version 1.0.0
+ *
+ * @return {void}
+ */
+window.eoxiaJS.photo.handleSearch = function( event ) {
+	let searchQuery = $('#search_in_gallery').val()
+	let photos = $('.center.clickable-photo')
+
+	photos.each(function(  ) {
+		console.log( $( this ).text().trim() );
+		$( this ).text().trim().match(searchQuery) ? $(this).show() : $(this).hide()
+	});
 };
 
 /**

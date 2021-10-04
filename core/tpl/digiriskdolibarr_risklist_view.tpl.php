@@ -690,6 +690,17 @@
 				// End "Add new file" area
 				?>
 				<div class="underbanner clearboth"></div>
+				<div class="form-element">
+					<div class="form-field-container">
+						<div class="wpeo-autocomplete">
+							<label class="autocomplete-label" for="mon-autocomplete">
+								<i class="autocomplete-icon-before far fa-search"></i>
+								<input id="search_in_gallery" placeholder="Recherche..." class="autocomplete-search-input" type="text" />
+								<span class="autocomplete-icon-after"><i class="far fa-times"></i></span>
+							</label>
+						</div>
+					</div>
+				</div>
 				<div class="ecm-photo-list-content">
 					<div class="wpeo-gridlayout grid-4 grid-gap-3 grid-margin-2 ecm-photo-list ecm-photo-list">
 						<?php
