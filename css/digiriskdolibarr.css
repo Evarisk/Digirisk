@@ -3375,6 +3375,11 @@ td > .risk-evaluation-container {
   max-height: 750px;
 }
 
+.risk-evaluation-edit-modal .modal-container {
+  max-width: 1500px;
+  max-height: 750px;
+}
+
 .wpeo-modal .modal-container ul, .wpeo-modal .modal-container li {
   margin: 0;
   list-style-type: none;
