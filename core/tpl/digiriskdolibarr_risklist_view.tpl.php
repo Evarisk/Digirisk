@@ -732,13 +732,7 @@
 		if ($key == 'status') $cssforfield .= ($cssforfield ? ' ' : '').'center';
 		if (!empty($arrayfields['evaluation.'.$key]['checked']))
 		{
-			$cssforfield = '';
-			if (GETPOST('sortorder') == 'asc') {
-				$sortorder = 'desc';
-			} else {
-				$sortorder = 'asc';
-			}
-			print getTitleFieldOfList($arrayfields['evaluation.'.$key]['label'], 0, $_SERVER['PHP_SELF'], 'evaluation.'.$key, '', $param, ($cssforfield ? 'class="'.$cssforfield.'"' : ''), $evalsortfield, $sortorder, ($cssforfield ? $cssforfield.' ' : ''))."\n";
+			print getTitleFieldOfList($arrayfields['evaluation.'.$key]['label'], 0, $_SERVER['PHP_SELF'], 'evaluation.'.$key, '', $param, ($cssforfield ? 'class="'.$cssforfield.'"' : ''), $sortfield, $sortorder, ($cssforfield ? $cssforfield.' ' : ''))."\n";
 		}
 	}
 
