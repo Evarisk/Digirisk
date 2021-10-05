@@ -2053,6 +2053,10 @@
 .page-ut-gp-list .side-nav .digirisk-wrap {
   padding: 0 !important;
 }
+.page-ut-gp-list .side-nav .navigation-container {
+  max-height: 1000px;
+  overflow-y: auto;
+}
 .page-ut-gp-list .side-nav .add-container {
   position: absolute;
   right: 0;
@@ -2480,6 +2484,10 @@
   padding: 0.2em 0.4em;
   font-weight: 700;
   color: rgba(0, 0, 0, 0.6);
+}
+.riskassessment-task-container .riskassessment-task-single .riskassessment-task-content .riskassessment-task-data .riskassessment-task-progress.progress-0 {
+  background: #e05353;
+  color: #fff;
 }
 .riskassessment-task-container .riskassessment-task-single .riskassessment-task-content .riskassessment-task-data .riskassessment-task-progress.progress-1 {
   background: #e05353;
@@ -3360,6 +3368,16 @@ td > .risk-evaluation-container {
   -webkit-box-align: center;
   -ms-flex-align: center;
   align-items: center;
+}
+
+.risk-evaluation-add-modal .modal-container {
+  max-width: 1500px;
+  max-height: 750px;
+}
+
+.risk-evaluation-edit-modal .modal-container {
+  max-width: 1500px;
+  max-height: 750px;
 }
 
 .wpeo-modal .modal-container ul, .wpeo-modal .modal-container li {

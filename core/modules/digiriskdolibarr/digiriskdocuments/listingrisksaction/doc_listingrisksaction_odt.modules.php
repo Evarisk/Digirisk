@@ -311,10 +311,9 @@ class doc_listingrisksaction_odt extends ModeleODTListingRisksAction
 
 					if ( ! empty( $digiriskelement ) ) {
 						$risks = $risk->fetchRisksOrderedByCotation($digiriskelement->id, true);
-						if ($risks > 0 && !empty($risks)) {
-							for ($i = 1; $i <= 4; $i++ ) {
-								$listlines = $odfHandler->setSegment('risk' . $i);
-
+						for ($i = 1; $i <= 4; $i++ ) {
+							$listlines = $odfHandler->setSegment('risk' . $i);
+							if ($risks > 0 && !empty($risks)) {
 								foreach ($risks as $line) {
 
 									$tmparray['actionPreventionUncompleted'] = "";
@@ -322,7 +321,7 @@ class doc_listingrisksaction_odt extends ModeleODTListingRisksAction
 
 									$evaluation = new RiskAssessment($this->db);
 									$lastEvaluation = $evaluation->fetchFromParent($line->id, 1);
-									if ( !empty ($lastEvaluation) && $lastEvaluation > 0 ) {
+									if (!empty ($lastEvaluation) && $lastEvaluation > 0) {
 										$lastEvaluation = array_shift($lastEvaluation);
 										$scale = $lastEvaluation->get_evaluation_scale();
 
@@ -342,7 +341,7 @@ class doc_listingrisksaction_odt extends ModeleODTListingRisksAction
 													if ($related_task->progress == 100) {
 														$tmparray['actionPreventionCompleted'] .= dol_print_date($related_task->date_c, 'dayhoursec', 'tzuser') . ': ' . $related_task->label . "\n";
 													} else {
-														$tmparray['actionPreventionUncompleted'] .= dol_print_date($related_task->date_c, 'dayhoursec', 'tzuser') . ': ' . $related_task->label . ' ' . ($related_task->progress ?  $related_task->progress : 0) . '%' . "\n";
+														$tmparray['actionPreventionUncompleted'] .= dol_print_date($related_task->date_c, 'dayhoursec', 'tzuser') . ': ' . $related_task->label . ' ' . ($related_task->progress ? $related_task->progress : 0) . '%' . "\n";
 													}
 												}
 											} else {
@@ -364,7 +363,7 @@ class doc_listingrisksaction_odt extends ModeleODTListingRisksAction
 														if (empty($val)) {
 															$listlines->setVars($key, $langs->trans('NoData'), true, 'UTF-8');
 														} else {
-															$listlines->setVars($key, html_entity_decode($val,ENT_QUOTES | ENT_HTML5), true, 'UTF-8');
+															$listlines->setVars($key, html_entity_decode($val, ENT_QUOTES | ENT_HTML5), true, 'UTF-8');
 														}
 													}
 												} catch (OdfException $e) {
@@ -377,15 +376,35 @@ class doc_listingrisksaction_odt extends ModeleODTListingRisksAction
 										}
 									}
 								}
-								$odfHandler->mergeSegment($listlines);
+							} else {
+								$tmparray['nomDanger']                   = $langs->trans('NoData');
+								$tmparray['identifiantRisque']           = $langs->trans('NoData');
+								$tmparray['quotationRisque']             = $langs->trans('NoData');
+								$tmparray['commentaireRisque']           = $langs->trans('NoRiskThere');
+								$tmparray['actionPreventionUncompleted'] = $langs->trans('NoData');
+								$tmparray['actionPreventionCompleted']   = $langs->trans('NoData');
+								foreach ($tmparray as $key => $val) {
+									try {
+										if (empty($val)) {
+											$listlines->setVars($key, $langs->trans('NoData'), true, 'UTF-8');
+										} else {
+											$listlines->setVars($key, html_entity_decode($val, ENT_QUOTES | ENT_HTML5), true, 'UTF-8');
+										}
+									} catch (OdfException $e) {
+										dol_syslog($e->getMessage(), LOG_INFO);
+									} catch (SegmentException $e) {
+										dol_syslog($e->getMessage(), LOG_INFO);
+									}
+								}
+								$listlines->merge();
 							}
+							$odfHandler->mergeSegment($listlines);
 						}
 					} else {
 						$risks = $risk->fetchRisksOrderedByCotation(0, true);
-						if ($risks > 0 && !empty($risks)) {
-							for ($i = 1; $i <= 4; $i++ ) {
-								$listlines = $odfHandler->setSegment('risk' . $i);
-
+						for ($i = 1; $i <= 4; $i++ ) {
+							$listlines = $odfHandler->setSegment('risk' . $i);
+							if ($risks > 0 && !empty($risks)) {
 								foreach ($risks as $line) {
 
 									$tmparray['actionPreventionUncompleted'] = "";
@@ -393,7 +412,7 @@ class doc_listingrisksaction_odt extends ModeleODTListingRisksAction
 
 									$evaluation = new RiskAssessment($this->db);
 									$lastEvaluation = $evaluation->fetchFromParent($line->id, 1);
-									if ( !empty ($lastEvaluation) && $lastEvaluation > 0 ) {
+									if (!empty ($lastEvaluation) && $lastEvaluation > 0) {
 										$lastEvaluation = array_shift($lastEvaluation);
 										$scale = $lastEvaluation->get_evaluation_scale();
 
@@ -411,9 +430,9 @@ class doc_listingrisksaction_odt extends ModeleODTListingRisksAction
 											if (!empty($related_tasks)) {
 												foreach ($related_tasks as $related_task) {
 													if ($related_task->progress == 100) {
-														$tmparray['actionPreventionCompleted'] .= dol_print_date($related_task->date_c, 'dayhoursec', 'tzuser') . ': ' ."\n";
+														$tmparray['actionPreventionCompleted'] .= dol_print_date($related_task->date_c, 'dayhoursec', 'tzuser') . ': ' . "\n";
 													} else {
-														$tmparray['actionPreventionUncompleted'] .= dol_print_date($related_task->date_c, 'dayhoursec', 'tzuser') . ': ' . $related_task->label . ' ' . ($related_task->progress ?  $related_task->progress : 0) . '%'. "\n";
+														$tmparray['actionPreventionUncompleted'] .= dol_print_date($related_task->date_c, 'dayhoursec', 'tzuser') . ': ' . $related_task->label . ' ' . ($related_task->progress ? $related_task->progress : 0) . '%' . "\n";
 													}
 												}
 											} else {
@@ -436,7 +455,7 @@ class doc_listingrisksaction_odt extends ModeleODTListingRisksAction
 														if (empty($val)) {
 															$listlines->setVars($key, $langs->trans('NoData'), true, 'UTF-8');
 														} else {
-															$listlines->setVars($key, html_entity_decode($val,ENT_QUOTES | ENT_HTML5), true, 'UTF-8');
+															$listlines->setVars($key, html_entity_decode($val, ENT_QUOTES | ENT_HTML5), true, 'UTF-8');
 														}
 													}
 												} catch (OdfException $e) {
@@ -449,8 +468,29 @@ class doc_listingrisksaction_odt extends ModeleODTListingRisksAction
 										}
 									}
 								}
-								$odfHandler->mergeSegment($listlines);
+							} else {
+								$tmparray['nomDanger']                   = $langs->trans('NoData');
+								$tmparray['identifiantRisque']           = $langs->trans('NoData');
+								$tmparray['quotationRisque']             = $langs->trans('NoData');
+								$tmparray['commentaireRisque']           = $langs->trans('NoRiskThere');
+								$tmparray['actionPreventionUncompleted'] = $langs->trans('NoData');
+								$tmparray['actionPreventionCompleted']   = $langs->trans('NoData');
+								foreach ($tmparray as $key => $val) {
+									try {
+										if (empty($val)) {
+											$listlines->setVars($key, $langs->trans('NoData'), true, 'UTF-8');
+										} else {
+											$listlines->setVars($key, html_entity_decode($val, ENT_QUOTES | ENT_HTML5), true, 'UTF-8');
+										}
+									} catch (OdfException $e) {
+										dol_syslog($e->getMessage(), LOG_INFO);
+									} catch (SegmentException $e) {
+										dol_syslog($e->getMessage(), LOG_INFO);
+									}
+								}
+								$listlines->merge();
 							}
+							$odfHandler->mergeSegment($listlines);
 						}
 					}
 				}

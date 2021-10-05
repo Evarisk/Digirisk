@@ -26,7 +26,6 @@ if (!empty ($lastEvaluation) && $lastEvaluation > 0) {
 						<span class="risk-evaluation-date">
 							<i class="fas fa-calendar-alt"></i> <?php echo date('d/m/Y', $lastEvaluation->date_creation); ?>
 						</span>
-						<span class="risk-evaluation-count"><i class="fas fa-comments"></i><?php echo count($cotationList) ?></span>
 					</div>
 					<div class="risk-evaluation-comment">
 						<span class="risk-evaluation-author">
@@ -51,7 +50,7 @@ if (!empty ($lastEvaluation) && $lastEvaluation > 0) {
 				<?php endif; ?>
 				<?php if ($permissiontoread) : ?>
 					<div class="risk-evaluation-list risk-evaluation-button wpeo-button button-square-50 button-primary wpeo-tooltip-event modal-open" aria-label="<?php echo $langs->trans('RiskAssessmentList') ?>" value="<?php echo $risk->id ?>">
-						<i class="fas fa-list button-icon"></i>
+						<i class="fas fa-list button-icon"> <?php echo count($cotationList) ?></i>
 					</div>
 				<?php else : ?>
 					<div class="wpeo-button button-grey wpeo-tooltip-event" aria-label="<?php echo $langs->trans('PermissionDenied') ?>">
@@ -289,7 +288,6 @@ if (!empty ($lastEvaluation) && $lastEvaluation > 0) {
 														<span class="risk-evaluation-date">
 															<i class="fas fa-calendar-alt"></i> <?php echo date('d/m/Y', $cotation->date_creation); ?>
 														</span>
-														<span class="risk-evaluation-count"><i class="fas fa-comments"></i><?php echo count($cotationList) ?></span>
 													</div>
 													<div class="risk-evaluation-comment">
 														<span class="risk-evaluation-author">
@@ -391,7 +389,7 @@ if (!empty ($lastEvaluation) && $lastEvaluation > 0) {
 							<?php endif; ?>
 							<i class="fas fa-info-circle wpeo-tooltip-event" aria-label="<?php echo $langs->trans("HowToSetMultipleRiskAssessmentMethod") ?>"></i>
 						<?php endif; ?>
-						<input class="risk-evaluation-method" type="hidden" value="standard">
+						<input class="risk-evaluation-method" type="hidden" value="<?php echo ($cotation->method == "standard") ? "standard" : "advanced" ?>">
 						<input class="risk-evaluation-multiple-method" type="hidden" value="<?php echo $conf->global->DIGIRISKDOLIBARR_MULTIPLE_RISKASSESSMENT_METHOD ?>">
 					</div>
 					<div class="risk-evaluation-content-wrapper">
@@ -493,9 +491,8 @@ if (!empty ($lastEvaluation) && $lastEvaluation > 0) {
 										<!-- BUTTON MODAL RISK EVALUATION LIST  -->
 										<span class="risk-evaluation-reference risk-evaluation-list" value="<?php echo $risk->id ?>"><?php echo $lastEvaluation->ref; ?></span>
 										<span class="risk-evaluation-date">
-															<i class="fas fa-calendar-alt"></i> <?php echo date('d/m/Y', $lastEvaluation->date_creation); ?>
-														</span>
-										<span class="risk-evaluation-count"><i class="fas fa-comments"></i><?php echo count($cotationList) ?></span>
+											<i class="fas fa-calendar-alt"></i> <?php echo date('d/m/Y', $lastEvaluation->date_creation); ?>
+										</span>
 									</div>
 									<div class="risk-evaluation-comment">
 														<span class="risk-evaluation-author">

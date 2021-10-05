@@ -264,6 +264,7 @@ class doc_groupmentdocument_odt extends ModeleODTGroupmentDocument
 			$array_object_from_properties = $this->get_substitutionarray_each_var_object($object, $outputlangs);
 			//$array_object = $this->get_substitutionarray_object($object, $outputlangs);
 			$array_soc = $this->get_substitutionarray_mysoc($mysoc, $outputlangs);
+			$array_soc['mycompany_logo'] = preg_replace('/_small/', '_mini', $array_soc['mycompany_logo']);
 
 			$tmparray = array_merge($substitutionarray, $array_object_from_properties, $array_soc);
 			complete_substitutions_array($tmparray, $outputlangs, $object);
@@ -312,14 +313,14 @@ class doc_groupmentdocument_odt extends ModeleODTGroupmentDocument
 					$risk = new Risk($this->db);
 					if ( ! empty( $digiriskelement ) ) {
 						$risks = $risk->fetchRisksOrderedByCotation($digiriskelement->id);
-						if ($risks > 0 && !empty($risks)) {
-							for ($i = 1; $i <= 4; $i++ ) {
-								$listlines = $odfHandler->setSegment('risq' . $i);
+						for ($i = 1; $i <= 4; $i++ ) {
+							$listlines = $odfHandler->setSegment('risq' . $i);
+							if ($risks > 0 && !empty($risks)) {
 								foreach ($risks as $line) {
 									$evaluation = new RiskAssessment($this->db);
 									$lastEvaluation = $evaluation->fetchFromParent($line->id, 1);
 
-									if ( $lastEvaluation > 0 && !empty($lastEvaluation)) {
+									if ($lastEvaluation > 0 && !empty($lastEvaluation)) {
 										$lastEvaluation = array_shift($lastEvaluation);
 										$scale = $lastEvaluation->get_evaluation_scale();
 
@@ -344,7 +345,7 @@ class doc_groupmentdocument_odt extends ModeleODTGroupmentDocument
 														if (empty($val)) {
 															$listlines->setVars($key, $langs->trans('NoData'), true, 'UTF-8');
 														} else {
-															$listlines->setVars($key, html_entity_decode($val,ENT_QUOTES | ENT_HTML5), true, 'UTF-8');
+															$listlines->setVars($key, html_entity_decode($val, ENT_QUOTES | ENT_HTML5), true, 'UTF-8');
 														}
 													}
 												} catch (OdfException $e) {
@@ -357,8 +358,27 @@ class doc_groupmentdocument_odt extends ModeleODTGroupmentDocument
 										}
 									}
 								}
-								$odfHandler->mergeSegment($listlines);
+							} else {
+								$tmparray['nomDanger']         = $langs->trans('NoData');
+								$tmparray['identifiantRisque'] = $langs->trans('NoData');
+								$tmparray['quotationRisque']   = $langs->trans('NoData');
+								$tmparray['commentaireRisque'] = $langs->trans('NoRiskThere');
+								foreach ($tmparray as $key => $val) {
+									try {
+										if (empty($val)) {
+											$listlines->setVars($key, $langs->trans('NoData'), true, 'UTF-8');
+										} else {
+											$listlines->setVars($key, html_entity_decode($val, ENT_QUOTES | ENT_HTML5), true, 'UTF-8');
+										}
+									} catch (OdfException $e) {
+										dol_syslog($e->getMessage(), LOG_INFO);
+									} catch (SegmentException $e) {
+										dol_syslog($e->getMessage(), LOG_INFO);
+									}
+								}
+								$listlines->merge();
 							}
+							$odfHandler->mergeSegment($listlines);
 						}
 					}
 
@@ -406,8 +426,8 @@ class doc_groupmentdocument_odt extends ModeleODTGroupmentDocument
 								}
 								$listlines->merge();
 							}
+							$odfHandler->mergeSegment($listlines);
 						}
-						$odfHandler->mergeSegment($listlines);
 					}
 
 					$risksign = new RiskSign($this->db);
