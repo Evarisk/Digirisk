@@ -36,8 +36,9 @@ if (!$res && file_exists("../../../main.inc.php")) $res = @include "../../../mai
 if (!$res) die("Include of main fails");
 
 require_once './class/digiriskstandard.class.php';
+require_once './class/digiriskelement.class.php';
 require_once './class/digiriskelement/groupment.class.php';
-require_once './class//digiriskelement/workunit.class.php';
+require_once './class/digiriskelement/workunit.class.php';
 require_once './class/riskanalysis/risk.class.php';
 require_once './class/riskanalysis/riskassessment.class.php';
 require_once './core/modules/digiriskdolibarr/digiriskelement/groupment/mod_groupment_standard.php';
@@ -52,10 +53,12 @@ $langs->loadLangs(array("digiriskdolibarr@digiriskdolibarr"));
 
 // Initialize technical objects
 $digiriskStandard     = new DigiriskStandard($db);
+$digiriskElement      = new DigiriskElement($db);
 $groupment            = new Groupment($db);
 $workUnit             = new WorkUnit($db);
 $risk                 = new Risk($db);
 $riskAssessment       = new RiskAssessment($db);
+$extrafields          = new ExtraFields($db);
 $refGroupmentMod      = new $conf->global->DIGIRISKDOLIBARR_GROUPMENT_ADDON();
 $refWorkUnitMod       = new $conf->global->DIGIRISKDOLIBARR_WORKUNIT_ADDON();
 $refRiskMod           = new $conf->global->DIGIRISKDOLIBARR_RISK_ADDON();
@@ -80,232 +83,38 @@ $error = 0;
 
 if ($action == "dataMigrationImport" && !empty($conf->global->MAIN_UPLOAD_DOC)) {
 
-	$json = file_get_contents("C:/wamp64/www/dolibarr-13.0.4/documents/ecm/digiriskdolibarr/20211004152016_global_export.json");
+	$json = file_get_contents("C:/wamp64/www/dolibarr-13.0.2/documents/ecm/digiriskdolibarr/20211005123613_global_export.json");
 	$digiriskExportArray = json_decode($json, true);
 	$digiriskExportArray = array_shift($digiriskExportArray);
 
-	//DigiriskStandard
-	$digiriskExportArray['title'] = $digiriskStandard->label;
-
-	echo '<pre>';
-	print_r($digiriskExportArray);
-	echo '</pre>';
-	exit;
-
-	$recursive = true;
-
-	if ( $recursive ) {
-		$elements = recurse_tree_import(0,0,$digiriskExportArray);
-		echo '<pre>';
-		print_r($elements);
-		echo '</pre>';
-		exit;
-		if ( $elements > 0  && !empty($elements) ) {
-			// Super fonction itérations flat.
-			$it = new RecursiveIteratorIterator(new RecursiveArrayIterator($elements));
-			echo '<pre>';
-			print_r($it);
-			echo '</pre>';
-			exit;
-			foreach($it as $key => $v) {
-				$element[$key][$v] = $v;
-			}
-
-			if (is_array($element)) {
-				$children_id = array_shift ($element);
-			}
-
-			echo '<pre>';
-			print_r($elements);
-			echo '</pre>';
-			exit;
-
-			// RISQUES des enfants du parent.
-			if (!empty ($children_id)) {
-				foreach ($children_id as $element) {
-
-					$risk = new Risk($this->db);
-
-					$result = $risk->fetchFromParent($element);
-					if (!empty ($result)) {
-						foreach ($result as $risk) {
-							$evaluation = new RiskAssessment($this->db);
-							$lastEvaluation = $evaluation->fetchFromParent($risk->id,1);
-							if ( $lastEvaluation > 0  && !empty($lastEvaluation) ) {
-								$lastEvaluation = array_shift($lastEvaluation);
-								$risk->lastEvaluation = $lastEvaluation->cotation;
-							}
-
-							$risks[$risk->id] = $risk;
-						}
-					}
-				}
-			}
-		}
+	$it = new RecursiveIteratorIterator(new RecursiveArrayIterator($digiriskExportArray));
+	foreach($it as $key => $v) {
+		$element[$key][] = $v;
 	}
 
-	//START NIVEAU 1
-	//Groupment
-	foreach ($digiriskExportArray['list_group'] as $digiriskExportGroupment) {
-		$groupment->ref          = $refGroupmentMod->getNextValue($groupment);
-		$groupment->element_type = 'groupment';
-		$groupment->label        = $digiriskExportGroupment['title'];
-		$groupment->description  = $digiriskExportGroupment['content'];
-
-		$groupmentID = $groupment->create($user);
-
-		//WorkUnit
-		foreach ($digiriskExportGroupment['list_workunit'] as $digiriskExportWorkUnit) {
-			$workUnit->ref          = $refWorkUnitMod->getNextValue($workUnit);
-			$workUnit->element_type = 'workunit';
-			$workUnit->label        = $digiriskExportWorkUnit['title'];
-			$workUnit->description  = $digiriskExportWorkUnit['content'];
-			$workUnit->fk_parent    = $groupmentID;
-
-			$workUnit->create($user);
-		}
-
-		//Risk
-		foreach ($digiriskExportGroupment['list_risk'] as $digiriskExportRisk) {
-			$risk->ref        = $refRiskMod->getNextValue($risk);
-			$risk->category   = $risk->get_danger_category_position_by_name($digiriskExportRisk['danger_category']['name']);
-			$risk->fk_element = $groupmentID;
-			$risk->fk_projet  = $conf->global->DIGIRISKDOLIBARR_DU_PROJECT;
-
-			if (!$error) {
-				$result = $risk->create($user, true);
-				if ($result > 0) {
-					$riskAssessment->ref           = $refRiskAssessmentMod->getNextValue($riskAssessment);
-					$riskAssessment->date_creation = $digiriskExportRisk['evaluation']['date']['raw'];
-					$riskAssessment->tms           = $digiriskExportRisk['evaluation']['date']['raw'];
-					$riskAssessment->cotation      = $digiriskExportRisk['current_equivalence'];
-					$riskAssessment->status        = 1;
-					$riskAssessment->fk_risk       = $risk->id;
-
-					if ($digiriskExportRisk['evaluation_method']['name'] == 'Evarisk') {
-						$riskAssessment->gravite    = $digiriskExportRisk['evaluation']['variables']['105'];
-						$riskAssessment->exposition = $digiriskExportRisk['evaluation']['variables']['106'];
-						$riskAssessment->occurrence = $digiriskExportRisk['evaluation']['variables']['107'];
-						$riskAssessment->formation  = $digiriskExportRisk['evaluation']['variables']['108'];
-						$riskAssessment->protection = $digiriskExportRisk['evaluation']['variables']['109'];
-
-						$riskAssessment->method = 'advanced';
-					}
-
-					foreach ($digiriskExportRisk['comment'] as $digiriskExportComment) {
-						$riskAssessment->comment = $digiriskExportComment['content'];
-					}
-
-					$result2 = $riskAssessment->create($user, true);
-
-					if ($result2 < 0) {
-						// Creation evaluation KO
-						if (!empty($riskAssessment->errors)) setEventMessages(null, $riskAssessment->errors, 'errors');
-						else  setEventMessages($riskAssessment->error, null, 'errors');
-					}
-				} else {
-					// Creation risk KO
-					if (!empty($risk->errors)) setEventMessages(null, $risk->errors, 'errors');
-					else  setEventMessages($risk->error, null, 'errors');
-				}
+	for ($i = 0; $i <= count($element['id']) -1; $i++) {
+		if ($element['type'][$i] != 'digi-society') {
+			if ($element['type'][$i] == 'digi-group') {
+				$digiriskElement->ref = $refGroupmentMod->getNextValue($digiriskElement);
+				$type = 'groupment';
+			} elseif ($element['type'][$i] == 'digi-workunit') {
+				$digiriskElement->ref = $refWorkUnitMod->getNextValue($digiriskElement);
+				$type = 'workunit';
 			}
-		}
-		echo '<pre>';
-		print_r($digiriskExportGroupment);
-		echo '</pre>';
-		exit;
-	}
-	//WorkUnit
-	foreach ($digiriskExportArray['list_workunit'] as $digiriskExportWorkUnit) {
-		$workUnit->ref          = $refWorkUnitMod->getNextValue($workUnit);
-		$workUnit->element_type = 'workunit';
-		$workUnit->label        = $digiriskExportWorkUnit['title'];
-		$workUnit->description  = $digiriskExportWorkUnit['content'];
 
-		$workUnitID = $workUnit->create($user);
+			$digiriskElement->element      = $type;
+			$digiriskElement->element_type = $type;
+			$digiriskElement->label        = $element['title'][$i];
+			$digiriskElement->description  = $element['content'][$i];
 
-		//Risk
-		foreach ($digiriskExportWorkUnit['list_risk'] as $digiriskExportRisk) {
-			$risk->ref        = $refRiskMod->getNextValue($risk);
-			$risk->category   = $risk->get_danger_category_position_by_name($digiriskExportRisk['danger_category']['name']);
-			$risk->fk_element = $workUnitID;
-			$risk->fk_projet  = $conf->global->DIGIRISKDOLIBARR_DU_PROJECT;
+			$digiriskElement->array_options['wp_digi_id'] = $element['id'][$i];
 
-			if (!$error) {
-				$result = $risk->create($user, true);
-				if ($result > 0) {
-					$riskAssessment->ref           = $refRiskAssessmentMod->getNextValue($riskAssessment);
-					$riskAssessment->date_creation = $digiriskExportRisk['evaluation']['date']['raw'];
-					$riskAssessment->tms           = $digiriskExportRisk['evaluation']['date']['raw'];
-					$riskAssessment->cotation      = $digiriskExportRisk['current_equivalence'];
-					$riskAssessment->status        = 1;
-					$riskAssessment->fk_risk       = $risk->id;
+			$digiriskElement->fk_parent = $digiriskElement->fetch_id_from_wp_digi_id($element['parent_id'][$i]) ?: 0;
 
-					if ($digiriskExportRisk['evaluation_method']['name'] == 'Evarisk') {
-						$riskAssessment->gravite    = $digiriskExportRisk['evaluation']['variables']['105'];
-						$riskAssessment->exposition = $digiriskExportRisk['evaluation']['variables']['106'];
-						$riskAssessment->occurrence = $digiriskExportRisk['evaluation']['variables']['107'];
-						$riskAssessment->formation  = $digiriskExportRisk['evaluation']['variables']['108'];
-						$riskAssessment->protection = $digiriskExportRisk['evaluation']['variables']['109'];
-
-						$riskAssessment->method = 'advanced';
-					}
-
-					foreach ($digiriskExportRisk['comment'] as $digiriskExportComment) {
-						$riskAssessment->comment = $digiriskExportComment['content'];
-					}
-
-					$result2 = $riskAssessment->create($user, true);
-
-					if ($result2 < 0) {
-						// Creation evaluation KO
-						if (!empty($riskAssessment->errors)) setEventMessages(null, $riskAssessment->errors, 'errors');
-						else  setEventMessages($riskAssessment->error, null, 'errors');
-					}
-				} else {
-					// Creation risk KO
-					if (!empty($risk->errors)) setEventMessages(null, $risk->errors, 'errors');
-					else  setEventMessages($risk->error, null, 'errors');
-				}
-			}
+			$digiriskElement->create($user);
 		}
 	}
-	//END NIVEAU 1
 }
-
-
-
-
-
-
-
-
-//	// Define relativepath and upload_dir
-//	$relativepath = 'digiriskdolibarr/medias';
-//	$upload_dir = $conf->ecm->dir_output.'/'.$relativepath;
-//
-//	if (is_array($_FILES['userfile']['tmp_name'])) $userfiles = $_FILES['userfile']['tmp_name'];
-//	else $userfiles = array($_FILES['userfile']['tmp_name']);
-//
-//	foreach ($userfiles as $key => $userfile) {
-//		if (empty($_FILES['userfile']['tmp_name'][$key])) {
-//			$error++;
-//			if ($_FILES['userfile']['error'][$key] == 1 || $_FILES['userfile']['error'][$key] == 2) {
-//				setEventMessages($langs->trans('ErrorFileSizeTooLarge'), null, 'errors');
-//			} else {
-//				setEventMessages($langs->trans("ErrorFieldRequired", $langs->transnoentitiesnoconv("File")), null, 'errors');
-//			}
-//		}
-//	}
-//
-//	if (!$error) {
-//		$generatethumbs = 1;
-//		$res = dol_add_file_process($upload_dir, 0, 1, 'userfile', '', null, '', $generatethumbs);
-//		if ($res > 0) {
-//			$result = $ecmdir->changeNbOfFiles('+');
-//		}
-//	}
-
 
 /*
  * View

@@ -722,29 +722,6 @@ function recurse_tree($parent, $niveau, $array) {
 }
 
 /**
- *	Recursive tree process
- *
- * @param	DigiriskElement $parent Element Parent of Digirisk Element object
- * @param 	int             $niveau Depth of tree
- * @param 	array           $array  Global Digirisk Element list
- * @return	array           $result Global Digirisk Element list after recursive process
- */
-function recurse_tree_import($parent, $niveau, $array) {
-	$result = array();
-	foreach ($array as $noeud) {
-		if ($parent == $noeud['parent_id']) {
-			$result[$noeud['id']] = array(
-				'id'       => $noeud['id'],
-				'depth'    => array('depth'.$noeud['id'] => $niveau),
-				'object'   => $noeud,
-				'children' => recurse_tree_import($noeud['id'], ($niveau + 1), $array),
-			);
-		}
-	}
-	return $result;
-}
-
-/**
  *	Display Recursive tree process
  *
  * @param	array $result Global Digirisk Element list after recursive process

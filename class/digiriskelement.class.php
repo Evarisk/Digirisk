@@ -503,4 +503,39 @@ class DigiriskElement extends CommonObject
 		if ($outputmode) return $outarray;
 		return $out;
 	}
+
+	/**
+	 * Return fk_object from wp_digi_id extrafields
+	 *
+	 * @param $wp_digi_id
+	 * @return array|int                 int <0 if KO, array of pages if OK
+	 * @throws Exception
+	 */
+	public function fetch_id_from_wp_digi_id($wp_digi_id)
+	{
+		dol_syslog(__METHOD__, LOG_DEBUG);
+
+		$sql = 'SELECT ';
+		$sql .= ' *';
+		$sql .= ' FROM '.MAIN_DB_PREFIX.$this->table_element.'_extrafields as t';
+		$sql .= ' WHERE wp_digi_id ='.$wp_digi_id;
+
+		$resql = $this->db->query($sql);
+		if ($resql) {
+			$num = $this->db->num_rows($resql);
+			$i = 0;
+			while ($i < 1)
+			{
+				$obj = $this->db->fetch_object($resql);
+				$i++;
+			}
+			$this->db->free($resql);
+
+			return $obj->fk_object;
+		} else {
+			$this->errors[] = 'Error '.$this->db->lasterror();
+			dol_syslog(__METHOD__.' '.join(',', $this->errors), LOG_ERR);
+			return -1;
+		}
+	}
 }
