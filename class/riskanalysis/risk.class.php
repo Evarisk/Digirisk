@@ -391,6 +391,23 @@ class Risk extends CommonObject
 	}
 
 	/**
+	 * Get danger category picto name
+	 *
+	 * @return	string $category['name']     name to danger category picto, -1 if don't exist
+	 */
+	public function get_danger_category_position_by_name($name)
+	{
+		$risk_categories = $this->get_danger_categories();
+		foreach ($risk_categories as $category) {
+			if ($category['name'] == $name) {
+				return $category['position'];
+			}
+		}
+
+		return -1;
+	}
+
+	/**
 	 * Get children tasks
 	 *
 	 * @return	array	$records or -1 if error

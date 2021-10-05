@@ -2737,6 +2737,69 @@ window.eoxiaJS.document.displayLoader = function(  ) {
 };
 
 /**
+ * Initialise l'objet "migration" ainsi que la méthode "init" obligatoire pour la bibliothèque EoxiaJS.
+ *
+ * @since   1.0.0
+ * @version 1.0.0
+ */
+window.eoxiaJS.migration = {};
+
+/**
+ * La méthode appelée automatiquement par la bibliothèque EoxiaJS.
+ *
+ * @since   1.0.0
+ * @version 1.0.0
+ *
+ * @return {void}
+ */
+window.eoxiaJS.migration.init = function() {
+	window.eoxiaJS.migration.event();
+};
+
+/**
+ * La méthode contenant tous les évènements pour le migration.
+ *
+ * @since   1.0.0
+ * @version 1.0.0
+ *
+ * @return {void}
+ */
+window.eoxiaJS.migration.event = function() {
+	jQuery( document ).on( 'click', '.data-migration-import .formattachnewfile .button', window.eoxiaJS.migration.DataMigrationImport );
+}
+
+/**
+ * Action send photo.
+ *
+ * @since   1.0.0
+ * @version 1.0.0
+ *
+ * @return {void}
+ */
+window.eoxiaJS.migration.DataMigrationImport = function( event ) {
+	//event.preventDefault()
+	//var formdata = JSON.stringify($("#DataMigrationImport").serializeArray());
+
+	event.preventDefault()
+	let element = $(this).closest('.nowrap');
+	let files   = element.find("input[name='userfile[]']").prop("files");
+	let formdata = new FormData();
+
+	formdata.append("userfile[]", files);
+
+	$.ajax({
+		url: document.URL + "&action=dataMigrationImport",
+		type: "POST",
+		data: formdata,
+		//dataType: "json",
+		//contentType: "application/json",
+		processData: false,
+		success: function ( ) {
+		}
+	});
+};
+
+/**
  * Initialise l'objet "slider" ainsi que la méthode "init" obligatoire pour la bibliothèque EoxiaJS.
  *
  * @since   1.0.0
