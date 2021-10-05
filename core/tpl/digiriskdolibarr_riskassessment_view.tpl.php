@@ -337,7 +337,7 @@ if (!empty ($lastEvaluation) && $lastEvaluation > 0) {
 	<?php $cotation = new RiskAssessment($db);
 	$cotation->method = $lastEvaluation->method ? $lastEvaluation->method : "standard" ; ?>
 <?php } else { ?>
-<div class="risk-evaluation-container">
+<div class="risk-evaluation-container risk-evaluation-container-<?php echo $risk->id ?>">
 	<div class="risk-evaluation-single-content risk-evaluation-single-content-<?php echo $risk->id ?>">
 		<div class="risk-evaluation-single risk-evaluation-single-<?php echo $risk->id ?>">
 			<div class="risk-evaluation-content">
