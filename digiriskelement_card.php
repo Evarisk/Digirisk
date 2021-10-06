@@ -424,7 +424,7 @@ if ((empty($action) || ($action != 'edit' && $action != 'create'))) {
 		$parent_element = new DigiriskElement($db);
 		$result = $parent_element->fetch($object->fk_parent);
 		if ($result > 0) {
-			print $parent_element->ref . ( !empty($parent_element->description) ?  ' - ' . $parent_element->description : '');
+			print $parent_element->ref . ( !empty($parent_element->label) ?  ' - ' . $parent_element->label : '');
 		}
 		else {
 			print $conf->global->MAIN_INFO_SOCIETE_NOM;
