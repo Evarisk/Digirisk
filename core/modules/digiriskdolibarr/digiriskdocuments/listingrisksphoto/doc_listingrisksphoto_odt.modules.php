@@ -226,6 +226,7 @@ class doc_listingrisksphoto_odt extends ModeleODTListingRisksPhoto
 				$filename = $objectref.'_'.$conf->global->MAIN_INFO_SOCIETE_NOM.'_'.$date.'.odt';
 			}
 			$filename = str_replace(' ', '_', $filename);
+			$filename = str_replace('/', '_', $filename);
 
 			$object->last_main_doc = $filename;
 
