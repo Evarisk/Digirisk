@@ -209,24 +209,17 @@
 				$offset = 0;
 			}
 		}
-		// if total of record found is smaller than limit, no need to do paging and to restart another select with limits set.
-		if (is_numeric($nbtotalofrecords) && ($limit > $nbtotalofrecords || empty($limit)))
-		{
-			$num = $nbtotalofrecords;
-		}
-		else
-		{
-			if ($limit) $sql .= $db->plimit($limit + 1, $offset);
 
-			$resql = $db->query($sql);
-			if (!$resql)
-			{
-				dol_print_error($db);
-				exit;
-			}
+		if ($limit) $sql .= $db->plimit($limit + 1, $offset);
 
-			$num = $db->num_rows($resql);
+		$resql = $db->query($sql);
+		if (!$resql)
+		{
+			dol_print_error($db);
+			exit;
 		}
+
+		$num = $db->num_rows($resql);
 
 		// Direct jump if only one record found
 		if ($num == 1 && !empty($conf->global->MAIN_SEARCH_DIRECT_OPEN_IF_ONLY_ONE) && $search_all && !$page)
@@ -623,7 +616,7 @@
 	<?php endif; ?>
 	<?php endif; ?>
 	<?php $title = $langs->trans('DigiriskElementRisksList');
-	print_barre_liste($title, $page, $_SERVER["PHP_SELF"], $param, $sortfield, $sortorder, $massactionbutton, $num, $num, 'digiriskdolibarr32px.png@digiriskdolibarr', 0, $newcardbutton, '', $limit, 0, 0, 1);
+	print_barre_liste($title, $page, $_SERVER["PHP_SELF"], $param, $sortfield, $sortorder, $massactionbutton, $num, $nbtotalofrecords, 'digiriskdolibarr32px.png@digiriskdolibarr', 0, $newcardbutton, '', $limit, 0, 0, 1);
 
 	include DOL_DOCUMENT_ROOT.'/core/tpl/massactions_pre.tpl.php';
 
