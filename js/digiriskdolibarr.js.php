@@ -2972,6 +2972,52 @@ window.eoxiaJS.mediaGallery.addToFavorite = function( event ) {
 };
 
 /**
+ * Initialise l'objet "keyEvent" ainsi que la méthode "init" obligatoire pour la bibliothèque EoxiaJS.
+ *
+ * @since   1.0.0
+ * @version 1.0.0
+ */
+window.eoxiaJS.keyEvent = {};
+
+/**
+ * La méthode appelée automatiquement par la bibliothèque EoxiaJS.
+ *
+ * @since   1.0.0
+ * @version 1.0.0
+ *
+ * @return {void}
+ */
+window.eoxiaJS.keyEvent.init = function() {
+	window.eoxiaJS.keyEvent.event();
+};
+
+/**
+ * La méthode contenant tous les évènements pour le migration.
+ *
+ * @since   1.0.0
+ * @version 1.0.0
+ *
+ * @return {void}
+ */
+window.eoxiaJS.keyEvent.event = function() {
+	jQuery( document ).on( 'keyup', window.eoxiaJS.keyEvent.keyup );
+}
+
+/**
+ * Action import migration data.
+ *
+ * @since   1.0.0
+ * @version 1.0.0
+ *
+ * @return {void}
+ */
+window.eoxiaJS.keyEvent.keyup = function( event ) {
+	if ( 27 === event.keyCode ) {
+		$(this).find('.modal-active').removeClass('modal-active');
+	}
+};
+
+/**
  * Initialise l'objet "slider" ainsi que la méthode "init" obligatoire pour la bibliothèque EoxiaJS.
  *
  * @since   1.0.0
