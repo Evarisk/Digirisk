@@ -333,16 +333,38 @@ class doc_workunitdocument_odt extends ModeleODTWorkUnitDocument
 											$tmparray['nomDanger'] = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $line->get_danger_category($line) . '.png';
 											$tmparray['identifiantRisque'] = $line->ref . ' - ' . $lastEvaluation->ref;
 											$tmparray['quotationRisque'] = $lastEvaluation->cotation ? $lastEvaluation->cotation : '0';
-											$tmparray['commentaireRisque'] = dol_print_date($lastEvaluation->date_creation, 'dayhoursec', 'tzuser') . ': ' . $lastEvaluation->comment;
+											$tmparray['descriptionRisque'] = $line->description;
+											$tmparray['commentaireEvaluation'] = dol_print_date($lastEvaluation->date_creation, 'dayhoursec', 'tzuser') . ': ' . $lastEvaluation->comment;
 
 											$related_tasks = $line->get_related_tasks($line);
+											$user = new User($this->db);
 
-											if (!empty($related_tasks)) {
+											if (!empty($related_tasks) && is_array($related_tasks)) {
 												foreach ($related_tasks as $related_task) {
+													$related_task_contact_ids = $related_task->getListContactId();
+													if (!empty($related_task_contact_ids) && is_array($related_task_contact_ids)) {
+														foreach ($related_task_contact_ids as $related_task_contact_id) {
+															$user->fetch($related_task_contact_id);
+															$contact_array[$related_task_contact_id] = $user;
+														}
+													}
+													$AllInitiales = '';
+													if (!empty($contact_array) && is_array($contact_array)) {
+														foreach ($contact_array as $contact_array_single) {
+															$initiales = '';
+															if (dol_strlen($contact_array_single->firstname)) {
+																$initiales .= str_split($contact_array_single->firstname, 1)[0];
+															}
+															if (dol_strlen($contact_array_single->lastname)) {
+																$initiales .= str_split($contact_array_single->lastname, 1)[0];
+															}
+															$AllInitiales .= strtoupper($initiales) . ',';
+														}
+													}
 													if ($related_task->progress == 100) {
-														$tmparray['actionPreventionCompleted'] .= dol_print_date($related_task->date_c, 'dayhoursec', 'tzuser') . ': ' . $related_task->label . "\n";
+														$tmparray['actionPreventionCompleted'] .= dol_print_date($related_task->date_c, 'dayhourreduceformat', 'tzuser') . "\n" . ' ' . $langs->trans('Contacts') . ' : ' . ($AllInitiales ?: $langs->trans('NoData')) . "\n" . $related_task->label . "\n\n";
 													} else {
-														$tmparray['actionPreventionUncompleted'] .= dol_print_date($related_task->date_c, 'dayhoursec', 'tzuser') . ': ' . $related_task->label . ' ' . ($related_task->progress ?: 0) . '%' . "\n";
+														$tmparray['actionPreventionUncompleted'] .= dol_print_date($related_task->date_c, 'dayhourreduceformat', 'tzuser') . ' - ' . $langs->trans('DigiriskProgress') . ' : ' . ($related_task->progress ?: 0) . '%' . ' ' . $langs->trans('Contacts') . ' : ' . ($AllInitiales ?: $langs->trans('NoData')) . "\n" . $related_task->label . "\n\n";
 													}
 												}
 											} else {
@@ -361,7 +383,7 @@ class doc_workunitdocument_odt extends ModeleODTWorkUnitDocument
 													if ($val == $tmparray['nomDanger']) {
 														$listlines->setImage($key, $val);
 													} else {
-														if (empty($val)) {
+														if (empty($val) && $val != '0') {
 															$listlines->setVars($key, $langs->trans('NoData'), true, 'UTF-8');
 														} else {
 															$listlines->setVars($key, html_entity_decode($val, ENT_QUOTES | ENT_HTML5), true, 'UTF-8');
@@ -381,7 +403,8 @@ class doc_workunitdocument_odt extends ModeleODTWorkUnitDocument
 								$tmparray['nomDanger']                   = $langs->trans('NoData');
 								$tmparray['identifiantRisque']           = $langs->trans('NoData');
 								$tmparray['quotationRisque']             = $langs->trans('NoData');
-								$tmparray['commentaireRisque']           = $langs->trans('NoRiskThere');
+								$tmparray['descriptionRisque']           = $langs->trans('NoData');
+								$tmparray['commentaireEvaluation']       = $langs->trans('NoRiskThere');
 								$tmparray['actionPreventionUncompleted'] = $langs->trans('NoData');
 								$tmparray['actionPreventionCompleted']   = $langs->trans('NoData');
 								foreach ($tmparray as $key => $val) {

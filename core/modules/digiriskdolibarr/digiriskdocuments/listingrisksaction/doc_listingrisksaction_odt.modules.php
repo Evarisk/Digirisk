@@ -333,7 +333,7 @@ class doc_listingrisksaction_odt extends ModeleODTListingRisksAction
 											$tmparray['identifiantRisque'] = $line->ref . ' - ' . $lastEvaluation->ref;
 											$tmparray['quotationRisque'] = $lastEvaluation->cotation ? $lastEvaluation->cotation : '0';
 											$tmparray['descriptionRisque'] = $line->description;
-											$tmparray['commentaireRisque'] = dol_print_date($lastEvaluation->date_creation, 'dayhoursec', 'tzuser') . ': ' . $lastEvaluation->comment;
+											$tmparray['commentaireEvaluation'] = dol_print_date($lastEvaluation->date_creation, 'dayhoursec', 'tzuser') . ': ' . $lastEvaluation->comment;
 
 											$related_tasks = $line->get_related_tasks($line);
 											$user = new User($this->db);
@@ -399,11 +399,12 @@ class doc_listingrisksaction_odt extends ModeleODTListingRisksAction
 									}
 								}
 							} else {
+								$tmparray['nomElement']                  = $langs->trans('NoData');
 								$tmparray['nomDanger']                   = $langs->trans('NoData');
 								$tmparray['identifiantRisque']           = $langs->trans('NoData');
 								$tmparray['quotationRisque']             = $langs->trans('NoData');
 								$tmparray['descriptionRisque']           = $langs->trans('NoData');
-								$tmparray['commentaireRisque']           = $langs->trans('NoRiskThere');
+								$tmparray['commentaireEvaluation']       = $langs->trans('NoRiskThere');
 								$tmparray['actionPreventionUncompleted'] = $langs->trans('NoData');
 								$tmparray['actionPreventionCompleted']   = $langs->trans('NoData');
 								foreach ($tmparray as $key => $val) {
@@ -447,7 +448,7 @@ class doc_listingrisksaction_odt extends ModeleODTListingRisksAction
 											$tmparray['identifiantRisque'] = $line->ref . ' - ' . $lastEvaluation->ref;
 											$tmparray['quotationRisque'] = $lastEvaluation->cotation ? $lastEvaluation->cotation : '0';
 											$tmparray['descriptionRisque'] = $line->description;
-											$tmparray['commentaireRisque'] = dol_print_date($lastEvaluation->date_creation, 'dayhoursec', 'tzuser') . ': ' . $lastEvaluation->comment;
+											$tmparray['commentaireEvaluation'] = dol_print_date($lastEvaluation->date_creation, 'dayhoursec', 'tzuser') . ': ' . $lastEvaluation->comment;
 
 											$related_tasks = $line->get_related_tasks($line);
 											$user = new User($this->db);
@@ -514,11 +515,12 @@ class doc_listingrisksaction_odt extends ModeleODTListingRisksAction
 									}
 								}
 							} else {
+								$tmparray['nomElement']                  = $langs->trans('NoData');
 								$tmparray['nomDanger']                   = $langs->trans('NoData');
 								$tmparray['identifiantRisque']           = $langs->trans('NoData');
 								$tmparray['quotationRisque']             = $langs->trans('NoData');
 								$tmparray['descriptionRisque']           = $langs->trans('NoData');
-								$tmparray['commentaireRisque']           = $langs->trans('NoRiskThere');
+								$tmparray['commentaireEvaluation']           = $langs->trans('NoRiskThere');
 								$tmparray['actionPreventionUncompleted'] = $langs->trans('NoData');
 								$tmparray['actionPreventionCompleted']   = $langs->trans('NoData');
 								foreach ($tmparray as $key => $val) {

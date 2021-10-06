@@ -423,7 +423,8 @@ class doc_riskassessmentdocument_odt extends ModeleODTRiskAssessmentDocument
 									$tmparray['nomDanger'] = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $line->get_danger_category($line) . '.png';
 									$tmparray['identifiantRisque'] = $line->ref . ' - ' . $lastEvaluation->ref;
 									$tmparray['quotationRisque'] = $lastEvaluation->cotation ? $lastEvaluation->cotation : '0';
-									$tmparray['commentaireRisque'] = dol_print_date($lastEvaluation->date_creation, 'dayhoursec', 'tzuser') . ': ' . $lastEvaluation->comment;
+									$tmparray['descriptionRisque'] = $line->description;
+									$tmparray['commentaireEvaluation'] = dol_print_date($lastEvaluation->date_creation, 'dayhoursec', 'tzuser') . ': ' . $lastEvaluation->comment;
 
 									$related_tasks = $line->get_related_tasks($line);
 									$user = new User($this->db);
@@ -512,7 +513,7 @@ class doc_riskassessmentdocument_odt extends ModeleODTRiskAssessmentDocument
 											if ($val == $tmparray['nomDanger']) {
 												$listlines->setImage($key, $val);
 											} else {
-												if (empty($val)) {
+												if (empty($val) && $val != '0') {
 													$listlines->setVars($key, $langs->trans('NoData'), true, 'UTF-8');
 												} else {
 													$listlines->setVars($key, html_entity_decode($val, ENT_QUOTES | ENT_HTML5), true, 'UTF-8');
@@ -528,10 +529,12 @@ class doc_riskassessmentdocument_odt extends ModeleODTRiskAssessmentDocument
 								}
 							}
 						} else {
+							$tmparray['nomElement']                  = $langs->trans('NoData');
 							$tmparray['nomDanger']                   = $langs->trans('NoData');
 							$tmparray['identifiantRisque']           = $langs->trans('NoData');
 							$tmparray['quotationRisque']             = $langs->trans('NoData');
-							$tmparray['commentaireRisque']           = $langs->trans('NoRiskThere');
+							$tmparray['descriptionRisque']           = $langs->trans('NoData');
+							$tmparray['commentaireEvaluation']       = $langs->trans('NoRiskThere');
 							$tmparray['actionPreventionUncompleted'] = $langs->trans('NoData');
 							$tmparray['actionPreventionCompleted']   = $langs->trans('NoData');
 							foreach ($tmparray as $key => $val) {
