@@ -365,6 +365,8 @@ if (empty($reshook)) {
 		$method            = GETPOST('cotationMethod');
 		$photo             = GETPOST('photo');
 
+		$risktmp = new Risk($db);
+		$risktmp->fetch($riskID);
 		$risk->fetch($riskID);
 
 		$evaluation->photo    = $photo;
@@ -389,26 +391,36 @@ if (empty($reshook)) {
 			$evaluation->exposition = $exposition;
 		}
 
-		//photo upload and thumbs generation
-		if ( !empty ($photo) ) {
-			$entity = ($conf->entity > 1) ? '/' . $conf->entity : '';
-			$pathToECMPhoto =  DOL_DATA_ROOT . $entity . '/ecm/digiriskdolibarr/medias/' . $photo;
+		$pathToTmpPhoto = $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessment/tmp/' . $risktmp->ref;
+		$files = dol_dir_list($pathToTmpPhoto);
 
-			$pathToEvaluationPhoto = DOL_DATA_ROOT . $entity . '/digiriskdolibarr/riskassessment/' . $evaluation->ref;
+		if (!empty($files)) {
+			foreach($files as $file) {
+				$pathToEvaluationPhoto =$conf->digiriskdolibarr->multidir_output[$conf->entity] .  '/riskassessment/' . $evaluation->ref;
 
-			mkdir($pathToEvaluationPhoto);
-			copy($pathToECMPhoto,$pathToEvaluationPhoto . '/' . $photo);
+				mkdir($pathToEvaluationPhoto);
+				copy($file['fullname'],$pathToEvaluationPhoto . '/' . $file['name']);
 
-			global $maxwidthmini, $maxheightmini, $maxwidthsmall,$maxheightsmall ;
-			$destfull = $pathToEvaluationPhoto . '/' . $photo;
+				global $maxwidthmini, $maxheightmini, $maxwidthsmall,$maxheightsmall ;
+				$destfull = $pathToEvaluationPhoto . '/' . $file['name'];
 
-			// Create thumbs
-			// We can't use $object->addThumbs here because there is no $object known
-			// Used on logon for example
-			$imgThumbSmall = vignette($destfull, $maxwidthsmall, $maxheightsmall, '_small', 50, "thumbs");
-			// Create mini thumbs for image (Ratio is near 16/9)
-			// Used on menu or for setup page for example
-			$imgThumbMini = vignette($destfull, $maxwidthmini, $maxheightmini, '_mini', 50, "thumbs");
+				// Create thumbs
+				// We can't use $object->addThumbs here because there is no $object known
+				// Used on logon for example
+				$imgThumbSmall = vignette($destfull, $maxwidthsmall, $maxheightsmall, '_small', 50, "thumbs");
+				// Create mini thumbs for image (Ratio is near 16/9)
+				// Used on menu or for setup page for example
+				$imgThumbMini = vignette($destfull, $maxwidthmini, $maxheightmini, '_mini', 50, "thumbs");
+				unlink($file['fullname']);
+
+			}
+		}
+		$filesThumbs = dol_dir_list($pathToTmpPhoto . '/thumbs/');
+		if (!empty($filesThumbs)) {
+			foreach($filesThumbs as $fileThumb) {
+				unlink($fileThumb['fullname']);
+
+			}
 		}
 
 		$result = $evaluation->create($user, true);
@@ -663,15 +675,22 @@ if (empty($reshook)) {
 
 		$riskassessment_id = GETPOST('riskassessment_id');
 		$filename = GETPOST('filename');
+		$risk_id = GETPOST('risk_id');
 		$riskassessment = new RiskAssessment($db);
 		$riskassessment->fetch($riskassessment_id);
-		$pathToEvaluationPhoto = $conf->digiriskdolibarr->multidir_output[$conf->entity] .'/riskassessment/' . $riskassessment->ref;
+		$risktmp = new Risk($db);
+		$risktmp->fetch($risk_id);
+
+		if ($riskassessment->id > 0) {
+			$pathToEvaluationPhoto = $conf->digiriskdolibarr->multidir_output[$conf->entity] .'/riskassessment/' . $riskassessment->ref;
+		} else {
+			$pathToEvaluationPhoto = $conf->digiriskdolibarr->multidir_output[$conf->entity] .'/riskassessment/tmp/' . $risktmp->ref;
+		}
 
 
 		$files = dol_dir_list($pathToEvaluationPhoto);
 
 		foreach ($files as $file) {
-
 			if (is_file($file['fullname']) && $file['name'] == $filename) {
 				unlink($file['fullname']);
 			}
@@ -679,7 +698,7 @@ if (empty($reshook)) {
 
 		$files = dol_dir_list($pathToEvaluationPhoto . '/thumbs');
 		foreach ($files as $file) {
-			if ($file['name'] == $filename) {
+			if (preg_match('/' . preg_split('/\./',$filename)[0] . '/', $file['name'])) {
 				unlink($file['fullname']);
 			}
 		}
@@ -687,7 +706,7 @@ if (empty($reshook)) {
 			$riskassessment->photo = '';
 			$riskassessment->update($user, true);
 		}
-		$urltogo = str_replace('__ID__', $riskassessment_id, $backtopage);
+		$urltogo = str_replace('__ID__', $id, $backtopage);
 		$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
 		header("Location: ".$urltogo);
 		exit;

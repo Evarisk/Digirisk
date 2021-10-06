@@ -1415,12 +1415,12 @@ function digirisk_show_medias_linked($modulepart = 'ecm', $sdir, $size = 0, $nbm
 			}
 $return .= '<div>
 				<div class="wpeo-button button-square-50 button-blue media-gallery-favorite" value="'.$object->id .'">
-				<input class="riskassessment-id" type="hidden" value="'.$object->id.'">
+				<input class="riskassessment-id" type="hidden" value="'.($object->id > 0 ? $object->id : 0).'">
 				<input class="filename" type="hidden" value="'.$photo.'">
 				<i class="'. ($object->photo == $photo ? 'fas' : 'far').' fa-star button-icon"></i>
 			</div>
 			<div class="wpeo-button button-square-50 button-grey media-gallery-unlink" value="'.$object->id .'">
-				<input class="riskassessment-id" type="hidden" value="'.$object->id.'">
+				<input class="riskassessment-id" type="hidden" value="'.($object->id > 0 ? $object->id : 0).'">
 				<input class="filename" type="hidden" value="'.$photo.'">
 				<i class="fas fa-unlink button-icon"></i>
 			</div></div></div>';

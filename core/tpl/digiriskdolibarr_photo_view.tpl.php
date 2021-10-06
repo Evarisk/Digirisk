@@ -58,7 +58,7 @@ if (empty($conf) || !is_object($conf))
 					<span class="floatleft inline-block valignmiddle divphotoref risk-evaluation-photo-single">
 						<input class="filepath-to-riskassessment" type="hidden" value="<?php echo $pathToThumb ?>">
 						<input class="filename" type="hidden" value="">
-						<img class="photodigiriskdolibarr clicked-photo-preview" alt="No photo" src="<?php echo DOL_URL_ROOT.$nophoto ?>">
+						<img class="photodigiriskdolibarr clicked-photo-preview" alt="No photo" src="<?php echo $pathToThumb ?>">
 					</span>
 				<?php }
 			} else { ?>
@@ -66,7 +66,7 @@ if (empty($conf) || !is_object($conf))
 				<?php $pathToThumb = DOL_URL_ROOT.'/viewimage.php?modulepart=digiriskdolibarr&entity='.$conf->entity.'&file='.urlencode($cotation->element.'/tmp/'.$risk->ref . '/thumbs/');  ?>
 				<input class="filepath-to-riskassessment" type="hidden" value="<?php echo $pathToThumb ?>">
 				<input class="filename" type="hidden" value="">
-				<img class="clicked-photo-preview photo maxwidth50"  src="<?php echo DOL_URL_ROOT.$nophoto ?>">
+				<img class="clicked-photo-preview photo maxwidth50"  src="<?php echo $pathToThumb ?>">
 			</span>
 			<?php } ?>
 		</div>
