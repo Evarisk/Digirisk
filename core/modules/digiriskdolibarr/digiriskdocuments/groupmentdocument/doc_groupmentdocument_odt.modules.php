@@ -361,9 +361,9 @@ class doc_groupmentdocument_odt extends ModeleODTGroupmentDocument
 														}
 													}
 													if ($related_task->progress == 100) {
-														$tmparray['actionPreventionCompleted'] .= dol_print_date($related_task->date_c, 'dayhourreduceformat', 'tzuser') . "\n" . ' ' . $langs->trans('Contacts') . ' : ' . ($AllInitiales ?: $langs->trans('NoData')) . "\n" . $related_task->label . "\n\n";
+														$tmparray['actionPreventionCompleted'] .= dol_print_date((($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_START_DATE) ? $related_task->date_start : $related_task->date_c), 'dayreduceformat') . (($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_END_DATE) ? ' - ' . dol_print_date($related_task->date_end, 'dayreduceformat') : '') . "\n" . ' ' . $langs->trans('Contacts') . ' : ' . ($AllInitiales ?: $langs->trans('NoData')) . "\n" . $related_task->label . "\n\n";
 													} else {
-														$tmparray['actionPreventionUncompleted'] .= dol_print_date($related_task->date_c, 'dayhourreduceformat', 'tzuser') . ' - ' . $langs->trans('DigiriskProgress') . ' : ' . ($related_task->progress ?: 0) . '%' . ' ' . $langs->trans('Contacts') . ' : ' . ($AllInitiales ?: $langs->trans('NoData')) . "\n" . $related_task->label . "\n\n";
+														$tmparray['actionPreventionUncompleted'] .= dol_print_date((($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_START_DATE) ? $related_task->date_start : $related_task->date_c), 'dayreduceformat') . (($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_END_DATE) ? ' - ' . dol_print_date($related_task->date_end, 'dayreduceformat') : '') . ' - ' . $langs->trans('DigiriskProgress') . ' : ' . ($related_task->progress ?: 0) . '%' . ' ' . $langs->trans('Contacts') . ' : ' . ($AllInitiales ?: $langs->trans('NoData')) . "\n" . $related_task->label . "\n\n";
 													}
 												}
 											} else {

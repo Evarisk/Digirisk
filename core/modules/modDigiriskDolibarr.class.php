@@ -271,6 +271,8 @@ class modDigiriskdolibarr extends DolibarrModules
 			162 => array('DIGIRISKDOLIBARR_DOCUMENT_MODELS_SET','integer', 0,'', $conf->entity),
 			163 => array('DIGIRISKDOLIBARR_THIRDPARTY_SET','integer', 0,'', $conf->entity),
 			164 => array('DIGIRISKDOLIBARR_TASK_MANAGEMENT','integer', 0 ,'', $conf->entity),
+			310 => array('DIGIRISKDOLIBARR_SHOW_TASK_START_DATE','integer', 0,'', $conf->entity),
+			311 => array('DIGIRISKDOLIBARR_SHOW_TASK_END_DATE','integer', 0,'', $conf->entity),
 
 			// CONST PREVENTION PLAN LINE
 			180 => array('MAIN_AGENDA_ACTIONAUTO_PREVENTIONPLANDET_CREATE','chaine',1,'', $conf->entity),
