@@ -57,7 +57,7 @@ $hookmanager->initHooks(array('digiriskelementinformationssharing', 'globalcard'
 $object->fetch($conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD);
 
 
-$upload_dir         = $conf->digiriskdolibarr->multidir_output[isset($object->entity) ? $object->entity : 1];
+$upload_dir         = $conf->digiriskdolibarr->multidir_output[isset($conf->entity) ? $conf->entity : 1];
 
 //Security check
 $permissiontoread   = $user->rights->digiriskdolibarr->informationssharing->read;
