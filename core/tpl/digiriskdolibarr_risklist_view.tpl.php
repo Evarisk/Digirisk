@@ -649,18 +649,19 @@
 	$varpage = empty($contextpage) ? $_SERVER["PHP_SELF"] : $contextpage;
 
 	if (!preg_match('/t.description/', $user->conf->MAIN_SELECTEDFIELDS_riskcard) && $conf->global->DIGIRISKDOLIBARR_RISK_DESCRIPTION) {
-		$user->conf->MAIN_SELECTEDFIELDS_riskcard = 't.ref,evaluation.cotation,t.category,t.description,';
+		$user->conf->MAIN_SELECTEDFIELDS_riskcard = ($varpage == 'risklist') ? 't.fk_element,' : ''.'t.ref,evaluation.cotation,t.category,t.description,';
 
 	} elseif (!$conf->global->DIGIRISKDOLIBARR_RISK_DESCRIPTION) {
 		$user->conf->MAIN_SELECTEDFIELDS_riskcard = preg_replace('/t.description,/', '', $user->conf->MAIN_SELECTEDFIELDS_riskcard);
 	}
 
 	if (!preg_match('/evaluation.has_tasks/', $user->conf->MAIN_SELECTEDFIELDS_riskcard) && $conf->global->DIGIRISKDOLIBARR_TASK_MANAGEMENT) {
-		$user->conf->MAIN_SELECTEDFIELDS_riskcard .= 't.ref,evaluation.cotation,t.category,evaluation.has_tasks,';
+		$user->conf->MAIN_SELECTEDFIELDS_riskcard .= ($varpage == 'risklist') ? 't.fk_element,' : ''.'t.ref,evaluation.cotation,t.category,evaluation.has_tasks,';
 
 	} elseif (!$conf->global->DIGIRISKDOLIBARR_TASK_MANAGEMENT) {
 		$user->conf->MAIN_SELECTEDFIELDS_riskcard = preg_replace('/evaluation.has_tasks,/', '', $user->conf->MAIN_SELECTEDFIELDS_riskcard);
 	}
+
 
 	$selectedfields = $form->multiSelectArrayWithCheckbox('selectedfields', $arrayfields, $varpage); // This also change content of $arrayfields
 	$selectedfields .= (count($arrayofmassactions) ? $form->showCheckAddButtons('checkforselect', 1) : '');
@@ -836,6 +837,13 @@
 			{
 				print '<td'.($cssforfield ? ' class="'.$cssforfield.'"' : '').' style="width:2%">';
 				if ($key == 'status') print $risk->getLibStatut(5);
+				elseif ($key == 'fk_element') { ?>
+					<?php $parent_element = new DigiriskElement($db);
+					$result = $parent_element->fetch($risk->fk_element);
+					if ($result > 0) {
+					print $parent_element->ref . ( !empty($parent_element->label) ?  ' - ' . $parent_element->label : '');
+					}
+				}
 				elseif ($key == 'category') { ?>
 					<div class="table-cell table-50 cell-risk" data-title="Risque">
 						<div class="wpeo-dropdown dropdown-large category-danger padding wpeo-tooltip-event" aria-label="<?php echo $risk->get_danger_category_name($risk) ?>">
@@ -844,7 +852,6 @@
 					</div>
 					<?php
 				}
-
 				elseif ($key == 'ref') {
 					?>
 					<div class="risk-container" value="<?php echo $risk->id ?>">
@@ -940,7 +947,6 @@
 					</div>
 					<?php
 				}
-
 				elseif ($key == 'description') {
 					if ($conf->global->DIGIRISKDOLIBARR_RISK_DESCRIPTION == 0 ) {
 						print $langs->trans('RiskDescriptionNotActivated');
