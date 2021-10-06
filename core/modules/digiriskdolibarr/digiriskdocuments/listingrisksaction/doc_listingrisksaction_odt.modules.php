@@ -336,13 +336,34 @@ class doc_listingrisksaction_odt extends ModeleODTListingRisksAction
 											$tmparray['commentaireRisque'] = dol_print_date($lastEvaluation->date_creation, 'dayhoursec', 'tzuser') . ': ' . $lastEvaluation->comment;
 
 											$related_tasks = $line->get_related_tasks($line);
+											$user = new User($this->db);
 
-											if (!empty($related_tasks)) {
+											if (!empty($related_tasks) && is_array($related_tasks)) {
 												foreach ($related_tasks as $related_task) {
+													$related_task_contact_ids = $related_task->getListContactId();
+													if (!empty($related_task_contact_ids) && is_array($related_task_contact_ids)) {
+														foreach ($related_task_contact_ids as $related_task_contact_id) {
+															$user->fetch($related_task_contact_id);
+															$contact_array[$related_task_contact_id] = $user;
+														}
+													}
+													$AllInitiales = '';
+													if (!empty($contact_array) && is_array($contact_array)) {
+														foreach ($contact_array as $contact_array_single) {
+															$initiales = '';
+															if (dol_strlen($contact_array_single->firstname)) {
+																$initiales .= str_split($contact_array_single->firstname, 1)[0];
+															}
+															if (dol_strlen($contact_array_single->lastname)) {
+																$initiales .= str_split($contact_array_single->lastname, 1)[0];
+															}
+															$AllInitiales .= strtoupper($initiales) . ',';
+														}
+													}
 													if ($related_task->progress == 100) {
-														$tmparray['actionPreventionCompleted'] .= dol_print_date($related_task->date_c, 'dayhoursec', 'tzuser') . ': ' . $related_task->label . "\n";
+														$tmparray['actionPreventionCompleted'] .= dol_print_date($related_task->date_c, 'dayhourreduceformat', 'tzuser') . "\n" . ' ' . $langs->trans('Contacts') . ' : ' . ($AllInitiales ?: $langs->trans('NoData')) . "\n" . $related_task->label . "\n\n";
 													} else {
-														$tmparray['actionPreventionUncompleted'] .= dol_print_date($related_task->date_c, 'dayhoursec', 'tzuser') . ': ' . $related_task->label . ' ' . ($related_task->progress ? $related_task->progress : 0) . '%' . "\n";
+														$tmparray['actionPreventionUncompleted'] .= dol_print_date($related_task->date_c, 'dayhourreduceformat', 'tzuser') . ' - ' . $langs->trans('DigiriskProgress') . ' : ' . ($related_task->progress ?: 0) . '%' . ' ' . $langs->trans('Contacts') . ' : ' . ($AllInitiales ?: $langs->trans('NoData')) . "\n" . $related_task->label . "\n\n";
 													}
 												}
 											} else {
@@ -429,13 +450,34 @@ class doc_listingrisksaction_odt extends ModeleODTListingRisksAction
 											$tmparray['commentaireRisque'] = dol_print_date($lastEvaluation->date_creation, 'dayhoursec', 'tzuser') . ': ' . $lastEvaluation->comment;
 
 											$related_tasks = $line->get_related_tasks($line);
+											$user = new User($this->db);
 
-											if (!empty($related_tasks)) {
+											if (!empty($related_tasks) && is_array($related_tasks)) {
 												foreach ($related_tasks as $related_task) {
+													$related_task_contact_ids = $related_task->getListContactId();
+													if (!empty($related_task_contact_ids) && is_array($related_task_contact_ids)) {
+														foreach ($related_task_contact_ids as $related_task_contact_id) {
+															$user->fetch($related_task_contact_id);
+															$contact_array[$related_task_contact_id] = $user;
+														}
+													}
+													$AllInitiales = '';
+													if (!empty($contact_array) && is_array($contact_array)) {
+														foreach ($contact_array as $contact_array_single) {
+															$initiales = '';
+															if (dol_strlen($contact_array_single->firstname)) {
+																$initiales .= str_split($contact_array_single->firstname, 1)[0];
+															}
+															if (dol_strlen($contact_array_single->lastname)) {
+																$initiales .= str_split($contact_array_single->lastname, 1)[0];
+															}
+															$AllInitiales .= strtoupper($initiales) . ',';
+														}
+													}
 													if ($related_task->progress == 100) {
-														$tmparray['actionPreventionCompleted'] .= dol_print_date($related_task->date_c, 'dayhoursec', 'tzuser') . ': ' . "\n";
+														$tmparray['actionPreventionCompleted'] .= dol_print_date($related_task->date_c, 'dayhourreduceformat', 'tzuser') . "\n" . ' ' . $langs->trans('Contacts') . ' : ' . ($AllInitiales ?: $langs->trans('NoData')) . "\n" . $related_task->label . "\n\n";
 													} else {
-														$tmparray['actionPreventionUncompleted'] .= dol_print_date($related_task->date_c, 'dayhoursec', 'tzuser') . ': ' . $related_task->label . ' ' . ($related_task->progress ? $related_task->progress : 0) . '%' . "\n";
+														$tmparray['actionPreventionUncompleted'] .= dol_print_date($related_task->date_c, 'dayhourreduceformat', 'tzuser') . ' - ' . $langs->trans('DigiriskProgress') . ' : ' . ($related_task->progress ?: 0) . '%' . ' ' . $langs->trans('Contacts') . ' : ' . ($AllInitiales ?: $langs->trans('NoData')) . "\n" . $related_task->label . "\n\n";
 													}
 												}
 											} else {
