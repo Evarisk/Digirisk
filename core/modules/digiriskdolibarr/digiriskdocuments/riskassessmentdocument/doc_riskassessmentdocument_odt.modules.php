@@ -379,10 +379,10 @@ class doc_riskassessmentdocument_odt extends ModeleODTRiskAssessmentDocument
 									$listlines->setVars('nomElement', html_entity_decode($key,ENT_QUOTES | ENT_HTML5), true, 'UTF-8');
 									$listlines->setVars('quotationTotale', $val[0], true, 'UTF-8');
 									$listlines->setVars('description', html_entity_decode($val[1],ENT_QUOTES | ENT_HTML5), true, 'UTF-8');
-									$listlines->setVars('NbRiskBlack', $val[2][1], true, 'UTF-8');
-									$listlines->setVars('NbRiskRed', $val[2][2], true, 'UTF-8');
-									$listlines->setVars('NbRiskOrange', $val[2][3], true, 'UTF-8');
-									$listlines->setVars('NbRiskGrey', $val[2][4], true, 'UTF-8');
+									$listlines->setVars('NbRiskBlack', $val[2][4], true, 'UTF-8');
+									$listlines->setVars('NbRiskRed', $val[2][3], true, 'UTF-8');
+									$listlines->setVars('NbRiskOrange', $val[2][2], true, 'UTF-8');
+									$listlines->setVars('NbRiskGrey', $val[2][1], true, 'UTF-8');
 								} catch (OdfException $e) {
 									dol_syslog($e->getMessage(), LOG_INFO);
 								} catch (SegmentException $e) {
