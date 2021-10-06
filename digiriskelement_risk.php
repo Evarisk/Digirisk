@@ -429,14 +429,12 @@ if (empty($reshook)) {
 		$cotation          = GETPOST('cotation');
 		$method            = GETPOST('cotationMethod');
 		$evaluationComment = GETPOST('evaluationComment', 'restricthtml');
-		$photo             = GETPOST('photo');
 
 		$evaluation->fetch($evaluationID);
 
 		$evaluation->cotation = $cotation;
 		$evaluation->method   = $method;
 		$evaluation->comment  = $evaluationComment;
-		$evaluation->photo    = $photo;
 
 		if ($method == 'advanced') {
 			$formation  = GETPOST('formation');

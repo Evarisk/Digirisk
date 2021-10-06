@@ -2904,28 +2904,42 @@ window.eoxiaJS.mediaGallery.addToFavorite = function( event ) {
 	let filename = $(this).find('.filename').val()
 	let querySeparator = '?'
 	let mediaContainer = $(this).closest('.media-container')
-	let mediaLinked = $('.risk-evaluation-medias-'+riskassessment_id)
 	let riskAssessmenModalPhoto = $(this).closest('.modal-container').find('.risk-evaluation-photo-'+riskassessment_id)
 	let riskAssessmenSinglePhoto = $('.risk-evaluation-photo-single-'+riskassessment_id)
 	let riskAssessmenLastEvaluationPhoto = $('.risk-evaluation-photo-last-'+riskassessment_id)
 	let riskAssessmenListEvaluationPhoto = $('.risk-evaluation-photo-list-single-'+riskassessment_id)
 	let saveButton = $(this).closest('.modal-container').find('.risk-evaluation-save')
+
+	//change star button style
+	let previousFavorite = $(this).closest('.modal-container').find('.fas.fa-star')
+	let newFavorite = $(this).find('.far.fa-star')
+	let previousPhoto = previousFavorite.closest('.media-container').find('.clicked-photo-preview')
+
+	previousFavorite.removeClass('fas')
+	previousFavorite.addClass('far')
+
+	newFavorite.addClass('fas')
+	newFavorite.removeClass('far')
+
 	document.URL.match('/?/') ? querySeparator = '&' : 1
 	saveButton.addClass('button-disable')
 	window.eoxiaJS.loader.display(mediaContainer);
+
+	let previousName = previousPhoto[0].src.trim().split(/thumbs%2F/)[1].split(/"/)[0]
 
 	$.ajax({
 		url: document.URL + querySeparator + "action=addToFavorite&riskassessment_id="+riskassessment_id+"&filename="+filename,
 		type: "POST",
 		processData: false,
 		success: function ( ) {
-			riskAssessmenModalPhoto.load(document.URL + ' .risk-evaluation-photo-'+riskassessment_id)
-			riskAssessmenSinglePhoto.load(document.URL + ' .risk-evaluation-photo-single-'+riskassessment_id)
-			mediaLinked.load(document.URL + ' .risk-evaluation-medias-'+riskassessment_id)
-			riskAssessmenLastEvaluationPhoto.load(document.URL + ' .risk-evaluation-photo-last-'+riskassessment_id)
-			riskAssessmenListEvaluationPhoto.load(document.URL + ' .risk-evaluation-photo-list-single-'+riskassessment_id)
+			let newPhoto = previousPhoto[0].src.trim().replace(previousName, filename.replace(/\./, '_small.'))
+
+			riskAssessmenModalPhoto.find('.clicked-photo-preview').attr('src',newPhoto )
+			riskAssessmenSinglePhoto.find('.clicked-photo-preview').attr('src',newPhoto )
+			riskAssessmenLastEvaluationPhoto.find('.clicked-photo-preview').attr('src',newPhoto )
+			riskAssessmenListEvaluationPhoto.find('.clicked-photo-preview').attr('src',newPhoto )
+
 			saveButton.removeClass('button-disable')
-//on pourrait tous leur donner la même classe pour directement les récupérer et changer leur valeurs avec le nouveau nom d'image, sans avoir a faire 10000 loads
 			$('.wpeo-loader').removeClass('wpeo-loader')
 
 		}
