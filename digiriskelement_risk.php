@@ -456,25 +456,30 @@ if (empty($reshook)) {
 			$pathToECMPhoto =  DOL_DATA_ROOT .$entity. '/ecm/digiriskdolibarr/medias/' . $photo;
 
 			$pathToEvaluationPhoto = DOL_DATA_ROOT . $entity . '/digiriskdolibarr/riskassessment/' . $evaluation->ref;
+//
+//			if (is_dir($pathToEvaluationPhoto)) {
+//				$files = dol_dir_list($pathToEvaluationPhoto);
+//				foreach ($files as $file) {
+//					if (is_file($file['fullname'])) {
+//						unlink($file['fullname']);
+//					}
+//				}
+//
+//				$files = dol_dir_list($pathToEvaluationPhoto . '/thumbs');
+//				foreach ($files as $file) {
+//					unlink($file['fullname']);
+//				}
+//
+//				copy($pathToECMPhoto,$pathToEvaluationPhoto . '/' . $photo);
+//			} else {
+//				mkdir($pathToEvaluationPhoto);
+//				copy($pathToECMPhoto,$pathToEvaluationPhoto . '/' . $photo);
+//			}
 
-			if (is_dir($pathToEvaluationPhoto)) {
-				$files = dol_dir_list($pathToEvaluationPhoto);
-				foreach ($files as $file) {
-					if (is_file($file['fullname'])) {
-						unlink($file['fullname']);
-					}
-				}
-
-				$files = dol_dir_list($pathToEvaluationPhoto . '/thumbs');
-				foreach ($files as $file) {
-					unlink($file['fullname']);
-				}
-
-				copy($pathToECMPhoto,$pathToEvaluationPhoto . '/' . $photo);
-			} else {
+			if (!is_dir($pathToEvaluationPhoto)) {
 				mkdir($pathToEvaluationPhoto);
-				copy($pathToECMPhoto,$pathToEvaluationPhoto . '/' . $photo);
 			}
+			copy($pathToECMPhoto,$pathToEvaluationPhoto . '/' . $photo);
 
 			global $maxwidthmini, $maxheightmini, $maxwidthsmall,$maxheightsmall ;
 			$destfull = $pathToEvaluationPhoto . '/' . $photo;
@@ -638,6 +643,36 @@ if (empty($reshook)) {
 			if (!empty($task->errors)) setEventMessages(null, $task->errors, 'errors');
 			else  setEventMessages($task->error, null, 'errors');
 		}
+	}
+
+	if (!$error && $action == "unlinkFile" && $permissiontodelete) {
+
+		$risk_assessment_id = GETPOST('riskassessment_id');
+		$filename = GETPOST('filename');
+		$riskassessment = new RiskAssessment($db);
+		$riskassessment->fetch($risk_assessment_id);
+		$pathToEvaluationPhoto = $conf->digiriskdolibarr->multidir_output[$conf->entity] .'/riskassessment/' . $riskassessment->ref;
+
+		$files = dol_dir_list($pathToEvaluationPhoto);
+
+		foreach ($files as $file) {
+
+			if (is_file($file['fullname']) && $file['name'] == $filename) {
+				unlink($file['fullname']);
+			}
+		}
+
+		$files = dol_dir_list($pathToEvaluationPhoto . '/thumbs');
+		foreach ($files as $file) {
+			if ($file['name'] == $filename) {
+				unlink($file['fullname']);
+			}
+		}
+
+			$urltogo = str_replace('__ID__', $risk_assessment_id, $backtopage);
+			$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
+			header("Location: ".$urltogo);
+			exit;
 	}
 }
 
