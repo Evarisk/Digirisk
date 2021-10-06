@@ -2904,10 +2904,9 @@ window.eoxiaJS.mediaGallery.addToFavorite = function( event ) {
 	let filename = $(this).find('.filename').val()
 	let querySeparator = '?'
 	let mediaContainer = $(this).closest('.media-container')
-	let riskAssessmenModalPhoto = $(this).closest('.modal-container').find('.risk-evaluation-photo-'+riskassessment_id)
-	let riskAssessmenSinglePhoto = $('.risk-evaluation-photo-single-'+riskassessment_id)
-	let riskAssessmenLastEvaluationPhoto = $('.risk-evaluation-photo-last-'+riskassessment_id)
-	let riskAssessmenListEvaluationPhoto = $('.risk-evaluation-photo-list-single-'+riskassessment_id)
+
+	//crée un sélecteur générique à l'évaluation risk-evaluation-photo-id et en le $() on itère sur ceux qui possèdent cette classe et on change la src de leur image
+	let riskAssessmentPhoto = $('.risk-evaluation-photo-'+riskassessment_id)
 	let saveButton = $(this).closest('.modal-container').find('.risk-evaluation-save')
 
 	//change star button style
@@ -2934,14 +2933,11 @@ window.eoxiaJS.mediaGallery.addToFavorite = function( event ) {
 		success: function ( ) {
 			let newPhoto = previousPhoto[0].src.trim().replace(previousName, filename.replace(/\./, '_small.'))
 
-			riskAssessmenModalPhoto.find('.clicked-photo-preview').attr('src',newPhoto )
-			riskAssessmenSinglePhoto.find('.clicked-photo-preview').attr('src',newPhoto )
-			riskAssessmenLastEvaluationPhoto.find('.clicked-photo-preview').attr('src',newPhoto )
-			riskAssessmenListEvaluationPhoto.find('.clicked-photo-preview').attr('src',newPhoto )
-
+			riskAssessmentPhoto.each( function() {
+				$(this).find('.clicked-photo-preview').attr('src',newPhoto )
+			});
 			saveButton.removeClass('button-disable')
 			$('.wpeo-loader').removeClass('wpeo-loader')
-
 		}
 	});
 };
