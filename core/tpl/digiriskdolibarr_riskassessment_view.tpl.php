@@ -10,10 +10,10 @@ if (!empty ($lastEvaluation) && $lastEvaluation > 0) {
 				<div class="risk-evaluation-cotation risk-evaluation-list modal-open" value="<?php echo $risk->id ?>" data-scale="<?php echo $lastEvaluation->get_evaluation_scale() ?>">
 					<span><?php echo $lastEvaluation->cotation; ?></span>
 				</div>
-				<div class="risk-evaluation-photo">
+				<div class="risk-evaluation-photo risk-evaluation-photo-single-<?php echo $lastEvaluation->id; ?>" >
 					<?php $filearray = dol_dir_list($conf->digiriskdolibarr->multidir_output[$conf->entity].'/'.$lastEvaluation->element.'/'.$lastEvaluation->ref, "files", 0, '', '(\.odt|_preview.*\.png)$', 'position_name', 'asc', 1);
 					if (count($filearray)) {
-						print '<span class="floatleft inline-block valignmiddle divphotoref">'.digirisk_show_photos('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity].'/'.$lastEvaluation->element, 'small', 1, 0, 0, 0, 40, 0, 0, 0, 0, $lastEvaluation->element, $lastEvaluation).'</span>';
+						print '<img height="40" width="100%" class="photo clicked-photo-preview" src="'.DOL_URL_ROOT.'/viewimage.php?modulepart=digiriskdolibarr&entity='.$conf->entity.'&file='.urlencode($lastEvaluation->element.'/'.$lastEvaluation->ref . '/thumbs/'. preg_replace('/\./', '_small.', $lastEvaluation->photo)).'" >';
 					} else {
 						$nophoto = '/public/theme/common/nophoto.png'; ?>
 						<span class="floatleft inline-block valignmiddle divphotoref"><img class="photodigiriskdolibarr" alt="No photo" src="<?php echo DOL_URL_ROOT.$nophoto ?>"></span>
@@ -186,7 +186,7 @@ if (!empty ($lastEvaluation) && $lastEvaluation > 0) {
 											<?php print '<textarea name="evaluationComment'. $cotation->id .'" rows="'.ROWS_2.'">'.$cotation->comment.'</textarea>'."\n"; ?>
 										</div>
 									</div>
-									<div class="risk-evaluation-medias">
+									<div class="risk-evaluation-medias risk-evaluation-medias-<?php echo $cotation->id ?>">
 										<div class="medias"><i class="fas fa-picture-o"></i> <?php echo $langs->trans('Medias'); ?></div>
 										<?php
 										$relativepath = 'digiriskdolibarr/medias/thumbs';
@@ -282,10 +282,10 @@ if (!empty ($lastEvaluation) && $lastEvaluation > 0) {
 												<div class="risk-evaluation-cotation" data-scale="<?php echo $cotation->get_evaluation_scale() ?>">
 													<span><?php echo $cotation->cotation; ?></span>
 												</div>
-												<div class="risk-evaluation-photo">
+												<div class="risk-evaluation-photo risk-evaluation-photo-list-single-<?php echo $cotation->id; ?>">
 													<?php $filearray = dol_dir_list($conf->digiriskdolibarr->multidir_output[$conf->entity].'/'.$cotation->element.'/'.$cotation->ref, "files", 0, '', '(\.odt|_preview.*\.png)$', 'position_name', 'asc', 1);
 													if (count($filearray)) {
-														print '<span class="floatleft inline-block valignmiddle divphotoref">'.digirisk_show_photos('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity].'/'.$cotation->element, 'small', 1, 0, 0, 0, 40, 0, 1, 0, 0, $cotation->element, $cotation).'</span>';
+														print '<img height="40" width="100%" class="photo clicked-photo-preview" src="'.DOL_URL_ROOT.'/viewimage.php?modulepart=digiriskdolibarr&entity='.$conf->entity.'&file='.urlencode($cotation->element.'/'.$cotation->ref . '/thumbs/'. preg_replace('/\./', '_small.', $cotation->photo)).'" >';
 													} else {
 														$nophoto = '/public/theme/common/nophoto.png'; ?>
 														<span class="floatleft inline-block valignmiddle divphotoref"><img class="photodigiriskdolibarr" alt="No photo" src="<?php echo DOL_URL_ROOT.$nophoto ?>"></span>
@@ -489,10 +489,10 @@ $cotation->method = $lastEvaluation->method ? $lastEvaluation->method : "standar
 								<div class="risk-evaluation-cotation risk-evaluation-list" value="<?php echo $risk->id ?>" data-scale="<?php echo $lastEvaluation->get_evaluation_scale() ?>">
 									<span><?php echo $lastEvaluation->cotation; ?></span>
 								</div>
-								<div class="risk-evaluation-photo">
+								<div class="risk-evaluation-photo risk-evaluation-photo-last-<?php echo $lastEvaluation->id; ?>">
 									<?php $filearray = dol_dir_list($conf->digiriskdolibarr->multidir_output[$conf->entity].'/'.$lastEvaluation->element.'/'.$lastEvaluation->ref, "files", 0, '', '(\.odt|_preview.*\.png)$', 'position_name', 'asc', 1);
 									if (count($filearray)) {
-										print '<span class="floatleft inline-block valignmiddle divphotoref">'.digirisk_show_photos('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity].'/'.$lastEvaluation->element, 'small', 1, 0, 0, 0, 40, 0, 0, 0, 0, $lastEvaluation->element, $lastEvaluation).'</span>';
+										print '<img height="40" width="100%" class="photo clicked-photo-preview" src="'.DOL_URL_ROOT.'/viewimage.php?modulepart=digiriskdolibarr&entity='.$conf->entity.'&file='.urlencode($lastEvaluation->element.'/'.$lastEvaluation->ref . '/thumbs/'. preg_replace('/\./', '_small.', $lastEvaluation->photo)).'" >';
 									} else {
 										$nophoto = '/public/theme/common/nophoto.png'; ?>
 										<span class="floatleft inline-block valignmiddle divphotoref"><img class="photodigiriskdolibarr" alt="No photo" src="<?php echo DOL_URL_ROOT.$nophoto ?>"></span>

@@ -452,43 +452,7 @@ if (empty($reshook)) {
 			$evaluation->exposition = $exposition;
 		}
 		$entity = ($conf->entity > 1) ? '/' . $conf->entity : '';
-		if ( !(empty($photo))) {
-			$pathToECMPhoto =  DOL_DATA_ROOT .$entity. '/ecm/digiriskdolibarr/medias/' . $photo;
 
-			$pathToEvaluationPhoto = DOL_DATA_ROOT . $entity . '/digiriskdolibarr/riskassessment/' . $evaluation->ref;
-//
-//			if (is_dir($pathToEvaluationPhoto)) {
-//				$files = dol_dir_list($pathToEvaluationPhoto);
-//				foreach ($files as $file) {
-//					if (is_file($file['fullname'])) {
-//						unlink($file['fullname']);
-//					}
-//				}
-//
-//				$files = dol_dir_list($pathToEvaluationPhoto . '/thumbs');
-//				foreach ($files as $file) {
-//					unlink($file['fullname']);
-//				}
-//
-//				copy($pathToECMPhoto,$pathToEvaluationPhoto . '/' . $photo);
-//			} else {
-//				mkdir($pathToEvaluationPhoto);
-//				copy($pathToECMPhoto,$pathToEvaluationPhoto . '/' . $photo);
-//			}
-
-			if (!is_dir($pathToEvaluationPhoto)) {
-				mkdir($pathToEvaluationPhoto);
-			}
-			copy($pathToECMPhoto,$pathToEvaluationPhoto . '/' . $photo);
-
-			global $maxwidthmini, $maxheightmini, $maxwidthsmall,$maxheightsmall ;
-			$destfull = $pathToEvaluationPhoto . '/' . $photo;
-
-			// Create thumbs
-			$imgThumbSmall = vignette($destfull, $maxwidthsmall, $maxheightsmall, '_small', 50, "thumbs");
-			// Create mini thumbs for image (Ratio is near 16/9)
-			$imgThumbMini = vignette($destfull, $maxwidthmini, $maxheightmini, '_mini', 50, "thumbs");
-		}
 		$result = $evaluation->update($user, true);
 
 		if ($result > 0) {
@@ -644,13 +608,57 @@ if (empty($reshook)) {
 			else  setEventMessages($task->error, null, 'errors');
 		}
 	}
+	if (!$error && $action == "addFiles" && $permissiontodelete) {
+
+		$riskassessment_id = GETPOST('riskassessment_id');
+		$filenames = GETPOST('filenames');
+		$riskassessment = new RiskAssessment($db);
+		$riskassessment->fetch($riskassessment_id);
+		$pathToEvaluationPhoto = $conf->digiriskdolibarr->multidir_output[$conf->entity] .'/riskassessment/' . $riskassessment->ref;
+		$filenames = preg_split('/vVv/',$filenames);
+		array_pop($filenames);
+
+		if ( !(empty($filenames))) {
+			$riskassessment->photo = $filenames[0];
+
+			foreach ($filenames as $filename) {
+				$entity = ($conf->entity > 1) ? '/' . $conf->entity : '';
+
+
+				if (is_file( DOL_DATA_ROOT .$entity. '/ecm/digiriskdolibarr/medias/' . $filename)) {
+
+					$pathToECMPhoto =  DOL_DATA_ROOT .$entity. '/ecm/digiriskdolibarr/medias/' . $filename;
+
+					$pathToEvaluationPhoto = DOL_DATA_ROOT . $entity . '/digiriskdolibarr/riskassessment/' . $riskassessment->ref;
+
+					if (!is_dir($pathToEvaluationPhoto)) {
+						mkdir($pathToEvaluationPhoto);
+					}
+					copy($pathToECMPhoto,$pathToEvaluationPhoto . '/' . $filename);
+
+					global $maxwidthmini, $maxheightmini, $maxwidthsmall,$maxheightsmall ;
+					$destfull = $pathToEvaluationPhoto . '/' . $filename;
+
+					// Create thumbs
+					$imgThumbSmall = vignette($destfull, $maxwidthsmall, $maxheightsmall, '_small', 50, "thumbs");
+					// Create mini thumbs for image (Ratio is near 16/9)
+					$imgThumbMini = vignette($destfull, $maxwidthmini, $maxheightmini, '_mini', 50, "thumbs");
+				}
+
+			}
+			$riskassessment->update($user, true);
+		}
+
+
+		exit;
+	}
 
 	if (!$error && $action == "unlinkFile" && $permissiontodelete) {
 
-		$risk_assessment_id = GETPOST('riskassessment_id');
+		$riskassessment_id = GETPOST('riskassessment_id');
 		$filename = GETPOST('filename');
 		$riskassessment = new RiskAssessment($db);
-		$riskassessment->fetch($risk_assessment_id);
+		$riskassessment->fetch($riskassessment_id);
 		$pathToEvaluationPhoto = $conf->digiriskdolibarr->multidir_output[$conf->entity] .'/riskassessment/' . $riskassessment->ref;
 
 		$files = dol_dir_list($pathToEvaluationPhoto);
@@ -669,10 +677,26 @@ if (empty($reshook)) {
 			}
 		}
 
-			$urltogo = str_replace('__ID__', $risk_assessment_id, $backtopage);
-			$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
-			header("Location: ".$urltogo);
-			exit;
+		$urltogo = str_replace('__ID__', $riskassessment_id, $backtopage);
+		$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
+		header("Location: ".$urltogo);
+		exit;
+	}
+
+	if (!$error && $action == "addToFavorite" && $permissiontodelete) {
+
+		$riskassessment_id = GETPOST('riskassessment_id');
+		$filename = GETPOST('filename');
+		$riskassessment = new RiskAssessment($db);
+		$riskassessment->fetch($riskassessment_id);
+		$pathToEvaluationPhoto = $conf->digiriskdolibarr->multidir_output[$conf->entity] .'/riskassessment/' . $riskassessment->ref;
+		$riskassessment->photo = $filename;
+		$riskassessment->update($user, true);
+
+		$urltogo = str_replace('__ID__', $riskassessment_id, $backtopage);
+		$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
+		header("Location: ".$urltogo);
+		exit;
 	}
 }
 

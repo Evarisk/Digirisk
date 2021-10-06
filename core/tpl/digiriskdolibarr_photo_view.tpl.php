@@ -48,7 +48,8 @@ if (empty($conf) || !is_object($conf))
 					<span class="floatleft inline-block valignmiddle divphotoref risk-evaluation-photo-single">
 						<input type="hidden" value="<?php echo $path ?>">
 						<input class="filename" type="hidden" value="">
-						 <?php print digirisk_show_photos('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity].'/'.$cotation->element, 'small', 1, 0, 0, 0, 40, 0, 1, 0, 0, $cotation->element, $cotation); ?>
+						 <?php 	print '<img height="40" width="100%" class="photo clicked-photo-preview" src="'.DOL_URL_ROOT.'/viewimage.php?modulepart=digiriskdolibarr&entity='.$conf->entity.'&file='.urlencode($cotation->element.'/'.$cotation->ref . '/thumbs/'. preg_replace('/\./', '_small.', $cotation->photo)).'" >';
+						 ?>
 					</span>
 					<?php
 				} else {

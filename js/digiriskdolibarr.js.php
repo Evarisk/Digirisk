@@ -986,14 +986,20 @@ window.eoxiaJS.photo.selectPhoto = function( event ) {
 	let photoID = $(this).attr('value');
 	let parent = $(this).closest('.modal-content')
 
-	parent.find('.clicked-photo').attr('style', 'none !important');
-	parent.find('.clicked-photo').removeClass('clicked-photo');
-	parent.closest('.modal-container').find('.save-photo').removeClass('button-disable');
+	if ($(this).hasClass('clicked-photo')) {
+		$(this).attr('style', 'none !important')
+		$(this).removeClass('clicked-photo')
 
-	parent.find('.clickable-photo'+photoID).attr('style', 'border: 5px solid #0d8aff !important');
-	parent.find('.clickable-photo'+photoID).addClass('clicked-photo');
+		if ($('.clicked-photo').length === 0) {
+			$(this).closest('.modal-container').find('.save-photo').addClass('button-disable');
+		}
 
+	} else {
+		parent.closest('.modal-container').find('.save-photo').removeClass('button-disable');
 
+		parent.find('.clickable-photo'+photoID).attr('style', 'border: 5px solid #0d8aff !important');
+		parent.find('.clickable-photo'+photoID).addClass('clicked-photo');
+	}
 };
 
 /**
@@ -1005,14 +1011,37 @@ window.eoxiaJS.photo.selectPhoto = function( event ) {
  * @return {void}
  */
 window.eoxiaJS.photo.savePhoto = function( event ) {
-    let parent = $('.ecm-photo-list-content')
+    let parent = $('#risk_evaluation_photo')
 	let idToSave = $(this).attr('value')
+	let mediaGalleryModal = $(this).closest('.modal-container')
+	let mediaLinked = $('.risk-evaluation-medias-'+idToSave)
+	let filesLinked = mediaGalleryModal.find('.clicked-photo')
 
-    $('.wpeo-modal.modal-photo.modal-active').removeClass('modal-active');
-    $(".risk-evaluation-photo-"+idToSave).find('.risk-evaluation-photo-single .filename').val(parent.find('.clicked-photo .filename').val());
-	$(".risk-evaluation-photo-"+idToSave).find('.risk-evaluation-photo-single img').attr('src' , parent.find('.clicked-photo img').attr('src'));
-	$('.clicked-photo').attr('style', '');
-	$('.clicked-photo').removeClass('clicked-photo');
+	window.eoxiaJS.loader.display(mediaLinked);
+
+	let filenames = ''
+	if (filesLinked.length > 0) {
+		filesLinked.each(function(  ) {
+			filenames += $( this ).find('.filename').val() + 'vVv'
+		});
+	}
+
+	$.ajax({
+		url: document.URL + "&action=addFiles&riskassessment_id="+idToSave+"&filenames="+filenames,
+		type: "POST",
+		processData: false,
+		contentType: false,
+		success: function ( ) {
+			$('.wpeo-loader').removeClass('wpeo-loader')
+			parent.removeClass('modal-active')
+			mediaLinked.load(document.URL + ' .risk-evaluation-medias-'+idToSave)
+		}
+	});
+    //$('.wpeo-modal.modal-photo.modal-active').removeClass('modal-active');
+    //$(".risk-evaluation-photo-"+idToSave).find('.risk-evaluation-photo-single .filename').val(parent.find('.clicked-photo .filename').val());
+	//$(".risk-evaluation-photo-"+idToSave).find('.risk-evaluation-photo-single img').attr('src' , parent.find('.clicked-photo img').attr('src'));
+	//$('.clicked-photo').attr('style', '');
+	//$('.clicked-photo').removeClass('clicked-photo');
 };
 
 /**
@@ -2827,6 +2856,7 @@ window.eoxiaJS.mediaGallery.init = function() {
  */
 window.eoxiaJS.mediaGallery.event = function() {
 	jQuery( document ).on( 'click', '.media-gallery-unlink', window.eoxiaJS.mediaGallery.unlinkFile );
+	jQuery( document ).on( 'click', '.media-gallery-favorite', window.eoxiaJS.mediaGallery.addToFavorite );
 }
 
 /**
@@ -2855,6 +2885,49 @@ window.eoxiaJS.mediaGallery.unlinkFile = function( event ) {
 		success: function ( ) {
 			$('.wpeo-loader').removeClass('wpeo-loader')
 			mediaContainer.hide()
+		}
+	});
+};
+
+/**
+ * Action send photo.
+ *
+ * @since   1.0.0
+ * @version 1.0.0
+ *
+ * @return {void}
+ */
+window.eoxiaJS.mediaGallery.addToFavorite = function( event ) {
+
+	event.preventDefault()
+	let riskassessment_id = $(this).find('.riskassessment-id').val()
+	let filename = $(this).find('.filename').val()
+	let querySeparator = '?'
+	let mediaContainer = $(this).closest('.media-container')
+	let mediaLinked = $('.risk-evaluation-medias-'+riskassessment_id)
+	let riskAssessmenModalPhoto = $(this).closest('.modal-container').find('.risk-evaluation-photo-'+riskassessment_id)
+	let riskAssessmenSinglePhoto = $('.risk-evaluation-photo-single-'+riskassessment_id)
+	let riskAssessmenLastEvaluationPhoto = $('.risk-evaluation-photo-last-'+riskassessment_id)
+	let riskAssessmenListEvaluationPhoto = $('.risk-evaluation-photo-list-single-'+riskassessment_id)
+	let saveButton = $(this).closest('.modal-container').find('.risk-evaluation-save')
+	document.URL.match('/?/') ? querySeparator = '&' : 1
+	saveButton.addClass('button-disable')
+	window.eoxiaJS.loader.display(mediaContainer);
+
+	$.ajax({
+		url: document.URL + querySeparator + "action=addToFavorite&riskassessment_id="+riskassessment_id+"&filename="+filename,
+		type: "POST",
+		processData: false,
+		success: function ( ) {
+			riskAssessmenModalPhoto.load(document.URL + ' .risk-evaluation-photo-'+riskassessment_id)
+			riskAssessmenSinglePhoto.load(document.URL + ' .risk-evaluation-photo-single-'+riskassessment_id)
+			mediaLinked.load(document.URL + ' .risk-evaluation-medias-'+riskassessment_id)
+			riskAssessmenLastEvaluationPhoto.load(document.URL + ' .risk-evaluation-photo-last-'+riskassessment_id)
+			riskAssessmenListEvaluationPhoto.load(document.URL + ' .risk-evaluation-photo-list-single-'+riskassessment_id)
+			saveButton.removeClass('button-disable')
+//on pourrait tous leur donner la même classe pour directement les récupérer et changer leur valeurs avec le nouveau nom d'image, sans avoir a faire 10000 loads
+			$('.wpeo-loader').removeClass('wpeo-loader')
+
 		}
 	});
 };
