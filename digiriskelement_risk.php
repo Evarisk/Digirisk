@@ -659,6 +659,7 @@ if (empty($reshook)) {
 		$riskassessment->fetch($riskassessment_id);
 		$pathToEvaluationPhoto = $conf->digiriskdolibarr->multidir_output[$conf->entity] .'/riskassessment/' . $riskassessment->ref;
 
+
 		$files = dol_dir_list($pathToEvaluationPhoto);
 
 		foreach ($files as $file) {
@@ -674,7 +675,10 @@ if (empty($reshook)) {
 				unlink($file['fullname']);
 			}
 		}
-
+		if ($riskassessment->photo == $filename) {
+			$riskassessment->photo = '';
+			$riskassessment->update($user, true);
+		}
 		$urltogo = str_replace('__ID__', $riskassessment_id, $backtopage);
 		$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
 		header("Location: ".$urltogo);

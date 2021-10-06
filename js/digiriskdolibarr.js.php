@@ -1025,6 +1025,13 @@ window.eoxiaJS.photo.savePhoto = function( event ) {
 			filenames += $( this ).find('.filename').val() + 'vVv'
 		});
 	}
+	let favorite = filenames
+	favorite = favorite.split('vVv')[0]
+	let filepath = $('.filepath-to-riskassessment')[0].value
+	let riskAssessmentPhoto = $('.risk-evaluation-photo-'+idToSave)
+	let newPhoto = filepath + favorite.replace(/\./, '_small.')
+	console.log(filepath)
+	console.log(newPhoto)
 
 	$.ajax({
 		url: document.URL + "&action=addFiles&riskassessment_id="+idToSave+"&filenames="+filenames,
@@ -1034,7 +1041,12 @@ window.eoxiaJS.photo.savePhoto = function( event ) {
 		success: function ( ) {
 			$('.wpeo-loader').removeClass('wpeo-loader')
 			parent.removeClass('modal-active')
+			riskAssessmentPhoto.each( function() {
+				$(this).find('.clicked-photo-preview').attr('src',newPhoto )
+			});
+
 			mediaLinked.load(document.URL + ' .risk-evaluation-medias-'+idToSave)
+
 		}
 	});
     //$('.wpeo-modal.modal-photo.modal-active').removeClass('modal-active');
@@ -2875,6 +2887,16 @@ window.eoxiaJS.mediaGallery.unlinkFile = function( event ) {
 	let querySeparator = '?'
 	let mediaContainer = $(this).closest('.media-container')
 	document.URL.match('/?/') ? querySeparator = '&' : 1
+	let previousPhoto = $(this).closest('.modal-container').find('.risk-evaluation-photo .clicked-photo-preview')
+	let previousName = previousPhoto[0].src.trim().split(/thumbs%2F/)[1].split(/"/)[0]
+	let newPhoto = ''
+	let riskAssessmentPhoto = $('.risk-evaluation-photo-'+riskassessment_id)
+
+	if (previousName == filename.replace(/\./, '_small.')) {
+		newPhoto = previousPhoto[0].src.replace(previousName, '')
+	} else {
+		newPhoto = previousPhoto[0].src
+	}
 
 	window.eoxiaJS.loader.display(mediaContainer);
 
@@ -2884,6 +2906,9 @@ window.eoxiaJS.mediaGallery.unlinkFile = function( event ) {
 		processData: false,
 		success: function ( ) {
 			$('.wpeo-loader').removeClass('wpeo-loader')
+			riskAssessmentPhoto.each( function() {
+				$(this).find('.clicked-photo-preview').attr('src',newPhoto )
+			});
 			mediaContainer.hide()
 		}
 	});
@@ -2912,7 +2937,7 @@ window.eoxiaJS.mediaGallery.addToFavorite = function( event ) {
 	//change star button style
 	let previousFavorite = $(this).closest('.modal-container').find('.fas.fa-star')
 	let newFavorite = $(this).find('.far.fa-star')
-	let previousPhoto = previousFavorite.closest('.media-container').find('.clicked-photo-preview')
+	let previousPhoto = $(this).closest('.modal-container').find('.risk-evaluation-photo .clicked-photo-preview')
 
 	previousFavorite.removeClass('fas')
 	previousFavorite.addClass('far')
@@ -2931,8 +2956,12 @@ window.eoxiaJS.mediaGallery.addToFavorite = function( event ) {
 		type: "POST",
 		processData: false,
 		success: function ( ) {
-			let newPhoto = previousPhoto[0].src.trim().replace(previousName, filename.replace(/\./, '_small.'))
-
+			let newPhoto = ''
+			if (previousName.length > 0 ) {
+				 newPhoto = previousPhoto[0].src.trim().replace(previousName , filename.replace(/\./, '_small.'))
+			} else {
+				 newPhoto = previousPhoto[0].src.trim() + filename.replace(/\./, '_small.')
+			}
 			riskAssessmentPhoto.each( function() {
 				$(this).find('.clicked-photo-preview').attr('src',newPhoto )
 			});
