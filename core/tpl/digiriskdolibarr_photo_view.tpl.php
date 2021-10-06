@@ -41,7 +41,7 @@ if (empty($conf) || !is_object($conf))
 		$pathToThumb = DOL_URL_ROOT.'/viewimage.php?modulepart=digiriskdolibarr&entity='.$conf->entity.'&file='.urlencode($cotation->element.'/'.$cotation->ref . '/thumbs/');
 		$nophoto = '/public/theme/common/nophoto.png'; ?>
 		<!-- BUTTON RISK EVALUATION PHOTO MODAL -->
-		<div class="action risk-evaluation-photo default-photo modal-open risk-evaluation-photo-<?php echo $cotation->id ?>" value="<?php echo $cotation->id ?>">
+		<div class="action risk-evaluation-photo default-photo modal-open risk-evaluation-photo-<?php echo $cotation->id > 0 ?  $cotation->id :  0 ;?>">
 			<?php if (isset($cotation->photo)) {
 				$filearray = dol_dir_list($conf->digiriskdolibarr->multidir_output[$conf->entity].'/'.$cotation->element.'/'.$cotation->ref, "files", 0, '', '(\.odt|_preview.*\.png)$', 'position_name', 'asc', 1);
 				if (count($filearray)) {
@@ -56,16 +56,17 @@ if (empty($conf) || !is_object($conf))
 				} else {
 					$nophoto = '/public/theme/common/nophoto.png'; ?>
 					<span class="floatleft inline-block valignmiddle divphotoref risk-evaluation-photo-single">
-						<input type="hidden" value="<?php echo $path ?>">
+						<input class="filepath-to-riskassessment" type="hidden" value="<?php echo $pathToThumb ?>">
 						<input class="filename" type="hidden" value="">
 						<img class="photodigiriskdolibarr clicked-photo-preview" alt="No photo" src="<?php echo DOL_URL_ROOT.$nophoto ?>">
 					</span>
 				<?php }
 			} else { ?>
 			<span class="floatleft inline-block valignmiddle divphotoref risk-evaluation-photo-single">
-				<input type="hidden" value="<?php echo $path ?>">
+				<?php $pathToThumb = DOL_URL_ROOT.'/viewimage.php?modulepart=digiriskdolibarr&entity='.$conf->entity.'&file='.urlencode($cotation->element.'/tmp/'.$risk->ref . '/thumbs/');  ?>
+				<input class="filepath-to-riskassessment" type="hidden" value="<?php echo $pathToThumb ?>">
 				<input class="filename" type="hidden" value="">
-				<img class="photo maxwidth50"  src="<?php echo DOL_URL_ROOT.$nophoto ?>">
+				<img class="clicked-photo-preview photo maxwidth50"  src="<?php echo DOL_URL_ROOT.$nophoto ?>">
 			</span>
 			<?php } ?>
 		</div>

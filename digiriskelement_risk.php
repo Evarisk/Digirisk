@@ -612,11 +612,18 @@ if (empty($reshook)) {
 	if (!$error && $action == "addFiles" && $permissiontodelete) {
 
 		$riskassessment_id = GETPOST('riskassessment_id');
+		$risk_id = GETPOST('risk_id');
 		$filenames = GETPOST('filenames');
 		$riskassessment = new RiskAssessment($db);
+		$risktmp = new Risk($db);
+		$risktmp->fetch($risk_id);
 		$riskassessment->fetch($riskassessment_id);
-		$pathToEvaluationPhoto = $conf->digiriskdolibarr->multidir_output[$conf->entity] .'/riskassessment/' . $riskassessment->ref;
-		$filenames = preg_split('/vVv/',$filenames);
+		if (dol_strlen($riskassessment->ref) > 0) {
+			$pathToEvaluationPhoto = $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessment/' . $riskassessment->ref;
+		} else {
+			$pathToEvaluationPhoto = $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessment/tmp/' . $risktmp->ref;
+		}
+		$filenames = preg_split('/vVv/', $filenames);
 		array_pop($filenames);
 
 		if ( !(empty($filenames))) {
@@ -629,8 +636,6 @@ if (empty($reshook)) {
 				if (is_file( DOL_DATA_ROOT .$entity. '/ecm/digiriskdolibarr/medias/' . $filename)) {
 
 					$pathToECMPhoto =  DOL_DATA_ROOT .$entity. '/ecm/digiriskdolibarr/medias/' . $filename;
-
-					$pathToEvaluationPhoto = DOL_DATA_ROOT . $entity . '/digiriskdolibarr/riskassessment/' . $riskassessment->ref;
 
 					if (!is_dir($pathToEvaluationPhoto)) {
 						mkdir($pathToEvaluationPhoto);
