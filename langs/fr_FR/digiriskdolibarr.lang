@@ -91,6 +91,7 @@ HasNotBeenDeletedF = n'a pas été supprimée
 HasNotBeenDeletedM = n'a pas été supprimé
 
 DigiriskDolibarrArea = Bienvenue sur DigiRisk
+WarningDigiriskNotUpdated = Veuillez mettre à jour votre Digirisk en désactivant et réactivant le module en vous rendant sur :
 
 #
 # Diaporama page index

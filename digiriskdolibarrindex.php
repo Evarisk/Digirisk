@@ -106,6 +106,15 @@ llxHeader("", $langs->trans("DigiriskDolibarrArea") . ' ' . $digirisk->version, 
 print load_fiche_titre($langs->trans("DigiriskDolibarrArea") . ' ' . $digirisk->version, '', 'digiriskdolibarr32px.png@digiriskdolibarr');
 ?>
 
+<?php if ($conf->global->DIGIRISKDOLIBARR_VERSION < $digirisk->version) : ?>
+<div class="wpeo-notice notice-warning">
+	<div class="notice-content">
+		<div class="notice-subtitle"><?php echo $langs->trans("WarningDigiriskNotUpdated"); ?>
+			<a href="<?php echo DOL_URL_ROOT.'/admin/modules.php?mainmenu=home'?>" target="_blank"><?php echo DOL_URL_ROOT.'/admin/modules.php?mainmenu=home'?></a>
+		</div>
+	</div>
+</div>
+<?php endif; ?>
 <div class="wpeo-notice notice-info">
 	<div class="notice-content">
 		<div class="notice-subtitle"><?php echo $langs->trans("DigiriskIndexNotice1"); ?></div>
