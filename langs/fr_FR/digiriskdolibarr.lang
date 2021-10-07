@@ -752,6 +752,8 @@ NoFileLinked = Pas de photo liée
 AddRiskAssessment = Ajouter une évaluation du risque
 AddRiskAssessmentTask = Ajouter une tâche au risque
 ListRiskAssessmentTask = Liste des tâches du risque
+ShowRiskAssessmentDate = Date des évaluations
+ShowRiskAssessmentDateDescription = Afficher la date des évaluations
 
 
 

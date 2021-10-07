@@ -22,3 +22,5 @@ ALTER TABLE `llx_digiriskdolibarr_digiriskelement` CHANGE `status` `status` SMAL
 ALTER TABLE `llx_digiriskdolibarr_risksign` CHANGE `status` `status` SMALLINT(6) NULL DEFAULT '1';
 ALTER TABLE `llx_digiriskdolibarr_evaluator` CHANGE `status` `status` SMALLINT(6) NULL DEFAULT '1';
 ALTER TABLE `llx_digiriskdolibarr_risk` CHANGE `status` `status` SMALLINT(6) NULL DEFAULT '1';
+
+ALTER TABLE llx_digiriskdolibarr_riskassessment ADD date_riskassessment datetime;

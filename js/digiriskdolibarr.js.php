@@ -1391,6 +1391,12 @@ window.eoxiaJS.risk.createRisk = function ( event ) {
 		commentPost = '&evaluationComment=' + encodeURI(comment);
 	}
 
+	var date = elementEvaluation.find('#RiskAssessmentDate').val();
+	var datePost = '';
+	if (date !== '') {
+		datePost = '&riskAssessmentDate=' + encodeURI(date);
+	}
+
 	var task = taskText;
 	var taskPost = '';
 	if (task !== '') {
@@ -1401,7 +1407,7 @@ window.eoxiaJS.risk.createRisk = function ( event ) {
 	window.eoxiaJS.loader.display($('.fichecenter'));
 
 	$.ajax({
-		url: document.URL + '&action=add' + categoryPost + descriptionPost + methodPost + cotationPost + criteres + photoPost + commentPost + taskPost,
+		url: document.URL + '&action=add' + categoryPost + descriptionPost + methodPost + cotationPost + criteres + photoPost + commentPost + datePost + taskPost,
 		type: "POST",
 		processData: false,
 		contentType: false,
@@ -1681,6 +1687,12 @@ window.eoxiaJS.evaluation.createEvaluation = function ( event ) {
 		commentPost = '&evaluationComment=' + encodeURI(comment);
 	}
 
+	var date = single.find('#RiskAssessmentDate').val();
+	var datePost = '';
+	if (date !== '') {
+		datePost = '&riskAssessmentDate=' + encodeURI(date);
+	}
+
 	var photo = single.find('.risk-evaluation-photo-single .filename').val();
 	var photoPost = '';
 	if (photo !== 0) {
@@ -1699,7 +1711,7 @@ window.eoxiaJS.evaluation.createEvaluation = function ( event ) {
 	window.eoxiaJS.loader.display($('.risk-evaluation-container-' + riskToAssign));
 
 	$.ajax({
-		url: document.URL + '&action=addEvaluation' + riskToAssignPost + methodPost + cotationPost + criteres + photoPost + commentPost,
+		url: document.URL + '&action=addEvaluation' + riskToAssignPost + methodPost + cotationPost + criteres + photoPost + commentPost + datePost,
 		type: "POST",
 		processData: false,
 		contentType: false,
@@ -1831,6 +1843,12 @@ window.eoxiaJS.evaluation.saveEvaluation = function ( event ) {
 		commentPost = '&evaluationComment=' + encodeURI(comment);
 	}
 
+	var date = element.find('#RiskAssessmentDate').val();
+	var datePost = '';
+	if (date !== '') {
+		datePost = '&riskAssessmentDate=' + encodeURI(date);
+	}
+
 	var photo = element.find('.risk-evaluation-photo .filename').val();
 	var photoPost = '';
 	if (photo !== 0) {
@@ -1847,7 +1865,7 @@ window.eoxiaJS.evaluation.saveEvaluation = function ( event ) {
 	window.eoxiaJS.loader.display($(this));
 	window.eoxiaJS.loader.display(listModalContainer.find('.modal-content .risk-evaluations-list-content'))
 	$.ajax({
-		url: document.URL + '&action=saveEvaluation&evaluationID=' + evaluationID +  methodPost + cotationPost + criteres + photoPost + commentPost,
+		url: document.URL + '&action=saveEvaluation&evaluationID=' + evaluationID +  methodPost + cotationPost + criteres + photoPost + commentPost + datePost,
 		type: "POST",
 		processData: false,
 		contentType: false,

@@ -22,15 +22,17 @@ if (!$error && $action == 'add' && $permissiontoadd) {
 		if ($result > 0) {
 			$lastRiskAdded = $risk->ref;
 
-			$evaluationComment 	= GETPOST('evaluationComment',  'restricthtml');
+			$evaluationComment  = GETPOST('evaluationComment',  'restricthtml');
+			$riskAssessmentDate = GETPOST('riskAssessmentDate');
 
-			$evaluation->photo       = $photo;
-			$evaluation->cotation    = $cotation;
-			$evaluation->fk_risk     = $risk->id;
-			$evaluation->status      = 1;
-			$evaluation->method      = $method;
-			$evaluation->ref         = $refEvaluationMod->getNextValue($evaluation);
-			$evaluation->comment     = $evaluationComment;
+			$evaluation->photo               = $photo;
+			$evaluation->cotation            = $cotation;
+			$evaluation->fk_risk             = $risk->id;
+			$evaluation->status              = 1;
+			$evaluation->method              = $method;
+			$evaluation->ref                 = $refEvaluationMod->getNextValue($evaluation);
+			$evaluation->comment             = $evaluationComment;
+			$evaluation->date_riskassessment = strtotime(preg_replace('/\//', '-',$riskAssessmentDate));
 
 			if ($method == 'advanced') {
 				$formation  = GETPOST('formation');
@@ -199,23 +201,25 @@ if (!$error && ($massaction == 'delete' || ($action == 'delete' && $confirm == '
 }
 
 if (!$error && $action == 'addEvaluation' && $permissiontoadd) {
-	$evaluationComment = GETPOST('evaluationComment', 'restricthtml');
-	$riskID            = GETPOST('riskToAssign');
-	$cotation          = GETPOST('cotation');
-	$method            = GETPOST('cotationMethod');
-	$photo             = GETPOST('photo');
+	$evaluationComment  = GETPOST('evaluationComment', 'restricthtml');
+	$riskAssessmentDate = GETPOST('riskAssessmentDate');
+	$riskID             = GETPOST('riskToAssign');
+	$cotation           = GETPOST('cotation');
+	$method             = GETPOST('cotationMethod');
+	$photo              = GETPOST('photo');
 
 	$risktmp = new Risk($db);
 	$risktmp->fetch($riskID);
 	$risk->fetch($riskID);
 
-	$evaluation->photo    = $photo;
-	$evaluation->cotation = $cotation;
-	$evaluation->fk_risk  = $risk->id;
-	$evaluation->status   = 1;
-	$evaluation->method   = $method;
-	$evaluation->ref      = $refEvaluationMod->getNextValue($evaluation);
-	$evaluation->comment  = $evaluationComment;
+	$evaluation->photo               = $photo;
+	$evaluation->cotation            = $cotation;
+	$evaluation->fk_risk             = $risk->id;
+	$evaluation->status              = 1;
+	$evaluation->method              = $method;
+	$evaluation->ref                 = $refEvaluationMod->getNextValue($evaluation);
+	$evaluation->comment             = $evaluationComment;
+	$evaluation->date_riskassessment = strtotime(preg_replace('/\//', '-',$riskAssessmentDate));
 
 	if ($method == 'advanced') {
 		$formation  = GETPOST('formation');
@@ -280,16 +284,18 @@ if (!$error && $action == 'addEvaluation' && $permissiontoadd) {
 }
 
 if (!$error && $action == 'saveEvaluation' && $permissiontoadd) {
-	$evaluationID      = GETPOST('evaluationID');
-	$cotation          = GETPOST('cotation');
-	$method            = GETPOST('cotationMethod');
-	$evaluationComment = GETPOST('evaluationComment', 'restricthtml');
+	$evaluationID       = GETPOST('evaluationID');
+	$cotation           = GETPOST('cotation');
+	$method             = GETPOST('cotationMethod');
+	$evaluationComment  = GETPOST('evaluationComment', 'restricthtml');
+	$riskAssessmentDate = GETPOST('riskAssessmentDate');
 
 	$evaluation->fetch($evaluationID);
 
-	$evaluation->cotation = $cotation;
-	$evaluation->method   = $method;
-	$evaluation->comment  = $evaluationComment;
+	$evaluation->cotation            = $cotation;
+	$evaluation->method              = $method;
+	$evaluation->comment             = $evaluationComment;
+	$evaluation->date_riskassessment = strtotime(preg_replace('/\//', '-',$riskAssessmentDate));
 
 	if ($method == 'advanced') {
 		$formation  = GETPOST('formation');

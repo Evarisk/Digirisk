@@ -24,7 +24,7 @@ if (!empty ($lastEvaluation) && $lastEvaluation > 0) {
 						<!-- BUTTON MODAL RISK EVALUATION LIST  -->
 						<span class="risk-evaluation-reference" value="<?php echo $risk->id ?>"><?php echo $lastEvaluation->ref; ?></span>
 						<span class="risk-evaluation-date">
-							<i class="fas fa-calendar-alt"></i> <?php echo date('d/m/Y', $lastEvaluation->date_creation); ?>
+							<i class="fas fa-calendar-alt"></i> <?php echo date('d/m/Y', (($conf->global->DIGIRISKDOLIBARR_SHOW_RISKASSESSMENT_DATE && (!empty($lastEvaluation->date_riskassessment))) ? $lastEvaluation->date_riskassessment : $lastEvaluation->date_creation)); ?>
 						</span>
 					</div>
 					<div class="risk-evaluation-comment">
@@ -186,6 +186,12 @@ if (!empty ($lastEvaluation) && $lastEvaluation > 0) {
 											<?php print '<textarea name="evaluationComment'. $cotation->id .'" rows="'.ROWS_2.'">'.$cotation->comment.'</textarea>'."\n"; ?>
 										</div>
 									</div>
+									<?php if ($conf->global->DIGIRISKDOLIBARR_SHOW_RISKASSESSMENT_DATE) : ?>
+										<div class="risk-evaluation-date">
+											<span class="title"><?php echo $langs->trans('Date'); ?></span>
+											<?php print $form->selectDate($lastEvaluation->date_riskassessment, 'RiskAssessmentDate', 0, 0, 0, '', 1, 1); ?>
+										</div>
+									<?php endif; ?>
 									<div class="risk-evaluation-medias risk-evaluation-medias-<?php echo $cotation->id ?> risk-<?php echo $risk->id ?>">
 										<div class="medias"><i class="fas fa-picture-o"></i><?php echo $langs->trans('Medias'); ?></div>
 										<?php
@@ -295,7 +301,7 @@ if (!empty ($lastEvaluation) && $lastEvaluation > 0) {
 													<div class="risk-evaluation-data">
 														<span class="risk-evaluation-reference"><?php echo $cotation->ref; ?></span>
 														<span class="risk-evaluation-date">
-															<i class="fas fa-calendar-alt"></i> <?php echo date('d/m/Y', $cotation->date_creation); ?>
+															<i class="fas fa-calendar-alt"></i> <?php echo date('d/m/Y', (($conf->global->DIGIRISKDOLIBARR_SHOW_RISKASSESSMENT_DATE && (!empty($cotation->date_riskassessment))) ? $cotation->date_riskassessment : $cotation->date_creation)); ?>
 														</span>
 													</div>
 													<div class="risk-evaluation-comment">
@@ -478,8 +484,13 @@ $cotation->method = $lastEvaluation->method ? $lastEvaluation->method : "standar
 							<span class="title"><i class="fas fa-comment-dots"></i> <?php echo $langs->trans('Comment'); ?></span>
 							<?php print '<textarea name="evaluationComment'. $risk->id .'" rows="'.ROWS_2.'">'.('').'</textarea>'."\n"; ?>
 						</div>
-
 					</div>
+					<?php if ($conf->global->DIGIRISKDOLIBARR_SHOW_RISKASSESSMENT_DATE) : ?>
+						<div class="risk-evaluation-date">
+							<span class="title"><?php echo $langs->trans('Date'); ?></span>
+							<?php print $form->selectDate('', 'RiskAssessmentDate', 0, 0, 0, '', 1, 1); ?>
+						</div>
+					<?php endif; ?>
 					<div class="risk-evaluation-medias risk-evaluation-medias-0 risk-<?php echo $risk->id ?>">
 						<div class="medias"><i class="fas fa-picture-o"></i><?php echo $langs->trans('Medias'); ?></div>
 						<?php
@@ -511,14 +522,14 @@ $cotation->method = $lastEvaluation->method ? $lastEvaluation->method : "standar
 										<!-- BUTTON MODAL RISK EVALUATION LIST  -->
 										<span class="risk-evaluation-reference risk-evaluation-list" value="<?php echo $risk->id ?>"><?php echo $lastEvaluation->ref; ?></span>
 										<span class="risk-evaluation-date">
-											<i class="fas fa-calendar-alt"></i> <?php echo date('d/m/Y', $lastEvaluation->date_creation); ?>
+											<i class="fas fa-calendar-alt"></i> <?php echo date('d/m/Y', (($conf->global->DIGIRISKDOLIBARR_SHOW_RISKASSESSMENT_DATE && (!empty($lastEvaluation->date_riskassessment))) ? $lastEvaluation->date_riskassessment : $lastEvaluation->date_creation)); ?>
 										</span>
 									</div>
 									<div class="risk-evaluation-comment">
-														<span class="risk-evaluation-author">
-															<?php $user->fetch($lastEvaluation->fk_user_creat); ?>
-															<?php echo getNomUrl( 0, '', 0, 0, 2 , 0,'','',-1, $user); ?>
-														</span>
+										<span class="risk-evaluation-author">
+											<?php $user->fetch($lastEvaluation->fk_user_creat); ?>
+											<?php echo getNomUrl( 0, '', 0, 0, 2 , 0,'','',-1, $user); ?>
+										</span>
 										<?php echo dol_trunc($lastEvaluation->comment, 120); ?>
 									</div>
 								</div>

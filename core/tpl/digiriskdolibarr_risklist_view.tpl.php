@@ -443,6 +443,12 @@
 										<?php print '<textarea name="evaluationComment'. $risk->id .'" class="minwidth150" cols="50" rows="'.ROWS_2.'">'.('').'</textarea>'."\n"; ?>
 									</div>
 								</div>
+								<?php if ($conf->global->DIGIRISKDOLIBARR_SHOW_RISKASSESSMENT_DATE) : ?>
+									<div class="risk-evaluation-date">
+										<span class="title"><?php echo $langs->trans('Date'); ?></span>
+										<?php print $form->selectDate('', 'RiskAssessmentDate', 0, 0, 0, '', 1, 1); ?>
+									</div>
+								<?php endif; ?>
 							</div>
 						</div>
 					</div>
@@ -596,6 +602,12 @@
 								<?php print '<textarea name="evaluationComment'. $risk->id .'" class="minwidth150" rows="'.ROWS_2.'">'.('').'</textarea>'."\n"; ?>
 							</div>
 						</div>
+						<?php if ($conf->global->DIGIRISKDOLIBARR_SHOW_RISKASSESSMENT_DATE) : ?>
+							<div class="risk-evaluation-date">
+								<span class="title"><?php echo $langs->trans('Date'); ?></span>
+								<?php print $form->selectDate('', 'RiskAssessmentDate', 0, 0, 0, '', 1, 1); ?>
+							</div>
+						<?php endif; ?>
 					</div>
 					<?php if ($conf->global->DIGIRISKDOLIBARR_TASK_MANAGEMENT) : ?>
 						<div class="riskassessment-task">
