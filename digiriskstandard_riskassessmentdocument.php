@@ -69,6 +69,7 @@ $upload_dir = $conf->digiriskdolibarr->multidir_output[isset($conf->entity) ? $c
 $permissiontoread   = $user->rights->digiriskdolibarr->riskassessmentdocument->read;
 $permissiontoadd    = $user->rights->digiriskdolibarr->riskassessmentdocument->write;
 $permissiontodelete = $user->rights->digiriskdolibarr->riskassessmentdocument->delete;
+$permtoupload       = $user->rights->ecm->upload;
 
 if (!$permissiontoread) accessforbidden();
 
@@ -241,30 +242,56 @@ if (empty($reshook)) {
 			}
 		}
 	}
-}
 
-// Delete file in doc form
-if ($action == 'remove_file' && $permissiontodelete) {
-	if (!empty($upload_dir)) {
-		require_once DOL_DOCUMENT_ROOT.'/core/lib/files.lib.php';
+	// Delete file in doc form
+	if ($action == 'remove_file' && $permissiontodelete) {
+		if (!empty($upload_dir)) {
+			require_once DOL_DOCUMENT_ROOT.'/core/lib/files.lib.php';
 
-		$langs->load("other");
-		$filetodelete = GETPOST('file', 'alpha');
-		$file = $upload_dir.'/'.$filetodelete;
-		$ret = dol_delete_file($file, 0, 0, 0, $object);
-		if ($ret) setEventMessages($langs->trans("FileWasRemoved", $filetodelete), null, 'mesgs');
-		else setEventMessages($langs->trans("ErrorFailToDeleteFile", $filetodelete), null, 'errors');
+			$langs->load("other");
+			$filetodelete = GETPOST('file', 'alpha');
+			$file = $upload_dir.'/'.$filetodelete;
+			$ret = dol_delete_file($file, 0, 0, 0, $object);
+			if ($ret) setEventMessages($langs->trans("FileWasRemoved", $filetodelete), null, 'mesgs');
+			else setEventMessages($langs->trans("ErrorFailToDeleteFile", $filetodelete), null, 'errors');
 
-		// Make a redirect to avoid to keep the remove_file into the url that create side effects
-		$urltoredirect = $_SERVER['REQUEST_URI'];
-		$urltoredirect = preg_replace('/#builddoc$/', '', $urltoredirect);
-		$urltoredirect = preg_replace('/action=remove_file&?/', '', $urltoredirect);
+			// Make a redirect to avoid to keep the remove_file into the url that create side effects
+			$urltoredirect = $_SERVER['REQUEST_URI'];
+			$urltoredirect = preg_replace('/#builddoc$/', '', $urltoredirect);
+			$urltoredirect = preg_replace('/action=remove_file&?/', '', $urltoredirect);
 
-		header('Location: '.$urltoredirect);
-		exit;
+			header('Location: '.$urltoredirect);
+			exit;
+		}
+		else {
+			setEventMessages('BugFoundVarUploaddirnotDefined', null, 'errors');
+		}
 	}
-	else {
-		setEventMessages('BugFoundVarUploaddirnotDefined', null, 'errors');
+
+	// Submit file
+	if (GETPOST('sendit', 'alpha') && !empty($conf->global->MAIN_UPLOAD_DOC)) {
+		if (!empty($_FILES)) {
+			if (is_array($_FILES['userfile']['tmp_name'])) $userfiles = $_FILES['userfile']['tmp_name'];
+			else $userfiles = array($_FILES['userfile']['tmp_name']);
+
+			foreach ($userfiles as $key => $userfile) {
+				if (empty($_FILES['userfile']['tmp_name'][$key])) {
+					$error++;
+					if ($_FILES['userfile']['error'][$key] == 1 || $_FILES['userfile']['error'][$key] == 2) {
+						setEventMessages($langs->trans('ErrorFileSizeTooLarge'), null, 'errors');
+					} else {
+						setEventMessages($langs->trans("ErrorFieldRequired", $langs->transnoentitiesnoconv("File")), null, 'errors');
+					}
+				}
+			}
+
+			if (!$error) {
+				$filedir = $upload_dir . '/riskassessmentdocument/';
+				if (!empty($filedir)) {
+					$result = dol_add_file_process($filedir, 0, 1, 'userfile', '', null, '', 1, $object);
+				}
+			}
+		}
 	}
 }
 
@@ -304,35 +331,6 @@ print '<table class="border centpercent tableforfield">' . "\n";
 
 //JSON Decode and show fields
 require_once './core/tpl/digiriskdolibarr_riskassessmentdocumentfields_view.tpl.php';
-
-print '</table>';
-print '</div>';
-
-// Buttons for actions
-print '<div class="tabsAction" >' . "\n";
-$parameters = array();
-$reshook = $hookmanager->executeHooks('addMoreActionsButtons', $parameters, $object, $action); // Note that $action and $object may have been modified by hook
-if ($reshook < 0) setEventMessages($hookmanager->error, $hookmanager->errors, 'errors');
-
-if (empty($reshook)) {
-	// Modify
-	if ($permissiontoadd) {
-		if ( $action == 'edit' ) {
-			print '<input type="submit" class="button" name="save" value="' . $langs->trans("Save") . '">';
-		} else {
-			print '<a class="butAction" id="actionButtonEdit" href="' . $_SERVER["PHP_SELF"] . '?action=edit">' . $langs->trans("Modify") . '</a>' . "\n";
-		}
-	} else {
-		if ( $action == 'edit' ) {
-			print '<a class="butActionRefused classfortooltip" href="#" title="' . dol_escape_htmltag($langs->trans("NotEnoughPermissions")) . '">' . $langs->trans('Save') . '</a>' . "\n";
-		} else {
-			print '<a class="butActionRefused classfortooltip" href="#" title="' . dol_escape_htmltag($langs->trans("NotEnoughPermissions")) . '">' . $langs->trans('Modify') . '</a>' . "\n";
-		}
-	}
-}
-
-print '</div>';
-print '</form>';
 
 print dol_get_fiche_end();
 

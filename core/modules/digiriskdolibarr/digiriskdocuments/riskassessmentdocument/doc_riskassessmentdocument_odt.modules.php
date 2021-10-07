@@ -276,10 +276,14 @@ class doc_riskassessmentdocument_odt extends ModeleODTRiskAssessmentDocument
 			$parameters = array('odfHandler'=>&$odfHandler, 'file'=>$file, 'object'=>$object, 'outputlangs'=>$outputlangs, 'substitutionarray'=>&$tmparray);
 			$reshook = $hookmanager->executeHooks('ODTSubstitution', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
 
+			$filearray = dol_dir_list($conf->digiriskdolibarr->multidir_output[$conf->entity].'/riskassessmentdocument/', "files", 0, '', '(\.odt|\.zip)', 'date', 'asc', 1);
+			$sitePlans = array_shift($filearray);
+			$tmparray['dispoDesPlans'] = $sitePlans['path'] . '/thumbs/' .preg_replace('/\./', '_small.',$sitePlans['name']);
+
 			foreach ($tmparray as $key=>$value)
 			{
 				try {
-					if (preg_match('/logo$/', $key)) // Image
+					if (preg_match('/logo$/', $key) || $key == 'dispoDesPlans') // Image
 					{
 						if (file_exists($value)) $odfHandler->setImage($key, $value);
 						else $odfHandler->setVars($key, $langs->transnoentities('ErrorFileNotFound'), true, 'UTF-8');

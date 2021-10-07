@@ -85,16 +85,28 @@ if ( $action == "edit" && $permissiontoadd ) {
 	$doleditor = new DolEditor('ImportantNote', $conf->global->DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_IMPORTANT_NOTES ? $conf->global->DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_IMPORTANT_NOTES : '', '', 90, 'dolibarr_notes', '', false, true, $conf->global->FCKEDITOR_ENABLE_SOCIETE, ROWS_3, '90%');
 	$doleditor->Create();
 	print '</td></tr>';
+	print '</table>';
+	print '<div class="tabsAction" >' . "\n";
+	// Modify
+	print '<input type="submit" class="button" name="save" value="' . $langs->trans("Save") . '">';
+	print '</form>';
+	print '</div>';
 
 // Disponibilité des plans
-
+	print '<div class="underbanner clearboth"></div>';
+	print '<table class="border centpercent tableforfield">' . "\n";
 	print '<tr>';
 	print '<td class="titlefield"><label for="SitePlans">' . $langs->trans("SitePlans") . '</label></td>';
 	print '<td>';
-	$doleditor = new DolEditor('SitePlans', $conf->global->DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_SITE_PLANS ? $conf->global->DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_SITE_PLANS : '', '', 90, 'dolibarr_notes', '', false, true, $conf->global->FCKEDITOR_ENABLE_SOCIETE, ROWS_3, '90%');
-	$doleditor->Create();
+	// To attach new file
+	if ((!empty($conf->use_javascript_ajax) && empty($conf->global->MAIN_ECM_DISABLE_JS))) {
+		print '<!-- Start form to attach new file in digiriskdolibarr_riskassessmentdocumentfields_view.tpl.php -->' . "\n";
+		include_once DOL_DOCUMENT_ROOT . '/core/class/html.formfile.class.php';
+		$formfile = new FormFile($db);
+		$formfile->form_attach_new_file($_SERVER["PHP_SELF"], 'none', 0, 0, $permtoupload, 48, $object, '', 0, '', 0, 'DataMigrationImport', '', '', 0);
+	}
+	// End "Add new file" area
 	print '</td></tr>';
-
 } else {
 	print '<tr>';
 	print '<td class="titlefield">' . $langs->trans("AuditStartDate") . '</td><td colspan="2">';
@@ -143,9 +155,32 @@ if ( $action == "edit" && $permissiontoadd ) {
 	print '<tr>';
 	print '<td class="titlefield">' . $langs->trans("SitePlans") . '</td>';
 	print '<td>';
-	print $conf->global->DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_SITE_PLANS;
-	print '</td></tr>';
+	$filearray = dol_dir_list($conf->digiriskdolibarr->multidir_output[$conf->entity].'/riskassessmentdocument/', "files", 0, '', '(\.odt|\.zip)', 'date', 'asc', 1);
+	if (count($filearray)) : ?>
+		<?php $file = array_shift($filearray); ?>
+		<span class="">
+			<?php print '<img class="" src="'.DOL_URL_ROOT.'/viewimage.php?modulepart=digiriskdolibarr&entity='.$conf->entity.'&file='.urlencode('/riskassessmentdocument/thumbs/'. preg_replace('/\./', '_small.',$file['name'])).'" >'; ?>
+		</span>
+	<?php else: ?>
+		<?php $nophoto = DOL_URL_ROOT.'/public/theme/common/nophoto.png'; ?>
+		<span class="">
+			<img class="" alt="No photo" src="<?php echo $nophoto ?>">
+		</span>
+	<?php endif; ?>
+	<?php print '</td></tr>';
+	print '</table>';
+	print '</div>';
+
+	// Buttons for actions
+	print '<div class="tabsAction" >' . "\n";
+	// Modify
+	if ($permissiontoadd) {
+		print '<a class="butAction" id="actionButtonEdit" href="' . $_SERVER["PHP_SELF"] . '?action=edit">' . $langs->trans("Modify") . '</a>' . "\n";
+	} else {
+		print '<a class="butActionRefused classfortooltip" href="#" title="' . dol_escape_htmltag($langs->trans("NotEnoughPermissions")) . '">' . $langs->trans('Modify') . '</a>' . "\n";
+	}
 }
+
 ?>
 
 <!-- END PHP TEMPLATE digiriskdolibarr_legaldisplayfields_view.tpl.php -->
