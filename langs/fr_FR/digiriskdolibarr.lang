@@ -930,6 +930,18 @@ TicketShowCompanyLogoHelp = Activez cette option pour masquer le logo de la soci
 
 
 #
+# Tools - Outils
+#
+
+# Data - Donnée
+Tools = Outils
+DigiriskDataMigration = Gestion des données de migration
+DataMigrationImport = Importation des données de migration de Digirisk
+DataMigrationImportDescription = Importation des données de l'arborecence de Digirisk WordPress au format JSON
+
+
+
+#
 # Other
 #
 

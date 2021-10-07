@@ -51,6 +51,13 @@ global $conf, $db, $langs, $user;
 // Load translation files required by the page
 $langs->loadLangs(array("digiriskdolibarr@digiriskdolibarr"));
 
+// Parameters
+$action     = GETPOST('action', 'alpha');
+$backtopage = GETPOST('backtopage', 'alpha');
+$value      = GETPOST('value', 'alpha');
+
+$error = 0;
+
 // Initialize technical objects
 $digiriskStandard     = new DigiriskStandard($db);
 $digiriskElement      = new DigiriskElement($db);
@@ -64,26 +71,44 @@ $refWorkUnitMod       = new $conf->global->DIGIRISKDOLIBARR_WORKUNIT_ADDON();
 $refRiskMod           = new $conf->global->DIGIRISKDOLIBARR_RISK_ADDON();
 $refRiskAssessmentMod = new $conf->global->DIGIRISKDOLIBARR_RISKASSESSMENT_ADDON();
 
+$upload_dir = $conf->digiriskdolibarr->multidir_output[isset($conf->entity) ? $conf->entity : 1];
 
 // Security check
-if (!$user->rights->digiriskdolibarr->lire) accessforbidden();
+$permissiontoread = $user->rights->digiriskdolibarr->adminpage->read;
+$permtoupload     = $user->rights->ecm->upload;
 
-$permtoupload = $user->rights->ecm->upload;
-
-// Parameters
-$action     = GETPOST('action', 'alpha');
-$backtopage = GETPOST('backtopage', 'alpha');
-$value      = GETPOST('value', 'alpha');
-
-$error = 0;
+if (!$user->rights->digiriskdolibarr->adminpage->read) accessforbidden();
 
 /*
  * Actions
  */
 
-if ($action == "dataMigrationImport" && !empty($conf->global->MAIN_UPLOAD_DOC)) {
+if (GETPOST('sendit', 'alpha') && !empty($conf->global->MAIN_UPLOAD_DOC)) {
+	// Submit file
+	if (!empty($_FILES)) {
+		if (is_array($_FILES['userfile']['tmp_name'])) $userfiles = $_FILES['userfile']['tmp_name'];
+		else $userfiles = array($_FILES['userfile']['tmp_name']);
 
-	$json = file_get_contents("C:/wamp64/www/dolibarr-13.0.2/documents/ecm/digiriskdolibarr/20211005123613_global_export.json");
+		foreach ($userfiles as $key => $userfile) {
+			if (empty($_FILES['userfile']['tmp_name'][$key])) {
+				$error++;
+				if ($_FILES['userfile']['error'][$key] == 1 || $_FILES['userfile']['error'][$key] == 2) {
+					setEventMessages($langs->trans('ErrorFileSizeTooLarge'), null, 'errors');
+				} else {
+					setEventMessages($langs->trans("ErrorFieldRequired", $langs->transnoentitiesnoconv("File")), null, 'errors');
+				}
+			}
+		}
+
+		if (!$error) {
+			$filedir = $upload_dir . '/temp/';
+			if (!empty($filedir)) {
+				$result = dol_add_file_process($filedir, 0, 1, 'userfile', '', null, '', 0, null);
+			}
+		}
+	}
+
+	$json = file_get_contents($filedir.$_FILES['userfile']['name'][0]);
 	$digiriskExportArray = json_decode($json, true);
 	$digiriskExportArray = array_shift($digiriskExportArray);
 
@@ -129,16 +154,6 @@ llxHeader("", $langs->trans("Tools"), $help_url, '', '', '', $morejs, $morecss);
 print load_fiche_titre($langs->trans("Tools"), '', 'wrench');
 
 if ($user->rights->digiriskdolibarr->adminpage->read) {
-	print '<form method="POST" id="DataMigrationImport" enctype="multipart/form-data" action="'.$_SERVER["PHP_SELF"]."\n";
-	print '<input type="hidden" name="token" value="'.newToken().'">';
-	print '<input type="hidden" name="formfilteraction" id="formfilteraction" value="list">';
-	print '<input type="hidden" name="action" value="list">';
-	print '<input type="hidden" name="id" value="'.$id.'">';
-	print '<input type="hidden" name="sortfield" value="'.$sortfield.'">';
-	print '<input type="hidden" name="sortorder" value="'.$sortorder.'">';
-	//print '<input type="hidden" name="page" value="'.$page.'">';
-	print '<input type="hidden" name="contextpage" value="'.$contextpage.'">';
-
 	print load_fiche_titre($langs->trans("DigiriskDataMigration"), '', '');
 
 	print '<table class="noborder centpercent">';
@@ -155,21 +170,17 @@ if ($user->rights->digiriskdolibarr->adminpage->read) {
 	print '</td>';
 
 	print '<td class="center data-migration-import">';
-
 	// To attach new file
 	if ((!empty($conf->use_javascript_ajax) && empty($conf->global->MAIN_ECM_DISABLE_JS)) || !empty($section)) {
-		$sectiondir = GETPOST('file', 'alpha') ? GETPOST('file', 'alpha') : GETPOST('section_dir', 'alpha');
-		print '<!-- Start form to attach new file in digiriskdolibarr_photo_view.tpl.tpl.php sectionid=' . $section . ' sectiondir=' . $sectiondir . ' -->' . "\n";
+		print '<!-- Start form to attach new file -->' . "\n";
 		include_once DOL_DOCUMENT_ROOT . '/core/class/html.formfile.class.php';
 		$formfile = new FormFile($db);
-		$formfile->form_attach_new_file($_SERVER["PHP_SELF"], 'none', 0, 0, $permtoupload, 48, null, '', 0, '', 0, 'DataMigrationImport', '', $sectiondir, 1);
-	} else print '&nbsp;';
+		$formfile->form_attach_new_file($_SERVER["PHP_SELF"], 'none', 0, 0, $permtoupload, 48, null, '', 0, '', 0, 'DataMigrationImport', '', '', 0);
+	}
 	// End "Add new file" area
-
 	print '</td>';
 	print '</tr>';
 	print '</table>';
-	print '</form>';
 }
 
 // End of page
