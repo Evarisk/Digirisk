@@ -334,8 +334,7 @@ class doc_listingrisksphoto_odt extends ModeleODTListingRisksPhoto
 											$tmparray['commentaireEvaluation'] = dol_print_date($lastEvaluation->date_creation, 'dayhoursec', 'tzuser') . ': ' . $lastEvaluation->comment;
 
 											if (dol_strlen($lastEvaluation->photo) && $lastEvaluation !== 'undefined') {
-												$entity = ($conf->entity > 1) ? '/' . $conf->entity : '';
-												$path = DOL_DATA_ROOT . $entity . '/digiriskdolibarr/riskassessment/' . $lastEvaluation->ref;
+												$path = $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessment/' . $lastEvaluation->ref;
 												$file_small = preg_split('/\./', $lastEvaluation->photo);
 												$new_file = $file_small[0] . '_small.' . $file_small[1];
 												$image = $path . '/thumbs/' . $new_file;
@@ -421,8 +420,7 @@ class doc_listingrisksphoto_odt extends ModeleODTListingRisksPhoto
 											$tmparray['commentaireEvaluation'] = dol_print_date($lastEvaluation->date_creation, 'dayhoursec', 'tzuser') . ': ' . $lastEvaluation->comment;
 
 											if (dol_strlen($lastEvaluation->photo) && $lastEvaluation !== 'undefined') {
-												$entity = ($conf->entity > 1) ? '/' . $conf->entity : '';
-												$path = DOL_DATA_ROOT . $entity . '/digiriskdolibarr/riskassessment/' . $lastEvaluation->ref;
+												$path = $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessment/' . $lastEvaluation->ref;
 												$file_small = preg_split('/\./', $lastEvaluation->photo);
 												$new_file = $file_small[0] . '_small.' . $file_small[1];
 												$image = $path . '/thumbs/' . $new_file;

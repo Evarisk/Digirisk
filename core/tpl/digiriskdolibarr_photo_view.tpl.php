@@ -27,8 +27,7 @@ if (empty($conf) || !is_object($conf))
 
 <!-- BEGIN PHP TEMPLATE core/tpl/digiriskdolibarr_photo_view.tpl.php -->
 
-<?php $permtoupload = $user->rights->ecm->upload; ?>
-
+<?php $permtoupload = $user->rights->ecm->upload;?>
 <div class="risk-evaluation-photo" value="<?php echo $risk->id ?>">
 	<span class="title"><?php echo $langs->trans('Photo'); ?></span>
 	<div class="risk-evaluation-photo-container wpeo-modal-event tooltip hover">
