@@ -310,6 +310,7 @@ PreventionPlanDocumentGeneratedWithDolibarr = Plan de prévention généré avec
 # Data - Donnée
 
 PreventionPlan = Plan de prévention
+PreventionPlanInitial = PPR
 PreventionPlanList = Liste des plans de prévention
 PreventionPlanLine = risque(s)
 PriorVisit = Inspection commune préalable
@@ -489,6 +490,7 @@ RiskAssessmentDocumentDigiriskTemplate = ODT par défaut des documents unique
 
 # Data - Donnée
 RiskAssessmentDocument = Document unique
+RiskAssessmentDocumentInitial = DU
 RiskAssessmentDocumentDU = Plan d'action Document Unique
 RiskAssessmentDocumentDescription = Description du plan d'action Document Unique
 

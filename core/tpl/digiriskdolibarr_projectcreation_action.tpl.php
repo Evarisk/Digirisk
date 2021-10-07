@@ -21,12 +21,17 @@ require_once DOL_DOCUMENT_ROOT.'/core/lib/date.lib.php';
 //Check projet
 if ($conf->global->DIGIRISKDOLIBARR_DU_PROJECT > 0) {
 	$project->fetch($conf->global->DIGIRISKDOLIBARR_DU_PROJECT);
+	//Backward compatibility
+	if ($project->title == $langs->trans('RiskAssessmentDocument')) {
+		$project->title = $langs->trans('RiskAssessmentDocumentInitial') . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
+		$project->update($user);
+	}
 }
 
 if ( $conf->global->DIGIRISKDOLIBARR_DU_PROJECT == 0 || $project->statut == 2 ) {
 
 	$project->ref         = $projectRef->getNextValue($third_party, $project);
-	$project->title       = $langs->trans('RiskAssessmentDocument');
+	$project->title       = $langs->trans('RiskAssessmentDocumentInitial') . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
 	$project->description = $langs->trans('RiskAssessmentDocumentDescription');
 	$project->date_c      = dol_now();
 	$currentYear          = dol_print_date(dol_now(),'%Y');
@@ -47,12 +52,17 @@ if ( $conf->global->DIGIRISKDOLIBARR_DU_PROJECT == 0 || $project->statut == 2 ) 
 
 if ($conf->global->DIGIRISKDOLIBARR_PREVENTIONPLAN_PROJECT > 0) {
 	$project->fetch($conf->global->DIGIRISKDOLIBARR_PREVENTIONPLAN_PROJECT);
+	//Backward compatibility
+	if ($project->title == $langs->trans('PreventionPlan')) {
+		$project->title       = $langs->trans('PreventionPlanInitial') . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
+		$project->update($user);
+	}
 }
 
 if ( $conf->global->DIGIRISKDOLIBARR_PREVENTIONPLAN_PROJECT == 0 || $project->statut == 2 ) {
 
 	$project->ref         = $projectRef->getNextValue($third_party, $project);
-	$project->title       = $langs->trans('PreventionPlan');
+	$project->title       = $langs->trans('PreventionPlanInitial') . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
 	$project->description = $langs->trans('PreventionPlanDescription');
 	$project->date_c      = dol_now();
 	$currentYear          = dol_print_date(dol_now(),'%Y');
