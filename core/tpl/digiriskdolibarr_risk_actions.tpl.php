@@ -480,6 +480,9 @@ if (!$error && $action == "addFiles" && $permissiontodelete) {
 	array_pop($filenames);
 
 	if ( !(empty($filenames))) {
+		if (!is_dir($conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessment/tmp/')) {
+			dol_mkdir($conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessment/tmp/');
+		}
 		$riskassessment->photo = $filenames[0];
 
 		foreach ($filenames as $filename) {
