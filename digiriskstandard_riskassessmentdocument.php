@@ -117,6 +117,33 @@ if (empty($reshook)) {
 		dolibarr_set_const($db, "DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_METHOD", $method, 'chaine', 0, '', $conf->entity);
 		dolibarr_set_const($db, "DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_SOURCES", $sources, 'chaine', 0, '', $conf->entity);
 		dolibarr_set_const($db, "DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_IMPORTANT_NOTES", $importantNote, 'chaine', 0, '', $conf->entity);
+
+		// Submit file
+		if (!empty($conf->global->MAIN_UPLOAD_DOC)) {
+			if (!empty($_FILES)) {
+				if (is_array($_FILES['userfile']['tmp_name'])) $userfiles = $_FILES['userfile']['tmp_name'];
+				else $userfiles = array($_FILES['userfile']['tmp_name']);
+
+				foreach ($userfiles as $key => $userfile) {
+					if (empty($_FILES['userfile']['tmp_name'][$key])) {
+						$error++;
+						if ($_FILES['userfile']['error'][$key] == 1 || $_FILES['userfile']['error'][$key] == 2) {
+							setEventMessages($langs->trans('ErrorFileSizeTooLarge'), null, 'errors');
+						} else {
+							setEventMessages($langs->trans("ErrorFieldRequired", $langs->transnoentitiesnoconv("File")), null, 'errors');
+						}
+					}
+				}
+
+				if (!$error) {
+					$filedir = $upload_dir . '/riskassessmentdocument/';
+					if (!empty($filedir)) {
+						$result = dol_add_file_process($filedir, 0, 1, 'userfile', '', null, '', 1, $object);
+					}
+				}
+			}
+		}
+
 		if ($action != 'updateedit' && !$error) {
 			header("Location: ".$_SERVER["PHP_SELF"]);
 			exit;
@@ -264,32 +291,6 @@ if (empty($reshook)) {
 			setEventMessages('BugFoundVarUploaddirnotDefined', null, 'errors');
 		}
 	}
-
-	// Submit file
-	if (GETPOST('sendit', 'alpha') && !empty($conf->global->MAIN_UPLOAD_DOC)) {
-		if (!empty($_FILES)) {
-			if (is_array($_FILES['userfile']['tmp_name'])) $userfiles = $_FILES['userfile']['tmp_name'];
-			else $userfiles = array($_FILES['userfile']['tmp_name']);
-
-			foreach ($userfiles as $key => $userfile) {
-				if (empty($_FILES['userfile']['tmp_name'][$key])) {
-					$error++;
-					if ($_FILES['userfile']['error'][$key] == 1 || $_FILES['userfile']['error'][$key] == 2) {
-						setEventMessages($langs->trans('ErrorFileSizeTooLarge'), null, 'errors');
-					} else {
-						setEventMessages($langs->trans("ErrorFieldRequired", $langs->transnoentitiesnoconv("File")), null, 'errors');
-					}
-				}
-			}
-
-			if (!$error) {
-				$filedir = $upload_dir . '/riskassessmentdocument/';
-				if (!empty($filedir)) {
-					$result = dol_add_file_process($filedir, 0, 1, 'userfile', '', null, '', 1, $object);
-				}
-			}
-		}
-	}
 }
 
 /*
@@ -323,11 +324,44 @@ $morehtmlleft = '<div class="floatleft inline-block valignmiddle divphotoref">'.
 
 digirisk_banner_tab($object, 'ref', '', 0, 'ref', 'ref', $morehtmlref, '', 0, $morehtmlleft);
 
+print '<form method="POST" action="'.$_SERVER["PHP_SELF"].'" name="edit" enctype="multipart/form-data">';
+print '<input type="hidden" name="token" value="'.newToken().'">';
+print '<input type="hidden" name="action" value="update">';
+
 print '<div class="fichecenter">';
 print '<table class="border centpercent tableforfield">' . "\n";
 
 //JSON Decode and show fields
 require_once './core/tpl/digiriskdolibarr_riskassessmentdocumentfields_view.tpl.php';
+
+print '</table>';
+print '</div>';
+
+// Buttons for actions
+print '<div class="tabsAction" >' . "\n";
+$parameters = array();
+$reshook = $hookmanager->executeHooks('addMoreActionsButtons', $parameters, $object, $action); // Note that $action and $object may have been modified by hook
+if ($reshook < 0) setEventMessages($hookmanager->error, $hookmanager->errors, 'errors');
+
+if (empty($reshook)) {
+	// Modify
+	if ($permissiontoadd) {
+		if ( $action == 'edit' ) {
+			print '<input type="submit" class="button" name="save" value="' . $langs->trans("Save") . '">';
+		} else {
+			print '<a class="butAction" id="actionButtonEdit" href="' . $_SERVER["PHP_SELF"] . '?action=edit">' . $langs->trans("Modify") . '</a>' . "\n";
+		}
+	} else {
+		if ( $action == 'edit' ) {
+			print '<a class="butActionRefused classfortooltip" href="#" title="' . dol_escape_htmltag($langs->trans("NotEnoughPermissions")) . '">' . $langs->trans('Save') . '</a>' . "\n";
+		} else {
+			print '<a class="butActionRefused classfortooltip" href="#" title="' . dol_escape_htmltag($langs->trans("NotEnoughPermissions")) . '">' . $langs->trans('Modify') . '</a>' . "\n";
+		}
+	}
+}
+
+print '</div>';
+print '</form>';
 
 print dol_get_fiche_end();
 

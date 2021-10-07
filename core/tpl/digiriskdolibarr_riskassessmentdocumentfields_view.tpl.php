@@ -37,11 +37,6 @@ if (!is_object($form)) $form = new Form($db);
 
 // Date d'audit
 if ( $action == "edit" && $permissiontoadd ) {
-
-	print '<form method="POST" action="'.$_SERVER["PHP_SELF"].'" name="edit">';
-	print '<input type="hidden" name="token" value="'.newToken().'">';
-	print '<input type="hidden" name="action" value="update">';
-
 	print '<tr>';
 	print '<td class="titlefield"><label for="AuditStartDate">' . $langs->trans("AuditStartDate") . '</label></td><td colspan="2">';
 	print $form->selectDate($conf->global->DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_AUDIT_START_DATE, 'AuditStartDate', '', '', '', "edit", 1, 1);
@@ -85,27 +80,12 @@ if ( $action == "edit" && $permissiontoadd ) {
 	$doleditor = new DolEditor('ImportantNote', $conf->global->DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_IMPORTANT_NOTES ? $conf->global->DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_IMPORTANT_NOTES : '', '', 90, 'dolibarr_notes', '', false, true, $conf->global->FCKEDITOR_ENABLE_SOCIETE, ROWS_3, '90%');
 	$doleditor->Create();
 	print '</td></tr>';
-	print '</table>';
-	print '<div class="tabsAction" >' . "\n";
-	// Modify
-	print '<input type="submit" class="button" name="save" value="' . $langs->trans("Save") . '">';
-	print '</form>';
-	print '</div>';
 
 // Disponibilité des plans
-	print '<div class="underbanner clearboth"></div>';
-	print '<table class="border centpercent tableforfield">' . "\n";
 	print '<tr>';
-	print '<td class="titlefield"><label for="SitePlans">' . $langs->trans("SitePlans") . '</label></td>';
+	print '<td class="titlefield">'.$form->editfieldkey($langs->trans("SitePlans"), 'SitePlans', '', $object, 0).'</td>';
 	print '<td>';
-	// To attach new file
-	if ((!empty($conf->use_javascript_ajax) && empty($conf->global->MAIN_ECM_DISABLE_JS))) {
-		print '<!-- Start form to attach new file in digiriskdolibarr_riskassessmentdocumentfields_view.tpl.php -->' . "\n";
-		include_once DOL_DOCUMENT_ROOT . '/core/class/html.formfile.class.php';
-		$formfile = new FormFile($db);
-		$formfile->form_attach_new_file($_SERVER["PHP_SELF"], 'none', 0, 0, $permtoupload, 48, $object, '', 0, '', 0, 'DataMigrationImport', '', '', 0);
-	}
-	// End "Add new file" area
+	print '<input class="flat" type="file" name="userfile[]" id="SitePlans" />';
 	print '</td></tr>';
 } else {
 	print '<tr>';
@@ -168,17 +148,6 @@ if ( $action == "edit" && $permissiontoadd ) {
 		</span>
 	<?php endif; ?>
 	<?php print '</td></tr>';
-	print '</table>';
-	print '</div>';
-
-	// Buttons for actions
-	print '<div class="tabsAction" >' . "\n";
-	// Modify
-	if ($permissiontoadd) {
-		print '<a class="butAction" id="actionButtonEdit" href="' . $_SERVER["PHP_SELF"] . '?action=edit">' . $langs->trans("Modify") . '</a>' . "\n";
-	} else {
-		print '<a class="butActionRefused classfortooltip" href="#" title="' . dol_escape_htmltag($langs->trans("NotEnoughPermissions")) . '">' . $langs->trans('Modify') . '</a>' . "\n";
-	}
 }
 
 ?>
