@@ -218,8 +218,7 @@ class doc_groupmentdocument_odt extends ModeleODTGroupmentDocument
 
 			$date = dol_print_date(dol_now(),'dayxcard');
 			$filename = $objectref.'_'.$digiriskelement->label.'_'.$date.'.odt';
-			$arrayErrorChar = array(' ', '<', '>', ':', '"', '/', '\\', '|', '?', '*');
-			$filename = str_replace($arrayErrorChar, '_', $filename);
+			$filename = dol_sanitizeFileName($filename);
 
 			$object->last_main_doc = $filename;
 
