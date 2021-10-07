@@ -317,7 +317,7 @@
 		<!-- RISK ADD MODAL-->
 		<?php if ($conf->global->DIGIRISKDOLIBARR_TASK_MANAGEMENT == 0 && $conf->global->DIGIRISKDOLIBARR_RISK_DESCRIPTION == 0 && $conf->global->DIGIRISKDOLIBARR_MULTIPLE_RISKASSESSMENT_METHOD ==0 ) : ?>
 		<div class="risk-add-modal" value="<?php echo $object->id ?>">
-			<div class="wpeo-modal modal-risk-0" id="risk_add<?php echo $object->id ?>">
+			<div class="wpeo-modal modal-risk-0 modal-risk" id="risk_add<?php echo $object->id ?>" value="0">
 				<div class="modal-container wpeo-modal-event">
 					<!-- Modal-Header -->
 					<div class="modal-header">
@@ -362,6 +362,9 @@
 									<?php endif; ?>
 									<input class="risk-evaluation-method" type="hidden" value="standard">
 									<input class="risk-evaluation-multiple-method" type="hidden" value="1">
+									<div class="wpeo-button open-media-gallery add-media modal-open" value="0">
+										<span><i class="fas fa-camera"></i>  <?php echo $langs->trans('AddMedia') ?></span>
+									</div>
 								</div>
 								<div class="risk-evaluation-content-wrapper">
 									<div class="risk-evaluation-content">
@@ -460,7 +463,7 @@
 		</div>
 	<?php else : ?>
 		<div class="risk-add-modal" value="<?php echo $object->id ?>">
-		<div class="wpeo-modal modal-risk-0" id="risk_add<?php echo $object->id ?>">
+			<div class="wpeo-modal modal-risk-0 modal-risk" id="risk_add<?php echo $object->id ?>" value="new">
 			<div class="modal-container wpeo-modal-event">
 				<!-- Modal-Header -->
 				<div class="modal-header">
@@ -512,6 +515,9 @@
 							<?php endif; ?>
 							<input class="risk-evaluation-method" type="hidden" value="standard">
 							<input class="risk-evaluation-multiple-method" type="hidden" value="1">
+							<div class="wpeo-button open-media-gallery add-media modal-open" value="0">
+								<span><i class="fas fa-camera"></i>  <?php echo $langs->trans('AddMedia') ?></span>
+							</div>
 						</div>
 						<div class="risk-evaluation-content-wrapper">
 							<div class="risk-evaluation-content">
@@ -597,6 +603,13 @@
 							<span class="title"><?php echo $langs->trans('Label'); ?> <input type="text" class="" name="label" value=""></span>
 						</div>
 					<?php endif; ?>
+					<div class="risk-evaluation-medias risk-evaluation-medias-0 risk-new">
+						<div class="medias"><i class="fas fa-picture-o"></i><?php echo $langs->trans('Medias'); ?></div>
+						<?php
+						$relativepath = 'digiriskdolibarr/medias/thumbs';
+						print digirisk_show_medias_linked('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessment/tmp/RK0' , 'small', '', 0, 0, 0, 50, 0, 1, 0, 0, '/riskassessment/tmp/RK0',);
+						?>
+					</div>
 				</div>
 				<!-- Modal-Footer -->
 				<div class="modal-footer">
@@ -612,7 +625,7 @@
 				</div>
 			</div>
 		</div>
-	</div>
+		</div>
 	<?php endif; ?>
 	<?php endif; ?>
 	<?php $title = $langs->trans('DigiriskElementRisksList');

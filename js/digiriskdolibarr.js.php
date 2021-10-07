@@ -938,12 +938,12 @@ window.eoxiaJS.signature.autoDownloadSpecimen = function( event ) {
 };
 
 /**
- * Initialise l'objet "photo" ainsi que la méthode "init" obligatoire pour la bibliothèque EoxiaJS.
+ * Initialise l'objet "mediaGallery" ainsi que la méthode "init" obligatoire pour la bibliothèque EoxiaJS.
  *
  * @since   1.0.0
  * @version 1.0.0
  */
-window.eoxiaJS.photo = {};
+window.eoxiaJS.mediaGallery = {};
 
 /**
  * La méthode appelée automatiquement par la bibliothèque EoxiaJS.
@@ -953,25 +953,27 @@ window.eoxiaJS.photo = {};
  *
  * @return {void}
  */
-window.eoxiaJS.photo.init = function() {
-	window.eoxiaJS.photo.event();
+window.eoxiaJS.mediaGallery.init = function() {
+	window.eoxiaJS.mediaGallery.event();
 };
 
 /**
- * La méthode contenant tous les évènements pour le photo.
+ * La méthode contenant tous les évènements pour le mediaGallery.
  *
  * @since   1.0.0
  * @version 1.0.0
  *
  * @return {void}
  */
-window.eoxiaJS.photo.event = function() {
+window.eoxiaJS.mediaGallery.event = function() {
 	// Photos
-	jQuery( document ).on( 'click', '.clickable-photo', window.eoxiaJS.photo.selectPhoto );
-	jQuery( document ).on( 'click', '.save-photo', window.eoxiaJS.photo.savePhoto );
-	jQuery( document ).on( 'click', '.modal-content .formattachnewfile .button', window.eoxiaJS.photo.sendPhoto );
-	jQuery( document ).on( 'click', '.clicked-photo-preview', window.eoxiaJS.photo.previewPhoto );
-	jQuery( document ).on( 'input', '.form-element #search_in_gallery', window.eoxiaJS.photo.handleSearch );
+	jQuery( document ).on( 'click', '.clickable-photo', window.eoxiaJS.mediaGallery.selectPhoto );
+	jQuery( document ).on( 'click', '.save-photo', window.eoxiaJS.mediaGallery.savePhoto );
+	jQuery( document ).on( 'click', '.modal-content .formattachnewfile .button', window.eoxiaJS.mediaGallery.sendPhoto );
+	jQuery( document ).on( 'click', '.clicked-photo-preview', window.eoxiaJS.mediaGallery.previewPhoto );
+	jQuery( document ).on( 'input', '.form-element #search_in_gallery', window.eoxiaJS.mediaGallery.handleSearch );
+	jQuery( document ).on( 'click', '.media-gallery-unlink', window.eoxiaJS.mediaGallery.unlinkFile );
+	jQuery( document ).on( 'click', '.media-gallery-favorite', window.eoxiaJS.mediaGallery.addToFavorite );
 }
 
 /**
@@ -982,7 +984,7 @@ window.eoxiaJS.photo.event = function() {
  *
  * @return {void}
  */
-window.eoxiaJS.photo.selectPhoto = function( event ) {
+window.eoxiaJS.mediaGallery.selectPhoto = function( event ) {
 	let photoID = $(this).attr('value');
 	let parent = $(this).closest('.modal-content')
 
@@ -1010,7 +1012,7 @@ window.eoxiaJS.photo.selectPhoto = function( event ) {
  *
  * @return {void}
  */
-window.eoxiaJS.photo.savePhoto = function( event ) {
+window.eoxiaJS.mediaGallery.savePhoto = function( event ) {
     let parent = $('#risk_evaluation_photo')
 	let idToSave = $(this).attr('value')
 	let mediaGalleryModal = $(this).closest('.modal-container')
@@ -1029,9 +1031,11 @@ window.eoxiaJS.photo.savePhoto = function( event ) {
 	}
 	let favorite = filenames
 	favorite = favorite.split('vVv')[0]
-	let riskAssessmentPhoto = modalFrom.find('.risk-evaluation-photo-'+idToSave)
+	let riskAssessmentPhoto = $('.risk-evaluation-photo-'+idToSave)
 	let filepath = riskAssessmentPhoto.find('.filepath-to-riskassessment').val()
-console.log(riskAssessmentPhoto.length)
+	console.log(riskAssessmentPhoto)
+	console.log(mediaLinked)
+	console.log(riskId)
 	let newPhoto = filepath + favorite.replace(/\./, '_small.')
 	console.log(filepath)
 	console.log(newPhoto)
@@ -1044,10 +1048,10 @@ console.log(riskAssessmentPhoto.length)
 		success: function ( ) {
 			$('.wpeo-loader').removeClass('wpeo-loader')
 			parent.removeClass('modal-active')
-
+			//modalFrom.find('.risk-evaluation-medias')
 			riskAssessmentPhoto.each( function() {
 				$(this).find('.clicked-photo-preview').attr('src',newPhoto )
-				$(this).find('.filename').attr('value', favorite.replace(/\./, '_small.'))
+				$(this).find('.filename').attr('value', favorite.match(/_small/) ? favorite.replace(/\./, '_small.') : favorite)
 			});
 
 			mediaLinked.load(document.URL + ' .risk-evaluation-medias-'+idToSave+'.risk-'+riskId)
@@ -1069,7 +1073,7 @@ console.log(riskAssessmentPhoto.length)
  *
  * @return {void}
  */
-window.eoxiaJS.photo.handleSearch = function( event ) {
+window.eoxiaJS.mediaGallery.handleSearch = function( event ) {
 	let searchQuery = $('#search_in_gallery').val()
 	let photos = $('.center.clickable-photo')
 
@@ -1086,7 +1090,7 @@ window.eoxiaJS.photo.handleSearch = function( event ) {
  *
  * @return {void}
  */
-window.eoxiaJS.photo.sendPhoto = function( event ) {
+window.eoxiaJS.mediaGallery.sendPhoto = function( event ) {
 
 	event.preventDefault()
 	let element  = $(this).closest('.nowrap');
@@ -1122,10 +1126,112 @@ window.eoxiaJS.photo.sendPhoto = function( event ) {
  *
  * @return {void}
  */
-window.eoxiaJS.photo.previewPhoto = function( event ) {
+window.eoxiaJS.mediaGallery.previewPhoto = function( event ) {
 	setTimeout(function(){
 		jQuery( document ).find('.ui-dialog').addClass('preview-photo');
 	}, 200);
+};
+
+/**
+ * Action send photo.
+ *
+ * @since   1.0.0
+ * @version 1.0.0
+ *
+ * @return {void}
+ */
+window.eoxiaJS.mediaGallery.unlinkFile = function( event ) {
+
+	event.preventDefault()
+	let riskassessment_id = $(this).find('.riskassessment-id').val()
+	let filename = $(this).find('.filename').val()
+	let querySeparator = '?'
+	let mediaContainer = $(this).closest('.media-container')
+	let riskId = $(this).closest('.modal-risk').attr('value')
+	document.URL.match('/?/') ? querySeparator = '&' : 1
+
+	let previousPhoto = $(this).closest('.modal-container').find('.risk-evaluation-photo .clicked-photo-preview')
+	let previousName = previousPhoto[0].src.trim().split(/thumbs%2F/)[1].split(/"/)[0]
+	let newPhoto = ''
+	let riskAssessmentPhoto = $('.risk-evaluation-photo-'+riskassessment_id)
+
+	if (previousName == filename.replace(/\./, '_small.')) {
+		newPhoto = previousPhoto[0].src.replace(previousName, '')
+	} else {
+		newPhoto = previousPhoto[0].src
+	}
+
+	window.eoxiaJS.loader.display(mediaContainer);
+
+	$.ajax({
+		url: document.URL + querySeparator + "action=unlinkFile&risk_id="+riskId+"&riskassessment_id="+riskassessment_id+"&filename="+filename,
+		type: "POST",
+		processData: false,
+		success: function ( ) {
+			$('.wpeo-loader').removeClass('wpeo-loader')
+			riskAssessmentPhoto.each( function() {
+				$(this).find('.clicked-photo-preview').attr('src',newPhoto )
+			});
+			mediaContainer.hide()
+		}
+	});
+};
+
+/**
+ * Action send photo.
+ *
+ * @since   1.0.0
+ * @version 1.0.0
+ *
+ * @return {void}
+ */
+window.eoxiaJS.mediaGallery.addToFavorite = function( event ) {
+
+	event.preventDefault()
+	let riskassessment_id = $(this).find('.riskassessment-id').val()
+	let filename = $(this).find('.filename').val()
+	let querySeparator = '?'
+	let mediaContainer = $(this).closest('.media-container')
+
+	//crée un sélecteur générique à l'évaluation risk-evaluation-photo-id et en le $() on itère sur ceux qui possèdent cette classe et on change la src de leur image
+	let riskAssessmentPhoto = $('.risk-evaluation-photo-'+riskassessment_id)
+	let saveButton = $(this).closest('.modal-container').find('.risk-evaluation-save')
+
+	//change star button style
+	let previousFavorite = $(this).closest('.modal-container').find('.fas.fa-star')
+	let newFavorite = $(this).find('.far.fa-star')
+	let previousPhoto = $(this).closest('.modal-container').find('.risk-evaluation-photo .clicked-photo-preview')
+
+	previousFavorite.removeClass('fas')
+	previousFavorite.addClass('far')
+
+	newFavorite.addClass('fas')
+	newFavorite.removeClass('far')
+
+	document.URL.match('/?/') ? querySeparator = '&' : 1
+	saveButton.addClass('button-disable')
+	window.eoxiaJS.loader.display(mediaContainer);
+	$(this).closest('.modal-container').find('.filename').attr('value', filename)
+	let previousName = previousPhoto[0].src.trim().split(/thumbs%2F/)[1].split(/"/)[0]
+
+	$.ajax({
+		url: document.URL + querySeparator + "action=addToFavorite&riskassessment_id="+riskassessment_id+"&filename="+filename,
+		type: "POST",
+		processData: false,
+		success: function ( ) {
+			let newPhoto = ''
+			if (previousName.length > 0 ) {
+				newPhoto = previousPhoto[0].src.trim().replace(previousName , filename.replace(/\./, '_small.'))
+			} else {
+				newPhoto = previousPhoto[0].src.trim() + filename.replace(/\./, '_small.')
+			}
+			riskAssessmentPhoto.each( function() {
+				$(this).find('.clicked-photo-preview').attr('src',newPhoto )
+			});
+			saveButton.removeClass('button-disable')
+			$('.wpeo-loader').removeClass('wpeo-loader')
+		}
+	});
 };
 
 /**
@@ -2839,141 +2945,6 @@ window.eoxiaJS.migration.DataMigrationImport = function( event ) {
 		//contentType: "application/json",
 		processData: false,
 		success: function ( ) {
-		}
-	});
-};
-
-/**
- * Initialise l'objet "mediaGallery" ainsi que la méthode "init" obligatoire pour la bibliothèque EoxiaJS.
- *
- * @since   1.0.0
- * @version 1.0.0
- */
-window.eoxiaJS.mediaGallery = {};
-
-/**
- * La méthode appelée automatiquement par la bibliothèque EoxiaJS.
- *
- * @since   1.0.0
- * @version 1.0.0
- *
- * @return {void}
- */
-window.eoxiaJS.mediaGallery.init = function() {
-	window.eoxiaJS.mediaGallery.event();
-};
-
-/**
- * La méthode contenant tous les évènements pour le mediaGallery.
- *
- * @since   1.0.0
- * @version 1.0.0
- *
- * @return {void}
- */
-window.eoxiaJS.mediaGallery.event = function() {
-	jQuery( document ).on( 'click', '.media-gallery-unlink', window.eoxiaJS.mediaGallery.unlinkFile );
-	jQuery( document ).on( 'click', '.media-gallery-favorite', window.eoxiaJS.mediaGallery.addToFavorite );
-}
-
-/**
- * Action send photo.
- *
- * @since   1.0.0
- * @version 1.0.0
- *
- * @return {void}
- */
-window.eoxiaJS.mediaGallery.unlinkFile = function( event ) {
-
-	event.preventDefault()
-	let riskassessment_id = $(this).find('.riskassessment-id').val()
-	let filename = $(this).find('.filename').val()
-	let querySeparator = '?'
-	let mediaContainer = $(this).closest('.media-container')
-	let riskId = $(this).closest('.modal-risk').attr('value')
-	document.URL.match('/?/') ? querySeparator = '&' : 1
-
-	let previousPhoto = $(this).closest('.modal-container').find('.risk-evaluation-photo .clicked-photo-preview')
-	let previousName = previousPhoto[0].src.trim().split(/thumbs%2F/)[1].split(/"/)[0]
-	let newPhoto = ''
-	let riskAssessmentPhoto = $(this).closest('.modal-container').find('.risk-evaluation-photo-'+riskassessment_id)
-
-	if (previousName == filename.replace(/\./, '_small.')) {
-		newPhoto = previousPhoto[0].src.replace(previousName, '')
-	} else {
-		newPhoto = previousPhoto[0].src
-	}
-
-	window.eoxiaJS.loader.display(mediaContainer);
-
-	$.ajax({
-		url: document.URL + querySeparator + "action=unlinkFile&risk_id="+riskId+"&riskassessment_id="+riskassessment_id+"&filename="+filename,
-		type: "POST",
-		processData: false,
-		success: function ( ) {
-			$('.wpeo-loader').removeClass('wpeo-loader')
-			riskAssessmentPhoto.each( function() {
-				$(this).find('.clicked-photo-preview').attr('src',newPhoto )
-			});
-			mediaContainer.hide()
-		}
-	});
-};
-
-/**
- * Action send photo.
- *
- * @since   1.0.0
- * @version 1.0.0
- *
- * @return {void}
- */
-window.eoxiaJS.mediaGallery.addToFavorite = function( event ) {
-
-	event.preventDefault()
-	let riskassessment_id = $(this).find('.riskassessment-id').val()
-	let filename = $(this).find('.filename').val()
-	let querySeparator = '?'
-	let mediaContainer = $(this).closest('.media-container')
-
-	//crée un sélecteur générique à l'évaluation risk-evaluation-photo-id et en le $() on itère sur ceux qui possèdent cette classe et on change la src de leur image
-	let riskAssessmentPhoto = $('.risk-evaluation-photo-'+riskassessment_id)
-	let saveButton = $(this).closest('.modal-container').find('.risk-evaluation-save')
-
-	//change star button style
-	let previousFavorite = $(this).closest('.modal-container').find('.fas.fa-star')
-	let newFavorite = $(this).find('.far.fa-star')
-	let previousPhoto = $(this).closest('.modal-container').find('.risk-evaluation-photo .clicked-photo-preview')
-
-	previousFavorite.removeClass('fas')
-	previousFavorite.addClass('far')
-
-	newFavorite.addClass('fas')
-	newFavorite.removeClass('far')
-
-	document.URL.match('/?/') ? querySeparator = '&' : 1
-	saveButton.addClass('button-disable')
-	window.eoxiaJS.loader.display(mediaContainer);
-	$(this).closest('.modal-container').find('.filename').attr('value', filename)
-	let previousName = previousPhoto[0].src.trim().split(/thumbs%2F/)[1].split(/"/)[0]
-
-	$.ajax({
-		url: document.URL + querySeparator + "action=addToFavorite&riskassessment_id="+riskassessment_id+"&filename="+filename,
-		type: "POST",
-		processData: false,
-		success: function ( ) {
-			let newPhoto = ''
-			if (previousName.length > 0 ) {
-				 newPhoto = previousPhoto[0].src.trim().replace(previousName , filename.replace(/\./, '_small.'))
-			} else {
-				 newPhoto = previousPhoto[0].src.trim() + filename.replace(/\./, '_small.')
-			}
-			riskAssessmentPhoto.each( function() {
-				$(this).find('.clicked-photo-preview').attr('src',newPhoto )
-			});
-			saveButton.removeClass('button-disable')
-			$('.wpeo-loader').removeClass('wpeo-loader')
 		}
 	});
 };

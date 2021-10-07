@@ -221,24 +221,39 @@ if (empty($reshook)) {
 					$evaluation->exposition = $exposition;
 				}
 
-				//photo upload and thumbs generation
-				if (!empty ($photo)) {
-					$entity = ($conf->entity > 1) ? '/' . $conf->entity : '';
-					$pathToECMPhoto =  DOL_DATA_ROOT . $entity . '/ecm/digiriskdolibarr/medias/' . $photo;
 
-					$pathToEvaluationPhoto = DOL_DATA_ROOT . $entity . '/digiriskdolibarr/riskassessment/' . $evaluation->ref;
+				$pathToTmpPhoto = $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessment/tmp/RK0/';
+				$files = dol_dir_list($pathToTmpPhoto);
 
-					mkdir($pathToEvaluationPhoto);
-					copy($pathToECMPhoto, $pathToEvaluationPhoto . '/' . $photo);
+				if (!empty($files)) {
+					foreach($files as $file) {
+						$pathToEvaluationPhoto =$conf->digiriskdolibarr->multidir_output[$conf->entity] .  '/riskassessment/' . $evaluation->ref;
 
-					global $maxwidthmini, $maxheightmini, $maxwidthsmall, $maxheightsmall;
-					$destfull = $pathToEvaluationPhoto . '/' . $photo;
+						mkdir($pathToEvaluationPhoto);
+						copy($file['fullname'],$pathToEvaluationPhoto . '/' . $file['name']);
 
-					// Create thumbs
-					$imgThumbSmall = vignette($destfull, $maxwidthsmall, $maxheightsmall, '_small', 50, "thumbs");
-					// Create mini thumbs for image (Ratio is near 16/9)
-					$imgThumbMini = vignette($destfull, $maxwidthmini, $maxheightmini, '_mini', 50, "thumbs");
+						global $maxwidthmini, $maxheightmini, $maxwidthsmall,$maxheightsmall ;
+						$destfull = $pathToEvaluationPhoto . '/' . $file['name'];
+
+						// Create thumbs
+						// We can't use $object->addThumbs here because there is no $object known
+						// Used on logon for example
+						$imgThumbSmall = vignette($destfull, $maxwidthsmall, $maxheightsmall, '_small', 50, "thumbs");
+						// Create mini thumbs for image (Ratio is near 16/9)
+						// Used on menu or for setup page for example
+						$imgThumbMini = vignette($destfull, $maxwidthmini, $maxheightmini, '_mini', 50, "thumbs");
+						unlink($file['fullname']);
+
+					}
 				}
+				$filesThumbs = dol_dir_list($pathToTmpPhoto . '/thumbs/');
+				if (!empty($filesThumbs)) {
+					foreach($filesThumbs as $fileThumb) {
+						unlink($fileThumb['fullname']);
+
+					}
+				}
+
 
 				$result2 = $evaluation->create($user, true);
 
@@ -633,7 +648,7 @@ if (empty($reshook)) {
 		if (dol_strlen($riskassessment->ref) > 0) {
 			$pathToEvaluationPhoto = $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessment/' . $riskassessment->ref;
 		} else {
-			$pathToEvaluationPhoto = $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessment/tmp/' . $risktmp->ref;
+			$pathToEvaluationPhoto = $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessment/tmp/' .( dol_strlen($risktmp->ref) > 0 ? $risktmp->ref : 'RK0');
 		}
 		$filenames = preg_split('/vVv/', $filenames);
 		array_pop($filenames);
@@ -681,10 +696,15 @@ if (empty($reshook)) {
 		$risktmp = new Risk($db);
 		$risktmp->fetch($risk_id);
 
+		//edit evaluation
 		if ($riskassessment->id > 0) {
 			$pathToEvaluationPhoto = $conf->digiriskdolibarr->multidir_output[$conf->entity] .'/riskassessment/' . $riskassessment->ref;
-		} else {
+		} elseif ($risk_id > 0) {
+		//create evaluation
 			$pathToEvaluationPhoto = $conf->digiriskdolibarr->multidir_output[$conf->entity] .'/riskassessment/tmp/' . $risktmp->ref;
+		} elseif ($risk_id == 'new') {
+		//create risk
+			$pathToEvaluationPhoto = $conf->digiriskdolibarr->multidir_output[$conf->entity] .'/riskassessment/tmp/RK0/';
 		}
 
 
