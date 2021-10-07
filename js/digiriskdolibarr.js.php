@@ -1410,7 +1410,7 @@ window.eoxiaJS.risk.createRisk = function ( event ) {
 			modalRisk.load( document.URL + ' .modal-risk-0');
 
 			elementParent.empty();
-			elementParent.load( document.URL + ' .tagtable.liste')
+			elementParent.load( document.URL + ' .div-table-responsive')
 
 			let numberOfRisks = $('.valignmiddle.col-title');
 			numberOfRisks.load( document.URL + ' .table-fiche-title .titre.inline-block');
