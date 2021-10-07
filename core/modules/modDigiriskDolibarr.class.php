@@ -274,6 +274,8 @@ class modDigiriskdolibarr extends DolibarrModules
 			164 => array('DIGIRISKDOLIBARR_TASK_MANAGEMENT','integer', 0 ,'', $conf->entity),
 			310 => array('DIGIRISKDOLIBARR_SHOW_TASK_START_DATE','integer', 0,'', $conf->entity),
 			311 => array('DIGIRISKDOLIBARR_SHOW_TASK_END_DATE','integer', 0,'', $conf->entity),
+			312 => array('DIGIRISKDOLIBARR_SHOW_TASK_PROGRESS','integer', 0,'', $conf->entity),
+			313 => array('DIGIRISKDOLIBARR_SHOW_ALL_TASKS','integer', 0,'', $conf->entity),
 
 			// CONST PREVENTION PLAN LINE
 			180 => array('MAIN_AGENDA_ACTIONAUTO_PREVENTIONPLANDET_CREATE','chaine',1,'', $conf->entity),
@@ -283,7 +285,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			190 => array('MAIN_AGENDA_ACTIONAUTO_FIREPERMITDET_CREATE','chaine',1,'', $conf->entity),
 			191 => array('DIGIRISKDOLIBARR_FIREPERMITDET_ADDON','chaine', 'mod_firepermitdet_standard' ,'', $conf->entity),
 
-			// MODULE
+			// CONST MODULE
 			200 => array('DIGIRISKDOLIBARR_VERSION','chaine', $this->version,'', $conf->entity),
 			201 => array('DIGIRISKDOLIBARR_SUBPERMCATEGORY_FOR_DOCUMENTS','integer', 1,'', $conf->entity),
 			202 => array('DIGIRISKDOLIBARR_DB_VERSION','chaine', $this->version,'', $conf->entity),
