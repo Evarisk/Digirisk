@@ -91,7 +91,6 @@ if (empty($reshook)) {
 		$method         = GETPOST('Method', 'alpha');
 		$sources        = GETPOST('Sources', 'alpha');
 		$importantNote  = GETPOST('ImportantNote', 'alpha');
-		$sitePlans      = GETPOST('SitePlans', 'alpha');
 
 		if ( strlen( $auditStartDate ) ) {
 			$auditStartDate = explode('/',$auditStartDate);
@@ -117,9 +116,7 @@ if (empty($reshook)) {
 
 		dolibarr_set_const($db, "DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_METHOD", $method, 'chaine', 0, '', $conf->entity);
 		dolibarr_set_const($db, "DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_SOURCES", $sources, 'chaine', 0, '', $conf->entity);
-		dolibarr_set_const($db, "DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_IMPORTANT_NOTE", $importantNote, 'chaine', 0, '', $conf->entity);
-		dolibarr_set_const($db, "DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_SITE_PLANS", $sitePlans, 'chaine', 0, '', $conf->entity);
-
+		dolibarr_set_const($db, "DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_IMPORTANT_NOTES", $importantNote, 'chaine', 0, '', $conf->entity);
 		if ($action != 'updateedit' && !$error) {
 			header("Location: ".$_SERVER["PHP_SELF"]);
 			exit;
