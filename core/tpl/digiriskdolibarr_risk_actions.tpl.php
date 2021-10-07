@@ -1,4 +1,126 @@
 <?php
+if (!$error && $action == 'add' && $permissiontoadd) {
+	$riskComment = GETPOST('riskComment', 'restricthtml');
+	$fk_element  = GETPOST('id');
+	$ref         = GETPOST('ref');
+	$cotation    = GETPOST('cotation');
+	$method      = GETPOST('cotationMethod');
+	$category    = GETPOST('category');
+	$photo       = GETPOST('photo');
+
+	if ($riskComment !== 'undefined') {
+		$risk->description = $riskComment;
+	}
+	$risk->fk_element  = $fk_element ? $fk_element : 0;
+	$risk->fk_projet   = $conf->global->DIGIRISKDOLIBARR_DU_PROJECT;
+	$risk->category    = $category;
+	$risk->ref         = $refRiskMod->getNextValue($risk);
+
+	if (!$error) {
+		$result = $risk->create($user, true);
+
+		if ($result > 0) {
+			$lastRiskAdded = $risk->ref;
+
+			$evaluationComment 	= GETPOST('evaluationComment',  'restricthtml');
+
+			$evaluation->photo       = $photo;
+			$evaluation->cotation    = $cotation;
+			$evaluation->fk_risk     = $risk->id;
+			$evaluation->status      = 1;
+			$evaluation->method      = $method;
+			$evaluation->ref         = $refEvaluationMod->getNextValue($evaluation);
+			$evaluation->comment     = $evaluationComment;
+
+			if ($method == 'advanced') {
+				$formation  = GETPOST('formation');
+				$protection = GETPOST('protection');
+				$occurrence = GETPOST('occurrence');
+				$gravite    = GETPOST('gravite');
+				$exposition = GETPOST('exposition');
+
+				$evaluation->formation  = $formation;
+				$evaluation->protection = $protection;
+				$evaluation->occurrence = $occurrence;
+				$evaluation->gravite    = $gravite;
+				$evaluation->exposition = $exposition;
+			}
+
+
+			$pathToTmpPhoto = $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessment/tmp/RK0/';
+			$files = dol_dir_list($pathToTmpPhoto);
+
+			if (!empty($files)) {
+				foreach($files as $file) {
+					$pathToEvaluationPhoto =$conf->digiriskdolibarr->multidir_output[$conf->entity] .  '/riskassessment/' . $evaluation->ref;
+
+					mkdir($pathToEvaluationPhoto);
+					copy($file['fullname'],$pathToEvaluationPhoto . '/' . $file['name']);
+
+					global $maxwidthmini, $maxheightmini, $maxwidthsmall,$maxheightsmall ;
+					$destfull = $pathToEvaluationPhoto . '/' . $file['name'];
+
+					// Create thumbs
+					// We can't use $object->addThumbs here because there is no $object known
+					// Used on logon for example
+					$imgThumbSmall = vignette($destfull, $maxwidthsmall, $maxheightsmall, '_small', 50, "thumbs");
+					// Create mini thumbs for image (Ratio is near 16/9)
+					// Used on menu or for setup page for example
+					$imgThumbMini = vignette($destfull, $maxwidthmini, $maxheightmini, '_mini', 50, "thumbs");
+					unlink($file['fullname']);
+
+				}
+			}
+			$filesThumbs = dol_dir_list($pathToTmpPhoto . '/thumbs/');
+			if (!empty($filesThumbs)) {
+				foreach($filesThumbs as $fileThumb) {
+					unlink($fileThumb['fullname']);
+
+				}
+			}
+
+
+			$result2 = $evaluation->create($user, true);
+
+			if ($result2 > 0) {
+				$tasktitle = GETPOST('tasktitle');
+				if (!empty($tasktitle) && $tasktitle !== 'undefined') {
+					$extrafields->fetch_name_optionals_label($task->table_element);
+
+					$task->ref = $refTaskMod->getNextValue('', $task);
+					$task->label = $tasktitle;
+					$task->fk_project = $conf->global->DIGIRISKDOLIBARR_DU_PROJECT;
+					$task->date_c = dol_now();
+					$task->array_options['options_fk_risk'] = $risk->id;
+
+					$result3 = $task->create($user, true);
+
+					if ($result3 > 0) {
+						// Creation risk + evaluation + task OK
+						$urltogo = str_replace('__ID__', $result3, $backtopage);
+						$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
+						header("Location: " . $urltogo);
+						exit;
+					} else {
+						// Creation task KO
+						if (!empty($task->errors)) setEventMessages(null, $task->errors, 'errors');
+						else  setEventMessages($task->error, null, 'errors');
+					}
+				}
+			} else {
+				// Creation evaluation KO
+				if (!empty($evaluation->errors)) setEventMessages(null, $evaluation->errors, 'errors');
+				else  setEventMessages($evaluation->error, null, 'errors');
+			}
+		}
+		else
+		{
+			// Creation risk KO
+			if (!empty($risk->errors)) setEventMessages(null, $risk->errors, 'errors');
+			else  setEventMessages($risk->error, null, 'errors');
+		}
+	}
+}
 
 if (!$error && $action == 'saveRisk' && $permissiontoadd) {
 	$riskID      = GETPOST('riskID');
