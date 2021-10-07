@@ -793,6 +793,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			$labour_inspector         = $societe;
 			$labour_inspector->name   = $langs->trans('LabourInspectorName');
 			$labour_inspector->client = 0;
+			$labour_inspector->phone  = '';
 			$labour_inspector->url    = $langs->trans('UrlLabourInspector');
 			$labour_inspectorID       = $labour_inspector->create($user);
 
@@ -800,34 +801,42 @@ class modDigiriskdolibarr extends DolibarrModules
 			$samu->name   = $langs->trans('SAMU');
 			$samu->client = 0;
 			$samu->phone  = '15';
+			$samu->url    = '';
 			$samuID       = $samu->create($user);
 
 			$pompiers         = $societe;
 			$pompiers->name   = $langs->trans('Pompiers');
 			$pompiers->client = 0;
 			$pompiers->phone  = '18';
+			$pompiers->url    = '';
 			$pompiersID       = $pompiers->create($user);
 
 			$police         = $societe;
 			$police->name   = $langs->trans('Police');
 			$police->client = 0;
 			$police->phone  = '17';
+			$police->url    = '';
 			$policeID       = $police->create($user);
 
 			$emergency         = $societe;
 			$emergency->name   = $langs->trans('AllEmergencies');
 			$emergency->client = 0;
 			$emergency->phone  = '112';
+			$emergency->url    = '';
 			$emergencyID       = $emergency->create($user);
 
 			$rights_defender         = $societe;
 			$rights_defender->name   = $langs->trans('RightsDefender');
 			$rights_defender->client = 0;
+			$rights_defender->phone  = '';
+			$rights_defender->url    = '';
 			$rights_defenderID       = $rights_defender->create($user);
 
 			$poison_control_center         = $societe;
 			$poison_control_center->name   = $langs->trans('PoisonControlCenter');
 			$poison_control_center->client = 0;
+			$poison_control_center->phone  = '';
+			$poison_control_center->url    = '';
 			$poison_control_centerID       = $poison_control_center->create($user);
 
 			$resources->digirisk_dolibarr_set_resources($this->db,1,  'LabourInspector',  'societe', array($labour_inspectorID), $conf->entity);
@@ -851,17 +860,22 @@ class modDigiriskdolibarr extends DolibarrModules
 			$labour_inspector         = $societe;
 			$labour_inspector->name   = $langs->trans('LabourInspectorName');
 			$labour_inspector->client = 0;
+			$labour_inspector->phone  = '';
 			$labour_inspector->url    = $langs->trans('UrlLabourInspector');
 			$labour_inspectorID       = $labour_inspector->create($user);
 
 			$rights_defender         = $societe;
 			$rights_defender->name   = $langs->trans('RightsDefender');
 			$rights_defender->client = 0;
+			$rights_defender->phone  = '';
+			$rights_defender->url    = '';
 			$rights_defenderID       = $rights_defender->create($user);
 
 			$poison_control_center         = $societe;
 			$poison_control_center->name   = $langs->trans('PoisonControlCenter');
 			$poison_control_center->client = 0;
+			$poison_control_center->phone  = '';
+			$poison_control_center->url    = '';
 			$poison_control_centerID       = $poison_control_center->create($user);
 
 			$resources->digirisk_dolibarr_set_resources($this->db,1,  'LabourInspector',  'societe', array($labour_inspectorID), $conf->entity);
@@ -886,7 +900,6 @@ class modDigiriskdolibarr extends DolibarrModules
 		dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_DB_VERSION', $this->version, 'chaine', 0, '', $conf->entity);
 
 		return $this->_init($sql, $options);
-
 	}
 
 	/**
