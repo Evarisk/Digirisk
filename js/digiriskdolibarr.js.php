@@ -359,6 +359,9 @@ window.eoxiaJS.modal.openModal = function ( event ) {
 		$('#risk_evaluation_edit' + idSelected).addClass('modal-active');
 	} else if ($(this).hasClass('evaluator-add')) {
 		$('#evaluator_add' + idSelected).addClass('modal-active');
+	} else if ($(this).hasClass('open-medias-linked')) {
+		console.log($('#risk_assessment_medias_modal_' + idSelected))
+		$('#risk_assessment_medias_modal_' + idSelected).addClass('modal-active');
 	}
 
 	// Open modal risk.
@@ -1031,14 +1034,12 @@ window.eoxiaJS.mediaGallery.savePhoto = function( event ) {
 	}
 	let favorite = filenames
 	favorite = favorite.split('vVv')[0]
-	let riskAssessmentPhoto = $('.risk-evaluation-photo-'+idToSave)
-	let filepath = riskAssessmentPhoto.find('.filepath-to-riskassessment').val()
-	console.log(riskAssessmentPhoto)
-	console.log(mediaLinked)
-	console.log(riskId)
+
+	let riskAssessmentPhoto = ''
+	riskAssessmentPhoto = $('.risk-evaluation-photo-'+idToSave+'.risk-'+riskId)
+
+	let filepath = $('.filepath-to-riskassessment-'+riskId)[0].value
 	let newPhoto = filepath + favorite.replace(/\./, '_small.')
-	console.log(filepath)
-	console.log(newPhoto)
 
 	$.ajax({
 		url: document.URL + "&action=addFiles&risk_id="+riskId+"&riskassessment_id="+idToSave+"&filenames="+filenames,
@@ -1048,7 +1049,6 @@ window.eoxiaJS.mediaGallery.savePhoto = function( event ) {
 		success: function ( ) {
 			$('.wpeo-loader').removeClass('wpeo-loader')
 			parent.removeClass('modal-active')
-			//modalFrom.find('.risk-evaluation-medias')
 			riskAssessmentPhoto.each( function() {
 				$(this).find('.clicked-photo-preview').attr('src',newPhoto )
 				$(this).find('.filename').attr('value', favorite.match(/_small/) ? favorite.replace(/\./, '_small.') : favorite)
@@ -1058,11 +1058,6 @@ window.eoxiaJS.mediaGallery.savePhoto = function( event ) {
 
 		}
 	});
-    //$('.wpeo-modal.modal-photo.modal-active').removeClass('modal-active');
-    //$(".risk-evaluation-photo-"+idToSave).find('.risk-evaluation-photo-single .filename').val(parent.find('.clicked-photo .filename').val());
-	//$(".risk-evaluation-photo-"+idToSave).find('.risk-evaluation-photo-single img').attr('src' , parent.find('.clicked-photo img').attr('src'));
-	//$('.clicked-photo').attr('style', '');
-	//$('.clicked-photo').removeClass('clicked-photo');
 };
 
 /**
@@ -1192,13 +1187,16 @@ window.eoxiaJS.mediaGallery.addToFavorite = function( event ) {
 	let filename = $(this).find('.filename').val()
 	let querySeparator = '?'
 	let mediaContainer = $(this).closest('.media-container')
-
+	let modalFrom = $('.modal-risk.modal-active')
+	let riskId = modalFrom.attr('value')
 	//crée un sélecteur générique à l'évaluation risk-evaluation-photo-id et en le $() on itère sur ceux qui possèdent cette classe et on change la src de leur image
-	let riskAssessmentPhoto = $('.risk-evaluation-photo-'+riskassessment_id)
+	let riskAssessmentPhoto = ''
+	riskAssessmentPhoto = $('.risk-evaluation-photo-'+riskassessment_id+'.risk-'+riskId)
+
 	let saveButton = $(this).closest('.modal-container').find('.risk-evaluation-save')
 
 	//change star button style
-	let previousFavorite = $(this).closest('.modal-container').find('.fas.fa-star')
+	let previousFavorite = $(this).closest('.risk-evaluation-medias').find('.fas.fa-star')
 	let newFavorite = $(this).find('.far.fa-star')
 	let previousPhoto = $(this).closest('.modal-container').find('.risk-evaluation-photo .clicked-photo-preview')
 
@@ -1211,7 +1209,9 @@ window.eoxiaJS.mediaGallery.addToFavorite = function( event ) {
 	document.URL.match('/?/') ? querySeparator = '&' : 1
 	saveButton.addClass('button-disable')
 	window.eoxiaJS.loader.display(mediaContainer);
-	$(this).closest('.modal-container').find('.filename').attr('value', filename)
+
+	$(this).find('.filename').attr('value', filename)
+
 	let previousName = previousPhoto[0].src.trim().split(/thumbs%2F/)[1].split(/"/)[0]
 
 	$.ajax({

@@ -1413,7 +1413,7 @@ function digirisk_show_medias_linked($modulepart = 'ecm', $sdir, $size = 0, $nbm
 				// On continue ou on arrete de boucler ?
 				if ($nbmax && $nbphoto >= $nbmax) break;
 			}
-$return .= '<div>
+			$return .= '<div>
 				<div class="wpeo-button button-square-50 button-blue media-gallery-favorite" value="'.$object->id .'">
 				<input class="riskassessment-id" type="hidden" value="'.($object->id > 0 ? $object->id : 0).'">
 				<input class="filename" type="hidden" value="'.$photo.'">
