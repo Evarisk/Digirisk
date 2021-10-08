@@ -1054,9 +1054,7 @@ window.eoxiaJS.mediaGallery.savePhoto = function( event ) {
 				$(this).find('.clicked-photo-preview').attr('src',newPhoto )
 				$(this).find('.filename').attr('value', favorite.match(/_small/) ? favorite.replace(/\./, '_small.') : favorite)
 			});
-
-			mediaLinked.load(document.URL + ' .risk-evaluation-medias-'+idToSave+'.risk-'+riskId)
-		//	modalMediaLinked.load(document.URL + ' .risk-evaluation-medias-'+idToSave+'.modal-media-linked')
+			mediaLinked.load(document.URL+'&favorite='+favorite + ' .risk-evaluation-medias-'+idToSave+'.risk-'+riskId)
 		}
 	});
 };
