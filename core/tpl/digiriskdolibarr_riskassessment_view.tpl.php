@@ -8,9 +8,10 @@ if (!empty ($lastEvaluation) && $lastEvaluation > 0) {
 		<div class="risk-evaluation-single-content risk-evaluation-single-content-<?php echo $risk->id ?>">
 			<div class="risk-evaluation-single risk-evaluation-single-<?php echo $risk->id ?>">
 				<div class="risk-evaluation-cotation risk-evaluation-list modal-open" value="<?php echo $risk->id ?>" data-scale="<?php echo $lastEvaluation->get_evaluation_scale() ?>">
-					<span><?php echo $lastEvaluation->cotation; ?></span>
+					<span><?php echo $lastEvaluation->cotation ?: 0; ?></span>
 				</div>
-				<div class="risk-evaluation-photo risk-evaluation-photo-<?php echo $lastEvaluation->id > 0 ?  $lastEvaluation->id :  0 ; echo $risk->id > 0 ? ' risk-'.$risk->id : ' risk-new' ?>  modal-open open-medias-linked" value="<?php echo $lastEvaluation->id ?>">
+<!--				@todo mettre le modal open ici si on veut la modal-->
+				<div class="risk-evaluation-photo risk-evaluation-photo-<?php echo $lastEvaluation->id > 0 ?  $lastEvaluation->id :  0 ; echo $risk->id > 0 ? ' risk-'.$risk->id : ' risk-new' ?> open-medias-linked" value="<?php echo $lastEvaluation->id ?>">
 					<?php $filearray = dol_dir_list($conf->digiriskdolibarr->multidir_output[$conf->entity].'/'.$lastEvaluation->element.'/'.$lastEvaluation->ref, "files", 0, '', '(\.odt|_preview.*\.png)$', 'position_name', 'asc', 1);
 					if (count($filearray)) {
 						print '<img height="40" width="100%" class="photo clicked-photo-preview" src="'.DOL_URL_ROOT.'/viewimage.php?modulepart=digiriskdolibarr&entity='.$conf->entity.'&file='.urlencode($lastEvaluation->element.'/'.$lastEvaluation->ref . '/thumbs/'. preg_replace('/\./', '_small.', $lastEvaluation->photo)).'" >';
@@ -74,13 +75,13 @@ if (!empty ($lastEvaluation) && $lastEvaluation > 0) {
 					<?php $cotation = $lastEvaluation;
 					include DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/core/tpl/digiriskdolibarr_photo_view.tpl.php'; ?>
 
-					<!-- Modal EDIT Evaluation Content-->
+					<!-- Modal Content-->
 					<div class="modal-content" id="#modalContent<?php echo $lastEvaluation->id ?>">
 						<div class="risk-evaluation-container <?php echo $lastEvaluation->method; ?>">
 							<div class="risk-evaluation-header">
 
 							</div>
-							<div class="risk-evaluation-medias risk-evaluation-medias-<?php echo $lastEvaluation->id ?>">
+							<div class="risk-evaluation-medias risk-evaluation-medias-<?php echo $lastEvaluation->id ?> modal-media-linked">
 								<div class="medias"><i class="fas fa-picture-o"></i><?php echo $langs->trans('Medias'); ?></div>
 								<?php
 								$relativepath = 'digiriskdolibarr/medias/thumbs';
