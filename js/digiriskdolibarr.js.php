@@ -1039,7 +1039,7 @@ window.eoxiaJS.mediaGallery.savePhoto = function( event ) {
 	let riskAssessmentPhoto = ''
 	riskAssessmentPhoto = $('.risk-evaluation-photo-'+idToSave+'.risk-'+riskId)
 
-	let filepath = $('.filepath-to-riskassessment-'+riskId)[0].value
+	let filepath = modalFrom.find('.risk-evaluation-photo-single .filepath-to-riskassessment').val()
 	let newPhoto = filepath + favorite.replace(/\./, '_small.')
 
 	$.ajax({
@@ -1143,7 +1143,7 @@ window.eoxiaJS.mediaGallery.unlinkFile = function( event ) {
 	let filename = $(this).find('.filename').val()
 	let querySeparator = '?'
 	let riskId = $(this).closest('.modal-risk').attr('value')
-	
+
 	let mediaContainer = $(this).closest('.media-container')
 	//let editModal = $('#risk_evaluation_edit'+riskassessment_id)
 	//let mediaLinkedModal = $('.risk-evaluation-medias-'+riskassessment_id+'.modal-media-linked')
@@ -1219,7 +1219,7 @@ window.eoxiaJS.mediaGallery.addToFavorite = function( event ) {
 	saveButton.addClass('button-disable')
 	window.eoxiaJS.loader.display(mediaContainer);
 
-	$(this).find('.filename').attr('value', filename)
+	$(this).closest('.modal-content').find('.risk-evaluation-photo-single .filename').attr('value', filename)
 
 	let previousName = previousPhoto[0].src.trim().split(/thumbs%2F/)[1].split(/"/)[0]
 
