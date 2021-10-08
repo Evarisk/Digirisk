@@ -129,8 +129,6 @@ if (empty($reshook)) {
 						$error++;
 						if ($_FILES['userfile']['error'][$key] == 1 || $_FILES['userfile']['error'][$key] == 2) {
 							setEventMessages($langs->trans('ErrorFileSizeTooLarge'), null, 'errors');
-						} else {
-							setEventMessages($langs->trans("ErrorFieldRequired", $langs->transnoentitiesnoconv("File")), null, 'errors');
 						}
 					}
 				}
