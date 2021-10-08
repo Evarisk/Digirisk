@@ -224,6 +224,7 @@ class doc_listingrisksaction_odt extends ModeleODTListingRisksAction
 			} else {
 				$filename = $objectref.'_'.$conf->global->MAIN_INFO_SOCIETE_NOM.'_'.$date.'.odt';
 			}
+			$filename = str_replace(' ', '_', $filename);
 			$filename = dol_sanitizeFileName($filename);
 
 			$object->last_main_doc = $filename;
