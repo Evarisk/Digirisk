@@ -782,11 +782,10 @@ function recurse_tree($parent, $niveau, $array) {
 function display_recurse_tree($results) {
 	include_once DOL_DOCUMENT_ROOT.'/core/lib/images.lib.php';
 
-	global $conf, $langs, $user, $db, $maxwidthmini, $maxheightmini, $maxwidthsmall,$maxheightsmall ;
+	global $conf, $langs, $user, $db;
 
 	require_once __DIR__ . '/../core/modules/digiriskdolibarr/digiriskelement/groupment/mod_groupment_standard.php';
 	require_once __DIR__ . '/../core/modules/digiriskdolibarr/digiriskelement/workunit/mod_workunit_standard.php';
-
 
 	if (GETPOST('action') == "addFiles" && GETPOST('digiriskelement_id')) {
 
@@ -797,8 +796,9 @@ function display_recurse_tree($results) {
 		$pathToDigiriskElementPhoto = $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/'.$digiriskelement->element_type.'/' . $digiriskelement->ref ;
 		$filenames = preg_split('/vVv/', $filenames);
 		array_pop($filenames);
-		if ( !(empty($filenames))) {
 
+		if ( !(empty($filenames))) {
+			$digiriskelement->photo = $filenames[0];
 			foreach ($filenames as $filename) {
 
 				if (is_file( $conf->ecm->multidir_output[$conf->entity] . '/digiriskdolibarr/medias/' . $filename)) {
@@ -815,13 +815,13 @@ function display_recurse_tree($results) {
 
 					$destfull = $pathToDigiriskElementPhoto . '/' . $filename;
 					// Create thumbs
-					$imgThumbSmall = vignette($destfull, $maxwidthsmall, $maxheightsmall, '_small', 50, "thumbs");
+					vignette($destfull, 480, 270, '_small', 50, "thumbs");
 					// Create mini thumbs for image (Ratio is near 16/9)
-					$imgThumbMini = vignette($destfull, $maxwidthmini, $maxheightmini, '_mini', 50, "thumbs");
+					vignette($destfull, 128, 72, '_mini', 50, "thumbs");
 				}
 			}
 		}
-
+		$digiriskelement->update($user);
 		exit;
 	}
 
@@ -839,6 +839,41 @@ function display_recurse_tree($results) {
 					<?php if ($element['object']->element_type == 'groupment' && count($element['children'])) { ?>
 						<div class="toggle-unit">
 							<i class="toggle-icon fas fa-chevron-right" id="menu<?php echo $element['object']->id;?>"></i>
+							<div class="digirisk-element-medias-modal" style="z-index:1500" value="<?php echo $element['object']->id ?>">
+							<div class="wpeo-modal"  id="digirisk_element_medias_modal_<?php echo $element['object']->id ?>" value="<?php echo $element['object']->id ?>" style="z-index: 1005 !important">
+								<div class="modal-container wpeo-modal-event">
+									<!-- Modal-Header -->
+									<div class="modal-header">
+										<h2 class="modal-title"><?php echo $langs->trans('RiskAssessmentMedias') . ' ' . $element['object']->ref ?></h2>
+										<div class="wpeo-button open-media-gallery add-media modal-open" value="<?php echo $element['object']->id ?>">
+											<input type="hidden" class="type-from" value="riskassessment"/>
+											<span><i class="fas fa-camera"></i>  <?php echo $langs->trans('AddMedia') ?></span>
+										</div>
+										<div class="modal-close"><i class="fas fa-times"></i></div>
+									</div>
+									<!-- Modal Content-->
+									<div class="modal-content" id="#modalContent<?php echo $element['object']->id ?>">
+										<div class="risk-evaluation-container">
+											<div class="risk-evaluation-header">
+											</div>
+											<div class="risk-evaluation-medias risk-evaluation-medias-<?php echo $lastEvaluation->id ?> modal-media-linked">
+												<div class="medias"><i class="fas fa-picture-o"></i><?php echo $langs->trans('Medias'); ?></div>
+												<?php
+												$relativepath = 'digiriskdolibarr/medias/thumbs';
+												print digirisk_show_medias_linked('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/'.$element['object']->element_type.'/' , 'small', '', 0, 0, 0, 150, 150, 1, 0, 0, $element['object']->element_type, $element['object']);
+												?>
+											</div>
+										</div>
+									</div>
+									<!-- Modal-Footer -->
+									<div class="modal-footer">
+										<div class="wpeo-button modal-close button-blue">
+											<i class="fas fa-times"></i> <?php echo $langs->trans('CloseModal'); ?>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
 						</div>
 					<?php } else { ?>
 						<div class="spacer"></div>

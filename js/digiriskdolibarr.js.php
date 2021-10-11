@@ -1027,6 +1027,9 @@ window.eoxiaJS.mediaGallery.savePhoto = function( event ) {
 	let mediaLinked = modalFrom.find('.risk-evaluation-medias')
 	let type = $(this).find('.type-from').val()
 
+	var params = new window.URLSearchParams(window.location.search);
+	var currentElementID = params.get('id')
+
 	let filenames = ''
 	if (filesLinked.length > 0) {
 		filesLinked.each(function(  ) {
@@ -1079,12 +1082,22 @@ window.eoxiaJS.mediaGallery.savePhoto = function( event ) {
             processData: false,
             contentType: false,
             success: function ( ) {
-                let digiriskBanner = $('.arearef.heightref')
                 $('.wpeo-loader').removeClass('wpeo-loader')
                 parent.removeClass('modal-active')
                 digiriskElementPhoto.attr('src',newPhoto )
 
-                digiriskBanner.load(document.URL+'&favorite='+favorite + ' .arearef.heightref')
+				let photoContainer = digiriskElementPhoto.closest('.open-media-gallery')
+				photoContainer.removeClass('open-media-gallery')
+				photoContainer.addClass('open-medias-linked')
+				photoContainer.addClass('digirisk-element')
+				photoContainer.closest('.unit-container').find('.digirisk-element-medias-modal').load(document.URL+ ' #digirisk_element_medias_modal_'+idToSave)
+
+				console.log(idToSave)
+				console.log(currentElementID)
+				if (idToSave === currentElementID) {
+					let digiriskBanner = $('.arearef.heightref')
+					digiriskBanner.load(document.URL+'&favorite='+favorite + ' .arearef.heightref')
+				}
             }
         });
 	}
