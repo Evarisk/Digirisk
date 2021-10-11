@@ -83,16 +83,16 @@ if (!$user->rights->digiriskdolibarr->adminpage->read) accessforbidden();
  * Actions
  */
 
-if (GETPOST('sendit', 'alpha') && !empty($conf->global->MAIN_UPLOAD_DOC)) {
+if (GETPOST('dataMigrationImport', 'alpha') && !empty($conf->global->MAIN_UPLOAD_DOC)) {
 	// Submit file
 	if (!empty($_FILES)) {
-		if (is_array($_FILES['userfile']['tmp_name'])) $userfiles = $_FILES['userfile']['tmp_name'];
-		else $userfiles = array($_FILES['userfile']['tmp_name']);
+		if (is_array($_FILES['dataMigrationImportfile']['tmp_name'])) $userfiles = $_FILES['dataMigrationImportfile']['tmp_name'];
+		else $userfiles = array($_FILES['dataMigrationImportfile']['tmp_name']);
 
 		foreach ($userfiles as $key => $userfile) {
-			if (empty($_FILES['userfile']['tmp_name'][$key])) {
+			if (empty($_FILES['dataMigrationImportfile']['tmp_name'][$key])) {
 				$error++;
-				if ($_FILES['userfile']['error'][$key] == 1 || $_FILES['userfile']['error'][$key] == 2) {
+				if ($_FILES['dataMigrationImportfile']['error'][$key] == 1 || $_FILES['dataMigrationImportfile']['error'][$key] == 2) {
 					setEventMessages($langs->trans('ErrorFileSizeTooLarge'), null, 'errors');
 				} else {
 					setEventMessages($langs->trans("ErrorFieldRequired", $langs->transnoentitiesnoconv("File")), null, 'errors');
@@ -103,12 +103,12 @@ if (GETPOST('sendit', 'alpha') && !empty($conf->global->MAIN_UPLOAD_DOC)) {
 		if (!$error) {
 			$filedir = $upload_dir . '/temp/';
 			if (!empty($filedir)) {
-				$result = dol_add_file_process($filedir, 0, 1, 'userfile', '', null, '', 0, null);
+				$result = dol_add_file_process($filedir, 0, 1, 'dataMigrationImportfile', '', null, '', 0, null);
 			}
 		}
 	}
 
-	$json = file_get_contents($filedir.$_FILES['userfile']['name'][0]);
+	$json = file_get_contents($filedir.$_FILES['dataMigrationImportfile']['name'][0]);
 	$digiriskExportArray = json_decode($json, true);
 	$digiriskExportArray = array_shift($digiriskExportArray);
 
@@ -141,6 +141,82 @@ if (GETPOST('sendit', 'alpha') && !empty($conf->global->MAIN_UPLOAD_DOC)) {
 	}
 }
 
+if (GETPOST('dataMigrationImportRisks', 'alpha') && !empty($conf->global->MAIN_UPLOAD_DOC)) {
+	// Submit file
+	if (!empty($_FILES)) {
+		if (is_array($_FILES['dataMigrationImportRisksfile']['tmp_name'])) $userfiles = $_FILES['dataMigrationImportRisksfile']['tmp_name'];
+		else $userfiles = array($_FILES['dataMigrationImportRisksfile']['tmp_name']);
+
+		foreach ($userfiles as $key => $userfile) {
+			if (empty($_FILES['dataMigrationImportRisksfile']['tmp_name'][$key])) {
+				$error++;
+				if ($_FILES['dataMigrationImportRisksfile']['error'][$key] == 1 || $_FILES['dataMigrationImportRisksfile']['error'][$key] == 2) {
+					setEventMessages($langs->trans('ErrorFileSizeTooLarge'), null, 'errors');
+				} else {
+					setEventMessages($langs->trans("ErrorFieldRequired", $langs->transnoentitiesnoconv("File")), null, 'errors');
+				}
+			}
+		}
+
+		if (!$error) {
+			$filedir = $upload_dir . '/temp/';
+			if (!empty($filedir)) {
+				$result = dol_add_file_process($filedir, 0, 1, 'dataMigrationImportRisksfile', '', null, '', 0, null);
+			}
+		}
+	}
+
+	$json = file_get_contents($filedir.$_FILES['dataMigrationImportRisksfile']['name'][0]);
+	$digiriskExportArray = json_decode($json, true);
+
+	//Risk
+	foreach ($digiriskExportArray as $digiriskExportRisk) {
+		$risk->ref        = $refRiskMod->getNextValue($risk);
+		$risk->category   = $risk->get_danger_category_position_by_name($digiriskExportRisk['danger_category']['name']);
+		$risk->fk_element = $digiriskElement->fetch_id_from_wp_digi_id($digiriskExportRisk['parent_id']);
+		$risk->fk_projet  = $conf->global->DIGIRISKDOLIBARR_DU_PROJECT;
+
+		if (!$error) {
+			$result = $risk->create($user, true);
+			if ($result > 0) {
+				$riskAssessment->ref                 = $refRiskAssessmentMod->getNextValue($riskAssessment);
+				$riskAssessment->date_riskassessment = $digiriskExportRisk['evaluation']['date']['raw'];
+				$riskAssessment->cotation            = $digiriskExportRisk['current_equivalence'];
+				$riskAssessment->status              = 1;
+				$riskAssessment->fk_risk             = $risk->id;
+
+				if ($digiriskExportRisk['evaluation_method']['name'] == 'Evarisk') {
+					$riskAssessment->gravite    = $digiriskExportRisk['evaluation']['variables']['105'];
+					$riskAssessment->exposition = $digiriskExportRisk['evaluation']['variables']['106'];
+					$riskAssessment->occurrence = $digiriskExportRisk['evaluation']['variables']['107'];
+					$riskAssessment->formation  = $digiriskExportRisk['evaluation']['variables']['108'];
+					$riskAssessment->protection = $digiriskExportRisk['evaluation']['variables']['109'];
+
+					$riskAssessment->method = 'advanced';
+				} else {
+					$riskAssessment->method = 'standard';
+				}
+
+				foreach ($digiriskExportRisk['comment'] as $digiriskExportComment) {
+					$riskAssessment->comment = $digiriskExportComment['content'];
+				}
+
+				$result2 = $riskAssessment->create($user, true);
+
+				if ($result2 < 0) {
+					// Creation evaluation KO
+					if (!empty($riskAssessment->errors)) setEventMessages(null, $riskAssessment->errors, 'errors');
+					else  setEventMessages($riskAssessment->error, null, 'errors');
+				}
+			} else {
+				// Creation risk KO
+				if (!empty($risk->errors)) setEventMessages(null, $risk->errors, 'errors');
+				else  setEventMessages($risk->error, null, 'errors');
+			}
+		}
+	}
+}
+
 /*
  * View
  */
@@ -156,6 +232,10 @@ print load_fiche_titre($langs->trans("Tools"), '', 'wrench');
 if ($user->rights->digiriskdolibarr->adminpage->read) {
 	print load_fiche_titre($langs->trans("DigiriskDataMigration"), '', '');
 
+	print '<form class="data-migration-from" name="DataMigration" id="DataMigration" action="'.$_SERVER["PHP_SELF"].'" enctype="multipart/form-data" method="POST">';
+	print '<input type="hidden" name="token" value="'.newToken().'">';
+	print '<input type="hidden" name="action" value="">';
+
 	print '<table class="noborder centpercent">';
 	print '<tr class="liste_titre">';
 	print '<td>'.$langs->trans("Name").'</td>';
@@ -170,17 +250,24 @@ if ($user->rights->digiriskdolibarr->adminpage->read) {
 	print '</td>';
 
 	print '<td class="center data-migration-import">';
-	// To attach new file
-	if ((!empty($conf->use_javascript_ajax) && empty($conf->global->MAIN_ECM_DISABLE_JS)) || !empty($section)) {
-		print '<!-- Start form to attach new file -->' . "\n";
-		include_once DOL_DOCUMENT_ROOT . '/core/class/html.formfile.class.php';
-		$formfile = new FormFile($db);
-		$formfile->form_attach_new_file($_SERVER["PHP_SELF"], 'none', 0, 0, $permtoupload, 48, null, '', 0, '', 0, 'DataMigrationImport', '', '', 0);
-	}
-	// End "Add new file" area
+	print '<input class="flat" type="file" name="dataMigrationImportfile[]" id="data-migration-import" />';
+	print '<input type="submit" class="button reposition data-migration-submit" name="dataMigrationImport" value="'.$langs->trans("Upload").'">';
+	print '</td>';
+	print '</tr>';
+
+	print '<tr class="oddeven"><td>';
+	print $langs->trans('DataMigrationImportRisks');
+	print "</td><td>";
+	print $langs->trans('DataMigrationImportRisksDescription');
+	print '</td>';
+
+	print '<td class="center data-migration-import-risks">';
+	print '<input class="flat" type="file" name="dataMigrationImportRisksfile[]" id="data-migration-import-risks" />';
+	print '<input type="submit" class="button reposition data-migration-submit" name="dataMigrationImportRisks" value="'.$langs->trans("Upload").'">';
 	print '</td>';
 	print '</tr>';
 	print '</table>';
+	print '</form>';
 }
 
 // End of page
