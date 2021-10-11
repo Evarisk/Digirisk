@@ -360,9 +360,10 @@ window.eoxiaJS.modal.openModal = function ( event ) {
 		$('#risk_evaluation_edit' + idSelected).addClass('modal-active');
 	} else if ($(this).hasClass('evaluator-add')) {
 		$('#evaluator_add' + idSelected).addClass('modal-active');
-	} else if ($(this).hasClass('open-medias-linked')) {
-		console.log($('#risk_assessment_medias_modal_' + idSelected))
-		$('#risk_assessment_medias_modal_' + idSelected).addClass('modal-active');
+	} else if ($(this).hasClass('open-medias-linked') && $(this).hasClass('digirisk-element')) {
+	    console.log( $('#digirisk_element_medias_modal_' + idSelected))
+        $('#digirisk_element_medias_modal_' + idSelected).addClass('modal-active');
+        //$('#risk_assessment_medias_modal_' + idSelected).addClass('modal-active');
 	}
 
 	// Open modal risk.

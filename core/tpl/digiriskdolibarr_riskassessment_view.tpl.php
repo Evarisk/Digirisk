@@ -86,7 +86,7 @@ if (!empty ($lastEvaluation) && $lastEvaluation > 0) {
 								<div class="medias"><i class="fas fa-picture-o"></i><?php echo $langs->trans('Medias'); ?></div>
 								<?php
 								$relativepath = 'digiriskdolibarr/medias/thumbs';
-								print digirisk_show_medias_linked('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessment/' , 'small', '', 0, 0, 0, 50, 0, 1, 0, 0, $lastEvaluation->element, $lastEvaluation);
+								print digirisk_show_medias_linked('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessment/' , 'small', '', 0, 0, 0, 150, 150, 1, 0, 0, $lastEvaluation->element, $lastEvaluation);
 								?>
 							</div>
 						</div>
@@ -240,7 +240,7 @@ if (!empty ($lastEvaluation) && $lastEvaluation > 0) {
 										<div class="medias"><i class="fas fa-picture-o"></i><?php echo $langs->trans('Medias'); ?></div>
 										<?php
 										$relativepath = 'digiriskdolibarr/medias/thumbs';
-										print digirisk_show_medias_linked('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessment/' , 'small', '', 0, 0, 0, 50, 0, 1, 0, 0, $cotation->element, $cotation);
+										print digirisk_show_medias_linked('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessment/' , 'small', '', 0, 0, 0, 150, 150, 1, 0, 0, $cotation->element, $cotation);
 										?>
 									</div>
 								</div>
@@ -540,7 +540,7 @@ $cotation->method = $lastEvaluation->method ? $lastEvaluation->method : "standar
 						<div class="medias"><i class="fas fa-picture-o"></i><?php echo $langs->trans('Medias'); ?></div>
 						<?php
 						$relativepath = 'digiriskdolibarr/medias/thumbs';
-						print digirisk_show_medias_linked('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessment/tmp/' .  $risk->ref . '/' , 'small', '', 0, 0, 0, 50, 0, 1, 0, 0, $cotation->element . '/tmp/' .  $risk->ref);
+						print digirisk_show_medias_linked('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessment/tmp/' .  $risk->ref . '/' , 'small', '', 0, 0, 0, 150, 150, 1, 0, 0, $cotation->element . '/tmp/' .  $risk->ref);
 						?>
 					</div>
 				</div>

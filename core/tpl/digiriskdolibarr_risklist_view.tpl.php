@@ -456,7 +456,7 @@
 							<div class="medias"><i class="fas fa-picture-o"></i><?php echo $langs->trans('Medias'); ?></div>
 							<?php
 							$relativepath = 'digiriskdolibarr/medias/thumbs';
-							print digirisk_show_medias_linked('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessment/tmp/RK0' , 'small', '', 0, 0, 0, 50, 0, 1, 0, 0, '/riskassessment/tmp/RK0');
+							print digirisk_show_medias_linked('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessment/tmp/RK0' , 'small', '', 0, 0, 0, 150, 150, 1, 0, 0, '/riskassessment/tmp/RK0');
 							?>
 						</div>
 					</div>
@@ -628,7 +628,7 @@
 						<div class="medias"><i class="fas fa-picture-o"></i><?php echo $langs->trans('Medias'); ?></div>
 						<?php
 						$relativepath = 'digiriskdolibarr/medias/thumbs';
-						print digirisk_show_medias_linked('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessment/tmp/RK0' , 'small', '', 0, 0, 0, 50, 0, 1, 0, 0, '/riskassessment/tmp/RK0');
+						print digirisk_show_medias_linked('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessment/tmp/RK0' , 'small', '', 0, 0, 0, 150, 150, 1, 0, 0, '/riskassessment/tmp/RK0');
 						?>
 					</div>
 				</div>
