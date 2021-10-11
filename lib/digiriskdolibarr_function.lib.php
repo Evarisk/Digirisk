@@ -97,6 +97,7 @@ function digirisk_show_photos($modulepart, $sdir, $size = 0, $nbmax = 0, $nbbyro
 				if ($size == 1 || $size == 'small') {   // Format vignette
 					// Find name of thumb file
 					$photo_vignette = basename(getImageFileNameForSize($dir.$file, '_small'));
+
 					if (!dol_is_file($dirthumb.$photo_vignette)) $photo_vignette = '';
 
 					// Get filesize of original file
@@ -149,7 +150,7 @@ function digirisk_show_photos($modulepart, $sdir, $size = 0, $nbmax = 0, $nbbyro
 					}
 					else
 					{
-						if (empty($maxHeight) || $photo_vignette && $imgarray['height'] > $maxHeight)
+						if ($photo_vignette && $imgarray['height'] > $maxHeight)
 						{
 							$return .= '<!-- Show thumb -->';
 							$return .= '<img class="photo clicked-photo-preview"  width="'.$maxHeight.'" src="'.DOL_URL_ROOT.'/viewimage.php?modulepart='.$modulepart.'&entity='.$conf->entity.'&file='.urlencode($pdirthumb.$photo_vignette).'" title="'.dol_escape_htmltag($alt).'">';
@@ -159,6 +160,7 @@ function digirisk_show_photos($modulepart, $sdir, $size = 0, $nbmax = 0, $nbbyro
 							$return .= '<img class="photo photowithmargin clicked-photo-preview" width="'.$maxHeight.'" src="'.DOL_URL_ROOT.'/viewimage.php?modulepart='.$modulepart.'&entity='.$conf->entity.'&file='.urlencode($pdir.$photo).'" title="'.dol_escape_htmltag($alt).'">';
 						}
 					}
+					$return .= '<input type="hidden" class="filename" value="'.$photo.'">';
 
 					if (empty($nolink)) $return .= '</a>';
 					$return .= "\n";
@@ -612,7 +614,7 @@ function digiriskHeader($head = '', $title = '', $help_url = '', $target = '', $
 	}
 	$results = recurse_tree(0,0,$objects); ?>
 		<!-- START MEDIA GALLERY MODAL -->
-	<div class="wpeo-modal modal-photo" id="media_gallery" style="z-index: 1008" data-id="<?php echo $object->id ?>">
+	<div class="wpeo-modal modal-photo" id="media_gallery" style="z-index: 2014 !important" data-id="<?php echo $object->id ?>">
 		<div class="modal-container wpeo-modal-event">
 			<!-- Modal-Header -->
 			<div class="modal-header">
@@ -820,8 +822,56 @@ function display_recurse_tree($results) {
 					vignette($destfull, 128, 72, '_mini', 50, "thumbs");
 				}
 			}
+			$digiriskelement->update($user);
 		}
-		$digiriskelement->update($user);
+		exit;
+	}
+
+	if (!$error && GETPOST('action') == "addToFavorite") {
+
+		$digiriskelement_id = GETPOST('digiriskelement_id');
+		$filename = GETPOST('filename');
+		$digiriskelement = new DigiriskElement($db);
+		$digiriskelement->fetch($digiriskelement_id);
+		$digiriskelement->photo = $filename;
+		$digiriskelement->update($user, true);
+		exit;
+	}
+
+	if (!$error && GETPOST('action') == "unlinkFile") {
+
+		$digiriskelement_id = GETPOST('digiriskelement_id');
+		$filename = GETPOST('filename');
+		$digiriskelement = new DigiriskElement($db);
+		$digiriskelement->fetch($digiriskelement_id);
+
+		//edit evaluation
+		if ($digiriskelement->id > 0) {
+			$pathToDigiriskElementPhoto = $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/'.$digiriskelement->element_type.'/' . $digiriskelement->ref ;
+		}
+
+
+		$files = dol_dir_list($pathToDigiriskElementPhoto);
+
+		foreach ($files as $file) {
+			if (is_file($file['fullname']) && $file['name'] == $filename) {
+				unlink($file['fullname']);
+			}
+		}
+
+		$files = dol_dir_list($pathToDigiriskElementPhoto . '/thumbs');
+		foreach ($files as $file) {
+			if (preg_match('/' . preg_split('/\./',$filename)[0] . '/', $file['name'])) {
+				unlink($file['fullname']);
+			}
+		}
+		if ($digiriskelement->photo == $filename) {
+			$digiriskelement->photo = '';
+			$digiriskelement->update($user, true);
+		}
+		$urltogo = str_replace('__ID__', $id, $backtopage);
+		$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
+		header("Location: ".$urltogo);
 		exit;
 	}
 
@@ -844,9 +894,9 @@ function display_recurse_tree($results) {
 								<div class="modal-container wpeo-modal-event">
 									<!-- Modal-Header -->
 									<div class="modal-header">
-										<h2 class="modal-title"><?php echo $langs->trans('RiskAssessmentMedias') . ' ' . $element['object']->ref ?></h2>
+										<h2 class="modal-title"><?php echo $langs->trans('DigiriskElementMedias') . ' ' . $element['object']->ref ?></h2>
 										<div class="wpeo-button open-media-gallery add-media modal-open" value="<?php echo $element['object']->id ?>">
-											<input type="hidden" class="type-from" value="riskassessment"/>
+											<input type="hidden" class="type-from" value="digiriskelement"/>
 											<span><i class="fas fa-camera"></i>  <?php echo $langs->trans('AddMedia') ?></span>
 										</div>
 										<div class="modal-close"><i class="fas fa-times"></i></div>
@@ -856,7 +906,7 @@ function display_recurse_tree($results) {
 										<div class="risk-evaluation-container">
 											<div class="risk-evaluation-header">
 											</div>
-											<div class="risk-evaluation-medias risk-evaluation-medias-<?php echo $lastEvaluation->id ?> modal-media-linked">
+											<div class="element-linked-medias element-linked-medias-<?php echo $element['object']->id ?> digirisk-element modal-media-linked">
 												<div class="medias"><i class="fas fa-picture-o"></i><?php echo $langs->trans('Medias'); ?></div>
 												<?php
 												$relativepath = 'digiriskdolibarr/medias/thumbs';
@@ -882,9 +932,9 @@ function display_recurse_tree($results) {
 								<div class="modal-container wpeo-modal-event">
 									<!-- Modal-Header -->
 									<div class="modal-header">
-										<h2 class="modal-title"><?php echo $langs->trans('RiskAssessmentMedias') . ' ' . $element['object']->ref ?></h2>
+										<h2 class="modal-title"><?php echo $langs->trans('DigiriskElementMedias') . ' ' . $element['object']->ref ?></h2>
 										<div class="wpeo-button open-media-gallery add-media modal-open" value="<?php echo $element['object']->id ?>">
-											<input type="hidden" class="type-from" value="riskassessment"/>
+											<input type="hidden" class="type-from" value="digiriskelement"/>
 											<span><i class="fas fa-camera"></i>  <?php echo $langs->trans('AddMedia') ?></span>
 										</div>
 										<div class="modal-close"><i class="fas fa-times"></i></div>
@@ -894,7 +944,7 @@ function display_recurse_tree($results) {
 										<div class="risk-evaluation-container">
 											<div class="risk-evaluation-header">
 											</div>
-											<div class="risk-evaluation-medias risk-evaluation-medias-<?php echo $lastEvaluation->id ?> modal-media-linked">
+											<div class="element-linked-medias element-linked-medias-<?php echo $element['object']->id ?> digirisk-element modal-media-linked">
 												<div class="medias"><i class="fas fa-picture-o"></i><?php echo $langs->trans('Medias'); ?></div>
 												<?php
 												$relativepath = 'digiriskdolibarr/medias/thumbs';
@@ -916,10 +966,13 @@ function display_recurse_tree($results) {
 					$pathToThumb = DOL_URL_ROOT.'/viewimage.php?modulepart=digiriskdolibarr&entity='.$conf->entity.'&file='.urlencode($element['object']->element_type.'/'.$element['object']->ref . '/thumbs/');
 					$filearray = dol_dir_list($conf->digiriskdolibarr->multidir_output[$conf->entity].'/'.$element['object']->element_type.'/'.$element['object']->ref.'/', "files", 0, '', '(\.odt|_preview.*\.png)$', 'position_name', 'asc', 1);
 					if (count($filearray)) {
-						print '<span class="floatleft inline-block valignmiddle divphotoref open-medias-linked modal-open digirisk-element" value="'. $element['object']->id.'">'.digirisk_show_photos('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity].'/'.$element['object']->element_type, 'small', 1, 0, 0, 0, 50, 50, 1, 0, 0, $element['object']->element_type, $element['object']).'</span>';
+						print '<span class="floatleft inline-block valignmiddle divphotoref open-medias-linked modal-open digirisk-element digirisk-element-'.$element['object']->id.'" value="'. $element['object']->id.'">';
+						 print '<img width="50" class="photo clicked-photo-preview" src="'.DOL_URL_ROOT.'/viewimage.php?modulepart=digiriskdolibarr&entity='.$conf->entity.'&file='.urlencode($element['object']->element_type.'/'.$element['object']->ref . '/thumbs/'. preg_replace('/\./', '_small.', $element['object']->photo)).'" >';
+						 print '<input type="hidden" class="filepath-to-digiriskelement" value="'.$pathToThumb.'"/>';
+						 print '</span>';
 					} else {
 						$nophoto = '/public/theme/common/nophoto.png'; ?>
-							<div class="open-media-gallery modal-open digiriskelement digiriskelement-<?php echo $element['object']->id ?>" value="<?php  echo $element['object']->id ?>">
+							<div class="open-media-gallery modal-open digiriskelement digirisk-element-<?php echo $element['object']->id ?>" value="<?php  echo $element['object']->id ?>">
 								<input type="hidden" class="type-from" value="digiriskelement"/>
 								<input type="hidden" class="filepath-to-digiriskelement" value="<?php echo $pathToThumb ?>"/>
 								<span class="floatleft inline-block valignmiddle divphotoref"><img width="50" class="photo photowithmargin clicked-photo-preview" alt="No photo" src="<?php echo DOL_URL_ROOT.$nophoto ?>"></span>
@@ -1580,12 +1633,12 @@ function digirisk_show_medias_linked($modulepart = 'ecm', $sdir, $size = 0, $nbm
 			}
 			$return .= '<div>
 				<div class="wpeo-button button-square-50 button-blue media-gallery-favorite" value="'.$object->id .'">
-				<input class="riskassessment-id" type="hidden" value="'.($object->id > 0 ? $object->id : 0).'">
+				<input class="element-linked-id" type="hidden" value="'.($object->id > 0 ? $object->id : 0).'">
 				<input class="filename" type="hidden" value="'.$photo.'">
 				<i class="'.(GETPOST('favorite') == $photo ? 'fas' : ($object->photo == $photo ? 'fas' : 'far')).' fa-star button-icon"></i>
 			</div>
 			<div class="wpeo-button button-square-50 button-grey media-gallery-unlink" value="'.$object->id .'">
-				<input class="riskassessment-id" type="hidden" value="'.($object->id > 0 ? $object->id : 0).'">
+				<input class="element-linked-id" type="hidden" value="'.($object->id > 0 ? $object->id : 0).'">
 				<input class="filename" type="hidden" value="'.$photo.'">
 				<i class="fas fa-unlink button-icon"></i>
 			</div></div></div>';

@@ -452,7 +452,7 @@
 								<?php endif; ?>
 							</div>
 						</div>
-						<div class="risk-evaluation-medias risk-evaluation-medias-0 risk-new">
+						<div class="element-linked-medias element-linked-medias-0 risk-new">
 							<div class="medias"><i class="fas fa-picture-o"></i><?php echo $langs->trans('Medias'); ?></div>
 							<?php
 							$relativepath = 'digiriskdolibarr/medias/thumbs';
@@ -624,7 +624,7 @@
 							<span class="title"><?php echo $langs->trans('Label'); ?> <input type="text" class="" name="label" value=""></span>
 						</div>
 					<?php endif; ?>
-					<div class="risk-evaluation-medias risk-evaluation-medias-0 risk-new">
+					<div class="element-linked-medias element-linked-medias-0 risk-new">
 						<div class="medias"><i class="fas fa-picture-o"></i><?php echo $langs->trans('Medias'); ?></div>
 						<?php
 						$relativepath = 'digiriskdolibarr/medias/thumbs';

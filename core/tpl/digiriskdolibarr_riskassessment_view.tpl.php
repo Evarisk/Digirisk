@@ -82,7 +82,7 @@ if (!empty ($lastEvaluation) && $lastEvaluation > 0) {
 							<div class="risk-evaluation-header">
 
 							</div>
-							<div class="risk-evaluation-medias risk-evaluation-medias-<?php echo $lastEvaluation->id ?> modal-media-linked">
+							<div class="element-linked-medias element-linked-medias-<?php echo $lastEvaluation->id ?> modal-media-linked">
 								<div class="medias"><i class="fas fa-picture-o"></i><?php echo $langs->trans('Medias'); ?></div>
 								<?php
 								$relativepath = 'digiriskdolibarr/medias/thumbs';
@@ -236,7 +236,7 @@ if (!empty ($lastEvaluation) && $lastEvaluation > 0) {
 											<?php print $form->selectDate($lastEvaluation->date_riskassessment, 'RiskAssessmentDate', 0, 0, 0, '', 1, 1); ?>
 										</div>
 									<?php endif; ?>
-									<div class="risk-evaluation-medias risk-evaluation-medias-<?php echo $cotation->id ?> risk-<?php echo $risk->id ?>">
+									<div class="element-linked-medias element-linked-medias-<?php echo $cotation->id ?> risk-<?php echo $risk->id ?>">
 										<div class="medias"><i class="fas fa-picture-o"></i><?php echo $langs->trans('Medias'); ?></div>
 										<?php
 										$relativepath = 'digiriskdolibarr/medias/thumbs';
@@ -536,7 +536,7 @@ $cotation->method = $lastEvaluation->method ? $lastEvaluation->method : "standar
 							<?php print $form->selectDate('', 'RiskAssessmentDate', 0, 0, 0, '', 1, 1); ?>
 						</div>
 					<?php endif; ?>
-					<div class="risk-evaluation-medias risk-evaluation-medias-0 risk-<?php echo $risk->id ?>">
+					<div class="element-linked-medias element-linked-medias-0 risk-<?php echo $risk->id ?>">
 						<div class="medias"><i class="fas fa-picture-o"></i><?php echo $langs->trans('Medias'); ?></div>
 						<?php
 						$relativepath = 'digiriskdolibarr/medias/thumbs';

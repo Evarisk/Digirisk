@@ -521,7 +521,7 @@ if (!$error && $action == "addFiles" && $permissiontodelete && !GETPOST('digiris
 	exit;
 }
 
-if (!$error && $action == "unlinkFile" && $permissiontodelete) {
+if (!$error && $action == "unlinkFile" && $permissiontodelete && !GETPOST('digiriskelement_id')) {
 
 	$riskassessment_id = GETPOST('riskassessment_id');
 	$filename = GETPOST('filename');
@@ -567,7 +567,7 @@ if (!$error && $action == "unlinkFile" && $permissiontodelete) {
 	exit;
 }
 
-if (!$error && $action == "addToFavorite" && $permissiontodelete) {
+if (!$error && $action == "addToFavorite" && $permissiontodelete && !GETPOST('digiriskelement_id')) {
 
 	$riskassessment_id = GETPOST('riskassessment_id');
 	$filename = GETPOST('filename');
