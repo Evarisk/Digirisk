@@ -468,7 +468,7 @@ if (!$error && $action == "deleteRiskAssessmentTask" && $permissiontodelete) {
 	}
 }
 
-if (!$error && $action == "addFiles" && $permissiontodelete) {
+if (!$error && $action == "addFiles" && $permissiontodelete && !GETPOST('digiriskelement_id')) {
 
 	$riskassessment_id = GETPOST('riskassessment_id');
 	$risk_id = GETPOST('risk_id');

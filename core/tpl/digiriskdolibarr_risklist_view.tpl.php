@@ -317,7 +317,7 @@
 		<!-- RISK ADD MODAL-->
 		<?php if ($conf->global->DIGIRISKDOLIBARR_TASK_MANAGEMENT == 0 && $conf->global->DIGIRISKDOLIBARR_RISK_DESCRIPTION == 0 && $conf->global->DIGIRISKDOLIBARR_MULTIPLE_RISKASSESSMENT_METHOD ==0 ) : ?>
 		<div class="risk-add-modal" value="<?php echo $object->id ?>">
-			<div class="wpeo-modal modal-risk-0 modal-risk" id="risk_add<?php echo $object->id ?>" value="0">
+			<div class="wpeo-modal modal-risk-0 modal-risk" id="risk_add<?php echo $object->id ?>" value="new">
 				<div class="modal-container wpeo-modal-event">
 					<!-- Modal-Header -->
 					<div class="modal-header">
@@ -363,6 +363,7 @@
 									<input class="risk-evaluation-method" type="hidden" value="standard">
 									<input class="risk-evaluation-multiple-method" type="hidden" value="1">
 									<div class="wpeo-button open-media-gallery add-media modal-open" value="0">
+										<input type="hidden" class="type-from" value="riskassessment"/>
 										<span><i class="fas fa-camera"></i>  <?php echo $langs->trans('AddMedia') ?></span>
 									</div>
 								</div>
@@ -451,6 +452,13 @@
 								<?php endif; ?>
 							</div>
 						</div>
+						<div class="risk-evaluation-medias risk-evaluation-medias-0 risk-new">
+							<div class="medias"><i class="fas fa-picture-o"></i><?php echo $langs->trans('Medias'); ?></div>
+							<?php
+							$relativepath = 'digiriskdolibarr/medias/thumbs';
+							print digirisk_show_medias_linked('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessment/tmp/RK0' , 'small', '', 0, 0, 0, 50, 0, 1, 0, 0, '/riskassessment/tmp/RK0');
+							?>
+						</div>
 					</div>
 					<!-- Modal-Footer -->
 					<div class="modal-footer">
@@ -522,6 +530,7 @@
 							<input class="risk-evaluation-method" type="hidden" value="standard">
 							<input class="risk-evaluation-multiple-method" type="hidden" value="1">
 							<div class="wpeo-button open-media-gallery add-media modal-open" value="0">
+								<input type="hidden" class="type-from" value="riskassessment"/>
 								<span><i class="fas fa-camera"></i>  <?php echo $langs->trans('AddMedia') ?></span>
 							</div>
 						</div>
@@ -686,58 +695,6 @@
 
 	print '<div class="div-table-responsive">'; // You can use div-table-responsive-no-min if you dont need reserved height for your table
 	?>
-	<!-- START RISK EVALUATION PHOTO MODAL -->
-	<div class="wpeo-modal modal-photo" id="risk_evaluation_photo" style="z-index: 1008" data-id="<?php echo $object->id ?>">
-		<div class="modal-container wpeo-modal-event">
-			<!-- Modal-Header -->
-			<div class="modal-header">
-				<h2 class="modal-title"><?php echo $langs->trans('ModalAddPhoto') ?></h2>
-				<div class="modal-close"><i class="fas fa-2x fa-times"></i></div>
-			</div>
-			<!-- Modal-Content -->
-			<div class="modal-content" id="#modalMediaGalleryContent">
-				<?php
-				// To attach new file
-				if ((!empty($conf->use_javascript_ajax) && empty($conf->global->MAIN_ECM_DISABLE_JS)) || !empty($section))
-				{
-					$sectiondir = GETPOST('file', 'alpha') ?GETPOST('file', 'alpha') : GETPOST('section_dir', 'alpha');
-					print '<!-- Start form to attach new file in digiriskdolibarr_photo_view.tpl.tpl.php sectionid='.$section.' sectiondir='.$sectiondir.' -->'."\n";
-					include_once DOL_DOCUMENT_ROOT.'/core/class/html.formfile.class.php';
-					$formfile = new FormFile($db);
-					$formfile->form_attach_new_file($_SERVER["PHP_SELF"], 'none', 0, 0, $permtoupload, 48, null, '', 0, '', 0, $nameforformuserfile, '', $sectiondir, 1);
-				} else print '&nbsp;';
-				// End "Add new file" area
-				?>
-				<div class="underbanner clearboth"></div>
-				<div class="form-element">
-					<div class="form-field-container">
-						<div class="wpeo-autocomplete">
-							<label class="autocomplete-label" for="media-gallery-search">
-								<i class="autocomplete-icon-before far fa-search"></i>
-								<input id="search_in_gallery" placeholder="<?php echo $langs->trans('Search') . '...' ?>" class="autocomplete-search-input" type="text" />
-								<span class="autocomplete-icon-after"><i class="far fa-times"></i></span>
-							</label>
-						</div>
-					</div>
-				</div>
-				<div class="ecm-photo-list-content">
-					<div class="wpeo-gridlayout grid-4 grid-gap-3 grid-margin-2 ecm-photo-list ecm-photo-list">
-						<?php
-							$relativepath = 'digiriskdolibarr/medias/thumbs';
-							print digirisk_show_medias('ecm', $conf->ecm->multidir_output[$conf->entity] . '/digiriskdolibarr/medias/thumbs', 'small');
-						?>
-					</div>
-				</div>
-			</div>
-			<!-- Modal-Footer -->
-			<div class="modal-footer">
-				<div class="save-photo wpeo-button button-blue button-disable" value="">
-					<span><?php echo $langs->trans('Add'); ?></span>
-				</div>
-			</div>
-		</div>
-	</div>
-	<!-- END RISK EVALUATION PHOTO MODAL -->
 	<?php
 	print '<table class="tagtable nobottomiftotal liste'.($moreforfilter ? " listwithfilterbefore" : "").'">'."\n";
 

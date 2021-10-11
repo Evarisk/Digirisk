@@ -352,9 +352,10 @@ window.eoxiaJS.modal.openModal = function ( event ) {
 	} else if ($(this).hasClass('risk-evaluation-list')) {
 		$('#risk_evaluation_list' + idSelected).addClass('modal-active');
 	} else if ($(this).hasClass('open-media-gallery')) {
-		$('#risk_evaluation_photo').addClass('modal-active');
-		$('#risk_evaluation_photo').attr('value', idSelected);
-		$('#risk_evaluation_photo').find('.wpeo-button').attr('value', idSelected);
+		$('#media_gallery').addClass('modal-active');
+        $('#media_gallery').attr('value', idSelected);
+        $('#media_gallery').find('.type-from').attr('value', $(this).find('.type-from').val());
+		$('#media_gallery').find('.wpeo-button').attr('value', idSelected);
 	} else if ($(this).hasClass('risk-evaluation-edit')) {
 		$('#risk_evaluation_edit' + idSelected).addClass('modal-active');
 	} else if ($(this).hasClass('evaluator-add')) {
@@ -1016,16 +1017,14 @@ window.eoxiaJS.mediaGallery.selectPhoto = function( event ) {
  * @return {void}
  */
 window.eoxiaJS.mediaGallery.savePhoto = function( event ) {
-    let parent = $('#risk_evaluation_photo')
+    let parent = $('#media_gallery')
 	let idToSave = $(this).attr('value')
 	let mediaGalleryModal = $(this).closest('.modal-container')
 	let filesLinked = mediaGalleryModal.find('.clicked-photo')
 	let modalFrom = $('.modal-risk.modal-active')
 	let riskId = modalFrom.attr('value')
 	let mediaLinked = modalFrom.find('.risk-evaluation-medias')
-//	let modalMediaLinked = $('.risk-evaluation-medias-'+idToSave+'.modal-media-linked')
-
-	window.eoxiaJS.loader.display(mediaLinked);
+	let type = $(this).find('.type-from').val()
 
 	let filenames = ''
 	if (filesLinked.length > 0) {
@@ -1033,30 +1032,61 @@ window.eoxiaJS.mediaGallery.savePhoto = function( event ) {
 			filenames += $( this ).find('.filename').val() + 'vVv'
 		});
 	}
+
 	let favorite = filenames
 	favorite = favorite.split('vVv')[0]
 
-	let riskAssessmentPhoto = ''
-	riskAssessmentPhoto = $('.risk-evaluation-photo-'+idToSave+'.risk-'+riskId)
+	if (type === 'riskassessment') {
+        window.eoxiaJS.loader.display(mediaLinked);
 
-	let filepath = modalFrom.find('.risk-evaluation-photo-single .filepath-to-riskassessment').val()
-	let newPhoto = filepath + favorite.replace(/\./, '_small.')
+        let riskAssessmentPhoto = ''
+        riskAssessmentPhoto = $('.risk-evaluation-photo-'+idToSave+'.risk-'+riskId)
 
-	$.ajax({
-		url: document.URL + "&action=addFiles&risk_id="+riskId+"&riskassessment_id="+idToSave+"&filenames="+filenames,
-		type: "POST",
-		processData: false,
-		contentType: false,
-		success: function ( ) {
-			$('.wpeo-loader').removeClass('wpeo-loader')
-			parent.removeClass('modal-active')
-			riskAssessmentPhoto.each( function() {
-				$(this).find('.clicked-photo-preview').attr('src',newPhoto )
-				$(this).find('.filename').attr('value', favorite.match(/_small/) ? favorite.replace(/\./, '_small.') : favorite)
-			});
-			mediaLinked.load(document.URL+'&favorite='+favorite + ' .risk-evaluation-medias-'+idToSave+'.risk-'+riskId)
-		}
-	});
+        let filepath = modalFrom.find('.risk-evaluation-photo-single .filepath-to-riskassessment').val()
+        let newPhoto = filepath + favorite.replace(/\./, '_small.')
+
+        $.ajax({
+            url: document.URL + "&action=addFiles&risk_id="+riskId+"&riskassessment_id="+idToSave+"&filenames="+filenames,
+            type: "POST",
+            processData: false,
+            contentType: false,
+            success: function ( ) {
+                $('.wpeo-loader').removeClass('wpeo-loader')
+                parent.removeClass('modal-active')
+                riskAssessmentPhoto.each( function() {
+                    $(this).find('.clicked-photo-preview').attr('src',newPhoto )
+                    $(this).find('.filename').attr('value', favorite.match(/_small/) ? favorite.replace(/\./, '_small.') : favorite)
+                });
+                mediaLinked.load(document.URL+'&favorite='+favorite + ' .risk-evaluation-medias-'+idToSave+'.risk-'+riskId)
+            }
+        });
+
+	} else if (type === 'digiriskelement') {
+	    console.log('oui')
+
+        let digiriskElementPhoto = ''
+        digiriskElementPhoto = $('.digiriskelement-'+idToSave).find('.clicked-photo-preview')
+
+        let filepath = $('.digiriskelement-'+idToSave).find('.filepath-to-digiriskelement').val()
+        let newPhoto = filepath + favorite.replace(/\./, '_small.')
+        console.log(filepath)
+        console.log(newPhoto)
+        console.log(idToSave)
+        $.ajax({
+            url: document.URL + "&action=addFiles&digiriskelement_id="+idToSave+"&filenames="+filenames,
+            type: "POST",
+            processData: false,
+            contentType: false,
+            success: function ( ) {
+                let digiriskBanner = $('.arearef.heightref')
+                $('.wpeo-loader').removeClass('wpeo-loader')
+                parent.removeClass('modal-active')
+                digiriskElementPhoto.attr('src',newPhoto )
+
+                digiriskBanner.load(document.URL+'&favorite='+favorite + ' .arearef.heightref')
+            }
+        });
+	}
 };
 
 /**
@@ -1091,7 +1121,7 @@ window.eoxiaJS.mediaGallery.sendPhoto = function( event ) {
 	let files    = element.find("input[name='userfile[]']").prop("files");
 	let formdata = new FormData();
     let elementParent = $(this).closest('.modal-container').find('.ecm-photo-list-content');
-	window.eoxiaJS.loader.display($('#risk_evaluation_photo').find('.modal-content'));
+	window.eoxiaJS.loader.display($('#media_gallery').find('.modal-content'));
 
 	$.each(files, function(index, file) {
 		formdata.append("userfile[]", file);
@@ -2466,7 +2496,7 @@ window.eoxiaJS.evaluator.createEvaluator = function ( event ) {
 	let actionContainerError = $('.messageErrorEvaluatorCreate');
 
 	var user = $('.user-selected').val()
-	alert(user);
+	//alert(user);
 	var userPost = '';
 	if (user !== 0) {
 		userPost = '&evaluatorID=' + encodeURI(user);

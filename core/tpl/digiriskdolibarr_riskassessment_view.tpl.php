@@ -14,7 +14,7 @@ if (!empty ($lastEvaluation) && $lastEvaluation > 0) {
 				<div class="risk-evaluation-photo risk-evaluation-photo-<?php echo $lastEvaluation->id > 0 ?  $lastEvaluation->id :  0 ; echo $risk->id > 0 ? ' risk-'.$risk->id : ' risk-new' ?> open-medias-linked" value="<?php echo $lastEvaluation->id ?>">
 					<?php $filearray = dol_dir_list($conf->digiriskdolibarr->multidir_output[$conf->entity].'/'.$lastEvaluation->element.'/'.$lastEvaluation->ref, "files", 0, '', '(\.odt|_preview.*\.png)$', 'position_name', 'asc', 1);
 					if (count($filearray)) {
-						print '<img height="40" width="100%" class="photo clicked-photo-preview" src="'.DOL_URL_ROOT.'/viewimage.php?modulepart=digiriskdolibarr&entity='.$conf->entity.'&file='.urlencode($lastEvaluation->element.'/'.$lastEvaluation->ref . '/thumbs/'. preg_replace('/\./', '_small.', $lastEvaluation->photo)).'" >';
+						print '<img width="50" class="photo clicked-photo-preview" src="'.DOL_URL_ROOT.'/viewimage.php?modulepart=digiriskdolibarr&entity='.$conf->entity.'&file='.urlencode($lastEvaluation->element.'/'.$lastEvaluation->ref . '/thumbs/'. preg_replace('/\./', '_small.', $lastEvaluation->photo)).'" >';
 					} else {
 						$nophoto = '/public/theme/common/nophoto.png'; ?>
 						<span class="floatleft inline-block valignmiddle divphotoref"><img class="photodigiriskdolibarr clicked-photo-preview" alt="No photo" src="<?php echo DOL_URL_ROOT.$nophoto ?>"></span>
@@ -68,6 +68,7 @@ if (!empty ($lastEvaluation) && $lastEvaluation > 0) {
 					<div class="modal-header">
 						<h2 class="modal-title"><?php echo $langs->trans('RiskAssessmentMedias') . ' ' . $lastEvaluation->ref ?></h2>
 						<div class="wpeo-button open-media-gallery add-media modal-open" value="<?php echo $lastEvaluation->id ?>">
+							<input type="hidden" class="type-from" value="riskassessment"/>
 							<span><i class="fas fa-camera"></i>  <?php echo $langs->trans('AddMedia') ?></span>
 						</div>
 						<div class="modal-close"><i class="fas fa-times"></i></div>
@@ -137,6 +138,7 @@ if (!empty ($lastEvaluation) && $lastEvaluation > 0) {
 										<input class="risk-evaluation-method" type="hidden" value="<?php echo $cotation->method ?>" />
 										<input class="risk-evaluation-multiple-method" type="hidden" value="<?php echo $conf->global->DIGIRISKDOLIBARR_MULTIPLE_RISKASSESSMENT_METHOD ?>">
 										<div class="wpeo-button open-media-gallery add-media modal-open" value="<?php echo $cotation->id ?>">
+											<input type="hidden" class="type-from" value="riskassessment"/>
 											<span><i class="fas fa-camera"></i>  <?php echo $langs->trans('AddMedia') ?></span>
 										</div>
 									</div>
@@ -449,6 +451,7 @@ $cotation->method = $lastEvaluation->method ? $lastEvaluation->method : "standar
 						<input class="risk-evaluation-method" type="hidden" value="<?php echo ($cotation->method == "standard") ? "standard" : "advanced" ?>">
 						<input class="risk-evaluation-multiple-method" type="hidden" value="<?php echo $conf->global->DIGIRISKDOLIBARR_MULTIPLE_RISKASSESSMENT_METHOD ?>">
 						<div class="wpeo-button open-media-gallery add-media modal-open" value="0">
+							<input type="hidden" class="type-from" value="riskassessment"/>
 							<span><i class="fas fa-camera"></i>  <?php echo $langs->trans('AddMedia') ?></span>
 						</div>
 					</div>

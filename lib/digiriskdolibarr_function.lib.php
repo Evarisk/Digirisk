@@ -156,7 +156,7 @@ function digirisk_show_photos($modulepart, $sdir, $size = 0, $nbmax = 0, $nbbyro
 						}
 						else {
 							$return .= '<!-- Show original file -->';
-							$return .= '<img class="photo photowithmargin  clicked-photo-preview" height="'.$maxHeight.'" src="'.DOL_URL_ROOT.'/viewimage.php?modulepart='.$modulepart.'&entity='.$conf->entity.'&file='.urlencode($pdir.$photo).'" title="'.dol_escape_htmltag($alt).'">';
+							$return .= '<img class="photo photowithmargin clicked-photo-preview" width="'.$maxHeight.'" src="'.DOL_URL_ROOT.'/viewimage.php?modulepart='.$modulepart.'&entity='.$conf->entity.'&file='.urlencode($pdir.$photo).'" title="'.dol_escape_htmltag($alt).'">';
 						}
 					}
 
@@ -611,6 +611,59 @@ function digiriskHeader($head = '', $title = '', $help_url = '', $target = '', $
 		$objects = $object->fetchAll('',  '',  0,  0, array('customsql' => 'status > 0'));
 	}
 	$results = recurse_tree(0,0,$objects); ?>
+		<!-- START MEDIA GALLERY MODAL -->
+	<div class="wpeo-modal modal-photo" id="media_gallery" style="z-index: 1008" data-id="<?php echo $object->id ?>">
+		<div class="modal-container wpeo-modal-event">
+			<!-- Modal-Header -->
+			<div class="modal-header">
+				<h2 class="modal-title"><?php echo $langs->trans('ModalAddPhoto')?></h2>
+				<div class="modal-close"><i class="fas fa-2x fa-times"></i></div>
+			</div>
+			<!-- Modal-Content -->
+			<div class="modal-content" id="#modalMediaGalleryContent">
+				<?php
+				// To attach new file
+				if ((!empty($conf->use_javascript_ajax) && empty($conf->global->MAIN_ECM_DISABLE_JS)) || !empty($section))
+				{
+					$sectiondir = GETPOST('file', 'alpha') ?GETPOST('file', 'alpha') : GETPOST('section_dir', 'alpha');
+					print '<!-- Start form to attach new file in digiriskdolibarr_photo_view.tpl.tpl.php sectionid='.$section.' sectiondir='.$sectiondir.' -->'."\n";
+					include_once DOL_DOCUMENT_ROOT.'/core/class/html.formfile.class.php';
+					$formfile = new FormFile($db);
+					$formfile->form_attach_new_file($_SERVER["PHP_SELF"], 'none', 0, 0, 1, 48, null, '', 0, '', 0, $nameforformuserfile, '', $sectiondir, 1);
+				} else print '&nbsp;';
+				// End "Add new file" area
+				?>
+				<div class="underbanner clearboth"></div>
+				<div class="form-element">
+					<div class="form-field-container">
+						<div class="wpeo-autocomplete">
+							<label class="autocomplete-label" for="media-gallery-search">
+								<i class="autocomplete-icon-before far fa-search"></i>
+								<input id="search_in_gallery" placeholder="<?php echo $langs->trans('Search') . '...' ?>" class="autocomplete-search-input" type="text" />
+								<span class="autocomplete-icon-after"><i class="far fa-times"></i></span>
+							</label>
+						</div>
+					</div>
+				</div>
+				<div class="ecm-photo-list-content">
+					<div class="wpeo-gridlayout grid-4 grid-gap-3 grid-margin-2 ecm-photo-list ecm-photo-list">
+						<?php
+							$relativepath = 'digiriskdolibarr/medias/thumbs';
+							print digirisk_show_medias('ecm', $conf->ecm->multidir_output[$conf->entity] . '/digiriskdolibarr/medias/thumbs', 'small');
+						?>
+					</div>
+				</div>
+			</div>
+			<!-- Modal-Footer -->
+			<div class="modal-footer">
+				<div class="save-photo wpeo-button button-blue button-disable" value="">
+				<input class="type-from" value="" type="hidden" />
+					<span><?php echo $langs->trans('Add'); ?></span>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- END MEDIA GALLERY MODAL -->
 	<div id="id-container" class="id-container page-ut-gp-list">
 		<div class="side-nav">
 			<div class="side-nav-responsive"><i class="fas fa-bars"></i> <?php echo "Navigation UT/GP"; ?></div>
@@ -688,7 +741,6 @@ function digiriskHeader($head = '', $title = '', $help_url = '', $target = '', $
 			</div>
 		</div>
 	<?php
-		// @todo SHOW TRASH
 	// main area
 	if ($replacemainareaby)
 	{
@@ -728,10 +780,50 @@ function recurse_tree($parent, $niveau, $array) {
  * @return	void
  */
 function display_recurse_tree($results) {
-	global $conf, $langs, $user;
+	include_once DOL_DOCUMENT_ROOT.'/core/lib/images.lib.php';
+
+	global $conf, $langs, $user, $db, $maxwidthmini, $maxheightmini, $maxwidthsmall,$maxheightsmall ;
 
 	require_once __DIR__ . '/../core/modules/digiriskdolibarr/digiriskelement/groupment/mod_groupment_standard.php';
 	require_once __DIR__ . '/../core/modules/digiriskdolibarr/digiriskelement/workunit/mod_workunit_standard.php';
+
+
+	if (GETPOST('action') == "addFiles" && GETPOST('digiriskelement_id')) {
+
+		$digiriskelement_id = GETPOST('digiriskelement_id');
+		$filenames = GETPOST('filenames');
+		$digiriskelement = new DigiriskElement($db);
+		$digiriskelement->fetch($digiriskelement_id);
+		$pathToDigiriskElementPhoto = $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/'.$digiriskelement->element_type.'/' . $digiriskelement->ref ;
+		$filenames = preg_split('/vVv/', $filenames);
+		array_pop($filenames);
+		if ( !(empty($filenames))) {
+
+			foreach ($filenames as $filename) {
+
+				if (is_file( $conf->ecm->multidir_output[$conf->entity] . '/digiriskdolibarr/medias/' . $filename)) {
+
+					$pathToECMPhoto =  $conf->ecm->multidir_output[$conf->entity] . '/digiriskdolibarr/medias/' . $filename;
+
+					if(!is_dir($conf->digiriskdolibarr->multidir_output[$conf->entity] . '/'.$digiriskelement->element_type.'/')) {
+						mkdir($conf->digiriskdolibarr->multidir_output[$conf->entity] . '/'.$digiriskelement->element_type.'/');
+					}
+					if (!is_dir($pathToDigiriskElementPhoto)) {
+						mkdir($pathToDigiriskElementPhoto);
+					}
+					copy($pathToECMPhoto,$pathToDigiriskElementPhoto . '/' . $filename);
+
+					$destfull = $pathToDigiriskElementPhoto . '/' . $filename;
+					// Create thumbs
+					$imgThumbSmall = vignette($destfull, $maxwidthsmall, $maxheightsmall, '_small', 50, "thumbs");
+					// Create mini thumbs for image (Ratio is near 16/9)
+					$imgThumbMini = vignette($destfull, $maxwidthmini, $maxheightmini, '_mini', 50, "thumbs");
+				}
+			}
+		}
+
+		exit;
+	}
 
 	$mod_groupment = new $conf->global->DIGIRISKDOLIBARR_GROUPMENT_ADDON();
 	$mod_workunit = new $conf->global->DIGIRISKDOLIBARR_WORKUNIT_ADDON();
@@ -750,15 +842,18 @@ function display_recurse_tree($results) {
 						</div>
 					<?php } else { ?>
 						<div class="spacer"></div>
-					<?php } ?>
-					<?php $filearray = dol_dir_list($conf->digiriskdolibarr->multidir_output[$conf->entity].'/'.$element['object']->element_type.'/'.$element['object']->ref.'/', "files", 0, '', '(\.odt|_preview.*\.png)$', 'position_name', 'asc', 1);
+					<?php }
+					$pathToThumb = DOL_URL_ROOT.'/viewimage.php?modulepart=digiriskdolibarr&entity='.$conf->entity.'&file='.urlencode($element['object']->element_type.'/'.$element['object']->ref . '/thumbs/');
+					$filearray = dol_dir_list($conf->digiriskdolibarr->multidir_output[$conf->entity].'/'.$element['object']->element_type.'/'.$element['object']->ref.'/', "files", 0, '', '(\.odt|_preview.*\.png)$', 'position_name', 'asc', 1);
 					if (count($filearray)) {
-						print '<span class="floatleft inline-block valignmiddle divphotoref">'.digirisk_show_photos('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity].'/'.$element['object']->element_type, 'small', 1, 0, 0, 0, 50, 0, 0, 0, 0, $element['object']->element_type, $element['object']).'</span>';
+						print '<span class="floatleft inline-block valignmiddle divphotoref">'.digirisk_show_photos('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity].'/'.$element['object']->element_type, 'small', 1, 0, 0, 0, 50, 50, 0, 0, 0, $element['object']->element_type, $element['object']).'</span>';
 					} else {
 						$nophoto = '/public/theme/common/nophoto.png'; ?>
-						<a href="../digiriskdolibarr/digiriskelement_document.php?id=<?php echo $element['object']->id; ?>">
-							<span class="floatleft inline-block valignmiddle divphotoref"><img class="photodigiriskdolibarr" alt="No photo" src="<?php echo DOL_URL_ROOT.$nophoto ?>"></span>
-						</a>
+							<div class="open-media-gallery modal-open digiriskelement digiriskelement-<?php echo $element['object']->id ?>" value="<?php  echo $element['object']->id ?>">
+								<input type="hidden" class="type-from" value="digiriskelement"/>
+								<input type="hidden" class="filepath-to-digiriskelement" value="<?php echo $pathToThumb ?>"/>
+								<span class="floatleft inline-block valignmiddle divphotoref"><img width="50" class="photo photowithmargin clicked-photo-preview" alt="No photo" src="<?php echo DOL_URL_ROOT.$nophoto ?>"></span>
+							</div>
 					<?php } ?>
 					<div class="title" id="scores" value="<?php echo $element['object']->id ?>">
 					<?php
