@@ -946,7 +946,7 @@ window.eoxiaJS.signature.autoDownloadSpecimen = function( event ) {
  * Initialise l'objet "mediaGallery" ainsi que la méthode "init" obligatoire pour la bibliothèque EoxiaJS.
  *
  * @since   1.0.0
- * @version 1.0.0
+ * @version 8.2.0
  */
 window.eoxiaJS.mediaGallery = {};
 
@@ -954,7 +954,7 @@ window.eoxiaJS.mediaGallery = {};
  * La méthode appelée automatiquement par la bibliothèque EoxiaJS.
  *
  * @since   1.0.0
- * @version 1.0.0
+ * @version 8.2.0
  *
  * @return {void}
  */
@@ -1013,7 +1013,7 @@ window.eoxiaJS.mediaGallery.selectPhoto = function( event ) {
  * Action save photo.
  *
  * @since   1.0.0
- * @version 1.0.0
+ * @version 8.2.0
  *
  * @return {void}
  */
@@ -1105,8 +1105,8 @@ window.eoxiaJS.mediaGallery.savePhoto = function( event ) {
 /**
  * Action handle search in medias
  *
- * @since   1.0.0
- * @version 1.0.0
+ * @since   8.2.0
+ * @version 8.2.0
  *
  * @return {void}
  */
@@ -1170,10 +1170,10 @@ window.eoxiaJS.mediaGallery.previewPhoto = function( event ) {
 };
 
 /**
- * Action send photo.
+ * Action unlink photo.
  *
- * @since   1.0.0
- * @version 1.0.0
+ * @since   8.2.0
+ * @version 8.2.0
  *
  * @return {void}
  */
@@ -1250,10 +1250,10 @@ window.eoxiaJS.mediaGallery.unlinkFile = function( event ) {
 };
 
 /**
- * Action send photo.
+ * Action add photo to favorite.
  *
- * @since   1.0.0
- * @version 1.0.0
+ * @since   8.2.0
+ * @version 8.2.0
  *
  * @return {void}
  */
