@@ -195,6 +195,7 @@ llxHeader('', $title, $help_url, '', '', '', $morejs, $morecss, '', 'classforhor
 // Object card
 // ------------------------------------------------------------
 $allRisks = 1;
+require_once './core/tpl/digiriskdolibarr_medias_gallery_modal.tpl.php';
 require_once './core/tpl/digiriskdolibarr_risklist_view.tpl.php';
 
 // End of page
