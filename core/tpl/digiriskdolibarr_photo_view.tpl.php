@@ -48,7 +48,7 @@ if (empty($conf) || !is_object($conf))
 					<span class="floatleft inline-block valignmiddle divphotoref risk-evaluation-photo-single">
 						<input class="filepath-to-riskassessment filepath-to-riskassessment-<?php echo $risk->id > 0 ? $risk->id : 'new' ?>" type="hidden" value="<?php echo $pathToThumb ?>">
 						<input class="filename" type="hidden" value="">
-						 <?php 	print '<img width="50" class="photo clicked-photo-preview" src="'.DOL_URL_ROOT.'/viewimage.php?modulepart=digiriskdolibarr&entity='.$conf->entity.'&file='.urlencode($cotation->element.'/'.$cotation->ref . '/thumbs/'. preg_replace('/\./', '_small.', $cotation->photo)).'" >';
+						 <?php 	print '<img width="40" class="photo clicked-photo-preview" src="'.DOL_URL_ROOT.'/viewimage.php?modulepart=digiriskdolibarr&entity='.$conf->entity.'&file='.urlencode($cotation->element.'/'.$cotation->ref . '/thumbs/'. preg_replace('/\./', '_small.', $cotation->photo)).'" >';
 						 ?>
 					</span>
 					<?php
