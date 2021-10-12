@@ -23,7 +23,8 @@ if ($conf->global->DIGIRISKDOLIBARR_DU_PROJECT > 0) {
 	$project->fetch($conf->global->DIGIRISKDOLIBARR_DU_PROJECT);
 	//Backward compatibility
 	if ($project->title == $langs->trans('RiskAssessmentDocument')) {
-		$project->title = $langs->trans('RiskAssessmentDocumentInitial') . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
+		$project->title       = $langs->trans('RiskAssessmentDocumentInitial') . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
+		$project->description = $langs->trans('RiskAssessmentDocumentDescription');
 		$project->update($user);
 	}
 }
@@ -54,7 +55,7 @@ if ($conf->global->DIGIRISKDOLIBARR_PREVENTIONPLAN_PROJECT > 0) {
 	$project->fetch($conf->global->DIGIRISKDOLIBARR_PREVENTIONPLAN_PROJECT);
 	//Backward compatibility
 	if ($project->title == $langs->trans('PreventionPlan')) {
-		$project->title       = $langs->trans('PreventionPlanInitial') . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
+		$project->title = $langs->trans('PreventionPlanInitial') . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
 		$project->update($user);
 	}
 }
