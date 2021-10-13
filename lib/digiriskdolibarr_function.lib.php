@@ -738,8 +738,13 @@ function display_recurse_tree($results) {
 
 	require_once __DIR__ . '/../core/modules/digiriskdolibarr/digiriskelement/groupment/mod_groupment_standard.php';
 	require_once __DIR__ . '/../core/modules/digiriskdolibarr/digiriskelement/workunit/mod_workunit_standard.php';
+	require_once DOL_DOCUMENT_ROOT . '/ecm/class/ecmdirectory.class.php';
 
-	if (GETPOST('action') == "addFiles" && GETPOST('digiriskelement_id')) {
+	$action = GETPOST('action');
+	$ecmdir = new EcmDirectory($db);
+	$error = 0;
+
+	if (!$error && $action == "addFiles" && GETPOST('digiriskelement_id')) {
 
 		$digiriskelement_id = GETPOST('digiriskelement_id');
 		$filenames = GETPOST('filenames');
@@ -777,7 +782,7 @@ function display_recurse_tree($results) {
 		exit;
 	}
 
-	if (!$error && GETPOST('action') == "addToFavorite") {
+	if (!$error && $action == "addToFavorite") {
 
 		$digiriskelement_id = GETPOST('digiriskelement_id');
 		$filename = GETPOST('filename');
@@ -788,7 +793,7 @@ function display_recurse_tree($results) {
 		exit;
 	}
 
-	if (!$error && GETPOST('action') == "unlinkFile") {
+	if (!$error && $action == "unlinkFile") {
 
 		$digiriskelement_id = GETPOST('digiriskelement_id');
 		$filename = GETPOST('filename');
@@ -823,6 +828,32 @@ function display_recurse_tree($results) {
 		$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
 		header("Location: ".$urltogo);
 		exit;
+	}
+
+	if (!$error && $action == "uploadPhoto" && !empty($conf->global->MAIN_UPLOAD_DOC)) {
+		// Define relativepath and upload_dir
+		$relativepath = 'digiriskdolibarr/medias';
+		$upload_dir = $conf->ecm->dir_output.'/'.$relativepath;
+		if (is_array($_FILES['userfile']['tmp_name'])) $userfiles = $_FILES['userfile']['tmp_name'];
+		else $userfiles = array($_FILES['userfile']['tmp_name']);
+
+		foreach ($userfiles as $key => $userfile) {
+			if (empty($_FILES['userfile']['tmp_name'][$key])) {
+				$error++;
+				if ($_FILES['userfile']['error'][$key] == 1 || $_FILES['userfile']['error'][$key] == 2) {
+					setEventMessages($langs->trans('ErrorFileSizeTooLarge'), null, 'errors');
+				} else {
+					setEventMessages($langs->trans("ErrorFieldRequired", $langs->transnoentitiesnoconv("File")), null, 'errors');
+				}
+			}
+		}
+		if (!$error) {
+			$generatethumbs = 1;
+			$res = dol_add_file_process($upload_dir, 0, 1, 'userfile', '', null, '', $generatethumbs);
+			if ($res > 0) {
+				$result = $ecmdir->changeNbOfFiles('+');
+			}
+		}
 	}
 
 	$mod_groupment = new $conf->global->DIGIRISKDOLIBARR_GROUPMENT_ADDON();
