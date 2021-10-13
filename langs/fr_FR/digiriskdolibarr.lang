@@ -948,6 +948,7 @@ DataMigrationImport = Importation des données de l'arborecence de Digirisk
 DataMigrationImportDescription = Importation des données de l'arborecence de Digirisk WordPress au format JSON
 DataMigrationImportRisks = Importation des données des risques de Digirisk
 DataMigrationImportRisksDescription = Importation des données des risques de Digirisk WordPress au format JSON
+ErrorFileNotWellFormatted = Le fichier n'est pas au bon format ou est vide. Vous devez joindre un fichier d'import provenant de Digirisk WordPress nommé DATE_OBJET_export.json
 
 
 
