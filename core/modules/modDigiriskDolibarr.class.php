@@ -240,6 +240,9 @@ class modDigiriskdolibarr extends DolibarrModules
 			110 => array('MAIN_AGENDA_ACTIONAUTO_WORKUNIT_CREATE','chaine',1,'', $conf->entity),
 			111 => array('DIGIRISKDOLIBARR_WORKUNIT_ADDON','chaine', 'mod_workunit_standard' ,'', $conf->entity),
 
+			//CONST DIGIRISKELEMENT
+			115 => array('DIGIRISKDOLIBARR_DIGIRISKELEMENT_MEDIAS_BACKWARD_COMPATIBILITY','integer', 0 ,'', $conf->entity),
+
 			// CONST EVALUATOR
 			120 => array('MAIN_AGENDA_ACTIONAUTO_EVALUATOR_CREATE','chaine',1,'', $conf->entity),
 			121 => array('DIGIRISKDOLIBARR_EVALUATOR_ADDON','chaine', 'mod_evaluator_standard' ,'', $conf->entity),
@@ -901,6 +904,29 @@ class modDigiriskdolibarr extends DolibarrModules
 
 		dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_VERSION', $this->version, 'chaine', 0, '', $conf->entity);
 		dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_DB_VERSION', $this->version, 'chaine', 0, '', $conf->entity);
+
+		//DigiriskElement favorite medias backward compatibility
+		if ($conf->global->DIGIRISKDOLIBARR_DIGIRISKELEMENT_MEDIAS_BACKWARD_COMPATIBILITY == 0) {
+			require_once __DIR__ . '/../../class/digiriskelement.class.php';
+
+			$digiriskelement = new DigiriskElement($this->db);
+			$digiriskElementList = $digiriskelement->fetchAll();
+
+			if (!empty($digiriskElementList) && $digiriskElementList > 0) {
+				foreach ($digiriskElementList as $digiriskElement) {
+					$mediasDir = DOL_DATA_ROOT . ($conf->entity == 1 ? '' : '/' . $conf->entity) . '/digiriskdolibarr/' . $digiriskElement->element_type . '/' . $digiriskElement->ref;
+
+					if (is_dir($mediasDir)) {
+						$fileList = dol_dir_list($mediasDir);
+						if (!empty($fileList) && $fileList > 0) {
+							$digiriskElement->photo = $fileList[0]['name'];
+							$digiriskElement->update($user);
+						}
+					}
+				}
+			}
+			dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_DIGIRISKELEMENT_MEDIAS_BACKWARD_COMPATIBILITY', 1, 'integer', 0, '', $conf->entity);
+		}
 
 		return $this->_init($sql, $options);
 	}
