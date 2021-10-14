@@ -697,14 +697,13 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 								$error++;
 								if (!empty($error)) setEventMessages(null, $langs->trans('WrongEmailFormat'), 'errors');
 								else  setEventMessages($error, null, 'errors');
-
-
 							}
 						}
-
 					}
 				}
-				
+				$ok = 1;
+				return $ok;
+				break;
 
 			default:
 				dol_syslog("Trigger '".$this->name."' for action '$action' launched by ".__FILE__.". id=".$object->id);
