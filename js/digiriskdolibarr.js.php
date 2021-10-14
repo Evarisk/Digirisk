@@ -171,6 +171,7 @@ window.eoxiaJS.navigation.event = function() {
  * @return {void}
  */
 window.eoxiaJS.navigation.switchToggle = function( event ) {
+	console.log($(this))
 	event.preventDefault();
 
 	var MENU = localStorage.menu
@@ -180,6 +181,7 @@ window.eoxiaJS.navigation.switchToggle = function( event ) {
 		MENU = JSON.parse(MENU)
 		MENU = new Set(MENU)
 	}
+
 
 	if ( jQuery( this ).find( '.toggle-icon' ).hasClass( 'fa-chevron-down' ) ) {
 

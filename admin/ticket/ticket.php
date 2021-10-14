@@ -65,6 +65,9 @@ if ($action == 'setPublicInterface') {
 	else dolibarr_set_const($db, 'DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE', 0, 'integer', 0, '', $conf->entity);
 }
 
+if ($action == 'setEmails') {
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_TICKET_SUBMITTED_SEND_MAIL_TO', GETPOST('emails'), 'integer', 0, '', $conf->entity);
+}
 
 if ($action == 'generateExtrafields') {
 	$ret1 = $extra_fields->addExtraField( 'digiriskdolibarr_ticket_lastname', $langs->trans("LastName"), 'varchar', 2000, 255, 'ticket', 0, 0, '', '', 1, '', 1);
@@ -256,6 +259,9 @@ if (!empty($conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE)) {
 	print ajax_constantonoff('DIGIRISKDOLIBARR_TICKET_SHOW_COMPANY_LOGO');
 	print '</td>';
 	print '<td class="center">';
+	print '';
+	print '</td>';
+	print '<td class="center">';
 	print $form->textwithpicto('', $langs->trans("TicketShowCompanyLogoHelp"), 1, 'help');
 	print '</td>';
 	print '</tr>';
@@ -302,8 +308,41 @@ if (!empty($conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE)) {
 	print '</tr>';
 	print '</form>';
 
+	//Envoi d'emails automatiques
+	print '<tr class="oddeven"><td>'.$langs->trans("SendEmailOnTicketSubmit").'</td>';
+	print '<td class="center">';
+	print ajax_constantonoff('DIGIRISKDOLIBARR_SEND_EMAIL_ON_TICKET_SUBMIT');
+	print '</td>';
+	print '<td class="center">';
+	print '';
+	print '</td>';
+	print '<td class="center">';
+	print $form->textwithpicto('', $langs->trans("SendEmailOnTicketSubmitHelp"), 1, 'help');
+	print '</td>';
+	print '</tr>';
+
+	//Email to send ticket submitted
+	print '<form method="POST" action="' . $_SERVER["PHP_SELF"] . '">';
+	print '<input type="hidden" name="token" value="' . newToken() . '">';
+	print '<input type="hidden" name="action" value="setEmails">';
+	print '<input type="hidden" name="backtopage" value="' . $backtopage . '">';
+
+	print '<tr class="oddeven"><td>' . $langs->trans("GenerateCategories") . '</td>';
+	print '<td class="center">';
+	print '<input name="emails" id="emails" value="'.$conf->global->DIGIRISKDOLIBARR_TICKET_SUBMITTED_SEND_MAIL_TO.'">';
+	print '</td>';
+	print '<td class="center">';
+	print '<button class="wpeo-button" type="submit">' . $langs->trans('Save') . '</button>';
+	print '</td>';
+	print '<td class="center">';
+	print $form->textwithpicto('', $langs->trans("MultipleEmailsSeparator"), 1, 'help');
+	print '</td>';
+	print '</tr>';
+	print '</form>';
+
 	print '</table>';
 	print '</div>';
+
 }
 
 
