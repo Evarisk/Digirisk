@@ -588,123 +588,123 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				//envoi du mail avec les infos de l'objet aux adresses mail configurées
 				//envoi du mail avec une trad puis avec un model
 				$error = 0;
-				if (!$error) {
-					$langs->load('mails');
+				if ($conf->global->DIGIRISKDOLIBARR_SEND_EMAIL_ON_TICKET_SUBMIT) {
+					if (!$error) {
+						$langs->load('mails');
 
-					$listOfMails = $conf->global->DIGIRISKDOLIBARR_TICKET_SUBMITTED_SEND_MAIL_TO;
-					if (!preg_match('/;/', $listOfMails)) {
-						$sendto = $listOfMails;
+						$listOfMails = $conf->global->DIGIRISKDOLIBARR_TICKET_SUBMITTED_SEND_MAIL_TO;
+						if (!preg_match('/;/', $listOfMails)) {
+							$sendto = $listOfMails;
 
-						if (dol_strlen($sendto) && (!empty($conf->global->MAIN_MAIL_EMAIL_FROM))) {
-							require_once DOL_DOCUMENT_ROOT . '/core/class/CMailFile.class.php';
+							if (dol_strlen($sendto) && (!empty($conf->global->MAIN_MAIL_EMAIL_FROM))) {
+								require_once DOL_DOCUMENT_ROOT . '/core/class/CMailFile.class.php';
 
-							$from = $conf->global->MAIN_MAIL_EMAIL_FROM;
+								$from = $conf->global->MAIN_MAIL_EMAIL_FROM;
 
-							$message = 	 $object->message;
-							$subject = 	$langs->trans('NewTicketSubmitted') . ' : ' . $object->subject . $langs->trans('By') . /* extrafield */ '';
+								$message = 	 $object->message;
+								$subject = 	$langs->trans('NewTicketSubmitted') . ' : ' . $object->subject . $langs->trans('By') . /* extrafield */ '';
 
-							// Create form object
-							// Send mail (substitutionarray must be done just before this)
-							$mailfile = new CMailFile($subject, $sendto, $from, $message, array(), array(), array(), "", "", 0, -1, '', '', '', '', 'mail');
+								// Create form object
+								// Send mail (substitutionarray must be done just before this)
+								$mailfile = new CMailFile($subject, $sendto, $from, $message, array(), array(), array(), "", "", 0, -1, '', '', '', '', 'mail');
 
-							if ($mailfile->error) {
-								setEventMessages($mailfile->error, $mailfile->errors, 'errors');
-							} else {
-								if (!empty($conf->global->MAIN_MAIL_SMTPS_ID)) {
-									$result = $mailfile->sendfile();
-									if ($result) {
-										setEventMessages($langs->trans('SendEmailAt') . ' ' . $listOfMails, array());
-										// This avoid sending mail twice if going out and then back to page
-										header('Location: ' . $_SERVER["PHP_SELF"] . '?id=' . $object->id);
-										exit;
-									} else {
-										$langs->load("other");
-										$mesg = '<div class="error">';
-										if ($mailfile->error) {
-											$mesg .= $langs->transnoentities('ErrorFailedToSendMail', dol_escape_htmltag($from), dol_escape_htmltag($sendto));
-											$mesg .= '<br>' . $mailfile->error;
-										} else {
-											$mesg .= $langs->transnoentities('ErrorFailedToSendMail', dol_escape_htmltag($from), dol_escape_htmltag($sendto));
-										}
-										$mesg .= '</div>';
-										setEventMessages($mesg, null, 'warnings');
-									}
+								if ($mailfile->error) {
+									setEventMessages($mailfile->error, $mailfile->errors, 'errors');
 								} else {
-									setEventMessages($langs->trans('ErrorSetupEmail'), '', 'errors');
-								}
-							}
-
-						} else {
-							$langs->load("errors");
-							setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv("MailTo")), null, 'warnings');
-							dol_syslog('Try to send email with no recipient defined', LOG_WARNING);
-						}
-					} else {
-						$listOfMails = preg_split('/;/', $listOfMails);
-						if (!empty($listOfMails) && $listOfMails > 0) {
-							array_pop($listOfMails);
-							foreach ($listOfMails as $email) {
-								$sendto = $email;
-
-								if (dol_strlen($sendto) && (!empty($conf->global->MAIN_MAIL_EMAIL_FROM))) {
-									require_once DOL_DOCUMENT_ROOT . '/core/class/CMailFile.class.php';
-
-									$from = $conf->global->MAIN_MAIL_EMAIL_FROM;
-
-									$message = 	 $object->message;
-									$subject = 	$langs->trans('NewTicketSubmitted') . ' : ' . $object->subject . $langs->trans('By') . /* extrafield */ '';
-
-									// Create form object
-									// Send mail (substitutionarray must be done just before this)
-									$mailfile = new CMailFile($subject, $sendto, $from, $message, array(), array(), array(), "", "", 0, -1, '', '', '', '', 'mail');
-
-									if ($mailfile->error) {
-										setEventMessages($mailfile->error, $mailfile->errors, 'errors');
-									} else {
-										if (!empty($conf->global->MAIN_MAIL_SMTPS_ID)) {
-											$result = $mailfile->sendfile();
-											if ($result) {
-												setEventMessages($langs->trans('SendEmailAt') . ' ' . $listOfMails, array());
-												// This avoid sending mail twice if going out and then back to page
-												header('Location: ' . $_SERVER["PHP_SELF"] . '?id=' . $object->id);
-												exit;
+									if (!empty($conf->global->MAIN_MAIL_SMTPS_ID)) {
+										$result = $mailfile->sendfile();
+										if ($result) {
+											setEventMessages($langs->trans('SendEmailAt') . ' ' . $listOfMails, array());
+											// This avoid sending mail twice if going out and then back to page
+											header('Location: ' . $_SERVER["PHP_SELF"] . '?id=' . $object->id);
+											exit;
+										} else {
+											$langs->load("other");
+											$mesg = '<div class="error">';
+											if ($mailfile->error) {
+												$mesg .= $langs->transnoentities('ErrorFailedToSendMail', dol_escape_htmltag($from), dol_escape_htmltag($sendto));
+												$mesg .= '<br>' . $mailfile->error;
 											} else {
-												$langs->load("other");
-												$mesg = '<div class="error">';
-												if ($mailfile->error) {
-													$mesg .= $langs->transnoentities('ErrorFailedToSendMail', dol_escape_htmltag($from), dol_escape_htmltag($sendto));
-													$mesg .= '<br>' . $mailfile->error;
-												} else {
-													$mesg .= $langs->transnoentities('ErrorFailedToSendMail', dol_escape_htmltag($from), dol_escape_htmltag($sendto));
-												}
-												$mesg .= '</div>';
-												setEventMessages($mesg, null, 'warnings');
+												$mesg .= $langs->transnoentities('ErrorFailedToSendMail', dol_escape_htmltag($from), dol_escape_htmltag($sendto));
 											}
-										} else {
-											setEventMessages($langs->trans('ErrorSetupEmail'), '', 'errors');
+											$mesg .= '</div>';
+											setEventMessages($mesg, null, 'warnings');
 										}
+									} else {
+										setEventMessages($langs->trans('ErrorSetupEmail'), '', 'errors');
 									}
-
-								} else {
-									$langs->load("errors");
-									setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv("MailTo")), null, 'warnings');
-									dol_syslog('Try to send email with no recipient defined', LOG_WARNING);
 								}
+
+							} else {
+								$langs->load("errors");
+								setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv("MailTo")), null, 'warnings');
+								dol_syslog('Try to send email with no recipient defined', LOG_WARNING);
 							}
 						} else {
+							$listOfMails = preg_split('/;/', $listOfMails);
+							if (!empty($listOfMails) && $listOfMails > 0) {
+								array_pop($listOfMails);
+								foreach ($listOfMails as $email) {
+									$sendto = $email;
+
+									if (dol_strlen($sendto) && (!empty($conf->global->MAIN_MAIL_EMAIL_FROM))) {
+										require_once DOL_DOCUMENT_ROOT . '/core/class/CMailFile.class.php';
+
+										$from = $conf->global->MAIN_MAIL_EMAIL_FROM;
+
+										$message = 	 $object->message;
+										$subject = 	$langs->trans('NewTicketSubmitted') . ' : ' . $object->subject . $langs->trans('By') . /* extrafield */ '';
+
+										// Create form object
+										// Send mail (substitutionarray must be done just before this)
+										$mailfile = new CMailFile($subject, $sendto, $from, $message, array(), array(), array(), "", "", 0, -1, '', '', '', '', 'mail');
+
+										if ($mailfile->error) {
+											setEventMessages($mailfile->error, $mailfile->errors, 'errors');
+										} else {
+											if (!empty($conf->global->MAIN_MAIL_SMTPS_ID)) {
+												$result = $mailfile->sendfile();
+												if ($result) {
+													setEventMessages($langs->trans('SendEmailAt') . ' ' . $listOfMails, array());
+													// This avoid sending mail twice if going out and then back to page
+													header('Location: ' . $_SERVER["PHP_SELF"] . '?id=' . $object->id);
+													exit;
+												} else {
+													$langs->load("other");
+													$mesg = '<div class="error">';
+													if ($mailfile->error) {
+														$mesg .= $langs->transnoentities('ErrorFailedToSendMail', dol_escape_htmltag($from), dol_escape_htmltag($sendto));
+														$mesg .= '<br>' . $mailfile->error;
+													} else {
+														$mesg .= $langs->transnoentities('ErrorFailedToSendMail', dol_escape_htmltag($from), dol_escape_htmltag($sendto));
+													}
+													$mesg .= '</div>';
+													setEventMessages($mesg, null, 'warnings');
+												}
+											} else {
+												setEventMessages($langs->trans('ErrorSetupEmail'), '', 'errors');
+											}
+										}
+
+									} else {
+										$langs->load("errors");
+										setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv("MailTo")), null, 'warnings');
+										dol_syslog('Try to send email with no recipient defined', LOG_WARNING);
+									}
+								}
+							} else {
 								// Mail sent KO
-							$error++;
-							if (!empty($error)) setEventMessages(null, $langs->trans('WrongEmailFormat'), 'errors');
-							else  setEventMessages($error, null, 'errors');
+								$error++;
+								if (!empty($error)) setEventMessages(null, $langs->trans('WrongEmailFormat'), 'errors');
+								else  setEventMessages($error, null, 'errors');
 
 
+							}
 						}
+
 					}
-
 				}
-
-				break;
-
+				
 
 			default:
 				dol_syslog("Trigger '".$this->name."' for action '$action' launched by ".__FILE__.". id=".$object->id);

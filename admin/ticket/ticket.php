@@ -327,7 +327,7 @@ if (!empty($conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE)) {
 	print '<input type="hidden" name="action" value="setEmails">';
 	print '<input type="hidden" name="backtopage" value="' . $backtopage . '">';
 
-	print '<tr class="oddeven"><td>' . $langs->trans("GenerateCategories") . '</td>';
+	print '<tr class="oddeven"><td>' . $langs->trans("SendEmailTo") . '</td>';
 	print '<td class="center">';
 	print '<input name="emails" id="emails" value="'.$conf->global->DIGIRISKDOLIBARR_TICKET_SUBMITTED_SEND_MAIL_TO.'">';
 	print '</td>';
