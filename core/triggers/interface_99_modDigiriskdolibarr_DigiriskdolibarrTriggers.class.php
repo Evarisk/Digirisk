@@ -603,22 +603,18 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 
 								$message = 	 $object->message;
 								$subject = 	$langs->trans('NewTicketSubmitted') . ' : ' . $object->subject . $langs->trans('By') . /* extrafield */ '';
+								$trackid = 'tic'.$object->id;
 
 								// Create form object
 								// Send mail (substitutionarray must be done just before this)
-								$mailfile = new CMailFile($subject, $sendto, $from, $message, array(), array(), array(), "", "", 0, -1, '', '', '', '', 'mail');
+								$mailfile = new CMailFile($subject, $sendto, $from, $message, array(), array(), array(), "", "", 0, -1, '', '', $trackid, '', 'ticket');
 
 								if ($mailfile->error) {
 									setEventMessages($mailfile->error, $mailfile->errors, 'errors');
 								} else {
 									if (!empty($conf->global->MAIN_MAIL_SMTPS_ID)) {
 										$result = $mailfile->sendfile();
-										if ($result) {
-											setEventMessages($langs->trans('SendEmailAt') . ' ' . $listOfMails, array());
-											// This avoid sending mail twice if going out and then back to page
-											header('Location: ' . $_SERVER["PHP_SELF"] . '?id=' . $object->id);
-											exit;
-										} else {
+										if (!$result) {
 											$langs->load("other");
 											$mesg = '<div class="error">';
 											if ($mailfile->error) {
@@ -654,22 +650,18 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 
 										$message = 	 $object->message;
 										$subject = 	$langs->trans('NewTicketSubmitted') . ' : ' . $object->subject . $langs->trans('By') . /* extrafield */ '';
+										$trackid = 'tic'.$object->id;
 
 										// Create form object
 										// Send mail (substitutionarray must be done just before this)
-										$mailfile = new CMailFile($subject, $sendto, $from, $message, array(), array(), array(), "", "", 0, -1, '', '', '', '', 'mail');
+										$mailfile = new CMailFile($subject, $sendto, $from, $message, array(), array(), array(), "", "", 0, -1, '', '', $trackid, '', 'ticket');
 
 										if ($mailfile->error) {
 											setEventMessages($mailfile->error, $mailfile->errors, 'errors');
 										} else {
 											if (!empty($conf->global->MAIN_MAIL_SMTPS_ID)) {
 												$result = $mailfile->sendfile();
-												if ($result) {
-													setEventMessages($langs->trans('SendEmailAt') . ' ' . $listOfMails, array());
-													// This avoid sending mail twice if going out and then back to page
-													header('Location: ' . $_SERVER["PHP_SELF"] . '?id=' . $object->id);
-													exit;
-												} else {
+												if (!$result) {
 													$langs->load("other");
 													$mesg = '<div class="error">';
 													if ($mailfile->error) {
@@ -701,8 +693,6 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 						}
 					}
 				}
-				$ok = 1;
-				return $ok;
 				break;
 
 			default:
