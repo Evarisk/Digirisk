@@ -86,7 +86,6 @@ if (!$user->rights->digiriskdolibarr->adminpage->read) accessforbidden();
  */
 
 if (GETPOST('dataMigrationImport', 'alpha') && !empty($conf->global->MAIN_UPLOAD_DOC)) {
-
 	// Submit file
 	if (!empty($_FILES)) {
 		if (!preg_match('/\.json/',$_FILES['dataMigrationImportfile']['name'][0]) || $_FILES['dataMigrationImportfile']['size'][0] < 1) {
@@ -146,13 +145,16 @@ if (GETPOST('dataMigrationImport', 'alpha') && !empty($conf->global->MAIN_UPLOAD
 			}
 		}
 
-
+		$fileImport = dol_dir_list($filedir, "files", 0, '', '', '', '', 1);
+		$fileImport = array_shift($fileImport);
+		if (!empty($fileImport)) {
+			unlink($fileImport['fullname']);
+		}
 	}
 }
 
 if (GETPOST('dataMigrationImportRisks', 'alpha') && !empty($conf->global->MAIN_UPLOAD_DOC)) {
 	// Submit file
-
 	if (!empty($_FILES)) {
 		if (!preg_match('/\.json/',$_FILES['dataMigrationImportRisksfile']['name'][0]) || $_FILES['dataMigrationImportRisksfile']['size'][0] < 1) {
 			setEventMessages($langs->trans('ErrorFileNotWellFormatted'), null, 'errors');
@@ -227,6 +229,12 @@ if (GETPOST('dataMigrationImportRisks', 'alpha') && !empty($conf->global->MAIN_U
 					}
 				}
 			}
+		}
+
+		$fileImportRisks = dol_dir_list($filedir, "files", 0, '', '', '', '', 1);
+		$fileImportRisks = array_shift($fileImportRisks);
+		if (!empty($fileImportRisks)) {
+			unlink($fileImportRisks['fullname']);
 		}
 	}
 }
