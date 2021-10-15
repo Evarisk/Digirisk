@@ -870,42 +870,42 @@ function display_recurse_tree($results) {
 					<?php if ($element['object']->element_type == 'groupment' && count($element['children'])) { ?>
 						<div class="toggle-unit">
 							<i class="toggle-icon fas fa-chevron-right" id="menu<?php echo $element['object']->id;?>"></i>
-							<div class="digirisk-element-medias-modal" style="z-index:1500" value="<?php echo $element['object']->id ?>">
-							<div class="wpeo-modal"  id="digirisk_element_medias_modal_<?php echo $element['object']->id ?>" value="<?php echo $element['object']->id ?>" style="z-index: 1005 !important">
-								<div class="modal-container wpeo-modal-event">
-									<!-- Modal-Header -->
-									<div class="modal-header">
-										<h2 class="modal-title"><?php echo $langs->trans('DigiriskElementMedias') . ' ' . $element['object']->ref ?></h2>
-										<div class="wpeo-button open-media-gallery add-media modal-open" value="<?php echo $element['object']->id ?>">
-											<input type="hidden" class="type-from" value="digiriskelement"/>
-											<span><i class="fas fa-camera"></i>  <?php echo $langs->trans('AddMedia') ?></span>
-										</div>
-										<div class="modal-close"><i class="fas fa-times"></i></div>
-									</div>
-									<!-- Modal Content-->
-									<div class="modal-content" id="#modalContent<?php echo $element['object']->id ?>">
-										<div class="risk-evaluation-container">
-											<div class="risk-evaluation-header">
+						</div>
+						<div class="digirisk-element-medias-modal" style="z-index:1500" value="<?php echo $element['object']->id ?>">
+								<div class="wpeo-modal"  id="digirisk_element_medias_modal_<?php echo $element['object']->id ?>" value="<?php echo $element['object']->id ?>" style="z-index: 1005 !important">
+									<div class="modal-container wpeo-modal-event">
+										<!-- Modal-Header -->
+										<div class="modal-header">
+											<h2 class="modal-title"><?php echo $langs->trans('DigiriskElementMedias') . ' ' . $element['object']->ref ?></h2>
+											<div class="wpeo-button open-media-gallery add-media modal-open" value="<?php echo $element['object']->id ?>">
+												<input type="hidden" class="type-from" value="digiriskelement"/>
+												<span><i class="fas fa-camera"></i>  <?php echo $langs->trans('AddMedia') ?></span>
 											</div>
-											<div class="element-linked-medias element-linked-medias-<?php echo $element['object']->id ?> digirisk-element modal-media-linked">
-												<div class="medias"><i class="fas fa-picture-o"></i><?php echo $langs->trans('Medias'); ?></div>
-												<?php
-												$relativepath = 'digiriskdolibarr/medias/thumbs';
-												print digirisk_show_medias_linked('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/'.$element['object']->element_type.'/' , 'small', '', 0, 0, 0, 150, 150, 1, 0, 0, $element['object']->element_type, $element['object']);
-												?>
+											<div class="modal-close"><i class="fas fa-times"></i></div>
+										</div>
+										<!-- Modal Content-->
+										<div class="modal-content" id="#modalContent<?php echo $element['object']->id ?>">
+											<div class="risk-evaluation-container">
+												<div class="risk-evaluation-header">
+												</div>
+												<div class="element-linked-medias element-linked-medias-<?php echo $element['object']->id ?> digirisk-element modal-media-linked">
+													<div class="medias"><i class="fas fa-picture-o"></i><?php echo $langs->trans('Medias'); ?></div>
+													<?php
+													$relativepath = 'digiriskdolibarr/medias/thumbs';
+													print digirisk_show_medias_linked('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/'.$element['object']->element_type.'/' , 'small', '', 0, 0, 0, 150, 150, 1, 0, 0, $element['object']->element_type, $element['object']);
+													?>
+												</div>
 											</div>
 										</div>
-									</div>
-									<!-- Modal-Footer -->
-									<div class="modal-footer">
-										<div class="wpeo-button modal-close button-blue">
-											<i class="fas fa-times"></i> <?php echo $langs->trans('CloseModal'); ?>
+										<!-- Modal-Footer -->
+										<div class="modal-footer">
+											<div class="wpeo-button modal-close button-blue">
+												<i class="fas fa-times"></i> <?php echo $langs->trans('CloseModal'); ?>
+											</div>
 										</div>
 									</div>
 								</div>
 							</div>
-						</div>
-						</div>
 					<?php } else { ?>
 						<div class="spacer"></div>
 						<div class="digirisk-element-medias-modal" style="z-index:1500" value="<?php echo $element['object']->id ?>">
