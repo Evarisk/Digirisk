@@ -38,6 +38,7 @@ if (!$res) die("Include of main fails");
 require_once DOL_DOCUMENT_ROOT.'/contact/class/contact.class.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/company.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/functions2.lib.php';
+
 require_once './class/digiriskelement.class.php';
 require_once './lib/digiriskdolibarr_digiriskelement.lib.php';
 require_once './lib/digiriskdolibarr_function.lib.php';

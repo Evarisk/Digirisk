@@ -73,6 +73,7 @@ class DigiriskElement extends CommonObject
 		'label'         => array('type'=>'varchar(255)', 'label'=>'Label', 'enabled'=>'1', 'position'=>80, 'notnull'=>1, 'visible'=>1, 'searchall'=>1, 'css'=>'minwidth200', 'help'=>"Help text", 'showoncombobox'=>'1',),
 		'description'   => array('type'=>'textarea', 'label'=>'Description', 'enabled'=>'1', 'position'=>90, 'notnull'=>0, 'visible'=>3,),
 		'element_type'  => array('type'=>'varchar(50)', 'label'=>'ElementType', 'enabled'=>'1', 'position'=>100, 'notnull'=>-1, 'visible'=>1,),
+		'photo'         => array('type'=>'varchar(255)', 'label'=>'Photo', 'enabled'=>'1', 'position'=>100, 'notnull'=>-1, 'visible'=>-2,),
 		'fk_user_creat' => array('type'=>'integer:User:user/class/user.class.php', 'label'=>'UserAuthor', 'enabled'=>'1', 'position'=>110, 'notnull'=>1, 'visible'=>-2, 'foreignkey'=>'user.rowid',),
 		'fk_user_modif' => array('type'=>'integer:User:user/class/user.class.php', 'label'=>'UserModif', 'enabled'=>'1', 'position'=>120, 'notnull'=>-1, 'visible'=>-2,),
 		'fk_parent'     => array('type'=>'integer', 'label'=>'ParentElement', 'enabled'=>'1', 'position'=>130, 'notnull'=>1, 'visible'=>1, 'default'=>0,),
@@ -90,6 +91,7 @@ class DigiriskElement extends CommonObject
 	public $label;
 	public $description;
 	public $element_type;
+	public $photo;
 	public $fk_user_creat;
 	public $fk_user_modif;
 	public $fk_parent;
@@ -502,5 +504,40 @@ class DigiriskElement extends CommonObject
 
 		if ($outputmode) return $outarray;
 		return $out;
+	}
+
+	/**
+	 * Return fk_object from wp_digi_id extrafields
+	 *
+	 * @param $wp_digi_id
+	 * @return array|int                 int <0 if KO, array of pages if OK
+	 * @throws Exception
+	 */
+	public function fetch_id_from_wp_digi_id($wp_digi_id)
+	{
+		dol_syslog(__METHOD__, LOG_DEBUG);
+
+		$sql = 'SELECT ';
+		$sql .= ' *';
+		$sql .= ' FROM '.MAIN_DB_PREFIX.$this->table_element.'_extrafields as t';
+		$sql .= ' WHERE wp_digi_id ='.$wp_digi_id;
+
+		$resql = $this->db->query($sql);
+		if ($resql) {
+			$num = $this->db->num_rows($resql);
+			$i = 0;
+			while ($i < 1)
+			{
+				$obj = $this->db->fetch_object($resql);
+				$i++;
+			}
+			$this->db->free($resql);
+
+			return $obj->fk_object;
+		} else {
+			$this->errors[] = 'Error '.$this->db->lasterror();
+			dol_syslog(__METHOD__.' '.join(',', $this->errors), LOG_ERR);
+			return -1;
+		}
 	}
 }

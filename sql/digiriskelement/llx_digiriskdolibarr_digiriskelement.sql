@@ -25,7 +25,8 @@ CREATE TABLE llx_digiriskdolibarr_digiriskelement(
 	label         varchar(255) NOT NULL,
 	description   text,
 	element_type  varchar(50),
-	fk_user_creat integer NOT NULL,
+    photo               varchar(255),
+    fk_user_creat integer NOT NULL,
 	fk_user_modif integer,
 	fk_parent     integer DEFAULT 0 NOT NULL,
 	fk_standard   integer DEFAULT 1 NOT NULL

@@ -84,9 +84,9 @@ class ActionsDigiriskdolibarr
 				$form = new Form($db);
 				?>
 				<script>
-					IDCC_form = '<?php $formother->select_dictionary('DIGIRISK_COLLECTIVE_AGREEMENT_TITLE','c_conventions_collectives', 'code', 'libelle', $conf->global->DIGIRISK_COLLECTIVE_AGREEMENT_TITLE );?>';
+					IDCC_form = '<?php $formother->select_dictionary('DIGIRISK_COLLECTIVE_AGREEMENT_TITLE','c_conventions_collectives', 'code', 'libelle', $conf->global->DIGIRISK_COLLECTIVE_AGREEMENT_TITLE, 1);?>';
 
-					let $tr = $('<tr class="oddeven"><td><label for="selectidcc_id"><?php print $form->textwithpicto($langs->trans('IDCC'), 'Ce champ provient du module Digirisk pour Dolibarr </br> La nomenclature des conventions collectives provient de travail-emploi.gouv.fr ');?></label></td>');
+					let $tr = $('<tr class="oddeven"><td><label for="selectidcc_id"><?php print $form->textwithpicto($langs->trans('IDCC'), $langs->trans('IDCCTooltip'));?></label></td>');
 					$tr.append('<td>' + IDCC_form + '</td></tr>');
 
 					let currElement = $('table:nth-child(7) .oddeven:last-child');

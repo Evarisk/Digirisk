@@ -37,6 +37,7 @@ if (!$res) die("Include of main fails");
 
 require_once DOL_DOCUMENT_ROOT.'/core/lib/admin.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/core/class/doleditor.class.php';
+require_once DOL_DOCUMENT_ROOT.'/core/lib/images.lib.php';
 
 require_once './class/digiriskstandard.class.php';
 require_once './class/digiriskelement.class.php';
@@ -69,6 +70,7 @@ $upload_dir = $conf->digiriskdolibarr->multidir_output[isset($conf->entity) ? $c
 $permissiontoread   = $user->rights->digiriskdolibarr->riskassessmentdocument->read;
 $permissiontoadd    = $user->rights->digiriskdolibarr->riskassessmentdocument->write;
 $permissiontodelete = $user->rights->digiriskdolibarr->riskassessmentdocument->delete;
+$permtoupload       = $user->rights->ecm->upload;
 
 if (!$permissiontoread) accessforbidden();
 
@@ -90,7 +92,6 @@ if (empty($reshook)) {
 		$method         = GETPOST('Method', 'alpha');
 		$sources        = GETPOST('Sources', 'alpha');
 		$importantNote  = GETPOST('ImportantNote', 'alpha');
-		$sitePlans      = GETPOST('SitePlans', 'alpha');
 
 		if ( strlen( $auditStartDate ) ) {
 			$auditStartDate = explode('/',$auditStartDate);
@@ -116,8 +117,31 @@ if (empty($reshook)) {
 
 		dolibarr_set_const($db, "DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_METHOD", $method, 'chaine', 0, '', $conf->entity);
 		dolibarr_set_const($db, "DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_SOURCES", $sources, 'chaine', 0, '', $conf->entity);
-		dolibarr_set_const($db, "DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_IMPORTANT_NOTE", $importantNote, 'chaine', 0, '', $conf->entity);
-		dolibarr_set_const($db, "DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_SITE_PLANS", $sitePlans, 'chaine', 0, '', $conf->entity);
+		dolibarr_set_const($db, "DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_IMPORTANT_NOTES", $importantNote, 'chaine', 0, '', $conf->entity);
+
+		// Submit file
+		if (!empty($conf->global->MAIN_UPLOAD_DOC)) {
+			if (!empty($_FILES)) {
+				if (is_array($_FILES['userfile']['tmp_name'])) $userfiles = $_FILES['userfile']['tmp_name'];
+				else $userfiles = array($_FILES['userfile']['tmp_name']);
+
+				foreach ($userfiles as $key => $userfile) {
+					if (empty($_FILES['userfile']['tmp_name'][$key])) {
+						$error++;
+						if ($_FILES['userfile']['error'][$key] == 1 || $_FILES['userfile']['error'][$key] == 2) {
+							setEventMessages($langs->trans('ErrorFileSizeTooLarge'), null, 'errors');
+						}
+					}
+				}
+
+				if (!$error) {
+					$filedir = $upload_dir . '/riskassessmentdocument/';
+					if (!empty($filedir)) {
+						$result = dol_add_file_process($filedir, 0, 1, 'userfile', '', null, '', 1, $object);
+					}
+				}
+			}
+		}
 
 		if ($action != 'updateedit' && !$error) {
 			header("Location: ".$_SERVER["PHP_SELF"]);
@@ -162,6 +186,7 @@ if (empty($reshook)) {
 		// Ajout du fichier au dossier à zipper
 		$nameFile = $riskassessmentdocument->ref.'_'.$conf->global->MAIN_INFO_SOCIETE_NOM.'_'.$date.'.odt';
 		$nameFile = str_replace(' ', '_', $nameFile);
+		$nameFile = dol_sanitizeFileName($nameFile);
 		copy(DOL_DATA_ROOT . $entity . '/digiriskdolibarr/riskassessmentdocument/' . $riskassessmentdocument->last_main_doc, $pathToZip . '/' . $nameFile);
 
 		$digiriskelementlist = $digiriskelement->fetchDigiriskElementFlat(0);
@@ -186,6 +211,7 @@ if (empty($reshook)) {
 				$sourceFilePath = DOL_DATA_ROOT . $entity . '/digiriskdolibarr/' . $subFolder . '/' . $digiriskelementsingle['object']->ref . '/';
 				$nameFile = $digiriskelementdocument->ref.'_'.$digiriskelementsingle['object']->label.'_'.$riskassessmentdocument->ref.'-'.$date.'.odt';
 				$nameFile = str_replace(' ', '_', $nameFile);
+				$nameFile = dol_sanitizeFileName($nameFile);
 				copy($sourceFilePath . $digiriskelementdocument->last_main_doc, $pathToZip . '/'  . $nameFile);
 			}
 
@@ -239,30 +265,30 @@ if (empty($reshook)) {
 			}
 		}
 	}
-}
 
-// Delete file in doc form
-if ($action == 'remove_file' && $permissiontodelete) {
-	if (!empty($upload_dir)) {
-		require_once DOL_DOCUMENT_ROOT.'/core/lib/files.lib.php';
+	// Delete file in doc form
+	if ($action == 'remove_file' && $permissiontodelete) {
+		if (!empty($upload_dir)) {
+			require_once DOL_DOCUMENT_ROOT.'/core/lib/files.lib.php';
 
-		$langs->load("other");
-		$filetodelete = GETPOST('file', 'alpha');
-		$file = $upload_dir.'/'.$filetodelete;
-		$ret = dol_delete_file($file, 0, 0, 0, $object);
-		if ($ret) setEventMessages($langs->trans("FileWasRemoved", $filetodelete), null, 'mesgs');
-		else setEventMessages($langs->trans("ErrorFailToDeleteFile", $filetodelete), null, 'errors');
+			$langs->load("other");
+			$filetodelete = GETPOST('file', 'alpha');
+			$file = $upload_dir.'/'.$filetodelete;
+			$ret = dol_delete_file($file, 0, 0, 0, $object);
+			if ($ret) setEventMessages($langs->trans("FileWasRemoved", $filetodelete), null, 'mesgs');
+			else setEventMessages($langs->trans("ErrorFailToDeleteFile", $filetodelete), null, 'errors');
 
-		// Make a redirect to avoid to keep the remove_file into the url that create side effects
-		$urltoredirect = $_SERVER['REQUEST_URI'];
-		$urltoredirect = preg_replace('/#builddoc$/', '', $urltoredirect);
-		$urltoredirect = preg_replace('/action=remove_file&?/', '', $urltoredirect);
+			// Make a redirect to avoid to keep the remove_file into the url that create side effects
+			$urltoredirect = $_SERVER['REQUEST_URI'];
+			$urltoredirect = preg_replace('/#builddoc$/', '', $urltoredirect);
+			$urltoredirect = preg_replace('/action=remove_file&?/', '', $urltoredirect);
 
-		header('Location: '.$urltoredirect);
-		exit;
-	}
-	else {
-		setEventMessages('BugFoundVarUploaddirnotDefined', null, 'errors');
+			header('Location: '.$urltoredirect);
+			exit;
+		}
+		else {
+			setEventMessages('BugFoundVarUploaddirnotDefined', null, 'errors');
+		}
 	}
 }
 
@@ -296,6 +322,10 @@ $morehtmlref .= '</div>';
 $morehtmlleft = '<div class="floatleft inline-block valignmiddle divphotoref">'.digirisk_show_photos('mycompany', $conf->mycompany->dir_output . '/logos', 'small', 1, 0, 0, 0, $width,0, 0, 0, 0, 'logos', $emptyobject).'</div>';
 
 digirisk_banner_tab($object, 'ref', '', 0, 'ref', 'ref', $morehtmlref, '', 0, $morehtmlleft);
+
+print '<form method="POST" action="'.$_SERVER["PHP_SELF"].'" name="edit" enctype="multipart/form-data">';
+print '<input type="hidden" name="token" value="'.newToken().'">';
+print '<input type="hidden" name="action" value="update">';
 
 print '<div class="fichecenter">';
 print '<table class="border centpercent tableforfield">' . "\n";

@@ -91,6 +91,7 @@ HasNotBeenDeletedF = n'a pas été supprimée
 HasNotBeenDeletedM = n'a pas été supprimé
 
 DigiriskDolibarrArea = Bienvenue sur DigiRisk
+WarningDigiriskNotUpdated = Veuillez mettre à jour votre Digirisk en désactivant et réactivant le module en vous rendant sur :
 
 #
 # Diaporama page index
@@ -309,6 +310,7 @@ PreventionPlanDocumentGeneratedWithDolibarr = Plan de prévention généré avec
 # Data - Donnée
 
 PreventionPlan = Plan de prévention
+PreventionPlanInitial = PPR
 PreventionPlanList = Liste des plans de prévention
 PreventionPlanLine = risque(s)
 PriorVisit = Inspection commune préalable
@@ -488,8 +490,9 @@ RiskAssessmentDocumentDigiriskTemplate = ODT par défaut des documents unique
 
 # Data - Donnée
 RiskAssessmentDocument = Document unique
+RiskAssessmentDocumentInitial = DU
 RiskAssessmentDocumentDU = Plan d'action Document Unique
-RiskAssessmentDocumentDescription = Description du plan d'action Document Unique
+RiskAssessmentDocumentDescription = Plan d'action Document Unique
 
 AuditStartDate = Date de début d'audit
 AuditEndDate = Date de fin d'audit
@@ -751,6 +754,8 @@ NoFileLinked = Pas de photo liée
 AddRiskAssessment = Ajouter une évaluation du risque
 AddRiskAssessmentTask = Ajouter une tâche au risque
 ListRiskAssessmentTask = Liste des tâches du risque
+ShowRiskAssessmentDate = Date des évaluations
+ShowRiskAssessmentDateDescription = Afficher la date des évaluations
 
 
 
@@ -814,6 +819,14 @@ DigiriskTaskData = Donnée configurable des tâches
 TaskManagementDescription = Activer la gestion des tâches
 TaskManagementNotActivated = Veuillez activer la gestion des tâches dans Configuration du module / Analyse des risques / Tâche
 DigiriskProgress = Avancement
+ShowTaskStartDate = Date de début des tâches
+ShowTaskStartDateDescription = Afficher la date de début des tâches
+ShowTaskEndDate = Date de fin des tâches
+ShowTaskEndDateDescription = Afficher la date de fin des tâches
+ShowTaskProgress = Progression des tâches
+ShowTaskProgressDescription = Afficher la progression des tâches à 100
+ShowAllTasks = Toutes les tâches
+ShowAllTasksDescription = Afficher toutes les tâches
 
 
 
@@ -925,6 +938,21 @@ TicketShowCompanyLogoHelp = Activez cette option pour masquer le logo de la soci
 
 
 #
+# Tools - Outils
+#
+
+# Data - Donnée
+Tools = Outils
+DigiriskDataMigration = Gestion des données de migration
+DataMigrationImport = Importation des données de l'arborescence de Digirisk
+DataMigrationImportDescription = Importation des données de l'arborescence de Digirisk WordPress au format JSON
+DataMigrationImportRisks = Importation des données des risques de Digirisk
+DataMigrationImportRisksDescription = Importation des données des risques de Digirisk WordPress au format JSON
+ErrorFileNotWellFormatted = Le fichier n'est pas au bon format ou est vide. Vous devez joindre un fichier d'import provenant de Digirisk WordPress nommé DATE_OBJET_export.json
+
+
+
+#
 # Other
 #
 
@@ -938,3 +966,4 @@ ErrorFileNotFound = Aucun logo de la société renseigné
 LabourInspectorName = DREETS
 UrlLabourInspector = https://travail-emploi.gouv.fr/ministere/organisation/article/dreets-directions-regionales-de-l-economie-de-l-emploi-du-travail-et-des
 ErrorSetupEmail = Erreur de configuration des mails, vous n'avez pas configuré votre serveur d'envoi de mail
+IDCCTooltip = Ce champ provient du module Digirisk pour Dolibarr </br> La nomenclature des conventions collectives provient de travail-emploi.gouv.fr

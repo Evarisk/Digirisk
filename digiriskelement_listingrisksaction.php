@@ -35,6 +35,8 @@ if (!$res && file_exists("../../main.inc.php")) $res = @include "../../main.inc.
 if (!$res && file_exists("../../../main.inc.php")) $res = @include "../../../main.inc.php";
 if (!$res) die("Include of main fails");
 
+require_once DOL_DOCUMENT_ROOT.'/core/lib/images.lib.php';
+
 require_once './class/digiriskelement.class.php';
 require_once './class/digiriskstandard.class.php';
 require_once './class/digiriskdocuments/listingrisksaction.class.php';

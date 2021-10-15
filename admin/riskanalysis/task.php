@@ -79,6 +79,26 @@ if ($action == 'settaskmanagement') {
 	dolibarr_set_const($db, $constforval, $value, 'integer', 0, '', $conf->entity);
 }
 
+if ($action == 'setshowtaskstartdate') {
+	$constforval = 'DIGIRISKDOLIBARR_SHOW_TASK_START_DATE';
+	dolibarr_set_const($db, $constforval, $value, 'integer', 0, '', $conf->entity);
+}
+
+if ($action == 'setshowtaskenddate') {
+	$constforval = 'DIGIRISKDOLIBARR_SHOW_TASK_END_DATE';
+	dolibarr_set_const($db, $constforval, $value, 'integer', 0, '', $conf->entity);
+}
+
+if ($action == 'setshowtaskprogress') {
+	$constforval = 'DIGIRISKDOLIBARR_SHOW_TASK_PROGRESS';
+	dolibarr_set_const($db, $constforval, $value, 'integer', 0, '', $conf->entity);
+}
+
+if ($action == 'setshowalltasks') {
+	$constforval = 'DIGIRISKDOLIBARR_SHOW_ALL_TASKS';
+	dolibarr_set_const($db, $constforval, $value, 'integer', 0, '', $conf->entity);
+}
+
 /*
  * View
  */
@@ -147,6 +167,70 @@ if ($conf->global->DIGIRISKDOLIBARR_TASK_MANAGEMENT) {
 }
 else {
 	print '<a class="reposition" href="'.$_SERVER["PHP_SELF"].'?action=settaskmanagement&value=1" alt="'.$langs->trans("Default").'">'.img_picto($langs->trans("Disabled"), 'switch_off').'</a>';
+}
+print '</td>';
+print '</tr>';
+
+print '<tr class="oddeven"><td>';
+print $langs->trans('ShowTaskStartDate');
+print "</td><td>";
+print $langs->trans('ShowTaskStartDateDescription');
+print '</td>';
+
+print '<td class="center">';
+if ($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_START_DATE) {
+	print '<a class="reposition" href="'.$_SERVER["PHP_SELF"].'?action=setshowtaskstartdate&value=0" alt="'.$langs->trans("Default").'">'.img_picto($langs->trans("Activated"), 'switch_on').'</a>';
+}
+else {
+	print '<a class="reposition" href="'.$_SERVER["PHP_SELF"].'?action=setshowtaskstartdate&value=1" alt="'.$langs->trans("Default").'">'.img_picto($langs->trans("Disabled"), 'switch_off').'</a>';
+}
+print '</td>';
+print '</tr>';
+
+print '<tr class="oddeven"><td>';
+print $langs->trans('ShowTaskEndDate');
+print "</td><td>";
+print $langs->trans('ShowTaskEndDateDescription');
+print '</td>';
+
+print '<td class="center">';
+if ($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_END_DATE) {
+	print '<a class="reposition" href="'.$_SERVER["PHP_SELF"].'?action=setshowtaskenddate&value=0" alt="'.$langs->trans("Default").'">'.img_picto($langs->trans("Activated"), 'switch_on').'</a>';
+}
+else {
+	print '<a class="reposition" href="'.$_SERVER["PHP_SELF"].'?action=setshowtaskenddate&value=1" alt="'.$langs->trans("Default").'">'.img_picto($langs->trans("Disabled"), 'switch_off').'</a>';
+}
+print '</td>';
+print '</tr>';
+
+print '<tr class="oddeven"><td>';
+print $langs->trans('ShowTaskProgress');
+print "</td><td>";
+print $langs->trans('ShowTaskProgressDescription') .' %';
+print '</td>';
+
+print '<td class="center">';
+if ($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_PROGRESS) {
+	print '<a class="reposition" href="'.$_SERVER["PHP_SELF"].'?action=setshowtaskprogress&value=0" alt="'.$langs->trans("Default").'">'.img_picto($langs->trans("Activated"), 'switch_on').'</a>';
+}
+else {
+	print '<a class="reposition" href="'.$_SERVER["PHP_SELF"].'?action=setshowtaskprogress&value=1" alt="'.$langs->trans("Default").'">'.img_picto($langs->trans("Disabled"), 'switch_off').'</a>';
+}
+print '</td>';
+print '</tr>';
+
+print '<tr class="oddeven"><td>';
+print $langs->trans('ShowAllTasks');
+print "</td><td>";
+print $langs->trans('ShowAllTasksDescription');
+print '</td>';
+
+print '<td class="center">';
+if ($conf->global->DIGIRISKDOLIBARR_SHOW_ALL_TASKS) {
+	print '<a class="reposition" href="'.$_SERVER["PHP_SELF"].'?action=setshowalltasks&value=0" alt="'.$langs->trans("Default").'">'.img_picto($langs->trans("Activated"), 'switch_on').'</a>';
+}
+else {
+	print '<a class="reposition" href="'.$_SERVER["PHP_SELF"].'?action=setshowalltasks&value=1" alt="'.$langs->trans("Default").'">'.img_picto($langs->trans("Disabled"), 'switch_off').'</a>';
 }
 print '</td>';
 print '</tr>';

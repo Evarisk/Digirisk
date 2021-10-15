@@ -27,8 +27,7 @@ if (empty($conf) || !is_object($conf))
 
 <!-- BEGIN PHP TEMPLATE core/tpl/digiriskdolibarr_photo_view.tpl.php -->
 
-<?php $permtoupload = $user->rights->ecm->upload; ?>
-
+<?php $permtoupload = $user->rights->ecm->upload;?>
 <div class="risk-evaluation-photo" value="<?php echo $risk->id ?>">
 	<span class="title"><?php echo $langs->trans('Photo'); ?></span>
 	<div class="risk-evaluation-photo-container wpeo-modal-event tooltip hover">
@@ -38,75 +37,37 @@ if (empty($conf) || !is_object($conf))
 		$relativepath = 'digiriskdolibarr/medias/thumbs/';
 		$modulepart = $entity . 'ecm';
 		$path = DOL_URL_ROOT.'/document.php?modulepart=' . $modulepart  . '&attachment=0&file=' . str_replace('/', '%2F', $relativepath) . '/';
+		$pathToThumb = DOL_URL_ROOT.'/viewimage.php?modulepart=digiriskdolibarr&entity='.$conf->entity.'&file='.urlencode($cotation->element.'/'.$cotation->ref . '/thumbs/');
 		$nophoto = '/public/theme/common/nophoto.png'; ?>
 		<!-- BUTTON RISK EVALUATION PHOTO MODAL -->
-		<div class="action risk-evaluation-photo default-photo modal-open" value="<?php echo $object->id ?>">
+		<div class="action risk-evaluation-photo default-photo modal-open risk-evaluation-photo-<?php echo $cotation->id > 0 ?  $cotation->id :  0 ; echo $risk->id > 0 ? ' risk-'.$risk->id : ' risk-new' ?>">
 			<?php if (isset($cotation->photo)) {
 				$filearray = dol_dir_list($conf->digiriskdolibarr->multidir_output[$conf->entity].'/'.$cotation->element.'/'.$cotation->ref, "files", 0, '', '(\.odt|_preview.*\.png)$', 'position_name', 'asc', 1);
 				if (count($filearray)) {
 					?>
 					<span class="floatleft inline-block valignmiddle divphotoref risk-evaluation-photo-single">
-						<input type="hidden" value="<?php echo $path ?>">
+						<input class="filepath-to-riskassessment filepath-to-riskassessment-<?php echo $risk->id > 0 ? $risk->id : 'new' ?>" type="hidden" value="<?php echo $pathToThumb ?>">
 						<input class="filename" type="hidden" value="">
-						 <?php print digirisk_show_photos('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity].'/'.$cotation->element, 'small', 1, 0, 0, 0, 40, 0, 1, 0, 0, $cotation->element, $cotation); ?>
+						 <?php 	print '<img width="40" class="photo clicked-photo-preview" src="'.DOL_URL_ROOT.'/viewimage.php?modulepart=digiriskdolibarr&entity='.$conf->entity.'&file='.urlencode($cotation->element.'/'.$cotation->ref . '/thumbs/'. preg_replace('/\./', '_small.', $cotation->photo)).'" >';
+						 ?>
 					</span>
 					<?php
 				} else {
 					$nophoto = '/public/theme/common/nophoto.png'; ?>
 					<span class="floatleft inline-block valignmiddle divphotoref risk-evaluation-photo-single">
-						<input type="hidden" value="<?php echo $path ?>">
+						<input class="filepath-to-riskassessment filepath-to-riskassessment-<?php echo $risk->id > 0 ? $risk->id : 'new' ?>" type="hidden" value="<?php echo $pathToThumb ?>">
 						<input class="filename" type="hidden" value="">
-						<img class="photodigiriskdolibarr" alt="No photo" src="<?php echo DOL_URL_ROOT.$nophoto ?>">
+						<img class="photodigiriskdolibarr clicked-photo-preview maxwidth50" alt="No photo" src="<?php echo $pathToThumb ?>">
 					</span>
 				<?php }
 			} else { ?>
-			<span class="floatleft inline-block valignmiddle divphotoref risk-evaluation-photo-single">
-				<input type="hidden" value="<?php echo $path ?>">
+			<span class="floatleft inline-block valignmiddle divphotoref risk-evaluation-photo-single" value="<?php echo $risk->id ?>">
+				<?php $pathToThumb = DOL_URL_ROOT.'/viewimage.php?modulepart=digiriskdolibarr&entity='.$conf->entity.'&file='.urlencode('/riskassessment/tmp/'.($risk->id > 0 ? $risk->ref : 'RK0') . '/thumbs/');  ?>
+				<input class="filepath-to-riskassessment filepath-to-riskassessment-<?php echo $risk->id > 0 ? $risk->id : 'new' ?>" type="hidden" value="<?php echo $pathToThumb ?>">
 				<input class="filename" type="hidden" value="">
-				<img class="photo maxwidth50"  src="<?php echo DOL_URL_ROOT.$nophoto ?>">
+				<img class="clicked-photo-preview photo maxwidth50"  src="<?php echo $pathToThumb ?>">
 			</span>
 			<?php } ?>
-		</div>
-		<!-- RISK EVALUATION PHOTO MODAL -->
-		<div class="wpeo-modal modal-photo" id="risk_evaluation_photo<?php echo $object->id ?>" data-id="<?php echo $object->id ?>">
-			<div class="modal-container wpeo-modal-event">
-				<!-- Modal-Header -->
-				<div class="modal-header">
-					<h2 class="modal-title"><?php echo $langs->trans('ModalAddPhoto') ?></h2>
-					<div class="modal-close"><i class="fas fa-2x fa-times"></i></div>
-				</div>
-				<!-- Modal-Content -->
-				<div class="modal-content" id="#modalContent<?php echo $object->id ?>">
-					<?php
-					// To attach new file
-					if ((!empty($conf->use_javascript_ajax) && empty($conf->global->MAIN_ECM_DISABLE_JS)) || !empty($section))
-					{
-						$sectiondir = GETPOST('file', 'alpha') ?GETPOST('file', 'alpha') : GETPOST('section_dir', 'alpha');
-						print '<!-- Start form to attach new file in digiriskdolibarr_photo_view.tpl.tpl.php sectionid='.$section.' sectiondir='.$sectiondir.' -->'."\n";
-						include_once DOL_DOCUMENT_ROOT.'/core/class/html.formfile.class.php';
-						$formfile = new FormFile($db);
-						$formfile->form_attach_new_file($_SERVER["PHP_SELF"], 'none', 0, 0, $permtoupload, 48, null, '', 0, '', 0, $nameforformuserfile, '', $sectiondir, 1);
-					} else print '&nbsp;';
-					// End "Add new file" area
-					?>
-					<div class="underbanner clearboth"></div>
-					<div class="ecm-photo-list-content">
-						<div class="wpeo-gridlayout grid-4 grid-gap-3 grid-margin-2 ecm-photo-list ecm-photo-list-<?php echo $risk->id . ($editModal ? '-edit' : '') ?>">
-							<?php
-							$relativepath = 'digiriskdolibarr/medias/thumbs';
-
-							print digirisk_show_medias('ecm', DOL_DATA_ROOT  . $entity. '/ecm/digiriskdolibarr/medias/thumbs', 'small');
-							?>
-						</div>
-					</div>
-				</div>
-				<!-- Modal-Footer -->
-				<div class="modal-footer">
-					<div class="save-photo wpeo-button button-blue button-disable">
-						<span><?php echo $langs->trans('Add'); ?></span>
-					</div>
-				</div>
-			</div>
 		</div>
 	</div>
 </div>

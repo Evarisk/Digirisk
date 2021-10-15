@@ -225,6 +225,7 @@ class doc_listingrisksaction_odt extends ModeleODTListingRisksAction
 				$filename = $objectref.'_'.$conf->global->MAIN_INFO_SOCIETE_NOM.'_'.$date.'.odt';
 			}
 			$filename = str_replace(' ', '_', $filename);
+			$filename = dol_sanitizeFileName($filename);
 
 			$object->last_main_doc = $filename;
 
@@ -270,6 +271,7 @@ class doc_listingrisksaction_odt extends ModeleODTListingRisksAction
 			$array_object_from_properties = $this->get_substitutionarray_each_var_object($object, $outputlangs);
 			$array_object = $this->get_substitutionarray_object($object, $outputlangs);
 			$array_soc = $this->get_substitutionarray_mysoc($mysoc, $outputlangs);
+			$array_soc['mycompany_logo'] = preg_replace('/_small/', '_mini', $array_soc['mycompany_logo']);
 
 			$tmparray = array_merge($substitutionarray, $array_object_from_properties, $array_object, $array_soc);
 			complete_substitutions_array($tmparray, $outputlangs, $object);
@@ -332,16 +334,38 @@ class doc_listingrisksaction_odt extends ModeleODTListingRisksAction
 											$tmparray['nomDanger'] = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $line->get_danger_category($line) . '.png';
 											$tmparray['identifiantRisque'] = $line->ref . ' - ' . $lastEvaluation->ref;
 											$tmparray['quotationRisque'] = $lastEvaluation->cotation ? $lastEvaluation->cotation : '0';
-											$tmparray['commentaireRisque'] = dol_print_date($lastEvaluation->date_creation, 'dayhoursec', 'tzuser') . ': ' . $lastEvaluation->comment;
+											$tmparray['descriptionRisque'] = $line->description;
+											$tmparray['commentaireEvaluation'] = dol_print_date((($conf->global->DIGIRISKDOLIBARR_SHOW_RISKASSESSMENT_DATE && (!empty($lastEvaluation->date_riskassessment))) ? $lastEvaluation->date_riskassessment : $lastEvaluation->date_creation), 'dayreduceformat') . ': ' . $lastEvaluation->comment;
 
 											$related_tasks = $line->get_related_tasks($line);
+											$user = new User($this->db);
 
-											if (!empty($related_tasks)) {
+											if (!empty($related_tasks) && is_array($related_tasks)) {
 												foreach ($related_tasks as $related_task) {
+													$related_task_contact_ids = $related_task->getListContactId();
+													if (!empty($related_task_contact_ids) && is_array($related_task_contact_ids)) {
+														foreach ($related_task_contact_ids as $related_task_contact_id) {
+															$user->fetch($related_task_contact_id);
+															$contact_array[$related_task_contact_id] = $user;
+														}
+													}
+													$AllInitiales = '';
+													if (!empty($contact_array) && is_array($contact_array)) {
+														foreach ($contact_array as $contact_array_single) {
+															$initiales = '';
+															if (dol_strlen($contact_array_single->firstname)) {
+																$initiales .= str_split($contact_array_single->firstname, 1)[0];
+															}
+															if (dol_strlen($contact_array_single->lastname)) {
+																$initiales .= str_split($contact_array_single->lastname, 1)[0];
+															}
+															$AllInitiales .= strtoupper($initiales) . ',';
+														}
+													}
 													if ($related_task->progress == 100) {
-														$tmparray['actionPreventionCompleted'] .= dol_print_date($related_task->date_c, 'dayhoursec', 'tzuser') . ': ' . $related_task->label . "\n";
+														$tmparray['actionPreventionCompleted'] .= dol_print_date((($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_START_DATE && (!empty($related_task->date_start))) ? $related_task->date_start : $related_task->date_c), 'dayreduceformat') . (($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_END_DATE && (!empty($related_task->date_end))) ? ' - ' . dol_print_date($related_task->date_end, 'dayreduceformat') : '') . "\n" . ' ' . $langs->trans('Contacts') . ' : ' . ($AllInitiales ?: $langs->trans('NoData')) . "\n" . $related_task->label . "\n\n";
 													} else {
-														$tmparray['actionPreventionUncompleted'] .= dol_print_date($related_task->date_c, 'dayhoursec', 'tzuser') . ': ' . $related_task->label . ' ' . ($related_task->progress ? $related_task->progress : 0) . '%' . "\n";
+														$tmparray['actionPreventionUncompleted'] .= dol_print_date((($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_START_DATE && (!empty($related_task->date_start))) ? $related_task->date_start : $related_task->date_c), 'dayreduceformat') . (($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_END_DATE && (!empty($related_task->date_end))) ? ' - ' . dol_print_date($related_task->date_end, 'dayreduceformat') : '') . ' - ' . $langs->trans('DigiriskProgress') . ' : ' . ($related_task->progress ?: 0) . '%' . ' ' . $langs->trans('Contacts') . ' : ' . ($AllInitiales ?: $langs->trans('NoData')) . "\n" . $related_task->label . "\n\n";
 													}
 												}
 											} else {
@@ -360,7 +384,7 @@ class doc_listingrisksaction_odt extends ModeleODTListingRisksAction
 													if ($val == $tmparray['nomDanger']) {
 														$listlines->setImage($key, $val);
 													} else {
-														if (empty($val)) {
+														if (empty($val) && $val != '0') {
 															$listlines->setVars($key, $langs->trans('NoData'), true, 'UTF-8');
 														} else {
 															$listlines->setVars($key, html_entity_decode($val, ENT_QUOTES | ENT_HTML5), true, 'UTF-8');
@@ -377,10 +401,12 @@ class doc_listingrisksaction_odt extends ModeleODTListingRisksAction
 									}
 								}
 							} else {
+								$tmparray['nomElement']                  = $langs->trans('NoData');
 								$tmparray['nomDanger']                   = $langs->trans('NoData');
 								$tmparray['identifiantRisque']           = $langs->trans('NoData');
 								$tmparray['quotationRisque']             = $langs->trans('NoData');
-								$tmparray['commentaireRisque']           = $langs->trans('NoRiskThere');
+								$tmparray['descriptionRisque']           = $langs->trans('NoData');
+								$tmparray['commentaireEvaluation']       = $langs->trans('NoRiskThere');
 								$tmparray['actionPreventionUncompleted'] = $langs->trans('NoData');
 								$tmparray['actionPreventionCompleted']   = $langs->trans('NoData');
 								foreach ($tmparray as $key => $val) {
@@ -423,16 +449,38 @@ class doc_listingrisksaction_odt extends ModeleODTListingRisksAction
 											$tmparray['nomDanger'] = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $line->get_danger_category($line) . '.png';
 											$tmparray['identifiantRisque'] = $line->ref . ' - ' . $lastEvaluation->ref;
 											$tmparray['quotationRisque'] = $lastEvaluation->cotation ? $lastEvaluation->cotation : '0';
-											$tmparray['commentaireRisque'] = dol_print_date($lastEvaluation->date_creation, 'dayhoursec', 'tzuser') . ': ' . $lastEvaluation->comment;
+											$tmparray['descriptionRisque'] = $line->description;
+											$tmparray['commentaireEvaluation'] = dol_print_date((($conf->global->DIGIRISKDOLIBARR_SHOW_RISKASSESSMENT_DATE && (!empty($lastEvaluation->date_riskassessment))) ? $lastEvaluation->date_riskassessment : $lastEvaluation->date_creation), 'dayreduceformat') . ': ' . $lastEvaluation->comment;
 
 											$related_tasks = $line->get_related_tasks($line);
+											$user = new User($this->db);
 
-											if (!empty($related_tasks)) {
+											if (!empty($related_tasks) && is_array($related_tasks)) {
 												foreach ($related_tasks as $related_task) {
+													$related_task_contact_ids = $related_task->getListContactId();
+													if (!empty($related_task_contact_ids) && is_array($related_task_contact_ids)) {
+														foreach ($related_task_contact_ids as $related_task_contact_id) {
+															$user->fetch($related_task_contact_id);
+															$contact_array[$related_task_contact_id] = $user;
+														}
+													}
+													$AllInitiales = '';
+													if (!empty($contact_array) && is_array($contact_array)) {
+														foreach ($contact_array as $contact_array_single) {
+															$initiales = '';
+															if (dol_strlen($contact_array_single->firstname)) {
+																$initiales .= str_split($contact_array_single->firstname, 1)[0];
+															}
+															if (dol_strlen($contact_array_single->lastname)) {
+																$initiales .= str_split($contact_array_single->lastname, 1)[0];
+															}
+															$AllInitiales .= strtoupper($initiales) . ',';
+														}
+													}
 													if ($related_task->progress == 100) {
-														$tmparray['actionPreventionCompleted'] .= dol_print_date($related_task->date_c, 'dayhoursec', 'tzuser') . ': ' . "\n";
+														$tmparray['actionPreventionCompleted'] .= dol_print_date((($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_START_DATE && (!empty($related_task->date_start))) ? $related_task->date_start : $related_task->date_c), 'dayreduceformat') . (($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_END_DATE && (!empty($related_task->date_end))) ? ' - ' . dol_print_date($related_task->date_end, 'dayreduceformat') : '') . "\n" . ' ' . $langs->trans('Contacts') . ' : ' . ($AllInitiales ?: $langs->trans('NoData')) . "\n" . $related_task->label . "\n\n";
 													} else {
-														$tmparray['actionPreventionUncompleted'] .= dol_print_date($related_task->date_c, 'dayhoursec', 'tzuser') . ': ' . $related_task->label . ' ' . ($related_task->progress ? $related_task->progress : 0) . '%' . "\n";
+														$tmparray['actionPreventionUncompleted'] .= dol_print_date((($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_START_DATE && (!empty($related_task->date_start))) ? $related_task->date_start : $related_task->date_c), 'dayreduceformat') . (($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_END_DATE && (!empty($related_task->date_end))) ? ' - ' . dol_print_date($related_task->date_end, 'dayreduceformat') : '') . ' - ' . $langs->trans('DigiriskProgress') . ' : ' . ($related_task->progress ?: 0) . '%' . ' ' . $langs->trans('Contacts') . ' : ' . ($AllInitiales ?: $langs->trans('NoData')) . "\n" . $related_task->label . "\n\n";
 													}
 												}
 											} else {
@@ -452,7 +500,7 @@ class doc_listingrisksaction_odt extends ModeleODTListingRisksAction
 													if ($val == $tmparray['nomDanger']) {
 														$listlines->setImage($key, $val);
 													} else {
-														if (empty($val)) {
+														if (empty($val) && $val != '0') {
 															$listlines->setVars($key, $langs->trans('NoData'), true, 'UTF-8');
 														} else {
 															$listlines->setVars($key, html_entity_decode($val, ENT_QUOTES | ENT_HTML5), true, 'UTF-8');
@@ -469,10 +517,12 @@ class doc_listingrisksaction_odt extends ModeleODTListingRisksAction
 									}
 								}
 							} else {
+								$tmparray['nomElement']                  = $langs->trans('NoData');
 								$tmparray['nomDanger']                   = $langs->trans('NoData');
 								$tmparray['identifiantRisque']           = $langs->trans('NoData');
 								$tmparray['quotationRisque']             = $langs->trans('NoData');
-								$tmparray['commentaireRisque']           = $langs->trans('NoRiskThere');
+								$tmparray['descriptionRisque']           = $langs->trans('NoData');
+								$tmparray['commentaireEvaluation']           = $langs->trans('NoRiskThere');
 								$tmparray['actionPreventionUncompleted'] = $langs->trans('NoData');
 								$tmparray['actionPreventionCompleted']   = $langs->trans('NoData');
 								foreach ($tmparray as $key => $val) {

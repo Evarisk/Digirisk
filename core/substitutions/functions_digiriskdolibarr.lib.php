@@ -135,7 +135,6 @@ function digiriskdolibarr_completesubstitutionarray(&$substitutionarray,$langs,$
 			$substitutionarray['methodologie']       = $langs->trans($riskassessmentdocument->methodologie);
 			$substitutionarray['sources']            = $langs->trans($riskassessmentdocument->sources);
 			$substitutionarray['remarqueImportante'] = $langs->trans($riskassessmentdocument->remarqueImportante);
-			$substitutionarray['dispoDesPlans']      = $langs->trans($riskassessmentdocument->dispoDesPlans);
 
 			break;
 	}

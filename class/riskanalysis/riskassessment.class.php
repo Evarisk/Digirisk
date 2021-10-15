@@ -58,27 +58,28 @@ class RiskAssessment extends CommonObject
 	 * @var array  Array with all fields and their property. Do not use it as a static var. It may be modified by constructor.
 	 */
 	public $fields=array(
-		'rowid'         => array('type'=>'integer', 'label'=>'TechnicalID', 'enabled'=>'1', 'position'=>1, 'notnull'=>1, 'visible'=>0, 'noteditable'=>'1', 'index'=>1, 'comment'=>"Id"),
-		'ref'           => array('type'=>'varchar(128)', 'label'=>'Ref', 'enabled'=>'1', 'position'=>10, 'notnull'=>1, 'visible'=>0, 'noteditable'=>'1', 'default'=>'(PROV)', 'index'=>1, 'searchall'=>1, 'showoncombobox'=>'1', 'comment'=>"Reference of object"),
-		'ref_ext'       => array('type'=>'varchar(128)', 'label'=>'RefExt', 'enabled'=>'1', 'position'=>20, 'notnull'=>0, 'visible'=>0,),
-		'entity'        => array('type'=>'integer', 'label'=>'entity', 'enabled'=>'1', 'position'=>30, 'notnull'=>1, 'visible'=>0,),
-		'date_creation' => array('type'=>'datetime', 'label'=>'DateCreation', 'enabled'=>'1', 'position'=>40, 'notnull'=>1, 'visible'=>-0,),
-		'tms'           => array('type'=>'timestamp', 'label'=>'DateModification', 'enabled'=>'1', 'position'=>50, 'notnull'=>0, 'visible'=>0,),
-		'import_key'    => array('type'=>'varchar(14)', 'label'=>'ImportId', 'enabled'=>'1', 'position'=>60, 'notnull'=>-1, 'visible'=>0,),
-		'status'        => array('type'=>'smallint', 'label'=>'Status', 'enabled'=>'1', 'position'=>70, 'notnull'=>0, 'visible'=>0,),
-		'method'        => array('type'=>'varchar(50)', 'label'=>'EvaluationMethod', 'enabled'=>'1', 'position'=>80, 'notnull'=>0, 'visible'=>0,),
-		'cotation'      => array('type'=>'integer', 'label'=>'Evaluation', 'enabled'=>'1', 'position'=>90, 'notnull'=>0, 'visible'=>4,),
-		'gravite'       => array('type'=>'integer', 'label'=>'Gravity', 'enabled'=>'1', 'position'=>100, 'notnull'=>0, 'visible'=>0,),
-		'protection'    => array('type'=>'integer', 'label'=>'Protection', 'enabled'=>'1', 'position'=>110, 'notnull'=>0, 'visible'=>0,),
-		'occurrence'    => array('type'=>'integer', 'label'=>'Occurrence', 'enabled'=>'1', 'position'=>120, 'notnull'=>0, 'visible'=>0,),
-		'formation'     => array('type'=>'integer', 'label'=>'Formation', 'enabled'=>'1', 'position'=>130, 'notnull'=>0, 'visible'=>0,),
-		'exposition'    => array('type'=>'integer', 'label'=>'Exposition', 'enabled'=>'1', 'position'=>140, 'notnull'=>0, 'visible'=>0,),
-		'comment'       => array('type'=>'text', 'label'=>'Comment', 'enabled'=>'1', 'position'=>150, 'notnull'=>0, 'visible'=>0,),
-		'photo'         => array('type'=>'varchar(255)', 'label'=>'Photo', 'enabled'=>'1', 'position'=>160, 'notnull'=>0, 'visible'=>0,),
-		'has_tasks'     => array('type'=>'integer', 'label'=>'Tasks', 'enabled'=>'1', 'position'=>170, 'notnull'=>0, 'visible'=>-1,),
-		'fk_user_creat' => array('type'=>'integer:User:user/class/user.class.php', 'label'=>'UserAuthor', 'enabled'=>'1', 'position'=>180, 'notnull'=>1, 'visible'=>0, 'foreignkey'=>'user.rowid',),
-		'fk_user_modif' => array('type'=>'integer:User:user/class/user.class.php', 'label'=>'UserModif', 'enabled'=>'1', 'position'=>190, 'notnull'=>-1, 'visible'=>0,),
-		'fk_risk'       => array('type'=>'integer', 'label'=>'ParentRisk', 'enabled'=>'1', 'position'=>200, 'notnull'=>1, 'visible'=>0,),
+		'rowid'               => array('type'=>'integer', 'label'=>'TechnicalID', 'enabled'=>'1', 'position'=>1, 'notnull'=>1, 'visible'=>0, 'noteditable'=>'1', 'index'=>1, 'comment'=>"Id"),
+		'ref'                 => array('type'=>'varchar(128)', 'label'=>'Ref', 'enabled'=>'1', 'position'=>10, 'notnull'=>1, 'visible'=>0, 'noteditable'=>'1', 'default'=>'(PROV)', 'index'=>1, 'searchall'=>1, 'showoncombobox'=>'1', 'comment'=>"Reference of object"),
+		'ref_ext'             => array('type'=>'varchar(128)', 'label'=>'RefExt', 'enabled'=>'1', 'position'=>20, 'notnull'=>0, 'visible'=>0,),
+		'entity'              => array('type'=>'integer', 'label'=>'entity', 'enabled'=>'1', 'position'=>30, 'notnull'=>1, 'visible'=>0,),
+		'date_creation'       => array('type'=>'datetime', 'label'=>'DateCreation', 'enabled'=>'1', 'position'=>40, 'notnull'=>1, 'visible'=>-0,),
+		'tms'                 => array('type'=>'timestamp', 'label'=>'DateModification', 'enabled'=>'1', 'position'=>50, 'notnull'=>0, 'visible'=>0,),
+		'import_key'          => array('type'=>'varchar(14)', 'label'=>'ImportId', 'enabled'=>'1', 'position'=>60, 'notnull'=>-1, 'visible'=>0,),
+		'status'              => array('type'=>'smallint', 'label'=>'Status', 'enabled'=>'1', 'position'=>70, 'notnull'=>0, 'visible'=>0,),
+		'method'              => array('type'=>'varchar(50)', 'label'=>'EvaluationMethod', 'enabled'=>'1', 'position'=>80, 'notnull'=>0, 'visible'=>0,),
+		'cotation'            => array('type'=>'integer', 'label'=>'Evaluation', 'enabled'=>'1', 'position'=>90, 'notnull'=>0, 'visible'=>4,),
+		'gravite'             => array('type'=>'integer', 'label'=>'Gravity', 'enabled'=>'1', 'position'=>100, 'notnull'=>0, 'visible'=>0,),
+		'protection'          => array('type'=>'integer', 'label'=>'Protection', 'enabled'=>'1', 'position'=>110, 'notnull'=>0, 'visible'=>0,),
+		'occurrence'          => array('type'=>'integer', 'label'=>'Occurrence', 'enabled'=>'1', 'position'=>120, 'notnull'=>0, 'visible'=>0,),
+		'formation'           => array('type'=>'integer', 'label'=>'Formation', 'enabled'=>'1', 'position'=>130, 'notnull'=>0, 'visible'=>0,),
+		'exposition'          => array('type'=>'integer', 'label'=>'Exposition', 'enabled'=>'1', 'position'=>140, 'notnull'=>0, 'visible'=>0,),
+		'date_riskassessment' => array('type'=>'datetime', 'label'=>'RiskAssessmentDate', 'enabled'=>'1', 'position'=>141, 'notnull'=>-1, 'visible'=>0,),
+		'comment'             => array('type'=>'text', 'label'=>'Comment', 'enabled'=>'1', 'position'=>150, 'notnull'=>0, 'visible'=>0,),
+		'photo'               => array('type'=>'varchar(255)', 'label'=>'Photo', 'enabled'=>'1', 'position'=>160, 'notnull'=>0, 'visible'=>0,),
+		'has_tasks'           => array('type'=>'integer', 'label'=>'Tasks', 'enabled'=>'1', 'position'=>170, 'notnull'=>0, 'visible'=>-1,),
+		'fk_user_creat'       => array('type'=>'integer:User:user/class/user.class.php', 'label'=>'UserAuthor', 'enabled'=>'1', 'position'=>180, 'notnull'=>1, 'visible'=>0, 'foreignkey'=>'user.rowid',),
+		'fk_user_modif'       => array('type'=>'integer:User:user/class/user.class.php', 'label'=>'UserModif', 'enabled'=>'1', 'position'=>190, 'notnull'=>-1, 'visible'=>0,),
+		'fk_risk'             => array('type'=>'integer', 'label'=>'ParentRisk', 'enabled'=>'1', 'position'=>200, 'notnull'=>1, 'visible'=>0,),
 	);
 
 	public $rowid;
@@ -96,6 +97,7 @@ class RiskAssessment extends CommonObject
 	public $occurrence;
 	public $formation;
 	public $exposition;
+	public $date_riskassessment;
 	public $comment;
 	public $photo;
 	public $has_tasks;

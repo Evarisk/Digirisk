@@ -35,6 +35,8 @@ if (!$res && file_exists("../../main.inc.php")) $res = @include "../../main.inc.
 if (!$res && file_exists("../../../main.inc.php")) $res = @include "../../../main.inc.php";
 if (!$res) die("Include of main fails");
 
+require_once DOL_DOCUMENT_ROOT.'/core/lib/images.lib.php';
+
 require_once './class/digiriskstandard.class.php';
 require_once './class/digiriskdocuments/informationssharing.class.php';
 require_once './lib/digiriskdolibarr_digiriskstandard.lib.php';
@@ -57,7 +59,7 @@ $hookmanager->initHooks(array('digiriskelementinformationssharing', 'globalcard'
 $object->fetch($conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD);
 
 
-$upload_dir         = $conf->digiriskdolibarr->multidir_output[isset($object->entity) ? $object->entity : 1];
+$upload_dir         = $conf->digiriskdolibarr->multidir_output[isset($conf->entity) ? $conf->entity : 1];
 
 //Security check
 $permissiontoread   = $user->rights->digiriskdolibarr->informationssharing->read;

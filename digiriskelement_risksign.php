@@ -37,6 +37,7 @@ if (!$res) die("Include of main fails");
 
 require_once DOL_DOCUMENT_ROOT.'/core/lib/images.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/core/class/html.form.class.php';
+
 require_once './class/digiriskelement.class.php';
 require_once './class/riskanalysis/risksign.class.php';
 require_once './core/modules/digiriskdolibarr/riskanalysis/risksign/mod_risksign_standard.php';

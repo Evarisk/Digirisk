@@ -36,6 +36,7 @@ if (!$res && file_exists("../../../main.inc.php")) $res = @include "../../../mai
 if (!$res) die("Include of main fails");
 
 require_once DOL_DOCUMENT_ROOT.'/core/class/html.formfile.class.php';
+require_once DOL_DOCUMENT_ROOT.'/core/lib/images.lib.php';
 
 require_once './class/digiriskdocuments.class.php';
 require_once './class/digiriskelement.class.php';
@@ -424,7 +425,7 @@ if ((empty($action) || ($action != 'edit' && $action != 'create'))) {
 		$parent_element = new DigiriskElement($db);
 		$result = $parent_element->fetch($object->fk_parent);
 		if ($result > 0) {
-			print $parent_element->ref . ( !empty($parent_element->description) ?  ' - ' . $parent_element->description : '');
+			print $parent_element->ref . ( !empty($parent_element->label) ?  ' - ' . $parent_element->label : '');
 		}
 		else {
 			print $conf->global->MAIN_INFO_SOCIETE_NOM;

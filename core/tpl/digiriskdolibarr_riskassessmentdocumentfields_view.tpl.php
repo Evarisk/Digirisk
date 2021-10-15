@@ -37,11 +37,6 @@ if (!is_object($form)) $form = new Form($db);
 
 // Date d'audit
 if ( $action == "edit" && $permissiontoadd ) {
-
-	print '<form method="POST" action="'.$_SERVER["PHP_SELF"].'" name="edit">';
-	print '<input type="hidden" name="token" value="'.newToken().'">';
-	print '<input type="hidden" name="action" value="update">';
-
 	print '<tr>';
 	print '<td class="titlefield"><label for="AuditStartDate">' . $langs->trans("AuditStartDate") . '</label></td><td colspan="2">';
 	print $form->selectDate($conf->global->DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_AUDIT_START_DATE, 'AuditStartDate', '', '', '', "edit", 1, 1);
@@ -87,14 +82,11 @@ if ( $action == "edit" && $permissiontoadd ) {
 	print '</td></tr>';
 
 // Disponibilité des plans
-
 	print '<tr>';
-	print '<td class="titlefield"><label for="SitePlans">' . $langs->trans("SitePlans") . '</label></td>';
+	print '<td class="titlefield">'.$form->editfieldkey($langs->trans("SitePlans"), 'SitePlans', '', $object, 0).'</td>';
 	print '<td>';
-	$doleditor = new DolEditor('SitePlans', $conf->global->DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_SITE_PLANS ? $conf->global->DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_SITE_PLANS : '', '', 90, 'dolibarr_notes', '', false, true, $conf->global->FCKEDITOR_ENABLE_SOCIETE, ROWS_3, '90%');
-	$doleditor->Create();
+	print '<input class="flat" type="file" name="userfile[]" id="SitePlans" />';
 	print '</td></tr>';
-
 } else {
 	print '<tr>';
 	print '<td class="titlefield">' . $langs->trans("AuditStartDate") . '</td><td colspan="2">';
@@ -143,9 +135,21 @@ if ( $action == "edit" && $permissiontoadd ) {
 	print '<tr>';
 	print '<td class="titlefield">' . $langs->trans("SitePlans") . '</td>';
 	print '<td>';
-	print $conf->global->DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_SITE_PLANS;
-	print '</td></tr>';
+	$filearray = dol_dir_list($conf->digiriskdolibarr->multidir_output[$conf->entity].'/riskassessmentdocument/', "files", 0, '', '(\.odt|\.zip)', 'date', 'asc', 1);
+	if (count($filearray)) : ?>
+		<?php $file = array_shift($filearray); ?>
+		<span class="">
+			<?php print '<img class="" src="'.DOL_URL_ROOT.'/viewimage.php?modulepart=digiriskdolibarr&entity='.$conf->entity.'&file='.urlencode('/riskassessmentdocument/thumbs/'. preg_replace('/\./', '_small.',$file['name'])).'" >'; ?>
+		</span>
+	<?php else: ?>
+		<?php $nophoto = DOL_URL_ROOT.'/public/theme/common/nophoto.png'; ?>
+		<span class="">
+			<img class="" alt="No photo" src="<?php echo $nophoto ?>">
+		</span>
+	<?php endif; ?>
+	<?php print '</td></tr>';
 }
+
 ?>
 
 <!-- END PHP TEMPLATE digiriskdolibarr_legaldisplayfields_view.tpl.php -->

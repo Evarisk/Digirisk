@@ -39,6 +39,7 @@ require_once __DIR__ . '/class/preventionplan.class.php';
 require_once __DIR__ . '/class/openinghours.class.php';
 require_once __DIR__ . '/lib/digiriskdolibarr_preventionplan.lib.php';
 require_once __DIR__ . '/lib/digiriskdolibarr_function.lib.php';
+require_once DOL_DOCUMENT_ROOT.'/core/lib/images.lib.php';
 
 global $conf, $db, $langs, $user, $hookmanager;
 

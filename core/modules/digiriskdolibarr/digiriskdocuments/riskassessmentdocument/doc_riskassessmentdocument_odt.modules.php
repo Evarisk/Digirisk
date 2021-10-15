@@ -222,6 +222,7 @@ class doc_riskassessmentdocument_odt extends ModeleODTRiskAssessmentDocument
 			$date = dol_print_date(dol_now(),'dayxcard');
 			$filename = $objectref.'_'.$conf->global->MAIN_INFO_SOCIETE_NOM.'_'.$date.'.odt';
 			$filename = str_replace(' ', '_', $filename);
+			$filename = dol_sanitizeFileName($filename);
 
 			$object->last_main_doc = $filename;
 
@@ -275,10 +276,14 @@ class doc_riskassessmentdocument_odt extends ModeleODTRiskAssessmentDocument
 			$parameters = array('odfHandler'=>&$odfHandler, 'file'=>$file, 'object'=>$object, 'outputlangs'=>$outputlangs, 'substitutionarray'=>&$tmparray);
 			$reshook = $hookmanager->executeHooks('ODTSubstitution', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
 
+			$filearray = dol_dir_list($conf->digiriskdolibarr->multidir_output[$conf->entity].'/riskassessmentdocument/', "files", 0, '', '(\.odt|\.zip)', 'date', 'asc', 1);
+			$sitePlans = array_shift($filearray);
+			$tmparray['dispoDesPlans'] = $sitePlans['path'] . '/thumbs/' .preg_replace('/\./', '_small.',$sitePlans['name']);
+
 			foreach ($tmparray as $key=>$value)
 			{
 				try {
-					if (preg_match('/logo$/', $key)) // Image
+					if (preg_match('/logo$/', $key) || $key == 'dispoDesPlans') // Image
 					{
 						if (file_exists($value)) $odfHandler->setImage($key, $value);
 						else $odfHandler->setVars($key, $langs->transnoentities('ErrorFileNotFound'), true, 'UTF-8');
@@ -379,10 +384,10 @@ class doc_riskassessmentdocument_odt extends ModeleODTRiskAssessmentDocument
 									$listlines->setVars('nomElement', html_entity_decode($key,ENT_QUOTES | ENT_HTML5), true, 'UTF-8');
 									$listlines->setVars('quotationTotale', $val[0], true, 'UTF-8');
 									$listlines->setVars('description', html_entity_decode($val[1],ENT_QUOTES | ENT_HTML5), true, 'UTF-8');
-									$listlines->setVars('NbRiskBlack', $val[2][1], true, 'UTF-8');
-									$listlines->setVars('NbRiskRed', $val[2][2], true, 'UTF-8');
-									$listlines->setVars('NbRiskOrange', $val[2][3], true, 'UTF-8');
-									$listlines->setVars('NbRiskGrey', $val[2][4], true, 'UTF-8');
+									$listlines->setVars('NbRiskBlack', $val[2][4], true, 'UTF-8');
+									$listlines->setVars('NbRiskRed', $val[2][3], true, 'UTF-8');
+									$listlines->setVars('NbRiskOrange', $val[2][2], true, 'UTF-8');
+									$listlines->setVars('NbRiskGrey', $val[2][1], true, 'UTF-8');
 								} catch (OdfException $e) {
 									dol_syslog($e->getMessage(), LOG_INFO);
 								} catch (SegmentException $e) {
@@ -423,7 +428,8 @@ class doc_riskassessmentdocument_odt extends ModeleODTRiskAssessmentDocument
 									$tmparray['nomDanger'] = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $line->get_danger_category($line) . '.png';
 									$tmparray['identifiantRisque'] = $line->ref . ' - ' . $lastEvaluation->ref;
 									$tmparray['quotationRisque'] = $lastEvaluation->cotation ? $lastEvaluation->cotation : '0';
-									$tmparray['commentaireRisque'] = dol_print_date($lastEvaluation->date_creation, 'dayhoursec', 'tzuser') . ': ' . $lastEvaluation->comment;
+									$tmparray['descriptionRisque'] = $line->description;
+									$tmparray['commentaireEvaluation'] = dol_print_date((($conf->global->DIGIRISKDOLIBARR_SHOW_RISKASSESSMENT_DATE && (!empty($lastEvaluation->date_riskassessment))) ? $lastEvaluation->date_riskassessment : $lastEvaluation->date_creation), 'dayreduceformat') . ': ' . $lastEvaluation->comment;
 
 									$related_tasks = $line->get_related_tasks($line);
 									$user = new User($this->db);
@@ -451,9 +457,9 @@ class doc_riskassessmentdocument_odt extends ModeleODTRiskAssessmentDocument
 												}
 											}
 											if ($related_task->progress == 100) {
-												$tmparray['actionPreventionCompleted'] .= dol_print_date($related_task->date_c, 'dayhourreduceformat', 'tzuser') . "\n" . ' ' . $langs->trans('Contacts') . ' : ' . ($AllInitiales ?: $langs->trans('NoData')) . "\n" . $related_task->label . "\n\n";
+												$tmparray['actionPreventionCompleted'] .= dol_print_date((($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_START_DATE && (!empty($related_task->date_start))) ? $related_task->date_start : $related_task->date_c), 'dayreduceformat') . (($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_END_DATE && (!empty($related_task->date_end))) ? ' - ' . dol_print_date($related_task->date_end, 'dayreduceformat') : '') . "\n" . ' ' . $langs->trans('Contacts') . ' : ' . ($AllInitiales ?: $langs->trans('NoData')) . "\n" . $related_task->label . "\n\n";
 											} else {
-												$tmparray['actionPreventionUncompleted'] .= dol_print_date($related_task->date_c, 'dayhourreduceformat', 'tzuser') . ' - ' . $langs->trans('DigiriskProgress') . ' : ' . ($related_task->progress ?: 0) . '%' . ' ' . $langs->trans('Contacts') . ' : ' . ($AllInitiales ?: $langs->trans('NoData')) . "\n" . $related_task->label . "\n\n";
+												$tmparray['actionPreventionUncompleted'] .= dol_print_date((($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_START_DATE && (!empty($related_task->date_start))) ? $related_task->date_start : $related_task->date_c), 'dayreduceformat') . (($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_END_DATE && (!empty($related_task->date_end))) ? ' - ' . dol_print_date($related_task->date_end, 'dayreduceformat') : '') . ' - ' . $langs->trans('DigiriskProgress') . ' : ' . ($related_task->progress ?: 0) . '%' . ' ' . $langs->trans('Contacts') . ' : ' . ($AllInitiales ?: $langs->trans('NoData')) . "\n" . $related_task->label . "\n\n";
 											}
 										}
 									} else {
@@ -512,7 +518,7 @@ class doc_riskassessmentdocument_odt extends ModeleODTRiskAssessmentDocument
 											if ($val == $tmparray['nomDanger']) {
 												$listlines->setImage($key, $val);
 											} else {
-												if (empty($val)) {
+												if (empty($val) && $val != '0') {
 													$listlines->setVars($key, $langs->trans('NoData'), true, 'UTF-8');
 												} else {
 													$listlines->setVars($key, html_entity_decode($val, ENT_QUOTES | ENT_HTML5), true, 'UTF-8');
@@ -528,10 +534,12 @@ class doc_riskassessmentdocument_odt extends ModeleODTRiskAssessmentDocument
 								}
 							}
 						} else {
+							$tmparray['nomElement']                  = $langs->trans('NoData');
 							$tmparray['nomDanger']                   = $langs->trans('NoData');
 							$tmparray['identifiantRisque']           = $langs->trans('NoData');
 							$tmparray['quotationRisque']             = $langs->trans('NoData');
-							$tmparray['commentaireRisque']           = $langs->trans('NoRiskThere');
+							$tmparray['descriptionRisque']           = $langs->trans('NoData');
+							$tmparray['commentaireEvaluation']       = $langs->trans('NoRiskThere');
 							$tmparray['actionPreventionUncompleted'] = $langs->trans('NoData');
 							$tmparray['actionPreventionCompleted']   = $langs->trans('NoData');
 							foreach ($tmparray as $key => $val) {

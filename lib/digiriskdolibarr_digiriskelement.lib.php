@@ -79,17 +79,6 @@ function digiriskelementPrepareHead($object)
 			}
 		}
 
-		require_once DOL_DOCUMENT_ROOT . '/core/lib/files.lib.php';
-		require_once DOL_DOCUMENT_ROOT . '/core/class/link.class.php';
-		$upload_dir = $conf->digiriskdolibarr->dir_output . "/digiriskelement/" . dol_sanitizeFileName($object->ref);
-		$nbFiles = count(dol_dir_list($upload_dir, 'files', 0, '', '(\.meta|_preview.*\.png)$'));
-		$nbLinks = Link::count($db, $object->element, $object->id);
-		$head[$h][0] = dol_buildpath("/digiriskdolibarr/digiriskelement_document.php", 1) . '?id=' . $object->id;
-		$head[$h][1] = '<i class="fas fa-file"></i> ' . $langs->trans('Documents');
-		if (($nbFiles + $nbLinks) > 0) $head[$h][1] .= '<span class="badge marginleftonlyshort">' . ($nbFiles + $nbLinks) . '</span>';
-		$head[$h][2] = 'elementDocument';
-		$h++;
-
 		$head[$h][0] = dol_buildpath("/digiriskdolibarr/digiriskelement_agenda.php", 1) . '?id=' . $object->id;
 		$head[$h][1] = '<i class="fas fa-calendar"></i> ' . $langs->trans("Events");
 		$head[$h][2] = 'elementAgenda';

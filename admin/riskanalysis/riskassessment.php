@@ -89,6 +89,11 @@ if ($action == 'setadvancedmethod') {
 	dolibarr_set_const($db, $constforval, $value, 'integer', 0, '', $conf->entity);
 }
 
+if ($action == 'setshowriskassessmentdate') {
+	$constforval = 'DIGIRISKDOLIBARR_SHOW_RISKASSESSMENT_DATE';
+	dolibarr_set_const($db, $constforval, $value, 'integer', 0, '', $conf->entity);
+}
+
 /*
  * View
  */
@@ -239,6 +244,22 @@ if ($conf->global->DIGIRISKDOLIBARR_MULTIPLE_RISKASSESSMENT_METHOD) {
 }
 else {
 	print '<a class="reposition" href="'.$_SERVER["PHP_SELF"].'?action=setmethod&value=1" alt="'.$langs->trans("Default").'">'.img_picto($langs->trans("Disabled"), 'switch_off').'</a>';
+}
+print '</td>';
+print '</tr>';
+
+print '<tr class="oddeven"><td>';
+print $langs->trans('ShowRiskAssessmentDate');
+print "</td><td>";
+print $langs->trans('ShowRiskAssessmentDateDescription');
+print '</td>';
+
+print '<td class="center">';
+if ($conf->global->DIGIRISKDOLIBARR_SHOW_RISKASSESSMENT_DATE) {
+	print '<a class="reposition" href="'.$_SERVER["PHP_SELF"].'?action=setshowriskassessmentdate&value=0" alt="'.$langs->trans("Default").'">'.img_picto($langs->trans("Activated"), 'switch_on').'</a>';
+}
+else {
+	print '<a class="reposition" href="'.$_SERVER["PHP_SELF"].'?action=setshowriskassessmentdate&value=1" alt="'.$langs->trans("Default").'">'.img_picto($langs->trans("Disabled"), 'switch_off').'</a>';
 }
 print '</td>';
 print '</tr>';

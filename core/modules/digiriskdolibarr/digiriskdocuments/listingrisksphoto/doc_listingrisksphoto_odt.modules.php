@@ -226,6 +226,7 @@ class doc_listingrisksphoto_odt extends ModeleODTListingRisksPhoto
 				$filename = $objectref.'_'.$conf->global->MAIN_INFO_SOCIETE_NOM.'_'.$date.'.odt';
 			}
 			$filename = str_replace(' ', '_', $filename);
+			$filename = dol_sanitizeFileName($filename);
 
 			$object->last_main_doc = $filename;
 
@@ -271,6 +272,7 @@ class doc_listingrisksphoto_odt extends ModeleODTListingRisksPhoto
 			$array_object_from_properties = $this->get_substitutionarray_each_var_object($object, $outputlangs);
 			$array_object = $this->get_substitutionarray_object($object, $outputlangs);
 			$array_soc = $this->get_substitutionarray_mysoc($mysoc, $outputlangs);
+			$array_soc['mycompany_logo'] = preg_replace('/_small/', '_mini', $array_soc['mycompany_logo']);
 
 			$tmparray = array_merge($substitutionarray, $array_object_from_properties, $array_object, $array_soc);
 
@@ -328,11 +330,11 @@ class doc_listingrisksphoto_odt extends ModeleODTListingRisksPhoto
 											$tmparray['nomDanger'] = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $line->get_danger_category($line) . '.png';
 											$tmparray['identifiantRisque'] = $line->ref . ' - ' . $lastEvaluation->ref;
 											$tmparray['quotationRisque'] = $lastEvaluation->cotation ? $lastEvaluation->cotation : '0';
-											$tmparray['commentaireRisque'] = dol_print_date($lastEvaluation->date_creation, 'dayhoursec', 'tzuser') . ': ' . $lastEvaluation->comment;
+											$tmparray['descriptionRisque'] = $line->description;
+											$tmparray['commentaireEvaluation'] = dol_print_date((($conf->global->DIGIRISKDOLIBARR_SHOW_RISKASSESSMENT_DATE && (!empty($lastEvaluation->date_riskassessment))) ? $lastEvaluation->date_riskassessment : $lastEvaluation->date_creation), 'dayreduceformat') . ': ' . $lastEvaluation->comment;
 
 											if (dol_strlen($lastEvaluation->photo) && $lastEvaluation !== 'undefined') {
-												$entity = ($conf->entity > 1) ? '/' . $conf->entity : '';
-												$path = DOL_DATA_ROOT . $entity . '/digiriskdolibarr/riskassessment/' . $lastEvaluation->ref;
+												$path = $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessment/' . $lastEvaluation->ref;
 												$file_small = preg_split('/\./', $lastEvaluation->photo);
 												$new_file = $file_small[0] . '_small.' . $file_small[1];
 												$image = $path . '/thumbs/' . $new_file;
@@ -353,7 +355,7 @@ class doc_listingrisksphoto_odt extends ModeleODTListingRisksPhoto
 													} elseif ($val == $tmparray['nomDanger']) {
 														$listlines->setImage($key, $val);
 													} else {
-														if (empty($val)) {
+														if (empty($val) && $val != '0') {
 															$listlines->setVars($key, $langs->trans('NoData'), true, 'UTF-8');
 														} else {
 															$listlines->setVars($key, html_entity_decode($val, ENT_QUOTES | ENT_HTML5), true, 'UTF-8');
@@ -371,11 +373,13 @@ class doc_listingrisksphoto_odt extends ModeleODTListingRisksPhoto
 									}
 								}
 							} else {
-								$tmparray['nomDanger']         = $langs->trans('NoData');
-								$tmparray['identifiantRisque'] = $langs->trans('NoData');
-								$tmparray['quotationRisque']   = $langs->trans('NoData');
-								$tmparray['commentaireRisque'] = $langs->trans('NoRiskThere');
-								$tmparray['photoAssociee']     = $langs->transnoentities('NoFileLinked');
+								$tmparray['nomElement']            = $langs->trans('NoData');
+								$tmparray['nomDanger']             = $langs->trans('NoData');
+								$tmparray['identifiantRisque']     = $langs->trans('NoData');
+								$tmparray['descriptionRisque']     = $langs->trans('NoData');
+								$tmparray['quotationRisque']       = $langs->trans('NoData');
+								$tmparray['commentaireEvaluation'] = $langs->trans('NoRiskThere');
+								$tmparray['photoAssociee']         = $langs->transnoentities('NoFileLinked');
 								foreach ($tmparray as $key => $val) {
 									try {
 										if (empty($val)) {
@@ -412,11 +416,11 @@ class doc_listingrisksphoto_odt extends ModeleODTListingRisksPhoto
 											$tmparray['nomDanger'] = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $line->get_danger_category($line) . '.png';
 											$tmparray['identifiantRisque'] = $line->ref . ' - ' . $lastEvaluation->ref;
 											$tmparray['quotationRisque'] = $lastEvaluation->cotation ? $lastEvaluation->cotation : '0';
-											$tmparray['commentaireRisque'] = dol_print_date($lastEvaluation->date_creation, 'dayhoursec', 'tzuser') . ': ' . $lastEvaluation->comment;
+											$tmparray['descriptionRisque'] = $line->description;
+											$tmparray['commentaireEvaluation'] = dol_print_date((($conf->global->DIGIRISKDOLIBARR_SHOW_RISKASSESSMENT_DATE && (!empty($lastEvaluation->date_riskassessment))) ? $lastEvaluation->date_riskassessment : $lastEvaluation->date_creation), 'dayreduceformat') . ': ' . $lastEvaluation->comment;
 
 											if (dol_strlen($lastEvaluation->photo) && $lastEvaluation !== 'undefined') {
-												$entity = ($conf->entity > 1) ? '/' . $conf->entity : '';
-												$path = DOL_DATA_ROOT . $entity . '/digiriskdolibarr/riskassessment/' . $lastEvaluation->ref;
+												$path = $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessment/' . $lastEvaluation->ref;
 												$file_small = preg_split('/\./', $lastEvaluation->photo);
 												$new_file = $file_small[0] . '_small.' . $file_small[1];
 												$image = $path . '/thumbs/' . $new_file;
@@ -438,7 +442,7 @@ class doc_listingrisksphoto_odt extends ModeleODTListingRisksPhoto
 													} elseif ($val == $tmparray['nomDanger']) {
 														$listlines->setImage($key, $val);
 													} else {
-														if (empty($val)) {
+														if (empty($val)  && $val != '0') {
 															$listlines->setVars($key, $langs->trans('NoData'), true, 'UTF-8');
 														} else {
 															$listlines->setVars($key, html_entity_decode($val, ENT_QUOTES | ENT_HTML5), true, 'UTF-8');
@@ -455,11 +459,13 @@ class doc_listingrisksphoto_odt extends ModeleODTListingRisksPhoto
 									}
 								}
 							} else {
-								$tmparray['nomDanger']         = $langs->trans('NoData');
-								$tmparray['identifiantRisque'] = $langs->trans('NoData');
-								$tmparray['quotationRisque']   = $langs->trans('NoData');
-								$tmparray['commentaireRisque'] = $langs->trans('NoRiskThere');
-								$tmparray['photoAssociee']     = $langs->transnoentities('NoFileLinked');
+								$tmparray['nomElement']            = $langs->trans('NoData');
+								$tmparray['nomDanger']             = $langs->trans('NoData');
+								$tmparray['identifiantRisque']     = $langs->trans('NoData');
+								$tmparray['quotationRisque']       = $langs->trans('NoData');
+								$tmparray['descriptionRisque']     = $langs->trans('NoData');
+								$tmparray['commentaireEvaluation'] = $langs->trans('NoRiskThere');
+								$tmparray['photoAssociee']         = $langs->transnoentities('NoFileLinked');
 								foreach ($tmparray as $key => $val) {
 									try {
 										if (empty($val)) {

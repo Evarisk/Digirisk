@@ -36,6 +36,8 @@ if (!$res && file_exists("../../../main.inc.php")) $res = @include "../../../mai
 if (!$res) die("Include of main fails");
 
 require_once DOL_DOCUMENT_ROOT.'/core/lib/company.lib.php';
+require_once DOL_DOCUMENT_ROOT.'/core/lib/images.lib.php';
+
 require_once './class/openinghours.class.php';
 
 $langs->loadLangs(array("digiriskdolibarr@digiriskdolibarr"));

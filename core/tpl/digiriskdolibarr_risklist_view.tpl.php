@@ -209,24 +209,17 @@
 				$offset = 0;
 			}
 		}
-		// if total of record found is smaller than limit, no need to do paging and to restart another select with limits set.
-		if (is_numeric($nbtotalofrecords) && ($limit > $nbtotalofrecords || empty($limit)))
-		{
-			$num = $nbtotalofrecords;
-		}
-		else
-		{
-			if ($limit) $sql .= $db->plimit($limit + 1, $offset);
 
-			$resql = $db->query($sql);
-			if (!$resql)
-			{
-				dol_print_error($db);
-				exit;
-			}
+		if ($limit) $sql .= $db->plimit($limit + 1, $offset);
 
-			$num = $db->num_rows($resql);
+		$resql = $db->query($sql);
+		if (!$resql)
+		{
+			dol_print_error($db);
+			exit;
 		}
+
+		$num = $db->num_rows($resql);
 
 		// Direct jump if only one record found
 		if ($num == 1 && !empty($conf->global->MAIN_SEARCH_DIRECT_OPEN_IF_ONLY_ONE) && $search_all && !$page)
@@ -324,7 +317,7 @@
 		<!-- RISK ADD MODAL-->
 		<?php if ($conf->global->DIGIRISKDOLIBARR_TASK_MANAGEMENT == 0 && $conf->global->DIGIRISKDOLIBARR_RISK_DESCRIPTION == 0 && $conf->global->DIGIRISKDOLIBARR_MULTIPLE_RISKASSESSMENT_METHOD ==0 ) : ?>
 		<div class="risk-add-modal" value="<?php echo $object->id ?>">
-			<div class="wpeo-modal modal-risk-0" id="risk_add<?php echo $object->id ?>">
+			<div class="wpeo-modal modal-risk-0 modal-risk" id="risk_add<?php echo $object->id ?>" value="new">
 				<div class="modal-container wpeo-modal-event">
 					<!-- Modal-Header -->
 					<div class="modal-header">
@@ -369,6 +362,10 @@
 									<?php endif; ?>
 									<input class="risk-evaluation-method" type="hidden" value="standard">
 									<input class="risk-evaluation-multiple-method" type="hidden" value="1">
+									<div class="wpeo-button open-media-gallery add-media modal-open" value="0">
+										<input type="hidden" class="type-from" value="riskassessment"/>
+										<span><i class="fas fa-camera"></i>  <?php echo $langs->trans('AddMedia') ?></span>
+									</div>
 								</div>
 								<div class="risk-evaluation-content-wrapper">
 									<div class="risk-evaluation-content">
@@ -447,7 +444,20 @@
 										<?php print '<textarea name="evaluationComment'. $risk->id .'" class="minwidth150" cols="50" rows="'.ROWS_2.'">'.('').'</textarea>'."\n"; ?>
 									</div>
 								</div>
+								<?php if ($conf->global->DIGIRISKDOLIBARR_SHOW_RISKASSESSMENT_DATE) : ?>
+									<div class="risk-evaluation-date">
+										<span class="title"><?php echo $langs->trans('Date'); ?></span>
+										<?php print $form->selectDate('', 'RiskAssessmentDate', 0, 0, 0, '', 1, 1); ?>
+									</div>
+								<?php endif; ?>
 							</div>
+						</div>
+						<div class="element-linked-medias element-linked-medias-0 risk-new">
+							<div class="medias"><i class="fas fa-picture-o"></i><?php echo $langs->trans('Medias'); ?></div>
+							<?php
+							$relativepath = 'digiriskdolibarr/medias/thumbs';
+							print digirisk_show_medias_linked('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessment/tmp/RK0' , 'small', '', 0, 0, 0, 150, 150, 1, 0, 0, '/riskassessment/tmp/RK0');
+							?>
 						</div>
 					</div>
 					<!-- Modal-Footer -->
@@ -467,7 +477,7 @@
 		</div>
 	<?php else : ?>
 		<div class="risk-add-modal" value="<?php echo $object->id ?>">
-		<div class="wpeo-modal modal-risk-0" id="risk_add<?php echo $object->id ?>">
+			<div class="wpeo-modal modal-risk-0 modal-risk" id="risk_add<?php echo $object->id ?>" value="new">
 			<div class="modal-container wpeo-modal-event">
 				<!-- Modal-Header -->
 				<div class="modal-header">
@@ -519,6 +529,10 @@
 							<?php endif; ?>
 							<input class="risk-evaluation-method" type="hidden" value="standard">
 							<input class="risk-evaluation-multiple-method" type="hidden" value="1">
+							<div class="wpeo-button open-media-gallery add-media modal-open" value="0">
+								<input type="hidden" class="type-from" value="riskassessment"/>
+								<span><i class="fas fa-camera"></i>  <?php echo $langs->trans('AddMedia') ?></span>
+							</div>
 						</div>
 						<div class="risk-evaluation-content-wrapper">
 							<div class="risk-evaluation-content">
@@ -597,6 +611,12 @@
 								<?php print '<textarea name="evaluationComment'. $risk->id .'" class="minwidth150" rows="'.ROWS_2.'">'.('').'</textarea>'."\n"; ?>
 							</div>
 						</div>
+						<?php if ($conf->global->DIGIRISKDOLIBARR_SHOW_RISKASSESSMENT_DATE) : ?>
+							<div class="risk-evaluation-date">
+								<span class="title"><?php echo $langs->trans('Date'); ?></span>
+								<?php print $form->selectDate('', 'RiskAssessmentDate', 0, 0, 0, '', 1, 1); ?>
+							</div>
+						<?php endif; ?>
 					</div>
 					<?php if ($conf->global->DIGIRISKDOLIBARR_TASK_MANAGEMENT) : ?>
 						<div class="riskassessment-task">
@@ -604,6 +624,13 @@
 							<span class="title"><?php echo $langs->trans('Label'); ?> <input type="text" class="" name="label" value=""></span>
 						</div>
 					<?php endif; ?>
+					<div class="element-linked-medias element-linked-medias-0 risk-new">
+						<div class="medias"><i class="fas fa-picture-o"></i><?php echo $langs->trans('Medias'); ?></div>
+						<?php
+						$relativepath = 'digiriskdolibarr/medias/thumbs';
+						print digirisk_show_medias_linked('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessment/tmp/RK0' , 'small', '', 0, 0, 0, 150, 150, 1, 0, 0, '/riskassessment/tmp/RK0');
+						?>
+					</div>
 				</div>
 				<!-- Modal-Footer -->
 				<div class="modal-footer">
@@ -619,11 +646,11 @@
 				</div>
 			</div>
 		</div>
-	</div>
+		</div>
 	<?php endif; ?>
 	<?php endif; ?>
 	<?php $title = $langs->trans('DigiriskElementRisksList');
-	print_barre_liste($title, $page, $_SERVER["PHP_SELF"], $param, $sortfield, $sortorder, $massactionbutton, $num, $num, 'digiriskdolibarr32px.png@digiriskdolibarr', 0, $newcardbutton, '', $limit, 0, 0, 1);
+	print_barre_liste($title, $page, $_SERVER["PHP_SELF"], $param, $sortfield, $sortorder, $massactionbutton, $num, $nbtotalofrecords, 'digiriskdolibarr32px.png@digiriskdolibarr', 0, $newcardbutton, '', $limit, 0, 0, 1);
 
 	include DOL_DOCUMENT_ROOT.'/core/tpl/massactions_pre.tpl.php';
 
@@ -649,23 +676,26 @@
 	$varpage = empty($contextpage) ? $_SERVER["PHP_SELF"] : $contextpage;
 
 	if (!preg_match('/t.description/', $user->conf->MAIN_SELECTEDFIELDS_riskcard) && $conf->global->DIGIRISKDOLIBARR_RISK_DESCRIPTION) {
-		$user->conf->MAIN_SELECTEDFIELDS_riskcard = 't.ref,evaluation.cotation,t.category,t.description,';
+		$user->conf->MAIN_SELECTEDFIELDS_riskcard = ($varpage == 'risklist') ? 't.fk_element,' : ''.'t.ref,evaluation.cotation,t.category,t.description,';
 
 	} elseif (!$conf->global->DIGIRISKDOLIBARR_RISK_DESCRIPTION) {
 		$user->conf->MAIN_SELECTEDFIELDS_riskcard = preg_replace('/t.description,/', '', $user->conf->MAIN_SELECTEDFIELDS_riskcard);
 	}
 
 	if (!preg_match('/evaluation.has_tasks/', $user->conf->MAIN_SELECTEDFIELDS_riskcard) && $conf->global->DIGIRISKDOLIBARR_TASK_MANAGEMENT) {
-		$user->conf->MAIN_SELECTEDFIELDS_riskcard .= 't.ref,evaluation.cotation,t.category,evaluation.has_tasks,';
+		$user->conf->MAIN_SELECTEDFIELDS_riskcard .= ($varpage == 'risklist') ? 't.fk_element,' : ''.'t.ref,evaluation.cotation,t.category,evaluation.has_tasks,';
 
 	} elseif (!$conf->global->DIGIRISKDOLIBARR_TASK_MANAGEMENT) {
 		$user->conf->MAIN_SELECTEDFIELDS_riskcard = preg_replace('/evaluation.has_tasks,/', '', $user->conf->MAIN_SELECTEDFIELDS_riskcard);
 	}
 
+
 	$selectedfields = $form->multiSelectArrayWithCheckbox('selectedfields', $arrayfields, $varpage); // This also change content of $arrayfields
 	$selectedfields .= (count($arrayofmassactions) ? $form->showCheckAddButtons('checkforselect', 1) : '');
 
 	print '<div class="div-table-responsive">'; // You can use div-table-responsive-no-min if you dont need reserved height for your table
+	?>
+	<?php
 	print '<table class="tagtable nobottomiftotal liste'.($moreforfilter ? " listwithfilterbefore" : "").'">'."\n";
 
 	// Fields title search
@@ -782,6 +812,13 @@
 			{
 				print '<td'.($cssforfield ? ' class="'.$cssforfield.'"' : '').' style="width:2%">';
 				if ($key == 'status') print $risk->getLibStatut(5);
+				elseif ($key == 'fk_element') { ?>
+					<?php $parent_element = new DigiriskElement($db);
+					$result = $parent_element->fetch($risk->fk_element);
+					if ($result > 0) {
+					print $parent_element->ref . ( !empty($parent_element->label) ?  ' - ' . $parent_element->label : '');
+					}
+				}
 				elseif ($key == 'category') { ?>
 					<div class="table-cell table-50 cell-risk" data-title="Risque">
 						<div class="wpeo-dropdown dropdown-large category-danger padding wpeo-tooltip-event" aria-label="<?php echo $risk->get_danger_category_name($risk) ?>">
@@ -790,7 +827,6 @@
 					</div>
 					<?php
 				}
-
 				elseif ($key == 'ref') {
 					?>
 					<div class="risk-container" value="<?php echo $risk->id ?>">
@@ -886,7 +922,6 @@
 					</div>
 					<?php
 				}
-
 				elseif ($key == 'description') {
 					if ($conf->global->DIGIRISKDOLIBARR_RISK_DESCRIPTION == 0 ) {
 						print $langs->trans('RiskDescriptionNotActivated');

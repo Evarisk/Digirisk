@@ -97,6 +97,7 @@ function digirisk_show_photos($modulepart, $sdir, $size = 0, $nbmax = 0, $nbbyro
 				if ($size == 1 || $size == 'small') {   // Format vignette
 					// Find name of thumb file
 					$photo_vignette = basename(getImageFileNameForSize($dir.$file, '_small'));
+
 					if (!dol_is_file($dirthumb.$photo_vignette)) $photo_vignette = '';
 
 					// Get filesize of original file
@@ -149,16 +150,17 @@ function digirisk_show_photos($modulepart, $sdir, $size = 0, $nbmax = 0, $nbbyro
 					}
 					else
 					{
-						if (empty($maxHeight) || $photo_vignette && $imgarray['height'] > $maxHeight)
+						if ($photo_vignette && $imgarray['height'] > $maxHeight)
 						{
 							$return .= '<!-- Show thumb -->';
 							$return .= '<img class="photo clicked-photo-preview"  width="'.$maxHeight.'" src="'.DOL_URL_ROOT.'/viewimage.php?modulepart='.$modulepart.'&entity='.$conf->entity.'&file='.urlencode($pdirthumb.$photo_vignette).'" title="'.dol_escape_htmltag($alt).'">';
 						}
 						else {
 							$return .= '<!-- Show original file -->';
-							$return .= '<img class="photo photowithmargin  clicked-photo-preview" height="'.$maxHeight.'" src="'.DOL_URL_ROOT.'/viewimage.php?modulepart='.$modulepart.'&entity='.$conf->entity.'&file='.urlencode($pdir.$photo).'" title="'.dol_escape_htmltag($alt).'">';
+							$return .= '<img class="photo photowithmargin clicked-photo-preview" width="'.$maxHeight.'" src="'.DOL_URL_ROOT.'/viewimage.php?modulepart='.$modulepart.'&entity='.$conf->entity.'&file='.urlencode($pdir.$photo).'" title="'.dol_escape_htmltag($alt).'">';
 						}
 					}
+					$return .= '<input type="hidden" class="filename" value="'.$photo.'">';
 
 					if (empty($nolink)) $return .= '</a>';
 					$return .= "\n";
@@ -261,7 +263,7 @@ function digiriskshowdocuments($modulepart, $modulesubdir, $filedir, $urlsource,
 	$file_list = null;
 	if (!empty($filedir))
 	{
-		$file_list = dol_dir_list($filedir, 'files', 0, '', '', 'date', SORT_DESC, 1);
+		$file_list = dol_dir_list($filedir, 'files', 0, '(\.odt|\.zip)', '', 'date', SORT_DESC, 1);
 	}
 	if ($hideifempty && empty($file_list)) return '';
 
@@ -601,7 +603,7 @@ function digiriskHeader($head = '', $title = '', $help_url = '', $target = '', $
 
 	print '<body id="mainbody" class="'.$tmpcsstouse.'">'."\n";
 
-	llxHeader('', $title, $help_url, '','','',$arrayofjs,$arrayofcss);
+	llxHeader('', $title, $help_url, '', '', '', $arrayofjs, $arrayofcss, $morequerystring, $morecssonbody);
 
 	//Body navigation digirisk
 	$object  = new DigiriskElement($db);
@@ -611,6 +613,9 @@ function digiriskHeader($head = '', $title = '', $help_url = '', $target = '', $
 		$objects = $object->fetchAll('',  '',  0,  0, array('customsql' => 'status > 0'));
 	}
 	$results = recurse_tree(0,0,$objects); ?>
+
+	<?php require_once './core/tpl/digiriskdolibarr_medias_gallery_modal.tpl.php'; ?>
+
 	<div id="id-container" class="id-container page-ut-gp-list">
 		<div class="side-nav">
 			<div class="side-nav-responsive"><i class="fas fa-bars"></i> <?php echo "Navigation UT/GP"; ?></div>
@@ -688,7 +693,6 @@ function digiriskHeader($head = '', $title = '', $help_url = '', $target = '', $
 			</div>
 		</div>
 	<?php
-		// @todo SHOW TRASH
 	// main area
 	if ($replacemainareaby)
 	{
@@ -728,10 +732,129 @@ function recurse_tree($parent, $niveau, $array) {
  * @return	void
  */
 function display_recurse_tree($results) {
-	global $conf, $langs, $user;
+	include_once DOL_DOCUMENT_ROOT.'/core/lib/images.lib.php';
+
+	global $conf, $langs, $user, $db;
 
 	require_once __DIR__ . '/../core/modules/digiriskdolibarr/digiriskelement/groupment/mod_groupment_standard.php';
 	require_once __DIR__ . '/../core/modules/digiriskdolibarr/digiriskelement/workunit/mod_workunit_standard.php';
+	require_once DOL_DOCUMENT_ROOT . '/ecm/class/ecmdirectory.class.php';
+
+	$action = GETPOST('action');
+	$ecmdir = new EcmDirectory($db);
+	$error = 0;
+
+	if (!$error && $action == "addFiles" && GETPOST('digiriskelement_id')) {
+
+		$digiriskelement_id = GETPOST('digiriskelement_id');
+		$filenames = GETPOST('filenames');
+		$digiriskelement = new DigiriskElement($db);
+		$digiriskelement->fetch($digiriskelement_id);
+		$pathToDigiriskElementPhoto = $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/'.$digiriskelement->element_type.'/' . $digiriskelement->ref ;
+		$filenames = preg_split('/vVv/', $filenames);
+		array_pop($filenames);
+
+		if ( !(empty($filenames))) {
+			$digiriskelement->photo = $filenames[0];
+			foreach ($filenames as $filename) {
+
+				if (is_file( $conf->ecm->multidir_output[$conf->entity] . '/digiriskdolibarr/medias/' . $filename)) {
+
+					$pathToECMPhoto =  $conf->ecm->multidir_output[$conf->entity] . '/digiriskdolibarr/medias/' . $filename;
+
+					if(!is_dir($conf->digiriskdolibarr->multidir_output[$conf->entity] . '/'.$digiriskelement->element_type.'/')) {
+						mkdir($conf->digiriskdolibarr->multidir_output[$conf->entity] . '/'.$digiriskelement->element_type.'/');
+					}
+					if (!is_dir($pathToDigiriskElementPhoto)) {
+						mkdir($pathToDigiriskElementPhoto);
+					}
+					copy($pathToECMPhoto,$pathToDigiriskElementPhoto . '/' . $filename);
+
+					$destfull = $pathToDigiriskElementPhoto . '/' . $filename;
+					// Create thumbs
+					vignette($destfull, 480, 270, '_small', 50, "thumbs");
+					// Create mini thumbs for image (Ratio is near 16/9)
+					vignette($destfull, 128, 72, '_mini', 50, "thumbs");
+				}
+			}
+			$digiriskelement->update($user);
+		}
+		exit;
+	}
+
+	if (!$error && $action == "addToFavorite") {
+
+		$digiriskelement_id = GETPOST('digiriskelement_id');
+		$filename = GETPOST('filename');
+		$digiriskelement = new DigiriskElement($db);
+		$digiriskelement->fetch($digiriskelement_id);
+		$digiriskelement->photo = $filename;
+		$digiriskelement->update($user, true);
+		exit;
+	}
+
+	if (!$error && $action == "unlinkFile") {
+
+		$digiriskelement_id = GETPOST('digiriskelement_id');
+		$filename = GETPOST('filename');
+		$digiriskelement = new DigiriskElement($db);
+		$digiriskelement->fetch($digiriskelement_id);
+
+		//edit evaluation
+		if ($digiriskelement->id > 0) {
+			$pathToDigiriskElementPhoto = $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/'.$digiriskelement->element_type.'/' . $digiriskelement->ref ;
+		}
+
+
+		$files = dol_dir_list($pathToDigiriskElementPhoto);
+
+		foreach ($files as $file) {
+			if (is_file($file['fullname']) && $file['name'] == $filename) {
+				unlink($file['fullname']);
+			}
+		}
+
+		$files = dol_dir_list($pathToDigiriskElementPhoto . '/thumbs');
+		foreach ($files as $file) {
+			if (preg_match('/' . preg_split('/\./',$filename)[0] . '/', $file['name'])) {
+				unlink($file['fullname']);
+			}
+		}
+		if ($digiriskelement->photo == $filename) {
+			$digiriskelement->photo = '';
+			$digiriskelement->update($user, true);
+		}
+		$urltogo = str_replace('__ID__', $id, $backtopage);
+		$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
+		header("Location: ".$urltogo);
+		exit;
+	}
+
+	if (!$error && $action == "uploadPhoto" && !empty($conf->global->MAIN_UPLOAD_DOC)) {
+		// Define relativepath and upload_dir
+		$relativepath = 'digiriskdolibarr/medias';
+		$upload_dir = $conf->ecm->dir_output.'/'.$relativepath;
+		if (is_array($_FILES['userfile']['tmp_name'])) $userfiles = $_FILES['userfile']['tmp_name'];
+		else $userfiles = array($_FILES['userfile']['tmp_name']);
+
+		foreach ($userfiles as $key => $userfile) {
+			if (empty($_FILES['userfile']['tmp_name'][$key])) {
+				$error++;
+				if ($_FILES['userfile']['error'][$key] == 1 || $_FILES['userfile']['error'][$key] == 2) {
+					setEventMessages($langs->trans('ErrorFileSizeTooLarge'), null, 'errors');
+				} else {
+					setEventMessages($langs->trans("ErrorFieldRequired", $langs->transnoentitiesnoconv("File")), null, 'errors');
+				}
+			}
+		}
+		if (!$error) {
+			$generatethumbs = 1;
+			$res = dol_add_file_process($upload_dir, 0, 1, 'userfile', '', null, '', $generatethumbs);
+			if ($res > 0) {
+				$result = $ecmdir->changeNbOfFiles('+');
+			}
+		}
+	}
 
 	$mod_groupment = new $conf->global->DIGIRISKDOLIBARR_GROUPMENT_ADDON();
 	$mod_workunit = new $conf->global->DIGIRISKDOLIBARR_WORKUNIT_ADDON();
@@ -750,16 +873,57 @@ function display_recurse_tree($results) {
 						</div>
 					<?php } else { ?>
 						<div class="spacer"></div>
-					<?php } ?>
-					<?php $filearray = dol_dir_list($conf->digiriskdolibarr->multidir_output[$conf->entity].'/'.$element['object']->element_type.'/'.$element['object']->ref.'/', "files", 0, '', '(\.odt|_preview.*\.png)$', 'position_name', 'asc', 1);
+					<?php }
+					$pathToThumb = DOL_URL_ROOT.'/viewimage.php?modulepart=digiriskdolibarr&entity='.$conf->entity.'&file='.urlencode($element['object']->element_type.'/'.$element['object']->ref . '/thumbs/');
+					$filearray = dol_dir_list($conf->digiriskdolibarr->multidir_output[$conf->entity].'/'.$element['object']->element_type.'/'.$element['object']->ref.'/', "files", 0, '', '(\.odt|_preview.*\.png)$', 'position_name', 'asc', 1);
 					if (count($filearray)) {
-						print '<span class="floatleft inline-block valignmiddle divphotoref">'.digirisk_show_photos('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity].'/'.$element['object']->element_type, 'small', 1, 0, 0, 0, 50, 0, 0, 0, 0, $element['object']->element_type, $element['object']).'</span>';
+						print '<span class="floatleft inline-block valignmiddle divphotoref open-medias-linked modal-open digirisk-element digirisk-element-'.$element['object']->id.'" value="'. $element['object']->id.'">';
+						 print '<img width="40" class="photo clicked-photo-preview" src="'.DOL_URL_ROOT.'/viewimage.php?modulepart=digiriskdolibarr&entity='.$conf->entity.'&file='.urlencode($element['object']->element_type.'/'.$element['object']->ref . '/thumbs/'. preg_replace('/\./', '_small.', $element['object']->photo)).'" >';
+						 print '<input type="hidden" class="filepath-to-digiriskelement" value="'.$pathToThumb.'"/>';
+						 print '</span>';
 					} else {
 						$nophoto = '/public/theme/common/nophoto.png'; ?>
-						<a href="../digiriskdolibarr/digiriskelement_document.php?id=<?php echo $element['object']->id; ?>">
-							<span class="floatleft inline-block valignmiddle divphotoref"><img class="photodigiriskdolibarr" alt="No photo" src="<?php echo DOL_URL_ROOT.$nophoto ?>"></span>
-						</a>
+							<div class="open-media-gallery modal-open digiriskelement digirisk-element-<?php echo $element['object']->id ?>" value="<?php  echo $element['object']->id ?>">
+								<input type="hidden" class="type-from" value="digiriskelement"/>
+								<input type="hidden" class="filepath-to-digiriskelement" value="<?php echo $pathToThumb ?>"/>
+								<span class="floatleft inline-block valignmiddle divphotoref"><img width="40" class="photo photowithmargin clicked-photo-preview" alt="No photo" src="<?php echo DOL_URL_ROOT.$nophoto ?>"></span>
+							</div>
 					<?php } ?>
+					<div class="digirisk-element-medias-modal" style="z-index:1500" value="<?php echo $element['object']->id ?>">
+							<div class="wpeo-modal"  id="digirisk_element_medias_modal_<?php echo $element['object']->id ?>" value="<?php echo $element['object']->id ?>" style="z-index: 1005 !important">
+								<div class="modal-container wpeo-modal-event">
+									<!-- Modal-Header -->
+									<div class="modal-header">
+										<h2 class="modal-title"><?php echo $langs->trans('DigiriskElementMedias') . ' ' . $element['object']->ref ?></h2>
+										<div class="wpeo-button open-media-gallery add-media modal-open" value="<?php echo $element['object']->id ?>">
+											<input type="hidden" class="type-from" value="digiriskelement"/>
+											<span><i class="fas fa-camera"></i>  <?php echo $langs->trans('AddMedia') ?></span>
+										</div>
+										<div class="modal-close"><i class="fas fa-times"></i></div>
+									</div>
+									<!-- Modal Content-->
+									<div class="modal-content" id="#modalContent<?php echo $element['object']->id ?>">
+										<div class="risk-evaluation-container">
+											<div class="risk-evaluation-header">
+											</div>
+											<div class="element-linked-medias element-linked-medias-<?php echo $element['object']->id ?> digirisk-element modal-media-linked">
+												<div class="medias"><i class="fas fa-picture-o"></i><?php echo $langs->trans('Medias'); ?></div>
+												<?php
+												$relativepath = 'digiriskdolibarr/medias/thumbs';
+												print digirisk_show_medias_linked('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/'.$element['object']->element_type.'/' , 'small', '', 0, 0, 0, 150, 150, 1, 0, 0, $element['object']->element_type, $element['object']);
+												?>
+											</div>
+										</div>
+									</div>
+									<!-- Modal-Footer -->
+									<div class="modal-footer">
+										<div class="wpeo-button modal-close button-blue">
+											<i class="fas fa-times"></i> <?php echo $langs->trans('CloseModal'); ?>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
 					<div class="title" id="scores" value="<?php echo $element['object']->id ?>">
 					<?php
 						if ($user->rights->digiriskdolibarr->risk->read) : ?>
@@ -1261,5 +1425,190 @@ function digirisk_show_medias($modulepart = 'ecm', $sdir, $size = 0, $nbmax = 0,
 		}
 	}
 
+	return $return;
+}
+
+function digirisk_show_medias_linked($modulepart = 'ecm', $sdir, $size = 0, $nbmax = 0, $nbbyrow = 5, $showfilename = 0, $showaction = 0, $maxHeight = 120, $maxWidth = 160, $nolink = 0, $notitle = 0, $usesharelink = 0,$subdir = "", $object = null)
+{
+		global $conf, $user, $langs;
+
+	include_once DOL_DOCUMENT_ROOT.'/core/lib/files.lib.php';
+	include_once DOL_DOCUMENT_ROOT.'/core/lib/images.lib.php';
+
+	$sortfield = 'position_name';
+	$sortorder = 'desc';
+
+	$dir = $sdir.'/'.$object->ref.'/';
+	$pdir = $subdir . '/'.$object->ref.'/';
+
+	// Defined relative dir to DOL_DATA_ROOT
+	$relativedir = '';
+	if ($dir)
+	{
+		$relativedir = preg_replace('/^'.preg_quote(DOL_DATA_ROOT, '/').'/', '', $dir);
+		$relativedir = preg_replace('/^[\\/]/', '', $relativedir);
+		$relativedir = preg_replace('/[\\/]$/', '', $relativedir);
+	}
+
+	$dirthumb = $dir.'thumbs/';
+	$pdirthumb = $pdir.'thumbs/';
+
+	$return = '<!-- Photo -->'."\n";
+	$nbphoto = 0;
+
+	$filearray = dol_dir_list($dir, "files", 0, '', '(\.meta|_preview.*\.png)$', $sortfield, (strtolower($sortorder) == 'desc' ?SORT_DESC:SORT_ASC), 1);
+	//echo '<pre>'; print_r( $pdirthumb ); echo '</pre>';
+	if (count($filearray))
+	{
+		if ($sortfield && $sortorder)
+		{
+			$filearray = dol_sort_array($filearray, $sortfield, $sortorder);
+		}
+		$return .= '<div class=" wpeo-gridlayout grid-4 grid-gap-3 grid-margin-2 valigntop center centpercent" style="height:50%; border: 0; padding: 2px; border-spacing: 2px; border-collapse: separate;">';
+
+		foreach ($filearray as $key => $val)
+		{
+			$return .= '<div class="media-container">';
+			$photo = '';
+			$file = $val['name'];
+
+			//if (! utf8_check($file)) $file=utf8_encode($file);	// To be sure file is stored in UTF8 in memory
+
+			//if (dol_is_file($dir.$file) && image_format_supported($file) >= 0)
+			if (image_format_supported($file) >= 0)
+			{
+				$nbphoto++;
+				$photo = $file;
+				$viewfilename = $file;
+
+				if ($size == 1 || $size == 'small') {   // Format vignette
+					// Find name of thumb file
+					$photo_vignette = basename(getImageFileNameForSize($dir.$file, '_small'));
+					if (!dol_is_file($dirthumb.$photo_vignette)) $photo_vignette = '';
+
+					// Get filesize of original file
+					$imgarray = dol_getImageSize($dir.$photo);
+
+					if ($nbbyrow > 0)
+					{
+						if ($nbphoto == 1) $return .= '<table class="valigntop center centpercent" style="border: 0; padding: 2px; border-spacing: 2px; border-collapse: separate;">';
+
+						if ($nbphoto % $nbbyrow == 1) $return .= '<tr class="center valignmiddle" style="border: 1px">';
+						$return .= '<td style="width: '.ceil(100 / $nbbyrow).'%" class="photo">';
+					}
+					elseif ($nbbyrow < 0) $return .= '<div class="inline-block">';
+
+					$return .= "\n";
+
+					$relativefile = preg_replace('/^\//', '', $pdir.$photo);
+					if (empty($nolink))
+					{
+						$urladvanced = getAdvancedPreviewUrl($modulepart, $relativefile, 0, 'entity='.$conf->entity);
+						if ($urladvanced) $return .= '<a href="'.$urladvanced.'">';
+						else $return .= '<a href="'.DOL_URL_ROOT.'/viewimage.php?modulepart='.$modulepart.'&entity='.$conf->entity.'&file='.urlencode($pdir.$photo).'" class="aphoto" target="_blank">';
+					}
+
+					// Show image (width height=$maxHeight)
+					// Si fichier vignette disponible et image source trop grande, on utilise la vignette, sinon on utilise photo origine
+					$alt = $langs->transnoentitiesnoconv('File').': '.$relativefile;
+					$alt .= ' - '.$langs->transnoentitiesnoconv('Size').': '.$imgarray['width'].'x'.$imgarray['height'];
+					if ($notitle) $alt = '';
+					if ($usesharelink)
+					{
+						if ($val['share'])
+						{
+							if (empty($maxHeight) || $photo_vignette && $imgarray['height'] > $maxHeight)
+							{
+								$return .= '<!-- Show original file (thumb not yet available with shared links) -->';
+								$return .= '<img width="65" height="65" class="photo photowithmargin clicked-photo-preview" height="'.$maxHeight.'" src="'.DOL_URL_ROOT.'/viewimage.php?hashp='.urlencode($val['share']).'" title="'.dol_escape_htmltag($alt).'">';
+							}
+							else {
+								$return .= '<!-- Show original file -->';
+								$return .= '<img  width="65" height="65" class="photo photowithmargin clicked-photo-preview" height="'.$maxHeight.'" src="'.DOL_URL_ROOT.'/viewimage.php?hashp='.urlencode($val['share']).'" title="'.dol_escape_htmltag($alt).'">';
+							}
+						}
+						else
+						{
+							$return .= '<!-- Show nophoto file (because file is not shared) -->';
+							$return .= '<img  width="65" height="65" class="photo photowithmargin" height="'.$maxHeight.'" src="'.DOL_URL_ROOT.'/public/theme/common/nophoto.png" title="'.dol_escape_htmltag($alt).'">';
+						}
+					}
+					else
+					{
+						if (empty($maxHeight) || $photo_vignette && $imgarray['height'] > $maxHeight)
+						{
+							$return .= '<!-- Show thumb -->';
+							$return .= '<img width="'.$maxWidth.'" height="'.$maxHeight.'" class="photo clicked-photo-preview"  src="'.DOL_URL_ROOT.'/viewimage.php?modulepart='.$modulepart.'&entity='.$conf->entity.'&file='.urlencode($pdirthumb.$photo_vignette).'" title="'.dol_escape_htmltag($alt).'">';
+						}
+						else {
+							$return .= '<!-- Show original file -->';
+							$return .= '<img width="'.$maxWidth.'" height="'.$maxHeight.'" class="photo photowithmargin  clicked-photo-preview" height="'.$maxHeight.'" src="'.DOL_URL_ROOT.'/viewimage.php?modulepart='.$modulepart.'&entity='.$conf->entity.'&file='.urlencode($pdir.$photo).'" title="'.dol_escape_htmltag($alt).'">';
+						}
+					}
+
+					if (empty($nolink)) $return .= '</a>';
+					$return .= "\n";
+					if ($showfilename) $return .= '<br>'.$viewfilename;
+					if ($showaction)
+					{
+						$return .= '<br>';
+						// On propose la generation de la vignette si elle n'existe pas et si la taille est superieure aux limites
+						if ($photo_vignette && (image_format_supported($photo) > 0) && ($object->imgWidth > $maxWidth || $object->imgHeight > $maxHeight))
+						{
+							$return .= '<a href="'.$_SERVER["PHP_SELF"].'?id='.$object->id.'&amp;action=addthumb&amp;file='.urlencode($pdir.$viewfilename).'">'.img_picto($langs->trans('GenerateThumb'), 'refresh').'&nbsp;&nbsp;</a>';
+						}
+					}
+					$return .= "\n";
+
+					if ($nbbyrow > 0)
+					{
+						$return .= '</td>';
+						if (($nbphoto % $nbbyrow) == 0) $return .= '</tr>';
+					}
+					elseif ($nbbyrow < 0) $return .= '</div>';
+				}
+
+				if (empty($size)) {     // Format origine
+					$return .= '<img class="photo photowithmargin" src="'.DOL_URL_ROOT.'/viewimage.php?modulepart='.$modulepart.'&entity='.$conf->entity.'&file='.urlencode($pdir.$photo).'">';
+
+					if ($showfilename) $return .= '<br>'.$viewfilename;
+				}
+
+				// On continue ou on arrete de boucler ?
+				if ($nbmax && $nbphoto >= $nbmax) break;
+			}
+			$return .= '<div>
+				<div class="wpeo-button button-square-50 button-blue media-gallery-favorite" value="'.$object->id .'">
+				<input class="element-linked-id" type="hidden" value="'.($object->id > 0 ? $object->id : 0).'">
+				<input class="filename" type="hidden" value="'.$photo.'">
+				<i class="'.(GETPOST('favorite') == $photo ? 'fas' : ($object->photo == $photo ? 'fas' : 'far')).' fa-star button-icon"></i>
+			</div>
+			<div class="wpeo-button button-square-50 button-grey media-gallery-unlink" value="'.$object->id .'">
+				<input class="element-linked-id" type="hidden" value="'.($object->id > 0 ? $object->id : 0).'">
+				<input class="filename" type="hidden" value="'.$photo.'">
+				<i class="fas fa-unlink button-icon"></i>
+			</div></div></div>';
+
+		}
+		$return .= "</div>\n";
+
+		if ($size == 1 || $size == 'small')
+		{
+			if ($nbbyrow > 0)
+			{
+				// Ferme tableau
+				while ($nbphoto % $nbbyrow)
+				{
+					$return .= '<td style="width: '.ceil(100 / $nbbyrow).'%">&nbsp;</td>';
+					$nbphoto++;
+				}
+
+				if ($nbphoto) $return .= '</table>';
+			}
+		}
+	}
+	if (is_object($object)){
+		$object->nbphoto = $nbphoto;
+	}
 	return $return;
 }
