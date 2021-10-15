@@ -269,8 +269,11 @@ class modDigiriskdolibarr extends DolibarrModules
 			150 => array('MAIN_AGENDA_ACTIONAUTO_RISKSIGN_CREATE','chaine',1,'', $conf->entity),
 			151 => array('DIGIRISKDOLIBARR_RISKSIGN_ADDON','chaine', 'mod_risksign_standard' ,'', $conf->entity),
 
-			// CONST TASK
+			// CONST PROJET
+			155 => array('DIGIRISKDOLIBARR_PROJECT_TAGS_SET','integer', 0,'', $conf->entity),
 			160 => array('DIGIRISKDOLIBARR_DU_PROJECT','integer', 0,'', $conf->entity),
+
+			// CONST TASK
 			161 => array('DIGIRISKDOLIBARR_ACTIVE_STANDARD','integer', 0,'', $conf->entity),
 			162 => array('DIGIRISKDOLIBARR_DOCUMENT_MODELS_SET','integer', 0,'', $conf->entity),
 			163 => array('DIGIRISKDOLIBARR_THIRDPARTY_SET','integer', 0,'', $conf->entity),
@@ -926,6 +929,29 @@ class modDigiriskdolibarr extends DolibarrModules
 				}
 			}
 			dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_DIGIRISKELEMENT_MEDIAS_BACKWARD_COMPATIBILITY', 1, 'integer', 0, '', $conf->entity);
+		}
+
+		//Categorie
+		if ($conf->global->DIGIRISKDOLIBARR_PROJECT_TAGS_SET == 0) {
+			require_once DOL_DOCUMENT_ROOT.'/categories/class/categorie.class.php';
+			require_once DOL_DOCUMENT_ROOT.'/projet/class/project.class.php';
+
+			$project = new Project($this->db);
+			$tags = new Categorie($this->db);
+
+			$tags->label = 'QHSE';
+			$tags->type = 'project';
+			$tag_id = $tags->create($user);
+
+			$tags->label = 'DU';
+			$tags->type = 'project';
+			$tags->fk_parent = $tag_id;
+			$tags->create($user);
+
+			$project->fetch($conf->global->DIGIRISKDOLIBARR_DU_PROJECT);
+			$tags->add_type($project, 'project');
+
+			dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_PROJECT_TAGS_SET', 1, 'integer', 0, '', $conf->entity);
 		}
 
 		return $this->_init($sql, $options);
