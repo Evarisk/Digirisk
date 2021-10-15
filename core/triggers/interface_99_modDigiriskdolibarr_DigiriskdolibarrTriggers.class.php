@@ -639,7 +639,9 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 						} else {
 							$listOfMails = preg_split('/;/', $listOfMails);
 							if (!empty($listOfMails) && $listOfMails > 0) {
-								array_pop($listOfMails);
+								if (end($listOfMails) == ';') {
+									array_pop($listOfMails);
+								}
 								foreach ($listOfMails as $email) {
 									$sendto = $email;
 
