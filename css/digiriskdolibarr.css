@@ -2273,6 +2273,29 @@
 .ticketpublicarea .ticket-register .wpeo-button {
   width: 100%;
   height: 100%;
+  padding: 12px 14px;
+}
+.ticketpublicarea .ticket-register .wpeo-button:hover {
+  -webkit-box-shadow: inset 0 -4.6em rgba(255, 255, 255, 0.25);
+  box-shadow: inset 0 -4.6em rgba(255, 255, 255, 0.25);
+}
+.ticketpublicarea .ticket-register .wpeo-button.button-yellow {
+  border-color: #ea7645;
+  background: -webkit-gradient(linear, left top, right top, from(#f2a160), to(#ea7645));
+  background: linear-gradient(90deg, #f2a160 0%, #ea7645 100%);
+}
+.ticketpublicarea .ticket-register .wpeo-button.button-blue {
+  border-color: #007dab;
+  background: -webkit-gradient(linear, left top, right top, from(#00b5dc), to(#007dab));
+  background: linear-gradient(90deg, #00b5dc 0%, #007dab 100%);
+}
+.ticketpublicarea .ticket-register .wpeo-button.button-red {
+  border-color: #c44e37;
+  background: -webkit-gradient(linear, left top, right top, from(#e26137), to(#c44e37));
+  background: linear-gradient(90deg, #e26137 0%, #c44e37 100%);
+}
+.ticketpublicarea .ticket-register:not(.active) .wpeo-button {
+  border-width: 0;
 }
 .ticketpublicarea .ticket-register.active .wpeo-button {
   border-color: #000 !important;

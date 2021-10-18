@@ -6,6 +6,27 @@
     .wpeo-button {
       width: 100%;
       height: 100%;
+      padding: 12px 14px;
+
+      &:hover {
+        box-shadow: inset 0 -4.6em rgb(255 255 255 / 25%)
+      }
+
+      &.button-yellow {
+        border-color: rgba(234,118,69,1);
+        background: linear-gradient(90deg, rgba(242,161,96,1) 0%, rgba(234,118,69,1) 100%);
+      }
+      &.button-blue {
+        border-color: rgba(0,125,171,1);
+        background: linear-gradient(90deg, rgba(0,181,220,1) 0%, rgba(0,125,171,1) 100%);
+      }
+      &.button-red {
+        border-color: rgba(196,78,55,1);
+        background: linear-gradient(90deg, rgba(226,97,55,1) 0%, rgba(196,78,55,1) 100%);
+      }
+    }
+    &:not(.active) .wpeo-button {
+      border-width: 0;
     }
     &.active .wpeo-button {
       border-color: #000 !important;
