@@ -57,6 +57,9 @@ $value      = GETPOST('value', 'alpha');
 $type          = 'preventionplan';
 $error         = 0;
 
+// Initialize technical objects
+$usertmp = new User($db);
+
 /*
  * Actions
  */
@@ -83,6 +86,24 @@ if ($action == 'setmod') {
 if ($action == 'setmodPreventionPlanDet') {
 	$constforval = 'DIGIRISKDOLIBARR_'.strtoupper('preventionplandet')."_ADDON";
 	dolibarr_set_const($db, $constforval, $value, 'chaine', 0, '', $conf->entity);
+}
+
+if ($action == 'setMaitreOeuvre') {
+	$maitre_oeuvre_id = GETPOST('maitre_oeuvre');
+
+	if ($maitre_oeuvre_id > 0) {
+		$usertmp->fetch($maitre_oeuvre_id);
+		if (!dol_strlen($usertmp->email)) {
+			setEventMessages($langs->trans('ErrorNoEmailForMaitreOeuvre', $langs->transnoentitiesnoconv('MaitreOeuvre')) . ' : ' . '<a target="_blank" href="'.dol_buildpath('/user/card.php?id='.$usertmp->id, 2).'">'.$usertmp->lastname . ' ' . $usertmp->firstname.'</a>', null, 'errors');
+			$error++;
+		}
+	}
+
+	if (!$error) {
+		$constforval = 'DIGIRISKDOLIBARR_'.strtoupper($type)."_MAITRE_OEUVRE";
+		dolibarr_set_const($db, $constforval, $maitre_oeuvre_id, 'integer', 0, '', $conf->entity);
+		setEventMessages($langs->trans("SetupSaved"), null, 'mesgs');
+	}
 }
 
 /*
@@ -285,6 +306,32 @@ if (is_dir($dir)) {
 }
 
 print '</table>';
+
+print load_fiche_titre($langs->trans("PreventionPlanData"), '', '');
+
+print '<form method="POST" action="'.$_SERVER["PHP_SELF"].'" name="prevention_plan_data">';
+print '<input type="hidden" name="token" value="'.newToken().'">';
+print '<input type="hidden" name="action" value="setMaitreOeuvre">';
+print '<table class="noborder centpercent editmode">';
+print '<tr class="liste_titre">';
+print '<td>'.$langs->trans("Name").'</td>';
+print '<td>'.$langs->trans("Description").'</td>';
+print '<td>'.$langs->trans("Value").'</td>';
+print '<td>'.$langs->trans("Action").'</td>';
+print '</tr>';
+
+print '<tr class="oddeven"><td><label for="MaitreOeuvre">'.$langs->trans("MaitreOeuvre").'</label></td>';
+print '<td>'.$langs->trans("MaitreOeuvreDescription").'</td>';
+$userlist = $form->select_dolusers((!empty($conf->global->DIGIRISKDOLIBARR_PREVENTIONPLAN_MAITRE_OEUVRE) ? $conf->global->DIGIRISKDOLIBARR_PREVENTIONPLAN_MAITRE_OEUVRE : $user->id), '', 0, null, 0, '', '', $conf->entity, 0, 0, 'AND u.statut = 1', 0, '', 'minwidth300', 0, 1);
+print '<td>';
+print $form->selectarray('maitre_oeuvre', $userlist, (!empty($conf->global->DIGIRISKDOLIBARR_PREVENTIONPLAN_MAITRE_OEUVRE) ? $conf->global->DIGIRISKDOLIBARR_PREVENTIONPLAN_MAITRE_OEUVRE : $user->id), $langs->trans('SelectUser'), null, null, null, "40%", 0,0,'','minwidth300',1);
+print ' <a href="'.DOL_URL_ROOT.'/user/card.php?action=create&backtopage='.urlencode($_SERVER["PHP_SELF"].'?action=create').'" target="_blank"><span class="fa fa-plus-circle valignmiddle paddingleft" title="'.$langs->trans("AddUser").'"></span></a>';
+print '</td>';
+print '<td><input type="submit" class="button" name="save" value="'.$langs->trans("Save").'">';
+print '</td></tr>';
+
+print '</table>';
+print '</form>';
 
 // Page end
 print dol_get_fiche_end();

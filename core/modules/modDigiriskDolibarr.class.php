@@ -206,6 +206,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			83 => array('MAIN_AGENDA_ACTIONAUTO_PREVENTIONPLAN_CREATE','chaine',1,'', $conf->entity),
 			84 => array('MAIN_AGENDA_ACTIONAUTO_PREVENTIONPLAN_EDIT','chaine',1,'', $conf->entity),
 			250 => array('DIGIRISKDOLIBARR_PREVENTIONPLAN_PROJECT','integer', 0,'', $conf->entity),
+			251 => array('DIGIRISKDOLIBARR_PREVENTIONPLAN_MAITRE_OEUVRE','integer', 0,'', $conf->entity),
 
 			// CONST PREVENTION PLAN DOCUMENT
 			85 => array('MAIN_AGENDA_ACTIONAUTO_PREVENTIONPLANDOCUMENT_CREATE','chaine',1,'', $conf->entity),
