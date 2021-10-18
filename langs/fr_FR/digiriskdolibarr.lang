@@ -806,6 +806,7 @@ DigiriskElementRiskSign = Signalisation
 
 # Data - Donnée
 
+ActionPlan = Plan d'action
 Task = Tâche
 TheTask = La tâche
 TaskWellCreated = Tâche créée
