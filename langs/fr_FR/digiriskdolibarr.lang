@@ -380,6 +380,9 @@ PreventionPlanMustBeInProgressToValidate = Le plan de prévention est déjà val
 CSEMustBeAlerted3DaysBeforeVisit = Le CSE doit être prévenu 3 jours avant l'inspection commune préalable
 LabourInspectorFirstName = Inspecteur du
 LabourInspectorLastName = travail
+PreventionPlanData = Données du Plan de prévention
+MaitreOeuvreDescription = L'utilisateur utilisé par défaut comme Responsable de l'Entreprise Utilisatrice
+
 
 
 #
@@ -980,3 +983,4 @@ LabourInspectorName = DREETS
 UrlLabourInspector = https://travail-emploi.gouv.fr/ministere/organisation/article/dreets-directions-regionales-de-l-economie-de-l-emploi-du-travail-et-des
 ErrorSetupEmail = Erreur de configuration des mails, vous n'avez pas configuré votre serveur d'envoi de mail
 IDCCTooltip = Ce champ provient du module Digirisk pour Dolibarr </br> La nomenclature des conventions collectives provient de travail-emploi.gouv.fr
+ContactNoEmail = Les contacts affichés en grisé sont des contacts qui ne possèdent pas d'email

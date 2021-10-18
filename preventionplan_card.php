@@ -709,23 +709,23 @@ if ($action == 'create') {
 	print '<table class="border centpercent tableforfieldcreate preventionplan-table">';
 
 	//Ref -- Ref
-	print '<tr><td class="fieldrequired">'.$langs->trans("Ref").'</td><td>';
+	print '<tr><td class="fieldrequired minwidth400">'.$langs->trans("Ref").'</td><td>';
 	print '<input hidden class="flat" type="text" size="36" name="ref" id="ref" value="'.$refPreventionPlanMod->getNextValue($object).'">';
 	print $refPreventionPlanMod->getNextValue($object);
 	print '</td></tr>';
 
 	//Label -- Libellé
-	print '<tr><td>'.$langs->trans("Label").'</td><td>';
+	print '<tr><td class="minwidth400">'.$langs->trans("Label").'</td><td>';
 	print '<input class="flat" type="text" size="36" name="label" id="label" value="'.GETPOST('label').'">';
 	print '</td></tr>';
 
 	//Start Date -- Date début
-	print '<tr><td><label for="date_debut">'.$langs->trans("StartDate").'</label></td><td>';
+	print '<tr><td class="minwidth400"><label for="date_debut">'.$langs->trans("StartDate").'</label></td><td>';
 	print $form->selectDate(dol_now('tzuser'), 'dateo', 1, 1, 0, '', 1);
 	print '</td></tr>';
 
 	//End Date -- Date fin
-	print '<tr><td><label for="date_fin">'.$langs->trans("EndDate").'</label></td><td>';
+	print '<tr><td class="minwidth400"><label for="date_fin">'.$langs->trans("EndDate").'</label></td><td>';
 	print $form->selectDate(dol_time_plus_duree(dol_now('tzuser'),1,'y'), 'datee', 1, 1, 0, '', 1);
 	print '</td></tr>';
 
@@ -733,7 +733,7 @@ if ($action == 'create') {
 	if ($conf->global->DIGIRISKDOLIBARR_PREVENTIONPLAN_MAITRE_OEUVRE < 0) {
 		$userlist = $form->select_dolusers((!empty(GETPOST('maitre_oeuvre')) ? GETPOST('maitre_oeuvre') : $user->id), '', 0, null, 0, '', '', $conf->entity, 0, 0, 'AND u.statut = 1', 0, '', 'minwidth300', 0, 1);
 		print '<tr>';
-		print '<td class="fieldrequired" style="width:10%">' . img_picto('', 'user') . ' ' . $form->editfieldkey('MaitreOeuvre', 'MaitreOeuvre_id', '', $object, 0) . '</td>';
+		print '<td class="fieldrequired minwidth400" style="width:10%">' . img_picto('', 'user') . ' ' . $form->editfieldkey('MaitreOeuvre', 'MaitreOeuvre_id', '', $object, 0) . '</td>';
 		print '<td>';
 		print $form->selectarray('maitre_oeuvre', $userlist, (!empty(GETPOST('maitre_oeuvre')) ? GETPOST('maitre_oeuvre') : $user->id), $langs->trans('SelectUser'), null, null, null, "40%", 0, 0, '', 'minwidth300', 1);
 		print ' <a href="' . DOL_URL_ROOT . '/user/card.php?action=create&backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?action=create') . '" target="_blank"><span class="fa fa-plus-circle valignmiddle paddingleft" title="' . $langs->trans("AddUser") . '"></span></a>';
@@ -741,14 +741,14 @@ if ($action == 'create') {
 	} else {
 		$usertmp->fetch($conf->global->DIGIRISKDOLIBARR_PREVENTIONPLAN_MAITRE_OEUVRE);
 		print '<tr>';
-		print '<td class="fieldrequired" style="width:10%">' . img_picto('', 'user') . ' ' . $form->editfieldkey('MaitreOeuvre', 'MaitreOeuvre_id', '', $object, 0) . '</td>';
+		print '<td class="fieldrequired minwidth400" style="width:10%">' . img_picto('', 'user') . ' ' . $form->editfieldkey('MaitreOeuvre', 'MaitreOeuvre_id', '', $object, 0) . '</td>';
 		print '<td>'.$usertmp->getNomUrl(1).'</td>';
 		print '<input type="hidden" name="maitre_oeuvre" value="'.$conf->global->DIGIRISKDOLIBARR_PREVENTIONPLAN_MAITRE_OEUVRE.'">';
 		print '</td></tr>';
 	}
 
 	//External society -- Société extérieure
-	print '<tr><td class="fieldrequired">'.img_picto('','building').' '.$langs->trans("ExtSociety").'</td><td>';
+	print '<tr><td class="fieldrequired minwidth400">'.img_picto('','building').' '.$langs->trans("ExtSociety").'</td><td>';
 	$events = array();
 	$events[1] = array('method' => 'getContacts', 'url' => dol_buildpath('/custom/digiriskdolibarr/core/ajax/contacts.php?showempty=1', 1), 'htmlname' => 'ext_society_responsible', 'params' => array('add-customer-contact' => 'disabled'));
 	print $form->select_company(GETPOST('ext_society'), 'ext_society', '', 'SelectThirdParty', 1, 0, $events, 0, 'minwidth300');
@@ -756,34 +756,37 @@ if ($action == 'create') {
 	print '</td></tr>';
 
 	//External responsible -- Responsable de la société extérieure
-	print '<tr><td class="fieldrequired">'.img_picto('','address').' '.$langs->trans("ExtSocietyResponsible").'</td><td>';
+	print '<tr><td class="fieldrequired minwidth400">';
+	$htmltext = img_picto('','address').' '.$langs->trans("ExtSocietyResponsible");
+	print $form->textwithpicto($htmltext, $langs->trans('ContactNoEmail'));
+	print '</td><td>';
 	print $form->selectcontacts(GETPOST('ext_society', 'int'), GETPOST('ext_society_responsible'), 'ext_society_responsible', 1, '', '', 0, 'minwidth300', false, 0, array(), false, '', 'ext_society_responsible');
 	print '</td></tr>';
 
 	// CSSCT Intervention
-	print '<tr><td>'.$langs->trans("CSSCTIntervention").'</td><td>';
+	print '<tr><td class="minwidth300">'.$langs->trans("CSSCTIntervention").'</td><td>';
 	print '<input type="checkbox" id="cssct_intervention" name="cssct_intervention" '.(GETPOST('cssct_intervention') ? ' checked=""' : '').'>';
 	print '</td></tr>';
 
 	//Prior Visit -- Inspection commune préalable
-	print '<tr><td>'.$langs->trans("PriorVisit").'</td><td>';
+	print '<tr><td class="minwidth400">'.$langs->trans("PriorVisit").'</td><td>';
 	print '<input type="checkbox" id="prior_visit_bool" name="prior_visit_bool"'.(GETPOST('prior_visit_bool') ? ' checked=""' : '').'>';
 	print $form->textwithpicto('', $langs->trans('CSEMustBeAlerted3DaysBeforeVisit'));
 	print '</td></tr>';
 
 	//Prior Visit Date -- Date de l'inspection commune préalable
-	print '<tr class="prior_visit_date_field hidden" '. (GETPOST('prior_visit_bool') ?  '' : 'style="display:none"') .'><td><label for="prior_visit_date">'.$langs->trans("PriorVisitDate").'</label></td><td>';
+	print '<tr class="prior_visit_date_field hidden" '. (GETPOST('prior_visit_bool') ?  '' : 'style="display:none"') .'><td class="minwidth400"><label for="prior_visit_date">'.$langs->trans("PriorVisitDate").'</label></td><td>';
 	print $form->selectDate(dol_now('tzuser'), 'datei', 1, 1, 0, '', 1);
 	print '</td></tr>';
 
 	//Prior Visit Texte -- Note de l'inspection
-	print '<tr  class="prior_visit_text_field hidden"'. (GETPOST('prior_visit_bool') ?  '' : 'style="display:none"') .'><td><label for="prior_visit_text">'.$langs->trans("PriorVisitText").'</label></td><td>';
+	print '<tr  class="prior_visit_text_field hidden"'. (GETPOST('prior_visit_bool') ?  '' : 'style="display:none"') .'><td class="minwidth400"><label for="prior_visit_text">'.$langs->trans("PriorVisitText").'</label></td><td>';
 	$doleditor = new DolEditor('prior_visit_text', GETPOST('prior_visit_text'), '', 90, 'dolibarr_notes', '', false, true, $conf->global->FCKEDITOR_ENABLE_SOCIETE, ROWS_3, '90%');
 	$doleditor->Create();
 	print '</td></tr>';
 
 	//Labour inspector Society -- Entreprise Inspecteur du travail
-	print '<tr><td class="fieldrequired">';
+	print '<tr><td class="fieldrequired minwidth400">';
 	print img_picto('','building').' '.$langs->trans("LabourInspectorSociety");
 	print '</td>';
 	print '<td>';
@@ -794,7 +797,10 @@ if ($action == 'create') {
 	print '</td></tr>';
 
 	//Labour inspector -- Inspecteur du travail
-	print '<tr><td class="fieldrequired">'.img_picto('','address').' '.$langs->trans("LabourInspector").'</td><td>';
+	print '<tr><td class="fieldrequired minwidth400">';
+	$htmltext = img_picto('','address').' '.$langs->trans("LabourInspector");
+	print $form->textwithpicto($htmltext, $langs->trans('ContactNoEmail'));
+	print '</td><td>';
 	print $form->selectcontacts((GETPOST('labour_inspector') ? GETPOST('labour_inspector') : ($allLinks['LabourInspectorSociety']->id[0] ?: 0)), (GETPOST('labour_inspector_contact') ? GETPOST('labour_inspector_contact') : ($allLinks['LabourInspectorContact']->id[0] ?: 0)), 'labour_inspector_contact', 1, '', '', 0, 'minwidth300', false, 0, array(), false, '', 'labour_inspector_contact');
 	print '</td></tr>';
 
@@ -832,22 +838,22 @@ if (($id || $ref) && $action == 'edit') {
 	print '<table class="border centpercent tableforfieldedit  preventionplan-table">'."\n";
 
 	//Ref -- Ref
-	print '<tr><td class="fieldrequired">'.$langs->trans("Ref").'</td><td>';
+	print '<tr><td class="fieldrequired minwidth400">'.$langs->trans("Ref").'</td><td>';
 	print $object->ref;
 	print '</td></tr>';
 
 	//Label -- Libellé
-	print '<tr><td>'.$langs->trans("Label").'</td><td>';
+	print '<tr><td class="minwidth400">'.$langs->trans("Label").'</td><td>';
 	print '<input class="flat" type="text" size="36" name="label" id="label" value="'.$object->label.'">';
 	print '</td></tr>';
 
 	//Start Date -- Date début
-	print '<tr class="oddeven"><td><label for="date_debut">'.$langs->trans("StartDate").'</label></td><td>';
+	print '<tr class="oddeven"><td class="minwidth400"><label for="date_debut">'.$langs->trans("StartDate").'</label></td><td>';
 	print $form->selectDate($object->date_start,'dateo', 1, 1, 0, '', 1);
 	print '</td></tr>';
 
 	//End Date -- Date fin
-	print '<tr class="oddeven"><td><label for="date_fin">'.$langs->trans("EndDate").'</label></td><td>';
+	print '<tr class="oddeven"><td class="minwidth400"><label for="date_fin">'.$langs->trans("EndDate").'</label></td><td>';
 	print $form->selectDate($object->date_end, 'datee', 1, 1, 0, '', 1);
 	print '</td></tr>';
 
@@ -855,14 +861,14 @@ if (($id || $ref) && $action == 'edit') {
 	$maitre_oeuvre = is_array($object_signatories['PP_MAITRE_OEUVRE']) ? array_shift($object_signatories['PP_MAITRE_OEUVRE'])->element_id : '';
 	$userlist = $form->select_dolusers($maitre_oeuvre, '', 1, null, 0, '', '', 0, 0, 0, 'AND u.statut = 1', 0, '', 'minwidth300', 0, 1);
 	print '<tr>';
-	print '<td class="fieldrequired" style="width:10%">'.img_picto('','user').' '.$form->editfieldkey('MaitreOeuvre', 'MaitreOeuvre_id', '', $object, 0).'</td>';
+	print '<td class="fieldrequired minwidth400" style="width:10%">'.img_picto('','user').' '.$form->editfieldkey('MaitreOeuvre', 'MaitreOeuvre_id', '', $object, 0).'</td>';
 	print '<td>';
 	print $form->selectarray('maitre_oeuvre', $userlist,$maitre_oeuvre, 1, null, null, null, "40%", 0, 0, 0, 'minwidth300',1);
 	print ' <a href="'.DOL_URL_ROOT.'/user/card.php?action=create&backtopage='.urlencode($_SERVER["PHP_SELF"].'?action=create').'" target="_blank"><span class="fa fa-plus-circle valignmiddle paddingleft" title="'.$langs->trans("AddUser").'"></span></a>';
 	print '</td></tr>';
 
 	//External society -- Société extérieure
-	print '<tr><td class="fieldrequired">';
+	print '<tr><td class="fieldrequired minwidth400">';
 	print img_picto('','building').' '.$langs->trans("ExtSociety");
 	print '</td>';
 	print '<td>';
@@ -880,12 +886,15 @@ if (($id || $ref) && $action == 'edit') {
 
 	//External responsible -- Responsable de la société extérieure
 	$ext_society_responsible_id = is_array($object_signatories['PP_EXT_SOCIETY_RESPONSIBLE']) ? array_shift($object_signatories['PP_EXT_SOCIETY_RESPONSIBLE'])->element_id : '';
-	print '<tr class="oddeven"><td class="fieldrequired">'.img_picto('','address').' '.$langs->trans("ExtSocietyResponsible").'</td><td>';
+	print '<tr class="oddeven"><td class="fieldrequired minwidth400">';
+	$htmltext = img_picto('','address').' '.$langs->trans("ExtSocietyResponsible");
+	print $form->textwithpicto($htmltext, $langs->trans('ContactNoEmail'));
+	print '</td><td>';
 	print $form->selectcontacts(GETPOST('ext_society', 'int'), $ext_society_responsible_id, 'ext_society_responsible', 0, '', '', 0, 'minwidth300', false, 0, array(), false, '', 'ext_society_responsible');
 	print '</td></tr>';
 
 	// CSSCT Intervention
-	print '<tr><td class="tdtop">';
+	print '<tr><td class="minwidth400">';
 	print $langs->trans("CSSCTIntervention");
 	print '</td>';
 	print '<td>';
@@ -896,7 +905,7 @@ if (($id || $ref) && $action == 'edit') {
 	print '</td></tr>';
 
 	//Prior Visit -- Inspection commune préalable
-	print '<tr class="oddeven"><td class="tdtop">';
+	print '<tr class="oddeven"><td class="minwidth400">';
 	print $langs->trans("PriorVisit");
 	print '</td>';
 	print '<td>';
@@ -904,12 +913,12 @@ if (($id || $ref) && $action == 'edit') {
 	print '</td></tr>';
 
 	//Prior Visit Date -- Date de l'inspection commune préalable
-	print '<tr class="'.($object->prior_visit_bool ?  ' prior_visit_date_field' : ' prior_visit_date_field hidden' ).'" style="'.($object->prior_visit_bool ? ' ' : ' display:none').'"><td><label for="prior_visit_date">'.$langs->trans("PriorVisitDate").'</label></td><td>';
+	print '<tr class="'.($object->prior_visit_bool ?  ' prior_visit_date_field' : ' prior_visit_date_field hidden' ).'" style="'.($object->prior_visit_bool ? ' ' : ' display:none').'"><td class="minwidth400"><label for="prior_visit_date">'.$langs->trans("PriorVisitDate").'</label></td><td>';
 	print $form->selectDate($object->date_start,'datei', 1, 1, 0, '', 1);
 	print '</td></tr>';
 
 	//Prior Visit Text -- Note de l'inspection
-	print '<tr class="'.($object->prior_visit_bool ?  ' prior_visit_date_field' : ' prior_visit_date_field hidden' ).'" style="'.($object->prior_visit_bool ? ' ' : ' display:none').'"><td><label for="prior_visit_text">'.$langs->trans("PriorVisitText").'</label></td><td>';
+	print '<tr class="'.($object->prior_visit_bool ?  ' prior_visit_date_field' : ' prior_visit_date_field hidden' ).'" style="'.($object->prior_visit_bool ? ' ' : ' display:none').'"><td class="minwidth400"><label for="prior_visit_text">'.$langs->trans("PriorVisitText").'</label></td><td>';
 	$doleditor = new DolEditor('prior_visit_text', $object->prior_visit_text, '', 90, 'dolibarr_notes', '', false, true, $conf->global->FCKEDITOR_ENABLE_SOCIETE, ROWS_3, '90%');
 	$doleditor->Create();
 	print '</td></tr>';
@@ -921,7 +930,7 @@ if (($id || $ref) && $action == 'edit') {
 		$labour_inspector_assigned = array_shift($object_resources['PP_LABOUR_INSPECTOR_ASSIGNED']);
 	}
 	//Labour inspector Society -- Entreprise Inspecteur du travail
-	print '<tr><td class="fieldrequired">';
+	print '<tr><td class="fieldrequired minwidth400">';
 	print img_picto('','building').' '.$langs->trans("LabourInspectorSociety");
 	print '</td>';
 	print '<td>';
@@ -932,7 +941,10 @@ if (($id || $ref) && $action == 'edit') {
 	print '</td></tr>';
 
 	//Labour inspector -- Inspecteur du travail
-	print '<tr><td class="fieldrequired">'.img_picto('','address').' '.$langs->trans("LabourInspector").'</td><td>';
+	print '<tr><td class="fieldrequired minwidth400">';
+	$htmltext = img_picto('','address').' '.$langs->trans("LabourInspector");
+	print $form->textwithpicto($htmltext, $langs->trans('ContactNoEmail'));
+	print '</td><td>';
 	print $form->selectcontacts(GETPOST('labour_inspector', 'int'), $labour_inspector_assigned->id, 'labour_inspector_contact', 1, '', '', 0, 'minwidth300', false, 0, array(), false, '', 'labour_inspector_contact');
 	print '</td></tr>';
 
