@@ -537,7 +537,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 		//Intervenants extérieurs
 		$ext_society = $digiriskresources->fetchResourcesFromObject('PP_EXT_SOCIETY', $object);
 		print '<tr class="oddeven"><td class="maxwidth200">';
-		print $form->selectcontacts($ext_society->id, '', 'ext_intervenants[]', 0, $already_selected_intervenants, '', 0, 'width200', false, 0, array(), false, 'multiple', 'ext_intervenants');
+		print $form->selectcontacts($ext_society->id, GETPOST('ext_intervenants'), 'ext_intervenants[]', 0, $already_selected_intervenants, '', 0, 'width200', false, 1, array(), false, 'multiple', 'ext_intervenants');
 		print '</td>';
 		print '<td>'.$langs->trans("ExtSocietyIntervenants").'</td>';
 		print '<td class="center">';
