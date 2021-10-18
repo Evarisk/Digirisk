@@ -177,7 +177,7 @@ if (empty($reshook)) {
 		} else {
 			$usertmp->fetch($maitre_oeuvre_id);
 			if (!dol_strlen($usertmp->email)) {
-				setEventMessages($langs->trans('ErrorNoEmailForMaitreOeuvre', $langs->transnoentitiesnoconv('MaitreOeuvre')), null, 'errors');
+				setEventMessages($langs->trans('ErrorNoEmailForMaitreOeuvre', $langs->transnoentitiesnoconv('MaitreOeuvre')) . ' : ' . '<a target="_blank" href="'.dol_buildpath('/user/card.php?id='.$usertmp->id, 2).'">'.$usertmp->lastname . ' ' . $usertmp->firstname.'</a>', null, 'errors');
 				$error++;
 			}
 		}
@@ -198,7 +198,7 @@ if (empty($reshook)) {
 		} else {
 			$contact->fetch($extresponsible_id);
 			if (!dol_strlen($contact->email)) {
-				setEventMessages($langs->trans('ErrorNoEmailForExtResponsible', $langs->transnoentitiesnoconv('ExtSocietyResponsible')), null, 'errors');
+				setEventMessages($langs->trans('ErrorNoEmailForExtResponsible', $langs->transnoentitiesnoconv('ExtSocietyResponsible')) . ' : ' . '<a target="_blank" href="'.dol_buildpath('/societe/contact.php?socid='.$contact->socid, 2).'">'.$contact->lastname . ' ' . $contact->firstname.'</a>', null, 'errors');
 				$error++;
 			}
 		}
@@ -219,7 +219,7 @@ if (empty($reshook)) {
 		} else {
 			$contact->fetch($labour_inspector_contact_id);
 			if (!dol_strlen($contact->email)) {
-				setEventMessages($langs->trans('ErrorNoEmailForLabourInspector', $langs->transnoentitiesnoconv('LabourInspectorContact')), null, 'errors');
+				setEventMessages($langs->trans('ErrorNoEmailForLabourInspector', $langs->transnoentitiesnoconv('LabourInspectorContact')) . ' : ' . '<a target="_blank" href="'.dol_buildpath('/societe/contact.php?socid='.$contact->socid, 2).'">'.$contact->lastname . ' ' . $contact->firstname.'</a>', null, 'errors');
 				$error++;
 			}
 		}
@@ -298,7 +298,7 @@ if (empty($reshook)) {
 		}   else {
 			$usertmp->fetch($maitre_oeuvre_id);
 			if (!dol_strlen($usertmp->email)) {
-				setEventMessages($langs->trans('ErrorNoEmailForMaitreOeuvre', $langs->transnoentitiesnoconv('MaitreOeuvre')), null, 'errors');
+				setEventMessages($langs->trans('ErrorNoEmailForMaitreOeuvre', $langs->transnoentitiesnoconv('MaitreOeuvre')) . ' : ' . '<a target="_blank" href="'.dol_buildpath('/user/card.php?id='.$usertmp->id, 2).'">'.$usertmp->lastname . ' ' . $usertmp->firstname.'</a>', null, 'errors');
 				$error++;
 			}
 		}
@@ -319,7 +319,7 @@ if (empty($reshook)) {
 		} else {
 			$contact->fetch($extresponsible_id);
 			if (!dol_strlen($contact->email)) {
-				setEventMessages($langs->trans('ErrorNoEmailForExtResponsible', $langs->transnoentitiesnoconv('ExtSocietyResponsible')), null, 'errors');
+				setEventMessages($langs->trans('ErrorNoEmailForExtResponsible', $langs->transnoentitiesnoconv('ExtSocietyResponsible')) . ' : ' . '<a target="_blank" href="'.dol_buildpath('/societe/contact.php?socid='.$contact->socid, 2).'">'.$contact->lastname . ' ' . $contact->firstname.'</a>', null, 'errors');
 				$error++;
 			}
 		}
@@ -340,7 +340,7 @@ if (empty($reshook)) {
 		} else {
 			$contact->fetch($labour_inspector_contact_id);
 			if (!dol_strlen($contact->email)) {
-				setEventMessages($langs->trans('ErrorNoEmailForLabourInspector', $langs->transnoentitiesnoconv('LabourInspectorContact')), null, 'errors');
+				setEventMessages($langs->trans('ErrorNoEmailForLabourInspector', $langs->transnoentitiesnoconv('LabourInspectorContact')) . ' : ' . '<a target="_blank" href="'.dol_buildpath('/societe/contact.php?socid='.$contact->socid, 2).'">'.$contact->lastname . ' ' . $contact->firstname.'</a>', null, 'errors');
 				$error++;
 			}
 		}
