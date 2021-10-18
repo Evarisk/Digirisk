@@ -97,7 +97,7 @@ if (empty($reshook)) {
 
 		$object->create($user);
 
-		setEventMessages($langs->trans('PreventionScheduleSave'), null, 'mesgs');
+		setEventMessages($langs->trans('PreventionPlanScheduleSave'), null, 'mesgs');
 	}
 }
 
