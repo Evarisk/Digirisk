@@ -910,6 +910,26 @@ class modDigiriskdolibarr extends DolibarrModules
 			dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_THIRDPARTY_SET', 2, 'integer', 0, '', $conf->entity);
 		}
 
+		if ( $conf->global->DIGIRISKDOLIBARR_CONTACTS_SET ==  0 ) {
+			require_once DOL_DOCUMENT_ROOT . '/contact/class/contact.class.php';
+			require_once __DIR__ . '/../../class/digiriskresources.class.php';
+
+			$contact   = new Contact($this->db);
+			$resources = new DigiriskResources($this->db);
+			$allLinks = $resources->digirisk_dolibarr_fetch_resource('LabourInspector');
+
+			$labour_inspector         = $contact;
+			$labour_inspector->socid = $allLinks;
+			$labour_inspector->firstname = $langs->trans('LabourInspectorFirstName');
+			$labour_inspector->lastname = $langs->trans('LabourInspectorLastName');
+
+			$labour_inspectorID       = $labour_inspector->create($user);
+
+			$resources->digirisk_dolibarr_set_resources($this->db,1,  'LabourInspector',  'contact', array($labour_inspectorID), $conf->entity);
+
+			dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_CONTACTS_SET', 2, 'integer', 0, '', $conf->entity);
+		}
+
 		// Create extrafields during init
 		include_once DOL_DOCUMENT_ROOT.'/core/class/extrafields.class.php';
 		$extra_fields = new ExtraFields( $this->db );

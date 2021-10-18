@@ -378,6 +378,8 @@ PreventionPlanMustBeValidated = Le plan de prévention doit être validé pour l
 PreventionPlanMustBeInProgress = Le plan de prévention doit être en cours pour accéder à cette fonctionnalité
 PreventionPlanMustBeInProgressToValidate = Le plan de prévention est déjà validé
 CSEMustBeAlerted3DaysBeforeVisit = Le CSE doit être prévenu 3 jours avant l'inspection commune préalable
+LabourInspectorFirstName = Inspecteur du
+LabourInspectorLastName = travail
 
 
 #
