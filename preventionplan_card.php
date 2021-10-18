@@ -70,22 +70,26 @@ $backtopageforcancel = GETPOST('backtopageforcancel', 'alpha');
 $fk_parent           = GETPOST('fk_parent', 'int');
 
 // Initialize technical objects
-$object                 = new PreventionPlan($db);
-$objectline             = new PreventionPlanLine($db);
-$signatory              = new PreventionPlanSignature($db);
-$preventionplandocument = new PreventionPlanDocument($db);
-$digiriskelement        = new DigiriskElement($db);
-$digiriskresources      = new DigiriskResources($db);
-$risk                   = new Risk($db);
-$contact                = new Contact($db);
-$usertmp                = new User($db);
-$extrafields            = new ExtraFields($db);
-
+$object                  = new PreventionPlan($db);
+$objectline              = new PreventionPlanLine($db);
+$signatory               = new PreventionPlanSignature($db);
+$preventionplandocument  = new PreventionPlanDocument($db);
+$digiriskelement         = new DigiriskElement($db);
+$digiriskresources       = new DigiriskResources($db);
+$risk                    = new Risk($db);
+$contact                 = new Contact($db);
+$usertmp                 = new User($db);
+$extrafields             = new ExtraFields($db);
+$resources               = new DigiriskResources($db);
+$thirdparty              = new Societe($db);
 $refPreventionPlanMod    = new $conf->global->DIGIRISKDOLIBARR_PREVENTIONPLAN_ADDON($db);
 $refPreventionPlanDetMod = new  $conf->global->DIGIRISKDOLIBARR_PREVENTIONPLANDET_ADDON($db);
 
 // Load object
 $object->fetch($id);
+
+// Load resources
+$allLinks = $resources->digirisk_dolibarr_fetch_resources();
 
 // Fetch optionals attributes and labels
 $extrafields->fetch_name_optionals_label($object->table_element);
@@ -641,6 +645,16 @@ if (empty($reshook)) {
 		}
 	}
 
+	// Actions to send emails
+	$triggersendname = 'COMPANY_SENTBYMAIL';
+	$paramname = 'socid';
+	$mode = 'emailfromthirdparty';
+	$trackid = 'thi'.$object->id;
+	$labour_inspector_id = $allLinks['LabourInspectorSociety']->id[0];
+	$thirdparty->fetch($labour_inspector_id);
+	$object->thirdparty = $thirdparty;
+	include DOL_DOCUMENT_ROOT.'/core/actions_sendmails.inc.php';
+
 	// Action clone object
 //	if ($action == 'confirm_clone' && $confirm == 'yes')
 //	{
@@ -775,13 +789,13 @@ if ($action == 'create') {
 	print '<td>';
 	$events = array();
 	$events[1] = array('method' => 'getContacts', 'url' => dol_buildpath('/core/ajax/contacts.php?showempty=1', 1), 'htmlname' => 'labour_inspector_contact', 'params' => array('add-customer-contact' => 'disabled'));
-	print $form->select_company(GETPOST('labour_inspector'), 'labour_inspector', '', 'SelectThirdParty', 1, 0, $events, 0, 'minwidth300');
+	print $form->select_company((GETPOST('labour_inspector') ? GETPOST('labour_inspector') : ($allLinks['LabourInspectorSociety']->id[0] ?: 0)), 'labour_inspector', '', 'SelectThirdParty', 1, 0, $events, 0, 'minwidth300');
 	print ' <a href="'.DOL_URL_ROOT.'/societe/card.php?action=create&backtopage='.urlencode($_SERVER["PHP_SELF"].'?action=create').'" target="_blank"><span class="fa fa-plus-circle valignmiddle paddingleft" title="'.$langs->trans("AddThirdParty").'"></span></a>';
 	print '</td></tr>';
 
 	//Labour inspector -- Inspecteur du travail
 	print '<tr><td class="fieldrequired">'.img_picto('','address').' '.$langs->trans("LabourInspector").'</td><td>';
-	print $form->selectcontacts(GETPOST('labour_inspector', 'int'), GETPOST('labour_inspector_contact'), 'labour_inspector_contact', 1, '', '', 0, 'minwidth300', false, 0, array(), false, '', 'labour_inspector_contact');
+	print $form->selectcontacts((GETPOST('labour_inspector') ? GETPOST('labour_inspector') : ($allLinks['LabourInspectorSociety']->id[0] ?: 0)), (GETPOST('labour_inspector_contact') ? GETPOST('labour_inspector_contact') : ($allLinks['LabourInspectorContact']->id[0] ?: 0)), 'labour_inspector_contact', 1, '', '', 0, 'minwidth300', false, 0, array(), false, '', 'labour_inspector_contact');
 	print '</td></tr>';
 
 	// Other attributes
@@ -1128,18 +1142,15 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 
 		if (empty($reshook) && $permissiontoadd) {
 
+			print '<a class="'. ($object->status == 1 ? 'butAction' : 'butActionRefused classfortooltip').'" id="actionButtonEdit" title="'.dol_escape_htmltag($langs->trans("PreventionPlanMustBeInProgress")).'" href="' . $_SERVER["PHP_SELF"] . '?id=' . $object->id . '&action=edit">' . $langs->trans("Modify") . '</a>';
+			print '<span class="'. ($object->status == 1 ? 'butAction' : 'butActionRefused classfortooltip').'" id="actionButtonPendingSignature" title="'.dol_escape_htmltag($langs->trans("PreventionPlanMustBeInProgressToValidate")).'" href="' . $_SERVER["PHP_SELF"] . '?id=' . $object->id . '&action=setPendingSignature">' . $langs->trans("Validate") . '</span>';
 			print '<span class="'. ($object->status == 2 ? 'butAction' : 'butActionRefused classfortooltip').'" id="actionButtonInProgress" title="'.dol_escape_htmltag($langs->trans("PreventionPlanMustBeValidated")).'" href="' . $_SERVER["PHP_SELF"] . '?id=' . $object->id . '&action=setInProgress">' . $langs->trans("ReOpenDigi") . '</span>';
-			print '<a class="'. ($object->status < 2 ? 'butAction' : 'butActionRefused classfortooltip').'" id="actionButtonEdit" title="'.dol_escape_htmltag($langs->trans("PreventionPlanMustBeInProgress")).'" href="' . $_SERVER["PHP_SELF"] . '?id=' . $object->id . '&action=edit">' . $langs->trans("Modify") . '</a>';
-			print '<span class="'. ($object->status  == 1 ? 'butAction' : 'butActionRefused classfortooltip').'" id="actionButtonPendingSignature" title="'.dol_escape_htmltag($langs->trans("PreventionPlanMustBeInProgressToValidate")).'" href="' . $_SERVER["PHP_SELF"] . '?id=' . $object->id . '&action=setPendingSignature">' . $langs->trans("Validate") . '</span>';
-			if (!$signatory->checkSignatoriesSignatures($object->id)) {
-				print '<a class="'. ($object->status  == 2 ? 'butAction' : 'butActionRefused').'" href="'.$url.'">'. $langs->trans("Sign").'</a>';
-				print '<a class="butActionRefused classfortooltip" href="#" title="'.dol_escape_htmltag($langs->trans("AllSignatoriesMustHaveSigned")).'">'.$langs->trans('Lock').'</a>';
-			} elseif ($object->status != 3) {
-				print '<span class="butAction" id="actionButtonLock">' . $langs->trans("Lock") . '</span>';
-			}
+			print '<a class="'. (($object->status == 2 && !$signatory->checkSignatoriesSignatures($object->id)) ? 'butAction' : 'butActionRefused').'" href="'.$url.'">'. $langs->trans("Sign").'</a>';
+			print '<span class="'. (($object->status == 2 && $signatory->checkSignatoriesSignatures($object->id)) ? 'butAction' : 'butActionRefused classfortooltip').'" id="actionButtonLock" title="'.dol_escape_htmltag($langs->trans("AllSignatoriesMustHaveSigned")).'">' . $langs->trans("Lock") . '</span>';
+			print '<a class="'. ($object->status == 3 ? 'butAction' : 'butActionRefused classfortooltip').'" href="'.$_SERVER['PHP_SELF'].'?id='.$object->id.'&action=presend&mode=init#formmailbeforetitle&sendto='.$allLinks['LabourInspectorSociety']->id[0].'">'.$langs->trans('SendMail').'</a>';
 			print '<a class="'. ($object->status == 3 ? 'butAction' : 'butActionRefused classfortooltip').'" id="actionButtonClose" title="'.dol_escape_htmltag($langs->trans("PreventionPlanMustBeLocked")).'" href="' . $_SERVER["PHP_SELF"] . '?id=' . $object->id . '&action=setArchived">' . $langs->trans("Close") . '</a>';
 
-			//print '<span class="butAction" id="actionButtonClone">' . $langs->trans("ToClone") . '</span>';
+			$langs->load("mails");
 			if ($object->date_end == dol_now()){
 				$object->setArchived($user, false);
 			}
@@ -1405,7 +1416,21 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	$formactions = new FormActions($db);
 	$somethingshown = $formactions->showactions($object, $object->element . '@digiriskdolibarr', (is_object($object->thirdparty) ? $object->thirdparty->id : 0), 1, '', $MAXEVENT, '', $morehtmlright);
 
+
 	print '</div></div></div>';
+
+	// Presend form
+	$labour_inspector_id = $allLinks['LabourInspectorSociety']->id[0];
+	$thirdparty->fetch($labour_inspector_id);
+	$object->thirdparty = $thirdparty;
+
+	$modelmail = 'thirdparty';
+	$defaulttopic = 'Information';
+	$diroutput = $conf->societe->dir_output;
+	$trackid = 'thi'.$object->id;
+
+	include DOL_DOCUMENT_ROOT.'/core/tpl/card_presend.tpl.php';
+
 }
 
 // End of page
