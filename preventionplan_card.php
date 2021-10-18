@@ -745,6 +745,7 @@ if ($action == 'create') {
 	//Prior Visit -- Inspection commune préalable
 	print '<tr><td>'.$langs->trans("PriorVisit").'</td><td>';
 	print '<input type="checkbox" id="prior_visit_bool" name="prior_visit_bool"'.(GETPOST('prior_visit_bool') ? ' checked=""' : '').'>';
+	print $form->textwithpicto('', $langs->trans('CSEMustBeAlerted3DaysBeforeVisit'));
 	print '</td></tr>';
 
 	//Prior Visit Date -- Date de l'inspection commune préalable
