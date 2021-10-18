@@ -954,18 +954,21 @@ class modDigiriskdolibarr extends DolibarrModules
 			$tags->fk_parent = $tag_id;
 			$tags->create($user);
 
+			$project->fetch($conf->global->DIGIRISKDOLIBARR_DU_PROJECT);
+			$tags->add_type($project, 'project');
+
 			$tags->label = 'PP';
 			$tags->type = 'project';
 			$tags->fk_parent = $tag_id;
 			$tags->create($user);
 
+			$project->fetch($conf->global->DIGIRISKDOLIBARR_PREVENTIONPLAN_PROJECT);
+			$tags->add_type($project, 'project');
+
 			$tags->label = 'ACC';
 			$tags->type = 'project';
 			$tags->fk_parent = $tag_id;
 			$tags->create($user);
-
-			$project->fetch($conf->global->DIGIRISKDOLIBARR_DU_PROJECT);
-			$tags->add_type($project, 'project');
 
 			dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_PROJECT_TAGS_SET', 1, 'integer', 0, '', $conf->entity);
 		}
