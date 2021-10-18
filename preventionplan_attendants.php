@@ -302,12 +302,20 @@ print dol_get_fiche_end(); ?>
 		<div class="notice-title"><?php echo $langs->trans('DisclaimerSignatureTitle') ?></div>
 		<div class="notice-subtitle"><?php echo $langs->trans("PreventionPlanMustBeValidated") ?></div>
 	</div>
+	<a class="butAction" style="width = 100%;margin-right:0" href="<?php echo DOL_URL_ROOT ?>/custom/digiriskdolibarr/preventionplan_card.php?id=<?php echo $id ?>"><?php echo $langs->trans("GoToValidate") ?></a>;
 </div>
 <?php endif; ?>
 <div class="noticeSignatureSuccess wpeo-notice notice-success hidden">
-	<div class="notice-content">
-		<div class="notice-title"><?php echo $langs->trans('AddSignatureSuccess') ?></div>
-		<div class="notice-subtitle"><?php echo $langs->trans("AddSignatureSuccessText") . GETPOST('signature_id')?></div>
+	<div class="all-notice-content">
+		<div class="notice-content">
+			<div class="notice-title"><?php echo $langs->trans('AddSignatureSuccess') ?></div>
+			<div class="notice-subtitle"><?php echo $langs->trans("AddSignatureSuccessText") . GETPOST('signature_id')?></div>
+		</div>
+		<?php
+		if ($signatory->checkSignatoriesSignatures($object->id)) {
+			print '<a class="butAction" style="width = 100%;margin-right:0" href="'.DOL_URL_ROOT . '/custom/digiriskdolibarr/preventionplan_card.php?id='.$id.'">'. $langs->trans("GoToLock").'</a>';
+		}
+		?>
 	</div>
 </div>
 <?php
@@ -360,6 +368,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	print load_fiche_titre($langs->trans("SignatureMaitreOeuvre"), '', '');
 
 	print '<div class="signatures-container">';
+
 	print '<table class="border centpercent tableforfield">';
 	print '<tr class="liste_titre">';
 	print '<td>' . $langs->trans("Name") . '</td>';

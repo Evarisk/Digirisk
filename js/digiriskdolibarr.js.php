@@ -900,8 +900,9 @@ window.eoxiaJS.signature.createSignature = function() {
 		data: signature,
 		success: function() {
             if (elementZone == "private") {
-                actionContainerSuccess.removeClass('hidden');
-                $('.signatures-container').load( document.URL + ' .signatures-container');
+				actionContainerSuccess.load(document.URL + ' .noticeSignatureSuccess .all-notice-content')
+				actionContainerSuccess.removeClass('hidden');
+				$('.signatures-container').load( document.URL + ' .signatures-container');
             } else {
                 window.location.replace(elementRedirect);
             }

@@ -372,7 +372,8 @@ ErrorNoEmailForExtIntervenant = Erreur : Le (ou les) intervenant(s) ne possède(
 SignatureEmailSubject = Signature du plan de prevention
 DocumentName = Référence du document
 PreventionScheduleSave = Les horaires du plan de prévention ont bien été enregistrées
-
+GoToLock = Verrouiller le plan de prévention
+GoToValidate = Valider le plan de prévention
 
 
 #

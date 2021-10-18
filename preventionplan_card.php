@@ -1117,25 +1117,20 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 		if ($reshook < 0) setEventMessages($hookmanager->error, $hookmanager->errors, 'errors');
 
 		if (empty($reshook) && $permissiontoadd) {
-			// Modify
-			if ($object->status < 2) {
-				print '<a class="butAction" id="actionButtonEdit" href="' . $_SERVER["PHP_SELF"] . '?id=' . $object->id . '&action=edit">' . $langs->trans("Modify") . '</a>';
-			}
-			if ($object->status == 1) {
-				print '<span class="butAction" id="actionButtonPendingSignature" href="' . $_SERVER["PHP_SELF"] . '?id=' . $object->id . '&action=setPendingSignature">' . $langs->trans("Validate") . '</span>';
-			} elseif ($object->status == 2) {
-				print '<span class="butAction" id="actionButtonInProgress" href="' . $_SERVER["PHP_SELF"] . '?id=' . $object->id . '&action=setInProgress">' . $langs->trans("ReOpenDigi") . '</span>';
 
-				if (!$signatory->checkSignatoriesSignatures($object->id)) {
-					print '<a class="butActionRefused classfortooltip" href="#" title="'.dol_escape_htmltag($langs->trans("AllSignatoriesMustHaveSigned")).'">'.$langs->trans('Lock').'</a>';
-					print '<a class="butAction" href="'.$url.'">'. $langs->trans("Sign").'</a>';
-				} else {
-					print '<span class="butAction" id="actionButtonLock">' . $langs->trans("Lock") . '</span>';
-				}
-			} elseif ($object->status == 3) {
-				//print '<span class="butAction" id="actionButtonClone">' . $langs->trans("ToClone") . '</span>';
-				print '<a class="butAction" id="actionButtonClose" href="' . $_SERVER["PHP_SELF"] . '?id=' . $object->id . '&action=setArchived">' . $langs->trans("Close") . '</a>';
+			print '<span class="'. ($object->status == 2 ? 'butAction' : 'butActionRefused').'" id="actionButtonInProgress" href="' . $_SERVER["PHP_SELF"] . '?id=' . $object->id . '&action=setInProgress">' . $langs->trans("ReOpenDigi") . '</span>';
+			print '<a class="'. ($object->status < 2 ? 'butAction' : 'butActionRefused').'" id="actionButtonEdit" href="' . $_SERVER["PHP_SELF"] . '?id=' . $object->id . '&action=edit">' . $langs->trans("Modify") . '</a>';
+			print '<span class="'. ($object->status  == 1 ? 'butAction' : 'butActionRefused').'" id="actionButtonPendingSignature" href="' . $_SERVER["PHP_SELF"] . '?id=' . $object->id . '&action=setPendingSignature">' . $langs->trans("Validate") . '</span>';
+
+			print '<a class="'. ($object->status == 3 ? 'butAction' : 'butActionRefused').'" id="actionButtonClose" href="' . $_SERVER["PHP_SELF"] . '?id=' . $object->id . '&action=setArchived">' . $langs->trans("Close") . '</a>';
+
+			if (!$signatory->checkSignatoriesSignatures($object->id)) {
+				print '<a class="'. ($object->status  == 2 ? 'butAction' : 'butActionRefused').'" href="'.$url.'">'. $langs->trans("Sign").'</a>';
+				print '<a class="butActionRefused classfortooltip" href="#" title="'.dol_escape_htmltag($langs->trans("AllSignatoriesMustHaveSigned")).'">'.$langs->trans('Lock').'</a>';
+			} elseif ($object->status != 3) {
+				print '<span class="butAction" id="actionButtonLock">' . $langs->trans("Lock") . '</span>';
 			}
+				//print '<span class="butAction" id="actionButtonClone">' . $langs->trans("ToClone") . '</span>';
 			if ($object->date_end == dol_now()){
 				$object->setArchived($user, false);
 			}
