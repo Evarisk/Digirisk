@@ -864,7 +864,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			$poison_control_center->url    = '';
 			$poison_control_centerID       = $poison_control_center->create($user);
 
-			$resources->digirisk_dolibarr_set_resources($this->db,1,  'LabourInspector',  'societe', array($labour_inspectorID), $conf->entity);
+			$resources->digirisk_dolibarr_set_resources($this->db,1,  'LabourInspectorSociety',  'societe', array($labour_inspectorID), $conf->entity);
 			$resources->digirisk_dolibarr_set_resources($this->db,1,  'Police',  'societe', array($policeID), $conf->entity);
 			$resources->digirisk_dolibarr_set_resources($this->db,1,  'SAMU',  'societe', array($samuID), $conf->entity);
 			$resources->digirisk_dolibarr_set_resources($this->db,1,  'Pompiers',  'societe', array($pompiersID), $conf->entity);
@@ -903,7 +903,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			$poison_control_center->url    = '';
 			$poison_control_centerID       = $poison_control_center->create($user);
 
-			$resources->digirisk_dolibarr_set_resources($this->db,1,  'LabourInspector',  'societe', array($labour_inspectorID), $conf->entity);
+			$resources->digirisk_dolibarr_set_resources($this->db,1,  'LabourInspectorSociety',  'societe', array($labour_inspectorID), $conf->entity);
 			$resources->digirisk_dolibarr_set_resources($this->db,1,  'RightsDefender',  'societe', array($rights_defenderID), $conf->entity);
 			$resources->digirisk_dolibarr_set_resources($this->db,1,  'PoisonControlCenter',  'societe', array($poison_control_centerID), $conf->entity);
 
@@ -925,7 +925,7 @@ class modDigiriskdolibarr extends DolibarrModules
 
 			$labour_inspectorID       = $labour_inspector->create($user);
 
-			$resources->digirisk_dolibarr_set_resources($this->db,1,  'LabourInspector',  'contact', array($labour_inspectorID), $conf->entity);
+			$resources->digirisk_dolibarr_set_resources($this->db,1,  'LabourInspectorContact',  'contact', array($labour_inspectorID), $conf->entity);
 
 			dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_CONTACTS_SET', 2, 'integer', 0, '', $conf->entity);
 		}
