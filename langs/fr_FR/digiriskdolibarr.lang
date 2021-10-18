@@ -374,6 +374,10 @@ DocumentName = Référence du document
 PreventionScheduleSave = Les horaires du plan de prévention ont bien été enregistrées
 GoToLock = Verrouiller le plan de prévention
 GoToValidate = Valider le plan de prévention
+PreventionPlanMustBeValidated = Le plan de prévention doit être validé pour le rouvrir
+PreventionPlanMustBeInProgress = Le plan de prévention doit être en cours pour accéder à cette fonctionnalité
+PreventionPlanMustBeInProgressToValidate = Le plan de prévention est déjà validé
+
 
 
 #

@@ -1118,19 +1118,18 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 
 		if (empty($reshook) && $permissiontoadd) {
 
-			print '<span class="'. ($object->status == 2 ? 'butAction' : 'butActionRefused').'" id="actionButtonInProgress" href="' . $_SERVER["PHP_SELF"] . '?id=' . $object->id . '&action=setInProgress">' . $langs->trans("ReOpenDigi") . '</span>';
-			print '<a class="'. ($object->status < 2 ? 'butAction' : 'butActionRefused').'" id="actionButtonEdit" href="' . $_SERVER["PHP_SELF"] . '?id=' . $object->id . '&action=edit">' . $langs->trans("Modify") . '</a>';
-			print '<span class="'. ($object->status  == 1 ? 'butAction' : 'butActionRefused').'" id="actionButtonPendingSignature" href="' . $_SERVER["PHP_SELF"] . '?id=' . $object->id . '&action=setPendingSignature">' . $langs->trans("Validate") . '</span>';
-
-			print '<a class="'. ($object->status == 3 ? 'butAction' : 'butActionRefused').'" id="actionButtonClose" href="' . $_SERVER["PHP_SELF"] . '?id=' . $object->id . '&action=setArchived">' . $langs->trans("Close") . '</a>';
-
+			print '<span class="'. ($object->status == 2 ? 'butAction' : 'butActionRefused classfortooltip').'" id="actionButtonInProgress" title="'.dol_escape_htmltag($langs->trans("PreventionPlanMustBeValidated")).'" href="' . $_SERVER["PHP_SELF"] . '?id=' . $object->id . '&action=setInProgress">' . $langs->trans("ReOpenDigi") . '</span>';
+			print '<a class="'. ($object->status < 2 ? 'butAction' : 'butActionRefused classfortooltip').'" id="actionButtonEdit" title="'.dol_escape_htmltag($langs->trans("PreventionPlanMustBeInProgress")).'" href="' . $_SERVER["PHP_SELF"] . '?id=' . $object->id . '&action=edit">' . $langs->trans("Modify") . '</a>';
+			print '<span class="'. ($object->status  == 1 ? 'butAction' : 'butActionRefused classfortooltip').'" id="actionButtonPendingSignature" title="'.dol_escape_htmltag($langs->trans("PreventionPlanMustBeInProgressToValidate")).'" href="' . $_SERVER["PHP_SELF"] . '?id=' . $object->id . '&action=setPendingSignature">' . $langs->trans("Validate") . '</span>';
 			if (!$signatory->checkSignatoriesSignatures($object->id)) {
 				print '<a class="'. ($object->status  == 2 ? 'butAction' : 'butActionRefused').'" href="'.$url.'">'. $langs->trans("Sign").'</a>';
 				print '<a class="butActionRefused classfortooltip" href="#" title="'.dol_escape_htmltag($langs->trans("AllSignatoriesMustHaveSigned")).'">'.$langs->trans('Lock').'</a>';
 			} elseif ($object->status != 3) {
 				print '<span class="butAction" id="actionButtonLock">' . $langs->trans("Lock") . '</span>';
 			}
-				//print '<span class="butAction" id="actionButtonClone">' . $langs->trans("ToClone") . '</span>';
+			print '<a class="'. ($object->status == 3 ? 'butAction' : 'butActionRefused classfortooltip').'" id="actionButtonClose" title="'.dol_escape_htmltag($langs->trans("PreventionPlanMustBeLocked")).'" href="' . $_SERVER["PHP_SELF"] . '?id=' . $object->id . '&action=setArchived">' . $langs->trans("Close") . '</a>';
+
+			//print '<span class="butAction" id="actionButtonClone">' . $langs->trans("ToClone") . '</span>';
 			if ($object->date_end == dol_now()){
 				$object->setArchived($user, false);
 			}
