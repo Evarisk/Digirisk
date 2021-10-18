@@ -718,14 +718,14 @@ if ($action == 'create') {
 	//Maitre d'oeuvre
 	$userlist = $form->select_dolusers(GETPOST('maitre_oeuvre'), '', 0, null, 0, '', '', 0, 0, 0, 'AND u.statut = 1', 0, '', 'minwidth300', 0, 1);
 	print '<tr>';
-	print '<td class="fieldrequired" style="width:10%">'.$form->editfieldkey('MaitreOeuvre', 'MaitreOeuvre_id', '', $object, 0).'</td>';
+	print '<td class="fieldrequired" style="width:10%">'.img_picto('','user').' '.$form->editfieldkey('MaitreOeuvre', 'MaitreOeuvre_id', '', $object, 0).'</td>';
 	print '<td>';
 	print $form->selectarray('maitre_oeuvre', $userlist, GETPOST('maitre_oeuvre'), $langs->trans('SelectUser'), null, null, null, "40%", 0,0,'','minwidth300',1);
 	print ' <a href="'.DOL_URL_ROOT.'/user/card.php?action=create&backtopage='.urlencode($_SERVER["PHP_SELF"].'?action=create').'" target="_blank"><span class="fa fa-plus-circle valignmiddle paddingleft" title="'.$langs->trans("AddUser").'"></span></a>';
 	print '</td></tr>';
 
 	//External society -- Société extérieure
-	print '<tr><td class="fieldrequired">'.$langs->trans("ExtSociety").'</td><td>';
+	print '<tr><td class="fieldrequired">'.img_picto('','building').' '.$langs->trans("ExtSociety").'</td><td>';
 	$events = array();
 	$events[1] = array('method' => 'getContacts', 'url' => dol_buildpath('/core/ajax/contacts.php?showempty=1', 1), 'htmlname' => 'ext_society_responsible', 'params' => array('add-customer-contact' => 'disabled'));
 	print $form->select_company(GETPOST('ext_society'), 'ext_society', '', 'SelectThirdParty', 1, 0, $events, 0, 'minwidth300');
@@ -733,7 +733,7 @@ if ($action == 'create') {
 	print '</td></tr>';
 
 	//External responsible -- Responsable de la société extérieure
-	print '<tr><td class="fieldrequired">'.$langs->trans("ExtSocietyResponsible").'</td><td>';
+	print '<tr><td class="fieldrequired">'.img_picto('','address').' '.$langs->trans("ExtSocietyResponsible").'</td><td>';
 	print $form->selectcontacts(GETPOST('ext_society', 'int'), GETPOST('ext_society_responsible'), 'ext_society_responsible', 1, '', '', 0, 'minwidth300', false, 0, array(), false, '', 'ext_society_responsible');
 	print '</td></tr>';
 
@@ -760,7 +760,7 @@ if ($action == 'create') {
 
 	//Labour inspector Society -- Entreprise Inspecteur du travail
 	print '<tr><td class="fieldrequired">';
-	print $langs->trans("LabourInspectorSociety");
+	print img_picto('','building').' '.$langs->trans("LabourInspectorSociety");
 	print '</td>';
 	print '<td>';
 	$events = array();
@@ -770,7 +770,7 @@ if ($action == 'create') {
 	print '</td></tr>';
 
 	//Labour inspector -- Inspecteur du travail
-	print '<tr><td class="fieldrequired">'.$langs->trans("LabourInspector").'</td><td>';
+	print '<tr><td class="fieldrequired">'.img_picto('','address').' '.$langs->trans("LabourInspector").'</td><td>';
 	print $form->selectcontacts(GETPOST('labour_inspector', 'int'), GETPOST('labour_inspector_contact'), 'labour_inspector_contact', 1, '', '', 0, 'minwidth300', false, 0, array(), false, '', 'labour_inspector_contact');
 	print '</td></tr>';
 
@@ -831,7 +831,7 @@ if (($id || $ref) && $action == 'edit') {
 	$maitre_oeuvre = is_array($object_signatories['PP_MAITRE_OEUVRE']) ? array_shift($object_signatories['PP_MAITRE_OEUVRE'])->element_id : '';
 	$userlist = $form->select_dolusers($maitre_oeuvre, '', 1, null, 0, '', '', 0, 0, 0, 'AND u.statut = 1', 0, '', 'minwidth300', 0, 1);
 	print '<tr>';
-	print '<td class="fieldrequired" style="width:10%">'.$form->editfieldkey('MaitreOeuvre', 'MaitreOeuvre_id', '', $object, 0).'</td>';
+	print '<td class="fieldrequired" style="width:10%">'.img_picto('','user').' '.$form->editfieldkey('MaitreOeuvre', 'MaitreOeuvre_id', '', $object, 0).'</td>';
 	print '<td>';
 	print $form->selectarray('maitre_oeuvre', $userlist,$maitre_oeuvre, 1, null, null, null, "40%", 0, 0, 0, 'minwidth300',1);
 	print ' <a href="'.DOL_URL_ROOT.'/user/card.php?action=create&backtopage='.urlencode($_SERVER["PHP_SELF"].'?action=create').'" target="_blank"><span class="fa fa-plus-circle valignmiddle paddingleft" title="'.$langs->trans("AddUser").'"></span></a>';
@@ -839,7 +839,7 @@ if (($id || $ref) && $action == 'edit') {
 
 	//External society -- Société extérieure
 	print '<tr><td class="fieldrequired">';
-	print $langs->trans("ExtSociety");
+	print img_picto('','building').' '.$langs->trans("ExtSociety");
 	print '</td>';
 	print '<td>';
 	$events = array();
@@ -856,7 +856,7 @@ if (($id || $ref) && $action == 'edit') {
 
 	//External responsible -- Responsable de la société extérieure
 	$ext_society_responsible_id = is_array($object_signatories['PP_EXT_SOCIETY_RESPONSIBLE']) ? array_shift($object_signatories['PP_EXT_SOCIETY_RESPONSIBLE'])->element_id : '';
-	print '<tr class="oddeven"><td class="fieldrequired">'.$langs->trans("ExtSocietyResponsible").'</td><td>';
+	print '<tr class="oddeven"><td class="fieldrequired">'.img_picto('','address').' '.$langs->trans("ExtSocietyResponsible").'</td><td>';
 	print $form->selectcontacts(GETPOST('ext_society', 'int'), $ext_society_responsible_id, 'ext_society_responsible', 0, '', '', 0, 'minwidth300', false, 0, array(), false, '', 'ext_society_responsible');
 	print '</td></tr>';
 
@@ -898,7 +898,7 @@ if (($id || $ref) && $action == 'edit') {
 	}
 	//Labour inspector Society -- Entreprise Inspecteur du travail
 	print '<tr><td class="fieldrequired">';
-	print $langs->trans("LabourInspectorSociety");
+	print img_picto('','building').' '.$langs->trans("LabourInspectorSociety");
 	print '</td>';
 	print '<td>';
 	$events = array();
@@ -908,7 +908,7 @@ if (($id || $ref) && $action == 'edit') {
 	print '</td></tr>';
 
 	//Labour inspector -- Inspecteur du travail
-	print '<tr><td class="fieldrequired">'.$langs->trans("LabourInspector").'</td><td>';
+	print '<tr><td class="fieldrequired">'.img_picto('','address').' '.$langs->trans("LabourInspector").'</td><td>';
 	print $form->selectcontacts(GETPOST('labour_inspector', 'int'), $labour_inspector_assigned->id, 'labour_inspector_contact', 1, '', '', 0, 'minwidth300', false, 0, array(), false, '', 'labour_inspector_contact');
 	print '</td></tr>';
 
