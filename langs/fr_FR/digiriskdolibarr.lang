@@ -371,6 +371,7 @@ ErrorNoEmailForMaitreOeuvre = Erreur : Le responsable de l'Entreprise Utilisatri
 ErrorNoEmailForExtIntervenant = Erreur : Le (ou les) intervenant(s) ne possède(nt) pas d'email
 SignatureEmailSubject = Signature du plan de prevention
 DocumentName = Référence du document
+PreventionScheduleSave = Les horaires du plan de prévention ont bien été enregistrées
 
 
 
