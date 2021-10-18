@@ -948,6 +948,16 @@ class modDigiriskdolibarr extends DolibarrModules
 			$tags->fk_parent = $tag_id;
 			$tags->create($user);
 
+			$tags->label = 'PP';
+			$tags->type = 'project';
+			$tags->fk_parent = $tag_id;
+			$tags->create($user);
+
+			$tags->label = 'ACC';
+			$tags->type = 'project';
+			$tags->fk_parent = $tag_id;
+			$tags->create($user);
+
 			$project->fetch($conf->global->DIGIRISKDOLIBARR_DU_PROJECT);
 			$tags->add_type($project, 'project');
 
