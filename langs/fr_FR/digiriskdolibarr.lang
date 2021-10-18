@@ -708,7 +708,9 @@ RiskDescription = Description du risque
 RiskDescriptionDescription = Activer le champ description du risque
 RiskDescriptionNotActivated = Veuillez activer le champ description du risque dans Configuration du module / Analyse des risques / Risques
 AddRisk = Ajouter un risque
+NoDescriptionThere = Aucune description renseignée sur ce risque
 NoRiskThere = "Aucun risque spécifique sur cette unité" Cependant vous pouvez être soumis aux risques génériques de vos groupements de travail.
+
 
 
 
@@ -828,6 +830,8 @@ ShowTaskProgress = Progression des tâches
 ShowTaskProgressDescription = Afficher la progression des tâches à 100
 ShowAllTasks = Toutes les tâches
 ShowAllTasksDescription = Afficher toutes les tâches
+NoTaskCompletedThere = Aucune tâche en cours
+NoTaskUnCompletedThere = Aucune tâche terminée
 
 
 

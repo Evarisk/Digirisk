@@ -376,7 +376,7 @@ class doc_listingrisksphoto_odt extends ModeleODTListingRisksPhoto
 								$tmparray['nomElement']            = $langs->trans('NoData');
 								$tmparray['nomDanger']             = $langs->trans('NoData');
 								$tmparray['identifiantRisque']     = $langs->trans('NoData');
-								$tmparray['descriptionRisque']     = $langs->trans('NoData');
+								$tmparray['descriptionRisque']     = $langs->trans('NoDesciptionThere');
 								$tmparray['quotationRisque']       = $langs->trans('NoData');
 								$tmparray['commentaireEvaluation'] = $langs->trans('NoRiskThere');
 								$tmparray['photoAssociee']         = $langs->transnoentities('NoFileLinked');
