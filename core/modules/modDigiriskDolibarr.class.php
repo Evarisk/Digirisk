@@ -916,16 +916,15 @@ class modDigiriskdolibarr extends DolibarrModules
 
 			$contact   = new Contact($this->db);
 			$resources = new DigiriskResources($this->db);
-			$allLinks = $resources->digirisk_dolibarr_fetch_resource('LabourInspector');
+			$allLinks = $resources->digirisk_dolibarr_fetch_resource('LabourInspectorSociety');
 
-			$labour_inspector         = $contact;
-			$labour_inspector->socid = $allLinks;
+			$labour_inspector            = $contact;
+			$labour_inspector->socid     = $allLinks;
 			$labour_inspector->firstname = $langs->trans('LabourInspectorFirstName');
-			$labour_inspector->lastname = $langs->trans('LabourInspectorLastName');
+			$labour_inspector->lastname  = $langs->trans('LabourInspectorLastName');
+			$labour_inspectorID          = $labour_inspector->create($user);
 
-			$labour_inspectorID       = $labour_inspector->create($user);
-
-			$resources->digirisk_dolibarr_set_resources($this->db,1,  'LabourInspectorContact',  'contact', array($labour_inspectorID), $conf->entity);
+			$resources->digirisk_dolibarr_set_resources($this->db,1, 'LabourInspectorContact', 'socpeople', array($labour_inspectorID), $conf->entity);
 
 			dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_CONTACTS_SET', 2, 'integer', 0, '', $conf->entity);
 		}

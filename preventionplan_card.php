@@ -317,7 +317,7 @@ if (empty($reshook)) {
 
 		if (is_array($labour_inspector_contact_id)) {
 			if (empty(array_filter($labour_inspector_contact_id))) {
-				setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv('LabourInspecto')), null, 'errors');
+				setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv('LabourInspector')), null, 'errors');
 				$error++;
 			}
 		} elseif (empty($labour_inspector_contact_id)) {
@@ -745,7 +745,7 @@ if ($action == 'create') {
 	$htmltext = img_picto('','address').' '.$langs->trans("ExtSocietyResponsible");
 	print $form->textwithpicto($htmltext, $langs->trans('ContactNoEmail'));
 	print '</td><td>';
-	print $form->selectcontacts(GETPOST('ext_society', 'int'), GETPOST('ext_society_responsible'), 'ext_society_responsible', 1, $contacts_no_email, '', 0, 'minwidth300', false, 0, array(), false, '', 'ext_society_responsible');
+	print digirisk_selectcontacts((empty(GETPOST('ext_society', 'int')) ? -1 : GETPOST('ext_society', 'int')), GETPOST('ext_society_responsible'), 'ext_society_responsible', 1, $contacts_no_email, '', 0, 'minwidth300', false, 0, array(), false, '', 'ext_society_responsible');
 	print '</td></tr>';
 
 	// CSSCT Intervention
@@ -782,7 +782,7 @@ if ($action == 'create') {
 	print '<a href="'.DOL_URL_ROOT.'/custom/digiriskdolibarr/admin/securityconf.php'.'" target="_blank">'.$langs->trans("ConfigureLabourInspector").'</a>';
 	print '</td></tr>';
 
-	$labour_inspector_contact_id = GETPOST('labour_inspector_contact');
+	$labour_inspector_contact_id = (GETPOST('labour_inspector_contact') ? GETPOST('labour_inspector_contact') : ($allLinks['LabourInspectorContact']->id[0] ?: -1));
 	$contacts = fetchAllSocPeople('',  '',  0,  0, array('customsql' => "s.rowid = $labour_inspector_contact_id AND c.email IS NULL OR c.email = ''" ));
 	$contacts_no_email_labour_inspector = array();
 	if (is_array($contacts) && !empty ($contacts) && $contacts > 0) {
@@ -791,12 +791,16 @@ if ($action == 'create') {
 		}
 	}
 
+	if (!empty($allLinks['LabourInspectorContact'])) {
+		$contact->fetch($allLinks['LabourInspectorContact']->id[0]);
+	}
+
 	//Labour inspector -- Inspecteur du travail
 	print '<tr><td class="fieldrequired minwidth400">';
 	$htmltext = img_picto('','address').' '.$langs->trans("LabourInspector");
 	print $form->textwithpicto($htmltext, $langs->trans('ContactNoEmail'));
 	print '</td><td>';
-	print $form->selectcontacts((GETPOST('labour_inspector') ? GETPOST('labour_inspector') : ($allLinks['LabourInspectorSociety']->id[0] ?: 0)), (GETPOST('labour_inspector_contact') ? GETPOST('labour_inspector_contact') : ($allLinks['LabourInspectorContact']->id[0] ?: 0)), 'labour_inspector_contact', 1, $contacts_no_email_labour_inspector, '', 0, 'minwidth300', false, 0, array(), false, '', 'labour_inspector_contact');
+	print digirisk_selectcontacts((GETPOST('labour_inspector') ? GETPOST('labour_inspector') : ($allLinks['LabourInspectorSociety']->id[0] ?: -1)), dol_strlen($contact->email) ? $labour_inspector_contact_id : -1, 'labour_inspector_contact', 1, $contacts_no_email_labour_inspector, '', 0, 'minwidth300', false, 0, array(), false, '', 'labour_inspector_contact');
 	print '</td></tr>';
 
 	// Other attributes
@@ -888,13 +892,17 @@ if (($id || $ref) && $action == 'edit') {
 		}
 	}
 
+	if ($ext_society_responsible_id > 0) {
+		$contact->fetch($ext_society_responsible_id);
+	}
+
 	//External responsible -- Responsable de la société extérieure
 	$ext_society = $digiriskresources->fetchResourcesFromObject('PP_EXT_SOCIETY', $object);
 	print '<tr class="oddeven"><td class="fieldrequired minwidth400">';
 	$htmltext = img_picto('','address').' '.$langs->trans("ExtSocietyResponsible");
 	print $form->textwithpicto($htmltext, $langs->trans('ContactNoEmail'));
 	print '</td><td>';
-	print $form->selectcontacts($ext_society->id, $ext_society_responsible_id, 'ext_society_responsible', 0, $contacts_no_email, '', 0, 'minwidth300', false, 0, array(), false, '', 'ext_society_responsible');
+	print digirisk_selectcontacts($ext_society->id, dol_strlen($contact->email) ? $ext_society_responsible_id : -1, 'ext_society_responsible', 0, $contacts_no_email, '', 0, 'minwidth300', false, 0, array(), false, '', 'ext_society_responsible');
 	print '</td></tr>';
 
 	// CSSCT Intervention
@@ -954,13 +962,17 @@ if (($id || $ref) && $action == 'edit') {
 		}
 	}
 
+	if ($labour_inspector_contact->id > 0) {
+		$contact->fetch($labour_inspector_contact->id);
+	}
+
 	//Labour inspector -- Inspecteur du travail
 	$labour_inspector_society = $digiriskresources->fetchResourcesFromObject('PP_LABOUR_INSPECTOR', $object);
 	print '<tr><td class="fieldrequired minwidth400">';
 	$htmltext = img_picto('','address').' '.$langs->trans("LabourInspector");
 	print $form->textwithpicto($htmltext, $langs->trans('ContactNoEmail'));
 	print '</td><td>';
-	print $form->selectcontacts($labour_inspector_society->id, $labour_inspector_contact->id, 'labour_inspector_contact', 0, $contacts_no_email_labour_inspector, '', 0, 'minwidth300', false, 0, array(), false, '', 'labour_inspector_contact');
+	print digirisk_selectcontacts($labour_inspector_society->id, dol_strlen($contact->email) ? $labour_inspector_contact->id : -1, 'labour_inspector_contact', 0, $contacts_no_email_labour_inspector, '', 0, 'minwidth300', false, 0, array(), false, '', 'labour_inspector_contact');
 	print '</td></tr>';
 
 	// Other attributes

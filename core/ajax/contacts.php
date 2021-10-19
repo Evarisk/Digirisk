@@ -73,7 +73,7 @@ if (!empty($id) && !empty($action) && !empty($htmlname)) {
 		}
 	}
 
-	$return['value'] = $form->selectcontacts($id, '', $htmlname, $showempty, $contacts_no_email, '', 0, '', true);
+	$return['value'] = digirisk_selectcontacts($id, '', $htmlname, $showempty, $contacts_no_email, '', 0, '', true);
 	$return['num']   = $form->num;
 	$return['error'] = $form->error;
 

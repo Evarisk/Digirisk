@@ -486,9 +486,10 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	print '</tr>';
 
 	$contacts = fetchAllSocPeople('',  '',  0,  0, array('customsql' => "s.rowid = $element->id AND c.email IS NULL OR c.email = ''" ));
+	$contacts_no_email = array();
 	if (is_array($contacts) && !empty ($contacts) && $contacts > 0) {
 		foreach ($contacts as $element_id) {
-			$already_selected_intervenants[$element_id->id] = $element_id->id;
+			$contacts_no_email[$element_id->id] = $element_id->id;
 		}
 	}
 
@@ -544,7 +545,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 		//Intervenants extérieurs
 		$ext_society = $digiriskresources->fetchResourcesFromObject('PP_EXT_SOCIETY', $object);
 		print '<tr class="oddeven"><td class="maxwidth200">';
-		print $form->selectcontacts($ext_society->id, GETPOST('ext_intervenants'), 'ext_intervenants[]', 0, $already_selected_intervenants, '', 0, 'width200', false, 1, array(), false, 'multiple', 'ext_intervenants');
+		print digirisk_selectcontacts($ext_society->id, GETPOST('ext_intervenants'), 'ext_intervenants[]', 0, $contacts_no_email, '', 0, 'width200', false, 1, array(), false, 'multiple', 'ext_intervenants', false,0, $already_selected_intervenants);
 		print '</td>';
 		print '<td>'.$langs->trans("ExtSocietyIntervenants").'</td>';
 		print '<td class="center">';
