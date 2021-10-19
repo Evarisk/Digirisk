@@ -538,7 +538,7 @@ class doc_riskassessmentdocument_odt extends ModeleODTRiskAssessmentDocument
 							$tmparray['nomDanger']                   = $langs->trans('NoData');
 							$tmparray['identifiantRisque']           = $langs->trans('NoData');
 							$tmparray['quotationRisque']             = $langs->trans('NoData');
-							$tmparray['descriptionRisque']           = $langs->trans('NoDesciptionThere');
+							$tmparray['descriptionRisque']           = $langs->trans('NoDescriptionThere');
 							$tmparray['commentaireEvaluation']       = $langs->trans('NoRiskThere');
 							$tmparray['actionPreventionUncompleted'] = $langs->trans('NoTaskCompletedThere');
 							$tmparray['actionPreventionCompleted']   = $langs->trans('NoTaskCompletedThere');

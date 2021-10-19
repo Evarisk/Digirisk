@@ -405,7 +405,7 @@ class doc_listingrisksaction_odt extends ModeleODTListingRisksAction
 								$tmparray['nomDanger']                   = $langs->trans('NoData');
 								$tmparray['identifiantRisque']           = $langs->trans('NoData');
 								$tmparray['quotationRisque']             = $langs->trans('NoData');
-								$tmparray['descriptionRisque']           = $langs->trans('NoDesciptionThere');
+								$tmparray['descriptionRisque']           = $langs->trans('NoDescriptionThere');
 								$tmparray['commentaireEvaluation']       = $langs->trans('NoRiskThere');
 								$tmparray['actionPreventionUncompleted'] = $langs->trans('NoTaskUnCompletedThere');
 								$tmparray['actionPreventionCompleted']   = $langs->trans('NoTaskCompletedThere');
@@ -521,7 +521,7 @@ class doc_listingrisksaction_odt extends ModeleODTListingRisksAction
 								$tmparray['nomDanger']                   = $langs->trans('NoData');
 								$tmparray['identifiantRisque']           = $langs->trans('NoData');
 								$tmparray['quotationRisque']             = $langs->trans('NoData');
-								$tmparray['descriptionRisque']           = $langs->trans('NoDesciptionThere');
+								$tmparray['descriptionRisque']           = $langs->trans('NoDescriptionThere');
 								$tmparray['commentaireEvaluation']       = $langs->trans('NoRiskThere');
 								$tmparray['actionPreventionUncompleted'] = $langs->trans('NoTaskUnCompletedThere');
 								$tmparray['actionPreventionCompleted']   = $langs->trans('NoTaskCompletedThere');

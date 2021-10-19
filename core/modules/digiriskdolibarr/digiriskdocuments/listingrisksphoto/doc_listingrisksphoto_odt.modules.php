@@ -376,7 +376,7 @@ class doc_listingrisksphoto_odt extends ModeleODTListingRisksPhoto
 								$tmparray['nomElement']            = $langs->trans('NoData');
 								$tmparray['nomDanger']             = $langs->trans('NoData');
 								$tmparray['identifiantRisque']     = $langs->trans('NoData');
-								$tmparray['descriptionRisque']     = $langs->trans('NoDesciptionThere');
+								$tmparray['descriptionRisque']     = $langs->trans('NoDescriptionThere');
 								$tmparray['quotationRisque']       = $langs->trans('NoData');
 								$tmparray['commentaireEvaluation'] = $langs->trans('NoRiskThere');
 								$tmparray['photoAssociee']         = $langs->transnoentities('NoFileLinked');
@@ -463,7 +463,7 @@ class doc_listingrisksphoto_odt extends ModeleODTListingRisksPhoto
 								$tmparray['nomDanger']             = $langs->trans('NoData');
 								$tmparray['identifiantRisque']     = $langs->trans('NoData');
 								$tmparray['quotationRisque']       = $langs->trans('NoData');
-								$tmparray['descriptionRisque']     = $langs->trans('NoData');
+								$tmparray['descriptionRisque']     = $langs->trans('NoDescriptionThere');
 								$tmparray['commentaireEvaluation'] = $langs->trans('NoRiskThere');
 								$tmparray['photoAssociee']         = $langs->transnoentities('NoFileLinked');
 								foreach ($tmparray as $key => $val) {
