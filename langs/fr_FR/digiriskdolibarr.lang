@@ -568,7 +568,7 @@ WorkUnitDocument = Fiche d'Unité de travail
 ReadDigiriskElement = Consulter les éléments digirisk
 CreateDigiriskElement = Créer/Modifier les éléments digirisk
 DeleteDigiriskElement = Supprimer les éléments digirisk
-HiddenElements = Eléments masqués
+HiddenElements = Corbeille
 
 # Data - Donnée
 NewDigiriskElement = Nouveau élément digirisk
