@@ -595,9 +595,9 @@ Groupment = Groupement
 NewGroupment = Nouveau groupement
 ModifyGroupment = Modifier groupement
 TrashGroupment = Groupement poubelle
-DeletedElements = Eléments masqués
-DeletedDigiriskElement = Groupements / Unités de travail masqués
-ShowDeletedDigiriskElement = Afficher les groupements / unités de travail masqués
+DeletedElements = Corbeille
+DeletedDigiriskElement = Groupements / Unités de travail placées dans la corbeille
+ShowDeletedDigiriskElement = Afficher les groupements / unités de travail qui se trouve dans la corbeille
 
 #
 # WorkUnit - Unité de travail
