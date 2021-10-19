@@ -25,3 +25,5 @@ ALTER TABLE `llx_digiriskdolibarr_risk` CHANGE `status` `status` SMALLINT(6) NUL
 
 ALTER TABLE llx_digiriskdolibarr_riskassessment ADD date_riskassessment datetime;
 ALTER TABLE llx_digiriskdolibarr_digiriskelement ADD photo varchar(255);
+ALTER TABLE llx_digiriskdolibarr_preventionplan_signature ADD stamp varchar(255);
+ALTER TABLE llx_digiriskdolibarr_preventionplan ADD last_email_sent_date datetime;
