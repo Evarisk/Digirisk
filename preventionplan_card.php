@@ -622,7 +622,7 @@ if (empty($reshook)) {
 	}
 
 	// Actions to send emails
-	$triggersendname = 'COMPANY_SENTBYMAIL';
+	$triggersendname = 'PREVENTIONPLAN_SENTBYMAIL';
 	$paramname = 'socid';
 	$mode = 'emailfromthirdparty';
 	$trackid = 'thi'.$object->id;

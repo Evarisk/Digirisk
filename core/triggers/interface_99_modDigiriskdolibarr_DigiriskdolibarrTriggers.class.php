@@ -697,6 +697,11 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				}
 				break;
 
+			case 'PREVENTIONPLAN_SENTBYMAIL' :
+				$object->last_email_sent_date = dol_now('tzuser');
+				$object->update($user, true);
+				break;
+
 			default:
 				dol_syslog("Trigger '".$this->name."' for action '$action' launched by ".__FILE__.". id=".$object->id);
 				break;
