@@ -878,7 +878,7 @@ if (($id || $ref) && $action == 'edit') {
 	print ' <a href="'.DOL_URL_ROOT.'/societe/card.php?action=create&backtopage='.urlencode($_SERVER["PHP_SELF"].'?action=create').'" target="_blank"><span class="fa fa-plus-circle valignmiddle paddingleft" title="'.$langs->trans("AddThirdParty").'"></span></a>';
 	print '</td></tr>';
 
-	$ext_society_responsible_id = GETPOST('ext_society_responsible');
+	$ext_society_responsible_id = is_array($object_signatories['PP_EXT_SOCIETY_RESPONSIBLE']) ? array_shift($object_signatories['PP_EXT_SOCIETY_RESPONSIBLE'])->element_id : GETPOST('ext_society_responsible');
 	$contacts = fetchAllSocPeople('',  '',  0,  0, array('customsql' => "s.rowid = $ext_society_responsible_id AND c.email IS NULL OR c.email = ''" ));
 	$contacts_no_email = array();
 	if (is_array($contacts) && !empty ($contacts) && $contacts > 0) {
@@ -888,12 +888,12 @@ if (($id || $ref) && $action == 'edit') {
 	}
 
 	//External responsible -- Responsable de la société extérieure
-	$ext_society_responsible_id = is_array($object_signatories['PP_EXT_SOCIETY_RESPONSIBLE']) ? array_shift($object_signatories['PP_EXT_SOCIETY_RESPONSIBLE'])->element_id : '';
+	$ext_society = $digiriskresources->fetchResourcesFromObject('PP_EXT_SOCIETY', $object);
 	print '<tr class="oddeven"><td class="fieldrequired minwidth400">';
 	$htmltext = img_picto('','address').' '.$langs->trans("ExtSocietyResponsible");
 	print $form->textwithpicto($htmltext, $langs->trans('ContactNoEmail'));
 	print '</td><td>';
-	print $form->selectcontacts(GETPOST('ext_society', 'int'), $ext_society_responsible_id, 'ext_society_responsible', 0, $contacts_no_email, '', 0, 'minwidth300', false, 0, array(), false, '', 'ext_society_responsible');
+	print $form->selectcontacts($ext_society->id, $ext_society_responsible_id, 'ext_society_responsible', 0, $contacts_no_email, '', 0, 'minwidth300', false, 0, array(), false, '', 'ext_society_responsible');
 	print '</td></tr>';
 
 	// CSSCT Intervention
@@ -943,8 +943,8 @@ if (($id || $ref) && $action == 'edit') {
 	print ' <a href="'.DOL_URL_ROOT.'/societe/card.php?action=create&backtopage='.urlencode($_SERVER["PHP_SELF"].'?action=create').'" target="_blank"><span class="fa fa-plus-circle valignmiddle paddingleft" title="'.$langs->trans("AddThirdParty").'"></span></a>';
 	print '</td></tr>';
 
-	$labour_inspector_contact_id = GETPOST('labour_inspector_contact');
-	$contacts = fetchAllSocPeople('',  '',  0,  0, array('customsql' => "s.rowid = $labour_inspector_contact_id AND c.email IS NULL OR c.email = ''" ));
+	$labour_inspector_contact = !empty($digiriskresources->fetchResourcesFromObject('PP_LABOUR_INSPECTOR_ASSIGNED', $object)) ? $digiriskresources->fetchResourcesFromObject('PP_LABOUR_INSPECTOR_ASSIGNED', $object) : GETPOST('labour_inspector_contact');
+	$contacts = fetchAllSocPeople('',  '',  0,  0, array('customsql' => "s.rowid = $labour_inspector_contact->id AND c.email IS NULL OR c.email = ''" ));
 	$contacts_no_email_labour_inspector = array();
 	if (is_array($contacts) && !empty ($contacts) && $contacts > 0) {
 		foreach ($contacts as $element) {
@@ -953,11 +953,12 @@ if (($id || $ref) && $action == 'edit') {
 	}
 
 	//Labour inspector -- Inspecteur du travail
+	$labour_inspector_society = $digiriskresources->fetchResourcesFromObject('PP_LABOUR_INSPECTOR', $object);
 	print '<tr><td class="fieldrequired minwidth400">';
 	$htmltext = img_picto('','address').' '.$langs->trans("LabourInspector");
 	print $form->textwithpicto($htmltext, $langs->trans('ContactNoEmail'));
 	print '</td><td>';
-	print $form->selectcontacts(GETPOST('labour_inspector', 'int'), $labour_inspector_assigned->id, 'labour_inspector_contact', 1, $contacts_no_email_labour_inspector, '', 0, 'minwidth300', false, 0, array(), false, '', 'labour_inspector_contact');
+	print $form->selectcontacts($labour_inspector_society->id, $labour_inspector_contact->id, 'labour_inspector_contact', 0, $contacts_no_email_labour_inspector, '', 0, 'minwidth300', false, 0, array(), false, '', 'labour_inspector_contact');
 	print '</td></tr>';
 
 	// Other attributes
