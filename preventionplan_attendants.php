@@ -485,6 +485,13 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	print '<td class="center">' . $langs->trans("Signature") . '</td>';
 	print '</tr>';
 
+	$contacts = fetchAllSocPeople('',  '',  0,  0, array('customsql' => "s.rowid = $element->id AND c.email IS NULL OR c.email = ''" ));
+	if (is_array($contacts) && !empty ($contacts) && $contacts > 0) {
+		foreach ($contacts as $element_id) {
+			$already_selected_intervenants[$element_id->id] = $element_id->id;
+		}
+	}
+
 	$already_selected_intervenants[$contact->id] = $contact->id;
 	$j = 1;
 	if (is_array($ext_society_intervenants) && !empty ($ext_society_intervenants) && $ext_society_intervenants > 0) {
