@@ -1150,6 +1150,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	$attendants += count($signatory->fetchSignatory('PP_EXT_SOCIETY_INTERVENANTS', $object->id));
 	$url = dol_buildpath('/custom/digiriskdolibarr/preventionplan_attendants.php?id='.$object->id, 3);
 	print '<a href="'.$url.'">'.$attendants.'</a>';
+	print '<a class="'. ($object->status == 1 ? 'butAction' : 'butActionRefused classfortooltip').'" id="actionButtonAddAttendants" title="'.dol_escape_htmltag($langs->trans("PreventionPlanMustBeInProgress")).'" href="'.$url.'">'.$langs->trans('AddAttendants').'</a>';
 	print '</td></tr>';
 
 	print '</table>';

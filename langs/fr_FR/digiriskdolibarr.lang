@@ -861,8 +861,8 @@ DigiriskSignatureDeletedTrigger = Participant supprimé
 
 
 # Data - Donnée
-SignatureResponsibles = Signatures des responsables
-SignatureIntervenants = Signatures des intervenants
+SignatureResponsibles = Signature des responsables
+SignatureIntervenants = Intervenants
 Sign = Signer
 Erase = Effacer
 DisclaimerSignatureTitle = Attention
@@ -886,10 +886,10 @@ SignaturePublicAccess = Une interface publique ne nécessitant aucune identifica
 SignatureActivatePublicInterface = Activer l'interface publique
 SignatureShowCompanyLogo = Afficher le logo de la société dans l'interface publique
 SignatureShowCompanyLogoHelp = Activez cette option pour masquer le logo de la société dans les pages de l'interface publique
-SignatureMaitreOeuvre = Signature du responsable de l'entreprise utilisatrice
-SignatureResponsibleExtSociety = Signature du responsable de l'entreprise extérieure
+SignatureMaitreOeuvre = Responsable de l'Entreprise Utilisatrice
+SignatureResponsibleExtSociety = Responsable de l'Entreprise Extérieure
 Role = Rôle
-NewIntervenants = Ajouter un nouveau intervenant
+NewIntervenants = Ajouter un nouvel intervenant
 SignatureLink = Lien signature
 SendMailDate = Date d'envoi d'email
 DeleteAttendant = Supprimer l'intervenant
@@ -905,7 +905,7 @@ AddSignatureSuccess = Signature du document réussie
 AddSignatureSuccessText = La signature a bien été enregistrée pour le document
 SignatureSeeDocument = Voir
 ShowDocument = Voir le document
-
+AddAttendants = Ajouter
 
 
 
