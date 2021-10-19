@@ -107,6 +107,7 @@ class PreventionPlan extends CommonObject
 	public $fk_project;
 	public $fk_user_creat;
 	public $fk_user_modif;
+	public $last_email_sent_date;
 
 	/**
 	 * Constructor
