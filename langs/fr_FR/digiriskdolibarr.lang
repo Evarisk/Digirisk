@@ -166,7 +166,7 @@ ThirdPartyOpeningHours = Horaires du tiers
 ExceptionsToWorkingHours = Dérogations aux horaires de travail
 PermanentDerogation = Dérogation permanente
 OccasionalDerogation = Dérogation occasionnelle
-ThirdPartyOpeningHoursSave = Les horaires d'ouverture du tier ont bien été enregistrées
+ThirdPartyOpeningHoursSave = Les horaires d'ouverture du tiers ont bien été enregistrés
 
 
 
@@ -372,7 +372,7 @@ ErrorNoEmailForMaitreOeuvre = Erreur : Le responsable de l'Entreprise Utilisatri
 ErrorNoEmailForExtIntervenant = Erreur : Le (ou les) intervenant(s) ne possède(nt) pas d'email
 SignatureEmailSubject = Signature du plan de prevention
 DocumentName = Référence du document
-PreventionPlanScheduleSave = Les horaires du plan de prévention ont bien été enregistrées
+PreventionPlanScheduleSave = Les horaires du plan de prévention ont bien été enregistrés
 GoToLock = Verrouiller le plan de prévention
 GoToValidate = Valider le plan de prévention
 PreventionPlanMustBeValidated = Le plan de prévention doit être validé pour le rouvrir
