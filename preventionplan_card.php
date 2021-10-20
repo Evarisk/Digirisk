@@ -1543,12 +1543,13 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 		$maitre_oeuvre = array_shift($maitre_oeuvre);
 
 		$formmail->param['langsmodels'] = (empty($newlang) ? $langs->defaultlang : $newlang);
-		$formmail->fromtype = (GETPOST('fromtype') ?GETPOST('fromtype') : (!empty($conf->global->MAIN_MAIL_DEFAULT_FROMTYPE) ? $conf->global->MAIN_MAIL_DEFAULT_FROMTYPE : 'user'));
-		$formmail->fromid   = $maitre_oeuvre->id;
-		$formmail->trackid  = $trackid;
-		$formmail->fromname = $maitre_oeuvre->firstname . ' ' . $maitre_oeuvre->lastname;
-		$formmail->frommail = $maitre_oeuvre->email;
-		$formmail->withfrom = 1;
+		$formmail->fromtype      = (GETPOST('fromtype') ?GETPOST('fromtype') : (!empty($conf->global->MAIN_MAIL_DEFAULT_FROMTYPE) ? $conf->global->MAIN_MAIL_DEFAULT_FROMTYPE : 'user'));
+		$formmail->fromid        = $maitre_oeuvre->id;
+		$formmail->trackid       = $trackid;
+		$formmail->fromname      = $maitre_oeuvre->firstname . ' ' . $maitre_oeuvre->lastname;
+		$formmail->frommail      = $maitre_oeuvre->email;
+		$formmail->fromalsorobot = 1;
+		$formmail->withfrom      = 1;
 
 		// Fill list of recipient with email inside <>.
 		$liste = array();
