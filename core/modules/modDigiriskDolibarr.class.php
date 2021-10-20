@@ -86,7 +86,8 @@ class modDigiriskdolibarr extends DolibarrModules
 			'hooks' => array(
 				'completeTabsHead',
 				'admincompany',
-				'globaladmin'
+				'globaladmin',
+				'emailtemplates'
 			),
 			'tabs' => array(
 				'mycompany_admin'

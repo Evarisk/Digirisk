@@ -386,6 +386,14 @@ PreventionPlanData = Données du Plan de prévention
 MaitreOeuvreDescription = L'utilisateur utilisé par défaut comme Responsable de l'Entreprise Utilisatrice
 fk_preventionplan = Plan de prévention lié
 
+# Email - Mail
+PreventionPlanLabel = Récapitulatif du plan de prévention
+PreventionPlanSubject = Email plan de prévention
+PreventionPlanContent = Veuillez trouver ci-joint le document ODT du plan de prévention.
+AdministrativeService = Service administratif
+WithKindRegards = Bien cordialement
+
+
 
 #
 # FirePermit - Permis de feu

@@ -1462,7 +1462,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	$thirdparty->fetch($labour_inspector_id);
 	$object->thirdparty = $thirdparty;
 
-	$modelmail = 'thirdparty';
+	$modelmail = 'preventionplan';
 	$defaulttopic = 'Information';
 	$diroutput = $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/' . $object->element . 'document';
 	$ref = $object->ref . '/';
