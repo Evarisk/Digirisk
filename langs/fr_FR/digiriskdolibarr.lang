@@ -291,7 +291,7 @@ PreventionPlanPendingSignatureTrigger = Plan de prévention en attente de signat
 PreventionPlanLockTrigger = Plan de prévention verrouillé - Prêt pour la génération du documuent
 PreventionPlanArchivedTrigger = Plan de prévention archivé
 PreventionPlanAddAttendantTrigger = Ajout d'un participant au plan de prévention
-PreventionPlanSentByMailTrigger = Email plan de prévention envoyée
+PreventionPlanSentByMailTrigger = Email plan de prévention envoyé
 
 # Mod Numbering - Modèle de numérotation
 DigiriskPreventionPlanNumberingModule = Modèle de numérotation des plans de prévention de Digirisk
