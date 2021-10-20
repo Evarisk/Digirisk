@@ -391,7 +391,7 @@ fk_preventionplan = Plan de prévention lié
 PreventionPlanLabel = Récapitulatif du plan de prévention
 PreventionPlanSubject = Email plan de prévention
 PreventionPlanContent = Veuillez trouver ci-joint le document ODT du plan de prévention.
-AdministrativeService = Service administratif
+QHSEService = Service QHSE
 WithKindRegards = Bien cordialement
 
 
