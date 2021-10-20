@@ -1544,6 +1544,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 
 		$formmail->param['langsmodels'] = (empty($newlang) ? $langs->defaultlang : $newlang);
 		$formmail->fromtype = (GETPOST('fromtype') ?GETPOST('fromtype') : (!empty($conf->global->MAIN_MAIL_DEFAULT_FROMTYPE) ? $conf->global->MAIN_MAIL_DEFAULT_FROMTYPE : 'user'));
+		$formmail->fromid   = $maitre_oeuvre->id;
 		$formmail->trackid  = $trackid;
 		$formmail->fromname = $maitre_oeuvre->firstname . ' ' . $maitre_oeuvre->lastname;
 		$formmail->frommail = $maitre_oeuvre->email;
