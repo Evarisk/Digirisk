@@ -708,7 +708,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->type_code   = 'AC_OTH_AUTO';
 				$actioncomm->label       = $langs->trans('PreventionPlanSentByMailTrigger');
 				$actioncomm->datep       = $now;
-				$actioncomm->fk_element  = $object->fk_object;
+				$actioncomm->fk_element  = $object->id;
 				$actioncomm->userownerid = $user->id;
 				$actioncomm->percentage  = -1;
 
