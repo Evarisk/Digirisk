@@ -176,7 +176,7 @@ function digiriskdolibarrAdminDigiriskElementPrepareHead()
 	$h++;
 
 	$head[$h][0] = dol_buildpath("/digiriskdolibarr/admin/digiriskelement/deletedelements.php", 1);
-	$head[$h][1] = $langs->trans("DeletedElements");
+	$head[$h][1] = $langs->trans("HiddenElements");
 	$head[$h][2] = 'deletedelements';
 	$h++;
 

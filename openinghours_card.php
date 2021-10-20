@@ -95,6 +95,7 @@ if (($action == 'update' && !GETPOST("cancel", 'alpha')) || ($action == 'updatee
 	$object->saturday = GETPOST('saturday', 'string');
 	$object->sunday = GETPOST('sunday', 'string');
 	$object->create($user);
+	setEventMessages($langs->trans('ThirdPartyOpeningHoursSave'), null, 'mesgs');
 }
 
 

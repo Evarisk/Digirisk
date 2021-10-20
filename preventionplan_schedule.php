@@ -96,6 +96,8 @@ if (empty($reshook)) {
 		$object->sunday = GETPOST('sunday', 'string');
 
 		$object->create($user);
+
+		setEventMessages($langs->trans('PreventionPlanScheduleSave'), null, 'mesgs');
 	}
 }
 

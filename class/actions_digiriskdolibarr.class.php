@@ -140,4 +140,36 @@ class ActionsDigiriskdolibarr
 			return -1;
 		}
 	}
+
+	/**
+	 *  Overloading the doActions function : replacing the parent's function with the one below
+	 *
+	 * @param $parameters
+	 * @param $object
+	 * @param $action
+	 * @param $hookmanager
+	 * @return int
+	 */
+	public function emailElementlist($parameters, &$object, &$action, $hookmanager)
+	{
+		global $db, $conf, $user, $langs;
+
+		$error = 0; // Error counter
+
+		/* print_r($parameters); print_r($object); echo "action: " . $action; */
+		if (in_array($parameters['currentcontext'], array('emailtemplates')))	    // do something only for the context 'somecontext1' or 'somecontext2'
+		{
+			if ($conf->digiriskdolibarr->enabled && $user->rights->digiriskdolibarr->preventionplan->read) {
+				$value = array('preventionplan' => '<i class="fas fa-info"></i>  ' . dol_escape_htmltag($langs->trans('PreventionPlan')));
+			}
+		}
+
+		if (!$error) {
+			$this->results = $value;
+			return 0; // or return 1 to replace standard code
+		} else {
+			$this->errors[] = 'Error message';
+			return -1;
+		}
+	}
 }

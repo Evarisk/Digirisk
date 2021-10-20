@@ -166,6 +166,7 @@ ThirdPartyOpeningHours = Horaires du tiers
 ExceptionsToWorkingHours = Dérogations aux horaires de travail
 PermanentDerogation = Dérogation permanente
 OccasionalDerogation = Dérogation occasionnelle
+ThirdPartyOpeningHoursSave = Les horaires d'ouverture du tiers ont bien été enregistrés
 
 
 
@@ -217,7 +218,7 @@ ResponsibleToNotify = Responsable à prévenir
 LocationOfDetailedInstructions = Emplacement de la consigne détaillée
 FirstAid = Premiers secours
 AddPhoneNumber = Ajouter un numéro de téléphone à l'utilisateur
-
+ConfigureLabourInspector = Configurer un inspecteur du travail
 SocietyAdditionalDetails = Informations complémentaires de la société
 GeneralMeansAtDisposal = Moyens généraux mis à disposition
 GeneralInstructions = Consignes générales
@@ -290,6 +291,7 @@ PreventionPlanPendingSignatureTrigger = Plan de prévention en attente de signat
 PreventionPlanLockTrigger = Plan de prévention verrouillé - Prêt pour la génération du documuent
 PreventionPlanArchivedTrigger = Plan de prévention archivé
 PreventionPlanAddAttendantTrigger = Ajout d'un participant au plan de prévention
+PreventionPlanSentByMailTrigger = Email plan de prévention envoyé
 
 # Mod Numbering - Modèle de numérotation
 DigiriskPreventionPlanNumberingModule = Modèle de numérotation des plans de prévention de Digirisk
@@ -354,7 +356,7 @@ ValidatePreventionPlan = Valider le plan de prévention
 ConfirmValidatePreventionPlan = Êtes-vous sûr de vouloir valider le plan de prévention ? <br> La validation permet aux participants de signer le document mais <b> empêche l'ajout de nouveaux participants ou la modification du plan de prévention </b>.
 ReOpenPreventionPlan = Ouvrir à nouveau le plan de prévention
 ConfirmReOpenPreventionPlan = Êtes-vous sûr de vouloir rouvrir le plan de prévention ? La réouverture permet la modification du plan de prévention et l'ajout de nouveaux participants mais <b>toutes les signatures du document seront perdues</b>.
-PreventionPlanMustBeValidated = Le plan de prévention doit être validé pour que les participants puissent signer
+PreventionPlanMustBeValidatedToSign = Le plan de prévention doit être validé pour que les participants puissent signer
 PreventionPlanRiskList = Liste des risques du plan de prévention
 PreventionPlanAttendants = Plan de prévention - Participants
 ActionsPreventionPlanRisk = Actions
@@ -371,6 +373,26 @@ ErrorNoEmailForMaitreOeuvre = Erreur : Le responsable de l'Entreprise Utilisatri
 ErrorNoEmailForExtIntervenant = Erreur : Le (ou les) intervenant(s) ne possède(nt) pas d'email
 SignatureEmailSubject = Signature du plan de prevention
 DocumentName = Référence du document
+PreventionPlanScheduleSave = Les horaires du plan de prévention ont bien été enregistrés
+GoToLock = Verrouiller le plan de prévention
+GoToValidate = Valider le plan de prévention
+PreventionPlanMustBeValidated = Le plan de prévention doit être validé pour le rouvrir
+PreventionPlanMustBeInProgress = Le plan de prévention doit être en cours pour accéder à cette fonctionnalité
+PreventionPlanMustBeInProgressToValidate = Le plan de prévention est déjà validé
+PreventionPlanMustBeLockedToSendEmail = Le plan de prévention doit être verrouillé pour envoyer un email
+CSEMustBeAlerted3DaysBeforeVisit = Le CSE doit être prévenu 3 jours avant l'inspection commune préalable
+LabourInspectorFirstName = Inspecteur du
+LabourInspectorLastName = travail
+PreventionPlanData = Données du Plan de prévention
+MaitreOeuvreDescription = L'utilisateur utilisé par défaut comme Responsable de l'Entreprise Utilisatrice
+fk_preventionplan = Plan de prévention lié
+
+# Email - Mail
+PreventionPlanLabel = Récapitulatif du plan de prévention
+PreventionPlanSubject = Email plan de prévention
+PreventionPlanContent = Veuillez trouver ci-joint le document ODT du plan de prévention.
+QHSEService = Service QHSE
+WithKindRegards = Bien cordialement
 
 
 
@@ -555,7 +577,7 @@ WorkUnitDocument = Fiche d'Unité de travail
 ReadDigiriskElement = Consulter les éléments digirisk
 CreateDigiriskElement = Créer/Modifier les éléments digirisk
 DeleteDigiriskElement = Supprimer les éléments digirisk
-HiddenElements = Eléments masqués
+HiddenElements = Corbeille
 
 # Data - Donnée
 NewDigiriskElement = Nouveau élément digirisk
@@ -582,9 +604,9 @@ Groupment = Groupement
 NewGroupment = Nouveau groupement
 ModifyGroupment = Modifier groupement
 TrashGroupment = Groupement poubelle
-DeletedElements = Eléments masqués
-DeletedDigiriskElement = Groupements / Unités de travail masqués
-ShowDeletedDigiriskElement = Afficher les groupements / unités de travail masqués
+DeletedElements = Corbeille
+DeletedDigiriskElement = Groupements / Unités de travail placées dans la corbeille
+ShowDeletedDigiriskElement = Afficher les groupements / unités de travail qui se trouve dans la corbeille
 
 #
 # WorkUnit - Unité de travail
@@ -707,7 +729,10 @@ RiskDescription = Description du risque
 RiskDescriptionDescription = Activer le champ description du risque
 RiskDescriptionNotActivated = Veuillez activer le champ description du risque dans Configuration du module / Analyse des risques / Risques
 AddRisk = Ajouter un risque
+NoDescriptionThere = Aucune description renseignée sur ce risque
 NoRiskThere = "Aucun risque spécifique sur cette unité" Cependant vous pouvez être soumis aux risques génériques de vos groupements de travail.
+fk_risk = Risque lié
+
 
 
 
@@ -798,6 +823,7 @@ DigiriskElementRiskSign = Signalisation
 
 # Data - Donnée
 
+ActionPlan = Plan d'action
 Task = Tâche
 TheTask = La tâche
 TaskWellCreated = Tâche créée
@@ -827,6 +853,8 @@ ShowTaskProgress = Progression des tâches
 ShowTaskProgressDescription = Afficher la progression des tâches à 100
 ShowAllTasks = Toutes les tâches
 ShowAllTasksDescription = Afficher toutes les tâches
+NoTaskCompletedThere = Aucune tâche en cours
+NoTaskUnCompletedThere = Aucune tâche terminée
 
 
 
@@ -842,8 +870,8 @@ DigiriskSignatureDeletedTrigger = Participant supprimé
 
 
 # Data - Donnée
-SignatureResponsibles = Signatures des responsables
-SignatureIntervenants = Signatures des intervenants
+SignatureResponsibles = Signature des responsables
+SignatureIntervenants = Intervenants
 Sign = Signer
 Erase = Effacer
 DisclaimerSignatureTitle = Attention
@@ -867,10 +895,10 @@ SignaturePublicAccess = Une interface publique ne nécessitant aucune identifica
 SignatureActivatePublicInterface = Activer l'interface publique
 SignatureShowCompanyLogo = Afficher le logo de la société dans l'interface publique
 SignatureShowCompanyLogoHelp = Activez cette option pour masquer le logo de la société dans les pages de l'interface publique
-SignatureMaitreOeuvre = Signature du responsable de l'entreprise utilisatrice
-SignatureResponsibleExtSociety = Signature du responsable de l'entreprise extérieure
+SignatureMaitreOeuvre = Responsable de l'Entreprise Utilisatrice
+SignatureResponsibleExtSociety = Responsable de l'Entreprise Extérieure
 Role = Rôle
-NewIntervenants = Ajouter un nouveau intervenant
+NewIntervenants = Ajouter un nouvel intervenant
 SignatureLink = Lien signature
 SendMailDate = Date d'envoi d'email
 DeleteAttendant = Supprimer l'intervenant
@@ -886,7 +914,7 @@ AddSignatureSuccess = Signature du document réussie
 AddSignatureSuccessText = La signature a bien été enregistrée pour le document
 SignatureSeeDocument = Voir
 ShowDocument = Voir le document
-
+AddAttendants = Ajouter
 
 
 
@@ -967,3 +995,5 @@ LabourInspectorName = DREETS
 UrlLabourInspector = https://travail-emploi.gouv.fr/ministere/organisation/article/dreets-directions-regionales-de-l-economie-de-l-emploi-du-travail-et-des
 ErrorSetupEmail = Erreur de configuration des mails, vous n'avez pas configuré votre serveur d'envoi de mail
 IDCCTooltip = Ce champ provient du module Digirisk pour Dolibarr </br> La nomenclature des conventions collectives provient de travail-emploi.gouv.fr
+ContactNoEmail = Les contacts affichés en grisé sont des contacts qui ne possèdent pas d'email
+NoEmailContact = Pas d'email sur ce contact

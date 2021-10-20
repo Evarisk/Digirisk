@@ -6,7 +6,28 @@
     .wpeo-button {
       width: 100%;
       height: 100%;
+      padding: 12px 14px;
+
+      &:hover {
+        box-shadow: inset 0 -4.6em rgb(255 255 255 / 25%)
+      }
+
+      &.button-yellow {
+        border-color: #e88740;
+        background: #e88740;
+      }
+      &.button-blue {
+        border-color: #009cc2;
+        background: #009cc2;
+      }
+      &.button-red {
+        border-color: #c44b2a;
+        background: #c44b2a;
+      }
     }
+    //&:not(.active) .wpeo-button {
+    //  border-width: 0;
+    //}
     &.active .wpeo-button {
       border-color: #000 !important;
     }

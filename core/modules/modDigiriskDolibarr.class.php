@@ -57,7 +57,7 @@ class modDigiriskdolibarr extends DolibarrModules
 		$this->descriptionlong = "Digirisk";
 		$this->editor_name     = 'Evarisk';
 		$this->editor_url      = 'https://evarisk.com';
-		$this->version         = '8.2.0';
+		$this->version         = '8.2.1';
 		$this->const_name      = 'MAIN_MODULE_'.strtoupper($this->name);
 		$this->picto           ='digiriskdolibarr@digiriskdolibarr';
 
@@ -86,7 +86,8 @@ class modDigiriskdolibarr extends DolibarrModules
 			'hooks' => array(
 				'completeTabsHead',
 				'admincompany',
-				'globaladmin'
+				'globaladmin',
+				'emailtemplates'
 			),
 			'tabs' => array(
 				'mycompany_admin'
@@ -206,6 +207,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			83 => array('MAIN_AGENDA_ACTIONAUTO_PREVENTIONPLAN_CREATE','chaine',1,'', $conf->entity),
 			84 => array('MAIN_AGENDA_ACTIONAUTO_PREVENTIONPLAN_EDIT','chaine',1,'', $conf->entity),
 			250 => array('DIGIRISKDOLIBARR_PREVENTIONPLAN_PROJECT','integer', 0,'', $conf->entity),
+			251 => array('DIGIRISKDOLIBARR_PREVENTIONPLAN_MAITRE_OEUVRE','integer', 0,'', $conf->entity),
 
 			// CONST PREVENTION PLAN DOCUMENT
 			85 => array('MAIN_AGENDA_ACTIONAUTO_PREVENTIONPLANDOCUMENT_CREATE','chaine',1,'', $conf->entity),
@@ -269,8 +271,11 @@ class modDigiriskdolibarr extends DolibarrModules
 			150 => array('MAIN_AGENDA_ACTIONAUTO_RISKSIGN_CREATE','chaine',1,'', $conf->entity),
 			151 => array('DIGIRISKDOLIBARR_RISKSIGN_ADDON','chaine', 'mod_risksign_standard' ,'', $conf->entity),
 
-			// CONST TASK
+			// CONST PROJET
+			155 => array('DIGIRISKDOLIBARR_PROJECT_TAGS_SET','integer', 0,'', $conf->entity),
 			160 => array('DIGIRISKDOLIBARR_DU_PROJECT','integer', 0,'', $conf->entity),
+
+			// CONST TASK
 			161 => array('DIGIRISKDOLIBARR_ACTIVE_STANDARD','integer', 0,'', $conf->entity),
 			162 => array('DIGIRISKDOLIBARR_DOCUMENT_MODELS_SET','integer', 0,'', $conf->entity),
 			163 => array('DIGIRISKDOLIBARR_THIRDPARTY_SET','integer', 0,'', $conf->entity),
@@ -669,6 +674,21 @@ class modDigiriskdolibarr extends DolibarrModules
 		$this->menu[$r++]=array(
 			'fk_menu'=>'fk_mainmenu=digiriskdolibarr',	    // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
 			'type'=>'left',			                // This is a Left menu entry
+			'titre'=>'<i class="fas fa-tasks"></i>  ' . $langs->trans('ActionPlan'),
+			'mainmenu'=>'digiriskdolibarr',
+			'leftmenu'=>'digirisktools',
+			'url'=>'/projet/tasks.php?id=' . $conf->global->DIGIRISKDOLIBARR_DU_PROJECT,
+			'langs'=>'digiriskdolibarr@digiriskdolibarr',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
+			'position'=>48520+$r,
+			'enabled'=>'$conf->digiriskdolibarr->enabled',  // Define condition to show or hide menu entry. Use '$conf->digiriskdolibarr->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
+			'perms'=>'$user->admin && $user->rights->digiriskdolibarr->digiriskelement->read',			                // Use 'perms'=>'$user->rights->digiriskdolibarr->level1->level2' if you want your menu with a permission rules
+			'target'=>'',
+			'user'=>0,				                // 0=Menu for internal users, 1=external users, 2=both
+		);
+
+		$this->menu[$r++]=array(
+			'fk_menu'=>'fk_mainmenu=digiriskdolibarr',	    // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
+			'type'=>'left',			                // This is a Left menu entry
 			'titre'=>'<i class="fas fa-wrench"></i>  ' . $langs->trans('Tools'),
 			'mainmenu'=>'digiriskdolibarr',
 			'leftmenu'=>'digirisktools',
@@ -845,7 +865,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			$poison_control_center->url    = '';
 			$poison_control_centerID       = $poison_control_center->create($user);
 
-			$resources->digirisk_dolibarr_set_resources($this->db,1,  'LabourInspector',  'societe', array($labour_inspectorID), $conf->entity);
+			$resources->digirisk_dolibarr_set_resources($this->db,1,  'LabourInspectorSociety',  'societe', array($labour_inspectorID), $conf->entity);
 			$resources->digirisk_dolibarr_set_resources($this->db,1,  'Police',  'societe', array($policeID), $conf->entity);
 			$resources->digirisk_dolibarr_set_resources($this->db,1,  'SAMU',  'societe', array($samuID), $conf->entity);
 			$resources->digirisk_dolibarr_set_resources($this->db,1,  'Pompiers',  'societe', array($pompiersID), $conf->entity);
@@ -884,11 +904,30 @@ class modDigiriskdolibarr extends DolibarrModules
 			$poison_control_center->url    = '';
 			$poison_control_centerID       = $poison_control_center->create($user);
 
-			$resources->digirisk_dolibarr_set_resources($this->db,1,  'LabourInspector',  'societe', array($labour_inspectorID), $conf->entity);
+			$resources->digirisk_dolibarr_set_resources($this->db,1,  'LabourInspectorSociety',  'societe', array($labour_inspectorID), $conf->entity);
 			$resources->digirisk_dolibarr_set_resources($this->db,1,  'RightsDefender',  'societe', array($rights_defenderID), $conf->entity);
 			$resources->digirisk_dolibarr_set_resources($this->db,1,  'PoisonControlCenter',  'societe', array($poison_control_centerID), $conf->entity);
 
 			dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_THIRDPARTY_SET', 2, 'integer', 0, '', $conf->entity);
+		}
+
+		if ( $conf->global->DIGIRISKDOLIBARR_CONTACTS_SET ==  0 ) {
+			require_once DOL_DOCUMENT_ROOT . '/contact/class/contact.class.php';
+			require_once __DIR__ . '/../../class/digiriskresources.class.php';
+
+			$contact   = new Contact($this->db);
+			$resources = new DigiriskResources($this->db);
+			$allLinks = $resources->digirisk_dolibarr_fetch_resource('LabourInspectorSociety');
+
+			$labour_inspector            = $contact;
+			$labour_inspector->socid     = $allLinks;
+			$labour_inspector->firstname = $langs->trans('LabourInspectorFirstName');
+			$labour_inspector->lastname  = $langs->trans('LabourInspectorLastName');
+			$labour_inspectorID          = $labour_inspector->create($user);
+
+			$resources->digirisk_dolibarr_set_resources($this->db,1, 'LabourInspectorContact', 'socpeople', array($labour_inspectorID), $conf->entity);
+
+			dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_CONTACTS_SET', 2, 'integer', 0, '', $conf->entity);
 		}
 
 		// Create extrafields during init
@@ -897,7 +936,13 @@ class modDigiriskdolibarr extends DolibarrModules
 
 		$extra_fields->update('fk_risk', $langs->trans("fk_risk"), 'sellist', '', 'projet_task', 0, 0, 1020, 'a:1:{s:7:"options";a:1:{s:50:"digiriskdolibarr_risk:ref:rowid::entity = $ENTITY$";N;}}', '', '', 1);
 		$extra_fields->addExtraField( 'fk_risk', $langs->trans("fk_risk"), 'sellist', 1020, '', 'projet_task', 0, 0, '', 'a:1:{s:7:"options";a:1:{s:50:"digiriskdolibarr_risk:ref:rowid::entity = $ENTITY$";N;}}', '', '', 1);
+
+		$extra_fields->addExtraField( 'fk_preventionplan', $langs->trans("fk_preventionplan"), 'sellist', 1020, '', 'projet_task', 0, 0, '', 'a:1:{s:7:"options";a:1:{s:60:"digiriskdolibarr_preventionplan:ref:rowid::entity = $ENTITY$";N;}}', '', '', 1);
+//		$extra_fields->addExtraField( 'fk_accident', $langs->trans("fk_accident"), 'sellist', 1020, '', 'projet_task', 0, 0, '', 'a:1:{s:7:"options";a:1:{s:50:"digiriskdolibarr_accident:ref:rowid::entity = $ENTITY$";N;}a:1:{s:7:"options";a:1:{s:50:"digiriskdolibarr_risk:ref:rowid::entity = $ENTITY$";N;}}}', '', '', 1);
+
+		//Used for data import from Digirisk Wordpress
 		$extra_fields->addExtraField( 'wp_digi_id', $langs->trans("WPDigiID"), 'int', 100, '', 'digiriskdolibarr_digiriskelement', 1, 0, '', '', '', '', 0);
+
 		if ($conf->global->MAIN_EXTRAFIELDS_USE_SELECT2 == 0) {
 			dolibarr_set_const($this->db, 'MAIN_EXTRAFIELDS_USE_SELECT2', 1, 'integer', 0, '', $conf->entity);
 		}
@@ -926,6 +971,42 @@ class modDigiriskdolibarr extends DolibarrModules
 				}
 			}
 			dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_DIGIRISKELEMENT_MEDIAS_BACKWARD_COMPATIBILITY', 1, 'integer', 0, '', $conf->entity);
+		}
+
+		//Categorie
+		if ($conf->global->DIGIRISKDOLIBARR_PROJECT_TAGS_SET == 0) {
+			require_once DOL_DOCUMENT_ROOT.'/categories/class/categorie.class.php';
+			require_once DOL_DOCUMENT_ROOT.'/projet/class/project.class.php';
+
+			$project = new Project($this->db);
+			$tags = new Categorie($this->db);
+
+			$tags->label = 'QHSE';
+			$tags->type = 'project';
+			$tag_id = $tags->create($user);
+
+			$tags->label = 'DU';
+			$tags->type = 'project';
+			$tags->fk_parent = $tag_id;
+			$tags->create($user);
+
+			$project->fetch($conf->global->DIGIRISKDOLIBARR_DU_PROJECT);
+			$tags->add_type($project, 'project');
+
+			$tags->label = 'PP';
+			$tags->type = 'project';
+			$tags->fk_parent = $tag_id;
+			$tags->create($user);
+
+			$project->fetch($conf->global->DIGIRISKDOLIBARR_PREVENTIONPLAN_PROJECT);
+			$tags->add_type($project, 'project');
+
+			$tags->label = 'ACC';
+			$tags->type = 'project';
+			$tags->fk_parent = $tag_id;
+			$tags->create($user);
+
+			dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_PROJECT_TAGS_SET', 1, 'integer', 0, '', $conf->entity);
 		}
 
 		return $this->_init($sql, $options);

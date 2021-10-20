@@ -300,14 +300,22 @@ print dol_get_fiche_end(); ?>
 <div class="wpeo-notice notice-warning">
 	<div class="notice-content">
 		<div class="notice-title"><?php echo $langs->trans('DisclaimerSignatureTitle') ?></div>
-		<div class="notice-subtitle"><?php echo $langs->trans("PreventionPlanMustBeValidated") ?></div>
+		<div class="notice-subtitle"><?php echo $langs->trans("PreventionPlanMustBeValidatedToSign") ?></div>
 	</div>
+	<a class="butAction" style="width = 100%;margin-right:0" href="<?php echo DOL_URL_ROOT ?>/custom/digiriskdolibarr/preventionplan_card.php?id=<?php echo $id ?>"><?php echo $langs->trans("GoToValidate") ?></a>;
 </div>
 <?php endif; ?>
 <div class="noticeSignatureSuccess wpeo-notice notice-success hidden">
-	<div class="notice-content">
-		<div class="notice-title"><?php echo $langs->trans('AddSignatureSuccess') ?></div>
-		<div class="notice-subtitle"><?php echo $langs->trans("AddSignatureSuccessText") . GETPOST('signature_id')?></div>
+	<div class="all-notice-content">
+		<div class="notice-content">
+			<div class="notice-title"><?php echo $langs->trans('AddSignatureSuccess') ?></div>
+			<div class="notice-subtitle"><?php echo $langs->trans("AddSignatureSuccessText") . GETPOST('signature_id')?></div>
+		</div>
+		<?php
+		if ($signatory->checkSignatoriesSignatures($object->id)) {
+			print '<a class="butAction" style="width = 100%;margin-right:0" href="'.DOL_URL_ROOT . '/custom/digiriskdolibarr/preventionplan_card.php?id='.$id.'">'. $langs->trans("GoToLock").'</a>';
+		}
+		?>
 	</div>
 </div>
 <?php
@@ -360,6 +368,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	print load_fiche_titre($langs->trans("SignatureMaitreOeuvre"), '', '');
 
 	print '<div class="signatures-container">';
+
 	print '<table class="border centpercent tableforfield">';
 	print '<tr class="liste_titre">';
 	print '<td>' . $langs->trans("Name") . '</td>';
@@ -476,6 +485,14 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	print '<td class="center">' . $langs->trans("Signature") . '</td>';
 	print '</tr>';
 
+	$contacts = fetchAllSocPeople('',  '',  0,  0, array('customsql' => "s.rowid = $element->id AND c.email IS NULL OR c.email = ''" ));
+	$contacts_no_email = array();
+	if (is_array($contacts) && !empty ($contacts) && $contacts > 0) {
+		foreach ($contacts as $element_id) {
+			$contacts_no_email[$element_id->id] = $element_id->id;
+		}
+	}
+
 	$already_selected_intervenants[$contact->id] = $contact->id;
 	$j = 1;
 	if (is_array($ext_society_intervenants) && !empty ($ext_society_intervenants) && $ext_society_intervenants > 0) {
@@ -528,7 +545,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 		//Intervenants extérieurs
 		$ext_society = $digiriskresources->fetchResourcesFromObject('PP_EXT_SOCIETY', $object);
 		print '<tr class="oddeven"><td class="maxwidth200">';
-		print $form->selectcontacts($ext_society->id, '', 'ext_intervenants[]', 0, $already_selected_intervenants, '', 0, 'width200', false, 0, array(), false, 'multiple', 'ext_intervenants');
+		print digirisk_selectcontacts($ext_society->id, GETPOST('ext_intervenants'), 'ext_intervenants[]', 0, $contacts_no_email, '', 0, 'width200', false, 1, array(), false, 'multiple', 'ext_intervenants', false,0, $already_selected_intervenants);
 		print '</td>';
 		print '<td>'.$langs->trans("ExtSocietyIntervenants").'</td>';
 		print '<td class="center">';

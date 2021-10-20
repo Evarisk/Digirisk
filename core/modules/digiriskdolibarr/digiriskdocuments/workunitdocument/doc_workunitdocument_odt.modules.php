@@ -404,10 +404,10 @@ class doc_workunitdocument_odt extends ModeleODTWorkUnitDocument
 								$tmparray['nomDanger']                   = $langs->trans('NoData');
 								$tmparray['identifiantRisque']           = $langs->trans('NoData');
 								$tmparray['quotationRisque']             = $langs->trans('NoData');
-								$tmparray['descriptionRisque']           = $langs->trans('NoData');
+								$tmparray['descriptionRisque']           = $langs->trans('NoDescriptionThere');
 								$tmparray['commentaireEvaluation']       = $langs->trans('NoRiskThere');
-								$tmparray['actionPreventionUncompleted'] = $langs->trans('NoData');
-								$tmparray['actionPreventionCompleted']   = $langs->trans('NoData');
+								$tmparray['actionPreventionUncompleted'] = $langs->trans('NoTaskUnCompletedThere');
+								$tmparray['actionPreventionCompleted']   = $langs->trans('NoTaskCompletedThere');
 								foreach ($tmparray as $key => $val) {
 									try {
 										if (empty($val)) {

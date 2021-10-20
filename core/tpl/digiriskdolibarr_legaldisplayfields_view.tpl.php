@@ -119,10 +119,10 @@ print '<td class="titlefield">'.$form->textwithpicto($langs->trans("RightsDefend
 		print $legaldisplay->emergency_service->right_defender;
 		print '</td></tr>';
 
-// Antipoison
+// Centre Antipoison
 
 print '<tr>';
-print '<td class="titlefield">'.$form->textwithpicto($langs->trans("Antipoison"), $langs->trans('HowToSetDataLegalDisplay')).'</td>';
+print '<td class="titlefield">'.$form->textwithpicto($langs->trans("PoisonControlCenter"), $langs->trans('HowToSetDataLegalDisplay')).'</td>';
 	print '<td>';
 		print $legaldisplay->emergency_service->poison_control_center;
 		print '</td></tr>';
