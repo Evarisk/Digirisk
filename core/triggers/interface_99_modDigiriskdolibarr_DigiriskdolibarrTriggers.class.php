@@ -698,6 +698,21 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				break;
 
 			case 'PREVENTIONPLAN_SENTBYMAIL' :
+				dol_syslog("Trigger '".$this->name."' for action '$action' launched by ".__FILE__.". id=".$object->id);
+				require_once DOL_DOCUMENT_ROOT.'/comm/action/class/actioncomm.class.php';
+				$now = dol_now();
+				$actioncomm = new ActionComm($this->db);
+
+				$actioncomm->elementtype = 'preventionplan@digiriskdolibarr';
+				$actioncomm->code        = 'AC_PREVENTIONPLAN_SENTBYMAIL';
+				$actioncomm->type_code   = 'AC_OTH_AUTO';
+				$actioncomm->label       = $langs->trans('PreventionPlanSentByMailTrigger');
+				$actioncomm->datep       = $now;
+				$actioncomm->fk_element  = $object->fk_object;
+				$actioncomm->userownerid = $user->id;
+				$actioncomm->percentage  = -1;
+
+				$actioncomm->create($user);
 				$object->last_email_sent_date = dol_now('tzuser');
 				$object->update($user, true);
 				break;
