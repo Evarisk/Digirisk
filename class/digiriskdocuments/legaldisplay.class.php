@@ -187,11 +187,11 @@ class LegalDisplay extends DigiriskDocuments
 				$json['LegalDisplay']['emergency_service']['right_defender'] = $rights_defender->phone;
 			}
 
-			$antipoison = new Societe($this->db);
-			$result = $antipoison->fetch($digirisk_resources['Antipoison']->id[0]);
+			$poison_control_center = new Societe($this->db);
+			$result = $poison_control_center->fetch($digirisk_resources['PoisonControlCenter']->id[0]);
 
 			if ($result > 0) {
-				$json['LegalDisplay']['emergency_service']['poison_control_center'] = $antipoison->phone;
+				$json['LegalDisplay']['emergency_service']['poison_control_center'] = $poison_control_center->phone;
 			}
 
 			$responsible_prevent = new User($this->db);

@@ -96,7 +96,7 @@ if (($action == 'update' && !GETPOST("cancel", 'alpha')) || ($action == 'updatee
 	$police_id[0] 		= GETPOST('police_socid', 'int') ? GETPOST('police_socid', 'int') : $allLinks['Police']->id[0] ;
 	$touteurgence_id[0] = GETPOST('touteurgence_socid', 'int') ? GETPOST('touteurgence_socid','int') : $allLinks['AllEmergencies']->id[0];
 	$defenseur_id[0] 	= GETPOST('defenseur_socid', 'int') ? GETPOST('defenseur_socid', 'int') : $allLinks['RightsDefender']->id[0] ;
-	$antipoison_id[0] 	= GETPOST('antipoison_socid', 'int') ? GETPOST('antipoison_socid','int') : $allLinks['Antipoison']->id[0];
+	$antipoison_id[0] 	= GETPOST('antipoison_socid', 'int') ? GETPOST('antipoison_socid','int') : $allLinks['PoisonControlCenter']->id[0];
 	$responsible_id[0]	= GETPOST('responsible_socid', 'int') ? GETPOST('responsible_socid','int') : $allLinks['Responsible']->id[0];
 
 	$resources->digirisk_dolibarr_set_resources($db,$user->id,  'SAMU',  'societe', $samu_id, $conf->entity);
@@ -104,7 +104,7 @@ if (($action == 'update' && !GETPOST("cancel", 'alpha')) || ($action == 'updatee
 	$resources->digirisk_dolibarr_set_resources($db,$user->id,  'Police',  'societe', $police_id, $conf->entity);
 	$resources->digirisk_dolibarr_set_resources($db,$user->id,  'AllEmergencies',  'societe', $touteurgence_id, $conf->entity);
 	$resources->digirisk_dolibarr_set_resources($db,$user->id,  'RightsDefender',  'societe', $defenseur_id, $conf->entity);
-	$resources->digirisk_dolibarr_set_resources($db,$user->id,  'Antipoison',  'societe', $antipoison_id, $conf->entity);
+	$resources->digirisk_dolibarr_set_resources($db,$user->id,  'PoisonControlCenter',  'societe', $antipoison_id, $conf->entity);
 	$resources->digirisk_dolibarr_set_resources($db,$user->id,  'Responsible',  'societe', $responsible_id, $conf->entity);
 
 	dolibarr_set_const($db, "DIGIRISK_LOCATION_OF_DETAILED_INSTRUCTION", GETPOST("emplacementCD", 'none'), 'chaine', 0, '', $conf->entity);
@@ -391,13 +391,13 @@ if ($conf->societe->enabled) {
 	print '<tr class="liste_titre"><th class="titlefield wordbreak">'.$langs->trans("PoisonControlCenter").'</th><th>.<i class="fas fa-skull-crossbones"></i></th></tr>'."\n";
 
 	print '<tr class="oddeven"><td class="titlefieldcreate nowrap">'.$langs->trans("ActionOnCompany").'</td><td>';
-	$antipoison_resources = $allLinks['Antipoison'];
+	$poison_control_center_resources = $allLinks['PoisonControlCenter'];
 
 	// * Third party concerned - Tiers concerné *
 
-	if ($antipoison_resources->ref == 'Antipoison') {
-		$societe->fetch($antipoison_resources->id[0]);
-		print $form->select_company($antipoison_resources->id[0], 'antipoison_socid', '', 'SelectThirdParty', 1, 0, 0, 0, 'minwidth300');
+	if ($poison_control_center_resources->ref == 'PoisonControlCenter') {
+		$societe->fetch($poison_control_center_resources->id[0]);
+		print $form->select_company($poison_control_center_resources->id[0], 'antipoison_socid', '', 'SelectThirdParty', 1, 0, 0, 0, 'minwidth300');
 
 	}
 	else {
