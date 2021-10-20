@@ -1539,21 +1539,20 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 		// Create form for email
 		include_once DOL_DOCUMENT_ROOT.'/core/class/html.formmail.class.php';
 		$formmail = new FormMail($db);
+		$maitre_oeuvre = $signatory->fetchSignatory('PP_MAITRE_OEUVRE', $object->id);
+		$maitre_oeuvre = array_shift($maitre_oeuvre);
 
 		$formmail->param['langsmodels'] = (empty($newlang) ? $langs->defaultlang : $newlang);
 		$formmail->fromtype = (GETPOST('fromtype') ?GETPOST('fromtype') : (!empty($conf->global->MAIN_MAIL_DEFAULT_FROMTYPE) ? $conf->global->MAIN_MAIL_DEFAULT_FROMTYPE : 'user'));
-
-		$formmail->trackid = $trackid;
-
-		if (!empty($conf->global->MAIN_EMAIL_ADD_TRACK_ID) && ($conf->global->MAIN_EMAIL_ADD_TRACK_ID & 2))	// If bit 2 is set
-		{
-			include DOL_DOCUMENT_ROOT.'/core/lib/functions2.lib.php';
-			$formmail->frommail = dolAddEmailTrackId($formmail->frommail, $trackid);
-		}
+		$formmail->trackid  = $trackid;
+		$formmail->fromname = $maitre_oeuvre->firstname . ' ' . $maitre_oeuvre->lastname;
+		$formmail->frommail = $maitre_oeuvre->email;
 		$formmail->withfrom = 1;
 
 		// Fill list of recipient with email inside <>.
 		$liste = array();
+
+		$labour_inspector_contact = $digiriskresources->fetchResourcesFromObject('PP_LABOUR_INSPECTOR_ASSIGNED', $object);
 
 		if (!empty($object->socid) && $object->socid > 0 && !is_object($object->thirdparty) && method_exists($object, 'fetch_thirdparty')) {
 			$object->fetch_thirdparty();
@@ -1562,7 +1561,6 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 		{
 			foreach ($object->thirdparty->thirdparty_and_contact_email_array(1) as $key => $value) {
 				$liste[$key] = $value;
-
 			}
 		}
 
@@ -1584,7 +1582,10 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 			}
 		}
 
-		$formmail->withto = $liste;
+
+		$withto = array($labour_inspector_contact->id => $labour_inspector_contact->firstname . ' ' .$labour_inspector_contact->lastname." <".$labour_inspector_contact->email.">");
+
+		$formmail->withto = $withto;
 		$formmail->withtofree = (GETPOSTISSET('sendto') ? (GETPOST('sendto', 'alphawithlgt') ? GETPOST('sendto', 'alphawithlgt') : '1') : '1');
 		$formmail->withtocc = $liste;
 		$formmail->withtoccc = $conf->global->MAIN_EMAIL_USECCC;
