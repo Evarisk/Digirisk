@@ -625,7 +625,8 @@ if (empty($reshook)) {
 	$triggersendname = 'PREVENTIONPLAN_SENTBYMAIL';
 	$mode = 'emailfromthirdparty';
 	$trackid = 'thi'.$object->id;
-	$labour_inspector_id = $allLinks['LabourInspectorSociety']->id[0];
+	$labour_inspector = $digiriskresources->fetchResourcesFromObject('PP_LABOUR_INSPECTOR', $object);
+	$labour_inspector_id = $labour_inspector->id;
 	$thirdparty->fetch($labour_inspector_id);
 	$object->thirdparty = $thirdparty;
 	include DOL_DOCUMENT_ROOT.'/core/actions_sendmails.inc.php';
@@ -1458,7 +1459,8 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	print '</div></div></div>';
 
 	// Presend form
-	$labour_inspector_id = $allLinks['LabourInspectorSociety']->id[0];
+	$labour_inspector = $digiriskresources->fetchResourcesFromObject('PP_LABOUR_INSPECTOR', $object);
+	$labour_inspector_id = $labour_inspector->id;
 	$thirdparty->fetch($labour_inspector_id);
 	$object->thirdparty = $thirdparty;
 
