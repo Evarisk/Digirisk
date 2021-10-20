@@ -623,7 +623,6 @@ if (empty($reshook)) {
 
 	// Actions to send emails
 	$triggersendname = 'PREVENTIONPLAN_SENTBYMAIL';
-	$paramname = 'socid';
 	$mode = 'emailfromthirdparty';
 	$trackid = 'thi'.$object->id;
 	$labour_inspector_id = $allLinks['LabourInspectorSociety']->id[0];
