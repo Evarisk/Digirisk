@@ -13,21 +13,21 @@
       }
 
       &.button-yellow {
-        border-color: rgba(234,118,69,1);
-        background: linear-gradient(90deg, rgba(242,161,96,1) 0%, rgba(234,118,69,1) 100%);
+        border-color: #e88740;
+        background: #e88740;
       }
       &.button-blue {
-        border-color: rgba(0,125,171,1);
-        background: linear-gradient(90deg, rgba(0,181,220,1) 0%, rgba(0,125,171,1) 100%);
+        border-color: #009cc2;
+        background: #009cc2;
       }
       &.button-red {
-        border-color: rgba(196,78,55,1);
-        background: linear-gradient(90deg, rgba(226,97,55,1) 0%, rgba(196,78,55,1) 100%);
+        border-color: #c44b2a;
+        background: #c44b2a;
       }
     }
-    &:not(.active) .wpeo-button {
-      border-width: 0;
-    }
+    //&:not(.active) .wpeo-button {
+    //  border-width: 0;
+    //}
     &.active .wpeo-button {
       border-color: #000 !important;
     }
