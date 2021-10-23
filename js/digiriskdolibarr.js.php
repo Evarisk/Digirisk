@@ -72,7 +72,7 @@ if ( ! window.eoxiaJS.scriptsLoaded ) {
 	 * @returns {void} [description]
 	 */
 	window.eoxiaJS.load_list_script = function() {
-		if ( ! window.eoxiaJS.scriptsLoaded ) {
+		if ( ! window.eoxiaJS.scriptsLoaded) {
 			var key = undefined, slug = undefined;
 			for ( key in window.eoxiaJS ) {
 
@@ -151,7 +151,7 @@ window.eoxiaJS.navigation.init = function() {
  */
 window.eoxiaJS.navigation.event = function() {
 	// Main Menu Digirisk Society
-	jQuery( document ).on( 'click', '.digirisk-wrap .navigation-container .unit-container .toggle-unit', window.eoxiaJS.navigation.switchToggle );
+	jQuery( document ).on( 'click', '.toggle-unit', window.eoxiaJS.navigation.switchToggle );
 	jQuery( document ).on( 'click', '#newGroupment', window.eoxiaJS.navigation.switchToggle );
 	jQuery( document ).on( 'click', '#newWorkunit', window.eoxiaJS.navigation.switchToggle );
 	jQuery( document ).on( 'click', '.digirisk-wrap .navigation-container .toolbar div', window.eoxiaJS.navigation.toggleAll );
@@ -159,6 +159,7 @@ window.eoxiaJS.navigation.event = function() {
 	jQuery( document ).on( 'click', '#newGroupment', window.eoxiaJS.navigation.redirect );
 	jQuery( document ).on( 'click', '#newWorkunit', window.eoxiaJS.navigation.redirect );
 	jQuery( document ).on( 'click', '.side-nav-responsive', window.eoxiaJS.navigation.toggleMobileNav );
+	jQuery( document ).on( 'click', '.unit-container.draggable', window.eoxiaJS.navigation.dragElement );
 };
 
 /**
@@ -181,7 +182,6 @@ window.eoxiaJS.navigation.switchToggle = function( event ) {
 		MENU = JSON.parse(MENU)
 		MENU = new Set(MENU)
 	}
-
 
 	if ( jQuery( this ).find( '.toggle-icon' ).hasClass( 'fa-chevron-down' ) ) {
 
@@ -294,6 +294,131 @@ window.eoxiaJS.navigation.redirect = function( event ) {
 window.eoxiaJS.navigation.toggleMobileNav = function( event ) {
 	$( this ).closest( '.side-nav' ).find( '#id-left' ).toggleClass( 'active' );
 }
+function calcWidth(obj){
+	console.log('---- calcWidth -----');
+
+	var titles = $(obj).siblings('.workunit-list').children('.unit.type-groupment').children('.unit-container');
+console.log(titles)
+	$(titles).each(function(index, element){
+		var pTitleWidth = parseInt($(obj).css('width'));
+		var leftOffset = parseInt($(obj).siblings('.workunit-list').css('margin-left'));
+
+		var newWidth = pTitleWidth - leftOffset;
+		if ($(obj).attr('id') == 'title0'){
+			console.log("called");
+
+			newWidth = newWidth - 10;
+		}
+
+		$(element).css({
+			'width': newWidth,
+		})
+
+		calcWidth(element);
+	});
+
+}
+
+/**
+ * Permet de drag & drop les éléments pour réorganiser la liste des groupements et unités de travail
+ *
+ * @since   8.2.2
+ * @version 8.2.2
+ */
+window.eoxiaJS.navigation.dragElement = function( event ) {
+
+	calcWidth($('#title0'));
+
+	window.onresize = function(event) {
+		console.log("window resized");
+
+		//method to execute one time after a timer
+
+	};
+
+	//recursively calculate the Width all titles
+
+
+	$('.sub-list, .workunit-list').sortable({
+		connectWith:'.workunit-list',
+		// handle:'.title',
+		// placeholder: ....,
+		tolerance:'intersect',
+		over:function(event,ui){
+			// //Recaculate width of all children
+			// var pTitleWidth = parseInt($(this).siblings('.title').css('width').replace('px', ''));
+
+			// if ($(this).siblings('.title').attr('id') == 'title0'){
+			// 	var newWidth = (pTitleWidth-20).toString().concat('px');
+			// }
+			// else {
+			// 	var newWidth = (pTitleWidth-70).toString().concat('px');
+			// }
+
+			// console.log(pTitleWidth + ', ' + newWidth);
+
+			// $(ui.item).children('.title').css({
+			// 	'width': newWidth,
+			// });
+		},
+		receive:function(event, ui){
+			calcWidth($(this).siblings('.unit-container'));
+		},
+	});
+	$('.workunit-list').disableSelection();
+
+
+
+
+	//
+	//jQuery( this ).draggable( {
+	//	helper: 'clone',
+	//	opacity: .75,
+	//	refreshPositions: true,
+	//	revert: 'invalid',
+	//	revertDuration: 300,
+	//	scroll: true
+	//} );
+	//$(".treetable .digi-group").each(function () {
+	//$(this).droppable({
+	//		drop: function(event, ui) {
+	//			$(this).css('background', 'rgb(0,200,0)');
+	//		},
+	//		over: function(event, ui) {;
+	//			$(this).css('background', 'gray');
+	//		},
+	//
+	//	});
+	//})
+	//$(".unit-container").each(function() { jQuery( this ).droppable( {
+	//		accept: '.unit-container',
+	//		drop: function( e, ui ) {
+	//			var droppedEl = ui.draggable.parents( 'ul' );
+	//
+	//			if ( droppedEl.attr( 'id' ) == jQuery( this ).data( 'ttParentId' ) ) {
+	//				e.preventDefault();
+	//				return false;
+	//			} else {
+	//				window.addEventListener( 'beforeunload', window.eoxiaJS.digirisk.pageSorter.safeExit );
+	//
+	//				jQuery( 'input[type="submit"]' ).attr( 'disabled', false );
+	//
+	//				jQuery( 'input[name="menu_item_parent_id[' + droppedEl.data( 'ttId' ) + ']"]' ).val( jQuery( this ).data( 'ttId' ) );
+	//				jQuery( '.treetable' ).treetable( 'move', droppedEl.data( 'ttId' ), jQuery( this ).data( 'ttId' ) );
+	//			}
+	//		},
+	//		hoverClass: 'accept',
+	//		over: function( e, ui ) {
+	//			var droppedEl = ui.draggable.parents( 'tr' );
+	//			if ( this != droppedEl[0] && ! jQuery( this ).is( '.expanded' ) ) {
+	//				jQuery( '.treetable' ).treetable( 'expandNode', jQuery( this ).data( 'ttId' ) );
+	//			}
+	//		}
+	//	});
+
+
+}
+
 
 /**
  * Initialise l'objet "modal" ainsi que la méthode "init" obligatoire pour la bibliothèque EoxiaJS.
