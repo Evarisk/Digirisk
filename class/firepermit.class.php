@@ -26,6 +26,7 @@ require_once DOL_DOCUMENT_ROOT.'/contact/class/contact.class.php';
 require_once DOL_DOCUMENT_ROOT.'/societe/class/societe.class.php';
 
 require_once __DIR__ . '/digiriskdocuments.class.php';
+require_once __DIR__ . '/digirisksignature.class.php';
 
 /**
  * Class for FirePermit
@@ -437,85 +438,80 @@ class FirePermitLine extends CommonObjectLine
 	}
 
 	/**
-	 *	Load invoice line from database
+	 *    Load invoice line from database
 	 *
-	 *	@param	int		$rowid      id of invoice line to get
-	 *	@return	int					<0 if KO, >0 if OK
+	 * @param int $rowid id of invoice line to get
+	 * @return    int                    <0 if KO, >0 if OK
 	 */
 	public function fetch($rowid)
 	{
 		global $db;
 
 		$sql = 'SELECT t.rowid, t.ref, t.date_creation, t.description, t.category, t.use_equipment, t.fk_firepermit, t.fk_element ';
-		$sql .= ' FROM '.MAIN_DB_PREFIX.'digiriskdolibarr_firepermitdet as t';
-		$sql .= ' WHERE t.rowid = '.$rowid;
-		$sql .= ' AND entity IN ('.getEntity($this->table_element).')';
+		$sql .= ' FROM ' . MAIN_DB_PREFIX . 'digiriskdolibarr_firepermitdet as t';
+		$sql .= ' WHERE t.rowid = ' . $rowid;
+		$sql .= ' AND entity IN (' . getEntity($this->table_element) . ')';
 
 		$result = $db->query($sql);
-		if ($result)
-		{
+		if ($result) {
 			$objp = $db->fetch_object($result);
 
-			$this->id                = $objp->rowid;
-			$this->ref               = $objp->ref;
-			$this->date_creation     = $objp->date_creation;
-			$this->description       = $objp->description;
-			$this->category          = $objp->category;
-			$this->use_equipment     = $objp->use_equipment;
-			$this->fk_firepermit     = $objp->fk_firepermit;
-			$this->fk_element        = $objp->fk_element;
+			$this->id = $objp->rowid;
+			$this->ref = $objp->ref;
+			$this->date_creation = $objp->date_creation;
+			$this->description = $objp->description;
+			$this->category = $objp->category;
+			$this->use_equipment = $objp->use_equipment;
+			$this->fk_firepermit = $objp->fk_firepermit;
+			$this->fk_element = $objp->fk_element;
 
 			$db->free($result);
 
 			return 1;
-		}
-		else
-		{
+		} else {
 			$this->error = $db->lasterror();
 			return -1;
 		}
 	}
 
 	/**
-	 *	Load firepermit line line from database
+	 *    Load firepermit line line from database
 	 *
-	 *	@param	int		$rowid      id of firepermit line line to get
-	 *	@return	int					<0 if KO, >0 if OK
+	 * @param int $rowid id of firepermit line line to get
+	 * @return    int                    <0 if KO, >0 if OK
 	 */
 	public function fetchAll($parent_id = 0, $limit = 0)
 	{
 		global $db;
 		$sql = 'SELECT t.rowid, t.ref, t.date_creation, t.description, t.category, t.use_equipment, t.fk_element';
-		$sql .= ' FROM '.MAIN_DB_PREFIX.'digiriskdolibarr_firepermitdet as t';
+		$sql .= ' FROM ' . MAIN_DB_PREFIX . 'digiriskdolibarr_firepermitdet as t';
 		if ($parent_id > 0) {
-			$sql .= ' WHERE t.fk_firepermit = '.$parent_id;
+			$sql .= ' WHERE t.fk_firepermit = ' . $parent_id;
 		} else {
 			$sql .= ' WHERE 1=1';
 		}
-		$sql .= ' AND entity IN ('.getEntity($this->table_element).')';
+		$sql .= ' AND entity IN (' . getEntity($this->table_element) . ')';
 
 
 		$result = $db->query($sql);
 
-		if ($result)
-		{
+		if ($result) {
 			$num = $db->num_rows($result);
 
 			$i = 0;
-			while ($i < ($limit ? min($limit, $num) : $num))
-			{
+			while ($i < ($limit ? min($limit, $num) : $num)) {
 				$obj = $db->fetch_object($result);
 
 				$record = new self($db);
 
-				$record->id                = $obj->rowid;
-				$record->ref               = $obj->ref;
-				$record->date_creation     = $obj->date_creation;
-				$record->description       = $obj->description;
-				$record->category          = $obj->category;
-				$record->use_equipment     = $obj->use_equipment;
-				$record->fk_firepermit     = $obj->fk_firepermit;
-				$record->fk_element        = $obj->fk_element;
+				$record->id = $obj->rowid;
+				$record->ref = $obj->ref;
+				$record->date_creation = $obj->date_creation;
+				$record->description = $obj->description;
+				$record->category = $obj->category;
+				$record->use_equipment = $obj->use_equipment;
+				$record->fk_firepermit = $obj->fk_firepermit;
+				$record->fk_element = $obj->fk_element;
 
 				$records[$record->id] = $record;
 
@@ -526,20 +522,18 @@ class FirePermitLine extends CommonObjectLine
 			$db->free($result);
 
 			return $records;
-		}
-		else
-		{
+		} else {
 			$this->error = $db->lasterror();
 			return -1;
 		}
 	}
 
 	/**
-	 *	Insert line into database
+	 *    Insert line into database
 	 *
-	 *	@param      int		$notrigger		                 1 no triggers
-	 *  @param      int     $noerrorifdiscountalreadylinked  1=Do not make error if lines is linked to a discount and discount already linked to another
-	 *	@return		int						                 <0 if KO, >0 if OK
+	 * @param int $notrigger 1 no triggers
+	 * @param int $noerrorifdiscountalreadylinked 1=Do not make error if lines is linked to a discount and discount already linked to another
+	 * @return        int                                         <0 if KO, >0 if OK
 	 */
 	public function insert($notrigger = 0, $noerrorifdiscountalreadylinked = 0)
 	{
@@ -555,7 +549,7 @@ class FirePermitLine extends CommonObjectLine
 		$now = dol_now();
 
 		// Insertion dans base de la ligne
-		$sql = 'INSERT INTO '.MAIN_DB_PREFIX.'digiriskdolibarr_firepermitdet';
+		$sql = 'INSERT INTO ' . MAIN_DB_PREFIX . 'digiriskdolibarr_firepermitdet';
 		$sql .= ' (ref, entity, date_creation, description, category, use_equipment, fk_firepermit, fk_element';
 		$sql .= ')';
 		$sql .= " VALUES (";
@@ -566,23 +560,20 @@ class FirePermitLine extends CommonObjectLine
 		$sql .= $this->category . ", ";
 		$sql .= "'" . $db->escape($this->use_equipment) . "'" . ", ";
 		$sql .= $this->fk_firepermit . ", ";
-		$sql .= $this->fk_element ;
+		$sql .= $this->fk_element;
 
 		$sql .= ')';
 
-		dol_syslog(get_class($this)."::insert", LOG_DEBUG);
+		dol_syslog(get_class($this) . "::insert", LOG_DEBUG);
 		$resql = $db->query($sql);
 
-		if ($resql)
-		{
-			$this->id = $db->last_insert_id(MAIN_DB_PREFIX.'firepermitdet');
+		if ($resql) {
+			$this->id = $db->last_insert_id(MAIN_DB_PREFIX . 'firepermitdet');
 			$this->rowid = $this->id; // For backward compatibility
 
 			$db->commit();
 			return $this->id;
-		}
-		else
-		{
+		} else {
 			$this->error = $db->lasterror();
 			$db->rollback();
 			return -2;
@@ -590,11 +581,11 @@ class FirePermitLine extends CommonObjectLine
 	}
 
 	/**
-	 *	Update line into database
+	 *    Update line into database
 	 *
-	 *	@param		User	$user		User object
-	 *	@param		int		$notrigger	Disable triggers
-	 *	@return		int					<0 if KO, >0 if OK
+	 * @param User $user User object
+	 * @param int $notrigger Disable triggers
+	 * @return        int                    <0 if KO, >0 if OK
 	 */
 	public function update($user = '', $notrigger = 1)
 	{
@@ -607,25 +598,22 @@ class FirePermitLine extends CommonObjectLine
 
 		$db->begin();
 		// Mise a jour ligne en base
-		$sql = "UPDATE ".MAIN_DB_PREFIX."digiriskdolibarr_firepermitdet SET";
-		$sql .= " ref='".$db->escape($this->ref)."',";
-		$sql .= " description='".$db->escape($this->description)."',";
-		$sql .= " category=".$db->escape($this->category) . ",";
-		$sql .= " use_equipment='".$db->escape($this->use_equipment)."'" . ",";
-		$sql .= " fk_firepermit=".$db->escape($this->fk_firepermit) . ",";
-		$sql .= " fk_element=".$db->escape($this->fk_element);
-		$sql .= " WHERE rowid = ".$this->id;
+		$sql = "UPDATE " . MAIN_DB_PREFIX . "digiriskdolibarr_firepermitdet SET";
+		$sql .= " ref='" . $db->escape($this->ref) . "',";
+		$sql .= " description='" . $db->escape($this->description) . "',";
+		$sql .= " category=" . $db->escape($this->category) . ",";
+		$sql .= " use_equipment='" . $db->escape($this->use_equipment) . "'" . ",";
+		$sql .= " fk_firepermit=" . $db->escape($this->fk_firepermit) . ",";
+		$sql .= " fk_element=" . $db->escape($this->fk_element);
+		$sql .= " WHERE rowid = " . $this->id;
 
-		dol_syslog(get_class($this)."::update", LOG_DEBUG);
+		dol_syslog(get_class($this) . "::update", LOG_DEBUG);
 		$resql = $db->query($sql);
 
-		if ($resql)
-		{
+		if ($resql) {
 			$db->commit();
 			return 1;
-		}
-		else
-		{
+		} else {
 			$this->error = $db->error();
 			$db->rollback();
 			return -2;
@@ -633,9 +621,9 @@ class FirePermitLine extends CommonObjectLine
 	}
 
 	/**
-	 * 	Delete line in database
+	 *    Delete line in database
 	 *
-	 *	@return	    int		           <0 if KO, >0 if OK
+	 * @return        int                   <0 if KO, >0 if OK
 	 */
 	public function delete()
 	{
@@ -643,19 +631,142 @@ class FirePermitLine extends CommonObjectLine
 
 		$db->begin();
 
-		$sql = "DELETE FROM ".MAIN_DB_PREFIX."digiriskdolibarr_firepermitdet WHERE rowid = ".$this->id;
-		dol_syslog(get_class($this)."::delete", LOG_DEBUG);
-		if ($db->query($sql))
-		{
+		$sql = "DELETE FROM " . MAIN_DB_PREFIX . "digiriskdolibarr_firepermitdet WHERE rowid = " . $this->id;
+		dol_syslog(get_class($this) . "::delete", LOG_DEBUG);
+		if ($db->query($sql)) {
 			$db->commit();
 			return 1;
-		}
-		else
-		{
-			$this->error = $db->error()." sql=".$sql;
+		} else {
+			$this->error = $db->error() . " sql=" . $sql;
 			$db->rollback();
 			return -1;
 		}
 	}
+}
 
+class FirePermitSignature extends DigiriskSignature
+{
+	/**
+	 * @var string Name of table without prefix where object is stored. This is also the key used for extrafields management.
+	 */
+	public $table_element = 'digiriskdolibarr_firepermit_signature';
+
+	/**
+	 * Constructor
+	 *
+	 * @param DoliDb $db Database handler
+	 */
+	public function __construct(DoliDB $db)
+	{
+		global $conf, $langs;
+
+		$this->db = $db;
+
+		if (empty($conf->global->MAIN_SHOW_TECHNICAL_ID) && isset($this->fields['rowid'])) $this->fields['rowid']['visible'] = 0;
+		if (empty($conf->multicompany->enabled) && isset($this->fields['entity'])) $this->fields['entity']['enabled'] = 0;
+
+		// Unset fields that are disabled
+		foreach ($this->fields as $key => $val)
+		{
+			if (isset($val['enabled']) && empty($val['enabled']))
+			{
+				unset($this->fields[$key]);
+			}
+		}
+
+		// Translate some data of arrayofkeyval
+		if (is_object($langs))
+		{
+			foreach ($this->fields as $key => $val)
+			{
+				if (is_array($val['arrayofkeyval']))
+				{
+					foreach ($val['arrayofkeyval'] as $key2 => $val2)
+					{
+						$this->fields[$key]['arrayofkeyval'][$key2] = $langs->trans($val2);
+					}
+				}
+			}
+		}
+	}
+
+	/**
+	 * Load list of objects in memory from the database.
+	 *
+	 * @param string $sortorder Sort Order
+	 * @param string $sortfield Sort field
+	 * @param int $limit limit
+	 * @param int $offset Offset
+	 * @param array $filter Filter array. Example array('field'=>'valueforlike', 'customurl'=>...)
+	 * @param string $filtermode Filter mode (AND or OR)
+	 * @return array|int                 int <0 if KO, array of pages if OK
+	 * @throws Exception
+	 */
+	public function fetchAll($sortorder = '', $sortfield = '', $limit = 0, $offset = 0, array $filter = array(), $filtermode = 'AND')
+	{
+		global $conf;
+
+		dol_syslog(__METHOD__, LOG_DEBUG);
+
+		$records = array();
+		$sql = 'SELECT ';
+		$sql .= $this->getFieldList();
+		$sql .= ' FROM '.MAIN_DB_PREFIX.$this->table_element;
+		if (isset($this->ismultientitymanaged) && $this->ismultientitymanaged == 1) $sql .= ' WHERE entity IN ('.getEntity($this->table_element).')';
+		else $sql .= ' WHERE 1 = 1';
+
+		// Manage filter
+		$sqlwhere = array();
+		if (count($filter) > 0) {
+			foreach ($filter as $key => $value) {
+				if ($key == 'rowid') {
+					$sqlwhere[] = $key.'='.$value;
+				} elseif (in_array($this->fields[$key]['type'], array('date', 'datetime', 'timestamp'))) {
+					$sqlwhere[] = $key.' = \''.$this->db->idate($value).'\'';
+				} elseif ($key == 'customsql') {
+					$sqlwhere[] = $value;
+				} elseif (strpos($value, '%') === false) {
+					$sqlwhere[] = $key.' IN ('.$this->db->sanitize($this->db->escape($value)).')';
+				} else {
+					$sqlwhere[] = $key.' LIKE \'%'.$this->db->escape($value).'%\'';
+				}
+			}
+		}
+		if (count($sqlwhere) > 0) {
+			$sql .= ' AND ('.implode(' '.$filtermode.' ', $sqlwhere).')';
+		}
+
+		if (!empty($sortfield)) {
+			$sql .= $this->db->order($sortfield, $sortorder);
+		}
+		if (!empty($limit)) {
+			$sql .= ' '.$this->db->plimit($limit, $offset);
+		}
+
+		$resql = $this->db->query($sql);
+
+		if ($resql) {
+			$num = $this->db->num_rows($resql);
+			$i = 0;
+			while ($i < ($limit ? min($limit, $num) : $num))
+			{
+				$obj = $this->db->fetch_object($resql);
+
+				$record = new self($this->db);
+				$record->setVarsFromFetchObj($obj);
+
+				$records[$record->id] = $record;
+
+				$i++;
+			}
+			$this->db->free($resql);
+
+			return $records;
+		} else {
+			$this->errors[] = 'Error '.$this->db->lasterror();
+			dol_syslog(__METHOD__.' '.join(',', $this->errors), LOG_ERR);
+
+			return -1;
+		}
+	}
 }

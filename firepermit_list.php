@@ -114,8 +114,8 @@ foreach ($firepermit->fields as $key => $val)
 include DOL_DOCUMENT_ROOT.'/core/actions_fetchobject.inc.php'; // Must be include, not include_once.
 
 //Permission for digiriskelement_firepermit
-$permissiontoread = $user->rights->digiriskdolibarr->firepermitdocument->read;
-$permissiontoadd = $user->rights->digiriskdolibarr->firepermitdocument->write;
+$permissiontoread = $user->rights->digiriskdolibarr->firepermit->read;
+$permissiontoadd = $user->rights->digiriskdolibarr->firepermit->write;
 $permissiontodelete = $user->rights->digiriskdolibarr->firepermitdocument->delete;
 
 // Security check - Protection if external user
