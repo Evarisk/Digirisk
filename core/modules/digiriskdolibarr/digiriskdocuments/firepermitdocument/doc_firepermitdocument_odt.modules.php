@@ -172,7 +172,7 @@ class doc_firepermitdocument_odt extends ModeleODTFirePermitDocument
 	public function write_file($object, $outputlangs, $srctemplatepath, $hidedetails = 0, $hidedesc = 0, $hideref = 0, $firepermit)
 	{
 		// phpcs:enable
-		global $user, $langs, $conf, $hookmanager, $action;
+		global $user, $langs, $conf, $hookmanager, $action, $mysoc;
 
 		if (empty($srctemplatepath))
 		{
@@ -219,7 +219,10 @@ class doc_firepermitdocument_odt extends ModeleODTFirePermitDocument
 			$filename = preg_split('/firepermitdocument\//' , $srctemplatepath);
 			$filename = preg_replace('/template_/','', $filename[1]);
 
-			$filename = $objectref . '_'. $filename;
+			$date = dol_print_date(dol_now(),'dayxcard');
+			$filename = $objectref.'_'.$conf->global->MAIN_INFO_SOCIETE_NOM.'_'.$date.'.odt';
+			$filename = str_replace(' ', '_', $filename);
+			$filename = dol_sanitizeFileName($filename);
 
 			$object->last_main_doc = $filename;
 
@@ -260,7 +263,15 @@ class doc_firepermitdocument_odt extends ModeleODTFirePermitDocument
 				return -1;
 			}
 
-			$tmparray = $substitutionarray;
+			// Define substitution array
+			$substitutionarray = getCommonSubstitutionArray($outputlangs, 0, null, $object);
+			$array_object_from_properties = $this->get_substitutionarray_each_var_object($object, $outputlangs);
+			$array_object = $this->get_substitutionarray_object($object, $outputlangs);
+			$array_soc = $this->get_substitutionarray_mysoc($mysoc, $outputlangs);
+			$array_soc['mycompany_logo'] = preg_replace('/_small/', '_mini', $array_soc['mycompany_logo']);
+
+			$tmparray = array_merge($substitutionarray, $array_object_from_properties, $array_object, $array_soc);
+			complete_substitutions_array($tmparray, $outputlangs, $object);
 
 			$filearray = dol_dir_list($conf->digiriskdolibarr->multidir_output[$conf->entity] . '/' . $firepermit->element_type . '/' . $firepermit->ref, "files", 0, '', '(\.odt|_preview.*\.png)$', 'position_name', 'desc', 1);
 			if (count($filearray)) {
@@ -302,7 +313,10 @@ class doc_firepermitdocument_odt extends ModeleODTFirePermitDocument
 			$tmparray['raison_plan_prevention']      = $preventionplan->label;
 			$tmparray['date_start_intervention_pre'] = dol_print_date($preventionplan->date_start, 'dayrfc');
 			$tmparray['date_end_intervention_pre']   = dol_print_date($preventionplan->date_end, 'dayrfc');
-			$tmparray['interventions_pre_info']      = count($preventionplanlines) . " " . $langs->trans('PreventionPlanLine');
+
+			if (!empty($preventionplanlines) && $preventionplanlines > 0 && is_array($preventionplanlines)) {
+				$tmparray['intervenants_info'] = count($preventionplanlines) . " " . $langs->trans('PreventionPlanLine');
+			}
 
 			$tmparray['date_start_intervention_PPP'] = dol_print_date($firepermit->date_start, 'dayrfc');
 			$tmparray['date_end_intervention_PPP'] = dol_print_date($firepermit->date_end, 'dayrfc');
