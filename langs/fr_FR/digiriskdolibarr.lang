@@ -414,6 +414,7 @@ FirePermitLineCreatedWithDolibarr = Ligne de Permis de Feu créée avec Dolibarr
 # Mod Numbering - Modèle de numérotation
 DigiriskFirePermitNumberingModule = Modèle de numérotation des permis de feu de Digirisk
 DigiriskFirePermitStandardModel = Renvoie le numéro sous la forme FPn où n est un compteur séquentiel sans rupture et sans remise à 0.
+DigiriskFirePermitDetStandardModel = Renvoie le numéro sous la forme FPRn où n est un compteur séquentiel sans rupture et sans remise à 0.
 
 # ODT Template - Template ODT
 DigiriskTemplateDocumentFirePermit = Modèle de documents des permis de feu de Digirisk
@@ -423,6 +424,7 @@ FirePermitDocument = Fiche de Permis de Feu
 FirePermitDocumentGeneratedWithDolibarr = Permis de feu généré avec Dolibarr
 
 # Data - Donnée
+NewFirePermit Nouveau permis de feu
 FirePermit = Permis de feu
 FirePermitLine = risque(s)
 MaitreOeuvre = Responsable de l'Entreprise Utilisatrice
