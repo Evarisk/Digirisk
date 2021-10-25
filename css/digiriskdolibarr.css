@@ -2651,6 +2651,115 @@
     padding-left: 0;
   }
 }
+.container {
+  position: relative;
+  margin-top: 150px;
+  margin-left: 60px;
+  margin-right: 60px;
+  padding-bottom: 10px;
+  min-height: 500px;
+  background: #eee;
+  -webkit-box-shadow: 0px 0px 10px 2px #bbb;
+  box-shadow: 0px 0px 10px 2px #bbb;
+}
+
+.container h3 {
+  position: absolute;
+  border: 0;
+  margin: 0;
+  padding: 0;
+  padding-top: 14px;
+  height: 44px;
+  width: 400px;
+  text-indent: 80px;
+  background: #71a9e2;
+  border-radius: 2px;
+  -webkit-box-shadow: 0px 0px 0px 2px #29f;
+  box-shadow: 0px 0px 0px 2px #29f;
+  pointer-events: none;
+  margin-left: 0px;
+  width: 100%;
+  background: white;
+  -webkit-box-shadow: 0px 2px 0px 1px #9bf;
+  box-shadow: 0px 2px 0px 1px #9bf;
+}
+
+.route {
+  position: relative;
+  list-style-type: none;
+  border: 0;
+  margin: 0;
+  padding: 0;
+  top: 0px;
+  margin-top: 0px;
+  max-height: 100% !important;
+  width: 100%;
+  background: #bcf;
+  border-radius: 2px;
+  z-index: -1;
+}
+
+.route span {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  /* IE 9 */
+  -webkit-transform: scale(2);
+  /* Chrome, Safari, Opera */
+  transform: scale(2);
+  z-index: 10px;
+}
+
+.route .title.workunit {
+  position: absolute;
+  border: 0;
+  margin: 0;
+  padding: 0;
+  padding-top: 14px;
+  height: 44px;
+  width: 400px;
+  text-indent: 80px;
+  background: #0761a0;
+  border-radius: 2px;
+  -webkit-box-shadow: 0px 0px 0px 2px #29f;
+  box-shadow: 0px 0px 0px 2px #29f;
+  pointer-events: none;
+}
+
+.route .title.groupment {
+  position: absolute;
+  border: 0;
+  margin: 0;
+  padding: 0;
+  padding-top: 14px;
+  height: 44px;
+  width: 400px;
+  text-indent: 80px;
+  background: #4f9bee;
+  border-radius: 2px;
+  -webkit-box-shadow: 0px 0px 0px 2px #29f;
+  box-shadow: 0px 0px 0px 2px #29f;
+  pointer-events: none;
+}
+
+.first-title {
+  margin-left: 10px;
+}
+
+.space {
+  position: relative;
+  list-style-type: none;
+  border: 0;
+  margin: 0;
+  padding: 0;
+  margin-left: 70px;
+  width: 60px;
+  top: 68px;
+  padding-bottom: 68px;
+  height: 100%;
+  z-index: 1;
+}
+
 .risk-container .risk-edit {
   color: #263C5C;
 }

@@ -608,9 +608,9 @@ function digiriskHeader($head = '', $title = '', $help_url = '', $target = '', $
 	//Body navigation digirisk
 	$object  = new DigiriskElement($db);
 	if ($conf->global->DIGIRISKDOLIBARR_SHOW_HIDDEN_DIGIRISKELEMENT) {
-		$objects = $object->fetchAll('',  'ref',  0,  0);
+		$objects = $object->fetchAll('',  'rank',  0,  0);
 	} else {
-		$objects = $object->fetchAll('',  '',  0,  0, array('customsql' => 'status > 0'));
+		$objects = $object->fetchAll('',  'rank',  0,  0, array('customsql' => 'status > 0'));
 	}
 	$results = recurse_tree(0,0,$objects); ?>
 
@@ -979,90 +979,27 @@ function display_recurse_tree($results) {
 	}
 }
 
+
 /**
- *	Display Recursive tree process
+ *	Display Recursive tree for edit
  *
  * @param	array $result Global Digirisk Element list after recursive process
  * @return	void
  */
-function display_recurse_tree_organization($results) {
-	include_once DOL_DOCUMENT_ROOT.'/core/lib/images.lib.php';
-
-	global $conf, $langs, $user, $db;
-
+function display_recurse_tree_organization($results, $i = 1) {
+	global $langs, $user;
 
 	if ($user->rights->digiriskdolibarr->digiriskelement->read) {
 		if ( !empty( $results )) {
-		foreach ($results as $element) { ?>
-			<li href="" class="unit type-<?php echo $element['object']->element_type; ?>" id="unit<?php  echo $element['object']->id; ?>">
-				<div class="unit-container draggable">
-					<?php if ($element['object']->element_type == 'groupment' && count($element['children'])) { ?>
-						<div class="toggle-unit">
-							<i class="toggle-icon fas fa-chevron-right" id="menu<?php echo $element['object']->id;?>"></i>
-						</div>
-					<?php } else { ?>
-						<div class="spacer"></div>
-					<?php } ?>
-					<div class="title" id="scores" value="<?php echo $element['object']->id ?>">
-						<span class="title-container digi-group ui-draggable ui-draggable-handle ui-droppable expanded branch">
-							<span class="ref"><?php echo $element['object']->ref; ?></span>
-							<span class="name"><?php echo $element['object']->label; ?></span>
-						</span>
-					</div>
-				</div>
-				<ul class="sub-list"><?php display_recurse_tree_organization($element['children']) ?></ul>
-			</li>
-
-<!--			<li class="unit type---><?php //echo (($element['object']->element_type == 'groupment' && count($element['children'])) > 0 ? 'toggle-unit' : '') ?><!--">-->
-<!--				--><?php //if ($element['object']->element_type == 'groupment' && count($element['children'])) { ?>
-<!--				<i class="toggle-icon fas fa-chevron-right" id="menu--><?php //echo $element['object']->id;?><!--"></i> --><?php
-//				} ?>
-<!--				<li>-->
-<!--					<input type="hidden" class="menu-item-data-parent-id" name="menu_item_parent_id[--><?php //echo $element['object']->id ; ?><!--]" value="--><?php //echo $element['object']->fk_parent ; ?><!--" />-->
-<!--					<input type="hidden" class="menu-item-data-db-id" name="menu_item_db_id[--><?php //echo $element['object']->id ; ?><!--]" value="--><?php //echo $element['object']->id; ?><!--" />-->
-<!--					<span class="--><?php //echo  $element['object']->element_type ; ?><!--">--><?php //echo $element['object']->ref . ' - ' . $element['object']->label; ?><!--</span>-->
-<!--				</li>-->
-<!--			</li>-->
-<!--		</ul>-->
-<!--		<ul class="sub-list">-->
-<!---->
-<!--		--><?php //display_recurse_tree_organization($element['children']) ?>
-<!--<script>-->
-<!--								// Get previous menu to display it-->
-<!--								// var MENU = localStorage.menu;-->
-<!--								// if (MENU == null || MENU == '') {-->
-<!--								// 	MENU = new Set()-->
-<!--								// } else {-->
-<!--								// 	MENU = JSON.parse(MENU);-->
-<!--								// 	MENU = new Set(MENU);-->
-<!--								// }-->
-<!--								//-->
-<!--								// MENU.forEach((id) =>  {-->
-<!--								// 	jQuery( '#menu'+id).removeClass( 'fa-chevron-right').addClass( 'fa-chevron-down' );-->
-<!--								// 	jQuery( '#unit'+id ).addClass( 'toggled' );-->
-<!--								// });-->
-<!---->
-<!--								--><?php
-////								$object = new DigiriskElement($db);
-////								 $object->fetch(GETPOST('id')); ?><!--//;-->
-<!--//								var idParent = --><?php ////echo json_encode($object->fk_parent) ;?><!--// ;-->
-<!--//-->
-<!--//								jQuery( '#menu'+idParent).removeClass( 'fa-chevron-right').addClass( 'fa-chevron-down' );-->
-<!--//								jQuery( '#unit'+idParent ).addClass( 'toggled' );-->
-<!--//-->
-<!--//								// Set active unit active-->
-<!--//								jQuery( '.digirisk-wrap .navigation-container .unit.active' ).removeClass( 'active' );-->
-<!--//-->
-<!--//								var params = new window.URLSearchParams(window.location.search);-->
-<!--//								var id = params.get('id');-->
-<!--//								if (document.URL.match(/digiriskelement/)) {-->
-<!--//									jQuery( '#unit'  + id ).addClass( 'active' );-->
-<!--//									jQuery( '#unit'  +id  ).closest( '.unit' ).attr( 'value', id );-->
-<!--//								};-->
-<!--//							</script>-->
-<!--//		</ul>-->
-
-		<?php }
+			foreach ($results as $element) { ?>
+				<li class="route ui-sortable-handle level-<?php echo $i ?>" id="<?php  echo $element['object']->id; ?>" value="<?php echo $i ?>">
+		 			<h3 class='title <?php echo $element['object']->element_type ?>'>
+						<?php echo  $element['object']->ref . ' - ' . $element['object']->label?>
+		  			</h3>
+		 			<span class='ui-icon ui-icon-arrow-4-diag'></span>
+					<ul class="space space-<?php echo $i; ?> ui-sortable  <?php echo $element['object']->element_type ?>" id="space<?php echo $element['object']->id?>" value="<?php echo $i ?>"><?php display_recurse_tree_organization($element['children'], $i + 1) ?></ul>
+				</li>
+			<?php }
 		}
 	} else {
 		print $langs->trans('YouDontHaveTheRightToSeeThis');

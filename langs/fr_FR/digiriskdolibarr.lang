@@ -585,7 +585,8 @@ GPUTOrganisation = Organisation des GP/UT
 DigiriskElement = Élément Digirisk
 ElementType = Type d'élément
 ParentElement = Élément parent
-
+OrganizationSaved = L'organisation et des groupements et des unités de travail a été sauvegardée
+OrganizationNotSaved = L'organisation et des groupements et des unités de travail n'a pas pu être sauvegardée
 
 #
 # Groupment - Groupement

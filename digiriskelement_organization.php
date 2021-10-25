@@ -38,16 +38,8 @@ if (!$res) die("Include of main fails");
 require_once DOL_DOCUMENT_ROOT.'/core/class/html.formfile.class.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/images.lib.php';
 
-require_once './class/digiriskdocuments.class.php';
 require_once './class/digiriskelement.class.php';
-require_once './class/digiriskdocuments/groupmentdocument.class.php';
-require_once './class/digiriskdocuments/workunitdocument.class.php';
-require_once './lib/digiriskdolibarr_digiriskelement.lib.php';
 require_once './lib/digiriskdolibarr_function.lib.php';
-require_once './core/modules/digiriskdolibarr/digiriskelement/groupment/mod_groupment_standard.php';
-require_once './core/modules/digiriskdolibarr/digiriskelement/workunit/mod_workunit_standard.php';
-require_once './core/modules/digiriskdolibarr/digiriskdocuments/groupmentdocument/modules_groupmentdocument.php';
-require_once './core/modules/digiriskdolibarr/digiriskdocuments/workunitdocument/modules_workunitdocument.php';
 
 global $db, $conf, $langs, $user;
 
@@ -63,8 +55,6 @@ $cancel              = GETPOST('cancel', 'aZ09');
 $contextpage         = GETPOST('contextpage', 'aZ') ?GETPOST('contextpage', 'aZ') : 'digiriskelementcard'; // To manage different context of search
 $backtopage          = GETPOST('backtopage', 'alpha');
 $backtopageforcancel = GETPOST('backtopageforcancel', 'alpha');
-$element_type        = GETPOST('element_type', 'alpha');
-$fk_parent           = GETPOST('fk_parent', 'int');
 
 // Initialize technical objects
 $object      = new DigiriskElement($db);
@@ -72,23 +62,13 @@ $extrafields = new ExtraFields($db);
 
 $object->fetch($id);
 
-if ( $object->element_type == 'groupment') {
-	$digiriskelementdocument = new GroupmentDocument($db);
-} elseif (  $object->element_type == 'workunit' ) {
-	$digiriskelementdocument = new WorkUnitDocument($db);
-}
-
 // Fetch optionals attributes and labels
 $extrafields->fetch_name_optionals_label($object->table_element);
 
 $hookmanager->initHooks(array('digiriskelementcard', 'globalcard')); // Note that conf->hooks_modules contains array
 
-$upload_dir         = $conf->digiriskdolibarr->multidir_output[isset($object->entity) ? $object->entity : 1];
-
 //Security check
 $permissiontoread   = $user->rights->digiriskdolibarr->digiriskelement->read;
-$permissiontoadd    = $user->rights->digiriskdolibarr->digiriskelement->write;
-$permissiontodelete = $user->rights->digiriskdolibarr->digiriskelement->delete;
 
 if (!$permissiontoread) accessforbidden();
 
@@ -112,107 +92,24 @@ if (empty($reshook)) {
 		}
 	}
 
-	// Action to add record
-	include DOL_DOCUMENT_ROOT.'/core/actions_addupdatedelete.inc.php';
+	if ($action == 'saveOrganization') {
 
-	if ($action == 'add' && $permissiontoadd) { ?>
-		<script>
-			jQuery( '.digirisk-wrap .navigation-container .unit.active' ).removeClass( 'active' );
-			//console.log( this );
-			let id = $(this).attr('value');
-			jQuery( this ).closest( '.unit' ).addClass( 'active' );
+		$ids = GETPOST('ids');
+		$parent_ids = GETPOST('parent_ids');
+		$array_ids = preg_split('/,/', $ids);
+		$array_parent_ids = preg_split('/,/', $parent_ids);
+		$i = 0;
+		if (!empty($array_ids) && $array_ids > 0) {
+			foreach ($array_ids as $id) {
 
-			var unitActive = jQuery( this ).closest( '.unit.active' ).attr('id');
-			localStorage.setItem('unitactive', unitActive );
+				$digiriskelement = new DigiriskElement($db);
+				$digiriskelement->fetch($id);
+				$digiriskelement->rank = $i + 1;
+				$digiriskelement->fk_parent = $array_parent_ids[$i];
 
-			jQuery( this ).closest( '.unit' ).attr( 'value', id );
-		</script>
-		<?php
-	}
-
-	if ($action == 'view' && $permissiontoadd) {
-		header('Location: ' . $backtopage);
-	}
-
-	// Action to build doc
-	if ($action == 'builddoc' && $permissiontoadd) {
-		$outputlangs = $langs;
-		$newlang = '';
-
-		if ($conf->global->MAIN_MULTILANGS && empty($newlang) && GETPOST('lang_id', 'aZ09')) $newlang = GETPOST('lang_id', 'aZ09');
-		if (!empty($newlang)) {
-			$outputlangs = new Translate("", $conf);
-			$outputlangs->setDefaultLang($newlang);
-		}
-
-		// To be sure vars is defined
-		if (empty($hidedetails)) $hidedetails = 0;
-		if (empty($hidedesc)) $hidedesc = 0;
-		if (empty($hideref)) $hideref = 0;
-		if (empty($moreparams)) $moreparams = null;
-
-		$model      = GETPOST('model', 'alpha');
-
-		$moreparams['object'] = $object;
-		$moreparams['user']   = $user;
-
-		$result = $digiriskelementdocument->generateDocument($model, $outputlangs, $hidedetails, $hidedesc, $hideref, $moreparams);
-		if ($result <= 0) {
-			setEventMessages($object->error, $object->errors, 'errors');
-			$action = '';
-		} else {
-			if (empty($donotredirect))
-			{
-				setEventMessages($langs->trans("FileGenerated") . ' - ' . $digiriskelementdocument->last_main_doc, null);
-
-				$urltoredirect = $_SERVER['REQUEST_URI'];
-				$urltoredirect = preg_replace('/#builddoc$/', '', $urltoredirect);
-				$urltoredirect = preg_replace('/action=builddoc&?/', '', $urltoredirect); // To avoid infinite loop
-
-				header('Location: ' . $urltoredirect . '#builddoc');
-				exit;
+				$digiriskelement->update($user);
+				$i++;
 			}
-		}
-	}
-
-	// Delete file in doc form
-	if ($action == 'remove_file' && $permissiontodelete) {
-		if (!empty($upload_dir)) {
-			require_once DOL_DOCUMENT_ROOT.'/core/lib/files.lib.php';
-
-			$langs->load("other");
-			$filetodelete = GETPOST('file', 'alpha');
-			$file = $upload_dir.'/'.$filetodelete;
-			$ret = dol_delete_file($file, 0, 0, 0, $object);
-			if ($ret) setEventMessages($langs->trans("FileWasRemoved", $filetodelete), null, 'mesgs');
-			else setEventMessages($langs->trans("ErrorFailToDeleteFile", $filetodelete), null, 'errors');
-
-			// Make a redirect to avoid to keep the remove_file into the url that create side effects
-			$urltoredirect = $_SERVER['REQUEST_URI'];
-			$urltoredirect = preg_replace('/#builddoc$/', '', $urltoredirect);
-			$urltoredirect = preg_replace('/action=remove_file&?/', '', $urltoredirect);
-
-			header('Location: '.$urltoredirect);
-			exit;
-		}
-		else {
-			setEventMessages('BugFoundVarUploaddirnotDefined', null, 'errors');
-		}
-	}
-
-	if ($action == 'confirm_delete' && GETPOST("confirm") == "yes")
-	{
-		$object->fetch($id);
-		$result = $object->delete($user);
-
-		if ($result > 0)
-		{
-			setEventMessages($langs->trans("RecordDeleted"), null, 'mesgs');
-			header('Location: '.$backurlforlist);
-			exit;
-		} else {
-			dol_syslog($object->error, LOG_DEBUG);
-			setEventMessages($object->error, $object->errors, 'errors');
 		}
 	}
 }
@@ -231,103 +128,102 @@ if (empty($reshook)) $formconfirm .= $hookmanager->resPrint;
 elseif ($reshook > 0) $formconfirm = $hookmanager->resPrint;
 
 
-if ( $object->element_type == 'groupment' ) {
-	$title        = $langs->trans("Groupment");
-	$title_create = $langs->trans("NewGroupment");
-	$title_edit   = $langs->trans("ModifyGroupment");
-	$object->picto = 'groupment@digiriskdolibarr';
-} else if ( $object->element_type == 'workunit' ) {
-	$title         = $langs->trans("WorkUnit");
-	$title_create  = $langs->trans("NewWorkUnit");
-	$title_edit    = $langs->trans("ModifyWorkUnit");
-	$object->picto = 'workunit@digiriskdolibarr';
-} else {
-	$element_type = GETPOST('element_type', 'alpha');
-	if ( $element_type == 'groupment' ){
-		$title_create = $langs->trans("NewGroupment");
-	}else {
-		$title_create  = $langs->trans("NewWorkUnit");
-	}
-}
-
 $help_url = 'FR:Module_DigiriskDolibarr';
+$title = $langs->trans('DigiriskElementOrganization');
 $morejs   = array("/digiriskdolibarr/js/digiriskdolibarr.js.php");
 $morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");
 
-llxHeader('', $title, $help_url, '', '', '', $morejs, $morecss); ?>
+llxHeader('', $title, $help_url, '', '', '', $morejs, $morecss);
 
-	<div id="cardContent" value="">
+?>
+<div id="cardContent" value="">
 <?php
-$object  = new DigiriskElement($db);
-if ($conf->global->DIGIRISKDOLIBARR_SHOW_HIDDEN_DIGIRISKELEMENT) {
-	$objects = $object->fetchAll('',  'ref',  0,  0);
-} else {
-	$objects = $object->fetchAll('',  '',  0,  0, array('customsql' => 'status > 0'));
-}
-		$results = recurse_tree(0,0,$objects); ?>
+$objects = $object->fetchAll('',  'rank',  0,  0, array('customsql' => 'status > 0'));
+$results = recurse_tree(0,0,$objects); ?>
 
-<div id="id-container" class="id-container page-ut-gp-list">
-		<div class="organization">
-			<div class="digirisk-wrap wpeo-wrap treetable">
-					<div class="navigation-container" id="oui">
-						<h3 class="title" id="title0">jQuery Nested Sortable Plugin Demo</h3>
-						<?php if (!empty($objects) && $objects > 0) : ?>
-							<div class="toolbar">
-								<div class="toggle-plus tooltip hover" aria-label="<?php echo $langs->trans('UnwrapAll'); ?>"><span class="icon fas fa-plus-square"></span></div>
-								<div class="toggle-minus tooltip hover" aria-label="<?php echo $langs->trans('WrapAll'); ?>"><span class="icon fas fa-minus-square"></span></div>
-							</div>
-						<?php else : ?>
-							<div class="society-header">
-								<a id="newGroupment" href="../digiriskdolibarr/digiriskelement_card.php?action=create&element_type=groupment&fk_parent=0">
-									<div class="wpeo-button button-square-40 button-secondary wpeo-tooltip-event" data-direction="bottom" data-color="light" aria-label="<?php echo $langs->trans('NewGroupment'); ?>"><strong><?php echo $mod_groupment->prefix; ?></strong><span class="button-add animated fas fa-plus-circle"></span></div>
-								</a>
-								<a id="newWorkunit" href="../digiriskdolibarr/digiriskelement_card.php?action=create&element_type=workunit&fk_parent=0">
-									<div class="wpeo-button button-square-40 wpeo-tooltip-event" data-direction="bottom" data-color="light" aria-label="<?php echo $langs->trans('NewWorkUnit'); ?>"><strong><?php echo $mod_workunit->prefix; ?></strong><span class="button-add animated fas fa-plus-circle"></span></div>
-								</a>
-							</div>
-						<?php endif; ?>
+<script>
+	$(document).ready(function() {
+		calcWidth($('#title0'));
 
-						<ul class="workunit-list">
-							<?php display_recurse_tree_organization($results) ?>
-							<script>
-								// Get previous menu to display it
-								var MENU = localStorage.menu;
-								if (MENU == null || MENU == '') {
-									MENU = new Set()
-								} else {
-									MENU = JSON.parse(MENU);
-									MENU = new Set(MENU);
-								}
+		window.onresize = function(event) {
+			//method to execute one time after a timer
+		};
 
-								MENU.forEach((id) =>  {
-									jQuery( '#menu'+id).removeClass( 'fa-chevron-right').addClass( 'fa-chevron-down' );
-									jQuery( '#unit'+id ).addClass( 'toggled' );
-								});
+		//recursively calculate the Width all titles
+		function calcWidth(obj){
 
-								<?php $object->fetch(GETPOST('id')); ?>;
-								var idParent = <?php echo json_encode($object->fk_parent) ;?> ;
+			var titles =
+				$(obj).siblings('.space').children('.route').children('.title');
 
-								jQuery( '#menu'+idParent).removeClass( 'fa-chevron-right').addClass( 'fa-chevron-down' );
-								jQuery( '#unit'+idParent ).addClass( 'toggled' );
+			$(titles).each(function(index, element){
+				var pTitleWidth = parseInt($(obj).css('width'));
+				var leftOffset = parseInt($(obj).siblings('.space').css('margin-left'));
 
-								// Set active unit active
-								jQuery( '.digirisk-wrap .navigation-container .unit.active' ).removeClass( 'active' );
+				var newWidth = pTitleWidth - leftOffset;
 
-								var params = new window.URLSearchParams(window.location.search);
-								var id = params.get('id');
-								if (document.URL.match(/digiriskelement/)) {
-									jQuery( '#unit'  + id ).addClass( 'active' );
-									jQuery( '#unit'  +id  ).closest( '.unit' ).attr( 'value', id );
-								};
-							</script>
-						</ul>
-					</div>
+				if ($(obj).attr('id') == 'title0'){
+					console.log("called");
+
+					newWidth = newWidth - 10;
+				}
+
+				$(element).css({
+					'width': newWidth,
+				})
+
+				calcWidth(element);
+			});
+
+		}
+
+		$('.space').sortable({
+			connectWith:'.space:not("'+'.workunit'+'")',
+			tolerance:'intersect',
+			over:function(event,ui){
+			},
+			receive:function(event, ui){
+				calcWidth($(this).siblings('.title'));
+				$('.save-organization').removeClass('button-disable')
+				$('.save-organization').attr('style','')
+				$('.save-organization .fas').attr('style','display:none')
+			},
+		});
+		$('.space').disableSelection();
+
+	})
+</script>
+<div class='container'>
+	<div class="messageSuccessOrganizationSaved notice hidden">
+		<div class="wpeo-notice notice-success organization-saved-success-notice">
+			<div class="notice-content">
+				<div class="notice-title"><?php echo $langs->trans('OrganizationSaved') ?></div>
+				<div class="notice-subtitle">
+					<span class="text"></span>
 				</div>
+			</div>
+			<div class="notice-close"><i class="fas fa-times"></i></div>
 		</div>
+	</div>
+	<div class="messageErrorOrganizationSaved notice hidden">
+		<div class="wpeo-notice notice-error organization-saved-error-notice">
+			<div class="notice-content">
+				<div class="notice-title"><?php echo $langs->trans('OrganizationNotSaved') ?></div>
+				<div class="notice-subtitle">
+					<span class="text"></span>
+				</div>
+			</div>
+			<div class="notice-close"><i class="fas fa-times"></i></div>
+		</div>
+	</div>
+	<h3 class='title' id='title0'><?php echo $conf->global->MAIN_INFO_SOCIETE_NOM ?></h3>
+	<ul class='space space-0 first-space ui-sortable' id='space0' value="0">
+		<?php display_recurse_tree_organization($results) ?>
+	</ul>
+</div>
 <?php
 
-
-
+print '<button class="save-organization wpeo-button button-disable">'.$langs->trans('Save').'  <i style="display:none" class="fas fa-times"></i><i style="display:none" class="fas fa-check"></i></button>';
+print '</form>';
 // End of page
 llxFooter();
 $db->close();
