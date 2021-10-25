@@ -36,7 +36,7 @@ function firepermitPrepareHead($object)
 	$h = 0;
 	$head = array();
 
-	if ($user->rights->digiriskdolibarr->firepermitdocument->read) {
+	if ($user->rights->digiriskdolibarr->firepermit->read) {
 		$head[$h][0] = dol_buildpath("/digiriskdolibarr/firepermit_card.php", 1) . '?id=' . $object->id;
 		$head[$h][1] = '<i class="fas fa-address-card"></i> ' . $langs->trans("Card");
 		$head[$h][2] = 'firepermitCard';
