@@ -62,7 +62,7 @@ $hookmanager->initHooks(array('firepermitschedule', 'globalcard')); // Note that
 $firepermit->fetch($id);
 
 $morewhere = ' AND element_id = ' . $id;
-$morewhere .= ' AND element_type = ' . "'" . $preventionplan->element . "'";
+$morewhere .= ' AND element_type = ' . "'" . $firepermit->element . "'";
 $morewhere .= ' AND status = 1';
 
 $object->fetch(0, '', $morewhere);
@@ -105,7 +105,7 @@ if (empty($reshook)) {
  *  View
  */
 
-$title    = $langs->trans("FirePermit");
+$title    = $langs->trans("FirePermit")  . ' - ' . $langs->trans("Schedule");
 $help_url = '';
 llxHeader('', $title, $help_url);
 
@@ -115,9 +115,9 @@ if (!empty($firepermit->id)) $res = $firepermit->fetch_optionals();
 // ------------------------------------------------------------
 
 $head = firepermitPrepareHead($firepermit);
-print dol_get_fiche_head($head, 'firepermitSchedule', $langs->trans("FirePermit"), 0, '');
-dol_strlen($object->label) ? $morehtmlref = ' - ' . $object->label : '';
-digirisk_banner_tab($preventionplan, 'ref', '', 0, 'ref', 'ref', $morehtmlref);
+print dol_get_fiche_head($head, 'firepermitSchedule', $langs->trans("FirePermit"), -1, "digiriskdolibarr@digiriskdolibarr");
+dol_strlen($firepermit->label) ? $morehtmlref = ' - ' . $firepermit->label : '';
+digirisk_banner_tab($firepermit, 'ref', '', 0, 'ref', 'ref', $morehtmlref);
 
 print dol_get_fiche_end();
 

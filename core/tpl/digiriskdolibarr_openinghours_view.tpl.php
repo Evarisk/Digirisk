@@ -80,7 +80,13 @@ print '<input name="sunday" id="sunday" class="minwidth100" value="'.($object->s
 
 print '</table>';
 
-if ($preventionplan->status < 2 && $permissiontoadd ){
+if ($object->element_type == 'preventionplan') {
+	$object->status = $preventionplan->status;
+} elseif ($object->element_type == 'firepermit') {
+	$object->status = $firepermit->status;
+}
+
+if ($object->status < 2 && $permissiontoadd ){
 	print '<br><div class="center">';
 	print '<input type="submit" class="button" name="save" value="'.$langs->trans("Save").'">';
 	print '</div>';
