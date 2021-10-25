@@ -180,41 +180,43 @@ $results = recurse_tree(0,0,$objects); ?>
 			connectWith:'.space:not("'+'.workunit'+'")',
 			tolerance:'intersect',
 			over:function(event,ui){
-			},
-			receive:function(event, ui){
-				calcWidth($(this).siblings('.title'));
 				$('.save-organization').removeClass('button-disable')
 				$('.save-organization').attr('style','')
 				$('.save-organization .fas').attr('style','display:none')
 			},
+			receive:function(event, ui){
+				calcWidth($(this).siblings('.title'));
+			},
+
 		});
+
 		$('.space').disableSelection();
 
 	})
 </script>
+<div class="messageSuccessOrganizationSaved notice hidden">
+	<div class="wpeo-notice notice-success organization-saved-success-notice">
+		<div class="notice-content">
+			<div class="notice-title"><?php echo $langs->trans('OrganizationSaved') ?></div>
+			<div class="notice-subtitle">
+				<span class="text"></span>
+			</div>
+		</div>
+		<div class="notice-close"><i class="fas fa-times"></i></div>
+	</div>
+</div>
+<div class="messageErrorOrganizationSaved notice hidden">
+	<div class="wpeo-notice notice-error organization-saved-error-notice">
+		<div class="notice-content">
+			<div class="notice-title"><?php echo $langs->trans('OrganizationNotSaved') ?></div>
+			<div class="notice-subtitle">
+				<span class="text"></span>
+			</div>
+		</div>
+		<div class="notice-close"><i class="fas fa-times"></i></div>
+	</div>
+</div>
 <div class='container'>
-	<div class="messageSuccessOrganizationSaved notice hidden">
-		<div class="wpeo-notice notice-success organization-saved-success-notice">
-			<div class="notice-content">
-				<div class="notice-title"><?php echo $langs->trans('OrganizationSaved') ?></div>
-				<div class="notice-subtitle">
-					<span class="text"></span>
-				</div>
-			</div>
-			<div class="notice-close"><i class="fas fa-times"></i></div>
-		</div>
-	</div>
-	<div class="messageErrorOrganizationSaved notice hidden">
-		<div class="wpeo-notice notice-error organization-saved-error-notice">
-			<div class="notice-content">
-				<div class="notice-title"><?php echo $langs->trans('OrganizationNotSaved') ?></div>
-				<div class="notice-subtitle">
-					<span class="text"></span>
-				</div>
-			</div>
-			<div class="notice-close"><i class="fas fa-times"></i></div>
-		</div>
-	</div>
 	<h3 class='title' id='title0'><?php echo $conf->global->MAIN_INFO_SOCIETE_NOM ?></h3>
 	<ul class='space space-0 first-space ui-sortable' id='space0' value="0">
 		<?php display_recurse_tree_organization($results) ?>
