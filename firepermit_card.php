@@ -844,7 +844,6 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 //	if (empty($reshook)) $formconfirm .= $hookmanager->resPrint;
 //	elseif ($reshook > 0) $formconfirm = $hookmanager->resPrint;
 
-	$width = 80; $cssclass = 'photoref';
 	dol_strlen($object->label) ? $morehtmlref = ' - ' . $object->label : '';
 	digirisk_banner_tab($object, 'ref', '', 0, 'ref', 'ref', $morehtmlref, '', 0, '');
 
