@@ -35,8 +35,8 @@ if (!$res && file_exists("../../main.inc.php")) $res = @include "../../main.inc.
 if (!$res && file_exists("../../../main.inc.php")) $res = @include "../../../main.inc.php";
 if (!$res) die("Include of main fails");
 
-require_once __DIR__ . '/class/digiriskelement.class.php';
 require_once __DIR__ . '/class/firepermit.class.php';
+require_once __DIR__ . '/class/openinghours.class.php';
 require_once __DIR__ . '/lib/digiriskdolibarr_firepermit.lib.php';
 require_once __DIR__ . '/lib/digiriskdolibarr_function.lib.php';
 
