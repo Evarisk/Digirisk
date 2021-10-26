@@ -16,9 +16,9 @@
  */
 
 /**
- *   	\file       preventionplan_attendants.php
+ *   	\file       firepermit_attendants.php
  *		\ingroup    digiriskdolibarr
- *		\brief      Page to add/edit/view preventionplan_signature
+ *		\brief      Page to add/edit/view firepermit_signature
  */
 
 // Load Dolibarr environment
@@ -38,8 +38,8 @@ if (!$res) die("Include of main fails");
 require_once DOL_DOCUMENT_ROOT.'/core/lib/images.lib.php';
 
 require_once __DIR__ . '/class/digiriskresources.class.php';
-require_once __DIR__ . '/class/preventionplan.class.php';
-require_once __DIR__ . '/lib/digiriskdolibarr_preventionplan.lib.php';
+require_once __DIR__ . '/class/firepermit.class.php';
+require_once __DIR__ . '/lib/digiriskdolibarr_firepermit.lib.php';
 require_once __DIR__ . '/lib/digiriskdolibarr_function.lib.php';
 
 global $db, $langs;
@@ -50,12 +50,12 @@ $langs->loadLangs(array("digiriskdolibarr@digiriskdolibarr", "other"));
 // Get parameters
 $id                  = GETPOST('id', 'int');
 $action              = GETPOST('action', 'aZ09');
-$contextpage         = GETPOST('contextpage', 'aZ') ?GETPOST('contextpage', 'aZ') : 'preventionplansignature'; // To manage different context of search
+$contextpage         = GETPOST('contextpage', 'aZ') ?GETPOST('contextpage', 'aZ') : 'firepermitsignature'; // To manage different context of search
 $backtopage          = GETPOST('backtopage', 'alpha');
 
 // Initialize technical objects
-$object            = new PreventionPlan($db);
-$signatory         = new PreventionPlanSignature($db);
+$object            = new FirePermit($db);
+$signatory         = new FirePermitSignature($db);
 $digiriskresources = new DigiriskResources($db);
 $usertmp           = new User($db);
 $contact           = new Contact($db);
@@ -63,12 +63,12 @@ $form              = new Form($db);
 
 $object->fetch($id);
 
-$hookmanager->initHooks(array('preventionplansignature', 'globalcard')); // Note that conf->hooks_modules contains array
+$hookmanager->initHooks(array('firepermitsignature', 'globalcard')); // Note that conf->hooks_modules contains array
 
 //Security check
-$permissiontoread   = $user->rights->digiriskdolibarr->preventionplan->read;
-$permissiontoadd    = $user->rights->digiriskdolibarr->preventionplan->write;
-$permissiontodelete = $user->rights->digiriskdolibarr->preventionplan->delete;
+$permissiontoread   = $user->rights->digiriskdolibarr->firepermit->read;
+$permissiontoadd    = $user->rights->digiriskdolibarr->firepermit->write;
+$permissiontodelete = $user->rights->digiriskdolibarr->firepermit->delete;
 if (!$permissiontoread) accessforbidden();
 
 /*
@@ -82,7 +82,7 @@ if ($reshook < 0) setEventMessages($hookmanager->error, $hookmanager->errors, 'e
 
 if (empty($backtopage) || ($cancel && empty($id))) {
 	if (empty($backtopage) || ($cancel && strpos($backtopage, '__ID__'))) {
-		$backtopage = dol_buildpath('/digiriskdolibarr/preventionplan_attendants.php', 1).'?id='.($object->id > 0 ? $object->id : '__ID__');
+		$backtopage = dol_buildpath('/digiriskdolibarr/firepermit_attendants.php', 1).'?id='.($object->id > 0 ? $object->id : '__ID__');
 	}
 }
 
@@ -104,7 +104,7 @@ if ($action == 'addAttendant') {
 	}
 
 	if (!$error) {
-		$result = $signatory->setSignatory($object->id,'socpeople', $extintervenant_ids, 'PP_EXT_SOCIETY_INTERVENANTS', 1);
+		$result = $signatory->setSignatory($object->id,'socpeople', $extintervenant_ids, 'FP_EXT_SOCIETY_INTERVENANTS', 1);
 		if ($result > 0) {
 			foreach ($extintervenant_ids as $extintervenant_id) {
 				$contact->fetch($extintervenant_id);
@@ -275,7 +275,7 @@ if ($action == 'deleteAttendant') {
  *  View
  */
 
-$title    = $langs->trans("PreventionPlanAttendants");
+$title    = $langs->trans("FirePermitAttendants");
 $help_url = '';
 $morejs   = array("/digiriskdolibarr/js/signature-pad.min.js", "/digiriskdolibarr/js/digiriskdolibarr.js.php");
 $morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");
@@ -287,8 +287,8 @@ if (!empty($object->id)) $res = $object->fetch_optionals();
 // Object card
 // ------------------------------------------------------------
 
-$head = preventionplanPrepareHead($object);
-print dol_get_fiche_head($head, 'preventionplanAttendants', $langs->trans("PreventionPlan"), -1, "digiriskdolibarr@digiriskdolibarr");
+$head = firepermitPrepareHead($object);
+print dol_get_fiche_head($head, 'firepermitAttendants', $langs->trans("FirePermit"), -1, "digiriskdolibarr@digiriskdolibarr");
 dol_strlen($object->label) ? $morehtmlref = ' - ' . $object->label : '';
 //$morehtmlleft .= '<div class="floatleft inline-block valignmiddle divphotoref">'.digirisk_show_photos('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$entity].'/'.$object->element_type, 'small', 5, 0, 0, 0, $width,0, 0, 0, 0, $object->element_type, $object).'</div>';
 
@@ -300,9 +300,9 @@ print dol_get_fiche_end(); ?>
 <div class="wpeo-notice notice-warning">
 	<div class="notice-content">
 		<div class="notice-title"><?php echo $langs->trans('DisclaimerSignatureTitle') ?></div>
-		<div class="notice-subtitle"><?php echo $langs->trans("PreventionPlanMustBeValidatedToSign") ?></div>
+		<div class="notice-subtitle"><?php echo $langs->trans("FirePermitMustBeValidatedToSign") ?></div>
 	</div>
-	<a class="butAction" style="width = 100%;margin-right:0" href="<?php echo DOL_URL_ROOT ?>/custom/digiriskdolibarr/preventionplan_card.php?id=<?php echo $id ?>"><?php echo $langs->trans("GoToValidate") ?></a>;
+	<a class="butAction" style="width = 100%;margin-right:0" href="<?php echo DOL_URL_ROOT ?>/custom/digiriskdolibarr/firepermit_card.php?id=<?php echo $id ?>"><?php echo $langs->trans("GoToValidate") ?></a>;
 </div>
 <?php endif; ?>
 <div class="noticeSignatureSuccess wpeo-notice notice-success hidden">
@@ -313,7 +313,7 @@ print dol_get_fiche_end(); ?>
 		</div>
 		<?php
 		if ($signatory->checkSignatoriesSignatures($object->id)) {
-			print '<a class="butAction" style="width = 100%;margin-right:0" href="'.DOL_URL_ROOT . '/custom/digiriskdolibarr/preventionplan_card.php?id='.$id.'">'. $langs->trans("GoToLock").'</a>';
+			print '<a class="butAction" style="width = 100%;margin-right:0" href="'.DOL_URL_ROOT . '/custom/digiriskdolibarr/firepermit_card.php?id='.$id.'">'. $langs->trans("GoToLock").'</a>';
 		}
 		?>
 	</div>
@@ -359,7 +359,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	$zone = "private";
 
 	//Master builder -- Maitre Oeuvre
-	$element = $signatory->fetchSignatory('PP_MAITRE_OEUVRE', $id);
+	$element = $signatory->fetchSignatory('FP_MAITRE_OEUVRE', $id);
 	if ($element > 0) {
 		$element = array_shift($element);
 		$usertmp->fetch($element->element_id);
@@ -415,7 +415,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	print '<br>';
 
 	//External Society Responsible -- Responsable Société extérieure
-	$element = $signatory->fetchSignatory('PP_EXT_SOCIETY_RESPONSIBLE', $id);
+	$element = $signatory->fetchSignatory('FP_EXT_SOCIETY_RESPONSIBLE', $id);
 	if ($element > 0) {
 		$element = array_shift($element);
 		$contact->fetch($element->element_id);
@@ -468,7 +468,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	print '<br>';
 
 	//External Society Interventants -- Intervenants Société extérieure
-	$ext_society_intervenants = $signatory->fetchSignatory('PP_EXT_SOCIETY_INTERVENANTS', $id);
+	$ext_society_intervenants = $signatory->fetchSignatory('FP_EXT_SOCIETY_INTERVENANTS', $id);
 
 	print load_fiche_titre($langs->trans("SignatureIntervenants"), $newcardbutton, '');
 
@@ -543,7 +543,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 		if ($backtopageforcancel) print '<input type="hidden" name="backtopageforcancel" value="'.$backtopageforcancel.'">';
 
 		//Intervenants extérieurs
-		$ext_society = $digiriskresources->fetchResourcesFromObject('PP_EXT_SOCIETY', $object);
+		$ext_society = $digiriskresources->fetchResourcesFromObject('FP_EXT_SOCIETY', $object);
 		print '<tr class="oddeven"><td class="maxwidth200">';
 		print digirisk_selectcontacts($ext_society->id, GETPOST('ext_intervenants'), 'ext_intervenants[]', 0, $contacts_no_email, '', 0, 'width200', false, 1, array(), false, 'multiple', 'ext_intervenants', false,0, $already_selected_intervenants);
 		print '</td>';

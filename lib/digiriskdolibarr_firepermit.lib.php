@@ -51,6 +51,11 @@ function firepermitPrepareHead($object)
 		$head[$h][1] = '<i class="fas fa-calendar-times"></i> ' . $langs->trans("Schedule");
 		$head[$h][2] = 'firepermitSchedule';
 		$h++;
+
+		$head[$h][0] = dol_buildpath("/digiriskdolibarr/firepermit_attendants.php", 1) . '?id=' . $object->id;
+		$head[$h][1] = '<i class="fas fa-file-signature"></i> ' . $langs->trans("Attendants");
+		$head[$h][2] = 'firepermitAttendants';
+		$h++;
 	}
 
 	complete_head_from_modules($conf, $langs, $object, $head, $h, 'firepermitdocument@digiriskdolibarr');
