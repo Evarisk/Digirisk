@@ -413,7 +413,16 @@ DeleteFirePermit = Supprimer le permis de feu
 FIREPERMIT_CREATEInDolibarr = Permis de feu créé dans Dolibarr
 ActionsOnFirePermit = Événements liés au permis de feu
 FirePermitGeneratedWithDolibarr = Permis de feu généré avec Dolibarr
-FirePermitLineCreatedWithDolibarr = Ligne de Permis de Feu créée avec Dolibarr
+FirePermitLineCreatedWithDolibarr = Ligne de permis de Feu créée avec Dolibarr
+FirePermitLineModifyTrigger = Ligne de permis de feu modifiée
+FirePermitLineDeleteTrigger = Ligne de permis de feu supprimée
+FirePermitModifyTrigger = Modification du permis de feu
+FirePermitInprogressTrigger = Permis de feu rouvert
+FirePermitPendingSignatureTrigger = Permis de feu en attente de signature des participants
+FirePermitLockTrigger = Permis de feu verrouillé - Prêt pour la génération du documuent
+FirePermitArchivedTrigger = Permis de feu archivé
+FirePermitAddAttendantTrigger = Ajout d'un participant au permis de feu
+FirePermitSentByMailTrigger = Email permis de feu envoyé
 
 # Mod Numbering - Modèle de numérotation
 DigiriskFirePermitNumberingModule = Modèle de numérotation des permis de feu de Digirisk
