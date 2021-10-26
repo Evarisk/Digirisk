@@ -387,6 +387,8 @@ LabourInspectorLastName = travail
 PreventionPlanData = Données du Plan de prévention
 MaitreOeuvreDescription = L'utilisateur utilisé par défaut comme Responsable de l'Entreprise Utilisatrice
 fk_preventionplan = Plan de prévention lié
+PreventionPlanLinked = Plan de prévention lié
+NoPreventionPlanRisk = Aucun risque sur le plan de prévention
 
 # Email - Mail
 PreventionPlanLabel = Récapitulatif du plan de prévention
@@ -415,28 +417,41 @@ FirePermitLineCreatedWithDolibarr = Ligne de Permis de Feu créée avec Dolibarr
 # Mod Numbering - Modèle de numérotation
 DigiriskFirePermitNumberingModule = Modèle de numérotation des permis de feu de Digirisk
 DigiriskFirePermitStandardModel = Renvoie le numéro sous la forme FPn où n est un compteur séquentiel sans rupture et sans remise à 0.
+DigiriskFirePermitDetNumberingModule = Modèle de numérotation des lignes du permis de feu de Digirisk
 DigiriskFirePermitDetStandardModel = Renvoie le numéro sous la forme FPRn où n est un compteur séquentiel sans rupture et sans remise à 0.
+DigiriskFirePermitDocumentNumberingModule = Modèle de numérotation des fiches de permis de feu de Digirisk
+DigiriskFirePermitDocumentStandardModel = Renvoie le numéro sous la forme FPDn où n est un compteur séquentiel sans rupture et sans remise à 0.
 
 # ODT Template - Template ODT
 DigiriskTemplateDocumentFirePermit = Modèle de documents des permis de feu de Digirisk
-FirePermitCustomDigiriskTemplate = ODT custom des permis de feu
-FirePermitDigiriskTemplate = ODT par défaut des permis de feu
+FirePermitDocumentCustomDigiriskTemplate = ODT custom des permis de feu
+FirePermitDocumentDigiriskTemplate = ODT par défaut des permis de feu
 FirePermitDocument = Fiche de Permis de Feu
 FirePermitDocumentGeneratedWithDolibarr = Permis de feu généré avec Dolibarr
 
 # Data - Donnée
 NewFirePermit Nouveau permis de feu
+ModifyFirePermit = Modifier le permis de feu
+FirePermitList = Liste des permis de feu
 FirePermit = Permis de feu
 FirePermitLine = risque(s)
-MaitreOeuvre = Responsable de l'Entreprise Utilisatrice
-ExtSociety = Entreprise extérieure
-ExtSocietyResponsible = Responsable de l'Entreprise Extérieure
-ExtSocietyIntervenants = Intervenants de l'Entreprise Extérieure
-ActionsDescription = Description des actions
-INRSRisk = Risque (INRS)
-PreventionMethod = Moyens de prévention
-Schedule = Horaires
 FirePermitSchedule = Horaires du permis de feu
+FirePermitRiskList = Liste des risques du permis de feu
+UsedMaterial = Matériel utilisé
+UsedMaterialTooltip = Matériel à utiliser pour limiter le risque
+ActionsFirePermitRisk = Actions
+ConfirmValidateFirePermit = Êtes-vous sûr de vouloir valider le permis de feu ? <br> La validation permet aux participants de signer le document mais <b> empêche l'ajout de nouveaux participants ou la modification du permis de feu </b>.
+ConfirmReOpenFirePermit = Êtes-vous sûr de vouloir rouvrir le permis de feu ? La réouverture permet la modification du permsi de feu et l'ajout de nouveaux participants mais <b>toutes les signatures du document seront perdues</b>.
+FirePermitMustBeInProgress = Le permis de feu doit être en cours pour accéder à cette fonctionnalité
+FirePermitMustBeInProgressToValidate = Le permis de feu est déjà validé
+FirePermitMustBeValidated = Le permis de feu doit être validé pour le rouvrir
+FirePermitMustBeValidatedToSign = Le permis de feu doit être validé pour que les participants puissent signer
+FirePermitMustBeLockedToSendEmail = Le permis de feu doit être verrouillé pour envoyer un email
+FirePermitMustBeLocked = Le permis de feu doit être verrouillé pour accéder à cette fonctionnalité
+GoToLockFirePermit = Verrouiller le permis de feu
+GoToValidateFirePermit = Valider le permis de feu
+FirePermitAttendants = Permis de feu - Participants
+
 
 
 #

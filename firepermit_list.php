@@ -184,7 +184,7 @@ if (empty($reshook))
 $form      = new Form($db);
 $formother = new FormOther($db);
 
-$title    = $langs->trans("FirePermit");
+$title    = $langs->trans("FirePermitList");
 $help_url = '';
 
 $morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");

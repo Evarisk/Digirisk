@@ -302,7 +302,7 @@ print dol_get_fiche_end(); ?>
 		<div class="notice-title"><?php echo $langs->trans('DisclaimerSignatureTitle') ?></div>
 		<div class="notice-subtitle"><?php echo $langs->trans("FirePermitMustBeValidatedToSign") ?></div>
 	</div>
-	<a class="butAction" style="width = 100%;margin-right:0" href="<?php echo DOL_URL_ROOT ?>/custom/digiriskdolibarr/firepermit_card.php?id=<?php echo $id ?>"><?php echo $langs->trans("GoToValidate") ?></a>;
+	<a class="butAction" style="width = 100%;margin-right:0" href="<?php echo DOL_URL_ROOT ?>/custom/digiriskdolibarr/firepermit_card.php?id=<?php echo $id ?>"><?php echo $langs->trans("GoToValidateFirePermit") ?></a>;
 </div>
 <?php endif; ?>
 <div class="noticeSignatureSuccess wpeo-notice notice-success hidden">
@@ -313,7 +313,7 @@ print dol_get_fiche_end(); ?>
 		</div>
 		<?php
 		if ($signatory->checkSignatoriesSignatures($object->id)) {
-			print '<a class="butAction" style="width = 100%;margin-right:0" href="'.DOL_URL_ROOT . '/custom/digiriskdolibarr/firepermit_card.php?id='.$id.'">'. $langs->trans("GoToLock").'</a>';
+			print '<a class="butAction" style="width = 100%;margin-right:0" href="'.DOL_URL_ROOT . '/custom/digiriskdolibarr/firepermit_card.php?id='.$id.'">'. $langs->trans("GoToLockFirePermit").'</a>';
 		}
 		?>
 	</div>
