@@ -239,7 +239,7 @@ $sql .= " FROM ".MAIN_DB_PREFIX.$firepermit->table_element." as t";
 if (is_array($extrafields->attributes[$firepermit->table_element]['label']) && count($extrafields->attributes[$firepermit->table_element]['label'])) $sql .= " LEFT JOIN ".MAIN_DB_PREFIX.$firepermit->table_element."_extrafields as ef on (t.rowid = ef.fk_object)";
 if ($firepermit->ismultientitymanaged == 1) $sql .= " WHERE t.entity IN (".getEntity($firepermit->element).")";
 else $sql .= " WHERE 1 = 1";
-$sql .= ' AND status = 1';
+$sql .= ' AND status != 0';
 
 
 foreach ($search as $key => $val)
