@@ -45,7 +45,6 @@ require_once __DIR__ . '/lib/digiriskdolibarr_function.lib.php';
 
 global $conf, $db, $langs, $hookmanager, $user;
 
-
 // Load translation files required by the page
 $langs->loadLangs(array("digiriskdolibarr@digiriskdolibarr", "other"));
 
