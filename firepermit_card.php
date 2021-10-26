@@ -1417,7 +1417,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 		$defaultmodel = $conf->global->DIGIRISKDOLIBARR_FIREPERMITDOCUMENT_DEFAULT_MODEL;
 		$title = $langs->trans('FirePermitDocument');
 
-		print digiriskshowdocuments($modulepart, $dir_files, $filedir, $urlsource, $permissiontoadd, $permissiontodelete, $defaultmodel, 1, 0, 28, 0, '', $title, '', $langs->defaultlang, '', $firepermitdocument, 0, 'remove_file');
+		print digiriskshowdocuments($modulepart, $dir_files, $filedir, $urlsource, $permissiontoadd, $permissiontodelete, $defaultmodel, 1, 0, 28, 0, '', $title, '', $langs->defaultlang, '', $firepermitdocument, 0, 'remove_file', $object->status == 3, $langs->trans('FirePermitMustBeLocked'));
 	}
 
 	if ($permissiontoadd) {
