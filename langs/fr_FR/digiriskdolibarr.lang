@@ -1001,3 +1001,4 @@ IDCCTooltip = Ce champ provient du module Digirisk pour Dolibarr </br> La nomenc
 ContactNoEmail = Les contacts affichés en grisé sont des contacts qui ne possèdent pas d'email
 NoEmailContact = Pas d'email sur ce contact
 AddMedia = Ajouter un média
+NoMediaLinked = Pas de média lié

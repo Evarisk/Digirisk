@@ -1633,6 +1633,8 @@ function digirisk_show_medias_linked($modulepart = 'ecm', $sdir, $size = 0, $nbm
 				if ($nbphoto) $return .= '</table>';
 			}
 		}
+	} else {
+		print $langs->trans('NoMediaLinked');
 	}
 	if (is_object($object)){
 		$object->nbphoto = $nbphoto;
