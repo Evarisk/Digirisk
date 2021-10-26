@@ -107,7 +107,9 @@ if (empty($reshook)) {
 
 $title    = $langs->trans("FirePermit")  . ' - ' . $langs->trans("Schedule");
 $help_url = '';
-llxHeader('', $title, $help_url);
+$morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");
+
+llxHeader('', $title, $help_url, '', '', '', '', $morecss);
 
 if (!empty($firepermit->id)) $res = $firepermit->fetch_optionals();
 
