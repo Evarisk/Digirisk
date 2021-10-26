@@ -254,6 +254,7 @@ InformationsSharingDigiriskTemplate = ODT par défaut des diffusions d'informati
 # Data - Donnée
 InformationsSharing = Diffusion d'informations
 HowToSetDataInformationsSharing = Pour configurer les données sur la diffusion d'informations, aller dans Accueil - Configuration - Société/Organisation - Social
+ConfigureSecurityAndSocialData = Configurer les données de la société
 
 ParticipationAgreement = Accords de participation
 TermsAndConditions = Modalités

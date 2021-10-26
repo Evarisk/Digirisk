@@ -327,6 +327,8 @@ print '<form method="POST" action="'.$_SERVER["PHP_SELF"].'" name="edit" enctype
 print '<input type="hidden" name="token" value="'.newToken().'">';
 print '<input type="hidden" name="action" value="update">';
 
+print '<a href="admin/socialconf.php" target="_blank">'.$langs->trans('ConfigureSecurityAndSocialData').' <i class="fas fa-external-link-alt"></i></a>';
+print '<hr>';
 print '<div class="fichecenter">';
 print '<table class="border centpercent tableforfield">' . "\n";
 
