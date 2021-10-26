@@ -519,6 +519,87 @@ if (empty($reshook)) {
 		}
 	}
 
+	// Action to set status STATUS_INPROGRESS
+	if ($action == 'confirm_setInProgress') {
+		$object->fetch($id);
+		if (!$error) {
+			$result = $object->setInProgress($user, false);
+			if ($result > 0) {
+				// Set In progress OK
+				$urltogo = str_replace('__ID__', $result, $backtopage);
+				$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
+				header("Location: " . $urltogo);
+				exit;
+			}
+			else {
+				// Set In progress KO
+				if (!empty($object->errors)) setEventMessages(null, $object->errors, 'errors');
+				else  setEventMessages($object->error, null, 'errors');
+			}
+		}
+	}
+
+	// Action to set status STATUS_PENDING_SIGNATURE
+	if ($action == 'confirm_setPendingSignature') {
+		$object->fetch($id);
+		if (!$error) {
+			$result = $object->setPendingSignature($user, false);
+			if ($result > 0) {
+				// Set pending signature OK
+				$urltogo = str_replace('__ID__', $result, $backtopage);
+				$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
+				header("Location: " . $urltogo);
+				exit;
+			}
+			else
+			{
+				// Set pending signature KO
+				if (!empty($object->errors)) setEventMessages(null, $object->errors, 'errors');
+				else  setEventMessages($object->error, null, 'errors');
+			}
+		}
+	}
+
+	// Action to set status STATUS_LOCKED
+	if ($action == 'confirm_setLocked') {
+		$object->fetch($id);
+		if (!$error) {
+			$result = $object->setLocked($user, false);
+			if ($result > 0) {
+				// Set locked OK
+				$urltogo = str_replace('__ID__', $result, $backtopage);
+				$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
+				header("Location: " . $urltogo);
+				exit;
+			}
+			else {
+				// Set locked KO
+				if (!empty($object->errors)) setEventMessages(null, $object->errors, 'errors');
+				else  setEventMessages($object->error, null, 'errors');
+			}
+		}
+	}
+
+	// Action to set status STATUS_ARCHIVED
+	if ($action == 'setArchived') {
+		$object->fetch($id);
+		if (!$error) {
+			$result = $object->setArchived($user, false);
+			if ($result > 0) {
+				// Set Archived OK
+				$urltogo = str_replace('__ID__', $result, $backtopage);
+				$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
+				header("Location: " . $urltogo);
+				exit;
+			}
+			else {
+				// Set Archived KO
+				if (!empty($object->errors)) setEventMessages(null, $object->errors, 'errors');
+				else  setEventMessages($object->error, null, 'errors');
+			}
+		}
+	}
+
 	// Actions to send emails
 	$triggersendname = 'FIREPERMIT_SENTBYMAIL';
 	$mode = 'emailfromthirdparty';
@@ -824,6 +905,65 @@ if (($id || $ref) && $action == 'edit') {
 	print '</form>';
 }
 
+$formconfirm = '';
+
+// SetLocked confirmation
+if (($action == 'setLocked' && (empty($conf->use_javascript_ajax) || !empty($conf->dol_use_jmobile)))		// Output when action = clone if jmobile or no js
+	|| (!empty($conf->use_javascript_ajax) && empty($conf->dol_use_jmobile)))							// Always output when not jmobile nor js
+{
+	$formconfirm .= $form->formconfirm($_SERVER["PHP_SELF"].'?id='.$object->id, $langs->trans('LockFirePermit'), $langs->trans('ConfirmLockFirePermit', $object->ref), 'confirm_setLocked', '', 'yes', 'actionButtonLock', 350, 600);
+}
+
+// setPendingSignature confirmation
+if (($action == 'setPendingSignature' && (empty($conf->use_javascript_ajax) || !empty($conf->dol_use_jmobile)))		// Output when action = clone if jmobile or no js
+	|| (!empty($conf->use_javascript_ajax) && empty($conf->dol_use_jmobile)))							// Always output when not jmobile nor js
+{
+	$formconfirm .= $form->formconfirm($_SERVER["PHP_SELF"].'?id='.$object->id, $langs->trans('ValidateFirePermit'), $langs->trans('ConfirmValidateFirePermit', $object->ref), 'confirm_setPendingSignature', '', 'yes', 'actionButtonPendingSignature', 350, 600);
+}
+
+// setInProgress confirmation
+if (($action == 'setInProgress' && (empty($conf->use_javascript_ajax) || !empty($conf->dol_use_jmobile)))		// Output when action = clone if jmobile or no js
+	|| (!empty($conf->use_javascript_ajax) && empty($conf->dol_use_jmobile)))							// Always output when not jmobile nor js
+{
+	$formconfirm .= $form->formconfirm($_SERVER["PHP_SELF"].'?id='.$object->id, $langs->trans('ReOpenFirePermit'), $langs->trans('ConfirmReOpenFirePermit', $object->ref), 'confirm_setInProgress', '', 'yes', 'actionButtonInProgress', 350, 600);
+}
+
+//// Clone confirmation
+//if (($action == 'clone' && (empty($conf->use_javascript_ajax) || !empty($conf->dol_use_jmobile)))		// Output when action = clone if jmobile or no js
+//	|| (!empty($conf->use_javascript_ajax) && empty($conf->dol_use_jmobile)))							// Always output when not jmobile nor js
+//{
+//	// Define confirmation messages
+//	$formquestionclone = array(
+//		'text' => $langs->trans("ConfirmClone"),
+//		array('type' => 'text', 'name' => 'clone_ref', 'label' => $langs->trans("NewRefForClone"), 'value' => empty($tmpcode) ? $langs->trans("CopyOf").' '.$object->ref : $tmpcode, 'size'=>24),
+//		array('type' => 'checkbox', 'name' => 'clone_content', 'label' => $langs->trans("CloneContentProduct"), 'value' => 1),
+//		array('type' => 'checkbox', 'name' => 'clone_categories', 'label' => $langs->trans("CloneCategoriesProduct"), 'value' => 1),
+//	);
+////	if (!empty($conf->global->PRODUIT_MULTIPRICES)) {
+////		$formquestionclone[] = array('type' => 'checkbox', 'name' => 'clone_prices', 'label' => $langs->trans("ClonePricesProduct").' ('.$langs->trans("CustomerPrices").')', 'value' => 0);
+////	}
+////	if (!empty($conf->global->PRODUIT_SOUSPRODUITS))
+////	{
+////		$formquestionclone[] = array('type' => 'checkbox', 'name' => 'clone_composition', 'label' => $langs->trans('CloneCompositionProduct'), 'value' => 1);
+////	}
+//
+//	$formconfirm .= $form->formconfirm($_SERVER["PHP_SELF"].'?id='.$object->id, $langs->trans('ToClone'), $langs->trans('ConfirmCloneFirePermit', $object->ref), 'confirm_clone', $formquestionclone, 'yes', 'actionButtonClone', 350, 600);
+//}
+
+//	// Confirmation to delete
+//	if ($action == 'delete') {
+//		$formconfirm = $form->formconfirm($_SERVER["PHP_SELF"].'?id='.$object->id, $langs->trans('DeleteFirePermit'), $langs->trans('ConfirmDeleteObject'), 'confirm_delete', '', 0, 1);
+//	}
+
+// Call Hook formConfirm
+$parameters = array('formConfirm' => $formconfirm, 'object' => $object);
+$reshook = $hookmanager->executeHooks('formConfirm', $parameters, $object, $action); // Note that $action and $object may have been modified by hook
+if (empty($reshook)) $formconfirm .= $hookmanager->resPrint;
+elseif ($reshook > 0) $formconfirm = $hookmanager->resPrint;
+
+// Print form confirm
+print $formconfirm;
+
 // Part to show record
 if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	// Object card
@@ -832,18 +972,6 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 
 	$head = firepermitPrepareHead($object);
 	print dol_get_fiche_head($head, 'firepermitCard', $title, -1, "digiriskdolibarr@digiriskdolibarr");
-
-//	$formconfirm = '';
-//	// Confirmation to delete
-//	if ($action == 'delete') {
-//		$formconfirm = $form->formconfirm($_SERVER["PHP_SELF"].'?id='.$object->id, $langs->trans('DeleteFirePermit'), $langs->trans('ConfirmDeleteObject'), 'confirm_delete', '', 0, 1);
-//	}
-
-//	// Call Hook formConfirm
-//	$parameters = array('formConfirm' => $formconfirm, 'lineid' => $lineid);
-//	$reshook = $hookmanager->executeHooks('formConfirm', $parameters, $object, $action); // Note that $action and $object may have been modified by hook
-//	if (empty($reshook)) $formconfirm .= $hookmanager->resPrint;
-//	elseif ($reshook > 0) $formconfirm = $hookmanager->resPrint;
 
 	dol_strlen($object->label) ? $morehtmlref = ' - ' . $object->label : '';
 	digirisk_banner_tab($object, 'ref', '', 0, 'ref', 'ref', $morehtmlref, '', 0, '', $object->getLibStatut(5));
