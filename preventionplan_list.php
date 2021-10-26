@@ -1,16 +1,9 @@
 <?php
-/* Copyright (C) 2001-2005 Rodolphe Quiedeville <rodolphe@quiedeville.org>
- * Copyright (C) 2004-2019 Laurent Destailleur  <eldy@users.sourceforge.net>
- * Copyright (C) 2005      Marc Bariley / Ocebo <marc@ocebo.com>
- * Copyright (C) 2005-2010 Regis Houssin        <regis.houssin@inodbox.com>
- * Copyright (C) 2013      Cédric Salvador      <csalvador@gpcsolutions.fr>
- * Copyright (C) 2015 	   Claudio Aschieri     <c.aschieri@19.coop>
- * Copyright (C) 2018 	   Ferran Marcet	    <fmarcet@2byte.es>
- * Copyright (C) 2019 	   Juanjo Menent	    <jmenent@2byte.es>
+/* Copyright (C) 2021 EOXIA <dev@eoxia.com>
  *
- * This program is free software; you can redistribute it and/or modify
+ * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 3 of the License, or
+ * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
@@ -19,7 +12,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
 /**
@@ -111,8 +104,9 @@ foreach ($preventionplan->fields as $key => $val)
 include DOL_DOCUMENT_ROOT.'/core/actions_fetchobject.inc.php'; // Must be include, not include_once.
 
 //Permission for preventionplan
-$permissiontoread = $user->rights->digiriskdolibarr->preventionplan->read;
-$permissiontoadd = $user->rights->digiriskdolibarr->preventionplan->write;
+$permissiontoread   = $user->rights->digiriskdolibarr->preventionplan->read;
+$permissiontoadd    = $user->rights->digiriskdolibarr->preventionplan->write;
+$permissiontodelete = $user->rights->digiriskdolibarr->preventionplan->delete;
 
 // Security check - Protection if external user
 if (!$permissiontoread) accessforbidden();
@@ -163,13 +157,13 @@ if (empty($reshook))
 				$result = $preventionplantodelete->update($user, true);
 
 				if ($result < 0) {
-					// Delete risk KO
+					// Delete preventionplan KO
 					if (!empty($risk->errors)) setEventMessages(null, $risk->errors, 'errors');
 					else  setEventMessages($risk->error, null, 'errors');
 				}
 			}
 
-			// Delete risk OK
+			// Delete preventionplan OK
 			$urltogo = str_replace('__ID__', $result, $backtopage);
 			$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
 			header("Location: ".$_SERVER["PHP_SELF"]);
@@ -187,7 +181,7 @@ $form = new Form($db);
 $formother = new FormOther($db);
 
 $title = $langs->trans("PreventionPlanList");
-$help_url = 'FR:Module_DigipreventionplanDolibarr';
+$help_url = '';
 
 $morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");
 
@@ -198,14 +192,13 @@ include DOL_DOCUMENT_ROOT.'/core/tpl/extrafields_list_search_param.tpl.php';
 
 // List of mass actions available
 $arrayofmassactions = array();
-if ($user->rights->digiriskdolibarr->preventionplan->delete) $arrayofmassactions['predelete'] = '<span class="fa fa-trash paddingrightonly"></span>'.$langs->trans("Delete");
+if ($permissiontodelete) $arrayofmassactions['predelete'] = '<span class="fa fa-trash paddingrightonly"></span>'.$langs->trans("Delete");
 if (in_array($massaction, array('presend', 'predelete'))) $arrayofmassactions = array();
 
 $massactionbutton = $form->selectMassAction('', $arrayofmassactions);
 
 $newcardbutton = '';
-if ($permissiontoadd)
-{
+if ($permissiontoadd) {
 	$newcardbutton .= dolGetButtonTitle($langs->trans('NewPreventionPlan'), '', 'fa fa-plus-circle', DOL_URL_ROOT.'/custom/digiriskdolibarr/preventionplan_card.php?action=create');
 }
 
@@ -303,7 +296,7 @@ foreach ($search as $key => $val)
 	{
 		$obj = $db->fetch_object($resql);
 		$id = $obj->rowid;
-		header("Location: ".dol_buildpath('/digiriskdolibarr/digiriskelement_preventionplan.php', 1).'?id='.$id);
+		header("Location: ".dol_buildpath('/digiriskdolibarr/preventionplan_card.php', 1).'?id='.$id);
 		exit;
 	}
 

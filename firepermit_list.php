@@ -1,16 +1,9 @@
 <?php
-/* Copyright (C) 2001-2005 Rodolphe Quiedeville <rodolphe@quiedeville.org>
- * Copyright (C) 2004-2019 Laurent Destailleur  <eldy@users.sourceforge.net>
- * Copyright (C) 2005      Marc Bariley / Ocebo <marc@ocebo.com>
- * Copyright (C) 2005-2010 Regis Houssin        <regis.houssin@inodbox.com>
- * Copyright (C) 2013      Cédric Salvador      <csalvador@gpcsolutions.fr>
- * Copyright (C) 2015 	   Claudio Aschieri     <c.aschieri@19.coop>
- * Copyright (C) 2018 	   Ferran Marcet	    <fmarcet@2byte.es>
- * Copyright (C) 2019 	   Juanjo Menent	    <jmenent@2byte.es>
+/* Copyright (C) 2021 EOXIA <dev@eoxia.com>
  *
- * This program is free software; you can redistribute it and/or modify
+ * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 3 of the License, or
+ * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
@@ -19,13 +12,13 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
 /**
  *   	\file       firepermit_list.php
  *		\ingroup    digiriskdolibarr
- *		\brief      List page for prevention plan
+ *		\brief      List page for fire permit
  */
 
 // Load Dolibarr environment
@@ -53,9 +46,12 @@ require_once __DIR__ . '/class/firepermit.class.php';
 require_once __DIR__ . '/class/preventionplan.class.php';
 require_once __DIR__ . '/class/digiriskresources.class.php';
 
+global $conf, $db;
+
 // Load translation files required by the page
 $langs->loadLangs(array('projects', 'companies', 'commercial'));
-global $conf, $db;
+
+// Get parameters
 $action      = GETPOST('action', 'alpha');
 $massaction  = GETPOST('massaction', 'alpha');
 $show_files  = GETPOST('show_files', 'int');
@@ -63,21 +59,21 @@ $confirm     = GETPOST('confirm', 'alpha');
 $toselect    = GETPOST('toselect', 'array');
 $contextpage = GETPOST('contextpage', 'aZ') ?GETPOST('contextpage', 'aZ') : 'firepermitlist';
 
-$title = $langs->trans("FirePermit");
-
-$firepermit         = new FirePermit($db);
-$preventionplan     = new PreventionPlan($db);
-$societe            = new Societe($db);
-$contact            = new Contact($db);
-$usertmp            = new User($db);
-$digiriskresources  = new DigiriskResources($db);
-
 $limit     = GETPOST('limit', 'int') ?GETPOST('limit', 'int') : $conf->liste_limit;
 $sortfield = GETPOST("sortfield", "alpha");
 $sortorder = GETPOST("sortorder", 'alpha');
 $page      = GETPOSTISSET('pageplusone') ? (GETPOST('pageplusone') - 1) : GETPOST("page", 'int');
 $page      = is_numeric($page) ? $page : 0;
 $page      = $page == -1 ? 0 : $page;
+
+// Initialize technical objects
+$firepermit         = new FirePermit($db);
+$signatory          = new FirePermitSignature($db);
+$preventionplan     = new PreventionPlan($db);
+$societe            = new Societe($db);
+$contact            = new Contact($db);
+$usertmp            = new User($db);
+$digiriskresources  = new DigiriskResources($db);
 
 if (!$sortfield) $sortfield = "t.ref";
 if (!$sortorder) $sortorder = "ASC";
@@ -110,16 +106,16 @@ foreach ($firepermit->fields as $key => $val)
 	if (!empty($val['visible'])) $arrayfields['t.'.$key] = array('label'=>$val['label'], 'checked'=>(($val['visible'] < 0) ? 0 : 1), 'enabled'=>($val['enabled'] && ($val['visible'] != 3)), 'position'=>$val['position']);
 }
 
-// Load Digifirepermit_element object
+// Load firepermit object
 include DOL_DOCUMENT_ROOT.'/core/actions_fetchobject.inc.php'; // Must be include, not include_once.
 
-//Permission for digiriskelement_firepermit
-$permissiontoread = $user->rights->digiriskdolibarr->firepermit->read;
-$permissiontoadd = $user->rights->digiriskdolibarr->firepermit->write;
-$permissiontodelete = $user->rights->digiriskdolibarr->firepermitdocument->delete;
+//Permission for firepermit
+$permissiontoread   = $user->rights->digiriskdolibarr->firepermit->read;
+$permissiontoadd    = $user->rights->digiriskdolibarr->firepermit->write;
+$permissiontodelete = $user->rights->digiriskdolibarr->firepermit->delete;
 
-// Security check - Protection if external user
-if (!$user->rights->digiriskdolibarr->lire) accessforbidden();
+// Security check
+if (!$permissiontoread) accessforbidden();
 
 /*
  * Actions
@@ -179,38 +175,34 @@ if (empty($reshook))
 			exit;
 		}
 	}
-
-
 }
-
 
 /*
  * View
  */
 
-$form = new Form($db);
+$form      = new Form($db);
 $formother = new FormOther($db);
 
-$title = $langs->trans("FirePermit");
-$help_url = 'FR:Module_DigifirepermitDolibarr';
+$title    = $langs->trans("FirePermit");
+$help_url = '';
 
-llxHeader("", $title, $help_url);
+$morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");
+
+llxHeader("", $title, $help_url, '', '', '', '', $morecss, '', 'classforhorizontalscrolloftabs');
 
 // Add $param from extra fields
 include DOL_DOCUMENT_ROOT.'/core/tpl/extrafields_list_search_param.tpl.php';
 
 // List of mass actions available
 $arrayofmassactions = array();
-//if($user->rights->societe->creer) $arrayofmassactions['createbills']=$langs->trans("CreateInvoiceForThisCustomer");
-if ($user->rights->projet->creer) $arrayofmassactions['close'] = $langs->trans("Close");
-if ($user->rights->societe->supprimer) $arrayofmassactions['predelete'] = '<span class="fa fa-trash paddingrightonly"></span>'.$langs->trans("Delete");
+if ($permissiontodelete) $arrayofmassactions['predelete'] = '<span class="fa fa-trash paddingrightonly"></span>'.$langs->trans("Delete");
 if (in_array($massaction, array('presend', 'predelete'))) $arrayofmassactions = array();
 
 $massactionbutton = $form->selectMassAction('', $arrayofmassactions);
 
 $newcardbutton = '';
-if ($user->rights->projet->creer)
-{
+if ($permissiontoadd) {
 	$newcardbutton .= dolGetButtonTitle($langs->trans('NewFirePermit'), '', 'fa fa-plus-circle', DOL_URL_ROOT.'/custom/digiriskdolibarr/firepermit_card.php?action=create');
 }
 
@@ -224,22 +216,19 @@ print '<input type="hidden" name="sortorder" value="'.$sortorder.'">';
 print '<input type="hidden" name="type" value="'.$type.'">';
 print '<input type="hidden" name="contextpage" value="'.$contextpage.'">';
 
-print_barre_liste($form->textwithpicto($title, $texthelp), $page, $_SERVER["PHP_SELF"], $param, $sortfield, $sortorder, $massactionbutton, $num, $nbtotalofrecords, 'firepermitdocument', 0, $newcardbutton, '', $limit, 0, 0, 1);
-
 include DOL_DOCUMENT_ROOT.'/core/tpl/massactions_pre.tpl.php';
 
 // Build and execute select
 // --------------------------------------------------------------------
 
 $sql = 'SELECT ';
-foreach ($firepermit->fields as $key => $val)
-	{
-		$sql .= 't.'.$key.', ';
-	}
+foreach ($firepermit->fields as $key => $val) {
+	$sql .= 't.'.$key.', ';
+}
 // Add fields from extrafields
 if (!empty($extrafields->attributes[$firepermit->table_element]['label'])) {
-		foreach ($extrafields->attributes[$firepermit->table_element]['label'] as $key => $val) $sql .= ($extrafields->attributes[$firepermit->table_element]['type'][$key] != 'separate' ? "ef.".$key.' as options_'.$key.', ' : '');
-	}
+	foreach ($extrafields->attributes[$firepermit->table_element]['label'] as $key => $val) $sql .= ($extrafields->attributes[$firepermit->table_element]['type'][$key] != 'separate' ? "ef.".$key.' as options_'.$key.', ' : '');
+}
 // Add fields from hooks
 $parameters = array();
 $reshook = $hookmanager->executeHooks('printFieldListSelect', $parameters, $firepermit); // Note that $action and $firepermitdocument may have been modified by hook
@@ -310,7 +299,7 @@ foreach ($search as $key => $val)
 	{
 		$obj = $db->fetch_object($resql);
 		$id = $obj->rowid;
-		header("Location: ".dol_buildpath('/digiriskdolibarr/digiriskelement_firepermit.php', 1).'?id='.$id);
+		header("Location: ".dol_buildpath('/digiriskdolibarr/firepermit_card.php', 1).'?id='.$id);
 		exit;
 	}
 
@@ -324,10 +313,12 @@ $moreforfilter = '';
 
 $varpage = empty($contextpage) ? $_SERVER["PHP_SELF"] : $contextpage;
 
-$arrayfields['MaitreOeuvre'] = array('label'=>'MaitreOeuvre');
-$arrayfields['ExtSociety'] = array('label'=>'ExtSociety');
-$arrayfields['ExtSocietyResponsible'] = array('label'=>'ExtSocietyResponsible');
-$arrayfields['ExtSocietyIntervenants'] = array('label'=>'ExtSocietyIntervenants');
+$arrayfields['MaitreOeuvre'] = array('label'=>'MaitreOeuvre', 'checked' => 1);
+$arrayfields['ExtSociety'] = array('label'=>'ExtSociety', 'checked' => 1);
+$arrayfields['ExtSocietyResponsible'] = array('label'=>'ExtSocietyResponsible', 'checked' => 1);
+$arrayfields['ExtSocietyIntervenants'] = array('label'=>'ExtSocietyIntervenants', 'checked' => 1);
+
+print_barre_liste($form->textwithpicto($title, $texthelp), $page, $_SERVER["PHP_SELF"], $param, $sortfield, $sortorder, $massactionbutton, $num, $nbtotalofrecords, 'digiriskdolibarr32px.png@digiriskdolibarr', 0, $newcardbutton, '', $limit, 0, 0, 1);
 
 $selectedfields = $form->multiSelectArrayWithCheckbox('selectedfields', $arrayfields, $varpage); // This also change content of $arrayfields
 if ($massactionbutton) $selectedfields .= $form->showCheckAddButtons('checkforselect', 1);
@@ -336,10 +327,10 @@ print '<div class="div-table-responsive">';
 print '<table class="tagtable nobottomiftotal liste'.($moreforfilter ? " listwithfilterbefore" : "").'">'."\n";
 print '<tr class="liste_titre">';
 
-$firepermit->fields['Custom']['FP_MAITRE_OEUVRE'] = 'MaitreOeuvre';
-$firepermit->fields['Custom']['FP_EXT_SOCIETY'] = 'ExtSociety';
-$firepermit->fields['Custom']['FP_EXT_SOCIETY_RESPONSIBLE'] = 'ExtSocietyResponsible';
-$firepermit->fields['Custom']['FP_EXT_SOCIETY_INTERVENANTS'] = 'ExtSocietyIntervenants';
+$firepermit->fields['Custom']['FP_MAITRE_OEUVRE']            = $arrayfields['MaitreOeuvre'] ;
+$firepermit->fields['Custom']['FP_EXT_SOCIETY']              = $arrayfields['ExtSociety'];
+$firepermit->fields['Custom']['FP_EXT_SOCIETY_RESPONSIBLE']  = $arrayfields['ExtSocietyResponsible'];
+$firepermit->fields['Custom']['FP_EXT_SOCIETY_INTERVENANTS'] = $arrayfields['ExtSocietyIntervenants'];
 
 foreach ($firepermit->fields as $key => $val) {
 	$cssforfield = (empty($val['css']) ? '' : $val['css']);
@@ -355,9 +346,10 @@ foreach ($firepermit->fields as $key => $val) {
 	}
 	if ($key == 'Custom') {
 		foreach ($val as $resource) {
-			print '<td>';
-			print '';
-			print '</td>';
+			if ($resource['checked']) {
+				print '<td>';
+				print '</td>';
+			}
 		}
 	}
 }
@@ -397,9 +389,11 @@ foreach ($firepermit->fields as $key => $val)
 	}
 	if ($key == 'Custom') {
 		foreach ($val as $resource) {
-			print '<td>';
-			print $langs->trans($resource);
-			print '</td>';
+			if ($resource['checked']) {
+				print '<td>';
+				print $langs->trans($resource['label']);
+				print '</td>';
+			}
 		}
 	}
 }
@@ -457,6 +451,11 @@ while ($i < ($limit ? min($num, $limit) : $num)) {
 			elseif ($key == 'ref') {
 				print $firepermit->getNomUrl();
 			}
+			elseif ($key == 'date_start') {
+				print dol_print_date($firepermit->date_start, 'dayhour', 'tzserver');	// We suppose dates without time are always gmt (storage of course + output)
+			} elseif ($key == 'date_end') {
+				print dol_print_date($firepermit->date_end, 'dayhour', 'tzserver');	// We suppose dates without time are always gmt (storage of course + output)
+			}
 			else print $firepermit->showOutputField($val, $key, $firepermit->$key, '');
 			print '</td>';
 			if (!$i) $totalarray['nbfield']++;
@@ -467,20 +466,43 @@ while ($i < ($limit ? min($num, $limit) : $num)) {
 		}
 		if ($key == 'Custom') {
 			foreach ($val as $name => $resource) {
-				$resourceLinked = $digiriskresources->fetchResourcesFromObject($name, $firepermit);
-				print '<td>';
-				if ($resourceLinked > 0) {
-					if ($resource == 'ExtSocietyIntervenants' && is_array($resourceLinked)) {
-						$resourcesLinked = array_shift($resourceLinked);
-						foreach($resourcesLinked as $resourceLinkedSingle) {
-							print $resourceLinkedSingle->getNomUrl(1);
-							print '<br>';
+				if ($resource['checked']) {
+					print '<td>';
+					if ($resource['label'] == 'MaitreOeuvre') {
+						$element = $signatory->fetchSignatory('FP_MAITRE_OEUVRE', $firepermit->id);
+						if ($element > 0) {
+							$element = array_shift($element);
+							$usertmp->fetch($element->element_id);
+							print $usertmp->getNomUrl(1);
 						}
-					} else {
-						print $resourceLinked->getNomUrl(1);
+					} elseif ($resource['label'] == 'ExtSociety') {
+						$ext_society = $digiriskresources->fetchResourcesFromObject('FP_EXT_SOCIETY', $firepermit);
+						if ($ext_society > 0) {
+							print $ext_society->getNomUrl(1);
+						}
 					}
+					if ($resource['label'] == 'ExtSocietyResponsible') {
+						$element = $signatory->fetchSignatory('FP_EXT_SOCIETY_RESPONSIBLE', $firepermit->id);
+						if ($element > 0) {
+							$element = array_shift($element);
+							$contact->fetch($element->element_id);
+							print $contact->getNomUrl(1);
+						}
+					}
+					if ($resource['label'] == 'ExtSocietyIntervenants') {
+						$ext_society_intervenants = $signatory->fetchSignatory('FP_EXT_SOCIETY_INTERVENANTS', $firepermit->id);
+						if (is_array($ext_society_intervenants) && !empty ($ext_society_intervenants) && $ext_society_intervenants > 0) {
+							foreach ($ext_society_intervenants as $element) {
+								if ($element > 0) {
+									$contact->fetch($element->element_id);
+									print $contact->getNomUrl(1);
+									print '<br>';
+								}
+							}
+						}
+					}
+					print '</td>';
 				}
-				print '</td>';
 			}
 		}
 	}
