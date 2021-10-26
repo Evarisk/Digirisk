@@ -160,7 +160,10 @@ class ActionsDigiriskdolibarr
 		if (in_array($parameters['currentcontext'], array('emailtemplates')))	    // do something only for the context 'somecontext1' or 'somecontext2'
 		{
 			if ($conf->digiriskdolibarr->enabled && $user->rights->digiriskdolibarr->preventionplan->read) {
-				$value = array('preventionplan' => '<i class="fas fa-info"></i>  ' . dol_escape_htmltag($langs->trans('PreventionPlan')));
+				$value['preventionplan'] = '<i class="fas fa-info"></i>  ' . dol_escape_htmltag($langs->trans('PreventionPlan'));
+			}
+			if ($conf->digiriskdolibarr->enabled && $user->rights->digiriskdolibarr->firepermit->read) {
+				$value['firepermit'] = '<i class="fas fa-fire-alt"></i>  ' . dol_escape_htmltag($langs->trans('FirePermit'));
 			}
 		}
 

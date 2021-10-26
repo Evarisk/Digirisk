@@ -389,6 +389,7 @@ MaitreOeuvreDescription = L'utilisateur utilisé par défaut comme Responsable d
 fk_preventionplan = Plan de prévention lié
 PreventionPlanLinked = Plan de prévention lié
 NoPreventionPlanRisk = Aucun risque sur le plan de prévention
+NoPreventionPlanLinked = Aucun plan de prévention lié
 
 # Email - Mail
 PreventionPlanLabel = Récapitulatif du plan de prévention
@@ -442,6 +443,7 @@ UsedMaterialTooltip = Matériel à utiliser pour limiter le risque
 ActionsFirePermitRisk = Actions
 ConfirmValidateFirePermit = Êtes-vous sûr de vouloir valider le permis de feu ? <br> La validation permet aux participants de signer le document mais <b> empêche l'ajout de nouveaux participants ou la modification du permis de feu </b>.
 ConfirmReOpenFirePermit = Êtes-vous sûr de vouloir rouvrir le permis de feu ? La réouverture permet la modification du permsi de feu et l'ajout de nouveaux participants mais <b>toutes les signatures du document seront perdues</b>.
+ConfirmLockFirePermit = Êtes-vous sûr de vouloir verrouiller le permis de feu ?<br>Ce verrouillage permet de figer les données et la génération du document.
 FirePermitMustBeInProgress = Le permis de feu doit être en cours pour accéder à cette fonctionnalité
 FirePermitMustBeInProgressToValidate = Le permis de feu est déjà validé
 FirePermitMustBeValidated = Le permis de feu doit être validé pour le rouvrir
@@ -451,6 +453,11 @@ FirePermitMustBeLocked = Le permis de feu doit être verrouillé pour accéder �
 GoToLockFirePermit = Verrouiller le permis de feu
 GoToValidateFirePermit = Valider le permis de feu
 FirePermitAttendants = Permis de feu - Participants
+
+# Email - Mail
+FirePermitLabel = Récapitulatif du permis de feu
+FirePermitSubject = Email permis de feu
+FirePermitContent = Veuillez trouver ci-joint le document ODT du permis de feu.
 
 
 
