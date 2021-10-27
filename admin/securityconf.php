@@ -146,7 +146,7 @@ foreach ($securityConsts as $securityConst) {
 	}
 }
 foreach ($securityResources as $securityResource) {
-	if (!empty($allLinks[$securityResource])) {
+	if (!empty($allLinks[$securityResource] && $allLinks[$securityResource]->id[0] > 0)) {
 		$counter += 1;
 	}
 }
