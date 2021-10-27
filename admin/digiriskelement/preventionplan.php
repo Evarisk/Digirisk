@@ -36,9 +36,10 @@ if (!$res && file_exists("../../../main.inc.php")) $res = @include "../../../mai
 if (!$res && file_exists("../../../../main.inc.php")) $res = @include "../../../../main.inc.php";
 if (!$res) die("Include of main fails");
 
-global $langs, $user;
+global $conf, $db, $langs, $user;
 
 // Libraries
+require_once DOL_DOCUMENT_ROOT . "/core/class/html.formprojet.class.php";
 require_once DOL_DOCUMENT_ROOT . "/core/lib/admin.lib.php";
 dol_include_once('/custom/digiriskdolibarr/lib/digiriskdolibarr.lib.php');
 dol_include_once('/custom/digiriskdolibarr/class/digiriskdocuments.class.php');
@@ -63,6 +64,20 @@ $usertmp = new User($db);
 /*
  * Actions
  */
+
+if (($action == 'update' && !GETPOST("cancel", 'alpha')) || ($action == 'updateedit')) {
+	$PPRProject = GETPOST('PPRProject', 'none');
+	$PPRProject  = preg_split('/_/', $PPRProject);
+
+	dolibarr_set_const($db, "DIGIRISKDOLIBARR_PREVENTIONPLAN_PROJECT", $PPRProject[0], 'integer', 0, '', $conf->entity);
+
+	if ($action != 'updateedit' && !$error)
+	{
+		header("Location: ".$_SERVER["PHP_SELF"]);
+		exit;
+	}
+}
+
 if ($action == 'updateMask') {
 	$maskconstpreventionplan = GETPOST('maskconstpreventionplan', 'alpha');
 	$maskpreventionplan      = GETPOST('maskpreventionplan', 'alpha');
@@ -110,6 +125,7 @@ if ($action == 'setMaitreOeuvre') {
  * View
  */
 
+if (!empty($conf->projet->enabled)) { $formproject = new FormProjets($db); }
 $form = new Form($db);
 
 $help_url = 'FR:Module_DigiriskDolibarr#L.27onglet_.C3.89l.C3.A9ment_Digirisk';
@@ -128,6 +144,31 @@ $head = digiriskdolibarrAdminPrepareHead();
 print dol_get_fiche_head($head, 'digiriskelement', '', -1, "digiriskdolibarr@digiriskdolibarr");
 $head = digiriskdolibarrAdminDigiriskElementPrepareHead();
 print dol_get_fiche_head($head, 'preventionplan', '', -1, "digiriskdolibarr@digiriskdolibarr");
+
+print load_fiche_titre($langs->trans("PreventionPlanManagement"), '', '');
+
+print '<form method="POST" action="'.$_SERVER["PHP_SELF"].'" name="social_form">';
+print '<input type="hidden" name="token" value="'.newToken().'">';
+print '<input type="hidden" name="action" value="update">';
+print '<table class="noborder centpercent editmode">';
+print '<tr class="liste_titre">';
+print '<td>'.$langs->trans("Name").'</td>';
+print '<td>'.$langs->trans("SelectProject").'</td>';
+print '<td>'.$langs->trans("Action").'</td>';
+print '</tr>';
+
+// Project
+if (!empty($conf->projet->enabled)) {
+	$langs->load("projects");
+	print '<tr class="oddeven"><td><label for="PPRProject">'.$langs->trans("PPRProject").'</label></td><td>';
+	$numprojet = $formproject->select_projects(0,  $conf->global->DIGIRISKDOLIBARR_PREVENTIONPLAN_PROJECT, 'PPRProject', 0, 0, 0, 0, 0, 0, 0, '', 0, 0, 'maxwidth500');
+	print ' <a href="'.DOL_URL_ROOT.'/projet/card.php?&action=create&status=1&backtopage='.urlencode($_SERVER["PHP_SELF"].'?action=create').'"><span class="fa fa-plus-circle valignmiddle" title="'.$langs->trans("AddProject").'"></span></a>';
+	print '<td><input type="submit" class="button" name="save" value="'.$langs->trans("Save").'">';
+	print '</td></tr>';
+}
+
+print '</table>';
+print '</form>';
 
 /*
  *  Numbering module Prevention Plan

@@ -395,6 +395,8 @@ fk_preventionplan = Plan de prévention lié
 PreventionPlanLinked = Plan de prévention lié
 NoPreventionPlanRisk = Aucun risque sur le plan de prévention
 NoPreventionPlanLinked = Aucun plan de prévention lié
+PreventionPlanManagement = Gestion des plans de prévention
+PPRProject = Projet lié aux plans de prévention
 
 # Email - Mail
 PreventionPlanLabel = Récapitulatif du plan de prévention
