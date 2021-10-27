@@ -134,7 +134,7 @@ $morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");
 
 $counter  = 0;
 
-$securityResources = array("SAMU","Pompiers","Police","AllEmergencies","RightsDefender","PoisonControlCenter", "Responsible");
+$securityResources = array("SAMU","Pompiers","Police","AllEmergencies","RightsDefender","PoisonControlCenter", "Responsible", "LabourDoctorSociety", "LabourDoctorContact", "LabourInspectorSociety", "LabourInspectorContact" );
 $securityConsts    = array("DIGIRISK_LOCATION_OF_DETAILED_INSTRUCTION", "DIGIRISK_SOCIETY_DESCRIPTION", "DIGIRISK_GENERAL_MEANS", "DIGIRISK_GENERAL_RULES", "DIGIRISK_FIRST_AID", "DIGIRISK_RULES_LOCATION", "DIGIRISK_DUER_LOCATION", "DIGIRISK_COLLECTIVE_AGREEMENT_LOCATION");
 $socialResources   = array("TitularsCSE", "AlternatesCSE", "TitularsDP", "AlternatesDP");
 
