@@ -297,6 +297,7 @@ PreventionPlanLockTrigger = Plan de prévention verrouillé - Prêt pour la gén
 PreventionPlanArchivedTrigger = Plan de prévention archivé
 PreventionPlanAddAttendantTrigger = Ajout d'un participant au plan de prévention
 PreventionPlanSentByMailTrigger = Email plan de prévention envoyé
+PreventionPlanOpeningHoursCreateTrigger = Enregistrement des horaires du plan de prévention
 
 # Mod Numbering - Modèle de numérotation
 DigiriskPreventionPlanNumberingModule = Modèle de numérotation des plans de prévention de Digirisk
@@ -427,6 +428,7 @@ FirePermitLockTrigger = Permis de feu verrouillé - Prêt pour la génération d
 FirePermitArchivedTrigger = Permis de feu archivé
 FirePermitAddAttendantTrigger = Ajout d'un participant au permis de feu
 FirePermitSentByMailTrigger = Email permis de feu envoyé
+FirePermitOpeningHoursCreateTrigger = Enregistrement des horaires du permis de feu
 
 # Mod Numbering - Modèle de numérotation
 DigiriskFirePermitNumberingModule = Modèle de numérotation des permis de feu de Digirisk
@@ -466,6 +468,7 @@ FirePermitMustBeLocked = Le permis de feu doit être verrouillé pour accéder �
 GoToLockFirePermit = Verrouiller le permis de feu
 GoToValidateFirePermit = Valider le permis de feu
 FirePermitAttendants = Permis de feu - Participants
+FirePermitScheduleSave = Les horaires du permis de feu ont bien été enregistrés
 
 # Email - Mail
 FirePermitLabel = Récapitulatif du permis de feu

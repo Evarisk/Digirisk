@@ -887,6 +887,29 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				}
 				break;
 
+			case 'OPENINGHOURS_CREATE' :
+
+				dol_syslog("Trigger '".$this->name."' for action '$action' launched by ".__FILE__.". id=".$object->id);
+				require_once DOL_DOCUMENT_ROOT.'/comm/action/class/actioncomm.class.php';
+				$now = dol_now();
+				$actioncomm = new ActionComm($this->db);
+
+				$actioncomm->elementtype = $object->element_type.'@digiriskdolibarr';
+				$actioncomm->code        = 'AC_OPENINGHOURS_CREATE';
+				$actioncomm->type_code   = 'AC_OTH_AUTO';
+				if ($object->element_type == 'preventionplan') {
+					$actioncomm->label = $langs->trans('PreventionPlanOpeningHoursCreateTrigger');
+				} elseif ($object->element_type == 'firepermit') {
+					$actioncomm->label = $langs->trans('FirePermitOpeningHoursCreateTrigger');
+				}
+				$actioncomm->datep       = $now;
+				$actioncomm->fk_element  = $object->element_id;
+				$actioncomm->userownerid = $user->id;
+				$actioncomm->percentage  = -1;
+
+				$actioncomm->create($user);
+				break;
+
 			default:
 				dol_syslog("Trigger '".$this->name."' for action '$action' launched by ".__FILE__.". id=".$object->id);
 				break;
