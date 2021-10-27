@@ -1913,3 +1913,107 @@ function digirisk_selectcontacts($socid, $selected = '', $htmlname = 'contactid'
 		return -1;
 	}
 }
+
+/**
+ * 	Return clickable name (with picto eventually)
+ *
+ * 	@param	int		$withpicto		          0=No picto, 1=Include picto into link, 2=Only picto
+ * 	@param	string	$option			          Variant where the link point to ('', 'nolink')
+ * 	@param	int		$addlabel		          0=Default, 1=Add label into string, >1=Add first chars into string
+ *  @param	string	$moreinpopup	          Text to add into popup
+ *  @param	string	$sep			          Separator between ref and label if option addlabel is set
+ *  @param	int   	$notooltip		          1=Disable tooltip
+ *  @param  int     $save_lastsearch_value    -1=Auto, 0=No save of lastsearch_values when clicking, 1=Save lastsearch_values whenclicking
+ *  @param	string	$morecss				  More css on a link
+ * 	@return	string					          String with URL
+ */
+function getNomUrlProject($project, $withpicto = 0, $option = '', $addlabel = 0, $moreinpopup = '', $sep = ' - ', $notooltip = 0, $save_lastsearch_value = -1, $morecss = '')
+{
+	global $conf, $langs, $user, $hookmanager;
+
+	if (!empty($conf->dol_no_mouse_hover)) $notooltip = 1; // Force disable tooltips
+
+	$result = '';
+	if (!empty($conf->global->PROJECT_OPEN_ALWAYS_ON_TAB)) {
+		$option = $conf->global->PROJECT_OPEN_ALWAYS_ON_TAB;
+	}
+
+	$label = '';
+	if ($option != 'nolink') $label = img_picto('', $project->picto).' <u class="paddingrightonly">'.$langs->trans("Project").'</u>';
+	if (isset($project->status)) {
+		$label .= ' '.$project->getLibStatut(5);
+	}
+	$label .= ($label ? '<br>' : '').'<b>'.$langs->trans('Ref').': </b>'.$project->ref; // The space must be after the : to not being explode when showing the title in img_picto
+	$label .= ($label ? '<br>' : '').'<b>'.$langs->trans('Label').': </b>'.$project->title; // The space must be after the : to not being explode when showing the title in img_picto
+	if (isset($project->public)) {
+		$label .= '<br><b>'.$langs->trans("Visibility").":</b> ".($project->public ? $langs->trans("SharedProject") : $langs->trans("PrivateProject"));
+	}
+	if (!empty($project->thirdparty_name)) {
+		$label .= ($label ? '<br>' : '').'<b>'.$langs->trans('ThirdParty').': </b>'.$project->thirdparty_name; // The space must be after the : to not being explode when showing the title in img_picto
+	}
+	if (!empty($project->dateo)) {
+		$label .= ($label ? '<br>' : '').'<b>'.$langs->trans('DateStart').': </b>'.dol_print_date($project->dateo, 'day'); // The space must be after the : to not being explode when showing the title in img_picto
+	}
+	if (!empty($project->datee)) {
+		$label .= ($label ? '<br>' : '').'<b>'.$langs->trans('DateEnd').': </b>'.dol_print_date($project->datee, 'day'); // The space must be after the : to not being explode when showing the title in img_picto
+	}
+	if ($moreinpopup) $label .= '<br>'.$moreinpopup;
+
+	$url = '';
+	if ($option != 'nolink')
+	{
+		if (preg_match('/\.php$/', $option)) {
+			$url = dol_buildpath($option, 1).'?id='.$project->id;
+		} elseif ($option == 'task')
+		{
+			$url = DOL_URL_ROOT.'/projet/tasks.php?id='.$project->id;
+		} elseif ($option == 'preview')
+		{
+			$url = DOL_URL_ROOT.'/projet/element.php?id='.$project->id;
+		} else {
+			$url = DOL_URL_ROOT.'/projet/card.php?id='.$project->id;
+		}
+		// Add param to save lastsearch_values or not
+		$add_save_lastsearch_values = ($save_lastsearch_value == 1 ? 1 : 0);
+		if ($save_lastsearch_value == -1 && preg_match('/list\.php/', $_SERVER["PHP_SELF"])) $add_save_lastsearch_values = 1;
+		if ($add_save_lastsearch_values) $url .= '&save_lastsearch_values=1';
+	}
+
+	$linkclose = '';
+	if ($option == 'blank'){
+		$linkclose .= ' target=_blank';
+	}
+	if (empty($notooltip) && $user->rights->projet->lire)
+	{
+		if (!empty($conf->global->MAIN_OPTIMIZEFORTEXTBROWSER))
+		{
+			$label = $langs->trans("ShowProject");
+			$linkclose .= ' alt="'.dol_escape_htmltag($label, 1).'"';
+		}
+		$linkclose .= ' title="'.dol_escape_htmltag($label, 1).'"';
+		$linkclose .= ' class="classfortooltip'.($morecss ? ' '.$morecss : '').'"';
+	}
+	else $linkclose = ($morecss ? ' class="'.$morecss.'"' : '');
+
+	$picto = 'projectpub';
+	if (!$project->public) $picto = 'project';
+
+	$linkstart = '<a href="'.$url.'"';
+	$linkstart .= $linkclose.'>';
+	$linkend = '</a>';
+
+	$result .= $linkstart;
+	if ($withpicto) $result .= img_object(($notooltip ? '' : $label), $picto, ($notooltip ? (($withpicto != 2) ? 'class="paddingright"' : '') : 'class="'.(($withpicto != 2) ? 'paddingright ' : '').'classfortooltip"'), 0, 0, $notooltip ? 0 : 1);
+	if ($withpicto != 2) $result .= $project->ref;
+	$result .= $linkend;
+	if ($withpicto != 2) $result .= (($addlabel && $project->title) ? $sep.dol_trunc($project->title, ($addlabel > 1 ? $addlabel : 0)) : '');
+
+	global $action;
+	$hookmanager->initHooks(array('projectdao'));
+	$parameters = array('id'=>$project->id, 'getnomurl'=>$result);
+	$reshook = $hookmanager->executeHooks('getNomUrl', $parameters, $project, $action); // Note that $action and $object may have been modified by some hooks
+	if ($reshook > 0) $result = $hookmanager->resPrint;
+	else $result .= $hookmanager->resPrint;
+
+	return $result;
+}

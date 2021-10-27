@@ -592,6 +592,9 @@ class PreventionPlan extends CommonObject
 		$linkstart .= '"';
 
 		$linkclose = '';
+		if ($option == 'blank'){
+			$linkclose .= ' target=_blank';
+		}
 		if (empty($notooltip))
 		{
 			if (!empty($conf->global->MAIN_OPTIMIZEFORTEXTBROWSER))

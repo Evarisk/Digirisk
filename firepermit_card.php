@@ -1013,7 +1013,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	//FK PREVENTION PLAN
 	$preventionplan->fetch($object->fk_preventionplan);
 	print '<tr class="oddeven"><td>'.$langs->trans("PreventionPlanLinked").'</td><td>';
-	print $preventionplan->getNomUrl(1);
+	print $preventionplan->getNomUrl(1, 'blank');
 	print '</td></tr>';
 
 	include DOL_DOCUMENT_ROOT.'/core/tpl/commonfields_view.tpl.php';

@@ -82,6 +82,7 @@ $usertmp                 = new User($db);
 $extrafields             = new ExtraFields($db);
 $resources               = new DigiriskResources($db);
 $thirdparty              = new Societe($db);
+$project                 = new Project($db);
 $refPreventionPlanMod    = new $conf->global->DIGIRISKDOLIBARR_PREVENTIONPLAN_ADDON($db);
 $refPreventionPlanDetMod = new  $conf->global->DIGIRISKDOLIBARR_PREVENTIONPLANDET_ADDON($db);
 
@@ -1054,7 +1055,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 
 	$width = 80; $cssclass = 'photoref';
 	dol_strlen($object->label) ? $morehtmlref = ' - ' . $object->label : '';
-	$morehtmlleft .= '<div class="floatleft inline-block valignmiddle divphotoref">'.digirisk_show_photos('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$entity].'/'.$object->element_type, 'small', 5, 0, 0, 0, $width,0, 0, 0, 0, $object->element_type, $object).'</div>';
+	$morehtmlleft = '<div class="floatleft inline-block valignmiddle divphotoref">'.digirisk_show_photos('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$entity].'/'.$object->element_type, 'small', 5, 0, 0, 0, $width,0, 0, 0, 0, $object->element_type, $object).'</div>';
 
 	digirisk_banner_tab($object, 'ref', '', 0, 'ref', 'ref', $morehtmlref, '', 0, $morehtmlleft, $object->getLibStatut(5));
 
@@ -1070,6 +1071,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	unset($object->fields['prior_visit_date']);
 	unset($object->fields['prior_visit_text']);
 	unset($object->fields['label']);
+	unset($object->fields['fk_project']);
 
 	//Label -- Libellé
 	print '<tr><td class="titlefield">';
@@ -1118,6 +1120,12 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 		print $object->prior_visit_text;
 		print '</td></tr>';
 	}
+
+	//Project -- Projet
+	$project->fetch($object->fk_project);
+	print '<tr class="oddeven"><td>'.$langs->trans("Project").'</td><td>';
+	print getNomUrlProject($project, 1, 'blank');
+	print '</td></tr>';
 
 	include DOL_DOCUMENT_ROOT.'/core/tpl/commonfields_view.tpl.php';
 
