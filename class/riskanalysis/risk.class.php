@@ -408,6 +408,53 @@ class Risk extends CommonObject
 	}
 
 	/**
+	 * Get fire permit risk categories json in /digiriskdolibarr/js/json/
+	 *
+	 * @return	array $risk_categories
+	 */
+	public function get_fire_permit_danger_categories()
+	{
+		$json_categories = file_get_contents(DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/js/json/firePermitDangerCategories.json');
+		$risk_categories = json_decode($json_categories, true);
+
+		return $risk_categories;
+	}
+
+	/**
+	 * Get fire permit danger category picto path
+	 *
+	 * @return	string $category['thumbnail_name']     path to fire permit danger category picto, -1 if don't exist
+	 */
+	public function get_fire_permit_danger_category($object)
+	{
+		$risk_categories = $this->get_fire_permit_danger_categories();
+		foreach ($risk_categories as $category) {
+			if ($category['position'] == $object->category) {
+				return $category['thumbnail_name'];
+			}
+		}
+
+		return -1;
+	}
+
+	/**
+	 * Get fire permit danger category picto name
+	 *
+	 * @return	string $category['name']     name to fire permit danger category picto, -1 if don't exist
+	 */
+	public function get_fire_permit_danger_category_name($object)
+	{
+		$risk_categories = $this->get_fire_permit_danger_categories();
+		foreach ($risk_categories as $category) {
+			if ($category['position'] == $object->category) {
+				return $category['name'];
+			}
+		}
+
+		return -1;
+	}
+
+	/**
 	 * Get children tasks
 	 *
 	 * @return	array	$records or -1 if error
