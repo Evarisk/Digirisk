@@ -1170,13 +1170,25 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 				print '<tr>';
 				print '<td>';
 				print $langs->trans('NoPreventionPlanRisk');
-				print '</td></tr>';
+				print '</td>';
+				print '<td></td>';
+				print '<td></td>';
+				print '<td></td>';
+				print '<td></td>';
+				print '<td></td>';
+				print '</tr>';
 			}
 		} else {
 			print '<tr>';
 			print '<td>';
 			print $langs->trans('NoPreventionPlanLinked');
-			print '</td></tr>';
+			print '</td>';
+			print '<td></td>';
+			print '<td></td>';
+			print '<td></td>';
+			print '<td></td>';
+			print '<td></td>';
+			print '</tr>';
 		}
 
 		print '</table></div>';
