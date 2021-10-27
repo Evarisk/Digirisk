@@ -98,29 +98,31 @@ class FirePermitDocument extends DigiriskDocuments
 	{
 		global $conf;
 
-		$digiriskelement = new DigiriskElement($this->db);
-		$resources       = new DigiriskResources($this->db);
-		$firepermit      = new FirePermit($this->db);
-		$signatory       = new FirePermitSignature($this->db);
-		$societe         = new Societe($this->db);
-		$firepermitline  = new FirePermitLine($this->db);
-		$risk            = new Risk($this->db);
-		$openinghours    = new Openinghours($this->db);
+		$digiriskelement    = new DigiriskElement($this->db);
+		$resources          = new DigiriskResources($this->db);
+		$firepermit         = new FirePermit($this->db);
+		$signatory          = new FirePermitSignature($this->db);
+		$societe            = new Societe($this->db);
+		$firepermitline     = new FirePermitLine($this->db);
+		$preventionplanline = new PreventionPlanLine($this->db);
+		$risk               = new Risk($this->db);
+		$openinghours       = new Openinghours($this->db);
 
 		$id = GETPOST('id');
 		if ($id > 0) {
 			$firepermit->fetch($id);
 		}
 
-		$firepermitlines    = $firepermitline->fetchAll(GETPOST('id'));
-		$digirisk_resources = $resources->digirisk_dolibarr_fetch_resources();
+		$firepermitlines     = $firepermitline->fetchAll(GETPOST('id'));
+		$preventionplanlines = $preventionplanline->fetchAll($firepermit->fk_preventionplan);
+		$digirisk_resources  = $resources->digirisk_dolibarr_fetch_resources();
 
-		$extsociety             = $resources->fetchResourcesFromObject('PP_EXT_SOCIETY', $firepermit);
-		$maitreoeuvre           = array_shift($signatory->fetchSignatory('PP_MAITRE_OEUVRE', $firepermit->id));
-		$extsocietyresponsible  = array_shift($signatory->fetchSignatory('PP_EXT_SOCIETY_RESPONSIBLE', $firepermit->id));
-		$extsocietyintervenants = $signatory->fetchSignatory('PP_EXT_SOCIETY_INTERVENANTS', $firepermit->id);
-		$labourinspector        = $resources->fetchResourcesFromObject('PP_LABOUR_INSPECTOR', $firepermit);
-		$labourinspectorcontact = $resources->fetchResourcesFromObject('PP_LABOUR_INSPECTOR_ASSIGNED', $firepermit);
+		$extsociety             = $resources->fetchResourcesFromObject('FP_EXT_SOCIETY', $firepermit);
+		$maitreoeuvre           = array_shift($signatory->fetchSignatory('FP_MAITRE_OEUVRE', $firepermit->id));
+		$extsocietyresponsible  = array_shift($signatory->fetchSignatory('FP_EXT_SOCIETY_RESPONSIBLE', $firepermit->id));
+		$extsocietyintervenants = $signatory->fetchSignatory('FP_EXT_SOCIETY_INTERVENANTS', $firepermit->id);
+		$labourinspector        = $resources->fetchResourcesFromObject('FP_LABOUR_INSPECTOR', $firepermit);
+		$labourinspectorcontact = $resources->fetchResourcesFromObject('FP_LABOUR_INSPECTOR_ASSIGNED', $firepermit);
 
 		if (!empty ($digirisk_resources)) {
 			$societe->fetch($digirisk_resources['Pompiers']->id[0]);
@@ -233,6 +235,18 @@ class FirePermitDocument extends DigiriskDocuments
 		$json['FirePermit']['dimanche_matin'] = $opening_hours_sunday[0];
 		$json['FirePermit']['dimanche_aprem'] = $opening_hours_sunday[1];
 
+		if (!empty($preventionplanlines) && $preventionplanlines > 0) {
+			foreach ($preventionplanlines as $line) {
+				$digiriskelement->fetch($line->fk_element);
+
+				$json['FirePermit']['PreventionPlan']['risk'][$line->id]['ref']               = $line->ref;
+				$json['FirePermit']['PreventionPlan']['risk'][$line->id]['unite_travail']     = $digiriskelement->ref . " - " . $digiriskelement->label;
+				$json['FirePermit']['PreventionPlan']['risk'][$line->id]['description']       = $line->description;
+				$json['FirePermit']['PreventionPlan']['risk'][$line->id]['name']              = $risk->get_danger_category_name($line);
+				$json['FirePermit']['PreventionPlan']['risk'][$line->id]['prevention_method'] = $line->prevention_method;
+			}
+		}
+
 		if (!empty($firepermitlines) && $firepermitlines > 0) {
 			foreach ($firepermitlines as $line) {
 				$digiriskelement->fetch($line->fk_element);
@@ -240,8 +254,8 @@ class FirePermitDocument extends DigiriskDocuments
 				$json['FirePermit']['risk'][$line->id]['ref']           = $line->ref;
 				$json['FirePermit']['risk'][$line->id]['unite_travail'] = $digiriskelement->ref . " - " . $digiriskelement->label;
 				$json['FirePermit']['risk'][$line->id]['description']   = $line->description;
-				$json['FirePermit']['risk'][$line->id]['name']          = $risk->get_danger_category_name($line);
-				$json['FirePermit']['risk'][$line->id]['use_equipment']  = $line->use_equipment;
+				$json['FirePermit']['risk'][$line->id]['name']          = $risk->get_fire_permit_danger_category_name($line);
+				$json['FirePermit']['risk'][$line->id]['use_equipment'] = $line->use_equipment;
 			}
 		}
 		return json_encode($json, JSON_UNESCAPED_UNICODE);
