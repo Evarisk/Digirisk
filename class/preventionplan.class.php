@@ -659,7 +659,7 @@ class PreventionPlan extends CommonObject
 
 		$sql .= " WHERE s.entity IN (".getEntity($this->table_element).")";
 		if ($filter) $sql .= " AND (".$filter.")";
-		$sql .= " AND status = 1";
+		$sql .= " AND status != 0";
 		$sql .= $this->db->order("rowid", "ASC");
 		$sql .= $this->db->plimit($limit, 0);
 
