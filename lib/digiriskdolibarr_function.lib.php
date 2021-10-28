@@ -994,7 +994,7 @@ function display_recurse_tree_organization($results, $i = 1) {
 			foreach ($results as $element) { ?>
 				<li class="route ui-sortable-handle level-<?php echo $i ?>" id="<?php  echo $element['object']->id; ?>" value="<?php echo $i ?>">
 		 			<h3 class='title <?php echo $element['object']->element_type ?>'>
-						<?php echo  $element['object']->ref . ' - ' . $element['object']->label?>
+						<span class="ref"><?php echo  $element['object']->ref; ?></span><?php echo $element['object']->label; ?>
 		  			</h3>
 		 			<span class='ui-icon ui-icon-arrow-4-diag'></span>
 					<ul class="space space-<?php echo $i; ?> ui-sortable  <?php echo $element['object']->element_type ?>" id="space<?php echo $element['object']->id?>" value="<?php echo $i ?>"><?php display_recurse_tree_organization($element['children'], $i + 1) ?></ul>
