@@ -37,8 +37,10 @@ if (!$res) die("Include of main fails");
 
 require_once DOL_DOCUMENT_ROOT.'/core/lib/admin.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/core/class/doleditor.class.php';
+require_once DOL_DOCUMENT_ROOT.'/contact/class/contact.class.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/images.lib.php';
 
+require_once './class/digiriskresources.class.php';
 require_once './class/digiriskstandard.class.php';
 require_once './class/digiriskelement.class.php';
 require_once './class/digiriskdocuments/groupmentdocument.class.php';
@@ -46,6 +48,7 @@ require_once './class/digiriskdocuments/workunitdocument.class.php';
 require_once './class/digiriskdocuments/riskassessmentdocument.class.php';
 require_once './lib/digiriskdolibarr_digiriskstandard.lib.php';
 require_once './lib/digiriskdolibarr_function.lib.php';
+require_once './core/modules/digiriskdolibarr/digiriskdocuments/riskassessmentdocument/mod_riskassessmentdocument_standard.php';
 require_once './core/modules/digiriskdolibarr/digiriskdocuments/riskassessmentdocument/modules_riskassessmentdocument.php';
 
 global $db, $conf, $langs, $hookmanager, $user;
@@ -60,9 +63,15 @@ $action = GETPOST('action', 'aZ09');
 $object                 = new DigiriskStandard($db);
 $digiriskelement        = new DigiriskElement($db);
 $riskassessmentdocument = new RiskAssessmentDocument($db);
+$digiriskresources      = new DigiriskResources($db);
+$thirdparty             = new Societe($db);
+$contact                = new Contact($db);
 $hookmanager->initHooks(array('digiriskelementriskassessmentdocument', 'globalcard')); // Note that conf->hooks_modules contains array
 
 $object->fetch($conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD);
+
+// Load resources
+$allLinks = $digiriskresources->digirisk_dolibarr_fetch_resources();
 
 $upload_dir = $conf->digiriskdolibarr->multidir_output[isset($conf->entity) ? $conf->entity : 1];
 
@@ -290,6 +299,16 @@ if (empty($reshook)) {
 			setEventMessages('BugFoundVarUploaddirnotDefined', null, 'errors');
 		}
 	}
+
+	// Actions to send emails
+	$triggersendname = 'RISKASSESSMENTDOCUMENT_SENTBYMAIL';
+	$mode = 'emailfromthirdparty';
+	$trackid = 'thi'.$object->id;
+	$labour_inspector = $allLinks['LabourInspectorSociety'];
+	$labour_inspector_id = $allLinks['LabourInspectorSociety']->id[0];
+	$thirdparty->fetch($labour_inspector_id);
+	$object->thirdparty = $thirdparty;
+	include DOL_DOCUMENT_ROOT.'/core/actions_sendmails.inc.php';
 }
 
 /*
@@ -351,12 +370,14 @@ if (empty($reshook)) {
 			print '<input type="submit" class="button" name="save" value="' . $langs->trans("Save") . '">';
 		} else {
 			print '<a class="butAction" id="actionButtonEdit" href="' . $_SERVER["PHP_SELF"] . '?action=edit">' . $langs->trans("Modify") . '</a>' . "\n";
+			print '<a class="butAction" id="actionButtonSign" href="' . $_SERVER['PHP_SELF'] . '?id=' . $object->id . '&action=presend&mode=init#formmailbeforetitle&sendto=' . $allLinks['LabourInspectorSociety']->id[0] . '">' . $langs->trans('SendMail') . '</a>';
 		}
 	} else {
 		if ( $action == 'edit' ) {
 			print '<a class="butActionRefused classfortooltip" href="#" title="' . dol_escape_htmltag($langs->trans("NotEnoughPermissions")) . '">' . $langs->trans('Save') . '</a>' . "\n";
 		} else {
 			print '<a class="butActionRefused classfortooltip" href="#" title="' . dol_escape_htmltag($langs->trans("NotEnoughPermissions")) . '">' . $langs->trans('Modify') . '</a>' . "\n";
+			print '<a class="butActionRefused classfortooltip" href="#" title="' . dol_escape_htmltag($langs->trans("NotEnoughPermissions")) . '">' . $langs->trans('SendEmail') . '</a>' . "\n";
 		}
 	}
 }
@@ -376,6 +397,174 @@ if ($includedocgeneration && $action != 'edit') {
 
 	$active = isset($conf->global->DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_AUDIT_START_DATE) && strlen($conf->global->DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_AUDIT_START_DATE);
 	print digiriskshowdocuments($modulepart,$dir_files, $filedir, $urlsource, $permissiontoadd, $permissiontodelete, $conf->global->DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_DEFAULT_MODEL, 1, 0, 28, 0, '', $langs->trans('RiskAssessmentDocument'), '', $langs->defaultlang, '', $riskassessmentdocument, 0, 'remove_file', $active, $langs->trans("SetStartEndDateBefore"));
+}
+
+// Presend form
+$labour_inspector = $allLinks['LabourInspectorSociety'];
+$labour_inspector_id = $allLinks['LabourInspectorSociety']->id[0];
+$thirdparty->fetch($labour_inspector_id);
+$object->thirdparty = $thirdparty;
+
+$modelmail = 'riskassessmentdocument';
+$defaulttopic = 'Information';
+$diroutput = $upload_dir . '/riskassessmentdocument';
+$filter = array('customsql' => "t.type='riskassessmentdocument'");
+$riskassessmentdocument = $riskassessmentdocument->fetchAll('desc','t.rowid', 1, 0, $filter, 'AND');
+if (!empty($riskassessmentdocument)){
+	$riskassessmentdocument = array_shift($riskassessmentdocument);
+	$ref = dol_sanitizeFileName($riskassessmentdocument->ref);
+}
+$trackid = 'thi'.$object->id;
+
+if ($action == 'presend' && !empty($riskassessmentdocument)) {
+	$langs->load("mails");
+
+	$titreform = 'SendMail';
+
+	$object->fetch_projet();
+
+	if (!in_array($object->element, array('societe', 'user', 'member'))) {
+		include_once DOL_DOCUMENT_ROOT . '/core/lib/files.lib.php';
+		$fileparams = dol_dir_list($diroutput, 'files', 0, '');
+		foreach ($fileparams as $fileparam) {
+			preg_match('/'.$ref.'/', $fileparam['name']) ? $filevalue[] = $fileparam['fullname'] : 0;
+		}
+	}
+
+	// Define output language
+	$outputlangs = $langs;
+	$newlang = '';
+	if ($conf->global->MAIN_MULTILANGS && empty($newlang) && !empty($_REQUEST['lang_id'])) {
+		$newlang = $_REQUEST['lang_id'];
+	}
+	if ($conf->global->MAIN_MULTILANGS && empty($newlang)) {
+		$newlang = $object->thirdparty->default_lang;
+	}
+
+	if (!empty($newlang)) {
+		$outputlangs = new Translate('', $conf);
+		$outputlangs->setDefaultLang($newlang);
+		// Load traductions files required by page
+		$outputlangs->loadLangs(array('digiriskdolibarr'));
+	}
+
+	$topicmail = '';
+	if (empty($object->ref_client)) {
+		$topicmail = $outputlangs->trans($defaulttopic, '__REF__');
+	} elseif (!empty($object->ref_client)) {
+		$topicmail = $outputlangs->trans($defaulttopic, '__REF__ (__REFCLIENT__)');
+	}
+
+	print '<div id="formmailbeforetitle" name="formmailbeforetitle"></div>';
+	print '<div class="clearboth"></div>';
+	print '<br>';
+	print load_fiche_titre($langs->trans($titreform));
+
+	print dol_get_fiche_head('');
+
+	// Create form for email
+	include_once DOL_DOCUMENT_ROOT . '/core/class/html.formmail.class.php';
+	$formmail = new FormMail($db);
+	$formmail->param['langsmodels'] = (empty($newlang) ? $langs->defaultlang : $newlang);
+	$formmail->fromtype = (GETPOST('fromtype') ? GETPOST('fromtype') : (!empty($conf->global->MAIN_MAIL_DEFAULT_FROMTYPE) ? $conf->global->MAIN_MAIL_DEFAULT_FROMTYPE : 'user'));
+	$formmail->fromid = $user->id;
+	$formmail->trackid = $trackid;
+	$formmail->fromname = $user->firstname . ' ' . $user->lastname;
+	$formmail->frommail = $user->email;
+	$formmail->fromalsorobot = 1;
+	$formmail->withfrom = 1;
+
+	// Fill list of recipient with email inside <>.
+	$liste = array();
+
+	$labour_inspector_contact = $allLinks['LabourInspectorContact'];
+
+	if (!empty($object->socid) && $object->socid > 0 && !is_object($object->thirdparty) && method_exists($object, 'fetch_thirdparty')) {
+		$object->fetch_thirdparty();
+	}
+	if (is_object($object->thirdparty)) {
+		foreach ($object->thirdparty->thirdparty_and_contact_email_array(1) as $key => $value) {
+			$liste[$key] = $value;
+		}
+	}
+
+	if (!empty($conf->global->MAIN_MAIL_ENABLED_USER_DEST_SELECT)) {
+		$listeuser = array();
+		$fuserdest = new User($db);
+
+		$result = $fuserdest->fetchAll('ASC', 't.lastname', 0, 0, array('customsql' => 't.statut=1 AND t.employee=1 AND t.email IS NOT NULL AND t.email<>\'\''), 'AND', true);
+		if ($result > 0 && is_array($fuserdest->users) && count($fuserdest->users) > 0) {
+			foreach ($fuserdest->users as $uuserdest) {
+				$listeuser[$uuserdest->id] = $uuserdest->user_get_property($uuserdest->id, 'email');
+			}
+		} elseif ($result < 0) {
+			setEventMessages(null, $fuserdest->errors, 'errors');
+		}
+		if (count($listeuser) > 0) {
+			$formmail->withtouser = $listeuser;
+			$formmail->withtoccuser = $listeuser;
+		}
+	}
+
+
+	$Labour_inspector_contact_id = $allLinks['LabourInspectorContact']->id[0];
+	$contact->fetch($Labour_inspector_contact_id);
+	$withto = array( $allLinks['LabourInspectorContact']->id[0] => $contact->firstname . ' ' . $contact->lastname . " <" . $contact->email . ">");
+
+	$formmail->withto = $withto;
+	$formmail->withtofree = (GETPOSTISSET('sendto') ? (GETPOST('sendto', 'alphawithlgt') ? GETPOST('sendto', 'alphawithlgt') : '1') : '1');
+	$formmail->withtocc = $liste;
+	$formmail->withtoccc = $conf->global->MAIN_EMAIL_USECCC;
+	$formmail->withtopic = $topicmail;
+	$formmail->withfile = 2;
+	$formmail->withbody = 1;
+	$formmail->withdeliveryreceipt = 1;
+	$formmail->withcancel = 1;
+
+	//$arrayoffamiliestoexclude=array('system', 'mycompany', 'object', 'objectamount', 'date', 'user', ...);
+	if (!isset($arrayoffamiliestoexclude)) $arrayoffamiliestoexclude = null;
+
+	// Make substitution in email content
+	$substitutionarray = getCommonSubstitutionArray($outputlangs, 0, $arrayoffamiliestoexclude, $object);
+	$substitutionarray['__CHECK_READ__'] = (is_object($object) && is_object($object->thirdparty)) ? '<img src="' . DOL_MAIN_URL_ROOT . '/public/emailing/mailing-read.php?tag=' . $object->thirdparty->tag . '&securitykey=' . urlencode($conf->global->MAILING_EMAIL_UNSUBSCRIBE_KEY) . '" width="1" height="1" style="width:1px;height:1px" border="0"/>' : '';
+	$substitutionarray['__CONTACTCIVNAME__'] = '';
+	$substitutionarray['__REF__'] = $ref;
+	$parameters = array(
+		'mode' => 'formemail'
+	);
+	complete_substitutions_array($substitutionarray, $outputlangs, $object, $parameters);
+
+	// Find the good contact address
+	$tmpobject = $object;
+
+	$contactarr = array();
+	$contactarr = $tmpobject->liste_contact(-1, 'external');
+
+	if (is_array($contactarr) && count($contactarr) > 0) {
+		require_once DOL_DOCUMENT_ROOT . '/contact/class/contact.class.php';
+		$contactstatic = new Contact($db);
+
+		foreach ($contactarr as $contact) {
+			$contactstatic->fetch($contact['id']);
+			$substitutionarray['__CONTACT_NAME_' . $contact['code'] . '__'] = $contactstatic->getFullName($outputlangs, 1);
+		}
+	}
+
+	// Array of substitutions
+	$formmail->substit = $substitutionarray;
+
+	// Array of other parameters
+	$formmail->param['action'] = 'send';
+	$formmail->param['models'] = $modelmail;
+	$formmail->param['models_id'] = GETPOST('modelmailselected', 'int');
+	$formmail->param['id'] = $object->id;
+	$formmail->param['returnurl'] = $_SERVER["PHP_SELF"] . '?id=' . $object->id;
+	$formmail->param['fileinit'] = $filevalue;
+
+	// Show form
+	print $formmail->get_form();
+
+	print dol_get_fiche_end();
 }
 
 // End of page

@@ -566,6 +566,14 @@ Sources = Sources
 ImportantNote = Remarque importante
 SitePlans = Localisation des plans
 SetStartEndDateBefore = Définissez la date de début et la date de fin d'audit sur cette page pour générer ce document
+
+# Email - Mail
+RiskAssessmentDocumentLabel = Récapitulatif du document unique
+RiskAssessmentDocumentSubject = Email document unique
+RiskAssessmentDocumentContent = Veuillez trouver ci-joint le document ODT du document unique.
+
+
+
 #
 # GroupmentDocument - Fiche Groupement
 #
