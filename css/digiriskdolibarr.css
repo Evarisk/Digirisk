@@ -2653,35 +2653,18 @@
 }
 .container {
   position: relative;
-  margin-top: 150px;
-  margin-left: 60px;
-  margin-right: 60px;
-  padding-bottom: 10px;
   min-height: 500px;
-  background: #eee;
-  -webkit-box-shadow: 0px 0px 10px 2px #bbb;
-  box-shadow: 0px 0px 10px 2px #bbb;
 }
 
 .container h3 {
   position: absolute;
   border: 0;
   margin: 0;
-  padding: 0;
-  padding-top: 14px;
-  height: 44px;
+  padding: 20px 0;
   width: 400px;
-  text-indent: 80px;
-  background: #71a9e2;
-  border-radius: 2px;
-  -webkit-box-shadow: 0px 0px 0px 2px #29f;
-  box-shadow: 0px 0px 0px 2px #29f;
   pointer-events: none;
   margin-left: 0px;
   width: 100%;
-  background: white;
-  -webkit-box-shadow: 0px 2px 0px 1px #9bf;
-  box-shadow: 0px 2px 0px 1px #9bf;
 }
 
 .route {
@@ -2701,45 +2684,63 @@
 
 .route span {
   position: absolute;
-  top: 20px;
+  top: 26px;
   left: 20px;
-  /* IE 9 */
   -webkit-transform: scale(2);
-  /* Chrome, Safari, Opera */
   transform: scale(2);
-  z-index: 10px;
+  z-index: 10;
+  -webkit-transition: all 0.2s ease-out;
+  transition: all 0.2s ease-out;
+}
+.route span:hover {
+  cursor: pointer;
+  opacity: 0.6;
+}
+
+.route .title {
+  font-size: 16px;
+}
+.route .title .ref {
+  position: static;
+  top: auto;
+  left: auto;
+  -webkit-transform: none;
+  transform: none;
+  font-size: 12px;
+  border-radius: 4px;
+  padding: 4px 6px;
+  margin-right: 0.8em;
 }
 
 .route .title.workunit {
   position: absolute;
   border: 0;
   margin: 0;
-  padding: 0;
-  padding-top: 14px;
-  height: 44px;
+  padding: 20px 0;
   width: 400px;
-  text-indent: 80px;
-  background: #0761a0;
-  border-radius: 2px;
-  -webkit-box-shadow: 0px 0px 0px 2px #29f;
-  box-shadow: 0px 0px 0px 2px #29f;
+  text-indent: 60px;
+  background: #ebebeb;
+  border: 1px solid rgba(0, 0, 0, 0.2);
   pointer-events: none;
+}
+.route .title.workunit > .ref {
+  background: #0d8aff;
+  color: #fff;
 }
 
 .route .title.groupment {
   position: absolute;
   border: 0;
   margin: 0;
-  padding: 0;
-  padding-top: 14px;
-  height: 44px;
   width: 400px;
-  text-indent: 80px;
-  background: #4f9bee;
-  border-radius: 2px;
-  -webkit-box-shadow: 0px 0px 0px 2px #29f;
-  box-shadow: 0px 0px 0px 2px #29f;
+  text-indent: 60px;
+  background: #ebebeb;
+  border: 1px solid rgba(0, 0, 0, 0.2);
   pointer-events: none;
+}
+.route .title.groupment > .ref {
+  background: #263C5C;
+  color: #fff;
 }
 
 .first-title {
@@ -2758,6 +2759,9 @@
   padding-bottom: 68px;
   height: 100%;
   z-index: 1;
+}
+.space.space-0 {
+  margin-left: 0;
 }
 
 .risk-container .risk-edit {
