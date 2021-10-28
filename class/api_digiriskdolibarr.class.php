@@ -35,19 +35,16 @@ class DigiriskDolibarr extends DolibarrApi
 	/**
 	 * @var array   $FIELDS     Mandatory fields, checked when create and update object
 	 */
-	static $FIELDS = array(
-		'socid',
-		'date'
-	);
+	static $FIELDS = array();
 	/**
 	 * Constructor
 	 */
 	public function __construct()
 	{
-		global $db, $conf;
+		global $db, $langs;
 		$this->db = $db;
-
 		$this->mod = new modDigiriskdolibarr($this->db);
+
 	}
 
 	/**
@@ -59,21 +56,30 @@ class DigiriskDolibarr extends DolibarrApi
 	 *
 	 * @throws 	RestException
 	 */
-	public function enableModule($entity = 14)
+	public function enableModule()
 	{
-		global $conf;
-		dol_include_once('/multicompany/class/dao_multicompany.class.php', 'DaoMulticompany');
-		$test = new DaoMulticompany($this->db);
-		$test->fetch(14);
-		$test->getConstants();
-		$test->setEntity($entity, 'active', 1);
-		$test->getEntityConfig($entity);
-		echo '<pre>'; print_r($test); echo '</pre>'; exit;
+		global $langs;
+		require_once DOL_DOCUMENT_ROOT .'/core/modules/modECM.class.php';
+		require_once DOL_DOCUMENT_ROOT .'/core/modules/modProjet.class.php';
+		require_once DOL_DOCUMENT_ROOT .'/core/modules/modSociete.class.php';
+		require_once DOL_DOCUMENT_ROOT .'/core/modules/modTicket.class.php';
+		require_once DOL_DOCUMENT_ROOT .'/core/modules/modCategorie.class.php';
+		require_once DOL_DOCUMENT_ROOT .'/core/modules/modFckeditor.class.php';
 
-		//voir comment multicompany arrive à switch de $conf
-//		$conf->entity = 14;
+		$modEcm = new modECM($this->db);
+		$modProjet = new modProjet($this->db);
+		$modSociete = new modSociete($this->db);
+		$modTicket = new modTicket($this->db);
+		$modCategorie = new modCategorie($this->db);
+		$modFckeditor = new modFckeditor($this->db);
 
-		echo '<pre>'; print_r($conf->entity ); echo '</pre>'; exit;
+		$modEcm->init();
+		$modProjet->init();
+		$modSociete->init();
+		$modTicket->init();
+		$modCategorie->init();
+		$modFckeditor->init();
+		$langs->loadLangs(array("digiriskdolibarr@digiriskdolibarr", "other"));
 
 		return $this->mod->init();
 	}
@@ -86,7 +92,7 @@ class DigiriskDolibarr extends DolibarrApi
 	 * @param       int         $contact_list  0: Returned array of contacts/addresses contains all properties, 1: Return array contains just id
 	 * @return 	array|mixed data without useless information
 	 *
-	 * @url GET    ref/{ref}
+	 * @url GET    disableModule
 	 *
 	 * @throws 	RestException
 	 */
@@ -102,11 +108,11 @@ class DigiriskDolibarr extends DolibarrApi
 	 *
 	 * @return 	string|mixed data without useless information
 	 *
-	 * @url GET    ref_ext/{ref_ext}
+	 * @url GET    getFilesVersion
 	 *
 	 * @throws 	RestException
 	 */
-	public function getVersion()
+	public function getFilesVersion()
 	{
 		return $this->mod->version;
 	}
