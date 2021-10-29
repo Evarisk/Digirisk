@@ -27,6 +27,8 @@ require_once DOL_DOCUMENT_ROOT.'/societe/class/societe.class.php';
 
 require_once __DIR__ . '/digiriskdocuments.class.php';
 require_once __DIR__ . '/digirisksignature.class.php';
+require_once __DIR__ . '/openinghours.class.php';
+
 
 /**
  * Class for FirePermit
@@ -44,6 +46,12 @@ class FirePermit extends CommonObject
 	 * @var string Name of table without prefix where object is stored. This is also the key used for extrafields management.
 	 */
 	public $table_element = 'digiriskdolibarr_firepermit';
+
+	/**
+	 * @var string Name of table without prefix where object is stored. This is also the key used for extrafields management.
+	 */
+	public $table_element_line = 'digiriskdolibarr_firepermitdet';
+
 
 	/**
 	 * @var int  Does this object support multicompany module ?
@@ -155,6 +163,136 @@ class FirePermit extends CommonObject
 	}
 
 	/**
+	 * Clone an object into another one
+	 *
+	 * @param  	User 	$user      	User that creates
+	 * @param  	int 	$fromid     Id of object to clone
+	 * @return 	mixed 				New object created, <0 if KO
+	 */
+	public function createFromClone(User $user, $fromid, $options)
+	{
+		global $conf, $langs;
+		$error = 0;
+
+		$signatory         = new FirePermitSignature($this->db);
+		$digiriskresources = new DigiriskResources($this->db);
+		$openinghours      = new Openinghours($this->db);
+
+		$refFirePermitMod = new $conf->global->DIGIRISKDOLIBARR_FIREPERMIT_ADDON($this->db);
+
+		dol_syslog(__METHOD__, LOG_DEBUG);
+
+		$object = new self($this->db);
+
+		$this->db->begin();
+
+		// Load source object
+		$result = $object->fetchCommon($fromid);
+		if ($result > 0 && !empty($object->table_element_line)) {
+			$object->fetchLines();
+		}
+
+		// Load openinghours form source object
+		$morewhere = ' AND element_id = ' . $object->id;
+		$morewhere .= ' AND element_type = ' . "'" . $object->element . "'";
+		$morewhere .= ' AND status = 1';
+
+		$openinghours->fetch(0, '', $morewhere);
+
+		// Load signatory and ressources form source object
+		$signatories = $signatory->fetchSignatory("", $fromid);
+		$resources   = $digiriskresources->fetchResourcesFromObject('', $object);
+
+		if (!empty ($signatories) && $signatories > 0) {
+			foreach ($signatories as $arrayRole) {
+				foreach ($arrayRole as $signatory) {
+					$signatoriesID[$signatory->role] = $signatory->id;
+					if ($signatory->role == 'FP_EXT_SOCIETY_INTERVENANTS') {
+						$extintervenant_ids[] = $signatory->id;
+					}
+				}
+			}
+		}
+
+		// Reset some properties
+		unset($object->id);
+		unset($object->fk_user_creat);
+		unset($object->import_key);
+
+		// Clear fields
+		if (property_exists($object, 'ref')) {
+			$object->ref = $refFirePermitMod->getNextValue($object);
+		}
+		if (property_exists($object, 'ref_ext')) {
+			$object->ref_ext = 'digirisk_' . $object->ref;
+		}
+		if (property_exists($object, 'label')) {
+			$object->label = empty($this->fields['label']['default']) ? $langs->trans("CopyOf")." ".$object->label : $this->fields['label']['default'];
+		}
+		if (property_exists($object, 'date_creation')) {
+			$object->date_creation = dol_now();
+		}
+
+		// Create clone
+		$object->context['createfromclone'] = 'createfromclone';
+		$firepermtid = $object->create($user);
+
+		if ($firepermtid > 0) {
+			$digiriskresources->digirisk_dolibarr_set_resources($this->db, $user->id, 'FP_EXT_SOCIETY', 'societe', array(array_shift($resources['FP_EXT_SOCIETY'])->id), $conf->entity, 'firepermit', $firepermtid, 0);
+			$digiriskresources->digirisk_dolibarr_set_resources($this->db, $user->id, 'FP_LABOUR_INSPECTOR', 'societe', array(array_shift($resources['FP_LABOUR_INSPECTOR'])->id), $conf->entity, 'firepermit', $firepermtid, 0);
+			$digiriskresources->digirisk_dolibarr_set_resources($this->db, $user->id, 'FP_LABOUR_INSPECTOR_ASSIGNED', 'socpeople', array(array_shift($resources['FP_LABOUR_INSPECTOR_ASSIGNED'])->id), $conf->entity, 'firepermit', $firepermtid, 0);
+			$signatory->createFromClone($user, $signatoriesID['FP_MAITRE_OEUVRE'], $firepermtid);
+			$signatory->createFromClone($user, $signatoriesID['FP_EXT_SOCIETY_RESPONSIBLE'], $firepermtid);
+
+			if (!empty($options['schedule'])) {
+				if (!empty($openinghours)) {
+					$openinghours->element_id = $firepermtid;
+					$openinghours->create($user);
+				}
+			}
+
+			if (!empty($options['attendants'])) {
+				if (!empty($extintervenant_ids) && $extintervenant_ids > 0) {
+					foreach ($extintervenant_ids as $extintervenant_id) {
+						$signatory->createFromClone($user, $extintervenant_id, $firepermtid);
+					}
+				}
+			}
+
+			if (!empty($options['firepermit_risk'])) {
+				$num = (is_array($object->lines) ? count($object->lines) : 0);
+				for ($i = 0; $i < $num; $i++) {
+					$line = $object->lines[$i];
+					$line->category = empty($line->category) ? 0 : $line->category;
+					$line->fk_firepermit = $firepermtid;
+
+					$result = $line->insert($user, 1);
+					if ($result < 0) {
+						$this->error = $this->db->lasterror();
+						$this->db->rollback();
+						return -1;
+					}
+				}
+			}
+		} else {
+			$error++;
+			$this->error = $object->error;
+			$this->errors = $object->errors;
+		}
+
+		unset($object->context['createfromclone']);
+
+		// End
+		if (!$error) {
+			$this->db->commit();
+			return $firepermtid;
+		} else {
+			$this->db->rollback();
+			return -1;
+		}
+	}
+
+	/**
 	 * Load object in memory from the database
 	 *
 	 * @param int    $id   Id object
@@ -164,6 +302,19 @@ class FirePermit extends CommonObject
 	public function fetch($id, $ref = null)
 	{
 		return $this->fetchCommon($id, $ref);
+	}
+
+	/**
+	 * Load object lines in memory from the database
+	 *
+	 * @return int         <0 if KO, 0 if not found, >0 if OK
+	 */
+	public function fetchLines()
+	{
+		$this->lines = array();
+
+		$result = $this->fetchLinesCommon();
+		return $result;
 	}
 
 	/**
@@ -505,7 +656,7 @@ class FirePermitLine extends CommonObjectLine
 	/**
 	 * @var string Name of table without prefix where object is stored
 	 */
-	public $table_element = 'firepermitdet';
+	public $table_element = 'digiriskdolibarr_firepermitdet';
 
 	public $ref = '';
 
@@ -520,6 +671,23 @@ class FirePermitLine extends CommonObjectLine
 	public $fk_firepermit = '';
 
 	public $fk_element = '';
+
+	/**
+	 * @var array  Array with all fields and their property. Do not use it as a static var. It may be modified by constructor.
+	 */
+	public $fields=array(
+		'rowid'         => array('type'=>'integer', 'label'=>'TechnicalID', 'enabled'=>'1', 'position'=>1, 'notnull'=>1, 'visible'=>0, 'noteditable'=>'1', 'index'=>1, 'comment'=>"Id"),
+		'ref'           => array('type'=>'varchar(128)', 'label'=>'Ref', 'enabled'=>'1', 'position'=>10, 'notnull'=>1, 'visible'=>1, 'noteditable'=>'1', 'default'=>'(PROV)', 'index'=>1, 'searchall'=>1, 'showoncombobox'=>'1', 'comment'=>"Reference of object"),
+		'ref_ext'       => array('type'=>'varchar(128)', 'label'=>'RefExt', 'enabled'=>'1', 'position'=>20, 'notnull'=>0, 'visible'=>0,),
+		'entity'        => array('type'=>'integer', 'label'=>'Entity', 'enabled'=>'1', 'position'=>30, 'notnull'=>1, 'visible'=>0,),
+		'date_creation' => array('type'=>'datetime', 'label'=>'DateCreation', 'enabled'=>'1', 'position'=>40, 'notnull'=>1, 'visible'=>0,),
+		'tms'           => array('type'=>'timestamp', 'label'=>'DateModification', 'enabled'=>'1', 'position'=>50, 'notnull'=>0, 'visible'=>0,),
+		'category'      => array('type'=>'integer', 'label'=>'PriorVisit', 'enabled'=>'1', 'position'=>60, 'notnull'=>-1, 'visible'=>-1,),
+		'description'   => array('type'=>'text', 'label'=>'Description', 'enabled'=>'1', 'position'=>70, 'notnull'=>-1, 'visible'=>-1,),
+		'use_equipment' => array('type'=>'text', 'label'=>'UseEquipment', 'enabled'=>'1', 'position'=>80, 'notnull'=>-1, 'visible'=>-1,),
+		'fk_firepermit' => array('type'=>'integer', 'label'=>'FkFirePermit', 'enabled'=>'1', 'position'=>90, 'notnull'=>1, 'visible'=>0,),
+		'fk_element'    => array('type'=>'integer', 'label'=>'FkEleme,nt', 'enabled'=>'1', 'position'=>100, 'notnull'=>1, 'visible'=>0,),
+	);
 
 
 	/**
@@ -867,6 +1035,54 @@ class FirePermitSignature extends DigiriskSignature
 			$this->errors[] = 'Error '.$this->db->lasterror();
 			dol_syslog(__METHOD__.' '.join(',', $this->errors), LOG_ERR);
 
+			return -1;
+		}
+	}
+
+	/**
+	 * Clone an object into another one
+	 *
+	 * @param  	User 	$user      	User that creates
+	 * @param  	int 	$fromid     Id of object to clone
+	 * @return 	mixed 				New object created, <0 if KO
+	 */
+	public function createFromClone(User $user, $fromid, $firepermitid)
+	{
+		$error = 0;
+
+		dol_syslog(__METHOD__, LOG_DEBUG);
+
+		$object = new self($this->db);
+
+		$this->db->begin();
+
+		// Load source object
+		$object->fetchCommon($fromid);
+
+		// Reset some properties
+		unset($object->id);
+		unset($object->fk_user_creat);
+		unset($object->import_key);
+
+		// Clear fields
+		if (property_exists($object, 'date_creation')) {
+			$object->date_creation = dol_now();
+		}
+		if (property_exists($object, 'fk_object')) {
+			$object->fk_object = $firepermitid;
+		}
+
+		// Create clone
+		$object->context['createfromclone'] = 'createfromclone';
+		$result = $object->createCommon($user);
+		unset($object->context['createfromclone']);
+
+		// End
+		if (!$error) {
+			$this->db->commit();
+			return $result;
+		} else {
+			$this->db->rollback();
 			return -1;
 		}
 	}

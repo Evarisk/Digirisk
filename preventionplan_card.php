@@ -628,7 +628,7 @@ if (empty($reshook)) {
 		$options['attendants'] = GETPOST('clone_attendants');
 		$options['schedule'] = GETPOST('clone_schedule');
 
-		if (1 == 0 && !GETPOST('clone_content') && !GETPOST('clone_receivers')) {
+		if (1 == 0 && !GETPOST('clone_preventionplan_risk') && !GETPOST('clone_attendants') && !GETPOST('clone_schedule')) {
 			setEventMessages($langs->trans("NoCloneOptionsSpecified"), null, 'errors');
 		} else {
 			if ($object->id > 0) {
