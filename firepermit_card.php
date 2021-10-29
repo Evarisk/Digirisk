@@ -51,7 +51,7 @@ require_once __DIR__ . '/core/modules/digiriskdolibarr/digiriskelement/firepermi
 require_once __DIR__ . '/core/modules/digiriskdolibarr/digiriskdocuments/firepermitdocument/mod_firepermitdocument_standard.php';
 require_once __DIR__ . '/core/modules/digiriskdolibarr/digiriskdocuments/firepermitdocument/modules_firepermitdocument.php';
 
-global $user, $db, $conf, $langs;
+global $conf, $db, $hookmanager, $langs, $user;
 
 // Load translation files required by the page
 $langs->loadLangs(array("digiriskdolibarr@digiriskdolibarr", "other"));
@@ -363,9 +363,9 @@ if (empty($reshook)) {
 		}
 
 		if (!$error) {
-			$result = $objectline->insert(1);
+			$result = $objectline->insert($user, false);
 			if ($result > 0) {
-				// Creation prevention plan line OK
+				// Creation fire permit line OK
 				setEventMessages($langs->trans('AddFirePermitLine').' '.$objectline->ref.' '.$langs->trans('FirePermitMessage'), array());
 				$objectline->call_trigger('FIREPERMITDET_CREATE', $user);
 				$urltogo = str_replace('__ID__', $result, $backtopage);
@@ -410,7 +410,7 @@ if (empty($reshook)) {
 		}
 
 		if (!$error) {
-			$result = $objectline->update(1);
+			$result = $objectline->update($user, false);
 			if ($result > 0) {
 				// Update fire permit line OK
 				setEventMessages($langs->trans('UpdateFirePermitLine').' '.$objectline->ref.' '.$langs->trans('FirePermitMessage'), array());
@@ -1415,7 +1415,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 
 			$coldisplay++;
 			print '<td>';
-			print '<textarea name="preventionmethod" class="minwidth150" cols="50" rows="' . ROWS_2 . '">' . ('') . '</textarea>' . "\n";
+			print '<textarea name="use_equipment" class="minwidth150" cols="50" rows="' . ROWS_2 . '">' . ('') . '</textarea>' . "\n";
 			print '</td>';
 
 			$coldisplay += $colspan;

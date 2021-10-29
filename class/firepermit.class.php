@@ -800,11 +800,12 @@ class FirePermitLine extends CommonObjectLine
 	/**
 	 *    Insert line into database
 	 *
-	 * @param int $notrigger 1 no triggers
-	 * @param int $noerrorifdiscountalreadylinked 1=Do not make error if lines is linked to a discount and discount already linked to another
+	 * @param User $user
+	 * @param bool $notrigger 1 no triggers
 	 * @return        int                                         <0 if KO, >0 if OK
+	 * @throws Exception
 	 */
-	public function insert($notrigger = 0, $noerrorifdiscountalreadylinked = 0)
+	public function insert(User $user, $notrigger = false)
 	{
 		global $db, $user;
 
@@ -841,6 +842,13 @@ class FirePermitLine extends CommonObjectLine
 			$this->rowid = $this->id; // For backward compatibility
 
 			$db->commit();
+			// Triggers
+			if (!$notrigger)
+			{
+				// Call triggers
+				$this->call_trigger(strtoupper(get_class($this)).'_CREATE', $user);
+				// End call triggers
+			}
 			return $this->id;
 		} else {
 			$this->error = $db->lasterror();
@@ -855,8 +863,9 @@ class FirePermitLine extends CommonObjectLine
 	 * @param User $user User object
 	 * @param int $notrigger Disable triggers
 	 * @return        int                    <0 if KO, >0 if OK
+	 * @throws Exception
 	 */
-	public function update($user = '', $notrigger = 1)
+	public function update($user = '', $notrigger = false)
 	{
 		global $user, $conf, $db;
 
@@ -881,6 +890,13 @@ class FirePermitLine extends CommonObjectLine
 
 		if ($resql) {
 			$db->commit();
+			// Triggers
+			if (!$notrigger)
+			{
+				// Call triggers
+				$this->call_trigger(strtoupper(get_class($this)).'_MODIFY', $user);
+				// End call triggers
+			}
 			return 1;
 		} else {
 			$this->error = $db->error();
@@ -893,8 +909,9 @@ class FirePermitLine extends CommonObjectLine
 	 *    Delete line in database
 	 *
 	 * @return        int                   <0 if KO, >0 if OK
+	 * @throws Exception
 	 */
-	public function delete()
+	public function delete(User $user, $notrigger = false)
 	{
 		global $user, $db;
 
@@ -904,6 +921,13 @@ class FirePermitLine extends CommonObjectLine
 		dol_syslog(get_class($this) . "::delete", LOG_DEBUG);
 		if ($db->query($sql)) {
 			$db->commit();
+			// Triggers
+			if (!$notrigger)
+			{
+				// Call trigger
+				$this->call_trigger(strtoupper(get_class($this)).'_DELETE', $user);
+				// End call triggers
+			}
 			return 1;
 		} else {
 			$this->error = $db->error() . " sql=" . $sql;
