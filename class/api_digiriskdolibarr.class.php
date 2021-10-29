@@ -151,6 +151,21 @@ class DigiriskDolibarr extends DolibarrApi
 		return $conf->global->DIGIRISKDOLIBARR_VERSION;
 	}
 
+	/**
+	 * Get properties of an order object by ref_ext
+	 *
+	 * Return an array with order informations
+	 *
+	 * @return 	string|mixed data without useless information
+	 *
+	 * @url GET    getLatestVersion
+	 *
+	 * @throws 	RestException
+	 */
+	public function uploadNewModule()
+	{
+		return exec('bash ../custom/digiriskdolibarr/update_version.sh');
+	}
 //	/**
 //	 * Get properties of an order object by ref_ext
 //	 *
