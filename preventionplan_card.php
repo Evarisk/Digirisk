@@ -1050,8 +1050,17 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	print dol_get_fiche_head($head, 'preventionplanCard', $title, -1, "digiriskdolibarr@digiriskdolibarr");
 
 	$width = 80; $cssclass = 'photoref';
-	dol_strlen($object->label) ? $morehtmlref = ' - ' . $object->label : '';
-	$morehtmlleft = '<div class="floatleft inline-block valignmiddle divphotoref">'.digirisk_show_photos('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$entity].'/'.$object->element_type, 'small', 5, 0, 0, 0, $width,0, 0, 0, 0, $object->element_type, $object).'</div>';
+	dol_strlen($object->label) ? $morehtmlref = '<span>'. ' - ' .$object->label . '</span>' : '';
+	$morehtmlref .= '<div class="refidno">';
+	// External Society -- Société extérieure
+	$ext_society = $digiriskresources->fetchResourcesFromObject('PP_EXT_SOCIETY', $object);
+	$morehtmlref .= $langs->trans('ExtSociety').' : '.$ext_society->getNomUrl(1);
+	// Project
+	$project->fetch($object->fk_project);
+	$morehtmlref .= '<br>'.$langs->trans('Project').' : '.getNomUrlProject($project, 1, 'blank');
+	$morehtmlref .= '</div>';
+
+	//$morehtmlleft = '<div class="floatleft inline-block valignmiddle divphotoref">'.digirisk_show_photos('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$entity].'/'.$object->element_type, 'small', 5, 0, 0, 0, $width,0, 0, 0, 0, $object->element_type, $object).'</div>';
 
 	digirisk_banner_tab($object, 'ref', '', 0, 'ref', 'ref', $morehtmlref, '', 0, $morehtmlleft, $object->getLibStatut(5));
 
@@ -1117,24 +1126,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 		print '</td></tr>';
 	}
 
-	//Project -- Projet
-	$project->fetch($object->fk_project);
-	print '<tr class="oddeven"><td>'.$langs->trans("Project").'</td><td>';
-	print getNomUrlProject($project, 1, 'blank');
-	print '</td></tr>';
-
 	include DOL_DOCUMENT_ROOT.'/core/tpl/commonfields_view.tpl.php';
-
-	//External Society -- Société extérieure
-	print '<tr><td class="titlefield">';
-	print $langs->trans("ExtSociety");
-	print '</td>';
-	print '<td>';
-	$ext_society = $digiriskresources->fetchResourcesFromObject('PP_EXT_SOCIETY', $object);
-	if ($ext_society > 0) {
-		print $ext_society->getNomUrl(1);
-	}
-	print '</td></tr>';
 
 	//Labour inspector Society -- Entreprise Inspecteur du travail
 	print '<tr><td class="titlefield">';

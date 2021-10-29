@@ -989,7 +989,12 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	$head = firepermitPrepareHead($object);
 	print dol_get_fiche_head($head, 'firepermitCard', $title, -1, "digiriskdolibarr@digiriskdolibarr");
 
-	dol_strlen($object->label) ? $morehtmlref = ' - ' . $object->label : '';
+	dol_strlen($object->label) ? $morehtmlref = '<span>'. ' - ' .$object->label . '</span>' : '';
+	$morehtmlref .= '<div class="refidno">';
+	// External Society -- Société extérieure
+	$ext_society = $digiriskresources->fetchResourcesFromObject('FP_EXT_SOCIETY', $object);
+	$morehtmlref .= $langs->trans('ExtSociety').' : '.$ext_society->getNomUrl(1);
+	$morehtmlref .= '</div>';
 	digirisk_banner_tab($object, 'ref', '', 0, 'ref', 'ref', $morehtmlref, '', 0, '', $object->getLibStatut(5));
 
 	print '<div class="div-table-responsive">';
@@ -1033,17 +1038,6 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	print '</td></tr>';
 
 	include DOL_DOCUMENT_ROOT.'/core/tpl/commonfields_view.tpl.php';
-
-	//External Society -- Société extérieure
-	print '<tr><td class="tdtop">';
-	print $langs->trans("ExtSociety");
-	print '</td>';
-	print '<td>';
-	$ext_society = $digiriskresources->fetchResourcesFromObject('FP_EXT_SOCIETY', $object);
-	if ($ext_society > 0) {
-		print $ext_society->getNomUrl(1);
-	}
-	print '</td></tr>';
 
 	//Labour inspector Society -- Entreprise Inspecteur du travail
 	print '<tr><td class="titlefield">';
