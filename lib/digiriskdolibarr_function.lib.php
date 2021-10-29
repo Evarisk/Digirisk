@@ -1851,7 +1851,10 @@ function digirisk_selectcontacts($socid, $selected = '', $htmlname = 'contactid'
 						$disabled = 0;
 						 $noTooltip = 0;
 						if (is_array($exclude) && count($exclude) && in_array($obj->rowid, $exclude)) $disabled = 1;
-						if (is_array($exclude_already_add) && count($exclude_already_add) && in_array($obj->rowid, $exclude_already_add)) $noTooltip = 1;
+						if (is_array($exclude_already_add) && count($exclude_already_add) && in_array($obj->rowid, $exclude_already_add)) {
+							$disabled = 1;
+							$noTooltip = 1;
+						}
 						if (is_array($limitto) && count($limitto) && !in_array($obj->rowid, $limitto)) $disabled = 1;
 						if (!empty($selected) && in_array($obj->rowid, $selected))
 						{
