@@ -117,6 +117,40 @@ class DigiriskDolibarr extends DolibarrApi
 		return $this->mod->version;
 	}
 
+	/**
+	 * Get properties of an order object by ref_ext
+	 *
+	 * Return an array with order informations
+	 *
+	 * @return 	string|mixed data without useless information
+	 *
+	 * @url GET    getActiveVersion
+	 *
+	 * @throws 	RestException
+	 */
+	public function getActiveVersion()
+	{
+		global $conf;
+		return $conf->global->DIGIRISKDOLIBARR_VERSION;
+	}
+
+	/**
+	 * Get properties of an order object by ref_ext
+	 *
+	 * Return an array with order informations
+	 *
+	 * @return 	string|mixed data without useless information
+	 *
+	 * @url GET    getLatestVersion
+	 *
+	 * @throws 	RestException
+	 */
+	public function getLatestVersion()
+	{
+		global $conf;
+		return $conf->global->DIGIRISKDOLIBARR_VERSION;
+	}
+
 //	/**
 //	 * Get properties of an order object by ref_ext
 //	 *

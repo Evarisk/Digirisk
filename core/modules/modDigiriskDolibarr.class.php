@@ -555,6 +555,18 @@ class modDigiriskdolibarr extends DolibarrModules
 		$this->rights[$r][5] = 'delete';
 		$r++;
 
+		/* API PERMISSIONS */
+		$this->rights[$r][0] = $this->numero.$r;
+		$this->rights[$r][1] = $langs->trans('GetAPI');
+		$this->rights[$r][4] = 'evaluator';
+		$this->rights[$r][5] = 'read';
+		$r++;
+		$this->rights[$r][0] = $this->numero.$r;
+		$this->rights[$r][1] = $langs->trans('PostAPI');
+		$this->rights[$r][4] = 'evaluator';
+		$this->rights[$r][5] = 'write';
+		$r++;
+
 		/* ADMINPAGE PANEL ACCESS PERMISSIONS */
 		$this->rights[$r][0] = $this->numero.$r;
 		$this->rights[$r][1] = $langs->trans('ReadAdminPage');
@@ -1023,6 +1035,28 @@ class modDigiriskdolibarr extends DolibarrModules
 			$tags->create($user);
 
 			dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_PROJECT_TAGS_SET', 1, 'integer', 0, '', $conf->entity);
+		}
+
+		if ( $conf->global->DIGIRISKDOLIBARR_USERAPI_SET ==  0 ) {
+			require_once DOL_DOCUMENT_ROOT.'/user/class/user.class.php';
+
+			$usertmp = new User($this->db);
+			$usertmp->lastname  = 'API';
+			$usertmp->firstname = 'REST';
+			$usertmp->login     = 'USERAPI';
+			$usertmp->entity    = $conf->entity;
+			$usertmp->setPassword($user);
+			$usertmp->api_key = getRandomPassword(true);
+
+			$user_id = $usertmp->create($user);
+			if ($user_id > 0) {
+				//Rights invoices
+				$userapi->rights->facture->lire ? 1 : $userapi->addrights(11);
+				$userapi->rights->facture->creer ? 1 : $userapi->addrights(12);
+				$userapi->rights->facture->paiment ? 1 : $userapi->addrights(16);
+			}
+
+			dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_USERAPI_SET', $user_id, 'integer', 0, '', $conf->entity);
 		}
 
 		return $this->_init($sql, $options);
