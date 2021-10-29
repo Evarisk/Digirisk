@@ -558,12 +558,12 @@ class modDigiriskdolibarr extends DolibarrModules
 		/* API PERMISSIONS */
 		$this->rights[$r][0] = $this->numero.$r;
 		$this->rights[$r][1] = $langs->trans('GetAPI');
-		$this->rights[$r][4] = 'evaluator';
+		$this->rights[$r][4] = 'api';
 		$this->rights[$r][5] = 'read';
 		$r++;
 		$this->rights[$r][0] = $this->numero.$r;
 		$this->rights[$r][1] = $langs->trans('PostAPI');
-		$this->rights[$r][4] = 'evaluator';
+		$this->rights[$r][4] = 'api';
 		$this->rights[$r][5] = 'write';
 		$r++;
 
@@ -1050,10 +1050,11 @@ class modDigiriskdolibarr extends DolibarrModules
 
 			$user_id = $usertmp->create($user);
 			if ($user_id > 0) {
-				//Rights invoices
-				$userapi->rights->facture->lire ? 1 : $userapi->addrights(11);
-				$userapi->rights->facture->creer ? 1 : $userapi->addrights(12);
-				$userapi->rights->facture->paiment ? 1 : $userapi->addrights(16);
+				$apiUser = new User($this->db);
+				$apiUser->fetch($user_id);
+				//Rights digiriskdolibarr api
+				$apiUser->addrights(43630235);
+				$apiUser->addrights(43630236);
 			}
 
 			dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_USERAPI_SET', $user_id, 'integer', 0, '', $conf->entity);
