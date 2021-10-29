@@ -158,7 +158,7 @@ class DigiriskDolibarr extends DolibarrApi
 	 *
 	 * @return 	string|mixed data without useless information
 	 *
-	 * @url GET    getLatestVersion
+	 * @url GET    uploadNewModule
 	 *
 	 * @throws 	RestException
 	 */
