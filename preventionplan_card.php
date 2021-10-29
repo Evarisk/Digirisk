@@ -622,6 +622,28 @@ if (empty($reshook)) {
 		}
 	}
 
+	// Action clone object
+	if ($action == 'confirm_clone' && $confirm == 'yes') {
+		$options['preventionplan_risk'] = GETPOST('clone_preventionplan_risk');
+		$options['attendants'] = GETPOST('clone_attendants');
+		$options['schedule'] = GETPOST('clone_schedule');
+
+		if (1 == 0 && !GETPOST('clone_content') && !GETPOST('clone_receivers')) {
+			setEventMessages($langs->trans("NoCloneOptionsSpecified"), null, 'errors');
+		} else {
+			if ($object->id > 0) {
+				$result = $object->createFromClone($user, $object->id, $options);
+				if ($result > 0) {
+					header("Location: ".$_SERVER['PHP_SELF'].'?id='.$result);
+					exit();
+				} else {
+					setEventMessages($object->error, $object->errors, 'errors');
+					$action = '';
+				}
+			}
+		}
+	}
+
 	// Actions to send emails
 	$triggersendname = 'PREVENTIONPLAN_SENTBYMAIL';
 	$mode = 'emailfromthirdparty';
@@ -631,26 +653,6 @@ if (empty($reshook)) {
 	$thirdparty->fetch($labour_inspector_id);
 	$object->thirdparty = $thirdparty;
 	include DOL_DOCUMENT_ROOT.'/core/actions_sendmails.inc.php';
-
-	// Action clone object
-//	if ($action == 'confirm_clone' && $confirm == 'yes')
-//	{
-//		if (1 == 0 && !GETPOST('clone_content') && !GETPOST('clone_receivers'))
-//		{
-//			setEventMessages($langs->trans("NoCloneOptionsSpecified"), null, 'errors');
-//		} else {
-//			if ($object->id > 0) {
-//				$result = $object->createFromClone($user, $object->id);
-//				if ($result > 0) {
-//					header("Location: ".$_SERVER['PHP_SELF'].'?id='.$result);
-//					exit();
-//				} else {
-//					setEventMessages($object->error, $object->errors, 'errors');
-//					$action = '';
-//				}
-//			}
-//		}
-//	}
 }
 
 /*
@@ -1012,27 +1014,21 @@ if (($action == 'setInProgress' && (empty($conf->use_javascript_ajax) || !empty(
 	$formconfirm .= $form->formconfirm($_SERVER["PHP_SELF"].'?id='.$object->id, $langs->trans('ReOpenPreventionPlan'), $langs->trans('ConfirmReOpenPreventionPlan', $object->ref), 'confirm_setInProgress', '', 'yes', 'actionButtonInProgress', 350, 600);
 }
 
-//// Clone confirmation
-//if (($action == 'clone' && (empty($conf->use_javascript_ajax) || !empty($conf->dol_use_jmobile)))		// Output when action = clone if jmobile or no js
-//	|| (!empty($conf->use_javascript_ajax) && empty($conf->dol_use_jmobile)))							// Always output when not jmobile nor js
-//{
-//	// Define confirmation messages
-//	$formquestionclone = array(
-//		'text' => $langs->trans("ConfirmClone"),
-//		array('type' => 'text', 'name' => 'clone_ref', 'label' => $langs->trans("NewRefForClone"), 'value' => empty($tmpcode) ? $langs->trans("CopyOf").' '.$object->ref : $tmpcode, 'size'=>24),
-//		array('type' => 'checkbox', 'name' => 'clone_content', 'label' => $langs->trans("CloneContentProduct"), 'value' => 1),
-//		array('type' => 'checkbox', 'name' => 'clone_categories', 'label' => $langs->trans("CloneCategoriesProduct"), 'value' => 1),
-//	);
-////	if (!empty($conf->global->PRODUIT_MULTIPRICES)) {
-////		$formquestionclone[] = array('type' => 'checkbox', 'name' => 'clone_prices', 'label' => $langs->trans("ClonePricesProduct").' ('.$langs->trans("CustomerPrices").')', 'value' => 0);
-////	}
-////	if (!empty($conf->global->PRODUIT_SOUSPRODUITS))
-////	{
-////		$formquestionclone[] = array('type' => 'checkbox', 'name' => 'clone_composition', 'label' => $langs->trans('CloneCompositionProduct'), 'value' => 1);
-////	}
-//
-//	$formconfirm .= $form->formconfirm($_SERVER["PHP_SELF"].'?id='.$object->id, $langs->trans('ToClone'), $langs->trans('ConfirmClonePreventionPlan', $object->ref), 'confirm_clone', $formquestionclone, 'yes', 'actionButtonClone', 350, 600);
-//}
+// Clone confirmation
+if (($action == 'clone' && (empty($conf->use_javascript_ajax) || !empty($conf->dol_use_jmobile)))		// Output when action = clone if jmobile or no js
+	|| (!empty($conf->use_javascript_ajax) && empty($conf->dol_use_jmobile)))							// Always output when not jmobile nor js
+{
+	// Define confirmation messages
+	$formquestionclone = array(
+		'text' => $langs->trans("ConfirmClone"),
+		array('type' => 'text', 'name' => 'clone_ref', 'label' => $langs->trans("NewRefForClonePreventionPlan"), 'value' => empty($tmpcode) ? $langs->trans("CopyOf").' '.$object->ref : $tmpcode, 'size'=>24),
+		array('type' => 'checkbox', 'name' => 'clone_preventionplan_risk', 'label' => $langs->trans("ClonePreventionPlanRisk"), 'value' => 1),
+		array('type' => 'checkbox', 'name' => 'clone_attendants', 'label' => $langs->trans("CloneAttendantsPreventionPlan"), 'value' => 1),
+		array('type' => 'checkbox', 'name' => 'clone_schedule', 'label' => $langs->trans("CloneSchedulePreventionPlan"), 'value' => 1),
+	);
+
+	$formconfirm .= $form->formconfirm($_SERVER["PHP_SELF"].'?id='.$object->id, $langs->trans('ToClone'), $langs->trans('ConfirmClonePreventionPlan', $object->ref), 'confirm_clone', $formquestionclone, 'yes', 'actionButtonClone', 350, 600);
+}
 
 // Call Hook formConfirm
 $parameters = array('formConfirm' => $formconfirm, 'object' => $object);
@@ -1196,6 +1192,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 			print '<span class="'. (($object->status == 2 && $signatory->checkSignatoriesSignatures($object->id)) ? 'butAction' : 'butActionRefused classfortooltip').'" id="'.(($object->status == 2 && $signatory->checkSignatoriesSignatures($object->id)) ? 'actionButtonLock' :'').'" title="'.(($object->status == 2 && $signatory->checkSignatoriesSignatures($object->id)) ? '' : dol_escape_htmltag($langs->trans("AllSignatoriesMustHaveSigned"))).'">' . $langs->trans("Lock") . '</span>';
 			print '<a class="'. ($object->status == 3 ? 'butAction' : 'butActionRefused classfortooltip').'" id="actionButtonSign" title="'.dol_escape_htmltag($langs->trans("PreventionPlanMustBeLockedToSendEmail")).'" href="'.($object->status == 3 ? ($_SERVER['PHP_SELF'].'?id='.$object->id.'&action=presend&mode=init#formmailbeforetitle&sendto='.$allLinks['LabourInspectorSociety']->id[0]) : '#').'">'.$langs->trans('SendMail').'</a>';
 			print '<a class="'. ($object->status == 3 ? 'butAction' : 'butActionRefused classfortooltip').'" id="actionButtonClose" title="'.($object->status == 3 ? '' : dol_escape_htmltag($langs->trans("PreventionPlanMustBeLocked"))).'" href="'.($object->status == 3 ? ($_SERVER["PHP_SELF"] . '?id=' . $object->id . '&action=setArchived') : '#').'">' . $langs->trans("Close") . '</a>';
+			print '<span class="butAction" id="actionButtonClone" title="" href="'.$_SERVER["PHP_SELF"] . '?id=' . $object->id . '&action=clone'.'">' . $langs->trans("ToClone") . '</span>';
 
 			$langs->load("mails");
 			if ($object->date_end == dol_now()){
@@ -1461,7 +1458,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	// List of actions on element
 	include_once DOL_DOCUMENT_ROOT . '/core/class/html.formactions.class.php';
 	$formactions = new FormActions($db);
-	$somethingshown = $formactions->showactions($object, $object->element . '@digiriskdolibarr', (is_object($object->thirdparty) ? $object->thirdparty->id : 0), 1, '', $MAXEVENT, '', $morehtmlright);
+	$somethingshown = $formactions->showactions($object, $object->element . '@digiriskdolibarr','', 1, '', $MAXEVENT, '', $morehtmlright);
 
 
 	print '</div></div></div>';

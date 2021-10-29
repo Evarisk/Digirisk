@@ -397,6 +397,12 @@ NoPreventionPlanRisk = Aucun risque sur le plan de prévention
 NoPreventionPlanLinked = Aucun plan de prévention lié
 PreventionPlanManagement = Gestion des plans de prévention
 PPRProject = Projet lié aux plans de prévention
+NewRefForClonePreventionPlan = Réf. du nouveau plan de prévention
+ClonePreventionPlanRisk = Cloner les risques du plan de prévention
+CloneAttendantsPreventionPlan = Cloner les participants du plan de prévention
+CloneSchedulePreventionPlan = Cloner les horaires du plan de prévention
+ConfirmClonePreventionPlan = Êtes-vous sûr de vouloir cloner le plan de prévention <b> %s </b> ?
+
 
 # Email - Mail
 PreventionPlanLabel = Récapitulatif du plan de prévention
