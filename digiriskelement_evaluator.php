@@ -531,16 +531,16 @@ if ($object->id > 0) {
 
 			if (!empty($arrayfields['t.'.$key]['checked'])) {
 				if ($key == 'assignment_date') {
-					print '<td style="width:2%">' . date('Y/m/d', $evaluator->$key);
+					print '<td>' . date('Y/m/d', $evaluator->$key);
 				} elseif ($key == 'duration') {
-					print '<td style="width:2%">' .$evaluator->$key . ' min';
+					print '<td>' .$evaluator->$key . ' min';
 				}  elseif ($key == 'fk_user') {
 					$user->fetch($evaluator->$key);
-					print '<td style="width:2%">' .$user->getNomUrl(1 );
+					print '<td>' .$user->getNomUrl(1 );
 				}  elseif ($key == 'fk_parent') {
-					print '<td style="width:2%">' .$object->getNomUrl($evaluator->$key);
+					print '<td>' .$object->getNomUrl($evaluator->$key);
 				} else {
-					print '<td style="width:2%">' .$evaluator->$key;
+					print '<td>' .$evaluator->$key;
 				}
 			}
 
