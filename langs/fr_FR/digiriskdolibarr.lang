@@ -813,8 +813,10 @@ NoRiskThere = "Aucun risque spécifique sur cette unité" Cependant vous pouvez 
 fk_risk = Risque lié
 ShowParentRisks = Risques des éléments parents
 ShowParentRisksDescription = Afficher les risques des éléments parents dans les fiches d'unité et de groupement
-
-
+MoveRisk = Déplacer le risque
+MoveRisks = Déplacer les risques
+MoveRisksDescription = Permet de déplacer les risques d'un groupement ou d'une unité de travail à un(e) autre
+SetConfToMoveRisk = Vous devez d'abord autoriser le déplacement des risques dans "Configuration du module -> Analyse de risques -> Risque"
 
 #
 # RiskAssessment - Évaluation
