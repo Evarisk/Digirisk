@@ -1051,43 +1051,15 @@ class modDigiriskdolibarr extends DolibarrModules
 			$project->fetch($conf->global->DIGIRISKDOLIBARR_PREVENTIONPLAN_PROJECT);
 			$tags->add_type($project, 'project');
 
-			$tags->label = 'FP';
-			$tags->type = 'project';
-			$tags->fk_parent = $tag_id;
-			$tags->create($user);
-
-			$project->fetch($conf->global->DIGIRISKDOLIBARR_FIREPERMIT_PROJECT);
-			$tags->add_type($project, 'project');
-
 			$tags->label = 'ACC';
 			$tags->type = 'project';
 			$tags->fk_parent = $tag_id;
 			$tags->create($user);
 
 			dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_PROJECT_TAGS_SET', 2, 'integer', 0, '', $conf->entity);
-		} elseif ($conf->global->DIGIRISKDOLIBARR_PROJECT_TAGS_SET == 1) {
-			//Install after 8.3.0
-
-			require_once DOL_DOCUMENT_ROOT.'/categories/class/categorie.class.php';
-			require_once DOL_DOCUMENT_ROOT.'/projet/class/project.class.php';
-
-			$project = new Project($this->db);
-			$tags = new Categorie($this->db);
-
-			$tag_id = $tags->fetch('', 'QHSE');
-
-			$tags->label = 'FP';
-			$tags->type = 'project';
-			$tags->fk_parent = $tag_id;
-			$tags->create($user);
-
-			$project->fetch($conf->global->DIGIRISKDOLIBARR_FIREPERMIT_PROJECT);
-			$tags->add_type($project, 'project');
-
-			dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_PROJECT_TAGS_SET', 2, 'integer', 0, '', $conf->entity);
 		}
 
-			if ( $conf->global->DIGIRISKDOLIBARR_USERAPI_SET ==  0 ) {
+		if ( $conf->global->DIGIRISKDOLIBARR_USERAPI_SET ==  0 ) {
 			require_once DOL_DOCUMENT_ROOT.'/user/class/user.class.php';
 
 			$usertmp = new User($this->db);

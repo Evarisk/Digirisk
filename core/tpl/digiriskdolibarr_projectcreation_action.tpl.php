@@ -102,4 +102,16 @@ if ( $conf->global->DIGIRISKDOLIBARR_FIREPERMIT_PROJECT == 0 || $project->statut
 	$project->statut      = 1;
 	$project_id = $project->create($user);
 	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_FIREPERMIT_PROJECT', $project_id, 'integer', 1, '',$conf->entity);
+
+	require_once DOL_DOCUMENT_ROOT.'/categories/class/categorie.class.php';
+	$tags = new Categorie($this->db);
+
+	$tag_id = $tags->fetch('', 'QHSE');
+
+	$tags->label = 'FP';
+	$tags->type = 'project';
+	$tags->fk_parent = $tag_id;
+	$tags->create($user);
+
+	$tags->add_type($project, 'project');
 }
