@@ -16,3 +16,4 @@
 ALTER TABLE llx_digiriskdolibarr_firepermit ADD INDEX idx_digiriskdolibarr_firepermit_rowid (rowid);
 ALTER TABLE llx_digiriskdolibarr_firepermit ADD INDEX idx_digiriskdolibarr_firepermit_ref_ext (ref_ext);
 ALTER TABLE llx_digiriskdolibarr_firepermit ADD CONSTRAINT llx_digiriskdolibarr_firepermit_fk_user_creat FOREIGN KEY (fk_user_creat) REFERENCES llx_user(rowid);
+ALTER TABLE llx_digiriskdolibarr_firepermit ADD CONSTRAINT llx_digiriskdolibarr_firepermit_fk_project FOREIGN KEY (fk_project) REFERENCES llx_projet(rowid);

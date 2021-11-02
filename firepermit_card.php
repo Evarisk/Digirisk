@@ -82,6 +82,7 @@ $thirdparty          = new Societe($db);
 $extrafields         = new ExtraFields($db);
 $digiriskelement     = new DigiriskElement($db);
 $digiriskresources   = new DigiriskResources($db);
+$project             = new Project($db);
 $refFirePermitMod    = new $conf->global->DIGIRISKDOLIBARR_FIREPERMIT_ADDON($db);
 $refFirePermitDetMod = new $conf->global->DIGIRISKDOLIBARR_FIREPERMITDET_ADDON($db);
 
@@ -152,6 +153,7 @@ if (empty($reshook)) {
 		$object->status        = 1;
 		$object->label         = $label;
 		$object->description   = $description;
+		$object->fk_project    = $conf->global->DIGIRISKDOLIBARR_FIREPERMIT_PROJECT;
 
 		$date_start = dol_mktime(GETPOST('dateohour', 'int'), GETPOST('dateomin', 'int'), 0, GETPOST('dateomonth', 'int'), GETPOST('dateoday', 'int'), GETPOST('dateoyear', 'int'));
 		$date_end   = dol_mktime(GETPOST('dateehour', 'int'), GETPOST('dateemin', 'int'), 0, GETPOST('dateemonth', 'int'), GETPOST('dateeday', 'int'), GETPOST('dateeyear', 'int'));
@@ -994,7 +996,11 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	// External Society -- Société extérieure
 	$ext_society = $digiriskresources->fetchResourcesFromObject('FP_EXT_SOCIETY', $object);
 	$morehtmlref .= $langs->trans('ExtSociety').' : '.$ext_society->getNomUrl(1);
+	// Project
+	$project->fetch($object->fk_project);
+	$morehtmlref .= '<br>'.$langs->trans('Project').' : '.getNomUrlProject($project, 1, 'blank');
 	$morehtmlref .= '</div>';
+
 	digirisk_banner_tab($object, 'ref', '', 0, 'ref', 'ref', $morehtmlref, '', 0, '', $object->getLibStatut(5));
 
 	print '<div class="div-table-responsive">';
@@ -1006,6 +1012,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	unset($object->fields['label']);
 	unset($object->fields['date_start']);
 	unset($object->fields['date_end']);
+	unset($object->fields['fk_project']);
 
 	//Label -- Libellé
 	print '<tr><td class="titlefield">';

@@ -90,7 +90,7 @@ class PreventionPlan extends CommonObject
 		'prior_visit_text'     => array('type'=>'text', 'label'=>'PriorVisitText', 'enabled'=>'1', 'position'=>150, 'notnull'=>-1, 'visible'=>-1,),
 		'prior_visit_date'     => array('type'=>'datetime', 'label'=>'PriorVisitDate', 'enabled'=>'1', 'position'=>200, 'notnull'=>-1, 'visible'=>-1,),
 		'cssct_intervention'   => array('type'=>'boolean', 'label'=>'CSSCTIntervention', 'enabled'=>'1', 'position'=>160, 'notnull'=>-1, 'visible'=>-1,),
-		'fk_project'           => array('type'=>'integer:Project:projet/class/project.class.php', 'label'=>'Projet', 'enabled'=>'1', 'position'=>170, 'notnull'=>1, 'visible'=>1,),
+		'fk_project'           => array('type'=>'integer:Project:projet/class/project.class.php', 'label'=>'Project', 'enabled'=>'1', 'position'=>170, 'notnull'=>1, 'visible'=>1,),
 		'fk_user_creat'        => array('type'=>'integer:User:user/class/user.class.php', 'label'=>'UserAuthor', 'enabled'=>'1', 'position'=>180, 'notnull'=>1, 'visible'=>0, 'foreignkey'=>'user.rowid',),
 		'fk_user_modif'        => array('type'=>'integer:User:user/class/user.class.php', 'label'=>'UserModif', 'enabled'=>'1', 'position'=>190, 'notnull'=>-1, 'visible'=>0,),
 		'last_email_sent_date' => array('type'=>'datetime', 'label'=>'LastEmailSentDate', 'enabled'=>'1', 'position'=>200, 'notnull'=>-1, 'visible'=>-2,),

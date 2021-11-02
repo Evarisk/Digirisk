@@ -493,6 +493,11 @@ CloneFirePermitRisk = Cloner les risques du permis de feu
 CloneAttendantsFirePermit = Cloner les participants du permis de feu
 CloneScheduleFirePermit = Cloner les horaires du permis de feu
 ConfirmCloneFirePermit = Êtes-vous sûr de vouloir cloner le permis de feu <b> %s </b> ?
+FirePermitInitial = FPR
+FirePermitDescription = Projet des permis de feu
+FirePermitData = Données du Permis de feu
+FirePermitManagement = Gestion des permis de feu
+FPRProject = Projet lié aux permis de feu
 
 # Email - Mail
 FirePermitLabel = Récapitulatif du permis de feu

@@ -88,7 +88,7 @@ class modDigiriskdolibarr extends DolibarrModules
 				'admincompany',
 				'globaladmin',
 				'emailtemplates',
-				'mainloginpage'
+				'mainloginpage',
 			),
 			'tabs' => array(
 				'mycompany_admin'
@@ -224,6 +224,8 @@ class modDigiriskdolibarr extends DolibarrModules
 			91 => array('DIGIRISKDOLIBARR_FIREPERMIT_ADDON','chaine', 'mod_firepermit_standard' ,'', $conf->entity),
 			92 => array('MAIN_AGENDA_ACTIONAUTO_FIREPERMIT_CREATE','chaine',1,'', $conf->entity),
 			93 => array('MAIN_AGENDA_ACTIONAUTO_FIREPERMIT_EDIT','chaine',1,'', $conf->entity),
+			270 => array('DIGIRISKDOLIBARR_FIREPERMIT_PROJECT','integer', 0,'', $conf->entity),
+			271 => array('DIGIRISKDOLIBARR_FIREPERMIT_MAITRE_OEUVRE','integer', 0,'', $conf->entity),
 
 			// CONST FIRE PERMIT DOCUMENT
 			94 => array('MAIN_AGENDA_ACTIONAUTO_FIREPERMITDOCUMENT_CREATE','chaine',1,'', $conf->entity),
@@ -298,9 +300,10 @@ class modDigiriskdolibarr extends DolibarrModules
 			200 => array('DIGIRISKDOLIBARR_VERSION','chaine', $this->version,'', $conf->entity),
 			201 => array('DIGIRISKDOLIBARR_SUBPERMCATEGORY_FOR_DOCUMENTS','integer', 1,'', $conf->entity),
 			202 => array('DIGIRISKDOLIBARR_DB_VERSION','chaine', $this->version,'', $conf->entity),
-			203 => array('DIGIRISKDOLIBARR_USERAPI_SET','chaine', 'integer', 0, $conf->entity),
-			204 => array('DIGIRISKDOLIBARR_USERGROUP_SET','chaine', 'integer', 0, $conf->entity),
-			205 => array('DIGIRISKDOLIBARR_ADMINUSERGROUP_SET','chaine', 'integer', 0, $conf->entity),
+			203 => array('DIGIRISKDOLIBARR_USERAPI_SET','integer', 0, '', $conf->entity),
+			204 => array('DIGIRISKDOLIBARR_USERGROUP_SET','integer', 0, '', $conf->entity),
+			205 => array('DIGIRISKDOLIBARR_ADMINUSERGROUP_SET','integer', 0, '', $conf->entity),
+			206 => array('DIGIRISKDOLIBARR_CONTACTS_SET','integer', 0, '', $conf->entity),
 
 			// CONST SIGNATURE
 			210 => array('DIGIRISKDOLIBARR_SIGNATURE_ENABLE_PUBLIC_INTERFACE','integer', 1,'', $conf->entity),
@@ -600,7 +603,7 @@ class modDigiriskdolibarr extends DolibarrModules
 		$this->menu[$r++] = array(
 			'fk_menu'  => 'fk_mainmenu=digiriskdolibarr', // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
 			'type'     => 'left', // This is a Top menu entry
-			'titre'    => '<i class="fas fa-home"></i> Digirisk',
+			'titre'    => '<i class="fas fa-home"></i>  ' . $langs->trans('Digirisk'),
 			'mainmenu' => 'digiriskdolibarr',
 			'leftmenu' => '',
 			'url'      => '/digiriskdolibarr/digiriskdolibarrindex.php',
@@ -762,6 +765,20 @@ class modDigiriskdolibarr extends DolibarrModules
 			'user'=>0,				                // 0=Menu for internal users, 1=external users, 2=both
 		);
 
+		$this->menu[$r++]=array(
+			'fk_menu'=>'fk_mainmenu=digiriskdolibarr',	    // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
+			'type'=>'left',			                // This is a Left menu entry
+			'titre'=>'<i class="fas fa-bars"></i>  ' . $langs->trans('MinimizeMenu'),
+			'mainmenu'=>'digiriskdolibarr',
+			'leftmenu'=>'',
+			'url'=>'/digiriskdolibarr/digiriskdolibarrindex.php',
+			'langs'=>'',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
+			'position'=>48520+$r,
+			'enabled'=>'$conf->digiriskdolibarr->enabled',  // Define condition to show or hide menu entry. Use '$conf->digiriskdolibarr->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
+			'perms'=>1,			                // Use 'perms'=>'$user->rights->digiriskdolibarr->level1->level2' if you want your menu with a permission rules
+			'target'=>'',
+			'user'=>0,				                // 0=Menu for internal users, 1=external users, 2=both
+		);
 	}
 
 	/**
@@ -1033,15 +1050,43 @@ class modDigiriskdolibarr extends DolibarrModules
 			$project->fetch($conf->global->DIGIRISKDOLIBARR_PREVENTIONPLAN_PROJECT);
 			$tags->add_type($project, 'project');
 
+			$tags->label = 'FP';
+			$tags->type = 'project';
+			$tags->fk_parent = $tag_id;
+			$tags->create($user);
+
+			$project->fetch($conf->global->DIGIRISKDOLIBARR_FIREPERMIT_PROJECT);
+			$tags->add_type($project, 'project');
+
 			$tags->label = 'ACC';
 			$tags->type = 'project';
 			$tags->fk_parent = $tag_id;
 			$tags->create($user);
 
-			dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_PROJECT_TAGS_SET', 1, 'integer', 0, '', $conf->entity);
+			dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_PROJECT_TAGS_SET', 2, 'integer', 0, '', $conf->entity);
+		} elseif ($conf->global->DIGIRISKDOLIBARR_PROJECT_TAGS_SET == 1) {
+			//Install after 8.3.0
+
+			require_once DOL_DOCUMENT_ROOT.'/categories/class/categorie.class.php';
+			require_once DOL_DOCUMENT_ROOT.'/projet/class/project.class.php';
+
+			$project = new Project($this->db);
+			$tags = new Categorie($this->db);
+
+			$tag_id = $tags->fetch('', 'QHSE');
+
+			$tags->label = 'FP';
+			$tags->type = 'project';
+			$tags->fk_parent = $tag_id;
+			$tags->create($user);
+
+			$project->fetch($conf->global->DIGIRISKDOLIBARR_FIREPERMIT_PROJECT);
+			$tags->add_type($project, 'project');
+
+			dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_PROJECT_TAGS_SET', 2, 'integer', 0, '', $conf->entity);
 		}
 
-		if ( $conf->global->DIGIRISKDOLIBARR_USERAPI_SET ==  0 ) {
+			if ( $conf->global->DIGIRISKDOLIBARR_USERAPI_SET ==  0 ) {
 			require_once DOL_DOCUMENT_ROOT.'/user/class/user.class.php';
 
 			$usertmp = new User($this->db);

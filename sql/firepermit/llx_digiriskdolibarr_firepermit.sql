@@ -25,6 +25,7 @@ CREATE TABLE llx_digiriskdolibarr_firepermit(
     date_start           datetime NOT NULL,
 	date_end             datetime,
 	last_email_sent_date datetime DEFAULT NULL,
+    fk_project           integer,
 	fk_user_creat        integer NOT NULL,
 	fk_user_modif        integer,
 	fk_preventionplan    integer

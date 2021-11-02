@@ -89,6 +89,7 @@ class FirePermit extends CommonObject
 		'date_start'           => array('type'=>'datetime', 'label'=>'StartDate', 'enabled'=>'1', 'position'=>90, 'notnull'=>-1, 'visible'=>1,),
 		'date_end'             => array('type'=>'datetime', 'label'=>'EndDate', 'enabled'=>'1', 'position'=>100, 'notnull'=>-1, 'visible'=>1,),
 		'last_email_sent_date' => array('type'=>'datetime', 'label'=>'LastEmailSentDate', 'enabled'=>'1', 'position'=>110, 'notnull'=>-1, 'visible'=>-2,),
+		'fk_project'           => array('type'=>'integer:Project:projet/class/project.class.php', 'label'=>'Project', 'enabled'=>'1', 'position'=>115, 'notnull'=>1, 'visible'=>1,),
 		'fk_user_creat'        => array('type'=>'integer:User:user/class/user.class.php', 'label'=>'UserAuthor', 'enabled'=>'1', 'position'=>120, 'notnull'=>1, 'visible'=>0, 'foreignkey'=>'user.rowid',),
 		'fk_user_modif'        => array('type'=>'integer:User:user/class/user.class.php', 'label'=>'UserModif', 'enabled'=>'1', 'position'=>130, 'notnull'=>-1, 'visible'=>0,),
 		'fk_preventionplan'    => array('type'=>'integer', 'label'=>'PreventionPlan', 'enabled'=>'1', 'position'=>140, 'notnull'=>-1, 'visible'=>-2,),
@@ -105,6 +106,7 @@ class FirePermit extends CommonObject
 	public $date_start;
 	public $date_end;
 	public $last_email_sent_date;
+	public $fk_project;
 	public $fk_user_creat;
 	public $fk_user_modif;
 	public $fk_preventionplan;
