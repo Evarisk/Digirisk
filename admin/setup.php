@@ -53,6 +53,11 @@ $project     = new Project($db);
 $third_party = new Societe($db);
 $projectRef  = new $conf->global->PROJECT_ADDON();
 
+// Parameters
+$action     = GETPOST('action', 'alpha');
+$backtopage = GETPOST('backtopage', 'alpha');
+$value      = GETPOST('value', 'alpha');
+
 // Access control
 if (!$user->admin) accessforbidden();
 
@@ -61,7 +66,16 @@ $backtopage = GETPOST('backtopage', 'alpha');
 
 $setupnotempty = 0;
 
+/*
+ * Actions
+ */
+
 require_once '../core/tpl/digiriskdolibarr_projectcreation_action.tpl.php';
+
+if ($action == 'setredirectafterconnection') {
+	$constforval = 'DIGIRISKDOLIBARR_REDIRECT_AFTER_CONNECTION';
+	dolibarr_set_const($db, $constforval, $value, 'integer', 0, '', $conf->entity);
+}
 
 /*
  * View
@@ -86,8 +100,33 @@ if (empty($setupnotempty)) {
 	print '<br>'.$langs->trans("AgendaModuleRequired") . '<br>';
 	print '<br>'.$langs->trans("HowToSetupOtherModules") . '  ' . '<a href="./../../../admin/modules.php' .'">' . $langs->trans('ConfigMyModules') . '</a>'. '<br>';
 	print '<br>'.$langs->trans("AvoidLogoProblems") . '  ' . '<a href="'.$langs->trans('LogoHelpLink').'">' . $langs->trans('LogoHelpLink') . '</a>'. '<br>';
-
 }
+
+print load_fiche_titre($langs->trans("DigiriskData"), '', '');
+
+print '<table class="noborder centpercent">';
+print '<tr class="liste_titre">';
+print '<td>'.$langs->trans("Name").'</td>';
+print '<td>'.$langs->trans("Description").'</td>';
+print '<td class="center">'.$langs->trans("Status").'</td>';
+print '</tr>';
+
+print '<tr class="oddeven"><td>';
+print $langs->trans('DigiriskManagement');
+print "</td><td>";
+print $langs->trans('DigiriskDescription');
+print '</td>';
+
+print '<td class="center">';
+if ($conf->global->DIGIRISKDOLIBARR_REDIRECT_AFTER_CONNECTION) {
+	print '<a class="reposition" href="'.$_SERVER["PHP_SELF"].'?action=setredirectafterconnection&value=0" alt="'.$langs->trans("Default").'">'.img_picto($langs->trans("Activated"), 'switch_on').'</a>';
+}
+else {
+	print '<a class="reposition" href="'.$_SERVER["PHP_SELF"].'?action=setredirectafterconnection&value=1" alt="'.$langs->trans("Default").'">'.img_picto($langs->trans("Disabled"), 'switch_off').'</a>';
+}
+print '</td>';
+print '</tr>';
+print '</table>';
 
 // Page end
 print dol_get_fiche_end();
