@@ -311,7 +311,7 @@ class doc_workunitdocument_custom_odt extends ModeleODTWorkUnitDocument
 				{
 					$risk = new Risk($this->db);
 					if ( ! empty( $object ) ) {
-						$risks = $risk->fetchRisksOrderedByCotation($object->id);
+						$risks = $risk->fetchRisksOrderedByCotation($object->id, false, $conf->global->DIGIRISKDOLIBARR_SHOW_PARENT_RISKS);
 						if ($risks > 0 && !empty($risks)) {
 							for ($i = 1; $i <= 4; $i++ ) {
 								$listlines = $odfHandler->setSegment('risq' . $i);
@@ -323,6 +323,9 @@ class doc_workunitdocument_custom_odt extends ModeleODTWorkUnitDocument
 									$scale = $lastEvaluation->get_evaluation_scale();
 
 									if ( $scale == $i ) {
+										$element = new DigiriskElement($this->db);
+										$element->fetch($line->fk_element);
+										$tmparray['nomElement'] = $element->ref . ' - ' . $element->label;
 										$tmparray['nomDanger']         = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $line->get_danger_category($line) . '.png';
 										$tmparray['identifiantRisque'] = $line->ref . ' - ' . $lastEvaluation->ref;
 										$tmparray['quotationRisque']   = $lastEvaluation->cotation;

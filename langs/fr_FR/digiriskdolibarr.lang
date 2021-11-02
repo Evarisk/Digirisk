@@ -798,7 +798,7 @@ RiskDescriptionNotEnabled = Le champ description du risque n'est pas activé
 HowToEnableRiskDescription = Pour activer le champ description du risque, allez dans "Configuration du module -> Analyse de risque -> Risque"
 HowToEnableRiskCategoryEdit = Pour activer la modification de la catégorie de risque, allez dans "Configuration du module -> Analyse de risque -> Risque"
 
-DigiriskRiskData = Donnée configurable des risques
+DigiriskRiskData = Données configurables des risques
 RiskDescription = Description du risque
 RiskDescriptionDescription = Activer le champ description du risque
 RiskDescriptionNotActivated = Veuillez activer le champ description du risque dans Configuration du module / Analyse des risques / Risques
@@ -806,7 +806,8 @@ AddRisk = Ajouter un risque
 NoDescriptionThere = Aucune description renseignée sur ce risque
 NoRiskThere = "Aucun risque spécifique sur cette unité" Cependant vous pouvez être soumis aux risques génériques de vos groupements de travail.
 fk_risk = Risque lié
-
+ShowParentRisks = Risques des éléments parents
+ShowParentRisksDescription = Afficher les risques des éléments parents dans les fiches d'unité et de groupement
 
 
 
@@ -834,7 +835,7 @@ EvaluationMethod = Méthode d'évaluation
 lastEvaluationOn = Dernière évaluation le
 EvaluatedOn = le
 DeleteEvaluation = Êtes-vous sûr(e) de vouloir supprimer l'évaluation
-DigiriskRiskAssessmentData = Donnée configurable des évaluations
+DigiriskRiskAssessmentData = Données configurables des évaluations
 MultipleRiskAssessmentMethodName = Méthodes d'évaluations
 MultipleRiskAssessmentMethodDescription = Activer le changement de méthode d'évaluation
 AdvancedRiskAssessmentMethod = Méthode d'évaluation avancée
@@ -915,7 +916,7 @@ TaskCreate = Ajout de la tâche
 TaskEdit = Édition de la tâche
 HowToSetDUProject = Pour configurer le choix du projet, aller dans Configuration du module - Analyse des risques - Tâche
 DeleteTask = Êtes-vous sûr(e) de vouloir supprimer la tâche
-DigiriskTaskData = Donnée configurable des tâches
+DigiriskTaskData = Données configurables des tâches
 TaskManagementDescription = Activer la gestion des tâches
 TaskManagementNotActivated = Veuillez activer la gestion des tâches dans Configuration du module / Analyse des risques / Tâche
 DigiriskProgress = Avancement
