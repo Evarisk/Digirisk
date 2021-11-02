@@ -364,7 +364,7 @@ function digiriskshowdocuments($modulepart, $modulesubdir, $filedir, $urlsource,
 			$genbutton = '<input class="button buttongen" id="'.$forname.'_generatebutton" name="'.$forname.'_generatebutton"';
 			$genbutton .= ' type="submit" value="'.$buttonlabel.'"';
 		} else {
-			$genbutton = '<input class="button buttongen disabled" name="'.$forname.'_generatebutton" style="pointer-events: none"';
+			$genbutton = '<input class="button buttongen disabled" name="'.$forname.'_generatebutton" style="cursor: not-allowed"';
 			$genbutton .= '  value="'.$buttonlabel.'"';
 		}
 
