@@ -97,6 +97,13 @@ HasNotBeenDeletedM = n'a pas été supprimé
 DigiriskDolibarrArea = Bienvenue sur DigiRisk
 WarningDigiriskNotUpdated = Veuillez mettre à jour votre Digirisk en désactivant et réactivant le module en vous rendant sur :
 
+DigiriskUserGroup = Groupe d'utilisateur Digirisk
+DigiriskUserGroupDescription = Le groupe d'utilisateur Digirisk possède les permissions de consulter tous les objets relatifs à Digirisk
+DigiriskAdminUserGroup = Groupe d'administrateur Digirisk
+DigiriskAdminUserGroupDescription = Le groupe d'administrateur Digirisk possède toutes les permissions à Digirisk
+
+
+
 #
 # Diaporama page index
 #
@@ -1066,3 +1073,5 @@ ContactNoEmail = Les contacts affichés en grisé sont des contacts qui ne poss�
 NoEmailContact = Pas d'email sur ce contact
 AddMedia = Ajouter un média
 NoMediaLinked = Pas de média lié
+SendPassword = Envoyer le mot de passe par email
+UserGroup = Groupe d'utilisateur

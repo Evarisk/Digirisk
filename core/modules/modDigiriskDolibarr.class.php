@@ -87,7 +87,8 @@ class modDigiriskdolibarr extends DolibarrModules
 				'completeTabsHead',
 				'admincompany',
 				'globaladmin',
-				'emailtemplates'
+				'emailtemplates',
+				'mainloginpage'
 			),
 			'tabs' => array(
 				'mycompany_admin'
@@ -297,6 +298,9 @@ class modDigiriskdolibarr extends DolibarrModules
 			200 => array('DIGIRISKDOLIBARR_VERSION','chaine', $this->version,'', $conf->entity),
 			201 => array('DIGIRISKDOLIBARR_SUBPERMCATEGORY_FOR_DOCUMENTS','integer', 1,'', $conf->entity),
 			202 => array('DIGIRISKDOLIBARR_DB_VERSION','chaine', $this->version,'', $conf->entity),
+			203 => array('DIGIRISKDOLIBARR_USERAPI_SET','chaine', 'integer', 0, $conf->entity),
+			204 => array('DIGIRISKDOLIBARR_USERGROUP_SET','chaine', 'integer', 0, $conf->entity),
+			205 => array('DIGIRISKDOLIBARR_ADMINUSERGROUP_SET','chaine', 'integer', 0, $conf->entity),
 
 			// CONST SIGNATURE
 			210 => array('DIGIRISKDOLIBARR_SIGNATURE_ENABLE_PUBLIC_INTERFACE','integer', 1,'', $conf->entity),
@@ -1060,6 +1064,68 @@ class modDigiriskdolibarr extends DolibarrModules
 			dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_USERAPI_SET', $user_id, 'integer', 0, '', $conf->entity);
 		}
 
+		if ( $conf->global->DIGIRISKDOLIBARR_USERGROUP_SET ==  0 ) {
+			require_once DOL_DOCUMENT_ROOT . '/user/class/usergroup.class.php';
+
+			$usergroup = new UserGroup($this->db);
+			$usergroup->entity = $conf->entity;
+			$usergroup->name = $langs->trans('DigiriskUserGroup');
+			$usergroup->note = $langs->trans('DigiriskUserGroupDescription');
+
+			$usergroup_id = $usergroup->create($user);
+			if ($usergroup_id > 0) {
+				$usergroup->fetch($usergroup_id);
+				//Rights digiriskdolibarr
+				$usergroup->addrights(4363020); //DigiriskDolibarr read
+				$usergroup->addrights(4363021); //DigiriskDolibarr lire
+				$usergroup->addrights(4363022); //RiskAssessmentDocument Read
+				$usergroup->addrights(4363025); //LegalDisplay Read
+				$usergroup->addrights(4363028); //InformationsSharing Read
+				$usergroup->addrights(43630211); //FirePermit Read
+				$usergroup->addrights(43630214); //Prevention Plan Read
+				$usergroup->addrights(43630217); //DigiriskElement Read
+				$usergroup->addrights(43630220); //Risk Read
+				$usergroup->addrights(43630223); //ListingRisksAction Read
+				$usergroup->addrights(43630226); //ListingRisksPhoto Read
+				$usergroup->addrights(43630229); //RiskSign Read
+				$usergroup->addrights(43630232); //Evaluator Read
+			}
+
+			dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_USERGROUP_SET ', $usergroup_id, 'integer', 0, '', $conf->entity);
+		}
+
+		if ( $conf->global->DIGIRISKDOLIBARR_ADMINUSERGROUP_SET ==  0 ) {
+			require_once DOL_DOCUMENT_ROOT . '/user/class/usergroup.class.php';
+
+			$usergroup = new UserGroup($this->db);
+			$usergroup->entity = $conf->entity;
+			$usergroup->name   = $langs->trans('DigiriskAdminUserGroup');
+			$usergroup->note   = $langs->trans('DigiriskAdminUserGroupDescription');
+
+			$usergroup_id = $usergroup->create($user);
+			if ($usergroup_id > 0) {
+				$usergroup->fetch($usergroup_id);
+				//Rights digiriskdolibarr
+				$usergroup->addrights(4363020); //DigiriskDolibarr read
+				$usergroup->addrights(4363021); //DigiriskDolibarr lire
+				$usergroup->addrights('', 'digiriskdolibarr', 'riskassessmentdocument'); //RiskAssessmentDocument
+				$usergroup->addrights('', 'digiriskdolibarr', 'legaldisplay');           //LegalDisplay
+				$usergroup->addrights('', 'digiriskdolibarr', 'informationssharing');    //InformationsSharing
+				$usergroup->addrights('', 'digiriskdolibarr', 'firepermit');             //FirePermit
+				$usergroup->addrights('', 'digiriskdolibarr', 'preventionplan');         //Prevention Plan
+				$usergroup->addrights('', 'digiriskdolibarr', 'digiriskelement');        //DigiriskElement
+				$usergroup->addrights('', 'digiriskdolibarr', 'risk');                   //Risk
+				$usergroup->addrights('', 'digiriskdolibarr', 'listingrisksaction');     //ListingRisksAction
+				$usergroup->addrights('', 'digiriskdolibarr', 'listingrisksphoto');      //ListingRisksPhoto
+				$usergroup->addrights('', 'digiriskdolibarr', 'risksign');               //RiskSign
+				$usergroup->addrights('', 'digiriskdolibarr', 'evaluator');              //Evaluator
+				$usergroup->addrights('', 'digiriskdolibarr', 'api');                    //API
+				$usergroup->addrights('', 'digiriskdolibarr', 'adminpage');              //AdminPage
+			}
+
+			dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_ADMINUSERGROUP_SET ', $usergroup_id, 'integer', 0, '', $conf->entity);
+		}
+
 		return $this->_init($sql, $options);
 	}
 
@@ -1074,6 +1140,9 @@ class modDigiriskdolibarr extends DolibarrModules
 	public function remove($options = '')
 	{
 		$sql = array();
+
+		$options = 'noremoverights';
+
 		return $this->_remove($sql, $options);
 	}
 }
