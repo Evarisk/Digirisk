@@ -626,7 +626,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$now = dol_now();
 				$actioncomm = new ActionComm($this->db);
 
-				$actioncomm->elementtype = 'preventionplan@digiriskdolibarr';
+				$actioncomm->elementtype = 'firepermit@digiriskdolibarr';
 				$actioncomm->code        = 'AC_FIREPERMITLINE_DELETE';
 				$actioncomm->type_code   = 'AC_OTH_AUTO';
 				$actioncomm->label       = $langs->trans('FirePermitLineDeleteTrigger');
