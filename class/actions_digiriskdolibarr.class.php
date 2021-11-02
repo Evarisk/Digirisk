@@ -197,7 +197,11 @@ class ActionsDigiriskdolibarr
 		/* print_r($parameters); print_r($object); echo "action: " . $action; */
 		if (in_array($parameters['currentcontext'], array('mainloginpage')))	    // do something only for the context 'somecontext1' or 'somecontext2'
 		{
-			$value = '/dolibarr-13.0.2/htdocs/custom/digiriskdolibarr/digiriskdolibarrindex.php?idmenu=1319&mainmenu=digiriskdolibarr&leftmenu=';
+			if ($conf->global->DIGIRISKDOLIBARR_REDIRECT_AFTER_CONNECTION > 0) {
+				$value = dol_buildpath('/custom/digiriskdolibarr/digiriskdolibarrindex.php?idmenu=1319&mainmenu=digiriskdolibarr&leftmenu=', 1);
+			} else {
+				$value = '';
+			}
 		}
 
 		if (!$error) {

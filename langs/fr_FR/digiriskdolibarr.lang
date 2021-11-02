@@ -41,6 +41,10 @@ SecurityConfiguration = Configuration des données sécurité
 SocialConfiguration = Configuration des données sociales
 SecurityConfigIsUpTo = La configuration des données sécurité est réalisée à
 Uncompleted = Non complété
+DigiriskData = Données configurables de Digirisk
+DigiriskManagement = Redirection après la connexion au site
+DigiriskDescription = Redirection sur la page de bienvenue de Digirisk par défaut au lieu de celle de Dolibarr.
+
 
 #
 # Page À propos
