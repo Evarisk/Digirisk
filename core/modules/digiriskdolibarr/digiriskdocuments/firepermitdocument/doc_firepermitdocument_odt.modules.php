@@ -451,7 +451,7 @@ class doc_firepermitdocument_odt extends ModeleODTFirePermitDocument
 						$odfHandler->setImage($key, $value);
 					} elseif (preg_match('/logo$/', $key)) {
 						if (file_exists($value)) $odfHandler->setImage($key, $value);
-						else $odfHandler->setVars($key, 'ErrorFileNotFound', true, 'UTF-8');
+						else $odfHandler->setVars($key, $langs->transnoentities('ErrorFileNotFound'), true, 'UTF-8');
 					}
 					else    // Text
 					{
