@@ -323,16 +323,16 @@ if ($action == 'add' && $canadduser) {
 				// Echec
 				setEventMessages($langs->trans("ErrorFailedToSetNewPassword"), null, 'errors');
 			} else {
-				// Succes
+				// Success
 				if (GETPOST('send_password')) {
 					if ($object->send_password($user, $newpassword) > 0)
 					{
-						setEventMessages($langs->trans("PasswordChangedAndSentTo", $object->email), null, 'mesgs');
+						setEventMessages($langs->trans("UserCreated", $object->email), null, 'success');
 					} else {
 						setEventMessages($object->error, $object->errors, 'errors');
 					}
 				} else {
-					setEventMessages($langs->trans("PasswordChangedTo", $newpassword), null, 'warnings');
+					setEventMessages($langs->trans("UserCreated", $newpassword), null, 'mesgs');
 				}
 			}
 
