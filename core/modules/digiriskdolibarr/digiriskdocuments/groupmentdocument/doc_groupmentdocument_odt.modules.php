@@ -403,6 +403,7 @@ class doc_groupmentdocument_odt extends ModeleODTGroupmentDocument
 									}
 								}
 							} else {
+								$tmparray['nomElement']                  = $langs->trans('NoData');
 								$tmparray['nomDanger']                   = $langs->trans('NoData');
 								$tmparray['identifiantRisque']           = $langs->trans('NoData');
 								$tmparray['quotationRisque']             = $langs->trans('NoData');

@@ -404,6 +404,7 @@ class doc_workunitdocument_odt extends ModeleODTWorkUnitDocument
 									}
 								}
 							} else {
+								$tmparray['nomElement']                  = $langs->trans('NoData');
 								$tmparray['nomDanger']                   = $langs->trans('NoData');
 								$tmparray['identifiantRisque']           = $langs->trans('NoData');
 								$tmparray['quotationRisque']             = $langs->trans('NoData');
