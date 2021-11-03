@@ -906,9 +906,12 @@
 									</div>
 									<div class="move-risk">
 										<span class="title"><?php echo $langs->trans('MoveRisk'); ?></span>
+										<?php $objecttmp = new DigiriskElement($db);
+										$objecttmp->fetch($risk->fk_element);
+										?>
 										<?php if ($conf->global->DIGIRISKDOLIBARR_MOVE_RISKS) : ?>
-											<input type="hidden" class="current-element-ref" value="<?php echo $object->ref; ?>">
-											<?php print $object->select_digiriskelement_list( $object->id,  'socid',  '',  '1',  0, 0, array(), '', 0, 0, 'disabled', '', false, 1); ?>
+											<input type="hidden" class="current-element-ref" value="<?php echo $objecttmp->ref; ?>">
+											<?php print $objecttmp->select_digiriskelement_list( $objecttmp->id,  'socid',  '',  '1',  0, 0, array(), '', 0, 0, 'disabled', '', false, 1); ?>
 										<?php else : ?>
 											<?php print '<span class="opacitymedium">'.$langs->trans("SetConfToMoveRisk")."</span><br>\n"; ?>
 										<?php endif; ?>
