@@ -1027,9 +1027,7 @@ class modDigiriskdolibarr extends DolibarrModules
 		//Categorie
 		if ($conf->global->DIGIRISKDOLIBARR_PROJECT_TAGS_SET == 0) {
 			require_once DOL_DOCUMENT_ROOT.'/categories/class/categorie.class.php';
-			require_once DOL_DOCUMENT_ROOT.'/projet/class/project.class.php';
 
-			$project = new Project($this->db);
 			$tags = new Categorie($this->db);
 
 			$tags->label = 'QHSE';
@@ -1041,23 +1039,37 @@ class modDigiriskdolibarr extends DolibarrModules
 			$tags->fk_parent = $tag_id;
 			$tags->create($user);
 
-			$project->fetch($conf->global->DIGIRISKDOLIBARR_DU_PROJECT);
-			$tags->add_type($project, 'project');
-
 			$tags->label = 'PP';
 			$tags->type = 'project';
 			$tags->fk_parent = $tag_id;
 			$tags->create($user);
 
-			$project->fetch($conf->global->DIGIRISKDOLIBARR_PREVENTIONPLAN_PROJECT);
-			$tags->add_type($project, 'project');
+			$tags->label = 'FP';
+			$tags->type = 'project';
+			$tags->fk_parent = $tag_id;
+			$tags->create($user);
 
 			$tags->label = 'ACC';
 			$tags->type = 'project';
 			$tags->fk_parent = $tag_id;
 			$tags->create($user);
 
-			dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_PROJECT_TAGS_SET', 1, 'integer', 0, '', $conf->entity);
+			dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_PROJECT_TAGS_SET', 2, 'integer', 0, '', $conf->entity);
+		} elseif ($conf->global->DIGIRISKDOLIBARR_PROJECT_TAGS_SET == 1) {
+			//Install after 8.3.0
+
+			require_once DOL_DOCUMENT_ROOT.'/categories/class/categorie.class.php';
+
+			$tags = new Categorie($this->db);
+
+			$tags->fetch('', 'QHSE');
+
+			$tags->label = 'FP';
+			$tags->type = 'project';
+			$tags->fk_parent = $tags->id;
+			$tags->create($user);
+
+			dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_PROJECT_TAGS_SET', 2, 'integer', 0, '', $conf->entity);
 		}
 
 		return $this->_init($sql, $options);
