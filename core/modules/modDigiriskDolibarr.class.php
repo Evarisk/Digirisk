@@ -57,7 +57,7 @@ class modDigiriskdolibarr extends DolibarrModules
 		$this->descriptionlong = "Digirisk";
 		$this->editor_name     = 'Evarisk';
 		$this->editor_url      = 'https://evarisk.com';
-		$this->version         = '8.2.1';
+		$this->version         = '8.2.2';
 		$this->const_name      = 'MAIN_MODULE_'.strtoupper($this->name);
 		$this->picto           ='digiriskdolibarr@digiriskdolibarr';
 
@@ -611,20 +611,20 @@ class modDigiriskdolibarr extends DolibarrModules
 			'user'=>0,				                // 0=Menu for internal users, 1=external users, 2=both
 		);
 
-		$this->menu[$r++]=array(
-			'fk_menu'=>'fk_mainmenu=digiriskdolibarr',	    		// '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
-			'type'=>'left', 										// This is a Left menu entry
-			'titre'=>'<i class="fas fa-exclamation-triangle"></i>  ' . $langs->trans('GPUTOrganisation'),
-			'mainmenu'=>'digiriskdolibarr',
-			'leftmenu'=>'digiriskstandard',
-			'url'=>'/digiriskdolibarr/digiriskelement_organization.php',
-			'langs'=>'digiriskdolibarr@digiriskdolibarr',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
-			'position'=>48520+$r,
-			'enabled'=>'$conf->digiriskdolibarr->enabled',  // Define condition to show or hide menu entry. Use '$conf->digiriskdolibarr->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
-			'perms'=>'$user->rights->digiriskdolibarr->riskassessmentdocument->read', // Use 'perms'=>'$user->rights->digiriskdolibarr->level1->level2' if you want your menu with a permission rules
-			'target'=>'',
-			'user'=>0,				                // 0=Menu for internal users, 1=external users, 2=both
-		);
+//		$this->menu[$r++]=array(
+//			'fk_menu'=>'fk_mainmenu=digiriskdolibarr',	    		// '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
+//			'type'=>'left', 										// This is a Left menu entry
+//			'titre'=>'<i class="fas fa-exclamation-triangle"></i>  ' . $langs->trans('GPUTOrganisation'),
+//			'mainmenu'=>'digiriskdolibarr',
+//			'leftmenu'=>'digiriskstandard',
+//			'url'=>'/digiriskdolibarr/digiriskelement_organization.php',
+//			'langs'=>'digiriskdolibarr@digiriskdolibarr',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
+//			'position'=>48520+$r,
+//			'enabled'=>'$conf->digiriskdolibarr->enabled',  // Define condition to show or hide menu entry. Use '$conf->digiriskdolibarr->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
+//			'perms'=>'$user->rights->digiriskdolibarr->riskassessmentdocument->read', // Use 'perms'=>'$user->rights->digiriskdolibarr->level1->level2' if you want your menu with a permission rules
+//			'target'=>'',
+//			'user'=>0,				                // 0=Menu for internal users, 1=external users, 2=both
+//		);
 
 		$this->menu[$r++]=array(
 			'fk_menu'=>'fk_mainmenu=digiriskdolibarr',	    // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
