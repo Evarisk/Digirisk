@@ -503,7 +503,7 @@ FirePermitDescription = Projet des permis de feu
 FirePermitData = Données du Permis de feu
 FirePermitManagement = Gestion des permis de feu
 FPRProject = Projet lié aux permis de feu
-fk_firepermit = Permis de feu lié .
+fk_firepermit = Permis de feu lié
 # Email - Mail
 FirePermitLabel = Récapitulatif du permis de feu
 FirePermitSubject = Email permis de feu
