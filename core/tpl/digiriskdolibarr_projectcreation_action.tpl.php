@@ -27,6 +27,12 @@ if ($conf->global->DIGIRISKDOLIBARR_DU_PROJECT > 0) {
 		$project->description = $langs->trans('RiskAssessmentDocumentDescription');
 		$project->update($user);
 	}
+
+	require_once DOL_DOCUMENT_ROOT.'/categories/class/categorie.class.php';
+	$tags = new Categorie($db);
+
+	$tags->fetch('', 'DU');
+	$tags->add_type($project, 'project');
 }
 
 if ( $conf->global->DIGIRISKDOLIBARR_DU_PROJECT == 0 || $project->statut == 2 ) {
@@ -49,6 +55,12 @@ if ( $conf->global->DIGIRISKDOLIBARR_DU_PROJECT == 0 || $project->statut == 2 ) 
 	$project->statut      = 1;
 	$project_id = $project->create($user);
 	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_DU_PROJECT', $project_id, 'integer', 1, '',$conf->entity);
+
+	require_once DOL_DOCUMENT_ROOT.'/categories/class/categorie.class.php';
+	$tags = new Categorie($db);
+
+	$tags->fetch('', 'DU');
+	$tags->add_type($project, 'project');
 }
 
 if ($conf->global->DIGIRISKDOLIBARR_PREVENTIONPLAN_PROJECT > 0) {
@@ -58,6 +70,12 @@ if ($conf->global->DIGIRISKDOLIBARR_PREVENTIONPLAN_PROJECT > 0) {
 		$project->title = $langs->trans('PreventionPlanInitial') . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
 		$project->update($user);
 	}
+
+	require_once DOL_DOCUMENT_ROOT.'/categories/class/categorie.class.php';
+	$tags = new Categorie($db);
+
+	$tags->fetch('', 'PP');
+	$tags->add_type($project, 'project');
 }
 
 if ( $conf->global->DIGIRISKDOLIBARR_PREVENTIONPLAN_PROJECT == 0 || $project->statut == 2 ) {
@@ -80,6 +98,12 @@ if ( $conf->global->DIGIRISKDOLIBARR_PREVENTIONPLAN_PROJECT == 0 || $project->st
 	$project->statut      = 1;
 	$project_id = $project->create($user);
 	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_PREVENTIONPLAN_PROJECT', $project_id, 'integer', 1, '',$conf->entity);
+
+	require_once DOL_DOCUMENT_ROOT.'/categories/class/categorie.class.php';
+	$tags = new Categorie($db);
+
+	$tags->fetch('', 'PP');
+	$tags->add_type($project, 'project');
 }
 
 if ( $conf->global->DIGIRISKDOLIBARR_FIREPERMIT_PROJECT == 0 || $project->statut == 2 ) {
@@ -106,13 +130,7 @@ if ( $conf->global->DIGIRISKDOLIBARR_FIREPERMIT_PROJECT == 0 || $project->statut
 	require_once DOL_DOCUMENT_ROOT.'/categories/class/categorie.class.php';
 	$tags = new Categorie($db);
 
-	$tags->fetch('', 'QHSE');
-
-	$tags->label = 'FP';
-	$tags->type = 'project';
-	$tags->fk_parent = $tags->id;
-	$tags->create($user);
-
+	$tags->fetch('', 'FP');
 	$tags->add_type($project, 'project');
 }
 
