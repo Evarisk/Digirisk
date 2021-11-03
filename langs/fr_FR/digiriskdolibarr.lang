@@ -585,7 +585,8 @@ GPUTOrganisation = Organisation des GP/UT
 DigiriskElement = Élément Digirisk
 ElementType = Type d'élément
 ParentElement = Élément parent
-
+OrganizationSaved = L'organisation et des groupements et des unités de travail a été sauvegardée
+OrganizationNotSaved = L'organisation et des groupements et des unités de travail n'a pas pu être sauvegardée
 
 #
 # Groupment - Groupement
@@ -997,3 +998,4 @@ ErrorSetupEmail = Erreur de configuration des mails, vous n'avez pas configuré 
 IDCCTooltip = Ce champ provient du module Digirisk pour Dolibarr </br> La nomenclature des conventions collectives provient de travail-emploi.gouv.fr
 ContactNoEmail = Les contacts affichés en grisé sont des contacts qui ne possèdent pas d'email
 NoEmailContact = Pas d'email sur ce contact
+AddMedia = Ajouter un média

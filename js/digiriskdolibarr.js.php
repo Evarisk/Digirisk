@@ -72,7 +72,7 @@ if ( ! window.eoxiaJS.scriptsLoaded ) {
 	 * @returns {void} [description]
 	 */
 	window.eoxiaJS.load_list_script = function() {
-		if ( ! window.eoxiaJS.scriptsLoaded ) {
+		if ( ! window.eoxiaJS.scriptsLoaded) {
 			var key = undefined, slug = undefined;
 			for ( key in window.eoxiaJS ) {
 
@@ -151,7 +151,7 @@ window.eoxiaJS.navigation.init = function() {
  */
 window.eoxiaJS.navigation.event = function() {
 	// Main Menu Digirisk Society
-	jQuery( document ).on( 'click', '.digirisk-wrap .navigation-container .unit-container .toggle-unit', window.eoxiaJS.navigation.switchToggle );
+	jQuery( document ).on( 'click', '.toggle-unit', window.eoxiaJS.navigation.switchToggle );
 	jQuery( document ).on( 'click', '#newGroupment', window.eoxiaJS.navigation.switchToggle );
 	jQuery( document ).on( 'click', '#newWorkunit', window.eoxiaJS.navigation.switchToggle );
 	jQuery( document ).on( 'click', '.digirisk-wrap .navigation-container .toolbar div', window.eoxiaJS.navigation.toggleAll );
@@ -159,6 +159,7 @@ window.eoxiaJS.navigation.event = function() {
 	jQuery( document ).on( 'click', '#newGroupment', window.eoxiaJS.navigation.redirect );
 	jQuery( document ).on( 'click', '#newWorkunit', window.eoxiaJS.navigation.redirect );
 	jQuery( document ).on( 'click', '.side-nav-responsive', window.eoxiaJS.navigation.toggleMobileNav );
+	jQuery( document ).on( 'click', '.save-organization', window.eoxiaJS.navigation.saveOrganization );
 };
 
 /**
@@ -181,7 +182,6 @@ window.eoxiaJS.navigation.switchToggle = function( event ) {
 		MENU = JSON.parse(MENU)
 		MENU = new Set(MENU)
 	}
-
 
 	if ( jQuery( this ).find( '.toggle-icon' ).hasClass( 'fa-chevron-down' ) ) {
 
@@ -294,6 +294,59 @@ window.eoxiaJS.navigation.redirect = function( event ) {
 window.eoxiaJS.navigation.toggleMobileNav = function( event ) {
 	$( this ).closest( '.side-nav' ).find( '#id-left' ).toggleClass( 'active' );
 }
+
+/**
+ * Permet de sauvegarder l'organisation des groupements et unités de travail
+ *
+ * @since   8.2.2
+ * @version 8.2.2
+ */
+window.eoxiaJS.navigation.saveOrganization = function( event ) {
+
+	let idArray = []
+	let parentArray = []
+	let id = 0
+	let parent_id = 0
+
+	//Notices
+    let actionContainerSuccess = $('.messageSuccessOrganizationSaved');
+	let actionContainerError = $('.messageErrorOrganizationSaved');
+
+	$('.route').each(function() {
+		id = $(this).attr('id')
+		parent_id = $(this).parent('ul').attr('id').split(/space/)[1]
+
+		idArray.push(id)
+		parentArray.push(parent_id)
+	})
+
+	window.eoxiaJS.loader.display($(this));
+
+	//ajouter sécurité si le nombre de gp à la fin n'est pas le même qu'en bdd alors on stop tout
+
+	$.ajax({
+		url: document.URL + '&action=saveOrganization&ids='+idArray.toString()+'&parent_ids='+parentArray,
+		success: function() {
+			actionContainerSuccess.removeClass('hidden');
+
+			$('.wpeo-loader').addClass('button-disable')
+			$('.wpeo-loader').attr('style','background: #47e58e !important;border-color: #47e58e !important;')
+			$('.wpeo-loader').find('.fas.fa-check').attr('style', '')
+
+			$('.wpeo-loader').removeClass('wpeo-loader')
+		},
+		error: function ( ) {
+			actionContainerError.removeClass('hidden');
+
+			$('.wpeo-loader').addClass('button-disable')
+			$('.wpeo-loader').attr('style','background: #e05353 !important;border-color: #e05353 !important;')
+			$('.wpeo-loader').find('.fas.fa-times').attr('style', '')
+
+			$('.wpeo-loader').removeClass('wpeo-loader')
+		}
+	});
+}
+
 
 /**
  * Initialise l'objet "modal" ainsi que la méthode "init" obligatoire pour la bibliothèque EoxiaJS.

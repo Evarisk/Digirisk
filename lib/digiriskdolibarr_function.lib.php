@@ -608,9 +608,9 @@ function digiriskHeader($head = '', $title = '', $help_url = '', $target = '', $
 	//Body navigation digirisk
 	$object  = new DigiriskElement($db);
 	if ($conf->global->DIGIRISKDOLIBARR_SHOW_HIDDEN_DIGIRISKELEMENT) {
-		$objects = $object->fetchAll('',  'ref',  0,  0);
+		$objects = $object->fetchAll('',  'rank',  0,  0);
 	} else {
-		$objects = $object->fetchAll('',  '',  0,  0, array('customsql' => 'status > 0'));
+		$objects = $object->fetchAll('',  'rank',  0,  0, array('customsql' => 'status > 0'));
 	}
 	$results = recurse_tree(0,0,$objects); ?>
 
@@ -974,6 +974,33 @@ function display_recurse_tree($results) {
 			<?php endif; ?>
 		<?php }
 	}
+	} else {
+		print $langs->trans('YouDontHaveTheRightToSeeThis');
+	}
+}
+
+
+/**
+ *	Display Recursive tree for edit
+ *
+ * @param	array $result Global Digirisk Element list after recursive process
+ * @return	void
+ */
+function display_recurse_tree_organization($results, $i = 1) {
+	global $langs, $user;
+
+	if ($user->rights->digiriskdolibarr->digiriskelement->read) {
+		if ( !empty( $results )) {
+			foreach ($results as $element) { ?>
+				<li class="route ui-sortable-handle level-<?php echo $i ?>" id="<?php  echo $element['object']->id; ?>" value="<?php echo $i ?>">
+		 			<h3 class='title <?php echo $element['object']->element_type ?>'>
+						<span class="ref"><?php echo  $element['object']->ref; ?></span><?php echo $element['object']->label; ?>
+		  			</h3>
+		 			<span class='ui-icon ui-icon-arrow-4-diag'></span>
+					<ul class="space space-<?php echo $i; ?> ui-sortable  <?php echo $element['object']->element_type ?>" id="space<?php echo $element['object']->id?>" value="<?php echo $i ?>"><?php display_recurse_tree_organization($element['children'], $i + 1) ?></ul>
+				</li>
+			<?php }
+		}
 	} else {
 		print $langs->trans('YouDontHaveTheRightToSeeThis');
 	}
