@@ -563,6 +563,13 @@ class modDigiriskdolibarr extends DolibarrModules
 		$this->rights[$r][5] = 'delete';
 		$r++;
 
+		/* ADMINPAGE PANEL ACCESS PERMISSIONS */
+		$this->rights[$r][0] = $this->numero.$r;
+		$this->rights[$r][1] = $langs->trans('ReadAdminPage');
+		$this->rights[$r][4] = 'adminpage';
+		$this->rights[$r][5] = 'read';
+		$r++;
+
 		/* API PERMISSIONS */
 		$this->rights[$r][0] = $this->numero.$r;
 		$this->rights[$r][1] = $langs->trans('GetAPI');
@@ -573,13 +580,6 @@ class modDigiriskdolibarr extends DolibarrModules
 		$this->rights[$r][1] = $langs->trans('PostAPI');
 		$this->rights[$r][4] = 'api';
 		$this->rights[$r][5] = 'write';
-		$r++;
-
-		/* ADMINPAGE PANEL ACCESS PERMISSIONS */
-		$this->rights[$r][0] = $this->numero.$r;
-		$this->rights[$r][1] = $langs->trans('ReadAdminPage');
-		$this->rights[$r][4] = 'adminpage';
-		$this->rights[$r][5] = 'read';
 
 		// Main menu entries to add
 		$this->menu = array();
@@ -1056,92 +1056,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			$tags->fk_parent = $tag_id;
 			$tags->create($user);
 
-			dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_PROJECT_TAGS_SET', 2, 'integer', 0, '', $conf->entity);
-		}
-
-		if ( $conf->global->DIGIRISKDOLIBARR_USERAPI_SET ==  0 ) {
-			require_once DOL_DOCUMENT_ROOT.'/user/class/user.class.php';
-
-			$usertmp = new User($this->db);
-			$usertmp->lastname  = 'API';
-			$usertmp->firstname = 'REST';
-			$usertmp->login     = 'USERAPI';
-			$usertmp->entity    = $conf->entity;
-			$usertmp->setPassword($user);
-			$usertmp->api_key = getRandomPassword(true);
-
-			$user_id = $usertmp->create($user);
-			if ($user_id > 0) {
-				$apiUser = new User($this->db);
-				$apiUser->fetch($user_id);
-				//Rights digiriskdolibarr api
-				$apiUser->addrights(43630235);
-				$apiUser->addrights(43630236);
-			}
-
-			dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_USERAPI_SET', $user_id, 'integer', 0, '', $conf->entity);
-		}
-
-		if ( $conf->global->DIGIRISKDOLIBARR_USERGROUP_SET ==  0 ) {
-			require_once DOL_DOCUMENT_ROOT . '/user/class/usergroup.class.php';
-
-			$usergroup = new UserGroup($this->db);
-			$usergroup->entity = $conf->entity;
-			$usergroup->name = $langs->trans('DigiriskUserGroup');
-			$usergroup->note = $langs->trans('DigiriskUserGroupDescription');
-
-			$usergroup_id = $usergroup->create($user);
-			if ($usergroup_id > 0) {
-				$usergroup->fetch($usergroup_id);
-				//Rights digiriskdolibarr
-				$usergroup->addrights(4363020); //DigiriskDolibarr read
-				$usergroup->addrights(4363021); //DigiriskDolibarr lire
-				$usergroup->addrights(4363022); //RiskAssessmentDocument Read
-				$usergroup->addrights(4363025); //LegalDisplay Read
-				$usergroup->addrights(4363028); //InformationsSharing Read
-				$usergroup->addrights(43630211); //FirePermit Read
-				$usergroup->addrights(43630214); //Prevention Plan Read
-				$usergroup->addrights(43630217); //DigiriskElement Read
-				$usergroup->addrights(43630220); //Risk Read
-				$usergroup->addrights(43630223); //ListingRisksAction Read
-				$usergroup->addrights(43630226); //ListingRisksPhoto Read
-				$usergroup->addrights(43630229); //RiskSign Read
-				$usergroup->addrights(43630232); //Evaluator Read
-			}
-
-			dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_USERGROUP_SET ', $usergroup_id, 'integer', 0, '', $conf->entity);
-		}
-
-		if ( $conf->global->DIGIRISKDOLIBARR_ADMINUSERGROUP_SET ==  0 ) {
-			require_once DOL_DOCUMENT_ROOT . '/user/class/usergroup.class.php';
-
-			$usergroup = new UserGroup($this->db);
-			$usergroup->entity = $conf->entity;
-			$usergroup->name   = $langs->trans('DigiriskAdminUserGroup');
-			$usergroup->note   = $langs->trans('DigiriskAdminUserGroupDescription');
-
-			$usergroup_id = $usergroup->create($user);
-			if ($usergroup_id > 0) {
-				$usergroup->fetch($usergroup_id);
-				//Rights digiriskdolibarr
-				$usergroup->addrights(4363020); //DigiriskDolibarr read
-				$usergroup->addrights(4363021); //DigiriskDolibarr lire
-				$usergroup->addrights('', 'digiriskdolibarr', 'riskassessmentdocument'); //RiskAssessmentDocument
-				$usergroup->addrights('', 'digiriskdolibarr', 'legaldisplay');           //LegalDisplay
-				$usergroup->addrights('', 'digiriskdolibarr', 'informationssharing');    //InformationsSharing
-				$usergroup->addrights('', 'digiriskdolibarr', 'firepermit');             //FirePermit
-				$usergroup->addrights('', 'digiriskdolibarr', 'preventionplan');         //Prevention Plan
-				$usergroup->addrights('', 'digiriskdolibarr', 'digiriskelement');        //DigiriskElement
-				$usergroup->addrights('', 'digiriskdolibarr', 'risk');                   //Risk
-				$usergroup->addrights('', 'digiriskdolibarr', 'listingrisksaction');     //ListingRisksAction
-				$usergroup->addrights('', 'digiriskdolibarr', 'listingrisksphoto');      //ListingRisksPhoto
-				$usergroup->addrights('', 'digiriskdolibarr', 'risksign');               //RiskSign
-				$usergroup->addrights('', 'digiriskdolibarr', 'evaluator');              //Evaluator
-				$usergroup->addrights('', 'digiriskdolibarr', 'api');                    //API
-				$usergroup->addrights('', 'digiriskdolibarr', 'adminpage');              //AdminPage
-			}
-
-			dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_ADMINUSERGROUP_SET ', $usergroup_id, 'integer', 0, '', $conf->entity);
+			dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_PROJECT_TAGS_SET', 1, 'integer', 0, '', $conf->entity);
 		}
 
 		return $this->_init($sql, $options);
