@@ -224,7 +224,7 @@ print '<td>'.$form->editfieldkey('Titulars', 'TitularsCSE_id', '', $object, 0).'
 print '<td colspan="3" class="maxwidthonsmartphone">';
 
 
-print $form->multiselectarray('TitularsCSE', $userlist, $titulars_cse->id, null, null, null, null, "minwidth300");
+print $form->multiselectarray('TitularsCSE', $userlist, $titulars_cse->id, null, null, null, null, "300");
 
 if (!GETPOSTISSET('backtopage')) print ' <a href="'.DOL_URL_ROOT.'/user/card.php?action=create&backtopage='.urlencode($_SERVER["PHP_SELF"].'?action=create').'"><span class="fa fa-plus-circle valignmiddle paddingleft" title="'.$langs->trans("AddUser").'"></span></a>';
 
@@ -239,7 +239,7 @@ print '<tr>';
 print '<td>'.$form->editfieldkey('Alternates', 'AlternatesCSE_id', '', $object, 0).'</td>';
 print '<td colspan="3" class="maxwidthonsmartphone">';
 
-print $form->multiselectarray('AlternatesCSE', $userlist, $alternates_cse->id, null, null, null, null, "minwidth300");
+print $form->multiselectarray('AlternatesCSE', $userlist, $alternates_cse->id, null, null, null, null, "300");
 
 if (!GETPOSTISSET('backtopage')) print ' <a href="'.DOL_URL_ROOT.'/user/card.php?action=create&backtopage='.urlencode($_SERVER["PHP_SELF"].'?action=create').'"><span class="fa fa-plus-circle valignmiddle paddingleft" title="'.$langs->trans("AddUser").'"></span></a>';
 
@@ -264,7 +264,7 @@ print '<tr>';
 print '<td>'.$form->editfieldkey('Titulars', 'TitularsDP_id', '', $object, 0).'</td>';
 print '<td colspan="3" class="maxwidthonsmartphone">';
 
-print $form->multiselectarray('TitularsDP', $userlist, $titulars_dp->id, null, null, null, null, "minwidth300");
+print $form->multiselectarray('TitularsDP', $userlist, $titulars_dp->id, null, null, null, null, "300");
 
 if (!GETPOSTISSET('backtopage')) print ' <a href="'.DOL_URL_ROOT.'/user/card.php?action=create&backtopage='.urlencode($_SERVER["PHP_SELF"].'?action=create').'"><span class="fa fa-plus-circle valignmiddle paddingleft" title="'.$langs->trans("AddUser").'"></span></a>';
 
@@ -279,7 +279,7 @@ print '<tr>';
 print '<td>'.$form->editfieldkey('Alternates', 'AlternatesDP', '', $object, 0).'</td>';
 print '<td colspan="3" class="maxwidthonsmartphone">';
 
-print $form->multiselectarray('AlternatesDP', $userlist, $alternates_dp->id, null, null, null, null, "minwidth300");
+print $form->multiselectarray('AlternatesDP', $userlist, $alternates_dp->id, null, null, null, null, "300");
 
 if (!GETPOSTISSET('backtopage')) print ' <a href="'.DOL_URL_ROOT.'/user/card.php?action=create&backtopage='.urlencode($_SERVER["PHP_SELF"].'?action=create').'"><span class="fa fa-plus-circle valignmiddle paddingleft" title="'.$langs->trans("AddUser").'"></span></a>';
 
