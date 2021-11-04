@@ -598,6 +598,7 @@ Sources = Sources
 ImportantNote = Remarque importante
 SitePlans = Localisation des plans
 SetStartEndDateBefore = Définissez la date de début et la date de fin d'audit sur cette page pour générer ce document
+SetStartEndDateBeforeSendEmail = Définissez la date de début et la date de fin d'audit sur cette page pour envoyer un email
 
 # Email - Mail
 RiskAssessmentDocumentLabel = Récapitulatif du document unique
@@ -1089,3 +1090,5 @@ NoMediaLinked = Pas de média lié
 SendPassword = Envoyer le mot de passe par email
 UserGroup = Groupe d'utilisateur
 UserCreated = L'utilisateur a bien été créé
+GetAPI =
+PostAPI =
