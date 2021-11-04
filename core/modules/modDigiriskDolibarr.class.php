@@ -117,7 +117,7 @@ class modDigiriskdolibarr extends DolibarrModules
 		// Dependencies
 
 		$this->hidden                  = false;
-		$this->depends                 = array('modECM', 'modProjet', 'modSociete', 'modTicket', 'modCategorie', 'modFckeditor');
+		$this->depends                 = array('modECM', 'modProjet', 'modSociete', 'modTicket', 'modCategorie', 'modFckeditor', 'modApi');
 		$this->requiredby              = array();
 		$this->conflictwith            = array();
 		$this->langfiles               = array("digiriskdolibarr@digiriskdolibarr");

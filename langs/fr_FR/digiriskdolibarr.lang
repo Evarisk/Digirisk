@@ -1090,5 +1090,5 @@ NoMediaLinked = Pas de média lié
 SendPassword = Envoyer le mot de passe par email
 UserGroup = Groupe d'utilisateur
 UserCreated = L'utilisateur a bien été créé
-GetAPI =
-PostAPI =
+GetAPI = Utilisation des routes API Digirisk en méthode GET
+PostAPI = Utilisation des routes API Digirisk en méthode POST
