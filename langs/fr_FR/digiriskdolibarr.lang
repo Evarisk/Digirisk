@@ -600,6 +600,12 @@ SitePlans = Localisation des plans
 SetStartEndDateBefore = Définissez la date de début et la date de fin d'audit sur cette page pour générer ce document
 SetStartEndDateBeforeSendEmail = Définissez la date de début et la date de fin d'audit sur cette page pour envoyer un email
 
+# Boxes - Widget
+RiskAssessmentDocumentBox = Box Document unique
+RiskAssessmentDocumentBoxTitle = Informations du Document unique
+LastGenerateDate = Date de dernière génération du document unique
+MandatoryUpdateEvery = Mise à jour obligatoire tous les
+
 # Email - Mail
 RiskAssessmentDocumentLabel = Récapitulatif du document unique
 RiskAssessmentDocumentSubject = Email document unique

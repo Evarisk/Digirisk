@@ -38,6 +38,7 @@ if (!$res) die("Include of main fails");
 require_once DOL_DOCUMENT_ROOT.'/core/lib/images.lib.php';
 
 require_once './class/digiriskstandard.class.php';
+require_once './core/boxes/box_riskassessmentdocument.php';
 require_once './lib/digiriskdolibarr_digiriskstandard.lib.php';
 require_once './lib/digiriskdolibarr_function.lib.php';
 
@@ -48,6 +49,7 @@ $langs->loadLangs(array("digiriskdolibarr@digiriskdolibarr"));
 
 // Initialize technical objects
 $object = new DigiriskStandard($db);
+$box    = new box_riskassessmentdocument($db);
 
 $object->fetch($conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD);
 
@@ -87,12 +89,12 @@ if ((empty($action) || ($action != 'edit' && $action != 'create'))) {
 	digirisk_banner_tab($object, 'ref', '', 0, 'ref', 'ref', $morehtmlref, '', 0, $morehtmlleft);
 
 	print '<div class="fichecenter">';
-	print '<table class="border centpercent tableforfield">'."\n";
+	print '<br>';
 
-	print '</table>';
-	print '</div>';
+	$box->loadBox();
+	$box->showBox();
 
-	print '<div class="clearboth"></div>';
+	print '<div class="fichecenter">';
 
 	print dol_get_fiche_end();
 }
