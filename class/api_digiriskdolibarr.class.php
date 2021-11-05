@@ -65,13 +65,15 @@ class DigiriskDolibarr extends DolibarrApi
 		require_once DOL_DOCUMENT_ROOT .'/core/modules/modTicket.class.php';
 		require_once DOL_DOCUMENT_ROOT .'/core/modules/modCategorie.class.php';
 		require_once DOL_DOCUMENT_ROOT .'/core/modules/modFckeditor.class.php';
+		require_once DOL_DOCUMENT_ROOT .'/core/modules/modApi.class.php';
 
-		$modEcm = new modECM($this->db);
-		$modProjet = new modProjet($this->db);
-		$modSociete = new modSociete($this->db);
-		$modTicket = new modTicket($this->db);
+		$modEcm       = new modECM($this->db);
+		$modProjet    = new modProjet($this->db);
+		$modSociete   = new modSociete($this->db);
+		$modTicket    = new modTicket($this->db);
 		$modCategorie = new modCategorie($this->db);
 		$modFckeditor = new modFckeditor($this->db);
+		$modApi       = new modApi($this->db);
 
 		$modEcm->init();
 		$modProjet->init();
@@ -79,6 +81,7 @@ class DigiriskDolibarr extends DolibarrApi
 		$modTicket->init();
 		$modCategorie->init();
 		$modFckeditor->init();
+		$modApi->init();
 		$langs->loadLangs(array("digiriskdolibarr@digiriskdolibarr", "other"));
 
 		return $this->mod->init();
@@ -98,6 +101,9 @@ class DigiriskDolibarr extends DolibarrApi
 	 */
 	public function disableModule()
 	{
+
+
+
 		return $this->mod->remove();
 	}
 
