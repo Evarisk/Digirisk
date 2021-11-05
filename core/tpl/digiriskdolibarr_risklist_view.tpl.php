@@ -816,7 +816,7 @@
 					<?php $parent_element = new DigiriskElement($db);
 					$result = $parent_element->fetch($risk->fk_element);
 					if ($result > 0) {
-					print $parent_element->ref . ( !empty($parent_element->label) ?  ' - ' . $parent_element->label : '');
+						print $parent_element->getNomUrl(1, 'blank');
 					}
 				}
 				elseif ($key == 'category') { ?>
