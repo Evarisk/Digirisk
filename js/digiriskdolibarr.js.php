@@ -1643,13 +1643,16 @@ window.eoxiaJS.risk.saveRisk = function ( event ) {
 			descriptionPost = '&riskComment=' + encodeURI(description);
 		}
 	}
-	var newParent = $(this).closest('.risk-container').find('#select2-socid-container').attr('title');
+	//var newParent = $(this).closest('.risk-container').find('#select2-socid-container').attr('title');
+	var newParent = $(this).closest('.risk-container').find('#socid option:selected').text();
 	if (newParent) {
 		var newParentPost = '';
 		console.log( $(this).closest('.risk-container').find('current-element-ref').val())
 		if (newParent !== '' && newParent.split(/ /)[0] !== $(this).closest('.risk-container').find('.current-element-ref').val()) {
 			newParentPost = '&newParent=' + newParent.split(/ /)[0];
 		}
+	} else {
+		newParentPost = '&newParent=';
 	}
 
 	let elementParent = $('.fichecenter').find('.div-table-responsive');
