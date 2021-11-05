@@ -58,7 +58,8 @@ class DigiriskDolibarr extends DolibarrApi
 	 */
 	public function enableModule()
 	{
-		global $langs;
+		global $langs, $user;
+
 		require_once DOL_DOCUMENT_ROOT .'/core/modules/modECM.class.php';
 		require_once DOL_DOCUMENT_ROOT .'/core/modules/modProjet.class.php';
 		require_once DOL_DOCUMENT_ROOT .'/core/modules/modSociete.class.php';
@@ -84,6 +85,10 @@ class DigiriskDolibarr extends DolibarrApi
 		$modApi->init();
 		$langs->loadLangs(array("digiriskdolibarr@digiriskdolibarr", "other"));
 
+		if (!$user->rights->digiriskdolibarr->api->read) {
+			throw new RestException(401, 'Access not allowed for login '.DolibarrApiAccess::$user->login);
+		}
+
 		return $this->mod->init();
 	}
 
@@ -101,8 +106,11 @@ class DigiriskDolibarr extends DolibarrApi
 	 */
 	public function disableModule()
 	{
+		global $user;
 
-
+		if (!$user->rights->digiriskdolibarr->api->read) {
+			throw new RestException(401, 'Access not allowed for login '.DolibarrApiAccess::$user->login);
+		}
 
 		return $this->mod->remove();
 	}
@@ -120,6 +128,12 @@ class DigiriskDolibarr extends DolibarrApi
 	 */
 	public function getFilesVersion()
 	{
+		global $user;
+
+		if (!$user->rights->digiriskdolibarr->api->read) {
+			throw new RestException(401, 'Access not allowed for login '.DolibarrApiAccess::$user->login);
+		}
+
 		return $this->mod->version;
 	}
 
@@ -136,7 +150,12 @@ class DigiriskDolibarr extends DolibarrApi
 	 */
 	public function getActiveVersion()
 	{
-		global $conf;
+		global $conf, $user;
+
+		if (!$user->rights->digiriskdolibarr->api->read) {
+			throw new RestException(401, 'Access not allowed for login '.DolibarrApiAccess::$user->login);
+		}
+
 		return $conf->global->DIGIRISKDOLIBARR_VERSION;
 	}
 
@@ -153,7 +172,12 @@ class DigiriskDolibarr extends DolibarrApi
 	 */
 	public function getLatestVersion()
 	{
-		global $conf;
+		global $conf, $user;
+
+		if (!$user->rights->digiriskdolibarr->api->read) {
+			throw new RestException(401, 'Access not allowed for login '.DolibarrApiAccess::$user->login);
+		}
+
 		return $conf->global->DIGIRISKDOLIBARR_VERSION;
 	}
 
@@ -170,24 +194,12 @@ class DigiriskDolibarr extends DolibarrApi
 	 */
 	public function uploadNewModule()
 	{
+		global $user;
+
+		if (!$user->rights->digiriskdolibarr->api->write) {
+			throw new RestException(401, 'Access not allowed for login '.DolibarrApiAccess::$user->login);
+		}
+
 		return exec('cd ../custom/digiriskdolibarr/shell/pull && bash update_version.sh');
 	}
-//	/**
-//	 * Get properties of an order object by ref_ext
-//	 *
-//	 * Return an array with order informations
-//	 *
-//	 * @param       string		$ref_ext			External reference of object
-//	 * @param       int         $contact_list  0: Returned array of contacts/addresses contains all properties, 1: Return array contains just id
-//	 * @return 	array|mixed data without useless information
-//	 *
-//	 * @url GET    ref_ext/{ref_ext}
-//	 *
-//	 * @throws 	RestException
-//	 */
-//	public function uploadNewModule($ref_ext, $contact_list = 1)
-//	{
-//		return $this->_fetch('', '', $ref_ext, $contact_list);
-//	}
-
 }
