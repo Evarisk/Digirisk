@@ -3120,6 +3120,85 @@ window.eoxiaJS.keyEvent.keyup = function( event ) {
 };
 
 /**
+ * Initialise l'objet "menu" ainsi que la méthode "init" obligatoire pour la bibliothèque EoxiaJS.
+ *
+ * @since   1.0.0
+ * @version 1.0.0
+ */
+window.eoxiaJS.menu = {};
+
+/**
+ * La méthode appelée automatiquement par la bibliothèque EoxiaJS.
+ *
+ * @since   1.0.0
+ * @version 1.0.0
+ *
+ * @return {void}
+ */
+window.eoxiaJS.menu.init = function() {
+	window.eoxiaJS.menu.event();
+};
+
+/**
+ * La méthode contenant tous les évènements pour le migration.
+ *
+ * @since   1.0.0
+ * @version 1.0.0
+ *
+ * @return {void}
+ */
+window.eoxiaJS.menu.event = function() {
+	jQuery(document).on( 'click', '.vmenu .minimizeMenu, .vmenu .maximizeMenu', window.eoxiaJS.menu.toggleMenu);
+}
+
+/**
+ * Action Toggle main menu.
+ *
+ * @since   1.0.0
+ * @version 1.0.0
+ *
+ * @return {void}
+ */
+window.eoxiaJS.menu.toggleMenu = function() {
+	var menu = $(this).closest('#id-left').find('a.vmenu');
+	var elementParent = $(this).closest('#id-left').find('div.vmenu')
+
+	if (jQuery(this).hasClass('minimizeMenu')) {
+
+		var text = '';
+		menu.each(function (index, value) {
+			text = $(this).html().split(' ');
+			$(this).html(text[0]+' '+text[1]+' '+text[2]);
+		});
+
+		var elementText = $(this).html().split(' ');
+		$(this).html(elementText[0]+' '+elementText[1]+' '+elementText[2]);
+
+		elementParent.css('width', '30px');
+		elementParent.find('.blockvmenusearch').hide();
+
+		jQuery(this).removeClass('minimizeMenu').addClass('maximizeMenu');
+
+	} else if (jQuery(this).hasClass('maximizeMenu')) {
+
+		var text2 = '';
+		menu.each(function (index, value) {
+			text2 = $(this).html().split(' ');
+			$(this).html(text2[0]+' '+text2[1]+' '+text2[2]+' '+$(this).attr('title'));
+		});
+
+		var elementText2 = $(this).html().split(' ');
+		$(this).html(elementText2[0]+' '+elementText2[1]+' '+elementText2[2]+' Réduire le menu');
+
+		elementParent.css('width', '');
+		elementParent.find('.blockvmenusearch').show();
+
+		jQuery(this).removeClass('maximizeMenu').addClass('minimizeMenu');
+	}
+};
+
+
+/**
  * Initialise l'objet "slider" ainsi que la méthode "init" obligatoire pour la bibliothèque EoxiaJS.
  *
  * @since   1.0.0

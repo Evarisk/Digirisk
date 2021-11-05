@@ -1098,3 +1098,4 @@ UserGroup = Groupe d'utilisateur
 UserCreated = L'utilisateur a bien été créé
 GetAPI = Utilisation des routes API Digirisk en méthode GET
 PostAPI = Utilisation des routes API Digirisk en méthode POST
+MinimizeMenu = Réduire le menu
