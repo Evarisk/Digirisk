@@ -910,6 +910,279 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->create($user);
 				break;
 
+			case 'RISK_CREATE' :
+
+				dol_syslog("Trigger '".$this->name."' for action '$action' launched by ".__FILE__.". id=".$object->id);
+				require_once DOL_DOCUMENT_ROOT.'/comm/action/class/actioncomm.class.php';
+				require_once __DIR__ . '/../../class/digiriskelement.class.php';
+				$now = dol_now();
+				$actioncomm      = new ActionComm($this->db);
+				$digiriskelement = new DigiriskElement($this->db);
+				$digiriskelement->fetch($object->fk_element);
+
+				$actioncomm->elementtype = $digiriskelement->element_type.'@digiriskdolibarr';
+				$actioncomm->code        = 'AC_RISK_CREATE';
+				$actioncomm->type_code   = 'AC_OTH_AUTO';
+				$actioncomm->label       = $langs->trans('RiskCreateTrigger');
+				$actioncomm->datep       = $now;
+				$actioncomm->fk_element  = $object->fk_element;
+				$actioncomm->userownerid = $user->id;
+				$actioncomm->percentage  = -1;
+
+				$actioncomm->create($user);
+				break;
+
+			case 'RISK_MODIFY' :
+
+				dol_syslog("Trigger '".$this->name."' for action '$action' launched by ".__FILE__.". id=".$object->id);
+				require_once DOL_DOCUMENT_ROOT.'/comm/action/class/actioncomm.class.php';
+				require_once __DIR__ . '/../../class/digiriskelement.class.php';
+				$now = dol_now();
+				$actioncomm      = new ActionComm($this->db);
+				$digiriskelement = new DigiriskElement($this->db);
+				$digiriskelement->fetch($object->fk_element);
+
+				$actioncomm->elementtype = $digiriskelement->element_type.'@digiriskdolibarr';
+				$actioncomm->code        = 'AC_RISK_MODIFY';
+				$actioncomm->type_code   = 'AC_OTH_AUTO';
+				$actioncomm->label       = $langs->trans('RiskModifyTrigger');
+				$actioncomm->datep       = $now;
+				$actioncomm->fk_element  = $object->fk_element;
+				$actioncomm->userownerid = $user->id;
+				$actioncomm->percentage  = -1;
+
+				$actioncomm->create($user);
+				break;
+
+			case 'RISK_DELETE' :
+
+				dol_syslog("Trigger '".$this->name."' for action '$action' launched by ".__FILE__.". id=".$object->id);
+				require_once DOL_DOCUMENT_ROOT.'/comm/action/class/actioncomm.class.php';
+				require_once __DIR__ . '/../../class/digiriskelement.class.php';
+				$now = dol_now();
+				$actioncomm      = new ActionComm($this->db);
+				$digiriskelement = new DigiriskElement($this->db);
+				$digiriskelement->fetch($object->fk_element);
+
+				$actioncomm->elementtype = $digiriskelement->element_type.'@digiriskdolibarr';
+				$actioncomm->code        = 'AC_RISK_DELETE';
+				$actioncomm->type_code   = 'AC_OTH_AUTO';
+				$actioncomm->label       = $langs->trans('RiskDeleteTrigger');
+				$actioncomm->datep       = $now;
+				$actioncomm->fk_element  = $object->fk_element;
+				$actioncomm->userownerid = $user->id;
+				$actioncomm->percentage  = -1;
+
+				$actioncomm->create($user);
+				break;
+
+			case 'RISKASSESSMENT_CREATE' :
+
+				dol_syslog("Trigger '".$this->name."' for action '$action' launched by ".__FILE__.". id=".$object->id);
+				require_once DOL_DOCUMENT_ROOT.'/comm/action/class/actioncomm.class.php';
+				require_once __DIR__ . '/../../class/riskanalysis/risk.class.php';
+				require_once __DIR__ . '/../../class/digiriskelement.class.php';
+				$now = dol_now();
+				$actioncomm      = new ActionComm($this->db);
+				$risk            = new Risk($this->db);
+				$digiriskelement = new DigiriskElement($this->db);
+				$risk->fetch($object->fk_risk);
+				$digiriskelement->fetch($risk->fk_element);
+
+				$actioncomm->elementtype = $digiriskelement->element_type.'@digiriskdolibarr';
+				$actioncomm->code        = 'AC_RISKASSESSMENT_CREATE';
+				$actioncomm->type_code   = 'AC_OTH_AUTO';
+				$actioncomm->label       = $langs->trans('RiskAssessmentCreateTrigger');
+				$actioncomm->datep       = $now;
+				$actioncomm->fk_element  = $risk->fk_element;
+				$actioncomm->userownerid = $user->id;
+				$actioncomm->percentage  = -1;
+
+				$actioncomm->create($user);
+				break;
+
+			case 'RISKASSESSMENT_MODIFY' :
+
+				dol_syslog("Trigger '".$this->name."' for action '$action' launched by ".__FILE__.". id=".$object->id);
+				require_once DOL_DOCUMENT_ROOT.'/comm/action/class/actioncomm.class.php';
+				require_once __DIR__ . '/../../class/riskanalysis/risk.class.php';
+				require_once __DIR__ . '/../../class/digiriskelement.class.php';
+				$now = dol_now();
+				$actioncomm      = new ActionComm($this->db);
+				$risk            = new Risk($this->db);
+				$digiriskelement = new DigiriskElement($this->db);
+				$risk->fetch($object->fk_risk);
+				$digiriskelement->fetch($risk->fk_element);
+
+				$actioncomm->elementtype = $digiriskelement->element_type.'@digiriskdolibarr';
+				$actioncomm->code        = 'AC_RISKASSESSMENT_MODIFY';
+				$actioncomm->type_code   = 'AC_OTH_AUTO';
+				$actioncomm->label       = $langs->trans('RiskAssessmentModifyTrigger');
+				$actioncomm->datep       = $now;
+				$actioncomm->fk_element  = $risk->fk_element;
+				$actioncomm->userownerid = $user->id;
+				$actioncomm->percentage  = -1;
+
+				$actioncomm->create($user);
+				break;
+
+			case 'RISKASSESSMENT_DELETE' :
+
+				dol_syslog("Trigger '".$this->name."' for action '$action' launched by ".__FILE__.". id=".$object->id);
+				require_once DOL_DOCUMENT_ROOT.'/comm/action/class/actioncomm.class.php';
+				require_once __DIR__ . '/../../class/riskanalysis/risk.class.php';
+				require_once __DIR__ . '/../../class/digiriskelement.class.php';
+				$now = dol_now();
+				$actioncomm      = new ActionComm($this->db);
+				$risk            = new Risk($this->db);
+				$digiriskelement = new DigiriskElement($this->db);
+				$risk->fetch($object->fk_risk);
+				$digiriskelement->fetch($risk->fk_element);
+
+				$actioncomm->elementtype = $digiriskelement->element_type.'@digiriskdolibarr';
+				$actioncomm->code        = 'AC_RISKASSESSMENT_DELETE';
+				$actioncomm->type_code   = 'AC_OTH_AUTO';
+				$actioncomm->label       = $langs->trans('RiskAssessmentDeleteTrigger');
+				$actioncomm->datep       = $now;
+				$actioncomm->fk_element  = $risk->fk_element;
+				$actioncomm->userownerid = $user->id;
+				$actioncomm->percentage  = -1;
+
+				$actioncomm->create($user);
+				break;
+
+			case 'EVALUATOR_CREATE' :
+
+				dol_syslog("Trigger '".$this->name."' for action '$action' launched by ".__FILE__.". id=".$object->id);
+				require_once DOL_DOCUMENT_ROOT.'/comm/action/class/actioncomm.class.php';
+				require_once __DIR__ . '/../../class/digiriskelement.class.php';
+				$now = dol_now();
+				$actioncomm      = new ActionComm($this->db);
+				$digiriskelement = new DigiriskElement($this->db);
+				$digiriskelement->fetch($object->fk_parent);
+
+				$actioncomm->elementtype = $digiriskelement->element_type.'@digiriskdolibarr';
+				$actioncomm->code        = 'AC_EVALUATOR_CREATE';
+				$actioncomm->type_code   = 'AC_OTH_AUTO';
+				$actioncomm->label       = $langs->trans('EvaluatorCreateTrigger');
+				$actioncomm->datep       = $now;
+				$actioncomm->fk_element  = $object->fk_parent;
+				$actioncomm->userownerid = $user->id;
+				$actioncomm->percentage  = -1;
+
+				$actioncomm->create($user);
+				break;
+
+			case 'EVALUATOR_MODIFY' :
+
+				dol_syslog("Trigger '".$this->name."' for action '$action' launched by ".__FILE__.". id=".$object->id);
+				require_once DOL_DOCUMENT_ROOT.'/comm/action/class/actioncomm.class.php';
+				require_once __DIR__ . '/../../class/digiriskelement.class.php';
+				$now = dol_now();
+				$actioncomm      = new ActionComm($this->db);
+				$digiriskelement = new DigiriskElement($this->db);
+				$digiriskelement->fetch($object->fk_parent);
+
+				$actioncomm->elementtype = $digiriskelement->element_type.'@digiriskdolibarr';
+				$actioncomm->code        = 'AC_EVALUATOR_MODIFY';
+				$actioncomm->type_code   = 'AC_OTH_AUTO';
+				$actioncomm->label       = $langs->trans('EvaluatorModifyTrigger');
+				$actioncomm->datep       = $now;
+				$actioncomm->fk_element  = $object->fk_parent;
+				$actioncomm->userownerid = $user->id;
+				$actioncomm->percentage  = -1;
+
+				$actioncomm->create($user);
+				break;
+
+			case 'EVALUATOR_DELETE' :
+
+				dol_syslog("Trigger '".$this->name."' for action '$action' launched by ".__FILE__.". id=".$object->id);
+				require_once DOL_DOCUMENT_ROOT.'/comm/action/class/actioncomm.class.php';
+				require_once __DIR__ . '/../../class/digiriskelement.class.php';
+				$now = dol_now();
+				$actioncomm      = new ActionComm($this->db);
+				$digiriskelement = new DigiriskElement($this->db);
+				$digiriskelement->fetch($object->fk_parent);
+
+				$actioncomm->elementtype = $digiriskelement->element_type.'@digiriskdolibarr';
+				$actioncomm->code        = 'AC_EVALUATOR_DELETE';
+				$actioncomm->type_code   = 'AC_OTH_AUTO';
+				$actioncomm->label       = $langs->trans('EvaluatorDeleteTrigger');
+				$actioncomm->datep       = $now;
+				$actioncomm->fk_element  = $object->fk_parent;
+				$actioncomm->userownerid = $user->id;
+				$actioncomm->percentage  = -1;
+
+				$actioncomm->create($user);
+				break;
+
+			case 'RISKSIGN_CREATE' :
+
+				dol_syslog("Trigger '".$this->name."' for action '$action' launched by ".__FILE__.". id=".$object->id);
+				require_once DOL_DOCUMENT_ROOT.'/comm/action/class/actioncomm.class.php';
+				require_once __DIR__ . '/../../class/digiriskelement.class.php';
+				$now = dol_now();
+				$actioncomm      = new ActionComm($this->db);
+				$digiriskelement = new DigiriskElement($this->db);
+				$digiriskelement->fetch($object->fk_element);
+
+				$actioncomm->elementtype = $digiriskelement->element_type.'@digiriskdolibarr';
+				$actioncomm->code        = 'AC_RISKSIGN_CREATE';
+				$actioncomm->type_code   = 'AC_OTH_AUTO';
+				$actioncomm->label       = $langs->trans('RiskSignCreateTrigger');
+				$actioncomm->datep       = $now;
+				$actioncomm->fk_element  = $object->fk_element;
+				$actioncomm->userownerid = $user->id;
+				$actioncomm->percentage  = -1;
+
+				$actioncomm->create($user);
+				break;
+
+			case 'RISKSIGN_MODIFY' :
+
+				dol_syslog("Trigger '".$this->name."' for action '$action' launched by ".__FILE__.". id=".$object->id);
+				require_once DOL_DOCUMENT_ROOT.'/comm/action/class/actioncomm.class.php';
+				require_once __DIR__ . '/../../class/digiriskelement.class.php';
+				$now = dol_now();
+				$actioncomm      = new ActionComm($this->db);
+				$digiriskelement = new DigiriskElement($this->db);
+				$digiriskelement->fetch($object->fk_element);
+
+				$actioncomm->elementtype = $digiriskelement->element_type.'@digiriskdolibarr';
+				$actioncomm->code        = 'AC_RISKSIGN_MODIFY';
+				$actioncomm->type_code   = 'AC_OTH_AUTO';
+				$actioncomm->label       = $langs->trans('RiskSignModifyTrigger');
+				$actioncomm->datep       = $now;
+				$actioncomm->fk_element  = $object->fk_element;
+				$actioncomm->userownerid = $user->id;
+				$actioncomm->percentage  = -1;
+
+				$actioncomm->create($user);
+				break;
+
+			case 'RISKSIGN_DELETE' :
+
+				dol_syslog("Trigger '".$this->name."' for action '$action' launched by ".__FILE__.". id=".$object->id);
+				require_once DOL_DOCUMENT_ROOT.'/comm/action/class/actioncomm.class.php';
+				require_once __DIR__ . '/../../class/digiriskelement.class.php';
+				$now = dol_now();
+				$actioncomm      = new ActionComm($this->db);
+				$digiriskelement = new DigiriskElement($this->db);
+				$digiriskelement->fetch($object->fk_element);
+
+				$actioncomm->elementtype = $digiriskelement->element_type.'@digiriskdolibarr';
+				$actioncomm->code        = 'AC_RISKSIGN_DELETE';
+				$actioncomm->type_code   = 'AC_OTH_AUTO';
+				$actioncomm->label       = $langs->trans('RiskSignDeleteTrigger');
+				$actioncomm->datep       = $now;
+				$actioncomm->fk_element  = $object->fk_element;
+				$actioncomm->userownerid = $user->id;
+				$actioncomm->percentage  = -1;
+
+				$actioncomm->create($user);
+				break;
+
 			default:
 				dol_syslog("Trigger '".$this->name."' for action '$action' launched by ".__FILE__.". id=".$object->id);
 				break;

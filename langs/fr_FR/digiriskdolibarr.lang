@@ -730,6 +730,9 @@ DeleteEvaluator = Supprimer les évaluateurs
 # Trigger - Déclencheur
 EVALUATOR_CREATEInDolibarr = Évaluateur créée dans Dolibarr
 ActionsOnÉvaluateur = Événements liés au évaluateur
+EvaluatorCreateTrigger = Évaluateur créée
+EvaluatorModifyTrigger = Évaluateur modifiée
+EvaluatorDeleteTrigger = Évaluateur supprimée
 
 # Mod Numbering - Modèle de numérotation
 DigiriskEvaluatorNumberingModule = Modèle de numérotation des évaluateurs de Digirisk
@@ -787,6 +790,11 @@ ReadDigiriskRisk = Consulter les risques
 CreateDigiriskRisk = Créer/Modifier les risques
 DeleteDigiriskRisk = Supprimer les risques
 
+# Trigger - Déclencheur
+RiskCreateTrigger = Risque créée
+RiskModifyTrigger = Risque modifiée
+RiskDeleteTrigger = Risque supprimée
+
 # Mod Numbering - Modèle de numérotation
 DigiriskRiskNumberingModule = Modèle de numérotation des risques de Digirisk
 DigiriskRiskStandardModel = Renvoie le numéro sous la forme RKn où n est un compteur séquentiel sans rupture et sans remise à 0.
@@ -833,6 +841,11 @@ SetConfToMoveRisk = Vous devez d'abord autoriser le déplacement des risques dan
 #
 # RiskAssessment - Évaluation
 #
+
+# Trigger - Déclencheur
+RiskAssessmentCreateTrigger = Évaluation créée
+RiskAssessmentModifyTrigger = Évaluation modifiée
+RiskAssessmentDeleteTrigger = Évaluation supprimée
 
 # Mod Numbering - Modèle de numérotation
 DigiriskRiskAssessmentStandardModel = Renvoie le numéro sous la forme RAn où n est un compteur séquentiel sans rupture et sans remise à 0.
@@ -887,6 +900,10 @@ ReadDigiriskRiskSign = Consulter les signalisations
 CreateDigiriskRiskSign = Créer/Modifier les signalisations
 DeleteDigiriskRiskSign = Supprimer les signalisations
 
+# Trigger - Déclencheur
+RiskSignCreateTrigger = Signalisation créée
+RiskSignModifyTrigger = Signalisation modifiée
+RiskSignDeleteTrigger = Signalisation supprimée
 
 # Mod Numbering - Modèle de numérotation
 DigiriskRiskSignStandardModel = Renvoie le numéro sous la forme RSn où n est un compteur séquentiel sans rupture et sans remise à 0.

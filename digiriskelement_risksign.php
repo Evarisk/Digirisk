@@ -160,7 +160,7 @@ if (empty($reshook)) {
 		$risksign->fk_element  = $fk_element ? $fk_element : 0;
 
 		if (!$error) {
-			$result = $risksign->create($user, true);
+			$result = $risksign->create($user);
 			if ($result > 0) {
 				// Creation risksign OK
 				$urltogo = str_replace('__ID__', $result, $backtopage);
@@ -187,7 +187,7 @@ if (empty($reshook)) {
 		$risksign->category    = $riskSignCategory;
 		$risksign->description = $db->escape($riskSignDescription);
 
-		$result = $risksign->update($user, true);
+		$result = $risksign->update($user);
 
 		if ($result > 0) {
 			// Update risksign OK
@@ -206,7 +206,7 @@ if (empty($reshook)) {
 		if (!empty($toselect)) {
 			foreach ($toselect as $toselectedid) {
 				$risksign->fetch($toselectedid);
-				$result = $risksign->delete($user, true);
+				$result = $risksign->delete($user);
 
 				if ($result > 0) {
 //					// Delete risksign OK
