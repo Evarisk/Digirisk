@@ -386,7 +386,7 @@ if ($object->id > 0) {
 							<input type="hidden" class="user-selected" value="<?php echo $user->id ?>">
 							<select class="minwidth200" id="userid" name="userid" data-select2-id="userid">
 								<?php
-								$userlist = $form->select_dolusers('','userid',0 , null, 0,'','','0',0,0,'',0, '','',0,3,false);
+								$userlist = $form->select_dolusers('','userid',0 , null, 0,'','', $conf->entity,0,0,'',0, '','',0,3,false);
 
 								foreach ($userlist as $key => $userselect) { ?>
 									<option value="<?php echo $key; ?>" data-select2-id="<?php echo $key.$userselect; ?>"><?php echo $userselect; ?></option>
