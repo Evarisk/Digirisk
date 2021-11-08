@@ -286,7 +286,7 @@ class doc_riskassessmentdocument_odt extends ModeleODTRiskAssessmentDocument
 					if (preg_match('/logo$/', $key) || $key == 'dispoDesPlans') // Image
 					{
 						if (file_exists($value)) $odfHandler->setImage($key, $value);
-						else $odfHandler->setVars($key, $langs->transnoentities('ErrorFileNotFound'), true, 'UTF-8');
+						else $odfHandler->setVars($key, ($key == 'dispoDesPlans') ? $langs->transnoentities('NoSitePlans') : $langs->transnoentities('ErrorFileNotFound'), true, 'UTF-8');
 					}
 					else    // Text
 					{

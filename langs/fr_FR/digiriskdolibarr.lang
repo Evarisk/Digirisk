@@ -599,6 +599,7 @@ ImportantNote = Remarque importante
 SitePlans = Localisation des plans
 SetStartEndDateBefore = Définissez la date de début et la date de fin d'audit sur cette page pour générer ce document
 SetStartEndDateBeforeSendEmail = Définissez la date de début et la date de fin d'audit sur cette page pour envoyer un email
+NoSitePlans = Aucun plan de la société renseigné
 
 # Boxes - Widget
 RiskAssessmentDocumentBox = Box Document unique
