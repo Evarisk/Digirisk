@@ -104,7 +104,7 @@ if (empty($reshook)) {
 
 		$model      = GETPOST('model', 'alpha');
 
-		if ( $id > 0 ) {
+		if ( $type != 'standard' ) {
 			$moreparams['object'] = $object;
 			$moreparams['user']   = $user;
 		} else {
@@ -227,11 +227,11 @@ if ($includedocgeneration) {
 		$objref = dol_sanitizeFileName($object->ref);
 		$dir_files = 'listingrisksaction/' . $objref;
 		$filedir = $upload_dir . '/' . $dir_files;
-		$urlsource = $_SERVER["PHP_SELF"] . '?id=' . $object->id . '&type=standard';
+		$urlsource = $_SERVER["PHP_SELF"] . '?id=' . $object->id;
 	} else {
 		$dir_files = 'listingrisksaction';
 		$filedir = $upload_dir . '/' . $dir_files;
-		$urlsource = $_SERVER["PHP_SELF"];
+		$urlsource = $_SERVER["PHP_SELF"]. '?id=' . $object->id . '&type=standard';
 	}
 
 	$modulepart = 'digiriskdolibarr:ListingRisksAction';
