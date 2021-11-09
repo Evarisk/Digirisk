@@ -327,7 +327,7 @@ if ($action == 'add' && $canadduser) {
 				if (GETPOST('send_password')) {
 					if ($object->send_password($user, $newpassword) > 0)
 					{
-						setEventMessages($langs->trans("UserCreated", $object->email), null, 'success');
+						setEventMessages($langs->trans("UserCreated", $object->email), null, 'mesgs');
 					} else {
 						setEventMessages($object->error, $object->errors, 'errors');
 					}
