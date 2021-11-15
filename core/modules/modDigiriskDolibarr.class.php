@@ -294,7 +294,7 @@ class modDigiriskdolibarr extends DolibarrModules
 
 			// CONST FIRE PERMIT LINE
 			190 => array('MAIN_AGENDA_ACTIONAUTO_FIREPERMITDET_CREATE','chaine',1,'', $conf->entity),
-			191 => array('DIGIRISKDOLIBARR_FIREPERMITDET_ADDON','chaine', 'mod_firepermitdet_standard' ,'', $conf->entity),
+			191 => array('DIGIRISKDOLIBARR_FIREPERMITDET_ADDON','chaine', 'mod_accidentdet_standard','', $conf->entity),
 
 			// CONST MODULE
 			200 => array('DIGIRISKDOLIBARR_VERSION','chaine', $this->version,'', $conf->entity),
@@ -316,6 +316,23 @@ class modDigiriskdolibarr extends DolibarrModules
 			302 => array('DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE','integer', 1,'', $conf->entity),
 			303 => array('DIGIRISKDOLIBARR_TICKET_SHOW_COMPANY_LOGO','integer', 1,'', $conf->entity),
 
+			// CONST ACCIDENT
+			330 => array('MAIN_AGENDA_ACTIONAUTO_ACCIDENT_CREATE','chaine',1,'', $conf->entity),
+			331 => array('MAIN_AGENDA_ACTIONAUTO_ACCIDENT_EDIT','chaine',1,'', $conf->entity),
+			332 => array('DIGIRISKDOLIBARR_ACCIDENT_ADDON','chaine', 'mod_accident_standard' ,'', $conf->entity),
+			333 => array('DIGIRISKDOLIBARR_ACCIDENT_PROJECT','integer', 0,'', $conf->entity),
+
+			// CONST ACCIDENT LINE
+			350 => array('MAIN_AGENDA_ACTIONAUTO_ACCIDENTDET_CREATE','chaine',1,'', $conf->entity),
+			351 => array('DIGIRISKDOLIBARR_ACCIDENTDET_ADDON','chaine', 'mod_accidentdet_standard','', $conf->entity),
+
+//			// CONST ACCIDENT DOCUMENT
+//			360 => array('MAIN_AGENDA_ACTIONAUTO_ACCIDENTDOCUMENT_CREATE','chaine',1,'', $conf->entity),
+//
+//			361 => array('DIGIRISKDOLIBARR_ACCIDENTDOCUMENT_ADDON','chaine', 'mod_accidentdocument_standard' ,'', $conf->entity),
+//			362 => array('DIGIRISKDOLIBARR_ACCIDENTDOCUMENT_ADDON_ODT_PATH','chaine', DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/documents/doctemplates/accidentdocument/' ,'', $conf->entity),
+//			363 => array('DIGIRISKDOLIBARR_ACCIDENTDOCUMENT_CUSTOM_ADDON_ODT_PATH','chaine', DOL_DATA_ROOT . '/ecm/digiriskdolibarr/accidentdocument/' ,'', $conf->entity),
+//			364 => array('DIGIRISKDOLIBARR_ACCIDENTDOCUMENT_DEFAULT_MODEL','chaine', 'accidentdocument_odt' ,'', $conf->entity),
 		);
 
 		if ( ! isset($conf->digiriskdolibarr ) || ! isset( $conf->digiriskdolibarr->enabled ) ) {
@@ -335,23 +352,68 @@ class modDigiriskdolibarr extends DolibarrModules
 		$this->dictionaries=array(
 			'langs'=>'digiriskdolibarr@digiriskdolibarr',
 			// List of tables we want to see into dictonnary editor
-			'tabname'=>array(MAIN_DB_PREFIX."c_conventions_collectives"),
+			'tabname'=>array(
+				MAIN_DB_PREFIX."c_conventions_collectives",
+				MAIN_DB_PREFIX."c_accident_location",
+				MAIN_DB_PREFIX."c_lesion_localization",
+				MAIN_DB_PREFIX."c_lesion_nature"
+			),
 			// Label of tables
-			'tablib'=>array("CollectiveAgreement"),
+			'tablib'=>array(
+				"CollectiveAgreement",
+				"AccidentLocation",
+				"LesionLocalization",
+				"LesionNature"
+			),
 			// Request to select fields
-			'tabsql'=>array('SELECT f.rowid as rowid, f.code, f.libelle, f.active FROM '.MAIN_DB_PREFIX.'c_conventions_collectives as f'),
+			'tabsql'=>array(
+				'SELECT f.rowid as rowid, f.code, f.libelle, f.active FROM '.MAIN_DB_PREFIX.'c_conventions_collectives as f',
+				'SELECT f.rowid as rowid, f.label, f.description, f.active FROM '.MAIN_DB_PREFIX.'c_accident_location as f',
+				'SELECT f.rowid as rowid, f.label, f.description, f.active FROM '.MAIN_DB_PREFIX.'c_lesion_localization as f',
+				'SELECT f.rowid as rowid, f.label, f.description, f.active FROM '.MAIN_DB_PREFIX.'c_lesion_nature as f'
+			),
 			// Sort order
-			'tabsqlsort'=>array("libelle ASC"),
+			'tabsqlsort'=>array(
+				"libelle ASC",
+				"label ASC",
+				"label ASC",
+				"label ASC"
+			),
 			// List of fields (result of select to show dictionary)
-			'tabfield'=>array("code,libelle"),
+			'tabfield'=>array(
+				"code,libelle",
+				"label,description",
+				"label,description",
+				"label,description"
+			),
 			// List of fields (list of fields to edit a record)
-			'tabfieldvalue'=>array("code,libelle"),
+			'tabfieldvalue'=>array(
+				"code,libelle",
+				"label,description",
+				"label,description",
+				"label,description"
+			),
 			// List of fields (list of fields for insert)
-			'tabfieldinsert'=>array("code,libelle"),
+			'tabfieldinsert'=>array(
+				"code,libelle",
+				"label,description",
+				"label,description",
+				"label,description"
+			),
 			// Name of columns with primary key (try to always name it 'rowid')
-			'tabrowid'=>array("rowid"),
+			'tabrowid'=>array(
+				"rowid",
+				"rowid",
+				"rowid",
+				"rowid"
+			),
 			// Condition to show each dictionary
-			'tabcond'=>array($conf->digiriskdolibarr->enabled, $conf->digiriskdolibarr->enabled, $conf->digiriskdolibarr->enabled)
+			'tabcond'=>array(
+				$conf->digiriskdolibarr->enabled,
+				$conf->digiriskdolibarr->enabled,
+				$conf->digiriskdolibarr->enabled,
+				$conf->digiriskdolibarr->enabled
+			)
 		);
 
 		// Boxes/Widgets
@@ -586,6 +648,23 @@ class modDigiriskdolibarr extends DolibarrModules
 		$this->rights[$r][1] = $langs->trans('PostAPI');
 		$this->rights[$r][4] = 'api';
 		$this->rights[$r][5] = 'write';
+		$r++;
+
+		/* ACCIDENT PERMISSIONS */
+		$this->rights[$r][0] = $this->numero.$r;
+		$this->rights[$r][1] = $langs->trans('ReadAccident');
+		$this->rights[$r][4] = 'accident';
+		$this->rights[$r][5] = 'read';
+		$r++;
+		$this->rights[$r][0] = $this->numero.$r;
+		$this->rights[$r][1] = $langs->trans('CreateAccident');
+		$this->rights[$r][4] = 'accident';
+		$this->rights[$r][5] = 'write';
+		$r++;
+		$this->rights[$r][0] = $this->numero.$r;
+		$this->rights[$r][1] = $langs->trans('DeleteAccident');
+		$this->rights[$r][4] = 'accident';
+		$this->rights[$r][5] = 'delete';
 
 		// Main menu entries to add
 		$this->menu = array();
@@ -693,6 +772,21 @@ class modDigiriskdolibarr extends DolibarrModules
 			'position'=>48520+$r,
 			'enabled'=>'$conf->digiriskdolibarr->enabled',  // Define condition to show or hide menu entry. Use '$conf->digiriskdolibarr->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
 			'perms'=>'$user->rights->digiriskdolibarr->firepermit->read', // Use 'perms'=>'$user->rights->digiriskdolibarr->level1->level2' if you want your menu with a permission rules
+			'target'=>'',
+			'user'=>0,				                // 0=Menu for internal users, 1=external users, 2=both
+		);
+
+		$this->menu[$r++]=array(
+			'fk_menu'=>'fk_mainmenu=digiriskdolibarr',	    // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
+			'type'=>'left',			                // This is a Left menu entry
+			'titre'=>'<i class="fas fa-fire-alt"></i>  ' . $langs->trans('Accident'),
+			'mainmenu'=>'digiriskdolibarr',
+			'leftmenu'=>'digiriskaccident',
+			'url'=>'/digiriskdolibarr/accident_list.php',
+			'langs'=>'digiriskdolibarr@digiriskdolibarr',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
+			'position'=>48520+$r,
+			'enabled'=>'$conf->digiriskdolibarr->enabled',  // Define condition to show or hide menu entry. Use '$conf->digiriskdolibarr->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
+			'perms'=>'$user->rights->digiriskdolibarr->accident->read', // Use 'perms'=>'$user->rights->digiriskdolibarr->level1->level2' if you want your menu with a permission rules
 			'target'=>'',
 			'user'=>0,				                // 0=Menu for internal users, 1=external users, 2=both
 		);
@@ -810,6 +904,7 @@ class modDigiriskdolibarr extends DolibarrModules
 		$this->_load_tables('/digiriskdolibarr/sql/riskanalysis/');
 		$this->_load_tables('/digiriskdolibarr/sql/preventionplan/');
 		$this->_load_tables('/digiriskdolibarr/sql/firepermit/');
+		$this->_load_tables('/digiriskdolibarr/sql/accident/');
 
 		delDocumentModel('informationssharing_odt'            ,'informationssharing');
 		delDocumentModel('legaldisplay_odt'                   ,'legaldisplay');

@@ -28,5 +28,6 @@ CREATE TABLE llx_digiriskdolibarr_accident(
 	accident_location           text,
 	collateral_victim           boolean,
 	police_report               boolean,
+	cerfa_link                  text,
 	fk_accident                 integer NOT NULL
 ) ENGINE=innodb;
