@@ -18,7 +18,7 @@
 /**
  *   	\file       accident_list.php
  *		\ingroup    digiriskdolibarr
- *		\brief      List page for fire permit
+ *		\brief      List page for accident
  */
 
 // Load Dolibarr environment
@@ -46,7 +46,7 @@ require_once __DIR__ . '/class/accident.class.php';
 require_once __DIR__ . '/class/preventionplan.class.php';
 require_once __DIR__ . '/class/digiriskresources.class.php';
 
-global $conf, $db;
+global $conf, $db, $hookmanager, $langs, $user;
 
 // Load translation files required by the page
 $langs->loadLangs(array('projects', 'companies', 'commercial'));
@@ -313,11 +313,6 @@ $moreforfilter = '';
 
 $varpage = empty($contextpage) ? $_SERVER["PHP_SELF"] : $contextpage;
 
-$arrayfields['MaitreOeuvre'] = array('label'=>'MaitreOeuvre', 'checked' => 1);
-$arrayfields['ExtSociety'] = array('label'=>'ExtSociety', 'checked' => 1);
-$arrayfields['ExtSocietyResponsible'] = array('label'=>'ExtSocietyResponsible', 'checked' => 1);
-$arrayfields['ExtSocietyIntervenants'] = array('label'=>'ExtSocietyIntervenants', 'checked' => 1);
-
 print_barre_liste($form->textwithpicto($title, $texthelp), $page, $_SERVER["PHP_SELF"], $param, $sortfield, $sortorder, $massactionbutton, $num, $nbtotalofrecords, 'digiriskdolibarr32px.png@digiriskdolibarr', 0, $newcardbutton, '', $limit, 0, 0, 1);
 
 $selectedfields = $form->multiSelectArrayWithCheckbox('selectedfields', $arrayfields, $varpage); // This also change content of $arrayfields
@@ -326,11 +321,6 @@ if ($massactionbutton) $selectedfields .= $form->showCheckAddButtons('checkforse
 print '<div class="div-table-responsive">';
 print '<table class="tagtable nobottomiftotal liste'.($moreforfilter ? " listwithfilterbefore" : "").'">'."\n";
 print '<tr class="liste_titre">';
-
-$accident->fields['Custom']['FP_MAITRE_OEUVRE']            = $arrayfields['MaitreOeuvre'] ;
-$accident->fields['Custom']['FP_EXT_SOCIETY']              = $arrayfields['ExtSociety'];
-$accident->fields['Custom']['FP_EXT_SOCIETY_RESPONSIBLE']  = $arrayfields['ExtSocietyResponsible'];
-$accident->fields['Custom']['FP_EXT_SOCIETY_INTERVENANTS'] = $arrayfields['ExtSocietyIntervenants'];
 
 foreach ($accident->fields as $key => $val) {
 	$cssforfield = (empty($val['css']) ? '' : $val['css']);
@@ -343,14 +333,6 @@ foreach ($accident->fields as $key => $val) {
 			print $accident->showInputField($val, $key, $search[$key], '', '', 'search_', 'maxwidth150', 1);
 		} elseif (!preg_match('/^(date|timestamp)/', $val['type'])) print '<input type="text" class="flat maxwidth75" name="search_' . $key . '" value="' . dol_escape_htmltag($search[$key]) . '">';
 		print '</td>';
-	}
-	if ($key == 'Custom') {
-		foreach ($val as $resource) {
-			if ($resource['checked']) {
-				print '<td>';
-				print '</td>';
-			}
-		}
 	}
 }
 
@@ -386,15 +368,6 @@ foreach ($accident->fields as $key => $val)
 		}
 		print getTitleFieldOfList($arrayfields['t.'.$key]['label'], 0, $_SERVER['PHP_SELF'], 't.'.$key, '', $param, ($cssforfield ? 'class="'.$cssforfield.'"' : ''), $sortfield, $sortorder, ($cssforfield ? $cssforfield.' ' : ''), $disablesort)."\n";
 
-	}
-	if ($key == 'Custom') {
-		foreach ($val as $resource) {
-			if ($resource['checked']) {
-				print '<td>';
-				print $langs->trans($resource['label']);
-				print '</td>';
-			}
-		}
 	}
 }
 
@@ -437,24 +410,15 @@ while ($i < ($limit ? min($num, $limit) : $num)) {
 		$cssforfield = (empty($val['css']) ? '' : $val['css']);
 		if ($key == 'status') $cssforfield .= ($cssforfield ? ' ' : '') . 'center';
 		elseif ($key == 'ref') $cssforfield .= ($cssforfield ? ' ' : '') . 'nowrap';
-		elseif ($key == 'category') $cssforfield .= ($cssforfield ? ' ' : '') . 'accidentdocument-category';
 		elseif ($key == 'description') $cssforfield .= ($cssforfield ? ' ' : '') . 'accidentdocument-description';
 		if (!empty($arrayfields['t.' . $key]['checked'])) {
 			print '<td' . ($cssforfield ? ' class="' . $cssforfield . '"' : '') . ' style="width:2%">';
 			if ($key == 'status') print $accident->getLibStatut(5);
-			elseif ($key == 'fk_preventionplan') {
-				if ($obj->fk_preventionplan > 0) {
-					$preventionplan->fetch($obj->fk_preventionplan);
-					print $preventionplan->getNomUrl(1);
-				}
-			}
 			elseif ($key == 'ref') {
 				print $accident->getNomUrl();
 			}
-			elseif ($key == 'date_start') {
-				print dol_print_date($accident->date_start, 'dayhour', 'tzserver');	// We suppose dates without time are always gmt (storage of course + output)
-			} elseif ($key == 'date_end') {
-				print dol_print_date($accident->date_end, 'dayhour', 'tzserver');	// We suppose dates without time are always gmt (storage of course + output)
+			elseif ($key == 'accident_date') {
+				print dol_print_date($accident->accident_date, 'dayhour', 'tzserver');	// We suppose dates without time are always gmt (storage of course + output)
 			}
 			else print $accident->showOutputField($val, $key, $accident->$key, '');
 			print '</td>';
@@ -462,47 +426,6 @@ while ($i < ($limit ? min($num, $limit) : $num)) {
 			if (!empty($val['isameasure'])) {
 				if (!$i) $totalarray['pos'][$totalarray['nbfield']] = 't.' . $key;
 				$totalarray['val']['t.' . $key] += $accident->$key;
-			}
-		}
-		if ($key == 'Custom') {
-			foreach ($val as $name => $resource) {
-				if ($resource['checked']) {
-					print '<td>';
-					if ($resource['label'] == 'MaitreOeuvre') {
-						$element = $signatory->fetchSignatory('FP_MAITRE_OEUVRE', $accident->id);
-						if ($element > 0) {
-							$element = array_shift($element);
-							$usertmp->fetch($element->element_id);
-							print $usertmp->getNomUrl(1);
-						}
-					} elseif ($resource['label'] == 'ExtSociety') {
-						$ext_society = $digiriskresources->fetchResourcesFromObject('FP_EXT_SOCIETY', $accident);
-						if ($ext_society > 0) {
-							print $ext_society->getNomUrl(1);
-						}
-					}
-					if ($resource['label'] == 'ExtSocietyResponsible') {
-						$element = $signatory->fetchSignatory('FP_EXT_SOCIETY_RESPONSIBLE', $accident->id);
-						if ($element > 0) {
-							$element = array_shift($element);
-							$contact->fetch($element->element_id);
-							print $contact->getNomUrl(1);
-						}
-					}
-					if ($resource['label'] == 'ExtSocietyIntervenants') {
-						$ext_society_intervenants = $signatory->fetchSignatory('FP_EXT_SOCIETY_INTERVENANTS', $accident->id);
-						if (is_array($ext_society_intervenants) && !empty ($ext_society_intervenants) && $ext_society_intervenants > 0) {
-							foreach ($ext_society_intervenants as $element) {
-								if ($element > 0) {
-									$contact->fetch($element->element_id);
-									print $contact->getNomUrl(1);
-									print '<br>';
-								}
-							}
-						}
-					}
-					print '</td>';
-				}
 			}
 		}
 	}

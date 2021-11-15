@@ -134,6 +134,34 @@ if ( $conf->global->DIGIRISKDOLIBARR_FIREPERMIT_PROJECT == 0 || $project->statut
 	$tags->add_type($project, 'project');
 }
 
+if ( $conf->global->DIGIRISKDOLIBARR_ACCIDENT_PROJECT == 0 || $project->statut == 2 ) {
+
+	$project->ref         = $projectRef->getNextValue($third_party, $project);
+	$project->title       = $langs->trans('AcciddentInitial') . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
+	$project->description = $langs->trans('AcciddentDescription');
+	$project->date_c      = dol_now();
+	$currentYear          = dol_print_date(dol_now(),'%Y');
+	$fiscalMonthStart     = $conf->global->SOCIETE_FISCAL_MONTH_START;
+	$startdate            = dol_mktime('0','0','0',$fiscalMonthStart ? $fiscalMonthStart : '1', '1', $currentYear);
+	$project->date_start  = $startdate;
+
+	$project->usage_task = 1;
+
+	$startdateAddYear      = dol_time_plus_duree($startdate, 1,'y');
+	$startdateAddYearMonth = dol_time_plus_duree($startdateAddYear, -1,'d');
+	$enddate               = dol_print_date($startdateAddYearMonth, 'dayrfc');
+	$project->date_end     = $enddate;
+	$project->statut      = 1;
+	$project_id = $project->create($user);
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_ACCIDENT_PROJECT', $project_id, 'integer', 1, '',$conf->entity);
+
+	require_once DOL_DOCUMENT_ROOT.'/categories/class/categorie.class.php';
+	$tags = new Categorie($db);
+
+	$tags->fetch('', 'ACC');
+	$tags->add_type($project, 'project');
+}
+
 if ( $conf->global->DIGIRISKDOLIBARR_USERAPI_SET ==  0 ) {
 	require_once DOL_DOCUMENT_ROOT.'/user/class/user.class.php';
 

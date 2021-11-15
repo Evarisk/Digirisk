@@ -16,9 +16,9 @@
  */
 
 /**
- *   	\file       accident_card.php
+ *   	\file       accident_metadata.php
  *		\ingroup    digiriskdolibarr
- *		\brief      Page to create/edit/view accident
+ *		\brief      Page to create/edit/view accident metadata
  */
 
 // Load Dolibarr environment
@@ -36,6 +36,7 @@ if (!$res && file_exists("../../../main.inc.php")) $res = @include "../../../mai
 if (!$res) die("Include of main fails");
 
 require_once DOL_DOCUMENT_ROOT.'/core/class/html.formfile.class.php';
+require_once DOL_DOCUMENT_ROOT.'/core/class/html.formother.class.php';
 require_once DOL_DOCUMENT_ROOT.'/core/class/doleditor.class.php';
 
 require_once __DIR__ . '/class/digiriskdocuments.class.php';
@@ -64,13 +65,14 @@ $ref                 = GETPOST('ref', 'alpha');
 $action              = GETPOST('action', 'aZ09');
 $confirm             = GETPOST('confirm', 'alpha');
 $cancel              = GETPOST('cancel', 'aZ09');
-$contextpage         = GETPOST('contextpage', 'aZ') ?GETPOST('contextpage', 'aZ') : 'accidentcard'; // To manage different context of search
+$contextpage         = GETPOST('contextpage', 'aZ') ?GETPOST('contextpage', 'aZ') : 'accidentmetadata'; // To manage different context of search
 $backtopage          = GETPOST('backtopage', 'alpha');
 $backtopageforcancel = GETPOST('backtopageforcancel', 'alpha');
 $fk_parent           = GETPOST('fk_parent', 'int');
 
 // Initialize technical objects
-$object              = new Accident($db);
+$object              = new AccidentMetaData($db);
+$accident            = new Accident($db);
 $preventionplan      = new PreventionPlan($db);
 $preventionplanline  = new PreventionPlanLine($db);
 $signatory           = new AccidentSignature($db);
@@ -88,12 +90,12 @@ $refAccidentMod      = new $conf->global->DIGIRISKDOLIBARR_ACCIDENT_ADDON($db);
 $refAccidentDetMod   = new $conf->global->DIGIRISKDOLIBARR_ACCIDENTDET_ADDON($db);
 
 // Load object
-$object->fetch($id);
+$accident->fetch($id);
 
 // Load resources
 $allLinks = $digiriskresources->digirisk_dolibarr_fetch_resources();
 
-$hookmanager->initHooks(array('accidentcard', 'globalcard')); // Note that conf->hooks_modules contains array
+$hookmanager->initHooks(array('accidentmetadata', 'globalmetadata')); // Note that conf->hooks_modules contains array
 
 $upload_dir         = $conf->digiriskdolibarr->multidir_output[isset($object->entity) ? $object->entity : 1];
 // Security check
@@ -119,7 +121,7 @@ if (empty($reshook)) {
 	if (empty($backtopage) || ($cancel && empty($id))) {
 		if (empty($backtopage) || ($cancel && strpos($backtopage, '__ID__'))) {
 			if (empty($object->id) && (($action != 'add' && $action != 'create') || $cancel)) $backtopage = $backurlforlist;
-			else $backtopage = dol_buildpath('/digiriskdolibarr/accident_card.php', 1).'?id='.($object->id > 0 ? $object->id : '__ID__');
+			else $backtopage = dol_buildpath('/digiriskdolibarr/accident_metadata.php', 1).'?id='.($object->id > 0 ? $object->id : '__ID__');
 		}
 	}
 
@@ -134,30 +136,36 @@ if (empty($reshook)) {
 	// Action to add record
 	if ($action == 'add' && $permissiontoadd) {
 		// Get parameters
-		$user_victim_id = GETPOST('fk_user_victim');
-		$soc_id = GETPOST('fk_element');
-		$label          = GETPOST('label');
-		$description    = GETPOST('description');
+		//$relative_location = GETPOST('relative_location');
+		$lesion_localization = GETPOST('lesion_localization');
+		$lesion_nature = GETPOST('lesion_nature');
+		//
+		$fatal = GETPOST('fatal');
+		$accident_investigation = GETPOST('accident_investigation');
+		$accident_investigation_link = GETPOST('accident_investigation_link');
+		$collateral_victim = GETPOST('collateral_victim');
+		$police_report = GETPOST('police_report');
+		$cerfa_link = GETPOST('cerfa_link');
+
+		$fk_accident = GETPOST('parent_id');
 
 		// Initialize object accident
-		$now                   = dol_now();
-		$object->ref           = $refAccidentMod->getNextValue($object);
-		$object->ref_ext       = 'digirisk_' . $object->ref;
-		$object->date_creation = $object->db->idate($now);
-		$object->tms           = $now;
-		$object->import_key    = "";
-		$object->status        = 1;
-		$object->label         = $label;
-		$object->description   = $description;
-		$object->fk_project    = $conf->global->DIGIRISKDOLIBARR_ACCIDENT_PROJECT;
+		$now                                 = dol_now();
+		$object->date_creation               = $object->db->idate($now);
+		$object->tms                         = $now;
+		$object->status                      = 1;
+		//$object->relative_location         = $relative_location;
+		$object->lesion_localization         = $lesion_localization;
+		$object->lesion_nature               = $lesion_nature;
+		//$object->thirdparty_responsibility = $thirdparty_responsibility;
+		$object->fatal                       = $fatal;
+		$object->accident_investigation      = $accident_investigation;
+		$object->accident_investigation_link = $accident_investigation_link;
+		$object->collateral_victim           = $collateral_victim;
+		$object->police_report               = $police_report;
+		$object->cerfa_link                  = $cerfa_link;
+		$object->fk_accident                 = $fk_accident;
 
-		$accident_date = dol_mktime(GETPOST('dateohour', 'int'), GETPOST('dateomin', 'int'), 0, GETPOST('dateomonth', 'int'), GETPOST('dateoday', 'int'), GETPOST('dateoyear', 'int'));
-
-		$object->accident_date = $accident_date;
-
-		$object->fk_element     = $soc_id;
-		$object->fk_user_victim = $user_victim_id;
-		$object->fk_user_creat  = $user->id ? $user->id : 1;
 
 		// Check parameters
 //		if ($maitre_oeuvre_id < 0) {
@@ -166,7 +174,7 @@ if (empty($reshook)) {
 //		} else {
 //			$usertmp->fetch($maitre_oeuvre_id);
 //			if (!dol_strlen($usertmp->email)) {
-//				setEventMessages($langs->trans('ErrorNoEmailForMaitreOeuvre', $langs->transnoentitiesnoconv('MaitreOeuvre')) . ' : ' . '<a target="_blank" href="'.dol_buildpath('/user/card.php?id='.$usertmp->id, 2).'">'.$usertmp->lastname . ' ' . $usertmp->firstname.'</a>', null, 'errors');
+//				setEventMessages($langs->trans('ErrorNoEmailForMaitreOeuvre', $langs->transnoentitiesnoconv('MaitreOeuvre')) . ' : ' . '<a target="_blank" href="'.dol_buildpath('/user/metadata.php?id='.$usertmp->id, 2).'">'.$usertmp->lastname . ' ' . $usertmp->firstname.'</a>', null, 'errors');
 //				$error++;
 //			}
 //		}
@@ -268,7 +276,7 @@ if (empty($reshook)) {
 		}   else {
 			$usertmp->fetch($maitre_oeuvre_id);
 			if (!dol_strlen($usertmp->email)) {
-				setEventMessages($langs->trans('ErrorNoEmailForMaitreOeuvre', $langs->transnoentitiesnoconv('MaitreOeuvre')) . ' : ' . '<a target="_blank" href="'.dol_buildpath('/user/card.php?id='.$usertmp->id, 2).'">'.$usertmp->lastname . ' ' . $usertmp->firstname.'</a>', null, 'errors');
+				setEventMessages($langs->trans('ErrorNoEmailForMaitreOeuvre', $langs->transnoentitiesnoconv('MaitreOeuvre')) . ' : ' . '<a target="_blank" href="'.dol_buildpath('/user/metadata.php?id='.$usertmp->id, 2).'">'.$usertmp->lastname . ' ' . $usertmp->firstname.'</a>', null, 'errors');
 				$error++;
 			}
 		}
@@ -634,11 +642,12 @@ if (empty($reshook)) {
  * View
  */
 
-$form = new Form($db);
+$form      = new Form($db);
+$formother = new FormOther($db);
 
-$title         = $langs->trans("Accident");
-$title_create  = $langs->trans("NewAccident");
-$title_edit    = $langs->trans("ModifyAccident");
+$title         = $langs->trans("AccidentMetaData");
+$title_create  = $langs->trans("NewAccidentMetaData");
+$title_edit    = $langs->trans("ModifyAccidentMetaData");
 $object->picto = 'accident@digiriskdolibarr';
 
 $help_url = 'FR:Module_DigiriskDolibarr';
@@ -654,60 +663,73 @@ if ($action == 'create') {
 	print '<form method="POST" action="'.$_SERVER["PHP_SELF"].'">';
 	print '<input type="hidden" name="token" value="'.newToken().'">';
 	print '<input type="hidden" name="action" value="add">';
+	print '<input type="hidden" name="parent_id" value="' . $accident->id . '">';
 	print '<input type="hidden" name="backtopage" value="'.$backtopage.'">';
 
 	if ($backtopageforcancel) print '<input type="hidden" name="backtopageforcancel" value="'.$backtopageforcancel.'">';
 
 	print dol_get_fiche_head();
 
-	print '<table class="border centpercent tableforfieldcreate accident-table">'."\n";
+	print '<table class="border tableforfieldcreate accident-metadata-table">'."\n";
 
-	//Ref -- Ref
-	print '<tr><td class="fieldrequired minwidth400">'.$langs->trans("Ref").'</td><td>';
-	print '<input hidden class="flat" type="text" size="36" name="ref" id="ref" value="'.$refAccidentMod->getNextValue($object).'">';
-	print $refAccidentMod->getNextValue($object);
+//	//RelativeLocation --
+//	print '<tr><td class="fieldrequired">'.$langs->trans("SenderService").'</td><td>';
+//	print $formother->select_dictionary('sender_service','c_sender_service', 'ref', 'label', 'MAIL', 0);
+//	print '</td></tr>';
+
+	//LesionLocalization -- Siège des lésions
+	print '<tr><td class="fieldrequired">'.$langs->trans("LesionLocalization").'</td><td>';
+	print $formother->select_dictionary('lesion_localization','c_lesion_localization', 'ref', 'label', '', 0);
 	print '</td></tr>';
 
-	//Label -- Libellé
-	print '<tr><td class="minwidth400">'.$langs->trans("Label").'</td><td>';
-	print '<input class="flat" type="text" size="36" name="label" id="label" value="'.GETPOST('label').'">';
+	//LesionNature -- Nature des lésions
+	print '<tr><td class="fieldrequired">'.$langs->trans("LesionNature").'</td><td>';
+	print $formother->select_dictionary('lesion_nature','c_lesion_nature', 'ref', 'label', '', 0);
 	print '</td></tr>';
 
-	//User Victim -- Utilisateur victime de l'accient
-	$userlist = $form->select_dolusers((!empty(GETPOST('fk_user_victim')) ? GETPOST('fk_user_victim') : $user->id), '', 0, null, 0, '', '', $conf->entity, 0, 0, 'AND u.statut = 1', 0, '', 'minwidth300', 0, 1);
-	print '<tr>';
-	print '<td class="fieldrequired minwidth400" style="width:10%">' . img_picto('', 'user') . ' ' . $form->editfieldkey('UserVictim', 'UserVictim_id', '', $object, 0) . '</td>';
-	print '<td>';
-	print $form->selectarray('fk_user_victim', $userlist, (!empty(GETPOST('fk_user_victim')) ? GETPOST('fk_user_victim') : $user->id), $langs->trans('SelectUser'), null, null, null, "40%", 0, 0, '', 'minwidth300', 1);
-	print ' <a href="' . DOL_URL_ROOT . '/user/card.php?action=create&backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?action=create') . '" target="_blank"><span class="fa fa-plus-circle valignmiddle paddingleft" title="' . $langs->trans("AddUser") . '"></span></a>';
+//	//ThirdPartyResponsability --
+//	print '<tr><td class="fieldrequired">'.$langs->trans("SenderService").'</td><td>';
+//	print $formother->select_dictionary('sender_service','c_sender_service', 'ref', 'label', 'MAIL', 0);
+//	print '</td></tr>';
+
+	//Fatal -- Décès
+	print '<tr><td class="minwidth400">'.$langs->trans("Fatal").'</td><td>';
+	print '<input type="checkbox" id="fatal" name="fatal"'.(GETPOST('fatal') ? ' checked=""' : '').'>';
+	print $form->textwithpicto('', $langs->trans(''));
 	print '</td></tr>';
 
-	//External society -- Société extérieure
-	print '<tr><td class="fieldrequired minwidth400">'.img_picto('','building').' '.$langs->trans("ExtSociety").'</td><td>';
-	$events = array();
-	$events[1] = array('method' => 'getContacts', 'url' => dol_buildpath('/custom/digiriskdolibarr/core/ajax/contacts.php?showempty=1', 1), 'htmlname' => 'ext_society_responsible', 'params' => array('add-customer-contact' => 'disabled'));
-	print $form->select_company(GETPOST('ext_society'), 'ext_society', '', 'SelectThirdParty', 1, 0, $events, 0, 'minwidth300');
-	print ' <a href="'.DOL_URL_ROOT.'/societe/card.php?action=create&backtopage='.urlencode($_SERVER["PHP_SELF"].'?action=create').'" target="_blank"><span class="fa fa-plus-circle valignmiddle paddingleft" title="'.$langs->trans("AddThirdParty").'"></span></a>';
+	//AccidentInvestigation -- Enquête accident
+	print '<tr><td class="minwidth400">'.$langs->trans("AccidentInvestigation").'</td><td>';
+	print '<input type="checkbox" id="accident_investigation" name="accident_investigation"'.(GETPOST('accident_investigation') ? ' checked=""' : '').'>';
+	print $form->textwithpicto('', $langs->trans(''));
 	print '</td></tr>';
 
-	$ext_society_responsible_id = GETPOST('ext_society_responsible');
-	$contacts = fetchAllSocPeople('',  '',  0,  0, array('customsql' => "s.rowid = $ext_society_responsible_id AND c.email IS NULL OR c.email = ''" ));
-	$contacts_no_email = array();
-	if (is_array($contacts) && !empty ($contacts) && $contacts > 0) {
-		foreach ($contacts as $element) {
-			$contacts_no_email[$element->id] = $element->id;
-		}
-	}
-
-	//Accident Date -- Date de l'accident
-	print '<tr><td class="minwidth400"><label for="accident_date">'.$langs->trans("AccidentDate").'</label></td><td>';
-	print $form->selectDate(dol_now('tzuser'), 'dateo', 1, 1, 0, '', 1);
+	//AccidentInvestigationLink -- lien vers l'enquête accident
+	print '<tr><td class="minwidth400">'.$langs->trans("AccidentInvestigationLink").'</td><td>';
+	print '<input type="checkbox" id="accident_investigation_link" name="accident_investigation_link"'.(GETPOST('accident_investigation_link') ? ' checked=""' : '').'>';
+	print $form->textwithpicto('', $langs->trans(''));
 	print '</td></tr>';
 
-	//Description -- Description
-	print '<tr class="content_field"><td><label for="content">'.$langs->trans("Description").'</label></td><td>';
-	$doleditor = new DolEditor('description', GETPOST('description'), '', 90, 'dolibarr_notes', '', false, true, $conf->global->FCKEDITOR_ENABLE_SOCIETE, ROWS_3, '90%');
-	$doleditor->Create();
+	//AccidentLocation -- Lieu de l'accident
+	print '<tr><td class="fieldrequired">'.$langs->trans("AccidentLocation").'</td><td>';
+	print $formother->select_dictionary('accident_location','c_accident_location', 'ref', 'label', '', 0);
+	print '</td></tr>';
+
+	//CollateraVictim -- Victime collatérale
+	print '<tr><td class="minwidth400">'.$langs->trans("CollateralVictim").'</td><td>';
+	print '<input type="checkbox" id="collateral_victim" name="collateral_victim"'.(GETPOST('collateral_victim') ? ' checked=""' : '').'>';
+	print $form->textwithpicto('', $langs->trans(''));
+	print '</td></tr>';
+
+	//PoliceReport  -- Rapport de police
+	print '<tr><td class="minwidth400">'.$langs->trans("PoliceReport").'</td><td>';
+	print '<input type="checkbox" id="police_report" name="police_report"'.(GETPOST('police_report') ? ' checked=""' : '').'>';
+	print $form->textwithpicto('', $langs->trans(''));
+	print '</td></tr>';
+
+	//CerfaLink -- Lien vers le Cerfa
+	print '<tr><td class="fieldrequired minwidth400">'.$langs->trans("CerfaLink").'</td><td>';
+	print '<input class="flat" type="text" size="36" name="cerfa_link" id="cerfa_link" value="'.GETPOST('cerfa_link').'">';
 	print '</td></tr>';
 
 	// Other attributes
@@ -770,7 +792,7 @@ if (($id || $ref) && $action == 'edit') {
 	print '<td class="fieldrequired minwidth400" style="width:10%">'.img_picto('','user').' '.$form->editfieldkey('MaitreOeuvre', 'MaitreOeuvre_id', '', $object, 0).'</td>';
 	print '<td>';
 	print $form->selectarray('maitre_oeuvre', $userlist,$maitre_oeuvre, 1, null, null, null, "40%", 0, 0, 0, 'minwidth300',1);
-	print ' <a href="'.DOL_URL_ROOT.'/user/card.php?action=create&backtopage='.urlencode($_SERVER["PHP_SELF"].'?action=create').'" target="_blank"><span class="fa fa-plus-circle valignmiddle paddingleft" title="'.$langs->trans("AddUser").'"></span></a>';
+	print ' <a href="'.DOL_URL_ROOT.'/user/metadata.php?action=create&backtopage='.urlencode($_SERVER["PHP_SELF"].'?action=create').'" target="_blank"><span class="fa fa-plus-circle valignmiddle paddingleft" title="'.$langs->trans("AddUser").'"></span></a>';
 	print '</td></tr>';
 
 	//External society -- Société extérieure
@@ -787,7 +809,7 @@ if (($id || $ref) && $action == 'edit') {
 		$ext_society_id = is_array($object_resources['FP_EXT_SOCIETY']) ? array_shift($object_resources['FP_EXT_SOCIETY'])->id : '';
 		print $form->select_company($ext_society_id, 'ext_society', '', 'SelectThirdParty', 1, 0, $events, 0, 'minwidth300');
 	}
-	print ' <a href="'.DOL_URL_ROOT.'/societe/card.php?action=create&backtopage='.urlencode($_SERVER["PHP_SELF"].'?action=create').'" target="_blank"><span class="fa fa-plus-circle valignmiddle paddingleft" title="'.$langs->trans("AddThirdParty").'"></span></a>';
+	print ' <a href="'.DOL_URL_ROOT.'/societe/metadata.php?action=create&backtopage='.urlencode($_SERVER["PHP_SELF"].'?action=create').'" target="_blank"><span class="fa fa-plus-circle valignmiddle paddingleft" title="'.$langs->trans("AddThirdParty").'"></span></a>';
 	print '</td></tr>';
 
 	$ext_society_responsible_id = is_array($object_signatories['FP_EXT_SOCIETY_RESPONSIBLE']) ? array_shift($object_signatories['FP_EXT_SOCIETY_RESPONSIBLE'])->element_id : GETPOST('ext_society_responsible');
@@ -826,7 +848,7 @@ if (($id || $ref) && $action == 'edit') {
 	$events = array();
 	$events[1] = array('method' => 'getContacts', 'url' => dol_buildpath('/custom/digiriskdolibarr/core/ajax/contacts.php?showempty=1', 1), 'htmlname' => 'labour_inspector_contact', 'params' => array('add-customer-contact' => 'disabled'));
 	print $form->select_company($labour_inspector_society->id, 'labour_inspector', '', 'SelectThirdParty', 1, 0, $events, 0, 'minwidth300');
-	print ' <a href="'.DOL_URL_ROOT.'/societe/card.php?action=create&backtopage='.urlencode($_SERVER["PHP_SELF"].'?action=create').'" target="_blank"><span class="fa fa-plus-circle valignmiddle paddingleft" title="'.$langs->trans("AddThirdParty").'"></span></a>';
+	print ' <a href="'.DOL_URL_ROOT.'/societe/metadata.php?action=create&backtopage='.urlencode($_SERVER["PHP_SELF"].'?action=create').'" target="_blank"><span class="fa fa-plus-circle valignmiddle paddingleft" title="'.$langs->trans("AddThirdParty").'"></span></a>';
 	print '<a href="'.DOL_URL_ROOT.'/custom/digiriskdolibarr/admin/securityconf.php'.'" target="_blank">'.$langs->trans("ConfigureLabourInspector").'</a>';
 	print '</td></tr>';
 
@@ -925,7 +947,7 @@ print $formconfirm;
 
 // Part to show record
 if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
-	// Object card
+	// Object metadata
 	// ------------------------------------------------------------
 	$res = $object->fetch_optionals();
 

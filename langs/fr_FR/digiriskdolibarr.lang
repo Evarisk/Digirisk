@@ -512,6 +512,92 @@ FirePermitContent = Veuillez trouver ci-joint le document ODT du permis de feu.
 
 
 #
+# Accident - Accident
+#
+
+# Right - Droit
+ReadAccident = Consulter l'accident
+CreateAccident = Créer/Modifier l'accident
+DeleteAccident = Supprimer l'accident
+
+# Trigger - Déclencheur
+FIREPERMIT_CREATEInDolibarr = Accident créé dans Dolibarr
+ActionsOnAccident = Événements liés au accident
+AccidentGeneratedWithDolibarr = Accident généré avec Dolibarr
+AccidentLineCreateTrigger = Ligne d'accident créée
+AccidentLineModifyTrigger = Ligne d'accident modifiée
+AccidentLineDeleteTrigger = Ligne d'accident supprimée
+AccidentModifyTrigger = Modification de l'accident
+AccidentInprogressTrigger = Accident rouvert
+AccidentPendingSignatureTrigger = Accident en attente de signature des participants
+AccidentLockTrigger = Accident verrouillé - Prêt pour la génération du documuent
+AccidentArchivedTrigger = Accident archivé
+AccidentAddAttendantTrigger = Ajout d'un participant au permis de feu
+AccidentSentByMailTrigger = Email permis de feu envoyé
+AccidentOpeningHoursCreateTrigger = Enregistrement des horaires du permis de feu
+
+# Mod Numbering - Modèle de numérotation
+DigiriskAccidentNumberingModule = Modèle de numérotation des accidents de Digirisk
+DigiriskAccidentStandardModel = Renvoie le numéro sous la forme ACCn où n est un compteur séquentiel sans rupture et sans remise à 0.
+DigiriskAccidentDetNumberingModule = Modèle de numérotation des lignes d'un accident de Digirisk
+DigiriskAccidentDetStandardModel = Renvoie le numéro sous la forme ACCLn où n est un compteur séquentiel sans rupture et sans remise à 0.
+DigiriskAccidentDocumentNumberingModule = Modèle de numérotation des fiches d'accident de Digirisk
+DigiriskAccidentDocumentStandardModel = Renvoie le numéro sous la forme ACCDn où n est un compteur séquentiel sans rupture et sans remise à 0.
+
+# ODT Template - Template ODT
+DigiriskTemplateDocumentAccident = Modèle de documents des accidents de Digirisk
+AccidentDocumentCustomDigiriskTemplate = ODT custom des accidents
+AccidentDocumentDigiriskTemplate = ODT par défaut des accidents
+AccidentDocument = Fiche d'Accident
+AccidentDocumentGeneratedWithDolibarr = Accident généré avec Dolibarr
+
+# Data - Donnée
+NewAccident Nouvelle accident
+ModifyAccident = Modifier l'accident
+AccidentList = Liste des accidents
+Accident = Accident
+AccidentLine = risque(s)
+AccidentDate = Date de l'accident
+AccidentSchedule = Horaires du permis de feu
+AccidentRiskList = Liste des risques du permis de feu
+AddAccidentLine = Ajout du risque
+UpdateAccidentLine = Mise à jour du risque
+DeleteAccidentLine = Suppression du risque
+AccidentMessage = au permis de feu
+UsedMaterial = Matériel utilisé
+UsedMaterialTooltip = Matériel à utiliser pour limiter le risque
+ActionsAccidentRisk = Actions
+ConfirmValidateAccident = Êtes-vous sûr de vouloir valider le permis de feu ? <br> La validation permet aux participants de signer le document mais <b> empêche l'ajout de nouveaux participants ou la modification du permis de feu </b>.
+ConfirmReOpenAccident = Êtes-vous sûr de vouloir rouvrir le permis de feu ? La réouverture permet la modification du permsi de feu et l'ajout de nouveaux participants mais <b>toutes les signatures du document seront perdues</b>.
+ConfirmLockAccident = Êtes-vous sûr de vouloir verrouiller le permis de feu ?<br>Ce verrouillage permet de figer les données et la génération du document.
+AccidentMustBeInProgress = Le permis de feu doit être en cours pour accéder à cette fonctionnalité
+AccidentMustBeInProgressToValidate = Le permis de feu est déjà validé
+AccidentMustBeValidated = Le permis de feu doit être validé pour le rouvrir
+AccidentMustBeValidatedToSign = Le permis de feu doit être validé pour que les participants puissent signer
+AccidentMustBeLockedToSendEmail = Le permis de feu doit être verrouillé pour envoyer un email
+AccidentMustBeLocked = Le permis de feu doit être verrouillé pour accéder à cette fonctionnalité
+GoToLockAccident = Verrouiller le permis de feu
+GoToValidateAccident = Valider le permis de feu
+AccidentAttendants = Permis de feu - Participants
+AccidentScheduleSave = Les horaires du permis de feu ont bien été enregistrés
+NewRefForCloneAccident = Réf. du nouveau permis de feu
+CloneAccidentRisk = Cloner les risques du permis de feu
+CloneAttendantsAccident = Cloner les participants du permis de feu
+CloneScheduleAccident = Cloner les horaires du permis de feu
+ConfirmCloneAccident = Êtes-vous sûr de vouloir cloner le permis de feu <b> %s </b> ?
+AccidentInitial = ACC
+AccidentDescription = Projet des accidents
+AccidentManagement = Gestion des accidents
+ACCProject = Projet lié aux accidents
+
+# Email - Mail
+AccidentLabel = Récapitulatif du permis de feu
+AccidentSubject = Email permis de feu
+AccidentContent = Veuillez trouver ci-joint le document ODT du permis de feu.
+
+
+
+#
 # ListingRisksPhoto - Listing des risques Photo
 #
 

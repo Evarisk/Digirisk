@@ -16,9 +16,9 @@
  */
 
 /**
- *  \file       firepermit_agenda.php
+ *  \file       accident_agenda.php
  *  \ingroup    digiriskdolibarr
- *  \brief      Page of FirePermit events
+ *  \brief      Page of Accident events
  */
 
 // Load Dolibarr environment
@@ -39,8 +39,8 @@ require_once DOL_DOCUMENT_ROOT.'/contact/class/contact.class.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/company.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/functions2.lib.php';
 
-require_once __DIR__ . '/class/firepermit.class.php';
-require_once __DIR__ . '/lib/digiriskdolibarr_firepermit.lib.php';
+require_once __DIR__ . '/class/accident.class.php';
+require_once __DIR__ . '/lib/digiriskdolibarr_accident.lib.php';
 require_once __DIR__ . '/lib/digiriskdolibarr_function.lib.php';
 
 global $conf, $db, $langs, $hookmanager, $user;
@@ -76,9 +76,9 @@ if (!$sortfield) $sortfield = 'a.datep,a.id';
 if (!$sortorder) $sortorder = 'DESC,DESC';
 
 // Initialize technical objects
-$object      = new FirePermit($db);
+$object      = new Accident($db);
 $extrafields = new ExtraFields($db);
-$hookmanager->initHooks(array('firepermitagenda', 'globalcard')); // Note that conf->hooks_modules contains array
+$hookmanager->initHooks(array('accidentagenda', 'globalcard')); // Note that conf->hooks_modules contains array
 // Fetch optionals attributes and labels
 $extrafields->fetch_name_optionals_label($object->table_element);
 
@@ -87,7 +87,7 @@ include DOL_DOCUMENT_ROOT.'/core/actions_fetchobject.inc.php'; // Must be includ
 if ($id > 0 || !empty($ref)) $upload_dir = $conf->digiriskdolibarr->multidir_output[$object->entity]."/".$object->id;
 
 // Security check - Protection if external user
-$permissiontoread = $user->rights->digiriskdolibarr->firepermit->read;
+$permissiontoread = $user->rights->digiriskdolibarr->accident->read;
 
 if (!$permissiontoread) accessforbidden();
 
@@ -118,16 +118,16 @@ if (empty($reshook)) {
  */
 
 if ($object->id > 0) {
-	$title    = $langs->trans("FirePermit") . ' - ' . $langs->trans("Agenda");
+	$title    = $langs->trans("Accident") . ' - ' . $langs->trans("Agenda");
 	$help_url = 'FR:Module_DigiriskDolibarr';
 	$morejs   = array("/digiriskdolibarr/js/digiriskdolibarr.js.php");
 	$morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");
 
 	llxHeader('', $title, $help_url, '', '', '', $morejs, $morecss);
 
-	$head = firepermitPrepareHead($object);
+	$head = accidentPrepareHead($object);
 
-	print dol_get_fiche_head($head, 'firepermitAgenda', $title, -1, "digiriskdolibarr@digiriskdolibarr");
+	print dol_get_fiche_head($head, 'accidentAgenda', $title, -1, "digiriskdolibarr@digiriskdolibarr");
 
 	// Object card
 	// ------------------------------------------------------------
@@ -157,7 +157,7 @@ if ($object->id > 0) {
 		if (!empty($contextpage) && $contextpage != $_SERVER["PHP_SELF"]) $param .= '&contextpage='.urlencode($contextpage);
 		if ($limit > 0 && $limit != $conf->liste_limit) $param .= '&limit='.urlencode($limit);
 
-		print_barre_liste($langs->trans("ActionsOnFirePermit"), 0, $_SERVER["PHP_SELF"], '', $sortfield, $sortorder, '', 0, -1, '', 0, $morehtmlcenter, '', 0, 1, 1);
+		print_barre_liste($langs->trans("ActionsOnAccident"), 0, $_SERVER["PHP_SELF"], '', $sortfield, $sortorder, '', 0, -1, '', 0, $morehtmlcenter, '', 0, 1, 1);
 
 		// List of all actions
 		$filters = array();

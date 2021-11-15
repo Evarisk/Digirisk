@@ -51,6 +51,11 @@ function accidentPrepareHead($object)
 		$head[$h][1] = '<i class="fas fa-file-signature"></i> ' . $langs->trans("WorkStop");
 		$head[$h][2] = 'accidentWorkStop';
 		$h++;
+
+		$head[$h][0] = dol_buildpath("/digiriskdolibarr/accident_metadata.php", 1) . '?action=create&id=' . $object->id;
+		$head[$h][1] = '<i class="fas fa-file-signature"></i> ' . $langs->trans("AccidentMetadata");
+		$head[$h][2] = 'accidentMetadata';
+		$h++;
 	}
 
 	complete_head_from_modules($conf, $langs, $object, $head, $h, 'accident@digiriskdolibarr');
