@@ -589,6 +589,16 @@ AccidentInitial = ACC
 AccidentDescription = Projet des accidents
 AccidentManagement = Gestion des accidents
 ACCProject = Projet lié aux accidents
+AccidentMetadata = Données complémentaires
+LesionLocalization = Siège des lésions
+LesionNature = Nature des lésions
+Fatal = Décès
+AccidentInvestigation = Enquête accident
+AccidentInvestigationLink = lien vers l'enquête accident
+AccidentLocation = Lieu de l'accident
+CollateralVictim = Victime collatérale
+PoliceReport = Rapport de police
+CerfaLink = Lien vers le Cerfa
 
 # Email - Mail
 AccidentLabel = Récapitulatif du permis de feu

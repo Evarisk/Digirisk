@@ -137,8 +137,8 @@ if ( $conf->global->DIGIRISKDOLIBARR_FIREPERMIT_PROJECT == 0 || $project->statut
 if ( $conf->global->DIGIRISKDOLIBARR_ACCIDENT_PROJECT == 0 || $project->statut == 2 ) {
 
 	$project->ref         = $projectRef->getNextValue($third_party, $project);
-	$project->title       = $langs->trans('AcciddentInitial') . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
-	$project->description = $langs->trans('AcciddentDescription');
+	$project->title       = $langs->trans('AccidentInitial') . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
+	$project->description = $langs->trans('AccidentDescription');
 	$project->date_c      = dol_now();
 	$currentYear          = dol_print_date(dol_now(),'%Y');
 	$fiscalMonthStart     = $conf->global->SOCIETE_FISCAL_MONTH_START;

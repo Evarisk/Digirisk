@@ -52,8 +52,18 @@ function accidentPrepareHead($object)
 		$head[$h][2] = 'accidentWorkStop';
 		$h++;
 
-		$head[$h][0] = dol_buildpath("/digiriskdolibarr/accident_metadata.php", 1) . '?action=create&id=' . $object->id;
-		$head[$h][1] = '<i class="fas fa-file-signature"></i> ' . $langs->trans("AccidentMetadata");
+		echo '<pre>'; print_r( $object ); echo '</pre>'; exit;
+		
+		
+		$accident = new AccidentMetaData($db);
+		$accident->fetchFromParent($object->id);
+
+		if (empty($accident->id)){
+			$head[$h][0] = dol_buildpath("/digiriskdolibarr/accident_metadata.php", 1) . '?action=create';
+		} else {
+			$head[$h][0] = dol_buildpath("/digiriskdolibarr/accident_metadata.php", 1) . '?&id=' . $object->id;
+		}
+		$head[$h][1] = '<i class="fas fa-info-circle"></i> ' . $langs->trans("AccidentMetadata");
 		$head[$h][2] = 'accidentMetadata';
 		$h++;
 	}

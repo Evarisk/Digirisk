@@ -91,6 +91,7 @@ $refAccidentDetMod   = new $conf->global->DIGIRISKDOLIBARR_ACCIDENTDET_ADDON($db
 
 // Load object
 $accident->fetch($id);
+$object->fetchFromParent($accident->id);
 
 // Load resources
 $allLinks = $digiriskresources->digirisk_dolibarr_fetch_resources();
@@ -672,25 +673,26 @@ if ($action == 'create') {
 
 	print '<table class="border tableforfieldcreate accident-metadata-table">'."\n";
 
-//	//RelativeLocation --
-//	print '<tr><td class="fieldrequired">'.$langs->trans("SenderService").'</td><td>';
-//	print $formother->select_dictionary('sender_service','c_sender_service', 'ref', 'label', 'MAIL', 0);
-//	print '</td></tr>';
+	//RelativeLocation --
+	print '<tr><td class="minwidth400">'.$langs->trans("RelativeLocation").'</td><td>';
+	print '<input class="flat" type="text" size="36" name="relative_location" id="relative_location" value="'.GETPOST('relative_location').'">';
+	print '</td></tr>';
 
 	//LesionLocalization -- Siège des lésions
-	print '<tr><td class="fieldrequired">'.$langs->trans("LesionLocalization").'</td><td>';
+	print '<tr><td class="minwidth400">'.$langs->trans("LesionLocalization").'</td><td>';
 	print $formother->select_dictionary('lesion_localization','c_lesion_localization', 'ref', 'label', '', 0);
 	print '</td></tr>';
 
 	//LesionNature -- Nature des lésions
-	print '<tr><td class="fieldrequired">'.$langs->trans("LesionNature").'</td><td>';
+	print '<tr><td class="minwidth400">'.$langs->trans("LesionNature").'</td><td>';
 	print $formother->select_dictionary('lesion_nature','c_lesion_nature', 'ref', 'label', '', 0);
 	print '</td></tr>';
 
-//	//ThirdPartyResponsability --
-//	print '<tr><td class="fieldrequired">'.$langs->trans("SenderService").'</td><td>';
-//	print $formother->select_dictionary('sender_service','c_sender_service', 'ref', 'label', 'MAIL', 0);
-//	print '</td></tr>';
+	//ThirdPartyResponsability --
+	print '<tr><td class="minwidth400">'.$langs->trans("ThirdPartyResponsability").'</td><td>';
+	print '<input type="checkbox" id="thirdparty_responsability" name="thirdparty_responsability"'.(GETPOST('thirdparty_responsability') ? ' checked=""' : '').'>';
+	print $form->textwithpicto('', $langs->trans(''));
+	print '</td></tr>';
 
 	//Fatal -- Décès
 	print '<tr><td class="minwidth400">'.$langs->trans("Fatal").'</td><td>';
@@ -711,7 +713,7 @@ if ($action == 'create') {
 	print '</td></tr>';
 
 	//AccidentLocation -- Lieu de l'accident
-	print '<tr><td class="fieldrequired">'.$langs->trans("AccidentLocation").'</td><td>';
+	print '<tr><td class="minwidth400">'.$langs->trans("AccidentLocation").'</td><td>';
 	print $formother->select_dictionary('accident_location','c_accident_location', 'ref', 'label', '', 0);
 	print '</td></tr>';
 
@@ -728,7 +730,7 @@ if ($action == 'create') {
 	print '</td></tr>';
 
 	//CerfaLink -- Lien vers le Cerfa
-	print '<tr><td class="fieldrequired minwidth400">'.$langs->trans("CerfaLink").'</td><td>';
+	print '<tr><td class="minwidth400">'.$langs->trans("CerfaLink").'</td><td>';
 	print '<input class="flat" type="text" size="36" name="cerfa_link" id="cerfa_link" value="'.GETPOST('cerfa_link').'">';
 	print '</td></tr>';
 
@@ -951,8 +953,8 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	// ------------------------------------------------------------
 	$res = $object->fetch_optionals();
 
-	$head = accidentPrepareHead($object);
-	print dol_get_fiche_head($head, 'accidentCard', $title, -1, "digiriskdolibarr@digiriskdolibarr");
+	$head = accidentPrepareHead($accident);
+	print dol_get_fiche_head($head, 'accidentMetadata', $title, -1, "digiriskdolibarr@digiriskdolibarr");
 
 	dol_strlen($object->label) ? $morehtmlref = '<span>'. ' - ' .$object->label . '</span>' : '';
 	$morehtmlref .= '<div class="refidno">';
@@ -972,25 +974,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	print '<table class="border centpercent tableforfield">';
 
 	//Unset for order
-	unset($object->fields['label']);
-	unset($object->fields['accident_date']);
 	unset($object->fields['fk_project']);
-
-	//Label -- Libellé
-	print '<tr><td class="titlefield">';
-	print $langs->trans("Label");
-	print '</td>';
-	print '<td>';
-	print $object->label;
-	print '</td></tr>';
-
-	//Accident date -- Date de l'accident
-	print '<tr><td class="titlefield">';
-	print $langs->trans("AccidentDate");
-	print '</td>';
-	print '<td>';
-	print dol_print_date($object->accident_date, 'dayhoursec');
-	print '</td></tr>';
 
 	include DOL_DOCUMENT_ROOT.'/core/tpl/commonfields_view.tpl.php';
 
@@ -1023,246 +1007,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 			}
 		}
 		print '</div>';
-
-		// FIREPERMIT LINES
-		print '<div class="div-table-responsive-no-min" style="overflow-x: unset !important">';
-		print load_fiche_titre($langs->trans("AccidentRiskList"), '', '');
-		print '<table id="tablelines" class="noborder noshadow" width="100%">';
-
-		global $forceall, $forcetoshowtitlelines;
-
-		if (empty($forceall)) $forceall = 0;
-
-		// Define colspan for the button 'Add'
-		$colspan = 3; // Columns: total ht + col edit + col delete
-
-		// Fire permit Lines
-		$accidentlines = $objectline->fetchAll($object->id);
-
-		print '<tr class="liste_titre">';
-		print '<td><span>' . $langs->trans('Ref.') . '</span></td>';
-		print '<td>' . $langs->trans('Location') . '</td>';
-		print '<td>' . $form->textwithpicto($langs->trans('ActionsDescription'), $langs->trans("ActionsDescriptionTooltip")) . '</td>';
-		print '<td class="center">' . $form->textwithpicto($langs->trans('INRSRisk'), $langs->trans('INRSRiskTooltip')) . '</td>';
-		print '<td>' . $form->textwithpicto($langs->trans('UsedMaterial'), $langs->trans('UsedMaterialTooltip')) . '</td>';
-		print '<td class="center" colspan="' . $colspan . '">' . $langs->trans('ActionsAccidentRisk') . '</td>';
-		print '</tr>';
-
-		if (!empty($accidentlines) && $accidentlines > 0) {
-			foreach ($accidentlines as $key => $item) {
-				if ($action == 'editline' && $lineid == $key) {
-					print '<form method="POST" action="' . $_SERVER["PHP_SELF"] . '?id=' . $object->id . '">';
-					print '<input type="hidden" name="token" value="' . newToken() . '">';
-					print '<input type="hidden" name="action" value="updateLine">';
-					print '<input type="hidden" name="backtopage" value="' . $backtopage . '">';
-					print '<input type="hidden" name="lineid" value="' . $item->id . '">';
-					print '<input type="hidden" name="parent_id" value="' . $object->id . '">';
-
-					print '<tr>';
-					print '<td>';
-					print $item->ref;
-					print '</td>';
-
-					print '<td class="bordertop nobottom linecollocation">';
-					print $digiriskelement->select_digiriskelement_list($item->fk_element, 'fk_element', '', '', 0, 0, array(), '', 0, 0, 'minwidth100', GETPOST('id'), false, 1);
-					print '</td>';
-
-					$coldisplay++;
-					print '<td>';
-					print '<textarea name="actionsdescription" class="minwidth150" cols="50" rows="' . ROWS_2 . '">' . $item->description . '</textarea>' . "\n";
-					print '</td>';
-
-					$coldisplay++;
-					print '<td  class="center">'; ?>
-					<div class="wpeo-dropdown dropdown-large dropdown-grid category-danger padding">
-						<div class="dropdown-toggle dropdown-add-button button-cotation">
-							<input class="input-hidden-danger" type="hidden" name="risk_category_id"
-								   value="<?php echo $item->category ?>"/>
-							<div class="wpeo-dropdown dropdown-large category-danger padding wpeo-tooltip-event"
-								 aria-label="<?php echo $risk->get_fire_permit_danger_category_name($item) ?>">
-								<img class="danger-category-pic hover"
-									 src="<?php echo DOL_URL_ROOT . '/custom/digiriskdolibarr/img/typeDeTravaux/' . $risk->get_fire_permit_danger_category($item) . '.png'; ?>"/>
-							</div>
-						</div>
-
-						<ul class="dropdown-content wpeo-gridlayout grid-5 grid-gap-0">
-							<?php
-							$dangerCategories = $risk->get_fire_permit_danger_categories();
-							if (!empty($dangerCategories)) :
-								foreach ($dangerCategories as $dangerCategory) : ?>
-									<li class="item dropdown-item wpeo-tooltip-event"
-										ata-is-preset="<?php echo ''; ?>"
-										data-id="<?php echo $dangerCategory['position'] ?>"
-										aria-label="<?php echo $dangerCategory['name'] ?>">
-										<img
-											src="<?php echo DOL_URL_ROOT . '/custom/digiriskdolibarr/img/typeDeTravaux/' . $dangerCategory['thumbnail_name'] . '.png' ?>"
-											class="attachment-thumbail size-thumbnail photo photowithmargin" alt="">
-									</li>
-								<?php endforeach;
-							endif; ?>
-						</ul>
-					</div>
-					<?php
-					print '</td>';
-
-					$coldisplay++;
-					print '<td>';
-					print '<textarea name="use_equipment" class="minwidth150" cols="50" rows="' . ROWS_2 . '">' . $item->use_equipment . '</textarea>' . "\n";
-					print '</td>';
-
-					$coldisplay += $colspan;
-					print '<td class="center" colspan="' . $colspan . '">';
-					print '<input type="submit" class="button" value="' . $langs->trans('Save') . '" name="updateLine" id="updateLine">';
-					print '</td>';
-					print '</tr>';
-
-					if (is_object($objectline)) {
-						print $objectline->showOptionals($extrafields, 'edit', array('style' => $bcnd[$var], 'colspan' => $coldisplay), '', '', 1);
-					}
-					print '</form>';
-				} else {
-					print '<td>';
-					print $item->ref;
-					print '</td>';
-
-					print '<td>';
-					$digiriskelement->fetch($item->fk_element);
-					print $digiriskelement->ref . " - " . $digiriskelement->label;
-					print '</td>';
-
-					$coldisplay++;
-					print '<td>';
-					print $item->description;
-					print '</td>';
-
-					$coldisplay++;
-					print '<td class="center">'; ?>
-					<div class="table-cell table-50 cell-risk" data-title="Risque">
-						<div class="wpeo-dropdown dropdown-large category-danger padding wpeo-tooltip-event"
-							 aria-label="<?php echo $risk->get_fire_permit_danger_category_name($item) ?>">
-							<img class="danger-category-pic hover"
-								 src="<?php echo DOL_URL_ROOT . '/custom/digiriskdolibarr/img/typeDeTravaux/' . $risk->get_fire_permit_danger_category($item) . '.png'; ?>"
-								 alt=""/>
-						</div>
-					</div>
-					<?php
-					print '</td>';
-
-					$coldisplay++;
-					print '<td>';
-					print $item->use_equipment;
-					print '</td>';
-
-					$coldisplay += $colspan;
-
-					//Actions buttons
-					if ($object->status == 1) {
-						print '<td class="center">';
-						$coldisplay++;
-						print '<a href="' . $_SERVER["PHP_SELF"] . '?id=' . $id . '&amp;action=editline&amp;lineid=' . $item->id . '" style="padding-right: 20px"><i class="fas fa-pencil-alt" style="color: #666"></i></a>';
-						print '<a href="' . $_SERVER["PHP_SELF"] . '?id=' . $id . '&amp;action=deleteline&amp;lineid=' . $item->id . '">';
-						print img_delete();
-						print '</a>';
-						print '</td>';
-					} else {
-						print '<td class="center">';
-						print '-';
-						print '</td>';
-					}
-
-					if (is_object($objectline)) {
-						print $objectline->showOptionals($extrafields, 'edit', array('style' => $bcnd[$var], 'colspan' => $coldisplay), '', '', 1);
-					}
-					print '</tr>';
-				}
-			}
-			print '</tr>';
-		}
-		if ($object->status == 1 && $permissiontoadd) {
-			print '<form method="POST" action="' . $_SERVER["PHP_SELF"] . '?id=' . $object->id . '">';
-			print '<input type="hidden" name="token" value="' . newToken() . '">';
-			print '<input type="hidden" name="action" value="addLine">';
-			print '<input type="hidden" name="backtopage" value="' . $backtopage . '">';
-			print '<input type="hidden" name="parent_id" value="' . $object->id . '">';
-
-			print '<tr>';
-			print '<td>';
-			print $refAccidentDetMod->getNextValue($objectline);
-			print '</td>';
-			print '<td>';
-			print $digiriskelement->select_digiriskelement_list('', 'fk_element', '', '', 0, 0, array(), '', 0, 0, 'minwidth100', GETPOST('id'), false, 1);
-			print '</td>';
-
-			$coldisplay++;
-			print '<td>';
-			print '<textarea name="actionsdescription" class="minwidth150" cols="50" rows="' . ROWS_2 . '">' . ('') . '</textarea>' . "\n";
-			print '</td>';
-
-			$coldisplay++;
-			print '<td class="center">'; ?>
-			<div class="wpeo-dropdown dropdown-large dropdown-grid category-danger padding">
-				<input class="input-hidden-danger" type="hidden" name="risk_category_id" value="undefined"/>
-				<div class="dropdown-toggle dropdown-add-button button-cotation">
-				<span class="wpeo-button button-square-50 button-grey"><i
-						class="fas fa-exclamation-triangle button-icon"></i><i
-						class="fas fa-plus-circle button-add"></i></span>
-					<img class="danger-category-pic wpeo-tooltip-event hidden" src="" aria-label=""/>
-				</div>
-				<ul class="dropdown-content wpeo-gridlayout grid-5 grid-gap-0">
-					<?php
-					$dangerCategories = $risk->get_fire_permit_danger_categories();
-					if (!empty($dangerCategories)) :
-						foreach ($dangerCategories as $dangerCategory) : ?>
-							<li class="item dropdown-item wpeo-tooltip-event" data-is-preset="<?php echo ''; ?>"
-								data-id="<?php echo $dangerCategory['position'] ?>"
-								aria-label="<?php echo $dangerCategory['name'] ?>">
-								<img
-									src="<?php echo DOL_URL_ROOT . '/custom/digiriskdolibarr/img/typeDeTravaux/' . $dangerCategory['thumbnail_name'] . '.png' ?>"
-									class="attachment-thumbail size-thumbnail photo photowithmargin" alt="">
-							</li>
-						<?php endforeach;
-					endif; ?>
-				</ul>
-			</div>
-			<?php
-			print '</td>';
-
-			$coldisplay++;
-			print '<td>';
-			print '<textarea name="use_equipment" class="minwidth150" cols="50" rows="' . ROWS_2 . '">' . ('') . '</textarea>' . "\n";
-			print '</td>';
-
-			$coldisplay += $colspan;
-			print '<td class="center" colspan="' . $colspan . '">';
-			print '<input type="submit" class="button" value="' . $langs->trans('Add') . '" name="addline" id="addline">';
-			print '</td>';
-			print '</tr>';
-
-			if (is_object($objectline)) {
-				print $objectline->showOptionals($extrafields, 'edit', array('style' => $bcnd[$var], 'colspan' => $coldisplay), '', '', 1);
-			}
-			print '</form>';
-		}
-		print '</table>';
-		print '</div>';
 	}
-	// Document Generation -- Génération des documents
-	$includedocgeneration = 0;
-	if ($includedocgeneration) {
-		print '<div class="fichecenter"><div class="accidentDocument fichehalfleft">';
-
-		$objref = dol_sanitizeFileName($object->ref);
-		$dir_files = $accidentdocument->element . '/' . $objref;
-		$filedir = $upload_dir . '/' . $dir_files;
-		$urlsource = $_SERVER["PHP_SELF"] . '?id='. $id;
-
-		$modulepart = 'digiriskdolibarr:AccidentDocument';
-		$defaultmodel = $conf->global->DIGIRISKDOLIBARR_ACCIDENTDOCUMENT_DEFAULT_MODEL;
-		$title = $langs->trans('AccidentDocument');
-
-		print digiriskshowdocuments($modulepart, $dir_files, $filedir, $urlsource, $permissiontoadd, $permissiontodelete, $defaultmodel, 1, 0, 28, 0, '', $title, '', $langs->defaultlang, '', $accidentdocument, 0, 'remove_file', $object->status == 3, $langs->trans('AccidentMustBeLocked'));
-	}
-
 	if ($permissiontoadd) {
 		print '</div><div class="fichehalfright">';
 	} else {
@@ -1281,183 +1026,6 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	$somethingshown = $formactions->showactions($object, $object->element . '@digiriskdolibarr', '', 1, '', $MAXEVENT, '', $morehtmlright);
 
 	print '</div></div></div>';
-
-	// Presend form
-	$labour_inspector = $digiriskresources->fetchResourcesFromObject('FP_LABOUR_INSPECTOR', $object);
-	$labour_inspector_id = $labour_inspector->id;
-	$thirdparty->fetch($labour_inspector_id);
-	$object->thirdparty = $thirdparty;
-
-	$modelmail = 'accident';
-	$defaulttopic = 'Information';
-	$diroutput = $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/' . $object->element . 'document';
-	$ref = $object->ref . '/';
-	$trackid = 'thi'.$object->id;
-
-	if ($action == 'presend') {
-		$langs->load("mails");
-
-		$titreform = 'SendMail';
-
-		$object->fetch_projet();
-
-		if (!in_array($object->element, array('societe', 'user', 'member'))) {
-			$ref = dol_sanitizeFileName($object->ref);
-			include_once DOL_DOCUMENT_ROOT.'/core/lib/files.lib.php';
-			$fileparams = dol_most_recent_file($diroutput.'/'.$ref, '');
-			$file = $fileparams['fullname'];
-		}
-
-		// Define output language
-		$outputlangs = $langs;
-		$newlang = '';
-		if ($conf->global->MAIN_MULTILANGS && empty($newlang) && !empty($_REQUEST['lang_id'])) {
-			$newlang = $_REQUEST['lang_id'];
-		}
-		if ($conf->global->MAIN_MULTILANGS && empty($newlang)) {
-			$newlang = $object->thirdparty->default_lang;
-		}
-
-		if (!empty($newlang)) {
-			$outputlangs = new Translate('', $conf);
-			$outputlangs->setDefaultLang($newlang);
-			// Load traductions files required by page
-			$outputlangs->loadLangs(array('digiriskdolibarr'));
-		}
-
-		$topicmail = '';
-		if (empty($object->ref_client)) {
-			$topicmail = $outputlangs->trans($defaulttopic, '__REF__');
-		} elseif (!empty($object->ref_client)) {
-			$topicmail = $outputlangs->trans($defaulttopic, '__REF__ (__REFCLIENT__)');
-		}
-
-		// Build document if it not exists
-		$forcebuilddoc = true;
-		if ($forcebuilddoc) {   // If there is no default value for supplier invoice, we do not generate file, even if modelpdf was set by a manual generation
-			if ((!$file || !is_readable($file)) && method_exists($object, 'generateDocument')) {
-				$result = $object->generateDocument(GETPOST('model') ? GETPOST('model') : $object->model_pdf, $outputlangs, $hidedetails, $hidedesc, $hideref);
-				if ($result < 0) {
-					dol_print_error($db, $object->error, $object->errors);
-					exit();
-				}
-				$fileparams = dol_most_recent_file($diroutput.'/'.$ref, preg_quote($ref, '/').'[^\-]+');
-				$file = $fileparams['fullname'];
-			}
-		}
-
-		print '<div id="formmailbeforetitle" name="formmailbeforetitle"></div>';
-		print '<div class="clearboth"></div>';
-		print '<br>';
-		print load_fiche_titre($langs->trans($titreform));
-
-		print dol_get_fiche_head('');
-
-		// Create form for email
-		include_once DOL_DOCUMENT_ROOT.'/core/class/html.formmail.class.php';
-		$formmail = new FormMail($db);
-		$maitre_oeuvre = $signatory->fetchSignatory('FP_MAITRE_OEUVRE', $object->id);
-		$maitre_oeuvre = array_shift($maitre_oeuvre);
-
-		$formmail->param['langsmodels'] = (empty($newlang) ? $langs->defaultlang : $newlang);
-		$formmail->fromtype      = (GETPOST('fromtype') ?GETPOST('fromtype') : (!empty($conf->global->MAIN_MAIL_DEFAULT_FROMTYPE) ? $conf->global->MAIN_MAIL_DEFAULT_FROMTYPE : 'user'));
-		$formmail->fromid        = $maitre_oeuvre->id;
-		$formmail->trackid       = $trackid;
-		$formmail->fromname      = $maitre_oeuvre->firstname . ' ' . $maitre_oeuvre->lastname;
-		$formmail->frommail      = $maitre_oeuvre->email;
-		$formmail->fromalsorobot = 1;
-		$formmail->withfrom      = 1;
-
-		// Fill list of recipient with email inside <>.
-		$liste = array();
-
-		$labour_inspector_contact = $digiriskresources->fetchResourcesFromObject('FP_LABOUR_INSPECTOR_ASSIGNED', $object);
-
-		if (!empty($object->socid) && $object->socid > 0 && !is_object($object->thirdparty) && method_exists($object, 'fetch_thirdparty')) {
-			$object->fetch_thirdparty();
-		}
-		if (is_object($object->thirdparty)) {
-			foreach ($object->thirdparty->thirdparty_and_contact_email_array(1) as $key => $value) {
-				$liste[$key] = $value;
-			}
-		}
-
-		if (!empty($conf->global->MAIN_MAIL_ENABLED_USER_DEST_SELECT)) {
-			$listeuser = array();
-			$fuserdest = new User($db);
-
-			$result = $fuserdest->fetchAll('ASC', 't.lastname', 0, 0, array('customsql'=>'t.statut=1 AND t.employee=1 AND t.email IS NOT NULL AND t.email<>\'\''), 'AND', true);
-			if ($result > 0 && is_array($fuserdest->users) && count($fuserdest->users) > 0) {
-				foreach ($fuserdest->users as $uuserdest) {
-					$listeuser[$uuserdest->id] = $uuserdest->user_get_property($uuserdest->id, 'email');
-				}
-			} elseif ($result < 0) {
-				setEventMessages(null, $fuserdest->errors, 'errors');
-			}
-			if (count($listeuser) > 0) {
-				$formmail->withtouser = $listeuser;
-				$formmail->withtoccuser = $listeuser;
-			}
-		}
-
-
-		$withto = array($labour_inspector_contact->id => $labour_inspector_contact->firstname . ' ' .$labour_inspector_contact->lastname." <".$labour_inspector_contact->email.">");
-
-		$formmail->withto = $withto;
-		$formmail->withtofree = (GETPOSTISSET('sendto') ? (GETPOST('sendto', 'alphawithlgt') ? GETPOST('sendto', 'alphawithlgt') : '1') : '1');
-		$formmail->withtocc = $liste;
-		$formmail->withtoccc = $conf->global->MAIN_EMAIL_USECCC;
-		$formmail->withtopic = $topicmail;
-		$formmail->withfile = 2;
-		$formmail->withbody = 1;
-		$formmail->withdeliveryreceipt = 1;
-		$formmail->withcancel = 1;
-
-		//$arrayoffamiliestoexclude=array('system', 'mycompany', 'object', 'objectamount', 'date', 'user', ...);
-		if (!isset($arrayoffamiliestoexclude)) $arrayoffamiliestoexclude = null;
-
-		// Make substitution in email content
-		$substitutionarray = getCommonSubstitutionArray($outputlangs, 0, $arrayoffamiliestoexclude, $object);
-		$substitutionarray['__CHECK_READ__'] = (is_object($object) && is_object($object->thirdparty)) ? '<img src="'.DOL_MAIN_URL_ROOT.'/public/emailing/mailing-read.php?tag='.$object->thirdparty->tag.'&securitykey='.urlencode($conf->global->MAILING_EMAIL_UNSUBSCRIBE_KEY).'" width="1" height="1" style="width:1px;height:1px" border="0"/>' : '';
-		$substitutionarray['__PERSONALIZED__'] = ''; // deprecated
-		$substitutionarray['__CONTACTCIVNAME__'] = '';
-		$parameters = array(
-			'mode' => 'formemail'
-		);
-		complete_substitutions_array($substitutionarray, $outputlangs, $object, $parameters);
-
-		// Find the good contact address
-		$tmpobject = $object;
-
-		$contactarr = array();
-		$contactarr = $tmpobject->liste_contact(-1, 'external');
-
-		if (is_array($contactarr) && count($contactarr) > 0) {
-			require_once DOL_DOCUMENT_ROOT.'/contact/class/contact.class.php';
-			$contactstatic = new Contact($db);
-
-			foreach ($contactarr as $contact) {
-				$contactstatic->fetch($contact['id']);
-				$substitutionarray['__CONTACT_NAME_'.$contact['code'].'__'] = $contactstatic->getFullName($outputlangs, 1);
-			}
-		}
-
-		// Array of substitutions
-		$formmail->substit = $substitutionarray;
-
-		// Array of other parameters
-		$formmail->param['action'] = 'send';
-		$formmail->param['models'] = $modelmail;
-		$formmail->param['models_id'] = GETPOST('modelmailselected', 'int');
-		$formmail->param['id'] = $object->id;
-		$formmail->param['returnurl'] = $_SERVER["PHP_SELF"].'?id='.$object->id;
-		$formmail->param['fileinit'] = array($file);
-
-		// Show form
-		print $formmail->get_form();
-
-		print dol_get_fiche_end();
-	}
 }
 
 // End of page
