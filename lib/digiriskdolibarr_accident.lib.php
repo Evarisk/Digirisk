@@ -52,14 +52,12 @@ function accidentPrepareHead($object)
 		$head[$h][2] = 'accidentWorkStop';
 		$h++;
 
-		echo '<pre>'; print_r( $object ); echo '</pre>'; exit;
-		
-		
 		$accident = new AccidentMetaData($db);
-		$accident->fetchFromParent($object->id);
+		$accident_data = $accident->fetchFromParent($object->id);
+		$accident_data = array_shift($accident_data);
 
-		if (empty($accident->id)){
-			$head[$h][0] = dol_buildpath("/digiriskdolibarr/accident_metadata.php", 1) . '?action=create';
+		if (empty($accident_data->id)){
+			$head[$h][0] = dol_buildpath("/digiriskdolibarr/accident_metadata.php", 1) . '?action=create&id=' . $object->id;
 		} else {
 			$head[$h][0] = dol_buildpath("/digiriskdolibarr/accident_metadata.php", 1) . '?&id=' . $object->id;
 		}

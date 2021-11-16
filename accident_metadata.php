@@ -71,8 +71,8 @@ $backtopageforcancel = GETPOST('backtopageforcancel', 'alpha');
 $fk_parent           = GETPOST('fk_parent', 'int');
 
 // Initialize technical objects
-$object              = new AccidentMetaData($db);
-$accident            = new Accident($db);
+$object              = new Accident($db);
+$accident            = new AccidentMetaData($db);
 $preventionplan      = new PreventionPlan($db);
 $preventionplanline  = new PreventionPlanLine($db);
 $signatory           = new AccidentSignature($db);
@@ -90,8 +90,7 @@ $refAccidentMod      = new $conf->global->DIGIRISKDOLIBARR_ACCIDENT_ADDON($db);
 $refAccidentDetMod   = new $conf->global->DIGIRISKDOLIBARR_ACCIDENTDET_ADDON($db);
 
 // Load object
-$accident->fetch($id);
-$object->fetchFromParent($accident->id);
+$object->fetch($id);
 
 // Load resources
 $allLinks = $digiriskresources->digirisk_dolibarr_fetch_resources();
@@ -953,7 +952,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	// ------------------------------------------------------------
 	$res = $object->fetch_optionals();
 
-	$head = accidentPrepareHead($accident);
+	$head = accidentPrepareHead($object);
 	print dol_get_fiche_head($head, 'accidentMetadata', $title, -1, "digiriskdolibarr@digiriskdolibarr");
 
 	dol_strlen($object->label) ? $morehtmlref = '<span>'. ' - ' .$object->label . '</span>' : '';
@@ -975,6 +974,8 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 
 	//Unset for order
 	unset($object->fields['fk_project']);
+
+	$object = $accident;
 
 	include DOL_DOCUMENT_ROOT.'/core/tpl/commonfields_view.tpl.php';
 
