@@ -15,4 +15,3 @@
 
 ALTER TABLE llx_digiriskdolibarr_accidentdet ADD INDEX idx_digiriskdolibarr_accidentdet_rowid (rowid);
 ALTER TABLE llx_digiriskdolibarr_accidentdet ADD INDEX idx_digiriskdolibarr_accidentdet_ref_ext (ref_ext);
-ALTER TABLE llx_digiriskdolibarr_accidentdet ADD CONSTRAINT llx_digiriskdolibarr_accidentdet_fk_user_creat FOREIGN KEY (fk_user_creat) REFERENCES llx_user(rowid);

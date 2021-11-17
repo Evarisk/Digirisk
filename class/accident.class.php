@@ -78,21 +78,22 @@ class Accident extends CommonObject
 	 * @var array  Array with all fields and their property. Do not use it as a static var. It may be modified by constructor.
 	 */
 	public $fields=array(
-		'rowid'                => array('type'=>'integer', 'label'=>'TechnicalID', 'enabled'=>'1', 'position'=>1, 'notnull'=>1, 'visible'=>0, 'noteditable'=>'1', 'index'=>1, 'comment'=>"Id"),
-		'ref'                  => array('type'=>'varchar(128)', 'label'=>'Ref', 'enabled'=>'1', 'position'=>10, 'notnull'=>1, 'visible'=>1, 'noteditable'=>'1', 'default'=>'(PROV)', 'index'=>1, 'searchall'=>1, 'showoncombobox'=>'1', 'comment'=>"Reference of object"),
-		'ref_ext'              => array('type'=>'varchar(128)', 'label'=>'RefExt', 'enabled'=>'1', 'position'=>20, 'notnull'=>0, 'visible'=>0,),
-		'entity'               => array('type'=>'integer', 'label'=>'Entity', 'enabled'=>'1', 'position'=>30, 'notnull'=>1, 'visible'=>0,),
-		'date_creation'        => array('type'=>'datetime', 'label'=>'DateCreation', 'enabled'=>'1', 'position'=>40, 'notnull'=>1, 'visible'=>0,),
-		'tms'                  => array('type'=>'timestamp', 'label'=>'DateModification', 'enabled'=>'1', 'position'=>50, 'notnull'=>0, 'visible'=>0,),
-		'status'               => array('type'=>'smallint', 'label'=>'Status', 'enabled'=>'1', 'position'=>70, 'notnull'=>0, 'visible'=>1, 'index'=>0,),
-		'label'                => array('type'=>'varchar(255)', 'label'=>'Label', 'enabled'=>'1', 'position'=>80, 'notnull'=>0, 'visible'=>1, 'searchall'=>1, 'css'=>'minwidth200', 'help'=>"Help text", 'showoncombobox'=>'1',),
-		'accident_date'        => array('type'=>'datetime', 'label'=>'AccidentDate', 'enabled'=>'1', 'position'=>90, 'notnull'=>-1, 'visible'=>1,),
-		'description'          => array('type'=>'text', 'label'=>'Description', 'enabled'=>'1', 'position'=>100, 'notnull'=>-1, 'visible'=>1,),
-		'photo'                => array('type'=>'text', 'label'=>'Photo', 'enabled'=>'1', 'position'=>110, 'notnull'=>-1, 'visible'=>1,),
-		'fk_user_creat'        => array('type'=>'integer:User:user/class/user.class.php', 'label'=>'UserAuthor', 'enabled'=>'1', 'position'=>120, 'notnull'=>1, 'visible'=>0, 'foreignkey'=>'user.rowid',),
-		'fk_user_modif'        => array('type'=>'integer:User:user/class/user.class.php', 'label'=>'UserModif', 'enabled'=>'1', 'position'=>130, 'notnull'=>-1, 'visible'=>0,),
-		'fk_element'           => array('type'=>'integer', 'label'=>'Element', 'enabled'=>'1', 'position'=>140, 'notnull'=>-1, 'visible'=>-2,),
-		'fk_user_victim'       => array('type'=>'integer', 'label'=>'UserVictim', 'enabled'=>'1', 'position'=>150, 'notnull'=>-1, 'visible'=>-2,),
+		'rowid'          => array('type'=>'integer', 'label'=>'TechnicalID', 'enabled'=>'1', 'position'=>1, 'notnull'=>1, 'visible'=>0, 'noteditable'=>'1', 'index'=>1, 'comment'=>"Id"),
+		'ref'            => array('type'=>'varchar(128)', 'label'=>'Ref', 'enabled'=>'1', 'position'=>10, 'notnull'=>1, 'visible'=>1, 'noteditable'=>'1', 'default'=>'(PROV)', 'index'=>1, 'searchall'=>1, 'showoncombobox'=>'1', 'comment'=>"Reference of object"),
+		'ref_ext'        => array('type'=>'varchar(128)', 'label'=>'RefExt', 'enabled'=>'1', 'position'=>20, 'notnull'=>0, 'visible'=>0,),
+		'entity'         => array('type'=>'integer', 'label'=>'Entity', 'enabled'=>'1', 'position'=>30, 'notnull'=>1, 'visible'=>0,),
+		'date_creation'  => array('type'=>'datetime', 'label'=>'DateCreation', 'enabled'=>'1', 'position'=>40, 'notnull'=>1, 'visible'=>0,),
+		'tms'            => array('type'=>'timestamp', 'label'=>'DateModification', 'enabled'=>'1', 'position'=>50, 'notnull'=>0, 'visible'=>0,),
+		'status'         => array('type'=>'smallint', 'label'=>'Status', 'enabled'=>'1', 'position'=>70, 'notnull'=>0, 'visible'=>1, 'index'=>0,),
+		'label'          => array('type'=>'varchar(255)', 'label'=>'Label', 'enabled'=>'1', 'position'=>80, 'notnull'=>0, 'visible'=>1, 'searchall'=>1, 'css'=>'minwidth200', 'help'=>"Help text", 'showoncombobox'=>'1',),
+		'accident_date'  => array('type'=>'datetime', 'label'=>'AccidentDate', 'enabled'=>'1', 'position'=>90, 'notnull'=>-1, 'visible'=>1,),
+		'description'    => array('type'=>'text', 'label'=>'Description', 'enabled'=>'1', 'position'=>100, 'notnull'=>-1, 'visible'=>1,),
+		'photo'          => array('type'=>'text', 'label'=>'Photo', 'enabled'=>'1', 'position'=>110, 'notnull'=>-1, 'visible'=>1,),
+		'fk_project'     => array('type'=>'integer', 'label'=>'FKProject', 'enabled'=>'1', 'position'=>120, 'notnull'=>1, 'visible'=>0,),
+		'fk_user_creat'  => array('type'=>'integer:User:user/class/user.class.php', 'label'=>'UserAuthor', 'enabled'=>'1', 'position'=>130, 'notnull'=>1, 'visible'=>0, 'foreignkey'=>'user.rowid',),
+		'fk_user_modif'  => array('type'=>'integer:User:user/class/user.class.php', 'label'=>'UserModif', 'enabled'=>'1', 'position'=>140, 'notnull'=>-1, 'visible'=>0,),
+		'fk_element'     => array('type'=>'integer', 'label'=>'Element', 'enabled'=>'1', 'position'=>150, 'notnull'=>-1, 'visible'=>-2,),
+		'fk_user_victim' => array('type'=>'integer', 'label'=>'UserVictim', 'enabled'=>'1', 'position'=>160, 'notnull'=>-1, 'visible'=>-2,),
 	);
 
 	public $rowid;
@@ -1123,7 +1124,7 @@ class AccidentSignature extends DigiriskSignature
  *	Class to manage accident metadata.
  *  Saved into database table llx_accident_metadata
  */
-class AccidentMetaData extends Accident
+class AccidentMetaData extends CommonObject
 {
 	/**
 	 * @var int  Does this object support multicompany module ?

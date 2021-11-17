@@ -589,6 +589,7 @@ AccidentInitial = ACC
 AccidentDescription = Projet des accidents
 AccidentManagement = Gestion des accidents
 ACCProject = Projet lié aux accidents
+UserVictim = Victime de l'accident
 AccidentMetadata = Données complémentaires
 LesionLocalization = Siège des lésions
 LesionNature = Nature des lésions
