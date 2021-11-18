@@ -162,7 +162,7 @@ if ( $conf->global->DIGIRISKDOLIBARR_READERGROUP_SET ==  0 ) {
 
 	$usergroup = new UserGroup($db);
 	$usergroup->entity = $conf->entity;
-	$usergroup->name = $langs->trans('DigiriskReaderGroup');
+	$usergroup->name = $conf->global->MAIN_INFO_SOCIETE_NOM . ' - ' . $langs->trans('DigiriskReaderGroup');
 	$usergroup->note = $langs->trans('DigiriskReaderGroupDescription');
 
 	$usergroup_id = $usergroup->create($user);
@@ -196,7 +196,7 @@ if ( $conf->global->DIGIRISKDOLIBARR_USERGROUP_SET ==  0 ) {
 
 	$usergroup = new UserGroup($db);
 	$usergroup->entity = $conf->entity;
-	$usergroup->name = $langs->trans('DigiriskUserGroup');
+	$usergroup->name = $conf->global->MAIN_INFO_SOCIETE_NOM . ' - ' . $langs->trans('DigiriskUserGroup');
 	$usergroup->note = $langs->trans('DigiriskUserGroupDescription');
 
 	$usergroup_id = $usergroup->create($user);
@@ -276,7 +276,7 @@ if ( $conf->global->DIGIRISKDOLIBARR_ADMINUSERGROUP_SET ==  0 ) {
 
 	$usergroup = new UserGroup($db);
 	$usergroup->entity = $conf->entity;
-	$usergroup->name   = $langs->trans('DigiriskAdminUserGroup');
+	$usergroup->name   = $conf->global->MAIN_INFO_SOCIETE_NOM . ' - ' . $langs->trans('DigiriskAdminUserGroup');
 	$usergroup->note   = $langs->trans('DigiriskAdminUserGroupDescription');
 
 	$usergroup_id = $usergroup->create($user);
