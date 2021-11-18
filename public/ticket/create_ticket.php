@@ -307,17 +307,17 @@ if (!empty($registerCategory) && $registerCategory > 0) {
 				print '<div class="ticket-register" id="' . $register->id . '">';
 			}
 
-			if ($register->label == $langs->trans('SST')) {
+			if ($register->label == $langs->transnoentities('SST')) {
 				print '<div class="wpeo-button button-blue">';
 				show_category_image($register, $upload_dir);
 				print '<span class="button-label">' . $register->label . '</span>';
 				print '</div>';
-			} elseif ($register->label == $langs->trans('Accident')) {
+			} elseif ($register->label == $langs->transnoentities('Accident')) {
 				print '<div class="wpeo-button button-yellow">';
 				show_category_image($register, $upload_dir);
 				print '<span class="button-label">' . $register->label . '</span>';
 				print '</div>';
-			} elseif ($register->label == $langs->trans('DGI')) {
+			} elseif ($register->label == $langs->transnoentities('DGI')) {
 				print '<div class="wpeo-button button-red">';
 				show_category_image($register, $upload_dir);
 				print '<span class="button-label">' . $register->label . '</span>';
