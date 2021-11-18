@@ -616,4 +616,28 @@ class DigiriskElement extends CommonObject
 
 		return $result;
 	}
+	
+	/**
+	 * 	Return list of deleted elements
+	 *
+	 * 	@param	bool   $only_ids
+	 * 	@return	array  Array with ids
+	 */
+	function getTrashList($only_ids = true)
+	{
+		global $conf, $langs, $user, $hookmanager;
+		$objects = $this->fetchAll('',  'rank',  0,  0);
+		$recurse_tree = recurse_tree($this->id, 0, $objects);
+		$ids = [];
+
+		array_walk_recursive($recurse_tree, 	function($item, $key) use (&$ids) {
+			if (is_object($item)) {
+				$ids[ $item->id] = $item->id;
+			}
+		}, $ids);
+
+		return $ids;
+	}
+
+
 }
