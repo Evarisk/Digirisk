@@ -150,7 +150,9 @@
 
 	$advanced_method_cotation_json  = file_get_contents(DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/js/json/default.json');
 	$advanced_method_cotation_array = json_decode($advanced_method_cotation_json, true);
-
+	$digiriskelement = new DigiriskElement($db);
+	$digiriskelement->fetch($conf->global->DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH);
+	$trashList = $digiriskelement->getTrashList();
 	// Build and execute select
 	// --------------------------------------------------------------------
 	if (!preg_match('/(evaluation)/', $sortfield)) {
@@ -169,13 +171,18 @@
 		$sql .= preg_replace('/^,/', '', $hookmanager->resPrint);
 		$sql = preg_replace('/,\s*$/', '', $sql);
 		$sql .= " FROM ".MAIN_DB_PREFIX.$risk->table_element." as t";
+		$sql .= " LEFT JOIN ".MAIN_DB_PREFIX.$digiriskelement->table_element." as e on (t.fk_element = e.rowid)";
 		if (is_array($extrafields->attributes[$risk->table_element]['label']) && count($extrafields->attributes[$risk->table_element]['label'])) $sql .= " LEFT JOIN ".MAIN_DB_PREFIX.$risk->table_element."_extrafields as ef on (t.rowid = ef.fk_object)";
 		if ($risk->ismultientitymanaged == 1) $sql .= " WHERE t.entity IN (".getEntity($risk->element).")";
 		else $sql .= " WHERE 1 = 1";
 		if (!$allRisks) {
 			$sql .= " AND fk_element = ".$id;
 		} else {
+			foreach ($trashList as $deleted_element => $element_id) {
+				$sql .= " AND fk_element !=" . $element_id;
+			}
 			$sql .= " AND fk_element > 0 ";
+			$sql .= " AND e.entity IN (".getEntity($risk->element).") ";
 		}
 
 		foreach ($search as $key => $val)
@@ -250,13 +257,21 @@
 		$sql = preg_replace('/,\s*$/', '', $sql);
 		$sql .= " FROM ".MAIN_DB_PREFIX.$evaluation->table_element." as evaluation";
 		$sql .= " LEFT JOIN ".MAIN_DB_PREFIX.$risk->table_element." as r on (evaluation.fk_risk = r.rowid)";
+		$sql .= " LEFT JOIN ".MAIN_DB_PREFIX.$digiriskelement->table_element." as e on (r.fk_element = e.rowid)";
 		if (is_array($extrafields->attributes[$evaluation->table_element]['label']) && count($extrafields->attributes[$evaluation->table_element]['label'])) $sql .= " LEFT JOIN ".MAIN_DB_PREFIX.$evaluation->table_element."_extrafields as ef on (evaluation.rowid = ef.fk_object)";
 		if ($evaluation->ismultientitymanaged == 1) $sql .= " WHERE evaluation.entity IN (".getEntity($evaluation->element).")";
 		else $sql .= " WHERE 1 = 1";
 		$sql .= " AND evaluation.status = 1";
 		if (!$allRisks) {
 			$sql .= " AND r.fk_element =" . $id;
+		} else {
+			foreach ($trashList as $deleted_element => $element_id) {
+				$sql .= " AND r.fk_element !=" . $element_id;
+			}
+			$sql .= " AND r.fk_element > 0";
+			$sql .= " AND e.entity IN (".getEntity($evaluation->element).")";
 		}
+
 		foreach ($search as $key => $val)
 		{
 			if ($key == 'status' && $search[$key] == -1) continue;
@@ -652,7 +667,7 @@
 	<?php endif; ?>
 	<?php endif; ?>
 	<?php $title = $langs->trans('DigiriskElementRisksList');
-	print_barre_liste($title, $page, $_SERVER["PHP_SELF"], $param, $sortfield, $sortorder, $massactionbutton, $num, $nbtotalofrecords, 'digiriskdolibarr32px.png@digiriskdolibarr', 0, $newcardbutton, '', $limit, 0, 0, 1);
+	print_barre_liste($title, $page, $_SERVER["PHP_SELF"], $param, $sortfield, $sortorder, $massactionbutton, $num, $num, 'digiriskdolibarr32px.png@digiriskdolibarr', 0, $newcardbutton, '', $limit, 0, 0, 1);
 
 	include DOL_DOCUMENT_ROOT.'/core/tpl/massactions_pre.tpl.php';
 
@@ -800,219 +815,212 @@
 			// Store properties in $risk
 			$risk->setVarsFromFetchObj($obj);
 		}
-		$digiriskelement = new DigiriskElement($db);
-		$digiriskelement->fetch($conf->global->DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH);
 
-		$trashList = $digiriskelement->getTrashList();
-
-		//fonction pour get la liste des id d'éléments dans la poubelle
-		if (!in_array($risk->fk_element, $trashList)) {
-			// Show here line of result
-			print '<tr class="oddeven risk-row risk_row_'. $risk->id .' risk-row-content-'. $risk->id . '" id="risk_row_'. $risk->id .'">';
-			foreach ($risk->fields as $key => $val)
+		// Show here line of result
+		print '<tr class="oddeven risk-row risk_row_'. $risk->id .' risk-row-content-'. $risk->id . '" id="risk_row_'. $risk->id .'">';
+		foreach ($risk->fields as $key => $val)
+		{
+			$cssforfield = (empty($val['css']) ? '' : $val['css']);
+			if ($key == 'status') $cssforfield .= ($cssforfield ? ' ' : '').'center';
+			elseif ($key == 'ref') $cssforfield .= ($cssforfield ? ' ' : '').'nowrap';
+			elseif ($key == 'category') $cssforfield .= ($cssforfield ? ' ' : '').'risk-category';
+			elseif ($key == 'description') $cssforfield .= ($cssforfield ? ' ' : '').'risk-description-'.$risk->id;
+			if (!empty($arrayfields['t.'.$key]['checked']))
 			{
-				$cssforfield = (empty($val['css']) ? '' : $val['css']);
-				if ($key == 'status') $cssforfield .= ($cssforfield ? ' ' : '').'center';
-				elseif ($key == 'ref') $cssforfield .= ($cssforfield ? ' ' : '').'nowrap';
-				elseif ($key == 'category') $cssforfield .= ($cssforfield ? ' ' : '').'risk-category';
-				elseif ($key == 'description') $cssforfield .= ($cssforfield ? ' ' : '').'risk-description-'.$risk->id;
-				if (!empty($arrayfields['t.'.$key]['checked']))
-				{
-					print '<td'.($cssforfield ? ' class="'.$cssforfield.'"' : '').' style="width:2%">';
-					if ($key == 'status') print $risk->getLibStatut(5);
-					elseif ($key == 'fk_element') { ?>
-						<?php $parent_element = new DigiriskElement($db);
-						$result = $parent_element->fetch($risk->fk_element);
-						if ($result > 0) {
-							print $parent_element->getNomUrl(1, 'blank');
-						}
+				print '<td'.($cssforfield ? ' class="'.$cssforfield.'"' : '').' style="width:2%">';
+				if ($key == 'status') print $risk->getLibStatut(5);
+				elseif ($key == 'fk_element') { ?>
+					<?php $parent_element = new DigiriskElement($db);
+					$result = $parent_element->fetch($risk->fk_element);
+					if ($result > 0) {
+						print $parent_element->getNomUrl(1, 'blank');
 					}
-					elseif ($key == 'category') { ?>
-						<div class="table-cell table-50 cell-risk" data-title="Risque">
-							<div class="wpeo-dropdown dropdown-large category-danger padding wpeo-tooltip-event" aria-label="<?php echo $risk->get_danger_category_name($risk) ?>">
-								<img class="danger-category-pic hover" src="<?php echo DOL_URL_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $risk->get_danger_category($risk) . '.png' ; ?>"/>
-							</div>
+				}
+				elseif ($key == 'category') { ?>
+					<div class="table-cell table-50 cell-risk" data-title="Risque">
+						<div class="wpeo-dropdown dropdown-large category-danger padding wpeo-tooltip-event" aria-label="<?php echo $risk->get_danger_category_name($risk) ?>">
+							<img class="danger-category-pic hover" src="<?php echo DOL_URL_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $risk->get_danger_category($risk) . '.png' ; ?>"/>
 						</div>
-						<?php
-					}
-					elseif ($key == 'ref') {
-						?>
-						<div class="risk-container" value="<?php echo $risk->id ?>">
-							<!-- BUTTON MODAL RISK EDIT -->
-							<?php if ($permissiontoadd) : ?>
-								<div class="risk-edit modal-open" value="<?php echo $risk->id ?>" id="<?php echo $risk->ref ?>"><i class="fas fa-exclamation-triangle"></i><?php echo ' ' . $risk->ref; ?></div>
-							<?php else : ?>
-								<div class="risk-edit-no-perm" value="<?php echo $risk->id ?>"><i class="fas fa-exclamation-triangle"></i><?php echo ' ' . $risk->ref; ?></div>
-							<?php endif; ?>
-							<!-- RISK EDIT MODAL -->
-							<div id="risk_edit<?php echo $risk->id ?>" class="wpeo-modal modal-risk-<?php echo $risk->id ?>">
-								<div class="modal-container wpeo-modal-event">
-									<!-- Modal-Header -->
-									<div class="modal-header">
-										<h2 class="modal-title"><?php echo $langs->trans('EditRisk') . ' ' . $risk->ref ?></h2>
-										<div class="modal-close"><i class="fas fa-times"></i></div>
-									</div>
-									<!-- MODAL RISK EDIT CONTENT -->
-									<div class="modal-content" id="#modalContent">
-										<div class="risk-content">
-											<div class="risk-category">
-												<span class="title">
-												<?php if (!$conf->global->DIGIRISKDOLIBARR_RISK_CATEGORY_EDIT) {
-													$htmltooltip = '';
-													$htmltooltip .= $langs->trans("HowToEnableRiskCategoryEdit");
-												} else {
-													$htmltooltip = '';
-													$htmltooltip .= $langs->trans("HowToEditRiskCategory");
-												}
-												print '<span class="center">';
-												print $form->textwithpicto($langs->trans('Risk'), $htmltooltip, 1, 0);
-												print '</span>';
-												?>
-												</span>
-													<div class="wpeo-dropdown dropdown-large dropdown-grid category-danger padding">
-
-														<input class="input-hidden-danger" type="hidden" name="risk_category_id" value=<?php echo $risk->category ?> />
-														<div class="dropdown-toggle dropdown-add-button button-cotation wpeo-tooltip-event" aria-label="<?php echo $risk->get_danger_category_name($risk) ?>">
-															<img class="danger-category-pic tooltip hover" src="<?php echo DOL_URL_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $risk->get_danger_category($risk) . '.png'?>"" />
-														</div>
-
-														<?php if ($conf->global->DIGIRISKDOLIBARR_RISK_CATEGORY_EDIT) : ?>
-
-														<ul class="dropdown-content wpeo-gridlayout grid-5 grid-gap-0">
-															<?php
-															$dangerCategories = $risk->get_danger_categories();
-															if ( ! empty( $dangerCategories ) ) :
-																foreach ( $dangerCategories as $dangerCategory ) : ?>
-																	<li class="item dropdown-item wpeo-tooltip-event classfortooltip" data-is-preset="<?php echo ''; ?>" data-id="<?php echo $dangerCategory['position'] ?>" aria-label="<?php echo $dangerCategory['name'] ?>">
-																		<img src="<?php echo DOL_URL_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $dangerCategory['thumbnail_name'] . '.png'?>" class="attachment-thumbail size-thumbnail photo photowithmargin" alt="" loading="lazy" width="48" height="48">
-																	</li>
-																<?php endforeach;
-															endif; ?>
-														</ul>
-														<?php endif; ?>
-													</div>
-											</div>
-											<?php if ($conf->global->DIGIRISKDOLIBARR_RISK_DESCRIPTION) : ?>
-												<div class="risk-description">
-													<span class="title"><?php echo $langs->trans('Description'); ?></span>
-													<?php print '<textarea name="riskComment" rows="'.ROWS_2.'">'.$risk->description.'</textarea>'."\n"; ?>
-												</div>
-											<?php else : ?>
-												<div class="risk-description">
-													<span class="title">
-														<?php
-														$htmltooltip = '';
-														$htmltooltip .= $langs->trans("HowToEnableRiskDescription");
-
-														print '<span class="center">';
-														print $form->textwithpicto($langs->trans('Description'), $htmltooltip, 1, 0);
-														print '</span>'; ?>
-													</span>
-													<?php echo $langs->trans('RiskDescriptionNotEnabled'); ?>
-												</div>
-											<?php endif; ?>
-										</div>
-										<div class="move-risk">
-											<span class="title"><?php echo $langs->trans('MoveRisk'); ?></span>
-											<?php $objecttmp = new DigiriskElement($db);
-											$objecttmp->fetch($risk->fk_element);
+					</div>
+					<?php
+				}
+				elseif ($key == 'ref') {
+					?>
+					<div class="risk-container" value="<?php echo $risk->id ?>">
+						<!-- BUTTON MODAL RISK EDIT -->
+						<?php if ($permissiontoadd) : ?>
+							<div class="risk-edit modal-open" value="<?php echo $risk->id ?>" id="<?php echo $risk->ref ?>"><i class="fas fa-exclamation-triangle"></i><?php echo ' ' . $risk->ref; ?></div>
+						<?php else : ?>
+							<div class="risk-edit-no-perm" value="<?php echo $risk->id ?>"><i class="fas fa-exclamation-triangle"></i><?php echo ' ' . $risk->ref; ?></div>
+						<?php endif; ?>
+						<!-- RISK EDIT MODAL -->
+						<div id="risk_edit<?php echo $risk->id ?>" class="wpeo-modal modal-risk-<?php echo $risk->id ?>">
+							<div class="modal-container wpeo-modal-event">
+								<!-- Modal-Header -->
+								<div class="modal-header">
+									<h2 class="modal-title"><?php echo $langs->trans('EditRisk') . ' ' . $risk->ref ?></h2>
+									<div class="modal-close"><i class="fas fa-times"></i></div>
+								</div>
+								<!-- MODAL RISK EDIT CONTENT -->
+								<div class="modal-content" id="#modalContent">
+									<div class="risk-content">
+										<div class="risk-category">
+											<span class="title">
+											<?php if (!$conf->global->DIGIRISKDOLIBARR_RISK_CATEGORY_EDIT) {
+												$htmltooltip = '';
+												$htmltooltip .= $langs->trans("HowToEnableRiskCategoryEdit");
+											} else {
+												$htmltooltip = '';
+												$htmltooltip .= $langs->trans("HowToEditRiskCategory");
+											}
+											print '<span class="center">';
+											print $form->textwithpicto($langs->trans('Risk'), $htmltooltip, 1, 0);
+											print '</span>';
 											?>
-											<?php if ($conf->global->DIGIRISKDOLIBARR_MOVE_RISKS) : ?>
-												<input type="hidden" class="current-element-ref" value="<?php echo $objecttmp->ref; ?>">
-												<?php print $objecttmp->select_digiriskelement_list( $objecttmp->id,  'socid',  '',  '1',  0, 1, array(), '', 0, 0, 'disabled', '', false, 1); ?>
-											<?php else : ?>
-												<?php print '<span class="opacitymedium">'.$langs->trans("SetConfToMoveRisk")."</span><br>\n"; ?>
-											<?php endif; ?>
+											</span>
+												<div class="wpeo-dropdown dropdown-large dropdown-grid category-danger padding">
+
+													<input class="input-hidden-danger" type="hidden" name="risk_category_id" value=<?php echo $risk->category ?> />
+													<div class="dropdown-toggle dropdown-add-button button-cotation wpeo-tooltip-event" aria-label="<?php echo $risk->get_danger_category_name($risk) ?>">
+														<img class="danger-category-pic tooltip hover" src="<?php echo DOL_URL_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $risk->get_danger_category($risk) . '.png'?>"" />
+													</div>
+
+													<?php if ($conf->global->DIGIRISKDOLIBARR_RISK_CATEGORY_EDIT) : ?>
+
+													<ul class="dropdown-content wpeo-gridlayout grid-5 grid-gap-0">
+														<?php
+														$dangerCategories = $risk->get_danger_categories();
+														if ( ! empty( $dangerCategories ) ) :
+															foreach ( $dangerCategories as $dangerCategory ) : ?>
+																<li class="item dropdown-item wpeo-tooltip-event classfortooltip" data-is-preset="<?php echo ''; ?>" data-id="<?php echo $dangerCategory['position'] ?>" aria-label="<?php echo $dangerCategory['name'] ?>">
+																	<img src="<?php echo DOL_URL_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $dangerCategory['thumbnail_name'] . '.png'?>" class="attachment-thumbail size-thumbnail photo photowithmargin" alt="" loading="lazy" width="48" height="48">
+																</li>
+															<?php endforeach;
+														endif; ?>
+													</ul>
+													<?php endif; ?>
+												</div>
 										</div>
-									</div>
-									<!-- Modal-Footer -->
-									<div class="modal-footer">
-										<?php if ($permissiontoadd) : ?>
-											<div class="risk-save wpeo-button button-green save" value="<?php echo $risk->id ?>">
-												<span><i class="fas fa-save"></i>  <?php echo $langs->trans('UpdateData'); ?></span>
+										<?php if ($conf->global->DIGIRISKDOLIBARR_RISK_DESCRIPTION) : ?>
+											<div class="risk-description">
+												<span class="title"><?php echo $langs->trans('Description'); ?></span>
+												<?php print '<textarea name="riskComment" rows="'.ROWS_2.'">'.$risk->description.'</textarea>'."\n"; ?>
 											</div>
 										<?php else : ?>
-											<div class="wpeo-button button-grey wpeo-tooltip-event" aria-label="<?php echo $langs->trans('PermissionDenied') ?>">
-												<i class="fas fa-plus"></i> <?php echo $langs->trans('UpdateData'); ?>
+											<div class="risk-description">
+												<span class="title">
+													<?php
+													$htmltooltip = '';
+													$htmltooltip .= $langs->trans("HowToEnableRiskDescription");
+
+													print '<span class="center">';
+													print $form->textwithpicto($langs->trans('Description'), $htmltooltip, 1, 0);
+													print '</span>'; ?>
+												</span>
+												<?php echo $langs->trans('RiskDescriptionNotEnabled'); ?>
 											</div>
 										<?php endif; ?>
 									</div>
+									<div class="move-risk">
+										<span class="title"><?php echo $langs->trans('MoveRisk'); ?></span>
+										<?php $objecttmp = new DigiriskElement($db);
+										$objecttmp->fetch($risk->fk_element);
+										?>
+										<?php if ($conf->global->DIGIRISKDOLIBARR_MOVE_RISKS) : ?>
+											<input type="hidden" class="current-element-ref" value="<?php echo $objecttmp->ref; ?>">
+											<?php print $objecttmp->select_digiriskelement_list( $objecttmp->id,  'socid',  '',  '1',  0, 1, array(), '', 0, 0, 'disabled', '', false, 1); ?>
+										<?php else : ?>
+											<?php print '<span class="opacitymedium">'.$langs->trans("SetConfToMoveRisk")."</span><br>\n"; ?>
+										<?php endif; ?>
+									</div>
+								</div>
+								<!-- Modal-Footer -->
+								<div class="modal-footer">
+									<?php if ($permissiontoadd) : ?>
+										<div class="risk-save wpeo-button button-green save" value="<?php echo $risk->id ?>">
+											<span><i class="fas fa-save"></i>  <?php echo $langs->trans('UpdateData'); ?></span>
+										</div>
+									<?php else : ?>
+										<div class="wpeo-button button-grey wpeo-tooltip-event" aria-label="<?php echo $langs->trans('PermissionDenied') ?>">
+											<i class="fas fa-plus"></i> <?php echo $langs->trans('UpdateData'); ?>
+										</div>
+									<?php endif; ?>
 								</div>
 							</div>
 						</div>
-						<?php
-					}
-					elseif ($key == 'description') {
-						if ($conf->global->DIGIRISKDOLIBARR_RISK_DESCRIPTION == 0 ) {
-							print $langs->trans('RiskDescriptionNotActivated');
-						} else {
-							print dol_trunc($risk->description, 120);
-						}
-					}
-					else print $risk->showOutputField($val, $key, $risk->$key, '');
-					print '</td>';
-					if (!$i) $totalarray['nbfield']++;
-					if (!empty($val['isameasure']))
-					{
-						if (!$i) $totalarray['pos'][$totalarray['nbfield']] = 't.'.$key;
-						$totalarray['val']['t.'.$key] += $risk->$key;
+					</div>
+					<?php
+				}
+				elseif ($key == 'description') {
+					if ($conf->global->DIGIRISKDOLIBARR_RISK_DESCRIPTION == 0 ) {
+						print $langs->trans('RiskDescriptionNotActivated');
+					} else {
+						print dol_trunc($risk->description, 120);
 					}
 				}
-			}
-
-			// Store properties in $lastEvaluation
-			foreach ($evaluation->fields as $key => $val)
-			{
-				$cssforfield = (empty($val['css']) ? '' : $val['css']);
-				if ($key == 'status') $cssforfield .= ($cssforfield ? ' ' : '').'center';
-				elseif ($key == 'ref') $cssforfield .= ($cssforfield ? ' ' : '').'nowrap';
-				elseif ($key == 'cotation') $cssforfield .= ($cssforfield ? ' ' : '').'nowrap';
-				if (!empty($arrayfields['evaluation.'.$key]['checked']))
+				else print $risk->showOutputField($val, $key, $risk->$key, '');
+				print '</td>';
+				if (!$i) $totalarray['nbfield']++;
+				if (!empty($val['isameasure']))
 				{
-					$cssforfield = '';
-					print '<td'.($cssforfield ? ' class="'.$cssforfield.'"' : '').'>';
-					if ($key == 'cotation') {
-						require './core/tpl/digiriskdolibarr_riskassessment_view.tpl.php';
-					}
-					elseif ($key == 'has_tasks' && $conf->global->DIGIRISKDOLIBARR_TASK_MANAGEMENT) {
-						require './core/tpl/digiriskdolibarr_riskassessment_task_view.tpl.php';
-					}
-					elseif ($conf->global->DIGIRISKDOLIBARR_TASK_MANAGEMENT == 0) {
-						print $langs->trans('TaskManagementNotActivated');
-					}
-					else print $lastEvaluation->showOutputField($val, $key, $lastEvaluation->$key, '');
-					print '</td>';
-					if (!$i) $totalarray['nbfield']++;
-					if (!empty($val['isameasure']))
-					{
-						if (!$i) $totalarray['pos'][$totalarray['nbfield']] = 't.'.$key;
-						$totalarray['val']['t.'.$key] += $lastEvaluation->$key;
-					}
+					if (!$i) $totalarray['pos'][$totalarray['nbfield']] = 't.'.$key;
+					$totalarray['val']['t.'.$key] += $risk->$key;
 				}
 			}
-
-			// Extra fields
-			include DOL_DOCUMENT_ROOT.'/core/tpl/extrafields_list_print_fields.tpl.php';
-
-			// Fields from hook
-			$parameters = array('arrayfields'=>$arrayfields, 'object'=>$risk, 'obj'=>$obj, 'i'=>$i, 'totalarray'=>&$totalarray);
-			$reshook = $hookmanager->executeHooks('printFieldListValue', $parameters, $risk); // Note that $action and $risk may have been modified by hook
-			print $hookmanager->resPrint;
-
-			// Action column
-			print '<td class="nowrap center">';
-			if ($massactionbutton || $massaction)   // If we are in select mode (massactionbutton defined) or if we have already selected and sent an action ($massaction) defined
-			{
-				$selected = 0;
-				if (in_array($risk->id, $arrayofselected)) $selected = 1;
-				print '<input id="cb'.$risk->id.'" class="flat checkforselect" type="checkbox" name="toselect[]" value="'.$risk->id.'"'.($selected ? ' checked="checked"' : '').'>';
-			}
-
-			print '</td>';
-			if (!$i) $totalarray['nbfield']++;
-			print '</tr>'."\n";
-			$i++;
 		}
+
+		// Store properties in $lastEvaluation
+		foreach ($evaluation->fields as $key => $val)
+		{
+			$cssforfield = (empty($val['css']) ? '' : $val['css']);
+			if ($key == 'status') $cssforfield .= ($cssforfield ? ' ' : '').'center';
+			elseif ($key == 'ref') $cssforfield .= ($cssforfield ? ' ' : '').'nowrap';
+			elseif ($key == 'cotation') $cssforfield .= ($cssforfield ? ' ' : '').'nowrap';
+			if (!empty($arrayfields['evaluation.'.$key]['checked']))
+			{
+				$cssforfield = '';
+				print '<td'.($cssforfield ? ' class="'.$cssforfield.'"' : '').'>';
+				if ($key == 'cotation') {
+					require './core/tpl/digiriskdolibarr_riskassessment_view.tpl.php';
+				}
+				elseif ($key == 'has_tasks' && $conf->global->DIGIRISKDOLIBARR_TASK_MANAGEMENT) {
+					require './core/tpl/digiriskdolibarr_riskassessment_task_view.tpl.php';
+				}
+				elseif ($conf->global->DIGIRISKDOLIBARR_TASK_MANAGEMENT == 0) {
+					print $langs->trans('TaskManagementNotActivated');
+				}
+				else print $lastEvaluation->showOutputField($val, $key, $lastEvaluation->$key, '');
+				print '</td>';
+				if (!$i) $totalarray['nbfield']++;
+				if (!empty($val['isameasure']))
+				{
+					if (!$i) $totalarray['pos'][$totalarray['nbfield']] = 't.'.$key;
+					$totalarray['val']['t.'.$key] += $lastEvaluation->$key;
+				}
+			}
+		}
+
+		// Extra fields
+		include DOL_DOCUMENT_ROOT.'/core/tpl/extrafields_list_print_fields.tpl.php';
+
+		// Fields from hook
+		$parameters = array('arrayfields'=>$arrayfields, 'object'=>$risk, 'obj'=>$obj, 'i'=>$i, 'totalarray'=>&$totalarray);
+		$reshook = $hookmanager->executeHooks('printFieldListValue', $parameters, $risk); // Note that $action and $risk may have been modified by hook
+		print $hookmanager->resPrint;
+
+		// Action column
+		print '<td class="nowrap center">';
+		if ($massactionbutton || $massaction)   // If we are in select mode (massactionbutton defined) or if we have already selected and sent an action ($massaction) defined
+		{
+			$selected = 0;
+			if (in_array($risk->id, $arrayofselected)) $selected = 1;
+			print '<input id="cb'.$risk->id.'" class="flat checkforselect" type="checkbox" name="toselect[]" value="'.$risk->id.'"'.($selected ? ' checked="checked"' : '').'>';
+		}
+
+		print '</td>';
+		if (!$i) $totalarray['nbfield']++;
+		print '</tr>'."\n";
+		$i++;
 	}
 
 	// If no record found
