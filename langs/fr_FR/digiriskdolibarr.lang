@@ -103,9 +103,11 @@ DigiriskDolibarrArea = Bienvenue sur DigiRisk
 WarningDigiriskNotUpdated = Veuillez mettre à jour votre Digirisk en désactivant et réactivant le module en vous rendant sur :
 
 DigiriskUserGroup = Groupe d'utilisateur Digirisk
-DigiriskUserGroupDescription = Le groupe d'utilisateur Digirisk possède les permissions de consulter tous les objets relatifs à Digirisk
-DigiriskAdminUserGroup = Groupe d'administrateur Digirisk
-DigiriskAdminUserGroupDescription = Le groupe d'administrateur Digirisk possède toutes les permissions à Digirisk
+DigiriskUserGroupDescription = Le groupe d'utilisateur Digirisk possède les permissions de consulter et modifier tous les objets relatifs à Digirisk
+DigiriskAdminUserGroup = Groupe d'administrateurs Digirisk
+DigiriskAdminUserGroupDescription = Le groupe d'administrateurs Digirisk possède toutes les permissions à Digirisk
+DigiriskAdminUserGroup = Groupe de lecteurs Digirisk
+DigiriskAdminUserGroupDescription = Le groupe de lecteurs Digirisk possède toutes les permissions de lecture, mais aucune d'écriture ni de suppression à Digirisk
 
 
 
@@ -1209,7 +1211,8 @@ NoEmailContact = Pas d'email sur ce contact
 AddMedia = Ajouter un média
 NoMediaLinked = Pas de média lié
 SendPassword = Envoyer le mot de passe par email
-UserGroup = Groupe d'utilisateur
+UserGroup = Groupe d'utilisateurs
+ReaderGroup = Groupe de lecteurs
 UserCreated = L'utilisateur a bien été créé
 GetAPI = Utilisation des routes API Digirisk en méthode GET
 PostAPI = Utilisation des routes API Digirisk en méthode POST
