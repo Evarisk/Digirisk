@@ -125,62 +125,75 @@ if ($action == 'add') {
 
 	$extrafields->setOptionalsFromPost(null, $object);
 
-	$result = $object->create($user);
-	$object->fetch($result);
-	$track_id = $object->track_id;
-
-	if ($result > 0) {
-		//Add categories linked
-		$registerCat = $category;
-		$registerCat->fetch($register);
-		$registerCat->add_type($object, Categorie::TYPE_TICKET);
-
-		$pertinenceCat = $category;
-		$pertinenceCat->fetch($pertinence);
-		$pertinenceCat->add_type($object, Categorie::TYPE_TICKET);
-
-		//Add files linked
-		$ticket_upload_dir = $conf->digiriskdolibarr->multidir_output[isset($conf->entity) ? $conf->entity : 1].'/temp';
-		$fileList          = dol_dir_list($ticket_upload_dir . '/ticket/' . $ticket_tmp_id . '/');
-		$thumbsList        = dol_dir_list($ticket_upload_dir . '/ticket/' . $ticket_tmp_id . '/thumbs/');
-		$ticketDirPath     = $conf->ticket->multidir_output[isset($conf->entity) ? $conf->entity : 1] . '/';
-		$fullTicketPath    = $ticketDirPath . $object->ref . '/';
-		$thumbsTicketPath  = $ticketDirPath . $object->ref . '/thumbs/';
-
-		if (!is_dir($ticketDirPath)) {
-			dol_mkdir($ticketDirPath);
+	$error=0;
+	// Check Captcha code if is enabled
+	if (!empty($conf->global->DIGIRISKDOLIBARR_USE_CAPCHA)) {
+		$sessionkey = 'dol_antispam_value';
+		$ok = (array_key_exists($sessionkey, $_SESSION) === true && (strtolower($_SESSION[$sessionkey]) === strtolower(GETPOST('code', 'none'))));
+		if (!$ok) {
+			$error++;
+			setEventMessage($langs->trans('ErrorBadValueForCode'), 'errors');
+			$action = '';
 		}
+	}
+	if (empty($error)) {
+		$result = $object->create($user);
+		$object->fetch($result);
+		$track_id = $object->track_id;
 
-		if (!is_dir($fullTicketPath)) {
-			dol_mkdir($fullTicketPath);
-		}
+		if ($result > 0) {
+			//Add categories linked
+			$registerCat = $category;
+			$registerCat->fetch($register);
+			$registerCat->add_type($object, Categorie::TYPE_TICKET);
 
-		if (!is_dir($thumbsTicketPath)) {
-			dol_mkdir($thumbsTicketPath);
-		}
+			$pertinenceCat = $category;
+			$pertinenceCat->fetch($pertinence);
+			$pertinenceCat->add_type($object, Categorie::TYPE_TICKET);
 
-		if (!empty($fileList)) {
-			foreach ($fileList as $fileToCopy) {
-				if (is_file($fileToCopy['fullname'])) {
-					rename($fileToCopy['fullname'],$fullTicketPath . $fileToCopy['name']);
+			//Add files linked
+			$ticket_upload_dir = $conf->digiriskdolibarr->multidir_output[isset($conf->entity) ? $conf->entity : 1] . '/temp';
+			$fileList = dol_dir_list($ticket_upload_dir . '/ticket/' . $ticket_tmp_id . '/');
+			$thumbsList = dol_dir_list($ticket_upload_dir . '/ticket/' . $ticket_tmp_id . '/thumbs/');
+			$ticketDirPath = $conf->ticket->multidir_output[isset($conf->entity) ? $conf->entity : 1] . '/';
+			$fullTicketPath = $ticketDirPath . $object->ref . '/';
+			$thumbsTicketPath = $ticketDirPath . $object->ref . '/thumbs/';
+
+			if (!is_dir($ticketDirPath)) {
+				dol_mkdir($ticketDirPath);
+			}
+
+			if (!is_dir($fullTicketPath)) {
+				dol_mkdir($fullTicketPath);
+			}
+
+			if (!is_dir($thumbsTicketPath)) {
+				dol_mkdir($thumbsTicketPath);
+			}
+
+			if (!empty($fileList)) {
+				foreach ($fileList as $fileToCopy) {
+					if (is_file($fileToCopy['fullname'])) {
+						rename($fileToCopy['fullname'], $fullTicketPath . $fileToCopy['name']);
+					}
 				}
 			}
-		}
 
-		if (!empty($thumbsList)) {
-			foreach ($thumbsList as $thumbsToCopy) {
-				if (is_file($thumbsToCopy['fullname'])) {
-					rename($thumbsToCopy['fullname'],$fullTicketPath . '/thumbs/' . $thumbsToCopy['name']);
+			if (!empty($thumbsList)) {
+				foreach ($thumbsList as $thumbsToCopy) {
+					if (is_file($thumbsToCopy['fullname'])) {
+						rename($thumbsToCopy['fullname'], $fullTicketPath . '/thumbs/' . $thumbsToCopy['name']);
+					}
 				}
 			}
-		}
 
-		// Creation OK
-		dol_delete_dir_recursive($ticket_upload_dir . '/ticket/' . $ticket_tmp_id . '/');
-		$urltogo = $_SERVER['PHP_SELF'] . '/../ticket_success.php?track_id=' . $track_id ;
-		setEventMessages($langs->trans("TicketSend", ''), null);
-		header("Location: ".$urltogo);
-		exit;
+			// Creation OK
+			dol_delete_dir_recursive($ticket_upload_dir . '/ticket/' . $ticket_tmp_id . '/');
+			$urltogo = $_SERVER['PHP_SELF'] . '/../ticket_success.php?track_id=' . $track_id;
+			setEventMessages($langs->trans("TicketSend", ''), null);
+			header("Location: " . $urltogo);
+			exit;
+		}
 	}
 
 }
@@ -418,6 +431,20 @@ print '</div>';
 	</div>
 
 	<?php include DOL_DOCUMENT_ROOT . '/core/tpl/extrafields_add.tpl.php'; ?>
+
+	<?php
+	if (!empty($conf->global->DIGIRISKDOLIBARR_USE_CAPCHA)) {
+		require_once DOL_DOCUMENT_ROOT.'/core/lib/security2.lib.php';
+		print '<div class="center"><label for="email"><span class="fieldrequired">'.$langs->trans("SecurityCode").'</span></label>';
+		print '<span class="span-icon-security inline-block">';
+		print '<input id="securitycode" placeholder="'.$langs->trans("SecurityCode").'" class="flat input-icon-security width125" type="text" maxlength="5" name="code" tabindex="3" />';
+		print '</span>';
+		print '<span class="nowrap inline-block">';
+		print '<img class="inline-block valignmiddle" src="'.DOL_URL_ROOT.'/core/antispamimage.php" border="0" width="80" height="32" id="img_securitycode" />';
+		print '<a class="inline-block valignmiddle" href="'.$php_self.'" tabindex="4" data-role="button">'.img_picto($langs->trans("Refresh"), 'refresh', 'id="captcha_refresh_img"').'</a>';
+		print '</span>';
+		print '</div>';
+	}?>
 
 	<?php print '<div class="center"><button form="sendTicketForm" type="submit" id ="actionButtonSave" class="wpeo-button" name="add">'.'<i class="fas fa-paper-plane"></i>    '.$langs->trans("Send") . '</button>'; ?>
 </div>
