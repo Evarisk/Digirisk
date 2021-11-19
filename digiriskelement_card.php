@@ -290,12 +290,11 @@ if ($action == 'create') {
 	print $modele->getNextValue($object);
 	print '</td></tr>';
 
-
 	include DOL_DOCUMENT_ROOT.'/core/tpl/commonfields_add.tpl.php';
 
 	print '<tr><td>'.$langs->trans("Description").'</td><td>';
 	print '<input hidden class="flat" type="text" size="36" name="description" id="description">';
-	print '<textarea name="description" id="description" class="minwidth300" rows="'.ROWS_3.'">'.'</textarea>'."\n";
+	print '<textarea name="description" id="description" class="minwidth400" rows="'.ROWS_3.'">'.'</textarea>'."\n";
 	print '</td></tr>';
 
 	print '<input hidden class="flat" type="text" size="36" name="element_type" value="'.$element_type.'">';
