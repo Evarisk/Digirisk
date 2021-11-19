@@ -16,9 +16,9 @@
  */
 
 /**
- *   	\file       firepermit_attendants.php
+ *   	\file       accident_attendants.php
  *		\ingroup    digiriskdolibarr
- *		\brief      Page to add/edit/view firepermit_signature
+ *		\brief      Page to add/edit/view accident_signature
  */
 
 // Load Dolibarr environment
@@ -38,8 +38,8 @@ if (!$res) die("Include of main fails");
 require_once DOL_DOCUMENT_ROOT.'/core/lib/images.lib.php';
 
 require_once __DIR__ . '/class/digiriskresources.class.php';
-require_once __DIR__ . '/class/firepermit.class.php';
-require_once __DIR__ . '/lib/digiriskdolibarr_firepermit.lib.php';
+require_once __DIR__ . '/class/accident.class.php';
+require_once __DIR__ . '/lib/digiriskdolibarr_accident.lib.php';
 require_once __DIR__ . '/lib/digiriskdolibarr_function.lib.php';
 
 global $db, $langs;
@@ -50,12 +50,12 @@ $langs->loadLangs(array("digiriskdolibarr@digiriskdolibarr", "other"));
 // Get parameters
 $id                  = GETPOST('id', 'int');
 $action              = GETPOST('action', 'aZ09');
-$contextpage         = GETPOST('contextpage', 'aZ') ?GETPOST('contextpage', 'aZ') : 'firepermitsignature'; // To manage different context of search
+$contextpage         = GETPOST('contextpage', 'aZ') ?GETPOST('contextpage', 'aZ') : 'accidentsignature'; // To manage different context of search
 $backtopage          = GETPOST('backtopage', 'alpha');
 
 // Initialize technical objects
-$object            = new FirePermit($db);
-$signatory         = new FirePermitSignature($db);
+$object            = new Accident($db);
+$signatory         = new AccidentSignature($db);
 $digiriskresources = new DigiriskResources($db);
 $usertmp           = new User($db);
 $contact           = new Contact($db);
@@ -63,12 +63,12 @@ $form              = new Form($db);
 
 $object->fetch($id);
 
-$hookmanager->initHooks(array('firepermitsignature', 'globalcard')); // Note that conf->hooks_modules contains array
+$hookmanager->initHooks(array('accidentsignature', 'globalcard')); // Note that conf->hooks_modules contains array
 
 //Security check
-$permissiontoread   = $user->rights->digiriskdolibarr->firepermit->read;
-$permissiontoadd    = $user->rights->digiriskdolibarr->firepermit->write;
-$permissiontodelete = $user->rights->digiriskdolibarr->firepermit->delete;
+$permissiontoread   = $user->rights->digiriskdolibarr->accident->read;
+$permissiontoadd    = $user->rights->digiriskdolibarr->accident->write;
+$permissiontodelete = $user->rights->digiriskdolibarr->accident->delete;
 if (!$permissiontoread) accessforbidden();
 
 /*
@@ -82,7 +82,7 @@ if ($reshook < 0) setEventMessages($hookmanager->error, $hookmanager->errors, 'e
 
 if (empty($backtopage) || ($cancel && empty($id))) {
 	if (empty($backtopage) || ($cancel && strpos($backtopage, '__ID__'))) {
-		$backtopage = dol_buildpath('/digiriskdolibarr/firepermit_attendants.php', 1).'?id='.($object->id > 0 ? $object->id : '__ID__');
+		$backtopage = dol_buildpath('/digiriskdolibarr/accident_attendants.php', 1).'?id='.($object->id > 0 ? $object->id : '__ID__');
 	}
 }
 
@@ -275,7 +275,7 @@ if ($action == 'deleteAttendant') {
  *  View
  */
 
-$title    = $langs->trans("FirePermitAttendants");
+$title    = $langs->trans("AccidentAttendants");
 $help_url = '';
 $morejs   = array("/digiriskdolibarr/js/signature-pad.min.js", "/digiriskdolibarr/js/digiriskdolibarr.js.php");
 $morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");
@@ -287,8 +287,8 @@ if (!empty($object->id)) $res = $object->fetch_optionals();
 // Object card
 // ------------------------------------------------------------
 
-$head = firepermitPrepareHead($object);
-print dol_get_fiche_head($head, 'firepermitAttendants', $langs->trans("FirePermit"), -1, "digiriskdolibarr@digiriskdolibarr");
+$head = accidentPrepareHead($object);
+print dol_get_fiche_head($head, 'accidentAttendants', $langs->trans("Accident"), -1, "digiriskdolibarr@digiriskdolibarr");
 dol_strlen($object->label) ? $morehtmlref = ' - ' . $object->label : '';
 //$morehtmlleft .= '<div class="floatleft inline-block valignmiddle divphotoref">'.digirisk_show_photos('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$entity].'/'.$object->element_type, 'small', 5, 0, 0, 0, $width,0, 0, 0, 0, $object->element_type, $object).'</div>';
 
@@ -300,9 +300,9 @@ print dol_get_fiche_end(); ?>
 <div class="wpeo-notice notice-warning">
 	<div class="notice-content">
 		<div class="notice-title"><?php echo $langs->trans('DisclaimerSignatureTitle') ?></div>
-		<div class="notice-subtitle"><?php echo $langs->trans("FirePermitMustBeValidatedToSign") ?></div>
+		<div class="notice-subtitle"><?php echo $langs->trans("AccidentMustBeValidatedToSign") ?></div>
 	</div>
-	<a class="butAction" style="width = 100%;margin-right:0" href="<?php echo DOL_URL_ROOT ?>/custom/digiriskdolibarr/firepermit_card.php?id=<?php echo $id ?>"><?php echo $langs->trans("GoToValidateFirePermit") ?></a>;
+	<a class="butAction" style="width = 100%;margin-right:0" href="<?php echo DOL_URL_ROOT ?>/custom/digiriskdolibarr/accident_card.php?id=<?php echo $id ?>"><?php echo $langs->trans("GoToValidateAccident") ?></a>;
 </div>
 <?php endif; ?>
 <div class="noticeSignatureSuccess wpeo-notice notice-success hidden">
@@ -313,7 +313,7 @@ print dol_get_fiche_end(); ?>
 		</div>
 		<?php
 		if ($signatory->checkSignatoriesSignatures($object->id)) {
-			print '<a class="butAction" style="width = 100%;margin-right:0" href="'.DOL_URL_ROOT . '/custom/digiriskdolibarr/firepermit_card.php?id='.$id.'">'. $langs->trans("GoToLockFirePermit").'</a>';
+			print '<a class="butAction" style="width = 100%;margin-right:0" href="'.DOL_URL_ROOT . '/custom/digiriskdolibarr/accident_card.php?id='.$id.'">'. $langs->trans("GoToLockAccident").'</a>';
 		}
 		?>
 	</div>

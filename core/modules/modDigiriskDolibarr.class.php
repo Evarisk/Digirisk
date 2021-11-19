@@ -421,7 +421,6 @@ class modDigiriskdolibarr extends DolibarrModules
 			0 => array(
 				'file' => 'box_riskassessmentdocument@digiriskdolibarr',
 				'note' => 'My notes',
-				'enabledbydefaulton' => 'Home'
 			)
 		);
 
