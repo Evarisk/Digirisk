@@ -59,7 +59,7 @@ if ( $action == "edit" && $permissiontoadd ) {
 	print '<tr>';
 	print '<td class="titlefield"><label for="Method">' . $langs->trans("Method") . '</label></td>';
 	print '<td>';
-	$doleditor = new DolEditor('Method', $conf->global->DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_METHOD ? $conf->global->DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_METHOD : '', '', 90, 'dolibarr_notes', '', false, true, $conf->global->FCKEDITOR_ENABLE_SOCIETE, ROWS_3, '90%');
+	$doleditor = new DolEditor('Method', $conf->global->DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_METHOD ? $conf->global->DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_METHOD : '', '', 90, 'dolibarr_details', '', false, true, $conf->global->FCKEDITOR_ENABLE_SOCIETE, ROWS_3, '90%');
 	$doleditor->Create();
 	print '</td></tr>';
 
@@ -68,7 +68,7 @@ if ( $action == "edit" && $permissiontoadd ) {
 	print '<tr>';
 	print '<td class="titlefield"><label for="Sources">' . $langs->trans("Sources") . '</label></td>';
 	print '<td>';
-	$doleditor = new DolEditor('Sources', $conf->global->DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_SOURCES ? $conf->global->DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_SOURCES : '', '', 90, 'dolibarr_notes', '', false, true, $conf->global->FCKEDITOR_ENABLE_SOCIETE, ROWS_3, '90%');
+	$doleditor = new DolEditor('Sources', $conf->global->DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_SOURCES ? $conf->global->DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_SOURCES : '', '', 90, 'dolibarr_details', '', false, true, $conf->global->FCKEDITOR_ENABLE_SOCIETE, ROWS_3, '90%');
 	$doleditor->Create();
 	print '</td></tr>';
 
@@ -77,7 +77,7 @@ if ( $action == "edit" && $permissiontoadd ) {
 	print '<tr>';
 	print '<td class="titlefield"><label for="ImportantNote">' . $langs->trans("ImportantNote") . '</label></td>';
 	print '<td>';
-	$doleditor = new DolEditor('ImportantNote', $conf->global->DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_IMPORTANT_NOTES ? $conf->global->DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_IMPORTANT_NOTES : '', '', 90, 'dolibarr_notes', '', false, true, $conf->global->FCKEDITOR_ENABLE_SOCIETE, ROWS_3, '90%');
+	$doleditor = new DolEditor('ImportantNote', $conf->global->DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_IMPORTANT_NOTES ? $conf->global->DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_IMPORTANT_NOTES : '', '', 90, 'dolibarr_details', '', false, true, $conf->global->FCKEDITOR_ENABLE_SOCIETE, ROWS_3, '90%');
 	$doleditor->Create();
 	print '</td></tr>';
 

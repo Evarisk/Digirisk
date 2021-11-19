@@ -769,7 +769,7 @@ if ($action == 'create') {
 
 	//Prior Visit Texte -- Note de l'inspection
 	print '<tr  class="prior_visit_text_field hidden"'. (GETPOST('prior_visit_bool') ?  '' : 'style="display:none"') .'><td class="minwidth400"><label for="prior_visit_text">'.$langs->trans("PriorVisitText").'</label></td><td>';
-	$doleditor = new DolEditor('prior_visit_text', GETPOST('prior_visit_text'), '', 90, 'dolibarr_notes', '', false, true, $conf->global->FCKEDITOR_ENABLE_SOCIETE, ROWS_3, '90%');
+	$doleditor = new DolEditor('prior_visit_text', GETPOST('prior_visit_text'), '', 90, 'dolibarr_details', '', false, true, $conf->global->FCKEDITOR_ENABLE_SOCIETE, ROWS_3, '90%');
 	$doleditor->Create();
 	print '</td></tr>';
 
@@ -934,7 +934,7 @@ if (($id || $ref) && $action == 'edit') {
 
 	//Prior Visit Text -- Note de l'inspection
 	print '<tr class="'.($object->prior_visit_bool ?  ' prior_visit_date_field' : ' prior_visit_date_field hidden' ).'" style="'.($object->prior_visit_bool ? ' ' : ' display:none').'"><td class="minwidth400"><label for="prior_visit_text">'.$langs->trans("PriorVisitText").'</label></td><td>';
-	$doleditor = new DolEditor('prior_visit_text', $object->prior_visit_text, '', 90, 'dolibarr_notes', '', false, true, $conf->global->FCKEDITOR_ENABLE_SOCIETE, ROWS_3, '90%');
+	$doleditor = new DolEditor('prior_visit_text', $object->prior_visit_text, '', 90, 'dolibarr_details', '', false, true, $conf->global->FCKEDITOR_ENABLE_SOCIETE, ROWS_3, '90%');
 	$doleditor->Create();
 	print '</td></tr>';
 
