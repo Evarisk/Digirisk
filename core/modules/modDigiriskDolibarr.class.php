@@ -326,6 +326,9 @@ class modDigiriskdolibarr extends DolibarrModules
 			350 => array('MAIN_AGENDA_ACTIONAUTO_ACCIDENTDET_CREATE','chaine',1,'', $conf->entity),
 			351 => array('DIGIRISKDOLIBARR_ACCIDENTDET_ADDON','chaine', 'mod_accidentdet_standard','', $conf->entity),
 
+			// GENERAL CONSTS
+			400 => array('MAIN_USE_EXIF_ROTATION','integer',1,'', $conf->entity),
+
 //			// CONST ACCIDENT DOCUMENT
 //			360 => array('MAIN_AGENDA_ACTIONAUTO_ACCIDENTDOCUMENT_CREATE','chaine',1,'', $conf->entity),
 //
