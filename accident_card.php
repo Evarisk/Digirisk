@@ -160,63 +160,53 @@ if (empty($reshook)) {
 		$object->fk_user_creat  = $user->id ? $user->id : 1;
 
 		// Check parameters
-//		if ($maitre_oeuvre_id < 0) {
-//			setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv('MaitreOeuvre')), null, 'errors');
-//			$error++;
-//		} else {
-//			$usertmp->fetch($maitre_oeuvre_id);
-//			if (!dol_strlen($usertmp->email)) {
-//				setEventMessages($langs->trans('ErrorNoEmailForMaitreOeuvre', $langs->transnoentitiesnoconv('MaitreOeuvre')) . ' : ' . '<a target="_blank" href="'.dol_buildpath('/user/card.php?id='.$usertmp->id, 2).'">'.$usertmp->lastname . ' ' . $usertmp->firstname.'</a>', null, 'errors');
-//				$error++;
-//			}
-//		}
-//
-//		if ($extsociety_id < 0) {
-//			setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv('ExtSociety')), null, 'errors');
-//			$error++;
-//		}
-//
-//		if (is_array($extresponsible_id)) {
-//			if (empty(array_filter($extresponsible_id))) {
-//				setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv('ExtSocietyResponsible')), null, 'errors');
-//				$error++;
-//			}
-//		} elseif (empty($extresponsible_id)) {
-//			setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv('ExtSocietyResponsible')), null, 'errors');
-//			$error++;
-//		}
-//
-//		if ($labour_inspector_id < 0) {
-//			setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv('LabourInspectorSociety')), null, 'errors');
-//			$error++;
-//		}
-//
-//		if (is_array($labour_inspector_contact_id)) {
-//			if (empty(array_filter($labour_inspector_contact_id))) {
-//				setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv('LabourInspector')), null, 'errors');
-//				$error++;
-//			}
-//		} elseif (empty($labour_inspector_contact_id)) {
-//			setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv('LabourInspector')), null, 'errors');
-//			$error++;
-//		}
+		if ($user_victim_id < 0) {
+			setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv('MaitreOeuvre')), null, 'errors');
+			$error++;
+		}
 
+		if ($soc_id < 0) {
+			setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv('ExtSociety')), null, 'errors');
+			$error++;
+		}
+
+		// Submit file
+		if (!empty($conf->global->MAIN_UPLOAD_DOC)) {
+			if (!empty($_FILES)) {
+				if (is_array($_FILES['userfile']['tmp_name'])) $userfiles = $_FILES['userfile']['tmp_name'];
+				else $userfiles = array($_FILES['userfile']['tmp_name']);
+
+				foreach ($userfiles as $key => $userfile) {
+					if (empty($_FILES['userfile']['tmp_name'][$key])) {
+						$error++;
+						if ($_FILES['userfile']['error'][$key] == 1 || $_FILES['userfile']['error'][$key] == 2) {
+							setEventMessages($langs->trans('ErrorFileSizeTooLarge'), null, 'errors');
+						}
+					}
+				}
+
+				$filedir = $conf->digiriskdolibarr->multidir_output[isset($object->entity) ? $object->entity : 1] . '/accident/'. $object->ref;
+				if (!file_exists($filedir))
+				{
+					if (dol_mkdir($filedir) < 0)
+					{
+						$object->error = $langs->transnoentities("ErrorCanNotCreateDir", $filedir);
+						$error++;
+					}
+				}
+
+				if (!$error) {
+					dol_mkdir($filedir);
+					if (!empty($filedir)) {
+						$result = dol_add_file_process($filedir, 0, 1, 'userfile', '', null, '', 1, $object);
+					}
+				}
+			}
+		}
 
 		if (!$error) {
 			$result = $object->create($user, false);
 			if ($result > 0) {
-//				$digiriskresources->digirisk_dolibarr_set_resources($db, $user->id, 'FP_EXT_SOCIETY', 'societe', array($extsociety_id), $conf->entity, 'accident', $object->id, 0);
-//				$digiriskresources->digirisk_dolibarr_set_resources($db, $user->id, 'FP_LABOUR_INSPECTOR', 'societe', array($labour_inspector_id), $conf->entity, 'accident', $object->id, 0);
-//				$digiriskresources->digirisk_dolibarr_set_resources($db, $user->id, 'FP_LABOUR_INSPECTOR_ASSIGNED', 'socpeople', array($labour_inspector_contact_id), $conf->entity, 'accident', $object->id, 0);
-//
-//				if ($maitre_oeuvre_id > 0) {
-//					$signatory->setSignatory($object->id,'user', array($maitre_oeuvre_id), 'FP_MAITRE_OEUVRE');
-//				}
-//
-//				if ($extresponsible_id > 0) {
-//					$signatory->setSignatory($object->id,'socpeople', array($extresponsible_id), 'FP_EXT_SOCIETY_RESPONSIBLE');
-//				}
-
 				// Creation Accident OK
 				$urltogo = str_replace('__ID__', $result, $backtopage);
 				$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
@@ -236,91 +226,82 @@ if (empty($reshook)) {
 	// Action to update record
 	if ($action == 'update' && $permissiontoadd) {
 		// Get parameters
-		$maitre_oeuvre_id            = GETPOST('maitre_oeuvre');
-		$extsociety_id               = GETPOST('ext_society');
-		$extresponsible_id           = GETPOST('ext_society_responsible');
-		$extintervenant_ids          = GETPOST('ext_intervenants');
-		$labour_inspector_id         = GETPOST('labour_inspector');
-		$labour_inspector_contact_id = GETPOST('labour_inspector_contact') ? GETPOST('labour_inspector_contact') : 0;
-		$label                       = GETPOST('label');
-		$description                 = GETPOST('description');
-		$fk_preventionplan           = GETPOST('fk_preventionplan');
+		$user_victim_id = GETPOST('fk_user_victim');
+		$soc_id         = GETPOST('fk_element');
+		$label          = GETPOST('label');
+		$description    = GETPOST('description');
 
-		// Initialize object fire permit
-		$now           = dol_now();
-		$object->tms   = $now;
-		$object->label = $label;
-
-		$date_start = dol_mktime(GETPOST('dateohour', 'int'), GETPOST('dateomin', 'int'), 0, GETPOST('dateomonth', 'int'), GETPOST('dateoday', 'int'), GETPOST('dateoyear', 'int'));
-		$date_end   = dol_mktime(GETPOST('dateehour', 'int'), GETPOST('dateemin', 'int'), 0, GETPOST('dateemonth', 'int'), GETPOST('dateeday', 'int'), GETPOST('dateeyear', 'int'));
-
+		// Initialize object accident
+		$now                 = dol_now();
+		$object->tms         = $now;
+		$object->label       = $label;
 		$object->description = $description;
-		$object->date_start  = $date_start;
-		$object->date_end    = $date_end;
+		$object->fk_project  = $conf->global->DIGIRISKDOLIBARR_ACCIDENT_PROJECT;
 
-		$object->fk_preventionplan = $fk_preventionplan;
-		$object->fk_user_creat     = $user->id ? $user->id : 1;
+		$accident_date = dol_mktime(GETPOST('dateohour', 'int'), GETPOST('dateomin', 'int'), 0, GETPOST('dateomonth', 'int'), GETPOST('dateoday', 'int'), GETPOST('dateoyear', 'int'));
+
+		$object->accident_date = $accident_date;
+
+		$object->fk_element     = $soc_id;
+		$object->fk_user_victim = $user_victim_id;
+		$object->fk_user_creat  = $user->id ? $user->id : 1;
 
 		// Check parameters
-		if ($maitre_oeuvre_id < 0) {
+		if ($user_victim_id < 0) {
 			setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv('MaitreOeuvre')), null, 'errors');
 			$error++;
-		}   else {
-			$usertmp->fetch($maitre_oeuvre_id);
-			if (!dol_strlen($usertmp->email)) {
-				setEventMessages($langs->trans('ErrorNoEmailForMaitreOeuvre', $langs->transnoentitiesnoconv('MaitreOeuvre')) . ' : ' . '<a target="_blank" href="'.dol_buildpath('/user/card.php?id='.$usertmp->id, 2).'">'.$usertmp->lastname . ' ' . $usertmp->firstname.'</a>', null, 'errors');
-				$error++;
-			}
 		}
 
-		if ($extsociety_id < 0) {
+		if ($soc_id < 0) {
 			setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv('ExtSociety')), null, 'errors');
 			$error++;
 		}
 
-		if (is_array($extresponsible_id)) {
-			if (empty(array_filter($extresponsible_id))) {
-				setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv('ExtSocietyResponsible')), null, 'errors');
-				$error++;
-			}
-		} elseif (empty($extresponsible_id)) {
-			setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv('ExtSocietyResponsible')), null, 'errors');
-			$error++;
-		}
+		// Submit file
+		if (!empty($conf->global->MAIN_UPLOAD_DOC)) {
+			if (!empty($_FILES)) {
+				if (is_array($_FILES['userfile']['tmp_name'])) $userfiles = $_FILES['userfile']['tmp_name'];
+				else $userfiles = array($_FILES['userfile']['tmp_name']);
 
-		if ($labour_inspector_id < 0) {
-			setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv('LabourInspectorSociety')), null, 'errors');
-			$error++;
-		}
+				foreach ($userfiles as $key => $userfile) {
+					if (empty($_FILES['userfile']['tmp_name'][$key])) {
+						$error++;
+						if ($_FILES['userfile']['error'][$key] == 1 || $_FILES['userfile']['error'][$key] == 2) {
+							setEventMessages($langs->trans('ErrorFileSizeTooLarge'), null, 'errors');
+						}
+					}
+				}
 
-		if (is_array($labour_inspector_contact_id)) {
-			if (empty(array_filter($labour_inspector_contact_id))) {
-				setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv('LabourInspector')), null, 'errors');
-				$error++;
+				$filedir = $conf->digiriskdolibarr->multidir_output[isset($object->entity) ? $object->entity : 1] . '/accident/'. $object->ref;
+				if (!file_exists($filedir))
+				{
+					if (dol_mkdir($filedir) < 0)
+					{
+						$object->error = $langs->transnoentities("ErrorCanNotCreateDir", $filedir);
+						$error++;
+					}
+				}
+
+				if (!$error) {
+					dol_mkdir($filedir);
+					if (!empty($filedir)) {
+						$result = dol_add_file_process($filedir, 0, 1, 'userfile', '', null, '', 1, $object);
+					}
+				}
 			}
-		} elseif (empty($labour_inspector_contact_id)) {
-			setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv('LabourInspector')), null, 'errors');
-			$error++;
 		}
 
 		if (!$error) {
 			$result = $object->update($user, false);
 			if ($result > 0) {
-				$digiriskresources->digirisk_dolibarr_set_resources($db, $user->id, 'FP_EXT_SOCIETY', 'societe', array($extsociety_id), $conf->entity, 'accident', $object->id, 0);
-				$digiriskresources->digirisk_dolibarr_set_resources($db, $user->id, 'FP_LABOUR_INSPECTOR', 'societe', array($labour_inspector_id), $conf->entity, 'accident', $object->id, 0);
-				$digiriskresources->digirisk_dolibarr_set_resources($db, $user->id, 'FP_LABOUR_INSPECTOR_ASSIGNED', 'socpeople', array($labour_inspector_contact_id), $conf->entity, 'accident', $object->id, 0);
-
-				$signatory->setSignatory($object->id,'user', array($maitre_oeuvre_id), 'FP_MAITRE_OEUVRE');
-				$signatory->setSignatory($object->id,'socpeople', array($extresponsible_id), 'FP_EXT_SOCIETY_RESPONSIBLE');
-
-				// Update fire permit OK
+				// Update Accident OK
 				$urltogo = str_replace('__ID__', $result, $backtopage);
 				$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
 				header("Location: " . $urltogo);
 				exit;
 			}
 			else {
-				// Update fire permit KO
+				// Update Accident KO
 				if (!empty($object->errors)) setEventMessages(null, $object->errors, 'errors');
 				else  setEventMessages($object->error, null, 'errors');
 			}
@@ -651,7 +632,7 @@ llxHeader('', $title, $help_url, '', '', '', $morejs, $morecss);
 if ($action == 'create') {
 	print load_fiche_titre($title_create, '', "digiriskdolibarr32px@digiriskdolibarr");
 
-	print '<form method="POST" action="'.$_SERVER["PHP_SELF"].'">';
+	print '<form method="POST" action="'.$_SERVER["PHP_SELF"].'" enctype="multipart/form-data">';
 	print '<input type="hidden" name="token" value="'.newToken().'">';
 	print '<input type="hidden" name="action" value="add">';
 	print '<input type="hidden" name="backtopage" value="'.$backtopage.'">';
@@ -710,6 +691,10 @@ if ($action == 'create') {
 	$doleditor->Create();
 	print '</td></tr>';
 
+	print '<tr><td class="titlefield">'.$form->editfieldkey($langs->trans("Photo"), 'Photo', '', $object, 0).'</td><td>';
+	print '<input class="flat" type="file" name="userfile[]" id="Photo" />';
+	print '</td></tr>';
+
 	// Other attributes
 	include DOL_DOCUMENT_ROOT.'/core/tpl/extrafields_add.tpl.php';
 
@@ -729,7 +714,7 @@ if ($action == 'create') {
 if (($id || $ref) && $action == 'edit') {
 	print load_fiche_titre($title_edit, '', "digiriskdolibarr32px@digiriskdolibarr");
 
-	print '<form method="POST" action="'.$_SERVER["PHP_SELF"].'">';
+	print '<form method="POST" action="'.$_SERVER["PHP_SELF"].'" enctype="multipart/form-data">';
 	print '<input type="hidden" name="token" value="'.newToken().'">';
 	print '<input type="hidden" name="action" value="update">';
 	print '<input type="hidden" name="id" value="'.$object->id.'">';
@@ -737,9 +722,6 @@ if (($id || $ref) && $action == 'edit') {
 	if ($backtopageforcancel) print '<input type="hidden" name="backtopageforcancel" value="'.$backtopageforcancel.'">';
 
 	print dol_get_fiche_head();
-
-	$object_resources = $digiriskresources->fetchResourcesFromObject('', $object);
-	$object_signatories = $signatory->fetchSignatory('',$object->id);
 
 	print '<table class="border centpercent tableforfieldedit accident-table">'."\n";
 
@@ -753,108 +735,55 @@ if (($id || $ref) && $action == 'edit') {
 	print '<input class="flat" type="text" size="36" name="label" id="label" value="'.$object->label.'">';
 	print '</td></tr>';
 
-	//Start Date -- Date début
-	print '<tr class="oddeven"><td><label for="date_debut">'.$langs->trans("StartDate").'</label></td><td>';
-	print $form->selectDate($object->date_start,'dateo', 1, 1, 0, '', 1);
-	print '</td></tr>';
-
-	//End Date -- Date fin
-	print '<tr class="oddeven"><td><label for="date_fin">'.$langs->trans("EndDate").'</label></td><td>';
-	print $form->selectDate($object->date_end, 'datee', 1, 1, 0, '', 1);
-	print '</td></tr>';
-
-	//Maitre d'oeuvre
-	$maitre_oeuvre = is_array($object_signatories['FP_MAITRE_OEUVRE']) ? array_shift($object_signatories['FP_MAITRE_OEUVRE'])->element_id : '';
-	$userlist = $form->select_dolusers($maitre_oeuvre, '', 1, null, 0, '', '', 0, 0, 0, 'AND u.statut = 1', 0, '', 'minwidth300', 0, 1);
+	//User Victim -- Utilisateur victime de l'accient
+	$userlist = $form->select_dolusers((!empty(GETPOST('fk_user_victim')) ? GETPOST('fk_user_victim') : $user->id), '', 0, null, 0, '', '', $conf->entity, 0, 0, 'AND u.statut = 1', 0, '', 'minwidth300', 0, 1);
 	print '<tr>';
-	print '<td class="fieldrequired minwidth400" style="width:10%">'.img_picto('','user').' '.$form->editfieldkey('MaitreOeuvre', 'MaitreOeuvre_id', '', $object, 0).'</td>';
+	print '<td class="fieldrequired minwidth400" style="width:10%">' . img_picto('', 'user') . ' ' . $form->editfieldkey('UserVictim', 'UserVictim_id', '', $object, 0) . '</td>';
 	print '<td>';
-	print $form->selectarray('maitre_oeuvre', $userlist,$maitre_oeuvre, 1, null, null, null, "40%", 0, 0, 0, 'minwidth300',1);
-	print ' <a href="'.DOL_URL_ROOT.'/user/card.php?action=create&backtopage='.urlencode($_SERVER["PHP_SELF"].'?action=create').'" target="_blank"><span class="fa fa-plus-circle valignmiddle paddingleft" title="'.$langs->trans("AddUser").'"></span></a>';
+	print $form->selectarray('fk_user_victim', $userlist, (!empty(GETPOST('fk_user_victim')) ? GETPOST('fk_user_victim') : $user->id), $langs->trans('SelectUser'), null, null, null, "40%", 0, 0, '', 'minwidth300', 1);
+	print ' <a href="' . DOL_URL_ROOT . '/user/card.php?action=create&backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?action=create') . '" target="_blank"><span class="fa fa-plus-circle valignmiddle paddingleft" title="' . $langs->trans("AddUser") . '"></span></a>';
 	print '</td></tr>';
 
-	//External society -- Société extérieure
-	print '<tr><td class="fieldrequired minwidth400">';
-	print img_picto('','building').' '.$langs->trans("ExtSociety");
-	print '</td>';
-	print '<td>';
-	$events = array();
-	$events[1] = array('method' => 'getContacts', 'url' => dol_buildpath('/custom/digiriskdolibarr/core/ajax/contacts.php?showempty=1', 1), 'htmlname' => 'ext_society_responsible', 'params' => array('add-customer-contact' => 'disabled'));
-	//For external user force the company to user company
-	if (!empty($user->socid)) {
-		print $form->select_company($user->socid, 'ext_society', '', 1, 1, 0, $events, 0, 'minwidth300');
-	} else {
-		$ext_society_id = is_array($object_resources['FP_EXT_SOCIETY']) ? array_shift($object_resources['FP_EXT_SOCIETY'])->id : '';
-		print $form->select_company($ext_society_id, 'ext_society', '', 'SelectThirdParty', 1, 0, $events, 0, 'minwidth300');
-	}
-	print ' <a href="'.DOL_URL_ROOT.'/societe/card.php?action=create&backtopage='.urlencode($_SERVER["PHP_SELF"].'?action=create').'" target="_blank"><span class="fa fa-plus-circle valignmiddle paddingleft" title="'.$langs->trans("AddThirdParty").'"></span></a>';
+//	//Maitre d'oeuvre
+//	$maitre_oeuvre = is_array($object_signatories['FP_MAITRE_OEUVRE']) ? array_shift($object_signatories['FP_MAITRE_OEUVRE'])->element_id : '';
+//	$userlist = $form->select_dolusers($maitre_oeuvre, '', 1, null, 0, '', '', 0, 0, 0, 'AND u.statut = 1', 0, '', 'minwidth300', 0, 1);
+//	print '<tr>';
+//	print '<td class="fieldrequired minwidth400" style="width:10%">'.img_picto('','user').' '.$form->editfieldkey('MaitreOeuvre', 'MaitreOeuvre_id', '', $object, 0).'</td>';
+//	print '<td>';
+//	print $form->selectarray('maitre_oeuvre', $userlist,$maitre_oeuvre, 1, null, null, null, "40%", 0, 0, 0, 'minwidth300',1);
+//	print ' <a href="'.DOL_URL_ROOT.'/user/card.php?action=create&backtopage='.urlencode($_SERVER["PHP_SELF"].'?action=create').'" target="_blank"><span class="fa fa-plus-circle valignmiddle paddingleft" title="'.$langs->trans("AddUser").'"></span></a>';
+//	print '</td></tr>';
+//
+//	//External society -- Société extérieure
+//	print '<tr><td class="fieldrequired minwidth400">'.img_picto('','building').' '.$langs->trans("ExtSociety").'</td><td>';
+//	$events = array();
+//	$events[1] = array('method' => 'getContacts', 'url' => dol_buildpath('/custom/digiriskdolibarr/core/ajax/contacts.php?showempty=1', 1), 'htmlname' => 'ext_society_responsible', 'params' => array('add-customer-contact' => 'disabled'));
+//	print $form->select_company(GETPOST('ext_society'), 'ext_society', '', 'SelectThirdParty', 1, 0, $events, 0, 'minwidth300');
+//	print ' <a href="'.DOL_URL_ROOT.'/societe/card.php?action=create&backtopage='.urlencode($_SERVER["PHP_SELF"].'?action=create').'" target="_blank"><span class="fa fa-plus-circle valignmiddle paddingleft" title="'.$langs->trans("AddThirdParty").'"></span></a>';
+//	print '</td></tr>';
+//
+//	$ext_society_responsible_id = GETPOST('ext_society_responsible');
+//	$contacts = fetchAllSocPeople('',  '',  0,  0, array('customsql' => "s.rowid = $ext_society_responsible_id AND c.email IS NULL OR c.email = ''" ));
+//	$contacts_no_email = array();
+//	if (is_array($contacts) && !empty ($contacts) && $contacts > 0) {
+//		foreach ($contacts as $element) {
+//			$contacts_no_email[$element->id] = $element->id;
+//		}
+//	}
+
+	//Accident Date -- Date de l'accident
+	print '<tr><td class="minwidth400"><label for="accident_date">'.$langs->trans("AccidentDate").'</label></td><td>';
+	print $form->selectDate(dol_now('tzuser'), 'dateo', 1, 1, 0, '', 1);
 	print '</td></tr>';
 
-	$ext_society_responsible_id = is_array($object_signatories['FP_EXT_SOCIETY_RESPONSIBLE']) ? array_shift($object_signatories['FP_EXT_SOCIETY_RESPONSIBLE'])->element_id : GETPOST('ext_society_responsible');
-	$contacts = fetchAllSocPeople('',  '',  0,  0, array('customsql' => "s.rowid = $ext_society_responsible_id AND c.email IS NULL OR c.email = ''" ));
-	$contacts_no_email = array();
-	if (is_array($contacts) && !empty ($contacts) && $contacts > 0) {
-		foreach ($contacts as $element) {
-			$contacts_no_email[$element->id] = $element->id;
-		}
-	}
-
-	if ($ext_society_responsible_id > 0) {
-		$contact->fetch($ext_society_responsible_id);
-	}
-
-	//External responsible -- Responsable de la société extérieure
-	$ext_society = $digiriskresources->fetchResourcesFromObject('FP_EXT_SOCIETY', $object);
-	print '<tr class="oddeven"><td class="fieldrequired minwidth400">';
-	$htmltext = img_picto('','address').' '.$langs->trans("ExtSocietyResponsible");
-	print $form->textwithpicto($htmltext, $langs->trans('ContactNoEmail'));
-	print '</td><td>';
-	print digirisk_selectcontacts($ext_society->id, dol_strlen($contact->email) ? $ext_society_responsible_id : -1, 'ext_society_responsible', 0, $contacts_no_email, '', 0, 'minwidth300', false, 0, array(), false, '', 'ext_society_responsible');
+	//Description -- Description
+	print '<tr class="content_field"><td><label for="content">'.$langs->trans("Description").'</label></td><td>';
+	$doleditor = new DolEditor('description', GETPOST('description'), '', 90, 'dolibarr_details', '', false, true, $conf->global->FCKEDITOR_ENABLE_SOCIETE, ROWS_3, '90%');
+	$doleditor->Create();
 	print '</td></tr>';
 
-	if (is_array($object_resources['FP_LABOUR_INSPECTOR']) && $object_resources['FP_LABOUR_INSPECTOR'] > 0) {
-		$labour_inspector_society  = array_shift($object_resources['FP_LABOUR_INSPECTOR']);
-	}
-	if (is_array($object_resources['FP_LABOUR_INSPECTOR_ASSIGNED']) && $object_resources['FP_LABOUR_INSPECTOR_ASSIGNED'] > 0) {
-		$labour_inspector_assigned = array_shift($object_resources['FP_LABOUR_INSPECTOR_ASSIGNED']);
-	}
-	//Labour inspector Society -- Entreprise Inspecteur du travail
-	print '<tr><td class="fieldrequired minwidth400">';
-	print img_picto('','building').' '.$langs->trans("LabourInspectorSociety");
-	print '</td>';
-	print '<td>';
-	$events = array();
-	$events[1] = array('method' => 'getContacts', 'url' => dol_buildpath('/custom/digiriskdolibarr/core/ajax/contacts.php?showempty=1', 1), 'htmlname' => 'labour_inspector_contact', 'params' => array('add-customer-contact' => 'disabled'));
-	print $form->select_company($labour_inspector_society->id, 'labour_inspector', '', 'SelectThirdParty', 1, 0, $events, 0, 'minwidth300');
-	print ' <a href="'.DOL_URL_ROOT.'/societe/card.php?action=create&backtopage='.urlencode($_SERVER["PHP_SELF"].'?action=create').'" target="_blank"><span class="fa fa-plus-circle valignmiddle paddingleft" title="'.$langs->trans("AddThirdParty").'"></span></a>';
-	print '<a href="'.DOL_URL_ROOT.'/custom/digiriskdolibarr/admin/securityconf.php'.'" target="_blank">'.$langs->trans("ConfigureLabourInspector").'</a>';
-	print '</td></tr>';
-
-	$labour_inspector_contact = !empty($digiriskresources->fetchResourcesFromObject('FP_LABOUR_INSPECTOR_ASSIGNED', $object)) ? $digiriskresources->fetchResourcesFromObject('FP_LABOUR_INSPECTOR_ASSIGNED', $object) : GETPOST('labour_inspector_contact');
-	$contacts = fetchAllSocPeople('',  '',  0,  0, array('customsql' => "s.rowid = $labour_inspector_contact->id AND c.email IS NULL OR c.email = ''" ));
-	$contacts_no_email_labour_inspector = array();
-	if (is_array($contacts) && !empty ($contacts) && $contacts > 0) {
-		foreach ($contacts as $element) {
-			$contacts_no_email_labour_inspector[$element->id] = $element->id;
-		}
-	}
-
-	if ($labour_inspector_contact->id > 0) {
-		$contact->fetch($labour_inspector_contact->id);
-	}
-
-	//Labour inspector -- Inspecteur du travail
-	$labour_inspector_society = $digiriskresources->fetchResourcesFromObject('FP_LABOUR_INSPECTOR', $object);
-	print '<tr><td class="fieldrequired minwidth400">';
-	$htmltext = img_picto('','address').' '.$langs->trans("LabourInspector");
-	print $form->textwithpicto($htmltext, $langs->trans('ContactNoEmail'));
-	print '</td><td>';
-	print digirisk_selectcontacts($labour_inspector_society->id, dol_strlen($contact->email) ? $labour_inspector_contact->id : -1, 'labour_inspector_contact', 0, $contacts_no_email_labour_inspector, '', 0, 'minwidth300', false, 0, array(), false, '', 'labour_inspector_contact');
-	print '</td></tr>';
-
-	//FK PREVENTION PLAN
-	print '<tr class="oddeven"><td>'.$langs->trans("PreventionPlanLinked").'</td><td>';
-	print $preventionplan->select_preventionplan_list($object->fk_preventionplan);
+	print '<tr><td class="titlefield">'.$form->editfieldkey($langs->trans("Photo"), 'Photo', '', $object, 0).'</td><td>';
+	print '<input class="flat" type="file" name="userfile[]" id="Photo" />';
 	print '</td></tr>';
 
 	// Other attributes
@@ -952,6 +881,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	//Unset for order
 	unset($object->fields['label']);
 	unset($object->fields['accident_date']);
+	unset($object->fields['photo']);
 	unset($object->fields['fk_project']);
 
 	//Label -- Libellé
@@ -971,6 +901,23 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	print '</td></tr>';
 
 	include DOL_DOCUMENT_ROOT.'/core/tpl/commonfields_view.tpl.php';
+
+	print '<tr><td class="titlefield">';
+	print $langs->trans("Photo") . '</td>';
+	print '<td>';
+	$filearray = dol_dir_list($conf->digiriskdolibarr->multidir_output[$conf->entity].'/accident/'.$object->ref, "files", 0, '', '(\.odt|\.zip)', 'date', 'asc', 1);
+	if (count($filearray)) : ?>
+		<?php $file = array_shift($filearray); ?>
+		<span class="">
+			<?php print '<img class="" src="'.DOL_URL_ROOT.'/viewimage.php?modulepart=digiriskdolibarr&entity='.$conf->entity.'&file='.urlencode('/accident/'.$object->ref.'/thumbs/'. preg_replace('/\./', '_small.',$file['name'])).'" >'; ?>
+		</span>
+	<?php else: ?>
+		<?php $nophoto = DOL_URL_ROOT.'/public/theme/common/nophoto.png'; ?>
+		<span class="">
+			<img class="" alt="No photo" src="<?php echo $nophoto ?>">
+		</span>
+	<?php endif; ?>
+	<?php print '</td></tr>';
 
 	print '</table>';
 	print '</div>';
