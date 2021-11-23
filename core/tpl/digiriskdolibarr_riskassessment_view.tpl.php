@@ -245,7 +245,7 @@ if (!empty ($lastEvaluation) && $lastEvaluation > 0) {
 								</div>
 							</div>
 							<!-- Modal-Footer -->
-							<div class="modal-footer">
+							<div class="modal-footer risk-evaluation-save">
 								<?php if ($permissiontoadd) : ?>
 									<div class="wpeo-button risk-evaluation-save button-green">
 										<i class="fas fa-save"></i> <?php echo $langs->trans('UpdateData'); ?>
@@ -583,7 +583,7 @@ $cotation->method = $lastEvaluation->method ? $lastEvaluation->method : "standar
 				<?php endif; ?>
 			</div>
 			<!-- Modal-Footer -->
-			<div class="modal-footer">
+			<div class="modal-footer risk-evaluation-create">
 				<?php if ($permissiontoadd) : ?>
 					<div class="risk-evaluation-create wpeo-button button-blue button-disable" value="<?php echo $risk->id ?>">
 						<i class="fas fa-plus"></i> <?php echo $langs->trans('Add'); ?>

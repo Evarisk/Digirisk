@@ -406,7 +406,7 @@ if ($object->id > 0) {
 					</div>
 				</div>
 				<!-- Modal-Footer -->
-				<div class="modal-footer">
+				<div class="modal-footer evaluator-create">
 					<?php if ($permissiontoadd) : ?>
 						<div class="evaluator-create wpeo-button button-primary modal-close">
 							<span><i class="fas fa-plus"></i>  <?php echo $langs->trans('AddEvaluatorButton'); ?></span>

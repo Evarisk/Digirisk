@@ -43,7 +43,7 @@
 			</div>
 		</div>
 		<!-- Modal-Footer -->
-		<div class="modal-footer">
+		<div class="modal-footer save-photo">
 			<div class="save-photo wpeo-button button-blue button-disable" value="">
 				<input class="type-from" value="" type="hidden" />
 				<span><?php echo $langs->trans('Add'); ?></span>
