@@ -91,6 +91,14 @@ if ($action == 'setriskcategoryedit') {
 	dolibarr_set_const($db, $constforval, $value, 'integer', 0, '', $conf->entity);
 }
 
+if ($action == 'setparentrisksvisible') {
+	$constforval = 'DIGIRISKDOLIBARR_SHOW_PARENT_RISKS';
+	dolibarr_set_const($db, $constforval, $value, 'integer', 0, '', $conf->entity);
+}
+if ($action == 'setMoveRisks') {
+	$constforval = 'DIGIRISKDOLIBARR_MOVE_RISKS';
+	dolibarr_set_const($db, $constforval, $value, 'integer', 0, '', $conf->entity);
+}
 /*
  * View
  */
@@ -240,6 +248,38 @@ if ($conf->global->DIGIRISKDOLIBARR_RISK_CATEGORY_EDIT) {
 }
 else {
 	print '<a class="reposition" href="'.$_SERVER["PHP_SELF"].'?action=setriskcategoryedit&value=1" alt="'.$langs->trans("Default").'">'.img_picto($langs->trans("Disabled"), 'switch_off').'</a>';
+}
+print '</td>';
+print '</tr>';
+
+print '<tr class="oddeven"><td>';
+print $langs->trans('ShowParentRisks');
+print "</td><td>";
+print $langs->trans('ShowParentRisksDescription');
+print '</td>';
+
+print '<td class="center">';
+if ($conf->global->DIGIRISKDOLIBARR_SHOW_PARENT_RISKS) {
+	print '<a class="reposition" href="'.$_SERVER["PHP_SELF"].'?action=setparentrisksvisible&value=0" alt="'.$langs->trans("Default").'">'.img_picto($langs->trans("Activated"), 'switch_on').'</a>';
+}
+else {
+	print '<a class="reposition" href="'.$_SERVER["PHP_SELF"].'?action=setparentrisksvisible&value=1" alt="'.$langs->trans("Default").'">'.img_picto($langs->trans("Disabled"), 'switch_off').'</a>';
+}
+print '</td>';
+print '</tr>';
+
+print '<tr class="oddeven"><td>';
+print $langs->trans('MoveRisks');
+print "</td><td>";
+print $langs->trans('MoveRisksDescription');
+print '</td>';
+
+print '<td class="center">';
+if ($conf->global->DIGIRISKDOLIBARR_MOVE_RISKS) {
+	print '<a class="reposition" href="'.$_SERVER["PHP_SELF"].'?action=setMoveRisks&value=0" alt="'.$langs->trans("Default").'">'.img_picto($langs->trans("Activated"), 'switch_on').'</a>';
+}
+else {
+	print '<a class="reposition" href="'.$_SERVER["PHP_SELF"].'?action=setMoveRisks&value=1" alt="'.$langs->trans("Default").'">'.img_picto($langs->trans("Disabled"), 'switch_off').'</a>';
 }
 print '</td>';
 print '</tr>';

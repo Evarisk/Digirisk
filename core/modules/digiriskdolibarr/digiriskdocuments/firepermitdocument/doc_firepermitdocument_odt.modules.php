@@ -172,7 +172,7 @@ class doc_firepermitdocument_odt extends ModeleODTFirePermitDocument
 	public function write_file($object, $outputlangs, $srctemplatepath, $hidedetails = 0, $hidedesc = 0, $hideref = 0, $firepermit)
 	{
 		// phpcs:enable
-		global $user, $langs, $conf, $hookmanager, $action;
+		global $user, $langs, $conf, $hookmanager, $action, $mysoc;
 
 		if (empty($srctemplatepath))
 		{
@@ -219,7 +219,10 @@ class doc_firepermitdocument_odt extends ModeleODTFirePermitDocument
 			$filename = preg_split('/firepermitdocument\//' , $srctemplatepath);
 			$filename = preg_replace('/template_/','', $filename[1]);
 
-			$filename = $objectref . '_'. $filename;
+			$date = dol_print_date(dol_now(),'dayxcard');
+			$filename = $objectref.'_'.$conf->global->MAIN_INFO_SOCIETE_NOM.'_'.$date.'.odt';
+			$filename = str_replace(' ', '_', $filename);
+			$filename = dol_sanitizeFileName($filename);
 
 			$object->last_main_doc = $filename;
 
@@ -260,56 +263,102 @@ class doc_firepermitdocument_odt extends ModeleODTFirePermitDocument
 				return -1;
 			}
 
-			$tmparray = $substitutionarray;
+			// Define substitution array
+			$substitutionarray = getCommonSubstitutionArray($outputlangs, 0, null, $object);
+			$array_object_from_properties = $this->get_substitutionarray_each_var_object($object, $outputlangs);
+			$array_object = $this->get_substitutionarray_object($object, $outputlangs);
+			$array_soc = $this->get_substitutionarray_mysoc($mysoc, $outputlangs);
+			$array_soc['mycompany_logo'] = preg_replace('/_small/', '_mini', $array_soc['mycompany_logo']);
 
-			$filearray = dol_dir_list($conf->digiriskdolibarr->multidir_output[$conf->entity] . '/' . $firepermit->element_type . '/' . $firepermit->ref, "files", 0, '', '(\.odt|_preview.*\.png)$', 'position_name', 'desc', 1);
-			if (count($filearray)) {
-				$image = array_shift($filearray);
-				$tmparray['photoDefault'] = $image['fullname'];
-			}
+			$tmparray = array_merge($substitutionarray, $array_object_from_properties, $array_object, $array_soc);
+			complete_substitutions_array($tmparray, $outputlangs, $object);
 
+			$digiriskelement    = new DigiriskElement($this->db);
 			$resources          = new DigiriskResources($this->db);
+			$signatory          = new FirePermitSignature($this->db);
 			$societe            = new Societe($this->db);
 			$firepermitline     = new FirePermitLine($this->db);
 			$risk               = new Risk($this->db);
 			$preventionplan     = new PreventionPlan($this->db);
 			$preventionplanline = new PreventionPlanLine($this->db);
+			$openinghours       = new Openinghours($this->db);
 
 			if ($firepermit->fk_preventionplan > 0) {
 				$preventionplan->fetch($firepermit->fk_preventionplan);
 				$preventionplanlines = $preventionplanline->fetchAll($preventionplan->id);
-
 			}
 
 			$firepermitlines = $firepermitline->fetchAll($firepermit->id);
 
 
-			$digirisk_resources      = $resources->digirisk_dolibarr_fetch_resources();
-			$extsociety              = $resources->fetchResourcesFromObject('FP_EXT_SOCIETY', $firepermit);
-			$extsocietyintervenants  = $resources->fetchResourcesFromObject('FP_EXT_SOCIETY_INTERVENANTS', $firepermit);
-			$maitreoeuvre            = $resources->fetchResourcesFromObject('FP_MAITRE_OEUVRE', $firepermit);
-			$extsocietyresponsible   = $resources->fetchResourcesFromObject('FP_EXT_SOCIETY_RESPONSIBLE', $firepermit);
+			$digirisk_resources     = $resources->digirisk_dolibarr_fetch_resources();
+			$extsociety             = $resources->fetchResourcesFromObject('FP_EXT_SOCIETY', $firepermit);
+			$maitreoeuvre           = array_shift($signatory->fetchSignatory('FP_MAITRE_OEUVRE', $firepermit->id));
+			$extsocietyresponsible  = array_shift($signatory->fetchSignatory('FP_EXT_SOCIETY_RESPONSIBLE', $firepermit->id));
+			$extsocietyintervenants = $signatory->fetchSignatory('FP_EXT_SOCIETY_INTERVENANTS', $firepermit->id);
 
-			$tmparray['titre_permis_feu']             = $firepermit->ref;
-			$tmparray['unique_identifier']            = $firepermit->label;
+			$tmparray['titre_permis_feu']     = $firepermit->ref;
+			$tmparray['raison_du_permis_feu'] = $firepermit->label;
+
+			if (!empty ($digirisk_resources )) {
+				$societe->fetch($digirisk_resources['Pompiers']->id[0]);
+				$tmparray['pompier_number'] = $societe->phone;
+
+				$societe->fetch($digirisk_resources['SAMU']->id[0]);
+				$tmparray['samu_number'] = $societe->phone;
+
+				$societe->fetch($digirisk_resources['AllEmergencies']->id[0]);
+				$tmparray['emergency_number'] = $societe->phone;
+
+				$societe->fetch($digirisk_resources['Police']->id[0]);
+				$tmparray['police_number'] = $societe->phone;
+			}
 
 			$tmparray['moyen_generaux_mis_disposition'] = $conf->global->DIGIRISK_GENERAL_MEANS;
 			$tmparray['consigne_generale']              = $conf->global->DIGIRISK_GENERAL_RULES;
 			$tmparray['premiers_secours']               = $conf->global->DIGIRISK_FIRST_AID;
 
+			$tmparray['titre_plan_prevention']  = $preventionplan->ref;
+			$tmparray['raison_plan_prevention'] = $preventionplan->label;
 
-			$tmparray['titre_plan_prevention']       = $preventionplan->ref;
-			$tmparray['raison_plan_prevention']      = $preventionplan->label;
-			$tmparray['date_start_intervention_pre'] = dol_print_date($preventionplan->date_start, 'dayrfc');
-			$tmparray['date_end_intervention_pre']   = dol_print_date($preventionplan->date_end, 'dayrfc');
-			$tmparray['interventions_pre_info']      = count($preventionplanlines) . " " . $langs->trans('PreventionPlanLine');
+			$tmparray['date_start_intervention_PPP'] = dol_print_date($preventionplan->date_start, 'dayhoursec', 'tzuser');
+			$tmparray['date_end_intervention_PPP']   = dol_print_date($preventionplan->date_end, 'dayhoursec', 'tzuser');
 
-			$tmparray['date_start_intervention_PPP'] = dol_print_date($firepermit->date_start, 'dayrfc');
-			$tmparray['date_end_intervention_PPP'] = dol_print_date($firepermit->date_end, 'dayrfc');
-			$tmparray['interventions_info'] = count($firepermitlines) . " " . $langs->trans('FirePermitLine');
+			$morewhere = ' AND element_id = ' . $preventionplan->id;
+			$morewhere .= ' AND element_type = ' . "'" . $preventionplan->element . "'";
+			$morewhere .= ' AND status = 1';
 
+			$openinghours->fetch(0, '', $morewhere);
 
-			$openinghours = new Openinghours($this->db);
+			$opening_hours_monday    = explode(' ', $openinghours->monday);
+			$opening_hours_tuesday   = explode(' ', $openinghours->tuesday);
+			$opening_hours_wednesday = explode(' ', $openinghours->wednesday);
+			$opening_hours_thursday  = explode(' ', $openinghours->thursday);
+			$opening_hours_friday    = explode(' ', $openinghours->friday);
+			$opening_hours_saturday  = explode(' ', $openinghours->saturday);
+			$opening_hours_sunday    = explode(' ', $openinghours->sunday);
+
+			$tmparray['lundi_matin']    = $opening_hours_monday[0];
+			$tmparray['lundi_aprem']    = $opening_hours_monday[1];
+			$tmparray['mardi_matin']    = $opening_hours_tuesday[0];
+			$tmparray['mardi_aprem']    = $opening_hours_tuesday[1];
+			$tmparray['mercredi_matin'] = $opening_hours_wednesday[0];
+			$tmparray['mercredi_aprem'] = $opening_hours_wednesday[1];
+			$tmparray['jeudi_matin']    = $opening_hours_thursday[0];
+			$tmparray['jeudi_aprem']    = $opening_hours_thursday[1];
+			$tmparray['vendredi_matin'] = $opening_hours_friday[0];
+			$tmparray['vendredi_aprem'] = $opening_hours_friday[1];
+			$tmparray['samedi_matin']   = $opening_hours_saturday[0];
+			$tmparray['samedi_aprem']   = $opening_hours_saturday[1];
+			$tmparray['dimanche_matin'] = $opening_hours_sunday[0];
+			$tmparray['dimanche_aprem'] = $opening_hours_sunday[1];
+
+			if (!empty($preventionplanlines) && $preventionplanlines > 0 && is_array($preventionplanlines)) {
+				$tmparray['interventions_info'] = count($preventionplanlines) . " " . $langs->trans('PreventionPlanLine');
+			}
+
+			$tmparray['date_start_intervention_FP'] = dol_print_date($firepermit->date_start, 'dayhoursec', 'tzuser');
+			$tmparray['date_end_intervention_FP']   = dol_print_date($firepermit->date_end, 'dayhoursec', 'tzuser');
 
 			$morewhere = ' AND element_id = ' . $firepermit->id;
 			$morewhere .= ' AND element_type = ' . "'" . $firepermit->element . "'";
@@ -340,18 +389,8 @@ class doc_firepermitdocument_odt extends ModeleODTFirePermitDocument
 			$tmparray['dimanche_matin'] = $opening_hours_sunday[0];
 			$tmparray['dimanche_aprem'] = $opening_hours_sunday[1];
 
-			if (!empty ($digirisk_resources )) {
-				$societe->fetch($digirisk_resources['Pompiers']->id[0]);
-				$tmparray['pompier_number'] = $societe->phone;
-
-				$societe->fetch($digirisk_resources['SAMU']->id[0]);
-				$tmparray['samu_number'] = $societe->phone;
-
-				$societe->fetch($digirisk_resources['AllEmergencies']->id[0]);
-				$tmparray['emergency_number'] = $societe->phone;
-
-				$societe->fetch($digirisk_resources['Police']->id[0]);
-				$tmparray['police_number'] = $societe->phone;
+			if (!empty($firepermitlines) && $firepermitlines > 0 && is_array($firepermitlines)) {
+				$tmparray['interventions_info_FP'] = count($firepermitlines) . " " . $langs->trans('FirePermitLine');
 			}
 
 			//Informations entreprise extérieure
@@ -365,9 +404,10 @@ class doc_firepermitdocument_odt extends ModeleODTFirePermitDocument
 			}
 
 			if (!empty( $extsocietyintervenants) && $extsocietyintervenants > 0 && is_array($extsocietyintervenants)) {
-				$extsocietyintervenants = array_shift($extsocietyintervenants);
 				$tmparray['intervenants_info'] = count($extsocietyintervenants);
 			}
+
+			$tempdir = $conf->digiriskdolibarr->multidir_output[isset($object->entity) ? $object->entity : 1] . '/temp/';
 
 			//Signatures
 			if (!empty( $maitreoeuvre) && $maitreoeuvre > 0) {
@@ -376,9 +416,11 @@ class doc_firepermitdocument_odt extends ModeleODTFirePermitDocument
 				$tmparray['maitre_oeuvre_email'] = $maitreoeuvre->email;
 				$tmparray['maitre_oeuvre_phone'] = $maitreoeuvre->phone;
 
-				//@todo when attendance will be created
-				$tmparray['maitre_oeuvre_signature_date'] = '';
-				$tmparray['maitre_oeuvre_signature']      = '';
+				$tmparray['maitre_oeuvre_signature_date'] = dol_print_date($maitreoeuvre->signature_date, 'dayhoursec', 'tzuser');
+				$encoded_image = explode(",",  $maitreoeuvre->signature)[1];
+				$decoded_image = base64_decode($encoded_image);
+				file_put_contents($tempdir."signature.png", $decoded_image);
+				$tmparray['maitre_oeuvre_signature'] = $tempdir."signature.png";
 			}
 
 			if (!empty( $extsocietyresponsible) && $extsocietyresponsible > 0) {
@@ -387,15 +429,17 @@ class doc_firepermitdocument_odt extends ModeleODTFirePermitDocument
 				$tmparray['intervenant_exterieur_email'] = $extsocietyresponsible->email;
 				$tmparray['intervenant_exterieur_phone'] = $extsocietyresponsible->phone;
 
-				//@todo when attendance will be created
-				$tmparray['intervenant_exterieur_signature_date'] = '';
-				$tmparray['intervenant_exterieur_signature']      = '';
+				$tmparray['intervenant_exterieur_signature_date'] = dol_print_date($extsocietyresponsible->signature_date, 'dayhoursec', 'tzuser');
+				$encoded_image = explode(",",  $extsocietyresponsible->signature)[1];
+				$decoded_image = base64_decode($encoded_image);
+				file_put_contents($tempdir."signature2.png", $decoded_image);
+				$tmparray['intervenant_exterieur_signature']      = $tempdir."signature2.png";
 			}
 
 			foreach ($tmparray as $key=>$value)
 			{
 				try {
-					if ($key == 'photoDefault') // Image
+					if ($key == 'maitre_oeuvre_signature' || $key == 'intervenant_exterieur_signature') // Image
 					{
 						$list = getimagesize($value);
 						$newWidth = 350;
@@ -405,10 +449,17 @@ class doc_firepermitdocument_odt extends ModeleODTFirePermitDocument
 							dol_imageResizeOrCrop($value, 0, $newWidth, $newHeight);
 						}
 						$odfHandler->setImage($key, $value);
+					} elseif (preg_match('/logo$/', $key)) {
+						if (file_exists($value)) $odfHandler->setImage($key, $value);
+						else $odfHandler->setVars($key, $langs->transnoentities('ErrorFileNotFound'), true, 'UTF-8');
 					}
 					else    // Text
 					{
-						$odfHandler->setVars($key, $value, true, 'UTF-8');
+						if (empty($value)) {
+							$odfHandler->setVars($key, $langs->trans('NoData'), true, 'UTF-8');
+						} else {
+							$odfHandler->setVars($key, html_entity_decode($value,ENT_QUOTES | ENT_HTML5), true, 'UTF-8');
+						}
 					}
 				}
 				catch (OdfException $e)
@@ -421,12 +472,14 @@ class doc_firepermitdocument_odt extends ModeleODTFirePermitDocument
 				$foundtagforlines = 1;
 				if ($foundtagforlines) {
 					if (!empty($preventionplanlines) && $preventionplanlines > 0) {
-						$listlines = $odfHandler->setSegment('interventions_pre');
+						$listlines = $odfHandler->setSegment('interventions');
 
 						foreach ($preventionplanlines as $line) {
 
+							$digiriskelement->fetch($line->fk_element);
+
 							$tmparray['key_unique']    = $line->ref;
-							$tmparray['unite_travail'] = $line->location;
+							$tmparray['unite_travail'] = $digiriskelement->ref . " - " . $digiriskelement->label;
 							$tmparray['action']        = $line->description;
 							$tmparray['risk']          = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $risk->get_danger_category($line) . '.png';
 							$tmparray['prevention']    = $line->prevention_method;
@@ -436,7 +489,11 @@ class doc_firepermitdocument_odt extends ModeleODTFirePermitDocument
 									if ($val == $tmparray['risk']) {
 										$listlines->setImage($key, $val);
 									} else {
-										$listlines->setVars($key, $val, true, 'UTF-8');
+										if (empty($val)) {
+											$listlines->setVars($key, $langs->trans('NoData'), true, 'UTF-8');
+										} else {
+											$listlines->setVars($key, html_entity_decode($val,ENT_QUOTES | ENT_HTML5), true, 'UTF-8');
+										}
 									}
 								} catch (OdfException $e) {
 									dol_syslog($e->getMessage(), LOG_INFO);
@@ -450,22 +507,28 @@ class doc_firepermitdocument_odt extends ModeleODTFirePermitDocument
 					}
 
 					if (!empty($firepermitlines) && $firepermitlines > 0) {
-						$listlines = $odfHandler->setSegment('interventions');
+						$listlines = $odfHandler->setSegment('interventions_FP');
 
 						foreach ($firepermitlines as $line) {
 
-							$tmparray['key_unique']    = $line->ref;
-							$tmparray['unite_travail'] = $line->location;
-							$tmparray['action']        = $line->description;
-							$tmparray['type_de_travaux']          = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $risk->get_danger_category($line) . '.png';
-							$tmparray['materiel']    = $line->use_equipment;
+							$digiriskelement->fetch($line->fk_element);
+
+							$tmparray['key_unique']      = $line->ref;
+							$tmparray['unite_travail']   = $digiriskelement->ref . " - " . $digiriskelement->label;
+							$tmparray['action']          = $line->description;
+							$tmparray['type_de_travaux'] = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/img/typeDeTravaux/' . $risk->get_fire_permit_danger_category($line) . '.png';
+							$tmparray['materiel']        = $line->use_equipment;
 
 							foreach ($tmparray as $key => $val) {
 								try {
 									if ($val == $tmparray['type_de_travaux']) {
 										$listlines->setImage($key, $val);
 									} else {
-										$listlines->setVars($key, $val, true, 'UTF-8');
+										if (empty($val)) {
+											$listlines->setVars($key, $langs->trans('NoData'), true, 'UTF-8');
+										} else {
+											$listlines->setVars($key, html_entity_decode($val,ENT_QUOTES | ENT_HTML5), true, 'UTF-8');
+										}
 									}
 								} catch (OdfException $e) {
 									dol_syslog($e->getMessage(), LOG_INFO);
@@ -480,37 +543,44 @@ class doc_firepermitdocument_odt extends ModeleODTFirePermitDocument
 
 					if (!empty($extsocietyintervenants) && $extsocietyintervenants > 0) {
 						$listlines = $odfHandler->setSegment('intervenants');
-
-						if(is_array($extsocietyintervenants)) {
-							foreach ($extsocietyintervenants as $line) {
-
-								$tmparray['id'] = $line->id;
-								$tmparray['name'] = $line->firstname;
-								$tmparray['lastname'] = $line->lastname;
-								$tmparray['phone'] = $line->phone;
-								$tmparray['mail'] = $line->mail;
-
-								foreach ($tmparray as $key => $val) {
-									try {
-										$listlines->setVars($key, $val, true, 'UTF-8');
-									} catch (OdfException $e) {
-										dol_syslog($e->getMessage(), LOG_INFO);
-									} catch (SegmentException $e) {
-										dol_syslog($e->getMessage(), LOG_INFO);
-									}
-								}
-								$listlines->merge();
+						$k = 3;
+						foreach ($extsocietyintervenants as $line) {
+							if ($line->status == 5) {
+								$encoded_image = explode(",", $line->signature)[1];
+								$decoded_image = base64_decode($encoded_image);
+								file_put_contents($tempdir."signature".$k.".png", $decoded_image);
+								$tmparray['intervenants_signature'] = $tempdir."signature".$k.".png";
+							}else {
+								$tmparray['intervenants_signature'] = '';
 							}
-						} else {
-							$tmparray['id'] = $extsocietyintervenants->id;
-							$tmparray['name'] = $extsocietyintervenants->firstname;
-							$tmparray['lastname'] = $extsocietyintervenants->lastname;
-							$tmparray['phone'] = $extsocietyintervenants->phone;
-							$tmparray['mail'] = $extsocietyintervenants->mail;
+							$tmparray['id']       = $line->id;
+							$tmparray['name']     = $line->firstname;
+							$tmparray['lastname'] = $line->lastname;
+							$tmparray['phone']    = $line->phone;
+							$tmparray['mail']     = $line->email;
+							$tmparray['status']   = $line->getLibStatut(1);
 
-							foreach ($tmparray as $key => $val) {
+							$k++;
+
+							foreach ($tmparray as $key => $value) {
 								try {
-									$listlines->setVars($key, $val, true, 'UTF-8');
+									if ($key == 'intervenants_signature' && $line->status == 5) { // Image
+										$list = getimagesize($value);
+										$newWidth = 200;
+										if ($list[0]) {
+											$ratio = $newWidth / $list[0];
+											$newHeight = $ratio * $list[1];
+											dol_imageResizeOrCrop($value, 0, $newWidth, $newHeight);
+										}
+										$listlines->setImage($key, $value);
+									}
+									else {  // Text
+										if (empty($value)) {
+											$listlines->setVars($key, $langs->trans('NoData'), true, 'UTF-8');
+										} else {
+											$listlines->setVars($key, html_entity_decode($value,ENT_QUOTES | ENT_HTML5), true, 'UTF-8');
+										}
+									}
 								} catch (OdfException $e) {
 									dol_syslog($e->getMessage(), LOG_INFO);
 								} catch (SegmentException $e) {
@@ -518,6 +588,8 @@ class doc_firepermitdocument_odt extends ModeleODTFirePermitDocument
 								}
 							}
 							$listlines->merge();
+
+							dol_delete_file($tempdir."signature".$k.".png");
 						}
 						$odfHandler->mergeSegment($listlines);
 					}
@@ -574,6 +646,9 @@ class doc_firepermitdocument_odt extends ModeleODTFirePermitDocument
 				@chmod($file, octdec($conf->global->MAIN_UMASK));
 
 			$odfHandler = null; // Destroy object
+
+			dol_delete_file($tempdir."signature.png");
+			dol_delete_file($tempdir."signature2.png");
 
 			$this->result = array('fullpath'=>$file);
 

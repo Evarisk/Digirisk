@@ -181,7 +181,7 @@ $results = recurse_tree(0,0,$objects); ?>
 			tolerance:'intersect',
 			over:function(event,ui){
 				$('.save-organization').removeClass('button-disable')
-				$('.save-organization').attr('style','')
+				$('.save-organization').attr('style','z-index:1050')
 				$('.save-organization .fas').attr('style','display:none')
 			},
 			receive:function(event, ui){
@@ -223,9 +223,9 @@ $results = recurse_tree(0,0,$objects); ?>
 	</ul>
 </div>
 <?php
+print '<hr>';
+print '<button class="save-organization wpeo-button button-disable" style="">'.$langs->trans('Save').'  <i style="display:none" class="fas fa-times"></i><i style="display:none" class="fas fa-check"></i></button>';
 
-print '<button class="save-organization wpeo-button button-disable">'.$langs->trans('Save').'  <i style="display:none" class="fas fa-times"></i><i style="display:none" class="fas fa-check"></i></button>';
-print '</form>';
 // End of page
 llxFooter();
 $db->close();

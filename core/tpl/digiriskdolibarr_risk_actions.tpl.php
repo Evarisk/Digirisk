@@ -128,9 +128,17 @@ if (!$error && $action == 'saveRisk' && $permissiontoadd) {
 	$riskID      = GETPOST('riskID');
 	$description = GETPOST('riskComment', 'restricthtml');
 	$category    = GETPOST('riskCategory');
+	$digiriskelement = new DigiriskElement($db);
+
+	if (dol_strlen(GETPOST('newParent'))) {
+		$parent_element = $digiriskelement->fetchAll('','',0,0, array('ref' => GETPOST('newParent')));
+		$parent_id = array_keys($parent_element)[0];
+	}
 
 	$risk->fetch($riskID);
-
+	if($parent_id > 0) {
+		$risk->fk_element = $parent_id;
+	}
 	$risk->description =  $description;
 	$risk->category    = $category;
 

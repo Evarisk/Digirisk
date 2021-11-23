@@ -107,7 +107,9 @@ if (empty($reshook)) {
 
 $title    = $langs->trans("PreventionPlan") . ' - ' . $langs->trans("Schedule");
 $help_url = '';
-llxHeader('', $title, $help_url);
+$morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");
+
+llxHeader('', $title, $help_url, '', '', '', '', $morecss);
 
 if (!empty($preventionplan->id)) $res = $preventionplan->fetch_optionals();
 
@@ -119,7 +121,7 @@ print dol_get_fiche_head($head, 'preventionplanSchedule', $langs->trans("Prevent
 dol_strlen($preventionplan->label) ? $morehtmlref = ' - ' . $preventionplan->label : '';
 //$morehtmlleft .= '<div class="floatleft inline-block valignmiddle divphotoref">'.digirisk_show_photos('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$entity].'/'.$object->element_type, 'small', 5, 0, 0, 0, $width,0, 0, 0, 0, $object->element_type, $object).'</div>';
 
-digirisk_banner_tab($preventionplan, 'ref', '', 0, 'ref', 'ref', $morehtmlref);
+digirisk_banner_tab($preventionplan, 'ref', '', 0, 'ref', 'ref', $morehtmlref, 0, '', '', $preventionplan->getLibStatut(5));
 
 print dol_get_fiche_end();
 

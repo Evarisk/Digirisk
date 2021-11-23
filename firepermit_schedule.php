@@ -16,9 +16,9 @@
  */
 
 /**
- *   	\file       firepermit_card.php
+ *   	\file       firepermit_schedule.php
  *		\ingroup    digiriskdolibarr
- *		\brief      Page to create/edit/view firepermit
+ *		\brief      Page to create/edit/view Fire Permit Schedule
  */
 
 // Load Dolibarr environment
@@ -35,65 +35,44 @@ if (!$res && file_exists("../../main.inc.php")) $res = @include "../../main.inc.
 if (!$res && file_exists("../../../main.inc.php")) $res = @include "../../../main.inc.php";
 if (!$res) die("Include of main fails");
 
-require_once DOL_DOCUMENT_ROOT.'/core/class/html.formfile.class.php';
-
-require_once __DIR__ . '/class/digiriskdocuments.class.php';
-require_once __DIR__ . '/class/digiriskelement.class.php';
-require_once __DIR__ . '/class/digiriskresources.class.php';
 require_once __DIR__ . '/class/firepermit.class.php';
-require_once __DIR__ . '/class/riskanalysis/risk.class.php';
-require_once __DIR__ . '/class/digiriskdocuments/firepermitdocument.class.php';
-require_once __DIR__ . '/lib/digiriskdolibarr_function.lib.php';
+require_once __DIR__ . '/class/openinghours.class.php';
 require_once __DIR__ . '/lib/digiriskdolibarr_firepermit.lib.php';
-require_once __DIR__ . '/core/modules/digiriskdolibarr/digiriskelement/firepermit/mod_firepermit_standard.php';
-require_once __DIR__ . '/core/modules/digiriskdolibarr/digiriskelement/firepermitdet/mod_firepermitdet_standard.php';
-require_once __DIR__ . '/core/modules/digiriskdolibarr/digiriskdocuments/firepermitdocument/mod_firepermitdocument_standard.php';
-require_once __DIR__ . '/core/modules/digiriskdolibarr/digiriskdocuments/firepermitdocument/modules_firepermitdocument.php';
+require_once __DIR__ . '/lib/digiriskdolibarr_function.lib.php';
 
-global $db, $conf, $langs;
+global $conf, $db, $langs, $user, $hookmanager;
 
 // Load translation files required by the page
 $langs->loadLangs(array("digiriskdolibarr@digiriskdolibarr", "other"));
 
 // Get parameters
-$id                  = GETPOST('id', 'int');
-$lineid                  = GETPOST('lineid', 'int');
-$ref                 = GETPOST('ref', 'alpha');
-$action              = GETPOST('action', 'aZ09');
-$confirm             = GETPOST('confirm', 'alpha');
-$cancel              = GETPOST('cancel', 'aZ09');
-$contextpage         = GETPOST('contextpage', 'aZ') ?GETPOST('contextpage', 'aZ') : 'firepermitcard'; // To manage different context of search
-$backtopage          = GETPOST('backtopage', 'alpha');
-$backtopageforcancel = GETPOST('backtopageforcancel', 'alpha');
-$fk_parent           = GETPOST('fk_parent', 'int');
+$id          = GETPOST('id', 'int');
+$ref         = GETPOST('ref', 'alpha');
+$action      = GETPOST('action', 'aZ09');
+$cancel      = GETPOST('cancel', 'aZ09');
+$contextpage = GETPOST('contextpage', 'aZ') ?GETPOST('contextpage', 'aZ') : 'preventionplanschedule'; // To manage different context of search
 
 // Initialize technical objects
-$firepermit                 = new FirePermit($db);
-$object = new Openinghours($db);
+$firepermit = new FirePermit($db);
+$object     = new Openinghours($db);
 
+$hookmanager->initHooks(array('firepermitschedule', 'globalcard')); // Note that conf->hooks_modules contains array
+
+// Load object
 $firepermit->fetch($id);
 
-$digiriskelement   = new DigiriskElement($db);
-$digiriskresources = new DigiriskResources($db);
-
-$refFirePermitMod = new $conf->global->DIGIRISKDOLIBARR_FIREPERMIT_ADDON($db);
-$refFirePermitDetMod = new  $conf->global->DIGIRISKDOLIBARR_FIREPERMITDET_ADDON($db);
-
-$hookmanager->initHooks(array('firepermitcard', 'globalcard')); // Note that conf->hooks_modules contains array
-
-$upload_dir         = $conf->digiriskdolibarr->multidir_output[isset($firepermit->entity) ? $firepermit->entity : 1];
-$permissiontoread   = $user->rights->digiriskdolibarr->firepermitdocument->read;
-$permissiontoadd    = $user->rights->digiriskdolibarr->firepermitdocument->write;
-$permissiontodelete = $user->rights->digiriskdolibarr->firepermitdocument->delete;
-
-$morewhere = ' AND element_id = ' . GETPOST('id');
+$morewhere = ' AND element_id = ' . $id;
 $morewhere .= ' AND element_type = ' . "'" . $firepermit->element . "'";
 $morewhere .= ' AND status = 1';
 
 $object->fetch(0, '', $morewhere);
 
+// Security check
+$permissiontoread = $user->rights->digiriskdolibarr->firepermit->read;
+$permissiontoadd  = $user->rights->digiriskdolibarr->firepermit->write;
+
 if (!$permissiontoread) accessforbidden();
-/*
+
 /*
  * Actions
  */
@@ -102,48 +81,53 @@ $parameters = array();
 $reshook = $hookmanager->executeHooks('doActions', $parameters, $firepermit, $action); // Note that $action and $firepermit may have been modified by some hooks
 if ($reshook < 0) setEventMessages($hookmanager->error, $hookmanager->errors, 'errors');
 
-if (($action == 'update' && !GETPOST("cancel", 'alpha'))
-	|| ($action == 'updateedit'))
-{
-	$object->element_type = $firepermit->element;
-	$object->element_id = GETPOST('id');
-	$object->status = 1;
-	$object->monday = GETPOST('monday', 'string');
-	$object->tuesday = GETPOST('tuesday', 'string');
-	$object->wednesday = GETPOST('wednesday', 'string');
-	$object->thursday = GETPOST('thursday', 'string');
-	$object->friday = GETPOST('friday', 'string');
-	$object->saturday = GETPOST('saturday', 'string');
-	$object->sunday = GETPOST('sunday', 'string');
-	$object->create($user);
-}
+if (empty($reshook)) {
+	if (($action == 'update' && !GETPOST("cancel", 'alpha')) || ($action == 'updateedit')) {
+		$object->element_type = $firepermit->element;
+		$object->element_id   = GETPOST('id');
+		$object->status       = 1;
 
+		$object->monday    = GETPOST('monday', 'string');
+		$object->tuesday   = GETPOST('tuesday', 'string');
+		$object->wednesday = GETPOST('wednesday', 'string');
+		$object->thursday  = GETPOST('thursday', 'string');
+		$object->friday    = GETPOST('friday', 'string');
+		$object->saturday = GETPOST('saturday', 'string');
+		$object->sunday   = GETPOST('sunday', 'string');
+
+		$object->create($user);
+
+		setEventMessages($langs->trans('FirePermitScheduleSave'), null, 'mesgs');
+	}
+}
 
 /*
  *  View
  */
 
-$title = $langs->trans("FirePermit");
-$help_url = 'EN:Module_Third_Parties|FR:Module_DigiriskDolibarr#L.27onglet_Horaire_de_travail|ES:Empresas';
-llxHeader('', $title, $help_url);
+$title    = $langs->trans("FirePermit")  . ' - ' . $langs->trans("Schedule");
+$help_url = '';
+$morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");
+
+llxHeader('', $title, $help_url, '', '', '', '', $morecss);
 
 if (!empty($firepermit->id)) $res = $firepermit->fetch_optionals();
 
 // Object card
 // ------------------------------------------------------------
-$morehtmlref = '<div class="refidno">';
-$morehtmlref .= '</div>';
 
 $head = firepermitPrepareHead($firepermit);
-dol_fiche_head($head, 'firepermitSchedule', $langs->trans("FirePermit"), 0, '');
-dol_banner_tab($firepermit, 'ref', '', ($user->socid ? 0 : 1), 'rowid', 'nom', '', '', 0, '', '', 'arearefnobottom');
+print dol_get_fiche_head($head, 'firepermitSchedule', $langs->trans("FirePermit"), -1, "digiriskdolibarr@digiriskdolibarr");
+dol_strlen($firepermit->label) ? $morehtmlref = ' - ' . $firepermit->label : '';
+digirisk_banner_tab($firepermit, 'ref', '', 0, 'ref', 'ref', $morehtmlref, 0, '', '', $firepermit->getLibStatut(5));
 
-print '<span class="opacitymedium">'.$langs->trans("FirePermitSchedule")."</span>\n";
+print dol_get_fiche_end();
+
+print load_fiche_titre($langs->trans("FirePermitSchedule"), '', '');
 
 //Show common fields
 require_once './core/tpl/digiriskdolibarr_openinghours_view.tpl.php';
 
-dol_fiche_end();
 // End of page
 llxFooter();
 $db->close();

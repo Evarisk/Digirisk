@@ -132,6 +132,26 @@ $help_url = 'FR:Module_DigiriskDolibarr#L.27onglet_S.C3.A9curit.C3.A9';
 $title    = $langs->trans("CompanyFoundation") . ' - ' . $langs->trans("Security");
 $morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");
 
+$counter  = 0;
+
+$securityResources = array("SAMU","Pompiers","Police","AllEmergencies","RightsDefender","PoisonControlCenter", "Responsible", "LabourDoctorSociety", "LabourDoctorContact", "LabourInspectorSociety", "LabourInspectorContact" );
+$securityConsts    = array("DIGIRISK_LOCATION_OF_DETAILED_INSTRUCTION", "DIGIRISK_SOCIETY_DESCRIPTION", "DIGIRISK_GENERAL_MEANS", "DIGIRISK_GENERAL_RULES", "DIGIRISK_FIRST_AID", "DIGIRISK_RULES_LOCATION", "DIGIRISK_DUER_LOCATION", "DIGIRISK_COLLECTIVE_AGREEMENT_LOCATION");
+$socialResources   = array("TitularsCSE", "AlternatesCSE", "TitularsDP", "AlternatesDP");
+
+$maxnumber = count($securityResources) + count($securityConsts);
+
+foreach ($securityConsts as $securityConst) {
+	if (dol_strlen($conf->global->$securityConst) > 0) {
+		$counter += 1;
+	}
+}
+foreach ($securityResources as $securityResource) {
+	if (!empty($allLinks[$securityResource] && $allLinks[$securityResource]->id[0] > 0)) {
+		$counter += 1;
+	}
+}
+
+
 llxHeader('', $title, $help_url, '', '', '', '', $morecss);
 
 print load_fiche_titre($title, '', 'title_setup');
@@ -145,16 +165,22 @@ print "<br>";
 
 print '<form method="POST" action="'.$_SERVER["PHP_SELF"].'" name="form_index">';
 print '<input type="hidden" name="token" value="'.newToken().'">';
-print '<input type="hidden" name="action" value="update">';
+print '<input type="hidden" name="action" value="update">'; ?>
 
-print '<table class="noborder centpercent editmode">';
+<h2 class="">
+	<?php echo $langs->trans('SecurityConfiguration') ?>
+</h2>
+<?php include_once '../core/tpl/digiriskdolibarr_configuration_gauge_view.tpl.php'; ?>
+<hr>
+
+<?php print '<table class="noborder centpercent editmode">';
 
 if ($conf->societe->enabled) {
 	/*
 	*** Labour Doctor -- Médecin du travail ***
 	*/
 
-	print '<tr class="liste_titre"><th class="titlefield wordbreak">'.$langs->trans("LabourDoctor").'</th><th>.<i class="fas fa-briefcase-medical"></i></th></tr>'."\n";
+	print '<tr class="liste_titre"><th class="titlefield wordbreak">'.$langs->trans("LabourDoctor").'</th><th><i class="fas fa-briefcase-medical"></i></th></tr>'."\n";
 	print '<tr class="oddeven"><td class="titlefieldcreate nowrap">'.$langs->trans("ActionOnCompany").'</td><td>';
 
 	$labour_doctor_society = $allLinks['LabourDoctorSociety'];
@@ -203,7 +229,7 @@ if ($conf->societe->enabled) {
 	 *** Labour Inspector -- Inspecteur du travail ***
 	*/
 
-	print '<tr class="liste_titre"><th class="titlefield wordbreak">'.$langs->trans("LabourInspector").'</th><th>.<i class="fas fa-search"></i></th></tr>'."\n";
+	print '<tr class="liste_titre"><th class="titlefield wordbreak">'.$langs->trans("LabourInspector").'</th><th><i class="fas fa-search"></i></th></tr>'."\n";
 	print '<tr class="oddeven"><td class="titlefieldcreate nowrap">'.$langs->trans("ActionOnCompany").'</td><td>';
 
 	$labour_inspector_societe = $allLinks['LabourInspectorSociety'];
@@ -251,7 +277,7 @@ if ($conf->societe->enabled) {
 	*** Emergencies -- SAMU ***
 	*/
 
-	print '<tr class="liste_titre"><th class="titlefield wordbreak">'.$langs->trans("SAMU").'</th><th>.<i class="fas fa-hospital-alt"></i></th></tr>'."\n";
+	print '<tr class="liste_titre"><th class="titlefield wordbreak">'.$langs->trans("SAMU").'</th><th><i class="fas fa-hospital-alt"></i></th></tr>'."\n";
 	print '<tr class="oddeven"><td class="titlefieldcreate nowrap">'.$langs->trans("ActionOnCompany").'</td><td>';
 
 	$samu_resources =  $allLinks['SAMU'];
@@ -279,7 +305,7 @@ if ($conf->societe->enabled) {
 	*** Fire Brigade -- Pompiers ***
 	*/
 
-	print '<tr class="liste_titre"><th class="titlefield wordbreak">'.$langs->trans("FireBrigade").'</th><th>.<i class="fas fa-ambulance"></i></th></tr>'."\n";
+	print '<tr class="liste_titre"><th class="titlefield wordbreak">'.$langs->trans("FireBrigade").'</th><th><i class="fas fa-ambulance"></i></th></tr>'."\n";
 	print '<tr class="oddeven"><td class="titlefieldcreate nowrap">'.$langs->trans("ActionOnCompany").'</td><td>';
 
 	$pompiers_resources = $allLinks['Pompiers'];
@@ -306,7 +332,7 @@ if ($conf->societe->enabled) {
 	*** Police -- Police ***
 	*/
 
-	print '<tr class="liste_titre"><th class="titlefield wordbreak">'.$langs->trans("Police").'</th><th>.<i class="fas fa-car"></i></th></tr>'."\n";
+	print '<tr class="liste_titre"><th class="titlefield wordbreak">'.$langs->trans("Police").'</th><th><i class="fas fa-car"></i></th></tr>'."\n";
 	print '<tr class="oddeven"><td class="titlefieldcreate nowrap">'.$langs->trans("ActionOnCompany").'</td><td>';
 
 	$police_resources = $allLinks['Police'];
@@ -333,7 +359,7 @@ if ($conf->societe->enabled) {
 	*** For any emergency -- Pour toute urgence ***
 	*/
 
-	print '<tr class="liste_titre"><th class="titlefield wordbreak">'.$langs->trans("AllEmergencies").'</th><th>.<i class="fas fa-phone"></i></th></tr>'."\n";
+	print '<tr class="liste_titre"><th class="titlefield wordbreak">'.$langs->trans("AllEmergencies").'</th><th><i class="fas fa-phone"></i></th></tr>'."\n";
 	print '<tr class="oddeven"><td class="titlefieldcreate nowrap">'.$langs->trans("ActionOnCompany").'</td><td>';
 
 	$touteurgence_resources = $allLinks['AllEmergencies'];
@@ -360,7 +386,7 @@ if ($conf->societe->enabled) {
 	*** Rights defender -- Défenseur des droits ***
 	*/
 
-	print '<tr class="liste_titre"><th class="titlefield wordbreak">'.$langs->trans("RightsDefender").'</th><th>.<i class="fas fa-gavel"></i></th></tr>'."\n";
+	print '<tr class="liste_titre"><th class="titlefield wordbreak">'.$langs->trans("RightsDefender").'</th><th><i class="fas fa-gavel"></i></th></tr>'."\n";
 	print '<tr class="oddeven"><td class="titlefieldcreate nowrap">'.$langs->trans("ActionOnCompany").'</td><td>';
 
 	$defenseur_resources = $allLinks['RightsDefender'];
@@ -388,7 +414,7 @@ if ($conf->societe->enabled) {
 	*** Poison control center -- Centre antipoison ***
 	*/
 
-	print '<tr class="liste_titre"><th class="titlefield wordbreak">'.$langs->trans("PoisonControlCenter").'</th><th>.<i class="fas fa-skull-crossbones"></i></th></tr>'."\n";
+	print '<tr class="liste_titre"><th class="titlefield wordbreak">'.$langs->trans("PoisonControlCenter").'</th><th><i class="fas fa-skull-crossbones"></i></th></tr>'."\n";
 
 	print '<tr class="oddeven"><td class="titlefieldcreate nowrap">'.$langs->trans("ActionOnCompany").'</td><td>';
 	$poison_control_center_resources = $allLinks['PoisonControlCenter'];
@@ -435,8 +461,6 @@ if ($responsible_resources->ref == 'Responsible' && $responsible_resources->id[0
 	print $form->selectarray('responsible_socid', $userlist, $usertmp->id, $langs->trans('SelectUser'), null, null, null, "40%", 0,0,'','minwidth300',1);
 	print ' <a href="'.DOL_URL_ROOT.'/user/card.php?action=create&backtopage='.urlencode($_SERVER["PHP_SELF"].'?action=create').'" target="_blank"><span class="fa fa-plus-circle valignmiddle paddingleft" title="'.$langs->trans("AddUser").'"></span></a>';
 	print '</td></tr>';
-
-	if (!GETPOSTISSET('backtopage')) print ' <a href="'.DOL_URL_ROOT.'/user/card.php?action=create&backtopage='.urlencode($_SERVER["PHP_SELF"].'?action=create').'"><span class="fa fa-plus-circle valignmiddle paddingleft" title="'.$langs->trans("AddUser").'"></span></a>';
 
 	// * Phone number - Numéro de téléphone *
 

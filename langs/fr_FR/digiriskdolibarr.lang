@@ -37,6 +37,15 @@ HowToSetupOtherModules = Pour plus de fonctionnalités sur Digirisk, vous pouvez
 ConfigMyModules = Configuration des modules
 AvoidLogoProblems = Pour éviter tout problème lié aux logos dans les documents générés, veuillez vous référer à ces conseils de paramétrages :
 LogoHelpLink = https://wiki.dolibarr.org/index.php?title=Premiers_paramétrages
+SecurityConfiguration = Configuration des données sécurité
+SocialConfiguration = Configuration des données sociales
+SecurityConfigIsUpTo = La configuration des données sécurité est réalisée à
+Uncompleted = Non complété
+DigiriskData = Données configurables de Digirisk
+DigiriskManagement = Redirection après la connexion au site
+DigiriskDescription = Redirection sur la page de bienvenue de Digirisk par défaut au lieu de celle de Dolibarr.
+
+
 
 #
 # Page À propos
@@ -92,6 +101,13 @@ HasNotBeenDeletedM = n'a pas été supprimé
 
 DigiriskDolibarrArea = Bienvenue sur DigiRisk
 WarningDigiriskNotUpdated = Veuillez mettre à jour votre Digirisk en désactivant et réactivant le module en vous rendant sur :
+
+DigiriskUserGroup = Groupe d'utilisateur Digirisk
+DigiriskUserGroupDescription = Le groupe d'utilisateur Digirisk possède les permissions de consulter tous les objets relatifs à Digirisk
+DigiriskAdminUserGroup = Groupe d'administrateur Digirisk
+DigiriskAdminUserGroupDescription = Le groupe d'administrateur Digirisk possède toutes les permissions à Digirisk
+
+
 
 #
 # Diaporama page index
@@ -254,6 +270,7 @@ InformationsSharingDigiriskTemplate = ODT par défaut des diffusions d'informati
 # Data - Donnée
 InformationsSharing = Diffusion d'informations
 HowToSetDataInformationsSharing = Pour configurer les données sur la diffusion d'informations, aller dans Accueil - Configuration - Société/Organisation - Social
+ConfigureSecurityAndSocialData = Configurer les données de la société
 
 ParticipationAgreement = Accords de participation
 TermsAndConditions = Modalités
@@ -292,6 +309,7 @@ PreventionPlanLockTrigger = Plan de prévention verrouillé - Prêt pour la gén
 PreventionPlanArchivedTrigger = Plan de prévention archivé
 PreventionPlanAddAttendantTrigger = Ajout d'un participant au plan de prévention
 PreventionPlanSentByMailTrigger = Email plan de prévention envoyé
+PreventionPlanOpeningHoursCreateTrigger = Enregistrement des horaires du plan de prévention
 
 # Mod Numbering - Modèle de numérotation
 DigiriskPreventionPlanNumberingModule = Modèle de numérotation des plans de prévention de Digirisk
@@ -386,6 +404,17 @@ LabourInspectorLastName = travail
 PreventionPlanData = Données du Plan de prévention
 MaitreOeuvreDescription = L'utilisateur utilisé par défaut comme Responsable de l'Entreprise Utilisatrice
 fk_preventionplan = Plan de prévention lié
+PreventionPlanLinked = Plan de prévention lié
+NoPreventionPlanRisk = Aucun risque sur le plan de prévention
+NoPreventionPlanLinked = Aucun plan de prévention lié
+PreventionPlanManagement = Gestion des plans de prévention
+PPRProject = Projet lié aux plans de prévention
+NewRefForClonePreventionPlan = Réf. du nouveau plan de prévention
+ClonePreventionPlanRisk = Cloner les risques du plan de prévention
+CloneAttendantsPreventionPlan = Cloner les participants du plan de prévention
+CloneSchedulePreventionPlan = Cloner les horaires du plan de prévention
+ConfirmClonePreventionPlan = Êtes-vous sûr de vouloir cloner le plan de prévention <b> %s </b> ?
+
 
 # Email - Mail
 PreventionPlanLabel = Récapitulatif du plan de prévention
@@ -409,31 +438,77 @@ DeleteFirePermit = Supprimer le permis de feu
 FIREPERMIT_CREATEInDolibarr = Permis de feu créé dans Dolibarr
 ActionsOnFirePermit = Événements liés au permis de feu
 FirePermitGeneratedWithDolibarr = Permis de feu généré avec Dolibarr
-FirePermitLineCreatedWithDolibarr = Ligne de Permis de Feu créée avec Dolibarr
+FirePermitLineCreateTrigger = Ligne de permis de Feu créée
+FirePermitLineModifyTrigger = Ligne de permis de feu modifiée
+FirePermitLineDeleteTrigger = Ligne de permis de feu supprimée
+FirePermitModifyTrigger = Modification du permis de feu
+FirePermitInprogressTrigger = Permis de feu rouvert
+FirePermitPendingSignatureTrigger = Permis de feu en attente de signature des participants
+FirePermitLockTrigger = Permis de feu verrouillé - Prêt pour la génération du documuent
+FirePermitArchivedTrigger = Permis de feu archivé
+FirePermitAddAttendantTrigger = Ajout d'un participant au permis de feu
+FirePermitSentByMailTrigger = Email permis de feu envoyé
+FirePermitOpeningHoursCreateTrigger = Enregistrement des horaires du permis de feu
 
 # Mod Numbering - Modèle de numérotation
 DigiriskFirePermitNumberingModule = Modèle de numérotation des permis de feu de Digirisk
 DigiriskFirePermitStandardModel = Renvoie le numéro sous la forme FPn où n est un compteur séquentiel sans rupture et sans remise à 0.
+DigiriskFirePermitDetNumberingModule = Modèle de numérotation des lignes du permis de feu de Digirisk
+DigiriskFirePermitDetStandardModel = Renvoie le numéro sous la forme FPRn où n est un compteur séquentiel sans rupture et sans remise à 0.
+DigiriskFirePermitDocumentNumberingModule = Modèle de numérotation des fiches de permis de feu de Digirisk
+DigiriskFirePermitDocumentStandardModel = Renvoie le numéro sous la forme FPDn où n est un compteur séquentiel sans rupture et sans remise à 0.
 
 # ODT Template - Template ODT
 DigiriskTemplateDocumentFirePermit = Modèle de documents des permis de feu de Digirisk
-FirePermitCustomDigiriskTemplate = ODT custom des permis de feu
-FirePermitDigiriskTemplate = ODT par défaut des permis de feu
+FirePermitDocumentCustomDigiriskTemplate = ODT custom des permis de feu
+FirePermitDocumentDigiriskTemplate = ODT par défaut des permis de feu
 FirePermitDocument = Fiche de Permis de Feu
 FirePermitDocumentGeneratedWithDolibarr = Permis de feu généré avec Dolibarr
 
 # Data - Donnée
+NewFirePermit Nouveau permis de feu
+ModifyFirePermit = Modifier le permis de feu
+FirePermitList = Liste des permis de feu
 FirePermit = Permis de feu
 FirePermitLine = risque(s)
-MaitreOeuvre = Responsable de l'Entreprise Utilisatrice
-ExtSociety = Entreprise extérieure
-ExtSocietyResponsible = Responsable de l'Entreprise Extérieure
-ExtSocietyIntervenants = Intervenants de l'Entreprise Extérieure
-ActionsDescription = Description des actions
-INRSRisk = Risque (INRS)
-PreventionMethod = Moyens de prévention
-Schedule = Horaires
 FirePermitSchedule = Horaires du permis de feu
+FirePermitRiskList = Liste des risques du permis de feu
+AddFirePermitLine = Ajout du risque
+UpdateFirePermitLine = Mise à jour du risque
+DeleteFirePermitLine = Suppression du risque
+FirePermitMessage = au permis de feu
+UsedMaterial = Matériel utilisé
+UsedMaterialTooltip = Matériel à utiliser pour limiter le risque
+ActionsFirePermitRisk = Actions
+ConfirmValidateFirePermit = Êtes-vous sûr de vouloir valider le permis de feu ? <br> La validation permet aux participants de signer le document mais <b> empêche l'ajout de nouveaux participants ou la modification du permis de feu </b>.
+ConfirmReOpenFirePermit = Êtes-vous sûr de vouloir rouvrir le permis de feu ? La réouverture permet la modification du permsi de feu et l'ajout de nouveaux participants mais <b>toutes les signatures du document seront perdues</b>.
+ConfirmLockFirePermit = Êtes-vous sûr de vouloir verrouiller le permis de feu ?<br>Ce verrouillage permet de figer les données et la génération du document.
+FirePermitMustBeInProgress = Le permis de feu doit être en cours pour accéder à cette fonctionnalité
+FirePermitMustBeInProgressToValidate = Le permis de feu est déjà validé
+FirePermitMustBeValidated = Le permis de feu doit être validé pour le rouvrir
+FirePermitMustBeValidatedToSign = Le permis de feu doit être validé pour que les participants puissent signer
+FirePermitMustBeLockedToSendEmail = Le permis de feu doit être verrouillé pour envoyer un email
+FirePermitMustBeLocked = Le permis de feu doit être verrouillé pour accéder à cette fonctionnalité
+GoToLockFirePermit = Verrouiller le permis de feu
+GoToValidateFirePermit = Valider le permis de feu
+FirePermitAttendants = Permis de feu - Participants
+FirePermitScheduleSave = Les horaires du permis de feu ont bien été enregistrés
+NewRefForCloneFirePermit = Réf. du nouveau permis de feu
+CloneFirePermitRisk = Cloner les risques du permis de feu
+CloneAttendantsFirePermit = Cloner les participants du permis de feu
+CloneScheduleFirePermit = Cloner les horaires du permis de feu
+ConfirmCloneFirePermit = Êtes-vous sûr de vouloir cloner le permis de feu <b> %s </b> ?
+FirePermitInitial = FPR
+FirePermitDescription = Projet des permis de feu
+FirePermitData = Données du Permis de feu
+FirePermitManagement = Gestion des permis de feu
+FPRProject = Projet lié aux permis de feu
+fk_firepermit = Permis de feu lié
+# Email - Mail
+FirePermitLabel = Récapitulatif du permis de feu
+FirePermitSubject = Email permis de feu
+FirePermitContent = Veuillez trouver ci-joint le document ODT du permis de feu.
+
 
 
 #
@@ -523,6 +598,14 @@ Sources = Sources
 ImportantNote = Remarque importante
 SitePlans = Localisation des plans
 SetStartEndDateBefore = Définissez la date de début et la date de fin d'audit sur cette page pour générer ce document
+
+# Email - Mail
+RiskAssessmentDocumentLabel = Récapitulatif du document unique
+RiskAssessmentDocumentSubject = Email document unique
+RiskAssessmentDocumentContent = Veuillez trouver ci-joint le ZIP et le document ODT du document unique.
+
+
+
 #
 # GroupmentDocument - Fiche Groupement
 #
@@ -725,7 +808,7 @@ RiskDescriptionNotEnabled = Le champ description du risque n'est pas activé
 HowToEnableRiskDescription = Pour activer le champ description du risque, allez dans "Configuration du module -> Analyse de risque -> Risque"
 HowToEnableRiskCategoryEdit = Pour activer la modification de la catégorie de risque, allez dans "Configuration du module -> Analyse de risque -> Risque"
 
-DigiriskRiskData = Donnée configurable des risques
+DigiriskRiskData = Données configurables des risques
 RiskDescription = Description du risque
 RiskDescriptionDescription = Activer le champ description du risque
 RiskDescriptionNotActivated = Veuillez activer le champ description du risque dans Configuration du module / Analyse des risques / Risques
@@ -733,9 +816,12 @@ AddRisk = Ajouter un risque
 NoDescriptionThere = Aucune description renseignée sur ce risque
 NoRiskThere = "Aucun risque spécifique sur cette unité" Cependant vous pouvez être soumis aux risques génériques de vos groupements de travail.
 fk_risk = Risque lié
-
-
-
+ShowParentRisks = Risques des éléments parents
+ShowParentRisksDescription = Afficher les risques des éléments parents dans les fiches d'unité et de groupement
+MoveRisk = Déplacer le risque
+MoveRisks = Déplacer les risques
+MoveRisksDescription = Permet de déplacer les risques d'un groupement ou d'une unité de travail à un(e) autre
+SetConfToMoveRisk = Vous devez d'abord autoriser le déplacement des risques dans "Configuration du module -> Analyse de risques -> Risque"
 
 #
 # RiskAssessment - Évaluation
@@ -761,7 +847,7 @@ EvaluationMethod = Méthode d'évaluation
 lastEvaluationOn = Dernière évaluation le
 EvaluatedOn = le
 DeleteEvaluation = Êtes-vous sûr(e) de vouloir supprimer l'évaluation
-DigiriskRiskAssessmentData = Donnée configurable des évaluations
+DigiriskRiskAssessmentData = Données configurables des évaluations
 MultipleRiskAssessmentMethodName = Méthodes d'évaluations
 MultipleRiskAssessmentMethodDescription = Activer le changement de méthode d'évaluation
 AdvancedRiskAssessmentMethod = Méthode d'évaluation avancée
@@ -781,7 +867,7 @@ AddRiskAssessment = Ajouter une évaluation du risque
 AddRiskAssessmentTask = Ajouter une tâche au risque
 ListRiskAssessmentTask = Liste des tâches du risque
 ShowRiskAssessmentDate = Date des évaluations
-ShowRiskAssessmentDateDescription = Afficher la date des évaluations
+ShowRiskAssessmentDateDescription = Remplace la date de création par la date de début des évaluations dans la fiche et les documents
 
 
 
@@ -842,12 +928,12 @@ TaskCreate = Ajout de la tâche
 TaskEdit = Édition de la tâche
 HowToSetDUProject = Pour configurer le choix du projet, aller dans Configuration du module - Analyse des risques - Tâche
 DeleteTask = Êtes-vous sûr(e) de vouloir supprimer la tâche
-DigiriskTaskData = Donnée configurable des tâches
+DigiriskTaskData = Données configurables des tâches
 TaskManagementDescription = Activer la gestion des tâches
 TaskManagementNotActivated = Veuillez activer la gestion des tâches dans Configuration du module / Analyse des risques / Tâche
 DigiriskProgress = Avancement
 ShowTaskStartDate = Date de début des tâches
-ShowTaskStartDateDescription = Afficher la date de début des tâches
+ShowTaskStartDateDescription = Remplace la date de création par la date de début des tâches dans la fiche et les documents
 ShowTaskEndDate = Date de fin des tâches
 ShowTaskEndDateDescription = Afficher la date de fin des tâches
 ShowTaskProgress = Progression des tâches
@@ -999,3 +1085,7 @@ IDCCTooltip = Ce champ provient du module Digirisk pour Dolibarr </br> La nomenc
 ContactNoEmail = Les contacts affichés en grisé sont des contacts qui ne possèdent pas d'email
 NoEmailContact = Pas d'email sur ce contact
 AddMedia = Ajouter un média
+NoMediaLinked = Pas de média lié
+SendPassword = Envoyer le mot de passe par email
+UserGroup = Groupe d'utilisateur
+UserCreated = L'utilisateur a bien été créé

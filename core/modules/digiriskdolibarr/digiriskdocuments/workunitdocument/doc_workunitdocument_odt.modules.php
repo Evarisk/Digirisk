@@ -315,7 +315,7 @@ class doc_workunitdocument_odt extends ModeleODTWorkUnitDocument
 				{
 					$risk = new Risk($this->db);
 					if ( ! empty( $digiriskelement ) ) {
-						$risks = $risk->fetchRisksOrderedByCotation($digiriskelement->id);
+						$risks = $risk->fetchRisksOrderedByCotation($digiriskelement->id, false, $conf->global->DIGIRISKDOLIBARR_SHOW_PARENT_RISKS);
 						for ($i = 1; $i <= 4; $i++ ) {
 							$listlines = $odfHandler->setSegment('risq' . $i);
 							if ($risks > 0 && !empty($risks)) {
@@ -331,6 +331,9 @@ class doc_workunitdocument_odt extends ModeleODTWorkUnitDocument
 										$scale = $lastEvaluation->get_evaluation_scale();
 
 										if ($scale == $i) {
+											$element = new DigiriskElement($this->db);
+											$element->fetch($line->fk_element);
+											$tmparray['nomElement'] = $element->ref . ' - ' . $element->label;
 											$tmparray['nomDanger'] = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $line->get_danger_category($line) . '.png';
 											$tmparray['identifiantRisque'] = $line->ref . ' - ' . $lastEvaluation->ref;
 											$tmparray['quotationRisque'] = $lastEvaluation->cotation ? $lastEvaluation->cotation : '0';
@@ -401,6 +404,7 @@ class doc_workunitdocument_odt extends ModeleODTWorkUnitDocument
 									}
 								}
 							} else {
+								$tmparray['nomElement']                  = $langs->trans('NoData');
 								$tmparray['nomDanger']                   = $langs->trans('NoData');
 								$tmparray['identifiantRisque']           = $langs->trans('NoData');
 								$tmparray['quotationRisque']             = $langs->trans('NoData');

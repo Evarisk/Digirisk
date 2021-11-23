@@ -160,12 +160,52 @@ class ActionsDigiriskdolibarr
 		if (in_array($parameters['currentcontext'], array('emailtemplates')))	    // do something only for the context 'somecontext1' or 'somecontext2'
 		{
 			if ($conf->digiriskdolibarr->enabled && $user->rights->digiriskdolibarr->preventionplan->read) {
-				$value = array('preventionplan' => '<i class="fas fa-info"></i>  ' . dol_escape_htmltag($langs->trans('PreventionPlan')));
+				$value['preventionplan'] = '<i class="fas fa-info"></i>  ' . dol_escape_htmltag($langs->trans('PreventionPlan'));
+			}
+			if ($conf->digiriskdolibarr->enabled && $user->rights->digiriskdolibarr->firepermit->read) {
+				$value['firepermit'] = '<i class="fas fa-fire-alt"></i>  ' . dol_escape_htmltag($langs->trans('FirePermit'));
+			}
+			if ($conf->digiriskdolibarr->enabled && $user->rights->digiriskdolibarr->riskassessmentdocument->read) {
+				$value['riskassessmentdocument'] = '<i class="fas fa-exclamation-triangle"></i>  ' . dol_escape_htmltag($langs->trans('RiskAssessmentDocument'));
 			}
 		}
 
 		if (!$error) {
 			$this->results = $value;
+			return 0; // or return 1 to replace standard code
+		} else {
+			$this->errors[] = 'Error message';
+			return -1;
+		}
+	}
+
+	/**
+	 *  Overloading the doActions function : replacing the parent's function with the one below
+	 *
+	 * @param $parameters
+	 * @param $object
+	 * @param $action
+	 * @param $hookmanager
+	 * @return int
+	 */
+	public function redirectAfterConnection($parameters, &$object, &$action, $hookmanager)
+	{
+		global $db, $conf, $user, $langs;
+
+		$error = 0; // Error counter
+
+		/* print_r($parameters); print_r($object); echo "action: " . $action; */
+		if (in_array($parameters['currentcontext'], array('mainloginpage')))	    // do something only for the context 'somecontext1' or 'somecontext2'
+		{
+			if ($conf->global->DIGIRISKDOLIBARR_REDIRECT_AFTER_CONNECTION > 0) {
+				$value = dol_buildpath('/custom/digiriskdolibarr/digiriskdolibarrindex.php?idmenu=1319&mainmenu=digiriskdolibarr&leftmenu=', 1);
+			} else {
+				$value = '';
+			}
+		}
+
+		if (!$error) {
+			$this->resprints = $value;
 			return 0; // or return 1 to replace standard code
 		} else {
 			$this->errors[] = 'Error message';

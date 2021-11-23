@@ -56,14 +56,14 @@ function digiriskstandardPrepareHead($object)
 	}
 
 	if ($user->rights->digiriskdolibarr->listingrisksaction->read) {
-		$head[$h][0] = dol_buildpath("/digiriskdolibarr/digiriskelement_listingrisksaction.php", 1). '?id=' . $object->id;
+		$head[$h][0] = dol_buildpath("/digiriskdolibarr/digiriskelement_listingrisksaction.php", 1). '?id=' . $object->id . '&type=standard';
 		$head[$h][1] = '<i class="fas fa-exclamation"></i> ' . $langs->trans("ListingRisksAction");
 		$head[$h][2] = 'elementListingRisksAction';
 		$h++;
 	}
 
 	if ($user->rights->digiriskdolibarr->listingrisksphoto->read) {
-		$head[$h][0] = dol_buildpath("/digiriskdolibarr/digiriskelement_listingrisksphoto.php", 1). '?id=' . $object->id;
+		$head[$h][0] = dol_buildpath("/digiriskdolibarr/digiriskelement_listingrisksphoto.php", 1). '?id=' . $object->id . '&type=standard';
 		$head[$h][1] = '<i class="fas fa-images"></i> ' . $langs->trans("ListingRisksPhoto");
 		$head[$h][2] = 'elementListingRisksPhoto';
 		$h++;

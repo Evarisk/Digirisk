@@ -1,0 +1,47 @@
+[
+	{
+		"name": "Ponceuse de surface et d'angle",
+		"thumbnail_name": "ponceuse",
+		"position": 0
+	},
+	{
+		"name": "Découpage et percage au laser",
+		"thumbnail_name": "laser",
+		"position": 1
+	},
+	{
+		"name": "Meuleuse de surface et d'angle",
+		"thumbnail_name": "meuleuse",
+		"position": 2
+	},
+	{
+		"name": "Rouleau compresseur manuel",
+		"thumbnail_name": "rouleau",
+		"position": 3
+	},
+	{
+		"name": "Conduction thermique",
+		"thumbnail_name": "conduction",
+		"position": 4
+	},
+	{
+		"name": "Tronconneuse",
+		"thumbnail_name": "tronconneuse",
+		"position": 5
+	},
+	{
+		"name": "Chalumeau",
+		"thumbnail_name": "chalumeau",
+		"position": 6
+	},
+	{
+		"name": "Fer à souder",
+		"thumbnail_name": "soudage",
+		"position": 7
+	},
+	{
+		"name": "Autres",
+		"thumbnail_name": "autres",
+		"position": 8
+	}
+]

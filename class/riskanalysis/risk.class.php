@@ -170,17 +170,18 @@ class Risk extends CommonObject
 	 * Load object in memory from the database
 	 *
 	 * @param int        $parent_id   Id parent object
-	 * @param boolean    $recursive   Recursive Mode
+	 * @param boolean    $get_children_data  Get children risks data
+	 * @param boolean    $get_parents_data   Get parents risks data
 	 * @return int         <0 if KO, 0 if not found, >0 if OK
 	 */
-	public function fetchRisksOrderedByCotation($parent_id, $recursive = false)
+	public function fetchRisksOrderedByCotation($parent_id, $get_children_data = false, $get_parents_data = false)
 	{
 		$object  = new DigiriskElement($this->db);
 		$objects = $object->fetchAll('',  '',  0,  0, array('customsql' => 'status > 0' ));
 		$risk    = new Risk($this->db);
 		$result  = $risk->fetchFromParent($parent_id);
 
-		// RISQUES du parent.
+		// RISQUES de l'élément appelant.
 		if ($result > 0 && !empty ($result)) {
 			foreach ( $result as $risk ) {
 				$evaluation = new RiskAssessment($this->db);
@@ -194,7 +195,7 @@ class Risk extends CommonObject
 			}
 		}
 
-		if ( $recursive ) {
+		if ( $get_children_data ) {
 			$elements = recurse_tree($parent_id,0,$objects);
 			if ( $elements > 0  && !empty($elements) ) {
 				// Super fonction itérations flat.
@@ -228,6 +229,26 @@ class Risk extends CommonObject
 						}
 					}
 				}
+			}
+		}
+
+		if ( $get_parents_data ) {
+			$parent_element_id = $objects[$parent_id]->id;
+			while ($parent_element_id > 0) {
+				$result  = $risk->fetchFromParent($parent_element_id);
+				if ($result > 0 && !empty ($result)) {
+					foreach ( $result as $risk ) {
+						$evaluation = new RiskAssessment($this->db);
+						$lastEvaluation = $evaluation->fetchFromParent($risk->id,1);
+						if ( $lastEvaluation > 0  && !empty($lastEvaluation) ) {
+							$lastEvaluation = array_shift($lastEvaluation);
+							$risk->lastEvaluation = $lastEvaluation->cotation;
+						}
+
+						$risks[$risk->id] = $risk;
+					}
+				}
+				$parent_element_id = $objects[$parent_element_id]->fk_parent;
 			}
 		}
 
@@ -401,6 +422,53 @@ class Risk extends CommonObject
 		foreach ($risk_categories as $category) {
 			if ($category['name'] == $name) {
 				return $category['position'];
+			}
+		}
+
+		return -1;
+	}
+
+	/**
+	 * Get fire permit risk categories json in /digiriskdolibarr/js/json/
+	 *
+	 * @return	array $risk_categories
+	 */
+	public function get_fire_permit_danger_categories()
+	{
+		$json_categories = file_get_contents(DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/js/json/firePermitDangerCategories.json');
+		$risk_categories = json_decode($json_categories, true);
+
+		return $risk_categories;
+	}
+
+	/**
+	 * Get fire permit danger category picto path
+	 *
+	 * @return	string $category['thumbnail_name']     path to fire permit danger category picto, -1 if don't exist
+	 */
+	public function get_fire_permit_danger_category($object)
+	{
+		$risk_categories = $this->get_fire_permit_danger_categories();
+		foreach ($risk_categories as $category) {
+			if ($category['position'] == $object->category) {
+				return $category['thumbnail_name'];
+			}
+		}
+
+		return -1;
+	}
+
+	/**
+	 * Get fire permit danger category picto name
+	 *
+	 * @return	string $category['name']     name to fire permit danger category picto, -1 if don't exist
+	 */
+	public function get_fire_permit_danger_category_name($object)
+	{
+		$risk_categories = $this->get_fire_permit_danger_categories();
+		foreach ($risk_categories as $category) {
+			if ($category['position'] == $object->category) {
+				return $category['name'];
 			}
 		}
 

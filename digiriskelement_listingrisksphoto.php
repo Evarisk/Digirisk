@@ -53,15 +53,19 @@ $langs->loadLangs(array("digiriskdolibarr@digiriskdolibarr", "other"));
 // Get parameters
 $id     = GETPOST('id', 'int');
 $action = GETPOST('action', 'aZ09');
+$type   = GETPOST('type', 'aZ09');
 
 // Initialize technical objects
-$object            = new DigiriskElement($db);
-$standard          = new DigiriskStandard($db);
 $listingrisksphoto = new ListingRisksPhoto($db);
 $hookmanager->initHooks(array('digiriskelementlistingrisksphoto', 'globalcard')); // Note that conf->hooks_modules contains array
 
-$object->fetch($id);
-$standard->fetch($conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD);
+if ($type != 'standard') {
+	$object            = new DigiriskElement($db);
+	$object->fetch($id);
+} else {
+	$object          = new DigiriskStandard($db);
+	$object->fetch($conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD);
+}
 
 $upload_dir         = $conf->digiriskdolibarr->multidir_output[isset($conf->entity) ? $conf->entity : 1];
 $permissiontoread   = $user->rights->digiriskdolibarr->listingrisksphoto->read;
@@ -100,7 +104,7 @@ if (empty($reshook)) {
 
 		$model      = GETPOST('model', 'alpha');
 
-		if ( $id > 0 ) {
+		if ( $type != 'standard' ) {
 			$moreparams['object'] = $object;
 			$moreparams['user']   = $user;
 		} else {
@@ -169,8 +173,8 @@ digiriskHeader('', $title, $help_url, '', '', '', $morejs, $morecss); ?>
 
 <?php $res  = $object->fetch_optionals();
 
-if (!$object->id) {
-	$head = digiriskstandardPrepareHead($standard);
+if ($type == 'standard') {
+	$head = digiriskstandardPrepareHead($object);
 } else {
 	$head = digiriskelementPrepareHead($object);
 }
@@ -182,14 +186,13 @@ print dol_get_fiche_head($head, 'elementListingRisksPhoto', $title, -1, "digiris
 // ------------------------------------------------------------
 $width = 80; $cssclass = 'photoref';
 
-
-if (isset($object->element_type)) {
+if ($type != 'standard') {
 	dol_strlen($object->label) ? $morehtmlref = ' - ' . $object->label : '';
 	$morehtmlleft .= '<div class="floatleft inline-block valignmiddle divphotoref">'.digirisk_show_photos('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$entity].'/'.$object->element_type, 'small', 5, 0, 0, 0, $width,0, 0, 0, 0, $object->element_type, $object).'</div>';
 	digirisk_banner_tab($object, 'ref', '', 0, 'ref', 'ref', $morehtmlref, '', 0, $morehtmlleft);
 } else {
 	$morehtmlleft .= '<div class="floatleft inline-block valignmiddle divphotoref">'.digirisk_show_photos('mycompany', $conf->mycompany->dir_output.'/logos', 'small', 1, 0, 0, 0, $width,0, 0, 0, 0, 'logos', $emptyobject).'</div>';
-	digirisk_banner_tab($standard, 'ref', '', 0, 'ref', 'ref', $morehtmlref, '', 0, $morehtmlleft);
+	digirisk_banner_tab($object, 'ref', '', 0, 'ref', 'ref', $morehtmlref, '', 0, $morehtmlleft);
 }
 
 unset($object->fields['element_type']);
@@ -218,7 +221,7 @@ print dol_get_fiche_end();
 // Document Generation -- Génération des documents
 $includedocgeneration = 1;
 if ($includedocgeneration) {
-	if ($object->id > 0) {
+	if ($type != 'standard') {
 		$objref = dol_sanitizeFileName($object->ref);
 		$dir_files = 'listingrisksphoto/' . $objref;
 		$filedir = $upload_dir. '/' . $dir_files;
@@ -226,7 +229,7 @@ if ($includedocgeneration) {
 	} else {
 		$dir_files = 'listingrisksphoto';
 		$filedir = $upload_dir . '/' . $dir_files;
-		$urlsource = $_SERVER["PHP_SELF"];
+		$urlsource = $_SERVER["PHP_SELF"] . '?id=' . $object->id . '&type=standard';
 	}
 
 	$modulepart = 'digiriskdolibarr:ListingRisksPhoto';

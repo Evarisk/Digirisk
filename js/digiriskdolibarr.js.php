@@ -1643,6 +1643,14 @@ window.eoxiaJS.risk.saveRisk = function ( event ) {
 			descriptionPost = '&riskComment=' + encodeURI(description);
 		}
 	}
+	var newParent = $(this).closest('.risk-container').find('#select2-socid-container').attr('title');
+	if (newParent) {
+		var newParentPost = '';
+		console.log( $(this).closest('.risk-container').find('current-element-ref').val())
+		if (newParent !== '' && newParent.split(/ /)[0] !== $(this).closest('.risk-container').find('.current-element-ref').val()) {
+			newParentPost = '&newParent=' + newParent.split(/ /)[0];
+		}
+	}
 
 	let elementParent = $('.fichecenter').find('.div-table-responsive');
 	window.eoxiaJS.loader.display($(this));
@@ -1652,9 +1660,9 @@ window.eoxiaJS.risk.saveRisk = function ( event ) {
 
 	var request = "";
 	if (riskCommentText) {
-		request = document.URL + '&action=saveRisk&riskID=' + editedRiskId + categoryPost + descriptionPost
+		request = document.URL + '&action=saveRisk&riskID=' + editedRiskId + categoryPost + descriptionPost + newParentPost
 	} else {
-		request = document.URL + '&action=saveRisk&riskID=' + editedRiskId + categoryPost
+		request = document.URL + '&action=saveRisk&riskID=' + editedRiskId + categoryPost + newParentPost
 	}
 
 	$.ajax({
@@ -1663,7 +1671,8 @@ window.eoxiaJS.risk.saveRisk = function ( event ) {
 		processData: false,
 		contentType: false,
 		success: function ( ) {
-			elementParent.load(document.URL + ' .div-table-responsive')
+			window.location.reload()
+			//elementParent.load(document.URL + ' .div-table-responsive')
 
 			actionContainerSuccess.empty()
 			actionContainerSuccess.load(' .risk-edit-success-notice')

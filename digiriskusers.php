@@ -36,7 +36,7 @@ if (!$res && file_exists("../../../main.inc.php")) $res = @include "../../../mai
 if (!$res) die("Include of main fails");
 
 require_once DOL_DOCUMENT_ROOT.'/core/lib/images.lib.php';
-
+require_once DOL_DOCUMENT_ROOT.'/core/lib/security2.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/core/class/html.formother.class.php';
 require_once DOL_DOCUMENT_ROOT.'/categories/class/categorie.class.php';
 
@@ -57,6 +57,7 @@ if ($user->socid > 0) {
 
 // Load mode employee
 $mode = GETPOST("mode", 'alpha');
+$group = GETPOST("group", "int", 3);
 
 // Load variable for pagination
 $limit = GETPOST('limit', 'int') ?GETPOST('limit', 'int') : $conf->liste_limit;
@@ -84,10 +85,11 @@ $extrafields = new ExtraFields($db);
 $extrafields->fetch_name_optionals_label($object->table_element);
 $search_array_options = $extrafields->getOptionalsFromPost($object->table_element, '', 'search_');
 
-$userstatic = new User($db);
-$companystatic = new Societe($db);
-$form = new Form($db);
-$formother = new FormOther($db);
+$userstatic      = new User($db);
+$companystatic   = new Societe($db);
+$usergroupstatic = new UserGroup($db);
+$form            = new Form($db);
+$formother       = new FormOther($db);
 
 // List of fields to search into when doing a "search in all"
 $fieldstosearchall = array(
@@ -115,6 +117,7 @@ $arrayfields = array(
 	'u.api_key'=>array('label'=>$langs->trans("ApiKey"), 'checked'=>0, "enabled"=>($conf->api->enabled && $user->admin)),
 	'u.fk_soc'=>array('label'=>$langs->trans("Company"), 'checked'=>1),
 	'u.entity'=>array('label'=>$langs->trans("Entity"), 'checked'=>1, 'enabled'=>(!empty($conf->multicompany->enabled) && empty($conf->global->MULTICOMPANY_TRANSVERSE_MODE))),
+	'g.fk_usergroup'=>array('label'=>$langs->trans("UserGroup"), 'checked'=>1),
 	'u.fk_user'=>array('label'=>$langs->trans("HierarchicalResponsible"), 'checked'=>1),
 	'u.datelastlogin'=>array('label'=>$langs->trans("LastConnexion"), 'checked'=>1, 'position'=>100),
 	'u.datepreviouslogin'=>array('label'=>$langs->trans("PreviousConnexion"), 'checked'=>0, 'position'=>110),
@@ -312,12 +315,25 @@ if ($action == 'add' && $canadduser) {
 		$id = $object->create($user);
 		if ($id > 0) {
 			if (GETPOST('password')) {
-				$object->setPassword($user, GETPOST('password'));
+				$newpassword = $object->setPassword($user, GETPOST('password'));
 			}
-			if (!empty($conf->categorie->enabled)) {
-				// Categories association
-				$usercats = GETPOST('usercats', 'array');
-				$object->setCategories($usercats);
+			$object->SetInGroup($group, $conf->entity);
+
+			if ($newpassword < 0) {
+				// Echec
+				setEventMessages($langs->trans("ErrorFailedToSetNewPassword"), null, 'errors');
+			} else {
+				// Success
+				if (GETPOST('send_password')) {
+					if ($object->send_password($user, $newpassword) > 0)
+					{
+						setEventMessages($langs->trans("UserCreated", $object->email), null, 'success');
+					} else {
+						setEventMessages($object->error, $object->errors, 'errors');
+					}
+				} else {
+					setEventMessages($langs->trans("UserCreated", $newpassword), null, 'mesgs');
+				}
 			}
 
 			$db->commit();
@@ -349,7 +365,8 @@ $sql .= " u.datelastlogin, u.datepreviouslogin,";
 $sql .= " u.ldap_sid, u.statut, u.entity,";
 $sql .= " u.tms as date_update, u.datec as date_creation,";
 $sql .= " u2.rowid as id2, u2.login as login2, u2.firstname as firstname2, u2.lastname as lastname2, u2.admin as admin2, u2.fk_soc as fk_soc2, u2.email as email2, u2.gender as gender2, u2.photo as photo2, u2.entity as entity2, u2.statut as statut2,";
-$sql .= " s.nom as name, s.canvas";
+$sql .= " s.nom as name, s.canvas,";
+$sql .= " g.fk_usergroup as fk_usergroup";
 // Add fields from extrafields
 if (!empty($extrafields->attributes[$object->table_element]['label'])) {
 	foreach ($extrafields->attributes[$object->table_element]['label'] as $key => $val) $sql .= ($extrafields->attributes[$object->table_element]['type'][$key] != 'separate' ? ", ef.".$key.' as options_'.$key : '');
@@ -362,6 +379,7 @@ $sql .= " FROM ".MAIN_DB_PREFIX."user as u";
 if (is_array($extrafields->attributes[$object->table_element]['label']) && count($extrafields->attributes[$object->table_element]['label'])) $sql .= " LEFT JOIN ".MAIN_DB_PREFIX.$object->table_element."_extrafields as ef on (u.rowid = ef.fk_object)";
 $sql .= " LEFT JOIN ".MAIN_DB_PREFIX."societe as s ON u.fk_soc = s.rowid";
 $sql .= " LEFT JOIN ".MAIN_DB_PREFIX."user as u2 ON u.fk_user = u2.rowid";
+$sql .= " LEFT JOIN ".MAIN_DB_PREFIX."usergroup_user as g ON u.rowid = g.fk_user";
 if (!empty($search_categ) || !empty($catid)) $sql .= ' LEFT JOIN '.MAIN_DB_PREFIX."categorie_user as cu ON u.rowid = cu.fk_user"; // We'll need this table joined to the select in order to filter by categ
 // Add fields from hooks
 $parameters = array();
@@ -623,6 +641,7 @@ if (!empty($arrayfields['u.email']['checked']))          print_liste_field_titre
 if (!empty($arrayfields['u.api_key']['checked']))        print_liste_field_titre("ApiKey", $_SERVER['PHP_SELF'], "u.api_key", $param, "", "", $sortfield, $sortorder);
 if (!empty($arrayfields['u.fk_soc']['checked']))         print_liste_field_titre("Company", $_SERVER['PHP_SELF'], "u.fk_soc", $param, "", "", $sortfield, $sortorder);
 if (!empty($arrayfields['u.entity']['checked']))         print_liste_field_titre("Entity", $_SERVER['PHP_SELF'], "u.entity", $param, "", "", $sortfield, $sortorder);
+if (!empty($arrayfields['g.fk_usergroup']['checked']))         print_liste_field_titre("UserGroup", $_SERVER['PHP_SELF'], "g.fk_usergroup", $param, "", "", $sortfield, $sortorder);
 if (!empty($arrayfields['u.fk_user']['checked']))        print_liste_field_titre("HierarchicalResponsible", $_SERVER['PHP_SELF'], "u.fk_user", $param, "", "", $sortfield, $sortorder);
 if (!empty($arrayfields['u.datelastlogin']['checked']))  print_liste_field_titre("LastConnexion", $_SERVER['PHP_SELF'], "u.datelastlogin", $param, "", '', $sortfield, $sortorder, 'center ');
 if (!empty($arrayfields['u.datepreviouslogin']['checked'])) print_liste_field_titre("PreviousConnexion", $_SERVER['PHP_SELF'], "u.datepreviouslogin", $param, "", '', $sortfield, $sortorder, 'center ');
@@ -754,6 +773,17 @@ while ($i < min($num, $limit))
 			if (!$i) $totalarray['nbfield']++;
 		}
 	}
+	if (!empty($arrayfields['g.fk_usergroup']['checked'])) {
+		print '<td>';
+		if ($obj->fk_usergroup)
+		{
+			$usergroupstatic->id = $obj->fk_usergroup;
+			$usergroupstatic->fetch($usergroupstatic->id);
+			print $usergroupstatic->getNomUrl(1);
+		}
+		print '</td>';
+		if (!$i) $totalarray['nbfield']++;
+	}
 	// Supervisor
 	if (!empty($arrayfields['u.fk_user']['checked']))
 	{
@@ -851,6 +881,9 @@ if ($canadduser) {
 	if (!empty($ldap_sid)) print '<input type="hidden" name="ldap_sid" value="'.dol_escape_htmltag($ldap_sid).'">';
 	print '<input type="hidden" name="entity" value="'.$conf->entity.'">';
 
+	$generated_password = getRandomPassword(false);
+	$password = (GETPOSTISSET('password') ? GETPOST('password') : $generated_password);
+
 	?>
 	<div class="digirisk-wrap wpeo-wrap digirisk-users" style="padding-right: 0 !important;">
 		<div class="main-container" style="width:auto;  margin-top:0 !important; padding-left:0 !important;">
@@ -862,13 +895,23 @@ if ($canadduser) {
 								<input type="hidden" name="action" value="add" />
 								<input type="hidden" class="input-domain-mail" name="societyname" value="<?php echo preg_replace('/ /', '',$conf->global->MAIN_INFO_SOCIETE_NOM) . '.fr' ?>" />
 								<div class="table-cell table-150">
-									<input type="text" id="lastname" placeholder="<?php echo $langs->trans('LastName') ; ?>" name="lastname" value="<?php dol_escape_htmltag(GETPOST('lastname', 'alphanohtml'))?>" />
+									<input type="text" id="lastname" placeholder="<?php echo $langs->trans('LastName'); ?>" name="lastname" value="<?php dol_escape_htmltag(GETPOST('lastname', 'alphanohtml'))?>" />
 								</div>
 								<div class="table-cell table-150">
-									<input type="text" id="firstname" placeholder="<?php echo $langs->trans('FirstName') ; ?>" name="firstname" value="<?php dol_escape_htmltag(GETPOST('firstname', 'alphanohtml'))?>" />
+									<input type="text" id="firstname" placeholder="<?php echo $langs->trans('FirstName'); ?>" name="firstname" value="<?php dol_escape_htmltag(GETPOST('firstname', 'alphanohtml'))?>" />
 								</div>
 								<div class="table-cell table-300">
-									<input style="width:100%" type="text" id="email" placeholder="<?php echo $langs->trans('Email') ; ?>" name="email" value="" />
+									<input style="width:100%" type="text" id="email" placeholder="<?php echo $langs->trans('Email'); ?>" name="email" value="" />
+								</div>
+								<div class="table-cell table-300">
+									<input style="width:100%" type="text" id="password" placeholder="<?php echo $langs->trans('Password'); ?>" name="password" value="<?php echo $password ?>" autocomplete="new-password" />
+								</div>
+								<div class="table-cell table-300">
+									<?php print $form->select_dolgroups($conf->global->DIGIRISKDOLIBARR_USERGROUP_SET, 'group', 1, '', 0, '', '', $conf->entity); ?>
+								</div>
+								<div class="table-cell table-300">
+									<?php print $langs->trans("SendPassword");
+									print '<input type="checkbox" id="send_password" name="send_password" checked="">'; ?>
 								</div>
 								<div class="table-cell">
 									<button type="submit" name="create" style="color: #3495f0; background-color: transparent; width:30%; border:none; margin-right:30%;">
