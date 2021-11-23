@@ -3577,6 +3577,9 @@ td > .risk-evaluation-container {
   margin-bottom: 0.6em;
   display: block;
 }
+.wpeo-modal[class*=modal-risk] .modal-container .maxwidthdate {
+  max-width: 125px;
+}
 
 .wpeo-modal[class*=modal-risk] .modal-container .risk-content {
   display: -webkit-box;
