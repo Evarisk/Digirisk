@@ -150,7 +150,9 @@
 
 	$advanced_method_cotation_json  = file_get_contents(DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/js/json/default.json');
 	$advanced_method_cotation_array = json_decode($advanced_method_cotation_json, true);
-
+	$digiriskelement = new DigiriskElement($db);
+	$digiriskelement->fetch($conf->global->DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH);
+	$trashList = $digiriskelement->getTrashList();
 	// Build and execute select
 	// --------------------------------------------------------------------
 	if (!preg_match('/(evaluation)/', $sortfield)) {
@@ -169,11 +171,18 @@
 		$sql .= preg_replace('/^,/', '', $hookmanager->resPrint);
 		$sql = preg_replace('/,\s*$/', '', $sql);
 		$sql .= " FROM ".MAIN_DB_PREFIX.$risk->table_element." as t";
+		$sql .= " LEFT JOIN ".MAIN_DB_PREFIX.$digiriskelement->table_element." as e on (t.fk_element = e.rowid)";
 		if (is_array($extrafields->attributes[$risk->table_element]['label']) && count($extrafields->attributes[$risk->table_element]['label'])) $sql .= " LEFT JOIN ".MAIN_DB_PREFIX.$risk->table_element."_extrafields as ef on (t.rowid = ef.fk_object)";
 		if ($risk->ismultientitymanaged == 1) $sql .= " WHERE t.entity IN (".getEntity($risk->element).")";
 		else $sql .= " WHERE 1 = 1";
 		if (!$allRisks) {
 			$sql .= " AND fk_element = ".$id;
+		} else {
+			foreach ($trashList as $deleted_element => $element_id) {
+				$sql .= " AND fk_element !=" . $element_id;
+			}
+			$sql .= " AND fk_element > 0 ";
+			$sql .= " AND e.entity IN (".getEntity($risk->element).") ";
 		}
 
 		foreach ($search as $key => $val)
@@ -248,13 +257,21 @@
 		$sql = preg_replace('/,\s*$/', '', $sql);
 		$sql .= " FROM ".MAIN_DB_PREFIX.$evaluation->table_element." as evaluation";
 		$sql .= " LEFT JOIN ".MAIN_DB_PREFIX.$risk->table_element." as r on (evaluation.fk_risk = r.rowid)";
+		$sql .= " LEFT JOIN ".MAIN_DB_PREFIX.$digiriskelement->table_element." as e on (r.fk_element = e.rowid)";
 		if (is_array($extrafields->attributes[$evaluation->table_element]['label']) && count($extrafields->attributes[$evaluation->table_element]['label'])) $sql .= " LEFT JOIN ".MAIN_DB_PREFIX.$evaluation->table_element."_extrafields as ef on (evaluation.rowid = ef.fk_object)";
 		if ($evaluation->ismultientitymanaged == 1) $sql .= " WHERE evaluation.entity IN (".getEntity($evaluation->element).")";
 		else $sql .= " WHERE 1 = 1";
 		$sql .= " AND evaluation.status = 1";
 		if (!$allRisks) {
 			$sql .= " AND r.fk_element =" . $id;
+		} else {
+			foreach ($trashList as $deleted_element => $element_id) {
+				$sql .= " AND r.fk_element !=" . $element_id;
+			}
+			$sql .= " AND r.fk_element > 0";
+			$sql .= " AND e.entity IN (".getEntity($evaluation->element).")";
 		}
+
 		foreach ($search as $key => $val)
 		{
 			if ($key == 'status' && $search[$key] == -1) continue;
@@ -311,9 +328,9 @@
 		<!-- BUTTON MODAL RISK ADD -->
 		<?php if ($permissiontoadd) {
 		$newcardbutton = '<div class="risk-add wpeo-button button-square-40 button-blue wpeo-tooltip-event modal-open" aria-label="'. $langs->trans('AddRisk').'" value="'.$object->id.'"><i class="fas fa-exclamation-triangle button-icon"></i><i class="fas fa-plus-circle button-add animated"></i></div>';
-	} else {
-		$newcardbutton = '<div class="wpeo-button button-square-40 button-grey wpeo-tooltip-event" aria-label="'. $langs->trans('PermissionDenied').'" data-direction="left" value="'.$object->id.'"><i class="fas fa-exclamation-triangle button-icon"></i><i class="fas fa-plus-circle button-add animated"></i></div>';
-	} ?>
+		} else {
+			$newcardbutton = '<div class="wpeo-button button-square-40 button-grey wpeo-tooltip-event" aria-label="'. $langs->trans('PermissionDenied').'" data-direction="left" value="'.$object->id.'"><i class="fas fa-exclamation-triangle button-icon"></i><i class="fas fa-plus-circle button-add animated"></i></div>';
+		} ?>
 		<!-- RISK ADD MODAL-->
 		<?php if ($conf->global->DIGIRISKDOLIBARR_TASK_MANAGEMENT == 0 && $conf->global->DIGIRISKDOLIBARR_RISK_DESCRIPTION == 0 && $conf->global->DIGIRISKDOLIBARR_MULTIPLE_RISKASSESSMENT_METHOD ==0 ) : ?>
 		<div class="risk-add-modal" value="<?php echo $object->id ?>">
@@ -650,7 +667,7 @@
 	<?php endif; ?>
 	<?php endif; ?>
 	<?php $title = $langs->trans('DigiriskElementRisksList');
-	print_barre_liste($title, $page, $_SERVER["PHP_SELF"], $param, $sortfield, $sortorder, $massactionbutton, $num, $nbtotalofrecords, 'digiriskdolibarr32px.png@digiriskdolibarr', 0, $newcardbutton, '', $limit, 0, 0, 1);
+	print_barre_liste($title, $page, $_SERVER["PHP_SELF"], $param, $sortfield, $sortorder, $massactionbutton, $num, $num, 'digiriskdolibarr32px.png@digiriskdolibarr', 0, $newcardbutton, '', $limit, 0, 0, 1);
 
 	include DOL_DOCUMENT_ROOT.'/core/tpl/massactions_pre.tpl.php';
 
@@ -816,7 +833,7 @@
 					<?php $parent_element = new DigiriskElement($db);
 					$result = $parent_element->fetch($risk->fk_element);
 					if ($result > 0) {
-					print $parent_element->ref . ( !empty($parent_element->label) ?  ' - ' . $parent_element->label : '');
+						print $parent_element->getNomUrl(1, 'blank');
 					}
 				}
 				elseif ($key == 'category') { ?>
@@ -911,7 +928,7 @@
 										?>
 										<?php if ($conf->global->DIGIRISKDOLIBARR_MOVE_RISKS) : ?>
 											<input type="hidden" class="current-element-ref" value="<?php echo $objecttmp->ref; ?>">
-											<?php print $objecttmp->select_digiriskelement_list( $objecttmp->id,  'socid',  '',  '1',  0, 0, array(), '', 0, 0, 'disabled', '', false, 1); ?>
+											<?php print $objecttmp->select_digiriskelement_list( $objecttmp->id,  'socid',  '',  '1',  0, 1, array(), '', 0, 0, 'disabled', '', false, 1); ?>
 										<?php else : ?>
 											<?php print '<span class="opacitymedium">'.$langs->trans("SetConfToMoveRisk")."</span><br>\n"; ?>
 										<?php endif; ?>

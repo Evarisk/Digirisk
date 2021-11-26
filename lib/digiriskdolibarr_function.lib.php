@@ -705,7 +705,7 @@ function digiriskHeader($head = '', $title = '', $help_url = '', $target = '', $
 /**
  *	Recursive tree process
  *
- * @param	DigiriskElement $parent Element Parent of Digirisk Element object
+ * @param	int             $parent Element Parent id of Digirisk Element object
  * @param 	int             $niveau Depth of tree
  * @param 	array           $array  Global Digirisk Element list
  * @return	array           $result Global Digirisk Element list after recursive process

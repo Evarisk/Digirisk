@@ -57,7 +57,7 @@ class modDigiriskdolibarr extends DolibarrModules
 		$this->descriptionlong = "Digirisk";
 		$this->editor_name     = 'Evarisk';
 		$this->editor_url      = 'https://evarisk.com';
-		$this->version         = '8.3.0';
+		$this->version         = '8.4.0';
 		$this->const_name      = 'MAIN_MODULE_'.strtoupper($this->name);
 		$this->picto           ='digiriskdolibarr@digiriskdolibarr';
 
@@ -305,6 +305,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			205 => array('DIGIRISKDOLIBARR_ADMINUSERGROUP_SET','integer', 0, '', $conf->entity),
 			206 => array('DIGIRISKDOLIBARR_CONTACTS_SET','integer', 0, '', $conf->entity),
 			207 => array('DIGIRISKDOLIBARR_REDIRECT_AFTER_CONNECTION','integer', 0, '', $conf->entity),
+			208 => array('DIGIRISKDOLIBARR_USE_CAPTCHA','integer', 0, '', $conf->entity),
 
 			// CONST SIGNATURE
 			210 => array('DIGIRISKDOLIBARR_SIGNATURE_ENABLE_PUBLIC_INTERFACE','integer', 1,'', $conf->entity),
@@ -316,6 +317,26 @@ class modDigiriskdolibarr extends DolibarrModules
 			302 => array('DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE','integer', 1,'', $conf->entity),
 			303 => array('DIGIRISKDOLIBARR_TICKET_SHOW_COMPANY_LOGO','integer', 1,'', $conf->entity),
 
+			// CONST ACCIDENT
+			330 => array('MAIN_AGENDA_ACTIONAUTO_ACCIDENT_CREATE','chaine',1,'', $conf->entity),
+			331 => array('MAIN_AGENDA_ACTIONAUTO_ACCIDENT_EDIT','chaine',1,'', $conf->entity),
+			332 => array('DIGIRISKDOLIBARR_ACCIDENT_ADDON','chaine', 'mod_accident_standard' ,'', $conf->entity),
+			333 => array('DIGIRISKDOLIBARR_ACCIDENT_PROJECT','integer', 0,'', $conf->entity),
+
+			// CONST ACCIDENT LINE
+			350 => array('MAIN_AGENDA_ACTIONAUTO_ACCIDENTDET_CREATE','chaine',1,'', $conf->entity),
+			351 => array('DIGIRISKDOLIBARR_ACCIDENTDET_ADDON','chaine', 'mod_accidentdet_standard','', $conf->entity),
+
+			// GENERAL CONSTS
+			400 => array('MAIN_USE_EXIF_ROTATION','integer',1,'', $conf->entity),
+
+//			// CONST ACCIDENT DOCUMENT
+//			360 => array('MAIN_AGENDA_ACTIONAUTO_ACCIDENTDOCUMENT_CREATE','chaine',1,'', $conf->entity),
+//
+//			361 => array('DIGIRISKDOLIBARR_ACCIDENTDOCUMENT_ADDON','chaine', 'mod_accidentdocument_standard' ,'', $conf->entity),
+//			362 => array('DIGIRISKDOLIBARR_ACCIDENTDOCUMENT_ADDON_ODT_PATH','chaine', DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/documents/doctemplates/accidentdocument/' ,'', $conf->entity),
+//			363 => array('DIGIRISKDOLIBARR_ACCIDENTDOCUMENT_CUSTOM_ADDON_ODT_PATH','chaine', DOL_DATA_ROOT . '/ecm/digiriskdolibarr/accidentdocument/' ,'', $conf->entity),
+//			364 => array('DIGIRISKDOLIBARR_ACCIDENTDOCUMENT_DEFAULT_MODEL','chaine', 'accidentdocument_odt' ,'', $conf->entity),
 		);
 
 		if ( ! isset($conf->digiriskdolibarr ) || ! isset( $conf->digiriskdolibarr->enabled ) ) {
