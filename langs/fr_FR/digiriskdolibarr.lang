@@ -1173,8 +1173,8 @@ TicketSuccess = Voici votre Id de suivi de ticket :
 TicketPublicAccess = Lien vers l'interface publique des tickets :
 TicketShowCompanyLogo = Afficher le logo de la société dans l'interface publique
 TicketShowCompanyLogoHelp = Activez cette option pour masquer le logo de la société dans les pages de l'interface publique
-SendEmailOnTicketSubmit=Envoyer des emails à la création
-UseCaptachOnCreateTicketPage=Utilisation du code graphique (CAPTCHA) sur la page de création
+SendEmailOnTicketSubmit = Envoyer des emails à la création
+UseCaptachOnCreateTicketPage = Utilisation du code graphique (CAPTCHA) sur la page de création
 
 
 

@@ -127,7 +127,7 @@ if ($action == 'add') {
 
 	$error=0;
 	// Check Captcha code if is enabled
-	if (!empty($conf->global->DIGIRISKDOLIBARR_USE_CAPCHA)) {
+	if (!empty($conf->global->DIGIRISKDOLIBARR_USE_CAPTCHA)) {
 		$sessionkey = 'dol_antispam_value';
 		$ok = (array_key_exists($sessionkey, $_SESSION) === true && (strtolower($_SESSION[$sessionkey]) === strtolower(GETPOST('code', 'none'))));
 		if (!$ok) {
@@ -433,7 +433,7 @@ print '</div>';
 	<?php include DOL_DOCUMENT_ROOT . '/core/tpl/extrafields_add.tpl.php'; ?>
 
 	<?php
-	if (!empty($conf->global->DIGIRISKDOLIBARR_USE_CAPCHA)) {
+	if (!empty($conf->global->DIGIRISKDOLIBARR_USE_CAPTCHA)) {
 		require_once DOL_DOCUMENT_ROOT.'/core/lib/security2.lib.php';
 		print '<div class="center"><label for="email"><span class="fieldrequired">'.$langs->trans("SecurityCode").'</span></label>';
 		print '<span class="span-icon-security inline-block">';
