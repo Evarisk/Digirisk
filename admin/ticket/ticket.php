@@ -321,6 +321,19 @@ if (!empty($conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE)) {
 	print '</td>';
 	print '</tr>';
 
+	//Use captcha on create ticket paghe
+	print '<tr class="oddeven"><td>'.$langs->trans("UseCaptachOnCreateTicketPage").'</td>';
+	print '<td class="center">';
+	print ajax_constantonoff('DIGIRISKDOLIBARR_USE_CAPCHA');
+	print '</td>';
+	print '<td class="center">';
+	print '';
+	print '</td>';
+	print '<td class="center">';
+	print '</td>';
+	print '</tr>';
+
+
 	//Email to send ticket submitted
 	print '<form method="POST" action="' . $_SERVER["PHP_SELF"] . '">';
 	print '<input type="hidden" name="token" value="' . newToken() . '">';
