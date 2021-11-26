@@ -169,6 +169,7 @@ if ( $conf->global->DIGIRISKDOLIBARR_USERAPI_SET ==  0 ) {
 	$usertmp->lastname  = 'API';
 	$usertmp->firstname = 'REST';
 	$usertmp->login     = 'USERAPI';
+	$usertmp->email     = '';
 	$usertmp->entity    = $conf->entity;
 	$usertmp->setPassword($user);
 	$usertmp->api_key = getRandomPassword(true);
