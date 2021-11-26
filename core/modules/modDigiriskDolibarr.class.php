@@ -305,6 +305,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			205 => array('DIGIRISKDOLIBARR_ADMINUSERGROUP_SET','integer', 0, '', $conf->entity),
 			206 => array('DIGIRISKDOLIBARR_CONTACTS_SET','integer', 0, '', $conf->entity),
 			207 => array('DIGIRISKDOLIBARR_REDIRECT_AFTER_CONNECTION','integer', 0, '', $conf->entity),
+			208 => array('DIGIRISKDOLIBARR_USE_CAPTCHA','integer', 0, '', $conf->entity),
 
 			// CONST SIGNATURE
 			210 => array('DIGIRISKDOLIBARR_SIGNATURE_ENABLE_PUBLIC_INTERFACE','integer', 1,'', $conf->entity),
