@@ -3106,7 +3106,7 @@ window.eoxiaJS.keyEvent.event = function() {
 }
 
 /**
- * Action import migration data.
+ * Action modal close & validation with key events
  *
  * @since   1.0.0
  * @version 1.0.0
@@ -3115,31 +3115,11 @@ window.eoxiaJS.keyEvent.event = function() {
  */
 window.eoxiaJS.keyEvent.keyup = function( event ) {
 	if ( 27 === event.keyCode ) {
-		$(this).find('.modal-active').removeClass('modal-active');
+		$(this).find('.modal-active .modal-close .fas.fa-times').first().click();
 	}
 
 	if ( 13 === event.keyCode )  {
-		if ($('.modal-footer').hasClass('risk-create')) {
-			$('.modal-footer .risk-create').not('.button-disable').click();
-		} else if ($('.modal-footer').hasClass('risk-save')) {
-			$('.modal-footer .risk-save').click();
-		} else if ($('.modal-footer').hasClass('risk-evaluation-create')) {
-			$('.modal-footer .risk-evaluation-create').not('.button-disable').click();
-		} else if ($('.modal-footer').hasClass('risk-evaluation-save')) {
-			$('.modal-footer .risk-evaluation-save').not('.button-disable').click();
-		} else if ($('.modal-footer').hasClass('riskassessment-task-create')) {
-			$('.modal-footer .riskassessment-task-create').not('.button-disable').click();
-		} else if ($('.modal-footer').hasClass('riskassessment-task-save')) {
-			$('.modal-footer .riskassessment-task-save').not('.button-disable').click();
-		} else if ($('.modal-footer').hasClass('save-photo')) {
-			$('.modal-footer .save-photo').not('.button-disable').click();
-		} else if ($('.modal-footer').hasClass('evaluator-create')) {
-			$('.modal-footer .evaluator-create').not('.button-disable').click();
-		} else if ($('.modal-footer').hasClass('risksign-create')) {
-			$('.modal-footer .risksign-create').not('.button-disable').click();
-		} else if ($('.modal-footer').hasClass('risksign-save')) {
-			$('.modal-footer .risksign-save').not('.button-disable').click();
-		}
+		$(this).find('.modal-active .modal-footer .wpeo-button').not('.button-disable').first().click();
 	}
 };
 
