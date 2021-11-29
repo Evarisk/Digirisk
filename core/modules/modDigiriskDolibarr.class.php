@@ -359,21 +359,21 @@ class modDigiriskdolibarr extends DolibarrModules
 			// List of tables we want to see into dictonnary editor
 			'tabname'=>array(
 				MAIN_DB_PREFIX."c_conventions_collectives",
-				MAIN_DB_PREFIX."c_accident_location",
+				MAIN_DB_PREFIX."c_relative_location",
 				MAIN_DB_PREFIX."c_lesion_localization",
 				MAIN_DB_PREFIX."c_lesion_nature"
 			),
 			// Label of tables
 			'tablib'=>array(
 				"CollectiveAgreement",
-				"AccidentLocation",
+				"RelativeLocation",
 				"LesionLocalization",
 				"LesionNature"
 			),
 			// Request to select fields
 			'tabsql'=>array(
 				'SELECT f.rowid as rowid, f.code, f.libelle, f.active FROM '.MAIN_DB_PREFIX.'c_conventions_collectives as f',
-				'SELECT f.rowid as rowid, f.label, f.description, f.active FROM '.MAIN_DB_PREFIX.'c_accident_location as f',
+				'SELECT f.rowid as rowid, f.label, f.description, f.active FROM '.MAIN_DB_PREFIX.'c_relative_location as f',
 				'SELECT f.rowid as rowid, f.label, f.description, f.active FROM '.MAIN_DB_PREFIX.'c_lesion_localization as f',
 				'SELECT f.rowid as rowid, f.label, f.description, f.active FROM '.MAIN_DB_PREFIX.'c_lesion_nature as f'
 			),

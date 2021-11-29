@@ -13,7 +13,7 @@
 -- You should have received a copy of the GNU General Public License
 -- along with this program.  If not, see https://www.gnu.org/licenses/.
 
-CREATE TABLE llx_c_accident_location(
+CREATE TABLE llx_c_relative_location(
 	rowid       integer AUTO_INCREMENT PRIMARY KEY NOT NULL,
 	entity      integer default 1,
 	ref         varchar(128),

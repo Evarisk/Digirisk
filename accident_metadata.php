@@ -115,6 +115,7 @@ if (empty($reshook)) {
 		$fatal                       = GETPOST('fatal');
 		$accident_investigation      = GETPOST('accident_investigation');
 		$accident_investigation_link = GETPOST('accident_investigation_link');
+		$accident_location           = GETPOST('accident_location');
 		$collateral_victim           = GETPOST('collateral_victim');
 		$police_report               = GETPOST('police_report');
 		$cerfa_link                  = GETPOST('cerfa_link');
@@ -132,6 +133,7 @@ if (empty($reshook)) {
 		$accidentmetadata->fatal                       = $fatal;
 		$accidentmetadata->accident_investigation      = $accident_investigation;
 		$accidentmetadata->accident_investigation_link = $accident_investigation_link;
+		$accidentmetadata->accident_location           = $accident_location;
 		$accidentmetadata->collateral_victim           = $collateral_victim;
 		$accidentmetadata->police_report               = $police_report;
 		$accidentmetadata->cerfa_link                  = $cerfa_link;
@@ -166,6 +168,7 @@ if (empty($reshook)) {
 		$fatal                       = GETPOST('fatal');
 		$accident_investigation      = GETPOST('accident_investigation');
 		$accident_investigation_link = GETPOST('accident_investigation_link');
+		$accident_location           = GETPOST('accident_location');
 		$collateral_victim           = GETPOST('collateral_victim');
 		$police_report               = GETPOST('police_report');
 		$cerfa_link                  = GETPOST('cerfa_link');
@@ -182,6 +185,7 @@ if (empty($reshook)) {
 		$accidentmetadata->fatal                       = $fatal;
 		$accidentmetadata->accident_investigation      = $accident_investigation;
 		$accidentmetadata->accident_investigation_link = $accident_investigation_link;
+		$accidentmetadata->accident_location           = $accident_location;
 		$accidentmetadata->collateral_victim           = $collateral_victim;
 		$accidentmetadata->police_report               = $police_report;
 		$accidentmetadata->cerfa_link                  = $cerfa_link;
@@ -242,7 +246,7 @@ if ($action == 'create') {
 
 	//RelativeLocation --
 	print '<tr><td class="minwidth400">'.$langs->trans("RelativeLocation").'</td><td>';
-	print '<input class="flat" type="text" size="36" name="relative_location" id="relative_location" value="'.GETPOST('relative_location').'">';
+	print $formother->select_dictionary('relative_location','c_relative_location', 'ref', 'label', '', 0);
 	print '</td></tr>';
 
 	//LesionLocalization -- Siège des lésions
@@ -281,7 +285,7 @@ if ($action == 'create') {
 
 	//AccidentLocation -- Lieu de l'accident
 	print '<tr><td class="minwidth400">'.$langs->trans("AccidentLocation").'</td><td>';
-	print $formother->select_dictionary('accident_location','c_accident_location', 'ref', 'label', '', 0);
+	print '<input class="flat" type="text" size="36" name="accident_location" id="accident_location" value="'.GETPOST('accident_location').'">';
 	print '</td></tr>';
 
 	//CollateralVictim -- Victime collatérale
@@ -333,7 +337,7 @@ if (($id || $ref) && $action == 'edit') {
 
 	//RelativeLocation --
 	print '<tr><td class="minwidth400">'.$langs->trans("RelativeLocation").'</td><td>';
-	print '<input class="flat" type="text" size="36" name="relative_location" id="relative_location" value="'.$accidentmetadata->relative_location.'">';
+	print $formother->select_dictionary('relative_location','c_relative_location', 'ref', 'label', $accidentmetadata->relative_location, 0);
 	print '</td></tr>';
 
 	//LesionLocalization -- Siège des lésions
@@ -372,7 +376,7 @@ if (($id || $ref) && $action == 'edit') {
 
 	//AccidentLocation -- Lieu de l'accident
 	print '<tr><td class="minwidth400">'.$langs->trans("AccidentLocation").'</td><td>';
-	print $formother->select_dictionary('accident_location','c_accident_location', 'ref', 'label', $accidentmetadata->accident_location, 0);
+	print '<input class="flat" type="text" size="36" name="accident_location" id="accident_location" value="'.$accidentmetadata->accident_location.'">';
 	print '</td></tr>';
 
 	//CollateralVictim -- Victime collatérale
