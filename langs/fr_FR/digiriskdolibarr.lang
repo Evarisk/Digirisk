@@ -523,7 +523,7 @@ CreateAccident = Créer/Modifier l'accident
 DeleteAccident = Supprimer l'accident
 
 # Trigger - Déclencheur
-FIREPERMIT_CREATEInDolibarr = Accident créé dans Dolibarr
+ACCIDENT_CREATEInDolibarr = Accident créé dans Dolibarr
 ActionsOnAccident = Événements liés au accident
 AccidentGeneratedWithDolibarr = Accident généré avec Dolibarr
 AccidentLineCreateTrigger = Ligne d'accident créée
@@ -561,11 +561,10 @@ Accident = Accident
 AccidentLine = risque(s)
 AccidentDate = Date de l'accident
 AccidentSchedule = Horaires du permis de feu
-AccidentRiskList = Liste des risques du permis de feu
-AddAccidentLine = Ajout du risque
-UpdateAccidentLine = Mise à jour du risque
-DeleteAccidentLine = Suppression du risque
-AccidentMessage = au permis de feu
+AccidentRiskList = Liste d'informations complémentaires sur l'accident
+AddAccidentLine = Ajout d'une information sur l'accident
+UpdateAccidentLine = Mise à jour d'une information sur l'accident
+DeleteAccidentLine = Suppression d'une information sur l'accident
 UsedMaterial = Matériel utilisé
 UsedMaterialTooltip = Matériel à utiliser pour limiter le risque
 ActionsAccidentRisk = Actions
@@ -602,6 +601,7 @@ AccidentLocation = Lieu de l'accident
 CollateralVictim = Victime collatérale
 PoliceReport = Rapport de police
 CerfaLink = Lien vers le Cerfa
+WorkStopDays = Nombre de jour d'arrêt de travail
 
 # Email - Mail
 AccidentLabel = Récapitulatif du permis de feu

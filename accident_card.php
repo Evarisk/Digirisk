@@ -134,10 +134,10 @@ if (empty($reshook)) {
 	// Action to add record
 	if ($action == 'add' && $permissiontoadd) {
 		// Get parameters
-		$user_victim_id = GETPOST('fk_user_victim');
-		$soc_id = GETPOST('fk_element');
-		$label          = GETPOST('label');
-		$description    = GETPOST('description');
+		$user_victim_id     = GETPOST('fk_user_victim');
+		$digiriskelement_id = GETPOST('fk_element');
+		$label              = GETPOST('label');
+		$description        = GETPOST('description');
 
 		// Initialize object accident
 		$now                   = dol_now();
@@ -155,18 +155,13 @@ if (empty($reshook)) {
 
 		$object->accident_date = $accident_date;
 
-		$object->fk_element     = $soc_id;
+		$object->fk_element     = $digiriskelement_id;
 		$object->fk_user_victim = $user_victim_id;
 		$object->fk_user_creat  = $user->id ? $user->id : 1;
 
 		// Check parameters
 		if ($user_victim_id < 0) {
 			setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv('MaitreOeuvre')), null, 'errors');
-			$error++;
-		}
-
-		if ($soc_id < 0) {
-			setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv('ExtSociety')), null, 'errors');
 			$error++;
 		}
 
@@ -226,10 +221,10 @@ if (empty($reshook)) {
 	// Action to update record
 	if ($action == 'update' && $permissiontoadd) {
 		// Get parameters
-		$user_victim_id = GETPOST('fk_user_victim');
-		$soc_id         = GETPOST('fk_element');
-		$label          = GETPOST('label');
-		$description    = GETPOST('description');
+		$user_victim_id     = GETPOST('fk_user_victim');
+		$digiriskelement_id = GETPOST('fk_element');
+		$label              = GETPOST('label');
+		$description        = GETPOST('description');
 
 		// Initialize object accident
 		$now                 = dol_now();
@@ -242,18 +237,13 @@ if (empty($reshook)) {
 
 		$object->accident_date = $accident_date;
 
-		$object->fk_element     = $soc_id;
+		$object->fk_element     = $digiriskelement_id;
 		$object->fk_user_victim = $user_victim_id;
 		$object->fk_user_creat  = $user->id ? $user->id : 1;
 
 		// Check parameters
 		if ($user_victim_id < 0) {
 			setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv('MaitreOeuvre')), null, 'errors');
-			$error++;
-		}
-
-		if ($soc_id < 0) {
-			setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv('ExtSociety')), null, 'errors');
 			$error++;
 		}
 
@@ -313,46 +303,35 @@ if (empty($reshook)) {
 	// Action to add line
 	if ($action == 'addLine' && $permissiontoadd) {
 		// Get parameters
-		$actions_description = GETPOST('actionsdescription');
-		$use_equipment       = GETPOST('use_equipment');
-		$location            = GETPOST('fk_element');
-		$risk_category_id    = GETPOST('risk_category_id');
-		$parent_id           = GETPOST('parent_id');
+		$workstop_days = GETPOST('workstop_days');
+		$parent_id     = GETPOST('parent_id');
 
 		// Initialize object accident line
 		$objectline->date_creation  = $object->db->idate($now);
 		$objectline->ref            = $refAccidentDetMod->getNextValue($objectline);
 		$objectline->entity         = $conf->entity;
-		$objectline->description    = $actions_description;
-		$objectline->category       = $risk_category_id;
-		$objectline->use_equipment  = $use_equipment;
-		$objectline->fk_accident  = $parent_id;
-		$objectline->fk_element     = $location;
+		$objectline->workstop_days  = $workstop_days;
+		$objectline->fk_accident    = $parent_id;
 
 		// Check parameters
-		if ($parent_id < 1) {
-			setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv('Location')), null, 'errors');
-			$error++;
-		}
-
-		if ($risk_category_id < 0 || $risk_category_id == 'undefined') {
-			setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv('INRSRisk')), null, 'errors');
+		if (empty($workstop_days)) {
+			setEventMessages($langs->trans('ErrorFieldNotEmpty', $langs->transnoentitiesnoconv('WorkStopDays')), null, 'errors');
 			$error++;
 		}
 
 		if (!$error) {
 			$result = $objectline->insert($user, false);
 			if ($result > 0) {
-				// Creation fire permit line OK
-				setEventMessages($langs->trans('AddAccidentLine').' '.$objectline->ref.' '.$langs->trans('AccidentMessage'), array());
-				$objectline->call_trigger('FIREPERMITDET_CREATE', $user);
+				// Creation accident line OK
+				setEventMessages($langs->trans('AddAccidentLine').' '.$objectline->ref, array());
+				$objectline->call_trigger('ACCIDENTDET_CREATE', $user);
 				$urltogo = str_replace('__ID__', $result, $backtopage);
 				$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
 				header("Location: " . $urltogo);
 				exit;
 			}
 			else {
-				// Creation fire permit line KO
+				// Creation accident line KO
 				if (!empty($objectline->errors)) setEventMessages(null, $objectline->errors, 'errors');
 				else  setEventMessages($objectline->error, null, 'errors');
 			}
@@ -362,43 +341,27 @@ if (empty($reshook)) {
 	// Action to update line
 	if ($action == 'updateLine' && $permissiontoadd) {
 		// Get parameters
-		$actions_description = GETPOST('actionsdescription');
-		$use_equipment       = GETPOST('use_equipment');
-		$location            = GETPOST('fk_element');
-		$risk_category_id    = GETPOST('risk_category_id');
-		$parent_id           = GETPOST('parent_id');
+		$workstop_days = GETPOST('workstop_days');
+		$parent_id     = GETPOST('parent_id');
 
 		$objectline->fetch($lineid);
 
-		// Initialize object fire permit line
-		$objectline->description   = $actions_description;
-		$objectline->category      = $risk_category_id;
-		$objectline->use_equipment = $use_equipment;
-		$objectline->fk_accident = $parent_id;
-		$objectline->fk_element    = $location;
-
-		// Check parameters
-		if ($parent_id < 1) {
-			setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv('Location')), null, 'errors');
-			$error++;
-		}
-		if ($risk_category_id < 0) {
-			setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv('INRSRisk')), null, 'errors');
-			$error++;
-		}
+		// Initialize object accident line
+		$objectline->workstop_days = $workstop_days;
+		$objectline->fk_accident   = $parent_id;
 
 		if (!$error) {
 			$result = $objectline->update($user, false);
 			if ($result > 0) {
-				// Update fire permit line OK
-				setEventMessages($langs->trans('UpdateAccidentLine').' '.$objectline->ref.' '.$langs->trans('AccidentMessage'), array());
+				// Update accident line OK
+				setEventMessages($langs->trans('UpdateAccidentLine').' '.$objectline->ref, array());
 				$urltogo = str_replace('__ID__', $result, $backtopage);
 				$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $parent_id, $urltogo); // New method to autoselect project after a New on another form object creation
 				header("Location: " . $urltogo);
 				exit;
 			}
 			else {
-				// Update fire permit line KO
+				// Update accident line KO
 				if (!empty($object->errors)) setEventMessages(null, $object->errors, 'errors');
 				else  setEventMessages($object->error, null, 'errors');
 			}
@@ -410,14 +373,14 @@ if (empty($reshook)) {
 		$objectline->fetch($lineid);
 		$result = $objectline->delete($user, false);
 		if ($result > 0) {
-			// Deletion fire permit line OK
-			setEventMessages($langs->trans('DeleteAccidentLine').' '.$objectline->ref.' '.$langs->trans('AccidentMessage'), array());
+			// Deletion accident line OK
+			setEventMessages($langs->trans('DeleteAccidentLine').' '.$objectline->ref, array());
 			$urltogo = str_replace('__ID__', $result, $backtopage);
 			$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $parent_id, $urltogo); // New method to autoselect project after a New on another form object creation
 			header("Location: " . $urltogo);
 			exit;
 		} else {
-			// Deletion fire permit line KO
+			// Deletion accident line KO
 			if (!empty($object->errors)) setEventMessages(null, $object->errors, 'errors');
 			else  setEventMessages($object->error, null, 'errors');
 		}
@@ -663,22 +626,10 @@ if ($action == 'create') {
 	print ' <a href="' . DOL_URL_ROOT . '/user/card.php?action=create&backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?action=create') . '" target="_blank"><span class="fa fa-plus-circle valignmiddle paddingleft" title="' . $langs->trans("AddUser") . '"></span></a>';
 	print '</td></tr>';
 
-	//External society -- Société extérieure
-	print '<tr><td class="fieldrequired minwidth400">'.img_picto('','building').' '.$langs->trans("ExtSociety").'</td><td>';
-	$events = array();
-	$events[1] = array('method' => 'getContacts', 'url' => dol_buildpath('/custom/digiriskdolibarr/core/ajax/contacts.php?showempty=1', 1), 'htmlname' => 'ext_society_responsible', 'params' => array('add-customer-contact' => 'disabled'));
-	print $form->select_company(GETPOST('ext_society'), 'ext_society', '', 'SelectThirdParty', 1, 0, $events, 0, 'minwidth300');
-	print ' <a href="'.DOL_URL_ROOT.'/societe/card.php?action=create&backtopage='.urlencode($_SERVER["PHP_SELF"].'?action=create').'" target="_blank"><span class="fa fa-plus-circle valignmiddle paddingleft" title="'.$langs->trans("AddThirdParty").'"></span></a>';
+	//ParentElement -- Element parent
+	print '<tr><td>'.$langs->trans("ParentElement").'</td><td>';
+	print $digiriskelement->select_digiriskelement_list($object->fk_element, 'fk_element', '', '',  0, 0, array(), '',  0,  0,  'minwidth100',  GETPOST('id'),  false);
 	print '</td></tr>';
-
-	$ext_society_responsible_id = GETPOST('ext_society_responsible');
-	$contacts = fetchAllSocPeople('',  '',  0,  0, array('customsql' => "s.rowid = $ext_society_responsible_id AND c.email IS NULL OR c.email = ''" ));
-	$contacts_no_email = array();
-	if (is_array($contacts) && !empty ($contacts) && $contacts > 0) {
-		foreach ($contacts as $element) {
-			$contacts_no_email[$element->id] = $element->id;
-		}
-	}
 
 	//Accident Date -- Date de l'accident
 	print '<tr><td class="minwidth400"><label for="accident_date">'.$langs->trans("AccidentDate").'</label></td><td>';
@@ -744,32 +695,10 @@ if (($id || $ref) && $action == 'edit') {
 	print ' <a href="' . DOL_URL_ROOT . '/user/card.php?action=create&backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?action=create') . '" target="_blank"><span class="fa fa-plus-circle valignmiddle paddingleft" title="' . $langs->trans("AddUser") . '"></span></a>';
 	print '</td></tr>';
 
-//	//Maitre d'oeuvre
-//	$maitre_oeuvre = is_array($object_signatories['FP_MAITRE_OEUVRE']) ? array_shift($object_signatories['FP_MAITRE_OEUVRE'])->element_id : '';
-//	$userlist = $form->select_dolusers($maitre_oeuvre, '', 1, null, 0, '', '', 0, 0, 0, 'AND u.statut = 1', 0, '', 'minwidth300', 0, 1);
-//	print '<tr>';
-//	print '<td class="fieldrequired minwidth400" style="width:10%">'.img_picto('','user').' '.$form->editfieldkey('MaitreOeuvre', 'MaitreOeuvre_id', '', $object, 0).'</td>';
-//	print '<td>';
-//	print $form->selectarray('maitre_oeuvre', $userlist,$maitre_oeuvre, 1, null, null, null, "40%", 0, 0, 0, 'minwidth300',1);
-//	print ' <a href="'.DOL_URL_ROOT.'/user/card.php?action=create&backtopage='.urlencode($_SERVER["PHP_SELF"].'?action=create').'" target="_blank"><span class="fa fa-plus-circle valignmiddle paddingleft" title="'.$langs->trans("AddUser").'"></span></a>';
-//	print '</td></tr>';
-//
-//	//External society -- Société extérieure
-//	print '<tr><td class="fieldrequired minwidth400">'.img_picto('','building').' '.$langs->trans("ExtSociety").'</td><td>';
-//	$events = array();
-//	$events[1] = array('method' => 'getContacts', 'url' => dol_buildpath('/custom/digiriskdolibarr/core/ajax/contacts.php?showempty=1', 1), 'htmlname' => 'ext_society_responsible', 'params' => array('add-customer-contact' => 'disabled'));
-//	print $form->select_company(GETPOST('ext_society'), 'ext_society', '', 'SelectThirdParty', 1, 0, $events, 0, 'minwidth300');
-//	print ' <a href="'.DOL_URL_ROOT.'/societe/card.php?action=create&backtopage='.urlencode($_SERVER["PHP_SELF"].'?action=create').'" target="_blank"><span class="fa fa-plus-circle valignmiddle paddingleft" title="'.$langs->trans("AddThirdParty").'"></span></a>';
-//	print '</td></tr>';
-//
-//	$ext_society_responsible_id = GETPOST('ext_society_responsible');
-//	$contacts = fetchAllSocPeople('',  '',  0,  0, array('customsql' => "s.rowid = $ext_society_responsible_id AND c.email IS NULL OR c.email = ''" ));
-//	$contacts_no_email = array();
-//	if (is_array($contacts) && !empty ($contacts) && $contacts > 0) {
-//		foreach ($contacts as $element) {
-//			$contacts_no_email[$element->id] = $element->id;
-//		}
-//	}
+	//ParentElement -- Element parent
+	print '<tr><td>'.$langs->trans("ParentElement").'</td><td>';
+	print $digiriskelement->select_digiriskelement_list($object->fk_element, 'fk_element', '', '',  0, 0, array(), '',  0,  0,  'minwidth100',  GETPOST('id'),  false);
+	print '</td></tr>';
 
 	//Accident Date -- Date de l'accident
 	print '<tr><td class="minwidth400"><label for="accident_date">'.$langs->trans("AccidentDate").'</label></td><td>';
@@ -949,7 +878,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 		}
 		print '</div>';
 
-		// FIREPERMIT LINES
+		// ACCIDENT LINES
 		print '<div class="div-table-responsive-no-min" style="overflow-x: unset !important">';
 		print load_fiche_titre($langs->trans("AccidentRiskList"), '', '');
 		print '<table id="tablelines" class="noborder noshadow" width="100%">';
@@ -961,15 +890,12 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 		// Define colspan for the button 'Add'
 		$colspan = 3; // Columns: total ht + col edit + col delete
 
-		// Fire permit Lines
+		// Accident Lines
 		$accidentlines = $objectline->fetchAll($object->id);
 
 		print '<tr class="liste_titre">';
 		print '<td><span>' . $langs->trans('Ref.') . '</span></td>';
-		print '<td>' . $langs->trans('Location') . '</td>';
-		print '<td>' . $form->textwithpicto($langs->trans('ActionsDescription'), $langs->trans("ActionsDescriptionTooltip")) . '</td>';
-		print '<td class="center">' . $form->textwithpicto($langs->trans('INRSRisk'), $langs->trans('INRSRiskTooltip')) . '</td>';
-		print '<td>' . $form->textwithpicto($langs->trans('UsedMaterial'), $langs->trans('UsedMaterialTooltip')) . '</td>';
+		print '<td>' . $langs->trans('WorkStopDays') . '</td>';
 		print '<td class="center" colspan="' . $colspan . '">' . $langs->trans('ActionsAccidentRisk') . '</td>';
 		print '</tr>';
 
@@ -988,51 +914,9 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 					print $item->ref;
 					print '</td>';
 
-					print '<td class="bordertop nobottom linecollocation">';
-					print $digiriskelement->select_digiriskelement_list($item->fk_element, 'fk_element', '', '', 0, 0, array(), '', 0, 0, 'minwidth100', GETPOST('id'), false, 1);
-					print '</td>';
-
 					$coldisplay++;
 					print '<td>';
-					print '<textarea name="actionsdescription" class="minwidth150" cols="50" rows="' . ROWS_2 . '">' . $item->description . '</textarea>' . "\n";
-					print '</td>';
-
-					$coldisplay++;
-					print '<td  class="center">'; ?>
-					<div class="wpeo-dropdown dropdown-large dropdown-grid category-danger padding">
-						<div class="dropdown-toggle dropdown-add-button button-cotation">
-							<input class="input-hidden-danger" type="hidden" name="risk_category_id"
-								   value="<?php echo $item->category ?>"/>
-							<div class="wpeo-dropdown dropdown-large category-danger padding wpeo-tooltip-event"
-								 aria-label="<?php echo $risk->get_fire_permit_danger_category_name($item) ?>">
-								<img class="danger-category-pic hover"
-									 src="<?php echo DOL_URL_ROOT . '/custom/digiriskdolibarr/img/typeDeTravaux/' . $risk->get_fire_permit_danger_category($item) . '.png'; ?>"/>
-							</div>
-						</div>
-
-						<ul class="dropdown-content wpeo-gridlayout grid-5 grid-gap-0">
-							<?php
-							$dangerCategories = $risk->get_fire_permit_danger_categories();
-							if (!empty($dangerCategories)) :
-								foreach ($dangerCategories as $dangerCategory) : ?>
-									<li class="item dropdown-item wpeo-tooltip-event"
-										ata-is-preset="<?php echo ''; ?>"
-										data-id="<?php echo $dangerCategory['position'] ?>"
-										aria-label="<?php echo $dangerCategory['name'] ?>">
-										<img
-											src="<?php echo DOL_URL_ROOT . '/custom/digiriskdolibarr/img/typeDeTravaux/' . $dangerCategory['thumbnail_name'] . '.png' ?>"
-											class="attachment-thumbail size-thumbnail photo photowithmargin" alt="">
-									</li>
-								<?php endforeach;
-							endif; ?>
-						</ul>
-					</div>
-					<?php
-					print '</td>';
-
-					$coldisplay++;
-					print '<td>';
-					print '<textarea name="use_equipment" class="minwidth150" cols="50" rows="' . ROWS_2 . '">' . $item->use_equipment . '</textarea>' . "\n";
+					print '<input type="integer" name="workstop_days" class="minwidth150" value="' .  $item->workstop_days . '">';
 					print '</td>';
 
 					$coldisplay += $colspan;
@@ -1050,32 +934,9 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 					print $item->ref;
 					print '</td>';
 
-					print '<td>';
-					$digiriskelement->fetch($item->fk_element);
-					print $digiriskelement->ref . " - " . $digiriskelement->label;
-					print '</td>';
-
 					$coldisplay++;
 					print '<td>';
-					print $item->description;
-					print '</td>';
-
-					$coldisplay++;
-					print '<td class="center">'; ?>
-					<div class="table-cell table-50 cell-risk" data-title="Risque">
-						<div class="wpeo-dropdown dropdown-large category-danger padding wpeo-tooltip-event"
-							 aria-label="<?php echo $risk->get_fire_permit_danger_category_name($item) ?>">
-							<img class="danger-category-pic hover"
-								 src="<?php echo DOL_URL_ROOT . '/custom/digiriskdolibarr/img/typeDeTravaux/' . $risk->get_fire_permit_danger_category($item) . '.png'; ?>"
-								 alt=""/>
-						</div>
-					</div>
-					<?php
-					print '</td>';
-
-					$coldisplay++;
-					print '<td>';
-					print $item->use_equipment;
+					print $item->workstop_days;
 					print '</td>';
 
 					$coldisplay += $colspan;
@@ -1114,47 +975,10 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 			print '<td>';
 			print $refAccidentDetMod->getNextValue($objectline);
 			print '</td>';
-			print '<td>';
-			print $digiriskelement->select_digiriskelement_list('', 'fk_element', '', '', 0, 0, array(), '', 0, 0, 'minwidth100', GETPOST('id'), false, 1);
-			print '</td>';
 
 			$coldisplay++;
 			print '<td>';
-			print '<textarea name="actionsdescription" class="minwidth150" cols="50" rows="' . ROWS_2 . '">' . ('') . '</textarea>' . "\n";
-			print '</td>';
-
-			$coldisplay++;
-			print '<td class="center">'; ?>
-			<div class="wpeo-dropdown dropdown-large dropdown-grid category-danger padding">
-				<input class="input-hidden-danger" type="hidden" name="risk_category_id" value="undefined"/>
-				<div class="dropdown-toggle dropdown-add-button button-cotation">
-				<span class="wpeo-button button-square-50 button-grey"><i
-						class="fas fa-exclamation-triangle button-icon"></i><i
-						class="fas fa-plus-circle button-add"></i></span>
-					<img class="danger-category-pic wpeo-tooltip-event hidden" src="" aria-label=""/>
-				</div>
-				<ul class="dropdown-content wpeo-gridlayout grid-5 grid-gap-0">
-					<?php
-					$dangerCategories = $risk->get_fire_permit_danger_categories();
-					if (!empty($dangerCategories)) :
-						foreach ($dangerCategories as $dangerCategory) : ?>
-							<li class="item dropdown-item wpeo-tooltip-event" data-is-preset="<?php echo ''; ?>"
-								data-id="<?php echo $dangerCategory['position'] ?>"
-								aria-label="<?php echo $dangerCategory['name'] ?>">
-								<img
-									src="<?php echo DOL_URL_ROOT . '/custom/digiriskdolibarr/img/typeDeTravaux/' . $dangerCategory['thumbnail_name'] . '.png' ?>"
-									class="attachment-thumbail size-thumbnail photo photowithmargin" alt="">
-							</li>
-						<?php endforeach;
-					endif; ?>
-				</ul>
-			</div>
-			<?php
-			print '</td>';
-
-			$coldisplay++;
-			print '<td>';
-			print '<textarea name="use_equipment" class="minwidth150" cols="50" rows="' . ROWS_2 . '">' . ('') . '</textarea>' . "\n";
+			print '<input type="integer" name="workstop_days" class="minwidth150" value="">';
 			print '</td>';
 
 			$coldisplay += $colspan;

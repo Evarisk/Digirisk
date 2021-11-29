@@ -14,4 +14,3 @@
 -- along with this program.  If not, see https://www.gnu.org/licenses/.
 
 ALTER TABLE llx_digiriskdolibarr_accidentdet ADD INDEX idx_digiriskdolibarr_accidentdet_rowid (rowid);
-ALTER TABLE llx_digiriskdolibarr_accidentdet ADD INDEX idx_digiriskdolibarr_accidentdet_ref_ext (ref_ext);

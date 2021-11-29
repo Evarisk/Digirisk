@@ -662,37 +662,25 @@ class AccidentLine extends CommonObjectLine
 	 */
 	public $table_element = 'digiriskdolibarr_accidentdet';
 
-	public $ref = '';
-
-	public $date_creation = '';
-
-	public $description = '';
-
-	public $category = '';
-
-	public $use_equipment = '';
-
-	public $fk_accident = '';
-
-	public $fk_element = '';
-
 	/**
 	 * @var array  Array with all fields and their property. Do not use it as a static var. It may be modified by constructor.
 	 */
 	public $fields=array(
 		'rowid'         => array('type'=>'integer', 'label'=>'TechnicalID', 'enabled'=>'1', 'position'=>1, 'notnull'=>1, 'visible'=>0, 'noteditable'=>'1', 'index'=>1, 'comment'=>"Id"),
 		'ref'           => array('type'=>'varchar(128)', 'label'=>'Ref', 'enabled'=>'1', 'position'=>10, 'notnull'=>1, 'visible'=>1, 'noteditable'=>'1', 'default'=>'(PROV)', 'index'=>1, 'searchall'=>1, 'showoncombobox'=>'1', 'comment'=>"Reference of object"),
-		'ref_ext'       => array('type'=>'varchar(128)', 'label'=>'RefExt', 'enabled'=>'1', 'position'=>20, 'notnull'=>0, 'visible'=>0,),
 		'entity'        => array('type'=>'integer', 'label'=>'Entity', 'enabled'=>'1', 'position'=>30, 'notnull'=>1, 'visible'=>0,),
 		'date_creation' => array('type'=>'datetime', 'label'=>'DateCreation', 'enabled'=>'1', 'position'=>40, 'notnull'=>1, 'visible'=>0,),
 		'tms'           => array('type'=>'timestamp', 'label'=>'DateModification', 'enabled'=>'1', 'position'=>50, 'notnull'=>0, 'visible'=>0,),
-		'category'      => array('type'=>'integer', 'label'=>'PriorVisit', 'enabled'=>'1', 'position'=>60, 'notnull'=>-1, 'visible'=>-1,),
-		'description'   => array('type'=>'text', 'label'=>'Description', 'enabled'=>'1', 'position'=>70, 'notnull'=>-1, 'visible'=>-1,),
-		'use_equipment' => array('type'=>'text', 'label'=>'UseEquipment', 'enabled'=>'1', 'position'=>80, 'notnull'=>-1, 'visible'=>-1,),
-		'fk_accident' => array('type'=>'integer', 'label'=>'FkAccident', 'enabled'=>'1', 'position'=>90, 'notnull'=>1, 'visible'=>0,),
-		'fk_element'    => array('type'=>'integer', 'label'=>'FkEleme,nt', 'enabled'=>'1', 'position'=>100, 'notnull'=>1, 'visible'=>0,),
+		'workstop_days' => array('type'=>'integer', 'label'=>'WorkStopDays', 'enabled'=>'1', 'position'=>60, 'notnull'=>-1, 'visible'=>-1,),
+		'fk_accident'   => array('type'=>'integer', 'label'=>'FkAccident', 'enabled'=>'1', 'position'=>70, 'notnull'=>1, 'visible'=>0,),
 	);
 
+	public $ref;
+	public $entity;
+	public $date_creation;
+	public $tms;
+	public $workstop_days;
+	public $fk_accident;
 
 	/**
 	 * Constructor
@@ -720,7 +708,7 @@ class AccidentLine extends CommonObjectLine
 	{
 		global $db;
 
-		$sql = 'SELECT t.rowid, t.ref, t.date_creation, t.description, t.category, t.use_equipment, t.fk_accident, t.fk_element ';
+		$sql = 'SELECT t.rowid, t.ref, t.date_creation, t.workstop_days, t.fk_accident';
 		$sql .= ' FROM ' . MAIN_DB_PREFIX . 'digiriskdolibarr_accidentdet as t';
 		$sql .= ' WHERE t.rowid = ' . $rowid;
 		$sql .= ' AND entity IN (' . getEntity($this->table_element) . ')';
@@ -732,11 +720,8 @@ class AccidentLine extends CommonObjectLine
 			$this->id = $objp->rowid;
 			$this->ref = $objp->ref;
 			$this->date_creation = $objp->date_creation;
-			$this->description = $objp->description;
-			$this->category = $objp->category;
-			$this->use_equipment = $objp->use_equipment;
+			$this->workstop_days = $objp->workstop_days;
 			$this->fk_accident = $objp->fk_accident;
-			$this->fk_element = $objp->fk_element;
 
 			$db->free($result);
 
@@ -756,7 +741,7 @@ class AccidentLine extends CommonObjectLine
 	public function fetchAll($parent_id = 0, $limit = 0)
 	{
 		global $db;
-		$sql = 'SELECT t.rowid, t.ref, t.date_creation, t.description, t.category, t.use_equipment, t.fk_element';
+		$sql = 'SELECT t.rowid, t.ref, t.date_creation, t.workstop_days';
 		$sql .= ' FROM ' . MAIN_DB_PREFIX . 'digiriskdolibarr_accidentdet as t';
 		if ($parent_id > 0) {
 			$sql .= ' WHERE t.fk_accident = ' . $parent_id;
@@ -780,11 +765,8 @@ class AccidentLine extends CommonObjectLine
 				$record->id = $obj->rowid;
 				$record->ref = $obj->ref;
 				$record->date_creation = $obj->date_creation;
-				$record->description = $obj->description;
-				$record->category = $obj->category;
-				$record->use_equipment = $obj->use_equipment;
+				$record->workstop_days = $obj->workstop_days;
 				$record->fk_accident = $obj->fk_accident;
-				$record->fk_element = $obj->fk_element;
 
 				$records[$record->id] = $record;
 
@@ -813,28 +795,19 @@ class AccidentLine extends CommonObjectLine
 	{
 		global $db, $user;
 
-		$error = 0;
-
-
-		// Clean parameters
-		$this->description = trim($this->description);
-
 		$db->begin();
 		$now = dol_now();
 
 		// Insertion dans base de la ligne
 		$sql = 'INSERT INTO ' . MAIN_DB_PREFIX . 'digiriskdolibarr_accidentdet';
-		$sql .= ' (ref, entity, date_creation, description, category, use_equipment, fk_accident, fk_element';
+		$sql .= ' (ref, entity, date_creation, workstop_days, fk_accident';
 		$sql .= ')';
 		$sql .= " VALUES (";
 		$sql .= "'" . $db->escape($this->ref) . "'" . ", ";
 		$sql .= $this->entity . ", ";
 		$sql .= "'" . $db->escape($db->idate($now)) . "'" . ", ";
-		$sql .= "'" . $db->escape($this->description) . "'" . ", ";
-		$sql .= $this->category . ", ";
-		$sql .= "'" . $db->escape($this->use_equipment) . "'" . ", ";
-		$sql .= $this->fk_accident . ", ";
-		$sql .= $this->fk_element;
+		$sql .= $this->workstop_days . ", ";
+		$sql .= $this->fk_accident;
 
 		$sql .= ')';
 
@@ -871,22 +844,14 @@ class AccidentLine extends CommonObjectLine
 	 */
 	public function update($user = '', $notrigger = false)
 	{
-		global $user, $conf, $db;
-
-		$error = 0;
-
-		// Clean parameters
-		$this->description = trim($this->description);
+		global $user, $db;
 
 		$db->begin();
 		// Mise a jour ligne en base
 		$sql = "UPDATE " . MAIN_DB_PREFIX . "digiriskdolibarr_accidentdet SET";
 		$sql .= " ref='" . $db->escape($this->ref) . "',";
-		$sql .= " description='" . $db->escape($this->description) . "',";
-		$sql .= " category=" . $db->escape($this->category) . ",";
-		$sql .= " use_equipment='" . $db->escape($this->use_equipment) . "'" . ",";
-		$sql .= " fk_accident=" . $db->escape($this->fk_accident) . ",";
-		$sql .= " fk_element=" . $db->escape($this->fk_element);
+		$sql .= " workstop_days=" . $this->workstop_days . ",";
+		$sql .= " fk_accident=" . $db->escape($this->fk_accident);
 		$sql .= " WHERE rowid = " . $this->id;
 
 		dol_syslog(get_class($this) . "::update", LOG_DEBUG);
