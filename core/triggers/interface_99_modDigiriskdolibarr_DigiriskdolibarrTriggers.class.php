@@ -1183,6 +1183,125 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->create($user);
 				break;
 
+			case 'ACCIDENT_CREATE' :
+
+				dol_syslog("Trigger '".$this->name."' for action '$action' launched by ".__FILE__.". id=".$object->id);
+				require_once DOL_DOCUMENT_ROOT.'/comm/action/class/actioncomm.class.php';
+				require_once __DIR__ . '/../../class/digiriskelement.class.php';
+				$now = dol_now();
+				$actioncomm      = new ActionComm($this->db);
+
+				$actioncomm->elementtype = 'accident@digiriskdolibarr';
+				$actioncomm->code        = 'AC_ACCIDENT_CREATE';
+				$actioncomm->type_code   = 'AC_OTH_AUTO';
+				$actioncomm->label       = $langs->trans('AccidentCreateTrigger');
+				$actioncomm->datep       = $now;
+				$actioncomm->fk_element  = $object->fk_element;
+				$actioncomm->userownerid = $user->id;
+				$actioncomm->percentage  = -1;
+
+				$actioncomm->create($user);
+				break;
+
+			case 'ACCIDENT_MODIFY' :
+
+				dol_syslog("Trigger '".$this->name."' for action '$action' launched by ".__FILE__.". id=".$object->id);
+				require_once DOL_DOCUMENT_ROOT.'/comm/action/class/actioncomm.class.php';
+				require_once __DIR__ . '/../../class/digiriskelement.class.php';
+				$now = dol_now();
+				$actioncomm      = new ActionComm($this->db);
+
+				$actioncomm->elementtype = 'accident@digiriskdolibarr';
+				$actioncomm->code        = 'AC_ACCIDENT_MODIFY';
+				$actioncomm->type_code   = 'AC_OTH_AUTO';
+				$actioncomm->label       = $langs->trans('AccidentModifyTrigger');
+				$actioncomm->datep       = $now;
+				$actioncomm->fk_element  = $object->fk_element;
+				$actioncomm->userownerid = $user->id;
+				$actioncomm->percentage  = -1;
+
+				$actioncomm->create($user);
+				break;
+
+			case 'ACCIDENT_DELETE' :
+
+				dol_syslog("Trigger '".$this->name."' for action '$action' launched by ".__FILE__.". id=".$object->id);
+				require_once DOL_DOCUMENT_ROOT.'/comm/action/class/actioncomm.class.php';
+				require_once __DIR__ . '/../../class/digiriskelement.class.php';
+				$now = dol_now();
+				$actioncomm      = new ActionComm($this->db);
+				$digiriskelement = new DigiriskElement($this->db);
+				$digiriskelement->fetch($object->fk_element);
+
+				$actioncomm->elementtype = 'accident@digiriskdolibarr';
+				$actioncomm->code        = 'AC_ACCIDENT_DELETE';
+				$actioncomm->type_code   = 'AC_OTH_AUTO';
+				$actioncomm->label       = $langs->trans('AccidentDeleteTrigger');
+				$actioncomm->datep       = $now;
+				$actioncomm->fk_element  = $object->fk_element;
+				$actioncomm->userownerid = $user->id;
+				$actioncomm->percentage  = -1;
+
+				$actioncomm->create($user);
+				break;
+
+			case 'ACCIDENTLINE_CREATE' :
+
+				dol_syslog("Trigger '".$this->name."' for action '$action' launched by ".__FILE__.". id=".$object->id);
+				require_once DOL_DOCUMENT_ROOT.'/comm/action/class/actioncomm.class.php';
+				$now = dol_now();
+				$actioncomm = new ActionComm($this->db);
+
+				$actioncomm->elementtype = 'accident@digiriskdolibarr';
+				$actioncomm->code        = 'AC_ACCIDENTLINE_CREATE';
+				$actioncomm->type_code   = 'AC_OTH_AUTO';
+				$actioncomm->label       = $langs->trans('AccidentLineCreateTrigger');
+				$actioncomm->datep       = $now;
+				$actioncomm->fk_element  = $object->fk_accident;
+				$actioncomm->userownerid = $user->id;
+				$actioncomm->percentage  = -1;
+
+				$actioncomm->create($user);
+				break;
+
+			case 'ACCIDENTLINE_MODIFY' :
+
+				dol_syslog("Trigger '".$this->name."' for action '$action' launched by ".__FILE__.". id=".$object->id);
+				require_once DOL_DOCUMENT_ROOT.'/comm/action/class/actioncomm.class.php';
+				$now = dol_now();
+				$actioncomm = new ActionComm($this->db);
+
+				$actioncomm->elementtype = 'accident@digiriskdolibarr';
+				$actioncomm->code        = 'AC_ACCIDENTLINE_MODIFY';
+				$actioncomm->type_code   = 'AC_OTH_AUTO';
+				$actioncomm->label       = $langs->trans('AccidentLineModifyTrigger');
+				$actioncomm->datep       = $now;
+				$actioncomm->fk_element  = $object->fk_accident;
+				$actioncomm->userownerid = $user->id;
+				$actioncomm->percentage  = -1;
+
+				$actioncomm->create($user);
+				break;
+
+			case 'ACCIDENTLINE_DELETE' :
+
+				dol_syslog("Trigger '".$this->name."' for action '$action' launched by ".__FILE__.". id=".$object->id);
+				require_once DOL_DOCUMENT_ROOT.'/comm/action/class/actioncomm.class.php';
+				$now = dol_now();
+				$actioncomm = new ActionComm($this->db);
+
+				$actioncomm->elementtype = 'accident@digiriskdolibarr';
+				$actioncomm->code        = 'AC_ACCIDENTLINE_DELETE';
+				$actioncomm->type_code   = 'AC_OTH_AUTO';
+				$actioncomm->label       = $langs->trans('AccidentLineDeleteTrigger');
+				$actioncomm->datep       = $now;
+				$actioncomm->fk_element  = $object->fk_accident;
+				$actioncomm->userownerid = $user->id;
+				$actioncomm->percentage  = -1;
+
+				$actioncomm->create($user);
+				break;
+
 			default:
 				dol_syslog("Trigger '".$this->name."' for action '$action' launched by ".__FILE__.". id=".$object->id);
 				break;
