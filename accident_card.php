@@ -135,7 +135,7 @@ if (empty($reshook)) {
 	if ($action == 'add' && $permissiontoadd) {
 		// Get parameters
 		$user_victim_id     = GETPOST('fk_user_victim');
-		$digiriskelement_id = GETPOST('fk_element');
+		$digiriskelement_id = GETPOST('fk_digiriskelement');
 		$label              = GETPOST('label');
 		$description        = GETPOST('description');
 
@@ -155,19 +155,19 @@ if (empty($reshook)) {
 
 		$object->accident_date = $accident_date;
 
-		$object->fk_element     = $digiriskelement_id;
-		$object->fk_user_victim = $user_victim_id;
-		$object->fk_user_creat  = $user->id ? $user->id : 1;
+		$object->fk_digiriskelement = $digiriskelement_id;
+		$object->fk_user_victim     = $user_victim_id;
+		$object->fk_user_creat      = $user->id ? $user->id : 1;
 
 		// Check parameters
 		if ($user_victim_id < 0) {
-			setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv('MaitreOeuvre')), null, 'errors');
+			setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv('UserVictim')), null, 'errors');
 			$error++;
 		}
 
 		// Submit file
 		if (!empty($conf->global->MAIN_UPLOAD_DOC)) {
-			if (!empty($_FILES)) {
+			if (!empty($_FILES && !empty($_FILES['userfile']['name'][0]))) {
 				if (is_array($_FILES['userfile']['tmp_name'])) $userfiles = $_FILES['userfile']['tmp_name'];
 				else $userfiles = array($_FILES['userfile']['tmp_name']);
 
@@ -185,6 +185,7 @@ if (empty($reshook)) {
 				{
 					if (dol_mkdir($filedir) < 0)
 					{
+
 						$object->error = $langs->transnoentities("ErrorCanNotCreateDir", $filedir);
 						$error++;
 					}
@@ -222,7 +223,7 @@ if (empty($reshook)) {
 	if ($action == 'update' && $permissiontoadd) {
 		// Get parameters
 		$user_victim_id     = GETPOST('fk_user_victim');
-		$digiriskelement_id = GETPOST('fk_element');
+		$digiriskelement_id = GETPOST('fk_digiriskelement');
 		$label              = GETPOST('label');
 		$description        = GETPOST('description');
 
@@ -237,13 +238,13 @@ if (empty($reshook)) {
 
 		$object->accident_date = $accident_date;
 
-		$object->fk_element     = $digiriskelement_id;
-		$object->fk_user_victim = $user_victim_id;
-		$object->fk_user_creat  = $user->id ? $user->id : 1;
+		$object->fk_digiriskelement = $digiriskelement_id;
+		$object->fk_user_victim     = $user_victim_id;
+		$object->fk_user_creat      = $user->id ? $user->id : 1;
 
 		// Check parameters
 		if ($user_victim_id < 0) {
-			setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv('MaitreOeuvre')), null, 'errors');
+			setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv('UserVictim')), null, 'errors');
 			$error++;
 		}
 
@@ -628,7 +629,7 @@ if ($action == 'create') {
 
 	//ParentElement -- Element parent
 	print '<tr><td>'.$langs->trans("ParentElement").'</td><td>';
-	print $digiriskelement->select_digiriskelement_list($object->fk_element, 'fk_element', '', '',  0, 0, array(), '',  0,  0,  'minwidth100',  GETPOST('id'),  false);
+	print $digiriskelement->select_digiriskelement_list($object->fk_digiriskelement, 'fk_digiriskelement', '', '',  0, 0, array(), '',  0,  0,  'minwidth100',  GETPOST('id'),  false);
 	print '</td></tr>';
 
 	//Accident Date -- Date de l'accident
@@ -697,7 +698,7 @@ if (($id || $ref) && $action == 'edit') {
 
 	//ParentElement -- Element parent
 	print '<tr><td>'.$langs->trans("ParentElement").'</td><td>';
-	print $digiriskelement->select_digiriskelement_list($object->fk_element, 'fk_element', '', '',  0, 0, array(), '',  0,  0,  'minwidth100',  GETPOST('id'),  false);
+	print $digiriskelement->select_digiriskelement_list($object->fk_digiriskelement, 'fk_digiriskelement', '', '',  0, 0, array(), '',  0,  0,  'minwidth100',  GETPOST('id'),  false);
 	print '</td></tr>';
 
 	//Accident Date -- Date de l'accident
@@ -792,9 +793,6 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 
 	dol_strlen($object->label) ? $morehtmlref = '<span>'. ' - ' .$object->label . '</span>' : '';
 	$morehtmlref .= '<div class="refidno">';
-	// External Society -- Société extérieure
-	//$ext_society = $digiriskresources->fetchResourcesFromObject('FP_EXT_SOCIETY', $object);
-	//$morehtmlref .= $langs->trans('ExtSociety').' : '.$ext_society->getNomUrl(1);
 	// Project
 	$project->fetch($object->fk_project);
 	$morehtmlref .= '<br>'.$langs->trans('Project').' : '.getNomUrlProject($project, 1, 'blank');
@@ -827,6 +825,17 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	print '</td>';
 	print '<td>';
 	print dol_print_date($object->accident_date, 'dayhoursec');
+	print '</td></tr>';
+
+	//Parent Element -- Elément parent
+	print '<tr><td class="titlefield">'.$langs->trans("ParentElement").'</td><td>';
+	$result = $digiriskelement->fetch($object->fk_digiriskelement);
+	if ($result > 0) {
+		print $digiriskelement->ref . ( !empty($digiriskelement->label) ?  ' - ' . $digiriskelement->label : '');
+	}
+	else {
+		print $conf->global->MAIN_INFO_SOCIETE_NOM;
+	}
 	print '</td></tr>';
 
 	include DOL_DOCUMENT_ROOT.'/core/tpl/commonfields_view.tpl.php';
