@@ -427,7 +427,7 @@ if ($object->id > 0) {
 					</div>
 				</div>
 				<!-- Modal-Footer -->
-				<div class="modal-footer risksign-create">
+				<div class="modal-footer">
 					<?php if ($permissiontoadd) : ?>
 						<div class="risksign-create wpeo-button button-primary button-disable modal-close">
 							<span><i class="fas fa-plus"></i>  <?php echo $langs->trans('AddRiskSignButton'); ?></span>
@@ -603,7 +603,7 @@ if ($object->id > 0) {
 								</div>
 							</div>
 							<!-- Modal-Footer -->
-							<div class="modal-footer risksign-save">
+							<div class="modal-footer">
 								<div class="risksign-save wpeo-button button-green save modal-close" value="<?php echo $risksign->id ?>">
 									<span><i class="fas fa-save"></i>  <?php echo $langs->trans('UpdateData'); ?></span>
 								</div>

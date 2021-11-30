@@ -67,7 +67,7 @@ $related_tasks = $risk->get_related_tasks($risk); ?>
 											</div>
 										</div>
 										<!-- Modal-Footer -->
-										<div class="modal-footer riskassessment-task-save">
+										<div class="modal-footer">
 											<?php if ($permissiontoadd) : ?>
 												<div class="wpeo-button riskassessment-task-save button-green" value="<?php echo $related_task->id ?>">
 													<i class="fas fa-save"></i> <?php echo $langs->trans('UpdateData'); ?>
@@ -160,7 +160,7 @@ $related_tasks = $risk->get_related_tasks($risk); ?>
 										</div>
 									</div>
 									<!-- Modal-Footer -->
-									<div class="modal-footer riskassessment-task-save">
+									<div class="modal-footer">
 										<?php if ($permissiontoadd) : ?>
 											<div class="wpeo-button riskassessment-task-save button-green" value="<?php echo $related_task->id ?>">
 												<i class="fas fa-save"></i> <?php echo $langs->trans('UpdateData'); ?>
@@ -239,7 +239,7 @@ $related_tasks = $risk->get_related_tasks($risk); ?>
 					</div>
 				</div>
 				<!-- Modal-Footer -->
-				<div class="modal-footer riskassessment-task-create">
+				<div class="modal-footer">
 					<?php if ($permissiontoadd) : ?>
 						<div class="wpeo-button riskassessment-task-create button-blue button-disable" value="<?php echo $risk->id ?>">
 							<i class="fas fa-plus"></i> <?php echo $langs->trans('Add'); ?>
@@ -378,7 +378,7 @@ $related_tasks = $risk->get_related_tasks($risk); ?>
 														</div>
 													</div>
 													<!-- Modal-Footer -->
-													<div class="modal-footer riskassessment-task-save">
+													<div class="modal-footer">
 														<?php if ($permissiontoadd) : ?>
 															<div class="wpeo-button riskassessment-task-save button-green" value="<?php echo $related_task->id ?>">
 																<i class="fas fa-save"></i> <?php echo $langs->trans('UpdateData'); ?>

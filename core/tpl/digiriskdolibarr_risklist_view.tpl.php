@@ -478,7 +478,7 @@
 						</div>
 					</div>
 					<!-- Modal-Footer -->
-					<div class="modal-footer risk-create">
+					<div class="modal-footer">
 						<?php if ($permissiontoadd) : ?>
 							<div class="risk-create wpeo-button button-primary button-disable modal-close">
 								<span><i class="fas fa-plus"></i>  <?php echo $langs->trans('AddRiskButton'); ?></span>
@@ -650,7 +650,7 @@
 					</div>
 				</div>
 				<!-- Modal-Footer -->
-				<div class="modal-footer risk-create">
+				<div class="modal-footer">
 					<?php if ($permissiontoadd) : ?>
 						<div class="risk-create wpeo-button button-primary button-disable modal-close">
 							<span><i class="fas fa-plus"></i>  <?php echo $langs->trans('AddRiskButton'); ?></span>
@@ -935,7 +935,7 @@
 									</div>
 								</div>
 								<!-- Modal-Footer -->
-								<div class="modal-footer risk-save">
+								<div class="modal-footer">
 									<?php if ($permissiontoadd) : ?>
 										<div class="risk-save wpeo-button button-green save" value="<?php echo $risk->id ?>">
 											<span><i class="fas fa-save"></i>  <?php echo $langs->trans('UpdateData'); ?></span>
