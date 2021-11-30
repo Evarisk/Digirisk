@@ -660,56 +660,6 @@ function digiriskHeader($head = '', $title = '', $help_url = '', $target = '', $
 								}
 							</script>
 							<?php display_recurse_tree($results) ?>
-							<script>
-								if (localStorage.maximized == 'false') {
-									var text = '';
-									var menu = $('a.vmenu');
-									var elementParent = $('div.vmenu')
-									$('#id-left').attr('style', 'display:block !important')
-									menu.each(function (index, value) {
-										text = $(this).html().split(' ');
-										$(this).html(text[0]+' '+text[1]+' '+text[2]);
-									});
-
-									var elementText = $('.minimizeMenu').html().split(' ');
-									$('.minimizeMenu').html(elementText[0]+' '+elementText[1]+' '+elementText[2]);
-									jQuery('.minimizeMenu').removeClass('minimizeMenu').addClass('maximizeMenu');
-
-									elementParent.css('width', '30px');
-									elementParent.find('.blockvmenusearch').hide();
-
-									}
-
-								// Get previous menu to display it
-								var MENU = localStorage.menu;
-								if (MENU == null || MENU == '') {
-									MENU = new Set()
-								} else {
-									MENU = JSON.parse(MENU);
-									MENU = new Set(MENU);
-								}
-
-								MENU.forEach((id) =>  {
-									jQuery( '#menu'+id).removeClass( 'fa-chevron-right').addClass( 'fa-chevron-down' );
-									jQuery( '#unit'+id ).addClass( 'toggled' );
-								});
-
-								<?php $object->fetch(GETPOST('id')); ?>;
-								var idParent = <?php echo json_encode($object->fk_parent) ;?> ;
-
-								jQuery( '#menu'+idParent).removeClass( 'fa-chevron-right').addClass( 'fa-chevron-down' );
-								jQuery( '#unit'+idParent ).addClass( 'toggled' );
-
-								// Set active unit active
-								jQuery( '.digirisk-wrap .navigation-container .unit.active' ).removeClass( 'active' );
-
-								var params = new window.URLSearchParams(window.location.search);
-								var id = params.get('id');
-								if (document.URL.match(/digiriskelement/) && !document.URL.match(/type=standard/)) {
-									jQuery( '#unit'  + id ).addClass( 'active' );
-									jQuery( '#unit'  +id  ).closest( '.unit' ).attr( 'value', id );
-								};
-							</script>
 						</ul>
 					</div>
 				</div>
