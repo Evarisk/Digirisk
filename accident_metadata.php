@@ -42,6 +42,7 @@ require_once DOL_DOCUMENT_ROOT.'/projet/class/project.class.php';
 require_once __DIR__ . '/class/accident.class.php';
 require_once __DIR__ . '/lib/digiriskdolibarr_function.lib.php';
 require_once __DIR__ . '/lib/digiriskdolibarr_accident.lib.php';
+require_once __DIR__ . '/core/modules/digiriskdolibarr/digiriskelement/accident_lesion/mod_accident_lesion_standard.php';
 
 global $conf, $db, $hookmanager, $langs, $user;
 
@@ -50,16 +51,18 @@ $langs->loadLangs(array("digiriskdolibarr@digiriskdolibarr", "other"));
 
 // Get parameters
 $id                  = GETPOST('id', 'int');
+$lineid              = GETPOST('lineid', 'int');
 $action              = GETPOST('action', 'aZ09');
 $contextpage         = GETPOST('contextpage', 'aZ') ?GETPOST('contextpage', 'aZ') : 'accidentmetadata'; // To manage different context of search
 $backtopage          = GETPOST('backtopage', 'alpha');
 $backtopageforcancel = GETPOST('backtopageforcancel', 'alpha');
 
 // Initialize technical objects
-$object           = new Accident($db);
-$accidentmetadata = new AccidentMetaData($db);
-$accidentlesion   = new AccidentLesion($db);
-$project          = new Project($db);
+$object               = new Accident($db);
+$accidentmetadata     = new AccidentMetaData($db);
+$objectline           = new AccidentLesion($db);
+$project              = new Project($db);
+$refAccidentLesionMod = new $conf->global->DIGIRISKDOLIBARR_ACCIDENT_LESION_ADDON($db);
 
 // Load object
 $object->fetch($id);
@@ -69,6 +72,7 @@ $hookmanager->initHooks(array('accidentmetadata', 'globalmetadata')); // Note th
 // Security check
 $permissiontoread   = $user->rights->digiriskdolibarr->accident->read;
 $permissiontoadd    = $user->rights->digiriskdolibarr->accident->write;
+$permissiontodelete = $user->rights->digiriskdolibarr->accident->delete;
 
 if (!$permissiontoread) accessforbidden();
 
@@ -95,8 +99,6 @@ if (empty($reshook)) {
 	if ($action == 'update' && $permissiontoadd) {
 		// Get parameters
 		$relative_location           = GETPOST('relative_location');
-		$lesion_localization         = GETPOST('lesion_localization');
-		$lesion_nature               = GETPOST('lesion_nature');
 		$thirdparty_responsibility   = GETPOST('thirdparty_responsibility');
 		$fatal                       = GETPOST('fatal');
 		$accident_investigation      = GETPOST('accident_investigation');
@@ -113,8 +115,6 @@ if (empty($reshook)) {
 		$accidentmetadata->tms                         = $now;
 		$accidentmetadata->status                      = 1;
 		$accidentmetadata->relative_location           = $relative_location;
-		$accidentmetadata->lesion_localization         = $lesion_localization;
-		$accidentmetadata->lesion_nature               = $lesion_nature;
 		$accidentmetadata->thirdparty_responsibility   = $thirdparty_responsibility;
 		$accidentmetadata->fatal                       = $fatal;
 		$accidentmetadata->accident_investigation      = $accident_investigation;
@@ -147,35 +147,42 @@ if (empty($reshook)) {
 	// Action to add line
 	if ($action == 'addLine' && $permissiontoadd) {
 		// Get parameters
-		$workstop_days = GETPOST('workstop_days');
-		$parent_id     = GETPOST('parent_id');
+		$lesion_localization = GETPOST('lesion_localization');
+		$lesion_nature       = GETPOST('lesion_nature');
+		$parent_id           = GETPOST('parent_id');
 
 		// Initialize object accident line
-		$objectline->date_creation  = $object->db->idate($now);
-		$objectline->ref            = $refAccidentDetMod->getNextValue($objectline);
-		$objectline->entity         = $conf->entity;
-		$objectline->workstop_days  = $workstop_days;
-		$objectline->fk_accident    = $parent_id;
+		$objectline->date_creation       = $object->db->idate($now);
+		$objectline->ref                 = $refAccidentLesionMod->getNextValue($objectline);
+		$objectline->entity              = $conf->entity;
+		$objectline->lesion_localization = $lesion_localization;
+		$objectline->lesion_nature       = $lesion_nature;
+		$objectline->fk_accident         = $parent_id;
 
 		// Check parameters
-		if (empty($workstop_days)) {
-			setEventMessages($langs->trans('ErrorFieldNotEmpty', $langs->transnoentitiesnoconv('WorkStopDays')), null, 'errors');
+		if (empty($lesion_localization)) {
+			setEventMessages($langs->trans('ErrorFieldNotEmpty', $langs->transnoentitiesnoconv('LesionLocalization')), null, 'errors');
 			$error++;
 		}
+
+//		if (empty($lesion_nature)) {
+//			setEventMessages($langs->trans('ErrorFieldNotEmpty', $langs->transnoentitiesnoconv('LesionNature')), null, 'errors');
+//			$error++;
+//		}
 
 		if (!$error) {
 			$result = $objectline->insert($user, false);
 			if ($result > 0) {
-				// Creation accident line OK
-				setEventMessages($langs->trans('AddAccidentLine').' '.$objectline->ref, array());
-				$objectline->call_trigger('ACCIDENTDET_CREATE', $user);
+				// Creation accident lesion OK
+				setEventMessages($langs->trans('AddAccidentLesion').' '.$objectline->ref, array());
+				$objectline->call_trigger('ACCIDENT_LESION_CREATE', $user);
 				$urltogo = str_replace('__ID__', $result, $backtopage);
 				$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
 				header("Location: " . $urltogo);
 				exit;
 			}
 			else {
-				// Creation accident line KO
+				// Creation accident lesion KO
 				if (!empty($objectline->errors)) setEventMessages(null, $objectline->errors, 'errors');
 				else  setEventMessages($objectline->error, null, 'errors');
 			}
@@ -185,27 +192,29 @@ if (empty($reshook)) {
 	// Action to update line
 	if ($action == 'updateLine' && $permissiontoadd) {
 		// Get parameters
-		$workstop_days = GETPOST('workstop_days');
-		$parent_id     = GETPOST('parent_id');
+		$lesion_localization = GETPOST('lesion_localization');
+		$lesion_nature       = GETPOST('lesion_nature');
+		$parent_id           = GETPOST('parent_id');
 
 		$objectline->fetch($lineid);
 
 		// Initialize object accident line
-		$objectline->workstop_days = $workstop_days;
-		$objectline->fk_accident   = $parent_id;
+		$objectline->lesion_localization = $lesion_localization;
+		$objectline->lesion_nature       = $lesion_nature;
+		$objectline->fk_accident         = $parent_id;
 
 		if (!$error) {
 			$result = $objectline->update($user, false);
 			if ($result > 0) {
-				// Update accident line OK
-				setEventMessages($langs->trans('UpdateAccidentLine').' '.$objectline->ref, array());
+				// Update accident lesion OK
+				setEventMessages($langs->trans('UpdateAccidentLesion').' '.$objectline->ref, array());
 				$urltogo = str_replace('__ID__', $result, $backtopage);
 				$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $parent_id, $urltogo); // New method to autoselect project after a New on another form object creation
 				header("Location: " . $urltogo);
 				exit;
 			}
 			else {
-				// Update accident line KO
+				// Update accident lesion KO
 				if (!empty($object->errors)) setEventMessages(null, $object->errors, 'errors');
 				else  setEventMessages($object->error, null, 'errors');
 			}
@@ -217,14 +226,14 @@ if (empty($reshook)) {
 		$objectline->fetch($lineid);
 		$result = $objectline->delete($user, false);
 		if ($result > 0) {
-			// Deletion accident line OK
-			setEventMessages($langs->trans('DeleteAccidentLine').' '.$objectline->ref, array());
+			// Deletion accident lesion OK
+			setEventMessages($langs->trans('DeleteAccidentlesion').' '.$objectline->ref, array());
 			$urltogo = str_replace('__ID__', $result, $backtopage);
 			$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $parent_id, $urltogo); // New method to autoselect project after a New on another form object creation
 			header("Location: " . $urltogo);
 			exit;
 		} else {
-			// Deletion accident line KO
+			// Deletion accident lesion KO
 			if (!empty($object->errors)) setEventMessages(null, $object->errors, 'errors');
 			else  setEventMessages($object->error, null, 'errors');
 		}
@@ -285,19 +294,14 @@ print dol_get_fiche_head();
 
 print '<table class="border tableforfieldedit accident-metadata-table">';
 
+//AccidentLocation -- Lieu de l'accident
+print '<tr><td class="minwidth400">'.$langs->trans("AccidentLocation").'</td><td>';
+print '<input class="flat" type="text" size="36" name="accident_location" id="accident_location" value="'.$accidentmetadata->accident_location.'">';
+print '</td></tr>';
+
 //RelativeLocation -- Précisions complémentaires sur le lieu de l’accident
 print '<tr><td class="minwidth400">'.$langs->trans("RelativeLocation").'</td><td>';
 print $formother->select_dictionary('relative_location','c_relative_location', 'ref', 'label', $accidentmetadata->relative_location, 1);
-print '</td></tr>';
-
-//LesionLocalization -- Siège des lésions
-print '<tr><td class="minwidth400">'.$langs->trans("LesionLocalization").'</td><td>';
-print $formother->select_dictionary('lesion_localization','c_lesion_localization', 'ref', 'label', $accidentmetadata->lesion_localization, 1);
-print '</td></tr>';
-
-//LesionNature -- Nature des lésions
-print '<tr><td class="minwidth400">'.$langs->trans("LesionNature").'</td><td>';
-print $formother->select_dictionary('lesion_nature','c_lesion_nature', 'ref', 'label', $accidentmetadata->lesion_nature, 1);
 print '</td></tr>';
 
 //ThirdPartyResponsability --
@@ -322,11 +326,6 @@ print '</td></tr>';
 print '<tr><td class="minwidth400">'.$langs->trans("AccidentInvestigationLink").'</td><td>';
 print '<input type="checkbox" id="accident_investigation_link" name="accident_investigation_link"'.($accidentmetadata->accident_investigation_link ? ' checked=""' : '').'>';
 print $form->textwithpicto('', $langs->trans(''));
-print '</td></tr>';
-
-//AccidentLocation -- Lieu de l'accident
-print '<tr><td class="minwidth400">'.$langs->trans("AccidentLocation").'</td><td>';
-print '<input class="flat" type="text" size="36" name="accident_location" id="accident_location" value="'.$accidentmetadata->accident_location.'">';
 print '</td></tr>';
 
 //CollateralVictim -- Victime collatérale
@@ -355,6 +354,143 @@ print '</div>';
 
 print '</form>';
 print '</div>';
+print '</div>';
+
+// ACCIDENT LESION
+print '<div class="div-table-responsive-no-min" style="overflow-x: unset !important">';
+print load_fiche_titre($langs->trans("AccidentLesionList"), '', '');
+print '<table id="tablelines" class="noborder noshadow" width="100%">';
+
+global $forceall, $forcetoshowtitlelines;
+
+if (empty($forceall)) $forceall = 0;
+
+// Define colspan for the button 'Add'
+$colspan = 3; // Columns: total ht + col edit + col delete
+
+// Accident Lines
+$accidentlines = $objectline->fetchAll($object->id);
+
+print '<tr class="liste_titre">';
+print '<td><span>' . $langs->trans('Ref.') . '</span></td>';
+print '<td>' . $langs->trans('LesionLocalization') . '</td>';
+print '<td>' . $langs->trans('LesionNature') . '</td>';
+print '<td class="center" colspan="' . $colspan . '">' . $langs->trans('ActionsLine') . '</td>';
+print '</tr>';
+
+if (!empty($accidentlines) && $accidentlines > 0) {
+	foreach ($accidentlines as $key => $item) {
+		if ($action == 'editline' && $lineid == $key) {
+			print '<form method="POST" action="' . $_SERVER["PHP_SELF"] . '?id=' . $object->id . '">';
+			print '<input type="hidden" name="token" value="' . newToken() . '">';
+			print '<input type="hidden" name="action" value="updateLine">';
+			print '<input type="hidden" name="backtopage" value="' . $backtopage . '">';
+			print '<input type="hidden" name="lineid" value="' . $item->id . '">';
+			print '<input type="hidden" name="parent_id" value="' . $object->id . '">';
+
+			print '<tr>';
+			print '<td>';
+			print $item->ref;
+			print '</td>';
+
+			$coldisplay++;
+			//LesionLocalization -- Siège des lésions
+			print '<td>';
+			print $formother->select_dictionary('lesion_localization','c_lesion_localization', 'ref', 'label', $item->lesion_localization, 1);
+			print '</td>';
+
+			$coldisplay++;
+			//LesionNature -- Nature des lésions
+			print '<td>';
+			print $formother->select_dictionary('lesion_nature','c_lesion_nature', 'ref', 'label', $item->lesion_nature, 1);
+			print '</td>';
+
+			$coldisplay += $colspan;
+			print '<td class="center" colspan="' . $colspan . '">';
+			print '<input type="submit" class="button" value="' . $langs->trans('Save') . '" name="updateLine" id="updateLine">';
+			print '</td>';
+			print '</tr>';
+
+			if (is_object($objectline)) {
+				print $objectline->showOptionals($extrafields, 'edit', array('style' => $bcnd[$var], 'colspan' => $coldisplay), '', '', 1);
+			}
+			print '</form>';
+		} else {
+			print '<td>';
+			print $item->ref;
+			print '</td>';
+
+			$coldisplay++;
+			print '<td>';
+			print $item->lesion_localization;
+			print '</td>';
+
+			$coldisplay++;
+			print '<td>';
+			print $item->lesion_nature;
+			print '</td>';
+
+			$coldisplay += $colspan;
+
+			//Actions buttons
+			if ($object->status == 1) {
+				print '<td class="center">';
+				$coldisplay++;
+				print '<a href="' . $_SERVER["PHP_SELF"] . '?id=' . $id . '&amp;action=editline&amp;lineid=' . $item->id . '" style="padding-right: 20px"><i class="fas fa-pencil-alt" style="color: #666"></i></a>';
+				print '<a href="' . $_SERVER["PHP_SELF"] . '?id=' . $id . '&amp;action=deleteline&amp;lineid=' . $item->id . '">';
+				print img_delete();
+				print '</a>';
+				print '</td>';
+			} else {
+				print '<td class="center">';
+				print '-';
+				print '</td>';
+			}
+
+			if (is_object($objectline)) {
+				print $objectline->showOptionals($extrafields, 'edit', array('style' => $bcnd[$var], 'colspan' => $coldisplay), '', '', 1);
+			}
+			print '</tr>';
+		}
+	}
+	print '</tr>';
+}
+if ($object->status == 1 && $permissiontoadd) {
+	print '<form method="POST" action="' . $_SERVER["PHP_SELF"] . '?id=' . $object->id . '">';
+	print '<input type="hidden" name="token" value="' . newToken() . '">';
+	print '<input type="hidden" name="action" value="addLine">';
+	print '<input type="hidden" name="backtopage" value="' . $backtopage . '">';
+	print '<input type="hidden" name="parent_id" value="' . $object->id . '">';
+
+	print '<tr>';
+	print '<td>';
+	print $refAccidentLesionMod->getNextValue($objectline);
+	print '</td>';
+
+	$coldisplay++;
+	//LesionLocalization -- Siège des lésions
+	print '<td>';
+	print $formother->select_dictionary('lesion_localization','c_lesion_localization', 'ref', 'label', '', 1);
+	print '</td>';
+
+	$coldisplay++;
+	//LesionNature -- Nature des lésions
+	print '<td>';
+	print $formother->select_dictionary('lesion_nature','c_lesion_nature', 'ref', 'label', '', 1);
+	print '</td>';
+
+	$coldisplay += $colspan;
+	print '<td class="center" colspan="' . $colspan . '">';
+	print '<input type="submit" class="button" value="' . $langs->trans('Add') . '" name="addline" id="addline">';
+	print '</td>';
+	print '</tr>';
+
+	if (is_object($objectline)) {
+		print $objectline->showOptionals($extrafields, 'edit', array('style' => $bcnd[$var], 'colspan' => $coldisplay), '', '', 1);
+	}
+	print '</form>';
+}
+print '</table>';
 print '</div>';
 
 print dol_get_fiche_end();

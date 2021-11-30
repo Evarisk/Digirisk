@@ -593,6 +593,7 @@ ACCProject = Projet lié aux accidents
 UserVictim = Victime de l'accident
 AccidentMetaData = Données complémentaires
 RelativeLocation = Précisions complémentaires sur le lieu de l’accident
+ThirdPartyResponsability = L’accident a-t-il été causé par un tiers ?
 LesionLocalization = Siège des lésions
 LesionNature = Nature des lésions
 Fatal = Décès
@@ -603,6 +604,8 @@ CollateralVictim = Victime collatérale
 PoliceReport = Rapport de police
 CerfaLink = Lien vers le Cerfa
 WorkStopDays = Nombre de jour d'arrêt de travail
+AccidentLesionList = Liste des lésions lié à l'accident
+
 
 # Email - Mail
 AccidentLabel = Récapitulatif du permis de feu
@@ -1175,7 +1178,7 @@ TicketPublicAccess = Lien vers l'interface publique des tickets :
 TicketShowCompanyLogo = Afficher le logo de la société dans l'interface publique
 TicketShowCompanyLogoHelp = Activez cette option pour masquer le logo de la société dans les pages de l'interface publique
 SendEmailOnTicketSubmit = Envoyer des emails à la création
-UseCaptachOnCreateTicketPage = Utilisation du code graphique (CAPTCHA) sur la page de création
+UseCaptchaOnCreateTicketPage = Utilisation du code graphique (CAPTCHA) sur la page de création
 
 
 
@@ -1220,3 +1223,4 @@ UserCreated = L'utilisateur a bien été créé
 GetAPI = Utilisation des routes API Digirisk en méthode GET
 PostAPI = Utilisation des routes API Digirisk en méthode POST
 MinimizeMenu = Réduire le menu
+ActionsLine = Actions

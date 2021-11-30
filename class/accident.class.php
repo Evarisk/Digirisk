@@ -1157,7 +1157,6 @@ class AccidentLesion extends CommonObjectLine
 		}
 		$sql .= ' AND entity IN (' . getEntity($this->table_element) . ')';
 
-
 		$result = $db->query($sql);
 
 		if ($result) {
@@ -1172,8 +1171,8 @@ class AccidentLesion extends CommonObjectLine
 				$record->id = $obj->rowid;
 				$record->ref = $obj->ref;
 				$record->date_creation = $obj->date_creation;
-				$this->lesion_localization = $obj->lesion_localization;
-				$this->lesion_nature = $obj->lesion_nature;
+				$record->lesion_localization = $obj->lesion_localization;
+				$record->lesion_nature = $obj->lesion_nature;
 				$record->fk_accident = $obj->fk_accident;
 
 				$records[$record->id] = $record;
@@ -1259,8 +1258,8 @@ class AccidentLesion extends CommonObjectLine
 		// Mise a jour ligne en base
 		$sql = "UPDATE " . MAIN_DB_PREFIX . "digiriskdolibarr_accident_lesion SET";
 		$sql .= " ref='" . $db->escape($this->ref) . "',";
-		$sql .= " lesion_localization=" . $db->escape($this->lesion_localization) . ",";
-		$sql .= " lesion_nature=" . $db->escape($this->lesion_nature) . ",";
+		$sql .= " lesion_localization='" . $db->escape($this->lesion_localization) . "',";
+		$sql .= " lesion_nature='" . $db->escape($this->lesion_nature) . "',";
 		$sql .= " fk_accident=" . $db->escape($this->fk_accident);
 		$sql .= " WHERE rowid = " . $this->id;
 

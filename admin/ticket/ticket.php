@@ -322,7 +322,7 @@ if (!empty($conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE)) {
 	print '</tr>';
 
 	//Use captcha on create ticket paghe
-	print '<tr class="oddeven"><td>'.$langs->trans("UseCaptachOnCreateTicketPage").'</td>';
+	print '<tr class="oddeven"><td>'.$langs->trans("UseCaptchaOnCreateTicketPage").'</td>';
 	print '<td class="center">';
 	print ajax_constantonoff('DIGIRISKDOLIBARR_USE_CAPTCHA');
 	print '</td>';

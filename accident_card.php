@@ -70,21 +70,21 @@ $backtopageforcancel = GETPOST('backtopageforcancel', 'alpha');
 $fk_parent           = GETPOST('fk_parent', 'int');
 
 // Initialize technical objects
-$object              = new Accident($db);
-$preventionplan      = new PreventionPlan($db);
-$preventionplanline  = new PreventionPlanLine($db);
-$objectline          = new AccidentWorkStop($db);
-//$accidentdocument    = new AccidentDocument($db);
-$risk                = new Risk($db);
-$contact             = new Contact($db);
-$usertmp             = new User($db);
-$thirdparty          = new Societe($db);
-$extrafields         = new ExtraFields($db);
-$digiriskelement     = new DigiriskElement($db);
-$digiriskresources   = new DigiriskResources($db);
-$project             = new Project($db);
-$refAccidentMod      = new $conf->global->DIGIRISKDOLIBARR_ACCIDENT_ADDON($db);
-$refAccidentWorkStopMod   = new $conf->global->DIGIRISKDOLIBARR_ACCIDENT_WORKSTOP_ADDON($db);
+$object                 = new Accident($db);
+$preventionplan         = new PreventionPlan($db);
+$preventionplanline     = new PreventionPlanLine($db);
+$objectline             = new AccidentWorkStop($db);
+//$accidentdocument     = new AccidentDocument($db);
+$risk                   = new Risk($db);
+$contact                = new Contact($db);
+$usertmp                = new User($db);
+$thirdparty             = new Societe($db);
+$extrafields            = new ExtraFields($db);
+$digiriskelement        = new DigiriskElement($db);
+$digiriskresources      = new DigiriskResources($db);
+$project                = new Project($db);
+$refAccidentMod         = new $conf->global->DIGIRISKDOLIBARR_ACCIDENT_ADDON($db);
+$refAccidentWorkStopMod = new $conf->global->DIGIRISKDOLIBARR_ACCIDENT_WORKSTOP_ADDON($db);
 
 // Load object
 $object->fetch($id);
