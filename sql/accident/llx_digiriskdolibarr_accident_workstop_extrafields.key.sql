@@ -13,4 +13,4 @@
 -- You should have received a copy of the GNU General Public License
 -- along with this program. If not, see https://www.gnu.org/licenses/.
 
-ALTER TABLE llx_digiriskdolibarr_accidentdet_extrafields ADD INDEX idx_fk_object(fk_object);
+ALTER TABLE llx_digiriskdolibarr_accident_workstop_extrafields ADD INDEX idx_fk_object(fk_object);

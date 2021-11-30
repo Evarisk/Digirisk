@@ -13,5 +13,12 @@
 -- You should have received a copy of the GNU General Public License
 -- along with this program.  If not, see https://www.gnu.org/licenses/.
 
-ALTER TABLE llx_digiriskdolibarr_accident_signature ADD INDEX idx_digiriskdolibarr_accident_signature_rowid (rowid);
-ALTER TABLE llx_digiriskdolibarr_accident_signature  ADD CONSTRAINT llx_digiriskdolibarr_accident_signature_fk_object FOREIGN KEY (fk_object) REFERENCES llx_digiriskdolibarr_accident(rowid);
+CREATE TABLE llx_digiriskdolibarr_accident_workstop(
+	rowid         integer AUTO_INCREMENT PRIMARY KEY NOT NULL,
+	ref           varchar(128) NOT NULL,
+	entity        integer DEFAULT 1 NOT NULL,
+	date_creation datetime NOT NULL,
+	tms           timestamp,
+	workstop_days integer,
+	fk_accident   integer NOT NULL
+) ENGINE=innodb;
