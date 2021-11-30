@@ -295,7 +295,7 @@ class modDigiriskdolibarr extends DolibarrModules
 
 			// CONST FIRE PERMIT LINE
 			190 => array('MAIN_AGENDA_ACTIONAUTO_FIREPERMITDET_CREATE','chaine',1,'', $conf->entity),
-			191 => array('DIGIRISKDOLIBARR_FIREPERMITDET_ADDON','chaine', 'mod_accidentdet_standard','', $conf->entity),
+			191 => array('DIGIRISKDOLIBARR_FIREPERMITDET_ADDON','chaine', 'mod_firepermitdet_standard','', $conf->entity),
 
 			// CONST MODULE
 			200 => array('DIGIRISKDOLIBARR_VERSION','chaine', $this->version,'', $conf->entity),
@@ -325,8 +325,9 @@ class modDigiriskdolibarr extends DolibarrModules
 			333 => array('DIGIRISKDOLIBARR_ACCIDENT_PROJECT','integer', 0,'', $conf->entity),
 
 			// CONST ACCIDENT LINE
-			350 => array('MAIN_AGENDA_ACTIONAUTO_ACCIDENTDET_CREATE','chaine',1,'', $conf->entity),
-			351 => array('DIGIRISKDOLIBARR_ACCIDENTDET_ADDON','chaine', 'mod_accidentdet_standard','', $conf->entity),
+			350 => array('MAIN_AGENDA_ACTIONAUTO_ACCIDENT_WORKSTOP_CREATE','chaine',1,'', $conf->entity),
+			351 => array('DIGIRISKDOLIBARR_ACCIDENT_WORKSTOP_ADDON','chaine', 'mod_accident_workstop_standard','', $conf->entity),
+			352 => array('DIGIRISKDOLIBARR_ACCIDENT_LESION_ADDON','chaine', 'mod_accident_lesion_standard','', $conf->entity),
 
 			// GENERAL CONSTS
 			400 => array('MAIN_USE_EXIF_ROTATION','integer',1,'', $conf->entity),
