@@ -134,7 +134,7 @@ if (empty($reshook)) {
 	if ($action == 'add' && $permissiontoadd) {
 		// Get parameters
 		$user_victim_id     = GETPOST('fk_user_victim');
-		$digiriskelement_id = GETPOST('fk_digiriskelement');
+		$digiriskelement_id = GETPOST('fk_element');
 		$label              = GETPOST('label');
 		$description        = GETPOST('description');
 
@@ -154,9 +154,9 @@ if (empty($reshook)) {
 
 		$object->accident_date = $accident_date;
 
-		$object->fk_digiriskelement = $digiriskelement_id;
-		$object->fk_user_victim     = $user_victim_id;
-		$object->fk_user_creat      = $user->id ? $user->id : 1;
+		$object->fk_element     = $digiriskelement_id;
+		$object->fk_user_victim = $user_victim_id;
+		$object->fk_user_creat  = $user->id ? $user->id : 1;
 
 		// Check parameters
 		if ($user_victim_id < 0) {
@@ -222,7 +222,7 @@ if (empty($reshook)) {
 	if ($action == 'update' && $permissiontoadd) {
 		// Get parameters
 		$user_victim_id     = GETPOST('fk_user_victim');
-		$digiriskelement_id = GETPOST('fk_digiriskelement');
+		$digiriskelement_id = GETPOST('fk_element');
 		$label              = GETPOST('label');
 		$description        = GETPOST('description');
 
@@ -237,9 +237,9 @@ if (empty($reshook)) {
 
 		$object->accident_date = $accident_date;
 
-		$object->fk_digiriskelement = $digiriskelement_id;
-		$object->fk_user_victim     = $user_victim_id;
-		$object->fk_user_creat      = $user->id ? $user->id : 1;
+		$object->fk_element     = $digiriskelement_id;
+		$object->fk_user_victim = $user_victim_id;
+		$object->fk_user_creat  = $user->id ? $user->id : 1;
 
 		// Check parameters
 		if ($user_victim_id < 0) {
@@ -324,7 +324,7 @@ if (empty($reshook)) {
 			if ($result > 0) {
 				// Creation accident line OK
 				setEventMessages($langs->trans('AddAccidentLine').' '.$objectline->ref, array());
-				$objectline->call_trigger('ACCIDENTDET_CREATE', $user);
+				$objectline->call_trigger('ACCIDENT_WORKSTOP_CREATE', $user);
 				$urltogo = str_replace('__ID__', $result, $backtopage);
 				$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
 				header("Location: " . $urltogo);
@@ -628,7 +628,7 @@ if ($action == 'create') {
 
 	//ParentElement -- Element parent
 	print '<tr><td>'.$langs->trans("ParentElement").'</td><td>';
-	print $digiriskelement->select_digiriskelement_list($object->fk_digiriskelement, 'fk_digiriskelement', '', '',  0, 0, array(), '',  0,  0,  'minwidth100',  GETPOST('id'),  false);
+	print $digiriskelement->select_digiriskelement_list($object->fk_element, 'fk_element', '', '',  0, 0, array(), '',  0,  0,  'minwidth100',  GETPOST('id'),  false, 0);
 	print '</td></tr>';
 
 	//Accident Date -- Date de l'accident
@@ -697,7 +697,7 @@ if (($id || $ref) && $action == 'edit') {
 
 	//ParentElement -- Element parent
 	print '<tr><td>'.$langs->trans("ParentElement").'</td><td>';
-	print $digiriskelement->select_digiriskelement_list($object->fk_digiriskelement, 'fk_digiriskelement', '', '',  0, 0, array(), '',  0,  0,  'minwidth100',  GETPOST('id'),  false);
+	print $digiriskelement->select_digiriskelement_list($object->fk_element, 'fk_element', '', '',  0, 0, array(), '',  0,  0,  'minwidth100',  GETPOST('id'),  false, 0);
 	print '</td></tr>';
 
 	//Accident Date -- Date de l'accident
@@ -828,7 +828,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 
 	//Parent Element -- Elément parent
 	print '<tr><td class="titlefield">'.$langs->trans("ParentElement").'</td><td>';
-	$result = $digiriskelement->fetch($object->fk_digiriskelement);
+	$result = $digiriskelement->fetch($object->fk_kelement);
 	if ($result > 0) {
 		print $digiriskelement->ref . ( !empty($digiriskelement->label) ?  ' - ' . $digiriskelement->label : '');
 	}
