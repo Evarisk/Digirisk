@@ -260,6 +260,7 @@ digiriskHeader('', $title, $help_url, '', '', '', $morejs, $morecss); ?>
 
 <?php // Part to create
 if ($action == 'create') {
+	$object->fetch($fk_parent);
 	print load_fiche_titre($title_create, '', "digiriskdolibarr32px@digiriskdolibarr");
 
 	print '<form method="POST" action="'.$_SERVER["PHP_SELF"].'">';
@@ -288,6 +289,11 @@ if ($action == 'create') {
 	print '<tr><td class="fieldrequired">'.$langs->trans("Ref").'</td><td>';
 	print '<input hidden class="flat" type="text" size="36" name="ref" id="ref" value="'.$modele->getNextValue($object).'">';
 	print $modele->getNextValue($object);
+	print '</td></tr>';
+
+	print '<tr><td class="fieldrequired">'.$langs->trans("ParentElement").'</td><td>';
+	print '<input hidden class="flat" type="text" size="36" name="fk_parent" id="fk_parent">';
+	print $object->getNomUrl(1, 'blank', 1);
 	print '</td></tr>';
 
 	include DOL_DOCUMENT_ROOT.'/core/tpl/commonfields_add.tpl.php';

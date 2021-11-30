@@ -279,7 +279,7 @@ window.eoxiaJS.navigation.redirect = function( event ) {
 	} else {
 		URLToGo = document.URL;
 	}
-	$( this ).closest( '.side-nav' ).find( '#id-left' ).toggleClass( 'active' );
+	$( this ).closest( '.side-nav' ).find( '#id-left' ).removeClass( 'active' );
 
 	//empty and fill object card
 	$('#cardContent').load( URLToGo + ' #cardContent' , id);

@@ -604,8 +604,8 @@ class DigiriskElement extends CommonObject
 		$result .= $linkstart;
 		if ($withpicto) $result .= '<i class="fas fa-info-circle"></i>' . ' ';
 		if ($withpicto != 2) $result .= $this->ref;
-		$result .= $linkend;
 		if ($withpicto != 2) $result .= (($addlabel && $this->label) ? $sep.dol_trunc($this->label, ($addlabel > 1 ? $addlabel : 0)) : '');
+		$result .= $linkend;
 
 		global $action;
 		$hookmanager->initHooks(array('digiriskelementtdao'));
