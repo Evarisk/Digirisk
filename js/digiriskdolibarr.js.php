@@ -2547,24 +2547,27 @@ window.eoxiaJS.risksign.saveRiskSign = function ( event ) {
 	if (description !== '') {
 		descriptionPost = '&riskSignDescription=' + encodeURI(description);
 	}
+	let elementParent = $('.div-table-responsive:not(.list-titre)');
 
+	window.eoxiaJS.loader.display(elementRiskSign);
 	$.ajax({
 		url: document.URL + '&action=saveRiskSign&riskSignID=' + editedRiskSignId + categoryPost + descriptionPost,
 		type: "POST",
 		processData: false,
-		contentType: false
+		contentType: false,
+		success: function ( ) {
+			elementParent.empty()
+			elementParent.load( document.URL + ' .div-table-responsive');
+			elementRiskSign.removeClass('wpeo-loader');
+
+			$(this).closest('.div-table-responsive').load( document.URL + '&action=saveRiskSign&riskSignID=' + editedRiskSignId + categoryPost + descriptionPost + ' .div-table-responsive');
+
+		},
+		error: function ( ) {
+
+		}
 	});
 
-	let elementParent = $('.div-table-responsive:not(.list-titre)');
-
-	window.eoxiaJS.loader.display(elementRiskSign);
-
-	setTimeout(function(){
-		elementParent.empty()
-		elementParent.load( document.URL + ' .div-table-responsive');
-		elementRiskSign.removeClass('wpeo-loader');
-	}, 800);
-	$(this).closest('.div-table-responsive').load( document.URL + '&action=saveRiskSign&riskSignID=' + editedRiskSignId + categoryPost + descriptionPost + ' .div-table-responsive');
 };
 
 /**
