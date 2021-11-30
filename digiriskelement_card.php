@@ -40,6 +40,7 @@ require_once DOL_DOCUMENT_ROOT.'/core/lib/images.lib.php';
 
 require_once './class/digiriskdocuments.class.php';
 require_once './class/digiriskelement.class.php';
+require_once './class/digiriskstandard.class.php';
 require_once './class/digiriskdocuments/groupmentdocument.class.php';
 require_once './class/digiriskdocuments/workunitdocument.class.php';
 require_once './lib/digiriskdolibarr_digiriskelement.lib.php';
@@ -67,8 +68,9 @@ $element_type        = GETPOST('element_type', 'alpha');
 $fk_parent           = GETPOST('fk_parent', 'int');
 
 // Initialize technical objects
-$object      = new DigiriskElement($db);
-$extrafields = new ExtraFields($db);
+$object           = new DigiriskElement($db);
+$extrafields      = new ExtraFields($db);
+$digiriskstandard = new DigiriskStandard($db);
 
 $object->fetch($id);
 
@@ -403,6 +405,19 @@ if ((empty($action) || ($action != 'edit' && $action != 'create'))) {
 	$width = 80; $cssclass = 'photoref';
 
 	dol_strlen($object->label) ? $morehtmlref = ' - ' . $object->label : '';
+	$morehtmlref .= '<div class="refidno">';
+	// ParentElement
+	$parent_element = new DigiriskElement($db);
+	$result = $parent_element->fetch($object->fk_parent);
+	if ($result > 0) {
+		$morehtmlref .= $langs->trans("Description").' : '.$parent_element->description;
+		$morehtmlref .= '<br>'.$langs->trans("ParentElement").' : '.$parent_element->getNomUrl(1, 'blank', 1);
+	}
+	else {
+		$digiriskstandard->fetch($conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD);
+		$morehtmlref .= $langs->trans("ParentElement").' : '.$digiriskstandard->getNomUrl(1, 'blank', 1);
+	}
+	$morehtmlref .= '</div>';
 	if (isset($object->element_type)) {
 		$morehtmlleft .= '<div class="floatleft inline-block valignmiddle divphotoref">'.digirisk_show_photos('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$entity].'/'.$object->element_type, 'small', 5, 0, 0, 0, $width,0, 0, 0, 0, $object->element_type, $object).'</div>';
 	} else {

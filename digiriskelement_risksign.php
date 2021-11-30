@@ -39,6 +39,7 @@ require_once DOL_DOCUMENT_ROOT.'/core/lib/images.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/core/class/html.form.class.php';
 
 require_once './class/digiriskelement.class.php';
+require_once './class/digiriskstandard.class.php';
 require_once './class/riskanalysis/risksign.class.php';
 require_once './core/modules/digiriskdolibarr/riskanalysis/risksign/mod_risksign_standard.php';
 require_once './lib/digiriskdolibarr_digiriskelement.lib.php';
@@ -66,10 +67,11 @@ $page        = is_numeric($page) ? $page : 0;
 $page        = $page == -1 ? 0 : $page;
 
 // Initialize technical objects
-$object         = new DigiriskElement($db);
-$risksign       = new RiskSign($db);
-$extrafields    = new ExtraFields($db);
-$refRiskSignMod = new $conf->global->DIGIRISKDOLIBARR_RISKSIGN_ADDON();
+$object           = new DigiriskElement($db);
+$digiriskstandard = new DigiriskStandard($db);
+$risksign         = new RiskSign($db);
+$extrafields      = new ExtraFields($db);
+$refRiskSignMod   = new $conf->global->DIGIRISKDOLIBARR_RISKSIGN_ADDON();
 
 $hookmanager->initHooks(array('risksigncard', 'globalcard')); // Note that conf->hooks_modules contains array
 
@@ -249,6 +251,19 @@ if ($object->id > 0) {
 	// ------------------------------------------------------------
 	$width = 80;
 	dol_strlen($object->label) ? $morehtmlref = ' - ' . $object->label : '';
+	$morehtmlref .= '<div class="refidno">';
+	// ParentElement
+	$parent_element = new DigiriskElement($db);
+	$result = $parent_element->fetch($object->fk_parent);
+	if ($result > 0) {
+		$morehtmlref .= $langs->trans("Description").' : '.$parent_element->description;
+		$morehtmlref .= '<br>'.$langs->trans("ParentElement").' : '.$parent_element->getNomUrl(1, 'blank', 1);
+	}
+	else {
+		$digiriskstandard->fetch($conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD);
+		$morehtmlref .= $langs->trans("ParentElement").' : '.$digiriskstandard->getNomUrl(1, 'blank', 1);
+	}
+	$morehtmlref .= '</div>';
 	$morehtmlleft = '<div class="floatleft inline-block valignmiddle divphotoref">'.digirisk_show_photos('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$entity].'/'.$object->element_type, 'small', 5, 0, 0, 0, $width,0, 0, 0, 0, $object->element_type, $object).'</div>';
 	digirisk_banner_tab($object, 'ref', '', 0, 'ref', 'ref', $morehtmlref, '', 0, $morehtmlleft);
 

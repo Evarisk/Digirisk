@@ -66,6 +66,7 @@ if ($type != 'standard') {
 	$object          = new DigiriskStandard($db);
 	$object->fetch($conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD);
 }
+$digiriskstandard = new DigiriskStandard($db);
 
 $upload_dir         = $conf->digiriskdolibarr->multidir_output[isset($conf->entity) ? $conf->entity : 1];
 $permissiontoread   = $user->rights->digiriskdolibarr->listingrisksphoto->read;
@@ -188,6 +189,19 @@ $width = 80; $cssclass = 'photoref';
 
 if ($type != 'standard') {
 	dol_strlen($object->label) ? $morehtmlref = ' - ' . $object->label : '';
+	$morehtmlref .= '<div class="refidno">';
+	// ParentElement
+	$parent_element = new DigiriskElement($db);
+	$result = $parent_element->fetch($object->fk_parent);
+	if ($result > 0) {
+		$morehtmlref .= $langs->trans("Description").' : '.$parent_element->description;
+		$morehtmlref .= '<br>'.$langs->trans("ParentElement").' : '.$parent_element->getNomUrl(1, 'blank', 1);
+	}
+	else {
+		$digiriskstandard->fetch($conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD);
+		$morehtmlref .= $langs->trans("ParentElement").' : '.$digiriskstandard->getNomUrl(1, 'blank', 1);
+	}
+	$morehtmlref .= '</div>';
 	$morehtmlleft .= '<div class="floatleft inline-block valignmiddle divphotoref">'.digirisk_show_photos('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$entity].'/'.$object->element_type, 'small', 5, 0, 0, 0, $width,0, 0, 0, 0, $object->element_type, $object).'</div>';
 	digirisk_banner_tab($object, 'ref', '', 0, 'ref', 'ref', $morehtmlref, '', 0, $morehtmlleft);
 } else {
