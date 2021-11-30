@@ -185,7 +185,7 @@ if (empty($reshook)) {
 		$risksign->fetch($riskSignID);
 
 		$risksign->category    = $riskSignCategory;
-		$risksign->description = $db->escape($riskSignDescription);
+		$risksign->description = $riskSignDescription;
 
 		$result = $risksign->update($user);
 
