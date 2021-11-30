@@ -121,9 +121,11 @@ $object_document = new DigiriskDocuments($db);
 
 $help_url = 'FR:Module_DigiriskDolibarr#L.27onglet_Document_Digirisk';
 $title    = $langs->trans("YourDocuments"). ' - '. $langs->trans("WorkUnitDocument");
+
+$morejs   = array("/digiriskdolibarr/js/digiriskdolibarr.js.php");
 $morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");
 
-llxHeader('', $title, $help_url, '', '', '', '', $morecss);
+llxHeader('', $title, $help_url, '', '', '', $morejs, $morecss);
 
 // Subheader
 $linkback = '<a href="'.($backtopage ? $backtopage : DOL_URL_ROOT.'/admin/modules.php?restore_lastsearch_values=1').'">'.$langs->trans("BackToModuleList").'</a>';

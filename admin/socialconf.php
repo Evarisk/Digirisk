@@ -116,6 +116,8 @@ if (empty($reshook)) {
 
 $help_url = 'FR:Module_DigiriskDolibarr#L.27onglet_Social';
 $title    = $langs->trans("CompanyFoundation") . ' - ' . $langs->trans("Social");
+
+$morejs   = array("/digiriskdolibarr/js/digiriskdolibarr.js.php");
 $morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");
 
 $counter = 0;
@@ -136,7 +138,7 @@ foreach ($socialResources as $socialResource) {
 	}
 }
 
-llxHeader('', $title, $help_url, '', '', '', '', $morecss);
+llxHeader('', $title, $help_url, '', '', '', $morejs, $morecss);
 
 print load_fiche_titre($title, '', 'title_setup');
 

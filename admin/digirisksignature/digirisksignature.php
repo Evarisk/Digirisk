@@ -70,9 +70,11 @@ $form = new Form($db);
 
 $help_url = '';
 $title    = $langs->trans("DigiriskSignature");
+
+$morejs   = array("/digiriskdolibarr/js/digiriskdolibarr.js.php");
 $morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");
 
-llxHeader('', $title, $help_url, '', '', '', '', $morecss);
+llxHeader('', $title, $help_url, '', '', '', $morejs, $morecss);
 
 // Subheader
 $linkback = '<a href="'.($backtopage ? $backtopage : DOL_URL_ROOT.'/admin/modules.php?restore_lastsearch_values=1').'">'.$langs->trans("BackToModuleList").'</a>';

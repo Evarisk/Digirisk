@@ -56,7 +56,6 @@ global $user, $db, $conf, $langs;
 
 // Load translation files required by the page
 $langs->loadLangs(array("digiriskdolibarr@digiriskdolibarr", "other"));
-
 // Get parameters
 $id                  = GETPOST('id', 'int');
 $lineid              = GETPOST('lineid', 'int');

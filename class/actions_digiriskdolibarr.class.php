@@ -79,6 +79,9 @@ class ActionsDigiriskdolibarr
 		/* print_r($parameters); print_r($object); echo "action: " . $action; */
 		if (in_array($parameters['currentcontext'], array('admincompany')))	    // do something only for the context 'somecontext1' or 'somecontext2'
 		{
+			?>
+			<script src="../custom/digiriskdolibarr/js/digiriskdolibarr.js.php"></script>
+			<?php
 			if ($conf->global->MAIN_INFO_SOCIETE_COUNTRY == '1:FR:France') {
 				$formother = new FormOther($db);
 				$form = new Form($db);
@@ -94,9 +97,8 @@ class ActionsDigiriskdolibarr
 				</script>
 				<?php
 			}
+			print ajax_combobox('selectDIGIRISK_COLLECTIVE_AGREEMENT_TITLE');
 		}
-
-		print ajax_combobox('selectDIGIRISK_COLLECTIVE_AGREEMENT_TITLE');
 
 		if (!$error) {
 			$this->results = array('myreturn' => 999);
