@@ -99,6 +99,11 @@ if ($action == 'setMoveRisks') {
 	$constforval = 'DIGIRISKDOLIBARR_MOVE_RISKS';
 	dolibarr_set_const($db, $constforval, $value, 'integer', 0, '', $conf->entity);
 }
+
+if ($action == 'setSortRisksListingsByCotation') {
+	$constforval = 'DIGIRISKDOLIBARR_SORT_LISTINGS_BY_COTATION';
+	dolibarr_set_const($db, $constforval, $value, 'integer', 0, '', $conf->entity);
+}
 /*
  * View
  */
@@ -282,6 +287,22 @@ if ($conf->global->DIGIRISKDOLIBARR_MOVE_RISKS) {
 }
 else {
 	print '<a class="reposition" href="'.$_SERVER["PHP_SELF"].'?action=setMoveRisks&value=1" alt="'.$langs->trans("Default").'">'.img_picto($langs->trans("Disabled"), 'switch_off').'</a>';
+}
+print '</td>';
+print '</tr>';
+
+print '<tr class="oddeven"><td>';
+print $langs->trans('SortRisksListingsByCotation');
+print "</td><td>";
+print $langs->trans('SortRisksListingsByCotationDescription');
+print '</td>';
+
+print '<td class="center">';
+if ($conf->global->DIGIRISKDOLIBARR_SORT_LISTINGS_BY_COTATION) {
+	print '<a class="reposition" href="'.$_SERVER["PHP_SELF"].'?action=setSortRisksListingsByCotation&value=0" alt="'.$langs->trans("Default").'">'.img_picto($langs->trans("Activated"), 'switch_on').'</a>';
+}
+else {
+	print '<a class="reposition" href="'.$_SERVER["PHP_SELF"].'?action=setSortRisksListingsByCotation&value=1" alt="'.$langs->trans("Default").'">'.img_picto($langs->trans("Disabled"), 'switch_off').'</a>';
 }
 print '</td>';
 print '</tr>';
