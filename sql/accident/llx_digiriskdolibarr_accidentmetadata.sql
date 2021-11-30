@@ -20,8 +20,6 @@ CREATE TABLE llx_digiriskdolibarr_accidentmetadata(
 	tms                         timestamp,
     status                      smallint,
 	relative_location           varchar(255),
-	lesion_localization         text,
-    lesion_nature               text,
 	thirdparty_responsibility   boolean,
 	fatal                       boolean,
 	accident_investigation      boolean,

@@ -17,7 +17,7 @@
  */
 
 /**
- *	\file       htdocs/custom/digiriskdolibarr/core/modules/digiriskdolibarr/mod_accidentdet_standard.php
+ *	\file       htdocs/custom/digiriskdolibarr/core/modules/digiriskdolibarr/mod_accident_lesion_standard.php
  * \ingroup     digiriskdolibarr
  *	\brief      File containing class for numbering module Standard
  */
@@ -25,9 +25,9 @@
 require_once __DIR__ . '/../../digiriskdocuments/modules_digiriskdocuments.php';
 
 /**
- * 	Class to manage accidentdet numbering rules Standard
+ * 	Class to manage accident_lesion numbering rules Standard
  */
-class mod_accidentdet_standard extends ModeleNumRefDigiriskDocuments
+class mod_accident_lesion_standard extends ModeleNumRefDigiriskDocuments
 {
 	/**
 	 * Dolibarr version of the loaded document
@@ -43,7 +43,7 @@ class mod_accidentdet_standard extends ModeleNumRefDigiriskDocuments
 	/**
 	 * @var string model name
 	 */
-	public $name = 'Tarvos';
+	public $name = 'Albiorix';
 
 	/**
 	 * @var string Error code (or message)
@@ -59,7 +59,7 @@ class mod_accidentdet_standard extends ModeleNumRefDigiriskDocuments
 	{
 		global $langs;
 		$langs->load("digiriskdolibarr@digiriskdolibarr");
-		return $langs->trans('DigiriskAccidentDetStandardModel', $this->prefix);
+		return $langs->trans('DigiriskAccidentLesionStandardModel', $this->prefix);
 	}
 
 	/**
@@ -85,7 +85,7 @@ class mod_accidentdet_standard extends ModeleNumRefDigiriskDocuments
 		// first we get the max value
 		$posindice = strlen($this->prefix) + 1;
 		$sql = "SELECT MAX(CAST(SUBSTRING(ref FROM ".$posindice.") AS SIGNED)) as max";
-		$sql .= " FROM ".MAIN_DB_PREFIX."digiriskdolibarr_accidentdet";
+		$sql .= " FROM ".MAIN_DB_PREFIX."digiriskdolibarr_accident_lesion";
 		$sql .= " WHERE ref LIKE '".$db->escape($this->prefix)."%'";
 		if ($object->ismultientitymanaged == 1) {
 			$sql .= " AND entity = ".$conf->entity;
@@ -100,14 +100,14 @@ class mod_accidentdet_standard extends ModeleNumRefDigiriskDocuments
 		}
 		else
 		{
-			dol_syslog("mod_accidentdet_standard::getNextValue", LOG_DEBUG);
+			dol_syslog("mod_accident_lesion_standard::getNextValue", LOG_DEBUG);
 			return -1;
 		}
 
 		if ($max >= (pow(10, 4) - 1)) $num = $max + 1; // If counter > 9999, we do not format on 4 chars, we take number as it is
 		else $num = sprintf("%s", $max + 1);
 
-		dol_syslog("mod_accidentdet_standard::getNextValue return ".$this->prefix.$num);
+		dol_syslog("mod_accident_lesion_standard::getNextValue return ".$this->prefix.$num);
 		return $this->prefix.$num;
 	}
 }

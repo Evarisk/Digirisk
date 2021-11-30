@@ -13,4 +13,13 @@
 -- You should have received a copy of the GNU General Public License
 -- along with this program.  If not, see https://www.gnu.org/licenses/.
 
-ALTER TABLE llx_digiriskdolibarr_accidentdet ADD INDEX idx_digiriskdolibarr_accidentdet_rowid (rowid);
+CREATE TABLE llx_digiriskdolibarr_accident_lesion(
+	rowid               integer AUTO_INCREMENT PRIMARY KEY NOT NULL,
+	ref                 varchar(128) NOT NULL,
+	entity              integer DEFAULT 1 NOT NULL,
+	date_creation       datetime NOT NULL,
+	tms                 timestamp,
+	lesion_localization text,
+	lesion_nature       text,
+	fk_accident         integer NOT NULL
+) ENGINE=innodb;
