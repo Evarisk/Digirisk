@@ -541,8 +541,10 @@ AccidentOpeningHoursCreateTrigger = Enregistrement des horaires du permis de feu
 # Mod Numbering - Modèle de numérotation
 DigiriskAccidentNumberingModule = Modèle de numérotation des accidents de Digirisk
 DigiriskAccidentStandardModel = Renvoie le numéro sous la forme ACCn où n est un compteur séquentiel sans rupture et sans remise à 0.
-DigiriskAccidentDetNumberingModule = Modèle de numérotation des lignes d'un accident de Digirisk
-DigiriskAccidentDetStandardModel = Renvoie le numéro sous la forme ACCLn où n est un compteur séquentiel sans rupture et sans remise à 0.
+DigiriskAccidentWorkStopNumberingModule = Modèle de numérotation des arrêts de travail lié à l'accident
+DigiriskAccidentWorkStopStandardModel = Renvoie le numéro sous la forme ACCWn où n est un compteur séquentiel sans rupture et sans remise à 0.
+DigiriskAccidentLesionNumberingModule = Modèle de numérotation des lésions lié à l'accident
+DigiriskAccidentLesionStandardModel = Renvoie le numéro sous la forme ACCLn où n est un compteur séquentiel sans rupture et sans remise à 0.
 DigiriskAccidentDocumentNumberingModule = Modèle de numérotation des fiches d'accident de Digirisk
 DigiriskAccidentDocumentStandardModel = Renvoie le numéro sous la forme ACCDn où n est un compteur séquentiel sans rupture et sans remise à 0.
 
