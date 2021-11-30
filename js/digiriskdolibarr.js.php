@@ -3069,7 +3069,8 @@ window.eoxiaJS.document.init = function() {
 };
 
 window.eoxiaJS.document.event = function() {
-    jQuery( document ).on( 'click', '#builddoc_generatebutton', window.eoxiaJS.document.displayLoader );
+	jQuery( document ).on( 'click', '#builddoc_generatebutton', window.eoxiaJS.document.displayLoader );
+	jQuery( document ).on( 'click', ' .send-risk-assessment-document-by-mail', window.eoxiaJS.document.displayLoader );
 };
 
 window.eoxiaJS.document.displayLoader = function(  ) {
