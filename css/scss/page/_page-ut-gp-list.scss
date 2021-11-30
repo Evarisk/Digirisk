@@ -54,6 +54,11 @@
     pointer-events: none;
     transition: all 0.2s ease-out;
   }
+
+  #id-left.active .add-container {
+    opacity: 1;
+  }
+
 }
 
 /** Header */

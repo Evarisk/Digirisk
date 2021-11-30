@@ -2066,6 +2066,9 @@
   -webkit-transition: all 0.2s ease-out;
   transition: all 0.2s ease-out;
 }
+.page-ut-gp-list .side-nav #id-left.active .add-container {
+  opacity: 1;
+}
 
 /** Header */
 .page-ut-gp-list .side-nav .society-header {
