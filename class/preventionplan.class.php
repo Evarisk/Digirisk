@@ -238,6 +238,9 @@ class PreventionPlan extends CommonObject
 		if (property_exists($object, 'date_creation')) {
 			$object->date_creation = dol_now();
 		}
+		if (property_exists($object, 'status')) {
+			$object->status = 1;
+		}
 
 		// Create clone
 		$object->context['createfromclone'] = 'createfromclone';
@@ -1220,6 +1223,9 @@ class PreventionPlanSignature extends DigiriskSignature
 		unset($object->id);
 		unset($object->fk_user_creat);
 		unset($object->import_key);
+		unset($object->signature);
+		unset($object->signature_date);
+		unset($object->last_email_sent_date);
 
 		// Clear fields
 		if (property_exists($object, 'date_creation')) {
@@ -1227,6 +1233,12 @@ class PreventionPlanSignature extends DigiriskSignature
 		}
 		if (property_exists($object, 'fk_object')) {
 			$object->fk_object = $preventionplanid;
+		}
+		if (property_exists($object, 'status')) {
+			$object->status = 1;
+		}
+		if (property_exists($object, 'signature_url')) {
+			$object->signature_url = generate_random_id(16);
 		}
 
 		// Create clone
