@@ -584,7 +584,6 @@ function digiriskHeader($head = '', $title = '', $help_url = '', $target = '', $
 	require_once __DIR__ . '/../class/digiriskelement.class.php';
 	require_once __DIR__ . '/../core/modules/digiriskdolibarr/digiriskelement/groupment/mod_groupment_standard.php';
 	require_once __DIR__ . '/../core/modules/digiriskdolibarr/digiriskelement/workunit/mod_workunit_standard.php';
-
 	$mod_groupment = new $conf->global->DIGIRISKDOLIBARR_GROUPMENT_ADDON();
 	$mod_workunit = new $conf->global->DIGIRISKDOLIBARR_WORKUNIT_ADDON();
 
@@ -655,8 +654,32 @@ function digiriskHeader($head = '', $title = '', $help_url = '', $target = '', $
 						<?php endif; ?>
 
 						<ul class="workunit-list">
+							<script>
+								if (localStorage.maximized == 'false') {
+									$('#id-left').attr('style', 'display:none !important')
+								}
+							</script>
 							<?php display_recurse_tree($results) ?>
 							<script>
+								if (localStorage.maximized == 'false') {
+									var text = '';
+									var menu = $('a.vmenu');
+									var elementParent = $('div.vmenu')
+									$('#id-left').attr('style', 'display:block !important')
+									menu.each(function (index, value) {
+										text = $(this).html().split(' ');
+										$(this).html(text[0]+' '+text[1]+' '+text[2]);
+									});
+
+									var elementText = $('.minimizeMenu').html().split(' ');
+									$('.minimizeMenu').html(elementText[0]+' '+elementText[1]+' '+elementText[2]);
+									jQuery('.minimizeMenu').removeClass('minimizeMenu').addClass('maximizeMenu');
+
+									elementParent.css('width', '30px');
+									elementParent.find('.blockvmenusearch').hide();
+
+									}
+
 								// Get previous menu to display it
 								var MENU = localStorage.menu;
 								if (MENU == null || MENU == '') {

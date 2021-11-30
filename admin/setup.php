@@ -83,9 +83,11 @@ if ($action == 'setredirectafterconnection') {
 
 $page_name = "DigiriskdolibarrSetup";
 $help_url  = 'FR:Module_DigiriskDolibarr#Configuration';
+
+$morejs   = array("/digiriskdolibarr/js/digiriskdolibarr.js.php");
 $morecss   = array("/digiriskdolibarr/css/digiriskdolibarr.css");
 
-llxHeader('', $langs->trans($page_name), $help_url, '', '', '', '', $morecss);
+llxHeader('', $langs->trans($page_name), $help_url, '', '', '', $morejs, $morecss);
 
 // Subheader
 $linkback = '<a href="'.($backtopage ? $backtopage : DOL_URL_ROOT.'/admin/modules.php?restore_lastsearch_values=1').'">'.$langs->trans("BackToModuleList").'</a>';
