@@ -902,14 +902,15 @@ class modDigiriskdolibarr extends DolibarrModules
 		$langs->load("digiriskdolibarr@digiriskdolibarr");
 
 		$sql = array();
-
 		$this->_load_tables('/digiriskdolibarr/sql/');
-		$this->_load_tables('/digiriskdolibarr/sql/digiriskdocuments/');
-		$this->_load_tables('/digiriskdolibarr/sql/digiriskelement/');
-		$this->_load_tables('/digiriskdolibarr/sql/riskanalysis/');
-		$this->_load_tables('/digiriskdolibarr/sql/preventionplan/');
-		$this->_load_tables('/digiriskdolibarr/sql/firepermit/');
-		$this->_load_tables('/digiriskdolibarr/sql/accident/');
+
+		// Load sql sub folders
+		$sqlFolder = dol_dir_list(__DIR__ . '/../../sql');
+		foreach ($sqlFolder as $subFolder) {
+			if ($subFolder['type'] == 'dir') {
+				$this->_load_tables('/digiriskdolibarr/sql/' . $subFolder['name'] . '/');
+			}
+		}
 
 		delDocumentModel('informationssharing_odt'            ,'informationssharing');
 		delDocumentModel('legaldisplay_odt'                   ,'legaldisplay');
