@@ -68,7 +68,6 @@ $page      = $page == -1 ? 0 : $page;
 
 // Initialize technical objects
 $accident           = new Accident($db);
-$signatory          = new AccidentSignature($db);
 $preventionplan     = new PreventionPlan($db);
 $societe            = new Societe($db);
 $contact            = new Contact($db);

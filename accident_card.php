@@ -48,7 +48,7 @@ require_once __DIR__ . '/class/riskanalysis/risk.class.php';
 require_once __DIR__ . '/lib/digiriskdolibarr_function.lib.php';
 require_once __DIR__ . '/lib/digiriskdolibarr_accident.lib.php';
 require_once __DIR__ . '/core/modules/digiriskdolibarr/digiriskelement/accident/mod_accident_standard.php';
-require_once __DIR__ . '/core/modules/digiriskdolibarr/digiriskelement/accidentdet/mod_accidentdet_standard.php';
+require_once __DIR__ . '/core/modules/digiriskdolibarr/digiriskelement/accident_workstop/mod_accident_workstop_standard.php';
 //require_once __DIR__ . '/core/modules/digiriskdolibarr/digiriskdocuments/accidentdocument/mod_accidentdocument_standard.php';
 //require_once __DIR__ . '/core/modules/digiriskdolibarr/digiriskdocuments/accidentdocument/modules_accidentdocument.php';
 
@@ -73,8 +73,7 @@ $fk_parent           = GETPOST('fk_parent', 'int');
 $object              = new Accident($db);
 $preventionplan      = new PreventionPlan($db);
 $preventionplanline  = new PreventionPlanLine($db);
-$signatory           = new AccidentSignature($db);
-$objectline          = new AccidentLine($db);
+$objectline          = new AccidentWorkStop($db);
 //$accidentdocument    = new AccidentDocument($db);
 $risk                = new Risk($db);
 $contact             = new Contact($db);
@@ -85,7 +84,7 @@ $digiriskelement     = new DigiriskElement($db);
 $digiriskresources   = new DigiriskResources($db);
 $project             = new Project($db);
 $refAccidentMod      = new $conf->global->DIGIRISKDOLIBARR_ACCIDENT_ADDON($db);
-$refAccidentDetMod   = new $conf->global->DIGIRISKDOLIBARR_ACCIDENTDET_ADDON($db);
+$refAccidentWorkStopMod   = new $conf->global->DIGIRISKDOLIBARR_ACCIDENT_WORKSTOP_ADDON($db);
 
 // Load object
 $object->fetch($id);
@@ -309,7 +308,7 @@ if (empty($reshook)) {
 
 		// Initialize object accident line
 		$objectline->date_creation  = $object->db->idate($now);
-		$objectline->ref            = $refAccidentDetMod->getNextValue($objectline);
+		$objectline->ref            = $refAccidentWorkStopMod->getNextValue($objectline);
 		$objectline->entity         = $conf->entity;
 		$objectline->workstop_days  = $workstop_days;
 		$objectline->fk_accident    = $parent_id;
@@ -982,7 +981,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 
 			print '<tr>';
 			print '<td>';
-			print $refAccidentDetMod->getNextValue($objectline);
+			print $refAccidentWorkStopMod->getNextValue($objectline);
 			print '</td>';
 
 			$coldisplay++;
