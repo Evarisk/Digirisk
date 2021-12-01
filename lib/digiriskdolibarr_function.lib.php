@@ -1369,9 +1369,8 @@ function digirisk_show_medias($modulepart = 'ecm', $sdir, $size = 0, $nbmax = 0,
 	include_once DOL_DOCUMENT_ROOT.'/core/lib/files.lib.php';
 	include_once DOL_DOCUMENT_ROOT.'/core/lib/images.lib.php';
 
-	$sortfield = 'position_name';
+	$sortfield = 'date';
 	$sortorder = 'desc';
-
 	$dir = $sdir.'/';
 	$pdir = $subdir . '/';
 
