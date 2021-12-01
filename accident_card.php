@@ -166,7 +166,7 @@ if (empty($reshook)) {
 
 		// Submit file
 		if (!empty($conf->global->MAIN_UPLOAD_DOC)) {
-			if (!empty($_FILES && !empty($_FILES['userfile']['name'][0]))) {
+			if (!empty($_FILES) && !empty($_FILES['userfile']['name'][0])) {
 				if (is_array($_FILES['userfile']['tmp_name'])) $userfiles = $_FILES['userfile']['tmp_name'];
 				else $userfiles = array($_FILES['userfile']['tmp_name']);
 
@@ -313,6 +313,7 @@ if (empty($reshook)) {
 		$objectline->workstop_days  = $workstop_days;
 		$objectline->fk_accident    = $parent_id;
 
+
 		// Check parameters
 		if (empty($workstop_days)) {
 			setEventMessages($langs->trans('ErrorFieldNotEmpty', $langs->transnoentitiesnoconv('WorkStopDays')), null, 'errors');
@@ -323,6 +324,8 @@ if (empty($reshook)) {
 			$result = $objectline->insert($user, false);
 			if ($result > 0) {
 				// Creation accident line OK
+				rename($conf->digiriskdolibarr->multidir_output[$conf->entity] . '/accident/' . $object->ref . '/workstop/temp/', $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/accident/' . $object->ref . '/workstop/' . $objectline->ref);
+
 				setEventMessages($langs->trans('AddAccidentLine').' '.$objectline->ref, array());
 				$objectline->call_trigger('ACCIDENT_WORKSTOP_CREATE', $user);
 				$urltogo = str_replace('__ID__', $result, $backtopage);
@@ -558,6 +561,44 @@ if (empty($reshook)) {
 				} else {
 					setEventMessages($object->error, $object->errors, 'errors');
 					$action = '';
+				}
+			}
+		}
+	}
+
+
+	// Add file in ticket form
+	if ($action == 'sendfile') {
+		include_once DOL_DOCUMENT_ROOT.'/core/lib/files.lib.php';
+		$object->fetch($id);
+
+		if (!empty($_FILES) && !empty($_FILES['files']['name'][0])) {
+			if (is_array($_FILES['files']['tmp_name'])) $filess = $_FILES['files']['tmp_name'];
+			else $filess = array($_FILES['files']['tmp_name']);
+
+			foreach ($filess as $key => $files) {
+				if (empty($_FILES['files']['tmp_name'][$key])) {
+					$error++;
+					if ($_FILES['files']['error'][$key] == 1 || $_FILES['files']['error'][$key] == 2) {
+						setEventMessages($langs->trans('ErrorFileSizeTooLarge'), null, 'errors');
+					}
+				}
+			}
+
+			$filedir = $conf->digiriskdolibarr->multidir_output[isset($object->entity) ? $object->entity : 1] . '/accident/'. $object->ref . '/workstop/temp';
+			if (!file_exists($filedir))
+			{
+				if (dol_mkdir($filedir) < 0)
+				{
+					$object->error = $langs->transnoentities("ErrorCanNotCreateDir", $filedir);
+					$error++;
+				}
+			}
+
+			if (!$error) {
+				dol_mkdir($filedir);
+				if (!empty($filedir)) {
+					$result = dol_add_file_process($filedir, 0, 1, 'files', '', null, '', 1, $object);
 				}
 			}
 		}
@@ -904,6 +945,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 		print '<tr class="liste_titre">';
 		print '<td><span>' . $langs->trans('Ref.') . '</span></td>';
 		print '<td>' . $langs->trans('WorkStopDays') . '</td>';
+		print '<td>' . $langs->trans('WorkStopDocument') . '</td>';
 		print '<td class="center" colspan="' . $colspan . '">' . $langs->trans('ActionsAccidentRisk') . '</td>';
 		print '</tr>';
 
@@ -927,6 +969,46 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 					print '<input type="integer" name="workstop_days" class="minwidth150" value="' .  $item->workstop_days . '">';
 					print '</td>';
 
+					$coldisplay++;
+					print '<td>'; ?>
+					<?php $fileLinkedList = dol_dir_list($conf->digiriskdolibarr->multidir_output[isset($conf->entity) ? $conf->entity : 1] . '/accident/' . $object->ref . '/workstop/'. $item->ref .'/'); ?>
+					<div class="wpeo-table table-flex table-3">
+						<?php
+						if (!empty($fileLinkedList)) {
+							foreach ($fileLinkedList as $fileLinked) {
+								if (preg_split('/\./', $fileLinked['name'])[1] == 'png' || preg_split('/\./', $fileLinked['name'])[1] == 'jpg' || preg_split('/\./', $fileLinked['name'])[1] == 'jpeg') :
+									?>
+									<div class="table-row">
+										<div class="table-cell">
+											<?php print '<img class="photo"  width="50" src="'.DOL_URL_ROOT.'/viewimage.php?modulepart=digiriskdolibarr&entity='.$conf->entity.'&file='.urlencode('/accident/'. $object->ref . '/workstop/'. $item->ref .'/thumbs/' . preg_split('/\./', $fileLinked['name'])[0] . '_mini.'. preg_split('/\./', $fileLinked['name'])[1]).'" title="'.dol_escape_htmltag($alt).'">'; ?>
+										</div>
+										<div class="table-cell">
+											<?php print preg_replace('/_mini/','', $fileLinked['name']); ?>
+										</div>
+									</div> <?php
+								elseif ($fileLinked['type'] != 'dir') : ?>
+									<div class="table-row">
+										<div class="table-cell  table-padding-100">
+											<i class="fas fa-file"></i>
+										</div>
+										<div class="table-cell">
+											<?php print preg_replace('/_mini/','', $fileLinked['name']); ?>
+										</div>
+									</div>
+								<?php
+								endif;
+							}
+						} else {
+							?>
+							<div class="table-row">
+								<div class="table-cell"><?php print $langs->trans('NoFileLinked'); ?></div>
+							</div>
+							<?php
+						}
+						?>
+					</div> <?php
+					print '</td>';
+
 					$coldisplay += $colspan;
 					print '<td class="center" colspan="' . $colspan . '">';
 					print '<input type="submit" class="button" value="' . $langs->trans('Save') . '" name="updateLine" id="updateLine">';
@@ -934,7 +1016,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 					print '</tr>';
 
 					if (is_object($objectline)) {
-						print $objectline->showOptionals($extrafields, 'edit', array('style' => $bcnd[$var], 'colspan' => $coldisplay), '', '', 1);
+//						print $objectline->showOptionals($extrafields, 'edit', array('style' => $bcnd[$var], 'colspan' => $coldisplay), '', '', 1);
 					}
 					print '</form>';
 				} else {
@@ -945,6 +1027,46 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 					$coldisplay++;
 					print '<td>';
 					print $item->workstop_days;
+					print '</td>';
+
+					$coldisplay++;
+					print '<td>'; ?>
+					<?php $fileLinkedList = dol_dir_list($conf->digiriskdolibarr->multidir_output[isset($conf->entity) ? $conf->entity : 1] . '/accident/' . $object->ref . '/workstop/'. $item->ref .'/'); ?>
+					<div class="wpeo-table table-flex table-3">
+						<?php
+						if (!empty($fileLinkedList)) {
+							foreach ($fileLinkedList as $fileLinked) {
+								if (preg_split('/\./', $fileLinked['name'])[1] == 'png' || preg_split('/\./', $fileLinked['name'])[1] == 'jpg' || preg_split('/\./', $fileLinked['name'])[1] == 'jpeg') :
+									?>
+									<div class="table-row">
+										<div class="table-cell">
+											<?php print '<img class="photo"  width="50" src="'.DOL_URL_ROOT.'/viewimage.php?modulepart=digiriskdolibarr&entity='.$conf->entity.'&file='.urlencode('/accident/'. $object->ref . '/workstop/'. $item->ref .'/thumbs/' . preg_split('/\./', $fileLinked['name'])[0] . '_mini.'. preg_split('/\./', $fileLinked['name'])[1]).'" title="'.dol_escape_htmltag($alt).'">'; ?>
+										</div>
+										<div class="table-cell">
+											<?php print preg_replace('/_mini/','', $fileLinked['name']); ?>
+										</div>
+									</div> <?php
+								elseif ($fileLinked['type'] != 'dir') : ?>
+									<div class="table-row">
+										<div class="table-cell  table-padding-100">
+											<i class="fas fa-file"></i>
+										</div>
+										<div class="table-cell">
+											<?php print preg_replace('/_mini/','', $fileLinked['name']); ?>
+										</div>
+									</div>
+								<?php
+								endif;
+							}
+						} else {
+							?>
+							<div class="table-row">
+								<div class="table-cell"><?php print $langs->trans('NoFileLinked'); ?></div>
+							</div>
+							<?php
+						}
+						?>
+					</div> <?php
 					print '</td>';
 
 					$coldisplay += $colspan;
@@ -965,7 +1087,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 					}
 
 					if (is_object($objectline)) {
-						print $objectline->showOptionals($extrafields, 'edit', array('style' => $bcnd[$var], 'colspan' => $coldisplay), '', '', 1);
+//						print $objectline->showOptionals($extrafields, 'edit', array('style' => $bcnd[$var], 'colspan' => $coldisplay), '', '', 1);
 					}
 					print '</tr>';
 				}
@@ -989,6 +1111,71 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 			print '<input type="integer" name="workstop_days" class="minwidth150" value="">';
 			print '</td>';
 
+			$coldisplay++;
+			print '<td class="maxwidth100">';
+			?>
+
+			<div class="form-element">
+				<div class="wpeo-gridlayout grid-2">
+					<span class="form-label"><?php print $langs->trans("FilesLinked"); ?></span>
+					<label class="wpeo-button button-blue" for="sendfile">
+						<i class="fas fa-image button-icon"></i>
+						<span class="button-label"><?php print $langs->trans('AddDocument'); ?></span>
+						<input type="file" name="userfile[]" multiple="multiple" id="sendfile" onchange="window.eoxiaJS.accident.tmpStockFile()"  style="display: none"/>
+					</label>
+				</div>
+
+				<div id="sendFileForm">
+					<div id="fileLinkedTable" class="tableforinputfields">
+						<?php $fileLinkedList = dol_dir_list($conf->digiriskdolibarr->multidir_output[isset($conf->entity) ? $conf->entity : 1] . '/accident/' . $object->ref . '/workstop/temp/'); ?>
+						<div class="wpeo-table table-flex table-3">
+							<?php
+							if (!empty($fileLinkedList)) {
+								foreach ($fileLinkedList as $fileLinked) {
+									if (preg_split('/\./', $fileLinked['name'])[1] == 'png' || preg_split('/\./', $fileLinked['name'])[1] == 'jpg' || preg_split('/\./', $fileLinked['name'])[1] == 'jpeg') :
+									?>
+										<div class="table-row">
+											<div class="table-cell">
+												<?php print '<img class="photo"  width="50" src="'.DOL_URL_ROOT.'/viewimage.php?modulepart=digiriskdolibarr&entity='.$conf->entity.'&file='.urlencode('/accident/'. $object->ref . '/workstop/temp/thumbs/' . preg_split('/\./', $fileLinked['name'])[0] . '_mini.'. preg_split('/\./', $fileLinked['name'])[1]).'" title="'.dol_escape_htmltag($alt).'">'; ?>
+											</div>
+											<div class="table-cell">
+												<?php print preg_replace('/_mini/','', $fileLinked['name']); ?>
+											</div>
+											<div class="table-cell table-50 table-end table-padding-0">
+												<?php print '<div class="linked-file-delete wpeo-button button-square-50 button-transparent" value="'. $fileLinked['name'] .'"><i class="fas fa-trash button-icon"></i></div>'; ?>
+											</div>
+										</div> <?php
+									elseif ($fileLinked['type'] != 'dir') : ?>
+										<div class="table-row">
+											<div class="table-cell  table-padding-100">
+												<i class="fas fa-file"></i>
+											</div>
+											<div class="table-cell">
+												<?php print preg_replace('/_mini/','', $fileLinked['name']); ?>
+											</div>
+											<div class="table-cell table-50 table-end table-padding-0">
+												<?php print '<div class="linked-file-delete wpeo-button button-square-50 button-transparent" value="'. $fileLinked['name'] .'"><i class="fas fa-trash button-icon"></i></div>'; ?>
+											</div>
+										</div>
+										<?php
+									endif;
+								}
+							} else {
+								?>
+								<div class="table-row">
+									<div class="table-cell"><?php print $langs->trans('NoFileLinked'); ?></div>
+								</div>
+								<?php
+							}
+							?>
+						</div>
+					</div>
+				</div>
+
+			</div>
+			<?php
+			print '</td>';
+
 			$coldisplay += $colspan;
 			print '<td class="center" colspan="' . $colspan . '">';
 			print '<input type="submit" class="button" value="' . $langs->trans('Add') . '" name="addline" id="addline">';
@@ -996,7 +1183,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 			print '</tr>';
 
 			if (is_object($objectline)) {
-				print $objectline->showOptionals($extrafields, 'edit', array('style' => $bcnd[$var], 'colspan' => $coldisplay), '', '', 1);
+//				print $objectline->showOptionals($extrafields, 'edit', array('style' => $bcnd[$var], 'colspan' => $coldisplay), '', '', 1);
 			}
 			print '</form>';
 		}

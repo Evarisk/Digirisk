@@ -3251,6 +3251,63 @@ window.eoxiaJS.menu.setMenu = function() {
 
 
 /**
+ * Initialise l'objet "accident" ainsi que la méthode "init" obligatoire pour la bibliothèque EoxiaJS.
+ *
+ * @since   1.1.0
+ * @version 1.1.0
+ */
+window.eoxiaJS.accident = {};
+
+/**
+ * La méthode appelée automatiquement par la bibliothèque EoxiaJS.
+ *
+ * @since   1.1.0
+ * @version 1.1.0
+ *
+ * @return {void}
+ */
+window.eoxiaJS.accident.init = function() {
+    window.eoxiaJS.accident.event();
+};
+
+/**
+ * La méthode contenant tous les évènements pour les accidents.
+ *
+ * @since   1.1.0
+ * @version 1.1.0
+ *
+ * @return {void}
+ */
+window.eoxiaJS.accident.event = function() {
+    jQuery( document ).on( 'submit', '#sendfile', window.eoxiaJS.accident.tmpStockFile );
+};
+
+window.eoxiaJS.accident.tmpStockFile = function() {
+    var files = $('#sendfile').prop('files');
+
+    const formData = new FormData();
+    for (let i = 0; i < files.length; i++) {
+        let file = files[i]
+        formData.append('files[]', file)
+    }
+
+
+    $.ajax({
+        url: document.URL + '&action=sendfile',
+        type: "POST",
+        processData: false,
+        contentType: false,
+		data: formData,
+        success: function ( ) {
+             $('#sendFileForm').load(document.URL+ ' #fileLinkedTable')
+        },
+        error: function ( ) {
+        }
+    });
+
+};
+
+/**
  * Initialise l'objet "slider" ainsi que la méthode "init" obligatoire pour la bibliothèque EoxiaJS.
  *
  * @since   1.0.0
