@@ -385,8 +385,7 @@ if (empty($reshook)) {
 					}
 				}
 
-
-				if ($empty = 0) {
+				if ($empty == 0) {
 					print '<a class="butAction" id="actionButtonSendMail" href="' . $_SERVER['PHP_SELF'] . '?id=' . $object->id . '&action=presend&mode=init#formmailbeforetitle&sendto=' . $allLinks['LabourInspectorSociety']->id[0] . '">' . $langs->trans('SendMail') . '</a>';
 				} else {
 					// Model
