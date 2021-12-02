@@ -607,6 +607,7 @@ PoliceReport = Rapport de police
 CerfaLink = Lien vers le Cerfa
 WorkStopDays = Nombre de jour d'arrêt de travail
 AccidentLesionList = Liste des lésions lié à l'accident
+DocumentsMetaData = Fichiers joints complémentaires
 
 
 # Email - Mail

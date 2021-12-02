@@ -874,7 +874,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	$morehtmlref .= '<div class="refidno">';
 	// Project
 	$project->fetch($object->fk_project);
-	$morehtmlref .= '<br>'.$langs->trans('Project').' : '.getNomUrlProject($project, 1, 'blank');
+	$morehtmlref .= $langs->trans('Project').' : '.getNomUrlProject($project, 1, 'blank');
 	$morehtmlref .= '</div>';
 
 	digirisk_banner_tab($object, 'ref', '', 0, 'ref', 'ref', $morehtmlref, '', 0, '', $object->getLibStatut(5));
