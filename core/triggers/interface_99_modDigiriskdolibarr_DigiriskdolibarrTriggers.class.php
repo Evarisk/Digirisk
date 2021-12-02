@@ -174,7 +174,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$now = dol_now();
 				$actioncomm = new ActionComm($this->db);
 
-				$actioncomm->elementtype = $object->parent_type . '@digiriskdolibarr';
+				$actioncomm->elementtype = 'digiriskelement@digiriskdolibarr';
 				$actioncomm->elementid   = $object->parent_id;
 				$actioncomm->code        = 'AC_GROUPMENTDOCUMENT_GENERATE';
 				$actioncomm->type_code   = 'AC_OTH_AUTO';
@@ -194,7 +194,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$now = dol_now();
 				$actioncomm = new ActionComm($this->db);
 
-				$actioncomm->elementtype = $object->parent_type . '@digiriskdolibarr';
+				$actioncomm->elementtype = 'digiriskelement@digiriskdolibarr';
 				$actioncomm->elementid   = $object->parent_id;
 				$actioncomm->code        = 'AC_WORKUNITDOCUMENT_GENERATE';
 				$actioncomm->type_code   = 'AC_OTH_AUTO';
@@ -212,8 +212,8 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				require_once DOL_DOCUMENT_ROOT.'/comm/action/class/actioncomm.class.php';
 				$now = dol_now();
 				$actioncomm = new ActionComm($this->db);
-
-				$actioncomm->elementtype = $object->parent_type . '@digiriskdolibarr';
+				$type = $object->parent_type == 'digiriskstandard' ? 'digiriskstandard' : 'digiriskelement';
+				$actioncomm->elementtype = $type;
 				$actioncomm->elementid   = $object->parent_id;
 				$actioncomm->code        = 'AC_LISTINGRISKSPHOTO_GENERATE';
 				$actioncomm->type_code   = 'AC_OTH_AUTO';
@@ -232,7 +232,8 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$now = dol_now();
 				$actioncomm = new ActionComm($this->db);
 
-				$actioncomm->elementtype = $object->parent_type . '@digiriskdolibarr';
+				$type = $object->parent_type == 'digiriskstandard' ? 'digiriskstandard' : 'digiriskelement';
+				$actioncomm->elementtype = $type;
 				$actioncomm->elementid   = $object->parent_id;
 				$actioncomm->code        = 'AC_LISTINGRISKSACTION_GENERATE';
 				$actioncomm->type_code   = 'AC_OTH_AUTO';
@@ -893,8 +894,11 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				require_once DOL_DOCUMENT_ROOT.'/comm/action/class/actioncomm.class.php';
 				$now = dol_now();
 				$actioncomm = new ActionComm($this->db);
-
-				$actioncomm->elementtype = $object->element_type.'@digiriskdolibarr';
+				if ($object->element_type == 'societe') {
+					$actioncomm->socid = $object->element_id;
+				} else {
+					$actioncomm->elementtype = $object->element_type.'@digiriskdolibarr';
+				}
 				$actioncomm->code        = 'AC_OPENINGHOURS_CREATE';
 				$actioncomm->type_code   = 'AC_OTH_AUTO';
 				if ($object->element_type == 'preventionplan') {
@@ -920,7 +924,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$digiriskelement = new DigiriskElement($this->db);
 				$digiriskelement->fetch($object->fk_element);
 
-				$actioncomm->elementtype = $digiriskelement->element_type.'@digiriskdolibarr';
+				$actioncomm->elementtype = 'digiriskelement@digiriskdolibarr';
 				$actioncomm->code        = 'AC_RISK_CREATE';
 				$actioncomm->type_code   = 'AC_OTH_AUTO';
 				$actioncomm->label       = $langs->trans('RiskCreateTrigger');
@@ -942,7 +946,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$digiriskelement = new DigiriskElement($this->db);
 				$digiriskelement->fetch($object->fk_element);
 
-				$actioncomm->elementtype = $digiriskelement->element_type.'@digiriskdolibarr';
+				$actioncomm->elementtype = 'digiriskelement@digiriskdolibarr';
 				$actioncomm->code        = 'AC_RISK_MODIFY';
 				$actioncomm->type_code   = 'AC_OTH_AUTO';
 				$actioncomm->label       = $langs->trans('RiskModifyTrigger');
@@ -964,7 +968,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$digiriskelement = new DigiriskElement($this->db);
 				$digiriskelement->fetch($object->fk_element);
 
-				$actioncomm->elementtype = $digiriskelement->element_type.'@digiriskdolibarr';
+				$actioncomm->elementtype = 'digiriskelement@digiriskdolibarr';
 				$actioncomm->code        = 'AC_RISK_DELETE';
 				$actioncomm->type_code   = 'AC_OTH_AUTO';
 				$actioncomm->label       = $langs->trans('RiskDeleteTrigger');
@@ -989,7 +993,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$risk->fetch($object->fk_risk);
 				$digiriskelement->fetch($risk->fk_element);
 
-				$actioncomm->elementtype = $digiriskelement->element_type.'@digiriskdolibarr';
+				$actioncomm->elementtype = 'digiriskelement@digiriskdolibarr';
 				$actioncomm->code        = 'AC_RISKASSESSMENT_CREATE';
 				$actioncomm->type_code   = 'AC_OTH_AUTO';
 				$actioncomm->label       = $langs->trans('RiskAssessmentCreateTrigger');
@@ -1014,7 +1018,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$risk->fetch($object->fk_risk);
 				$digiriskelement->fetch($risk->fk_element);
 
-				$actioncomm->elementtype = $digiriskelement->element_type.'@digiriskdolibarr';
+				$actioncomm->elementtype = 'digiriskelement@digiriskdolibarr';
 				$actioncomm->code        = 'AC_RISKASSESSMENT_MODIFY';
 				$actioncomm->type_code   = 'AC_OTH_AUTO';
 				$actioncomm->label       = $langs->trans('RiskAssessmentModifyTrigger');
@@ -1039,7 +1043,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$risk->fetch($object->fk_risk);
 				$digiriskelement->fetch($risk->fk_element);
 
-				$actioncomm->elementtype = $digiriskelement->element_type.'@digiriskdolibarr';
+				$actioncomm->elementtype = 'digiriskelement@digiriskdolibarr';
 				$actioncomm->code        = 'AC_RISKASSESSMENT_DELETE';
 				$actioncomm->type_code   = 'AC_OTH_AUTO';
 				$actioncomm->label       = $langs->trans('RiskAssessmentDeleteTrigger');
@@ -1061,7 +1065,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$digiriskelement = new DigiriskElement($this->db);
 				$digiriskelement->fetch($object->fk_parent);
 
-				$actioncomm->elementtype = $digiriskelement->element_type.'@digiriskdolibarr';
+				$actioncomm->elementtype = 'digiriskelement@digiriskdolibarr';
 				$actioncomm->code        = 'AC_EVALUATOR_CREATE';
 				$actioncomm->type_code   = 'AC_OTH_AUTO';
 				$actioncomm->label       = $langs->trans('EvaluatorCreateTrigger');
@@ -1083,7 +1087,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$digiriskelement = new DigiriskElement($this->db);
 				$digiriskelement->fetch($object->fk_parent);
 
-				$actioncomm->elementtype = $digiriskelement->element_type.'@digiriskdolibarr';
+				$actioncomm->elementtype = 'digiriskelement@digiriskdolibarr';
 				$actioncomm->code        = 'AC_EVALUATOR_MODIFY';
 				$actioncomm->type_code   = 'AC_OTH_AUTO';
 				$actioncomm->label       = $langs->trans('EvaluatorModifyTrigger');
@@ -1105,7 +1109,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$digiriskelement = new DigiriskElement($this->db);
 				$digiriskelement->fetch($object->fk_parent);
 
-				$actioncomm->elementtype = $digiriskelement->element_type.'@digiriskdolibarr';
+				$actioncomm->elementtype = 'digiriskelement@digiriskdolibarr';
 				$actioncomm->code        = 'AC_EVALUATOR_DELETE';
 				$actioncomm->type_code   = 'AC_OTH_AUTO';
 				$actioncomm->label       = $langs->trans('EvaluatorDeleteTrigger');
@@ -1127,7 +1131,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$digiriskelement = new DigiriskElement($this->db);
 				$digiriskelement->fetch($object->fk_element);
 
-				$actioncomm->elementtype = $digiriskelement->element_type.'@digiriskdolibarr';
+				$actioncomm->elementtype = 'digiriskelement@digiriskdolibarr';
 				$actioncomm->code        = 'AC_RISKSIGN_CREATE';
 				$actioncomm->type_code   = 'AC_OTH_AUTO';
 				$actioncomm->label       = $langs->trans('RiskSignCreateTrigger');
@@ -1149,7 +1153,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$digiriskelement = new DigiriskElement($this->db);
 				$digiriskelement->fetch($object->fk_element);
 
-				$actioncomm->elementtype = $digiriskelement->element_type.'@digiriskdolibarr';
+				$actioncomm->elementtype = 'digiriskelement@digiriskdolibarr';
 				$actioncomm->code        = 'AC_RISKSIGN_MODIFY';
 				$actioncomm->type_code   = 'AC_OTH_AUTO';
 				$actioncomm->label       = $langs->trans('RiskSignModifyTrigger');
@@ -1171,7 +1175,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$digiriskelement = new DigiriskElement($this->db);
 				$digiriskelement->fetch($object->fk_element);
 
-				$actioncomm->elementtype = $digiriskelement->element_type.'@digiriskdolibarr';
+				$actioncomm->elementtype = 'digiriskelement@digiriskdolibarr';
 				$actioncomm->code        = 'AC_RISKSIGN_DELETE';
 				$actioncomm->type_code   = 'AC_OTH_AUTO';
 				$actioncomm->label       = $langs->trans('RiskSignDeleteTrigger');

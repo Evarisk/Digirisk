@@ -1179,6 +1179,24 @@ class modDigiriskdolibarr extends DolibarrModules
 			dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_PROJECT_TAGS_SET', 2, 'integer', 0, '', $conf->entity);
 		}
 
+		if ( $conf->global->DIGIRISKDOLIBARR_TRIGGERS_UPDATED ==  0 ) {
+			require_once DOL_DOCUMENT_ROOT.'/comm/action/class/actioncomm.class.php';
+
+			$actioncomm = new Actioncomm($this->db);
+
+			$allGroupments = $actioncomm->getActions( $this->db, 0, 0, 'groupment@digiriskdolibarr');
+			echo '<pre>'; print_r( $allGroupments ); echo '</pre>'; exit;
+			//fetch all tous les événements avec type groupment puis rename en digiriskelement
+
+
+			// fetch all tous les événements avec type workunit puis rename en digiriskelemenet
+
+			// fetch all tous les évenements avec type societe puis mettre ça en fk_soc à la place
+
+
+			dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_TRIGGERS_UPDATED', 1, 'integer', 0, '', $conf->entity);
+		}
+
 		return $this->_init($sql, $options);
 	}
 
