@@ -3253,16 +3253,16 @@ window.eoxiaJS.menu.setMenu = function() {
 /**
  * Initialise l'objet "accident" ainsi que la méthode "init" obligatoire pour la bibliothèque EoxiaJS.
  *
- * @since   1.1.0
- * @version 1.1.0
+ * @since   8.5.0
+ * @version 8.5.0
  */
 window.eoxiaJS.accident = {};
 
 /**
  * La méthode appelée automatiquement par la bibliothèque EoxiaJS.
  *
- * @since   1.1.0
- * @version 1.1.0
+ * @since   8.5.0
+ * @version 8.5.0
  *
  * @return {void}
  */
@@ -3273,17 +3273,28 @@ window.eoxiaJS.accident.init = function() {
 /**
  * La méthode contenant tous les évènements pour les accidents.
  *
- * @since   1.1.0
- * @version 1.1.0
+ * @since   8.5.0
+ * @version 8.5.0
  *
  * @return {void}
  */
 window.eoxiaJS.accident.event = function() {
-    jQuery( document ).on( 'submit', '#sendfile', window.eoxiaJS.accident.tmpStockFile );
+    jQuery( document ).on( 'submit', ' .sendfile', window.eoxiaJS.accident.tmpStockFile );
+    jQuery( document ).on( 'click', ' .linked-file-delete-workstop', window.eoxiaJS.accident.removeFile );
+
 };
 
-window.eoxiaJS.accident.tmpStockFile = function() {
+/**
+ * Upload automatiquement le(s) fichier(s) séelectionnés dans digiriskdolibarr/accident/accident_ref/workstop/__REF__ (temp ou ref du workstop)
+ *
+ * @since   8.5.0
+ * @version 8.5.0
+ *
+ * @return {void}
+ */
+window.eoxiaJS.accident.tmpStockFile = function(id) {
     var files = $('#sendfile').prop('files');
+
 
     const formData = new FormData();
     for (let i = 0; i < files.length; i++) {
@@ -3293,18 +3304,44 @@ window.eoxiaJS.accident.tmpStockFile = function() {
 
 
     $.ajax({
-        url: document.URL + '&action=sendfile',
+        url: document.URL + '&action=sendfile&objectlineid=' + id,
         type: "POST",
         processData: false,
         contentType: false,
 		data: formData,
         success: function ( ) {
-             $('#sendFileForm').load(document.URL+ ' #fileLinkedTable')
+            $('#sendFileForm' + id).load(document.URL + ' #fileLinkedTable' + id)
         },
         error: function ( ) {
         }
     });
+};
 
+/**
+ * Supprime le fichier séelectionné dans  digiriskdolibarr/accident/accident_ref/workstop/__REF__ (temp ou ref du workstop)
+ *
+ * @since   8.5.0
+ * @version 8.5.0
+ *
+ * @return {void}
+ */
+
+window.eoxiaJS.accident.removeFile = function( event ) {
+    let filetodelete = $(this).attr('value');
+    filetodelete = filetodelete.replace('_mini', '')
+    let objectlineid = $(this).closest('.objectline').attr('value')
+
+    $.ajax({
+        url: document.URL + '&action=removefile&filetodelete='+filetodelete+'&objectlineid='+objectlineid,
+        type: "POST",
+        processData: false,
+        contentType: false,
+        success: function ( ) {
+            $('#sendFileForm' + objectlineid).load(document.URL + ' #fileLinkedTable' + objectlineid)
+        },
+        error: function ( ) {
+        }
+    });
 };
 
 /**

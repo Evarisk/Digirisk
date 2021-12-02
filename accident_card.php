@@ -570,6 +570,13 @@ if (empty($reshook)) {
 	// Add file in ticket form
 	if ($action == 'sendfile') {
 		include_once DOL_DOCUMENT_ROOT.'/core/lib/files.lib.php';
+		$objectlineid = GETPOST('objectlineid');
+		if ($objectlineid > 0) {
+			$objectline->fetch($objectlineid);
+			$folder =  $objectline->ref;
+		} else {
+			$folder = 'temp';
+		}
 		$object->fetch($id);
 
 		if (!empty($_FILES) && !empty($_FILES['files']['name'][0])) {
@@ -585,7 +592,7 @@ if (empty($reshook)) {
 				}
 			}
 
-			$filedir = $conf->digiriskdolibarr->multidir_output[isset($object->entity) ? $object->entity : 1] . '/accident/'. $object->ref . '/workstop/temp';
+			$filedir = $conf->digiriskdolibarr->multidir_output[isset($object->entity) ? $object->entity : 1] . '/accident/'. $object->ref . '/workstop/' . $folder;
 			if (!file_exists($filedir))
 			{
 				if (dol_mkdir($filedir) < 0)
@@ -603,6 +610,38 @@ if (empty($reshook)) {
 			}
 		}
 	}
+
+	if ($action == 'removefile') {
+		include_once DOL_DOCUMENT_ROOT.'/core/lib/files.lib.php';
+		$filetodelete = GETPOST('filetodelete');
+		$objectlineid = GETPOST('objectlineid');
+		if ($objectlineid > 0) {
+			$objectline->fetch($objectlineid);
+			$folder = $objectline->ref;
+		} else {
+			$folder = 'temp';
+		}
+
+
+		$accident_upload_dir = $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/accident/' . $object->ref . '/workstop/' . $folder . '/';
+		//Add files linked
+		$fileList          = dol_dir_list($accident_upload_dir);
+
+		if (is_file($accident_upload_dir . $filetodelete)) {
+			dol_delete_file($accident_upload_dir . $filetodelete);
+
+			$thumbsList = dol_dir_list($accident_upload_dir . 'thumbs/');
+			if (!empty($thumbsList)) {
+				foreach ($thumbsList as $thumb) {
+					if (preg_match('/'. preg_split('/\./', $filetodelete)[0] . '/', $thumb['name'])) {
+						dol_delete_file($accident_upload_dir . 'thumbs/' . $thumb['name'] );
+					}
+				}
+			}
+		}
+		$action = '';
+	}
+
 
 	// Actions to send emails
 	$triggersendname = 'FIREPERMIT_SENTBYMAIL';
@@ -971,33 +1010,50 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 
 					$coldisplay++;
 					print '<td>'; ?>
-					<?php $fileLinkedList = dol_dir_list($conf->digiriskdolibarr->multidir_output[isset($conf->entity) ? $conf->entity : 1] . '/accident/' . $object->ref . '/workstop/'. $item->ref .'/'); ?>
-					<div class="wpeo-table table-flex table-3">
-						<?php
-						if (!empty($fileLinkedList)) {
-							foreach ($fileLinkedList as $fileLinked) {
-								if (preg_split('/\./', $fileLinked['name'])[1] == 'png' || preg_split('/\./', $fileLinked['name'])[1] == 'jpg' || preg_split('/\./', $fileLinked['name'])[1] == 'jpeg') :
-									?>
-									<div class="table-row">
-										<div class="table-cell">
-											<?php print '<img class="photo"  width="50" src="'.DOL_URL_ROOT.'/viewimage.php?modulepart=digiriskdolibarr&entity='.$conf->entity.'&file='.urlencode('/accident/'. $object->ref . '/workstop/'. $item->ref .'/thumbs/' . preg_split('/\./', $fileLinked['name'])[0] . '_mini.'. preg_split('/\./', $fileLinked['name'])[1]).'" title="'.dol_escape_htmltag($alt).'">'; ?>
-										</div>
-										<div class="table-cell">
-											<?php print preg_replace('/_mini/','', $fileLinked['name']); ?>
-										</div>
-									</div> <?php
-								elseif ($fileLinked['type'] != 'dir') : ?>
-									<div class="table-row">
-										<div class="table-cell  table-padding-100">
-											<i class="fas fa-file"></i>
-										</div>
-										<div class="table-cell">
-											<?php print preg_replace('/_mini/','', $fileLinked['name']); ?>
-										</div>
-									</div>
+					<div class="wpeo-gridlayout grid-2">
+						<span class="form-label"><?php print $langs->trans("FilesLinked"); ?></span>
+						<label class="wpeo-button button-blue" for="sendfile">
+							<i class="fas fa-image button-icon"></i>
+							<span class="button-label"><?php print $langs->trans('AddDocument'); ?></span>
+							<input type="file" name="userfile[]" class="sendfile" multiple="multiple" id="sendfile" onchange="window.eoxiaJS.accident.tmpStockFile(<?php echo $item->id ?>)"  style="display: none"/>
+						</label>
+					</div>
+					<div id="sendFileForm<?php echo $item->id ?>">
+						<div id="fileLinkedTable<?php echo $item->id ?>" class="tableforinputfields objectline" value="<?php echo 0 ?>">
+							<?php $fileLinkedList = dol_dir_list($conf->digiriskdolibarr->multidir_output[isset($conf->entity) ? $conf->entity : 1] . '/accident/' . $object->ref . '/workstop/'. $item->ref .'/'); ?>
+							<div class="wpeo-table table-flex table-3 objectline" value="<?php echo $item->id ?>"">
 								<?php
-								endif;
-							}
+								if (!empty($fileLinkedList)) {
+									foreach ($fileLinkedList as $fileLinked) {
+										if (preg_split('/\./', $fileLinked['name'])[1] == 'png' || preg_split('/\./', $fileLinked['name'])[1] == 'jpg' || preg_split('/\./', $fileLinked['name'])[1] == 'jpeg') :
+											?>
+											<div class="table-row">
+												<div class="table-cell">
+													<?php print '<img class="photo"  width="50" src="' . DOL_URL_ROOT . '/viewimage.php?modulepart=digiriskdolibarr&entity=' . $conf->entity . '&file=' . urlencode('/accident/' . $object->ref . '/workstop/' . $item->ref . '/thumbs/' . preg_split('/\./', $fileLinked['name'])[0] . '_mini.' . preg_split('/\./', $fileLinked['name'])[1]) . '" title="' . dol_escape_htmltag($alt) . '">'; ?>
+												</div>
+												<div class="table-cell">
+													<?php print preg_replace('/_mini/', '', $fileLinked['name']); ?>
+												</div>
+												<div class="table-cell table-50 table-end table-padding-0">
+													<?php print '<div class="linked-file-delete-workstop wpeo-button button-square-50 button-transparent" value="' . $fileLinked['name'] . '"><i class="fas fa-trash button-icon"></i></div>'; ?>
+												</div>
+											</div> <?php
+										elseif ($fileLinked['type'] != 'dir') : ?>
+											<div class="table-row">
+												<div class="table-cell  table-padding-100">
+													<i class="fas fa-file"></i>
+												</div>
+												<div class="table-cell">
+													<?php print preg_replace('/_mini/', '', $fileLinked['name']); ?>
+												</div>
+												<div class="table-cell table-50 table-end table-padding-0">
+													<?php print '<div class="linked-file-delete-workstop wpeo-button button-square-50 button-transparent" value="' . $fileLinked['name'] . '"><i class="fas fa-trash button-icon"></i></div>'; ?>
+												</div>
+											</div>
+										<?php
+										endif;
+									} ?> </div>
+						</div> <?php
 						} else {
 							?>
 							<div class="table-row">
@@ -1032,7 +1088,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 					$coldisplay++;
 					print '<td>'; ?>
 					<?php $fileLinkedList = dol_dir_list($conf->digiriskdolibarr->multidir_output[isset($conf->entity) ? $conf->entity : 1] . '/accident/' . $object->ref . '/workstop/'. $item->ref .'/'); ?>
-					<div class="wpeo-table table-flex table-3">
+					<div class="wpeo-table table-flex table-3 objectline" value="<?php echo $item->id ?>">
 						<?php
 						if (!empty($fileLinkedList)) {
 							foreach ($fileLinkedList as $fileLinked) {
@@ -1094,7 +1150,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 			}
 			print '</tr>';
 		}
-		if ($object->status == 1 && $permissiontoadd) {
+		if ($object->status == 1 && $permissiontoadd && $action != 'editline') {
 			print '<form method="POST" action="' . $_SERVER["PHP_SELF"] . '?id=' . $object->id . '">';
 			print '<input type="hidden" name="token" value="' . newToken() . '">';
 			print '<input type="hidden" name="action" value="addLine">';
@@ -1121,12 +1177,12 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 					<label class="wpeo-button button-blue" for="sendfile">
 						<i class="fas fa-image button-icon"></i>
 						<span class="button-label"><?php print $langs->trans('AddDocument'); ?></span>
-						<input type="file" name="userfile[]" multiple="multiple" id="sendfile" onchange="window.eoxiaJS.accident.tmpStockFile()"  style="display: none"/>
+						<input type="file" name="userfile[]" class="sendfile" multiple="multiple" id="sendfile" onchange="window.eoxiaJS.accident.tmpStockFile(<?php echo 0 ?>)"  style="display: none"/>
 					</label>
 				</div>
 
-				<div id="sendFileForm">
-					<div id="fileLinkedTable" class="tableforinputfields">
+				<div id="sendFileForm<?php echo 0 ?>">
+					<div id="fileLinkedTable<?php echo 0 ?>" class="tableforinputfields objectline" value="<?php echo 0 ?>">
 						<?php $fileLinkedList = dol_dir_list($conf->digiriskdolibarr->multidir_output[isset($conf->entity) ? $conf->entity : 1] . '/accident/' . $object->ref . '/workstop/temp/'); ?>
 						<div class="wpeo-table table-flex table-3">
 							<?php
@@ -1142,7 +1198,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 												<?php print preg_replace('/_mini/','', $fileLinked['name']); ?>
 											</div>
 											<div class="table-cell table-50 table-end table-padding-0">
-												<?php print '<div class="linked-file-delete wpeo-button button-square-50 button-transparent" value="'. $fileLinked['name'] .'"><i class="fas fa-trash button-icon"></i></div>'; ?>
+												<?php print '<div class="linked-file-delete-workstop wpeo-button button-square-50 button-transparent" value="'. $fileLinked['name'] .'"><i class="fas fa-trash button-icon"></i></div>'; ?>
 											</div>
 										</div> <?php
 									elseif ($fileLinked['type'] != 'dir') : ?>
@@ -1154,7 +1210,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 												<?php print preg_replace('/_mini/','', $fileLinked['name']); ?>
 											</div>
 											<div class="table-cell table-50 table-end table-padding-0">
-												<?php print '<div class="linked-file-delete wpeo-button button-square-50 button-transparent" value="'. $fileLinked['name'] .'"><i class="fas fa-trash button-icon"></i></div>'; ?>
+												<?php print '<div class="linked-file-delete-workstop wpeo-button button-square-50 button-transparent" value="'. $fileLinked['name'] .'"><i class="fas fa-trash button-icon"></i></div>'; ?>
 											</div>
 										</div>
 										<?php
