@@ -10,6 +10,8 @@ Prérequis:
 * Dolibarr min version 13.0.0
 * Dolibarr min version 14.0.4
 
+Thème: Eldy Menu
+
 Editeur/Licence: [Evarisk](https://www.evarisk.com) / GPL-v3
 
 Assitance: [Forum www.dolibarr.fr](https://www.dolibarr.fr) / Par mail à contact@evarisk.com

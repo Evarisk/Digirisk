@@ -14,9 +14,11 @@
 				legend: {
 					display: false
 				},
+				tooltips: {
+					enabled: false
+				},
 			},
 			data: {
-				labels: ['<?php echo $langs->transnoentities('Uncompleted'); ?>',' <?php echo $langs->transnoentities('Completed') ?>'],
 				datasets: [{
 					label: '# of Votes',
 					data: [<?php echo bcdiv(((1 - $counter / $maxnumber) * 100), 1, 2) ;?>, <?php echo bcdiv((($counter / $maxnumber) * 100), 1, 2) ;?>],

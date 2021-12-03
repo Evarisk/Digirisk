@@ -792,6 +792,8 @@ OrganizationNotSaved = L'organisation et des groupements et des unités de trava
 # Trigger - Déclencheur
 GROUPMENT_CREATEInDolibarr = Groupement créé dans Dolibarr
 ActionsOnGroupment = Événements liés au groupement
+groupmentCreatedWithDolibarr = Groupement créé dans Dolibarr
+workunitCreatedWithDolibarr = Unité de travail créée dans Dolibarr
 
 # Mod Numbering - Modèle de numérotation
 DigiriskGroupmentNumberingModule = Modèle de numérotation des groupements de Digirisk

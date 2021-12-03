@@ -404,8 +404,11 @@ if (empty($reshook)) {
 							$modelselected = $arraykeys[0];
 						}
 					}
-
-					print '<a class="butAction send-risk-assessment-document-by-mail" id="actionButtonSendMail"  href="' . $_SERVER['PHP_SELF'] . '?id=' . $object->id . '&action=presend&forcebuilddoc=1&model='.$modelselected.'&mode=init#formmailbeforetitle&sendto=' . $allLinks['LabourInspectorSociety']->id[0] . '">' . $langs->trans('SendMail') . '</a>';
+					if (dol_strlen($modelselected) > 0) {
+						print '<a class="butAction send-risk-assessment-document-by-mail" id="actionButtonSendMail"  href="' . $_SERVER['PHP_SELF'] . '?id=' . $object->id . '&action=presend&forcebuilddoc=1&model='.$modelselected.'&mode=init#formmailbeforetitle&sendto=' . $allLinks['LabourInspectorSociety']->id[0] . '">' . $langs->trans('SendMail') . '</a>';
+					} else {
+						print '<a class="butAction send-risk-assessment-document-by-mail" id="actionButtonSendMail"  href="' . $_SERVER['PHP_SELF'] . '?id=' . $object->id . '&action=presend&mode=init#formmailbeforetitle&sendto=' . $allLinks['LabourInspectorSociety']->id[0] . '">' . $langs->trans('SendMail') . '</a>';
+					}
 				}
 			} else {
 				print '<span class="butActionRefused classfortooltip" href="#" title="' . dol_escape_htmltag($langs->trans("SetStartEndDateBeforeSendEmail")) . '">' . $langs->trans('SendEmail') . '</span>';
