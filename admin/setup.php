@@ -40,6 +40,7 @@ global $langs, $user, $conf, $db;
 
 // Libraries
 require_once DOL_DOCUMENT_ROOT."/core/lib/admin.lib.php";
+require_once DOL_DOCUMENT_ROOT."/core/lib/files.lib.php";
 require_once DOL_DOCUMENT_ROOT.'/projet/class/project.class.php';
 require_once DOL_DOCUMENT_ROOT.'/societe/class/societe.class.php';
 require_once DOL_DOCUMENT_ROOT.'/core/modules/project/mod_project_simple.php';
@@ -129,6 +130,23 @@ else {
 print '</td>';
 print '</tr>';
 print '</table>';
+
+if ($conf->global->DIGIRISKDOLIBARR_MAIN_LOGIN_BACKGROUND == 1) {
+	$dirforimage   = $conf->mycompany->dir_output.'/logos/';
+	$original_file = 'login-background.jpg';
+	$src_file = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/img/backgroundDigirisk/';
+
+	if (!is_dir($dirforimage)) {
+		dol_mkdir($dirforimage);
+	}
+
+	$result = dol_copy($src_file.$original_file, $dirforimage.$original_file, 0, 0);
+
+	if ($result > 0) {
+		dolibarr_set_const($db, 'MAIN_LOGIN_BACKGROUND', $original_file, 'chaine', 0, '', $conf->entity);
+		dolibarr_set_const($db, 'DIGIRISKDOLIBARR_MAIN_LOGIN_BACKGROUND', 2, 'integer', 0, '', $conf->entity);
+	}
+}
 
 // Page end
 print dol_get_fiche_end();
