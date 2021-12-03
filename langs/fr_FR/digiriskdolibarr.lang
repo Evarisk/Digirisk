@@ -721,7 +721,7 @@ DigiriskRiskAssessmentDocumentNumberingModule = Modèle de numérotation des doc
 DigiriskRiskAssessmentDocumentStandardModel = Renvoie le numéro sous la forme DUn où n est un compteur séquentiel sans rupture et sans remise à 0.
 
 # ODT Template - Template ODT
-DigiriskTemplateDocumentRiskAssessmentDocument = Modèle de documents des documents unique de Digirisk
+DigiriskTemplateDocumentRiskAssessment = Modèle de documents des documents unique de Digirisk
 RiskAssessmentDocumentCustomDigiriskTemplate = ODT custom des documents unique
 RiskAssessmentDocumentDigiriskTemplate = ODT par défaut des documents unique
 
@@ -768,7 +768,7 @@ DigiriskGroupmentDocumentNumberingModule = Modèle de numérotation des fiches d
 DigiriskGroupmentDocumentStandardModel = Renvoie le numéro sous la forme GPDn où n est un compteur séquentiel sans rupture et sans remise à 0.
 
 # ODT Template - Template ODT
-DigiriskTemplateDocumentGroupmentDocument = Modèle de documents des fiches de groupement de Digirisk
+DigiriskTemplateDocumentGroupment = Modèle de documents des fiches de groupement de Digirisk
 GroupmentDocumentCustomDigiriskTemplate = ODT custom des fiches de groupement
 GroupmentDocumentDigiriskTemplate = ODT par défaut des fiches de groupement
 
@@ -791,7 +791,7 @@ DigiriskWorkUnitDocumentNumberingModule = Modèle de numérotation des fiches d'
 DigiriskWorkUnitDocumentStandardModel = Renvoie le numéro sous la forme WUDn où n est un compteur séquentiel sans rupture et sans remise à 0.
 
 # ODT Template - Template ODT
-DigiriskTemplateDocumentWorkUnitDocument = Modèle de documents des fiches d'unité de travail de Digirisk
+DigiriskTemplateDocumentWorkUnit = Modèle de documents des fiches d'unité de travail de Digirisk
 WorkUnitDocumentCustomDigiriskTemplate = ODT custom des fiches d'unité de travail
 WorkUnitDocumentDigiriskTemplate = ODT par défaut des fiches d'unité de travail
 
