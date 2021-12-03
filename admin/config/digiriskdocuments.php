@@ -49,7 +49,46 @@ $langs->loadLangs(array("admin", "digiriskdolibarr@digiriskdolibarr"));
 if (!$user->admin) accessforbidden();
 
 // Parameters
+$action     = GETPOST('action', 'alpha');
 $backtopage = GETPOST('backtopage', 'alpha');
+$value      = GETPOST('value', 'alpha');
+$type       = GETPOST('type', 'alpha');
+$const 		= GETPOST('const', 'alpha');
+$label 		= GETPOST('label', 'alpha');
+
+/*
+ * Actions
+ */
+
+// Activate a model
+if ($action == 'set') {
+	addDocumentModel($value, $type, $label, $const);
+} elseif ($action == 'del') {
+	delDocumentModel($value, $type);
+}
+
+// Set default model
+if ($action == 'setdoc') {
+	$constforval = "DIGIRISKDOLIBARR_".strtoupper($type)."_DEFAULT_MODEL";
+	$label       = '';
+
+	if (dolibarr_set_const($db, $constforval, $value, 'chaine', 0, '', $conf->entity))
+	{
+		$conf->global->$constforval = $value;
+	}
+
+	// On active le modele
+	$ret = delDocumentModel($value, $type);
+
+	if ($ret > 0)
+	{
+		$ret = addDocumentModel($value, $type, $label);
+	}
+} elseif ($action == 'setmod') {
+	$constforval = 'DIGIRISKDOLIBARR_'.strtoupper($type)."_ADDON";
+	dolibarr_set_const($db, $constforval, $value, 'chaine', 0, '', $conf->entity);
+}
+
 
 /*
  * View
@@ -142,7 +181,7 @@ foreach ($types as $type => $documentType) {
 								print img_picto($langs->trans("Activated"), 'switch_on');
 							}
 							else {
-								print '<a class="reposition" href="'.$_SERVER["PHP_SELF"].'?action=setmod&value='.preg_replace('/\.php$/', '', $file).'&scan_dir='.$module->scandir.'&label='.urlencode($module->name).'" alt="'.$langs->trans("Default").'">'.img_picto($langs->trans("Disabled"), 'switch_off').'</a>';
+								print '<a class="reposition" href="'.$_SERVER["PHP_SELF"].'?action=setmod&value='.preg_replace('/\.php$/', '', $file).'&const='.$module->scandir.'&label='.urlencode($module->name).'" alt="'.$langs->trans("Default").'">'.img_picto($langs->trans("Disabled"), 'switch_off').'</a>';
 							}
 							print '</td>';
 
@@ -250,7 +289,7 @@ foreach ($types as $type => $documentType) {
 							// Active
 							if (in_array($name, $def)) {
 								print '<td class="center">';
-								print '<a href="'.$_SERVER["PHP_SELF"].'?action=del&amp;value='.$name.'&amp;scan_dir='.$module->scandir.'&amp;label='.urlencode($module->name).'">';
+								print '<a href="'.$_SERVER["PHP_SELF"].'?action=del&amp;value='.$name.'&amp;const='.$module->scandir.'&amp;label='.urlencode($module->name).'&type='.preg_split('/_/',$name)[0].'">';
 								print img_picto($langs->trans("Enabled"), 'switch_on');
 								print '</a>';
 								print "</td>";
@@ -258,7 +297,7 @@ foreach ($types as $type => $documentType) {
 							else
 							{
 								print '<td class="center">';
-								print '<a href="'.$_SERVER["PHP_SELF"].'?action=set&amp;value='.$name.'&amp;scan_dir='.$module->scandir.'&amp;label='.urlencode($module->name).'">'.img_picto($langs->trans("Disabled"), 'switch_off').'</a>';
+								print '<a href="'.$_SERVER["PHP_SELF"].'?action=set&amp;value='.$name.'&amp;const='.$module->scandir.'&amp;label='.urlencode($module->name).'&type='.preg_split('/_/',$name)[0].'">'.img_picto($langs->trans("Disabled"), 'switch_off').'</a>';
 								print "</td>";
 							}
 
@@ -269,7 +308,7 @@ foreach ($types as $type => $documentType) {
 								print img_picto($langs->trans("Default"), 'on');
 							}
 							else {
-								print '<a href="'.$_SERVER["PHP_SELF"].'?action=setdoc&amp;value='.$name.'&amp;scan_dir='.$module->scandir.'&amp;label='.urlencode($module->name).'" alt="'.$langs->trans("Default").'">'.img_picto($langs->trans("Disabled"), 'off').'</a>';
+								print '<a href="'.$_SERVER["PHP_SELF"].'?action=setdoc&amp;value='.$name.'&amp;const='.$module->scandir.'&amp;label='.urlencode($module->name).'" alt="'.$langs->trans("Default").'">'.img_picto($langs->trans("Disabled"), 'off').'</a>';
 							}
 							print '</td>';
 

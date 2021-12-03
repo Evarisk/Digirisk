@@ -55,9 +55,9 @@ function digiriskdolibarrAdminPrepareHead()
 	$head[$h][2] = 'digiriskelement';
 	$h++;
 
-	$head[$h][0] = dol_buildpath("/digiriskdolibarr/admin/config/riskanalysis.php", 1);
+	$head[$h][0] = dol_buildpath("/digiriskdolibarr/admin/config/riskassessmentdocument.php", 1);
 	$head[$h][1] = $langs->trans("RiskAssessmentDocument");
-	$head[$h][2] = 'riskanalysis';
+	$head[$h][2] = 'riskassessmentdocument';
 	$h++;
 
 	$head[$h][0] = dol_buildpath("/digiriskdolibarr/admin/config/digirisksignature.php", 1);

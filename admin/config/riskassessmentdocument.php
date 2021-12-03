@@ -43,6 +43,10 @@ require_once DOL_DOCUMENT_ROOT . "/core/lib/admin.lib.php";
 require_once DOL_DOCUMENT_ROOT . "/core/class/html.formprojet.class.php";
 require_once '../../lib/digiriskdolibarr.lib.php';
 
+$action     = GETPOST('action', 'alpha');
+$backtopage = GETPOST('backtopage', 'alpha');
+$value      = GETPOST('value', 'alpha');
+
 // Translations
 $langs->loadLangs(array("admin", "digiriskdolibarr@digiriskdolibarr"));
 
@@ -51,6 +55,11 @@ if (!$user->admin) accessforbidden();
 
 // Parameters
 $backtopage = GETPOST('backtopage', 'alpha');
+
+/*
+ * Actions
+ */
+
 
 /*
  * View
@@ -73,7 +82,7 @@ print load_fiche_titre($title, $linkback, 'digiriskdolibarr32px@digiriskdolibarr
 
 // Configuration header
 $head = digiriskdolibarrAdminPrepareHead();
-print dol_get_fiche_head($head, 'riskanalysis', '', -1, "digiriskdolibarr@digiriskdolibarr");
+print dol_get_fiche_head($head, 'riskassessmentdocument', '', -1, "digiriskdolibarr@digiriskdolibarr");
 
 
 // RISKS
@@ -95,7 +104,7 @@ print '</tr>';
 
 clearstatcache();
 
-$dir = dol_buildpath("/custom/digiriskdolibarr/core/modules/digiriskdolibarr/riskanalysis/".$type."/");
+$dir = dol_buildpath("/custom/digiriskdolibarr/core/modules/digiriskdolibarr/riskanalysis/risk/");
 if (is_dir($dir)) {
 	$handle = opendir($dir);
 	if (is_resource($handle)) {
@@ -183,13 +192,9 @@ print "</td><td>";
 print $langs->trans('RiskDescriptionDescription');
 print '</td>';
 
+
 print '<td class="center">';
-if ($conf->global->DIGIRISKDOLIBARR_RISK_DESCRIPTION) {
-	print '<a class="reposition" href="'.$_SERVER["PHP_SELF"].'?action=setriskdescription&value=0" alt="'.$langs->trans("Default").'">'.img_picto($langs->trans("Activated"), 'switch_on').'</a>';
-}
-else {
-	print '<a class="reposition" href="'.$_SERVER["PHP_SELF"].'?action=setriskdescription&value=1" alt="'.$langs->trans("Default").'">'.img_picto($langs->trans("Disabled"), 'switch_off').'</a>';
-}
+print ajax_constantonoff('DIGIRISKDOLIBARR_RISK_DESCRIPTION');
 print '</td>';
 print '</tr>';
 
@@ -201,12 +206,7 @@ print $langs->trans('RiskCategoryEditDescription');
 print '</td>';
 
 print '<td class="center">';
-if ($conf->global->DIGIRISKDOLIBARR_RISK_CATEGORY_EDIT) {
-	print '<a class="reposition" href="'.$_SERVER["PHP_SELF"].'?action=setriskcategoryedit&value=0" alt="'.$langs->trans("Default").'">'.img_picto($langs->trans("Activated"), 'switch_on').'</a>';
-}
-else {
-	print '<a class="reposition" href="'.$_SERVER["PHP_SELF"].'?action=setriskcategoryedit&value=1" alt="'.$langs->trans("Default").'">'.img_picto($langs->trans("Disabled"), 'switch_off').'</a>';
-}
+print ajax_constantonoff('DIGIRISKDOLIBARR_RISK_CATEGORY_EDIT');
 print '</td>';
 print '</tr>';
 
@@ -217,12 +217,7 @@ print $langs->trans('ShowParentRisksDescription');
 print '</td>';
 
 print '<td class="center">';
-if ($conf->global->DIGIRISKDOLIBARR_SHOW_PARENT_RISKS) {
-	print '<a class="reposition" href="'.$_SERVER["PHP_SELF"].'?action=setparentrisksvisible&value=0" alt="'.$langs->trans("Default").'">'.img_picto($langs->trans("Activated"), 'switch_on').'</a>';
-}
-else {
-	print '<a class="reposition" href="'.$_SERVER["PHP_SELF"].'?action=setparentrisksvisible&value=1" alt="'.$langs->trans("Default").'">'.img_picto($langs->trans("Disabled"), 'switch_off').'</a>';
-}
+print ajax_constantonoff('DIGIRISKDOLIBARR_SHOW_PARENT_RISKS');
 print '</td>';
 print '</tr>';
 
@@ -233,12 +228,7 @@ print $langs->trans('MoveRisksDescription');
 print '</td>';
 
 print '<td class="center">';
-if ($conf->global->DIGIRISKDOLIBARR_MOVE_RISKS) {
-	print '<a class="reposition" href="'.$_SERVER["PHP_SELF"].'?action=setMoveRisks&value=0" alt="'.$langs->trans("Default").'">'.img_picto($langs->trans("Activated"), 'switch_on').'</a>';
-}
-else {
-	print '<a class="reposition" href="'.$_SERVER["PHP_SELF"].'?action=setMoveRisks&value=1" alt="'.$langs->trans("Default").'">'.img_picto($langs->trans("Disabled"), 'switch_off').'</a>';
-}
+print ajax_constantonoff('DIGIRISKDOLIBARR_MOVE_RISKS');
 print '</td>';
 print '</tr>';
 
@@ -249,12 +239,7 @@ print $langs->trans('SortRisksListingsByCotationDescription');
 print '</td>';
 
 print '<td class="center">';
-if ($conf->global->DIGIRISKDOLIBARR_SORT_LISTINGS_BY_COTATION) {
-	print '<a class="reposition" href="'.$_SERVER["PHP_SELF"].'?action=setSortRisksListingsByCotation&value=0" alt="'.$langs->trans("Default").'">'.img_picto($langs->trans("Activated"), 'switch_on').'</a>';
-}
-else {
-	print '<a class="reposition" href="'.$_SERVER["PHP_SELF"].'?action=setSortRisksListingsByCotation&value=1" alt="'.$langs->trans("Default").'">'.img_picto($langs->trans("Disabled"), 'switch_off').'</a>';
-}
+print ajax_constantonoff('DIGIRISKDOLIBARR_SORT_LISTINGS_BY_COTATION');
 print '</td>';
 print '</tr>';
 
@@ -279,7 +264,7 @@ print '</tr>';
 
 clearstatcache();
 
-$dir = dol_buildpath("/custom/digiriskdolibarr/core/modules/digiriskdolibarr/riskanalysis/".$type."/");
+$dir = dol_buildpath("/custom/digiriskdolibarr/core/modules/digiriskdolibarr/riskanalysis/riskassessment/");
 if (is_dir($dir)) {
 	$handle = opendir($dir);
 	if (is_resource($handle)) {
@@ -368,12 +353,7 @@ print $langs->trans('AdvancedRiskAssessmentMethodDescription');
 print '</td>';
 
 print '<td class="center">';
-if ($conf->global->DIGIRISKDOLIBARR_ADVANCED_RISKASSESSMENT_METHOD) {
-	print '<a class="reposition" href="'.$_SERVER["PHP_SELF"].'?action=setadvancedmethod&value=0" alt="'.$langs->trans("Default").'">'.img_picto($langs->trans("Activated"), 'switch_on').'</a>';
-}
-else {
-	print '<a class="reposition" href="'.$_SERVER["PHP_SELF"].'?action=setadvancedmethod&value=1" alt="'.$langs->trans("Default").'">'.img_picto($langs->trans("Disabled"), 'switch_off').'</a>';
-}
+print ajax_constantonoff('DIGIRISKDOLIBARR_ADVANCED_RISKASSESSMENT_METHOD');
 print '</td>';
 print '</tr>';
 
@@ -384,12 +364,7 @@ print $langs->trans('MultipleRiskAssessmentMethodDescription');
 print '</td>';
 
 print '<td class="center">';
-if ($conf->global->DIGIRISKDOLIBARR_MULTIPLE_RISKASSESSMENT_METHOD) {
-	print '<a class="reposition" href="'.$_SERVER["PHP_SELF"].'?action=setmethod&value=0" alt="'.$langs->trans("Default").'">'.img_picto($langs->trans("Activated"), 'switch_on').'</a>';
-}
-else {
-	print '<a class="reposition" href="'.$_SERVER["PHP_SELF"].'?action=setmethod&value=1" alt="'.$langs->trans("Default").'">'.img_picto($langs->trans("Disabled"), 'switch_off').'</a>';
-}
+print ajax_constantonoff('DIGIRISKDOLIBARR_MULTIPLE_RISKASSESSMENT_METHOD');
 print '</td>';
 print '</tr>';
 
@@ -400,12 +375,7 @@ print $langs->trans('ShowRiskAssessmentDateDescription');
 print '</td>';
 
 print '<td class="center">';
-if ($conf->global->DIGIRISKDOLIBARR_SHOW_RISKASSESSMENT_DATE) {
-	print '<a class="reposition" href="'.$_SERVER["PHP_SELF"].'?action=setshowriskassessmentdate&value=0" alt="'.$langs->trans("Default").'">'.img_picto($langs->trans("Activated"), 'switch_on').'</a>';
-}
-else {
-	print '<a class="reposition" href="'.$_SERVER["PHP_SELF"].'?action=setshowriskassessmentdate&value=1" alt="'.$langs->trans("Default").'">'.img_picto($langs->trans("Disabled"), 'switch_off').'</a>';
-}
+print ajax_constantonoff('DIGIRISKDOLIBARR_SHOW_RISKASSESSMENT_DATE');
 print '</td>';
 print '</tr>';
 print '</table>';
@@ -457,12 +427,7 @@ print $langs->trans('TaskManagementDescription');
 print '</td>';
 
 print '<td class="center">';
-if ($conf->global->DIGIRISKDOLIBARR_TASK_MANAGEMENT) {
-	print '<a class="reposition" href="'.$_SERVER["PHP_SELF"].'?action=settaskmanagement&value=0" alt="'.$langs->trans("Default").'">'.img_picto($langs->trans("Activated"), 'switch_on').'</a>';
-}
-else {
-	print '<a class="reposition" href="'.$_SERVER["PHP_SELF"].'?action=settaskmanagement&value=1" alt="'.$langs->trans("Default").'">'.img_picto($langs->trans("Disabled"), 'switch_off').'</a>';
-}
+print ajax_constantonoff('DIGIRISKDOLIBARR_TASK_MANAGEMENT');
 print '</td>';
 print '</tr>';
 
@@ -473,12 +438,7 @@ print $langs->trans('ShowTaskStartDateDescription');
 print '</td>';
 
 print '<td class="center">';
-if ($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_START_DATE) {
-	print '<a class="reposition" href="'.$_SERVER["PHP_SELF"].'?action=setshowtaskstartdate&value=0" alt="'.$langs->trans("Default").'">'.img_picto($langs->trans("Activated"), 'switch_on').'</a>';
-}
-else {
-	print '<a class="reposition" href="'.$_SERVER["PHP_SELF"].'?action=setshowtaskstartdate&value=1" alt="'.$langs->trans("Default").'">'.img_picto($langs->trans("Disabled"), 'switch_off').'</a>';
-}
+print ajax_constantonoff('DIGIRISKDOLIBARR_SHOW_TASK_START_DATE');
 print '</td>';
 print '</tr>';
 
@@ -489,12 +449,7 @@ print $langs->trans('ShowTaskEndDateDescription');
 print '</td>';
 
 print '<td class="center">';
-if ($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_END_DATE) {
-	print '<a class="reposition" href="'.$_SERVER["PHP_SELF"].'?action=setshowtaskenddate&value=0" alt="'.$langs->trans("Default").'">'.img_picto($langs->trans("Activated"), 'switch_on').'</a>';
-}
-else {
-	print '<a class="reposition" href="'.$_SERVER["PHP_SELF"].'?action=setshowtaskenddate&value=1" alt="'.$langs->trans("Default").'">'.img_picto($langs->trans("Disabled"), 'switch_off').'</a>';
-}
+print ajax_constantonoff('DIGIRISKDOLIBARR_SHOW_TASK_END_DATE');
 print '</td>';
 print '</tr>';
 
@@ -505,12 +460,7 @@ print $langs->trans('ShowTaskProgressDescription') .' %';
 print '</td>';
 
 print '<td class="center">';
-if ($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_PROGRESS) {
-	print '<a class="reposition" href="'.$_SERVER["PHP_SELF"].'?action=setshowtaskprogress&value=0" alt="'.$langs->trans("Default").'">'.img_picto($langs->trans("Activated"), 'switch_on').'</a>';
-}
-else {
-	print '<a class="reposition" href="'.$_SERVER["PHP_SELF"].'?action=setshowtaskprogress&value=1" alt="'.$langs->trans("Default").'">'.img_picto($langs->trans("Disabled"), 'switch_off').'</a>';
-}
+print ajax_constantonoff('DIGIRISKDOLIBARR_SHOW_TASK_PROGRESS');
 print '</td>';
 print '</tr>';
 
@@ -521,12 +471,7 @@ print $langs->trans('ShowAllTasksDescription');
 print '</td>';
 
 print '<td class="center">';
-if ($conf->global->DIGIRISKDOLIBARR_SHOW_ALL_TASKS) {
-	print '<a class="reposition" href="'.$_SERVER["PHP_SELF"].'?action=setshowalltasks&value=0" alt="'.$langs->trans("Default").'">'.img_picto($langs->trans("Activated"), 'switch_on').'</a>';
-}
-else {
-	print '<a class="reposition" href="'.$_SERVER["PHP_SELF"].'?action=setshowalltasks&value=1" alt="'.$langs->trans("Default").'">'.img_picto($langs->trans("Disabled"), 'switch_off').'</a>';
-}
+print ajax_constantonoff('DIGIRISKDOLIBARR_SHOW_ALL_TASKS');
 print '</td>';
 print '</tr>';
 print '</table>';
