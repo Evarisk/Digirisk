@@ -294,7 +294,7 @@ if ($action == 'create') {
 	print '</td></tr>';
 
 	print '<tr><td class="fieldrequired">'.$langs->trans("ParentElement").'</td><td>';
-	print '<input hidden class="flat" type="text" size="36" name="fk_parent" id="fk_parent">';
+	print '<input hidden class="flat" type="text" size="36" name="parent" id="parent">';
 	print $object->getNomUrl(1, 'blank', 1);
 	print '</td></tr>';
 
