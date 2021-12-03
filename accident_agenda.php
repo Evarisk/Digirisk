@@ -132,7 +132,7 @@ if ($object->id > 0) {
 	// Object card
 	// ------------------------------------------------------------
 	dol_strlen($object->label) ? $morehtmlref = ' - ' . $object->label : '';
-	digirisk_banner_tab($object, 'ref', '', 0, 'ref', 'ref', $morehtmlref, '', 0, '', $object->getLibStatut(5));
+	digirisk_banner_tab($object, 'ref', '', 0, 'ref', 'ref', $morehtmlref);
 
 	print '<div class="fichecenter">';
 	print '<div class="underbanner clearboth"></div>';

@@ -71,11 +71,8 @@ $fk_parent           = GETPOST('fk_parent', 'int');
 
 // Initialize technical objects
 $object                 = new Accident($db);
-$preventionplan         = new PreventionPlan($db);
-$preventionplanline     = new PreventionPlanLine($db);
 $objectline             = new AccidentWorkStop($db);
 //$accidentdocument     = new AccidentDocument($db);
-$risk                   = new Risk($db);
 $contact                = new Contact($db);
 $usertmp                = new User($db);
 $thirdparty             = new Societe($db);
@@ -863,6 +860,29 @@ print $formconfirm;
 
 // Part to show record
 if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
+
+	$counter = 0;
+
+	$morecssGauge = 'inline-block floatright';
+	$move_title_gauge = 1;
+
+	$arrayAccident = array();
+	$arrayAccident[] = $object->ref;
+	$arrayAccident[] = $object->label;
+	$arrayAccident[] = $object->accident_date;
+	$arrayAccident[] = $object->description;
+	$arrayAccident[] = $object->photo;
+	$arrayAccident[] = $object->fk_element;
+	$arrayAccident[] = $object->fk_user_victim;
+
+	$maxnumber  = count($arrayAccident);
+
+	foreach ($arrayAccident as $arrayAccidentData) {
+		if (dol_strlen($arrayAccidentData) > 0 ) {
+			$counter += 1;
+		}
+	}
+
 	// Object card
 	// ------------------------------------------------------------
 	$res = $object->fetch_optionals();
@@ -877,7 +897,9 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	$morehtmlref .= $langs->trans('Project').' : '.getNomUrlProject($project, 1, 'blank');
 	$morehtmlref .= '</div>';
 
-	digirisk_banner_tab($object, 'ref', '', 0, 'ref', 'ref', $morehtmlref, '', 0, '', $object->getLibStatut(5));
+	include_once './core/tpl/digiriskdolibarr_configuration_gauge_view.tpl.php';
+
+	digirisk_banner_tab($object, 'ref', '', 0, 'ref', 'ref', $morehtmlref);
 
 	print '<div class="div-table-responsive">';
 	print '<div class="fichecenter">';
@@ -951,18 +973,6 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 
 		if (empty($reshook)) {
 			print '<a class="' . ($object->status == 1 ? 'butAction' : 'butActionRefused classfortooltip') . '" id="actionButtonEdit" title="' . ($object->status == 1 ? '' : dol_escape_htmltag($langs->trans("AccidentMustBeInProgress"))) . '" href="' . ($object->status == 1 ? ($_SERVER["PHP_SELF"] . '?id=' . $object->id . '&action=edit') : '#') . '">' . $langs->trans("Modify") . '</a>';
-			print '<span class="' . ($object->status == 1 ? 'butAction' : 'butActionRefused classfortooltip') . '" id="' . ($object->status == 1 ? 'actionButtonPendingSignature' : '') . '" title="' . ($object->status == 1 ? '' : dol_escape_htmltag($langs->trans("AccidentMustBeInProgressToValidate"))) . '" href="' . ($object->status == 1 ? ($_SERVER["PHP_SELF"] . '?id=' . $object->id . '&action=setPendingSignature') : '#') . '">' . $langs->trans("Validate") . '</span>';
-			print '<span class="' . ($object->status == 2 ? 'butAction' : 'butActionRefused classfortooltip') . '" id="' . ($object->status == 2 ? 'actionButtonInProgress' : '') . '" title="' . ($object->status == 2 ? '' : dol_escape_htmltag($langs->trans("AccidentMustBeValidated"))) . '" href="' . ($object->status == 2 ? ($_SERVER["PHP_SELF"] . '?id=' . $object->id . '&action=setInProgress') : '#') . '">' . $langs->trans("ReOpenDigi") . '</span>';
-			print '<a class="' . (($object->status == 2 && !$signatory->checkSignatoriesSignatures($object->id)) ? 'butAction' : 'butActionRefused classfortooltip') . '" id="actionButtonSign" title="' . (($object->status == 2 && !$signatory->checkSignatoriesSignatures($object->id)) ? '' : dol_escape_htmltag($langs->trans("AccidentMustBeValidatedToSign"))) . '" href="' . (($object->status == 2 && !$signatory->checkSignatoriesSignatures($object->id)) ? $url : '#') . '">' . $langs->trans("Sign") . '</a>';
-			print '<span class="' . (($object->status == 2 && $signatory->checkSignatoriesSignatures($object->id)) ? 'butAction' : 'butActionRefused classfortooltip') . '" id="' . (($object->status == 2 && $signatory->checkSignatoriesSignatures($object->id)) ? 'actionButtonLock' : '') . '" title="' . (($object->status == 2 && $signatory->checkSignatoriesSignatures($object->id)) ? '' : dol_escape_htmltag($langs->trans("AllSignatoriesMustHaveSigned"))) . '">' . $langs->trans("Lock") . '</span>';
-			print '<a class="' . ($object->status == 3 ? 'butAction' : 'butActionRefused classfortooltip') . '" id="actionButtonSign" title="' . dol_escape_htmltag($langs->trans("AccidentMustBeLockedToSendEmail")) . '" href="' . ($object->status == 3 ? ($_SERVER['PHP_SELF'] . '?id=' . $object->id . '&action=presend&mode=init#formmailbeforetitle&sendto=' . $allLinks['LabourInspectorSociety']->id[0]) : '#') . '">' . $langs->trans('SendMail') . '</a>';
-			print '<a class="' . ($object->status == 3 ? 'butAction' : 'butActionRefused classfortooltip') . '" id="actionButtonClose" title="' . ($object->status == 3 ? '' : dol_escape_htmltag($langs->trans("AccidentMustBeLocked"))) . '" href="' . ($object->status == 3 ? ($_SERVER["PHP_SELF"] . '?id=' . $object->id . '&action=setArchived') : '#') . '">' . $langs->trans("Close") . '</a>';
-			print '<span class="butAction" id="actionButtonClone" title="" href="'.$_SERVER["PHP_SELF"] . '?id=' . $object->id . '&action=clone'.'">' . $langs->trans("ToClone") . '</span>';
-
-			$langs->load("mails");
-			if ($object->date_end == dol_now()) {
-				$object->setArchived($user, false);
-			}
 		}
 		print '</div>';
 

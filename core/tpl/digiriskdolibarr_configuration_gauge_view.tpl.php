@@ -1,9 +1,11 @@
-<div class="chart-container" style=" width:50px">
+<div class="chart-container <?php echo $morecssGauge ?>" style=" width:50px">
 	<div class="wpeo-gridlayout grid-2">
 		<canvas class="" id="advancementGauge" width="40" height="40" style="width:50px !important"></canvas>
-		<h3 class="">
-			<?php echo bcdiv((($counter / $maxnumber) * 100), 1, 2) . '%' ?>
-		</h3>
+		<?php if (empty($move_title_gauge)) : ?>
+			<h3 class="">
+				<?php echo bcdiv((($counter / $maxnumber) * 100), 1, 2) . '%' ?>
+			</h3>
+		<?php endif; ?>
 	</div>
 
 	<script>
@@ -37,4 +39,10 @@
 			width: 100
 		});
 	</script>
+
+	<?php if ($move_title_gauge) : ?>
+		<h3 class="">
+			<?php echo bcdiv((($counter / $maxnumber) * 100), 1, 2) . '%' ?>
+		</h3>
+	<?php endif; ?>
 </div>

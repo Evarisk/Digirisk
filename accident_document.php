@@ -131,7 +131,7 @@ if ($object->id) {
 	$morehtmlref .= $langs->trans('Project').' : '.getNomUrlProject($project, 1, 'blank');
 	$morehtmlref .= '</div>';
 
-	digirisk_banner_tab($object, 'ref', '', 0, 'ref', 'ref', $morehtmlref, '', 0, '', $object->getLibStatut(5));
+	digirisk_banner_tab($object, 'ref', '', 0, 'ref', 'ref', $morehtmlref);
 
 	print '<div class="fichecenter">';
 	print '<table class="border centpercent tableforfield">';

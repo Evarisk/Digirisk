@@ -52,10 +52,10 @@ function accidentPrepareHead($object)
 		$head[$h][2] = 'accidentDocument';
 		$h++;
 
-		$head[$h][0] = dol_buildpath("/digiriskdolibarr/accident_document_metadata.php", 1) . '?id=' . $object->id;
-		$head[$h][1] = '<i class="fas fa-file-alt"></i> ' . $langs->trans("DocumentsMetaData");
-		$head[$h][2] = 'accidentDocumentMetaData';
-		$h++;
+//		$head[$h][0] = dol_buildpath("/digiriskdolibarr/accident_document_metadata.php", 1) . '?id=' . $object->id;
+//		$head[$h][1] = '<i class="fas fa-file-alt"></i> ' . $langs->trans("DocumentsMetaData");
+//		$head[$h][2] = 'accidentDocumentMetaData';
+//		$h++;
 
 		$head[$h][0] = dol_buildpath("/digiriskdolibarr/accident_agenda.php", 1) . '?id=' . $object->id;
 		$head[$h][1] = '<i class="fas fa-calendar"></i> ' . $langs->trans("Events");
