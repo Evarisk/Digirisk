@@ -61,7 +61,7 @@ if (!empty ($lastEvaluation) && $lastEvaluation > 0) {
 		</div>
 		<!-- RISK ASSESSMENT MEDIAS MODAL START-->
 		<div class="risk-evaluation-medias-modal" style="z-index:1500" value="<?php echo $lastEvaluation->id ?>">
-			<div class="wpeo-modal modal-risk"  id="risk_assessment_medias_modal_<?php echo $lastEvaluation->id ?>" value="<?php echo $risk->id ?>" style="z-index: 1005 !important">
+			<div class="wpeo-modal modal-risk"  id="risk_assessment_medias_modal_<?php echo $lastEvaluation->id ?>" value="<?php echo $risk->id ?>">
 				<div class="modal-container wpeo-modal-event">
 					<!-- Modal-Header -->
 					<div class="modal-header">
@@ -105,7 +105,7 @@ if (!empty ($lastEvaluation) && $lastEvaluation > 0) {
 			foreach ($cotationList as $cotation) : ?>
 				<!-- RISK EVALUATION EDIT MODAL START-->
 				<div class="risk-evaluation-edit-modal" value="<?php echo $cotation->id ?>">
-					<div class="wpeo-modal modal-risk" id="risk_evaluation_edit<?php echo $cotation->id ?>" value="<?php echo $risk->id ?>" style="z-index: 1005 !important">
+					<div class="wpeo-modal modal-risk" id="risk_evaluation_edit<?php echo $cotation->id ?>" value="<?php echo $risk->id ?>">
 						<div class="modal-container wpeo-modal-event">
 							<!-- Modal-Header -->
 							<div class="modal-header">

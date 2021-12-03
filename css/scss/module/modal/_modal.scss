@@ -28,6 +28,16 @@
       transform: translate(-50%, -50%);
     }
   }
+
+  // Fix 2eme niveau modal.
+  &.modal-active .modal-active {
+    z-index: 1003;
+  }
+  // Fix 3eme niveau modal.
+  &.modal-active .modal-active .modal-active {
+    z-index: 1004;
+  }
+
   &.modal-force-display {
     .modal-close {
       display: none;

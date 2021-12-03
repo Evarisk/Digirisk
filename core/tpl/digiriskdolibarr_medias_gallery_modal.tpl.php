@@ -1,6 +1,6 @@
 
 <!-- START MEDIA GALLERY MODAL -->
-<div class="wpeo-modal modal-photo" id="media_gallery" style="z-index: 2014 !important" data-id="<?php echo $object->id ?>">
+<div class="wpeo-modal modal-photo" id="media_gallery" data-id="<?php echo $object->id ?>">
 	<div class="modal-container wpeo-modal-event">
 		<!-- Modal-Header -->
 		<div class="modal-header">

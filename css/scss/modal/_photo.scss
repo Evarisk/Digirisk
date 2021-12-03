@@ -1,4 +1,9 @@
 .wpeo-modal.modal-photo {
+
+  &.modal-active {
+    z-index: 2014;
+  }
+
   .clickable-photo {
     border: 5px solid #fff;
     transition: all 0.2s ease-out;
