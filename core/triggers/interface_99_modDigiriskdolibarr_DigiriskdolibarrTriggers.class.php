@@ -266,15 +266,22 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				break;
 
 			case 'DIGIRISKELEMENT_CREATE' :
+				dol_syslog("Trigger '".$this->name."' for action '$action' launched by ".__FILE__.". id=".$object->id);
+				require_once DOL_DOCUMENT_ROOT.'/comm/action/class/actioncomm.class.php';
+				$now = dol_now();
+				$actioncomm = new ActionComm($this->db);
 
-				if ( $object->element_type == 'groupment' ) {
-					$object->call_trigger('GROUPMENT_CREATE', $user);
-				}
+				$actioncomm->elementtype = 'digiriskelement@digiriskdolibarr';
+				$actioncomm->elementid   = $object->id;
+				$actioncomm->code        = 'AC_DIGIRISKELEMENT_CREATE';
+				$actioncomm->type_code   = 'AC_OTH_AUTO';
+				$actioncomm->label       = $langs->trans($object->element_type . 'CreatedWithDolibarr');
+				$actioncomm->datep       = $now;
+				$actioncomm->fk_element  = $object->id;
+				$actioncomm->userownerid = $user->id;
+				$actioncomm->percentage  = -1;
 
-				if ( $object->element_type == 'workunit' ) {
-					$object->call_trigger('WORKUNIT_CREATE', $user);
-				}
-
+				$actioncomm->create($user);
 				break;
 
 			case 'SIGNATURE_GENERATE' :
