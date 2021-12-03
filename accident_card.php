@@ -784,7 +784,7 @@ if (($id || $ref) && $action == 'edit') {
 
 	//Description -- Description
 	print '<tr class="content_field"><td><label for="content">'.$langs->trans("Description").'</label></td><td>';
-	$doleditor = new DolEditor('description', GETPOST('description'), '', 90, 'dolibarr_details', '', false, true, $conf->global->FCKEDITOR_ENABLE_SOCIETE, ROWS_3, '90%');
+	$doleditor = new DolEditor('description', $object->description, '', 90, 'dolibarr_details', '', false, true, $conf->global->FCKEDITOR_ENABLE_SOCIETE, ROWS_3, '90%');
 	$doleditor->Create();
 	print '</td></tr>';
 
