@@ -16,9 +16,9 @@
  */
 
 /**
- * \file    admin/preventionplan.php
+ * \file    admin/firepermit.php
  * \ingroup digiriskdolibarr
- * \brief   Digiriskdolibarr preventionplan page.
+ * \brief   Digiriskdolibarr firepermit page.
  */
 
 // Load Dolibarr environment
@@ -55,7 +55,7 @@ $action     = GETPOST('action', 'alpha');
 $backtopage = GETPOST('backtopage', 'alpha');
 $value      = GETPOST('value', 'alpha');
 
-$type          = 'preventionplan';
+$type          = 'firepermit';
 $error         = 0;
 
 // Initialize technical objects
@@ -66,10 +66,10 @@ $usertmp = new User($db);
  */
 
 if (($action == 'update' && !GETPOST("cancel", 'alpha')) || ($action == 'updateedit')) {
-	$PPRProject = GETPOST('PPRProject', 'none');
-	$PPRProject  = preg_split('/_/', $PPRProject);
+	$FPRProject = GETPOST('FPRProject', 'none');
+	$FPRProject  = preg_split('/_/', $FPRProject);
 
-	dolibarr_set_const($db, "DIGIRISKDOLIBARR_PREVENTIONPLAN_PROJECT", $PPRProject[0], 'integer', 0, '', $conf->entity);
+	dolibarr_set_const($db, "DIGIRISKDOLIBARR_FIREPERMIT_PROJECT", $FPRProject[0], 'integer', 0, '', $conf->entity);
 
 	if ($action != 'updateedit' && !$error)
 	{
@@ -79,10 +79,10 @@ if (($action == 'update' && !GETPOST("cancel", 'alpha')) || ($action == 'updatee
 }
 
 if ($action == 'updateMask') {
-	$maskconstpreventionplan = GETPOST('maskconstpreventionplan', 'alpha');
-	$maskpreventionplan      = GETPOST('maskpreventionplan', 'alpha');
+	$maskconstfirepermit = GETPOST('maskconstfirepermit', 'alpha');
+	$maskfirepermit      = GETPOST('maskfirepermit', 'alpha');
 
-	if ($maskconstpreventionplan) $res = dolibarr_set_const($db, $maskconstpreventionplan, $maskpreventionplan, 'chaine', 0, '', $conf->entity);
+	if ($maskconstfirepermit) $res = dolibarr_set_const($db, $maskconstfirepermit, $maskfirepermit, 'chaine', 0, '', $conf->entity);
 
 	if (!$res > 0) $error++;
 
@@ -98,8 +98,8 @@ if ($action == 'setmod') {
 	dolibarr_set_const($db, $constforval, $value, 'chaine', 0, '', $conf->entity);
 }
 
-if ($action == 'setmodPreventionPlanDet') {
-	$constforval = 'DIGIRISKDOLIBARR_'.strtoupper('preventionplandet')."_ADDON";
+if ($action == 'setmodFirePermitDet') {
+	$constforval = 'DIGIRISKDOLIBARR_'.strtoupper('firepermitdet')."_ADDON";
 	dolibarr_set_const($db, $constforval, $value, 'chaine', 0, '', $conf->entity);
 }
 
@@ -129,7 +129,7 @@ if (!empty($conf->projet->enabled)) { $formproject = new FormProjets($db); }
 $form = new Form($db);
 
 $help_url = 'FR:Module_DigiriskDolibarr#L.27onglet_.C3.89l.C3.A9ment_Digirisk';
-$title    = $langs->trans("DigiriskElement") . ' - ' . $langs->trans("PreventionPlan");
+$title    = $langs->trans("FirePermit");
 
 $morejs   = array("/digiriskdolibarr/js/digiriskdolibarr.js.php");
 $morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");
@@ -143,11 +143,9 @@ print load_fiche_titre($title, $linkback, 'digiriskdolibarr32px@digiriskdolibarr
 
 // Configuration header
 $head = digiriskdolibarrAdminPrepareHead();
-print dol_get_fiche_head($head, 'digiriskelement', '', -1, "digiriskdolibarr@digiriskdolibarr");
-$head = digiriskdolibarrAdminDigiriskElementPrepareHead();
-print dol_get_fiche_head($head, 'preventionplan', '', -1, "digiriskdolibarr@digiriskdolibarr");
+print dol_get_fiche_head($head, 'firepermit', '', -1, "digiriskdolibarr@digiriskdolibarr");
 
-print load_fiche_titre($langs->trans("PreventionPlanManagement"), '', '');
+print load_fiche_titre($langs->trans("FirePermitManagement"), '', '');
 
 print '<form method="POST" action="'.$_SERVER["PHP_SELF"].'" name="social_form">';
 print '<input type="hidden" name="token" value="'.newToken().'">';
@@ -162,8 +160,8 @@ print '</tr>';
 // Project
 if (!empty($conf->projet->enabled)) {
 	$langs->load("projects");
-	print '<tr class="oddeven"><td><label for="PPRProject">'.$langs->trans("PPRProject").'</label></td><td>';
-	$numprojet = $formproject->select_projects(0,  $conf->global->DIGIRISKDOLIBARR_PREVENTIONPLAN_PROJECT, 'PPRProject', 0, 0, 0, 0, 0, 0, 0, '', 0, 0, 'maxwidth500');
+	print '<tr class="oddeven"><td><label for="FPRProject">'.$langs->trans("FPRProject").'</label></td><td>';
+	$numprojet = $formproject->select_projects(0,  $conf->global->DIGIRISKDOLIBARR_FIREPERMIT_PROJECT, 'FPRProject', 0, 0, 0, 0, 0, 0, 0, '', 0, 0, 'maxwidth500');
 	print ' <a href="'.DOL_URL_ROOT.'/projet/card.php?&action=create&status=1&backtopage='.urlencode($_SERVER["PHP_SELF"].'?action=create').'"><span class="fa fa-plus-circle valignmiddle" title="'.$langs->trans("AddProject").'"></span></a>';
 	print '<td><input type="submit" class="button" name="save" value="'.$langs->trans("Save").'">';
 	print '</td></tr>';
@@ -173,10 +171,10 @@ print '</table>';
 print '</form>';
 
 /*
- *  Numbering module Prevention Plan
+ *  Numbering module
  */
 
-print load_fiche_titre($langs->trans("DigiriskPreventionPlanNumberingModule"), '', '');
+print load_fiche_titre($langs->trans("DigiriskFirePermitNumberingModule"), '', '');
 
 print '<table class="noborder centpercent">';
 print '<tr class="liste_titre">';
@@ -221,7 +219,7 @@ if (is_dir($dir)) {
 						print '</td>';
 
 						print '<td class="center">';
-						if ($conf->global->DIGIRISKDOLIBARR_PREVENTIONPLAN_ADDON == $file || $conf->global->DIGIRISKDOLIBARR_PREVENTIONPLAN_ADDON.'.php' == $file) {
+						if ($conf->global->DIGIRISKDOLIBARR_FIREPERMIT_ADDON == $file || $conf->global->DIGIRISKDOLIBARR_FIREPERMIT_ADDON.'.php' == $file) {
 							print img_picto($langs->trans("Activated"), 'switch_on');
 						}
 						else {
@@ -246,7 +244,7 @@ if (is_dir($dir)) {
 
 						print '<td class="center">';
 						print $form->textwithpicto('', $htmltooltip, 1, 0);
-						if ($conf->global->DIGIRISKDOLIBARR_PREVENTIONPLAN_ADDON.'.php' == $file) { // If module is the one used, we show existing errors
+						if ($conf->global->DIGIRISKDOLIBARR_FIREPERMIT_ADDON.'.php' == $file) { // If module is the one used, we show existing errors
 							if (!empty($module->error)) dol_htmloutput_mesg($module->error, '', 'error', 1);
 						}
 						print '</td>';
@@ -262,10 +260,10 @@ if (is_dir($dir)) {
 print '</table>';
 
 /*
- *  Numbering module Prevention Plan Det
+ *  Numbering module Fire Permit Det
  */
 
-print load_fiche_titre($langs->trans("DigiriskPreventionPlanDetNumberingModule"), '', '');
+print load_fiche_titre($langs->trans("DigiriskFirePermitDetNumberingModule"), '', '');
 
 print '<table class="noborder centpercent">';
 print '<tr class="liste_titre">';
@@ -277,7 +275,7 @@ print '<td class="center">'.$langs->trans("ShortInfo").'</td>';
 print '</tr>';
 
 clearstatcache();
-$dir = dol_buildpath("/custom/digiriskdolibarr/core/modules/digiriskdolibarr/digiriskelement/preventionplandet/");
+$dir = dol_buildpath("/custom/digiriskdolibarr/core/modules/digiriskdolibarr/digiriskelement/firepermitdet/");
 if (is_dir($dir)) {
 	$handle = opendir($dir);
 	if (is_resource($handle)) {
@@ -310,11 +308,11 @@ if (is_dir($dir)) {
 						print '</td>';
 
 						print '<td class="center">';
-						if ($conf->global->DIGIRISKDOLIBARR_PREVENTIONPLANDET_ADDON == $file || $conf->global->DIGIRISKDOLIBARR_PREVENTIONPLANDET_ADDON.'.php' == $file) {
+						if ($conf->global->DIGIRISKDOLIBARR_FIREPERMITDET_ADDON == $file || $conf->global->DIGIRISKDOLIBARR_FIREPERMITDET_ADDON.'.php' == $file) {
 							print img_picto($langs->trans("Activated"), 'switch_on');
 						}
 						else {
-							print '<a class="reposition" href="'.$_SERVER["PHP_SELF"].'?action=setmodPreventionPlanDet&value='.preg_replace('/\.php$/', '', $file).'&scan_dir='.$module->scandir.'&label='.urlencode($module->name).'" alt="'.$langs->trans("Default").'">'.img_picto($langs->trans("Disabled"), 'switch_off').'</a>';
+							print '<a class="reposition" href="'.$_SERVER["PHP_SELF"].'?action=setmodFirePermitDet&value='.preg_replace('/\.php$/', '', $file).'&scan_dir='.$module->scandir.'&label='.urlencode($module->name).'" alt="'.$langs->trans("Default").'">'.img_picto($langs->trans("Disabled"), 'switch_off').'</a>';
 						}
 						print '</td>';
 
@@ -335,7 +333,7 @@ if (is_dir($dir)) {
 
 						print '<td class="center">';
 						print $form->textwithpicto('', $htmltooltip, 1, 0);
-						if ($conf->global->DIGIRISKDOLIBARR_PREVENTIONPLANDET_ADDON.'.php' == $file) {  // If module is the one used, we show existing errors
+						if ($conf->global->DIGIRISKDOLIBARR_FIREPERMITDET_ADDON.'.php' == $file) {  // If module is the one used, we show existing errors
 							if (!empty($module->error)) dol_htmloutput_mesg($module->error, '', 'error', 1);
 						}
 						print '</td>';
@@ -350,9 +348,9 @@ if (is_dir($dir)) {
 
 print '</table>';
 
-print load_fiche_titre($langs->trans("PreventionPlanData"), '', '');
+print load_fiche_titre($langs->trans("FirePermitData"), '', '');
 
-print '<form method="POST" action="'.$_SERVER["PHP_SELF"].'" name="prevention_plan_data">';
+print '<form method="POST" action="'.$_SERVER["PHP_SELF"].'" name="fire_permit_data">';
 print '<input type="hidden" name="token" value="'.newToken().'">';
 print '<input type="hidden" name="action" value="setMaitreOeuvre">';
 print '<table class="noborder centpercent editmode">';
@@ -365,9 +363,9 @@ print '</tr>';
 
 print '<tr class="oddeven"><td><label for="MaitreOeuvre">'.$langs->trans("MaitreOeuvre").'</label></td>';
 print '<td>'.$langs->trans("MaitreOeuvreDescription").'</td>';
-$userlist = $form->select_dolusers((!empty($conf->global->DIGIRISKDOLIBARR_PREVENTIONPLAN_MAITRE_OEUVRE) ? $conf->global->DIGIRISKDOLIBARR_PREVENTIONPLAN_MAITRE_OEUVRE : $user->id), '', 0, null, 0, '', '', $conf->entity, 0, 0, 'AND u.statut = 1', 0, '', 'minwidth300', 0, 1);
+$userlist = $form->select_dolusers((!empty($conf->global->DIGIRISKDOLIBARR_FIREPERMIT_MAITRE_OEUVRE) ? $conf->global->DIGIRISKDOLIBARR_FIREPERMIT_MAITRE_OEUVRE : $user->id), '', 0, null, 0, '', '', $conf->entity, 0, 0, 'AND u.statut = 1', 0, '', 'minwidth300', 0, 1);
 print '<td>';
-print $form->selectarray('maitre_oeuvre', $userlist, (!empty($conf->global->DIGIRISKDOLIBARR_PREVENTIONPLAN_MAITRE_OEUVRE) ? $conf->global->DIGIRISKDOLIBARR_PREVENTIONPLAN_MAITRE_OEUVRE : $user->id), $langs->trans('SelectUser'), null, null, null, "40%", 0,0,'','minwidth300',1);
+print $form->selectarray('maitre_oeuvre', $userlist, (!empty($conf->global->DIGIRISKDOLIBARR_FIREPERMIT_MAITRE_OEUVRE) ? $conf->global->DIGIRISKDOLIBARR_FIREPERMIT_MAITRE_OEUVRE : $user->id), $langs->trans('SelectUser'), null, null, null, "40%", 0,0,'','minwidth300',1);
 print ' <a href="'.DOL_URL_ROOT.'/user/card.php?action=create&backtopage='.urlencode($_SERVER["PHP_SELF"].'?action=create').'" target="_blank"><span class="fa fa-plus-circle valignmiddle paddingleft" title="'.$langs->trans("AddUser").'"></span></a>';
 print '</td>';
 print '<td><input type="submit" class="button" name="save" value="'.$langs->trans("Save").'">';

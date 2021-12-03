@@ -211,7 +211,7 @@ ActionsOnLegalDisplay = Événements liés à l'affichage légal
 LegalDisplayGeneratedWithDolibarr = Affichage légal généré avec Dolibarr
 
 # Mod Numbering - Modèle de numérotation
-DigiriskLegalDisplayNumberingModule = Modèle de numérotation des affichages légaux de Digirisk
+DigiriskLegalDisplayDocumentNumberingModule = Modèle de numérotation des affichages légaux de Digirisk
 DigiriskNumberingDate = Fixe la référence comme étant la date et l'heure de création.
 DigiriskLegalDisplayStandardModel = Renvoie le numéro sous la forme LDn où n est un compteur séquentiel sans rupture et sans remise à 0.
 
@@ -261,7 +261,7 @@ ActionsOnInformationsSharing = Événements liés à la diffusion d'informations
 InformationsSharingGeneratedWithDolibarr = Diffusion d'informations générée avec Dolibarr
 
 # Mod Numbering - Modèle de numérotation
-DigiriskInformationsSharingNumberingModule = Modèle de numérotation des diffusions d'information de Digirisk
+DigiriskInformationsSharingDocumentNumberingModule = Modèle de numérotation des diffusions d'information de Digirisk
 DigiriskInformationsSharingStandardModel = Renvoie le numéro sous la forme ISn où n est un compteur séquentiel sans rupture et sans remise à 0.
 
 # ODT Template - Template ODT
@@ -664,7 +664,7 @@ DeleteListingRisksPhoto = Supprimer les listing des risques avec photos
 ListingRisksPhotoGeneratedWithDolibarr = Listing de risques photo généré avec Dolibarr
 
 # Mod Numbering - Modèle de numérotation
-DigiriskListingRisksPhotoNumberingModule = Modèle de numérotation des listing des risques photo de Digirisk
+DigiriskListingRisksPhotoDocumentNumberingModule = Modèle de numérotation des listing des risques photo de Digirisk
 DigiriskListingRisksPhotoStandardModel = Renvoie le numéro sous la forme RLPn où n est un compteur séquentiel sans rupture et sans remise à 0.
 
 # ODT Template - Template ODT
@@ -690,7 +690,7 @@ DeleteListingRisksAction = Supprimer les listing des risques avec actions correc
 ListingRisksActionGeneratedWithDolibarr = Listing de risques actions correctives généré avec Dolibarr
 
 # Mod Numbering - Modèle de numérotation
-DigiriskListingRisksActionNumberingModule = Modèle de numérotation des listing des actions correctives de Digirisk
+DigiriskListingRisksActionDocumentNumberingModule = Modèle de numérotation des listing des actions correctives de Digirisk
 DigiriskListingRisksActionStandardModel = Renvoie le numéro sous la forme RLAn où n est un compteur séquentiel sans rupture et sans remise à 0.
 
 # ODT Template - Template ODT
@@ -839,8 +839,8 @@ NewGroupment = Nouveau groupement
 ModifyGroupment = Modifier groupement
 TrashGroupment = Groupement poubelle
 DeletedElements = Corbeille
-DeletedDigiriskElement = Groupements / Unités de travail placées dans la corbeille
-ShowDeletedDigiriskElement = Afficher les groupements / unités de travail qui se trouve dans la corbeille
+DeletedDigiriskElement = Groupements / Unités de travail placés dans la corbeille
+ShowDeletedDigiriskElement = Afficher les groupements / unités de travail qui se trouvent dans la corbeille
 
 #
 # WorkUnit - Unité de travail
@@ -945,6 +945,7 @@ DigiriskRiskStandardModel = Renvoie le numéro sous la forme RKn où n est un co
 # Data - Donnée
 Risks = Risques
 Risk = Risque
+RiskConfig = Configuration des données des risques
 TheRisk = Le risque
 RiskWellCreated = Risque créé
 RiskNotCreated = Erreur lors de la création du risque
@@ -996,6 +997,8 @@ DigiriskRiskAssessmentNumberingModule = Modèle de numérotation des évaluation
 
 # Data - Donnée
 RiskAssessment = Évaluation
+RiskAssessments = Évaluations
+RiskAssessmentConfig = Configuration des données des évaluations
 TheRiskAssessment = L'évaluation
 LastRiskAssessment = Dernière évaluation du risque
 RiskAssessmentWellCreated = Évaluation créée
@@ -1055,6 +1058,7 @@ DigiriskRiskSignNumberingModule = Modèle de numérotation des signalisation des
 # Data - Donnée
 RiskSign = Signalisation
 TheRiskSign = La signalisation
+RiskSignConfig = Configuration des données des signalisations
 RiskSignWellCreated = Signalisation créée
 RiskSignNotCreated = Erreur lors de la création de la signalisation
 RiskSignWellEdited = Signalisation éditée
@@ -1080,6 +1084,7 @@ DigiriskElementRiskSign = Signalisation
 ActionPlan = Plan d'action
 Task = Tâche
 TheTask = La tâche
+TaskConfig = Configuration des données des tâches
 TaskWellCreated = Tâche créée
 TaskNotCreated = Erreur lors de la création de la tâche
 TaskWellEdited = Tâche éditée

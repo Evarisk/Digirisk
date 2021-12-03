@@ -16,9 +16,9 @@
  */
 
 /**
- * \file    admin/groupmentdocument.php
+ * \file    admin/firepermitdocument.php
  * \ingroup digiriskdolibarr
- * \brief   Digiriskdolibarr groupmentdocument page.
+ * \brief   Digiriskdolibarr firepermitdocument page.
  */
 
 // Load Dolibarr environment
@@ -54,7 +54,7 @@ $action     = GETPOST('action', 'alpha');
 $backtopage = GETPOST('backtopage', 'alpha');
 $value      = GETPOST('value', 'alpha');
 
-$type          = 'groupmentdocument';
+$type          = 'firepermitdocument';
 $error         = 0;
 
 /*
@@ -64,10 +64,10 @@ $error         = 0;
 include DOL_DOCUMENT_ROOT.'/core/actions_setmoduleoptions.inc.php';
 
 if ($action == 'updateMask') {
-	$maskconstgroupmentdocument = GETPOST('maskconstgroupmentdocument', 'alpha');
-	$maskgroupmentdocument      = GETPOST('maskgroupmentdocument', 'alpha');
+	$maskconstfirepermitdocument = GETPOST('maskconstfirepermitdocument', 'alpha');
+	$maskfirepermitdocument      = GETPOST('maskfirepermitdocument', 'alpha');
 
-	if ($maskconstgroupmentdocument) $res = dolibarr_set_const($db, $maskconstgroupmen,tdocument, $maskgroupmen,tdocument, 'chaine', 0, '', $conf->entity);
+	if ($maskconstfirepermitdocument) $res = dolibarr_set_const($db, $maskconstfirepermitdocument, $maskfirepermitdocument, 'chaine', 0, '', $conf->entity);
 
 	if (!$res > 0) $error++;
 
@@ -82,9 +82,9 @@ if ($action == 'updateMask') {
 if ($action == 'set') {
 	$label = GETPOST('label', 'alpha');
 
-	if ( $value == 'groupmentdocument_odt' ) {
+	if ( $value == 'firepermitdocument_odt' ) {
 		$description = "DIGIRISKDOLIBARR_".strtoupper($type)."_ADDON_ODT_PATH";
-	} elseif ( $value == 'groupmentdocument_custom_odt' ) {
+	} elseif ( $value == 'firepermitdocument_custom_odt' ) {
 		$description = "DIGIRISKDOLIBARR_".strtoupper($type)."_CUSTOM_ADDON_ODT_PATH";
 	}
 
@@ -98,14 +98,16 @@ if ($action == 'setdoc') {
 	$constforval = "DIGIRISKDOLIBARR_".strtoupper($type)."_DEFAULT_MODEL";
 	$label       = '';
 
-	if (dolibarr_set_const($db, $constforval, $value, 'chaine', 0, '', $conf->entity)) {
+	if (dolibarr_set_const($db, $constforval, $value, 'chaine', 0, '', $conf->entity))
+	{
 		$conf->global->$constforval = $value;
 	}
 
 	// On active le modele
 	$ret = delDocumentModel($value, $type);
 
-	if ($ret > 0) {
+	if ($ret > 0)
+	{
 		$ret = addDocumentModel($value, $type, $label);
 	}
 } elseif ($action == 'setmod') {
@@ -121,7 +123,7 @@ $form            = new Form($db);
 $object_document = new DigiriskDocuments($db);
 
 $help_url = 'FR:Module_DigiriskDolibarr#L.27onglet_Document_Digirisk';
-$title    = $langs->trans("YourDocuments"). ' - '. $langs->trans("GroupmentDocument");
+$title    = $langs->trans("YourDocuments"). ' - '. $langs->trans("FirePermitDocument");
 
 $morejs   = array("/digiriskdolibarr/js/digiriskdolibarr.js.php");
 $morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");
@@ -137,13 +139,13 @@ print load_fiche_titre($title, $linkback, 'digiriskdolibarr32px@digiriskdolibarr
 $head = digiriskdolibarrAdminPrepareHead();
 print dol_get_fiche_head($head, 'digiriskdocuments', '', -1, "digiriskdolibarr@digiriskdolibarr");
 $head = digiriskdolibarrAdminDigiriskDocumentsPrepareHead();
-print dol_get_fiche_head($head, 'groupmentdocument', '', -1, "digiriskdolibarr@digiriskdolibarr");
+print dol_get_fiche_head($head, 'firepermitdocument', '', -1, "digiriskdolibarr@digiriskdolibarr");
 
 /*
  *  Numbering module
  */
 
-print load_fiche_titre($langs->trans("DigiriskGroupmentDocumentNumberingModule"), '', '');
+print load_fiche_titre($langs->trans("DigiriskFirePermitDocumentNumberingModule"), '', '');
 
 print '<table class="noborder centpercent">';
 print '<tr class="liste_titre">';
@@ -189,7 +191,7 @@ if (is_dir($dir)) {
 						print '</td>';
 
 						print '<td class="center">';
-						if ($conf->global->DIGIRISKDOLIBARR_GROUPMENTDOCUMENT_ADDON == $file || $conf->global->DIGIRISKDOLIBARR_GROUPMENTDOCUMENT_ADDON.'.php' == $file) {
+						if ($conf->global->DIGIRISKDOLIBARR_FIREPERMITDOCUMENT_ADDON == $file || $conf->global->DIGIRISKDOLIBARR_FIREPERMITDOCUMENT_ADDON.'.php' == $file) {
 							print img_picto($langs->trans("Activated"), 'switch_on');
 						}
 						else {
@@ -214,7 +216,7 @@ if (is_dir($dir)) {
 
 						print '<td class="center">';
 						print $form->textwithpicto('', $htmltooltip, 1, 0);
-						if ($conf->global->DIGIRISKDOLIBARR_GROUPMENTDOCUMENT_ADDON.'.php' == $file) { // If module is the one used, we show existing errors
+						if ($conf->global->DIGIRISKDOLIBARR_FIREPERMITDOCUMENT_ADDON.'.php' == $file) { // If module is the one used, we show existing errors
 							if (!empty($module->error)) dol_htmloutput_mesg($module->error, '', 'error', 1);
 						}
 						print '</td>';
@@ -231,7 +233,7 @@ if (is_dir($dir)) {
 *  Documents models for Listing Risks Action
 */
 
-print load_fiche_titre($langs->trans("DigiriskTemplateDocumentGroupmentDocument"), '', '');
+print load_fiche_titre($langs->trans("DigiriskTemplateDocumentFirePermit"), '', '');
 
 // Defini tableau def des modeles
 $def = array();
@@ -250,7 +252,8 @@ if ($resql) {
 		$i++;
 	}
 }
-else {
+else
+{
 	dol_print_error($db);
 }
 
@@ -277,7 +280,7 @@ if (is_dir($dir)) {
 		arsort($filelist);
 
 		foreach ($filelist as $file) {
-			if (preg_match('/\.modules\.php$/i', $file) && preg_match('/^(pdf_|doc_)/', $file) && preg_match('/groupmentdocument/i', $file) && preg_match('/odt/i', $file)) {
+			if (preg_match('/\.modules\.php$/i', $file) && preg_match('/^(pdf_|doc_)/', $file) && preg_match('/firepermitdocument/i', $file) && preg_match('/odt/i', $file)) {
 				if (file_exists($dir.'/'.$file)) {
 					$name = substr($file, 4, dol_strlen($file) - 16);
 					$classname = substr($file, 0, dol_strlen($file) - 12);
@@ -292,7 +295,7 @@ if (is_dir($dir)) {
 					if ($modulequalified) {
 						print '<tr class="oddeven"><td>';
 						print (empty($module->name) ? $name : $module->name);
-						print "</td><td>\n";
+						print "</td><td>";
 						if (method_exists($module, 'info')) print $module->info($langs);
 						else print $module->description;
 						print '</td>';
@@ -305,7 +308,8 @@ if (is_dir($dir)) {
 							print '</a>';
 							print "</td>";
 						}
-						else {
+						else
+						{
 							print '<td class="center">';
 							print '<a href="'.$_SERVER["PHP_SELF"].'?action=set&amp;value='.$name.'&amp;scan_dir='.$module->scandir.'&amp;label='.urlencode($module->name).'">'.img_picto($langs->trans("Disabled"), 'switch_off').'</a>';
 							print "</td>";
@@ -313,7 +317,7 @@ if (is_dir($dir)) {
 
 						// Default
 						print '<td class="center">';
-						if ($conf->global->DIGIRISKDOLIBARR_GROUPMENTDOCUMENT_DEFAULT_MODEL == $name) {
+						if ($conf->global->DIGIRISKDOLIBARR_FIREPERMITDOCUMENT_DEFAULT_MODEL == $name) {
 							print img_picto($langs->trans("Default"), 'on');
 						}
 						else {

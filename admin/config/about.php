@@ -16,9 +16,9 @@
  */
 
 /**
- * \file    admin/digiriskdocuments/digiriskdocuments.php
+ * \file    admin/about.php
  * \ingroup digiriskdolibarr
- * \brief   Digiriskdolibarr digiriskdocuments page.
+ * \brief   About page of module Digiriskdolibarr.
  */
 
 // Load Dolibarr environment
@@ -36,14 +36,16 @@ if (!$res && file_exists("../../../main.inc.php")) $res = @include "../../../mai
 if (!$res && file_exists("../../../../main.inc.php")) $res = @include "../../../../main.inc.php";
 if (!$res) die("Include of main fails");
 
-global $langs, $user;
+global $langs, $user, $db;
 
 // Libraries
-require_once DOL_DOCUMENT_ROOT . "/core/lib/admin.lib.php";
+require_once DOL_DOCUMENT_ROOT.'/core/lib/admin.lib.php';
+require_once DOL_DOCUMENT_ROOT.'/core/lib/functions2.lib.php';
+require_once DOL_DOCUMENT_ROOT.'/includes/parsedown/Parsedown.php';
 require_once '../../lib/digiriskdolibarr.lib.php';
 
 // Translations
-$langs->loadLangs(array("admin", "digiriskdolibarr@digiriskdolibarr"));
+$langs->loadLangs(array("errors", "admin", "digiriskdolibarr@digiriskdolibarr"));
 
 // Access control
 if (!$user->admin) accessforbidden();
@@ -55,27 +57,28 @@ $backtopage = GETPOST('backtopage', 'alpha');
  * View
  */
 
-$help_url = 'FR:Module_DigiriskDolibarr#L.27onglet_Document_Digirisk';
-$title    = $langs->trans("YourDocuments");
+$page_name = "DigiriskdolibarrAbout";
+$help_url  = 'FR:Module_DigiriskDolibarr';
 
 $morejs   = array("/digiriskdolibarr/js/digiriskdolibarr.js.php");
-$morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");
+$morecss   = array("/digiriskdolibarr/css/digiriskdolibarr.css");
 
-llxHeader('', $title, $help_url, '', '', '', $morejs, $morecss);
+llxHeader('', $langs->trans($page_name), $help_url, '', '', '', $morejs, $morecss);
 
 // Subheader
 $linkback = '<a href="'.($backtopage ? $backtopage : DOL_URL_ROOT.'/admin/modules.php?restore_lastsearch_values=1').'">'.$langs->trans("BackToModuleList").'</a>';
 
-print load_fiche_titre($title, $linkback, 'digiriskdolibarr32px@digiriskdolibarr');
+print load_fiche_titre($langs->trans($page_name), $linkback, 'digiriskdolibarr32px@digiriskdolibarr');
 
 // Configuration header
 $head = digiriskdolibarrAdminPrepareHead();
-print dol_get_fiche_head($head, 'digiriskdocuments', '', -1, "digiriskdolibarr@digiriskdolibarr");
-$head = digiriskdolibarrAdminDigiriskDocumentsPrepareHead();
-print dol_get_fiche_head($head, '', '', -1, "digiriskdolibarr@digiriskdolibarr");
+print dol_get_fiche_head($head, 'about', '', 0, 'digiriskdolibarr@digiriskdolibarr');
+
+$contents = file_get_contents(DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/README.md');
+$Parsedown = new Parsedown();
+echo $Parsedown->text($contents);
 
 // Page end
 print dol_get_fiche_end();
 llxFooter();
 $db->close();
-

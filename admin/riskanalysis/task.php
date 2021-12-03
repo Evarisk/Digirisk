@@ -120,8 +120,6 @@ print load_fiche_titre($title, $linkback, 'digiriskdolibarr32px@digiriskdolibarr
 
 $head = digiriskdolibarrAdminPrepareHead();
 print dol_get_fiche_head($head, 'riskanalysis', '', -1, "digiriskdolibarr@digiriskdolibarr");
-$head = digiriskdolibarrAdminRiskAnalysisPrepareHead();
-print dol_get_fiche_head($head, 'task', '', -1, "digiriskdolibarr@digiriskdolibarr");
 
 print load_fiche_titre($langs->trans("TasksManagement"), '', '');
 

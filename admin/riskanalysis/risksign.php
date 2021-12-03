@@ -102,8 +102,6 @@ print load_fiche_titre($title, $linkback, 'digiriskdolibarr32px@digiriskdolibarr
 // Configuration header
 $head = digiriskdolibarrAdminPrepareHead();
 print dol_get_fiche_head($head, 'riskanalysis', '', -1, "digiriskdolibarr@digiriskdolibarr");
-$head = digiriskdolibarrAdminRiskAnalysisPrepareHead();
-print dol_get_fiche_head($head, 'risksign', '', -1, "digiriskdolibarr@digiriskdolibarr");
 
 /*
  *  Numbering module
