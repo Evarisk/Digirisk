@@ -1185,7 +1185,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			$actioncomm = new Actioncomm($this->db);
 
 			$allGroupments = $actioncomm->getActions( $this->db, 0, 0, 'groupment@digiriskdolibarr');
-			echo '<pre>'; print_r( $allGroupments ); echo '</pre>'; exit;
+//			echo '<pre>'; print_r( $allGroupments ); echo '</pre>'; exit;
 			//fetch all tous les événements avec type groupment puis rename en digiriskelement
 
 
