@@ -608,7 +608,41 @@ CerfaLink = Lien vers le Cerfa
 WorkStopDays = Nombre de jour d'arrêt de travail
 AccidentLesionList = Liste des lésions lié à l'accident
 DocumentsMetaData = Fichiers joints complémentaires
+WorkStopDocument = Déclaration d'arrêt de travail
 
+# Dictionnary - Dictionnaire
+UsualWorkplace = Lieu de travail habituel
+OccasionalWorkplace = Lieu de travail occasionnel
+LocationOfTheMeal = Lieu du repas
+OnTheWayBetweenHomeAndWorkplace = Au cours du trajet entre le domicile et le lieu de travail
+OnTheWayBetweenMealAndWorkplace = Au cours du trajet entre le travail et le lieu du repas
+DuringATripForTheEmployer = Au cours d'un déplacement pour l'employeur
+
+Trunk = Tronc
+Hand = Main
+LowerLimbs = Membres inférieurs
+UpperLimbs = Membres supérieurs
+MultipleLocations = Localisations multiples
+Foot = Pied
+Head = Tête
+Eyes = Yeux
+InternalSeating = Sièges internes
+Neck = Cou
+Back = Bas
+WholeBody = Ensemble du corps
+NotSpecified = Non précisé
+
+PainEffortLumbago = Douleur effort lumbago
+Contusion = Contusion
+Wounds = Plaies
+Sprain = Entorse
+FracturePitting = Fracture félûre
+MultipleInjuries = lésions de nature multiple
+MuscleOrTendonTear = Déchirure musculaire ou tendineuse
+PresenceOfForeignBody = Présence corps étranger
+Burns = Brûlure
+UnspecifiedAndMiscellaneous = Non précisé et divers
+Other = Autres
 
 # Email - Mail
 AccidentLabel = Récapitulatif du permis de feu
