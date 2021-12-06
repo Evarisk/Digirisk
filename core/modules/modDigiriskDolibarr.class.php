@@ -376,9 +376,9 @@ class modDigiriskdolibarr extends DolibarrModules
 			// Request to select fields
 			'tabsql'=>array(
 				'SELECT f.rowid as rowid, f.code, f.libelle, f.active FROM '.MAIN_DB_PREFIX.'c_conventions_collectives as f',
-				'SELECT f.rowid as rowid, f.label, f.description, f.active FROM '.MAIN_DB_PREFIX.'c_relative_location as f',
-				'SELECT f.rowid as rowid, f.label, f.description, f.active FROM '.MAIN_DB_PREFIX.'c_lesion_localization as f',
-				'SELECT f.rowid as rowid, f.label, f.description, f.active FROM '.MAIN_DB_PREFIX.'c_lesion_nature as f'
+				'SELECT f.rowid as rowid, f.ref, f.label, f.description, f.active FROM '.MAIN_DB_PREFIX.'c_relative_location as f',
+				'SELECT f.rowid as rowid, f.ref, f.label, f.description, f.active FROM '.MAIN_DB_PREFIX.'c_lesion_localization as f',
+				'SELECT f.rowid as rowid, f.ref, f.label, f.description, f.active FROM '.MAIN_DB_PREFIX.'c_lesion_nature as f'
 			),
 			// Sort order
 			'tabsqlsort'=>array(
@@ -390,23 +390,23 @@ class modDigiriskdolibarr extends DolibarrModules
 			// List of fields (result of select to show dictionary)
 			'tabfield'=>array(
 				"code,libelle",
-				"label,description",
-				"label,description",
-				"label,description"
+				"ref,label,description",
+				"ref,label,description",
+				"ref,label,description"
 			),
 			// List of fields (list of fields to edit a record)
 			'tabfieldvalue'=>array(
 				"code,libelle",
-				"label,description",
-				"label,description",
-				"label,description"
+				"ref,label,description",
+				"ref,label,description",
+				"ref,label,description"
 			),
 			// List of fields (list of fields for insert)
 			'tabfieldinsert'=>array(
 				"code,libelle",
-				"label,description",
-				"label,description",
-				"label,description"
+				"ref,label,description",
+				"ref,label,description",
+				"ref,label,description"
 			),
 			// Name of columns with primary key (try to always name it 'rowid')
 			'tabrowid'=>array(
