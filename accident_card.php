@@ -677,6 +677,17 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	print $object->label;
 	print '</td></tr>';
 
+	//User Victim -- Victime de l'accident
+	print '<tr><td class="titlefield">';
+	print $langs->trans("UserVictim");
+	print '</td>';
+	print '<td>';
+	$usertmp->fetch($object->fk_user_victim);
+	if ($usertmp > 0) {
+		print $usertmp->getNomUrl(1);
+	}
+	print '</td></tr>';
+
 	//Accident date -- Date de l'accident
 	print '<tr><td class="titlefield">';
 	print $langs->trans("AccidentDate");
