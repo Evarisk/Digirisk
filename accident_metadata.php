@@ -227,7 +227,7 @@ if (empty($reshook)) {
 		$result = $objectline->delete($user, false);
 		if ($result > 0) {
 			// Deletion accident lesion OK
-			setEventMessages($langs->trans('DeleteAccidentlesion').' '.$object->ref, array());
+			setEventMessages($langs->trans('DeleteAccidentLesion').' '.$object->ref, array());
 			$urltogo = str_replace('__ID__', $result, $backtopage);
 			$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $parent_id, $urltogo); // New method to autoselect project after a New on another form object creation
 			header("Location: " . $urltogo);
