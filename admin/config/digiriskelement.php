@@ -77,6 +77,8 @@ $types = array('groupment' => 'Groupment', 'workunit' => 'WorkUnit');
  *  Numbering module
  */
 foreach ($types as $type => $typeWithCase) {
+	print load_fiche_titre($langs->trans($typeWithCase), '', '');
+	print '<hr>';
 	print load_fiche_titre($langs->trans("Digirisk" . $typeWithCase . "NumberingModule"), '', '');
 
 	print '<table class="noborder centpercent">';
@@ -164,12 +166,17 @@ foreach ($types as $type => $typeWithCase) {
 	}
 
 	print '</table>';
+	print '<hr>';
 
 }
 
 /*
  *  Deleted Elements
  */
+
+print load_fiche_titre($langs->trans('DeletedElements'), '', '');
+print '<hr>';
+
 print load_fiche_titre($langs->trans("DeletedDigiriskElement"), '', '');
 
 print '<table class="noborder centpercent">';
