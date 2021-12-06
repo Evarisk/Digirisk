@@ -188,7 +188,6 @@ if ($object->id > 0) {
 		$filters['search_agenda_label'] = $search_agenda_label;
 
 		// TODO Replace this with same code than into list.php
-		$object->element = $object->element_type;
 		show_actions_done($conf, $langs, $db, $object, null, 0, $actioncode, '', $filters, $sortfield, $sortorder, 'digiriskdolibarr');
 		print '</div>';
 	}
