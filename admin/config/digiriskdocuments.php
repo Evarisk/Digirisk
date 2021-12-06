@@ -115,13 +115,13 @@ print dol_get_fiche_head($head, 'digiriskdocuments', '', -1, "digiriskdolibarr@d
 $types = array(
 	'LegalDisplay' 				=> 'legaldisplay',
 	'InformationsSharing' 		=> 'informationssharing',
-	'FirePermit' 				=> 'firepermitdocument',
-	'PreventionPlan' 			=> 'preventionplandocument',
 	'ListingRisksAction' 		=> 'listingrisksaction',
 	'ListingRisksPhoto' 		=> 'listingrisksphoto',
-	'WorkUnit' 					=> 'workunitdocument',
 	'Groupment' 				=> 'groupmentdocument',
-	'RiskAssessmentDocument' 	=> 'riskassessmentdocument'
+	'WorkUnit' 					=> 'workunitdocument',
+	'RiskAssessmentDocument' 	=> 'riskassessmentdocument',
+	'PreventionPlan' 			=> 'preventionplandocument',
+	'FirePermit' 				=> 'firepermitdocument'
 );
 
 foreach ($types as $type => $documentType) {
