@@ -942,6 +942,8 @@ DigiriskElementRisk = Risques
 RiskDescriptionNotEnabled = Le champ description du risque n'est pas activé
 HowToEnableRiskDescription = Pour activer le champ description du risque, allez dans "Configuration du module -> Analyse de risque -> Risque"
 HowToEnableRiskCategoryEdit = Pour activer la modification de la catégorie de risque, allez dans "Configuration du module -> Analyse de risque -> Risque"
+SortRisksListingsByCotation = Trier les risques par cotation
+SortRisksListingsByCotationDescription =  Activer le tri automatique des risques par cotation dans les listings
 
 DigiriskRiskData = Données configurables des risques
 RiskDescription = Description du risque
