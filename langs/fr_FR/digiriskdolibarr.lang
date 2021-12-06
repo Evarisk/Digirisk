@@ -588,7 +588,7 @@ WorkStopDays = Nombre de jour d'arrêt de travail
 AccidentLesionList = Liste des lésions lié à l'accident
 DocumentsMetaData = Fichiers joints complémentaires
 WorkStopDocument = Déclaration d'arrêt de travail
-AccidentMetaDataSave = Les données complémentaires de l'accident ont bien été enregistrés
+AccidentMetaDataSave = Les données complémentaires de l'accident ont bien été enregistrées
 
 # Dictionnary - Dictionnaire
 UsualWorkplace = Lieu de travail habituel
