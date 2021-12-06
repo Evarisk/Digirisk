@@ -173,18 +173,26 @@ if (empty($reshook)) {
 				$result = $evaluator->delete($user);
 
 				if ($result > 0) {
-					// Delete evaluator OK
-					$urltogo = str_replace('__ID__', $result, $backtopage);
-					$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
-					header("Location: ".$urltogo);
+					setEventMessages($langs->trans('DeleteEvaluatorMessage').' '.$evaluator->ref, array());
 				} else {
 					// Delete evaluator KO
+					$error++;
 					if (!empty($evaluator->errors)) setEventMessages(null, $evaluator->errors, 'errors');
 					else  setEventMessages($evaluator->error, null, 'errors');
 				}
 			}
-			header("Location: ".$urltogo);
-			exit;
+
+			if ($error > 0) {
+				// Delete evaluator KO
+				if (!empty($evaluator->errors)) setEventMessages(null, $evaluator->errors, 'errors');
+				else  setEventMessages($evaluator->error, null, 'errors');
+			} else {
+				// Delete evaluator OK
+				$urltogo = str_replace('__ID__', $id, $backtopage);
+				$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
+				header("Location: ".$urltogo);
+				exit;
+			}
 		}
 	}
 }

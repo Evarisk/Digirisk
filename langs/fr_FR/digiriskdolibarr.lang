@@ -873,6 +873,7 @@ UserAssigned = Utilisateur assigné
 AddEvaluatorTitle = Ajout d'un évaluateur
 AddEvaluatorButton = Ajouter l'évaluateur
 EvaluatorConfig = Configuration des données des évaluateurs
+DeleteEvaluatorMessage = Suppression de l'évaluateur
 
 DigiriskEvaluatorData = Données des Évaluateurs
 EvaluatorDuration = Durée de l'évalution par l'évaluateur
@@ -1048,6 +1049,7 @@ RiskSignCategory = Catégorie
 AddRiskSignTitle = Ajout d'une signalisation
 AddRiskSignButton = Ajouter la signalisation
 EditRiskSign = Édition d'une signalisation
+DeleteRiskSignMessage = Suppression de la signalisation
 
 DigiriskElementRiskSignList = Liste des signalisations
 DigiriskElementRiskSign = Signalisation

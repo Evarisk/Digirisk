@@ -211,16 +211,25 @@ if (empty($reshook)) {
 				$result = $risksign->delete($user);
 
 				if ($result > 0) {
-//					// Delete risksign OK
-//					$urltogo = str_replace('__ID__', $result, $backtopage);
-//					$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
-//					header("Location: ".$urltogo);
-//					exit;
+					setEventMessages($langs->trans('DeleteRiskSignMessage').' '.$risksign->ref, array());
 				} else {
 					// Delete risksign KO
+					$error++;
 					if (!empty($risksign->errors)) setEventMessages(null, $risksign->errors, 'errors');
 					else  setEventMessages($risksign->error, null, 'errors');
 				}
+			}
+
+			if ($error > 0) {
+				// Delete risksign KO
+				if (!empty($risksign->errors)) setEventMessages(null, $risksign->errors, 'errors');
+				else  setEventMessages($risksign->error, null, 'errors');
+			} else {
+				// Delete risksign OK
+				$urltogo = str_replace('__ID__', $id, $backtopage);
+				$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
+				header("Location: ".$urltogo);
+				exit;
 			}
 		}
 	}
