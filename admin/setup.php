@@ -143,8 +143,8 @@ if ($conf->global->DIGIRISKDOLIBARR_MAIN_LOGIN_BACKGROUND == 1) {
 	$result = dol_copy($src_file.$original_file, $dirforimage.$original_file, 0, 0);
 
 	if ($result > 0) {
-		dolibarr_set_const($db, 'MAIN_LOGIN_BACKGROUND', $original_file, 'chaine', 0, '', $conf->entity);
-		dolibarr_set_const($db, 'DIGIRISKDOLIBARR_MAIN_LOGIN_BACKGROUND', 2, 'integer', 0, '', $conf->entity);
+		dolibarr_set_const($db, 'MAIN_LOGIN_BACKGROUND', $original_file, 'chaine', 1, '', $conf->entity);
+		dolibarr_set_const($db, 'DIGIRISKDOLIBARR_MAIN_LOGIN_BACKGROUND', 2, 'integer', 1, '', $conf->entity);
 	}
 }
 
