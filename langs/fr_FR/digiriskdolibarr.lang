@@ -872,6 +872,7 @@ EvaluationDuration = Durée
 UserAssigned = Utilisateur assigné
 AddEvaluatorTitle = Ajout d'un évaluateur
 AddEvaluatorButton = Ajouter l'évaluateur
+EvaluatorConfig = Configuration des données des évaluateurs
 
 DigiriskEvaluatorData = Données des Évaluateurs
 EvaluatorDuration = Durée de l'évalution par l'évaluateur
