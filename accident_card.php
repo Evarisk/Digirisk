@@ -246,7 +246,7 @@ if (empty($reshook)) {
 
 		// Submit file
 		if (!empty($conf->global->MAIN_UPLOAD_DOC)) {
-			if (!empty($_FILES)) {
+			if (!empty($_FILES) && !empty($_FILES['userfile']['name'][0])) {
 				if (is_array($_FILES['userfile']['tmp_name'])) $userfiles = $_FILES['userfile']['tmp_name'];
 				else $userfiles = array($_FILES['userfile']['tmp_name']);
 
