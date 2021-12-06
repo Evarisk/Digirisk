@@ -121,7 +121,7 @@ $types = array(
 	'ListingRisksPhoto' 		=> 'listingrisksphoto',
 	'WorkUnit' 					=> 'workunitdocument',
 	'Groupment' 				=> 'groupmentdocument',
-	'RiskAssessment' 			=> 'riskassessmentdocument'
+	'RiskAssessmentDocument' 	=> 'riskassessmentdocument'
 );
 
 foreach ($types as $type => $documentType) {

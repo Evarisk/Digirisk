@@ -693,11 +693,11 @@ DeleteRiskAssessmentDocument = Supprimer le document unique
 RiskAssessmentDocumentGeneratedWithDolibarr = Document unique généré avec Dolibarr
 
 # Mod Numbering - Modèle de numérotation
-DigiriskRiskAssessmentDocumentNumberingModule = Modèle de numérotation des documents unique de Digirisk
+DigiriskRiskAssessmentDocumentDocumentNumberingModule = Modèle de numérotation des documents unique de Digirisk
 DigiriskRiskAssessmentDocumentStandardModel = Renvoie le numéro sous la forme DUn où n est un compteur séquentiel sans rupture et sans remise à 0.
 
 # ODT Template - Template ODT
-DigiriskTemplateDocumentRiskAssessment = Modèle de documents des documents unique de Digirisk
+DigiriskTemplateDocumentRiskAssessmentDocument = Modèle de documents des documents unique de Digirisk
 RiskAssessmentDocumentCustomDigiriskTemplate = ODT custom des documents unique
 RiskAssessmentDocumentDigiriskTemplate = ODT par défaut des documents unique
 
