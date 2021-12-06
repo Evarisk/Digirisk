@@ -63,8 +63,10 @@ $label 		= GETPOST('label', 'alpha');
 // Activate a model
 if ($action == 'set') {
 	addDocumentModel($value, $type, $label, $const);
+	header("Location: " . $_SERVER["PHP_SELF"]);
 } elseif ($action == 'del') {
 	delDocumentModel($value, $type);
+	header("Location: " . $_SERVER["PHP_SELF"]);
 }
 
 // Set default model
