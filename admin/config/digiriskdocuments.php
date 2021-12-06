@@ -303,7 +303,7 @@ foreach ($types as $type => $documentType) {
 
 							// Default
 							print '<td class="center">';
-							$defaultModelConf = 'DIGIRISKDOLIBARR_' . strtoupper($type) . 'DOCUMENT_DEFAULT_MODEL';
+							$defaultModelConf = 'DIGIRISKDOLIBARR_' . strtoupper($documentType) . '_DEFAULT_MODEL';
 							if ($conf->global->$defaultModelConf == $name) {
 								print img_picto($langs->trans("Default"), 'on');
 							}
