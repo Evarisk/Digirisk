@@ -309,6 +309,25 @@ if ($object->id > 0) {
 			<div class="notice-close"><i class="fas fa-times"></i></div>
 		</div>
 	</div>
+
+	<div class="messageSuccessRiskSignEdit notice hidden">
+		<div class="wpeo-notice notice-success risksign-edit-success-notice">
+			<div class="notice-content">
+				<div class="notice-title"><?php echo $langs->trans('RiskSignWellEdited') ?></div>
+				<div class="notice-subtitle"><?php echo $langs->trans('TheRiskSign') . ' ' . $refRiskSignMod->getLastValue($risksign) . ' ' . $langs->trans('HasBeenEditedF') ?></div>
+			</div>
+			<div class="notice-close"><i class="fas fa-times"></i></div>
+		</div>
+	</div>
+	<div class="messageErrorRiskSignEdit notice hidden">
+		<div class="wpeo-notice notice-warning risksign-edit-error-notice">
+			<div class="notice-content">
+				<div class="notice-title"><?php echo $langs->trans('RiskSignNotEdited') ?></div>
+				<div class="notice-subtitle"><?php echo $langs->trans('TheRiskSign') . ' ' . $refRiskSignMod->getLastValue($risksign) . ' ' . $langs->trans('HasNotBeenEditedF') ?></div>
+			</div>
+			<div class="notice-close"><i class="fas fa-times"></i></div>
+		</div>
+	</div>
 <?php
 // Build and execute select
 	// --------------------------------------------------------------------

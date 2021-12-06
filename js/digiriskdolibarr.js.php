@@ -2581,6 +2581,8 @@ window.eoxiaJS.risksign.createRiskSign = function ( event ) {
 window.eoxiaJS.risksign.saveRiskSign = function ( event ) {
 	let editedRiskSignId = $(this).attr('value');
 	let elementRiskSign = $(this).closest('.risksign-container').find('.risksign-content');
+	let actionContainerSuccess = $('.messageSuccessRiskSignEdit');
+	let actionContainerError = $('.messageErrorRiskSignEdit');
 
 	var category = elementRiskSign.find('.risksign-category input').val();
 	var categoryPost = '';
@@ -2608,9 +2610,14 @@ window.eoxiaJS.risksign.saveRiskSign = function ( event ) {
 
 			$(this).closest('.div-table-responsive').load( document.URL + '&action=saveRiskSign&riskSignID=' + editedRiskSignId + categoryPost + descriptionPost + ' .div-table-responsive');
 
+			actionContainerSuccess.empty()
+			actionContainerSuccess.load(' .risksign-edit-success-notice')
+			actionContainerSuccess.removeClass('hidden');
 		},
 		error: function ( ) {
-
+			actionContainerError.empty()
+			actionContainerError.load(' .risksign-edit-error-notice')
+			actionContainerError.removeClass('hidden');
 		}
 	});
 
