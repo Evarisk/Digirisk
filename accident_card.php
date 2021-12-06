@@ -91,7 +91,7 @@ $allLinks = $digiriskresources->digirisk_dolibarr_fetch_resources();
 
 $hookmanager->initHooks(array('accidentcard', 'globalcard')); // Note that conf->hooks_modules contains array
 
-$upload_dir         = $conf->digiriskdolibarr->multidir_output[isset($object->entity) ? $object->entity : 1];
+$upload_dir         = $conf->digiriskdolibarr->multidir_output[$conf->entity];
 // Security check
 $permissiontoread   = $user->rights->digiriskdolibarr->accident->read;
 $permissiontoadd    = $user->rights->digiriskdolibarr->accident->write;
@@ -176,7 +176,8 @@ if (empty($reshook)) {
 					}
 				}
 
-				$filedir = $conf->digiriskdolibarr->multidir_output[isset($object->entity) ? $object->entity : 1] . '/accident/'. $object->ref;
+				$filedir = $upload_dir . '/accident/'. $object->ref;
+
 				if (!file_exists($filedir))
 				{
 					if (dol_mkdir($filedir) < 0)
@@ -259,7 +260,8 @@ if (empty($reshook)) {
 					}
 				}
 
-				$filedir = $conf->digiriskdolibarr->multidir_output[isset($object->entity) ? $object->entity : 1] . '/accident/'. $object->ref;
+				$filedir = $upload_dir . '/accident/'. $object->ref;
+
 				if (!file_exists($filedir))
 				{
 					if (dol_mkdir($filedir) < 0)
