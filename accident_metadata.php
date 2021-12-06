@@ -161,12 +161,12 @@ if (empty($reshook)) {
 		$objectline->fk_accident         = $parent_id;
 
 		// Check parameters
-		if (empty($lesion_localization)) {
+		if ($lesion_localization < 0) {
 			setEventMessages($langs->trans('ErrorFieldNotEmpty', $langs->transnoentitiesnoconv('LesionLocalization')), null, 'errors');
 			$error++;
 		}
 
-		if (empty($lesion_nature)) {
+		if ($lesion_nature <0) {
 			setEventMessages($langs->trans('ErrorFieldNotEmpty', $langs->transnoentitiesnoconv('LesionNature')), null, 'errors');
 			$error++;
 		}
@@ -437,13 +437,13 @@ if (!empty($accidentlines) && $accidentlines > 0) {
 			$coldisplay++;
 			//LesionLocalization -- Siège des lésions
 			print '<td>';
-			print $formother->select_dictionary('lesion_localization','c_lesion_localization', 'ref', 'label', $item->lesion_localization, 1);
+			print $formother->select_dictionary('lesion_localization','c_lesion_localization', 'label', 'label', $item->lesion_localization, 1);
 			print '</td>';
 
 			$coldisplay++;
 			//LesionNature -- Nature des lésions
 			print '<td>';
-			print $formother->select_dictionary('lesion_nature','c_lesion_nature', 'ref', 'label', $item->lesion_nature, 1);
+			print $formother->select_dictionary('lesion_nature','c_lesion_nature', 'label', 'label', $item->lesion_nature, 1);
 			print '</td>';
 
 			$coldisplay += $colspan;
