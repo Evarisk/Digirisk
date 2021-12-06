@@ -41,7 +41,7 @@ require_once DOL_DOCUMENT_ROOT.'/core/lib/images.lib.php';
 require_once './class/digiriskelement.class.php';
 require_once './lib/digiriskdolibarr_function.lib.php';
 
-global $db, $conf, $langs, $user;
+global $conf, $db, $hookmanager, $langs, $user;
 
 // Load translation files required by the page
 $langs->loadLangs(array("digiriskdolibarr@digiriskdolibarr", "other"));

@@ -50,7 +50,7 @@ require_once './core/modules/digiriskdolibarr/digiriskelement/workunit/mod_worku
 require_once './core/modules/digiriskdolibarr/digiriskdocuments/groupmentdocument/modules_groupmentdocument.php';
 require_once './core/modules/digiriskdolibarr/digiriskdocuments/workunitdocument/modules_workunitdocument.php';
 
-global $db, $conf, $langs, $user;
+global $conf, $db, $hookmanager, $langs, $user;
 
 // Load translation files required by the page
 $langs->loadLangs(array("digiriskdolibarr@digiriskdolibarr", "other"));
@@ -410,18 +410,19 @@ if ((empty($action) || ($action != 'edit' && $action != 'create'))) {
 	$parent_element = new DigiriskElement($db);
 	$result = $parent_element->fetch($object->fk_parent);
 	if ($result > 0) {
-		$morehtmlref .= $langs->trans("Description").' : '.$parent_element->description;
+		$morehtmlref .= $langs->trans("Description").' : '.$object->description;
 		$morehtmlref .= '<br>'.$langs->trans("ParentElement").' : '.$parent_element->getNomUrl(1, 'blank', 1);
 	}
 	else {
 		$digiriskstandard->fetch($conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD);
-		$morehtmlref .= $langs->trans("ParentElement").' : '.$digiriskstandard->getNomUrl(1, 'blank', 1);
+		$morehtmlref .= $langs->trans("Description").' : '.$object->description;
+		$morehtmlref .= '<br>'.$langs->trans("ParentElement").' : '.$digiriskstandard->getNomUrl(1, 'blank', 1);
 	}
 	$morehtmlref .= '</div>';
 	if (isset($object->element_type)) {
-		$morehtmlleft .= '<div class="floatleft inline-block valignmiddle divphotoref">'.digirisk_show_photos('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$entity].'/'.$object->element_type, 'small', 5, 0, 0, 0, $width,0, 0, 0, 0, $object->element_type, $object).'</div>';
+		$morehtmlleft = '<div class="floatleft inline-block valignmiddle divphotoref">'.digirisk_show_photos('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity].'/'.$object->element_type, 'small', 5, 0, 0, 0, $width,0, 0, 0, 0, $object->element_type, $object).'</div>';
 	} else {
-		$morehtmlleft .= '<div class="floatleft inline-block valignmiddle divphotoref">'.digirisk_show_photos('mycompany', $conf->mycompany->dir_output . '/logos', 'small', 5, 0, 0, 0, $width,0, 0, 0, 0, 'logos', $emptyobject).'</div>';
+		$morehtmlleft = '<div class="floatleft inline-block valignmiddle divphotoref">'.digirisk_show_photos('mycompany', $conf->mycompany->dir_output . '/logos', 'small', 5, 0, 0, 0, $width,0, 0, 0, 0, 'logos', $emptyobject).'</div>';
 	}
 
 	digirisk_banner_tab($object, 'ref', '', 0, 'ref', 'ref', $morehtmlref, '', 0, $morehtmlleft);
