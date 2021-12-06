@@ -1256,7 +1256,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->create($user);
 				break;
 
-			case 'ACCIDENTLINE_CREATE' :
+			case 'ACCIDENTWORKSTOP_CREATE' :
 
 				dol_syslog("Trigger '".$this->name."' for action '$action' launched by ".__FILE__.". id=".$object->id);
 				require_once DOL_DOCUMENT_ROOT.'/comm/action/class/actioncomm.class.php';
@@ -1264,9 +1264,9 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm = new ActionComm($this->db);
 
 				$actioncomm->elementtype = 'accident@digiriskdolibarr';
-				$actioncomm->code        = 'AC_ACCIDENTLINE_CREATE';
+				$actioncomm->code        = 'AC_ACCIDENTWORKSTOP_CREATE';
 				$actioncomm->type_code   = 'AC_OTH_AUTO';
-				$actioncomm->label       = $langs->trans('AccidentLineCreateTrigger');
+				$actioncomm->label       = $langs->trans('AccidentWorkStopCreateTrigger');
 				$actioncomm->datep       = $now;
 				$actioncomm->fk_element  = $object->fk_accident;
 				$actioncomm->userownerid = $user->id;
@@ -1275,7 +1275,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->create($user);
 				break;
 
-			case 'ACCIDENTLINE_MODIFY' :
+			case 'ACCIDENTWORKSTOP_MODIFY' :
 
 				dol_syslog("Trigger '".$this->name."' for action '$action' launched by ".__FILE__.". id=".$object->id);
 				require_once DOL_DOCUMENT_ROOT.'/comm/action/class/actioncomm.class.php';
@@ -1283,9 +1283,9 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm = new ActionComm($this->db);
 
 				$actioncomm->elementtype = 'accident@digiriskdolibarr';
-				$actioncomm->code        = 'AC_ACCIDENTLINE_MODIFY';
+				$actioncomm->code        = 'AC_ACCIDENTWORKSTOP_MODIFY';
 				$actioncomm->type_code   = 'AC_OTH_AUTO';
-				$actioncomm->label       = $langs->trans('AccidentLineModifyTrigger');
+				$actioncomm->label       = $langs->trans('AccidentWorkStopModifyTrigger');
 				$actioncomm->datep       = $now;
 				$actioncomm->fk_element  = $object->fk_accident;
 				$actioncomm->userownerid = $user->id;
@@ -1294,7 +1294,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->create($user);
 				break;
 
-			case 'ACCIDENTLINE_DELETE' :
+			case 'ACCIDENTWORKSTOP_DELETE' :
 
 				dol_syslog("Trigger '".$this->name."' for action '$action' launched by ".__FILE__.". id=".$object->id);
 				require_once DOL_DOCUMENT_ROOT.'/comm/action/class/actioncomm.class.php';
@@ -1302,9 +1302,86 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm = new ActionComm($this->db);
 
 				$actioncomm->elementtype = 'accident@digiriskdolibarr';
-				$actioncomm->code        = 'AC_ACCIDENTLINE_DELETE';
+				$actioncomm->code        = 'AC_ACCIDENTWORKSTOP_DELETE';
 				$actioncomm->type_code   = 'AC_OTH_AUTO';
-				$actioncomm->label       = $langs->trans('AccidentLineDeleteTrigger');
+				$actioncomm->label       = $langs->trans('AccidentWorkStopDeleteTrigger');
+				$actioncomm->datep       = $now;
+				$actioncomm->fk_element  = $object->fk_accident;
+				$actioncomm->userownerid = $user->id;
+				$actioncomm->percentage  = -1;
+
+				$actioncomm->create($user);
+				break;
+
+			case 'ACCIDENTLESION_CREATE' :
+
+				dol_syslog("Trigger '".$this->name."' for action '$action' launched by ".__FILE__.". id=".$object->id);
+				require_once DOL_DOCUMENT_ROOT.'/comm/action/class/actioncomm.class.php';
+				$now = dol_now();
+				$actioncomm = new ActionComm($this->db);
+
+				$actioncomm->elementtype = 'accident@digiriskdolibarr';
+				$actioncomm->code        = 'AC_ACCIDENTLESION_CREATE';
+				$actioncomm->type_code   = 'AC_OTH_AUTO';
+				$actioncomm->label       = $langs->trans('AccidentLesionCreateTrigger');
+				$actioncomm->datep       = $now;
+				$actioncomm->fk_element  = $object->fk_accident;
+				$actioncomm->userownerid = $user->id;
+				$actioncomm->percentage  = -1;
+
+				$actioncomm->create($user);
+				break;
+
+			case 'ACCIDENTLESION_MODIFY' :
+
+				dol_syslog("Trigger '".$this->name."' for action '$action' launched by ".__FILE__.". id=".$object->id);
+				require_once DOL_DOCUMENT_ROOT.'/comm/action/class/actioncomm.class.php';
+				$now = dol_now();
+				$actioncomm = new ActionComm($this->db);
+
+				$actioncomm->elementtype = 'accident@digiriskdolibarr';
+				$actioncomm->code        = 'AC_ACCIDENTLESION_MODIFY';
+				$actioncomm->type_code   = 'AC_OTH_AUTO';
+				$actioncomm->label       = $langs->trans('AccidentLesionModifyTrigger');
+				$actioncomm->datep       = $now;
+				$actioncomm->fk_element  = $object->fk_accident;
+				$actioncomm->userownerid = $user->id;
+				$actioncomm->percentage  = -1;
+
+				$actioncomm->create($user);
+				break;
+
+			case 'ACCIDENTLESION_DELETE' :
+
+				dol_syslog("Trigger '".$this->name."' for action '$action' launched by ".__FILE__.". id=".$object->id);
+				require_once DOL_DOCUMENT_ROOT.'/comm/action/class/actioncomm.class.php';
+				$now = dol_now();
+				$actioncomm = new ActionComm($this->db);
+
+				$actioncomm->elementtype = 'accident@digiriskdolibarr';
+				$actioncomm->code        = 'AC_ACCIDENTLESION_DELETE';
+				$actioncomm->type_code   = 'AC_OTH_AUTO';
+				$actioncomm->label       = $langs->trans('AccidentLesionDeleteTrigger');
+				$actioncomm->datep       = $now;
+				$actioncomm->fk_element  = $object->fk_accident;
+				$actioncomm->userownerid = $user->id;
+				$actioncomm->percentage  = -1;
+
+				$actioncomm->create($user);
+				break;
+
+			case 'ACCIDENTMETADATA_CREATE' :
+
+				dol_syslog("Trigger '".$this->name."' for action '$action' launched by ".__FILE__.". id=".$object->id);
+				require_once DOL_DOCUMENT_ROOT.'/comm/action/class/actioncomm.class.php';
+				require_once __DIR__ . '/../../class/digiriskelement.class.php';
+				$now = dol_now();
+				$actioncomm      = new ActionComm($this->db);
+
+				$actioncomm->elementtype = 'accident@digiriskdolibarr';
+				$actioncomm->code        = 'AC_ACCIDENTMETADATA_CREATE';
+				$actioncomm->type_code   = 'AC_OTH_AUTO';
+				$actioncomm->label       = $langs->trans('AccidentMetaDataCreateTrigger');
 				$actioncomm->datep       = $now;
 				$actioncomm->fk_element  = $object->fk_accident;
 				$actioncomm->userownerid = $user->id;

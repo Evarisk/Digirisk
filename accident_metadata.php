@@ -129,6 +129,7 @@ if (empty($reshook)) {
 			$result = $accidentmetadata->create($user, false);
 			if ($result > 0) {
 				// Update Accident metadata OK
+				setEventMessages($langs->trans('AccidentMetaDataSave'), null, 'mesgs');
 				$urltogo = str_replace('__ID__', $result, $backtopage);
 				$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
 				header("Location: " . $urltogo);
@@ -165,17 +166,16 @@ if (empty($reshook)) {
 			$error++;
 		}
 
-//		if (empty($lesion_nature)) {
-//			setEventMessages($langs->trans('ErrorFieldNotEmpty', $langs->transnoentitiesnoconv('LesionNature')), null, 'errors');
-//			$error++;
-//		}
+		if (empty($lesion_nature)) {
+			setEventMessages($langs->trans('ErrorFieldNotEmpty', $langs->transnoentitiesnoconv('LesionNature')), null, 'errors');
+			$error++;
+		}
 
 		if (!$error) {
 			$result = $objectline->insert($user, false);
 			if ($result > 0) {
 				// Creation accident lesion OK
-				setEventMessages($langs->trans('AddAccidentLesion').' '.$objectline->ref, array());
-				$objectline->call_trigger('ACCIDENT_LESION_CREATE', $user);
+				setEventMessages($langs->trans('AddAccidentLesion').' '.$object->ref, array());
 				$urltogo = str_replace('__ID__', $result, $backtopage);
 				$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
 				header("Location: " . $urltogo);
@@ -207,7 +207,7 @@ if (empty($reshook)) {
 			$result = $objectline->update($user, false);
 			if ($result > 0) {
 				// Update accident lesion OK
-				setEventMessages($langs->trans('UpdateAccidentLesion').' '.$objectline->ref, array());
+				setEventMessages($langs->trans('UpdateAccidentLesion').' '.$object->ref, array());
 				$urltogo = str_replace('__ID__', $result, $backtopage);
 				$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $parent_id, $urltogo); // New method to autoselect project after a New on another form object creation
 				header("Location: " . $urltogo);
@@ -227,7 +227,7 @@ if (empty($reshook)) {
 		$result = $objectline->delete($user, false);
 		if ($result > 0) {
 			// Deletion accident lesion OK
-			setEventMessages($langs->trans('DeleteAccidentlesion').' '.$objectline->ref, array());
+			setEventMessages($langs->trans('DeleteAccidentlesion').' '.$object->ref, array());
 			$urltogo = str_replace('__ID__', $result, $backtopage);
 			$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $parent_id, $urltogo); // New method to autoselect project after a New on another form object creation
 			header("Location: " . $urltogo);
@@ -278,7 +278,9 @@ $arrayAccidentMetaData[] = $accidentmetadata->police_report;
 $arrayAccidentMetaData[] = $accidentmetadata->cerfa_link;
 
 $accidentlesions = $objectline->fetchAll($object->id);
-$accidentlesions = array_shift($accidentlesions);
+if (!empty($accidentlesions)) {
+	$accidentlesions = array_shift($accidentlesions);
+}
 
 $arrayAccidentLesion = array();
 $arrayAccidentLesion[] = $accidentlesions->lesion_nature;
@@ -450,9 +452,6 @@ if (!empty($accidentlines) && $accidentlines > 0) {
 			print '</td>';
 			print '</tr>';
 
-			if (is_object($objectline)) {
-				print $objectline->showOptionals($extrafields, 'edit', array('style' => $bcnd[$var], 'colspan' => $coldisplay), '', '', 1);
-			}
 			print '</form>';
 		} else {
 			print '<td>';
@@ -461,12 +460,12 @@ if (!empty($accidentlines) && $accidentlines > 0) {
 
 			$coldisplay++;
 			print '<td>';
-			print $item->lesion_localization;
+			print $langs->transnoentities($item->lesion_localization);
 			print '</td>';
 
 			$coldisplay++;
 			print '<td>';
-			print $item->lesion_nature;
+			print $langs->transnoentities($item->lesion_nature);
 			print '</td>';
 
 			$coldisplay += $colspan;
@@ -486,9 +485,6 @@ if (!empty($accidentlines) && $accidentlines > 0) {
 				print '</td>';
 			}
 
-			if (is_object($objectline)) {
-				print $objectline->showOptionals($extrafields, 'edit', array('style' => $bcnd[$var], 'colspan' => $coldisplay), '', '', 1);
-			}
 			print '</tr>';
 		}
 	}
@@ -509,13 +505,13 @@ if ($object->status == 1 && $permissiontoadd) {
 	$coldisplay++;
 	//LesionLocalization -- Siège des lésions
 	print '<td>';
-	print $formother->select_dictionary('lesion_localization','c_lesion_localization', 'ref', 'label', '', 1);
+	print $formother->select_dictionary('lesion_localization','c_lesion_localization', 'label', 'label', '', 1);
 	print '</td>';
 
 	$coldisplay++;
 	//LesionNature -- Nature des lésions
 	print '<td>';
-	print $formother->select_dictionary('lesion_nature','c_lesion_nature', 'ref', 'label', '', 1);
+	print $formother->select_dictionary('lesion_nature','c_lesion_nature', 'label', 'label', '', 1);
 	print '</td>';
 
 	$coldisplay += $colspan;
@@ -524,9 +520,6 @@ if ($object->status == 1 && $permissiontoadd) {
 	print '</td>';
 	print '</tr>';
 
-	if (is_object($objectline)) {
-		print $objectline->showOptionals($extrafields, 'edit', array('style' => $bcnd[$var], 'colspan' => $coldisplay), '', '', 1);
-	}
 	print '</form>';
 }
 print '</table>';

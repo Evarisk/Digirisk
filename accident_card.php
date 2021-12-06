@@ -323,8 +323,7 @@ if (empty($reshook)) {
 				// Creation accident line OK
 				rename($conf->digiriskdolibarr->multidir_output[$conf->entity] . '/accident/' . $object->ref . '/workstop/temp/', $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/accident/' . $object->ref . '/workstop/' . $objectline->ref);
 
-				setEventMessages($langs->trans('AddAccidentLine').' '.$objectline->ref, array());
-				$objectline->call_trigger('ACCIDENT_WORKSTOP_CREATE', $user);
+				setEventMessages($langs->trans('AddAccidentWorkStop').' '.$object->ref, array());
 				$urltogo = str_replace('__ID__', $result, $backtopage);
 				$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
 				header("Location: " . $urltogo);
@@ -354,7 +353,7 @@ if (empty($reshook)) {
 			$result = $objectline->update($user, false);
 			if ($result > 0) {
 				// Update accident line OK
-				setEventMessages($langs->trans('UpdateAccidentLine').' '.$objectline->ref, array());
+				setEventMessages($langs->trans('UpdateAccidentWorkStop').' '.$object->ref, array());
 				$urltogo = str_replace('__ID__', $result, $backtopage);
 				$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $parent_id, $urltogo); // New method to autoselect project after a New on another form object creation
 				header("Location: " . $urltogo);
@@ -374,7 +373,7 @@ if (empty($reshook)) {
 		$result = $objectline->delete($user, false);
 		if ($result > 0) {
 			// Deletion accident line OK
-			setEventMessages($langs->trans('DeleteAccidentLine').' '.$objectline->ref, array());
+			setEventMessages($langs->trans('DeleteAccidentWorkStop').' '.$object->ref, array());
 			$urltogo = str_replace('__ID__', $result, $backtopage);
 			$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $parent_id, $urltogo); // New method to autoselect project after a New on another form object creation
 			header("Location: " . $urltogo);
