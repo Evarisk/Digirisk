@@ -70,9 +70,6 @@ class Accident extends CommonObject
 	public $picto = 'accident@digiriskdolibarr';
 
 	const STATUS_IN_PROGRESS       = 1;
-	const STATUS_PENDING_SIGNATURE = 2;
-	const STATUS_LOCKED            = 3;
-	const STATUS_ARCHIVED          = 4;
 
 	/**
 	 * @var array  Array with all fields and their property. Do not use it as a static var. It may be modified by constructor.
@@ -163,136 +160,6 @@ class Accident extends CommonObject
 	{
 		$this->element = $this->element . '@digiriskdolibarr';
 		return $this->createCommon($user, $notrigger);
-	}
-
-	/**
-	 * Clone an object into another one
-	 *
-	 * @param  	User 	$user      	User that creates
-	 * @param  	int 	$fromid     Id of object to clone
-	 * @return 	mixed 				New object created, <0 if KO
-	 */
-	public function createFromClone(User $user, $fromid, $options)
-	{
-		global $conf, $langs;
-		$error = 0;
-
-		$signatory         = new AccidentSignature($this->db);
-		$digiriskresources = new DigiriskResources($this->db);
-		$openinghours      = new Openinghours($this->db);
-
-		$refAccidentMod = new $conf->global->DIGIRISKDOLIBARR_FIREPERMIT_ADDON($this->db);
-
-		dol_syslog(__METHOD__, LOG_DEBUG);
-
-		$object = new self($this->db);
-
-		$this->db->begin();
-
-		// Load source object
-		$result = $object->fetchCommon($fromid);
-		if ($result > 0 && !empty($object->table_element_line)) {
-			$object->fetchLines();
-		}
-
-		// Load openinghours form source object
-		$morewhere = ' AND element_id = ' . $object->id;
-		$morewhere .= ' AND element_type = ' . "'" . $object->element . "'";
-		$morewhere .= ' AND status = 1';
-
-		$openinghours->fetch(0, '', $morewhere);
-
-		// Load signatory and ressources form source object
-		$signatories = $signatory->fetchSignatory("", $fromid);
-		$resources   = $digiriskresources->fetchResourcesFromObject('', $object);
-
-		if (!empty ($signatories) && $signatories > 0) {
-			foreach ($signatories as $arrayRole) {
-				foreach ($arrayRole as $signatory) {
-					$signatoriesID[$signatory->role] = $signatory->id;
-					if ($signatory->role == 'FP_EXT_SOCIETY_INTERVENANTS') {
-						$extintervenant_ids[] = $signatory->id;
-					}
-				}
-			}
-		}
-
-		// Reset some properties
-		unset($object->id);
-		unset($object->fk_user_creat);
-		unset($object->import_key);
-
-		// Clear fields
-		if (property_exists($object, 'ref')) {
-			$object->ref = $refAccidentMod->getNextValue($object);
-		}
-		if (property_exists($object, 'ref_ext')) {
-			$object->ref_ext = 'digirisk_' . $object->ref;
-		}
-		if (property_exists($object, 'label')) {
-			$object->label = empty($this->fields['label']['default']) ? $langs->trans("CopyOf")." ".$object->label : $this->fields['label']['default'];
-		}
-		if (property_exists($object, 'date_creation')) {
-			$object->date_creation = dol_now();
-		}
-
-		// Create clone
-		$object->context['createfromclone'] = 'createfromclone';
-		$firepermtid = $object->create($user);
-
-		if ($firepermtid > 0) {
-			$digiriskresources->digirisk_dolibarr_set_resources($this->db, $user->id, 'FP_EXT_SOCIETY', 'societe', array(array_shift($resources['FP_EXT_SOCIETY'])->id), $conf->entity, 'accident', $firepermtid, 0);
-			$digiriskresources->digirisk_dolibarr_set_resources($this->db, $user->id, 'FP_LABOUR_INSPECTOR', 'societe', array(array_shift($resources['FP_LABOUR_INSPECTOR'])->id), $conf->entity, 'accident', $firepermtid, 0);
-			$digiriskresources->digirisk_dolibarr_set_resources($this->db, $user->id, 'FP_LABOUR_INSPECTOR_ASSIGNED', 'socpeople', array(array_shift($resources['FP_LABOUR_INSPECTOR_ASSIGNED'])->id), $conf->entity, 'accident', $firepermtid, 0);
-			$signatory->createFromClone($user, $signatoriesID['FP_MAITRE_OEUVRE'], $firepermtid);
-			$signatory->createFromClone($user, $signatoriesID['FP_EXT_SOCIETY_RESPONSIBLE'], $firepermtid);
-
-			if (!empty($options['schedule'])) {
-				if (!empty($openinghours)) {
-					$openinghours->element_id = $firepermtid;
-					$openinghours->create($user);
-				}
-			}
-
-			if (!empty($options['attendants'])) {
-				if (!empty($extintervenant_ids) && $extintervenant_ids > 0) {
-					foreach ($extintervenant_ids as $extintervenant_id) {
-						$signatory->createFromClone($user, $extintervenant_id, $firepermtid);
-					}
-				}
-			}
-
-			if (!empty($options['accident_risk'])) {
-				$num = (is_array($object->lines) ? count($object->lines) : 0);
-				for ($i = 0; $i < $num; $i++) {
-					$line = $object->lines[$i];
-					$line->category = empty($line->category) ? 0 : $line->category;
-					$line->fk_accident = $firepermtid;
-
-					$result = $line->insert($user, 1);
-					if ($result < 0) {
-						$this->error = $this->db->lasterror();
-						$this->db->rollback();
-						return -1;
-					}
-				}
-			}
-		} else {
-			$error++;
-			$this->error = $object->error;
-			$this->errors = $object->errors;
-		}
-
-		unset($object->context['createfromclone']);
-
-		// End
-		if (!$error) {
-			$this->db->commit();
-			return $firepermtid;
-		} else {
-			$this->db->rollback();
-			return -1;
-		}
 	}
 
 	/**
@@ -422,109 +289,6 @@ class Accident extends CommonObject
 	}
 
 	/**
-	 *	Load the info information in the object
-	 *
-	 *	@param  int		$id       Id of object
-	 *	@return	void
-	 */
-	public function info($id)
-	{
-		$sql = 'SELECT rowid, date_creation as datec, tms as datem,';
-		$sql .= ' fk_user_creat, fk_user_modif';
-		$sql .= ' FROM '.MAIN_DB_PREFIX.$this->table_element.' as t';
-		$sql .= ' WHERE t.rowid = '.$id;
-		$result = $this->db->query($sql);
-		if ($result)
-		{
-			if ($this->db->num_rows($result))
-			{
-				$obj = $this->db->fetch_object($result);
-				$this->id = $obj->rowid;
-				if ($obj->fk_user_author)
-				{
-					$cuser = new User($this->db);
-					$cuser->fetch($obj->fk_user_author);
-					$this->user_creation = $cuser;
-				}
-
-				if ($obj->fk_user_valid)
-				{
-					$vuser = new User($this->db);
-					$vuser->fetch($obj->fk_user_valid);
-					$this->user_validation = $vuser;
-				}
-
-				if ($obj->fk_user_cloture)
-				{
-					$cluser = new User($this->db);
-					$cluser->fetch($obj->fk_user_cloture);
-					$this->user_cloture = $cluser;
-				}
-
-				$this->date_creation     = $this->db->jdate($obj->datec);
-				$this->date_modification = $this->db->jdate($obj->datem);
-				$this->date_validation   = $this->db->jdate($obj->datev);
-			}
-
-			$this->db->free($result);
-		}
-		else
-		{
-			dol_print_error($this->db);
-		}
-	}
-
-	/**
-	 *	Set in progress status
-	 *
-	 *	@param	User	$user			Object user that modify
-	 *  @param	int		$notrigger		1=Does not execute triggers, 0=Execute triggers
-	 *	@return	int						<0 if KO, >0 if OK
-	 */
-	public function setInProgress($user, $notrigger = 0)
-	{
-		$signatory = new PreventionPlanSignature($this->db);
-		$signatory->deleteSignatoriesSignatures($this->id);
-		return $this->setStatusCommon($user, self::STATUS_IN_PROGRESS, $notrigger, 'FIREPERMIT_INPROGRESS');
-	}
-
-	/**
-	 *	Set pending signature status
-	 *
-	 *	@param	User	$user			Object user that modify
-	 *  @param	int		$notrigger		1=Does not execute triggers, 0=Execute triggers
-	 *	@return	int						<0 if KO, >0 if OK
-	 */
-	public function setPendingSignature($user, $notrigger = 0)
-	{
-		return $this->setStatusCommon($user, self::STATUS_PENDING_SIGNATURE, $notrigger, 'FIREPERMIT_PENDINGSIGNATURE');
-	}
-
-	/**
-	 *	Set lock status
-	 *
-	 *	@param	User	$user			Object user that modify
-	 *  @param	int		$notrigger		1=Does not execute triggers, 0=Execute triggers
-	 *	@return	int						<0 if KO, >0 if OK
-	 */
-	public function setLocked($user, $notrigger = 0)
-	{
-		return $this->setStatusCommon($user, self::STATUS_LOCKED, $notrigger, 'FIREPERMIT_LOCKED');
-	}
-
-	/**
-	 *	Set close status
-	 *
-	 *	@param	User	$user			Object user that modify
-	 *  @param	int		$notrigger		1=Does not execute triggers, 0=Execute triggers
-	 *	@return	int						<0 if KO, >0 if OK
-	 */
-	public function setArchived($user, $notrigger = 0)
-	{
-		return $this->setStatusCommon($user, self::STATUS_ARCHIVED, $notrigger, 'FIREPERMIT_ARCHIVED');
-	}
-
-	/**
 	 *  Return the label of the status
 	 *
 	 *  @param  int		$mode          0=long label, 1=short label, 2=Picto + short label, 3=Picto, 4=Picto + long label, 5=Short label + Picto, 6=Long label + Picto
@@ -552,15 +316,9 @@ class Accident extends CommonObject
 			$langs->load("digiriskdolibarr@digiriskdolibarr");
 
 			$this->labelStatus[self::STATUS_IN_PROGRESS] = $langs->trans('InProgress');
-			$this->labelStatus[self::STATUS_PENDING_SIGNATURE] = $langs->trans('ValidatePendingSignature');
-			$this->labelStatus[self::STATUS_LOCKED] = $langs->trans('Locked');
-			$this->labelStatus[self::STATUS_ARCHIVED] = $langs->trans('Archived');
 		}
 
 		$statusType = 'status'.$status;
-		if ($status == self::STATUS_PENDING_SIGNATURE) $statusType = 'status3';
-		if ($status == self::STATUS_LOCKED) $statusType = 'status8';
-		if ($status == self::STATUS_ARCHIVED) $statusType = 'status8';
 
 		return dolGetStatus($this->labelStatus[$status], $this->labelStatusShort[$status], '', $statusType, $mode);
 	}
