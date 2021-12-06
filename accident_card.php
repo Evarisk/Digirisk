@@ -442,7 +442,6 @@ if (empty($reshook)) {
 			$folder = 'temp';
 		}
 
-
 		$accident_upload_dir = $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/accident/' . $object->ref . '/workstop/' . $folder . '/';
 		//Add files linked
 		$fileList          = dol_dir_list($accident_upload_dir);
@@ -453,7 +452,7 @@ if (empty($reshook)) {
 			$thumbsList = dol_dir_list($accident_upload_dir . 'thumbs/');
 			if (!empty($thumbsList)) {
 				foreach ($thumbsList as $thumb) {
-					if (preg_match('/'. preg_split('/\./', $filetodelete)[0] . '/', $thumb['name'])) {
+					if (preg_match('/'. preg_split('/\./', $filetodelete)[0] . '_/', $thumb['name'])) {
 						dol_delete_file($accident_upload_dir . 'thumbs/' . $thumb['name'] );
 					}
 				}
