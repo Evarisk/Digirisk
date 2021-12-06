@@ -85,6 +85,9 @@ print load_fiche_titre($title, $linkback, 'digiriskdolibarr32px@digiriskdolibarr
 $head = digiriskdolibarrAdminPrepareHead();
 print dol_get_fiche_head($head, 'digirisksignature', '', -1, "digiriskdolibarr@digiriskdolibarr");
 
+print load_fiche_titre($langs->trans('SignatureManagement'), '', '');
+print '<hr>';
+
 $enabledisablehtml = $langs->trans("SignatureActivatePublicInterface").' ';
 if (empty($conf->global->DIGIRISKDOLIBARR_SIGNATURE_ENABLE_PUBLIC_INTERFACE)) {
 	// Button off, click to enable
