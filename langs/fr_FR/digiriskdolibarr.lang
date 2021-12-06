@@ -1029,7 +1029,7 @@ RiskSignDeleteTrigger = Signalisation supprimée
 
 # Mod Numbering - Modèle de numérotation
 DigiriskRiskSignStandardModel = Renvoie le numéro sous la forme RSn où n est un compteur séquentiel sans rupture et sans remise à 0.
-DigiriskRiskSignNumberingModule = Modèle de numérotation des signalisation des risques de Digirisk
+DigiriskRiskSignNumberingModule = Modèle de numérotation des signalisations des risques de Digirisk
 
 # Data - Donnée
 RiskSign = Signalisation
