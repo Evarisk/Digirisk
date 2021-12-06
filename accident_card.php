@@ -763,7 +763,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 		print '<td><span>' . $langs->trans('Ref.') . '</span></td>';
 		print '<td>' . $langs->trans('WorkStopDays') . '</td>';
 		print '<td>' . $langs->trans('WorkStopDocument') . '</td>';
-		print '<td class="center" colspan="' . $colspan . '">' . $langs->trans('ActionsAccidentRisk') . '</td>';
+		print '<td class="center" colspan="' . $colspan . '">' . $langs->trans('ActionsLine') . '</td>';
 		print '</tr>';
 
 		if (!empty($accidentlines) && $accidentlines > 0) {
