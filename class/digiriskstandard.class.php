@@ -201,7 +201,7 @@ class DigiriskStandard extends CommonObject
 		$result .= $linkstart;
 		if ($withpicto) $result .= '<i class="fas fa-building"></i>' . ' ';
 		if ($withpicto != 2) $result .= $this->ref;
-		if ($withpicto != 2) $result .= (($addlabel && $this->label) ? $sep.dol_trunc($this->label, ($addlabel > 1 ? $addlabel : 0)) : '');
+		if ($withpicto != 2) $result .= (($addlabel && $conf->global->MAIN_INFO_SOCIETE_NOM) ? $sep.dol_trunc($conf->global->MAIN_INFO_SOCIETE_NOM, ($addlabel > 1 ? $addlabel : 0)) : '');
 		$result .= $linkend;
 
 		global $action;

@@ -295,7 +295,12 @@ if ($action == 'create') {
 
 	print '<tr><td class="fieldrequired">'.$langs->trans("ParentElement").'</td><td>';
 	print '<input hidden class="flat" type="text" size="36" name="parent" id="parent">';
-	print $object->getNomUrl(1, 'blank', 1);
+	if (empty($fk_parent)) {
+		$digiriskstandard->fetch($conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD);
+		print $digiriskstandard->getNomUrl(1, 'blank', 1);
+	} else {
+		print $object->getNomUrl(1, 'blank', 1);
+	}
 	print '</td></tr>';
 
 	include DOL_DOCUMENT_ROOT.'/core/tpl/commonfields_add.tpl.php';
