@@ -589,6 +589,7 @@ AccidentLesionList = Liste des lésions lié à l'accident
 DocumentsMetaData = Fichiers joints complémentaires
 WorkStopDocument = Déclaration d'arrêt de travail
 AccidentMetaDataSave = Les données complémentaires de l'accident ont bien été enregistrées
+ErrorFieldNotEmpty = Erreur : Le champ '%s' ne peut pas être vide
 
 # Dictionnary - Dictionnaire
 UsualWorkplace = Lieu de travail habituel
