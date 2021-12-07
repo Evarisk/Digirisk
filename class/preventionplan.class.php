@@ -247,9 +247,9 @@ class PreventionPlan extends CommonObject
 		$preventionplanid = $object->create($user);
 
 		if ($preventionplanid > 0) {
-			$digiriskresources->digirisk_dolibarr_set_resources($this->db, $user->id, 'PP_EXT_SOCIETY', 'societe', array(array_shift($resources['PP_EXT_SOCIETY'])->id), $conf->entity, 'preventionplan', $preventionplanid, 0);
-			$digiriskresources->digirisk_dolibarr_set_resources($this->db, $user->id, 'PP_LABOUR_INSPECTOR', 'societe', array(array_shift($resources['PP_LABOUR_INSPECTOR'])->id), $conf->entity, 'preventionplan', $preventionplanid, 0);
-			$digiriskresources->digirisk_dolibarr_set_resources($this->db, $user->id, 'PP_LABOUR_INSPECTOR_ASSIGNED', 'socpeople', array(array_shift($resources['PP_LABOUR_INSPECTOR_ASSIGNED'])->id), $conf->entity, 'preventionplan', $preventionplanid, 0);
+			$digiriskresources->digirisk_dolibarr_set_resources($this->db, $user->id, 'PP_EXT_SOCIETY', 'societe', array(array_shift($resources['PP_EXT_SOCIETY'])->id), $conf->entity, 'preventionplan', $preventionplanid, 1);
+			$digiriskresources->digirisk_dolibarr_set_resources($this->db, $user->id, 'PP_LABOUR_INSPECTOR', 'societe', array(array_shift($resources['PP_LABOUR_INSPECTOR'])->id), $conf->entity, 'preventionplan', $preventionplanid, 1);
+			$digiriskresources->digirisk_dolibarr_set_resources($this->db, $user->id, 'PP_LABOUR_INSPECTOR_ASSIGNED', 'socpeople', array(array_shift($resources['PP_LABOUR_INSPECTOR_ASSIGNED'])->id), $conf->entity, 'preventionplan', $preventionplanid, 1);
 			$signatory->createFromClone($user, $signatoriesID['PP_MAITRE_OEUVRE'], $preventionplanid);
 			$signatory->createFromClone($user, $signatoriesID['PP_EXT_SOCIETY_RESPONSIBLE'], $preventionplanid);
 

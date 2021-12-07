@@ -210,9 +210,9 @@ if (empty($reshook)) {
 		if (!$error) {
 			$result = $object->create($user, false);
 			if ($result > 0) {
-				$digiriskresources->digirisk_dolibarr_set_resources($db, $user->id, 'FP_EXT_SOCIETY', 'societe', array($extsociety_id), $conf->entity, 'firepermit', $object->id, 0);
-				$digiriskresources->digirisk_dolibarr_set_resources($db, $user->id, 'FP_LABOUR_INSPECTOR', 'societe', array($labour_inspector_id), $conf->entity, 'firepermit', $object->id, 0);
-				$digiriskresources->digirisk_dolibarr_set_resources($db, $user->id, 'FP_LABOUR_INSPECTOR_ASSIGNED', 'socpeople', array($labour_inspector_contact_id), $conf->entity, 'firepermit', $object->id, 0);
+				$digiriskresources->digirisk_dolibarr_set_resources($db, $user->id, 'FP_EXT_SOCIETY', 'societe', array($extsociety_id), $conf->entity, 'firepermit', $object->id, 1);
+				$digiriskresources->digirisk_dolibarr_set_resources($db, $user->id, 'FP_LABOUR_INSPECTOR', 'societe', array($labour_inspector_id), $conf->entity, 'firepermit', $object->id, 1);
+				$digiriskresources->digirisk_dolibarr_set_resources($db, $user->id, 'FP_LABOUR_INSPECTOR_ASSIGNED', 'socpeople', array($labour_inspector_contact_id), $conf->entity, 'firepermit', $object->id, 1);
 
 				if ($maitre_oeuvre_id > 0) {
 					$signatory->setSignatory($object->id,'user', array($maitre_oeuvre_id), 'FP_MAITRE_OEUVRE');

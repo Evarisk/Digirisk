@@ -243,9 +243,9 @@ class FirePermit extends CommonObject
 		$firepermtid = $object->create($user);
 
 		if ($firepermtid > 0) {
-			$digiriskresources->digirisk_dolibarr_set_resources($this->db, $user->id, 'FP_EXT_SOCIETY', 'societe', array(array_shift($resources['FP_EXT_SOCIETY'])->id), $conf->entity, 'firepermit', $firepermtid, 0);
-			$digiriskresources->digirisk_dolibarr_set_resources($this->db, $user->id, 'FP_LABOUR_INSPECTOR', 'societe', array(array_shift($resources['FP_LABOUR_INSPECTOR'])->id), $conf->entity, 'firepermit', $firepermtid, 0);
-			$digiriskresources->digirisk_dolibarr_set_resources($this->db, $user->id, 'FP_LABOUR_INSPECTOR_ASSIGNED', 'socpeople', array(array_shift($resources['FP_LABOUR_INSPECTOR_ASSIGNED'])->id), $conf->entity, 'firepermit', $firepermtid, 0);
+			$digiriskresources->digirisk_dolibarr_set_resources($this->db, $user->id, 'FP_EXT_SOCIETY', 'societe', array(array_shift($resources['FP_EXT_SOCIETY'])->id), $conf->entity, 'firepermit', $firepermtid, 1);
+			$digiriskresources->digirisk_dolibarr_set_resources($this->db, $user->id, 'FP_LABOUR_INSPECTOR', 'societe', array(array_shift($resources['FP_LABOUR_INSPECTOR'])->id), $conf->entity, 'firepermit', $firepermtid, 1);
+			$digiriskresources->digirisk_dolibarr_set_resources($this->db, $user->id, 'FP_LABOUR_INSPECTOR_ASSIGNED', 'socpeople', array(array_shift($resources['FP_LABOUR_INSPECTOR_ASSIGNED'])->id), $conf->entity, 'firepermit', $firepermtid, 1);
 			$signatory->createFromClone($user, $signatoriesID['FP_MAITRE_OEUVRE'], $firepermtid);
 			$signatory->createFromClone($user, $signatoriesID['FP_EXT_SOCIETY_RESPONSIBLE'], $firepermtid);
 
