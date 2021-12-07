@@ -40,10 +40,8 @@ require_once DOL_DOCUMENT_ROOT.'/core/class/doleditor.class.php';
 
 require_once __DIR__ . '/class/digiriskdocuments.class.php';
 require_once __DIR__ . '/class/digiriskelement.class.php';
-require_once __DIR__ . '/class/digiriskresources.class.php';
 require_once __DIR__ . '/class/accident.class.php';
-require_once __DIR__ . '/class/preventionplan.class.php';
-require_once __DIR__ . '/class/riskanalysis/risk.class.php';
+require_once __DIR__ . './class/digiriskstandard.class.php';
 //require_once __DIR__ . '/class/digiriskdocuments/accidentdocument.class.php';
 require_once __DIR__ . '/lib/digiriskdolibarr_function.lib.php';
 require_once __DIR__ . '/lib/digiriskdolibarr_accident.lib.php';
@@ -78,16 +76,13 @@ $usertmp                = new User($db);
 $thirdparty             = new Societe($db);
 $extrafields            = new ExtraFields($db);
 $digiriskelement        = new DigiriskElement($db);
-$digiriskresources      = new DigiriskResources($db);
+$digiriskstandard       = new DigiriskStandard($db);
 $project                = new Project($db);
 $refAccidentMod         = new $conf->global->DIGIRISKDOLIBARR_ACCIDENT_ADDON($db);
 $refAccidentWorkStopMod = new $conf->global->DIGIRISKDOLIBARR_ACCIDENT_WORKSTOP_ADDON($db);
 
 // Load object
 $object->fetch($id);
-
-// Load resources
-$allLinks = $digiriskresources->digirisk_dolibarr_fetch_resources();
 
 $hookmanager->initHooks(array('accidentcard', 'globalcard')); // Note that conf->hooks_modules contains array
 
@@ -150,10 +145,13 @@ if (empty($reshook)) {
 		$accident_date = dol_mktime(GETPOST('dateohour', 'int'), GETPOST('dateomin', 'int'), 0, GETPOST('dateomonth', 'int'), GETPOST('dateoday', 'int'), GETPOST('dateoyear', 'int'));
 
 		$object->accident_date = $accident_date;
-
-		$object->fk_element     = $digiriskelement_id;
+		if (empty($digiriskelement_id)) {
+			$object->fk_element = $conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD;
+		} else {
+			$object->fk_element = $digiriskelement_id;
+		}
 		$object->fk_user_victim = $user_victim_id;
-		$object->fk_user_creat  = $user->id ? $user->id : 1;
+		$object->fk_user_creat  = $user->id ?: 1;
 
 		// Check parameters
 		if ($user_victim_id < 0) {
@@ -699,12 +697,12 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 
 	//Parent Element -- Elément parent
 	print '<tr><td class="titlefield">'.$langs->trans("ParentElement").'</td><td>';
-	$result = $digiriskelement->fetch($object->fk_kelement);
-	if ($result > 0) {
-		print $digiriskelement->ref . ( !empty($digiriskelement->label) ?  ' - ' . $digiriskelement->label : '');
-	}
-	else {
-		print $conf->global->MAIN_INFO_SOCIETE_NOM;
+	if ($conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD == $object->fk_element) {
+		$digiriskstandard->fetch($conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD);
+		print $digiriskstandard->getNomUrl(1, 'blank', 1);
+	} else {
+		$digiriskelement->fetch($object->fk_element);
+		print $digiriskelement->getNomUrl(1, 'blank', 1);
 	}
 	print '</td></tr>';
 
