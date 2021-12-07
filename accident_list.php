@@ -415,7 +415,7 @@ while ($i < ($limit ? min($num, $limit) : $num)) {
 			print '<td' . ($cssforfield ? ' class="' . $cssforfield . '"' : '') . ' style="width:2%">';
 			if ($key == 'status') print $accident->getLibStatut(5);
 			elseif ($key == 'ref') {
-				print $accident->getNomUrl();
+				print '<i class="fas fa-user-injured"></i>  ' . $accident->getNomUrl();
 			}
 			elseif ($key == 'accident_date') {
 				print dol_print_date($accident->accident_date, 'dayhour', 'tzserver');	// We suppose dates without time are always gmt (storage of course + output)

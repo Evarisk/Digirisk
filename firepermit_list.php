@@ -450,7 +450,7 @@ while ($i < ($limit ? min($num, $limit) : $num)) {
 				}
 			}
 			elseif ($key == 'ref') {
-				print $firepermit->getNomUrl();
+				print '<i class="fas fa-fire-alt"></i>  ' . $firepermit->getNomUrl();
 			}
 			elseif ($key == 'date_start') {
 				print dol_print_date($firepermit->date_start, 'dayhour', 'tzserver');	// We suppose dates without time are always gmt (storage of course + output)
