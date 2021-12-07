@@ -52,7 +52,7 @@ require_once __DIR__ . '/core/modules/digiriskdolibarr/digiriskelement/preventio
 require_once __DIR__ . '/core/modules/digiriskdolibarr/digiriskdocuments/preventionplandocument/mod_preventionplandocument_standard.php';
 require_once __DIR__ . '/core/modules/digiriskdolibarr/digiriskdocuments/preventionplandocument/modules_preventionplandocument.php';
 
-global $user, $db, $conf, $langs;
+global $conf, $db, $hookmanager, $langs, $user;
 
 // Load translation files required by the page
 $langs->loadLangs(array("digiriskdolibarr@digiriskdolibarr", "other"));
@@ -125,7 +125,7 @@ if (empty($reshook)) {
 		}
 	}
 
-	if (GETPOST('cancel')) {
+	if (GETPOST('cancel') || GETPOST('cancelLine')) {
 		// Cancel prevention plan
 		$urltogo = str_replace('__ID__', $result, $backtopage);
 		$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
@@ -1286,6 +1286,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 					$coldisplay += $colspan;
 					print '<td class="center" colspan="' . $colspan . '">';
 					print '<input type="submit" class="button" value="' . $langs->trans('Save') . '" name="updateLine" id="updateLine">';
+					print ' &nbsp; <input type="submit" id ="cancelLine" class="button" name="cancelLine" value="'.$langs->trans("Cancel").'">';
 					print '</td>';
 					print '</tr>';
 

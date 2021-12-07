@@ -119,7 +119,7 @@ if (empty($reshook)) {
 		}
 	}
 
-	if (GETPOST('cancel')) {
+	if (GETPOST('cancel') || GETPOST('cancelLine')) {
 		// Cancel accident
 		$urltogo = str_replace('__ID__', $result, $backtopage);
 		$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
@@ -847,6 +847,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 					$coldisplay += $colspan;
 					print '<td class="center" colspan="' . $colspan . '">';
 					print '<input type="submit" class="button" value="' . $langs->trans('Save') . '" name="updateLine" id="updateLine">';
+					print ' &nbsp; <input type="submit" id ="cancelLine" class="button" name="cancelLine" value="'.$langs->trans("Cancel").'">';
 					print '</td>';
 					print '</tr>';
 

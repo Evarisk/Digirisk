@@ -95,6 +95,14 @@ if (empty($reshook)) {
 		}
 	}
 
+	if (GETPOST('cancel') || GETPOST('cancelLine')) {
+		// Cancel accident
+		$urltogo = str_replace('__ID__', $result, $backtopage);
+		$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
+		header("Location: " . $urltogo);
+		exit;
+	}
+
 	// Action to update record
 	if ($action == 'update' && $permissiontoadd) {
 		// Get parameters
@@ -449,6 +457,7 @@ if (!empty($accidentlines) && $accidentlines > 0) {
 			$coldisplay += $colspan;
 			print '<td class="center" colspan="' . $colspan . '">';
 			print '<input type="submit" class="button" value="' . $langs->trans('Save') . '" name="updateLine" id="updateLine">';
+			print ' &nbsp; <input type="submit" id ="cancelLine" class="button" name="cancelLine" value="'.$langs->trans("Cancel").'">';
 			print '</td>';
 			print '</tr>';
 
