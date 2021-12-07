@@ -351,6 +351,7 @@ print '</td></tr>';
 //RelativeLocation -- Précisions complémentaires sur le lieu de l’accident
 print '<tr><td class="minwidth400">'.$langs->trans("RelativeLocation").'</td><td>';
 print $formother->select_dictionary('relative_location','c_relative_location', 'ref', 'label', $accidentmetadata->relative_location, 1);
+print '<a href="'.DOL_URL_ROOT.'/admin/dict.php?mainmenu=home" target="_blank">' . $form->textwithpicto('', $langs->trans('ConfigDico')) . '</a>';
 print '</td></tr>';
 
 //ThirdPartyResponsability --
@@ -446,12 +447,14 @@ if (!empty($accidentlines) && $accidentlines > 0) {
 			//LesionLocalization -- Siège des lésions
 			print '<td>';
 			print $formother->select_dictionary('lesion_localization','c_lesion_localization', 'label', 'label', $item->lesion_localization, 1);
+			print '<a href="'.DOL_URL_ROOT.'/admin/dict.php?mainmenu=home" target="_blank">' . $form->textwithpicto('', $langs->trans('ConfigDico')) . '</a>';
 			print '</td>';
 
 			$coldisplay++;
 			//LesionNature -- Nature des lésions
 			print '<td>';
 			print $formother->select_dictionary('lesion_nature','c_lesion_nature', 'label', 'label', $item->lesion_nature, 1);
+			print '<a href="'.DOL_URL_ROOT.'/admin/dict.php?mainmenu=home" target="_blank">' . $form->textwithpicto('', $langs->trans('ConfigDico')) . '</a>';
 			print '</td>';
 
 			$coldisplay += $colspan;
@@ -515,12 +518,14 @@ if ($object->status == 1 && $permissiontoadd) {
 	//LesionLocalization -- Siège des lésions
 	print '<td>';
 	print $formother->select_dictionary('lesion_localization','c_lesion_localization', 'label', 'label', '', 1);
+	print '<a href="'.DOL_URL_ROOT.'/admin/dict.php?mainmenu=home" target="_blank">' . $form->textwithpicto('', $langs->trans('ConfigDico')) . '</a>';
 	print '</td>';
 
 	$coldisplay++;
 	//LesionNature -- Nature des lésions
 	print '<td>';
 	print $formother->select_dictionary('lesion_nature','c_lesion_nature', 'label', 'label', '', 1);
+	print '<a href="'.DOL_URL_ROOT.'/admin/dict.php?mainmenu=home" target="_blank">' . $form->textwithpicto('', $langs->trans('ConfigDico')) . '</a>';
 	print '</td>';
 
 	$coldisplay += $colspan;

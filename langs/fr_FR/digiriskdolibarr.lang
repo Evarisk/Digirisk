@@ -46,7 +46,7 @@ DigiriskManagement = Redirection après la connexion au site
 DigiriskDescription = Redirection sur la page de bienvenue de Digirisk par défaut au lieu de celle de Dolibarr.
 HowToSetupIHM = Pour plus de fonctionnalités sur l'affichage de Dolibarr (Configuration de l'image de fond du Dolibarr, etc), vous pouvez vous rendre sur ce lien :
 ConfigIHM = Configuration de l'affichage
-
+ConfigDico =  Accéder à la page de configuration des dictionnaires
 
 
 #
