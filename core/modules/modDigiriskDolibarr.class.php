@@ -725,7 +725,7 @@ class modDigiriskdolibarr extends DolibarrModules
 		$this->menu[$r++]=array(
 			'fk_menu'=>'fk_mainmenu=digiriskdolibarr',	    		// '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
 			'type'=>'left', 										// This is a Left menu entry
-			'titre'=>'<i class="fas fa-exclamation-triangle"></i>  ' . $langs->trans('GPUTOrganisation'),
+			'titre'=>'<i class="fas fa-network-wired"></i>  ' . $langs->trans('GPUTOrganisation'),
 			'mainmenu'=>'digiriskdolibarr',
 			'leftmenu'=>'digiriskstandard',
 			'url'=>'/digiriskdolibarr/digiriskelement_organization.php',
