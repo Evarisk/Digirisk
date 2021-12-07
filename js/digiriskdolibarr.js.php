@@ -3160,7 +3160,7 @@ window.eoxiaJS.keyEvent.init = function() {
  * @return {void}
  */
 window.eoxiaJS.keyEvent.event = function() {
-	jQuery( document ).on( 'keyup', window.eoxiaJS.keyEvent.keyup );
+	jQuery( document ).on( 'keydown', window.eoxiaJS.keyEvent.keyup );
 }
 
 /**
@@ -3172,11 +3172,11 @@ window.eoxiaJS.keyEvent.event = function() {
  * @return {void}
  */
 window.eoxiaJS.keyEvent.keyup = function( event ) {
-	if ( 27 === event.keyCode ) {
+	if ( 'Escape' === event.key  ) {
 		$(this).find('.modal-active .modal-close .fas.fa-times').first().click();
 	}
 
-	if ( 13 === event.keyCode )  {
+	if ( 'Enter' === event.key )  {
 		$(this).find('.modal-active .modal-footer .wpeo-button').not('.button-disable').first().click();
 	}
 };
