@@ -190,6 +190,7 @@ if (empty($reshook)) {
 					dol_mkdir($filedir);
 					if (!empty($filedir)) {
 						$result = dol_add_file_process($filedir, 0, 1, 'userfile', '', null, '', 1, $object);
+						$object->photo = $_FILES['userfile']['name'][0];
 					}
 				}
 			}
@@ -273,6 +274,7 @@ if (empty($reshook)) {
 					dol_mkdir($filedir);
 					if (!empty($filedir)) {
 						$result = dol_add_file_process($filedir, 0, 1, 'userfile', '', null, '', 1, $object);
+						$object->photo = $_FILES['userfile']['name'][0];
 					}
 				}
 			}
