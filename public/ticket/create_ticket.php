@@ -131,10 +131,6 @@ if ($action == 'add') {
 		setEventMessages($langs->trans('ErrorFieldNotEmpty', $langs->transnoentitiesnoconv('Firstname')), null, 'errors');
 		$error++;
 	}
-	if (empty(GETPOST('options_digiriskdolibarr_ticket_phone'))) {
-		setEventMessages($langs->trans('ErrorFieldNotEmpty', $langs->transnoentitiesnoconv('Phone')), null, 'errors');
-		$error++;
-	}
 	if (empty(GETPOST('options_digiriskdolibarr_ticket_service'))) {
 		setEventMessages($langs->trans('ErrorFieldNotEmpty', $langs->transnoentitiesnoconv('Service')), null, 'errors');
 		$error++;

@@ -1202,10 +1202,12 @@ AlreadyGenerated = Déjà généré(e)s
 NotCreated = Pas encore créé(e)s
 ExtrafieldsGeneration = Cette option permet la génération des extrafields liés au ticket
 CategoriesGeneration = Cette option permet la génération des catégories liées au ticket
-TicketSuccess = Voici votre Id de suivi de ticket :
-TicketPublicAccess = Lien vers l'interface publique des tickets :
+TicketSuccess = Votre registre a été transmis au service prévention sous le numéro :
+TicketPublicAccess = Lien de retour vers l'interface publique des tickets :
 TicketShowCompanyLogo = Afficher le logo de la société dans l'interface publique
 TicketShowCompanyLogoHelp = Activez cette option pour masquer le logo de la société dans les pages de l'interface publique
+YouMustNotifyYourHierarchy = Vous êtes dans l'<b>obligation</b> de prévenir votre hiérarchie
+GoBackToTicketCreation = Retourner sur la page de création de ticket
 SendEmailOnTicketSubmit = Envoyer des emails à la création
 UseCaptchaOnCreateTicketPage = Utilisation du code graphique (CAPTCHA) sur la page de création
 
