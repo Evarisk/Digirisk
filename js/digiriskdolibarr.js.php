@@ -1142,10 +1142,11 @@ window.eoxiaJS.mediaGallery.savePhoto = function( event ) {
 
 	let favorite = filenames
 	favorite = favorite.split('vVv')[0]
+    window.eoxiaJS.loader.display($(this));
 
 	if (type === 'riskassessment') {
 		mediaLinked = modalFrom.find('.element-linked-medias')
-		window.eoxiaJS.loader.display(mediaLinked);
+        window.eoxiaJS.loader.display(mediaLinked);
 
         let riskAssessmentPhoto = ''
         riskAssessmentPhoto = $('.risk-evaluation-photo-'+idToSave+'.risk-'+riskId)
