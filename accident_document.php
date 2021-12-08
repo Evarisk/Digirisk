@@ -87,18 +87,17 @@ $extrafields->fetch_name_optionals_label($object->table_element);
 include DOL_DOCUMENT_ROOT.'/core/actions_fetchobject.inc.php'; // Must be include, not include_once  // Must be include, not include_once. Include fetch and fetch_thirdparty but not fetch_optionals
 
 if ($id > 0 || !empty($ref)) {
-	$upload_dir = $conf->digiriskdolibarr->multidir_output[$object->entity ? $object->entity : $conf->entity]."/myobject/".get_exdir(0, 0, 0, 1, $object);
+	$upload_dir = $conf->digiriskdolibarr->multidir_output[$object->entity ? $object->entity : $conf->entity]."/accident/".get_exdir(0, 0, 0, 1, $object);
 }
 
 $permissiontoadd = $user->rights->digiriskdolibarr->accident->write; // Used by the include of actions_addupdatedelete.inc.php and actions_linkedfiles.inc.php
 
-// Security check (enable the most restrictive one)
-//if ($user->socid > 0) accessforbidden();
-//if ($user->socid > 0) $socid = $user->socid;
-//$isdraft = (($object->status == $object::STATUS_DRAFT) ? 1 : 0);
-//restrictedArea($user, $object->element, $object->id, $object->table_element, '', 'fk_soc', 'rowid', $isdraft);
-//if (empty($conf->digiriskdolibarr->enabled)) accessforbidden();
-//if (!$permissiontoread) accessforbidden();
+// Security check
+$permissiontoread   = $user->rights->digiriskdolibarr->accident->read;
+$permissiontoadd    = $user->rights->digiriskdolibarr->accident->write;
+$permissiontodelete = $user->rights->digiriskdolibarr->accident->delete;
+
+if (!$permissiontoread) accessforbidden();
 
 /*
  * Actions
@@ -138,6 +137,14 @@ if ($object->id) {
 
 	// Build file list
 	$filearray = dol_dir_list($upload_dir, "files", 0, '', '(\.meta|_preview.*\.png)$', $sortfield, (strtolower($sortorder) == 'desc' ?SORT_DESC:SORT_ASC), 1);
+	$workstopDirectories =  dol_dir_list($upload_dir . '/workstop/', 'directories', 0);
+	foreach ($workstopDirectories as $workstopDirectory) {
+		$workstopFileArray = dol_dir_list($workstopDirectory['fullname'], 'files', 0, '', '(\.meta|_preview.*\.png)$', $sortfield, (strtolower($sortorder) == 'desc' ?SORT_DESC:SORT_ASC), 1);
+		foreach ($workstopFileArray as $workstopFile) {
+			$workstopFile['name'] = $workstopFile['level1name'] . '/' . $workstopFile['name'];
+			$filearray[] = $workstopFile;
+		}
+	}
 	$totalsize = 0;
 	foreach ($filearray as $key => $file) {
 		$totalsize += $file['size'];
@@ -161,7 +168,6 @@ if ($object->id) {
 	$permtoedit = 1;
 	$param = '&id='.$object->id;
 
-	//$relativepathwithnofile='myobject/' . dol_sanitizeFileName($object->id).'/';
 	$relativepathwithnofile = 'accident/'.dol_sanitizeFileName($object->ref).'/';
 
 	include DOL_DOCUMENT_ROOT.'/core/tpl/document_actions_post_headers.tpl.php';
