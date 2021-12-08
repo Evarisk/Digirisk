@@ -390,6 +390,7 @@ $arrayofselected = is_array($toselect) ? $toselect : array();
 
 // contenu
 $i = 0;
+$kCounter = 0;
 $totalarray = array();
 
 while ($i < ($limit ? min($num, $limit) : $num)) {
@@ -413,7 +414,32 @@ while ($i < ($limit ? min($num, $limit) : $num)) {
 		elseif ($key == 'description') $cssforfield .= ($cssforfield ? ' ' : '') . 'accidentdocument-description';
 		if (!empty($arrayfields['t.' . $key]['checked'])) {
 			print '<td' . ($cssforfield ? ' class="' . $cssforfield . '"' : '') . ' style="width:2%">';
-			if ($key == 'status') print $accident->getLibStatut(5);
+			if ($key == 'status') {
+				$counter = 0;
+				$kCounter++;
+
+				$morecssGauge = 'center';
+				$move_title_gauge = 1;
+
+				$arrayAccident = array();
+				$arrayAccident[] = $accident->ref;
+				$arrayAccident[] = $accident->label;
+				$arrayAccident[] = $accident->accident_date;
+				$arrayAccident[] = $accident->description;
+				$arrayAccident[] = $accident->photo;
+				$arrayAccident[] = $accident->fk_element;
+				$arrayAccident[] = $accident->fk_user_victim;
+
+				$maxnumber  = count($arrayAccident);
+
+				foreach ($arrayAccident as $arrayAccidentData) {
+					if (dol_strlen($arrayAccidentData) > 0 ) {
+						$counter += 1;
+					}
+				}
+
+				include './core/tpl/digiriskdolibarr_configuration_gauge_view.tpl.php';
+			}
 			elseif ($key == 'ref') {
 				print '<i class="fas fa-user-injured"></i>  ' . $accident->getNomUrl();
 			}

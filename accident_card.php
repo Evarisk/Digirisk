@@ -234,7 +234,11 @@ if (empty($reshook)) {
 
 		$object->accident_date = $accident_date;
 
-		$object->fk_element     = $digiriskelement_id;
+		if (empty($digiriskelement_id)) {
+			$object->fk_element = $conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD;
+		} else {
+			$object->fk_element = $digiriskelement_id;
+		}
 		$object->fk_user_victim = $user_victim_id;
 		$object->fk_user_creat  = $user->id ? $user->id : 1;
 

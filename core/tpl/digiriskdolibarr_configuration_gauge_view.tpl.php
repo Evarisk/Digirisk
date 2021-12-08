@@ -1,6 +1,6 @@
 <div class="chart-container <?php echo $morecssGauge ?>" style=" width:50px">
 	<div class="wpeo-gridlayout grid-2">
-		<canvas class="" id="advancementGauge" width="40" height="40" style="width:50px !important"></canvas>
+		<canvas class="" id="advancementGauge<?php echo $kCounter?>" width="40" height="40" style="width:50px !important"></canvas>
 		<?php if (empty($move_title_gauge)) : ?>
 			<h3 class="">
 				<?php echo bcdiv((($counter / $maxnumber) * 100), 1, 2) . '%' ?>
@@ -9,8 +9,8 @@
 	</div>
 
 	<script>
-		const ctx = document.getElementById('advancementGauge').getContext('2d');
-		const advancementGauge = new Chart(ctx, {
+		const ctx<?php echo $kCounter?> = document.getElementById('advancementGauge<?php echo $kCounter?>').getContext('2d');
+		const advancementGauge<?php echo $kCounter?> = new Chart(ctx<?php echo $kCounter?>, {
 			type: 'doughnut',
 			options: {
 				legend: {

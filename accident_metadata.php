@@ -269,44 +269,44 @@ $morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");
 
 llxHeader('', $title, $help_url, '', '', '', $morejs, $morecss);
 
-$counter = 0;
-
-$morecssGauge = 'inline-block floatright';
-$move_title_gauge = 1;
-
-$arrayAccidentMetaData = array();
-$arrayAccidentMetaData[] = $accidentmetadata->relative_location;
-$arrayAccidentMetaData[] = $accidentmetadata->thirdparty_responsibility;
-$arrayAccidentMetaData[] = $accidentmetadata->fatal;
-$arrayAccidentMetaData[] = $accidentmetadata->accident_investigation;
-$arrayAccidentMetaData[] = $accidentmetadata->accident_investigation_link;
-$arrayAccidentMetaData[] = $accidentmetadata->accident_location;
-$arrayAccidentMetaData[] = $accidentmetadata->collateral_victim;
-$arrayAccidentMetaData[] = $accidentmetadata->police_report;
-$arrayAccidentMetaData[] = $accidentmetadata->cerfa_link;
-
-$accidentlesions = $objectline->fetchAll($object->id);
-if (!empty($accidentlesions)) {
-	$accidentlesions = array_shift($accidentlesions);
-}
-
-$arrayAccidentLesion = array();
-$arrayAccidentLesion[] = $accidentlesions->lesion_nature;
-$arrayAccidentLesion[] = $accidentlesions->lesion_localization;
-
-$maxnumber  = count($arrayAccidentMetaData) + count($arrayAccidentLesion);
-
-foreach ($arrayAccidentMetaData as $arrayAccidentMetaDataSingle) {
-	if (dol_strlen($arrayAccidentMetaDataSingle) > 0 ) {
-		$counter += 1;
-	}
-}
-
-foreach ($arrayAccidentLesion as $arrayAccidentLesionSingle) {
-	if (dol_strlen($arrayAccidentLesionSingle) > 0 ) {
-		$counter += 1;
-	}
-}
+//$counter = 0;
+//
+//$morecssGauge = 'inline-block floatright';
+//$move_title_gauge = 1;
+//
+//$arrayAccidentMetaData = array();
+//$arrayAccidentMetaData[] = $accidentmetadata->relative_location;
+//$arrayAccidentMetaData[] = $accidentmetadata->thirdparty_responsibility;
+//$arrayAccidentMetaData[] = $accidentmetadata->fatal;
+//$arrayAccidentMetaData[] = $accidentmetadata->accident_investigation;
+//$arrayAccidentMetaData[] = $accidentmetadata->accident_investigation_link;
+//$arrayAccidentMetaData[] = $accidentmetadata->accident_location;
+//$arrayAccidentMetaData[] = $accidentmetadata->collateral_victim;
+//$arrayAccidentMetaData[] = $accidentmetadata->police_report;
+//$arrayAccidentMetaData[] = $accidentmetadata->cerfa_link;
+//
+//$accidentlesions = $objectline->fetchAll($object->id);
+//if (!empty($accidentlesions)) {
+//	$accidentlesions = array_shift($accidentlesions);
+//}
+//
+//$arrayAccidentLesion = array();
+//$arrayAccidentLesion[] = $accidentlesions->lesion_nature;
+//$arrayAccidentLesion[] = $accidentlesions->lesion_localization;
+//
+//$maxnumber  = count($arrayAccidentMetaData) + count($arrayAccidentLesion);
+//
+//foreach ($arrayAccidentMetaData as $arrayAccidentMetaDataSingle) {
+//	if (dol_strlen($arrayAccidentMetaDataSingle) > 0 ) {
+//		$counter += 1;
+//	}
+//}
+//
+//foreach ($arrayAccidentLesion as $arrayAccidentLesionSingle) {
+//	if (dol_strlen($arrayAccidentLesionSingle) > 0 ) {
+//		$counter += 1;
+//	}
+//}
 
 // Object metadata
 // ------------------------------------------------------------
@@ -320,7 +320,7 @@ $project->fetch($object->fk_project);
 $morehtmlref .= $langs->trans('Project').' : '.getNomUrlProject($project, 1, 'blank');
 $morehtmlref .= '</div>';
 
-include_once './core/tpl/digiriskdolibarr_configuration_gauge_view.tpl.php';
+//include_once './core/tpl/digiriskdolibarr_configuration_gauge_view.tpl.php';
 
 digirisk_banner_tab($object, 'ref', '', 0, 'ref', 'ref', $morehtmlref);
 
