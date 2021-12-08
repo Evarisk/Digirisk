@@ -349,3 +349,34 @@ if ( $conf->global->DIGIRISKDOLIBARR_ADMINUSERGROUP_UPDATED ==  0 ) {
 	}
 	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_ADMINUSERGROUP_UPDATED', 1, 'integer', 0, '', $conf->entity);
 }
+
+if ($conf->global->DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH_UPDATED ==  0) {
+	require_once '../class/digiriskelement/groupment.class.php';
+
+	$digiriskelement = new Groupment($db);
+	$digiriskelement->fetch($conf->global->DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH);
+
+	$dirforimage   = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/img/defaultImgGP0/';
+	$original_file = 'trash-alt-solid.png';
+	$src_file = $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/groupment/GP0/';
+	$src_file_thumbs = $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/groupment/GP0/thumbs/';
+
+	if (!is_dir($src_file)) {
+		dol_mkdir($src_file);
+	}
+
+	if (!is_dir($src_file_thumbs)) {
+		dol_mkdir($src_file_thumbs);
+	}
+
+	dol_copy($dirforimage.$original_file, $src_file.$original_file, 0, 0);
+	dol_copy($dirforimage.'/thumbs/trash-alt-solid_mini.png', $src_file.'/thumbs/trash-alt-solid_mini.png', 0, 0);
+	dol_copy($dirforimage.'/thumbs/trash-alt-solid_small.png', $src_file.'/thumbs/trash-alt-solid_small.png', 0, 0);
+
+	$digiriskelement->photo = $original_file;
+	$result = $digiriskelement->update($user);
+
+	if ($result > 0) {
+		dolibarr_set_const($db, 'DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH_UPDATED', 1, 'integer', 0, '', $conf->entity);
+	}
+}

@@ -947,47 +947,9 @@ class modDigiriskdolibarr extends DolibarrModules
 			$digiriskelement->rank = 0;
 			$digiriskelement->description = $langs->trans('TrashGroupment');
 			$digiriskelement->status = 0;
-
-			$dirforimage   = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/img/defaultImgGP0/';
-			$original_file = 'trash-alt-solid.png';
-			$src_file = $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/groupment/GP0/';
-
-			if (!is_dir($dirforimage)) {
-				dol_mkdir($dirforimage);
-			}
-
-			dol_copy($dirforimage.$original_file, $src_file.$original_file, 0, 0);
-
-			$digiriskelement->photo = $original_file;
-
 			$trash_id = $digiriskelement->create($user);
 
 			dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH', $trash_id, 'integer', 0, '', $conf->entity);
-			dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH_UPDATED', 1, 'integer', 0, '', $conf->entity);
-		}
-
-		if ( $conf->global->DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH_UPDATED ==  0 ) {
-			require_once __DIR__ . '/../../class/digiriskelement/groupment.class.php';
-
-			$digiriskelement = new Groupment($this->db);
-			$digiriskelement->fetch($conf->global->DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH);
-
-			$dirforimage   = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/img/defaultImgGP0/';
-			$original_file = 'trash-alt-solid.png';
-			$src_file = $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/groupment/GP0/';
-
-			if (!is_dir($dirforimage)) {
-				dol_mkdir($dirforimage);
-			}
-
-			dol_copy($dirforimage.$original_file, $src_file.$original_file, 0, 0);
-
-			$digiriskelement->photo = $original_file;
-			$result = $digiriskelement->update($user);
-
-			if ($result > 0) {
-				dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH_UPDATED', 1, 'integer', 0, '', $conf->entity);
-			}
 		}
 
 		if ( $conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD ==  0 ) {
