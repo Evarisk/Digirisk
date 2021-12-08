@@ -763,7 +763,7 @@ class AccidentMetaData extends CommonObject
 		'thirdparty_responsibility'   => array('type'=>'boolean', 'label'=>'ThirdPartyResponsability', 'enabled'=>'1', 'position'=>80, 'notnull'=>-1, 'visible'=>1,),
 		'fatal'                       => array('type'=>'boolean', 'label'=>'Fatal', 'enabled'=>'1', 'position'=>90, 'notnull'=>-1, 'visible'=>1,),
 		'accident_investigation'      => array('type'=>'boolean', 'label'=>'AccidentInvestigation', 'enabled'=>'1', 'position'=>100, 'notnull'=>-1, 'visible'=>1,),
-		'accident_investigation_link' => array('type'=>'boolean', 'label'=>'AccidentInvestigationLink', 'enabled'=>'1', 'position'=>110, 'notnull'=>-1, 'visible'=>1,),
+		'accident_investigation_link' => array('type'=>'text', 'label'=>'AccidentInvestigationLink', 'enabled'=>'1', 'position'=>110, 'notnull'=>-1, 'visible'=>1,),
 		'accident_location'           => array('type'=>'text', 'label'=>'AccidentLocation', 'enabled'=>'1', 'position'=>120, 'notnull'=>-1, 'visible'=>1,),
 		'collateral_victim'           => array('type'=>'boolean', 'label'=>'CollateralVictim', 'enabled'=>'1', 'position'=>130, 'notnull'=>-1, 'visible'=>1,),
 		'police_report'               => array('type'=>'boolean', 'label'=>'PoliceReport', 'enabled'=>'1', 'position'=>140, 'notnull'=>-1, 'visible'=>1,),

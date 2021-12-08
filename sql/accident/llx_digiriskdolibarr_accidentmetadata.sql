@@ -23,7 +23,7 @@ CREATE TABLE llx_digiriskdolibarr_accidentmetadata(
 	thirdparty_responsibility   boolean,
 	fatal                       boolean,
 	accident_investigation      boolean,
-	accident_investigation_link boolean,
+	accident_investigation_link text,
 	accident_location           text,
 	collateral_victim           boolean,
 	police_report               boolean,

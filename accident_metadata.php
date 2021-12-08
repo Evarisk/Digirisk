@@ -357,42 +357,36 @@ print '</td></tr>';
 //ThirdPartyResponsability --
 print '<tr><td class="minwidth400">'.$langs->trans("ThirdPartyResponsability").'</td><td>';
 print '<input type="checkbox" id="thirdparty_responsibility" name="thirdparty_responsibility"'.($accidentmetadata->thirdparty_responsibility ? ' checked=""' : '').'>';
-print $form->textwithpicto('', $langs->trans(''));
 print '</td></tr>';
 
 //Fatal -- Décès
 print '<tr><td class="minwidth400">'.$langs->trans("Fatal").'</td><td>';
 print '<input type="checkbox" id="fatal" name="fatal"'.($accidentmetadata->fatal ? ' checked=""' : '').'>';
-print $form->textwithpicto('', $langs->trans(''));
 print '</td></tr>';
 
 //AccidentInvestigation -- Enquête accident
 print '<tr><td class="minwidth400">'.$langs->trans("AccidentInvestigation").'</td><td>';
 print '<input type="checkbox" id="accident_investigation" name="accident_investigation"'.($accidentmetadata->accident_investigation ? ' checked=""' : '').'>';
-print $form->textwithpicto('', $langs->trans(''));
 print '</td></tr>';
 
 //AccidentInvestigationLink -- lien vers l'enquête accident
 print '<tr><td class="minwidth400">'.$langs->trans("AccidentInvestigationLink").'</td><td>';
-print '<input type="checkbox" id="accident_investigation_link" name="accident_investigation_link"'.($accidentmetadata->accident_investigation_link ? ' checked=""' : '').'>';
-print $form->textwithpicto('', $langs->trans(''));
+print img_picto('', 'globe').'<input type="text" class="minwidth400" id="accident_investigation_link" name="accident_investigation_link"'.($accidentmetadata->accident_investigation_link ? ' checked=""' : '').'>';
 print '</td></tr>';
 
 //CollateralVictim -- Victime collatérale
 print '<tr><td class="minwidth400">'.$langs->trans("CollateralVictim").'</td><td>';
 print '<input type="checkbox" id="collateral_victim" name="collateral_victim"'.($accidentmetadata->collateral_victim ? ' checked=""' : '').'>';
-print $form->textwithpicto('', $langs->trans(''));
 print '</td></tr>';
 
 //PoliceReport  -- Rapport de police
 print '<tr><td class="minwidth400">'.$langs->trans("PoliceReport").'</td><td>';
 print '<input type="checkbox" id="police_report" name="police_report"'.($accidentmetadata->police_report ? ' checked=""' : '').'>';
-print $form->textwithpicto('', $langs->trans(''));
 print '</td></tr>';
 
 //CerfaLink -- Lien vers le Cerfa
 print '<tr><td class="minwidth400">'.$langs->trans("CerfaLink").'</td><td>';
-print '<input class="flat" type="text" size="36" name="cerfa_link" id="cerfa_link" value="'.$accidentmetadata->cerfa_link.'">';
+print img_picto('', 'globe').'<input type="text" class="minwidth400" name="cerfa_link" id="cerfa_link" value="'.$accidentmetadata->cerfa_link.'">';
 print '</td></tr>';
 
 print '</table>';
