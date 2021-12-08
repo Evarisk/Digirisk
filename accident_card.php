@@ -784,7 +784,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 
 					$coldisplay++;
 					print '<td>';
-					print '<input type="integer" name="workstop_days" class="minwidth150" value="' .  $item->workstop_days . '">';
+					print '<input type="number" name="workstop_days" class="minwidth150" value="' .  $item->workstop_days . '">';
 					print '</td>';
 
 					$coldisplay++;
@@ -944,7 +944,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 
 			$coldisplay++;
 			print '<td>';
-			print '<input type="integer" name="workstop_days" class="minwidth150" value="">';
+			print '<input type="number" name="workstop_days" class="minwidth150" value="">';
 			print '</td>';
 
 			$coldisplay++;
