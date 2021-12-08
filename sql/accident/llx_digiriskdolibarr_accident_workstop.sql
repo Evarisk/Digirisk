@@ -19,6 +19,7 @@ CREATE TABLE llx_digiriskdolibarr_accident_workstop(
 	entity        integer DEFAULT 1 NOT NULL,
 	date_creation datetime NOT NULL,
 	tms           timestamp,
+    status        smallint,
 	workstop_days integer,
 	fk_accident   integer NOT NULL
 ) ENGINE=innodb;

@@ -307,11 +307,11 @@ if (empty($reshook)) {
 
 		// Initialize object accident line
 		$objectline->date_creation  = $object->db->idate($now);
+		$objectline->status         = 1;
 		$objectline->ref            = $refAccidentWorkStopMod->getNextValue($objectline);
 		$objectline->entity         = $conf->entity;
 		$objectline->workstop_days  = $workstop_days;
 		$objectline->fk_accident    = $parent_id;
-
 
 		// Check parameters
 		if (empty($workstop_days)) {
@@ -370,9 +370,28 @@ if (empty($reshook)) {
 	}
 
 	// Action to delete line
-	if ($action == 'deleteline' && $permissiontodelete) {
+	if ($action == 'confirm_deleteLine' && GETPOST("confirm") == "yes" && $permissiontodelete) {
 		$objectline->fetch($lineid);
-		$result = $objectline->delete($user, false);
+
+		$objectline->status = 0;
+
+		$pathPhoto = $upload_dir . '/accident/'.$object->ref.'/workstop/'.$objectline->ref;
+		$filedir   = $upload_dir . '/accident/'.$object->ref.'/archive/workstop/';
+
+		if (!file_exists($filedir))
+		{
+			if (dol_mkdir($filedir) < 0)
+			{
+				$object->error = $langs->transnoentities("ErrorCanNotCreateDir", $filedir);
+				$error++;
+			}
+		}
+
+		if (!$error) {
+			rename($pathPhoto, $filedir . $objectline->ref);
+			$result = $objectline->delete($user, false);
+		}
+
 		if ($result > 0) {
 			// Deletion accident line OK
 			setEventMessages($langs->trans('DeleteAccidentWorkStop').' '.$object->ref, array());
@@ -616,6 +635,22 @@ if (($id || $ref) && $action == 'edit') {
 	print '</form>';
 }
 
+$formconfirm = '';
+// Confirmation to delete
+if ($action == 'deleteline') {
+	$objectline->fetch($lineid);
+	$formconfirm = $form->formconfirm($_SERVER["PHP_SELF"].'?id='.$object->id.'&lineid='.$lineid, $langs->trans('DeleteAccidentWorkStop'), $langs->trans('ConfirmDeleteAccidentWorkStop', $objectline->ref), 'confirm_deleteLine', '', 0, 1);
+}
+
+// Call Hook formConfirm
+$parameters = array('formConfirm' => $formconfirm, 'object' => $object);
+$reshook = $hookmanager->executeHooks('formConfirm', $parameters, $object, $action); // Note that $action and $object may have been modified by hook
+if (empty($reshook)) $formconfirm .= $hookmanager->resPrint;
+elseif ($reshook > 0) $formconfirm = $hookmanager->resPrint;
+
+// Print form confirm
+print $formconfirm;
+
 // Part to show record
 if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 
@@ -855,7 +890,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 //						print $objectline->showOptionals($extrafields, 'edit', array('style' => $bcnd[$var], 'colspan' => $coldisplay), '', '', 1);
 					}
 					print '</form>';
-				} else {
+				} elseif ($item->status == 1) {
 					print '<td>';
 					print $item->ref;
 					print '</td>';

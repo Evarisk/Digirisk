@@ -592,6 +592,7 @@ DocumentsMetaData = Fichiers joints complémentaires
 WorkStopDocument = Déclaration d'arrêt de travail
 AccidentMetaDataSave = Les données complémentaires de l'accident ont bien été enregistrées
 ErrorFieldNotEmpty = Erreur : Le champ '%s' ne peut pas être vide
+ConfirmDeleteAccidentWorkStop = Êtes-vous sûr de vouloir supprimer l'arrêt de travail <b>%s</b> sur l'accident
 
 # Dictionnary - Dictionnaire
 UsualWorkplace = Lieu de travail habituel

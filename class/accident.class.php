@@ -482,14 +482,16 @@ class AccidentWorkStop extends CommonObjectLine
 		'entity'        => array('type'=>'integer', 'label'=>'Entity', 'enabled'=>'1', 'position'=>30, 'notnull'=>1, 'visible'=>0,),
 		'date_creation' => array('type'=>'datetime', 'label'=>'DateCreation', 'enabled'=>'1', 'position'=>40, 'notnull'=>1, 'visible'=>0,),
 		'tms'           => array('type'=>'timestamp', 'label'=>'DateModification', 'enabled'=>'1', 'position'=>50, 'notnull'=>0, 'visible'=>0,),
-		'workstop_days' => array('type'=>'integer', 'label'=>'WorkStopDays', 'enabled'=>'1', 'position'=>60, 'notnull'=>-1, 'visible'=>-1,),
-		'fk_accident'   => array('type'=>'integer', 'label'=>'FkAccident', 'enabled'=>'1', 'position'=>70, 'notnull'=>1, 'visible'=>0,),
+		'status'        => array('type'=>'smallint', 'label'=>'Status', 'enabled'=>'1', 'position'=>60, 'notnull'=>0, 'visible'=>0, 'index'=>0,),
+		'workstop_days' => array('type'=>'integer', 'label'=>'WorkStopDays', 'enabled'=>'1', 'position'=>70, 'notnull'=>-1, 'visible'=>-1,),
+		'fk_accident'   => array('type'=>'integer', 'label'=>'FkAccident', 'enabled'=>'1', 'position'=>80, 'notnull'=>1, 'visible'=>0,),
 	);
 
 	public $ref;
 	public $entity;
 	public $date_creation;
 	public $tms;
+	public $status;
 	public $workstop_days;
 	public $fk_accident;
 
@@ -519,7 +521,7 @@ class AccidentWorkStop extends CommonObjectLine
 	{
 		global $db;
 
-		$sql = 'SELECT t.rowid, t.ref, t.date_creation, t.workstop_days, t.fk_accident';
+		$sql = 'SELECT t.rowid, t.ref, t.date_creation, t.status, t.workstop_days, t.fk_accident';
 		$sql .= ' FROM ' . MAIN_DB_PREFIX . 'digiriskdolibarr_accident_workstop as t';
 		$sql .= ' WHERE t.rowid = ' . $rowid;
 		$sql .= ' AND entity IN (' . getEntity($this->table_element) . ')';
@@ -531,6 +533,7 @@ class AccidentWorkStop extends CommonObjectLine
 			$this->id = $objp->rowid;
 			$this->ref = $objp->ref;
 			$this->date_creation = $objp->date_creation;
+			$this->status = $objp->status;
 			$this->workstop_days = $objp->workstop_days;
 			$this->fk_accident = $objp->fk_accident;
 
@@ -552,7 +555,7 @@ class AccidentWorkStop extends CommonObjectLine
 	public function fetchAll($parent_id = 0, $limit = 0)
 	{
 		global $db;
-		$sql = 'SELECT t.rowid, t.ref, t.date_creation, t.workstop_days';
+		$sql = 'SELECT t.rowid, t.ref, t.date_creation, t.status, t.workstop_days';
 		$sql .= ' FROM ' . MAIN_DB_PREFIX . 'digiriskdolibarr_accident_workstop as t';
 		if ($parent_id > 0) {
 			$sql .= ' WHERE t.fk_accident = ' . $parent_id;
@@ -576,6 +579,7 @@ class AccidentWorkStop extends CommonObjectLine
 				$record->id = $obj->rowid;
 				$record->ref = $obj->ref;
 				$record->date_creation = $obj->date_creation;
+				$record->status = $obj->status;
 				$record->workstop_days = $obj->workstop_days;
 				$record->fk_accident = $obj->fk_accident;
 
@@ -611,12 +615,13 @@ class AccidentWorkStop extends CommonObjectLine
 
 		// Insertion dans base de la ligne
 		$sql = 'INSERT INTO ' . MAIN_DB_PREFIX . 'digiriskdolibarr_accident_workstop';
-		$sql .= ' (ref, entity, date_creation, workstop_days, fk_accident';
+		$sql .= ' (ref, entity, date_creation, status, workstop_days, fk_accident';
 		$sql .= ')';
 		$sql .= " VALUES (";
 		$sql .= "'" . $db->escape($this->ref) . "'" . ", ";
 		$sql .= $this->entity . ", ";
 		$sql .= "'" . $db->escape($db->idate($now)) . "'" . ", ";
+		$sql .= $this->status . ", ";
 		$sql .= $this->workstop_days . ", ";
 		$sql .= $this->fk_accident;
 
@@ -661,6 +666,7 @@ class AccidentWorkStop extends CommonObjectLine
 		// Mise a jour ligne en base
 		$sql = "UPDATE " . MAIN_DB_PREFIX . "digiriskdolibarr_accident_workstop SET";
 		$sql .= " ref='" . $db->escape($this->ref) . "',";
+		$sql .= " status=" . $this->status . ",";
 		$sql .= " workstop_days=" . $this->workstop_days . ",";
 		$sql .= " fk_accident=" . $db->escape($this->fk_accident);
 		$sql .= " WHERE rowid = " . $this->id;
@@ -693,27 +699,13 @@ class AccidentWorkStop extends CommonObjectLine
 	 */
 	public function delete(User $user, $notrigger = false)
 	{
-		global $user, $db;
-
-		$db->begin();
-
-		$sql = "DELETE FROM " . MAIN_DB_PREFIX . "digiriskdolibarr_accident_workstop WHERE rowid = " . $this->id;
-		dol_syslog(get_class($this) . "::delete", LOG_DEBUG);
-		if ($db->query($sql)) {
-			$db->commit();
-			// Triggers
-			if (!$notrigger)
-			{
-				// Call trigger
-				$this->call_trigger(strtoupper(get_class($this)).'_DELETE', $user);
-				// End call triggers
-			}
-			return 1;
-		} else {
-			$this->error = $db->error() . " sql=" . $sql;
-			$db->rollback();
-			return -1;
+		// Triggers
+		if (!$notrigger) {
+			// Call trigger
+			$this->call_trigger(strtoupper(get_class($this)).'_DELETE', $user);
+			// End call triggers
 		}
+		return $this->update($user,true);
 	}
 }
 
