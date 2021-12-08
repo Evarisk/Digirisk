@@ -351,7 +351,7 @@ if ( $conf->global->DIGIRISKDOLIBARR_ADMINUSERGROUP_UPDATED ==  0 ) {
 }
 
 if ($conf->global->DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH_UPDATED ==  0) {
-	require_once '../class/digiriskelement/groupment.class.php';
+	require_once __DIR__ . './../../class/digiriskelement/groupment.class.php';
 
 	$digiriskelement = new Groupment($db);
 	$digiriskelement->fetch($conf->global->DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH);
