@@ -1207,7 +1207,7 @@ TicketPublicAccess = Lien de retour vers l'interface publique des tickets :
 TicketShowCompanyLogo = Afficher le logo de la société dans l'interface publique
 TicketShowCompanyLogoHelp = Activez cette option pour masquer le logo de la société dans les pages de l'interface publique
 YouMustNotifyYourHierarchy = Vous êtes dans l'<b>obligation</b> de prévenir votre hiérarchie
-GoBackToTicketCreation = Retourner sur la page de création de ticket
+GoBackToTicketCreation = Aller à la page de suivi des tickets
 SendEmailOnTicketSubmit = Envoyer des emails à la création
 UseCaptchaOnCreateTicketPage = Utilisation du code graphique (CAPTCHA) sur la page de création
 
