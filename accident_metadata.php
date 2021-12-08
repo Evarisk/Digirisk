@@ -343,11 +343,6 @@ print dol_get_fiche_head();
 
 print '<table class="border tableforfieldedit accident-metadata-table">';
 
-//AccidentLocation -- Lieu de l'accident
-print '<tr><td class="minwidth400">'.$langs->trans("AccidentLocation").'</td><td>';
-print '<input class="flat" type="text" size="36" name="accident_location" id="accident_location" value="'.$accidentmetadata->accident_location.'">';
-print '</td></tr>';
-
 //RelativeLocation -- Précisions complémentaires sur le lieu de l’accident
 print '<tr><td class="minwidth400">'.$langs->trans("RelativeLocation").'</td><td>';
 print $formother->select_dictionary('relative_location','c_relative_location', 'ref', 'label', $accidentmetadata->relative_location, 1);

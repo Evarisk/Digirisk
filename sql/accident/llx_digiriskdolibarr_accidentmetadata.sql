@@ -24,7 +24,6 @@ CREATE TABLE llx_digiriskdolibarr_accidentmetadata(
 	fatal                       boolean,
 	accident_investigation      boolean,
 	accident_investigation_link text,
-	accident_location           text,
 	collateral_victim           boolean,
 	police_report               boolean,
 	cerfa_link                  text,

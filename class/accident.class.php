@@ -89,7 +89,7 @@ class Accident extends CommonObject
 		'fk_project'         => array('type'=>'integer', 'label'=>'FKProject', 'enabled'=>'1', 'position'=>120, 'notnull'=>1, 'visible'=>0,),
 		'fk_user_creat'      => array('type'=>'integer:User:user/class/user.class.php', 'label'=>'UserAuthor', 'enabled'=>'1', 'position'=>130, 'notnull'=>1, 'visible'=>0, 'foreignkey'=>'user.rowid',),
 		'fk_user_modif'      => array('type'=>'integer:User:user/class/user.class.php', 'label'=>'UserModif', 'enabled'=>'1', 'position'=>140, 'notnull'=>-1, 'visible'=>0,),
-		'fk_element' => array('type'=>'integer', 'label'=>'ParentElement', 'enabled'=>'1', 'position'=>150, 'notnull'=>-1, 'visible'=>-2,),
+		'fk_element'         => array('type'=>'integer', 'label'=>'AccidentLocation', 'enabled'=>'1', 'position'=>150, 'notnull'=>-1, 'visible'=>-2,),
 		'fk_user_victim'     => array('type'=>'integer', 'label'=>'UserVictim', 'enabled'=>'1', 'position'=>160, 'notnull'=>-1, 'visible'=>-2,),
 	);
 
@@ -764,11 +764,10 @@ class AccidentMetaData extends CommonObject
 		'fatal'                       => array('type'=>'boolean', 'label'=>'Fatal', 'enabled'=>'1', 'position'=>90, 'notnull'=>-1, 'visible'=>1,),
 		'accident_investigation'      => array('type'=>'boolean', 'label'=>'AccidentInvestigation', 'enabled'=>'1', 'position'=>100, 'notnull'=>-1, 'visible'=>1,),
 		'accident_investigation_link' => array('type'=>'text', 'label'=>'AccidentInvestigationLink', 'enabled'=>'1', 'position'=>110, 'notnull'=>-1, 'visible'=>1,),
-		'accident_location'           => array('type'=>'text', 'label'=>'AccidentLocation', 'enabled'=>'1', 'position'=>120, 'notnull'=>-1, 'visible'=>1,),
-		'collateral_victim'           => array('type'=>'boolean', 'label'=>'CollateralVictim', 'enabled'=>'1', 'position'=>130, 'notnull'=>-1, 'visible'=>1,),
-		'police_report'               => array('type'=>'boolean', 'label'=>'PoliceReport', 'enabled'=>'1', 'position'=>140, 'notnull'=>-1, 'visible'=>1,),
-		'cerfa_link'                  => array('type'=>'text', 'label'=>'CerfaLink', 'enabled'=>'1', 'position'=>150, 'notnull'=>-1, 'visible'=>1,),
-		'fk_accident'                 => array('type'=>'integer', 'label'=>'UserVictim', 'enabled'=>'1', 'position'=>160, 'notnull'=>-1, 'visible'=>-2,),
+		'collateral_victim'           => array('type'=>'boolean', 'label'=>'CollateralVictim', 'enabled'=>'1', 'position'=>120, 'notnull'=>-1, 'visible'=>1,),
+		'police_report'               => array('type'=>'boolean', 'label'=>'PoliceReport', 'enabled'=>'1', 'position'=>130, 'notnull'=>-1, 'visible'=>1,),
+		'cerfa_link'                  => array('type'=>'text', 'label'=>'CerfaLink', 'enabled'=>'1', 'position'=>140, 'notnull'=>-1, 'visible'=>1,),
+		'fk_accident'                 => array('type'=>'integer', 'label'=>'UserVictim', 'enabled'=>'1', 'position'=>150, 'notnull'=>-1, 'visible'=>-2,),
 	);
 
 	public $rowid;
@@ -781,7 +780,6 @@ class AccidentMetaData extends CommonObject
 	public $fatal;
 	public $accident_investigation;
 	public $accident_investigation_link;
-	public $accident_location;
 	public $collateral_victim;
 	public $police_report;
 	public $cerfa_link;

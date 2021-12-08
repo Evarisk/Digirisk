@@ -514,8 +514,8 @@ if ($action == 'create') {
 	print ' <a href="' . DOL_URL_ROOT . '/user/card.php?action=create&backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?action=create') . '" target="_blank"><span class="fa fa-plus-circle valignmiddle paddingleft" title="' . $langs->trans("AddUser") . '"></span></a>';
 	print '</td></tr>';
 
-	//ParentElement -- Element parent
-	print '<tr><td>'.$langs->trans("ParentElement").'</td><td>';
+	//AccidentLocation -- Lieu de l'accident
+	print '<tr><td>'.$langs->trans("AccidentLocation").'</td><td>';
 	print $digiriskelement->select_digiriskelement_list($object->fk_element, 'fk_element', '', '',  0, 0, array(), '',  0,  0,  'minwidth100',  GETPOST('id'),  false, 0);
 	print '</td></tr>';
 
@@ -583,8 +583,8 @@ if (($id || $ref) && $action == 'edit') {
 	print ' <a href="' . DOL_URL_ROOT . '/user/card.php?action=create&backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?action=create') . '" target="_blank"><span class="fa fa-plus-circle valignmiddle paddingleft" title="' . $langs->trans("AddUser") . '"></span></a>';
 	print '</td></tr>';
 
-	//ParentElement -- Element parent
-	print '<tr><td>'.$langs->trans("ParentElement").'</td><td>';
+	//AccidentLocation -- Lieu de l'accident
+	print '<tr><td>'.$langs->trans("AccidentLocation").'</td><td>';
 	print $digiriskelement->select_digiriskelement_list($object->fk_element, 'fk_element', '', '',  0, 0, array(), '',  0,  0,  'minwidth100',  GETPOST('id'),  false, 0);
 	print '</td></tr>';
 
@@ -697,8 +697,8 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	print dol_print_date($object->accident_date, 'dayhoursec');
 	print '</td></tr>';
 
-	//Parent Element -- Elément parent
-	print '<tr><td class="titlefield">'.$langs->trans("ParentElement").'</td><td>';
+	//AccidentLocation -- Lieu de l'accident
+	print '<tr><td class="titlefield">'.$langs->trans("AccidentLocation").'</td><td>';
 	if ($conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD == $object->fk_element) {
 		$digiriskstandard->fetch($conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD);
 		print $digiriskstandard->getNomUrl(1, 'blank', 1);
