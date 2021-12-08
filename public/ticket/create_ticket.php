@@ -102,10 +102,47 @@ if ($reshook < 0) {
 }
 
 if ($action == 'add') {
+	$error=0;
+
 	$register      = GETPOST('register');
 	$pertinence    = GETPOST('pertinence');
 	$message       = GETPOST('message');
 	$ticket_tmp_id = GETPOST('ticket_id');
+
+	// Check parameters
+	if (empty($register)) {
+		setEventMessages($langs->trans('ErrorFieldNotEmpty', $langs->transnoentitiesnoconv('Register')), null, 'errors');
+		$error++;
+	}
+	if (empty($pertinence)) {
+		setEventMessages($langs->trans('ErrorFieldNotEmpty', $langs->transnoentitiesnoconv('Pertinence')), null, 'errors');
+		$error++;
+	}
+	if (empty($message)) {
+		setEventMessages($langs->trans('ErrorFieldNotEmpty', $langs->transnoentitiesnoconv('Message')), null, 'errors');
+		$error++;
+	}
+
+	if (empty(GETPOST('options_digiriskdolibarr_ticket_lastname'))) {
+		setEventMessages($langs->trans('ErrorFieldNotEmpty', $langs->transnoentitiesnoconv('Lastname')), null, 'errors');
+		$error++;
+	}
+	if (empty(GETPOST('options_digiriskdolibarr_ticket_firstname'))) {
+		setEventMessages($langs->trans('ErrorFieldNotEmpty', $langs->transnoentitiesnoconv('Firstname')), null, 'errors');
+		$error++;
+	}
+	if (empty(GETPOST('options_digiriskdolibarr_ticket_phone'))) {
+		setEventMessages($langs->trans('ErrorFieldNotEmpty', $langs->transnoentitiesnoconv('Phone')), null, 'errors');
+		$error++;
+	}
+	if (empty(GETPOST('options_digiriskdolibarr_ticket_service'))) {
+		setEventMessages($langs->trans('ErrorFieldNotEmpty', $langs->transnoentitiesnoconv('Service')), null, 'errors');
+		$error++;
+	}
+	if (empty(GETPOST('options_digiriskdolibarr_ticket_date'))) {
+		setEventMessages($langs->trans('ErrorFieldNotEmpty', $langs->transnoentitiesnoconv('Date')), null, 'errors');
+		$error++;
+	}
 
 	$object->ref = $modTicket->getNextValue($thirdparty,$object);
 
@@ -124,8 +161,6 @@ if ($action == 'add') {
 	$object->message = html_entity_decode($message);
 
 	$extrafields->setOptionalsFromPost(null, $object);
-
-	$error=0;
 	// Check Captcha code if is enabled
 	if (!empty($conf->global->DIGIRISKDOLIBARR_USE_CAPTCHA)) {
 		$sessionkey = 'dol_antispam_value';
