@@ -253,6 +253,18 @@ print ajax_constantonoff('DIGIRISKDOLIBARR_SORT_LISTINGS_BY_COTATION');
 print '</td>';
 print '</tr>';
 
+print '<tr class="oddeven"><td>';
+print $langs->trans('RiskDescriptionPrefill');
+print "</td><td>";
+print $langs->trans('RiskDescriptionPrefillDescription');
+print '</td>';
+
+
+print '<td class="center">';
+print ajax_constantonoff('DIGIRISKDOLIBARR_RISK_DESCRIPTION_PREFILL');
+print '</td>';
+print '</tr>';
+
 print '</table>';
 print '<hr>';
 

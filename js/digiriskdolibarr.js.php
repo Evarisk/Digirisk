@@ -1490,6 +1490,10 @@ window.eoxiaJS.risk.selectDanger = function( event ) {
 	element.closest('.wpeo-dropdown').find('.dropdown-toggle img').attr('aria-label', element.closest('.wpeo-tooltip-event').attr('aria-label'));
 
 	element.closest('.wpeo-dropdown').find('.input-hidden-danger').val(element.data('id'));
+	var riskDescriptionPrefill = element.closest('.wpeo-dropdown').find('.input-risk-description-prefill').val();
+	if (riskDescriptionPrefill == 1) {
+		element.closest('.risk-content').find('.risk-description textarea').text(element.closest('.wpeo-tooltip-event').attr('aria-label'));
+	}
 	var elementParent = jQuery(this).closest('.modal-container');
 
 	// Rend le bouton "active".
@@ -1546,9 +1550,12 @@ window.eoxiaJS.risk.createRisk = function ( event ) {
 	let evaluationText = elementEvaluation.find('.risk-evaluation-comment textarea').val()
 	let riskCommentText = elementRisk.find('.risk-description textarea').val()
 	let taskText = elementTask.find('input').val()
+	let riskDescriptionPrefill = elementRisk.find('.risk-category .input-risk-description-prefill').val()
+	let riskDesciptionText = elementRisk.find('.risk-category .danger-category-pic').attr('aria-label')
 
 	evaluationText = window.eoxiaJS.risk.sanitizeBeforeRequest(evaluationText)
 	riskCommentText = window.eoxiaJS.risk.sanitizeBeforeRequest(riskCommentText)
+	riskDesciptionText = window.eoxiaJS.risk.sanitizeBeforeRequest(riskDesciptionText)
 	taskText = window.eoxiaJS.risk.sanitizeBeforeRequest(taskText)
 
 	var category = elementRisk.find('.risk-category input').val();
@@ -1557,7 +1564,12 @@ window.eoxiaJS.risk.createRisk = function ( event ) {
 		categoryPost = '&category=' + category;
 	}
 
-	var description = riskCommentText;
+	if (riskDescriptionPrefill == 1) {
+		var description = riskDesciptionText;
+	} else {
+		var description = riskCommentText;
+	}
+
 	var descriptionPost = '';
 	if (description !== '') {
 		descriptionPost = '&riskComment=' + encodeURI(description);

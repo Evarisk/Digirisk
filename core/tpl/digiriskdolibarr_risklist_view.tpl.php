@@ -348,6 +348,7 @@
 								<span class="title"><?php echo $langs->trans('Risk'); ?><required>*</required></span>
 								<div class="wpeo-dropdown dropdown-large dropdown-grid category-danger padding">
 									<input class="input-hidden-danger" type="hidden" name="risk_category_id" value="undefined" />
+									<input class="input-risk-description-prefill" type="hidden" name="risk_description_prefill" value="<?php echo $conf->global->DIGIRISKDOLIBARR_RISK_DESCRIPTION_PREFILL; ?>" />
 									<div class="dropdown-toggle dropdown-add-button button-cotation">
 										<span class="wpeo-button button-square-50 button-grey"><i class="fas fa-exclamation-triangle button-icon"></i><i class="fas fa-plus-circle button-add"></i></span>
 										<img class="danger-category-pic wpeo-tooltip-event hidden" src="" aria-label=""/>
@@ -508,6 +509,7 @@
 							<span class="title"><?php echo $langs->trans('Risk'); ?><required>*</required></span>
 							<div class="wpeo-dropdown dropdown-large dropdown-grid category-danger padding">
 								<input class="input-hidden-danger" type="hidden" name="risk_category_id" value="undefined" />
+								<input class="input-risk-description-prefill" type="hidden" name="risk_description_prefill" value="<?php echo $conf->global->DIGIRISKDOLIBARR_RISK_DESCRIPTION_PREFILL; ?>" />
 								<div class="dropdown-toggle dropdown-add-button button-cotation">
 									<span class="wpeo-button button-square-50 button-grey"><i class="fas fa-exclamation-triangle button-icon"></i><i class="fas fa-plus-circle button-add"></i></span>
 									<img class="danger-category-pic wpeo-tooltip-event hidden" src="" aria-label=""/>

@@ -263,6 +263,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			131 => array('DIGIRISKDOLIBARR_RISK_ADDON','chaine', 'mod_risk_standard' ,'', $conf->entity),
 			132 => array('DIGIRISKDOLIBARR_RISK_DESCRIPTION','integer', 1 ,'', $conf->entity),
 			133 => array('DIGIRISKDOLIBARR_RISK_CATEGORY_EDIT','integer', 0 ,'', $conf->entity),
+			132 => array('DIGIRISKDOLIBARR_RISK_DESCRIPTION_PREFILL','integer', 0 ,'', $conf->entity),
 
 			// CONST RISK ASSESSMENT
 			140 => array('MAIN_AGENDA_ACTIONAUTO_RISKASSESSMENT_CREATE','chaine',1,'', $conf->entity),

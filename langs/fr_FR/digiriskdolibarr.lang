@@ -964,6 +964,8 @@ MoveRisk = Déplacer le risque
 MoveRisks = Déplacer les risques
 MoveRisksDescription = Permet de déplacer les risques d'un groupement ou d'une unité de travail à un(e) autre
 SetConfToMoveRisk = Vous devez d'abord autoriser le déplacement des risques dans "Configuration du module -> Analyse de risques -> Risque"
+RiskDescriptionPrefill = Préremplir la description
+RiskDescriptionPrefillDescription = Préremplir la description du risque avec le nom de la catégorie
 
 #
 # RiskAssessment - Évaluation
