@@ -14,20 +14,22 @@
 -- along with this program.  If not, see https://www.gnu.org/licenses/.
 
 CREATE TABLE llx_digiriskdolibarr_accident(
-	rowid          integer AUTO_INCREMENT PRIMARY KEY NOT NULL,
-	ref            varchar(128) NOT NULL,
-	ref_ext        varchar(128),
-	entity         integer DEFAULT 1 NOT NULL,
-	date_creation  datetime NOT NULL,
-	tms            timestamp,
-	status         smallint,
-	label          varchar(255) NOT NULL,
-    accident_date  datetime NOT NULL,
-	description    text,
-	photo          text,
-	fk_project     integer,
-	fk_user_creat  integer NOT NULL,
-	fk_user_modif  integer,
-	fk_element     integer,
-	fk_user_victim integer
+	rowid             integer AUTO_INCREMENT PRIMARY KEY NOT NULL,
+	ref               varchar(128) NOT NULL,
+	ref_ext           varchar(128),
+	entity            integer DEFAULT 1 NOT NULL,
+	date_creation     datetime NOT NULL,
+	tms               timestamp,
+	status            smallint,
+	label             varchar(255) NOT NULL,
+    accident_date     datetime NOT NULL,
+	description       text,
+	photo             text,
+    external_accident boolean,
+	fk_project        integer,
+	fk_user_creat     integer NOT NULL,
+	fk_user_modif     integer,
+	fk_element        integer,
+    fk_soc            integer,
+	fk_user_victim    integer
 ) ENGINE=innodb;
