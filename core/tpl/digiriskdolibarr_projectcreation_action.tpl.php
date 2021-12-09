@@ -358,8 +358,13 @@ if ($conf->global->DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH_UPDATED ==  0) {
 
 	$dirforimage   = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/img/defaultImgGP0/';
 	$original_file = 'trash-alt-solid.png';
+	$dir = $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/groupment/';
 	$src_file = $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/groupment/GP0/';
 	$src_file_thumbs = $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/groupment/GP0/thumbs/';
+
+	if (!is_dir($dir)) {
+		dol_mkdir($dir);
+	}
 
 	if (!is_dir($src_file)) {
 		dol_mkdir($src_file);
