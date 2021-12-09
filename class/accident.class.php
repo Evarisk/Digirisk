@@ -86,11 +86,13 @@ class Accident extends CommonObject
 		'accident_date'      => array('type'=>'datetime', 'label'=>'AccidentDate', 'enabled'=>'1', 'position'=>90, 'notnull'=>-1, 'visible'=>1,),
 		'description'        => array('type'=>'text', 'label'=>'Description', 'enabled'=>'1', 'position'=>100, 'notnull'=>-1, 'visible'=>1,),
 		'photo'              => array('type'=>'text', 'label'=>'Photo', 'enabled'=>'1', 'position'=>110, 'notnull'=>-1, 'visible'=>1,),
+		'external_accident'  => array('type'=>'text', 'label'=>'ExternalAccident', 'enabled'=>'1', 'position'=>115, 'notnull'=>-1, 'visible'=>1,),
 		'fk_project'         => array('type'=>'integer', 'label'=>'FKProject', 'enabled'=>'1', 'position'=>120, 'notnull'=>1, 'visible'=>0,),
 		'fk_user_creat'      => array('type'=>'integer:User:user/class/user.class.php', 'label'=>'UserAuthor', 'enabled'=>'1', 'position'=>130, 'notnull'=>1, 'visible'=>0, 'foreignkey'=>'user.rowid',),
 		'fk_user_modif'      => array('type'=>'integer:User:user/class/user.class.php', 'label'=>'UserModif', 'enabled'=>'1', 'position'=>140, 'notnull'=>-1, 'visible'=>0,),
 		'fk_element'         => array('type'=>'integer', 'label'=>'AccidentLocation', 'enabled'=>'1', 'position'=>150, 'notnull'=>-1, 'visible'=>-2,),
-		'fk_user_victim'     => array('type'=>'integer', 'label'=>'UserVictim', 'enabled'=>'1', 'position'=>160, 'notnull'=>-1, 'visible'=>-2,),
+		'fk_soc'             => array('type'=>'integer', 'label'=>'AccidentLocation', 'enabled'=>'1', 'position'=>160, 'notnull'=>-1, 'visible'=>-2,),
+		'fk_user_victim'     => array('type'=>'integer', 'label'=>'UserVictim', 'enabled'=>'1', 'position'=>170, 'notnull'=>-1, 'visible'=>-2,),
 	);
 
 	public $rowid;
@@ -104,9 +106,11 @@ class Accident extends CommonObject
 	public $accident_date;
 	public $description;
 	public $photo;
+	public $external_accident;
 	public $fk_user_creat;
 	public $fk_user_modif;
 	public $fk_element;
+	public $fk_soc;
 	public $fk_user_victim;
 
 	/**
@@ -746,20 +750,40 @@ class AccidentMetaData extends CommonObject
 	 * @var array  Array with all fields and their property. Do not use it as a static var. It may be modified by constructor.
 	 */
 	public $fields = array(
-		'rowid'                       => array('type'=>'integer', 'label'=>'TechnicalID', 'enabled'=>'1', 'position'=>1, 'notnull'=>1, 'visible'=>0, 'noteditable'=>'1', 'index'=>1, 'comment'=>"Id"),
-		'entity'                      => array('type'=>'integer', 'label'=>'Entity', 'enabled'=>'1', 'position'=>10, 'notnull'=>1, 'visible'=>0,),
-		'date_creation'               => array('type'=>'datetime', 'label'=>'DateCreation', 'enabled'=>'1', 'position'=>20, 'notnull'=>1, 'visible'=>0,),
-		'tms'                         => array('type'=>'timestamp', 'label'=>'DateModification', 'enabled'=>'1', 'position'=>30, 'notnull'=>0, 'visible'=>0,),
-		'status'                      => array('type'=>'smallint', 'label'=>'Status', 'enabled'=>'1', 'position'=>40, 'notnull'=>0, 'visible'=>1, 'index'=>0,),
-		'relative_location'           => array('type'=>'varchar(255)', 'label'=>'RelativeLocation', 'enabled'=>'1', 'position'=>50, 'notnull'=>-1, 'visible'=>1,),
-		'thirdparty_responsibility'   => array('type'=>'boolean', 'label'=>'ThirdPartyResponsability', 'enabled'=>'1', 'position'=>80, 'notnull'=>-1, 'visible'=>1,),
-		'fatal'                       => array('type'=>'boolean', 'label'=>'Fatal', 'enabled'=>'1', 'position'=>90, 'notnull'=>-1, 'visible'=>1,),
-		'accident_investigation'      => array('type'=>'boolean', 'label'=>'AccidentInvestigation', 'enabled'=>'1', 'position'=>100, 'notnull'=>-1, 'visible'=>1,),
-		'accident_investigation_link' => array('type'=>'text', 'label'=>'AccidentInvestigationLink', 'enabled'=>'1', 'position'=>110, 'notnull'=>-1, 'visible'=>1,),
-		'collateral_victim'           => array('type'=>'boolean', 'label'=>'CollateralVictim', 'enabled'=>'1', 'position'=>120, 'notnull'=>-1, 'visible'=>1,),
-		'police_report'               => array('type'=>'boolean', 'label'=>'PoliceReport', 'enabled'=>'1', 'position'=>130, 'notnull'=>-1, 'visible'=>1,),
-		'cerfa_link'                  => array('type'=>'text', 'label'=>'CerfaLink', 'enabled'=>'1', 'position'=>140, 'notnull'=>-1, 'visible'=>1,),
-		'fk_accident'                 => array('type'=>'integer', 'label'=>'UserVictim', 'enabled'=>'1', 'position'=>150, 'notnull'=>-1, 'visible'=>-2,),
+		'rowid'                                => array('type'=>'integer', 'label'=>'TechnicalID', 'enabled'=>'1', 'position'=>1, 'notnull'=>1, 'visible'=>0, 'noteditable'=>'1', 'index'=>1, 'comment'=>"Id"),
+		'entity'                               => array('type'=>'integer', 'label'=>'Entity', 'enabled'=>'1', 'position'=>10, 'notnull'=>1, 'visible'=>0,),
+		'date_creation'                        => array('type'=>'datetime', 'label'=>'DateCreation', 'enabled'=>'1', 'position'=>20, 'notnull'=>1, 'visible'=>0,),
+		'tms'                                  => array('type'=>'timestamp', 'label'=>'DateModification', 'enabled'=>'1', 'position'=>30, 'notnull'=>0, 'visible'=>0,),
+		'status'                               => array('type'=>'smallint', 'label'=>'Status', 'enabled'=>'1', 'position'=>40, 'notnull'=>0, 'visible'=>1, 'index'=>0,),
+		'relative_location'                    => array('type'=>'varchar(255)', 'label'=>'RelativeLocation', 'enabled'=>'1', 'position'=>50, 'notnull'=>-1, 'visible'=>1,),
+		'victim_activity'                      => array('type'=>'text', 'label'=>'VictimActivity', 'enabled'=>'1', 'position'=>60, 'notnull'=>-1, 'visible'=>1,),
+		'accident_nature'                      => array('type'=>'text', 'label'=>'AccidentNature', 'enabled'=>'1', 'position'=>70, 'notnull'=>-1, 'visible'=>1,),
+		'accident_object'                      => array('type'=>'text', 'label'=>'AccidentObject', 'enabled'=>'1', 'position'=>80, 'notnull'=>-1, 'visible'=>1,),
+		'accident_nature_doubt'                => array('type'=>'boolean', 'label'=>'AccidentNatureDoubt', 'enabled'=>'1', 'position'=>90, 'notnull'=>-1, 'visible'=>1,),
+		'accident_nature_doubt_link'           => array('type'=>'text', 'label'=>'AccidentNatureDoubtLink', 'enabled'=>'1', 'position'=>100, 'notnull'=>-1, 'visible'=>1,),
+		'victim_transported_to'                => array('type'=>'text', 'label'=>'VictimTransportedTo', 'enabled'=>'1', 'position'=>110, 'notnull'=>-1, 'visible'=>1,),
+		'collateral_victim'                    => array('type'=>'boolean', 'label'=>'CollateralVictim', 'enabled'=>'1', 'position'=>120, 'notnull'=>-1, 'visible'=>1,),
+		'victim_workhours'                     => array('type'=>'datetime', 'label'=>'VictimWorkHours', 'enabled'=>'1', 'position'=>130, 'notnull'=>1, 'visible'=>1,),
+		'accident_noticed'                     => array('type'=>'text', 'label'=>'AccidentNoticed', 'enabled'=>'1', 'position'=>140, 'notnull'=>-1, 'visible'=>1,),
+		'accident_notice_date'                 => array('type'=>'datetime', 'label'=>'AccidentNoticeDate', 'enabled'=>'1', 'position'=>150, 'notnull'=>1, 'visible'=>1,),
+		'accident_notice_by'                   => array('type'=>'text', 'label'=>'AccidentNoticeBy', 'enabled'=>'1', 'position'=>160, 'notnull'=>-1, 'visible'=>1,),
+		'accident_described_by_victim'         => array('type'=>'boolean', 'label'=>'AccidentDescribedByVictim', 'enabled'=>'1', 'position'=>170, 'notnull'=>-1, 'visible'=>1,),
+		'registered_in_accident_register'      => array('type'=>'boolean', 'label'=>'RegisteredInAccidentRegister', 'enabled'=>'1', 'position'=>180, 'notnull'=>-1, 'visible'=>1,),
+		'register_date'                        => array('type'=>'datetime', 'label'=>'RegisterDate', 'enabled'=>'1', 'position'=>190, 'notnull'=>1, 'visible'=>1,),
+		'register_number'                      => array('type'=>'varchar(255)', 'label'=>'RegisterNumber', 'enabled'=>'1', 'position'=>200, 'notnull'=>-1, 'visible'=>1,),
+		'consequence'                          => array('type'=>'text', 'label'=>'Consequence', 'enabled'=>'1', 'position'=>210, 'notnull'=>-1, 'visible'=>1, 'arrayofkeyval'=>array(0=>'Draft', 1=>'Validated', 9=>'Canceled')),
+		'police_report'                        => array('type'=>'boolean', 'label'=>'PoliceReport', 'enabled'=>'1', 'position'=>220, 'notnull'=>-1, 'visible'=>1,),
+		'police_report_by'                     => array('type'=>'text', 'label'=>'PoliceReportBy', 'enabled'=>'1', 'position'=>230, 'notnull'=>-1, 'visible'=>1,),
+		'first_person_noticed_is_witness'      => array('type'=>'boolean', 'label'=>'FirstPersonNoticedIsWitness', 'enabled'=>'1', 'position'=>240, 'notnull'=>-1, 'visible'=>1,),
+		'thirdparty_responsibility'            => array('type'=>'boolean', 'label'=>'ThirdPartyResponsability', 'enabled'=>'1', 'position'=>250, 'notnull'=>-1, 'visible'=>1,),
+		'accident_investigation'               => array('type'=>'boolean', 'label'=>'AccidentInvestigation', 'enabled'=>'1', 'position'=>260, 'notnull'=>-1, 'visible'=>1,),
+		'accident_investigation_link'          => array('type'=>'text', 'label'=>'AccidentInvestigationLink', 'enabled'=>'1', 'position'=>270, 'notnull'=>-1, 'visible'=>1,),
+		'cerfa_link'                           => array('type'=>'text', 'label'=>'CerfaLink', 'enabled'=>'1', 'position'=>280, 'notnull'=>-1, 'visible'=>1,),
+		'json'                                 => array('type'=>'text', 'label'=>'Json', 'enabled'=>'1', 'position'=>290, 'notnull'=>-1, 'visible'=>1,),
+		'fk_user_witness'                      => array('type'=>'integer', 'label'=>'UserVictim', 'enabled'=>'1', 'position'=>300, 'notnull'=>-1, 'visible'=>-2,),
+		'fk_soc_responsible'                   => array('type'=>'integer', 'label'=>'SocResponsible', 'enabled'=>'1', 'position'=>310, 'notnull'=>-1, 'visible'=>-2,),
+		'fk_soc_responsible_insurance_society' => array('type'=>'integer', 'label'=>'SocResponsibleInsuranceSociety', 'enabled'=>'1', 'position'=>320, 'notnull'=>-1, 'visible'=>-2,),
+		'fk_accident'                          => array('type'=>'integer', 'label'=>'FkAccident', 'enabled'=>'1', 'position'=>330, 'notnull'=>-1, 'visible'=>-2,),
 	);
 
 	public $rowid;
@@ -768,13 +792,33 @@ class AccidentMetaData extends CommonObject
 	public $tms;
 	public $status;
 	public $relative_location;
+	public $victim_activity;
+	public $accident_nature;
+	public $accident_object;
+	public $accident_nature_doubt;
+	public $accident_nature_doubt_link;
+	public $victim_transported_to;
+	public $collateral_victim;
+	public $victim_workhours;
+	public $accident_noticed;
+	public $accident_notice_date;
+	public $accident_notice_by;
+	public $accident_described_by_victim;
+	public $registered_in_accident_register;
+	public $register_date;
+	public $register_number;
+	public $consequence;
+	public $police_report;
+	public $police_report_by;
+	public $first_person_noticed_is_witness;
 	public $thirdparty_responsibility;
-	public $fatal;
 	public $accident_investigation;
 	public $accident_investigation_link;
-	public $collateral_victim;
-	public $police_report;
 	public $cerfa_link;
+	public $json;
+	public $fk_user_witness;
+	public $fk_soc_responsible;
+	public $fk_soc_responsible_insurance_society;
 	public $fk_accident;
 
 	/**
