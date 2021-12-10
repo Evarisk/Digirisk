@@ -35,49 +35,49 @@ function digiriskdolibarrAdminPrepareHead()
 	$h = 0;
 	$head = array();
 
-	$head[$h][0] = dol_buildpath("/digiriskdolibarr/admin/setup.php", 1);
-	$head[$h][1] = $langs->trans("Settings");
-	$head[$h][2] = 'settings';
-	$h++;
-
-	$head[$h][0] = dol_buildpath("/digiriskdolibarr/admin/config/about.php", 1);
-	$head[$h][1] = $langs->trans("About");
-	$head[$h][2] = 'about';
-	$h++;
-
-	$head[$h][0] = dol_buildpath("/digiriskdolibarr/admin/config/digiriskdocuments.php", 1);
-	$head[$h][1] = $langs->trans("YourDocuments");
-	$head[$h][2] = 'digiriskdocuments';
-	$h++;
-
-	$head[$h][0] = dol_buildpath("/digiriskdolibarr/admin/config/digiriskelement.php", 1);
-	$head[$h][1] = $langs->trans("Arborescence");
-	$head[$h][2] = 'digiriskelement';
-	$h++;
-
 	$head[$h][0] = dol_buildpath("/digiriskdolibarr/admin/config/riskassessmentdocument.php", 1);
-	$head[$h][1] = $langs->trans("RiskAssessmentDocument");
+	$head[$h][1] = '<i class="fas fa-exclamation-triangle"></i>  ' . $langs->trans("RiskAssessmentDocument");
 	$head[$h][2] = 'riskassessmentdocument';
 	$h++;
 
-	$head[$h][0] = dol_buildpath("/digiriskdolibarr/admin/config/digirisksignature.php", 1);
-	$head[$h][1] = $langs->trans("DigiriskSignature");
-	$head[$h][2] = 'digirisksignature';
+	$head[$h][0] = dol_buildpath("/digiriskdolibarr/admin/config/digiriskelement.php", 1);
+	$head[$h][1] = '<i class="fas fa-network-wired"></i>  ' . $langs->trans("Arborescence");
+	$head[$h][2] = 'digiriskelement';
 	$h++;
 
 	$head[$h][0] = dol_buildpath("/digiriskdolibarr/admin/config/preventionplan.php", 1);
-	$head[$h][1] = $langs->trans("PreventionPlan");
+	$head[$h][1] = '<i class="fas fa-info"></i>  ' . $langs->trans("PreventionPlan");
 	$head[$h][2] = 'preventionplan';
 	$h++;
 
 	$head[$h][0] = dol_buildpath("/digiriskdolibarr/admin/config/firepermit.php", 1);
-	$head[$h][1] = $langs->trans("FirePermit");
+	$head[$h][1] = '<i class="fas fa-fire-alt"></i>  ' . $langs->trans("FirePermit");
 	$head[$h][2] = 'firepermit';
 	$h++;
 
 	$head[$h][0] = dol_buildpath("/digiriskdolibarr/admin/config/accident.php", 1);
-	$head[$h][1] = $langs->trans("Accident");
+	$head[$h][1] = '<i class="fas fa-user-injured"></i>  ' . $langs->trans("Accident");
 	$head[$h][2] = 'accident';
+	$h++;
+
+	$head[$h][0] = dol_buildpath("/digiriskdolibarr/admin/config/digiriskdocuments.php", 1);
+	$head[$h][1] = '<i class="fas fa-file-alt"></i> ' . $langs->trans("YourDocuments");
+	$head[$h][2] = 'digiriskdocuments';
+	$h++;
+
+	$head[$h][0] = dol_buildpath("/digiriskdolibarr/admin/config/digirisksignature.php", 1);
+	$head[$h][1] = '<i class="fas fa-file-signature"></i> ' . $langs->trans("DigiriskSignature");
+	$head[$h][2] = 'digirisksignature';
+	$h++;
+
+	$head[$h][0] = dol_buildpath("/digiriskdolibarr/admin/setup.php", 1);
+	$head[$h][1] = '<i class="fas fa-cog"></i>  ' . $langs->trans("Settings");
+	$head[$h][2] = 'settings';
+	$h++;
+
+	$head[$h][0] = dol_buildpath("/digiriskdolibarr/admin/config/about.php", 1);
+	$head[$h][1] = '<i class="fab fa-readme"></i> ' . $langs->trans("About");
+	$head[$h][2] = 'about';
 	$h++;
 
 //	if ($user->admin) {
