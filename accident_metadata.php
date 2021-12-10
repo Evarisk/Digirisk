@@ -128,13 +128,13 @@ if (empty($reshook)) {
 		$accident_investigation               = GETPOST('accident_investigation');
 		$accident_investigation_link          = GETPOST('accident_investigation_link');
 		$cerfa_link                           = GETPOST('cerfa_link');
-		$fk_user_witness                      = GETPOST('fk_user_witness ');
+		$fk_user_witness                      = GETPOST('fk_user_witness');
 		$fk_soc_responsible                   = GETPOST('fk_soc_responsible');
 		$fk_soc_responsible_insurance_society = GETPOST('fk_soc_responsible_insurance_society');
 		$fk_accident                          = GETPOST('id');
 
-		$accident_notice_date = dol_mktime(GETPOST('dateohour', 'int'), GETPOST('dateomin', 'int'), 0, GETPOST('dateomonth', 'int'), GETPOST('dateoday', 'int'), GETPOST('dateoyear', 'int'));
-		$register_date        = dol_mktime(GETPOST('dateehour', 'int'), GETPOST('dateemin', 'int'), 0, GETPOST('dateemonth', 'int'), GETPOST('dateeday', 'int'), GETPOST('dateeyear', 'int'));
+		$accident_notice_date = dol_mktime(GETPOST('datenhour', 'int'), GETPOST('datenmin', 'int'), 0, GETPOST('datenmonth', 'int'), GETPOST('datenday', 'int'), GETPOST('datenyear', 'int'));
+		$register_date        = dol_mktime(GETPOST('daterhour', 'int'), GETPOST('datermin', 'int'), 0, GETPOST('datermonth', 'int'), GETPOST('daterday', 'int'), GETPOST('dateryear', 'int'));
 
 		// Initialize object AccidentMetaData
 		$now                                                    = dol_now();
@@ -205,6 +205,7 @@ if (empty($reshook)) {
 		$parent_id           = GETPOST('parent_id');
 
 		// Initialize object accident line
+		$now                             = dol_now();
 		$objectline->date_creation       = $object->db->idate($now);
 		$objectline->ref                 = $refAccidentLesionMod->getNextValue($objectline);
 		$objectline->entity              = $conf->entity;
@@ -387,46 +388,47 @@ print dol_get_fiche_head();
 
 print '<table class="border tableforfieldedit accident-metadata-table">';
 
-//RelativeLocation -- Précisions complémentaires sur le lieu de l’accident
+//RelativeLocation
 print '<tr><td class="minwidth400">'.$langs->trans("RelativeLocation").'</td><td>';
 print $formother->select_dictionary('relative_location','c_relative_location', 'ref', 'label', $accidentmetadata->relative_location, 1);
 print '<a href="'.DOL_URL_ROOT.'/admin/dict.php?mainmenu=home" target="_blank" class="wpeo-tooltip-event" aria-label="'.$langs->trans('ConfigDico').'">' .' '. img_picto('', 'globe').'</a>';
 print '</td></tr>';
 
-//VictimActivity --
+//VictimActivity
 print '<tr class="content_field"><td><label for="victim_activity">'.$langs->trans("VictimActivity").'</label></td><td>';
-$doleditor = new DolEditor('victim_activity', GETPOST('victim_activity'), '', 90, 'dolibarr_details', '', false, true, $conf->global->FCKEDITOR_ENABLE_SOCIETE, ROWS_3, '90%');
+$doleditor = new DolEditor('victim_activity', $accidentmetadata->victim_activity, '', 90, 'dolibarr_details', '', false, true, $conf->global->FCKEDITOR_ENABLE_SOCIETE, ROWS_3, '90%');
 $doleditor->Create();
 print '</td></tr>';
 
-//AccidentNature -- Nature de l'accident
+//AccidentNature
 print '<tr class="content_field"><td><label for="accident_nature">'.$langs->trans("AccidentNature").'</label></td><td>';
-$doleditor = new DolEditor('accident_nature', GETPOST('accident_nature'), '', 90, 'dolibarr_details', '', false, true, $conf->global->FCKEDITOR_ENABLE_SOCIETE, ROWS_3, '90%');
+$doleditor = new DolEditor('accident_nature', $accidentmetadata->accident_nature, '', 90, 'dolibarr_details', '', false, true, $conf->global->FCKEDITOR_ENABLE_SOCIETE, ROWS_3, '90%');
 $doleditor->Create();
 print '</td></tr>';
 
-//AccidentObject --
+//AccidentObject
 print '<tr class="content_field"><td><label for="accident_object">'.$langs->trans("AccidentObject").'</label></td><td>';
-$doleditor = new DolEditor('accident_object', GETPOST('accident_object'), '', 90, 'dolibarr_details', '', false, true, $conf->global->FCKEDITOR_ENABLE_SOCIETE, ROWS_3, '90%');
+$doleditor = new DolEditor('accident_object', $accidentmetadata->accident_object, '', 90, 'dolibarr_details', '', false, true, $conf->global->FCKEDITOR_ENABLE_SOCIETE, ROWS_3, '90%');
 $doleditor->Create();
 print '</td></tr>';
 
-//AccidentNatureDoubt --
+//AccidentNatureDoubt
 print '<tr><td class="minwidth400">'.$langs->trans("AccidentNatureDoubt").'</td><td>';
-print '<input type="checkbox" id="accident_nature_doubt" name="accident_nature_doubt"'.($accidentmetadata->accident_nature_doubt ? ' checked=""' : '').'>';
+$doleditor = new DolEditor('accident_nature_doubt', $accidentmetadata->accident_nature_doubt, '', 90, 'dolibarr_details', '', false, true, $conf->global->FCKEDITOR_ENABLE_SOCIETE, ROWS_3, '90%');
+$doleditor->Create();
 print '</td></tr>';
 
-//AccidentNatureDoubtLink --
+//AccidentNatureDoubtLink
 print '<tr><td class="minwidth400">'.$langs->trans("AccidentNatureDoubtLink").'</td><td>';
 print img_picto('', 'globe').'<input type="text" class="minwidth400" name="accident_nature_doubt_link" id="accident_nature_doubt_link" value="'.$accidentmetadata->accident_nature_doubt_link.'">';
 print '</td></tr>';
 
-//VictimTransportedTo --
+//VictimTransportedTo
 print '<tr><td class="minwidth400">'.$langs->trans("VictimTransportedTo").'</td><td>';
 print '<input type="text" class="minwidth400" name="victim_transported_to" id="victim_transported_to" value="'.$accidentmetadata->victim_transported_to.'">';
 print '</td></tr>';
 
-//CollateralVictim -- Victime collatérale
+//CollateralVictim
 print '<tr><td class="minwidth400">'.$langs->trans("CollateralVictim").'</td><td>';
 print '<input type="checkbox" id="collateral_victim" name="collateral_victim"'.($accidentmetadata->collateral_victim ? ' checked=""' : '').'>';
 print '</td></tr>';
@@ -441,9 +443,9 @@ print '<tr><td class="minwidth400">'.$langs->trans("AccidentNoticed").'</td><td>
 print $form->selectarray('accident_noticed', array('0'=>$langs->trans('Found'), '1'=>$langs->trans('Known')), $accidentmetadata->accident_noticed, 0, 0, 0, '', 0, 0, 0, '', 'minwidth400', 1);
 print '</td></tr>';
 
-//AccidentNoticeDate --
+//AccidentNoticeDate
 print '<tr><td class="minwidth400"><label for="accident_notice_date">'.$langs->trans("AccidentNoticeDate").'</label></td><td>';
-print $form->selectDate($accidentmetadata->accident_notice_date, 'datei', 1, 1, 0, '', 1);
+print $form->selectDate($accidentmetadata->accident_notice_date, 'daten', 1, 1, 0, '', 1);
 print '</td></tr>';
 
 //AccidentNoticeBy
@@ -451,29 +453,29 @@ print '<tr><td class="minwidth400">'.$langs->trans("AccidentNoticeBy").'</td><td
 print $form->selectarray('accident_notice_by', array('0'=>$langs->trans('ByEmployer'), '1'=>$langs->trans('ByEmployees')), $accidentmetadata->accident_notice_by, 0, 0, 0, '', 0, 0, 0, '', 'minwidth400', 1);
 print '</td></tr>';
 
-//AccidentDescribedByVictim --
+//AccidentDescribedByVictim
 print '<tr><td class="minwidth400">'.$langs->trans("AccidentDescribedByVictim").'</td><td>';
 print '<input type="checkbox" id="accident_described_by_victim" name="accident_described_by_victim"'.($accidentmetadata->accident_described_by_victim ? ' checked=""' : '').'>';
 print '</td></tr>';
 
-//RegisteredInAccidentRegister  --
+//RegisteredInAccidentRegister
 print '<tr><td class="minwidth400">'.$langs->trans("RegisteredInAccidentRegister").'</td><td>';
 print '<input type="checkbox" id="registered_in_accident_register" name="registered_in_accident_register"'.($accidentmetadata->registered_in_accident_register ? ' checked=""' : '').'>';
 print '</td></tr>';
 
-//RegisterDate --
+//RegisterDate
 print '<tr><td class="minwidth400"><label for="register_date">'.$langs->trans("RegisterDate").'</label></td><td>';
 print $form->selectDate($accidentmetadata->register_date, 'dater', 1, 1, 0, '', 1);
 print '</td></tr>';
 
-//RegisterNumber --
+//RegisterNumber
 print '<tr><td class="minwidth400">'.$langs->trans("RegisterNumber").'</td><td>';
 print '<input type="text" class="minwidth400" name="register_number" id="register_number" value="'.$accidentmetadata->register_number.'">';
 print '</td></tr>';
 
-//Consequence --
+//Consequence
 print '<tr><td class="minwidth400">'.$langs->trans("Consequence").'</td><td>';
-print '<input type="text" class="minwidth400" name="consequence" id="consequence" value="'.$accidentmetadata->consequence.'">';
+print $form->selectarray('consequence', array('0'=>$langs->trans('WithoutWorkStop'), '1'=>$langs->trans('WithWorkStop'), '2'=>$langs->trans('Fatal')), $accidentmetadata->consequence, 0, 0, 0, '', 0, 0, 0, '', 'minwidth400', 1);
 print '</td></tr>';
 
 //PoliceReport  -- Rapport de police
@@ -481,32 +483,69 @@ print '<tr><td class="minwidth400">'.$langs->trans("PoliceReport").'</td><td>';
 print '<input type="checkbox" id="police_report" name="police_report"'.($accidentmetadata->police_report ? ' checked=""' : '').'>';
 print '</td></tr>';
 
-//PoliceReportBy --
+//PoliceReportBy
 print '<tr><td class="minwidth400">'.$langs->trans("PoliceReportBy").'</td><td>';
 print '<input type="text" class="minwidth400" name="police_report_by" id="police_report_by" value="'.$accidentmetadata->police_report_by.'">';
 print '</td></tr>';
 
-//FirstPersonNoticedIsWitness --
+//FirstPersonNoticedIsWitness
 print '<tr><td class="minwidth400">'.$langs->trans("FirstPersonNoticedIsWitness").'</td><td>';
-print '<input type="checkbox" id="first_person_noticed_is_witness" name="first_person_noticed_is_witness"'.($accidentmetadata->first_person_noticed_is_witness ? ' checked=""' : '').'>';
+print $form->selectarray('first_person_noticed_is_witness', array('0'=>$langs->trans('Witness'), '1'=>$langs->trans('FirstPersonNoticed')), $accidentmetadata->first_person_noticed_is_witness, 0, 0, 0, '', 0, 0, 0, '', 'minwidth400', 1);
 print '</td></tr>';
 
-//ThirdPartyResponsability --
+//FKUserWitness
+$userlist = $form->select_dolusers('', 'fk_user_witness', 0, null, 0, '', '', $conf->entity, 0, 0, 'AND u.statut = 1', 0, '', 'minwidth300', 0, 1);
+print '<tr>';
+print '<td class="minwidth400" style="width:10%">' . img_picto('', 'user') . ' ' . $form->editfieldkey('UserNoticed', 'fk_user_witness', '', $object, 0) . '</td>';
+print '<td>';
+print $form->selectarray('fk_user_witness', $userlist, $accidentmetadata->fk_user_witness, $langs->trans('SelectUser'), null, null, null, "40%", 0, 0, '', 'minwidth300', 1);
+print ' <a href="' . DOL_URL_ROOT . '/user/card.php?action=create&backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?action=create') . '" target="_blank"><span class="fa fa-plus-circle valignmiddle paddingleft" title="' . $langs->trans("AddUser") . '"></span></a>';
+print '</td></tr>';
+
+//ThirdPartyResponsability
 print '<tr><td class="minwidth400">'.$langs->trans("ThirdPartyResponsability").'</td><td>';
 print '<input type="checkbox" id="thirdparty_responsibility" name="thirdparty_responsibility"'.($accidentmetadata->thirdparty_responsibility ? ' checked=""' : '').'>';
 print '</td></tr>';
 
-//AccidentInvestigation -- Enquête accident
+//FkSocResponsible
+print '<tr><td class="minwidth400">';
+print img_picto('','building').' '.$langs->trans("FkSocResponsible");
+print '</td>';
+print '<td>';
+//For external user force the company to user company
+if (!empty($user->socid)) {
+	print $form->select_company($user->socid, 'fk_soc_responsible', '', 1, 1, 0, '', 0, 'minwidth300');
+} else {
+	print $form->select_company($accidentmetadata->fk_soc_responsible, 'fk_soc_responsible', '', 'SelectThirdParty', 1, 0, '', 0, 'minwidth300');
+}
+print ' <a href="'.DOL_URL_ROOT.'/societe/card.php?action=create&backtopage='.urlencode($_SERVER["PHP_SELF"].'?action=create').'" target="_blank"><span class="fa fa-plus-circle valignmiddle paddingleft" title="'.$langs->trans("AddThirdParty").'"></span></a>';
+print '</td></tr>';
+
+//FkSocResponsibleInsuranceSociety
+print '<tr><td class="minwidth400">';
+print img_picto('','building').' '.$langs->trans("FkSocResponsibleInsuranceSociety");
+print '</td>';
+print '<td>';
+//For external user force the company to user company
+if (!empty($user->socid)) {
+	print $form->select_company($user->socid, 'fk_soc_responsible_insurance_society', '', 1, 1, 0, '', 0, 'minwidth300');
+} else {
+	print $form->select_company($accidentmetadata->fk_soc_responsible_insurance_society, 'fk_soc_responsible_insurance_society', '', 'SelectThirdParty', 1, 0, '', 0, 'minwidth300');
+}
+print ' <a href="'.DOL_URL_ROOT.'/societe/card.php?action=create&backtopage='.urlencode($_SERVER["PHP_SELF"].'?action=create').'" target="_blank"><span class="fa fa-plus-circle valignmiddle paddingleft" title="'.$langs->trans("AddThirdParty").'"></span></a>';
+print '</td></tr>';
+
+//AccidentInvestigation
 print '<tr><td class="minwidth400">'.$langs->trans("AccidentInvestigation").'</td><td>';
 print '<input type="checkbox" id="accident_investigation" name="accident_investigation"'.($accidentmetadata->accident_investigation ? ' checked=""' : '').'>';
 print '</td></tr>';
 
-//AccidentInvestigationLink -- lien vers l'enquête accident
+//AccidentInvestigationLink
 print '<tr><td class="minwidth400">'.$langs->trans("AccidentInvestigationLink").'</td><td>';
 print img_picto('', 'globe').'<input type="text" class="minwidth400" id="accident_investigation_link" name="accident_investigation_link"'.($accidentmetadata->accident_investigation_link ? ' checked=""' : '').'>';
 print '</td></tr>';
 
-//CerfaLink -- Lien vers le Cerfa
+//CerfaLink
 print '<tr><td class="minwidth400">'.$langs->trans("CerfaLink").'</td><td>';
 print img_picto('', 'globe').'<input type="text" class="minwidth400" name="cerfa_link" id="cerfa_link" value="'.$accidentmetadata->cerfa_link.'">';
 print '</td></tr>';

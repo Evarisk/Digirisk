@@ -38,7 +38,7 @@ CREATE TABLE llx_digiriskdolibarr_accidentmetadata(
     consequence                          text,
     police_report                        boolean,
     police_report_by                     text,
-    first_person_noticed_is_witness      boolean,
+    first_person_noticed_is_witness      text,
 	thirdparty_responsibility            boolean,
 	accident_investigation               boolean,
 	accident_investigation_link          text,
