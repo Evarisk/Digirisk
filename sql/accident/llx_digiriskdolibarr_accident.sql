@@ -25,6 +25,7 @@ CREATE TABLE llx_digiriskdolibarr_accident(
     accident_date     datetime NOT NULL,
 	description       text,
 	photo             text,
+	accident_type     text,
     external_accident boolean,
 	fk_project        integer,
 	fk_user_creat     integer NOT NULL,

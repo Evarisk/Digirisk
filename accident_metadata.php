@@ -542,7 +542,7 @@ print '</td></tr>';
 
 //AccidentInvestigationLink
 print '<tr><td class="minwidth400">'.$langs->trans("AccidentInvestigationLink").'</td><td>';
-print img_picto('', 'globe').'<input type="text" class="minwidth400" id="accident_investigation_link" name="accident_investigation_link"'.($accidentmetadata->accident_investigation_link ? ' checked=""' : '').'>';
+print img_picto('', 'globe').'<input type="text" class="minwidth400" name="accident_investigation_link" id="accident_investigation_link" value="'.$accidentmetadata->accident_investigation_link.'">';
 print '</td></tr>';
 
 //CerfaLink
