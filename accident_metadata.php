@@ -402,6 +402,8 @@ print $formother->select_dictionary('relative_location','c_relative_location', '
 print '<a href="'.DOL_URL_ROOT.'/admin/dict.php?mainmenu=home" target="_blank" class="wpeo-tooltip-event" aria-label="'.$langs->trans('ConfigDico').'">' .' '. img_picto('', 'globe').'</a>';
 print '</td></tr>';
 
+print '<tr></tr>';
+
 //VictimActivity
 print '<tr class="content_field"><td><label for="victim_activity">'.$langs->trans("VictimActivity").'</label></td><td>';
 $doleditor = new DolEditor('victim_activity', $accidentmetadata->victim_activity, '', 90, 'dolibarr_details', '', false, true, $conf->global->FCKEDITOR_ENABLE_SOCIETE, ROWS_3, '90%');
@@ -420,6 +422,8 @@ $doleditor = new DolEditor('accident_object', $accidentmetadata->accident_object
 $doleditor->Create();
 print '</td></tr>';
 
+print '<tr></tr>';
+
 //AccidentNatureDoubt
 print '<tr><td class="minwidth400">'.$langs->trans("AccidentNatureDoubt").'</td><td>';
 $doleditor = new DolEditor('accident_nature_doubt', $accidentmetadata->accident_nature_doubt, '', 90, 'dolibarr_details', '', false, true, $conf->global->FCKEDITOR_ENABLE_SOCIETE, ROWS_3, '90%');
@@ -431,6 +435,8 @@ print '<tr><td class="minwidth400">'.$langs->trans("AccidentNatureDoubtLink").'<
 print img_picto('', 'globe').'<input type="text" class="minwidth400" name="accident_nature_doubt_link" id="accident_nature_doubt_link" value="'.$accidentmetadata->accident_nature_doubt_link.'">';
 print '</td></tr>';
 
+print '<tr></tr>';
+
 //VictimTransportedTo
 print '<tr><td class="minwidth400">'.$langs->trans("VictimTransportedTo").'</td><td>';
 print '<input type="text" class="minwidth400" name="victim_transported_to" id="victim_transported_to" value="'.$accidentmetadata->victim_transported_to.'">';
@@ -441,10 +447,14 @@ print '<tr><td class="minwidth400">'.$langs->trans("CollateralVictim").'</td><td
 print '<input type="checkbox" id="collateral_victim" name="collateral_victim"'.($accidentmetadata->collateral_victim ? ' checked=""' : '').'>';
 print '</td></tr>';
 
+print '<tr></tr>';
+
 //VictimWorkHours
 print '<tr><td class="minwidth400">'.$langs->trans("VictimWorkHours").'</td><td>';
 print $langs->trans("FromDigirisk") . ' ' . $form->selectDate($accidentmetadata->workhours_morning_date_start, 'datewms', 1, 1, 0, '', 0) . ' ' . $langs->trans("At") . ' ' . $form->selectDate($accidentmetadata->workhours_morning_date_end, 'datewme', 1, 1, 0, '', 0) . ' ' . $langs->trans("AndFrom") . ' ' . $form->selectDate($accidentmetadata->workhours_afternoon_date_start, 'datewas', 1, 1, 0, '', 0) . ' ' . $langs->trans("At") . ' ' . $form->selectDate($accidentmetadata->workhours_afternoon_date_end, 'datewae', 1, 1, 0, '', 0);
 print '</td></tr>';
+
+print '<tr></tr>';
 
 //AccidentNoticed
 print '<tr><td class="minwidth400">'.$langs->trans("AccidentNoticed").'</td><td>';
@@ -466,6 +476,8 @@ print '<tr><td class="minwidth400">'.$langs->trans("AccidentDescribedByVictim").
 print '<input type="checkbox" id="accident_described_by_victim" name="accident_described_by_victim"'.($accidentmetadata->accident_described_by_victim ? ' checked=""' : '').'>';
 print '</td></tr>';
 
+print '<tr></tr>';
+
 //RegisteredInAccidentRegister
 print '<tr><td class="minwidth400">'.$langs->trans("RegisteredInAccidentRegister").'</td><td>';
 print '<input type="checkbox" id="registered_in_accident_register" name="registered_in_accident_register"'.($accidentmetadata->registered_in_accident_register ? ' checked=""' : '').'>';
@@ -481,10 +493,14 @@ print '<tr><td class="minwidth400">'.$langs->trans("RegisterNumber").'</td><td>'
 print '<input type="text" class="minwidth400" name="register_number" id="register_number" value="'.$accidentmetadata->register_number.'">';
 print '</td></tr>';
 
+print '<tr></tr>';
+
 //Consequence
 print '<tr><td class="minwidth400">'.$langs->trans("Consequence").'</td><td>';
 print $form->selectarray('consequence', array('0'=>$langs->trans('WithoutWorkStop'), '1'=>$langs->trans('WithWorkStop'), '2'=>$langs->trans('Fatal')), $accidentmetadata->consequence, 0, 0, 0, '', 0, 0, 0, '', 'minwidth400', 1);
 print '</td></tr>';
+
+print '<tr></tr>';
 
 //PoliceReport  -- Rapport de police
 print '<tr><td class="minwidth400">'.$langs->trans("PoliceReport").'</td><td>';
@@ -495,6 +511,8 @@ print '</td></tr>';
 print '<tr><td class="minwidth400">'.$langs->trans("PoliceReportBy").'</td><td>';
 print '<input type="text" class="minwidth400" name="police_report_by" id="police_report_by" value="'.$accidentmetadata->police_report_by.'">';
 print '</td></tr>';
+
+print '<tr></tr>';
 
 //FirstPersonNoticedIsWitness
 print '<tr><td class="minwidth400">'.$langs->trans("FirstPersonNoticedIsWitness").'</td><td>';
@@ -509,6 +527,8 @@ print '<td>';
 print $form->selectarray('fk_user_witness', $userlist, $accidentmetadata->fk_user_witness, $langs->trans('SelectUser'), null, null, null, "40%", 0, 0, '', 'minwidth300', 1);
 print ' <a href="' . DOL_URL_ROOT . '/user/card.php?action=create&backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?action=create') . '" target="_blank"><span class="fa fa-plus-circle valignmiddle paddingleft" title="' . $langs->trans("AddUser") . '"></span></a>';
 print '</td></tr>';
+
+print '<tr></tr>';
 
 //ThirdPartyResponsability
 print '<tr><td class="minwidth400">'.$langs->trans("ThirdPartyResponsability").'</td><td>';
@@ -542,6 +562,8 @@ if (!empty($user->socid)) {
 }
 print ' <a href="'.DOL_URL_ROOT.'/societe/card.php?action=create&backtopage='.urlencode($_SERVER["PHP_SELF"].'?action=create').'" target="_blank"><span class="fa fa-plus-circle valignmiddle paddingleft" title="'.$langs->trans("AddThirdParty").'"></span></a>';
 print '</td></tr>';
+
+print '<tr></tr>';
 
 //AccidentInvestigation
 print '<tr><td class="minwidth400">'.$langs->trans("AccidentInvestigation").'</td><td>';
