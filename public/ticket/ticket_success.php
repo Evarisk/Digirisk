@@ -78,8 +78,6 @@ llxHeaderTicketDigirisk($langs->trans("CreateTicket"), "", 0, 0, $morejs, $morec
 			<span class="notice-subtitle" style="color: red"><?php echo $langs->trans("YouMustNotifyYourHierarchy") . ' ' ?></span>
 		</span>
 	</span>
-	<br>
-	<p class="center"><i class="fas fa-plus-circle"></i> <a class="wordbreak" style="font-size:19px;" href="<?php echo dol_buildpath('/public/ticket/index.php', 2) ?>" target="_blank" ><?php echo $langs->trans('GoBackToTicketCreation') ?></a>
 </div>
 <?php
 

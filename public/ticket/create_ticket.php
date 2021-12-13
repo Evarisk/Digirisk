@@ -114,10 +114,11 @@ if ($action == 'add') {
 		setEventMessages($langs->trans('ErrorFieldNotEmpty', $langs->transnoentitiesnoconv('Register')), null, 'errors');
 		$error++;
 	}
-	if (empty($pertinence)) {
-		setEventMessages($langs->trans('ErrorFieldNotEmpty', $langs->transnoentitiesnoconv('Pertinence')), null, 'errors');
-		$error++;
-	}
+	// Quand le registre choisi est Danger Grave et Imminent, il ne faut pas check ça
+//	if (empty($pertinence)) {
+//		setEventMessages($langs->trans('ErrorFieldNotEmpty', $langs->transnoentitiesnoconv('Pertinence')), null, 'errors');
+//		$error++;
+//	}
 	if (empty($message)) {
 		setEventMessages($langs->trans('ErrorFieldNotEmpty', $langs->transnoentitiesnoconv('Message')), null, 'errors');
 		$error++;
