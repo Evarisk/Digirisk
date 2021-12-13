@@ -3190,7 +3190,12 @@ window.eoxiaJS.keyEvent.keyup = function( event ) {
 	}
 
 	if ( 'Enter' === event.key )  {
-		$(this).find('.modal-active .modal-footer .wpeo-button').not('.button-disable').first().click();
+		event.preventDefault()
+		if (!$('input, textarea').is(':focus')) {
+			$(this).find('.modal-active .modal-footer .wpeo-button').not('.button-disable').first().click();
+		} else {
+			$('textarea:focus').val($('textarea:focus').val() + '\n')
+		}
 	}
 };
 
