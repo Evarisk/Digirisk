@@ -765,7 +765,10 @@ class AccidentMetaData extends CommonObject
 		'accident_nature_doubt_link'           => array('type'=>'text', 'label'=>'AccidentNatureDoubtLink', 'enabled'=>'1', 'position'=>100, 'notnull'=>-1, 'visible'=>1,),
 		'victim_transported_to'                => array('type'=>'text', 'label'=>'VictimTransportedTo', 'enabled'=>'1', 'position'=>110, 'notnull'=>-1, 'visible'=>1,),
 		'collateral_victim'                    => array('type'=>'boolean', 'label'=>'CollateralVictim', 'enabled'=>'1', 'position'=>120, 'notnull'=>-1, 'visible'=>1,),
-		'victim_workhours'                     => array('type'=>'datetime', 'label'=>'VictimWorkHours', 'enabled'=>'1', 'position'=>130, 'notnull'=>-1, 'visible'=>1,),
+		'workhours_morning_date_start'         => array('type'=>'datetime', 'label'=>'WorkHoursMorningDateStart', 'enabled'=>'1', 'position'=>130, 'notnull'=>-1, 'visible'=>1,),
+		'workhours_morning_date_end'           => array('type'=>'datetime', 'label'=>'WorkHoursMorningDateEnd', 'enabled'=>'1', 'position'=>131, 'notnull'=>-1, 'visible'=>1,),
+		'workhours_afternoon_date_start'       => array('type'=>'datetime', 'label'=>'WorkHoursAfternoonDateStart', 'enabled'=>'1', 'position'=>132, 'notnull'=>-1, 'visible'=>1,),
+		'workhours_afternoon_date_end'         => array('type'=>'datetime', 'label'=>'WorkHoursAfternoonDateEnd', 'enabled'=>'1', 'position'=>133, 'notnull'=>-1, 'visible'=>1,),
 		'accident_noticed'                     => array('type'=>'text', 'label'=>'AccidentNoticed', 'enabled'=>'1', 'position'=>140, 'notnull'=>-1, 'visible'=>1,),
 		'accident_notice_date'                 => array('type'=>'datetime', 'label'=>'AccidentNoticeDate', 'enabled'=>'1', 'position'=>150, 'notnull'=>-1, 'visible'=>1,),
 		'accident_notice_by'                   => array('type'=>'text', 'label'=>'AccidentNoticeBy', 'enabled'=>'1', 'position'=>160, 'notnull'=>-1, 'visible'=>1,),
@@ -801,7 +804,10 @@ class AccidentMetaData extends CommonObject
 	public $accident_nature_doubt_link;
 	public $victim_transported_to;
 	public $collateral_victim;
-	public $victim_workhours;
+	public $workhours_morning_date_start;
+	public $workhours_morning_date_end;
+	public $workhours_afternoon_date_start;
+	public $workhours_afternoon_date_end;
 	public $accident_noticed;
 	public $accident_notice_date;
 	public $accident_notice_by;

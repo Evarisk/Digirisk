@@ -616,6 +616,9 @@ AccidentInvestigation = Enquête accident
 AccidentInvestigationLink = Lien vers l'enquête accident
 AccidentLocation = Lieu de l'accident
 CollateralVictim = Victime collatérale
+FromDigirisk = De
+At = À
+AndFrom = Et de
 
 CerfaLink = Lien vers le Cerfa
 WorkStopDays = Nombre de jour d'arrêt de travail

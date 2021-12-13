@@ -114,7 +114,6 @@ if (empty($reshook)) {
 		$accident_nature_doubt_link           = GETPOST('accident_nature_doubt_link');
 		$victim_transported_to                = GETPOST('victim_transported_to');
 		$collateral_victim                    = GETPOST('collateral_victim');
-		$victim_workhours                     = GETPOST('victim_workhours');
 		$accident_noticed                     = GETPOST('accident_noticed');
 		$accident_notice_by                   = GETPOST('accident_notice_by');
 		$accident_described_by_victim         = GETPOST('accident_described_by_victim');
@@ -132,6 +131,11 @@ if (empty($reshook)) {
 		$fk_soc_responsible                   = GETPOST('fk_soc_responsible');
 		$fk_soc_responsible_insurance_society = GETPOST('fk_soc_responsible_insurance_society');
 		$fk_accident                          = GETPOST('id');
+
+		$workhours_morning_date_start   = dol_mktime(GETPOST('datewmshour', 'int'), GETPOST('datewmsmin', 'int'), 0, dol_print_date(dol_now(),'%m'), dol_print_date(dol_now(),'%d'), dol_print_date(dol_now(),'%Y'));
+		$workhours_morning_date_end     = dol_mktime(GETPOST('datewmehour', 'int'), GETPOST('datewmemin', 'int'), 0, dol_print_date(dol_now(),'%m'),dol_print_date(dol_now(),'%d'), dol_print_date(dol_now(),'%Y'));
+		$workhours_afternoon_date_start = dol_mktime(GETPOST('datewashour', 'int'), GETPOST('datewasmin', 'int'), 0, dol_print_date(dol_now(),'%m'), dol_print_date(dol_now(),'%d'), dol_print_date(dol_now(),'%Y'));
+		$workhours_afternoon_date_end   = dol_mktime(GETPOST('datewaehour', 'int'), GETPOST('datewaemin', 'int'), 0, dol_print_date(dol_now(),'%m'), dol_print_date(dol_now(),'%d'), dol_print_date(dol_now(),'%Y'));
 
 		$accident_notice_date = dol_mktime(GETPOST('datenhour', 'int'), GETPOST('datenmin', 'int'), 0, GETPOST('datenmonth', 'int'), GETPOST('datenday', 'int'), GETPOST('datenyear', 'int'));
 		$register_date        = dol_mktime(GETPOST('daterhour', 'int'), GETPOST('datermin', 'int'), 0, GETPOST('datermonth', 'int'), GETPOST('daterday', 'int'), GETPOST('dateryear', 'int'));
@@ -151,7 +155,11 @@ if (empty($reshook)) {
 		$accidentmetadata->accident_nature_doubt_link           = $accident_nature_doubt_link;
 		$accidentmetadata->victim_transported_to                = $victim_transported_to;
 		$accidentmetadata->collateral_victim                    = $collateral_victim;
-		$accidentmetadata->victim_workhours                     = $victim_workhours;
+
+		$accidentmetadata->workhours_morning_date_start         = $workhours_morning_date_start;
+		$accidentmetadata->workhours_morning_date_end           = $workhours_morning_date_end;
+		$accidentmetadata->workhours_afternoon_date_start       = $workhours_afternoon_date_start;
+		$accidentmetadata->workhours_afternoon_date_end         = $workhours_afternoon_date_end;
 
 		$accidentmetadata->accident_noticed                     = $accident_noticed;
 		$accidentmetadata->accident_notice_date                 = $accident_notice_date;
@@ -435,7 +443,7 @@ print '</td></tr>';
 
 //VictimWorkHours
 print '<tr><td class="minwidth400">'.$langs->trans("VictimWorkHours").'</td><td>';
-print '<input type="text" class="minwidth400" name="victim_workhours" id="victim_workhours" value="'.$accidentmetadata->victim_workhours.'">';
+print $langs->trans("FromDigirisk") . ' ' . $form->selectDate($accidentmetadata->workhours_morning_date_start, 'datewms', 1, 1, 0, '', 0) . ' ' . $langs->trans("At") . ' ' . $form->selectDate($accidentmetadata->workhours_morning_date_end, 'datewme', 1, 1, 0, '', 0) . ' ' . $langs->trans("AndFrom") . ' ' . $form->selectDate($accidentmetadata->workhours_afternoon_date_start, 'datewas', 1, 1, 0, '', 0) . ' ' . $langs->trans("At") . ' ' . $form->selectDate($accidentmetadata->workhours_afternoon_date_end, 'datewae', 1, 1, 0, '', 0);
 print '</td></tr>';
 
 //AccidentNoticed
