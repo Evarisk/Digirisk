@@ -628,6 +628,7 @@ CollateralVictim = Victime collatérale
 FromDigirisk = De
 At = À
 AndFrom = Et de
+ExternalAccident = L'accident a-t-il eu lieu dans un autre établissement que celui d'attache de la victime
 
 CerfaLink = Lien vers le Cerfa
 WorkStopDays = Nombre de jour d'arrêt de travail

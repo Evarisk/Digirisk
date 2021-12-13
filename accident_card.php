@@ -560,14 +560,12 @@ if ($action == 'create') {
 	print '</td></tr>';
 
 	//AccidentLocation -- Lieu de l'accident
-	print '<tr><td class="minwidth400">'.$langs->trans("AccidentLocation").'</td><td>';
+	print '<tr class="fk_element_field"><td class="minwidth400">'.$langs->trans("AccidentLocation").'</td><td>';
 	print $digiriskelement->select_digiriskelement_list($object->fk_element, 'fk_element', '', '',  0, 0, array(), '',  0,  0,  'minwidth100',  GETPOST('id'),  false, 0);
 	print '</td></tr>';
 
 	//FkSoc -- Société extérieure
-	print '<tr><td class="minwidth400">';
-	print img_picto('','building').' '.$langs->trans("ExtSociety");
-	print '</td>';
+	print '<tr class="fk_soc_field hidden" '. (GETPOST('fk_soc') ?  '' : 'style="display:none"') .'><td class="minwidth400">'.$langs->trans("AccidentLocation").'</td>';
 	print '<td>';
 	//For external user force the company to user company
 	if (!empty($user->socid)) {
@@ -653,14 +651,12 @@ if (($id || $ref) && $action == 'edit') {
 	print '</td></tr>';
 
 	//AccidentLocation -- Lieu de l'accident
-	print '<tr><td>'.$langs->trans("AccidentLocation").'</td><td>';
+	print '<tr class="'.(empty($object->external_accident) ?  ' fk_element_field' : ' fk_element_field hidden' ).'" style="'.(empty($object->external_accident) ? ' ' : ' display:none').'"><td>'.$langs->trans("AccidentLocation").'</td><td>';
 	print $digiriskelement->select_digiriskelement_list($object->fk_element, 'fk_element', '', '',  0, 0, array(), '',  0,  0,  'minwidth100',  GETPOST('id'),  false, 0);
 	print '</td></tr>';
 
 	//FkSoc -- Société extérieure
-	print '<tr><td class="minwidth400">';
-	print img_picto('','building').' '.$langs->trans("ExtSociety");
-	print '</td>';
+	print '<tr class="'.($object->external_accident ?  ' fk_soc_field' : ' fk_soc_field hidden' ).'" style="'.($object->external_accident ? ' ' : ' display:none').'"><td class="minwidth400">'.$langs->trans("AccidentLocation").'</td>';
 	print '<td>';
 	//For external user force the company to user company
 	if (!empty($user->socid)) {
@@ -730,7 +726,11 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	$arrayAccident[] = $object->accident_date;
 	$arrayAccident[] = $object->description;
 	$arrayAccident[] = $object->photo;
-	$arrayAccident[] = $object->fk_element;
+	if (empty($object->external_accident)) {
+		$arrayAccident[] = $object->fk_element;
+	} else {
+		$arrayAccident[] = $object->fk_soc;
+	}
 	$arrayAccident[] = $object->fk_user_victim;
 
 	$maxnumber  = count($arrayAccident);

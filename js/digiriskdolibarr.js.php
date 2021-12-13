@@ -3352,7 +3352,7 @@ window.eoxiaJS.accident.init = function() {
 window.eoxiaJS.accident.event = function() {
     jQuery( document ).on( 'submit', ' .sendfile', window.eoxiaJS.accident.tmpStockFile );
     jQuery( document ).on( 'click', ' .linked-file-delete-workstop', window.eoxiaJS.accident.removeFile );
-
+	jQuery( document ).on( 'click', '#external_accident', window.eoxiaJS.accident.showExternalAccidentLocation );
 };
 
 /**
@@ -3413,6 +3413,23 @@ window.eoxiaJS.accident.removeFile = function( event ) {
         error: function ( ) {
         }
     });
+};
+
+window.eoxiaJS.accident.showExternalAccidentLocation = function() {
+	let fkElementField = $(this).closest('.accident-table').find('.fk_element_field')
+	let fkSocField = $(this).closest('.accident-table').find('.fk_soc_field')
+
+	if (fkSocField.hasClass('hidden')) {
+		fkElementField.attr('style', 'display:none')
+		fkSocField.attr('style', '')
+		fkElementField.addClass('hidden')
+		fkSocField.removeClass('hidden')
+	} else {
+		fkElementField.attr('style', '')
+		fkSocField.attr('style', 'display:none')
+		fkElementField.removeClass('hidden')
+		fkSocField.addClass('hidden')
+	}
 };
 
 /**
