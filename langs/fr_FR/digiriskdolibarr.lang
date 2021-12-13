@@ -111,6 +111,9 @@ DigiriskAdminUserGroupDescription = Le groupe d'administrateurs Digirisk possèd
 DigiriskAdminUserGroup = Groupe de lecteurs Digirisk
 DigiriskAdminUserGroupDescription = Le groupe de lecteurs Digirisk possède toutes les permissions de lecture, mais aucune d'écriture ni de suppression à Digirisk
 
+ContractType = Type de contrat
+Apprentice/Student = Apprenti/Elève
+Interim = Intérimaire
 
 
 #
