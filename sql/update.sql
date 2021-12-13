@@ -38,3 +38,8 @@ ALTER TABLE llx_digiriskdolibarr_digiriskelement ADD `rank` integer;
 -- 8.3.0
 ALTER TABLE llx_digiriskdolibarr_firepermit ADD last_email_sent_date datetime;
 ALTER TABLE llx_digiriskdolibarr_firepermit ADD fk_project integer;
+
+-- 8.5.0
+
+DROP TABLE llx_digiriskdolibarr_preventionplan_signature;
+DROP TABLE llx_digiriskdolibarr_firepermit_signature;

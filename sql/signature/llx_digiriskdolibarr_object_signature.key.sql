@@ -13,5 +13,5 @@
 -- You should have received a copy of the GNU General Public License
 -- along with this program.  If not, see https://www.gnu.org/licenses/.
 
-ALTER TABLE llx_digiriskdolibarr_preventionplan_signature ADD INDEX idx_digiriskdolibarr_preventionplan_signature _rowid (rowid);
-ALTER TABLE llx_digiriskdolibarr_preventionplan_signature  ADD CONSTRAINT llx_digiriskdolibarr_preventionplan_signature_fk_object FOREIGN KEY (fk_object) REFERENCES llx_digiriskdolibarr_preventionplan(rowid);
+ALTER TABLE llx_digiriskdolibarr_object_signature ADD INDEX idx_digiriskdolibarr_object_signature _rowid (rowid);
+ALTER TABLE llx_digiriskdolibarr_object_signature  ADD CONSTRAINT llx_digiriskdolibarr_object_signature_fk_object FOREIGN KEY (fk_object) REFERENCES llx_digiriskdolibarr_object(rowid);

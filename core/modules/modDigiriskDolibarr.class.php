@@ -905,6 +905,29 @@ class modDigiriskdolibarr extends DolibarrModules
 
 		$langs->load("digiriskdolibarr@digiriskdolibarr");
 
+		if ( $conf->global->DIGIRISKDOLIBARR_NEW_SIGNATURE_TABLE ==  0 ) {
+			require_once __DIR__ . '/../../class/preventionplan.class.php';
+			require_once __DIR__ . '/../../class/firepermit.class.php';
+
+			$preventionPlanSignature = new PreventionPlanSignature($this->db);
+			$preventionPlanSignatureList = $preventionPlanSignature->fetchAll('', '', 0, 0, array(), 'AND', 'digiriskdolibarr_preventionplan_signature');
+			if (!empty($preventionPlanSignatureList)) {
+				foreach ($preventionPlanSignatureList as $preventionPlanSignature) {
+					$preventionPlanSignature->create($user, 1);
+				}
+			}
+
+			$firePermitSignature = new FirePermitSignature($this->db);
+			$firePermitSignatureList = $firePermitSignature->fetchAll('', '', 0, 0, array(), 'AND', 'digiriskdolibarr_firepermit_signature');
+			if (!empty($firePermitSignatureList)) {
+				foreach ($firePermitSignatureList as $firePermitSignature) {
+					$firePermitSignature->create($user, 1);
+				}
+			}
+
+			dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_NEW_SIGNATURE_TABLE', 1, 'integer', 0, '', $conf->entity);
+		}
+
 		$sql = array();
 		$this->_load_tables('/digiriskdolibarr/sql/');
 

@@ -691,19 +691,27 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				dol_syslog("Trigger '".$this->name."' for action '$action' launched by ".__FILE__.". id=".$object->id);
 				require_once DOL_DOCUMENT_ROOT.'/comm/action/class/actioncomm.class.php';
 				$now = dol_now();
+
+				if ($object->element_type == 'socpeople') {
+					$people = new Contact($this->db);
+				} elseif ($object->element_type == 'user') {
+					$people = new User($this->db);
+				}
+				if ($people) {
+					$people->fetch($object->element_id);
+				}
+
 				$actioncomm = new ActionComm($this->db);
 
-				$object_type = $object->table_element;
-				$object_type = preg_replace('/digiriskdolibarr_/', '', $object_type);
-				$object_type = preg_replace('/_signature/', '', $object_type);
-
-				$actioncomm->elementtype        = $object_type.'@digiriskdolibarr';
+				$actioncomm->elementtype        = $object->object_type.'@digiriskdolibarr';
 				$actioncomm->code               = 'AC_DIGIRISKSIGNATURE_SIGNED';
 				$actioncomm->type_code          = 'AC_OTH_AUTO';
-				$actioncomm->label              = $langs->trans('DigiriskSignatureSignedTrigger');
+				$actioncomm->label       		= $langs->trans($object->role .'Signed') . ' : ' . $people->firstname . ' ' . $people->lastname;
 				$actioncomm->datep              = $now;
 				$actioncomm->fk_element         = $object->fk_object;
-				$actioncomm->socpeopleassigned  = array($object->element_id => $object->element_id);
+				if ($object->element_type == 'socpeople') {
+					$actioncomm->socpeopleassigned  = array($object->element_id => $object->element_id);
+				}
 				$actioncomm->userownerid        = $user->id;
 				$actioncomm->percentage         = -1;
 

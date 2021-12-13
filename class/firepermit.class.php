@@ -947,7 +947,7 @@ class FirePermitSignature extends DigiriskSignature
 	/**
 	 * @var string Name of table without prefix where object is stored. This is also the key used for extrafields management.
 	 */
-	public $table_element = 'digiriskdolibarr_firepermit_signature';
+	public $object_type = 'firepermit';
 
 	/**
 	 * Constructor
@@ -1000,7 +1000,7 @@ class FirePermitSignature extends DigiriskSignature
 	 * @return array|int                 int <0 if KO, array of pages if OK
 	 * @throws Exception
 	 */
-	public function fetchAll($sortorder = '', $sortfield = '', $limit = 0, $offset = 0, array $filter = array(), $filtermode = 'AND')
+	public function fetchAll($sortorder = '', $sortfield = '', $limit = 0, $offset = 0, array $filter = array(), $filtermode = 'AND', $old_table_element)
 	{
 		global $conf;
 
@@ -1009,9 +1009,14 @@ class FirePermitSignature extends DigiriskSignature
 		$records = array();
 		$sql = 'SELECT ';
 		$sql .= $this->getFieldList();
-		$sql .= ' FROM '.MAIN_DB_PREFIX.$this->table_element;
+		if (dol_strlen($old_table_element)) {
+			$sql .= ' FROM '.MAIN_DB_PREFIX.$old_table_element;
+		} else {
+			$sql .= ' FROM '.MAIN_DB_PREFIX.$this->table_element;
+		}
 		if (isset($this->ismultientitymanaged) && $this->ismultientitymanaged == 1) $sql .= ' WHERE entity IN ('.getEntity($this->table_element).')';
 		else $sql .= ' WHERE 1 = 1';
+		$sql .= ' AND object_type = "' . $this->object_type . '"';
 
 		// Manage filter
 		$sqlwhere = array();
