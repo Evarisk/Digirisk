@@ -438,7 +438,14 @@ while ($i < ($limit ? min($num, $limit) : $num)) {
 					}
 				}
 
-				include './core/tpl/digiriskdolibarr_configuration_gauge_view.tpl.php';
+				$advancement =  bcdiv((($counter / $maxnumber) * 100),1, 2);
+
+				print $advancement . '%';
+				?>
+				<div class="progress-bar progress-bar-info" style="width: 100%; height:20%; background-color: lightgray" title=" <?php echo $advancement ?>%">
+					<div class="progress-bar progress-bar-consumed" style="width:  <?php echo $advancement ?>%; background-color: forestgreen" title="0%"></div>
+				</div>
+				<?php
 			}
 			elseif ($key == 'ref') {
 				print '<i class="fas fa-user-injured"></i>  ' . $accident->getNomUrl();
