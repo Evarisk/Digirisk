@@ -72,12 +72,22 @@ print load_fiche_titre($title, $linkback, 'digiriskdolibarr32px@digiriskdolibarr
 $head = digiriskdolibarrAdminPrepareHead();
 print dol_get_fiche_head($head, 'digiriskelement', '', -1, "digiriskdolibarr@digiriskdolibarr");
 
-$types = array('groupment' => 'Groupment', 'workunit' => 'WorkUnit');
+$types = array(
+	'groupment' => 'Groupment',
+	'workunit' => 'WorkUnit'
+);
+
+$pictos = array(
+	'groupment' => '<span class="ref" style="font-size: 10px; color: #fff; text-transform: uppercase; font-weight: 600; display: inline-block; background: #263C5C; padding: 0.2em 0.4em; line-height: 10px !important">GP</span> ',
+	'workunit' => '<span class="ref" style="background: #0d8aff;  font-size: 10px; color: #fff; text-transform: uppercase; font-weight: 600; display: inline-block;; padding: 0.2em 0.4em; line-height: 10px !important">WU</span> '
+);
+
 /*
  *  Numbering module
  */
 foreach ($types as $type => $typeWithCase) {
-	print load_fiche_titre($langs->trans($typeWithCase), '', '');
+
+	print load_fiche_titre( $pictos[$type] . $langs->trans($typeWithCase . 'Management'), '', '');
 	print '<hr>';
 	print load_fiche_titre($langs->trans("Digirisk" . $typeWithCase . "NumberingModule"), '', '');
 
@@ -174,7 +184,7 @@ foreach ($types as $type => $typeWithCase) {
  *  Deleted Elements
  */
 
-print load_fiche_titre($langs->trans('DeletedElements'), '', '');
+print load_fiche_titre('<i class="fas fa-trash"></i> ' . $langs->trans('DeletedElements'), '', '');
 print '<hr>';
 
 print load_fiche_titre($langs->trans("DeletedDigiriskElement"), '', '');

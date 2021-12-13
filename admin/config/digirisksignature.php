@@ -85,8 +85,10 @@ print load_fiche_titre($title, $linkback, 'digiriskdolibarr32px@digiriskdolibarr
 $head = digiriskdolibarrAdminPrepareHead();
 print dol_get_fiche_head($head, 'digirisksignature', '', -1, "digiriskdolibarr@digiriskdolibarr");
 
-print load_fiche_titre($langs->trans('SignatureManagement'), '', '');
+print load_fiche_titre('<i class="fas fa-file-signature"></i> ' . $langs->trans('SignatureManagement'), '', '');
 print '<hr>';
+
+print load_fiche_titre($langs->trans("SignaturePublicInterface"), '', '');
 
 $enabledisablehtml = $langs->trans("SignatureActivatePublicInterface").' ';
 if (empty($conf->global->DIGIRISKDOLIBARR_SIGNATURE_ENABLE_PUBLIC_INTERFACE)) {

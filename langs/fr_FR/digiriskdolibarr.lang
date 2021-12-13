@@ -47,7 +47,7 @@ DigiriskDescription = Redirection sur la page de bienvenue de Digirisk par défa
 HowToSetupIHM = Pour plus de fonctionnalités sur l'affichage de Dolibarr (Configuration de l'image de fond du Dolibarr, etc), vous pouvez vous rendre sur ce lien :
 ConfigIHM = Configuration de l'affichage
 ConfigDico =  Accéder à la page de configuration des dictionnaires
-
+LinkedProject = Projet lié
 
 #
 # Page À propos
@@ -775,11 +775,11 @@ RiskAssessmentDocumentContent = Veuillez trouver ci-joint le ZIP et le document 
 GroupmentDocumentGeneratedWithDolibarr = Fiche de groupement générée avec Dolibarr
 
 # Mod Numbering - Modèle de numérotation
-DigiriskGroupmentDocumentNumberingModule = Modèle de numérotation des fiches de groupement de Digirisk
+DigiriskGroupmentDocumentDocumentNumberingModule = Modèle de numérotation des fiches de groupement de Digirisk
 DigiriskGroupmentDocumentStandardModel = Renvoie le numéro sous la forme GPDn où n est un compteur séquentiel sans rupture et sans remise à 0.
 
 # ODT Template - Template ODT
-DigiriskTemplateDocumentGroupment = Modèle de documents des fiches de groupement de Digirisk
+DigiriskTemplateDocumentGroupmentDocument = Modèle de documents des fiches de groupement de Digirisk
 GroupmentDocumentCustomDigiriskTemplate = ODT custom des fiches de groupement
 GroupmentDocumentDigiriskTemplate = ODT par défaut des fiches de groupement
 
@@ -798,11 +798,11 @@ GroupmentDocument = Fiche de Groupement
 WorkUnitDocumentGeneratedWithDolibarr = Fiche d'Unité de travail générée avec Dolibarr
 
 # Mod Numbering - Modèle de numérotation
-DigiriskWorkUnitDocumentNumberingModule = Modèle de numérotation des fiches d'unité de travail de Digirisk
+DigiriskWorkUnitDocumentDocumentNumberingModule = Modèle de numérotation des fiches d'unité de travail de Digirisk
 DigiriskWorkUnitDocumentStandardModel = Renvoie le numéro sous la forme WUDn où n est un compteur séquentiel sans rupture et sans remise à 0.
 
 # ODT Template - Template ODT
-DigiriskTemplateDocumentWorkUnit = Modèle de documents des fiches d'unité de travail de Digirisk
+DigiriskTemplateDocumentWorkUnitDocument = Modèle de documents des fiches d'unité de travail de Digirisk
 WorkUnitDocumentCustomDigiriskTemplate = ODT custom des fiches d'unité de travail
 WorkUnitDocumentDigiriskTemplate = ODT par défaut des fiches d'unité de travail
 
@@ -846,6 +846,7 @@ DigiriskGroupmentStandardModel = Renvoie le numéro sous la forme GPn où n est 
 
 # Data - Donnée
 Groupment = Groupement
+GroupmentManagement = Gestion des données des groupements
 NewGroupment = Nouveau groupement
 ModifyGroupment = Modifier groupement
 TrashGroupment = Groupement poubelle
@@ -867,6 +868,7 @@ DigiriskWorkUnitStandardModel = Renvoie le numéro sous la forme WUn où n est u
 
 # Data - Donnée
 WorkUnit = Unité de travail
+WorkUnitManagement = Gestion des données des unités de travail
 NewWorkUnit = Nouvelle unité de travail
 ModifyWorkUnit = Modifier unité de travail
 
@@ -910,7 +912,7 @@ AddEvaluatorButton = Ajouter l'évaluateur
 EvaluatorConfig = Configuration des données des évaluateurs
 DeleteEvaluatorMessage = Suppression de l'évaluateur
 
-DigiriskEvaluatorData = Données des Évaluateurs
+DigiriskEvaluatorData = Données configurables des évaluateurs
 EvaluatorDuration = Durée de l'évalution par l'évaluateur
 EvaluatorDurationDescription = Le temps que met l'évaluateur à réaliser son évaluation des risques
 
@@ -1182,6 +1184,7 @@ DeleteAttendant = Supprimer l'intervenant
 AddAttendantMessage = Ajout de l'intervenant :
 DeleteAttendantMessage = Suppression de l'intervenant :
 SignaturePublicInterfaceForbidden = Accès interdit à l'interface publique de signature
+SignaturePublicInterface = Interface publique de signature
 Attendant = Le participant
 SetAbsentAttendant = est absent
 SendMailSignature = Email émetteur utilisé pour envoyer les liens de signature

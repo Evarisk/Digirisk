@@ -132,7 +132,9 @@ print load_fiche_titre($title, $linkback, 'digiriskdolibarr32px@digiriskdolibarr
 $head = digiriskdolibarrAdminPrepareHead();
 print dol_get_fiche_head($head, 'accident', '', -1, "digiriskdolibarr@digiriskdolibarr");
 
-print load_fiche_titre($langs->trans("AccidentManagement"), '', '');
+print load_fiche_titre('<i class="fas fa-user-injured"></i> ' . $langs->trans("AccidentManagement"), '', '');
+print '<hr>';
+print load_fiche_titre($langs->trans("LinkedProject"), '', '');
 
 print '<form method="POST" action="'.$_SERVER["PHP_SELF"].'" name="social_form">';
 print '<input type="hidden" name="token" value="'.newToken().'">';

@@ -119,16 +119,28 @@ $types = array(
 	'InformationsSharing' 		=> 'informationssharing',
 	'ListingRisksAction' 		=> 'listingrisksaction',
 	'ListingRisksPhoto' 		=> 'listingrisksphoto',
-	'Groupment' 				=> 'groupmentdocument',
-	'WorkUnit' 					=> 'workunitdocument',
+	'GroupmentDocument' 		=> 'groupmentdocument',
+	'WorkUnitDocument' 			=> 'workunitdocument',
 	'RiskAssessmentDocument' 	=> 'riskassessmentdocument',
 	'PreventionPlan' 			=> 'preventionplandocument',
 	'FirePermit' 				=> 'firepermitdocument'
 );
 
+$pictos = array(
+	'LegalDisplay' 				=> '<i class="fas fa-file"></i> ',
+	'InformationsSharing' 		=> '<i class="fas fa-comment-dots"></i> ',
+	'ListingRisksAction' 		=> '<i class="fas fa-exclamation"></i> ',
+	'ListingRisksPhoto' 		=> '<i class="fas fa-images"></i> ',
+	'GroupmentDocument' 		=> '<i class="fas fa-info-circle"></i> <span class="ref" style="font-size: 10px; color: #fff; text-transform: uppercase; font-weight: 600; display: inline-block; background: #263C5C; padding: 0.2em 0.4em; line-height: 10px !important">GP</span> ',
+	'WorkUnitDocument' 			=> '<i class="fas fa-info-circle"></i> <span class="ref" style="background: #0d8aff;  font-size: 10px; color: #fff; text-transform: uppercase; font-weight: 600; display: inline-block;; padding: 0.2em 0.4em; line-height: 10px !important">WU</span> ',
+	'RiskAssessmentDocument' 	=> '<i class="fas fa-file-alt"></i> ',
+	'PreventionPlan' 			=> '<i class="fas fa-info"></i> ',
+	'FirePermit' 				=> '<i class="fas fa-fire-alt"></i> '
+);
+
 foreach ($types as $type => $documentType) {
 
-	print load_fiche_titre($langs->trans($type), '', '');
+	print load_fiche_titre($pictos[$type] . $langs->trans($type), '', '');
 	print '<hr>';
 
 	$trad = 'Digirisk' . $type . 'DocumentNumberingModule';

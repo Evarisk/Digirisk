@@ -145,7 +145,9 @@ print load_fiche_titre($title, $linkback, 'digiriskdolibarr32px@digiriskdolibarr
 $head = digiriskdolibarrAdminPrepareHead();
 print dol_get_fiche_head($head, 'firepermit', '', -1, "digiriskdolibarr@digiriskdolibarr");
 
-print load_fiche_titre($langs->trans("FirePermitManagement"), '', '');
+print load_fiche_titre('<i class="fas fa-fire-alt"></i> ' . $langs->trans("FirePermitManagement"), '', '');
+print '<hr>';
+print load_fiche_titre($langs->trans("LinkedProject"), '', '');
 
 print '<form method="POST" action="'.$_SERVER["PHP_SELF"].'" name="social_form">';
 print '<input type="hidden" name="token" value="'.newToken().'">';
@@ -156,6 +158,7 @@ print '<td>'.$langs->trans("Name").'</td>';
 print '<td>'.$langs->trans("SelectProject").'</td>';
 print '<td>'.$langs->trans("Action").'</td>';
 print '</tr>';
+
 
 // Project
 if (!empty($conf->projet->enabled)) {
