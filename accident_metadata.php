@@ -398,7 +398,7 @@ print '<table class="border tableforfieldedit accident-metadata-table">';
 
 //RelativeLocation
 print '<tr><td class="minwidth400">'.$langs->trans("RelativeLocation").'</td><td>';
-print $formother->select_dictionary('relative_location','c_relative_location', 'ref', 'label', $accidentmetadata->relative_location, 1);
+print digirisk_select_dictionary('relative_location','c_relative_location', 'ref', 'label', $accidentmetadata->relative_location, 1);
 print '<a href="'.DOL_URL_ROOT.'/admin/dict.php?mainmenu=home" target="_blank" class="wpeo-tooltip-event" aria-label="'.$langs->trans('ConfigDico').'">' .' '. img_picto('', 'globe').'</a>';
 print '</td></tr>';
 
@@ -631,14 +631,14 @@ if (!empty($accidentlines) && $accidentlines > 0) {
 			$coldisplay++;
 			//LesionLocalization -- Siège des lésions
 			print '<td>';
-			print $formother->select_dictionary('lesion_localization','c_lesion_localization', 'label', 'label', $item->lesion_localization, 1);
+			print digirisk_select_dictionary('lesion_localization','c_lesion_localization', 'label', 'label', $item->lesion_localization, 1);
 			print '<a href="'.DOL_URL_ROOT.'/admin/dict.php?mainmenu=home" target="_blank" class="wpeo-tooltip-event" aria-label="'.$langs->trans('ConfigDico').'">' .' '. img_picto('', 'globe').'</a>';
 			print '</td>';
 
 			$coldisplay++;
 			//LesionNature -- Nature des lésions
 			print '<td>';
-			print $formother->select_dictionary('lesion_nature','c_lesion_nature', 'label', 'label', $item->lesion_nature, 1);
+			print digirisk_select_dictionary('lesion_nature','c_lesion_nature', 'label', 'label', $item->lesion_nature, 1);
 			print '<a href="'.DOL_URL_ROOT.'/admin/dict.php?mainmenu=home" target="_blank" class="wpeo-tooltip-event" aria-label="'.$langs->trans('ConfigDico').'">' .' '. img_picto('', 'globe').'</a>';
 			print '</td>';
 
@@ -702,14 +702,14 @@ if ($object->status == 1 && $permissiontoadd) {
 	$coldisplay++;
 	//LesionLocalization -- Siège des lésions
 	print '<td>';
-	print $formother->select_dictionary('lesion_localization','c_lesion_localization', 'label', 'label', '', 1);
+	print digirisk_select_dictionary('lesion_localization','c_lesion_localization', 'label', 'label', '', 1);
 	print '<a href="'.DOL_URL_ROOT.'/admin/dict.php?mainmenu=home" target="_blank" class="wpeo-tooltip-event" aria-label="'.$langs->trans('ConfigDico').'">' .' '. img_picto('', 'globe').'</a>';
 	print '</td>';
 
 	$coldisplay++;
 	//LesionNature -- Nature des lésions
 	print '<td>';
-	print $formother->select_dictionary('lesion_nature','c_lesion_nature', 'label', 'label', '', 1);
+	print digirisk_select_dictionary('lesion_nature','c_lesion_nature', 'label', 'label', '', 1);
 	print '<a href="'.DOL_URL_ROOT.'/admin/dict.php?mainmenu=home" target="_blank" class="wpeo-tooltip-event" aria-label="'.$langs->trans('ConfigDico').'">' .' '. img_picto('', 'globe').'</a>';
 	print '</td>';
 
