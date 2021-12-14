@@ -263,7 +263,16 @@ $morehtmlref .= '</div>';
 digirisk_banner_tab($object, 'ref', '', 0, 'ref', 'ref', $morehtmlref);
 
 print dol_get_fiche_end();
-
+?>
+<div class="noticeSignatureSuccess wpeo-notice notice-success hidden">
+	<div class="all-notice-content">
+		<div class="notice-content">
+			<div class="notice-title"><?php echo $langs->trans('AddSignatureSuccess') ?></div>
+			<div class="notice-subtitle"><?php echo $langs->trans("AddSignatureSuccessText") . GETPOST('signature_id')?></div>
+		</div>
+	</div>
+</div>
+<?php
 // Part to show record
 if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	$url = $_SERVER['REQUEST_URI'];
@@ -278,6 +287,8 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	}
 
 	print load_fiche_titre($langs->trans("SignatureUserEmployer"), '', '');
+
+	print '<div class="signatures-container">';
 
 	print '<table class="border centpercent tableforfield">';
 
@@ -321,6 +332,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	}
 	print '</tr>';
 	print '</table>';
+	print '</div>';
 }
 
 // End of page
