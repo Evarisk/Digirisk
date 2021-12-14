@@ -316,6 +316,7 @@ if (empty($reshook)) {
 				} else {
 					$usertmp->fetch($object->fk_user_employer);
 				}
+				$signatory->deleteSignatoriesSignatures($object->id);
 				$signatory->setSignatory($object->id,'user', array($usertmp->id), 'ACC_USER_EMPLOYER');
 
 				// Update Accident OK
