@@ -703,14 +703,14 @@ if ($object->status == 1 && $permissiontoadd) {
 	//LesionLocalization -- Siège des lésions
 	print '<td>';
 	print $formother->select_dictionary('lesion_localization','c_lesion_localization', 'label', 'label', '', 1);
-	print '<a href="'.DOL_URL_ROOT.'/admin/dict.php?mainmenu=home" target="_blank">' . $form->textwithpicto('', $langs->trans('ConfigDico')) . '</a>';
+	print '<a href="'.DOL_URL_ROOT.'/admin/dict.php?mainmenu=home" target="_blank" class="wpeo-tooltip-event" aria-label="'.$langs->trans('ConfigDico').'">' .' '. img_picto('', 'globe').'</a>';
 	print '</td>';
 
 	$coldisplay++;
 	//LesionNature -- Nature des lésions
 	print '<td>';
 	print $formother->select_dictionary('lesion_nature','c_lesion_nature', 'label', 'label', '', 1);
-	print '<a href="'.DOL_URL_ROOT.'/admin/dict.php?mainmenu=home" target="_blank">' . $form->textwithpicto('', $langs->trans('ConfigDico')) . '</a>';
+	print '<a href="'.DOL_URL_ROOT.'/admin/dict.php?mainmenu=home" target="_blank" class="wpeo-tooltip-event" aria-label="'.$langs->trans('ConfigDico').'">' .' '. img_picto('', 'globe').'</a>';
 	print '</td>';
 
 	$coldisplay += $colspan;
