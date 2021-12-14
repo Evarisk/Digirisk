@@ -424,10 +424,15 @@ while ($i < ($limit ? min($num, $limit) : $num)) {
 				$arrayAccident = array();
 				$arrayAccident[] = $accident->ref;
 				$arrayAccident[] = $accident->label;
+				$arrayAccident[] = $accident->accident_type;
 				$arrayAccident[] = $accident->accident_date;
 				$arrayAccident[] = $accident->description;
 				$arrayAccident[] = $accident->photo;
-				$arrayAccident[] = $accident->fk_element;
+				if (empty($accident->external_accident)) {
+					$arrayAccident[] = $accident->fk_element;
+				} else {
+					$arrayAccident[] = $accident->fk_soc;
+				}
 				$arrayAccident[] = $accident->fk_user_victim;
 
 				$maxnumber  = count($arrayAccident);
@@ -452,6 +457,13 @@ while ($i < ($limit ? min($num, $limit) : $num)) {
 			}
 			elseif ($key == 'accident_date') {
 				print dol_print_date($accident->accident_date, 'dayhour', 'tzserver');	// We suppose dates without time are always gmt (storage of course + output)
+			}
+			elseif ($key == 'accident_type') {
+				if ($accident->accident_type == 0) {
+					print $langs->trans('WorkAccidentStatement');
+				} elseif ($accident->accident_type == 1) {
+					print $langs->trans('CommutingAccident');
+				}
 			}
 			else print $accident->showOutputField($val, $key, $accident->$key, '');
 			print '</td>';
