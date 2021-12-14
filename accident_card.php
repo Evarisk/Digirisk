@@ -582,7 +582,7 @@ if ($action == 'create') {
 
 	//AccidentType
 	print '<tr><td class="minwidth400">'.$langs->trans("AccidentType").'</td><td>';
-	print $form->selectarray('accident_type', array('0'=>$langs->trans('WorkAccidentStatement'), '1'=>$langs->trans('CommutingAccident')), '', 0, 0, 1, '', 0, 0, 0, '', 'minwidth300', 1);
+	print $form->selectarray('accident_type', array('0'=>$langs->trans('WorkAccidentStatement'), '1'=>$langs->trans('CommutingAccident')), '', 0, 0, 0, '', 0, 0, 0, '', 'minwidth300', 1);
 	print '</td></tr>';
 
 	//ExternalAccident
@@ -682,7 +682,7 @@ if (($id || $ref) && $action == 'edit') {
 
 	//AccidentType
 	print '<tr><td class="minwidth400">'.$langs->trans("AccidentType").'</td><td>';
-	print $form->selectarray('accident_type', array('0'=>$langs->trans('WorkAccidentStatement'), '1'=>$langs->trans('CommutingAccident')), $object->accident_type, 0, 0, 1, '', 0, 0, 0, '', 'minwidth400', 1);
+	print $form->selectarray('accident_type', array('0'=>$langs->trans('WorkAccidentStatement'), '1'=>$langs->trans('CommutingAccident')), $object->accident_type, 0, 0, 0, '', 0, 0, 0, '', 'minwidth400', 1);
 	print '</td></tr>';
 
 	//ExternalAccident
@@ -851,7 +851,11 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	print $langs->trans("AccidentType");
 	print '</td>';
 	print '<td>';
-	print $object->accident_type;
+	if ($object->accident_type == 0) {
+		print $langs->trans('WorkAccidentStatement');
+	} elseif ($object->accident_type == 1) {
+		print $langs->trans('CommutingAccident');
+	}
 	print '</td></tr>';
 
 	//Accident date -- Date de l'accident
