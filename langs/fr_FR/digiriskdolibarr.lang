@@ -546,6 +546,7 @@ AccidentMetaDataCreateTrigger = Enregistrement des données complémentaires de 
 AccidentLesionCreateTrigger = Une lésion a été ajoutée à l'accident
 AccidentLesionModifyTrigger = Une lésion a été modifiée sur l'accident
 AccidentLesionDeleteTrigger = Une lésion a été supprimée de l'accident
+ACC_USER_EMPLOYERSigned = Signature du reponsable de l'entreprise
 
 # Mod Numbering - Modèle de numérotation
 DigiriskAccidentNumberingModule = Modèle de numérotation des accidents de Digirisk
