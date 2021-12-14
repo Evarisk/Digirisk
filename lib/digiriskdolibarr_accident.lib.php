@@ -47,6 +47,11 @@ function accidentPrepareHead($object)
 		$head[$h][2] = 'accidentMetadata';
 		$h++;
 
+		$head[$h][0] = dol_buildpath("/digiriskdolibarr/accident_attendants.php", 1) . '?id=' . $object->id;
+		$head[$h][1] = '<i class="fas fa-info-circle"></i> ' . $langs->trans("Attendants");
+		$head[$h][2] = 'accidentAttendants';
+		$h++;
+
 		$head[$h][0] = dol_buildpath("/digiriskdolibarr/accident_document.php", 1) . '?id=' . $object->id;
 		$head[$h][1] = '<i class="fas fa-file-alt"></i> ' . $langs->trans("Documents");
 		$head[$h][2] = 'accidentDocument';

@@ -32,5 +32,6 @@ CREATE TABLE llx_digiriskdolibarr_accident(
 	fk_user_modif     integer,
 	fk_element        integer,
     fk_soc            integer,
-	fk_user_victim    integer
+	fk_user_victim    integer,
+	fk_user_employer  integer
 ) ENGINE=innodb;

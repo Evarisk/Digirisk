@@ -50,7 +50,7 @@ require_once __DIR__ . '/core/modules/digiriskdolibarr/digiriskelement/accident_
 //require_once __DIR__ . '/core/modules/digiriskdolibarr/digiriskdocuments/accidentdocument/mod_accidentdocument_standard.php';
 //require_once __DIR__ . '/core/modules/digiriskdolibarr/digiriskdocuments/accidentdocument/modules_accidentdocument.php';
 
-global $conf, $db, $hookmanager, $langs, $user;
+global $conf, $db, $hookmanager, $langs, $mysoc, $user;
 
 // Load translation files required by the page
 $langs->loadLangs(array("digiriskdolibarr@digiriskdolibarr", "other"));
@@ -69,6 +69,7 @@ $fk_parent           = GETPOST('fk_parent', 'int');
 
 // Initialize technical objects
 $object                 = new Accident($db);
+$signatory              = new AccidentSignature($db);
 $objectline             = new AccidentWorkStop($db);
 //$accidentdocument     = new AccidentDocument($db);
 $contact                = new Contact($db);
@@ -126,6 +127,7 @@ if (empty($reshook)) {
 	if ($action == 'add' && $permissiontoadd) {
 		// Get parameters
 		$user_victim_id     = GETPOST('fk_user_victim');
+		$user_employer_id   = GETPOST('fk_user_employer');
 		$digiriskelement_id = GETPOST('fk_element');
 		$label              = GETPOST('label');
 		$description        = GETPOST('description');
@@ -155,9 +157,10 @@ if (empty($reshook)) {
 		} else {
 			$object->fk_element = $digiriskelement_id;
 		}
-		$object->fk_soc         = $ext_society_id;
-		$object->fk_user_victim = $user_victim_id;
-		$object->fk_user_creat  = $user->id ?: 1;
+		$object->fk_soc           = $ext_society_id;
+		$object->fk_user_employer = $user_employer_id;
+		$object->fk_user_victim   = $user_victim_id;
+		$object->fk_user_creat    = $user->id ?: 1;
 
 		// Check parameters
 		if ($user_victim_id < 0) {
@@ -205,6 +208,13 @@ if (empty($reshook)) {
 		if (!$error) {
 			$result = $object->create($user, false);
 			if ($result > 0) {
+				if (empty($object->fk_user_employer)) {
+					$usertmp->fetch('', $mysoc->managers, $mysoc->id, 0, $conf->entity);
+				} else {
+					$usertmp->fetch($object->fk_user_employer);
+				}
+				$signatory->setSignatory($object->id,'user', array($usertmp->id), 'ACC_USER_EMPLOYER');
+
 				// Creation Accident OK
 				$urltogo = str_replace('__ID__', $result, $backtopage);
 				$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
@@ -225,6 +235,7 @@ if (empty($reshook)) {
 	if ($action == 'update' && $permissiontoadd) {
 		// Get parameters
 		$user_victim_id     = GETPOST('fk_user_victim');
+		$user_employer_id   = GETPOST('fk_user_employer');
 		$digiriskelement_id = GETPOST('fk_element');
 		$label              = GETPOST('label');
 		$description        = GETPOST('description');
@@ -250,9 +261,10 @@ if (empty($reshook)) {
 		} else {
 			$object->fk_element = $digiriskelement_id;
 		}
-		$object->fk_soc         = $ext_society_id;
-		$object->fk_user_victim = $user_victim_id;
-		$object->fk_user_creat  = $user->id ? $user->id : 1;
+		$object->fk_soc           = $ext_society_id;
+		$object->fk_user_victim   = $user_victim_id;
+		$object->fk_user_employer = $user_employer_id;
+		$object->fk_user_creat    = $user->id ? $user->id : 1;
 
 		// Check parameters
 		if ($user_victim_id < 0) {
@@ -299,6 +311,13 @@ if (empty($reshook)) {
 		if (!$error) {
 			$result = $object->update($user, false);
 			if ($result > 0) {
+				if (empty($object->fk_user_employer)) {
+					$usertmp->fetch('', $mysoc->managers, $mysoc->id, 0, $conf->entity);
+				} else {
+					$usertmp->fetch($object->fk_user_employer);
+				}
+				$signatory->setSignatory($object->id,'user', array($usertmp->id), 'ACC_USER_EMPLOYER');
+
 				// Update Accident OK
 				$urltogo = str_replace('__ID__', $result, $backtopage);
 				$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
@@ -540,6 +559,18 @@ if ($action == 'create') {
 	print '<input class="flat" type="text" size="36" name="label" id="label" value="'.GETPOST('label').'">';
 	print '</td></tr>';
 
+	//User Employer -- Utilisateur responsable de la société
+	if (!empty($mysoc->managers)) {
+		$usertmp->fetch('', $mysoc->managers, $mysoc->id, 0, $conf->entity);
+	}
+	$userlist = $form->select_dolusers($usertmp->id, '', 0, null, 0, '', '', $conf->entity, 0, 0, 'AND u.statut = 1', 0, '', 'minwidth300', 0, 1);
+	print '<tr>';
+	print '<td class="fieldrequired minwidth400" style="width:10%">' . img_picto('', 'user') . ' ' . $form->editfieldkey('UserEmployer', 'UserEmployer_id', '', $object, 0) . '</td>';
+	print '<td>';
+	print $form->selectarray('fk_user_employer', $userlist, $usertmp->id, $langs->trans('SelectUser'), null, null, null, "40%", 0, 0, '', 'minwidth300', 1);
+	print ' <a href="' . DOL_URL_ROOT . '/user/card.php?action=create&backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?action=create') . '" target="_blank"><span class="fa fa-plus-circle valignmiddle paddingleft" title="' . $langs->trans("AddUser") . '"></span></a>';
+	print '</td></tr>';
+
 	//User Victim -- Utilisateur victime de l'accient
 	$userlist = $form->select_dolusers((!empty(GETPOST('fk_user_victim')) ? GETPOST('fk_user_victim') : $user->id), '', 0, null, 0, '', '', $conf->entity, 0, 0, 'AND u.statut = 1', 0, '', 'minwidth300', 0, 1);
 	print '<tr>';
@@ -631,12 +662,21 @@ if (($id || $ref) && $action == 'edit') {
 	print '<input class="flat" type="text" size="36" name="label" id="label" value="'.$object->label.'">';
 	print '</td></tr>';
 
+	//User Employer -- Utilisateur responsable de la société
+	$userlist = $form->select_dolusers((!empty($object->fk_user_employer) ? $object->fk_user_employer : $user->id), '', 0, null, 0, '', '', $conf->entity, 0, 0, 'AND u.statut = 1', 0, '', 'minwidth300', 0, 1);
+	print '<tr>';
+	print '<td class="fieldrequired minwidth400" style="width:10%">' . img_picto('', 'user') . ' ' . $form->editfieldkey('UserEmployer', 'UserEmployer_id', '', $object, 0) . '</td>';
+	print '<td>';
+	print $form->selectarray('fk_user_employer', $userlist, (!empty($object->fk_user_employer) ? $object->fk_user_employer : $user->id), $langs->trans('SelectUser'), null, null, null, "40%", 0, 0, '', 'minwidth300', 1);
+	print ' <a href="' . DOL_URL_ROOT . '/user/card.php?action=create&backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?action=create') . '" target="_blank"><span class="fa fa-plus-circle valignmiddle paddingleft" title="' . $langs->trans("AddUser") . '"></span></a>';
+	print '</td></tr>';
+
 	//User Victim -- Utilisateur victime de l'accient
-	$userlist = $form->select_dolusers((!empty(GETPOST('fk_user_victim')) ? GETPOST('fk_user_victim') : $user->id), '', 0, null, 0, '', '', $conf->entity, 0, 0, 'AND u.statut = 1', 0, '', 'minwidth300', 0, 1);
+	$userlist = $form->select_dolusers((!empty($object->fk_user_victim) ?$object->fk_user_victim : $user->id), '', 0, null, 0, '', '', $conf->entity, 0, 0, 'AND u.statut = 1', 0, '', 'minwidth300', 0, 1);
 	print '<tr>';
 	print '<td class="fieldrequired minwidth400" style="width:10%">' . img_picto('', 'user') . ' ' . $form->editfieldkey('UserVictim', 'UserVictim_id', '', $object, 0) . '</td>';
 	print '<td>';
-	print $form->selectarray('fk_user_victim', $userlist, (!empty(GETPOST('fk_user_victim')) ? GETPOST('fk_user_victim') : $user->id), $langs->trans('SelectUser'), null, null, null, "40%", 0, 0, '', 'minwidth300', 1);
+	print $form->selectarray('fk_user_victim', $userlist, (!empty($object->fk_user_victim) ? $object->fk_user_victim : $user->id), $langs->trans('SelectUser'), null, null, null, "40%", 0, 0, '', 'minwidth300', 1);
 	print ' <a href="' . DOL_URL_ROOT . '/user/card.php?action=create&backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?action=create') . '" target="_blank"><span class="fa fa-plus-circle valignmiddle paddingleft" title="' . $langs->trans("AddUser") . '"></span></a>';
 	print '</td></tr>';
 
@@ -778,6 +818,17 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	print '</td>';
 	print '<td>';
 	print $object->label;
+	print '</td></tr>';
+
+	//User Employer -- Responsable de la société
+	print '<tr><td class="titlefield">';
+	print $langs->trans("UserEmployer");
+	print '</td>';
+	print '<td>';
+	$usertmp->fetch($object->fk_user_employer);
+	if ($usertmp > 0) {
+		print $usertmp->getNomUrl(1);
+	}
 	print '</td></tr>';
 
 	//User Victim -- Victime de l'accident

@@ -94,6 +94,7 @@ class Accident extends CommonObject
 		'fk_element'         => array('type'=>'integer', 'label'=>'AccidentLocation', 'enabled'=>'1', 'position'=>170, 'notnull'=>-1, 'visible'=>-2,),
 		'fk_soc'             => array('type'=>'integer', 'label'=>'ExtSociety', 'enabled'=>'1', 'position'=>180, 'notnull'=>-1, 'visible'=>-2,),
 		'fk_user_victim'     => array('type'=>'integer', 'label'=>'UserVictim', 'enabled'=>'1', 'position'=>190, 'notnull'=>-1, 'visible'=>-2,),
+		'fk_user_employer'   => array('type'=>'integer', 'label'=>'UserEmployer', 'enabled'=>'1', 'position'=>200, 'notnull'=>-1, 'visible'=>-2,),
 	);
 
 	public $rowid;
@@ -114,6 +115,7 @@ class Accident extends CommonObject
 	public $fk_element;
 	public $fk_soc;
 	public $fk_user_victim;
+	public $fk_user_employer;
 
 	/**
 	 * Constructor
@@ -465,7 +467,7 @@ class Accident extends CommonObject
 
 /**
  *	Class to manage accident workstop.
- *  Saved into database table llx_accident_workstop
+ *  Saved into database table llx_digiriskdolibarr_accident_workstop
  */
 class AccidentWorkStop extends CommonObjectLine
 {
@@ -717,7 +719,7 @@ class AccidentWorkStop extends CommonObjectLine
 
 /**
  *	Class to manage accident metadata.
- *  Saved into database table llx_accident_metadata
+ *  Saved into database table llx_digiriskdolibarr_accident_metadata
  */
 class AccidentMetaData extends CommonObject
 {
@@ -905,7 +907,7 @@ class AccidentMetaData extends CommonObject
 
 /**
  *	Class to manage accident lesion.
- *  Saved into database table llx_accident_lesion
+ *  Saved into database table llx_digiriskdolibarr_accident_lesion
  */
 class AccidentLesion extends CommonObjectLine
 {
@@ -1163,6 +1165,143 @@ class AccidentLesion extends CommonObjectLine
 		} else {
 			$this->error = $db->error() . " sql=" . $sql;
 			$db->rollback();
+			return -1;
+		}
+	}
+}
+
+/**
+ *	Class to manage accident signature.
+ *  Saved into database table llx_digiriskdolibarr_object_signature
+ */
+class AccidentSignature extends DigiriskSignature
+{
+	/**
+	 * @var string Name of table without prefix where object is stored. This is also the key used for extrafields management.
+	 */
+
+	public $object_type = 'accident';
+
+	/**
+	 * Constructor
+	 *
+	 * @param DoliDb $db Database handler
+	 */
+	public function __construct(DoliDB $db)
+	{
+		global $conf, $langs;
+
+		$this->db = $db;
+
+		if (empty($conf->global->MAIN_SHOW_TECHNICAL_ID) && isset($this->fields['rowid'])) $this->fields['rowid']['visible'] = 0;
+		if (empty($conf->multicompany->enabled) && isset($this->fields['entity'])) $this->fields['entity']['enabled'] = 0;
+
+		// Unset fields that are disabled
+		foreach ($this->fields as $key => $val)
+		{
+			if (isset($val['enabled']) && empty($val['enabled']))
+			{
+				unset($this->fields[$key]);
+			}
+		}
+
+		// Translate some data of arrayofkeyval
+		if (is_object($langs))
+		{
+			foreach ($this->fields as $key => $val)
+			{
+				if (is_array($val['arrayofkeyval']))
+				{
+					foreach ($val['arrayofkeyval'] as $key2 => $val2)
+					{
+						$this->fields[$key]['arrayofkeyval'][$key2] = $langs->trans($val2);
+					}
+				}
+			}
+		}
+	}
+
+	/**
+	 * Load list of objects in memory from the database.
+	 *
+	 * @param string $sortorder Sort Order
+	 * @param string $sortfield Sort field
+	 * @param int $limit limit
+	 * @param int $offset Offset
+	 * @param array $filter Filter array. Example array('field'=>'valueforlike', 'customurl'=>...)
+	 * @param string $filtermode Filter mode (AND or OR)
+	 * @return array|int                 int <0 if KO, array of pages if OK
+	 * @throws Exception
+	 */
+	public function fetchAll($sortorder = '', $sortfield = '', $limit = 0, $offset = 0, array $filter = array(), $filtermode = 'AND', $old_table_element = '')
+	{
+		global $conf;
+
+		dol_syslog(__METHOD__, LOG_DEBUG);
+
+		$records = array();
+		$sql = 'SELECT ';
+		$sql .= $this->getFieldList();
+		if (dol_strlen($old_table_element)) {
+			$sql .= ' FROM '.MAIN_DB_PREFIX.$old_table_element;
+		} else {
+			$sql .= ' FROM '.MAIN_DB_PREFIX.$this->table_element;
+		}
+		if (isset($this->ismultientitymanaged) && $this->ismultientitymanaged == 1) $sql .= ' WHERE entity IN ('.getEntity($this->table_element).')';
+		else $sql .= ' WHERE 1 = 1';
+		$sql .= ' AND object_type = "' . $this->object_type . '"';
+
+		// Manage filter
+		$sqlwhere = array();
+		if (count($filter) > 0) {
+			foreach ($filter as $key => $value) {
+				if ($key == 'rowid') {
+					$sqlwhere[] = $key.'='.$value;
+				} elseif (in_array($this->fields[$key]['type'], array('date', 'datetime', 'timestamp'))) {
+					$sqlwhere[] = $key.' = \''.$this->db->idate($value).'\'';
+				} elseif ($key == 'customsql') {
+					$sqlwhere[] = $value;
+				} elseif (strpos($value, '%') === false) {
+					$sqlwhere[] = $key.' IN ('.$this->db->sanitize($this->db->escape($value)).')';
+				} else {
+					$sqlwhere[] = $key.' LIKE \'%'.$this->db->escape($value).'%\'';
+				}
+			}
+		}
+		if (count($sqlwhere) > 0) {
+			$sql .= ' AND ('.implode(' '.$filtermode.' ', $sqlwhere).')';
+		}
+
+		if (!empty($sortfield)) {
+			$sql .= $this->db->order($sortfield, $sortorder);
+		}
+		if (!empty($limit)) {
+			$sql .= ' '.$this->db->plimit($limit, $offset);
+		}
+
+		$resql = $this->db->query($sql);
+
+		if ($resql) {
+			$num = $this->db->num_rows($resql);
+			$i = 0;
+			while ($i < ($limit ? min($limit, $num) : $num))
+			{
+				$obj = $this->db->fetch_object($resql);
+
+				$record = new self($this->db);
+				$record->setVarsFromFetchObj($obj);
+
+				$records[$record->id] = $record;
+
+				$i++;
+			}
+			$this->db->free($resql);
+
+			return $records;
+		} else {
+			$this->errors[] = 'Error '.$this->db->lasterror();
+			dol_syslog(__METHOD__.' '.join(',', $this->errors), LOG_ERR);
+
 			return -1;
 		}
 	}
