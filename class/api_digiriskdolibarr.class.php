@@ -41,7 +41,7 @@ class DigiriskDolibarr extends DolibarrApi
 	 */
 	public function __construct()
 	{
-		global $db, $langs;
+		global $db;
 		$this->db = $db;
 		$this->mod = new modDigiriskdolibarr($this->db);
 
@@ -58,7 +58,7 @@ class DigiriskDolibarr extends DolibarrApi
 	 */
 	public function enableModule()
 	{
-		global $langs, $user;
+		global $langs;
 
 		require_once DOL_DOCUMENT_ROOT .'/core/modules/modECM.class.php';
 		require_once DOL_DOCUMENT_ROOT .'/core/modules/modProjet.class.php';
@@ -102,12 +102,6 @@ class DigiriskDolibarr extends DolibarrApi
 	 */
 	public function disableModule()
 	{
-		global $user;
-
-		if (!$user->rights->digiriskdolibarr->api->read) {
-			throw new RestException(401, 'Access not allowed for login '.DolibarrApiAccess::$user->login);
-		}
-
 		return $this->mod->remove();
 	}
 
@@ -124,12 +118,6 @@ class DigiriskDolibarr extends DolibarrApi
 	 */
 	public function getFilesVersion()
 	{
-		global $user;
-
-		if (!$user->rights->digiriskdolibarr->api->read) {
-			throw new RestException(401, 'Access not allowed for login '.DolibarrApiAccess::$user->login);
-		}
-
 		return $this->mod->version;
 	}
 
@@ -146,11 +134,7 @@ class DigiriskDolibarr extends DolibarrApi
 	 */
 	public function getActiveVersion()
 	{
-		global $conf, $user;
-
-		if (!$user->rights->digiriskdolibarr->api->read) {
-			throw new RestException(401, 'Access not allowed for login '.DolibarrApiAccess::$user->login);
-		}
+		global $conf;
 
 		return $conf->global->DIGIRISKDOLIBARR_VERSION;
 	}
@@ -168,11 +152,7 @@ class DigiriskDolibarr extends DolibarrApi
 	 */
 	public function getLatestVersion()
 	{
-		global $conf, $user;
-
-		if (!$user->rights->digiriskdolibarr->api->read) {
-			throw new RestException(401, 'Access not allowed for login '.DolibarrApiAccess::$user->login);
-		}
+		global $conf;
 
 		return $conf->global->DIGIRISKDOLIBARR_VERSION;
 	}
@@ -190,12 +170,6 @@ class DigiriskDolibarr extends DolibarrApi
 	 */
 	public function uploadNewModule()
 	{
-		global $user;
-
-		if (!$user->rights->digiriskdolibarr->api->write) {
-			throw new RestException(401, 'Access not allowed for login '.DolibarrApiAccess::$user->login);
-		}
-
 		return exec('cd ../custom/digiriskdolibarr/shell/pull && bash update_version.sh');
 	}
 }
