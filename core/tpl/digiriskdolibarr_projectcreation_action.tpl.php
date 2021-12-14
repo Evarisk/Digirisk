@@ -297,6 +297,7 @@ if ( $conf->global->DIGIRISKDOLIBARR_USERGROUP_UPDATED ==  0 ) {
 		$usergroup->addrights('', 'ticket', 'write');
 		$usergroup->addrights('', 'agenda', 'myactions');
 	}
+  
 	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_USERGROUP_UPDATED', 1, 'integer', 0, '', $conf->entity);
 }
 
@@ -333,6 +334,7 @@ if ( $conf->global->DIGIRISKDOLIBARR_ADMINUSERGROUP_SET ==  0 ) {
 		$usergroup->addrights('', 'agenda');
 		$usergroup->addrights('', 'projet');
 	}
+  
 	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_ADMINUSERGROUP_SET', $usergroup_id, 'integer', 0, '', $conf->entity);
 }
 
@@ -347,6 +349,7 @@ if ( $conf->global->DIGIRISKDOLIBARR_ADMINUSERGROUP_UPDATED ==  0 ) {
 		$usergroup->addrights('', 'agenda');
 		$usergroup->addrights('', 'projet');
 	}
+  
 	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_ADMINUSERGROUP_UPDATED', 1, 'integer', 0, '', $conf->entity);
 }
 

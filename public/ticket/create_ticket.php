@@ -158,6 +158,8 @@ if ($action == 'add') {
 	$object->message = html_entity_decode($message);
 
 	$extrafields->setOptionalsFromPost(null, $object);
+
+	$error=0;
 	// Check Captcha code if is enabled
 	if (!empty($conf->global->DIGIRISKDOLIBARR_USE_CAPTCHA)) {
 		$sessionkey = 'dol_antispam_value';

@@ -335,7 +335,6 @@ class modDigiriskdolibarr extends DolibarrModules
 			// GENERAL CONSTS
 			400 => array('MAIN_USE_EXIF_ROTATION','integer',1,'', $conf->entity),
 
-
 //			// CONST ACCIDENT DOCUMENT
 //			360 => array('MAIN_AGENDA_ACTIONAUTO_ACCIDENTDOCUMENT_CREATE','chaine',1,'', $conf->entity),
 //
