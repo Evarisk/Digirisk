@@ -431,8 +431,8 @@ $doleditor->Create();
 print '</td></tr>';
 
 //AccidentNatureDoubtLink
-print '<tr><td class="minwidth400">'.$langs->trans("AccidentNatureDoubtLink").'</td><td>';
-print img_picto('', 'globe').'<input type="text" class="minwidth400" name="accident_nature_doubt_link" id="accident_nature_doubt_link" value="'.$accidentmetadata->accident_nature_doubt_link.'">';
+print '<tr><td class="minwidth400">'. img_picto('', 'globe'). ' ' .$langs->trans("AccidentNatureDoubtLink").'</td><td>';
+print '<input type="text" class="minwidth400" name="accident_nature_doubt_link" id="accident_nature_doubt_link" value="'.$accidentmetadata->accident_nature_doubt_link.'">';
 print '</td></tr>';
 
 print '<tr></tr>';
@@ -571,13 +571,13 @@ print '<input type="checkbox" id="accident_investigation" name="accident_investi
 print '</td></tr>';
 
 //AccidentInvestigationLink
-print '<tr><td class="minwidth400">'.$langs->trans("AccidentInvestigationLink").'</td><td>';
-print img_picto('', 'globe').'<input type="text" class="minwidth400" name="accident_investigation_link" id="accident_investigation_link" value="'.$accidentmetadata->accident_investigation_link.'">';
+print '<tr><td class="minwidth400">'. img_picto('', 'globe'). ' ' .$langs->trans("AccidentInvestigationLink").'</td><td>';
+print '<input type="text" class="minwidth400" name="accident_investigation_link" id="accident_investigation_link" value="'.$accidentmetadata->accident_investigation_link.'">';
 print '</td></tr>';
 
 //CerfaLink
-print '<tr><td class="minwidth400">'.$langs->trans("CerfaLink").'</td><td>';
-print img_picto('', 'globe').'<input type="text" class="minwidth400" name="cerfa_link" id="cerfa_link" value="'.$accidentmetadata->cerfa_link.'">';
+print '<tr><td class="minwidth400">'. img_picto('', 'globe'). ' ' .$langs->trans("CerfaLink").'</td><td>';
+print '<input type="text" class="minwidth400" name="cerfa_link" id="cerfa_link" value="'.$accidentmetadata->cerfa_link.'">';
 print '</td></tr>';
 
 print '</table>';

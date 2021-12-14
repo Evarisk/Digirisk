@@ -564,7 +564,7 @@ AccidentDocument = Fiche d'Accident
 AccidentDocumentGeneratedWithDolibarr = Accident généré avec Dolibarr
 
 # Data - Donnée
-NewAccident Nouvel accident
+NewAccident = Nouvel accident
 ModifyAccident = Modifier l'accident
 AccidentList = Liste des accidents
 Accident = Accident
