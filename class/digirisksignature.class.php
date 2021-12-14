@@ -98,7 +98,7 @@ class DigiriskSignature extends CommonObject
 		'signature_url'        => array('type'=>'varchar(50)', 'label'=>'SignatureUrl', 'enabled'=>'1', 'position'=>170, 'notnull'=>0, 'visible'=>1, 'default'=>NULL,),
 		'transaction_url'      => array('type'=>'varchar(50)', 'label'=>'TransactionUrl', 'enabled'=>'1', 'position'=>180, 'notnull'=>0, 'visible'=>1,'default'=>NULL,),
 		'last_email_sent_date' => array('type'=>'datetime', 'label'=>'LastEmailSentDate', 'enabled'=>'1', 'position'=>190, 'notnull'=>0, 'visible'=>3,),
-		'object_type'          => array('type'=>'varchar(255)', 'label'=>'object_type', 'enabled'=>'1', 'position'=>195, 'notnull'=>1, 'visible'=>0,),
+		'object_type'          => array('type'=>'varchar(255)', 'label'=>'object_type', 'enabled'=>'1', 'position'=>195, 'notnull'=>0, 'visible'=>0,),
 		'fk_object'            => array('type'=>'integer', 'label'=>'FKObject', 'enabled'=>'1', 'position'=>200, 'notnull'=>1, 'visible'=>0,),
 	);
 
@@ -217,9 +217,17 @@ class DigiriskSignature extends CommonObject
 		$records = array();
 
 		$sql = 'SELECT ';
+		if (dol_strlen($old_table_element) > 0) {
+			unset($this->fields['signature_location']);
+			unset($this->fields['object_type']);
+		}
 		$sql .= $this->getFieldList();
-		$sql .= ' FROM '.MAIN_DB_PREFIX.$this->table_element.' as t';
-		if (isset($this->ismultientitymanaged) && $this->ismultientitymanaged == 1) $sql .= ' WHERE t.entity IN ('.getEntity($this->table_element).')';
+
+		if (dol_strlen($old_table_element)) {
+			$sql .= ' FROM '.MAIN_DB_PREFIX.$old_table_element. ' as t';
+		} else {
+			$sql .= ' FROM '.MAIN_DB_PREFIX.$this->table_element . ' as t';
+		}		if (isset($this->ismultientitymanaged) && $this->ismultientitymanaged == 1) $sql .= ' WHERE t.entity IN ('.getEntity($this->table_element).')';
 		else $sql .= ' WHERE 1 = 1';
 		// Manage filter
 		$sqlwhere = array();
@@ -248,9 +256,7 @@ class DigiriskSignature extends CommonObject
 		if (!empty($limit)) {
 			$sql .= ' '.$this->db->plimit($limit, $offset);
 		}
-
 		$resql = $this->db->query($sql);
-
 		if ($resql) {
 			$num = $this->db->num_rows($resql);
 			$i = 0;
