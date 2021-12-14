@@ -811,6 +811,10 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	unset($object->fields['photo']);
 	unset($object->fields['fk_project']);
 	unset($object->fields['external_accident']);
+	unset($object->fields['fk_soc']);
+	unset($object->fields['fk_user_employer']);
+	unset($object->fields['fk_user_victim']);
+	unset($object->fields['fk_element']);
 
 	//Label -- Libellé
 	print '<tr><td class="titlefield">';
