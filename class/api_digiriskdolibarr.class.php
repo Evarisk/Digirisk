@@ -85,10 +85,6 @@ class DigiriskDolibarr extends DolibarrApi
 		$modApi->init();
 		$langs->loadLangs(array("digiriskdolibarr@digiriskdolibarr", "other"));
 
-		if (!$user->rights->digiriskdolibarr->api->read) {
-			throw new RestException(401, 'Access not allowed for login '.DolibarrApiAccess::$user->login);
-		}
-
 		return $this->mod->init();
 	}
 
