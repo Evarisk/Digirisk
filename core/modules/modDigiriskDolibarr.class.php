@@ -57,7 +57,7 @@ class modDigiriskdolibarr extends DolibarrModules
 		$this->descriptionlong = "Digirisk";
 		$this->editor_name     = 'Evarisk';
 		$this->editor_url      = 'https://evarisk.com';
-		$this->version         = '8.5.0';
+		$this->version         = '8.5.1';
 		$this->const_name      = 'MAIN_MODULE_'.strtoupper($this->name);
 		$this->picto           ='digiriskdolibarr@digiriskdolibarr';
 
@@ -931,10 +931,10 @@ class modDigiriskdolibarr extends DolibarrModules
 		$this->_load_tables('/digiriskdolibarr/sql/');
 
 		// Load sql sub folders
-		$sqlFolder = dol_dir_list(__DIR__ . '/../../sql');
+		$sqlFolder = scandir(__DIR__ . '/../../sql');
 		foreach ($sqlFolder as $subFolder) {
-			if ($subFolder['type'] == 'dir') {
-				$this->_load_tables('/digiriskdolibarr/sql/' . $subFolder['name'] . '/');
+			if (!preg_match('/\./', $subFolder)) {
+				$this->_load_tables('/digiriskdolibarr/sql/' . $subFolder . '/');
 			}
 		}
 
