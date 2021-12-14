@@ -563,11 +563,11 @@ if ($action == 'create') {
 	if (!empty($mysoc->managers)) {
 		$usertmp->fetch('', $mysoc->managers, $mysoc->id, 0, $conf->entity);
 	}
-	$userlist = $form->select_dolusers($usertmp->id, '', 0, null, 0, '', '', $conf->entity, 0, 0, 'AND u.statut = 1', 0, '', 'minwidth300', 0, 1);
+	$userlist = $form->select_dolusers((($usertmp->id > 0) ? $usertmp->id : $user->id), '', 0, null, 0, '', '', $conf->entity, 0, 0, 'AND u.statut = 1', 0, '', 'minwidth300', 0, 1);
 	print '<tr>';
 	print '<td class="fieldrequired minwidth400" style="width:10%">' . img_picto('', 'user') . ' ' . $form->editfieldkey('UserEmployer', 'UserEmployer_id', '', $object, 0) . '</td>';
 	print '<td>';
-	print $form->selectarray('fk_user_employer', $userlist, $usertmp->id, $langs->trans('SelectUser'), null, null, null, "40%", 0, 0, '', 'minwidth300', 1);
+	print $form->selectarray('fk_user_employer', $userlist, (($usertmp->id > 0) ? $usertmp->id : $user->id), $langs->trans('SelectUser'), null, null, null, "40%", 0, 0, '', 'minwidth300', 1);
 	print ' <a href="' . DOL_URL_ROOT . '/user/card.php?action=create&backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?action=create') . '" target="_blank"><span class="fa fa-plus-circle valignmiddle paddingleft" title="' . $langs->trans("AddUser") . '"></span></a>';
 	print '</td></tr>';
 
