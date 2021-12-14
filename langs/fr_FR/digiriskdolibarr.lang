@@ -1212,6 +1212,7 @@ AddSignatureSuccessText = La signature a bien été enregistrée pour le documen
 SignatureSeeDocument = Voir
 ShowDocument = Voir le document
 AddAttendants = Ajouter
+NoAttendants = Pas d'intervenants liés à cet objet. Pour ajouter des intervenants, le statut doit être "En cours".
 SignatureManagement = Gestion des signatures
 
 

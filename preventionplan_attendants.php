@@ -531,6 +531,10 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 			$already_selected_intervenants[$element->element_id] = $element->element_id;
 			$j++;
 		}
+	} else {
+		print '<tr><td>';
+		print $langs->trans('NoAttendants');
+		print '</td></tr>';
 	}
 
 	if ($object->status == 1 && $permissiontoadd) {
