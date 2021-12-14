@@ -102,10 +102,44 @@ if ($reshook < 0) {
 }
 
 if ($action == 'add') {
+	$error=0;
+
 	$register      = GETPOST('register');
 	$pertinence    = GETPOST('pertinence');
 	$message       = GETPOST('message');
 	$ticket_tmp_id = GETPOST('ticket_id');
+
+	// Check parameters
+	if (empty($register)) {
+		setEventMessages($langs->trans('ErrorFieldNotEmpty', $langs->transnoentitiesnoconv('Register')), null, 'errors');
+		$error++;
+	}
+	// Quand le registre choisi est Danger Grave et Imminent, il ne faut pas check ça
+//	if (empty($pertinence)) {
+//		setEventMessages($langs->trans('ErrorFieldNotEmpty', $langs->transnoentitiesnoconv('Pertinence')), null, 'errors');
+//		$error++;
+//	}
+	if (empty($message)) {
+		setEventMessages($langs->trans('ErrorFieldNotEmpty', $langs->transnoentitiesnoconv('Message')), null, 'errors');
+		$error++;
+	}
+
+	if (empty(GETPOST('options_digiriskdolibarr_ticket_lastname'))) {
+		setEventMessages($langs->trans('ErrorFieldNotEmpty', $langs->transnoentitiesnoconv('Lastname')), null, 'errors');
+		$error++;
+	}
+	if (empty(GETPOST('options_digiriskdolibarr_ticket_firstname'))) {
+		setEventMessages($langs->trans('ErrorFieldNotEmpty', $langs->transnoentitiesnoconv('Firstname')), null, 'errors');
+		$error++;
+	}
+	if (empty(GETPOST('options_digiriskdolibarr_ticket_service'))) {
+		setEventMessages($langs->trans('ErrorFieldNotEmpty', $langs->transnoentitiesnoconv('Service')), null, 'errors');
+		$error++;
+	}
+	if (empty(GETPOST('options_digiriskdolibarr_ticket_date'))) {
+		setEventMessages($langs->trans('ErrorFieldNotEmpty', $langs->transnoentitiesnoconv('Date')), null, 'errors');
+		$error++;
+	}
 
 	$object->ref = $modTicket->getNextValue($thirdparty,$object);
 
@@ -320,17 +354,17 @@ if (!empty($registerCategory) && $registerCategory > 0) {
 				print '<div class="ticket-register" id="' . $register->id . '">';
 			}
 
-			if ($register->label == $langs->trans('SST')) {
+			if ($register->label == $langs->transnoentities('SST')) {
 				print '<div class="wpeo-button button-blue">';
 				show_category_image($register, $upload_dir);
 				print '<span class="button-label">' . $register->label . '</span>';
 				print '</div>';
-			} elseif ($register->label == $langs->trans('Accident')) {
+			} elseif ($register->label == $langs->transnoentities('Accident')) {
 				print '<div class="wpeo-button button-yellow">';
 				show_category_image($register, $upload_dir);
 				print '<span class="button-label">' . $register->label . '</span>';
 				print '</div>';
-			} elseif ($register->label == $langs->trans('DGI')) {
+			} elseif ($register->label == $langs->transnoentities('DGI')) {
 				print '<div class="wpeo-button button-red">';
 				show_category_image($register, $upload_dir);
 				print '<span class="button-label">' . $register->label . '</span>';

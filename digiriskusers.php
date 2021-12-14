@@ -909,9 +909,9 @@ if ($canadduser) {
 								<div class="table-cell table-300">
 									<?php print $form->select_dolgroups($conf->global->DIGIRISKDOLIBARR_USERGROUP_SET, 'group', 1, '', 0, '', '', $conf->entity); ?>
 								</div>
-								<div class="table-cell table-300">
-									<?php print $langs->trans("SendPassword");
-									print '<input type="checkbox" id="send_password" name="send_password" checked="">'; ?>
+								<div class="table-cell table-400">
+									<?php print '<label style="margin-left: 50px" for="send_password">'.$langs->trans("SendPassword").'</label>';
+									print '<input type="checkbox" id="send_password" name="send_password" style="text-align: right">'; ?>
 								</div>
 								<div class="table-cell">
 									<button type="submit" name="create" style="color: #3495f0; background-color: transparent; width:30%; border:none; margin-right:30%;">

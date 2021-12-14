@@ -17,7 +17,7 @@ if (!$error && $action == 'add' && $permissiontoadd) {
 	$risk->ref         = $refRiskMod->getNextValue($risk);
 
 	if (!$error) {
-		$result = $risk->create($user, true);
+		$result = $risk->create($user);
 
 		if ($result > 0) {
 			$lastRiskAdded = $risk->ref;
@@ -142,7 +142,7 @@ if (!$error && $action == 'saveRisk' && $permissiontoadd) {
 	$risk->description =  $description;
 	$risk->category    = $category;
 
-	$result = $risk->update($user, true);
+	$result = $risk->update($user);
 
 	if ($result > 0) {
 		// Update risk OK
@@ -191,7 +191,7 @@ if (!$error && ($massaction == 'delete' || ($action == 'delete' && $confirm == '
 				}
 			}
 
-			$result = $risk->delete($user, true);
+			$result = $risk->delete($user);
 
 			if ($result < 0) {
 				// Delete risk KO
@@ -275,7 +275,7 @@ if (!$error && $action == 'addEvaluation' && $permissiontoadd) {
 		}
 	}
 
-	$result = $evaluation->create($user, true);
+	$result = $evaluation->create($user);
 
 	if ($result > 0) {
 		// Creation evaluation OK
@@ -320,7 +320,7 @@ if (!$error && $action == 'saveEvaluation' && $permissiontoadd) {
 	}
 	$entity = ($conf->entity > 1) ? '/' . $conf->entity : '';
 
-	$result = $evaluation->update($user, true);
+	$result = $evaluation->update($user);
 
 	if ($result > 0) {
 		// Update evaluation OK
@@ -358,7 +358,7 @@ if (!$error && $action == "deleteEvaluation" && $permissiontodelete) {
 	dol_delete_dir($pathToEvaluationPhoto);
 
 	$previousEvaluation = $evaluation;
-	$result = $evaluation->delete($user, true);
+	$result = $evaluation->delete($user);
 	$previousEvaluation->updateEvaluationStatus($user,$evaluation->fk_risk);
 
 	if ($result > 0) {

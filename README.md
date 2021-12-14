@@ -1,5 +1,27 @@
 # DIGIRISKDOLIBARR FOR [DOLIBARR ERP CRM](https://www.dolibarr.org)
 
+## Informations
+
+Version du module: 8.5.0
+
+Dernière mise à jour: 14/12/2021
+
+Prérequis:
+* Dolibarr min version 13.0.0
+* Dolibarr min version 14.0.4
+
+Thème: Eldy Menu
+
+Editeur/Licence: [Evarisk](https://www.evarisk.com) / GPL-v3
+
+Assitance: [Forum www.dolibarr.fr](https://www.dolibarr.fr) / Par mail à contact@evarisk.com
+
+Demo: [Demo Digirisk](https://www.demodoli.digirisk.com) - ID: demo - Password: demo
+
+Documentation: [Wiki Digirisk](https://wiki.dolibarr.org/index.php/Module_DigiriskDolibarr)
+
+Forum: [Forum Digirisk](https://www.dolibarr.fr/forum/t/module-digirisk-document-unique/37119)
+
 ## Fonctionnalités
 
 Gérez les risques de votre entreprise et créez votre document unique en toute simplicité

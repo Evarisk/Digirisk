@@ -40,6 +40,7 @@ require_once DOL_DOCUMENT_ROOT.'/core/lib/images.lib.php';
 
 require_once './class/digiriskdocuments.class.php';
 require_once './class/digiriskelement.class.php';
+require_once './class/digiriskstandard.class.php';
 require_once './class/digiriskdocuments/groupmentdocument.class.php';
 require_once './class/digiriskdocuments/workunitdocument.class.php';
 require_once './lib/digiriskdolibarr_digiriskelement.lib.php';
@@ -49,7 +50,7 @@ require_once './core/modules/digiriskdolibarr/digiriskelement/workunit/mod_worku
 require_once './core/modules/digiriskdolibarr/digiriskdocuments/groupmentdocument/modules_groupmentdocument.php';
 require_once './core/modules/digiriskdolibarr/digiriskdocuments/workunitdocument/modules_workunitdocument.php';
 
-global $db, $conf, $langs, $user;
+global $conf, $db, $hookmanager, $langs, $user;
 
 // Load translation files required by the page
 $langs->loadLangs(array("digiriskdolibarr@digiriskdolibarr", "other"));
@@ -67,8 +68,9 @@ $element_type        = GETPOST('element_type', 'alpha');
 $fk_parent           = GETPOST('fk_parent', 'int');
 
 // Initialize technical objects
-$object      = new DigiriskElement($db);
-$extrafields = new ExtraFields($db);
+$object           = new DigiriskElement($db);
+$extrafields      = new ExtraFields($db);
+$digiriskstandard = new DigiriskStandard($db);
 
 $object->fetch($id);
 
@@ -260,6 +262,7 @@ digiriskHeader('', $title, $help_url, '', '', '', $morejs, $morecss); ?>
 
 <?php // Part to create
 if ($action == 'create') {
+	$object->fetch($fk_parent);
 	print load_fiche_titre($title_create, '', "digiriskdolibarr32px@digiriskdolibarr");
 
 	print '<form method="POST" action="'.$_SERVER["PHP_SELF"].'">';
@@ -290,12 +293,21 @@ if ($action == 'create') {
 	print $modele->getNextValue($object);
 	print '</td></tr>';
 
+	print '<tr><td class="fieldrequired">'.$langs->trans("ParentElement").'</td><td>';
+	print '<input hidden class="flat" type="text" size="36" name="parent" id="parent">';
+	if (empty($fk_parent)) {
+		$digiriskstandard->fetch($conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD);
+		print $digiriskstandard->getNomUrl(1, 'blank', 1);
+	} else {
+		print $object->getNomUrl(1, 'blank', 1);
+	}
+	print '</td></tr>';
 
 	include DOL_DOCUMENT_ROOT.'/core/tpl/commonfields_add.tpl.php';
 
 	print '<tr><td>'.$langs->trans("Description").'</td><td>';
 	print '<input hidden class="flat" type="text" size="36" name="description" id="description">';
-	print '<textarea name="description" id="description" class="minwidth300" rows="'.ROWS_3.'">'.'</textarea>'."\n";
+	print '<textarea name="description" id="description" class="minwidth400" rows="'.ROWS_3.'">'.'</textarea>'."\n";
 	print '</td></tr>';
 
 	print '<input hidden class="flat" type="text" size="36" name="element_type" value="'.$element_type.'">';
@@ -398,10 +410,24 @@ if ((empty($action) || ($action != 'edit' && $action != 'create'))) {
 	$width = 80; $cssclass = 'photoref';
 
 	dol_strlen($object->label) ? $morehtmlref = ' - ' . $object->label : '';
+	$morehtmlref .= '<div class="refidno">';
+	// ParentElement
+	$parent_element = new DigiriskElement($db);
+	$result = $parent_element->fetch($object->fk_parent);
+	if ($result > 0) {
+		$morehtmlref .= $langs->trans("Description").' : '.$object->description;
+		$morehtmlref .= '<br>'.$langs->trans("ParentElement").' : '.$parent_element->getNomUrl(1, 'blank', 1);
+	}
+	else {
+		$digiriskstandard->fetch($conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD);
+		$morehtmlref .= $langs->trans("Description").' : '.$object->description;
+		$morehtmlref .= '<br>'.$langs->trans("ParentElement").' : '.$digiriskstandard->getNomUrl(1, 'blank', 1);
+	}
+	$morehtmlref .= '</div>';
 	if (isset($object->element_type)) {
-		$morehtmlleft .= '<div class="floatleft inline-block valignmiddle divphotoref">'.digirisk_show_photos('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$entity].'/'.$object->element_type, 'small', 5, 0, 0, 0, $width,0, 0, 0, 0, $object->element_type, $object).'</div>';
+		$morehtmlleft = '<div class="floatleft inline-block valignmiddle divphotoref">'.digirisk_show_photos('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity].'/'.$object->element_type, 'small', 5, 0, 0, 0, $width,0, 0, 0, 0, $object->element_type, $object).'</div>';
 	} else {
-		$morehtmlleft .= '<div class="floatleft inline-block valignmiddle divphotoref">'.digirisk_show_photos('mycompany', $conf->mycompany->dir_output . '/logos', 'small', 5, 0, 0, 0, $width,0, 0, 0, 0, 'logos', $emptyobject).'</div>';
+		$morehtmlleft = '<div class="floatleft inline-block valignmiddle divphotoref">'.digirisk_show_photos('mycompany', $conf->mycompany->dir_output . '/logos', 'small', 5, 0, 0, 0, $width,0, 0, 0, 0, 'logos', $emptyobject).'</div>';
 	}
 
 	digirisk_banner_tab($object, 'ref', '', 0, 'ref', 'ref', $morehtmlref, '', 0, $morehtmlleft);
@@ -525,7 +551,7 @@ if ((empty($action) || ($action != 'edit' && $action != 'create'))) {
 		// List of actions on element
 		include_once DOL_DOCUMENT_ROOT . '/core/class/html.formactions.class.php';
 		$formactions = new FormActions($db);
-		$somethingshown = $formactions->showactions($object, $object->element_type . '@digiriskdolibarr', (is_object($object->thirdparty) ? $object->thirdparty->id : 0), 1, '', $MAXEVENT, '', $morehtmlright);
+		$somethingshown = $formactions->showactions($object, 'digiriskelement@digiriskdolibarr', (is_object($object->thirdparty) ? $object->thirdparty->id : 0), 1, '', $MAXEVENT, '', $morehtmlright);
 
 		print '</div></div></div>';
 	}

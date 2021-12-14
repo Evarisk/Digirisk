@@ -13,6 +13,39 @@ INSERT INTO llx_c_email_templates (entity,module,type_template,lang,private,fk_u
 INSERT INTO llx_c_email_templates (entity,module,type_template,lang,private,fk_user,datec,label,position,enabled,active,topic,content,content_lines,joinfiles) VALUES (0,'digiriskdolibarr','firepermit','',0,null,null,'(FirePermitSubject)',80,'$conf->digiriskdolibarr->enabled',1,'[__[MAIN_INFO_SOCIETE_NOM]__] __(FirePermitLabel)__ __REF__','__(Hello)__,<br><br>\n\n__(FirePermitContent)__<br><br>\n__(WithKindRegards)__,<br><br>\n\n__(QHSEService)__<br>__MYCOMPANY_NAME__<br>\n__MYCOMPANY_FULLADDRESS__<br>\n__MYCOMPANY_EMAIL__',null, 1);
 INSERT INTO llx_c_email_templates (entity,module,type_template,lang,private,fk_user,datec,label,position,enabled,active,topic,content,content_lines,joinfiles) VALUES (0,'digiriskdolibarr','riskassessmentdocument','',0,null,null,'(RiskAssessmentDocumentSubject)',80,'$conf->digiriskdolibarr->enabled',1,'[__[MAIN_INFO_SOCIETE_NOM]__] __(RiskAssessmentDocumentLabel)__ __REF__','__(Hello)__,<br><br>\n\n__(RiskAssessmentDocumentContent)__<br><br>\n__(WithKindRegards)__,<br><br>\n\n__(QHSEService)__<br>__MYCOMPANY_NAME__<br>\n__MYCOMPANY_FULLADDRESS__<br>\n__MYCOMPANY_EMAIL__',null, 1);
 
+INSERT INTO `llx_c_relative_location` (`rowid`, `entity`, `ref`, `label`, `description`, `active`) VALUES(1, 0, 'UsualWorkplace', 'UsualWorkplace', '', 1);
+INSERT INTO `llx_c_relative_location` (`rowid`, `entity`, `ref`, `label`, `description`, `active`) VALUES(2, 0, 'OccasionalWorkplace', 'OccasionalWorkplace', '', 1);
+INSERT INTO `llx_c_relative_location` (`rowid`, `entity`, `ref`, `label`, `description`, `active`) VALUES(3, 0, 'LocationOfTheMeal', 'LocationOfTheMeal', '', 1);
+INSERT INTO `llx_c_relative_location` (`rowid`, `entity`, `ref`, `label`, `description`, `active`) VALUES(4, 0, 'OnTheWayBetweenHomeAndWorkplace', 'OnTheWayBetweenHomeAndWorkplace', '', 1);
+INSERT INTO `llx_c_relative_location` (`rowid`, `entity`, `ref`, `label`, `description`, `active`) VALUES(5, 0, 'OnTheWayBetweenMealAndWorkplace', 'OnTheWayBetweenMealAndWorkplace', '', 1);
+INSERT INTO `llx_c_relative_location` (`rowid`, `entity`, `ref`, `label`, `description`, `active`) VALUES(6, 0, 'DuringATripForTheEmployer', 'DuringATripForTheEmployer', '', 1);
+
+INSERT INTO `llx_c_lesion_localization` (`rowid`, `entity`, `ref`, `label`, `description`, `active`) VALUES(1, 0, 'Trunk', 'Trunk', '', 1);
+INSERT INTO `llx_c_lesion_localization` (`rowid`, `entity`, `ref`, `label`, `description`, `active`) VALUES(2, 0, 'Hand', 'Hand', '', 1);
+INSERT INTO `llx_c_lesion_localization` (`rowid`, `entity`, `ref`, `label`, `description`, `active`) VALUES(3, 0, 'LowerLimbs', 'LowerLimbs', '', 1);
+INSERT INTO `llx_c_lesion_localization` (`rowid`, `entity`, `ref`, `label`, `description`, `active`) VALUES(4, 0, 'UpperLimbs', 'UpperLimbs', '', 1);
+INSERT INTO `llx_c_lesion_localization` (`rowid`, `entity`, `ref`, `label`, `description`, `active`) VALUES(5, 0, 'MultipleLocations', 'MultipleLocations', '', 1);
+INSERT INTO `llx_c_lesion_localization` (`rowid`, `entity`, `ref`, `label`, `description`, `active`) VALUES(6, 0, 'Foot', 'Foot', '', 1);
+INSERT INTO `llx_c_lesion_localization` (`rowid`, `entity`, `ref`, `label`, `description`, `active`) VALUES(7, 0, 'Head', 'Head', '', 1);
+INSERT INTO `llx_c_lesion_localization` (`rowid`, `entity`, `ref`, `label`, `description`, `active`) VALUES(8, 0, 'Eyes', 'Eyes', '', 1);
+INSERT INTO `llx_c_lesion_localization` (`rowid`, `entity`, `ref`, `label`, `description`, `active`) VALUES(9, 0, 'InternalSeating', 'InternalSeating', '', 1);
+INSERT INTO `llx_c_lesion_localization` (`rowid`, `entity`, `ref`, `label`, `description`, `active`) VALUES(10, 0, 'Neck', 'Neck', '', 1);
+INSERT INTO `llx_c_lesion_localization` (`rowid`, `entity`, `ref`, `label`, `description`, `active`) VALUES(11, 0, 'Back', 'Back', '', 1);
+INSERT INTO `llx_c_lesion_localization` (`rowid`, `entity`, `ref`, `label`, `description`, `active`) VALUES(12, 0, 'WholeBody', 'WholeBody', '', 1);
+INSERT INTO `llx_c_lesion_localization` (`rowid`, `entity`, `ref`, `label`, `description`, `active`) VALUES(13, 0, 'NotSpecified', 'NotSpecified', '', 1);
+
+INSERT INTO `llx_c_lesion_nature` (`rowid`, `entity`, `ref`, `label`, `description`, `active`) VALUES(1, 0, 'PainEffortLumbago', 'PainEffortLumbago', '', 1);
+INSERT INTO `llx_c_lesion_nature` (`rowid`, `entity`, `ref`, `label`, `description`, `active`) VALUES(2, 0, 'Contusion', 'Contusion', '', 1);
+INSERT INTO `llx_c_lesion_nature` (`rowid`, `entity`, `ref`, `label`, `description`, `active`) VALUES(3, 0, 'Wounds', 'Wounds', '', 1);
+INSERT INTO `llx_c_lesion_nature` (`rowid`, `entity`, `ref`, `label`, `description`, `active`) VALUES(4, 0, 'Sprain', 'Sprain', '', 1);
+INSERT INTO `llx_c_lesion_nature` (`rowid`, `entity`, `ref`, `label`, `description`, `active`) VALUES(5, 0, 'FracturePitting', 'FracturePitting', '', 1);
+INSERT INTO `llx_c_lesion_nature` (`rowid`, `entity`, `ref`, `label`, `description`, `active`) VALUES(6, 0, 'MultipleInjuries', 'MultipleInjuries', '', 1);
+INSERT INTO `llx_c_lesion_nature` (`rowid`, `entity`, `ref`, `label`, `description`, `active`) VALUES(7, 0, 'MuscleOrTendonTear', 'MuscleOrTendonTear', '', 1);
+INSERT INTO `llx_c_lesion_nature` (`rowid`, `entity`, `ref`, `label`, `description`, `active`) VALUES(8, 0, 'PresenceOfForeignBody', 'PresenceOfForeignBody', '', 1);
+INSERT INTO `llx_c_lesion_nature` (`rowid`, `entity`, `ref`, `label`, `description`, `active`) VALUES(9, 0, 'Burns', 'Burns', '', 1);
+INSERT INTO `llx_c_lesion_nature` (`rowid`, `entity`, `ref`, `label`, `description`, `active`) VALUES(10, 0, 'UnspecifiedAndMiscellaneous', 'UnspecifiedAndMiscellaneous', '', 1);
+INSERT INTO `llx_c_lesion_nature` (`rowid`, `entity`, `ref`, `label`, `description`, `active`) VALUES(11, 0, 'Other', 'Other', '', 1);
+
 INSERT INTO `llx_c_conventions_collectives` (`rowid`, `entity`, `tms`, `code`, `libelle`, `description`, `tracking`, `active`, `module`) VALUES(1, 0, '2021-01-22 09:27:09', '0003', 'Convention collective nationale des ouvriers de la navigation intérieure de marchandises', 'Convention collective nationale des ouvriers de la navigation intérieure de marchandises', '1', 1, NULL);
 INSERT INTO `llx_c_conventions_collectives` (`rowid`, `entity`, `tms`, `code`, `libelle`, `description`, `tracking`, `active`, `module`) VALUES(2, 0, '2021-01-22 09:27:09', '0016', 'Convention collective nationale des transports routiers et activités auxiliaires du transport ', 'Convention collective nationale des transports routiers et activités auxiliaires du transport ', '1', 1, NULL);
 INSERT INTO `llx_c_conventions_collectives` (`rowid`, `entity`, `tms`, `code`, `libelle`, `description`, `tracking`, `active`, `module`) VALUES(3, 0, '2021-01-22 09:27:09', '0018', 'Convention collective nationale des industries textiles ', 'Convention collective nationale des industries textiles ', '1', 1, NULL);

@@ -1,9 +1,9 @@
-.risk-evaluation-add-modal .modal-container {
-  max-width: 1500px;
-  max-height: 750px;
-}
+.risk-evaluation-add-modal, .risk-evaluation-edit-modal {
+  .modal-active {
+    z-index: 1005;
+  }
 
-.risk-evaluation-edit-modal .modal-container {
-  max-width: 1500px;
-  max-height: 750px;
+  .modal-container {
+    max-height: 750px;
+  }
 }

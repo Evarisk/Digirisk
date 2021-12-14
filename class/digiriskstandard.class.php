@@ -141,27 +141,76 @@ class DigiriskStandard extends CommonObject
 	}
 
 	/**
-	 *	Return clicable name (with picto eventually)
+	 * 	Return clickable name (with picto eventually)
 	 *
-	 *	@param		int		$withpicto		0=No picto, 1=Include picto into link, 2=Only picto
-	 *	@return		string					Chaine avec URL
+	 * 	@param	int		$withpicto		          0=No picto, 1=Include picto into link, 2=Only picto
+	 * 	@param	string	$option			          Variant where the link point to ('', 'nolink')
+	 * 	@param	int		$addlabel		          0=Default, 1=Add label into string, >1=Add first chars into string
+	 *  @param	string	$moreinpopup	          Text to add into popup
+	 *  @param	string	$sep			          Separator between ref and label if option addlabel is set
+	 *  @param	int   	$notooltip		          1=Disable tooltip
+	 *  @param  int     $save_lastsearch_value    -1=Auto, 0=No save of lastsearch_values when clicking, 1=Save lastsearch_values whenclicking
+	 *  @param	string	$morecss				  More css on a link
+	 * 	@return	string					          String with URL
 	 */
-	public function getNomUrl($withpicto = 0)
+	function getNomUrl($withpicto = 0, $option = '', $addlabel = 0, $moreinpopup = '', $sep = ' - ', $notooltip = 0, $save_lastsearch_value = -1, $morecss = '')
 	{
-		global $conf, $langs;
+		global $conf, $langs, $user, $hookmanager;
+
+		if (!empty($conf->dol_no_mouse_hover)) $notooltip = 1; // Force disable tooltips
 
 		$result = '';
-		$label = $langs->trans("Show").': '.$this->ref;
 
-		$link = '<a href="'.DOL_URL_ROOT.'/custom/digiriskdolibarr/digiriskstandard_card.php?id='.$conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD.'" title="'.dol_escape_htmltag($label, 1).'" class="classfortooltip">';
+		$label = '';
+		if ($option != 'nolink') $label =  '<i class="fas fa-building"></i> <u class="paddingrightonly">'.$langs->trans('DigiriskStandard').'</u>';
+		$label .= ($label ? '<br>' : '').'<b>'.$langs->trans('Ref').': </b>'.$this->ref; // The space must be after the : to not being explode when showing the title in img_picto
+		$label .= ($label ? '<br>' : '').'<b>'.$langs->trans('Label').': </b>'.$conf->global->MAIN_INFO_SOCIETE_NOM; // The space must be after the : to not being explode when showing the title in img_picto
+		if ($moreinpopup) $label .= '<br>'.$moreinpopup;
+
+		$url = dol_buildpath('/digiriskdolibarr/digiriskstandard_card.php', 1).'?id='.$this->id;
+
+		if ($option != 'nolink')
+		{
+			// Add param to save lastsearch_values or not
+			$add_save_lastsearch_values = ($save_lastsearch_value == 1 ? 1 : 0);
+			if ($save_lastsearch_value == -1 && preg_match('/list\.php/', $_SERVER["PHP_SELF"])) $add_save_lastsearch_values = 1;
+			if ($add_save_lastsearch_values) $url .= '&save_lastsearch_values=1';
+		}
+
+		$linkclose = '';
+		if ($option == 'blank'){
+			$linkclose .= ' target=_blank';
+		}
+
+		if (empty($notooltip) && $user->rights->digiriskdolibarr->digiriskelement->read)
+		{
+			if (!empty($conf->global->MAIN_OPTIMIZEFORTEXTBROWSER))
+			{
+				$label = $langs->trans("ShowDigiriskStandard");
+				$linkclose .= ' alt="'.dol_escape_htmltag($label, 1).'"';
+			}
+			$linkclose .= ' title="'.dol_escape_htmltag($label, 1).'"';
+			$linkclose .= ' class="classfortooltip'.($morecss ? ' '.$morecss : '').'"';
+		}
+		else $linkclose = ($morecss ? ' class="'.$morecss.'"' : '');
+
+		$linkstart = '<a href="'.$url.'"';
+		$linkstart .= $linkclose.'>';
 		$linkend = '</a>';
 
-		$picto = 'trip';
+		$result .= $linkstart;
+		if ($withpicto) $result .= '<i class="fas fa-building"></i>' . ' ';
+		if ($withpicto != 2) $result .= $this->ref;
+		if ($withpicto != 2) $result .= (($addlabel && $conf->global->MAIN_INFO_SOCIETE_NOM) ? $sep.dol_trunc($conf->global->MAIN_INFO_SOCIETE_NOM, ($addlabel > 1 ? $addlabel : 0)) : '');
+		$result .= $linkend;
 
+		global $action;
+		$hookmanager->initHooks(array('digiriskstandardtdao'));
+		$parameters = array('id'=>$this->id, 'getnomurl'=>$result);
+		$reshook = $hookmanager->executeHooks('getNomUrl', $parameters, $this, $action); // Note that $action and $this may have been modified by some hooks
+		if ($reshook > 0) $result = $hookmanager->resPrint;
+		else $result .= $hookmanager->resPrint;
 
-		if ($withpicto) $result .= ($link.img_object($label, $picto, 'class="classfortooltip"').$linkend);
-		if ($withpicto && $withpicto != 2) $result .= ' ';
-		if ($withpicto != 2) $result .= $link.$this->ref.$linkend;
 		return $result;
 	}
 }

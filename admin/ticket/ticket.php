@@ -218,7 +218,7 @@ llxHeader('', $title, $help_url, '', '', '', '', $morecss);
 // Subheader
 $linkback = '<a href="'.($backtopage ? $backtopage : DOL_URL_ROOT.'/admin/modules.php?restore_lastsearch_values=1').'">'.$langs->trans("BackToModuleList").'</a>';
 
-print load_fiche_titre($title, $linkback, 'object_digiriskdolibarr@digiriskdolibarr');
+print load_fiche_titre($title, $linkback, 'digiriskdolibarr32px@digiriskdolibarr');
 
 // Configuration header
 $head = digiriskdolibarrAdminPrepareHead();
@@ -322,7 +322,7 @@ if (!empty($conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE)) {
 	print '</tr>';
 
 	//Use captcha on create ticket paghe
-	print '<tr class="oddeven"><td>'.$langs->trans("UseCaptachOnCreateTicketPage").'</td>';
+	print '<tr class="oddeven"><td>'.$langs->trans("UseCaptchaOnCreateTicketPage").'</td>';
 	print '<td class="center">';
 	print ajax_constantonoff('DIGIRISKDOLIBARR_USE_CAPTCHA');
 	print '</td>';

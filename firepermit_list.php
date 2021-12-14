@@ -187,9 +187,10 @@ $formother = new FormOther($db);
 $title    = $langs->trans("FirePermitList");
 $help_url = '';
 
+$morejs   = array("/digiriskdolibarr/js/digiriskdolibarr.js.php");
 $morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");
 
-llxHeader("", $title, $help_url, '', '', '', '', $morecss, '', 'classforhorizontalscrolloftabs');
+llxHeader("", $title, $help_url, '', '', '', $morejs, $morecss, '', 'classforhorizontalscrolloftabs');
 
 // Add $param from extra fields
 include DOL_DOCUMENT_ROOT.'/core/tpl/extrafields_list_search_param.tpl.php';
@@ -449,7 +450,7 @@ while ($i < ($limit ? min($num, $limit) : $num)) {
 				}
 			}
 			elseif ($key == 'ref') {
-				print $firepermit->getNomUrl();
+				print '<i class="fas fa-fire-alt"></i>  ' . $firepermit->getNomUrl();
 			}
 			elseif ($key == 'date_start') {
 				print dol_print_date($firepermit->date_start, 'dayhour', 'tzserver');	// We suppose dates without time are always gmt (storage of course + output)

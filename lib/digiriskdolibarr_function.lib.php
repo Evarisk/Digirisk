@@ -584,7 +584,6 @@ function digiriskHeader($head = '', $title = '', $help_url = '', $target = '', $
 	require_once __DIR__ . '/../class/digiriskelement.class.php';
 	require_once __DIR__ . '/../core/modules/digiriskdolibarr/digiriskelement/groupment/mod_groupment_standard.php';
 	require_once __DIR__ . '/../core/modules/digiriskdolibarr/digiriskelement/workunit/mod_workunit_standard.php';
-
 	$mod_groupment = new $conf->global->DIGIRISKDOLIBARR_GROUPMENT_ADDON();
 	$mod_workunit = new $conf->global->DIGIRISKDOLIBARR_WORKUNIT_ADDON();
 
@@ -655,6 +654,11 @@ function digiriskHeader($head = '', $title = '', $help_url = '', $target = '', $
 						<?php endif; ?>
 
 						<ul class="workunit-list">
+							<script>
+								if (localStorage.maximized == 'false') {
+									$('#id-left').attr('style', 'display:none !important')
+								}
+							</script>
 							<?php display_recurse_tree($results) ?>
 							<script>
 								// Get previous menu to display it
@@ -682,7 +686,7 @@ function digiriskHeader($head = '', $title = '', $help_url = '', $target = '', $
 
 								var params = new window.URLSearchParams(window.location.search);
 								var id = params.get('id');
-								if (document.URL.match(/digiriskelement/)) {
+								if (document.URL.match(/digiriskelement/) && !document.URL.match(/type=standard/)) {
 									jQuery( '#unit'  + id ).addClass( 'active' );
 									jQuery( '#unit'  +id  ).closest( '.unit' ).attr( 'value', id );
 								};
@@ -1396,9 +1400,8 @@ function digirisk_show_medias($modulepart = 'ecm', $sdir, $size = 0, $nbmax = 0,
 	include_once DOL_DOCUMENT_ROOT.'/core/lib/files.lib.php';
 	include_once DOL_DOCUMENT_ROOT.'/core/lib/images.lib.php';
 
-	$sortfield = 'position_name';
+	$sortfield = 'date';
 	$sortorder = 'desc';
-
 	$dir = $sdir.'/';
 	$pdir = $subdir . '/';
 
@@ -2020,3 +2023,58 @@ function getNomUrlProject($project, $withpicto = 0, $option = '', $addlabel = 0,
 
 	return $result;
 }
+
+// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+/**
+ *  Return a HTML select list of a dictionary
+ *
+ *  @param  string	$htmlname          	Name of select zone
+ *  @param	string	$dictionarytable	Dictionary table
+ *  @param	string	$keyfield			Field for key
+ *  @param	string	$labelfield			Label field
+ *  @param	string	$selected			Selected value
+ *  @param  int		$useempty          	1=Add an empty value in list, 2=Add an empty value in list only if there is more than 2 entries.
+ *  @param  string  $moreattrib         More attributes on HTML select tag
+ * 	@return	void
+ */
+function digirisk_select_dictionary($htmlname, $dictionarytable, $keyfield = 'code', $labelfield = 'label', $selected = '', $useempty = 0, $moreattrib = '')
+{
+	// phpcs:enable
+	global $langs, $conf, $db;
+
+	$langs->load("admin");
+
+	$sql = "SELECT rowid, ".$keyfield.", ".$labelfield;
+	$sql .= " FROM ".MAIN_DB_PREFIX.$dictionarytable;
+	$sql .= " ORDER BY ".$labelfield;
+
+	$result = $db->query($sql);
+	if ($result) {
+		$num = $db->num_rows($result);
+		$i = 0;
+		if ($num) {
+			print '<select id="select'.$htmlname.'" class="flat selectdictionary" name="'.$htmlname.'"'.($moreattrib ? ' '.$moreattrib : '').'>';
+			if ($useempty == 1 || ($useempty == 2 && $num > 1)) {
+				print '<option value="-1">&nbsp;</option>';
+			}
+
+			while ($i < $num) {
+				$obj = $db->fetch_object($result);
+				if ($selected == $obj->rowid || $selected == $obj->$keyfield) {
+					print '<option value="'.$langs->transnoentities($obj->$keyfield).'" selected>';
+				} else {
+					print '<option value="'.$langs->transnoentities($obj->$keyfield).'">';
+				}
+				print $langs->transnoentities($obj->$labelfield);
+				print '</option>';
+				$i++;
+			}
+			print "</select>";
+		} else {
+			print $langs->trans("DictionaryEmpty");
+		}
+	} else {
+		dol_print_error($db);
+	}
+}
+

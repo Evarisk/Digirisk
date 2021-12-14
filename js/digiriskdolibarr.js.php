@@ -15,7 +15,53 @@
  *
  * Library javascript to enable Browser notifications
  */
+<?php
+if (!defined('NOREQUIRESOC')) {
+	define('NOREQUIRESOC', '1');
+}
+if (!defined('NOCSRFCHECK')) {
+	define('NOCSRFCHECK', 1);
+}
+if (!defined('NOTOKENRENEWAL')) {
+	define('NOTOKENRENEWAL', 1);
+}
+if (!defined('NOLOGIN')) {
+	define('NOLOGIN', 1);
+}
+if (!defined('NOREQUIREMENU')) {
+	define('NOREQUIREMENU', 1);
+}
+if (!defined('NOREQUIREHTML')) {
+	define('NOREQUIREHTML', 1);
+}
+if (!defined('NOREQUIREAJAX')) {
+	define('NOREQUIREAJAX', '1');
+}
 
+session_cache_limiter('public');
+
+$res = 0;
+// Try main.inc.php into web root known defined into CONTEXT_DOCUMENT_ROOT (not always defined)
+if (!$res && !empty($_SERVER["CONTEXT_DOCUMENT_ROOT"])) $res = @include $_SERVER["CONTEXT_DOCUMENT_ROOT"]."/main.inc.php";
+// Try main.inc.php into web root detected using web root calculated from SCRIPT_FILENAME
+$tmp = empty($_SERVER['SCRIPT_FILENAME']) ? '' : $_SERVER['SCRIPT_FILENAME']; $tmp2 = realpath(__FILE__); $i = strlen($tmp) - 1; $j = strlen($tmp2) - 1;
+while ($i > 0 && $j > 0 && isset($tmp[$i]) && isset($tmp2[$j]) && $tmp[$i] == $tmp2[$j]) { $i--; $j--; }
+if (!$res && $i > 0 && file_exists(substr($tmp, 0, ($i + 1))."/main.inc.php")) $res = @include substr($tmp, 0, ($i + 1))."/main.inc.php";
+if (!$res && $i > 0 && file_exists(substr($tmp, 0, ($i + 1))."/../main.inc.php")) $res = @include substr($tmp, 0, ($i + 1))."/../main.inc.php";
+// Try main.inc.php using relative path
+if (!$res && file_exists("../../main.inc.php")) $res = @include "../../main.inc.php";
+if (!$res && file_exists("../../../main.inc.php")) $res = @include "../../../main.inc.php";
+if (!$res) die("Include of main fails");
+
+// Define javascript type
+top_httphead('text/javascript; charset=UTF-8');
+// Important: Following code is to avoid page request by browser and PHP CPU at each Dolibarr page access.
+if (empty($dolibarr_nocache)) {
+	header('Cache-Control: max-age=10800, public, must-revalidate');
+} else {
+	header('Cache-Control: no-cache');
+}
+?>
 /**
  * \file    digiriskdolibarr/js/digiriskdolibarr.js.php
  * \ingroup digiriskdolibarr
@@ -279,6 +325,7 @@ window.eoxiaJS.navigation.redirect = function( event ) {
 	} else {
 		URLToGo = document.URL;
 	}
+	$( this ).closest( '.side-nav' ).find( '#id-left' ).removeClass( 'active' );
 
 	//empty and fill object card
 	$('#cardContent').load( URLToGo + ' #cardContent' , id);
@@ -1095,10 +1142,11 @@ window.eoxiaJS.mediaGallery.savePhoto = function( event ) {
 
 	let favorite = filenames
 	favorite = favorite.split('vVv')[0]
+    window.eoxiaJS.loader.display($(this));
 
 	if (type === 'riskassessment') {
 		mediaLinked = modalFrom.find('.element-linked-medias')
-		window.eoxiaJS.loader.display(mediaLinked);
+        window.eoxiaJS.loader.display(mediaLinked);
 
         let riskAssessmentPhoto = ''
         riskAssessmentPhoto = $('.risk-evaluation-photo-'+idToSave+'.risk-'+riskId)
@@ -1442,6 +1490,10 @@ window.eoxiaJS.risk.selectDanger = function( event ) {
 	element.closest('.wpeo-dropdown').find('.dropdown-toggle img').attr('aria-label', element.closest('.wpeo-tooltip-event').attr('aria-label'));
 
 	element.closest('.wpeo-dropdown').find('.input-hidden-danger').val(element.data('id'));
+	var riskDescriptionPrefill = element.closest('.wpeo-dropdown').find('.input-risk-description-prefill').val();
+	if (riskDescriptionPrefill == 1) {
+		element.closest('.risk-content').find('.risk-description textarea').text(element.closest('.wpeo-tooltip-event').attr('aria-label'));
+	}
 	var elementParent = jQuery(this).closest('.modal-container');
 
 	// Rend le bouton "active".
@@ -1498,9 +1550,12 @@ window.eoxiaJS.risk.createRisk = function ( event ) {
 	let evaluationText = elementEvaluation.find('.risk-evaluation-comment textarea').val()
 	let riskCommentText = elementRisk.find('.risk-description textarea').val()
 	let taskText = elementTask.find('input').val()
+	let riskDescriptionPrefill = elementRisk.find('.risk-category .input-risk-description-prefill').val()
+	let riskDesciptionText = elementRisk.find('.risk-category .danger-category-pic').attr('aria-label')
 
 	evaluationText = window.eoxiaJS.risk.sanitizeBeforeRequest(evaluationText)
 	riskCommentText = window.eoxiaJS.risk.sanitizeBeforeRequest(riskCommentText)
+	riskDesciptionText = window.eoxiaJS.risk.sanitizeBeforeRequest(riskDesciptionText)
 	taskText = window.eoxiaJS.risk.sanitizeBeforeRequest(taskText)
 
 	var category = elementRisk.find('.risk-category input').val();
@@ -1509,7 +1564,12 @@ window.eoxiaJS.risk.createRisk = function ( event ) {
 		categoryPost = '&category=' + category;
 	}
 
-	var description = riskCommentText;
+	if (riskDescriptionPrefill == 1) {
+		var description = riskDesciptionText;
+	} else {
+		var description = riskCommentText;
+	}
+
 	var descriptionPost = '';
 	if (description !== '') {
 		descriptionPost = '&riskComment=' + encodeURI(description);
@@ -2534,6 +2594,8 @@ window.eoxiaJS.risksign.createRiskSign = function ( event ) {
 window.eoxiaJS.risksign.saveRiskSign = function ( event ) {
 	let editedRiskSignId = $(this).attr('value');
 	let elementRiskSign = $(this).closest('.risksign-container').find('.risksign-content');
+	let actionContainerSuccess = $('.messageSuccessRiskSignEdit');
+	let actionContainerError = $('.messageErrorRiskSignEdit');
 
 	var category = elementRiskSign.find('.risksign-category input').val();
 	var categoryPost = '';
@@ -2546,24 +2608,32 @@ window.eoxiaJS.risksign.saveRiskSign = function ( event ) {
 	if (description !== '') {
 		descriptionPost = '&riskSignDescription=' + encodeURI(description);
 	}
+	let elementParent = $('.div-table-responsive:not(.list-titre)');
 
+	window.eoxiaJS.loader.display(elementRiskSign);
 	$.ajax({
 		url: document.URL + '&action=saveRiskSign&riskSignID=' + editedRiskSignId + categoryPost + descriptionPost,
 		type: "POST",
 		processData: false,
-		contentType: false
+		contentType: false,
+		success: function ( ) {
+			elementParent.empty()
+			elementParent.load( document.URL + ' .div-table-responsive');
+			elementRiskSign.removeClass('wpeo-loader');
+
+			$(this).closest('.div-table-responsive').load( document.URL + '&action=saveRiskSign&riskSignID=' + editedRiskSignId + categoryPost + descriptionPost + ' .div-table-responsive');
+
+			actionContainerSuccess.empty()
+			actionContainerSuccess.load(' .risksign-edit-success-notice')
+			actionContainerSuccess.removeClass('hidden');
+		},
+		error: function ( ) {
+			actionContainerError.empty()
+			actionContainerError.load(' .risksign-edit-error-notice')
+			actionContainerError.removeClass('hidden');
+		}
 	});
 
-	let elementParent = $('.div-table-responsive:not(.list-titre)');
-
-	window.eoxiaJS.loader.display(elementRiskSign);
-
-	setTimeout(function(){
-		elementParent.empty()
-		elementParent.load( document.URL + ' .div-table-responsive');
-		elementRiskSign.removeClass('wpeo-loader');
-	}, 800);
-	$(this).closest('.div-table-responsive').load( document.URL + '&action=saveRiskSign&riskSignID=' + editedRiskSignId + categoryPost + descriptionPost + ' .div-table-responsive');
 };
 
 /**
@@ -3065,7 +3135,8 @@ window.eoxiaJS.document.init = function() {
 };
 
 window.eoxiaJS.document.event = function() {
-    jQuery( document ).on( 'click', '#builddoc_generatebutton', window.eoxiaJS.document.displayLoader );
+	jQuery( document ).on( 'click', '#builddoc_generatebutton', window.eoxiaJS.document.displayLoader );
+	jQuery( document ).on( 'click', ' .send-risk-assessment-document-by-mail', window.eoxiaJS.document.displayLoader );
 };
 
 window.eoxiaJS.document.displayLoader = function(  ) {
@@ -3102,11 +3173,11 @@ window.eoxiaJS.keyEvent.init = function() {
  * @return {void}
  */
 window.eoxiaJS.keyEvent.event = function() {
-	jQuery( document ).on( 'keyup', window.eoxiaJS.keyEvent.keyup );
+	jQuery( document ).on( 'keydown', window.eoxiaJS.keyEvent.keyup );
 }
 
 /**
- * Action import migration data.
+ * Action modal close & validation with key events
  *
  * @since   1.0.0
  * @version 1.0.0
@@ -3114,8 +3185,250 @@ window.eoxiaJS.keyEvent.event = function() {
  * @return {void}
  */
 window.eoxiaJS.keyEvent.keyup = function( event ) {
-	if ( 27 === event.keyCode ) {
-		$(this).find('.modal-active').removeClass('modal-active');
+	if ( 'Escape' === event.key  ) {
+		$(this).find('.modal-active .modal-close .fas.fa-times').first().click();
+	}
+
+	if ( 'Enter' === event.key )  {
+		event.preventDefault()
+		if (!$('input, textarea').is(':focus')) {
+			$(this).find('.modal-active .modal-footer .wpeo-button').not('.button-disable').first().click();
+		} else {
+			$('textarea:focus').val($('textarea:focus').val() + '\n')
+		}
+	}
+};
+
+/**
+ * Initialise l'objet "menu" ainsi que la méthode "init" obligatoire pour la bibliothèque EoxiaJS.
+ *
+ * @since   1.0.0
+ * @version 1.0.0
+ */
+window.eoxiaJS.menu = {};
+
+/**
+ * La méthode appelée automatiquement par la bibliothèque EoxiaJS.
+ *
+ * @since   1.0.0
+ * @version 1.0.0
+ *
+ * @return {void}
+ */
+window.eoxiaJS.menu.init = function() {
+	window.eoxiaJS.menu.event();
+};
+
+/**
+ * La méthode contenant tous les évènements pour le migration.
+ *
+ * @since   1.0.0
+ * @version 1.0.0
+ *
+ * @return {void}
+ */
+window.eoxiaJS.menu.event = function() {
+	jQuery(document).on( 'click', ' .blockvmenu', window.eoxiaJS.menu.toggleMenu);
+	jQuery(document).ready(function() { window.eoxiaJS.menu.setMenu()});
+}
+
+/**
+ * Action Toggle main menu.
+ *
+ * @since   8.5.0
+ * @version 8.5.0
+ *
+ * @return {void}
+ */
+window.eoxiaJS.menu.toggleMenu = function() {
+
+	var menu = $(this).closest('#id-left').find('a.vmenu');
+	var elementParent = $(this).closest('#id-left').find('div.vmenu')
+
+
+	if (jQuery(this).find('.minimizeMenu').length > 0) {
+
+		var text = '';
+		menu.each(function (index, value) {
+			text = $(this).html().split(' ');
+			$(this).html(text[0]+' '+text[1]+' '+text[2]);
+		});
+
+		var elementText = $(this).find('.minimizeMenu').html().split(' ');
+		$(this).find('.minimizeMenu').html(elementText[0]+' '+elementText[1]+' '+elementText[2]);
+
+		elementParent.css('width', '30px');
+		elementParent.find('.blockvmenusearch').hide();
+
+		jQuery(this).find('.minimizeMenu').removeClass('minimizeMenu').addClass('maximizeMenu');
+		localStorage.setItem('maximized', 'false')
+
+	} else if (jQuery(this).find('.maximizeMenu').length > 0) {
+		var text2 = '';
+		menu.each(function (index, value) {
+			text2 = $(this).html().split(' ');
+			$(this).html(text2[0]+' '+text2[1]+' '+text2[2]+' '+$(this).attr('title'));
+		});
+
+		var elementText2 = $(this).find('.maximizeMenu').html().split(' ');
+		jQuery(this).find('.maximizeMenu').html(elementText2[0]+' '+elementText2[1]+' '+elementText2[2]+' Réduire le menu');
+
+		elementParent.css('width', '');
+		elementParent.find('.blockvmenusearch').show();
+
+		jQuery(this).find('.maximizeMenu').removeClass('maximizeMenu').addClass('minimizeMenu');
+		$('div.menu_titre').attr('style', 'width: 188px !important')
+
+		localStorage.setItem('maximized', 'true')
+
+	}
+};
+
+/**
+ * Action set  menu.
+ *
+ * @since   8.5.0
+ * @version 8.5.0
+ *
+ * @return {void}
+ */
+window.eoxiaJS.menu.setMenu = function() {
+	$('.minimizeMenu').parent().parent().parent().attr('style', 'cursor:pointer ! important')
+	if (localStorage.maximized == 'false') {
+		$('#id-left').attr('style', 'display:none !important')
+	}
+	if (localStorage.maximized == 'false') {
+		var text = '';
+		var menu = $(document).find('a.vmenu');
+		var elementParent = $(document).find('div.vmenu')
+		console.log(menu)
+		menu.each(function (index, value) {
+			text = $(this).html().split(' ');
+			$(this).html(text[0]+' '+text[1]+' '+text[2]);
+			console.log($(this))
+		});
+
+		$('#id-left').attr('style', 'display:block !important')
+		$('div.menu_titre').attr('style', 'width: 50px !important')
+
+		var elementText = $('.minimizeMenu').html().split(' ');
+		$('.minimizeMenu').html(elementText[0]+' '+elementText[1]+' '+elementText[2]);
+		$('.minimizeMenu').removeClass('minimizeMenu').addClass('maximizeMenu');
+
+		elementParent.css('width', '30px');
+		elementParent.find('.blockvmenusearch').hide();
+	}
+};
+
+
+/**
+ * Initialise l'objet "accident" ainsi que la méthode "init" obligatoire pour la bibliothèque EoxiaJS.
+ *
+ * @since   8.5.0
+ * @version 8.5.0
+ */
+window.eoxiaJS.accident = {};
+
+/**
+ * La méthode appelée automatiquement par la bibliothèque EoxiaJS.
+ *
+ * @since   8.5.0
+ * @version 8.5.0
+ *
+ * @return {void}
+ */
+window.eoxiaJS.accident.init = function() {
+    window.eoxiaJS.accident.event();
+};
+
+/**
+ * La méthode contenant tous les évènements pour les accidents.
+ *
+ * @since   8.5.0
+ * @version 8.5.0
+ *
+ * @return {void}
+ */
+window.eoxiaJS.accident.event = function() {
+    jQuery( document ).on( 'submit', ' .sendfile', window.eoxiaJS.accident.tmpStockFile );
+    jQuery( document ).on( 'click', ' .linked-file-delete-workstop', window.eoxiaJS.accident.removeFile );
+	jQuery( document ).on( 'click', '#external_accident', window.eoxiaJS.accident.showExternalAccidentLocation );
+};
+
+/**
+ * Upload automatiquement le(s) fichier(s) séelectionnés dans digiriskdolibarr/accident/accident_ref/workstop/__REF__ (temp ou ref du workstop)
+ *
+ * @since   8.5.0
+ * @version 8.5.0
+ *
+ * @return {void}
+ */
+window.eoxiaJS.accident.tmpStockFile = function(id) {
+    var files = $('#sendfile').prop('files');
+
+
+    const formData = new FormData();
+    for (let i = 0; i < files.length; i++) {
+        let file = files[i]
+        formData.append('files[]', file)
+    }
+
+
+    $.ajax({
+        url: document.URL + '&action=sendfile&objectlineid=' + id,
+        type: "POST",
+        processData: false,
+        contentType: false,
+		data: formData,
+        success: function ( ) {
+            $('#sendFileForm' + id).load(document.URL + ' #fileLinkedTable' + id)
+        },
+        error: function ( ) {
+        }
+    });
+};
+
+/**
+ * Supprime le fichier séelectionné dans  digiriskdolibarr/accident/accident_ref/workstop/__REF__ (temp ou ref du workstop)
+ *
+ * @since   8.5.0
+ * @version 8.5.0
+ *
+ * @return {void}
+ */
+
+window.eoxiaJS.accident.removeFile = function( event ) {
+    let filetodelete = $(this).attr('value');
+    filetodelete = filetodelete.replace('_mini', '')
+    let objectlineid = $(this).closest('.objectline').attr('value')
+
+    $.ajax({
+        url: document.URL + '&action=removefile&filetodelete='+filetodelete+'&objectlineid='+objectlineid,
+        type: "POST",
+        processData: false,
+        contentType: false,
+        success: function ( ) {
+            $('#sendFileForm' + objectlineid).load(document.URL + ' #fileLinkedTable' + objectlineid)
+        },
+        error: function ( ) {
+        }
+    });
+};
+
+window.eoxiaJS.accident.showExternalAccidentLocation = function() {
+	let fkElementField = $(this).closest('.accident-table').find('.fk_element_field')
+	let fkSocField = $(this).closest('.accident-table').find('.fk_soc_field')
+
+	if (fkSocField.hasClass('hidden')) {
+		fkElementField.attr('style', 'display:none')
+		fkSocField.attr('style', '')
+		fkElementField.addClass('hidden')
+		fkSocField.removeClass('hidden')
+	} else {
+		fkElementField.attr('style', '')
+		fkSocField.attr('style', 'display:none')
+		fkElementField.removeClass('hidden')
+		fkSocField.addClass('hidden')
 	}
 };
 

@@ -40,6 +40,7 @@ global $langs, $user, $conf, $db;
 
 // Libraries
 require_once DOL_DOCUMENT_ROOT."/core/lib/admin.lib.php";
+require_once DOL_DOCUMENT_ROOT."/core/lib/files.lib.php";
 require_once DOL_DOCUMENT_ROOT.'/projet/class/project.class.php';
 require_once DOL_DOCUMENT_ROOT.'/societe/class/societe.class.php';
 require_once DOL_DOCUMENT_ROOT.'/core/modules/project/mod_project_simple.php';
@@ -83,14 +84,16 @@ if ($action == 'setredirectafterconnection') {
 
 $page_name = "DigiriskdolibarrSetup";
 $help_url  = 'FR:Module_DigiriskDolibarr#Configuration';
+
+$morejs   = array("/digiriskdolibarr/js/digiriskdolibarr.js.php");
 $morecss   = array("/digiriskdolibarr/css/digiriskdolibarr.css");
 
-llxHeader('', $langs->trans($page_name), $help_url, '', '', '', '', $morecss);
+llxHeader('', $langs->trans($page_name), $help_url, '', '', '', $morejs, $morecss);
 
 // Subheader
 $linkback = '<a href="'.($backtopage ? $backtopage : DOL_URL_ROOT.'/admin/modules.php?restore_lastsearch_values=1').'">'.$langs->trans("BackToModuleList").'</a>';
 
-print load_fiche_titre($langs->trans($page_name), $linkback, 'object_digiriskdolibarr@digiriskdolibarr');
+print load_fiche_titre($langs->trans($page_name), $linkback, 'digiriskdolibarr32px@digiriskdolibarr');
 
 // Configuration header
 $head = digiriskdolibarrAdminPrepareHead();
@@ -98,8 +101,9 @@ print dol_get_fiche_head($head, 'settings', '', -1, "digiriskdolibarr@digiriskdo
 
 if (empty($setupnotempty)) {
 	print '<br>'.$langs->trans("AgendaModuleRequired") . '<br>';
-	print '<br>'.$langs->trans("HowToSetupOtherModules") . '  ' . '<a href="./../../../admin/modules.php' .'">' . $langs->trans('ConfigMyModules') . '</a>'. '<br>';
+	print '<br>'.$langs->trans("HowToSetupOtherModules") . '  ' . '<a href=' . '"../../../admin/modules.php">' . $langs->trans('ConfigMyModules') . '</a>'. '<br>';
 	print '<br>'.$langs->trans("AvoidLogoProblems") . '  ' . '<a href="'.$langs->trans('LogoHelpLink').'">' . $langs->trans('LogoHelpLink') . '</a>'. '<br>';
+	print '<br>'.$langs->trans("HowToSetupIHM") . '  ' . '<a href=' . '"../../../admin/ihm.php">' . $langs->trans('ConfigIHM') . '</a>'. '<br>';
 }
 
 print load_fiche_titre($langs->trans("DigiriskData"), '', '');

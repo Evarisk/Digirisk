@@ -673,6 +673,12 @@
   -webkit-transform: translate(-50%, -50%);
   transform: translate(-50%, -50%);
 }
+.wpeo-modal.modal-active .modal-active {
+  z-index: 1003;
+}
+.wpeo-modal.modal-active .modal-active .modal-active {
+  z-index: 1004;
+}
 .wpeo-modal.modal-force-display .modal-close {
   display: none;
 }
@@ -2066,6 +2072,9 @@
   -webkit-transition: all 0.2s ease-out;
   transition: all 0.2s ease-out;
 }
+.page-ut-gp-list .side-nav #id-left.active .add-container {
+  opacity: 1;
+}
 
 /** Header */
 .page-ut-gp-list .side-nav .society-header {
@@ -2775,8 +2784,8 @@
   border: 0;
   margin: 0;
   padding: 0;
-  margin-left: 70px;
-  width: 60px;
+  margin-left: 40px;
+  width: 30px;
   top: 68px;
   padding-bottom: 68px;
   height: 100%;
@@ -3577,6 +3586,9 @@ td > .risk-evaluation-container {
   margin-bottom: 0.6em;
   display: block;
 }
+.wpeo-modal[class*=modal-risk] .modal-container .maxwidthdate {
+  max-width: 125px;
+}
 
 .wpeo-modal[class*=modal-risk] .modal-container .risk-content {
   display: -webkit-box;
@@ -3751,6 +3763,9 @@ td > .risk-evaluation-container {
   margin-left: auto;
 }
 
+.wpeo-modal.modal-photo.modal-active {
+  z-index: 2014;
+}
 .wpeo-modal.modal-photo .clickable-photo {
   border: 5px solid #fff;
   -webkit-transition: all 0.2s ease-out;
@@ -3822,13 +3837,10 @@ td > .risk-evaluation-container {
   align-items: center;
 }
 
-.risk-evaluation-add-modal .modal-container {
-  max-width: 1500px;
-  max-height: 750px;
+.risk-evaluation-add-modal .modal-active, .risk-evaluation-edit-modal .modal-active {
+  z-index: 1005;
 }
-
-.risk-evaluation-edit-modal .modal-container {
-  max-width: 1500px;
+.risk-evaluation-add-modal .modal-container, .risk-evaluation-edit-modal .modal-container {
   max-height: 750px;
 }
 
@@ -3879,8 +3891,6 @@ td > .risk-evaluation-container {
     background: #446ba4;
   }
   #id-container.page-ut-gp-list .side-nav #id-left {
-    opacity: 0;
-    pointer-events: none;
     position: absolute;
     z-index: 999;
     background: #efefef;
@@ -3889,16 +3899,17 @@ td > .risk-evaluation-container {
     box-shadow: 0 0 40px 0 rgba(0, 0, 0, 0.1);
     -webkit-transition: all 0.2s ease-out;
     transition: all 0.2s ease-out;
-    -webkit-transform: translateY(-10px);
-    transform: translateY(-10px);
     max-height: 500px;
     overflow-y: auto;
   }
-  #id-container.page-ut-gp-list .side-nav #id-left.active {
-    opacity: 1;
-    pointer-events: auto;
-    -webkit-transform: translateY(0px);
-    transform: translateY(0px);
+  #id-container.page-ut-gp-list .side-nav #id-left:not(.active) {
+    opacity: 0;
+    pointer-events: none;
+    -webkit-transform: translateY(-10px);
+    transform: translateY(-10px);
+  }
+  #id-container.page-ut-gp-list .side-nav #id-left:not(.active) .wpeo-button {
+    pointer-events: none;
   }
 
   #id-container.page-ut-gp-list #id-right {

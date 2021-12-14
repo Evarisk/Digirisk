@@ -40,12 +40,13 @@ require_once DOL_DOCUMENT_ROOT.'/core/lib/images.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/core/class/html.form.class.php';
 
 require_once './class/digiriskelement.class.php';
+require_once './class/digiriskstandard.class.php';
 require_once './class/evaluator.class.php';
 require_once './core/modules/digiriskdolibarr/digiriskelement/evaluator/mod_evaluator_standard.php';
 require_once './lib/digiriskdolibarr_digiriskelement.lib.php';
 require_once './lib/digiriskdolibarr_function.lib.php';
 
-global $langs, $conf, $db, $user, $hookmanager;
+global $conf, $db, $hookmanager, $langs, $user;
 
 // Load translation files required by the page
 $langs->loadLangs(array("digiriskdolibarr@digiriskdolibarr", "other"));
@@ -67,10 +68,11 @@ $page        = is_numeric($page) ? $page : 0;
 $page        = $page == -1 ? 0 : $page;
 
 // Initialize technical objects
-$object          = new DigiriskElement($db);
-$evaluator       = new Evaluator($db);
-$extrafields     = new ExtraFields($db);
-$refEvaluatorMod = new $conf->global->DIGIRISKDOLIBARR_EVALUATOR_ADDON();
+$object           = new DigiriskElement($db);
+$digiriskstandard = new DigiriskStandard($db);
+$evaluator        = new Evaluator($db);
+$extrafields      = new ExtraFields($db);
+$refEvaluatorMod  = new $conf->global->DIGIRISKDOLIBARR_EVALUATOR_ADDON();
 
 $hookmanager->initHooks(array('evaluatorcard', 'globalcard')); // Note that conf->hooks_modules contains array
 
@@ -160,7 +162,7 @@ if (empty($reshook)) {
 		$evaluator->fk_user         = $evaluatorID;
 		$evaluator->fk_parent       = $object->id;
 
-		$evaluator->create($user, true);
+		$evaluator->create($user);
 	}
 
 	if (!$error && ($massaction == 'delete' || ($action == 'delete' && $confirm == 'yes')) && $permissiontodelete) {
@@ -168,21 +170,29 @@ if (empty($reshook)) {
 			foreach ($toselect as $toselectedid) {
 				$evaluator->fetch($toselectedid);
 
-				$result = $evaluator->delete($user, true);
+				$result = $evaluator->delete($user);
 
 				if ($result > 0) {
-					// Delete evaluator OK
-					$urltogo = str_replace('__ID__', $result, $backtopage);
-					$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
-					header("Location: ".$urltogo);
+					setEventMessages($langs->trans('DeleteEvaluatorMessage').' '.$evaluator->ref, array());
 				} else {
 					// Delete evaluator KO
+					$error++;
 					if (!empty($evaluator->errors)) setEventMessages(null, $evaluator->errors, 'errors');
 					else  setEventMessages($evaluator->error, null, 'errors');
 				}
 			}
-			header("Location: ".$urltogo);
-			exit;
+
+			if ($error > 0) {
+				// Delete evaluator KO
+				if (!empty($evaluator->errors)) setEventMessages(null, $evaluator->errors, 'errors');
+				else  setEventMessages($evaluator->error, null, 'errors');
+			} else {
+				// Delete evaluator OK
+				$urltogo = str_replace('__ID__', $id, $backtopage);
+				$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
+				header("Location: ".$urltogo);
+				exit;
+			}
 		}
 	}
 }
@@ -212,7 +222,21 @@ if ($object->id > 0) {
 	// ------------------------------------------------------------
 	$width = 80;
 	dol_strlen($object->label) ? $morehtmlref = ' - ' . $object->label : '';
-	$morehtmlleft .= '<div class="floatleft inline-block valignmiddle divphotoref">'.digirisk_show_photos('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$entity].'/'.$object->element_type, 'small', 5, 0, 0, 0, $width,0, 0, 0, 0, $object->element_type, $object).'</div>';
+	$morehtmlref .= '<div class="refidno">';
+	// ParentElement
+	$parent_element = new DigiriskElement($db);
+	$result = $parent_element->fetch($object->fk_parent);
+	if ($result > 0) {
+		$morehtmlref .= $langs->trans("Description").' : '.$object->description;
+		$morehtmlref .= '<br>'.$langs->trans("ParentElement").' : '.$parent_element->getNomUrl(1, 'blank', 1);
+	}
+	else {
+		$digiriskstandard->fetch($conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD);
+		$morehtmlref .= $langs->trans("Description").' : '.$object->description;
+		$morehtmlref .= '<br>'.$langs->trans("ParentElement").' : '.$digiriskstandard->getNomUrl(1, 'blank', 1);
+	}
+	$morehtmlref .= '</div>';
+	$morehtmlleft = '<div class="floatleft inline-block valignmiddle divphotoref">'.digirisk_show_photos('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity].'/'.$object->element_type, 'small', 5, 0, 0, 0, $width,0, 0, 0, 0, $object->element_type, $object).'</div>';
 	digirisk_banner_tab($object, 'ref', '', 0, 'ref', 'ref', $morehtmlref, '', 0, $morehtmlleft);
 
 	print '<div class="fichecenter wpeo-wrap">';
@@ -386,7 +410,7 @@ if ($object->id > 0) {
 							<input type="hidden" class="user-selected" value="<?php echo $user->id ?>">
 							<select class="minwidth200" id="userid" name="userid" data-select2-id="userid">
 								<?php
-								$userlist = $form->select_dolusers('','userid',0 , null, 0,'','','0',0,0,'',0, '','',0,3,false);
+								$userlist = $form->select_dolusers('','userid',0 , null, 0,'','', $conf->entity,0,0,'',0, '','',0,3,false);
 
 								foreach ($userlist as $key => $userselect) { ?>
 									<option value="<?php echo $key; ?>" data-select2-id="<?php echo $key.$userselect; ?>"><?php echo $userselect; ?></option>

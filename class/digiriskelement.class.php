@@ -70,7 +70,7 @@ class DigiriskElement extends CommonObject
 		'tms'           => array('type'=>'timestamp', 'label'=>'DateModification', 'enabled'=>'1', 'position'=>50, 'notnull'=>0, 'visible'=>-2,),
 		'import_key'    => array('type'=>'integer', 'label'=>'ImportId', 'enabled'=>'1', 'position'=>60, 'notnull'=>1, 'visible'=>-2,),
 		'status'        => array('type'=>'smallint', 'label'=>'Status', 'enabled'=>'1', 'position'=>70, 'notnull'=>1, 'default' => 1, 'visible'=>1, 'index'=>1,),
-		'label'         => array('type'=>'varchar(255)', 'label'=>'Label', 'enabled'=>'1', 'position'=>80, 'notnull'=>1, 'visible'=>1, 'searchall'=>1, 'css'=>'minwidth200', 'help'=>"Help text", 'showoncombobox'=>'1',),
+		'label'         => array('type'=>'varchar(255)', 'label'=>'Label', 'enabled'=>'1', 'position'=>80, 'notnull'=>1, 'visible'=>1, 'searchall'=>1, 'css'=>'minwidth400', 'help'=>"Help text", 'showoncombobox'=>'1',),
 		'description'   => array('type'=>'textarea', 'label'=>'Description', 'enabled'=>'1', 'position'=>90, 'notnull'=>0, 'visible'=>3,),
 		'element_type'  => array('type'=>'varchar(50)', 'label'=>'ElementType', 'enabled'=>'1', 'position'=>100, 'notnull'=>-1, 'visible'=>1,),
 		'photo'         => array('type'=>'varchar(255)', 'label'=>'Photo', 'enabled'=>'1', 'position'=>105, 'notnull'=>-1, 'visible'=>-2,),
@@ -604,8 +604,8 @@ class DigiriskElement extends CommonObject
 		$result .= $linkstart;
 		if ($withpicto) $result .= '<i class="fas fa-info-circle"></i>' . ' ';
 		if ($withpicto != 2) $result .= $this->ref;
-		$result .= $linkend;
 		if ($withpicto != 2) $result .= (($addlabel && $this->label) ? $sep.dol_trunc($this->label, ($addlabel > 1 ? $addlabel : 0)) : '');
+		$result .= $linkend;
 
 		global $action;
 		$hookmanager->initHooks(array('digiriskelementtdao'));
@@ -616,7 +616,7 @@ class DigiriskElement extends CommonObject
 
 		return $result;
 	}
-	
+
 	/**
 	 * 	Return list of deleted elements
 	 *

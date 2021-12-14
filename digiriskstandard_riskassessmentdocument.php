@@ -159,7 +159,7 @@ if (empty($reshook)) {
 	}
 
 	// Action to build doc
-	if ($action == 'builddoc' && $permissiontoadd) {
+	if (($action == 'builddoc' || GETPOST('forcebuilddoc')) && $permissiontoadd) {
 
 		$outputlangs = $langs;
 		$newlang = '';
@@ -268,6 +268,7 @@ if (empty($reshook)) {
 				$urltoredirect = $_SERVER['REQUEST_URI'];
 				$urltoredirect = preg_replace('/#builddoc$/', '', $urltoredirect);
 				$urltoredirect = preg_replace('/action=builddoc&?/', '', $urltoredirect); // To avoid infinite loop
+				$urltoredirect = preg_replace('/forcebuilddoc=1&?/', '', $urltoredirect); // To avoid infinite loop
 
 				header('Location: ' . $urltoredirect . '#builddoc');
 				exit;
@@ -369,15 +370,56 @@ if (empty($reshook)) {
 		if ( $action == 'edit' ) {
 			print '<input type="submit" class="button" name="save" value="' . $langs->trans("Save") . '">';
 		} else {
-			print '<a class="butAction" id="actionButtonEdit" href="' . $_SERVER["PHP_SELF"] . '?action=edit">' . $langs->trans("Modify") . '</a>' . "\n";
-			print '<a class="butAction" id="actionButtonSign" href="' . $_SERVER['PHP_SELF'] . '?id=' . $object->id . '&action=presend&mode=init#formmailbeforetitle&sendto=' . $allLinks['LabourInspectorSociety']->id[0] . '">' . $langs->trans('SendMail') . '</a>';
+			print '<a class="butAction" id="actionButtonEdit" href="' . $_SERVER["PHP_SELF"] . '?action=edit">' . $langs->trans("Modify") . '</a>';
+
+			$active = isset($conf->global->DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_AUDIT_START_DATE) && strlen($conf->global->DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_AUDIT_START_DATE);
+			if ($active) {
+				$dir_files  = 'riskassessmentdocument';
+				$filedir    = $upload_dir . '/' . $dir_files;
+				$files      = dol_dir_list($filedir);
+				$empty = 1;
+
+				foreach ($files as $file) {
+					if ($file['type'] != 'dir') {
+						$empty = 0;
+					}
+				}
+
+				if ($empty == 0) {
+					print '<a class="butAction" id="actionButtonSendMail" href="' . $_SERVER['PHP_SELF'] . '?id=' . $object->id . '&action=presend&mode=init#formmailbeforetitle&sendto=' . $allLinks['LabourInspectorSociety']->id[0] . '">' . $langs->trans('SendMail') . '</a>';
+				} else {
+					// Model
+					$class = 'ModeleODTRiskAssessmentDocument';
+					$modellist = call_user_func($class.'::liste_modeles', $db, 100);
+
+					if (!empty($modellist))
+					{
+						asort($modellist);
+						$modellist = array_filter($modellist, 'remove_index');
+						if (is_array($modellist) && count($modellist) == 1)    // If there is only one element
+						{
+							$arraykeys = array_keys($modellist);
+							$arrayvalues = preg_replace('/template_/','', array_values($modellist)[0]);
+							$modellist[$arraykeys[0]] = $arrayvalues;
+							$modelselected = $arraykeys[0];
+						}
+					}
+					if (dol_strlen($modelselected) > 0) {
+						print '<a class="butAction send-risk-assessment-document-by-mail" id="actionButtonSendMail"  href="' . $_SERVER['PHP_SELF'] . '?id=' . $object->id . '&action=presend&forcebuilddoc=1&model='.$modelselected.'&mode=init#formmailbeforetitle&sendto=' . $allLinks['LabourInspectorSociety']->id[0] . '">' . $langs->trans('SendMail') . '</a>';
+					} else {
+						print '<a class="butAction send-risk-assessment-document-by-mail" id="actionButtonSendMail"  href="' . $_SERVER['PHP_SELF'] . '?id=' . $object->id . '&action=presend&mode=init#formmailbeforetitle&sendto=' . $allLinks['LabourInspectorSociety']->id[0] . '">' . $langs->trans('SendMail') . '</a>';
+					}
+				}
+			} else {
+				print '<span class="butActionRefused classfortooltip" href="#" title="' . dol_escape_htmltag($langs->trans("SetStartEndDateBeforeSendEmail")) . '">' . $langs->trans('SendEmail') . '</span>';
+			}
 		}
 	} else {
 		if ( $action == 'edit' ) {
-			print '<a class="butActionRefused classfortooltip" href="#" title="' . dol_escape_htmltag($langs->trans("NotEnoughPermissions")) . '">' . $langs->trans('Save') . '</a>' . "\n";
+			print '<a class="butActionRefused classfortooltip" href="#" title="' . dol_escape_htmltag($langs->trans("NotEnoughPermissions")) . '">' . $langs->trans('Save') . '</a>';
 		} else {
-			print '<a class="butActionRefused classfortooltip" href="#" title="' . dol_escape_htmltag($langs->trans("NotEnoughPermissions")) . '">' . $langs->trans('Modify') . '</a>' . "\n";
-			print '<a class="butActionRefused classfortooltip" href="#" title="' . dol_escape_htmltag($langs->trans("NotEnoughPermissions")) . '">' . $langs->trans('SendEmail') . '</a>' . "\n";
+			print '<a class="butActionRefused classfortooltip" href="#" title="' . dol_escape_htmltag($langs->trans("NotEnoughPermissions")) . '">' . $langs->trans('Modify') . '</a>';
+			print '<a class="butActionRefused classfortooltip" href="#" title="' . dol_escape_htmltag($langs->trans("NotEnoughPermissions")) . '">' . $langs->trans('SendEmail') . '</a>';
 		}
 	}
 }

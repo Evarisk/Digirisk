@@ -183,9 +183,10 @@ $formother = new FormOther($db);
 $title = $langs->trans("PreventionPlanList");
 $help_url = '';
 
+$morejs   = array("/digiriskdolibarr/js/digiriskdolibarr.js.php");
 $morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");
 
-llxHeader("", $title, $help_url, '', '', '', '', $morecss, '', 'classforhorizontalscrolloftabs');
+llxHeader("", $title, $help_url, '', '', '', $morejs, $morecss, '', 'classforhorizontalscrolloftabs');
 
 // Add $param from extra fields
 include DOL_DOCUMENT_ROOT.'/core/tpl/extrafields_list_search_param.tpl.php';
@@ -443,7 +444,7 @@ while ($i < ($limit ? min($num, $limit) : $num)) {
 			print '<td' . ($cssforfield ? ' class="' . $cssforfield . '"' : '') . ' style="width:2%">';
 			if ($key == 'status') print $preventionplan->getLibStatut(5);
 			elseif ($key == 'ref') {
-				print $preventionplan->getNomUrl();
+				print '<i class="fas fa-info"></i>  ' . $preventionplan->getNomUrl();
 			} elseif ($key == 'date_start') {
 				print dol_print_date($preventionplan->date_start, 'dayhour', 'tzserver');	// We suppose dates without time are always gmt (storage of course + output)
 			} elseif ($key == 'date_end') {

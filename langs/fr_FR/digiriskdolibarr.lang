@@ -44,8 +44,10 @@ Uncompleted = Non complété
 DigiriskData = Données configurables de Digirisk
 DigiriskManagement = Redirection après la connexion au site
 DigiriskDescription = Redirection sur la page de bienvenue de Digirisk par défaut au lieu de celle de Dolibarr.
-
-
+HowToSetupIHM = Pour plus de fonctionnalités sur l'affichage de Dolibarr (Configuration de l'image de fond du Dolibarr, etc), vous pouvez vous rendre sur ce lien :
+ConfigIHM = Configuration de l'affichage
+ConfigDico =  Accéder à la page de configuration des dictionnaires
+LinkedProject = Projet lié
 
 #
 # Page À propos
@@ -109,6 +111,10 @@ DigiriskAdminUserGroupDescription = Le groupe d'administrateurs Digirisk possèd
 DigiriskAdminUserGroup = Groupe de lecteurs Digirisk
 DigiriskAdminUserGroupDescription = Le groupe de lecteurs Digirisk possède toutes les permissions de lecture, mais aucune d'écriture ni de suppression à Digirisk
 
+ContractType = Type de contrat
+Apprentice/Student = Apprenti/Elève
+Interim = Intérimaire
+ProfessionalQualification = Qualification professionnelle
 
 
 #
@@ -211,7 +217,7 @@ ActionsOnLegalDisplay = Événements liés à l'affichage légal
 LegalDisplayGeneratedWithDolibarr = Affichage légal généré avec Dolibarr
 
 # Mod Numbering - Modèle de numérotation
-DigiriskLegalDisplayNumberingModule = Modèle de numérotation des affichages légaux de Digirisk
+DigiriskLegalDisplayDocumentNumberingModule = Modèle de numérotation des affichages légaux de Digirisk
 DigiriskNumberingDate = Fixe la référence comme étant la date et l'heure de création.
 DigiriskLegalDisplayStandardModel = Renvoie le numéro sous la forme LDn où n est un compteur séquentiel sans rupture et sans remise à 0.
 
@@ -261,7 +267,7 @@ ActionsOnInformationsSharing = Événements liés à la diffusion d'informations
 InformationsSharingGeneratedWithDolibarr = Diffusion d'informations générée avec Dolibarr
 
 # Mod Numbering - Modèle de numérotation
-DigiriskInformationsSharingNumberingModule = Modèle de numérotation des diffusions d'information de Digirisk
+DigiriskInformationsSharingDocumentNumberingModule = Modèle de numérotation des diffusions d'information de Digirisk
 DigiriskInformationsSharingStandardModel = Renvoie le numéro sous la forme ISn où n est un compteur séquentiel sans rupture et sans remise à 0.
 
 # ODT Template - Template ODT
@@ -312,6 +318,9 @@ PreventionPlanArchivedTrigger = Plan de prévention archivé
 PreventionPlanAddAttendantTrigger = Ajout d'un participant au plan de prévention
 PreventionPlanSentByMailTrigger = Email plan de prévention envoyé
 PreventionPlanOpeningHoursCreateTrigger = Enregistrement des horaires du plan de prévention
+PP_EXT_SOCIETY_INTERVENANTSSigned = Signature de l'intervenant
+PP_EXT_SOCIETY_RESPONSIBLESigned = Signature du responsable de la société extérieure
+PP_MAITRE_OEUVRESigned = Signature du maître d'oeuvre
 
 # Mod Numbering - Modèle de numérotation
 DigiriskPreventionPlanNumberingModule = Modèle de numérotation des plans de prévention de Digirisk
@@ -370,7 +379,7 @@ ValidatePendingSignature = Validé (en attente de signature)
 LockPreventionPlan = Verrouiller le plan de prévention
 ConfirmLockPreventionPlan = Êtes-vous sûr de vouloir verrouiller le plan de prévention ?<br>Ce verrouillage permet de figer les données et la génération du document.
 NoIntervenantsYet = Il n'y a aucun intervenant pour le moment, vous pouvez en ajouter à l'aide du "+" situé en haut à droite de ce tableau
-PreventionPlanMustBeLocked = Le plan de prévention doit être verrouillé pour accéder à cette fonctionnalité
+PreventionPlanMustBeLocked = Le plan de prévention ne doit pas déjà être généré et doit être verrouillé pour accéder à cette fonctionnalité
 AllSignatoriesMustHaveSigned = Tous les participants doivent avoir signé pour verrouiller l'objet
 ValidatePreventionPlan = Valider le plan de prévention
 ConfirmValidatePreventionPlan = Êtes-vous sûr de vouloir valider le plan de prévention ? <br> La validation permet aux participants de signer le document mais <b> empêche l'ajout de nouveaux participants ou la modification du plan de prévention </b>.
@@ -451,6 +460,9 @@ FirePermitArchivedTrigger = Permis de feu archivé
 FirePermitAddAttendantTrigger = Ajout d'un participant au permis de feu
 FirePermitSentByMailTrigger = Email permis de feu envoyé
 FirePermitOpeningHoursCreateTrigger = Enregistrement des horaires du permis de feu
+FP_EXT_SOCIETY_INTERVENANTSSigned = Signature de l'intervenant
+FP_EXT_SOCIETY_RESPONSIBLESigned = Signature du responsable de la société extérieure
+FP_MAITRE_OEUVRESigned = Signature du maître d'oeuvre
 
 # Mod Numbering - Modèle de numérotation
 DigiriskFirePermitNumberingModule = Modèle de numérotation des permis de feu de Digirisk
@@ -490,7 +502,7 @@ FirePermitMustBeInProgressToValidate = Le permis de feu est déjà validé
 FirePermitMustBeValidated = Le permis de feu doit être validé pour le rouvrir
 FirePermitMustBeValidatedToSign = Le permis de feu doit être validé pour que les participants puissent signer
 FirePermitMustBeLockedToSendEmail = Le permis de feu doit être verrouillé pour envoyer un email
-FirePermitMustBeLocked = Le permis de feu doit être verrouillé pour accéder à cette fonctionnalité
+FirePermitMustBeLocked = Le permis de feu ne doit pas déjà être généré doit être verrouillé pour accéder à cette fonctionnalité
 GoToLockFirePermit = Verrouiller le permis de feu
 GoToValidateFirePermit = Valider le permis de feu
 FirePermitAttendants = Permis de feu - Participants
@@ -514,6 +526,162 @@ FirePermitContent = Veuillez trouver ci-joint le document ODT du permis de feu.
 
 
 #
+# Accident - Accident
+#
+
+# Right - Droit
+ReadAccident = Consulter l'accident
+CreateAccident = Créer/Modifier l'accident
+DeleteAccident = Supprimer l'accident
+
+# Trigger - Déclencheur
+ACCIDENT_CREATEInDolibarr = Accident créé dans Dolibarr
+ActionsOnAccident = Événements liés au accident
+AccidentGeneratedWithDolibarr = Accident généré avec Dolibarr
+AccidentWorkStopCreateTrigger = Un arrêt de travail a été ajouté à l'accident
+AccidentWorkStopModifyTrigger = Un arrêt de travail a été modifié sur l'accident
+AccidentWorkStopDeleteTrigger = Un arrêt de travail a été suprimmé de l'accident
+AccidentModifyTrigger = Modification de l'accident
+AccidentMetaDataCreateTrigger = Enregistrement des données complémentaires de l'accident
+AccidentLesionCreateTrigger = Une lésion a été ajoutée à l'accident
+AccidentLesionModifyTrigger = Une lésion a été modifiée sur l'accident
+AccidentLesionDeleteTrigger = Une lésion a été supprimée de l'accident
+ACC_USER_EMPLOYERSigned = Signature du reponsable de l'entreprise
+
+# Mod Numbering - Modèle de numérotation
+DigiriskAccidentNumberingModule = Modèle de numérotation des accidents de Digirisk
+DigiriskAccidentStandardModel = Renvoie le numéro sous la forme ACCn où n est un compteur séquentiel sans rupture et sans remise à 0.
+DigiriskAccidentWorkStopNumberingModule = Modèle de numérotation des arrêts de travail liés à l'accident
+DigiriskAccidentWorkStopStandardModel = Renvoie le numéro sous la forme ACCWn où n est un compteur séquentiel sans rupture et sans remise à 0.
+DigiriskAccidentLesionNumberingModule = Modèle de numérotation des lésions liées à l'accident
+DigiriskAccidentLesionStandardModel = Renvoie le numéro sous la forme ACCLn où n est un compteur séquentiel sans rupture et sans remise à 0.
+DigiriskAccidentDocumentNumberingModule = Modèle de numérotation des fiches d'accident de Digirisk
+DigiriskAccidentDocumentStandardModel = Renvoie le numéro sous la forme ACCDn où n est un compteur séquentiel sans rupture et sans remise à 0.
+
+# ODT Template - Template ODT
+DigiriskTemplateDocumentAccident = Modèle de documents des accidents de Digirisk
+AccidentDocumentCustomDigiriskTemplate = ODT custom des accidents
+AccidentDocumentDigiriskTemplate = ODT par défaut des accidents
+AccidentDocument = Fiche d'Accident
+AccidentDocumentGeneratedWithDolibarr = Accident généré avec Dolibarr
+
+# Data - Donnée
+NewAccident = Nouvel accident
+ModifyAccident = Modifier l'accident
+AccidentList = Liste des accidents
+Accident = Accident
+AccidentLine = risque(s)
+AccidentDate = Date de l'accident
+AccidentSchedule = Horaires du permis de feu
+AccidentRiskList = Liste d'informations complémentaires sur l'accident
+AddAccidentWorkStop = Ajout d'un arrêt de travail sur l'accident
+UpdateAccidentWorkStop = Mise à jour d'un arrêt de travail sur l'accident
+DeleteAccidentWorkStop = Suppression d'un arrêt de travail sur l'accident
+AddAccidentLesion = Ajout d'une lésion sur l'accident
+UpdateAccidentLesion = Mise à jour d'une lésion sur l'accident
+DeleteAccidentLesion = Suppression d'une lésion sur l'accident
+AccidentInitial = ACC
+AccidentDescription = Projet des accidents
+AccidentManagement = Gestion des accidents
+ACCProject = Projet lié aux accidents
+UserVictim = Victime de l'accident
+AccidentType = Type de l'accident
+WorkAccidentStatement = Accident de travail
+CommutingAccident = Accident de trajet
+AccidentMetaData = Données complémentaires
+RelativeLocation = Précisions complémentaires sur le lieu de l’accident
+VictimActivity = Activité de la victime lors de l'accident
+AccidentNature = Nature de l’accident
+AccidentObject = Objet dont le contact a blessé la victime
+AccidentNatureDoubt = Eventuelles réserves motivées (joignez, si besoin, une lettre d'accompagnement)
+AccidentNatureDoubtLink = Lien vers la lettre d'accompagnement
+VictimTransportedTo = La victime a été transportée à
+VictimWorkHours = Horaire de travail de la victime le jour de l’accident
+AccidentNoticed = Information de l'accident
+Found = Constaté
+Known = Connu
+AccidentNoticeDate = Date de prise de connaissance de l'accident
+AccidentNoticeBy = La personne qui a informé de l'accident
+ByEmployer = Par l’employeur
+ByEmployees = Par ses préposés
+AccidentDescribedByVictim = Décrit par la victime
+RegisteredInAccidentRegister = L'accident est inscrit au registre d'accidents du travail bénins
+RegisterDate = Date d'inscription au registre d'accidents du travail bénins
+RegisterNumber = Numéro d'inscription au registre d'accidents du travail bénins
+Consequence = Conséquences
+WithoutWorkStop = Sans arrêt de travail
+WithWorkStop = Avec arrêt de travail
+Fatal = Décès
+PoliceReport = Rapport de police
+PoliceReportBy = La personne qui a établi le rapport de police
+FirstPersonNoticedIsWitness = Personne avisée
+Witness = Témoin
+FirstPersonNoticed = Première personne avisée
+UserNoticed = Utilisateur avisée
+ThirdPartyResponsability = L’accident a-t-il été causé par un tiers ?
+FkSocResponsible = Société du tiers responsable
+FkSocResponsibleInsuranceSociety = Société d’assurance du tiers
+LesionLocalization = Siège des lésions
+LesionNature = Nature des lésions
+AccidentInvestigation = Enquête accident
+AccidentInvestigationLink = Lien vers l'enquête accident
+AccidentLocation = Lieu de l'accident
+CollateralVictim = Victime collatérale
+FromDigirisk = De
+At = À
+AndFrom = Et de
+ExternalAccident = L'accident a-t-il eu lieu dans un autre établissement que celui d'attache de la victime
+AccidentAttendants = Accident - Participants
+UserEmployer = Responsable de la société
+SignatureUserEmployer = Signature du responsable de la société
+
+
+CerfaLink = Lien vers le Cerfa
+WorkStopDays = Nombre de jour d'arrêt de travail
+AccidentLesionList = Liste des lésions lié à l'accident
+DocumentsMetaData = Fichiers joints complémentaires
+WorkStopDocument = Déclaration d'arrêt de travail
+AccidentMetaDataSave = Les données complémentaires de l'accident ont bien été enregistrées
+ErrorFieldNotEmpty = Erreur : Le champ '%s' ne peut pas être vide
+ConfirmDeleteAccidentWorkStop = Êtes-vous sûr de vouloir supprimer l'arrêt de travail <b>%s</b> sur l'accident ?
+
+# Dictionnary - Dictionnaire
+UsualWorkplace = Lieu de travail habituel
+OccasionalWorkplace = Lieu de travail occasionnel
+LocationOfTheMeal = Lieu du repas
+OnTheWayBetweenHomeAndWorkplace = Au cours du trajet entre le domicile et le lieu de travail
+OnTheWayBetweenMealAndWorkplace = Au cours du trajet entre le travail et le lieu du repas
+DuringATripForTheEmployer = Au cours d'un déplacement pour l'employeur
+
+Trunk = Tronc
+Hand = Main
+LowerLimbs = Membres inférieurs
+UpperLimbs = Membres supérieurs
+MultipleLocations = Localisations multiples
+Foot = Pied
+Head = Tête
+Eyes = Yeux
+InternalSeating = Sièges internes
+Neck = Cou
+Back = Bas
+WholeBody = Ensemble du corps
+NotSpecified = Non précisé
+
+PainEffortLumbago = Douleur effort lumbago
+Contusion = Contusion
+Wounds = Plaies
+Sprain = Entorse
+FracturePitting = Fracture félûre
+MultipleInjuries = lésions de nature multiple
+MuscleOrTendonTear = Déchirure musculaire ou tendineuse
+PresenceOfForeignBody = Présence corps étranger
+Burns = Brûlure
+UnspecifiedAndMiscellaneous = Non précisé et divers
+Other = Autres
+
+
+
+#
 # ListingRisksPhoto - Listing des risques Photo
 #
 
@@ -526,7 +694,7 @@ DeleteListingRisksPhoto = Supprimer les listing des risques avec photos
 ListingRisksPhotoGeneratedWithDolibarr = Listing de risques photo généré avec Dolibarr
 
 # Mod Numbering - Modèle de numérotation
-DigiriskListingRisksPhotoNumberingModule = Modèle de numérotation des listing des risques photo de Digirisk
+DigiriskListingRisksPhotoDocumentNumberingModule = Modèle de numérotation des listing des risques photo de Digirisk
 DigiriskListingRisksPhotoStandardModel = Renvoie le numéro sous la forme RLPn où n est un compteur séquentiel sans rupture et sans remise à 0.
 
 # ODT Template - Template ODT
@@ -552,7 +720,7 @@ DeleteListingRisksAction = Supprimer les listing des risques avec actions correc
 ListingRisksActionGeneratedWithDolibarr = Listing de risques actions correctives généré avec Dolibarr
 
 # Mod Numbering - Modèle de numérotation
-DigiriskListingRisksActionNumberingModule = Modèle de numérotation des listing des actions correctives de Digirisk
+DigiriskListingRisksActionDocumentNumberingModule = Modèle de numérotation des listing des actions correctives de Digirisk
 DigiriskListingRisksActionStandardModel = Renvoie le numéro sous la forme RLAn où n est un compteur séquentiel sans rupture et sans remise à 0.
 
 # ODT Template - Template ODT
@@ -579,7 +747,7 @@ DeleteRiskAssessmentDocument = Supprimer le document unique
 RiskAssessmentDocumentGeneratedWithDolibarr = Document unique généré avec Dolibarr
 
 # Mod Numbering - Modèle de numérotation
-DigiriskRiskAssessmentDocumentNumberingModule = Modèle de numérotation des documents unique de Digirisk
+DigiriskRiskAssessmentDocumentDocumentNumberingModule = Modèle de numérotation des documents unique de Digirisk
 DigiriskRiskAssessmentDocumentStandardModel = Renvoie le numéro sous la forme DUn où n est un compteur séquentiel sans rupture et sans remise à 0.
 
 # ODT Template - Template ODT
@@ -600,7 +768,14 @@ Sources = Sources
 ImportantNote = Remarque importante
 SitePlans = Localisation des plans
 SetStartEndDateBefore = Définissez la date de début et la date de fin d'audit sur cette page pour générer ce document
+SetStartEndDateBeforeSendEmail = Définissez la date de début et la date de fin d'audit sur cette page pour envoyer un email
 NoSitePlans = Aucun plan de la société renseigné
+
+# Boxes - Widget
+RiskAssessmentDocumentBox = Box Document unique
+RiskAssessmentDocumentBoxTitle = Informations du Document unique
+LastGenerateDate = Date de dernière génération du document unique
+MandatoryUpdateEvery = Mise à jour obligatoire tous les
 
 # Email - Mail
 RiskAssessmentDocumentLabel = Récapitulatif du document unique
@@ -619,7 +794,7 @@ RiskAssessmentDocumentContent = Veuillez trouver ci-joint le ZIP et le document 
 GroupmentDocumentGeneratedWithDolibarr = Fiche de groupement générée avec Dolibarr
 
 # Mod Numbering - Modèle de numérotation
-DigiriskGroupmentDocumentNumberingModule = Modèle de numérotation des fiches de groupement de Digirisk
+DigiriskGroupmentDocumentDocumentNumberingModule = Modèle de numérotation des fiches de groupement de Digirisk
 DigiriskGroupmentDocumentStandardModel = Renvoie le numéro sous la forme GPDn où n est un compteur séquentiel sans rupture et sans remise à 0.
 
 # ODT Template - Template ODT
@@ -642,7 +817,7 @@ GroupmentDocument = Fiche de Groupement
 WorkUnitDocumentGeneratedWithDolibarr = Fiche d'Unité de travail générée avec Dolibarr
 
 # Mod Numbering - Modèle de numérotation
-DigiriskWorkUnitDocumentNumberingModule = Modèle de numérotation des fiches d'unité de travail de Digirisk
+DigiriskWorkUnitDocumentDocumentNumberingModule = Modèle de numérotation des fiches d'unité de travail de Digirisk
 DigiriskWorkUnitDocumentStandardModel = Renvoie le numéro sous la forme WUDn où n est un compteur séquentiel sans rupture et sans remise à 0.
 
 # ODT Template - Template ODT
@@ -681,6 +856,8 @@ OrganizationNotSaved = L'organisation et des groupements et des unités de trava
 # Trigger - Déclencheur
 GROUPMENT_CREATEInDolibarr = Groupement créé dans Dolibarr
 ActionsOnGroupment = Événements liés au groupement
+groupmentCreatedWithDolibarr = Groupement créé dans Dolibarr
+workunitCreatedWithDolibarr = Unité de travail créée dans Dolibarr
 
 # Mod Numbering - Modèle de numérotation
 DigiriskGroupmentNumberingModule = Modèle de numérotation des groupements de Digirisk
@@ -688,12 +865,13 @@ DigiriskGroupmentStandardModel = Renvoie le numéro sous la forme GPn où n est 
 
 # Data - Donnée
 Groupment = Groupement
+GroupmentManagement = Gestion des données des groupements
 NewGroupment = Nouveau groupement
 ModifyGroupment = Modifier groupement
 TrashGroupment = Groupement poubelle
 DeletedElements = Corbeille
-DeletedDigiriskElement = Groupements / Unités de travail placées dans la corbeille
-ShowDeletedDigiriskElement = Afficher les groupements / unités de travail qui se trouve dans la corbeille
+DeletedDigiriskElement = Groupements / Unités de travail placés dans la corbeille
+ShowDeletedDigiriskElement = Afficher les groupements / unités de travail qui se trouvent dans la corbeille
 
 #
 # WorkUnit - Unité de travail
@@ -709,6 +887,7 @@ DigiriskWorkUnitStandardModel = Renvoie le numéro sous la forme WUn où n est u
 
 # Data - Donnée
 WorkUnit = Unité de travail
+WorkUnitManagement = Gestion des données des unités de travail
 NewWorkUnit = Nouvelle unité de travail
 ModifyWorkUnit = Modifier unité de travail
 
@@ -724,8 +903,11 @@ CreateEvaluator = Créer/Modifer les évaluateurs
 DeleteEvaluator = Supprimer les évaluateurs
 
 # Trigger - Déclencheur
-EVALUATOR_CREATEInDolibarr = Évaluateur créée dans Dolibarr
+EVALUATOR_CREATEInDolibarr = Évaluateur créé dans Dolibarr
 ActionsOnÉvaluateur = Événements liés au évaluateur
+EvaluatorCreateTrigger = Évaluateur créé
+EvaluatorModifyTrigger = Évaluateur modifié
+EvaluatorDeleteTrigger = Évaluateur supprimé
 
 # Mod Numbering - Modèle de numérotation
 DigiriskEvaluatorNumberingModule = Modèle de numérotation des évaluateurs de Digirisk
@@ -746,8 +928,10 @@ EvaluationDuration = Durée
 UserAssigned = Utilisateur assigné
 AddEvaluatorTitle = Ajout d'un évaluateur
 AddEvaluatorButton = Ajouter l'évaluateur
+EvaluatorConfig = Configuration des données des évaluateurs
+DeleteEvaluatorMessage = Suppression de l'évaluateur
 
-DigiriskEvaluatorData = Données des Évaluateurs
+DigiriskEvaluatorData = Données configurables des évaluateurs
 EvaluatorDuration = Durée de l'évalution par l'évaluateur
 EvaluatorDurationDescription = Le temps que met l'évaluateur à réaliser son évaluation des risques
 
@@ -783,6 +967,11 @@ ReadDigiriskRisk = Consulter les risques
 CreateDigiriskRisk = Créer/Modifier les risques
 DeleteDigiriskRisk = Supprimer les risques
 
+# Trigger - Déclencheur
+RiskCreateTrigger = Risque créé
+RiskModifyTrigger = Risque modifié
+RiskDeleteTrigger = Risque supprimé
+
 # Mod Numbering - Modèle de numérotation
 DigiriskRiskNumberingModule = Modèle de numérotation des risques de Digirisk
 DigiriskRiskStandardModel = Renvoie le numéro sous la forme RKn où n est un compteur séquentiel sans rupture et sans remise à 0.
@@ -790,6 +979,7 @@ DigiriskRiskStandardModel = Renvoie le numéro sous la forme RKn où n est un co
 # Data - Donnée
 Risks = Risques
 Risk = Risque
+RiskConfig = Configuration des données des risques
 TheRisk = Le risque
 RiskWellCreated = Risque créé
 RiskNotCreated = Erreur lors de la création du risque
@@ -810,6 +1000,8 @@ DigiriskElementRisk = Risques
 RiskDescriptionNotEnabled = Le champ description du risque n'est pas activé
 HowToEnableRiskDescription = Pour activer le champ description du risque, allez dans "Configuration du module -> Analyse de risque -> Risque"
 HowToEnableRiskCategoryEdit = Pour activer la modification de la catégorie de risque, allez dans "Configuration du module -> Analyse de risque -> Risque"
+SortRisksListingsByCotation = Trier les risques par cotation
+SortRisksListingsByCotationDescription =  Activer le tri automatique des risques par cotation dans les listings
 
 DigiriskRiskData = Données configurables des risques
 RiskDescription = Description du risque
@@ -825,10 +1017,17 @@ MoveRisk = Déplacer le risque
 MoveRisks = Déplacer les risques
 MoveRisksDescription = Permet de déplacer les risques d'un groupement ou d'une unité de travail à un(e) autre
 SetConfToMoveRisk = Vous devez d'abord autoriser le déplacement des risques dans "Configuration du module -> Analyse de risques -> Risque"
+RiskDescriptionPrefill = Préremplir la description
+RiskDescriptionPrefillDescription = Préremplir la description du risque avec le nom de la catégorie
 
 #
 # RiskAssessment - Évaluation
 #
+
+# Trigger - Déclencheur
+RiskAssessmentCreateTrigger = Évaluation créée
+RiskAssessmentModifyTrigger = Évaluation modifiée
+RiskAssessmentDeleteTrigger = Évaluation supprimée
 
 # Mod Numbering - Modèle de numérotation
 DigiriskRiskAssessmentStandardModel = Renvoie le numéro sous la forme RAn où n est un compteur séquentiel sans rupture et sans remise à 0.
@@ -836,6 +1035,8 @@ DigiriskRiskAssessmentNumberingModule = Modèle de numérotation des évaluation
 
 # Data - Donnée
 RiskAssessment = Évaluation
+RiskAssessments = Évaluations
+RiskAssessmentConfig = Configuration des données des évaluations
 TheRiskAssessment = L'évaluation
 LastRiskAssessment = Dernière évaluation du risque
 RiskAssessmentWellCreated = Évaluation créée
@@ -883,14 +1084,19 @@ ReadDigiriskRiskSign = Consulter les signalisations
 CreateDigiriskRiskSign = Créer/Modifier les signalisations
 DeleteDigiriskRiskSign = Supprimer les signalisations
 
+# Trigger - Déclencheur
+RiskSignCreateTrigger = Signalisation créée
+RiskSignModifyTrigger = Signalisation modifiée
+RiskSignDeleteTrigger = Signalisation supprimée
 
 # Mod Numbering - Modèle de numérotation
 DigiriskRiskSignStandardModel = Renvoie le numéro sous la forme RSn où n est un compteur séquentiel sans rupture et sans remise à 0.
-DigiriskRiskSignNumberingModule = Modèle de numérotation des signalisation des risques de Digirisk
+DigiriskRiskSignNumberingModule = Modèle de numérotation des signalisations des risques de Digirisk
 
 # Data - Donnée
 RiskSign = Signalisation
 TheRiskSign = La signalisation
+RiskSignConfig = Configuration des données des signalisations
 RiskSignWellCreated = Signalisation créée
 RiskSignNotCreated = Erreur lors de la création de la signalisation
 RiskSignWellEdited = Signalisation éditée
@@ -901,6 +1107,7 @@ RiskSignCategory = Catégorie
 AddRiskSignTitle = Ajout d'une signalisation
 AddRiskSignButton = Ajouter la signalisation
 EditRiskSign = Édition d'une signalisation
+DeleteRiskSignMessage = Suppression de la signalisation
 
 DigiriskElementRiskSignList = Liste des signalisations
 DigiriskElementRiskSign = Signalisation
@@ -916,6 +1123,7 @@ DigiriskElementRiskSign = Signalisation
 ActionPlan = Plan d'action
 Task = Tâche
 TheTask = La tâche
+TaskConfig = Configuration des données des tâches
 TaskWellCreated = Tâche créée
 TaskNotCreated = Erreur lors de la création de la tâche
 TaskWellEdited = Tâche éditée
@@ -940,7 +1148,7 @@ ShowTaskStartDateDescription = Remplace la date de création par la date de déb
 ShowTaskEndDate = Date de fin des tâches
 ShowTaskEndDateDescription = Afficher la date de fin des tâches
 ShowTaskProgress = Progression des tâches
-ShowTaskProgressDescription = Afficher la progression des tâches à 100
+ShowTaskProgressDescription = Afficher les tâches complétées dans la liste des risques
 ShowAllTasks = Toutes les tâches
 ShowAllTasksDescription = Afficher toutes les tâches
 NoTaskCompletedThere = Aucune tâche en cours
@@ -995,6 +1203,7 @@ DeleteAttendant = Supprimer l'intervenant
 AddAttendantMessage = Ajout de l'intervenant :
 DeleteAttendantMessage = Suppression de l'intervenant :
 SignaturePublicInterfaceForbidden = Accès interdit à l'interface publique de signature
+SignaturePublicInterface = Interface publique de signature
 Attendant = Le participant
 SetAbsentAttendant = est absent
 SendMailSignature = Email émetteur utilisé pour envoyer les liens de signature
@@ -1005,6 +1214,8 @@ AddSignatureSuccessText = La signature a bien été enregistrée pour le documen
 SignatureSeeDocument = Voir
 ShowDocument = Voir le document
 AddAttendants = Ajouter
+NoAttendants = Pas d'intervenants liés à cet objet. Pour ajouter des intervenants, le statut doit être "En cours".
+SignatureManagement = Gestion des signatures
 
 
 
@@ -1048,12 +1259,14 @@ AlreadyGenerated = Déjà généré(e)s
 NotCreated = Pas encore créé(e)s
 ExtrafieldsGeneration = Cette option permet la génération des extrafields liés au ticket
 CategoriesGeneration = Cette option permet la génération des catégories liées au ticket
-TicketSuccess = Voici votre Id de suivi de ticket :
-TicketPublicAccess = Lien vers l'interface publique des tickets :
+TicketSuccess = Votre registre a été transmis au service prévention sous le numéro :
+TicketPublicAccess = Lien de retour vers l'interface publique des tickets :
 TicketShowCompanyLogo = Afficher le logo de la société dans l'interface publique
 TicketShowCompanyLogoHelp = Activez cette option pour masquer le logo de la société dans les pages de l'interface publique
+YouMustNotifyYourHierarchy = Vous êtes dans l'<b>obligation</b> de prévenir votre hiérarchie
+GoBackToTicketCreation = Aller à la page de suivi des tickets
 SendEmailOnTicketSubmit = Envoyer des emails à la création
-UseCaptachOnCreateTicketPage = Utilisation du code graphique (CAPTCHA) sur la page de création
+UseCaptchaOnCreateTicketPage = Utilisation du code graphique (CAPTCHA) sur la page de création
 
 
 
@@ -1095,3 +1308,7 @@ SendPassword = Envoyer le mot de passe par email
 UserGroup = Groupe d'utilisateurs
 ReaderGroup = Groupe de lecteurs
 UserCreated = L'utilisateur a bien été créé
+GetAPI = Utilisation des routes API Digirisk en méthode GET
+PostAPI = Utilisation des routes API Digirisk en méthode POST
+MinimizeMenu = Réduire le menu
+ActionsLine = Actions

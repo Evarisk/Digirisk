@@ -70,9 +70,14 @@ $morecss = array("/digiriskdolibarr/css/digiriskdolibarr.css");
 
 llxHeaderTicketDigirisk($langs->trans("CreateTicket"), "", 0, 0, $morejs, $morecss);
 ?>
-<div class="digirisk-signature-container">
-	<p class="center"><?php echo $langs->trans("TicketSuccess") . ' ' . $track_id; ?> </p>
-	<p class="center"><?php echo $langs->trans("TicketPublicAccess") . '  '?><a class="wordbreak" href="<?php echo dol_buildpath('/public/ticket/index.php', 2) ?>" target="_blank" ><?php echo dol_buildpath('/public/ticket/index.php', 2) ?></a></p>
+<div class="digirisk-signature-container" style="">
+	<p class="center"><?php echo $langs->trans("TicketSuccess") . ' ' ?><b><?php echo $track_id; ?> </b></p>
+	<b><i><p class="center"</p></b></i>
+	<span class="wpeo-notice notice-warning center" style="margin-left: 16%;width: 70%; border-left: solid red 6px; color: red;background: rgba(255, 0, 0, 0.05)">
+		<span class="notice-content" >
+			<span class="notice-subtitle" style="color: red"><?php echo $langs->trans("YouMustNotifyYourHierarchy") . ' ' ?></span>
+		</span>
+	</span>
 </div>
 <?php
 

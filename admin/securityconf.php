@@ -130,6 +130,8 @@ $form = new Form($db);
 
 $help_url = 'FR:Module_DigiriskDolibarr#L.27onglet_S.C3.A9curit.C3.A9';
 $title    = $langs->trans("CompanyFoundation") . ' - ' . $langs->trans("Security");
+
+$morejs   = array("/digiriskdolibarr/js/digiriskdolibarr.js.php");
 $morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");
 
 $counter  = 0;
@@ -152,7 +154,7 @@ foreach ($securityResources as $securityResource) {
 }
 
 
-llxHeader('', $title, $help_url, '', '', '', '', $morecss);
+llxHeader('', $title, $help_url, '', '', '', $morejs, $morecss);
 
 print load_fiche_titre($title, '', 'title_setup');
 

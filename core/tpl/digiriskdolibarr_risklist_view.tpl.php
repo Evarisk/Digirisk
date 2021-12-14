@@ -348,6 +348,7 @@
 								<span class="title"><?php echo $langs->trans('Risk'); ?><required>*</required></span>
 								<div class="wpeo-dropdown dropdown-large dropdown-grid category-danger padding">
 									<input class="input-hidden-danger" type="hidden" name="risk_category_id" value="undefined" />
+									<input class="input-risk-description-prefill" type="hidden" name="risk_description_prefill" value="<?php echo $conf->global->DIGIRISKDOLIBARR_RISK_DESCRIPTION_PREFILL; ?>" />
 									<div class="dropdown-toggle dropdown-add-button button-cotation">
 										<span class="wpeo-button button-square-50 button-grey"><i class="fas fa-exclamation-triangle button-icon"></i><i class="fas fa-plus-circle button-add"></i></span>
 										<img class="danger-category-pic wpeo-tooltip-event hidden" src="" aria-label=""/>
@@ -508,6 +509,7 @@
 							<span class="title"><?php echo $langs->trans('Risk'); ?><required>*</required></span>
 							<div class="wpeo-dropdown dropdown-large dropdown-grid category-danger padding">
 								<input class="input-hidden-danger" type="hidden" name="risk_category_id" value="undefined" />
+								<input class="input-risk-description-prefill" type="hidden" name="risk_description_prefill" value="<?php echo $conf->global->DIGIRISKDOLIBARR_RISK_DESCRIPTION_PREFILL; ?>" />
 								<div class="dropdown-toggle dropdown-add-button button-cotation">
 									<span class="wpeo-button button-square-50 button-grey"><i class="fas fa-exclamation-triangle button-icon"></i><i class="fas fa-plus-circle button-add"></i></span>
 									<img class="danger-category-pic wpeo-tooltip-event hidden" src="" aria-label=""/>
@@ -691,19 +693,20 @@
 	}
 
 	$varpage = empty($contextpage) ? $_SERVER["PHP_SELF"] : $contextpage;
+	$menuConf = 'MAIN_SELECTEDFIELDS_' . $varpage;
 
-	if (!preg_match('/t.description/', $user->conf->MAIN_SELECTEDFIELDS_riskcard) && $conf->global->DIGIRISKDOLIBARR_RISK_DESCRIPTION) {
-		$user->conf->MAIN_SELECTEDFIELDS_riskcard = ($varpage == 'risklist') ? 't.fk_element,' : ''.'t.ref,evaluation.cotation,t.category,t.description,';
+	if (!preg_match('/t.description/', $user->conf->$menuConf) && $conf->global->DIGIRISKDOLIBARR_RISK_DESCRIPTION) {
+		$user->conf->$menuConf = (($varpage == 'risklist') ? 't.fk_element,' : '').'t.ref,evaluation.cotation,t.category,t.description,';
 
 	} elseif (!$conf->global->DIGIRISKDOLIBARR_RISK_DESCRIPTION) {
-		$user->conf->MAIN_SELECTEDFIELDS_riskcard = preg_replace('/t.description,/', '', $user->conf->MAIN_SELECTEDFIELDS_riskcard);
+		$user->conf->$menuConf = preg_replace('/t.description,/', '', $user->conf->$menuConf);
 	}
 
-	if (!preg_match('/evaluation.has_tasks/', $user->conf->MAIN_SELECTEDFIELDS_riskcard) && $conf->global->DIGIRISKDOLIBARR_TASK_MANAGEMENT) {
-		$user->conf->MAIN_SELECTEDFIELDS_riskcard .= ($varpage == 'risklist') ? 't.fk_element,' : ''.'t.ref,evaluation.cotation,t.category,evaluation.has_tasks,';
+	if (!preg_match('/evaluation.has_tasks/', $user->conf->$menuConf) && $conf->global->DIGIRISKDOLIBARR_TASK_MANAGEMENT) {
+		$user->conf->$menuConf .= (($varpage == 'risklist') ? 't.fk_element,' : '').'t.ref,evaluation.cotation,t.category,evaluation.has_tasks,';
 
 	} elseif (!$conf->global->DIGIRISKDOLIBARR_TASK_MANAGEMENT) {
-		$user->conf->MAIN_SELECTEDFIELDS_riskcard = preg_replace('/evaluation.has_tasks,/', '', $user->conf->MAIN_SELECTEDFIELDS_riskcard);
+		$user->conf->$menuConf = preg_replace('/evaluation.has_tasks,/', '', $user->conf->$menuConf);
 	}
 
 
@@ -849,7 +852,7 @@
 					<div class="risk-container" value="<?php echo $risk->id ?>">
 						<!-- BUTTON MODAL RISK EDIT -->
 						<?php if ($permissiontoadd) : ?>
-							<div class="risk-edit modal-open" value="<?php echo $risk->id ?>" id="<?php echo $risk->ref ?>"><i class="fas fa-exclamation-triangle"></i><?php echo ' ' . $risk->ref; ?></div>
+							<div><i class="fas fa-exclamation-triangle"></i><?php echo ' ' . $risk->ref; ?> <i class="risk-edit wpeo-tooltip-event modal-open fas fa-pencil-alt" aria-label="<?php echo $langs->trans('EditRisk'); ?>" value="<?php echo $risk->id; ?>" id="<?php echo $risk->ref; ?>"></i></div>
 						<?php else : ?>
 							<div class="risk-edit-no-perm" value="<?php echo $risk->id ?>"><i class="fas fa-exclamation-triangle"></i><?php echo ' ' . $risk->ref; ?></div>
 						<?php endif; ?>
