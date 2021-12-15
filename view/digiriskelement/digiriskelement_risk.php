@@ -16,9 +16,9 @@
  */
 
 /**
- *   	\file       view/risk_list.php
+ *   	\file       view/digiriskelement/digiriskelement_risk.php
  *		\ingroup    digiriskdolibarr
- *		\brief      List page for risk
+ *		\brief      Page to create/edit/view risk
  */
 
 // Load Dolibarr environment
@@ -33,6 +33,7 @@ if (!$res && $i > 0 && file_exists(dirname(substr($tmp, 0, ($i + 1)))."/main.inc
 // Try main.inc.php using relative path
 if (!$res && file_exists("../../main.inc.php")) $res = @include "../../main.inc.php";
 if (!$res && file_exists("../../../main.inc.php")) $res = @include "../../../main.inc.php";
+if (!$res && file_exists("../../../../main.inc.php")) $res = @include "../../../../main.inc.php";
 if (!$res) die("Include of main fails");
 
 require_once DOL_DOCUMENT_ROOT.'/core/lib/images.lib.php';
@@ -44,17 +45,16 @@ require_once DOL_DOCUMENT_ROOT.'/projet/class/task.class.php';
 require_once DOL_DOCUMENT_ROOT.'/core/modules/project/mod_project_simple.php';
 require_once DOL_DOCUMENT_ROOT.'/core/modules/project/task/mod_task_simple.php';
 
-require_once './../class/digiriskelement.class.php';
-require_once './../class/digiriskstandard.class.php';
-require_once './../class/riskanalysis/risk.class.php';
-require_once './../class/riskanalysis/riskassessment.class.php';
-require_once './../core/modules/digiriskdolibarr/riskanalysis/risk/mod_risk_standard.php';
-require_once './../core/modules/digiriskdolibarr/riskanalysis/riskassessment/mod_riskassessment_standard.php';
-require_once './../lib/digiriskdolibarr_digiriskstandard.lib.php';
-require_once './../lib/digiriskdolibarr_function.lib.php';
+require_once './../../class/digiriskelement.class.php';
+require_once './../../class/digiriskstandard.class.php';
+require_once './../../class/riskanalysis/risk.class.php';
+require_once './../../class/riskanalysis/riskassessment.class.php';
+require_once './../../core/modules/digiriskdolibarr/riskanalysis/risk/mod_risk_standard.php';
+require_once './../../core/modules/digiriskdolibarr/riskanalysis/riskassessment/mod_riskassessment_standard.php';
+require_once './../../lib/digiriskdolibarr_digiriskelement.lib.php';
+require_once './../../lib/digiriskdolibarr_function.lib.php';
 
-global $langs, $user, $conf, $db, $hookmanager;
-$permtoupload = $user->rights->ecm->upload;
+global $conf, $db, $hookmanager, $langs, $user;
 
 // Load translation files required by the page
 $langs->loadLangs(array("digiriskdolibarr@digiriskdolibarr", "other"));
@@ -65,7 +65,7 @@ $action      = GETPOST('action', 'aZ09');
 $massaction  = GETPOST('massaction', 'alpha'); // The bulk action (combo box choice into lists)
 $confirm     = GETPOST('confirm', 'alpha');
 $cancel      = GETPOST('cancel', 'aZ09');
-$contextpage = GETPOST('contextpage', 'aZ') ?GETPOST('contextpage', 'aZ') : 'risklist'; // To manage different context of search
+$contextpage = GETPOST('contextpage', 'aZ') ?GETPOST('contextpage', 'aZ') : 'riskcard'; // To manage different context of search
 $backtopage  = GETPOST('backtopage', 'alpha');
 $toselect    = GETPOST('toselect', 'array'); // Array of ids of elements selected into a list
 $limit       = GETPOST('limit', 'int') ?GETPOST('limit', 'int') : $conf->liste_limit;
@@ -75,23 +75,21 @@ $page        = GETPOSTISSET('pageplusone') ? (GETPOST('pageplusone') - 1) : GETP
 $page        = is_numeric($page) ? $page : 0;
 $page        = $page == -1 ? 0 : $page;
 
-global $db, $conf, $langs, $user, $hookmanager;
-
 // Initialize technical objects
-$object           = new DigiriskStandard($db);
-$risk             = new Risk($db);
-$evaluation       = new RiskAssessment($db);
-$ecmdir           = new EcmDirectory($db);
-$project          = new Project($db);
-$task             = new Task($db);
-$extrafields      = new ExtraFields($db);
-$refRiskMod       = new $conf->global->DIGIRISKDOLIBARR_RISK_ADDON();
-$refEvaluationMod = new $conf->global->DIGIRISKDOLIBARR_RISKASSESSMENT_ADDON();
-$refProjectMod    = new $conf->global->PROJECT_ADDON();
-$refTaskMod       = new $conf->global->PROJECT_TASK_ADDON();
+$object            = new DigiriskElement($db);
+$digiriskstandard  = new DigiriskStandard($db);
+$risk              = new Risk($db);
+$evaluation        = new RiskAssessment($db);
+$ecmdir            = new EcmDirectory($db);
+$project           = new Project($db);
+$task              = new Task($db);
+$extrafields       = new ExtraFields($db);
+$refRiskMod        = new $conf->global->DIGIRISKDOLIBARR_RISK_ADDON();
+$refEvaluationMod  = new $conf->global->DIGIRISKDOLIBARR_RISKASSESSMENT_ADDON();
+$refProjectMod     = new $conf->global->PROJECT_ADDON();
+$refTaskMod        = new $conf->global->PROJECT_TASK_ADDON();
 
-$object->fetch($conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD);
-$hookmanager->initHooks(array('risklist', 'globalcard')); // Note that conf->hooks_modules contains array
+$hookmanager->initHooks(array('riskcard', 'globalcard')); // Note that conf->hooks_modules contains array
 
 // Fetch optionals attributes and labels
 $extrafields->fetch_name_optionals_label($risk->table_element);
@@ -123,6 +121,9 @@ foreach ($risk->fields as $key => $val) {
 $arrayfields = array();
 foreach ($risk->fields as $key => $val) {
 	// If $val['visible']==0, then we never show the field
+	if ($val['label'] == 'ParentElement') {
+		$val['visible'] = 0;
+	}
 	if (!empty($val['visible'])) $arrayfields['t.'.$key] = array('label'=>$val['label'], 'checked'=>(($val['visible'] < 0) ? 0 : 1), 'enabled'=>($val['enabled'] && ($val['visible'] != 3)), 'position'=>$val['position']);
 }
 foreach ($evaluation->fields as $key => $val) {
@@ -153,7 +154,7 @@ if ($reshook < 0) setEventMessages($hookmanager->error, $hookmanager->errors, 'e
 
 if (empty($reshook)) {
 	// Selection of new fields
-	include DOL_DOCUMENT_ROOT . '/core/actions_changeselectedfields.inc.php';
+	include DOL_DOCUMENT_ROOT.'/core/actions_changeselectedfields.inc.php';
 
 	// Purge search criteria
 	if (GETPOST('button_removefilter_x', 'alpha') || GETPOST('button_removefilter.x', 'alpha') || GETPOST('button_removefilter', 'alpha')) { // All tests are required to be compatible with all browsers
@@ -167,15 +168,16 @@ if (empty($reshook)) {
 		$search_array_options = array();
 	}
 	if (GETPOST('button_removefilter_x', 'alpha') || GETPOST('button_removefilter.x', 'alpha') || GETPOST('button_removefilter', 'alpha')
-		|| GETPOST('button_search_x', 'alpha') || GETPOST('button_search.x', 'alpha') || GETPOST('button_search', 'alpha')) {
+		|| GETPOST('button_search_x', 'alpha') || GETPOST('button_search.x', 'alpha') || GETPOST('button_search', 'alpha'))
+	{
 		$massaction = ''; // Protection to avoid mass action if we force a new search during a mass action confirmation
 	}
 
 	$error = 0;
 
-	$backtopage = dol_buildpath('/digiriskdolibarr/view/risk_list.php', 1);
+	$backtopage = dol_buildpath('/digiriskdolibarr/view/digiriskelement/digiriskelement_risk.php', 1).'?id='.($id > 0 ? $id : '__ID__');
 
-	require_once './../core/tpl/digiriskdolibarr_risk_actions.tpl.php';
+	require_once './../../core/tpl/digiriskdolibarr_risk_actions.tpl.php';
 
 }
 
@@ -185,18 +187,47 @@ if (empty($reshook)) {
 
 $form = new Form($db);
 
-$title    = $langs->trans("RiskList");
-$help_url = 'FR:Module_DigiriskDolibarr';
+$title    = $langs->trans("DigiriskElementRisk");
+$help_url = 'FR:Module_DigiriskDolibarr#Risques';
 $morejs   = array("/digiriskdolibarr/js/digiriskdolibarr.js.php");
 $morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");
 
-llxHeader('', $title, $help_url, '', '', '', $morejs, $morecss, '', 'classforhorizontalscrolloftabs');
+digiriskHeader('', $title, $help_url, '', '', '', $morejs, $morecss, '', 'classforhorizontalscrolloftabs');
 
-// Object card
-// ------------------------------------------------------------
-$allRisks = 1;
-require_once './../core/tpl/digiriskdolibarr_medias_gallery_modal.tpl.php';
-require_once './../core/tpl/digiriskdolibarr_risklist_view.tpl.php';
+print '<div id="cardContent" value="">';
+
+if ($object->id > 0) {
+	$res = $object->fetch_optionals();
+
+	$head = digiriskelementPrepareHead($object);
+	dol_fiche_head($head, 'elementRisk', $title, -1, "digiriskdolibarr@digiriskdolibarr");
+
+	// Object card
+	// ------------------------------------------------------------
+	$width = 80;
+	dol_strlen($object->label) ? $morehtmlref = ' - ' . $object->label : '';
+	$morehtmlref .= '<div class="refidno">';
+	// ParentElement
+	$parent_element = new DigiriskElement($db);
+	$result = $parent_element->fetch($object->fk_parent);
+	if ($result > 0) {
+		$morehtmlref .= $langs->trans("Description").' : '.$object->description;
+		$morehtmlref .= '<br>'.$langs->trans("ParentElement").' : '.$parent_element->getNomUrl(1, 'blank', 1);
+	}
+	else {
+		$digiriskstandard->fetch($conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD);
+		$morehtmlref .= $langs->trans("Description").' : '.$object->description;
+		$morehtmlref .= '<br>'.$langs->trans("ParentElement").' : '.$digiriskstandard->getNomUrl(1, 'blank', 1);
+	}
+	$morehtmlref .= '</div>';
+	$morehtmlleft = '<div class="floatleft inline-block valignmiddle divphotoref">'.digirisk_show_photos('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity].'/'.$object->element_type, 'small', 5, 0, 0, 0, $width,0, 0, 0, 0, $object->element_type, $object).'</div>';
+	digirisk_banner_tab($object, 'ref', '', 0, 'ref', 'ref', $morehtmlref, '', 0, $morehtmlleft);
+
+	require_once './../../core/tpl/digiriskdolibarr_risklist_view.tpl.php';
+}
+
+print '</div>'."\n";
+print '<!-- End div class="cardcontent" -->';
 
 // End of page
 llxFooter();

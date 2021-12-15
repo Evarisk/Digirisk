@@ -16,7 +16,7 @@
  */
 
 /**
- *   	\file       digiriskelement_listingrisksphoto.php
+ *   	\file       view/digiriskelement/digiriskelement_listingrisksphoto.php
  *		\ingroup    digiriskdolibarr
  *		\brief      Page to view listingrisksphoto
  */
@@ -33,17 +33,18 @@ if (!$res && $i > 0 && file_exists(dirname(substr($tmp, 0, ($i + 1)))."/main.inc
 // Try main.inc.php using relative path
 if (!$res && file_exists("../../main.inc.php")) $res = @include "../../main.inc.php";
 if (!$res && file_exists("../../../main.inc.php")) $res = @include "../../../main.inc.php";
+if (!$res && file_exists("../../../../main.inc.php")) $res = @include "../../../../main.inc.php";
 if (!$res) die("Include of main fails");
 
 require_once DOL_DOCUMENT_ROOT.'/core/lib/images.lib.php';
 
-require_once './class/digiriskelement.class.php';
-require_once './class/digiriskstandard.class.php';
-require_once './class/digiriskdocuments/listingrisksphoto.class.php';
-require_once './lib/digiriskdolibarr_digiriskelement.lib.php';
-require_once './lib/digiriskdolibarr_digiriskstandard.lib.php';
-require_once './lib/digiriskdolibarr_function.lib.php';
-require_once './core/modules/digiriskdolibarr/digiriskdocuments/listingrisksphoto/modules_listingrisksphoto.php';
+require_once './../../class/digiriskelement.class.php';
+require_once './../../class/digiriskstandard.class.php';
+require_once './../../class/digiriskdocuments/listingrisksphoto.class.php';
+require_once './../../lib/digiriskdolibarr_digiriskelement.lib.php';
+require_once './../../lib/digiriskdolibarr_digiriskstandard.lib.php';
+require_once './../../lib/digiriskdolibarr_function.lib.php';
+require_once './../../core/modules/digiriskdolibarr/digiriskdocuments/listingrisksphoto/modules_listingrisksphoto.php';
 
 global $conf, $db, $hookmanager, $langs, $user;
 

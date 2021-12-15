@@ -16,9 +16,9 @@
  */
 
 /**
- *   	\file       digiriskelement_card.php
+ *   	\file       view/digiriskelement/digiriskelement_organization.php
  *		\ingroup    digiriskdolibarr
- *		\brief      Page to create/edit/view digiriskelement
+ *		\brief      Page to organize arborescence
  */
 
 // Load Dolibarr environment
@@ -33,13 +33,14 @@ if (!$res && $i > 0 && file_exists(dirname(substr($tmp, 0, ($i + 1)))."/main.inc
 // Try main.inc.php using relative path
 if (!$res && file_exists("../../main.inc.php")) $res = @include "../../main.inc.php";
 if (!$res && file_exists("../../../main.inc.php")) $res = @include "../../../main.inc.php";
+if (!$res && file_exists("../../../../main.inc.php")) $res = @include "../../../../main.inc.php";
 if (!$res) die("Include of main fails");
 
 require_once DOL_DOCUMENT_ROOT.'/core/class/html.formfile.class.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/images.lib.php';
 
-require_once './class/digiriskelement.class.php';
-require_once './lib/digiriskdolibarr_function.lib.php';
+require_once './../../class/digiriskelement.class.php';
+require_once './../../lib/digiriskdolibarr_function.lib.php';
 
 global $conf, $db, $hookmanager, $langs, $user;
 
@@ -83,12 +84,12 @@ if ($reshook < 0) setEventMessages($hookmanager->error, $hookmanager->errors, 'e
 if (empty($reshook)) {
 	$error = 0;
 
-	$backurlforlist = dol_buildpath('/digiriskdolibarr/digiriskstandard_card.php?id=1', 1);
+	$backurlforlist = dol_buildpath('/digiriskdolibarr/view/digiriskstandard/digiriskstandard_card.php?id=1', 1);
 
 	if (empty($backtopage) || ($cancel && empty($id))) {
 		if (empty($backtopage) || ($cancel && strpos($backtopage, '__ID__'))) {
 			if (empty($object->id) && (($action != 'add' && $action != 'create') || $cancel)) $backtopage = $backurlforlist;
-			else $backtopage = dol_buildpath('/digiriskdolibarr/digiriskelement_card.php', 1).'?id='.($object->id > 0 ? $object->id : '__ID__');
+			else $backtopage = dol_buildpath('/digiriskdolibarr/view/digiriskelement/digiriskelement_card.php', 1).'?id='.($object->id > 0 ? $object->id : '__ID__');
 		}
 	}
 

@@ -235,7 +235,7 @@
 		{
 			$obj = $db->fetch_object($resql);
 			$id = $obj->rowid;
-			header("Location: ".dol_buildpath('/digiriskdolibarr/digiriskelement_risk.php', 1).'?id='.$id);
+			header("Location: ".dol_buildpath('/digiriskdolibarr/view/digiriskelement/digiriskelement_risk.php', 1).'?id='.$id);
 			exit;
 		}
 	}
@@ -984,10 +984,10 @@
 				$cssforfield = '';
 				print '<td'.($cssforfield ? ' class="'.$cssforfield.'"' : '').'>';
 				if ($key == 'cotation') {
-					require './core/tpl/digiriskdolibarr_riskassessment_view.tpl.php';
+					require './../../core/tpl/digiriskdolibarr_riskassessment_view.tpl.php';
 				}
 				elseif ($key == 'has_tasks' && $conf->global->DIGIRISKDOLIBARR_TASK_MANAGEMENT) {
-					require './core/tpl/digiriskdolibarr_riskassessment_task_view.tpl.php';
+					require './../../core/tpl/digiriskdolibarr_riskassessment_task_view.tpl.php';
 				}
 				elseif ($conf->global->DIGIRISKDOLIBARR_TASK_MANAGEMENT == 0) {
 					print $langs->trans('TaskManagementNotActivated');

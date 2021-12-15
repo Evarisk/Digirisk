@@ -613,7 +613,7 @@ function digiriskHeader($head = '', $title = '', $help_url = '', $target = '', $
 	}
 	$results = recurse_tree(0,0,$objects); ?>
 
-	<?php require_once './core/tpl/digiriskdolibarr_medias_gallery_modal.tpl.php'; ?>
+	<?php require_once './../../core/tpl/digiriskdolibarr_medias_gallery_modal.tpl.php'; ?>
 
 	<div id="id-container" class="id-container page-ut-gp-list">
 		<div class="side-nav">
@@ -622,15 +622,15 @@ function digiriskHeader($head = '', $title = '', $help_url = '', $target = '', $
 				<div class="digirisk-wrap wpeo-wrap">
 					<div class="navigation-container">
 						<div class="society-header">
-							<a class="linkElement" href="../digiriskdolibarr/digiriskstandard_card.php?id=<?php echo $conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD ?>">
+							<a class="linkElement" href="../digiriskstandard/digiriskstandard_card.php?id=<?php echo $conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD ?>">
 								<span class="icon fas fa-building fa-fw"></span>
 								<div class="title"><?php echo $conf->global->MAIN_INFO_SOCIETE_NOM ?></div>
 								<?php if ($user->rights->digiriskdolibarr->digiriskelement->write) : ?>
 									<div class="add-container">
-										<a id="newGroupment" href="../digiriskdolibarr/digiriskelement_card.php?action=create&element_type=groupment&fk_parent=0">
+										<a id="newGroupment" href="../digiriskelement/digiriskelement_card.php?action=create&element_type=groupment&fk_parent=0">
 											<div class="wpeo-button button-square-40 button-secondary wpeo-tooltip-event" data-direction="bottom" data-color="light" aria-label="<?php echo $langs->trans('NewGroupment'); ?>"><strong><?php echo $mod_groupment->prefix; ?></strong><span class="button-add animated fas fa-plus-circle"></span></div>
 										</a>
-										<a id="newWorkunit" href="../digiriskdolibarr/digiriskelement_card.php?action=create&element_type=workunit&fk_parent=0">
+										<a id="newWorkunit" href="../digiriskelement/digiriskelement_card.php?action=create&element_type=workunit&fk_parent=0">
 											<div class="wpeo-button button-square-40 wpeo-tooltip-event" data-direction="bottom" data-color="light" aria-label="<?php echo $langs->trans('NewWorkUnit'); ?>"><strong><?php echo $mod_workunit->prefix; ?></strong><span class="button-add animated fas fa-plus-circle"></span></div>
 										</a>
 									</div>
@@ -644,10 +644,10 @@ function digiriskHeader($head = '', $title = '', $help_url = '', $target = '', $
 							</div>
 						<?php else : ?>
 							<div class="society-header">
-								<a id="newGroupment" href="../digiriskdolibarr/digiriskelement_card.php?action=create&element_type=groupment&fk_parent=0">
+								<a id="newGroupment" href="../digiriskelement/digiriskelement_card.php?action=create&element_type=groupment&fk_parent=0">
 									<div class="wpeo-button button-square-40 button-secondary wpeo-tooltip-event" data-direction="bottom" data-color="light" aria-label="<?php echo $langs->trans('NewGroupment'); ?>"><strong><?php echo $mod_groupment->prefix; ?></strong><span class="button-add animated fas fa-plus-circle"></span></div>
 								</a>
-								<a id="newWorkunit" href="../digiriskdolibarr/digiriskelement_card.php?action=create&element_type=workunit&fk_parent=0">
+								<a id="newWorkunit" href="../digiriskelement/digiriskelement_card.php?action=create&element_type=workunit&fk_parent=0">
 									<div class="wpeo-button button-square-40 wpeo-tooltip-event" data-direction="bottom" data-color="light" aria-label="<?php echo $langs->trans('NewWorkUnit'); ?>"><strong><?php echo $mod_workunit->prefix; ?></strong><span class="button-add animated fas fa-plus-circle"></span></div>
 								</a>
 							</div>
@@ -931,14 +931,14 @@ function display_recurse_tree($results) {
 					<div class="title" id="scores" value="<?php echo $element['object']->id ?>">
 					<?php
 						if ($user->rights->digiriskdolibarr->risk->read) : ?>
-							<a id="slider" class="linkElement id<?php echo $element['object']->id;?>" href="../digiriskdolibarr/digiriskelement_risk.php?id=<?php echo $element['object']->id; ?>">
+							<a id="slider" class="linkElement id<?php echo $element['object']->id;?>" href="../digiriskelement/digiriskelement_risk.php?id=<?php echo $element['object']->id; ?>">
 								<span class="title-container">
 									<span class="ref"><?php echo $element['object']->ref; ?></span>
 									<span class="name"><?php echo $element['object']->label; ?></span>
 								</span>
 							</a>
 						<?php else : ?>
-							<a id="slider" class="linkElement id<?php echo $element['object']->id;?>" href="../digiriskdolibarr/digiriskelement_card.php?id=<?php echo $element['object']->id; ?>">
+							<a id="slider" class="linkElement id<?php echo $element['object']->id;?>" href="../digiriskelement/digiriskelement_card.php?id=<?php echo $element['object']->id; ?>">
 								<span class="title-container">
 									<span class="ref"><?php echo $element['object']->ref; ?></span>
 									<span class="name"><?php echo $element['object']->label; ?></span>
@@ -949,7 +949,7 @@ function display_recurse_tree($results) {
 					<?php if ($user->rights->digiriskdolibarr->digiriskelement->write) : ?>
 						<?php if ($element['object']->element_type == 'groupment') : ?>
 							<div class="add-container">
-								<a id="newGroupment" href="../digiriskdolibarr/digiriskelement_card.php?action=create&element_type=groupment&fk_parent=<?php echo $element['object']->id; ?>">
+								<a id="newGroupment" href="../digiriskelement/digiriskelement_card.php?action=create&element_type=groupment&fk_parent=<?php echo $element['object']->id; ?>">
 									<div
 										class="wpeo-button button-secondary button-square-40 wpeo-tooltip-event"
 										data-direction="bottom" data-color="light"
@@ -958,7 +958,7 @@ function display_recurse_tree($results) {
 										<span class="button-add animated fas fa-plus-circle"></span>
 									</div>
 								</a>
-								<a id="newWorkunit" href="../digiriskdolibarr/digiriskelement_card.php?action=create&element_type=workunit&fk_parent=<?php echo $element['object']->id; ?>">
+								<a id="newWorkunit" href="../digiriskelement/digiriskelement_card.php?action=create&element_type=workunit&fk_parent=<?php echo $element['object']->id; ?>">
 									<div
 										class="wpeo-button button-square-40 wpeo-tooltip-event"
 										data-direction="bottom" data-color="light"

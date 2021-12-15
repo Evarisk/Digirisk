@@ -570,7 +570,7 @@ class DigiriskElement extends CommonObject
 		$label .= ($label ? '<br>' : '').'<b>'.$langs->trans('Label').': </b>'.$this->label; // The space must be after the : to not being explode when showing the title in img_picto
 		if ($moreinpopup) $label .= '<br>'.$moreinpopup;
 
-		$url = dol_buildpath('/digiriskdolibarr/digiriskelement_card.php', 1).'?id='.$this->id;
+		$url = dol_buildpath('/digiriskdolibarr/view/digiriskelement/digiriskelement_card.php', 1).'?id='.$this->id;
 
 		if ($option != 'nolink')
 		{
