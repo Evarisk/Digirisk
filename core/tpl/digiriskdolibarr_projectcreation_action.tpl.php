@@ -297,7 +297,7 @@ if ( $conf->global->DIGIRISKDOLIBARR_USERGROUP_UPDATED ==  0 ) {
 		$usergroup->addrights('', 'ticket', 'write');
 		$usergroup->addrights('', 'agenda', 'myactions');
 	}
-  
+
 	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_USERGROUP_UPDATED', 1, 'integer', 0, '', $conf->entity);
 }
 
@@ -334,7 +334,7 @@ if ( $conf->global->DIGIRISKDOLIBARR_ADMINUSERGROUP_SET ==  0 ) {
 		$usergroup->addrights('', 'agenda');
 		$usergroup->addrights('', 'projet');
 	}
-  
+
 	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_ADMINUSERGROUP_SET', $usergroup_id, 'integer', 0, '', $conf->entity);
 }
 
@@ -349,12 +349,12 @@ if ( $conf->global->DIGIRISKDOLIBARR_ADMINUSERGROUP_UPDATED ==  0 ) {
 		$usergroup->addrights('', 'agenda');
 		$usergroup->addrights('', 'projet');
 	}
-  
+
 	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_ADMINUSERGROUP_UPDATED', 1, 'integer', 0, '', $conf->entity);
 }
 
 if ($conf->global->DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH_UPDATED ==  0) {
-	require_once __DIR__ . './../../class/digiriskelement/groupment.class.php';
+	require_once __DIR__ . '/../../class/digiriskelement/groupment.class.php';
 
 	$digiriskelement = new Groupment($db);
 	$digiriskelement->fetch($conf->global->DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH);

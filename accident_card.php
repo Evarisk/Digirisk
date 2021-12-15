@@ -41,7 +41,7 @@ require_once DOL_DOCUMENT_ROOT.'/core/class/doleditor.class.php';
 require_once __DIR__ . '/class/digiriskdocuments.class.php';
 require_once __DIR__ . '/class/digiriskelement.class.php';
 require_once __DIR__ . '/class/accident.class.php';
-require_once __DIR__ . './class/digiriskstandard.class.php';
+require_once __DIR__ . '/class/digiriskstandard.class.php';
 //require_once __DIR__ . '/class/digiriskdocuments/accidentdocument.class.php';
 require_once __DIR__ . '/lib/digiriskdolibarr_function.lib.php';
 require_once __DIR__ . '/lib/digiriskdolibarr_accident.lib.php';
