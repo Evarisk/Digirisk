@@ -610,7 +610,7 @@ class FirePermit extends CommonObject
 		if (empty($linkstart))
 		{
 			$label .= '<u>'.$langs->trans("FirePermit").'</u>';
-			$linkstart = '<a href="'.DOL_URL_ROOT.'/custom/digiriskdolibarr/firepermit_card.php?id='.$this->id;
+			$linkstart = '<a href="'.DOL_URL_ROOT.'/custom/digiriskdolibarr/view/firepermit/firepermit_card.php?id='.$this->id;
 		}
 
 		if (!empty($this->ref))
