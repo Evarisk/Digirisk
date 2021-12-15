@@ -16,7 +16,7 @@
  */
 
 /**
- *	\file       digirisktools.php
+ *	\file       view/digirisktools.php
  *	\ingroup    digiriskdolibarr
  *	\brief      Tools page of digiriskdolibarr top menu
  */
@@ -37,16 +37,16 @@ if (!$res) die("Include of main fails");
 
 require_once DOL_DOCUMENT_ROOT.'/core/lib/images.lib.php';
 
-require_once './class/digiriskstandard.class.php';
-require_once './class/digiriskelement.class.php';
-require_once './class/digiriskelement/groupment.class.php';
-require_once './class/digiriskelement/workunit.class.php';
-require_once './class/riskanalysis/risk.class.php';
-require_once './class/riskanalysis/riskassessment.class.php';
-require_once './core/modules/digiriskdolibarr/digiriskelement/groupment/mod_groupment_standard.php';
-require_once './core/modules/digiriskdolibarr/digiriskelement/workunit/mod_workunit_standard.php';
-require_once './core/modules/digiriskdolibarr/riskanalysis/risk/mod_risk_standard.php';
-require_once './core/modules/digiriskdolibarr/riskanalysis/riskassessment/mod_riskassessment_standard.php';
+require_once './../class/digiriskstandard.class.php';
+require_once './../class/digiriskelement.class.php';
+require_once './../class/digiriskelement/groupment.class.php';
+require_once './../class/digiriskelement/workunit.class.php';
+require_once './../class/riskanalysis/risk.class.php';
+require_once './../class/riskanalysis/riskassessment.class.php';
+require_once './../core/modules/digiriskdolibarr/digiriskelement/groupment/mod_groupment_standard.php';
+require_once './../core/modules/digiriskdolibarr/digiriskelement/workunit/mod_workunit_standard.php';
+require_once './../core/modules/digiriskdolibarr/riskanalysis/risk/mod_risk_standard.php';
+require_once './../core/modules/digiriskdolibarr/riskanalysis/riskassessment/mod_riskassessment_standard.php';
 
 global $conf, $db, $langs, $user;
 

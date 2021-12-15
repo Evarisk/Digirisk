@@ -16,7 +16,7 @@
  */
 
 /**
- *      \file       digiriskusers.php
+ *      \file       view/digiriskusers.php
  *		\ingroup    digiriskdolibarr
  *		\brief      Page to view Users
  */
@@ -443,7 +443,7 @@ if ($num == 1 && !empty($conf->global->MAIN_SEARCH_DIRECT_OPEN_IF_ONLY_ONE) && $
 	exit;
 }
 
-require_once './lib/digiriskdolibarr_function.lib.php';
+require_once './../lib/digiriskdolibarr_function.lib.php';
 
 $title    = $langs->trans("ListOfUsers");
 $help_url = '';

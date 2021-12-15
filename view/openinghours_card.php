@@ -16,7 +16,7 @@
  */
 
 /**
- *   	\file       openinghours_card.php
+ *   	\file       view/openinghours_card.php
  *		\ingroup    digiriskdolibarr
  *		\brief      Page to view Opening Hours
  */
@@ -38,7 +38,7 @@ if (!$res) die("Include of main fails");
 require_once DOL_DOCUMENT_ROOT.'/core/lib/company.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/images.lib.php';
 
-require_once './class/openinghours.class.php';
+require_once './../class/openinghours.class.php';
 
 $langs->loadLangs(array("digiriskdolibarr@digiriskdolibarr"));
 
@@ -136,7 +136,7 @@ dol_banner_tab($societe, 'socid', $linkback, ($user->socid ? 0 : 1), 'rowid', 'n
 print '<span class="opacitymedium">'.$langs->trans("ThirdPartyOpeningHours")."</span>\n";
 
 //Show common fields
-require_once __DIR__ . '/core/tpl/digiriskdolibarr_openinghours_view.tpl.php';
+require_once __DIR__ . '/../core/tpl/digiriskdolibarr_openinghours_view.tpl.php';
 
 print dol_get_fiche_end();
 // End of page
