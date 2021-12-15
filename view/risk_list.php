@@ -16,7 +16,7 @@
  */
 
 /**
- *   	\file       risk_list.php
+ *   	\file       view/risk_list.php
  *		\ingroup    digiriskdolibarr
  *		\brief      List page for risk
  */
@@ -44,14 +44,14 @@ require_once DOL_DOCUMENT_ROOT.'/projet/class/task.class.php';
 require_once DOL_DOCUMENT_ROOT.'/core/modules/project/mod_project_simple.php';
 require_once DOL_DOCUMENT_ROOT.'/core/modules/project/task/mod_task_simple.php';
 
-require_once './class/digiriskelement.class.php';
-require_once './class/digiriskstandard.class.php';
-require_once './class/riskanalysis/risk.class.php';
-require_once './class/riskanalysis/riskassessment.class.php';
-require_once './core/modules/digiriskdolibarr/riskanalysis/risk/mod_risk_standard.php';
-require_once './core/modules/digiriskdolibarr/riskanalysis/riskassessment/mod_riskassessment_standard.php';
-require_once './lib/digiriskdolibarr_digiriskstandard.lib.php';
-require_once './lib/digiriskdolibarr_function.lib.php';
+require_once './../class/digiriskelement.class.php';
+require_once './../class/digiriskstandard.class.php';
+require_once './../class/riskanalysis/risk.class.php';
+require_once './../class/riskanalysis/riskassessment.class.php';
+require_once './../core/modules/digiriskdolibarr/riskanalysis/risk/mod_risk_standard.php';
+require_once './../core/modules/digiriskdolibarr/riskanalysis/riskassessment/mod_riskassessment_standard.php';
+require_once './../lib/digiriskdolibarr_digiriskstandard.lib.php';
+require_once './../lib/digiriskdolibarr_function.lib.php';
 
 global $langs, $user, $conf, $db, $hookmanager;
 $permtoupload = $user->rights->ecm->upload;
@@ -173,9 +173,9 @@ if (empty($reshook)) {
 
 	$error = 0;
 
-	$backtopage = dol_buildpath('/digiriskdolibarr/risk_list.php', 1);
+	$backtopage = dol_buildpath('/digiriskdolibarr/view/risk_list.php', 1);
 
-	require_once './core/tpl/digiriskdolibarr_risk_actions.tpl.php';
+	require_once './../core/tpl/digiriskdolibarr_risk_actions.tpl.php';
 
 }
 
@@ -195,8 +195,8 @@ llxHeader('', $title, $help_url, '', '', '', $morejs, $morecss, '', 'classforhor
 // Object card
 // ------------------------------------------------------------
 $allRisks = 1;
-require_once './core/tpl/digiriskdolibarr_medias_gallery_modal.tpl.php';
-require_once './core/tpl/digiriskdolibarr_risklist_view.tpl.php';
+require_once './../core/tpl/digiriskdolibarr_medias_gallery_modal.tpl.php';
+require_once './../core/tpl/digiriskdolibarr_risklist_view.tpl.php';
 
 // End of page
 llxFooter();

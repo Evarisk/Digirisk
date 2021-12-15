@@ -16,7 +16,7 @@
  */
 
 /**
- *  \file       firepermit_agenda.php
+ *  \file       view/firepermit/firepermit_agenda.php
  *  \ingroup    digiriskdolibarr
  *  \brief      Page of FirePermit events
  */
@@ -33,15 +33,16 @@ if (!$res && $i > 0 && file_exists(dirname(substr($tmp, 0, ($i + 1)))."/main.inc
 // Try main.inc.php using relative path
 if (!$res && file_exists("../../main.inc.php")) $res = @include "../../main.inc.php";
 if (!$res && file_exists("../../../main.inc.php")) $res = @include "../../../main.inc.php";
+if (!$res && file_exists("../../../../main.inc.php")) $res = @include "../../../../main.inc.php";
 if (!$res) die("Include of main fails");
 
 require_once DOL_DOCUMENT_ROOT.'/contact/class/contact.class.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/company.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/functions2.lib.php';
 
-require_once __DIR__ . '/class/firepermit.class.php';
-require_once __DIR__ . '/lib/digiriskdolibarr_firepermit.lib.php';
-require_once __DIR__ . '/lib/digiriskdolibarr_function.lib.php';
+require_once __DIR__ . '/../../class/firepermit.class.php';
+require_once __DIR__ . '/../../lib/digiriskdolibarr_firepermit.lib.php';
+require_once __DIR__ . '/../../lib/digiriskdolibarr_function.lib.php';
 
 global $conf, $db, $langs, $hookmanager, $user;
 

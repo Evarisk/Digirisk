@@ -16,7 +16,7 @@
  */
 
 /**
- *   	\file       digiriskstandard_card.php
+ *   	\file       view/digiriskstandard/digiriskstandard_card.php
  *		\ingroup    digiriskdolibarr
  *		\brief      Page to create/edit/view digiriskstandard
  */
@@ -33,14 +33,15 @@ if (!$res && $i > 0 && file_exists(dirname(substr($tmp, 0, ($i + 1)))."/main.inc
 // Try main.inc.php using relative path
 if (!$res && file_exists("../../main.inc.php")) $res = @include "../../main.inc.php";
 if (!$res && file_exists("../../../main.inc.php")) $res = @include "../../../main.inc.php";
+if (!$res && file_exists("../../../../main.inc.php")) $res = @include "../../../../main.inc.php";
 if (!$res) die("Include of main fails");
 
 require_once DOL_DOCUMENT_ROOT.'/core/lib/images.lib.php';
 
-require_once './class/digiriskstandard.class.php';
-require_once './core/boxes/box_riskassessmentdocument.php';
-require_once './lib/digiriskdolibarr_digiriskstandard.lib.php';
-require_once './lib/digiriskdolibarr_function.lib.php';
+require_once './../../class/digiriskstandard.class.php';
+require_once './../../core/boxes/box_riskassessmentdocument.php';
+require_once './../../lib/digiriskdolibarr_digiriskstandard.lib.php';
+require_once './../../lib/digiriskdolibarr_function.lib.php';
 
 global $db, $conf, $langs, $user,  $maxwidthmini, $maxheightmini, $maxwidthsmall,$maxheightsmall;
 

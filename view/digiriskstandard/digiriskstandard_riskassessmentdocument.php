@@ -16,7 +16,7 @@
  */
 
 /**
- *   	\file       digiriskstandard_riskassessmentdocument.php
+ *   	\file       view/digiriskstandard/digiriskstandard_riskassessmentdocument.php
  *		\ingroup    digiriskdolibarr
  *		\brief      Page to view riskassessmentdocument
  */
@@ -33,6 +33,7 @@ if (!$res && $i > 0 && file_exists(dirname(substr($tmp, 0, ($i + 1)))."/main.inc
 // Try main.inc.php using relative path
 if (!$res && file_exists("../../main.inc.php")) $res = @include "../../main.inc.php";
 if (!$res && file_exists("../../../main.inc.php")) $res = @include "../../../main.inc.php";
+if (!$res && file_exists("../../../../main.inc.php")) $res = @include "../../../../main.inc.php";
 if (!$res) die("Include of main fails");
 
 require_once DOL_DOCUMENT_ROOT.'/core/lib/admin.lib.php';
@@ -40,16 +41,16 @@ require_once DOL_DOCUMENT_ROOT.'/core/class/doleditor.class.php';
 require_once DOL_DOCUMENT_ROOT.'/contact/class/contact.class.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/images.lib.php';
 
-require_once './class/digiriskresources.class.php';
-require_once './class/digiriskstandard.class.php';
-require_once './class/digiriskelement.class.php';
-require_once './class/digiriskdocuments/groupmentdocument.class.php';
-require_once './class/digiriskdocuments/workunitdocument.class.php';
-require_once './class/digiriskdocuments/riskassessmentdocument.class.php';
-require_once './lib/digiriskdolibarr_digiriskstandard.lib.php';
-require_once './lib/digiriskdolibarr_function.lib.php';
-require_once './core/modules/digiriskdolibarr/digiriskdocuments/riskassessmentdocument/mod_riskassessmentdocument_standard.php';
-require_once './core/modules/digiriskdolibarr/digiriskdocuments/riskassessmentdocument/modules_riskassessmentdocument.php';
+require_once './../../class/digiriskresources.class.php';
+require_once './../../class/digiriskstandard.class.php';
+require_once './../../class/digiriskelement.class.php';
+require_once './../../class/digiriskdocuments/groupmentdocument.class.php';
+require_once './../../class/digiriskdocuments/workunitdocument.class.php';
+require_once './../../class/digiriskdocuments/riskassessmentdocument.class.php';
+require_once './../../lib/digiriskdolibarr_digiriskstandard.lib.php';
+require_once './../../lib/digiriskdolibarr_function.lib.php';
+require_once './../../core/modules/digiriskdolibarr/digiriskdocuments/riskassessmentdocument/mod_riskassessmentdocument_standard.php';
+require_once './../../core/modules/digiriskdolibarr/digiriskdocuments/riskassessmentdocument/modules_riskassessmentdocument.php';
 
 global $db, $conf, $langs, $hookmanager, $user;
 
@@ -347,13 +348,13 @@ print '<form method="POST" action="'.$_SERVER["PHP_SELF"].'" name="edit" enctype
 print '<input type="hidden" name="token" value="'.newToken().'">';
 print '<input type="hidden" name="action" value="update">';
 
-print '<a href="admin/socialconf.php" target="_blank">'.$langs->trans('ConfigureSecurityAndSocialData').' <i class="fas fa-external-link-alt"></i></a>';
+print '<a href="../../admin/socialconf.php" target="_blank">' .$langs->trans('ConfigureSecurityAndSocialData').' <i class="fas fa-external-link-alt"></i></a>';
 print '<hr>';
 print '<div class="fichecenter">';
 print '<table class="border centpercent tableforfield">' . "\n";
 
 //JSON Decode and show fields
-require_once './core/tpl/digiriskdolibarr_riskassessmentdocumentfields_view.tpl.php';
+require_once './../../core/tpl/digiriskdolibarr_riskassessmentdocumentfields_view.tpl.php';
 
 print '</table>';
 print '</div>';

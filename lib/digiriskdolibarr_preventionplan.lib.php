@@ -37,22 +37,22 @@ function preventionplanPrepareHead($object)
 	$head = array();
 
 	if ($user->rights->digiriskdolibarr->preventionplan->read) {
-		$head[$h][0] = dol_buildpath("/digiriskdolibarr/preventionplan_card.php", 1) . '?id=' . $object->id;
+		$head[$h][0] = dol_buildpath("/digiriskdolibarr/view/preventionplan/preventionplan_card.php", 1) . '?id=' . $object->id;
 		$head[$h][1] = '<i class="fas fa-address-card"></i> ' . $langs->trans("Card");
 		$head[$h][2] = 'preventionplanCard';
 		$h++;
 
-		$head[$h][0] = dol_buildpath("/digiriskdolibarr/preventionplan_agenda.php", 1) . '?id=' . $object->id;
+		$head[$h][0] = dol_buildpath("/digiriskdolibarr/view/preventionplan/preventionplan_agenda.php", 1) . '?id=' . $object->id;
 		$head[$h][1] = '<i class="fas fa-calendar"></i> ' . $langs->trans("Events");
 		$head[$h][2] = 'preventionplanAgenda';
 		$h++;
 
-		$head[$h][0] = dol_buildpath("/digiriskdolibarr/preventionplan_schedule.php", 1) . '?id=' . $object->id;
+		$head[$h][0] = dol_buildpath("/digiriskdolibarr/view/preventionplan/preventionplan_schedule.php", 1) . '?id=' . $object->id;
 		$head[$h][1] = '<i class="fas fa-calendar-times"></i> ' . $langs->trans("Schedule");
 		$head[$h][2] = 'preventionplanSchedule';
 		$h++;
 
-		$head[$h][0] = dol_buildpath("/digiriskdolibarr/preventionplan_attendants.php", 1) . '?id=' . $object->id;
+		$head[$h][0] = dol_buildpath("/digiriskdolibarr/view/preventionplan/preventionplan_attendants.php", 1) . '?id=' . $object->id;
 		$head[$h][1] = '<i class="fas fa-file-signature"></i> ' . $langs->trans("Attendants");
 		$head[$h][2] = 'preventionplanAttendants';
 		$h++;

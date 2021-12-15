@@ -16,9 +16,9 @@
  */
 
 /**
- *   	\file       firepermit_schedule.php
+ *   	\file       view/preventionplan/preventionplan_schedule.php
  *		\ingroup    digiriskdolibarr
- *		\brief      Page to create/edit/view Fire Permit Schedule
+ *		\brief      Page to create/edit/view Prevention Plan Schedule
  */
 
 // Load Dolibarr environment
@@ -33,12 +33,14 @@ if (!$res && $i > 0 && file_exists(dirname(substr($tmp, 0, ($i + 1)))."/main.inc
 // Try main.inc.php using relative path
 if (!$res && file_exists("../../main.inc.php")) $res = @include "../../main.inc.php";
 if (!$res && file_exists("../../../main.inc.php")) $res = @include "../../../main.inc.php";
+if (!$res && file_exists("../../../../main.inc.php")) $res = @include "../../../../main.inc.php";
 if (!$res) die("Include of main fails");
 
-require_once __DIR__ . '/class/firepermit.class.php';
-require_once __DIR__ . '/class/openinghours.class.php';
-require_once __DIR__ . '/lib/digiriskdolibarr_firepermit.lib.php';
-require_once __DIR__ . '/lib/digiriskdolibarr_function.lib.php';
+require_once __DIR__ . '/../../class/preventionplan.class.php';
+require_once __DIR__ . '/../../class/openinghours.class.php';
+require_once __DIR__ . '/../../lib/digiriskdolibarr_preventionplan.lib.php';
+require_once __DIR__ . '/../../lib/digiriskdolibarr_function.lib.php';
+require_once DOL_DOCUMENT_ROOT.'/core/lib/images.lib.php';
 
 global $conf, $db, $langs, $user, $hookmanager;
 
@@ -53,24 +55,23 @@ $cancel      = GETPOST('cancel', 'aZ09');
 $contextpage = GETPOST('contextpage', 'aZ') ?GETPOST('contextpage', 'aZ') : 'preventionplanschedule'; // To manage different context of search
 
 // Initialize technical objects
-$firepermit = new FirePermit($db);
-$object     = new Openinghours($db);
+$preventionplan = new PreventionPlan($db);
+$object         = new Openinghours($db);
 
-$hookmanager->initHooks(array('firepermitschedule', 'globalcard')); // Note that conf->hooks_modules contains array
+$hookmanager->initHooks(array('preventionplanschedule', 'globalcard')); // Note that conf->hooks_modules contains array
 
 // Load object
-$firepermit->fetch($id);
+$preventionplan->fetch($id);
 
 $morewhere = ' AND element_id = ' . $id;
-$morewhere .= ' AND element_type = ' . "'" . $firepermit->element . "'";
+$morewhere .= ' AND element_type = ' . "'" . $preventionplan->element . "'";
 $morewhere .= ' AND status = 1';
 
 $object->fetch(0, '', $morewhere);
 
-// Security check
-$permissiontoread = $user->rights->digiriskdolibarr->firepermit->read;
-$permissiontoadd  = $user->rights->digiriskdolibarr->firepermit->write;
-
+// Security check - Protection if external user
+$permissiontoread = $user->rights->digiriskdolibarr->preventionplan->read;
+$permissiontoadd  = $user->rights->digiriskdolibarr->preventionplan->write;
 if (!$permissiontoread) accessforbidden();
 
 /*
@@ -78,26 +79,26 @@ if (!$permissiontoread) accessforbidden();
  */
 
 $parameters = array();
-$reshook = $hookmanager->executeHooks('doActions', $parameters, $firepermit, $action); // Note that $action and $firepermit may have been modified by some hooks
+$reshook = $hookmanager->executeHooks('doActions', $parameters, $preventionplan, $action); // Note that $action and $preventionplan may have been modified by some hooks
 if ($reshook < 0) setEventMessages($hookmanager->error, $hookmanager->errors, 'errors');
 
 if (empty($reshook)) {
 	if (($action == 'update' && !GETPOST("cancel", 'alpha')) || ($action == 'updateedit')) {
-		$object->element_type = $firepermit->element;
-		$object->element_id   = GETPOST('id');
-		$object->status       = 1;
+		$object->element_type = $preventionplan->element;
+		$object->element_id = $id;
+		$object->status = 1;
 
-		$object->monday    = GETPOST('monday', 'string');
-		$object->tuesday   = GETPOST('tuesday', 'string');
+		$object->monday = GETPOST('monday', 'string');
+		$object->tuesday = GETPOST('tuesday', 'string');
 		$object->wednesday = GETPOST('wednesday', 'string');
-		$object->thursday  = GETPOST('thursday', 'string');
-		$object->friday    = GETPOST('friday', 'string');
+		$object->thursday = GETPOST('thursday', 'string');
+		$object->friday = GETPOST('friday', 'string');
 		$object->saturday = GETPOST('saturday', 'string');
-		$object->sunday   = GETPOST('sunday', 'string');
+		$object->sunday = GETPOST('sunday', 'string');
 
 		$object->create($user);
 
-		setEventMessages($langs->trans('FirePermitScheduleSave'), null, 'mesgs');
+		setEventMessages($langs->trans('PreventionPlanScheduleSave'), null, 'mesgs');
 	}
 }
 
@@ -105,28 +106,30 @@ if (empty($reshook)) {
  *  View
  */
 
-$title    = $langs->trans("FirePermit")  . ' - ' . $langs->trans("Schedule");
+$title    = $langs->trans("PreventionPlan") . ' - ' . $langs->trans("Schedule");
 $help_url = '';
 $morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");
 
 llxHeader('', $title, $help_url, '', '', '', '', $morecss);
 
-if (!empty($firepermit->id)) $res = $firepermit->fetch_optionals();
+if (!empty($preventionplan->id)) $res = $preventionplan->fetch_optionals();
 
 // Object card
 // ------------------------------------------------------------
 
-$head = firepermitPrepareHead($firepermit);
-print dol_get_fiche_head($head, 'firepermitSchedule', $langs->trans("FirePermit"), -1, "digiriskdolibarr@digiriskdolibarr");
-dol_strlen($firepermit->label) ? $morehtmlref = ' - ' . $firepermit->label : '';
-digirisk_banner_tab($firepermit, 'ref', '', 0, 'ref', 'ref', $morehtmlref, 0, '', '', $firepermit->getLibStatut(5));
+$head = preventionplanPrepareHead($preventionplan);
+print dol_get_fiche_head($head, 'preventionplanSchedule', $langs->trans("PreventionPlan"), -1, "digiriskdolibarr@digiriskdolibarr");
+dol_strlen($preventionplan->label) ? $morehtmlref = ' - ' . $preventionplan->label : '';
+//$morehtmlleft .= '<div class="floatleft inline-block valignmiddle divphotoref">'.digirisk_show_photos('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$entity].'/'.$object->element_type, 'small', 5, 0, 0, 0, $width,0, 0, 0, 0, $object->element_type, $object).'</div>';
+
+digirisk_banner_tab($preventionplan, 'ref', '', 0, 'ref', 'ref', $morehtmlref, 0, '', '', $preventionplan->getLibStatut(5));
 
 print dol_get_fiche_end();
 
-print load_fiche_titre($langs->trans("FirePermitSchedule"), '', '');
+print load_fiche_titre($langs->trans("PreventionPlanSchedule"), '', '');
 
 //Show common fields
-require_once './core/tpl/digiriskdolibarr_openinghours_view.tpl.php';
+require_once './../../core/tpl/digiriskdolibarr_openinghours_view.tpl.php';
 
 // End of page
 llxFooter();

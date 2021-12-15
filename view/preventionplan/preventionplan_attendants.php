@@ -16,7 +16,7 @@
  */
 
 /**
- *   	\file       preventionplan_attendants.php
+ *   	\file       view/preventionplan/preventionplan_attendants.php
  *		\ingroup    digiriskdolibarr
  *		\brief      Page to add/edit/view preventionplan_signature
  */
@@ -33,14 +33,15 @@ if (!$res && $i > 0 && file_exists(dirname(substr($tmp, 0, ($i + 1)))."/main.inc
 // Try main.inc.php using relative path
 if (!$res && file_exists("../../main.inc.php")) $res = @include "../../main.inc.php";
 if (!$res && file_exists("../../../main.inc.php")) $res = @include "../../../main.inc.php";
+if (!$res && file_exists("../../../../main.inc.php")) $res = @include "../../../../main.inc.php";
 if (!$res) die("Include of main fails");
 
 require_once DOL_DOCUMENT_ROOT.'/core/lib/images.lib.php';
 
-require_once __DIR__ . '/class/digiriskresources.class.php';
-require_once __DIR__ . '/class/preventionplan.class.php';
-require_once __DIR__ . '/lib/digiriskdolibarr_preventionplan.lib.php';
-require_once __DIR__ . '/lib/digiriskdolibarr_function.lib.php';
+require_once __DIR__ . '/../../class/digiriskresources.class.php';
+require_once __DIR__ . '/../../class/preventionplan.class.php';
+require_once __DIR__ . '/../../lib/digiriskdolibarr_preventionplan.lib.php';
+require_once __DIR__ . '/../../lib/digiriskdolibarr_function.lib.php';
 
 global $db, $langs;
 
@@ -82,7 +83,7 @@ if ($reshook < 0) setEventMessages($hookmanager->error, $hookmanager->errors, 'e
 
 if (empty($backtopage) || ($cancel && empty($id))) {
 	if (empty($backtopage) || ($cancel && strpos($backtopage, '__ID__'))) {
-		$backtopage = dol_buildpath('/digiriskdolibarr/preventionplan_attendants.php', 1).'?id='.($object->id > 0 ? $object->id : '__ID__');
+		$backtopage = dol_buildpath('/digiriskdolibarr/view/preventionplan/preventionplan_attendants.php', 1).'?id='.($object->id > 0 ? $object->id : '__ID__');
 	}
 }
 
@@ -302,7 +303,7 @@ print dol_get_fiche_end(); ?>
 		<div class="notice-title"><?php echo $langs->trans('DisclaimerSignatureTitle') ?></div>
 		<div class="notice-subtitle"><?php echo $langs->trans("PreventionPlanMustBeValidatedToSign") ?></div>
 	</div>
-	<a class="butAction" style="width = 100%;margin-right:0" href="<?php echo DOL_URL_ROOT ?>/custom/digiriskdolibarr/preventionplan_card.php?id=<?php echo $id ?>"><?php echo $langs->trans("GoToValidate") ?></a>;
+	<a class="butAction" style="width = 100%;margin-right:0" href="<?php echo DOL_URL_ROOT ?>/custom/digiriskdolibarr/view/preventionplan/preventionplan_card.php?id=<?php echo $id ?>"><?php echo $langs->trans("GoToValidate") ?></a>;
 </div>
 <?php endif; ?>
 <div class="noticeSignatureSuccess wpeo-notice notice-success hidden">
@@ -313,7 +314,7 @@ print dol_get_fiche_end(); ?>
 		</div>
 		<?php
 		if ($signatory->checkSignatoriesSignatures($object->id)) {
-			print '<a class="butAction" style="width = 100%;margin-right:0" href="'.DOL_URL_ROOT . '/custom/digiriskdolibarr/preventionplan_card.php?id='.$id.'">'. $langs->trans("GoToLock").'</a>';
+			print '<a class="butAction" style="width = 100%;margin-right:0" href="'.DOL_URL_ROOT . '/custom/digiriskdolibarr/view/preventionplan/preventionplan_card.php?id='.$id.'">'. $langs->trans("GoToLock").'</a>';
 		}
 		?>
 	</div>
@@ -402,12 +403,12 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 
 	print '<td class="center">';
 	if ($object->status == 2  && $permissiontoadd) {
-		require __DIR__ . "/core/tpl/digiriskdolibarr_signature_action_view.tpl.php";
+		require __DIR__ . "/../../core/tpl/digiriskdolibarr_signature_action_view.tpl.php";
 	}
 	print '</td>';
 	if ($element->signature != $langs->trans("FileGenerated") && $permissiontoadd) {
 		print '<td class="center">';
-		require __DIR__ . "/core/tpl/digiriskdolibarr_signature_view.tpl.php";
+		require __DIR__ . "/../../core/tpl/digiriskdolibarr_signature_view.tpl.php";
 		print '</td>';
 	}
 	print '</tr>';
@@ -456,11 +457,11 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	print '</td>';
 	print '<td class="center">';
 	if ($object->status == 2 && $permissiontoadd) {
-		require __DIR__ . "/core/tpl/digiriskdolibarr_signature_action_view.tpl.php";
+		require __DIR__ . "/../../core/tpl/digiriskdolibarr_signature_action_view.tpl.php";
 	}	print '</td>';
 	if ($element->signature != $langs->trans("FileGenerated")  && $permissiontoadd) {
 		print '<td class="center">';
-		require __DIR__ . "/core/tpl/digiriskdolibarr_signature_view.tpl.php";
+		require __DIR__ . "/../../core/tpl/digiriskdolibarr_signature_view.tpl.php";
 		print '</td>';
 	}
 	print '</tr>';
@@ -519,12 +520,12 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 			print '</td>';
 			print '<td class="center">';
 			if ($object->status < 3  && $permissiontoadd) {
-				require __DIR__ . "/core/tpl/digiriskdolibarr_signature_action_view.tpl.php";
+				require __DIR__ . "/../../core/tpl/digiriskdolibarr_signature_action_view.tpl.php";
 			}
 			print '</td>';
 			if ($element->signature != $langs->trans("FileGenerated")  && $permissiontoadd) {
 				print '<td class="center">';
-				require __DIR__ . "/core/tpl/digiriskdolibarr_signature_view.tpl.php";
+				require __DIR__ . "/../../core/tpl/digiriskdolibarr_signature_view.tpl.php";
 				print '</td>';
 			}
 			print '</tr>';

@@ -16,9 +16,9 @@
  */
 
 /**
- *  \file       digiriskstandard_agenda.php
+ *  \file       view/preventionplan/preventionplan_agenda.php
  *  \ingroup    digiriskdolibarr
- *  \brief      Page of DigiriskStandard events
+ *  \brief      Page of PreventionPlan events
  */
 
 // Load Dolibarr environment
@@ -33,18 +33,18 @@ if (!$res && $i > 0 && file_exists(dirname(substr($tmp, 0, ($i + 1)))."/main.inc
 // Try main.inc.php using relative path
 if (!$res && file_exists("../../main.inc.php")) $res = @include "../../main.inc.php";
 if (!$res && file_exists("../../../main.inc.php")) $res = @include "../../../main.inc.php";
+if (!$res && file_exists("../../../../main.inc.php")) $res = @include "../../../../main.inc.php";
 if (!$res) die("Include of main fails");
 
-require_once DOL_DOCUMENT_ROOT.'/contact/class/contact.class.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/company.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/functions2.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/images.lib.php';
 
-require_once './class/digiriskstandard.class.php';
-require_once './lib/digiriskdolibarr_digiriskstandard.lib.php';
-require_once './lib/digiriskdolibarr_function.lib.php';
+require_once __DIR__ . '/../../class/preventionplan.class.php';
+require_once __DIR__ . '/../../lib/digiriskdolibarr_preventionplan.lib.php';
+require_once __DIR__ . '/../../lib/digiriskdolibarr_function.lib.php';
 
-global $conf, $db, $langs, $user, $hookmanager;
+global $conf, $db, $langs, $hookmanager, $user;
 
 // Load translation files required by the page
 $langs->loadLangs(array("digiriskdolibarr@digiriskdolibarr", "other"));
@@ -70,20 +70,16 @@ $sortfield = GETPOST("sortfield", 'alpha');
 $sortorder = GETPOST("sortorder", 'alpha');
 $page      = GETPOSTISSET('pageplusone') ? (GETPOST('pageplusone') - 1) : GETPOST("page", 'int');
 if (empty($page) || $page == -1) { $page = 0; }     // If $page is not defined, or '' or -1
-$offset = $limit * $page;
+$offset   = $limit * $page;
 $pageprev = $page - 1;
 $pagenext = $page + 1;
 if (!$sortfield) $sortfield = 'a.datep,a.id';
 if (!$sortorder) $sortorder = 'DESC,DESC';
 
 // Initialize technical objects
-$object      = new DigiriskStandard($db);
-$emptyobject = new stdClass($db);
+$object      = new PreventionPlan($db);
 $extrafields = new ExtraFields($db);
-
-$object->fetch($conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD);
-
-$hookmanager->initHooks(array('digiriskstandardagenda', 'globalcard')); // Note that conf->hooks_modules contains array
+$hookmanager->initHooks(array('preventionplanagenda', 'globalcard')); // Note that conf->hooks_modules contains array
 // Fetch optionals attributes and labels
 $extrafields->fetch_name_optionals_label($object->table_element);
 
@@ -91,9 +87,8 @@ $extrafields->fetch_name_optionals_label($object->table_element);
 include DOL_DOCUMENT_ROOT.'/core/actions_fetchobject.inc.php'; // Must be include, not include_once  // Must be include, not include_once. Include fetch and fetch_thirdparty but not fetch_optionals
 if ($id > 0 || !empty($ref)) $upload_dir = $conf->digiriskdolibarr->multidir_output[$object->entity]."/".$object->id;
 
-//Security check
-$permissiontoread = $user->rights->digiriskdolibarr->digiriskelement->read;
-$permissiontoadd  = $user->rights->digiriskdolibarr->digiriskelement->write;
+// Security check - Protection if external user
+$permissiontoread = $user->rights->digiriskdolibarr->preventionplan->read;
 
 if (!$permissiontoread) accessforbidden();
 
@@ -101,7 +96,7 @@ if (!$permissiontoread) accessforbidden();
  *  Actions
  */
 
-$parameters = array('id'=>$id);
+$parameters = array();
 $reshook = $hookmanager->executeHooks('doActions', $parameters, $object, $action); // Note that $action and $object may have been modified by some hooks
 if ($reshook < 0) setEventMessages($hookmanager->error, $hookmanager->errors, 'errors');
 
@@ -123,37 +118,37 @@ if (empty($reshook)) {
  *	View
  */
 
-if ($object->id > 0){
-	$title = $langs->trans("Agenda");
-	//if (! empty($conf->global->MAIN_HTML_TITLE) && preg_match('/thirdpartynameonly/',$conf->global->MAIN_HTML_TITLE) && $object->name) $title=$object->name." - ".$title;
-	$help_url = 'FR:Module_DigiriskDolibarr';
-	$morejs   = array("/digiriskdolibarr/js/digiriskdolibarr.js.php");
-	$morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");
+if ($object->id > 0) {
+	$title     = $langs->trans("PreventionPlan") . ' - ' . $langs->trans("Agenda");
+	$help_url  = 'FR:Module_DigiriskDolibarr';
+	$morejs    = array("/digiriskdolibarr/js/digiriskdolibarr.js.php");
+	$morecss   = array("/digiriskdolibarr/css/digiriskdolibarr.css");
 
-	digiriskHeader('', $title, $help_url, '', '', '', $morejs, $morecss);
-	print '<div id="cardContent" value="">';
+	llxHeader('', $title, $help_url, '', '', '', $morejs, $morecss);
 
-	if (!empty($conf->notification->enabled)) $langs->load("mails");
-	$head = digiriskstandardPrepareHead($object);
+	$head = preventionplanPrepareHead($object);
 
-	print dol_get_fiche_head($head, 'standardAgenda', $title, -1, "digiriskdolibarr@digiriskdolibarr");
+	print dol_get_fiche_head($head, 'preventionplanAgenda', $title, -1, "digiriskdolibarr@digiriskdolibarr");
 
 	// Object card
 	// ------------------------------------------------------------
-	$morehtmlref = '<div class="refidno">';
-	$morehtmlref .= '</div>';
-	$width = 80; $cssclass = 'photoref';
-	$morehtmlleft = '<div class="floatleft inline-block valignmiddle divphotoref">'.digirisk_show_photos('mycompany', $conf->mycompany->dir_output . '/logos', 'small', 1, 0, 0, 0, $width,0, 0, 0, 0, 'logos', $emptyobject).'</div>';
+	//$width = 80; $cssclass = 'photoref';
+	dol_strlen($object->label) ? $morehtmlref = ' - ' . $object->label : '';
+	//$morehtmlleft .= '<div class="floatleft inline-block valignmiddle divphotoref">'.digirisk_show_photos('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$entity].'/'.$object->element_type, 'small', 5, 0, 0, 0, $width,0, 0, 0, 0, $object->element_type, $object).'</div>';
 
-	digirisk_banner_tab($object, 'ref', '', 0, 'ref', 'ref', $morehtmlref, '', 0, $morehtmlleft);
+	digirisk_banner_tab($object, 'ref', '', 0, 'ref', 'ref', $morehtmlref, 0, '', '', $object->getLibStatut(5));
 
 	print '<div class="fichecenter">';
+
+	$object->info($object->id);
+	dol_print_object_info($object, 1);
+
 	print '</div>';
 
 	print dol_get_fiche_end();
 
 	// Actions buttons
-	$out = '&origin='.$object->element.'@digiriskdolibarr'.'&originid='.$object->id;
+	$out = '&origin='.$object->element.'@digiriskdolibarr'.'&originid='.$object->id.'&backtopage=1&percentage=-1';
 
 	if (!empty($conf->agenda->enabled)) {
 		$linktocreatetimeBtnStatus = !empty($user->rights->agenda->myactions->create) || !empty($user->rights->agenda->allactions->create);
@@ -165,14 +160,10 @@ if ($object->id > 0){
 		if (!empty($contextpage) && $contextpage != $_SERVER["PHP_SELF"]) $param .= '&contextpage='.urlencode($contextpage);
 		if ($limit > 0 && $limit != $conf->liste_limit) $param .= '&limit='.urlencode($limit);
 
-		print_barre_liste($langs->trans("ActionsOnDigiriskStandard"), 0, $_SERVER["PHP_SELF"], '', $sortfield, $sortorder, '', 0, -1, '', 0, $morehtmlcenter, '', 0, 1, 1);
+		print_barre_liste($langs->trans("ActionsOnPreventionPlan"), 0, $_SERVER["PHP_SELF"], '', $sortfield, $sortorder, '', 0, -1, '', 0, $morehtmlcenter, '', 0, 1, 1);
 
 		// List of all actions
 		$filters = array();
-		$filters['search_agenda_label'] = $search_agenda_label;
-
-		// TODO Replace this with same code than into list.php
-
 		show_actions_done($conf, $langs, $db, $object, null, 0, $actioncode, '', $filters, $sortfield, $sortorder, 'digiriskdolibarr');
 		print '</div>';
 	}
