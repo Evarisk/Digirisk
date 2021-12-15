@@ -11,6 +11,7 @@ if (!$error && $action == 'add' && $permissiontoadd) {
 	if ($riskComment !== 'undefined') {
 		$risk->description = $riskComment;
 	}
+
 	$risk->fk_element  = $fk_element ? $fk_element : 0;
 	$risk->fk_projet   = $conf->global->DIGIRISKDOLIBARR_DU_PROJECT;
 	$risk->category    = $category;
@@ -32,7 +33,7 @@ if (!$error && $action == 'add' && $permissiontoadd) {
 			$evaluation->method              = $method;
 			$evaluation->ref                 = $refEvaluationMod->getNextValue($evaluation);
 			$evaluation->comment             = $evaluationComment;
-			$evaluation->date_riskassessment = strtotime(preg_replace('/\//', '-',$riskAssessmentDate));
+			$evaluation->date_riskassessment = $riskAssessmentDate != 'undefined' ? strtotime(preg_replace('/\//', '-',$riskAssessmentDate)) : dol_now();
 
 			if ($method == 'advanced') {
 				$formation  = GETPOST('formation');
@@ -47,7 +48,6 @@ if (!$error && $action == 'add' && $permissiontoadd) {
 				$evaluation->gravite    = $gravite;
 				$evaluation->exposition = $exposition;
 			}
-
 
 			$pathToTmpPhoto = $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessment/tmp/RK0/';
 			$files = dol_dir_list($pathToTmpPhoto);
@@ -70,7 +70,6 @@ if (!$error && $action == 'add' && $permissiontoadd) {
 					// Used on menu or for setup page for example
 					$imgThumbMini = vignette($destfull, $maxwidthmini, $maxheightmini, '_mini', 50, "thumbs");
 					unlink($file['fullname']);
-
 				}
 			}
 			$filesThumbs = dol_dir_list($pathToTmpPhoto . '/thumbs/');
@@ -80,7 +79,6 @@ if (!$error && $action == 'add' && $permissiontoadd) {
 
 				}
 			}
-
 
 			$result2 = $evaluation->create($user, true);
 
