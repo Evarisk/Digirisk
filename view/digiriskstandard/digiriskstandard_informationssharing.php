@@ -16,7 +16,7 @@
  */
 
 /**
- *   	\file       digiriskstandard_informationssharing.php
+ *   	\file       view/digiriskstandard/digiriskstandard_informationssharing.php
  *		\ingroup    digiriskdolibarr
  *		\brief      Page to view informationssharing
  */
@@ -33,15 +33,16 @@ if (!$res && $i > 0 && file_exists(dirname(substr($tmp, 0, ($i + 1)))."/main.inc
 // Try main.inc.php using relative path
 if (!$res && file_exists("../../main.inc.php")) $res = @include "../../main.inc.php";
 if (!$res && file_exists("../../../main.inc.php")) $res = @include "../../../main.inc.php";
+if (!$res && file_exists("../../../../main.inc.php")) $res = @include "../../../../main.inc.php";
 if (!$res) die("Include of main fails");
 
 require_once DOL_DOCUMENT_ROOT.'/core/lib/images.lib.php';
 
-require_once './class/digiriskstandard.class.php';
-require_once './class/digiriskdocuments/informationssharing.class.php';
-require_once './lib/digiriskdolibarr_digiriskstandard.lib.php';
-require_once './lib/digiriskdolibarr_function.lib.php';
-require_once './core/modules/digiriskdolibarr/digiriskdocuments/informationssharing/modules_informationssharing.php';
+require_once './../../class/digiriskstandard.class.php';
+require_once './../../class/digiriskdocuments/informationssharing.class.php';
+require_once './../../lib/digiriskdolibarr_digiriskstandard.lib.php';
+require_once './../../lib/digiriskdolibarr_function.lib.php';
+require_once './../../core/modules/digiriskdolibarr/digiriskdocuments/informationssharing/modules_informationssharing.php';
 
 global $db, $conf, $langs, $hookmanager, $user;
 
@@ -176,13 +177,13 @@ $morehtmlref .= '</div>';
 $morehtmlleft = '<div class="floatleft inline-block valignmiddle divphotoref">'.digirisk_show_photos('mycompany', $conf->mycompany->dir_output . '/logos', 'small', 1, 0, 0, 0, $width,0, 0, 0, 0, 'logos', $emptyobject).'</div>';
 
 digirisk_banner_tab($object, 'ref', '', 0, 'ref', 'ref', $morehtmlref, '', 0, $morehtmlleft);
-print '<a href="admin/socialconf.php" target="_blank">'.$langs->trans('ConfigureSecurityAndSocialData').' <i class="fas fa-external-link-alt"></i></a>';
+print '<a href="../../admin/socialconf.php" target="_blank">' .$langs->trans('ConfigureSecurityAndSocialData').' <i class="fas fa-external-link-alt"></i></a>';
 print '<hr>';
 print '<div class="fichecenter">';
 print '<table class="border centpercent tableforfield">' . "\n";
 
 //JSON Decode and show fields
-require_once './core/tpl/digiriskdolibarr_informationssharingfields_view.tpl.php';
+require_once './../../core/tpl/digiriskdolibarr_informationssharingfields_view.tpl.php';
 
 print '</table>';
 print '</div>';
