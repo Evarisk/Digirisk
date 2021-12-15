@@ -43,8 +43,11 @@ require_once DOL_DOCUMENT_ROOT.'/contact/class/contact.class.php';
 require_once DOL_DOCUMENT_ROOT.'/societe/class/societe.class.php';
 
 require_once __DIR__ . '/class/accident.class.php';
+require_once __DIR__ . '/class/digiriskelement.class.php';
+require_once __DIR__ . '/class/digiriskstandard.class.php';
 require_once __DIR__ . '/class/preventionplan.class.php';
 require_once __DIR__ . '/class/digiriskresources.class.php';
+require_once __DIR__ . '/lib/digiriskdolibarr_function.lib.php';
 
 global $conf, $db, $hookmanager, $langs, $user;
 
@@ -72,7 +75,10 @@ $preventionplan     = new PreventionPlan($db);
 $societe            = new Societe($db);
 $contact            = new Contact($db);
 $usertmp            = new User($db);
+$thirdparty         = new Societe($db);
 $digiriskresources  = new DigiriskResources($db);
+$digiriskelement    = new DigiriskElement($db);
+$digiriskstandard   = new DigiriskStandard($db);
 
 if (!$sortfield) $sortfield = "t.ref";
 if (!$sortorder) $sortorder = "ASC";
@@ -360,14 +366,7 @@ foreach ($accident->fields as $key => $val)
 	$cssforfield = (empty($val['css']) ? '' : $val['css']);
 	if ($key == 'status') $cssforfield .= ($cssforfield ? ' ' : '').'center';
 	if (!empty($arrayfields['t.'.$key]['checked'])) {
-		if (preg_match('/MaitreOeuvre/', $arrayfields['t.'.$key]['label']) || preg_match('/StartDate/', $arrayfields['t.'.$key]['label']) || preg_match('/EndDate/', $arrayfields['t.'.$key]['label']) || preg_match('/ExtSociety/', $arrayfields['t.'.$key]['label']) || preg_match('/NbIntervenants/', $arrayfields['t.'.$key]['label']) || preg_match('/NbInterventions/', $arrayfields['t.'.$key]['label']) || preg_match('/Location/', $arrayfields['t.'.$key]['label'])) {
-			$disablesort = 1;
-		}
-		else {
-			$disablesort = 0;
-		}
 		print getTitleFieldOfList($arrayfields['t.'.$key]['label'], 0, $_SERVER['PHP_SELF'], 't.'.$key, '', $param, ($cssforfield ? 'class="'.$cssforfield.'"' : ''), $sortfield, $sortorder, ($cssforfield ? $cssforfield.' ' : ''), $disablesort)."\n";
-
 	}
 }
 
@@ -455,8 +454,17 @@ while ($i < ($limit ? min($num, $limit) : $num)) {
 			elseif ($key == 'ref') {
 				print '<i class="fas fa-user-injured"></i>  ' . $accident->getNomUrl();
 			}
-			elseif ($key == 'accident_date') {
-				print dol_print_date($accident->accident_date, 'dayhour', 'tzserver');	// We suppose dates without time are always gmt (storage of course + output)
+			elseif ($key == 'fk_user_employer') {
+				$usertmp->fetch($accident->fk_user_employer);
+				if ($usertmp > 0) {
+					print getNomUrl( 1, 'blank', 0, 0, 0, 0,'','',-1, $usertmp, 0);
+				}
+			}
+			elseif ($key == 'fk_user_victim') {
+				$usertmp->fetch($accident->fk_user_victim);
+				if ($usertmp > 0) {
+					print getNomUrl( 1, 'blank', 0, 0, 0, 0,'','',-1, $usertmp, 0);
+				}
 			}
 			elseif ($key == 'accident_type') {
 				if ($accident->accident_type == 0) {
@@ -464,6 +472,21 @@ while ($i < ($limit ? min($num, $limit) : $num)) {
 				} elseif ($accident->accident_type == 1) {
 					print $langs->trans('CommutingAccident');
 				}
+			} elseif ($key == 'fk_element') {
+				if (empty($accident->external_accident)) {
+					if ($conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD == $accident->fk_element) {
+						$digiriskstandard->fetch($conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD);
+						print $digiriskstandard->getNomUrl(1, 'blank', 1);
+					} else {
+						$digiriskelement->fetch($accident->fk_element);
+						print $digiriskelement->getNomUrl(1, 'blank', 1);
+					}
+				} else {
+					$thirdparty->fetch($accident->fk_soc);
+					print getNomUrlSociety($thirdparty, 1, 'blank');
+				}
+			} elseif ($key == 'accident_date') {
+				print dol_print_date($accident->accident_date, 'dayhour', 'tzserver');	// We suppose dates without time are always gmt (storage of course + output)
 			}
 			else print $accident->showOutputField($val, $key, $accident->$key, '');
 			print '</td>';
