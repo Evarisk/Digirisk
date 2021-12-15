@@ -424,7 +424,7 @@ while ($i < ($limit ? min($num, $limit) : $num)) {
 				$arrayAccident = array();
 				$arrayAccident[] = $accident->ref;
 				$arrayAccident[] = $accident->label;
-				$arrayAccident[] = $accident->accident_type;
+				$arrayAccident[] = (!empty($object->accident_type) ? $object->accident_type : 0);
 				$arrayAccident[] = $accident->accident_date;
 				$arrayAccident[] = $accident->description;
 				$arrayAccident[] = $accident->photo;

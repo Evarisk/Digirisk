@@ -764,7 +764,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	$arrayAccident = array();
 	$arrayAccident[] = $object->ref;
 	$arrayAccident[] = $object->label;
-	$arrayAccident[] = $object->accident_type;
+	$arrayAccident[] = (!empty($object->accident_type) ? $object->accident_type : 0);
 	$arrayAccident[] = $object->accident_date;
 	$arrayAccident[] = $object->description;
 	$arrayAccident[] = $object->photo;
