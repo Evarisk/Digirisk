@@ -16,7 +16,7 @@
  */
 
 /**
- *   	\file       accident_card.php
+ *   	\file       view/accident/accident_card.php
  *		\ingroup    digiriskdolibarr
  *		\brief      Page to create/edit/view accident
  */
@@ -33,22 +33,23 @@ if (!$res && $i > 0 && file_exists(dirname(substr($tmp, 0, ($i + 1)))."/main.inc
 // Try main.inc.php using relative path
 if (!$res && file_exists("../../main.inc.php")) $res = @include "../../main.inc.php";
 if (!$res && file_exists("../../../main.inc.php")) $res = @include "../../../main.inc.php";
+if (!$res && file_exists("../../../../main.inc.php")) $res = @include "../../../../main.inc.php";
 if (!$res) die("Include of main fails");
 
 require_once DOL_DOCUMENT_ROOT.'/core/class/html.formfile.class.php';
 require_once DOL_DOCUMENT_ROOT.'/core/class/doleditor.class.php';
 
-require_once __DIR__ . '/class/digiriskdocuments.class.php';
-require_once __DIR__ . '/class/digiriskelement.class.php';
-require_once __DIR__ . '/class/accident.class.php';
-require_once __DIR__ . '/class/digiriskstandard.class.php';
-//require_once __DIR__ . '/class/digiriskdocuments/accidentdocument.class.php';
-require_once __DIR__ . '/lib/digiriskdolibarr_function.lib.php';
-require_once __DIR__ . '/lib/digiriskdolibarr_accident.lib.php';
-require_once __DIR__ . '/core/modules/digiriskdolibarr/digiriskelement/accident/mod_accident_standard.php';
-require_once __DIR__ . '/core/modules/digiriskdolibarr/digiriskelement/accident_workstop/mod_accident_workstop_standard.php';
-//require_once __DIR__ . '/core/modules/digiriskdolibarr/digiriskdocuments/accidentdocument/mod_accidentdocument_standard.php';
-//require_once __DIR__ . '/core/modules/digiriskdolibarr/digiriskdocuments/accidentdocument/modules_accidentdocument.php';
+require_once __DIR__ . '/../../class/digiriskdocuments.class.php';
+require_once __DIR__ . '/../../class/digiriskelement.class.php';
+require_once __DIR__ . '/../../class/accident.class.php';
+require_once __DIR__ . '/../../class/digiriskstandard.class.php';
+//require_once __DIR__ . '/../../class/digiriskdocuments/accidentdocument.class.php';
+require_once __DIR__ . '/../../lib/digiriskdolibarr_function.lib.php';
+require_once __DIR__ . '/../../lib/digiriskdolibarr_accident.lib.php';
+require_once __DIR__ . '/../../core/modules/digiriskdolibarr/digiriskelement/accident/mod_accident_standard.php';
+require_once __DIR__ . '/../../core/modules/digiriskdolibarr/digiriskelement/accident_workstop/mod_accident_workstop_standard.php';
+//require_once __DIR__ . '/../../core/modules/digiriskdolibarr/digiriskdocuments/accidentdocument/mod_accidentdocument_standard.php';
+//require_once __DIR__ . '/../../core/modules/digiriskdolibarr/digiriskdocuments/accidentdocument/modules_accidentdocument.php';
 
 global $conf, $db, $hookmanager, $langs, $mysoc, $user;
 
@@ -106,12 +107,12 @@ if ($reshook < 0) setEventMessages($hookmanager->error, $hookmanager->errors, 'e
 if (empty($reshook)) {
 	$error = 0;
 
-	$backurlforlist = dol_buildpath('/digiriskdolibarr/accident_list.php', 1);
+	$backurlforlist = dol_buildpath('/digiriskdolibarr/view/accident/accident_list.php', 1);
 
 	if (empty($backtopage) || ($cancel && empty($id))) {
 		if (empty($backtopage) || ($cancel && strpos($backtopage, '__ID__'))) {
 			if (empty($object->id) && (($action != 'add' && $action != 'create') || $cancel)) $backtopage = $backurlforlist;
-			else $backtopage = dol_buildpath('/digiriskdolibarr/accident_card.php', 1).'?id='.($object->id > 0 ? $object->id : '__ID__');
+			else $backtopage = dol_buildpath('/digiriskdolibarr/view/accident/accident_card.php', 1).'?id='.($object->id > 0 ? $object->id : '__ID__');
 		}
 	}
 
@@ -796,7 +797,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	$morehtmlref .= $langs->trans('Project').' : '.getNomUrlProject($project, 1, 'blank');
 	$morehtmlref .= '</div>';
 
-	include_once './core/tpl/digiriskdolibarr_configuration_gauge_view.tpl.php';
+	include_once './../../core/tpl/digiriskdolibarr_configuration_gauge_view.tpl.php';
 
 	digirisk_banner_tab($object, 'ref', '', 0, 'ref', 'ref', $morehtmlref);
 
@@ -1226,7 +1227,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 
 	$MAXEVENT = 10;
 
-	$morehtmlright = '<a href="' . dol_buildpath('/digiriskdolibarr/accident_agenda.php', 1) . '?id=' . $object->id . '">';
+	$morehtmlright = '<a href="' . dol_buildpath('/digiriskdolibarr/view/accident/accident_agenda.php', 1) . '?id=' . $object->id . '">';
 	$morehtmlright .= $langs->trans("SeeAll");
 	$morehtmlright .= '</a>';
 

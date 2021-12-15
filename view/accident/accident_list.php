@@ -16,7 +16,7 @@
  */
 
 /**
- *   	\file       accident_list.php
+ *   	\file       view/accident/accident_list.php
  *		\ingroup    digiriskdolibarr
  *		\brief      List page for accident
  */
@@ -33,6 +33,7 @@ if (!$res && $i > 0 && file_exists(dirname(substr($tmp, 0, ($i + 1)))."/main.inc
 // Try main.inc.php using relative path
 if (!$res && file_exists("../../main.inc.php")) $res = @include "../../main.inc.php";
 if (!$res && file_exists("../../../main.inc.php")) $res = @include "../../../main.inc.php";
+if (!$res && file_exists("../../../../main.inc.php")) $res = @include "../../../../main.inc.php";
 if (!$res) die("Include of main fails");
 
 require_once DOL_DOCUMENT_ROOT.'/projet/class/project.class.php';
@@ -42,12 +43,12 @@ require_once DOL_DOCUMENT_ROOT.'/user/class/user.class.php';
 require_once DOL_DOCUMENT_ROOT.'/contact/class/contact.class.php';
 require_once DOL_DOCUMENT_ROOT.'/societe/class/societe.class.php';
 
-require_once __DIR__ . '/class/accident.class.php';
-require_once __DIR__ . '/class/digiriskelement.class.php';
-require_once __DIR__ . '/class/digiriskstandard.class.php';
-require_once __DIR__ . '/class/preventionplan.class.php';
-require_once __DIR__ . '/class/digiriskresources.class.php';
-require_once __DIR__ . '/lib/digiriskdolibarr_function.lib.php';
+require_once __DIR__ . '/../../class/accident.class.php';
+require_once __DIR__ . '/../../class/digiriskelement.class.php';
+require_once __DIR__ . '/../../class/digiriskstandard.class.php';
+require_once __DIR__ . '/../../class/preventionplan.class.php';
+require_once __DIR__ . '/../../class/digiriskresources.class.php';
+require_once __DIR__ . '/../../lib/digiriskdolibarr_function.lib.php';
 
 global $conf, $db, $hookmanager, $langs, $user;
 
@@ -138,7 +139,7 @@ if (empty($reshook))
 	// Selection of new fields
 	include DOL_DOCUMENT_ROOT . '/core/actions_changeselectedfields.inc.php';
 
-	$backtopage = dol_buildpath('/digiriskdolibarr/accident_list.php', 1);
+	$backtopage = dol_buildpath('/digiriskdolibarr/view/accident/accident_list.php', 1);
 
 	// Purge search criteria
 	if (GETPOST('button_removefilter_x', 'alpha') || GETPOST('button_removefilter.x', 'alpha') || GETPOST('button_removefilter', 'alpha')) // All tests are required to be compatible with all browsers
@@ -209,7 +210,7 @@ $massactionbutton = $form->selectMassAction('', $arrayofmassactions);
 
 $newcardbutton = '';
 if ($permissiontoadd) {
-	$newcardbutton .= dolGetButtonTitle($langs->trans('NewAccident'), '', 'fa fa-plus-circle', DOL_URL_ROOT.'/custom/digiriskdolibarr/accident_card.php?action=create');
+	$newcardbutton .= dolGetButtonTitle($langs->trans('NewAccident'), '', 'fa fa-plus-circle', DOL_URL_ROOT.'/custom/digiriskdolibarr/view/accident/accident_card.php?action=create');
 }
 
 print '<form method="POST" id="searchFormList" action="'.$_SERVER["PHP_SELF"].'">';
@@ -305,7 +306,7 @@ foreach ($search as $key => $val)
 	{
 		$obj = $db->fetch_object($resql);
 		$id = $obj->rowid;
-		header("Location: ".dol_buildpath('/digiriskdolibarr/accident_card.php', 1).'?id='.$id);
+		header("Location: ".dol_buildpath('/digiriskdolibarr/view/accident/accident_card.php', 1).'?id='.$id);
 		exit;
 	}
 

@@ -37,32 +37,32 @@ function accidentPrepareHead($object)
 	$head = array();
 
 	if ($user->rights->digiriskdolibarr->accident->read) {
-		$head[$h][0] = dol_buildpath("/digiriskdolibarr/accident_card.php", 1) . '?id=' . $object->id;
+		$head[$h][0] = dol_buildpath("/digiriskdolibarr/view/accident/accident_card.php", 1) . '?id=' . $object->id;
 		$head[$h][1] = '<i class="fas fa-address-card"></i> ' . $langs->trans("Card");
 		$head[$h][2] = 'accidentCard';
 		$h++;
 
-		$head[$h][0] = dol_buildpath("/digiriskdolibarr/accident_metadata.php", 1) . '?id=' . $object->id;
+		$head[$h][0] = dol_buildpath("/digiriskdolibarr/view/accident/accident_metadata.php", 1) . '?id=' . $object->id;
 		$head[$h][1] = '<i class="fas fa-info-circle"></i> ' . $langs->trans("AccidentMetaData");
 		$head[$h][2] = 'accidentMetadata';
 		$h++;
 
-		$head[$h][0] = dol_buildpath("/digiriskdolibarr/accident_attendants.php", 1) . '?id=' . $object->id;
+		$head[$h][0] = dol_buildpath("/digiriskdolibarr/view/accident/accident_attendants.php", 1) . '?id=' . $object->id;
 		$head[$h][1] = '<i class="fas fa-file-signature"></i> ' . $langs->trans("Signature");
 		$head[$h][2] = 'accidentAttendants';
 		$h++;
 
-		$head[$h][0] = dol_buildpath("/digiriskdolibarr/accident_document.php", 1) . '?id=' . $object->id;
+		$head[$h][0] = dol_buildpath("/digiriskdolibarr/view/accident/accident_document.php", 1) . '?id=' . $object->id;
 		$head[$h][1] = '<i class="fas fa-file-alt"></i> ' . $langs->trans("Documents");
 		$head[$h][2] = 'accidentDocument';
 		$h++;
 
-//		$head[$h][0] = dol_buildpath("/digiriskdolibarr/accident_document_metadata.php", 1) . '?id=' . $object->id;
+//		$head[$h][0] = dol_buildpath("/digiriskdolibarr/view/accident/accident_document_metadata.php", 1) . '?id=' . $object->id;
 //		$head[$h][1] = '<i class="fas fa-file-alt"></i> ' . $langs->trans("DocumentsMetaData");
 //		$head[$h][2] = 'accidentDocumentMetaData';
 //		$h++;
 
-		$head[$h][0] = dol_buildpath("/digiriskdolibarr/accident_agenda.php", 1) . '?id=' . $object->id;
+		$head[$h][0] = dol_buildpath("/digiriskdolibarr/view/accident/accident_agenda.php", 1) . '?id=' . $object->id;
 		$head[$h][1] = '<i class="fas fa-calendar"></i> ' . $langs->trans("Events");
 		$head[$h][2] = 'accidentAgenda';
 		$h++;

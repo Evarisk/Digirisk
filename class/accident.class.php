@@ -427,7 +427,7 @@ class Accident extends CommonObject
 		if (empty($linkstart))
 		{
 			$label .= '<u>'.$langs->trans("Accident").'</u>';
-			$linkstart = '<a href="'.DOL_URL_ROOT.'/custom/digiriskdolibarr/accident_card.php?id='.$this->id;
+			$linkstart = '<a href="'.DOL_URL_ROOT.'/custom/digiriskdolibarr/view/accident/accident_card.php?id='.$this->id;
 		}
 
 		if (!empty($this->ref))

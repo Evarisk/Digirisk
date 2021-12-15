@@ -16,7 +16,7 @@
  */
 
 /**
- *   	\file       accident_metadata.php
+ *   	\file       view/accident/accident_metadata.php
  *		\ingroup    digiriskdolibarr
  *		\brief      Page to create/edit/view accident metadata
  */
@@ -33,16 +33,17 @@ if (!$res && $i > 0 && file_exists(dirname(substr($tmp, 0, ($i + 1)))."/main.inc
 // Try main.inc.php using relative path
 if (!$res && file_exists("../../main.inc.php")) $res = @include "../../main.inc.php";
 if (!$res && file_exists("../../../main.inc.php")) $res = @include "../../../main.inc.php";
+if (!$res && file_exists("../../../../main.inc.php")) $res = @include "../../../../main.inc.php";
 if (!$res) die("Include of main fails");
 
 require_once DOL_DOCUMENT_ROOT.'/core/class/html.formother.class.php';
 require_once DOL_DOCUMENT_ROOT.'/core/class/doleditor.class.php';
 require_once DOL_DOCUMENT_ROOT.'/projet/class/project.class.php';
 
-require_once __DIR__ . '/class/accident.class.php';
-require_once __DIR__ . '/lib/digiriskdolibarr_function.lib.php';
-require_once __DIR__ . '/lib/digiriskdolibarr_accident.lib.php';
-require_once __DIR__ . '/core/modules/digiriskdolibarr/digiriskelement/accident_lesion/mod_accident_lesion_standard.php';
+require_once __DIR__ . '/../../class/accident.class.php';
+require_once __DIR__ . '/../../lib/digiriskdolibarr_function.lib.php';
+require_once __DIR__ . '/../../lib/digiriskdolibarr_accident.lib.php';
+require_once __DIR__ . '/../../core/modules/digiriskdolibarr/digiriskelement/accident_lesion/mod_accident_lesion_standard.php';
 
 global $conf, $db, $hookmanager, $langs, $user;
 
@@ -86,12 +87,12 @@ if ($reshook < 0) setEventMessages($hookmanager->error, $hookmanager->errors, 'e
 
 if (empty($reshook)) {
 
-	$backurlforlist = dol_buildpath('/digiriskdolibarr/accident_list.php', 1);
+	$backurlforlist = dol_buildpath('/digiriskdolibarr/view/accident/accident_list.php', 1);
 
 	if (empty($backtopage) || ($cancel && empty($id))) {
 		if (empty($backtopage) || ($cancel && strpos($backtopage, '__ID__'))) {
 			if (empty($object->id) && (($action != 'add' && $action != 'create') || $cancel)) $backtopage = $backurlforlist;
-			else $backtopage = dol_buildpath('/digiriskdolibarr/accident_metadata.php', 1).'?id='.($object->id > 0 ? $object->id : '__ID__');
+			else $backtopage = dol_buildpath('/digiriskdolibarr/view/accident/accident_metadata.php', 1).'?id='.($object->id > 0 ? $object->id : '__ID__');
 		}
 	}
 

@@ -16,7 +16,7 @@
  */
 
 /**
- *   	\file       accident_attendants.php
+ *   	\file       view/accident/accident_attendants.php
  *		\ingroup    digiriskdolibarr
  *		\brief      Page to add/edit/view accident_signature
  */
@@ -33,15 +33,16 @@ if (!$res && $i > 0 && file_exists(dirname(substr($tmp, 0, ($i + 1)))."/main.inc
 // Try main.inc.php using relative path
 if (!$res && file_exists("../../main.inc.php")) $res = @include "../../main.inc.php";
 if (!$res && file_exists("../../../main.inc.php")) $res = @include "../../../main.inc.php";
+if (!$res && file_exists("../../../../main.inc.php")) $res = @include "../../../../main.inc.php";
 if (!$res) die("Include of main fails");
 
 require_once DOL_DOCUMENT_ROOT.'/core/lib/images.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/projet/class/project.class.php';
 
-require_once __DIR__ . '/class/digiriskresources.class.php';
-require_once __DIR__ . '/class/accident.class.php';
-require_once __DIR__ . '/lib/digiriskdolibarr_accident.lib.php';
-require_once __DIR__ . '/lib/digiriskdolibarr_function.lib.php';
+require_once __DIR__ . '/../../class/digiriskresources.class.php';
+require_once __DIR__ . '/../../class/accident.class.php';
+require_once __DIR__ . '/../../lib/digiriskdolibarr_accident.lib.php';
+require_once __DIR__ . '/../../lib/digiriskdolibarr_function.lib.php';
 
 global $db, $hookmanager, $langs, $user;
 
@@ -83,7 +84,7 @@ if ($reshook < 0) setEventMessages($hookmanager->error, $hookmanager->errors, 'e
 
 if (empty($backtopage) || ($cancel && empty($id))) {
 	if (empty($backtopage) || ($cancel && strpos($backtopage, '__ID__'))) {
-		$backtopage = dol_buildpath('/digiriskdolibarr/accident_attendants.php', 1).'?id='.($object->id > 0 ? $object->id : '__ID__');
+		$backtopage = dol_buildpath('/digiriskdolibarr/view/accident/accident_attendants.php', 1).'?id='.($object->id > 0 ? $object->id : '__ID__');
 	}
 }
 
@@ -323,11 +324,11 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	print '</td>';
 	print '<td class="center">';
 	if ($object->status == 2 && $permissiontoadd) {
-		require __DIR__ . "/core/tpl/digiriskdolibarr_signature_action_view.tpl.php";
+		require __DIR__ . "/../../core/tpl/digiriskdolibarr_signature_action_view.tpl.php";
 	}	print '</td>';
 	if ($element->signature != $langs->trans("FileGenerated")  && $permissiontoadd) {
 		print '<td class="center">';
-		require __DIR__ . "/core/tpl/digiriskdolibarr_signature_view.tpl.php";
+		require __DIR__ . "/../../core/tpl/digiriskdolibarr_signature_view.tpl.php";
 		print '</td>';
 	}
 	print '</tr>';

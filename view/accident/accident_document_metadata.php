@@ -16,7 +16,7 @@
  */
 
 /**
- *  \file       accident_document_metadata.php
+ *  \file       view/accident/accident_document_metadata.php
  *  \ingroup    digiriskdolibarr
  *  \brief      Tab for documents linked to Accident Metadata
  */
@@ -33,6 +33,7 @@ if (!$res && $i > 0 && file_exists(dirname(substr($tmp, 0, ($i + 1)))."/main.inc
 // Try main.inc.php using relative path
 if (!$res && file_exists("../../main.inc.php")) $res = @include "../../main.inc.php";
 if (!$res && file_exists("../../../main.inc.php")) $res = @include "../../../main.inc.php";
+if (!$res && file_exists("../../../../main.inc.php")) $res = @include "../../../../main.inc.php";
 if (!$res) die("Include of main fails");
 
 require_once DOL_DOCUMENT_ROOT.'/core/lib/company.lib.php';
@@ -42,9 +43,9 @@ require_once DOL_DOCUMENT_ROOT.'/core/class/html.formfile.class.php';
 require_once DOL_DOCUMENT_ROOT.'/projet/class/project.class.php';
 include_once DOL_DOCUMENT_ROOT.'/ecm/class/ecmfiles.class.php';
 
-require_once __DIR__ . '/class/accident.class.php';
-require_once __DIR__ . '/lib/digiriskdolibarr_accident.lib.php';
-require_once __DIR__ . '/lib/digiriskdolibarr_function.lib.php';
+require_once __DIR__ . '/../../class/accident.class.php';
+require_once __DIR__ . '/../../lib/digiriskdolibarr_accident.lib.php';
+require_once __DIR__ . '/../../lib/digiriskdolibarr_function.lib.php';
 
 global $conf, $db, $hookmanager, $langs, $user;
 
@@ -139,7 +140,7 @@ if (GETPOST('upload_file', 'alpha') && !empty($conf->global->MAIN_UPLOAD_DOC))
 				$ecmfile->description = $type;
 				$ecmfile->update($user);
 				// Upload File OK
-				$urltogo = dol_buildpath('/digiriskdolibarr/accident_document_metadata.php', 1).'?id='.$id;
+				$urltogo = dol_buildpath('/digiriskdolibarr/view/accident/accident_document_metadata.php', 1).'?id='.$id;
 				header("Location: " . $urltogo);
 				exit;
 			}
