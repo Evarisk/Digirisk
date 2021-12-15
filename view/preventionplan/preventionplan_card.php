@@ -16,7 +16,7 @@
  */
 
 /**
- *   	\file       preventionplan_card.php
+ *   	\file       view/preventionplan/preventionplan_card.php
  *		\ingroup    digiriskdolibarr
  *		\brief      Page to create/edit/view preventionplan
  */
@@ -33,24 +33,25 @@ if (!$res && $i > 0 && file_exists(dirname(substr($tmp, 0, ($i + 1)))."/main.inc
 // Try main.inc.php using relative path
 if (!$res && file_exists("../../main.inc.php")) $res = @include "../../main.inc.php";
 if (!$res && file_exists("../../../main.inc.php")) $res = @include "../../../main.inc.php";
+if (!$res && file_exists("../../../../main.inc.php")) $res = @include "../../../../main.inc.php";
 if (!$res) die("Include of main fails");
 
 require_once DOL_DOCUMENT_ROOT.'/core/class/html.form.class.php';
 require_once DOL_DOCUMENT_ROOT.'/core/class/doleditor.class.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/images.lib.php';
 
-require_once __DIR__ . '/class/digiriskdocuments.class.php';
-require_once __DIR__ . '/class/digiriskelement.class.php';
-require_once __DIR__ . '/class/digiriskresources.class.php';
-require_once __DIR__ . '/class/preventionplan.class.php';
-require_once __DIR__ . '/class/riskanalysis/risk.class.php';
-require_once __DIR__ . '/class/digiriskdocuments/preventionplandocument.class.php';
-require_once __DIR__ . '/lib/digiriskdolibarr_function.lib.php';
-require_once __DIR__ . '/lib/digiriskdolibarr_preventionplan.lib.php';
-require_once __DIR__ . '/core/modules/digiriskdolibarr/digiriskelement/preventionplan/mod_preventionplan_standard.php';
-require_once __DIR__ . '/core/modules/digiriskdolibarr/digiriskelement/preventionplandet/mod_preventionplandet_standard.php';
-require_once __DIR__ . '/core/modules/digiriskdolibarr/digiriskdocuments/preventionplandocument/mod_preventionplandocument_standard.php';
-require_once __DIR__ . '/core/modules/digiriskdolibarr/digiriskdocuments/preventionplandocument/modules_preventionplandocument.php';
+require_once __DIR__ . '/../../class/digiriskdocuments.class.php';
+require_once __DIR__ . '/../../class/digiriskelement.class.php';
+require_once __DIR__ . '/../../class/digiriskresources.class.php';
+require_once __DIR__ . '/../../class/preventionplan.class.php';
+require_once __DIR__ . '/../../class/riskanalysis/risk.class.php';
+require_once __DIR__ . '/../../class/digiriskdocuments/preventionplandocument.class.php';
+require_once __DIR__ . '/../../lib/digiriskdolibarr_function.lib.php';
+require_once __DIR__ . '/../../lib/digiriskdolibarr_preventionplan.lib.php';
+require_once __DIR__ . '/../../core/modules/digiriskdolibarr/digiriskelement/preventionplan/mod_preventionplan_standard.php';
+require_once __DIR__ . '/../../core/modules/digiriskdolibarr/digiriskelement/preventionplandet/mod_preventionplandet_standard.php';
+require_once __DIR__ . '/../../core/modules/digiriskdolibarr/digiriskdocuments/preventionplandocument/mod_preventionplandocument_standard.php';
+require_once __DIR__ . '/../../core/modules/digiriskdolibarr/digiriskdocuments/preventionplandocument/modules_preventionplandocument.php';
 
 global $conf, $db, $hookmanager, $langs, $user;
 
@@ -116,12 +117,12 @@ if ($reshook < 0) setEventMessages($hookmanager->error, $hookmanager->errors, 'e
 if (empty($reshook)) {
 	$error = 0;
 
-	$backurlforlist = dol_buildpath('/digiriskdolibarr/preventionplan_list.php', 1);
+	$backurlforlist = dol_buildpath('/digiriskdolibarr/view/preventionplan/preventionplan_list.php', 1);
 
 	if (empty($backtopage) || ($cancel && empty($id))) {
 		if (empty($backtopage) || ($cancel && strpos($backtopage, '__ID__'))) {
 			if (empty($object->id) && (($action != 'add' && $action != 'create') || $cancel)) $backtopage = $backurlforlist;
-			else $backtopage = dol_buildpath('/digiriskdolibarr/preventionplan_card.php', 1).'?id='.($object->id > 0 ? $object->id : '__ID__');
+			else $backtopage = dol_buildpath('/digiriskdolibarr/view/preventionplan/preventionplan_card.php', 1).'?id='.($object->id > 0 ? $object->id : '__ID__');
 		}
 	}
 
@@ -1160,7 +1161,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	$attendants = count($signatory->fetchSignatory('PP_MAITRE_OEUVRE', $object->id));
 	$attendants += count($signatory->fetchSignatory('PP_EXT_SOCIETY_RESPONSIBLE', $object->id));
 	$attendants += count($signatory->fetchSignatory('PP_EXT_SOCIETY_INTERVENANTS', $object->id));
-	$url = dol_buildpath('/custom/digiriskdolibarr/preventionplan_attendants.php?id='.$object->id, 3);
+	$url = dol_buildpath('/custom/digiriskdolibarr/view/preventionplan/preventionplan_attendants.php?id='.$object->id, 3);
 	print '<a href="'.$url.'">'.$attendants.'</a>';
 	print '<a class="'. ($object->status == 1 ? 'butAction' : 'butActionRefused classfortooltip').'" id="actionButtonAddAttendants" title="'.dol_escape_htmltag($langs->trans("PreventionPlanMustBeInProgress")).'" href="'.$url.'">'.$langs->trans('AddAttendants').'</a>';
 	print '</td></tr>';
@@ -1446,7 +1447,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 
 	$MAXEVENT = 10;
 
-	$morehtmlright = '<a href="' . dol_buildpath('/digiriskdolibarr/preventionplan_agenda.php', 1) . '?id=' . $object->id . '">';
+	$morehtmlright = '<a href="' . dol_buildpath('/digiriskdolibarr/view/preventionplan/preventionplan_agenda.php', 1) . '?id=' . $object->id . '">';
 	$morehtmlright .= $langs->trans("SeeAll");
 	$morehtmlright .= '</a>';
 

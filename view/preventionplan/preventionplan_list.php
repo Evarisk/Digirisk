@@ -16,7 +16,7 @@
  */
 
 /**
- *   	\file       preventionplan_list.php
+ *   	\file       view/preventionplan/preventionplan_list.php
  *		\ingroup    digiriskdolibarr
  *		\brief      List page for prevention plan
  */
@@ -33,14 +33,15 @@ if (!$res && $i > 0 && file_exists(dirname(substr($tmp, 0, ($i + 1)))."/main.inc
 // Try main.inc.php using relative path
 if (!$res && file_exists("../../main.inc.php")) $res = @include "../../main.inc.php";
 if (!$res && file_exists("../../../main.inc.php")) $res = @include "../../../main.inc.php";
+if (!$res && file_exists("../../../../main.inc.php")) $res = @include "../../../../main.inc.php";
 if (!$res) die("Include of main fails");
 
 require_once DOL_DOCUMENT_ROOT.'/core/lib/date.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/core/class/html.formother.class.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/images.lib.php';
 
-require_once __DIR__ . '/class/preventionplan.class.php';
-require_once __DIR__ . '/class/digiriskresources.class.php';
+require_once __DIR__ . '/../../class/preventionplan.class.php';
+require_once __DIR__ . '/../../class/digiriskresources.class.php';
 
 // Load translation files required by the page
 $langs->loadLangs(array('projects', 'companies', 'commercial'));
@@ -127,7 +128,7 @@ if (empty($reshook))
 	// Selection of new fields
 	include DOL_DOCUMENT_ROOT . '/core/actions_changeselectedfields.inc.php';
 
-	$backtopage = dol_buildpath('/digiriskdolibarr/preventionplan_list.php', 1);
+	$backtopage = dol_buildpath('/digiriskdolibarr/view/preventionplan/preventionplan_list.php', 1);
 
 	// Purge search criteria
 	if (GETPOST('button_removefilter_x', 'alpha') || GETPOST('button_removefilter.x', 'alpha') || GETPOST('button_removefilter', 'alpha')) // All tests are required to be compatible with all browsers
@@ -200,7 +201,7 @@ $massactionbutton = $form->selectMassAction('', $arrayofmassactions);
 
 $newcardbutton = '';
 if ($permissiontoadd) {
-	$newcardbutton .= dolGetButtonTitle($langs->trans('NewPreventionPlan'), '', 'fa fa-plus-circle', DOL_URL_ROOT.'/custom/digiriskdolibarr/preventionplan_card.php?action=create');
+	$newcardbutton .= dolGetButtonTitle($langs->trans('NewPreventionPlan'), '', 'fa fa-plus-circle', DOL_URL_ROOT.'/custom/digiriskdolibarr/view/preventionplan/preventionplan_card.php?action=create');
 }
 
 print '<form method="POST" id="searchFormList" action="'.$_SERVER["PHP_SELF"].'">';
@@ -297,7 +298,7 @@ foreach ($search as $key => $val)
 	{
 		$obj = $db->fetch_object($resql);
 		$id = $obj->rowid;
-		header("Location: ".dol_buildpath('/digiriskdolibarr/preventionplan_card.php', 1).'?id='.$id);
+		header("Location: ".dol_buildpath('/digiriskdolibarr/view/preventionplan/preventionplan_card.php', 1).'?id='.$id);
 		exit;
 	}
 

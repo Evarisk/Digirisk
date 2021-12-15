@@ -16,7 +16,7 @@
  */
 
 /**
- *   	\file       preventionplan_schedule.php
+ *   	\file       view/preventionplan/preventionplan_schedule.php
  *		\ingroup    digiriskdolibarr
  *		\brief      Page to create/edit/view Prevention Plan Schedule
  */
@@ -33,12 +33,13 @@ if (!$res && $i > 0 && file_exists(dirname(substr($tmp, 0, ($i + 1)))."/main.inc
 // Try main.inc.php using relative path
 if (!$res && file_exists("../../main.inc.php")) $res = @include "../../main.inc.php";
 if (!$res && file_exists("../../../main.inc.php")) $res = @include "../../../main.inc.php";
+if (!$res && file_exists("../../../../main.inc.php")) $res = @include "../../../../main.inc.php";
 if (!$res) die("Include of main fails");
 
-require_once __DIR__ . '/class/preventionplan.class.php';
-require_once __DIR__ . '/class/openinghours.class.php';
-require_once __DIR__ . '/lib/digiriskdolibarr_preventionplan.lib.php';
-require_once __DIR__ . '/lib/digiriskdolibarr_function.lib.php';
+require_once __DIR__ . '/../../class/preventionplan.class.php';
+require_once __DIR__ . '/../../class/openinghours.class.php';
+require_once __DIR__ . '/../../lib/digiriskdolibarr_preventionplan.lib.php';
+require_once __DIR__ . '/../../lib/digiriskdolibarr_function.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/images.lib.php';
 
 global $conf, $db, $langs, $user, $hookmanager;
@@ -128,7 +129,7 @@ print dol_get_fiche_end();
 print load_fiche_titre($langs->trans("PreventionPlanSchedule"), '', '');
 
 //Show common fields
-require_once './core/tpl/digiriskdolibarr_openinghours_view.tpl.php';
+require_once './../../core/tpl/digiriskdolibarr_openinghours_view.tpl.php';
 
 // End of page
 llxFooter();

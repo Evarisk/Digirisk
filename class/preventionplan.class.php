@@ -613,7 +613,7 @@ class PreventionPlan extends CommonObject
 		if (empty($linkstart))
 		{
 			$label .= '<u>'.$langs->trans("PreventionPlan").'</u>';
-			$linkstart = '<a href="'.DOL_URL_ROOT.'/custom/digiriskdolibarr/preventionplan_card.php?id='.$this->id;
+			$linkstart = '<a href="'.DOL_URL_ROOT.'/custom/digiriskdolibarr/view/preventionplan/preventionplan_card.php?id='.$this->id;
 		}
 
 		if (!empty($this->ref))
