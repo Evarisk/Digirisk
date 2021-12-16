@@ -31,6 +31,52 @@
 			<div class="notice-close"><i class="fas fa-times"></i></div>
 		</div>
 	</div>
+	<div class="messageSuccessEvaluationEdit notice hidden">
+		<input type="hidden" class="valueForEditEvaluation1" value="<?php echo $langs->trans('TheRiskAssessment') . ' ' ?>">
+		<input type="hidden" class="valueForEditEvaluation2" value="<?php echo ' ' . $langs->trans('HasBeenEditedF') ?>">
+		<div class="wpeo-notice notice-success riskassessment-edit-success-notice">
+			<div class="notice-content">
+				<div class="notice-title"><?php echo $langs->trans('RiskAssessmentWellEdited') ?></div>
+				<div class="notice-subtitle">
+					<span class="text"></span>
+				</div>
+			</div>
+			<div class="notice-close"><i class="fas fa-times"></i></div>
+		</div>
+	</div>
+	<div class="messageErrorEvaluationEdit notice hidden">
+		<input type="hidden" class="valueForEditEvaluation1" value="<?php echo $langs->trans('TheRiskAssessment') . ' ' ?>">
+		<input type="hidden" class="valueForEditEvaluation2" value="<?php echo ' ' . $langs->trans('HasNotBeenEditedF') ?>">
+		<div class="wpeo-notice notice-warning riskassessment-edit-error-notice">
+			<div class="notice-content">
+				<div class="notice-title"><?php echo $langs->trans('RiskAssessmentNotEdited') ?></div>
+			</div>
+			<div class="notice-close"><i class="fas fa-times"></i></div>
+		</div>
+	</div>
+	<div class="messageSuccessEvaluationDelete notice hidden">
+		<input type="hidden" class="valueForDeleteEvaluation1" value="<?php echo $langs->trans('TheRiskAssessment') . ' ' ?>">
+		<input type="hidden" class="valueForDeleteEvaluation2" value="<?php echo ' ' . $langs->trans('HasBeenDeletedF') ?>">
+		<div class="wpeo-notice notice-success riskassessment-delete-success-notice">
+			<div class="notice-content">
+				<div class="notice-title"><?php echo $langs->trans('RiskAssessmentWellDeleted') ?></div>
+				<div class="notice-subtitle">
+					<span class="text"></span>
+				</div>
+			</div>
+			<div class="notice-close"><i class="fas fa-times"></i></div>
+		</div>
+	</div>
+	<div class="messageErrorEvaluationDelete notice hidden">
+		<input type="hidden" class="valueForDeleteEvaluation1" value="<?php echo $langs->trans('TheRiskAssessment') . ' ' ?>">
+		<input type="hidden" class="valueForDeleteEvaluation2" value="<?php echo ' ' . $langs->trans('HasNotBeenDeletedF') ?>">
+		<div class="wpeo-notice notice-warning riskassessment-delete-error-notice">
+			<div class="notice-content">
+				<div class="notice-title"><?php echo $langs->trans('RiskAssessmentNotDeleted') ?></div>
+			</div>
+			<div class="notice-close"><i class="fas fa-times"></i></div>
+		</div>
+	</div>
 
 	<!--	RISK -->
 	<div class="messageSuccessRiskCreate notice hidden">
