@@ -465,7 +465,7 @@
 								<?php if ($conf->global->DIGIRISKDOLIBARR_SHOW_RISKASSESSMENT_DATE) : ?>
 									<div class="risk-evaluation-date">
 										<span class="title"><?php echo $langs->trans('Date'); ?></span>
-										<?php print $form->selectDate('', 'RiskAssessmentDate', 0, 0, 0, '', 1, 1); ?>
+										<?php print $form->selectDate('', 'RiskAssessmentDate0', 0, 0, 0, '', 1, 1); ?>
 									</div>
 								<?php endif; ?>
 							</div>

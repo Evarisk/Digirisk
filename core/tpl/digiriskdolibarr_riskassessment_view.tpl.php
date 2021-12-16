@@ -232,7 +232,7 @@ if (!empty ($lastEvaluation) && $lastEvaluation > 0) {
 									<?php if ($conf->global->DIGIRISKDOLIBARR_SHOW_RISKASSESSMENT_DATE) : ?>
 										<div class="risk-evaluation-date">
 											<span class="title"><?php echo $langs->trans('Date'); ?></span>
-											<?php print $form->selectDate($lastEvaluation->date_riskassessment, 'RiskAssessmentDate', 0, 0, 0, '', 1, 1); ?>
+											<?php print $form->selectDate($lastEvaluation->date_riskassessment, 'RiskAssessmentDateEdit' . $lastEvaluation->id, 0, 0, 0, '', 1, 1); ?>
 										</div>
 									<?php endif; ?>
 									<div class="element-linked-medias element-linked-medias-<?php echo $cotation->id ?> risk-<?php echo $risk->id ?>">
@@ -532,7 +532,7 @@ $cotation->method = $lastEvaluation->method ? $lastEvaluation->method : "standar
 					<?php if ($conf->global->DIGIRISKDOLIBARR_SHOW_RISKASSESSMENT_DATE) : ?>
 						<div class="risk-evaluation-date">
 							<span class="title"><?php echo $langs->trans('Date'); ?></span>
-							<?php print $form->selectDate('', 'RiskAssessmentDate', 0, 0, 0, '', 1, 1); ?>
+							<?php print $form->selectDate('', 'RiskAssessmentDateCreate0', 0, 0, 0, '', 1, 1); ?>
 						</div>
 					<?php endif; ?>
 					<div class="element-linked-medias element-linked-medias-0 risk-<?php echo $risk->id ?>">
