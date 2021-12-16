@@ -1914,7 +1914,7 @@ window.eoxiaJS.evaluation.createEvaluation = function ( event ) {
 		commentPost = '&evaluationComment=' + encodeURI(comment);
 	}
 
-	var date = single.find('#RiskAssessmentDate').val();
+	var date = single.find('#RiskAssessmentDateCreate0').val();
 	var datePost = '';
 	if (date !== '') {
 		datePost = '&riskAssessmentDate=' + encodeURI(date);
@@ -2070,7 +2070,7 @@ window.eoxiaJS.evaluation.saveEvaluation = function ( event ) {
 		commentPost = '&evaluationComment=' + encodeURI(comment);
 	}
 
-	var date = element.find('#RiskAssessmentDate').val();
+	var date = element.find('#RiskAssessmentDateEdit' + evaluationID).val();
 	var datePost = '';
 	if (date !== '') {
 		datePost = '&riskAssessmentDate=' + encodeURI(date);
