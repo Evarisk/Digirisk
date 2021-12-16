@@ -299,19 +299,19 @@ print '</td></tr>';
 print '<tr></tr>';
 
 //VictimActivity
-print '<tr class="content_field"><td><label for="victim_activity">'.$langs->trans("VictimActivity").'</label></td><td>';
+print '<tr class="content_field"><td><label for="victim_activity">'.$form->textwithpicto($langs->trans("VictimActivity"), $langs->trans("VictimActivityTooltip")).'</label></td><td>';
 $doleditor = new DolEditor('victim_activity', $accidentmetadata->victim_activity, '', 90, 'dolibarr_details', '', false, true, $conf->global->FCKEDITOR_ENABLE_SOCIETE, ROWS_3, '90%');
 $doleditor->Create();
 print '</td></tr>';
 
 //AccidentNature
-print '<tr class="content_field"><td><label for="accident_nature">'.$langs->trans("AccidentNature").'</label></td><td>';
+print '<tr class="content_field"><td><label for="accident_nature">'.$form->textwithpicto($langs->trans("AccidentNature"), $langs->trans("AccidentNatureTooltip")).'</label></td><td>';
 $doleditor = new DolEditor('accident_nature', $accidentmetadata->accident_nature, '', 90, 'dolibarr_details', '', false, true, $conf->global->FCKEDITOR_ENABLE_SOCIETE, ROWS_3, '90%');
 $doleditor->Create();
 print '</td></tr>';
 
 //AccidentObject
-print '<tr class="content_field"><td><label for="accident_object">'.$langs->trans("AccidentObject").'</label></td><td>';
+print '<tr class="content_field"><td><label for="accident_object">'.$form->textwithpicto($langs->trans("AccidentObject"), $langs->trans("AccidentObjectTooltip")).'</label></td><td>';
 $doleditor = new DolEditor('accident_object', $accidentmetadata->accident_object, '', 90, 'dolibarr_details', '', false, true, $conf->global->FCKEDITOR_ENABLE_SOCIETE, ROWS_3, '90%');
 $doleditor->Create();
 print '</td></tr>';
@@ -319,7 +319,7 @@ print '</td></tr>';
 print '<tr></tr>';
 
 //AccidentNatureDoubt
-print '<tr><td class="minwidth400">'.$langs->trans("AccidentNatureDoubt").'</td><td>';
+print '<tr><td class="minwidth400">'.$form->textwithpicto($langs->trans("AccidentNatureDoubt"), $langs->trans("AccidentNatureDoubtTooltip")).'</td><td>';
 $doleditor = new DolEditor('accident_nature_doubt', $accidentmetadata->accident_nature_doubt, '', 90, 'dolibarr_details', '', false, true, $conf->global->FCKEDITOR_ENABLE_SOCIETE, ROWS_3, '90%');
 $doleditor->Create();
 print '</td></tr>';
@@ -344,7 +344,7 @@ print '</td></tr>';
 print '<tr></tr>';
 
 //VictimWorkHours
-print '<tr><td class="minwidth400">'.$langs->trans("VictimWorkHours").'</td><td>';
+print '<tr><td class="minwidth400">'.$form->textwithpicto($langs->trans("VictimWorkHours"), $langs->trans("VictimWorkHoursTooltip")).'</td><td>';
 print $langs->trans("FromDigirisk") . ' ' . $form->selectDate($accidentmetadata->workhours_morning_date_start, 'datewms', 1, 1, 0, '', 0) . ' ' . $langs->trans("At") . ' ' . $form->selectDate($accidentmetadata->workhours_morning_date_end, 'datewme', 1, 1, 0, '', 0) . ' ' . $langs->trans("AndFrom") . ' ' . $form->selectDate($accidentmetadata->workhours_afternoon_date_start, 'datewas', 1, 1, 0, '', 0) . ' ' . $langs->trans("At") . ' ' . $form->selectDate($accidentmetadata->workhours_afternoon_date_end, 'datewae', 1, 1, 0, '', 0);
 print '</td></tr>';
 
@@ -390,7 +390,7 @@ print '</td></tr>';
 print '<tr></tr>';
 
 //Consequence
-print '<tr><td class="minwidth400">'.$langs->trans("Consequence").'</td><td>';
+print '<tr><td class="minwidth400">'.$form->textwithpicto($langs->trans("Consequence"), $langs->trans("ConsequenceTooltip")).'</td><td>';
 print $form->selectarray('consequence', array('0'=>$langs->trans('WithoutWorkStop'), '1'=>$langs->trans('WithWorkStop'), '2'=>$langs->trans('Fatal')), $accidentmetadata->consequence, 0, 0, 0, '', 0, 0, 0, '', 'minwidth400', 1);
 print '</td></tr>';
 
@@ -409,7 +409,7 @@ print '</td></tr>';
 print '<tr></tr>';
 
 //FirstPersonNoticedIsWitness
-print '<tr><td class="minwidth400">'.img_picto('','user').' '.$langs->trans("FirstPersonNoticedIsWitness").'</td><td>';
+print '<tr><td class="minwidth400">'.img_picto('','user').' '.$form->textwithpicto($langs->trans("FirstPersonNoticedIsWitness"), $langs->trans("FirstPersonNoticedIsWitnessTooltip")).'</td><td>';
 print $form->selectarray('first_person_noticed_is_witness', array('0'=>$langs->trans('Witness'), '1'=>$langs->trans('FirstPersonNoticed')), $accidentmetadata->first_person_noticed_is_witness, 0, 0, 0, '', 0, 0, 0, '', 'minwidth400', 1);
 
 //FKUserWitness
@@ -421,7 +421,7 @@ print '</td></tr>';
 print '<tr></tr>';
 
 //ThirdPartyResponsability
-print '<tr><td class="minwidth400">'.$langs->trans("ThirdPartyResponsability").'</td><td>';
+print '<tr><td class="minwidth400">'.$form->textwithpicto($langs->trans("ThirdPartyResponsability"), $langs->trans("ThirdPartyResponsabilityTooltip")).'</td><td>';
 print '<input type="checkbox" id="thirdparty_responsibility" name="thirdparty_responsibility"'.($accidentmetadata->thirdparty_responsibility ? ' checked=""' : '').'>';
 print '</td></tr>';
 

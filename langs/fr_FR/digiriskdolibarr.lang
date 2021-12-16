@@ -643,6 +643,16 @@ ErrorFieldNotEmpty = Erreur : Le champ '%s' ne peut pas être vide
 ConfirmDeleteAccidentWorkStop = Êtes-vous sûr de vouloir supprimer l'arrêt de travail <b>%s</b> sur l'accident ?
 AccidentMetaDataLesion = Données complémentaires des lésions
 
+# AccidentTooltip - Tooltip des accidents
+VictimActivityTooltip = Précisez l’activité ou la tâche de la victime au moment de l’accident, c’est-à-dire ce que faisait la victime
+AccidentNatureTooltip = Décrire l’évènement ayant conduit à l’accident, comment l’accident s’est produit (problème électrique, fuite de gaz, rupture de matériel, glissade, chute, effort physique, agression...), ou comment s’est blessée la victime (heurt, collision, écrasement, piqûre, noyade, contact avec une substance...)
+AccidentObjectTooltip = C’est-à-dire avec quoi s’est blessée la victime : matériau, déchet, outil (tournevis, cutter, perceuse...),machine, véhicule, chariot de manutention, substance chimique, élément de construction (porte, mur...), sol...
+AccidentNatureDoubtTooltip = Indiquez le cas échéant, les réserves motivées qui ne pourront être prises en compte que si elles portent sur les circonstances de temps et de lieu de l’accident ou sur l’existence d’une cause totalement étrangère au travail (art. R. 441-11 du Code de la sécurité sociale)
+VictimWorkHoursTooltip = Indiquez les heures de travail effectuées par votre salarié(e), ou les heures prévues, le jour de l’accident
+ConsequenceTooltip = Si la victime a arrêté son travail sur prescription d’un médecin, vous devez OBLIGATOIREMENT établir et envoyer le formulaire « attestation de salaire accident du travail ou maladie professionnelle » - référencé S6202, à la Caisse primaire du lieu de résidence habituelle de la victime. <br> Par la suite, en cas de nouvel arrêt après une période de soins ou une reprise du travail, sur un mois différent, vous devrez également remplir cette même formalité
+FirstPersonNoticedIsWitnessTooltip = Indiquez le nom, le prénom et l’adresse du témoin. <br> En l’absence de témoin, indiquez la 1ère personne de l’entreprise qui a été avisée de l’accident
+ThirdPartyResponsabilityTooltip = Lorsque vous avez connaissance de l’implication d’un tiers, quelle que soit sa part de responsabilité, dans un accident du travail ou de trajet, cette mention doit impérativement être reportée dans cette partie
+
 # Dictionnary - Dictionnaire
 UsualWorkplace = Lieu de travail habituel
 OccasionalWorkplace = Lieu de travail occasionnel
