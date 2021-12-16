@@ -601,10 +601,10 @@
 												<div class="table-row">
 													<div class="table-cell"><?php echo $critere['name'] ; ?></div>
 													<?php foreach($critere['option']['survey']['request'] as $request) : ?>
-														<div class="table-cell can-select cell-<?php echo  $risk->id ? $risk->id : 0 ; ?>"
+														<div class="table-cell can-select cell-0"
 															 data-type="<?php echo $name ?>"
-															 data-id="<?php echo  $risk->id ? $risk->id : 0 ; ?>"
-															 data-evaluation-id="<?php echo $evaluation_id ? $evaluation_id : 0 ; ?>"
+															 data-id="<?php echo 0 ; ?>"
+															 data-evaluation-id="<?php echo 0 ; ?>"
 															 data-variable-id="<?php echo $l ; ?>"
 															 data-seuil="<?php echo  $request['seuil']; ?>">
 															<?php echo  $request['question'] ; ?>

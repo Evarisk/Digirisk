@@ -1547,104 +1547,90 @@ window.eoxiaJS.risk.createRisk = function ( event ) {
 	let actionContainerSuccess = $('.messageSuccessRiskCreate');
 	let actionContainerError = $('.messageErrorRiskCreate');
 
-	let evaluationText = elementEvaluation.find('.risk-evaluation-comment textarea').val()
 	let riskCommentText = elementRisk.find('.risk-description textarea').val()
-	let taskText = elementTask.find('input').val()
 	let riskDescriptionPrefill = elementRisk.find('.risk-category .input-risk-description-prefill').val()
-	let riskDesciptionText = elementRisk.find('.risk-category .danger-category-pic').attr('aria-label')
+	let riskDescriptionText = elementRisk.find('.risk-category .danger-category-pic').attr('aria-label')
 
-	evaluationText = window.eoxiaJS.risk.sanitizeBeforeRequest(evaluationText)
+	let evaluationText = elementEvaluation.find('.risk-evaluation-comment textarea').val()
+
+	let taskText = elementTask.find('input').val()
+
 	riskCommentText = window.eoxiaJS.risk.sanitizeBeforeRequest(riskCommentText)
-	riskDesciptionText = window.eoxiaJS.risk.sanitizeBeforeRequest(riskDesciptionText)
+	riskDescriptionText = window.eoxiaJS.risk.sanitizeBeforeRequest(riskDescriptionText)
+	evaluationText = window.eoxiaJS.risk.sanitizeBeforeRequest(evaluationText)
 	taskText = window.eoxiaJS.risk.sanitizeBeforeRequest(taskText)
 
+	//Risk
 	var category = elementRisk.find('.risk-category input').val();
-	var categoryPost = '';
-	if (category !== 0) {
-		categoryPost = '&category=' + category;
-	}
-
 	if (riskDescriptionPrefill == 1) {
-		var description = riskDesciptionText;
+		var description = riskDescriptionText;
 	} else {
 		var description = riskCommentText;
 	}
 
-	var descriptionPost = '';
-	if (description !== '') {
-		descriptionPost = '&riskComment=' + encodeURI(description);
-	}
-
+	//Risk assessment
 	var method = elementEvaluation.find('.risk-evaluation-header .risk-evaluation-method').val();
-	var methodPost = '';
-	if (method !== '') {
-		methodPost = '&cotationMethod=' + method;
-	}
-
 	var cotation = elementEvaluation.find('.risk-evaluation-seuil').val();
-	var cotationPost = '';
-	if (cotation !== 0) {
-		cotationPost = '&cotation=' + cotation;
-	}
+	var photo = elementEvaluation.find('.risk-evaluation-photo-single .filename').val();
+	var comment = evaluationText;
+	var date = elementEvaluation.find('#RiskAssessmentDate').val();
+	var criteres = []
 
-	let criteres = '';
 	Object.values($('.table-cell.active.cell-0')).forEach(function(v) {
 		if ($(v).data( 'seuil' ) > -1) {
-			criteres += '&' + $(v).data( 'type' ) + '=' + $(v).data( 'seuil' );
+			criteres[ $(v).data( 'type' )] = $(v).data( 'seuil' )
 		}
 	})
 
-	var photo = elementEvaluation.find('.risk-evaluation-photo-single .filename').val();
-	var photoPost = '';
-	if (photo !== 0) {
-		photoPost = '&photo=' + encodeURI(photo);
-	}
-
-	var comment = evaluationText;
-	var commentPost = '';
-	if (comment !== '') {
-		commentPost = '&evaluationComment=' + encodeURI(comment);
-	}
-
-	var date = elementEvaluation.find('#RiskAssessmentDate').val();
-	var datePost = '';
-	if (date !== '') {
-		datePost = '&riskAssessmentDate=' + encodeURI(date);
-	}
-
+	//Task
 	var task = taskText;
-	var taskPost = '';
-	if (task !== '') {
-		taskPost = '&tasktitle=' + encodeURI(task);
-	}
 
 	let elementParent = $('.fichecenter').find('.div-table-responsive');
 	window.eoxiaJS.loader.display($('.fichecenter'));
 
 	$.ajax({
-		url: document.URL + '&action=add' + categoryPost + descriptionPost + methodPost + cotationPost + criteres + photoPost + commentPost + datePost + taskPost,
+		url: document.URL + '&action=add',
 		type: "POST",
+		data: JSON.stringify({
+			cotation: cotation,
+			comment: comment,
+			category: category,
+			description: description,
+			method: method,
+			photo: photo,
+			date: date,
+			task: task,
+			criteres: {
+				gravite: criteres['gravite'] ? criteres['gravite'] : 0,
+				occurrence: criteres['occurrence'] ? criteres['occurrence'] : 0,
+				protection: criteres['protection'] ? criteres['protection'] : 0,
+				formation: criteres['formation'] ? criteres['formation'] : 0,
+				exposition: criteres['exposition'] ? criteres['exposition'] : 0
+			}
+		}),
 		processData: false,
 		contentType: false,
-		success: function ( ) {
+		success: function ( resp ) {
+
 			let modalRisk = $('.risk-add-modal');
-			modalRisk.load( document.URL + ' .modal-risk-0');
+			modalRisk.html($(resp).find('.risk-add-modal'))
 
 			elementParent.empty();
-			elementParent.load( document.URL + ' .div-table-responsive')
+			elementParent.html($(resp).find('.div-table-responsive'))
 
 			let numberOfRisks = $('.valignmiddle.col-title');
-			numberOfRisks.load( document.URL + ' .table-fiche-title .titre.inline-block');
+			numberOfRisks.html($(resp).find('.valignmiddle.col-title'));
 
 			actionContainerSuccess.empty()
-			actionContainerSuccess.load(' .risk-create-success-notice')
+			actionContainerSuccess.html($(resp).find('.risk-create-success-notice'));
+
 			actionContainerSuccess.removeClass('hidden');
 
 			$('.fichecenter').removeClass('wpeo-loader');
 		},
-		error: function ( ) {
+		error: function ( resp ) {
 			actionContainerError.empty()
-			actionContainerError.load(' .risk-create-error-notice')
+			actionContainerError.html($(resp).find('.risk-create-error-notice'));
 			actionContainerError.removeClass('hidden');
 
 			$('.fichecenter').removeClass('wpeo-loader');
