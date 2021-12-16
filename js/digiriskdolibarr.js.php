@@ -2192,7 +2192,9 @@ window.eoxiaJS.evaluationMethodEvarisk.selectSeuil = function( event ) {
 	if (criteres.length === 5) {
 		let cotationBeforeAdapt = criteres[0] * criteres[1] * criteres[2] * criteres[3] * criteres[4];
 
-		fetch('js/json/default.json').then(response => response.json()).then(data => {
+		let root = window.location.pathname.split(/view/)[0]
+		
+		fetch(root + '/js/json/default.json').then(response => response.json()).then(data => {
 			let cotationAfterAdapt = data[0].option.matrix[cotationBeforeAdapt];
 			elementParent.find('.risk-evaluation-calculated-cotation').find('.risk-evaluation-cotation').attr('data-scale', window.eoxiaJS.evaluation.getDynamicScale(cotationAfterAdapt));
 			elementParent.find('.risk-evaluation-calculated-cotation').find('.risk-evaluation-cotation span').text(cotationAfterAdapt);
