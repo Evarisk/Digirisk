@@ -465,7 +465,7 @@ while ($i < ($limit ? min($num, $limit) : $num)) {
 				if ($resource['checked']) {
 					print '<td>';
 					if ($resource['label'] == 'MaitreOeuvre') {
-						$element = $signatory->fetchSignatory('PP_MAITRE_OEUVRE', $preventionplan->id);
+						$element = $signatory->fetchSignatory('PP_MAITRE_OEUVRE', $preventionplan->id, 'preventionplan');
 						if ($element > 0) {
 							$element = array_shift($element);
 							$usertmp->fetch($element->element_id);
@@ -479,7 +479,7 @@ while ($i < ($limit ? min($num, $limit) : $num)) {
 						}
 					}
 					if ($resource['label'] == 'ExtSocietyResponsible') {
-						$element = $signatory->fetchSignatory('PP_EXT_SOCIETY_RESPONSIBLE', $preventionplan->id);
+						$element = $signatory->fetchSignatory('PP_EXT_SOCIETY_RESPONSIBLE', $preventionplan->id, 'preventionplan');
 						if ($element > 0) {
 							$element = array_shift($element);
 							$contact->fetch($element->element_id);
@@ -487,7 +487,7 @@ while ($i < ($limit ? min($num, $limit) : $num)) {
 						}
 					}
 					if ($resource['label'] == 'ExtSocietyIntervenants') {
-						$ext_society_intervenants = $signatory->fetchSignatory('PP_EXT_SOCIETY_INTERVENANTS', $preventionplan->id);
+						$ext_society_intervenants = $signatory->fetchSignatory('PP_EXT_SOCIETY_INTERVENANTS', $preventionplan->id, 'preventionplan');
 						if (is_array($ext_society_intervenants) && !empty ($ext_society_intervenants) && $ext_society_intervenants > 0) {
 							foreach ($ext_society_intervenants as $element) {
 								if ($element > 0) {

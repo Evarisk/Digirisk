@@ -486,7 +486,7 @@ class FirePermit extends CommonObject
 	public function setInProgress($user, $notrigger = 0)
 	{
 		$signatory = new PreventionPlanSignature($this->db);
-		$signatory->deleteSignatoriesSignatures($this->id);
+		$signatory->deleteSignatoriesSignatures($this->id, 'firepermit');
 		return $this->setStatusCommon($user, self::STATUS_IN_PROGRESS, $notrigger, 'FIREPERMIT_INPROGRESS');
 	}
 

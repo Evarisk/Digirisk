@@ -489,11 +489,12 @@ class DigiriskSignature extends CommonObject
 	 *
 	 * @param string $role Role of resource
 	 * @param int $fk_object ID of object linked
+	 * @param string $object_type ID of object linked
 	 * @return array|int
 	 */
-	function fetchSignatory($role = "", $fk_object)
+	function fetchSignatory($role = "", $fk_object, $object_type)
 	{
-		$filter = array('customsql' => 'fk_object=' . $fk_object . ' AND status!=0');
+		$filter = array('customsql' => 'fk_object=' . $fk_object . ' AND status!=0 AND object_type="'.$object_type . '"');
 		if (strlen($role)) {
 			$filter['customsql'] .= ' AND role = "' . $role . '"';
 			return $this->fetchAll('', '', 0, 0, $filter, 'AND');
@@ -514,11 +515,13 @@ class DigiriskSignature extends CommonObject
 	 * Fetch signatories in database with parent ID
 	 *
 	 * @param $fk_object
+	 * @param $object_type
 	 * @param string $morefilter
 	 * @return int
 	 */
-	public function fetchSignatories($fk_object, $morefilter = '1 = 1') {
-		$signatories = $this->fetchAll('','', 0, 0, array('fk_object' => $fk_object, 'customsql' => $morefilter),'AND');
+	public function fetchSignatories($fk_object, $object_type, $morefilter = '1 = 1') {
+		$filter = array('customsql' => 'fk_object=' . $fk_object . ' AND '. $morefilter . ' AND object_type="'.$object_type . '"');
+		$signatories = $this->fetchAll('','', 0, 0, $filter,'AND');
 		return $signatories;
 	}
 
@@ -526,17 +529,20 @@ class DigiriskSignature extends CommonObject
 	 * Check if signatories signed
 	 *
 	 * @param $fk_object
+	 * @param $object_type
 	 * @return int
 	 */
-	public function checkSignatoriesSignatures($fk_object) {
+	public function checkSignatoriesSignatures($fk_object, $object_type) {
 		$morefilter = 'status != 0';
-		$signatories = $this->fetchSignatories($fk_object, $morefilter);
+
+		$signatories = $this->fetchSignatories($fk_object, $object_type, $morefilter);
 
 		if (!empty($signatories) && $signatories > 0) {
 			foreach ($signatories as $signatory) {
 				if ($signatory->status == 5 || $signatory->status == 7) {
 					continue;
 				} else {
+
 					return 0;
 				}
 			}
@@ -548,12 +554,13 @@ class DigiriskSignature extends CommonObject
 	 * Delete signatories signatures
 	 *
 	 * @param $fk_object
+	 * @param $object_type
 	 * @return int
 	 */
-	public function deleteSignatoriesSignatures($fk_object) {
+	public function deleteSignatoriesSignatures($fk_object, $object_type) {
 		global $user;
 
-		$signatories = $this->fetchSignatories($fk_object);
+		$signatories = $this->fetchSignatories($fk_object, $object_type);
 
 		if (!empty($signatories) && $signatories > 0) {
 			foreach ($signatories as $signatory) {
@@ -573,11 +580,12 @@ class DigiriskSignature extends CommonObject
 	 *
 	 * @param string $role Role of resource
 	 * @param int $fk_object ID of object linked
+	 * @param int $object_type type of object linked
 	 */
-	function deletePreviousSignatories($role = "", $fk_object)
+	function deletePreviousSignatories($role = "", $fk_object, $object_type)
 	{
 		global $user;
-		$filter = array('customsql' => ' role="' . $role . '" AND fk_object=' . $fk_object . ' AND status=1');
+		$filter = array('customsql' => ' role="' . $role . '" AND fk_object=' . $fk_object . ' AND status=1 AND objet_type=' . $object_type);
 		$signatoriesToDelete = $this->fetchAll('', '', 0, 0, $filter, 'AND');
 
 		if ( ! empty($signatoriesToDelete) && $signatoriesToDelete > 0) {

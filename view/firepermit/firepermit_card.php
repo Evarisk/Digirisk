@@ -216,11 +216,11 @@ if (empty($reshook)) {
 				$digiriskresources->digirisk_dolibarr_set_resources($db, $user->id, 'FP_LABOUR_INSPECTOR_ASSIGNED', 'socpeople', array($labour_inspector_contact_id), $conf->entity, 'firepermit', $object->id, 1);
 
 				if ($maitre_oeuvre_id > 0) {
-					$signatory->setSignatory($object->id,'user', array($maitre_oeuvre_id), 'FP_MAITRE_OEUVRE');
+					$signatory->setSignatory($object->id,'user', array($maitre_oeuvre_id), 'FP_MAITRE_OEUVRE', 'firepermit');
 				}
 
 				if ($extresponsible_id > 0) {
-					$signatory->setSignatory($object->id,'socpeople', array($extresponsible_id), 'FP_EXT_SOCIETY_RESPONSIBLE');
+					$signatory->setSignatory($object->id,'socpeople', array($extresponsible_id), 'FP_EXT_SOCIETY_RESPONSIBLE', 'firepermit');
 				}
 
 				// Creation fire permit OK
@@ -771,7 +771,7 @@ if ($action == 'create') {
 	print '</td></tr>';
 
 	// Other attributes
-	include DOL_DOCUMENT_ROOT.'/core/tpl/extrafields_add.tpl.php';
+//	include DOL_DOCUMENT_ROOT.'/core/tpl/extrafields_add.tpl.php';
 
 	print '</table>';
 
@@ -1074,9 +1074,9 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	print $langs->trans("Attendants");
 	print '</td>';
 	print '<td>';
-	$attendants = count($signatory->fetchSignatory('FP_MAITRE_OEUVRE', $object->id));
-	$attendants += count($signatory->fetchSignatory('FP_EXT_SOCIETY_RESPONSIBLE', $object->id));
-	$attendants += count($signatory->fetchSignatory('FP_EXT_SOCIETY_INTERVENANTS', $object->id));
+	$attendants = count($signatory->fetchSignatory('FP_MAITRE_OEUVRE', $object->id, 'firepermit'));
+	$attendants += count($signatory->fetchSignatory('FP_EXT_SOCIETY_RESPONSIBLE', $object->id, 'firepermit'));
+	$attendants += count($signatory->fetchSignatory('FP_EXT_SOCIETY_INTERVENANTS', $object->id, 'firepermit'));
 	$url = dol_buildpath('/custom/digiriskdolibarr/view/firepermit/firepermit_attendants.php?id='.$object->id, 3);
 	print '<a href="'.$url.'">'.$attendants.'</a>';
 	print '<a class="'. ($object->status == 1 ? 'butAction' : 'butActionRefused classfortooltip').'" id="actionButtonAddAttendants" title="'.dol_escape_htmltag($langs->trans("FirePermitMustBeInProgress")).'" href="'.$url.'">'.$langs->trans('AddAttendants').'</a>';
@@ -1099,8 +1099,8 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 			print '<a class="' . ($object->status == 1 ? 'butAction' : 'butActionRefused classfortooltip') . '" id="actionButtonEdit" title="' . ($object->status == 1 ? '' : dol_escape_htmltag($langs->trans("FirePermitMustBeInProgress"))) . '" href="' . ($object->status == 1 ? ($_SERVER["PHP_SELF"] . '?id=' . $object->id . '&action=edit') : '#') . '">' . $langs->trans("Modify") . '</a>';
 			print '<span class="' . ($object->status == 1 ? 'butAction' : 'butActionRefused classfortooltip') . '" id="' . ($object->status == 1 ? 'actionButtonPendingSignature' : '') . '" title="' . ($object->status == 1 ? '' : dol_escape_htmltag($langs->trans("FirePermitMustBeInProgressToValidate"))) . '" href="' . ($object->status == 1 ? ($_SERVER["PHP_SELF"] . '?id=' . $object->id . '&action=setPendingSignature') : '#') . '">' . $langs->trans("Validate") . '</span>';
 			print '<span class="' . ($object->status == 2 ? 'butAction' : 'butActionRefused classfortooltip') . '" id="' . ($object->status == 2 ? 'actionButtonInProgress' : '') . '" title="' . ($object->status == 2 ? '' : dol_escape_htmltag($langs->trans("FirePermitMustBeValidated"))) . '" href="' . ($object->status == 2 ? ($_SERVER["PHP_SELF"] . '?id=' . $object->id . '&action=setInProgress') : '#') . '">' . $langs->trans("ReOpenDigi") . '</span>';
-			print '<a class="' . (($object->status == 2 && !$signatory->checkSignatoriesSignatures($object->id)) ? 'butAction' : 'butActionRefused classfortooltip') . '" id="actionButtonSign" title="' . (($object->status == 2 && !$signatory->checkSignatoriesSignatures($object->id)) ? '' : dol_escape_htmltag($langs->trans("FirePermitMustBeValidatedToSign"))) . '" href="' . (($object->status == 2 && !$signatory->checkSignatoriesSignatures($object->id)) ? $url : '#') . '">' . $langs->trans("Sign") . '</a>';
-			print '<span class="' . (($object->status == 2 && $signatory->checkSignatoriesSignatures($object->id)) ? 'butAction' : 'butActionRefused classfortooltip') . '" id="' . (($object->status == 2 && $signatory->checkSignatoriesSignatures($object->id)) ? 'actionButtonLock' : '') . '" title="' . (($object->status == 2 && $signatory->checkSignatoriesSignatures($object->id)) ? '' : dol_escape_htmltag($langs->trans("AllSignatoriesMustHaveSigned"))) . '">' . $langs->trans("Lock") . '</span>';
+			print '<a class="' . (($object->status == 2 && !$signatory->checkSignatoriesSignatures($object->id, 'firepermit')) ? 'butAction' : 'butActionRefused classfortooltip') . '" id="actionButtonSign" title="' . (($object->status == 2 && !$signatory->checkSignatoriesSignatures($object->id, 'firepermit')) ? '' : dol_escape_htmltag($langs->trans("FirePermitMustBeValidatedToSign"))) . '" href="' . (($object->status == 2 && !$signatory->checkSignatoriesSignatures($object->id, 'firepermit')) ? $url : '#') . '">' . $langs->trans("Sign") . '</a>';
+			print '<span class="' . (($object->status == 2 && $signatory->checkSignatoriesSignatures($object->id, 'firepermit')) ? 'butAction' : 'butActionRefused classfortooltip') . '" id="' . (($object->status == 2 && $signatory->checkSignatoriesSignatures($object->id, 'firepermit')) ? 'actionButtonLock' : '') . '" title="' . (($object->status == 2 && $signatory->checkSignatoriesSignatures($object->id, 'firepermit')) ? '' : dol_escape_htmltag($langs->trans("AllSignatoriesMustHaveSigned"))) . '">' . $langs->trans("Lock") . '</span>';
 			print '<a class="' . ($object->status == 3 ? 'butAction' : 'butActionRefused classfortooltip') . '" id="actionButtonSign" title="' . dol_escape_htmltag($langs->trans("FirePermitMustBeLockedToSendEmail")) . '" href="' . ($object->status == 3 ? ($_SERVER['PHP_SELF'] . '?id=' . $object->id . '&action=presend&mode=init#formmailbeforetitle&sendto=' . $allLinks['LabourInspectorSociety']->id[0]) : '#') . '">' . $langs->trans('SendMail') . '</a>';
 			print '<a class="' . ($object->status == 3 ? 'butAction' : 'butActionRefused classfortooltip') . '" id="actionButtonClose" title="' . ($object->status == 3 ? '' : dol_escape_htmltag($langs->trans("FirePermitMustBeLocked"))) . '" href="' . ($object->status == 3 ? ($_SERVER["PHP_SELF"] . '?id=' . $object->id . '&action=setArchived') : '#') . '">' . $langs->trans("Close") . '</a>';
 			print '<span class="butAction" id="actionButtonClone" title="" href="'.$_SERVER["PHP_SELF"] . '?id=' . $object->id . '&action=clone'.'">' . $langs->trans("ToClone") . '</span>';
@@ -1428,7 +1428,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 			print '</tr>';
 
 			if (is_object($objectline)) {
-				print $objectline->showOptionals($extrafields, 'edit', array('style' => $bcnd[$var], 'colspan' => $coldisplay), '', '', 1);
+//				print $objectline->showOptionals($extrafields, 'edit', array('style' => $bcnd[$var], 'colspan' => $coldisplay), '', '', 1);
 			}
 			print '</form>';
 		}

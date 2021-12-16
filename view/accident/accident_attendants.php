@@ -281,7 +281,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	$object->status = 2;
 
 	//User employer -- Responsable de la société
-	$element = $signatory->fetchSignatory('ACC_USER_EMPLOYER', $id);
+	$element = $signatory->fetchSignatory('ACC_USER_EMPLOYER', $id, 'accident');
 	if ($element > 0) {
 		$element = array_shift($element);
 		$usertmp->fetch($element->element_id);

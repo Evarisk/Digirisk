@@ -491,7 +491,7 @@ class PreventionPlan extends CommonObject
 	public function setInProgress($user, $notrigger = 0)
 	{
 		$signatory = new PreventionPlanSignature($this->db);
-		$signatory->deleteSignatoriesSignatures($this->id);
+		$signatory->deleteSignatoriesSignatures($this->id, 'preventionplan');
 		return $this->setStatusCommon($user, self::STATUS_IN_PROGRESS, $notrigger, 'PREVENTIONPLAN_INPROGRESS');
 	}
 	/**

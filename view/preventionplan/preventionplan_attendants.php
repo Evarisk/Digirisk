@@ -313,7 +313,7 @@ print dol_get_fiche_end(); ?>
 			<div class="notice-subtitle"><?php echo $langs->trans("AddSignatureSuccessText") . GETPOST('signature_id')?></div>
 		</div>
 		<?php
-		if ($signatory->checkSignatoriesSignatures($object->id)) {
+		if ($signatory->checkSignatoriesSignatures($object->id, 'preventionplan')) {
 			print '<a class="butAction" style="width = 100%;margin-right:0" href="'.DOL_URL_ROOT . '/custom/digiriskdolibarr/view/preventionplan/preventionplan_card.php?id='.$id.'">'. $langs->trans("GoToLock").'</a>';
 		}
 		?>
@@ -360,7 +360,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	$zone = "private";
 
 	//Master builder -- Maitre Oeuvre
-	$element = $signatory->fetchSignatory('PP_MAITRE_OEUVRE', $id);
+	$element = $signatory->fetchSignatory('PP_MAITRE_OEUVRE', $id, 'preventionplan');
 	if ($element > 0) {
 		$element = array_shift($element);
 		$usertmp->fetch($element->element_id);
@@ -416,7 +416,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	print '<br>';
 
 	//External Society Responsible -- Responsable Société extérieure
-	$element = $signatory->fetchSignatory('PP_EXT_SOCIETY_RESPONSIBLE', $id);
+	$element = $signatory->fetchSignatory('PP_EXT_SOCIETY_RESPONSIBLE', $id, 'preventionplan');
 	if ($element > 0) {
 		$element = array_shift($element);
 		$contact->fetch($element->element_id);
@@ -469,7 +469,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	print '<br>';
 
 	//External Society Interventants -- Intervenants Société extérieure
-	$ext_society_intervenants = $signatory->fetchSignatory('PP_EXT_SOCIETY_INTERVENANTS', $id);
+	$ext_society_intervenants = $signatory->fetchSignatory('PP_EXT_SOCIETY_INTERVENANTS', $id, 'preventionplan');
 
 	print load_fiche_titre($langs->trans("SignatureIntervenants"), $newcardbutton, '');
 
