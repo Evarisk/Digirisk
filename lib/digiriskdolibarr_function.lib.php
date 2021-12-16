@@ -2076,7 +2076,7 @@ function digirisk_select_dictionary($htmlname, $dictionarytable, $keyfield = 'co
 
 			while ($i < $num) {
 				$obj = $db->fetch_object($result);
-				if ($selected == $obj->rowid || $selected == $obj->$keyfield) {
+				if ($selected == $obj->rowid || $selected == $langs->transnoentities($obj->$keyfield)) {
 					print '<option value="'.$langs->transnoentities($obj->$keyfield).'" selected>';
 				} else {
 					print '<option value="'.$langs->transnoentities($obj->$keyfield).'">';

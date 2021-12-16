@@ -634,8 +634,6 @@ ExternalAccident = L'accident a-t-il eu lieu dans un autre établissement que ce
 AccidentAttendants = Accident - Participants
 UserEmployer = Responsable de la société
 SignatureUserEmployer = Signature du responsable de la société
-
-
 CerfaLink = Lien vers le Cerfa
 WorkStopDays = Nombre de jour d'arrêt de travail
 AccidentLesionList = Liste des lésions lié à l'accident
@@ -644,6 +642,7 @@ WorkStopDocument = Déclaration d'arrêt de travail
 AccidentMetaDataSave = Les données complémentaires de l'accident ont bien été enregistrées
 ErrorFieldNotEmpty = Erreur : Le champ '%s' ne peut pas être vide
 ConfirmDeleteAccidentWorkStop = Êtes-vous sûr de vouloir supprimer l'arrêt de travail <b>%s</b> sur l'accident ?
+AccidentMetaDataLesion = Données complémentaires des lésions
 
 # Dictionnary - Dictionnaire
 UsualWorkplace = Lieu de travail habituel
