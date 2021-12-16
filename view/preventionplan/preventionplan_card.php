@@ -226,11 +226,11 @@ if (empty($reshook)) {
 				$digiriskresources->digirisk_dolibarr_set_resources($db, $user->id, 'PP_LABOUR_INSPECTOR_ASSIGNED', 'socpeople', array($labour_inspector_contact_id), $conf->entity, 'preventionplan', $object->id, 1);
 
 				if ($maitre_oeuvre_id > 0) {
-					$signatory->setSignatory($object->id,'user', array($maitre_oeuvre_id), 'PP_MAITRE_OEUVRE');
+					$signatory->setSignatory($object->id, 'preventionplan', 'user', array($maitre_oeuvre_id), 'PP_MAITRE_OEUVRE');
 				}
 
 				if ($extresponsible_id > 0) {
-					$signatory->setSignatory($object->id,'socpeople', array($extresponsible_id), 'PP_EXT_SOCIETY_RESPONSIBLE');
+					$signatory->setSignatory($object->id, 'preventionplan','socpeople', array($extresponsible_id), 'PP_EXT_SOCIETY_RESPONSIBLE');
 				}
 
 				// Creation prevention plan OK
@@ -333,8 +333,8 @@ if (empty($reshook)) {
 				$digiriskresources->digirisk_dolibarr_set_resources($db, $user->id, 'PP_LABOUR_INSPECTOR', 'societe', array($labour_inspector_id), $conf->entity, 'preventionplan', $object->id, 0);
 				$digiriskresources->digirisk_dolibarr_set_resources($db, $user->id, 'PP_LABOUR_INSPECTOR_ASSIGNED', 'socpeople', array($labour_inspector_contact_id), $conf->entity, 'preventionplan', $object->id, 0);
 
-				$signatory->setSignatory($object->id,'user', array($maitre_oeuvre_id), 'PP_MAITRE_OEUVRE');
-				$signatory->setSignatory($object->id,'socpeople', array($extresponsible_id), 'PP_EXT_SOCIETY_RESPONSIBLE');
+				$signatory->setSignatory($object->id, 'preventionplan', 'user', array($maitre_oeuvre_id), 'PP_MAITRE_OEUVRE');
+				$signatory->setSignatory($object->id, 'preventionplan', 'socpeople', array($extresponsible_id), 'PP_EXT_SOCIETY_RESPONSIBLE');
 
 				// Update prevention plan OK
 				$urltogo = str_replace('__ID__', $result, $backtopage);

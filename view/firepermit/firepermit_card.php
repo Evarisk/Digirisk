@@ -216,11 +216,11 @@ if (empty($reshook)) {
 				$digiriskresources->digirisk_dolibarr_set_resources($db, $user->id, 'FP_LABOUR_INSPECTOR_ASSIGNED', 'socpeople', array($labour_inspector_contact_id), $conf->entity, 'firepermit', $object->id, 1);
 
 				if ($maitre_oeuvre_id > 0) {
-					$signatory->setSignatory($object->id,'user', array($maitre_oeuvre_id), 'FP_MAITRE_OEUVRE', 'firepermit');
+					$signatory->setSignatory($object->id, 'firepermit', 'user', array($maitre_oeuvre_id), 'FP_MAITRE_OEUVRE', 'firepermit');
 				}
 
 				if ($extresponsible_id > 0) {
-					$signatory->setSignatory($object->id,'socpeople', array($extresponsible_id), 'FP_EXT_SOCIETY_RESPONSIBLE', 'firepermit');
+					$signatory->setSignatory($object->id, 'firepermit', 'socpeople', array($extresponsible_id), 'FP_EXT_SOCIETY_RESPONSIBLE', 'firepermit');
 				}
 
 				// Creation fire permit OK
@@ -316,8 +316,8 @@ if (empty($reshook)) {
 				$digiriskresources->digirisk_dolibarr_set_resources($db, $user->id, 'FP_LABOUR_INSPECTOR', 'societe', array($labour_inspector_id), $conf->entity, 'firepermit', $object->id, 0);
 				$digiriskresources->digirisk_dolibarr_set_resources($db, $user->id, 'FP_LABOUR_INSPECTOR_ASSIGNED', 'socpeople', array($labour_inspector_contact_id), $conf->entity, 'firepermit', $object->id, 0);
 
-				$signatory->setSignatory($object->id,'user', array($maitre_oeuvre_id), 'FP_MAITRE_OEUVRE');
-				$signatory->setSignatory($object->id,'socpeople', array($extresponsible_id), 'FP_EXT_SOCIETY_RESPONSIBLE');
+				$signatory->setSignatory($object->id, 'firepermit', 'user', array($maitre_oeuvre_id), 'FP_MAITRE_OEUVRE');
+				$signatory->setSignatory($object->id, 'firepermit', 'socpeople', array($extresponsible_id), 'FP_EXT_SOCIETY_RESPONSIBLE');
 
 				// Update fire permit OK
 				$urltogo = str_replace('__ID__', $result, $backtopage);

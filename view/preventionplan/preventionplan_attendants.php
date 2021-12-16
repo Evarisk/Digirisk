@@ -105,7 +105,7 @@ if ($action == 'addAttendant') {
 	}
 
 	if (!$error) {
-		$result = $signatory->setSignatory($object->id,'socpeople', $extintervenant_ids, 'PP_EXT_SOCIETY_INTERVENANTS', 1);
+		$result = $signatory->setSignatory($object->id, 'preventionplan', 'socpeople', $extintervenant_ids, 'PP_EXT_SOCIETY_INTERVENANTS', 1);
 		if ($result > 0) {
 			foreach ($extintervenant_ids as $extintervenant_id) {
 				$contact->fetch($extintervenant_id);

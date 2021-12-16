@@ -214,7 +214,7 @@ if (empty($reshook)) {
 				} else {
 					$usertmp->fetch($object->fk_user_employer);
 				}
-				$signatory->setSignatory($object->id,'user', array($usertmp->id), 'ACC_USER_EMPLOYER');
+				$signatory->setSignatory($object->id,'accident','user', array($usertmp->id), 'ACC_USER_EMPLOYER');
 
 				// Creation Accident OK
 				$urltogo = str_replace('__ID__', $result, $backtopage);
@@ -317,8 +317,8 @@ if (empty($reshook)) {
 				} else {
 					$usertmp->fetch($object->fk_user_employer);
 				}
-				$signatory->deleteSignatoriesSignatures($object->id);
-				$signatory->setSignatory($object->id,'user', array($usertmp->id), 'ACC_USER_EMPLOYER');
+				$signatory->deleteSignatoriesSignatures($object->id, 'accident');
+				$signatory->setSignatory($object->id,'accident', 'user', array($usertmp->id), 'ACC_USER_EMPLOYER');
 
 				// Update Accident OK
 				$urltogo = str_replace('__ID__', $result, $backtopage);
