@@ -39,6 +39,7 @@ if (!$res) die("Include of main fails");
 require_once DOL_DOCUMENT_ROOT.'/contact/class/contact.class.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/company.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/functions2.lib.php';
+require_once DOL_DOCUMENT_ROOT.'/projet/class/project.class.php';
 
 require_once __DIR__ . '/../../class/accident.class.php';
 require_once __DIR__ . '/../../lib/digiriskdolibarr_accident.lib.php';
@@ -79,6 +80,8 @@ if (!$sortorder) $sortorder = 'DESC,DESC';
 // Initialize technical objects
 $object      = new Accident($db);
 $extrafields = new ExtraFields($db);
+$project     = new Project($db);
+
 $hookmanager->initHooks(array('accidentagenda', 'globalcard')); // Note that conf->hooks_modules contains array
 // Fetch optionals attributes and labels
 $extrafields->fetch_name_optionals_label($object->table_element);
@@ -132,8 +135,16 @@ if ($object->id > 0) {
 
 	// Object card
 	// ------------------------------------------------------------
-	dol_strlen($object->label) ? $morehtmlref = ' - ' . $object->label : '';
-	digirisk_banner_tab($object, 'ref', '', 0, 'ref', 'ref', $morehtmlref);
+	dol_strlen($object->label) ? $morehtmlref = '<span>'. ' - ' .$object->label . '</span>' : '';
+	$morehtmlref .= '<div class="refidno">';
+	// Project
+	$project->fetch($object->fk_project);
+	$morehtmlref .= $langs->trans('Project').' : '.getNomUrlProject($project, 1, 'blank');
+	$morehtmlref .= '</div>';
+
+	$morehtmlleft = '<div class="floatleft inline-block valignmiddle divphotoref">'.digirisk_show_photos('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity].'/'.$object->element, 'small', 5, 0, 0, 0, $width,0, 0, 0, 0, $object->element, $object).'</div>';
+
+	digirisk_banner_tab($object, 'ref', '', 0, 'ref', 'ref', $morehtmlref, '','',$morehtmlleft);
 
 	print '<div class="fichecenter">';
 	print '<div class="underbanner clearboth"></div>';
