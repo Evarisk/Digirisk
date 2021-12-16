@@ -409,15 +409,11 @@ print '</td></tr>';
 print '<tr></tr>';
 
 //FirstPersonNoticedIsWitness
-print '<tr><td class="minwidth400">'.$langs->trans("FirstPersonNoticedIsWitness").'</td><td>';
+print '<tr><td class="minwidth400">'.img_picto('','user').' '.$langs->trans("FirstPersonNoticedIsWitness").'</td><td>';
 print $form->selectarray('first_person_noticed_is_witness', array('0'=>$langs->trans('Witness'), '1'=>$langs->trans('FirstPersonNoticed')), $accidentmetadata->first_person_noticed_is_witness, 0, 0, 0, '', 0, 0, 0, '', 'minwidth400', 1);
-print '</td></tr>';
 
 //FKUserWitness
 $userlist = $form->select_dolusers('', 'fk_user_witness', 0, null, 0, '', '', $conf->entity, 0, 0, 'AND u.statut = 1', 0, '', 'minwidth300', 0, 1);
-print '<tr>';
-print '<td class="minwidth400" style="width:10%">' . img_picto('', 'user') . ' ' . $form->editfieldkey('UserNoticed', 'fk_user_witness', '', $object, 0) . '</td>';
-print '<td>';
 print $form->selectarray('fk_user_witness', $userlist, $accidentmetadata->fk_user_witness, $langs->trans('SelectUser'), null, null, null, "40%", 0, 0, '', 'minwidth300', 1);
 print ' <a href="' . DOL_URL_ROOT . '/user/card.php?action=create&backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?action=create') . '" target="_blank"><span class="fa fa-plus-circle valignmiddle paddingleft" title="' . $langs->trans("AddUser") . '"></span></a>';
 print '</td></tr>';

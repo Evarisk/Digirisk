@@ -617,7 +617,6 @@ PoliceReportBy = La personne qui a établi le rapport de police
 FirstPersonNoticedIsWitness = Personne avisée
 Witness = Témoin
 FirstPersonNoticed = Première personne avisée
-UserNoticed = Utilisateur avisée
 ThirdPartyResponsability = L’accident a-t-il été causé par un tiers ?
 FkSocResponsible = Société du tiers responsable
 FkSocResponsibleInsuranceSociety = Société d’assurance du tiers
