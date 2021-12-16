@@ -3566,10 +3566,6 @@ td > .risk-evaluation-container {
   background: black;
 }
 
-.wpeo-modal[class*=modal-risk] .modal-container {
-  max-width: 1800px;
-  max-height: 900px;
-}
 .wpeo-modal[class*=modal-risk] .modal-container .title {
   display: block;
   font-weight: 600;
