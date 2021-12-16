@@ -269,7 +269,9 @@ $morehtmlref .= '</div>';
 
 //include_once './core/tpl/digiriskdolibarr_configuration_gauge_view.tpl.php';
 
-digirisk_banner_tab($object, 'ref', '', 0, 'ref', 'ref', $morehtmlref);
+$morehtmlleft = '<div class="floatleft inline-block valignmiddle divphotoref">'.digirisk_show_photos('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity].'/'.$object->element, 'small', 5, 0, 0, 0, $width,0, 0, 0, 0, $object->element, $object).'</div>';
+
+digirisk_banner_tab($object, 'ref', '', 0, 'ref', 'ref', $morehtmlref, '','',$morehtmlleft);
 
 print '<div class="div-table-responsive">';
 print '<div class="fichecenter">';

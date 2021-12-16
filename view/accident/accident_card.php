@@ -799,7 +799,9 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 
 	include_once './../../core/tpl/digiriskdolibarr_configuration_gauge_view.tpl.php';
 
-	digirisk_banner_tab($object, 'ref', '', 0, 'ref', 'ref', $morehtmlref);
+	$morehtmlleft = '<div class="floatleft inline-block valignmiddle divphotoref">'.digirisk_show_photos('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity].'/'.$object->element, 'small', 5, 0, 0, 0, $width,0, 0, 0, 0, $object->element, $object).'</div>';
+
+	digirisk_banner_tab($object, 'ref', '', 0, 'ref', 'ref', $morehtmlref, '','',$morehtmlleft);
 
 	print '<div class="div-table-responsive">';
 	print '<div class="fichecenter">';
@@ -885,23 +887,6 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	print '</td></tr>';
 
 	include DOL_DOCUMENT_ROOT.'/core/tpl/commonfields_view.tpl.php';
-
-	print '<tr><td class="titlefield">';
-	print $langs->trans("Photo") . '</td>';
-	print '<td>';
-	$filearray = dol_dir_list($conf->digiriskdolibarr->multidir_output[$conf->entity].'/accident/'.$object->ref, "files", 0, '', '(\.odt|\.zip)', 'date', 'asc', 1);
-	if (count($filearray)) : ?>
-		<?php $file = array_shift($filearray); ?>
-		<span class="">
-			<?php print '<img class="" src="'.DOL_URL_ROOT.'/viewimage.php?modulepart=digiriskdolibarr&entity='.$conf->entity.'&file='.urlencode('/accident/'.$object->ref.'/thumbs/'. preg_replace('/\./', '_small.',$file['name'])).'" >'; ?>
-		</span>
-	<?php else: ?>
-		<?php $nophoto = DOL_URL_ROOT.'/public/theme/common/nophoto.png'; ?>
-		<span class="">
-			<img class="" alt="No photo" src="<?php echo $nophoto ?>">
-		</span>
-	<?php endif; ?>
-	<?php print '</td></tr>';
 
 	print '</table>';
 	print '</div>';
