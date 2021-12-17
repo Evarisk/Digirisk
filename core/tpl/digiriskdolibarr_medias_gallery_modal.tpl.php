@@ -11,7 +11,7 @@
 			<div class="messageSuccessSendPhoto notice hidden">
 				<div class="wpeo-notice notice-success send-photo-success-notice">
 					<div class="notice-content">
-						<div class="notice-title"><?php echo $langs->trans('SendPhotoWell') ?></div>
+						<div class="notice-title"><?php echo $langs->trans('PhotoWellSent') ?></div>
 					</div>
 					<div class="notice-close"><i class="fas fa-times"></i></div>
 				</div>
@@ -19,7 +19,7 @@
 			<div class="messageErrorSendPhoto notice hidden">
 				<div class="wpeo-notice notice-warning send-photo-error-notice">
 					<div class="notice-content">
-						<div class="notice-title"><?php echo $langs->trans('NotSendPhoto') ?></div>
+						<div class="notice-title"><?php echo $langs->trans('PhotoNotSent') ?></div>
 					</div>
 					<div class="notice-close"><i class="fas fa-times"></i></div>
 				</div>

@@ -1125,14 +1125,11 @@ window.eoxiaJS.mediaGallery.savePhoto = function( event ) {
 	let idToSave = $(this).attr('value')
 	let mediaGalleryModal = $(this).closest('.modal-container')
 	let filesLinked = mediaGalleryModal.find('.clicked-photo')
-	let modalFrom = $('.modal-risk.modal-active')
+	let modalFrom = $('.modal-active:not(.modal-photo)')
+
 	let riskId = modalFrom.attr('value')
 	let mediaLinked = ''
 	let type = $(this).find('.type-from').val()
-	let actionContainerSuccess = $('.messageSuccessSavePhoto');
-	let actionContainerError = $('.messageErrorSavePhoto');
-	let actionContainerRiskSuccess = $('.messageSuccessSavePhotoRisk');
-	let actionContainerRiskError = $('.messageErrorSavePhotoRisk');
 
 	var params = new window.URLSearchParams(window.location.search);
 	var currentElementID = params.get('id')
@@ -1164,22 +1161,17 @@ window.eoxiaJS.mediaGallery.savePhoto = function( event ) {
             processData: false,
             contentType: false,
             success: function ( ) {
-                $('.wpeo-loader').removeClass('wpeo-loader')
+				$('.wpeo-loader').removeClass('wpeo-loader')
                 parent.removeClass('modal-active')
                 riskAssessmentPhoto.each( function() {
                     $(this).find('.clicked-photo-preview').attr('src',newPhoto )
                     $(this).find('.filename').attr('value', favorite.match(/_small/) ? favorite.replace(/\./, '_small.') : favorite)
                 });
                 mediaLinked.load(document.URL+'&favorite='+favorite + ' .element-linked-medias-'+idToSave+'.risk-'+riskId)
-
-				//actionContainerRiskSuccess.empty()
-				//modalFrom.find('.risk-evaluation-container').load(' .save-photo-success-notice')
-				//actionContainerRiskSuccess.removeClass('hidden');
+				modalFrom.find('.messageSuccessSavePhoto').removeClass('hidden')
             },
 			error: function ( ) {
-				//actionContainerRiskError.empty()
-				//actionContainerRiskError.load(' .save-photo-error-notice')
-				//actionContainerRiskError.removeClass('hidden');
+				modalFrom.find('.messageErrorSavePhoto').removeClass('hidden')
 			}
         });
 
@@ -1214,15 +1206,11 @@ window.eoxiaJS.mediaGallery.savePhoto = function( event ) {
 					digiriskBanner.load(document.URL+'&favorite='+favorite + ' .arearef.heightref')
 				}
 				mediaLinked.load(document.URL+'&favorite='+favorite + ' .element-linked-medias-'+idToSave+'.digirisk-element')
-
-				//actionContainerSuccess.empty()
-				//actionContainerSuccess.load(' .save-photo-success-notice')
-				//actionContainerSuccess.removeClass('hidden');
+				console.log(modalFrom)
+				modalFrom.find('.messageSuccessSavePhoto').removeClass('hidden')
 			},
 			error: function ( ) {
-				//actionContainerError.empty()
-				//actionContainerError.load(' .save-photo-error-notice')
-				//actionContainerError.removeClass('hidden');
+				modalFrom.find('.messageErrorSavePhoto').removeClass('hidden')
 			}
         });
 	}

@@ -114,6 +114,23 @@ if (!empty ($lastEvaluation) && $lastEvaluation > 0) {
 							</div>
 							<!-- Modal EDIT Evaluation Content-->
 							<div class="modal-content" id="#modalContent<?php echo $cotation->id ?>">
+								<!-- PHOTO -->
+								<div class="messageSuccessSavePhoto notice hidden">
+									<div class="wpeo-notice notice-success save-photo-success-notice">
+										<div class="notice-content">
+											<div class="notice-title"><?php echo $langs->trans('PhotoWellSaved') ?></div>
+										</div>
+										<div class="notice-close"><i class="fas fa-times"></i></div>
+									</div>
+								</div>
+								<div class="messageErrorSavePhoto notice hidden">
+									<div class="wpeo-notice notice-warning save-photo-error-notice">
+										<div class="notice-content">
+											<div class="notice-title"><?php echo $langs->trans('PhotoNotSaved') ?></div>
+										</div>
+										<div class="notice-close"><i class="fas fa-times"></i></div>
+									</div>
+								</div>
 								<div class="risk-evaluation-container <?php echo $cotation->method; ?>">
 									<div class="risk-evaluation-header">
 										<?php if ($conf->global->DIGIRISKDOLIBARR_ADVANCED_RISKASSESSMENT_METHOD) : ?>
@@ -425,8 +442,26 @@ $cotation->method = $lastEvaluation->method ? $lastEvaluation->method : "standar
 				<h2 class="modal-title"><?php echo $langs->trans('EvaluationCreate') . ' ' . $refEvaluationMod->getNextValue($evaluation)?></h2>
 				<div class="modal-close"><i class="fas fa-times"></i></div>
 			</div>
+
 			<!-- Modal-ADD Evaluation Content-->
 			<div class="modal-content" id="#modalContent<?php echo $risk->id?>">
+				<!-- PHOTO -->
+				<div class="messageSuccessSavePhoto notice hidden">
+					<div class="wpeo-notice notice-success save-photo-success-notice">
+						<div class="notice-content">
+							<div class="notice-title"><?php echo $langs->trans('PhotoWellSaved') ?></div>
+						</div>
+						<div class="notice-close"><i class="fas fa-times"></i></div>
+					</div>
+				</div>
+				<div class="messageErrorSavePhoto notice hidden">
+					<div class="wpeo-notice notice-warning save-photo-error-notice">
+						<div class="notice-content">
+							<div class="notice-title"><?php echo $langs->trans('PhotoNotSaved') ?></div>
+						</div>
+						<div class="notice-close"><i class="fas fa-times"></i></div>
+					</div>
+				</div>
 				<div class="risk-evaluation-container <?php echo $cotation->method; ?>">
 					<div class="risk-evaluation-header">
 						<?php if ($conf->global->DIGIRISKDOLIBARR_ADVANCED_RISKASSESSMENT_METHOD) : ?>
@@ -542,6 +577,7 @@ $cotation->method = $lastEvaluation->method ? $lastEvaluation->method : "standar
 						print digirisk_show_medias_linked('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessment/tmp/' .  $risk->ref . '/' , 'small', '', 0, 0, 0, 150, 150, 1, 0, 0, $cotation->element . '/tmp/' .  $risk->ref);
 						?>
 					</div>
+
 				</div>
 				<!-- RISK EVALUATION SINGLE -->
 				<?php if (!empty($lastEvaluation) && $lastEvaluation > 0) : ?>

@@ -193,23 +193,7 @@
 		</div>
 	</div>
 
-	<!-- PHOTO -->
-	<div class="messageSuccessSavePhotoRisk notice hidden">
-		<div class="wpeo-notice notice-success save-photo-success-notice">
-			<div class="notice-content">
-				<div class="notice-title"><?php echo $langs->trans('SavePhotoWell') ?></div>
-			</div>
-			<div class="notice-close"><i class="fas fa-times"></i></div>
-		</div>
-	</div>
-	<div class="messageErrorSavePhotoRisk notice hidden">
-		<div class="wpeo-notice notice-warning save-photo-error-notice">
-			<div class="notice-content">
-				<div class="notice-title"><?php echo $langs->trans('NotSavePhoto') ?></div>
-			</div>
-			<div class="notice-close"><i class="fas fa-times"></i></div>
-		</div>
-	</div>
+
 	<?php
 
 	$advanced_method_cotation_json  = file_get_contents(DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/js/json/default.json');
@@ -407,6 +391,23 @@
 					</div>
 					<!-- Modal-ADD Risk Content-->
 					<div class="modal-content" id="#modalContent">
+						<!-- PHOTO -->
+						<div class="messageSuccessSavePhoto notice hidden">
+							<div class="wpeo-notice notice-success save-photo-success-notice">
+								<div class="notice-content">
+									<div class="notice-title"><?php echo $langs->trans('PhotoWellSaved') ?></div>
+								</div>
+								<div class="notice-close"><i class="fas fa-times"></i></div>
+							</div>
+						</div>
+						<div class="messageErrorSavePhoto notice hidden">
+							<div class="wpeo-notice notice-warning save-photo-error-notice">
+								<div class="notice-content">
+									<div class="notice-title"><?php echo $langs->trans('PhotoNotSaved') ?></div>
+								</div>
+								<div class="notice-close"><i class="fas fa-times"></i></div>
+							</div>
+						</div>
 						<div class="risk-content">
 							<div class="risk-category">
 								<span class="title"><?php echo $langs->trans('Risk'); ?><required>*</required></span>
@@ -568,6 +569,23 @@
 				</div>
 				<!-- Modal-ADD Risk Content-->
 				<div class="modal-content" id="#modalContent">
+					<!-- PHOTO -->
+					<div class="messageSuccessSavePhoto notice hidden">
+						<div class="wpeo-notice notice-success save-photo-success-notice">
+							<div class="notice-content">
+								<div class="notice-title"><?php echo $langs->trans('PhotoWellSaved') ?></div>
+							</div>
+							<div class="notice-close"><i class="fas fa-times"></i></div>
+						</div>
+					</div>
+					<div class="messageErrorSavePhoto notice hidden">
+						<div class="wpeo-notice notice-warning save-photo-error-notice">
+							<div class="notice-content">
+								<div class="notice-title"><?php echo $langs->trans('PhotoNotSaved') ?></div>
+							</div>
+							<div class="notice-close"><i class="fas fa-times"></i></div>
+						</div>
+					</div>
 					<div class="risk-content">
 						<div class="risk-category">
 							<span class="title"><?php echo $langs->trans('Risk'); ?><required>*</required></span>

@@ -910,7 +910,7 @@ function display_recurse_tree($results) {
 										<div class="messageSuccessSavePhoto notice hidden">
 											<div class="wpeo-notice notice-success save-photo-success-notice">
 												<div class="notice-content">
-													<div class="notice-title"><?php echo $langs->trans('SavePhotoWell') ?></div>
+													<div class="notice-title"><?php echo $langs->trans('PhotoWellSaved') ?></div>
 												</div>
 												<div class="notice-close"><i class="fas fa-times"></i></div>
 											</div>
@@ -918,7 +918,7 @@ function display_recurse_tree($results) {
 										<div class="messageErrorSavePhoto notice hidden">
 											<div class="wpeo-notice notice-warning save-photo-error-notice">
 												<div class="notice-content">
-													<div class="notice-title"><?php echo $langs->trans('NotSavePhoto') ?></div>
+													<div class="notice-title"><?php echo $langs->trans('PhotoNotSaved') ?></div>
 												</div>
 												<div class="notice-close"><i class="fas fa-times"></i></div>
 											</div>
