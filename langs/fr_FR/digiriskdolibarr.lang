@@ -1320,5 +1320,5 @@ GetAPI = Utilisation des routes API Digirisk en méthode GET
 PostAPI = Utilisation des routes API Digirisk en méthode POST
 MinimizeMenu = Réduire le menu
 ActionsLine = Actions
-SendPhotoWell = La photo a été ajouté à la bibliothèque de médias
+SendPhotoWell = La photo a été ajoutée à la bibliothèque de médias
 NotSendPhoto = La photo ne s'est pas correctement envoyée
