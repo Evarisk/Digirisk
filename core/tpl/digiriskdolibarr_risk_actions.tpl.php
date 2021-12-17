@@ -124,13 +124,16 @@ if (!$error && $action == 'add' && $permissiontoadd) {
 }
 
 if (!$error && $action == 'saveRisk' && $permissiontoadd) {
-	$riskID      = GETPOST('riskID');
-	$description = GETPOST('riskComment', 'restricthtml');
-	$category    = GETPOST('riskCategory');
+
+	$data = json_decode(file_get_contents('php://input'), true);
+
+	$riskID      = $data['riskID'];
+	$description = $data['comment'];
+	$category    = $data['category'];
 	$digiriskelement = new DigiriskElement($db);
 
-	if (dol_strlen(GETPOST('newParent'))) {
-		$parent_element = $digiriskelement->fetchAll('','',0,0, array('ref' => GETPOST('newParent')));
+	if (dol_strlen($data['newParent'])) {
+		$parent_element = $digiriskelement->fetchAll('','',0,0, array('ref' => $data['newParent']));
 		$parent_id = array_keys($parent_element)[0];
 	}
 
@@ -148,7 +151,6 @@ if (!$error && $action == 'saveRisk' && $permissiontoadd) {
 		$urltogo = str_replace('__ID__', $result, $backtopage);
 		$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
 		header("Location: ".$urltogo);
-		exit;
 	} else {
 		// Update risk KO
 		if (!empty($risk->errors)) setEventMessages(null, $risk->errors, 'errors');
@@ -208,12 +210,14 @@ if (!$error && ($massaction == 'delete' || ($action == 'delete' && $confirm == '
 }
 
 if (!$error && $action == 'addEvaluation' && $permissiontoadd) {
-	$evaluationComment  = GETPOST('evaluationComment', 'restricthtml');
-	$riskAssessmentDate = GETPOST('riskAssessmentDate');
-	$riskID             = GETPOST('riskToAssign');
-	$cotation           = GETPOST('cotation');
-	$method             = GETPOST('cotationMethod');
-	$photo              = GETPOST('photo');
+	$data = json_decode(file_get_contents('php://input'), true);
+
+	$evaluationComment  = $data['comment'];
+	$riskAssessmentDate = $data['date'];
+	$riskID             = $data['riskId'];
+	$cotation           = $data['cotation'];
+	$method             = $data['method'];
+	$photo              = $data['photo'];
 
 	$risktmp = new Risk($db);
 	$risktmp->fetch($riskID);
@@ -229,11 +233,11 @@ if (!$error && $action == 'addEvaluation' && $permissiontoadd) {
 	$evaluation->date_riskassessment = strtotime(preg_replace('/\//', '-',$riskAssessmentDate));
 
 	if ($method == 'advanced') {
-		$formation  = GETPOST('formation');
-		$protection = GETPOST('protection');
-		$occurrence = GETPOST('occurrence');
-		$gravite    = GETPOST('gravite');
-		$exposition = GETPOST('exposition');
+		$formation  = $data['criteres']['formation'];
+		$protection = $data['criteres']['protection'];
+		$occurrence = $data['criteres']['occurrence'];
+		$gravite    = $data['criteres']['gravite'];
+		$exposition = $data['criteres']['exposition'];
 
 		$evaluation->formation  = $formation;
 		$evaluation->protection = $protection;
@@ -281,7 +285,6 @@ if (!$error && $action == 'addEvaluation' && $permissiontoadd) {
 		$urltogo = str_replace('__ID__', $result, $backtopage);
 		$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
 		header("Location: ".$urltogo);
-		exit;
 	}
 	else {
 		// Creation evaluation KO
@@ -291,11 +294,14 @@ if (!$error && $action == 'addEvaluation' && $permissiontoadd) {
 }
 
 if (!$error && $action == 'saveEvaluation' && $permissiontoadd) {
-	$evaluationID       = GETPOST('evaluationID');
-	$cotation           = GETPOST('cotation');
-	$method             = GETPOST('cotationMethod');
-	$evaluationComment  = GETPOST('evaluationComment', 'restricthtml');
-	$riskAssessmentDate = GETPOST('riskAssessmentDate');
+
+	$data = json_decode(file_get_contents('php://input'), true);
+
+	$evaluationID       = $data['evaluationID'];
+	$cotation           = $data['cotation'];
+	$method             = $data['method'];
+	$evaluationComment  = $data['comment'];
+	$riskAssessmentDate = $data['date'];
 
 	$evaluation->fetch($evaluationID);
 
@@ -305,11 +311,11 @@ if (!$error && $action == 'saveEvaluation' && $permissiontoadd) {
 	$evaluation->date_riskassessment = strtotime(preg_replace('/\//', '-',$riskAssessmentDate));
 
 	if ($method == 'advanced') {
-		$formation  = GETPOST('formation');
-		$protection = GETPOST('protection');
-		$occurrence = GETPOST('occurrence');
-		$gravite    = GETPOST('gravite');
-		$exposition = GETPOST('exposition');
+		$formation  = $data['criteres']['formation'];
+		$protection = $data['criteres']['protection'];
+		$occurrence = $data['criteres']['occurrence'];
+		$gravite    = $data['criteres']['gravite'];
+		$exposition = $data['criteres']['exposition'];
 
 		$evaluation->formation  = $formation;
 		$evaluation->protection = $protection;
@@ -326,7 +332,6 @@ if (!$error && $action == 'saveEvaluation' && $permissiontoadd) {
 		$urltogo = str_replace('__ID__', $result, $backtopage);
 		$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
 		header("Location: ".$urltogo);
-		exit;
 	}
 	else {
 		// Update evaluation KO
