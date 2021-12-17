@@ -18,6 +18,7 @@ if (!$error && $action == 'add' && $permissiontoadd) {
 	$risk->fk_projet   = $conf->global->DIGIRISKDOLIBARR_DU_PROJECT;
 	$risk->category    = $category;
 	$risk->ref         = $refRiskMod->getNextValue($risk);
+	$risk->status      = 1;
 
 	if (!$error) {
 		$result = $risk->create($user);

@@ -159,6 +159,7 @@ if (empty($reshook)) {
 		$risksign->ref         = $refRiskSignMod->getNextValue($risksign);
 		$risksign->category    = $riskSignCategory;
 		$risksign->description = $riskSignDescription;
+		$risksign->status      = 1;
 
 		$risksign->fk_element  = $fk_element ? $fk_element : 0;
 

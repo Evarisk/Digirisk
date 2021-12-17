@@ -162,6 +162,7 @@ if (empty($reshook)) {
 		$evaluator->duration        = $duration;
 		$evaluator->fk_user         = $evaluatorID;
 		$evaluator->fk_parent       = $object->id;
+		$evaluator->status          = 1;
 
 		$evaluator->create($user);
 	}
