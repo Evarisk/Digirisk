@@ -256,7 +256,7 @@ if (empty($reshook)) {
 			$zip->close();
 
 			//move archive to riskassessmentdocument folder
-			rename(DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/' . $riskassessmentdocument->ref . '.zip', $pathToZip . '.zip');
+			rename(DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/view/digiriskstandard/' . $riskassessmentdocument->ref . '.zip', $pathToZip . '.zip');
 		}
 		if ($result <= 0) {
 			setEventMessages($object->error, $object->errors, 'errors');
