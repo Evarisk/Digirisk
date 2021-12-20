@@ -1010,6 +1010,7 @@ HowToEnableRiskDescription = Pour activer le champ description du risque, allez 
 HowToEnableRiskCategoryEdit = Pour activer la modification de la catégorie de risque, allez dans "Configuration du module -> Analyse de risque -> Risque"
 SortRisksListingsByCotation = Trier les risques par cotation
 SortRisksListingsByCotationDescription =  Activer le tri automatique des risques par cotation dans les listings
+ListingHeaderCotation = Liste des évaluations
 
 DigiriskRiskData = Données configurables des risques
 RiskDescription = Description du risque
@@ -1147,6 +1148,7 @@ TaskCreate = Ajout de la tâche
 TaskEdit = Édition de la tâche
 HowToSetDUProject = Pour configurer le choix du projet, aller dans Configuration du module - Analyse des risques - Tâche
 DeleteTask = Êtes-vous sûr(e) de vouloir supprimer la tâche
+ListingHeaderTask = Liste des tâches
 DigiriskTaskData = Données configurables des tâches
 TaskManagementDescription = Activer la gestion des tâches
 TaskManagementNotActivated = Veuillez activer la gestion des tâches dans Configuration du module / Analyse des risques / Tâche

@@ -19,6 +19,11 @@
   pointer-events: none;
   transition: all 0.2s ease-out;
 
+  // Fix pointer event on textarea field.
+  textarea {
+    resize: none;
+  }
+
   &.modal-active {
     opacity: 1;
     pointer-events: auto;
@@ -26,6 +31,9 @@
 
     .modal-container {
       transform: translate(-50%, -50%);
+    }
+    textarea {
+      resize: both;
     }
   }
 

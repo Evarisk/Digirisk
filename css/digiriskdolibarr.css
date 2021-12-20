@@ -664,6 +664,9 @@
   -webkit-transition: all 0.2s ease-out;
   transition: all 0.2s ease-out;
 }
+.wpeo-modal textarea {
+  resize: none;
+}
 .wpeo-modal.modal-active {
   opacity: 1;
   pointer-events: auto;
@@ -672,6 +675,9 @@
 .wpeo-modal.modal-active .modal-container {
   -webkit-transform: translate(-50%, -50%);
   transform: translate(-50%, -50%);
+}
+.wpeo-modal.modal-active textarea {
+  resize: both;
 }
 .wpeo-modal.modal-active .modal-active {
   z-index: 1003;
@@ -2795,6 +2801,25 @@
   margin-left: 0;
 }
 
+/** Cell header */
+.table-cell-header {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-wrap: wrap;
+  flex-wrap: wrap;
+  -webkit-box-pack: justify;
+  -ms-flex-pack: justify;
+  justify-content: space-between;
+  margin-bottom: 0.5em;
+}
+.table-cell-header > * {
+  margin: auto 0;
+}
+.table-cell-header .wpeo-button {
+  margin: 0;
+}
+
 .risk-container .risk-edit {
   color: #263C5C;
 }
@@ -3475,7 +3500,6 @@ td > .risk-evaluation-container {
   padding: 0.2em 0.4em;
 }
 .risk-evaluation-container .risk-evaluation-single .risk-evaluation-button {
-  min-width: 50px;
   margin-left: 0.5em;
 }
 

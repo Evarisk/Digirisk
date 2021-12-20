@@ -1064,7 +1064,7 @@
 			if (!empty($arrayfields['evaluation.'.$key]['checked']))
 			{
 				$cssforfield = '';
-				print '<td'.($cssforfield ? ' class="'.$cssforfield.'"' : '').'>';
+				print '<td'.($cssforfield ? ' class="'.$cssforfield.'"' : '').' style="vertical-align: top;">';
 				if ($key == 'cotation') {
 					require './../../core/tpl/digiriskdolibarr_riskassessment_view.tpl.php';
 				}

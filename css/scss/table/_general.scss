@@ -1,0 +1,14 @@
+/** Cell header */
+.table-cell-header {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  margin-bottom: 0.5em;
+
+  > * {
+    margin: auto 0;
+  }
+  .wpeo-button {
+    margin: 0;
+  }
+}
