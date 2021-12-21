@@ -22,5 +22,9 @@
     "sass": "latest",
     "gulp-uglify": "latest",
     "gulp-watch": "latest"
+  },
+  "dependencies": {
+    "composer": "^4.1.0",
+    "gulp-phpunit": "^0.26.0"
   }
 }

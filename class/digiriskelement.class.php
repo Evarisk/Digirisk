@@ -638,6 +638,4 @@ class DigiriskElement extends CommonObject
 
 		return $ids;
 	}
-
-
 }
