@@ -1,4 +1,3 @@
-
 <!-- START MEDIA GALLERY MODAL -->
 <div class="wpeo-modal modal-photo" id="media_gallery" data-id="<?php echo $object->id ?>">
 	<div class="modal-container wpeo-modal-event">
@@ -9,6 +8,22 @@
 		</div>
 		<!-- Modal-Content -->
 		<div class="modal-content" id="#modalMediaGalleryContent">
+			<div class="messageSuccessSendPhoto notice hidden">
+				<div class="wpeo-notice notice-success send-photo-success-notice">
+					<div class="notice-content">
+						<div class="notice-title"><?php echo $langs->trans('PhotoWellSent') ?></div>
+					</div>
+					<div class="notice-close"><i class="fas fa-times"></i></div>
+				</div>
+			</div>
+			<div class="messageErrorSendPhoto notice hidden">
+				<div class="wpeo-notice notice-warning send-photo-error-notice">
+					<div class="notice-content">
+						<div class="notice-title"><?php echo $langs->trans('PhotoNotSent') ?></div>
+					</div>
+					<div class="notice-close"><i class="fas fa-times"></i></div>
+				</div>
+			</div>
 			<?php
 			// To attach new file
 			if ((!empty($conf->use_javascript_ajax) && empty($conf->global->MAIN_ECM_DISABLE_JS)) || !empty($section))

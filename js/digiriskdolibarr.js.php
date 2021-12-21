@@ -1125,7 +1125,8 @@ window.eoxiaJS.mediaGallery.savePhoto = function( event ) {
 	let idToSave = $(this).attr('value')
 	let mediaGalleryModal = $(this).closest('.modal-container')
 	let filesLinked = mediaGalleryModal.find('.clicked-photo')
-	let modalFrom = $('.modal-risk.modal-active')
+	let modalFrom = $('.modal-active:not(.modal-photo)')
+
 	let riskId = modalFrom.attr('value')
 	let mediaLinked = ''
 	let type = $(this).find('.type-from').val()
@@ -1160,14 +1161,18 @@ window.eoxiaJS.mediaGallery.savePhoto = function( event ) {
             processData: false,
             contentType: false,
             success: function ( ) {
-                $('.wpeo-loader').removeClass('wpeo-loader')
+				$('.wpeo-loader').removeClass('wpeo-loader')
                 parent.removeClass('modal-active')
                 riskAssessmentPhoto.each( function() {
                     $(this).find('.clicked-photo-preview').attr('src',newPhoto )
                     $(this).find('.filename').attr('value', favorite.match(/_small/) ? favorite.replace(/\./, '_small.') : favorite)
                 });
                 mediaLinked.load(document.URL+'&favorite='+favorite + ' .element-linked-medias-'+idToSave+'.risk-'+riskId)
-            }
+				modalFrom.find('.messageSuccessSavePhoto').removeClass('hidden')
+            },
+			error: function ( ) {
+				modalFrom.find('.messageErrorSavePhoto').removeClass('hidden')
+			}
         });
 
 	} else if (type === 'digiriskelement') {
@@ -1201,6 +1206,11 @@ window.eoxiaJS.mediaGallery.savePhoto = function( event ) {
 					digiriskBanner.load(document.URL+'&favorite='+favorite + ' .arearef.heightref')
 				}
 				mediaLinked.load(document.URL+'&favorite='+favorite + ' .element-linked-medias-'+idToSave+'.digirisk-element')
+				console.log(modalFrom)
+				modalFrom.find('.messageSuccessSavePhoto').removeClass('hidden')
+			},
+			error: function ( ) {
+				modalFrom.find('.messageErrorSavePhoto').removeClass('hidden')
 			}
         });
 	}
@@ -1238,6 +1248,8 @@ window.eoxiaJS.mediaGallery.sendPhoto = function( event ) {
 	let files    = element.find("input[name='userfile[]']").prop("files");
 	let formdata = new FormData();
     let elementParent = $(this).closest('.modal-container').find('.ecm-photo-list-content');
+	let actionContainerSuccess = $('.messageSuccessSendPhoto');
+	let actionContainerError = $('.messageErrorSendPhoto');
 	window.eoxiaJS.loader.display($('#media_gallery').find('.modal-content'));
 
 	$.each(files, function(index, file) {
@@ -1255,7 +1267,16 @@ window.eoxiaJS.mediaGallery.sendPhoto = function( event ) {
 			elementParent.empty()
 			elementParent.load( document.URL + ' .ecm-photo-list');
             elementParent.removeClass('wpeo-loader');
-        }
+
+			actionContainerSuccess.empty()
+			actionContainerSuccess.load(' .send-photo-success-notice')
+			actionContainerSuccess.removeClass('hidden');
+        },
+		error: function ( ) {
+			actionContainerError.empty()
+			actionContainerError.load(' .send-photo-error-notice')
+			actionContainerError.removeClass('hidden');
+		}
 	});
 };
 
@@ -1547,104 +1568,90 @@ window.eoxiaJS.risk.createRisk = function ( event ) {
 	let actionContainerSuccess = $('.messageSuccessRiskCreate');
 	let actionContainerError = $('.messageErrorRiskCreate');
 
-	let evaluationText = elementEvaluation.find('.risk-evaluation-comment textarea').val()
 	let riskCommentText = elementRisk.find('.risk-description textarea').val()
-	let taskText = elementTask.find('input').val()
 	let riskDescriptionPrefill = elementRisk.find('.risk-category .input-risk-description-prefill').val()
-	let riskDesciptionText = elementRisk.find('.risk-category .danger-category-pic').attr('aria-label')
+	let riskDescriptionText = elementRisk.find('.risk-category .danger-category-pic').attr('aria-label')
 
-	evaluationText = window.eoxiaJS.risk.sanitizeBeforeRequest(evaluationText)
+	let evaluationText = elementEvaluation.find('.risk-evaluation-comment textarea').val()
+
+	let taskText = elementTask.find('input').val()
+
 	riskCommentText = window.eoxiaJS.risk.sanitizeBeforeRequest(riskCommentText)
-	riskDesciptionText = window.eoxiaJS.risk.sanitizeBeforeRequest(riskDesciptionText)
+	riskDescriptionText = window.eoxiaJS.risk.sanitizeBeforeRequest(riskDescriptionText)
+	evaluationText = window.eoxiaJS.risk.sanitizeBeforeRequest(evaluationText)
 	taskText = window.eoxiaJS.risk.sanitizeBeforeRequest(taskText)
 
+	//Risk
 	var category = elementRisk.find('.risk-category input').val();
-	var categoryPost = '';
-	if (category !== 0) {
-		categoryPost = '&category=' + category;
-	}
-
 	if (riskDescriptionPrefill == 1) {
-		var description = riskDesciptionText;
+		var description = riskDescriptionText;
 	} else {
 		var description = riskCommentText;
 	}
 
-	var descriptionPost = '';
-	if (description !== '') {
-		descriptionPost = '&riskComment=' + encodeURI(description);
-	}
-
+	//Risk assessment
 	var method = elementEvaluation.find('.risk-evaluation-header .risk-evaluation-method').val();
-	var methodPost = '';
-	if (method !== '') {
-		methodPost = '&cotationMethod=' + method;
-	}
-
 	var cotation = elementEvaluation.find('.risk-evaluation-seuil').val();
-	var cotationPost = '';
-	if (cotation !== 0) {
-		cotationPost = '&cotation=' + cotation;
-	}
+	var photo = elementEvaluation.find('.risk-evaluation-photo-single .filename').val();
+	var comment = evaluationText;
+	var date = elementEvaluation.find('#RiskAssessmentDate').val();
+	var criteres = []
 
-	let criteres = '';
 	Object.values($('.table-cell.active.cell-0')).forEach(function(v) {
 		if ($(v).data( 'seuil' ) > -1) {
-			criteres += '&' + $(v).data( 'type' ) + '=' + $(v).data( 'seuil' );
+			criteres[ $(v).data( 'type' )] = $(v).data( 'seuil' )
 		}
 	})
 
-	var photo = elementEvaluation.find('.risk-evaluation-photo-single .filename').val();
-	var photoPost = '';
-	if (photo !== 0) {
-		photoPost = '&photo=' + encodeURI(photo);
-	}
-
-	var comment = evaluationText;
-	var commentPost = '';
-	if (comment !== '') {
-		commentPost = '&evaluationComment=' + encodeURI(comment);
-	}
-
-	var date = elementEvaluation.find('#RiskAssessmentDate').val();
-	var datePost = '';
-	if (date !== '') {
-		datePost = '&riskAssessmentDate=' + encodeURI(date);
-	}
-
+	//Task
 	var task = taskText;
-	var taskPost = '';
-	if (task !== '') {
-		taskPost = '&tasktitle=' + encodeURI(task);
-	}
 
 	let elementParent = $('.fichecenter').find('.div-table-responsive');
 	window.eoxiaJS.loader.display($('.fichecenter'));
 
 	$.ajax({
-		url: document.URL + '&action=add' + categoryPost + descriptionPost + methodPost + cotationPost + criteres + photoPost + commentPost + datePost + taskPost,
+		url: document.URL + '&action=add',
 		type: "POST",
+		data: JSON.stringify({
+			cotation: cotation,
+			comment: comment,
+			category: category,
+			description: description,
+			method: method,
+			photo: photo,
+			date: date,
+			task: task,
+			criteres: {
+				gravite: criteres['gravite'] ? criteres['gravite'] : 0,
+				occurrence: criteres['occurrence'] ? criteres['occurrence'] : 0,
+				protection: criteres['protection'] ? criteres['protection'] : 0,
+				formation: criteres['formation'] ? criteres['formation'] : 0,
+				exposition: criteres['exposition'] ? criteres['exposition'] : 0
+			}
+		}),
 		processData: false,
 		contentType: false,
-		success: function ( ) {
+		success: function ( resp ) {
+
 			let modalRisk = $('.risk-add-modal');
-			modalRisk.load( document.URL + ' .modal-risk-0');
+			modalRisk.html($(resp).find('.risk-add-modal'))
 
 			elementParent.empty();
-			elementParent.load( document.URL + ' .div-table-responsive')
+			elementParent.html($(resp).find('.div-table-responsive'))
 
 			let numberOfRisks = $('.valignmiddle.col-title');
-			numberOfRisks.load( document.URL + ' .table-fiche-title .titre.inline-block');
+			numberOfRisks.html($(resp).find('.valignmiddle.col-title'));
 
 			actionContainerSuccess.empty()
-			actionContainerSuccess.load(' .risk-create-success-notice')
+			actionContainerSuccess.html($(resp).find('.risk-create-success-notice'));
+
 			actionContainerSuccess.removeClass('hidden');
 
 			$('.fichecenter').removeClass('wpeo-loader');
 		},
-		error: function ( ) {
+		error: function ( resp ) {
 			actionContainerError.empty()
-			actionContainerError.load(' .risk-create-error-notice')
+			actionContainerError.html($(resp).find('.risk-create-error-notice'));
 			actionContainerError.removeClass('hidden');
 
 			$('.fichecenter').removeClass('wpeo-loader');
@@ -1691,28 +1698,16 @@ window.eoxiaJS.risk.saveRisk = function ( event ) {
 	riskCommentText = window.eoxiaJS.risk.sanitizeBeforeRequest(riskCommentText)
 
 	var category = elementRisk.find('.risk-category input').val();
-	var categoryPost = '';
-	if (category !== 0) {
-		categoryPost = '&riskCategory=' + category;
-	}
 
 	if (riskCommentText) {
 		var description = riskCommentText;
-		var descriptionPost = '';
-		if (description !== '') {
-			descriptionPost = '&riskComment=' + encodeURI(description);
-		}
+	} else {
+		var description = '';
 	}
 	//var newParent = $(this).closest('.risk-container').find('#select2-socid-container').attr('title');
 	var newParent = $(this).closest('.risk-container').find('#socid option:selected').text();
 	if (newParent) {
-		var newParentPost = '';
-		console.log( $(this).closest('.risk-container').find('current-element-ref').val())
-		if (newParent !== '' && newParent.split(/ /)[0] !== $(this).closest('.risk-container').find('.current-element-ref').val()) {
-			newParentPost = '&newParent=' + newParent.split(/ /)[0];
-		}
-	} else {
-		newParentPost = '&newParent=';
+			newParent = newParent.split(/ /)[0];
 	}
 
 	let elementParent = $('.fichecenter').find('.div-table-responsive');
@@ -1721,17 +1716,16 @@ window.eoxiaJS.risk.saveRisk = function ( event ) {
 		window.eoxiaJS.loader.display($(this).closest('.risk-row-content-' + editedRiskId).find('.risk-description-'+editedRiskId));
 	}
 
-	var request = "";
-	if (riskCommentText) {
-		request = document.URL + '&action=saveRisk&riskID=' + editedRiskId + categoryPost + descriptionPost + newParentPost
-	} else {
-		request = document.URL + '&action=saveRisk&riskID=' + editedRiskId + categoryPost + newParentPost
-	}
-
 	$.ajax({
-		url: request,
+		url:  document.URL + '&action=saveRisk',
 		type: "POST",
 		processData: false,
+		data: JSON.stringify({
+			riskID: editedRiskId,
+			category: category,
+			comment: description,
+			newParent: newParent
+		}),
 		contentType: false,
 		success: function ( ) {
 			window.location.reload()
@@ -1881,6 +1875,7 @@ window.eoxiaJS.evaluation.getDynamicScale = function (cotation) {
  * @return {void}
  */
 window.eoxiaJS.evaluation.createEvaluation = function ( event ) {
+
 	var riskToAssign = $(this).attr('value');
 	let element = $(this).closest('.risk-evaluation-add-modal');
 	let single = element.find('.risk-evaluation-container');
@@ -1888,48 +1883,18 @@ window.eoxiaJS.evaluation.createEvaluation = function ( event ) {
 	let actionContainerError = $('.messageErrorEvaluationCreate');
 
 	let evaluationText = single.find('.risk-evaluation-comment textarea').val()
-
 	evaluationText = window.eoxiaJS.risk.sanitizeBeforeRequest(evaluationText)
 
-	var riskToAssignPost = '';
-	if (riskToAssign !== '') {
-		riskToAssignPost = '&riskToAssign=' + riskToAssign;
-	}
-
 	var method = single.find('.risk-evaluation-method').val();
-	var methodPost = '';
-	if (method !== '') {
-		methodPost = '&cotationMethod=' + method;
-	}
-
 	var cotation = single.find('.risk-evaluation-seuil').val();
-	var cotationPost = '';
-	if (cotation !== 0) {
-		cotationPost = '&cotation=' + cotation;
-	}
-
 	var comment = evaluationText
-	var commentPost = '';
-	if (comment !== '') {
-		commentPost = '&evaluationComment=' + encodeURI(comment);
-	}
-
-	var date = single.find('#RiskAssessmentDate').val();
-	var datePost = '';
-	if (date !== '') {
-		datePost = '&riskAssessmentDate=' + encodeURI(date);
-	}
-
+	var date = single.find('#RiskAssessmentDateCreate0').val();
 	var photo = single.find('.risk-evaluation-photo-single .filename').val();
-	var photoPost = '';
-	if (photo !== 0) {
-		photoPost = '&photo=' + encodeURI(photo);
-	}
 
-	let criteres = '';
+	let criteres = [];
 	Object.values($('.table-cell.active.cell-0')).forEach(function(v) {
 		if ($(v).data( 'seuil' ) > -1) {
-			criteres += '&' + $(v).data( 'type' ) + '=' + $(v).data( 'seuil' )
+			criteres[ $(v).data( 'type' )] = $(v).data( 'seuil' )
 		}
 	})
 
@@ -1938,8 +1903,23 @@ window.eoxiaJS.evaluation.createEvaluation = function ( event ) {
 	window.eoxiaJS.loader.display($('.risk-evaluation-container-' + riskToAssign));
 
 	$.ajax({
-		url: document.URL + '&action=addEvaluation' + riskToAssignPost + methodPost + cotationPost + criteres + photoPost + commentPost + datePost,
+		url: document.URL + '&action=addEvaluation',
 		type: "POST",
+		data: JSON.stringify({
+			cotation: cotation,
+			comment: comment,
+			method: method,
+			photo: photo,
+			date: date,
+			riskId: riskToAssign,
+			criteres: {
+				gravite: criteres['gravite'] ? criteres['gravite'] : 0,
+				occurrence: criteres['occurrence'] ? criteres['occurrence'] : 0,
+				protection: criteres['protection'] ? criteres['protection'] : 0,
+				formation: criteres['formation'] ? criteres['formation'] : 0,
+				exposition: criteres['exposition'] ? criteres['exposition'] : 0
+			}
+		}),
 		processData: false,
 		contentType: false,
 		success: function( ) {
@@ -2039,7 +2019,6 @@ window.eoxiaJS.evaluation.saveEvaluation = function ( event ) {
 	let evaluationID = element.attr('value');
 	let actionContainerSuccess = $('.messageSuccessEvaluationEdit');
 	let actionContainerError = $('.messageErrorEvaluationEdit');
-	//let riskId = $(this).closest('.risk-evaluation-container').attr('value')
 	let evaluationText = element.find('.risk-evaluation-comment textarea').val()
 
 	let elementParent = $(this).closest('.risk-evaluation-container').find('.risk-evaluations-list-content');
@@ -2053,48 +2032,39 @@ window.eoxiaJS.evaluation.saveEvaluation = function ( event ) {
 	evaluationText = window.eoxiaJS.risk.sanitizeBeforeRequest(evaluationText)
 
 	var method = element.find('.risk-evaluation-method').val();
-	var methodPost = '';
-	if (method !== '') {
-		methodPost = '&cotationMethod=' + method;
-	}
-
 	var cotation = element.find('.risk-evaluation-seuil').val();
-	var cotationPost = '';
-	if (cotation !== 0) {
-		cotationPost = '&cotation=' + cotation;
-	}
-
 	var comment = evaluationText;
-	var commentPost = '';
-	if (comment !== '') {
-		commentPost = '&evaluationComment=' + encodeURI(comment);
-	}
-
-	var date = element.find('#RiskAssessmentDate').val();
-	var datePost = '';
-	if (date !== '') {
-		datePost = '&riskAssessmentDate=' + encodeURI(date);
-	}
-
+	var date = element.find('#RiskAssessmentDateEdit' + evaluationID).val();
 	var photo = element.find('.risk-evaluation-photo .filename').val();
-	var photoPost = '';
-	if (photo !== 0) {
-		photoPost = '&photo=' + encodeURI(photo);
-	}
 
-	let criteres = '';
+	let criteres = [];
 	Object.values($('.table-cell.active.cell-'+evaluationID)).forEach(function(v) {
 		if ($(v).data( 'seuil' ) > -1) {
-			criteres += '&' + $(v).data( 'type' ) + '=' + $(v).data( 'seuil' );
+			criteres[ $(v).data( 'type' )] = $(v).data( 'seuil' )
 		}
 	})
 
 	window.eoxiaJS.loader.display($(this));
 	window.eoxiaJS.loader.display(listModalContainer.find('.modal-content .risk-evaluations-list-content'))
 	$.ajax({
-		url: document.URL + '&action=saveEvaluation&evaluationID=' + evaluationID +  methodPost + cotationPost + criteres + photoPost + commentPost + datePost,
+		url: document.URL + '&action=saveEvaluation',
 		type: "POST",
 		processData: false,
+		data: JSON.stringify({
+			cotation: cotation,
+			comment: comment,
+			method: method,
+			photo: photo,
+			date: date,
+			evaluationID: evaluationID,
+			criteres: {
+				gravite: criteres['gravite'] ? criteres['gravite'] : 0,
+				occurrence: criteres['occurrence'] ? criteres['occurrence'] : 0,
+				protection: criteres['protection'] ? criteres['protection'] : 0,
+				formation: criteres['formation'] ? criteres['formation'] : 0,
+				exposition: criteres['exposition'] ? criteres['exposition'] : 0
+			}
+		}),
 		contentType: false,
 		success: function ( ) {
 			if (fromList) {
@@ -2192,7 +2162,9 @@ window.eoxiaJS.evaluationMethodEvarisk.selectSeuil = function( event ) {
 	if (criteres.length === 5) {
 		let cotationBeforeAdapt = criteres[0] * criteres[1] * criteres[2] * criteres[3] * criteres[4];
 
-		fetch('js/json/default.json').then(response => response.json()).then(data => {
+		let root = window.location.pathname.split(/view/)[0]
+
+		fetch(root + '/js/json/default.json').then(response => response.json()).then(data => {
 			let cotationAfterAdapt = data[0].option.matrix[cotationBeforeAdapt];
 			elementParent.find('.risk-evaluation-calculated-cotation').find('.risk-evaluation-cotation').attr('data-scale', window.eoxiaJS.evaluation.getDynamicScale(cotationAfterAdapt));
 			elementParent.find('.risk-evaluation-calculated-cotation').find('.risk-evaluation-cotation span').text(cotationAfterAdapt);

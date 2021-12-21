@@ -491,7 +491,7 @@ class PreventionPlan extends CommonObject
 	public function setInProgress($user, $notrigger = 0)
 	{
 		$signatory = new PreventionPlanSignature($this->db);
-		$signatory->deleteSignatoriesSignatures($this->id);
+		$signatory->deleteSignatoriesSignatures($this->id, 'preventionplan');
 		return $this->setStatusCommon($user, self::STATUS_IN_PROGRESS, $notrigger, 'PREVENTIONPLAN_INPROGRESS');
 	}
 	/**
@@ -613,7 +613,7 @@ class PreventionPlan extends CommonObject
 		if (empty($linkstart))
 		{
 			$label .= '<u>'.$langs->trans("PreventionPlan").'</u>';
-			$linkstart = '<a href="'.DOL_URL_ROOT.'/custom/digiriskdolibarr/preventionplan_card.php?id='.$this->id;
+			$linkstart = '<a href="'.DOL_URL_ROOT.'/custom/digiriskdolibarr/view/preventionplan/preventionplan_card.php?id='.$this->id;
 		}
 
 		if (!empty($this->ref))

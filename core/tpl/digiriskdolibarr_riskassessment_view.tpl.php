@@ -114,6 +114,23 @@ if (!empty ($lastEvaluation) && $lastEvaluation > 0) {
 							</div>
 							<!-- Modal EDIT Evaluation Content-->
 							<div class="modal-content" id="#modalContent<?php echo $cotation->id ?>">
+								<!-- PHOTO -->
+								<div class="messageSuccessSavePhoto notice hidden">
+									<div class="wpeo-notice notice-success save-photo-success-notice">
+										<div class="notice-content">
+											<div class="notice-title"><?php echo $langs->trans('PhotoWellSaved') ?></div>
+										</div>
+										<div class="notice-close"><i class="fas fa-times"></i></div>
+									</div>
+								</div>
+								<div class="messageErrorSavePhoto notice hidden">
+									<div class="wpeo-notice notice-warning save-photo-error-notice">
+										<div class="notice-content">
+											<div class="notice-title"><?php echo $langs->trans('PhotoNotSaved') ?></div>
+										</div>
+										<div class="notice-close"><i class="fas fa-times"></i></div>
+									</div>
+								</div>
 								<div class="risk-evaluation-container <?php echo $cotation->method; ?>">
 									<div class="risk-evaluation-header">
 										<?php if ($conf->global->DIGIRISKDOLIBARR_ADVANCED_RISKASSESSMENT_METHOD) : ?>
@@ -232,7 +249,7 @@ if (!empty ($lastEvaluation) && $lastEvaluation > 0) {
 									<?php if ($conf->global->DIGIRISKDOLIBARR_SHOW_RISKASSESSMENT_DATE) : ?>
 										<div class="risk-evaluation-date">
 											<span class="title"><?php echo $langs->trans('Date'); ?></span>
-											<?php print $form->selectDate($lastEvaluation->date_riskassessment, 'RiskAssessmentDate', 0, 0, 0, '', 1, 1); ?>
+											<?php print $form->selectDate($lastEvaluation->date_riskassessment, 'RiskAssessmentDateEdit' . $lastEvaluation->id, 0, 0, 0, '', 1, 1); ?>
 										</div>
 									<?php endif; ?>
 									<div class="element-linked-medias element-linked-medias-<?php echo $cotation->id ?> risk-<?php echo $risk->id ?>">
@@ -425,8 +442,26 @@ $cotation->method = $lastEvaluation->method ? $lastEvaluation->method : "standar
 				<h2 class="modal-title"><?php echo $langs->trans('EvaluationCreate') . ' ' . $refEvaluationMod->getNextValue($evaluation)?></h2>
 				<div class="modal-close"><i class="fas fa-times"></i></div>
 			</div>
+
 			<!-- Modal-ADD Evaluation Content-->
 			<div class="modal-content" id="#modalContent<?php echo $risk->id?>">
+				<!-- PHOTO -->
+				<div class="messageSuccessSavePhoto notice hidden">
+					<div class="wpeo-notice notice-success save-photo-success-notice">
+						<div class="notice-content">
+							<div class="notice-title"><?php echo $langs->trans('PhotoWellSaved') ?></div>
+						</div>
+						<div class="notice-close"><i class="fas fa-times"></i></div>
+					</div>
+				</div>
+				<div class="messageErrorSavePhoto notice hidden">
+					<div class="wpeo-notice notice-warning save-photo-error-notice">
+						<div class="notice-content">
+							<div class="notice-title"><?php echo $langs->trans('PhotoNotSaved') ?></div>
+						</div>
+						<div class="notice-close"><i class="fas fa-times"></i></div>
+					</div>
+				</div>
 				<div class="risk-evaluation-container <?php echo $cotation->method; ?>">
 					<div class="risk-evaluation-header">
 						<?php if ($conf->global->DIGIRISKDOLIBARR_ADVANCED_RISKASSESSMENT_METHOD) : ?>
@@ -532,7 +567,7 @@ $cotation->method = $lastEvaluation->method ? $lastEvaluation->method : "standar
 					<?php if ($conf->global->DIGIRISKDOLIBARR_SHOW_RISKASSESSMENT_DATE) : ?>
 						<div class="risk-evaluation-date">
 							<span class="title"><?php echo $langs->trans('Date'); ?></span>
-							<?php print $form->selectDate('', 'RiskAssessmentDate', 0, 0, 0, '', 1, 1); ?>
+							<?php print $form->selectDate('', 'RiskAssessmentDateCreate0', 0, 0, 0, '', 1, 1); ?>
 						</div>
 					<?php endif; ?>
 					<div class="element-linked-medias element-linked-medias-0 risk-<?php echo $risk->id ?>">
@@ -542,6 +577,7 @@ $cotation->method = $lastEvaluation->method ? $lastEvaluation->method : "standar
 						print digirisk_show_medias_linked('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessment/tmp/' .  $risk->ref . '/' , 'small', '', 0, 0, 0, 150, 150, 1, 0, 0, $cotation->element . '/tmp/' .  $risk->ref);
 						?>
 					</div>
+
 				</div>
 				<!-- RISK EVALUATION SINGLE -->
 				<?php if (!empty($lastEvaluation) && $lastEvaluation > 0) : ?>

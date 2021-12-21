@@ -31,6 +31,52 @@
 			<div class="notice-close"><i class="fas fa-times"></i></div>
 		</div>
 	</div>
+	<div class="messageSuccessEvaluationEdit notice hidden">
+		<input type="hidden" class="valueForEditEvaluation1" value="<?php echo $langs->trans('TheRiskAssessment') . ' ' ?>">
+		<input type="hidden" class="valueForEditEvaluation2" value="<?php echo ' ' . $langs->trans('HasBeenEditedF') ?>">
+		<div class="wpeo-notice notice-success riskassessment-edit-success-notice">
+			<div class="notice-content">
+				<div class="notice-title"><?php echo $langs->trans('RiskAssessmentWellEdited') ?></div>
+				<div class="notice-subtitle">
+					<span class="text"></span>
+				</div>
+			</div>
+			<div class="notice-close"><i class="fas fa-times"></i></div>
+		</div>
+	</div>
+	<div class="messageErrorEvaluationEdit notice hidden">
+		<input type="hidden" class="valueForEditEvaluation1" value="<?php echo $langs->trans('TheRiskAssessment') . ' ' ?>">
+		<input type="hidden" class="valueForEditEvaluation2" value="<?php echo ' ' . $langs->trans('HasNotBeenEditedF') ?>">
+		<div class="wpeo-notice notice-warning riskassessment-edit-error-notice">
+			<div class="notice-content">
+				<div class="notice-title"><?php echo $langs->trans('RiskAssessmentNotEdited') ?></div>
+			</div>
+			<div class="notice-close"><i class="fas fa-times"></i></div>
+		</div>
+	</div>
+	<div class="messageSuccessEvaluationDelete notice hidden">
+		<input type="hidden" class="valueForDeleteEvaluation1" value="<?php echo $langs->trans('TheRiskAssessment') . ' ' ?>">
+		<input type="hidden" class="valueForDeleteEvaluation2" value="<?php echo ' ' . $langs->trans('HasBeenDeletedF') ?>">
+		<div class="wpeo-notice notice-success riskassessment-delete-success-notice">
+			<div class="notice-content">
+				<div class="notice-title"><?php echo $langs->trans('RiskAssessmentWellDeleted') ?></div>
+				<div class="notice-subtitle">
+					<span class="text"></span>
+				</div>
+			</div>
+			<div class="notice-close"><i class="fas fa-times"></i></div>
+		</div>
+	</div>
+	<div class="messageErrorEvaluationDelete notice hidden">
+		<input type="hidden" class="valueForDeleteEvaluation1" value="<?php echo $langs->trans('TheRiskAssessment') . ' ' ?>">
+		<input type="hidden" class="valueForDeleteEvaluation2" value="<?php echo ' ' . $langs->trans('HasNotBeenDeletedF') ?>">
+		<div class="wpeo-notice notice-warning riskassessment-delete-error-notice">
+			<div class="notice-content">
+				<div class="notice-title"><?php echo $langs->trans('RiskAssessmentNotDeleted') ?></div>
+			</div>
+			<div class="notice-close"><i class="fas fa-times"></i></div>
+		</div>
+	</div>
 
 	<!--	RISK -->
 	<div class="messageSuccessRiskCreate notice hidden">
@@ -146,6 +192,8 @@
 			<div class="notice-close"><i class="fas fa-times"></i></div>
 		</div>
 	</div>
+
+
 	<?php
 
 	$advanced_method_cotation_json  = file_get_contents(DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/js/json/default.json');
@@ -235,7 +283,7 @@
 		{
 			$obj = $db->fetch_object($resql);
 			$id = $obj->rowid;
-			header("Location: ".dol_buildpath('/digiriskdolibarr/digiriskelement_risk.php', 1).'?id='.$id);
+			header("Location: ".dol_buildpath('/digiriskdolibarr/view/digiriskelement/digiriskelement_risk.php', 1).'?id='.$id);
 			exit;
 		}
 	}
@@ -343,6 +391,23 @@
 					</div>
 					<!-- Modal-ADD Risk Content-->
 					<div class="modal-content" id="#modalContent">
+						<!-- PHOTO -->
+						<div class="messageSuccessSavePhoto notice hidden">
+							<div class="wpeo-notice notice-success save-photo-success-notice">
+								<div class="notice-content">
+									<div class="notice-title"><?php echo $langs->trans('PhotoWellSaved') ?></div>
+								</div>
+								<div class="notice-close"><i class="fas fa-times"></i></div>
+							</div>
+						</div>
+						<div class="messageErrorSavePhoto notice hidden">
+							<div class="wpeo-notice notice-warning save-photo-error-notice">
+								<div class="notice-content">
+									<div class="notice-title"><?php echo $langs->trans('PhotoNotSaved') ?></div>
+								</div>
+								<div class="notice-close"><i class="fas fa-times"></i></div>
+							</div>
+						</div>
 						<div class="risk-content">
 							<div class="risk-category">
 								<span class="title"><?php echo $langs->trans('Risk'); ?><required>*</required></span>
@@ -465,7 +530,7 @@
 								<?php if ($conf->global->DIGIRISKDOLIBARR_SHOW_RISKASSESSMENT_DATE) : ?>
 									<div class="risk-evaluation-date">
 										<span class="title"><?php echo $langs->trans('Date'); ?></span>
-										<?php print $form->selectDate('', 'RiskAssessmentDate', 0, 0, 0, '', 1, 1); ?>
+										<?php print $form->selectDate('', 'RiskAssessmentDate0', 0, 0, 0, '', 1, 1); ?>
 									</div>
 								<?php endif; ?>
 							</div>
@@ -504,6 +569,23 @@
 				</div>
 				<!-- Modal-ADD Risk Content-->
 				<div class="modal-content" id="#modalContent">
+					<!-- PHOTO -->
+					<div class="messageSuccessSavePhoto notice hidden">
+						<div class="wpeo-notice notice-success save-photo-success-notice">
+							<div class="notice-content">
+								<div class="notice-title"><?php echo $langs->trans('PhotoWellSaved') ?></div>
+							</div>
+							<div class="notice-close"><i class="fas fa-times"></i></div>
+						</div>
+					</div>
+					<div class="messageErrorSavePhoto notice hidden">
+						<div class="wpeo-notice notice-warning save-photo-error-notice">
+							<div class="notice-content">
+								<div class="notice-title"><?php echo $langs->trans('PhotoNotSaved') ?></div>
+							</div>
+							<div class="notice-close"><i class="fas fa-times"></i></div>
+						</div>
+					</div>
 					<div class="risk-content">
 						<div class="risk-category">
 							<span class="title"><?php echo $langs->trans('Risk'); ?><required>*</required></span>
@@ -601,10 +683,10 @@
 												<div class="table-row">
 													<div class="table-cell"><?php echo $critere['name'] ; ?></div>
 													<?php foreach($critere['option']['survey']['request'] as $request) : ?>
-														<div class="table-cell can-select cell-<?php echo  $risk->id ? $risk->id : 0 ; ?>"
+														<div class="table-cell can-select cell-0"
 															 data-type="<?php echo $name ?>"
-															 data-id="<?php echo  $risk->id ? $risk->id : 0 ; ?>"
-															 data-evaluation-id="<?php echo $evaluation_id ? $evaluation_id : 0 ; ?>"
+															 data-id="<?php echo 0 ; ?>"
+															 data-evaluation-id="<?php echo 0 ; ?>"
 															 data-variable-id="<?php echo $l ; ?>"
 															 data-seuil="<?php echo  $request['seuil']; ?>">
 															<?php echo  $request['question'] ; ?>
@@ -984,10 +1066,10 @@
 				$cssforfield = '';
 				print '<td'.($cssforfield ? ' class="'.$cssforfield.'"' : '').'>';
 				if ($key == 'cotation') {
-					require './core/tpl/digiriskdolibarr_riskassessment_view.tpl.php';
+					require './../../core/tpl/digiriskdolibarr_riskassessment_view.tpl.php';
 				}
 				elseif ($key == 'has_tasks' && $conf->global->DIGIRISKDOLIBARR_TASK_MANAGEMENT) {
-					require './core/tpl/digiriskdolibarr_riskassessment_task_view.tpl.php';
+					require './../../core/tpl/digiriskdolibarr_riskassessment_task_view.tpl.php';
 				}
 				elseif ($conf->global->DIGIRISKDOLIBARR_TASK_MANAGEMENT == 0) {
 					print $langs->trans('TaskManagementNotActivated');

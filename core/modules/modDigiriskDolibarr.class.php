@@ -57,7 +57,7 @@ class modDigiriskdolibarr extends DolibarrModules
 		$this->descriptionlong = "Digirisk";
 		$this->editor_name     = 'Evarisk';
 		$this->editor_url      = 'https://evarisk.com';
-		$this->version         = '8.5.3';
+		$this->version         = '8.5.4';
 		$this->const_name      = 'MAIN_MODULE_'.strtoupper($this->name);
 		$this->picto           ='digiriskdolibarr@digiriskdolibarr';
 
@@ -354,7 +354,7 @@ class modDigiriskdolibarr extends DolibarrModules
 		// Example:
 		$this->tabs[] = array('data'=>'mycompany_admin:+security:Sécurité:@digiriskdolibarr:1:/custom/digiriskdolibarr/admin/securityconf.php');  					// To add a new tab identified by code tabname1
 		$this->tabs[] = array('data'=>'mycompany_admin:+social:Social:@digiriskdolibarr:1:/custom/digiriskdolibarr/admin/socialconf.php');  					// To add a new tab identified by code tabname1
-		$this->tabs[] = array('data'=>'thirdparty:+openinghours:Horaires:@digiriskdolibarr:1:/custom/digiriskdolibarr/openinghours_card.php?id=__ID__');  					// To add a new tab identified by code tabname1
+		$this->tabs[] = array('data'=>'thirdparty:+openinghours:Horaires:@digiriskdolibarr:1:/custom/digiriskdolibarr/view/openinghours_card.php?id=__ID__');  					// To add a new tab identified by code tabname1
 
 		// To remove an existing tab identified by code tabname
 		// Dictionaries
@@ -715,7 +715,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			'titre'=>'<i class="fas fa-exclamation-triangle"></i>  ' . $langs->trans('RiskAssessmentDocument'),
 			'mainmenu'=>'digiriskdolibarr',
 			'leftmenu'=>'digiriskstandard',
-			'url'=>'/digiriskdolibarr/digiriskstandard_card.php?id='.$conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD,
+			'url'=>'/digiriskdolibarr/view/digiriskstandard/digiriskstandard_card.php?id='.$conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD,
 			'langs'=>'digiriskdolibarr@digiriskdolibarr',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
 			'position'=>48520+$r,
 			'enabled'=>'$conf->digiriskdolibarr->enabled',  // Define condition to show or hide menu entry. Use '$conf->digiriskdolibarr->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
@@ -730,7 +730,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			'titre'=>'<i class="fas fa-network-wired"></i>  ' . $langs->trans('Arborescence'),
 			'mainmenu'=>'digiriskdolibarr',
 			'leftmenu'=>'digiriskstandard',
-			'url'=>'/digiriskdolibarr/digiriskelement_organization.php',
+			'url'=>'/digiriskdolibarr/view/digiriskelement/digiriskelement_organization.php',
 			'langs'=>'digiriskdolibarr@digiriskdolibarr',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
 			'position'=>48520+$r,
 			'enabled'=>'$conf->digiriskdolibarr->enabled',  // Define condition to show or hide menu entry. Use '$conf->digiriskdolibarr->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
@@ -745,7 +745,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			'titre'=>'<i class="fas fa-list"></i>  ' . $langs->trans('RiskList'),
 			'mainmenu'=>'digiriskdolibarr',
 			'leftmenu'=>'digirisklistingrisk',
-			'url'=>'/digiriskdolibarr/risk_list.php',
+			'url'=>'/digiriskdolibarr/view/digiriskelement/risk_list.php',
 			'langs'=>'digiriskdolibarr@digiriskdolibarr',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
 			'position'=>48520+$r,
 			'enabled'=>'$conf->digiriskdolibarr->enabled',  // Define condition to show or hide menu entry. Use '$conf->digiriskdolibarr->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
@@ -760,7 +760,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			'titre'=>'<i class="fas fa-info"></i>  ' . $langs->trans('PreventionPlan'),
 			'mainmenu'=>'digiriskdolibarr',
 			'leftmenu'=>'digiriskpreventionplan',
-			'url'=>'/digiriskdolibarr/preventionplan_list.php',
+			'url'=>'/digiriskdolibarr/view/preventionplan/preventionplan_list.php',
 			'langs'=>'digiriskdolibarr@digiriskdolibarr',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
 			'position'=>48520+$r,
 			'enabled'=>'$conf->digiriskdolibarr->enabled',  // Define condition to show or hide menu entry. Use '$conf->digiriskdolibarr->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
@@ -775,7 +775,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			'titre'=>'<i class="fas fa-fire-alt"></i>  ' . $langs->trans('FirePermit'),
 			'mainmenu'=>'digiriskdolibarr',
 			'leftmenu'=>'digiriskfirepermit',
-			'url'=>'/digiriskdolibarr/firepermit_list.php',
+			'url'=>'/digiriskdolibarr/view/firepermit/firepermit_list.php',
 			'langs'=>'digiriskdolibarr@digiriskdolibarr',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
 			'position'=>48520+$r,
 			'enabled'=>'$conf->digiriskdolibarr->enabled',  // Define condition to show or hide menu entry. Use '$conf->digiriskdolibarr->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
@@ -790,7 +790,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			'titre'=>'<i class="fas fa-user-injured"></i>  ' . $langs->trans('Accident'),
 			'mainmenu'=>'digiriskdolibarr',
 			'leftmenu'=>'digiriskaccident',
-			'url'=>'/digiriskdolibarr/accident_list.php',
+			'url'=>'/digiriskdolibarr/view/accident/accident_list.php',
 			'langs'=>'digiriskdolibarr@digiriskdolibarr',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
 			'position'=>48520+$r,
 			'enabled'=>'$conf->digiriskdolibarr->enabled',  // Define condition to show or hide menu entry. Use '$conf->digiriskdolibarr->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
@@ -805,7 +805,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			'titre'=>'<i class="fas fa-user"></i>  ' . $langs->trans('Users'),
 			'mainmenu'=>'digiriskdolibarr',
 			'leftmenu'=>'digiriskusers',
-			'url'=>'/digiriskdolibarr/digiriskusers.php',
+			'url'=>'/digiriskdolibarr/view/digiriskusers.php',
 			'langs'=>'digiriskdolibarr@digiriskdolibarr',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
 			'position'=>48520+$r,
 			'enabled'=>'$user->rights->user->user->lire',  // Define condition to show or hide menu entry. Use '$conf->digiriskdolibarr->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
@@ -835,7 +835,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			'titre'=>'<i class="fas fa-wrench"></i>  ' . $langs->trans('Tools'),
 			'mainmenu'=>'digiriskdolibarr',
 			'leftmenu'=>'digirisktools',
-			'url'=>'/digiriskdolibarr/digirisktools.php',
+			'url'=>'/digiriskdolibarr/view/digirisktools.php',
 			'langs'=>'digiriskdolibarr@digiriskdolibarr',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
 			'position'=>48520+$r,
 			'enabled'=>'$conf->digiriskdolibarr->enabled && $user->admin',  // Define condition to show or hide menu entry. Use '$conf->digiriskdolibarr->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.

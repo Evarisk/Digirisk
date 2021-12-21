@@ -613,7 +613,7 @@ function digiriskHeader($head = '', $title = '', $help_url = '', $target = '', $
 	}
 	$results = recurse_tree(0,0,$objects); ?>
 
-	<?php require_once './core/tpl/digiriskdolibarr_medias_gallery_modal.tpl.php'; ?>
+	<?php require_once './../../core/tpl/digiriskdolibarr_medias_gallery_modal.tpl.php'; ?>
 
 	<div id="id-container" class="id-container page-ut-gp-list">
 		<div class="side-nav">
@@ -622,15 +622,15 @@ function digiriskHeader($head = '', $title = '', $help_url = '', $target = '', $
 				<div class="digirisk-wrap wpeo-wrap">
 					<div class="navigation-container">
 						<div class="society-header">
-							<a class="linkElement" href="../digiriskdolibarr/digiriskstandard_card.php?id=<?php echo $conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD ?>">
+							<a class="linkElement" href="../digiriskstandard/digiriskstandard_card.php?id=<?php echo $conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD ?>">
 								<span class="icon fas fa-building fa-fw"></span>
 								<div class="title"><?php echo $conf->global->MAIN_INFO_SOCIETE_NOM ?></div>
 								<?php if ($user->rights->digiriskdolibarr->digiriskelement->write) : ?>
 									<div class="add-container">
-										<a id="newGroupment" href="../digiriskdolibarr/digiriskelement_card.php?action=create&element_type=groupment&fk_parent=0">
+										<a id="newGroupment" href="../digiriskelement/digiriskelement_card.php?action=create&element_type=groupment&fk_parent=0">
 											<div class="wpeo-button button-square-40 button-secondary wpeo-tooltip-event" data-direction="bottom" data-color="light" aria-label="<?php echo $langs->trans('NewGroupment'); ?>"><strong><?php echo $mod_groupment->prefix; ?></strong><span class="button-add animated fas fa-plus-circle"></span></div>
 										</a>
-										<a id="newWorkunit" href="../digiriskdolibarr/digiriskelement_card.php?action=create&element_type=workunit&fk_parent=0">
+										<a id="newWorkunit" href="../digiriskelement/digiriskelement_card.php?action=create&element_type=workunit&fk_parent=0">
 											<div class="wpeo-button button-square-40 wpeo-tooltip-event" data-direction="bottom" data-color="light" aria-label="<?php echo $langs->trans('NewWorkUnit'); ?>"><strong><?php echo $mod_workunit->prefix; ?></strong><span class="button-add animated fas fa-plus-circle"></span></div>
 										</a>
 									</div>
@@ -644,10 +644,10 @@ function digiriskHeader($head = '', $title = '', $help_url = '', $target = '', $
 							</div>
 						<?php else : ?>
 							<div class="society-header">
-								<a id="newGroupment" href="../digiriskdolibarr/digiriskelement_card.php?action=create&element_type=groupment&fk_parent=0">
+								<a id="newGroupment" href="../digiriskelement/digiriskelement_card.php?action=create&element_type=groupment&fk_parent=0">
 									<div class="wpeo-button button-square-40 button-secondary wpeo-tooltip-event" data-direction="bottom" data-color="light" aria-label="<?php echo $langs->trans('NewGroupment'); ?>"><strong><?php echo $mod_groupment->prefix; ?></strong><span class="button-add animated fas fa-plus-circle"></span></div>
 								</a>
-								<a id="newWorkunit" href="../digiriskdolibarr/digiriskelement_card.php?action=create&element_type=workunit&fk_parent=0">
+								<a id="newWorkunit" href="../digiriskelement/digiriskelement_card.php?action=create&element_type=workunit&fk_parent=0">
 									<div class="wpeo-button button-square-40 wpeo-tooltip-event" data-direction="bottom" data-color="light" aria-label="<?php echo $langs->trans('NewWorkUnit'); ?>"><strong><?php echo $mod_workunit->prefix; ?></strong><span class="button-add animated fas fa-plus-circle"></span></div>
 								</a>
 							</div>
@@ -907,6 +907,22 @@ function display_recurse_tree($results) {
 									</div>
 									<!-- Modal Content-->
 									<div class="modal-content" id="#modalContent<?php echo $element['object']->id ?>">
+										<div class="messageSuccessSavePhoto notice hidden">
+											<div class="wpeo-notice notice-success save-photo-success-notice">
+												<div class="notice-content">
+													<div class="notice-title"><?php echo $langs->trans('PhotoWellSaved') ?></div>
+												</div>
+												<div class="notice-close"><i class="fas fa-times"></i></div>
+											</div>
+										</div>
+										<div class="messageErrorSavePhoto notice hidden">
+											<div class="wpeo-notice notice-warning save-photo-error-notice">
+												<div class="notice-content">
+													<div class="notice-title"><?php echo $langs->trans('PhotoNotSaved') ?></div>
+												</div>
+												<div class="notice-close"><i class="fas fa-times"></i></div>
+											</div>
+										</div>
 										<div class="risk-evaluation-container">
 											<div class="risk-evaluation-header">
 											</div>
@@ -931,14 +947,14 @@ function display_recurse_tree($results) {
 					<div class="title" id="scores" value="<?php echo $element['object']->id ?>">
 					<?php
 						if ($user->rights->digiriskdolibarr->risk->read) : ?>
-							<a id="slider" class="linkElement id<?php echo $element['object']->id;?>" href="../digiriskdolibarr/digiriskelement_risk.php?id=<?php echo $element['object']->id; ?>">
+							<a id="slider" class="linkElement id<?php echo $element['object']->id;?>" href="../digiriskelement/digiriskelement_risk.php?id=<?php echo $element['object']->id; ?>">
 								<span class="title-container">
 									<span class="ref"><?php echo $element['object']->ref; ?></span>
 									<span class="name"><?php echo $element['object']->label; ?></span>
 								</span>
 							</a>
 						<?php else : ?>
-							<a id="slider" class="linkElement id<?php echo $element['object']->id;?>" href="../digiriskdolibarr/digiriskelement_card.php?id=<?php echo $element['object']->id; ?>">
+							<a id="slider" class="linkElement id<?php echo $element['object']->id;?>" href="../digiriskelement/digiriskelement_card.php?id=<?php echo $element['object']->id; ?>">
 								<span class="title-container">
 									<span class="ref"><?php echo $element['object']->ref; ?></span>
 									<span class="name"><?php echo $element['object']->label; ?></span>
@@ -949,7 +965,7 @@ function display_recurse_tree($results) {
 					<?php if ($user->rights->digiriskdolibarr->digiriskelement->write) : ?>
 						<?php if ($element['object']->element_type == 'groupment') : ?>
 							<div class="add-container">
-								<a id="newGroupment" href="../digiriskdolibarr/digiriskelement_card.php?action=create&element_type=groupment&fk_parent=<?php echo $element['object']->id; ?>">
+								<a id="newGroupment" href="../digiriskelement/digiriskelement_card.php?action=create&element_type=groupment&fk_parent=<?php echo $element['object']->id; ?>">
 									<div
 										class="wpeo-button button-secondary button-square-40 wpeo-tooltip-event"
 										data-direction="bottom" data-color="light"
@@ -958,7 +974,7 @@ function display_recurse_tree($results) {
 										<span class="button-add animated fas fa-plus-circle"></span>
 									</div>
 								</a>
-								<a id="newWorkunit" href="../digiriskdolibarr/digiriskelement_card.php?action=create&element_type=workunit&fk_parent=<?php echo $element['object']->id; ?>">
+								<a id="newWorkunit" href="../digiriskelement/digiriskelement_card.php?action=create&element_type=workunit&fk_parent=<?php echo $element['object']->id; ?>">
 									<div
 										class="wpeo-button button-square-40 wpeo-tooltip-event"
 										data-direction="bottom" data-color="light"
@@ -1054,55 +1070,55 @@ function digirisk_banner_tab($object, $paramid, $morehtml = '', $shownav = 1, $f
 *  @param  int     $save_lastsearch_value    	-1=Auto, 0=No save of lastsearch_values when clicking, 1=Save lastsearch_values whenclicking
 *  @return	string								String with URL
 */
-function getNomUrl($withpictoimg = 0, $option = '', $infologin = 0, $notooltip = 0, $maxlen = 24, $hidethirdpartylogo = 0, $mode = '', $morecss = '', $save_lastsearch_value = -1, $object)
+function getNomUrl($withpictoimg = 0, $option = '', $infologin = 0, $notooltip = 0, $maxlen = 24, $hidethirdpartylogo = 0, $mode = '', $morecss = '', $save_lastsearch_value = -1, $object = null, $display_initials = 1)
 {
 	global $langs, $conf, $db, $hookmanager, $user;
 	global $dolibarr_main_authentication, $dolibarr_main_demo;
 	global $menumanager;
 
-       if (!$user->rights->user->user->lire && $user->id != $user->id) $option = 'nolink';
+       if (!$object->rights->user->user->lire && $object->id != $object->id) $option = 'nolink';
 
 	if (!empty($conf->global->MAIN_OPTIMIZEFORTEXTBROWSER) && $withpictoimg) $withpictoimg = 0;
 
 	$result = ''; $label = '';
 
-	if (!empty($user->photo))
+	if (!empty($object->photo))
 	{
 		$label .= '<div class="photointooltip">';
-		$label .= Form::showphoto('userphoto', $user, 0, 60, 0, 'photowithmargin photologintooltip', 'small', 0, 1); // Force height to 60 so we total height of tooltip can be calculated and collision can be managed
+		$label .= Form::showphoto('userphoto', $object, 0, 60, 0, 'photowithmargin photologintooltip', 'small', 0, 1); // Force height to 60 so we total height of tooltip can be calculated and collision can be managed
 		$label .= '</div><div style="clear: both;"></div>';
 	}
 
 	// Info Login
 	$label .= '<div class="centpercent">';
 	$label .= '<u>'.$langs->trans("User").'</u><br>';
-	$label .= '<b>'.$langs->trans('Name').':</b> '.$user->getFullName($langs, '');
-	if (!empty($user->login)) $label .= '<br><b>'.$langs->trans('Login').':</b> '.$user->login;
-	if (!empty($user->job)) $label .= '<br><b>'.$langs->trans("Job").':</b> '.$user->job;
-	$label .= '<br><b>'.$langs->trans("Email").':</b> '.$user->email;
-	if (!empty($user->phone)) $label .= '<br><b>'.$langs->trans("Phone").':</b> '.$user->phone;
-	if (!empty($user->admin))
-		$label .= '<br><b>'.$langs->trans("Administrator").'</b>: '.yn($user->admin);
-	if (!empty($user->socid))	// Add thirdparty for external users
+	$label .= '<b>'.$langs->trans('Name').':</b> '.$object->getFullName($langs, '');
+	if (!empty($object->login)) $label .= '<br><b>'.$langs->trans('Login').':</b> '.$object->login;
+	if (!empty($object->job)) $label .= '<br><b>'.$langs->trans("Job").':</b> '.$object->job;
+	$label .= '<br><b>'.$langs->trans("Email").':</b> '.$object->email;
+	if (!empty($object->phone)) $label .= '<br><b>'.$langs->trans("Phone").':</b> '.$object->phone;
+	if (!empty($object->admin))
+		$label .= '<br><b>'.$langs->trans("Administrator").'</b>: '.yn($object->admin);
+	if (!empty($object->socid))	// Add thirdparty for external users
 	{
 		$thirdpartystatic = new Societe($db);
-		$thirdpartystatic->fetch($user->socid);
+		$thirdpartystatic->fetch($object->socid);
 		if (empty($hidethirdpartylogo)) $companylink = ' '.$thirdpartystatic->getNomUrl(2, (($option == 'nolink') ? 'nolink' : '')); // picto only of company
 		$company = ' ('.$langs->trans("Company").': '.$thirdpartystatic->name.')';
 	}
-	$type = ($user->socid ? $langs->trans("External").$company : $langs->trans("Internal"));
+	$type = ($object->socid ? $langs->trans("External").$company : $langs->trans("Internal"));
 	$label .= '<br><b>'.$langs->trans("Type").':</b> '.$type;
-	$label .= '<br><b>'.$langs->trans("Status").'</b>: '.$user->getLibStatut(4);
+	$label .= '<br><b>'.$langs->trans("Status").'</b>: '.$object->getLibStatut(4);
 	$label .= '</div>';
 	if ($infologin > 0)
 	{
 		$label .= '<br>';
 		$label .= '<br><u>'.$langs->trans("Session").'</u>';
 		$label .= '<br><b>'.$langs->trans("IPAddress").'</b>: '.$_SERVER["REMOTE_ADDR"];
-		if (!empty($conf->global->MAIN_MODULE_MULTICOMPANY)) $label .= '<br><b>'.$langs->trans("ConnectedOnMultiCompany").':</b> '.$conf->entity.' (user entity '.$user->entity.')';
+		if (!empty($conf->global->MAIN_MODULE_MULTICOMPANY)) $label .= '<br><b>'.$langs->trans("ConnectedOnMultiCompany").':</b> '.$conf->entity.' (user entity '.$object->entity.')';
 		$label .= '<br><b>'.$langs->trans("AuthenticationMode").':</b> '.$_SESSION["dol_authmode"].(empty($dolibarr_main_demo) ? '' : ' (demo)');
-		$label .= '<br><b>'.$langs->trans("ConnectedSince").':</b> '.dol_print_date($user->datelastlogin, "dayhour", 'tzuser');
-		$label .= '<br><b>'.$langs->trans("PreviousConnexion").':</b> '.dol_print_date($user->datepreviouslogin, "dayhour", 'tzuser');
+		$label .= '<br><b>'.$langs->trans("ConnectedSince").':</b> '.dol_print_date($object->datelastlogin, "dayhour", 'tzuser');
+		$label .= '<br><b>'.$langs->trans("PreviousConnexion").':</b> '.dol_print_date($object->datepreviouslogin, "dayhour", 'tzuser');
 		$label .= '<br><b>'.$langs->trans("CurrentTheme").':</b> '.$conf->theme;
 		$label .= '<br><b>'.$langs->trans("CurrentMenuManager").':</b> '.$menumanager->name;
 		$s = picto_from_langcode($langs->getDefaultLang());
@@ -1115,8 +1131,8 @@ function getNomUrl($withpictoimg = 0, $option = '', $infologin = 0, $notooltip =
 	}
 	if ($infologin < 0) $label = '';
 
-	$url = DOL_URL_ROOT.'/user/card.php?id='.$user->id;
-	if ($option == 'leave') $url = DOL_URL_ROOT.'/holiday/list.php?id='.$user->id;
+	$url = DOL_URL_ROOT.'/user/card.php?id='.$object->id;
+	if ($option == 'leave') $url = DOL_URL_ROOT.'/holiday/list.php?id='.$object->id;
 
 	if ($option != 'nolink')
 	{
@@ -1126,8 +1142,11 @@ function getNomUrl($withpictoimg = 0, $option = '', $infologin = 0, $notooltip =
 		if ($add_save_lastsearch_values) $url .= '&save_lastsearch_values=1';
 	}
 
-	$linkstart = '<a href="'.$url.'"';
 	$linkclose = "";
+	if ($option == 'blank'){
+		$linkclose .= ' target=_blank';
+	}
+	$linkstart = '<a href="'.$url.'"';
 	if (empty($notooltip))
 	{
 		if (!empty($conf->global->MAIN_OPTIMIZEFORTEXTBROWSER))
@@ -1141,8 +1160,8 @@ function getNomUrl($withpictoimg = 0, $option = '', $infologin = 0, $notooltip =
 
 		/*
 		 $hookmanager->initHooks(array('userdao'));
-		 $parameters=array('id'=>$user->id);
-		 $reshook=$hookmanager->executeHooks('getnomurltooltip',$parameters,$user,$action);    // Note that $action and $object may have been modified by some hooks
+		 $parameters=array('id'=>$object->id);
+		 $reshook=$hookmanager->executeHooks('getnomurltooltip',$parameters,$object,$action);    // Note that $action and $object may have been modified by some hooks
 		 if ($reshook > 0) $linkclose = $hookmanager->resPrint;
 		 */
 	}
@@ -1159,22 +1178,35 @@ function getNomUrl($withpictoimg = 0, $option = '', $infologin = 0, $notooltip =
 		// Only picto
 		if ($withpictoimg > 0) $picto = '<!-- picto user --><span class="nopadding userimg'.($morecss ? ' '.$morecss : '').'">'.img_object('', 'user', $paddafterimage.' '.($notooltip ? '' : 'class="paddingright classfortooltip"'), 0, 0, $notooltip ? 0 : 1).'</span>';
 		// Picto must be a photo
-		else $picto = '<!-- picto photo user --><span class="nopadding userimg'.($morecss ? ' '.$morecss : '').'"'.($paddafterimage ? ' '.$paddafterimage : '').'>'.Form::showphoto('userphoto', $user, 0, 0, 0, 'userphoto'.($withpictoimg == -3 ? 'small' : ''), 'mini', 0, 1).'</span>';
+		else $picto = '<!-- picto photo user --><span class="nopadding userimg'.($morecss ? ' '.$morecss : '').'"'.($paddafterimage ? ' '.$paddafterimage : '').'>'.Form::showphoto('userphoto', $object, 0, 0, 0, 'userphoto'.($withpictoimg == -3 ? 'small' : ''), 'mini', 0, 1).'</span>';
 		$result .= $picto;
 	}
-	if ($withpictoimg > -2 && $withpictoimg != 2)
+
+	if ($withpictoimg > -2 && $withpictoimg != 2 && $display_initials)
 	{
-		$initiales = '';
-		if (dol_strlen($user->firstname)) {
-			$initiales .= str_split($user->firstname, 1)[0];
+		$initials = '';
+		if (dol_strlen($object->firstname)) {
+			$initials .= str_split($object->firstname, 1)[0];
 		}
-		if (dol_strlen($user->lastname)) {
-			$initiales .= str_split($user->lastname, 1)[0];
+		if (dol_strlen($object->lastname)) {
+			$initials .= str_split($object->lastname, 1)[0];
 		}
-		if (empty($conf->global->MAIN_OPTIMIZEFORTEXTBROWSER)) $result .= '<span class=" nopadding usertext'.((!isset($user->statut) || $user->statut) ? '' : ' strikefordisabled').($morecss ? ' '.$morecss : '').'">';
-		if ($mode == 'login') $result .= $initiales;
-		else $result .= $initiales;
+		if (empty($conf->global->MAIN_OPTIMIZEFORTEXTBROWSER)) $result .= '<span class=" nopadding usertext'.((!isset($object->statut) || $object->statut) ? '' : ' strikefordisabled').($morecss ? ' '.$morecss : '').'">';
+		if ($mode == 'login') $result .= $initials;
+		else $result .= $initials;
 		if (empty($conf->global->MAIN_OPTIMIZEFORTEXTBROWSER)) $result .= '</span>';
+	} elseif ($display_initials == 0) {
+		if (empty($conf->global->MAIN_OPTIMIZEFORTEXTBROWSER)) {
+			$result .= '<span class="nopadding usertext'.((!isset($object->statut) || $object->statut) ? '' : ' strikefordisabled').($morecss ? ' '.$morecss : '').'">';
+		}
+		if ($mode == 'login') {
+			$result .= dol_string_nohtmltag(dol_trunc($object->login, $maxlen));
+		} else {
+			$result .= dol_string_nohtmltag($object->getFullName($langs, '', ($mode == 'firstelselast' ? 3 : ($mode == 'firstname' ? 2 : -1)), $maxlen));
+		}
+		if (empty($conf->global->MAIN_OPTIMIZEFORTEXTBROWSER)) {
+			$result .= '</span>';
+		}
 	}
 	$result .= (($option == 'nolink') ? '' : $linkend);
 	//if ($withpictoimg == -1) $result.='</div>';
@@ -1183,8 +1215,8 @@ function getNomUrl($withpictoimg = 0, $option = '', $infologin = 0, $notooltip =
 
 	global $action;
 	$hookmanager->initHooks(array('userdao'));
-	$parameters = array('id'=>$user->id, 'getnomurl'=>$result);
-	$reshook = $hookmanager->executeHooks('getNomUrl', $parameters, $user, $action); // Note that $action and $object may have been modified by some hooks
+	$parameters = array('id'=>$object->id, 'getnomurl'=>$result);
+	$reshook = $hookmanager->executeHooks('getNomUrl', $parameters, $object, $action); // Note that $action and $object may have been modified by some hooks
 	if ($reshook > 0) $result = $hookmanager->resPrint;
 	else $result .= $hookmanager->resPrint;
 
@@ -2060,7 +2092,7 @@ function digirisk_select_dictionary($htmlname, $dictionarytable, $keyfield = 'co
 
 			while ($i < $num) {
 				$obj = $db->fetch_object($result);
-				if ($selected == $obj->rowid || $selected == $obj->$keyfield) {
+				if ($selected == $obj->rowid || $selected == $langs->transnoentities($obj->$keyfield)) {
 					print '<option value="'.$langs->transnoentities($obj->$keyfield).'" selected>';
 				} else {
 					print '<option value="'.$langs->transnoentities($obj->$keyfield).'">';
@@ -2076,5 +2108,224 @@ function digirisk_select_dictionary($htmlname, $dictionarytable, $keyfield = 'co
 	} else {
 		dol_print_error($db);
 	}
+}
+
+/**
+ *    	Return a link on thirdparty (with picto)
+ *
+ *		@param	int		$withpicto		          Add picto into link (0=No picto, 1=Include picto with link, 2=Picto only)
+ *		@param	string	$option			          Target of link ('', 'customer', 'prospect', 'supplier', 'project')
+ *		@param	int		$maxlen			          Max length of name
+ *      @param	int  	$notooltip		          1=Disable tooltip
+ *      @param  int     $save_lastsearch_value    -1=Auto, 0=No save of lastsearch_values when clicking, 1=Save lastsearch_values whenclicking
+ *		@return	string					          String with URL
+ */
+function getNomUrlSociety($thirdparty, $withpicto = 0, $option = '', $maxlen = 0, $notooltip = 0, $save_lastsearch_value = -1)
+{
+	global $conf, $langs, $hookmanager;
+
+	if (!empty($conf->dol_no_mouse_hover)) {
+		$notooltip = 1; // Force disable tooltips
+	}
+
+	$name = $thirdparty->name ? $thirdparty->name : $thirdparty->nom;
+
+	if (!empty($conf->global->SOCIETE_ON_SEARCH_AND_LIST_GO_ON_CUSTOMER_OR_SUPPLIER_CARD)) {
+		if (empty($option) && $thirdparty->client > 0) {
+			$option = 'customer';
+		}
+		if (empty($option) && $thirdparty->fournisseur > 0) {
+			$option = 'supplier';
+		}
+	}
+
+	if (!empty($conf->global->SOCIETE_ADD_REF_IN_LIST) && (!empty($withpicto))) {
+		$code = '';
+		if (($thirdparty->client) && (!empty($thirdparty->code_client)) && ($conf->global->SOCIETE_ADD_REF_IN_LIST == 1 || $conf->global->SOCIETE_ADD_REF_IN_LIST == 2)) {
+			$code = $thirdparty->code_client.' - ';
+		}
+
+		if (($thirdparty->fournisseur) && (!empty($thirdparty->code_fournisseur)) && ($conf->global->SOCIETE_ADD_REF_IN_LIST == 1 || $conf->global->SOCIETE_ADD_REF_IN_LIST == 3)) {
+			$code .= $thirdparty->code_fournisseur.' - ';
+		}
+
+		if ($code) {
+			if ($conf->global->SOCIETE_ADD_REF_IN_LIST == 1) {
+				$name = $code.' '.$name;
+			} else {
+				$name = $code;
+			}
+		}
+	}
+
+	if (!empty($thirdparty->name_alias)) {
+		$name .= ' ('.$thirdparty->name_alias.')';
+	}
+
+	$result = ''; $label = '';
+	$linkstart = ''; $linkend = '';
+
+	if (!empty($thirdparty->logo) && class_exists('Form')) {
+		$label .= '<div class="photointooltip">';
+		$label .= Form::showphoto('societe', $thirdparty, 0, 40, 0, '', 'mini', 0); // Important, we must force height so image will have height tags and if image is inside a tooltip, the tooltip manager can calculate height and position correctly the tooltip.
+		$label .= '</div><div style="clear: both;"></div>';
+	} elseif (!empty($thirdparty->logo_squarred) && class_exists('Form')) {
+		/*$label.= '<div class="photointooltip">';
+		$label.= Form::showphoto('societe', $thirdparty, 0, 40, 0, 'photowithmargin', 'mini', 0);	// Important, we must force height so image will have height tags and if image is inside a tooltip, the tooltip manager can calculate height and position correctly the tooltip.
+		$label.= '</div><div style="clear: both;"></div>';*/
+	}
+
+	$label .= '<div class="centpercent">';
+
+	if ($option == 'customer' || $option == 'compta' || $option == 'category') {
+		$label .= img_picto('', $thirdparty->picto).' <u class="paddingrightonly">'.$langs->trans("Customer").'</u>';
+		$linkstart = '<a href="'.DOL_URL_ROOT.'/comm/card.php?socid='.$thirdparty->id;
+	} elseif ($option == 'prospect' && empty($conf->global->SOCIETE_DISABLE_PROSPECTS)) {
+		$label .= img_picto('', $thirdparty->picto).' <u class="paddingrightonly">'.$langs->trans("Prospect").'</u>';
+		$linkstart = '<a href="'.DOL_URL_ROOT.'/comm/card.php?socid='.$thirdparty->id;
+	} elseif ($option == 'supplier' || $option == 'category_supplier') {
+		$label .= img_picto('', $thirdparty->picto).' <u class="paddingrightonly">'.$langs->trans("Supplier").'</u>';
+		$linkstart = '<a href="'.DOL_URL_ROOT.'/fourn/card.php?socid='.$thirdparty->id;
+	} elseif ($option == 'agenda') {
+		$label .= img_picto('', $thirdparty->picto).' <u class="paddingrightonly">'.$langs->trans("ThirdParty").'</u>';
+		$linkstart = '<a href="'.DOL_URL_ROOT.'/societe/agenda.php?socid='.$thirdparty->id;
+	} elseif ($option == 'project') {
+		$label .= img_picto('', $thirdparty->picto).' <u class="paddingrightonly">'.$langs->trans("ThirdParty").'</u>';
+		$linkstart = '<a href="'.DOL_URL_ROOT.'/societe/project.php?socid='.$thirdparty->id;
+	} elseif ($option == 'margin') {
+		$label .= img_picto('', $thirdparty->picto).' <u class="paddingrightonly">'.$langs->trans("ThirdParty").'</u>';
+		$linkstart = '<a href="'.DOL_URL_ROOT.'/margin/tabs/thirdpartyMargins.php?socid='.$thirdparty->id.'&type=1';
+	} elseif ($option == 'contact') {
+		$label .= img_picto('', $thirdparty->picto).' <u class="paddingrightonly">'.$langs->trans("ThirdParty").'</u>';
+		$linkstart = '<a href="'.DOL_URL_ROOT.'/societe/contact.php?socid='.$thirdparty->id;
+	} elseif ($option == 'ban') {
+		$label .= img_picto('', $thirdparty->picto).' <u class="paddingrightonly">'.$langs->trans("ThirdParty").'</u>';
+		$linkstart = '<a href="'.DOL_URL_ROOT.'/societe/paymentmodes.php?socid='.$thirdparty->id;
+	}
+
+	// By default
+	if (empty($linkstart)) {
+		$label .= img_picto('', $thirdparty->picto).' <u class="paddingrightonly">'.$langs->trans("ThirdParty").'</u>';
+		$linkstart = '<a href="'.DOL_URL_ROOT.'/societe/card.php?socid='.$thirdparty->id;
+	}
+	if (isset($thirdparty->status)) {
+		$label .= ' '.$thirdparty->getLibStatut(5);
+	}
+
+	if (!empty($thirdparty->name)) {
+		$label .= '<br><b>'.$langs->trans('Name').':</b> '.dol_escape_htmltag($thirdparty->name);
+		if (!empty($thirdparty->name_alias)) {
+			$label .= ' ('.dol_escape_htmltag($thirdparty->name_alias).')';
+		}
+	}
+	$label .= '<br><b>'.$langs->trans('Email').':</b> '.$thirdparty->email;
+	if (!empty($thirdparty->country_code)) {
+		$label .= '<br><b>'.$langs->trans('Country').':</b> '.$thirdparty->country_code;
+	}
+	if (!empty($thirdparty->tva_intra) || (!empty($conf->global->SOCIETE_SHOW_FIELD_IN_TOOLTIP) && strpos($conf->global->SOCIETE_SHOW_FIELD_IN_TOOLTIP, 'vatnumber') !== false)) {
+		$label .= '<br><b>'.$langs->trans('VATIntra').':</b> '.dol_escape_htmltag($thirdparty->tva_intra);
+	}
+	if (!empty($conf->global->SOCIETE_SHOW_FIELD_IN_TOOLTIP)) {
+		if (strpos($conf->global->SOCIETE_SHOW_FIELD_IN_TOOLTIP, 'profid1') !== false) {
+			$label .= '<br><b>'.$langs->trans('ProfId1'.$thirdparty->country_code).':</b> '.$thirdparty->idprof1;
+		}
+		if (strpos($conf->global->SOCIETE_SHOW_FIELD_IN_TOOLTIP, 'profid2') !== false) {
+			$label .= '<br><b>'.$langs->trans('ProfId2'.$thirdparty->country_code).':</b> '.$thirdparty->idprof2;
+		}
+		if (strpos($conf->global->SOCIETE_SHOW_FIELD_IN_TOOLTIP, 'profid3') !== false) {
+			$label .= '<br><b>'.$langs->trans('ProfId3'.$thirdparty->country_code).':</b> '.$thirdparty->idprof3;
+		}
+		if (strpos($conf->global->SOCIETE_SHOW_FIELD_IN_TOOLTIP, 'profid4') !== false) {
+			$label .= '<br><b>'.$langs->trans('ProfId4'.$thirdparty->country_code).':</b> '.$thirdparty->idprof4;
+		}
+		if (strpos($conf->global->SOCIETE_SHOW_FIELD_IN_TOOLTIP, 'profid5') !== false) {
+			$label .= '<br><b>'.$langs->trans('ProfId5'.$thirdparty->country_code).':</b> '.$thirdparty->idprof5;
+		}
+		if (strpos($conf->global->SOCIETE_SHOW_FIELD_IN_TOOLTIP, 'profid6') !== false) {
+			$label .= '<br><b>'.$langs->trans('ProfId6'.$thirdparty->country_code).':</b> '.$thirdparty->idprof6;
+		}
+	}
+	if (!empty($thirdparty->code_client) && ($thirdparty->client == 1 || $thirdparty->client == 3)) {
+		$label .= '<br><b>'.$langs->trans('CustomerCode').':</b> '.$thirdparty->code_client;
+	}
+	if (!empty($thirdparty->code_fournisseur) && $thirdparty->fournisseur) {
+		$label .= '<br><b>'.$langs->trans('SupplierCode').':</b> '.$thirdparty->code_fournisseur;
+	}
+	if (!empty($conf->accounting->enabled) && ($thirdparty->client == 1 || $thirdparty->client == 3)) {
+		$label .= '<br><b>'.$langs->trans('CustomerAccountancyCode').':</b> '.($thirdparty->code_compta ? $thirdparty->code_compta : $thirdparty->code_compta_client);
+	}
+	if (!empty($conf->accounting->enabled) && $thirdparty->fournisseur) {
+		$label .= '<br><b>'.$langs->trans('SupplierAccountancyCode').':</b> '.$thirdparty->code_compta_fournisseur;
+	}
+	$label .= '</div>';
+
+	// Add type of canvas
+	$linkstart .= (!empty($thirdparty->canvas) ? '&canvas='.$thirdparty->canvas : '');
+	// Add param to save lastsearch_values or not
+	$add_save_lastsearch_values = ($save_lastsearch_value == 1 ? 1 : 0);
+	if ($save_lastsearch_value == -1 && preg_match('/list\.php/', $_SERVER["PHP_SELF"])) {
+		$add_save_lastsearch_values = 1;
+	}
+	if ($add_save_lastsearch_values) {
+		$linkstart .= '&save_lastsearch_values=1';
+	}
+	$linkstart .= '"';
+
+	$linkclose = '';
+	if ($option == 'blank'){
+		$linkclose .= ' target=_blank';
+	}
+	if (empty($notooltip)) {
+		if (!empty($conf->global->MAIN_OPTIMIZEFORTEXTBROWSER)) {
+			$label = $langs->trans("ShowCompany");
+			$linkclose .= ' alt="'.dol_escape_htmltag($label, 1).'"';
+		}
+		$linkclose .= ' title="'.dol_escape_htmltag($label, 1).'"';
+		$linkclose .= ' class="classfortooltip refurl"';
+
+		/*
+		$hookmanager->initHooks(array('thirdpartydao'));
+		$parameters=array('id'=>$thirdparty->id);
+		$reshook=$hookmanager->executeHooks('getnomurltooltip',$parameters,$thirdparty,$action);    // Note that $action and $object may have been modified by some hooks
+		if ($reshook > 0) $linkclose = $hookmanager->resPrint;
+		*/
+	}
+	$linkstart .= $linkclose.'>';
+	$linkend = '</a>';
+
+	global $user;
+	if (!$user->rights->societe->client->voir && $user->socid > 0 && $thirdparty->id != $user->socid) {
+		$linkstart = '';
+		$linkend = '';
+	}
+
+	$result .= $linkstart;
+	if ($withpicto) {
+		$result .= img_object(($notooltip ? '' : $label), ($thirdparty->picto ? $thirdparty->picto : 'generic'), ($notooltip ? (($withpicto != 2) ? 'class="paddingright"' : '') : 'class="'.(($withpicto != 2) ? 'paddingright ' : '').'classfortooltip"'), 0, 0, $notooltip ? 0 : 1);
+	}
+	if ($withpicto != 2) {
+		$result .= dol_escape_htmltag($maxlen ? dol_trunc($name, $maxlen) : $name);
+	}
+	$result .= $linkend;
+
+	global $action;
+	$hookmanager->initHooks(array('thirdpartydao'));
+	$parameters = array(
+		'id'=>$thirdparty->id,
+		'getnomurl'=>$result,
+		'withpicto '=> $withpicto,
+		'option'=> $option,
+		'maxlen'=> $maxlen,
+		'notooltip'=> $notooltip,
+		'save_lastsearch_value'=> $save_lastsearch_value
+	);
+	$reshook = $hookmanager->executeHooks('getNomUrl', $parameters, $thirdparty, $action); // Note that $action and $object may have been modified by some hooks
+	if ($reshook > 0) {
+		$result = $hookmanager->resPrint;
+	} else {
+		$result .= $hookmanager->resPrint;
+	}
+
+	return $result;
 }
 

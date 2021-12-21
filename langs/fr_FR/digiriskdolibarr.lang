@@ -604,7 +604,7 @@ AccidentNoticeDate = Date de prise de connaissance de l'accident
 AccidentNoticeBy = La personne qui a informé de l'accident
 ByEmployer = Par l’employeur
 ByEmployees = Par ses préposés
-AccidentDescribedByVictim = Décrit par la victime
+AccidentDescribedByVictim = L'accident a été décrit par la victime
 RegisteredInAccidentRegister = L'accident est inscrit au registre d'accidents du travail bénins
 RegisterDate = Date d'inscription au registre d'accidents du travail bénins
 RegisterNumber = Numéro d'inscription au registre d'accidents du travail bénins
@@ -617,7 +617,6 @@ PoliceReportBy = La personne qui a établi le rapport de police
 FirstPersonNoticedIsWitness = Personne avisée
 Witness = Témoin
 FirstPersonNoticed = Première personne avisée
-UserNoticed = Utilisateur avisée
 ThirdPartyResponsability = L’accident a-t-il été causé par un tiers ?
 FkSocResponsible = Société du tiers responsable
 FkSocResponsibleInsuranceSociety = Société d’assurance du tiers
@@ -634,8 +633,6 @@ ExternalAccident = L'accident a-t-il eu lieu dans un autre établissement que ce
 AccidentAttendants = Accident - Participants
 UserEmployer = Responsable de la société
 SignatureUserEmployer = Signature du responsable de la société
-
-
 CerfaLink = Lien vers le Cerfa
 WorkStopDays = Nombre de jour d'arrêt de travail
 AccidentLesionList = Liste des lésions lié à l'accident
@@ -644,6 +641,17 @@ WorkStopDocument = Déclaration d'arrêt de travail
 AccidentMetaDataSave = Les données complémentaires de l'accident ont bien été enregistrées
 ErrorFieldNotEmpty = Erreur : Le champ '%s' ne peut pas être vide
 ConfirmDeleteAccidentWorkStop = Êtes-vous sûr de vouloir supprimer l'arrêt de travail <b>%s</b> sur l'accident ?
+AccidentMetaDataLesion = Données complémentaires des lésions
+
+# AccidentTooltip - Tooltip des accidents
+VictimActivityTooltip = Précisez l’activité ou la tâche de la victime au moment de l’accident, c’est-à-dire ce que faisait la victime
+AccidentNatureTooltip = Décrire l’évènement ayant conduit à l’accident, comment l’accident s’est produit (problème électrique, fuite de gaz, rupture de matériel, glissade, chute, effort physique, agression...), ou comment s’est blessée la victime (heurt, collision, écrasement, piqûre, noyade, contact avec une substance...)
+AccidentObjectTooltip = C’est-à-dire avec quoi s’est blessée la victime : matériau, déchet, outil (tournevis, cutter, perceuse...),machine, véhicule, chariot de manutention, substance chimique, élément de construction (porte, mur...), sol...
+AccidentNatureDoubtTooltip = Indiquez le cas échéant, les réserves motivées qui ne pourront être prises en compte que si elles portent sur les circonstances de temps et de lieu de l’accident ou sur l’existence d’une cause totalement étrangère au travail (art. R. 441-11 du Code de la sécurité sociale)
+VictimWorkHoursTooltip = Indiquez les heures de travail effectuées par votre salarié(e), ou les heures prévues, le jour de l’accident
+ConsequenceTooltip = Si la victime a arrêté son travail sur prescription d’un médecin, vous devez OBLIGATOIREMENT établir et envoyer le formulaire « attestation de salaire accident du travail ou maladie professionnelle » - référencé S6202, à la Caisse primaire du lieu de résidence habituelle de la victime. <br> Par la suite, en cas de nouvel arrêt après une période de soins ou une reprise du travail, sur un mois différent, vous devrez également remplir cette même formalité
+FirstPersonNoticedIsWitnessTooltip = Indiquez le nom, le prénom et l’adresse du témoin. <br> En l’absence de témoin, indiquez la 1ère personne de l’entreprise qui a été avisée de l’accident
+ThirdPartyResponsabilityTooltip = Lorsque vous avez connaissance de l’implication d’un tiers, quelle que soit sa part de responsabilité, dans un accident du travail ou de trajet, cette mention doit impérativement être reportée dans cette partie
 
 # Dictionnary - Dictionnaire
 UsualWorkplace = Lieu de travail habituel
@@ -672,7 +680,7 @@ Contusion = Contusion
 Wounds = Plaies
 Sprain = Entorse
 FracturePitting = Fracture félûre
-MultipleInjuries = lésions de nature multiple
+MultipleInjuries = Lésions de nature multiple
 MuscleOrTendonTear = Déchirure musculaire ou tendineuse
 PresenceOfForeignBody = Présence corps étranger
 Burns = Brûlure
@@ -1312,3 +1320,7 @@ GetAPI = Utilisation des routes API Digirisk en méthode GET
 PostAPI = Utilisation des routes API Digirisk en méthode POST
 MinimizeMenu = Réduire le menu
 ActionsLine = Actions
+PhotoWellSent = La photo a été ajouté à la bibliothèque de médias
+PhotoNotSent = La photo ne s'est pas correctement envoyée
+PhotoWellSaved = Le(s) média(s) a (ont) bien été ajouté(s)
+PhotoNotSaved = Le(s) média(s) n'a (ont) pas été ajouté(s)

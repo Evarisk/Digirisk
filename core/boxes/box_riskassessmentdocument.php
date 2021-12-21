@@ -27,7 +27,7 @@
 
 include_once DOL_DOCUMENT_ROOT . "/core/boxes/modules_boxes.php";
 
-require_once './class/digiriskdocuments/riskassessmentdocument.class.php';
+require_once __DIR__ . '/../../class/digiriskdocuments/riskassessmentdocument.class.php';
 
 /**
  * Class to manage the box

@@ -486,7 +486,7 @@ class FirePermit extends CommonObject
 	public function setInProgress($user, $notrigger = 0)
 	{
 		$signatory = new PreventionPlanSignature($this->db);
-		$signatory->deleteSignatoriesSignatures($this->id);
+		$signatory->deleteSignatoriesSignatures($this->id, 'firepermit');
 		return $this->setStatusCommon($user, self::STATUS_IN_PROGRESS, $notrigger, 'FIREPERMIT_INPROGRESS');
 	}
 
@@ -610,7 +610,7 @@ class FirePermit extends CommonObject
 		if (empty($linkstart))
 		{
 			$label .= '<u>'.$langs->trans("FirePermit").'</u>';
-			$linkstart = '<a href="'.DOL_URL_ROOT.'/custom/digiriskdolibarr/firepermit_card.php?id='.$this->id;
+			$linkstart = '<a href="'.DOL_URL_ROOT.'/custom/digiriskdolibarr/view/firepermit/firepermit_card.php?id='.$this->id;
 		}
 
 		if (!empty($this->ref))

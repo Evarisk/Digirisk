@@ -37,22 +37,22 @@ function firepermitPrepareHead($object)
 	$head = array();
 
 	if ($user->rights->digiriskdolibarr->firepermit->read) {
-		$head[$h][0] = dol_buildpath("/digiriskdolibarr/firepermit_card.php", 1) . '?id=' . $object->id;
+		$head[$h][0] = dol_buildpath("/digiriskdolibarr/view/firepermit/firepermit_card.php", 1) . '?id=' . $object->id;
 		$head[$h][1] = '<i class="fas fa-address-card"></i> ' . $langs->trans("Card");
 		$head[$h][2] = 'firepermitCard';
 		$h++;
 
-		$head[$h][0] = dol_buildpath("/digiriskdolibarr/firepermit_agenda.php", 1) . '?id=' . $object->id;
+		$head[$h][0] = dol_buildpath("/digiriskdolibarr/view/firepermit/firepermit_agenda.php", 1) . '?id=' . $object->id;
 		$head[$h][1] = '<i class="fas fa-calendar"></i> ' . $langs->trans("Events");
 		$head[$h][2] = 'firepermitAgenda';
 		$h++;
 
-		$head[$h][0] = dol_buildpath("/digiriskdolibarr/firepermit_schedule.php", 1) . '?id=' . $object->id;
+		$head[$h][0] = dol_buildpath("/digiriskdolibarr/view/firepermit/firepermit_schedule.php", 1) . '?id=' . $object->id;
 		$head[$h][1] = '<i class="fas fa-calendar-times"></i> ' . $langs->trans("Schedule");
 		$head[$h][2] = 'firepermitSchedule';
 		$h++;
 
-		$head[$h][0] = dol_buildpath("/digiriskdolibarr/firepermit_attendants.php", 1) . '?id=' . $object->id;
+		$head[$h][0] = dol_buildpath("/digiriskdolibarr/view/firepermit/firepermit_attendants.php", 1) . '?id=' . $object->id;
 		$head[$h][1] = '<i class="fas fa-file-signature"></i> ' . $langs->trans("Attendants");
 		$head[$h][2] = 'firepermitAttendants';
 		$h++;

@@ -83,18 +83,18 @@ class Accident extends CommonObject
 		'tms'                => array('type'=>'timestamp', 'label'=>'DateModification', 'enabled'=>'1', 'position'=>50, 'notnull'=>0, 'visible'=>0,),
 		'status'             => array('type'=>'smallint', 'label'=>'Status', 'enabled'=>'1', 'position'=>70, 'notnull'=>0, 'visible'=>2, 'index'=>0,),
 		'label'              => array('type'=>'varchar(255)', 'label'=>'Label', 'enabled'=>'1', 'position'=>80, 'notnull'=>0, 'visible'=>1, 'searchall'=>1, 'css'=>'minwidth200', 'help'=>"Help text", 'showoncombobox'=>'1',),
-		'accident_type'      => array('type'=>'text', 'label'=>'AccidentType', 'enabled'=>'1', 'position'=>90, 'notnull'=>-1, 'visible'=>1,),
-		'accident_date'      => array('type'=>'datetime', 'label'=>'AccidentDate', 'enabled'=>'1', 'position'=>100, 'notnull'=>-1, 'visible'=>1,),
+		'fk_user_victim'     => array('type'=>'integer', 'label'=>'UserVictim', 'enabled'=>'1', 'position'=>81, 'notnull'=>-1, 'visible'=>1,),
+		'fk_user_employer'   => array('type'=>'integer', 'label'=>'UserEmployer', 'enabled'=>'1', 'position'=>82, 'notnull'=>-1, 'visible'=>1,),
+		'accident_type'      => array('type'=>'text', 'label'=>'AccidentType', 'enabled'=>'1', 'position'=>90, 'notnull'=>-1, 'visible'=>1, 'css'=>'minwidth150',),
+		'fk_element'         => array('type'=>'integer', 'label'=>'AccidentLocation', 'enabled'=>'1', 'position'=>91, 'notnull'=>-1, 'visible'=>1,'css'=>'minwidth150',),
+		'fk_soc'             => array('type'=>'integer', 'label'=>'ExtSociety', 'enabled'=>'1', 'position'=>92, 'notnull'=>-1, 'visible'=>3,),
+		'accident_date'      => array('type'=>'datetime', 'label'=>'AccidentDate', 'enabled'=>'1', 'position'=>100, 'notnull'=>-1, 'visible'=>1, 'css'=>'minwidth150',),
 		'description'        => array('type'=>'text', 'label'=>'Description', 'enabled'=>'1', 'position'=>110, 'notnull'=>-1, 'visible'=>1,),
 		'photo'              => array('type'=>'text', 'label'=>'Photo', 'enabled'=>'1', 'position'=>120, 'notnull'=>-1, 'visible'=>3,),
 		'external_accident'  => array('type'=>'boolean', 'label'=>'ExternalAccident', 'enabled'=>'1', 'position'=>130, 'notnull'=>-1, 'visible'=>3,),
 		'fk_project'         => array('type'=>'integer', 'label'=>'FKProject', 'enabled'=>'1', 'position'=>140, 'notnull'=>1, 'visible'=>0,),
 		'fk_user_creat'      => array('type'=>'integer:User:user/class/user.class.php', 'label'=>'UserAuthor', 'enabled'=>'1', 'position'=>150, 'notnull'=>1, 'visible'=>0, 'foreignkey'=>'user.rowid',),
 		'fk_user_modif'      => array('type'=>'integer:User:user/class/user.class.php', 'label'=>'UserModif', 'enabled'=>'1', 'position'=>160, 'notnull'=>-1, 'visible'=>0,),
-		'fk_element'         => array('type'=>'integer', 'label'=>'AccidentLocation', 'enabled'=>'1', 'position'=>170, 'notnull'=>-1, 'visible'=>3,),
-		'fk_soc'             => array('type'=>'integer', 'label'=>'ExtSociety', 'enabled'=>'1', 'position'=>180, 'notnull'=>-1, 'visible'=>3,),
-		'fk_user_victim'     => array('type'=>'integer', 'label'=>'UserVictim', 'enabled'=>'1', 'position'=>190, 'notnull'=>-1, 'visible'=>3,),
-		'fk_user_employer'   => array('type'=>'integer', 'label'=>'UserEmployer', 'enabled'=>'1', 'position'=>200, 'notnull'=>-1, 'visible'=>3,),
 	);
 
 	public $rowid;
@@ -427,7 +427,7 @@ class Accident extends CommonObject
 		if (empty($linkstart))
 		{
 			$label .= '<u>'.$langs->trans("Accident").'</u>';
-			$linkstart = '<a href="'.DOL_URL_ROOT.'/custom/digiriskdolibarr/accident_card.php?id='.$this->id;
+			$linkstart = '<a href="'.DOL_URL_ROOT.'/custom/digiriskdolibarr/view/accident/accident_card.php?id='.$this->id;
 		}
 
 		if (!empty($this->ref))
@@ -764,7 +764,7 @@ class AccidentMetaData extends CommonObject
 		'accident_nature'                      => array('type'=>'text', 'label'=>'AccidentNature', 'enabled'=>'1', 'position'=>70, 'notnull'=>-1, 'visible'=>1,),
 		'accident_object'                      => array('type'=>'text', 'label'=>'AccidentObject', 'enabled'=>'1', 'position'=>80, 'notnull'=>-1, 'visible'=>1,),
 		'accident_nature_doubt'                => array('type'=>'text', 'label'=>'AccidentNatureDoubt', 'enabled'=>'1', 'position'=>90, 'notnull'=>-1, 'visible'=>1,),
-		'accident_nature_doubt_link'           => array('type'=>'text', 'label'=>'AccidentNatureDoubtLink', 'enabled'=>'1', 'position'=>100, 'notnull'=>-1, 'visible'=>1,),
+		'accident_nature_doubt_link'           => array('type'=>'url', 'label'=>'AccidentNatureDoubtLink', 'enabled'=>'1', 'position'=>100, 'notnull'=>-1, 'visible'=>1,),
 		'victim_transported_to'                => array('type'=>'text', 'label'=>'VictimTransportedTo', 'enabled'=>'1', 'position'=>110, 'notnull'=>-1, 'visible'=>1,),
 		'collateral_victim'                    => array('type'=>'boolean', 'label'=>'CollateralVictim', 'enabled'=>'1', 'position'=>120, 'notnull'=>-1, 'visible'=>1,),
 		'workhours_morning_date_start'         => array('type'=>'datetime', 'label'=>'WorkHoursMorningDateStart', 'enabled'=>'1', 'position'=>130, 'notnull'=>-1, 'visible'=>1,),
@@ -784,8 +784,8 @@ class AccidentMetaData extends CommonObject
 		'first_person_noticed_is_witness'      => array('type'=>'text', 'label'=>'FirstPersonNoticedIsWitness', 'enabled'=>'1', 'position'=>240, 'notnull'=>-1, 'visible'=>1,),
 		'thirdparty_responsibility'            => array('type'=>'boolean', 'label'=>'ThirdPartyResponsability', 'enabled'=>'1', 'position'=>250, 'notnull'=>-1, 'visible'=>1,),
 		'accident_investigation'               => array('type'=>'boolean', 'label'=>'AccidentInvestigation', 'enabled'=>'1', 'position'=>260, 'notnull'=>-1, 'visible'=>1,),
-		'accident_investigation_link'          => array('type'=>'text', 'label'=>'AccidentInvestigationLink', 'enabled'=>'1', 'position'=>270, 'notnull'=>-1, 'visible'=>1,),
-		'cerfa_link'                           => array('type'=>'text', 'label'=>'CerfaLink', 'enabled'=>'1', 'position'=>280, 'notnull'=>-1, 'visible'=>1,),
+		'accident_investigation_link'          => array('type'=>'url', 'label'=>'AccidentInvestigationLink', 'enabled'=>'1', 'position'=>270, 'notnull'=>-1, 'visible'=>1,),
+		'cerfa_link'                           => array('type'=>'url', 'label'=>'CerfaLink', 'enabled'=>'1', 'position'=>280, 'notnull'=>-1, 'visible'=>1,),
 		'json'                                 => array('type'=>'text', 'label'=>'Json', 'enabled'=>'1', 'position'=>290, 'notnull'=>-1, 'visible'=>1,),
 		'fk_user_witness'                      => array('type'=>'integer', 'label'=>'UserVictim', 'enabled'=>'1', 'position'=>300, 'notnull'=>-1, 'visible'=>-2,),
 		'fk_soc_responsible'                   => array('type'=>'integer', 'label'=>'SocResponsible', 'enabled'=>'1', 'position'=>310, 'notnull'=>-1, 'visible'=>-2,),
