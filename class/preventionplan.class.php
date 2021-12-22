@@ -206,7 +206,7 @@ class PreventionPlan extends CommonObject
 		$openinghours->fetch(0, '', $morewhere);
 
 		// Load signatory and ressources form source object
-		$signatories = $signatory->fetchSignatory("", $fromid);
+		$signatories = $signatory->fetchSignatory("", $fromid, 'preventionplan');
 		$resources   = $digiriskresources->fetchResourcesFromObject('', $object);
 
 		if (!empty ($signatories) && $signatories > 0) {
@@ -804,7 +804,7 @@ class PreventionPlanLine extends CommonObjectLine
 		'description'       => array('type'=>'text', 'label'=>'Description', 'enabled'=>'1', 'position'=>70, 'notnull'=>-1, 'visible'=>-1,),
 		'prevention_method' => array('type'=>'text', 'label'=>'PreventionMethod', 'enabled'=>'1', 'position'=>80, 'notnull'=>-1, 'visible'=>-1,),
 		'fk_preventionplan' => array('type'=>'integer', 'label'=>'FkPreventionPlan', 'enabled'=>'1', 'position'=>90, 'notnull'=>1, 'visible'=>0,),
-		'fk_element'       => array('type'=>'integer', 'label'=>'FkEleme,nt', 'enabled'=>'1', 'position'=>100, 'notnull'=>1, 'visible'=>0,),
+		'fk_element'        => array('type'=>'integer', 'label'=>'FkElement', 'enabled'=>'1', 'position'=>100, 'notnull'=>1, 'visible'=>0,),
 	);
 
 	/**
@@ -854,7 +854,7 @@ class PreventionPlanLine extends CommonObjectLine
 
 			$db->free($result);
 
-			return 1;
+			return $this->id;
 		}
 		else
 		{
@@ -1024,7 +1024,7 @@ class PreventionPlanLine extends CommonObjectLine
 				$this->call_trigger(strtoupper(get_class($this)).'_MODIFY', $user);
 				// End call triggers
 			}
-			return 1;
+			return $this->id;
 		}
 		else
 		{
