@@ -65,6 +65,7 @@ class PreventionPlanUnitTest extends PHPUnit\Framework\TestCase
 		$this->savdb = $db;
 
 		print __METHOD__ . " db->type=".$db->type." user->id=".$user->id;
+		print "\n";
 		print __METHOD__ . " ok";
 		print "\n";
 	}
