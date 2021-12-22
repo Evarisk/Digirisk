@@ -24,7 +24,6 @@
 
 global $conf, $user, $langs, $db;
 
-define('DOL_DOCUMENT_ROOT', __DIR__ . '/../../../../../htdocs');
 require_once __DIR__ . '/../../../../../htdocs/master.inc.php';
 require_once __DIR__ . '/../../class/firepermit.class.php';
 
@@ -173,10 +172,10 @@ class FirePermitUnitTest extends PHPUnit\Framework\TestCase
 	/**
 	 * testFirePermitFetch
 	 *
-	 * @param   int            $id          Id prevention plan
-	 * @return  FirePermit $localobject Prevention plan object
+	 * @param   int            $id          Id fire permit
+	 * @return  FirePermit $localobject Fire permit object
 	 *
-	 * @covers FirePermit::fetch
+	 * @covers  FirePermit::fetch
 	 *
 	 * @depends testFirePermitCreate
 	 * The depends says test is run only if previous is ok
@@ -202,10 +201,10 @@ class FirePermitUnitTest extends PHPUnit\Framework\TestCase
 	/**
 	 * testFirePermitInfo
 	 *
-	 * @param   FirePermit $localobject Prevention plan object
+	 * @param   FirePermit $localobject Fire permit object
 	 * @return  void
 	 *
-	 * @covers FirePermit::info
+	 * @covers  FirePermit::info
 	 *
 	 * @depends testFirePermitFetch
 	 * The depends says test is run only if previous is ok
@@ -227,12 +226,12 @@ class FirePermitUnitTest extends PHPUnit\Framework\TestCase
 	/**
 	 * testFirePermitSetInProgress
 	 *
-	 * @param   FirePermit $localobject Prevention plan object
+	 * @param   FirePermit $localobject Fire permit object
 	 * @return  void
 	 *
-	 * @covers FirePermit::setInProgress
-	 * @covers FirePermit::getLibStatut
-	 * @covers FirePermit::LibStatut
+	 * @covers  FirePermit::setInProgress
+	 * @covers  FirePermit::getLibStatut
+	 * @covers  FirePermit::LibStatut
 	 *
 	 * @depends testFirePermitFetch
 	 * The depends says test is run only if previous is ok
@@ -259,13 +258,12 @@ class FirePermitUnitTest extends PHPUnit\Framework\TestCase
 	/**
 	 * testFirePermitSetPendingSignature
 	 *
-	 * @param   FirePermit $localobject Prevention plan object
+	 * @param   FirePermit $localobject Fire permit object
 	 * @return  void
 	 *
-	 * @covers FirePermit::setPendingSignature
-	 * @covers FirePermit::getLibStatut
-	 * @covers FirePermit::LibStatut
-	 *
+	 * @covers  FirePermit::setPendingSignature
+	 * @covers  FirePermit::getLibStatut
+	 * @covers  FirePermit::LibStatut
 	 *
 	 * @depends testFirePermitFetch
 	 * The depends says test is run only if previous is ok
@@ -292,12 +290,12 @@ class FirePermitUnitTest extends PHPUnit\Framework\TestCase
 	/**
 	 * testFirePermitSetLocked
 	 *
-	 * @param   FirePermit $localobject Prevention plan object
+	 * @param   FirePermit $localobject Fire permit object
 	 * @return  void
 	 *
-	 * @covers FirePermit::setLocked
-	 * @covers FirePermit::getLibStatut
-	 * @covers FirePermit::LibStatut
+	 * @covers  FirePermit::setLocked
+	 * @covers  FirePermit::getLibStatut
+	 * @covers  FirePermit::LibStatut
 	 *
 	 * @depends testFirePermitFetch
 	 * The depends says test is run only if previous is ok
@@ -324,12 +322,12 @@ class FirePermitUnitTest extends PHPUnit\Framework\TestCase
 	/**
 	 * testFirePermitSetArchived
 	 *
-	 * @param   FirePermit $localobject Prevention plan object
+	 * @param   FirePermit $localobject Fire permit object
 	 * @return  void
 	 *
-	 * @covers FirePermit::setArchived
-	 * @covers FirePermit::getLibStatut
-	 * @covers FirePermit::LibStatut
+	 * @covers  FirePermit::setArchived
+	 * @covers  FirePermit::getLibStatut
+	 * @covers  FirePermit::LibStatut
 	 *
 	 * @depends testFirePermitFetch
 	 * The depends says test is run only if previous is ok
@@ -356,10 +354,10 @@ class FirePermitUnitTest extends PHPUnit\Framework\TestCase
 	/**
 	 * testFirePermitUpdate
 	 *
-	 * @param  FirePermit $localobject Prevention plan object
-	 * @return FirePermit $localobject Prevention plan object
+	 * @param   FirePermit $localobject Fire permit object
+	 * @return  FirePermit $localobject Fire permit object
 	 *
-	 * @covers FirePermit::update
+	 * @covers  FirePermit::update
 	 *
 	 * @depends testFirePermitFetch
 	 * The depends says test is run only if previous is ok
@@ -418,7 +416,7 @@ class FirePermitUnitTest extends PHPUnit\Framework\TestCase
 //	/**
 //	 * testFirePermitCreateFromClone
 //	 *
-//	 * @param  FirePermit $localobject Prevention plan object
+//	 * @param  FirePermit $localobject Fire permit object
 //	 * @return void
 //	 *
 //	 * @covers FirePermit::createFormClone
@@ -443,8 +441,8 @@ class FirePermitUnitTest extends PHPUnit\Framework\TestCase
 	/**
 	 * testFirePermitLineInsert
 	 *
-	 * @param FirePermit $localobject Prevention plan object
-	 * @return int
+	 * @param   FirePermit $localobject Fire permit object
+	 * @return  int
 	 *
 	 * @covers  FirePermitLine::insert
 	 *
@@ -487,10 +485,10 @@ class FirePermitUnitTest extends PHPUnit\Framework\TestCase
 	/**
 	 * testFirePermitLineFetch
 	 *
-	 * @param   int                $id              Id prevention plan line
-	 * @return  FirePermitLine $localobjectline Prevention plan object
+	 * @param   int                $id              Id fire permit line
+	 * @return  FirePermitLine $localobjectline Fire permit object
 	 *
-	 * @covers FirePermitLine::fetch
+	 * @covers  FirePermitLine::fetch
 	 *
 	 * @depends testFirePermitLineInsert
 	 * The depends says test is run only if previous is ok
@@ -516,10 +514,10 @@ class FirePermitUnitTest extends PHPUnit\Framework\TestCase
 	/**
 	 * testFirePermitLineUpdate
 	 *
-	 * @param  FirePermitLine $localobjectline Prevention plan line object
-	 * @return FirePermitLine $localobjectline Prevention plan line object
+	 * @param   FirePermitLine $localobjectline Fire permit line object
+	 * @return  FirePermitLine $localobjectline Fire permit line object
 	 *
-	 * @covers FirePermitLine::update
+	 * @covers  FirePermitLine::update
 	 *
 	 * @depends testFirePermitLineFetch
 	 * The depends says test is run only if previous is ok
@@ -564,10 +562,10 @@ class FirePermitUnitTest extends PHPUnit\Framework\TestCase
 	/**
 	 * testFirePermitFetchLines
 	 *
-	 * @param  FirePermit $localobject Prevention plan object
-	 * @return void
+	 * @param   FirePermit $localobject Fire permit object
+	 * @return  void
 	 *
-	 * @covers FirePermit::fetchLines
+	 * @covers  FirePermit::fetchLines
 	 *
 	 * @depends testFirePermitFetch
 	 * The depends says test is run only if previous is ok
@@ -642,8 +640,8 @@ class FirePermitUnitTest extends PHPUnit\Framework\TestCase
 	/**
 	 * testFirePermitLineDelete
 	 *
-	 * @param  FirePermitLine $localobjectline Prevention plan line object
-	 * @return int
+	 * @param   FirePermitLine $localobjectline Fire permit line object
+	 * @return  int
 	 *
 	 * @covers  FirePermitLine::delete
 	 *
@@ -673,10 +671,10 @@ class FirePermitUnitTest extends PHPUnit\Framework\TestCase
 	/**
 	 * testFirePermitDelete
 	 *
-	 * @param  FirePermit $localobject Prevention plan object
-	 * @return int
+	 * @param   FirePermit $localobject Fire permit object
+	 * @return  int
 	 *
-	 * @covers FirePermit::delete
+	 * @covers  FirePermit::delete
 	 *
 	 * @depends testFirePermitUpdate
 	 * The depends says test is run only if previous is ok

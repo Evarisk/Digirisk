@@ -24,7 +24,6 @@
 
 global $conf, $user, $langs, $db;
 
-define('DOL_DOCUMENT_ROOT', __DIR__ . '/../../../../../htdocs');
 require_once __DIR__ . '/../../../../../htdocs/master.inc.php';
 require_once __DIR__ . '/../../class/preventionplan.class.php';
 
@@ -179,7 +178,7 @@ class PreventionPlanUnitTest extends PHPUnit\Framework\TestCase
 	 * @param   int            $id          Id prevention plan
 	 * @return  PreventionPlan $localobject Prevention plan object
 	 *
-	 * @covers PreventionPlan::fetch
+	 * @covers  PreventionPlan::fetch
 	 *
 	 * @depends testPreventionPlanCreate
 	 * The depends says test is run only if previous is ok
@@ -208,7 +207,7 @@ class PreventionPlanUnitTest extends PHPUnit\Framework\TestCase
 	 * @param   PreventionPlan $localobject Prevention plan object
 	 * @return  void
 	 *
-	 * @covers PreventionPlan::info
+	 * @covers  PreventionPlan::info
 	 *
 	 * @depends testPreventionPlanFetch
 	 * The depends says test is run only if previous is ok
@@ -233,9 +232,9 @@ class PreventionPlanUnitTest extends PHPUnit\Framework\TestCase
 	 * @param   PreventionPlan $localobject Prevention plan object
 	 * @return  void
 	 *
-	 * @covers PreventionPlan::setInProgress
-	 * @covers PreventionPlan::getLibStatut
-	 * @covers PreventionPlan::LibStatut
+	 * @covers  PreventionPlan::setInProgress
+	 * @covers  PreventionPlan::getLibStatut
+	 * @covers  PreventionPlan::LibStatut
 	 *
 	 * @depends testPreventionPlanFetch
 	 * The depends says test is run only if previous is ok
@@ -265,10 +264,9 @@ class PreventionPlanUnitTest extends PHPUnit\Framework\TestCase
 	 * @param   PreventionPlan $localobject Prevention plan object
 	 * @return  void
 	 *
-	 * @covers PreventionPlan::setPendingSignature
-	 * @covers PreventionPlan::getLibStatut
-	 * @covers PreventionPlan::LibStatut
-	 *
+	 * @covers  PreventionPlan::setPendingSignature
+	 * @covers  PreventionPlan::getLibStatut
+	 * @covers  PreventionPlan::LibStatut
 	 *
 	 * @depends testPreventionPlanFetch
 	 * The depends says test is run only if previous is ok
@@ -298,9 +296,9 @@ class PreventionPlanUnitTest extends PHPUnit\Framework\TestCase
 	 * @param   PreventionPlan $localobject Prevention plan object
 	 * @return  void
 	 *
-	 * @covers PreventionPlan::setLocked
-	 * @covers PreventionPlan::getLibStatut
-	 * @covers PreventionPlan::LibStatut
+	 * @covers  PreventionPlan::setLocked
+	 * @covers  PreventionPlan::getLibStatut
+	 * @covers  PreventionPlan::LibStatut
 	 *
 	 * @depends testPreventionPlanFetch
 	 * The depends says test is run only if previous is ok
@@ -330,9 +328,9 @@ class PreventionPlanUnitTest extends PHPUnit\Framework\TestCase
 	 * @param   PreventionPlan $localobject Prevention plan object
 	 * @return  void
 	 *
-	 * @covers PreventionPlan::setArchived
-	 * @covers PreventionPlan::getLibStatut
-	 * @covers PreventionPlan::LibStatut
+	 * @covers  PreventionPlan::setArchived
+	 * @covers  PreventionPlan::getLibStatut
+	 * @covers  PreventionPlan::LibStatut
 	 *
 	 * @depends testPreventionPlanFetch
 	 * The depends says test is run only if previous is ok
@@ -359,10 +357,10 @@ class PreventionPlanUnitTest extends PHPUnit\Framework\TestCase
 	/**
 	 * testPreventionPlanUpdate
 	 *
-	 * @param  PreventionPlan $localobject Prevention plan object
-	 * @return PreventionPlan $localobject Prevention plan object
+	 * @param   PreventionPlan $localobject Prevention plan object
+	 * @return  PreventionPlan $localobject Prevention plan object
 	 *
-	 * @covers PreventionPlan::update
+	 * @covers  PreventionPlan::update
 	 *
 	 * @depends testPreventionPlanFetch
 	 * The depends says test is run only if previous is ok
@@ -454,8 +452,8 @@ class PreventionPlanUnitTest extends PHPUnit\Framework\TestCase
 	/**
 	 * testPreventionPlanLineInsert
 	 *
-	 * @param PreventionPlan $localobject Prevention plan object
-	 * @return int
+	 * @param   PreventionPlan $localobject Prevention plan object
+	 * @return  int
 	 *
 	 * @covers  PreventionPlanLine::insert
 	 *
@@ -501,7 +499,7 @@ class PreventionPlanUnitTest extends PHPUnit\Framework\TestCase
 	 * @param   int                $id              Id prevention plan line
 	 * @return  PreventionPlanLine $localobjectline Prevention plan object
 	 *
-	 * @covers PreventionPlanLine::fetch
+	 * @covers  PreventionPlanLine::fetch
 	 *
 	 * @depends testPreventionPlanLineInsert
 	 * The depends says test is run only if previous is ok
@@ -527,10 +525,10 @@ class PreventionPlanUnitTest extends PHPUnit\Framework\TestCase
 	/**
 	 * testPreventionPlanLineUpdate
 	 *
-	 * @param  PreventionPlanLine $localobjectline Prevention plan line object
-	 * @return PreventionPlanLine $localobjectline Prevention plan line object
+	 * @param   PreventionPlanLine $localobjectline Prevention plan line object
+	 * @return  PreventionPlanLine $localobjectline Prevention plan line object
 	 *
-	 * @covers PreventionPlanLine::update
+	 * @covers  PreventionPlanLine::update
 	 *
 	 * @depends testPreventionPlanLineFetch
 	 * The depends says test is run only if previous is ok
@@ -575,10 +573,10 @@ class PreventionPlanUnitTest extends PHPUnit\Framework\TestCase
 	/**
 	 * testPreventionPlanFetchLines
 	 *
-	 * @param  PreventionPlan $localobject Prevention plan object
-	 * @return void
+	 * @param   PreventionPlan $localobject Prevention plan object
+	 * @return  void
 	 *
-	 * @covers PreventionPlan::fetchLines
+	 * @covers  PreventionPlan::fetchLines
 	 *
 	 * @depends testPreventionPlanFetch
 	 * The depends says test is run only if previous is ok
@@ -653,8 +651,8 @@ class PreventionPlanUnitTest extends PHPUnit\Framework\TestCase
 	/**
 	 * testPreventionPlanLineDelete
 	 *
-	 * @param  PreventionPlanLine $localobjectline Prevention plan line object
-	 * @return int
+	 * @param   PreventionPlanLine $localobjectline Prevention plan line object
+	 * @return  int
 	 *
 	 * @covers  PreventionPlanLine::delete
 	 *
@@ -684,10 +682,10 @@ class PreventionPlanUnitTest extends PHPUnit\Framework\TestCase
 	/**
 	 * testPreventionPlanDelete
 	 *
-	 * @param  PreventionPlan $localobject Prevention plan object
-	 * @return int
+	 * @param   PreventionPlan $localobject Prevention plan object
+	 * @return  int
 	 *
-	 * @covers PreventionPlan::delete
+	 * @covers  PreventionPlan::delete
 	 *
 	 * @depends testPreventionPlanUpdate
 	 * The depends says test is run only if previous is ok
