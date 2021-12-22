@@ -542,7 +542,6 @@ class DigiriskSignature extends CommonObject
 				if ($signatory->status == 5 || $signatory->status == 7) {
 					continue;
 				} else {
-
 					return 0;
 				}
 			}
@@ -585,7 +584,7 @@ class DigiriskSignature extends CommonObject
 	function deletePreviousSignatories($role = "", $fk_object, $object_type)
 	{
 		global $user;
-		$filter = array('customsql' => ' role="' . $role . '" AND fk_object=' . $fk_object . ' AND status=1 AND objet_type=' . $object_type);
+		$filter = array('customsql' => ' role="' . $role . '" AND fk_object=' . $fk_object . ' AND status=1 AND object_type="' . $object_type . '"');
 		$signatoriesToDelete = $this->fetchAll('', '', 0, 0, $filter, 'AND');
 
 		if ( ! empty($signatoriesToDelete) && $signatoriesToDelete > 0) {

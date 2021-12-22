@@ -258,6 +258,7 @@ class DigiriskResourcesUnitTest extends PHPUnit\Framework\TestCase
 	 * @covers DigiriskResources::digirisk_dolibarr_set_resources
 	 *
 	 * @return string $ref ref digirisk resource
+	 * @throws Exception
 	 */
 	public function testDigiriskResourcesDigiriskDolibarrSetResources()
 	{

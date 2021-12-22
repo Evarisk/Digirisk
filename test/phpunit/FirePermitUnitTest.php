@@ -154,7 +154,7 @@ class FirePermitUnitTest extends PHPUnit\Framework\TestCase
 		$localobject->tms                  = $now;
 		$localobject->status               = 1;
 		$localobject->label                = "TestFirePermit";
-		$localobject->fk_project           = $conf->global->DIGIRISKDOLIBARR_PREVENTIONPLAN_PROJECT;
+		$localobject->fk_project           = $conf->global->DIGIRISKDOLIBARR_FIREPERMIT_PROJECT;
 		$localobject->date_start           = $localobject->db->idate($now);
 		$localobject->date_end             = $localobject->db->idate($now);
 		$localobject->last_email_sent_date = $localobject->db->idate($now);
@@ -380,7 +380,7 @@ class FirePermitUnitTest extends PHPUnit\Framework\TestCase
 		$localobject->tms                  = $now;
 		$localobject->status               = 1;
 		$localobject->label                = "UpdatedTestFirePermit";
-		$localobject->fk_project           = $conf->global->DIGIRISKDOLIBARR_PREVENTIONPLAN_PROJECT;
+		$localobject->fk_project           = $conf->global->DIGIRISKDOLIBARR_FIREPERMIT_PROJECT;
 		$localobject->date_start           = $now;
 		$localobject->date_end             = $now;
 		$localobject->last_email_sent_date = $now;
