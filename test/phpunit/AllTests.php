@@ -51,11 +51,23 @@ class AllTests
 	{
 		$suite = new PHPUnit\Framework\TestSuite('PHPUnit Framework');
 
-		require_once dirname(__FILE__).'/DigiriskElementFunctionalTest.php';
-		$suite->addTestSuite('DigiriskElementFunctionalTest');
+		require_once dirname(__FILE__).'/DigiriskStandardUnitTest.php';
+		$suite->addTestSuite('DigiriskStandardUnitTest');
+
+		require_once dirname(__FILE__).'/DigiriskElementUnitTest.php';
+		$suite->addTestSuite('DigiriskElementUnitTest');
+
+		require_once dirname(__FILE__).'/DigiriskResourcesUnitTest.php';
+		$suite->addTestSuite('DigiriskResourcesUnitTest');
+
+		require_once dirname(__FILE__).'/EvaluatorUnitTest.php';
+		$suite->addTestSuite('EvaluatorUnitTest');
 
 		require_once dirname(__FILE__).'/PreventionPlanUnitTest.php';
 		$suite->addTestSuite('PreventionPlanUnitTest');
+
+		require_once dirname(__FILE__).'/OpeninghoursUnitTest.php';
+		$suite->addTestSuite('OpeninghoursUnitTest');
 
 		require_once dirname(__FILE__).'/FirePermitUnitTest.php';
 		$suite->addTestSuite('FirePermitUnitTest');
