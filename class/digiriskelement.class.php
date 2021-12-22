@@ -78,7 +78,7 @@ class DigiriskElement extends CommonObject
 		'fk_user_modif' => array('type'=>'integer:User:user/class/user.class.php', 'label'=>'UserModif', 'enabled'=>'1', 'position'=>120, 'notnull'=>-1, 'visible'=>-2,),
 		'fk_parent'     => array('type'=>'integer', 'label'=>'ParentElement', 'enabled'=>'1', 'position'=>130, 'notnull'=>1, 'visible'=>1, 'default'=>0,),
 		'fk_standard'   => array('type'=>'integer', 'label'=>'Standard', 'enabled'=>'1', 'position'=>140, 'notnull'=>1, 'visible'=>0, 'default'=>1,),
-		'rank'         => array('type'=>'integer', 'label'=>'Order', 'enabled'=>'1', 'position'=>150, 'notnull'=>1, 'visible'=>0),
+		'rank'          => array('type'=>'integer', 'label'=>'Order', 'enabled'=>'1', 'position'=>150, 'notnull'=>1, 'visible'=>0),
 	);
 
 	public $rowid;
