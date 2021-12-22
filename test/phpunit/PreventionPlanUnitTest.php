@@ -625,6 +625,32 @@ class PreventionPlanUnitTest extends PHPUnit\Framework\TestCase
 	}
 
 	/**
+	 * testPreventionPlanFetchAll
+	 *
+	 * @return void
+	 *
+	 * @covers PreventionPlan::fetchAll
+	 *
+	 * @throws Exception
+	 */
+	public function testPreventionPlanFetchAll() : void
+	{
+		global $conf, $user, $langs, $db;
+		$conf = $this->savconf;
+		$user = $this->savuser;
+		$langs = $this->savlangs;
+		$db = $this->savdb;
+
+		$localobject = new PreventionPlan($this->savdb);
+		$localobjectList = $localobject->fetchAll();
+
+		$this->assertSame(true, is_array($localobjectList));
+		$this->assertInstanceOf(get_class($localobject), array_shift($localobjectList));
+		print __METHOD__ . " ok";
+		print "\n";
+	}
+
+	/**
 	 * testPreventionPlanLineDelete
 	 *
 	 * @param  PreventionPlanLine $localobjectline Prevention plan line object
@@ -682,32 +708,6 @@ class PreventionPlanUnitTest extends PHPUnit\Framework\TestCase
 		$this->assertLessThan($result, 0);
 
 		return $result;
-	}
-
-	/**
-	 * testPreventionPlanFetchAll
-	 *
-	 * @return void
-	 *
-	 * @covers PreventionPlan::fetchAll
-	 *
-	 * @throws Exception
-	 */
-	public function testPreventionPlanFetchAll() : void
-	{
-		global $conf, $user, $langs, $db;
-		$conf = $this->savconf;
-		$user = $this->savuser;
-		$langs = $this->savlangs;
-		$db = $this->savdb;
-
-		$localobject = new PreventionPlan($this->savdb);
-		$localobjectList = $localobject->fetchAll();
-
-		$this->assertSame(true, is_array($localobjectList));
-		$this->assertInstanceOf(get_class($localobject), array_shift($localobjectList));
-		print __METHOD__ . " ok";
-		print "\n";
 	}
 }
 
