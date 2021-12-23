@@ -102,7 +102,7 @@ if ($reshook < 0) {
 }
 
 if ($action == 'add') {
-	$error=0;
+	$error = 0;
 
 	$register      = GETPOST('register');
 	$pertinence    = GETPOST('pertinence');
@@ -159,7 +159,6 @@ if ($action == 'add') {
 
 	$extrafields->setOptionalsFromPost(null, $object);
 
-	$error=0;
 	// Check Captcha code if is enabled
 	if (!empty($conf->global->DIGIRISKDOLIBARR_USE_CAPTCHA)) {
 		$sessionkey = 'dol_antispam_value';
