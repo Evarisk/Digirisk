@@ -69,6 +69,9 @@ class AllTests
 		require_once dirname(__FILE__).'/riskanalysis/RiskUnitTest.php';
 		$suite->addTestSuite('RiskUnitTest');
 
+		require_once dirname(__FILE__).'/riskanalysis/RiskAssessmentUnitTest.php';
+		$suite->addTestSuite('RiskAssessmentUnitTest');
+
 		require_once dirname(__FILE__).'/riskanalysis/RiskSignUnitTest.php';
 		$suite->addTestSuite('RiskSignUnitTest');
 
