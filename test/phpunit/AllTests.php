@@ -60,6 +60,9 @@ class AllTests
 		require_once dirname(__FILE__).'/DigiriskResourcesUnitTest.php';
 		$suite->addTestSuite('DigiriskResourcesUnitTest');
 
+		require_once dirname(__FILE__).'/DigiriskDocumentsUnitTest.php';
+		$suite->addTestSuite('DigiriskDocumentsUnitTest');
+
 		require_once dirname(__FILE__).'/EvaluatorUnitTest.php';
 		$suite->addTestSuite('EvaluatorUnitTest');
 
