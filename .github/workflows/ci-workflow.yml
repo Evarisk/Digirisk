@@ -1,0 +1,19 @@
+
+name: 'Generate Auto Changelog'
+on:
+  push:
+    branches:
+      - master
+jobs:
+  master:
+    name: 'build'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+        with:
+          fetch-depth: 0
+
+      - name: Run docs
+        run: cd shell/ci && ./all-ci.sh
+
+
