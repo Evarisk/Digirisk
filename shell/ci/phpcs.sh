@@ -1,1 +1,2 @@
-echo 'salut cest moi phpcs'
+cd workflow/bin
+phpcbf ../../class

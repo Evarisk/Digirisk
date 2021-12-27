@@ -1,4 +1,3 @@
-
 name: 'Generate PHP doc'
 on:
   pull_request:
