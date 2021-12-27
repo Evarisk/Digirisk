@@ -8,11 +8,12 @@ jobs:
     name: 'build'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@master
+      - uses: actions/checkout@v2
         with:
           fetch-depth: 0
 
       - name: Run docs
-        run: cd shell/ci && ./phpdoc.sh
+        run: cd workflow/phpdocumentor/phpdocumentor && composer update && cd ../../bin && phpdoc -d "..\..\class" -t "..\..\docs"
+
 
 
