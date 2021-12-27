@@ -1,19 +1,19 @@
-name: 'Generate PHP doc'
-on:
-  pull_request:
-    branches:
-      - master
-jobs:
-  master:
-    name: 'build'
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
-
-      - name: Run docs
-        run: cd workflow/phpdocumentor/phpdocumentor && composer update && cd ../../bin && phpdoc -d "..\..\class" -t "..\..\docs"
-
-
-
+#name: 'Generate PHP doc'
+#on:
+#  pull_request:
+#    branches:
+#      - master
+#jobs:
+#  master:
+#    name: 'build'
+#    runs-on: ubuntu-latest
+#    steps:
+#      - uses: actions/checkout@v2
+#        with:
+#          fetch-depth: 0
+#
+#      - name: Run docs
+#        run: cd workflow/phpdocumentor/phpdocumentor && composer update && cd ../../bin && phpdoc -d "..\..\class" -t "..\..\docs"
+#
+#
+#
