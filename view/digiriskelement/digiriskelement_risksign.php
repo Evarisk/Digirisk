@@ -311,21 +311,28 @@ if ($object->id > 0) {
 			<div class="notice-close"><i class="fas fa-times"></i></div>
 		</div>
 	</div>
-
 	<div class="messageSuccessRiskSignEdit notice hidden">
+		<input type="hidden" class="valueForEditRiskSign1" value="<?php echo $langs->trans('TheRiskSign') . ' ' ?>">
+		<input type="hidden" class="valueForEditRiskSign2" value="<?php echo ' ' . $langs->trans('HasBeenEditedF') ?>">
 		<div class="wpeo-notice notice-success risksign-edit-success-notice">
 			<div class="notice-content">
 				<div class="notice-title"><?php echo $langs->trans('RiskSignWellEdited') ?></div>
-				<div class="notice-subtitle"><?php echo $langs->trans('TheRiskSign') . ' ' . $refRiskSignMod->getLastValue($risksign) . ' ' . $langs->trans('HasBeenEditedF') ?></div>
+				<div class="notice-subtitle">
+					<span class="text"></span>
+				</div>
 			</div>
 			<div class="notice-close"><i class="fas fa-times"></i></div>
 		</div>
 	</div>
 	<div class="messageErrorRiskSignEdit notice hidden">
+		<input type="hidden" class="valueForEditRiskSign1" value="<?php echo $langs->trans('TheRiskSign') . ' ' ?>">
+		<input type="hidden" class="valueForEditRiskSign2" value="<?php echo ' ' . $langs->trans('HasNotBeenEditedF') ?>">
 		<div class="wpeo-notice notice-warning risksign-edit-error-notice">
 			<div class="notice-content">
 				<div class="notice-title"><?php echo $langs->trans('RiskSignNotEdited') ?></div>
-				<div class="notice-subtitle"><?php echo $langs->trans('TheRiskSign') . ' ' . $refRiskSignMod->getLastValue($risksign) . ' ' . $langs->trans('HasNotBeenEditedF') ?></div>
+				<div class="notice-subtitle">
+					<span class="text"></span>
+				</div>
 			</div>
 			<div class="notice-close"><i class="fas fa-times"></i></div>
 		</div>

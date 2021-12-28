@@ -50,6 +50,9 @@
 		<div class="wpeo-notice notice-warning riskassessment-edit-error-notice">
 			<div class="notice-content">
 				<div class="notice-title"><?php echo $langs->trans('RiskAssessmentNotEdited') ?></div>
+				<div class="notice-subtitle">
+					<span class="text"></span>
+				</div>
 			</div>
 			<div class="notice-close"><i class="fas fa-times"></i></div>
 		</div>
@@ -73,6 +76,9 @@
 		<div class="wpeo-notice notice-warning riskassessment-delete-error-notice">
 			<div class="notice-content">
 				<div class="notice-title"><?php echo $langs->trans('RiskAssessmentNotDeleted') ?></div>
+				<div class="notice-subtitle">
+					<span class="text"></span>
+				</div>
 			</div>
 			<div class="notice-close"><i class="fas fa-times"></i></div>
 		</div>
@@ -104,12 +110,12 @@
 
 	<div class="messageSuccessRiskEdit notice hidden">
 		<div class="wpeo-notice notice-success risk-edit-success-notice">
+			<input type="hidden" class="valueForEditRisk1" value="<?php echo $langs->trans('TheRisk') . ' ' ?>">
+			<input type="hidden" class="valueForEditRisk2" value="<?php echo ' ' . $langs->trans('HasBeenEditedM') ?>">
 			<div class="notice-content">
 				<div class="notice-title"><?php echo $langs->trans('RiskWellEdited') ?></div>
 				<div class="notice-subtitle">
-					<a href="#<?php echo $refRiskMod->getLastValue($evaluation) ?>">
-						<?php echo $langs->trans('TheRisk') . ' ' . $refRiskMod->getLastValue($risk) . ' ' . $langs->trans('HasBeenEditedM') ?>
-					</a>
+					<span class="text"></span>
 				</div>
 			</div>
 			<div class="notice-close"><i class="fas fa-times"></i></div>
@@ -117,9 +123,13 @@
 	</div>
 	<div class="messageErrorRiskEdit notice hidden">
 		<div class="wpeo-notice notice-warning risk-edit-error-notice">
+			<input type="hidden" class="valueForEditRisk1" value="<?php echo $langs->trans('TheRisk') . ' ' ?>">
+			<input type="hidden" class="valueForEditRisk2" value="<?php echo ' ' . $langs->trans('HasNotBeenEditedM') ?>">
 			<div class="notice-content">
 				<div class="notice-title"><?php echo $langs->trans('RiskNotEdited') ?></div>
-				<div class="notice-subtitle"><?php echo $langs->trans('TheRisk') . ' ' . $refRiskMod->getLastValue($risk) . ' ' . $langs->trans('HasNotBeenEditedM') ?></div>
+				<div class="notice-subtitle">
+					<span class="text"></span>
+				</div>
 			</div>
 			<div class="notice-close"><i class="fas fa-times"></i></div>
 		</div>
