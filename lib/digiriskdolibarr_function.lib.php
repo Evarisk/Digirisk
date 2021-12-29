@@ -800,10 +800,13 @@ function display_recurse_tree($results) {
 		exit;
 	}
 
-	if (!$error && $action == "unlinkFile") {
+	if (!$error && $action == "unlinkDigiriskElementFile") {
 
-		$digiriskelement_id = GETPOST('digiriskelement_id');
-		$filename = GETPOST('filename');
+		$data = json_decode(file_get_contents('php://input'), true);
+
+		$digiriskelement_id = $data['digiriskelement_id'];
+		$filename = $data['filename'];
+
 		$digiriskelement = new DigiriskElement($db);
 		$digiriskelement->fetch($digiriskelement_id);
 

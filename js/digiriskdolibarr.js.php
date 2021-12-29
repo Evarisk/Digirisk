@@ -1118,7 +1118,7 @@ window.eoxiaJS.mediaGallery.selectPhoto = function( event ) {
  * Action save photo.
  *
  * @since   8.2.0
- * @version 8.2.0
+ * @version 9.0.0
  *
  * @return {void}
  */
@@ -1339,8 +1339,13 @@ window.eoxiaJS.mediaGallery.unlinkFile = function( event ) {
 		}
 
 		$.ajax({
-			url: document.URL + querySeparator + "action=unlinkFile&risk_id="+riskId+"&riskassessment_id="+element_linked_id+"&filename="+filename,
+			url: document.URL + querySeparator + "action=unlinkFile",
 			type: "POST",
+			data: JSON.stringify({
+				risk_id: riskId,
+				riskassessment_id: element_linked_id,
+				filename: filename,
+			}),
 			processData: false,
 			success: function ( ) {
 				$('.wpeo-loader').removeClass('wpeo-loader')
@@ -1361,8 +1366,12 @@ window.eoxiaJS.mediaGallery.unlinkFile = function( event ) {
 		}
 
 		$.ajax({
-			url: document.URL + querySeparator + "action=unlinkFile&digiriskelement_id="+element_linked_id+"&filename="+filename,
+			url: document.URL + querySeparator + "action=unlinkDigiriskElementFile",
 			type: "POST",
+			data: JSON.stringify({
+				digiriskelement_id: element_linked_id,
+				filename: filename,
+			}),
 			processData: false,
 			success: function ( ) {
 				$('.wpeo-loader').removeClass('wpeo-loader')

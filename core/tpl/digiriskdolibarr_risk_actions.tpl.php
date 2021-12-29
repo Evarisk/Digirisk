@@ -453,7 +453,7 @@ if (!$error && $action == "deleteRiskAssessmentTask" && $permissiontodelete) {
 	}
 }
 
-if (!$error && $action == "addFiles" && $permissiontodelete && !GETPOST('digiriskelement_id')) {
+if (!$error && $action == "addFiles" && $permissiontodelete) {
 
 	$data        = json_decode(file_get_contents('php://input'), true);
 
@@ -503,16 +503,17 @@ if (!$error && $action == "addFiles" && $permissiontodelete && !GETPOST('digiris
 		}
 		$riskassessment->update($user, true);
 	}
-
-
 	exit;
 }
 
-if (!$error && $action == "unlinkFile" && $permissiontodelete && !GETPOST('digiriskelement_id')) {
+if (!$error && $action == "unlinkFile" && $permissiontodelete) {
 
-	$riskassessment_id = GETPOST('riskassessment_id');
-	$filename = GETPOST('filename');
-	$risk_id = GETPOST('risk_id');
+	$data        = json_decode(file_get_contents('php://input'), true);
+
+	$riskassessment_id = $data['riskassessment_id'];
+	$risk_id = $data['risk_id'];
+	$filename = $data['filename'];
+
 	$riskassessment = new RiskAssessment($db);
 	$riskassessment->fetch($riskassessment_id);
 	$risktmp = new Risk($db);
