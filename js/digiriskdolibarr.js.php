@@ -2671,8 +2671,13 @@ window.eoxiaJS.evaluator.createEvaluator = function ( event ) {
 	window.eoxiaJS.loader.display(elementParent);
 
 	$.ajax({
-		url: document.URL + '&action=add' + durationPost + datePost + userPost,
+		url: document.URL + '&action=add',
 		type: "POST",
+		data: JSON.stringify({
+			evaluatorID: user,
+			date: date,
+			duration: duration
+		}),
 		processData: false,
 		contentType: false,
 		success: function ( resp ) {

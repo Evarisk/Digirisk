@@ -152,9 +152,11 @@ if (empty($reshook)) {
 	$backtopage = dol_buildpath('/digiriskdolibarr/view/digiriskelement/digiriskelement_evaluator.php', 1) . '?id=' . ($id > 0 ? $id : '__ID__');
 
 	if (!$error && $action == 'add' && $permissiontoadd) {
-		$duration    = GETPOST('duration');
-		$date        = GETPOST('date');
-		$evaluatorID = GETPOST('evaluatorID');
+		$data = json_decode(file_get_contents('php://input'), true);
+
+		$duration = $data['duration'];
+		$date = $data['date'];
+		$evaluatorID = $data['evaluatorID'];
 
 		$evaluator->ref             = $refEvaluatorMod->getNextValue($evaluator);
 		$evaluator->ref_ext         = $evaluator->ref;
