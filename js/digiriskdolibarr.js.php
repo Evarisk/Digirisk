@@ -2502,22 +2502,17 @@ window.eoxiaJS.risksign.createRiskSign = function ( event ) {
 	let elementRiskSign = $(this).closest('.fichecenter').find('.risksign-content');
 
 	var category = elementRiskSign.find('.risksign-category input').val();
-	var categoryPost = '';
-	if (category !== 0) {
-		categoryPost = '&riskSignCategory=' + category;
-	}
-
 	var description = elementRiskSign.find('.risksign-description textarea').val();
-	var descriptionPost = '';
-	if (description !== '') {
-		descriptionPost = '&riskSignDescription=' + encodeURI(description);
-	}
 
 	window.eoxiaJS.loader.display($('.fichecenter'));
 
 	$.ajax({
-		url: document.URL + '&action=add' + categoryPost + descriptionPost,
+		url: document.URL + '&action=add',
 		type: "POST",
+		data: JSON.stringify({
+			riskSignCategory: category,
+			riskSignDescription: description
+		}),
 		processData: false,
 		contentType: false,
 		success: function ( resp ) {
@@ -2551,22 +2546,20 @@ window.eoxiaJS.risksign.saveRiskSign = function ( event ) {
 	let editedRiskSignId = $(this).attr('value');
 	let elementRiskSign = $(this).closest('.risksign-container').find('.risksign-content');
     let textToShow = ''
-	var category = elementRiskSign.find('.risksign-category input').val();
-	var categoryPost = '';
-	if (category !== 0) {
-		categoryPost = '&riskSignCategory=' + category;
-	}
 
+	var category = elementRiskSign.find('.risksign-category input').val();
 	var description = elementRiskSign.find('.risksign-description textarea').val();
-	var descriptionPost = '';
-	if (description !== '') {
-		descriptionPost = '&riskSignDescription=' + encodeURI(description);
-	}
+
 	let riskSignRef =  $('.risksign_row_'+editedRiskSignId).find('.risksign-container > div:nth-child(1)').text();
 
 	window.eoxiaJS.loader.display(elementRiskSign);
 	$.ajax({
-		url: document.URL + '&action=saveRiskSign&riskSignID=' + editedRiskSignId + categoryPost + descriptionPost,
+		url: document.URL + '&action=saveRiskSign',
+		data: JSON.stringify({
+			riskSignID: editedRiskSignId,
+			riskSignCategory: category,
+			riskSignDescription: description
+		}),
 		type: "POST",
 		processData: false,
 		contentType: false,

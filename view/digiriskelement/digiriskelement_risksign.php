@@ -152,8 +152,12 @@ if (empty($reshook)) {
 	$backtopage = dol_buildpath('/digiriskdolibarr/view/digiriskelement/digiriskelement_risksign.php', 1).'?id='.($id > 0 ? $id : '__ID__');
 
 	if (!$error && $action == 'add' && $permissiontoadd) {
-		$riskSignCategory    = GETPOST('riskSignCategory');
-		$riskSignDescription = GETPOST('riskSignDescription', 'restricthtml');
+
+		$data = json_decode(file_get_contents('php://input'), true);
+
+		$riskSignCategory = $data['riskSignCategory'];
+		$riskSignDescription = $data['riskSignDescription'];
+
 		$fk_element          = GETPOST('id');
 
 		$risksign->ref         = $refRiskSignMod->getNextValue($risksign);
@@ -182,9 +186,12 @@ if (empty($reshook)) {
 	}
 
 	if (!$error && $action == 'saveRiskSign' && $permissiontoadd) {
-		$riskSignID          = GETPOST('riskSignID');
-		$riskSignCategory    = GETPOST('riskSignCategory');
-		$riskSignDescription = GETPOST('riskSignDescription', 'restricthtml');
+
+		$data = json_decode(file_get_contents('php://input'), true);
+
+		$riskSignID = $data['riskSignID'];
+		$riskSignCategory = $data['riskSignCategory'];
+		$riskSignDescription = $data['riskSignDescription'];
 
 		$risksign->fetch($riskSignID);
 
