@@ -1032,7 +1032,7 @@
 								<!-- Modal-Footer -->
 								<div class="modal-footer">
 									<?php if ($permissiontoadd) : ?>
-										<div class="risk-save wpeo-button button-green save" value="<?php echo $risk->id ?>">
+										<div class="risk-save wpeo-button button-green save modal-close" value="<?php echo $risk->id ?>">
 											<span><i class="fas fa-save"></i>  <?php echo $langs->trans('UpdateData'); ?></span>
 										</div>
 									<?php else : ?>
