@@ -455,9 +455,11 @@ if (!$error && $action == "deleteRiskAssessmentTask" && $permissiontodelete) {
 
 if (!$error && $action == "addFiles" && $permissiontodelete && !GETPOST('digiriskelement_id')) {
 
-	$riskassessment_id = GETPOST('riskassessment_id');
-	$risk_id = GETPOST('risk_id');
-	$filenames = GETPOST('filenames');
+	$data        = json_decode(file_get_contents('php://input'), true);
+
+	$riskassessment_id = $data['riskassessment_id'];
+	$risk_id = $data['risk_id'];
+	$filenames = $data['filenames'];
 	$riskassessment = new RiskAssessment($db);
 	$risktmp = new Risk($db);
 	$risktmp->fetch($risk_id);

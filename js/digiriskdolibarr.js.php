@@ -1158,8 +1158,13 @@ window.eoxiaJS.mediaGallery.savePhoto = function( event ) {
         let newPhoto = filepath + favorite.replace(/\./, '_small.')
 
         $.ajax({
-            url: document.URL + "&action=addFiles&risk_id="+riskId+"&riskassessment_id="+idToSave+"&filenames="+filenames,
+            url: document.URL + "&action=addFiles",
             type: "POST",
+			data: JSON.stringify({
+				risk_id: riskId,
+				riskassessment_id: idToSave,
+				filenames: filenames,
+			}),
             processData: false,
             contentType: false,
             success: function ( ) {
@@ -1188,8 +1193,12 @@ window.eoxiaJS.mediaGallery.savePhoto = function( event ) {
         let newPhoto = filepath + favorite.replace(/\./, '_small.')
 
         $.ajax({
-            url: document.URL + "&action=addFiles&digiriskelement_id="+idToSave+"&filenames="+filenames,
+            url: document.URL + "&action=addDigiriskElementFiles",
             type: "POST",
+			data: JSON.stringify({
+				digiriskelement_id: idToSave,
+				filenames: filenames,
+			}),
             processData: false,
             contentType: false,
             success: function ( resp ) {

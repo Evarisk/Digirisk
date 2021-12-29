@@ -748,10 +748,13 @@ function display_recurse_tree($results) {
 	$ecmdir = new EcmDirectory($db);
 	$error = 0;
 
-	if (!$error && $action == "addFiles" && GETPOST('digiriskelement_id')) {
+	if (!$error && $action == "addDigiriskElementFiles") {
 
-		$digiriskelement_id = GETPOST('digiriskelement_id');
-		$filenames = GETPOST('filenames');
+		$data = json_decode(file_get_contents('php://input'), true);
+
+		$digiriskelement_id = $data['digiriskelement_id'];
+		$filenames = $data['filenames'];
+
 		$digiriskelement = new DigiriskElement($db);
 		$digiriskelement->fetch($digiriskelement_id);
 		$pathToDigiriskElementPhoto = $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/'.$digiriskelement->element_type.'/' . $digiriskelement->ref ;
