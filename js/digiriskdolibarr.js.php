@@ -1302,7 +1302,7 @@ window.eoxiaJS.mediaGallery.previewPhoto = function( event ) {
  * Action unlink photo.
  *
  * @since   8.2.0
- * @version 8.2.0
+ * @version 9.0.0
  *
  * @return {void}
  */
@@ -1391,7 +1391,7 @@ window.eoxiaJS.mediaGallery.unlinkFile = function( event ) {
  * Action add photo to favorite.
  *
  * @since   8.2.0
- * @version 8.2.0
+ * @version 9.0.0
  *
  * @return {void}
  */
@@ -1430,7 +1430,11 @@ window.eoxiaJS.mediaGallery.addToFavorite = function( event ) {
 		let saveButton = $(this).closest('.modal-container').find('.risk-evaluation-save')
 		saveButton.addClass('button-disable')
 		$.ajax({
-			url: document.URL + querySeparator + "action=addToFavorite&riskassessment_id="+element_linked_id+"&filename="+filename,
+			url: document.URL + querySeparator + "action=addToFavorite",
+			data: JSON.stringify({
+				riskassessment_id: element_linked_id,
+				filename: filename,
+			}),
 			type: "POST",
 			processData: false,
 			success: function ( ) {
@@ -1453,8 +1457,12 @@ window.eoxiaJS.mediaGallery.addToFavorite = function( event ) {
 		let previousName = previousPhoto[0].src.trim().split(/thumbs%2F/)[1].split(/"/)[0]
 
 		$.ajax({
-			url: document.URL + querySeparator + "action=addToFavorite&digiriskelement_id="+element_linked_id+"&filename="+filename,
+			url: document.URL + querySeparator + "action=addDigiriskElementPhotoToFavorite",
 			type: "POST",
+			data: JSON.stringify({
+				digiriskelement_id: element_linked_id,
+				filename: filename,
+			}),
 			processData: false,
 			success: function ( ) {
 				let newPhoto = ''
@@ -1643,9 +1651,6 @@ window.eoxiaJS.risk.createRisk = function ( event ) {
 		contentType: false,
 		success: function ( resp ) {
 			$('.fichecenter').html($(resp).find('#searchFormList'))
-
-            $('#risk_row_' + riskId).fadeOut(200);
-            $('#risk_row_' + riskId).fadeIn("quick");
 
 			let actionContainerSuccess = $('.messageSuccessRiskCreate')
 			actionContainerSuccess.html($(resp).find('.risk-create-success-notice'))

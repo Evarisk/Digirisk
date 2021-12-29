@@ -555,10 +555,13 @@ if (!$error && $action == "unlinkFile" && $permissiontodelete) {
 	exit;
 }
 
-if (!$error && $action == "addToFavorite" && $permissiontodelete && !GETPOST('digiriskelement_id')) {
+if (!$error && $action == "addToFavorite" && $permissiontodelete) {
 
-	$riskassessment_id = GETPOST('riskassessment_id');
-	$filename = GETPOST('filename');
+	$data        = json_decode(file_get_contents('php://input'), true);
+
+	$riskassessment_id = $data['riskassessment_id'];
+	$filename = $data['filename'];
+
 	$riskassessment = new RiskAssessment($db);
 	$riskassessment->fetch($riskassessment_id);
 	$pathToEvaluationPhoto = $conf->digiriskdolibarr->multidir_output[$conf->entity] .'/riskassessment/' . $riskassessment->ref;
