@@ -2266,32 +2266,26 @@ window.eoxiaJS.riskassessmenttask.createRiskAssessmentTask = function ( event ) 
 	let single = element.find('.riskassessment-task-container');
 
 	let taskText = single.find('.riskassessment-task-label').val()
-
 	taskText = window.eoxiaJS.risk.sanitizeBeforeRequest(taskText)
-
-	var riskToAssignPost = '';
-	if (riskToAssign !== '') {
-		riskToAssignPost = '&riskToAssign=' + riskToAssign;
-	}
-
-	var task = taskText;
-	var taskPost = '';
-	if (task !== '') {
-		taskPost = '&tasktitle=' + encodeURI(task);
-	}
 
 	window.eoxiaJS.loader.display($(this));
 
 	$.ajax({
-		url: document.URL + '&action=addRiskAssessmentTask' + riskToAssignPost + taskPost,
+		url: document.URL + '&action=addRiskAssessmentTask',
 		type: "POST",
+		data: JSON.stringify({
+			tasktitle: taskText,
+			riskToAssign: riskToAssign,
+		}),
 		processData: false,
 		contentType: false,
 		success: function ( resp ) {
 			$('.fichecenter').html($(resp).find('#searchFormList'))
 			let actionContainerSuccess = $('.messageSuccessTaskCreate');
+
             $('.riskassessment-tasks' + riskToAssign).fadeOut(200);
             $('.riskassessment-tasks' + riskToAssign).fadeIn("quick");
+
 			actionContainerSuccess.html($(resp).find('.task-create-success-notice'))
 			actionContainerSuccess.removeClass('hidden');
 		},
@@ -2376,14 +2370,7 @@ window.eoxiaJS.riskassessmenttask.saveRiskAssessmentTask = function ( event ) {
     let textToShow = '';
 
 	let taskText = elementRiskAssessmentTask.find('.riskassessment-task-label' + editedRiskAssessmentTaskId).val()
-
 	taskText = window.eoxiaJS.risk.sanitizeBeforeRequest(taskText)
-
-	var task = taskText
-	var taskPost = '';
-	if (task !== '') {
-		taskPost = '&tasktitle=' + encodeURI(task);
-	}
 
 	let taskRef =  $('.riskassessment-task-ref-'+editedRiskAssessmentTaskId).attr('value');
 
@@ -2391,7 +2378,11 @@ window.eoxiaJS.riskassessmenttask.saveRiskAssessmentTask = function ( event ) {
 	window.eoxiaJS.loader.display($('.riskassessment-task-single-'+ editedRiskAssessmentTaskId));
 
 	$.ajax({
-		url: document.URL + '&action=saveRiskAssessmentTask&riskAssessmentTaskID=' + editedRiskAssessmentTaskId + taskPost,
+		url: document.URL + '&action=saveRiskAssessmentTask',
+		data: JSON.stringify({
+			riskAssessmentTaskID: editedRiskAssessmentTaskId,
+			tasktitle: taskText,
+		}),
 		type: "POST",
 		processData: false,
 		contentType: false,

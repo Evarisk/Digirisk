@@ -381,8 +381,11 @@ if (!$error && $action == "deleteEvaluation" && $permissiontodelete) {
 }
 
 if (!$error && $action == 'addRiskAssessmentTask' && $permissiontoadd) {
-	$riskID    = GETPOST('riskToAssign');
-	$tasktitle = GETPOST('tasktitle');
+
+	$data = json_decode(file_get_contents('php://input'), true);
+
+	$riskID = $data['riskToAssign'];
+	$tasktitle = $data['tasktitle'];
 
 	$extrafields->fetch_name_optionals_label($task->table_element);
 
@@ -409,8 +412,11 @@ if (!$error && $action == 'addRiskAssessmentTask' && $permissiontoadd) {
 }
 
 if (!$error && $action == 'saveRiskAssessmentTask' && $permissiontoadd) {
-	$riskAssessmentTaskID  = GETPOST('riskAssessmentTaskID');
-	$tasktitle             = GETPOST('tasktitle');
+
+	$data = json_decode(file_get_contents('php://input'), true);
+
+	$riskAssessmentTaskID = $data['riskAssessmentTaskID'];
+	$tasktitle = $data['tasktitle'];
 
 	$task->fetch($riskAssessmentTaskID);
 

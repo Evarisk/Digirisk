@@ -262,7 +262,7 @@ $related_tasks = $risk->get_related_tasks($risk); ?>
 					<!-- Modal-Footer -->
 					<div class="modal-footer">
 						<?php if ($permissiontoadd) : ?>
-							<div class="wpeo-button riskassessment-task-create button-blue button-disable" value="<?php echo $risk->id ?>">
+							<div class="wpeo-button riskassessment-task-create button-blue button-disable modal-close" value="<?php echo $risk->id ?>">
 								<i class="fas fa-plus"></i> <?php echo $langs->trans('Add'); ?>
 							</div>
 						<?php else : ?>
