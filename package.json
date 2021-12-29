@@ -19,9 +19,10 @@
     "gulp-line-ending-corrector": "^1.0.3",
     "gulp-rename": "latest",
     "gulp-sass": "latest",
-    "sass": "latest",
     "gulp-uglify": "latest",
-    "gulp-watch": "latest"
+    "gulp-watch": "latest",
+    "jsdoc": "^3.6.7",
+    "sass": "latest"
   },
   "dependencies": {
     "composer": "^4.1.0",
