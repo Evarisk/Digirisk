@@ -21,31 +21,31 @@
  *       \brief      Public page to add signature
  */
 
-if (!defined('NOREQUIREUSER'))  define('NOREQUIREUSER', '1');
-if (!defined('NOTOKENRENEWAL')) define('NOTOKENRENEWAL', '1');
-if (!defined('NOREQUIREMENU'))  define('NOREQUIREMENU', '1');
-if (!defined('NOREQUIREHTML'))  define('NOREQUIREHTML', '1');
-if (!defined('NOLOGIN'))        define("NOLOGIN", 1);           // This means this output page does not require to be logged.
-if (!defined('NOCSRFCHECK'))    define("NOCSRFCHECK", 1);       // We accept to go on this page from external web site.
-if (!defined('NOIPCHECK'))		define('NOIPCHECK', '1');      // Do not check IP defined into conf $dolibarr_main_restrict_ip
-if (!defined('NOBROWSERNOTIF')) define('NOBROWSERNOTIF', '1');
+if ( ! defined('NOREQUIREUSER'))  define('NOREQUIREUSER', '1');
+if ( ! defined('NOTOKENRENEWAL')) define('NOTOKENRENEWAL', '1');
+if ( ! defined('NOREQUIREMENU'))  define('NOREQUIREMENU', '1');
+if ( ! defined('NOREQUIREHTML'))  define('NOREQUIREHTML', '1');
+if ( ! defined('NOLOGIN'))        define("NOLOGIN", 1);           // This means this output page does not require to be logged.
+if ( ! defined('NOCSRFCHECK'))    define("NOCSRFCHECK", 1);       // We accept to go on this page from external web site.
+if ( ! defined('NOIPCHECK'))		define('NOIPCHECK', '1');      // Do not check IP defined into conf $dolibarr_main_restrict_ip
+if ( ! defined('NOBROWSERNOTIF')) define('NOBROWSERNOTIF', '1');
 
 // Load Dolibarr environment
 $res = 0;
 // Try main.inc.php into web root known defined into CONTEXT_DOCUMENT_ROOT (not always defined)
-if (!$res && !empty($_SERVER["CONTEXT_DOCUMENT_ROOT"])) $res = @include $_SERVER["CONTEXT_DOCUMENT_ROOT"]."/main.inc.php";
+if ( ! $res && ! empty($_SERVER["CONTEXT_DOCUMENT_ROOT"])) $res = @include $_SERVER["CONTEXT_DOCUMENT_ROOT"] . "/main.inc.php";
 // Try main.inc.php into web root detected using web root calculated from SCRIPT_FILENAME
 $tmp = empty($_SERVER['SCRIPT_FILENAME']) ? '' : $_SERVER['SCRIPT_FILENAME']; $tmp2 = realpath(__FILE__); $i = strlen($tmp) - 1; $j = strlen($tmp2) - 1;
 while ($i > 0 && $j > 0 && isset($tmp[$i]) && isset($tmp2[$j]) && $tmp[$i] == $tmp2[$j]) { $i--; $j--; }
-if (!$res && $i > 0 && file_exists(substr($tmp, 0, ($i + 1))."/main.inc.php")) $res = @include substr($tmp, 0, ($i + 1))."/main.inc.php";
-if (!$res && $i > 0 && file_exists(dirname(substr($tmp, 0, ($i + 1)))."/main.inc.php")) $res = @include dirname(substr($tmp, 0, ($i + 1)))."/main.inc.php";
+if ( ! $res && $i > 0 && file_exists(substr($tmp, 0, ($i + 1)) . "/main.inc.php")) $res          = @include substr($tmp, 0, ($i + 1)) . "/main.inc.php";
+if ( ! $res && $i > 0 && file_exists(dirname(substr($tmp, 0, ($i + 1))) . "/main.inc.php")) $res = @include dirname(substr($tmp, 0, ($i + 1))) . "/main.inc.php";
 // Try main.inc.php using relative path
-if (!$res && file_exists("../../main.inc.php")) $res = @include "../../main.inc.php";
-if (!$res && file_exists("../../../main.inc.php")) $res = @include "../../../main.inc.php";
-if (!$res && file_exists("../../../../main.inc.php")) $res = @include "../../../../main.inc.php";
-if (!$res) die("Include of main fails");
+if ( ! $res && file_exists("../../main.inc.php")) $res       = @include "../../main.inc.php";
+if ( ! $res && file_exists("../../../main.inc.php")) $res    = @include "../../../main.inc.php";
+if ( ! $res && file_exists("../../../../main.inc.php")) $res = @include "../../../../main.inc.php";
+if ( ! $res) die("Include of main fails");
 
-require_once DOL_DOCUMENT_ROOT.'/core/class/html.form.class.php';
+require_once DOL_DOCUMENT_ROOT . '/core/class/html.form.class.php';
 require_once '../../class/preventionplan.class.php';
 require_once '../../class/digiriskdocuments/preventionplandocument.class.php';
 require_once '../../lib/digiriskdolibarr_function.lib.php';
@@ -65,7 +65,7 @@ $object                 = new PreventionPlan($db);
 $signatory              = new PreventionPlanSignature($db);
 $preventionplandocument = new PreventionPlanDocument($db);
 
-$signatory->fetch('',''," AND signature_url ="."'".$track_id."'");
+$signatory->fetch('', '', " AND signature_url =" . "'" . $track_id . "'");
 $object->fetch($signatory->fk_object);
 
 $upload_dir = $conf->digiriskdolibarr->multidir_output[isset($object->entity) ? $object->entity : 1];
@@ -75,53 +75,52 @@ $upload_dir = $conf->digiriskdolibarr->multidir_output[isset($object->entity) ? 
  */
 
 $parameters = array();
-$reshook = $hookmanager->executeHooks('doActions', $parameters, $object, $action); // Note that $action and $object may have been modified by some hooks
+$reshook    = $hookmanager->executeHooks('doActions', $parameters, $object, $action); // Note that $action and $object may have been modified by some hooks
 if ($reshook < 0) setEventMessages($hookmanager->error, $hookmanager->errors, 'errors');
 
 // Action to add record
 if ($action == 'addSignature') {
-	$signatoryID = GETPOST('signatoryID');
+	$signatoryID  = GETPOST('signatoryID');
 	$request_body = file_get_contents('php://input');
 
 	$signatory->fetch($signatoryID);
-	$signatory->signature = $request_body;
+	$signatory->signature      = $request_body;
 	$signatory->signature_date = dol_now();
 
-	if (!$error) {
+	if ( ! $error) {
 		$result = $signatory->update($user, false);
 		if ($result > 0) {
 			$signatory->setSigned($user, false);
 			// Creation signature OK
 			exit;
-		}
-		else {
+		} else {
 			// Creation signature KO
-			if (!empty($signatory->errors)) setEventMessages(null, $signatory->errors, 'errors');
-			else  setEventMessages($signatory->error, null, 'errors');
+			if ( ! empty($signatory->errors)) setEventMessages(null, $signatory->errors, 'errors');
+			else setEventMessages($signatory->error, null, 'errors');
 		}
 	}
 }
 
 if ($action == 'builddoc') {
 	$outputlangs = $langs;
-	$newlang = '';
+	$newlang     = '';
 
 	if ($conf->global->MAIN_MULTILANGS && empty($newlang) && GETPOST('lang_id', 'aZ09')) $newlang = GETPOST('lang_id', 'aZ09');
-	if (!empty($newlang)) {
+	if ( ! empty($newlang)) {
 		$outputlangs = new Translate("", $conf);
 		$outputlangs->setDefaultLang($newlang);
 	}
 
 	// To be sure vars is defined
 	if (empty($hidedetails)) $hidedetails = 0;
-	if (empty($hidedesc)) $hidedesc = 0;
-	if (empty($hideref)) $hideref = 0;
-	if (empty($moreparams)) $moreparams = null;
+	if (empty($hidedesc)) $hidedesc       = 0;
+	if (empty($hideref)) $hideref         = 0;
+	if (empty($moreparams)) $moreparams   = null;
 
 	$model = 'preventionplandocument_specimen_odt';
 
 	$moreparams['object'] = $object;
-	$moreparams['user'] = $user;
+	$moreparams['user']   = $user;
 
 	$result = $preventionplandocument->generateDocument($model, $outputlangs, $hidedetails, $hidedesc, $hideref, $moreparams);
 	if ($result <= 0) {
@@ -147,11 +146,10 @@ if ($action == 'builddoc') {
 }
 
 if ($action == 'remove_file') {
-
 	$files = dol_dir_list(DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/documents/temp/'); // get all file names
 
-	foreach($files as $file){
-		if(is_file($file['fullname'])) {
+	foreach ($files as $file) {
+		if (is_file($file['fullname'])) {
 			dol_delete_file($file['fullname']);
 		}
 	}
@@ -162,14 +160,13 @@ if ($action == 'remove_file') {
 
 $form = new Form($db);
 
-if (empty($conf->global->DIGIRISKDOLIBARR_SIGNATURE_ENABLE_PUBLIC_INTERFACE))
-{
+if (empty($conf->global->DIGIRISKDOLIBARR_SIGNATURE_ENABLE_PUBLIC_INTERFACE)) {
 	print $langs->trans('SignaturePublicInterfaceForbidden');
 	exit;
 }
 
-$morejs   = array("/digiriskdolibarr/js/signature-pad.min.js", "/digiriskdolibarr/js/digiriskdolibarr.js.php");
-$morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");
+$morejs  = array("/digiriskdolibarr/js/signature-pad.min.js", "/digiriskdolibarr/js/digiriskdolibarr.js.php");
+$morecss = array("/digiriskdolibarr/css/digiriskdolibarr.css");
 
 llxHeaderSignature($langs->trans("Signature"), "", 0, 0, $morejs, $morecss);
 

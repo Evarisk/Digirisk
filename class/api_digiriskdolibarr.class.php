@@ -18,7 +18,7 @@
 
 use Luracast\Restler\RestException;
 
-require_once __DIR__ .'/../core/modules/modDigiriskDolibarr.class.php';
+require_once __DIR__ . '/../core/modules/modDigiriskDolibarr.class.php';
 
 /**
  * API class for orders
@@ -42,9 +42,8 @@ class DigiriskDolibarr extends DolibarrApi
 	public function __construct()
 	{
 		global $db;
-		$this->db = $db;
+		$this->db  = $db;
 		$this->mod = new modDigiriskdolibarr($this->db);
-
 	}
 
 	/**
@@ -60,13 +59,13 @@ class DigiriskDolibarr extends DolibarrApi
 	{
 		global $langs;
 
-		require_once DOL_DOCUMENT_ROOT .'/core/modules/modECM.class.php';
-		require_once DOL_DOCUMENT_ROOT .'/core/modules/modProjet.class.php';
-		require_once DOL_DOCUMENT_ROOT .'/core/modules/modSociete.class.php';
-		require_once DOL_DOCUMENT_ROOT .'/core/modules/modTicket.class.php';
-		require_once DOL_DOCUMENT_ROOT .'/core/modules/modCategorie.class.php';
-		require_once DOL_DOCUMENT_ROOT .'/core/modules/modFckeditor.class.php';
-		require_once DOL_DOCUMENT_ROOT .'/core/modules/modApi.class.php';
+		require_once DOL_DOCUMENT_ROOT . '/core/modules/modECM.class.php';
+		require_once DOL_DOCUMENT_ROOT . '/core/modules/modProjet.class.php';
+		require_once DOL_DOCUMENT_ROOT . '/core/modules/modSociete.class.php';
+		require_once DOL_DOCUMENT_ROOT . '/core/modules/modTicket.class.php';
+		require_once DOL_DOCUMENT_ROOT . '/core/modules/modCategorie.class.php';
+		require_once DOL_DOCUMENT_ROOT . '/core/modules/modFckeditor.class.php';
+		require_once DOL_DOCUMENT_ROOT . '/core/modules/modApi.class.php';
 
 		$modEcm       = new modECM($this->db);
 		$modProjet    = new modProjet($this->db);

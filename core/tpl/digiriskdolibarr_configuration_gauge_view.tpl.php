@@ -23,7 +23,7 @@
 			data: {
 				datasets: [{
 					label: '# of Votes',
-					data: [<?php echo bcdiv(((1 - $counter / $maxnumber) * 100), 1, 2) ;?>, <?php echo bcdiv((($counter / $maxnumber) * 100), 1, 2) ;?>],
+					data: [<?php echo bcdiv(((1 - $counter / $maxnumber) * 100), 1, 2);?>, <?php echo bcdiv((($counter / $maxnumber) * 100), 1, 2);?>],
 					backgroundColor: [
 						'rgba(108, 108, 108, 0.4)',
 						'rgba(13, 138, 255, 0.8)',

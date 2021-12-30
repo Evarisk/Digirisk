@@ -23,7 +23,7 @@
  * \brief   Digirisk Dolibarr trigger.
  */
 
-require_once DOL_DOCUMENT_ROOT.'/core/triggers/dolibarrtriggers.class.php';
+require_once DOL_DOCUMENT_ROOT . '/core/triggers/dolibarrtriggers.class.php';
 
 /**
  *  Class of triggers for Digiriskdolibarr module
@@ -44,11 +44,11 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 	{
 		$this->db = $db;
 
-		$this->name = preg_replace('/^Interface/i', '', get_class($this));
-		$this->family = "demo";
+		$this->name        = preg_replace('/^Interface/i', '', get_class($this));
+		$this->family      = "demo";
 		$this->description = "Digiriskdolibarr triggers.";
-		$this->version = '8.5.4';
-		$this->picto = 'digiriskdolibarr@digiriskdolibarr';
+		$this->version     = '8.5.4';
+		$this->picto       = 'digiriskdolibarr@digiriskdolibarr';
 	}
 
 	/**
@@ -91,9 +91,9 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 
 		switch ($action) {
 			case 'INFORMATIONSSHARING_GENERATE' :
-				dol_syslog("Trigger '".$this->name."' for action '$action' launched by ".__FILE__.". id=".$object->id);
-				require_once DOL_DOCUMENT_ROOT.'/comm/action/class/actioncomm.class.php';
-				$now = dol_now();
+				dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id);
+				require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
+				$now        = dol_now();
 				$actioncomm = new ActionComm($this->db);
 
 				$actioncomm->elementtype = $object->parent_type . '@digiriskdolibarr';
@@ -110,9 +110,9 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				break;
 
 			case 'LEGALDISPLAY_GENERATE' :
-				dol_syslog("Trigger '".$this->name."' for action '$action' launched by ".__FILE__.". id=".$object->id);
-				require_once DOL_DOCUMENT_ROOT.'/comm/action/class/actioncomm.class.php';
-				$now = dol_now();
+				dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id);
+				require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
+				$now        = dol_now();
 				$actioncomm = new ActionComm($this->db);
 
 				$actioncomm->elementtype = $object->parent_type . '@digiriskdolibarr';
@@ -129,9 +129,9 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				break;
 
 			case 'PREVENTIONPLANDOCUMENT_GENERATE' :
-				dol_syslog("Trigger '".$this->name."' for action '$action' launched by ".__FILE__.". id=".$object->id);
-				require_once DOL_DOCUMENT_ROOT.'/comm/action/class/actioncomm.class.php';
-				$now = dol_now();
+				dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id);
+				require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
+				$now        = dol_now();
 				$actioncomm = new ActionComm($this->db);
 
 				$actioncomm->elementtype = $object->parent_type . '@digiriskdolibarr';
@@ -149,9 +149,9 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				break;
 
 			case 'FIREPERMITDOCUMENT_GENERATE' :
-				dol_syslog("Trigger '".$this->name."' for action '$action' launched by ".__FILE__.". id=".$object->id);
-				require_once DOL_DOCUMENT_ROOT.'/comm/action/class/actioncomm.class.php';
-				$now = dol_now();
+				dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id);
+				require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
+				$now        = dol_now();
 				$actioncomm = new ActionComm($this->db);
 
 				$actioncomm->elementtype = $object->parent_type . '@digiriskdolibarr';
@@ -169,9 +169,9 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				break;
 
 			case 'GROUPMENTDOCUMENT_GENERATE' :
-				dol_syslog("Trigger '".$this->name."' for action '$action' launched by ".__FILE__.". id=".$object->id);
-				require_once DOL_DOCUMENT_ROOT.'/comm/action/class/actioncomm.class.php';
-				$now = dol_now();
+				dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id);
+				require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
+				$now        = dol_now();
 				$actioncomm = new ActionComm($this->db);
 
 				$actioncomm->elementtype = 'digiriskelement@digiriskdolibarr';
@@ -189,9 +189,9 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				break;
 
 			case 'WORKUNITDOCUMENT_GENERATE' :
-				dol_syslog("Trigger '".$this->name."' for action '$action' launched by ".__FILE__.". id=".$object->id);
-				require_once DOL_DOCUMENT_ROOT.'/comm/action/class/actioncomm.class.php';
-				$now = dol_now();
+				dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id);
+				require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
+				$now        = dol_now();
 				$actioncomm = new ActionComm($this->db);
 
 				$actioncomm->elementtype = 'digiriskelement@digiriskdolibarr';
@@ -208,11 +208,11 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				break;
 
 			case 'LISTINGRISKSPHOTO_GENERATE' :
-				dol_syslog("Trigger '".$this->name."' for action '$action' launched by ".__FILE__.". id=".$object->id);
-				require_once DOL_DOCUMENT_ROOT.'/comm/action/class/actioncomm.class.php';
-				$now = dol_now();
-				$actioncomm = new ActionComm($this->db);
-				$type = $object->parent_type == 'digiriskstandard' ? 'digiriskstandard' : 'digiriskelement';
+				dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id);
+				require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
+				$now                     = dol_now();
+				$actioncomm              = new ActionComm($this->db);
+				$type                    = $object->parent_type == 'digiriskstandard' ? 'digiriskstandard' : 'digiriskelement';
 				$actioncomm->elementtype = $type;
 				$actioncomm->elementid   = $object->parent_id;
 				$actioncomm->code        = 'AC_LISTINGRISKSPHOTO_GENERATE';
@@ -227,12 +227,12 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				break;
 
 			case 'LISTINGRISKSACTION_GENERATE' :
-				dol_syslog("Trigger '".$this->name."' for action '$action' launched by ".__FILE__.". id=".$object->id);
-				require_once DOL_DOCUMENT_ROOT.'/comm/action/class/actioncomm.class.php';
-				$now = dol_now();
+				dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id);
+				require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
+				$now        = dol_now();
 				$actioncomm = new ActionComm($this->db);
 
-				$type = $object->parent_type == 'digiriskstandard' ? 'digiriskstandard' : 'digiriskelement';
+				$type                    = $object->parent_type == 'digiriskstandard' ? 'digiriskstandard' : 'digiriskelement';
 				$actioncomm->elementtype = $type;
 				$actioncomm->elementid   = $object->parent_id;
 				$actioncomm->code        = 'AC_LISTINGRISKSACTION_GENERATE';
@@ -247,9 +247,9 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 			break;
 
 			case 'RISKASSESSMENTDOCUMENT_GENERATE' :
-				dol_syslog("Trigger '".$this->name."' for action '$action' launched by ".__FILE__.". id=".$object->id);
-				require_once DOL_DOCUMENT_ROOT.'/comm/action/class/actioncomm.class.php';
-				$now = dol_now();
+				dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id);
+				require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
+				$now        = dol_now();
 				$actioncomm = new ActionComm($this->db);
 
 				$actioncomm->elementtype = $object->parent_type . '@digiriskdolibarr';
@@ -266,9 +266,9 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				break;
 
 			case 'DIGIRISKELEMENT_CREATE' :
-				dol_syslog("Trigger '".$this->name."' for action '$action' launched by ".__FILE__.". id=".$object->id);
-				require_once DOL_DOCUMENT_ROOT.'/comm/action/class/actioncomm.class.php';
-				$now = dol_now();
+				dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id);
+				require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
+				$now        = dol_now();
 				$actioncomm = new ActionComm($this->db);
 
 				$actioncomm->elementtype = 'digiriskelement@digiriskdolibarr';
@@ -285,9 +285,9 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				break;
 
 			case 'SIGNATURE_GENERATE' :
-				dol_syslog("Trigger '".$this->name."' for action '$action' launched by ".__FILE__.". id=".$object->id);
-				require_once DOL_DOCUMENT_ROOT.'/comm/action/class/actioncomm.class.php';
-				$now = dol_now();
+				dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id);
+				require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
+				$now        = dol_now();
 				$actioncomm = new ActionComm($this->db);
 
 				$actioncomm->elementtype = 'digirisksignature@digiriskdolibarr';
@@ -306,9 +306,9 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 
 			case 'PREVENTIONPLAN_MODIFY' :
 
-				dol_syslog("Trigger '".$this->name."' for action '$action' launched by ".__FILE__.". id=".$object->id);
-				require_once DOL_DOCUMENT_ROOT.'/comm/action/class/actioncomm.class.php';
-				$now = dol_now();
+				dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id);
+				require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
+				$now        = dol_now();
 				$actioncomm = new ActionComm($this->db);
 
 				$actioncomm->elementtype = 'preventionplan@digiriskdolibarr';
@@ -325,9 +325,9 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 
 			case 'PREVENTIONPLAN_INPROGRESS' :
 
-				dol_syslog("Trigger '".$this->name."' for action '$action' launched by ".__FILE__.". id=".$object->id);
-				require_once DOL_DOCUMENT_ROOT.'/comm/action/class/actioncomm.class.php';
-				$now = dol_now();
+				dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id);
+				require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
+				$now        = dol_now();
 				$actioncomm = new ActionComm($this->db);
 
 				$actioncomm->elementtype = 'preventionplan@digiriskdolibarr';
@@ -343,9 +343,9 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				break;
 
 			case 'PREVENTIONPLAN_PENDINGSIGNATURE' :
-				dol_syslog("Trigger '".$this->name."' for action '$action' launched by ".__FILE__.". id=".$object->id);
-				require_once DOL_DOCUMENT_ROOT.'/comm/action/class/actioncomm.class.php';
-				$now = dol_now();
+				dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id);
+				require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
+				$now        = dol_now();
 				$actioncomm = new ActionComm($this->db);
 
 				$actioncomm->elementtype = 'preventionplan@digiriskdolibarr';
@@ -362,9 +362,9 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 
 			case 'PREVENTIONPLAN_LOCKED' :
 
-				dol_syslog("Trigger '".$this->name."' for action '$action' launched by ".__FILE__.". id=".$object->id);
-				require_once DOL_DOCUMENT_ROOT.'/comm/action/class/actioncomm.class.php';
-				$now = dol_now();
+				dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id);
+				require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
+				$now        = dol_now();
 				$actioncomm = new ActionComm($this->db);
 
 				$actioncomm->elementtype = 'preventionplan@digiriskdolibarr';
@@ -381,9 +381,9 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 
 			case 'PREVENTIONPLAN_ARCHIVED' :
 
-				dol_syslog("Trigger '".$this->name."' for action '$action' launched by ".__FILE__.". id=".$object->id);
-				require_once DOL_DOCUMENT_ROOT.'/comm/action/class/actioncomm.class.php';
-				$now = dol_now();
+				dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id);
+				require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
+				$now        = dol_now();
 				$actioncomm = new ActionComm($this->db);
 
 				$actioncomm->elementtype = 'preventionplan@digiriskdolibarr';
@@ -400,9 +400,9 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 
 			case 'PREVENTIONPLANLINE_CREATE' :
 
-				dol_syslog("Trigger '".$this->name."' for action '$action' launched by ".__FILE__.". id=".$object->id);
-				require_once DOL_DOCUMENT_ROOT.'/comm/action/class/actioncomm.class.php';
-				$now = dol_now();
+				dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id);
+				require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
+				$now        = dol_now();
 				$actioncomm = new ActionComm($this->db);
 
 				$actioncomm->elementtype = 'preventionplan@digiriskdolibarr';
@@ -419,9 +419,9 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 
 			case 'PREVENTIONPLANLINE_MODIFY' :
 
-				dol_syslog("Trigger '".$this->name."' for action '$action' launched by ".__FILE__.". id=".$object->id);
-				require_once DOL_DOCUMENT_ROOT.'/comm/action/class/actioncomm.class.php';
-				$now = dol_now();
+				dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id);
+				require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
+				$now        = dol_now();
 				$actioncomm = new ActionComm($this->db);
 
 				$actioncomm->elementtype = 'preventionplan@digiriskdolibarr';
@@ -438,9 +438,9 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 
 			case 'PREVENTIONPLANLINE_DELETE' :
 
-				dol_syslog("Trigger '".$this->name."' for action '$action' launched by ".__FILE__.". id=".$object->id);
-				require_once DOL_DOCUMENT_ROOT.'/comm/action/class/actioncomm.class.php';
-				$now = dol_now();
+				dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id);
+				require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
+				$now        = dol_now();
 				$actioncomm = new ActionComm($this->db);
 
 				$actioncomm->elementtype = 'preventionplan@digiriskdolibarr';
@@ -457,28 +457,28 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 
 			case 'PREVENTIONPLANSIGNATURE_ADDATTENDANT' :
 
-				dol_syslog("Trigger '".$this->name."' for action '$action' launched by ".__FILE__.". id=".$object->id);
-				require_once DOL_DOCUMENT_ROOT.'/comm/action/class/actioncomm.class.php';
-				$now = dol_now();
+				dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id);
+				require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
+				$now        = dol_now();
 				$actioncomm = new ActionComm($this->db);
 
-				$actioncomm->elementtype = 'preventionplan@digiriskdolibarr';
-				$actioncomm->code        = 'AC_PREVENTIONPLANSIGNATURE_ADDATTENDANT';
-				$actioncomm->type_code   = 'AC_OTH_AUTO';
-				$actioncomm->label       = $langs->trans('PreventionPlanAddAttendantTrigger');
-				$actioncomm->datep       = $now;
-				$actioncomm->fk_element  = $object->fk_object;
-				$actioncomm->socpeopleassigned  = array($object->element_id => $object->element_id);
-				$actioncomm->userownerid = $user->id;
-				$actioncomm->percentage  = -1;
+				$actioncomm->elementtype       = 'preventionplan@digiriskdolibarr';
+				$actioncomm->code              = 'AC_PREVENTIONPLANSIGNATURE_ADDATTENDANT';
+				$actioncomm->type_code         = 'AC_OTH_AUTO';
+				$actioncomm->label             = $langs->trans('PreventionPlanAddAttendantTrigger');
+				$actioncomm->datep             = $now;
+				$actioncomm->fk_element        = $object->fk_object;
+				$actioncomm->socpeopleassigned = array($object->element_id => $object->element_id);
+				$actioncomm->userownerid       = $user->id;
+				$actioncomm->percentage        = -1;
 
 				$actioncomm->create($user);
 				break;
 
 			case 'PREVENTIONPLAN_SENTBYMAIL' :
-				dol_syslog("Trigger '".$this->name."' for action '$action' launched by ".__FILE__.". id=".$object->id);
-				require_once DOL_DOCUMENT_ROOT.'/comm/action/class/actioncomm.class.php';
-				$now = dol_now();
+				dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id);
+				require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
+				$now        = dol_now();
 				$actioncomm = new ActionComm($this->db);
 
 				$actioncomm->elementtype = 'preventionplan@digiriskdolibarr';
@@ -497,9 +497,9 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 
 			case 'FIREPERMIT_MODIFY' :
 
-				dol_syslog("Trigger '".$this->name."' for action '$action' launched by ".__FILE__.". id=".$object->id);
-				require_once DOL_DOCUMENT_ROOT.'/comm/action/class/actioncomm.class.php';
-				$now = dol_now();
+				dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id);
+				require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
+				$now        = dol_now();
 				$actioncomm = new ActionComm($this->db);
 
 				$actioncomm->elementtype = 'firepermit@digiriskdolibarr';
@@ -516,9 +516,9 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 
 			case 'FIREPERMIT_INPROGRESS' :
 
-				dol_syslog("Trigger '".$this->name."' for action '$action' launched by ".__FILE__.". id=".$object->id);
-				require_once DOL_DOCUMENT_ROOT.'/comm/action/class/actioncomm.class.php';
-				$now = dol_now();
+				dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id);
+				require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
+				$now        = dol_now();
 				$actioncomm = new ActionComm($this->db);
 
 				$actioncomm->elementtype = 'firepermit@digiriskdolibarr';
@@ -534,9 +534,9 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				break;
 
 			case 'FIREPERMIT_PENDINGSIGNATURE' :
-				dol_syslog("Trigger '".$this->name."' for action '$action' launched by ".__FILE__.". id=".$object->id);
-				require_once DOL_DOCUMENT_ROOT.'/comm/action/class/actioncomm.class.php';
-				$now = dol_now();
+				dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id);
+				require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
+				$now        = dol_now();
 				$actioncomm = new ActionComm($this->db);
 
 				$actioncomm->elementtype = 'firepermit@digiriskdolibarr';
@@ -553,9 +553,9 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 
 			case 'FIREPERMIT_LOCKED' :
 
-				dol_syslog("Trigger '".$this->name."' for action '$action' launched by ".__FILE__.". id=".$object->id);
-				require_once DOL_DOCUMENT_ROOT.'/comm/action/class/actioncomm.class.php';
-				$now = dol_now();
+				dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id);
+				require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
+				$now        = dol_now();
 				$actioncomm = new ActionComm($this->db);
 
 				$actioncomm->elementtype = 'firepermit@digiriskdolibarr';
@@ -572,9 +572,9 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 
 			case 'FIREPERMIT_ARCHIVED' :
 
-				dol_syslog("Trigger '".$this->name."' for action '$action' launched by ".__FILE__.". id=".$object->id);
-				require_once DOL_DOCUMENT_ROOT.'/comm/action/class/actioncomm.class.php';
-				$now = dol_now();
+				dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id);
+				require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
+				$now        = dol_now();
 				$actioncomm = new ActionComm($this->db);
 
 				$actioncomm->elementtype = 'firepermit@digiriskdolibarr';
@@ -591,9 +591,9 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 
 			case 'FIREPERMITLINE_CREATE' :
 
-				dol_syslog("Trigger '".$this->name."' for action '$action' launched by ".__FILE__.". id=".$object->id);
-				require_once DOL_DOCUMENT_ROOT.'/comm/action/class/actioncomm.class.php';
-				$now = dol_now();
+				dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id);
+				require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
+				$now        = dol_now();
 				$actioncomm = new ActionComm($this->db);
 
 				$actioncomm->elementtype = 'firepermit@digiriskdolibarr';
@@ -610,9 +610,9 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 
 			case 'FIREPERMITLINE_MODIFY' :
 
-				dol_syslog("Trigger '".$this->name."' for action '$action' launched by ".__FILE__.". id=".$object->id);
-				require_once DOL_DOCUMENT_ROOT.'/comm/action/class/actioncomm.class.php';
-				$now = dol_now();
+				dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id);
+				require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
+				$now        = dol_now();
 				$actioncomm = new ActionComm($this->db);
 
 				$actioncomm->elementtype = 'firepermit@digiriskdolibarr';
@@ -629,9 +629,9 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 
 			case 'FIREPERMITLINE_DELETE' :
 
-				dol_syslog("Trigger '".$this->name."' for action '$action' launched by ".__FILE__.". id=".$object->id);
-				require_once DOL_DOCUMENT_ROOT.'/comm/action/class/actioncomm.class.php';
-				$now = dol_now();
+				dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id);
+				require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
+				$now        = dol_now();
 				$actioncomm = new ActionComm($this->db);
 
 				$actioncomm->elementtype = 'firepermit@digiriskdolibarr';
@@ -648,28 +648,28 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 
 			case 'FIREPERMITSIGNATURE_ADDATTENDANT' :
 
-				dol_syslog("Trigger '".$this->name."' for action '$action' launched by ".__FILE__.". id=".$object->id);
-				require_once DOL_DOCUMENT_ROOT.'/comm/action/class/actioncomm.class.php';
-				$now = dol_now();
+				dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id);
+				require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
+				$now        = dol_now();
 				$actioncomm = new ActionComm($this->db);
 
-				$actioncomm->elementtype = 'firepermit@digiriskdolibarr';
-				$actioncomm->code        = 'AC_FIREPERMITSIGNATURE_ADDATTENDANT';
-				$actioncomm->type_code   = 'AC_OTH_AUTO';
-				$actioncomm->label       = $langs->trans('FirePermitAddAttendantTrigger');
-				$actioncomm->datep       = $now;
-				$actioncomm->fk_element  = $object->fk_object;
-				$actioncomm->socpeopleassigned  = array($object->element_id => $object->element_id);
-				$actioncomm->userownerid = $user->id;
-				$actioncomm->percentage  = -1;
+				$actioncomm->elementtype       = 'firepermit@digiriskdolibarr';
+				$actioncomm->code              = 'AC_FIREPERMITSIGNATURE_ADDATTENDANT';
+				$actioncomm->type_code         = 'AC_OTH_AUTO';
+				$actioncomm->label             = $langs->trans('FirePermitAddAttendantTrigger');
+				$actioncomm->datep             = $now;
+				$actioncomm->fk_element        = $object->fk_object;
+				$actioncomm->socpeopleassigned = array($object->element_id => $object->element_id);
+				$actioncomm->userownerid       = $user->id;
+				$actioncomm->percentage        = -1;
 
 				$actioncomm->create($user);
 				break;
 
 			case 'FIREPERMIT_SENTBYMAIL' :
-				dol_syslog("Trigger '".$this->name."' for action '$action' launched by ".__FILE__.". id=".$object->id);
-				require_once DOL_DOCUMENT_ROOT.'/comm/action/class/actioncomm.class.php';
-				$now = dol_now();
+				dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id);
+				require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
+				$now        = dol_now();
 				$actioncomm = new ActionComm($this->db);
 
 				$actioncomm->elementtype = 'firepermit@digiriskdolibarr';
@@ -688,8 +688,8 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 
 			case 'DIGIRISKSIGNATURE_SIGNED' :
 
-				dol_syslog("Trigger '".$this->name."' for action '$action' launched by ".__FILE__.". id=".$object->id);
-				require_once DOL_DOCUMENT_ROOT.'/comm/action/class/actioncomm.class.php';
+				dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id);
+				require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
 				$now = dol_now();
 
 				if ($object->element_type == 'socpeople') {
@@ -703,89 +703,89 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 
 				$actioncomm = new ActionComm($this->db);
 
-				$actioncomm->elementtype        = $object->object_type.'@digiriskdolibarr';
-				$actioncomm->code               = 'AC_DIGIRISKSIGNATURE_SIGNED';
-				$actioncomm->type_code          = 'AC_OTH_AUTO';
-				$actioncomm->label       		= $langs->trans($object->role .'Signed') . ' : ' . $people->firstname . ' ' . $people->lastname;
-				$actioncomm->datep              = $now;
-				$actioncomm->fk_element         = $object->fk_object;
+				$actioncomm->elementtype = $object->object_type . '@digiriskdolibarr';
+				$actioncomm->code        = 'AC_DIGIRISKSIGNATURE_SIGNED';
+				$actioncomm->type_code   = 'AC_OTH_AUTO';
+				$actioncomm->label       = $langs->trans($object->role . 'Signed') . ' : ' . $people->firstname . ' ' . $people->lastname;
+				$actioncomm->datep       = $now;
+				$actioncomm->fk_element  = $object->fk_object;
 				if ($object->element_type == 'socpeople') {
-					$actioncomm->socpeopleassigned  = array($object->element_id => $object->element_id);
+					$actioncomm->socpeopleassigned = array($object->element_id => $object->element_id);
 				}
-				$actioncomm->userownerid        = $user->id;
-				$actioncomm->percentage         = -1;
+				$actioncomm->userownerid = $user->id;
+				$actioncomm->percentage  = -1;
 
 				$actioncomm->create($user);
 				break;
 
 			case 'DIGIRISKSIGNATURE_PENDING_SIGNATURE' :
 
-				dol_syslog("Trigger '".$this->name."' for action '$action' launched by ".__FILE__.". id=".$object->id);
-				require_once DOL_DOCUMENT_ROOT.'/comm/action/class/actioncomm.class.php';
-				$now = dol_now();
+				dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id);
+				require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
+				$now        = dol_now();
 				$actioncomm = new ActionComm($this->db);
 
 				$object_type = $object->table_element;
 				$object_type = preg_replace('/digiriskdolibarr_/', '', $object_type);
 				$object_type = preg_replace('/_signature/', '', $object_type);
 
-				$actioncomm->elementtype        = $object_type.'@digiriskdolibarr';
-				$actioncomm->code               = 'AC_DIGIRISKSIGNATURE_PENDING_SIGNATURE';
-				$actioncomm->type_code          = 'AC_OTH_AUTO';
-				$actioncomm->label              = $langs->trans('DigiriskSignaturePendingSignatureTrigger');
-				$actioncomm->datep              = $now;
-				$actioncomm->fk_element         = $object->fk_object;
-				$actioncomm->socpeopleassigned  = array($object->element_id => $object->element_id);
-				$actioncomm->userownerid        = $user->id;
-				$actioncomm->percentage         = -1;
+				$actioncomm->elementtype       = $object_type . '@digiriskdolibarr';
+				$actioncomm->code              = 'AC_DIGIRISKSIGNATURE_PENDING_SIGNATURE';
+				$actioncomm->type_code         = 'AC_OTH_AUTO';
+				$actioncomm->label             = $langs->trans('DigiriskSignaturePendingSignatureTrigger');
+				$actioncomm->datep             = $now;
+				$actioncomm->fk_element        = $object->fk_object;
+				$actioncomm->socpeopleassigned = array($object->element_id => $object->element_id);
+				$actioncomm->userownerid       = $user->id;
+				$actioncomm->percentage        = -1;
 
 				$actioncomm->create($user);
 				break;
 
 			case 'DIGIRISKSIGNATURE_ABSENT' :
 
-				dol_syslog("Trigger '".$this->name."' for action '$action' launched by ".__FILE__.". id=".$object->id);
-				require_once DOL_DOCUMENT_ROOT.'/comm/action/class/actioncomm.class.php';
-				$now = dol_now();
+				dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id);
+				require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
+				$now        = dol_now();
 				$actioncomm = new ActionComm($this->db);
 
 				$object_type = $object->table_element;
 				$object_type = preg_replace('/digiriskdolibarr_/', '', $object_type);
 				$object_type = preg_replace('/_signature/', '', $object_type);
 
-				$actioncomm->elementtype        = $object_type.'@digiriskdolibarr';
-				$actioncomm->code               = 'AC_DIGIRISKSIGNATURE_ABSENT';
-				$actioncomm->type_code          = 'AC_OTH_AUTO';
-				$actioncomm->label              = $langs->trans('DigiriskSignatureAbsentTrigger');
-				$actioncomm->datep              = $now;
-				$actioncomm->fk_element         = $object->fk_object;
-				$actioncomm->socpeopleassigned  = array($object->element_id => $object->element_id);
-				$actioncomm->userownerid        = $user->id;
-				$actioncomm->percentage         = -1;
+				$actioncomm->elementtype       = $object_type . '@digiriskdolibarr';
+				$actioncomm->code              = 'AC_DIGIRISKSIGNATURE_ABSENT';
+				$actioncomm->type_code         = 'AC_OTH_AUTO';
+				$actioncomm->label             = $langs->trans('DigiriskSignatureAbsentTrigger');
+				$actioncomm->datep             = $now;
+				$actioncomm->fk_element        = $object->fk_object;
+				$actioncomm->socpeopleassigned = array($object->element_id => $object->element_id);
+				$actioncomm->userownerid       = $user->id;
+				$actioncomm->percentage        = -1;
 
 				$actioncomm->create($user);
 				break;
 
 			case 'DIGIRISKSIGNATURE_DELETED' :
 
-				dol_syslog("Trigger '".$this->name."' for action '$action' launched by ".__FILE__.". id=".$object->id);
-				require_once DOL_DOCUMENT_ROOT.'/comm/action/class/actioncomm.class.php';
-				$now = dol_now();
+				dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id);
+				require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
+				$now        = dol_now();
 				$actioncomm = new ActionComm($this->db);
 
 				$object_type = $object->table_element;
 				$object_type = preg_replace('/digiriskdolibarr_/', '', $object_type);
 				$object_type = preg_replace('/_signature/', '', $object_type);
 
-				$actioncomm->elementtype = $object_type.'@digiriskdolibarr';
-				$actioncomm->code        = 'AC_DIGIRISKSIGNATURE_DELETED';
-				$actioncomm->type_code   = 'AC_OTH_AUTO';
-				$actioncomm->label       = $langs->trans('DigiriskSignatureDeletedTrigger');
-				$actioncomm->datep       = $now;
-				$actioncomm->fk_element  = $object->fk_object;
-				$actioncomm->socpeopleassigned  = array($object->element_id => $object->element_id);
-				$actioncomm->userownerid = $user->id;
-				$actioncomm->percentage  = -1;
+				$actioncomm->elementtype       = $object_type . '@digiriskdolibarr';
+				$actioncomm->code              = 'AC_DIGIRISKSIGNATURE_DELETED';
+				$actioncomm->type_code         = 'AC_OTH_AUTO';
+				$actioncomm->label             = $langs->trans('DigiriskSignatureDeletedTrigger');
+				$actioncomm->datep             = $now;
+				$actioncomm->fk_element        = $object->fk_object;
+				$actioncomm->socpeopleassigned = array($object->element_id => $object->element_id);
+				$actioncomm->userownerid       = $user->id;
+				$actioncomm->percentage        = -1;
 
 				$actioncomm->create($user);
 				break;
@@ -795,21 +795,21 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				//envoi du mail avec une trad puis avec un model
 				$error = 0;
 				if ($conf->global->DIGIRISKDOLIBARR_SEND_EMAIL_ON_TICKET_SUBMIT) {
-					if (!$error) {
+					if ( ! $error) {
 						$langs->load('mails');
 
 						$listOfMails = $conf->global->DIGIRISKDOLIBARR_TICKET_SUBMITTED_SEND_MAIL_TO;
-						if (!preg_match('/;/', $listOfMails)) {
+						if ( ! preg_match('/;/', $listOfMails)) {
 							$sendto = $listOfMails;
 
-							if (dol_strlen($sendto) && (!empty($conf->global->MAIN_MAIL_EMAIL_FROM))) {
+							if (dol_strlen($sendto) && ( ! empty($conf->global->MAIN_MAIL_EMAIL_FROM))) {
 								require_once DOL_DOCUMENT_ROOT . '/core/class/CMailFile.class.php';
 
 								$from = $conf->global->MAIN_MAIL_EMAIL_FROM;
 
-								$message = 	 $object->message;
-								$subject = 	$langs->trans('NewTicketSubmitted') . ' : ' . $object->subject . $langs->trans('By') . /* extrafield */ '';
-								$trackid = 'tic'.$object->id;
+								$message = $object->message;
+								$subject = $langs->trans('NewTicketSubmitted') . ' : ' . $object->subject . $langs->trans('By') . /* extrafield */ '';
+								$trackid = 'tic' . $object->id;
 
 								// Create form object
 								// Send mail (substitutionarray must be done just before this)
@@ -818,9 +818,9 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 								if ($mailfile->error) {
 									setEventMessages($mailfile->error, $mailfile->errors, 'errors');
 								} else {
-									if (!empty($conf->global->MAIN_MAIL_SMTPS_ID)) {
+									if ( ! empty($conf->global->MAIN_MAIL_SMTPS_ID)) {
 										$result = $mailfile->sendfile();
-										if (!$result) {
+										if ( ! $result) {
 											$langs->load("other");
 											$mesg = '<div class="error">';
 											if ($mailfile->error) {
@@ -836,7 +836,6 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 										setEventMessages($langs->trans('ErrorSetupEmail'), '', 'errors');
 									}
 								}
-
 							} else {
 								$langs->load("errors");
 								setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv("MailTo")), null, 'warnings');
@@ -844,21 +843,21 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 							}
 						} else {
 							$listOfMails = preg_split('/;/', $listOfMails);
-							if (!empty($listOfMails) && $listOfMails > 0) {
+							if ( ! empty($listOfMails) && $listOfMails > 0) {
 								if (end($listOfMails) == ';') {
 									array_pop($listOfMails);
 								}
 								foreach ($listOfMails as $email) {
 									$sendto = $email;
 
-									if (dol_strlen($sendto) && (!empty($conf->global->MAIN_MAIL_EMAIL_FROM))) {
+									if (dol_strlen($sendto) && ( ! empty($conf->global->MAIN_MAIL_EMAIL_FROM))) {
 										require_once DOL_DOCUMENT_ROOT . '/core/class/CMailFile.class.php';
 
 										$from = $conf->global->MAIN_MAIL_EMAIL_FROM;
 
-										$message = 	 $object->message;
-										$subject = 	$langs->trans('NewTicketSubmitted') . ' : ' . $object->subject . $langs->trans('By') . /* extrafield */ '';
-										$trackid = 'tic'.$object->id;
+										$message = $object->message;
+										$subject = $langs->trans('NewTicketSubmitted') . ' : ' . $object->subject . $langs->trans('By') . /* extrafield */ '';
+										$trackid = 'tic' . $object->id;
 
 										// Create form object
 										// Send mail (substitutionarray must be done just before this)
@@ -867,9 +866,9 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 										if ($mailfile->error) {
 											setEventMessages($mailfile->error, $mailfile->errors, 'errors');
 										} else {
-											if (!empty($conf->global->MAIN_MAIL_SMTPS_ID)) {
+											if ( ! empty($conf->global->MAIN_MAIL_SMTPS_ID)) {
 												$result = $mailfile->sendfile();
-												if (!$result) {
+												if ( ! $result) {
 													$langs->load("other");
 													$mesg = '<div class="error">';
 													if ($mailfile->error) {
@@ -885,7 +884,6 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 												setEventMessages($langs->trans('ErrorSetupEmail'), '', 'errors');
 											}
 										}
-
 									} else {
 										$langs->load("errors");
 										setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv("MailTo")), null, 'warnings');
@@ -895,8 +893,8 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 							} else {
 								// Mail sent KO
 								$error++;
-								if (!empty($error)) setEventMessages(null, $langs->trans('WrongEmailFormat'), 'errors');
-								else  setEventMessages($error, null, 'errors');
+								if ( ! empty($error)) setEventMessages(null, $langs->trans('WrongEmailFormat'), 'errors');
+								else setEventMessages($error, null, 'errors');
 							}
 						}
 					}
@@ -905,17 +903,17 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 
 			case 'OPENINGHOURS_CREATE' :
 
-				dol_syslog("Trigger '".$this->name."' for action '$action' launched by ".__FILE__.". id=".$object->id);
-				require_once DOL_DOCUMENT_ROOT.'/comm/action/class/actioncomm.class.php';
-				$now = dol_now();
+				dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id);
+				require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
+				$now        = dol_now();
 				$actioncomm = new ActionComm($this->db);
 				if ($object->element_type == 'societe') {
 					$actioncomm->socid = $object->element_id;
 				} else {
-					$actioncomm->elementtype = $object->element_type.'@digiriskdolibarr';
+					$actioncomm->elementtype = $object->element_type . '@digiriskdolibarr';
 				}
-				$actioncomm->code        = 'AC_OPENINGHOURS_CREATE';
-				$actioncomm->type_code   = 'AC_OTH_AUTO';
+				$actioncomm->code      = 'AC_OPENINGHOURS_CREATE';
+				$actioncomm->type_code = 'AC_OTH_AUTO';
 				if ($object->element_type == 'preventionplan') {
 					$actioncomm->label = $langs->trans('PreventionPlanOpeningHoursCreateTrigger');
 				} elseif ($object->element_type == 'firepermit') {
@@ -931,10 +929,10 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 
 			case 'RISK_CREATE' :
 
-				dol_syslog("Trigger '".$this->name."' for action '$action' launched by ".__FILE__.". id=".$object->id);
-				require_once DOL_DOCUMENT_ROOT.'/comm/action/class/actioncomm.class.php';
+				dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id);
+				require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
 				require_once __DIR__ . '/../../class/digiriskelement.class.php';
-				$now = dol_now();
+				$now             = dol_now();
 				$actioncomm      = new ActionComm($this->db);
 				$digiriskelement = new DigiriskElement($this->db);
 				$digiriskelement->fetch($object->fk_element);
@@ -953,10 +951,10 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 
 			case 'RISK_MODIFY' :
 
-				dol_syslog("Trigger '".$this->name."' for action '$action' launched by ".__FILE__.". id=".$object->id);
-				require_once DOL_DOCUMENT_ROOT.'/comm/action/class/actioncomm.class.php';
+				dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id);
+				require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
 				require_once __DIR__ . '/../../class/digiriskelement.class.php';
-				$now = dol_now();
+				$now             = dol_now();
 				$actioncomm      = new ActionComm($this->db);
 				$digiriskelement = new DigiriskElement($this->db);
 				$digiriskelement->fetch($object->fk_element);
@@ -975,10 +973,10 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 
 			case 'RISK_DELETE' :
 
-				dol_syslog("Trigger '".$this->name."' for action '$action' launched by ".__FILE__.". id=".$object->id);
-				require_once DOL_DOCUMENT_ROOT.'/comm/action/class/actioncomm.class.php';
+				dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id);
+				require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
 				require_once __DIR__ . '/../../class/digiriskelement.class.php';
-				$now = dol_now();
+				$now             = dol_now();
 				$actioncomm      = new ActionComm($this->db);
 				$digiriskelement = new DigiriskElement($this->db);
 				$digiriskelement->fetch($object->fk_element);
@@ -997,11 +995,11 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 
 			case 'RISKASSESSMENT_CREATE' :
 
-				dol_syslog("Trigger '".$this->name."' for action '$action' launched by ".__FILE__.". id=".$object->id);
-				require_once DOL_DOCUMENT_ROOT.'/comm/action/class/actioncomm.class.php';
+				dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id);
+				require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
 				require_once __DIR__ . '/../../class/riskanalysis/risk.class.php';
 				require_once __DIR__ . '/../../class/digiriskelement.class.php';
-				$now = dol_now();
+				$now             = dol_now();
 				$actioncomm      = new ActionComm($this->db);
 				$risk            = new Risk($this->db);
 				$digiriskelement = new DigiriskElement($this->db);
@@ -1022,11 +1020,11 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 
 			case 'RISKASSESSMENT_MODIFY' :
 
-				dol_syslog("Trigger '".$this->name."' for action '$action' launched by ".__FILE__.". id=".$object->id);
-				require_once DOL_DOCUMENT_ROOT.'/comm/action/class/actioncomm.class.php';
+				dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id);
+				require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
 				require_once __DIR__ . '/../../class/riskanalysis/risk.class.php';
 				require_once __DIR__ . '/../../class/digiriskelement.class.php';
-				$now = dol_now();
+				$now             = dol_now();
 				$actioncomm      = new ActionComm($this->db);
 				$risk            = new Risk($this->db);
 				$digiriskelement = new DigiriskElement($this->db);
@@ -1047,11 +1045,11 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 
 			case 'RISKASSESSMENT_DELETE' :
 
-				dol_syslog("Trigger '".$this->name."' for action '$action' launched by ".__FILE__.". id=".$object->id);
-				require_once DOL_DOCUMENT_ROOT.'/comm/action/class/actioncomm.class.php';
+				dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id);
+				require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
 				require_once __DIR__ . '/../../class/riskanalysis/risk.class.php';
 				require_once __DIR__ . '/../../class/digiriskelement.class.php';
-				$now = dol_now();
+				$now             = dol_now();
 				$actioncomm      = new ActionComm($this->db);
 				$risk            = new Risk($this->db);
 				$digiriskelement = new DigiriskElement($this->db);
@@ -1072,10 +1070,10 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 
 			case 'EVALUATOR_CREATE' :
 
-				dol_syslog("Trigger '".$this->name."' for action '$action' launched by ".__FILE__.". id=".$object->id);
-				require_once DOL_DOCUMENT_ROOT.'/comm/action/class/actioncomm.class.php';
+				dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id);
+				require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
 				require_once __DIR__ . '/../../class/digiriskelement.class.php';
-				$now = dol_now();
+				$now             = dol_now();
 				$actioncomm      = new ActionComm($this->db);
 				$digiriskelement = new DigiriskElement($this->db);
 				$digiriskelement->fetch($object->fk_parent);
@@ -1094,10 +1092,10 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 
 			case 'EVALUATOR_MODIFY' :
 
-				dol_syslog("Trigger '".$this->name."' for action '$action' launched by ".__FILE__.". id=".$object->id);
-				require_once DOL_DOCUMENT_ROOT.'/comm/action/class/actioncomm.class.php';
+				dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id);
+				require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
 				require_once __DIR__ . '/../../class/digiriskelement.class.php';
-				$now = dol_now();
+				$now             = dol_now();
 				$actioncomm      = new ActionComm($this->db);
 				$digiriskelement = new DigiriskElement($this->db);
 				$digiriskelement->fetch($object->fk_parent);
@@ -1116,10 +1114,10 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 
 			case 'EVALUATOR_DELETE' :
 
-				dol_syslog("Trigger '".$this->name."' for action '$action' launched by ".__FILE__.". id=".$object->id);
-				require_once DOL_DOCUMENT_ROOT.'/comm/action/class/actioncomm.class.php';
+				dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id);
+				require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
 				require_once __DIR__ . '/../../class/digiriskelement.class.php';
-				$now = dol_now();
+				$now             = dol_now();
 				$actioncomm      = new ActionComm($this->db);
 				$digiriskelement = new DigiriskElement($this->db);
 				$digiriskelement->fetch($object->fk_parent);
@@ -1138,10 +1136,10 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 
 			case 'RISKSIGN_CREATE' :
 
-				dol_syslog("Trigger '".$this->name."' for action '$action' launched by ".__FILE__.". id=".$object->id);
-				require_once DOL_DOCUMENT_ROOT.'/comm/action/class/actioncomm.class.php';
+				dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id);
+				require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
 				require_once __DIR__ . '/../../class/digiriskelement.class.php';
-				$now = dol_now();
+				$now             = dol_now();
 				$actioncomm      = new ActionComm($this->db);
 				$digiriskelement = new DigiriskElement($this->db);
 				$digiriskelement->fetch($object->fk_element);
@@ -1160,10 +1158,10 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 
 			case 'RISKSIGN_MODIFY' :
 
-				dol_syslog("Trigger '".$this->name."' for action '$action' launched by ".__FILE__.". id=".$object->id);
-				require_once DOL_DOCUMENT_ROOT.'/comm/action/class/actioncomm.class.php';
+				dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id);
+				require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
 				require_once __DIR__ . '/../../class/digiriskelement.class.php';
-				$now = dol_now();
+				$now             = dol_now();
 				$actioncomm      = new ActionComm($this->db);
 				$digiriskelement = new DigiriskElement($this->db);
 				$digiriskelement->fetch($object->fk_element);
@@ -1182,10 +1180,10 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 
 			case 'RISKSIGN_DELETE' :
 
-				dol_syslog("Trigger '".$this->name."' for action '$action' launched by ".__FILE__.". id=".$object->id);
-				require_once DOL_DOCUMENT_ROOT.'/comm/action/class/actioncomm.class.php';
+				dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id);
+				require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
 				require_once __DIR__ . '/../../class/digiriskelement.class.php';
-				$now = dol_now();
+				$now             = dol_now();
 				$actioncomm      = new ActionComm($this->db);
 				$digiriskelement = new DigiriskElement($this->db);
 				$digiriskelement->fetch($object->fk_element);
@@ -1204,11 +1202,11 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 
 			case 'ACCIDENT_MODIFY' :
 
-				dol_syslog("Trigger '".$this->name."' for action '$action' launched by ".__FILE__.". id=".$object->id);
-				require_once DOL_DOCUMENT_ROOT.'/comm/action/class/actioncomm.class.php';
+				dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id);
+				require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
 				require_once __DIR__ . '/../../class/digiriskelement.class.php';
-				$now = dol_now();
-				$actioncomm      = new ActionComm($this->db);
+				$now        = dol_now();
+				$actioncomm = new ActionComm($this->db);
 
 				$actioncomm->elementtype = 'accident@digiriskdolibarr';
 				$actioncomm->code        = 'AC_ACCIDENT_MODIFY';
@@ -1224,10 +1222,10 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 
 			case 'ACCIDENT_DELETE' :
 
-				dol_syslog("Trigger '".$this->name."' for action '$action' launched by ".__FILE__.". id=".$object->id);
-				require_once DOL_DOCUMENT_ROOT.'/comm/action/class/actioncomm.class.php';
+				dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id);
+				require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
 				require_once __DIR__ . '/../../class/digiriskelement.class.php';
-				$now = dol_now();
+				$now             = dol_now();
 				$actioncomm      = new ActionComm($this->db);
 				$digiriskelement = new DigiriskElement($this->db);
 				$digiriskelement->fetch($object->fk_element);
@@ -1246,9 +1244,9 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 
 			case 'ACCIDENTWORKSTOP_CREATE' :
 
-				dol_syslog("Trigger '".$this->name."' for action '$action' launched by ".__FILE__.". id=".$object->id);
-				require_once DOL_DOCUMENT_ROOT.'/comm/action/class/actioncomm.class.php';
-				$now = dol_now();
+				dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id);
+				require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
+				$now        = dol_now();
 				$actioncomm = new ActionComm($this->db);
 
 				$actioncomm->elementtype = 'accident@digiriskdolibarr';
@@ -1265,9 +1263,9 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 
 			case 'ACCIDENTWORKSTOP_MODIFY' :
 
-				dol_syslog("Trigger '".$this->name."' for action '$action' launched by ".__FILE__.". id=".$object->id);
-				require_once DOL_DOCUMENT_ROOT.'/comm/action/class/actioncomm.class.php';
-				$now = dol_now();
+				dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id);
+				require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
+				$now        = dol_now();
 				$actioncomm = new ActionComm($this->db);
 
 				$actioncomm->elementtype = 'accident@digiriskdolibarr';
@@ -1284,9 +1282,9 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 
 			case 'ACCIDENTWORKSTOP_DELETE' :
 
-				dol_syslog("Trigger '".$this->name."' for action '$action' launched by ".__FILE__.". id=".$object->id);
-				require_once DOL_DOCUMENT_ROOT.'/comm/action/class/actioncomm.class.php';
-				$now = dol_now();
+				dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id);
+				require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
+				$now        = dol_now();
 				$actioncomm = new ActionComm($this->db);
 
 				$actioncomm->elementtype = 'accident@digiriskdolibarr';
@@ -1303,9 +1301,9 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 
 			case 'ACCIDENTLESION_CREATE' :
 
-				dol_syslog("Trigger '".$this->name."' for action '$action' launched by ".__FILE__.". id=".$object->id);
-				require_once DOL_DOCUMENT_ROOT.'/comm/action/class/actioncomm.class.php';
-				$now = dol_now();
+				dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id);
+				require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
+				$now        = dol_now();
 				$actioncomm = new ActionComm($this->db);
 
 				$actioncomm->elementtype = 'accident@digiriskdolibarr';
@@ -1322,9 +1320,9 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 
 			case 'ACCIDENTLESION_MODIFY' :
 
-				dol_syslog("Trigger '".$this->name."' for action '$action' launched by ".__FILE__.". id=".$object->id);
-				require_once DOL_DOCUMENT_ROOT.'/comm/action/class/actioncomm.class.php';
-				$now = dol_now();
+				dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id);
+				require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
+				$now        = dol_now();
 				$actioncomm = new ActionComm($this->db);
 
 				$actioncomm->elementtype = 'accident@digiriskdolibarr';
@@ -1341,9 +1339,9 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 
 			case 'ACCIDENTLESION_DELETE' :
 
-				dol_syslog("Trigger '".$this->name."' for action '$action' launched by ".__FILE__.". id=".$object->id);
-				require_once DOL_DOCUMENT_ROOT.'/comm/action/class/actioncomm.class.php';
-				$now = dol_now();
+				dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id);
+				require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
+				$now        = dol_now();
 				$actioncomm = new ActionComm($this->db);
 
 				$actioncomm->elementtype = 'accident@digiriskdolibarr';
@@ -1360,11 +1358,11 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 
 			case 'ACCIDENTMETADATA_CREATE' :
 
-				dol_syslog("Trigger '".$this->name."' for action '$action' launched by ".__FILE__.". id=".$object->id);
-				require_once DOL_DOCUMENT_ROOT.'/comm/action/class/actioncomm.class.php';
+				dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id);
+				require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
 				require_once __DIR__ . '/../../class/digiriskelement.class.php';
-				$now = dol_now();
-				$actioncomm      = new ActionComm($this->db);
+				$now        = dol_now();
+				$actioncomm = new ActionComm($this->db);
 
 				$actioncomm->elementtype = 'accident@digiriskdolibarr';
 				$actioncomm->code        = 'AC_ACCIDENTMETADATA_CREATE';
@@ -1379,7 +1377,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				break;
 
 			default:
-				dol_syslog("Trigger '".$this->name."' for action '$action' launched by ".__FILE__.". id=".$object->id);
+				dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id);
 				break;
 		}
 

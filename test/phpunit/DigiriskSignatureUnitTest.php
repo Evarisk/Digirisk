@@ -59,12 +59,12 @@ class DigiriskSignatureUnitTest extends PHPUnit\Framework\TestCase
 
 		//$this->sharedFixture
 		global $conf, $user, $langs, $db;
-		$this->savconf = $conf;
-		$this->savuser = $user;
+		$this->savconf  = $conf;
+		$this->savuser  = $user;
 		$this->savlangs = $langs;
-		$this->savdb = $db;
+		$this->savdb    = $db;
 
-		print __METHOD__ . " db->type=".$db->type." user->id=".$user->id;
+		print __METHOD__ . " db->type=" . $db->type . " user->id=" . $user->id;
 		print "\n";
 		print __METHOD__ . " ok";
 		print "\n";
@@ -80,12 +80,12 @@ class DigiriskSignatureUnitTest extends PHPUnit\Framework\TestCase
 		global $conf, $db;
 
 		if (empty($conf->digiriskdolibarr->enabled)) {
-			print __METHOD__." module digiriskdolibarr must be enabled.\n"; die(1);
+			print __METHOD__ . " module digiriskdolibarr must be enabled.\n"; die(1);
 		}
 
 		$db->begin(); // This is to have all actions inside a transaction even if test launched without suite.
 
-		print __METHOD__."\n";
+		print __METHOD__ . "\n";
 	}
 
 	/**
@@ -98,7 +98,7 @@ class DigiriskSignatureUnitTest extends PHPUnit\Framework\TestCase
 		global $db;
 		$db->rollback();
 
-		print __METHOD__."\n";
+		print __METHOD__ . "\n";
 	}
 
 	/**
@@ -109,12 +109,12 @@ class DigiriskSignatureUnitTest extends PHPUnit\Framework\TestCase
 	protected function setUp() : void
 	{
 		global $conf, $user, $langs, $db;
-		$conf = $this->savconf;
-		$user = $this->savuser;
+		$conf  = $this->savconf;
+		$user  = $this->savuser;
 		$langs = $this->savlangs;
-		$db = $this->savdb;
+		$db    = $this->savdb;
 
-		print __METHOD__."\n";
+		print __METHOD__ . "\n";
 	}
 
 	/**
@@ -124,7 +124,7 @@ class DigiriskSignatureUnitTest extends PHPUnit\Framework\TestCase
 	 */
 	protected function tearDown() : void
 	{
-		print __METHOD__."\n";
+		print __METHOD__ . "\n";
 	}
 
 	/**
@@ -137,10 +137,10 @@ class DigiriskSignatureUnitTest extends PHPUnit\Framework\TestCase
 	public function testDigiriskSignatureCreate()
 	{
 		global $conf, $user, $langs, $db;
-		$conf = $this->savconf;
-		$user = $this->savuser;
+		$conf  = $this->savconf;
+		$user  = $this->savuser;
 		$langs = $this->savlangs;
-		$db = $this->savdb;
+		$db    = $this->savdb;
 
 		$localobject = new DigiriskSignature($this->savdb);
 
@@ -174,7 +174,7 @@ class DigiriskSignatureUnitTest extends PHPUnit\Framework\TestCase
 
 		$this->assertLessThan($result, 0);
 
-		print __METHOD__." result=".$result."\n";
+		print __METHOD__ . " result=" . $result . "\n";
 		return $result;
 	}
 
@@ -192,10 +192,10 @@ class DigiriskSignatureUnitTest extends PHPUnit\Framework\TestCase
 	public function testDigiriskSignatureFetch($id)
 	{
 		global $conf, $user, $langs, $db;
-		$conf = $this->savconf;
-		$user = $this->savuser;
+		$conf  = $this->savconf;
+		$user  = $this->savuser;
 		$langs = $this->savlangs;
-		$db = $this->savdb;
+		$db    = $this->savdb;
 
 		$localobject = new DigiriskSignature($this->savdb);
 
@@ -203,7 +203,7 @@ class DigiriskSignatureUnitTest extends PHPUnit\Framework\TestCase
 
 		$this->assertLessThan($result, 0);
 
-		print __METHOD__." id=".$id." result=".$result."\n";
+		print __METHOD__ . " id=" . $id . " result=" . $result . "\n";
 		return $localobject;
 	}
 
@@ -223,20 +223,20 @@ class DigiriskSignatureUnitTest extends PHPUnit\Framework\TestCase
 	public function testDigiriskSignatureSetRegistered($localobject) : void
 	{
 		global $conf, $user, $langs, $db;
-		$conf = $this->savconf;
-		$user = $this->savuser;
+		$conf  = $this->savconf;
+		$user  = $this->savuser;
 		$langs = $this->savlangs;
-		$db = $this->savdb;
+		$db    = $this->savdb;
 
 		$result = $localobject->setRegistered($user);
 		$this->assertLessThan($result, 0);
 
-		print __METHOD__." id=".$localobject->id." result=".$result."\n";
+		print __METHOD__ . " id=" . $localobject->id . " result=" . $result . "\n";
 
 		$result = $localobject->getLibStatut(0);
 		$this->assertSame($result, $langs->trans('Registered'));
 
-		print __METHOD__." id=".$localobject->id." result=".$result."\n";
+		print __METHOD__ . " id=" . $localobject->id . " result=" . $result . "\n";
 	}
 
 	/**
@@ -255,20 +255,20 @@ class DigiriskSignatureUnitTest extends PHPUnit\Framework\TestCase
 	public function testDigiriskSignatureSetPending($localobject) : void
 	{
 		global $conf, $user, $langs, $db;
-		$conf = $this->savconf;
-		$user = $this->savuser;
+		$conf  = $this->savconf;
+		$user  = $this->savuser;
 		$langs = $this->savlangs;
-		$db = $this->savdb;
+		$db    = $this->savdb;
 
 		$result = $localobject->setPending($user);
 		$this->assertLessThan($result, 0);
 
-		print __METHOD__." id=".$localobject->id." result=".$result."\n";
+		print __METHOD__ . " id=" . $localobject->id . " result=" . $result . "\n";
 
 		$result = $localobject->getLibStatut(0);
 		$this->assertSame($result, $langs->trans('PendingSignature'));
 
-		print __METHOD__." id=".$localobject->id." result=".$result."\n";
+		print __METHOD__ . " id=" . $localobject->id . " result=" . $result . "\n";
 	}
 
 	/**
@@ -287,20 +287,20 @@ class DigiriskSignatureUnitTest extends PHPUnit\Framework\TestCase
 	public function testDigiriskSignatureSetSigned($localobject) : void
 	{
 		global $conf, $user, $langs, $db;
-		$conf = $this->savconf;
-		$user = $this->savuser;
+		$conf  = $this->savconf;
+		$user  = $this->savuser;
 		$langs = $this->savlangs;
-		$db = $this->savdb;
+		$db    = $this->savdb;
 
 		$result = $localobject->setSigned($user);
 		$this->assertLessThan($result, 0);
 
-		print __METHOD__." id=".$localobject->id." result=".$result."\n";
+		print __METHOD__ . " id=" . $localobject->id . " result=" . $result . "\n";
 
 		$result = $localobject->getLibStatut(0);
 		$this->assertSame($result, $langs->trans('Signed'));
 
-		print __METHOD__." id=".$localobject->id." result=".$result."\n";
+		print __METHOD__ . " id=" . $localobject->id . " result=" . $result . "\n";
 	}
 
 	/**
@@ -319,20 +319,20 @@ class DigiriskSignatureUnitTest extends PHPUnit\Framework\TestCase
 	public function testDigiriskSignatureSetAbsent($localobject) : void
 	{
 		global $conf, $user, $langs, $db;
-		$conf = $this->savconf;
-		$user = $this->savuser;
+		$conf  = $this->savconf;
+		$user  = $this->savuser;
 		$langs = $this->savlangs;
-		$db = $this->savdb;
+		$db    = $this->savdb;
 
 		$result = $localobject->setAbsent($user);
 		$this->assertLessThan($result, 0);
 
-		print __METHOD__." id=".$localobject->id." result=".$result."\n";
+		print __METHOD__ . " id=" . $localobject->id . " result=" . $result . "\n";
 
 		$result = $localobject->getLibStatut(0);
 		$this->assertSame($result, $langs->trans('Absent'));
 
-		print __METHOD__." id=".$localobject->id." result=".$result."\n";
+		print __METHOD__ . " id=" . $localobject->id . " result=" . $result . "\n";
 	}
 
 	/**
@@ -351,20 +351,20 @@ class DigiriskSignatureUnitTest extends PHPUnit\Framework\TestCase
 	public function testDigiriskSignatureSetDeleted($localobject) : void
 	{
 		global $conf, $user, $langs, $db;
-		$conf = $this->savconf;
-		$user = $this->savuser;
+		$conf  = $this->savconf;
+		$user  = $this->savuser;
 		$langs = $this->savlangs;
-		$db = $this->savdb;
+		$db    = $this->savdb;
 
 		$result = $localobject->setDeleted($user);
 		$this->assertLessThan($result, 0);
 
-		print __METHOD__." id=".$localobject->id." result=".$result."\n";
+		print __METHOD__ . " id=" . $localobject->id . " result=" . $result . "\n";
 
 		$result = $localobject->getLibStatut(0);
 		$this->assertSame($result, $langs->trans('Deleted'));
 
-		print __METHOD__." id=".$localobject->id." result=".$result."\n";
+		print __METHOD__ . " id=" . $localobject->id . " result=" . $result . "\n";
 	}
 
 	/**
@@ -381,10 +381,10 @@ class DigiriskSignatureUnitTest extends PHPUnit\Framework\TestCase
 	public function testDigiriskSignatureUpdate($localobject)
 	{
 		global $conf, $user, $langs, $db;
-		$conf = $this->savconf;
-		$user = $this->savuser;
+		$conf  = $this->savconf;
+		$user  = $this->savuser;
 		$langs = $this->savlangs;
-		$db = $this->savdb;
+		$db    = $this->savdb;
 
 		$now                               = dol_now();
 		$localobject->entity               = 1;
@@ -412,12 +412,12 @@ class DigiriskSignatureUnitTest extends PHPUnit\Framework\TestCase
 		$localobject->fk_object            = 1;
 
 		$result = $localobject->update($user);
-		print __METHOD__." id=".$localobject->id." result=".$result."\n";
+		print __METHOD__ . " id=" . $localobject->id . " result=" . $result . "\n";
 		$this->assertLessThan($result, 0);
 
 		$newobject = new DigiriskSignature($this->savdb);
-		$result = $newobject->fetch($localobject->id);
-		print __METHOD__." id=".$localobject->id." result=".$result."\n";
+		$result    = $newobject->fetch($localobject->id);
+		print __METHOD__ . " id=" . $localobject->id . " result=" . $result . "\n";
 		$this->assertLessThan($result, 0);
 
 		$this->assertEquals($localobject->id, $newobject->id);
@@ -465,10 +465,10 @@ class DigiriskSignatureUnitTest extends PHPUnit\Framework\TestCase
 	public function testDigiriskSignatureCheckSignatoriesSignatures($localobject) : void
 	{
 		global $conf, $user, $langs, $db;
-		$conf = $this->savconf;
-		$user = $this->savuser;
+		$conf  = $this->savconf;
+		$user  = $this->savuser;
 		$langs = $this->savlangs;
-		$db = $this->savdb;
+		$db    = $this->savdb;
 
 		$newobject = new DigiriskSignature($this->savdb);
 		$newobject->fetch($localobject->id);
@@ -476,7 +476,7 @@ class DigiriskSignatureUnitTest extends PHPUnit\Framework\TestCase
 		$result = $newobject->checkSignatoriesSignatures($newobject->fk_object, $newobject->object_type);
 		$this->assertLessThan($result, 0);
 
-		print __METHOD__." id=".$localobject->id." result=".$result."\n";
+		print __METHOD__ . " id=" . $localobject->id . " result=" . $result . "\n";
 	}
 
 	/**
@@ -491,10 +491,10 @@ class DigiriskSignatureUnitTest extends PHPUnit\Framework\TestCase
 	public function testDigiriskSignatureSetSignatory() : void
 	{
 		global $conf, $user, $langs, $db;
-		$conf = $this->savconf;
-		$user = $this->savuser;
+		$conf  = $this->savconf;
+		$user  = $this->savuser;
 		$langs = $this->savlangs;
-		$db = $this->savdb;
+		$db    = $this->savdb;
 
 		$localobject = new DigiriskSignature($this->savdb);
 
@@ -508,7 +508,7 @@ class DigiriskSignatureUnitTest extends PHPUnit\Framework\TestCase
 
 		$this->assertLessThan($result, 0);
 
-		print __METHOD__." result=".$result."\n";
+		print __METHOD__ . " result=" . $result . "\n";
 	}
 
 	/**
@@ -523,12 +523,12 @@ class DigiriskSignatureUnitTest extends PHPUnit\Framework\TestCase
 	public function testDigiriskSignatureFetchAll() : void
 	{
 		global $conf, $user, $langs, $db;
-		$conf = $this->savconf;
-		$user = $this->savuser;
+		$conf  = $this->savconf;
+		$user  = $this->savuser;
 		$langs = $this->savlangs;
-		$db = $this->savdb;
+		$db    = $this->savdb;
 
-		$localobject = new DigiriskSignature($this->savdb);
+		$localobject     = new DigiriskSignature($this->savdb);
 		$localobjectList = $localobject->fetchAll();
 
 		$this->assertSame(true, is_array($localobjectList));
@@ -549,12 +549,12 @@ class DigiriskSignatureUnitTest extends PHPUnit\Framework\TestCase
 	public function testDigiriskSignatureFetchSignatory() : void
 	{
 		global $conf, $user, $langs, $db;
-		$conf = $this->savconf;
-		$user = $this->savuser;
+		$conf  = $this->savconf;
+		$user  = $this->savuser;
 		$langs = $this->savlangs;
-		$db = $this->savdb;
+		$db    = $this->savdb;
 
-		$localobject = new DigiriskSignature($this->savdb);
+		$localobject     = new DigiriskSignature($this->savdb);
 		$localobjectList = $localobject->fetchSignatory("UpdatedTestRoleDigiriskSignature", 1, 'preventionplan');
 
 		$this->assertSame(true, is_array($localobjectList));
@@ -575,12 +575,12 @@ class DigiriskSignatureUnitTest extends PHPUnit\Framework\TestCase
 	public function testDigiriskSignatureFetchSignatories() : void
 	{
 		global $conf, $user, $langs, $db;
-		$conf = $this->savconf;
-		$user = $this->savuser;
+		$conf  = $this->savconf;
+		$user  = $this->savuser;
 		$langs = $this->savlangs;
-		$db = $this->savdb;
+		$db    = $this->savdb;
 
-		$localobject = new DigiriskSignature($this->savdb);
+		$localobject     = new DigiriskSignature($this->savdb);
 		$localobjectList = $localobject->fetchSignatories(1, 'preventionplan');
 
 		$this->assertSame(true, is_array($localobjectList));
@@ -601,16 +601,16 @@ class DigiriskSignatureUnitTest extends PHPUnit\Framework\TestCase
 	public function testDigiriskSignatureDeletePreviousSignatories() : void
 	{
 		global $conf, $user, $langs, $db;
-		$conf = $this->savconf;
-		$user = $this->savuser;
+		$conf  = $this->savconf;
+		$user  = $this->savuser;
 		$langs = $this->savlangs;
-		$db = $this->savdb;
+		$db    = $this->savdb;
 
 		$localobject = new DigiriskSignature($this->savdb);
-		$result = $localobject->deletePreviousSignatories("UpdatedTestRoleDigiriskSignature", 1, 'preventionplan');
+		$result      = $localobject->deletePreviousSignatories("UpdatedTestRoleDigiriskSignature", 1, 'preventionplan');
 
 		$this->assertEquals($result, 0);
-		print __METHOD__." id=".$localobject->id." result=".$result."\n";
+		print __METHOD__ . " id=" . $localobject->id . " result=" . $result . "\n";
 	}
 
 
@@ -626,16 +626,16 @@ class DigiriskSignatureUnitTest extends PHPUnit\Framework\TestCase
 	public function testDigiriskSignatureDeleteSignatoriesSignatures() : void
 	{
 		global $conf, $user, $langs, $db;
-		$conf = $this->savconf;
-		$user = $this->savuser;
+		$conf  = $this->savconf;
+		$user  = $this->savuser;
 		$langs = $this->savlangs;
-		$db = $this->savdb;
+		$db    = $this->savdb;
 
 		$localobject = new DigiriskSignature($this->savdb);
-		$result = $localobject->deleteSignatoriesSignatures(1, 'preventionplan');
+		$result      = $localobject->deleteSignatoriesSignatures(1, 'preventionplan');
 
 		$this->assertLessThan($result, 0);
-		print __METHOD__." id=".$localobject->id." result=".$result."\n";
+		print __METHOD__ . " id=" . $localobject->id . " result=" . $result . "\n";
 	}
 
 	/**
@@ -652,19 +652,18 @@ class DigiriskSignatureUnitTest extends PHPUnit\Framework\TestCase
 	public function testDigiriskSignatureDelete($localobject)
 	{
 		global $conf, $user, $langs, $db;
-		$conf = $this->savconf;
-		$user = $this->savuser;
+		$conf  = $this->savconf;
+		$user  = $this->savuser;
 		$langs = $this->savlangs;
-		$db = $this->savdb;
+		$db    = $this->savdb;
 
 		$newobject = new DigiriskSignature($this->savdb);
 		$newobject->fetch($localobject->id);
 
 		$result = $localobject->delete($user);
-		print __METHOD__." id=".$newobject->id." result=".$result."\n";
+		print __METHOD__ . " id=" . $newobject->id . " result=" . $result . "\n";
 		$this->assertLessThan($result, 0);
 
 		return $result;
 	}
 }
-

@@ -59,12 +59,12 @@ class RiskAssessmentUnitTest extends PHPUnit\Framework\TestCase
 
 		//$this->sharedFixture
 		global $conf, $user, $langs, $db;
-		$this->savconf = $conf;
-		$this->savuser = $user;
+		$this->savconf  = $conf;
+		$this->savuser  = $user;
 		$this->savlangs = $langs;
-		$this->savdb = $db;
+		$this->savdb    = $db;
 
-		print __METHOD__ . " db->type=".$db->type." user->id=".$user->id;
+		print __METHOD__ . " db->type=" . $db->type . " user->id=" . $user->id;
 		print "\n";
 		print __METHOD__ . " ok";
 		print "\n";
@@ -80,12 +80,12 @@ class RiskAssessmentUnitTest extends PHPUnit\Framework\TestCase
 		global $conf, $db;
 
 		if (empty($conf->digiriskdolibarr->enabled)) {
-			print __METHOD__." module digiriskdolibarr must be enabled.\n"; die(1);
+			print __METHOD__ . " module digiriskdolibarr must be enabled.\n"; die(1);
 		}
 
 		$db->begin(); // This is to have all actions inside a transaction even if test launched without suite.
 
-		print __METHOD__."\n";
+		print __METHOD__ . "\n";
 	}
 
 	/**
@@ -98,7 +98,7 @@ class RiskAssessmentUnitTest extends PHPUnit\Framework\TestCase
 		global $db;
 		$db->rollback();
 
-		print __METHOD__."\n";
+		print __METHOD__ . "\n";
 	}
 
 	/**
@@ -109,12 +109,12 @@ class RiskAssessmentUnitTest extends PHPUnit\Framework\TestCase
 	protected function setUp() : void
 	{
 		global $conf, $user, $langs, $db;
-		$conf = $this->savconf;
-		$user = $this->savuser;
+		$conf  = $this->savconf;
+		$user  = $this->savuser;
 		$langs = $this->savlangs;
-		$db = $this->savdb;
+		$db    = $this->savdb;
 
-		print __METHOD__."\n";
+		print __METHOD__ . "\n";
 	}
 
 	/**
@@ -124,7 +124,7 @@ class RiskAssessmentUnitTest extends PHPUnit\Framework\TestCase
 	 */
 	protected function tearDown() : void
 	{
-		print __METHOD__."\n";
+		print __METHOD__ . "\n";
 	}
 
 	/**
@@ -137,15 +137,15 @@ class RiskAssessmentUnitTest extends PHPUnit\Framework\TestCase
 	public function testRiskAssessmentCreate()
 	{
 		global $conf, $user, $langs, $db;
-		$conf = $this->savconf;
-		$user = $this->savuser;
+		$conf  = $this->savconf;
+		$user  = $this->savuser;
 		$langs = $this->savlangs;
-		$db = $this->savdb;
+		$db    = $this->savdb;
 
 		$localobject = new RiskAssessment($this->savdb);
 
-		$now                              = dol_now();
-		$localobject->id                  = 0;
+		$now             = dol_now();
+		$localobject->id = 0;
 		//$localobject->ref               = $refRiskAssessmentMod->getNextValue($localobject);
 		$localobject->ref                 = "TestRefRiskAssessment";
 		$localobject->ref_ext             = "TestRefExtRiskAssessment";
@@ -173,7 +173,7 @@ class RiskAssessmentUnitTest extends PHPUnit\Framework\TestCase
 
 		$this->assertLessThan($result, 0);
 
-		print __METHOD__." result=".$result."\n";
+		print __METHOD__ . " result=" . $result . "\n";
 		return $result;
 	}
 
@@ -191,10 +191,10 @@ class RiskAssessmentUnitTest extends PHPUnit\Framework\TestCase
 	public function testRiskAssessmentFetch($id)
 	{
 		global $conf, $user, $langs, $db;
-		$conf = $this->savconf;
-		$user = $this->savuser;
+		$conf  = $this->savconf;
+		$user  = $this->savuser;
 		$langs = $this->savlangs;
-		$db = $this->savdb;
+		$db    = $this->savdb;
 
 		$localobject = new RiskAssessment($this->savdb);
 
@@ -202,7 +202,7 @@ class RiskAssessmentUnitTest extends PHPUnit\Framework\TestCase
 
 		$this->assertLessThan($result, 0);
 
-		print __METHOD__." id=".$id." result=".$result."\n";
+		print __METHOD__ . " id=" . $id . " result=" . $result . "\n";
 		return $localobject;
 	}
 
@@ -220,16 +220,16 @@ class RiskAssessmentUnitTest extends PHPUnit\Framework\TestCase
 	public function testRiskAssessmentFetchFromParent($localobject)
 	{
 		global $conf, $user, $langs, $db;
-		$conf = $this->savconf;
-		$user = $this->savuser;
+		$conf  = $this->savconf;
+		$user  = $this->savuser;
 		$langs = $this->savlangs;
-		$db = $this->savdb;
+		$db    = $this->savdb;
 
 		$result = $localobject->fetchFromParent($localobject->fk_risk);
 
 		$this->assertLessThan($result, 0);
 
-		print __METHOD__." id=".$localobject->id." result=".$result."\n";
+		print __METHOD__ . " id=" . $localobject->id . " result=" . $result . "\n";
 	}
 
 	/**
@@ -246,12 +246,12 @@ class RiskAssessmentUnitTest extends PHPUnit\Framework\TestCase
 	public function testRiskAssessmentUpdate($localobject)
 	{
 		global $conf, $user, $langs, $db;
-		$conf = $this->savconf;
-		$user = $this->savuser;
+		$conf  = $this->savconf;
+		$user  = $this->savuser;
 		$langs = $this->savlangs;
-		$db = $this->savdb;
+		$db    = $this->savdb;
 
-		$now                              = dol_now();
+		$now = dol_now();
 		//$localobject->ref               = $refRiskAssessmentMod->getNextValue($localobject);
 		$localobject->ref                 = "TestRefRiskAssessment";
 		$localobject->ref_ext             = "TestRefExtRiskAssessment";
@@ -276,12 +276,12 @@ class RiskAssessmentUnitTest extends PHPUnit\Framework\TestCase
 		$localobject->fk_risk             = 1;
 
 		$result = $localobject->update($user);
-		print __METHOD__." id=".$localobject->id." result=".$result."\n";
+		print __METHOD__ . " id=" . $localobject->id . " result=" . $result . "\n";
 		$this->assertLessThan($result, 0);
 
 		$newobject = new RiskAssessment($this->savdb);
-		$result = $newobject->fetch($localobject->id);
-		print __METHOD__." id=".$localobject->id." result=".$result."\n";
+		$result    = $newobject->fetch($localobject->id);
+		print __METHOD__ . " id=" . $localobject->id . " result=" . $result . "\n";
 		$this->assertLessThan($result, 0);
 
 		$this->assertEquals($localobject->id, $newobject->id);
@@ -323,16 +323,16 @@ class RiskAssessmentUnitTest extends PHPUnit\Framework\TestCase
 	public function testRiskAssessmentUpdateEvaluationStatus($localobject) : void
 	{
 		global $conf, $user, $langs, $db;
-		$conf = $this->savconf;
-		$user = $this->savuser;
+		$conf  = $this->savconf;
+		$user  = $this->savuser;
 		$langs = $this->savlangs;
-		$db = $this->savdb;
+		$db    = $this->savdb;
 
 		$result = $localobject->updateEvaluationStatus($user, $localobject->fk_risk);
 
 		$this->assertLessThan($result, 0);
 
-		print __METHOD__." id=".$localobject->id." result=".$result."\n";
+		print __METHOD__ . " id=" . $localobject->id . " result=" . $result . "\n";
 	}
 
 	/**
@@ -349,16 +349,16 @@ class RiskAssessmentUnitTest extends PHPUnit\Framework\TestCase
 	public function testRiskAssessmentGetEvaluationScale($localobject) : void
 	{
 		global $conf, $user, $langs, $db;
-		$conf = $this->savconf;
-		$user = $this->savuser;
+		$conf  = $this->savconf;
+		$user  = $this->savuser;
 		$langs = $this->savlangs;
-		$db = $this->savdb;
+		$db    = $this->savdb;
 
 		$result = $localobject->get_evaluation_scale();
 
 		$this->assertSame(true, is_int($result));
 
-		print __METHOD__." id=".$localobject->id." result=".$result."\n";
+		print __METHOD__ . " id=" . $localobject->id . " result=" . $result . "\n";
 	}
 
 	/**
@@ -373,12 +373,12 @@ class RiskAssessmentUnitTest extends PHPUnit\Framework\TestCase
 	public function testRiskAssessmentFetchAll() : void
 	{
 		global $conf, $user, $langs, $db;
-		$conf = $this->savconf;
-		$user = $this->savuser;
+		$conf  = $this->savconf;
+		$user  = $this->savuser;
 		$langs = $this->savlangs;
-		$db = $this->savdb;
+		$db    = $this->savdb;
 
-		$localobject = new RiskAssessment($this->savdb);
+		$localobject     = new RiskAssessment($this->savdb);
 		$localobjectList = $localobject->fetchAll();
 
 		$this->assertSame(true, is_array($localobjectList));
@@ -401,19 +401,18 @@ class RiskAssessmentUnitTest extends PHPUnit\Framework\TestCase
 	public function testRiskAssessmentDelete($localobject)
 	{
 		global $conf, $user, $langs, $db;
-		$conf = $this->savconf;
-		$user = $this->savuser;
+		$conf  = $this->savconf;
+		$user  = $this->savuser;
 		$langs = $this->savlangs;
-		$db = $this->savdb;
+		$db    = $this->savdb;
 
 		$newobject = new RiskAssessment($this->savdb);
 		$newobject->fetch($localobject->id);
 
 		$result = $localobject->delete($user);
-		print __METHOD__." id=".$newobject->id." result=".$result."\n";
+		print __METHOD__ . " id=" . $newobject->id . " result=" . $result . "\n";
 		$this->assertLessThan($result, 0);
 
 		return $result;
 	}
 }
-

@@ -24,12 +24,11 @@
  */
 
 // Protection to avoid direct call of template
-if (empty($conf) || !is_object($conf))
-{
+if (empty($conf) || ! is_object($conf)) {
 	print "Error, template page can't be called as URL";
 	exit;
 }
-if (!is_object($form)) $form = new Form($db);
+if ( ! is_object($form)) $form = new Form($db);
 
 ?>
 	<!-- BEGIN PHP TEMPLATE digiriskdolibarr_informationssharingfields_view.tpl -->
@@ -67,7 +66,7 @@ $informationssharing = json_decode($informationssharing->InformationssharingFill
 
 //Date
 print '<tr>';
-print '<td class="titlefield">'.$form->textwithpicto($langs->trans("ElectionDateCSE"), $langs->trans('HowToSetDataInformationsSharing')).'</td>';
+print '<td class="titlefield">' . $form->textwithpicto($langs->trans("ElectionDateCSE"), $langs->trans('HowToSetDataInformationsSharing')) . '</td>';
 print '<td>';
 
 print $informationssharing->membres_du_comite_entreprise_date;
@@ -77,7 +76,7 @@ print '</td></tr>';
 
 //Titulars
 print '<tr>';
-print '<td class="titlefield">'.$form->textwithpicto($langs->trans("Titulars"), $langs->trans('HowToSetDataInformationsSharing')).'</td>';
+print '<td class="titlefield">' . $form->textwithpicto($langs->trans("Titulars"), $langs->trans('HowToSetDataInformationsSharing')) . '</td>';
 print '<td>';
 
 print $informationssharing->membres_du_comite_entreprise_titulaires;
@@ -87,7 +86,7 @@ print '</td></tr>';
 
 //Alternates
 print '<tr>';
-print '<td class="titlefield">'.$form->textwithpicto($langs->trans("Alternates"), $langs->trans('HowToSetDataInformationsSharing')).'</td>';
+print '<td class="titlefield">' . $form->textwithpicto($langs->trans("Alternates"), $langs->trans('HowToSetDataInformationsSharing')) . '</td>';
 print '<td>';
 
 print $informationssharing->membres_du_comite_entreprise_suppleants;
@@ -99,7 +98,7 @@ print '</td></tr>';
 
 //Date
 print '<tr>';
-print '<td class="titlefield">'.$form->textwithpicto($langs->trans("ElectionDateDP"), $langs->trans('HowToSetDataInformationsSharing')).'</td>';
+print '<td class="titlefield">' . $form->textwithpicto($langs->trans("ElectionDateDP"), $langs->trans('HowToSetDataInformationsSharing')) . '</td>';
 print '<td>';
 
 print $informationssharing->delegues_du_personnels_date;
@@ -109,7 +108,7 @@ print '</td></tr>';
 
 //Titulars
 print '<tr>';
-print '<td class="titlefield">'.$form->textwithpicto($langs->trans("Titulars"), $langs->trans('HowToSetDataInformationsSharing')).'</td>';
+print '<td class="titlefield">' . $form->textwithpicto($langs->trans("Titulars"), $langs->trans('HowToSetDataInformationsSharing')) . '</td>';
 print '<td>';
 
 print $informationssharing->delegues_du_personnels_titulaires;
@@ -119,7 +118,7 @@ print '</td></tr>';
 
 //Alternates
 print '<tr>';
-print '<td class="titlefield">'.$form->textwithpicto($langs->trans("Alternates"), $langs->trans('HowToSetDataInformationsSharing')).'</td>';
+print '<td class="titlefield">' . $form->textwithpicto($langs->trans("Alternates"), $langs->trans('HowToSetDataInformationsSharing')) . '</td>';
 print '<td>';
 
 print $informationssharing->delegues_du_personnels_suppleants;

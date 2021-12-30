@@ -60,12 +60,12 @@ class DigiriskElementUnitTest extends PHPUnit\Framework\TestCase
 
 		//$this->sharedFixture
 		global $conf, $user, $langs, $db;
-		$this->savconf = $conf;
-		$this->savuser = $user;
+		$this->savconf  = $conf;
+		$this->savuser  = $user;
 		$this->savlangs = $langs;
-		$this->savdb = $db;
+		$this->savdb    = $db;
 
-		print __METHOD__ . " db->type=".$db->type." user->id=".$user->id;
+		print __METHOD__ . " db->type=" . $db->type . " user->id=" . $user->id;
 		print "\n";
 		print __METHOD__ . " ok";
 		print "\n";
@@ -81,12 +81,12 @@ class DigiriskElementUnitTest extends PHPUnit\Framework\TestCase
 		global $conf, $db;
 
 		if (empty($conf->digiriskdolibarr->enabled)) {
-			print __METHOD__." module digiriskdolibarr must be enabled.\n"; die(1);
+			print __METHOD__ . " module digiriskdolibarr must be enabled.\n"; die(1);
 		}
 
 		$db->begin(); // This is to have all actions inside a transaction even if test launched without suite.
 
-		print __METHOD__."\n";
+		print __METHOD__ . "\n";
 	}
 
 	/**
@@ -99,7 +99,7 @@ class DigiriskElementUnitTest extends PHPUnit\Framework\TestCase
 		global $db;
 		$db->rollback();
 
-		print __METHOD__."\n";
+		print __METHOD__ . "\n";
 	}
 
 	/**
@@ -110,12 +110,12 @@ class DigiriskElementUnitTest extends PHPUnit\Framework\TestCase
 	protected function setUp() : void
 	{
 		global $conf, $user, $langs, $db;
-		$conf = $this->savconf;
-		$user = $this->savuser;
+		$conf  = $this->savconf;
+		$user  = $this->savuser;
 		$langs = $this->savlangs;
-		$db = $this->savdb;
+		$db    = $this->savdb;
 
-		print __METHOD__."\n";
+		print __METHOD__ . "\n";
 	}
 
 	/**
@@ -125,7 +125,7 @@ class DigiriskElementUnitTest extends PHPUnit\Framework\TestCase
 	 */
 	protected function tearDown() : void
 	{
-		print __METHOD__."\n";
+		print __METHOD__ . "\n";
 	}
 
 	/**
@@ -138,15 +138,15 @@ class DigiriskElementUnitTest extends PHPUnit\Framework\TestCase
 	public function testDigiriskElementCreate()
 	{
 		global $conf, $user, $langs, $db;
-		$conf = $this->savconf;
-		$user = $this->savuser;
+		$conf  = $this->savconf;
+		$user  = $this->savuser;
 		$langs = $this->savlangs;
-		$db = $this->savdb;
+		$db    = $this->savdb;
 
 		$localobject = new DigiriskElement($this->savdb);
 
-		$now                        = dol_now();
-		$localobject->id            = 0;
+		$now             = dol_now();
+		$localobject->id = 0;
 		//$localobject->ref         = $refPreventionPlanMod->getNextValue($localobject);
 		$localobject->ref           = "TestRefPreventionPlan";
 		$localobject->ref_ext       = "TestRefExtPreventionPlan";
@@ -169,7 +169,7 @@ class DigiriskElementUnitTest extends PHPUnit\Framework\TestCase
 
 		$this->assertLessThan($result, 0);
 
-		print __METHOD__." result=".$result."\n";
+		print __METHOD__ . " result=" . $result . "\n";
 		return $result;
 	}
 
@@ -187,10 +187,10 @@ class DigiriskElementUnitTest extends PHPUnit\Framework\TestCase
 	public function testDigiriskElementFetch($id)
 	{
 		global $conf, $user, $langs, $db;
-		$conf = $this->savconf;
-		$user = $this->savuser;
+		$conf  = $this->savconf;
+		$user  = $this->savuser;
 		$langs = $this->savlangs;
-		$db = $this->savdb;
+		$db    = $this->savdb;
 
 		$localobject = new DigiriskElement($this->savdb);
 
@@ -198,7 +198,7 @@ class DigiriskElementUnitTest extends PHPUnit\Framework\TestCase
 
 		$this->assertLessThan($result, 0);
 
-		print __METHOD__." id=".$id." result=".$result."\n";
+		print __METHOD__ . " id=" . $id . " result=" . $result . "\n";
 		return $localobject;
 	}
 
@@ -216,15 +216,15 @@ class DigiriskElementUnitTest extends PHPUnit\Framework\TestCase
 	public function testDigiriskElementInfo($localobject) : void
 	{
 		global $conf, $user, $langs, $db;
-		$conf = $this->savconf;
-		$user = $this->savuser;
+		$conf  = $this->savconf;
+		$user  = $this->savuser;
 		$langs = $this->savlangs;
-		$db = $this->savdb;
+		$db    = $this->savdb;
 
 		$result = $localobject->info($localobject->id);
 		$this->assertNull($result);
 
-		print __METHOD__." id=".$localobject->id."\n";
+		print __METHOD__ . " id=" . $localobject->id . "\n";
 	}
 
 	/**
@@ -241,12 +241,12 @@ class DigiriskElementUnitTest extends PHPUnit\Framework\TestCase
 	public function testDigiriskElementUpdate($localobject)
 	{
 		global $conf, $user, $langs, $db;
-		$conf = $this->savconf;
-		$user = $this->savuser;
+		$conf  = $this->savconf;
+		$user  = $this->savuser;
 		$langs = $this->savlangs;
-		$db = $this->savdb;
+		$db    = $this->savdb;
 
-		$now                        = dol_now();
+		$now = dol_now();
 		//$localobject->ref         = $refPreventionPlanMod->getNextValue($localobject);
 		$localobject->ref           = "UpdatedTestRefPreventionPlan";
 		$localobject->ref_ext       = "UpdatedTestRefExtPreventionPlan";
@@ -266,12 +266,12 @@ class DigiriskElementUnitTest extends PHPUnit\Framework\TestCase
 		$localobject->fk_standard   = $conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD;
 
 		$result = $localobject->update($user);
-		print __METHOD__." id=".$localobject->id." result=".$result."\n";
+		print __METHOD__ . " id=" . $localobject->id . " result=" . $result . "\n";
 		$this->assertLessThan($result, 0);
 
 		$newobject = new DigiriskElement($this->savdb);
-		$result = $newobject->fetch($localobject->id);
-		print __METHOD__." id=".$localobject->id." result=".$result."\n";
+		$result    = $newobject->fetch($localobject->id);
+		print __METHOD__ . " id=" . $localobject->id . " result=" . $result . "\n";
 		$this->assertLessThan($result, 0);
 
 		$this->assertEquals($localobject->id, $newobject->id);
@@ -307,12 +307,12 @@ class DigiriskElementUnitTest extends PHPUnit\Framework\TestCase
 	public function testDigiriskElementFetchAll()
 	{
 		global $conf, $user, $langs, $db;
-		$conf = $this->savconf;
-		$user = $this->savuser;
+		$conf  = $this->savconf;
+		$user  = $this->savuser;
 		$langs = $this->savlangs;
-		$db = $this->savdb;
+		$db    = $this->savdb;
 
-		$localobject = new DigiriskElement($this->savdb);
+		$localobject     = new DigiriskElement($this->savdb);
 		$localobjectList = $localobject->fetchAll();
 
 		$this->assertSame(true, is_array($localobjectList));
@@ -332,12 +332,12 @@ class DigiriskElementUnitTest extends PHPUnit\Framework\TestCase
 	public function testDigiriskElementFetchDigiriskElementFlat()
 	{
 		global $conf, $user, $langs, $db;
-		$conf = $this->savconf;
-		$user = $this->savuser;
+		$conf  = $this->savconf;
+		$user  = $this->savuser;
 		$langs = $this->savlangs;
-		$db = $this->savdb;
+		$db    = $this->savdb;
 
-		$localobject = new DigiriskElement($this->savdb);
+		$localobject         = new DigiriskElement($this->savdb);
 		$localobjectFlatList = $localobject->fetchDigiriskElementFlat(0);
 
 		$this->assertSame(true, is_array($localobjectFlatList));
@@ -361,19 +361,18 @@ class DigiriskElementUnitTest extends PHPUnit\Framework\TestCase
 	public function testDigiriskElementDelete($localobject)
 	{
 		global $conf, $user, $langs, $db;
-		$conf = $this->savconf;
-		$user = $this->savuser;
+		$conf  = $this->savconf;
+		$user  = $this->savuser;
 		$langs = $this->savlangs;
-		$db = $this->savdb;
+		$db    = $this->savdb;
 
 		$newobject = new DigiriskElement($this->savdb);
 		$newobject->fetch($localobject->id);
 
 		$result = $localobject->delete($user);
-		print __METHOD__." id=".$newobject->id." result=".$result."\n";
+		print __METHOD__ . " id=" . $newobject->id . " result=" . $result . "\n";
 		$this->assertLessThan($result, 0);
 
 		return $result;
 	}
 }
-

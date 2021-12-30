@@ -236,11 +236,11 @@
 			<property name="ignoreNewlines" value="true"/>
 		</properties>
 	</rule>
-	<rule ref="Generic.Functions.OpeningFunctionBraceKernighanRitchie">
-		<properties>
-			<property name="checkClosures" value="true"/>
-		</properties>
-	</rule>
+<!--	<rule ref="Generic.Functions.OpeningFunctionBraceKernighanRitchie">-->
+<!--		<properties>-->
+<!--			<property name="checkClosures" value="true"/>-->
+<!--		</properties>-->
+<!--	</rule>-->
 	<rule ref="WordPress.WhiteSpace.OperatorSpacing"/>
 
 	<rule ref="Squiz.WhiteSpace.ControlStructureSpacing.SpacingAfterOpen" />

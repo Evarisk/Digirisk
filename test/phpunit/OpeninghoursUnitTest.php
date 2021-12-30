@@ -59,12 +59,12 @@ class OpeninghoursUnitTest extends PHPUnit\Framework\TestCase
 
 		//$this->sharedFixture
 		global $conf, $user, $langs, $db;
-		$this->savconf = $conf;
-		$this->savuser = $user;
+		$this->savconf  = $conf;
+		$this->savuser  = $user;
 		$this->savlangs = $langs;
-		$this->savdb = $db;
+		$this->savdb    = $db;
 
-		print __METHOD__ . " db->type=".$db->type." user->id=".$user->id;
+		print __METHOD__ . " db->type=" . $db->type . " user->id=" . $user->id;
 		print "\n";
 		print __METHOD__ . " ok";
 		print "\n";
@@ -80,12 +80,12 @@ class OpeninghoursUnitTest extends PHPUnit\Framework\TestCase
 		global $conf, $db;
 
 		if (empty($conf->digiriskdolibarr->enabled)) {
-			print __METHOD__." module digiriskdolibarr must be enabled.\n"; die(1);
+			print __METHOD__ . " module digiriskdolibarr must be enabled.\n"; die(1);
 		}
 
 		$db->begin(); // This is to have all actions inside a transaction even if test launched without suite.
 
-		print __METHOD__."\n";
+		print __METHOD__ . "\n";
 	}
 
 	/**
@@ -98,7 +98,7 @@ class OpeninghoursUnitTest extends PHPUnit\Framework\TestCase
 		global $db;
 		$db->rollback();
 
-		print __METHOD__."\n";
+		print __METHOD__ . "\n";
 	}
 
 	/**
@@ -109,12 +109,12 @@ class OpeninghoursUnitTest extends PHPUnit\Framework\TestCase
 	protected function setUp() : void
 	{
 		global $conf, $user, $langs, $db;
-		$conf = $this->savconf;
-		$user = $this->savuser;
+		$conf  = $this->savconf;
+		$user  = $this->savuser;
 		$langs = $this->savlangs;
-		$db = $this->savdb;
+		$db    = $this->savdb;
 
-		print __METHOD__."\n";
+		print __METHOD__ . "\n";
 	}
 
 	/**
@@ -124,7 +124,7 @@ class OpeninghoursUnitTest extends PHPUnit\Framework\TestCase
 	 */
 	protected function tearDown() : void
 	{
-		print __METHOD__."\n";
+		print __METHOD__ . "\n";
 	}
 
 	/**
@@ -139,10 +139,10 @@ class OpeninghoursUnitTest extends PHPUnit\Framework\TestCase
 	public function testOpeninghoursCreate()
 	{
 		global $conf, $user, $langs, $db;
-		$conf = $this->savconf;
-		$user = $this->savuser;
+		$conf  = $this->savconf;
+		$user  = $this->savuser;
 		$langs = $this->savlangs;
-		$db = $this->savdb;
+		$db    = $this->savdb;
 
 		$localobject = new Openinghours($this->savdb);
 
@@ -167,7 +167,7 @@ class OpeninghoursUnitTest extends PHPUnit\Framework\TestCase
 
 		$this->assertLessThan($result, 0);
 
-		print __METHOD__." result=".$result."\n";
+		print __METHOD__ . " result=" . $result . "\n";
 		return $result;
 	}
 
@@ -185,10 +185,10 @@ class OpeninghoursUnitTest extends PHPUnit\Framework\TestCase
 	public function testOpeninghoursFetch($id)
 	{
 		global $conf, $user, $langs, $db;
-		$conf = $this->savconf;
-		$user = $this->savuser;
+		$conf  = $this->savconf;
+		$user  = $this->savuser;
 		$langs = $this->savlangs;
-		$db = $this->savdb;
+		$db    = $this->savdb;
 
 		$localobject = new Openinghours($this->savdb);
 
@@ -196,8 +196,7 @@ class OpeninghoursUnitTest extends PHPUnit\Framework\TestCase
 
 		$this->assertLessThan($result, 0);
 
-		print __METHOD__." id=".$id." result=".$result."\n";
+		print __METHOD__ . " id=" . $id . " result=" . $result . "\n";
 		return $localobject;
 	}
 }
-

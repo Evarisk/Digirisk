@@ -26,11 +26,10 @@
 			</div>
 			<?php
 			// To attach new file
-			if ((!empty($conf->use_javascript_ajax) && empty($conf->global->MAIN_ECM_DISABLE_JS)) || !empty($section))
-			{
-				$sectiondir = GETPOST('file', 'alpha') ?GETPOST('file', 'alpha') : GETPOST('section_dir', 'alpha');
-				print '<!-- Start form to attach new file in digiriskdolibarr_photo_view.tpl.tpl.php sectionid='.$section.' sectiondir='.$sectiondir.' -->'."\n";
-				include_once DOL_DOCUMENT_ROOT.'/core/class/html.formfile.class.php';
+			if (( ! empty($conf->use_javascript_ajax) && empty($conf->global->MAIN_ECM_DISABLE_JS)) || ! empty($section)) {
+				$sectiondir = GETPOST('file', 'alpha') ? GETPOST('file', 'alpha') : GETPOST('section_dir', 'alpha');
+				print '<!-- Start form to attach new file in digiriskdolibarr_photo_view.tpl.tpl.php sectionid=' . $section . ' sectiondir=' . $sectiondir . ' -->' . "\n";
+				include_once DOL_DOCUMENT_ROOT . '/core/class/html.formfile.class.php';
 				$formfile = new FormFile($db);
 				$formfile->form_attach_new_file($_SERVER["PHP_SELF"], 'none', 0, 0, 1, 48, null, '', 0, '', 0, $nameforformuserfile, '', $sectiondir, 1);
 			} else print '&nbsp;';

@@ -13,22 +13,22 @@ var paths = {
 };
 
 /** Core */
-gulp.task( 'scss_core', function() {
-	return gulp.src( paths.scss_core[0] )
-		.pipe( sass( { 'outputStyle': 'expanded' } ).on( 'error', sass.logError ) )
+gulp.task( 'scss_core', function () {
+	return gulp.src(paths.scss_core[0])
+		.pipe(sass({ 'outputStyle': 'expanded' }).on('error', sass.logError))
 		.pipe( autoprefixer({
 			browsers: ['last 2 versions'],
 			cascade: false
 		}) )
-		.pipe( rename( './digiriskdolibarr.css' ) )
-		.pipe( gulp.dest( paths.scss_core[1] ) )
-		.pipe( sass({outputStyle: 'compressed'}).on( 'error', sass.logError ) )
-		.pipe( rename( './digiriskdolibarr.min.css' ) )
-		.pipe( gulp.dest( paths.scss_core[1] ) );
+		.pipe(rename('./digiriskdolibarr.css'))
+		.pipe(gulp.dest(paths.scss_core[1]))
+		.pipe(sass({outputStyle: 'compressed'}).on('error', sass.logError))
+		.pipe(rename('./digiriskdolibarr.min.css'))
+		.pipe(gulp.dest(paths.scss_core[1]));
 });
 
 
 /** Watch */
-gulp.task( 'default', function() {
-	gulp.watch( paths.scss_core[0], gulp.series('scss_core') );
+gulp.task( 'default', function () {
+	gulp.watch(paths.scss_core[0], gulp.series('scss_core'));
 });

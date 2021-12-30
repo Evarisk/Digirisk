@@ -1,12 +1,12 @@
 <?php
-$lastEvaluation = $evaluation->fetchFromParent($risk->id, 1);
-$lastEvaluationCount = count( $evaluation->fetchFromParent($risk->id) );
-if (!empty ($lastEvaluation) && $lastEvaluation > 0) {
+$lastEvaluation      = $evaluation->fetchFromParent($risk->id, 1);
+$lastEvaluationCount = count($evaluation->fetchFromParent($risk->id));
+if ( ! empty($lastEvaluation) && $lastEvaluation > 0) {
 	$lastEvaluation = array_shift($lastEvaluation);
-	$cotationList = $evaluation->fetchFromParent($risk->id, 0, 'DESC'); ?>
+	$cotationList   = $evaluation->fetchFromParent($risk->id, 0, 'DESC'); ?>
 
 	<div class="table-cell-header">
-		<div class="table-cell-header-label"><strong><?php echo $langs->trans('ListingHeaderCotation'); ?> (<?php echo count( $cotationList ); ?>)</strong></div>
+		<div class="table-cell-header-label"><strong><?php echo $langs->trans('ListingHeaderCotation'); ?> (<?php echo count($cotationList); ?>)</strong></div>
 		<div class="table-cell-header-actions">
 			<?php if ($permissiontoread) : ?>
 				<div class="risk-evaluation-list risk-evaluation-button wpeo-button button-square-40 button-grey wpeo-tooltip-event modal-open" aria-label="<?php echo $langs->trans('RiskAssessmentList') ?>" value="<?php echo $risk->id ?>">
@@ -37,13 +37,13 @@ if (!empty ($lastEvaluation) && $lastEvaluation > 0) {
 				<div class="risk-evaluation-cotation risk-evaluation-list modal-open" value="<?php echo $risk->id ?>" data-scale="<?php echo $lastEvaluation->get_evaluation_scale() ?>">
 					<span><?php echo $lastEvaluation->cotation ?: 0; ?></span>
 				</div>
-				<div class="risk-evaluation-photo risk-evaluation-photo-<?php echo $lastEvaluation->id > 0 ?  $lastEvaluation->id :  0 ; echo $risk->id > 0 ? ' risk-'.$risk->id : ' risk-new' ?> open-medias-linked" value="<?php echo $lastEvaluation->id ?>">
-					<?php $filearray = dol_dir_list($conf->digiriskdolibarr->multidir_output[$conf->entity].'/'.$lastEvaluation->element.'/'.$lastEvaluation->ref, "files", 0, '', '(\.odt|_preview.*\.png)$', 'position_name', 'asc', 1);
+				<div class="risk-evaluation-photo risk-evaluation-photo-<?php echo $lastEvaluation->id > 0 ? $lastEvaluation->id : 0 ; echo $risk->id > 0 ? ' risk-' . $risk->id : ' risk-new' ?> open-medias-linked" value="<?php echo $lastEvaluation->id ?>">
+					<?php $filearray = dol_dir_list($conf->digiriskdolibarr->multidir_output[$conf->entity] . '/' . $lastEvaluation->element . '/' . $lastEvaluation->ref, "files", 0, '', '(\.odt|_preview.*\.png)$', 'position_name', 'asc', 1);
 					if (count($filearray)) {
-						print '<span class="floatleft inline-block valignmiddle divphotoref">'.digirisk_show_photos('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity].'/'.$lastEvaluation->element, 'small', 1, 0, 0, 0, 40, 0, 0, 0, 0, $lastEvaluation->element, $lastEvaluation).'</span>';
+						print '<span class="floatleft inline-block valignmiddle divphotoref">' . digirisk_show_photos('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/' . $lastEvaluation->element, 'small', 1, 0, 0, 0, 40, 0, 0, 0, 0, $lastEvaluation->element, $lastEvaluation) . '</span>';
 					} else {
 						$nophoto = '/public/theme/common/nophoto.png'; ?>
-						<span class="floatleft inline-block valignmiddle divphotoref"><img class="photodigiriskdolibarr" alt="No photo" src="<?php echo DOL_URL_ROOT.$nophoto ?>"></span>
+						<span class="floatleft inline-block valignmiddle divphotoref"><img class="photodigiriskdolibarr" alt="No photo" src="<?php echo DOL_URL_ROOT . $nophoto ?>"></span>
 					<?php } ?>
 				</div>
 				<div class="risk-evaluation-content">
@@ -51,13 +51,13 @@ if (!empty ($lastEvaluation) && $lastEvaluation > 0) {
 						<!-- BUTTON MODAL RISK EVALUATION LIST  -->
 						<span class="risk-evaluation-reference" value="<?php echo $risk->id ?>"><?php echo $lastEvaluation->ref; ?></span>
 						<span class="risk-evaluation-date">
-							<i class="fas fa-calendar-alt"></i> <?php echo date('d/m/Y', (($conf->global->DIGIRISKDOLIBARR_SHOW_RISKASSESSMENT_DATE && (!empty($lastEvaluation->date_riskassessment))) ? $lastEvaluation->date_riskassessment : $lastEvaluation->date_creation)); ?>
+							<i class="fas fa-calendar-alt"></i> <?php echo date('d/m/Y', (($conf->global->DIGIRISKDOLIBARR_SHOW_RISKASSESSMENT_DATE && ( ! empty($lastEvaluation->date_riskassessment))) ? $lastEvaluation->date_riskassessment : $lastEvaluation->date_creation)); ?>
 						</span>
 					</div>
 					<div class="risk-evaluation-comment">
 						<span class="risk-evaluation-author">
 							<?php $user->fetch($lastEvaluation->fk_user_creat); ?>
-							<?php echo getNomUrl( 0, '', 0, 0, 2 , 0,'','',-1, $user); ?>
+							<?php echo getNomUrl(0, '', 0, 0, 2, 0, '', '', -1, $user); ?>
 						</span>
 						<?php echo dol_trunc($lastEvaluation->comment, 120); ?>
 					</div>
@@ -96,7 +96,7 @@ if (!empty ($lastEvaluation) && $lastEvaluation > 0) {
 								<div class="medias"><i class="fas fa-picture-o"></i><?php echo $langs->trans('Medias'); ?></div>
 								<?php
 								$relativepath = 'digiriskdolibarr/medias/thumbs';
-								print digirisk_show_medias_linked('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessment/' , 'small', '', 0, 0, 0, 150, 150, 1, 0, 0, $lastEvaluation->element, $lastEvaluation);
+								print digirisk_show_medias_linked('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessment/', 'small', '', 0, 0, 0, 150, 150, 1, 0, 0, $lastEvaluation->element, $lastEvaluation);
 								?>
 							</div>
 						</div>
@@ -112,7 +112,7 @@ if (!empty ($lastEvaluation) && $lastEvaluation > 0) {
 		</div>
 		<!-- RISK ASSESSMENT MEDIAS MODAL END-->
 
-		<?php if (!empty($cotationList)) :
+		<?php if ( ! empty($cotationList)) :
 			foreach ($cotationList as $cotation) : ?>
 				<!-- RISK EVALUATION EDIT MODAL START-->
 				<div class="risk-evaluation-edit-modal" value="<?php echo $cotation->id ?>">
@@ -178,13 +178,13 @@ if (!empty ($lastEvaluation) && $lastEvaluation > 0) {
 														<div class="cotation-listing wpeo-gridlayout grid-4 grid-gap-0">
 															<?php
 															$defaultCotation = array(0, 48, 51, 100);
-															if ( ! empty( $defaultCotation )) :
-																foreach ( $defaultCotation as $request ) :
+															if ( ! empty($defaultCotation)) :
+																foreach ($defaultCotation as $request) :
 																	$evaluation->cotation = $request; ?>
 																	<div data-id="<?php echo 0; ?>"
 																		 data-evaluation-method="standard"
 																		 data-evaluation-id="<?php echo $request; ?>"
-																		 data-variable-id="<?php echo 152+$request; ?>"
+																		 data-variable-id="<?php echo 152 + $request; ?>"
 																		 data-seuil="<?php echo  $evaluation->get_evaluation_scale(); ?>"
 																		 data-scale="<?php echo  $evaluation->get_evaluation_scale(); ?>"
 																		 class="risk-evaluation-cotation cotation<?php echo ($cotation->cotation == $request) ? " selected-cotation" : "" ?>"><?php echo $request; ?></div>
@@ -196,7 +196,7 @@ if (!empty ($lastEvaluation) && $lastEvaluation > 0) {
 												<input class="risk-evaluation-seuil" type="hidden" value="<?php echo $cotation->cotation ?>">
 												<?php if ( $cotation->method == "advanced" || $conf->global->DIGIRISKDOLIBARR_MULTIPLE_RISKASSESSMENT_METHOD) : ?>
 													<?php
-													$evaluation_method = $advanced_method_cotation_array[0];
+													$evaluation_method        = $advanced_method_cotation_array[0];
 													$evaluation_method_survey = $evaluation_method['option']['variable'];
 													?>
 													<div class="wpeo-gridlayout cotation-advanced" style="<?php echo ($cotation->method == "advanced") ? " display:block" : " display:none" ?>">
@@ -215,13 +215,13 @@ if (!empty ($lastEvaluation) && $lastEvaluation > 0) {
 																<?php endfor; ?>
 															</div>
 															<?php $l = 0;
-															foreach($evaluation_method_survey as $critere) :
+															foreach ($evaluation_method_survey as $critere) :
 																$name = strtolower($critere['name']); ?>
 																<div class="table-row">
 																	<div class="table-cell"><?php echo $critere['name'] ; ?></div>
-																	<?php foreach($critere['option']['survey']['request'] as $request) : ?>
+																	<?php foreach ($critere['option']['survey']['request'] as $request) : ?>
 																		<div class="table-cell can-select cell-<?php echo $cotation->id ? $cotation->id : 0;
-																		if (!empty($request['seuil'])) {
+																		if ( ! empty($request['seuil'])) {
 																			echo $request['seuil'] == $cotation->$name ? " active" : "" ;
 																		} ?>"
 																			 data-type="<?php echo $name ?>"
@@ -254,7 +254,7 @@ if (!empty ($lastEvaluation) && $lastEvaluation > 0) {
 										</div>
 										<div class="risk-evaluation-comment">
 											<span class="title"><i class="fas fa-comment-dots"></i> <?php echo $langs->trans('Comment'); ?></span>
-											<?php print '<textarea name="evaluationComment'. $cotation->id .'" rows="'.ROWS_2.'">'.$cotation->comment.'</textarea>'."\n"; ?>
+											<?php print '<textarea name="evaluationComment' . $cotation->id . '" rows="' . ROWS_2 . '">' . $cotation->comment . '</textarea>' . "\n"; ?>
 										</div>
 									</div>
 									<?php if ($conf->global->DIGIRISKDOLIBARR_SHOW_RISKASSESSMENT_DATE) : ?>
@@ -267,7 +267,7 @@ if (!empty ($lastEvaluation) && $lastEvaluation > 0) {
 										<div class="medias"><i class="fas fa-picture-o"></i><?php echo $langs->trans('Medias'); ?></div>
 										<?php
 										$relativepath = 'digiriskdolibarr/medias/thumbs';
-										print digirisk_show_medias_linked('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessment/' , 'small', '', 0, 0, 0, 150, 150, 1, 0, 0, $cotation->element, $cotation);
+										print digirisk_show_medias_linked('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessment/', 'small', '', 0, 0, 0, 150, 150, 1, 0, 0, $cotation->element, $cotation);
 										?>
 									</div>
 								</div>
@@ -350,7 +350,7 @@ if (!empty ($lastEvaluation) && $lastEvaluation > 0) {
 						</div>
 						<div class="risk-evaluations-list-content" value="<?php echo $risk->id ?>">
 							<ul class="risk-evaluations-list risk-evaluations-list-<?php echo $risk->id ?>">
-								<?php if (!empty($cotationList)) :
+								<?php if ( ! empty($cotationList)) :
 									foreach ($cotationList as $cotation) : ?>
 									<div class="risk-evaluation risk-evaluation<?php echo $cotation->id ?>" value="<?php echo $cotation->id ?>">
 										<input type="hidden" class="labelForDelete" value="<?php echo $langs->trans('DeleteEvaluation') . ' ' . $cotation->ref . ' ?'; ?>">
@@ -359,26 +359,26 @@ if (!empty ($lastEvaluation) && $lastEvaluation > 0) {
 												<div class="risk-evaluation-cotation" data-scale="<?php echo $cotation->get_evaluation_scale() ?>">
 													<span><?php echo $cotation->cotation; ?></span>
 												</div>
-												<div class="risk-evaluation-photo risk-evaluation-photo-<?php echo $cotation->id > 0 ?  $cotation->id :  0 ; echo $risk->id > 0 ? ' risk-'.$risk->id : ' risk-new' ?>">
-													<?php $filearray = dol_dir_list($conf->digiriskdolibarr->multidir_output[$conf->entity].'/'.$cotation->element.'/'.$cotation->ref, "files", 0, '', '(\.odt|_preview.*\.png)$', 'position_name', 'asc', 1);
+												<div class="risk-evaluation-photo risk-evaluation-photo-<?php echo $cotation->id > 0 ? $cotation->id : 0 ; echo $risk->id > 0 ? ' risk-' . $risk->id : ' risk-new' ?>">
+													<?php $filearray = dol_dir_list($conf->digiriskdolibarr->multidir_output[$conf->entity] . '/' . $cotation->element . '/' . $cotation->ref, "files", 0, '', '(\.odt|_preview.*\.png)$', 'position_name', 'asc', 1);
 													if (count($filearray)) {
-														print '<img width="40" class="photo clicked-photo-preview" src="'.DOL_URL_ROOT.'/viewimage.php?modulepart=digiriskdolibarr&entity='.$conf->entity.'&file='.urlencode($cotation->element.'/'.$cotation->ref . '/thumbs/'. preg_replace('/\./', '_small.', $cotation->photo)).'" >';
+														print '<img width="40" class="photo clicked-photo-preview" src="' . DOL_URL_ROOT . '/viewimage.php?modulepart=digiriskdolibarr&entity=' . $conf->entity . '&file=' . urlencode($cotation->element . '/' . $cotation->ref . '/thumbs/' . preg_replace('/\./', '_small.', $cotation->photo)) . '" >';
 													} else {
 														$nophoto = '/public/theme/common/nophoto.png'; ?>
-														<span class="floatleft inline-block valignmiddle divphotoref"><img class="photodigiriskdolibarr clicked-photo-preview" alt="No photo" src="<?php echo DOL_URL_ROOT.$nophoto ?>"></span>
+														<span class="floatleft inline-block valignmiddle divphotoref"><img class="photodigiriskdolibarr clicked-photo-preview" alt="No photo" src="<?php echo DOL_URL_ROOT . $nophoto ?>"></span>
 													<?php } ?>
 												</div>
 												<div class="risk-evaluation-content">
 													<div class="risk-evaluation-data">
 														<span class="risk-evaluation-reference"><?php echo $cotation->ref; ?></span>
 														<span class="risk-evaluation-date">
-															<i class="fas fa-calendar-alt"></i> <?php echo date('d/m/Y', (($conf->global->DIGIRISKDOLIBARR_SHOW_RISKASSESSMENT_DATE && (!empty($cotation->date_riskassessment))) ? $cotation->date_riskassessment : $cotation->date_creation)); ?>
+															<i class="fas fa-calendar-alt"></i> <?php echo date('d/m/Y', (($conf->global->DIGIRISKDOLIBARR_SHOW_RISKASSESSMENT_DATE && ( ! empty($cotation->date_riskassessment))) ? $cotation->date_riskassessment : $cotation->date_creation)); ?>
 														</span>
 													</div>
 													<div class="risk-evaluation-comment">
 														<span class="risk-evaluation-author">
 															<?php $user->fetch($cotation->fk_user_creat); ?>
-															<?php echo getNomUrl( 0, '', 0, 0, 2 ,0,'','',-1,$user); ?>
+															<?php echo getNomUrl(0, '', 0, 0, 2, 0, '', '', -1, $user); ?>
 														</span>
 														<?php echo dol_trunc($cotation->comment, 120); ?>
 													</div>
@@ -442,7 +442,7 @@ if (!empty ($lastEvaluation) && $lastEvaluation > 0) {
 	</div>
 </div>
 <?php }
-$cotation = new RiskAssessment($db);
+$cotation         = new RiskAssessment($db);
 $cotation->method = $lastEvaluation->method ? $lastEvaluation->method : "standard" ; ?>
 <!-- RISK EVALUATION ADD MODAL-->
 <div class="risk-evaluation-add-modal">
@@ -508,13 +508,13 @@ $cotation->method = $lastEvaluation->method ? $lastEvaluation->method : "standar
 									<div class="cotation-listing wpeo-gridlayout grid-4 grid-gap-0">
 										<?php
 										$defaultCotation = array(0, 48, 51, 100);
-										if ( ! empty( $defaultCotation )) :
-											foreach ( $defaultCotation as $request ) :
+										if ( ! empty($defaultCotation)) :
+											foreach ($defaultCotation as $request) :
 												$evaluation->cotation = $request; ?>
 												<div data-id="<?php echo 0; ?>"
 													 data-evaluation-method="standard"
 													 data-evaluation-id="<?php echo $request; ?>"
-													 data-variable-id="<?php echo 152+$request; ?>"
+													 data-variable-id="<?php echo 152 + $request; ?>"
 													 data-seuil="<?php echo  $evaluation->get_evaluation_scale(); ?>"
 													 data-scale="<?php echo  $evaluation->get_evaluation_scale(); ?>"
 													 class="risk-evaluation-cotation cotation"><?php echo $request; ?></div>
@@ -523,7 +523,7 @@ $cotation->method = $lastEvaluation->method ? $lastEvaluation->method : "standar
 									</div>
 								</div>
 								<input class="risk-evaluation-seuil" type="hidden">
-								<?php $evaluation_method = $advanced_method_cotation_array[0];
+								<?php $evaluation_method  = $advanced_method_cotation_array[0];
 								$evaluation_method_survey = $evaluation_method['option']['variable']; ?>
 								<div class="wpeo-gridlayout cotation-advanced" style="<?php echo ($cotation->method == "advanced") ? " display:block" : " display:none" ?>">
 									<input type="hidden" class="digi-method-evaluation-id" value="<?php echo $risk->id ; ?>" />
@@ -541,11 +541,11 @@ $cotation->method = $lastEvaluation->method ? $lastEvaluation->method : "standar
 											<?php endfor; ?>
 										</div>
 										<?php $l = 0; ?>
-										<?php foreach($evaluation_method_survey as $critere) :
+										<?php foreach ($evaluation_method_survey as $critere) :
 											$name = strtolower($critere['name']); ?>
 											<div class="table-row">
 												<div class="table-cell"><?php echo $critere['name'] ; ?></div>
-												<?php foreach($critere['option']['survey']['request'] as $request) : ?>
+												<?php foreach ($critere['option']['survey']['request'] as $request) : ?>
 													<div class="table-cell can-select cell-<?php echo  $evaluation_id ? $evaluation_id : 0 ; ?>"
 														 data-type="<?php echo $name ?>"
 														 data-id="<?php echo  $risk->id ? $risk->id : 0 ; ?>"
@@ -572,7 +572,7 @@ $cotation->method = $lastEvaluation->method ? $lastEvaluation->method : "standar
 						</div>
 						<div class="risk-evaluation-comment">
 							<span class="title"><i class="fas fa-comment-dots"></i> <?php echo $langs->trans('Comment'); ?></span>
-							<?php print '<textarea name="evaluationComment'. $risk->id .'" rows="'.ROWS_2.'">'.('').'</textarea>'."\n"; ?>
+							<?php print '<textarea name="evaluationComment' . $risk->id . '" rows="' . ROWS_2 . '">' . ('') . '</textarea>' . "\n"; ?>
 						</div>
 					</div>
 					<?php if ($conf->global->DIGIRISKDOLIBARR_SHOW_RISKASSESSMENT_DATE) : ?>
@@ -585,13 +585,13 @@ $cotation->method = $lastEvaluation->method ? $lastEvaluation->method : "standar
 						<div class="medias"><i class="fas fa-picture-o"></i><?php echo $langs->trans('Medias'); ?></div>
 						<?php
 						$relativepath = 'digiriskdolibarr/medias/thumbs';
-						print digirisk_show_medias_linked('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessment/tmp/' .  $risk->ref . '/' , 'small', '', 0, 0, 0, 150, 150, 1, 0, 0, $cotation->element . '/tmp/' .  $risk->ref);
+						print digirisk_show_medias_linked('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessment/tmp/' . $risk->ref . '/', 'small', '', 0, 0, 0, 150, 150, 1, 0, 0, $cotation->element . '/tmp/' . $risk->ref);
 						?>
 					</div>
 
 				</div>
 				<!-- RISK EVALUATION SINGLE -->
-				<?php if (!empty($lastEvaluation) && $lastEvaluation > 0) : ?>
+				<?php if ( ! empty($lastEvaluation) && $lastEvaluation > 0) : ?>
 					<div class="risk-evaluation-container risk-evaluation-container-<?php echo $risk->ref ?>">
 						<h2><?php echo $langs->trans('LastRiskAssessment') . ' ' . $risk->ref; ?></h2>
 						<div class="risk-evaluation-single-content risk-evaluation-single-content-<?php echo $risk->id ?>">
@@ -599,13 +599,13 @@ $cotation->method = $lastEvaluation->method ? $lastEvaluation->method : "standar
 								<div class="risk-evaluation-cotation risk-evaluation-list" value="<?php echo $risk->id ?>" data-scale="<?php echo $lastEvaluation->get_evaluation_scale() ?>">
 									<span><?php echo $lastEvaluation->cotation; ?></span>
 								</div>
-								<div class="risk-evaluation-photo risk-evaluation-photo-<?php echo $cotation->id > 0 ?  $cotation->id :  0 ; echo $risk->id > 0 ? ' risk-'.$risk->id : ' risk-new' ?>">
-									<?php $filearray = dol_dir_list($conf->digiriskdolibarr->multidir_output[$conf->entity].'/'.$lastEvaluation->element.'/'.$lastEvaluation->ref, "files", 0, '', '(\.odt|_preview.*\.png)$', 'position_name', 'asc', 1);
+								<div class="risk-evaluation-photo risk-evaluation-photo-<?php echo $cotation->id > 0 ? $cotation->id : 0 ; echo $risk->id > 0 ? ' risk-' . $risk->id : ' risk-new' ?>">
+									<?php $filearray = dol_dir_list($conf->digiriskdolibarr->multidir_output[$conf->entity] . '/' . $lastEvaluation->element . '/' . $lastEvaluation->ref, "files", 0, '', '(\.odt|_preview.*\.png)$', 'position_name', 'asc', 1);
 									if (count($filearray)) {
-										print '<img height="40" width="100%" class="photo clicked-photo-preview" src="'.DOL_URL_ROOT.'/viewimage.php?modulepart=digiriskdolibarr&entity='.$conf->entity.'&file='.urlencode($lastEvaluation->element.'/'.$lastEvaluation->ref . '/thumbs/'. preg_replace('/\./', '_small.', $lastEvaluation->photo)).'" >';
+										print '<img height="40" width="100%" class="photo clicked-photo-preview" src="' . DOL_URL_ROOT . '/viewimage.php?modulepart=digiriskdolibarr&entity=' . $conf->entity . '&file=' . urlencode($lastEvaluation->element . '/' . $lastEvaluation->ref . '/thumbs/' . preg_replace('/\./', '_small.', $lastEvaluation->photo)) . '" >';
 									} else {
 										$nophoto = '/public/theme/common/nophoto.png'; ?>
-										<span class="floatleft inline-block valignmiddle divphotoref"><img class="photodigiriskdolibarr clicked-photo-preview" alt="No photo" src="<?php echo DOL_URL_ROOT.$nophoto ?>"></span>
+										<span class="floatleft inline-block valignmiddle divphotoref"><img class="photodigiriskdolibarr clicked-photo-preview" alt="No photo" src="<?php echo DOL_URL_ROOT . $nophoto ?>"></span>
 									<?php } ?>
 								</div>
 								<div class="risk-evaluation-content">
@@ -613,13 +613,13 @@ $cotation->method = $lastEvaluation->method ? $lastEvaluation->method : "standar
 										<!-- BUTTON MODAL RISK EVALUATION LIST  -->
 										<span class="risk-evaluation-reference risk-evaluation-list" value="<?php echo $risk->id ?>"><?php echo $lastEvaluation->ref; ?></span>
 										<span class="risk-evaluation-date">
-											<i class="fas fa-calendar-alt"></i> <?php echo date('d/m/Y', (($conf->global->DIGIRISKDOLIBARR_SHOW_RISKASSESSMENT_DATE && (!empty($lastEvaluation->date_riskassessment))) ? $lastEvaluation->date_riskassessment : $lastEvaluation->date_creation)); ?>
+											<i class="fas fa-calendar-alt"></i> <?php echo date('d/m/Y', (($conf->global->DIGIRISKDOLIBARR_SHOW_RISKASSESSMENT_DATE && ( ! empty($lastEvaluation->date_riskassessment))) ? $lastEvaluation->date_riskassessment : $lastEvaluation->date_creation)); ?>
 										</span>
 									</div>
 									<div class="risk-evaluation-comment">
 										<span class="risk-evaluation-author">
 											<?php $user->fetch($lastEvaluation->fk_user_creat); ?>
-											<?php echo getNomUrl( 0, '', 0, 0, 2 , 0,'','',-1, $user); ?>
+											<?php echo getNomUrl(0, '', 0, 0, 2, 0, '', '', -1, $user); ?>
 										</span>
 										<?php echo dol_trunc($lastEvaluation->comment, 120); ?>
 									</div>

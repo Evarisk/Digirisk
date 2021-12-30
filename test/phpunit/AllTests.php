@@ -22,8 +22,8 @@
  *      \remarks    To run this script as CLI:  phpunit filename.php
  */
 
-print "PHP Version: ".phpversion()."\n";
-print "Memory: ". ini_get('memory_limit')."\n";
+print "PHP Version: " . phpversion() . "\n";
+print "Memory: " . ini_get('memory_limit') . "\n";
 
 global $conf,$user,$langs,$db;
 
@@ -51,40 +51,40 @@ class AllTests
 	{
 		$suite = new PHPUnit\Framework\TestSuite('PHPUnit Framework');
 
-		require_once dirname(__FILE__).'/DigiriskStandardUnitTest.php';
+		require_once dirname(__FILE__) . '/DigiriskStandardUnitTest.php';
 		$suite->addTestSuite('DigiriskStandardUnitTest');
 
-		require_once dirname(__FILE__).'/DigiriskElementUnitTest.php';
+		require_once dirname(__FILE__) . '/DigiriskElementUnitTest.php';
 		$suite->addTestSuite('DigiriskElementUnitTest');
 
-		require_once dirname(__FILE__).'/DigiriskResourcesUnitTest.php';
+		require_once dirname(__FILE__) . '/DigiriskResourcesUnitTest.php';
 		$suite->addTestSuite('DigiriskResourcesUnitTest');
 
-		require_once dirname(__FILE__).'/DigiriskDocumentsUnitTest.php';
+		require_once dirname(__FILE__) . '/DigiriskDocumentsUnitTest.php';
 		$suite->addTestSuite('DigiriskDocumentsUnitTest');
 
-		require_once dirname(__FILE__).'/EvaluatorUnitTest.php';
+		require_once dirname(__FILE__) . '/EvaluatorUnitTest.php';
 		$suite->addTestSuite('EvaluatorUnitTest');
 
-		require_once dirname(__FILE__).'/DigiriskSignatureUnitTest.php';
+		require_once dirname(__FILE__) . '/DigiriskSignatureUnitTest.php';
 		$suite->addTestSuite('DigiriskSignatureUnitTest');
 
-		require_once dirname(__FILE__).'/riskanalysis/RiskUnitTest.php';
+		require_once dirname(__FILE__) . '/riskanalysis/RiskUnitTest.php';
 		$suite->addTestSuite('RiskUnitTest');
 
-		require_once dirname(__FILE__).'/riskanalysis/RiskAssessmentUnitTest.php';
+		require_once dirname(__FILE__) . '/riskanalysis/RiskAssessmentUnitTest.php';
 		$suite->addTestSuite('RiskAssessmentUnitTest');
 
-		require_once dirname(__FILE__).'/riskanalysis/RiskSignUnitTest.php';
+		require_once dirname(__FILE__) . '/riskanalysis/RiskSignUnitTest.php';
 		$suite->addTestSuite('RiskSignUnitTest');
 
-		require_once dirname(__FILE__).'/PreventionPlanUnitTest.php';
+		require_once dirname(__FILE__) . '/PreventionPlanUnitTest.php';
 		$suite->addTestSuite('PreventionPlanUnitTest');
 
-		require_once dirname(__FILE__).'/OpeninghoursUnitTest.php';
+		require_once dirname(__FILE__) . '/OpeninghoursUnitTest.php';
 		$suite->addTestSuite('OpeninghoursUnitTest');
 
-		require_once dirname(__FILE__).'/FirePermitUnitTest.php';
+		require_once dirname(__FILE__) . '/FirePermitUnitTest.php';
 		$suite->addTestSuite('FirePermitUnitTest');
 
 		return $suite;

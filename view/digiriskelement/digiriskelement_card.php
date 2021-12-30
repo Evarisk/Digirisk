@@ -24,20 +24,20 @@
 // Load Dolibarr environment
 $res = 0;
 // Try main.inc.php into web root known defined into CONTEXT_DOCUMENT_ROOT (not always defined)
-if (!$res && !empty($_SERVER["CONTEXT_DOCUMENT_ROOT"])) $res = @include $_SERVER["CONTEXT_DOCUMENT_ROOT"]."/main.inc.php";
+if ( ! $res && ! empty($_SERVER["CONTEXT_DOCUMENT_ROOT"])) $res = @include $_SERVER["CONTEXT_DOCUMENT_ROOT"] . "/main.inc.php";
 // Try main.inc.php into web root detected using web root calculated from SCRIPT_FILENAME
 $tmp = empty($_SERVER['SCRIPT_FILENAME']) ? '' : $_SERVER['SCRIPT_FILENAME']; $tmp2 = realpath(__FILE__); $i = strlen($tmp) - 1; $j = strlen($tmp2) - 1;
 while ($i > 0 && $j > 0 && isset($tmp[$i]) && isset($tmp2[$j]) && $tmp[$i] == $tmp2[$j]) { $i--; $j--; }
-if (!$res && $i > 0 && file_exists(substr($tmp, 0, ($i + 1))."/main.inc.php")) $res = @include substr($tmp, 0, ($i + 1))."/main.inc.php";
-if (!$res && $i > 0 && file_exists(dirname(substr($tmp, 0, ($i + 1)))."/main.inc.php")) $res = @include dirname(substr($tmp, 0, ($i + 1)))."/main.inc.php";
+if ( ! $res && $i > 0 && file_exists(substr($tmp, 0, ($i + 1)) . "/main.inc.php")) $res          = @include substr($tmp, 0, ($i + 1)) . "/main.inc.php";
+if ( ! $res && $i > 0 && file_exists(dirname(substr($tmp, 0, ($i + 1))) . "/main.inc.php")) $res = @include dirname(substr($tmp, 0, ($i + 1))) . "/main.inc.php";
 // Try main.inc.php using relative path
-if (!$res && file_exists("../../main.inc.php")) $res = @include "../../main.inc.php";
-if (!$res && file_exists("../../../main.inc.php")) $res = @include "../../../main.inc.php";
-if (!$res && file_exists("../../../../main.inc.php")) $res = @include "../../../../main.inc.php";
-if (!$res) die("Include of main fails");
+if ( ! $res && file_exists("../../main.inc.php")) $res       = @include "../../main.inc.php";
+if ( ! $res && file_exists("../../../main.inc.php")) $res    = @include "../../../main.inc.php";
+if ( ! $res && file_exists("../../../../main.inc.php")) $res = @include "../../../../main.inc.php";
+if ( ! $res) die("Include of main fails");
 
-require_once DOL_DOCUMENT_ROOT.'/core/class/html.formfile.class.php';
-require_once DOL_DOCUMENT_ROOT.'/core/lib/images.lib.php';
+require_once DOL_DOCUMENT_ROOT . '/core/class/html.formfile.class.php';
+require_once DOL_DOCUMENT_ROOT . '/core/lib/images.lib.php';
 
 require_once './../../class/digiriskdocuments.class.php';
 require_once './../../class/digiriskelement.class.php';
@@ -62,7 +62,7 @@ $ref                 = GETPOST('ref', 'alpha');
 $action              = GETPOST('action', 'aZ09');
 $confirm             = GETPOST('confirm', 'alpha');
 $cancel              = GETPOST('cancel', 'aZ09');
-$contextpage         = GETPOST('contextpage', 'aZ') ?GETPOST('contextpage', 'aZ') : 'digiriskelementcard'; // To manage different context of search
+$contextpage         = GETPOST('contextpage', 'aZ') ? GETPOST('contextpage', 'aZ') : 'digiriskelementcard'; // To manage different context of search
 $backtopage          = GETPOST('backtopage', 'alpha');
 $backtopageforcancel = GETPOST('backtopageforcancel', 'alpha');
 $element_type        = GETPOST('element_type', 'alpha');
@@ -86,21 +86,21 @@ $extrafields->fetch_name_optionals_label($object->table_element);
 
 $hookmanager->initHooks(array('digiriskelementcard', 'globalcard')); // Note that conf->hooks_modules contains array
 
-$upload_dir         = $conf->digiriskdolibarr->multidir_output[isset($object->entity) ? $object->entity : 1];
+$upload_dir = $conf->digiriskdolibarr->multidir_output[isset($object->entity) ? $object->entity : 1];
 
 //Security check
 $permissiontoread   = $user->rights->digiriskdolibarr->digiriskelement->read;
 $permissiontoadd    = $user->rights->digiriskdolibarr->digiriskelement->write;
 $permissiontodelete = $user->rights->digiriskdolibarr->digiriskelement->delete;
 
-if (!$permissiontoread) accessforbidden();
+if ( ! $permissiontoread) accessforbidden();
 
 /*
  * Actions
  */
 
 $parameters = array();
-$reshook = $hookmanager->executeHooks('doActions', $parameters, $object, $action); // Note that $action and $object may have been modified by some hooks
+$reshook    = $hookmanager->executeHooks('doActions', $parameters, $object, $action); // Note that $action and $object may have been modified by some hooks
 if ($reshook < 0) setEventMessages($hookmanager->error, $hookmanager->errors, 'errors');
 
 if (empty($reshook)) {
@@ -111,12 +111,12 @@ if (empty($reshook)) {
 	if (empty($backtopage) || ($cancel && empty($id))) {
 		if (empty($backtopage) || ($cancel && strpos($backtopage, '__ID__'))) {
 			if (empty($object->id) && (($action != 'add' && $action != 'create') || $cancel)) $backtopage = $backurlforlist;
-			else $backtopage = dol_buildpath('/digiriskdolibarr/view/digiriskelement/digiriskelement_card.php', 1).'?id='.($object->id > 0 ? $object->id : '__ID__');
+			else $backtopage                                                                              = dol_buildpath('/digiriskdolibarr/view/digiriskelement/digiriskelement_card.php', 1) . '?id=' . ($object->id > 0 ? $object->id : '__ID__');
 		}
 	}
 
 	// Action to add record
-	include DOL_DOCUMENT_ROOT.'/core/actions_addupdatedelete.inc.php';
+	include DOL_DOCUMENT_ROOT . '/core/actions_addupdatedelete.inc.php';
 
 	if ($action == 'add' && $permissiontoadd) { ?>
 		<script>
@@ -140,21 +140,21 @@ if (empty($reshook)) {
 	// Action to build doc
 	if ($action == 'builddoc' && $permissiontoadd) {
 		$outputlangs = $langs;
-		$newlang = '';
+		$newlang     = '';
 
 		if ($conf->global->MAIN_MULTILANGS && empty($newlang) && GETPOST('lang_id', 'aZ09')) $newlang = GETPOST('lang_id', 'aZ09');
-		if (!empty($newlang)) {
+		if ( ! empty($newlang)) {
 			$outputlangs = new Translate("", $conf);
 			$outputlangs->setDefaultLang($newlang);
 		}
 
 		// To be sure vars is defined
 		if (empty($hidedetails)) $hidedetails = 0;
-		if (empty($hidedesc)) $hidedesc = 0;
-		if (empty($hideref)) $hideref = 0;
-		if (empty($moreparams)) $moreparams = null;
+		if (empty($hidedesc)) $hidedesc       = 0;
+		if (empty($hideref)) $hideref         = 0;
+		if (empty($moreparams)) $moreparams   = null;
 
-		$model      = GETPOST('model', 'alpha');
+		$model = GETPOST('model', 'alpha');
 
 		$moreparams['object'] = $object;
 		$moreparams['user']   = $user;
@@ -164,8 +164,7 @@ if (empty($reshook)) {
 			setEventMessages($object->error, $object->errors, 'errors');
 			$action = '';
 		} else {
-			if (empty($donotredirect))
-			{
+			if (empty($donotredirect)) {
 				setEventMessages($langs->trans("FileGenerated") . ' - ' . $digiriskelementdocument->last_main_doc, null);
 
 				$urltoredirect = $_SERVER['REQUEST_URI'];
@@ -180,13 +179,13 @@ if (empty($reshook)) {
 
 	// Delete file in doc form
 	if ($action == 'remove_file' && $permissiontodelete) {
-		if (!empty($upload_dir)) {
-			require_once DOL_DOCUMENT_ROOT.'/core/lib/files.lib.php';
+		if ( ! empty($upload_dir)) {
+			require_once DOL_DOCUMENT_ROOT . '/core/lib/files.lib.php';
 
 			$langs->load("other");
 			$filetodelete = GETPOST('file', 'alpha');
-			$file = $upload_dir.'/'.$filetodelete;
-			$ret = dol_delete_file($file, 0, 0, 0, $object);
+			$file         = $upload_dir . '/' . $filetodelete;
+			$ret          = dol_delete_file($file, 0, 0, 0, $object);
 			if ($ret) setEventMessages($langs->trans("FileWasRemoved", $filetodelete), null, 'mesgs');
 			else setEventMessages($langs->trans("ErrorFailToDeleteFile", $filetodelete), null, 'errors');
 
@@ -195,23 +194,20 @@ if (empty($reshook)) {
 			$urltoredirect = preg_replace('/#builddoc$/', '', $urltoredirect);
 			$urltoredirect = preg_replace('/action=remove_file&?/', '', $urltoredirect);
 
-			header('Location: '.$urltoredirect);
+			header('Location: ' . $urltoredirect);
 			exit;
-		}
-		else {
+		} else {
 			setEventMessages('BugFoundVarUploaddirnotDefined', null, 'errors');
 		}
 	}
 
-	if ($action == 'confirm_delete' && GETPOST("confirm") == "yes")
-	{
+	if ($action == 'confirm_delete' && GETPOST("confirm") == "yes") {
 		$object->fetch($id);
 		$result = $object->delete($user);
 
-		if ($result > 0)
-		{
+		if ($result > 0) {
 			setEventMessages($langs->trans("RecordDeleted"), null, 'mesgs');
-			header('Location: '.$backurlforlist);
+			header('Location: ' . $backurlforlist);
 			exit;
 		} else {
 			dol_syslog($object->error, LOG_DEBUG);
@@ -228,28 +224,28 @@ $form        = new Form($db);
 $emptyobject = new stdClass($db);
 $formconfirm = '';
 
-$parameters = array('formConfirm' => $formconfirm, 'object' => $object);
-$reshook = $hookmanager->executeHooks('formConfirm', $parameters, $object, $action); // Note that $action and $object may have been modified by hook
+$parameters                        = array('formConfirm' => $formconfirm, 'object' => $object);
+$reshook                           = $hookmanager->executeHooks('formConfirm', $parameters, $object, $action); // Note that $action and $object may have been modified by hook
 if (empty($reshook)) $formconfirm .= $hookmanager->resPrint;
 elseif ($reshook > 0) $formconfirm = $hookmanager->resPrint;
 
 
 if ( $object->element_type == 'groupment' ) {
-	$title        = $langs->trans("Groupment");
-	$title_create = $langs->trans("NewGroupment");
-	$title_edit   = $langs->trans("ModifyGroupment");
+	$title         = $langs->trans("Groupment");
+	$title_create  = $langs->trans("NewGroupment");
+	$title_edit    = $langs->trans("ModifyGroupment");
 	$object->picto = 'groupment@digiriskdolibarr';
-} else if ( $object->element_type == 'workunit' ) {
+} elseif ( $object->element_type == 'workunit' ) {
 	$title         = $langs->trans("WorkUnit");
 	$title_create  = $langs->trans("NewWorkUnit");
 	$title_edit    = $langs->trans("ModifyWorkUnit");
 	$object->picto = 'workunit@digiriskdolibarr';
 } else {
 	$element_type = GETPOST('element_type', 'alpha');
-	if ( $element_type == 'groupment' ){
+	if ( $element_type == 'groupment' ) {
 		$title_create = $langs->trans("NewGroupment");
-	}else {
-		$title_create  = $langs->trans("NewWorkUnit");
+	} else {
+		$title_create = $langs->trans("NewWorkUnit");
 	}
 }
 
@@ -266,12 +262,12 @@ if ($action == 'create') {
 	$object->fetch($fk_parent);
 	print load_fiche_titre($title_create, '', "digiriskdolibarr32px@digiriskdolibarr");
 
-	print '<form method="POST" action="'.$_SERVER["PHP_SELF"].'">';
-	print '<input type="hidden" name="token" value="'.newToken().'">';
+	print '<form method="POST" action="' . $_SERVER["PHP_SELF"] . '">';
+	print '<input type="hidden" name="token" value="' . newToken() . '">';
 	print '<input type="hidden" name="action" value="add">';
-	print '<input type="hidden" name="backtopage" value="'.$backtopage.'">';
+	print '<input type="hidden" name="backtopage" value="' . $backtopage . '">';
 
-	if ($backtopageforcancel) print '<input type="hidden" name="backtopageforcancel" value="'.$backtopageforcancel.'">';
+	if ($backtopageforcancel) print '<input type="hidden" name="backtopageforcancel" value="' . $backtopageforcancel . '">';
 
 	print dol_get_fiche_head(array(), '');
 
@@ -283,18 +279,18 @@ if ($action == 'create') {
 	unset($object->fields['entity']);
 	unset($object->fields['description']);
 
-	print '<table class="border centpercent tableforfieldcreate">'."\n";
+	print '<table class="border centpercent tableforfieldcreate">' . "\n";
 
-	$type = 'DIGIRISKDOLIBARR_'.strtoupper($element_type).'_ADDON';
+	$type           = 'DIGIRISKDOLIBARR_' . strtoupper($element_type) . '_ADDON';
 	$digirisk_addon = $conf->global->$type;
-	$modele = new $digirisk_addon($db);
+	$modele         = new $digirisk_addon($db);
 
-	print '<tr><td class="fieldrequired">'.$langs->trans("Ref").'</td><td>';
-	print '<input hidden class="flat" type="text" size="36" name="ref" id="ref" value="'.$modele->getNextValue($object).'">';
+	print '<tr><td class="fieldrequired">' . $langs->trans("Ref") . '</td><td>';
+	print '<input hidden class="flat" type="text" size="36" name="ref" id="ref" value="' . $modele->getNextValue($object) . '">';
 	print $modele->getNextValue($object);
 	print '</td></tr>';
 
-	print '<tr><td class="fieldrequired">'.$langs->trans("ParentElement").'</td><td>';
+	print '<tr><td class="fieldrequired">' . $langs->trans("ParentElement") . '</td><td>';
 	print '<input hidden class="flat" type="text" size="36" name="parent" id="parent">';
 	if (empty($fk_parent)) {
 		$digiriskstandard->fetch($conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD);
@@ -304,43 +300,42 @@ if ($action == 'create') {
 	}
 	print '</td></tr>';
 
-	include DOL_DOCUMENT_ROOT.'/core/tpl/commonfields_add.tpl.php';
+	include DOL_DOCUMENT_ROOT . '/core/tpl/commonfields_add.tpl.php';
 
-	print '<tr><td>'.$langs->trans("Description").'</td><td>';
+	print '<tr><td>' . $langs->trans("Description") . '</td><td>';
 	print '<input hidden class="flat" type="text" size="36" name="description" id="description">';
-	print '<textarea name="description" id="description" class="minwidth400" rows="'.ROWS_3.'">'.'</textarea>'."\n";
+	print '<textarea name="description" id="description" class="minwidth400" rows="' . ROWS_3 . '">' . '</textarea>' . "\n";
 	print '</td></tr>';
 
-	print '<input hidden class="flat" type="text" size="36" name="element_type" value="'.$element_type.'">';
-	print '<input hidden class="flat" type="text" size="36" name="fk_parent" value="'.$fk_parent.'">';
+	print '<input hidden class="flat" type="text" size="36" name="element_type" value="' . $element_type . '">';
+	print '<input hidden class="flat" type="text" size="36" name="fk_parent" value="' . $fk_parent . '">';
 
 	// Other attributes
-	include DOL_DOCUMENT_ROOT.'/core/tpl/extrafields_add.tpl.php';
+	include DOL_DOCUMENT_ROOT . '/core/tpl/extrafields_add.tpl.php';
 
-	print '</table>'."\n";
+	print '</table>' . "\n";
 
 	print dol_get_fiche_end();
 
 	print '<div class="center">';
-	print '<input type="submit" class="button" id ="actionButtonCreate" name="add" value="'.dol_escape_htmltag($langs->trans("Create")).'">';
+	print '<input type="submit" class="button" id ="actionButtonCreate" name="add" value="' . dol_escape_htmltag($langs->trans("Create")) . '">';
 	print '&nbsp; ';
-	print ' &nbsp; <input type="submit" id ="actionButtonCancelCreate" class="button" name="cancel" value="'.$langs->trans("Cancel").'" onClick="javascript:history.go(-1)">';
+	print ' &nbsp; <input type="submit" id ="actionButtonCancelCreate" class="button" name="cancel" value="' . $langs->trans("Cancel") . '" onClick="javascript:history.go(-1)">';
 	print '</div>';
 
 	print '</form>';
-
 }
 
 // Part to edit record
 if (($id || $ref) && $action == 'edit') {
 	print load_fiche_titre($title_edit, '', "digiriskdolibarr32px@digiriskdolibarr");
 
-	print '<form method="POST" action="'.$_SERVER["PHP_SELF"].'">';
-	print '<input type="hidden" name="token" value="'.newToken().'">';
+	print '<form method="POST" action="' . $_SERVER["PHP_SELF"] . '">';
+	print '<input type="hidden" name="token" value="' . newToken() . '">';
 	print '<input type="hidden" name="action" value="update">';
-	print '<input type="hidden" name="id" value="'.$object->id.'">';
-	if ($backtopage) print '<input type="hidden" name="backtopage" value="'.$backtopage.'">';
-	if ($backtopageforcancel) print '<input type="hidden" name="backtopageforcancel" value="'.$backtopageforcancel.'">';
+	print '<input type="hidden" name="id" value="' . $object->id . '">';
+	if ($backtopage) print '<input type="hidden" name="backtopage" value="' . $backtopage . '">';
+	if ($backtopageforcancel) print '<input type="hidden" name="backtopageforcancel" value="' . $backtopageforcancel . '">';
 
 	print dol_get_fiche_head();
 
@@ -350,16 +345,16 @@ if (($id || $ref) && $action == 'edit') {
 	unset($object->fields['last_main_doc']);
 	unset($object->fields['entity']);
 
-	print '<table class="border centpercent tableforfieldedit">'."\n";
+	print '<table class="border centpercent tableforfieldedit">' . "\n";
 
 	// Common attributes
-	include DOL_DOCUMENT_ROOT.'/core/tpl/commonfields_edit.tpl.php';
+	include DOL_DOCUMENT_ROOT . '/core/tpl/commonfields_edit.tpl.php';
 
 	// Other attributes
-	include DOL_DOCUMENT_ROOT.'/core/tpl/extrafields_edit.tpl.php';
+	include DOL_DOCUMENT_ROOT . '/core/tpl/extrafields_edit.tpl.php';
 
 	if ($id != $conf->global->DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH) {
-		print '<tr><td>'.$langs->trans("ParentElement").'</td><td>';
+		print '<tr><td>' . $langs->trans("ParentElement") . '</td><td>';
 		print $object->select_digiriskelement_list($object->fk_parent, 'fk_parent', 'element_type="groupment"', '',  0, 0, array(), '',  0,  0,  'minwidth100',  GETPOST('id'),  false);
 	}
 
@@ -369,14 +364,14 @@ if (($id || $ref) && $action == 'edit') {
 
 	print dol_get_fiche_end();
 
-	print '<div class="center"><input type="submit" id ="actionButtonSave" class="button" name="save" value="'.$langs->trans("Save").'">';
-	print ' &nbsp; <input type="submit" id ="actionButtonCancelEdit" class="button" name="cancel" value="'.$langs->trans("Cancel").'"  onClick="javascript:history.go(-1)">';
+	print '<div class="center"><input type="submit" id ="actionButtonSave" class="button" name="save" value="' . $langs->trans("Save") . '">';
+	print ' &nbsp; <input type="submit" id ="actionButtonCancelEdit" class="button" name="cancel" value="' . $langs->trans("Cancel") . '"  onClick="javascript:history.go(-1)">';
 	print '</div>';
 
 	print '</form>';
 }
 
-if (!$object->id) {
+if ( ! $object->id) {
 	$object->ref    = $conf->global->MAIN_INFO_SOCIETE_NOM;
 	$object->label  = $langs->trans('Society');
 	$object->entity = $conf->entity;
@@ -385,11 +380,10 @@ if (!$object->id) {
 
 // Part to show record
 if ((empty($action) || ($action != 'edit' && $action != 'create'))) {
-
 	$formconfirm = '';
 	// Confirmation to delete
 	if ($action == 'delete') {
-		$formconfirm = $form->formconfirm($_SERVER["PHP_SELF"].'?id='.$object->id, $langs->trans('DeleteDigiriskElement'), $langs->trans('ConfirmDeleteObject'), 'confirm_delete', '', 0, 1);
+		$formconfirm = $form->formconfirm($_SERVER["PHP_SELF"] . '?id=' . $object->id, $langs->trans('DeleteDigiriskElement'), $langs->trans('ConfirmDeleteObject'), 'confirm_delete', '', 0, 1);
 	}
 
 
@@ -411,24 +405,23 @@ if ((empty($action) || ($action != 'edit' && $action != 'create'))) {
 	$width = 80; $cssclass = 'photoref';
 
 	dol_strlen($object->label) ? $morehtmlref = ' - ' . $object->label : '';
-	$morehtmlref .= '<div class="refidno">';
+	$morehtmlref                             .= '<div class="refidno">';
 	// ParentElement
 	$parent_element = new DigiriskElement($db);
-	$result = $parent_element->fetch($object->fk_parent);
+	$result         = $parent_element->fetch($object->fk_parent);
 	if ($result > 0) {
-		$morehtmlref .= $langs->trans("Description").' : '.$object->description;
-		$morehtmlref .= '<br>'.$langs->trans("ParentElement").' : '.$parent_element->getNomUrl(1, 'blank', 1);
-	}
-	else {
+		$morehtmlref .= $langs->trans("Description") . ' : ' . $object->description;
+		$morehtmlref .= '<br>' . $langs->trans("ParentElement") . ' : ' . $parent_element->getNomUrl(1, 'blank', 1);
+	} else {
 		$digiriskstandard->fetch($conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD);
-		$morehtmlref .= $langs->trans("Description").' : '.$object->description;
-		$morehtmlref .= '<br>'.$langs->trans("ParentElement").' : '.$digiriskstandard->getNomUrl(1, 'blank', 1);
+		$morehtmlref .= $langs->trans("Description") . ' : ' . $object->description;
+		$morehtmlref .= '<br>' . $langs->trans("ParentElement") . ' : ' . $digiriskstandard->getNomUrl(1, 'blank', 1);
 	}
 	$morehtmlref .= '</div>';
 	if (isset($object->element_type)) {
-		$morehtmlleft = '<div class="floatleft inline-block valignmiddle divphotoref">'.digirisk_show_photos('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity].'/'.$object->element_type, 'small', 5, 0, 0, 0, $width,0, 0, 0, 0, $object->element_type, $object).'</div>';
+		$morehtmlleft = '<div class="floatleft inline-block valignmiddle divphotoref">' . digirisk_show_photos('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/' . $object->element_type, 'small', 5, 0, 0, 0, $width, 0, 0, 0, 0, $object->element_type, $object) . '</div>';
 	} else {
-		$morehtmlleft = '<div class="floatleft inline-block valignmiddle divphotoref">'.digirisk_show_photos('mycompany', $conf->mycompany->dir_output . '/logos', 'small', 5, 0, 0, 0, $width,0, 0, 0, 0, 'logos', $emptyobject).'</div>';
+		$morehtmlleft = '<div class="floatleft inline-block valignmiddle divphotoref">' . digirisk_show_photos('mycompany', $conf->mycompany->dir_output . '/logos', 'small', 5, 0, 0, 0, $width, 0, 0, 0, 0, 'logos', $emptyobject) . '</div>';
 	}
 
 	digirisk_banner_tab($object, 'ref', '', 0, 'ref', 'ref', $morehtmlref, '', 0, $morehtmlleft);
@@ -440,21 +433,20 @@ if ((empty($action) || ($action != 'edit' && $action != 'create'))) {
 
 	print '<div class="fichecenter">';
 	print '<div class="fichehalfleft">';
-	print '<table class="border centpercent tableforfield">'."\n";
+	print '<table class="border centpercent tableforfield">' . "\n";
 
 	if ($object->id) {
 		print '<tr><td class="titlefield">' . $langs->trans("ElementType") . '</td><td>';
 		print $langs->trans($object->element_type);
 		print '</td></tr>';
 
-		print '<div class="titlefield hidden elementID" id="elementID" value="'.$object->id.'">'.$langs->trans("ID").'</div>';
-		print '<tr><td class="titlefield">'.$langs->trans("ParentElement").'</td><td>';
+		print '<div class="titlefield hidden elementID" id="elementID" value="' . $object->id . '">' . $langs->trans("ID") . '</div>';
+		print '<tr><td class="titlefield">' . $langs->trans("ParentElement") . '</td><td>';
 		$parent_element = new DigiriskElement($db);
-		$result = $parent_element->fetch($object->fk_parent);
+		$result         = $parent_element->fetch($object->fk_parent);
 		if ($result > 0) {
-			print $parent_element->ref . ( !empty($parent_element->label) ?  ' - ' . $parent_element->label : '');
-		}
-		else {
+			print $parent_element->ref . ( ! empty($parent_element->label) ? ' - ' . $parent_element->label : '');
+		} else {
 			print $conf->global->MAIN_INFO_SOCIETE_NOM;
 		}
 
@@ -462,10 +454,10 @@ if ((empty($action) || ($action != 'edit' && $action != 'create'))) {
 	}
 
 	//Show common fields
-//	include DOL_DOCUMENT_ROOT.'/core/tpl/commonfields_view.tpl.php';
+	//  include DOL_DOCUMENT_ROOT.'/core/tpl/commonfields_view.tpl.php';
 
 	// Other attributes. Fields from hook formObjectOptions and Extrafields.
-	include DOL_DOCUMENT_ROOT.'/core/tpl/extrafields_view.tpl.php';
+	include DOL_DOCUMENT_ROOT . '/core/tpl/extrafields_view.tpl.php';
 
 	print '</table>';
 	print '</div>';
@@ -476,12 +468,12 @@ if ((empty($action) || ($action != 'edit' && $action != 'create'))) {
 	print '<table class="border tableforfield" width="100%">';
 
 	// label
-	print '<td class="titlefield tdtop">'.$langs->trans("label").'</td><td>';
+	print '<td class="titlefield tdtop">' . $langs->trans("label") . '</td><td>';
 	print dol_htmlentitiesbr($object->label);
 	print '</td></tr>';
 
 	// Description
-	print '<td class="titlefield tdtop">'.$langs->trans("Description").'</td><td>';
+	print '<td class="titlefield tdtop">' . $langs->trans("Description") . '</td><td>';
 	print dol_htmlentitiesbr($object->description);
 	print '</td></tr>';
 
@@ -497,7 +489,7 @@ if ((empty($action) || ($action != 'edit' && $action != 'create'))) {
 		// Buttons for actions
 		print '<div class="tabsAction" >' . "\n";
 		$parameters = array();
-		$reshook = $hookmanager->executeHooks('addMoreActionsButtons', $parameters, $object, $action); // Note that $action and $object may have been modified by hook
+		$reshook    = $hookmanager->executeHooks('addMoreActionsButtons', $parameters, $object, $action); // Note that $action and $object may have been modified by hook
 		if ($reshook < 0) setEventMessages($hookmanager->error, $hookmanager->errors, 'errors');
 
 		if (empty($reshook)) {
@@ -508,12 +500,11 @@ if ((empty($action) || ($action != 'edit' && $action != 'create'))) {
 				print '<a class="butActionRefused classfortooltip" href="#" title="' . dol_escape_htmltag($langs->trans("NotEnoughPermissions")) . '">' . $langs->trans('Modify') . '</a>' . "\n";
 			}
 
-			if ($permissiontodelete && !array_key_exists($object->id, $trash_list) && $object->id != $conf->global->DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH){
-				print '<a class="butActionDelete" href="' . $_SERVER["PHP_SELF"] . '?id=' . $object->id . '&action=delete">'.$langs->trans("Delete").'</a>';
+			if ($permissiontodelete && ! array_key_exists($object->id, $trash_list) && $object->id != $conf->global->DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH) {
+				print '<a class="butActionDelete" href="' . $_SERVER["PHP_SELF"] . '?id=' . $object->id . '&action=delete">' . $langs->trans("Delete") . '</a>';
 			} else {
-				print '<a class="butActionRefused classfortooltip" href="#" title="'.$langs->trans("CanNotDoThis").'">'.$langs->trans('Delete').'</a>';
+				print '<a class="butActionRefused classfortooltip" href="#" title="' . $langs->trans("CanNotDoThis") . '">' . $langs->trans('Delete') . '</a>';
 			}
-
 		}
 		print '</div>' . "\n";
 
@@ -522,19 +513,19 @@ if ((empty($action) || ($action != 'edit' && $action != 'create'))) {
 		if ($includedocgeneration) {
 			print '<div class="fichecenter"><div class="fichehalfleft elementDocument">';
 
-			$objref = dol_sanitizeFileName($object->ref);
+			$objref    = dol_sanitizeFileName($object->ref);
 			$dir_files = $digiriskelementdocument->element . '/' . $objref;
-			$filedir = $upload_dir . '/' . $dir_files;
-			$urlsource = $_SERVER["PHP_SELF"] . '?id='. $id;
+			$filedir   = $upload_dir . '/' . $dir_files;
+			$urlsource = $_SERVER["PHP_SELF"] . '?id=' . $id;
 
 			if ($digiriskelementdocument->element == 'groupmentdocument') {
-				$modulepart = 'digiriskdolibarr:GroupmentDocument';
+				$modulepart   = 'digiriskdolibarr:GroupmentDocument';
 				$defaultmodel = $conf->global->DIGIRISKDOLIBARR_GROUPMENTDOCUMENT_DEFAULT_MODEL;
-				$title = $langs->trans('GroupmentDocument');
+				$title        = $langs->trans('GroupmentDocument');
 			} elseif ($digiriskelementdocument->element == 'workunitdocument') {
-				$modulepart = 'digiriskdolibarr:WorkUnitDocument';
+				$modulepart   = 'digiriskdolibarr:WorkUnitDocument';
 				$defaultmodel = $conf->global->DIGIRISKDOLIBARR_WORKUNITDOCUMENT_DEFAULT_MODEL;
-				$title = $langs->trans('WorkUnitDocument');
+				$title        = $langs->trans('WorkUnitDocument');
 			}
 
 			print digiriskshowdocuments($modulepart, $dir_files, $filedir, $urlsource, $permissiontoadd, $permissiontodelete, $defaultmodel, 1, 0, 28, 0, '', $title, '', $langs->defaultlang, '', $digiriskelementdocument);
@@ -545,13 +536,13 @@ if ((empty($action) || ($action != 'edit' && $action != 'create'))) {
 
 		$MAXEVENT = 10;
 
-		$morehtmlright = '<a href="' . dol_buildpath('/digiriskdolibarr/view/digiriskelement/digiriskelement_agenda.php', 1) . '?id=' . $object->id . '">';
+		$morehtmlright  = '<a href="' . dol_buildpath('/digiriskdolibarr/view/digiriskelement/digiriskelement_agenda.php', 1) . '?id=' . $object->id . '">';
 		$morehtmlright .= $langs->trans("SeeAll");
 		$morehtmlright .= '</a>';
 
 		// List of actions on element
 		include_once DOL_DOCUMENT_ROOT . '/core/class/html.formactions.class.php';
-		$formactions = new FormActions($db);
+		$formactions    = new FormActions($db);
 		$somethingshown = $formactions->showactions($object, 'digiriskelement@digiriskdolibarr', (is_object($object->thirdparty) ? $object->thirdparty->id : 0), 1, '', $MAXEVENT, '', $morehtmlright);
 
 		print '</div></div></div>';

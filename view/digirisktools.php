@@ -24,18 +24,18 @@
 // Load Dolibarr environment
 $res = 0;
 // Try main.inc.php into web root known defined into CONTEXT_DOCUMENT_ROOT (not always defined)
-if (!$res && !empty($_SERVER["CONTEXT_DOCUMENT_ROOT"])) $res = @include $_SERVER["CONTEXT_DOCUMENT_ROOT"]."/main.inc.php";
+if ( ! $res && ! empty($_SERVER["CONTEXT_DOCUMENT_ROOT"])) $res = @include $_SERVER["CONTEXT_DOCUMENT_ROOT"] . "/main.inc.php";
 // Try main.inc.php into web root detected using web root calculated from SCRIPT_FILENAME
 $tmp = empty($_SERVER['SCRIPT_FILENAME']) ? '' : $_SERVER['SCRIPT_FILENAME']; $tmp2 = realpath(__FILE__); $i = strlen($tmp) - 1; $j = strlen($tmp2) - 1;
 while ($i > 0 && $j > 0 && isset($tmp[$i]) && isset($tmp2[$j]) && $tmp[$i] == $tmp2[$j]) { $i--; $j--; }
-if (!$res && $i > 0 && file_exists(substr($tmp, 0, ($i + 1))."/main.inc.php")) $res = @include substr($tmp, 0, ($i + 1))."/main.inc.php";
-if (!$res && $i > 0 && file_exists(dirname(substr($tmp, 0, ($i + 1)))."/main.inc.php")) $res = @include dirname(substr($tmp, 0, ($i + 1)))."/main.inc.php";
+if ( ! $res && $i > 0 && file_exists(substr($tmp, 0, ($i + 1)) . "/main.inc.php")) $res          = @include substr($tmp, 0, ($i + 1)) . "/main.inc.php";
+if ( ! $res && $i > 0 && file_exists(dirname(substr($tmp, 0, ($i + 1))) . "/main.inc.php")) $res = @include dirname(substr($tmp, 0, ($i + 1))) . "/main.inc.php";
 // Try main.inc.php using relative path
-if (!$res && file_exists("../../main.inc.php")) $res = @include "../../main.inc.php";
-if (!$res && file_exists("../../../main.inc.php")) $res = @include "../../../main.inc.php";
-if (!$res) die("Include of main fails");
+if ( ! $res && file_exists("../../main.inc.php")) $res    = @include "../../main.inc.php";
+if ( ! $res && file_exists("../../../main.inc.php")) $res = @include "../../../main.inc.php";
+if ( ! $res) die("Include of main fails");
 
-require_once DOL_DOCUMENT_ROOT.'/core/lib/images.lib.php';
+require_once DOL_DOCUMENT_ROOT . '/core/lib/images.lib.php';
 
 require_once './../class/digiriskstandard.class.php';
 require_once './../class/digiriskelement.class.php';
@@ -79,20 +79,20 @@ $upload_dir = $conf->digiriskdolibarr->multidir_output[isset($conf->entity) ? $c
 $permissiontoread = $user->rights->digiriskdolibarr->adminpage->read;
 $permtoupload     = $user->rights->ecm->upload;
 
-if (!$user->rights->digiriskdolibarr->adminpage->read) accessforbidden();
+if ( ! $user->rights->digiriskdolibarr->adminpage->read) accessforbidden();
 
 /*
  * Actions
  */
 
-if (GETPOST('dataMigrationImport', 'alpha') && !empty($conf->global->MAIN_UPLOAD_DOC)) {
+if (GETPOST('dataMigrationImport', 'alpha') && ! empty($conf->global->MAIN_UPLOAD_DOC)) {
 	// Submit file
-	if (!empty($_FILES)) {
-		if (!preg_match('/\.json/',$_FILES['dataMigrationImportfile']['name'][0]) || $_FILES['dataMigrationImportfile']['size'][0] < 1) {
+	if ( ! empty($_FILES)) {
+		if ( ! preg_match('/\.json/', $_FILES['dataMigrationImportfile']['name'][0]) || $_FILES['dataMigrationImportfile']['size'][0] < 1) {
 			setEventMessages($langs->trans('ErrorFileNotWellFormatted'), null, 'errors');
 		} else {
 			if (is_array($_FILES['dataMigrationImportfile']['tmp_name'])) $userfiles = $_FILES['dataMigrationImportfile']['tmp_name'];
-			else $userfiles = array($_FILES['dataMigrationImportfile']['tmp_name']);
+			else $userfiles                                                          = array($_FILES['dataMigrationImportfile']['tmp_name']);
 
 			foreach ($userfiles as $key => $userfile) {
 				if (empty($_FILES['dataMigrationImportfile']['tmp_name'][$key])) {
@@ -105,30 +105,30 @@ if (GETPOST('dataMigrationImport', 'alpha') && !empty($conf->global->MAIN_UPLOAD
 				}
 			}
 
-			if (!$error) {
+			if ( ! $error) {
 				$filedir = $upload_dir . '/temp/';
-				if (!empty($filedir)) {
+				if ( ! empty($filedir)) {
 					$result = dol_add_file_process($filedir, 0, 1, 'dataMigrationImportfile', '', null, '', 0, null);
 				}
 			}
 
-			$json = file_get_contents($filedir.$_FILES['dataMigrationImportfile']['name'][0]);
+			$json                = file_get_contents($filedir . $_FILES['dataMigrationImportfile']['name'][0]);
 			$digiriskExportArray = json_decode($json, true);
 			$digiriskExportArray = end($digiriskExportArray);
 
 			$it = new RecursiveIteratorIterator(new RecursiveArrayIterator($digiriskExportArray));
-			foreach($it as $key => $v) {
+			foreach ($it as $key => $v) {
 				$element[$key][] = $v;
 			}
 
-			for ($i = 0; $i <= count($element['id']) -1; $i++) {
+			for ($i = 0; $i <= count($element['id']) - 1; $i++) {
 				if ($element['type'][$i] != 'digi-society') {
 					if ($element['type'][$i] == 'digi-group') {
 						$digiriskElement->ref = $refGroupmentMod->getNextValue($digiriskElement);
-						$type = 'groupment';
+						$type                 = 'groupment';
 					} elseif ($element['type'][$i] == 'digi-workunit') {
 						$digiriskElement->ref = $refWorkUnitMod->getNextValue($digiriskElement);
-						$type = 'workunit';
+						$type                 = 'workunit';
 					}
 
 					$digiriskElement->element      = $type;
@@ -147,20 +147,20 @@ if (GETPOST('dataMigrationImport', 'alpha') && !empty($conf->global->MAIN_UPLOAD
 
 		$fileImport = dol_dir_list($filedir, "files", 0, '', '', '', '', 1);
 		$fileImport = array_shift($fileImport);
-		if (!empty($fileImport)) {
+		if ( ! empty($fileImport)) {
 			unlink($fileImport['fullname']);
 		}
 	}
 }
 
-if (GETPOST('dataMigrationImportRisks', 'alpha') && !empty($conf->global->MAIN_UPLOAD_DOC)) {
+if (GETPOST('dataMigrationImportRisks', 'alpha') && ! empty($conf->global->MAIN_UPLOAD_DOC)) {
 	// Submit file
-	if (!empty($_FILES)) {
-		if (!preg_match('/\.json/',$_FILES['dataMigrationImportRisksfile']['name'][0]) || $_FILES['dataMigrationImportRisksfile']['size'][0] < 1) {
+	if ( ! empty($_FILES)) {
+		if ( ! preg_match('/\.json/', $_FILES['dataMigrationImportRisksfile']['name'][0]) || $_FILES['dataMigrationImportRisksfile']['size'][0] < 1) {
 			setEventMessages($langs->trans('ErrorFileNotWellFormatted'), null, 'errors');
 		} else {
 			if (is_array($_FILES['dataMigrationImportRisksfile']['tmp_name'])) $userfiles = $_FILES['dataMigrationImportRisksfile']['tmp_name'];
-			else $userfiles = array($_FILES['dataMigrationImportRisksfile']['tmp_name']);
+			else $userfiles                                                               = array($_FILES['dataMigrationImportRisksfile']['tmp_name']);
 
 			foreach ($userfiles as $key => $userfile) {
 				if (empty($_FILES['dataMigrationImportRisksfile']['tmp_name'][$key])) {
@@ -173,14 +173,14 @@ if (GETPOST('dataMigrationImportRisks', 'alpha') && !empty($conf->global->MAIN_U
 				}
 			}
 
-			if (!$error) {
+			if ( ! $error) {
 				$filedir = $upload_dir . '/temp/';
-				if (!empty($filedir)) {
+				if ( ! empty($filedir)) {
 					$result = dol_add_file_process($filedir, 0, 1, 'dataMigrationImportRisksfile', '', null, '', 0, null);
 				}
 			}
 
-			$json = file_get_contents($filedir.$_FILES['dataMigrationImportRisksfile']['name'][0]);
+			$json                = file_get_contents($filedir . $_FILES['dataMigrationImportRisksfile']['name'][0]);
 			$digiriskExportArray = json_decode($json, true);
 
 			//Risk
@@ -190,7 +190,7 @@ if (GETPOST('dataMigrationImportRisks', 'alpha') && !empty($conf->global->MAIN_U
 				$risk->fk_element = $digiriskElement->fetch_id_from_wp_digi_id($digiriskExportRisk['parent_id']);
 				$risk->fk_projet  = $conf->global->DIGIRISKDOLIBARR_DU_PROJECT;
 
-				if (!$error) {
+				if ( ! $error) {
 					$result = $risk->create($user, true);
 					if ($result > 0) {
 						$riskAssessment->ref                 = $refRiskAssessmentMod->getNextValue($riskAssessment);
@@ -219,13 +219,13 @@ if (GETPOST('dataMigrationImportRisks', 'alpha') && !empty($conf->global->MAIN_U
 
 						if ($result2 < 0) {
 							// Creation evaluation KO
-							if (!empty($riskAssessment->errors)) setEventMessages(null, $riskAssessment->errors, 'errors');
-							else  setEventMessages($riskAssessment->error, null, 'errors');
+							if ( ! empty($riskAssessment->errors)) setEventMessages(null, $riskAssessment->errors, 'errors');
+							else setEventMessages($riskAssessment->error, null, 'errors');
 						}
 					} else {
 						// Creation risk KO
-						if (!empty($risk->errors)) setEventMessages(null, $risk->errors, 'errors');
-						else  setEventMessages($risk->error, null, 'errors');
+						if ( ! empty($risk->errors)) setEventMessages(null, $risk->errors, 'errors');
+						else setEventMessages($risk->error, null, 'errors');
 					}
 				}
 			}
@@ -233,7 +233,7 @@ if (GETPOST('dataMigrationImportRisks', 'alpha') && !empty($conf->global->MAIN_U
 
 		$fileImportRisks = dol_dir_list($filedir, "files", 0, '', '', '', '', 1);
 		$fileImportRisks = array_shift($fileImportRisks);
-		if (!empty($fileImportRisks)) {
+		if ( ! empty($fileImportRisks)) {
 			unlink($fileImportRisks['fullname']);
 		}
 	}
@@ -254,15 +254,15 @@ print load_fiche_titre($langs->trans("Tools"), '', 'wrench');
 if ($user->rights->digiriskdolibarr->adminpage->read) {
 	print load_fiche_titre($langs->trans("DigiriskDataMigration"), '', '');
 
-	print '<form class="data-migration-from" name="DataMigration" id="DataMigration" action="'.$_SERVER["PHP_SELF"].'" enctype="multipart/form-data" method="POST">';
-	print '<input type="hidden" name="token" value="'.newToken().'">';
+	print '<form class="data-migration-from" name="DataMigration" id="DataMigration" action="' . $_SERVER["PHP_SELF"] . '" enctype="multipart/form-data" method="POST">';
+	print '<input type="hidden" name="token" value="' . newToken() . '">';
 	print '<input type="hidden" name="action" value="">';
 
 	print '<table class="noborder centpercent">';
 	print '<tr class="liste_titre">';
-	print '<td>'.$langs->trans("Name").'</td>';
-	print '<td>'.$langs->trans("Description").'</td>';
-	print '<td class="center">'.$langs->trans("Action").'</td>';
+	print '<td>' . $langs->trans("Name") . '</td>';
+	print '<td>' . $langs->trans("Description") . '</td>';
+	print '<td class="center">' . $langs->trans("Action") . '</td>';
 	print '</tr>';
 
 	print '<tr class="oddeven"><td>';
@@ -273,7 +273,7 @@ if ($user->rights->digiriskdolibarr->adminpage->read) {
 
 	print '<td class="center data-migration-import">';
 	print '<input class="flat" type="file" name="dataMigrationImportfile[]" id="data-migration-import" />';
-	print '<input type="submit" class="button reposition data-migration-submit" name="dataMigrationImport" value="'.$langs->trans("Upload").'">';
+	print '<input type="submit" class="button reposition data-migration-submit" name="dataMigrationImport" value="' . $langs->trans("Upload") . '">';
 	print '</td>';
 	print '</tr>';
 
@@ -285,7 +285,7 @@ if ($user->rights->digiriskdolibarr->adminpage->read) {
 
 	print '<td class="center data-migration-import-risks">';
 	print '<input class="flat" type="file" name="dataMigrationImportRisksfile[]" id="data-migration-import-risks" />';
-	print '<input type="submit" class="button reposition data-migration-submit" name="dataMigrationImportRisks" value="'.$langs->trans("Upload").'">';
+	print '<input type="submit" class="button reposition data-migration-submit" name="dataMigrationImportRisks" value="' . $langs->trans("Upload") . '">';
 	print '</td>';
 	print '</tr>';
 	print '</table>';

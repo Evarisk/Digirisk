@@ -21,9 +21,9 @@
  * \brief       This file is a class file for PreventionPlan
  */
 
-require_once DOL_DOCUMENT_ROOT.'/user/class/user.class.php';
-require_once DOL_DOCUMENT_ROOT.'/contact/class/contact.class.php';
-require_once DOL_DOCUMENT_ROOT.'/societe/class/societe.class.php';
+require_once DOL_DOCUMENT_ROOT . '/user/class/user.class.php';
+require_once DOL_DOCUMENT_ROOT . '/contact/class/contact.class.php';
+require_once DOL_DOCUMENT_ROOT . '/societe/class/societe.class.php';
 
 require_once __DIR__ . '/digiriskdocuments.class.php';
 require_once __DIR__ . '/digirisksignature.class.php';
@@ -75,25 +75,25 @@ class PreventionPlan extends CommonObject
 	/**
 	 * @var array  Array with all fields and their property. Do not use it as a static var. It may be modified by constructor.
 	 */
-	public $fields=array(
-		'rowid'                => array('type'=>'integer', 'label'=>'TechnicalID', 'enabled'=>'1', 'position'=>1, 'notnull'=>1, 'visible'=>0, 'noteditable'=>'1', 'index'=>1, 'comment'=>"Id"),
-		'ref'                  => array('type'=>'varchar(128)', 'label'=>'Ref', 'enabled'=>'1', 'position'=>10, 'notnull'=>1, 'visible'=>1, 'noteditable'=>'1', 'default'=>'(PROV)', 'index'=>1, 'searchall'=>1, 'showoncombobox'=>'1', 'comment'=>"Reference of object"),
-		'ref_ext'              => array('type'=>'varchar(128)', 'label'=>'RefExt', 'enabled'=>'1', 'position'=>20, 'notnull'=>0, 'visible'=>0,),
-		'entity'               => array('type'=>'integer', 'label'=>'Entity', 'enabled'=>'1', 'position'=>30, 'notnull'=>1, 'visible'=>0,),
-		'date_creation'        => array('type'=>'datetime', 'label'=>'DateCreation', 'enabled'=>'1', 'position'=>40, 'notnull'=>1, 'visible'=>0,),
-		'tms'                  => array('type'=>'timestamp', 'label'=>'DateModification', 'enabled'=>'1', 'position'=>50, 'notnull'=>0, 'visible'=>0,),
-		'status'               => array('type'=>'smallint', 'label'=>'Status', 'enabled'=>'1', 'position'=>70, 'notnull'=>0, 'visible'=>1, 'index'=>0,),
-		'label'                => array('type'=>'varchar(255)', 'label'=>'Label', 'enabled'=>'1', 'position'=>80, 'notnull'=>0, 'visible'=>1, 'searchall'=>1, 'css'=>'minwidth200', 'help'=>"Help text", 'showoncombobox'=>'1',),
-		'date_start'           => array('type'=>'datetime', 'label'=>'StartDate', 'enabled'=>'1', 'position'=>100, 'notnull'=>-1, 'visible'=>1,),
-		'date_end'             => array('type'=>'datetime', 'label'=>'EndDate', 'enabled'=>'1', 'position'=>130, 'notnull'=>-1, 'visible'=>1,),
-		'prior_visit_bool'     => array('type'=>'boolean', 'label'=>'PriorVisit', 'enabled'=>'1', 'position'=>140, 'notnull'=>-1, 'visible'=>-1,),
-		'prior_visit_text'     => array('type'=>'text', 'label'=>'PriorVisitText', 'enabled'=>'1', 'position'=>150, 'notnull'=>-1, 'visible'=>-1,),
-		'prior_visit_date'     => array('type'=>'datetime', 'label'=>'PriorVisitDate', 'enabled'=>'1', 'position'=>200, 'notnull'=>-1, 'visible'=>-1,),
-		'cssct_intervention'   => array('type'=>'boolean', 'label'=>'CSSCTIntervention', 'enabled'=>'1', 'position'=>160, 'notnull'=>-1, 'visible'=>-1,),
-		'fk_project'           => array('type'=>'integer:Project:projet/class/project.class.php', 'label'=>'Project', 'enabled'=>'1', 'position'=>170, 'notnull'=>1, 'visible'=>1,),
-		'fk_user_creat'        => array('type'=>'integer:User:user/class/user.class.php', 'label'=>'UserAuthor', 'enabled'=>'1', 'position'=>180, 'notnull'=>1, 'visible'=>0, 'foreignkey'=>'user.rowid',),
-		'fk_user_modif'        => array('type'=>'integer:User:user/class/user.class.php', 'label'=>'UserModif', 'enabled'=>'1', 'position'=>190, 'notnull'=>-1, 'visible'=>0,),
-		'last_email_sent_date' => array('type'=>'datetime', 'label'=>'LastEmailSentDate', 'enabled'=>'1', 'position'=>200, 'notnull'=>-1, 'visible'=>-2,),
+	public $fields = array(
+		'rowid'                => array('type' => 'integer', 'label' => 'TechnicalID', 'enabled' => '1', 'position' => 1, 'notnull' => 1, 'visible' => 0, 'noteditable' => '1', 'index' => 1, 'comment' => "Id"),
+		'ref'                  => array('type' => 'varchar(128)', 'label' => 'Ref', 'enabled' => '1', 'position' => 10, 'notnull' => 1, 'visible' => 1, 'noteditable' => '1', 'default' => '(PROV)', 'index' => 1, 'searchall' => 1, 'showoncombobox' => '1', 'comment' => "Reference of object"),
+		'ref_ext'              => array('type' => 'varchar(128)', 'label' => 'RefExt', 'enabled' => '1', 'position' => 20, 'notnull' => 0, 'visible' => 0,),
+		'entity'               => array('type' => 'integer', 'label' => 'Entity', 'enabled' => '1', 'position' => 30, 'notnull' => 1, 'visible' => 0,),
+		'date_creation'        => array('type' => 'datetime', 'label' => 'DateCreation', 'enabled' => '1', 'position' => 40, 'notnull' => 1, 'visible' => 0,),
+		'tms'                  => array('type' => 'timestamp', 'label' => 'DateModification', 'enabled' => '1', 'position' => 50, 'notnull' => 0, 'visible' => 0,),
+		'status'               => array('type' => 'smallint', 'label' => 'Status', 'enabled' => '1', 'position' => 70, 'notnull' => 0, 'visible' => 1, 'index' => 0,),
+		'label'                => array('type' => 'varchar(255)', 'label' => 'Label', 'enabled' => '1', 'position' => 80, 'notnull' => 0, 'visible' => 1, 'searchall' => 1, 'css' => 'minwidth200', 'help' => "Help text", 'showoncombobox' => '1',),
+		'date_start'           => array('type' => 'datetime', 'label' => 'StartDate', 'enabled' => '1', 'position' => 100, 'notnull' => -1, 'visible' => 1,),
+		'date_end'             => array('type' => 'datetime', 'label' => 'EndDate', 'enabled' => '1', 'position' => 130, 'notnull' => -1, 'visible' => 1,),
+		'prior_visit_bool'     => array('type' => 'boolean', 'label' => 'PriorVisit', 'enabled' => '1', 'position' => 140, 'notnull' => -1, 'visible' => -1,),
+		'prior_visit_text'     => array('type' => 'text', 'label' => 'PriorVisitText', 'enabled' => '1', 'position' => 150, 'notnull' => -1, 'visible' => -1,),
+		'prior_visit_date'     => array('type' => 'datetime', 'label' => 'PriorVisitDate', 'enabled' => '1', 'position' => 200, 'notnull' => -1, 'visible' => -1,),
+		'cssct_intervention'   => array('type' => 'boolean', 'label' => 'CSSCTIntervention', 'enabled' => '1', 'position' => 160, 'notnull' => -1, 'visible' => -1,),
+		'fk_project'           => array('type' => 'integer:Project:projet/class/project.class.php', 'label' => 'Project', 'enabled' => '1', 'position' => 170, 'notnull' => 1, 'visible' => 1,),
+		'fk_user_creat'        => array('type' => 'integer:User:user/class/user.class.php', 'label' => 'UserAuthor', 'enabled' => '1', 'position' => 180, 'notnull' => 1, 'visible' => 0, 'foreignkey' => 'user.rowid',),
+		'fk_user_modif'        => array('type' => 'integer:User:user/class/user.class.php', 'label' => 'UserModif', 'enabled' => '1', 'position' => 190, 'notnull' => -1, 'visible' => 0,),
+		'last_email_sent_date' => array('type' => 'datetime', 'label' => 'LastEmailSentDate', 'enabled' => '1', 'position' => 200, 'notnull' => -1, 'visible' => -2,),
 	);
 
 	public $rowid;
@@ -127,26 +127,20 @@ class PreventionPlan extends CommonObject
 		$this->db = $db;
 
 		if (empty($conf->global->MAIN_SHOW_TECHNICAL_ID) && isset($this->fields['rowid'])) $this->fields['rowid']['visible'] = 0;
-		if (empty($conf->multicompany->enabled) && isset($this->fields['entity'])) $this->fields['entity']['enabled'] = 0;
+		if (empty($conf->multicompany->enabled) && isset($this->fields['entity'])) $this->fields['entity']['enabled']        = 0;
 
 		// Unset fields that are disabled
-		foreach ($this->fields as $key => $val)
-		{
-			if (isset($val['enabled']) && empty($val['enabled']))
-			{
+		foreach ($this->fields as $key => $val) {
+			if (isset($val['enabled']) && empty($val['enabled'])) {
 				unset($this->fields[$key]);
 			}
 		}
 
 		// Translate some data of arrayofkeyval
-		if (is_object($langs))
-		{
-			foreach ($this->fields as $key => $val)
-			{
-				if (is_array($val['arrayofkeyval']))
-				{
-					foreach ($val['arrayofkeyval'] as $key2 => $val2)
-					{
+		if (is_object($langs)) {
+			foreach ($this->fields as $key => $val) {
+				if (is_array($val['arrayofkeyval'])) {
+					foreach ($val['arrayofkeyval'] as $key2 => $val2) {
 						$this->fields[$key]['arrayofkeyval'][$key2] = $langs->trans($val2);
 					}
 				}
@@ -194,12 +188,12 @@ class PreventionPlan extends CommonObject
 
 		// Load source object
 		$result = $object->fetchCommon($fromid);
-		if ($result > 0 && !empty($object->table_element_line)) {
+		if ($result > 0 && ! empty($object->table_element_line)) {
 			$object->fetchLines();
 		}
 
 		// Load openinghours form source object
-		$morewhere = ' AND element_id = ' . $object->id;
+		$morewhere  = ' AND element_id = ' . $object->id;
 		$morewhere .= ' AND element_type = ' . "'" . $object->element . "'";
 		$morewhere .= ' AND status = 1';
 
@@ -209,7 +203,7 @@ class PreventionPlan extends CommonObject
 		$signatories = $signatory->fetchSignatory("", $fromid, 'preventionplan');
 		$resources   = $digiriskresources->fetchResourcesFromObject('', $object);
 
-		if (!empty ($signatories) && $signatories > 0) {
+		if ( ! empty($signatories) && $signatories > 0) {
 			foreach ($signatories as $arrayRole) {
 				foreach ($arrayRole as $signatory) {
 					$signatoriesID[$signatory->role] = $signatory->id;
@@ -233,7 +227,7 @@ class PreventionPlan extends CommonObject
 			$object->ref_ext = 'digirisk_' . $object->ref;
 		}
 		if (property_exists($object, 'label')) {
-			$object->label = empty($this->fields['label']['default']) ? $langs->trans("CopyOf")." ".$object->label : $this->fields['label']['default'];
+			$object->label = empty($this->fields['label']['default']) ? $langs->trans("CopyOf") . " " . $object->label : $this->fields['label']['default'];
 		}
 		if (property_exists($object, 'date_creation')) {
 			$object->date_creation = dol_now();
@@ -244,7 +238,7 @@ class PreventionPlan extends CommonObject
 
 		// Create clone
 		$object->context['createfromclone'] = 'createfromclone';
-		$preventionplanid = $object->create($user);
+		$preventionplanid                   = $object->create($user);
 
 		if ($preventionplanid > 0) {
 			$digiriskresources->digirisk_dolibarr_set_resources($this->db, $user->id, 'PP_EXT_SOCIETY', 'societe', array(array_shift($resources['PP_EXT_SOCIETY'])->id), $conf->entity, 'preventionplan', $preventionplanid, 1);
@@ -253,26 +247,26 @@ class PreventionPlan extends CommonObject
 			$signatory->createFromClone($user, $signatoriesID['PP_MAITRE_OEUVRE'], $preventionplanid);
 			$signatory->createFromClone($user, $signatoriesID['PP_EXT_SOCIETY_RESPONSIBLE'], $preventionplanid);
 
-			if (!empty($options['schedule'])) {
-				if (!empty($openinghours)) {
+			if ( ! empty($options['schedule'])) {
+				if ( ! empty($openinghours)) {
 					$openinghours->element_id = $preventionplanid;
 					$openinghours->create($user);
 				}
 			}
 
-			if (!empty($options['attendants'])) {
-				if (!empty($extintervenant_ids) && $extintervenant_ids > 0) {
+			if ( ! empty($options['attendants'])) {
+				if ( ! empty($extintervenant_ids) && $extintervenant_ids > 0) {
 					foreach ($extintervenant_ids as $extintervenant_id) {
 						$signatory->createFromClone($user, $extintervenant_id, $preventionplanid);
 					}
 				}
 			}
 
-			if (!empty($options['preventionplan_risk'])) {
+			if ( ! empty($options['preventionplan_risk'])) {
 				$num = (is_array($object->lines) ? count($object->lines) : 0);
 				for ($i = 0; $i < $num; $i++) {
-					$line = $object->lines[$i];
-					$line->category = empty($line->category) ? 0 : $line->category;
+					$line                    = $object->lines[$i];
+					$line->category          = empty($line->category) ? 0 : $line->category;
 					$line->fk_preventionplan = $preventionplanid;
 
 					$result = $line->insert($user, 1);
@@ -285,14 +279,14 @@ class PreventionPlan extends CommonObject
 			}
 		} else {
 			$error++;
-			$this->error = $object->error;
+			$this->error  = $object->error;
 			$this->errors = $object->errors;
 		}
 
 		unset($object->context['createfromclone']);
 
 		// End
-		if (!$error) {
+		if ( ! $error) {
 			$this->db->commit();
 			return $preventionplanid;
 		} else {
@@ -344,45 +338,41 @@ class PreventionPlan extends CommonObject
 
 		$records = array();
 
-		$sql = 'SELECT ';
-		$sql .= $this->getFieldList();
-		$sql .= ' FROM '.MAIN_DB_PREFIX.$this->table_element.' as t';
-		if (isset($this->ismultientitymanaged) && $this->ismultientitymanaged == 1) $sql .= ' WHERE t.entity IN ('.getEntity($this->table_element).')';
-		else $sql .= ' WHERE 1 = 1';
+		$sql                                                                              = 'SELECT ';
+		$sql                                                                             .= $this->getFieldList();
+		$sql                                                                             .= ' FROM ' . MAIN_DB_PREFIX . $this->table_element . ' as t';
+		if (isset($this->ismultientitymanaged) && $this->ismultientitymanaged == 1) $sql .= ' WHERE t.entity IN (' . getEntity($this->table_element) . ')';
+		else $sql                                                                        .= ' WHERE 1 = 1';
 		// Manage filter
 		$sqlwhere = array();
 		if (count($filter) > 0) {
 			foreach ($filter as $key => $value) {
 				if ($key == 't.rowid') {
-					$sqlwhere[] = $key.'='.$value;
-				}
-				elseif (strpos($key, 'date') !== false) {
-					$sqlwhere[] = $key.' = \''.$this->db->idate($value).'\'';
-				}
-				elseif ($key == 'customsql') {
+					$sqlwhere[] = $key . '=' . $value;
+				} elseif (strpos($key, 'date') !== false) {
+					$sqlwhere[] = $key . ' = \'' . $this->db->idate($value) . '\'';
+				} elseif ($key == 'customsql') {
 					$sqlwhere[] = $value;
-				}
-				else {
-					$sqlwhere[] = $key.' LIKE \'%'.$this->db->escape($value).'%\'';
+				} else {
+					$sqlwhere[] = $key . ' LIKE \'%' . $this->db->escape($value) . '%\'';
 				}
 			}
 		}
 		if (count($sqlwhere) > 0) {
-			$sql .= ' AND ('.implode(' '.$filtermode.' ', $sqlwhere).')';
+			$sql .= ' AND (' . implode(' ' . $filtermode . ' ', $sqlwhere) . ')';
 		}
 
-		if (!empty($sortfield)) {
+		if ( ! empty($sortfield)) {
 			$sql .= $this->db->order($sortfield, $sortorder);
 		}
-		if (!empty($limit)) {
-			$sql .= ' '.$this->db->plimit($limit, $offset);
+		if ( ! empty($limit)) {
+			$sql .= ' ' . $this->db->plimit($limit, $offset);
 		}
 		$resql = $this->db->query($sql);
 		if ($resql) {
 			$num = $this->db->num_rows($resql);
-			$i = 0;
-			while ($i < ($limit ? min($limit, $num) : $num))
-			{
+			$i   = 0;
+			while ($i < ($limit ? min($limit, $num) : $num)) {
 				$obj = $this->db->fetch_object($resql);
 
 				$record = new self($this->db);
@@ -396,8 +386,8 @@ class PreventionPlan extends CommonObject
 
 			return $records;
 		} else {
-			$this->errors[] = 'Error '.$this->db->lasterror();
-			dol_syslog(__METHOD__.' '.join(',', $this->errors), LOG_ERR);
+			$this->errors[] = 'Error ' . $this->db->lasterror();
+			dol_syslog(__METHOD__ . ' ' . join(',', $this->errors), LOG_ERR);
 
 			return -1;
 		}
@@ -436,33 +426,28 @@ class PreventionPlan extends CommonObject
 	 */
 	public function info($id)
 	{
-		$sql = 'SELECT rowid, date_creation as datec, tms as datem,';
-		$sql .= ' fk_user_creat, fk_user_modif';
-		$sql .= ' FROM '.MAIN_DB_PREFIX.$this->table_element.' as t';
-		$sql .= ' WHERE t.rowid = '.$id;
+		$sql    = 'SELECT rowid, date_creation as datec, tms as datem,';
+		$sql   .= ' fk_user_creat, fk_user_modif';
+		$sql   .= ' FROM ' . MAIN_DB_PREFIX . $this->table_element . ' as t';
+		$sql   .= ' WHERE t.rowid = ' . $id;
 		$result = $this->db->query($sql);
-		if ($result)
-		{
-			if ($this->db->num_rows($result))
-			{
-				$obj = $this->db->fetch_object($result);
+		if ($result) {
+			if ($this->db->num_rows($result)) {
+				$obj      = $this->db->fetch_object($result);
 				$this->id = $obj->rowid;
-				if ($obj->fk_user_author)
-				{
+				if ($obj->fk_user_author) {
 					$cuser = new User($this->db);
 					$cuser->fetch($obj->fk_user_author);
 					$this->user_creation = $cuser;
 				}
 
-				if ($obj->fk_user_valid)
-				{
+				if ($obj->fk_user_valid) {
 					$vuser = new User($this->db);
 					$vuser->fetch($obj->fk_user_valid);
 					$this->user_validation = $vuser;
 				}
 
-				if ($obj->fk_user_cloture)
-				{
+				if ($obj->fk_user_cloture) {
 					$cluser = new User($this->db);
 					$cluser->fetch($obj->fk_user_cloture);
 					$this->user_cloture = $cluser;
@@ -474,9 +459,7 @@ class PreventionPlan extends CommonObject
 			}
 
 			$this->db->free($result);
-		}
-		else
-		{
+		} else {
 			dol_print_error($this->db);
 		}
 	}
@@ -552,21 +535,20 @@ class PreventionPlan extends CommonObject
 	{
 
 		// phpcs:enable
-		if (empty($this->labelStatus) || empty($this->labelStatusShort))
-		{
+		if (empty($this->labelStatus) || empty($this->labelStatusShort)) {
 			global $langs;
 			$langs->load("digiriskdolibarr@digiriskdolibarr");
 
-			$this->labelStatus[self::STATUS_IN_PROGRESS] = $langs->trans('InProgress');
+			$this->labelStatus[self::STATUS_IN_PROGRESS]       = $langs->trans('InProgress');
 			$this->labelStatus[self::STATUS_PENDING_SIGNATURE] = $langs->trans('ValidatePendingSignature');
-			$this->labelStatus[self::STATUS_LOCKED] = $langs->trans('Locked');
-			$this->labelStatus[self::STATUS_ARCHIVED] = $langs->trans('Archived');
+			$this->labelStatus[self::STATUS_LOCKED]            = $langs->trans('Locked');
+			$this->labelStatus[self::STATUS_ARCHIVED]          = $langs->trans('Archived');
 		}
 
-		$statusType = 'status'.$status;
+		$statusType                                                = 'status' . $status;
 		if ($status == self::STATUS_PENDING_SIGNATURE) $statusType = 'status3';
-		if ($status == self::STATUS_LOCKED) $statusType = 'status8';
-		if ($status == self::STATUS_ARCHIVED) $statusType = 'status8';
+		if ($status == self::STATUS_LOCKED) $statusType            = 'status8';
+		if ($status == self::STATUS_ARCHIVED) $statusType          = 'status8';
 
 		return dolGetStatus($this->labelStatus[$status], $this->labelStatusShort[$status], '', $statusType, $mode);
 	}
@@ -585,7 +567,7 @@ class PreventionPlan extends CommonObject
 	{
 		global $conf, $langs, $hookmanager;
 
-		if (!empty($conf->dol_no_mouse_hover)) $notooltip = 1; // Force disable tooltips
+		if ( ! empty($conf->dol_no_mouse_hover)) $notooltip = 1; // Force disable tooltips
 
 		$name = $this->ref;
 
@@ -594,14 +576,11 @@ class PreventionPlan extends CommonObject
 		$result = ''; $label = '';
 		$linkstart = ''; $linkend = '';
 
-		if (!empty($this->logo) && class_exists('Form'))
-		{
+		if ( ! empty($this->logo) && class_exists('Form')) {
 			$label .= '<div class="photointooltip">';
 			$label .= Form::showphoto('societe', $this, 0, 40, 0, '', 'mini', 0); // Important, we must force height so image will have height tags and if image is inside a tooltip, the tooltip manager can calculate height and position correctly the tooltip.
 			$label .= '</div><div style="clear: both;"></div>';
-		}
-		elseif (!empty($this->logo_squarred) && class_exists('Form'))
-		{
+		} elseif ( ! empty($this->logo_squarred) && class_exists('Form')) {
 			/*$label.= '<div class="photointooltip">';
 			$label.= Form::showphoto('societe', $this, 0, 40, 0, 'photowithmargin', 'mini', 0);	// Important, we must force height so image will have height tags and if image is inside a tooltip, the tooltip manager can calculate height and position correctly the tooltip.
 			$label.= '</div><div style="clear: both;"></div>';*/
@@ -610,15 +589,13 @@ class PreventionPlan extends CommonObject
 		$label .= '<div class="centpercent">';
 
 		// By default
-		if (empty($linkstart))
-		{
-			$label .= '<u>'.$langs->trans("PreventionPlan").'</u>';
-			$linkstart = '<a href="'.DOL_URL_ROOT.'/custom/digiriskdolibarr/view/preventionplan/preventionplan_card.php?id='.$this->id;
+		if (empty($linkstart)) {
+			$label    .= '<u>' . $langs->trans("PreventionPlan") . '</u>';
+			$linkstart = '<a href="' . DOL_URL_ROOT . '/custom/digiriskdolibarr/view/preventionplan/preventionplan_card.php?id=' . $this->id;
 		}
 
-		if (!empty($this->ref))
-		{
-			$label .= '<br><b>'.$langs->trans('Ref').':</b> '.$this->ref;
+		if ( ! empty($this->ref)) {
+			$label .= '<br><b>' . $langs->trans('Ref') . ':</b> ' . $this->ref;
 		}
 
 		$label .= '</div>';
@@ -626,26 +603,24 @@ class PreventionPlan extends CommonObject
 		$linkstart .= '"';
 
 		$linkclose = '';
-		if ($option == 'blank'){
+		if ($option == 'blank') {
 			$linkclose .= ' target=_blank';
 		}
-		if (empty($notooltip))
-		{
-			if (!empty($conf->global->MAIN_OPTIMIZEFORTEXTBROWSER))
-			{
-				$label = $langs->trans("ShowCompany");
-				$linkclose .= ' alt="'.dol_escape_htmltag($label, 1).'"';
+		if (empty($notooltip)) {
+			if ( ! empty($conf->global->MAIN_OPTIMIZEFORTEXTBROWSER)) {
+				$label      = $langs->trans("ShowCompany");
+				$linkclose .= ' alt="' . dol_escape_htmltag($label, 1) . '"';
 			}
-			$linkclose .= ' title="'.dol_escape_htmltag($label, 1).'"';
+			$linkclose .= ' title="' . dol_escape_htmltag($label, 1) . '"';
 			$linkclose .= ' class="classfortooltip refurl"';
 		}
-		$linkstart .= $linkclose.'>';
-		$linkend = '</a>';
+		$linkstart .= $linkclose . '>';
+		$linkend    = '</a>';
 
-		$result .= $linkstart;
-		if ($withpicto) $result .= img_object(($notooltip ? '' : $label), ($this->picto ? $this->picto : 'generic'), ($notooltip ? (($withpicto != 2) ? 'class="paddingright"' : '') : 'class="'.(($withpicto != 2) ? 'paddingright ' : '').'classfortooltip"'), 0, 0, $notooltip ? 0 : 1);
-		if ($withpicto != 2) $result .= ($maxlen ?dol_trunc($name, $maxlen) : $name);
-		$result .= $linkend;
+		$result                      .= $linkstart;
+		if ($withpicto) $result      .= img_object(($notooltip ? '' : $label), ($this->picto ? $this->picto : 'generic'), ($notooltip ? (($withpicto != 2) ? 'class="paddingright"' : '') : 'class="' . (($withpicto != 2) ? 'paddingright ' : '') . 'classfortooltip"'), 0, 0, $notooltip ? 0 : 1);
+		if ($withpicto != 2) $result .= ($maxlen ? dol_trunc($name, $maxlen) : $name);
+		$result                      .= $linkend;
 
 		 $result .= $hookmanager->resPrint;
 
@@ -676,12 +651,12 @@ class PreventionPlan extends CommonObject
 	{
 		global $conf, $user, $langs;
 
-		$out = '';
-		$num = 0;
+		$out      = '';
+		$num      = 0;
 		$outarray = array();
 
-		if ($selected === '') $selected = array();
-		elseif (!is_array($selected)) $selected = array($selected);
+		if ($selected === '') $selected           = array();
+		elseif ( ! is_array($selected)) $selected = array($selected);
 
 		// Clean $filter that may contains sql conditions so sql code
 		if (function_exists('testSqlAndScriptInject')) {
@@ -690,75 +665,62 @@ class PreventionPlan extends CommonObject
 			}
 		}
 		// On recherche les societes
-		$sql = 'SELECT ';
+		$sql  = 'SELECT ';
 		$sql .= $this->getFieldList();
-		$sql .= " FROM ".MAIN_DB_PREFIX."digiriskdolibarr_preventionplan as s";
+		$sql .= " FROM " . MAIN_DB_PREFIX . "digiriskdolibarr_preventionplan as s";
 
-		$sql .= " WHERE s.entity IN (".getEntity($this->table_element).")";
-		if ($filter) $sql .= " AND (".$filter.")";
-		$sql .= " AND status != 0";
-		$sql .= $this->db->order("rowid", "ASC");
-		$sql .= $this->db->plimit($limit, 0);
+		$sql              .= " WHERE s.entity IN (" . getEntity($this->table_element) . ")";
+		if ($filter) $sql .= " AND (" . $filter . ")";
+		$sql              .= " AND status != 0";
+		$sql              .= $this->db->order("rowid", "ASC");
+		$sql              .= $this->db->plimit($limit, 0);
 
 		// Build output string
-		dol_syslog(get_class($this)."::select_preventionplan_list", LOG_DEBUG);
+		dol_syslog(get_class($this) . "::select_preventionplan_list", LOG_DEBUG);
 		$resql = $this->db->query($sql);
-		if ($resql)
-		{
-			if (!$forcecombo)
-			{
-				include_once DOL_DOCUMENT_ROOT.'/core/lib/ajax.lib.php';
+		if ($resql) {
+			if ( ! $forcecombo) {
+				include_once DOL_DOCUMENT_ROOT . '/core/lib/ajax.lib.php';
 				$out .= ajax_combobox($htmlname, $events, 0);
 			}
 
 			// Construct $out and $outarray
-			$out .= '<select id="'.$htmlname.'" class="flat'.($morecss ? ' '.$morecss : '').'"'.($moreparam ? ' '.$moreparam : '').' name="'.$htmlname.($multiple ? '[]' : '').'" '.($multiple ? 'multiple' : '').'>'."\n";
+			$out .= '<select id="' . $htmlname . '" class="flat' . ($morecss ? ' ' . $morecss : '') . '"' . ($moreparam ? ' ' . $moreparam : '') . ' name="' . $htmlname . ($multiple ? '[]' : '') . '" ' . ($multiple ? 'multiple' : '') . '>' . "\n";
 
-			$textifempty = (($showempty && !is_numeric($showempty)) ? $langs->trans($showempty) : '');
-			if ($showempty) $out .= '<option value="-1">'.$textifempty.'</option>'."\n";
+			$textifempty          = (($showempty && ! is_numeric($showempty)) ? $langs->trans($showempty) : '');
+			if ($showempty) $out .= '<option value="-1">' . $textifempty . '</option>' . "\n";
 
 			$num = $this->db->num_rows($resql);
-			$i = 0;
-			if ($num)
-			{
-				while ($i < $num)
-				{
-					$obj = $this->db->fetch_object($resql);
+			$i   = 0;
+			if ($num) {
+				while ($i < $num) {
+					$obj   = $this->db->fetch_object($resql);
 					$label = $obj->ref;
 
-					if (empty($outputmode))
-					{
-						if (in_array($obj->rowid, $selected))
-						{
-							$out .= '<option value="'.$obj->rowid.'" selected>'.$label.'</option>';
+					if (empty($outputmode)) {
+						if (in_array($obj->rowid, $selected)) {
+							$out .= '<option value="' . $obj->rowid . '" selected>' . $label . '</option>';
+						} else {
+							$out .= '<option value="' . $obj->rowid . '">' . $label . '</option>';
 						}
-						else
-						{
-							$out .= '<option value="'.$obj->rowid.'">'.$label.'</option>';
-						}
-					}
-					else
-					{
-						array_push($outarray, array('key'=>$obj->rowid, 'value'=>$label, 'label'=>$label));
+					} else {
+						array_push($outarray, array('key' => $obj->rowid, 'value' => $label, 'label' => $label));
 					}
 
 					$i++;
 					if (($i % 10) == 0) $out .= "\n";
 				}
 			}
-			$out .= '</select>'."\n";
-		}
-		else
-		{
+			$out .= '</select>' . "\n";
+		} else {
 			dol_print_error($this->db);
 		}
 
-		$this->result = array('nbofpreventionplan'=>$num);
+		$this->result = array('nbofpreventionplan' => $num);
 
 		if ($outputmode) return $outarray;
 		return $out;
 	}
-
 }
 /**
  *	Class to manage invoice lines.
@@ -793,18 +755,18 @@ class PreventionPlanLine extends CommonObjectLine
 	/**
 	 * @var array  Array with all fields and their property. Do not use it as a static var. It may be modified by constructor.
 	 */
-	public $fields=array(
-		'rowid'             => array('type'=>'integer', 'label'=>'TechnicalID', 'enabled'=>'1', 'position'=>1, 'notnull'=>1, 'visible'=>0, 'noteditable'=>'1', 'index'=>1, 'comment'=>"Id"),
-		'ref'               => array('type'=>'varchar(128)', 'label'=>'Ref', 'enabled'=>'1', 'position'=>10, 'notnull'=>1, 'visible'=>1, 'noteditable'=>'1', 'default'=>'(PROV)', 'index'=>1, 'searchall'=>1, 'showoncombobox'=>'1', 'comment'=>"Reference of object"),
-		'ref_ext'           => array('type'=>'varchar(128)', 'label'=>'RefExt', 'enabled'=>'1', 'position'=>20, 'notnull'=>0, 'visible'=>0,),
-		'entity'            => array('type'=>'integer', 'label'=>'Entity', 'enabled'=>'1', 'position'=>30, 'notnull'=>1, 'visible'=>0,),
-		'date_creation'     => array('type'=>'datetime', 'label'=>'DateCreation', 'enabled'=>'1', 'position'=>40, 'notnull'=>1, 'visible'=>0,),
-		'tms'               => array('type'=>'timestamp', 'label'=>'DateModification', 'enabled'=>'1', 'position'=>50, 'notnull'=>0, 'visible'=>0,),
-		'category'          => array('type'=>'integer', 'label'=>'PriorVisit', 'enabled'=>'1', 'position'=>60, 'notnull'=>-1, 'visible'=>-1,),
-		'description'       => array('type'=>'text', 'label'=>'Description', 'enabled'=>'1', 'position'=>70, 'notnull'=>-1, 'visible'=>-1,),
-		'prevention_method' => array('type'=>'text', 'label'=>'PreventionMethod', 'enabled'=>'1', 'position'=>80, 'notnull'=>-1, 'visible'=>-1,),
-		'fk_preventionplan' => array('type'=>'integer', 'label'=>'FkPreventionPlan', 'enabled'=>'1', 'position'=>90, 'notnull'=>1, 'visible'=>0,),
-		'fk_element'        => array('type'=>'integer', 'label'=>'FkElement', 'enabled'=>'1', 'position'=>100, 'notnull'=>1, 'visible'=>0,),
+	public $fields = array(
+		'rowid'             => array('type' => 'integer', 'label' => 'TechnicalID', 'enabled' => '1', 'position' => 1, 'notnull' => 1, 'visible' => 0, 'noteditable' => '1', 'index' => 1, 'comment' => "Id"),
+		'ref'               => array('type' => 'varchar(128)', 'label' => 'Ref', 'enabled' => '1', 'position' => 10, 'notnull' => 1, 'visible' => 1, 'noteditable' => '1', 'default' => '(PROV)', 'index' => 1, 'searchall' => 1, 'showoncombobox' => '1', 'comment' => "Reference of object"),
+		'ref_ext'           => array('type' => 'varchar(128)', 'label' => 'RefExt', 'enabled' => '1', 'position' => 20, 'notnull' => 0, 'visible' => 0,),
+		'entity'            => array('type' => 'integer', 'label' => 'Entity', 'enabled' => '1', 'position' => 30, 'notnull' => 1, 'visible' => 0,),
+		'date_creation'     => array('type' => 'datetime', 'label' => 'DateCreation', 'enabled' => '1', 'position' => 40, 'notnull' => 1, 'visible' => 0,),
+		'tms'               => array('type' => 'timestamp', 'label' => 'DateModification', 'enabled' => '1', 'position' => 50, 'notnull' => 0, 'visible' => 0,),
+		'category'          => array('type' => 'integer', 'label' => 'PriorVisit', 'enabled' => '1', 'position' => 60, 'notnull' => -1, 'visible' => -1,),
+		'description'       => array('type' => 'text', 'label' => 'Description', 'enabled' => '1', 'position' => 70, 'notnull' => -1, 'visible' => -1,),
+		'prevention_method' => array('type' => 'text', 'label' => 'PreventionMethod', 'enabled' => '1', 'position' => 80, 'notnull' => -1, 'visible' => -1,),
+		'fk_preventionplan' => array('type' => 'integer', 'label' => 'FkPreventionPlan', 'enabled' => '1', 'position' => 90, 'notnull' => 1, 'visible' => 0,),
+		'fk_element'        => array('type' => 'integer', 'label' => 'FkElement', 'enabled' => '1', 'position' => 100, 'notnull' => 1, 'visible' => 0,),
 	);
 
 	/**
@@ -819,8 +781,7 @@ class PreventionPlanLine extends CommonObjectLine
 		$this->db = $db;
 
 		if (empty($conf->global->MAIN_SHOW_TECHNICAL_ID) && isset($this->fields['rowid'])) $this->fields['rowid']['visible'] = 0;
-		if (empty($conf->multicompany->enabled) && isset($this->fields['entity'])) $this->fields['entity']['enabled'] = 0;
-
+		if (empty($conf->multicompany->enabled) && isset($this->fields['entity'])) $this->fields['entity']['enabled']        = 0;
 	}
 
 	/**
@@ -833,14 +794,13 @@ class PreventionPlanLine extends CommonObjectLine
 	{
 		global $db;
 
-		$sql = 'SELECT  t.rowid, t.ref, t.date_creation, t.description, t.category, t.prevention_method, t.fk_preventionplan, t.fk_element ';
-		$sql .= ' FROM '.MAIN_DB_PREFIX.'digiriskdolibarr_preventionplandet as t';
-		$sql .= ' WHERE t.rowid = '.$rowid;
-		$sql .= ' AND entity IN ('.getEntity($this->table_element).')';
+		$sql  = 'SELECT  t.rowid, t.ref, t.date_creation, t.description, t.category, t.prevention_method, t.fk_preventionplan, t.fk_element ';
+		$sql .= ' FROM ' . MAIN_DB_PREFIX . 'digiriskdolibarr_preventionplandet as t';
+		$sql .= ' WHERE t.rowid = ' . $rowid;
+		$sql .= ' AND entity IN (' . getEntity($this->table_element) . ')';
 
 		$result = $db->query($sql);
-		if ($result)
-		{
+		if ($result) {
 			$objp = $db->fetch_object($result);
 
 			$this->id                = $objp->rowid;
@@ -855,9 +815,7 @@ class PreventionPlanLine extends CommonObjectLine
 			$db->free($result);
 
 			return $this->id;
-		}
-		else
-		{
+		} else {
 			$this->error = $db->lasterror();
 			return -1;
 		}
@@ -873,25 +831,23 @@ class PreventionPlanLine extends CommonObjectLine
 	public function fetchAll($parent_id = 0, $limit = 0)
 	{
 		global $db;
-		$sql = 'SELECT  t.rowid, t.ref, t.date_creation, t.description, t.category, t.prevention_method, t.fk_element';
-		$sql .= ' FROM '.MAIN_DB_PREFIX.'digiriskdolibarr_preventionplandet as t';
+		$sql  = 'SELECT  t.rowid, t.ref, t.date_creation, t.description, t.category, t.prevention_method, t.fk_element';
+		$sql .= ' FROM ' . MAIN_DB_PREFIX . 'digiriskdolibarr_preventionplandet as t';
 		if ($parent_id > 0) {
-			$sql .= ' WHERE t.fk_preventionplan = '.$parent_id;
+			$sql .= ' WHERE t.fk_preventionplan = ' . $parent_id;
 		} else {
 			$sql .= ' WHERE 1=1';
 		}
-		$sql .= ' AND entity IN ('.getEntity($this->table_element).')';
+		$sql .= ' AND entity IN (' . getEntity($this->table_element) . ')';
 
 
 		$result = $db->query($sql);
 
-		if ($result)
-		{
+		if ($result) {
 			$num = $db->num_rows($result);
 
 			$i = 0;
-			while ($i < ($limit ? min($limit, $num) : $num))
-			{
+			while ($i < ($limit ? min($limit, $num) : $num)) {
 				$obj = $db->fetch_object($result);
 
 				$record = new self($db);
@@ -913,9 +869,7 @@ class PreventionPlanLine extends CommonObjectLine
 			$db->free($result);
 
 			return $records;
-		}
-		else
-		{
+		} else {
 			$this->error = $db->lasterror();
 			return -1;
 		}
@@ -940,7 +894,7 @@ class PreventionPlanLine extends CommonObjectLine
 		$now = dol_now();
 
 		// Insertion dans base de la ligne
-		$sql = 'INSERT INTO '.MAIN_DB_PREFIX.'digiriskdolibarr_preventionplandet';
+		$sql  = 'INSERT INTO ' . MAIN_DB_PREFIX . 'digiriskdolibarr_preventionplandet';
 		$sql .= ' (ref, entity, date_creation, description, category, prevention_method, fk_preventionplan, fk_element';
 		$sql .= ')';
 		$sql .= " VALUES (";
@@ -955,26 +909,22 @@ class PreventionPlanLine extends CommonObjectLine
 
 		$sql .= ')';
 
-		dol_syslog(get_class($this)."::insert", LOG_DEBUG);
+		dol_syslog(get_class($this) . "::insert", LOG_DEBUG);
 		$resql = $db->query($sql);
 
-		if ($resql)
-		{
-			$this->id = $db->last_insert_id(MAIN_DB_PREFIX.'preventionplandet');
+		if ($resql) {
+			$this->id    = $db->last_insert_id(MAIN_DB_PREFIX . 'preventionplandet');
 			$this->rowid = $this->id; // For backward compatibility
 
 			$db->commit();
 			// Triggers
-			if (!$notrigger)
-			{
+			if ( ! $notrigger) {
 				// Call triggers
-				$this->call_trigger(strtoupper(get_class($this)).'_CREATE', $user);
+				$this->call_trigger(strtoupper(get_class($this)) . '_CREATE', $user);
 				// End call triggers
 			}
 			return $this->id;
-		}
-		else
-		{
+		} else {
 			$this->error = $db->lasterror();
 			$db->rollback();
 			return -2;
@@ -1001,33 +951,29 @@ class PreventionPlanLine extends CommonObjectLine
 		$db->begin();
 
 		// Mise a jour ligne en base
-		$sql = "UPDATE ".MAIN_DB_PREFIX."digiriskdolibarr_preventionplandet SET";
-		$sql .= " ref='".$db->escape($this->ref)."',";
-		$sql .= " description='".$db->escape($this->description)."',";
-		$sql .= " category=".$db->escape($this->category) . ",";
-		$sql .= " prevention_method='".$db->escape($this->prevention_method)."'" . ",";
-		$sql .= " fk_preventionplan=".$db->escape($this->fk_preventionplan) . ",";
-		$sql .= " fk_element=".$db->escape($this->fk_element);
+		$sql  = "UPDATE " . MAIN_DB_PREFIX . "digiriskdolibarr_preventionplandet SET";
+		$sql .= " ref='" . $db->escape($this->ref) . "',";
+		$sql .= " description='" . $db->escape($this->description) . "',";
+		$sql .= " category=" . $db->escape($this->category) . ",";
+		$sql .= " prevention_method='" . $db->escape($this->prevention_method) . "'" . ",";
+		$sql .= " fk_preventionplan=" . $db->escape($this->fk_preventionplan) . ",";
+		$sql .= " fk_element=" . $db->escape($this->fk_element);
 
-		$sql .= " WHERE rowid = ".$this->id;
+		$sql .= " WHERE rowid = " . $this->id;
 
-		dol_syslog(get_class($this)."::update", LOG_DEBUG);
+		dol_syslog(get_class($this) . "::update", LOG_DEBUG);
 		$resql = $db->query($sql);
 
-		if ($resql)
-		{
+		if ($resql) {
 			$db->commit();
 			// Triggers
-			if (!$notrigger)
-			{
+			if ( ! $notrigger) {
 				// Call triggers
-				$this->call_trigger(strtoupper(get_class($this)).'_MODIFY', $user);
+				$this->call_trigger(strtoupper(get_class($this)) . '_MODIFY', $user);
 				// End call triggers
 			}
 			return $this->id;
-		}
-		else
-		{
+		} else {
 			$this->error = $db->error();
 			$db->rollback();
 			return -2;
@@ -1046,31 +992,23 @@ class PreventionPlanLine extends CommonObjectLine
 
 		$db->begin();
 
-		$sql = "DELETE FROM ".MAIN_DB_PREFIX."digiriskdolibarr_preventionplandet WHERE rowid = ".$this->id;
-		dol_syslog(get_class($this)."::delete", LOG_DEBUG);
-		if ($db->query($sql))
-		{
+		$sql = "DELETE FROM " . MAIN_DB_PREFIX . "digiriskdolibarr_preventionplandet WHERE rowid = " . $this->id;
+		dol_syslog(get_class($this) . "::delete", LOG_DEBUG);
+		if ($db->query($sql)) {
 			$db->commit();
 			// Triggers
-			if (!$notrigger)
-			{
+			if ( ! $notrigger) {
 				// Call trigger
-				$this->call_trigger(strtoupper(get_class($this)).'_DELETE', $user);
+				$this->call_trigger(strtoupper(get_class($this)) . '_DELETE', $user);
 				// End call triggers
 			}
 			return 1;
-		}
-		else
-		{
-			$this->error = $db->error()." sql=".$sql;
+		} else {
+			$this->error = $db->error() . " sql=" . $sql;
 			$db->rollback();
 			return -1;
 		}
-
-
-
 	}
-
 }
 
 class PreventionPlanSignature extends DigiriskSignature
@@ -1093,26 +1031,20 @@ class PreventionPlanSignature extends DigiriskSignature
 		$this->db = $db;
 
 		if (empty($conf->global->MAIN_SHOW_TECHNICAL_ID) && isset($this->fields['rowid'])) $this->fields['rowid']['visible'] = 0;
-		if (empty($conf->multicompany->enabled) && isset($this->fields['entity'])) $this->fields['entity']['enabled'] = 0;
+		if (empty($conf->multicompany->enabled) && isset($this->fields['entity'])) $this->fields['entity']['enabled']        = 0;
 
 		// Unset fields that are disabled
-		foreach ($this->fields as $key => $val)
-		{
-			if (isset($val['enabled']) && empty($val['enabled']))
-			{
+		foreach ($this->fields as $key => $val) {
+			if (isset($val['enabled']) && empty($val['enabled'])) {
 				unset($this->fields[$key]);
 			}
 		}
 
 		// Translate some data of arrayofkeyval
-		if (is_object($langs))
-		{
-			foreach ($this->fields as $key => $val)
-			{
-				if (is_array($val['arrayofkeyval']))
-				{
-					foreach ($val['arrayofkeyval'] as $key2 => $val2)
-					{
+		if (is_object($langs)) {
+			foreach ($this->fields as $key => $val) {
+				if (is_array($val['arrayofkeyval'])) {
+					foreach ($val['arrayofkeyval'] as $key2 => $val2) {
 						$this->fields[$key]['arrayofkeyval'][$key2] = $langs->trans($val2);
 					}
 				}
@@ -1164,11 +1096,11 @@ class PreventionPlanSignature extends DigiriskSignature
 
 		// Create clone
 		$object->context['createfromclone'] = 'createfromclone';
-		$result = $object->createCommon($user);
+		$result                             = $object->createCommon($user);
 		unset($object->context['createfromclone']);
 
 		// End
-		if (!$error) {
+		if ( ! $error) {
 			$this->db->commit();
 			return $result;
 		} else {

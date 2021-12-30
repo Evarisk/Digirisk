@@ -24,12 +24,11 @@
  */
 
 // Protection to avoid direct call of template
-if (empty($conf) || !is_object($conf))
-{
+if (empty($conf) || ! is_object($conf)) {
 	print "Error, template page can't be called as URL";
 	exit;
 }
-if (!is_object($form)) $form = new Form($db);
+if ( ! is_object($form)) $form = new Form($db);
 
 ?>
 	<!-- BEGIN PHP TEMPLATE digiriskdolibarr_legaldisplayfields_view.tpl.php -->
@@ -47,14 +46,14 @@ if ( $action == "edit" && $permissiontoadd ) {
 	print $form->selectDate($conf->global->DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_AUDIT_END_DATE, 'AuditEndDate', '', '', '', "edit", 1, 1);
 	print '</td></tr>';
 
-// Destinataire
+	// Destinataire
 
 	print '<tr>';
-	print '<td class="titlefield"><label for="Recipient">' .$langs->trans("Recipient") . '</label></td><td colspan="2">';
+	print '<td class="titlefield"><label for="Recipient">' . $langs->trans("Recipient") . '</label></td><td colspan="2">';
 	print $form->select_dolusers($conf->global->DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_RECIPIENT, 'Recipient', 0, null, 0, '', '', 0, 0, 0, '', 0, '', '', 0, 0);
 	print '</td></tr>';
 
-// Méthodologie
+	// Méthodologie
 
 	print '<tr>';
 	print '<td class="titlefield"><label for="Method">' . $langs->trans("Method") . '</label></td>';
@@ -63,7 +62,7 @@ if ( $action == "edit" && $permissiontoadd ) {
 	$doleditor->Create();
 	print '</td></tr>';
 
-// Sources
+	// Sources
 
 	print '<tr>';
 	print '<td class="titlefield"><label for="Sources">' . $langs->trans("Sources") . '</label></td>';
@@ -72,7 +71,7 @@ if ( $action == "edit" && $permissiontoadd ) {
 	$doleditor->Create();
 	print '</td></tr>';
 
-// Remarque Importante
+	// Remarque Importante
 
 	print '<tr>';
 	print '<td class="titlefield"><label for="ImportantNote">' . $langs->trans("ImportantNote") . '</label></td>';
@@ -81,9 +80,9 @@ if ( $action == "edit" && $permissiontoadd ) {
 	$doleditor->Create();
 	print '</td></tr>';
 
-// Disponibilité des plans
+	// Disponibilité des plans
 	print '<tr>';
-	print '<td class="titlefield">'.$form->editfieldkey($langs->trans("SitePlans"), 'SitePlans', '', $object, 0).'</td>';
+	print '<td class="titlefield">' . $form->editfieldkey($langs->trans("SitePlans"), 'SitePlans', '', $object, 0) . '</td>';
 	print '<td>';
 	print '<input class="flat" type="file" name="userfile[]" id="SitePlans" />';
 	print '</td></tr>';
@@ -98,7 +97,7 @@ if ( $action == "edit" && $permissiontoadd ) {
 	print dol_print_date(strtotime($conf->global->DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_AUDIT_END_DATE), '%d/%m/%Y');
 	print '</td></tr>';
 
-// Destinataire
+	// Destinataire
 
 	print '<tr>';
 	print '<td class="titlefield">' . $langs->trans("Recipient") . '</td><td colspan="2">';
@@ -106,7 +105,7 @@ if ( $action == "edit" && $permissiontoadd ) {
 	print $user->lastname . ' ' . $user->firstname;
 	print '</td></tr>';
 
-// Méthodologie
+	// Méthodologie
 
 	print '<tr>';
 	print '<td class="titlefield">' . $langs->trans("Method") . '</td>';
@@ -114,7 +113,7 @@ if ( $action == "edit" && $permissiontoadd ) {
 	print $conf->global->DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_METHOD;
 	print '</td></tr>';
 
-// Sources
+	// Sources
 
 	print '<tr>';
 	print '<td class="titlefield">' . $langs->trans("Sources") . '</td>';
@@ -122,7 +121,7 @@ if ( $action == "edit" && $permissiontoadd ) {
 	print $conf->global->DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_SOURCES;
 	print '</td></tr>';
 
-// Remarque Importante
+	// Remarque Importante
 
 	print '<tr>';
 	print '<td class="titlefield">' . $langs->trans("ImportantNote") . '</td>';
@@ -130,19 +129,19 @@ if ( $action == "edit" && $permissiontoadd ) {
 	print $conf->global->DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_IMPORTANT_NOTES;
 	print '</td></tr>';
 
-// Disponibilité des plans
+	// Disponibilité des plans
 
 	print '<tr>';
 	print '<td class="titlefield">' . $langs->trans("SitePlans") . '</td>';
 	print '<td>';
-	$filearray = dol_dir_list($conf->digiriskdolibarr->multidir_output[$conf->entity].'/riskassessmentdocument/', "files", 0, '', '(\.odt|\.zip)', 'date', 'asc', 1);
+	$filearray = dol_dir_list($conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessmentdocument/', "files", 0, '', '(\.odt|\.zip)', 'date', 'asc', 1);
 	if (count($filearray)) : ?>
 		<?php $file = array_shift($filearray); ?>
 		<span class="">
-			<?php print '<img class="" src="'.DOL_URL_ROOT.'/viewimage.php?modulepart=digiriskdolibarr&entity='.$conf->entity.'&file='.urlencode('/riskassessmentdocument/thumbs/'. preg_replace('/\./', '_small.',$file['name'])).'" >'; ?>
+			<?php print '<img class="" src="' . DOL_URL_ROOT . '/viewimage.php?modulepart=digiriskdolibarr&entity=' . $conf->entity . '&file=' . urlencode('/riskassessmentdocument/thumbs/' . preg_replace('/\./', '_small.', $file['name'])) . '" >'; ?>
 		</span>
-	<?php else: ?>
-		<?php $nophoto = DOL_URL_ROOT.'/public/theme/common/nophoto.png'; ?>
+	<?php else : ?>
+		<?php $nophoto = DOL_URL_ROOT . '/public/theme/common/nophoto.png'; ?>
 		<span class="">
 			<img class="" alt="No photo" src="<?php echo $nophoto ?>">
 		</span>

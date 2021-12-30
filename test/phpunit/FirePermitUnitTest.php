@@ -59,12 +59,12 @@ class FirePermitUnitTest extends PHPUnit\Framework\TestCase
 
 		//$this->sharedFixture
 		global $conf, $user, $langs, $db;
-		$this->savconf = $conf;
-		$this->savuser = $user;
+		$this->savconf  = $conf;
+		$this->savuser  = $user;
 		$this->savlangs = $langs;
-		$this->savdb = $db;
+		$this->savdb    = $db;
 
-		print __METHOD__ . " db->type=".$db->type." user->id=".$user->id;
+		print __METHOD__ . " db->type=" . $db->type . " user->id=" . $user->id;
 		print "\n";
 		print __METHOD__ . " ok";
 		print "\n";
@@ -80,12 +80,12 @@ class FirePermitUnitTest extends PHPUnit\Framework\TestCase
 		global $conf, $db;
 
 		if (empty($conf->digiriskdolibarr->enabled)) {
-			print __METHOD__." module digiriskdolibarr must be enabled.\n"; die(1);
+			print __METHOD__ . " module digiriskdolibarr must be enabled.\n"; die(1);
 		}
 
 		$db->begin(); // This is to have all actions inside a transaction even if test launched without suite.
 
-		print __METHOD__."\n";
+		print __METHOD__ . "\n";
 	}
 
 	/**
@@ -98,7 +98,7 @@ class FirePermitUnitTest extends PHPUnit\Framework\TestCase
 		global $db;
 		$db->rollback();
 
-		print __METHOD__."\n";
+		print __METHOD__ . "\n";
 	}
 
 	/**
@@ -109,12 +109,12 @@ class FirePermitUnitTest extends PHPUnit\Framework\TestCase
 	protected function setUp() : void
 	{
 		global $conf, $user, $langs, $db;
-		$conf = $this->savconf;
-		$user = $this->savuser;
+		$conf  = $this->savconf;
+		$user  = $this->savuser;
 		$langs = $this->savlangs;
-		$db = $this->savdb;
+		$db    = $this->savdb;
 
-		print __METHOD__."\n";
+		print __METHOD__ . "\n";
 	}
 
 	/**
@@ -124,7 +124,7 @@ class FirePermitUnitTest extends PHPUnit\Framework\TestCase
 	 */
 	protected function tearDown() : void
 	{
-		print __METHOD__."\n";
+		print __METHOD__ . "\n";
 	}
 
 	/**
@@ -137,15 +137,15 @@ class FirePermitUnitTest extends PHPUnit\Framework\TestCase
 	public function testFirePermitCreate()
 	{
 		global $conf, $user, $langs, $db;
-		$conf = $this->savconf;
-		$user = $this->savuser;
+		$conf  = $this->savconf;
+		$user  = $this->savuser;
 		$langs = $this->savlangs;
-		$db = $this->savdb;
+		$db    = $this->savdb;
 
 		$localobject = new FirePermit($this->savdb);
 
-		$now                               = dol_now();
-		$localobject->id                   = 0;
+		$now             = dol_now();
+		$localobject->id = 0;
 		//$localobject->ref                = $refFirePermitMod->getNextValue($localobject);
 		$localobject->ref                  = "TestRefFirePermit";
 		$localobject->ref_ext              = "TestRefExtFirePermit";
@@ -166,7 +166,7 @@ class FirePermitUnitTest extends PHPUnit\Framework\TestCase
 
 		$this->assertLessThan($result, 0);
 
-		print __METHOD__." result=".$result."\n";
+		print __METHOD__ . " result=" . $result . "\n";
 		return $result;
 	}
 
@@ -184,10 +184,10 @@ class FirePermitUnitTest extends PHPUnit\Framework\TestCase
 	public function testFirePermitFetch($id)
 	{
 		global $conf, $user, $langs, $db;
-		$conf = $this->savconf;
-		$user = $this->savuser;
+		$conf  = $this->savconf;
+		$user  = $this->savuser;
 		$langs = $this->savlangs;
-		$db = $this->savdb;
+		$db    = $this->savdb;
 
 		$localobject = new FirePermit($this->savdb);
 
@@ -195,7 +195,7 @@ class FirePermitUnitTest extends PHPUnit\Framework\TestCase
 
 		$this->assertLessThan($result, 0);
 
-		print __METHOD__." id=".$id." result=".$result."\n";
+		print __METHOD__ . " id=" . $id . " result=" . $result . "\n";
 		return $localobject;
 	}
 
@@ -213,15 +213,15 @@ class FirePermitUnitTest extends PHPUnit\Framework\TestCase
 	public function testFirePermitInfo($localobject) : void
 	{
 		global $conf, $user, $langs, $db;
-		$conf = $this->savconf;
-		$user = $this->savuser;
+		$conf  = $this->savconf;
+		$user  = $this->savuser;
 		$langs = $this->savlangs;
-		$db = $this->savdb;
+		$db    = $this->savdb;
 
 		$result = $localobject->info($localobject->id);
 		$this->assertNull($result);
 
-		print __METHOD__." id=".$localobject->id."\n";
+		print __METHOD__ . " id=" . $localobject->id . "\n";
 	}
 
 	/**
@@ -240,20 +240,20 @@ class FirePermitUnitTest extends PHPUnit\Framework\TestCase
 	public function testFirePermitSetInProgress($localobject) : void
 	{
 		global $conf, $user, $langs, $db;
-		$conf = $this->savconf;
-		$user = $this->savuser;
+		$conf  = $this->savconf;
+		$user  = $this->savuser;
 		$langs = $this->savlangs;
-		$db = $this->savdb;
+		$db    = $this->savdb;
 
 		$result = $localobject->setInProgress($user);
 		$this->assertLessThan($result, 0);
 
-		print __METHOD__." id=".$localobject->id." result=".$result."\n";
+		print __METHOD__ . " id=" . $localobject->id . " result=" . $result . "\n";
 
 		$result = $localobject->getLibStatut(0);
 		$this->assertSame($result, $langs->trans('InProgress'));
 
-		print __METHOD__." id=".$localobject->id." result=".$result."\n";
+		print __METHOD__ . " id=" . $localobject->id . " result=" . $result . "\n";
 	}
 
 	/**
@@ -272,20 +272,20 @@ class FirePermitUnitTest extends PHPUnit\Framework\TestCase
 	public function testFirePermitSetPendingSignature($localobject) : void
 	{
 		global $conf, $user, $langs, $db;
-		$conf = $this->savconf;
-		$user = $this->savuser;
+		$conf  = $this->savconf;
+		$user  = $this->savuser;
 		$langs = $this->savlangs;
-		$db = $this->savdb;
+		$db    = $this->savdb;
 
 		$result = $localobject->setPendingSignature($user);
 		$this->assertLessThan($result, 0);
 
-		print __METHOD__." id=".$localobject->id." result=".$result."\n";
+		print __METHOD__ . " id=" . $localobject->id . " result=" . $result . "\n";
 
 		$result = $localobject->getLibStatut(0);
 		$this->assertSame($result, $langs->trans('ValidatePendingSignature'));
 
-		print __METHOD__." id=".$localobject->id." result=".$result."\n";
+		print __METHOD__ . " id=" . $localobject->id . " result=" . $result . "\n";
 	}
 
 	/**
@@ -304,20 +304,20 @@ class FirePermitUnitTest extends PHPUnit\Framework\TestCase
 	public function testFirePermitSetLocked($localobject) : void
 	{
 		global $conf, $user, $langs, $db;
-		$conf = $this->savconf;
-		$user = $this->savuser;
+		$conf  = $this->savconf;
+		$user  = $this->savuser;
 		$langs = $this->savlangs;
-		$db = $this->savdb;
+		$db    = $this->savdb;
 
 		$result = $localobject->setLocked($user);
 		$this->assertLessThan($result, 0);
 
-		print __METHOD__." id=".$localobject->id." result=".$result."\n";
+		print __METHOD__ . " id=" . $localobject->id . " result=" . $result . "\n";
 
 		$result = $localobject->getLibStatut(0);
 		$this->assertSame($result, $langs->trans('Locked'));
 
-		print __METHOD__." id=".$localobject->id." result=".$result."\n";
+		print __METHOD__ . " id=" . $localobject->id . " result=" . $result . "\n";
 	}
 
 	/**
@@ -336,20 +336,20 @@ class FirePermitUnitTest extends PHPUnit\Framework\TestCase
 	public function testFirePermitSetArchived($localobject) : void
 	{
 		global $conf, $user, $langs, $db;
-		$conf = $this->savconf;
-		$user = $this->savuser;
+		$conf  = $this->savconf;
+		$user  = $this->savuser;
 		$langs = $this->savlangs;
-		$db = $this->savdb;
+		$db    = $this->savdb;
 
 		$result = $localobject->setArchived($user);
 		$this->assertLessThan($result, 0);
 
-		print __METHOD__." id=".$localobject->id." result=".$result."\n";
+		print __METHOD__ . " id=" . $localobject->id . " result=" . $result . "\n";
 
 		$result = $localobject->getLibStatut(0);
 		$this->assertSame($result, $langs->trans('Archived'));
 
-		print __METHOD__." id=".$localobject->id." result=".$result."\n";
+		print __METHOD__ . " id=" . $localobject->id . " result=" . $result . "\n";
 	}
 
 	/**
@@ -366,12 +366,12 @@ class FirePermitUnitTest extends PHPUnit\Framework\TestCase
 	public function testFirePermitUpdate($localobject)
 	{
 		global $conf, $user, $langs, $db;
-		$conf = $this->savconf;
-		$user = $this->savuser;
+		$conf  = $this->savconf;
+		$user  = $this->savuser;
 		$langs = $this->savlangs;
-		$db = $this->savdb;
+		$db    = $this->savdb;
 
-		$now                               = dol_now();
+		$now = dol_now();
 		//$localobject->ref                = $refFirePermitMod->getNextValue($localobject);
 		$localobject->ref                  = "UpdatedTestRefFirePermit";
 		$localobject->ref_ext              = "UpdatedTestRefExtFirePermit";
@@ -388,12 +388,12 @@ class FirePermitUnitTest extends PHPUnit\Framework\TestCase
 		$localobject->fk_user_modif        = $user->id ? $user->id : 1;
 
 		$result = $localobject->update($user);
-		print __METHOD__." id=".$localobject->id." result=".$result."\n";
+		print __METHOD__ . " id=" . $localobject->id . " result=" . $result . "\n";
 		$this->assertLessThan($result, 0);
 
 		$newobject = new FirePermit($this->savdb);
-		$result = $newobject->fetch($localobject->id);
-		print __METHOD__." id=".$localobject->id." result=".$result."\n";
+		$result    = $newobject->fetch($localobject->id);
+		print __METHOD__ . " id=" . $localobject->id . " result=" . $result . "\n";
 		$this->assertLessThan($result, 0);
 
 		$this->assertEquals($localobject->id, $newobject->id);
@@ -414,30 +414,30 @@ class FirePermitUnitTest extends PHPUnit\Framework\TestCase
 		return $localobject;
 	}
 
-//	/**
-//	 * testFirePermitCreateFromClone
-//	 *
-//	 * @param  FirePermit $localobject Fire permit object
-//	 * @return void
-//	 *
-//	 * @covers FirePermit::createFormClone
-//	 *
-//	 * @depends testFirePermitFetch
-//	 * The depends says test is run only if previous is ok
-//	 */
-//	public function testFirePermitCreateFromClone($localobject) : void
-//	{
-//		global $conf, $user, $langs, $db;
-//		$conf = $this->savconf;
-//		$user = $this->savuser;
-//		$langs = $this->savlangs;
-//		$db = $this->savdb;
-//
-//		$result = $localobject->createFromClone($user, $localobject->id, '');
-//		$this->assertLessThan($result, 0);
-//
-//		print __METHOD__." result=".$result."\n";
-//	}
+	//  /**
+	//   * testFirePermitCreateFromClone
+	//   *
+	//   * @param  FirePermit $localobject Fire permit object
+	//   * @return void
+	//   *
+	//   * @covers FirePermit::createFormClone
+	//   *
+	//   * @depends testFirePermitFetch
+	//   * The depends says test is run only if previous is ok
+	//   */
+	//  public function testFirePermitCreateFromClone($localobject) : void
+	//  {
+	//      global $conf, $user, $langs, $db;
+	//      $conf = $this->savconf;
+	//      $user = $this->savuser;
+	//      $langs = $this->savlangs;
+	//      $db = $this->savdb;
+	//
+	//      $result = $localobject->createFromClone($user, $localobject->id, '');
+	//      $this->assertLessThan($result, 0);
+	//
+	//      print __METHOD__." result=".$result."\n";
+	//  }
 
 	/**
 	 * testFirePermitLineInsert
@@ -455,31 +455,31 @@ class FirePermitUnitTest extends PHPUnit\Framework\TestCase
 	public function testFirePermitLineInsert($localobject)
 	{
 		global $conf, $user, $langs, $db;
-		$conf = $this->savconf;
-		$user = $this->savuser;
+		$conf  = $this->savconf;
+		$user  = $this->savuser;
 		$langs = $this->savlangs;
-		$db = $this->savdb;
+		$db    = $this->savdb;
 
 		$localobjectline = new FirePermitLine($this->savdb);
 
-		$now                                 = dol_now();
-		$localobjectline->id                 = 0;
+		$now                 = dol_now();
+		$localobjectline->id = 0;
 		//$localobjectline->ref              = $refFirePermitMod->getNextValue($localobjectline);
-		$localobjectline->ref                = "TestRefFirePermitLine";
-		$localobjectline->ref_ext            = "TestRefExtFirePermitLine";
-		$localobjectline->entity             = 1;
-		$localobjectline->date_creation      = $localobjectline->db->idate($now);
-		$localobjectline->category           = 1;
-		$localobjectline->description        = "TestFirePermitLine";
-		$localobjectline->use_equipment      = "TestFirePermitLineUseEquipment";
-		$localobjectline->fk_element         = 1;
-		$localobjectline->fk_firepermit      = $localobject->id;
+		$localobjectline->ref           = "TestRefFirePermitLine";
+		$localobjectline->ref_ext       = "TestRefExtFirePermitLine";
+		$localobjectline->entity        = 1;
+		$localobjectline->date_creation = $localobjectline->db->idate($now);
+		$localobjectline->category      = 1;
+		$localobjectline->description   = "TestFirePermitLine";
+		$localobjectline->use_equipment = "TestFirePermitLineUseEquipment";
+		$localobjectline->fk_element    = 1;
+		$localobjectline->fk_firepermit = $localobject->id;
 
 		$result = $localobjectline->insert($user);
 
 		$this->assertLessThan($result, 0);
 
-		print __METHOD__." id=".$localobjectline->id." result=".$result."\n";
+		print __METHOD__ . " id=" . $localobjectline->id . " result=" . $result . "\n";
 		return $result;
 	}
 
@@ -497,10 +497,10 @@ class FirePermitUnitTest extends PHPUnit\Framework\TestCase
 	public function testFirePermitLineFetch($id)
 	{
 		global $conf, $user, $langs, $db;
-		$conf = $this->savconf;
-		$user = $this->savuser;
+		$conf  = $this->savconf;
+		$user  = $this->savuser;
 		$langs = $this->savlangs;
-		$db = $this->savdb;
+		$db    = $this->savdb;
 
 		$localobjectline = new FirePermitLine($this->savdb);
 
@@ -508,7 +508,7 @@ class FirePermitUnitTest extends PHPUnit\Framework\TestCase
 
 		$this->assertLessThan($result, 0);
 
-		print __METHOD__." id=".$id." result=".$result."\n";
+		print __METHOD__ . " id=" . $id . " result=" . $result . "\n";
 		return $localobjectline;
 	}
 
@@ -528,12 +528,12 @@ class FirePermitUnitTest extends PHPUnit\Framework\TestCase
 	public function testFirePermitLineUpdate($localobjectline)
 	{
 		global $conf, $user, $langs, $db;
-		$conf = $this->savconf;
-		$user = $this->savuser;
+		$conf  = $this->savconf;
+		$user  = $this->savuser;
 		$langs = $this->savlangs;
-		$db = $this->savdb;
+		$db    = $this->savdb;
 
-		$now                            = dol_now();
+		$now = dol_now();
 		//$localobject->ref             = $refFirePermitMod->getNextValue($localobject);
 		$localobjectline->ref           = "UpdatedTestRefFirePermitLine";
 		$localobjectline->category      = 1;
@@ -542,12 +542,12 @@ class FirePermitUnitTest extends PHPUnit\Framework\TestCase
 		$localobjectline->fk_element    = 1;
 
 		$result = $localobjectline->update($user);
-		print __METHOD__." id=".$localobjectline->id." result=".$result."\n";
+		print __METHOD__ . " id=" . $localobjectline->id . " result=" . $result . "\n";
 		$this->assertLessThan($result, 0);
 
 		$newobjectline = new FirePermitLine($this->savdb);
-		$result = $newobjectline->fetch($localobjectline->id);
-		print __METHOD__." id=".$localobjectline->id." result=".$result."\n";
+		$result        = $newobjectline->fetch($localobjectline->id);
+		print __METHOD__ . " id=" . $localobjectline->id . " result=" . $result . "\n";
 		$this->assertLessThan($result, 0);
 
 		$this->assertEquals($localobjectline->id, $newobjectline->id);
@@ -574,16 +574,16 @@ class FirePermitUnitTest extends PHPUnit\Framework\TestCase
 	public function testFirePermitFetchLines($localobject) : void
 	{
 		global $conf, $user, $langs, $db;
-		$conf = $this->savconf;
-		$user = $this->savuser;
+		$conf  = $this->savconf;
+		$user  = $this->savuser;
 		$langs = $this->savlangs;
-		$db = $this->savdb;
+		$db    = $this->savdb;
 
 		$result = $localobject->fetchLines();
 
 		$this->assertLessThan($result, 0);
 
-		print __METHOD__." id=".$localobject->id." result=".$result."\n";
+		print __METHOD__ . " id=" . $localobject->id . " result=" . $result . "\n";
 	}
 
 	/**
@@ -598,12 +598,12 @@ class FirePermitUnitTest extends PHPUnit\Framework\TestCase
 	public function testFirePermitLineFetchAll() : void
 	{
 		global $conf, $user, $langs, $db;
-		$conf = $this->savconf;
-		$user = $this->savuser;
+		$conf  = $this->savconf;
+		$user  = $this->savuser;
 		$langs = $this->savlangs;
-		$db = $this->savdb;
+		$db    = $this->savdb;
 
-		$localobjectline = new FirePermitLine($this->savdb);
+		$localobjectline     = new FirePermitLine($this->savdb);
 		$localobjectlineList = $localobjectline->fetchAll();
 
 		$this->assertSame(true, is_array($localobjectlineList));
@@ -624,12 +624,12 @@ class FirePermitUnitTest extends PHPUnit\Framework\TestCase
 	public function testFirePermitFetchAll() : void
 	{
 		global $conf, $user, $langs, $db;
-		$conf = $this->savconf;
-		$user = $this->savuser;
+		$conf  = $this->savconf;
+		$user  = $this->savuser;
 		$langs = $this->savlangs;
-		$db = $this->savdb;
+		$db    = $this->savdb;
 
-		$localobject = new FirePermit($this->savdb);
+		$localobject     = new FirePermit($this->savdb);
 		$localobjectList = $localobject->fetchAll();
 
 		$this->assertSame(true, is_array($localobjectList));
@@ -654,16 +654,16 @@ class FirePermitUnitTest extends PHPUnit\Framework\TestCase
 	public function testFirePermitLineDelete($localobjectline)
 	{
 		global $conf, $user, $langs, $db;
-		$conf = $this->savconf;
-		$user = $this->savuser;
+		$conf  = $this->savconf;
+		$user  = $this->savuser;
 		$langs = $this->savlangs;
-		$db = $this->savdb;
+		$db    = $this->savdb;
 
 		$newobjectline = new FirePermitLine($this->savdb);
 		$newobjectline->fetch($localobjectline->id);
 
 		$result = $localobjectline->delete($user);
-		print __METHOD__." id=".$newobjectline->id." result=".$result."\n";
+		print __METHOD__ . " id=" . $newobjectline->id . " result=" . $result . "\n";
 		$this->assertLessThan($result, 0);
 
 		return $result;
@@ -683,20 +683,18 @@ class FirePermitUnitTest extends PHPUnit\Framework\TestCase
 	public function testFirePermitDelete($localobject)
 	{
 		global $conf, $user, $langs, $db;
-		$conf = $this->savconf;
-		$user = $this->savuser;
+		$conf  = $this->savconf;
+		$user  = $this->savuser;
 		$langs = $this->savlangs;
-		$db = $this->savdb;
+		$db    = $this->savdb;
 
 		$newobject = new FirePermit($this->savdb);
 		$newobject->fetch($localobject->id);
 
 		$result = $localobject->delete($user);
-		print __METHOD__." id=".$newobject->id." result=".$result."\n";
+		print __METHOD__ . " id=" . $newobject->id . " result=" . $result . "\n";
 		$this->assertLessThan($result, 0);
 
 		return $result;
 	}
 }
-
-

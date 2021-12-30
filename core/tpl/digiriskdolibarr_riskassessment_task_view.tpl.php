@@ -3,7 +3,7 @@ $related_tasks = $risk->get_related_tasks($risk); ?>
 <div class="wpeo-table riskassessment-tasks riskassessment-tasks<?php echo $risk->id ?>" value="<?php echo $risk->id ?>">
 	<div class="table-cell riskassessment-task-listing-wrapper riskassessment-task-listing-wrapper-<?php echo $risk->id ?>">
 		<div class="table-cell-header">
-			<div class="table-cell-header-label"><strong><?php echo $langs->trans('ListingHeaderTask'); ?> (<?php echo $related_tasks ? count( $related_tasks ) : 0; ?>)</strong></div>
+			<div class="table-cell-header-label"><strong><?php echo $langs->trans('ListingHeaderTask'); ?> (<?php echo $related_tasks ? count($related_tasks) : 0; ?>)</strong></div>
 			<div class="table-cell-header-actions">
 				<?php if ($permissiontoread) : ?>
 					<div class="wpeo-button riskassessment-task-list button-square-40 button-grey wpeo-tooltip-event modal-open risk-list-button" aria-label="<?php echo $langs->trans('ListRiskAssessmentTask') ?>" value="<?php echo $risk->id;?>">
@@ -26,7 +26,7 @@ $related_tasks = $risk->get_related_tasks($risk); ?>
 				<?php endif; ?>
 			</div>
 		</div>
-		<?php if (!empty($related_tasks) && $related_tasks > 0) : ?>
+		<?php if ( ! empty($related_tasks) && $related_tasks > 0) : ?>
 			<?php if ($conf->global->DIGIRISKDOLIBARR_SHOW_ALL_TASKS) : ?>
 					<?php $nb_of_tasks_in_progress = 0 ?>
 					<?php foreach ($related_tasks as $related_task) : ?>
@@ -40,14 +40,14 @@ $related_tasks = $risk->get_related_tasks($risk); ?>
 										<div class="riskassessment-task-data">
 											<span class="riskassessment-task-reference" value="<?php echo $related_task->id ?>"><?php echo getNomUrlTask($related_task, 0, 'withproject'); ?></span>
 											<span class="riskassessment-task-date">
-												<i class="fas fa-calendar-alt"></i> <?php echo date('d/m/Y', (($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_START_DATE  && (!empty($related_task->date_start))) ? $related_task->date_start : $related_task->date_c)) . (($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_END_DATE && (!empty($related_task->date_end))) ? ' - ' . date('d/m/Y', $related_task->date_end) : ''); ?>
+												<i class="fas fa-calendar-alt"></i> <?php echo date('d/m/Y', (($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_START_DATE && ( ! empty($related_task->date_start))) ? $related_task->date_start : $related_task->date_c)) . (($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_END_DATE && ( ! empty($related_task->date_end))) ? ' - ' . date('d/m/Y', $related_task->date_end) : ''); ?>
 											</span>
 											<span class="riskassessment-task-progress progress-<?php echo $related_task->progress ? $related_task->progress : 0 ?>"><?php echo $related_task->progress ? $related_task->progress . " %" : 0 . " %" ?></span>
 										</div>
 										<div class="riskassessment-task-title">
 											<span class="riskassessment-task-author">
 												<?php $user->fetch($related_task->fk_user_creat); ?>
-												<?php echo getNomUrl( 0, '', 0, 0, 2 ,0,'','',-1,$user); ?>
+												<?php echo getNomUrl(0, '', 0, 0, 2, 0, '', '', -1, $user); ?>
 											</span>
 											<span class="riskassessment-task-author-label">
 												<?php echo $related_task->label; ?>
@@ -133,7 +133,7 @@ $related_tasks = $risk->get_related_tasks($risk); ?>
 							</div>
 						</div>
 					<?php endif; ?>
-				<?php else : ?>
+			<?php else : ?>
 					<?php $related_task = end($related_tasks); ?>
 					<div class="table-cell riskassessment-task-container riskassessment-task-container-<?php echo $related_task->id ?>" value="<?php echo $related_task->ref ?>">
 						<input type="hidden" class="labelForDelete" value="<?php echo $langs->trans('DeleteTask') . ' ' . $related_task->ref . ' ?'; ?>">
@@ -143,14 +143,14 @@ $related_tasks = $risk->get_related_tasks($risk); ?>
 									<div class="riskassessment-task-data">
 										<span class="riskassessment-task-reference" value="<?php echo $related_task->id ?>"><?php echo getNomUrlTask($related_task, 0, 'withproject'); ?></span>
 										<span class="riskassessment-task-date">
-												<i class="fas fa-calendar-alt"></i> <?php echo date('d/m/Y', (($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_START_DATE  && (!empty($related_task->date_start))) ? $related_task->date_start : $related_task->date_c)) . (($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_END_DATE && (!empty($related_task->date_end))) ? ' - ' . date('d/m/Y', $related_task->date_end) : ''); ?>
+												<i class="fas fa-calendar-alt"></i> <?php echo date('d/m/Y', (($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_START_DATE && ( ! empty($related_task->date_start))) ? $related_task->date_start : $related_task->date_c)) . (($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_END_DATE && ( ! empty($related_task->date_end))) ? ' - ' . date('d/m/Y', $related_task->date_end) : ''); ?>
 											</span>
 										<span class="riskassessment-task-progress progress-<?php echo $related_task->progress ? $related_task->progress : 0 ?>"><?php echo $related_task->progress ? $related_task->progress . " %" : 0 . " %" ?></span>
 									</div>
 									<div class="riskassessment-task-title">
 											<span class="riskassessment-task-author">
 												<?php $user->fetch($related_task->fk_user_creat); ?>
-												<?php echo getNomUrl( 0, '', 0, 0, 2 ,0,'','',-1,$user); ?>
+												<?php echo getNomUrl(0, '', 0, 0, 2, 0, '', '', -1, $user); ?>
 											</span>
 										<span class="riskassessment-task-author-label">
 												<?php echo $related_task->label; ?>
@@ -211,7 +211,7 @@ $related_tasks = $risk->get_related_tasks($risk); ?>
 							<!-- RISK ASSESSMENT TASK EDIT MODAL END -->
 						</div>
 					</div>
-				<?php endif; ?>
+			<?php endif; ?>
 		<?php else : ?>
 			<div class="riskassessment-task-listing-wrapper riskassessment-task-listing-wrapper-<?php echo $risk->id ?>">
 				<div class="riskassessment-task-container riskassessment-no-task">
@@ -238,7 +238,7 @@ $related_tasks = $risk->get_related_tasks($risk); ?>
 			</div>
 		<?php endif; ?>
 
-		<?php $riskAssessment = new RiskAssessment($db);
+		<?php $riskAssessment   = new RiskAssessment($db);
 		$riskAssessment->method = $lastEvaluation->method ? $lastEvaluation->method : "standard" ; ?>
 
 		<!-- RISK ASSESSMENT TASK ADD MODAL-->
@@ -248,7 +248,7 @@ $related_tasks = $risk->get_related_tasks($risk); ?>
 					<!-- Modal-Header -->
 					<div class="modal-header">
 						<?php $project->fetch($conf->global->DIGIRISKDOLIBARR_DU_PROJECT); ?>
-						<h2 class="modal-title"><?php echo $langs->trans('TaskCreate') . ' ' .  $refTaskMod->getNextValue('', $task) . '  ' . $langs->trans('AT') . '  ' . $langs->trans('Project') . '  ' . $project->getNomUrl() ?><i class="fas fa-info-circle wpeo-tooltip-event" aria-label="<?php echo $langs->trans('HowToSetDUProject'); ?>"></i></h2>
+						<h2 class="modal-title"><?php echo $langs->trans('TaskCreate') . ' ' . $refTaskMod->getNextValue('', $task) . '  ' . $langs->trans('AT') . '  ' . $langs->trans('Project') . '  ' . $project->getNomUrl() ?><i class="fas fa-info-circle wpeo-tooltip-event" aria-label="<?php echo $langs->trans('HowToSetDUProject'); ?>"></i></h2>
 						<div class="modal-close"><i class="fas fa-times"></i></div>
 					</div>
 					<!-- Modal ADD RISK ASSESSMENT TASK Content-->
@@ -334,7 +334,7 @@ $related_tasks = $risk->get_related_tasks($risk); ?>
 								<div class="notice-close"><i class="fas fa-times"></i></div>
 							</div>
 						</div>
-						<?php if (!empty($related_tasks) && $related_tasks > 0) : ?>
+						<?php if ( ! empty($related_tasks) && $related_tasks > 0) : ?>
 							<?php foreach ($related_tasks as $related_task) : ?>
 								<div class="riskassessment-task-list-content" value="<?php echo $risk->id ?>">
 									<ul class="riskassessment-task-list riskassessment-task-list-<?php echo $related_task->id ?>">
@@ -347,14 +347,14 @@ $related_tasks = $risk->get_related_tasks($risk); ?>
 															<div class="riskassessment-task-data">
 																<span class="riskassessment-task-reference" value="<?php echo $related_task->id ?>"><?php echo getNomUrlTask($related_task, 0, 'withproject'); ?></span>
 																<span class="riskassessment-task-date">
-																	<i class="fas fa-calendar-alt"></i> <?php echo date('d/m/Y', (($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_START_DATE && (!empty($related_task->date_start))) ? $related_task->date_start : $related_task->date_c)) . (($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_END_DATE && (!empty($related_task->date_end))) ? ' - ' . date('d/m/Y', $related_task->date_end) : ''); ?>
+																	<i class="fas fa-calendar-alt"></i> <?php echo date('d/m/Y', (($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_START_DATE && ( ! empty($related_task->date_start))) ? $related_task->date_start : $related_task->date_c)) . (($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_END_DATE && ( ! empty($related_task->date_end))) ? ' - ' . date('d/m/Y', $related_task->date_end) : ''); ?>
 																</span>
 																<span class="riskassessment-task-progress progress-<?php echo $related_task->progress ? $related_task->progress : 0 ?>"><?php echo $related_task->progress ? $related_task->progress . " %" : 0 . " %" ?></span>
 															</div>
 															<div class="riskassessment-task-title">
 																<span class="riskassessment-task-author">
 																	<?php $user->fetch($related_task->fk_user_creat); ?>
-																	<?php echo getNomUrl( 0, '', 0, 0, 2 ,0,'','',-1,$user); ?>
+																	<?php echo getNomUrl(0, '', 0, 0, 2, 0, '', '', -1, $user); ?>
 																</span>
 																<span class="riskassessment-task-label">
 																	<?php echo $related_task->label; ?>
@@ -387,7 +387,7 @@ $related_tasks = $risk->get_related_tasks($risk); ?>
 													<div class="modal-container wpeo-modal-event">
 														<!-- Modal-Header -->
 														<div class="modal-header">
-															<h2 class="modal-title"><?php echo $langs->trans('TaskEdit') . ' ' .  $related_task->ref ?></h2>
+															<h2 class="modal-title"><?php echo $langs->trans('TaskEdit') . ' ' . $related_task->ref ?></h2>
 															<div class="modal-close"><i class="fas fa-times"></i></div>
 														</div>
 														<!-- Modal EDIT RISK ASSESSMENT TASK Content-->

@@ -1,7 +1,6 @@
 <?php
-if (!$error && $action == 'add' && $permissiontoadd) {
-
-	$data        = json_decode(file_get_contents('php://input'), true);
+if ( ! $error && $action == 'add' && $permissiontoadd) {
+	$data = json_decode(file_get_contents('php://input'), true);
 
 	$fk_element  = GETPOST('id');
 	$riskComment = $data['description'];
@@ -14,13 +13,13 @@ if (!$error && $action == 'add' && $permissiontoadd) {
 		$risk->description = $riskComment;
 	}
 
-	$risk->fk_element  = $fk_element ?: 0;
-	$risk->fk_projet   = $conf->global->DIGIRISKDOLIBARR_DU_PROJECT;
-	$risk->category    = $category;
-	$risk->ref         = $refRiskMod->getNextValue($risk);
-	$risk->status      = 1;
+	$risk->fk_element = $fk_element ?: 0;
+	$risk->fk_projet  = $conf->global->DIGIRISKDOLIBARR_DU_PROJECT;
+	$risk->category   = $category;
+	$risk->ref        = $refRiskMod->getNextValue($risk);
+	$risk->status     = 1;
 
-	if (!$error) {
+	if ( ! $error) {
 		$result = $risk->create($user);
 
 		if ($result > 0) {
@@ -36,7 +35,7 @@ if (!$error && $action == 'add' && $permissiontoadd) {
 			$evaluation->method              = $method;
 			$evaluation->ref                 = $refEvaluationMod->getNextValue($evaluation);
 			$evaluation->comment             = $evaluationComment;
-			$evaluation->date_riskassessment = $riskAssessmentDate != 'undefined' ? strtotime(preg_replace('/\//', '-',$riskAssessmentDate)) : dol_now();
+			$evaluation->date_riskassessment = $riskAssessmentDate != 'undefined' ? strtotime(preg_replace('/\//', '-', $riskAssessmentDate)) : dol_now();
 
 			if ($method == 'advanced') {
 				$formation  = $data['criteres']['formation'];
@@ -53,17 +52,17 @@ if (!$error && $action == 'add' && $permissiontoadd) {
 			}
 
 			$pathToTmpPhoto = $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessment/tmp/RK0/';
-			$files = dol_dir_list($pathToTmpPhoto);
+			$files          = dol_dir_list($pathToTmpPhoto);
 
-			if (!empty($files)) {
-				foreach($files as $file) {
-					$pathToEvaluationPhoto =$conf->digiriskdolibarr->multidir_output[$conf->entity] .  '/riskassessment/' . $evaluation->ref;
+			if ( ! empty($files)) {
+				foreach ($files as $file) {
+					$pathToEvaluationPhoto = $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessment/' . $evaluation->ref;
 
-					if (!is_dir($pathToEvaluationPhoto)) {
+					if ( ! is_dir($pathToEvaluationPhoto)) {
 						mkdir($pathToEvaluationPhoto);
 					}
-					if (!is_file($pathToEvaluationPhoto . '/' . $file['name'])) {
-						copy($file['fullname'],$pathToEvaluationPhoto . '/' . $file['name']);
+					if ( ! is_file($pathToEvaluationPhoto . '/' . $file['name'])) {
+						copy($file['fullname'], $pathToEvaluationPhoto . '/' . $file['name']);
 					}
 
 					global $maxwidthmini, $maxheightmini, $maxwidthsmall,$maxheightsmall ;
@@ -71,15 +70,14 @@ if (!$error && $action == 'add' && $permissiontoadd) {
 
 					// Create thumbs
 					$imgThumbSmall = vignette($destfull, $maxwidthsmall, $maxheightsmall, '_small', 50, "thumbs");
-					$imgThumbMini = vignette($destfull, $maxwidthmini, $maxheightmini, '_mini', 50, "thumbs");
+					$imgThumbMini  = vignette($destfull, $maxwidthmini, $maxheightmini, '_mini', 50, "thumbs");
 					unlink($file['fullname']);
 				}
 			}
 			$filesThumbs = dol_dir_list($pathToTmpPhoto . '/thumbs/');
-			if (!empty($filesThumbs)) {
-				foreach($filesThumbs as $fileThumb) {
+			if ( ! empty($filesThumbs)) {
+				foreach ($filesThumbs as $fileThumb) {
 					unlink($fileThumb['fullname']);
-
 				}
 			}
 
@@ -87,13 +85,13 @@ if (!$error && $action == 'add' && $permissiontoadd) {
 
 			if ($result2 > 0) {
 				$tasktitle = $data['task'];
-				if (!empty($tasktitle) && $tasktitle !== 'undefined') {
+				if ( ! empty($tasktitle) && $tasktitle !== 'undefined') {
 					$extrafields->fetch_name_optionals_label($task->table_element);
 
-					$task->ref = $refTaskMod->getNextValue('', $task);
-					$task->label = $tasktitle;
-					$task->fk_project = $conf->global->DIGIRISKDOLIBARR_DU_PROJECT;
-					$task->date_c = dol_now();
+					$task->ref                              = $refTaskMod->getNextValue('', $task);
+					$task->label                            = $tasktitle;
+					$task->fk_project                       = $conf->global->DIGIRISKDOLIBARR_DU_PROJECT;
+					$task->date_c                           = dol_now();
 					$task->array_options['options_fk_risk'] = $risk->id;
 
 					$result3 = $task->create($user, true);
@@ -105,44 +103,41 @@ if (!$error && $action == 'add' && $permissiontoadd) {
 						header("Location: " . $urltogo);
 					} else {
 						// Creation task KO
-						if (!empty($task->errors)) setEventMessages(null, $task->errors, 'errors');
-						else  setEventMessages($task->error, null, 'errors');
+						if ( ! empty($task->errors)) setEventMessages(null, $task->errors, 'errors');
+						else setEventMessages($task->error, null, 'errors');
 					}
 				}
 			} else {
 				// Creation evaluation KO
-				if (!empty($evaluation->errors)) setEventMessages(null, $evaluation->errors, 'errors');
-				else  setEventMessages($evaluation->error, null, 'errors');
+				if ( ! empty($evaluation->errors)) setEventMessages(null, $evaluation->errors, 'errors');
+				else setEventMessages($evaluation->error, null, 'errors');
 			}
-		}
-		else
-		{
+		} else {
 			// Creation risk KO
-			if (!empty($risk->errors)) setEventMessages(null, $risk->errors, 'errors');
-			else  setEventMessages($risk->error, null, 'errors');
+			if ( ! empty($risk->errors)) setEventMessages(null, $risk->errors, 'errors');
+			else setEventMessages($risk->error, null, 'errors');
 		}
 	}
 }
 
-if (!$error && $action == 'saveRisk' && $permissiontoadd) {
-
+if ( ! $error && $action == 'saveRisk' && $permissiontoadd) {
 	$data = json_decode(file_get_contents('php://input'), true);
 
-	$riskID      = $data['riskID'];
-	$description = $data['comment'];
-	$category    = $data['category'];
+	$riskID          = $data['riskID'];
+	$description     = $data['comment'];
+	$category        = $data['category'];
 	$digiriskelement = new DigiriskElement($db);
 
 	if (dol_strlen($data['newParent'])) {
-		$parent_element = $digiriskelement->fetchAll('','',0,0, array('ref' => $data['newParent']));
-		$parent_id = array_keys($parent_element)[0];
+		$parent_element = $digiriskelement->fetchAll('', '', 0, 0, array('ref' => $data['newParent']));
+		$parent_id      = array_keys($parent_element)[0];
 	}
 
 	$risk->fetch($riskID);
-	if($parent_id > 0) {
+	if ($parent_id > 0) {
 		$risk->fk_element = $parent_id;
 	}
-	$risk->description =  $description;
+	$risk->description = $description;
 	$risk->category    = $category;
 
 	$result = $risk->update($user);
@@ -151,27 +146,27 @@ if (!$error && $action == 'saveRisk' && $permissiontoadd) {
 		// Update risk OK
 		$urltogo = str_replace('__ID__', $result, $backtopage);
 		$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
-		header("Location: ".$urltogo);
+		header("Location: " . $urltogo);
 	} else {
 		// Update risk KO
-		if (!empty($risk->errors)) setEventMessages(null, $risk->errors, 'errors');
-		else  setEventMessages($risk->error, null, 'errors');
+		if ( ! empty($risk->errors)) setEventMessages(null, $risk->errors, 'errors');
+		else setEventMessages($risk->error, null, 'errors');
 	}
 }
 
-if (!$error && ($massaction == 'delete' || ($action == 'delete' && $confirm == 'yes')) && $permissiontodelete) {
-	if (!empty($toselect)) {
+if ( ! $error && ($massaction == 'delete' || ($action == 'delete' && $confirm == 'yes')) && $permissiontodelete) {
+	if ( ! empty($toselect)) {
 		foreach ($toselect as $toselectedid) {
-			$ListEvaluations =  $evaluation->fetchFromParent($toselectedid,0);
+			$ListEvaluations = $evaluation->fetchFromParent($toselectedid, 0);
 			$risk->fetch($toselectedid);
 
-			if (!empty ($ListEvaluations) && $ListEvaluations > 0) {
-				foreach ($ListEvaluations as $lastEvaluation ) {
+			if ( ! empty($ListEvaluations) && $ListEvaluations > 0) {
+				foreach ($ListEvaluations as $lastEvaluation) {
 					$pathToEvaluationPhoto = DOL_DATA_ROOT . '/digiriskdolibarr/riskassessment/' . $lastEvaluation->ref;
 
-					if ( file_exists( $pathToEvaluationPhoto ) && !(empty($lastEvaluation->ref))) {
+					if ( file_exists($pathToEvaluationPhoto) && ! (empty($lastEvaluation->ref))) {
 						$files = dol_dir_list($pathToEvaluationPhoto);
-						if (!empty($files)) {
+						if ( ! empty($files)) {
 							foreach ($files as $file) {
 								if (is_file($file['fullname'])) {
 									unlink($file['fullname']);
@@ -180,7 +175,7 @@ if (!$error && ($massaction == 'delete' || ($action == 'delete' && $confirm == '
 						}
 
 						$files = dol_dir_list($pathToEvaluationPhoto . '/thumbs');
-						if (!empty($files)) {
+						if ( ! empty($files)) {
 							foreach ($files as $file) {
 								unlink($file['fullname']);
 							}
@@ -197,20 +192,20 @@ if (!$error && ($massaction == 'delete' || ($action == 'delete' && $confirm == '
 
 			if ($result < 0) {
 				// Delete risk KO
-				if (!empty($risk->errors)) setEventMessages(null, $risk->errors, 'errors');
-				else  setEventMessages($risk->error, null, 'errors');
+				if ( ! empty($risk->errors)) setEventMessages(null, $risk->errors, 'errors');
+				else setEventMessages($risk->error, null, 'errors');
 			}
 		}
 
 		// Delete risk OK
 		$urltogo = str_replace('__ID__', $result, $backtopage);
 		$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
-		header("Location: ".$urltogo);
+		header("Location: " . $urltogo);
 		exit;
 	}
 }
 
-if (!$error && $action == 'addEvaluation' && $permissiontoadd) {
+if ( ! $error && $action == 'addEvaluation' && $permissiontoadd) {
 	$data = json_decode(file_get_contents('php://input'), true);
 
 	$evaluationComment  = $data['comment'];
@@ -231,7 +226,7 @@ if (!$error && $action == 'addEvaluation' && $permissiontoadd) {
 	$evaluation->method              = $method;
 	$evaluation->ref                 = $refEvaluationMod->getNextValue($evaluation);
 	$evaluation->comment             = $evaluationComment;
-	$evaluation->date_riskassessment = strtotime(preg_replace('/\//', '-',$riskAssessmentDate));
+	$evaluation->date_riskassessment = strtotime(preg_replace('/\//', '-', $riskAssessmentDate));
 
 	if ($method == 'advanced') {
 		$formation  = $data['criteres']['formation'];
@@ -248,14 +243,14 @@ if (!$error && $action == 'addEvaluation' && $permissiontoadd) {
 	}
 
 	$pathToTmpPhoto = $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessment/tmp/' . $risktmp->ref;
-	$files = dol_dir_list($pathToTmpPhoto);
+	$files          = dol_dir_list($pathToTmpPhoto);
 
-	if (!empty($files)) {
-		foreach($files as $file) {
-			$pathToEvaluationPhoto =$conf->digiriskdolibarr->multidir_output[$conf->entity] .  '/riskassessment/' . $evaluation->ref;
+	if ( ! empty($files)) {
+		foreach ($files as $file) {
+			$pathToEvaluationPhoto = $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessment/' . $evaluation->ref;
 
 			mkdir($pathToEvaluationPhoto);
-			copy($file['fullname'],$pathToEvaluationPhoto . '/' . $file['name']);
+			copy($file['fullname'], $pathToEvaluationPhoto . '/' . $file['name']);
 
 			global $maxwidthmini, $maxheightmini, $maxwidthsmall,$maxheightsmall ;
 			$destfull = $pathToEvaluationPhoto . '/' . $file['name'];
@@ -268,14 +263,12 @@ if (!$error && $action == 'addEvaluation' && $permissiontoadd) {
 			// Used on menu or for setup page for example
 			$imgThumbMini = vignette($destfull, $maxwidthmini, $maxheightmini, '_mini', 50, "thumbs");
 			unlink($file['fullname']);
-
 		}
 	}
 	$filesThumbs = dol_dir_list($pathToTmpPhoto . '/thumbs/');
-	if (!empty($filesThumbs)) {
-		foreach($filesThumbs as $fileThumb) {
+	if ( ! empty($filesThumbs)) {
+		foreach ($filesThumbs as $fileThumb) {
 			unlink($fileThumb['fullname']);
-
 		}
 	}
 
@@ -285,17 +278,15 @@ if (!$error && $action == 'addEvaluation' && $permissiontoadd) {
 		// Creation evaluation OK
 		$urltogo = str_replace('__ID__', $result, $backtopage);
 		$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
-		header("Location: ".$urltogo);
-	}
-	else {
+		header("Location: " . $urltogo);
+	} else {
 		// Creation evaluation KO
-		if (!empty($evaluation->errors)) setEventMessages(null, $evaluation->errors, 'errors');
-		else  setEventMessages($evaluation->error, null, 'errors');
+		if ( ! empty($evaluation->errors)) setEventMessages(null, $evaluation->errors, 'errors');
+		else setEventMessages($evaluation->error, null, 'errors');
 	}
 }
 
-if (!$error && $action == 'saveEvaluation' && $permissiontoadd) {
-
+if ( ! $error && $action == 'saveEvaluation' && $permissiontoadd) {
 	$data = json_decode(file_get_contents('php://input'), true);
 
 	$evaluationID       = $data['evaluationID'];
@@ -309,7 +300,7 @@ if (!$error && $action == 'saveEvaluation' && $permissiontoadd) {
 	$evaluation->cotation            = $cotation;
 	$evaluation->method              = $method;
 	$evaluation->comment             = $evaluationComment;
-	$evaluation->date_riskassessment = strtotime(preg_replace('/\//', '-',$riskAssessmentDate));
+	$evaluation->date_riskassessment = strtotime(preg_replace('/\//', '-', $riskAssessmentDate));
 
 	if ($method == 'advanced') {
 		$formation  = $data['criteres']['formation'];
@@ -332,22 +323,21 @@ if (!$error && $action == 'saveEvaluation' && $permissiontoadd) {
 		// Update evaluation OK
 		$urltogo = str_replace('__ID__', $result, $backtopage);
 		$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
-		header("Location: ".$urltogo);
-	}
-	else {
+		header("Location: " . $urltogo);
+	} else {
 		// Update evaluation KO
-		if (!empty($evaluation->errors)) setEventMessages(null, $evaluation->errors, 'errors');
-		else  setEventMessages($evaluation->error, null, 'errors');
+		if ( ! empty($evaluation->errors)) setEventMessages(null, $evaluation->errors, 'errors');
+		else setEventMessages($evaluation->error, null, 'errors');
 	}
 }
 
-if (!$error && $action == "deleteEvaluation" && $permissiontodelete) {
+if ( ! $error && $action == "deleteEvaluation" && $permissiontodelete) {
 	$evaluation_id = GETPOST('deletedEvaluationId');
 
 	$evaluation->fetch($evaluation_id);
 
 	$pathToEvaluationPhoto = DOL_DATA_ROOT . '/digiriskdolibarr/riskassessment/' . $evaluation->ref;
-	$files = dol_dir_list($pathToEvaluationPhoto);
+	$files                 = dol_dir_list($pathToEvaluationPhoto);
 	foreach ($files as $file) {
 		if (is_file($file['fullname'])) {
 			unlink($file['fullname']);
@@ -363,28 +353,26 @@ if (!$error && $action == "deleteEvaluation" && $permissiontodelete) {
 	dol_delete_dir($pathToEvaluationPhoto);
 
 	$previousEvaluation = $evaluation;
-	$result = $evaluation->delete($user);
-	$previousEvaluation->updateEvaluationStatus($user,$evaluation->fk_risk);
+	$result             = $evaluation->delete($user);
+	$previousEvaluation->updateEvaluationStatus($user, $evaluation->fk_risk);
 
 	if ($result > 0) {
 		// Delete evaluation OK
 		$urltogo = str_replace('__ID__', $result, $backtopage);
 		$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
-		header("Location: ".$urltogo);
+		header("Location: " . $urltogo);
 		exit;
-	}
-	else {
+	} else {
 		// Delete evaluation KO
-		if (!empty($evaluation->errors)) setEventMessages(null, $evaluation->errors, 'errors');
-		else  setEventMessages($evaluation->error, null, 'errors');
+		if ( ! empty($evaluation->errors)) setEventMessages(null, $evaluation->errors, 'errors');
+		else setEventMessages($evaluation->error, null, 'errors');
 	}
 }
 
-if (!$error && $action == 'addRiskAssessmentTask' && $permissiontoadd) {
-
+if ( ! $error && $action == 'addRiskAssessmentTask' && $permissiontoadd) {
 	$data = json_decode(file_get_contents('php://input'), true);
 
-	$riskID = $data['riskToAssign'];
+	$riskID    = $data['riskToAssign'];
 	$tasktitle = $data['tasktitle'];
 
 	$extrafields->fetch_name_optionals_label($task->table_element);
@@ -402,21 +390,20 @@ if (!$error && $action == 'addRiskAssessmentTask' && $permissiontoadd) {
 		// Creation task OK
 		$urltogo = str_replace('__ID__', $result, $backtopage);
 		$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
-		header("Location: ".$urltogo);
+		header("Location: " . $urltogo);
 		exit;
 	} else {
 		// Creation task KO
-		if (!empty($task->errors)) setEventMessages(null, $task->errors, 'errors');
-		else  setEventMessages($task->error, null, 'errors');
+		if ( ! empty($task->errors)) setEventMessages(null, $task->errors, 'errors');
+		else setEventMessages($task->error, null, 'errors');
 	}
 }
 
-if (!$error && $action == 'saveRiskAssessmentTask' && $permissiontoadd) {
-
+if ( ! $error && $action == 'saveRiskAssessmentTask' && $permissiontoadd) {
 	$data = json_decode(file_get_contents('php://input'), true);
 
 	$riskAssessmentTaskID = $data['riskAssessmentTaskID'];
-	$tasktitle = $data['tasktitle'];
+	$tasktitle            = $data['tasktitle'];
 
 	$task->fetch($riskAssessmentTaskID);
 
@@ -428,16 +415,16 @@ if (!$error && $action == 'saveRiskAssessmentTask' && $permissiontoadd) {
 		// Update task OK
 		$urltogo = str_replace('__ID__', $result, $backtopage);
 		$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
-		header("Location: ".$urltogo);
+		header("Location: " . $urltogo);
 		exit;
 	} else {
 		// Update task KO
-		if (!empty($task->errors)) setEventMessages(null, $task->errors, 'errors');
-		else  setEventMessages($task->error, null, 'errors');
+		if ( ! empty($task->errors)) setEventMessages(null, $task->errors, 'errors');
+		else setEventMessages($task->error, null, 'errors');
 	}
 }
 
-if (!$error && $action == "deleteRiskAssessmentTask" && $permissiontodelete) {
+if ( ! $error && $action == "deleteRiskAssessmentTask" && $permissiontodelete) {
 	$deleteRiskAssessmentTaskId = GETPOST('deletedRiskAssessmentTaskId');
 
 	$task->fetch($deleteRiskAssessmentTaskId);
@@ -448,38 +435,35 @@ if (!$error && $action == "deleteRiskAssessmentTask" && $permissiontodelete) {
 		// Delete task OK
 		$urltogo = str_replace('__ID__', $result, $backtopage);
 		$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
-		header("Location: ".$urltogo);
+		header("Location: " . $urltogo);
 		exit;
-	}
-	else
-	{
+	} else {
 		// Delete $task KO
-		if (!empty($task->errors)) setEventMessages(null, $task->errors, 'errors');
-		else  setEventMessages($task->error, null, 'errors');
+		if ( ! empty($task->errors)) setEventMessages(null, $task->errors, 'errors');
+		else setEventMessages($task->error, null, 'errors');
 	}
 }
 
-if (!$error && $action == "addFiles" && $permissiontodelete) {
-
-	$data        = json_decode(file_get_contents('php://input'), true);
+if ( ! $error && $action == "addFiles" && $permissiontodelete) {
+	$data = json_decode(file_get_contents('php://input'), true);
 
 	$riskassessment_id = $data['riskassessment_id'];
-	$risk_id = $data['risk_id'];
-	$filenames = $data['filenames'];
-	$riskassessment = new RiskAssessment($db);
-	$risktmp = new Risk($db);
+	$risk_id           = $data['risk_id'];
+	$filenames         = $data['filenames'];
+	$riskassessment    = new RiskAssessment($db);
+	$risktmp           = new Risk($db);
 	$risktmp->fetch($risk_id);
 	$riskassessment->fetch($riskassessment_id);
 	if (dol_strlen($riskassessment->ref) > 0) {
 		$pathToEvaluationPhoto = $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessment/' . $riskassessment->ref;
 	} else {
-		$pathToEvaluationPhoto = $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessment/tmp/' .( dol_strlen($risktmp->ref) > 0 ? $risktmp->ref : 'RK0');
+		$pathToEvaluationPhoto = $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessment/tmp/' . ( dol_strlen($risktmp->ref) > 0 ? $risktmp->ref : 'RK0');
 	}
 	$filenames = preg_split('/vVv/', $filenames);
 	array_pop($filenames);
 
-	if ( !(empty($filenames))) {
-		if (!is_dir($conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessment/tmp/')) {
+	if ( ! (empty($filenames))) {
+		if ( ! is_dir($conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessment/tmp/')) {
 			dol_mkdir($conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessment/tmp/');
 		}
 		$riskassessment->photo = $filenames[0];
@@ -488,14 +472,13 @@ if (!$error && $action == "addFiles" && $permissiontodelete) {
 			$entity = ($conf->entity > 1) ? '/' . $conf->entity : '';
 
 
-			if (is_file( $conf->ecm->multidir_output[$conf->entity] . '/digiriskdolibarr/medias/' . $filename)) {
+			if (is_file($conf->ecm->multidir_output[$conf->entity] . '/digiriskdolibarr/medias/' . $filename)) {
+				$pathToECMPhoto = $conf->ecm->multidir_output[$conf->entity] . '/digiriskdolibarr/medias/' . $filename;
 
-				$pathToECMPhoto =  $conf->ecm->multidir_output[$conf->entity] . '/digiriskdolibarr/medias/' . $filename;
-
-				if (!is_dir($pathToEvaluationPhoto)) {
+				if ( ! is_dir($pathToEvaluationPhoto)) {
 					mkdir($pathToEvaluationPhoto);
 				}
-				copy($pathToECMPhoto,$pathToEvaluationPhoto . '/' . $filename);
+				copy($pathToECMPhoto, $pathToEvaluationPhoto . '/' . $filename);
 
 				global $maxwidthmini, $maxheightmini, $maxwidthsmall,$maxheightsmall ;
 				$destfull = $pathToEvaluationPhoto . '/' . $filename;
@@ -505,20 +488,18 @@ if (!$error && $action == "addFiles" && $permissiontodelete) {
 				// Create mini thumbs for image (Ratio is near 16/9)
 				$imgThumbMini = vignette($destfull, $maxwidthmini, $maxheightmini, '_mini', 50, "thumbs");
 			}
-
 		}
 		$riskassessment->update($user, true);
 	}
 	exit;
 }
 
-if (!$error && $action == "unlinkFile" && $permissiontodelete) {
-
-	$data        = json_decode(file_get_contents('php://input'), true);
+if ( ! $error && $action == "unlinkFile" && $permissiontodelete) {
+	$data = json_decode(file_get_contents('php://input'), true);
 
 	$riskassessment_id = $data['riskassessment_id'];
-	$risk_id = $data['risk_id'];
-	$filename = $data['filename'];
+	$risk_id           = $data['risk_id'];
+	$filename          = $data['filename'];
 
 	$riskassessment = new RiskAssessment($db);
 	$riskassessment->fetch($riskassessment_id);
@@ -527,13 +508,13 @@ if (!$error && $action == "unlinkFile" && $permissiontodelete) {
 
 	//edit evaluation
 	if ($riskassessment->id > 0) {
-		$pathToEvaluationPhoto = $conf->digiriskdolibarr->multidir_output[$conf->entity] .'/riskassessment/' . $riskassessment->ref;
+		$pathToEvaluationPhoto = $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessment/' . $riskassessment->ref;
 	} elseif ($risk_id > 0) {
 		//create evaluation
-		$pathToEvaluationPhoto = $conf->digiriskdolibarr->multidir_output[$conf->entity] .'/riskassessment/tmp/' . $risktmp->ref;
+		$pathToEvaluationPhoto = $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessment/tmp/' . $risktmp->ref;
 	} elseif ($risk_id == 'new') {
 		//create risk
-		$pathToEvaluationPhoto = $conf->digiriskdolibarr->multidir_output[$conf->entity] .'/riskassessment/tmp/RK0/';
+		$pathToEvaluationPhoto = $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessment/tmp/RK0/';
 	}
 
 
@@ -547,7 +528,7 @@ if (!$error && $action == "unlinkFile" && $permissiontodelete) {
 
 	$files = dol_dir_list($pathToEvaluationPhoto . '/thumbs');
 	foreach ($files as $file) {
-		if (preg_match('/' . preg_split('/\./',$filename)[0] . '/', $file['name'])) {
+		if (preg_match('/' . preg_split('/\./', $filename)[0] . '/', $file['name'])) {
 			unlink($file['fullname']);
 		}
 	}
@@ -557,25 +538,24 @@ if (!$error && $action == "unlinkFile" && $permissiontodelete) {
 	}
 	$urltogo = str_replace('__ID__', $id, $backtopage);
 	$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
-	header("Location: ".$urltogo);
+	header("Location: " . $urltogo);
 	exit;
 }
 
-if (!$error && $action == "addToFavorite" && $permissiontodelete) {
-
-	$data        = json_decode(file_get_contents('php://input'), true);
+if ( ! $error && $action == "addToFavorite" && $permissiontodelete) {
+	$data = json_decode(file_get_contents('php://input'), true);
 
 	$riskassessment_id = $data['riskassessment_id'];
-	$filename = $data['filename'];
+	$filename          = $data['filename'];
 
 	$riskassessment = new RiskAssessment($db);
 	$riskassessment->fetch($riskassessment_id);
-	$pathToEvaluationPhoto = $conf->digiriskdolibarr->multidir_output[$conf->entity] .'/riskassessment/' . $riskassessment->ref;
+	$pathToEvaluationPhoto = $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessment/' . $riskassessment->ref;
 	$riskassessment->photo = $filename;
 	$riskassessment->update($user, true);
 
 	$urltogo = str_replace('__ID__', $riskassessment_id, $backtopage);
 	$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
-	header("Location: ".$urltogo);
+	header("Location: " . $urltogo);
 	exit;
 }

@@ -21,9 +21,9 @@
  * \brief       This file is a class file for FirePermit
  */
 
-require_once DOL_DOCUMENT_ROOT.'/user/class/user.class.php';
-require_once DOL_DOCUMENT_ROOT.'/contact/class/contact.class.php';
-require_once DOL_DOCUMENT_ROOT.'/societe/class/societe.class.php';
+require_once DOL_DOCUMENT_ROOT . '/user/class/user.class.php';
+require_once DOL_DOCUMENT_ROOT . '/contact/class/contact.class.php';
+require_once DOL_DOCUMENT_ROOT . '/societe/class/societe.class.php';
 
 require_once __DIR__ . '/digiriskdocuments.class.php';
 require_once __DIR__ . '/digirisksignature.class.php';
@@ -77,22 +77,22 @@ class FirePermit extends CommonObject
 	/**
 	 * @var array  Array with all fields and their property. Do not use it as a static var. It may be modified by constructor.
 	 */
-	public $fields=array(
-		'rowid'                => array('type'=>'integer', 'label'=>'TechnicalID', 'enabled'=>'1', 'position'=>1, 'notnull'=>1, 'visible'=>0, 'noteditable'=>'1', 'index'=>1, 'comment'=>"Id"),
-		'ref'                  => array('type'=>'varchar(128)', 'label'=>'Ref', 'enabled'=>'1', 'position'=>10, 'notnull'=>1, 'visible'=>1, 'noteditable'=>'1', 'default'=>'(PROV)', 'index'=>1, 'searchall'=>1, 'showoncombobox'=>'1', 'comment'=>"Reference of object"),
-		'ref_ext'              => array('type'=>'varchar(128)', 'label'=>'RefExt', 'enabled'=>'1', 'position'=>20, 'notnull'=>0, 'visible'=>0,),
-		'entity'               => array('type'=>'integer', 'label'=>'Entity', 'enabled'=>'1', 'position'=>30, 'notnull'=>1, 'visible'=>0,),
-		'date_creation'        => array('type'=>'datetime', 'label'=>'DateCreation', 'enabled'=>'1', 'position'=>40, 'notnull'=>1, 'visible'=>0,),
-		'tms'                  => array('type'=>'timestamp', 'label'=>'DateModification', 'enabled'=>'1', 'position'=>50, 'notnull'=>0, 'visible'=>0,),
-		'status'               => array('type'=>'smallint', 'label'=>'Status', 'enabled'=>'1', 'position'=>70, 'notnull'=>0, 'visible'=>1, 'index'=>0,),
-		'label'                => array('type'=>'varchar(255)', 'label'=>'Label', 'enabled'=>'1', 'position'=>80, 'notnull'=>0, 'visible'=>1, 'searchall'=>1, 'css'=>'minwidth200', 'help'=>"Help text", 'showoncombobox'=>'1',),
-		'date_start'           => array('type'=>'datetime', 'label'=>'StartDate', 'enabled'=>'1', 'position'=>90, 'notnull'=>-1, 'visible'=>1,),
-		'date_end'             => array('type'=>'datetime', 'label'=>'EndDate', 'enabled'=>'1', 'position'=>100, 'notnull'=>-1, 'visible'=>1,),
-		'last_email_sent_date' => array('type'=>'datetime', 'label'=>'LastEmailSentDate', 'enabled'=>'1', 'position'=>110, 'notnull'=>-1, 'visible'=>-2,),
-		'fk_project'           => array('type'=>'integer:Project:projet/class/project.class.php', 'label'=>'Project', 'enabled'=>'1', 'position'=>115, 'notnull'=>1, 'visible'=>1,),
-		'fk_user_creat'        => array('type'=>'integer:User:user/class/user.class.php', 'label'=>'UserAuthor', 'enabled'=>'1', 'position'=>120, 'notnull'=>1, 'visible'=>0, 'foreignkey'=>'user.rowid',),
-		'fk_user_modif'        => array('type'=>'integer:User:user/class/user.class.php', 'label'=>'UserModif', 'enabled'=>'1', 'position'=>130, 'notnull'=>-1, 'visible'=>0,),
-		'fk_preventionplan'    => array('type'=>'integer', 'label'=>'PreventionPlan', 'enabled'=>'1', 'position'=>140, 'notnull'=>-1, 'visible'=>-2,),
+	public $fields = array(
+		'rowid'                => array('type' => 'integer', 'label' => 'TechnicalID', 'enabled' => '1', 'position' => 1, 'notnull' => 1, 'visible' => 0, 'noteditable' => '1', 'index' => 1, 'comment' => "Id"),
+		'ref'                  => array('type' => 'varchar(128)', 'label' => 'Ref', 'enabled' => '1', 'position' => 10, 'notnull' => 1, 'visible' => 1, 'noteditable' => '1', 'default' => '(PROV)', 'index' => 1, 'searchall' => 1, 'showoncombobox' => '1', 'comment' => "Reference of object"),
+		'ref_ext'              => array('type' => 'varchar(128)', 'label' => 'RefExt', 'enabled' => '1', 'position' => 20, 'notnull' => 0, 'visible' => 0,),
+		'entity'               => array('type' => 'integer', 'label' => 'Entity', 'enabled' => '1', 'position' => 30, 'notnull' => 1, 'visible' => 0,),
+		'date_creation'        => array('type' => 'datetime', 'label' => 'DateCreation', 'enabled' => '1', 'position' => 40, 'notnull' => 1, 'visible' => 0,),
+		'tms'                  => array('type' => 'timestamp', 'label' => 'DateModification', 'enabled' => '1', 'position' => 50, 'notnull' => 0, 'visible' => 0,),
+		'status'               => array('type' => 'smallint', 'label' => 'Status', 'enabled' => '1', 'position' => 70, 'notnull' => 0, 'visible' => 1, 'index' => 0,),
+		'label'                => array('type' => 'varchar(255)', 'label' => 'Label', 'enabled' => '1', 'position' => 80, 'notnull' => 0, 'visible' => 1, 'searchall' => 1, 'css' => 'minwidth200', 'help' => "Help text", 'showoncombobox' => '1',),
+		'date_start'           => array('type' => 'datetime', 'label' => 'StartDate', 'enabled' => '1', 'position' => 90, 'notnull' => -1, 'visible' => 1,),
+		'date_end'             => array('type' => 'datetime', 'label' => 'EndDate', 'enabled' => '1', 'position' => 100, 'notnull' => -1, 'visible' => 1,),
+		'last_email_sent_date' => array('type' => 'datetime', 'label' => 'LastEmailSentDate', 'enabled' => '1', 'position' => 110, 'notnull' => -1, 'visible' => -2,),
+		'fk_project'           => array('type' => 'integer:Project:projet/class/project.class.php', 'label' => 'Project', 'enabled' => '1', 'position' => 115, 'notnull' => 1, 'visible' => 1,),
+		'fk_user_creat'        => array('type' => 'integer:User:user/class/user.class.php', 'label' => 'UserAuthor', 'enabled' => '1', 'position' => 120, 'notnull' => 1, 'visible' => 0, 'foreignkey' => 'user.rowid',),
+		'fk_user_modif'        => array('type' => 'integer:User:user/class/user.class.php', 'label' => 'UserModif', 'enabled' => '1', 'position' => 130, 'notnull' => -1, 'visible' => 0,),
+		'fk_preventionplan'    => array('type' => 'integer', 'label' => 'PreventionPlan', 'enabled' => '1', 'position' => 140, 'notnull' => -1, 'visible' => -2,),
 	);
 
 	public $rowid;
@@ -123,26 +123,20 @@ class FirePermit extends CommonObject
 		$this->db = $db;
 
 		if (empty($conf->global->MAIN_SHOW_TECHNICAL_ID) && isset($this->fields['rowid'])) $this->fields['rowid']['visible'] = 0;
-		if (empty($conf->multicompany->enabled) && isset($this->fields['entity'])) $this->fields['entity']['enabled'] = 0;
+		if (empty($conf->multicompany->enabled) && isset($this->fields['entity'])) $this->fields['entity']['enabled']        = 0;
 
 		// Unset fields that are disabled
-		foreach ($this->fields as $key => $val)
-		{
-			if (isset($val['enabled']) && empty($val['enabled']))
-			{
+		foreach ($this->fields as $key => $val) {
+			if (isset($val['enabled']) && empty($val['enabled'])) {
 				unset($this->fields[$key]);
 			}
 		}
 
 		// Translate some data of arrayofkeyval
-		if (is_object($langs))
-		{
-			foreach ($this->fields as $key => $val)
-			{
-				if (is_array($val['arrayofkeyval']))
-				{
-					foreach ($val['arrayofkeyval'] as $key2 => $val2)
-					{
+		if (is_object($langs)) {
+			foreach ($this->fields as $key => $val) {
+				if (is_array($val['arrayofkeyval'])) {
+					foreach ($val['arrayofkeyval'] as $key2 => $val2) {
 						$this->fields[$key]['arrayofkeyval'][$key2] = $langs->trans($val2);
 					}
 				}
@@ -190,12 +184,12 @@ class FirePermit extends CommonObject
 
 		// Load source object
 		$result = $object->fetchCommon($fromid);
-		if ($result > 0 && !empty($object->table_element_line)) {
+		if ($result > 0 && ! empty($object->table_element_line)) {
 			$object->fetchLines();
 		}
 
 		// Load openinghours form source object
-		$morewhere = ' AND element_id = ' . $object->id;
+		$morewhere  = ' AND element_id = ' . $object->id;
 		$morewhere .= ' AND element_type = ' . "'" . $object->element . "'";
 		$morewhere .= ' AND status = 1';
 
@@ -205,7 +199,7 @@ class FirePermit extends CommonObject
 		$signatories = $signatory->fetchSignatory("", $fromid, 'firepermit');
 		$resources   = $digiriskresources->fetchResourcesFromObject('', $object);
 
-		if (!empty ($signatories) && $signatories > 0) {
+		if ( ! empty($signatories) && $signatories > 0) {
 			foreach ($signatories as $arrayRole) {
 				foreach ($arrayRole as $signatory) {
 					$signatoriesID[$signatory->role] = $signatory->id;
@@ -229,7 +223,7 @@ class FirePermit extends CommonObject
 			$object->ref_ext = 'digirisk_' . $object->ref;
 		}
 		if (property_exists($object, 'label')) {
-			$object->label = empty($this->fields['label']['default']) ? $langs->trans("CopyOf")." ".$object->label : $this->fields['label']['default'];
+			$object->label = empty($this->fields['label']['default']) ? $langs->trans("CopyOf") . " " . $object->label : $this->fields['label']['default'];
 		}
 		if (property_exists($object, 'date_creation')) {
 			$object->date_creation = dol_now();
@@ -240,7 +234,7 @@ class FirePermit extends CommonObject
 
 		// Create clone
 		$object->context['createfromclone'] = 'createfromclone';
-		$firepermtid = $object->create($user);
+		$firepermtid                        = $object->create($user);
 
 		if ($firepermtid > 0) {
 			$digiriskresources->digirisk_dolibarr_set_resources($this->db, $user->id, 'FP_EXT_SOCIETY', 'societe', array(array_shift($resources['FP_EXT_SOCIETY'])->id), $conf->entity, 'firepermit', $firepermtid, 1);
@@ -249,26 +243,26 @@ class FirePermit extends CommonObject
 			$signatory->createFromClone($user, $signatoriesID['FP_MAITRE_OEUVRE'], $firepermtid);
 			$signatory->createFromClone($user, $signatoriesID['FP_EXT_SOCIETY_RESPONSIBLE'], $firepermtid);
 
-			if (!empty($options['schedule'])) {
-				if (!empty($openinghours)) {
+			if ( ! empty($options['schedule'])) {
+				if ( ! empty($openinghours)) {
 					$openinghours->element_id = $firepermtid;
 					$openinghours->create($user);
 				}
 			}
 
-			if (!empty($options['attendants'])) {
-				if (!empty($extintervenant_ids) && $extintervenant_ids > 0) {
+			if ( ! empty($options['attendants'])) {
+				if ( ! empty($extintervenant_ids) && $extintervenant_ids > 0) {
 					foreach ($extintervenant_ids as $extintervenant_id) {
 						$signatory->createFromClone($user, $extintervenant_id, $firepermtid);
 					}
 				}
 			}
 
-			if (!empty($options['firepermit_risk'])) {
+			if ( ! empty($options['firepermit_risk'])) {
 				$num = (is_array($object->lines) ? count($object->lines) : 0);
 				for ($i = 0; $i < $num; $i++) {
-					$line = $object->lines[$i];
-					$line->category = empty($line->category) ? 0 : $line->category;
+					$line                = $object->lines[$i];
+					$line->category      = empty($line->category) ? 0 : $line->category;
 					$line->fk_firepermit = $firepermtid;
 
 					$result = $line->insert($user, 1);
@@ -281,14 +275,14 @@ class FirePermit extends CommonObject
 			}
 		} else {
 			$error++;
-			$this->error = $object->error;
+			$this->error  = $object->error;
 			$this->errors = $object->errors;
 		}
 
 		unset($object->context['createfromclone']);
 
 		// End
-		if (!$error) {
+		if ( ! $error) {
 			$this->db->commit();
 			return $firepermtid;
 		} else {
@@ -339,45 +333,41 @@ class FirePermit extends CommonObject
 
 		$records = array();
 
-		$sql = 'SELECT ';
-		$sql .= $this->getFieldList();
-		$sql .= ' FROM '.MAIN_DB_PREFIX.$this->table_element.' as t';
-		if (isset($this->ismultientitymanaged) && $this->ismultientitymanaged == 1) $sql .= ' WHERE t.entity IN ('.getEntity($this->table_element).')';
-		else $sql .= ' WHERE 1 = 1';
+		$sql                                                                              = 'SELECT ';
+		$sql                                                                             .= $this->getFieldList();
+		$sql                                                                             .= ' FROM ' . MAIN_DB_PREFIX . $this->table_element . ' as t';
+		if (isset($this->ismultientitymanaged) && $this->ismultientitymanaged == 1) $sql .= ' WHERE t.entity IN (' . getEntity($this->table_element) . ')';
+		else $sql                                                                        .= ' WHERE 1 = 1';
 		// Manage filter
 		$sqlwhere = array();
 		if (count($filter) > 0) {
 			foreach ($filter as $key => $value) {
 				if ($key == 't.rowid') {
-					$sqlwhere[] = $key.'='.$value;
-				}
-				elseif (strpos($key, 'date') !== false) {
-					$sqlwhere[] = $key.' = \''.$this->db->idate($value).'\'';
-				}
-				elseif ($key == 'customsql') {
+					$sqlwhere[] = $key . '=' . $value;
+				} elseif (strpos($key, 'date') !== false) {
+					$sqlwhere[] = $key . ' = \'' . $this->db->idate($value) . '\'';
+				} elseif ($key == 'customsql') {
 					$sqlwhere[] = $value;
-				}
-				else {
-					$sqlwhere[] = $key.' LIKE \'%'.$this->db->escape($value).'%\'';
+				} else {
+					$sqlwhere[] = $key . ' LIKE \'%' . $this->db->escape($value) . '%\'';
 				}
 			}
 		}
 		if (count($sqlwhere) > 0) {
-			$sql .= ' AND ('.implode(' '.$filtermode.' ', $sqlwhere).')';
+			$sql .= ' AND (' . implode(' ' . $filtermode . ' ', $sqlwhere) . ')';
 		}
 
-		if (!empty($sortfield)) {
+		if ( ! empty($sortfield)) {
 			$sql .= $this->db->order($sortfield, $sortorder);
 		}
-		if (!empty($limit)) {
-			$sql .= ' '.$this->db->plimit($limit, $offset);
+		if ( ! empty($limit)) {
+			$sql .= ' ' . $this->db->plimit($limit, $offset);
 		}
 		$resql = $this->db->query($sql);
 		if ($resql) {
 			$num = $this->db->num_rows($resql);
-			$i = 0;
-			while ($i < ($limit ? min($limit, $num) : $num))
-			{
+			$i   = 0;
+			while ($i < ($limit ? min($limit, $num) : $num)) {
 				$obj = $this->db->fetch_object($resql);
 
 				$record = new self($this->db);
@@ -391,8 +381,8 @@ class FirePermit extends CommonObject
 
 			return $records;
 		} else {
-			$this->errors[] = 'Error '.$this->db->lasterror();
-			dol_syslog(__METHOD__.' '.join(',', $this->errors), LOG_ERR);
+			$this->errors[] = 'Error ' . $this->db->lasterror();
+			dol_syslog(__METHOD__ . ' ' . join(',', $this->errors), LOG_ERR);
 
 			return -1;
 		}
@@ -431,33 +421,28 @@ class FirePermit extends CommonObject
 	 */
 	public function info($id)
 	{
-		$sql = 'SELECT rowid, date_creation as datec, tms as datem,';
-		$sql .= ' fk_user_creat, fk_user_modif';
-		$sql .= ' FROM '.MAIN_DB_PREFIX.$this->table_element.' as t';
-		$sql .= ' WHERE t.rowid = '.$id;
+		$sql    = 'SELECT rowid, date_creation as datec, tms as datem,';
+		$sql   .= ' fk_user_creat, fk_user_modif';
+		$sql   .= ' FROM ' . MAIN_DB_PREFIX . $this->table_element . ' as t';
+		$sql   .= ' WHERE t.rowid = ' . $id;
 		$result = $this->db->query($sql);
-		if ($result)
-		{
-			if ($this->db->num_rows($result))
-			{
-				$obj = $this->db->fetch_object($result);
+		if ($result) {
+			if ($this->db->num_rows($result)) {
+				$obj      = $this->db->fetch_object($result);
 				$this->id = $obj->rowid;
-				if ($obj->fk_user_author)
-				{
+				if ($obj->fk_user_author) {
 					$cuser = new User($this->db);
 					$cuser->fetch($obj->fk_user_author);
 					$this->user_creation = $cuser;
 				}
 
-				if ($obj->fk_user_valid)
-				{
+				if ($obj->fk_user_valid) {
 					$vuser = new User($this->db);
 					$vuser->fetch($obj->fk_user_valid);
 					$this->user_validation = $vuser;
 				}
 
-				if ($obj->fk_user_cloture)
-				{
+				if ($obj->fk_user_cloture) {
 					$cluser = new User($this->db);
 					$cluser->fetch($obj->fk_user_cloture);
 					$this->user_cloture = $cluser;
@@ -469,9 +454,7 @@ class FirePermit extends CommonObject
 			}
 
 			$this->db->free($result);
-		}
-		else
-		{
+		} else {
 			dol_print_error($this->db);
 		}
 	}
@@ -548,21 +531,20 @@ class FirePermit extends CommonObject
 	{
 
 		// phpcs:enable
-		if (empty($this->labelStatus) || empty($this->labelStatusShort))
-		{
+		if (empty($this->labelStatus) || empty($this->labelStatusShort)) {
 			global $langs;
 			$langs->load("digiriskdolibarr@digiriskdolibarr");
 
-			$this->labelStatus[self::STATUS_IN_PROGRESS] = $langs->trans('InProgress');
+			$this->labelStatus[self::STATUS_IN_PROGRESS]       = $langs->trans('InProgress');
 			$this->labelStatus[self::STATUS_PENDING_SIGNATURE] = $langs->trans('ValidatePendingSignature');
-			$this->labelStatus[self::STATUS_LOCKED] = $langs->trans('Locked');
-			$this->labelStatus[self::STATUS_ARCHIVED] = $langs->trans('Archived');
+			$this->labelStatus[self::STATUS_LOCKED]            = $langs->trans('Locked');
+			$this->labelStatus[self::STATUS_ARCHIVED]          = $langs->trans('Archived');
 		}
 
-		$statusType = 'status'.$status;
+		$statusType                                                = 'status' . $status;
 		if ($status == self::STATUS_PENDING_SIGNATURE) $statusType = 'status3';
-		if ($status == self::STATUS_LOCKED) $statusType = 'status8';
-		if ($status == self::STATUS_ARCHIVED) $statusType = 'status8';
+		if ($status == self::STATUS_LOCKED) $statusType            = 'status8';
+		if ($status == self::STATUS_ARCHIVED) $statusType          = 'status8';
 
 		return dolGetStatus($this->labelStatus[$status], $this->labelStatusShort[$status], '', $statusType, $mode);
 	}
@@ -581,7 +563,7 @@ class FirePermit extends CommonObject
 	{
 		global $conf, $langs, $hookmanager;
 
-		if (!empty($conf->dol_no_mouse_hover)) $notooltip = 1; // Force disable tooltips
+		if ( ! empty($conf->dol_no_mouse_hover)) $notooltip = 1; // Force disable tooltips
 
 		$name = $this->ref;
 
@@ -590,14 +572,11 @@ class FirePermit extends CommonObject
 		$result = ''; $label = '';
 		$linkstart = ''; $linkend = '';
 
-		if (!empty($this->logo) && class_exists('Form'))
-		{
+		if ( ! empty($this->logo) && class_exists('Form')) {
 			$label .= '<div class="photointooltip">';
 			$label .= Form::showphoto('societe', $this, 0, 40, 0, '', 'mini', 0); // Important, we must force height so image will have height tags and if image is inside a tooltip, the tooltip manager can calculate height and position correctly the tooltip.
 			$label .= '</div><div style="clear: both;"></div>';
-		}
-		elseif (!empty($this->logo_squarred) && class_exists('Form'))
-		{
+		} elseif ( ! empty($this->logo_squarred) && class_exists('Form')) {
 			/*$label.= '<div class="photointooltip">';
 			$label.= Form::showphoto('societe', $this, 0, 40, 0, 'photowithmargin', 'mini', 0);	// Important, we must force height so image will have height tags and if image is inside a tooltip, the tooltip manager can calculate height and position correctly the tooltip.
 			$label.= '</div><div style="clear: both;"></div>';*/
@@ -607,15 +586,13 @@ class FirePermit extends CommonObject
 
 
 		// By default
-		if (empty($linkstart))
-		{
-			$label .= '<u>'.$langs->trans("FirePermit").'</u>';
-			$linkstart = '<a href="'.DOL_URL_ROOT.'/custom/digiriskdolibarr/view/firepermit/firepermit_card.php?id='.$this->id;
+		if (empty($linkstart)) {
+			$label    .= '<u>' . $langs->trans("FirePermit") . '</u>';
+			$linkstart = '<a href="' . DOL_URL_ROOT . '/custom/digiriskdolibarr/view/firepermit/firepermit_card.php?id=' . $this->id;
 		}
 
-		if (!empty($this->ref))
-		{
-			$label .= '<br><b>'.$langs->trans('Ref').':</b> '.$this->ref;
+		if ( ! empty($this->ref)) {
+			$label .= '<br><b>' . $langs->trans('Ref') . ':</b> ' . $this->ref;
 		}
 
 		$label .= '</div>';
@@ -623,29 +600,26 @@ class FirePermit extends CommonObject
 		$linkstart .= '"';
 
 		$linkclose = '';
-		if (empty($notooltip))
-		{
-			if (!empty($conf->global->MAIN_OPTIMIZEFORTEXTBROWSER))
-			{
-				$label = $langs->trans("ShowCompany");
-				$linkclose .= ' alt="'.dol_escape_htmltag($label, 1).'"';
+		if (empty($notooltip)) {
+			if ( ! empty($conf->global->MAIN_OPTIMIZEFORTEXTBROWSER)) {
+				$label      = $langs->trans("ShowCompany");
+				$linkclose .= ' alt="' . dol_escape_htmltag($label, 1) . '"';
 			}
-			$linkclose .= ' title="'.dol_escape_htmltag($label, 1).'"';
+			$linkclose .= ' title="' . dol_escape_htmltag($label, 1) . '"';
 			$linkclose .= ' class="classfortooltip refurl"';
 		}
-		$linkstart .= $linkclose.'>';
-		$linkend = '</a>';
+		$linkstart .= $linkclose . '>';
+		$linkend    = '</a>';
 
-		$result .= $linkstart;
-		if ($withpicto) $result .= img_object(($notooltip ? '' : $label), ($this->picto ? $this->picto : 'generic'), ($notooltip ? (($withpicto != 2) ? 'class="paddingright"' : '') : 'class="'.(($withpicto != 2) ? 'paddingright ' : '').'classfortooltip"'), 0, 0, $notooltip ? 0 : 1);
-		if ($withpicto != 2) $result .= ($maxlen ?dol_trunc($name, $maxlen) : $name);
-		$result .= $linkend;
+		$result                      .= $linkstart;
+		if ($withpicto) $result      .= img_object(($notooltip ? '' : $label), ($this->picto ? $this->picto : 'generic'), ($notooltip ? (($withpicto != 2) ? 'class="paddingright"' : '') : 'class="' . (($withpicto != 2) ? 'paddingright ' : '') . 'classfortooltip"'), 0, 0, $notooltip ? 0 : 1);
+		if ($withpicto != 2) $result .= ($maxlen ? dol_trunc($name, $maxlen) : $name);
+		$result                      .= $linkend;
 
 		 $result .= $hookmanager->resPrint;
 
 		return $result;
 	}
-
 }
 /**
  *	Class to manage invoice lines.
@@ -680,18 +654,18 @@ class FirePermitLine extends CommonObjectLine
 	/**
 	 * @var array  Array with all fields and their property. Do not use it as a static var. It may be modified by constructor.
 	 */
-	public $fields=array(
-		'rowid'         => array('type'=>'integer', 'label'=>'TechnicalID', 'enabled'=>'1', 'position'=>1, 'notnull'=>1, 'visible'=>0, 'noteditable'=>'1', 'index'=>1, 'comment'=>"Id"),
-		'ref'           => array('type'=>'varchar(128)', 'label'=>'Ref', 'enabled'=>'1', 'position'=>10, 'notnull'=>1, 'visible'=>1, 'noteditable'=>'1', 'default'=>'(PROV)', 'index'=>1, 'searchall'=>1, 'showoncombobox'=>'1', 'comment'=>"Reference of object"),
-		'ref_ext'       => array('type'=>'varchar(128)', 'label'=>'RefExt', 'enabled'=>'1', 'position'=>20, 'notnull'=>0, 'visible'=>0,),
-		'entity'        => array('type'=>'integer', 'label'=>'Entity', 'enabled'=>'1', 'position'=>30, 'notnull'=>1, 'visible'=>0,),
-		'date_creation' => array('type'=>'datetime', 'label'=>'DateCreation', 'enabled'=>'1', 'position'=>40, 'notnull'=>1, 'visible'=>0,),
-		'tms'           => array('type'=>'timestamp', 'label'=>'DateModification', 'enabled'=>'1', 'position'=>50, 'notnull'=>0, 'visible'=>0,),
-		'category'      => array('type'=>'integer', 'label'=>'PriorVisit', 'enabled'=>'1', 'position'=>60, 'notnull'=>-1, 'visible'=>-1,),
-		'description'   => array('type'=>'text', 'label'=>'Description', 'enabled'=>'1', 'position'=>70, 'notnull'=>-1, 'visible'=>-1,),
-		'use_equipment' => array('type'=>'text', 'label'=>'UseEquipment', 'enabled'=>'1', 'position'=>80, 'notnull'=>-1, 'visible'=>-1,),
-		'fk_firepermit' => array('type'=>'integer', 'label'=>'FkFirePermit', 'enabled'=>'1', 'position'=>90, 'notnull'=>1, 'visible'=>0,),
-		'fk_element'    => array('type'=>'integer', 'label'=>'FkElement', 'enabled'=>'1', 'position'=>100, 'notnull'=>1, 'visible'=>0,),
+	public $fields = array(
+		'rowid'         => array('type' => 'integer', 'label' => 'TechnicalID', 'enabled' => '1', 'position' => 1, 'notnull' => 1, 'visible' => 0, 'noteditable' => '1', 'index' => 1, 'comment' => "Id"),
+		'ref'           => array('type' => 'varchar(128)', 'label' => 'Ref', 'enabled' => '1', 'position' => 10, 'notnull' => 1, 'visible' => 1, 'noteditable' => '1', 'default' => '(PROV)', 'index' => 1, 'searchall' => 1, 'showoncombobox' => '1', 'comment' => "Reference of object"),
+		'ref_ext'       => array('type' => 'varchar(128)', 'label' => 'RefExt', 'enabled' => '1', 'position' => 20, 'notnull' => 0, 'visible' => 0,),
+		'entity'        => array('type' => 'integer', 'label' => 'Entity', 'enabled' => '1', 'position' => 30, 'notnull' => 1, 'visible' => 0,),
+		'date_creation' => array('type' => 'datetime', 'label' => 'DateCreation', 'enabled' => '1', 'position' => 40, 'notnull' => 1, 'visible' => 0,),
+		'tms'           => array('type' => 'timestamp', 'label' => 'DateModification', 'enabled' => '1', 'position' => 50, 'notnull' => 0, 'visible' => 0,),
+		'category'      => array('type' => 'integer', 'label' => 'PriorVisit', 'enabled' => '1', 'position' => 60, 'notnull' => -1, 'visible' => -1,),
+		'description'   => array('type' => 'text', 'label' => 'Description', 'enabled' => '1', 'position' => 70, 'notnull' => -1, 'visible' => -1,),
+		'use_equipment' => array('type' => 'text', 'label' => 'UseEquipment', 'enabled' => '1', 'position' => 80, 'notnull' => -1, 'visible' => -1,),
+		'fk_firepermit' => array('type' => 'integer', 'label' => 'FkFirePermit', 'enabled' => '1', 'position' => 90, 'notnull' => 1, 'visible' => 0,),
+		'fk_element'    => array('type' => 'integer', 'label' => 'FkElement', 'enabled' => '1', 'position' => 100, 'notnull' => 1, 'visible' => 0,),
 	);
 
 
@@ -707,8 +681,7 @@ class FirePermitLine extends CommonObjectLine
 		$this->db = $db;
 
 		if (empty($conf->global->MAIN_SHOW_TECHNICAL_ID) && isset($this->fields['rowid'])) $this->fields['rowid']['visible'] = 0;
-		if (empty($conf->multicompany->enabled) && isset($this->fields['entity'])) $this->fields['entity']['enabled'] = 0;
-
+		if (empty($conf->multicompany->enabled) && isset($this->fields['entity'])) $this->fields['entity']['enabled']        = 0;
 	}
 
 	/**
@@ -721,7 +694,7 @@ class FirePermitLine extends CommonObjectLine
 	{
 		global $db;
 
-		$sql = 'SELECT t.rowid, t.ref, t.date_creation, t.description, t.category, t.use_equipment, t.fk_firepermit, t.fk_element ';
+		$sql  = 'SELECT t.rowid, t.ref, t.date_creation, t.description, t.category, t.use_equipment, t.fk_firepermit, t.fk_element ';
 		$sql .= ' FROM ' . MAIN_DB_PREFIX . 'digiriskdolibarr_firepermitdet as t';
 		$sql .= ' WHERE t.rowid = ' . $rowid;
 		$sql .= ' AND entity IN (' . getEntity($this->table_element) . ')';
@@ -730,14 +703,14 @@ class FirePermitLine extends CommonObjectLine
 		if ($result) {
 			$objp = $db->fetch_object($result);
 
-			$this->id = $objp->rowid;
-			$this->ref = $objp->ref;
+			$this->id            = $objp->rowid;
+			$this->ref           = $objp->ref;
 			$this->date_creation = $objp->date_creation;
-			$this->description = $objp->description;
-			$this->category = $objp->category;
+			$this->description   = $objp->description;
+			$this->category      = $objp->category;
 			$this->use_equipment = $objp->use_equipment;
 			$this->fk_firepermit = $objp->fk_firepermit;
-			$this->fk_element = $objp->fk_element;
+			$this->fk_element    = $objp->fk_element;
 
 			$db->free($result);
 
@@ -757,7 +730,7 @@ class FirePermitLine extends CommonObjectLine
 	public function fetchAll($parent_id = 0, $limit = 0)
 	{
 		global $db;
-		$sql = 'SELECT t.rowid, t.ref, t.date_creation, t.description, t.category, t.use_equipment, t.fk_element';
+		$sql  = 'SELECT t.rowid, t.ref, t.date_creation, t.description, t.category, t.use_equipment, t.fk_element';
 		$sql .= ' FROM ' . MAIN_DB_PREFIX . 'digiriskdolibarr_firepermitdet as t';
 		if ($parent_id > 0) {
 			$sql .= ' WHERE t.fk_firepermit = ' . $parent_id;
@@ -778,14 +751,14 @@ class FirePermitLine extends CommonObjectLine
 
 				$record = new self($db);
 
-				$record->id = $obj->rowid;
-				$record->ref = $obj->ref;
+				$record->id            = $obj->rowid;
+				$record->ref           = $obj->ref;
 				$record->date_creation = $obj->date_creation;
-				$record->description = $obj->description;
-				$record->category = $obj->category;
+				$record->description   = $obj->description;
+				$record->category      = $obj->category;
 				$record->use_equipment = $obj->use_equipment;
 				$record->fk_firepermit = $obj->fk_firepermit;
-				$record->fk_element = $obj->fk_element;
+				$record->fk_element    = $obj->fk_element;
 
 				$records[$record->id] = $record;
 
@@ -824,7 +797,7 @@ class FirePermitLine extends CommonObjectLine
 		$now = dol_now();
 
 		// Insertion dans base de la ligne
-		$sql = 'INSERT INTO ' . MAIN_DB_PREFIX . 'digiriskdolibarr_firepermitdet';
+		$sql  = 'INSERT INTO ' . MAIN_DB_PREFIX . 'digiriskdolibarr_firepermitdet';
 		$sql .= ' (ref, entity, date_creation, description, category, use_equipment, fk_firepermit, fk_element';
 		$sql .= ')';
 		$sql .= " VALUES (";
@@ -843,15 +816,14 @@ class FirePermitLine extends CommonObjectLine
 		$resql = $db->query($sql);
 
 		if ($resql) {
-			$this->id = $db->last_insert_id(MAIN_DB_PREFIX . 'firepermitdet');
+			$this->id    = $db->last_insert_id(MAIN_DB_PREFIX . 'firepermitdet');
 			$this->rowid = $this->id; // For backward compatibility
 
 			$db->commit();
 			// Triggers
-			if (!$notrigger)
-			{
+			if ( ! $notrigger) {
 				// Call triggers
-				$this->call_trigger(strtoupper(get_class($this)).'_CREATE', $user);
+				$this->call_trigger(strtoupper(get_class($this)) . '_CREATE', $user);
 				// End call triggers
 			}
 			return $this->id;
@@ -881,7 +853,7 @@ class FirePermitLine extends CommonObjectLine
 
 		$db->begin();
 		// Mise a jour ligne en base
-		$sql = "UPDATE " . MAIN_DB_PREFIX . "digiriskdolibarr_firepermitdet SET";
+		$sql  = "UPDATE " . MAIN_DB_PREFIX . "digiriskdolibarr_firepermitdet SET";
 		$sql .= " ref='" . $db->escape($this->ref) . "',";
 		$sql .= " description='" . $db->escape($this->description) . "',";
 		$sql .= " category=" . $db->escape($this->category) . ",";
@@ -896,10 +868,9 @@ class FirePermitLine extends CommonObjectLine
 		if ($resql) {
 			$db->commit();
 			// Triggers
-			if (!$notrigger)
-			{
+			if ( ! $notrigger) {
 				// Call triggers
-				$this->call_trigger(strtoupper(get_class($this)).'_MODIFY', $user);
+				$this->call_trigger(strtoupper(get_class($this)) . '_MODIFY', $user);
 				// End call triggers
 			}
 			return $this->id;
@@ -927,10 +898,9 @@ class FirePermitLine extends CommonObjectLine
 		if ($db->query($sql)) {
 			$db->commit();
 			// Triggers
-			if (!$notrigger)
-			{
+			if ( ! $notrigger) {
 				// Call trigger
-				$this->call_trigger(strtoupper(get_class($this)).'_DELETE', $user);
+				$this->call_trigger(strtoupper(get_class($this)) . '_DELETE', $user);
 				// End call triggers
 			}
 			return 1;
@@ -961,26 +931,20 @@ class FirePermitSignature extends DigiriskSignature
 		$this->db = $db;
 
 		if (empty($conf->global->MAIN_SHOW_TECHNICAL_ID) && isset($this->fields['rowid'])) $this->fields['rowid']['visible'] = 0;
-		if (empty($conf->multicompany->enabled) && isset($this->fields['entity'])) $this->fields['entity']['enabled'] = 0;
+		if (empty($conf->multicompany->enabled) && isset($this->fields['entity'])) $this->fields['entity']['enabled']        = 0;
 
 		// Unset fields that are disabled
-		foreach ($this->fields as $key => $val)
-		{
-			if (isset($val['enabled']) && empty($val['enabled']))
-			{
+		foreach ($this->fields as $key => $val) {
+			if (isset($val['enabled']) && empty($val['enabled'])) {
 				unset($this->fields[$key]);
 			}
 		}
 
 		// Translate some data of arrayofkeyval
-		if (is_object($langs))
-		{
-			foreach ($this->fields as $key => $val)
-			{
-				if (is_array($val['arrayofkeyval']))
-				{
-					foreach ($val['arrayofkeyval'] as $key2 => $val2)
-					{
+		if (is_object($langs)) {
+			foreach ($this->fields as $key => $val) {
+				if (is_array($val['arrayofkeyval'])) {
+					foreach ($val['arrayofkeyval'] as $key2 => $val2) {
 						$this->fields[$key]['arrayofkeyval'][$key2] = $langs->trans($val2);
 					}
 				}
@@ -1032,11 +996,11 @@ class FirePermitSignature extends DigiriskSignature
 
 		// Create clone
 		$object->context['createfromclone'] = 'createfromclone';
-		$result = $object->createCommon($user);
+		$result                             = $object->createCommon($user);
 		unset($object->context['createfromclone']);
 
 		// End
-		if (!$error) {
+		if ( ! $error) {
 			$this->db->commit();
 			return $result;
 		} else {

@@ -59,12 +59,12 @@ class RiskSignUnitTest extends PHPUnit\Framework\TestCase
 
 		//$this->sharedFixture
 		global $conf, $user, $langs, $db;
-		$this->savconf = $conf;
-		$this->savuser = $user;
+		$this->savconf  = $conf;
+		$this->savuser  = $user;
 		$this->savlangs = $langs;
-		$this->savdb = $db;
+		$this->savdb    = $db;
 
-		print __METHOD__ . " db->type=".$db->type." user->id=".$user->id;
+		print __METHOD__ . " db->type=" . $db->type . " user->id=" . $user->id;
 		print "\n";
 		print __METHOD__ . " ok";
 		print "\n";
@@ -80,12 +80,12 @@ class RiskSignUnitTest extends PHPUnit\Framework\TestCase
 		global $conf, $db;
 
 		if (empty($conf->digiriskdolibarr->enabled)) {
-			print __METHOD__." module digiriskdolibarr must be enabled.\n"; die(1);
+			print __METHOD__ . " module digiriskdolibarr must be enabled.\n"; die(1);
 		}
 
 		$db->begin(); // This is to have all actions inside a transaction even if test launched without suite.
 
-		print __METHOD__."\n";
+		print __METHOD__ . "\n";
 	}
 
 	/**
@@ -98,7 +98,7 @@ class RiskSignUnitTest extends PHPUnit\Framework\TestCase
 		global $db;
 		$db->rollback();
 
-		print __METHOD__."\n";
+		print __METHOD__ . "\n";
 	}
 
 	/**
@@ -109,12 +109,12 @@ class RiskSignUnitTest extends PHPUnit\Framework\TestCase
 	protected function setUp() : void
 	{
 		global $conf, $user, $langs, $db;
-		$conf = $this->savconf;
-		$user = $this->savuser;
+		$conf  = $this->savconf;
+		$user  = $this->savuser;
 		$langs = $this->savlangs;
-		$db = $this->savdb;
+		$db    = $this->savdb;
 
-		print __METHOD__."\n";
+		print __METHOD__ . "\n";
 	}
 
 	/**
@@ -124,7 +124,7 @@ class RiskSignUnitTest extends PHPUnit\Framework\TestCase
 	 */
 	protected function tearDown() : void
 	{
-		print __METHOD__."\n";
+		print __METHOD__ . "\n";
 	}
 
 	/**
@@ -137,34 +137,34 @@ class RiskSignUnitTest extends PHPUnit\Framework\TestCase
 	public function testRiskSignCreate()
 	{
 		global $conf, $user, $langs, $db;
-		$conf = $this->savconf;
-		$user = $this->savuser;
+		$conf  = $this->savconf;
+		$user  = $this->savuser;
 		$langs = $this->savlangs;
-		$db = $this->savdb;
+		$db    = $this->savdb;
 
 		$localobject = new RiskSign($this->savdb);
 
-		$now                         = dol_now();
-		$localobject->id             = 0;
+		$now             = dol_now();
+		$localobject->id = 0;
 		//$localobject->ref          = $refRiskSignMod->getNextValue($localobject);
-		$localobject->ref            = "TestRefRiskSign";
-		$localobject->ref_ext        = "TestRefExtRiskSign";
-		$localobject->entity         = 1;
-		$localobject->date_creation  = $localobject->db->idate($now);
-		$localobject->tms            = $now;
-		$localobject->import_key     = 1;
-		$localobject->status         = 1;
-		$localobject->category       = 1;
-		$localobject->description    = "TestDescriptionRiskSign";
-		$localobject->fk_user_creat  = $user->id ? $user->id : 1;
-		$localobject->fk_user_modif  = $user->id ? $user->id : 1;
-		$localobject->fk_element     = 1;
+		$localobject->ref           = "TestRefRiskSign";
+		$localobject->ref_ext       = "TestRefExtRiskSign";
+		$localobject->entity        = 1;
+		$localobject->date_creation = $localobject->db->idate($now);
+		$localobject->tms           = $now;
+		$localobject->import_key    = 1;
+		$localobject->status        = 1;
+		$localobject->category      = 1;
+		$localobject->description   = "TestDescriptionRiskSign";
+		$localobject->fk_user_creat = $user->id ? $user->id : 1;
+		$localobject->fk_user_modif = $user->id ? $user->id : 1;
+		$localobject->fk_element    = 1;
 
 		$result = $localobject->create($user);
 
 		$this->assertLessThan($result, 0);
 
-		print __METHOD__." result=".$result."\n";
+		print __METHOD__ . " result=" . $result . "\n";
 		return $result;
 	}
 
@@ -182,10 +182,10 @@ class RiskSignUnitTest extends PHPUnit\Framework\TestCase
 	public function testRiskSignFetch($id)
 	{
 		global $conf, $user, $langs, $db;
-		$conf = $this->savconf;
-		$user = $this->savuser;
+		$conf  = $this->savconf;
+		$user  = $this->savuser;
 		$langs = $this->savlangs;
-		$db = $this->savdb;
+		$db    = $this->savdb;
 
 		$localobject = new RiskSign($this->savdb);
 
@@ -193,7 +193,7 @@ class RiskSignUnitTest extends PHPUnit\Framework\TestCase
 
 		$this->assertLessThan($result, 0);
 
-		print __METHOD__." id=".$id." result=".$result."\n";
+		print __METHOD__ . " id=" . $id . " result=" . $result . "\n";
 		return $localobject;
 	}
 
@@ -211,16 +211,16 @@ class RiskSignUnitTest extends PHPUnit\Framework\TestCase
 	public function testRiskSignFetchFromParent($localobject)
 	{
 		global $conf, $user, $langs, $db;
-		$conf = $this->savconf;
-		$user = $this->savuser;
+		$conf  = $this->savconf;
+		$user  = $this->savuser;
 		$langs = $this->savlangs;
-		$db = $this->savdb;
+		$db    = $this->savdb;
 
 		$result = $localobject->fetchFromParent($localobject->fk_element);
 
 		$this->assertLessThan($result, 0);
 
-		print __METHOD__." id=".$localobject->id." result=".$result."\n";
+		print __METHOD__ . " id=" . $localobject->id . " result=" . $result . "\n";
 	}
 
 	/**
@@ -237,33 +237,33 @@ class RiskSignUnitTest extends PHPUnit\Framework\TestCase
 	public function testRiskSignUpdate($localobject)
 	{
 		global $conf, $user, $langs, $db;
-		$conf = $this->savconf;
-		$user = $this->savuser;
+		$conf  = $this->savconf;
+		$user  = $this->savuser;
 		$langs = $this->savlangs;
-		$db = $this->savdb;
+		$db    = $this->savdb;
 
-		$now                          = dol_now();
+		$now = dol_now();
 		//$localobject->ref           = $refRiskSignMod->getNextValue($localobject);
-		$localobject->ref             = "UpdatedTestRefRiskSign";
-		$localobject->ref_ext         = "UpdatedTestRefExtRiskSign";
-		$localobject->entity          = 1;
-		$localobject->date_creation   = $now;
-		$localobject->tms             = $now;
-		$localobject->import_key      = 1;
-		$localobject->status          = 1;
-		$localobject->category        = 1;
-		$localobject->description     = "UpdatedTestDescriptionRiskSign";
-		$localobject->fk_user_creat   = $user->id ? $user->id : 1;
-		$localobject->fk_user_modif   = $user->id ? $user->id : 1;
-		$localobject->fk_element      = 1;
+		$localobject->ref           = "UpdatedTestRefRiskSign";
+		$localobject->ref_ext       = "UpdatedTestRefExtRiskSign";
+		$localobject->entity        = 1;
+		$localobject->date_creation = $now;
+		$localobject->tms           = $now;
+		$localobject->import_key    = 1;
+		$localobject->status        = 1;
+		$localobject->category      = 1;
+		$localobject->description   = "UpdatedTestDescriptionRiskSign";
+		$localobject->fk_user_creat = $user->id ? $user->id : 1;
+		$localobject->fk_user_modif = $user->id ? $user->id : 1;
+		$localobject->fk_element    = 1;
 
 		$result = $localobject->update($user);
-		print __METHOD__." id=".$localobject->id." result=".$result."\n";
+		print __METHOD__ . " id=" . $localobject->id . " result=" . $result . "\n";
 		$this->assertLessThan($result, 0);
 
 		$newobject = new RiskSign($this->savdb);
-		$result = $newobject->fetch($localobject->id);
-		print __METHOD__." id=".$localobject->id." result=".$result."\n";
+		$result    = $newobject->fetch($localobject->id);
+		print __METHOD__ . " id=" . $localobject->id . " result=" . $result . "\n";
 		$this->assertLessThan($result, 0);
 
 		$this->assertEquals($localobject->id, $newobject->id);
@@ -295,12 +295,12 @@ class RiskSignUnitTest extends PHPUnit\Framework\TestCase
 	public function testRiskSignFetchAll() : void
 	{
 		global $conf, $user, $langs, $db;
-		$conf = $this->savconf;
-		$user = $this->savuser;
+		$conf  = $this->savconf;
+		$user  = $this->savuser;
 		$langs = $this->savlangs;
-		$db = $this->savdb;
+		$db    = $this->savdb;
 
-		$localobject = new RiskSign($this->savdb);
+		$localobject     = new RiskSign($this->savdb);
 		$localobjectList = $localobject->fetchAll();
 
 		$this->assertSame(true, is_array($localobjectList));
@@ -320,12 +320,12 @@ class RiskSignUnitTest extends PHPUnit\Framework\TestCase
 	public function testRiskSignGetRiskSignCategories() : void
 	{
 		global $conf, $user, $langs, $db;
-		$conf = $this->savconf;
-		$user = $this->savuser;
+		$conf  = $this->savconf;
+		$user  = $this->savuser;
 		$langs = $this->savlangs;
-		$db = $this->savdb;
+		$db    = $this->savdb;
 
-		$localobject = new RiskSign($this->savdb);
+		$localobject     = new RiskSign($this->savdb);
 		$localobjectList = $localobject->get_risksign_categories();
 
 		$this->assertSame(true, is_array($localobjectList));
@@ -347,16 +347,16 @@ class RiskSignUnitTest extends PHPUnit\Framework\TestCase
 	public function testRiskSignGetRiskSignCategory($localobject) : void
 	{
 		global $conf, $user, $langs, $db;
-		$conf = $this->savconf;
-		$user = $this->savuser;
+		$conf  = $this->savconf;
+		$user  = $this->savuser;
 		$langs = $this->savlangs;
-		$db = $this->savdb;
+		$db    = $this->savdb;
 
 		$result = $localobject->get_risksign_category($localobject);
 
 		$this->assertSame(true, is_string($result));
 
-		print __METHOD__." id=".$localobject->id." result=".$result."\n";
+		print __METHOD__ . " id=" . $localobject->id . " result=" . $result . "\n";
 	}
 
 	/**
@@ -373,16 +373,16 @@ class RiskSignUnitTest extends PHPUnit\Framework\TestCase
 	public function testRiskSignGetRiskSignCategoryName($localobject)
 	{
 		global $conf, $user, $langs, $db;
-		$conf = $this->savconf;
-		$user = $this->savuser;
+		$conf  = $this->savconf;
+		$user  = $this->savuser;
 		$langs = $this->savlangs;
-		$db = $this->savdb;
+		$db    = $this->savdb;
 
 		$result = $localobject->get_risksign_category_name($localobject);
 
 		$this->assertSame(true, is_string($result));
 
-		print __METHOD__." id=".$localobject->id." result=".$result."\n";
+		print __METHOD__ . " id=" . $localobject->id . " result=" . $result . "\n";
 		return $result;
 	}
 
@@ -400,19 +400,18 @@ class RiskSignUnitTest extends PHPUnit\Framework\TestCase
 	public function testRiskSignDelete($localobject)
 	{
 		global $conf, $user, $langs, $db;
-		$conf = $this->savconf;
-		$user = $this->savuser;
+		$conf  = $this->savconf;
+		$user  = $this->savuser;
 		$langs = $this->savlangs;
-		$db = $this->savdb;
+		$db    = $this->savdb;
 
 		$newobject = new RiskSign($this->savdb);
 		$newobject->fetch($localobject->id);
 
 		$result = $localobject->delete($user);
-		print __METHOD__." id=".$newobject->id." result=".$result."\n";
+		print __METHOD__ . " id=" . $newobject->id . " result=" . $result . "\n";
 		$this->assertLessThan($result, 0);
 
 		return $result;
 	}
 }
-

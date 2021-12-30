@@ -59,12 +59,12 @@ class RiskUnitTest extends PHPUnit\Framework\TestCase
 
 		//$this->sharedFixture
 		global $conf, $user, $langs, $db;
-		$this->savconf = $conf;
-		$this->savuser = $user;
+		$this->savconf  = $conf;
+		$this->savuser  = $user;
 		$this->savlangs = $langs;
-		$this->savdb = $db;
+		$this->savdb    = $db;
 
-		print __METHOD__ . " db->type=".$db->type." user->id=".$user->id;
+		print __METHOD__ . " db->type=" . $db->type . " user->id=" . $user->id;
 		print "\n";
 		print __METHOD__ . " ok";
 		print "\n";
@@ -80,12 +80,12 @@ class RiskUnitTest extends PHPUnit\Framework\TestCase
 		global $conf, $db;
 
 		if (empty($conf->digiriskdolibarr->enabled)) {
-			print __METHOD__." module digiriskdolibarr must be enabled.\n"; die(1);
+			print __METHOD__ . " module digiriskdolibarr must be enabled.\n"; die(1);
 		}
 
 		$db->begin(); // This is to have all actions inside a transaction even if test launched without suite.
 
-		print __METHOD__."\n";
+		print __METHOD__ . "\n";
 	}
 
 	/**
@@ -98,7 +98,7 @@ class RiskUnitTest extends PHPUnit\Framework\TestCase
 		global $db;
 		$db->rollback();
 
-		print __METHOD__."\n";
+		print __METHOD__ . "\n";
 	}
 
 	/**
@@ -109,12 +109,12 @@ class RiskUnitTest extends PHPUnit\Framework\TestCase
 	protected function setUp() : void
 	{
 		global $conf, $user, $langs, $db;
-		$conf = $this->savconf;
-		$user = $this->savuser;
+		$conf  = $this->savconf;
+		$user  = $this->savuser;
 		$langs = $this->savlangs;
-		$db = $this->savdb;
+		$db    = $this->savdb;
 
-		print __METHOD__."\n";
+		print __METHOD__ . "\n";
 	}
 
 	/**
@@ -124,7 +124,7 @@ class RiskUnitTest extends PHPUnit\Framework\TestCase
 	 */
 	protected function tearDown() : void
 	{
-		print __METHOD__."\n";
+		print __METHOD__ . "\n";
 	}
 
 	/**
@@ -137,35 +137,35 @@ class RiskUnitTest extends PHPUnit\Framework\TestCase
 	public function testRiskCreate()
 	{
 		global $conf, $user, $langs, $db;
-		$conf = $this->savconf;
-		$user = $this->savuser;
+		$conf  = $this->savconf;
+		$user  = $this->savuser;
 		$langs = $this->savlangs;
-		$db = $this->savdb;
+		$db    = $this->savdb;
 
 		$localobject = new Risk($this->savdb);
 
-		$now                         = dol_now();
-		$localobject->id             = 0;
+		$now             = dol_now();
+		$localobject->id = 0;
 		//$localobject->ref          = $refRiskMod->getNextValue($localobject);
-		$localobject->ref            = "TestRefRisk";
-		$localobject->ref_ext        = "TestRefExtRisk";
-		$localobject->entity         = 1;
-		$localobject->date_creation  = $localobject->db->idate($now);
-		$localobject->tms            = $now;
-		$localobject->import_key     = 1;
-		$localobject->status         = 1;
-		$localobject->category       = 1;
-		$localobject->description    = "TestDescriptionRisk";
-		$localobject->fk_user_creat  = $user->id ? $user->id : 1;
-		$localobject->fk_user_modif  = $user->id ? $user->id : 1;
-		$localobject->fk_element     = 1;
-		$localobject->fk_projet      = $conf->global->DIGIRISKDOLIBARR_DU_PROJECT;
+		$localobject->ref           = "TestRefRisk";
+		$localobject->ref_ext       = "TestRefExtRisk";
+		$localobject->entity        = 1;
+		$localobject->date_creation = $localobject->db->idate($now);
+		$localobject->tms           = $now;
+		$localobject->import_key    = 1;
+		$localobject->status        = 1;
+		$localobject->category      = 1;
+		$localobject->description   = "TestDescriptionRisk";
+		$localobject->fk_user_creat = $user->id ? $user->id : 1;
+		$localobject->fk_user_modif = $user->id ? $user->id : 1;
+		$localobject->fk_element    = 1;
+		$localobject->fk_projet     = $conf->global->DIGIRISKDOLIBARR_DU_PROJECT;
 
 		$result = $localobject->create($user);
 
 		$this->assertLessThan($result, 0);
 
-		print __METHOD__." result=".$result."\n";
+		print __METHOD__ . " result=" . $result . "\n";
 		return $result;
 	}
 
@@ -183,10 +183,10 @@ class RiskUnitTest extends PHPUnit\Framework\TestCase
 	public function testRiskFetch($id)
 	{
 		global $conf, $user, $langs, $db;
-		$conf = $this->savconf;
-		$user = $this->savuser;
+		$conf  = $this->savconf;
+		$user  = $this->savuser;
 		$langs = $this->savlangs;
-		$db = $this->savdb;
+		$db    = $this->savdb;
 
 		$localobject = new Risk($this->savdb);
 
@@ -194,7 +194,7 @@ class RiskUnitTest extends PHPUnit\Framework\TestCase
 
 		$this->assertLessThan($result, 0);
 
-		print __METHOD__." id=".$id." result=".$result."\n";
+		print __METHOD__ . " id=" . $id . " result=" . $result . "\n";
 		return $localobject;
 	}
 
@@ -212,16 +212,16 @@ class RiskUnitTest extends PHPUnit\Framework\TestCase
 	public function testRiskFetchFromParent($localobject)
 	{
 		global $conf, $user, $langs, $db;
-		$conf = $this->savconf;
-		$user = $this->savuser;
+		$conf  = $this->savconf;
+		$user  = $this->savuser;
 		$langs = $this->savlangs;
-		$db = $this->savdb;
+		$db    = $this->savdb;
 
 		$result = $localobject->fetchFromParent($localobject->fk_element);
 
 		$this->assertLessThan($result, 0);
 
-		print __METHOD__." id=".$localobject->id." result=".$result."\n";
+		print __METHOD__ . " id=" . $localobject->id . " result=" . $result . "\n";
 	}
 
 	/**
@@ -238,34 +238,34 @@ class RiskUnitTest extends PHPUnit\Framework\TestCase
 	public function testRiskUpdate($localobject)
 	{
 		global $conf, $user, $langs, $db;
-		$conf = $this->savconf;
-		$user = $this->savuser;
+		$conf  = $this->savconf;
+		$user  = $this->savuser;
 		$langs = $this->savlangs;
-		$db = $this->savdb;
+		$db    = $this->savdb;
 
-		$now                          = dol_now();
+		$now = dol_now();
 		//$localobject->ref           = $refRiskMod->getNextValue($localobject);
-		$localobject->ref             = "UpdatedTestRefRisk";
-		$localobject->ref_ext         = "UpdatedTestRefExtRisk";
-		$localobject->entity          = 1;
-		$localobject->date_creation   = $now;
-		$localobject->tms             = $now;
-		$localobject->import_key      = 1;
-		$localobject->status          = 1;
-		$localobject->category        = 1;
-		$localobject->description     = "UpdatedTestDescriptionRisk";
-		$localobject->fk_user_creat   = $user->id ? $user->id : 1;
-		$localobject->fk_user_modif   = $user->id ? $user->id : 1;
-		$localobject->fk_element      = 1;
-		$localobject->fk_projet       = $conf->global->DIGIRISKDOLIBARR_DU_PROJECT;
+		$localobject->ref           = "UpdatedTestRefRisk";
+		$localobject->ref_ext       = "UpdatedTestRefExtRisk";
+		$localobject->entity        = 1;
+		$localobject->date_creation = $now;
+		$localobject->tms           = $now;
+		$localobject->import_key    = 1;
+		$localobject->status        = 1;
+		$localobject->category      = 1;
+		$localobject->description   = "UpdatedTestDescriptionRisk";
+		$localobject->fk_user_creat = $user->id ? $user->id : 1;
+		$localobject->fk_user_modif = $user->id ? $user->id : 1;
+		$localobject->fk_element    = 1;
+		$localobject->fk_projet     = $conf->global->DIGIRISKDOLIBARR_DU_PROJECT;
 
 		$result = $localobject->update($user);
-		print __METHOD__." id=".$localobject->id." result=".$result."\n";
+		print __METHOD__ . " id=" . $localobject->id . " result=" . $result . "\n";
 		$this->assertLessThan($result, 0);
 
 		$newobject = new Risk($this->savdb);
-		$result = $newobject->fetch($localobject->id);
-		print __METHOD__." id=".$localobject->id." result=".$result."\n";
+		$result    = $newobject->fetch($localobject->id);
+		print __METHOD__ . " id=" . $localobject->id . " result=" . $result . "\n";
 		$this->assertLessThan($result, 0);
 
 		$this->assertEquals($localobject->id, $newobject->id);
@@ -298,12 +298,12 @@ class RiskUnitTest extends PHPUnit\Framework\TestCase
 	public function testRiskFetchAll() : void
 	{
 		global $conf, $user, $langs, $db;
-		$conf = $this->savconf;
-		$user = $this->savuser;
+		$conf  = $this->savconf;
+		$user  = $this->savuser;
 		$langs = $this->savlangs;
-		$db = $this->savdb;
+		$db    = $this->savdb;
 
-		$localobject = new Risk($this->savdb);
+		$localobject     = new Risk($this->savdb);
 		$localobjectList = $localobject->fetchAll();
 
 		$this->assertSame(true, is_array($localobjectList));
@@ -323,12 +323,12 @@ class RiskUnitTest extends PHPUnit\Framework\TestCase
 	public function testRiskGetDangerCategories() : void
 	{
 		global $conf, $user, $langs, $db;
-		$conf = $this->savconf;
-		$user = $this->savuser;
+		$conf  = $this->savconf;
+		$user  = $this->savuser;
 		$langs = $this->savlangs;
-		$db = $this->savdb;
+		$db    = $this->savdb;
 
-		$localobject = new Risk($this->savdb);
+		$localobject     = new Risk($this->savdb);
 		$localobjectList = $localobject->get_danger_categories();
 
 		$this->assertSame(true, is_array($localobjectList));
@@ -350,16 +350,16 @@ class RiskUnitTest extends PHPUnit\Framework\TestCase
 	public function testRiskGetDangerCategory($localobject) : void
 	{
 		global $conf, $user, $langs, $db;
-		$conf = $this->savconf;
-		$user = $this->savuser;
+		$conf  = $this->savconf;
+		$user  = $this->savuser;
 		$langs = $this->savlangs;
-		$db = $this->savdb;
+		$db    = $this->savdb;
 
 		$result = $localobject->get_danger_category($localobject);
 
 		$this->assertSame(true, is_string($result));
 
-		print __METHOD__." id=".$localobject->id." result=".$result."\n";
+		print __METHOD__ . " id=" . $localobject->id . " result=" . $result . "\n";
 	}
 
 	/**
@@ -376,16 +376,16 @@ class RiskUnitTest extends PHPUnit\Framework\TestCase
 	public function testRiskGetDangerCategoryName($localobject)
 	{
 		global $conf, $user, $langs, $db;
-		$conf = $this->savconf;
-		$user = $this->savuser;
+		$conf  = $this->savconf;
+		$user  = $this->savuser;
 		$langs = $this->savlangs;
-		$db = $this->savdb;
+		$db    = $this->savdb;
 
 		$result = $localobject->get_danger_category_name($localobject);
 
 		$this->assertSame(true, is_string($result));
 
-		print __METHOD__." id=".$localobject->id." result=".$result."\n";
+		print __METHOD__ . " id=" . $localobject->id . " result=" . $result . "\n";
 		return $result;
 	}
 
@@ -404,16 +404,16 @@ class RiskUnitTest extends PHPUnit\Framework\TestCase
 	public function testRiskGetDangerCategoryPositionByName($localobject, $name) : void
 	{
 		global $conf, $user, $langs, $db;
-		$conf = $this->savconf;
-		$user = $this->savuser;
+		$conf  = $this->savconf;
+		$user  = $this->savuser;
 		$langs = $this->savlangs;
-		$db = $this->savdb;
+		$db    = $this->savdb;
 
 		$result = $localobject->get_danger_category_position_by_name($name);
 
 		$this->assertSame(true, is_int($result));
 
-		print __METHOD__." id=".$localobject->id." result=".$result."\n";
+		print __METHOD__ . " id=" . $localobject->id . " result=" . $result . "\n";
 	}
 
 	/**
@@ -427,12 +427,12 @@ class RiskUnitTest extends PHPUnit\Framework\TestCase
 	public function testRiskGetFirePermitDangerCategories() : void
 	{
 		global $conf, $user, $langs, $db;
-		$conf = $this->savconf;
-		$user = $this->savuser;
+		$conf  = $this->savconf;
+		$user  = $this->savuser;
 		$langs = $this->savlangs;
-		$db = $this->savdb;
+		$db    = $this->savdb;
 
-		$localobject = new Risk($this->savdb);
+		$localobject     = new Risk($this->savdb);
 		$localobjectList = $localobject->get_fire_permit_danger_categories();
 
 		$this->assertSame(true, is_array($localobjectList));
@@ -454,16 +454,16 @@ class RiskUnitTest extends PHPUnit\Framework\TestCase
 	public function testRiskGetFirePermitDangerCategory($localobject) : void
 	{
 		global $conf, $user, $langs, $db;
-		$conf = $this->savconf;
-		$user = $this->savuser;
+		$conf  = $this->savconf;
+		$user  = $this->savuser;
 		$langs = $this->savlangs;
-		$db = $this->savdb;
+		$db    = $this->savdb;
 
 		$result = $localobject->get_fire_permit_danger_category($localobject);
 
 		$this->assertSame(true, is_string($result));
 
-		print __METHOD__." id=".$localobject->id." result=".$result."\n";
+		print __METHOD__ . " id=" . $localobject->id . " result=" . $result . "\n";
 	}
 
 	/**
@@ -480,16 +480,16 @@ class RiskUnitTest extends PHPUnit\Framework\TestCase
 	public function testRiskGetFirePermitDangerCategoryName($localobject)
 	{
 		global $conf, $user, $langs, $db;
-		$conf = $this->savconf;
-		$user = $this->savuser;
+		$conf  = $this->savconf;
+		$user  = $this->savuser;
 		$langs = $this->savlangs;
-		$db = $this->savdb;
+		$db    = $this->savdb;
 
 		$result = $localobject->get_fire_permit_danger_category_name($localobject);
 
 		$this->assertSame(true, is_string($result));
 
-		print __METHOD__." id=".$localobject->id." result=".$result."\n";
+		print __METHOD__ . " id=" . $localobject->id . " result=" . $result . "\n";
 		return $result;
 	}
 
@@ -506,10 +506,10 @@ class RiskUnitTest extends PHPUnit\Framework\TestCase
 	public function testRiskGetRelatedTasks($localobject) : void
 	{
 		global $conf, $user, $langs, $db;
-		$conf = $this->savconf;
-		$user = $this->savuser;
+		$conf  = $this->savconf;
+		$user  = $this->savuser;
 		$langs = $this->savlangs;
-		$db = $this->savdb;
+		$db    = $this->savdb;
 
 		$localobjectList = $localobject->get_related_tasks($localobject);
 
@@ -537,10 +537,10 @@ class RiskUnitTest extends PHPUnit\Framework\TestCase
 	public function testRiskFetchRisksOrderedByCotation($localobject) : void
 	{
 		global $conf, $user, $langs, $db;
-		$conf = $this->savconf;
-		$user = $this->savuser;
+		$conf  = $this->savconf;
+		$user  = $this->savuser;
 		$langs = $this->savlangs;
-		$db = $this->savdb;
+		$db    = $this->savdb;
 
 		$localobjectList = $localobject->fetchRisksOrderedByCotation($localobject->fk_element);
 
@@ -564,19 +564,18 @@ class RiskUnitTest extends PHPUnit\Framework\TestCase
 	public function testRiskDelete($localobject)
 	{
 		global $conf, $user, $langs, $db;
-		$conf = $this->savconf;
-		$user = $this->savuser;
+		$conf  = $this->savconf;
+		$user  = $this->savuser;
 		$langs = $this->savlangs;
-		$db = $this->savdb;
+		$db    = $this->savdb;
 
 		$newobject = new Risk($this->savdb);
 		$newobject->fetch($localobject->id);
 
 		$result = $localobject->delete($user);
-		print __METHOD__." id=".$newobject->id." result=".$result."\n";
+		print __METHOD__ . " id=" . $newobject->id . " result=" . $result . "\n";
 		$this->assertLessThan($result, 0);
 
 		return $result;
 	}
 }
-

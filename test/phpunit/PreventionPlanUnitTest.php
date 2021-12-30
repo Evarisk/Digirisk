@@ -59,12 +59,12 @@ class PreventionPlanUnitTest extends PHPUnit\Framework\TestCase
 
 		//$this->sharedFixture
 		global $conf, $user, $langs, $db;
-		$this->savconf = $conf;
-		$this->savuser = $user;
+		$this->savconf  = $conf;
+		$this->savuser  = $user;
 		$this->savlangs = $langs;
-		$this->savdb = $db;
+		$this->savdb    = $db;
 
-		print __METHOD__ . " db->type=".$db->type." user->id=".$user->id;
+		print __METHOD__ . " db->type=" . $db->type . " user->id=" . $user->id;
 		print "\n";
 		print __METHOD__ . " ok";
 		print "\n";
@@ -80,12 +80,12 @@ class PreventionPlanUnitTest extends PHPUnit\Framework\TestCase
 		global $conf, $db;
 
 		if (empty($conf->digiriskdolibarr->enabled)) {
-			print __METHOD__." module digiriskdolibarr must be enabled.\n"; die(1);
+			print __METHOD__ . " module digiriskdolibarr must be enabled.\n"; die(1);
 		}
 
 		$db->begin(); // This is to have all actions inside a transaction even if test launched without suite.
 
-		print __METHOD__."\n";
+		print __METHOD__ . "\n";
 	}
 
 	/**
@@ -98,7 +98,7 @@ class PreventionPlanUnitTest extends PHPUnit\Framework\TestCase
 		global $db;
 		$db->rollback();
 
-		print __METHOD__."\n";
+		print __METHOD__ . "\n";
 	}
 
 	/**
@@ -109,12 +109,12 @@ class PreventionPlanUnitTest extends PHPUnit\Framework\TestCase
 	protected function setUp() : void
 	{
 		global $conf, $user, $langs, $db;
-		$conf = $this->savconf;
-		$user = $this->savuser;
+		$conf  = $this->savconf;
+		$user  = $this->savuser;
 		$langs = $this->savlangs;
-		$db = $this->savdb;
+		$db    = $this->savdb;
 
-		print __METHOD__."\n";
+		print __METHOD__ . "\n";
 	}
 
 	/**
@@ -124,7 +124,7 @@ class PreventionPlanUnitTest extends PHPUnit\Framework\TestCase
 	 */
 	protected function tearDown() : void
 	{
-		print __METHOD__."\n";
+		print __METHOD__ . "\n";
 	}
 
 	/**
@@ -137,15 +137,15 @@ class PreventionPlanUnitTest extends PHPUnit\Framework\TestCase
 	public function testPreventionPlanCreate()
 	{
 		global $conf, $user, $langs, $db;
-		$conf = $this->savconf;
-		$user = $this->savuser;
+		$conf  = $this->savconf;
+		$user  = $this->savuser;
 		$langs = $this->savlangs;
-		$db = $this->savdb;
+		$db    = $this->savdb;
 
 		$localobject = new PreventionPlan($this->savdb);
 
-		$now                               = dol_now();
-		$localobject->id                   = 0;
+		$now             = dol_now();
+		$localobject->id = 0;
 		//$localobject->ref                = $refPreventionPlanMod->getNextValue($localobject);
 		$localobject->ref                  = "TestRefPreventionPlan";
 		$localobject->ref_ext              = "TestRefExtPreventionPlan";
@@ -169,7 +169,7 @@ class PreventionPlanUnitTest extends PHPUnit\Framework\TestCase
 
 		$this->assertLessThan($result, 0);
 
-		print __METHOD__." result=".$result."\n";
+		print __METHOD__ . " result=" . $result . "\n";
 		return $result;
 	}
 
@@ -187,10 +187,10 @@ class PreventionPlanUnitTest extends PHPUnit\Framework\TestCase
 	public function testPreventionPlanFetch($id)
 	{
 		global $conf, $user, $langs, $db;
-		$conf = $this->savconf;
-		$user = $this->savuser;
+		$conf  = $this->savconf;
+		$user  = $this->savuser;
 		$langs = $this->savlangs;
-		$db = $this->savdb;
+		$db    = $this->savdb;
 
 		$localobject = new PreventionPlan($this->savdb);
 
@@ -198,7 +198,7 @@ class PreventionPlanUnitTest extends PHPUnit\Framework\TestCase
 
 		$this->assertLessThan($result, 0);
 
-		print __METHOD__." id=".$id." result=".$result."\n";
+		print __METHOD__ . " id=" . $id . " result=" . $result . "\n";
 		return $localobject;
 	}
 
@@ -216,15 +216,15 @@ class PreventionPlanUnitTest extends PHPUnit\Framework\TestCase
 	public function testPreventionPlanInfo($localobject) : void
 	{
 		global $conf, $user, $langs, $db;
-		$conf = $this->savconf;
-		$user = $this->savuser;
+		$conf  = $this->savconf;
+		$user  = $this->savuser;
 		$langs = $this->savlangs;
-		$db = $this->savdb;
+		$db    = $this->savdb;
 
 		$result = $localobject->info($localobject->id);
 		$this->assertNull($result);
 
-		print __METHOD__." id=".$localobject->id."\n";
+		print __METHOD__ . " id=" . $localobject->id . "\n";
 	}
 
 	/**
@@ -243,20 +243,20 @@ class PreventionPlanUnitTest extends PHPUnit\Framework\TestCase
 	public function testPreventionPlanSetInProgress($localobject) : void
 	{
 		global $conf, $user, $langs, $db;
-		$conf = $this->savconf;
-		$user = $this->savuser;
+		$conf  = $this->savconf;
+		$user  = $this->savuser;
 		$langs = $this->savlangs;
-		$db = $this->savdb;
+		$db    = $this->savdb;
 
 		$result = $localobject->setInProgress($user);
 		$this->assertLessThan($result, 0);
 
-		print __METHOD__." id=".$localobject->id." result=".$result."\n";
+		print __METHOD__ . " id=" . $localobject->id . " result=" . $result . "\n";
 
 		$result = $localobject->getLibStatut(0);
 		$this->assertSame($result, $langs->trans('InProgress'));
 
-		print __METHOD__." id=".$localobject->id." result=".$result."\n";
+		print __METHOD__ . " id=" . $localobject->id . " result=" . $result . "\n";
 	}
 
 	/**
@@ -275,20 +275,20 @@ class PreventionPlanUnitTest extends PHPUnit\Framework\TestCase
 	public function testPreventionPlanSetPendingSignature($localobject) : void
 	{
 		global $conf, $user, $langs, $db;
-		$conf = $this->savconf;
-		$user = $this->savuser;
+		$conf  = $this->savconf;
+		$user  = $this->savuser;
 		$langs = $this->savlangs;
-		$db = $this->savdb;
+		$db    = $this->savdb;
 
 		$result = $localobject->setPendingSignature($user);
 		$this->assertLessThan($result, 0);
 
-		print __METHOD__." id=".$localobject->id." result=".$result."\n";
+		print __METHOD__ . " id=" . $localobject->id . " result=" . $result . "\n";
 
 		$result = $localobject->getLibStatut(0);
 		$this->assertSame($result, $langs->trans('ValidatePendingSignature'));
 
-		print __METHOD__." id=".$localobject->id." result=".$result."\n";
+		print __METHOD__ . " id=" . $localobject->id . " result=" . $result . "\n";
 	}
 
 	/**
@@ -307,20 +307,20 @@ class PreventionPlanUnitTest extends PHPUnit\Framework\TestCase
 	public function testPreventionPlanSetLocked($localobject) : void
 	{
 		global $conf, $user, $langs, $db;
-		$conf = $this->savconf;
-		$user = $this->savuser;
+		$conf  = $this->savconf;
+		$user  = $this->savuser;
 		$langs = $this->savlangs;
-		$db = $this->savdb;
+		$db    = $this->savdb;
 
 		$result = $localobject->setLocked($user);
 		$this->assertLessThan($result, 0);
 
-		print __METHOD__." id=".$localobject->id." result=".$result."\n";
+		print __METHOD__ . " id=" . $localobject->id . " result=" . $result . "\n";
 
 		$result = $localobject->getLibStatut(0);
 		$this->assertSame($result, $langs->trans('Locked'));
 
-		print __METHOD__." id=".$localobject->id." result=".$result."\n";
+		print __METHOD__ . " id=" . $localobject->id . " result=" . $result . "\n";
 	}
 
 	/**
@@ -339,20 +339,20 @@ class PreventionPlanUnitTest extends PHPUnit\Framework\TestCase
 	public function testPreventionPlanSetArchived($localobject) : void
 	{
 		global $conf, $user, $langs, $db;
-		$conf = $this->savconf;
-		$user = $this->savuser;
+		$conf  = $this->savconf;
+		$user  = $this->savuser;
 		$langs = $this->savlangs;
-		$db = $this->savdb;
+		$db    = $this->savdb;
 
 		$result = $localobject->setArchived($user);
 		$this->assertLessThan($result, 0);
 
-		print __METHOD__." id=".$localobject->id." result=".$result."\n";
+		print __METHOD__ . " id=" . $localobject->id . " result=" . $result . "\n";
 
 		$result = $localobject->getLibStatut(0);
 		$this->assertSame($result, $langs->trans('Archived'));
 
-		print __METHOD__." id=".$localobject->id." result=".$result."\n";
+		print __METHOD__ . " id=" . $localobject->id . " result=" . $result . "\n";
 	}
 
 	/**
@@ -369,12 +369,12 @@ class PreventionPlanUnitTest extends PHPUnit\Framework\TestCase
 	public function testPreventionPlanUpdate($localobject)
 	{
 		global $conf, $user, $langs, $db;
-		$conf = $this->savconf;
-		$user = $this->savuser;
+		$conf  = $this->savconf;
+		$user  = $this->savuser;
 		$langs = $this->savlangs;
-		$db = $this->savdb;
+		$db    = $this->savdb;
 
-		$now                               = dol_now();
+		$now = dol_now();
 		//$localobject->ref                = $refPreventionPlanMod->getNextValue($localobject);
 		$localobject->ref                  = "UpdatedTestRefPreventionPlan";
 		$localobject->ref_ext              = "UpdatedTestRefExtPreventionPlan";
@@ -395,12 +395,12 @@ class PreventionPlanUnitTest extends PHPUnit\Framework\TestCase
 		$localobject->fk_user_modif        = $user->id ? $user->id : 1;
 
 		$result = $localobject->update($user);
-		print __METHOD__." id=".$localobject->id." result=".$result."\n";
+		print __METHOD__ . " id=" . $localobject->id . " result=" . $result . "\n";
 		$this->assertLessThan($result, 0);
 
 		$newobject = new PreventionPlan($this->savdb);
-		$result = $newobject->fetch($localobject->id);
-		print __METHOD__." id=".$localobject->id." result=".$result."\n";
+		$result    = $newobject->fetch($localobject->id);
+		print __METHOD__ . " id=" . $localobject->id . " result=" . $result . "\n";
 		$this->assertLessThan($result, 0);
 
 		$this->assertEquals($localobject->id, $newobject->id);
@@ -425,30 +425,30 @@ class PreventionPlanUnitTest extends PHPUnit\Framework\TestCase
 		return $localobject;
 	}
 
-//	/**
-//	 * testPreventionPlanCreateFromClone
-//	 *
-//	 * @param  PreventionPlan $localobject Prevention plan object
-//	 * @return void
-//	 *
-//	 * @covers PreventionPlan::createFormClone
-//	 *
-//	 * @depends testPreventionPlanFetch
-//	 * The depends says test is run only if previous is ok
-//	 */
-//	public function testPreventionPlanCreateFromClone($localobject) : void
-//	{
-//		global $conf, $user, $langs, $db;
-//		$conf = $this->savconf;
-//		$user = $this->savuser;
-//		$langs = $this->savlangs;
-//		$db = $this->savdb;
-//
-//		$result = $localobject->createFromClone($user, $localobject->id, '');
-//		$this->assertLessThan($result, 0);
-//
-//		print __METHOD__." result=".$result."\n";
-//	}
+	//  /**
+	//   * testPreventionPlanCreateFromClone
+	//   *
+	//   * @param  PreventionPlan $localobject Prevention plan object
+	//   * @return void
+	//   *
+	//   * @covers PreventionPlan::createFormClone
+	//   *
+	//   * @depends testPreventionPlanFetch
+	//   * The depends says test is run only if previous is ok
+	//   */
+	//  public function testPreventionPlanCreateFromClone($localobject) : void
+	//  {
+	//      global $conf, $user, $langs, $db;
+	//      $conf = $this->savconf;
+	//      $user = $this->savuser;
+	//      $langs = $this->savlangs;
+	//      $db = $this->savdb;
+	//
+	//      $result = $localobject->createFromClone($user, $localobject->id, '');
+	//      $this->assertLessThan($result, 0);
+	//
+	//      print __METHOD__." result=".$result."\n";
+	//  }
 
 	/**
 	 * testPreventionPlanLineInsert
@@ -466,31 +466,31 @@ class PreventionPlanUnitTest extends PHPUnit\Framework\TestCase
 	public function testPreventionPlanLineInsert($localobject)
 	{
 		global $conf, $user, $langs, $db;
-		$conf = $this->savconf;
-		$user = $this->savuser;
+		$conf  = $this->savconf;
+		$user  = $this->savuser;
 		$langs = $this->savlangs;
-		$db = $this->savdb;
+		$db    = $this->savdb;
 
 		$localobjectline = new PreventionPlanLine($this->savdb);
 
-		$now                                 = dol_now();
-		$localobjectline->id                 = 0;
+		$now                 = dol_now();
+		$localobjectline->id = 0;
 		//$localobjectline->ref              = $refPreventionPlanMod->getNextValue($localobjectline);
-		$localobjectline->ref                = "TestRefPreventionPlanLine";
-		$localobjectline->ref_ext            = "TestRefExtPreventionPlanLine";
-		$localobjectline->entity             = 1;
-		$localobjectline->date_creation      = $localobjectline->db->idate($now);
-		$localobjectline->category           = 1;
-		$localobjectline->description        = "TestPreventionPlan";
-		$localobjectline->prevention_method  = "TestPreventionPlanMethod";
-		$localobjectline->fk_element         = 1;
-		$localobjectline->fk_preventionplan  = $localobject->id;
+		$localobjectline->ref               = "TestRefPreventionPlanLine";
+		$localobjectline->ref_ext           = "TestRefExtPreventionPlanLine";
+		$localobjectline->entity            = 1;
+		$localobjectline->date_creation     = $localobjectline->db->idate($now);
+		$localobjectline->category          = 1;
+		$localobjectline->description       = "TestPreventionPlan";
+		$localobjectline->prevention_method = "TestPreventionPlanMethod";
+		$localobjectline->fk_element        = 1;
+		$localobjectline->fk_preventionplan = $localobject->id;
 
 		$result = $localobjectline->insert($user);
 
 		$this->assertLessThan($result, 0);
 
-		print __METHOD__." id=".$localobjectline->id." result=".$result."\n";
+		print __METHOD__ . " id=" . $localobjectline->id . " result=" . $result . "\n";
 		return $result;
 	}
 
@@ -508,10 +508,10 @@ class PreventionPlanUnitTest extends PHPUnit\Framework\TestCase
 	public function testPreventionPlanLineFetch($id)
 	{
 		global $conf, $user, $langs, $db;
-		$conf = $this->savconf;
-		$user = $this->savuser;
+		$conf  = $this->savconf;
+		$user  = $this->savuser;
 		$langs = $this->savlangs;
-		$db = $this->savdb;
+		$db    = $this->savdb;
 
 		$localobjectline = new PreventionPlanLine($this->savdb);
 
@@ -519,7 +519,7 @@ class PreventionPlanUnitTest extends PHPUnit\Framework\TestCase
 
 		$this->assertLessThan($result, 0);
 
-		print __METHOD__." id=".$id." result=".$result."\n";
+		print __METHOD__ . " id=" . $id . " result=" . $result . "\n";
 		return $localobjectline;
 	}
 
@@ -539,12 +539,12 @@ class PreventionPlanUnitTest extends PHPUnit\Framework\TestCase
 	public function testPreventionPlanLineUpdate($localobjectline)
 	{
 		global $conf, $user, $langs, $db;
-		$conf = $this->savconf;
-		$user = $this->savuser;
+		$conf  = $this->savconf;
+		$user  = $this->savuser;
 		$langs = $this->savlangs;
-		$db = $this->savdb;
+		$db    = $this->savdb;
 
-		$now                                = dol_now();
+		$now = dol_now();
 		//$localobject->ref                 = $refPreventionPlanMod->getNextValue($localobject);
 		$localobjectline->ref               = "UpdatedTestRefPreventionPlanLine";
 		$localobjectline->category          = 1;
@@ -553,12 +553,12 @@ class PreventionPlanUnitTest extends PHPUnit\Framework\TestCase
 		$localobjectline->fk_element        = 1;
 
 		$result = $localobjectline->update($user);
-		print __METHOD__." id=".$localobjectline->id." result=".$result."\n";
+		print __METHOD__ . " id=" . $localobjectline->id . " result=" . $result . "\n";
 		$this->assertLessThan($result, 0);
 
 		$newobjectline = new PreventionPlanLine($this->savdb);
-		$result = $newobjectline->fetch($localobjectline->id);
-		print __METHOD__." id=".$localobjectline->id." result=".$result."\n";
+		$result        = $newobjectline->fetch($localobjectline->id);
+		print __METHOD__ . " id=" . $localobjectline->id . " result=" . $result . "\n";
 		$this->assertLessThan($result, 0);
 
 		$this->assertEquals($localobjectline->id, $newobjectline->id);
@@ -585,16 +585,16 @@ class PreventionPlanUnitTest extends PHPUnit\Framework\TestCase
 	public function testPreventionPlanFetchLines($localobject) : void
 	{
 		global $conf, $user, $langs, $db;
-		$conf = $this->savconf;
-		$user = $this->savuser;
+		$conf  = $this->savconf;
+		$user  = $this->savuser;
 		$langs = $this->savlangs;
-		$db = $this->savdb;
+		$db    = $this->savdb;
 
 		$result = $localobject->fetchLines();
 
 		$this->assertLessThan($result, 0);
 
-		print __METHOD__." id=".$localobject->id." result=".$result."\n";
+		print __METHOD__ . " id=" . $localobject->id . " result=" . $result . "\n";
 	}
 
 	/**
@@ -609,12 +609,12 @@ class PreventionPlanUnitTest extends PHPUnit\Framework\TestCase
 	public function testPreventionPlanLineFetchAll() : void
 	{
 		global $conf, $user, $langs, $db;
-		$conf = $this->savconf;
-		$user = $this->savuser;
+		$conf  = $this->savconf;
+		$user  = $this->savuser;
 		$langs = $this->savlangs;
-		$db = $this->savdb;
+		$db    = $this->savdb;
 
-		$localobjectline = new PreventionPlanLine($this->savdb);
+		$localobjectline     = new PreventionPlanLine($this->savdb);
 		$localobjectlineList = $localobjectline->fetchAll();
 
 		$this->assertSame(true, is_array($localobjectlineList));
@@ -635,12 +635,12 @@ class PreventionPlanUnitTest extends PHPUnit\Framework\TestCase
 	public function testPreventionPlanFetchAll() : void
 	{
 		global $conf, $user, $langs, $db;
-		$conf = $this->savconf;
-		$user = $this->savuser;
+		$conf  = $this->savconf;
+		$user  = $this->savuser;
 		$langs = $this->savlangs;
-		$db = $this->savdb;
+		$db    = $this->savdb;
 
-		$localobject = new PreventionPlan($this->savdb);
+		$localobject     = new PreventionPlan($this->savdb);
 		$localobjectList = $localobject->fetchAll();
 
 		$this->assertSame(true, is_array($localobjectList));
@@ -665,16 +665,16 @@ class PreventionPlanUnitTest extends PHPUnit\Framework\TestCase
 	public function testPreventionPlanLineDelete($localobjectline)
 	{
 		global $conf, $user, $langs, $db;
-		$conf = $this->savconf;
-		$user = $this->savuser;
+		$conf  = $this->savconf;
+		$user  = $this->savuser;
 		$langs = $this->savlangs;
-		$db = $this->savdb;
+		$db    = $this->savdb;
 
 		$newobjectline = new PreventionPlanLine($this->savdb);
 		$newobjectline->fetch($localobjectline->id);
 
 		$result = $localobjectline->delete($user);
-		print __METHOD__." id=".$newobjectline->id." result=".$result."\n";
+		print __METHOD__ . " id=" . $newobjectline->id . " result=" . $result . "\n";
 		$this->assertLessThan($result, 0);
 
 		return $result;
@@ -694,19 +694,18 @@ class PreventionPlanUnitTest extends PHPUnit\Framework\TestCase
 	public function testPreventionPlanDelete($localobject)
 	{
 		global $conf, $user, $langs, $db;
-		$conf = $this->savconf;
-		$user = $this->savuser;
+		$conf  = $this->savconf;
+		$user  = $this->savuser;
 		$langs = $this->savlangs;
-		$db = $this->savdb;
+		$db    = $this->savdb;
 
 		$newobject = new PreventionPlan($this->savdb);
 		$newobject->fetch($localobject->id);
 
 		$result = $localobject->delete($user);
-		print __METHOD__." id=".$newobject->id." result=".$result."\n";
+		print __METHOD__ . " id=" . $newobject->id . " result=" . $result . "\n";
 		$this->assertLessThan($result, 0);
 
 		return $result;
 	}
 }
-
