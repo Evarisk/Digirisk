@@ -2,7 +2,7 @@
 
 ## Informations
 
-Version du module: 8.5.4
+Version du module: 9.0.0
 
 Dernière mise à jour: 17/12/2021
 
