@@ -857,6 +857,7 @@ ElementType = Type d'élément
 ParentElement = Élément parent
 OrganizationSaved = L'organisation et des groupements et des unités de travail a été sauvegardée
 OrganizationNotSaved = L'organisation et des groupements et des unités de travail n'a pas pu être sauvegardée
+DigiriskElementOrganization = Organisation de l'arborescence
 
 #
 # Groupment - Groupement
