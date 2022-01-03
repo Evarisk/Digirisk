@@ -408,14 +408,13 @@ if ($object->id > 0) {
 						<div class="evaluator-user">
 							<span class="title"><?php echo $langs->trans('SelectUser'); ?><required>*</required></span>
 							<input type="hidden" class="user-selected" value="<?php echo $user->id ?>">
-							<select class="minwidth200" id="userid" name="userid" data-select2-id="userid">
-								<?php
-								$userlist = $form->select_dolusers('', 'userid', 0, null, 0, '', '', $conf->entity, 0, 0, '', 0, '', '', 0, 3, false);
 
-								foreach ($userlist as $key => $userselect) { ?>
-									<option value="<?php echo $key; ?>" data-select2-id="<?php echo $key . $userselect; ?>"><?php echo $userselect; ?></option>
-								<?php } ?>
-							</select>
+									<?php
+									$userlist = $form->select_dolusers((($usertmp->id > 0) ? $usertmp->id : $user->id), '', 0, null, 0, '', '', $conf->entity, 0, 0, 'AND u.statut = 1', 0, '', 'minwidth300', 0, 1);
+									print $form->selectarray('fk_user_employer', $userlist, (($usertmp->id > 0) ? $usertmp->id : $user->id), $langs->trans('SelectUser'), null, null, null, "40%", 0, 0, '', 'minwidth300', 1);
+
+									?>
+
 						</div>
 						<div class="evaluator-assignment wpeo-gridlayout grid-2">
 							<div class="evaluator-duration">

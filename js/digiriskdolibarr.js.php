@@ -2649,24 +2649,12 @@ window.eoxiaJS.evaluator.selectUser = function( event ) {
 window.eoxiaJS.evaluator.createEvaluator = function ( event ) {
 	let elementEvaluator = $(this).closest('.fichecenter').find('.evaluator-content');
 
-	var user = $('.user-selected').val()
-	var userPost = '';
-	if (user !== 0) {
-		userPost = '&evaluatorID=' + encodeURI(user);
-	}
+	var userName = $('#select2-fk_user_employer-container').attr('title')
+	var userID = $('#fk_user_employer').find("option:contains('"+userName+"')").attr('value')
 
 	var date = elementEvaluator.find('#EvaluatorDate').val();
-	var datePost = '';
-	if (date !== '') {
-		datePost = '&date=' + encodeURI(date);
-	}
 
 	var duration = elementEvaluator.find('.evaluator-duration .duration').val();
-	var durationPost = '';
-	if (duration !== 0) {
-		durationPost = '&duration=' + duration;
-	}
-
 	let elementParent = $(this).closest('.fichecenter').find('.div-table-responsive');
 
 	window.eoxiaJS.loader.display(elementParent);
@@ -2675,7 +2663,7 @@ window.eoxiaJS.evaluator.createEvaluator = function ( event ) {
 		url: document.URL + '&action=add',
 		type: "POST",
 		data: JSON.stringify({
-			evaluatorID: user,
+			evaluatorID: userID,
 			date: date,
 			duration: duration
 		}),
