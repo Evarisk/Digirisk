@@ -379,12 +379,14 @@ print '</td></tr>';
 
 //RegisterDate
 print '<tr><td class="minwidth400"><label for="register_date">' . $langs->trans("RegisterDate") . '</label></td><td>';
-print $form->selectDate($accidentmetadata->register_date, 'dater', 1, 1, 0, '', 1, 1);
+print dol_print_date($object->date_creation);
+//print $form->selectDate($accidentmetadata->register_date, 'dater', 1, 1, 0, '', 1, 1);
 print '</td></tr>';
 
 //RegisterNumber
 print '<tr><td class="minwidth400">' . $langs->trans("RegisterNumber") . '</td><td>';
-print '<input type="text" class="minwidth400" name="register_number" id="register_number" value="' . $accidentmetadata->register_number . '">';
+print $object->ref;
+//print '<input type="text" class="minwidth400" name="register_number" id="register_number" value="' . $accidentmetadata->register_number . '">';
 print '</td></tr>';
 
 print '<tr></tr>';
