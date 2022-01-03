@@ -1003,6 +1003,7 @@ window.eoxiaJS.signature.createSignature = function() {
 		data: signature,
 		success: function( resp ) {
 			if (elementZone == "private") {
+				actionContainerSuccess.html($(resp).find('.noticeSignatureSuccess .all-notice-content'));
 				actionContainerSuccess.removeClass('hidden');
 				$('.signatures-container').html($(resp).find('.signatures-container'));
 			} else {

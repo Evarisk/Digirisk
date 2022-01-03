@@ -473,7 +473,7 @@ if (empty($reshook)) {
 		} else {
 			setEventMessages($langs->trans("FileGenerated") . ' - ' . $firepermitdocument->last_main_doc, null);
 
-			$signatories = $signatory->fetchSignatory("", $object->id);
+			$signatories = $signatory->fetchSignatory("", $object->id, 'firepermit');
 
 			if ( ! empty($signatories) && $signatories > 0) {
 				foreach ($signatories as $arrayRole) {
@@ -789,7 +789,7 @@ if (($id || $ref) && $action == 'edit') {
 	print dol_get_fiche_head();
 
 	$object_resources   = $digiriskresources->fetchResourcesFromObject('', $object);
-	$object_signatories = $signatory->fetchSignatory('', $object->id);
+	$object_signatories = $signatory->fetchSignatory('', $object->id, 'firepermit');
 
 	print '<table class="border centpercent tableforfieldedit firepermit-table">' . "\n";
 
@@ -1531,7 +1531,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 		// Create form for email
 		include_once DOL_DOCUMENT_ROOT . '/core/class/html.formmail.class.php';
 		$formmail      = new FormMail($db);
-		$maitre_oeuvre = $signatory->fetchSignatory('FP_MAITRE_OEUVRE', $object->id);
+		$maitre_oeuvre = $signatory->fetchSignatory('FP_MAITRE_OEUVRE', $object->id, 'firepermit');
 		$maitre_oeuvre = array_shift($maitre_oeuvre);
 
 		$formmail->param['langsmodels'] = (empty($newlang) ? $langs->defaultlang : $newlang);

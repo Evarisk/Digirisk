@@ -284,9 +284,9 @@ class doc_preventionplandocument_odt extends ModeleODTPreventionPlanDocument
 
 			$digirisk_resources      = $resources->digirisk_dolibarr_fetch_resources();
 			$extsociety              = $resources->fetchResourcesFromObject('PP_EXT_SOCIETY', $preventionplan);
-			$maitreoeuvre            = array_shift($signatory->fetchSignatory('PP_MAITRE_OEUVRE', $preventionplan->id));
-			$extsocietyresponsible   = array_shift($signatory->fetchSignatory('PP_EXT_SOCIETY_RESPONSIBLE', $preventionplan->id));
-			$extsocietyintervenants  = $signatory->fetchSignatory('PP_EXT_SOCIETY_INTERVENANTS', $preventionplan->id);
+			$maitreoeuvre            = array_shift($signatory->fetchSignatory('PP_MAITRE_OEUVRE', $preventionplan->id, 'preventionplan'));
+			$extsocietyresponsible   = array_shift($signatory->fetchSignatory('PP_EXT_SOCIETY_RESPONSIBLE', $preventionplan->id, 'preventionplan'));
+			$extsocietyintervenants  = $signatory->fetchSignatory('PP_EXT_SOCIETY_INTERVENANTS', $preventionplan->id, 'preventionplan');
 
 			$tmparray['titre_prevention']             = $preventionplan->ref;
 			$tmparray['raison_du_plan_de_prevention'] = $preventionplan->label;

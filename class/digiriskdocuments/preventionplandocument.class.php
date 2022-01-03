@@ -117,9 +117,9 @@ class PreventionPlanDocument extends DigiriskDocuments
 		$digirisk_resources = $resources->digirisk_dolibarr_fetch_resources();
 
 		$extsociety = $resources->fetchResourcesFromObject('PP_EXT_SOCIETY', $preventionplan);
-		$maitreoeuvre = array_shift($signatory->fetchSignatory('PP_MAITRE_OEUVRE', $preventionplan->id));
-		$extsocietyresponsible = array_shift($signatory->fetchSignatory('PP_EXT_SOCIETY_RESPONSIBLE', $preventionplan->id));
-		$extsocietyintervenants = $signatory->fetchSignatory('PP_EXT_SOCIETY_INTERVENANTS', $preventionplan->id);
+		$maitreoeuvre = array_shift($signatory->fetchSignatory('PP_MAITRE_OEUVRE', $preventionplan->id, 'preventionplan'));
+		$extsocietyresponsible = array_shift($signatory->fetchSignatory('PP_EXT_SOCIETY_RESPONSIBLE', $preventionplan->id, 'preventionplan'));
+		$extsocietyintervenants = $signatory->fetchSignatory('PP_EXT_SOCIETY_INTERVENANTS', $preventionplan->id, 'preventionplan');
 		$labourinspector = $resources->fetchResourcesFromObject('PP_LABOUR_INSPECTOR', $preventionplan);
 		$labourinspectorcontact = $resources->fetchResourcesFromObject('PP_LABOUR_INSPECTOR_ASSIGNED', $preventionplan);
 
