@@ -400,6 +400,7 @@ ErrorNoEmailForLabourInspector = Erreur : l'Inspecteur du travail n'a pas d'emai
 ErrorNoEmailForExtResponsible = Erreur : Le responsable de l'Entreprise Extérieure n'a pas d'email
 ErrorNoEmailForMaitreOeuvre = Erreur : Le responsable de l'Entreprise Utilisatrice n'a pas d'email
 ErrorNoEmailForExtIntervenant = Erreur : Le (ou les) intervenant(s) ne possède(nt) pas d'email
+ErrorNoAttendantSelected = Erreur : Aucun intervenant n'a été sélectionné
 SignatureEmailSubject = Signature du plan de prevention
 DocumentName = Référence du document
 PreventionPlanScheduleSave = Les horaires du plan de prévention ont bien été enregistrés

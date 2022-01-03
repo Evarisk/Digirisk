@@ -101,6 +101,8 @@ if ($action == 'addAttendant') {
 				$error++;
 			}
 		}
+	} else {
+		setEventMessages($langs->trans('ErrorNoAttendantSelected', $langs->transnoentitiesnoconv('ExtIntervenant')), null, 'errors');
 	}
 
 	if ( ! $error) {

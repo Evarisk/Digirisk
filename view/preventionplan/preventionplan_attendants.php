@@ -89,6 +89,7 @@ if (empty($backtopage) || ($cancel && empty($id))) {
 
 // Action to add record
 if ($action == 'addAttendant') {
+	$error = 0;
 	$object->fetch($id);
 	$extintervenant_ids = GETPOST('ext_intervenants');
 
@@ -101,6 +102,8 @@ if ($action == 'addAttendant') {
 				$error++;
 			}
 		}
+	} else {
+		setEventMessages($langs->trans('ErrorNoAttendantSelected', $langs->transnoentitiesnoconv('ExtIntervenant')), null, 'errors');
 	}
 
 	if ( ! $error) {
