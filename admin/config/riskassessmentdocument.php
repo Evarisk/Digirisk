@@ -398,6 +398,17 @@ print '<td class="center">';
 print ajax_constantonoff('DIGIRISKDOLIBARR_SHOW_RISKASSESSMENT_DATE');
 print '</td>';
 print '</tr>';
+
+print '<tr class="oddeven"><td>';
+print $langs->trans('ShowAllRiskAssessments');
+print "</td><td>";
+print $langs->trans('ShowAllRiskAssessmentsDescription');
+print '</td>';
+
+print '<td class="center">';
+print ajax_constantonoff('DIGIRISKDOLIBARR_SHOW_ALL_RISKASESSMENTS');
+print '</td>';
+print '</tr>';
 print '</table>';
 
 // Tasks

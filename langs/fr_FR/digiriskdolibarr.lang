@@ -1070,6 +1070,8 @@ AdvancedRiskAssessmentMethodDescription = Activer la méthode d'évaluation avan
 NoRiskAssessment = Pas d'évaluation assignée au risque
 RiskAssessmentList = Liste des évaluations du risque
 EditRiskAssessment = Editer l'évaluation
+ShowAllRiskAssessments = Voir toutes les évaluations
+ShowAllRiskAssessmentsDescription = Afficher la liste complète des évaluations des risques dans la liste des risques
 
 SimpleCotation = Cotation simple
 AdvancedCotation = Cotation avancée
@@ -1083,7 +1085,6 @@ AddRiskAssessmentTask = Ajouter une tâche au risque
 ListRiskAssessmentTask = Liste des tâches du risque
 ShowRiskAssessmentDate = Date des évaluations
 ShowRiskAssessmentDateDescription = Remplace la date de création par la date de début des évaluations dans la fiche et les documents
-
 
 
 #
