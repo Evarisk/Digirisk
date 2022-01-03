@@ -357,7 +357,7 @@ print '</td></tr>';
 
 //AccidentNoticeDate
 print '<tr><td class="minwidth400"><label for="accident_notice_date">' . $langs->trans("AccidentNoticeDate") . '</label></td><td>';
-print $form->selectDate($accidentmetadata->accident_notice_date, 'daten', 1, 1, 0, '', 1);
+print $form->selectDate($accidentmetadata->accident_notice_date, 'daten', 1, 1, 0, '', 1, 1);
 print '</td></tr>';
 
 //AccidentNoticeBy
@@ -379,7 +379,7 @@ print '</td></tr>';
 
 //RegisterDate
 print '<tr><td class="minwidth400"><label for="register_date">' . $langs->trans("RegisterDate") . '</label></td><td>';
-print $form->selectDate($accidentmetadata->register_date, 'dater', 1, 1, 0, '', 1);
+print $form->selectDate($accidentmetadata->register_date, 'dater', 1, 1, 0, '', 1, 1);
 print '</td></tr>';
 
 //RegisterNumber
