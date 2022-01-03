@@ -3121,19 +3121,20 @@ window.eoxiaJS.keyEvent.init = function() {
  * La méthode contenant tous les événements pour le migration.
  *
  * @since   1.0.0
- * @version 1.0.0
+ * @version 9.0.0
  *
  * @return {void}
  */
 window.eoxiaJS.keyEvent.event = function() {
 	$( document ).on( 'keydown', window.eoxiaJS.keyEvent.keyup );
+	$( document ).on( 'keyup', '.url-container' , window.eoxiaJS.keyEvent.checkUrlFormat );
 }
 
 /**
  * Action modal close & validation with key events
  *
  * @since   1.0.0
- * @version 1.0.0
+ * @version 8.5.0
  *
  * @return {void}
  */
@@ -3151,6 +3152,25 @@ window.eoxiaJS.keyEvent.keyup = function( event ) {
 		}
 	}
 };
+
+/**
+ * Check url format of url containers
+ *
+ * @since   1.0.0
+ * @version 8.5.0
+ *
+ * @return {void}
+ */
+window.eoxiaJS.keyEvent.checkUrlFormat = function( event ) {
+	var urlRegex = /[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)?/gi;
+	console.log($('input:focus').val())
+	if ($(this).val().match(urlRegex)) {
+		$(this).attr('style', 'border: solid; border-color: green')
+	} else if ($('input:focus').val().length > 0) {
+		$(this).attr('style', 'border: solid; border-color: red')
+	}
+};
+
 
 /**
  * Initialise l'objet "menu" ainsi que la méthode "init" obligatoire pour la bibliothèque EoxiaJS.

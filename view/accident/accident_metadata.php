@@ -464,12 +464,12 @@ print '</td></tr>';
 
 //AccidentInvestigationLink
 print '<tr><td class="minwidth400">' . img_picto('', 'globe') . ' ' . $langs->trans("AccidentInvestigationLink") . '</td><td>';
-print '<input type="text" class="minwidth400" name="accident_investigation_link" id="accident_investigation_link" value="' . $accidentmetadata->accident_investigation_link . '">';
+print '<input type="text" class="minwidth400 url-container" name="accident_investigation_link" id="accident_investigation_link" value="' . $accidentmetadata->accident_investigation_link . '">';
 print '</td></tr>';
 
 //CerfaLink
 print '<tr><td class="minwidth400">' . img_picto('', 'globe') . ' ' . $langs->trans("CerfaLink") . '</td><td>';
-print '<input type="text" class="minwidth400" name="cerfa_link" id="cerfa_link" value="' . $accidentmetadata->cerfa_link . '">';
+print '<input type="text" class="minwidth400 url-container" name="cerfa_link" id="cerfa_link" value="' . $accidentmetadata->cerfa_link . '">';
 print '</td></tr>';
 
 print '</table>';
