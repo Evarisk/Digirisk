@@ -17,7 +17,9 @@
 		<div class="wpeo-notice notice-success riskassessment-create-success-notice">
 			<div class="notice-content">
 				<div class="notice-title"><?php echo $langs->trans('RiskAssessmentWellCreated') ?></div>
-				<div class="notice-subtitle"><?php echo $langs->trans('TheRiskAssessment') . ' ' . $refEvaluationMod->getLastValue($evaluation) . ' ' . $langs->trans('HasBeenCreatedF') ?></div>
+				<a href="">
+					<div class="notice-subtitle"><?php echo $langs->trans('TheRiskAssessment') . ' ' . $refEvaluationMod->getLastValue($evaluation) . ' ' . $langs->trans('HasBeenCreatedF') ?></div>
+				</a>
 			</div>
 			<div class="notice-close"><i class="fas fa-times"></i></div>
 		</div>
@@ -26,7 +28,9 @@
 		<div class="wpeo-notice notice-warning riskassessment-create-error-notice">
 			<div class="notice-content">
 				<div class="notice-title"><?php echo $langs->trans('RiskAssessmentNotCreated') ?></div>
-				<div class="notice-subtitle"><?php echo $langs->trans('TheRiskAssessment') . ' ' . $refEvaluationMod->getLastValue($evaluation) . ' ' . $langs->trans('HasNotBeenCreatedF') ?></div>
+				<a href="">
+					<div class="notice-subtitle"><?php echo $langs->trans('TheRiskAssessment') . ' ' . $refEvaluationMod->getLastValue($evaluation) . ' ' . $langs->trans('HasNotBeenCreatedF') ?></div>
+				</a>
 			</div>
 			<div class="notice-close"><i class="fas fa-times"></i></div>
 		</div>
@@ -38,7 +42,9 @@
 			<div class="notice-content">
 				<div class="notice-title"><?php echo $langs->trans('RiskAssessmentWellEdited') ?></div>
 				<div class="notice-subtitle">
-					<span class="text"></span>
+					<a href="">
+						<span class="text"></span>
+					</a>
 				</div>
 			</div>
 			<div class="notice-close"><i class="fas fa-times"></i></div>
@@ -51,7 +57,9 @@
 			<div class="notice-content">
 				<div class="notice-title"><?php echo $langs->trans('RiskAssessmentNotEdited') ?></div>
 				<div class="notice-subtitle">
-					<span class="text"></span>
+					<a href="">
+						<span class="text"></span>
+					</a>
 				</div>
 			</div>
 			<div class="notice-close"><i class="fas fa-times"></i></div>
@@ -64,7 +72,9 @@
 			<div class="notice-content">
 				<div class="notice-title"><?php echo $langs->trans('RiskAssessmentWellDeleted') ?></div>
 				<div class="notice-subtitle">
-					<span class="text"></span>
+					<a href="">
+						<span class="text"></span>
+					</a>
 				</div>
 			</div>
 			<div class="notice-close"><i class="fas fa-times"></i></div>
@@ -77,7 +87,9 @@
 			<div class="notice-content">
 				<div class="notice-title"><?php echo $langs->trans('RiskAssessmentNotDeleted') ?></div>
 				<div class="notice-subtitle">
-					<span class="text"></span>
+					<a href="">
+						<span class="text"></span>
+					</a>
 				</div>
 			</div>
 			<div class="notice-close"><i class="fas fa-times"></i></div>
@@ -91,7 +103,7 @@
 				<div class="notice-title"><?php echo $langs->trans('RiskWellCreated') ?></div>
 				<div class="notice-subtitle">
 					<a href="#<?php echo $refRiskMod->getLastValue($evaluation) ?>">
-						<?php echo $langs->trans('TheRisk') . ' ' . $refRiskMod->getLastValue($risk) . ' ' . $langs->trans('HasBeenCreatedM') ?>
+						<?php echo $langs->trans('TheRisk') . ' <strong><u> ' . $refRiskMod->getLastValue($risk) . ' </u></strong> ' . $langs->trans('HasBeenCreatedM') ?>
 					</a>
 				</div>
 			</div>
@@ -102,7 +114,7 @@
 		<div class="wpeo-notice notice-warning risk-create-error-notice">
 			<div class="notice-content">
 				<div class="notice-title"><?php echo $langs->trans('RiskNotCreated') ?></div>
-				<div class="notice-subtitle"><?php echo $langs->trans('TheRisk') . ' ' . $refRiskMod->getLastValue($risk) . ' ' . $langs->trans('HasNotBeenCreatedM') ?></div>
+				<div class="notice-subtitle"><?php echo $langs->trans('TheRisk') . $langs->trans('HasNotBeenCreatedM') ?></div>
 			</div>
 			<div class="notice-close"><i class="fas fa-times"></i></div>
 		</div>
@@ -115,7 +127,9 @@
 			<div class="notice-content">
 				<div class="notice-title"><?php echo $langs->trans('RiskWellEdited') ?></div>
 				<div class="notice-subtitle">
-					<span class="text"></span>
+					<a href="">
+						<span class="text"></span>
+					</a>
 				</div>
 			</div>
 			<div class="notice-close"><i class="fas fa-times"></i></div>
@@ -128,7 +142,9 @@
 			<div class="notice-content">
 				<div class="notice-title"><?php echo $langs->trans('RiskNotEdited') ?></div>
 				<div class="notice-subtitle">
-					<span class="text"></span>
+					<a href="">
+						<span class="text"></span>
+					</a>
 				</div>
 			</div>
 			<div class="notice-close"><i class="fas fa-times"></i></div>
@@ -163,7 +179,9 @@
 			<div class="notice-content">
 				<div class="notice-title"><?php echo $langs->trans('TaskWellEdited') ?></div>
 				<div class="notice-subtitle">
-					<span class="text"></span>
+					<a href="">
+						<span class="text"></span>
+					</a>
 				</div>
 			</div>
 			<div class="notice-close"><i class="fas fa-times"></i></div>
@@ -186,7 +204,9 @@
 			<div class="notice-content">
 				<div class="notice-title"><?php echo $langs->trans('TaskWellDeleted') ?></div>
 				<div class="notice-subtitle">
-					<span class="text"></span>
+					<a href="">
+						<span class="text"></span>
+					</a>
 				</div>
 			</div>
 			<div class="notice-close"><i class="fas fa-times"></i></div>

@@ -1727,6 +1727,7 @@ window.eoxiaJS.risk.saveRisk = function ( event ) {
 			textToShow += actionContainerSuccess.find('.valueForEditRisk1').val()
 			textToShow += riskRef
 			textToShow += actionContainerSuccess.find('.valueForEditRisk2').val()
+			actionContainerSuccess.find('a').attr('href', '#risk_row_'+editedRiskId)
 
 			actionContainerSuccess.find('.notice-subtitle .text').text(textToShow)
 			actionContainerSuccess.removeClass('hidden');
@@ -1929,6 +1930,8 @@ window.eoxiaJS.evaluation.createEvaluation = function ( event ) {
 			$('#risk_row_' + riskToAssign).fadeIn(400);
 			actionContainerSuccess.empty()
 			actionContainerSuccess.html($(resp).find('.riskassessment-create-success-notice'))
+			actionContainerSuccess.find('a').attr('href', '#risk_row_'+riskToAssign)
+
 			actionContainerSuccess.removeClass('hidden');
 		},
 		error: function ( resp ) {
@@ -2024,13 +2027,11 @@ window.eoxiaJS.evaluation.deleteEvaluation = function ( event ) {
 window.eoxiaJS.evaluation.saveEvaluation = function ( event ) {
 	let element = $(this).closest('.risk-evaluation-edit-modal');
 	let evaluationID = element.attr('value');
-	let actionContainerSuccess = $('.messageSuccessEvaluationEdit');
-	let actionContainerError = $('.messageErrorEvaluationEdit');
+
 	let evaluationText = element.find('.risk-evaluation-comment textarea').val()
 
 	let elementParent = $(this).closest('.risk-evaluation-container').find('.risk-evaluations-list-content');
 	let riskId = elementParent.attr('value');
-	let evaluationSingle = $(this).closest('.risk-evaluation-container').find('.risk-evaluation-single-content');
 	let evaluationRef =  $('.risk-evaluation-ref-'+evaluationID).attr('value');
 	let listModalContainer = $('.risk-evaluation-list-modal-'+riskId)
 	let listModal = $('#risk_evaluation_list'+riskId)
@@ -2081,9 +2082,10 @@ window.eoxiaJS.evaluation.saveEvaluation = function ( event ) {
 				$('.fichecenter').html($(resp).find('#searchFormList'))
 				$('#risk_row_' + riskId).fadeOut(400);
 				$('#risk_row_' + riskId).fadeIn(400);
+
 			}
 			$('.wpeo-loader').removeClass('wpeo-loader')
-
+			let actionContainerSuccess = $('.messageSuccessEvaluationEdit');
 
 			element.find('#risk_evaluation_edit'+evaluationID).removeClass('modal-active');
 
@@ -2091,11 +2093,14 @@ window.eoxiaJS.evaluation.saveEvaluation = function ( event ) {
 			textToShow += actionContainerSuccess.find('.valueForEditEvaluation1').val()
 			textToShow += evaluationRef
 			textToShow += actionContainerSuccess.find('.valueForEditEvaluation2').val()
+			actionContainerSuccess.find('a').attr('href', '#risk_row_'+riskId)
 
 			actionContainerSuccess.find('.notice-subtitle .text').text(textToShow)
 			actionContainerSuccess.removeClass('hidden');
 		},
 		error: function ( ) {
+			let actionContainerError = $('.messageErrorEvaluationEdit');
+
 			let textToShow = '';
 			textToShow += actionContainerError.find('.valueForEditEvaluation1').val()
 			textToShow += evaluationRef
@@ -2287,10 +2292,12 @@ window.eoxiaJS.riskassessmenttask.createRiskAssessmentTask = function ( event ) 
 			$('.riskassessment-tasks' + riskToAssign).fadeOut(400);
 			$('.riskassessment-tasks' + riskToAssign).fadeIn(400);
 
+			actionContainerSuccess.find('a').attr('href', '#risk_row_'+riskToAssign)
+
 			actionContainerSuccess.html($(resp).find('.task-create-success-notice'))
 			actionContainerSuccess.removeClass('hidden');
 		},
-		error: function ( ) {
+		error: function ( resp ) {
 			$(this).closest('.risk-row-content-' + riskToAssign).removeClass('wpeo-loader');
 			let actionContainerError = $('.messageErrorTaskCreate');
 			actionContainerError.html($(resp).find('.task-create-error-notice'))
@@ -2334,6 +2341,8 @@ window.eoxiaJS.riskassessmenttask.deleteRiskAssessmentTask = function ( event ) 
 				textToShow += actionContainerSuccess.find('.valueForDeleteTask1').val()
 				textToShow += riskAssessmentTaskRef
 				textToShow += actionContainerSuccess.find('.valueForDeleteTask2').val()
+
+				actionContainerSuccess.find('a').attr('href', '#risk_row_'+riskId)
 
 				actionContainerSuccess.find('.notice-subtitle .text').text(textToShow)
 				actionContainerSuccess.removeClass('hidden');
@@ -2395,6 +2404,8 @@ window.eoxiaJS.riskassessmenttask.saveRiskAssessmentTask = function ( event ) {
 			textToShow += actionContainerSuccess.find('.valueForEditTask1').val()
 			textToShow += taskRef
 			textToShow += actionContainerSuccess.find('.valueForEditTask2').val()
+
+			actionContainerSuccess.find('a').attr('href', '#risk_row_'+riskId)
 
 			actionContainerSuccess.find('.notice-subtitle .text').text(textToShow)
 			actionContainerSuccess.removeClass('hidden');
@@ -2789,12 +2800,13 @@ window.eoxiaJS.notice.init = function() {
  * La méthode contenant tous les événements pour l'évaluateur.
  *
  * @since   1.0.0
- * @version 1.0.0
+ * @version 9.0.0
  *
  * @return {void}
  */
 window.eoxiaJS.notice.event = function() {
 	$( document ).on( 'click', '.notice-close', window.eoxiaJS.notice.closeNotice );
+	$( document ).on( 'click', '.notice-subtitle', window.eoxiaJS.notice.lineBlink );
 };
 
 /**
@@ -2808,6 +2820,24 @@ window.eoxiaJS.notice.event = function() {
  */
 window.eoxiaJS.notice.closeNotice = function( event ) {
 	$(this).closest('.notice').addClass("hidden");
+};
+
+/**
+ * Fais disparaître & réapparaître la ligne du risque concerné par l'action
+ *
+ * @since   9.0.0
+ * @version 9.0.0
+ *
+ * @param  {ClickEvent} event L'état du clic.
+ * @return {void}
+ */
+window.eoxiaJS.notice.lineBlink = function( event ) {
+	var jquerySelector = $(this).closest('.notice-content').find('a').attr('href');
+	if (jquerySelector.match(/RK/)) {
+		jquerySelector = '#risk_row_' + jquerySelector.split(/RK/)[1]
+	}
+	$(jquerySelector).fadeOut(200)
+	$(jquerySelector).fadeIn(200)
 };
 
 
