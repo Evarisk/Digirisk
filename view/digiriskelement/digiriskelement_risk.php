@@ -190,7 +190,7 @@ $help_url = 'FR:Module_DigiriskDolibarr#Risques';
 $morejs   = array("/digiriskdolibarr/js/digiriskdolibarr.js.php");
 $morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");
 
-digiriskHeader('', $title, $help_url, '', '', '', $morejs, $morecss, '', 'classforhorizontalscrolloftabs');
+digiriskHeader('', $title, $help_url, '', '', '', $morejs, $morecss);
 
 print '<div id="cardContent" value="">';
 
