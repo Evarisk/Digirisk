@@ -3262,7 +3262,7 @@ window.eoxiaJS.menu.toggleMenu = function() {
 		});
 
 		var elementText2 = $(this).find('.maximizeMenu').html().split(' ');
-		$(this).find('.maximizeMenu').html(elementText2[0]+' '+elementText2[1]+' '+elementText2[2]+' Réduire le menu');
+		$(this).find('.maximizeMenu').html(elementText2[0]+' '+elementText2[1]+' '+elementText2[2]+' Réduire le menu<');
 
 		elementParent.css('width', '');
 		elementParent.find('.blockvmenusearch').show();
