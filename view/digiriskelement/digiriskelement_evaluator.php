@@ -314,6 +314,7 @@ if ($object->id > 0) {
 	$reshook    = $hookmanager->executeHooks('printFieldListWhere', $parameters, $evaluator); // Note that $action and $evaluator may have been modified by hook
 	$sql       .= $hookmanager->resPrint;
 	$sql       .= $db->order($sortfield, $sortorder);
+	if ($limit) $sql .= $db->plimit($limit + 1, $offset);
 
 	// Count total nb of records
 	$nbtotalofrecords = '';
@@ -330,7 +331,6 @@ if ($object->id > 0) {
 	if (is_numeric($nbtotalofrecords) && ($limit > $nbtotalofrecords || empty($limit))) {
 		$num = $nbtotalofrecords;
 	} else {
-		if ($limit) $sql .= $db->plimit($limit + 1, $offset);
 
 		$resql = $db->query($sql);
 		if ( ! $resql) {
@@ -355,8 +355,6 @@ if ($object->id > 0) {
 	$parameters = array();
 	$reshook    = $hookmanager->executeHooks('printFieldListWhere', $parameters, $evaluation); // Note that $action and $evaluation may have been modified by hook
 	$sql       .= $hookmanager->resPrint;
-
-	if ($limit) $sql .= $db->plimit($limit + 1, $offset);
 
 	$resql = $db->query($sql);
 	if ( ! $resql) {
