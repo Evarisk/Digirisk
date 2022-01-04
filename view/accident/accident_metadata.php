@@ -258,10 +258,6 @@ $arrayAccidentMetaData[] = ($accidentmetadata->fk_soc_responsible > 0 ? $acciden
 $arrayAccidentMetaData[] = ($accidentmetadata->fk_soc_responsible_insurance_society > 0 ? $accidentmetadata->fk_soc_responsible_insurance_society : '');
 $arrayAccidentMetaData[] = ($accidentmetadata->fk_accident > 0 ? $accidentmetadata->fk_accident : '');
 
-
-echo '<pre>'; print_r( $arrayAccidentMetaData ); echo '</pre>';
-
-
 $maxnumber  = count($arrayAccidentMetaData);
 
 foreach ($arrayAccidentMetaData as $arrayAccidentMetaDataSingle) {
