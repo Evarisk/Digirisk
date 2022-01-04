@@ -776,7 +776,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	$head = accidentPrepareHead($object);
 	print dol_get_fiche_head($head, 'accidentCard', $title, -1, "digiriskdolibarr@digiriskdolibarr");
 
-	dol_strlen($object->label) ? $morehtmlref = '<span>' . ' - ' . $object->label . '</span>' : '';
+	dol_strlen($object->label) ? $morehtmlref = '<span>' . ' - ' . $object->label  . '</span>' : '';
 	$morehtmlref                             .= '<div class="refidno">';
 	// Project
 	$project->fetch($object->fk_project);
@@ -784,6 +784,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	//Number workstop days
 	$accidentlines = $objectline->fetchAll($object->id);
 	$totalworkstopdays = 0;
+
 	if ( ! empty($accidentlines) && $accidentlines > 0) {
 		foreach ($accidentlines as $accidentline) {
 			if ($accidentline->status > 0) {
@@ -791,9 +792,14 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 			}
 		}
 	}
-	$morehtmlref .= '<br>' . $langs->trans('TotalWorkStopDays') . ' : ' . $totalworkstopdays;
-	$morehtmlref .= '</div>';
 
+	if (empty($totalworkstopdays)) {
+		$morehtmlref .= '<br>' . $langs->trans('RegisterAccident');
+	} else {
+		$morehtmlref .= '<br>' . $langs->trans('TotalWorkStopDays') . ' : ' . $totalworkstopdays;
+	}
+
+	$morehtmlref .= '</div>';
 
 	include_once './../../core/tpl/digiriskdolibarr_configuration_gauge_view.tpl.php';
 
