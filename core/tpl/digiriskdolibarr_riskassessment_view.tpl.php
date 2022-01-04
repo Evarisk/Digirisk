@@ -60,7 +60,7 @@ if ( ! empty($allRiskAssessment) && $allRiskAssessment > 0) :
 							<?php $user->fetch($lastEvaluation->fk_user_creat); ?>
 							<?php echo getNomUrl(0, '', 0, 0, 2, 0, '', '', -1, $user); ?>
 						</span>
-								<?php echo dol_trunc($lastEvaluation->comment, 120); ?>
+								<?php print nl2br(dol_trunc($lastEvaluation->comment, 120)); ?>
 							</div>
 						</div>
 						<!-- BUTTON MODAL RISK EVALUATION ADD  -->
