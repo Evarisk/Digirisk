@@ -781,7 +781,19 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	// Project
 	$project->fetch($object->fk_project);
 	$morehtmlref .= $langs->trans('Project') . ' : ' . getNomUrlProject($project, 1, 'blank');
+	//Number workstop days
+	$accidentlines = $objectline->fetchAll($object->id);
+	$totalworkstopdays = 0;
+	if ( ! empty($accidentlines) && $accidentlines > 0) {
+		foreach ($accidentlines as $accidentline) {
+			if ($accidentline->status > 0) {
+				$totalworkstopdays += $accidentline->workstop_days;
+			}
+		}
+	}
+	$morehtmlref .= '<br>' . $langs->trans('TotalWorkStopDays') . ' : ' . $totalworkstopdays;
 	$morehtmlref .= '</div>';
+
 
 	include_once './../../core/tpl/digiriskdolibarr_configuration_gauge_view.tpl.php';
 
