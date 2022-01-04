@@ -1146,6 +1146,7 @@ window.eoxiaJS.mediaGallery.savePhoto = function( event ) {
 
 	let favorite = filenames
 	favorite = favorite.split('vVv')[0]
+	favorite = favorite.replace(/\ /, '')
 	window.eoxiaJS.loader.display($(this));
 
 	if (type === 'riskassessment') {
