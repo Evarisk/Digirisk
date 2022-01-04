@@ -274,7 +274,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			143 => array('DIGIRISKDOLIBARR_ADVANCED_RISKASSESSMENT_METHOD','integer', 0 ,'', $conf->entity),
 			144 => array('DIGIRISKDOLIBARR_SHOW_RISKASSESSMENT_DATE','integer', 0,'', $conf->entity),
 			145 => array('DIGIRISKDOLIBARR_SHOW_ALL_RISKASESSMENTS','integer', 0,'', $conf->entity),
-			
+
 			// CONST RISK SIGN
 			150 => array('MAIN_AGENDA_ACTIONAUTO_RISKSIGN_CREATE','chaine',1,'', $conf->entity),
 			151 => array('DIGIRISKDOLIBARR_RISKSIGN_ADDON','chaine', 'mod_risksign_standard' ,'', $conf->entity),
@@ -826,7 +826,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			'position' => 48520 + $r,
 			'enabled' => '$conf->digiriskdolibarr->enabled',  // Define condition to show or hide menu entry. Use '$conf->digiriskdolibarr->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
 			'perms' => '$user->admin && $user->rights->digiriskdolibarr->digiriskelement->read',			                // Use 'perms'=>'$user->rights->digiriskdolibarr->level1->level2' if you want your menu with a permission rules
-			'target' => '',
+			'target' => '_blank',
 			'user' => 0,				                // 0=Menu for internal users, 1=external users, 2=both
 		);
 
