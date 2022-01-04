@@ -214,44 +214,61 @@ $morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");
 
 llxHeader('', $title, $help_url, '', '', '', $morejs, $morecss);
 
-//$counter = 0;
-//
-//$morecssGauge = 'inline-block floatright';
-//$move_title_gauge = 1;
-//
-//$arrayAccidentMetaData = array();
-//$arrayAccidentMetaData[] = $accidentmetadata->relative_location;
-//$arrayAccidentMetaData[] = $accidentmetadata->thirdparty_responsibility;
-//$arrayAccidentMetaData[] = $accidentmetadata->fatal;
-//$arrayAccidentMetaData[] = $accidentmetadata->accident_investigation;
-//$arrayAccidentMetaData[] = $accidentmetadata->accident_investigation_link;
-//$arrayAccidentMetaData[] = $accidentmetadata->accident_location;
-//$arrayAccidentMetaData[] = $accidentmetadata->collateral_victim;
-//$arrayAccidentMetaData[] = $accidentmetadata->police_report;
-//$arrayAccidentMetaData[] = $accidentmetadata->cerfa_link;
-//
-//$accidentlesions = $objectline->fetchAll($object->id);
-//if (!empty($accidentlesions)) {
-//	$accidentlesions = array_shift($accidentlesions);
-//}
-//
-//$arrayAccidentLesion = array();
-//$arrayAccidentLesion[] = $accidentlesions->lesion_nature;
-//$arrayAccidentLesion[] = $accidentlesions->lesion_localization;
-//
-//$maxnumber  = count($arrayAccidentMetaData) + count($arrayAccidentLesion);
-//
-//foreach ($arrayAccidentMetaData as $arrayAccidentMetaDataSingle) {
-//	if (dol_strlen($arrayAccidentMetaDataSingle) > 0 ) {
-//		$counter += 1;
-//	}
-//}
-//
-//foreach ($arrayAccidentLesion as $arrayAccidentLesionSingle) {
-//	if (dol_strlen($arrayAccidentLesionSingle) > 0 ) {
-//		$counter += 1;
-//	}
-//}
+$counter = 0;
+
+$morecssGauge = 'inline-block floatright';
+$move_title_gauge = 1;
+
+$arrayAccidentMetaData = array();
+$arrayAccidentMetaData[] = ($accidentmetadata->relative_location == '-1' ? '' : $accidentmetadata->relative_location);
+$arrayAccidentMetaData[] = $accidentmetadata->victim_activity;
+$arrayAccidentMetaData[] = $accidentmetadata->accident_nature;
+$arrayAccidentMetaData[] = $accidentmetadata->accident_object;
+
+$arrayAccidentMetaData[] = $accidentmetadata->accident_nature_doubt;
+$arrayAccidentMetaData[] = $accidentmetadata->accident_nature_doubt_link;
+$arrayAccidentMetaData[] = $accidentmetadata->victim_transported_to;
+$arrayAccidentMetaData[] = $accidentmetadata->collateral_victim;
+
+$arrayAccidentMetaData[] = $accidentmetadata->workhours_morning_date_start;
+$arrayAccidentMetaData[] = $accidentmetadata->workhours_morning_date_end;
+$arrayAccidentMetaData[] = $accidentmetadata->workhours_afternoon_date_start;
+$arrayAccidentMetaData[] = $accidentmetadata->workhours_afternoon_date_end;
+
+$arrayAccidentMetaData[] = (empty($accidentmetadata->accident_noticed) ? 0 : $accidentmetadata->accident_noticed);
+$arrayAccidentMetaData[] = $accidentmetadata->accident_notice_date;
+$arrayAccidentMetaData[] = (empty($accidentmetadata->accident_notice_by) ? 0 : $accidentmetadata->accident_notice_by);
+$arrayAccidentMetaData[] = $accidentmetadata->accident_described_by_victim;
+
+$arrayAccidentMetaData[] = $accidentmetadata->registered_in_accident_register;
+
+$arrayAccidentMetaData[] = (empty($accidentmetadata->consequence) ? 0 : $accidentmetadata->consequence);
+$arrayAccidentMetaData[] = $accidentmetadata->police_report;
+$arrayAccidentMetaData[] = $accidentmetadata->police_report_by;
+
+$arrayAccidentMetaData[] = (empty($accidentmetadata->first_person_noticed_is_witness) ? 0 : $accidentmetadata->first_person_noticed_is_witness);
+$arrayAccidentMetaData[] = $accidentmetadata->thirdparty_responsibility;
+
+$arrayAccidentMetaData[] = $accidentmetadata->accident_investigation;
+$arrayAccidentMetaData[] = $accidentmetadata->accident_investigation_link;
+$arrayAccidentMetaData[] = $accidentmetadata->cerfa_link;
+
+$arrayAccidentMetaData[] = ($accidentmetadata->fk_user_witness > 0 ? $accidentmetadata->fk_user_witness : '');
+$arrayAccidentMetaData[] = ($accidentmetadata->fk_soc_responsible > 0 ? $accidentmetadata->fk_soc_responsible : '');
+$arrayAccidentMetaData[] = ($accidentmetadata->fk_soc_responsible_insurance_society > 0 ? $accidentmetadata->fk_soc_responsible_insurance_society : '');
+$arrayAccidentMetaData[] = ($accidentmetadata->fk_accident > 0 ? $accidentmetadata->fk_accident : '');
+
+
+echo '<pre>'; print_r( $arrayAccidentMetaData ); echo '</pre>';
+
+
+$maxnumber  = count($arrayAccidentMetaData);
+
+foreach ($arrayAccidentMetaData as $arrayAccidentMetaDataSingle) {
+	if (dol_strlen($arrayAccidentMetaDataSingle) > 0 ) {
+		$counter += 1;
+	}
+}
 
 // Object metadata
 // ------------------------------------------------------------
@@ -265,7 +282,7 @@ $project->fetch($object->fk_project);
 $morehtmlref .= $langs->trans('Project') . ' : ' . getNomUrlProject($project, 1, 'blank');
 $morehtmlref .= '</div>';
 
-//include_once './core/tpl/digiriskdolibarr_configuration_gauge_view.tpl.php';
+include_once './../../core/tpl/digiriskdolibarr_configuration_gauge_view.tpl.php';
 
 $morehtmlleft = '<div class="floatleft inline-block valignmiddle divphotoref">' . digirisk_show_photos('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/' . $object->element, 'small', 5, 0, 0, 0, $width, 0, 0, 0, 0, $object->element, $object) . '</div>';
 
