@@ -1125,7 +1125,7 @@ window.eoxiaJS.mediaGallery.event = function() {
 	// Photos
 	$( document ).on( 'click', '.clickable-photo', window.eoxiaJS.mediaGallery.selectPhoto );
 	$( document ).on( 'click', '.save-photo', window.eoxiaJS.mediaGallery.savePhoto );
-	$( document ).on( 'click', '.modal-content .formattachnewfile .button', window.eoxiaJS.mediaGallery.sendPhoto );
+	$( document ).on( 'change', '.flat.minwidth400.maxwidth200onsmartphone', window.eoxiaJS.mediaGallery.sendPhoto );
 	$( document ).on( 'click', '.clicked-photo-preview', window.eoxiaJS.mediaGallery.previewPhoto );
 	$( document ).on( 'input', '.form-element #search_in_gallery', window.eoxiaJS.mediaGallery.handleSearch );
 	$( document ).on( 'click', '.media-gallery-unlink', window.eoxiaJS.mediaGallery.unlinkFile );
@@ -1161,7 +1161,7 @@ window.eoxiaJS.mediaGallery.selectPhoto = function( event ) {
 };
 
 /**
- * Action save photo.
+ * Action save photo to an object.
  *
  * @since   8.2.0
  * @version 9.0.0
