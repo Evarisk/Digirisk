@@ -1301,17 +1301,19 @@ window.eoxiaJS.mediaGallery.handleSearch = function( event ) {
 window.eoxiaJS.mediaGallery.sendPhoto = function( event ) {
 
 	event.preventDefault()
-	let element  = $(this).closest('.nowrap');
-	let files    = element.find("input[name='userfile[]']").prop("files");
+	let files    = $(this).prop("files");
 	let formdata = new FormData();
 	let elementParent = $(this).closest('.modal-container').find('.ecm-photo-list-content');
 	let actionContainerSuccess = $('.messageSuccessSendPhoto');
 	let actionContainerError = $('.messageErrorSendPhoto');
 	window.eoxiaJS.loader.display($('#media_gallery').find('.modal-content'));
-
 	$.each(files, function(index, file) {
+		console.log(file)
 		formdata.append("userfile[]", file);
+		console.log(formdata)
+
 	})
+
 	$.ajax({
 		url: document.URL + "&action=uploadPhoto",
 		type: "POST",
@@ -1319,6 +1321,8 @@ window.eoxiaJS.mediaGallery.sendPhoto = function( event ) {
 		processData: false,
 		contentType: false,
 		success: function ( resp ) {
+			console.log(document.URL)
+
 			$('.wpeo-loader').removeClass('wpeo-loader')
 			window.eoxiaJS.loader.display(elementParent);
 			elementParent.load( document.URL + ' .ecm-photo-list');

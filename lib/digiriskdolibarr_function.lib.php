@@ -742,7 +742,6 @@ function display_recurse_tree($results)
 		$digiriskelement->fetch($digiriskelement_id);
 		$digiriskelement->photo = $filename;
 		$digiriskelement->update($user, true);
-		exit;
 	}
 
 	if ( ! $error && $action == "unlinkDigiriskElementFile") {

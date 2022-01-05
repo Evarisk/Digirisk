@@ -1,3 +1,31 @@
+<?php
+if ( ! $error && $action == "uploadPhoto" && ! empty($conf->global->MAIN_UPLOAD_DOC)) {
+	// Define relativepath and upload_dir
+	$relativepath                                             = 'digiriskdolibarr/medias';
+	$upload_dir                                               = $conf->ecm->dir_output . '/' . $relativepath;
+	if (is_array($_FILES['userfile']['tmp_name'])) $userfiles = $_FILES['userfile']['tmp_name'];
+	else $userfiles                                           = array($_FILES['userfile']['tmp_name']);
+
+
+	foreach ($userfiles as $key => $userfile) {
+		if (empty($_FILES['userfile']['tmp_name'][$key])) {
+			$error++;
+			if ($_FILES['userfile']['error'][$key] == 1 || $_FILES['userfile']['error'][$key] == 2) {
+				setEventMessages($langs->trans('ErrorFileSizeTooLarge'), null, 'errors');
+			} else {
+				setEventMessages($langs->trans("ErrorFieldRequired", $langs->transnoentitiesnoconv("File")), null, 'errors');
+			}
+		}
+	}
+	if ( ! $error) {
+		$generatethumbs = 1;
+		$res            = dol_add_file_process($upload_dir, 0, 1, 'userfile', '', null, '', $generatethumbs);
+		if ($res > 0) {
+			$result = $ecmdir->changeNbOfFiles('+');
+		}
+	}
+}
+?>
 <!-- START MEDIA GALLERY MODAL -->
 <div class="wpeo-modal modal-photo" id="media_gallery" data-id="<?php echo $object->id ?>">
 	<div class="modal-container wpeo-modal-event">
@@ -30,9 +58,11 @@
 				$sectiondir = GETPOST('file', 'alpha') ? GETPOST('file', 'alpha') : GETPOST('section_dir', 'alpha');
 				print '<!-- Start form to attach new file in digiriskdolibarr_photo_view.tpl.tpl.php sectionid=' . $section . ' sectiondir=' . $sectiondir . ' -->' . "\n";
 				include_once DOL_DOCUMENT_ROOT . '/core/class/html.formfile.class.php';
-				$formfile = new FormFile($db);
-				$formfile->form_attach_new_file($_SERVER["PHP_SELF"], 'none', 0, 0, 1, 48, null, '', 0, '', 0, $nameforformuserfile, '', $sectiondir, 1);
-			} else print '&nbsp;';
+				print '<strong>' . $langs->trans('AddFile') . '</strong>'
+				?>
+
+				<input type="file" id="add_media_to_gallery" class="flat minwidth400 maxwidth200onsmartphone" name="userfile[]" multiple accept>
+			<?php } else print '&nbsp;';
 			// End "Add new file" area
 			?>
 			<div class="underbanner clearboth"></div>
