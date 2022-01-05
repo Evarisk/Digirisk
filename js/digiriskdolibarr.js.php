@@ -3333,7 +3333,7 @@ window.eoxiaJS.menu.toggleMenu = function() {
 		});
 
 		var elementText = $(this).find('.minimizeMenu').html().split(' ');
-		$(this).find('.minimizeMenu').html(elementText[0]+' '+elementText[1]+' '+elementText[2]);
+		$(this).find('.minimizeMenu').html(elementText[0]+' '+elementText[1]+' '+elementText[2]+' >');
 
 		elementParent.css('width', '30px');
 		elementParent.find('.blockvmenusearch').hide();
