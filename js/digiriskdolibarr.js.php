@@ -1445,6 +1445,8 @@ window.eoxiaJS.mediaGallery.unlinkFile = function( event ) {
 window.eoxiaJS.mediaGallery.addToFavorite = function( event ) {
 
 	event.preventDefault()
+	var params = new window.URLSearchParams(window.location.search);
+	var id = window.location.search.split(/id=/)[1]
 	let element_linked_id = $(this).find('.element-linked-id').val()
 	let filename = $(this).find('.filename').val()
 	let querySeparator = '?'
@@ -1503,7 +1505,7 @@ window.eoxiaJS.mediaGallery.addToFavorite = function( event ) {
 
 		let previousName = previousPhoto[0].src.trim().split(/thumbs%2F/)[1].split(/"/)[0]
 
-		$.ajax({
+		jQuery.ajax({
 			url: document.URL + querySeparator + "action=addDigiriskElementPhotoToFavorite",
 			type: "POST",
 			data: JSON.stringify({
@@ -1511,8 +1513,18 @@ window.eoxiaJS.mediaGallery.addToFavorite = function( event ) {
 				filename: filename,
 			}),
 			processData: false,
-			success: function ( ) {
+			success: function ( resp ) {
 				let newPhoto = ''
+				console.log(id)
+				console.log(element_linked_id)
+				if (id === element_linked_id) {
+					console.log($('.arearef.heightref.valignmiddle.centpercent'))
+					console.log($(resp).find('.arearef.heightref.valignmiddle.centpercent'))
+					console.log(resp)
+
+					//$('.arearef.heightref.valignmiddle.centpercent').html($(resp).find('.arearef.heightref.valignmiddle.centpercent'))
+					$('.arearef.heightref.valignmiddle.centpercent').load(' .arearef.heightref.valignmiddle.centpercent')
+				}
 				if (previousName.length > 0 ) {
 					newPhoto = previousPhoto[0].src.trim().replace(previousName , filename.replace(/\./, '_small.'))
 				} else {
