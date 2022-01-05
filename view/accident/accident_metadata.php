@@ -385,7 +385,7 @@ if (($id || $ref) && $action == 'edit') {
 	print '</td>';
 	print '<td>';
 	//For external user force the company to user company
-	if (!empty($user->socid)) {
+	if ( ! empty($user->socid)) {
 		print $form->select_company($user->socid, 'fk_soc_responsible', '', 1, 1, 0, '', 0, 'minwidth300');
 	} else {
 		print $form->select_company($accidentmetadata->fk_soc_responsible, 'fk_soc_responsible', '', 'SelectThirdParty', 1, 0, '', 0, 'minwidth300');
@@ -399,7 +399,7 @@ if (($id || $ref) && $action == 'edit') {
 	print '</td>';
 	print '<td>';
 	//For external user force the company to user company
-	if (!empty($user->socid)) {
+	if ( ! empty($user->socid)) {
 		print $form->select_company($user->socid, 'fk_soc_responsible_insurance_society', '', 1, 1, 0, '', 0, 'minwidth300');
 	} else {
 		print $form->select_company($accidentmetadata->fk_soc_responsible_insurance_society, 'fk_soc_responsible_insurance_society', '', 'SelectThirdParty', 1, 0, '', 0, 'minwidth300');
@@ -441,10 +441,10 @@ if (($id || $ref) && $action == 'edit') {
 if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	$counter = 0;
 
-	$morecssGauge = 'inline-block floatright';
+	$morecssGauge     = 'inline-block floatright';
 	$move_title_gauge = 1;
 
-	$arrayAccidentMetaData = array();
+	$arrayAccidentMetaData   = array();
 	$arrayAccidentMetaData[] = ($accidentmetadata->relative_location == '-1' ? '' : $accidentmetadata->relative_location);
 	$arrayAccidentMetaData[] = $accidentmetadata->victim_activity;
 	$arrayAccidentMetaData[] = $accidentmetadata->accident_nature;
@@ -497,7 +497,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	print dol_get_fiche_head($head, 'accidentMetadata', $title, -1, "digiriskdolibarr@digiriskdolibarr");
 
 	dol_strlen($object->label) ? $morehtmlref = '<span>' . ' - ' . $object->label . '</span>' : '';
-	$morehtmlref .= '<div class="refidno">';
+	$morehtmlref                             .= '<div class="refidno">';
 	// Project
 	$project->fetch($object->fk_project);
 	$morehtmlref .= $langs->trans('Project') . ' : ' . getNomUrlProject($project, 1, 'blank');
@@ -557,7 +557,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 
 	$thirdparty->fetch($object->fk_soc_responsible);
 	if ($thirdparty > 0) {
-		$object->fk_soc_responsible =  getNomUrlSociety($thirdparty, 1, 'blank');
+		$object->fk_soc_responsible = getNomUrlSociety($thirdparty, 1, 'blank');
 	}
 
 	$thirdparty->fetch($object->fk_soc_responsible_insurance_society);
@@ -576,11 +576,11 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	// Buttons for actions
 	print '<div class="tabsAction" >';
 	$parameters = array();
-	$reshook = $hookmanager->executeHooks('addMoreActionsButtons', $parameters, $object, $action); // Note that $action and $object may have been modified by hook
+	$reshook    = $hookmanager->executeHooks('addMoreActionsButtons', $parameters, $object, $action); // Note that $action and $object may have been modified by hook
 	if ($reshook < 0) setEventMessages($hookmanager->error, $hookmanager->errors, 'errors');
 
 	if (empty($reshook)) {
-		print '<a class="butAction" id="actionButtonEdit" href="' . $_SERVER["PHP_SELF"] . '?id=' . $id . '&action=edit'.'">' . $langs->trans("Modify") . '</a>';
+		print '<a class="butAction" id="actionButtonEdit" href="' . $_SERVER["PHP_SELF"] . '?id=' . $id . '&action=edit' . '">' . $langs->trans("Modify") . '</a>';
 	}
 	print '</div>';
 }

@@ -224,8 +224,8 @@ if ($object->id > 0) {
 
 	// Object card
 	// ------------------------------------------------------------
-	$width  = 80;
-	$height = 80;
+	$width                                    = 80;
+	$height                                   = 80;
 	dol_strlen($object->label) ? $morehtmlref = ' - ' . $object->label : '';
 	$morehtmlref                             .= '<div class="refidno">';
 	// ParentElement
@@ -311,10 +311,10 @@ if ($object->id > 0) {
 	// Add where from extra fields
 	include DOL_DOCUMENT_ROOT . '/core/tpl/extrafields_list_search_sql.tpl.php';
 	// Add where from hooks
-	$parameters = array();
-	$reshook    = $hookmanager->executeHooks('printFieldListWhere', $parameters, $evaluator); // Note that $action and $evaluator may have been modified by hook
-	$sql       .= $hookmanager->resPrint;
-	$sql       .= $db->order($sortfield, $sortorder);
+	$parameters       = array();
+	$reshook          = $hookmanager->executeHooks('printFieldListWhere', $parameters, $evaluator); // Note that $action and $evaluator may have been modified by hook
+	$sql             .= $hookmanager->resPrint;
+	$sql             .= $db->order($sortfield, $sortorder);
 	if ($limit) $sql .= $db->plimit($limit + 1, $offset);
 
 	// Count total nb of records
@@ -332,7 +332,6 @@ if ($object->id > 0) {
 	if (is_numeric($nbtotalofrecords) && ($limit > $nbtotalofrecords || empty($limit))) {
 		$num = $nbtotalofrecords;
 	} else {
-
 		$resql = $db->query($sql);
 		if ( ! $resql) {
 			dol_print_error($db);

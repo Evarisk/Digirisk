@@ -144,8 +144,8 @@ class AccidentUnitTest extends PHPUnit\Framework\TestCase
 
 		$localobject = new Accident($this->savdb);
 
-		$now                            = dol_now();
-		$localobject->id                = 0;
+		$now             = dol_now();
+		$localobject->id = 0;
 		//$localobject->ref             = $refAccidentMod->getNextValue($localobject);
 		$localobject->ref               = "TestRefAccident";
 		$localobject->ref_ext           = "TestRefExtAccident";
@@ -248,7 +248,7 @@ class AccidentUnitTest extends PHPUnit\Framework\TestCase
 		$langs = $this->savlangs;
 		$db    = $this->savdb;
 
-		$now                            = dol_now();
+		$now = dol_now();
 		//$localobject->ref             = $refAccidentMod->getNextValue($localobject);
 		$localobject->ref               = "UpdatedTestRefAccident";
 		$localobject->ref_ext           = "UpdatedTestRefExtAccident";
@@ -447,8 +447,8 @@ class AccidentUnitTest extends PHPUnit\Framework\TestCase
 
 		$localobjectline = new AccidentLesion($this->savdb);
 
-		$now                                  = dol_now();
-		$localobjectline->id                  = 0;
+		$now                 = dol_now();
+		$localobjectline->id = 0;
 		//$localobjectline->ref               = $refAccidentPlanMod->getNextValue($localobjectline);
 		$localobjectline->ref                 = "TestRefAccidentLesion";
 		$localobjectline->entity              = 1;
@@ -545,31 +545,31 @@ class AccidentUnitTest extends PHPUnit\Framework\TestCase
 		return $localobjectline;
 	}
 
-//	/**
-//	 * testAccidentFetchLines
-//	 *
-//	 * @param   Accident $localobject Accident object
-//	 * @return  void
-//	 *
-//	 * @covers  Accident::fetchLines
-//	 *
-//	 * @depends testAccidentFetch
-//	 * The depends says test is run only if previous is ok
-//	 */
-//	public function testAccidentFetchLines($localobject) : void
-//	{
-//		global $conf, $user, $langs, $db;
-//		$conf  = $this->savconf;
-//		$user  = $this->savuser;
-//		$langs = $this->savlangs;
-//		$db    = $this->savdb;
-//
-//		$result = $localobject->fetchLines();
-//
-//		$this->assertLessThan($result, 0);
-//
-//		print __METHOD__ . " id=" . $localobject->id . " result=" . $result . "\n";
-//	}
+	//  /**
+	//   * testAccidentFetchLines
+	//   *
+	//   * @param   Accident $localobject Accident object
+	//   * @return  void
+	//   *
+	//   * @covers  Accident::fetchLines
+	//   *
+	//   * @depends testAccidentFetch
+	//   * The depends says test is run only if previous is ok
+	//   */
+	//  public function testAccidentFetchLines($localobject) : void
+	//  {
+	//      global $conf, $user, $langs, $db;
+	//      $conf  = $this->savconf;
+	//      $user  = $this->savuser;
+	//      $langs = $this->savlangs;
+	//      $db    = $this->savdb;
+	//
+	//      $result = $localobject->fetchLines();
+	//
+	//      $this->assertLessThan($result, 0);
+	//
+	//      print __METHOD__ . " id=" . $localobject->id . " result=" . $result . "\n";
+	//  }
 
 	/**
 	 * testAccidentMetaDataCreate

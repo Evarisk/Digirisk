@@ -776,13 +776,13 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	$head = accidentPrepareHead($object);
 	print dol_get_fiche_head($head, 'accidentCard', $title, -1, "digiriskdolibarr@digiriskdolibarr");
 
-	dol_strlen($object->label) ? $morehtmlref = '<span>' . ' - ' . $object->label  . '</span>' : '';
+	dol_strlen($object->label) ? $morehtmlref = '<span>' . ' - ' . $object->label . '</span>' : '';
 	$morehtmlref                             .= '<div class="refidno">';
 	// Project
 	$project->fetch($object->fk_project);
 	$morehtmlref .= $langs->trans('Project') . ' : ' . getNomUrlProject($project, 1, 'blank');
 	//Number workstop days
-	$accidentlines = $objectline->fetchAll($object->id);
+	$accidentlines     = $objectline->fetchAll($object->id);
 	$totalworkstopdays = 0;
 
 	if ( ! empty($accidentlines) && $accidentlines > 0) {
