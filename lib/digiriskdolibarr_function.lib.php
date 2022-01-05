@@ -136,7 +136,7 @@ function digirisk_show_photos($modulepart, $sdir, $size = 0, $nbmax = 0, $nbbyro
 					} else {
 						if ($photo_vignette && $imgarray['height'] > $maxHeight) {
 							$return .= '<!-- Show thumb -->';
-							$return .= '<img class="photo clicked-photo-preview ' . (($file == $object->photo) ? 'favorite-photo' : '') . '"  height="' . $maxHeight . '" width="' . $maxWidth . '" src="' . DOL_URL_ROOT . '/viewimage.php?modulepart=' . $modulepart . '&entity=' . $conf->entity . '&file=' . urlencode($pdirthumb . $photo_vignette) . '" title="' . dol_escape_htmltag($alt) . '">';
+							$return .= '<img class="photo clicked-photo-preview ' . (($file == $object->photo && $object->element == 'digiriskelement') ? 'favorite-photo' : '') . '"  height="' . $maxHeight . '" width="' . $maxWidth . '" src="' . DOL_URL_ROOT . '/viewimage.php?modulepart=' . $modulepart . '&entity=' . $conf->entity . '&file=' . urlencode($pdirthumb . $photo_vignette) . '" title="' . dol_escape_htmltag($alt) . '">';
 						} else {
 							$return .= '<!-- Show original file -->';
 							$return .= '<img class="photo photowithmargin clicked-photo-preview" height="' . $maxHeight . '" width="' . $maxWidth . '" src="' . DOL_URL_ROOT . '/viewimage.php?modulepart=' . $modulepart . '&entity=' . $conf->entity . '&file=' . urlencode($pdir . $photo) . '" title="' . dol_escape_htmltag($alt) . '">';
