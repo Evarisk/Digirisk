@@ -518,10 +518,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 
 	$object = $accidentmetadata;
 
-	$object->workhours_morning_date_start   = dol_print_date($object->workhours_morning_date_start, 'hour');
-	$object->workhours_morning_date_end     = dol_print_date($object->workhours_morning_date_end, 'hour');
-	$object->workhours_afternoon_date_start = dol_print_date($object->workhours_afternoon_date_start, 'hour');
-	$object->workhours_afternoon_date_end   = dol_print_date($object->workhours_afternoon_date_end, 'hour');
+	$object->relative_location = (($object->relative_location > 0) ? $object->relative_location : '');
 
 	//Accident Noticed
 	if ($object->accident_noticed == 0) {
@@ -576,18 +573,16 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 
 	print dol_get_fiche_end();
 
-	if ($object->id > 0) {
-		// Buttons for actions
-		print '<div class="tabsAction" >';
-		$parameters = array();
-		$reshook = $hookmanager->executeHooks('addMoreActionsButtons', $parameters, $object, $action); // Note that $action and $object may have been modified by hook
-		if ($reshook < 0) setEventMessages($hookmanager->error, $hookmanager->errors, 'errors');
+	// Buttons for actions
+	print '<div class="tabsAction" >';
+	$parameters = array();
+	$reshook = $hookmanager->executeHooks('addMoreActionsButtons', $parameters, $object, $action); // Note that $action and $object may have been modified by hook
+	if ($reshook < 0) setEventMessages($hookmanager->error, $hookmanager->errors, 'errors');
 
-		if (empty($reshook)) {
-			print '<a class="' . ($object->status == 1 ? 'butAction' : 'butActionRefused classfortooltip') . '" id="actionButtonEdit" title="' . ($object->status == 1 ? '' : dol_escape_htmltag($langs->trans("AccidentMustBeInProgress"))) . '" href="' . ($object->status == 1 ? ($_SERVER["PHP_SELF"] . '?id=' . $object->fk_accident . '&action=edit') : '#') . '">' . $langs->trans("Modify") . '</a>';
-		}
-		print '</div>';
+	if (empty($reshook)) {
+		print '<a class="butAction" id="actionButtonEdit" href="' . $_SERVER["PHP_SELF"] . '?id=' . $id . '&action=edit'.'">' . $langs->trans("Modify") . '</a>';
 	}
+	print '</div>';
 }
 
 // End of page
