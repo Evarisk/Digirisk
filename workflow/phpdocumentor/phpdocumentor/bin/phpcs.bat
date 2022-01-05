@@ -1,4 +1,0 @@
-@ECHO OFF
-setlocal DISABLEDELAYEDEXPANSION
-SET BIN_TARGET=%~dp0/phpcs
-php "%BIN_TARGET%" %*
