@@ -1013,7 +1013,7 @@
 											<input type="hidden" class="current-element-ref" value="<?php echo $objecttmp->ref; ?>">
 											<?php print $objecttmp->select_digiriskelement_list($objecttmp->id,  'socid',  '',  '1',  0, 0, array(), '', 0, 0, 'disabled', '', false, 1); ?>
 										<?php else : ?>
-											<?php print '<span class="opacitymedium">' . $langs->trans("SetConfToMoveRisk") . "</span><br>\n"; ?>
+											<?php print '<span class="opacitymedium">' . '<a href=' . '"../../../digiriskdolibarr/admin/config/riskassessmentdocument.php" target="_blank">' . $langs->trans('SetConfToMoveRisk') . '</a>' . "</span><br>\n"; ?>
 										<?php endif; ?>
 									</div>
 								</div>
