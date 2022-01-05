@@ -1362,7 +1362,7 @@ function llxHeaderTicketDigirisk($title, $head = "", $disablejs = 0, $disablehea
 	}
 }
 
-function digirisk_show_medias($modulepart = 'ecm', $sdir, $size = 0, $nbmax = 0, $nbbyrow = 5, $showfilename = 0, $showaction = 0, $maxHeight = 120, $maxWidth = 160, $nolink = 0, $notitle = 0, $usesharelink = 0, $subdir = "")
+function digirisk_show_medias($modulepart = 'ecm', $sdir, $size = 0, $nbmax = 0, $nbbyrow = 5, $showfilename = 0, $showaction = 0, $maxHeight = 80, $maxWidth = 80, $nolink = 0, $notitle = 0, $usesharelink = 0, $subdir = "")
 {
 	global $conf, $user, $langs;
 
@@ -1406,7 +1406,7 @@ function digirisk_show_medias($modulepart = 'ecm', $sdir, $size = 0, $nbmax = 0,
 								<?php if (image_format_supported($val['name']) >= 0) : ?>
 									<?php $fullpath = $path . '/' . $val['relativename'] . '&entity=' . $conf->entity; ?>
 								<input class="filename" type="hidden" value="<?php echo preg_replace('/_' . $size . '/', '', $val['name']) ?>">
-								<img class="photo photo<?php echo $j ?> maxwidth50" src="<?php echo $fullpath; ?>">
+								<img class="photo photo<?php echo $j ?>" height="<?php echo $maxHeight; ?>" width="<?php echo $maxWidth; ?>" src="<?php echo $fullpath; ?>">
 								<?php endif; ?>
 							</figure>
 							<div class="title"><?php echo preg_replace('/_' . $size . '/', '', $val['name']); ?></div>
