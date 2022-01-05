@@ -701,9 +701,6 @@ window.eoxiaJS.dropdown.toggleAngleClass = function( button ) {
  * @copyright 2015-2018 Eoxia
  */
 
-/*
-
- */
 if ( ! window.eoxiaJS.tooltip ) {
 
 	/**
@@ -941,12 +938,28 @@ window.eoxiaJS.signature.init = function() {
 	window.eoxiaJS.signature.event();
 };
 
+/**
+ * La méthode contenant tous les événements pour la signature.
+ *
+ * @since   9.0.0
+ * @version 9.0.0
+ *
+ * @return {void}
+ */
 window.eoxiaJS.signature.event = function() {
 	$( document ).on( 'click', '.signature-erase', window.eoxiaJS.signature.clearCanvas );
 	$( document ).on( 'click', '.signature-validate', window.eoxiaJS.signature.createSignature );
 	$( document ).on( 'click', '.auto-download', window.eoxiaJS.signature.autoDownloadSpecimen );
 };
 
+/**
+ * Open modal signature
+ *
+ * @since   9.0.0
+ * @version 9.0.0
+ *
+ * @return {void}
+ */
 window.eoxiaJS.signature.modalSignatureOpened = function( triggeredElement ) {
 	window.eoxiaJS.signature.buttonSignature = triggeredElement;
 
@@ -967,11 +980,27 @@ window.eoxiaJS.signature.modalSignatureOpened = function( triggeredElement ) {
 	window.eoxiaJS.signature.canvas.signaturePad.fromDataURL(signature_data);
 };
 
+/**
+ * Action Clear sign
+ *
+ * @since   9.0.0
+ * @version 9.0.0
+ *
+ * @return {void}
+ */
 window.eoxiaJS.signature.clearCanvas = function( event ) {
 	var canvas = $( this ).closest( '.modal-signature' ).find( 'canvas' );
 	canvas[0].signaturePad.clear();
 };
 
+/**
+ * Action create signature
+ *
+ * @since   9.0.0
+ * @version 9.0.0
+ *
+ * @return {void}
+ */
 window.eoxiaJS.signature.createSignature = function() {
 	let elementSignatory = $(this).attr('value');
 	let elementRedirect  = $(this).find('#redirect' + elementSignatory).attr('value');
@@ -1016,6 +1045,14 @@ window.eoxiaJS.signature.createSignature = function() {
 	});
 };
 
+/**
+ * Download signature
+ *
+ * @since   9.0.0
+ * @version 9.0.0
+ *
+ * @return {void}
+ */
 window.eoxiaJS.signature.download = function(fileUrl, filename) {
 	var a = document.createElement("a");
 	a.href = fileUrl;
@@ -1023,6 +1060,14 @@ window.eoxiaJS.signature.download = function(fileUrl, filename) {
 	a.click();
 }
 
+/**
+ * Auto Download signature specimen
+ *
+ * @since   9.0.0
+ * @version 9.0.0
+ *
+ * @return {void}
+ */
 window.eoxiaJS.signature.autoDownloadSpecimen = function( event ) {
 	let element = $(this).closest('.file-generation')
 	let url = document.URL + '&action=builddoc'
@@ -1567,6 +1612,15 @@ window.eoxiaJS.risk.haveDataInInput = function( elementParent ) {
 		}
 	}
 };
+
+/**
+ * Sanitize request before send.
+ *
+ * @since   1.0.0
+ * @version 9.0.0
+ *
+ * @return {void}
+ */
 window.eoxiaJS.risk.sanitizeBeforeRequest = function ( text ) {
 	if (typeof text == 'string') {
 		if (text.match(/"/)) {
@@ -1575,6 +1629,7 @@ window.eoxiaJS.risk.sanitizeBeforeRequest = function ( text ) {
 	}
 	return text
 }
+
 /**
  * Action create risk.
  *
@@ -2237,8 +2292,6 @@ window.eoxiaJS.riskassessmenttask.fillRiskAssessmentTaskLabel = function( event 
 	window.eoxiaJS.riskassessmenttask.haveDataInInput(elementParent);
 };
 
-
-
 /**
  * Check value on riskAssessmentTask.
  *
@@ -2650,6 +2703,7 @@ window.eoxiaJS.evaluator.event = function() {
 window.eoxiaJS.evaluator.selectUser = function( event ) {
 	$(this).closest('.evaluator-user').find('.user-selected').val(this.value)
 };
+
 /**
  * Action create evaluator.
  *
@@ -2775,7 +2829,6 @@ window.eoxiaJS.digiriskusers.removeDiacritics = function( input ) {
 
 	return output;
 };
-
 
 /**
  * Initialise l'objet "notice" ainsi que la méthode "init" obligatoire pour la bibliothèque EoxiaJS.
@@ -2960,7 +3013,6 @@ window.eoxiaJS.ticket.selectPertinence = function( ) {
  *
  * @return {void}
  */
-
 window.eoxiaJS.ticket.getPertinence = function(  ) {
 	return $('.ticketpublicarea').find("#pertinence").val()
 };
@@ -2973,7 +3025,6 @@ window.eoxiaJS.ticket.getPertinence = function(  ) {
  *
  * @return {void}
  */
-
 window.eoxiaJS.ticket.tmpStockFile = function( ) {
 	event.preventDefault()
 
@@ -3004,7 +3055,6 @@ window.eoxiaJS.ticket.tmpStockFile = function( ) {
  *
  * @return {void}
  */
-
 window.eoxiaJS.ticket.removeFile = function( event ) {
 	let filetodelete = $(this).attr('value');
 	filetodelete = filetodelete.replace('_mini', '')
@@ -3051,6 +3101,14 @@ window.eoxiaJS.preventionplan.event = function() {
 	$( document ).on( 'click', '#prior_visit_bool', window.eoxiaJS.preventionplan.showDateAndText );
 };
 
+/**
+ * Show date and text for prevention plan prior visit.
+ *
+ * @since   1.0.0
+ * @version 9.0.0
+ *
+ * @return {void}
+ */
 window.eoxiaJS.preventionplan.showDateAndText = function() {
 	let dateField = $(this).closest('.preventionplan-table').find('.prior_visit_date_field')
 	let textField = $(this).closest('.preventionplan-table').find('.prior_visit_text_field')
@@ -3068,7 +3126,6 @@ window.eoxiaJS.preventionplan.showDateAndText = function() {
 	}
 
 };
-
 
 /**
  * Initialise l'objet "signature" ainsi que la méthode "init" obligatoire pour la bibliothèque EoxiaJS.
@@ -3106,11 +3163,27 @@ window.eoxiaJS.document.init = function() {
 	window.eoxiaJS.document.event();
 };
 
+/**
+ * La méthode contenant tous les événements pour les documents.
+ *
+ * @since   1.1.0
+ * @version 1.1.0
+ *
+ * @return {void}
+ */
 window.eoxiaJS.document.event = function() {
 	$( document ).on( 'click', '#builddoc_generatebutton', window.eoxiaJS.document.displayLoader );
 	$( document ).on( 'click', ' .send-risk-assessment-document-by-mail', window.eoxiaJS.document.displayLoader );
 };
 
+/**
+ * Display loader on generation document.
+ *
+ * @since   1.1.0
+ * @version 1.1.0
+ *
+ * @return {void}
+ */
 window.eoxiaJS.document.displayLoader = function(  ) {
 	window.eoxiaJS.loader.display($('#builddoc_generatebutton'));
 	window.eoxiaJS.loader.display($('.tabBar'));
@@ -3189,7 +3262,6 @@ window.eoxiaJS.keyEvent.checkUrlFormat = function( event ) {
 		$(this).attr('style', 'border: solid; border-color: red')
 	}
 };
-
 
 /**
  * Initialise l'objet "menu" ainsi que la méthode "init" obligatoire pour la bibliothèque EoxiaJS.
@@ -3312,7 +3384,6 @@ window.eoxiaJS.menu.setMenu = function() {
 	}
 };
 
-
 /**
  * Initialise l'objet "accident" ainsi que la méthode "init" obligatoire pour la bibliothèque EoxiaJS.
  *
@@ -3406,6 +3477,14 @@ window.eoxiaJS.accident.removeFile = function( event ) {
 	});
 };
 
+/**
+ * Show external Accident location.
+ *
+ * @since   1.1.0
+ * @version 1.1.0
+ *
+ * @return {void}
+ */
 window.eoxiaJS.accident.showExternalAccidentLocation = function() {
 	let fkElementField = $(this).closest('.accident-table').find('.fk_element_field')
 	let fkSocField = $(this).closest('.accident-table').find('.fk_soc_field')
