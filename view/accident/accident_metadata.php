@@ -278,7 +278,7 @@ if (($id || $ref) && $action == 'edit') {
 
 	//AccidentNatureDoubtLink
 	print '<tr><td class="minwidth400">' . img_picto('', 'globe') . ' ' . $langs->trans("AccidentNatureDoubtLink") . '</td><td>';
-	print '<input type="text" class="minwidth400" name="accident_nature_doubt_link" id="accident_nature_doubt_link" value="' . $accidentmetadata->accident_nature_doubt_link . '">';
+	print '<input type="text" class="minwidth400 url-container" name="accident_nature_doubt_link" id="accident_nature_doubt_link" value="' . $accidentmetadata->accident_nature_doubt_link . '">';
 	print '</td></tr>';
 
 	print '<tr></tr>';
