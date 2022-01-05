@@ -30,5 +30,5 @@ CREATE TABLE llx_digiriskdolibarr_digiriskelement(
 	fk_user_modif integer,
 	fk_parent     integer DEFAULT 0 NOT NULL,
     fk_standard   integer DEFAULT 1 NOT NULL,
-    rank          integer
+    `rank`        integer
 ) ENGINE=innodb;
