@@ -402,7 +402,7 @@ if ((empty($action) || ($action != 'edit' && $action != 'create'))) {
 
 	// Object card
 	// ------------------------------------------------------------
-	$width = 80; $cssclass = 'photoref';
+	$width = 80; $height = 80; $cssclass = 'photoref';
 
 	dol_strlen($object->label) ? $morehtmlref = ' - ' . $object->label : '';
 	$morehtmlref                             .= '<div class="refidno">';
@@ -419,9 +419,9 @@ if ((empty($action) || ($action != 'edit' && $action != 'create'))) {
 	}
 	$morehtmlref .= '</div>';
 	if (isset($object->element_type)) {
-		$morehtmlleft = '<div class="floatleft inline-block valignmiddle divphotoref">' . digirisk_show_photos('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/' . $object->element_type, 'small', 5, 0, 0, 0, $width, 0, 0, 0, 0, $object->element_type, $object) . '</div>';
+		$morehtmlleft = '<div class="floatleft inline-block valignmiddle divphotoref">' . digirisk_show_photos('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/' . $object->element_type, 'small', 5, 0, 0, 0, $height, $width, 0, 0, 0, $object->element_type, $object) . '</div>';
 	} else {
-		$morehtmlleft = '<div class="floatleft inline-block valignmiddle divphotoref">' . digirisk_show_photos('mycompany', $conf->mycompany->dir_output . '/logos', 'small', 5, 0, 0, 0, $width, 0, 0, 0, 0, 'logos', $emptyobject) . '</div>';
+		$morehtmlleft = '<div class="floatleft inline-block valignmiddle divphotoref">' . digirisk_show_photos('mycompany', $conf->mycompany->dir_output . '/logos', 'small', 5, 0, 0, 0, $height, $width, 0, 0, 0, 'logos', $emptyobject) . '</div>';
 	}
 
 	digirisk_banner_tab($object, 'ref', '', 0, 'ref', 'ref', $morehtmlref, '', 0, $morehtmlleft);

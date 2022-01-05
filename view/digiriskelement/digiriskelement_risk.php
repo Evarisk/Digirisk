@@ -202,6 +202,7 @@ if ($object->id > 0) {
 
 	// Object card
 	// ------------------------------------------------------------
+	$height                                   = 80;
 	$width                                    = 80;
 	dol_strlen($object->label) ? $morehtmlref = ' - ' . $object->label : '';
 	$morehtmlref                             .= '<div class="refidno">';
@@ -217,7 +218,7 @@ if ($object->id > 0) {
 		$morehtmlref .= '<br>' . $langs->trans("ParentElement") . ' : ' . $digiriskstandard->getNomUrl(1, 'blank', 1);
 	}
 	$morehtmlref .= '</div>';
-	$morehtmlleft = '<div class="floatleft inline-block valignmiddle divphotoref">' . digirisk_show_photos('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/' . $object->element_type, 'small', 5, 0, 0, 0, $width, 0, 0, 0, 0, $object->element_type, $object) . '</div>';
+	$morehtmlleft = '<div class="floatleft inline-block valignmiddle divphotoref">' . digirisk_show_photos('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/' . $object->element_type, 'small', 5, 0, 0, 0, $height, $width, 0, 0, 0, $object->element_type, $object) . '</div>';
 	digirisk_banner_tab($object, 'ref', '', 0, 'ref', 'ref', $morehtmlref, '', 0, $morehtmlleft);
 
 	require_once './../../core/tpl/digiriskdolibarr_risklist_view.tpl.php';
