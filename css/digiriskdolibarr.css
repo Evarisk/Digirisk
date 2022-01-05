@@ -2194,8 +2194,6 @@
 .page-ut-gp-list .side-nav .workunit-list .unit-container .divphotoref .photo {
   -o-object-fit: cover;
   object-fit: cover;
-  width: 100%;
-  height: 100%;
   margin: 0;
 }
 .page-ut-gp-list .side-nav .workunit-list .unit-container .title {
