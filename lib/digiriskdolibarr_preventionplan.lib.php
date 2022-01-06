@@ -33,7 +33,7 @@ function preventionplanPrepareHead($object)
 
 	$langs->load("digiriskdolibarr@digiriskdolibarr");
 
-	$h = 0;
+	$h    = 0;
 	$head = array();
 
 	if ($user->rights->digiriskdolibarr->preventionplan->read) {
@@ -56,7 +56,6 @@ function preventionplanPrepareHead($object)
 		$head[$h][1] = '<i class="fas fa-file-signature"></i> ' . $langs->trans("Attendants");
 		$head[$h][2] = 'preventionplanAttendants';
 		$h++;
-
 	}
 
 	complete_head_from_modules($conf, $langs, $object, $head, $h, 'preventionplandocument@digiriskdolibarr');

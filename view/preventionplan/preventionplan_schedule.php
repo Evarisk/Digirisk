@@ -24,23 +24,23 @@
 // Load Dolibarr environment
 $res = 0;
 // Try main.inc.php into web root known defined into CONTEXT_DOCUMENT_ROOT (not always defined)
-if (!$res && !empty($_SERVER["CONTEXT_DOCUMENT_ROOT"])) $res = @include $_SERVER["CONTEXT_DOCUMENT_ROOT"]."/main.inc.php";
+if ( ! $res && ! empty($_SERVER["CONTEXT_DOCUMENT_ROOT"])) $res = @include $_SERVER["CONTEXT_DOCUMENT_ROOT"] . "/main.inc.php";
 // Try main.inc.php into web root detected using web root calculated from SCRIPT_FILENAME
 $tmp = empty($_SERVER['SCRIPT_FILENAME']) ? '' : $_SERVER['SCRIPT_FILENAME']; $tmp2 = realpath(__FILE__); $i = strlen($tmp) - 1; $j = strlen($tmp2) - 1;
 while ($i > 0 && $j > 0 && isset($tmp[$i]) && isset($tmp2[$j]) && $tmp[$i] == $tmp2[$j]) { $i--; $j--; }
-if (!$res && $i > 0 && file_exists(substr($tmp, 0, ($i + 1))."/main.inc.php")) $res = @include substr($tmp, 0, ($i + 1))."/main.inc.php";
-if (!$res && $i > 0 && file_exists(dirname(substr($tmp, 0, ($i + 1)))."/main.inc.php")) $res = @include dirname(substr($tmp, 0, ($i + 1)))."/main.inc.php";
+if ( ! $res && $i > 0 && file_exists(substr($tmp, 0, ($i + 1)) . "/main.inc.php")) $res          = @include substr($tmp, 0, ($i + 1)) . "/main.inc.php";
+if ( ! $res && $i > 0 && file_exists(dirname(substr($tmp, 0, ($i + 1))) . "/main.inc.php")) $res = @include dirname(substr($tmp, 0, ($i + 1))) . "/main.inc.php";
 // Try main.inc.php using relative path
-if (!$res && file_exists("../../main.inc.php")) $res = @include "../../main.inc.php";
-if (!$res && file_exists("../../../main.inc.php")) $res = @include "../../../main.inc.php";
-if (!$res && file_exists("../../../../main.inc.php")) $res = @include "../../../../main.inc.php";
-if (!$res) die("Include of main fails");
+if ( ! $res && file_exists("../../main.inc.php")) $res       = @include "../../main.inc.php";
+if ( ! $res && file_exists("../../../main.inc.php")) $res    = @include "../../../main.inc.php";
+if ( ! $res && file_exists("../../../../main.inc.php")) $res = @include "../../../../main.inc.php";
+if ( ! $res) die("Include of main fails");
 
 require_once __DIR__ . '/../../class/preventionplan.class.php';
 require_once __DIR__ . '/../../class/openinghours.class.php';
 require_once __DIR__ . '/../../lib/digiriskdolibarr_preventionplan.lib.php';
 require_once __DIR__ . '/../../lib/digiriskdolibarr_function.lib.php';
-require_once DOL_DOCUMENT_ROOT.'/core/lib/images.lib.php';
+require_once DOL_DOCUMENT_ROOT . '/core/lib/images.lib.php';
 
 global $conf, $db, $langs, $user, $hookmanager;
 
@@ -52,7 +52,7 @@ $id          = GETPOST('id', 'int');
 $ref         = GETPOST('ref', 'alpha');
 $action      = GETPOST('action', 'aZ09');
 $cancel      = GETPOST('cancel', 'aZ09');
-$contextpage = GETPOST('contextpage', 'aZ') ?GETPOST('contextpage', 'aZ') : 'preventionplanschedule'; // To manage different context of search
+$contextpage = GETPOST('contextpage', 'aZ') ? GETPOST('contextpage', 'aZ') : 'preventionplanschedule'; // To manage different context of search
 
 // Initialize technical objects
 $preventionplan = new PreventionPlan($db);
@@ -63,7 +63,7 @@ $hookmanager->initHooks(array('preventionplanschedule', 'globalcard')); // Note 
 // Load object
 $preventionplan->fetch($id);
 
-$morewhere = ' AND element_id = ' . $id;
+$morewhere  = ' AND element_id = ' . $id;
 $morewhere .= ' AND element_type = ' . "'" . $preventionplan->element . "'";
 $morewhere .= ' AND status = 1';
 
@@ -72,29 +72,29 @@ $object->fetch(0, '', $morewhere);
 // Security check - Protection if external user
 $permissiontoread = $user->rights->digiriskdolibarr->preventionplan->read;
 $permissiontoadd  = $user->rights->digiriskdolibarr->preventionplan->write;
-if (!$permissiontoread) accessforbidden();
+if ( ! $permissiontoread) accessforbidden();
 
 /*
  * Actions
  */
 
 $parameters = array();
-$reshook = $hookmanager->executeHooks('doActions', $parameters, $preventionplan, $action); // Note that $action and $preventionplan may have been modified by some hooks
+$reshook    = $hookmanager->executeHooks('doActions', $parameters, $preventionplan, $action); // Note that $action and $preventionplan may have been modified by some hooks
 if ($reshook < 0) setEventMessages($hookmanager->error, $hookmanager->errors, 'errors');
 
 if (empty($reshook)) {
-	if (($action == 'update' && !GETPOST("cancel", 'alpha')) || ($action == 'updateedit')) {
+	if (($action == 'update' && ! GETPOST("cancel", 'alpha')) || ($action == 'updateedit')) {
 		$object->element_type = $preventionplan->element;
-		$object->element_id = $id;
-		$object->status = 1;
+		$object->element_id   = $id;
+		$object->status       = 1;
 
-		$object->monday = GETPOST('monday', 'string');
-		$object->tuesday = GETPOST('tuesday', 'string');
+		$object->monday    = GETPOST('monday', 'string');
+		$object->tuesday   = GETPOST('tuesday', 'string');
 		$object->wednesday = GETPOST('wednesday', 'string');
-		$object->thursday = GETPOST('thursday', 'string');
-		$object->friday = GETPOST('friday', 'string');
-		$object->saturday = GETPOST('saturday', 'string');
-		$object->sunday = GETPOST('sunday', 'string');
+		$object->thursday  = GETPOST('thursday', 'string');
+		$object->friday    = GETPOST('friday', 'string');
+		$object->saturday  = GETPOST('saturday', 'string');
+		$object->sunday    = GETPOST('sunday', 'string');
 
 		$object->create($user);
 
@@ -112,7 +112,7 @@ $morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");
 
 llxHeader('', $title, $help_url, '', '', '', '', $morecss);
 
-if (!empty($preventionplan->id)) $res = $preventionplan->fetch_optionals();
+if ( ! empty($preventionplan->id)) $res = $preventionplan->fetch_optionals();
 
 // Object card
 // ------------------------------------------------------------

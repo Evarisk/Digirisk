@@ -64,24 +64,24 @@ class doc_listingrisksphoto_odt extends ModeleODTListingRisksPhoto
 		// Load translation files required by the page
 		$langs->loadLangs(array("main", "companies"));
 
-		$this->db = $db;
-		$this->name = $langs->trans('ListingRisksPhotoDigiriskTemplate');
+		$this->db          = $db;
+		$this->name        = $langs->trans('ListingRisksPhotoDigiriskTemplate');
 		$this->description = $langs->trans("DocumentModelOdt");
-		$this->scandir = 'DIGIRISKDOLIBARR_LISTINGRISKSPHOTO_ADDON_ODT_PATH'; // Name of constant that is used to save list of directories to scan
+		$this->scandir     = 'DIGIRISKDOLIBARR_LISTINGRISKSPHOTO_ADDON_ODT_PATH'; // Name of constant that is used to save list of directories to scan
 
 		// Page size for A4 format
-		$this->type = 'odt';
+		$this->type         = 'odt';
 		$this->page_largeur = 0;
 		$this->page_hauteur = 0;
-		$this->format = array($this->page_largeur, $this->page_hauteur);
+		$this->format       = array($this->page_largeur, $this->page_hauteur);
 		$this->marge_gauche = 0;
 		$this->marge_droite = 0;
-		$this->marge_haute = 0;
-		$this->marge_basse = 0;
+		$this->marge_haute  = 0;
+		$this->marge_basse  = 0;
 
 		// Recupere emetteur
-		$this->emetteur = $mysoc;
-		if (!$this->emetteur->country_code) $this->emetteur->country_code = substr($langs->defaultlang, -2); // By default if not defined
+		$this->emetteur                                                     = $mysoc;
+		if ( ! $this->emetteur->country_code) $this->emetteur->country_code = substr($langs->defaultlang, -2); // By default if not defined
 	}
 
 	/**
@@ -97,51 +97,46 @@ class doc_listingrisksphoto_odt extends ModeleODTListingRisksPhoto
 		// Load translation files required by the page
 		$langs->loadLangs(array("errors", "companies"));
 
-		$form = new Form($this->db);
-		$texte = $this->description.".<br>\n";
-		$texte .= '<form action="'.$_SERVER["PHP_SELF"].'" method="POST">';
-		$texte .= '<input type="hidden" name="token" value="'.newToken().'">';
+		$form   = new Form($this->db);
+		$texte  = $this->description . ".<br>\n";
+		$texte .= '<form action="' . $_SERVER["PHP_SELF"] . '" method="POST">';
+		$texte .= '<input type="hidden" name="token" value="' . newToken() . '">';
 		$texte .= '<input type="hidden" name="action" value="setModuleOptions">';
 		$texte .= '<input type="hidden" name="param1" value="DIGIRISKDOLIBARR_LISTINGRISKSPHOTO_ADDON_ODT_PATH">';
 		$texte .= '<table class="nobordernopadding" width="100%">';
 
 		// List of directories area
-		$texte .= '<tr><td>';
-		$texttitle = $langs->trans("ListOfDirectories");
-		$listofdir = explode(',', preg_replace('/[\r\n]+/', ',', trim($conf->global->DIGIRISKDOLIBARR_LISTINGRISKSPHOTO_ADDON_ODT_PATH)));
+		$texte      .= '<tr><td>';
+		$texttitle   = $langs->trans("ListOfDirectories");
+		$listofdir   = explode(',', preg_replace('/[\r\n]+/', ',', trim($conf->global->DIGIRISKDOLIBARR_LISTINGRISKSPHOTO_ADDON_ODT_PATH)));
 		$listoffiles = array();
-		foreach ($listofdir as $key=>$tmpdir)
-		{
+		foreach ($listofdir as $key => $tmpdir) {
 			$tmpdir = trim($tmpdir);
 			$tmpdir = preg_replace('/DOL_DATA_ROOT/', DOL_DATA_ROOT, $tmpdir);
-			if (!$tmpdir) {
+			if ( ! $tmpdir) {
 				unset($listofdir[$key]); continue;
 			}
-			if (!is_dir($tmpdir)) $texttitle .= img_warning($langs->trans("ErrorDirNotFound", $tmpdir), 0);
-			else
-			{
-				$tmpfiles = dol_dir_list($tmpdir, 'files', 0, '\.(ods|odt)');
+			if ( ! is_dir($tmpdir)) $texttitle .= img_warning($langs->trans("ErrorDirNotFound", $tmpdir), 0);
+			else {
+				$tmpfiles                          = dol_dir_list($tmpdir, 'files', 0, '\.(ods|odt)');
 				if (count($tmpfiles)) $listoffiles = array_merge($listoffiles, $tmpfiles);
 			}
 		}
 
 		// Scan directories
 		$nbofiles = count($listoffiles);
-		if (!empty($conf->global->DIGIRISKDOLIBARR_LISTINGRISKSPHOTO_ADDON_ODT_PATH))
-		{
-			$texte .= $langs->trans("DigiriskNumberOfModelFilesFound").': <b>';
+		if ( ! empty($conf->global->DIGIRISKDOLIBARR_LISTINGRISKSPHOTO_ADDON_ODT_PATH)) {
+			$texte .= $langs->trans("DigiriskNumberOfModelFilesFound") . ': <b>';
 			//$texte.=$nbofiles?'<a id="a_'.get_class($this).'" href="#">':'';
 			$texte .= count($listoffiles);
 			//$texte.=$nbofiles?'</a>':'';
 			$texte .= '</b>';
 		}
 
-		if ($nbofiles)
-		{
-			$texte .= '<div id="div_'.get_class($this).'" class="hidden">';
-			foreach ($listoffiles as $file)
-			{
-				$texte .= $file['name'].'<br>';
+		if ($nbofiles) {
+			$texte .= '<div id="div_' . get_class($this) . '" class="hidden">';
+			foreach ($listoffiles as $file) {
+				$texte .= $file['name'] . '<br>';
 			}
 			$texte .= '</div>';
 		}
@@ -170,73 +165,68 @@ class doc_listingrisksphoto_odt extends ModeleODTListingRisksPhoto
 		// phpcs:enable
 		global $user, $langs, $conf, $mysoc, $hookmanager, $action, $mysoc;
 
-		if (empty($srctemplatepath))
-		{
+		if (empty($srctemplatepath)) {
 			dol_syslog("doc_listingrisksphoto_odt::write_file parameter srctemplatepath empty", LOG_WARNING);
 			return -1;
 		}
 
 		// Add odtgeneration hook
-		if (!is_object($hookmanager))
-		{
+		if ( ! is_object($hookmanager)) {
 			include_once DOL_DOCUMENT_ROOT . '/core/class/hookmanager.class.php';
 			$hookmanager = new HookManager($this->db);
 		}
 		$hookmanager->initHooks(array('odtgeneration'));
 
-		if (!is_object($outputlangs)) $outputlangs = $langs;
-		$outputlangs->charset_output = 'UTF-8';
+		if ( ! is_object($outputlangs)) $outputlangs = $langs;
+		$outputlangs->charset_output                 = 'UTF-8';
 		$outputlangs->loadLangs(array("main", "dict", "companies", "bills","digiriskdolibarr@digiriskdolibarr"));
 
 		$mod = new $conf->global->DIGIRISKDOLIBARR_LISTINGRISKSPHOTO_ADDON($this->db);
 		$ref = $mod->getNextValue($object);
 
 		$object->ref = $ref;
-		$id = $object->create($user, true, $digiriskelement);
+		$id          = $object->create($user, true, $digiriskelement);
 
 		$object->fetch($id);
 
-		if ( ! isset( $digiriskelement->element_type ) ) {
+		if ( ! isset($digiriskelement->element_type) ) {
 			$dir = $conf->digiriskdolibarr->multidir_output[isset($conf->entity) ? $conf->entity : 1] . '/listingrisksphoto';
 		} else {
 			$dir = $conf->digiriskdolibarr->multidir_output[isset($conf->entity) ? $conf->entity : 1] . '/listingrisksphoto/' . $digiriskelement->ref;
 		}
 
-		$objectref = dol_sanitizeFileName($ref);
+		$objectref                                       = dol_sanitizeFileName($ref);
 		if (preg_match('/specimen/i', $objectref)) $dir .= '/specimen';
 
-		if (!file_exists($dir))
-		{
-			if (dol_mkdir($dir) < 0)
-			{
+		if ( ! file_exists($dir)) {
+			if (dol_mkdir($dir) < 0) {
 				$this->error = $langs->transnoentities("ErrorCanNotCreateDir", $dir);
 				return -1;
 			}
 		}
 
-		if (file_exists($dir))
-		{
-			$filename = preg_split('/listingrisksphoto\//' , $srctemplatepath);
-			$filename = preg_replace('/template_/','', $filename[1]);
+		if (file_exists($dir)) {
+			$filename = preg_split('/listingrisksphoto\//', $srctemplatepath);
+			$filename = preg_replace('/template_/', '', $filename[1]);
 
-			$date = dol_print_date(dol_now(),'dayxcard');
-			if (!empty($digiriskelement)) {
-				$filename = $objectref.'_'.$digiriskelement->label.'_'.$date.'.odt';
+			$date = dol_print_date(dol_now(), 'dayxcard');
+			if ( ! empty($digiriskelement)) {
+				$filename = $objectref . '_' . $digiriskelement->label . '_' . $date . '.odt';
 			} else {
-				$filename = $objectref.'_'.$conf->global->MAIN_INFO_SOCIETE_NOM.'_'.$date.'.odt';
+				$filename = $objectref . '_' . $conf->global->MAIN_INFO_SOCIETE_NOM . '_' . $date . '.odt';
 			}
 			$filename = str_replace(' ', '_', $filename);
 			$filename = dol_sanitizeFileName($filename);
 
 			$object->last_main_doc = $filename;
 
-			$sql = "UPDATE ".MAIN_DB_PREFIX."digiriskdolibarr_digiriskdocuments";
-			$sql .= " SET last_main_doc =" .(!empty($filename) ? "'".$this->db->escape($filename)."'" : 'null');
-			$sql .= " WHERE rowid = ".$object->id;
+			$sql  = "UPDATE " . MAIN_DB_PREFIX . "digiriskdolibarr_digiriskdocuments";
+			$sql .= " SET last_main_doc =" . ( ! empty($filename) ? "'" . $this->db->escape($filename) . "'" : 'null');
+			$sql .= " WHERE rowid = " . $object->id;
 
 			dol_syslog("admin.lib::Insert last main doc", LOG_DEBUG);
 			$this->db->query($sql);
-			$file = $dir.'/'.$filename;
+			$file = $dir . '/' . $filename;
 
 			dol_mkdir($conf->digiriskdolibarr->dir_temp);
 
@@ -244,11 +234,11 @@ class doc_listingrisksphoto_odt extends ModeleODTListingRisksPhoto
 			$substitutionarray = array();
 			complete_substitutions_array($substitutionarray, $langs, $object);
 			// Call the ODTSubstitution hook
-			$parameters = array('file'=>$file, 'object'=>$object, 'outputlangs'=>$outputlangs, 'substitutionarray'=>&$substitutionarray);
-			$reshook = $hookmanager->executeHooks('ODTSubstitution', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
+			$parameters = array('file' => $file, 'object' => $object, 'outputlangs' => $outputlangs, 'substitutionarray' => &$substitutionarray);
+			$reshook    = $hookmanager->executeHooks('ODTSubstitution', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
 
 			// Open and load template
-			require_once ODTPHP_PATH.'odf.php';
+			require_once ODTPHP_PATH . 'odf.php';
 			try {
 				$odfHandler = new odf(
 					$srctemplatepath,
@@ -259,85 +249,76 @@ class doc_listingrisksphoto_odt extends ModeleODTListingRisksPhoto
 						'DELIMITER_RIGHT' => '}'
 					)
 				);
-			}
-			catch (Exception $e)
-			{
+			} catch (Exception $e) {
 				$this->error = $e->getMessage();
 				dol_syslog($e->getMessage(), LOG_INFO);
 				return -1;
 			}
 
 			// Define substitution array
-			$substitutionarray = getCommonSubstitutionArray($outputlangs, 0, null, $object);
+			$substitutionarray            = getCommonSubstitutionArray($outputlangs, 0, null, $object);
 			$array_object_from_properties = $this->get_substitutionarray_each_var_object($object, $outputlangs);
-			$array_object = $this->get_substitutionarray_object($object, $outputlangs);
-			$array_soc = $this->get_substitutionarray_mysoc($mysoc, $outputlangs);
-			$array_soc['mycompany_logo'] = preg_replace('/_small/', '_mini', $array_soc['mycompany_logo']);
+			$array_object                 = $this->get_substitutionarray_object($object, $outputlangs);
+			$array_soc                    = $this->get_substitutionarray_mysoc($mysoc, $outputlangs);
+			$array_soc['mycompany_logo']  = preg_replace('/_small/', '_mini', $array_soc['mycompany_logo']);
 
 			$tmparray = array_merge($substitutionarray, $array_object_from_properties, $array_object, $array_soc);
 
 			complete_substitutions_array($tmparray, $outputlangs, $object);
 
 			// Call the ODTSubstitution hook
-			$parameters = array('odfHandler'=>&$odfHandler, 'file'=>$file, 'object'=>$object, 'outputlangs'=>$outputlangs, 'substitutionarray'=>&$tmparray);
-			$reshook = $hookmanager->executeHooks('ODTSubstitution', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
+			$parameters = array('odfHandler' => &$odfHandler, 'file' => $file, 'object' => $object, 'outputlangs' => $outputlangs, 'substitutionarray' => &$tmparray);
+			$reshook    = $hookmanager->executeHooks('ODTSubstitution', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
 
-			foreach ($tmparray as $key=>$value)
-			{
+			foreach ($tmparray as $key => $value) {
 				try {
-					if (preg_match('/logo$/', $key)) // Image
-					{
+					if (preg_match('/logo$/', $key)) { // Image
 						if (file_exists($value)) $odfHandler->setImage($key, $value);
 						else $odfHandler->setVars($key, $langs->transnoentities('ErrorFileNotFound'), true, 'UTF-8');
-					}
-					else    // Text
+					} else // Text
 					{
 						if (empty($value)) {
 							$odfHandler->setVars($key, $langs->trans('NoData'), true, 'UTF-8');
 						} else {
-							$odfHandler->setVars($key, html_entity_decode($value,ENT_QUOTES | ENT_HTML5), true, 'UTF-8');
+							$odfHandler->setVars($key, html_entity_decode($value, ENT_QUOTES | ENT_HTML5), true, 'UTF-8');
 						}
 					}
-				}
-				catch (OdfException $e)
-				{
+				} catch (OdfException $e) {
 					dol_syslog($e->getMessage(), LOG_INFO);
 				}
 			}
 			// Replace tags of lines
-			try
-			{
+			try {
 				$foundtagforlines = 1;
-				if ($foundtagforlines)
-				{
+				if ($foundtagforlines) {
 					$risk = new Risk($this->db);
-					if ( ! empty( $digiriskelement ) ) {
+					if ( ! empty($digiriskelement) ) {
 						$risks = $risk->fetchRisksOrderedByCotation($digiriskelement->id, true);
 						for ($i = 1; $i <= 4; $i++ ) {
 							$listlines = $odfHandler->setSegment('risk' . $i);
-							if ($risks > 0 && !empty($risks)) {
+							if ($risks > 0 && ! empty($risks)) {
 								foreach ($risks as $line) {
-									$evaluation = new RiskAssessment($this->db);
+									$evaluation     = new RiskAssessment($this->db);
 									$lastEvaluation = $evaluation->fetchFromParent($line->id, 1);
-									if (!empty ($lastEvaluation) && $lastEvaluation > 0) {
+									if ( ! empty($lastEvaluation) && $lastEvaluation > 0) {
 										$lastEvaluation = array_shift($lastEvaluation);
-										$scale = $lastEvaluation->get_evaluation_scale();
+										$scale          = $lastEvaluation->get_evaluation_scale();
 
 										if ($scale == $i) {
 											$element = new DigiriskElement($this->db);
 											$element->fetch($line->fk_element);
-											$tmparray['nomElement'] = $element->ref . ' - ' . $element->label;
-											$tmparray['nomDanger'] = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $line->get_danger_category($line) . '.png';
-											$tmparray['identifiantRisque'] = $line->ref . ' - ' . $lastEvaluation->ref;
-											$tmparray['quotationRisque'] = $lastEvaluation->cotation ? $lastEvaluation->cotation : '0';
-											$tmparray['descriptionRisque'] = $line->description;
-											$tmparray['commentaireEvaluation'] = dol_print_date((($conf->global->DIGIRISKDOLIBARR_SHOW_RISKASSESSMENT_DATE && (!empty($lastEvaluation->date_riskassessment))) ? $lastEvaluation->date_riskassessment : $lastEvaluation->date_creation), 'dayreduceformat') . ': ' . $lastEvaluation->comment;
+											$tmparray['nomElement']            = $element->ref . ' - ' . $element->label;
+											$tmparray['nomDanger']             = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $line->get_danger_category($line) . '.png';
+											$tmparray['identifiantRisque']     = $line->ref . ' - ' . $lastEvaluation->ref;
+											$tmparray['quotationRisque']       = $lastEvaluation->cotation ? $lastEvaluation->cotation : '0';
+											$tmparray['descriptionRisque']     = $line->description;
+											$tmparray['commentaireEvaluation'] = dol_print_date((($conf->global->DIGIRISKDOLIBARR_SHOW_RISKASSESSMENT_DATE && ( ! empty($lastEvaluation->date_riskassessment))) ? $lastEvaluation->date_riskassessment : $lastEvaluation->date_creation), 'dayreduceformat') . ': ' . $lastEvaluation->comment;
 
 											if (dol_strlen($lastEvaluation->photo) && $lastEvaluation !== 'undefined') {
-												$path = $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessment/' . $lastEvaluation->ref;
-												$file_small = preg_split('/\./', $lastEvaluation->photo);
-												$new_file = $file_small[0] . '_small.' . $file_small[1];
-												$image = $path . '/thumbs/' . $new_file;
+												$path                      = $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessment/' . $lastEvaluation->ref;
+												$file_small                = preg_split('/\./', $lastEvaluation->photo);
+												$new_file                  = $file_small[0] . '_small.' . $file_small[1];
+												$image                     = $path . '/thumbs/' . $new_file;
 												$tmparray['photoAssociee'] = $image;
 											} else {
 												$tmparray['photoAssociee'] = $langs->transnoentities('NoFileLinked');
@@ -347,7 +328,7 @@ class doc_listingrisksphoto_odt extends ModeleODTListingRisksPhoto
 											complete_substitutions_array($tmparray, $outputlangs, $object, $line, "completesubstitutionarray_lines");
 											// Call the ODTSubstitutionLine hook
 											$parameters = array('odfHandler' => &$odfHandler, 'file' => $file, 'object' => $object, 'outputlangs' => $outputlangs, 'substitutionarray' => &$tmparray, 'line' => $line);
-											$reshook = $hookmanager->executeHooks('ODTSubstitutionLine', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
+											$reshook    = $hookmanager->executeHooks('ODTSubstitutionLine', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
 											foreach ($tmparray as $key => $val) {
 												try {
 													if (file_exists($val) && $val == $image) {
@@ -403,27 +384,27 @@ class doc_listingrisksphoto_odt extends ModeleODTListingRisksPhoto
 							$listlines = $odfHandler->setSegment('risk' . $i);
 							if ($risks !== -1) {
 								foreach ($risks as $line) {
-									$evaluation = new RiskAssessment($this->db);
+									$evaluation     = new RiskAssessment($this->db);
 									$lastEvaluation = $evaluation->fetchFromParent($line->id, 1);
-									if (!empty ($lastEvaluation) && $lastEvaluation > 0) {
+									if ( ! empty($lastEvaluation) && $lastEvaluation > 0) {
 										$lastEvaluation = array_shift($lastEvaluation);
-										$scale = $lastEvaluation->get_evaluation_scale();
+										$scale          = $lastEvaluation->get_evaluation_scale();
 
 										if ($scale == $i) {
 											$element = new DigiriskElement($this->db);
 											$element->fetch($line->fk_element);
-											$tmparray['nomElement'] = $element->ref . ' - ' . $element->label;
-											$tmparray['nomDanger'] = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $line->get_danger_category($line) . '.png';
-											$tmparray['identifiantRisque'] = $line->ref . ' - ' . $lastEvaluation->ref;
-											$tmparray['quotationRisque'] = $lastEvaluation->cotation ? $lastEvaluation->cotation : '0';
-											$tmparray['descriptionRisque'] = $line->description;
-											$tmparray['commentaireEvaluation'] = dol_print_date((($conf->global->DIGIRISKDOLIBARR_SHOW_RISKASSESSMENT_DATE && (!empty($lastEvaluation->date_riskassessment))) ? $lastEvaluation->date_riskassessment : $lastEvaluation->date_creation), 'dayreduceformat') . ': ' . $lastEvaluation->comment;
+											$tmparray['nomElement']            = $element->ref . ' - ' . $element->label;
+											$tmparray['nomDanger']             = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $line->get_danger_category($line) . '.png';
+											$tmparray['identifiantRisque']     = $line->ref . ' - ' . $lastEvaluation->ref;
+											$tmparray['quotationRisque']       = $lastEvaluation->cotation ? $lastEvaluation->cotation : '0';
+											$tmparray['descriptionRisque']     = $line->description;
+											$tmparray['commentaireEvaluation'] = dol_print_date((($conf->global->DIGIRISKDOLIBARR_SHOW_RISKASSESSMENT_DATE && ( ! empty($lastEvaluation->date_riskassessment))) ? $lastEvaluation->date_riskassessment : $lastEvaluation->date_creation), 'dayreduceformat') . ': ' . $lastEvaluation->comment;
 
 											if (dol_strlen($lastEvaluation->photo) && $lastEvaluation !== 'undefined') {
-												$path = $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessment/' . $lastEvaluation->ref;
-												$file_small = preg_split('/\./', $lastEvaluation->photo);
-												$new_file = $file_small[0] . '_small.' . $file_small[1];
-												$image = $path . '/thumbs/' . $new_file;
+												$path                      = $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessment/' . $lastEvaluation->ref;
+												$file_small                = preg_split('/\./', $lastEvaluation->photo);
+												$new_file                  = $file_small[0] . '_small.' . $file_small[1];
+												$image                     = $path . '/thumbs/' . $new_file;
 												$tmparray['photoAssociee'] = $image;
 											} else {
 												$tmparray['photoAssociee'] = $langs->transnoentities('NoFileLinked');
@@ -434,7 +415,7 @@ class doc_listingrisksphoto_odt extends ModeleODTListingRisksPhoto
 											complete_substitutions_array($tmparray, $outputlangs, $object, $line, "completesubstitutionarray_lines");
 											// Call the ODTSubstitutionLine hook
 											$parameters = array('odfHandler' => &$odfHandler, 'file' => $file, 'object' => $object, 'outputlangs' => $outputlangs, 'substitutionarray' => &$tmparray, 'line' => $line);
-											$reshook = $hookmanager->executeHooks('ODTSubstitutionLine', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
+											$reshook    = $hookmanager->executeHooks('ODTSubstitutionLine', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
 											foreach ($tmparray as $key => $val) {
 												try {
 													if (file_exists($val) && $val == $image) {
@@ -442,7 +423,7 @@ class doc_listingrisksphoto_odt extends ModeleODTListingRisksPhoto
 													} elseif ($val == $tmparray['nomDanger']) {
 														$listlines->setImage($key, $val);
 													} else {
-														if (empty($val)  && $val != '0') {
+														if (empty($val) && $val != '0') {
 															$listlines->setVars($key, $langs->trans('NoData'), true, 'UTF-8');
 														} else {
 															$listlines->setVars($key, html_entity_decode($val, ENT_QUOTES | ENT_HTML5), true, 'UTF-8');
@@ -484,9 +465,7 @@ class doc_listingrisksphoto_odt extends ModeleODTListingRisksPhoto
 						}
 					}
 				}
-			}
-			catch (OdfException $e)
-			{
+			} catch (OdfException $e) {
 				$this->error = $e->getMessage();
 				dol_syslog($this->error, LOG_WARNING);
 				return -1;
@@ -494,23 +473,20 @@ class doc_listingrisksphoto_odt extends ModeleODTListingRisksPhoto
 
 			// Replace labels translated
 			$tmparray = $outputlangs->get_translations_for_substitutions();
-			foreach ($tmparray as $key=>$value)
-			{
+			foreach ($tmparray as $key => $value) {
 				try {
 					$odfHandler->setVars($key, $value, true, 'UTF-8');
-				}
-				catch (OdfException $e)
-				{
+				} catch (OdfException $e) {
 					dol_syslog($e->getMessage(), LOG_INFO);
 				}
 			}
 
 			// Call the beforeODTSave hook
-			$parameters = array('odfHandler'=>&$odfHandler, 'file'=>$file, 'object'=>$object, 'outputlangs'=>$outputlangs, 'substitutionarray'=>&$tmparray);
-			$reshook = $hookmanager->executeHooks('beforeODTSave', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
+			$parameters = array('odfHandler' => &$odfHandler, 'file' => $file, 'object' => $object, 'outputlangs' => $outputlangs, 'substitutionarray' => &$tmparray);
+			$reshook    = $hookmanager->executeHooks('beforeODTSave', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
 
 			// Write new file
-			if (!empty($conf->global->MAIN_ODT_AS_PDF)) {
+			if ( ! empty($conf->global->MAIN_ODT_AS_PDF)) {
 				try {
 					$odfHandler->exportAsAttachedPDF($file);
 				} catch (Exception $e) {
@@ -518,8 +494,7 @@ class doc_listingrisksphoto_odt extends ModeleODTListingRisksPhoto
 					dol_syslog($e->getMessage(), LOG_INFO);
 					return -1;
 				}
-			}
-			else {
+			} else {
 				try {
 					$odfHandler->saveToDisk($file);
 				} catch (Exception $e) {
@@ -529,20 +504,18 @@ class doc_listingrisksphoto_odt extends ModeleODTListingRisksPhoto
 				}
 			}
 
-			$parameters = array('odfHandler'=>&$odfHandler, 'file'=>$file, 'object'=>$object, 'outputlangs'=>$outputlangs, 'substitutionarray'=>&$tmparray);
-			$reshook = $hookmanager->executeHooks('afterODTCreation', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
+			$parameters = array('odfHandler' => &$odfHandler, 'file' => $file, 'object' => $object, 'outputlangs' => $outputlangs, 'substitutionarray' => &$tmparray);
+			$reshook    = $hookmanager->executeHooks('afterODTCreation', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
 
-			if (!empty($conf->global->MAIN_UMASK))
+			if ( ! empty($conf->global->MAIN_UMASK))
 				@chmod($file, octdec($conf->global->MAIN_UMASK));
 
 			$odfHandler = null; // Destroy object
 
-			$this->result = array('fullpath'=>$file);
+			$this->result = array('fullpath' => $file);
 
 			return 1; // Success
-		}
-		else
-		{
+		} else {
 			$this->error = $langs->transnoentities("ErrorCanNotCreateDir", $dir);
 			return -1;
 		}

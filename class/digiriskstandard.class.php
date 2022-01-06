@@ -21,7 +21,7 @@
  * \brief       This file is a CRUD class file for DigiriskStandard (Create/Read/Update/Delete)
  */
 
-require_once DOL_DOCUMENT_ROOT.'/core/class/commonobject.class.php';
+require_once DOL_DOCUMENT_ROOT . '/core/class/commonobject.class.php';
 
 /**
  * Class for DigiriskStandard
@@ -95,7 +95,7 @@ class DigiriskStandard extends CommonObject
 		$this->db = $db;
 
 		if (empty($conf->global->MAIN_SHOW_TECHNICAL_ID) && isset($this->fields['rowid'])) $this->fields['rowid']['visible'] = 0;
-		if (empty($conf->multicompany->enabled) && isset($this->fields['entity'])) $this->fields['entity']['enabled'] = 0;
+		if (empty($conf->multicompany->enabled) && isset($this->fields['entity'])) $this->fields['entity']['enabled']        = 0;
 
 		// Unset fields that are disabled
 		foreach ($this->fields as $key => $val) {
@@ -157,59 +157,55 @@ class DigiriskStandard extends CommonObject
 	{
 		global $conf, $langs, $user, $hookmanager;
 
-		if (!empty($conf->dol_no_mouse_hover)) $notooltip = 1; // Force disable tooltips
+		if ( ! empty($conf->dol_no_mouse_hover)) $notooltip = 1; // Force disable tooltips
 
 		$result = '';
 
-		$label = '';
-		if ($option != 'nolink') $label =  '<i class="fas fa-building"></i> <u class="paddingrightonly">'.$langs->trans('DigiriskStandard').'</u>';
-		$label .= ($label ? '<br>' : '').'<b>'.$langs->trans('Ref').': </b>'.$this->ref; // The space must be after the : to not being explode when showing the title in img_picto
-		$label .= ($label ? '<br>' : '').'<b>'.$langs->trans('Label').': </b>'.$conf->global->MAIN_INFO_SOCIETE_NOM; // The space must be after the : to not being explode when showing the title in img_picto
-		if ($moreinpopup) $label .= '<br>'.$moreinpopup;
+		$label                          = '';
+		if ($option != 'nolink') $label = '<i class="fas fa-building"></i> <u class="paddingrightonly">' . $langs->trans('DigiriskStandard') . '</u>';
+		$label                         .= ($label ? '<br>' : '') . '<b>' . $langs->trans('Ref') . ': </b>' . $this->ref; // The space must be after the : to not being explode when showing the title in img_picto
+		$label                         .= ($label ? '<br>' : '') . '<b>' . $langs->trans('Label') . ': </b>' . $conf->global->MAIN_INFO_SOCIETE_NOM; // The space must be after the : to not being explode when showing the title in img_picto
+		if ($moreinpopup) $label       .= '<br>' . $moreinpopup;
 
-		$url = dol_buildpath('/digiriskdolibarr/view/digiriskstandard/digiriskstandard_card.php', 1).'?id='.$this->id;
+		$url = dol_buildpath('/digiriskdolibarr/view/digiriskstandard/digiriskstandard_card.php', 1) . '?id=' . $this->id;
 
-		if ($option != 'nolink')
-		{
+		if ($option != 'nolink') {
 			// Add param to save lastsearch_values or not
-			$add_save_lastsearch_values = ($save_lastsearch_value == 1 ? 1 : 0);
+			$add_save_lastsearch_values                                                                                      = ($save_lastsearch_value == 1 ? 1 : 0);
 			if ($save_lastsearch_value == -1 && preg_match('/list\.php/', $_SERVER["PHP_SELF"])) $add_save_lastsearch_values = 1;
-			if ($add_save_lastsearch_values) $url .= '&save_lastsearch_values=1';
+			if ($add_save_lastsearch_values) $url                                                                           .= '&save_lastsearch_values=1';
 		}
 
 		$linkclose = '';
-		if ($option == 'blank'){
+		if ($option == 'blank') {
 			$linkclose .= ' target=_blank';
 		}
 
-		if (empty($notooltip) && $user->rights->digiriskdolibarr->digiriskelement->read)
-		{
-			if (!empty($conf->global->MAIN_OPTIMIZEFORTEXTBROWSER))
-			{
-				$label = $langs->trans("ShowDigiriskStandard");
-				$linkclose .= ' alt="'.dol_escape_htmltag($label, 1).'"';
+		if (empty($notooltip) && $user->rights->digiriskdolibarr->digiriskelement->read) {
+			if ( ! empty($conf->global->MAIN_OPTIMIZEFORTEXTBROWSER)) {
+				$label      = $langs->trans("ShowDigiriskStandard");
+				$linkclose .= ' alt="' . dol_escape_htmltag($label, 1) . '"';
 			}
-			$linkclose .= ' title="'.dol_escape_htmltag($label, 1).'"';
-			$linkclose .= ' class="classfortooltip'.($morecss ? ' '.$morecss : '').'"';
-		}
-		else $linkclose = ($morecss ? ' class="'.$morecss.'"' : '');
+			$linkclose .= ' title="' . dol_escape_htmltag($label, 1) . '"';
+			$linkclose .= ' class="classfortooltip' . ($morecss ? ' ' . $morecss : '') . '"';
+		} else $linkclose = ($morecss ? ' class="' . $morecss . '"' : '');
 
-		$linkstart = '<a href="'.$url.'"';
-		$linkstart .= $linkclose.'>';
-		$linkend = '</a>';
+		$linkstart  = '<a href="' . $url . '"';
+		$linkstart .= $linkclose . '>';
+		$linkend    = '</a>';
 
-		$result .= $linkstart;
-		if ($withpicto) $result .= '<i class="fas fa-building"></i>' . ' ';
+		$result                      .= $linkstart;
+		if ($withpicto) $result      .= '<i class="fas fa-building"></i>' . ' ';
 		if ($withpicto != 2) $result .= $this->ref;
-		if ($withpicto != 2) $result .= (($addlabel && $conf->global->MAIN_INFO_SOCIETE_NOM) ? $sep.dol_trunc($conf->global->MAIN_INFO_SOCIETE_NOM, ($addlabel > 1 ? $addlabel : 0)) : '');
-		$result .= $linkend;
+		if ($withpicto != 2) $result .= (($addlabel && $conf->global->MAIN_INFO_SOCIETE_NOM) ? $sep . dol_trunc($conf->global->MAIN_INFO_SOCIETE_NOM, ($addlabel > 1 ? $addlabel : 0)) : '');
+		$result                      .= $linkend;
 
 		global $action;
 		$hookmanager->initHooks(array('digiriskstandardtdao'));
-		$parameters = array('id'=>$this->id, 'getnomurl'=>$result);
-		$reshook = $hookmanager->executeHooks('getNomUrl', $parameters, $this, $action); // Note that $action and $this may have been modified by some hooks
+		$parameters               = array('id' => $this->id, 'getnomurl' => $result);
+		$reshook                  = $hookmanager->executeHooks('getNomUrl', $parameters, $this, $action); // Note that $action and $this may have been modified by some hooks
 		if ($reshook > 0) $result = $hookmanager->resPrint;
-		else $result .= $hookmanager->resPrint;
+		else $result             .= $hookmanager->resPrint;
 
 		return $result;
 	}

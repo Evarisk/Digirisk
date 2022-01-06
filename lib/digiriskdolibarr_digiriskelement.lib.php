@@ -33,10 +33,9 @@ function digiriskelementPrepareHead($object)
 
 	$langs->load("digiriskdolibarr@digiriskdolibarr");
 
-	$h = 0;
+	$h    = 0;
 	$head = array();
 	if ($object->id > 0) {
-
 		if ($user->rights->digiriskdolibarr->risk->read) {
 			$head[$h][0] = dol_buildpath("/digiriskdolibarr/view/digiriskelement/digiriskelement_risk.php", 1) . '?id=' . $object->id;
 			$head[$h][1] = '<i class="fas fa-exclamation-triangle"></i> ' . $langs->trans("Risks");

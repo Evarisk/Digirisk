@@ -400,6 +400,7 @@ ErrorNoEmailForLabourInspector = Erreur : l'Inspecteur du travail n'a pas d'emai
 ErrorNoEmailForExtResponsible = Erreur : Le responsable de l'Entreprise Extérieure n'a pas d'email
 ErrorNoEmailForMaitreOeuvre = Erreur : Le responsable de l'Entreprise Utilisatrice n'a pas d'email
 ErrorNoEmailForExtIntervenant = Erreur : Le (ou les) intervenant(s) ne possède(nt) pas d'email
+ErrorNoAttendantSelected = Erreur : Aucun intervenant n'a été sélectionné
 SignatureEmailSubject = Signature du plan de prevention
 DocumentName = Référence du document
 PreventionPlanScheduleSave = Les horaires du plan de prévention ont bien été enregistrés
@@ -597,6 +598,10 @@ AccidentNatureDoubt = Eventuelles réserves motivées (joignez, si besoin, une l
 AccidentNatureDoubtLink = Lien vers la lettre d'accompagnement
 VictimTransportedTo = La victime a été transportée à
 VictimWorkHours = Horaire de travail de la victime le jour de l’accident
+WorkHoursMorningDateStart = Début horaire de travail de la victime (Matin)
+WorkHoursMorningDateEnd = Fin horaire de travail de la victime (Matin)
+WorkHoursAfternoonDateStart = Début horaire de travail de la victime (Après midi)
+WorkHoursAfternoonDateEnd = Fin horaire de travail de la victime (Après midi)
 AccidentNoticed = Information de l'accident
 Found = Constaté
 Known = Connu
@@ -642,6 +647,8 @@ AccidentMetaDataSave = Les données complémentaires de l'accident ont bien ét�
 ErrorFieldNotEmpty = Erreur : Le champ '%s' ne peut pas être vide
 ConfirmDeleteAccidentWorkStop = Êtes-vous sûr de vouloir supprimer l'arrêt de travail <b>%s</b> sur l'accident ?
 AccidentMetaDataLesion = Données complémentaires des lésions
+TotalWorkStopDays = Nombre total de jour d'arrêt de travail
+RegisterAccident = Accident bénin
 
 # AccidentTooltip - Tooltip des accidents
 VictimActivityTooltip = Précisez l’activité ou la tâche de la victime au moment de l’accident, c’est-à-dire ce que faisait la victime
@@ -856,6 +863,7 @@ ElementType = Type d'élément
 ParentElement = Élément parent
 OrganizationSaved = L'organisation et des groupements et des unités de travail a été sauvegardée
 OrganizationNotSaved = L'organisation et des groupements et des unités de travail n'a pas pu être sauvegardée
+DigiriskElementOrganization = Organisation de l'arborescence
 
 #
 # Groupment - Groupement
@@ -1006,10 +1014,11 @@ HowToEditRiskCategory = Pour modifier la catégorie du risque, cliquez sur le pi
 DigiriskElementRisksList = Liste des risques
 DigiriskElementRisk = Risques
 RiskDescriptionNotEnabled = Le champ description du risque n'est pas activé
-HowToEnableRiskDescription = Pour activer le champ description du risque, allez dans "Configuration du module -> Analyse de risque -> Risque"
-HowToEnableRiskCategoryEdit = Pour activer la modification de la catégorie de risque, allez dans "Configuration du module -> Analyse de risque -> Risque"
+HowToEnableRiskDescription = Pour activer le champ description du risque, allez dans "Configuration du module -> Document Unique"
+HowToEnableRiskCategoryEdit = Pour activer la modification de la catégorie de risque, allez dans "Configuration du module -> Document Unique"
 SortRisksListingsByCotation = Trier les risques par cotation
 SortRisksListingsByCotationDescription =  Activer le tri automatique des risques par cotation dans les listings
+ListingHeaderCotation = Liste des évaluations
 
 DigiriskRiskData = Données configurables des risques
 RiskDescription = Description du risque
@@ -1024,7 +1033,7 @@ ShowParentRisksDescription = Afficher les risques des éléments parents dans le
 MoveRisk = Déplacer le risque
 MoveRisks = Déplacer les risques
 MoveRisksDescription = Permet de déplacer les risques d'un groupement ou d'une unité de travail à un(e) autre
-SetConfToMoveRisk = Vous devez d'abord autoriser le déplacement des risques dans "Configuration du module -> Analyse de risques -> Risque"
+SetConfToMoveRisk = Vous devez d'abord autoriser le déplacement des risques dans "Configuration du module -> Document Unique"
 RiskDescriptionPrefill = Préremplir la description
 RiskDescriptionPrefillDescription = Préremplir la description du risque avec le nom de la catégorie
 
@@ -1067,6 +1076,8 @@ AdvancedRiskAssessmentMethodDescription = Activer la méthode d'évaluation avan
 NoRiskAssessment = Pas d'évaluation assignée au risque
 RiskAssessmentList = Liste des évaluations du risque
 EditRiskAssessment = Editer l'évaluation
+ShowAllRiskAssessments = Voir toutes les évaluations
+ShowAllRiskAssessmentsDescription = Afficher la liste complète des évaluations des risques dans la liste des risques
 
 SimpleCotation = Cotation simple
 AdvancedCotation = Cotation avancée
@@ -1080,7 +1091,6 @@ AddRiskAssessmentTask = Ajouter une tâche au risque
 ListRiskAssessmentTask = Liste des tâches du risque
 ShowRiskAssessmentDate = Date des évaluations
 ShowRiskAssessmentDateDescription = Remplace la date de création par la date de début des évaluations dans la fiche et les documents
-
 
 
 #
@@ -1147,6 +1157,7 @@ TaskCreate = Ajout de la tâche
 TaskEdit = Édition de la tâche
 HowToSetDUProject = Pour configurer le choix du projet, aller dans Configuration du module - Analyse des risques - Tâche
 DeleteTask = Êtes-vous sûr(e) de vouloir supprimer la tâche
+ListingHeaderTask = Liste des tâches
 DigiriskTaskData = Données configurables des tâches
 TaskManagementDescription = Activer la gestion des tâches
 TaskManagementNotActivated = Veuillez activer la gestion des tâches dans Configuration du module / Analyse des risques / Tâche
@@ -1320,7 +1331,7 @@ GetAPI = Utilisation des routes API Digirisk en méthode GET
 PostAPI = Utilisation des routes API Digirisk en méthode POST
 MinimizeMenu = Réduire le menu
 ActionsLine = Actions
-PhotoWellSent = La photo a été ajouté à la bibliothèque de médias
+PhotoWellSent = La photo a été ajoutée à la bibliothèque de médias
 PhotoNotSent = La photo ne s'est pas correctement envoyée
 PhotoWellSaved = Le(s) média(s) a (ont) bien été ajouté(s)
 PhotoNotSaved = Le(s) média(s) n'a (ont) pas été ajouté(s)

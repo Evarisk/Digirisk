@@ -3,6 +3,7 @@ td > .risk-evaluation-container {
   border: 1px solid rgba(0,0,0,0.1);
   background: rgba(0,0,0,0.05);
   padding: 0.5em;
+  margin-bottom: 0.5em;
 }
 .risk-evaluation-container .risk-evaluation-single {
   display: flex;
@@ -105,7 +106,6 @@ td > .risk-evaluation-container {
   }
 
   .risk-evaluation-button {
-    min-width: 50px;
     margin-left: 0.5em;
   }
 }

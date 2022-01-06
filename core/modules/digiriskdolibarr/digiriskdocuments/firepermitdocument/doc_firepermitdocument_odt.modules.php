@@ -68,24 +68,24 @@ class doc_firepermitdocument_odt extends ModeleODTFirePermitDocument
 		// Load translation files required by the page
 		$langs->loadLangs(array("main", "companies"));
 
-		$this->db = $db;
-		$this->name = $langs->trans('FirePermitDocumentDigiriskTemplate');
+		$this->db          = $db;
+		$this->name        = $langs->trans('FirePermitDocumentDigiriskTemplate');
 		$this->description = $langs->trans("DocumentModelOdt");
-		$this->scandir = 'DIGIRISKDOLIBARR_FIREPERMITDOCUMENT_ADDON_ODT_PATH'; // Name of constant that is used to save list of directories to scan
+		$this->scandir     = 'DIGIRISKDOLIBARR_FIREPERMITDOCUMENT_ADDON_ODT_PATH'; // Name of constant that is used to save list of directories to scan
 
 		// Page size for A4 format
-		$this->type = 'odt';
+		$this->type         = 'odt';
 		$this->page_largeur = 0;
 		$this->page_hauteur = 0;
-		$this->format = array($this->page_largeur, $this->page_hauteur);
+		$this->format       = array($this->page_largeur, $this->page_hauteur);
 		$this->marge_gauche = 0;
 		$this->marge_droite = 0;
-		$this->marge_haute = 0;
-		$this->marge_basse = 0;
+		$this->marge_haute  = 0;
+		$this->marge_basse  = 0;
 
 		// Recupere emetteur
-		$this->emetteur = $mysoc;
-		if (!$this->emetteur->country_code) $this->emetteur->country_code = substr($langs->defaultlang, -2); // By default if not defined
+		$this->emetteur                                                     = $mysoc;
+		if ( ! $this->emetteur->country_code) $this->emetteur->country_code = substr($langs->defaultlang, -2); // By default if not defined
 	}
 
 	/**
@@ -101,51 +101,46 @@ class doc_firepermitdocument_odt extends ModeleODTFirePermitDocument
 		// Load translation files required by the page
 		$langs->loadLangs(array("errors", "companies"));
 
-		$form = new Form($this->db);
-		$texte = $this->description.".<br>\n";
-		$texte .= '<form action="'.$_SERVER["PHP_SELF"].'" method="POST">';
-		$texte .= '<input type="hidden" name="token" value="'.newToken().'">';
+		$form   = new Form($this->db);
+		$texte  = $this->description . ".<br>\n";
+		$texte .= '<form action="' . $_SERVER["PHP_SELF"] . '" method="POST">';
+		$texte .= '<input type="hidden" name="token" value="' . newToken() . '">';
 		$texte .= '<input type="hidden" name="action" value="setModuleOptions">';
 		$texte .= '<input type="hidden" name="param1" value="DIGIRISKDOLIBARR_FIREPERMITDOCUMENT_ADDON_ODT_PATH">';
 		$texte .= '<table class="nobordernopadding" width="100%">';
 
 		// List of directories area
-		$texte .= '<tr><td>';
-		$texttitle = $langs->trans("ListOfDirectories");
-		$listofdir = explode(',', preg_replace('/[\r\n]+/', ',', trim($conf->global->DIGIRISKDOLIBARR_FIREPERMITDOCUMENT_ADDON_ODT_PATH)));
+		$texte      .= '<tr><td>';
+		$texttitle   = $langs->trans("ListOfDirectories");
+		$listofdir   = explode(',', preg_replace('/[\r\n]+/', ',', trim($conf->global->DIGIRISKDOLIBARR_FIREPERMITDOCUMENT_ADDON_ODT_PATH)));
 		$listoffiles = array();
-		foreach ($listofdir as $key=>$tmpdir)
-		{
+		foreach ($listofdir as $key => $tmpdir) {
 			$tmpdir = trim($tmpdir);
 			$tmpdir = preg_replace('/DOL_DATA_ROOT/', DOL_DATA_ROOT, $tmpdir);
-			if (!$tmpdir) {
+			if ( ! $tmpdir) {
 				unset($listofdir[$key]); continue;
 			}
-			if (!is_dir($tmpdir)) $texttitle .= img_warning($langs->trans("ErrorDirNotFound", $tmpdir), 0);
-			else
-			{
-				$tmpfiles = dol_dir_list($tmpdir, 'files', 0, '\.(ods|odt)');
+			if ( ! is_dir($tmpdir)) $texttitle .= img_warning($langs->trans("ErrorDirNotFound", $tmpdir), 0);
+			else {
+				$tmpfiles                          = dol_dir_list($tmpdir, 'files', 0, '\.(ods|odt)');
 				if (count($tmpfiles)) $listoffiles = array_merge($listoffiles, $tmpfiles);
 			}
 		}
 
 		// Scan directories
 		$nbofiles = count($listoffiles);
-		if (!empty($conf->global->DIGIRISKDOLIBARR_FIREPERMITDOCUMENT_ADDON_ODT_PATH))
-		{
-			$texte .= $langs->trans("DigiriskNumberOfModelFilesFound").': <b>';
+		if ( ! empty($conf->global->DIGIRISKDOLIBARR_FIREPERMITDOCUMENT_ADDON_ODT_PATH)) {
+			$texte .= $langs->trans("DigiriskNumberOfModelFilesFound") . ': <b>';
 			//$texte.=$nbofiles?'<a id="a_'.get_class($this).'" href="#">':'';
 			$texte .= count($listoffiles);
 			//$texte.=$nbofiles?'</a>':'';
 			$texte .= '</b>';
 		}
 
-		if ($nbofiles)
-		{
-			$texte .= '<div id="div_'.get_class($this).'" class="hidden">';
-			foreach ($listoffiles as $file)
-			{
-				$texte .= $file['name'].'<br>';
+		if ($nbofiles) {
+			$texte .= '<div id="div_' . get_class($this) . '" class="hidden">';
+			foreach ($listoffiles as $file) {
+				$texte .= $file['name'] . '<br>';
 			}
 			$texte .= '</div>';
 		}
@@ -174,22 +169,20 @@ class doc_firepermitdocument_odt extends ModeleODTFirePermitDocument
 		// phpcs:enable
 		global $user, $langs, $conf, $hookmanager, $action, $mysoc;
 
-		if (empty($srctemplatepath))
-		{
+		if (empty($srctemplatepath)) {
 			dol_syslog("doc_firepermitdocument_odt::write_file parameter srctemplatepath empty", LOG_WARNING);
 			return -1;
 		}
 
 		// Add odtgeneration hook
-		if (!is_object($hookmanager))
-		{
+		if ( ! is_object($hookmanager)) {
 			include_once DOL_DOCUMENT_ROOT . '/core/class/hookmanager.class.php';
 			$hookmanager = new HookManager($this->db);
 		}
 		$hookmanager->initHooks(array('odtgeneration'));
 
-		if (!is_object($outputlangs)) $outputlangs = $langs;
-		$outputlangs->charset_output = 'UTF-8';
+		if ( ! is_object($outputlangs)) $outputlangs = $langs;
+		$outputlangs->charset_output                 = 'UTF-8';
 
 		$outputlangs->loadLangs(array("main", "dict", "companies", "digiriskdolibarr@digiriskdolibarr"));
 
@@ -197,42 +190,39 @@ class doc_firepermitdocument_odt extends ModeleODTFirePermitDocument
 		$ref = $mod->getNextValue($object);
 
 		$object->ref = $ref;
-		$id = $object->create($user, true, $firepermit);
+		$id          = $object->create($user, true, $firepermit);
 
 		$object->fetch($id);
 
-		$dir = $conf->digiriskdolibarr->multidir_output[isset($object->entity) ? $object->entity : 1] . '/firepermitdocument/'. $firepermit->ref;
-		$objectref = dol_sanitizeFileName($ref);
+		$dir                                             = $conf->digiriskdolibarr->multidir_output[isset($object->entity) ? $object->entity : 1] . '/firepermitdocument/' . $firepermit->ref;
+		$objectref                                       = dol_sanitizeFileName($ref);
 		if (preg_match('/specimen/i', $objectref)) $dir .= '/specimen';
 
-		if (!file_exists($dir))
-		{
-			if (dol_mkdir($dir) < 0)
-			{
+		if ( ! file_exists($dir)) {
+			if (dol_mkdir($dir) < 0) {
 				$this->error = $langs->transnoentities("ErrorCanNotCreateDir", $dir);
 				return -1;
 			}
 		}
 
-		if (file_exists($dir))
-		{
-			$filename = preg_split('/firepermitdocument\//' , $srctemplatepath);
-			$filename = preg_replace('/template_/','', $filename[1]);
+		if (file_exists($dir)) {
+			$filename = preg_split('/firepermitdocument\//', $srctemplatepath);
+			$filename = preg_replace('/template_/', '', $filename[1]);
 
-			$date = dol_print_date(dol_now(),'dayxcard');
-			$filename = $objectref.'_'.$conf->global->MAIN_INFO_SOCIETE_NOM.'_'.$date.'.odt';
+			$date     = dol_print_date(dol_now(), 'dayxcard');
+			$filename = $objectref . '_' . $conf->global->MAIN_INFO_SOCIETE_NOM . '_' . $date . '.odt';
 			$filename = str_replace(' ', '_', $filename);
 			$filename = dol_sanitizeFileName($filename);
 
 			$object->last_main_doc = $filename;
 
-			$sql = "UPDATE ".MAIN_DB_PREFIX."digiriskdolibarr_digiriskdocuments";
-			$sql .= " SET last_main_doc =" .(!empty($filename) ? "'".$this->db->escape($filename)."'" : 'null');
-			$sql .= " WHERE rowid = ".$object->id;
+			$sql  = "UPDATE " . MAIN_DB_PREFIX . "digiriskdolibarr_digiriskdocuments";
+			$sql .= " SET last_main_doc =" . ( ! empty($filename) ? "'" . $this->db->escape($filename) . "'" : 'null');
+			$sql .= " WHERE rowid = " . $object->id;
 
 			dol_syslog("admin.lib::Insert last main doc", LOG_DEBUG);
 			$this->db->query($sql);
-			$file = $dir.'/'.$filename;
+			$file = $dir . '/' . $filename;
 
 			dol_mkdir($conf->digiriskdolibarr->dir_temp);
 
@@ -240,11 +230,11 @@ class doc_firepermitdocument_odt extends ModeleODTFirePermitDocument
 			$substitutionarray = array();
 			complete_substitutions_array($substitutionarray, $langs, $firepermit);
 			// Call the ODTSubstitution hook
-			$parameters = array('file'=>$file, 'object'=>$firepermit, 'outputlangs'=>$outputlangs, 'substitutionarray'=>&$substitutionarray);
-			$reshook = $hookmanager->executeHooks('ODTSubstitution', $parameters, $this, $action); // Note that $action and $firepermit may have been modified by some hooks
+			$parameters = array('file' => $file, 'object' => $firepermit, 'outputlangs' => $outputlangs, 'substitutionarray' => &$substitutionarray);
+			$reshook    = $hookmanager->executeHooks('ODTSubstitution', $parameters, $this, $action); // Note that $action and $firepermit may have been modified by some hooks
 
 			// Open and load template
-			require_once ODTPHP_PATH.'odf.php';
+			require_once ODTPHP_PATH . 'odf.php';
 			try {
 				$odfHandler = new odf(
 					$srctemplatepath,
@@ -255,20 +245,18 @@ class doc_firepermitdocument_odt extends ModeleODTFirePermitDocument
 						'DELIMITER_RIGHT' => '}'
 					)
 				);
-			}
-			catch (Exception $e)
-			{
+			} catch (Exception $e) {
 				$this->error = $e->getMessage();
 				dol_syslog($e->getMessage(), LOG_INFO);
 				return -1;
 			}
 
 			// Define substitution array
-			$substitutionarray = getCommonSubstitutionArray($outputlangs, 0, null, $object);
+			$substitutionarray            = getCommonSubstitutionArray($outputlangs, 0, null, $object);
 			$array_object_from_properties = $this->get_substitutionarray_each_var_object($object, $outputlangs);
-			$array_object = $this->get_substitutionarray_object($object, $outputlangs);
-			$array_soc = $this->get_substitutionarray_mysoc($mysoc, $outputlangs);
-			$array_soc['mycompany_logo'] = preg_replace('/_small/', '_mini', $array_soc['mycompany_logo']);
+			$array_object                 = $this->get_substitutionarray_object($object, $outputlangs);
+			$array_soc                    = $this->get_substitutionarray_mysoc($mysoc, $outputlangs);
+			$array_soc['mycompany_logo']  = preg_replace('/_small/', '_mini', $array_soc['mycompany_logo']);
 
 			$tmparray = array_merge($substitutionarray, $array_object_from_properties, $array_object, $array_soc);
 			complete_substitutions_array($tmparray, $outputlangs, $object);
@@ -293,14 +281,14 @@ class doc_firepermitdocument_odt extends ModeleODTFirePermitDocument
 
 			$digirisk_resources     = $resources->digirisk_dolibarr_fetch_resources();
 			$extsociety             = $resources->fetchResourcesFromObject('FP_EXT_SOCIETY', $firepermit);
-			$maitreoeuvre           = array_shift($signatory->fetchSignatory('FP_MAITRE_OEUVRE', $firepermit->id));
-			$extsocietyresponsible  = array_shift($signatory->fetchSignatory('FP_EXT_SOCIETY_RESPONSIBLE', $firepermit->id));
-			$extsocietyintervenants = $signatory->fetchSignatory('FP_EXT_SOCIETY_INTERVENANTS', $firepermit->id);
+			$maitreoeuvre           = array_shift($signatory->fetchSignatory('FP_MAITRE_OEUVRE', $firepermit->id, 'firepermit'));
+			$extsocietyresponsible  = array_shift($signatory->fetchSignatory('FP_EXT_SOCIETY_RESPONSIBLE', $firepermit->id, 'firepermit'));
+			$extsocietyintervenants = $signatory->fetchSignatory('FP_EXT_SOCIETY_INTERVENANTS', $firepermit->id, 'firepermit');
 
 			$tmparray['titre_permis_feu']     = $firepermit->ref;
 			$tmparray['raison_du_permis_feu'] = $firepermit->label;
 
-			if (!empty ($digirisk_resources )) {
+			if ( ! empty($digirisk_resources)) {
 				$societe->fetch($digirisk_resources['Pompiers']->id[0]);
 				$tmparray['pompier_number'] = $societe->phone;
 
@@ -324,7 +312,7 @@ class doc_firepermitdocument_odt extends ModeleODTFirePermitDocument
 			$tmparray['date_start_intervention_PPP'] = dol_print_date($preventionplan->date_start, 'dayhoursec', 'tzuser');
 			$tmparray['date_end_intervention_PPP']   = dol_print_date($preventionplan->date_end, 'dayhoursec', 'tzuser');
 
-			$morewhere = ' AND element_id = ' . $preventionplan->id;
+			$morewhere  = ' AND element_id = ' . $preventionplan->id;
 			$morewhere .= ' AND element_type = ' . "'" . $preventionplan->element . "'";
 			$morewhere .= ' AND status = 1';
 
@@ -353,14 +341,14 @@ class doc_firepermitdocument_odt extends ModeleODTFirePermitDocument
 			$tmparray['dimanche_matin'] = $opening_hours_sunday[0];
 			$tmparray['dimanche_aprem'] = $opening_hours_sunday[1];
 
-			if (!empty($preventionplanlines) && $preventionplanlines > 0 && is_array($preventionplanlines)) {
+			if ( ! empty($preventionplanlines) && $preventionplanlines > 0 && is_array($preventionplanlines)) {
 				$tmparray['interventions_info'] = count($preventionplanlines) . " " . $langs->trans('PreventionPlanLine');
 			}
 
 			$tmparray['date_start_intervention_FP'] = dol_print_date($firepermit->date_start, 'dayhoursec', 'tzuser');
 			$tmparray['date_end_intervention_FP']   = dol_print_date($firepermit->date_end, 'dayhoursec', 'tzuser');
 
-			$morewhere = ' AND element_id = ' . $firepermit->id;
+			$morewhere  = ' AND element_id = ' . $firepermit->id;
 			$morewhere .= ' AND element_type = ' . "'" . $firepermit->element . "'";
 			$morewhere .= ' AND status = 1';
 
@@ -389,13 +377,13 @@ class doc_firepermitdocument_odt extends ModeleODTFirePermitDocument
 			$tmparray['dimanche_matin'] = $opening_hours_sunday[0];
 			$tmparray['dimanche_aprem'] = $opening_hours_sunday[1];
 
-			if (!empty($firepermitlines) && $firepermitlines > 0 && is_array($firepermitlines)) {
+			if ( ! empty($firepermitlines) && $firepermitlines > 0 && is_array($firepermitlines)) {
 				$tmparray['interventions_info_FP'] = count($firepermitlines) . " " . $langs->trans('FirePermitLine');
 			}
 
 			//Informations entreprise extérieure
 
-			if (!empty( $extsociety) && $extsociety > 0) {
+			if ( ! empty($extsociety) && $extsociety > 0) {
 				$tmparray['society_title']    = $extsociety->name;
 				$tmparray['society_siret_id'] = $extsociety->siret;
 				$tmparray['society_address']  = $extsociety->address;
@@ -403,48 +391,46 @@ class doc_firepermitdocument_odt extends ModeleODTFirePermitDocument
 				$tmparray['society_town']     = $extsociety->town;
 			}
 
-			if (!empty( $extsocietyintervenants) && $extsocietyintervenants > 0 && is_array($extsocietyintervenants)) {
+			if ( ! empty($extsocietyintervenants) && $extsocietyintervenants > 0 && is_array($extsocietyintervenants)) {
 				$tmparray['intervenants_info'] = count($extsocietyintervenants);
 			}
 
 			$tempdir = $conf->digiriskdolibarr->multidir_output[isset($object->entity) ? $object->entity : 1] . '/temp/';
 
 			//Signatures
-			if (!empty( $maitreoeuvre) && $maitreoeuvre > 0) {
+			if ( ! empty($maitreoeuvre) && $maitreoeuvre > 0) {
 				$tmparray['maitre_oeuvre_lname'] = $maitreoeuvre->lastname;
 				$tmparray['maitre_oeuvre_fname'] = $maitreoeuvre->firstname;
 				$tmparray['maitre_oeuvre_email'] = $maitreoeuvre->email;
 				$tmparray['maitre_oeuvre_phone'] = $maitreoeuvre->phone;
 
 				$tmparray['maitre_oeuvre_signature_date'] = dol_print_date($maitreoeuvre->signature_date, 'dayhoursec', 'tzuser');
-				$encoded_image = explode(",",  $maitreoeuvre->signature)[1];
-				$decoded_image = base64_decode($encoded_image);
-				file_put_contents($tempdir."signature.png", $decoded_image);
-				$tmparray['maitre_oeuvre_signature'] = $tempdir."signature.png";
+				$encoded_image                            = explode(",",  $maitreoeuvre->signature)[1];
+				$decoded_image                            = base64_decode($encoded_image);
+				file_put_contents($tempdir . "signature.png", $decoded_image);
+				$tmparray['maitre_oeuvre_signature'] = $tempdir . "signature.png";
 			}
 
-			if (!empty( $extsocietyresponsible) && $extsocietyresponsible > 0) {
+			if ( ! empty($extsocietyresponsible) && $extsocietyresponsible > 0) {
 				$tmparray['intervenant_exterieur_lname'] = $extsocietyresponsible->lastname;
 				$tmparray['intervenant_exterieur_fname'] = $extsocietyresponsible->firstname;
 				$tmparray['intervenant_exterieur_email'] = $extsocietyresponsible->email;
 				$tmparray['intervenant_exterieur_phone'] = $extsocietyresponsible->phone;
 
 				$tmparray['intervenant_exterieur_signature_date'] = dol_print_date($extsocietyresponsible->signature_date, 'dayhoursec', 'tzuser');
-				$encoded_image = explode(",",  $extsocietyresponsible->signature)[1];
-				$decoded_image = base64_decode($encoded_image);
-				file_put_contents($tempdir."signature2.png", $decoded_image);
-				$tmparray['intervenant_exterieur_signature']      = $tempdir."signature2.png";
+				$encoded_image                                    = explode(",",  $extsocietyresponsible->signature)[1];
+				$decoded_image                                    = base64_decode($encoded_image);
+				file_put_contents($tempdir . "signature2.png", $decoded_image);
+				$tmparray['intervenant_exterieur_signature'] = $tempdir . "signature2.png";
 			}
 
-			foreach ($tmparray as $key=>$value)
-			{
+			foreach ($tmparray as $key => $value) {
 				try {
-					if ($key == 'maitre_oeuvre_signature' || $key == 'intervenant_exterieur_signature') // Image
-					{
-						$list = getimagesize($value);
+					if ($key == 'maitre_oeuvre_signature' || $key == 'intervenant_exterieur_signature') { // Image
+						$list     = getimagesize($value);
 						$newWidth = 350;
 						if ($list[0]) {
-							$ratio = $newWidth / $list[0];
+							$ratio     = $newWidth / $list[0];
 							$newHeight = $ratio * $list[1];
 							dol_imageResizeOrCrop($value, 0, $newWidth, $newHeight);
 						}
@@ -452,18 +438,15 @@ class doc_firepermitdocument_odt extends ModeleODTFirePermitDocument
 					} elseif (preg_match('/logo$/', $key)) {
 						if (file_exists($value)) $odfHandler->setImage($key, $value);
 						else $odfHandler->setVars($key, $langs->transnoentities('ErrorFileNotFound'), true, 'UTF-8');
-					}
-					else    // Text
+					} else // Text
 					{
 						if (empty($value)) {
 							$odfHandler->setVars($key, $langs->trans('NoData'), true, 'UTF-8');
 						} else {
-							$odfHandler->setVars($key, html_entity_decode($value,ENT_QUOTES | ENT_HTML5), true, 'UTF-8');
+							$odfHandler->setVars($key, html_entity_decode($value, ENT_QUOTES | ENT_HTML5), true, 'UTF-8');
 						}
 					}
-				}
-				catch (OdfException $e)
-				{
+				} catch (OdfException $e) {
 					dol_syslog($e->getMessage(), LOG_INFO);
 				}
 			}
@@ -471,11 +454,10 @@ class doc_firepermitdocument_odt extends ModeleODTFirePermitDocument
 			try {
 				$foundtagforlines = 1;
 				if ($foundtagforlines) {
-					if (!empty($preventionplanlines) && $preventionplanlines > 0) {
+					if ( ! empty($preventionplanlines) && $preventionplanlines > 0) {
 						$listlines = $odfHandler->setSegment('interventions');
 
 						foreach ($preventionplanlines as $line) {
-
 							$digiriskelement->fetch($line->fk_element);
 
 							$tmparray['key_unique']    = $line->ref;
@@ -492,7 +474,7 @@ class doc_firepermitdocument_odt extends ModeleODTFirePermitDocument
 										if (empty($val)) {
 											$listlines->setVars($key, $langs->trans('NoData'), true, 'UTF-8');
 										} else {
-											$listlines->setVars($key, html_entity_decode($val,ENT_QUOTES | ENT_HTML5), true, 'UTF-8');
+											$listlines->setVars($key, html_entity_decode($val, ENT_QUOTES | ENT_HTML5), true, 'UTF-8');
 										}
 									}
 								} catch (OdfException $e) {
@@ -506,11 +488,10 @@ class doc_firepermitdocument_odt extends ModeleODTFirePermitDocument
 						$odfHandler->mergeSegment($listlines);
 					}
 
-					if (!empty($firepermitlines) && $firepermitlines > 0) {
+					if ( ! empty($firepermitlines) && $firepermitlines > 0) {
 						$listlines = $odfHandler->setSegment('interventions_FP');
 
 						foreach ($firepermitlines as $line) {
-
 							$digiriskelement->fetch($line->fk_element);
 
 							$tmparray['key_unique']      = $line->ref;
@@ -527,7 +508,7 @@ class doc_firepermitdocument_odt extends ModeleODTFirePermitDocument
 										if (empty($val)) {
 											$listlines->setVars($key, $langs->trans('NoData'), true, 'UTF-8');
 										} else {
-											$listlines->setVars($key, html_entity_decode($val,ENT_QUOTES | ENT_HTML5), true, 'UTF-8');
+											$listlines->setVars($key, html_entity_decode($val, ENT_QUOTES | ENT_HTML5), true, 'UTF-8');
 										}
 									}
 								} catch (OdfException $e) {
@@ -541,16 +522,16 @@ class doc_firepermitdocument_odt extends ModeleODTFirePermitDocument
 						$odfHandler->mergeSegment($listlines);
 					}
 
-					if (!empty($extsocietyintervenants) && $extsocietyintervenants > 0) {
+					if ( ! empty($extsocietyintervenants) && $extsocietyintervenants > 0) {
 						$listlines = $odfHandler->setSegment('intervenants');
-						$k = 3;
+						$k         = 3;
 						foreach ($extsocietyintervenants as $line) {
 							if ($line->status == 5) {
 								$encoded_image = explode(",", $line->signature)[1];
 								$decoded_image = base64_decode($encoded_image);
-								file_put_contents($tempdir."signature".$k.".png", $decoded_image);
-								$tmparray['intervenants_signature'] = $tempdir."signature".$k.".png";
-							}else {
+								file_put_contents($tempdir . "signature" . $k . ".png", $decoded_image);
+								$tmparray['intervenants_signature'] = $tempdir . "signature" . $k . ".png";
+							} else {
 								$tmparray['intervenants_signature'] = '';
 							}
 							$tmparray['id']       = $line->id;
@@ -565,20 +546,19 @@ class doc_firepermitdocument_odt extends ModeleODTFirePermitDocument
 							foreach ($tmparray as $key => $value) {
 								try {
 									if ($key == 'intervenants_signature' && $line->status == 5) { // Image
-										$list = getimagesize($value);
+										$list     = getimagesize($value);
 										$newWidth = 200;
 										if ($list[0]) {
-											$ratio = $newWidth / $list[0];
+											$ratio     = $newWidth / $list[0];
 											$newHeight = $ratio * $list[1];
 											dol_imageResizeOrCrop($value, 0, $newWidth, $newHeight);
 										}
 										$listlines->setImage($key, $value);
-									}
-									else {  // Text
+									} else {  // Text
 										if (empty($value)) {
 											$listlines->setVars($key, $langs->trans('NoData'), true, 'UTF-8');
 										} else {
-											$listlines->setVars($key, html_entity_decode($value,ENT_QUOTES | ENT_HTML5), true, 'UTF-8');
+											$listlines->setVars($key, html_entity_decode($value, ENT_QUOTES | ENT_HTML5), true, 'UTF-8');
 										}
 									}
 								} catch (OdfException $e) {
@@ -589,14 +569,12 @@ class doc_firepermitdocument_odt extends ModeleODTFirePermitDocument
 							}
 							$listlines->merge();
 
-							dol_delete_file($tempdir."signature".$k.".png");
+							dol_delete_file($tempdir . "signature" . $k . ".png");
 						}
 						$odfHandler->mergeSegment($listlines);
 					}
 				}
-			}
-			catch (OdfException $e)
-			{
+			} catch (OdfException $e) {
 				$this->error = $e->getMessage();
 				dol_syslog($this->error, LOG_WARNING);
 				return -1;
@@ -604,23 +582,20 @@ class doc_firepermitdocument_odt extends ModeleODTFirePermitDocument
 
 			// Replace labels translated
 			$tmparray = $outputlangs->get_translations_for_substitutions();
-			foreach ($tmparray as $key=>$value)
-			{
+			foreach ($tmparray as $key => $value) {
 				try {
 					$odfHandler->setVars($key, $value, true, 'UTF-8');
-				}
-				catch (OdfException $e)
-				{
+				} catch (OdfException $e) {
 					dol_syslog($e->getMessage(), LOG_INFO);
 				}
 			}
 
 			// Call the beforeODTSave hook
-			$parameters = array('odfHandler'=>&$odfHandler, 'file'=>$file, 'object'=>$object, 'outputlangs'=>$outputlangs, 'substitutionarray'=>&$tmparray);
-			$reshook = $hookmanager->executeHooks('beforeODTSave', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
+			$parameters = array('odfHandler' => &$odfHandler, 'file' => $file, 'object' => $object, 'outputlangs' => $outputlangs, 'substitutionarray' => &$tmparray);
+			$reshook    = $hookmanager->executeHooks('beforeODTSave', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
 
 			// Write new file
-			if (!empty($conf->global->MAIN_ODT_AS_PDF)) {
+			if ( ! empty($conf->global->MAIN_ODT_AS_PDF)) {
 				try {
 					$odfHandler->exportAsAttachedPDF($file);
 				} catch (Exception $e) {
@@ -628,8 +603,7 @@ class doc_firepermitdocument_odt extends ModeleODTFirePermitDocument
 					dol_syslog($e->getMessage(), LOG_INFO);
 					return -1;
 				}
-			}
-			else {
+			} else {
 				try {
 					$odfHandler->saveToDisk($file);
 				} catch (Exception $e) {
@@ -639,23 +613,21 @@ class doc_firepermitdocument_odt extends ModeleODTFirePermitDocument
 				}
 			}
 
-			$parameters = array('odfHandler'=>&$odfHandler, 'file'=>$file, 'object'=>$object, 'outputlangs'=>$outputlangs, 'substitutionarray'=>&$tmparray);
-			$reshook = $hookmanager->executeHooks('afterODTCreation', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
+			$parameters = array('odfHandler' => &$odfHandler, 'file' => $file, 'object' => $object, 'outputlangs' => $outputlangs, 'substitutionarray' => &$tmparray);
+			$reshook    = $hookmanager->executeHooks('afterODTCreation', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
 
-			if (!empty($conf->global->MAIN_UMASK))
+			if ( ! empty($conf->global->MAIN_UMASK))
 				@chmod($file, octdec($conf->global->MAIN_UMASK));
 
 			$odfHandler = null; // Destroy object
 
-			dol_delete_file($tempdir."signature.png");
-			dol_delete_file($tempdir."signature2.png");
+			dol_delete_file($tempdir . "signature.png");
+			dol_delete_file($tempdir . "signature2.png");
 
-			$this->result = array('fullpath'=>$file);
+			$this->result = array('fullpath' => $file);
 
 			return 1; // Success
-		}
-		else
-		{
+		} else {
 			$this->error = $langs->transnoentities("ErrorCanNotCreateDir", $dir);
 			return -1;
 		}

@@ -21,7 +21,7 @@
  * \brief       This file is a CRUD class file for Openinghours (Create/Read/Update/Delete)
  */
 
-require_once DOL_DOCUMENT_ROOT.'/core/class/commonobject.class.php';
+require_once DOL_DOCUMENT_ROOT . '/core/class/commonobject.class.php';
 
 /**
  * Class for Openinghours
@@ -103,7 +103,7 @@ class Openinghours extends CommonObject
 		$this->db = $db;
 
 		if (empty($conf->global->MAIN_SHOW_TECHNICAL_ID) && isset($this->fields['rowid'])) $this->fields['rowid']['visible'] = 0;
-		if (empty($conf->multicompany->enabled) && isset($this->fields['entity'])) $this->fields['entity']['enabled'] = 0;
+		if (empty($conf->multicompany->enabled) && isset($this->fields['entity'])) $this->fields['entity']['enabled']        = 0;
 
 		// Unset fields that are disabled
 		foreach ($this->fields as $key => $val) {
@@ -134,12 +134,12 @@ class Openinghours extends CommonObject
 	 */
 	public function create(User $user, $notrigger = false)
 	{
-		$sql = "UPDATE " . MAIN_DB_PREFIX . "$this->table_element";
-		$sql .= " SET status = 0";
+		$sql                                                                              = "UPDATE " . MAIN_DB_PREFIX . "$this->table_element";
+		$sql                                                                             .= " SET status = 0";
 		if (isset($this->ismultientitymanaged) && $this->ismultientitymanaged == 1) $sql .= ' WHERE entity IN (' . getEntity($this->table_element) . ')';
-		else $sql .= ' WHERE 1 = 1';
-		$sql .= " AND element_type = " . "'" . $this->element_type . "'";
-		$sql .= " AND element_id = " . $this->element_id;
+		else $sql                                                                        .= ' WHERE 1 = 1';
+		$sql                                                                             .= " AND element_type = " . "'" . $this->element_type . "'";
+		$sql                                                                             .= " AND element_id = " . $this->element_id;
 
 		dol_syslog("admin.lib::create", LOG_DEBUG);
 		$this->db->query($sql);
@@ -169,5 +169,4 @@ class Openinghours extends CommonObject
 	{
 		return '';
 	}
-
 }

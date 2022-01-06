@@ -24,19 +24,19 @@
 // Load Dolibarr environment
 $res = 0;
 // Try main.inc.php into web root known defined into CONTEXT_DOCUMENT_ROOT (not always defined)
-if (!$res && !empty($_SERVER["CONTEXT_DOCUMENT_ROOT"])) $res = @include $_SERVER["CONTEXT_DOCUMENT_ROOT"]."/main.inc.php";
+if ( ! $res && ! empty($_SERVER["CONTEXT_DOCUMENT_ROOT"])) $res = @include $_SERVER["CONTEXT_DOCUMENT_ROOT"] . "/main.inc.php";
 // Try main.inc.php into web root detected using web root calculated from SCRIPT_FILENAME
 $tmp = empty($_SERVER['SCRIPT_FILENAME']) ? '' : $_SERVER['SCRIPT_FILENAME']; $tmp2 = realpath(__FILE__); $i = strlen($tmp) - 1; $j = strlen($tmp2) - 1;
 while ($i > 0 && $j > 0 && isset($tmp[$i]) && isset($tmp2[$j]) && $tmp[$i] == $tmp2[$j]) { $i--; $j--; }
-if (!$res && $i > 0 && file_exists(substr($tmp, 0, ($i + 1))."/main.inc.php")) $res = @include substr($tmp, 0, ($i + 1))."/main.inc.php";
-if (!$res && $i > 0 && file_exists(dirname(substr($tmp, 0, ($i + 1)))."/main.inc.php")) $res = @include dirname(substr($tmp, 0, ($i + 1)))."/main.inc.php";
+if ( ! $res && $i > 0 && file_exists(substr($tmp, 0, ($i + 1)) . "/main.inc.php")) $res          = @include substr($tmp, 0, ($i + 1)) . "/main.inc.php";
+if ( ! $res && $i > 0 && file_exists(dirname(substr($tmp, 0, ($i + 1))) . "/main.inc.php")) $res = @include dirname(substr($tmp, 0, ($i + 1))) . "/main.inc.php";
 // Try main.inc.php using relative path
-if (!$res && file_exists("../../main.inc.php")) $res = @include "../../main.inc.php";
-if (!$res && file_exists("../../../main.inc.php")) $res = @include "../../../main.inc.php";
-if (!$res && file_exists("../../../../main.inc.php")) $res = @include "../../../../main.inc.php";
-if (!$res) die("Include of main fails");
+if ( ! $res && file_exists("../../main.inc.php")) $res       = @include "../../main.inc.php";
+if ( ! $res && file_exists("../../../main.inc.php")) $res    = @include "../../../main.inc.php";
+if ( ! $res && file_exists("../../../../main.inc.php")) $res = @include "../../../../main.inc.php";
+if ( ! $res) die("Include of main fails");
 
-require_once DOL_DOCUMENT_ROOT.'/core/lib/images.lib.php';
+require_once DOL_DOCUMENT_ROOT . '/core/lib/images.lib.php';
 
 require_once './../../class/digiriskstandard.class.php';
 require_once './../../class/digiriskdocuments/legaldisplay.class.php';
@@ -66,14 +66,14 @@ $permissiontoread   = $user->rights->digiriskdolibarr->legaldisplay->read;
 $permissiontoadd    = $user->rights->digiriskdolibarr->legaldisplay->write;
 $permissiontodelete = $user->rights->digiriskdolibarr->legaldisplay->delete;
 
-if (!$permissiontoread) accessforbidden();
+if ( ! $permissiontoread) accessforbidden();
 
 /*
  * Actions
  */
 
 $parameters = array();
-$reshook = $hookmanager->executeHooks('doActions', $parameters, $object, $action); // Note that $action and $object may have been modified by some hooks
+$reshook    = $hookmanager->executeHooks('doActions', $parameters, $object, $action); // Note that $action and $object may have been modified by some hooks
 if ($reshook < 0) setEventMessages($hookmanager->error, $hookmanager->errors, 'errors');
 
 if (empty($reshook)) {
@@ -82,19 +82,19 @@ if (empty($reshook)) {
 	// Action to build doc
 	if ($action == 'builddoc' && $permissiontoadd) {
 		$outputlangs = $langs;
-		$newlang = '';
+		$newlang     = '';
 
 		if ($conf->global->MAIN_MULTILANGS && empty($newlang) && GETPOST('lang_id', 'aZ09')) $newlang = GETPOST('lang_id', 'aZ09');
-		if (!empty($newlang)) {
+		if ( ! empty($newlang)) {
 			$outputlangs = new Translate("", $conf);
 			$outputlangs->setDefaultLang($newlang);
 		}
 
 		// To be sure vars is defined
 		if (empty($hidedetails)) $hidedetails = 0;
-		if (empty($hidedesc)) $hidedesc = 0;
-		if (empty($hideref)) $hideref = 0;
-		if (empty($moreparams)) $moreparams = null;
+		if (empty($hidedesc)) $hidedesc       = 0;
+		if (empty($hideref)) $hideref         = 0;
+		if (empty($moreparams)) $moreparams   = null;
 
 		$model = GETPOST('model', 'alpha');
 
@@ -106,8 +106,7 @@ if (empty($reshook)) {
 			setEventMessages($object->error, $object->errors, 'errors');
 			$action = '';
 		} else {
-			if (empty($donotredirect))
-			{
+			if (empty($donotredirect)) {
 				setEventMessages($langs->trans("FileGenerated") . ' - ' . $legaldisplay->last_main_doc, null);
 
 				$urltoredirect = $_SERVER['REQUEST_URI'];
@@ -123,13 +122,13 @@ if (empty($reshook)) {
 
 // Delete file in doc form
 if ($action == 'remove_file' && $permissiontodelete) {
-	if (!empty($upload_dir)) {
-		require_once DOL_DOCUMENT_ROOT.'/core/lib/files.lib.php';
+	if ( ! empty($upload_dir)) {
+		require_once DOL_DOCUMENT_ROOT . '/core/lib/files.lib.php';
 
 		$langs->load("other");
 		$filetodelete = GETPOST('file', 'alpha');
-		$file = $upload_dir.'/'.$filetodelete;
-		$ret = dol_delete_file($file, 0, 0, 0, $object);
+		$file         = $upload_dir . '/' . $filetodelete;
+		$ret          = dol_delete_file($file, 0, 0, 0, $object);
 		if ($ret) setEventMessages($langs->trans("FileWasRemoved", $filetodelete), null, 'mesgs');
 		else setEventMessages($langs->trans("ErrorFailToDeleteFile", $filetodelete), null, 'errors');
 
@@ -138,10 +137,9 @@ if ($action == 'remove_file' && $permissiontodelete) {
 		$urltoredirect = preg_replace('/#builddoc$/', '', $urltoredirect);
 		$urltoredirect = preg_replace('/action=remove_file&?/', '', $urltoredirect);
 
-		header('Location: '.$urltoredirect);
+		header('Location: ' . $urltoredirect);
 		exit;
-	}
-	else {
+	} else {
 		setEventMessages('BugFoundVarUploaddirnotDefined', null, 'errors');
 	}
 }
@@ -171,12 +169,12 @@ print dol_get_fiche_head($head, 'standardLegalDisplay', $title, -1, "digiriskdol
 // ------------------------------------------------------------
 $width = 80; $cssclass = 'photoref';
 
-$morehtmlref = '<div class="refidno">';
+$morehtmlref  = '<div class="refidno">';
 $morehtmlref .= '</div>';
-$morehtmlleft = '<div class="floatleft inline-block valignmiddle divphotoref">'.digirisk_show_photos('mycompany', $conf->mycompany->dir_output . '/logos', 'small', 1, 0, 0, 0, $width,0, 0, 0, 0, 'logos', $emptyobject).'</div>';
+$morehtmlleft = '<div class="floatleft inline-block valignmiddle divphotoref">' . digirisk_show_photos('mycompany', $conf->mycompany->dir_output . '/logos', 'small', 1, 0, 0, 0, $width, 0, 0, 0, 0, 'logos', $emptyobject) . '</div>';
 
 digirisk_banner_tab($object, 'ref', '', 0, 'ref', 'ref', $morehtmlref, '', 0, $morehtmlleft);
-print '<a href="../../admin/socialconf.php" target="_blank">' .$langs->trans('ConfigureSecurityAndSocialData').' <i class="fas fa-external-link-alt"></i></a>';
+print '<a href="../../admin/socialconf.php" target="_blank">' . $langs->trans('ConfigureSecurityAndSocialData') . ' <i class="fas fa-external-link-alt"></i></a>';
 print '<hr>';
 print '<div class="fichecenter">';
 print '<table class="border centpercent tableforfield">' . "\n";
@@ -197,7 +195,7 @@ if ($includedocgeneration) {
 	$urlsource  = $_SERVER["PHP_SELF"];
 	$modulepart = 'digiriskdolibarr:LegalDisplay';
 
-	print digiriskshowdocuments($modulepart,$dir_files, $filedir, $urlsource, $permissiontoadd, $permissiontodelete, $conf->global->DIGIRISKDOLIBARR_LEGALDISPLAY_DEFAULT_MODEL, 1, 0, 28, 0, '', $langs->trans('LegalDisplay'), '', $langs->defaultlang, '', $legaldisplay);
+	print digiriskshowdocuments($modulepart, $dir_files, $filedir, $urlsource, $permissiontoadd, $permissiontodelete, $conf->global->DIGIRISKDOLIBARR_LEGALDISPLAY_DEFAULT_MODEL, 1, 0, 28, 0, '', $langs->trans('LegalDisplay'), '', $langs->defaultlang, '', $legaldisplay);
 }
 
 // End of page

@@ -43,3 +43,8 @@ ALTER TABLE llx_digiriskdolibarr_firepermit ADD fk_project integer;
 
 DROP TABLE llx_digiriskdolibarr_preventionplan_signature;
 DROP TABLE llx_digiriskdolibarr_firepermit_signature;
+
+-- 9.0.0
+ALTER TABLE llx_digiriskdolibarr_digiriskelement CHANGE rank `rank` integer;
+
+

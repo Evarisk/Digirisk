@@ -77,17 +77,16 @@ class ActionsDigiriskdolibarr
 		$error = 0; // Error counter
 
 		/* print_r($parameters); print_r($object); echo "action: " . $action; */
-		if (in_array($parameters['currentcontext'], array('admincompany')))	    // do something only for the context 'somecontext1' or 'somecontext2'
-		{
+		if (in_array($parameters['currentcontext'], array('admincompany'))) {	    // do something only for the context 'somecontext1' or 'somecontext2'
 			?>
 			<script src="../custom/digiriskdolibarr/js/digiriskdolibarr.js.php"></script>
 			<?php
 			if ($conf->global->MAIN_INFO_SOCIETE_COUNTRY == '1:FR:France') {
 				$formother = new FormOther($db);
-				$form = new Form($db);
+				$form      = new Form($db);
 				?>
 				<script>
-					IDCC_form = '<?php $formother->select_dictionary('DIGIRISK_COLLECTIVE_AGREEMENT_TITLE','c_conventions_collectives', 'code', 'libelle', $conf->global->DIGIRISK_COLLECTIVE_AGREEMENT_TITLE, 1);?>';
+					IDCC_form = '<?php $formother->select_dictionary('DIGIRISK_COLLECTIVE_AGREEMENT_TITLE', 'c_conventions_collectives', 'code', 'libelle', $conf->global->DIGIRISK_COLLECTIVE_AGREEMENT_TITLE, 1);?>';
 
 					let $tr = $('<tr class="oddeven"><td><label for="selectidcc_id"><?php print $form->textwithpicto($langs->trans('IDCC'), $langs->trans('IDCCTooltip'));?></label></td>');
 					$tr.append('<td>' + IDCC_form + '</td></tr>');
@@ -100,8 +99,8 @@ class ActionsDigiriskdolibarr
 			print ajax_combobox('selectDIGIRISK_COLLECTIVE_AGREEMENT_TITLE');
 		}
 
-		if (!$error) {
-			$this->results = array('myreturn' => 999);
+		if ( ! $error) {
+			$this->results   = array('myreturn' => 999);
 			$this->resprints = 'A text to show';
 			return 0; // or return 1 to replace standard code
 		} else {
@@ -126,15 +125,14 @@ class ActionsDigiriskdolibarr
 		$error = 0; // Error counter
 
 		/* print_r($parameters); print_r($object); echo "action: " . $action; */
-		if (in_array($parameters['currentcontext'], array('admincompany')))	    // do something only for the context 'somecontext1' or 'somecontext2'
-		{
+		if (in_array($parameters['currentcontext'], array('admincompany'))) {	    // do something only for the context 'somecontext1' or 'somecontext2'
 			if ($action == 'updateedit' || $action == 'update') {
 				dolibarr_set_const($db, "DIGIRISK_COLLECTIVE_AGREEMENT_TITLE", GETPOST("DIGIRISK_COLLECTIVE_AGREEMENT_TITLE", 'nohtml'), 'chaine', 0, '', $conf->entity);
 			}
 		}
 
-		if (!$error) {
-			$this->results = array('myreturn' => 999);
+		if ( ! $error) {
+			$this->results   = array('myreturn' => 999);
 			$this->resprints = 'A text to show';
 			return 0; // or return 1 to replace standard code
 		} else {
@@ -159,8 +157,7 @@ class ActionsDigiriskdolibarr
 		$error = 0; // Error counter
 
 		/* print_r($parameters); print_r($object); echo "action: " . $action; */
-		if (in_array($parameters['currentcontext'], array('emailtemplates')))	    // do something only for the context 'somecontext1' or 'somecontext2'
-		{
+		if (in_array($parameters['currentcontext'], array('emailtemplates'))) {	    // do something only for the context 'somecontext1' or 'somecontext2'
 			if ($conf->digiriskdolibarr->enabled && $user->rights->digiriskdolibarr->preventionplan->read) {
 				$value['preventionplan'] = '<i class="fas fa-info"></i>  ' . dol_escape_htmltag($langs->trans('PreventionPlan'));
 			}
@@ -172,7 +169,7 @@ class ActionsDigiriskdolibarr
 			}
 		}
 
-		if (!$error) {
+		if ( ! $error) {
 			$this->results = $value;
 			return 0; // or return 1 to replace standard code
 		} else {
@@ -197,8 +194,7 @@ class ActionsDigiriskdolibarr
 		$error = 0; // Error counter
 
 		/* print_r($parameters); print_r($object); echo "action: " . $action; */
-		if (in_array($parameters['currentcontext'], array('mainloginpage')))	    // do something only for the context 'somecontext1' or 'somecontext2'
-		{
+		if (in_array($parameters['currentcontext'], array('mainloginpage'))) {	    // do something only for the context 'somecontext1' or 'somecontext2'
 			if ($conf->global->DIGIRISKDOLIBARR_REDIRECT_AFTER_CONNECTION > 0) {
 				$value = dol_buildpath('/custom/digiriskdolibarr/digiriskdolibarrindex.php?idmenu=1319&mainmenu=digiriskdolibarr&leftmenu=', 1);
 			} else {
@@ -206,7 +202,7 @@ class ActionsDigiriskdolibarr
 			}
 		}
 
-		if (!$error) {
+		if ( ! $error) {
 			$this->resprints = $value;
 			return 0; // or return 1 to replace standard code
 		} else {

@@ -69,32 +69,32 @@ class Accident extends CommonObject
 	 */
 	public $picto = 'accident@digiriskdolibarr';
 
-	const STATUS_IN_PROGRESS       = 1;
+	const STATUS_IN_PROGRESS = 1;
 
 	/**
 	 * @var array  Array with all fields and their property. Do not use it as a static var. It may be modified by constructor.
 	 */
-	public $fields=array(
-		'rowid'              => array('type'=>'integer', 'label'=>'TechnicalID', 'enabled'=>'1', 'position'=>1, 'notnull'=>1, 'visible'=>0, 'noteditable'=>'1', 'index'=>1, 'comment'=>"Id"),
-		'ref'                => array('type'=>'varchar(128)', 'label'=>'Ref', 'enabled'=>'1', 'position'=>10, 'notnull'=>1, 'visible'=>1, 'noteditable'=>'1', 'default'=>'(PROV)', 'index'=>1, 'searchall'=>1, 'showoncombobox'=>'1', 'comment'=>"Reference of object"),
-		'ref_ext'            => array('type'=>'varchar(128)', 'label'=>'RefExt', 'enabled'=>'1', 'position'=>20, 'notnull'=>0, 'visible'=>0,),
-		'entity'             => array('type'=>'integer', 'label'=>'Entity', 'enabled'=>'1', 'position'=>30, 'notnull'=>1, 'visible'=>0,),
-		'date_creation'      => array('type'=>'datetime', 'label'=>'DateCreation', 'enabled'=>'1', 'position'=>40, 'notnull'=>1, 'visible'=>0,),
-		'tms'                => array('type'=>'timestamp', 'label'=>'DateModification', 'enabled'=>'1', 'position'=>50, 'notnull'=>0, 'visible'=>0,),
-		'status'             => array('type'=>'smallint', 'label'=>'Status', 'enabled'=>'1', 'position'=>70, 'notnull'=>0, 'visible'=>2, 'index'=>0,),
-		'label'              => array('type'=>'varchar(255)', 'label'=>'Label', 'enabled'=>'1', 'position'=>80, 'notnull'=>0, 'visible'=>1, 'searchall'=>1, 'css'=>'minwidth200', 'help'=>"Help text", 'showoncombobox'=>'1',),
-		'fk_user_victim'     => array('type'=>'integer', 'label'=>'UserVictim', 'enabled'=>'1', 'position'=>81, 'notnull'=>-1, 'visible'=>1,),
-		'fk_user_employer'   => array('type'=>'integer', 'label'=>'UserEmployer', 'enabled'=>'1', 'position'=>82, 'notnull'=>-1, 'visible'=>1,),
-		'accident_type'      => array('type'=>'text', 'label'=>'AccidentType', 'enabled'=>'1', 'position'=>90, 'notnull'=>-1, 'visible'=>1, 'css'=>'minwidth150',),
-		'fk_element'         => array('type'=>'integer', 'label'=>'AccidentLocation', 'enabled'=>'1', 'position'=>91, 'notnull'=>-1, 'visible'=>1,'css'=>'minwidth150',),
-		'fk_soc'             => array('type'=>'integer', 'label'=>'ExtSociety', 'enabled'=>'1', 'position'=>92, 'notnull'=>-1, 'visible'=>3,),
-		'accident_date'      => array('type'=>'datetime', 'label'=>'AccidentDate', 'enabled'=>'1', 'position'=>100, 'notnull'=>-1, 'visible'=>1, 'css'=>'minwidth150',),
-		'description'        => array('type'=>'text', 'label'=>'Description', 'enabled'=>'1', 'position'=>110, 'notnull'=>-1, 'visible'=>1,),
-		'photo'              => array('type'=>'text', 'label'=>'Photo', 'enabled'=>'1', 'position'=>120, 'notnull'=>-1, 'visible'=>3,),
-		'external_accident'  => array('type'=>'boolean', 'label'=>'ExternalAccident', 'enabled'=>'1', 'position'=>130, 'notnull'=>-1, 'visible'=>3,),
-		'fk_project'         => array('type'=>'integer', 'label'=>'FKProject', 'enabled'=>'1', 'position'=>140, 'notnull'=>1, 'visible'=>0,),
-		'fk_user_creat'      => array('type'=>'integer:User:user/class/user.class.php', 'label'=>'UserAuthor', 'enabled'=>'1', 'position'=>150, 'notnull'=>1, 'visible'=>0, 'foreignkey'=>'user.rowid',),
-		'fk_user_modif'      => array('type'=>'integer:User:user/class/user.class.php', 'label'=>'UserModif', 'enabled'=>'1', 'position'=>160, 'notnull'=>-1, 'visible'=>0,),
+	public $fields = array(
+		'rowid'              => array('type' => 'integer', 'label' => 'TechnicalID', 'enabled' => '1', 'position' => 1, 'notnull' => 1, 'visible' => 0, 'noteditable' => '1', 'index' => 1, 'comment' => "Id"),
+		'ref'                => array('type' => 'varchar(128)', 'label' => 'Ref', 'enabled' => '1', 'position' => 10, 'notnull' => 1, 'visible' => 1, 'noteditable' => '1', 'default' => '(PROV)', 'index' => 1, 'searchall' => 1, 'showoncombobox' => '1', 'comment' => "Reference of object"),
+		'ref_ext'            => array('type' => 'varchar(128)', 'label' => 'RefExt', 'enabled' => '1', 'position' => 20, 'notnull' => 0, 'visible' => 0,),
+		'entity'             => array('type' => 'integer', 'label' => 'Entity', 'enabled' => '1', 'position' => 30, 'notnull' => 1, 'visible' => 0,),
+		'date_creation'      => array('type' => 'datetime', 'label' => 'DateCreation', 'enabled' => '1', 'position' => 40, 'notnull' => 1, 'visible' => 0,),
+		'tms'                => array('type' => 'timestamp', 'label' => 'DateModification', 'enabled' => '1', 'position' => 50, 'notnull' => 0, 'visible' => 0,),
+		'status'             => array('type' => 'smallint', 'label' => 'Status', 'enabled' => '1', 'position' => 70, 'notnull' => 0, 'visible' => 2, 'index' => 0,),
+		'label'              => array('type' => 'varchar(255)', 'label' => 'Label', 'enabled' => '1', 'position' => 80, 'notnull' => 0, 'visible' => 1, 'searchall' => 1, 'css' => 'minwidth200', 'help' => "Help text", 'showoncombobox' => '1',),
+		'fk_user_victim'     => array('type' => 'integer', 'label' => 'UserVictim', 'enabled' => '1', 'position' => 81, 'notnull' => -1, 'visible' => 1,),
+		'fk_user_employer'   => array('type' => 'integer', 'label' => 'UserEmployer', 'enabled' => '1', 'position' => 82, 'notnull' => -1, 'visible' => 1,),
+		'accident_type'      => array('type' => 'text', 'label' => 'AccidentType', 'enabled' => '1', 'position' => 90, 'notnull' => -1, 'visible' => 1, 'css' => 'minwidth150',),
+		'fk_element'         => array('type' => 'integer', 'label' => 'AccidentLocation', 'enabled' => '1', 'position' => 91, 'notnull' => -1, 'visible' => 1,'css' => 'minwidth150',),
+		'fk_soc'             => array('type' => 'integer', 'label' => 'ExtSociety', 'enabled' => '1', 'position' => 92, 'notnull' => -1, 'visible' => 3,),
+		'accident_date'      => array('type' => 'datetime', 'label' => 'AccidentDate', 'enabled' => '1', 'position' => 100, 'notnull' => -1, 'visible' => 1, 'css' => 'minwidth150',),
+		'description'        => array('type' => 'text', 'label' => 'Description', 'enabled' => '1', 'position' => 110, 'notnull' => -1, 'visible' => 1,),
+		'photo'              => array('type' => 'text', 'label' => 'Photo', 'enabled' => '1', 'position' => 120, 'notnull' => -1, 'visible' => 3,),
+		'external_accident'  => array('type' => 'boolean', 'label' => 'ExternalAccident', 'enabled' => '1', 'position' => 130, 'notnull' => -1, 'visible' => 3,),
+		'fk_project'         => array('type' => 'integer', 'label' => 'FKProject', 'enabled' => '1', 'position' => 140, 'notnull' => 1, 'visible' => 0,),
+		'fk_user_creat'      => array('type' => 'integer:User:user/class/user.class.php', 'label' => 'UserAuthor', 'enabled' => '1', 'position' => 150, 'notnull' => 1, 'visible' => 0, 'foreignkey' => 'user.rowid',),
+		'fk_user_modif'      => array('type' => 'integer:User:user/class/user.class.php', 'label' => 'UserModif', 'enabled' => '1', 'position' => 160, 'notnull' => -1, 'visible' => 0,),
 	);
 
 	public $rowid;
@@ -129,26 +129,20 @@ class Accident extends CommonObject
 		$this->db = $db;
 
 		if (empty($conf->global->MAIN_SHOW_TECHNICAL_ID) && isset($this->fields['rowid'])) $this->fields['rowid']['visible'] = 0;
-		if (empty($conf->multicompany->enabled) && isset($this->fields['entity'])) $this->fields['entity']['enabled'] = 0;
+		if (empty($conf->multicompany->enabled) && isset($this->fields['entity'])) $this->fields['entity']['enabled']        = 0;
 
 		// Unset fields that are disabled
-		foreach ($this->fields as $key => $val)
-		{
-			if (isset($val['enabled']) && empty($val['enabled']))
-			{
+		foreach ($this->fields as $key => $val) {
+			if (isset($val['enabled']) && empty($val['enabled'])) {
 				unset($this->fields[$key]);
 			}
 		}
 
 		// Translate some data of arrayofkeyval
-		if (is_object($langs))
-		{
-			foreach ($this->fields as $key => $val)
-			{
-				if (is_array($val['arrayofkeyval']))
-				{
-					foreach ($val['arrayofkeyval'] as $key2 => $val2)
-					{
+		if (is_object($langs)) {
+			foreach ($this->fields as $key => $val) {
+				if (is_array($val['arrayofkeyval'])) {
+					foreach ($val['arrayofkeyval'] as $key2 => $val2) {
 						$this->fields[$key]['arrayofkeyval'][$key2] = $langs->trans($val2);
 					}
 				}
@@ -212,45 +206,41 @@ class Accident extends CommonObject
 
 		$records = array();
 
-		$sql = 'SELECT ';
-		$sql .= $this->getFieldList();
-		$sql .= ' FROM '.MAIN_DB_PREFIX.$this->table_element.' as t';
-		if (isset($this->ismultientitymanaged) && $this->ismultientitymanaged == 1) $sql .= ' WHERE t.entity IN ('.getEntity($this->table_element).')';
-		else $sql .= ' WHERE 1 = 1';
+		$sql                                                                              = 'SELECT ';
+		$sql                                                                             .= $this->getFieldList();
+		$sql                                                                             .= ' FROM ' . MAIN_DB_PREFIX . $this->table_element . ' as t';
+		if (isset($this->ismultientitymanaged) && $this->ismultientitymanaged == 1) $sql .= ' WHERE t.entity IN (' . getEntity($this->table_element) . ')';
+		else $sql                                                                        .= ' WHERE 1 = 1';
 		// Manage filter
 		$sqlwhere = array();
 		if (count($filter) > 0) {
 			foreach ($filter as $key => $value) {
 				if ($key == 't.rowid') {
-					$sqlwhere[] = $key.'='.$value;
-				}
-				elseif (strpos($key, 'date') !== false) {
-					$sqlwhere[] = $key.' = \''.$this->db->idate($value).'\'';
-				}
-				elseif ($key == 'customsql') {
+					$sqlwhere[] = $key . '=' . $value;
+				} elseif (strpos($key, 'date') !== false) {
+					$sqlwhere[] = $key . ' = \'' . $this->db->idate($value) . '\'';
+				} elseif ($key == 'customsql') {
 					$sqlwhere[] = $value;
-				}
-				else {
-					$sqlwhere[] = $key.' LIKE \'%'.$this->db->escape($value).'%\'';
+				} else {
+					$sqlwhere[] = $key . ' LIKE \'%' . $this->db->escape($value) . '%\'';
 				}
 			}
 		}
 		if (count($sqlwhere) > 0) {
-			$sql .= ' AND ('.implode(' '.$filtermode.' ', $sqlwhere).')';
+			$sql .= ' AND (' . implode(' ' . $filtermode . ' ', $sqlwhere) . ')';
 		}
 
-		if (!empty($sortfield)) {
+		if ( ! empty($sortfield)) {
 			$sql .= $this->db->order($sortfield, $sortorder);
 		}
-		if (!empty($limit)) {
-			$sql .= ' '.$this->db->plimit($limit, $offset);
+		if ( ! empty($limit)) {
+			$sql .= ' ' . $this->db->plimit($limit, $offset);
 		}
 		$resql = $this->db->query($sql);
 		if ($resql) {
 			$num = $this->db->num_rows($resql);
-			$i = 0;
-			while ($i < ($limit ? min($limit, $num) : $num))
-			{
+			$i   = 0;
+			while ($i < ($limit ? min($limit, $num) : $num)) {
 				$obj = $this->db->fetch_object($resql);
 
 				$record = new self($this->db);
@@ -264,8 +254,8 @@ class Accident extends CommonObject
 
 			return $records;
 		} else {
-			$this->errors[] = 'Error '.$this->db->lasterror();
-			dol_syslog(__METHOD__.' '.join(',', $this->errors), LOG_ERR);
+			$this->errors[] = 'Error ' . $this->db->lasterror();
+			dol_syslog(__METHOD__ . ' ' . join(',', $this->errors), LOG_ERR);
 
 			return -1;
 		}
@@ -304,33 +294,28 @@ class Accident extends CommonObject
 	 */
 	public function info($id)
 	{
-		$sql = 'SELECT rowid, date_creation as datec, tms as datem,';
-		$sql .= ' fk_user_creat, fk_user_modif';
-		$sql .= ' FROM '.MAIN_DB_PREFIX.$this->table_element.' as t';
-		$sql .= ' WHERE t.rowid = '.$id;
+		$sql    = 'SELECT rowid, date_creation as datec, tms as datem,';
+		$sql   .= ' fk_user_creat, fk_user_modif';
+		$sql   .= ' FROM ' . MAIN_DB_PREFIX . $this->table_element . ' as t';
+		$sql   .= ' WHERE t.rowid = ' . $id;
 		$result = $this->db->query($sql);
-		if ($result)
-		{
-			if ($this->db->num_rows($result))
-			{
-				$obj = $this->db->fetch_object($result);
+		if ($result) {
+			if ($this->db->num_rows($result)) {
+				$obj      = $this->db->fetch_object($result);
 				$this->id = $obj->rowid;
-				if ($obj->fk_user_author)
-				{
+				if ($obj->fk_user_author) {
 					$cuser = new User($this->db);
 					$cuser->fetch($obj->fk_user_author);
 					$this->user_creation = $cuser;
 				}
 
-				if ($obj->fk_user_valid)
-				{
+				if ($obj->fk_user_valid) {
 					$vuser = new User($this->db);
 					$vuser->fetch($obj->fk_user_valid);
 					$this->user_validation = $vuser;
 				}
 
-				if ($obj->fk_user_cloture)
-				{
+				if ($obj->fk_user_cloture) {
 					$cluser = new User($this->db);
 					$cluser->fetch($obj->fk_user_cloture);
 					$this->user_cloture = $cluser;
@@ -342,9 +327,7 @@ class Accident extends CommonObject
 			}
 
 			$this->db->free($result);
-		}
-		else
-		{
+		} else {
 			dol_print_error($this->db);
 		}
 	}
@@ -371,15 +354,14 @@ class Accident extends CommonObject
 	{
 
 		// phpcs:enable
-		if (empty($this->labelStatus) || empty($this->labelStatusShort))
-		{
+		if (empty($this->labelStatus) || empty($this->labelStatusShort)) {
 			global $langs;
 			$langs->load("digiriskdolibarr@digiriskdolibarr");
 
 			$this->labelStatus[self::STATUS_IN_PROGRESS] = $langs->trans('InProgress');
 		}
 
-		$statusType = 'status'.$status;
+		$statusType = 'status' . $status;
 
 		return dolGetStatus($this->labelStatus[$status], $this->labelStatusShort[$status], '', $statusType, $mode);
 	}
@@ -398,7 +380,7 @@ class Accident extends CommonObject
 	{
 		global $conf, $langs, $hookmanager;
 
-		if (!empty($conf->dol_no_mouse_hover)) $notooltip = 1; // Force disable tooltips
+		if ( ! empty($conf->dol_no_mouse_hover)) $notooltip = 1; // Force disable tooltips
 
 		$name = $this->ref;
 
@@ -407,14 +389,11 @@ class Accident extends CommonObject
 		$result = ''; $label = '';
 		$linkstart = ''; $linkend = '';
 
-		if (!empty($this->logo) && class_exists('Form'))
-		{
+		if ( ! empty($this->logo) && class_exists('Form')) {
 			$label .= '<div class="photointooltip">';
 			$label .= Form::showphoto('societe', $this, 0, 40, 0, '', 'mini', 0); // Important, we must force height so image will have height tags and if image is inside a tooltip, the tooltip manager can calculate height and position correctly the tooltip.
 			$label .= '</div><div style="clear: both;"></div>';
-		}
-		elseif (!empty($this->logo_squarred) && class_exists('Form'))
-		{
+		} elseif ( ! empty($this->logo_squarred) && class_exists('Form')) {
 			/*$label.= '<div class="photointooltip">';
 			$label.= Form::showphoto('societe', $this, 0, 40, 0, 'photowithmargin', 'mini', 0);	// Important, we must force height so image will have height tags and if image is inside a tooltip, the tooltip manager can calculate height and position correctly the tooltip.
 			$label.= '</div><div style="clear: both;"></div>';*/
@@ -424,15 +403,13 @@ class Accident extends CommonObject
 
 
 		// By default
-		if (empty($linkstart))
-		{
-			$label .= '<u>'.$langs->trans("Accident").'</u>';
-			$linkstart = '<a href="'.DOL_URL_ROOT.'/custom/digiriskdolibarr/view/accident/accident_card.php?id='.$this->id;
+		if (empty($linkstart)) {
+			$label    .= '<u>' . $langs->trans("Accident") . '</u>';
+			$linkstart = '<a href="' . DOL_URL_ROOT . '/custom/digiriskdolibarr/view/accident/accident_card.php?id=' . $this->id;
 		}
 
-		if (!empty($this->ref))
-		{
-			$label .= '<br><b>'.$langs->trans('Ref').':</b> '.$this->ref;
+		if ( ! empty($this->ref)) {
+			$label .= '<br><b>' . $langs->trans('Ref') . ':</b> ' . $this->ref;
 		}
 
 		$label .= '</div>';
@@ -440,29 +417,26 @@ class Accident extends CommonObject
 		$linkstart .= '"';
 
 		$linkclose = '';
-		if (empty($notooltip))
-		{
-			if (!empty($conf->global->MAIN_OPTIMIZEFORTEXTBROWSER))
-			{
-				$label = $langs->trans("ShowCompany");
-				$linkclose .= ' alt="'.dol_escape_htmltag($label, 1).'"';
+		if (empty($notooltip)) {
+			if ( ! empty($conf->global->MAIN_OPTIMIZEFORTEXTBROWSER)) {
+				$label      = $langs->trans("ShowCompany");
+				$linkclose .= ' alt="' . dol_escape_htmltag($label, 1) . '"';
 			}
-			$linkclose .= ' title="'.dol_escape_htmltag($label, 1).'"';
+			$linkclose .= ' title="' . dol_escape_htmltag($label, 1) . '"';
 			$linkclose .= ' class="classfortooltip refurl"';
 		}
-		$linkstart .= $linkclose.'>';
-		$linkend = '</a>';
+		$linkstart .= $linkclose . '>';
+		$linkend    = '</a>';
 
-		$result .= $linkstart;
-		if ($withpicto) $result .= img_object(($notooltip ? '' : $label), ($this->picto ? $this->picto : 'generic'), ($notooltip ? (($withpicto != 2) ? 'class="paddingright"' : '') : 'class="'.(($withpicto != 2) ? 'paddingright ' : '').'classfortooltip"'), 0, 0, $notooltip ? 0 : 1);
-		if ($withpicto != 2) $result .= ($maxlen ?dol_trunc($name, $maxlen) : $name);
-		$result .= $linkend;
+		$result                      .= $linkstart;
+		if ($withpicto) $result      .= img_object(($notooltip ? '' : $label), ($this->picto ? $this->picto : 'generic'), ($notooltip ? (($withpicto != 2) ? 'class="paddingright"' : '') : 'class="' . (($withpicto != 2) ? 'paddingright ' : '') . 'classfortooltip"'), 0, 0, $notooltip ? 0 : 1);
+		if ($withpicto != 2) $result .= ($maxlen ? dol_trunc($name, $maxlen) : $name);
+		$result                      .= $linkend;
 
 		 $result .= $hookmanager->resPrint;
 
 		return $result;
 	}
-
 }
 
 /**
@@ -484,15 +458,15 @@ class AccidentWorkStop extends CommonObjectLine
 	/**
 	 * @var array  Array with all fields and their property. Do not use it as a static var. It may be modified by constructor.
 	 */
-	public $fields=array(
-		'rowid'         => array('type'=>'integer', 'label'=>'TechnicalID', 'enabled'=>'1', 'position'=>1, 'notnull'=>1, 'visible'=>0, 'noteditable'=>'1', 'index'=>1, 'comment'=>"Id"),
-		'ref'           => array('type'=>'varchar(128)', 'label'=>'Ref', 'enabled'=>'1', 'position'=>10, 'notnull'=>1, 'visible'=>1, 'noteditable'=>'1', 'default'=>'(PROV)', 'index'=>1, 'searchall'=>1, 'showoncombobox'=>'1', 'comment'=>"Reference of object"),
-		'entity'        => array('type'=>'integer', 'label'=>'Entity', 'enabled'=>'1', 'position'=>30, 'notnull'=>1, 'visible'=>0,),
-		'date_creation' => array('type'=>'datetime', 'label'=>'DateCreation', 'enabled'=>'1', 'position'=>40, 'notnull'=>1, 'visible'=>0,),
-		'tms'           => array('type'=>'timestamp', 'label'=>'DateModification', 'enabled'=>'1', 'position'=>50, 'notnull'=>0, 'visible'=>0,),
-		'status'        => array('type'=>'smallint', 'label'=>'Status', 'enabled'=>'1', 'position'=>60, 'notnull'=>0, 'visible'=>0, 'index'=>0,),
-		'workstop_days' => array('type'=>'integer', 'label'=>'WorkStopDays', 'enabled'=>'1', 'position'=>70, 'notnull'=>-1, 'visible'=>-1,),
-		'fk_accident'   => array('type'=>'integer', 'label'=>'FkAccident', 'enabled'=>'1', 'position'=>80, 'notnull'=>1, 'visible'=>0,),
+	public $fields = array(
+		'rowid'         => array('type' => 'integer', 'label' => 'TechnicalID', 'enabled' => '1', 'position' => 1, 'notnull' => 1, 'visible' => 0, 'noteditable' => '1', 'index' => 1, 'comment' => "Id"),
+		'ref'           => array('type' => 'varchar(128)', 'label' => 'Ref', 'enabled' => '1', 'position' => 10, 'notnull' => 1, 'visible' => 1, 'noteditable' => '1', 'default' => '(PROV)', 'index' => 1, 'searchall' => 1, 'showoncombobox' => '1', 'comment' => "Reference of object"),
+		'entity'        => array('type' => 'integer', 'label' => 'Entity', 'enabled' => '1', 'position' => 30, 'notnull' => 1, 'visible' => 0,),
+		'date_creation' => array('type' => 'datetime', 'label' => 'DateCreation', 'enabled' => '1', 'position' => 40, 'notnull' => 1, 'visible' => 0,),
+		'tms'           => array('type' => 'timestamp', 'label' => 'DateModification', 'enabled' => '1', 'position' => 50, 'notnull' => 0, 'visible' => 0,),
+		'status'        => array('type' => 'smallint', 'label' => 'Status', 'enabled' => '1', 'position' => 60, 'notnull' => 0, 'visible' => 0, 'index' => 0,),
+		'workstop_days' => array('type' => 'integer', 'label' => 'WorkStopDays', 'enabled' => '1', 'position' => 70, 'notnull' => -1, 'visible' => -1,),
+		'fk_accident'   => array('type' => 'integer', 'label' => 'FkAccident', 'enabled' => '1', 'position' => 80, 'notnull' => 1, 'visible' => 0,),
 	);
 
 	public $ref;
@@ -515,8 +489,7 @@ class AccidentWorkStop extends CommonObjectLine
 		$this->db = $db;
 
 		if (empty($conf->global->MAIN_SHOW_TECHNICAL_ID) && isset($this->fields['rowid'])) $this->fields['rowid']['visible'] = 0;
-		if (empty($conf->multicompany->enabled) && isset($this->fields['entity'])) $this->fields['entity']['enabled'] = 0;
-
+		if (empty($conf->multicompany->enabled) && isset($this->fields['entity'])) $this->fields['entity']['enabled']        = 0;
 	}
 
 	/**
@@ -529,7 +502,7 @@ class AccidentWorkStop extends CommonObjectLine
 	{
 		global $db;
 
-		$sql = 'SELECT t.rowid, t.ref, t.date_creation, t.status, t.workstop_days, t.fk_accident';
+		$sql  = 'SELECT t.rowid, t.ref, t.date_creation, t.status, t.workstop_days, t.fk_accident';
 		$sql .= ' FROM ' . MAIN_DB_PREFIX . 'digiriskdolibarr_accident_workstop as t';
 		$sql .= ' WHERE t.rowid = ' . $rowid;
 		$sql .= ' AND entity IN (' . getEntity($this->table_element) . ')';
@@ -538,12 +511,12 @@ class AccidentWorkStop extends CommonObjectLine
 		if ($result) {
 			$objp = $db->fetch_object($result);
 
-			$this->id = $objp->rowid;
-			$this->ref = $objp->ref;
+			$this->id            = $objp->rowid;
+			$this->ref           = $objp->ref;
 			$this->date_creation = $objp->date_creation;
-			$this->status = $objp->status;
+			$this->status        = $objp->status;
 			$this->workstop_days = $objp->workstop_days;
-			$this->fk_accident = $objp->fk_accident;
+			$this->fk_accident   = $objp->fk_accident;
 
 			$db->free($result);
 
@@ -563,7 +536,7 @@ class AccidentWorkStop extends CommonObjectLine
 	public function fetchAll($parent_id = 0, $limit = 0)
 	{
 		global $db;
-		$sql = 'SELECT t.rowid, t.ref, t.date_creation, t.status, t.workstop_days';
+		$sql  = 'SELECT t.rowid, t.ref, t.date_creation, t.status, t.workstop_days';
 		$sql .= ' FROM ' . MAIN_DB_PREFIX . 'digiriskdolibarr_accident_workstop as t';
 		if ($parent_id > 0) {
 			$sql .= ' WHERE t.fk_accident = ' . $parent_id;
@@ -584,12 +557,12 @@ class AccidentWorkStop extends CommonObjectLine
 
 				$record = new self($db);
 
-				$record->id = $obj->rowid;
-				$record->ref = $obj->ref;
+				$record->id            = $obj->rowid;
+				$record->ref           = $obj->ref;
 				$record->date_creation = $obj->date_creation;
-				$record->status = $obj->status;
+				$record->status        = $obj->status;
 				$record->workstop_days = $obj->workstop_days;
-				$record->fk_accident = $obj->fk_accident;
+				$record->fk_accident   = $obj->fk_accident;
 
 				$records[$record->id] = $record;
 
@@ -622,7 +595,7 @@ class AccidentWorkStop extends CommonObjectLine
 		$now = dol_now();
 
 		// Insertion dans base de la ligne
-		$sql = 'INSERT INTO ' . MAIN_DB_PREFIX . 'digiriskdolibarr_accident_workstop';
+		$sql  = 'INSERT INTO ' . MAIN_DB_PREFIX . 'digiriskdolibarr_accident_workstop';
 		$sql .= ' (ref, entity, date_creation, status, workstop_days, fk_accident';
 		$sql .= ')';
 		$sql .= " VALUES (";
@@ -639,15 +612,14 @@ class AccidentWorkStop extends CommonObjectLine
 		$resql = $db->query($sql);
 
 		if ($resql) {
-			$this->id = $db->last_insert_id(MAIN_DB_PREFIX . 'accident_workstop');
+			$this->id    = $db->last_insert_id(MAIN_DB_PREFIX . 'accident_workstop');
 			$this->rowid = $this->id; // For backward compatibility
 
 			$db->commit();
 			// Triggers
-			if (!$notrigger)
-			{
+			if ( ! $notrigger) {
 				// Call triggers
-				$this->call_trigger(strtoupper(get_class($this)).'_CREATE', $user);
+				$this->call_trigger(strtoupper(get_class($this)) . '_CREATE', $user);
 				// End call triggers
 			}
 			return $this->id;
@@ -672,7 +644,7 @@ class AccidentWorkStop extends CommonObjectLine
 
 		$db->begin();
 		// Mise a jour ligne en base
-		$sql = "UPDATE " . MAIN_DB_PREFIX . "digiriskdolibarr_accident_workstop SET";
+		$sql  = "UPDATE " . MAIN_DB_PREFIX . "digiriskdolibarr_accident_workstop SET";
 		$sql .= " ref='" . $db->escape($this->ref) . "',";
 		$sql .= " status=" . $this->status . ",";
 		$sql .= " workstop_days=" . $this->workstop_days . ",";
@@ -685,10 +657,9 @@ class AccidentWorkStop extends CommonObjectLine
 		if ($resql) {
 			$db->commit();
 			// Triggers
-			if (!$notrigger)
-			{
+			if ( ! $notrigger) {
 				// Call triggers
-				$this->call_trigger(strtoupper(get_class($this)).'_MODIFY', $user);
+				$this->call_trigger(strtoupper(get_class($this)) . '_MODIFY', $user);
 				// End call triggers
 			}
 			return 1;
@@ -708,12 +679,12 @@ class AccidentWorkStop extends CommonObjectLine
 	public function delete(User $user, $notrigger = false)
 	{
 		// Triggers
-		if (!$notrigger) {
+		if ( ! $notrigger) {
 			// Call trigger
-			$this->call_trigger(strtoupper(get_class($this)).'_DELETE', $user);
+			$this->call_trigger(strtoupper(get_class($this)) . '_DELETE', $user);
 			// End call triggers
 		}
-		return $this->update($user,true);
+		return $this->update($user, true);
 	}
 }
 
@@ -754,43 +725,43 @@ class AccidentMetaData extends CommonObject
 	 * @var array  Array with all fields and their property. Do not use it as a static var. It may be modified by constructor.
 	 */
 	public $fields = array(
-		'rowid'                                => array('type'=>'integer', 'label'=>'TechnicalID', 'enabled'=>'1', 'position'=>1, 'notnull'=>1, 'visible'=>0, 'noteditable'=>'1', 'index'=>1, 'comment'=>"Id"),
-		'entity'                               => array('type'=>'integer', 'label'=>'Entity', 'enabled'=>'1', 'position'=>10, 'notnull'=>1, 'visible'=>0,),
-		'date_creation'                        => array('type'=>'datetime', 'label'=>'DateCreation', 'enabled'=>'1', 'position'=>20, 'notnull'=>1, 'visible'=>0,),
-		'tms'                                  => array('type'=>'timestamp', 'label'=>'DateModification', 'enabled'=>'1', 'position'=>30, 'notnull'=>0, 'visible'=>0,),
-		'status'                               => array('type'=>'smallint', 'label'=>'Status', 'enabled'=>'1', 'position'=>40, 'notnull'=>0, 'visible'=>1, 'index'=>0,),
-		'relative_location'                    => array('type'=>'varchar(255)', 'label'=>'RelativeLocation', 'enabled'=>'1', 'position'=>50, 'notnull'=>-1, 'visible'=>1,),
-		'victim_activity'                      => array('type'=>'text', 'label'=>'VictimActivity', 'enabled'=>'1', 'position'=>60, 'notnull'=>-1, 'visible'=>1,),
-		'accident_nature'                      => array('type'=>'text', 'label'=>'AccidentNature', 'enabled'=>'1', 'position'=>70, 'notnull'=>-1, 'visible'=>1,),
-		'accident_object'                      => array('type'=>'text', 'label'=>'AccidentObject', 'enabled'=>'1', 'position'=>80, 'notnull'=>-1, 'visible'=>1,),
-		'accident_nature_doubt'                => array('type'=>'text', 'label'=>'AccidentNatureDoubt', 'enabled'=>'1', 'position'=>90, 'notnull'=>-1, 'visible'=>1,),
-		'accident_nature_doubt_link'           => array('type'=>'url', 'label'=>'AccidentNatureDoubtLink', 'enabled'=>'1', 'position'=>100, 'notnull'=>-1, 'visible'=>1,),
-		'victim_transported_to'                => array('type'=>'text', 'label'=>'VictimTransportedTo', 'enabled'=>'1', 'position'=>110, 'notnull'=>-1, 'visible'=>1,),
-		'collateral_victim'                    => array('type'=>'boolean', 'label'=>'CollateralVictim', 'enabled'=>'1', 'position'=>120, 'notnull'=>-1, 'visible'=>1,),
-		'workhours_morning_date_start'         => array('type'=>'datetime', 'label'=>'WorkHoursMorningDateStart', 'enabled'=>'1', 'position'=>130, 'notnull'=>-1, 'visible'=>1,),
-		'workhours_morning_date_end'           => array('type'=>'datetime', 'label'=>'WorkHoursMorningDateEnd', 'enabled'=>'1', 'position'=>131, 'notnull'=>-1, 'visible'=>1,),
-		'workhours_afternoon_date_start'       => array('type'=>'datetime', 'label'=>'WorkHoursAfternoonDateStart', 'enabled'=>'1', 'position'=>132, 'notnull'=>-1, 'visible'=>1,),
-		'workhours_afternoon_date_end'         => array('type'=>'datetime', 'label'=>'WorkHoursAfternoonDateEnd', 'enabled'=>'1', 'position'=>133, 'notnull'=>-1, 'visible'=>1,),
-		'accident_noticed'                     => array('type'=>'text', 'label'=>'AccidentNoticed', 'enabled'=>'1', 'position'=>140, 'notnull'=>-1, 'visible'=>1,),
-		'accident_notice_date'                 => array('type'=>'datetime', 'label'=>'AccidentNoticeDate', 'enabled'=>'1', 'position'=>150, 'notnull'=>-1, 'visible'=>1,),
-		'accident_notice_by'                   => array('type'=>'text', 'label'=>'AccidentNoticeBy', 'enabled'=>'1', 'position'=>160, 'notnull'=>-1, 'visible'=>1,),
-		'accident_described_by_victim'         => array('type'=>'boolean', 'label'=>'AccidentDescribedByVictim', 'enabled'=>'1', 'position'=>170, 'notnull'=>-1, 'visible'=>1,),
-		'registered_in_accident_register'      => array('type'=>'boolean', 'label'=>'RegisteredInAccidentRegister', 'enabled'=>'1', 'position'=>180, 'notnull'=>-1, 'visible'=>1,),
-		'register_date'                        => array('type'=>'datetime', 'label'=>'RegisterDate', 'enabled'=>'1', 'position'=>190, 'notnull'=>-1, 'visible'=>1,),
-		'register_number'                      => array('type'=>'varchar(255)', 'label'=>'RegisterNumber', 'enabled'=>'1', 'position'=>200, 'notnull'=>-1, 'visible'=>1,),
-		'consequence'                          => array('type'=>'text', 'label'=>'Consequence', 'enabled'=>'1', 'position'=>210, 'notnull'=>-1, 'visible'=>1, 'arrayofkeyval'=>array(0=>'Draft', 1=>'Validated', 9=>'Canceled')),
-		'police_report'                        => array('type'=>'boolean', 'label'=>'PoliceReport', 'enabled'=>'1', 'position'=>220, 'notnull'=>-1, 'visible'=>1,),
-		'police_report_by'                     => array('type'=>'text', 'label'=>'PoliceReportBy', 'enabled'=>'1', 'position'=>230, 'notnull'=>-1, 'visible'=>1,),
-		'first_person_noticed_is_witness'      => array('type'=>'text', 'label'=>'FirstPersonNoticedIsWitness', 'enabled'=>'1', 'position'=>240, 'notnull'=>-1, 'visible'=>1,),
-		'thirdparty_responsibility'            => array('type'=>'boolean', 'label'=>'ThirdPartyResponsability', 'enabled'=>'1', 'position'=>250, 'notnull'=>-1, 'visible'=>1,),
-		'accident_investigation'               => array('type'=>'boolean', 'label'=>'AccidentInvestigation', 'enabled'=>'1', 'position'=>260, 'notnull'=>-1, 'visible'=>1,),
-		'accident_investigation_link'          => array('type'=>'url', 'label'=>'AccidentInvestigationLink', 'enabled'=>'1', 'position'=>270, 'notnull'=>-1, 'visible'=>1,),
-		'cerfa_link'                           => array('type'=>'url', 'label'=>'CerfaLink', 'enabled'=>'1', 'position'=>280, 'notnull'=>-1, 'visible'=>1,),
-		'json'                                 => array('type'=>'text', 'label'=>'Json', 'enabled'=>'1', 'position'=>290, 'notnull'=>-1, 'visible'=>1,),
-		'fk_user_witness'                      => array('type'=>'integer', 'label'=>'UserVictim', 'enabled'=>'1', 'position'=>300, 'notnull'=>-1, 'visible'=>-2,),
-		'fk_soc_responsible'                   => array('type'=>'integer', 'label'=>'SocResponsible', 'enabled'=>'1', 'position'=>310, 'notnull'=>-1, 'visible'=>-2,),
-		'fk_soc_responsible_insurance_society' => array('type'=>'integer', 'label'=>'SocResponsibleInsuranceSociety', 'enabled'=>'1', 'position'=>320, 'notnull'=>-1, 'visible'=>-2,),
-		'fk_accident'                          => array('type'=>'integer', 'label'=>'FkAccident', 'enabled'=>'1', 'position'=>330, 'notnull'=>-1, 'visible'=>-2,),
+		'rowid'                                => array('type' => 'integer', 'label' => 'TechnicalID', 'enabled' => '1', 'position' => 1, 'notnull' => 1, 'visible' => 0, 'noteditable' => '1', 'index' => 1, 'comment' => "Id"),
+		'entity'                               => array('type' => 'integer', 'label' => 'Entity', 'enabled' => '1', 'position' => 10, 'notnull' => 1, 'visible' => 0,),
+		'date_creation'                        => array('type' => 'datetime', 'label' => 'DateCreation', 'enabled' => '1', 'position' => 20, 'notnull' => 1, 'visible' => 0,),
+		'tms'                                  => array('type' => 'timestamp', 'label' => 'DateModification', 'enabled' => '1', 'position' => 30, 'notnull' => 0, 'visible' => 0,),
+		'status'                               => array('type' => 'smallint', 'label' => 'Status', 'enabled' => '1', 'position' => 40, 'notnull' => 0, 'visible' => 1, 'index' => 0,),
+		'relative_location'                    => array('type' => 'varchar(255)', 'label' => 'RelativeLocation', 'enabled' => '1', 'position' => 50, 'notnull' => -1, 'visible' => 1,),
+		'victim_activity'                      => array('type' => 'text', 'label' => 'VictimActivity', 'enabled' => '1', 'position' => 60, 'notnull' => -1, 'visible' => 1,),
+		'accident_nature'                      => array('type' => 'text', 'label' => 'AccidentNature', 'enabled' => '1', 'position' => 70, 'notnull' => -1, 'visible' => 1,),
+		'accident_object'                      => array('type' => 'text', 'label' => 'AccidentObject', 'enabled' => '1', 'position' => 80, 'notnull' => -1, 'visible' => 1,),
+		'accident_nature_doubt'                => array('type' => 'text', 'label' => 'AccidentNatureDoubt', 'enabled' => '1', 'position' => 90, 'notnull' => -1, 'visible' => 1,),
+		'accident_nature_doubt_link'           => array('type' => 'url', 'label' => 'AccidentNatureDoubtLink', 'enabled' => '1', 'position' => 100, 'notnull' => -1, 'visible' => 1,),
+		'victim_transported_to'                => array('type' => 'text', 'label' => 'VictimTransportedTo', 'enabled' => '1', 'position' => 110, 'notnull' => -1, 'visible' => 1,),
+		'collateral_victim'                    => array('type' => 'boolean', 'label' => 'CollateralVictim', 'enabled' => '1', 'position' => 120, 'notnull' => -1, 'visible' => 1,),
+		'workhours_morning_date_start'         => array('type' => 'datetime', 'label' => 'WorkHoursMorningDateStart', 'enabled' => '1', 'position' => 130, 'notnull' => -1, 'visible' => 1,),
+		'workhours_morning_date_end'           => array('type' => 'datetime', 'label' => 'WorkHoursMorningDateEnd', 'enabled' => '1', 'position' => 131, 'notnull' => -1, 'visible' => 1,),
+		'workhours_afternoon_date_start'       => array('type' => 'datetime', 'label' => 'WorkHoursAfternoonDateStart', 'enabled' => '1', 'position' => 132, 'notnull' => -1, 'visible' => 1,),
+		'workhours_afternoon_date_end'         => array('type' => 'datetime', 'label' => 'WorkHoursAfternoonDateEnd', 'enabled' => '1', 'position' => 133, 'notnull' => -1, 'visible' => 1,),
+		'accident_noticed'                     => array('type' => 'text', 'label' => 'AccidentNoticed', 'enabled' => '1', 'position' => 140, 'notnull' => -1, 'visible' => 1,),
+		'accident_notice_date'                 => array('type' => 'datetime', 'label' => 'AccidentNoticeDate', 'enabled' => '1', 'position' => 150, 'notnull' => -1, 'visible' => 1,),
+		'accident_notice_by'                   => array('type' => 'text', 'label' => 'AccidentNoticeBy', 'enabled' => '1', 'position' => 160, 'notnull' => -1, 'visible' => 1,),
+		'accident_described_by_victim'         => array('type' => 'boolean', 'label' => 'AccidentDescribedByVictim', 'enabled' => '1', 'position' => 170, 'notnull' => -1, 'visible' => 1,),
+		'registered_in_accident_register'      => array('type' => 'boolean', 'label' => 'RegisteredInAccidentRegister', 'enabled' => '1', 'position' => 180, 'notnull' => -1, 'visible' => 1,),
+		'register_date'                        => array('type' => 'datetime', 'label' => 'RegisterDate', 'enabled' => '1', 'position' => 190, 'notnull' => -1, 'visible' => 1,),
+		'register_number'                      => array('type' => 'varchar(255)', 'label' => 'RegisterNumber', 'enabled' => '1', 'position' => 200, 'notnull' => -1, 'visible' => 1,),
+		'consequence'                          => array('type' => 'text', 'label' => 'Consequence', 'enabled' => '1', 'position' => 210, 'notnull' => -1, 'visible' => 1,),
+		'police_report'                        => array('type' => 'boolean', 'label' => 'PoliceReport', 'enabled' => '1', 'position' => 220, 'notnull' => -1, 'visible' => 1,),
+		'police_report_by'                     => array('type' => 'text', 'label' => 'PoliceReportBy', 'enabled' => '1', 'position' => 230, 'notnull' => -1, 'visible' => 1,),
+		'first_person_noticed_is_witness'      => array('type' => 'text', 'label' => 'FirstPersonNoticedIsWitness', 'enabled' => '1', 'position' => 240, 'notnull' => -1, 'visible' => 1,),
+		'thirdparty_responsibility'            => array('type' => 'boolean', 'label' => 'ThirdPartyResponsability', 'enabled' => '1', 'position' => 250, 'notnull' => -1, 'visible' => 1,),
+		'accident_investigation'               => array('type' => 'boolean', 'label' => 'AccidentInvestigation', 'enabled' => '1', 'position' => 260, 'notnull' => -1, 'visible' => 1,),
+		'accident_investigation_link'          => array('type' => 'url', 'label' => 'AccidentInvestigationLink', 'enabled' => '1', 'position' => 270, 'notnull' => -1, 'visible' => 1,),
+		'cerfa_link'                           => array('type' => 'url', 'label' => 'CerfaLink', 'enabled' => '1', 'position' => 280, 'notnull' => -1, 'visible' => 1,),
+		'json'                                 => array('type' => 'text', 'label' => 'Json', 'enabled' => '1', 'position' => 290, 'notnull' => -1, 'visible' => 1,),
+		'fk_user_witness'                      => array('type' => 'integer', 'label' => 'FirstPersonNoticedIsWitness', 'enabled' => '1', 'position' => 241, 'notnull' => -1, 'visible' => 1,),
+		'fk_soc_responsible'                   => array('type' => 'integer', 'label' => 'FkSocResponsible', 'enabled' => '1', 'position' => 251, 'notnull' => -1, 'visible' => 1,),
+		'fk_soc_responsible_insurance_society' => array('type' => 'integer', 'label' => 'FkSocResponsibleInsuranceSociety', 'enabled' => '1', 'position' => 252, 'notnull' => -1, 'visible' => 1,),
+		'fk_accident'                          => array('type' => 'integer', 'label' => 'FkAccident', 'enabled' => '1', 'position' => 330, 'notnull' => -1, 'visible' => -2,),
 	);
 
 	public $rowid;
@@ -843,26 +814,20 @@ class AccidentMetaData extends CommonObject
 		$this->db = $db;
 
 		if (empty($conf->global->MAIN_SHOW_TECHNICAL_ID) && isset($this->fields['rowid'])) $this->fields['rowid']['visible'] = 0;
-		if (empty($conf->multicompany->enabled) && isset($this->fields['entity'])) $this->fields['entity']['enabled'] = 0;
+		if (empty($conf->multicompany->enabled) && isset($this->fields['entity'])) $this->fields['entity']['enabled']        = 0;
 
 		// Unset fields that are disabled
-		foreach ($this->fields as $key => $val)
-		{
-			if (isset($val['enabled']) && empty($val['enabled']))
-			{
+		foreach ($this->fields as $key => $val) {
+			if (isset($val['enabled']) && empty($val['enabled'])) {
 				unset($this->fields[$key]);
 			}
 		}
 
 		// Translate some data of arrayofkeyval
-		if (is_object($langs))
-		{
-			foreach ($this->fields as $key => $val)
-			{
-				if (is_array($val['arrayofkeyval']))
-				{
-					foreach ($val['arrayofkeyval'] as $key2 => $val2)
-					{
+		if (is_object($langs)) {
+			foreach ($this->fields as $key => $val) {
+				if (is_array($val['arrayofkeyval'])) {
+					foreach ($val['arrayofkeyval'] as $key2 => $val2) {
 						$this->fields[$key]['arrayofkeyval'][$key2] = $langs->trans($val2);
 					}
 				}
@@ -880,11 +845,11 @@ class AccidentMetaData extends CommonObject
 	 */
 	public function create(User $user, $notrigger = false)
 	{
-		$sql = "UPDATE " . MAIN_DB_PREFIX . "$this->table_element";
-		$sql .= " SET status = 0";
+		$sql                                                                              = "UPDATE " . MAIN_DB_PREFIX . "$this->table_element";
+		$sql                                                                             .= " SET status = 0";
 		if (isset($this->ismultientitymanaged) && $this->ismultientitymanaged == 1) $sql .= ' WHERE entity IN (' . getEntity($this->table_element) . ')';
-		else $sql .= ' WHERE 1 = 1';
-		$sql .= " AND fk_accident = " . $this->fk_accident;
+		else $sql                                                                        .= ' WHERE 1 = 1';
+		$sql                                                                             .= " AND fk_accident = " . $this->fk_accident;
 
 		dol_syslog("accidentmetadata.class::create", LOG_DEBUG);
 		$this->db->query($sql);
@@ -924,15 +889,15 @@ class AccidentLesion extends CommonObjectLine
 	/**
 	 * @var array  Array with all fields and their property. Do not use it as a static var. It may be modified by constructor.
 	 */
-	public $fields=array(
-		'rowid'               => array('type'=>'integer', 'label'=>'TechnicalID', 'enabled'=>'1', 'position'=>1, 'notnull'=>1, 'visible'=>0, 'noteditable'=>'1', 'index'=>1, 'comment'=>"Id"),
-		'ref'                 => array('type'=>'varchar(128)', 'label'=>'Ref', 'enabled'=>'1', 'position'=>10, 'notnull'=>1, 'visible'=>1, 'noteditable'=>'1', 'default'=>'(PROV)', 'index'=>1, 'searchall'=>1, 'showoncombobox'=>'1', 'comment'=>"Reference of object"),
-		'entity'              => array('type'=>'integer', 'label'=>'Entity', 'enabled'=>'1', 'position'=>30, 'notnull'=>1, 'visible'=>0,),
-		'date_creation'       => array('type'=>'datetime', 'label'=>'DateCreation', 'enabled'=>'1', 'position'=>40, 'notnull'=>1, 'visible'=>0,),
-		'tms'                 => array('type'=>'timestamp', 'label'=>'DateModification', 'enabled'=>'1', 'position'=>50, 'notnull'=>0, 'visible'=>0,),
-		'lesion_localization' => array('type'=>'text', 'label'=>'LesionLocalization', 'enabled'=>'1', 'position'=>60, 'notnull'=>-1, 'visible'=>1,),
-		'lesion_nature'       => array('type'=>'text', 'label'=>'LesionNature', 'enabled'=>'1', 'position'=>70, 'notnull'=>-1, 'visible'=>1,),
-		'fk_accident'         => array('type'=>'integer', 'label'=>'FkAccident', 'enabled'=>'1', 'position'=>80, 'notnull'=>1, 'visible'=>0,),
+	public $fields = array(
+		'rowid'               => array('type' => 'integer', 'label' => 'TechnicalID', 'enabled' => '1', 'position' => 1, 'notnull' => 1, 'visible' => 0, 'noteditable' => '1', 'index' => 1, 'comment' => "Id"),
+		'ref'                 => array('type' => 'varchar(128)', 'label' => 'Ref', 'enabled' => '1', 'position' => 10, 'notnull' => 1, 'visible' => 1, 'noteditable' => '1', 'default' => '(PROV)', 'index' => 1, 'searchall' => 1, 'showoncombobox' => '1', 'comment' => "Reference of object"),
+		'entity'              => array('type' => 'integer', 'label' => 'Entity', 'enabled' => '1', 'position' => 30, 'notnull' => 1, 'visible' => 0,),
+		'date_creation'       => array('type' => 'datetime', 'label' => 'DateCreation', 'enabled' => '1', 'position' => 40, 'notnull' => 1, 'visible' => 0,),
+		'tms'                 => array('type' => 'timestamp', 'label' => 'DateModification', 'enabled' => '1', 'position' => 50, 'notnull' => 0, 'visible' => 0,),
+		'lesion_localization' => array('type' => 'text', 'label' => 'LesionLocalization', 'enabled' => '1', 'position' => 60, 'notnull' => -1, 'visible' => 1,),
+		'lesion_nature'       => array('type' => 'text', 'label' => 'LesionNature', 'enabled' => '1', 'position' => 70, 'notnull' => -1, 'visible' => 1,),
+		'fk_accident'         => array('type' => 'integer', 'label' => 'FkAccident', 'enabled' => '1', 'position' => 80, 'notnull' => 1, 'visible' => 0,),
 	);
 
 	public $ref;
@@ -955,8 +920,7 @@ class AccidentLesion extends CommonObjectLine
 		$this->db = $db;
 
 		if (empty($conf->global->MAIN_SHOW_TECHNICAL_ID) && isset($this->fields['rowid'])) $this->fields['rowid']['visible'] = 0;
-		if (empty($conf->multicompany->enabled) && isset($this->fields['entity'])) $this->fields['entity']['enabled'] = 0;
-
+		if (empty($conf->multicompany->enabled) && isset($this->fields['entity'])) $this->fields['entity']['enabled']        = 0;
 	}
 
 	/**
@@ -969,7 +933,7 @@ class AccidentLesion extends CommonObjectLine
 	{
 		global $db;
 
-		$sql = 'SELECT t.rowid, t.ref, t.date_creation, t.lesion_localization, t.lesion_nature, t.fk_accident';
+		$sql  = 'SELECT t.rowid, t.ref, t.date_creation, t.lesion_localization, t.lesion_nature, t.fk_accident';
 		$sql .= ' FROM ' . MAIN_DB_PREFIX . 'digiriskdolibarr_accident_lesion as t';
 		$sql .= ' WHERE t.rowid = ' . $rowid;
 		$sql .= ' AND entity IN (' . getEntity($this->table_element) . ')';
@@ -978,12 +942,12 @@ class AccidentLesion extends CommonObjectLine
 		if ($result) {
 			$objp = $db->fetch_object($result);
 
-			$this->id = $objp->rowid;
-			$this->ref = $objp->ref;
-			$this->date_creation = $objp->date_creation;
+			$this->id                  = $objp->rowid;
+			$this->ref                 = $objp->ref;
+			$this->date_creation       = $objp->date_creation;
 			$this->lesion_localization = $objp->lesion_localization;
-			$this->lesion_nature = $objp->lesion_nature;
-			$this->fk_accident = $objp->fk_accident;
+			$this->lesion_nature       = $objp->lesion_nature;
+			$this->fk_accident         = $objp->fk_accident;
 
 			$db->free($result);
 
@@ -1003,7 +967,7 @@ class AccidentLesion extends CommonObjectLine
 	public function fetchAll($parent_id = 0, $limit = 0)
 	{
 		global $db;
-		$sql = 'SELECT t.rowid, t.ref, t.date_creation, t.lesion_localization, t.lesion_nature';
+		$sql  = 'SELECT t.rowid, t.ref, t.date_creation, t.lesion_localization, t.lesion_nature';
 		$sql .= ' FROM ' . MAIN_DB_PREFIX . 'digiriskdolibarr_accident_lesion as t';
 		if ($parent_id > 0) {
 			$sql .= ' WHERE t.fk_accident = ' . $parent_id;
@@ -1023,12 +987,12 @@ class AccidentLesion extends CommonObjectLine
 
 				$record = new self($db);
 
-				$record->id = $obj->rowid;
-				$record->ref = $obj->ref;
-				$record->date_creation = $obj->date_creation;
+				$record->id                  = $obj->rowid;
+				$record->ref                 = $obj->ref;
+				$record->date_creation       = $obj->date_creation;
 				$record->lesion_localization = $obj->lesion_localization;
-				$record->lesion_nature = $obj->lesion_nature;
-				$record->fk_accident = $obj->fk_accident;
+				$record->lesion_nature       = $obj->lesion_nature;
+				$record->fk_accident         = $obj->fk_accident;
 
 				$records[$record->id] = $record;
 
@@ -1061,7 +1025,7 @@ class AccidentLesion extends CommonObjectLine
 		$now = dol_now();
 
 		// Insertion dans base de la ligne
-		$sql = 'INSERT INTO ' . MAIN_DB_PREFIX . 'digiriskdolibarr_accident_lesion';
+		$sql  = 'INSERT INTO ' . MAIN_DB_PREFIX . 'digiriskdolibarr_accident_lesion';
 		$sql .= ' (ref, entity, date_creation, lesion_localization, lesion_nature, fk_accident';
 		$sql .= ')';
 		$sql .= " VALUES (";
@@ -1078,15 +1042,14 @@ class AccidentLesion extends CommonObjectLine
 		$resql = $db->query($sql);
 
 		if ($resql) {
-			$this->id = $db->last_insert_id(MAIN_DB_PREFIX . 'accident_lesion');
+			$this->id    = $db->last_insert_id(MAIN_DB_PREFIX . 'accident_lesion');
 			$this->rowid = $this->id; // For backward compatibility
 
 			$db->commit();
 			// Triggers
-			if (!$notrigger)
-			{
+			if ( ! $notrigger) {
 				// Call triggers
-				$this->call_trigger(strtoupper(get_class($this)).'_CREATE', $user);
+				$this->call_trigger(strtoupper(get_class($this)) . '_CREATE', $user);
 				// End call triggers
 			}
 			return $this->id;
@@ -1111,7 +1074,7 @@ class AccidentLesion extends CommonObjectLine
 
 		$db->begin();
 		// Mise a jour ligne en base
-		$sql = "UPDATE " . MAIN_DB_PREFIX . "digiriskdolibarr_accident_lesion SET";
+		$sql  = "UPDATE " . MAIN_DB_PREFIX . "digiriskdolibarr_accident_lesion SET";
 		$sql .= " ref='" . $db->escape($this->ref) . "',";
 		$sql .= " lesion_localization='" . $db->escape($this->lesion_localization) . "',";
 		$sql .= " lesion_nature='" . $db->escape($this->lesion_nature) . "',";
@@ -1124,10 +1087,9 @@ class AccidentLesion extends CommonObjectLine
 		if ($resql) {
 			$db->commit();
 			// Triggers
-			if (!$notrigger)
-			{
+			if ( ! $notrigger) {
 				// Call triggers
-				$this->call_trigger(strtoupper(get_class($this)).'_MODIFY', $user);
+				$this->call_trigger(strtoupper(get_class($this)) . '_MODIFY', $user);
 				// End call triggers
 			}
 			return 1;
@@ -1155,10 +1117,9 @@ class AccidentLesion extends CommonObjectLine
 		if ($db->query($sql)) {
 			$db->commit();
 			// Triggers
-			if (!$notrigger)
-			{
+			if ( ! $notrigger) {
 				// Call trigger
-				$this->call_trigger(strtoupper(get_class($this)).'_DELETE', $user);
+				$this->call_trigger(strtoupper(get_class($this)) . '_DELETE', $user);
 				// End call triggers
 			}
 			return 1;
@@ -1194,26 +1155,20 @@ class AccidentSignature extends DigiriskSignature
 		$this->db = $db;
 
 		if (empty($conf->global->MAIN_SHOW_TECHNICAL_ID) && isset($this->fields['rowid'])) $this->fields['rowid']['visible'] = 0;
-		if (empty($conf->multicompany->enabled) && isset($this->fields['entity'])) $this->fields['entity']['enabled'] = 0;
+		if (empty($conf->multicompany->enabled) && isset($this->fields['entity'])) $this->fields['entity']['enabled']        = 0;
 
 		// Unset fields that are disabled
-		foreach ($this->fields as $key => $val)
-		{
-			if (isset($val['enabled']) && empty($val['enabled']))
-			{
+		foreach ($this->fields as $key => $val) {
+			if (isset($val['enabled']) && empty($val['enabled'])) {
 				unset($this->fields[$key]);
 			}
 		}
 
 		// Translate some data of arrayofkeyval
-		if (is_object($langs))
-		{
-			foreach ($this->fields as $key => $val)
-			{
-				if (is_array($val['arrayofkeyval']))
-				{
-					foreach ($val['arrayofkeyval'] as $key2 => $val2)
-					{
+		if (is_object($langs)) {
+			foreach ($this->fields as $key => $val) {
+				if (is_array($val['arrayofkeyval'])) {
+					foreach ($val['arrayofkeyval'] as $key2 => $val2) {
 						$this->fields[$key]['arrayofkeyval'][$key2] = $langs->trans($val2);
 					}
 				}
@@ -1240,52 +1195,51 @@ class AccidentSignature extends DigiriskSignature
 		dol_syslog(__METHOD__, LOG_DEBUG);
 
 		$records = array();
-		$sql = 'SELECT ';
-		$sql .= $this->getFieldList();
+		$sql     = 'SELECT ';
+		$sql    .= $this->getFieldList();
 		if (dol_strlen($old_table_element)) {
-			$sql .= ' FROM '.MAIN_DB_PREFIX.$old_table_element;
+			$sql .= ' FROM ' . MAIN_DB_PREFIX . $old_table_element;
 		} else {
-			$sql .= ' FROM '.MAIN_DB_PREFIX.$this->table_element;
+			$sql .= ' FROM ' . MAIN_DB_PREFIX . $this->table_element;
 		}
-		if (isset($this->ismultientitymanaged) && $this->ismultientitymanaged == 1) $sql .= ' WHERE entity IN ('.getEntity($this->table_element).')';
-		else $sql .= ' WHERE 1 = 1';
-		$sql .= ' AND object_type = "' . $this->object_type . '"';
+		if (isset($this->ismultientitymanaged) && $this->ismultientitymanaged == 1) $sql .= ' WHERE entity IN (' . getEntity($this->table_element) . ')';
+		else $sql                                                                        .= ' WHERE 1 = 1';
+		$sql                                                                             .= ' AND object_type = "' . $this->object_type . '"';
 
 		// Manage filter
 		$sqlwhere = array();
 		if (count($filter) > 0) {
 			foreach ($filter as $key => $value) {
 				if ($key == 'rowid') {
-					$sqlwhere[] = $key.'='.$value;
+					$sqlwhere[] = $key . '=' . $value;
 				} elseif (in_array($this->fields[$key]['type'], array('date', 'datetime', 'timestamp'))) {
-					$sqlwhere[] = $key.' = \''.$this->db->idate($value).'\'';
+					$sqlwhere[] = $key . ' = \'' . $this->db->idate($value) . '\'';
 				} elseif ($key == 'customsql') {
 					$sqlwhere[] = $value;
 				} elseif (strpos($value, '%') === false) {
-					$sqlwhere[] = $key.' IN ('.$this->db->sanitize($this->db->escape($value)).')';
+					$sqlwhere[] = $key . ' IN (' . $this->db->sanitize($this->db->escape($value)) . ')';
 				} else {
-					$sqlwhere[] = $key.' LIKE \'%'.$this->db->escape($value).'%\'';
+					$sqlwhere[] = $key . ' LIKE \'%' . $this->db->escape($value) . '%\'';
 				}
 			}
 		}
 		if (count($sqlwhere) > 0) {
-			$sql .= ' AND ('.implode(' '.$filtermode.' ', $sqlwhere).')';
+			$sql .= ' AND (' . implode(' ' . $filtermode . ' ', $sqlwhere) . ')';
 		}
 
-		if (!empty($sortfield)) {
+		if ( ! empty($sortfield)) {
 			$sql .= $this->db->order($sortfield, $sortorder);
 		}
-		if (!empty($limit)) {
-			$sql .= ' '.$this->db->plimit($limit, $offset);
+		if ( ! empty($limit)) {
+			$sql .= ' ' . $this->db->plimit($limit, $offset);
 		}
 
 		$resql = $this->db->query($sql);
 
 		if ($resql) {
 			$num = $this->db->num_rows($resql);
-			$i = 0;
-			while ($i < ($limit ? min($limit, $num) : $num))
-			{
+			$i   = 0;
+			while ($i < ($limit ? min($limit, $num) : $num)) {
 				$obj = $this->db->fetch_object($resql);
 
 				$record = new self($this->db);
@@ -1299,8 +1253,8 @@ class AccidentSignature extends DigiriskSignature
 
 			return $records;
 		} else {
-			$this->errors[] = 'Error '.$this->db->lasterror();
-			dol_syslog(__METHOD__.' '.join(',', $this->errors), LOG_ERR);
+			$this->errors[] = 'Error ' . $this->db->lasterror();
+			dol_syslog(__METHOD__ . ' ' . join(',', $this->errors), LOG_ERR);
 
 			return -1;
 		}

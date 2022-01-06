@@ -59,21 +59,21 @@ class Risk extends CommonObject
 	/**
 	 * @var array  Array with all fields and their property. Do not use it as a static var. It may be modified by constructor.
 	 */
-	public $fields=array(
-		'rowid' => array('type'=>'integer', 'label'=>'TechnicalID', 'enabled'=>'1', 'position'=>10, 'notnull'=>1, 'visible'=>0, 'noteditable'=>'1', 'index'=>1, 'comment'=>"Id"),
-		'fk_element' => array('type'=>'integer', 'label'=>'ParentElement', 'enabled'=>'1', 'position'=>9, 'notnull'=>1, 'visible'=>1,),
-		'ref' => array('type'=>'varchar(128)', 'label'=>'Ref', 'enabled'=>'1', 'position'=>20, 'notnull'=>1, 'visible'=>4, 'noteditable'=>'1', 'default'=>'(PROV)', 'index'=>1, 'searchall'=>1, 'showoncombobox'=>'1', 'comment'=>"Reference of object"),
-		'ref_ext' => array('type'=>'varchar(128)', 'label'=>'RefExt', 'enabled'=>'1', 'position'=>30, 'notnull'=>0, 'visible'=>0,),
-		'entity' => array('type'=>'integer', 'label'=>'Entity', 'enabled'=>'1', 'position'=>40, 'notnull'=>1, 'visible'=>0,),
-		'date_creation' => array('type'=>'datetime', 'label'=>'DateCreation', 'enabled'=>'1', 'position'=>50, 'notnull'=>1, 'visible'=>0,),
-		'tms' => array('type'=>'timestamp', 'label'=>'DateModification', 'enabled'=>'1', 'position'=>60, 'notnull'=>0, 'visible'=>0,),
-		'import_key' => array('type'=>'varchar(14)', 'label'=>'ImportId', 'enabled'=>'1', 'position'=>70, 'notnull'=>-1, 'visible'=>0,),
-		'status' => array('type'=>'smallint', 'label'=>'Status', 'enabled'=>'1', 'position'=>80, 'notnull'=>0, 'visible'=>0,),
-		'category' => array('type'=>'varchar(255)', 'label'=>'RiskCategory', 'enabled'=>'1', 'position'=>21, 'notnull'=>0, 'visible'=>1,),
-		'description' => array('type'=>'text', 'label'=>'Description', 'enabled'=>'1', 'position'=>23, 'notnull'=>0, 'visible'=>-1,),
-		'fk_user_creat' => array('type'=>'integer:User:user/class/user.class.php', 'label'=>'UserAuthor', 'enabled'=>'1', 'position'=>110, 'notnull'=>1, 'visible'=>0, 'foreignkey'=>'user.rowid',),
-		'fk_user_modif' => array('type'=>'integer:User:user/class/user.class.php', 'label'=>'UserModif', 'enabled'=>'1', 'position'=>120, 'notnull'=>-1, 'visible'=>0,),
-		'fk_projet' => array('type'=>'integer:Project:projet/class/project.class.php', 'label'=>'Projet', 'enabled'=>'1', 'position'=>140, 'notnull'=>1, 'visible'=>0,),
+	public $fields = array(
+		'rowid' => array('type' => 'integer', 'label' => 'TechnicalID', 'enabled' => '1', 'position' => 10, 'notnull' => 1, 'visible' => 0, 'noteditable' => '1', 'index' => 1, 'comment' => "Id"),
+		'fk_element' => array('type' => 'integer', 'label' => 'ParentElement', 'enabled' => '1', 'position' => 9, 'notnull' => 1, 'visible' => 1,),
+		'ref' => array('type' => 'varchar(128)', 'label' => 'Ref', 'enabled' => '1', 'position' => 20, 'notnull' => 1, 'visible' => 4, 'noteditable' => '1', 'default' => '(PROV)', 'index' => 1, 'searchall' => 1, 'showoncombobox' => '1', 'comment' => "Reference of object"),
+		'ref_ext' => array('type' => 'varchar(128)', 'label' => 'RefExt', 'enabled' => '1', 'position' => 30, 'notnull' => 0, 'visible' => 0,),
+		'entity' => array('type' => 'integer', 'label' => 'Entity', 'enabled' => '1', 'position' => 40, 'notnull' => 1, 'visible' => 0,),
+		'date_creation' => array('type' => 'datetime', 'label' => 'DateCreation', 'enabled' => '1', 'position' => 50, 'notnull' => 1, 'visible' => 0,),
+		'tms' => array('type' => 'timestamp', 'label' => 'DateModification', 'enabled' => '1', 'position' => 60, 'notnull' => 0, 'visible' => 0,),
+		'import_key' => array('type' => 'varchar(14)', 'label' => 'ImportId', 'enabled' => '1', 'position' => 70, 'notnull' => -1, 'visible' => 0,),
+		'status' => array('type' => 'smallint', 'label' => 'Status', 'enabled' => '1', 'position' => 80, 'notnull' => 0, 'visible' => 0,),
+		'category' => array('type' => 'varchar(255)', 'label' => 'RiskCategory', 'enabled' => '1', 'position' => 21, 'notnull' => 0, 'visible' => 1,),
+		'description' => array('type' => 'text', 'label' => 'Description', 'enabled' => '1', 'position' => 23, 'notnull' => 0, 'visible' => -1,),
+		'fk_user_creat' => array('type' => 'integer:User:user/class/user.class.php', 'label' => 'UserAuthor', 'enabled' => '1', 'position' => 110, 'notnull' => 1, 'visible' => 0, 'foreignkey' => 'user.rowid',),
+		'fk_user_modif' => array('type' => 'integer:User:user/class/user.class.php', 'label' => 'UserModif', 'enabled' => '1', 'position' => 120, 'notnull' => -1, 'visible' => 0,),
+		'fk_projet' => array('type' => 'integer:Project:projet/class/project.class.php', 'label' => 'Projet', 'enabled' => '1', 'position' => 140, 'notnull' => 1, 'visible' => 0,),
 	);
 
 	public $rowid;
@@ -103,26 +103,20 @@ class Risk extends CommonObject
 		$this->db = $db;
 
 		if (empty($conf->global->MAIN_SHOW_TECHNICAL_ID) && isset($this->fields['rowid'])) $this->fields['rowid']['visible'] = 0;
-		if (empty($conf->multicompany->enabled) && isset($this->fields['entity'])) $this->fields['entity']['enabled'] = 0;
+		if (empty($conf->multicompany->enabled) && isset($this->fields['entity'])) $this->fields['entity']['enabled']        = 0;
 
 		// Unset fields that are disabled
-		foreach ($this->fields as $key => $val)
-		{
-			if (isset($val['enabled']) && empty($val['enabled']))
-			{
+		foreach ($this->fields as $key => $val) {
+			if (isset($val['enabled']) && empty($val['enabled'])) {
 				unset($this->fields[$key]);
 			}
 		}
 
 		// Translate some data of arrayofkeyval
-		if (is_object($langs))
-		{
-			foreach ($this->fields as $key => $val)
-			{
-				if (is_array($val['arrayofkeyval']))
-				{
-					foreach ($val['arrayofkeyval'] as $key2 => $val2)
-					{
+		if (is_object($langs)) {
+			foreach ($this->fields as $key => $val) {
+				if (is_array($val['arrayofkeyval'])) {
+					foreach ($val['arrayofkeyval'] as $key2 => $val2) {
 						$this->fields[$key]['arrayofkeyval'][$key2] = $langs->trans($val2);
 					}
 				}
@@ -182,12 +176,12 @@ class Risk extends CommonObject
 		$result  = $risk->fetchFromParent($parent_id);
 
 		// RISQUES de l'élément appelant.
-		if ($result > 0 && !empty ($result)) {
-			foreach ( $result as $risk ) {
-				$evaluation = new RiskAssessment($this->db);
-				$lastEvaluation = $evaluation->fetchFromParent($risk->id,1);
-				if ( $lastEvaluation > 0  && !empty($lastEvaluation) ) {
-					$lastEvaluation = array_shift($lastEvaluation);
+		if ($result > 0 && ! empty($result)) {
+			foreach ($result as $risk) {
+				$evaluation     = new RiskAssessment($this->db);
+				$lastEvaluation = $evaluation->fetchFromParent($risk->id, 1);
+				if ( $lastEvaluation > 0 && ! empty($lastEvaluation) ) {
+					$lastEvaluation       = array_shift($lastEvaluation);
 					$risk->lastEvaluation = $lastEvaluation->cotation;
 				}
 
@@ -196,31 +190,30 @@ class Risk extends CommonObject
 		}
 
 		if ( $get_children_data ) {
-			$elements = recurse_tree($parent_id,0,$objects);
-			if ( $elements > 0  && !empty($elements) ) {
+			$elements = recurse_tree($parent_id, 0, $objects);
+			if ( $elements > 0 && ! empty($elements) ) {
 				// Super fonction itérations flat.
 				$it = new RecursiveIteratorIterator(new RecursiveArrayIterator($elements));
-				foreach($it as $key => $v) {
+				foreach ($it as $key => $v) {
 					$element[$key][$v] = $v;
 				}
 
 				if (is_array($element)) {
-					$children_id = array_shift ($element);
+					$children_id = array_shift($element);
 				}
 
 				// RISQUES des enfants du parent.
-				if (!empty ($children_id)) {
+				if ( ! empty($children_id)) {
 					foreach ($children_id as $element) {
-
 						$risk = new Risk($this->db);
 
 						$result = $risk->fetchFromParent($element);
-						if (!empty ($result)) {
+						if ( ! empty($result)) {
 							foreach ($result as $risk) {
-								$evaluation = new RiskAssessment($this->db);
-								$lastEvaluation = $evaluation->fetchFromParent($risk->id,1);
-								if ( $lastEvaluation > 0  && !empty($lastEvaluation) ) {
-									$lastEvaluation = array_shift($lastEvaluation);
+								$evaluation     = new RiskAssessment($this->db);
+								$lastEvaluation = $evaluation->fetchFromParent($risk->id, 1);
+								if ( $lastEvaluation > 0 && ! empty($lastEvaluation) ) {
+									$lastEvaluation       = array_shift($lastEvaluation);
 									$risk->lastEvaluation = $lastEvaluation->cotation;
 								}
 
@@ -235,13 +228,13 @@ class Risk extends CommonObject
 		if ( $get_parents_data ) {
 			$parent_element_id = $objects[$parent_id]->id;
 			while ($parent_element_id > 0) {
-				$result  = $risk->fetchFromParent($parent_element_id);
-				if ($result > 0 && !empty ($result)) {
-					foreach ( $result as $risk ) {
-						$evaluation = new RiskAssessment($this->db);
-						$lastEvaluation = $evaluation->fetchFromParent($risk->id,1);
-						if ( $lastEvaluation > 0  && !empty($lastEvaluation) ) {
-							$lastEvaluation = array_shift($lastEvaluation);
+				$result = $risk->fetchFromParent($parent_element_id);
+				if ($result > 0 && ! empty($result)) {
+					foreach ($result as $risk) {
+						$evaluation     = new RiskAssessment($this->db);
+						$lastEvaluation = $evaluation->fetchFromParent($risk->id, 1);
+						if ( $lastEvaluation > 0 && ! empty($lastEvaluation) ) {
+							$lastEvaluation       = array_shift($lastEvaluation);
 							$risk->lastEvaluation = $lastEvaluation->cotation;
 						}
 
@@ -252,8 +245,8 @@ class Risk extends CommonObject
 			}
 		}
 
-		if ( !empty($risks) ) {
-			usort($risks,function($first,$second){
+		if ( ! empty($risks) ) {
+			usort($risks, function ($first, $second) {
 				return $first->lastEvaluation < $second->lastEvaluation;
 			});
 			return $risks;
@@ -279,47 +272,43 @@ class Risk extends CommonObject
 
 		$records = array();
 
-		$sql = 'SELECT ';
-		$sql .= $this->getFieldList();
-		$sql .= ' FROM '.MAIN_DB_PREFIX.$this->table_element.' as t';
-		if (isset($this->ismultientitymanaged) && $this->ismultientitymanaged == 1) $sql .= ' WHERE t.entity IN ('.getEntity($this->table_element).')';
-		else $sql .= ' WHERE 1 = 1';
+		$sql                                                                              = 'SELECT ';
+		$sql                                                                             .= $this->getFieldList();
+		$sql                                                                             .= ' FROM ' . MAIN_DB_PREFIX . $this->table_element . ' as t';
+		if (isset($this->ismultientitymanaged) && $this->ismultientitymanaged == 1) $sql .= ' WHERE t.entity IN (' . getEntity($this->table_element) . ')';
+		else $sql                                                                        .= ' WHERE 1 = 1';
 
 		// Manage filter
 		$sqlwhere = array();
 		if (count($filter) > 0) {
 			foreach ($filter as $key => $value) {
 				if ($key == 't.rowid') {
-					$sqlwhere[] = $key.'='.$value;
-				}
-				elseif (strpos($key, 'date') !== false) {
-					$sqlwhere[] = $key.' = \''.$this->db->idate($value).'\'';
-				}
-				elseif ($key == 'customsql') {
+					$sqlwhere[] = $key . '=' . $value;
+				} elseif (strpos($key, 'date') !== false) {
+					$sqlwhere[] = $key . ' = \'' . $this->db->idate($value) . '\'';
+				} elseif ($key == 'customsql') {
 					$sqlwhere[] = $value;
-				}
-				else {
-					$sqlwhere[] = $key.' LIKE \'%'.$this->db->escape($value).'%\'';
+				} else {
+					$sqlwhere[] = $key . ' LIKE \'%' . $this->db->escape($value) . '%\'';
 				}
 			}
 		}
 		if (count($sqlwhere) > 0) {
-			$sql .= ' AND ('.implode(' '.$filtermode.' ', $sqlwhere).')';
+			$sql .= ' AND (' . implode(' ' . $filtermode . ' ', $sqlwhere) . ')';
 		}
 
-		if (!empty($sortfield)) {
+		if ( ! empty($sortfield)) {
 			$sql .= $this->db->order($sortfield, $sortorder);
 		}
-		if (!empty($limit)) {
-			$sql .= ' '.$this->db->plimit($limit, $offset);
+		if ( ! empty($limit)) {
+			$sql .= ' ' . $this->db->plimit($limit, $offset);
 		}
 
 		$resql = $this->db->query($sql);
 		if ($resql) {
 			$num = $this->db->num_rows($resql);
-			$i = 0;
-			while ($i < ($limit ? min($limit, $num) : $num))
-			{
+			$i   = 0;
+			while ($i < ($limit ? min($limit, $num) : $num)) {
 				$obj = $this->db->fetch_object($resql);
 
 				$record = new self($this->db);
@@ -333,8 +322,8 @@ class Risk extends CommonObject
 
 			return $records;
 		} else {
-			$this->errors[] = 'Error '.$this->db->lasterror();
-			dol_syslog(__METHOD__.' '.join(',', $this->errors), LOG_ERR);
+			$this->errors[] = 'Error ' . $this->db->lasterror();
+			dol_syslog(__METHOD__ . ' ' . join(',', $this->errors), LOG_ERR);
 
 			return -1;
 		}
@@ -482,15 +471,14 @@ class Risk extends CommonObject
 	 */
 	public function get_related_tasks($risk)
 	{
-		$sql = "SELECT * FROM " . MAIN_DB_PREFIX.'projet_task_extrafields' . ' WHERE fk_risk =' . $risk->id;
+		$sql = "SELECT * FROM " . MAIN_DB_PREFIX . 'projet_task_extrafields' . ' WHERE fk_risk =' . $risk->id;
 
 		$resql = $this->db->query($sql);
 
 		if ($resql) {
 			$num = $this->db->num_rows($resql);
-			$i = 0;
-			while ($i < $num)
-			{
+			$i   = 0;
+			while ($i < $num) {
 				$obj = $this->db->fetch_object($resql);
 
 				$record = new Task($this->db);
@@ -503,8 +491,8 @@ class Risk extends CommonObject
 
 			return $records;
 		} else {
-			$this->errors[] = 'Error '.$this->db->lasterror();
-			dol_syslog(__METHOD__.' '.join(',', $this->errors), LOG_ERR);
+			$this->errors[] = 'Error ' . $this->db->lasterror();
+			dol_syslog(__METHOD__ . ' ' . join(',', $this->errors), LOG_ERR);
 
 			return -1;
 		}

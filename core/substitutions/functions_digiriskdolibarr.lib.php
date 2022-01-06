@@ -33,9 +33,9 @@
  */
 require_once __DIR__ . '/../../class/digiriskresources.class.php';
 
-function digiriskdolibarr_completesubstitutionarray(&$substitutionarray,$langs,$object)
+function digiriskdolibarr_completesubstitutionarray(&$substitutionarray, $langs, $object)
 {
-	$type = $object->element;
+	$type         = $object->element;
 	$element_type = $object->element_type;
 
 	switch ($type) {
@@ -140,7 +140,6 @@ function digiriskdolibarr_completesubstitutionarray(&$substitutionarray,$langs,$
 	}
 
 	switch ($element_type) {
-
 		case 'groupment':
 		case 'workunit':
 

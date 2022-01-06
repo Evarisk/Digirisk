@@ -118,15 +118,15 @@ class box_riskassessmentdocument extends ModeleBoxes
 
 		$riskassessmentdocument = new RiskAssessmentDocument($this->db);
 
-		$filter = array('customsql' => "t.type='riskassessmentdocument'");
-		$riskassessmentdocument = $riskassessmentdocument->fetchAll('desc','t.rowid', 1, 0, $filter, 'AND');
-		if (!empty($riskassessmentdocument)){
+		$filter                 = array('customsql' => "t.type='riskassessmentdocument'");
+		$riskassessmentdocument = $riskassessmentdocument->fetchAll('desc', 't.rowid', 1, 0, $filter, 'AND');
+		if ( ! empty($riskassessmentdocument)) {
 			$riskassessmentdocument = array_shift($riskassessmentdocument);
-			$ref = dol_sanitizeFileName($riskassessmentdocument->ref);
+			$ref                    = dol_sanitizeFileName($riskassessmentdocument->ref);
 		}
 
 		// Populate the head at runtime
-		$text = $langs->trans("RiskAssessmentDocumentBoxTitle", $max);
+		$text                = $langs->trans("RiskAssessmentDocumentBoxTitle", $max);
 		$this->info_box_head = array(
 			// Title text
 			'text' => $text,
@@ -156,7 +156,7 @@ class box_riskassessmentdocument extends ModeleBoxes
 					'td' => '',
 
 					// Main text for content of cell
-					'text' => $langs->transnoentities('LastGenerateDate'). ' : ' . dol_print_date($riskassessmentdocument->date_creation),
+					'text' => $langs->transnoentities('LastGenerateDate') . ' : ' . dol_print_date($riskassessmentdocument->date_creation),
 					// Link on 'text' and 'logo' elements
 					'url' => '',
 					// Link's target HTML property
@@ -179,29 +179,29 @@ class box_riskassessmentdocument extends ModeleBoxes
 				1 => array( // Another column
 					// No TR for n≠0
 					'td' => '',
-					'text' => $langs->transnoentities('MandatoryUpdateEvery'). ' 365 ' . $langs->transnoentities('Days'),
+					'text' => $langs->transnoentities('MandatoryUpdateEvery') . ' 365 ' . $langs->transnoentities('Days'),
 				)
 			),
-//			1 => array( // Another line
-//				0 => array( // TR
-//					'tr' => 'class="left"',
-//					'text' => 'Another line'
-//				),
-//				1 => array( // TR
-//					'tr' => 'class="left"',
-//					'text' => ''
-//				)
-//			),
-//			2 => array( // Another line
-//				0 => array( // TR
-//					'tr' => 'class="left"',
-//					'text' => ''
-//				),
-//				1 => array( // TR
-//					'tr' => 'class="left"',
-//					'text' => ''
-//				)
-//			),
+		//          1 => array( // Another line
+		//              0 => array( // TR
+		//                  'tr' => 'class="left"',
+		//                  'text' => 'Another line'
+		//              ),
+		//              1 => array( // TR
+		//                  'tr' => 'class="left"',
+		//                  'text' => ''
+		//              )
+		//          ),
+		//          2 => array( // Another line
+		//              0 => array( // TR
+		//                  'tr' => 'class="left"',
+		//                  'text' => ''
+		//              ),
+		//              1 => array( // TR
+		//                  'tr' => 'class="left"',
+		//                  'text' => ''
+		//              )
+		//          ),
 		);
 	}
 

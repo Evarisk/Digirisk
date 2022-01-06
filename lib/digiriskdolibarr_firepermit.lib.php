@@ -33,7 +33,7 @@ function firepermitPrepareHead($object)
 
 	$langs->load("digiriskdolibarr@digiriskdolibarr");
 
-	$h = 0;
+	$h    = 0;
 	$head = array();
 
 	if ($user->rights->digiriskdolibarr->firepermit->read) {

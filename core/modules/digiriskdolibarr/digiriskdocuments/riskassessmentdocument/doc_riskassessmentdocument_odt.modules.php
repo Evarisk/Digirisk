@@ -68,24 +68,24 @@ class doc_riskassessmentdocument_odt extends ModeleODTRiskAssessmentDocument
 		// Load translation files required by the page
 		$langs->loadLangs(array("main", "companies"));
 
-		$this->db = $db;
-		$this->name = $langs->trans('RiskAssessmentDocumentDigiriskTemplate');
+		$this->db          = $db;
+		$this->name        = $langs->trans('RiskAssessmentDocumentDigiriskTemplate');
 		$this->description = $langs->trans("DocumentModelOdt");
-		$this->scandir = 'DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_ADDON_ODT_PATH'; // Name of constant that is used to save list of directories to scan
+		$this->scandir     = 'DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_ADDON_ODT_PATH'; // Name of constant that is used to save list of directories to scan
 
 		// Page size for A4 format
-		$this->type = 'odt';
+		$this->type         = 'odt';
 		$this->page_largeur = 0;
 		$this->page_hauteur = 0;
-		$this->format = array($this->page_largeur, $this->page_hauteur);
+		$this->format       = array($this->page_largeur, $this->page_hauteur);
 		$this->marge_gauche = 0;
 		$this->marge_droite = 0;
-		$this->marge_haute = 0;
-		$this->marge_basse = 0;
+		$this->marge_haute  = 0;
+		$this->marge_basse  = 0;
 
 		// Recupere emetteur
-		$this->emetteur = $mysoc;
-		if (!$this->emetteur->country_code) $this->emetteur->country_code = substr($langs->defaultlang, -2); // By default if not defined
+		$this->emetteur                                                     = $mysoc;
+		if ( ! $this->emetteur->country_code) $this->emetteur->country_code = substr($langs->defaultlang, -2); // By default if not defined
 	}
 
 	/**
@@ -101,51 +101,46 @@ class doc_riskassessmentdocument_odt extends ModeleODTRiskAssessmentDocument
 		// Load translation files required by the page
 		$langs->loadLangs(array("errors", "companies"));
 
-		$form = new Form($this->db);
-		$texte = $this->description.".<br>\n";
-		$texte .= '<form action="'.$_SERVER["PHP_SELF"].'" method="POST">';
-		$texte .= '<input type="hidden" name="token" value="'.newToken().'">';
+		$form   = new Form($this->db);
+		$texte  = $this->description . ".<br>\n";
+		$texte .= '<form action="' . $_SERVER["PHP_SELF"] . '" method="POST">';
+		$texte .= '<input type="hidden" name="token" value="' . newToken() . '">';
 		$texte .= '<input type="hidden" name="action" value="setModuleOptions">';
 		$texte .= '<input type="hidden" name="param1" value="DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_ADDON_ODT_PATH">';
 		$texte .= '<table class="nobordernopadding" width="100%">';
 
 		// List of directories area
-		$texte .= '<tr><td>';
-		$texttitle = $langs->trans("ListOfDirectories");
-		$listofdir = explode(',', preg_replace('/[\r\n]+/', ',', trim($conf->global->DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_ADDON_ODT_PATH)));
+		$texte      .= '<tr><td>';
+		$texttitle   = $langs->trans("ListOfDirectories");
+		$listofdir   = explode(',', preg_replace('/[\r\n]+/', ',', trim($conf->global->DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_ADDON_ODT_PATH)));
 		$listoffiles = array();
-		foreach ($listofdir as $key=>$tmpdir)
-		{
+		foreach ($listofdir as $key => $tmpdir) {
 			$tmpdir = trim($tmpdir);
 			$tmpdir = preg_replace('/DOL_DATA_ROOT/', DOL_DATA_ROOT, $tmpdir);
-			if (!$tmpdir) {
+			if ( ! $tmpdir) {
 				unset($listofdir[$key]); continue;
 			}
-			if (!is_dir($tmpdir)) $texttitle .= img_warning($langs->trans("ErrorDirNotFound", $tmpdir), 0);
-			else
-			{
-				$tmpfiles = dol_dir_list($tmpdir, 'files', 0, '\.(ods|odt)');
+			if ( ! is_dir($tmpdir)) $texttitle .= img_warning($langs->trans("ErrorDirNotFound", $tmpdir), 0);
+			else {
+				$tmpfiles                          = dol_dir_list($tmpdir, 'files', 0, '\.(ods|odt)');
 				if (count($tmpfiles)) $listoffiles = array_merge($listoffiles, $tmpfiles);
 			}
 		}
 
 		// Scan directories
 		$nbofiles = count($listoffiles);
-		if (!empty($conf->global->DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_ADDON_ODT_PATH))
-		{
-			$texte .= $langs->trans("DigiriskNumberOfModelFilesFound").': <b>';
+		if ( ! empty($conf->global->DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_ADDON_ODT_PATH)) {
+			$texte .= $langs->trans("DigiriskNumberOfModelFilesFound") . ': <b>';
 			//$texte.=$nbofiles?'<a id="a_'.get_class($this).'" href="#">':'';
 			$texte .= count($listoffiles);
 			//$texte.=$nbofiles?'</a>':'';
 			$texte .= '</b>';
 		}
 
-		if ($nbofiles)
-		{
-			$texte .= '<div id="div_'.get_class($this).'" class="hidden">';
-			foreach ($listoffiles as $file)
-			{
-				$texte .= $file['name'].'<br>';
+		if ($nbofiles) {
+			$texte .= '<div id="div_' . get_class($this) . '" class="hidden">';
+			foreach ($listoffiles as $file) {
+				$texte .= $file['name'] . '<br>';
 			}
 			$texte .= '</div>';
 		}
@@ -174,22 +169,20 @@ class doc_riskassessmentdocument_odt extends ModeleODTRiskAssessmentDocument
 		// phpcs:enable
 		global $user, $langs, $conf, $hookmanager, $action, $mysoc;
 
-		if (empty($srctemplatepath))
-		{
+		if (empty($srctemplatepath)) {
 			dol_syslog("doc_riskassessmentdocument_odt::write_file parameter srctemplatepath empty", LOG_WARNING);
 			return -1;
 		}
 
 		// Add odtgeneration hook
-		if (!is_object($hookmanager))
-		{
+		if ( ! is_object($hookmanager)) {
 			include_once DOL_DOCUMENT_ROOT . '/core/class/hookmanager.class.php';
 			$hookmanager = new HookManager($this->db);
 		}
 		$hookmanager->initHooks(array('odtgeneration'));
 
-		if (!is_object($outputlangs)) $outputlangs = $langs;
-		$outputlangs->charset_output = 'UTF-8';
+		if ( ! is_object($outputlangs)) $outputlangs = $langs;
+		$outputlangs->charset_output                 = 'UTF-8';
 
 		$outputlangs->loadLangs(array("main", "dict", "companies", "digiriskdolibarr@digiriskdolibarr"));
 
@@ -197,42 +190,39 @@ class doc_riskassessmentdocument_odt extends ModeleODTRiskAssessmentDocument
 		$ref = $mod->getNextValue($object);
 
 		$object->ref = $ref;
-		$id = $object->create($user, true, $digiriskelement);
+		$id          = $object->create($user, true, $digiriskelement);
 
 		$object->fetch($id);
 
-		$dir = $conf->digiriskdolibarr->multidir_output[isset($object->entity) ? $object->entity : 1] . '/riskassessmentdocument';
-		$objectref = dol_sanitizeFileName($ref);
+		$dir                                             = $conf->digiriskdolibarr->multidir_output[isset($object->entity) ? $object->entity : 1] . '/riskassessmentdocument';
+		$objectref                                       = dol_sanitizeFileName($ref);
 		if (preg_match('/specimen/i', $objectref)) $dir .= '/specimen';
 
-		if (!file_exists($dir))
-		{
-			if (dol_mkdir($dir) < 0)
-			{
+		if ( ! file_exists($dir)) {
+			if (dol_mkdir($dir) < 0) {
 				$this->error = $langs->transnoentities("ErrorCanNotCreateDir", $dir);
 				return -1;
 			}
 		}
 
-		if (file_exists($dir))
-		{
-			$filename = preg_split('/riskassessmentdocument\//' , $srctemplatepath);
-			$filename = preg_replace('/template_/','', $filename[1]);
+		if (file_exists($dir)) {
+			$filename = preg_split('/riskassessmentdocument\//', $srctemplatepath);
+			$filename = preg_replace('/template_/', '', $filename[1]);
 
-			$date = dol_print_date(dol_now(),'dayxcard');
-			$filename = $objectref.'_'.$conf->global->MAIN_INFO_SOCIETE_NOM.'_'.$date.'.odt';
+			$date     = dol_print_date(dol_now(), 'dayxcard');
+			$filename = $objectref . '_' . $conf->global->MAIN_INFO_SOCIETE_NOM . '_' . $date . '.odt';
 			$filename = str_replace(' ', '_', $filename);
 			$filename = dol_sanitizeFileName($filename);
 
 			$object->last_main_doc = $filename;
 
-			$sql = "UPDATE ".MAIN_DB_PREFIX."digiriskdolibarr_digiriskdocuments";
-			$sql .= " SET last_main_doc =" .(!empty($filename) ? "'".$this->db->escape($filename)."'" : 'null');
-			$sql .= " WHERE rowid = ".$object->id;
+			$sql  = "UPDATE " . MAIN_DB_PREFIX . "digiriskdolibarr_digiriskdocuments";
+			$sql .= " SET last_main_doc =" . ( ! empty($filename) ? "'" . $this->db->escape($filename) . "'" : 'null');
+			$sql .= " WHERE rowid = " . $object->id;
 
 			dol_syslog("admin.lib::Insert last main doc", LOG_DEBUG);
 			$this->db->query($sql);
-			$file = $dir.'/'.$filename;
+			$file = $dir . '/' . $filename;
 
 			dol_mkdir($conf->digiriskdolibarr->dir_temp);
 
@@ -240,11 +230,11 @@ class doc_riskassessmentdocument_odt extends ModeleODTRiskAssessmentDocument
 			$substitutionarray = array();
 			complete_substitutions_array($substitutionarray, $langs, $object);
 			// Call the ODTSubstitution hook
-			$parameters = array('file'=>$file, 'object'=>$object, 'outputlangs'=>$outputlangs, 'substitutionarray'=>&$substitutionarray);
-			$reshook = $hookmanager->executeHooks('ODTSubstitution', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
+			$parameters = array('file' => $file, 'object' => $object, 'outputlangs' => $outputlangs, 'substitutionarray' => &$substitutionarray);
+			$reshook    = $hookmanager->executeHooks('ODTSubstitution', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
 
 			// Open and load template
-			require_once ODTPHP_PATH.'odf.php';
+			require_once ODTPHP_PATH . 'odf.php';
 			try {
 				$odfHandler = new odf(
 					$srctemplatepath,
@@ -255,16 +245,14 @@ class doc_riskassessmentdocument_odt extends ModeleODTRiskAssessmentDocument
 						'DELIMITER_RIGHT' => '}'
 					)
 				);
-			}
-			catch (Exception $e)
-			{
+			} catch (Exception $e) {
 				$this->error = $e->getMessage();
 				dol_syslog($e->getMessage(), LOG_INFO);
 				return -1;
 			}
 
 			// Define substitution array
-			$substitutionarray = getCommonSubstitutionArray($outputlangs, 0, null, $object);
+			$substitutionarray            = getCommonSubstitutionArray($outputlangs, 0, null, $object);
 			$array_object_from_properties = $this->get_substitutionarray_each_var_object($object, $outputlangs);
 			//$array_object = $this->get_substitutionarray_object($object, $outputlangs);
 			$array_soc = $this->get_substitutionarray_mysoc($mysoc, $outputlangs);
@@ -273,69 +261,61 @@ class doc_riskassessmentdocument_odt extends ModeleODTRiskAssessmentDocument
 			complete_substitutions_array($tmparray, $outputlangs, $object);
 
 			// Call the ODTSubstitution hook
-			$parameters = array('odfHandler'=>&$odfHandler, 'file'=>$file, 'object'=>$object, 'outputlangs'=>$outputlangs, 'substitutionarray'=>&$tmparray);
-			$reshook = $hookmanager->executeHooks('ODTSubstitution', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
+			$parameters = array('odfHandler' => &$odfHandler, 'file' => $file, 'object' => $object, 'outputlangs' => $outputlangs, 'substitutionarray' => &$tmparray);
+			$reshook    = $hookmanager->executeHooks('ODTSubstitution', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
 
-			$filearray = dol_dir_list($conf->digiriskdolibarr->multidir_output[$conf->entity].'/riskassessmentdocument/', "files", 0, '', '(\.odt|\.zip)', 'date', 'asc', 1);
-			$sitePlans = array_shift($filearray);
-			$tmparray['dispoDesPlans'] = $sitePlans['path'] . '/thumbs/' .preg_replace('/\./', '_small.',$sitePlans['name']);
+			$filearray                 = dol_dir_list($conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessmentdocument/', "files", 0, '', '(\.odt|\.zip)', 'date', 'asc', 1);
+			$sitePlans                 = array_shift($filearray);
+			$tmparray['dispoDesPlans'] = $sitePlans['path'] . '/thumbs/' . preg_replace('/\./', '_small.', $sitePlans['name']);
 
-			foreach ($tmparray as $key=>$value)
-			{
+			foreach ($tmparray as $key => $value) {
 				try {
-					if (preg_match('/logo$/', $key) || $key == 'dispoDesPlans') // Image
-					{
+					if (preg_match('/logo$/', $key) || $key == 'dispoDesPlans') { // Image
 						if (file_exists($value)) $odfHandler->setImage($key, $value);
 						else $odfHandler->setVars($key, ($key == 'dispoDesPlans') ? $langs->transnoentities('NoSitePlans') : $langs->transnoentities('ErrorFileNotFound'), true, 'UTF-8');
-					}
-					else    // Text
+					} else // Text
 					{
 						if (empty($value)) {
 							$odfHandler->setVars($key, $langs->trans('NoData'), true, 'UTF-8');
 						} else {
-							$odfHandler->setVars($key, html_entity_decode($value,ENT_QUOTES | ENT_HTML5), true, 'UTF-8');
+							$odfHandler->setVars($key, html_entity_decode($value, ENT_QUOTES | ENT_HTML5), true, 'UTF-8');
 						}
 					}
-				}
-				catch (OdfException $e)
-				{
+				} catch (OdfException $e) {
 					dol_syslog($e->getMessage(), LOG_INFO);
 				}
 			}
 			// Replace tags of lines
-			try
-			{
+			try {
 				$foundtagforlines = 1;
-				if ($foundtagforlines)
-				{
+				if ($foundtagforlines) {
 					$digiriskelementobject = new DigiriskElement($this->db);
-					$digiriskelementlist = $digiriskelementobject->fetchDigiriskElementFlat(0);
-					$risk = new Risk($this->db);
-					$risks = $risk->fetchRisksOrderedByCotation(0, true);
+					$digiriskelementlist   = $digiriskelementobject->fetchDigiriskElementFlat(0);
+					$risk                  = new Risk($this->db);
+					$risks                 = $risk->fetchRisksOrderedByCotation(0, true);
 
-					if ( ! empty( $digiriskelementlist ) ) {
+					if ( ! empty($digiriskelementlist) ) {
 						$listlines = $odfHandler->setSegment('elementParHierarchie');
 
 						foreach ($digiriskelementlist as $line) {
-
 							$depthHyphens = '';
 							for ($k = 0; $k < $line['depth']; $k++) {
 								$depthHyphens .= '- ';
 							}
-							$tmparray['nomElement'] = $depthHyphens . $line['object']->ref .' '. $line['object']->label;
+							$tmparray['nomElement'] = $depthHyphens . $line['object']->ref . ' ' . $line['object']->label;
 
 							unset($tmparray['object_fields']);
 
 							complete_substitutions_array($tmparray, $outputlangs, $object, $line['object'], "completesubstitutionarray_lines");
 							// Call the ODTSubstitutionLine hook
 							$parameters = array('odfHandler' => &$odfHandler, 'file' => $file, 'object' => $object, 'outputlangs' => $outputlangs, 'substitutionarray' => &$tmparray, 'line' => $line['object']);
-							$reshook = $hookmanager->executeHooks('ODTSubstitutionLine', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
+							$reshook    = $hookmanager->executeHooks('ODTSubstitutionLine', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
 							foreach ($tmparray as $key => $val) {
 								try {
 									if (empty($val)) {
 										$listlines->setVars($key, $langs->trans('NoData'), true, 'UTF-8');
 									} else {
-										$listlines->setVars($key, html_entity_decode($val,ENT_QUOTES | ENT_HTML5), true, 'UTF-8');
+										$listlines->setVars($key, html_entity_decode($val, ENT_QUOTES | ENT_HTML5), true, 'UTF-8');
 									}
 								} catch (OdfException $e) {
 									dol_syslog($e->getMessage(), LOG_INFO);
@@ -348,29 +328,27 @@ class doc_riskassessmentdocument_odt extends ModeleODTRiskAssessmentDocument
 						$odfHandler->mergeSegment($listlines);
 					}
 
-					if ( ! empty( $digiriskelementlist ) ) {
-
+					if ( ! empty($digiriskelementlist) ) {
 						$totalQuotation = 0;
-						$listlines = $odfHandler->setSegment('risqueFiche');
+						$listlines      = $odfHandler->setSegment('risqueFiche');
 
 						foreach ($digiriskelementlist as $digiriskelementsingle) {
 							$digiriskelementrisks = $risk->fetchFromParent($digiriskelementsingle['object']->id);
-							if ($digiriskelementrisks > 0 && !empty($digiriskelementrisks)) {
+							if ($digiriskelementrisks > 0 && ! empty($digiriskelementrisks)) {
 								foreach ($digiriskelementrisks as $line) {
-									$evaluation = new RiskAssessment($this->db);
-									$lastEvaluation = $evaluation->fetchFromParent($line->id, 1);
-									$lastEvaluation = array_shift($lastEvaluation);
+									$evaluation      = new RiskAssessment($this->db);
+									$lastEvaluation  = $evaluation->fetchFromParent($line->id, 1);
+									$lastEvaluation  = array_shift($lastEvaluation);
 									$totalQuotation += $lastEvaluation->cotation;
 								}
 							}
 
-							$elementName = $digiriskelementsingle['object']->ref .' '. $digiriskelementsingle['object']->label;
-							$scale_counter = $digiriskelementsingle['object']->getRiskAssessmentCategoriesNumber();
+							$elementName                 = $digiriskelementsingle['object']->ref . ' ' . $digiriskelementsingle['object']->label;
+							$scale_counter               = $digiriskelementsingle['object']->getRiskAssessmentCategoriesNumber();
 							$cotationarray[$elementName] = array($totalQuotation, $digiriskelementsingle['object']->description,$scale_counter);
 
 							$totalQuotation = 0;
 							unset($tmparray['object_fields']);
-
 						}
 						//use arsort to sort array according to value
 						arsort($cotationarray);
@@ -378,35 +356,34 @@ class doc_riskassessmentdocument_odt extends ModeleODTRiskAssessmentDocument
 						complete_substitutions_array($tmparray, $outputlangs, $object, $line, "completesubstitutionarray_lines");
 						// Call the ODTSubstitutionLine hook
 						$parameters = array('odfHandler' => &$odfHandler, 'file' => $file, 'object' => $object, 'outputlangs' => $outputlangs, 'substitutionarray' => &$tmparray, 'line' => $line);
-						$reshook = $hookmanager->executeHooks('ODTSubstitutionLine', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
-							foreach ($cotationarray as $key => $val) {
-								try {
-									$listlines->setVars('nomElement', html_entity_decode($key,ENT_QUOTES | ENT_HTML5), true, 'UTF-8');
-									$listlines->setVars('quotationTotale', $val[0], true, 'UTF-8');
-									$listlines->setVars('description', html_entity_decode($val[1],ENT_QUOTES | ENT_HTML5), true, 'UTF-8');
-									$listlines->setVars('NbRiskBlack', $val[2][4], true, 'UTF-8');
-									$listlines->setVars('NbRiskRed', $val[2][3], true, 'UTF-8');
-									$listlines->setVars('NbRiskOrange', $val[2][2], true, 'UTF-8');
-									$listlines->setVars('NbRiskGrey', $val[2][1], true, 'UTF-8');
-								} catch (OdfException $e) {
-									dol_syslog($e->getMessage(), LOG_INFO);
-								} catch (SegmentException $e) {
-									dol_syslog($e->getMessage(), LOG_INFO);
-								}
-								$listlines->merge();
+						$reshook    = $hookmanager->executeHooks('ODTSubstitutionLine', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
+						foreach ($cotationarray as $key => $val) {
+							try {
+								$listlines->setVars('nomElement', html_entity_decode($key, ENT_QUOTES | ENT_HTML5), true, 'UTF-8');
+								$listlines->setVars('quotationTotale', $val[0], true, 'UTF-8');
+								$listlines->setVars('description', html_entity_decode($val[1], ENT_QUOTES | ENT_HTML5), true, 'UTF-8');
+								$listlines->setVars('NbRiskBlack', $val[2][4], true, 'UTF-8');
+								$listlines->setVars('NbRiskRed', $val[2][3], true, 'UTF-8');
+								$listlines->setVars('NbRiskOrange', $val[2][2], true, 'UTF-8');
+								$listlines->setVars('NbRiskGrey', $val[2][1], true, 'UTF-8');
+							} catch (OdfException $e) {
+								dol_syslog($e->getMessage(), LOG_INFO);
+							} catch (SegmentException $e) {
+								dol_syslog($e->getMessage(), LOG_INFO);
 							}
+							$listlines->merge();
+						}
 						$odfHandler->mergeSegment($listlines);
 					}
 
 					for ($i = 1; $i <= 4; $i++ ) {
 						$listlines = $odfHandler->setSegment('risq' . $i);
-						if ($risks > 0 && !empty($risks)) {
+						if ($risks > 0 && ! empty($risks)) {
 							$digiriskelementobject->fetch($conf->global->DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH);
 							$trashList = $digiriskelementobject->getTrashList();
 
 							foreach ($risks as $line) {
-								if (!in_array($line->fk_element, $trashList) && $line->fk_element > 0) {
-
+								if ( ! in_array($line->fk_element, $trashList) && $line->fk_element > 0) {
 									//$tmparray['actionPreventionUncompletedDate'] = "";
 									//$tmparray['actionPreventionUncompletedProgress'] = "";
 									//$tmparray['actionPreventionUncompletedContact'] = "";
@@ -416,40 +393,40 @@ class doc_riskassessmentdocument_odt extends ModeleODTRiskAssessmentDocument
 									//$tmparray['actionPreventionCompletedContact'] = "";
 									//$tmparray['actionPreventionCompletedlabel'] = "";																													d
 									$tmparray['actionPreventionUncompleted'] = "";
-									$tmparray['actionPreventionCompleted'] = "";
+									$tmparray['actionPreventionCompleted']   = "";
 
-									$evaluation = new RiskAssessment($this->db);
+									$evaluation     = new RiskAssessment($this->db);
 									$lastEvaluation = $evaluation->fetchFromParent($line->id, 1);
 
-									if ($lastEvaluation > 0 && !empty($lastEvaluation)) {
+									if ($lastEvaluation > 0 && ! empty($lastEvaluation)) {
 										$lastEvaluation = array_shift($lastEvaluation);
-										$scale = $lastEvaluation->get_evaluation_scale();
+										$scale          = $lastEvaluation->get_evaluation_scale();
 									}
 
 									if ($scale == $i) {
 										$element = new DigiriskElement($this->db);
 										$element->fetch($line->fk_element);
-										$tmparray['nomElement'] = $element->ref . ' - ' . $element->label;
-										$tmparray['nomDanger'] = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $line->get_danger_category($line) . '.png';
-										$tmparray['identifiantRisque'] = $line->ref . ' - ' . $lastEvaluation->ref;
-										$tmparray['quotationRisque'] = $lastEvaluation->cotation ? $lastEvaluation->cotation : '0';
-										$tmparray['descriptionRisque'] = $line->description;
-										$tmparray['commentaireEvaluation'] = dol_print_date((($conf->global->DIGIRISKDOLIBARR_SHOW_RISKASSESSMENT_DATE && (!empty($lastEvaluation->date_riskassessment))) ? $lastEvaluation->date_riskassessment : $lastEvaluation->date_creation), 'dayreduceformat') . ': ' . $lastEvaluation->comment;
+										$tmparray['nomElement']            = $element->ref . ' - ' . $element->label;
+										$tmparray['nomDanger']             = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $line->get_danger_category($line) . '.png';
+										$tmparray['identifiantRisque']     = $line->ref . ' - ' . $lastEvaluation->ref;
+										$tmparray['quotationRisque']       = $lastEvaluation->cotation ? $lastEvaluation->cotation : '0';
+										$tmparray['descriptionRisque']     = $line->description;
+										$tmparray['commentaireEvaluation'] = dol_print_date((($conf->global->DIGIRISKDOLIBARR_SHOW_RISKASSESSMENT_DATE && ( ! empty($lastEvaluation->date_riskassessment))) ? $lastEvaluation->date_riskassessment : $lastEvaluation->date_creation), 'dayreduceformat') . ': ' . $lastEvaluation->comment;
 
 										$related_tasks = $line->get_related_tasks($line);
-										$user = new User($this->db);
+										$user          = new User($this->db);
 
-										if (!empty($related_tasks) && is_array($related_tasks)) {
+										if ( ! empty($related_tasks) && is_array($related_tasks)) {
 											foreach ($related_tasks as $related_task) {
 												$related_task_contact_ids = $related_task->getListContactId();
-												if (!empty($related_task_contact_ids) && is_array($related_task_contact_ids)) {
+												if ( ! empty($related_task_contact_ids) && is_array($related_task_contact_ids)) {
 													foreach ($related_task_contact_ids as $related_task_contact_id) {
 														$user->fetch($related_task_contact_id);
 														$contact_array[$related_task_contact_id] = $user;
 													}
 												}
 												$AllInitiales = '';
-												if (!empty($contact_array) && is_array($contact_array)) {
+												if ( ! empty($contact_array) && is_array($contact_array)) {
 													foreach ($contact_array as $contact_array_single) {
 														$initiales = '';
 														if (dol_strlen($contact_array_single->firstname)) {
@@ -462,14 +439,14 @@ class doc_riskassessmentdocument_odt extends ModeleODTRiskAssessmentDocument
 													}
 												}
 												if ($related_task->progress == 100) {
-													$tmparray['actionPreventionCompleted'] .= dol_print_date((($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_START_DATE && (!empty($related_task->date_start))) ? $related_task->date_start : $related_task->date_c), 'dayreduceformat') . (($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_END_DATE && (!empty($related_task->date_end))) ? ' - ' . dol_print_date($related_task->date_end, 'dayreduceformat') : '') . "\n" . ' ' . $langs->trans('Contacts') . ' : ' . ($AllInitiales ?: $langs->trans('NoData')) . "\n" . $related_task->label . "\n\n";
+													$tmparray['actionPreventionCompleted'] .= dol_print_date((($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_START_DATE && ( ! empty($related_task->date_start))) ? $related_task->date_start : $related_task->date_c), 'dayreduceformat') . (($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_END_DATE && ( ! empty($related_task->date_end))) ? ' - ' . dol_print_date($related_task->date_end, 'dayreduceformat') : '') . "\n" . ' ' . $langs->trans('Contacts') . ' : ' . ($AllInitiales ?: $langs->trans('NoData')) . "\n" . $related_task->label . "\n\n";
 												} else {
-													$tmparray['actionPreventionUncompleted'] .= dol_print_date((($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_START_DATE && (!empty($related_task->date_start))) ? $related_task->date_start : $related_task->date_c), 'dayreduceformat') . (($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_END_DATE && (!empty($related_task->date_end))) ? ' - ' . dol_print_date($related_task->date_end, 'dayreduceformat') : '') . ' - ' . $langs->trans('DigiriskProgress') . ' : ' . ($related_task->progress ?: 0) . '%' . ' ' . $langs->trans('Contacts') . ' : ' . ($AllInitiales ?: $langs->trans('NoData')) . "\n" . $related_task->label . "\n\n";
+													$tmparray['actionPreventionUncompleted'] .= dol_print_date((($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_START_DATE && ( ! empty($related_task->date_start))) ? $related_task->date_start : $related_task->date_c), 'dayreduceformat') . (($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_END_DATE && ( ! empty($related_task->date_end))) ? ' - ' . dol_print_date($related_task->date_end, 'dayreduceformat') : '') . ' - ' . $langs->trans('DigiriskProgress') . ' : ' . ($related_task->progress ?: 0) . '%' . ' ' . $langs->trans('Contacts') . ' : ' . ($AllInitiales ?: $langs->trans('NoData')) . "\n" . $related_task->label . "\n\n";
 												}
 											}
 										} else {
 											$tmparray['actionPreventionUncompleted'] = "";
-											$tmparray['actionPreventionCompleted'] = "";
+											$tmparray['actionPreventionCompleted']   = "";
 										}
 
 										//$listTask = $odfHandler->setSegment('UncompletedAction' . $i);
@@ -517,7 +494,7 @@ class doc_riskassessmentdocument_odt extends ModeleODTRiskAssessmentDocument
 										complete_substitutions_array($tmparray, $outputlangs, $object, $line, "completesubstitutionarray_lines");
 										// Call the ODTSubstitutionLine hook
 										$parameters = array('odfHandler' => &$odfHandler, 'file' => $file, 'object' => $object, 'outputlangs' => $outputlangs, 'substitutionarray' => &$tmparray, 'line' => $line);
-										$reshook = $hookmanager->executeHooks('ODTSubstitutionLine', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
+										$reshook    = $hookmanager->executeHooks('ODTSubstitutionLine', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
 										foreach ($tmparray as $key => $val) {
 											try {
 												if ($val == $tmparray['nomDanger']) {
@@ -566,9 +543,7 @@ class doc_riskassessmentdocument_odt extends ModeleODTRiskAssessmentDocument
 						$odfHandler->mergeSegment($listlines);
 					}
 				}
-			}
-			catch (OdfException $e)
-			{
+			} catch (OdfException $e) {
 				$this->error = $e->getMessage();
 				dol_syslog($this->error, LOG_WARNING);
 				return -1;
@@ -576,23 +551,20 @@ class doc_riskassessmentdocument_odt extends ModeleODTRiskAssessmentDocument
 
 			// Replace labels translated
 			$tmparray = $outputlangs->get_translations_for_substitutions();
-			foreach ($tmparray as $key=>$value)
-			{
+			foreach ($tmparray as $key => $value) {
 				try {
 					$odfHandler->setVars($key, $value, true, 'UTF-8');
-				}
-				catch (OdfException $e)
-				{
+				} catch (OdfException $e) {
 					dol_syslog($e->getMessage(), LOG_INFO);
 				}
 			}
 
 			// Call the beforeODTSave hook
-			$parameters = array('odfHandler'=>&$odfHandler, 'file'=>$file, 'object'=>$object, 'outputlangs'=>$outputlangs, 'substitutionarray'=>&$tmparray);
-			$reshook = $hookmanager->executeHooks('beforeODTSave', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
+			$parameters = array('odfHandler' => &$odfHandler, 'file' => $file, 'object' => $object, 'outputlangs' => $outputlangs, 'substitutionarray' => &$tmparray);
+			$reshook    = $hookmanager->executeHooks('beforeODTSave', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
 
 			// Write new file
-			if (!empty($conf->global->MAIN_ODT_AS_PDF)) {
+			if ( ! empty($conf->global->MAIN_ODT_AS_PDF)) {
 				try {
 					$odfHandler->exportAsAttachedPDF($file);
 				} catch (Exception $e) {
@@ -600,8 +572,7 @@ class doc_riskassessmentdocument_odt extends ModeleODTRiskAssessmentDocument
 					dol_syslog($e->getMessage(), LOG_INFO);
 					return -1;
 				}
-			}
-			else {
+			} else {
 				try {
 					$odfHandler->saveToDisk($file);
 				} catch (Exception $e) {
@@ -611,20 +582,18 @@ class doc_riskassessmentdocument_odt extends ModeleODTRiskAssessmentDocument
 				}
 			}
 
-			$parameters = array('odfHandler'=>&$odfHandler, 'file'=>$file, 'object'=>$object, 'outputlangs'=>$outputlangs, 'substitutionarray'=>&$tmparray);
-			$reshook = $hookmanager->executeHooks('afterODTCreation', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
+			$parameters = array('odfHandler' => &$odfHandler, 'file' => $file, 'object' => $object, 'outputlangs' => $outputlangs, 'substitutionarray' => &$tmparray);
+			$reshook    = $hookmanager->executeHooks('afterODTCreation', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
 
-			if (!empty($conf->global->MAIN_UMASK))
+			if ( ! empty($conf->global->MAIN_UMASK))
 				@chmod($file, octdec($conf->global->MAIN_UMASK));
 
 			$odfHandler = null; // Destroy object
 
-			$this->result = array('fullpath'=>$file);
+			$this->result = array('fullpath' => $file);
 
 			return 1; // Success
-		}
-		else
-		{
+		} else {
 			$this->error = $langs->transnoentities("ErrorCanNotCreateDir", $dir);
 			return -1;
 		}
