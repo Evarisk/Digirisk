@@ -36,6 +36,9 @@ if ( ! $res && file_exists("../../../main.inc.php")) $res    = @include "../../.
 if ( ! $res && file_exists("../../../../main.inc.php")) $res = @include "../../../../main.inc.php";
 if ( ! $res) die("Include of main fails");
 
+global $conf, $db, $langs, $user, $hookmanager;
+
+// Libraries
 require_once DOL_DOCUMENT_ROOT . '/core/lib/admin.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/company.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/functions2.lib.php';
@@ -45,8 +48,6 @@ require_once DOL_DOCUMENT_ROOT . '/core/class/html.formactions.class.php';
 require_once DOL_DOCUMENT_ROOT . '/core/class/html.form.class.php';
 
 require_once '../class/digiriskresources.class.php';
-
-global $conf, $db, $langs, $user, $hookmanager;
 
 // Translations
 $langs->loadLangs(array('admin', 'companies', "digiriskdolibarr@digiriskdolibarr"));

@@ -41,6 +41,7 @@ global $langs, $user;
 // Libraries
 require_once DOL_DOCUMENT_ROOT . "/core/lib/admin.lib.php";
 require_once DOL_DOCUMENT_ROOT . "/core/class/html.formprojet.class.php";
+
 require_once '../../lib/digiriskdolibarr.lib.php';
 
 $action     = GETPOST('action', 'alpha');
