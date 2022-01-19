@@ -3325,8 +3325,8 @@ window.eoxiaJS.menu.event = function() {
 window.eoxiaJS.menu.toggleMenu = function() {
 
 	var menu = $(this).closest('#id-left').find('a.vmenu');
+	var menuDisabled = $(this).closest('#id-left').find('font.vmenudisabled');
 	var elementParent = $(this).closest('#id-left').find('div.vmenu')
-
 
 	if ($(this).find('.minimizeMenu').length > 0) {
 
@@ -3334,6 +3334,21 @@ window.eoxiaJS.menu.toggleMenu = function() {
 		menu.each(function (index, value) {
 			text = $(this).html().split(' ');
 			$(this).html(text[0]+' '+text[1]+' '+text[2]);
+		});
+
+		var textDisabled = '';
+		menuDisabled.each(function (index, value) {
+			textDisabled = $(this).html().split(' ');
+			$(this).html(textDisabled[0]+' '+textDisabled[1]+' '+textDisabled[2]);
+			console.log(textDisabled)
+			if (textDisabled[5] == 'undefined') {
+				textDisabled[5] = '';
+				console.log("e")
+			}
+			if (textDisabled[6] == 'undefined') {
+				textDisabled[6] = '';
+			}
+			$(this).attr('title',textDisabled[3]+' '+textDisabled[4]+' '+textDisabled[5]+' '+textDisabled[6]);
 		});
 
 		var elementText = $(this).find('.minimizeMenu').html().split(' ');
@@ -3350,6 +3365,12 @@ window.eoxiaJS.menu.toggleMenu = function() {
 		menu.each(function (index, value) {
 			text2 = $(this).html().split(' ');
 			$(this).html(text2[0]+' '+text2[1]+' '+text2[2]+' '+$(this).attr('title'));
+		});
+
+		var text2Disabled = '';
+		menuDisabled.each(function (index, value) {
+			text2Disabled = $(this).html().split(' ');
+			$(this).html(text2Disabled[0]+' '+text2Disabled[1]+' '+text2Disabled[2]+' '+$(this).attr('title'));
 		});
 
 		var elementText2 = $(this).find('.maximizeMenu').html().split(' ');
@@ -3382,11 +3403,26 @@ window.eoxiaJS.menu.setMenu = function() {
 	if (localStorage.maximized == 'false') {
 		var text = '';
 		var menu = $(document).find('a.vmenu');
+		var menuDisabled = $(document).find('font.vmenudisabled');
 		var elementParent = $(document).find('div.vmenu')
 		console.log(menu)
 		menu.each(function (index, value) {
 			text = $(this).html().split(' ');
 			$(this).html(text[0]+' '+text[1]+' '+text[2]);
+			console.log($(this))
+		});
+
+		var textDisabled = '';
+		menuDisabled.each(function (index, value) {
+			textDisabled = $(this).html().split(' ');
+			$(this).html(textDisabled[0]+' '+textDisabled[1]+' '+textDisabled[2]);
+			if (textDisabled[5] == 'undefined') {
+				textDisabled[5] = '';
+			}
+			if (textDisabled[6] == 'undefined') {
+				textDisabled[6] = '';
+			}
+			$(this).attr('title',textDisabled[3]+' '+textDisabled[4]+' '+textDisabled[5]+' '+textDisabled[6]);
 			console.log($(this))
 		});
 
