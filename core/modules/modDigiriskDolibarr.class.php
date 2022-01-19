@@ -929,8 +929,6 @@ class modDigiriskdolibarr extends DolibarrModules
 		}
 
 		$sql = array();
-		$this->_load_tables('/digiriskdolibarr/sql/');
-
 		// Load sql sub folders
 		$sqlFolder = scandir(__DIR__ . '/../../sql');
 		foreach ($sqlFolder as $subFolder) {
@@ -938,6 +936,8 @@ class modDigiriskdolibarr extends DolibarrModules
 				$this->_load_tables('/digiriskdolibarr/sql/' . $subFolder . '/');
 			}
 		}
+
+		$this->_load_tables('/digiriskdolibarr/sql/');
 
 		delDocumentModel('informationssharing_odt', 'informationssharing');
 		delDocumentModel('legaldisplay_odt', 'legaldisplay');
