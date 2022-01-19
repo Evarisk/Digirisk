@@ -201,10 +201,10 @@ class FirePermit extends CommonObject
 
 		if ( ! empty($signatories) && $signatories > 0) {
 			foreach ($signatories as $arrayRole) {
-				foreach ($arrayRole as $signatory) {
-					$signatoriesID[$signatory->role] = $signatory->id;
-					if ($signatory->role == 'FP_EXT_SOCIETY_INTERVENANTS') {
-						$extintervenant_ids[] = $signatory->id;
+				foreach ($arrayRole as $signatoryRole) {
+					$signatoriesID[$signatoryRole->role] = $signatoryRole->id;
+					if ($signatoryRole->role == 'FP_EXT_SOCIETY_INTERVENANTS') {
+						$extintervenant_ids[] = $signatoryRole->id;
 					}
 				}
 			}

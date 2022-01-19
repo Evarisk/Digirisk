@@ -205,10 +205,10 @@ class PreventionPlan extends CommonObject
 
 		if ( ! empty($signatories) && $signatories > 0) {
 			foreach ($signatories as $arrayRole) {
-				foreach ($arrayRole as $signatory) {
-					$signatoriesID[$signatory->role] = $signatory->id;
-					if ($signatory->role == 'PP_EXT_SOCIETY_INTERVENANTS') {
-						$extintervenant_ids[] = $signatory->id;
+				foreach ($arrayRole as $signatoryRole) {
+					$signatoriesID[$signatoryRole->role] = $signatoryRole->id;
+					if ($signatoryRole->role == 'PP_EXT_SOCIETY_INTERVENANTS') {
+						$extintervenant_ids[] = $signatoryRole->id;
 					}
 				}
 			}
