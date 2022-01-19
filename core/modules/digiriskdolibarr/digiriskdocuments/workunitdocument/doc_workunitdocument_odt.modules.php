@@ -30,6 +30,7 @@ require_once __DIR__ . '/../../../../../class/evaluator.class.php';
 require_once __DIR__ . '/../../../../../class/riskanalysis/risk.class.php';
 require_once __DIR__ . '/../../../../../class/riskanalysis/riskassessment.class.php';
 require_once __DIR__ . '/../../../../../class/riskanalysis/risksign.class.php';
+require_once __DIR__ . '/../../../../../class/accident.class.php';
 require_once __DIR__ . '/mod_workunitdocument_standard.php';
 require_once __DIR__ . '/modules_workunitdocument.php';
 /**
@@ -471,6 +472,55 @@ class doc_workunitdocument_odt extends ModeleODTWorkUnitDocument
 								$tmparray['identifiantRecommandation'] = $line->ref;
 								$tmparray['recommandationName']        = $line->get_risksign_category($line, 'name');
 								$tmparray['recommandationComment']     = $line->description;
+
+								unset($tmparray['object_fields']);
+
+								complete_substitutions_array($tmparray, $outputlangs, $object, $line, "completesubstitutionarray_lines");
+								// Call the ODTSubstitutionLine hook
+								$parameters = array('odfHandler' => &$odfHandler, 'file' => $file, 'object' => $object, 'outputlangs' => $outputlangs, 'substitutionarray' => &$tmparray, 'line' => $line);
+								$reshook    = $hookmanager->executeHooks('ODTSubstitutionLine', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
+								foreach ($tmparray as $key => $val) {
+									try {
+										if (file_exists($val)) {
+											$listlines->setImage($key, $val);
+										} else {
+											if (empty($val)) {
+												$listlines->setVars($key, $langs->trans('NoData'), true, 'UTF-8');
+											} else {
+												$listlines->setVars($key, html_entity_decode($val, ENT_QUOTES | ENT_HTML5), true, 'UTF-8');
+											}
+										}
+									} catch (OdfException $e) {
+										dol_syslog($e->getMessage(), LOG_INFO);
+									} catch (SegmentException $e) {
+										dol_syslog($e->getMessage(), LOG_INFO);
+									}
+								}
+								$listlines->merge();
+							}
+						}
+						$odfHandler->mergeSegment($listlines);
+					}
+
+					$accident = new Accident($this->db);
+
+					if ( ! empty($digiriskelement) ) {
+						$accidents = $accident->fetchFromParent($digiriskelement->id);
+						if ($accidents !== -1) {
+							$listlines = $odfHandler->setSegment('affectedAccident');
+							foreach ($accidents as $line) {
+								$filearray = dol_dir_list($conf->digiriskdolibarr->multidir_output[$conf->entity] . '/' . $line->element . '/' . $line->ref . '/thumbs/', "files", 0, '', '(\.odt|_preview.*\.png)$', 'position_name', 'desc', 1);
+								if (count($filearray)) {
+									$image                    = array_shift($filearray);
+									$tmparray['AccidentIcon'] = $image['fullname'];
+								} else {
+									$nophoto                  = '/public/theme/common/nophoto.png';
+									$tmparray['AccidentIcon'] = DOL_DOCUMENT_ROOT . $nophoto;
+								}
+
+								$tmparray['identifiantAccident'] = $line->ref;
+								$tmparray['AccidentName']        = $line->label;
+								$tmparray['AccidentComment']     = $line->description;
 
 								unset($tmparray['object_fields']);
 

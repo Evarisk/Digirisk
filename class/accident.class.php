@@ -177,6 +177,18 @@ class Accident extends CommonObject
 	}
 
 	/**
+	 * Load object in memory from the database
+	 *
+	 * @param int $parent_id Id parent object
+	 * @return int         <0 if KO, 0 if not found, >0 if OK
+	 */
+	public function fetchFromParent($parent_id)
+	{
+		$filter = array('customsql' => 'fk_element=' . $this->db->escape($parent_id));
+		return $this->fetchAll('', '', 0, 0, $filter, 'AND');
+	}
+
+	/**
 	 * Load object lines in memory from the database
 	 *
 	 * @return int         <0 if KO, 0 if not found, >0 if OK
