@@ -88,10 +88,11 @@ class Accident extends CommonObject
 		'accident_type'      => array('type' => 'text', 'label' => 'AccidentType', 'enabled' => '1', 'position' => 90, 'notnull' => -1, 'visible' => 1, 'css' => 'minwidth150',),
 		'fk_element'         => array('type' => 'integer', 'label' => 'AccidentLocation', 'enabled' => '1', 'position' => 91, 'notnull' => -1, 'visible' => 1,'css' => 'minwidth150',),
 		'fk_soc'             => array('type' => 'integer', 'label' => 'ExtSociety', 'enabled' => '1', 'position' => 92, 'notnull' => -1, 'visible' => 3,),
+		'accident_location'  => array('type' => 'text', 'label' => 'AccidentLocation', 'enabled' => '1', 'position' => 93, 'notnull' => -1, 'visible' => 3, 'css' => 'minwidth150',),
 		'accident_date'      => array('type' => 'datetime', 'label' => 'AccidentDate', 'enabled' => '1', 'position' => 100, 'notnull' => -1, 'visible' => 1, 'css' => 'minwidth150',),
 		'description'        => array('type' => 'text', 'label' => 'Description', 'enabled' => '1', 'position' => 110, 'notnull' => -1, 'visible' => 1,),
 		'photo'              => array('type' => 'text', 'label' => 'Photo', 'enabled' => '1', 'position' => 120, 'notnull' => -1, 'visible' => 3,),
-		'external_accident'  => array('type' => 'boolean', 'label' => 'ExternalAccident', 'enabled' => '1', 'position' => 130, 'notnull' => -1, 'visible' => 3,),
+		'external_accident'  => array('type' => 'smallint', 'label' => 'ExternalAccident', 'enabled' => '1', 'position' => 130, 'notnull' => -1, 'visible' => 3, 'arrayofkeyval' => array('1' => 'No', '2' => 'Yes', '3' => 'Other'),),
 		'fk_project'         => array('type' => 'integer', 'label' => 'FKProject', 'enabled' => '1', 'position' => 140, 'notnull' => 1, 'visible' => 0,),
 		'fk_user_creat'      => array('type' => 'integer:User:user/class/user.class.php', 'label' => 'UserAuthor', 'enabled' => '1', 'position' => 150, 'notnull' => 1, 'visible' => 0, 'foreignkey' => 'user.rowid',),
 		'fk_user_modif'      => array('type' => 'integer:User:user/class/user.class.php', 'label' => 'UserModif', 'enabled' => '1', 'position' => 160, 'notnull' => -1, 'visible' => 0,),
@@ -110,6 +111,7 @@ class Accident extends CommonObject
 	public $photo;
 	public $accident_type;
 	public $external_accident;
+	public $accident_location;
 	public $fk_user_creat;
 	public $fk_user_modif;
 	public $fk_element;

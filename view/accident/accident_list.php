@@ -411,10 +411,16 @@ while ($i < ($limit ? min($num, $limit) : $num)) {
 				$arrayAccident[] = $accident->accident_date;
 				$arrayAccident[] = $accident->description;
 				$arrayAccident[] = $accident->photo;
-				if (empty($accident->external_accident)) {
-					$arrayAccident[] = $accident->fk_element;
-				} else {
-					$arrayAccident[] = $accident->fk_soc;
+				switch ($object->external_accident) {
+					case 1:
+						$arrayAccident[] = $object->fk_element;
+						break;
+					case 2:
+						$arrayAccident[] = $object->fk_soc;
+						break;
+					case 3:
+						$arrayAccident[] = $object->accident_location;
+						break;
 				}
 				$arrayAccident[] = $accident->fk_user_victim;
 
@@ -453,17 +459,23 @@ while ($i < ($limit ? min($num, $limit) : $num)) {
 					print $langs->trans('CommutingAccident');
 				}
 			} elseif ($key == 'fk_element') {
-				if (empty($accident->external_accident)) {
-					if ($conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD == $accident->fk_element) {
-						$digiriskstandard->fetch($conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD);
-						print $digiriskstandard->getNomUrl(1, 'blank', 1);
-					} else {
-						$digiriskelement->fetch($accident->fk_element);
-						print $digiriskelement->getNomUrl(1, 'blank', 1);
-					}
-				} else {
-					$thirdparty->fetch($accident->fk_soc);
-					print getNomUrlSociety($thirdparty, 1, 'blank');
+				switch ($accident->external_accident) {
+					case 1:
+						if ($conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD == $accident->fk_element) {
+							$digiriskstandard->fetch($conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD);
+							print $digiriskstandard->getNomUrl(1, 'blank', 1);
+						} else {
+							$digiriskelement->fetch($accident->fk_element);
+							print $digiriskelement->getNomUrl(1, 'blank', 1);
+						}
+						break;
+					case 2:
+						$thirdparty->fetch($accident->fk_soc);
+						print getNomUrlSociety($thirdparty, 1, 'blank');
+						break;
+					case 3:
+						print $accident->accident_location;
+						break;
 				}
 			} elseif ($key == 'accident_date') {
 				print dol_print_date($accident->accident_date, 'dayhour', 'tzserver');	// We suppose dates without time are always gmt (storage of course + output)

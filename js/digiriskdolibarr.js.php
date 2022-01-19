@@ -3470,7 +3470,7 @@ window.eoxiaJS.accident.init = function() {
 window.eoxiaJS.accident.event = function() {
 	$( document ).on( 'submit', ' .sendfile', window.eoxiaJS.accident.tmpStockFile );
 	$( document ).on( 'click', ' .linked-file-delete-workstop', window.eoxiaJS.accident.removeFile );
-	$( document ).on( 'click', '#external_accident', window.eoxiaJS.accident.showExternalAccidentLocation );
+	$( document ).on( 'change', '#external_accident', window.eoxiaJS.accident.showExternalAccidentLocation );
 };
 
 /**
@@ -3543,17 +3543,34 @@ window.eoxiaJS.accident.removeFile = function( event ) {
 window.eoxiaJS.accident.showExternalAccidentLocation = function() {
 	let fkElementField = $(this).closest('.accident-table').find('.fk_element_field')
 	let fkSocField = $(this).closest('.accident-table').find('.fk_soc_field')
+	let accidentLocationField = $(this).closest('.accident-table').find('.accident_location_field')
+	let externalAccident = $(this).closest('.accident-table').find('#select2-external_accident-container').attr('title')
 
-	if (fkSocField.hasClass('hidden')) {
-		fkElementField.attr('style', 'display:none')
-		fkSocField.attr('style', '')
-		fkElementField.addClass('hidden')
-		fkSocField.removeClass('hidden')
-	} else {
-		fkElementField.attr('style', '')
-		fkSocField.attr('style', 'display:none')
-		fkElementField.removeClass('hidden')
-		fkSocField.addClass('hidden')
+	switch (externalAccident) {
+		case 'Non':
+			fkElementField.attr('style', '')
+			fkSocField.attr('style', 'display:none')
+			accidentLocationField.attr('style', 'display:none')
+			fkElementField.removeClass('hidden')
+			fkSocField.addClass('hidden')
+			accidentLocationField.addClass('hidden')
+			break;
+		case 'Oui':
+			fkElementField.attr('style', 'display:none')
+			fkSocField.attr('style', '')
+			accidentLocationField.attr('style', 'display:none')
+			fkElementField.addClass('hidden')
+			fkSocField.removeClass('hidden')
+			accidentLocationField.addClass('hidden')
+			break;
+		case 'Autre':
+			fkElementField.attr('style', 'display:none')
+			fkSocField.attr('style', 'display:none')
+			accidentLocationField.attr('style', '')
+			fkElementField.addClass('hidden')
+			fkSocField.addClass('hidden')
+			accidentLocationField.removeClass('hidden')
+			break;
 	}
 };
 

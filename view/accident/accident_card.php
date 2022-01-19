@@ -134,6 +134,7 @@ if (empty($reshook)) {
 		$description        = GETPOST('description');
 		$accident_type      = GETPOST('accident_type');
 		$external_accident  = GETPOST('external_accident');
+		$accident_location  = GETPOST('accident_location');
 		$ext_society_id     = GETPOST('fk_soc');
 
 		// Initialize object accident
@@ -148,6 +149,7 @@ if (empty($reshook)) {
 		$object->description       = $description;
 		$object->accident_type     = $accident_type;
 		$object->external_accident = $external_accident;
+		$object->accident_location = $accident_location;
 		$object->fk_project        = $conf->global->DIGIRISKDOLIBARR_ACCIDENT_PROJECT;
 
 		$accident_date = dol_mktime(GETPOST('dateohour', 'int'), GETPOST('dateomin', 'int'), 0, GETPOST('dateomonth', 'int'), GETPOST('dateoday', 'int'), GETPOST('dateoyear', 'int'));
@@ -238,6 +240,7 @@ if (empty($reshook)) {
 		$description        = GETPOST('description');
 		$accident_type      = GETPOST('accident_type');
 		$external_accident  = GETPOST('external_accident');
+		$accident_location  = GETPOST('accident_location');
 		$ext_society_id     = GETPOST('fk_soc');
 
 		// Initialize object accident
@@ -247,6 +250,7 @@ if (empty($reshook)) {
 		$object->description       = $description;
 		$object->accident_type     = $accident_type;
 		$object->external_accident = $external_accident;
+		$object->accident_location = $accident_location;
 		$object->fk_project        = $conf->global->DIGIRISKDOLIBARR_ACCIDENT_PROJECT;
 
 		$accident_date = dol_mktime(GETPOST('dateohour', 'int'), GETPOST('dateomin', 'int'), 0, GETPOST('dateomonth', 'int'), GETPOST('dateoday', 'int'), GETPOST('dateoyear', 'int'));
@@ -576,15 +580,15 @@ if ($action == 'create') {
 
 	//ExternalAccident
 	print '<tr><td class="minwidth400">' . $langs->trans("ExternalAccident") . '</td><td>';
-	print '<input type="checkbox" id="external_accident" name="external_accident"' . ($object->external_accident ? ' checked=""' : '') . '>';
+	print $form->selectarray('external_accident', array('1' => $langs->trans('No'), '2' => $langs->trans('Yes'), '3' => $langs->trans('Other')), '', 0, 0, 0, '', 0, 0, 0, '', 'minwidth300', 1);
 	print '</td></tr>';
 
-	//AccidentLocation -- Lieu de l'accident
+	//FkElement -- Lieu de l'accident - DigiriskElement
 	print '<tr class="fk_element_field"><td class="minwidth400">' . $langs->trans("AccidentLocation") . '</td><td>';
-	print $digiriskelement->select_digiriskelement_list($object->fk_element, 'fk_element', '', '',  0, 0, array(), '',  0,  0,  'minwidth100',  GETPOST('id'),  false, 0);
+	print $digiriskelement->select_digiriskelement_list($object->fk_element, 'fk_element', '', '',  0, 0, array(), '',  0,  0,  'minwidth300',  GETPOST('id'),  false, 0);
 	print '</td></tr>';
 
-	//FkSoc -- Société extérieure
+	//FkSoc -- Lieu de l'accident - Société extérieure
 	print '<tr class="fk_soc_field hidden" ' . (GETPOST('fk_soc') ? '' : 'style="display:none"') . '><td class="minwidth400">' . $langs->trans("AccidentLocation") . '</td>';
 	print '<td>';
 	//For external user force the company to user company
@@ -594,6 +598,12 @@ if ($action == 'create') {
 		print $form->select_company('', 'fk_soc', '', 'SelectThirdParty', 1, 0, '', 0, 'minwidth300');
 	}
 	print ' <a href="' . DOL_URL_ROOT . '/societe/card.php?action=create&backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?action=create') . '" target="_blank"><span class="fa fa-plus-circle valignmiddle paddingleft" title="' . $langs->trans("AddThirdParty") . '"></span></a>';
+	print '</td></tr>';
+
+	//AccidentLocation -- lieu de l'accident
+	print '<tr class="accident_location_field hidden" ' . (GETPOST('accident_location') ? '' : 'style="display:none"') . '><td class="minwidth400">' . $langs->trans("AccidentLocation") . '</td><td>';
+	$doleditor = new DolEditor('accident_location', GETPOST('accident_location'), '', 90, 'dolibarr_details', '', false, true, $conf->global->FCKEDITOR_ENABLE_SOCIETE, ROWS_3, '90%');
+	$doleditor->Create();
 	print '</td></tr>';
 
 	//Accident Date -- Date de l'accident
@@ -671,21 +681,21 @@ if (($id || $ref) && $action == 'edit') {
 
 	//AccidentType
 	print '<tr><td class="minwidth400">' . $langs->trans("AccidentType") . '</td><td>';
-	print $form->selectarray('accident_type', array('0' => $langs->trans('WorkAccidentStatement'), '1' => $langs->trans('CommutingAccident')), $object->accident_type, 0, 0, 0, '', 0, 0, 0, '', 'minwidth400', 1);
+	print $form->selectarray('accident_type', array('0' => $langs->trans('WorkAccidentStatement'), '1' => $langs->trans('CommutingAccident')), $object->accident_type, 0, 0, 0, '', 0, 0, 0, '', 'minwidth300', 1);
 	print '</td></tr>';
 
 	//ExternalAccident
 	print '<tr><td class="minwidth400">' . $langs->trans("ExternalAccident") . '</td><td>';
-	print '<input type="checkbox" id="external_accident" name="external_accident"' . ($object->external_accident ? ' checked=""' : '') . '>';
+	print $form->selectarray('external_accident', array('1' => $langs->trans('No'), '2' => $langs->trans('Yes'), '3' => $langs->trans('Other')), $object->external_accident, 0, 0, 0, '', 0, 0, 0, '', 'minwidth300', 1);
 	print '</td></tr>';
 
 	//AccidentLocation -- Lieu de l'accident
-	print '<tr class="' . (empty($object->external_accident) ? ' fk_element_field' : ' fk_element_field hidden' ) . '" style="' . (empty($object->external_accident) ? ' ' : ' display:none') . '"><td>' . $langs->trans("AccidentLocation") . '</td><td>';
-	print $digiriskelement->select_digiriskelement_list($object->fk_element, 'fk_element', '', '',  0, 0, array(), '',  0,  0,  'minwidth100',  GETPOST('id'),  false, 0);
+	print '<tr class="' . (($object->external_accident == 1) ? ' fk_element_field' : ' fk_element_field hidden' ) . '" style="' . (($object->external_accident == 1) ? ' ' : ' display:none') . '"><td>' . $langs->trans("AccidentLocation") . '</td><td>';
+	print $digiriskelement->select_digiriskelement_list($object->fk_element, 'fk_element', '', '',  0, 0, array(), '',  0,  0,  'minwidth300',  GETPOST('id'),  false, 0);
 	print '</td></tr>';
 
 	//FkSoc -- Société extérieure
-	print '<tr class="' . ($object->external_accident ? ' fk_soc_field' : ' fk_soc_field hidden' ) . '" style="' . ($object->external_accident ? ' ' : ' display:none') . '"><td class="minwidth400">' . $langs->trans("AccidentLocation") . '</td>';
+	print '<tr class="' . (($object->external_accident == 2) ? ' fk_soc_field' : ' fk_soc_field hidden' ) . '" style="' . (($object->external_accident == 2) ? ' ' : ' display:none') . '"><td class="minwidth400">' . $langs->trans("AccidentLocation") . '</td>';
 	print '<td>';
 	//For external user force the company to user company
 	if ( ! empty($user->socid)) {
@@ -694,6 +704,12 @@ if (($id || $ref) && $action == 'edit') {
 		print $form->select_company($object->fk_soc, 'fk_soc', '', 'SelectThirdParty', 1, 0, '', 0, 'minwidth300');
 	}
 	print ' <a href="' . DOL_URL_ROOT . '/societe/card.php?action=create&backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?action=create') . '" target="_blank"><span class="fa fa-plus-circle valignmiddle paddingleft" title="' . $langs->trans("AddThirdParty") . '"></span></a>';
+	print '</td></tr>';
+
+	//AccidentLocation -- lieu de l'accident
+	print '<tr class="' . (($object->external_accident == 3) ? ' accident_location_field' : ' accident_location_field hidden' ) . '" style="' . (($object->external_accident == 3) ? ' ' : ' display:none') . '"><td class="minwidth400">' . $langs->trans("AccidentLocation") . '</td><td>';
+	$doleditor = new DolEditor('accident_location', GETPOST('accident_location'), '', 90, 'dolibarr_details', '', false, true, $conf->global->FCKEDITOR_ENABLE_SOCIETE, ROWS_3, '90%');
+	$doleditor->Create();
 	print '</td></tr>';
 
 	//Accident Date -- Date de l'accident
@@ -754,10 +770,16 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	$arrayAccident[] = $object->accident_date;
 	$arrayAccident[] = $object->description;
 	$arrayAccident[] = $object->photo;
-	if (empty($object->external_accident)) {
-		$arrayAccident[] = $object->fk_element;
-	} else {
-		$arrayAccident[] = $object->fk_soc;
+	switch ($object->external_accident) {
+		case 1:
+			$arrayAccident[] = $object->fk_element;
+			break;
+		case 2:
+			$arrayAccident[] = $object->fk_soc;
+			break;
+		case 3:
+			$arrayAccident[] = $object->accident_location;
+			break;
 	}
 	$arrayAccident[] = $object->fk_user_victim;
 
@@ -819,6 +841,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	unset($object->fields['photo']);
 	unset($object->fields['fk_project']);
 	unset($object->fields['external_accident']);
+	unset($object->fields['accident_location']);
 	unset($object->fields['fk_soc']);
 	unset($object->fields['fk_user_employer']);
 	unset($object->fields['fk_user_victim']);
@@ -876,17 +899,23 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 
 	//AccidentLocation -- Lieu de l'accident
 	print '<tr><td class="titlefield">' . $langs->trans("AccidentLocation") . '</td><td>';
-	if (empty($object->external_accident)) {
-		if ($conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD == $object->fk_element) {
-			$digiriskstandard->fetch($conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD);
-			print $digiriskstandard->getNomUrl(1, 'blank', 1);
-		} else {
-			$digiriskelement->fetch($object->fk_element);
-			print $digiriskelement->getNomUrl(1, 'blank', 1);
-		}
-	} else {
-		$thirdparty->fetch($object->fk_soc);
-		print $thirdparty->getNomUrl(1);
+	switch ($object->external_accident) {
+		case 1:
+			if ($conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD == $object->fk_element) {
+				$digiriskstandard->fetch($conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD);
+				print $digiriskstandard->getNomUrl(1, 'blank', 1);
+			} else {
+				$digiriskelement->fetch($object->fk_element);
+				print $digiriskelement->getNomUrl(1, 'blank', 1);
+			}
+			break;
+		case 2:
+			$thirdparty->fetch($object->fk_soc);
+			print $thirdparty->getNomUrl(1);
+			break;
+		case 3:
+			print $object->accident_location;
+			break;
 	}
 	print '</td></tr>';
 
