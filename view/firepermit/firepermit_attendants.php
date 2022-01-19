@@ -188,7 +188,7 @@ if ($action == 'send') {
 			require_once DOL_DOCUMENT_ROOT . '/core/class/CMailFile.class.php';
 
 			$from = $conf->global->MAIN_MAIL_EMAIL_FROM;
-			$url  = dol_buildpath('/custom/digiriskdolibarr/public/signature/add_signature.php?track_id=' . $signatory->signature_url, 3);
+			$url  = dol_buildpath('/custom/digiriskdolibarr/public/signature/add_signature.php?track_id=' . $signatory->signature_url . '&type=' . $object->element, 3);
 
 			$message = $langs->trans('SignatureEmailMessage') . ' ' . $url;
 			$subject = $langs->trans('SignatureEmailSubject') . ' ' . $object->ref;
@@ -376,7 +376,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	print $langs->trans("MaitreOeuvre");
 	print '</td><td class="center">';
 	if ($object->status == 2) {
-		$signatureUrl = dol_buildpath('/custom/digiriskdolibarr/public/signature/add_signature.php?track_id=' . $element->signature_url, 3);
+		$signatureUrl = dol_buildpath('/custom/digiriskdolibarr/public/signature/add_signature.php?track_id=' . $element->signature_url . '&type=' . $object->element, 3);
 		print '<a href=' . $signatureUrl . ' target="_blank"><i class="fas fa-external-link-alt"></i></a>';
 	} else {
 		print '-';
@@ -431,7 +431,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	print $langs->trans("ExtSocietyResponsible");
 	print '</td><td class="center">';
 	if ($object->status == 2) {
-		$signatureUrl = dol_buildpath('/custom/digiriskdolibarr/public/signature/add_signature.php?track_id=' . $element->signature_url, 3);
+		$signatureUrl = dol_buildpath('/custom/digiriskdolibarr/public/signature/add_signature.php?track_id=' . $element->signature_url  . '&type=' . $object->element, 3);
 		print '<a href=' . $signatureUrl . ' target="_blank"><i class="fas fa-external-link-alt"></i></a>';
 	} else {
 		print '-';
@@ -493,7 +493,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 			print $langs->trans("ExtSocietyIntervenant") . ' ' . $j;
 			print '</td><td class="center">';
 			if ($object->status == 2) {
-				$signatureUrl = dol_buildpath('/custom/digiriskdolibarr/public/signature/add_signature.php?track_id=' . $element->signature_url, 3);
+				$signatureUrl = dol_buildpath('/custom/digiriskdolibarr/public/signature/add_signature.php?track_id=' . $element->signature_url  . '&type=' . $object->element, 3);
 				print '<a href=' . $signatureUrl . ' target="_blank"><i class="fas fa-external-link-alt"></i></a>';
 			} else {
 				print '-';

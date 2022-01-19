@@ -48,6 +48,10 @@ if ( ! $res) die("Include of main fails");
 require_once DOL_DOCUMENT_ROOT . '/core/class/html.form.class.php';
 require_once '../../class/preventionplan.class.php';
 require_once '../../class/digiriskdocuments/preventionplandocument.class.php';
+require_once '../../class/firepermit.class.php';
+require_once '../../class/digiriskdocuments/firepermitdocument.class.php';
+require_once '../../class/accident.class.php';
+//require_once '../../class/digiriskdocuments/accidentdocument.class.php';
 require_once '../../lib/digiriskdolibarr_function.lib.php';
 
 // Load translation files required by the page
@@ -58,12 +62,28 @@ $track_id = GETPOST('track_id', 'alpha');
 $action   = GETPOST('action', 'aZ09');
 $url      = dirname($_SERVER['PHP_SELF']) . '/signature_success.php';
 $source   = GETPOST('source', 'aZ09');
+$type     = GETPOST('type', 'aZ09');
 
 // Initialize technical objects
-$user                   = new User($db);
-$object                 = new PreventionPlan($db);
-$signatory              = new PreventionPlanSignature($db);
-$preventionplandocument = new PreventionPlanDocument($db);
+$user = new User($db);
+
+switch ($type) {
+	case 'preventionplan':
+		$object         = new PreventionPlan($db);
+		$signatory      = new PreventionPlanSignature($db);
+		$objectdocument = new PreventionPlanDocument($db);
+		break;
+	case 'firepermit':
+		$object         = new FirePermit($db);
+		$signatory      = new FirePermitSignature($db);
+		$objectdocument = new FirePermitDocument($db);
+		break;
+	case 'accident':
+		$object         = new Accident($db);
+		$signatory      = new AccidentSignature($db);
+		//$objectdocument = new AccidentDocument($db);
+		break;
+}
 
 $signatory->fetch('', '', " AND signature_url =" . "'" . $track_id . "'");
 $object->fetch($signatory->fk_object);
@@ -117,21 +137,21 @@ if ($action == 'builddoc') {
 	if (empty($hideref)) $hideref         = 0;
 	if (empty($moreparams)) $moreparams   = null;
 
-	$model = 'preventionplandocument_specimen_odt';
+	$model = $type.'_specimen_odt';
 
 	$moreparams['object'] = $object;
 	$moreparams['user']   = $user;
 
-	$result = $preventionplandocument->generateDocument($model, $outputlangs, $hidedetails, $hidedesc, $hideref, $moreparams);
+	$result = $objectdocument->generateDocument($model, $outputlangs, $hidedetails, $hidedesc, $hideref, $moreparams);
 	if ($result <= 0) {
 		setEventMessages($object->error, $object->errors, 'errors');
 
 		$action = '';
 	} else {
 		if (empty($donotredirect)) {
-			$document_name = $preventionplandocument->last_main_doc;
+			$document_name = $objectdocument->last_main_doc;
 
-			copy($conf->digiriskdolibarr->multidir_output[isset($object->entity) ? $object->entity : 1] . '/preventionplandocument/' . $object->ref . '/specimen/' . $document_name, DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/documents/temp/preventionplandocument_specimen_' . $track_id . '.odt');
+			copy($conf->digiriskdolibarr->multidir_output[isset($object->entity) ? $object->entity : 1] . '/' . $type . '/' . $object->ref . '/specimen/' . $document_name, DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/documents/temp/' . $type . '_specimen_' . $track_id . '.odt');
 
 			setEventMessages($langs->trans("FileGenerated") . ' - ' . $document_name, null);
 
@@ -173,7 +193,7 @@ llxHeaderSignature($langs->trans("Signature"), "", 0, 0, $morejs, $morecss);
 if ( $signatory->role == 'PP_EXT_SOCIETY_INTERVENANTS') {
 	$element = $signatory;
 } else {
-	$element = $signatory->fetchSignatory($signatory->role, $signatory->fk_object);
+	$element = $signatory->fetchSignatory($signatory->role, $signatory->fk_object, $type);
 	$element = array_shift($element);
 }
 ?>
@@ -183,7 +203,7 @@ if ( $signatory->role == 'PP_EXT_SOCIETY_INTERVENANTS') {
 			<div class="wpeo-gridlayout grid-2 file-generation">
 				<?php $path = DOL_MAIN_URL_ROOT . '/custom/digiriskdolibarr/documents/temp/';	?>
 				<strong class="grid-align-middle"><?php echo $langs->trans("ThisIsInformationOnDocumentToSign"); ?></strong>
-				<input type="hidden" class="specimen-name" value="<?php echo 'preventionplandocument_specimen_' . $track_id . '.odt' ?>">
+				<input type="hidden" class="specimen-name" value="<?php echo $type . '_specimen_' . $track_id . '.odt' ?>">
 				<input type="hidden" class="specimen-path" value="<?php echo $path ?>">
 				<input type="hidden" class="track-id" value="<?php echo $track_id ?>">
 				<span class="wpeo-button button-primary  button-radius-2 grid-align-right auto-download"><i class="button-icon fas fa-file-pdf"></i><?php echo '  ' . $langs->trans('ShowDocument'); ?></span>
