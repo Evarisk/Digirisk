@@ -53,7 +53,7 @@ class mod_risk_standard extends ModeleNumRefRiskAnalysis
 	/**
 	 *  Returns the description of the numbering model
 	 *
-	 *  @return     string      Texte descripif
+	 *  @return     string      Texte descriptif
 	 */
 	public function info()
 	{

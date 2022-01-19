@@ -53,7 +53,7 @@ class mod_preventionplandocument_standard extends ModeleNumRefDigiriskDocuments
 	/**
 	 *  Returns the description of the numbering model
 	 *
-	 *  @return     string      Texte descripif
+	 *  @return     string      Texte descriptif
 	 */
 	public function info()
 	{

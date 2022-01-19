@@ -53,7 +53,7 @@ class mod_evaluator_standard extends ModeleNumRefDigiriskElement
 	/**
 	 *  Returns the description of the numbering model
 	 *
-	 *  @return     string      Texte descripif
+	 *  @return     string      Texte descriptif
 	 */
 	public function info()
 	{
