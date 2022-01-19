@@ -207,6 +207,10 @@ if (empty($reshook)) {
 			$error++;
 		}
 
+		if ($fk_preventionplan < 0) {
+			setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv('PreventionPlanLinked')), null, 'errors');
+			$error++;
+		}
 
 		if ( ! $error) {
 			$result = $object->create($user, false);
@@ -305,6 +309,11 @@ if (empty($reshook)) {
 			}
 		} elseif (empty($labour_inspector_contact_id)) {
 			setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv('LabourInspector')), null, 'errors');
+			$error++;
+		}
+
+		if ($fk_preventionplan < 0) {
+			setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv('PreventionPlanLinked')), null, 'errors');
 			$error++;
 		}
 
@@ -756,8 +765,9 @@ if ($action == 'create') {
 	print '</td></tr>';
 
 	//FK PREVENTION PLAN
-	print '<tr class="oddeven"><td>' . $langs->trans("PreventionPlanLinked") . '</td><td>';
+	print '<tr class="fieldrequired oddeven"><td>' . $langs->trans("PreventionPlanLinked") . '</td><td>';
 	print $preventionplan->select_preventionplan_list();
+	print '<a href="' . DOL_URL_ROOT . '/custom/digiriskdolibarr/view/preventionplan/preventionplan_card.php?action=create&backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?action=create') . '" target="_blank"><span class="fa fa-plus-circle valignmiddle paddingleft" title="' . $langs->trans("NewPreventionPlan") . '"></span></a>';
 	print '</td></tr>';
 
 	// Other attributes

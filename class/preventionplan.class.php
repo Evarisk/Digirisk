@@ -647,7 +647,7 @@ class PreventionPlan extends CommonObject
 	 * @return    string                    HTML string with
 	 * @throws Exception
 	 */
-	public function select_preventionplan_list($selected = '', $htmlname = 'fk_preventionplan', $filter = '', $showempty = '0', $showtype = 0, $forcecombo = 0, $events = array(), $filterkey = '', $outputmode = 0, $limit = 0, $morecss = 'minwidth100', $moreparam = '', $multiple = false)
+	public function select_preventionplan_list($selected = '', $htmlname = 'fk_preventionplan', $filter = '', $showempty = '1', $showtype = 0, $forcecombo = 0, $events = array(), $filterkey = '', $outputmode = 0, $limit = 0, $morecss = 'minwidth100', $moreparam = '', $multiple = false)
 	{
 		global $conf, $user, $langs;
 
