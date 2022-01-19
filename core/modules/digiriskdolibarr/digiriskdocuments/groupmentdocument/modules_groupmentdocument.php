@@ -17,7 +17,7 @@
  */
 
 /**
- *  \file			htdocs/core/modules/digiriskdolibarr/modules_groupmentdocument.php
+ *  \file			core/modules/digiriskdolibarr/digiriskdocuments/groupmentdocument/modules_groupmentdocument.php
  *  \ingroup		digiriskdolibarr
  *  \brief			File that contains parent class for groupmentdocuments document models
  */

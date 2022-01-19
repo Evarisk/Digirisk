@@ -17,7 +17,7 @@
  */
 
 /**
- *  \file			htdocs/core/modules/digiriskdolibarr/modules_digiriskelement.php
+ *  \file			core/modules/digiriskdolibarr/digiriskelement/modules_digiriskelement.php
  *  \ingroup		digiriskdolibarr
  *  \brief			File that contains parent class for digiriskelements numbering models
  */

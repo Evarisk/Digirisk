@@ -17,7 +17,7 @@
  */
 
 /**
- *	\file       htdocs/core/modules/digiriskdolibarr/digiriskdocuments/informationssharing/doc_informationssharing_odt.modules.php
+ *	\file       core/modules/digiriskdolibarr/digiriskdocuments/informationssharing/doc_informationssharing_odt.modules.php
  *	\ingroup    digiriskdolibarr
  *	\brief      File of class to build ODT documents for digiriskdolibarr
  */

@@ -17,15 +17,15 @@
  */
 
 /**
- *	\file       htdocs/custom/digiriskdolibarr/core/modules/digiriskdolibarr/mod_riskassessment_standard.php
+ *	\file       core/modules/digiriskdolibarr/riskanalysis/riskassessment/mod_riskassessment_standard.php
  * \ingroup     digiriskdolibarr
- *	\brief      File containing class for numbering module Standard
+ *	\brief      File containing class for riskassessment numbering module Standard
  */
 
 require_once __DIR__ . '/../modules_riskanalysis.php';
 
 /**
- * 	Class to manage risk numbering rules Standard
+ * 	Class to manage riskassessment numbering rules Standard
  */
 class mod_riskassessment_standard extends ModeleNumRefRiskAnalysis
 {

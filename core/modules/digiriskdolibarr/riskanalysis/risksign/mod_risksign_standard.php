@@ -17,9 +17,9 @@
  */
 
 /**
- *	\file       htdocs/custom/digiriskdolibarr/core/modules/digiriskdolibarr/mod_risksign_standard.php
+ *	\file       ore/modules/digiriskdolibarr/riskanalysis/risksign/mod_risksign_standard.php
  * \ingroup     digiriskdolibarr
- *	\brief      File containing class for numbering module Standard
+ *	\brief      File containing class for risksign numbering module Standard
  */
 
 require_once __DIR__ . '/../modules_riskanalysis.php';
@@ -133,7 +133,7 @@ class mod_risksign_standard extends ModeleNumRefRiskAnalysis
 		if ($resql) {
 			$obj = $db->fetch_object($resql);
 		} else {
-			dol_syslog("mod_risk_standard::getNextValue", LOG_DEBUG);
+			dol_syslog("mod_risksign_standard::getlastValue", LOG_DEBUG);
 			return -1;
 		}
 		return $this->prefix . $obj->max;

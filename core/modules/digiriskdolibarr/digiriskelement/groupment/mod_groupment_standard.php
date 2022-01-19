@@ -17,9 +17,9 @@
  */
 
 /**
- *	\file       htdocs/custom/digiriskdolibarr/core/modules/digiriskdolibarr/mod_groupment_standard.php
+ *	\file       core/modules/digiriskdolibarr/digiriskelement/groupment/mod_groupment_standard.php
  * \ingroup     digiriskdolibarr
- *	\brief      File containing class for numbering module Standard
+ *	\brief      File containing class for groupment numbering module Standard
  */
 
 require_once __DIR__ . '/../modules_digiriskelement.php';

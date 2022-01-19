@@ -17,9 +17,9 @@
  */
 
 /**
- *	\file       htdocs/custom/digiriskdolibarr/core/modules/digiriskdolibarr/mod_listingrisksphoto_standard.php
+ *	\file       core/modules/digiriskdolibarr/digiriskdocuments/listingrisksphoto/mod_listingrisksphoto_standard.php
  * \ingroup     digiriskdolibarr
- *	\brief      File containing class for numbering module Standard
+ *	\brief      File containing class for listingrisksphoto numbering module Standard
  */
 
 require_once __DIR__ . '/../modules_digiriskdocuments.php';

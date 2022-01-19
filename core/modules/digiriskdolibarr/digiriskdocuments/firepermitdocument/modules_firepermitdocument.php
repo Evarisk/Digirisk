@@ -17,7 +17,7 @@
  */
 
 /**
- *  \file			htdocs/core/modules/digiriskdolibarr/modules_firepermitdocument.php
+ *  \file			core/modules/digiriskdolibarr/digiriskdocuments/firepermitdocument/modules_firepermitdocument.php
  *  \ingroup		digiriskdolibarr
  *  \brief			File that contains parent class for firepermits document models
  */

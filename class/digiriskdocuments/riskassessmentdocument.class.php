@@ -16,7 +16,7 @@
  */
 
 /**
- * \file        class/riskassessmentdocument.class.php
+ * \file        class/digiriskdocuments/riskassessmentdocument.class.php
  * \ingroup     digiriskdolibarr
  * \brief       This file is a class file for RiskAssessmentDocument
  */

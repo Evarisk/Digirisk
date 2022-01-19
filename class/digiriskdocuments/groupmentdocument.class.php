@@ -16,7 +16,7 @@
  */
 
 /**
- * \file        class/groupmentdocument.class.php
+ * \file        class/digiriskdocuments/groupmentdocument.class.php
  * \ingroup     digiriskdolibarr
  * \brief       This file is a class file for GroupmentDocument
  */

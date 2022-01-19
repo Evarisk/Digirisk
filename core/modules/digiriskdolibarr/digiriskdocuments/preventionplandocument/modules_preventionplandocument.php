@@ -17,7 +17,7 @@
  */
 
 /**
- *  \file			htdocs/core/modules/digiriskdolibarr/modules_preventionplandocument.php
+ *  \file			core/modules/digiriskdolibarr/digiriskdocuments/preventionplandocument/modules_preventionplandocument.php
  *  \ingroup		digiriskdolibarr
  *  \brief			File that contains parent class for preventionplans document models
  */

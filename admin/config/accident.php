@@ -16,7 +16,7 @@
  */
 
 /**
- * \file    admin/accident.php
+ * \file    admin/config/accident.php
  * \ingroup digiriskdolibarr
  * \brief   Digiriskdolibarr accident page.
  */

@@ -17,9 +17,9 @@
  */
 
 /**
- *	\file       htdocs/custom/digiriskdolibarr/core/modules/digiriskdolibarr/mod_accident_workstop_standard.php
+ *	\file       core/modules/digiriskdolibarr/digiriskelement/accident_workstop/mod_accident_workstop_standard.php
  * \ingroup     digiriskdolibarr
- *	\brief      File containing class for numbering module Standard
+ *	\brief      File containing class for accident_workstop numbering module Standard
  */
 
 require_once __DIR__ . '/../../digiriskdocuments/modules_digiriskdocuments.php';

@@ -16,7 +16,7 @@
  */
 
 /**
- * \file    admin/digiriskdocuments/digiriskdocuments.php
+ * \file    admin/config/digiriskdocuments.php
  * \ingroup digiriskdolibarr
  * \brief   Digiriskdolibarr digiriskdocuments page.
  */

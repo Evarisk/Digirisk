@@ -16,7 +16,7 @@
  */
 
 /**
- * \file        class/legaldisplay.class.php
+ * \file        class/digiriskdocuments/legaldisplay.class.php
  * \ingroup     digiriskdolibarr
  * \brief       This file is a class file for LegalDisplay
  */

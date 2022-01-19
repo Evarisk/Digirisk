@@ -16,6 +16,12 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
+/**
+ * \file    class/api_digiriskdolibarr.class.php
+ * \ingroup digiriskdolibarr
+ * \brief   File for API management of DigiriskDolibarr.
+ */
+
 use Luracast\Restler\RestException;
 
 require_once __DIR__ . '/../core/modules/modDigiriskDolibarr.class.php';

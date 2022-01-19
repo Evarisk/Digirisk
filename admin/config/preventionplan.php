@@ -16,7 +16,7 @@
  */
 
 /**
- * \file    admin/preventionplan.php
+ * \file    admin/config/preventionplan.php
  * \ingroup digiriskdolibarr
  * \brief   Digiriskdolibarr preventionplan page.
  */

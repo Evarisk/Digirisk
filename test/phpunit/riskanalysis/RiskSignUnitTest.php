@@ -16,7 +16,7 @@
  */
 
 /**
- *      \file       test/phpunit/RiskSignUnitTest.php
+ *      \file       test/phpunit/riskanalysis/RiskSignUnitTest.php
  *      \ingroup    test
  *      \brief      PHPUnit test
  *      \remarks    To run this script as CLI:  phpunit filename.php

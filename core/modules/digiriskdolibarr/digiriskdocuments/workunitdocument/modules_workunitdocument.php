@@ -17,7 +17,7 @@
  */
 
 /**
- *  \file			htdocs/core/modules/digiriskdolibarr/modules_workunitdocument.php
+ *  \file			core/modules/digiriskdolibarr/modules_workunitdocument.php
  *  \ingroup		digiriskdolibarr
  *  \brief			File that contains parent class for workunitdocuments document models
  */

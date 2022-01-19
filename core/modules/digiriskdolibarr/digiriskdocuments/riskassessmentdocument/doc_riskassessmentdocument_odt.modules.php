@@ -17,7 +17,7 @@
  */
 
 /**
- *	\file       htdocs/core/modules/digiriskdolibarr/digiriskdocuments/riskassessmentdocument/doc_riskassessmentdocument_odt.modules.php
+ *	\file       core/modules/digiriskdolibarr/digiriskdocuments/riskassessmentdocument/doc_riskassessmentdocument_odt.modules.php
  *	\ingroup    digiriskdolibarr
  *	\brief      File of class to build ODT documents for digiriskdolibarr
  */
@@ -34,6 +34,7 @@ require_once __DIR__ . '/../../../../../class/riskanalysis/riskassessment.class.
 require_once __DIR__ . '/../../../../../class/riskanalysis/risksign.class.php';
 require_once __DIR__ . '/mod_riskassessmentdocument_standard.php';
 require_once __DIR__ . '/modules_riskassessmentdocument.php';
+
 /**
  *	Class to build documents using ODF templates generator
  */

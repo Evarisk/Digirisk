@@ -16,7 +16,7 @@
  */
 
 /**
- * \file    admin/about.php
+ * \file    admin/config/about.php
  * \ingroup digiriskdolibarr
  * \brief   About page of module Digiriskdolibarr.
  */

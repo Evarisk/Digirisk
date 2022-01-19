@@ -16,9 +16,9 @@
  */
 
 /**
- * \file    admin/riskanalysis.php
+ * \file    admin/config/riskassessmentdocument.php
  * \ingroup digiriskdolibarr
- * \brief   Digiriskdolibarr riskanalysis page.
+ * \brief   Digiriskdolibarr riskassessmentdocument page.
  */
 
 // Load Dolibarr environment

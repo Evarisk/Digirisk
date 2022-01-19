@@ -17,7 +17,7 @@
  */
 
 /**
- *  \file			htdocs/core/modules/digiriskdolibarr/modules_informationssharing.php
+ *  \file			core/modules/digiriskdolibarr/modules_informationssharing.php
  *  \ingroup		digiriskdolibarr
  *  \brief			File that contains parent class for informationssharings document models
  */

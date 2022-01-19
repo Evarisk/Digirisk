@@ -16,7 +16,7 @@
 */
 
 /**
- *     \file        admin/digirisksignature.php
+ *     \file        admin/config/digirisksignature.php
  *     \ingroup     digiriskdolibarr
  *     \brief       Page to public interface of module DigiriskDolibarr for signature
  */

@@ -17,7 +17,7 @@
  */
 
 /**
- *	\file       htdocs/core/modules/digiriskdolibarr/digiriskdocuments/groupmentdocument/doc_groupmentdocument_custom_odt.modules.php
+ *	\file       core/modules/digiriskdolibarr/digiriskdocuments/groupmentdocument/doc_groupmentdocument_custom_odt.modules.php
  *	\ingroup    digiriskdolibarr
  *	\brief      File of class to build ODT documents for digiriskdolibarr
  */
@@ -27,6 +27,7 @@ require_once DOL_DOCUMENT_ROOT . '/core/lib/company.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/doc.lib.php';
 require_once __DIR__ . '/mod_groupmentdocument_standard.php';
 require_once __DIR__ . '/modules_groupmentdocument.php';
+
 /**
  *	Class to build documents using ODF templates generator
  */

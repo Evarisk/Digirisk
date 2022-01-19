@@ -16,7 +16,7 @@
  */
 
 /**
- * \file        class/risksign.class.php
+ * \file        class/riskanalysis/risksign.class.php
  * \ingroup     digiriskdolibarr
  * \brief       This file is a CRUD class file for RiskSign (Create/Read/Update/Delete)
  */

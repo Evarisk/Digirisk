@@ -16,7 +16,7 @@
 */
 
 /**
- *     \file        admin/ticket.php
+ *     \file        admin/ticket/ticket.php
  *     \ingroup     digiriskdolibarr
  *     \brief       Page to public interface of module DigiriskDolibarr for ticket
  */

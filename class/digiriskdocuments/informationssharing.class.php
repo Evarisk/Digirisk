@@ -16,7 +16,7 @@
  */
 
 /**
- * \file        class/informationssharing.class.php
+ * \file        class/digiriskdocuments/informationssharing.class.php
  * \ingroup     digiriskdolibarr
  * \brief       This file is a class file for InformationsSharing
  */

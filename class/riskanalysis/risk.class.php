@@ -16,7 +16,7 @@
  */
 
 /**
- * \file        class/risk.class.php
+ * \file        class/riskanalysis/risk.class.php
  * \ingroup     digiriskdolibarr
  * \brief       This file is a CRUD class file for Risk (Create/Read/Update/Delete)
  */

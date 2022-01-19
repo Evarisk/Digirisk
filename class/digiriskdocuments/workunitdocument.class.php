@@ -16,7 +16,7 @@
  */
 
 /**
- * \file        class/workunitdocument.class.php
+ * \file        class/digiriskdocuments/workunitdocument.class.php
  * \ingroup     digiriskdolibarr
  * \brief       This file is a class file for WorkUnitDocument
  */

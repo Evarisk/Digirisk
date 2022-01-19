@@ -16,7 +16,7 @@
  */
 
 /**
- * \file        class/preventionplandocument.class.php
+ * \file        class/preventionplan.class.php
  * \ingroup     digiriskdolibarr
  * \brief       This file is a class file for PreventionPlan
  */

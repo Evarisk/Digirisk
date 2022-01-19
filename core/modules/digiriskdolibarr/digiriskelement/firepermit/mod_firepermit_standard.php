@@ -17,9 +17,9 @@
  */
 
 /**
- *	\file       htdocs/custom/digiriskdolibarr/core/modules/digiriskdolibarr/mod_firepermit_standard.php
+ *	\file       core/modules/digiriskdolibarr/digiriskelement/firepermit/mod_firepermit_standard.php
  * \ingroup     digiriskdolibarr
- *	\brief      File containing class for numbering module Standard
+ *	\brief      File containing class for firepermit numbering module Standard
  */
 
 require_once __DIR__ . '/../../digiriskdocuments/modules_digiriskdocuments.php';

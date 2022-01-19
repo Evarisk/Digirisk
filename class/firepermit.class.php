@@ -16,7 +16,7 @@
  */
 
 /**
- * \file        class/firepermitdocument.class.php
+ * \file        class/firepermit.class.php
  * \ingroup     digiriskdolibarr
  * \brief       This file is a class file for FirePermit
  */

@@ -16,7 +16,7 @@
  */
 
 /**
- * \file    admin/digiriskelement.php
+ * \file    admin/config/digiriskelement.php
  * \ingroup digiriskdolibarr
  * \brief   Digiriskdolibarr digiriskelement page.
  */

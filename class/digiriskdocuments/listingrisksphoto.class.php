@@ -16,7 +16,7 @@
  */
 
 /**
- * \file        class/listingrisksphoto.class.php
+ * \file        class/digiriskdocuments/listingrisksphoto.class.php
  * \ingroup     digiriskdolibarr
  * \brief       This file is a class file for ListingRisksPhoto
  */

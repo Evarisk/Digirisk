@@ -16,9 +16,9 @@
  */
 
 /**
- * \file    digiriskdolibarr/class/actions_digiriskdolibarr.class.php
+ * \file    class/actions_digiriskdolibarr.class.php
  * \ingroup digiriskdolibarr
- * \brief   Example hook overload.
+ * \brief   DigiriskDolibarr hook overload.
  */
 
 /**

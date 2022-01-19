@@ -17,7 +17,7 @@
  */
 
 /**
- *  \file			htdocs/core/modules/digiriskdolibarr/modules_riskassessmentdocument.php
+ *  \file			core/modules/digiriskdolibarr/digiriskdocuments/riskassessmentdocument/modules_riskassessmentdocument.php
  *  \ingroup		digiriskdolibarr
  *  \brief			File that contains parent class for riskassessmentdocuments document models
  */

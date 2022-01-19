@@ -17,7 +17,7 @@
  */
 
 /**
- *  \file			htdocs/core/modules/digiriskdolibarr/modules_listingrisksaction.php
+ *  \file			core/modules/digiriskdolibarr/digiriskdocuments/listingrisksaction/modules_listingrisksaction.php
  *  \ingroup		digiriskdolibarr
  *  \brief			File that contains parent class for listingrisksactions document models
  */

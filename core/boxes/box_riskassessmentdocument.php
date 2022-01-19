@@ -18,11 +18,9 @@
  */
 
 /**
- * \file    htdocs/modulebuilder/template/core/boxes/mymodulewidget1.php
- * \ingroup mymodule
- * \brief   Widget provided by MyModule
- *
- * Put detailed description here.
+ * \file    core/boxes/box_riskassessmentdocument.php
+ * \ingroup digiriskdolibarr
+ * \brief   Widget provided by DigiriskDolibarr
  */
 
 include_once DOL_DOCUMENT_ROOT . "/core/boxes/modules_boxes.php";

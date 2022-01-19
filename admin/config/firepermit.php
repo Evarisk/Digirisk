@@ -16,7 +16,7 @@
  */
 
 /**
- * \file    admin/firepermit.php
+ * \file    admin/config/firepermit.php
  * \ingroup digiriskdolibarr
  * \brief   Digiriskdolibarr firepermit page.
  */

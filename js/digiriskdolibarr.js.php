@@ -62,8 +62,9 @@ if (empty($dolibarr_nocache)) {
 	header('Cache-Control: no-cache');
 }
 ?>
+
 /**
- * \file    digiriskdolibarr/js/digiriskdolibarr.js.php
+ * \file    js/digiriskdolibarr.js.php
  * \ingroup digiriskdolibarr
  * \brief   JavaScript file for module DigiriskDolibarr.
  */

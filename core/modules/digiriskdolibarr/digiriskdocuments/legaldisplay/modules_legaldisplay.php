@@ -17,7 +17,7 @@
  */
 
 /**
- *  \file			htdocs/core/modules/digiriskdolibarr/modules_legaldisplay.php
+ *  \file			core/modules/digiriskdolibarr/digiriskdocuments/legaldisplay/modules_legaldisplay.php
  *  \ingroup		digiriskdolibarr
  *  \brief			File that contains parent class for legaldisplays document models
  */

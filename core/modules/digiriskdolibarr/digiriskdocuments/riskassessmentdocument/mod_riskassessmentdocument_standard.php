@@ -17,9 +17,9 @@
  */
 
 /**
- *	\file       htdocs/custom/digiriskdolibarr/core/modules/digiriskdolibarr/mod_riskassessmentdocument_standard.php
+ *	\file       core/modules/digiriskdolibarr/digiriskdocuments/riskassessmentdocument/mod_riskassessmentdocument_standard.php
  * \ingroup     digiriskdolibarr
- *	\brief      File containing class for numbering module Standard
+ *	\brief      File containing class for riskassessmentdocument numbering module Standard
  */
 
 require_once __DIR__ . '/../modules_digiriskdocuments.php';
