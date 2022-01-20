@@ -811,37 +811,40 @@ function display_recurse_tree($results)
 
 	$mod_groupment = new $conf->global->DIGIRISKDOLIBARR_GROUPMENT_ADDON();
 	$mod_workunit  = new $conf->global->DIGIRISKDOLIBARR_WORKUNIT_ADDON();
+?>
 
+<?php
 	if ($user->rights->digiriskdolibarr->digiriskelement->read) {
 		if ( ! empty($results)) {
 			foreach ($results as $element) { ?>
 				<?php if ($element['object']->id == $conf->global->DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH) : ?>
 				<hr>
 				<?php endif; ?>
+
 			<li class="unit type-<?php echo $element['object']->element_type; ?>" id="unit<?php  echo $element['object']->id; ?>">
 				<div class="unit-container">
-						<?php if ($element['object']->element_type == 'groupment' && count($element['children'])) { ?>
-						<div class="toggle-unit">
-							<i class="toggle-icon fas fa-chevron-right" id="menu<?php echo $element['object']->id;?>"></i>
+					<?php if ($element['object']->element_type == 'groupment' && count($element['children'])) { ?>
+					<div class="toggle-unit">
+						<i class="toggle-icon fas fa-chevron-right" id="menu<?php echo $element['object']->id;?>"></i>
+					</div>
+					<?php } else { ?>
+					<div class="spacer"></div>
+					<?php }
+					$pathToThumb = DOL_URL_ROOT . '/viewimage.php?modulepart=digiriskdolibarr&entity=' . $conf->entity . '&file=' . urlencode($element['object']->element_type . '/' . $element['object']->ref . '/thumbs/');
+					$filearray   = dol_dir_list($conf->digiriskdolibarr->multidir_output[$conf->entity] . '/' . $element['object']->element_type . '/' . $element['object']->ref . '/', "files", 0, '', '(\.odt|_preview.*\.png)$', 'position_name', 'asc', 1);
+					if (count($filearray)) {
+						print '<span class="floatleft inline-block valignmiddle divphotoref open-medias-linked modal-open digirisk-element digirisk-element-' . $element['object']->id . '" value="' . $element['object']->id . '">';
+						 print '<img width="50" height="50" class="photo clicked-photo-preview" src="' . DOL_URL_ROOT . '/viewimage.php?modulepart=digiriskdolibarr&entity=' . $conf->entity . '&file=' . urlencode($element['object']->element_type . '/' . $element['object']->ref . '/thumbs/' . preg_replace('/\./', '_small.', $element['object']->photo)) . '" >';
+						 print '<input type="hidden" class="filepath-to-digiriskelement" value="' . $pathToThumb . '"/>';
+						 print '</span>';
+					} else {
+						$nophoto = '/public/theme/common/nophoto.png'; ?>
+						<div class="open-media-gallery modal-open digiriskelement digirisk-element-<?php echo $element['object']->id ?>" value="<?php  echo $element['object']->id ?>">
+							<input type="hidden" class="type-from" value="digiriskelement"/>
+							<input type="hidden" class="filepath-to-digiriskelement" value="<?php echo $pathToThumb ?>"/>
+							<span class="floatleft inline-block valignmiddle divphotoref"><img width="50" height="50" class="photo photowithmargin clicked-photo-preview" alt="No photo" src="<?php echo DOL_URL_ROOT . $nophoto ?>"></span>
 						</div>
-						<?php } else { ?>
-						<div class="spacer"></div>
-						<?php }
-						$pathToThumb = DOL_URL_ROOT . '/viewimage.php?modulepart=digiriskdolibarr&entity=' . $conf->entity . '&file=' . urlencode($element['object']->element_type . '/' . $element['object']->ref . '/thumbs/');
-						$filearray   = dol_dir_list($conf->digiriskdolibarr->multidir_output[$conf->entity] . '/' . $element['object']->element_type . '/' . $element['object']->ref . '/', "files", 0, '', '(\.odt|_preview.*\.png)$', 'position_name', 'asc', 1);
-						if (count($filearray)) {
-							print '<span class="floatleft inline-block valignmiddle divphotoref open-medias-linked modal-open digirisk-element digirisk-element-' . $element['object']->id . '" value="' . $element['object']->id . '">';
-							 print '<img width="50" height="50" class="photo clicked-photo-preview" src="' . DOL_URL_ROOT . '/viewimage.php?modulepart=digiriskdolibarr&entity=' . $conf->entity . '&file=' . urlencode($element['object']->element_type . '/' . $element['object']->ref . '/thumbs/' . preg_replace('/\./', '_small.', $element['object']->photo)) . '" >';
-							 print '<input type="hidden" class="filepath-to-digiriskelement" value="' . $pathToThumb . '"/>';
-							 print '</span>';
-						} else {
-							$nophoto = '/public/theme/common/nophoto.png'; ?>
-							<div class="open-media-gallery modal-open digiriskelement digirisk-element-<?php echo $element['object']->id ?>" value="<?php  echo $element['object']->id ?>">
-								<input type="hidden" class="type-from" value="digiriskelement"/>
-								<input type="hidden" class="filepath-to-digiriskelement" value="<?php echo $pathToThumb ?>"/>
-								<span class="floatleft inline-block valignmiddle divphotoref"><img width="50" height="50" class="photo photowithmargin clicked-photo-preview" alt="No photo" src="<?php echo DOL_URL_ROOT . $nophoto ?>"></span>
-							</div>
-						<?php } ?>
+					<?php } ?>
 					<div class="digirisk-element-medias-modal" style="z-index:1500" value="<?php echo $element['object']->id ?>">
 							<div class="wpeo-modal"  id="digirisk_element_medias_modal_<?php echo $element['object']->id ?>" value="<?php echo $element['object']->id ?>" style="z-index: 1005 !important">
 								<div class="modal-container wpeo-modal-event">
@@ -896,14 +899,14 @@ function display_recurse_tree($results)
 					<div class="title" id="scores" value="<?php echo $element['object']->id ?>">
 						<?php
 						if ($user->rights->digiriskdolibarr->risk->read) : ?>
-							<a id="slider" class="linkElement id<?php echo $element['object']->id;?>" href="../digiriskelement/digiriskelement_risk.php?id=<?php echo $element['object']->id; ?>">
+							<a id="slider" class="linkElement id<?php echo $element['object']->id;?>" href="../digiriskelement/digiriskelement_risk.php?id=<?php echo $element['object']->id; ?>#unit<?php echo $element['object']->id; ?>">
 								<span class="title-container">
 									<span class="ref"><?php echo $element['object']->ref; ?></span>
 									<span class="name"><?php echo $element['object']->label; ?></span>
 								</span>
 							</a>
 						<?php else : ?>
-							<a id="slider" class="linkElement id<?php echo $element['object']->id;?>" href="../digiriskelement/digiriskelement_card.php?id=<?php echo $element['object']->id; ?>">
+							<a id="slider" class="linkElement id<?php echo $element['object']->id;?>" href="../digiriskelement/digiriskelement_card.php?id=<?php echo $element['object']->id; ?>#unit<?php echo $element['object']->id; ?>"">
 								<span class="title-container">
 									<span class="ref"><?php echo $element['object']->ref; ?></span>
 									<span class="name"><?php echo $element['object']->label; ?></span>
