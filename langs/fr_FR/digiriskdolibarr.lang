@@ -649,6 +649,7 @@ ConfirmDeleteAccidentWorkStop = Êtes-vous sûr de vouloir supprimer l'arrêt de
 AccidentMetaDataLesion = Données complémentaires des lésions
 TotalWorkStopDays = Nombre total de jour d'arrêt de travail
 RegisterAccident = Accident bénin
+fk_accident = Accident lié
 
 # AccidentTooltip - Tooltip des accidents
 VictimActivityTooltip = Précisez l’activité ou la tâche de la victime au moment de l’accident, c’est-à-dire ce que faisait la victime
