@@ -57,7 +57,6 @@ function digirisk_show_photos($modulepart, $sdir, $size = 0, $nbmax = 0, $nbbyro
 	}
 
 	// Defined relative dir to DOL_DATA_ROOT
-	$relativedir = '';
 	if ($dir) {
 		$relativedir = preg_replace('/^' . preg_quote(DOL_DATA_ROOT, '/') . '/', '', $dir);
 		$relativedir = preg_replace('/^[\\/]/', '', $relativedir);
@@ -70,7 +69,7 @@ function digirisk_show_photos($modulepart, $sdir, $size = 0, $nbmax = 0, $nbbyro
 	$return  = '<!-- Photo -->' . "\n";
 	$nbphoto = 0;
 
-	$filearray = dol_dir_list($dir, "files", 0, '', '(\.meta|_preview.*\.png)$', $sortfield, (strtolower($sortorder) == 'desc' ? SORT_DESC : SORT_ASC), 1);
+	$filearray = dol_dir_list($dir, "files", 0, '', '(\.meta|_preview.*\.png)$', $sortfield, SORT_DESC, 1);
 	//echo '<pre>'; print_r( $pdirthumb ); echo '</pre>';
 	if (count($filearray)) {
 		if ($sortfield && $sortorder) {

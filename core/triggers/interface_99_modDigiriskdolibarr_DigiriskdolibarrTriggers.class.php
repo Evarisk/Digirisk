@@ -36,6 +36,31 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 	protected $db;
 
 	/**
+	 * @var string Trigger name.
+	 */
+	public $name;
+
+	/**
+	 * @var string Trigger family.
+	 */
+	public $family;
+
+	/**
+	 * @var string Trigger description.
+	 */
+	public $description;
+
+	/**
+	 * @var string Trigger version.
+	 */
+	public $version;
+
+	/**
+	 * @var string String with name of icon for digiriskdolibarr.
+	 */
+	public $picto;
+
+	/**
 	 * Constructor
 	 *
 	 * @param DoliDB $db Database handler

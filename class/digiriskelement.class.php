@@ -33,6 +33,26 @@ require_once __DIR__ . '/riskanalysis/riskassessment.class.php';
 class DigiriskElement extends CommonObject
 {
 	/**
+	 * @var DoliDB Database handler.
+	 */
+	public $db;
+
+	/**
+	 * @var array Errors.
+	 */
+	public $errors = array();
+
+	/**
+	 * @var array Result array.
+	 */
+	public $result = array();
+
+	/**
+	 * @var integer ID Object.
+	 */
+	public $id;
+
+	/**
 	 * @var string ID to identify managed object.
 	 */
 	public $element = 'digiriskelement';
@@ -235,7 +255,7 @@ class DigiriskElement extends CommonObject
 	 * Load ordered flat list of DigiriskElement in memory from the database
 	 *
 	 * @param int $parent_id Id parent object
-	 * @return int         <0 if KO, 0 if not found, >0 if OK
+	 * @return array         <0 if KO, 0 if not found, >0 if OK
 	 */
 	public function fetchDigiriskElementFlat($parent_id)
 	{
@@ -313,27 +333,27 @@ class DigiriskElement extends CommonObject
 			if ($this->db->num_rows($result)) {
 				$obj      = $this->db->fetch_object($result);
 				$this->id = $obj->rowid;
-				if ($obj->fk_user_author) {
-					$cuser = new User($this->db);
-					$cuser->fetch($obj->fk_user_author);
-					$this->user_creation = $cuser;
-				}
+//				if ($obj->fk_user_author) {
+//					$cuser = new User($this->db);
+//					$cuser->fetch($obj->fk_user_author);
+//					$this->user_creation = $cuser;
+//				}
+//
+//				if ($obj->fk_user_valid) {
+//					$vuser = new User($this->db);
+//					$vuser->fetch($obj->fk_user_valid);
+//					$this->user_validation = $vuser;
+//				}
+//
+//				if ($obj->fk_user_cloture) {
+//					$cluser = new User($this->db);
+//					$cluser->fetch($obj->fk_user_cloture);
+//					$this->user_cloture = $cluser;
+//				}
 
-				if ($obj->fk_user_valid) {
-					$vuser = new User($this->db);
-					$vuser->fetch($obj->fk_user_valid);
-					$this->user_validation = $vuser;
-				}
-
-				if ($obj->fk_user_cloture) {
-					$cluser = new User($this->db);
-					$cluser->fetch($obj->fk_user_cloture);
-					$this->user_cloture = $cluser;
-				}
-
-				$this->date_creation     = $this->db->jdate($obj->datec);
-				$this->date_modification = $this->db->jdate($obj->datem);
-				$this->date_validation   = $this->db->jdate($obj->datev);
+				$this->date_creation     = $this->db->jdate($obj->date_creation);
+//				$this->date_modification = $this->db->jdate($obj->datem);
+//				$this->date_validation   = $this->db->jdate($obj->datev);
 			}
 
 			$this->db->free($result);
@@ -384,7 +404,7 @@ class DigiriskElement extends CommonObject
 	 * @param string $morecss    Add more css styles to the SELECT component
 	 * @param string $moreparam  Add more parameters onto the select tag. For example 'style="width: 95%"' to avoid select2 component to go over parent container
 	 * @param bool   $multiple   add [] in the name of element and add 'multiple' attribut
-	 * @return       string      HTML string with
+	 * @return       string|array      HTML string with
 	 * @throws Exception
 	 */
 	public function select_digiriskelement_list($selected = '', $htmlname = 'socid', $filter = '', $showempty = '1', $showtype = 0, $forcecombo = 0, $events = array(), $filterkey = '', $outputmode = 0, $limit = 0, $morecss = 'minwidth100', $moreparam = '', $multiple = false, $noroot = 0)
@@ -393,7 +413,6 @@ class DigiriskElement extends CommonObject
 		global $conf, $user, $langs;
 
 		$out      = '';
-		$num      = 0;
 		$outarray = array();
 
 		if ($selected === '') $selected           = array();
@@ -526,7 +545,7 @@ class DigiriskElement extends CommonObject
 	 *  @param	string	$morecss				  More css on a link
 	 * 	@return	string					          String with URL
 	 */
-	function getNomUrl($withpicto = 0, $option = '', $addlabel = 0, $moreinpopup = '', $sep = ' - ', $notooltip = 0, $save_lastsearch_value = -1, $morecss = '')
+	public function getNomUrl($withpicto = 0, $option = '', $addlabel = 0, $moreinpopup = '', $sep = ' - ', $notooltip = 0, $save_lastsearch_value = -1, $morecss = '')
 	{
 		global $conf, $langs, $user, $hookmanager;
 
@@ -589,14 +608,13 @@ class DigiriskElement extends CommonObject
 	 * 	@param	bool   $only_ids
 	 * 	@return	array  Array with ids
 	 */
-	function getTrashList($only_ids = true)
+	public function getTrashList($only_ids = true)
 	{
-		global $conf, $langs, $user, $hookmanager;
-		$objects      = $this->fetchAll('',  'rank',  0,  0);
+		$objects      = $this->fetchAll('',  'rank');
 		$recurse_tree = recurse_tree($this->id, 0, $objects);
 		$ids          = [];
 
-		array_walk_recursive($recurse_tree, 	function ($item, $key) use (&$ids) {
+		array_walk_recursive($recurse_tree, function ($item) use (&$ids) {
 			if (is_object($item)) {
 				$ids[ $item->id] = $item->id;
 			}
