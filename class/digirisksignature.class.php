@@ -32,6 +32,16 @@ require_once DOL_DOCUMENT_ROOT . '/core/lib/ticket.lib.php';
 class DigiriskSignature extends CommonObject
 {
 	/**
+	 * @var DoliDB Database handler.
+	 */
+	public $db;
+
+	/**
+	 * @var array Errors.
+	 */
+	public $errors = array();
+
+	/**
 	 * @var string ID of module.
 	 */
 	public $module = 'digiriskdolibarr';
@@ -61,6 +71,11 @@ class DigiriskSignature extends CommonObject
 	 * @var string String with name of icon for digirisksignature. Must be the part after the 'object_' into object_digirisksignature.png
 	 */
 	public $picto = 'object_signature@digiriskdolibarr';
+
+	/**
+	 * @var string Label status of const.
+	 */
+	public $labelStatus;
 
 	const STATUS_DELETED           = 0;
 	const STATUS_REGISTERED        = 1;
@@ -194,13 +209,14 @@ class DigiriskSignature extends CommonObject
 	/**
 	 * Load list of objects in memory from the database.
 	 *
-	 * @param  string      $sortorder    Sort Order
-	 * @param  string      $sortfield    Sort field
-	 * @param  int         $limit        limit
-	 * @param  int         $offset       Offset
-	 * @param  array       $filter       Filter array. Example array('field'=>'valueforlike', 'customurl'=>...)
-	 * @param  string      $filtermode   Filter mode (AND or OR)
+	 * @param string $sortorder Sort Order
+	 * @param string $sortfield Sort field
+	 * @param int $limit limit
+	 * @param int $offset Offset
+	 * @param array $filter Filter array. Example array('field'=>'valueforlike', 'customurl'=>...)
+	 * @param string $filtermode Filter mode (AND or OR)
 	 * @return array|int                 int <0 if KO, array of pages if OK
+	 * @throws Exception
 	 */
 	public function fetchAll($sortorder = '', $sortfield = '', $limit = 0, $offset = 0, array $filter = array(), $filtermode = 'AND', $old_table_element = '')
 	{
@@ -410,7 +426,7 @@ class DigiriskSignature extends CommonObject
 	 * @param int $noupdate Update previous signatories
 	 * @return int
 	 */
-	function setSignatory($fk_object, $object_type, $element_type, $element_ids, $role = "", $noupdate = 0)
+	public function setSignatory($fk_object, $object_type, $element_type, $element_ids, $role = "", $noupdate = 0)
 	{
 		global $conf, $user;
 
@@ -483,7 +499,7 @@ class DigiriskSignature extends CommonObject
 	 * @param string $object_type ID of object linked
 	 * @return array|int
 	 */
-	function fetchSignatory($role = "", $fk_object, $object_type)
+	public function fetchSignatory($role = "", $fk_object, $object_type)
 	{
 		$filter = array('customsql' => 'fk_object=' . $fk_object . ' AND status!=0 AND object_type="' . $object_type . '"');
 		if (strlen($role)) {
@@ -508,7 +524,8 @@ class DigiriskSignature extends CommonObject
 	 * @param $fk_object
 	 * @param $object_type
 	 * @param string $morefilter
-	 * @return int
+	 * @return array
+	 * @throws Exception
 	 */
 	public function fetchSignatories($fk_object, $object_type, $morefilter = '1 = 1')
 	{
@@ -575,7 +592,7 @@ class DigiriskSignature extends CommonObject
 	 * @param int $fk_object ID of object linked
 	 * @param int $object_type type of object linked
 	 */
-	function deletePreviousSignatories($role = "", $fk_object, $object_type)
+	public function deletePreviousSignatories($role = "", $fk_object, $object_type)
 	{
 		global $user;
 		$filter              = array('customsql' => ' role="' . $role . '" AND fk_object=' . $fk_object . ' AND status=1 AND object_type="' . $object_type . '"');

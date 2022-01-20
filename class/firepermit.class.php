@@ -35,6 +35,25 @@ require_once __DIR__ . '/openinghours.class.php';
  */
 class FirePermit extends CommonObject
 {
+	/**
+	 * @var DoliDB Database handler.
+	 */
+	public $db;
+
+	/**
+	 * @var string Error code (or message)
+	 */
+	public $error;
+
+	/**
+	 * @var array Errors.
+	 */
+	public $errors = array();
+
+	/**
+	 * @var integer ID Object.
+	 */
+	public $id;
 
 	/**
 	 * @var int  Does this object support multicompany module ?
@@ -68,6 +87,11 @@ class FirePermit extends CommonObject
 	 * @var string String with name of icon for digiriskelement. Must be the part after the 'object_' into object_digiriskelement.png
 	 */
 	public $picto = 'firepermitdocument@digiriskdolibarr';
+
+	/**
+	 * @var string Label status of const.
+	 */
+	public $labelStatus;
 
 	const STATUS_IN_PROGRESS       = 1;
 	const STATUS_PENDING_SIGNATURE = 2;
@@ -430,27 +454,27 @@ class FirePermit extends CommonObject
 			if ($this->db->num_rows($result)) {
 				$obj      = $this->db->fetch_object($result);
 				$this->id = $obj->rowid;
-				if ($obj->fk_user_author) {
-					$cuser = new User($this->db);
-					$cuser->fetch($obj->fk_user_author);
-					$this->user_creation = $cuser;
-				}
+//				if ($obj->fk_user_author) {
+//					$cuser = new User($this->db);
+//					$cuser->fetch($obj->fk_user_author);
+//					$this->user_creation = $cuser;
+//				}
+//
+//				if ($obj->fk_user_valid) {
+//					$vuser = new User($this->db);
+//					$vuser->fetch($obj->fk_user_valid);
+//					$this->user_validation = $vuser;
+//				}
+//
+//				if ($obj->fk_user_cloture) {
+//					$cluser = new User($this->db);
+//					$cluser->fetch($obj->fk_user_cloture);
+//					$this->user_cloture = $cluser;
+//				}
 
-				if ($obj->fk_user_valid) {
-					$vuser = new User($this->db);
-					$vuser->fetch($obj->fk_user_valid);
-					$this->user_validation = $vuser;
-				}
-
-				if ($obj->fk_user_cloture) {
-					$cluser = new User($this->db);
-					$cluser->fetch($obj->fk_user_cloture);
-					$this->user_cloture = $cluser;
-				}
-
-				$this->date_creation     = $this->db->jdate($obj->datec);
-				$this->date_modification = $this->db->jdate($obj->datem);
-				$this->date_validation   = $this->db->jdate($obj->datev);
+				$this->date_creation     = $this->db->jdate($obj->date_creation);
+//				$this->date_modification = $this->db->jdate($obj->datem);
+//				$this->date_validation   = $this->db->jdate($obj->datev);
 			}
 
 			$this->db->free($result);
@@ -628,6 +652,21 @@ class FirePermit extends CommonObject
 class FirePermitLine extends CommonObjectLine
 {
 	/**
+	 * @var DoliDB Database handler.
+	 */
+	public $db;
+
+	/**
+	 * @var string Error code (or message)
+	 */
+	public $error;
+
+	/**
+	 * @var integer ID Object.
+	 */
+	public $id;
+
+	/**
 	 * @var string ID to identify managed object
 	 */
 	public $element = 'firepermitdet';
@@ -636,20 +675,6 @@ class FirePermitLine extends CommonObjectLine
 	 * @var string Name of table without prefix where object is stored
 	 */
 	public $table_element = 'digiriskdolibarr_firepermitdet';
-
-	public $ref = '';
-
-	public $date_creation = '';
-
-	public $description = '';
-
-	public $category = '';
-
-	public $use_equipment = '';
-
-	public $fk_firepermit = '';
-
-	public $fk_element = '';
 
 	/**
 	 * @var array  Array with all fields and their property. Do not use it as a static var. It may be modified by constructor.
@@ -668,6 +693,16 @@ class FirePermitLine extends CommonObjectLine
 		'fk_element'    => array('type' => 'integer', 'label' => 'FkElement', 'enabled' => '1', 'position' => 100, 'notnull' => 1, 'visible' => 0,),
 	);
 
+	public $rowid;
+	public $ref;
+	public $ref_ext;
+	public $entity;
+	public $date_creation;
+	public $description;
+	public $category;
+	public $use_equipment;
+	public $fk_firepermit;
+	public $fk_element;
 
 	/**
 	 * Constructor
