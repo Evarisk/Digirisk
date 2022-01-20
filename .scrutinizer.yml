@@ -1,0 +1,28 @@
+# .scrutinizer.yml
+#build:
+#    - php-scrutinizer-run
+build:
+  nodes:
+    analysis:
+      tests:
+        override:
+          - php-scrutinizer-run
+
+imports:
+  - javascript
+  - php
+
+filter:
+  excluded_paths:
+    - .github/*
+    - shell/*
+    - workflow/*
+    - docs/*
+    - documents/*
+    - img/*
+  paths:
+
+before_commands: {  }
+after_commands: {  }
+artifacts: {  }
+build_failure_conditions: {  }
