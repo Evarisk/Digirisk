@@ -1175,9 +1175,9 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 					print '-';
 					print '</td>';
 
-					if (is_object($objectline)) {
-						print $objectline->showOptionals($extrafields, 'edit', array('style' => $bcnd[$var], 'colspan' => $coldisplay), '', '', 1);
-					}
+//					if (is_object($objectline)) {
+//						print $objectline->showOptionals($extrafields, 'edit', array('style' => $bcnd[$var], 'colspan' => $coldisplay), '', '', 1);
+//					}
 					print '</tr>';
 				}
 				print '</tr>';
@@ -1301,9 +1301,9 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 					print '</td>';
 					print '</tr>';
 
-					if (is_object($objectline)) {
-						print $objectline->showOptionals($extrafields, 'edit', array('style' => $bcnd[$var], 'colspan' => $coldisplay), '', '', 1);
-					}
+//					if (is_object($objectline)) {
+//						print $objectline->showOptionals($extrafields, 'edit', array('style' => $bcnd[$var], 'colspan' => $coldisplay), '', '', 1);
+//					}
 					print '</form>';
 				} else {
 					print '<td>';
@@ -1355,9 +1355,9 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 						print '</td>';
 					}
 
-					if (is_object($objectline)) {
-						print $objectline->showOptionals($extrafields, 'edit', array('style' => $bcnd[$var], 'colspan' => $coldisplay), '', '', 1);
-					}
+//					if (is_object($objectline)) {
+//						print $objectline->showOptionals($extrafields, 'edit', array('style' => $bcnd[$var], 'colspan' => $coldisplay), '', '', 1);
+//					}
 					print '</tr>';
 				}
 			}
