@@ -35,6 +35,10 @@ require_once __DIR__ . '/../core/modules/modDigiriskDolibarr.class.php';
 class DigiriskDolibarr extends DolibarrApi
 {
 	/**
+	 * @var DoliDB Database handler.
+	 */
+	public $db;
+	/**
 	 * @var modDigiriskDolibarr $mod {@type modDigiriskDolibarr}
 	 */
 	public $mod;

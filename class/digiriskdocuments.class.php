@@ -29,6 +29,21 @@ require_once DOL_DOCUMENT_ROOT . '/core/class/commonobject.class.php';
 class DigiriskDocuments extends CommonObject
 {
 	/**
+	 * @var DoliDB Database handler.
+	 */
+	public $db;
+
+	/**
+	 * @var array Errors
+	 */
+	public $errors = array();
+
+	/**
+	 * @var integer ID Object.
+	 */
+	public $id;
+
+	/**
 	 * @var string ID to identify managed object.
 	 */
 	public $element = 'digiriskdocuments';
@@ -90,7 +105,8 @@ class DigiriskDocuments extends CommonObject
 	public $model_odt;
 	public $last_main_doc;
 	public $fk_user_creat;
-	public $fk_standard;
+	public $parent_type;
+	public $parent_id;
 
 	/**
 	 * Constructor
@@ -308,7 +324,7 @@ class DigiriskDocuments extends CommonObject
 	 *	Load the info information of the object
 	 *
 	 *	@param  int		$id       Id of object
-	 *	@return	void
+	 *	@return	int
 	 */
 	public function info($id)
 	{
@@ -326,30 +342,30 @@ class DigiriskDocuments extends CommonObject
 			{
 				$obj = $this->db->fetch_object($result);
 				$this->id = $obj->rowid;
-				if ($obj->fk_user_author)
-				{
-					$cuser = new User($this->db);
-					$cuser->fetch($obj->fk_user_author);
-					$this->user_creation = $cuser;
-				}
+//				if ($obj->fk_user_author)
+//				{
+//					$cuser = new User($this->db);
+//					$cuser->fetch($obj->fk_user_author);
+//					$this->user_creation = $cuser;
+//				}
+//
+//				if ($obj->fk_user_valid)
+//				{
+//					$vuser = new User($this->db);
+//					$vuser->fetch($obj->fk_user_valid);
+//					$this->user_validation = $vuser;
+//				}
+//
+//				if ($obj->fk_user_cloture)
+//				{
+//					$cluser = new User($this->db);
+//					$cluser->fetch($obj->fk_user_cloture);
+//					$this->user_cloture = $cluser;
+//				}
 
-				if ($obj->fk_user_valid)
-				{
-					$vuser = new User($this->db);
-					$vuser->fetch($obj->fk_user_valid);
-					$this->user_validation = $vuser;
-				}
-
-				if ($obj->fk_user_cloture)
-				{
-					$cluser = new User($this->db);
-					$cluser->fetch($obj->fk_user_cloture);
-					$this->user_cloture = $cluser;
-				}
-
-				$this->date_creation     = $this->db->jdate($obj->datec);
-				$this->date_modification = $this->db->jdate($obj->datem);
-				$this->date_validation   = $this->db->jdate($obj->datev);
+				$this->date_creation = $this->db->jdate($obj->date_creation);
+				//$this->date_modification = $this->db->jdate($obj->datem);
+				//$this->date_validation   = $this->db->jdate($obj->datev);
 			}
 
 			$this->db->free($result);
@@ -395,7 +411,7 @@ class DigiriskDocuments extends CommonObject
 			$result = $this->commonGenerateDocument($modelpath, $modele, $outputlangs, $hidedetails, $hidedesc, $hideref, $moreparams['object']);
 		}
 
-		$this->call_trigger(strtoupper($this->type).'_GENERATE', $moreparams['user'], $parent);
+		$this->call_trigger(strtoupper($this->type).'_GENERATE', $moreparams['user']);
 
 		return $result;
 	}

@@ -65,19 +65,14 @@ class ActionsDigiriskdolibarr
 	 * Overloading the printCommonFooter function : replacing the parent's function with the one below
 	 *
 	 * @param   array           $parameters     Hook metadatas (context, etc...)
-	 * @param   CommonObject    $object         The object to process (an invoice if you are in invoice module, a propale in propale's module, etc...)
-	 * @param   string          $action         Current action (if set). Generally create or edit or null
-	 * @param   HookManager     $hookmanager    Hook manager propagated to allow calling another hook
 	 * @return  int                             < 0 on error, 0 on success, 1 to replace standard code
 	 */
-	public function printCommonFooter($parameters, &$object, &$action, $hookmanager)
+	public function printCommonFooter($parameters)
 	{
-		global $db, $conf, $user, $langs;
-
-		$error = 0; // Error counter
+		global $db, $conf, $langs;
 
 		/* print_r($parameters); print_r($object); echo "action: " . $action; */
-		if (in_array($parameters['currentcontext'], array('admincompany'))) {	    // do something only for the context 'somecontext1' or 'somecontext2'
+		if ($parameters['currentcontext'] == 'admincompany') {	    // do something only for the context 'somecontext1' or 'somecontext2'
 			?>
 			<script src="../custom/digiriskdolibarr/js/digiriskdolibarr.js.php"></script>
 			<?php
@@ -99,7 +94,7 @@ class ActionsDigiriskdolibarr
 			print ajax_combobox('selectDIGIRISK_COLLECTIVE_AGREEMENT_TITLE');
 		}
 
-		if ( ! $error) {
+		if (true) {
 			$this->results   = array('myreturn' => 999);
 			$this->resprints = 'A text to show';
 			return 0; // or return 1 to replace standard code
@@ -112,26 +107,22 @@ class ActionsDigiriskdolibarr
 	/**
 	 *  Overloading the doActions function : replacing the parent's function with the one below
 	 *
-	 * @param $parameters
-	 * @param $object
+	 * @param $parameters Hook  metadatas (context, etc...)
 	 * @param $action
-	 * @param $hookmanager
-	 * @return int
+	 * @return int              < 0 on error, 0 on success, 1 to replace standard code
 	 */
-	public function doActions($parameters, &$object, &$action, $hookmanager)
+	public function doActions($parameters, $action)
 	{
-		global $db, $conf, $user, $langs;
-
-		$error = 0; // Error counter
+		global $db, $conf;
 
 		/* print_r($parameters); print_r($object); echo "action: " . $action; */
-		if (in_array($parameters['currentcontext'], array('admincompany'))) {	    // do something only for the context 'somecontext1' or 'somecontext2'
+		if ($parameters['currentcontext'] == 'admincompany') {	    // do something only for the context 'somecontext1' or 'somecontext2'
 			if ($action == 'updateedit' || $action == 'update') {
 				dolibarr_set_const($db, "DIGIRISK_COLLECTIVE_AGREEMENT_TITLE", GETPOST("DIGIRISK_COLLECTIVE_AGREEMENT_TITLE", 'nohtml'), 'chaine', 0, '', $conf->entity);
 			}
 		}
 
-		if ( ! $error) {
+		if (true) {
 			$this->results   = array('myreturn' => 999);
 			$this->resprints = 'A text to show';
 			return 0; // or return 1 to replace standard code
@@ -145,19 +136,16 @@ class ActionsDigiriskdolibarr
 	 *  Overloading the doActions function : replacing the parent's function with the one below
 	 *
 	 * @param $parameters
-	 * @param $object
-	 * @param $action
-	 * @param $hookmanager
 	 * @return int
 	 */
-	public function emailElementlist($parameters, &$object, &$action, $hookmanager)
+	public function emailElementlist($parameters)
 	{
-		global $db, $conf, $user, $langs;
+		global $conf, $user, $langs;
 
-		$error = 0; // Error counter
+		$value = array();
 
 		/* print_r($parameters); print_r($object); echo "action: " . $action; */
-		if (in_array($parameters['currentcontext'], array('emailtemplates'))) {	    // do something only for the context 'somecontext1' or 'somecontext2'
+		if ($parameters['currentcontext'] == 'emailtemplates') {	    // do something only for the context 'somecontext1' or 'somecontext2'
 			if ($conf->digiriskdolibarr->enabled && $user->rights->digiriskdolibarr->preventionplan->read) {
 				$value['preventionplan'] = '<i class="fas fa-info"></i>  ' . dol_escape_htmltag($langs->trans('PreventionPlan'));
 			}
@@ -169,7 +157,7 @@ class ActionsDigiriskdolibarr
 			}
 		}
 
-		if ( ! $error) {
+		if (true) {
 			$this->results = $value;
 			return 0; // or return 1 to replace standard code
 		} else {
@@ -182,19 +170,16 @@ class ActionsDigiriskdolibarr
 	 *  Overloading the doActions function : replacing the parent's function with the one below
 	 *
 	 * @param $parameters
-	 * @param $object
-	 * @param $action
-	 * @param $hookmanager
 	 * @return int
 	 */
-	public function redirectAfterConnection($parameters, &$object, &$action, $hookmanager)
+	public function redirectAfterConnection($parameters)
 	{
-		global $db, $conf, $user, $langs;
+		global $conf;
 
-		$error = 0; // Error counter
+		$value = array();
 
 		/* print_r($parameters); print_r($object); echo "action: " . $action; */
-		if (in_array($parameters['currentcontext'], array('mainloginpage'))) {	    // do something only for the context 'somecontext1' or 'somecontext2'
+		if ($parameters['currentcontext'] == 'mainloginpage') {	    // do something only for the context 'somecontext1' or 'somecontext2'
 			if ($conf->global->DIGIRISKDOLIBARR_REDIRECT_AFTER_CONNECTION > 0) {
 				$value = dol_buildpath('/custom/digiriskdolibarr/digiriskdolibarrindex.php?idmenu=1319&mainmenu=digiriskdolibarr&leftmenu=', 1);
 			} else {
@@ -202,7 +187,7 @@ class ActionsDigiriskdolibarr
 			}
 		}
 
-		if ( ! $error) {
+		if (true) {
 			$this->resprints = $value;
 			return 0; // or return 1 to replace standard code
 		} else {

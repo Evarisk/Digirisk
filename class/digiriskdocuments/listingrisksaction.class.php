@@ -28,6 +28,10 @@ require_once __DIR__ . '/../digiriskdocuments.class.php';
  */
 class ListingRisksAction extends DigiriskDocuments
 {
+	/**
+	 * @var DoliDB Database handler.
+	 */
+	public $db;
 
 	/**
 	 * @var int  Does this object support multicompany module ?

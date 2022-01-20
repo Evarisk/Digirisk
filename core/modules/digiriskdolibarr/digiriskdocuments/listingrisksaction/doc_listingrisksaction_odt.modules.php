@@ -37,6 +37,76 @@ require_once __DIR__ . '/modules_listingrisksaction.php';
 class doc_listingrisksaction_odt extends ModeleODTListingRisksAction
 {
 	/**
+	 * @var DoliDB Database handler.
+	 */
+	public $db;
+
+	/**
+	 * @var string Error code (or message)
+	 */
+	public $error;
+
+	/**
+	 * @var array Fullpath file
+	 */
+	public $result;
+
+	/**
+	 * @var string ODT Template Name.
+	 */
+	public $name;
+
+	/**
+	 * @var string ODT Template Description.
+	 */
+	public $description;
+
+	/**
+	 * @var string ODT Template path.
+	 */
+	public $scandir;
+
+	/**
+	 * @var string Format file.
+	 */
+	public $type;
+
+	/**
+	 * @var integer Width page.
+	 */
+	public $page_largeur;
+
+	/**
+	 * @var integer Height page.
+	 */
+	public $page_hauteur;
+
+	/**
+	 * @var array Format page.
+	 */
+	public $format;
+
+	/**
+	 * @var integer Left margin.
+	 */
+	public $marge_gauche;
+
+	/**
+	 * @var integer Right margin.
+	 */
+	public $marge_droite;
+
+	/**
+	 * @var integer Top margin.
+	 */
+	public $marge_haute;
+
+	/**
+	 * @var integer Bottom margin.
+	 */
+	public $marge_basse;
+
+	/**
 	 * Issuer
 	 * @var Societe
 	 */
@@ -565,8 +635,8 @@ class doc_listingrisksaction_odt extends ModeleODTListingRisksAction
 			$parameters = array('odfHandler' => &$odfHandler, 'file' => $file, 'object' => $object, 'outputlangs' => $outputlangs, 'substitutionarray' => &$tmparray);
 			$reshook    = $hookmanager->executeHooks('afterODTCreation', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
 
-			if ( ! empty($conf->global->MAIN_UMASK))
-				@chmod($file, octdec($conf->global->MAIN_UMASK));
+//			if ( ! empty($conf->global->MAIN_UMASK))
+//				@chmod($file, octdec($conf->global->MAIN_UMASK));
 
 			$odfHandler = null; // Destroy object
 
