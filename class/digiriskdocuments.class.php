@@ -34,12 +34,12 @@ class DigiriskDocuments extends CommonObject
 	public $db;
 
 	/**
-	 * @var array Errors
+	 * @var string[] Array of error strings
 	 */
 	public $errors = array();
 
 	/**
-	 * @var integer ID Object.
+	 * @var int The object identifier
 	 */
 	public $id;
 
@@ -185,7 +185,6 @@ class DigiriskDocuments extends CommonObject
 	 * Function for JSON filling before saving in database
 	 *
 	 * @param $object
-	 * @return false|string
 	 */
 	public function DigiriskFillJSON($object) {
 		switch ($object->element) {
@@ -222,13 +221,14 @@ class DigiriskDocuments extends CommonObject
 	/**
 	 * Load list of objects in memory from the database.
 	 *
-	 * @param  string      $sortorder    Sort Order
-	 * @param  string      $sortfield    Sort field
-	 * @param  int         $limit        limit
-	 * @param  int         $offset       Offset
-	 * @param  array       $filter       Filter array. Example array('field'=>'valueforlike', 'customurl'=>...)
-	 * @param  string      $filtermode   Filter mode (AND or OR)
+	 * @param string $sortorder Sort Order
+	 * @param string $sortfield Sort field
+	 * @param int $limit limit
+	 * @param int $offset Offset
+	 * @param array $filter Filter array. Example array('field'=>'valueforlike', 'customurl'=>...)
+	 * @param string $filtermode Filter mode (AND or OR)
 	 * @return array|int                 int <0 if KO, array of pages if OK
+	 * @throws Exception
 	 */
 	public function fetchAll($sortorder = '', $sortfield = '', $limit = 0, $offset = 0, array $filter = array(), $filtermode = 'AND')
 	{

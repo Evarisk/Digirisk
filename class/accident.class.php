@@ -35,10 +35,34 @@ require_once __DIR__ . '/openinghours.class.php';
  */
 class Accident extends CommonObject
 {
+	/**
+	 * @var DoliDB Database handler.
+	 */
+	public $db;
 
 	/**
-	 * @var int  Does this object support multicompany module ?
-	 * 0=No test on entity, 1=Test with field entity, 'field@table'=Test with link by field@table
+	 * @var string Error string
+	 * @see        $errors
+	 */
+	public $error;
+
+	/**
+	 * @var string[] Array of error strings
+	 */
+	public $errors = array();
+
+	/**
+	 * @var array Result array.
+	 */
+	public $result = array();
+
+	/**
+	 * @var int The object identifier
+	 */
+	public $id;
+
+	/**
+	 * @var string ID to identify managed object.
 	 */
 	public $element = 'accident';
 
@@ -51,7 +75,6 @@ class Accident extends CommonObject
 	 * @var string Name of table without prefix where object is stored. This is also the key used for extrafields management.
 	 */
 	public $table_element_line = 'digiriskdolibarr_accidentdet';
-
 
 	/**
 	 * @var int  Does this object support multicompany module ?
@@ -68,6 +91,16 @@ class Accident extends CommonObject
 	 * @var string String with name of icon for digiriskelement. Must be the part after the 'object_' into object_digiriskelement.png
 	 */
 	public $picto = 'accident@digiriskdolibarr';
+
+	/**
+	 * @var string Label status of const.
+	 */
+	public $labelStatus;
+
+	/**
+	 * @var string Label status short of const.
+	 */
+	public $labelStatusShort;
 
 	const STATUS_IN_PROGRESS = 1;
 
@@ -199,20 +232,20 @@ class Accident extends CommonObject
 	{
 		$this->lines = array();
 
-		$result = $this->fetchLinesCommon();
-		return $result;
+		return $this->fetchLinesCommon();
 	}
 
 	/**
 	 * Load list of objects in memory from the database.
 	 *
-	 * @param  string      $sortorder    Sort Order
-	 * @param  string      $sortfield    Sort field
-	 * @param  int         $limit        limit
-	 * @param  int         $offset       Offset
-	 * @param  array       $filter       Filter array. Example array('field'=>'valueforlike', 'customurl'=>...)
-	 * @param  string      $filtermode   Filter mode (AND or OR)
+	 * @param string $sortorder Sort Order
+	 * @param string $sortfield Sort field
+	 * @param int $limit limit
+	 * @param int $offset Offset
+	 * @param array $filter Filter array. Example array('field'=>'valueforlike', 'customurl'=>...)
+	 * @param string $filtermode Filter mode (AND or OR)
 	 * @return array|int                 int <0 if KO, array of pages if OK
+	 * @throws Exception
 	 */
 	public function fetchAll($sortorder = '', $sortfield = '', $limit = 0, $offset = 0, array $filter = array(), $filtermode = 'AND')
 	{
@@ -317,27 +350,27 @@ class Accident extends CommonObject
 			if ($this->db->num_rows($result)) {
 				$obj      = $this->db->fetch_object($result);
 				$this->id = $obj->rowid;
-				if ($obj->fk_user_author) {
-					$cuser = new User($this->db);
-					$cuser->fetch($obj->fk_user_author);
-					$this->user_creation = $cuser;
-				}
+//				if ($obj->fk_user_author) {
+//					$cuser = new User($this->db);
+//					$cuser->fetch($obj->fk_user_author);
+//					$this->user_creation = $cuser;
+//				}
+//
+//				if ($obj->fk_user_valid) {
+//					$vuser = new User($this->db);
+//					$vuser->fetch($obj->fk_user_valid);
+//					$this->user_validation = $vuser;
+//				}
+//
+//				if ($obj->fk_user_cloture) {
+//					$cluser = new User($this->db);
+//					$cluser->fetch($obj->fk_user_cloture);
+//					$this->user_cloture = $cluser;
+//				}
 
-				if ($obj->fk_user_valid) {
-					$vuser = new User($this->db);
-					$vuser->fetch($obj->fk_user_valid);
-					$this->user_validation = $vuser;
-				}
-
-				if ($obj->fk_user_cloture) {
-					$cluser = new User($this->db);
-					$cluser->fetch($obj->fk_user_cloture);
-					$this->user_cloture = $cluser;
-				}
-
-				$this->date_creation     = $this->db->jdate($obj->datec);
-				$this->date_modification = $this->db->jdate($obj->datem);
-				$this->date_validation   = $this->db->jdate($obj->datev);
+				$this->date_creation     = $this->db->jdate($obj->date_creation);
+//				$this->date_modification = $this->db->jdate($obj->datem);
+//				$this->date_validation   = $this->db->jdate($obj->datev);
 			}
 
 			$this->db->free($result);
@@ -366,8 +399,6 @@ class Accident extends CommonObject
 	 */
 	public function LibStatut($status, $mode = 0)
 	{
-
-		// phpcs:enable
 		if (empty($this->labelStatus) || empty($this->labelStatusShort)) {
 			global $langs;
 			$langs->load("digiriskdolibarr@digiriskdolibarr");
@@ -381,46 +412,34 @@ class Accident extends CommonObject
 	}
 
 	/**
-	 *    	Return a link on thirdparty (with picto)
+	 *        Return a link on thirdparty (with picto)
 	 *
-	 *		@param	int		$withpicto		          Add picto into link (0=No picto, 1=Include picto with link, 2=Picto only)
-	 *		@param	string	$option			          Target of link ('', 'customer', 'prospect', 'supplier', 'project')
-	 *		@param	int		$maxlen			          Max length of name
-	 *      @param	int  	$notooltip		          1=Disable tooltip
-	 *      @param  int     $save_lastsearch_value    -1=Auto, 0=No save of lastsearch_values when clicking, 1=Save lastsearch_values whenclicking
-	 *		@return	string					          String with URL
+	 * @param int $withpicto Add picto into link (0=No picto, 1=Include picto with link, 2=Picto only)
+	 * @param int $maxlen Max length of name
+	 * @param int $notooltip 1=Disable tooltip
+	 * @return    string                              String with URL
 	 */
-	public function getNomUrl($withpicto = 0, $option = '', $maxlen = 0, $notooltip = 0, $save_lastsearch_value = -1)
+	public function getNomUrl($withpicto = 0, $maxlen = 0, $notooltip = 0)
 	{
 		global $conf, $langs, $hookmanager;
 
 		if ( ! empty($conf->dol_no_mouse_hover)) $notooltip = 1; // Force disable tooltips
 
 		$name = $this->ref;
-
-
-
 		$result = ''; $label = '';
-		$linkstart = ''; $linkend = '';
 
 		if ( ! empty($this->logo) && class_exists('Form')) {
 			$label .= '<div class="photointooltip">';
 			$label .= Form::showphoto('societe', $this, 0, 40, 0, '', 'mini', 0); // Important, we must force height so image will have height tags and if image is inside a tooltip, the tooltip manager can calculate height and position correctly the tooltip.
 			$label .= '</div><div style="clear: both;"></div>';
-		} elseif ( ! empty($this->logo_squarred) && class_exists('Form')) {
-			/*$label.= '<div class="photointooltip">';
-			$label.= Form::showphoto('societe', $this, 0, 40, 0, 'photowithmargin', 'mini', 0);	// Important, we must force height so image will have height tags and if image is inside a tooltip, the tooltip manager can calculate height and position correctly the tooltip.
-			$label.= '</div><div style="clear: both;"></div>';*/
 		}
 
 		$label .= '<div class="centpercent">';
 
 
 		// By default
-		if (empty($linkstart)) {
-			$label    .= '<u>' . $langs->trans("Accident") . '</u>';
-			$linkstart = '<a href="' . DOL_URL_ROOT . '/custom/digiriskdolibarr/view/accident/accident_card.php?id=' . $this->id;
-		}
+		$label    .= '<u>' . $langs->trans("Accident") . '</u>';
+		$linkstart = '<a href="' . DOL_URL_ROOT . '/custom/digiriskdolibarr/view/accident/accident_card.php?id=' . $this->id;
 
 		if ( ! empty($this->ref)) {
 			$label .= '<br><b>' . $langs->trans('Ref') . ':</b> ' . $this->ref;
@@ -460,6 +479,21 @@ class Accident extends CommonObject
 class AccidentWorkStop extends CommonObjectLine
 {
 	/**
+	 * @var DoliDB Database handler.
+	 */
+	public $db;
+
+	/**
+	 * @var string Error string
+	 */
+	public $error;
+
+	/**
+	 * @var int The object identifier
+	 */
+	public $id;
+
+	/**
 	 * @var string ID to identify managed object
 	 */
 	public $element = 'accident_workstop';
@@ -483,6 +517,7 @@ class AccidentWorkStop extends CommonObjectLine
 		'fk_accident'   => array('type' => 'integer', 'label' => 'FkAccident', 'enabled' => '1', 'position' => 80, 'notnull' => 1, 'visible' => 0,),
 	);
 
+	public $rowid;
 	public $ref;
 	public $entity;
 	public $date_creation;
@@ -498,7 +533,7 @@ class AccidentWorkStop extends CommonObjectLine
 	 */
 	public function __construct(DoliDB $db)
 	{
-		global $conf, $langs;
+		global $conf;
 
 		$this->db = $db;
 
@@ -544,8 +579,9 @@ class AccidentWorkStop extends CommonObjectLine
 	/**
 	 *    Load accident line line from database
 	 *
-	 * @param int $rowid id of accident line line to get
-	 * @return    int                    <0 if KO, >0 if OK
+	 * @param int $parent_id
+	 * @param int $limit
+	 * @return array|int  <0 if KO, >0 if OK
 	 */
 	public function fetchAll($parent_id = 0, $limit = 0)
 	{
@@ -559,13 +595,13 @@ class AccidentWorkStop extends CommonObjectLine
 		}
 		$sql .= ' AND entity IN (' . getEntity($this->table_element) . ')';
 
-
 		$result = $db->query($sql);
 
 		if ($result) {
 			$num = $db->num_rows($result);
 
 			$i = 0;
+			$records = array();
 			while ($i < ($limit ? min($limit, $num) : $num)) {
 				$obj = $db->fetch_object($result);
 
@@ -582,7 +618,6 @@ class AccidentWorkStop extends CommonObjectLine
 
 				$i++;
 			}
-
 
 			$db->free($result);
 
@@ -647,8 +682,8 @@ class AccidentWorkStop extends CommonObjectLine
 	/**
 	 *    Update line into database
 	 *
-	 * @param User $user User object
-	 * @param int $notrigger Disable triggers
+	 * @param string $user User object
+	 * @param bool $notrigger Disable triggers
 	 * @return        int                    <0 if KO, >0 if OK
 	 * @throws Exception
 	 */
@@ -657,7 +692,6 @@ class AccidentWorkStop extends CommonObjectLine
 		global $user, $db;
 
 		$db->begin();
-		// Mise a jour ligne en base
 		$sql  = "UPDATE " . MAIN_DB_PREFIX . "digiriskdolibarr_accident_workstop SET";
 		$sql .= " ref='" . $db->escape($this->ref) . "',";
 		$sql .= " status=" . $this->status . ",";
@@ -687,6 +721,8 @@ class AccidentWorkStop extends CommonObjectLine
 	/**
 	 *    Delete line in database
 	 *
+	 * @param User $user
+	 * @param bool $notrigger
 	 * @return        int                   <0 if KO, >0 if OK
 	 * @throws Exception
 	 */
@@ -708,6 +744,21 @@ class AccidentWorkStop extends CommonObjectLine
  */
 class AccidentMetaData extends CommonObject
 {
+	/**
+	 * @var DoliDB Database handler.
+	 */
+	public $db;
+
+	/**
+	 * @var string Error string
+	 */
+	public $error;
+
+	/**
+	 * @var int The object identifier
+	 */
+	public $id;
+
 	/**
 	 * @var int  Does this object support multicompany module ?
 	 * 0=No test on entity, 1=Test with field entity, 'field@table'=Test with link by field@table
@@ -891,6 +942,21 @@ class AccidentMetaData extends CommonObject
 class AccidentLesion extends CommonObjectLine
 {
 	/**
+	 * @var DoliDB Database handler.
+	 */
+	public $db;
+
+	/**
+	 * @var string Error string
+	 */
+	public $error;
+
+	/**
+	 * @var int The object identifier
+	 */
+	public $id;
+
+	/**
 	 * @var string ID to identify managed object
 	 */
 	public $element = 'accident_lesion';
@@ -914,6 +980,7 @@ class AccidentLesion extends CommonObjectLine
 		'fk_accident'         => array('type' => 'integer', 'label' => 'FkAccident', 'enabled' => '1', 'position' => 80, 'notnull' => 1, 'visible' => 0,),
 	);
 
+	public $rowid;
 	public $ref;
 	public $entity;
 	public $date_creation;
@@ -929,7 +996,7 @@ class AccidentLesion extends CommonObjectLine
 	 */
 	public function __construct(DoliDB $db)
 	{
-		global $conf, $langs;
+		global $conf;
 
 		$this->db = $db;
 
@@ -973,10 +1040,11 @@ class AccidentLesion extends CommonObjectLine
 	}
 
 	/**
-	 *    Load accident lesion from database
+	 *  Load accident lesion from database
 	 *
-	 * @param int $rowid id of accident lesion to get
-	 * @return    int                    <0 if KO, >0 if OK
+	 * 	@param  int       $parent_id
+	 *	@param  int       $limit
+	 * 	@return array|int             <0 if KO, >0 if OK
 	 */
 	public function fetchAll($parent_id = 0, $limit = 0)
 	{
@@ -996,6 +1064,7 @@ class AccidentLesion extends CommonObjectLine
 			$num = $db->num_rows($result);
 
 			$i = 0;
+			$records = array();
 			while ($i < ($limit ? min($limit, $num) : $num)) {
 				$obj = $db->fetch_object($result);
 
@@ -1038,7 +1107,7 @@ class AccidentLesion extends CommonObjectLine
 		$db->begin();
 		$now = dol_now();
 
-		// Insertion dans base de la ligne
+		// Insertion dans base de la line
 		$sql  = 'INSERT INTO ' . MAIN_DB_PREFIX . 'digiriskdolibarr_accident_lesion';
 		$sql .= ' (ref, entity, date_creation, lesion_localization, lesion_nature, fk_accident';
 		$sql .= ')';
@@ -1077,8 +1146,8 @@ class AccidentLesion extends CommonObjectLine
 	/**
 	 *    Update line into database
 	 *
-	 * @param User $user User object
-	 * @param int $notrigger Disable triggers
+	 * @param string $user User object
+	 * @param bool $notrigger Disable triggers
 	 * @return        int                    <0 if KO, >0 if OK
 	 * @throws Exception
 	 */
@@ -1087,7 +1156,6 @@ class AccidentLesion extends CommonObjectLine
 		global $user, $db;
 
 		$db->begin();
-		// Mise a jour ligne en base
 		$sql  = "UPDATE " . MAIN_DB_PREFIX . "digiriskdolibarr_accident_lesion SET";
 		$sql .= " ref='" . $db->escape($this->ref) . "',";
 		$sql .= " lesion_localization='" . $db->escape($this->lesion_localization) . "',";
@@ -1117,6 +1185,8 @@ class AccidentLesion extends CommonObjectLine
 	/**
 	 *    Delete line in database
 	 *
+	 * @param User $user
+	 * @param bool $notrigger
 	 * @return        int                   <0 if KO, >0 if OK
 	 * @throws Exception
 	 */
@@ -1151,6 +1221,16 @@ class AccidentLesion extends CommonObjectLine
  */
 class AccidentSignature extends DigiriskSignature
 {
+	/**
+	 * @var DoliDB Database handler.
+	 */
+	public $db;
+
+	/**
+	 * @var string[] Array of error strings
+	 */
+	public $errors = array();
+	
 	/**
 	 * @var string Name of table without prefix where object is stored. This is also the key used for extrafields management.
 	 */
@@ -1199,13 +1279,12 @@ class AccidentSignature extends DigiriskSignature
 	 * @param int $offset Offset
 	 * @param array $filter Filter array. Example array('field'=>'valueforlike', 'customurl'=>...)
 	 * @param string $filtermode Filter mode (AND or OR)
+	 * @param string $old_table_element
 	 * @return array|int                 int <0 if KO, array of pages if OK
 	 * @throws Exception
 	 */
 	public function fetchAll($sortorder = '', $sortfield = '', $limit = 0, $offset = 0, array $filter = array(), $filtermode = 'AND', $old_table_element = '')
 	{
-		global $conf;
-
 		dol_syslog(__METHOD__, LOG_DEBUG);
 
 		$records = array();

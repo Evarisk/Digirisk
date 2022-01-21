@@ -29,6 +29,16 @@ require_once DOL_DOCUMENT_ROOT.'/core/class/commonobject.class.php';
 class DigiriskResources extends CommonObject
 {
 	/**
+	 * @var DoliDB Database handler.
+	 */
+	public $db;
+
+	/**
+	 * @var string Error string
+	 */
+	public $error;
+
+	/**
 	 * @var string ID to identify managed object.
 	 */
 	public $element = 'digiriskresources';
@@ -131,7 +141,7 @@ class DigiriskResources extends CommonObject
 	/**
 	 * Set resources in database
 	 *
-	 * @param $db
+	 * @param DoliDb $db
 	 * @param $user_creat
 	 * @param string $ref name of resource
 	 * @param string $element_type type of resource
@@ -153,22 +163,21 @@ class DigiriskResources extends CommonObject
 		// Check parameters
 		if (empty($ref)) {
 			dol_print_error($db, "Error: Call to function dolibarr_set_const with wrong parameters", LOG_ERR);
-			exit;
+			return -1;
 		}
 		//dol_syslog("dolibarr_set_const name=$name, value=$value type=$type, visible=$visible, note=$note entity=$entity");
 
 		$db->begin();
-
+		$resql = '';
 		if (!$noupdate) {
-			// Change le statut des ressources précédentes à 0
+			// Change status previous ressources at 0
 			$sql = "UPDATE " . MAIN_DB_PREFIX . "digiriskdolibarr_digiriskresources";
 			$sql .= " SET status = 0";
 			$sql .= " WHERE ref = " . $db->encrypt($ref, 1);
 			if ($entity >= 0) $sql .= " AND entity = " . $entity;
+			dol_syslog("admin.lib::digirisk_dolibarr_set_resources", LOG_DEBUG);
+			$resql = $db->query($sql);
 		}
-
-		dol_syslog("admin.lib::digirisk_dolibarr_set_resources", LOG_DEBUG);
-		$resql = $db->query($sql);
 
 		if (strcmp($element_type, '') && !empty($element_id))    // true if different. Must work for $value='0' or $value=0
 		{
@@ -197,7 +206,7 @@ class DigiriskResources extends CommonObject
 			$conf->global->ref = $ref;
 			return 1;
 		} else {
-			$error = $db->lasterror();
+			$this->error = $db->lasterror();
 			$db->rollback();
 			return -1;
 		}
@@ -209,6 +218,7 @@ class DigiriskResources extends CommonObject
 	 *
 	 * @param string $ref name of resource
 	 * @return int
+	 * @throws Exception
 	 */
 	public function digirisk_dolibarr_fetch_resource($ref)
 	{
@@ -216,8 +226,7 @@ class DigiriskResources extends CommonObject
 		$allLinks = $this->digirisk_dolibarr_fetch_resources();
 
 		if(!empty($allLinks[$ref])) {
-			$id = array_shift($allLinks[$ref]->id);
-			return $id;
+			return array_shift($allLinks[$ref]->id);
 		}
 		return $langs->trans('NoLabourInspectorAssigned');
 	}
@@ -227,11 +236,10 @@ class DigiriskResources extends CommonObject
 	 *
 	 * @param string $ref name of resource
 	 * @param $object
-	 * @return int
+	 * @return array|int|Contact|Societe|User
 	 */
-	public function fetchResourcesFromObject($ref, $object )
+	public function fetchResourcesFromObject($ref, $object)
 	{
-
 		$sql = 'SELECT '.$this->getFieldList();
 		$sql .= ' FROM '.MAIN_DB_PREFIX.$this->table_element;
 		if (dol_strlen($ref)) {
@@ -246,20 +254,19 @@ class DigiriskResources extends CommonObject
 
 		$res = $this->db->query($sql);
 
-
-
-		if ($res)
-		{
-
+		if ($res) {
 			if ($res->num_rows > 1) {
 				$num = $this->db->num_rows($res);
 				$i = 0;
+				$limit = 100;
+				$records = array();
 				while ($i < ($limit ? min($limit, $num) : $num)) {
 					$obj = $this->db->fetch_object($res);
 
 					$record = new self($this->db);
 					$record->setVarsFromFetchObj($obj);
 
+					$resourcetmp = '';
 					if ($record->element_type == 'user') {
 						$resourcetmp = new User($this->db);
 					} elseif ($record->element_type == 'socpeople') {
@@ -279,16 +286,15 @@ class DigiriskResources extends CommonObject
 				return $records;
 			} else {
 				$obj = $this->db->fetch_object($res);
-				if ($obj)
-				{
+				if ($obj) {
 					$this->setVarsFromFetchObj($obj);
 
 					// Retreive all extrafield
 					// fetch optionals attributes and labels
 					$this->fetch_optionals();
 
+					$resourcetmp = '';
 					if ($this->element_type == 'user') {
-
 						$resourcetmp = new User($this->db);
 					} elseif ($this->element_type == 'socpeople') {
 						$resourcetmp = new Contact($this->db);
@@ -298,16 +304,13 @@ class DigiriskResources extends CommonObject
 					$resourcetmp->fetch($this->element_id);
 
 					return $resourcetmp;
-				}
-				else
-				{
+				} else {
 					return 0;
 				}
 			}
 
 		}
-		else
-		{
+		else {
 			$this->error = $this->db->lasterror();
 			$this->errors[] = $this->error;
 			return -1;
@@ -318,6 +321,7 @@ class DigiriskResources extends CommonObject
 	 * Fetch all resources in database
 	 *
 	 * @return array
+	 * @throws Exception
 	 */
 	public function digirisk_dolibarr_fetch_resources()
 	{
@@ -331,7 +335,7 @@ class DigiriskResources extends CommonObject
 				if ($allLinks[$link->ref]->ref == $link->ref) {
 					array_push($allLinks[$link->ref]->id, $link->element_id);
 				} else {
-					$allLinks[$link->ref] = new stdClass;
+					$allLinks[$link->ref] = new stdClass();
 					$allLinks[$link->ref]->id[] = $link->element_id;
 					$allLinks[$link->ref]->type = $link->element_type;
 					$allLinks[$link->ref]->ref = $link->ref;

@@ -32,12 +32,12 @@ class ActionsDigiriskdolibarr
 	public $db;
 
 	/**
-	 * @var string Error code (or message)
+	 * @var string Error string
 	 */
-	public $error = '';
+	public $error;
 
 	/**
-	 * @var array Errors
+	 * @var string[] Array of error strings
 	 */
 	public $errors = array();
 
@@ -107,7 +107,7 @@ class ActionsDigiriskdolibarr
 	/**
 	 *  Overloading the doActions function : replacing the parent's function with the one below
 	 *
-	 * @param $parameters Hook  metadatas (context, etc...)
+	 * @param Hook $parameters metadatas (context, etc...)
 	 * @param $action
 	 * @return int              < 0 on error, 0 on success, 1 to replace standard code
 	 */

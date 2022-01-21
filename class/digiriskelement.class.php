@@ -38,7 +38,7 @@ class DigiriskElement extends CommonObject
 	public $db;
 
 	/**
-	 * @var array Errors.
+	 * @var string[] Array of error strings
 	 */
 	public $errors = array();
 
@@ -48,7 +48,7 @@ class DigiriskElement extends CommonObject
 	public $result = array();
 
 	/**
-	 * @var integer ID Object.
+	 * @var int The object identifier
 	 */
 	public $id;
 
@@ -182,13 +182,14 @@ class DigiriskElement extends CommonObject
 	/**
 	 * Load list of objects in memory from the database.
 	 *
-	 * @param  string      $sortorder    Sort Order
-	 * @param  string      $sortfield    Sort field
-	 * @param  int         $limit        limit
-	 * @param  int         $offset       Offset
-	 * @param  array       $filter       Filter array. Example array('field'=>'valueforlike', 'customurl'=>...)
-	 * @param  string      $filtermode   Filter mode (AND or OR)
+	 * @param string $sortorder Sort Order
+	 * @param string $sortfield Sort field
+	 * @param int $limit limit
+	 * @param int $offset Offset
+	 * @param array $filter Filter array. Example array('field'=>'valueforlike', 'customurl'=>...)
+	 * @param string $filtermode Filter mode (AND or OR)
 	 * @return array|int                 int <0 if KO, array of pages if OK
+	 * @throws Exception
 	 */
 	public function fetchAll($sortorder = '', $sortfield = '', $limit = 0, $offset = 0, array $filter = array(), $filtermode = 'AND')
 	{
@@ -256,6 +257,7 @@ class DigiriskElement extends CommonObject
 	 *
 	 * @param int $parent_id Id parent object
 	 * @return array         <0 if KO, 0 if not found, >0 if OK
+	 * @throws Exception
 	 */
 	public function fetchDigiriskElementFlat($parent_id)
 	{
@@ -263,15 +265,18 @@ class DigiriskElement extends CommonObject
 		$objects = $object->fetchAll('',  '',  0,  0, array('customsql' => 'status > 0' ));
 
 		$elements = recurse_tree($parent_id, 0, $objects);
+		$digiriskelementlist = array();
 		if ($elements > 0 && ! empty($elements)) {
-			// Super fonction itérations flat.
+			// Super function iterations flat.
 			$it = new RecursiveIteratorIterator(new RecursiveArrayIterator($elements));
+			$element = array();
 			foreach ($it as $key => $v) {
 				$element[$key][$v] = $v;
 			}
 			if (is_array($element)) {
 				$children_id = array_shift($element);
 			}
+
 
 			if ( ! empty($children_id)) {
 				foreach ($children_id as $id) {
@@ -313,7 +318,7 @@ class DigiriskElement extends CommonObject
 		global $conf;
 
 		$this->fk_parent = $conf->global->DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH;
-		return $this->update($user);
+		return $this->update($user, $notrigger);
 	}
 
 	/**
@@ -362,55 +367,52 @@ class DigiriskElement extends CommonObject
 		}
 	}
 
-	public function getRiskAssessmentCategoriesNumber()
-	{
-		$risk          = new Risk($this->db);
-		$risks         = $risk->fetchFromParent($this->id);
-		$scale_counter = array(
-			1 => 0,
-			2 => 0,
-			3 => 0,
-			4 => 0
-		);
-		if ( ! empty($risks) && $risks > 0) {
-			foreach ($risks as $risk) {
-				$riskassessment = new RiskAssessment($this->db);
-				$riskassessment = $riskassessment->fetchFromParent($risk->id, 1);
-				if ( ! empty($riskassessment) && $riskassessment > 0) {
-					$riskassessment         = array_shift($riskassessment);
-					$scale                  = $riskassessment->get_evaluation_scale();
-					$scale_counter[$scale] += 1;
-				}
-			}
-		}
-
-		return $scale_counter;
-	}
+//	public function getRiskAssessmentCategoriesNumber()
+//	{
+//		$risk          = new Risk($this->db);
+//		$risks         = $risk->fetchFromParent($this->id);
+//		$scale_counter = array(
+//			1 => 0,
+//			2 => 0,
+//			3 => 0,
+//			4 => 0
+//		);
+//		if ( ! empty($risks) && $risks > 0) {
+//			foreach ($risks as $risk) {
+//				$riskassessment = new RiskAssessment($this->db);
+//				$riskassessment = $riskassessment->fetchFromParent($risk->id, 1);
+//				if ( ! empty($riskassessment) && $riskassessment > 0) {
+//					$riskassessment         = array_shift($riskassessment);
+//					$scale                  = $riskassessment->get_evaluation_scale();
+//					$scale_counter[$scale] += 1;
+//				}
+//			}
+//		}
+//
+//		return $scale_counter;
+//	}
 
 	/**
 	 *  Output html form to select a third party.
 	 *  Note, you must use the select_company to get the component to select a third party. This function must only be called by select_company.
 	 *
-	 * @param string $selected   Preselected type
-	 * @param string $htmlname   Name of field in form
-	 * @param string $filter     Optional filters criteras (example: 's.rowid <> x', 's.client in (1,3)')
-	 * @param string $showempty  Add an empty field (Can be '1' or text to use on empty line like 'SelectThirdParty')
-	 * @param int    $showtype   Show third party type in combolist (customer, prospect or supplier)
-	 * @param int    $forcecombo Force to use standard HTML select component without beautification
-	 * @param array  $events     Event options. Example: array(array('method'=>'getContacts', 'url'=>dol_buildpath('/core/ajax/contacts.php',1), 'htmlname'=>'contactid', 'params'=>array('add-customer-contact'=>'disabled')))
-	 * @param string $filterkey  Filter on key value
-	 * @param int    $outputmode 0=HTML select string, 1=Array
-	 * @param int    $limit      Limit number of answers
-	 * @param string $morecss    Add more css styles to the SELECT component
-	 * @param string $moreparam  Add more parameters onto the select tag. For example 'style="width: 95%"' to avoid select2 component to go over parent container
-	 * @param bool   $multiple   add [] in the name of element and add 'multiple' attribut
+	 * @param string $selected Preselected type
+	 * @param string $htmlname Name of field in form
+	 * @param string $filter Optional filters criteras (example: 's.rowid <> x', 's.client in (1,3)')
+	 * @param int $forcecombo Force to use standard HTML select component without beautification
+	 * @param array $events Event options. Example: array(array('method'=>'getContacts', 'url'=>dol_buildpath('/core/ajax/contacts.php',1), 'htmlname'=>'contactid', 'params'=>array('add-customer-contact'=>'disabled')))
+	 * @param int $outputmode 0=HTML select string, 1=Array
+	 * @param int $limit Limit number of answers
+	 * @param string $morecss Add more css styles to the SELECT component
+	 * @param string $moreparam Add more parameters onto the select tag. For example 'style="width: 95%"' to avoid select2 component to go over parent container
+	 * @param bool $multiple add [] in the name of element and add 'multiple' attribut
+	 * @param int $noroot
 	 * @return       string|array      HTML string with
 	 * @throws Exception
 	 */
-	public function select_digiriskelement_list($selected = '', $htmlname = 'socid', $filter = '', $showempty = '1', $showtype = 0, $forcecombo = 0, $events = array(), $filterkey = '', $outputmode = 0, $limit = 0, $morecss = 'minwidth100', $moreparam = '', $multiple = false, $noroot = 0)
+	public function select_digiriskelement_list($selected = '', $htmlname = 'socid', $filter = '', $forcecombo = 0, $events = array(), $outputmode = 0, $limit = 0, $morecss = 'minwidth100', $moreparam = '', $multiple = false, $noroot = 0)
 	{
-		// phpcs:enable
-		global $conf, $user, $langs;
+		global $conf, $langs;
 
 		$out      = '';
 		$outarray = array();
@@ -424,7 +426,7 @@ class DigiriskElement extends CommonObject
 				$filter = '';
 			}
 		}
-		// On recherche les societes
+		// On recherche les societies
 		$sql  = "SELECT *";
 		$sql .= " FROM " . MAIN_DB_PREFIX . "digiriskdolibarr_digiriskelement as s";
 
@@ -454,6 +456,7 @@ class DigiriskElement extends CommonObject
 		// Build output string
 		dol_syslog(get_class($this) . "::select_digiriskelement_list", LOG_DEBUG);
 		$resql = $this->db->query($sql);
+		$num = '';
 		if ($resql) {
 			if ( ! $forcecombo) {
 				include_once DOL_DOCUMENT_ROOT . '/core/lib/ajax.lib.php';
@@ -516,8 +519,8 @@ class DigiriskElement extends CommonObject
 
 		$resql = $this->db->query($sql);
 		if ($resql) {
-			$num = $this->db->num_rows($resql);
 			$i   = 0;
+			$obj = '';
 			while ($i < 1) {
 				$obj = $this->db->fetch_object($resql);
 				$i++;
@@ -603,12 +606,12 @@ class DigiriskElement extends CommonObject
 	}
 
 	/**
-	 * 	Return list of deleted elements
+	 *  Return list of deleted elements
 	 *
-	 * 	@param	bool   $only_ids
-	 * 	@return	array  Array with ids
+	 * 	@return    array  Array with ids
+	 * 	@throws Exception
 	 */
-	public function getTrashList($only_ids = true)
+	public function getTrashList()
 	{
 		$objects      = $this->fetchAll('',  'rank');
 		$recurse_tree = recurse_tree($this->id, 0, $objects);

@@ -1,6 +1,5 @@
 <?php
-/* Copyright (C) 2015   Jean-François Ferry     <jfefe@aternatik.fr>
- * Copyright (C) 2016	Laurent Destailleur		<eldy@users.sourceforge.net>
+/* Copyright (C) 2021 EOXIA <dev@eoxia.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,8 +21,6 @@
  * \brief   File for API management of DigiriskDolibarr.
  */
 
-use Luracast\Restler\RestException;
-
 require_once __DIR__ . '/../core/modules/modDigiriskDolibarr.class.php';
 
 /**
@@ -38,14 +35,12 @@ class DigiriskDolibarr extends DolibarrApi
 	 * @var DoliDB Database handler.
 	 */
 	public $db;
+
 	/**
 	 * @var modDigiriskDolibarr $mod {@type modDigiriskDolibarr}
 	 */
 	public $mod;
-	/**
-	 * @var array   $FIELDS     Mandatory fields, checked when create and update object
-	 */
-	static $FIELDS = array();
+
 	/**
 	 * Constructor
 	 */
@@ -63,7 +58,6 @@ class DigiriskDolibarr extends DolibarrApi
 	 *
 	 * @return 	array|mixed data without useless information
 	 *
-	 * @throws 	RestException
 	 */
 	public function enableModule()
 	{
@@ -102,12 +96,10 @@ class DigiriskDolibarr extends DolibarrApi
 	 *
 	 * Return an array with order informations
 	 *
-	 * @param       int         $contact_list  0: Returned array of contacts/addresses contains all properties, 1: Return array contains just id
-	 * @return 	array|mixed data without useless information
+	 * @return    array|mixed data without useless information
 	 *
 	 * @url GET    disableModule
 	 *
-	 * @throws 	RestException
 	 */
 	public function disableModule()
 	{
@@ -123,7 +115,6 @@ class DigiriskDolibarr extends DolibarrApi
 	 *
 	 * @url GET    getFilesVersion
 	 *
-	 * @throws 	RestException
 	 */
 	public function getFilesVersion()
 	{
@@ -139,7 +130,6 @@ class DigiriskDolibarr extends DolibarrApi
 	 *
 	 * @url GET    getActiveVersion
 	 *
-	 * @throws 	RestException
 	 */
 	public function getActiveVersion()
 	{
@@ -157,7 +147,6 @@ class DigiriskDolibarr extends DolibarrApi
 	 *
 	 * @url GET    getLatestVersion
 	 *
-	 * @throws 	RestException
 	 */
 	public function getLatestVersion()
 	{
@@ -175,7 +164,6 @@ class DigiriskDolibarr extends DolibarrApi
 	 *
 	 * @url GET    uploadNewModule
 	 *
-	 * @throws 	RestException
 	 */
 	public function uploadNewModule()
 	{

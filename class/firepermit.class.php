@@ -41,23 +41,23 @@ class FirePermit extends CommonObject
 	public $db;
 
 	/**
-	 * @var string Error code (or message)
+	 * @var string Error string
+	 * @see        $errors
 	 */
 	public $error;
 
 	/**
-	 * @var array Errors.
+	 * @var string[] Array of error strings
 	 */
 	public $errors = array();
 
 	/**
-	 * @var integer ID Object.
+	 * @var int The object identifier
 	 */
 	public $id;
 
 	/**
-	 * @var int  Does this object support multicompany module ?
-	 * 0=No test on entity, 1=Test with field entity, 'field@table'=Test with link by field@table
+	 * @var string ID to identify managed object.
 	 */
 	public $element = 'firepermit';
 
@@ -92,6 +92,21 @@ class FirePermit extends CommonObject
 	 * @var string Label status of const.
 	 */
 	public $labelStatus;
+
+	/**
+	 * @var string Label status short of const.
+	 */
+	public $labelStatusShort;
+
+	/**
+	 * @var array Context element object
+	 */
+	public $context = array();
+
+	 /**
+	  * @var FirePermitLine[]     Array of subtable lines
+	  */
+	 public $lines = array();
 
 	const STATUS_IN_PROGRESS       = 1;
 	const STATUS_PENDING_SIGNATURE = 2;
@@ -185,9 +200,11 @@ class FirePermit extends CommonObject
 	/**
 	 * Clone an object into another one
 	 *
-	 * @param  	User 	$user      	User that creates
-	 * @param  	int 	$fromid     Id of object to clone
-	 * @return 	mixed 				New object created, <0 if KO
+	 * @param User $user User that creates
+	 * @param int $fromid Id of object to clone
+	 * @param $options
+	 * @return    mixed                New object created, <0 if KO
+	 * @throws Exception
 	 */
 	public function createFromClone(User $user, $fromid, $options)
 	{
@@ -264,8 +281,10 @@ class FirePermit extends CommonObject
 			$digiriskresources->digirisk_dolibarr_set_resources($this->db, $user->id, 'FP_EXT_SOCIETY', 'societe', array(array_shift($resources['FP_EXT_SOCIETY'])->id), $conf->entity, 'firepermit', $firepermtid, 1);
 			$digiriskresources->digirisk_dolibarr_set_resources($this->db, $user->id, 'FP_LABOUR_INSPECTOR', 'societe', array(array_shift($resources['FP_LABOUR_INSPECTOR'])->id), $conf->entity, 'firepermit', $firepermtid, 1);
 			$digiriskresources->digirisk_dolibarr_set_resources($this->db, $user->id, 'FP_LABOUR_INSPECTOR_ASSIGNED', 'socpeople', array(array_shift($resources['FP_LABOUR_INSPECTOR_ASSIGNED'])->id), $conf->entity, 'firepermit', $firepermtid, 1);
-			$signatory->createFromClone($user, $signatoriesID['FP_MAITRE_OEUVRE'], $firepermtid);
-			$signatory->createFromClone($user, $signatoriesID['FP_EXT_SOCIETY_RESPONSIBLE'], $firepermtid);
+			if (!empty($signatoriesID)) {
+				$signatory->createFromClone($user, $signatoriesID['FP_MAITRE_OEUVRE'], $firepermtid);
+				$signatory->createFromClone($user, $signatoriesID['FP_EXT_SOCIETY_RESPONSIBLE'], $firepermtid);
+			}
 
 			if ( ! empty($options['schedule'])) {
 				if ( ! empty($openinghours)) {
@@ -336,20 +355,20 @@ class FirePermit extends CommonObject
 	{
 		$this->lines = array();
 
-		$result = $this->fetchLinesCommon();
-		return $result;
+		return $this->fetchLinesCommon();
 	}
 
 	/**
 	 * Load list of objects in memory from the database.
 	 *
-	 * @param  string      $sortorder    Sort Order
-	 * @param  string      $sortfield    Sort field
-	 * @param  int         $limit        limit
-	 * @param  int         $offset       Offset
-	 * @param  array       $filter       Filter array. Example array('field'=>'valueforlike', 'customurl'=>...)
-	 * @param  string      $filtermode   Filter mode (AND or OR)
+	 * @param string $sortorder Sort Order
+	 * @param string $sortfield Sort field
+	 * @param int $limit limit
+	 * @param int $offset Offset
+	 * @param array $filter Filter array. Example array('field'=>'valueforlike', 'customurl'=>...)
+	 * @param string $filtermode Filter mode (AND or OR)
 	 * @return array|int                 int <0 if KO, array of pages if OK
+	 * @throws Exception
 	 */
 	public function fetchAll($sortorder = '', $sortfield = '', $limit = 0, $offset = 0, array $filter = array(), $filtermode = 'AND')
 	{
@@ -574,16 +593,14 @@ class FirePermit extends CommonObject
 	}
 
 	/**
-	 *    	Return a link on thirdparty (with picto)
+	 *        Return a link on thirdparty (with picto)
 	 *
-	 *		@param	int		$withpicto		          Add picto into link (0=No picto, 1=Include picto with link, 2=Picto only)
-	 *		@param	string	$option			          Target of link ('', 'customer', 'prospect', 'supplier', 'project')
-	 *		@param	int		$maxlen			          Max length of name
-	 *      @param	int  	$notooltip		          1=Disable tooltip
-	 *      @param  int     $save_lastsearch_value    -1=Auto, 0=No save of lastsearch_values when clicking, 1=Save lastsearch_values whenclicking
-	 *		@return	string					          String with URL
+	 * @param int $withpicto Add picto into link (0=No picto, 1=Include picto with link, 2=Picto only)
+	 * @param int $maxlen Max length of name
+	 * @param int $notooltip 1=Disable tooltip
+	 * @return    string                              String with URL
 	 */
-	public function getNomUrl($withpicto = 0, $option = '', $maxlen = 0, $notooltip = 0, $save_lastsearch_value = -1)
+	public function getNomUrl($withpicto = 0, $maxlen = 0, $notooltip = 0)
 	{
 		global $conf, $langs, $hookmanager;
 
@@ -591,29 +608,20 @@ class FirePermit extends CommonObject
 
 		$name = $this->ref;
 
-
-
 		$result = ''; $label = '';
-		$linkstart = ''; $linkend = '';
 
 		if ( ! empty($this->logo) && class_exists('Form')) {
 			$label .= '<div class="photointooltip">';
 			$label .= Form::showphoto('societe', $this, 0, 40, 0, '', 'mini', 0); // Important, we must force height so image will have height tags and if image is inside a tooltip, the tooltip manager can calculate height and position correctly the tooltip.
 			$label .= '</div><div style="clear: both;"></div>';
-		} elseif ( ! empty($this->logo_squarred) && class_exists('Form')) {
-			/*$label.= '<div class="photointooltip">';
-			$label.= Form::showphoto('societe', $this, 0, 40, 0, 'photowithmargin', 'mini', 0);	// Important, we must force height so image will have height tags and if image is inside a tooltip, the tooltip manager can calculate height and position correctly the tooltip.
-			$label.= '</div><div style="clear: both;"></div>';*/
 		}
 
 		$label .= '<div class="centpercent">';
 
 
 		// By default
-		if (empty($linkstart)) {
-			$label    .= '<u>' . $langs->trans("FirePermit") . '</u>';
-			$linkstart = '<a href="' . DOL_URL_ROOT . '/custom/digiriskdolibarr/view/firepermit/firepermit_card.php?id=' . $this->id;
-		}
+		$label    .= '<u>' . $langs->trans("FirePermit") . '</u>';
+		$linkstart = '<a href="' . DOL_URL_ROOT . '/custom/digiriskdolibarr/view/firepermit/firepermit_card.php?id=' . $this->id;
 
 		if ( ! empty($this->ref)) {
 			$label .= '<br><b>' . $langs->trans('Ref') . ':</b> ' . $this->ref;
@@ -657,12 +665,12 @@ class FirePermitLine extends CommonObjectLine
 	public $db;
 
 	/**
-	 * @var string Error code (or message)
+	 * @var string Error string
 	 */
 	public $error;
 
 	/**
-	 * @var integer ID Object.
+	 * @var int The object identifier
 	 */
 	public $id;
 
@@ -698,8 +706,9 @@ class FirePermitLine extends CommonObjectLine
 	public $ref_ext;
 	public $entity;
 	public $date_creation;
-	public $description;
+	public $tms;
 	public $category;
+	public $description;
 	public $use_equipment;
 	public $fk_firepermit;
 	public $fk_element;
@@ -711,7 +720,7 @@ class FirePermitLine extends CommonObjectLine
 	 */
 	public function __construct(DoliDB $db)
 	{
-		global $conf, $langs;
+		global $conf;
 
 		$this->db = $db;
 
@@ -759,8 +768,9 @@ class FirePermitLine extends CommonObjectLine
 	/**
 	 *    Load firepermit line line from database
 	 *
-	 * @param int $rowid id of firepermit line line to get
-	 * @return    int                    <0 if KO, >0 if OK
+	 * @param int $parent_id
+	 * @param int $limit
+	 * @return array|int
 	 */
 	public function fetchAll($parent_id = 0, $limit = 0)
 	{
@@ -781,6 +791,7 @@ class FirePermitLine extends CommonObjectLine
 			$num = $db->num_rows($result);
 
 			$i = 0;
+			$records = array();
 			while ($i < ($limit ? min($limit, $num) : $num)) {
 				$obj = $db->fetch_object($result);
 
@@ -821,9 +832,6 @@ class FirePermitLine extends CommonObjectLine
 	public function insert(User $user, $notrigger = false)
 	{
 		global $db, $user;
-
-		$error = 0;
-
 
 		// Clean parameters
 		$this->description = trim($this->description);
@@ -872,16 +880,14 @@ class FirePermitLine extends CommonObjectLine
 	/**
 	 *    Update line into database
 	 *
-	 * @param User $user User object
-	 * @param int $notrigger Disable triggers
+	 * @param string $user User object
+	 * @param bool $notrigger Disable triggers
 	 * @return        int                    <0 if KO, >0 if OK
 	 * @throws Exception
 	 */
 	public function update($user = '', $notrigger = false)
 	{
-		global $user, $conf, $db;
-
-		$error = 0;
+		global $user, $db;
 
 		// Clean parameters
 		$this->description = trim($this->description);
@@ -919,6 +925,8 @@ class FirePermitLine extends CommonObjectLine
 	/**
 	 *    Delete line in database
 	 *
+	 * @param User $user
+	 * @param bool $notrigger
 	 * @return        int                   <0 if KO, >0 if OK
 	 * @throws Exception
 	 */
@@ -947,6 +955,9 @@ class FirePermitLine extends CommonObjectLine
 	}
 }
 
+/**
+ * Class FirePermitSignature
+ */
 class FirePermitSignature extends DigiriskSignature
 {
 	/**
@@ -990,9 +1001,11 @@ class FirePermitSignature extends DigiriskSignature
 	/**
 	 * Clone an object into another one
 	 *
-	 * @param  	User 	$user      	User that creates
-	 * @param  	int 	$fromid     Id of object to clone
-	 * @return 	mixed 				New object created, <0 if KO
+	 * @param User $user User that creates
+	 * @param int $fromid Id of object to clone
+	 * @param $firepermitid
+	 * @return    mixed                New object created, <0 if KO
+	 * @throws Exception
 	 */
 	public function createFromClone(User $user, $fromid, $firepermitid)
 	{

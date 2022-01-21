@@ -21,9 +21,7 @@
  * \brief       This file is a CRUD class file for Evaluator (Create/Read/Update/Delete)
  */
 
-// Put here all includes required by your class file
 require_once DOL_DOCUMENT_ROOT . '/core/class/commonobject.class.php';
-require_once DOL_DOCUMENT_ROOT . '/core/lib/files.lib.php';
 
 /**
  * Class for Evaluator
@@ -36,12 +34,12 @@ class Evaluator extends CommonObject
 	public $db;
 
 	/**
-	 * @var array Errors.
+	 * @var string[] Array of error strings
 	 */
 	public $errors = array();
 
 	/**
-	 * @var integer ID Object.
+	 * @var int The object identifier
 	 */
 	public $id;
 
@@ -148,7 +146,7 @@ class Evaluator extends CommonObject
 	 */
 	public function create(User $user, $notrigger = false)
 	{
-		$this->element = $this->element_type . '@digiriskdolibarr';
+		$this->element = $this->element . '@digiriskdolibarr';
 		return $this->createCommon($user, $notrigger);
 	}
 
@@ -167,8 +165,9 @@ class Evaluator extends CommonObject
 	/**
 	 * Load object in memory from the database
 	 *
-	 * @param int    $parent_id   Id parent object
+	 * @param int $parent_id Id parent object
 	 * @return int         <0 if KO, 0 if not found, >0 if OK
+	 * @throws Exception
 	 */
 	public function fetchFromParent($parent_id)
 	{
