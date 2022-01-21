@@ -29,6 +29,16 @@ require_once DOL_DOCUMENT_ROOT . '/core/class/commonobject.class.php';
 class RiskAssessment extends CommonObject
 {
 	/**
+	 * @var DoliDB Database handler.
+	 */
+	public $db;
+
+	/**
+	 * @var string[] Array of error strings
+	 */
+	public $errors = array();
+
+	/**
 	 * @var string ID to identify managed object.
 	 */
 	public $element = 'riskassessment';
@@ -141,21 +151,20 @@ class RiskAssessment extends CommonObject
 	/**
 	 * Create object into database
 	 *
-	 * @param  User $user      User that creates
-	 * @param  bool $notrigger false=launch triggers after, true=disable triggers
+	 * @param User $user User that creates
+	 * @param bool $notrigger false=launch triggers after, true=disable triggers
 	 * @return int             <0 if KO, Id of created object if OK
+	 * @throws Exception
 	 */
 	public function create(User $user, $notrigger = false)
 	{
-		$previousEvaluation = $this->fetchFromParent($this->fk_risk, 1);
-
-		// Change le statut des ressources précédentes à 0
+		// Change status previous ressources at 0
 		$sql   = "UPDATE " . MAIN_DB_PREFIX . "digiriskdolibarr_riskassessment";
 		$sql  .= " SET status = 0";
 		$sql  .= " WHERE fk_risk = " . $this->fk_risk;
-		$resql = $this->db->query($sql);
+		$this->db->query($sql);
 
-		//RAJOUTER LIGNE POUR LE SELECT ENTITY
+		//ADD LINES POUR LE SELECT ENTITY
 		return $this->createCommon($user, $notrigger);
 	}
 
@@ -174,8 +183,11 @@ class RiskAssessment extends CommonObject
 	/**
 	 * Load object in memory from the database with Parent ID
 	 *
-	 * @param int    $parent_id   Id parent object
-	 * @return int         <0 if KO, 0 if not found, >0 if OK
+	 * @param int $parent_id Id parent object
+	 * @param int $active
+	 * @param string $desc
+	 * @return array|int         <0 if KO, 0 if not found, >0 if OK
+	 * @throws Exception
 	 */
 	public function fetchFromParent($parent_id, $active = 0, $desc = '')
 	{
@@ -188,13 +200,14 @@ class RiskAssessment extends CommonObject
 	/**
 	 * Load list of objects in memory from the database.
 	 *
-	 * @param  string      $sortorder    Sort Order
-	 * @param  string      $sortfield    Sort field
-	 * @param  int         $limit        limit
-	 * @param  int         $offset       Offset
-	 * @param  array       $filter       Filter array. Example array('field'=>'valueforlike', 'customurl'=>...)
-	 * @param  string      $filtermode   Filter mode (AND or OR)
+	 * @param string $sortorder Sort Order
+	 * @param string $sortfield Sort field
+	 * @param int $limit limit
+	 * @param int $offset Offset
+	 * @param array $filter Filter array. Example array('field'=>'valueforlike', 'customurl'=>...)
+	 * @param string $filtermode Filter mode (AND or OR)
 	 * @return array|int                 int <0 if KO, array of pages if OK
+	 * @throws Exception
 	 */
 	public function fetchAll($sortorder = '', $sortfield = '', $limit = 0, $offset = 0, array $filter = array(), $filtermode = 'AND')
 	{
@@ -299,8 +312,7 @@ class RiskAssessment extends CommonObject
 			$this->db->free($resql);
 			$evaluation->fetch($obj->rowid);
 			$evaluation->status = 1;
-			$records            = $evaluation->update($user);
-			return $records;
+			return $evaluation->update($user);
 		} else {
 			$this->errors[] = 'Error ' . $this->db->lasterror();
 			dol_syslog(__METHOD__ . ' ' . join(',', $this->errors), LOG_ERR);
@@ -340,37 +352,8 @@ class RiskAssessment extends CommonObject
 				return 3;
 			case ($this->cotation >= 80):
 				return 4;
+			default :
+				return -1;
 		}
-	}
-
-	/**
-	 * Return photo for risk assessment
-	 *
-	 * @param $element
-	 * @return void between 1 and 4
-	 */
-	public function show_photo_evaluation($element)
-	{
-		global $conf;
-
-		$risk = new Risk($this->db);
-
-		$relativepath = 'digiriskdolibarr/medias';
-		$modulepart   = 'ecm';
-		$path         = DOL_URL_ROOT . '/document.php?modulepart=' . $modulepart . '&attachment=0&file=' . str_replace('/', '%2F', $relativepath) . '/';
-		$filearray    = dol_dir_list($conf->digiriskdolibarr->multidir_output[$conf->entity] . '/' . $element->element . '/' . $element->ref . '/', "files", 0, '', '(\.odt|_preview.*\.png)$', 'position_name', 'asc', 1);
-
-		if (count($filearray)) : ?>
-			<?php print '<span class="floatleft inline-block valignmiddle divphotoref">' . $risk->digirisk_show_photos('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/' . $element->element, 'small', 1, 0, 0, 0, 50, 0, 0, 0, 0, $element->element) . '</span>'; ?>
-		<?php else : ?>
-			<?php $nophoto = '/public/theme/common/nophoto.png'; ?>
-			<div class="action photo default-photo evaluation-photo-open modal-open" value="0">
-				<span class="floatleft inline-block valignmiddle divphotoref photo-edit0">
-					<input type="hidden" value="<?php echo $path ?>" id="pathToPhoto0">
-					<img class="photo maxwidth50"  src="<?php echo DOL_URL_ROOT . $nophoto ?>">
-				</span>
-			</div>
-		<?php endif; ?>
-		<?php
 	}
 }

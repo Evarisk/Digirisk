@@ -32,10 +32,13 @@ require_once __DIR__ . '/../../class/openinghours.class.php';
  */
 class LegalDisplay extends DigiriskDocuments
 {
+	/**
+	 * @var DoliDB Database handler.
+	 */
+	public $db;
 
 	/**
-	 * @var int  Does this object support multicompany module ?
-	 * 0=No test on entity, 1=Test with field entity, 'field@table'=Test with link by field@table
+	 * @var string ID to identify managed object.
 	 */
 	public $element = 'legaldisplay';
 
@@ -99,6 +102,7 @@ class LegalDisplay extends DigiriskDocuments
 	 *
 	 * @param $object
 	 * @return false|string
+	 * @throws Exception
 	 */
 	public function LegalDisplayFillJSON($object) {
 		global $conf;
@@ -259,7 +263,7 @@ class LegalDisplay extends DigiriskDocuments
 			$sql .= " WHERE code = " . $code ;
 
 			$result = $this->db->query($sql);
-
+			$obj = '';
 			if ($result)
 			{
 				$obj = $this->db->fetch_object($result);

@@ -28,10 +28,13 @@ require_once __DIR__ . '/../digiriskelement.class.php';
  */
 class Groupment extends DigiriskElement
 {
+	/**
+	 * @var DoliDB Database handler.
+	 */
+	public $db;
 
 	/**
-	 * @var int  Does this object support multicompany module ?
-	 * 0=No test on entity, 1=Test with field entity, 'field@table'=Test with link by field@table
+	 * @var string ID to identify managed object.
 	 */
 	public $element = 'groupment';
 

@@ -1230,7 +1230,7 @@ class AccidentSignature extends DigiriskSignature
 	 * @var string[] Array of error strings
 	 */
 	public $errors = array();
-	
+
 	/**
 	 * @var string Name of table without prefix where object is stored. This is also the key used for extrafields management.
 	 */
