@@ -1593,7 +1593,8 @@ function digirisk_show_medias_linked($modulepart = 'ecm', $sdir, $size = 0, $nbm
  * @param  array       $filter       Filter array. Example array('field'=>'valueforlike', 'customurl'=>...)
  * @param  string      $filtermode   Filter mode (AND or OR)
  * @return array|int                 int <0 if KO, array of pages if OK
- */
+ * @throws Exception
+*/
 function fetchAllSocPeople($sortorder = '', $sortfield = '', $limit = 0, $offset = 0, array $filter = array(), $filtermode = 'AND')
 {
 	global $db;
@@ -1676,30 +1677,32 @@ function fetchAllSocPeople($sortorder = '', $sortfield = '', $limit = 0, $offset
 }
 
 /**
- *	Return HTML code of the SELECT of list of all contacts (for a third party or all).
- *  This also set the number of contacts found into $this->num
+ * Return HTML code of the SELECT of list of all contacts (for a third party or all).
+ * This also set the number of contacts found into $this->num
  *
  * @since 9.0 Add afterSelectContactOptions hook
  *
- *	@param	int			$socid      	Id ot third party or 0 for all or -1 for empty list
- *	@param  array|int	$selected   	Array of ID of pre-selected contact id
- *	@param  string		$htmlname  	    Name of HTML field ('none' for a not editable field)
- *	@param  int			$showempty     	0=no empty value, 1=add an empty value, 2=add line 'Internal' (used by user edit), 3=add an empty value only if more than one record into list
- *	@param  string		$exclude        List of contacts id to exclude
- *	@param	string		$limitto		Disable answers that are not id in this array list
- *	@param	integer		$showfunction   Add function into label
- *	@param	string		$moreclass		Add more class to class style
- *	@param	bool		$options_only	Return options only (for ajax treatment)
- *	@param	integer		$showsoc	    Add company into label
- * 	@param	int			$forcecombo		Force to use combo box (so no ajax beautify effect)
- *  @param	array		$events			Event options. Example: array(array('method'=>'getContacts', 'url'=>dol_buildpath('/core/ajax/contacts.php',1), 'htmlname'=>'contactid', 'params'=>array('add-customer-contact'=>'disabled')))
- *  @param	string		$moreparam		Add more parameters onto the select tag. For example 'style="width: 95%"' to avoid select2 component to go over parent container
- *  @param	string		$htmlid			Html id to use instead of htmlname
- *  @param	bool		$multiple		add [] in the name of element and add 'multiple' attribut
- *  @param	integer		$disableifempty Set tag 'disabled' on select if there is no choice
- *	@return	 int						<0 if KO, Nb of contact in list if OK
- */
-function digirisk_selectcontacts($socid, $selected = '', $htmlname = 'contactid', $showempty = 0, $exclude = '', $limitto = '', $showfunction = 0, $moreclass = '', $options_only = false, $showsoc = 0, $forcecombo = 0, $events = array(), $moreparam = '', $htmlid = '', $multiple = false, $disableifempty = 0, $exclude_already_add = '')
+ * @param	int			$socid      	Id ot third party or 0 for all or -1 for empty list
+ * @param string $selected Array of ID of pre-selected contact id
+ * @param  string		$htmlname  	    Name of HTML field ('none' for a not editable field)
+ * @param  int			$showempty     	0=no empty value, 1=add an empty value, 2=add line 'Internal' (used by user edit), 3=add an empty value only if more than one record into list
+ * @param  array		$exclude        List of contacts id to exclude
+ * @param	string		$limitto		Disable answers that are not id in this array list
+ * @param	integer		$showfunction   Add function into label
+ * @param	string		$moreclass		Add more class to class style
+ * @param	bool		$options_only	Return options only (for ajax treatment)
+ * @param	integer		$showsoc	    Add company into label
+ * @param	int			$forcecombo		Force to use combo box (so no ajax beautify effect)
+ * @param	array		$events			Event options. Example: array(array('method'=>'getContacts', 'url'=>dol_buildpath('/core/ajax/contacts.php',1), 'htmlname'=>'contactid', 'params'=>array('add-customer-contact'=>'disabled')))
+ * @param	string		$moreparam		Add more parameters onto the select tag. For example 'style="width: 95%"' to avoid select2 component to go over parent container
+ * @param	string		$htmlid			Html id to use instead of htmlname
+ * @param	bool		$multiple		add [] in the name of element and add 'multiple' attribut
+ * @param	integer		$disableifempty Set tag 'disabled' on select if there is no choice
+ * @param string $exclude_already_add
+ * @return	 int						<0 if KO, Nb of contact in list if OK
+ *
+*/
+function digirisk_selectcontacts($socid, $selected = '', $htmlname = 'contactid', $showempty = 0, $exclude = array(), $limitto = '', $showfunction = 0, $moreclass = '', $options_only = false, $showsoc = 0, $forcecombo = 0, $events = array(), $moreparam = '', $htmlid = '', $multiple = false, $disableifempty = 0, $exclude_already_add = '')
 {
 	global $conf, $langs, $hookmanager, $action, $db;
 

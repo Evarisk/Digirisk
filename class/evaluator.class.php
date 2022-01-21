@@ -166,7 +166,7 @@ class Evaluator extends CommonObject
 	 * Load object in memory from the database
 	 *
 	 * @param int $parent_id Id parent object
-	 * @return int         <0 if KO, 0 if not found, >0 if OK
+	 * @return array|int         <0 if KO, 0 if not found, >0 if OK
 	 * @throws Exception
 	 */
 	public function fetchFromParent($parent_id)

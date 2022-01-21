@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2017  Laurent Destailleur  <eldy@users.sourceforge.net>
+/* Copyright (C) 2021 EOXIA <dev@eoxia.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -13,14 +13,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
- *
- * Need to have following variables defined:
- * $legaldisplay (invoice, order, ...)
- * $action
- * $conf
- * $langs
- *
- * $keyforbreak may be defined to key to switch on second column
+ * or see https://www.gnu.org/
  */
 
 // Protection to avoid direct call of template
@@ -34,8 +27,11 @@ if ( ! is_object($form)) $form = new Form($db);
 	<!-- BEGIN PHP TEMPLATE digiriskdolibarr_legaldisplayfields_view.tpl.php -->
 <?php
 
-$legaldisplay = json_decode($legaldisplay->LegaldisplayFillJSON($legaldisplay), false, 512, JSON_UNESCAPED_UNICODE)->LegalDisplay;
+try {
+	$legaldisplay = json_decode($legaldisplay->LegalDisplayFillJSON($legaldisplay), false, 512, JSON_UNESCAPED_UNICODE)->LegalDisplay;
+} catch (Exception $e) {
 
+}
 
 //Creation User
 

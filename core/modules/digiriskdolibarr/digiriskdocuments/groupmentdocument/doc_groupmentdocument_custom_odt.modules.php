@@ -69,12 +69,12 @@ class doc_groupmentdocument_custom_odt extends ModeleODTGroupmentDocument
 	public $type;
 
 	/**
-	 * @var integer Width page.
+	 * @var int Width page.
 	 */
 	public $page_largeur;
 
 	/**
-	 * @var integer Height page.
+	 * @var int Height page.
 	 */
 	public $page_hauteur;
 
@@ -84,22 +84,22 @@ class doc_groupmentdocument_custom_odt extends ModeleODTGroupmentDocument
 	public $format;
 
 	/**
-	 * @var integer Left margin.
+	 * @var int Left margin.
 	 */
 	public $marge_gauche;
 
 	/**
-	 * @var integer Right margin.
+	 * @var int Right margin.
 	 */
 	public $marge_droite;
 
 	/**
-	 * @var integer Top margin.
+	 * @var int Top margin.
 	 */
 	public $marge_haute;
 
 	/**
-	 * @var integer Bottom margin.
+	 * @var int Bottom margin.
 	 */
 	public $marge_basse;
 
@@ -147,7 +147,7 @@ class doc_groupmentdocument_custom_odt extends ModeleODTGroupmentDocument
 		$this->marge_haute  = 0;
 		$this->marge_basse  = 0;
 
-		// Recupere emetteur
+		// emetteur
 		$this->emetteur                                                     = $mysoc;
 		if ( ! $this->emetteur->country_code) $this->emetteur->country_code = substr($langs->defaultlang, -2); // By default if not defined
 	}
@@ -173,10 +173,10 @@ class doc_groupmentdocument_custom_odt extends ModeleODTGroupmentDocument
 		$texte .= '<input type="hidden" name="action" value="setModuleOptions">';
 		$texte .= '<input type="hidden" name="param1" value="DIGIRISKDOLIBARR_GROUPMENTDOCUMENT_CUSTOM_ADDON_ODT_PATH">';
 		$texte .= '<input type="hidden" name="value1" value="' . $conf->global->DIGIRISKDOLIBARR_GROUPMENTDOCUMENT_CUSTOM_ADDON_ODT_PATH . '">';
-		$texte .= '<table class="nobordernopadding" width="100%">';
+		$texte .= '<table class="nobordernopadding">';
 
 		// List of directories area
-		$texte      .= '<tr><td valign="middle">';
+		$texte      .= '<tr><td>';
 		$texttitle   = $langs->trans("ListOfDirectories");
 		$listofdir   = explode(',', preg_replace('/[\r\n]+/', ',', trim($conf->global->DIGIRISKDOLIBARR_GROUPMENTDOCUMENT_CUSTOM_ADDON_ODT_PATH)));
 		$listoffiles = array();
@@ -200,7 +200,7 @@ class doc_groupmentdocument_custom_odt extends ModeleODTGroupmentDocument
 
 		$texte .= $form->textwithpicto($texttitle, $texthelp, 1, 'help', '', 1);
 		$texte .= '<div><div style="display: inline-block; min-width: 100px; vertical-align: middle;">';
-		$texte .= '<span class="flat" cols="60" name="value1" style="font-weight: bold">';
+		$texte .= '<span class="flat" style="font-weight: bold">';
 		$texte .= $conf->global->DIGIRISKDOLIBARR_GROUPMENTDOCUMENT_CUSTOM_ADDON_ODT_PATH;
 		$texte .= '</span>';
 		$texte .= '</div><div style="display: inline-block; vertical-align: middle;">';
@@ -239,18 +239,17 @@ class doc_groupmentdocument_custom_odt extends ModeleODTGroupmentDocument
 	}
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
 	/**
 	 *  Function to build a document on disk using the generic odt module.
 	 *
-	 *	@param		GroupmentDocument	$object				Object source to build document
-	 *	@param		Translate	$outputlangs		Lang output object
-	 * 	@param		string		$srctemplatepath	Full path of source filename for generator using a template file
-	 *  @param		int			$hidedetails		Do not show line details
-	 *  @param		int			$hidedesc			Do not show desc
-	 *  @param		int			$hideref			Do not show ref
-	 *	@return		int         					1 if OK, <=0 if KO
+	 * @param GroupmentDocument $object Object source to build document
+	 * @param Translate $outputlangs Lang output object
+	 * @param string $srctemplatepath Full path of source filename for generator using a template file
+	 * @return        int                            1 if OK, <=0 if KO
+	 * @throws Exception
 	 */
-	public function write_file($object, $outputlangs, $srctemplatepath, $hidedetails = 0, $hidedesc = 0, $hideref = 0)
+	public function write_file($object, $outputlangs, $srctemplatepath)
 	{
 		// phpcs:enable
 		global $user, $langs, $conf, $hookmanager, $action;
@@ -312,7 +311,7 @@ class doc_groupmentdocument_custom_odt extends ModeleODTGroupmentDocument
 			complete_substitutions_array($substitutionarray, $langs, $object);
 			// Call the ODTSubstitution hook
 			$parameters = array('file' => $file, 'object' => $object, 'outputlangs' => $outputlangs, 'substitutionarray' => &$substitutionarray);
-			$reshook    = $hookmanager->executeHooks('ODTSubstitution', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
+			$hookmanager->executeHooks('ODTSubstitution', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
 
 			// Open and load template
 			require_once ODTPHP_PATH . 'odf.php';
@@ -342,7 +341,7 @@ class doc_groupmentdocument_custom_odt extends ModeleODTGroupmentDocument
 
 			// Call the ODTSubstitution hook
 			$parameters = array('odfHandler' => &$odfHandler, 'file' => $file, 'object' => $object, 'outputlangs' => $outputlangs, 'substitutionarray' => &$tmparray);
-			$reshook    = $hookmanager->executeHooks('ODTSubstitution', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
+			$hookmanager->executeHooks('ODTSubstitution', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
 
 			foreach ($tmparray as $key => $value) {
 				try {
@@ -370,37 +369,40 @@ class doc_groupmentdocument_custom_odt extends ModeleODTGroupmentDocument
 								foreach ($risks as $line) {
 									$evaluation     = new RiskAssessment($this->db);
 									$lastEvaluation = $evaluation->fetchFromParent($line->id, 1);
-									$lastEvaluation = array_shift($lastEvaluation);
-									$scale          = $lastEvaluation->get_evaluation_scale();
-									if ( $scale == $i ) {
-										$element = new DigiriskElement($this->db);
-										$element->fetch($line->fk_element);
-										$tmparray['nomElement']        = $element->ref . ' - ' . $element->label;
-										$tmparray['nomDanger']         = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $line->get_danger_category($line) . '.png';
-										$tmparray['identifiantRisque'] = $line->ref . ' - ' . $lastEvaluation->ref;
-										$tmparray['quotationRisque']   = $lastEvaluation->cotation;
-										$tmparray['commentaireRisque'] = dol_print_date($lastEvaluation->date_creation, '%A %e %B %G %H:%M') . ': ' . $lastEvaluation->comment;
+									if ($lastEvaluation > 0 && ! empty($lastEvaluation)) {
+										$lastEvaluation = array_shift($lastEvaluation);
+										$scale = $lastEvaluation->get_evaluation_scale();
 
-										unset($tmparray['object_fields']);
+										if ($scale == $i) {
+											$element = new DigiriskElement($this->db);
+											$element->fetch($line->fk_element);
+											$tmparray['nomElement'] = $element->ref . ' - ' . $element->label;
+											$tmparray['nomDanger'] = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $line->get_danger_category($line) . '.png';
+											$tmparray['identifiantRisque'] = $line->ref . ' - ' . $lastEvaluation->ref;
+											$tmparray['quotationRisque'] = $lastEvaluation->cotation;
+											$tmparray['commentaireRisque'] = dol_print_date($lastEvaluation->date_creation, '%A %e %B %G %H:%M') . ': ' . $lastEvaluation->comment;
 
-										complete_substitutions_array($tmparray, $outputlangs, $object, $line, "completesubstitutionarray_lines");
-										// Call the ODTSubstitutionLine hook
-										$parameters = array('odfHandler' => &$odfHandler, 'file' => $file, 'object' => $object, 'outputlangs' => $outputlangs, 'substitutionarray' => &$tmparray, 'line' => $line);
-										$reshook    = $hookmanager->executeHooks('ODTSubstitutionLine', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
-										foreach ($tmparray as $key => $val) {
-											try {
-												if ( $val == $tmparray['nomDanger'] ) {
-													$listlines->setImage($key, $val);
-												} else {
-													$listlines->setVars($key, $val, true, 'UTF-8');
+											unset($tmparray['object_fields']);
+
+											complete_substitutions_array($tmparray, $outputlangs, $object, $line, "completesubstitutionarray_lines");
+											// Call the ODTSubstitutionLine hook
+											$parameters = array('odfHandler' => &$odfHandler, 'file' => $file, 'object' => $object, 'outputlangs' => $outputlangs, 'substitutionarray' => &$tmparray, 'line' => $line);
+											$hookmanager->executeHooks('ODTSubstitutionLine', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
+											foreach ($tmparray as $key => $val) {
+												try {
+													if ($val == $tmparray['nomDanger']) {
+														$listlines->setImage($key, $val);
+													} else {
+														$listlines->setVars($key, $val, true, 'UTF-8');
+													}
+												} catch (OdfException $e) {
+													dol_syslog($e->getMessage(), LOG_INFO);
+												} catch (SegmentException $e) {
+													dol_syslog($e->getMessage(), LOG_INFO);
 												}
-											} catch (OdfException $e) {
-												dol_syslog($e->getMessage(), LOG_INFO);
-											} catch (SegmentException $e) {
-												dol_syslog($e->getMessage(), LOG_INFO);
 											}
+											$listlines->merge();
 										}
-										$listlines->merge();
 									}
 								}
 								$odfHandler->mergeSegment($listlines);
@@ -408,18 +410,19 @@ class doc_groupmentdocument_custom_odt extends ModeleODTGroupmentDocument
 						}
 					}
 
-					$signalisation = new DigiriskSignalisation($this->db);
+					$signalisation = new RiskSign($this->db);
 
 					if ( ! empty($object) ) {
 						$signalisations = $signalisation->fetchFromParent($object->id);
+						$listlines = '';
 						if ($signalisations !== -1) {
 							$listlines = $odfHandler->setSegment('affectedRecommandation');
 							foreach ($signalisations as $line) {
 								$path = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/img/';
 
-								$tmparray['recommandationIcon']        = $path . '/' . $signalisation->get_signalisation_category($signalisation);
+								$tmparray['recommandationIcon']        = $path . '/' . $signalisation->get_risksign_category($signalisation);
 								$tmparray['identifiantRecommandation'] = $line->ref;
-								$tmparray['recommandationName']        = $line->get_signalisation_category($line, 'name');
+								$tmparray['recommandationName']        = $line->get_risksign_category($line, 'name');
 								$tmparray['recommandationComment']     = $line->description;
 
 								unset($tmparray['object_fields']);
@@ -427,7 +430,7 @@ class doc_groupmentdocument_custom_odt extends ModeleODTGroupmentDocument
 								complete_substitutions_array($tmparray, $outputlangs, $object, $line, "completesubstitutionarray_lines");
 								// Call the ODTSubstitutionLine hook
 								$parameters = array('odfHandler' => &$odfHandler, 'file' => $file, 'object' => $object, 'outputlangs' => $outputlangs, 'substitutionarray' => &$tmparray, 'line' => $line);
-								$reshook    = $hookmanager->executeHooks('ODTSubstitutionLine', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
+								$hookmanager->executeHooks('ODTSubstitutionLine', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
 								foreach ($tmparray as $key => $val) {
 									try {
 										if (file_exists($val)) {
@@ -465,7 +468,7 @@ class doc_groupmentdocument_custom_odt extends ModeleODTGroupmentDocument
 
 			// Call the beforeODTSave hook
 			$parameters = array('odfHandler' => &$odfHandler, 'file' => $file, 'object' => $object, 'outputlangs' => $outputlangs, 'substitutionarray' => &$tmparray);
-			$reshook    = $hookmanager->executeHooks('beforeODTSave', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
+			$hookmanager->executeHooks('beforeODTSave', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
 
 			// Write new file
 			if ( ! empty($conf->global->MAIN_ODT_AS_PDF)) {
@@ -487,7 +490,7 @@ class doc_groupmentdocument_custom_odt extends ModeleODTGroupmentDocument
 			}
 
 			$parameters = array('odfHandler' => &$odfHandler, 'file' => $file, 'object' => $object, 'outputlangs' => $outputlangs, 'substitutionarray' => &$tmparray);
-			$reshook    = $hookmanager->executeHooks('afterODTCreation', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
+			$hookmanager->executeHooks('afterODTCreation', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
 
 //			if ( ! empty($conf->global->MAIN_UMASK))
 //				@chmod($file, octdec($conf->global->MAIN_UMASK));
@@ -501,7 +504,5 @@ class doc_groupmentdocument_custom_odt extends ModeleODTGroupmentDocument
 			$this->error = $langs->transnoentities("ErrorCanNotCreateDir", $dir);
 			return -1;
 		}
-
-		return -1;
 	}
 }
