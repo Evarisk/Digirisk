@@ -523,8 +523,9 @@ class DigiriskElement extends CommonObject
 		$resql = $this->db->query($sql);
 
 		if ($resql) {
+			$num = $this->db->num_rows($resql);
 			$i   = 0;
-			$obj = '';
+			$obj = new StdClass();
 			while ($i < $num) {
 				$obj = $this->db->fetch_object($resql);
 				$i++;
