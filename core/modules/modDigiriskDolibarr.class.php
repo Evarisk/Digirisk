@@ -1124,7 +1124,9 @@ class modDigiriskdolibarr extends DolibarrModules
 		$extra_fields->addExtraField('fk_accident', $langs->trans("fk_accident"), 'sellist', 1020, '', 'projet_task', 0, 0, '', 'a:1:{s:7:"options";a:1:{s:50:"digiriskdolibarr_accident:ref:rowid::entity = $ENTITY$";N;}a:1:{s:7:"options";a:1:{s:50:"digiriskdolibarr_risk:ref:rowid::entity = $ENTITY$";N;}}}', '', '', 1);
 
 		//Used for data import from Digirisk Wordpress
-		$extra_fields->addExtraField('wp_digi_id', $langs->trans("WPDigiID"), 'int', 100, '', 'digiriskdolibarr_digiriskelement', 1, 0, '', '', '', '', 0);
+		$extra_fields->update('wp_digi_id', $langs->trans("WPDigiID"), 'int', 100, 'digiriskdolibarr_digiriskelement', 0, 0, 1020, '', '', '', 1);
+		$extra_fields->addExtraField('wp_digi_id', $langs->trans("WPDigiID"), 'int', 100, '', 'digiriskdolibarr_digiriskelement', 0, 0, '', '', '', '', 0);
+		$extra_fields->addExtraField('entity', $langs->trans("Entity"), 'int', 100, '', 'digiriskdolibarr_digiriskelement', 0, 0, '', '', '', '', 0);
 
 		$extra_fields->addExtraField('professional_qualification', $langs->trans("ProfessionalQualification"), 'varchar', 990, 255, 'user', 0, 0, '', 'a:1:{s:7:"options";a:1:{s:0:"";N;}}', 1, '', 1, '', '', 0, 'digiriskdolibarr');
 		$extra_fields->addExtraField('contract_type', $langs->trans("ContractType"), 'select', 1000, '', 'user', 0, 0, '', 'a:1:{s:7:"options";a:5:{i:1;s:3:"CDI";i:2;s:3:"CDD";i:3;s:18:"Apprentice/Student";i:4;s:7:"Interim";i:5;s:5:"Other";}}', 1, '', 1, '', '', 0, 'digiriskdolibarr');

@@ -510,19 +510,25 @@ class DigiriskElement extends CommonObject
 	 */
 	public function fetch_id_from_wp_digi_id($wp_digi_id)
 	{
+		global $conf;
+
 		dol_syslog(__METHOD__, LOG_DEBUG);
 
 		$sql  = 'SELECT ';
 		$sql .= ' *';
 		$sql .= ' FROM ' . MAIN_DB_PREFIX . $this->table_element . '_extrafields as t';
 		$sql .= ' WHERE wp_digi_id =' . $wp_digi_id;
+		$sql .= ' AND entity =' . $conf->entity;
 
 		$resql = $this->db->query($sql);
+
 		if ($resql) {
 			$i   = 0;
 			$obj = '';
-			while ($i < 1) {
+			while ($i < $num) {
 				$obj = $this->db->fetch_object($resql);
+				echo '<pre>'; print_r( $obj ); echo '</pre>'; exit;
+
 				$i++;
 			}
 			$this->db->free($resql);
