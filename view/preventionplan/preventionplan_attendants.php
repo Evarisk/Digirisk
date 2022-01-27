@@ -140,7 +140,7 @@ if ($action == 'addSignature') {
 
 		if ($result > 0) {
 			// Creation signature OK
-			$signatory->setSigned($user, false);
+			$signatory->setSigned($user, 0);
 			$urltogo = str_replace('__ID__', $result, $backtopage);
 			$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
 			header("Location: " . $urltogo);
@@ -160,7 +160,7 @@ if ($action == 'setAbsent') {
 	$signatory->fetch($signatoryID);
 
 	if ( ! $error) {
-		$result = $signatory->setAbsent($user, false);
+		$result = $signatory->setAbsent($user, 0);
 		if ($result > 0) {
 			// set absent OK
 			setEventMessages($langs->trans('Attendant') . ' ' . $signatory->firstname . ' ' . $signatory->lastname . ' ' . $langs->trans('SetAbsentAttendant'), array());
@@ -245,7 +245,7 @@ if ($action == 'deleteAttendant') {
 	$signatory->fetch($signatoryToDeleteID);
 
 	if ( ! $error) {
-		$result = $signatory->setDeleted($user, false);
+		$result = $signatory->setDeleted($user, 0);
 		if ($result > 0) {
 			setEventMessages($langs->trans('DeleteAttendantMessage') . ' ' . $signatory->firstname . ' ' . $signatory->lastname, array());
 			// Deletion attendant OK
@@ -350,7 +350,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 
 	//Master builder -- Maitre Oeuvre
 	$element = $signatory->fetchSignatory('PP_MAITRE_OEUVRE', $id, 'preventionplan');
-	if ($element > 0) {
+	if (is_array($element)) {
 		$element = array_shift($element);
 		$usertmp->fetch($element->element_id);
 	}
@@ -538,8 +538,11 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 
 		//Intervenants extérieurs
 		$ext_society = $digiriskresources->fetchResourcesFromObject('PP_EXT_SOCIETY', $object);
+		if ($ext_society < 1) {
+			$ext_society = new StdClass();
+		}
 		print '<tr class="oddeven"><td class="maxwidth200">';
-		print digirisk_selectcontacts($ext_society->id, GETPOST('ext_intervenants'), 'ext_intervenants[]', 0, $contacts_no_email, '', 0, 'width200', false, 1, array(), false, 'multiple', 'ext_intervenants', false, 0, $already_selected_intervenants);
+		print digirisk_selectcontacts($ext_society->id, GETPOST('ext_intervenants'), 'ext_intervenants[]', 0, $contacts_no_email, '', 0, 'width200', false, 1, 0, array(), 'multiple', 'ext_intervenants', false, 0, $already_selected_intervenants);
 		print '</td>';
 		print '<td>' . $langs->trans("ExtSocietyIntervenants") . '</td>';
 		print '<td class="center">';

@@ -140,7 +140,7 @@ class FirePermitDocument extends DigiriskDocuments
 		if ($labourinspectorcontact < 1) {
 			$labourinspectorcontact = new StdClass();
 		}
-		
+
 		$json = array();
 
 		if (!empty ($digirisk_resources)) {
