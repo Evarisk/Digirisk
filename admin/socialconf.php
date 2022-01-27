@@ -94,10 +94,10 @@ if (empty($reshook)) {
 		dolibarr_set_const($db, "DIGIRISK_CSE_ELECTION_DATE", $electionDateCSE, 'date', 0, '', $conf->entity);
 		dolibarr_set_const($db, "DIGIRISK_DP_ELECTION_DATE", $electionDateDP, 'date', 0, '', $conf->entity);
 
-		$CSEtitulaires = ! empty(GETPOST('TitularsCSE', 'array')) ? GETPOST('TitularsCSE', 'array') : (GETPOST('TitularsCSE', 'int') > 0 ? GETPOST('TitularsCSE', 'int') : 0);
-		$CSEsuppleants = ! empty(GETPOST('AlternatesCSE', 'array')) ? GETPOST('AlternatesCSE', 'array') : (GETPOST('AlternatesCSE', 'int') > 0 ? GETPOST('AlternatesCSE', 'int') : 0);
-		$TitularsDP    = ! empty(GETPOST('TitularsDP', 'array')) ? GETPOST('TitularsDP', 'array') : (GETPOST('TitularsDP', 'int') > 0 ? GETPOST('TitularsDP', 'int') : 0);
-		$AlternatesDP  = ! empty(GETPOST('AlternatesDP', 'array')) ? GETPOST('AlternatesDP', 'array') : (GETPOST('AlternatesDP', 'int') > 0 ? GETPOST('AlternatesDP', 'int') : 0);
+		$CSEtitulaires = ! empty(GETPOST('TitularsCSE', 'array')) ? GETPOST('TitularsCSE', 'array') : (GETPOST('TitularsCSE', 'int') > 0 ? array(GETPOST('TitularsCSE', 'int')) : array());
+		$CSEsuppleants = ! empty(GETPOST('AlternatesCSE', 'array')) ? GETPOST('AlternatesCSE', 'array') : (GETPOST('AlternatesCSE', 'int') > 0 ? array(GETPOST('AlternatesCSE', 'int')) : array());
+		$TitularsDP    = ! empty(GETPOST('TitularsDP', 'array')) ? GETPOST('TitularsDP', 'array') : (GETPOST('TitularsDP', 'int') > 0 ? array(GETPOST('TitularsDP', 'int')) : array());
+		$AlternatesDP  = ! empty(GETPOST('AlternatesDP', 'array')) ? GETPOST('AlternatesDP', 'array') : (GETPOST('AlternatesDP', 'int') > 0 ? array(GETPOST('AlternatesDP', 'int')) : array());
 
 		$resources->digirisk_dolibarr_set_resources($db, $user->id, 'TitularsCSE', 'societe', $CSEtitulaires, $conf->entity);
 		$resources->digirisk_dolibarr_set_resources($db, $user->id, 'AlternatesCSE', 'societe', $CSEsuppleants, $conf->entity);

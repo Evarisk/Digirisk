@@ -120,12 +120,28 @@ class FirePermitDocument extends DigiriskDocuments
 		$preventionplanlines = $preventionplanline->fetchAll($firepermit->fk_preventionplan);
 		$digirisk_resources  = $resources->digirisk_dolibarr_fetch_resources();
 
-		$extsociety             = $resources->fetchResourcesFromObject('FP_EXT_SOCIETY', $firepermit);
-		$maitreoeuvre           = array_shift($signatory->fetchSignatory('FP_MAITRE_OEUVRE', $firepermit->id, 'firepermit'));
-		$extsocietyresponsible  = array_shift($signatory->fetchSignatory('FP_EXT_SOCIETY_RESPONSIBLE', $firepermit->id, 'firepermit'));
+		$extsociety          = $resources->fetchResourcesFromObject('FP_EXT_SOCIETY', $firepermit);
+		if ($extsociety < 1) {
+			$extsociety = new StdClass();
+		}
+		$maitreoeuvre           = $signatory->fetchSignatory('FP_MAITRE_OEUVRE', $firepermit->id, 'firepermit');
+		$maitreoeuvre           = is_array($maitreoeuvre) ? array_shift($maitreoeuvre) : $maitreoeuvre;
+
+		$extsocietyresponsible  = $signatory->fetchSignatory('FP_EXT_SOCIETY_RESPONSIBLE', $firepermit->id, 'firepermit');
+		$extsocietyresponsible  = is_array($extsocietyresponsible) ? array_shift($extsocietyresponsible) : $extsocietyresponsible;
+
 		$extsocietyintervenants = $signatory->fetchSignatory('FP_EXT_SOCIETY_INTERVENANTS', $firepermit->id, 'firepermit');
 		$labourinspector        = $resources->fetchResourcesFromObject('FP_LABOUR_INSPECTOR', $firepermit);
+		if ($labourinspector < 1) {
+			$labourinspector = new StdClass();
+		}
+
 		$labourinspectorcontact = $resources->fetchResourcesFromObject('FP_LABOUR_INSPECTOR_ASSIGNED', $firepermit);
+		if ($labourinspectorcontact < 1) {
+			$labourinspectorcontact = new StdClass();
+		}
+		
+		$json = array();
 
 		if (!empty ($digirisk_resources)) {
 			$societe->fetch($digirisk_resources['Pompiers']->id[0]);
@@ -142,6 +158,7 @@ class FirePermitDocument extends DigiriskDocuments
 		}
 
 		if ($maitreoeuvre->id > 0) {
+			$json['FirePermit']['maitre_oeuvre'] = array();
 			$json['FirePermit']['maitre_oeuvre']['user_id']        = $maitreoeuvre->id;
 			$json['FirePermit']['maitre_oeuvre']['phone']          = $maitreoeuvre->phone;
 			$json['FirePermit']['maitre_oeuvre']['firstname']      = $maitreoeuvre->firstname;
@@ -151,7 +168,8 @@ class FirePermitDocument extends DigiriskDocuments
 			$json['FirePermit']['maitre_oeuvre']['signature_date'] = $maitreoeuvre->signature_date;
 		}
 
-		if ($extsociety->id > 0) {
+		if (is_object($extsociety) && $extsociety->id > 0) {
+			$json['FirePermit']['society_outside'] = array();
 			$json['FirePermit']['society_outside']['id']      = $extsociety->id;
 			$json['FirePermit']['society_outside']['name']    = $extsociety->name;
 			$json['FirePermit']['society_outside']['siret']   = $extsociety->siret;
@@ -161,6 +179,7 @@ class FirePermitDocument extends DigiriskDocuments
 		}
 
 		if ($extsocietyresponsible->id > 0) {
+			$json['FirePermit']['responsable_exterieur'] = array();
 			$json['FirePermit']['responsable_exterieur']['id']             = $extsocietyresponsible->id;
 			$json['FirePermit']['responsable_exterieur']['firstname']      = $extsocietyresponsible->firstname;
 			$json['FirePermit']['responsable_exterieur']['lastname']       = $extsocietyresponsible->lastname;
@@ -172,6 +191,7 @@ class FirePermitDocument extends DigiriskDocuments
 
 		if (!empty ($extsocietyintervenants) && $extsocietyintervenants > 0) {
 			foreach ($extsocietyintervenants as $extsocietyintervenant) {
+				$json['FirePermit']['intervenant_exterieur'] = array();
 				$json['FirePermit']['intervenant_exterieur'][$extsocietyintervenant->id]['firstname'] = $extsocietyintervenant->firstname;
 				$json['FirePermit']['intervenant_exterieur'][$extsocietyintervenant->id]['lastname'] = $extsocietyintervenant->lastname;
 				$json['FirePermit']['intervenant_exterieur'][$extsocietyintervenant->id]['phone'] = $extsocietyintervenant->phone;
@@ -182,6 +202,7 @@ class FirePermitDocument extends DigiriskDocuments
 		}
 
 		if ($labourinspector->id > 0) {
+			$json['FirePermit']['labour_inspector'] = array();
 			$json['FirePermit']['labour_inspector']['id']      = $extsociety->id;
 			$json['FirePermit']['labour_inspector']['name']    = $extsociety->name;
 			$json['FirePermit']['labour_inspector']['siret']   = $extsociety->siret;
@@ -191,6 +212,7 @@ class FirePermitDocument extends DigiriskDocuments
 		}
 
 		if ($labourinspectorcontact->id > 0) {
+			$json['FirePermit']['labour_inspector_contact'] = array();
 			$json['FirePermit']['labour_inspector_contact']['id']        = $extsocietyresponsible->id;
 			$json['FirePermit']['labour_inspector_contact']['firstname'] = $extsocietyresponsible->firstname;
 			$json['FirePermit']['labour_inspector_contact']['lastname']  = $extsocietyresponsible->lastname;

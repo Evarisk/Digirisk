@@ -62,6 +62,11 @@ class Accident extends CommonObject
 	public $id;
 
 	/**
+	 * @var array The object lines
+	 */
+	public $lines;
+
+	/**
 	 * @var string ID to identify managed object.
 	 */
 	public $element = 'accident';
@@ -232,7 +237,6 @@ class Accident extends CommonObject
 	public function fetchLines()
 	{
 		$this->lines = array();
-
 		return $this->fetchLinesCommon();
 	}
 
