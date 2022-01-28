@@ -38,7 +38,7 @@
  *  @param		int		$usesharelink	Use the public shared link of image (if not available, the 'nophoto' image will be shown instead)
  *  @return     string					Html code to show photo. Number of photos shown is saved in this->nbphoto
  */
-function digirisk_show_photos($modulepart, $sdir, $size = 0, $nbmax = 0, $nbbyrow = 5, $showfilename = 0, $showaction = 0, $maxHeight = 120, $maxWidth = 160, $nolink = 0, $notitle = 0, $usesharelink = 0, $subdir = "", $object = null)
+function digirisk_show_photos($modulepart, $sdir, $size = '', $nbmax = 0, $nbbyrow = 5, $showfilename = 0, $showaction = 0, $maxHeight = 120, $maxWidth = 160, $nolink = 0, $notitle = 0, $usesharelink = 0, $subdir = "", $object = null)
 {
 	global $conf, $user, $langs;
 
@@ -88,7 +88,7 @@ function digirisk_show_photos($modulepart, $sdir, $size = 0, $nbmax = 0, $nbbyro
 				$photo        = $file;
 				$viewfilename = $file;
 
-				if ($size == 1 || $size == 'small') {   // Format vignette
+				if ($size == 'small') {   // Format vignette
 					// Find name of thumb file
 					$photo_vignette = basename(getImageFileNameForSize($dir . $file, '_small'));
 

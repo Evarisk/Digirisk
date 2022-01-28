@@ -99,10 +99,12 @@ if (empty($reshook)) {
 		$array_ids        = preg_split('/,/', $ids);
 		$array_parent_ids = preg_split('/,/', $parent_ids);
 		$i                = 0;
+		echo '<pre>'; print_r( $array_ids ); echo '</pre>'; exit;
+
 		if ( ! empty($array_ids) && $array_ids > 0) {
 			foreach ($array_ids as $id) {
 				$digiriskelement = new DigiriskElement($db);
-				$digiriskelement->fetch($id);
+				$digiriskelement->fetch((int) $id);
 				$digiriskelement->rank      = $i + 1;
 				$digiriskelement->fk_parent = $array_parent_ids[$i];
 
@@ -118,7 +120,7 @@ if (empty($reshook)) {
  */
 
 $form        = new Form($db);
-$emptyobject = new stdClass($db);
+$emptyobject = new stdClass();
 $formconfirm = '';
 
 $parameters                        = array('formConfirm' => $formconfirm, 'object' => $object);
@@ -138,7 +140,12 @@ llxHeader('', $title, $help_url, '', '', '', $morejs, $morecss);
 <div id="cardContent" value="">
 <?php
 $objects = $object->fetchAll('',  'rank',  0,  0, array('customsql' => 'status > 0'));
-$results = recurse_tree(0, 0, $objects); ?>
+if (is_array($objects)) {
+	$results = recurse_tree(0, 0, $objects);
+} else {
+	$results = array();
+}
+?>
 
 <script>
 	$(document).ready(function() {

@@ -405,7 +405,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 
 	//External Society Responsible -- Responsable Société extérieure
 	$element = $signatory->fetchSignatory('FP_EXT_SOCIETY_RESPONSIBLE', $id, 'firepermit');
-	if ($element > 0) {
+	if (is_array($element)) {
 		$element = array_shift($element);
 		$contact->fetch($element->element_id);
 	}

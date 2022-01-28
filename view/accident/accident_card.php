@@ -813,12 +813,9 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 				$totalworkstopdays += $accidentline->workstop_days;
 			}
 		}
-	}
-
-	if (empty($totalworkstopdays)) {
-		$morehtmlref .= '<br>' . $langs->trans('RegisterAccident');
-	} else {
 		$morehtmlref .= '<br>' . $langs->trans('TotalWorkStopDays') . ' : ' . $totalworkstopdays;
+	}
+		$morehtmlref .= '<br>' . $langs->trans('RegisterAccident');
 	}
 
 	$morehtmlref .= '</div>';
@@ -827,7 +824,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 
 	$morehtmlleft = '<div class="floatleft inline-block valignmiddle divphotoref">' . digirisk_show_photos('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/' . $object->element, 'small', 5, 0, 0, 0, $width, 0, 0, 0, 0, $object->element, $object) . '</div>';
 
-	digirisk_banner_tab($object, 'ref', '', 0, 'ref', 'ref', $morehtmlref, '', '', $morehtmlleft);
+	digirisk_banner_tab($object, 'ref', '', 0, 'ref', 'ref', $morehtmlref, '', 0, $morehtmlleft);
 
 	print '<div class="div-table-responsive">';
 	print '<div class="fichecenter">';
@@ -1234,7 +1231,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 		$defaultmodel = $conf->global->DIGIRISKDOLIBARR_ACCIDENTDOCUMENT_DEFAULT_MODEL;
 		$title        = $langs->trans('AccidentDocument');
 
-		print digiriskshowdocuments($modulepart, $dir_files, $filedir, $urlsource, $permissiontoadd, $permissiontodelete, $defaultmodel, 1, 0, 28, 0, '', $title, '', $langs->defaultlang, '', $accidentdocument, 0, 'remove_file', $object->status == 3, $langs->trans('AccidentMustBeLocked'));
+		print digiriskshowdocuments($modulepart, $dir_files, $filedir, $urlsource, $permissiontoadd, $permissiontodelete, $defaultmodel, 1, 0, 28, 0, '', $title, '', $langs->defaultlang, '', $accidentdocument, 0, 'remove_file', $object->status == 3 ? 1 : 0, $langs->trans('AccidentMustBeLocked'));
 	}
 
 	if ($permissiontoadd) {
