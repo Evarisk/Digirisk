@@ -168,7 +168,7 @@ $help_url = 'FR:Module_DigiriskDolibarr#Listing_des_actions_correctives';
 $morejs   = array("/digiriskdolibarr/js/digiriskdolibarr.js.php");
 $morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");
 
-digiriskHeader('', $title, $help_url, '', 0, 0, $morejs, $morecss); ?>
+digiriskHeader($title, $help_url, $morejs, $morecss); ?>
 
 <div id="cardContent" value="">
 
@@ -250,7 +250,7 @@ if ($includedocgeneration) {
 
 	$modulepart = 'digiriskdolibarr:ListingRisksAction';
 
-	print digiriskshowdocuments($modulepart, $dir_files, $filedir, $urlsource, $permissiontoadd, $permissiontodelete, $conf->global->DIGIRISKDOLIBARR_LISTINGRISKSACTION_DEFAULT_MODEL, 1, 0, 28, 0, '', $langs->trans('ListingRisksAction'), '', $langs->defaultlang, '', $listingrisksaction);
+	print digiriskshowdocuments($modulepart, $dir_files, $filedir, $urlsource, $permissiontoadd, $permissiontodelete, $conf->global->DIGIRISKDOLIBARR_LISTINGRISKSACTION_DEFAULT_MODEL, 1, 0, '', $langs->trans('ListingRisksAction'), '', '', $listingrisksaction);
 }
 
 // End of page

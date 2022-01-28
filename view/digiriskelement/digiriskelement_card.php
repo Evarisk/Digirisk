@@ -253,7 +253,7 @@ $help_url = 'FR:Module_DigiriskDolibarr';
 $morejs   = array("/digiriskdolibarr/js/digiriskdolibarr.js.php");
 $morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");
 
-digiriskHeader('', $title, $help_url, '', 0, 0, $morejs, $morecss); ?>
+digiriskHeader($title, $help_url, $morejs, $morecss); ?>
 
 	<div id="cardContent" value="">
 
@@ -528,7 +528,7 @@ if ((empty($action) || ($action != 'edit' && $action != 'create'))) {
 				$title        = $langs->trans('WorkUnitDocument');
 			}
 
-			print digiriskshowdocuments($modulepart, $dir_files, $filedir, $urlsource, $permissiontoadd, $permissiontodelete, $defaultmodel, 1, 0, 28, 0, '', $title, '', $langs->defaultlang, '', $digiriskelementdocument);
+			print digiriskshowdocuments($modulepart, $dir_files, $filedir, $urlsource, $permissiontoadd, $permissiontodelete, $defaultmodel, 1, 0, '', $title, '', '', $digiriskelementdocument);
 		}
 
 

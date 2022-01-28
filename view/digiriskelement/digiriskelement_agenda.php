@@ -128,7 +128,7 @@ if ($object->id > 0) {
 	$morejs   = array("/digiriskdolibarr/js/digiriskdolibarr.js.php");
 	$morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");
 
-	digiriskHeader('', $title, $help_url, '', 0, 0, $morejs, $morecss);
+	digiriskHeader($title, $help_url, $morejs, $morecss);
 	print '<div id="cardContent" value="">';
 
 	if ( ! empty($conf->notification->enabled)) $langs->load("mails");

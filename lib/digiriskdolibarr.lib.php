@@ -28,7 +28,7 @@
  */
 function digiriskdolibarrAdminPrepareHead()
 {
-	global $langs, $conf, $user;
+	global $langs, $conf;
 
 	$langs->load("digiriskdolibarr@digiriskdolibarr");
 

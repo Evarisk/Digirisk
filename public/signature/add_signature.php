@@ -147,21 +147,19 @@ if ($action == 'builddoc') {
 		setEventMessages($object->error, $object->errors, 'errors');
 
 		$action = '';
-	} else {
-		if (empty($donotredirect)) {
-			$document_name = $objectdocument->last_main_doc;
+	} elseif (empty($donotredirect)) {
+		$document_name = $objectdocument->last_main_doc;
 
-			copy($conf->digiriskdolibarr->multidir_output[isset($object->entity) ? $object->entity : 1] . '/' . $type . '/' . $object->ref . '/specimen/' . $document_name, DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/documents/temp/' . $type . '_specimen_' . $track_id . '.odt');
+		copy($conf->digiriskdolibarr->multidir_output[isset($object->entity) ? $object->entity : 1] . '/' . $type . '/' . $object->ref . '/specimen/' . $document_name, DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/documents/temp/' . $type . '_specimen_' . $track_id . '.odt');
 
-			setEventMessages($langs->trans("FileGenerated") . ' - ' . $document_name, null);
+		setEventMessages($langs->trans("FileGenerated") . ' - ' . $document_name, null);
 
-			$urltoredirect = $_SERVER['REQUEST_URI'];
-			$urltoredirect = preg_replace('/#builddoc$/', '', $urltoredirect);
-			$urltoredirect = preg_replace('/action=builddoc&?/', '', $urltoredirect); // To avoid infinite loop
+		$urltoredirect = $_SERVER['REQUEST_URI'];
+		$urltoredirect = preg_replace('/#builddoc$/', '', $urltoredirect);
+		$urltoredirect = preg_replace('/action=builddoc&?/', '', $urltoredirect); // To avoid infinite loop
 
-			header('Location: ' . $urltoredirect . '#builddoc');
-			exit;
-		}
+		header('Location: ' . $urltoredirect . '#builddoc');
+		exit;
 	}
 }
 

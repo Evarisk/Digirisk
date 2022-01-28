@@ -155,7 +155,7 @@ $help_url = 'FR:Module_DigiriskDolibarr#Affichage_l.C3.A9gal';
 $morejs   = array("/digiriskdolibarr/js/digiriskdolibarr.js.php");
 $morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");
 
-digiriskHeader('', $title, $help_url, '', 0, 0, $morejs, $morecss); ?>
+digiriskHeader($title, $help_url, $morejs, $morecss); ?>
 
 <div id="cardContent" value="">
 
@@ -195,7 +195,7 @@ if ($includedocgeneration) {
 	$urlsource  = $_SERVER["PHP_SELF"];
 	$modulepart = 'digiriskdolibarr:LegalDisplay';
 
-	print digiriskshowdocuments($modulepart, $dir_files, $filedir, $urlsource, $permissiontoadd, $permissiontodelete, $conf->global->DIGIRISKDOLIBARR_LEGALDISPLAY_DEFAULT_MODEL, 1, 0, 28, 0, '', $langs->trans('LegalDisplay'), '', $langs->defaultlang, '', $legaldisplay);
+	print digiriskshowdocuments($modulepart, $dir_files, $filedir, $urlsource, $permissiontoadd, $permissiontodelete, $conf->global->DIGIRISKDOLIBARR_LEGALDISPLAY_DEFAULT_MODEL, 1, 0, '', $langs->trans('LegalDisplay'), '', '', $legaldisplay);
 }
 
 // End of page
