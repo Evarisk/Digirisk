@@ -34,6 +34,313 @@ include_once DOL_DOCUMENT_ROOT . '/core/modules/DolibarrModules.class.php';
 class modDigiriskdolibarr extends DolibarrModules
 {
 	/**
+	 * @var DoliDb Database handler
+	 */
+	public $db;
+
+	/**
+	 * @var int Module unique ID
+	 * @see https://wiki.dolibarr.org/index.php/List_of_modules_id
+	 */
+	public $numero;
+
+	/**
+	 * @var   string Publisher name
+	 * @since 4.0.0
+	 */
+	public $editor_name;
+
+	/**
+	 * @var   string URL of module at publisher site
+	 * @since 4.0.0
+	 */
+	public $editor_url;
+
+	/**
+	 * @var string Family
+	 * @see $familyinfo
+	 *
+	 * Native values: 'crm', 'financial', 'hr', 'projects', 'products', 'ecm', 'technic', 'other'.
+	 * Use familyinfo to declare a custom value.
+	 */
+	public $family;
+
+	/**
+	 * @var array Custom family informations
+	 * @see $family
+	 *
+	 * e.g.:
+	 * array(
+	 *     'myownfamily' => array(
+	 *         'position' => '001',
+	 *         'label' => $langs->trans("MyOwnFamily")
+	 *     )
+	 * );
+	 */
+	public $familyinfo;
+
+	/**
+	 * @var string    Module position on 2 digits
+	 */
+	public $module_position = '50';
+
+	/**
+	 * @var string Module name
+	 *
+	 * Only used if Module[ID]Name translation string is not found.
+	 *
+	 * You can use the following code to automatically derive it from your module's class name:
+	 * preg_replace('/^mod/i', '', get_class($this))
+	 */
+	public $name;
+
+	/**
+	 * @var string[] Paths to create when module is activated
+	 *
+	 * e.g.: array('/mymodule/temp')
+	 */
+	public $dirs = array();
+
+	/**
+	 * @var array Module boxes
+	 */
+	public $boxes = array();
+
+	/**
+	 * @var array Module constants
+	 */
+	public $const = array();
+
+	/**
+	 * @var array Module cron jobs entries
+	 */
+	public $cronjobs = array();
+
+	/**
+	 * @var array Module access rights
+	 */
+	public $rights;
+
+	/**
+	 * @var string Module access rights family
+	 */
+	public $rights_class;
+
+	/**
+	 * @var array|int 	Module menu entries (1 means the menu entries are not declared into module descriptor but are hardcoded into menu manager)
+	 */
+	public $menu = array();
+
+	/**
+	 * @var array Module parts
+	 *  array(
+	 *      // Set this to 1 if module has its own trigger directory (/mymodule/core/triggers)
+	 *      'triggers' => 0,
+	 *      // Set this to 1 if module has its own login method directory (/mymodule/core/login)
+	 *      'login' => 0,
+	 *      // Set this to 1 if module has its own substitution function file (/mymodule/core/substitutions)
+	 *      'substitutions' => 0,
+	 *      // Set this to 1 if module has its own menus handler directory (/mymodule/core/menus)
+	 *      'menus' => 0,
+	 *      // Set this to 1 if module has its own theme directory (/mymodule/theme)
+	 *      'theme' => 0,
+	 *      // Set this to 1 if module overwrite template dir (/mymodule/core/tpl)
+	 *      'tpl' => 0,
+	 *      // Set this to 1 if module has its own barcode directory (/mymodule/core/modules/barcode)
+	 *      'barcode' => 0,
+	 *      // Set this to 1 if module has its own models directory (/mymodule/core/modules/xxx)
+	 *      'models' => 0,
+	 *      // Set this to relative path of css file if module has its own css file
+	 *      'css' => '/mymodule/css/mymodule.css.php',
+	 *      // Set this to relative path of js file if module must load a js on all pages
+	 *      'js' => '/mymodule/js/mymodule.js',
+	 *      // Set here all hooks context managed by module
+	 *      'hooks' => array('hookcontext1','hookcontext2')
+	 *  )
+	 */
+	public $module_parts = array();
+
+	/**
+	 * @var        string Module documents ?
+	 * @deprecated Seems unused anywhere
+	 */
+	public $docs;
+
+	/**
+	 * @var        string ?
+	 * @deprecated Seems unused anywhere
+	 */
+	public $dbversion = "-";
+
+	/**
+	 * @var string Error message
+	 */
+	public $error;
+
+	/**
+	 * @var string Module version
+	 * @see http://semver.org
+	 *
+	 * The following keywords can also be used:
+	 * 'development'
+	 * 'experimental'
+	 * 'dolibarr': only for core modules that share its version
+	 * 'dolibarr_deprecated': only for deprecated core modules
+	 */
+	public $version;
+
+	/**
+	 * Module last version
+	 * @var string $lastVersion
+	 */
+	public $lastVersion = '';
+
+	/**
+	 * true indicate this module need update
+	 * @var bool $needUpdate
+	 */
+	public $needUpdate = false;
+
+	/**
+	 * @var string Module description (short text)
+	 *
+	 * Only used if Module[ID]Desc translation string is not found.
+	 */
+	public $description;
+
+	/**
+	 * @var   string Module description (long text)
+	 * @since 4.0.0
+	 *
+	 * HTML content supported.
+	 */
+	public $descriptionlong;
+
+
+	// For exports
+
+	/**
+	 * @var string Module export code
+	 */
+	public $export_code;
+
+	/**
+	 * @var string Module export label
+	 */
+	public $export_label;
+
+	public $export_permission;
+	public $export_fields_array;
+	public $export_TypeFields_array; // Array of key=>type where type can be 'Numeric', 'Date', 'Text', 'Boolean', 'Status', 'List:xxx:login:rowid'
+	public $export_entities_array;
+	public $export_special_array; // special or computed field
+	public $export_dependencies_array;
+	public $export_sql_start;
+	public $export_sql_end;
+	public $export_sql_order;
+
+
+	// For import
+
+	/**
+	 * @var string Module import code
+	 */
+	public $import_code;
+
+	/**
+	 * @var string Module import label
+	 */
+	public $import_label;
+
+
+	/**
+	 * @var string Module constant name
+	 */
+	public $const_name;
+
+	/**
+	 * @var bool Module can't be disabled
+	 */
+	public $always_enabled;
+
+	/**
+	 * @var int Module is enabled globally (Multicompany support)
+	 */
+	public $core_enabled;
+
+	/**
+	 * @var string Name of image file used for this module
+	 *
+	 * If file is in theme/yourtheme/img directory under name object_pictoname.png use 'pictoname'
+	 * If file is in module/img directory under name object_pictoname.png use 'pictoname@module'
+	 */
+	public $picto;
+
+	/**
+	 * @var string[] List of config pages
+	 *
+	 * Name of php pages stored into module/admin directory, used to setup module.
+	 * e.g.: "admin.php@module"
+	 */
+	public $config_page_url;
+
+
+	/**
+	 * @var string[] List of module class names that must be enabled if this module is enabled. e.g.: array('modAnotherModule', 'FR'=>'modYetAnotherModule')
+	 * @see $requiredby
+	 */
+	public $depends;
+
+	/**
+	 * @var string[] List of module class names to disable if the module is disabled.
+	 * @see $depends
+	 */
+	public $requiredby;
+
+	/**
+	 * @var string[] List of module class names as string this module is in conflict with.
+	 * @see $depends
+	 */
+	public $conflictwith;
+
+	/**
+	 * @var string[] Module language files
+	 */
+	public $langfiles;
+
+	/**
+	 * @var array<string,string> Array of warnings to show when we activate the module
+	 *
+	 * array('always'='text') or array('FR'='text')
+	 */
+	public $warnings_activation;
+
+	/**
+	 * @var array<string,string> Array of warnings to show when we activate an external module
+	 *
+	 * array('always'='text') or array('FR'='text')
+	 */
+	public $warnings_activation_ext;
+
+
+	/**
+	 * @var array Minimum version of PHP required by module.
+	 * e.g.: PHP ≥ 5.6 = array(5, 6)
+	 */
+	public $phpmin;
+
+	/**
+	 * @var array Minimum version of Dolibarr required by module.
+	 * e.g.: Dolibarr ≥ 3.6 = array(3, 6)
+	 */
+	public $need_dolibarr_version;
+
+	/**
+	 * @var bool Whether to hide the module.
+	 */
+	public $hidden = false;
+
+	/**
 	 * Constructor. Define names, constants, directories, boxes, permissions
 	 *
 	 * @param DoliDB $db Database handler

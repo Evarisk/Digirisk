@@ -448,7 +448,7 @@ $defaulttopic           = 'Information';
 $diroutput              = $upload_dir . '/riskassessmentdocument';
 $filter                 = array('customsql' => "t.type='riskassessmentdocument'");
 $riskassessmentdocument = $riskassessmentdocument->fetchAll('desc', 't.rowid', 1, 0, $filter, 'AND');
-if ( ! empty($riskassessmentdocument)) {
+if ( ! empty($riskassessmentdocument) && is_array($riskassessmentdocument)) {
 	$riskassessmentdocument = array_shift($riskassessmentdocument);
 	$ref                    = dol_sanitizeFileName($riskassessmentdocument->ref);
 }
