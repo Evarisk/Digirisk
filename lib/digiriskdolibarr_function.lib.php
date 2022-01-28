@@ -506,15 +506,15 @@ function remove_index($model)
 * @param	string	$help_url			Url links to help page
  * 		                            	Syntax is: For a wiki page: EN:EnglishPage|FR:FrenchPage|ES:SpanishPage
  *                                  	For other external page: http://server/url
-* @param string $arrayofjs Array of complementary js files
-* @param string $arrayofcss Array of complementary css files
+* @param array $arrayofjs Array of complementary js files
+* @param array $arrayofcss Array of complementary css files
 * @param	string	$morequerystring	Query string to add to the link "print" to get same parameters (use only if autodetect fails)
 * @param   string  $morecssonbody      More CSS on body tag.
 * @param	string	$replacemainareaby	Replace call to main_area() by a print of this string
 * @return	void
 *@throws Exception
 */
-function digiriskHeader($title = '', $help_url = '', $arrayofjs = '', $arrayofcss = '', $morequerystring = '', $morecssonbody = '', $replacemainareaby = '')
+function digiriskHeader($title = '', $help_url = '', $arrayofjs = array(), $arrayofcss =  array(), $morequerystring = '', $morecssonbody = '', $replacemainareaby = '')
 {
 	global $conf, $langs, $db, $user;
 
