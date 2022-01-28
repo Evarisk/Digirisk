@@ -460,6 +460,9 @@ class DigiriskSignature extends CommonObject
 						$signatory_data = new Contact($this->db);
 
 						$signatory_data->fetch($element_id);
+						if (!is_object($signatory_data)) {
+							$signatory_data = new StdClass();
+						}
 
 						$society->fetch($signatory_data->socid);
 
@@ -532,7 +535,7 @@ class DigiriskSignature extends CommonObject
 	 * @param $fk_object
 	 * @param $object_type
 	 * @param string $morefilter
-	 * @return array
+	 * @return array|integer
 	 * @throws Exception
 	 */
 	public function fetchSignatories($fk_object, $object_type, $morefilter = '1 = 1')

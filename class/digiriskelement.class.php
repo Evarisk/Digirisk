@@ -263,7 +263,9 @@ class DigiriskElement extends CommonObject
 	{
 		$object  = new DigiriskElement($this->db);
 		$objects = $object->fetchAll('',  '',  0,  0, array('customsql' => 'status > 0' ));
-
+		if (!is_array($objects)) {
+			$objects = array();
+		}
 		$elements = recurse_tree($parent_id, 0, $objects);
 		$digiriskelementlist = array();
 		if ($elements > 0 && ! empty($elements)) {
@@ -273,9 +275,7 @@ class DigiriskElement extends CommonObject
 			foreach ($it as $key => $v) {
 				$element[$key][$v] = $v;
 			}
-			if (is_array($element)) {
-				$children_id = array_shift($element);
-			}
+			$children_id = array_shift($element);
 
 			if ( ! empty($children_id)) {
 				foreach ($children_id as $id) {
@@ -395,29 +395,28 @@ class DigiriskElement extends CommonObject
 	 *  Output html form to select a third party.
 	 *  Note, you must use the select_company to get the component to select a third party. This function must only be called by select_company.
 	 *
-	 * @param  string 	$selected Preselected type
-	 * @param  string 	$htmlname Name of field in form
-	 * @param  string 	$filter Optional filters criteras (example: 's.rowid <> x', 's.client in (1,3)')
-	 * @param  int 		$forcecombo Force to use standard HTML select component without beautification
-	 * @param  array 	$events Event options. Example: array(array('method'=>'getContacts', 'url'=>dol_buildpath('/core/ajax/contacts.php',1), 'htmlname'=>'contactid', 'params'=>array('add-customer-contact'=>'disabled')))
-	 * @param  int 		$outputmode 0=HTML select string, 1=Array
-	 * @param  int 		$limit Limit number of answers
-	 * @param  string 	$morecss Add more css styles to the SELECT component
-	 * @param  string 	$moreparam Add more parameters onto the select tag. For example 'style="width: 95%"' to avoid select2 component to go over parent container
-	 * @param  bool 	$multiple add [] in the name of element and add 'multiple' attribut
-	 * @param  int 		$noroot
-	 * @return string      HTML string with
+	 * @param  string 		$selected Preselected type
+	 * @param  string 		$htmlname Name of field in form
+	 * @param  string 		$filter Optional filters criteras (example: 's.rowid <> x', 's.client in (1,3)')
+	 * @param  int 			$forcecombo Force to use standard HTML select component without beautification
+	 * @param  array 		$events Event options. Example: array(array('method'=>'getContacts', 'url'=>dol_buildpath('/core/ajax/contacts.php',1), 'htmlname'=>'contactid', 'params'=>array('add-customer-contact'=>'disabled')))
+	 * @param  int 			$outputmode 0=HTML select string, 1=Array
+	 * @param  int 			$limit Limit number of answers
+	 * @param  string 		$morecss Add more css styles to the SELECT component
+	 * @param  int	 		$moreparam Add more parameters onto the select tag. For example 'style="width: 95%"' to avoid select2 component to go over parent container
+	 * @param  bool 		$multiple add [] in the name of element and add 'multiple' attribut
+	 * @param  int 			$noroot
+	 * @return string|array HTML string with
 	 * @throws Exception
 	 */
-	public function select_digiriskelement_list($selected = '', $htmlname = 'socid', $filter = '', $forcecombo = 0, $events = array(), $outputmode = 0, $limit = 0, $morecss = 'minwidth100', $moreparam = '', $multiple = false, $noroot = 0)
+	public function select_digiriskelement_list($selected = '', $htmlname = 'socid', $filter = '', $forcecombo = 0, $events = array(), $outputmode = 0, $limit = 0, $morecss = 'minwidth100', $moreparam = 0, $multiple = false, $noroot = 0)
 	{
 		global $conf, $langs;
 
 		$out      = '';
 		$outarray = array();
 
-		if ($selected === '') $selected           = array();
-		elseif ( ! is_array($selected)) $selected = array($selected);
+		if ( ! is_array($selected)) $selected = array($selected);
 
 		// Clean $filter that may contains sql conditions so sql code
 		if (function_exists('testSqlAndScriptInject')) {
@@ -618,6 +617,9 @@ class DigiriskElement extends CommonObject
 	public function getTrashList()
 	{
 		$objects      = $this->fetchAll('',  'rank');
+		if (!is_array($objects)) {
+			$objects = array();
+		}
 		$recurse_tree = recurse_tree($this->id, 0, $objects);
 		$ids          = [];
 
