@@ -407,7 +407,7 @@ class DigiriskElement extends CommonObject
 	 * @param  int	 		$moreparam Add more parameters onto the select tag. For example 'style="width: 95%"' to avoid select2 component to go over parent container
 	 * @param  bool 		$multiple add [] in the name of element and add 'multiple' attribut
 	 * @param  int 			$noroot
-	 * @return string|array HTML string with
+	 * @return string HTML string with
 	 * @throws Exception
 	 */
 	public function select_digiriskelement_list($selected = '', $htmlname = 'socid', $filter = '', $forcecombo = 0, $events = array(), $outputmode = 0, $limit = 0, $morecss = 'minwidth100', $moreparam = 0, $multiple = false, $noroot = 0)
@@ -496,7 +496,6 @@ class DigiriskElement extends CommonObject
 
 		$this->result = array('nbofdigiriskelement' => $num);
 
-		if ($outputmode) return $outarray;
 		return $out;
 	}
 
