@@ -244,7 +244,7 @@ if (($id || $ref) && $action == 'edit') {
 
 	//RelativeLocation
 	print '<tr><td class="minwidth400">' . $langs->trans("RelativeLocation") . '</td><td>';
-	print digirisk_select_dictionary('relative_location', 'c_relative_location', 'ref', 'label', $accidentmetadata->relative_location, 1);
+	digirisk_select_dictionary('relative_location', 'c_relative_location', 'ref', 'label', $accidentmetadata->relative_location, 1);
 	print '<a href="' . DOL_URL_ROOT . '/admin/dict.php?mainmenu=home" target="_blank" class="wpeo-tooltip-event" aria-label="' . $langs->trans('ConfigDico') . '">' . ' ' . img_picto('', 'globe') . '</a>';
 	print '</td></tr>';
 
@@ -507,7 +507,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 
 	$morehtmlleft = '<div class="floatleft inline-block valignmiddle divphotoref">' . digirisk_show_photos('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/' . $object->element, 'small', 5, 0, 0, 0, $width, 0, 0, 0, 0, $object->element, $object) . '</div>';
 
-	digirisk_banner_tab($object, 'ref', '', 0, 'ref', 'ref', $morehtmlref, '', '', $morehtmlleft);
+	digirisk_banner_tab($object, 'ref', '', 0, 'ref', 'ref', $morehtmlref, '', 0, $morehtmlleft);
 
 	print '<div class="div-table-responsive">';
 	print '<div class="fichecenter">';

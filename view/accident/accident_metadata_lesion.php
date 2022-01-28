@@ -225,7 +225,7 @@ $morehtmlref .= '</div>';
 
 $morehtmlleft = '<div class="floatleft inline-block valignmiddle divphotoref">' . digirisk_show_photos('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/' . $object->element, 'small', 5, 0, 0, 0, $width, 0, 0, 0, 0, $object->element, $object) . '</div>';
 
-digirisk_banner_tab($object, 'ref', '', 0, 'ref', 'ref', $morehtmlref, '', '', $morehtmlleft);
+digirisk_banner_tab($object, 'ref', '', 0, 'ref', 'ref', $morehtmlref, '', 0, $morehtmlleft);
 
 // ACCIDENT LESION
 print '<div class="div-table-responsive-no-min" style="overflow-x: unset !important">';
@@ -267,14 +267,14 @@ if ( ! empty($accidentlines) && $accidentlines > 0) {
 			$coldisplay++;
 			//LesionLocalization -- Siège des lésions
 			print '<td>';
-			print digirisk_select_dictionary('lesion_localization', 'c_lesion_localization', 'label', 'label', $item->lesion_localization, 1);
+			digirisk_select_dictionary('lesion_localization', 'c_lesion_localization', 'label', 'label', $item->lesion_localization, 1);
 			print '<a href="' . DOL_URL_ROOT . '/admin/dict.php?mainmenu=home" target="_blank" class="wpeo-tooltip-event" aria-label="' . $langs->trans('ConfigDico') . '">' . ' ' . img_picto('', 'globe') . '</a>';
 			print '</td>';
 
 			$coldisplay++;
 			//LesionNature -- Nature des lésions
 			print '<td>';
-			print digirisk_select_dictionary('lesion_nature', 'c_lesion_nature', 'label', 'label', $item->lesion_nature, 1);
+			digirisk_select_dictionary('lesion_nature', 'c_lesion_nature', 'label', 'label', $item->lesion_nature, 1);
 			print '<a href="' . DOL_URL_ROOT . '/admin/dict.php?mainmenu=home" target="_blank" class="wpeo-tooltip-event" aria-label="' . $langs->trans('ConfigDico') . '">' . ' ' . img_picto('', 'globe') . '</a>';
 			print '</td>';
 
@@ -338,14 +338,14 @@ if ($object->status == 1 && $permissiontoadd) {
 	$coldisplay++;
 	//LesionLocalization -- Siège des lésions
 	print '<td>';
-	print digirisk_select_dictionary('lesion_localization', 'c_lesion_localization', 'label', 'label', '', 1);
+	digirisk_select_dictionary('lesion_localization', 'c_lesion_localization', 'label', 'label', '', 1);
 	print '<a href="' . DOL_URL_ROOT . '/admin/dict.php?mainmenu=home" target="_blank" class="wpeo-tooltip-event" aria-label="' . $langs->trans('ConfigDico') . '">' . ' ' . img_picto('', 'globe') . '</a>';
 	print '</td>';
 
 	$coldisplay++;
 	//LesionNature -- Nature des lésions
 	print '<td>';
-	print digirisk_select_dictionary('lesion_nature', 'c_lesion_nature', 'label', 'label', '', 1);
+	digirisk_select_dictionary('lesion_nature', 'c_lesion_nature', 'label', 'label', '', 1);
 	print '<a href="' . DOL_URL_ROOT . '/admin/dict.php?mainmenu=home" target="_blank" class="wpeo-tooltip-event" aria-label="' . $langs->trans('ConfigDico') . '">' . ' ' . img_picto('', 'globe') . '</a>';
 	print '</td>';
 

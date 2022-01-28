@@ -78,7 +78,7 @@ if ( ! $sortorder) $sortorder = 'DESC,DESC';
 
 // Initialize technical objects
 $object      = new DigiriskStandard($db);
-$emptyobject = new stdClass($db);
+$emptyobject = new stdClass();
 $extrafields = new ExtraFields($db);
 
 $object->fetch($conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD);
@@ -130,7 +130,7 @@ if ($object->id > 0) {
 	$morejs   = array("/digiriskdolibarr/js/digiriskdolibarr.js.php");
 	$morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");
 
-	digiriskHeader('', $title, $help_url, '', '', '', $morejs, $morecss);
+	digiriskHeader('', $title, $help_url, '', 0, 0, $morejs, $morecss);
 	print '<div id="cardContent" value="">';
 
 	if ( ! empty($conf->notification->enabled)) $langs->load("mails");

@@ -212,7 +212,7 @@ $help_url = 'FR:Module_DigiriskDolibarr#.C3.89valuateur';
 $morejs   = array("/digiriskdolibarr/js/digiriskdolibarr.js.php");
 $morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");
 
-digiriskHeader('', $title, $help_url, '', '', '', $morejs, $morecss);
+digiriskHeader('', $title, $help_url, '', 0, 0, $morejs, $morecss);
 
 print '<div id="cardContent" value="">';
 

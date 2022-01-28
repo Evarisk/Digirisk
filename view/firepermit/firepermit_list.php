@@ -463,7 +463,7 @@ while ($i < ($limit ? min($num, $limit) : $num)) {
 					}
 					if ($resource['label'] == 'ExtSocietyResponsible') {
 						$element = $signatory->fetchSignatory('FP_EXT_SOCIETY_RESPONSIBLE', $firepermit->id, 'firepermit');
-						if ($element > 0) {
+						if (is_array($element)) {
 							$element = array_shift($element);
 							$contact->fetch($element->element_id);
 							print $contact->getNomUrl(1);
