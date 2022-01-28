@@ -75,12 +75,12 @@ class doc_preventionplandocument_specimen_odt extends ModeleODTPreventionPlanDoc
 	public $type;
 
 	/**
-	 * @var integer Width page.
+	 * @var int Width page.
 	 */
 	public $page_largeur;
 
 	/**
-	 * @var integer Height page.
+	 * @var int Height page.
 	 */
 	public $page_hauteur;
 
@@ -90,22 +90,22 @@ class doc_preventionplandocument_specimen_odt extends ModeleODTPreventionPlanDoc
 	public $format;
 
 	/**
-	 * @var integer Left margin.
+	 * @var int Left margin.
 	 */
 	public $marge_gauche;
 
 	/**
-	 * @var integer Right margin.
+	 * @var int Right margin.
 	 */
 	public $marge_droite;
 
 	/**
-	 * @var integer Top margin.
+	 * @var int Top margin.
 	 */
 	public $marge_haute;
 
 	/**
-	 * @var integer Bottom margin.
+	 * @var int Bottom margin.
 	 */
 	public $marge_basse;
 
@@ -153,7 +153,7 @@ class doc_preventionplandocument_specimen_odt extends ModeleODTPreventionPlanDoc
 		$this->marge_haute  = 0;
 		$this->marge_basse  = 0;
 
-		// Recupere emetteur
+		// emetteur
 		$this->emetteur                                                     = $mysoc;
 		if ( ! $this->emetteur->country_code) $this->emetteur->country_code = substr($langs->defaultlang, -2); // By default if not defined
 	}
@@ -177,7 +177,7 @@ class doc_preventionplandocument_specimen_odt extends ModeleODTPreventionPlanDoc
 		$texte .= '<input type="hidden" name="token" value="' . newToken() . '">';
 		$texte .= '<input type="hidden" name="action" value="setModuleOptions">';
 		$texte .= '<input type="hidden" name="param1" value="DIGIRISKDOLIBARR_PREVENTIONPLANDOCUMENT_SPECIMEN_ADDON_ODT_PATH">';
-		$texte .= '<table class="nobordernopadding" width="100%">';
+		$texte .= '<table class="nobordernopadding">';
 
 		// List of directories area
 		$texte      .= '<tr><td>';
@@ -223,18 +223,18 @@ class doc_preventionplandocument_specimen_odt extends ModeleODTPreventionPlanDoc
 	}
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
 	/**
 	 *  Function to build a document on disk using the generic odt module.
 	 *
-	 *	@param		PreventionPlanDocument	$object				Object source to build document
-	 *	@param		Translate	$outputlangs		Lang output object
-	 * 	@param		string		$srctemplatepath	Full path of source filename for generator using a template file
-	 *  @param		int			$hidedetails		Do not show line details
-	 *  @param		int			$hidedesc			Do not show desc
-	 *  @param		int			$hideref			Do not show ref
-	 *	@return		int         					1 if OK, <=0 if KO
+	 * @param PreventionPlanDocument $object Object source to build document
+	 * @param Translate $outputlangs Lang output object
+	 * @param string $srctemplatepath Full path of source filename for generator using a template file
+	 * @param $preventionplan
+	 * @return        int                            1 if OK, <=0 if KO
+	 * @throws Exception
 	 */
-	public function write_file($object, $outputlangs, $srctemplatepath, $hidedetails = 0, $hidedesc = 0, $hideref = 0, $preventionplan)
+	public function write_file($object, $outputlangs, $srctemplatepath, $preventionplan)
 	{
 		// phpcs:enable
 		global $user, $langs, $conf, $hookmanager, $action, $mysoc;
@@ -278,7 +278,7 @@ class doc_preventionplandocument_specimen_odt extends ModeleODTPreventionPlanDoc
 		if (file_exists($dir)) {
 			$filename = preg_split('/preventionplandocument\//', $srctemplatepath);
 			$filename = preg_replace('/template_/', '', $filename[1]);
-			$filename = preg_replace('/specimen\//', '', $filename);
+			preg_replace('/specimen\//', '', $filename);
 
 			$date     = dol_print_date(dol_now(), 'dayxcard');
 			$filename = $objectref . '_' . $conf->global->MAIN_INFO_SOCIETE_NOM . '_' . $date . '.odt';
@@ -344,8 +344,10 @@ class doc_preventionplandocument_specimen_odt extends ModeleODTPreventionPlanDoc
 
 			$digirisk_resources     = $resources->digirisk_dolibarr_fetch_resources();
 			$extsociety             = $resources->fetchResourcesFromObject('PP_EXT_SOCIETY', $preventionplan);
-			$maitreoeuvre           = array_shift($signatory->fetchSignatory('PP_MAITRE_OEUVRE', $preventionplan->id));
-			$extsocietyresponsible  = array_shift($signatory->fetchSignatory('PP_EXT_SOCIETY_RESPONSIBLE', $preventionplan->id));
+			$maitreoeuvre           = $signatory->fetchSignatory('PP_MAITRE_OEUVRE', $preventionplan->id);
+			$maitreoeuvre           = is_array($maitreoeuvre) ? array_shift($maitreoeuvre) : $maitreoeuvre;
+			$extsocietyresponsible  = $signatory->fetchSignatory('PP_EXT_SOCIETY_RESPONSIBLE', $preventionplan->id);
+			$extsocietyresponsible  = is_array($extsocietyresponsible) ? array_shift($extsocietyresponsible) : $extsocietyresponsible;
 			$extsocietyintervenants = $signatory->fetchSignatory('PP_EXT_SOCIETY_INTERVENANTS', $preventionplan->id);
 
 			$tmparray['titre_prevention']             = $preventionplan->ref;
@@ -410,7 +412,7 @@ class doc_preventionplandocument_specimen_odt extends ModeleODTPreventionPlanDoc
 
 			if ( ! empty($extsociety) && $extsociety > 0) {
 				$tmparray['society_title']    = $extsociety->name;
-				$tmparray['society_siret_id'] = $extsociety->siret;
+				$tmparray['society_siret_id'] = $extsociety->idprof2;
 				$tmparray['society_address']  = $extsociety->address;
 				$tmparray['society_postcode'] = $extsociety->zip;
 				$tmparray['society_town']     = $extsociety->town;

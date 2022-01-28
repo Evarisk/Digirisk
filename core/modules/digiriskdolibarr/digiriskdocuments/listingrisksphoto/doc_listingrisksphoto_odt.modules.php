@@ -71,12 +71,12 @@ class doc_listingrisksphoto_odt extends ModeleODTListingRisksPhoto
 	public $type;
 
 	/**
-	 * @var integer Width page.
+	 * @var int Width page.
 	 */
 	public $page_largeur;
 
 	/**
-	 * @var integer Height page.
+	 * @var int Height page.
 	 */
 	public $page_hauteur;
 
@@ -86,22 +86,22 @@ class doc_listingrisksphoto_odt extends ModeleODTListingRisksPhoto
 	public $format;
 
 	/**
-	 * @var integer Left margin.
+	 * @var int Left margin.
 	 */
 	public $marge_gauche;
 
 	/**
-	 * @var integer Right margin.
+	 * @var int Right margin.
 	 */
 	public $marge_droite;
 
 	/**
-	 * @var integer Top margin.
+	 * @var int Top margin.
 	 */
 	public $marge_haute;
 
 	/**
-	 * @var integer Bottom margin.
+	 * @var int Bottom margin.
 	 */
 	public $marge_basse;
 
@@ -149,7 +149,7 @@ class doc_listingrisksphoto_odt extends ModeleODTListingRisksPhoto
 		$this->marge_haute  = 0;
 		$this->marge_basse  = 0;
 
-		// Recupere emetteur
+		// emetteur
 		$this->emetteur                                                     = $mysoc;
 		if ( ! $this->emetteur->country_code) $this->emetteur->country_code = substr($langs->defaultlang, -2); // By default if not defined
 	}
@@ -167,13 +167,12 @@ class doc_listingrisksphoto_odt extends ModeleODTListingRisksPhoto
 		// Load translation files required by the page
 		$langs->loadLangs(array("errors", "companies"));
 
-		$form   = new Form($this->db);
 		$texte  = $this->description . ".<br>\n";
 		$texte .= '<form action="' . $_SERVER["PHP_SELF"] . '" method="POST">';
 		$texte .= '<input type="hidden" name="token" value="' . newToken() . '">';
 		$texte .= '<input type="hidden" name="action" value="setModuleOptions">';
 		$texte .= '<input type="hidden" name="param1" value="DIGIRISKDOLIBARR_LISTINGRISKSPHOTO_ADDON_ODT_PATH">';
-		$texte .= '<table class="nobordernopadding" width="100%">';
+		$texte .= '<table class="nobordernopadding">';
 
 		// List of directories area
 		$texte      .= '<tr><td>';
@@ -219,21 +218,21 @@ class doc_listingrisksphoto_odt extends ModeleODTListingRisksPhoto
 	}
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
 	/**
 	 *  Function to build a document on disk using the generic odt module.
 	 *
-	 *	@param		ListingRisksPhoto	$object				Object source to build document
-	 *	@param		Translate	$outputlangs		Lang output object
-	 * 	@param		string		$srctemplatepath	Full path of source filename for generator using a template file
-	 *  @param		int			$hidedetails		Do not show line details
-	 *  @param		int			$hidedesc			Do not show desc
-	 *  @param		int			$hideref			Do not show ref
-	 *	@return		int         					1 if OK, <=0 if KO
+	 * @param ListingRisksPhoto $object Object source to build document
+	 * @param Translate $outputlangs Lang output object
+	 * @param string $srctemplatepath Full path of source filename for generator using a template file
+	 * @param $digiriskelement
+	 * @return        int                            1 if OK, <=0 if KO
+	 * @throws Exception
 	 */
-	public function write_file($object, $outputlangs, $srctemplatepath, $hidedetails = 0, $hidedesc = 0, $hideref = 0, $digiriskelement)
+	public function write_file($object, $outputlangs, $srctemplatepath, $digiriskelement)
 	{
 		// phpcs:enable
-		global $user, $langs, $conf, $mysoc, $hookmanager, $action, $mysoc;
+		global $user, $langs, $conf, $hookmanager, $action, $mysoc;
 
 		if (empty($srctemplatepath)) {
 			dol_syslog("doc_listingrisksphoto_odt::write_file parameter srctemplatepath empty", LOG_WARNING);
@@ -277,7 +276,7 @@ class doc_listingrisksphoto_odt extends ModeleODTListingRisksPhoto
 
 		if (file_exists($dir)) {
 			$filename = preg_split('/listingrisksphoto\//', $srctemplatepath);
-			$filename = preg_replace('/template_/', '', $filename[1]);
+			preg_replace('/template_/', '', $filename[1]);
 
 			$date = dol_print_date(dol_now(), 'dayxcard');
 			if ( ! empty($digiriskelement)) {
@@ -305,7 +304,7 @@ class doc_listingrisksphoto_odt extends ModeleODTListingRisksPhoto
 			complete_substitutions_array($substitutionarray, $langs, $object);
 			// Call the ODTSubstitution hook
 			$parameters = array('file' => $file, 'object' => $object, 'outputlangs' => $outputlangs, 'substitutionarray' => &$substitutionarray);
-			$reshook    = $hookmanager->executeHooks('ODTSubstitution', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
+			$hookmanager->executeHooks('ODTSubstitution', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
 
 			// Open and load template
 			require_once ODTPHP_PATH . 'odf.php';
@@ -338,20 +337,17 @@ class doc_listingrisksphoto_odt extends ModeleODTListingRisksPhoto
 
 			// Call the ODTSubstitution hook
 			$parameters = array('odfHandler' => &$odfHandler, 'file' => $file, 'object' => $object, 'outputlangs' => $outputlangs, 'substitutionarray' => &$tmparray);
-			$reshook    = $hookmanager->executeHooks('ODTSubstitution', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
+			$hookmanager->executeHooks('ODTSubstitution', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
 
 			foreach ($tmparray as $key => $value) {
 				try {
 					if (preg_match('/logo$/', $key)) { // Image
 						if (file_exists($value)) $odfHandler->setImage($key, $value);
 						else $odfHandler->setVars($key, $langs->transnoentities('ErrorFileNotFound'), true, 'UTF-8');
-					} else // Text
-					{
-						if (empty($value)) {
-							$odfHandler->setVars($key, $langs->trans('NoData'), true, 'UTF-8');
-						} else {
-							$odfHandler->setVars($key, html_entity_decode($value, ENT_QUOTES | ENT_HTML5), true, 'UTF-8');
-						}
+					} elseif (empty($value)) { // Text
+						$odfHandler->setVars($key, $langs->trans('NoData'), true, 'UTF-8');
+					} else {
+						$odfHandler->setVars($key, html_entity_decode($value, ENT_QUOTES | ENT_HTML5), true, 'UTF-8');
 					}
 				} catch (OdfException $e) {
 					dol_syslog($e->getMessage(), LOG_INFO);
@@ -398,19 +394,17 @@ class doc_listingrisksphoto_odt extends ModeleODTListingRisksPhoto
 											complete_substitutions_array($tmparray, $outputlangs, $object, $line, "completesubstitutionarray_lines");
 											// Call the ODTSubstitutionLine hook
 											$parameters = array('odfHandler' => &$odfHandler, 'file' => $file, 'object' => $object, 'outputlangs' => $outputlangs, 'substitutionarray' => &$tmparray, 'line' => $line);
-											$reshook    = $hookmanager->executeHooks('ODTSubstitutionLine', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
+											$hookmanager->executeHooks('ODTSubstitutionLine', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
 											foreach ($tmparray as $key => $val) {
 												try {
 													if (file_exists($val) && $val == $image) {
 														$listlines->setImage($key, $val);
 													} elseif ($val == $tmparray['nomDanger']) {
 														$listlines->setImage($key, $val);
+													} elseif (empty($val) && $val != '0') {
+														$listlines->setVars($key, $langs->trans('NoData'), true, 'UTF-8');
 													} else {
-														if (empty($val) && $val != '0') {
-															$listlines->setVars($key, $langs->trans('NoData'), true, 'UTF-8');
-														} else {
-															$listlines->setVars($key, html_entity_decode($val, ENT_QUOTES | ENT_HTML5), true, 'UTF-8');
-														}
+														$listlines->setVars($key, html_entity_decode($val, ENT_QUOTES | ENT_HTML5), true, 'UTF-8');
 													}
 												} catch (OdfException $e) {
 													dol_syslog($e->getMessage(), LOG_INFO);
@@ -438,8 +432,6 @@ class doc_listingrisksphoto_odt extends ModeleODTListingRisksPhoto
 										} else {
 											$listlines->setVars($key, html_entity_decode($val, ENT_QUOTES | ENT_HTML5), true, 'UTF-8');
 										}
-									} catch (OdfException $e) {
-										dol_syslog($e->getMessage(), LOG_INFO);
 									} catch (SegmentException $e) {
 										dol_syslog($e->getMessage(), LOG_INFO);
 									}
@@ -485,19 +477,17 @@ class doc_listingrisksphoto_odt extends ModeleODTListingRisksPhoto
 											complete_substitutions_array($tmparray, $outputlangs, $object, $line, "completesubstitutionarray_lines");
 											// Call the ODTSubstitutionLine hook
 											$parameters = array('odfHandler' => &$odfHandler, 'file' => $file, 'object' => $object, 'outputlangs' => $outputlangs, 'substitutionarray' => &$tmparray, 'line' => $line);
-											$reshook    = $hookmanager->executeHooks('ODTSubstitutionLine', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
+											$hookmanager->executeHooks('ODTSubstitutionLine', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
 											foreach ($tmparray as $key => $val) {
 												try {
 													if (file_exists($val) && $val == $image) {
 														$listlines->setImage($key, $val);
 													} elseif ($val == $tmparray['nomDanger']) {
 														$listlines->setImage($key, $val);
+													} elseif (empty($val) && $val != '0') {
+														$listlines->setVars($key, $langs->trans('NoData'), true, 'UTF-8');
 													} else {
-														if (empty($val) && $val != '0') {
-															$listlines->setVars($key, $langs->trans('NoData'), true, 'UTF-8');
-														} else {
-															$listlines->setVars($key, html_entity_decode($val, ENT_QUOTES | ENT_HTML5), true, 'UTF-8');
-														}
+														$listlines->setVars($key, html_entity_decode($val, ENT_QUOTES | ENT_HTML5), true, 'UTF-8');
 													}
 												} catch (OdfException $e) {
 													dol_syslog($e->getMessage(), LOG_INFO);
@@ -524,8 +514,6 @@ class doc_listingrisksphoto_odt extends ModeleODTListingRisksPhoto
 										} else {
 											$listlines->setVars($key, html_entity_decode($val, ENT_QUOTES | ENT_HTML5), true, 'UTF-8');
 										}
-									} catch (OdfException $e) {
-										dol_syslog($e->getMessage(), LOG_INFO);
 									} catch (SegmentException $e) {
 										dol_syslog($e->getMessage(), LOG_INFO);
 									}
@@ -553,7 +541,7 @@ class doc_listingrisksphoto_odt extends ModeleODTListingRisksPhoto
 
 			// Call the beforeODTSave hook
 			$parameters = array('odfHandler' => &$odfHandler, 'file' => $file, 'object' => $object, 'outputlangs' => $outputlangs, 'substitutionarray' => &$tmparray);
-			$reshook    = $hookmanager->executeHooks('beforeODTSave', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
+			$hookmanager->executeHooks('beforeODTSave', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
 
 			// Write new file
 			if ( ! empty($conf->global->MAIN_ODT_AS_PDF)) {
@@ -575,7 +563,7 @@ class doc_listingrisksphoto_odt extends ModeleODTListingRisksPhoto
 			}
 
 			$parameters = array('odfHandler' => &$odfHandler, 'file' => $file, 'object' => $object, 'outputlangs' => $outputlangs, 'substitutionarray' => &$tmparray);
-			$reshook    = $hookmanager->executeHooks('afterODTCreation', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
+			$hookmanager->executeHooks('afterODTCreation', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
 
 //			if ( ! empty($conf->global->MAIN_UMASK))
 //				@chmod($file, octdec($conf->global->MAIN_UMASK));
@@ -589,7 +577,5 @@ class doc_listingrisksphoto_odt extends ModeleODTListingRisksPhoto
 			$this->error = $langs->transnoentities("ErrorCanNotCreateDir", $dir);
 			return -1;
 		}
-
-		return -1;
 	}
 }

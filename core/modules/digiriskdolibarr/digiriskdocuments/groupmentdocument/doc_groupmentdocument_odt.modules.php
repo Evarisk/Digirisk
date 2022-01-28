@@ -374,7 +374,7 @@ class doc_groupmentdocument_odt extends ModeleODTGroupmentDocument
 									$evaluation     = new RiskAssessment($this->db);
 									$lastEvaluation = $evaluation->fetchFromParent($line->id, 1);
 
-									if ($lastEvaluation > 0 && ! empty($lastEvaluation)) {
+									if ($lastEvaluation > 0 && ! empty($lastEvaluation) && is_array($lastEvaluation)) {
 										$lastEvaluation = array_shift($lastEvaluation);
 										$scale          = $lastEvaluation->get_evaluation_scale();
 

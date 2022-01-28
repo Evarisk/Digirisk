@@ -350,8 +350,10 @@ class doc_firepermitdocument_odt extends ModeleODTFirePermitDocument
 
 			$digirisk_resources     = $resources->digirisk_dolibarr_fetch_resources();
 			$extsociety             = $resources->fetchResourcesFromObject('FP_EXT_SOCIETY', $firepermit);
-			$maitreoeuvre           = array_shift($signatory->fetchSignatory('FP_MAITRE_OEUVRE', $firepermit->id, 'firepermit'));
-			$extsocietyresponsible  = array_shift($signatory->fetchSignatory('FP_EXT_SOCIETY_RESPONSIBLE', $firepermit->id, 'firepermit'));
+			$maitreoeuvre           = $signatory->fetchSignatory('FP_MAITRE_OEUVRE', $firepermit->id, 'firepermit');
+			$maitreoeuvre           = is_array($maitreoeuvre) ? array_shift($maitreoeuvre) : $maitreoeuvre;
+			$extsocietyresponsible  = $signatory->fetchSignatory('FP_EXT_SOCIETY_RESPONSIBLE', $firepermit->id, 'firepermit');
+			$extsocietyresponsible  = is_array($extsocietyresponsible) ? array_shift($extsocietyresponsible) : $extsocietyresponsible;
 			$extsocietyintervenants = $signatory->fetchSignatory('FP_EXT_SOCIETY_INTERVENANTS', $firepermit->id, 'firepermit');
 
 			$tmparray['titre_permis_feu']     = $firepermit->ref;
@@ -454,7 +456,7 @@ class doc_firepermitdocument_odt extends ModeleODTFirePermitDocument
 
 			if ( ! empty($extsociety) && $extsociety > 0) {
 				$tmparray['society_title']    = $extsociety->name;
-				$tmparray['society_siret_id'] = $extsociety->siret;
+				$tmparray['society_siret_id'] = $extsociety->idprof2;
 				$tmparray['society_address']  = $extsociety->address;
 				$tmparray['society_postcode'] = $extsociety->zip;
 				$tmparray['society_town']     = $extsociety->town;

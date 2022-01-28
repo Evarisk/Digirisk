@@ -75,10 +75,11 @@ class mod_risk_standard extends ModeleNumRefRiskAnalysis
 	/**
 	 * 	Return next free value
 	 *
-	 *  @param  Object		$object		Object we need next value for
-	 *  @return string      			Value if KO, <0 if KO
+	 *	@param Object $object Object we need next value for
+	 * 	@return string                Value if KO, <0 if KO
+	 * 	@throws Exception
 	 */
-	public function getNextValue($object, $version = 0)
+	public function getNextValue($object)
 	{
 		global $db, $conf;
 
