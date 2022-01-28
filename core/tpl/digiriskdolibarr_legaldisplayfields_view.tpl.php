@@ -30,7 +30,9 @@ if ( ! is_object($form)) $form = new Form($db);
 try {
 	$legaldisplay = json_decode($legaldisplay->LegalDisplayFillJSON($legaldisplay), false, 512, JSON_UNESCAPED_UNICODE)->LegalDisplay;
 } catch (Exception $e) {
-
+	$legaldisplay->error = $e->getMessage();
+	dol_syslog($e->getMessage(), LOG_INFO);
+	return -1;
 }
 
 //Creation User

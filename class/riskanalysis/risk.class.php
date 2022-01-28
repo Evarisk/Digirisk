@@ -216,9 +216,7 @@ class Risk extends CommonObject
 					$element[$key][$v] = $v;
 				}
 
-				if (is_array($element)) {
-					$children_id = array_shift($element);
-				}
+				$children_id = array_shift($element);
 
 				// RISKS parent children.
 				if ( ! empty($children_id)) {

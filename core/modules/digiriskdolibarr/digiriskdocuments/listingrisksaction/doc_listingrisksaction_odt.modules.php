@@ -370,7 +370,7 @@ class doc_listingrisksaction_odt extends ModeleODTListingRisksAction
 
 									$evaluation     = new RiskAssessment($this->db);
 									$lastEvaluation = $evaluation->fetchFromParent($line->id, 1);
-									if ( ! empty($lastEvaluation) && $lastEvaluation > 0) {
+									if ( ! empty($lastEvaluation) && $lastEvaluation > 0 && is_array($lastEvaluation)) {
 										$lastEvaluation = array_shift($lastEvaluation);
 										$scale          = $lastEvaluation->get_evaluation_scale();
 
@@ -481,7 +481,7 @@ class doc_listingrisksaction_odt extends ModeleODTListingRisksAction
 
 									$evaluation     = new RiskAssessment($this->db);
 									$lastEvaluation = $evaluation->fetchFromParent($line->id, 1);
-									if ( ! empty($lastEvaluation) && $lastEvaluation > 0) {
+									if ( ! empty($lastEvaluation) && $lastEvaluation > 0 && is_array($lastEvaluation)) {
 										$lastEvaluation = array_shift($lastEvaluation);
 										$scale          = $lastEvaluation->get_evaluation_scale();
 

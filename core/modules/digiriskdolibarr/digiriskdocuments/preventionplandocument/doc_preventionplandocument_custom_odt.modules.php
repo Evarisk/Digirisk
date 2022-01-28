@@ -358,12 +358,12 @@ class doc_preventionplandocument_custom_odt extends ModeleODTPreventionPlanDocum
 			// Replace tags of lines
 			try {
 				$foundtagforlines = 1;
-				$listlines = '';
 				try {
 					$listlines = $odfHandler->setSegment('lines');
 				} catch (OdfException $e) {
 					// We may arrive here if tags for lines not present into template
 					$foundtagforlines = 0;
+					$listlines = '';
 					dol_syslog($e->getMessage(), LOG_INFO);
 				}
 				if ($foundtagforlines) {

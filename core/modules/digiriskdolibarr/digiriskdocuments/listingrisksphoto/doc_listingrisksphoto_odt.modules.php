@@ -366,7 +366,7 @@ class doc_listingrisksphoto_odt extends ModeleODTListingRisksPhoto
 								foreach ($risks as $line) {
 									$evaluation     = new RiskAssessment($this->db);
 									$lastEvaluation = $evaluation->fetchFromParent($line->id, 1);
-									if ( ! empty($lastEvaluation) && $lastEvaluation > 0) {
+									if ( ! empty($lastEvaluation) && $lastEvaluation > 0 && is_array($lastEvaluation)) {
 										$lastEvaluation = array_shift($lastEvaluation);
 										$scale          = $lastEvaluation->get_evaluation_scale();
 
@@ -387,6 +387,7 @@ class doc_listingrisksphoto_odt extends ModeleODTListingRisksPhoto
 												$image                     = $path . '/thumbs/' . $new_file;
 												$tmparray['photoAssociee'] = $image;
 											} else {
+												$image = '';
 												$tmparray['photoAssociee'] = $langs->transnoentities('NoFileLinked');
 											}
 											unset($tmparray['object_fields']);
@@ -448,7 +449,7 @@ class doc_listingrisksphoto_odt extends ModeleODTListingRisksPhoto
 								foreach ($risks as $line) {
 									$evaluation     = new RiskAssessment($this->db);
 									$lastEvaluation = $evaluation->fetchFromParent($line->id, 1);
-									if ( ! empty($lastEvaluation) && $lastEvaluation > 0) {
+									if ( ! empty($lastEvaluation) && $lastEvaluation > 0 && is_array($lastEvaluation)) {
 										$lastEvaluation = array_shift($lastEvaluation);
 										$scale          = $lastEvaluation->get_evaluation_scale();
 
@@ -469,6 +470,7 @@ class doc_listingrisksphoto_odt extends ModeleODTListingRisksPhoto
 												$image                     = $path . '/thumbs/' . $new_file;
 												$tmparray['photoAssociee'] = $image;
 											} else {
+												$image = '';
 												$tmparray['photoAssociee'] = $langs->transnoentities('NoFileLinked');
 											}
 

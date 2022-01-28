@@ -359,8 +359,9 @@ class doc_preventionplandocument_odt extends ModeleODTPreventionPlanDocument
 
 			$tmparray['date_start_intervention_PPP'] = dol_print_date($preventionplan->date_start, 'dayhoursec', 'tzuser');
 			$tmparray['date_end_intervention_PPP']   = dol_print_date($preventionplan->date_end, 'dayhoursec', 'tzuser');
-			$tmparray['interventions_info']          = count($preventionplanlines) . " " . $langs->trans('PreventionPlanLine');
-
+			if (is_array($preventionplanlines)) {
+				$tmparray['interventions_info'] = count($preventionplanlines) . " " . $langs->trans('PreventionPlanLine');
+			}
 
 			$openinghours = new Openinghours($this->db);
 
@@ -541,10 +542,10 @@ class doc_preventionplandocument_odt extends ModeleODTPreventionPlanDocument
 											dol_imageResizeOrCrop($value, 0, $newWidth, $newHeight);
 										}
 										$listlines->setImage($key, $value);
-									} elseif (empty($val)) {  // Text
+									} elseif (empty($value)) {  // Text
 										$listlines->setVars($key, $langs->trans('NoData'), true, 'UTF-8');
 									} else {
-										$listlines->setVars($key, html_entity_decode($val, ENT_QUOTES | ENT_HTML5), true, 'UTF-8');
+										$listlines->setVars($key, html_entity_decode($value, ENT_QUOTES | ENT_HTML5), true, 'UTF-8');
 									}
 								} catch (OdfException $e) {
 									dol_syslog($e->getMessage(), LOG_INFO);

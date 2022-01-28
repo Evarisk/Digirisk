@@ -171,7 +171,6 @@ class doc_preventionplandocument_specimen_odt extends ModeleODTPreventionPlanDoc
 		// Load translation files required by the page
 		$langs->loadLangs(array("errors", "companies"));
 
-		$form   = new Form($this->db);
 		$texte  = $this->description . ".<br>\n";
 		$texte .= '<form action="' . $_SERVER["PHP_SELF"] . '" method="POST">';
 		$texte .= '<input type="hidden" name="token" value="' . newToken() . '">';
@@ -303,7 +302,7 @@ class doc_preventionplandocument_specimen_odt extends ModeleODTPreventionPlanDoc
 			complete_substitutions_array($substitutionarray, $langs, $object);
 			// Call the ODTSubstitution hook
 			$parameters = array('file' => $file, 'object' => $object, 'outputlangs' => $outputlangs, 'substitutionarray' => &$substitutionarray);
-			$reshook    = $hookmanager->executeHooks('ODTSubstitution', $parameters, $this, $action); // Note that $action and $preventionplan may have been modified by some hooks
+			$hookmanager->executeHooks('ODTSubstitution', $parameters, $this, $action); // Note that $action and $preventionplan may have been modified by some hooks
 
 			// Open and load template
 			require_once ODTPHP_PATH . 'odf.php';
@@ -344,11 +343,11 @@ class doc_preventionplandocument_specimen_odt extends ModeleODTPreventionPlanDoc
 
 			$digirisk_resources     = $resources->digirisk_dolibarr_fetch_resources();
 			$extsociety             = $resources->fetchResourcesFromObject('PP_EXT_SOCIETY', $preventionplan);
-			$maitreoeuvre           = $signatory->fetchSignatory('PP_MAITRE_OEUVRE', $preventionplan->id);
+			$maitreoeuvre           = $signatory->fetchSignatory('PP_MAITRE_OEUVRE', $preventionplan->id, 'preventionplan');
 			$maitreoeuvre           = is_array($maitreoeuvre) ? array_shift($maitreoeuvre) : $maitreoeuvre;
-			$extsocietyresponsible  = $signatory->fetchSignatory('PP_EXT_SOCIETY_RESPONSIBLE', $preventionplan->id);
+			$extsocietyresponsible  = $signatory->fetchSignatory('PP_EXT_SOCIETY_RESPONSIBLE', $preventionplan->id, 'preventionplan');
 			$extsocietyresponsible  = is_array($extsocietyresponsible) ? array_shift($extsocietyresponsible) : $extsocietyresponsible;
-			$extsocietyintervenants = $signatory->fetchSignatory('PP_EXT_SOCIETY_INTERVENANTS', $preventionplan->id);
+			$extsocietyintervenants = $signatory->fetchSignatory('PP_EXT_SOCIETY_INTERVENANTS', $preventionplan->id, 'preventionplan');
 
 			$tmparray['titre_prevention']             = $preventionplan->ref;
 			$tmparray['unique_identifier']            = $preventionplan->label;
@@ -360,8 +359,9 @@ class doc_preventionplandocument_specimen_odt extends ModeleODTPreventionPlanDoc
 
 			$tmparray['date_start_intervention_PPP'] = dol_print_date($preventionplan->date_start, 'dayhoursec', 'tzuser');
 			$tmparray['date_end_intervention_PPP']   = dol_print_date($preventionplan->date_end, 'dayhoursec', 'tzuser');
-			$tmparray['interventions_info']          = count($preventionplanlines) . " " . $langs->trans('PreventionPlanLine');
-
+			if (is_array($preventionplanlines)) {
+				$tmparray['interventions_info'] = count($preventionplanlines) . " " . $langs->trans('PreventionPlanLine');
+			}
 
 			$openinghours = new Openinghours($this->db);
 
@@ -447,13 +447,10 @@ class doc_preventionplandocument_specimen_odt extends ModeleODTPreventionPlanDoc
 					if (preg_match('/logo$/', $key)) {
 						if (file_exists($value)) $odfHandler->setImage($key, $value);
 						else $odfHandler->setVars($key, $langs->transnoentities('ErrorFileNotFound'), true, 'UTF-8');
-					} else // Text
-					{
-						if (empty($value)) {
-							$odfHandler->setVars($key, $langs->trans('NoData'), true, 'UTF-8');
-						} else {
-							$odfHandler->setVars($key, html_entity_decode($value, ENT_QUOTES | ENT_HTML5), true, 'UTF-8');
-						}
+					} elseif (empty($value)) { // Text
+						$odfHandler->setVars($key, $langs->trans('NoData'), true, 'UTF-8');
+					} else {
+						$odfHandler->setVars($key, html_entity_decode($value, ENT_QUOTES | ENT_HTML5), true, 'UTF-8');
 					}
 				} catch (OdfException $e) {
 					dol_syslog($e->getMessage(), LOG_INFO);
@@ -479,12 +476,10 @@ class doc_preventionplandocument_specimen_odt extends ModeleODTPreventionPlanDoc
 								try {
 									if ($val == $tmparray['risk']) {
 										$listlines->setImage($key, $val);
+									} elseif (empty($val)) {
+										$listlines->setVars($key, $langs->trans('NoData'), true, 'UTF-8');
 									} else {
-										if (empty($val)) {
-											$listlines->setVars($key, $langs->trans('NoData'), true, 'UTF-8');
-										} else {
-											$listlines->setVars($key, html_entity_decode($val, ENT_QUOTES | ENT_HTML5), true, 'UTF-8');
-										}
+										$listlines->setVars($key, html_entity_decode($val, ENT_QUOTES | ENT_HTML5), true, 'UTF-8');
 									}
 								} catch (OdfException $e) {
 									dol_syslog($e->getMessage(), LOG_INFO);
@@ -516,8 +511,6 @@ class doc_preventionplandocument_specimen_odt extends ModeleODTPreventionPlanDoc
 									} else {
 										$listlines->setVars($key, html_entity_decode($value, ENT_QUOTES | ENT_HTML5), true, 'UTF-8');
 									}
-								} catch (OdfException $e) {
-									dol_syslog($e->getMessage(), LOG_INFO);
 								} catch (SegmentException $e) {
 									dol_syslog($e->getMessage(), LOG_INFO);
 								}
@@ -545,7 +538,7 @@ class doc_preventionplandocument_specimen_odt extends ModeleODTPreventionPlanDoc
 
 			// Call the beforeODTSave hook
 			$parameters = array('odfHandler' => &$odfHandler, 'file' => $file, 'object' => $object, 'outputlangs' => $outputlangs, 'substitutionarray' => &$tmparray);
-			$reshook    = $hookmanager->executeHooks('beforeODTSave', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
+			$hookmanager->executeHooks('beforeODTSave', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
 
 			// Write new file
 			if ( ! empty($conf->global->MAIN_ODT_AS_PDF)) {
@@ -567,7 +560,7 @@ class doc_preventionplandocument_specimen_odt extends ModeleODTPreventionPlanDoc
 			}
 
 			$parameters = array('odfHandler' => &$odfHandler, 'file' => $file, 'object' => $object, 'outputlangs' => $outputlangs, 'substitutionarray' => &$tmparray);
-			$reshook    = $hookmanager->executeHooks('afterODTCreation', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
+			$hookmanager->executeHooks('afterODTCreation', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
 
 //			if ( ! empty($conf->global->MAIN_UMASK))
 //				@chmod($file, octdec($conf->global->MAIN_UMASK));
@@ -581,7 +574,5 @@ class doc_preventionplandocument_specimen_odt extends ModeleODTPreventionPlanDoc
 			$this->error = $langs->transnoentities("ErrorCanNotCreateDir", $dir);
 			return -1;
 		}
-
-		return -1;
 	}
 }

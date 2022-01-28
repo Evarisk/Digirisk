@@ -30,7 +30,9 @@ if ( ! is_object($form)) $form = new Form($db);
 try {
 	$informationssharing = json_decode($informationssharing->InformationsSharingFillJSON($informationssharing), false, 512, JSON_UNESCAPED_UNICODE)->InformationsSharing;
 } catch (Exception $e) {
-
+	$informationssharing->error = $e->getMessage();
+	dol_syslog($e->getMessage(), LOG_INFO);
+	return -1;
 }
 
 // CSE
