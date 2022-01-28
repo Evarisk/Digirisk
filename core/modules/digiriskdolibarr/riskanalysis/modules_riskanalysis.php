@@ -35,7 +35,7 @@ abstract class ModeleNumRefRiskAnalysis
 	/**
 	 *	Return if a module can be used or not
 	 *
-	 *	@return		boolean     true if module can be used
+	 *	@return        bool     true if module can be used
 	 */
 	public function isEnabled()
 	{
@@ -58,21 +58,19 @@ abstract class ModeleNumRefRiskAnalysis
 	 *  Checks if the numbers already in the database do not
 	 *  cause conflicts that would prevent this numbering working.
 	 *
-	 *	@param	Object		$object		Object we need next value for
-	 *	@return boolean     			false if conflict, true if ok
+	 * @return bool                false if conflict, true if ok
 	 */
-	public function canBeActivated($object)
+	public function canBeActivated()
 	{
 		return true;
 	}
 
 	/**
-	 *	Returns next assigned value
+	 *    Returns next assigned value
 	 *
-	 *	@param	Object		$object		Object we need next value for
-	 *	@return	string      Valeur
+	 * @return    string      Valeur
 	 */
-	public function getNextValue($object)
+	public function getNextValue()
 	{
 		global $langs;
 		return $langs->trans("NotAvailable");

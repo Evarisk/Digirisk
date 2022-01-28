@@ -73,11 +73,11 @@ class mod_firepermitdocument_standard extends ModeleNumRefDigiriskDocuments
 	}
 
 	/**
-	 *    Return next free value
+	 * 	Return next free value
 	 *
-	 * @param Object $object Object we need next value for
-	 * @return string                Value if KO, <0 if KO
-	 * @throws Exception
+	 *	@param Object $object Object we need next value for
+	 * 	@return string                Value if KO, <0 if KO
+	 * 	@throws Exception
 	 */
 	public function getNextValue($object)
 	{
