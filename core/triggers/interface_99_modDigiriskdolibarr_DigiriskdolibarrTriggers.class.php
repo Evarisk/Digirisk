@@ -723,18 +723,22 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 					$people = new User($this->db);
 				}
 
-				if (!empty($people)) {
-					$people->fetch($object->element_id);
-				} else {
-					$people = '';
-				}
-
 				$actioncomm = new ActionComm($this->db);
+
+
+
 
 				$actioncomm->elementtype = $object->object_type . '@digiriskdolibarr';
 				$actioncomm->code        = 'AC_DIGIRISKSIGNATURE_SIGNED';
 				$actioncomm->type_code   = 'AC_OTH_AUTO';
-				$actioncomm->label       = $langs->trans($object->role . 'Signed') . ' : ' . $people->firstname . ' ' . $people->lastname;
+
+				if (!empty($people)) {
+					$people->fetch($object->element_id);
+					$actioncomm->label = $langs->trans($object->role . 'Signed') . ' : ' . $people->firstname . ' ' . $people->lastname;
+				} else {
+					$actioncomm->label = $langs->trans($object->role . 'Signed');
+				}
+
 				$actioncomm->datep       = $now;
 				$actioncomm->fk_element  = $object->fk_object;
 				if ($object->element_type == 'socpeople') {

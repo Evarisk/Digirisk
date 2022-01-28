@@ -548,10 +548,11 @@ function digiriskHeader($title = '', $help_url = '', $arrayofjs = '', $arrayofcs
 		$objects = $object->fetchAll('',  'rank',  0,  0, array('customsql' => 'status > 0'));
 	}
 
+	$results = array();
+
 	if (is_array($objects)) {
 		$results = recurse_tree(0, 0, $objects);
-	}
-	?>
+	} ?>
 
 	<?php require_once './../../core/tpl/digiriskdolibarr_medias_gallery_modal.tpl.php'; ?>
 
@@ -629,7 +630,7 @@ function digiriskHeader($title = '', $help_url = '', $arrayofjs = '', $arrayofcs
 								if (document.URL.match(/digiriskelement/) && !document.URL.match(/type=standard/)) {
 									jQuery( '#unit'  + id ).addClass( 'active' );
 									jQuery( '#unit'  +id  ).closest( '.unit' ).attr( 'value', id );
-								};
+								}
 							</script>
 						</ul>
 					</div>
@@ -724,7 +725,7 @@ function display_recurse_tree($results)
 			}
 			$digiriskelement->update($user);
 		}
-		exit;
+		return;
 	}
 
 	if ( ! $error && $action == "addDigiriskElementPhotoToFavorite") {
@@ -1012,11 +1013,11 @@ function digirisk_banner_tab($object, $paramid, $morehtml = '', $shownav = 1, $f
 * @param  string  $mode               		''=Show firstname and lastname, 'firstname'=Show only firstname, 'firstelselast'=Show firstname or lastname if not defined, 'login'=Show login
 * @param  string  $morecss            		Add more css on link
 * @param  int     $save_lastsearch_value    	-1=Auto, 0=No save of lastsearch_values when clicking, 1=Save lastsearch_values whenclicking
-* @param null $object
+* @param User $object
 * @param int $display_initials
 * @return	string								String with URL
 */
-function getNomUrl($withpictoimg = 0, $option = '', $infologin = 0, $notooltip = 0, $maxlen = 24, $hidethirdpartylogo = 0, $mode = '', $morecss = '', $save_lastsearch_value = -1, $object = null, $display_initials = 1)
+function getNomUrl($withpictoimg = 0, $option = '', $infologin = 0, $notooltip = 0, $maxlen = 24, $hidethirdpartylogo = 0, $mode = '', $morecss = '', $save_lastsearch_value = -1, User $object, $display_initials = 1)
 {
 	global $langs, $conf, $db, $hookmanager, $dolibarr_main_demo;
 	global $menumanager;
@@ -1428,22 +1429,25 @@ function digirisk_show_medias($sdir, $size = 0, $maxHeight = 80, $maxWidth = 80)
 }
 
 /**
-* @param string $modulepart
-* @param $sdir
-* @param int $size
-* @param int $nbmax
-* @param int $nbbyrow
-* @param int $showfilename
-* @param int $showaction
-* @param int $maxHeight
-* @param int $maxWidth
-* @param int $nolink
-* @param int $notitle
-* @param int $usesharelink
-* @param string $subdir
-* @param null $object
- * @return string
-*/function digirisk_show_medias_linked($modulepart = 'ecm', $sdir, $size = 0, $nbmax = 0, $nbbyrow = 5, $showfilename = 0, $showaction = 0, $maxHeight = 120, $maxWidth = 160, $nolink = 0, $notitle = 0, $usesharelink = 0, $subdir = "", $object = null)
+ *  Show photos of an object (nbmax maximum), into several columns
+ *
+ *  @param		string	$modulepart		'product', 'ticket', ...
+ *  @param      string	$sdir        	Directory to scan (full absolute path)
+ *  @param      string	$size        	0=original size, 1='small' use thumbnail if possible
+ *  @param      int		$nbmax       	Nombre maximum de photos (0=pas de max)
+ *  @param      int		$nbbyrow     	Number of image per line or -1 to use div. Used only if size=1.
+ * 	@param		int		$showfilename	1=Show filename
+ * 	@param		int		$showaction		1=Show icon with action links (resize, delete)
+ * 	@param		int		$maxHeight		Max height of original image when size='small' (so we can use original even if small requested). If 0, always use 'small' thumb image.
+ * 	@param		int		$maxWidth		Max width of original image when size='small'
+ *  @param      int     $nolink         Do not add a href link to view enlarged imaged into a new tab
+ *  @param      int     $notitle        Do not add title tag on image
+ *  @param		int		$usesharelink	Use the public shared link of image (if not available, the 'nophoto' image will be shown instead)
+ *  @param		string  $subdir			Subdirectory to scan
+ *  @param		object	$object			Object element
+ *  @return     string					Html code to show photo. Number of photos shown is saved in this->nbphoto
+ */
+function digirisk_show_medias_linked($modulepart, $sdir, $size = '', $nbmax = 0, $nbbyrow = 5, $showfilename = 0, $showaction = 0, $maxHeight = 120, $maxWidth = 160, $nolink = 0, $notitle = 0, $usesharelink = 0, $subdir = "", $object)
 {
 	global $conf, $langs;
 
