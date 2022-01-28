@@ -532,7 +532,9 @@ class DigiriskSignatureUnitTest extends PHPUnit\Framework\TestCase
 		$localobjectList = $localobject->fetchAll();
 
 		$this->assertSame(true, is_array($localobjectList));
-		$this->assertInstanceOf(get_class($localobject), array_shift($localobjectList));
+		if (is_array($localobjectList)) {
+			$this->assertInstanceOf(get_class($localobject), array_shift($localobjectList));
+		}
 		print __METHOD__ . " ok";
 		print "\n";
 	}
@@ -558,7 +560,9 @@ class DigiriskSignatureUnitTest extends PHPUnit\Framework\TestCase
 		$localobjectList = $localobject->fetchSignatory("UpdatedTestRoleDigiriskSignature", 1, 'preventionplan');
 
 		$this->assertSame(true, is_array($localobjectList));
-		$this->assertInstanceOf(get_class($localobject), array_shift($localobjectList));
+		if (is_array($localobjectList)) {
+			$this->assertInstanceOf(get_class($localobject), array_shift($localobjectList));
+		}
 		print __METHOD__ . " ok";
 		print "\n";
 	}
@@ -584,7 +588,9 @@ class DigiriskSignatureUnitTest extends PHPUnit\Framework\TestCase
 		$localobjectList = $localobject->fetchSignatories(1, 'preventionplan');
 
 		$this->assertSame(true, is_array($localobjectList));
-		$this->assertInstanceOf(get_class($localobject), array_shift($localobjectList));
+		if (is_array($localobjectList)) {
+			$this->assertInstanceOf(get_class($localobject), array_shift($localobjectList));
+		}
 		print __METHOD__ . " ok";
 		print "\n";
 	}

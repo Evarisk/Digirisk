@@ -201,13 +201,14 @@ class RiskUnitTest extends PHPUnit\Framework\TestCase
 	/**
 	 * testRiskFetchFormParent
 	 *
-	 * @param   Risk $localobject Risk object
+	 * @param Risk $localobject Risk object
 	 * @return  void
 	 *
 	 * @covers  Risk::fetchFromParent
 	 *
 	 * @depends testRiskFetch
 	 * The depends says test is run only if previous is ok
+	 * @throws Exception
 	 */
 	public function testRiskFetchFromParent($localobject)
 	{
@@ -217,11 +218,13 @@ class RiskUnitTest extends PHPUnit\Framework\TestCase
 		$langs = $this->savlangs;
 		$db    = $this->savdb;
 
-		$result = $localobject->fetchFromParent($localobject->fk_element);
+		$localobjectList = $localobject->fetchFromParent($localobject->fk_element);
 
-		$this->assertLessThan($result, 0);
-
-		print __METHOD__ . " id=" . $localobject->id . " result=" . $result . "\n";
+		$this->assertSame(true, is_array($localobjectList));
+		if (is_array($localobjectList)) {
+			$this->assertInstanceOf(get_class($localobject), array_shift($localobjectList));
+		}
+		print __METHOD__ . " id=" . $localobject->id . "\n";
 	}
 
 	/**
@@ -307,7 +310,9 @@ class RiskUnitTest extends PHPUnit\Framework\TestCase
 		$localobjectList = $localobject->fetchAll();
 
 		$this->assertSame(true, is_array($localobjectList));
-		$this->assertInstanceOf(get_class($localobject), array_shift($localobjectList));
+		if (is_array($localobjectList)) {
+			$this->assertInstanceOf(get_class($localobject), array_shift($localobjectList));
+		}
 		print __METHOD__ . " ok";
 		print "\n";
 	}
@@ -517,7 +522,9 @@ class RiskUnitTest extends PHPUnit\Framework\TestCase
 			$this->assertNull($localobjectList);
 		} else {
 			$this->assertSame(true, is_array($localobjectList));
-			$this->assertInstanceOf(get_class($localobject), array_shift($localobjectList));
+			if (is_array($localobjectList)) {
+				$this->assertInstanceOf(get_class($localobject), array_shift($localobjectList));
+			}
 		}
 
 		print __METHOD__ . " ok";
@@ -545,7 +552,9 @@ class RiskUnitTest extends PHPUnit\Framework\TestCase
 		$localobjectList = $localobject->fetchRisksOrderedByCotation($localobject->fk_element);
 
 		$this->assertSame(true, is_array($localobjectList));
-		$this->assertInstanceOf(get_class($localobject), array_shift($localobjectList));
+		if (is_array($localobjectList)) {
+			$this->assertInstanceOf(get_class($localobject), array_shift($localobjectList));
+		}
 		print __METHOD__ . " ok";
 		print "\n";
 	}

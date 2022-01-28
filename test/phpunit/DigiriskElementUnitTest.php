@@ -316,7 +316,9 @@ class DigiriskElementUnitTest extends PHPUnit\Framework\TestCase
 		$localobjectList = $localobject->fetchAll();
 
 		$this->assertSame(true, is_array($localobjectList));
-		$this->assertInstanceOf(get_class($localobject), array_shift($localobjectList));
+		if (is_array($localobjectList)) {
+			$this->assertInstanceOf(get_class($localobject), array_shift($localobjectList));
+		}
 		print __METHOD__ . " ok";
 		print "\n";
 	}
@@ -328,6 +330,7 @@ class DigiriskElementUnitTest extends PHPUnit\Framework\TestCase
 	 *
 	 * @covers DigiriskElement::fetchDigiriskElementFlat
 	 *
+	 * @throws Exception
 	 */
 	public function testDigiriskElementFetchDigiriskElementFlat()
 	{
@@ -341,7 +344,9 @@ class DigiriskElementUnitTest extends PHPUnit\Framework\TestCase
 		$localobjectFlatList = $localobject->fetchDigiriskElementFlat(0);
 
 		$this->assertSame(true, is_array($localobjectFlatList));
-		$this->assertInstanceOf(get_class($localobject), array_shift($localobjectFlatList)['object']);
+		if (is_array($localobjectFlatList)) {
+			$this->assertInstanceOf(get_class($localobject), array_shift($localobjectFlatList)['object']);
+		}
 		$this->assertIsInt(array_shift($localobjectFlatList)['depth']);
 		print __METHOD__ . " ok";
 		print "\n";

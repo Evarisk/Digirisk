@@ -209,13 +209,14 @@ class RiskAssessmentUnitTest extends PHPUnit\Framework\TestCase
 	/**
 	 * testRiskAssessmentFetchFormParent
 	 *
-	 * @param   RiskAssessment $localobject RiskAssessment object
+	 * @param RiskAssessment $localobject RiskAssessment object
 	 * @return  void
 	 *
 	 * @covers  RiskAssessment::fetchFromParent
 	 *
 	 * @depends testRiskAssessmentFetch
 	 * The depends says test is run only if previous is ok
+	 * @throws Exception
 	 */
 	public function testRiskAssessmentFetchFromParent($localobject)
 	{
@@ -225,11 +226,13 @@ class RiskAssessmentUnitTest extends PHPUnit\Framework\TestCase
 		$langs = $this->savlangs;
 		$db    = $this->savdb;
 
-		$result = $localobject->fetchFromParent($localobject->fk_risk);
+		$localobjectList = $localobject->fetchFromParent($localobject->fk_risk);
 
-		$this->assertLessThan($result, 0);
-
-		print __METHOD__ . " id=" . $localobject->id . " result=" . $result . "\n";
+		$this->assertSame(true, is_array($localobjectList));
+		if (is_array($localobjectList)) {
+			$this->assertInstanceOf(get_class($localobject), array_shift($localobjectList));
+		}
+		print __METHOD__ . " id=" . $localobject->id . "\n";
 	}
 
 	/**
@@ -382,7 +385,9 @@ class RiskAssessmentUnitTest extends PHPUnit\Framework\TestCase
 		$localobjectList = $localobject->fetchAll();
 
 		$this->assertSame(true, is_array($localobjectList));
-		$this->assertInstanceOf(get_class($localobject), array_shift($localobjectList));
+		if (is_array($localobjectList)) {
+			$this->assertInstanceOf(get_class($localobject), array_shift($localobjectList));
+		}
 		print __METHOD__ . " ok";
 		print "\n";
 	}

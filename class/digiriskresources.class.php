@@ -44,6 +44,11 @@ class DigiriskResources extends CommonObject
 	public $errors = array();
 
 	/**
+	 * @var int The object identifier
+	 */
+	public $id;
+
+	/**
 	 * @var string ID to identify managed object.
 	 */
 	public $element = 'digiriskresources';

@@ -22,6 +22,8 @@
  *      \remarks    To run this script as CLI:  phpunit filename.php
  */
 
+use PHPUnit\Framework\TestSuite;
+
 print "PHP Version: " . phpversion() . "\n";
 print "Memory: " . ini_get('memory_limit') . "\n";
 
@@ -45,7 +47,7 @@ class AllTests
 	/**
 	 * Function suite to make all PHPUnit tests
 	 *
-	 * @return	void
+	 * @return TestSuite
 	 */
 	public static function suite()
 	{

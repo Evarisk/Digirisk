@@ -607,6 +607,7 @@ class DigiriskSignature extends CommonObject
 	 * @param string $role Role of resource
 	 * @param int $fk_object ID of object linked
 	 * @param int $object_type type of object linked
+	 * @return int
 	 * @throws Exception
 	 */
 	public function deletePreviousSignatories($role, $fk_object, $object_type)
@@ -619,6 +620,9 @@ class DigiriskSignature extends CommonObject
 			foreach ($signatoriesToDelete as $signatoryToDelete) {
 				$signatoryToDelete->setDeleted($user, true);
 			}
+			return 1;
+		} else {
+			return -1;
 		}
 	}
 }
