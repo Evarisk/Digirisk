@@ -687,7 +687,7 @@ class PreventionPlan extends CommonObject
 		$num      = 0;
 		$outarray = array();
 
-		if ( ! is_array($selected)) $selected = array($selected);
+		$selected = array($selected);
 
 		// Clean $filter that may contains sql conditions so sql code
 		if (function_exists('testSqlAndScriptInject')) {

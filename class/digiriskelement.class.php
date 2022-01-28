@@ -263,34 +263,35 @@ class DigiriskElement extends CommonObject
 	{
 		$object  = new DigiriskElement($this->db);
 		$objects = $object->fetchAll('',  '',  0,  0, array('customsql' => 'status > 0' ));
-		if (!is_array($objects)) {
-			$objects = array();
-		}
-		$elements = recurse_tree($parent_id, 0, $objects);
-		$digiriskelementlist = array();
-		if ($elements > 0 && ! empty($elements)) {
-			// Super function iterations flat.
-			$it = new RecursiveIteratorIterator(new RecursiveArrayIterator($elements));
-			$element = array();
-			foreach ($it as $key => $v) {
-				$element[$key][$v] = $v;
-			}
-			$children_id = array_shift($element);
+		if (is_array($objects)) {
+			$elements = recurse_tree($parent_id, 0, $objects);
+			$digiriskelementlist = array();
+			if ($elements > 0 && ! empty($elements)) {
+				// Super function iterations flat.
+				$it = new RecursiveIteratorIterator(new RecursiveArrayIterator($elements));
+				$element = array();
+				foreach ($it as $key => $v) {
+					$element[$key][$v] = $v;
+				}
+				$children_id = array_shift($element);
 
-			if ( ! empty($children_id)) {
-				foreach ($children_id as $id) {
-					$object = new DigiriskElement($this->db);
-					$result = $object->fetch($id);
-					if ( ! empty($result)) {
-						$depth = 'depth' . $id;
+				if ( ! empty($children_id)) {
+					foreach ($children_id as $id) {
+						$object = new DigiriskElement($this->db);
+						$result = $object->fetch($id);
+						if ( ! empty($result)) {
+							$depth = 'depth' . $id;
 
-						$digiriskelementlist[$id]['object'] = $object;
-						$digiriskelementlist[$id]['depth']  = array_shift($element[$depth]);
+							$digiriskelementlist[$id]['object'] = $object;
+							$digiriskelementlist[$id]['depth']  = array_shift($element[$depth]);
+						}
 					}
 				}
 			}
+			return $digiriskelementlist;
+		} else {
+			return array();
 		}
-		return $digiriskelementlist;
 	}
 
 	/**
@@ -416,7 +417,7 @@ class DigiriskElement extends CommonObject
 		$out      = '';
 		$outarray = array();
 
-		if ( ! is_array($selected)) $selected = array($selected);
+		$selected = array($selected);
 
 		// Clean $filter that may contains sql conditions so sql code
 		if (function_exists('testSqlAndScriptInject')) {
@@ -616,19 +617,20 @@ class DigiriskElement extends CommonObject
 	 */
 	public function getTrashList()
 	{
-		$objects      = $this->fetchAll('',  'rank');
-		if (!is_array($objects)) {
-			$objects = array();
+		$objects = $this->fetchAll('',  'rank');
+		if (is_array($objects)) {
+			$recurse_tree = recurse_tree($this->id, 0, $objects);
+			$ids          = [];
+
+			array_walk_recursive($recurse_tree, function ($item) use (&$ids) {
+				if (is_object($item)) {
+					$ids[ $item->id] = $item->id;
+				}
+			}, $ids);
+
+			return $ids;
+		} else {
+			return array();
 		}
-		$recurse_tree = recurse_tree($this->id, 0, $objects);
-		$ids          = [];
-
-		array_walk_recursive($recurse_tree, function ($item) use (&$ids) {
-			if (is_object($item)) {
-				$ids[ $item->id] = $item->id;
-			}
-		}, $ids);
-
-		return $ids;
 	}
 }
