@@ -123,7 +123,7 @@ class box_riskassessmentdocument extends ModeleBoxes
 
 		$filter                 = array('customsql' => "t.type='riskassessmentdocument'");
 		$riskassessmentdocument = $riskassessmentdocument->fetchAll('desc', 't.rowid', 1, 0, $filter, 'AND');
-		if ( ! empty($riskassessmentdocument) && $riskassessmentdocument > 0) {
+		if ( ! empty($riskassessmentdocument) && $riskassessmentdocument > 0 && is_array($riskassessmentdocument)) {
 			$riskassessmentdocument = array_shift($riskassessmentdocument);
 		}
 

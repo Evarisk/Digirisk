@@ -107,6 +107,7 @@ class InformationsSharing extends DigiriskDocuments
 
 		$resources 			= new DigiriskResources($this->db);
 		$digirisk_resources = $resources->digirisk_dolibarr_fetch_resources();
+		$json               = array();
 
 		// 		*** JSON FILLING ***
 		if (!empty ($digirisk_resources)) {

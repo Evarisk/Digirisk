@@ -62,9 +62,9 @@ class Accident extends CommonObject
 	public $id;
 
 	/**
-	 * @var array The object lines
+	 * @var AccidentWorkStop[]     Array of subtable lines
 	 */
-	public $lines;
+	public $lines = array();
 
 	/**
 	 * @var string ID to identify managed object.
@@ -107,7 +107,7 @@ class Accident extends CommonObject
 	 */
 	public $labelStatusShort;
 
-	const STATUS_IN_PROGRESS = 1;
+	public const STATUS_IN_PROGRESS = 1;
 
 	/**
 	 * @var array  Array with all fields and their property. Do not use it as a static var. It may be modified by constructor.

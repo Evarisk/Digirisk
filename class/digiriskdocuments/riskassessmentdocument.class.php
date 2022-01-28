@@ -105,6 +105,7 @@ class RiskAssessmentDocument extends DigiriskDocuments
 
 		$user = new User($this->db);
 		$user->fetch($this->fk_user_creat);
+		$json = array();
 
 		// *** JSON FILLING ***
 		$json['RiskAssessmentDocument']['nomEntreprise']  = $conf->global->MAIN_INFO_SOCIETE_NOM;

@@ -277,7 +277,6 @@ class DigiriskElement extends CommonObject
 				$children_id = array_shift($element);
 			}
 
-
 			if ( ! empty($children_id)) {
 				foreach ($children_id as $id) {
 					$object = new DigiriskElement($this->db);
@@ -525,7 +524,7 @@ class DigiriskElement extends CommonObject
 		if ($resql) {
 			$num = $this->db->num_rows($resql);
 			$i   = 0;
-			$obj = new StdClass();
+			$obj = new stdClass();
 			while ($i < $num) {
 				$obj = $this->db->fetch_object($resql);
 				$i++;

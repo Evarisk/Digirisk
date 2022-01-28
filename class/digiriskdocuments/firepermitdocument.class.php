@@ -122,7 +122,7 @@ class FirePermitDocument extends DigiriskDocuments
 
 		$extsociety          = $resources->fetchResourcesFromObject('FP_EXT_SOCIETY', $firepermit);
 		if ($extsociety < 1) {
-			$extsociety = new StdClass();
+			$extsociety = new stdClass();
 		}
 		$maitreoeuvre           = $signatory->fetchSignatory('FP_MAITRE_OEUVRE', $firepermit->id, 'firepermit');
 		$maitreoeuvre           = is_array($maitreoeuvre) ? array_shift($maitreoeuvre) : $maitreoeuvre;
@@ -133,12 +133,12 @@ class FirePermitDocument extends DigiriskDocuments
 		$extsocietyintervenants = $signatory->fetchSignatory('FP_EXT_SOCIETY_INTERVENANTS', $firepermit->id, 'firepermit');
 		$labourinspector        = $resources->fetchResourcesFromObject('FP_LABOUR_INSPECTOR', $firepermit);
 		if ($labourinspector < 1) {
-			$labourinspector = new StdClass();
+			$labourinspector = new stdClass();
 		}
 
 		$labourinspectorcontact = $resources->fetchResourcesFromObject('FP_LABOUR_INSPECTOR_ASSIGNED', $firepermit);
 		if ($labourinspectorcontact < 1) {
-			$labourinspectorcontact = new StdClass();
+			$labourinspectorcontact = new stdClass();
 		}
 
 		$json = array();
@@ -172,7 +172,7 @@ class FirePermitDocument extends DigiriskDocuments
 			$json['FirePermit']['society_outside'] = array();
 			$json['FirePermit']['society_outside']['id']      = $extsociety->id;
 			$json['FirePermit']['society_outside']['name']    = $extsociety->name;
-			$json['FirePermit']['society_outside']['siret']   = $extsociety->siret;
+			$json['FirePermit']['society_outside']['siret']   = $extsociety->idprof2;
 			$json['FirePermit']['society_outside']['address'] = $extsociety->address;
 			$json['FirePermit']['society_outside']['postal']  = $extsociety->zip;
 			$json['FirePermit']['society_outside']['town']    = $extsociety->town;
@@ -205,7 +205,7 @@ class FirePermitDocument extends DigiriskDocuments
 			$json['FirePermit']['labour_inspector'] = array();
 			$json['FirePermit']['labour_inspector']['id']      = $extsociety->id;
 			$json['FirePermit']['labour_inspector']['name']    = $extsociety->name;
-			$json['FirePermit']['labour_inspector']['siret']   = $extsociety->siret;
+			$json['FirePermit']['labour_inspector']['siret']   = $extsociety->idprof2;
 			$json['FirePermit']['labour_inspector']['address'] = $extsociety->address;
 			$json['FirePermit']['labour_inspector']['postal']  = $extsociety->zip;
 			$json['FirePermit']['labour_inspector']['town']    = $extsociety->town;

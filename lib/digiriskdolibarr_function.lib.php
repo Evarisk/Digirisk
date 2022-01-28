@@ -676,7 +676,7 @@ function recurse_tree($parent, $niveau, $array)
 /**
  *	Display Recursive tree process
  *
- * @param	array $result Global Digirisk Element list after recursive process
+ * @param	array $results Global Digirisk Element list after recursive process
  * @return	void
  */
 function display_recurse_tree($results)

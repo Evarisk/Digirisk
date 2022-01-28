@@ -39,6 +39,11 @@ class DigiriskResources extends CommonObject
 	public $error;
 
 	/**
+	 * @var string[] Array of error strings
+	 */
+	public $errors = array();
+
+	/**
 	 * @var string ID to identify managed object.
 	 */
 	public $element = 'digiriskresources';
@@ -250,13 +255,13 @@ class DigiriskResources extends CommonObject
 		$sql .= ' AND object_type = '. "'" . $object->element . "'";
 		$sql .= ' AND object_id = '.$object->id;
 		$sql .= ' AND status = 1';
-		if (empty($id) && isset($this->ismultientitymanaged) && $this->ismultientitymanaged == 1) $sql .= ' AND entity IN ('.getEntity($this->table_element).')';
+		if (isset($this->ismultientitymanaged) && $this->ismultientitymanaged == 1) $sql .= ' AND entity IN ('.getEntity($this->table_element).')';
 
 		$res = $this->db->query($sql);
 
 		if ($res) {
-			if ($res->num_rows > 1) {
-				$num = $this->db->num_rows($res);
+			$num = $this->db->num_rows($res);
+			if ($num > 1) {
 				$i = 0;
 				$limit = 100;
 				$records = array();

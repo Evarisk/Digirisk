@@ -107,14 +107,14 @@ class PreventionPlan extends CommonObject
 	public $context = array();
 
 	/**
-	 * @var FirePermitLine[]     Array of subtable lines
+	 * @var PreventionPlanLine[]     Array of subtable lines
 	 */
 	public $lines = array();
 
-	const STATUS_IN_PROGRESS       = 1;
-	const STATUS_PENDING_SIGNATURE = 2;
-	const STATUS_LOCKED            = 3;
-	const STATUS_ARCHIVED          = 4;
+	public const STATUS_IN_PROGRESS = 1;
+	public const STATUS_PENDING_SIGNATURE = 2;
+	public const STATUS_LOCKED = 3;
+	public const STATUS_ARCHIVED = 4;
 
 	/**
 	 * @var array  Array with all fields and their property. Do not use it as a static var. It may be modified by constructor.
@@ -311,7 +311,7 @@ class PreventionPlan extends CommonObject
 			}
 
 			if ( ! empty($options['preventionplan_risk'])) {
-				$num = (is_array($object->lines) ? count($object->lines) : 0);
+				$num = (!empty($object->lines) ? count($object->lines) : 0);
 				for ($i = 0; $i < $num; $i++) {
 					$line                    = $object->lines[$i];
 					$line->category          = empty($line->category) ? 0 : $line->category;
@@ -665,7 +665,7 @@ class PreventionPlan extends CommonObject
 	 *  Output html form to select a third party.
 	 *  Note, you must use the select_company to get the component to select a third party. This function must only be called by select_company.
 	 *
-	 * @param string $selected Preselected type
+	 * @param string|int $selected Preselected type
 	 * @param string $htmlname Name of field in form
 	 * @param string $filter Optional filters criteras (example: 's.rowid <> x', 's.client in (1,3)')
 	 * @param string $showempty Add an empty field (Can be '1' or text to use on empty line like 'SelectThirdParty')
@@ -676,7 +676,7 @@ class PreventionPlan extends CommonObject
 	 * @param string $morecss Add more css styles to the SELECT component
 	 * @param string $moreparam Add more parameters onto the select tag. For example 'style="width: 95%"' to avoid select2 component to go over parent container
 	 * @param bool $multiple add [] in the name of element and add 'multiple' attribut
-	 * @return array|int
+	 * @return array|string
 	 * @throws Exception
 	 */
 	public function select_preventionplan_list($selected = '', $htmlname = 'fk_preventionplan', $filter = '', $showempty = '1', $forcecombo = 0, $events = array(), $outputmode = 0, $limit = 0, $morecss = 'minwidth100', $moreparam = '', $multiple = false)
@@ -754,6 +754,7 @@ class PreventionPlan extends CommonObject
 		return $out;
 	}
 }
+
 /**
  *	Class to manage invoice lines.
  *  Saved into database table llx_preventionplandet

@@ -108,10 +108,10 @@ class FirePermit extends CommonObject
 	  */
 	 public $lines = array();
 
-	const STATUS_IN_PROGRESS       = 1;
-	const STATUS_PENDING_SIGNATURE = 2;
-	const STATUS_LOCKED            = 3;
-	const STATUS_ARCHIVED          = 4;
+	public const STATUS_IN_PROGRESS = 1;
+	public const STATUS_PENDING_SIGNATURE = 2;
+	public const STATUS_LOCKED = 3;
+	public const STATUS_ARCHIVED = 4;
 
 	/**
 	 * @var array  Array with all fields and their property. Do not use it as a static var. It may be modified by constructor.
@@ -302,7 +302,7 @@ class FirePermit extends CommonObject
 			}
 
 			if ( ! empty($options['firepermit_risk'])) {
-				$num = (is_array($object->lines) ? count($object->lines) : 0);
+				$num = (!empty($object->lines) ? count($object->lines) : 0);
 				for ($i = 0; $i < $num; $i++) {
 					$line                = $object->lines[$i];
 					$line->category      = empty($line->category) ? 0 : $line->category;
@@ -964,6 +964,11 @@ class FirePermitSignature extends DigiriskSignature
 	 * @var string Name of table without prefix where object is stored. This is also the key used for extrafields management.
 	 */
 	public $object_type = 'firepermit';
+
+	/**
+	 * @var array Context element object
+	 */
+	public $context = array();
 
 	/**
 	 * Constructor

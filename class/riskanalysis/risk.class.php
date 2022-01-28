@@ -192,7 +192,7 @@ class Risk extends CommonObject
 			foreach ($result as $risk) {
 				$evaluation     = new RiskAssessment($this->db);
 				$lastEvaluation = $evaluation->fetchFromParent($risk->id, 1);
-				if ( $lastEvaluation > 0 && ! empty($lastEvaluation) ) {
+				if ( $lastEvaluation > 0 && ! empty($lastEvaluation) && is_array($lastEvaluation)) {
 					$lastEvaluation       = array_shift($lastEvaluation);
 					$risk->lastEvaluation = $lastEvaluation->cotation;
 				}
@@ -202,11 +202,16 @@ class Risk extends CommonObject
 		}
 
 		if ( $get_children_data ) {
-			$elements = recurse_tree($parent_id, 0, $objects);
+			if (is_array($objects)) {
+				$elements = recurse_tree($parent_id, 0, $objects);
+			} else {
+				return -1;
+			}
+
 			if ( $elements > 0 && ! empty($elements) ) {
 				// Super function iterations flat.
 				$it = new RecursiveIteratorIterator(new RecursiveArrayIterator($elements));
-				$element = 0;
+				$element = array();
 				foreach ($it as $key => $v) {
 					$element[$key][$v] = $v;
 				}
@@ -225,7 +230,7 @@ class Risk extends CommonObject
 							foreach ($result as $risk) {
 								$evaluation     = new RiskAssessment($this->db);
 								$lastEvaluation = $evaluation->fetchFromParent($risk->id, 1);
-								if ( $lastEvaluation > 0 && ! empty($lastEvaluation) ) {
+								if ( $lastEvaluation > 0 && ! empty($lastEvaluation)  && is_array($lastEvaluation)) {
 									$lastEvaluation       = array_shift($lastEvaluation);
 									$risk->lastEvaluation = $lastEvaluation->cotation;
 								}
@@ -246,7 +251,7 @@ class Risk extends CommonObject
 					foreach ($result as $risk) {
 						$evaluation     = new RiskAssessment($this->db);
 						$lastEvaluation = $evaluation->fetchFromParent($risk->id, 1);
-						if ( $lastEvaluation > 0 && ! empty($lastEvaluation) ) {
+						if ( $lastEvaluation > 0 && ! empty($lastEvaluation)  && is_array($lastEvaluation)) {
 							$lastEvaluation       = array_shift($lastEvaluation);
 							$risk->lastEvaluation = $lastEvaluation->cotation;
 						}

@@ -110,6 +110,7 @@ class LegalDisplay extends DigiriskDocuments
 		$resources               = new DigiriskResources($this->db);
 		$digirisk_resources      = $resources->digirisk_dolibarr_fetch_resources();
 		$thirdparty_openinghours = new Openinghours($this->db);
+		$json                    = array();
 
 		// *** JSON FILLING ***
 		if (!empty ($digirisk_resources )) {
