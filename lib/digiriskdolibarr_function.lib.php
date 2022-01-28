@@ -26,7 +26,7 @@
  *
  *  @param		string	$modulepart		'product', 'ticket', ...
  *  @param      string	$sdir        	Directory to scan (full absolute path)
- *  @param      int		$size        	0=original size, 1='small' use thumbnail if possible
+ *  @param      string	$size        	0=original size, 1='small' use thumbnail if possible
  *  @param      int		$nbmax       	Nombre maximum de photos (0=pas de max)
  *  @param      int		$nbbyrow     	Number of image per line or -1 to use div. Used only if size=1.
  * 	@param		int		$showfilename	1=Show filename
@@ -172,7 +172,7 @@ function digirisk_show_photos($modulepart, $sdir, $size = '', $nbmax = 0, $nbbyr
 			}
 		}
 
-		if ($size == 1 || $size == 'small') {
+		if ($size == 'small') {
 			if ($nbbyrow > 0) {
 				// Ferme tableau
 				while ($nbphoto % $nbbyrow) {
