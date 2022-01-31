@@ -814,7 +814,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 			}
 		}
 		$morehtmlref .= '<br>' . $langs->trans('TotalWorkStopDays') . ' : ' . $totalworkstopdays;
-	}
+	} else {
 		$morehtmlref .= '<br>' . $langs->trans('RegisterAccident');
 	}
 
