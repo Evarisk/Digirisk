@@ -1447,7 +1447,7 @@ function digirisk_show_medias($sdir, $size = 0, $maxHeight = 80, $maxWidth = 80)
  *  @param		object	$object			Object element
  *  @return     string					Html code to show photo. Number of photos shown is saved in this->nbphoto
  */
-function digirisk_show_medias_linked($modulepart, $sdir, $size = '', $nbmax = 0, $nbbyrow = 5, $showfilename = 0, $showaction = 0, $maxHeight = 120, $maxWidth = 160, $nolink = 0, $notitle = 0, $usesharelink = 0, $subdir = "", $object)
+function digirisk_show_medias_linked($modulepart, $sdir, $size = '', $nbmax = 0, $nbbyrow = 5, $showfilename = 0, $showaction = 0, $maxHeight = 120, $maxWidth = 160, $nolink = 0, $notitle = 0, $usesharelink = 0, $subdir = "", $object = null)
 {
 	global $conf, $langs;
 
