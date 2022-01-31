@@ -202,30 +202,30 @@ class DigiriskElementUnitTest extends PHPUnit\Framework\TestCase
 		return $localobject;
 	}
 
-	/**
-	 * testDigiriskElementInfo
-	 *
-	 * @param   DigiriskElement $localobject Digiriskelement object
-	 * @return  void
-	 *
-	 * @covers  DigiriskElement::info
-	 *
-	 * @depends testDigiriskElementFetch
-	 * The depends says test is run only if previous is ok
-	 */
-	public function testDigiriskElementInfo($localobject) : void
-	{
-		global $conf, $user, $langs, $db;
-		$conf  = $this->savconf;
-		$user  = $this->savuser;
-		$langs = $this->savlangs;
-		$db    = $this->savdb;
-
-		$result = $localobject->info($localobject->id);
-		$this->assertNull($result);
-
-		print __METHOD__ . " id=" . $localobject->id . "\n";
-	}
+//	/**
+//	 * testDigiriskElementInfo
+//	 *
+//	 * @param   DigiriskElement $localobject Digiriskelement object
+//	 * @return  void
+//	 *
+//	 * @covers  DigiriskElement::info
+//	 *
+//	 * @depends testDigiriskElementFetch
+//	 * The depends says test is run only if previous is ok
+//	 */
+//	public function testDigiriskElementInfo($localobject) : void
+//	{
+//		global $conf, $user, $langs, $db;
+//		$conf  = $this->savconf;
+//		$user  = $this->savuser;
+//		$langs = $this->savlangs;
+//		$db    = $this->savdb;
+//
+//		$result = $localobject->info($localobject->id);
+//		$this->assertNull($result);
+//
+//		print __METHOD__ . " id=" . $localobject->id . "\n";
+//	}
 
 	/**
 	 * testDigiriskElementUpdate
@@ -344,9 +344,7 @@ class DigiriskElementUnitTest extends PHPUnit\Framework\TestCase
 		$localobjectFlatList = $localobject->fetchDigiriskElementFlat(0);
 
 		$this->assertSame(true, is_array($localobjectFlatList));
-		if (is_array($localobjectFlatList)) {
-			$this->assertInstanceOf(get_class($localobject), array_shift($localobjectFlatList)['object']);
-		}
+		$this->assertInstanceOf(get_class($localobject), array_shift($localobjectFlatList)['object']);
 		$this->assertIsInt(array_shift($localobjectFlatList)['depth']);
 		print __METHOD__ . " ok";
 		print "\n";
