@@ -606,7 +606,7 @@ class DigiriskSignature extends CommonObject
 	 *
 	 * @param string $role Role of resource
 	 * @param int $fk_object ID of object linked
-	 * @param int $object_type type of object linked
+	 * @param string $object_type type of object linked
 	 * @return int
 	 * @throws Exception
 	 */
