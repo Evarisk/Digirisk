@@ -350,6 +350,10 @@ class doc_firepermitdocument_odt extends ModeleODTFirePermitDocument
 
 			$digirisk_resources     = $resources->digirisk_dolibarr_fetch_resources();
 			$extsociety             = $resources->fetchResourcesFromObject('FP_EXT_SOCIETY', $firepermit);
+			if ($extsociety < 1) {
+				$extsociety = new stdClass();
+			}
+
 			$maitreoeuvre           = $signatory->fetchSignatory('FP_MAITRE_OEUVRE', $firepermit->id, 'firepermit');
 			$maitreoeuvre           = is_array($maitreoeuvre) ? array_shift($maitreoeuvre) : $maitreoeuvre;
 			$extsocietyresponsible  = $signatory->fetchSignatory('FP_EXT_SOCIETY_RESPONSIBLE', $firepermit->id, 'firepermit');

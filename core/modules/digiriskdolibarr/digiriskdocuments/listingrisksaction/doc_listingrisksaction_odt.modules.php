@@ -361,9 +361,12 @@ class doc_listingrisksaction_odt extends ModeleODTListingRisksAction
 
 					if ( ! empty($digiriskelement) ) {
 						$risks = $risk->fetchRisksOrderedByCotation($digiriskelement->id, true);
+						if ($risks < 1) {
+							$risks = array();
+						}
 						for ($i = 1; $i <= 4; $i++ ) {
 							$listlines = $odfHandler->setSegment('risk' . $i);
-							if ($risks > 0 && ! empty($risks)) {
+							if (! empty($risks)) {
 								foreach ($risks as $line) {
 									$tmparray['actionPreventionUncompleted'] = "";
 									$tmparray['actionPreventionCompleted']   = "";
@@ -472,9 +475,12 @@ class doc_listingrisksaction_odt extends ModeleODTListingRisksAction
 						}
 					} else {
 						$risks = $risk->fetchRisksOrderedByCotation(0, true);
+						if ($risks < 1) {
+							$risks = array();
+						}
 						for ($i = 1; $i <= 4; $i++ ) {
 							$listlines = $odfHandler->setSegment('risk' . $i);
-							if ($risks > 0 && ! empty($risks)) {
+							if (! empty($risks)) {
 								foreach ($risks as $line) {
 									$tmparray['actionPreventionUncompleted'] = "";
 									$tmparray['actionPreventionCompleted']   = "";

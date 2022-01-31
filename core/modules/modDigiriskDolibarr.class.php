@@ -341,6 +341,17 @@ class modDigiriskdolibarr extends DolibarrModules
 	public $hidden = false;
 
 	/**
+	 * @var array To add new tabs on Dolibarr objects.
+	 */
+	public $tabs = array();
+
+	/**
+	 * @var array To add new dictionaries on Dolibarr objects.
+	 */
+	public $dictionaries = array();
+
+
+	/**
 	 * Constructor. Define names, constants, directories, boxes, permissions
 	 *
 	 * @param DoliDB $db Database handler

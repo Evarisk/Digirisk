@@ -362,7 +362,10 @@ class doc_riskassessmentdocument_custom_odt extends ModeleODTRiskAssessmentDocum
 					$risk = new Risk($this->db);
 					if ( ! empty($object) ) {
 						$risks = $risk->fetchRisksOrderedByCotation($object->id);
-						if ($risks > 0 && ! empty($risks)) {
+						if ($risks < 1) {
+							$risks = array();
+						}
+						if (! empty($risks)) {
 							for ($i = 1; $i <= 4; $i++ ) {
 								$listlines = $odfHandler->setSegment('risq' . $i);
 

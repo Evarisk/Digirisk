@@ -363,7 +363,10 @@ class doc_workunitdocument_custom_odt extends ModeleODTWorkUnitDocument
 					$risk = new Risk($this->db);
 					if ( ! empty($object) ) {
 						$risks = $risk->fetchRisksOrderedByCotation($object->id, false, $conf->global->DIGIRISKDOLIBARR_SHOW_PARENT_RISKS);
-						if ($risks > 0 && ! empty($risks)) {
+						if ($risks < 1) {
+							$risks = array();
+						}
+						if (! empty($risks)) {
 							for ($i = 1; $i <= 4; $i++ ) {
 								$listlines = $odfHandler->setSegment('risq' . $i);
 

@@ -343,6 +343,10 @@ class doc_preventionplandocument_specimen_odt extends ModeleODTPreventionPlanDoc
 
 			$digirisk_resources     = $resources->digirisk_dolibarr_fetch_resources();
 			$extsociety             = $resources->fetchResourcesFromObject('PP_EXT_SOCIETY', $preventionplan);
+			if ($extsociety < 1) {
+				$extsociety = new stdClass();
+			}
+
 			$maitreoeuvre           = $signatory->fetchSignatory('PP_MAITRE_OEUVRE', $preventionplan->id, 'preventionplan');
 			$maitreoeuvre           = is_array($maitreoeuvre) ? array_shift($maitreoeuvre) : $maitreoeuvre;
 			$extsocietyresponsible  = $signatory->fetchSignatory('PP_EXT_SOCIETY_RESPONSIBLE', $preventionplan->id, 'preventionplan');
