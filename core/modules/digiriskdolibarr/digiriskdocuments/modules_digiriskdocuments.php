@@ -68,9 +68,10 @@ abstract class ModeleNumRefDigiriskDocuments
 	/**
 	 *    Returns next assigned value
 	 *
+	 * @param Object $object Object we need next value for
 	 * @return    string      Valeur
 	 */
-	public function getNextValue()
+	public function getNextValue($object)
 	{
 		global $langs;
 		return $langs->trans("NotAvailable");

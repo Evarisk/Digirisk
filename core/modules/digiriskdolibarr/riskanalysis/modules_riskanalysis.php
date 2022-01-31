@@ -17,7 +17,7 @@
  */
 
 /**
- *  \file			htdocs/core/modules/digiriskdolibarr/modules_RiskAnalysis.php
+ *  \file			htdocs/core/modules/digiriskdolibarr/modules_riskanalysis.php
  *  \ingroup		digiriskdolibarr
  *  \brief			File that contains parent class for RiskAnalysis numbering models
  */
@@ -66,11 +66,12 @@ abstract class ModeleNumRefRiskAnalysis
 	}
 
 	/**
-	 *    Returns next assigned value
+	 * Returns next assigned value
 	 *
+	 * @param Object $object Object we need next value for
 	 * @return    string      Valeur
 	 */
-	public function getNextValue()
+	public function getNextValue($object)
 	{
 		global $langs;
 		return $langs->trans("NotAvailable");

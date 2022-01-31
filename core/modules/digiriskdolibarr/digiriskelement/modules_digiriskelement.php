@@ -66,11 +66,12 @@ abstract class ModeleNumRefDigiriskElement
 	}
 
 	/**
-	 *    Returns next assigned value
+	 * 	Returns next assigned value
 	 *
-	 * @return    string      Valeur
+	 * 	@param	Object 	$object	Object we need next value for
+	 * 	@return	string      	Valeur
 	 */
-	public function getNextValue()
+	public function getNextValue($object)
 	{
 		global $langs;
 		return $langs->trans("NotAvailable");
