@@ -446,9 +446,12 @@ class doc_listingrisksphoto_odt extends ModeleODTListingRisksPhoto
 						}
 					} else {
 						$risks = $risk->fetchRisksOrderedByCotation(0, true);
+						if ($risks < 1) {
+							$risks = array();
+						}
 						for ($i = 1; $i <= 4; $i++ ) {
 							$listlines = $odfHandler->setSegment('risk' . $i);
-							if ($risks !== -1) {
+							if (! empty($risks)) {
 								foreach ($risks as $line) {
 									$evaluation     = new RiskAssessment($this->db);
 									$lastEvaluation = $evaluation->fetchFromParent($line->id, 1);

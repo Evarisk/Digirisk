@@ -1366,7 +1366,7 @@ function llxHeaderTicketDigirisk($title, $head = "", $disablejs = 0, $disablehea
 
 /**
 * @param $sdir
-* @param int $size
+* @param string $size
 * @param int $maxHeight
 * @param int $maxWidth
 * @return string
