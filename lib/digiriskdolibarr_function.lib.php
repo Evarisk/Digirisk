@@ -1371,7 +1371,7 @@ function llxHeaderTicketDigirisk($title, $head = "", $disablejs = 0, $disablehea
 * @param int $maxWidth
 * @return string
 */
-function digirisk_show_medias($sdir, $size = 0, $maxHeight = 80, $maxWidth = 80)
+function digirisk_show_medias($sdir, $size = '', $maxHeight = 80, $maxWidth = 80)
 {
 	global $conf;
 
@@ -1399,7 +1399,7 @@ function digirisk_show_medias($sdir, $size = 0, $maxHeight = 80, $maxWidth = 80)
 				if (image_format_supported($file) >= 0) {
 					$nbphoto++;
 
-					if ($size == 1 || $size == 'small') {   // Format vignette
+					if ($size == 'small') {   // Format vignette
 						$relativepath = 'digiriskdolibarr/medias/thumbs';
 						$modulepart   = 'ecm';
 						$path         = DOL_URL_ROOT . '/document.php?modulepart=' . $modulepart . '&attachment=0&file=' . str_replace('/', '%2F', $relativepath);
