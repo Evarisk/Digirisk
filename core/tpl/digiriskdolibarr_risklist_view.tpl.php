@@ -287,21 +287,27 @@
 			$resql = $db->query($sql);
 
 			$nbtotalofrecords = $db->num_rows($resql);
+
 			if (($page * $limit) > $nbtotalofrecords) {	// if total of record found is smaller than page * limit, goto and load page 0
 				$page   = 0;
 				$offset = 0;
 			}
 		}
 
-		if ($limit) $sql .= $db->plimit($limit + 1, $offset);
+		// if total of record found is smaller than limit, no need to do paging and to restart another select with limits set.
+		if (is_numeric($nbtotalofrecords) && ($limit > $nbtotalofrecords || empty($limit))) {
+			$num = $nbtotalofrecords;
+		} else {
+			if ($limit) $sql .= $db->plimit($limit + 1, $offset);
 
-		$resql = $db->query($sql);
-		if ( ! $resql) {
-			dol_print_error($db);
-			exit;
+			$resql = $db->query($sql);
+			if ( ! $resql) {
+				dol_print_error($db);
+				exit;
+			}
+
+			$num = $db->num_rows($resql);
 		}
-
-		$num = $db->num_rows($resql);
 
 		// Direct jump if only one record found
 		if ($num == 1 && ! empty($conf->global->MAIN_SEARCH_DIRECT_OPEN_IF_ONLY_ONE) && $search_all && ! $page) {
@@ -360,14 +366,41 @@
 
 		$sql .= $db->order($sortfield, $sortorder);
 
-		if ($limit) $sql .= $db->plimit($limit + 1, $offset);
+		// Count total nb of records
+		$nbtotalofrecords = '';
+		if (empty($conf->global->MAIN_DISABLE_FULL_SCANLIST)) {
+			$resql = $db->query($sql);
 
-		$resql = $db->query($sql);
-		if ( ! $resql) {
-			dol_print_error($db);
+			$nbtotalofrecords = $db->num_rows($resql);
+
+			if (($page * $limit) > $nbtotalofrecords) {	// if total of record found is smaller than page * limit, goto and load page 0
+				$page   = 0;
+				$offset = 0;
+			}
+		}
+
+		// if total of record found is smaller than limit, no need to do paging and to restart another select with limits set.
+		if (is_numeric($nbtotalofrecords) && ($limit > $nbtotalofrecords || empty($limit))) {
+			$num = $nbtotalofrecords;
+		} else {
+			if ($limit) $sql .= $db->plimit($limit + 1, $offset);
+
+			$resql = $db->query($sql);
+			if ( ! $resql) {
+				dol_print_error($db);
+				exit;
+			}
+
+			$num = $db->num_rows($resql);
+		}
+
+		// Direct jump if only one record found
+		if ($num == 1 && ! empty($conf->global->MAIN_SEARCH_DIRECT_OPEN_IF_ONLY_ONE) && $search_all && ! $page) {
+			$obj = $db->fetch_object($resql);
+			$id  = $obj->rowid;
+			header("Location: " . dol_buildpath('/digiriskdolibarr/view/digiriskelement/digiriskelement_risk.php', 1) . '?id=' . $id);
 			exit;
 		}
-		$num = $db->num_rows($resql);
 	}
 
 	$arrayofselected = is_array($toselect) ? $toselect : array();
@@ -769,7 +802,7 @@
 		<?php endif; ?>
 	<?php endif; ?>
 	<?php $title = $langs->trans('DigiriskElementRisksList');
-	print_barre_liste($title, $page, $_SERVER["PHP_SELF"], $param, $sortfield, $sortorder, $massactionbutton, $num, $num, 'digiriskdolibarr32px.png@digiriskdolibarr', 0, $newcardbutton, '', $limit, 0, 0, 1);
+	print_barre_liste($title, $page, $_SERVER["PHP_SELF"], $param, $sortfield, $sortorder, $massactionbutton, $num, $nbtotalofrecords, 'digiriskdolibarr32px.png@digiriskdolibarr', 0, $newcardbutton, '', $limit, 0, 0, 1);
 
 	include DOL_DOCUMENT_ROOT . '/core/tpl/massactions_pre.tpl.php';
 
