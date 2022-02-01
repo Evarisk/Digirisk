@@ -269,6 +269,9 @@
 				if ($search[$key] == '-1') $search[$key] = '';
 				$mode_search                             = 2;
 			}
+			if ($key == 'category') {
+				$mode_search = 1;
+			}
 			if ($search[$key] != '') $sql .= natural_search($key, $search[$key], (($key == 'status') ? 2 : $mode_search));
 		}
 		if ($search_all) $sql .= natural_search(array_keys($fieldstosearchall), $search_all);
@@ -858,7 +861,27 @@
 			if (is_array($val['arrayofkeyval'])) print $form->selectarray('search_' . $key, $val['arrayofkeyval'], $search[$key], $val['notnull'], 0, 0, '', 1, 0, 0, '', 'maxwidth75');
 			elseif (strpos($val['type'], 'integer:') === 0) {
 				print $risk->showInputField($val, $key, $search[$key], '', '', 'search_', 'maxwidth150', 1);
-			} elseif ( ! preg_match('/^(date|timestamp)/', $val['type'])) print '<input type="text" class="flat maxwidth75" name="search_' . $key . '" value="' . dol_escape_htmltag($search[$key]) . '">';
+			} elseif ($key == 'category') { ?>
+				<div class="wpeo-dropdown dropdown-large dropdown-grid category-danger padding">
+					<input class="input-hidden-danger" type="hidden" name="<?php echo 'search_' . $key ?>" value="<?php echo dol_escape_htmltag($search[$key]) ?>" />
+					<div class="dropdown-toggle dropdown-add-button button-cotation wpeo-tooltip-event" aria-label="<?php echo (empty(dol_escape_htmltag($search[$key]))) ? $risk->get_danger_category_name($risk) : $risk->get_danger_category_name_by_position($search[$key]); ?>">
+						<img class="danger-category-pic tooltip hover" src="<?php echo DOL_URL_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . ((empty(dol_escape_htmltag($search[$key]))) ? $risk->get_danger_category($risk) : $risk->get_danger_category_by_position($search[$key])) . '.png'?>" />
+					</div>
+					<?php if ($conf->global->DIGIRISKDOLIBARR_RISK_CATEGORY_EDIT) : ?>
+					<ul class="dropdown-content wpeo-gridlayout grid-5 grid-gap-0">
+						<?php
+						$dangerCategories = $risk->get_danger_categories();
+						if ( ! empty($dangerCategories) ) :
+							foreach ($dangerCategories as $dangerCategory) : ?>
+								<li class="item dropdown-item wpeo-tooltip-event classfortooltip" data-is-preset="<?php echo ''; ?>" data-id="<?php echo $dangerCategory['position'] ?>" aria-label="<?php echo $dangerCategory['name'] ?>">
+									<img src="<?php echo DOL_URL_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $dangerCategory['thumbnail_name'] . '.png'?>" class="attachment-thumbail size-thumbnail photo photowithmargin" alt="" loading="lazy" width="48" height="48">
+								</li>
+							<?php endforeach;
+						endif; ?>
+					</ul>
+					<?php endif; ?>
+				</div>
+			<?php } elseif ( ! preg_match('/^(date|timestamp)/', $val['type']) && $key != 'category') print '<input type="text" class="flat maxwidth75" name="search_' . $key . '" value="' . dol_escape_htmltag($search[$key]) . '">';
 			print '</td>';
 		}
 	}
@@ -1141,8 +1164,6 @@
 	$parameters = array('arrayfields' => $arrayfields, 'sql' => $sql);
 	$reshook    = $hookmanager->executeHooks('printFieldListFooter', $parameters, $risk); // Note that $action and $risk may have been modified by hook
 	print $hookmanager->resPrint; ?>
-
-
 
 	<?php print '</table>' . "\n";
 	print '<!-- End table -->';

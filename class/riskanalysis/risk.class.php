@@ -436,6 +436,42 @@ class Risk extends CommonObject
 	}
 
 	/**
+	 * Get danger category picto path
+	 *
+	 * @param int $position
+	 * @return    string $category['thumbnail_name']     path to danger category picto, -1 if don't exist
+	 */
+	public function get_danger_category_by_position($position)
+	{
+		$risk_categories = $this->get_danger_categories();
+		foreach ($risk_categories as $category) {
+			if ($category['position'] == $position) {
+				return $category['thumbnail_name'];
+			}
+		}
+
+		return -1;
+	}
+
+	/**
+	 * Get danger category picto path
+	 *
+	 * @param int $position
+	 * @return    string $category['thumbnail_name']     path to danger category picto, -1 if don't exist
+	 */
+	public function get_danger_category_name_by_position($position)
+	{
+		$risk_categories = $this->get_danger_categories();
+		foreach ($risk_categories as $category) {
+			if ($category['position'] == $position) {
+				return $category['name'];
+			}
+		}
+
+		return -1;
+	}
+
+	/**
 	 * Get fire permit risk categories json in /digiriskdolibarr/js/json/
 	 *
 	 * @return	array $risk_categories
