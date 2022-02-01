@@ -226,14 +226,17 @@ class doc_workunitdocument_odt extends ModeleODTWorkUnitDocument
 	/**
 	 *  Function to build a document on disk using the generic odt module.
 	 *
-	 * @param WorkUnitDocument $object Object source to build document
-	 * @param Translate $outputlangs Lang output object
-	 * @param string $srctemplatepath Full path of source filename for generator using a template file
-	 * @param $digiriskelement
-	 * @return        int                            1 if OK, <=0 if KO
-	 * @throws Exception
+	 * @param 	WorkUnitDocument		$object 			Object source to build document
+	 * @param 	Translate 				$outputlangs 		Lang output object
+	 * @param 	string 					$srctemplatepath 	Full path of source filename for generator using a template file
+	 * @param	int						$hidedetails		Do not show line details
+	 * @param	int						$hidedesc			Do not show desc
+	 * @param	int						$hideref			Do not show ref
+	 * @param 	DigiriskElement			$digiriskelement    Object for get DigiriskElement info
+	 * @return	int                            				1 if OK, <=0 if KO
+	 * @throws 	Exception
 	 */
-	public function write_file($object, $outputlangs, $srctemplatepath, $digiriskelement)
+	public function write_file($object, $outputlangs, $srctemplatepath, $hidedetails, $hidedesc, $hideref, $digiriskelement)
 	{
 		// phpcs:enable
 		global $user, $langs, $conf, $hookmanager, $action, $mysoc;

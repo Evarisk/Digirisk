@@ -226,14 +226,17 @@ class doc_firepermitdocument_odt extends ModeleODTFirePermitDocument
 	/**
 	 *  Function to build a document on disk using the generic odt module.
 	 *
-	 * @param FirePermitDocument $object Object source to build document
-	 * @param Translate $outputlangs Lang output object
-	 * @param string $srctemplatepath Full path of source filename for generator using a template file
-	 * @param $firepermit
-	 * @return        int                            1 if OK, <=0 if KO
-	 * @throws Exception
+	 * @param 	FirePermitDocument	$object 			Object source to build document
+	 * @param 	Translate 			$outputlangs 		Lang output object
+	 * @param 	string 				$srctemplatepath 	Full path of source filename for generator using a template file
+	 * @param	int					$hidedetails		Do not show line details
+	 * @param	int					$hidedesc			Do not show desc
+	 * @param	int					$hideref			Do not show ref
+	 * @param 	FirePermit			$firepermit			FirePermit object
+	 * @return	int                            			1 if OK, <=0 if KO
+	 * @throws 	Exception
 	 */
-	public function write_file($object, $outputlangs, $srctemplatepath, $firepermit)
+	public function write_file($object, $outputlangs, $srctemplatepath, $hidedetails, $hidedesc, $hideref, $firepermit)
 	{
 		// phpcs:enable
 		global $user, $langs, $conf, $hookmanager, $action, $mysoc;
