@@ -387,7 +387,7 @@ class DigiriskElement extends CommonObject
 			foreach ($risks as $risk) {
 				$riskassessment = new RiskAssessment($this->db);
 				$riskassessment = $riskassessment->fetchFromParent($risk->id, 1);
-				if ( ! empty($riskassessment) && $riskassessment > 0) {
+				if ( ! empty($riskassessment) && $riskassessment > 0 && is_array($riskassessment)) {
 					$riskassessment         = array_shift($riskassessment);
 					$scale                  = $riskassessment->get_evaluation_scale();
 					$scale_counter[$scale] += 1;
