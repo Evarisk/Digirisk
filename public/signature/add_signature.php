@@ -199,12 +199,14 @@ if ( $signatory->role == 'PP_EXT_SOCIETY_INTERVENANTS') {
 	<div class="wpeo-gridlayout grid-2">
 		<div class="informations">
 			<div class="wpeo-gridlayout grid-2 file-generation">
-				<?php $path = DOL_MAIN_URL_ROOT . '/custom/digiriskdolibarr/documents/temp/';	?>
 				<strong class="grid-align-middle"><?php echo $langs->trans("ThisIsInformationOnDocumentToSign"); ?></strong>
-				<input type="hidden" class="specimen-name" value="<?php echo $type . '_specimen_' . $track_id . '.odt' ?>">
-				<input type="hidden" class="specimen-path" value="<?php echo $path ?>">
-				<input type="hidden" class="track-id" value="<?php echo $track_id ?>">
-				<span class="wpeo-button button-primary  button-radius-2 grid-align-right auto-download"><i class="button-icon fas fa-file-pdf"></i><?php echo '  ' . $langs->trans('ShowDocument'); ?></span>
+				<?php if ($type == 'preventionplan') : ?>
+					<?php $path = DOL_MAIN_URL_ROOT . '/custom/digiriskdolibarr/documents/temp/';	?>
+					<input type="hidden" class="specimen-name" value="<?php echo $type . '_specimen_' . $track_id . '.odt' ?>">
+					<input type="hidden" class="specimen-path" value="<?php echo $path ?>">
+					<input type="hidden" class="track-id" value="<?php echo $track_id ?>">
+					<span class="wpeo-button button-primary  button-radius-2 grid-align-right auto-download"><i class="button-icon fas fa-file-pdf"></i><?php echo '  ' . $langs->trans('ShowDocument'); ?></span>
+				<?php endif; ?>
 			</div>
 			<br>
 			<div class="wpeo-table table-flex table-2">
