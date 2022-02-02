@@ -708,7 +708,7 @@ if (($id || $ref) && $action == 'edit') {
 
 	//AccidentLocation -- lieu de l'accident
 	print '<tr class="' . (($object->external_accident == 3) ? ' accident_location_field' : ' accident_location_field hidden' ) . '" style="' . (($object->external_accident == 3) ? ' ' : ' display:none') . '"><td class="minwidth400">' . $langs->trans("AccidentLocation") . '</td><td>';
-	$doleditor = new DolEditor('accident_location', GETPOST('accident_location'), '', 90, 'dolibarr_details', '', false, true, $conf->global->FCKEDITOR_ENABLE_SOCIETE, ROWS_3, '90%');
+	$doleditor = new DolEditor('accident_location', $object->accident_location, '', 90, 'dolibarr_details', '', false, true, $conf->global->FCKEDITOR_ENABLE_SOCIETE, ROWS_3, '90%');
 	$doleditor->Create();
 	print '</td></tr>';
 
