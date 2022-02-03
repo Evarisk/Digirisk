@@ -272,7 +272,13 @@
 			if ($key == 'category') {
 				$mode_search = 1;
 			}
-			if ($search[$key] != '') $sql .= natural_search($key, $search[$key], (($key == 'status') ? 2 : $mode_search));
+			if ($search[$key] != '') {
+				if ($key == 'ref') {
+					$key = 't.ref';
+					$search[$key] = $search['ref'];
+				}
+				$sql .= natural_search($key, $search[$key], (($key == 'status') ? 2 : $mode_search));
+			}
 		}
 		if ($search_all) $sql .= natural_search(array_keys($fieldstosearchall), $search_all);
 		// Add where from extra fields
@@ -861,6 +867,8 @@
 			if (is_array($val['arrayofkeyval'])) print $form->selectarray('search_' . $key, $val['arrayofkeyval'], $search[$key], $val['notnull'], 0, 0, '', 1, 0, 0, '', 'maxwidth75');
 			elseif (strpos($val['type'], 'integer:') === 0) {
 				print $risk->showInputField($val, $key, $search[$key], '', '', 'search_', 'maxwidth150', 1);
+			} elseif ($key == 'fk_element') {
+				print $digiriskelement->select_digiriskelement_list();
 			} elseif ($key == 'category') { ?>
 				<div class="wpeo-dropdown dropdown-large dropdown-grid category-danger padding">
 					<input class="input-hidden-danger" type="hidden" name="<?php echo 'search_' . $key ?>" value="<?php echo dol_escape_htmltag($search[$key]) ?>" />
