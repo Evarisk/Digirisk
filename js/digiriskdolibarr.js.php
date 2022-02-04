@@ -1575,6 +1575,7 @@ window.eoxiaJS.risk.event = function() {
 	$( document ).on( 'click', '.category-danger .item, .wpeo-table .category-danger .item', window.eoxiaJS.risk.selectDanger );
 	$( document ).on( 'click', '.risk-create:not(.button-disable)', window.eoxiaJS.risk.createRisk );
 	$( document ).on( 'click', '.risk-save', window.eoxiaJS.risk.saveRisk );
+	$( document ).on( 'change', '#fk_element', window.eoxiaJS.risk.selectDigiriskElement );
 };
 
 /**
@@ -1817,6 +1818,21 @@ window.eoxiaJS.risk.saveRisk = function ( event ) {
 			actionContainerError.removeClass('hidden');
 		}
 	});
+};
+
+/**
+ * Lors du clic sur un digiriskElement, met a jour la ref du champ de recherche
+ *
+ * @since   9.0.1
+ * @version 9.0.1
+ *
+ * @param  {MouseEvent} event [description]
+ * @return {void}
+ */
+window.eoxiaJS.risk.selectDigiriskElement = function( event ) {
+	let selectTitle = $(this).closest('td').find('#select2-fk_element-container').attr('title')
+	let digiriskElementRef = selectTitle.split(/ /)[0]
+	$('.input-hidden-fk_element').attr('value',digiriskElementRef);
 };
 
 /**

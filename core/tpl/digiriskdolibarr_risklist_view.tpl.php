@@ -274,10 +274,12 @@
 			}
 			if ($search[$key] != '') {
 				if ($key == 'ref') {
-					$key = 't.ref';
-					$search[$key] = $search['ref'];
+					$sql .= " AND (t.ref = '$search[$key]')";
+				} elseif ($key == 'fk_element') {
+					$sql .= " AND (e.ref = '$search[$key]')";
+				} else {
+					$sql .= natural_search($key, $search[$key], (($key == 'status') ? 2 : $mode_search));
 				}
-				$sql .= natural_search($key, $search[$key], (($key == 'status') ? 2 : $mode_search));
 			}
 		}
 		if ($search_all) $sql .= natural_search(array_keys($fieldstosearchall), $search_all);
@@ -868,14 +870,23 @@
 			elseif (strpos($val['type'], 'integer:') === 0) {
 				print $risk->showInputField($val, $key, $search[$key], '', '', 'search_', 'maxwidth150', 1);
 			} elseif ($key == 'fk_element') {
-				print $digiriskelement->select_digiriskelement_list();
+				$digiriskelementtmp = new DigiriskElement($db);
+				$digiriskelementtmp->fetch(0, $search['fk_element']);
+				print $digiriskelement->select_digiriskelement_list($digiriskelementtmp->id, 'fk_element', '', 1, 0, array(), 0, 0, 'minwidth100', 0, false, 1);
+				print '<input class="input-hidden-fk_element" type="hidden" name="search_fk_element" value=""/>';
 			} elseif ($key == 'category') { ?>
 				<div class="wpeo-dropdown dropdown-large dropdown-grid category-danger padding">
 					<input class="input-hidden-danger" type="hidden" name="<?php echo 'search_' . $key ?>" value="<?php echo dol_escape_htmltag($search[$key]) ?>" />
-					<div class="dropdown-toggle dropdown-add-button button-cotation wpeo-tooltip-event" aria-label="<?php echo (empty(dol_escape_htmltag($search[$key]))) ? $risk->get_danger_category_name($risk) : $risk->get_danger_category_name_by_position($search[$key]); ?>">
-						<img class="danger-category-pic tooltip hover" src="<?php echo DOL_URL_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . ((empty(dol_escape_htmltag($search[$key]))) ? $risk->get_danger_category($risk) : $risk->get_danger_category_by_position($search[$key])) . '.png'?>" />
-					</div>
-					<?php if ($conf->global->DIGIRISKDOLIBARR_RISK_CATEGORY_EDIT) : ?>
+					<?php if (dol_strlen(dol_escape_htmltag($search[$key])) == 0) : ?>
+						<div class="dropdown-toggle dropdown-add-button button-cotation">
+							<span class="wpeo-button button-square-50 button-grey"><i class="fas fa-exclamation-triangle button-icon"></i></span>
+							<img class="danger-category-pic wpeo-tooltip-event hidden" src="" aria-label=""/>
+						</div>
+					<?php else : ?>
+						<div class="dropdown-toggle dropdown-add-button button-cotation wpeo-tooltip-event" aria-label="<?php echo (empty(dol_escape_htmltag($search[$key]))) ? $risk->get_danger_category_name($risk) : $risk->get_danger_category_name_by_position($search[$key]); ?>">
+							<img class="danger-category-pic tooltip hover" src="<?php echo DOL_URL_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . ((empty(dol_escape_htmltag($search[$key]))) ? $risk->get_danger_category($risk) : $risk->get_danger_category_by_position($search[$key])) . '.png'?>" />
+						</div>
+					<?php endif; ?>
 					<ul class="dropdown-content wpeo-gridlayout grid-5 grid-gap-0">
 						<?php
 						$dangerCategories = $risk->get_danger_categories();
@@ -887,7 +898,6 @@
 							<?php endforeach;
 						endif; ?>
 					</ul>
-					<?php endif; ?>
 				</div>
 			<?php } elseif ( ! preg_match('/^(date|timestamp)/', $val['type']) && $key != 'category') print '<input type="text" class="flat maxwidth75" name="search_' . $key . '" value="' . dol_escape_htmltag($search[$key]) . '">';
 			print '</td>';
@@ -1075,7 +1085,7 @@
 										?>
 										<?php if ($conf->global->DIGIRISKDOLIBARR_MOVE_RISKS) : ?>
 											<input type="hidden" class="current-element-ref" value="<?php echo $objecttmp->ref; ?>">
-											<?php print $objecttmp->select_digiriskelement_list($objecttmp->id, 'socid', '', 0, array(), 0, 0, 'disabled', 0, false, 1); ?>
+											<?php print $objecttmp->select_digiriskelement_list($objecttmp->id, 'socid', '', 0, 0, array(), 0, 0, 'disabled', 0, false, 1); ?>
 										<?php else : ?>
 											<?php print '<span class="opacitymedium">' . '<a href=' . '"../../../digiriskdolibarr/admin/config/riskassessmentdocument.php" target="_blank">' . $langs->trans('SetConfToMoveRisk') . '</a>' . "</span><br>\n"; ?>
 										<?php endif; ?>

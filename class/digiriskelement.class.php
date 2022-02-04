@@ -405,6 +405,7 @@ class DigiriskElement extends CommonObject
 	 * @param  string 		$selected Preselected type
 	 * @param  string 		$htmlname Name of field in form
 	 * @param  string 		$filter Optional filters criteras (example: 's.rowid <> x', 's.client in (1,3)')
+	 * @param  string 		$showempty Add an empty field (Can be '1' or text to use on empty line like 'SelectThirdParty')
 	 * @param  int 			$forcecombo Force to use standard HTML select component without beautification
 	 * @param  array 		$events Event options. Example: array(array('method'=>'getContacts', 'url'=>dol_buildpath('/core/ajax/contacts.php',1), 'htmlname'=>'contactid', 'params'=>array('add-customer-contact'=>'disabled')))
 	 * @param  int 			$outputmode 0=HTML select string, 1=Array
@@ -416,7 +417,7 @@ class DigiriskElement extends CommonObject
 	 * @return string HTML string with
 	 * @throws Exception
 	 */
-	public function select_digiriskelement_list($selected = '', $htmlname = 'socid', $filter = '', $forcecombo = 0, $events = array(), $outputmode = 0, $limit = 0, $morecss = 'minwidth100', $moreparam = 0, $multiple = false, $noroot = 0)
+	public function select_digiriskelement_list($selected = '', $htmlname = 'fk_element', $filter = '', $showempty = '1', $forcecombo = 0, $events = array(), $outputmode = 0, $limit = 0, $morecss = 'minwidth100', $moreparam = 0, $multiple = false, $noroot = 0)
 	{
 		global $conf, $langs;
 
@@ -470,9 +471,12 @@ class DigiriskElement extends CommonObject
 
 			// Construct $out and $outarray
 			$out .= '<select id="' . $htmlname . '" class="flat' . ($morecss ? ' ' . $morecss : '') . '"' . ($moreparam ? ' ' . $moreparam : '') . ' name="' . $htmlname . ($multiple ? '[]' : '') . '" ' . ($multiple ? 'multiple' : '') . '>' . "\n";
-
 			$num                  = $this->db->num_rows($resql);
 			$i                    = 0;
+
+			$textifempty          = (($showempty && ! is_numeric($showempty)) ? $langs->trans($showempty) : '');
+			if ($showempty) $out .= '<option value="-1">' . $textifempty . '</option>' . "\n";
+
 			if ( ! $noroot) $out .= '<option value="0" selected>' . $langs->trans('Root') . ' : ' . $conf->global->MAIN_INFO_SOCIETE_NOM . '</option>';
 
 			if ($num) {
