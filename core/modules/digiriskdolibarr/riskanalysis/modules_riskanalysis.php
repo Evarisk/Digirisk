@@ -74,6 +74,7 @@ abstract class ModeleNumRefRiskAnalysis
 	public function getNextValue($object)
 	{
 		global $langs;
+		$object->ref = '';
 		return $langs->trans("NotAvailable");
 	}
 

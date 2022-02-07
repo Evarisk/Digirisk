@@ -74,6 +74,7 @@ abstract class ModeleNumRefDigiriskElement
 	public function getNextValue($object)
 	{
 		global $langs;
+		$object->ref = '';
 		return $langs->trans("NotAvailable");
 	}
 
