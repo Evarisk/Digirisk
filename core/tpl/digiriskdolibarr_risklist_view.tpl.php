@@ -895,7 +895,7 @@
 							<img class="danger-category-pic tooltip hover" src="<?php echo DOL_URL_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . ((empty(dol_escape_htmltag($search[$key]))) ? $risk->get_danger_category($risk) : $risk->get_danger_category_by_position($search[$key])) . '.png'?>" />
 						</div>
 					<?php endif; ?>
-					<ul class="dropdown-content wpeo-gridlayout grid-5 grid-gap-0">
+					<ul class="dropdown-content wpeo-gridlayout grid-5 grid-gap-0" style="position: fixed">
 						<?php
 						$dangerCategories = $risk->get_danger_categories();
 						if ( ! empty($dangerCategories) ) :
