@@ -72,7 +72,6 @@ function digirisk_show_photos($modulepart, $sdir, $size = '', $nbmax = 0, $nbbyr
 	$nbphoto = 0;
 
 	$filearray = dol_dir_list($dir, "files", 0, '', '(\.meta|_preview.*\.png)$', $sortfield, SORT_DESC, 1);
-	//echo '<pre>'; print_r( $pdirthumb ); echo '</pre>';
 	if (count($filearray)) {
 		if ($sortfield && $sortorder) {
 			$filearray = dol_sort_array($filearray, $sortfield, $sortorder);
@@ -1474,7 +1473,6 @@ function digirisk_show_medias_linked($modulepart, $sdir, $size = '', $nbmax = 0,
 	$nbphoto = 0;
 
 	$filearray = dol_dir_list($dir, "files", 0, '', '(\.meta|_preview.*\.png)$', $sortfield, SORT_DESC, 1);
-	//echo '<pre>'; print_r( $pdirthumb ); echo '</pre>';
 	if (count($filearray)) {
 		if ($sortfield && $sortorder) {
 			$filearray = dol_sort_array($filearray, $sortfield, $sortorder);
