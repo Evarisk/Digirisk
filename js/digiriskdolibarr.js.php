@@ -1662,25 +1662,18 @@ window.eoxiaJS.risk.createRisk = function ( event ) {
 	let elementTask = $(this).closest('.fichecenter').find('.riskassessment-task');
 
 	let riskCommentText = elementRisk.find('.risk-description textarea').val()
-	let riskDescriptionPrefill = elementRisk.find('.risk-category .input-risk-description-prefill').val()
-	let riskDescriptionText = elementRisk.find('.risk-category .danger-category-pic').attr('aria-label')
 
 	let evaluationText = elementEvaluation.find('.risk-evaluation-comment textarea').val()
 
 	let taskText = elementTask.find('input').val()
 
 	riskCommentText = window.eoxiaJS.risk.sanitizeBeforeRequest(riskCommentText)
-	riskDescriptionText = window.eoxiaJS.risk.sanitizeBeforeRequest(riskDescriptionText)
 	evaluationText = window.eoxiaJS.risk.sanitizeBeforeRequest(evaluationText)
 	taskText = window.eoxiaJS.risk.sanitizeBeforeRequest(taskText)
 
 	//Risk
 	var category = elementRisk.find('.risk-category input').val();
-	if (riskDescriptionPrefill == 1) {
-		var description = riskDescriptionText;
-	} else {
-		var description = riskCommentText;
-	}
+	var description = riskCommentText;
 
 	//Risk assessment
 	var method = elementEvaluation.find('.risk-evaluation-header .risk-evaluation-method').val();
