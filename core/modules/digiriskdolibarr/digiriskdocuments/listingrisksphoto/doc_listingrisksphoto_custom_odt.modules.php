@@ -17,7 +17,7 @@
  */
 
 /**
- *	\file       htdocs/core/modules/digiriskdolibarr/digiriskdocuments/listingrisksphoto/doc_listingrisksphoto_custom_odt.modules.php
+ *	\file       core/modules/digiriskdolibarr/digiriskdocuments/listingrisksphoto/doc_listingrisksphoto_custom_odt.modules.php
  *	\ingroup    digiriskdolibarr
  *	\brief      File of class to build ODT documents for digiriskdolibarr
  */
@@ -33,6 +33,76 @@ require_once __DIR__ . '/modules_listingrisksphoto.php';
  */
 class doc_listingrisksphoto_custom_odt extends ModeleODTListingRisksPhoto
 {
+	/**
+	 * @var DoliDB Database handler.
+	 */
+	public $db;
+
+	/**
+	 * @var string Error code (or message)
+	 */
+	public $error;
+
+	/**
+	 * @var array Fullpath file
+	 */
+	public $result;
+
+	/**
+	 * @var string ODT Template Name.
+	 */
+	public $name;
+
+	/**
+	 * @var string ODT Template Description.
+	 */
+	public $description;
+
+	/**
+	 * @var string ODT Template path.
+	 */
+	public $scandir;
+
+	/**
+	 * @var string Format file.
+	 */
+	public $type;
+
+	/**
+	 * @var int Width page.
+	 */
+	public $page_largeur;
+
+	/**
+	 * @var int Height page.
+	 */
+	public $page_hauteur;
+
+	/**
+	 * @var array Format page.
+	 */
+	public $format;
+
+	/**
+	 * @var int Left margin.
+	 */
+	public $marge_gauche;
+
+	/**
+	 * @var int Right margin.
+	 */
+	public $marge_droite;
+
+	/**
+	 * @var int Top margin.
+	 */
+	public $marge_haute;
+
+	/**
+	 * @var int Bottom margin.
+	 */
+	public $marge_basse;
+
 	/**
 	 * Issuer
 	 * @var Societe
@@ -77,7 +147,7 @@ class doc_listingrisksphoto_custom_odt extends ModeleODTListingRisksPhoto
 		$this->marge_haute  = 0;
 		$this->marge_basse  = 0;
 
-		// Recupere emetteur
+		// emetteur
 		$this->emetteur                                                     = $mysoc;
 		if ( ! $this->emetteur->country_code) $this->emetteur->country_code = substr($langs->defaultlang, -2); // By default if not defined
 	}
@@ -103,10 +173,10 @@ class doc_listingrisksphoto_custom_odt extends ModeleODTListingRisksPhoto
 		$texte .= '<input type="hidden" name="action" value="setModuleOptions">';
 		$texte .= '<input type="hidden" name="param1" value="DIGIRISKDOLIBARR_LISTINGRISKSPHOTO_CUSTOM_ADDON_ODT_PATH">';
 		$texte .= '<input type="hidden" name="value1" value="' . $conf->global->DIGIRISKDOLIBARR_LISTINGRISKSPHOTO_CUSTOM_ADDON_ODT_PATH . '">';
-		$texte .= '<table class="nobordernopadding" width="100%">';
+		$texte .= '<table class="nobordernopadding">';
 
 		// List of directories area
-		$texte      .= '<tr><td valign="middle">';
+		$texte      .= '<tr><td>';
 		$texttitle   = $langs->trans("ListOfDirectories");
 		$listofdir   = explode(',', preg_replace('/[\r\n]+/', ',', trim($conf->global->DIGIRISKDOLIBARR_LISTINGRISKSPHOTO_CUSTOM_ADDON_ODT_PATH)));
 		$listoffiles = array();
@@ -130,7 +200,7 @@ class doc_listingrisksphoto_custom_odt extends ModeleODTListingRisksPhoto
 
 		$texte .= $form->textwithpicto($texttitle, $texthelp, 1, 'help', '', 1);
 		$texte .= '<div><div style="display: inline-block; min-width: 100px; vertical-align: middle;">';
-		$texte .= '<span class="flat" cols="60" name="value1" style="font-weight: bold">';
+		$texte .= '<span class="flat" style="font-weight: bold">';
 		$texte .= $conf->global->DIGIRISKDOLIBARR_LISTINGRISKSPHOTO_CUSTOM_ADDON_ODT_PATH;
 		$texte .= '</span>';
 		$texte .= '</div><div style="display: inline-block; vertical-align: middle;">';
@@ -176,13 +246,10 @@ class doc_listingrisksphoto_custom_odt extends ModeleODTListingRisksPhoto
 	 * @param ListingRisksPhoto $object Object source to build document
 	 * @param Translate $outputlangs Lang output object
 	 * @param string $srctemplatepath Full path of source filename for generator using a template file
-	 * @param int $hidedetails Do not show line details
-	 * @param int $hidedesc Do not show desc
-	 * @param int $hideref Do not show ref
 	 * @return int         1 if OK, <=0 if KO
 	 * @throws Exception
 	 */
-	public function write_file($object, $outputlangs, $srctemplatepath, $hidedetails = 0, $hidedesc = 0, $hideref = 0)
+	public function write_file($object, $outputlangs, $srctemplatepath)
 	{
 		// phpcs:enable
 		global $user, $langs, $conf, $hookmanager, $action;
@@ -242,7 +309,7 @@ class doc_listingrisksphoto_custom_odt extends ModeleODTListingRisksPhoto
 			complete_substitutions_array($substitutionarray, $langs, $object);
 			// Call the ODTSubstitution hook
 			$parameters = array('file' => $file, 'object' => $object, 'outputlangs' => $outputlangs, 'substitutionarray' => &$substitutionarray);
-			$reshook    = $hookmanager->executeHooks('ODTSubstitution', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
+			$hookmanager->executeHooks('ODTSubstitution', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
 
 			// Open and load template
 			require_once ODTPHP_PATH . 'odf.php';
@@ -272,7 +339,7 @@ class doc_listingrisksphoto_custom_odt extends ModeleODTListingRisksPhoto
 
 			// Call the ODTSubstitution hook
 			$parameters = array('odfHandler' => &$odfHandler, 'file' => $file, 'object' => $object, 'outputlangs' => $outputlangs, 'substitutionarray' => &$tmparray);
-			$reshook    = $hookmanager->executeHooks('ODTSubstitution', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
+			$hookmanager->executeHooks('ODTSubstitution', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
 
 			foreach ($tmparray as $key => $value) {
 				try {
@@ -300,7 +367,7 @@ class doc_listingrisksphoto_custom_odt extends ModeleODTListingRisksPhoto
 
 			// Call the beforeODTSave hook
 			$parameters = array('odfHandler' => &$odfHandler, 'file' => $file, 'object' => $object, 'outputlangs' => $outputlangs, 'substitutionarray' => &$tmparray);
-			$reshook    = $hookmanager->executeHooks('beforeODTSave', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
+			$hookmanager->executeHooks('beforeODTSave', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
 
 			// Write new file
 			if ( ! empty($conf->global->MAIN_ODT_AS_PDF)) {
@@ -322,10 +389,10 @@ class doc_listingrisksphoto_custom_odt extends ModeleODTListingRisksPhoto
 			}
 
 			$parameters = array('odfHandler' => &$odfHandler, 'file' => $file, 'object' => $object, 'outputlangs' => $outputlangs, 'substitutionarray' => &$tmparray);
-			$reshook    = $hookmanager->executeHooks('afterODTCreation', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
+			$hookmanager->executeHooks('afterODTCreation', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
 
-			if ( ! empty($conf->global->MAIN_UMASK))
-				@chmod($file, octdec($conf->global->MAIN_UMASK));
+//			if ( ! empty($conf->global->MAIN_UMASK))
+//				@chmod($file, octdec($conf->global->MAIN_UMASK));
 
 			$odfHandler = null; // Destroy object
 
@@ -336,7 +403,5 @@ class doc_listingrisksphoto_custom_odt extends ModeleODTListingRisksPhoto
 			$this->error = $langs->transnoentities("ErrorCanNotCreateDir", $dir);
 			return -1;
 		}
-
-		return -1;
 	}
 }

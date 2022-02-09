@@ -16,7 +16,7 @@
  */
 
 /**
- * \file    admin/about.php
+ * \file    admin/config/about.php
  * \ingroup digiriskdolibarr
  * \brief   About page of module Digiriskdolibarr.
  */
@@ -42,6 +42,7 @@ global $langs, $user, $db;
 require_once DOL_DOCUMENT_ROOT . '/core/lib/admin.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/functions2.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/includes/parsedown/Parsedown.php';
+
 require_once '../../lib/digiriskdolibarr.lib.php';
 
 // Translations

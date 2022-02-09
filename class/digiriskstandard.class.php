@@ -29,6 +29,11 @@ require_once DOL_DOCUMENT_ROOT . '/core/class/commonobject.class.php';
 class DigiriskStandard extends CommonObject
 {
 	/**
+	 * @var DoliDB Database handler.
+	 */
+	public $db;
+
+	/**
 	 * @var string ID to identify managed object.
 	 */
 	public $element = 'digiriskstandard';
@@ -153,7 +158,7 @@ class DigiriskStandard extends CommonObject
 	 *  @param	string	$morecss				  More css on a link
 	 * 	@return	string					          String with URL
 	 */
-	function getNomUrl($withpicto = 0, $option = '', $addlabel = 0, $moreinpopup = '', $sep = ' - ', $notooltip = 0, $save_lastsearch_value = -1, $morecss = '')
+	public function getNomUrl($withpicto = 0, $option = '', $addlabel = 0, $moreinpopup = '', $sep = ' - ', $notooltip = 0, $save_lastsearch_value = -1, $morecss = '')
 	{
 		global $conf, $langs, $user, $hookmanager;
 

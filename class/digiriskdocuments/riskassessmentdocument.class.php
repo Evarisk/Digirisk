@@ -16,7 +16,7 @@
  */
 
 /**
- * \file        class/riskassessmentdocument.class.php
+ * \file        class/digiriskdocuments/riskassessmentdocument.class.php
  * \ingroup     digiriskdolibarr
  * \brief       This file is a class file for RiskAssessmentDocument
  */
@@ -28,10 +28,13 @@ require_once __DIR__ . '/../digiriskdocuments.class.php';
  */
 class RiskAssessmentDocument extends DigiriskDocuments
 {
+	/**
+	 * @var DoliDB Database handler.
+	 */
+	public $db;
 
 	/**
-	 * @var int  Does this object support multicompany module ?
-	 * 0=No test on entity, 1=Test with field entity, 'field@table'=Test with link by field@table
+	 * @var string ID to identify managed object.
 	 */
 	public $element = 'riskassessmentdocument';
 
@@ -98,10 +101,11 @@ class RiskAssessmentDocument extends DigiriskDocuments
 	 */
 	public function RiskAssessmentDocumentFillJSON($object)
 	{
-		global $conf, $langs;
+		global $conf;
 
 		$user = new User($this->db);
 		$user->fetch($this->fk_user_creat);
+		$json = array();
 
 		// *** JSON FILLING ***
 		$json['RiskAssessmentDocument']['nomEntreprise']  = $conf->global->MAIN_INFO_SOCIETE_NOM;

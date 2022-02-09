@@ -36,6 +36,31 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 	protected $db;
 
 	/**
+	 * @var string Trigger name.
+	 */
+	public $name;
+
+	/**
+	 * @var string Trigger family.
+	 */
+	public $family;
+
+	/**
+	 * @var string Trigger description.
+	 */
+	public $description;
+
+	/**
+	 * @var string Trigger version.
+	 */
+	public $version;
+
+	/**
+	 * @var string String with name of icon for digiriskdolibarr.
+	 */
+	public $picto;
+
+	/**
 	 * Constructor
 	 *
 	 * @param DoliDB $db Database handler
@@ -47,7 +72,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 		$this->name        = preg_replace('/^Interface/i', '', get_class($this));
 		$this->family      = "demo";
 		$this->description = "Digiriskdolibarr triggers.";
-		$this->version     = '9.0.0';
+		$this->version     = '9.0.1';
 		$this->picto       = 'digiriskdolibarr@digiriskdolibarr';
 	}
 
@@ -76,12 +101,13 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 	 * All functions "runTrigger" are triggered if file
 	 * is inside directory core/triggers
 	 *
-	 * @param string 		$action 	Event action code
-	 * @param CommonObject 	$object 	Object
-	 * @param User 			$user 		Object user
-	 * @param Translate 	$langs 		Object langs
-	 * @param Conf 			$conf 		Object conf
-	 * @return int              		<0 if KO, 0 if no triggered ran, >0 if OK
+	 * @param string $action Event action code
+	 * @param CommonObject $object Object
+	 * @param User $user Object user
+	 * @param Translate $langs Object langs
+	 * @param Conf $conf Object conf
+	 * @return int                    <0 if KO, 0 if no triggered ran, >0 if OK
+	 * @throws Exception
 	 */
 	public function runTrigger($action, $object, User $user, Translate $langs, Conf $conf)
 	{
@@ -184,8 +210,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->userownerid = $user->id;
 				$actioncomm->percentage  = -1;
 
-				$res = $actioncomm->create($user);
-
+				$actioncomm->create($user);
 				break;
 
 			case 'WORKUNITDOCUMENT_GENERATE' :
@@ -244,7 +269,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->percentage  = -1;
 
 				$actioncomm->create($user);
-			break;
+				break;
 
 			case 'RISKASSESSMENTDOCUMENT_GENERATE' :
 				dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id);
@@ -697,16 +722,23 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				} elseif ($object->element_type == 'user') {
 					$people = new User($this->db);
 				}
-				if ($people) {
-					$people->fetch($object->element_id);
-				}
 
 				$actioncomm = new ActionComm($this->db);
+
+
+
 
 				$actioncomm->elementtype = $object->object_type . '@digiriskdolibarr';
 				$actioncomm->code        = 'AC_DIGIRISKSIGNATURE_SIGNED';
 				$actioncomm->type_code   = 'AC_OTH_AUTO';
-				$actioncomm->label       = $langs->trans($object->role . 'Signed') . ' : ' . $people->firstname . ' ' . $people->lastname;
+
+				if (!empty($people)) {
+					$people->fetch($object->element_id);
+					$actioncomm->label = $langs->trans($object->role . 'Signed') . ' : ' . $people->firstname . ' ' . $people->lastname;
+				} else {
+					$actioncomm->label = $langs->trans($object->role . 'Signed');
+				}
+
 				$actioncomm->datep       = $now;
 				$actioncomm->fk_element  = $object->fk_object;
 				if ($object->element_type == 'socpeople') {
@@ -817,24 +849,22 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 
 								if ($mailfile->error) {
 									setEventMessages($mailfile->error, $mailfile->errors, 'errors');
-								} else {
-									if ( ! empty($conf->global->MAIN_MAIL_SMTPS_ID)) {
-										$result = $mailfile->sendfile();
-										if ( ! $result) {
-											$langs->load("other");
-											$mesg = '<div class="error">';
-											if ($mailfile->error) {
-												$mesg .= $langs->transnoentities('ErrorFailedToSendMail', dol_escape_htmltag($from), dol_escape_htmltag($sendto));
-												$mesg .= '<br>' . $mailfile->error;
-											} else {
-												$mesg .= $langs->transnoentities('ErrorFailedToSendMail', dol_escape_htmltag($from), dol_escape_htmltag($sendto));
-											}
-											$mesg .= '</div>';
-											setEventMessages($mesg, null, 'warnings');
+								} elseif ( ! empty($conf->global->MAIN_MAIL_SMTPS_ID)) {
+									$result = $mailfile->sendfile();
+									if ( ! $result) {
+										$langs->load("other");
+										$mesg = '<div class="error">';
+										if ($mailfile->error) {
+											$mesg .= $langs->transnoentities('ErrorFailedToSendMail', dol_escape_htmltag($from), dol_escape_htmltag($sendto));
+											$mesg .= '<br>' . $mailfile->error;
+										} else {
+											$mesg .= $langs->transnoentities('ErrorFailedToSendMail', dol_escape_htmltag($from), dol_escape_htmltag($sendto));
 										}
-									} else {
-										setEventMessages($langs->trans('ErrorSetupEmail'), '', 'errors');
+										$mesg .= '</div>';
+										setEventMessages($mesg, null, 'warnings');
 									}
+								} else {
+									setEventMessages($langs->trans('ErrorSetupEmail'), '', 'errors');
 								}
 							} else {
 								$langs->load("errors");

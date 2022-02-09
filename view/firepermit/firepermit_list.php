@@ -450,7 +450,7 @@ while ($i < ($limit ? min($num, $limit) : $num)) {
 					print '<td>';
 					if ($resource['label'] == 'MaitreOeuvre') {
 						$element = $signatory->fetchSignatory('FP_MAITRE_OEUVRE', $firepermit->id, 'firepermit');
-						if ($element > 0) {
+						if (is_array($element)) {
 							$element = array_shift($element);
 							$usertmp->fetch($element->element_id);
 							print $usertmp->getNomUrl(1);
@@ -463,7 +463,7 @@ while ($i < ($limit ? min($num, $limit) : $num)) {
 					}
 					if ($resource['label'] == 'ExtSocietyResponsible') {
 						$element = $signatory->fetchSignatory('FP_EXT_SOCIETY_RESPONSIBLE', $firepermit->id, 'firepermit');
-						if ($element > 0) {
+						if (is_array($element)) {
 							$element = array_shift($element);
 							$contact->fetch($element->element_id);
 							print $contact->getNomUrl(1);

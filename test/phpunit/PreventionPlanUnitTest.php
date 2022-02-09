@@ -202,35 +202,35 @@ class PreventionPlanUnitTest extends PHPUnit\Framework\TestCase
 		return $localobject;
 	}
 
-	/**
-	 * testPreventionPlanInfo
-	 *
-	 * @param   PreventionPlan $localobject Prevention plan object
-	 * @return  void
-	 *
-	 * @covers  PreventionPlan::info
-	 *
-	 * @depends testPreventionPlanFetch
-	 * The depends says test is run only if previous is ok
-	 */
-	public function testPreventionPlanInfo($localobject) : void
-	{
-		global $conf, $user, $langs, $db;
-		$conf  = $this->savconf;
-		$user  = $this->savuser;
-		$langs = $this->savlangs;
-		$db    = $this->savdb;
-
-		$result = $localobject->info($localobject->id);
-		$this->assertNull($result);
-
-		print __METHOD__ . " id=" . $localobject->id . "\n";
-	}
+//	/**
+//	 * testPreventionPlanInfo
+//	 *
+//	 * @param   PreventionPlan $localobject Prevention plan object
+//	 * @return  void
+//	 *
+//	 * @covers  PreventionPlan::info
+//	 *
+//	 * @depends testPreventionPlanFetch
+//	 * The depends says test is run only if previous is ok
+//	 */
+//	public function testPreventionPlanInfo($localobject) : void
+//	{
+//		global $conf, $user, $langs, $db;
+//		$conf  = $this->savconf;
+//		$user  = $this->savuser;
+//		$langs = $this->savlangs;
+//		$db    = $this->savdb;
+//
+//		$result = $localobject->info($localobject->id);
+//		$this->assertNull($result);
+//
+//		print __METHOD__ . " id=" . $localobject->id . "\n";
+//	}
 
 	/**
 	 * testPreventionPlanSetInProgress
 	 *
-	 * @param   PreventionPlan $localobject Prevention plan object
+	 * @param PreventionPlan $localobject Prevention plan object
 	 * @return  void
 	 *
 	 * @covers  PreventionPlan::setInProgress
@@ -239,6 +239,7 @@ class PreventionPlanUnitTest extends PHPUnit\Framework\TestCase
 	 *
 	 * @depends testPreventionPlanFetch
 	 * The depends says test is run only if previous is ok
+	 * @throws Exception
 	 */
 	public function testPreventionPlanSetInProgress($localobject) : void
 	{
@@ -544,7 +545,6 @@ class PreventionPlanUnitTest extends PHPUnit\Framework\TestCase
 		$langs = $this->savlangs;
 		$db    = $this->savdb;
 
-		$now = dol_now();
 		//$localobject->ref                 = $refPreventionPlanMod->getNextValue($localobject);
 		$localobjectline->ref               = "UpdatedTestRefPreventionPlanLine";
 		$localobjectline->category          = 1;
@@ -618,7 +618,9 @@ class PreventionPlanUnitTest extends PHPUnit\Framework\TestCase
 		$localobjectlineList = $localobjectline->fetchAll();
 
 		$this->assertSame(true, is_array($localobjectlineList));
-		$this->assertInstanceOf(get_class($localobjectline), array_shift($localobjectlineList));
+		if (is_array($localobjectlineList)) {
+			$this->assertInstanceOf(get_class($localobjectline), array_shift($localobjectlineList));
+		}
 		print __METHOD__ . " ok";
 		print "\n";
 	}
@@ -644,7 +646,9 @@ class PreventionPlanUnitTest extends PHPUnit\Framework\TestCase
 		$localobjectList = $localobject->fetchAll();
 
 		$this->assertSame(true, is_array($localobjectList));
-		$this->assertInstanceOf(get_class($localobject), array_shift($localobjectList));
+		if (is_array($localobjectList)) {
+			$this->assertInstanceOf(get_class($localobject), array_shift($localobjectList));
+		}
 		print __METHOD__ . " ok";
 		print "\n";
 	}

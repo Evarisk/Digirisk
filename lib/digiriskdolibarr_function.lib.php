@@ -26,7 +26,7 @@
  *
  *  @param		string	$modulepart		'product', 'ticket', ...
  *  @param      string	$sdir        	Directory to scan (full absolute path)
- *  @param      int		$size        	0=original size, 1='small' use thumbnail if possible
+ *  @param      string	$size        	0=original size, 1='small' use thumbnail if possible
  *  @param      int		$nbmax       	Nombre maximum de photos (0=pas de max)
  *  @param      int		$nbbyrow     	Number of image per line or -1 to use div. Used only if size=1.
  * 	@param		int		$showfilename	1=Show filename
@@ -36,11 +36,13 @@
  *  @param      int     $nolink         Do not add a href link to view enlarged imaged into a new tab
  *  @param      int     $notitle        Do not add title tag on image
  *  @param		int		$usesharelink	Use the public shared link of image (if not available, the 'nophoto' image will be shown instead)
+ *  @param		string  $subdir			Subdirectory to scan
+ *  @param		object	$object			Object element
  *  @return     string					Html code to show photo. Number of photos shown is saved in this->nbphoto
  */
-function digirisk_show_photos($modulepart, $sdir, $size = 0, $nbmax = 0, $nbbyrow = 5, $showfilename = 0, $showaction = 0, $maxHeight = 120, $maxWidth = 160, $nolink = 0, $notitle = 0, $usesharelink = 0, $subdir = "", $object = null)
+function digirisk_show_photos($modulepart, $sdir, $size = '', $nbmax = 0, $nbbyrow = 5, $showfilename = 0, $showaction = 0, $maxHeight = 120, $maxWidth = 160, $nolink = 0, $notitle = 0, $usesharelink = 0, $subdir = "", $object = null)
 {
-	global $conf, $user, $langs;
+	global $conf, $langs;
 
 	include_once DOL_DOCUMENT_ROOT . '/core/lib/files.lib.php';
 	include_once DOL_DOCUMENT_ROOT . '/core/lib/images.lib.php';
@@ -57,11 +59,10 @@ function digirisk_show_photos($modulepart, $sdir, $size = 0, $nbmax = 0, $nbbyro
 	}
 
 	// Defined relative dir to DOL_DATA_ROOT
-	$relativedir = '';
 	if ($dir) {
 		$relativedir = preg_replace('/^' . preg_quote(DOL_DATA_ROOT, '/') . '/', '', $dir);
 		$relativedir = preg_replace('/^[\\/]/', '', $relativedir);
-		$relativedir = preg_replace('/[\\/]$/', '', $relativedir);
+		preg_replace('/[\\/]$/', '', $relativedir);
 	}
 
 	$dirthumb  = $dir . 'thumbs/';
@@ -70,7 +71,7 @@ function digirisk_show_photos($modulepart, $sdir, $size = 0, $nbmax = 0, $nbbyro
 	$return  = '<!-- Photo -->' . "\n";
 	$nbphoto = 0;
 
-	$filearray = dol_dir_list($dir, "files", 0, '', '(\.meta|_preview.*\.png)$', $sortfield, (strtolower($sortorder) == 'desc' ? SORT_DESC : SORT_ASC), 1);
+	$filearray = dol_dir_list($dir, "files", 0, '', '(\.meta|_preview.*\.png)$', $sortfield, SORT_DESC, 1);
 	//echo '<pre>'; print_r( $pdirthumb ); echo '</pre>';
 	if (count($filearray)) {
 		if ($sortfield && $sortorder) {
@@ -78,7 +79,6 @@ function digirisk_show_photos($modulepart, $sdir, $size = 0, $nbmax = 0, $nbbyro
 		}
 
 		foreach ($filearray as $key => $val) {
-			$photo = '';
 			$file  = $val['name'];
 
 			//if (! utf8_check($file)) $file=utf8_encode($file);	// To be sure file is stored in UTF8 in memory
@@ -89,7 +89,7 @@ function digirisk_show_photos($modulepart, $sdir, $size = 0, $nbmax = 0, $nbbyro
 				$photo        = $file;
 				$viewfilename = $file;
 
-				if ($size == 1 || $size == 'small') {   // Format vignette
+				if ($size == 'small') {   // Format vignette
 					// Find name of thumb file
 					$photo_vignette = basename(getImageFileNameForSize($dir . $file, '_small'));
 
@@ -133,14 +133,12 @@ function digirisk_show_photos($modulepart, $sdir, $size = 0, $nbmax = 0, $nbbyro
 							$return .= '<!-- Show nophoto file (because file is not shared) -->';
 							$return .= '<img class="photo photowithmargin" height="' . $maxHeight . '" width="' . $maxWidth . '" src="' . DOL_URL_ROOT . '/public/theme/common/nophoto.png" title="' . dol_escape_htmltag($alt) . '">';
 						}
+					} elseif ($photo_vignette && $imgarray['height'] > $maxHeight) {
+						$return .= '<!-- Show thumb -->';
+						$return .= '<img class="photo clicked-photo-preview ' . (($file == $object->photo && $object->element == 'digiriskelement') ? 'favorite-photo' : '') . '"  height="' . $maxHeight . '" width="' . $maxWidth . '" src="' . DOL_URL_ROOT . '/viewimage.php?modulepart=' . $modulepart . '&entity=' . $conf->entity . '&file=' . urlencode($pdirthumb . $photo_vignette) . '" title="' . dol_escape_htmltag($alt) . '">';
 					} else {
-						if ($photo_vignette && $imgarray['height'] > $maxHeight) {
-							$return .= '<!-- Show thumb -->';
-							$return .= '<img class="photo clicked-photo-preview ' . (($file == $object->photo && $object->element == 'digiriskelement') ? 'favorite-photo' : '') . '"  height="' . $maxHeight . '" width="' . $maxWidth . '" src="' . DOL_URL_ROOT . '/viewimage.php?modulepart=' . $modulepart . '&entity=' . $conf->entity . '&file=' . urlencode($pdirthumb . $photo_vignette) . '" title="' . dol_escape_htmltag($alt) . '">';
-						} else {
-							$return .= '<!-- Show original file -->';
-							$return .= '<img class="photo photowithmargin clicked-photo-preview" height="' . $maxHeight . '" width="' . $maxWidth . '" src="' . DOL_URL_ROOT . '/viewimage.php?modulepart=' . $modulepart . '&entity=' . $conf->entity . '&file=' . urlencode($pdir . $photo) . '" title="' . dol_escape_htmltag($alt) . '">';
-						}
+						$return .= '<!-- Show original file -->';
+						$return .= '<img class="photo photowithmargin clicked-photo-preview" height="' . $maxHeight . '" width="' . $maxWidth . '" src="' . DOL_URL_ROOT . '/viewimage.php?modulepart=' . $modulepart . '&entity=' . $conf->entity . '&file=' . urlencode($pdir . $photo) . '" title="' . dol_escape_htmltag($alt) . '">';
 					}
 					$return .= '<input type="hidden" class="filename" value="' . $photo . '">';
 
@@ -173,7 +171,7 @@ function digirisk_show_photos($modulepart, $sdir, $size = 0, $nbmax = 0, $nbbyro
 			}
 		}
 
-		if ($size == 1 || $size == 'small') {
+		if ($size == 'small') {
 			if ($nbbyrow > 0) {
 				// Ferme tableau
 				while ($nbphoto % $nbbyrow) {
@@ -195,35 +193,31 @@ function digirisk_show_photos($modulepart, $sdir, $size = 0, $nbmax = 0, $nbbyro
  *      Return a string to show the box with list of available documents for object.
  *      This also set the property $this->numoffiles
  *
- *      @param      string				$modulepart         Module the files are related to ('propal', 'facture', 'facture_fourn', 'mymodule', 'mymodule:nameofsubmodule', 'mymodule_temp', ...)
- *      @param      string				$modulesubdir       Existing (so sanitized) sub-directory to scan (Example: '0/1/10', 'FA/DD/MM/YY/9999'). Use '' if file is not into subdir of module.
- *      @param      string				$filedir            Directory to scan
- *      @param      string				$urlsource          Url of origin page (for return)
- *      @param      int|string[]        $genallowed         Generation is allowed (1/0 or array list of templates)
- *      @param      int					$delallowed         Remove is allowed (1/0)
- *      @param      string				$modelselected      Model to preselect by default
- *      @param      integer				$allowgenifempty	Allow generation even if list of template ($genallowed) is empty (show however a warning)
- *      @param      integer				$forcenomultilang	Do not show language option (even if MAIN_MULTILANGS defined)
- *      @param      int					$iconPDF            Deprecated, see getDocumentsLink
- * 		@param		int					$notused	        Not used
- * 		@param		integer				$noform				Do not output html form tags
- * 		@param		string				$param				More param on http links
- * 		@param		string				$title				Title to show on top of form. Example: '' (Default to "Documents") or 'none'
- * 		@param		string				$buttonlabel		Label on submit button
- * 		@param		string				$codelang			Default language code to use on lang combo box if multilang is enabled
- * 		@param		string				$morepicto			Add more HTML content into cell with picto
- *      @param      Object              $object             Object when method is called from an object card.
- *      @param		int					$hideifempty		Hide section of generated files if there is no file
- *      @param      string              $removeaction       (optional) The action to remove a file
- *      @param      int                 $active             (optional) To show gen button disabled
- *      @param      string              $tooltiptext       (optional) Tooltip text when gen button disabled
- * 		@return		string              					Output string with HTML array of documents (might be empty string)
- */
-function digiriskshowdocuments($modulepart, $modulesubdir, $filedir, $urlsource, $genallowed, $delallowed = 0, $modelselected = '', $allowgenifempty = 1, $forcenomultilang = 0, $notused = 0, $noform = 0, $param = '', $title = '', $buttonlabel = '', $codelang = '', $morepicto = '', $object = null, $hideifempty = 0, $removeaction = 'remove_file', $active = 1, $tooltiptext = '')
+* @param      string				$modulepart         Module the files are related to ('propal', 'facture', 'facture_fourn', 'mymodule', 'mymodule:nameofsubmodule', 'mymodule_temp', ...)
+* @param      string				$modulesubdir       Existing (so sanitized) sub-directory to scan (Example: '0/1/10', 'FA/DD/MM/YY/9999'). Use '' if file is not into subdir of module.
+* @param      string				$filedir            Directory to scan
+* @param      string				$urlsource          Url of origin page (for return)
+* @param      int|string[]        $genallowed         Generation is allowed (1/0 or array list of templates)
+* @param      int					$delallowed         Remove is allowed (1/0)
+* @param      string				$modelselected      Model to preselect by default
+* @param      int					$allowgenifempty	Allow generation even if list of template ($genallowed) is empty (show however a warning)
+* @param		int					$noform				Do not output html form tags
+* @param		string				$param				More param on http links
+* @param		string				$title				Title to show on top of form. Example: '' (Default to "Documents") or 'none'
+* @param		string				$buttonlabel		Label on submit button
+* @param		string				$morepicto			Add more HTML content into cell with picto
+* @param      Object              $object             Object when method is called from an object card.
+* @param		int					$hideifempty		Hide section of generated files if there is no file
+* @param      string              $removeaction       (optional) The action to remove a file
+* @param      bool                 $active             (optional) To show gen button disabled
+* @param      string              $tooltiptext       (optional) Tooltip text when gen button disabled
+* @return		string              					Output string with HTML array of documents (might be empty string)
+*/
+function digiriskshowdocuments($modulepart, $modulesubdir, $filedir, $urlsource, $genallowed, $delallowed = 0, $modelselected = '', $allowgenifempty = 1, $noform = 0, $param = '', $title = '', $buttonlabel = '', $morepicto = '', $object = null, $hideifempty = 0, $removeaction = 'remove_file', $active = true, $tooltiptext = '')
 {
-	global $db, $langs, $conf, $user, $hookmanager, $form;
+	global $db, $langs, $conf, $hookmanager, $form;
 
-	if ( ! is_object($form)) $form = new Form($this->db);
+	if ( ! is_object($form)) $form = new Form($db);
 
 	include_once DOL_DOCUMENT_ROOT . '/core/lib/files.lib.php';
 
@@ -270,8 +264,6 @@ function digiriskshowdocuments($modulepart, $modulesubdir, $filedir, $urlsource,
 		if (class_exists($class)) {
 			if (preg_match('/specimen/', $param)) {
 				$type      = strtolower($class) . 'specimen';
-				$modellist = array();
-
 				include_once DOL_DOCUMENT_ROOT . '/core/lib/functions2.lib.php';
 				$modellist = getListOfModels($db, $type, 0);
 			} else {
@@ -298,7 +290,7 @@ function digiriskshowdocuments($modulepart, $modulesubdir, $filedir, $urlsource,
 
 		$out .= '<tr class="liste_titre">';
 
-		$addcolumforpicto = ($delallowed || $printer || $morepicto);
+		$addcolumforpicto = ($delallowed || $morepicto);
 		$colspan          = (3 + ($addcolumforpicto ? 1 : 0)); $colspanmore = 0;
 
 		$out .= '<th colspan="' . $colspan . '" class="formdoc liste_titre maxwidthonsmartphone center">';
@@ -315,7 +307,7 @@ function digiriskshowdocuments($modulepart, $modulesubdir, $filedir, $urlsource,
 			}
 			$morecss                                        = 'maxwidth200';
 			if ($conf->browser->layout == 'phone') $morecss = 'maxwidth100';
-			$out                                           .= $form->selectarray('model', $modellist, $modelselected, $showempty, 0, 0, '', 0, 0, 0, '', $morecss);
+			$out                                           .= $form::selectarray('model', $modellist, $modelselected, $showempty, 0, 0, '', 0, 0, 0, '', $morecss);
 
 			if ($conf->use_javascript_ajax) {
 				$out .= ajax_combobox('model');
@@ -366,7 +358,7 @@ function digiriskshowdocuments($modulepart, $modulesubdir, $filedir, $urlsource,
 		// Execute hooks
 		$parameters = array('colspan' => ($colspan + $colspanmore), 'socid' => (isset($GLOBALS['socid']) ? $GLOBALS['socid'] : ''), 'id' => (isset($GLOBALS['id']) ? $GLOBALS['id'] : ''), 'modulepart' => $modulepart);
 		if (is_object($hookmanager)) {
-			$reshook = $hookmanager->executeHooks('formBuilddocOptions', $parameters, $GLOBALS['object']);
+			$hookmanager->executeHooks('formBuilddocOptions', $parameters, $GLOBALS['object']);
 			$out    .= $hookmanager->resPrint;
 		}
 	}
@@ -374,11 +366,13 @@ function digiriskshowdocuments($modulepart, $modulesubdir, $filedir, $urlsource,
 	// Get list of files
 	if ( ! empty($filedir)) {
 		$link_list = array();
+		$addcolumforpicto = ($delallowed || $morepicto);
+		$colspan          = (3 + ($addcolumforpicto ? 1 : 0)); $colspanmore = 0;
 		if (is_object($object) && $object->id > 0) {
 			require_once DOL_DOCUMENT_ROOT . '/core/class/link.class.php';
 			$link      = new Link($db);
 			$sortfield = $sortorder = null;
-			$res       = $link->fetchAll($link_list, $object->element, $object->id, $sortfield, $sortorder);
+			$link->fetchAll($link_list, $object->element, $object->id, $sortfield, $sortorder);
 		}
 
 		$out .= '<!-- html.formfile::showdocuments -->' . "\n";
@@ -494,7 +488,7 @@ function digiriskshowdocuments($modulepart, $modulesubdir, $filedir, $urlsource,
  *	Exclude index.php files from list of models for document generation
  *
  * @param   string $model
- * @return  '' or $model
+ * @return  string '' or $model
  */
 function remove_index($model)
 {
@@ -508,22 +502,19 @@ function remove_index($model)
 /**
  *	Show HTML header HTML + BODY + Top menu + left menu + DIV
  *
- * @param 	string 	$head				Optionnal head lines
- * @param 	string 	$title				HTML title
- * @param	string	$help_url			Url links to help page
+* @param 	string 	$title				HTML title
+* @param	string	$help_url			Url links to help page
  * 		                            	Syntax is: For a wiki page: EN:EnglishPage|FR:FrenchPage|ES:SpanishPage
  *                                  	For other external page: http://server/url
- * @param	string	$target				Target to use on links
- * @param 	int    	$disablejs			More content into html header
- * @param 	int    	$disablehead		More content into html header
- * @param 	array  	$arrayofjs			Array of complementary js files
- * @param 	array  	$arrayofcss			Array of complementary css files
- * @param	string	$morequerystring	Query string to add to the link "print" to get same parameters (use only if autodetect fails)
- * @param   string  $morecssonbody      More CSS on body tag.
- * @param	string	$replacemainareaby	Replace call to main_area() by a print of this string
- * @return	void
- */
-function digiriskHeader($head = '', $title = '', $help_url = '', $target = '', $disablejs = 0, $disablehead = 0, $arrayofjs = '', $arrayofcss = '', $morequerystring = '', $morecssonbody = '', $replacemainareaby = '')
+* @param array $arrayofjs Array of complementary js files
+* @param array $arrayofcss Array of complementary css files
+* @param	string	$morequerystring	Query string to add to the link "print" to get same parameters (use only if autodetect fails)
+* @param   string  $morecssonbody      More CSS on body tag.
+* @param	string	$replacemainareaby	Replace call to main_area() by a print of this string
+* @return	void
+*@throws Exception
+*/
+function digiriskHeader($title = '', $help_url = '', $arrayofjs = array(), $arrayofcss =  array(), $morequerystring = '', $morecssonbody = '', $replacemainareaby = '')
 {
 	global $conf, $langs, $db, $user;
 
@@ -556,7 +547,12 @@ function digiriskHeader($head = '', $title = '', $help_url = '', $target = '', $
 	} else {
 		$objects = $object->fetchAll('',  'rank',  0,  0, array('customsql' => 'status > 0'));
 	}
-	$results = recurse_tree(0, 0, $objects); ?>
+
+	$results = array();
+
+	if (is_array($objects)) {
+		$results = recurse_tree(0, 0, $objects);
+	} ?>
 
 	<?php require_once './../../core/tpl/digiriskdolibarr_medias_gallery_modal.tpl.php'; ?>
 
@@ -634,7 +630,7 @@ function digiriskHeader($head = '', $title = '', $help_url = '', $target = '', $
 								if (document.URL.match(/digiriskelement/) && !document.URL.match(/type=standard/)) {
 									jQuery( '#unit'  + id ).addClass( 'active' );
 									jQuery( '#unit'  +id  ).closest( '.unit' ).attr( 'value', id );
-								};
+								}
 							</script>
 						</ul>
 					</div>
@@ -677,7 +673,7 @@ function recurse_tree($parent, $niveau, $array)
 /**
  *	Display Recursive tree process
  *
- * @param	array $result Global Digirisk Element list after recursive process
+ * @param	array $results Global Digirisk Element list after recursive process
  * @return	void
  */
 function display_recurse_tree($results)
@@ -729,7 +725,7 @@ function display_recurse_tree($results)
 			}
 			$digiriskelement->update($user);
 		}
-		exit;
+		return;
 	}
 
 	if ( ! $error && $action == "addDigiriskElementPhotoToFavorite") {
@@ -756,31 +752,29 @@ function display_recurse_tree($results)
 		//edit evaluation
 		if ($digiriskelement->id > 0) {
 			$pathToDigiriskElementPhoto = $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/' . $digiriskelement->element_type . '/' . $digiriskelement->ref ;
-		}
+			$files = dol_dir_list($pathToDigiriskElementPhoto);
 
-
-		$files = dol_dir_list($pathToDigiriskElementPhoto);
-
-		foreach ($files as $file) {
-			if (is_file($file['fullname']) && $file['name'] == $filename) {
-				unlink($file['fullname']);
+			foreach ($files as $file) {
+				if (is_file($file['fullname']) && $file['name'] == $filename) {
+					unlink($file['fullname']);
+				}
 			}
-		}
 
-		$files = dol_dir_list($pathToDigiriskElementPhoto . '/thumbs');
-		foreach ($files as $file) {
-			if (preg_match('/' . preg_split('/\./', $filename)[0] . '/', $file['name'])) {
-				unlink($file['fullname']);
+			$files = dol_dir_list($pathToDigiriskElementPhoto . '/thumbs');
+			foreach ($files as $file) {
+				if (preg_match('/' . preg_split('/\./', $filename)[0] . '/', $file['name'])) {
+					unlink($file['fullname']);
+				}
 			}
+			if ($digiriskelement->photo == $filename) {
+				$digiriskelement->photo = '';
+				$digiriskelement->update($user, true);
+			}
+//			$urltogo = str_replace('__ID__', $id, $backtopage);
+//			$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
+//			header("Location: " . $urltogo);
+//			exit;
 		}
-		if ($digiriskelement->photo == $filename) {
-			$digiriskelement->photo = '';
-			$digiriskelement->update($user, true);
-		}
-		$urltogo = str_replace('__ID__', $id, $backtopage);
-		$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
-		header("Location: " . $urltogo);
-		exit;
 	}
 
 	if ( ! $error && $action == "uploadPhoto" && ! empty($conf->global->MAIN_UPLOAD_DOC)) {
@@ -804,44 +798,47 @@ function display_recurse_tree($results)
 			$generatethumbs = 1;
 			$res            = dol_add_file_process($upload_dir, 0, 1, 'userfile', '', null, '', $generatethumbs);
 			if ($res > 0) {
-				$result = $ecmdir->changeNbOfFiles('+');
+				$ecmdir->changeNbOfFiles('+');
 			}
 		}
 	}
 
 	$mod_groupment = new $conf->global->DIGIRISKDOLIBARR_GROUPMENT_ADDON();
 	$mod_workunit  = new $conf->global->DIGIRISKDOLIBARR_WORKUNIT_ADDON();
+?>
 
+<?php
 	if ($user->rights->digiriskdolibarr->digiriskelement->read) {
 		if ( ! empty($results)) {
 			foreach ($results as $element) { ?>
 				<?php if ($element['object']->id == $conf->global->DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH) : ?>
 				<hr>
 				<?php endif; ?>
+
 			<li class="unit type-<?php echo $element['object']->element_type; ?>" id="unit<?php  echo $element['object']->id; ?>">
 				<div class="unit-container">
-						<?php if ($element['object']->element_type == 'groupment' && count($element['children'])) { ?>
-						<div class="toggle-unit">
-							<i class="toggle-icon fas fa-chevron-right" id="menu<?php echo $element['object']->id;?>"></i>
+					<?php if ($element['object']->element_type == 'groupment' && count($element['children'])) { ?>
+					<div class="toggle-unit">
+						<i class="toggle-icon fas fa-chevron-right" id="menu<?php echo $element['object']->id;?>"></i>
+					</div>
+					<?php } else { ?>
+					<div class="spacer"></div>
+					<?php }
+					$pathToThumb = DOL_URL_ROOT . '/viewimage.php?modulepart=digiriskdolibarr&entity=' . $conf->entity . '&file=' . urlencode($element['object']->element_type . '/' . $element['object']->ref . '/thumbs/');
+					$filearray   = dol_dir_list($conf->digiriskdolibarr->multidir_output[$conf->entity] . '/' . $element['object']->element_type . '/' . $element['object']->ref . '/', "files", 0, '', '(\.odt|_preview.*\.png)$', 'position_name', 'asc', 1);
+					if (count($filearray)) {
+						print '<span class="floatleft inline-block valignmiddle divphotoref open-medias-linked modal-open digirisk-element digirisk-element-' . $element['object']->id . '" value="' . $element['object']->id . '">';
+						 print '<img width="50" height="50" class="photo clicked-photo-preview" src="' . DOL_URL_ROOT . '/viewimage.php?modulepart=digiriskdolibarr&entity=' . $conf->entity . '&file=' . urlencode($element['object']->element_type . '/' . $element['object']->ref . '/thumbs/' . preg_replace('/\./', '_small.', $element['object']->photo)) . '" >';
+						 print '<input type="hidden" class="filepath-to-digiriskelement" value="' . $pathToThumb . '"/>';
+						 print '</span>';
+					} else {
+						$nophoto = '/public/theme/common/nophoto.png'; ?>
+						<div class="open-media-gallery modal-open digiriskelement digirisk-element-<?php echo $element['object']->id ?>" value="<?php  echo $element['object']->id ?>">
+							<input type="hidden" class="type-from" value="digiriskelement"/>
+							<input type="hidden" class="filepath-to-digiriskelement" value="<?php echo $pathToThumb ?>"/>
+							<span class="floatleft inline-block valignmiddle divphotoref"><img width="50" height="50" class="photo photowithmargin clicked-photo-preview" alt="No photo" src="<?php echo DOL_URL_ROOT . $nophoto ?>"></span>
 						</div>
-						<?php } else { ?>
-						<div class="spacer"></div>
-						<?php }
-						$pathToThumb = DOL_URL_ROOT . '/viewimage.php?modulepart=digiriskdolibarr&entity=' . $conf->entity . '&file=' . urlencode($element['object']->element_type . '/' . $element['object']->ref . '/thumbs/');
-						$filearray   = dol_dir_list($conf->digiriskdolibarr->multidir_output[$conf->entity] . '/' . $element['object']->element_type . '/' . $element['object']->ref . '/', "files", 0, '', '(\.odt|_preview.*\.png)$', 'position_name', 'asc', 1);
-						if (count($filearray)) {
-							print '<span class="floatleft inline-block valignmiddle divphotoref open-medias-linked modal-open digirisk-element digirisk-element-' . $element['object']->id . '" value="' . $element['object']->id . '">';
-							 print '<img width="50" height="50" class="photo clicked-photo-preview" src="' . DOL_URL_ROOT . '/viewimage.php?modulepart=digiriskdolibarr&entity=' . $conf->entity . '&file=' . urlencode($element['object']->element_type . '/' . $element['object']->ref . '/thumbs/' . preg_replace('/\./', '_small.', $element['object']->photo)) . '" >';
-							 print '<input type="hidden" class="filepath-to-digiriskelement" value="' . $pathToThumb . '"/>';
-							 print '</span>';
-						} else {
-							$nophoto = '/public/theme/common/nophoto.png'; ?>
-							<div class="open-media-gallery modal-open digiriskelement digirisk-element-<?php echo $element['object']->id ?>" value="<?php  echo $element['object']->id ?>">
-								<input type="hidden" class="type-from" value="digiriskelement"/>
-								<input type="hidden" class="filepath-to-digiriskelement" value="<?php echo $pathToThumb ?>"/>
-								<span class="floatleft inline-block valignmiddle divphotoref"><img width="50" height="50" class="photo photowithmargin clicked-photo-preview" alt="No photo" src="<?php echo DOL_URL_ROOT . $nophoto ?>"></span>
-							</div>
-						<?php } ?>
+					<?php } ?>
 					<div class="digirisk-element-medias-modal" style="z-index:1500" value="<?php echo $element['object']->id ?>">
 							<div class="wpeo-modal"  id="digirisk_element_medias_modal_<?php echo $element['object']->id ?>" value="<?php echo $element['object']->id ?>" style="z-index: 1005 !important">
 								<div class="modal-container wpeo-modal-event">
@@ -877,10 +874,7 @@ function display_recurse_tree($results)
 											</div>
 											<div class="element-linked-medias element-linked-medias-<?php echo $element['object']->id ?> digirisk-element modal-media-linked">
 												<div class="medias"><i class="fas fa-picture-o"></i><?php echo $langs->trans('Medias'); ?></div>
-													<?php
-													$relativepath = 'digiriskdolibarr/medias/thumbs';
-													print digirisk_show_medias_linked('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/' . $element['object']->element_type . '/', 'small', '', 0, 0, 0, 150, 150, 1, 0, 0, $element['object']->element_type, $element['object']);
-													?>
+												<?php print digirisk_show_medias_linked('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/' . $element['object']->element_type . '/', 'small', 0, 0, 0, 0, 150, 150, 1, 0, 0, $element['object']->element_type, $element['object']); ?>
 											</div>
 										</div>
 									</div>
@@ -896,14 +890,14 @@ function display_recurse_tree($results)
 					<div class="title" id="scores" value="<?php echo $element['object']->id ?>">
 						<?php
 						if ($user->rights->digiriskdolibarr->risk->read) : ?>
-							<a id="slider" class="linkElement id<?php echo $element['object']->id;?>" href="../digiriskelement/digiriskelement_risk.php?id=<?php echo $element['object']->id; ?>">
+							<a id="slider" class="linkElement id<?php echo $element['object']->id;?>" href="../digiriskelement/digiriskelement_risk.php?id=<?php echo $element['object']->id; ?>#unit<?php echo $element['object']->id; ?>">
 								<span class="title-container">
 									<span class="ref"><?php echo $element['object']->ref; ?></span>
 									<span class="name"><?php echo $element['object']->label; ?></span>
 								</span>
 							</a>
 						<?php else : ?>
-							<a id="slider" class="linkElement id<?php echo $element['object']->id;?>" href="../digiriskelement/digiriskelement_card.php?id=<?php echo $element['object']->id; ?>">
+							<a id="slider" class="linkElement id<?php echo $element['object']->id;?>" href="../digiriskelement/digiriskelement_card.php?id=<?php echo $element['object']->id; ?>#unit<?php echo $element['object']->id; ?>">
 								<span class="title-container">
 									<span class="ref"><?php echo $element['object']->ref; ?></span>
 									<span class="name"><?php echo $element['object']->label; ?></span>
@@ -952,9 +946,10 @@ function display_recurse_tree($results)
 /**
  *	Display Recursive tree for edit
  *
- * @param	array $result Global Digirisk Element list after recursive process
- * @return	void
- */
+* @param	array $results Global Digirisk Element list after recursive process
+* @param 	int   $i
+* @return	void
+*/
 function display_recurse_tree_organization($results, $i = 1)
 {
 	global $langs, $user;
@@ -1009,24 +1004,23 @@ function digirisk_banner_tab($object, $paramid, $morehtml = '', $shownav = 1, $f
 *  Return a link to the user card (with optionaly the picto)
 *  Use this->id,this->lastname, this->firstname
 *
-*  @param	int		$withpictoimg				Include picto in link (0=No picto, 1=Include picto into link, 2=Only picto, -1=Include photo into link, -2=Only picto photo, -3=Only photo very small)
-*  @param	string	$option						On what the link point to ('leave', 'nolink', )
-*  @param  integer $infologin      			0=Add default info tooltip, 1=Add complete info tooltip, -1=No info tooltip
-*  @param	integer	$notooltip					1=Disable tooltip on picto and name
-*  @param	int		$maxlen						Max length of visible user name
-*  @param	int		$hidethirdpartylogo			Hide logo of thirdparty if user is external user
-*  @param  string  $mode               		''=Show firstname and lastname, 'firstname'=Show only firstname, 'firstelselast'=Show firstname or lastname if not defined, 'login'=Show login
-*  @param  string  $morecss            		Add more css on link
-*  @param  int     $save_lastsearch_value    	-1=Auto, 0=No save of lastsearch_values when clicking, 1=Save lastsearch_values whenclicking
-*  @return	string								String with URL
+* @param	int		$withpictoimg				Include picto in link (0=No picto, 1=Include picto into link, 2=Only picto, -1=Include photo into link, -2=Only picto photo, -3=Only photo very small)
+* @param	string	$option						On what the link point to ('leave', 'nolink', )
+* @param  int $infologin      			0=Add default info tooltip, 1=Add complete info tooltip, -1=No info tooltip
+* @param	int	$notooltip					1=Disable tooltip on picto and name
+* @param	int		$maxlen						Max length of visible user name
+* @param	int		$hidethirdpartylogo			Hide logo of thirdparty if user is external user
+* @param  string  $mode               		''=Show firstname and lastname, 'firstname'=Show only firstname, 'firstelselast'=Show firstname or lastname if not defined, 'login'=Show login
+* @param  string  $morecss            		Add more css on link
+* @param  int     $save_lastsearch_value    	-1=Auto, 0=No save of lastsearch_values when clicking, 1=Save lastsearch_values whenclicking
+* @param User $object
+* @param int $display_initials
+* @return	string								String with URL
 */
-function getNomUrl($withpictoimg = 0, $option = '', $infologin = 0, $notooltip = 0, $maxlen = 24, $hidethirdpartylogo = 0, $mode = '', $morecss = '', $save_lastsearch_value = -1, $object = null, $display_initials = 1)
+function getNomUrl($withpictoimg = 0, $option = '', $infologin = 0, $notooltip = 0, $maxlen = 24, $hidethirdpartylogo = 0, $mode = '', $morecss = '', $save_lastsearch_value = -1, User $object, $display_initials = 1)
 {
-	global $langs, $conf, $db, $hookmanager, $user;
-	global $dolibarr_main_authentication, $dolibarr_main_demo;
+	global $langs, $conf, $db, $hookmanager, $dolibarr_main_demo;
 	global $menumanager;
-
-	   if ( ! $object->rights->user->user->lire && $object->id != $object->id) $option = 'nolink';
 
 	if ( ! empty($conf->global->MAIN_OPTIMIZEFORTEXTBROWSER) && $withpictoimg) $withpictoimg = 0;
 
@@ -1039,6 +1033,8 @@ function getNomUrl($withpictoimg = 0, $option = '', $infologin = 0, $notooltip =
 	}
 
 	// Info Login
+	$company = '';
+	$companylink = '';
 	$label                               .= '<div class="centpercent">';
 	$label                               .= '<u>' . $langs->trans("User") . '</u><br>';
 	$label                               .= '<b>' . $langs->trans('Name') . ':</b> ' . $object->getFullName($langs, '');
@@ -1168,18 +1164,19 @@ function getNomUrl($withpictoimg = 0, $option = '', $infologin = 0, $notooltip =
 /**
  *	Return clicable name (with picto eventually)
  *
- *	@param	int		$withpicto		0=No picto, 1=Include picto into link, 2=Only picto
- *	@param	string	$option			'withproject' or ''
- *  @param	string	$mode			Mode 'task', 'time', 'contact', 'note', document' define page to link to.
- * 	@param	int		$addlabel		0=Default, 1=Add label into string, >1=Add first chars into string
- *  @param	string	$sep			Separator between ref and label if option addlabel is set
- *  @param	int   	$notooltip		1=Disable tooltip
- *  @param  int     $save_lastsearch_value    -1=Auto, 0=No save of lastsearch_values when clicking, 1=Save lastsearch_values whenclicking
- *	@return	string					Chaine avec URL
- */
+* @param $task
+* @param	int		$withpicto		0=No picto, 1=Include picto into link, 2=Only picto
+* @param	string	$option			'withproject' or ''
+* @param	string	$mode			Mode 'task', 'time', 'contact', 'note', document' define page to link to.
+* @param	int		$addlabel		0=Default, 1=Add label into string, >1=Add first chars into string
+* @param	string	$sep			Separator between ref and label if option addlabel is set
+* @param	int   	$notooltip		1=Disable tooltip
+* @param  int     $save_lastsearch_value    -1=Auto, 0=No save of lastsearch_values when clicking, 1=Save lastsearch_values whenclicking
+* @return	string					Chaine avec URL
+*/
 function getNomUrlTask($task, $withpicto = 0, $option = '', $mode = 'task', $addlabel = 0, $sep = ' - ', $notooltip = 0, $save_lastsearch_value = -1)
 {
-	global $conf, $langs, $user;
+	global $conf, $langs;
 
 	if ( ! empty($conf->dol_no_mouse_hover)) $notooltip = 1; // Force disable tooltips
 
@@ -1226,6 +1223,12 @@ function getNomUrlTask($task, $withpicto = 0, $option = '', $mode = 'task', $add
 	return $result;
 }
 
+/**
+ *	Show category image
+ *
+* @param object	$object
+* @param string $upload_dir
+*/
 function show_category_image($object, $upload_dir)
 {
 
@@ -1259,7 +1262,7 @@ function show_category_image($object, $upload_dir)
 			}
 
 			// Nom affiche
-			$viewfilename = $obj['photo'];
+			//$viewfilename = $obj['photo'];
 
 			// Taille de l'image
 			$object->get_image_size($dir . $filename);
@@ -1292,11 +1295,11 @@ function show_category_image($object, $upload_dir)
 * @param  string $head        Head array
 * @param  int    $disablejs   More content into html header
 * @param  int    $disablehead More content into html header
-* @param string $arrayofjs Array of complementary js files
-* @param string $arrayofcss Array of complementary css files
+* @param  array  $arrayofjs   Array of complementary js files
+* @param  array  $arrayofcss  Array of complementary css files
 * @return void
 */
-function llxHeaderSignature($title, $head = "", $disablejs = 0, $disablehead = 0, $arrayofjs = '', $arrayofcss = '')
+function llxHeaderSignature($title, $head = "", $disablejs = 0, $disablehead = 0, $arrayofjs = array(), $arrayofcss = array())
 {
 	global $conf, $mysoc;
 
@@ -1330,11 +1333,11 @@ function llxHeaderSignature($title, $head = "", $disablejs = 0, $disablehead = 0
 * @param  string $head        Head array
 * @param  int    $disablejs   More content into html header
 * @param  int    $disablehead More content into html header
-* @param string $arrayofjs Array of complementary js files
-* @param string $arrayofcss Array of complementary css files
+* @param  array  $arrayofjs   Array of complementary js files
+* @param  array  $arrayofcss  Array of complementary css files
 * @return void
 */
-function llxHeaderTicketDigirisk($title, $head = "", $disablejs = 0, $disablehead = 0, $arrayofjs = '', $arrayofcss = '')
+function llxHeaderTicketDigirisk($title, $head = "", $disablejs = 0, $disablehead = 0,$arrayofjs = array(), $arrayofcss = array())
 {
 	global $conf, $mysoc;
 
@@ -1361,9 +1364,16 @@ function llxHeaderTicketDigirisk($title, $head = "", $disablejs = 0, $disablehea
 	}
 }
 
-function digirisk_show_medias($modulepart = 'ecm', $sdir, $size = 0, $nbmax = 0, $nbbyrow = 5, $showfilename = 0, $showaction = 0, $maxHeight = 80, $maxWidth = 80, $nolink = 0, $notitle = 0, $usesharelink = 0, $subdir = "")
+/**
+* @param $sdir
+* @param string $size
+* @param int $maxHeight
+* @param int $maxWidth
+* @return string
+*/
+function digirisk_show_medias($sdir, $size = '', $maxHeight = 80, $maxWidth = 80)
 {
-	global $conf, $user, $langs;
+	global $conf;
 
 	include_once DOL_DOCUMENT_ROOT . '/core/lib/files.lib.php';
 	include_once DOL_DOCUMENT_ROOT . '/core/lib/images.lib.php';
@@ -1371,13 +1381,11 @@ function digirisk_show_medias($modulepart = 'ecm', $sdir, $size = 0, $nbmax = 0,
 	$sortfield = 'date';
 	$sortorder = 'desc';
 	$dir       = $sdir . '/';
-	$pdir      = $subdir . '/';
-
 
 	$return  = '<!-- Photo -->' . "\n";
 	$nbphoto = 0;
 
-	$filearray = dol_dir_list($dir, "files", 0, '', '(\.meta|_preview.*\.png)$', $sortfield, (strtolower($sortorder) == 'desc' ? SORT_DESC : SORT_ASC), 1);
+	$filearray = dol_dir_list($dir, "files", 0, '', '(\.meta|_preview.*\.png)$', $sortfield, SORT_DESC, 1);
 	$j         = 0;
 
 	if (count($filearray)) {
@@ -1391,7 +1399,7 @@ function digirisk_show_medias($modulepart = 'ecm', $sdir, $size = 0, $nbmax = 0,
 				if (image_format_supported($file) >= 0) {
 					$nbphoto++;
 
-					if ($size == 1 || $size == 'small') {   // Format vignette
+					if ($size == 'small') {   // Format vignette
 						$relativepath = 'digiriskdolibarr/medias/thumbs';
 						$modulepart   = 'ecm';
 						$path         = DOL_URL_ROOT . '/document.php?modulepart=' . $modulepart . '&attachment=0&file=' . str_replace('/', '%2F', $relativepath);
@@ -1420,9 +1428,28 @@ function digirisk_show_medias($modulepart = 'ecm', $sdir, $size = 0, $nbmax = 0,
 	return $return;
 }
 
-function digirisk_show_medias_linked($modulepart = 'ecm', $sdir, $size = 0, $nbmax = 0, $nbbyrow = 5, $showfilename = 0, $showaction = 0, $maxHeight = 120, $maxWidth = 160, $nolink = 0, $notitle = 0, $usesharelink = 0, $subdir = "", $object = null)
+/**
+ *  Show photos of an object (nbmax maximum), into several columns
+ *
+ *  @param		string	$modulepart		'product', 'ticket', ...
+ *  @param      string	$sdir        	Directory to scan (full absolute path)
+ *  @param      string	$size        	0=original size, 1='small' use thumbnail if possible
+ *  @param      int		$nbmax       	Nombre maximum de photos (0=pas de max)
+ *  @param      int		$nbbyrow     	Number of image per line or -1 to use div. Used only if size=1.
+ * 	@param		int		$showfilename	1=Show filename
+ * 	@param		int		$showaction		1=Show icon with action links (resize, delete)
+ * 	@param		int		$maxHeight		Max height of original image when size='small' (so we can use original even if small requested). If 0, always use 'small' thumb image.
+ * 	@param		int		$maxWidth		Max width of original image when size='small'
+ *  @param      int     $nolink         Do not add a href link to view enlarged imaged into a new tab
+ *  @param      int     $notitle        Do not add title tag on image
+ *  @param		int		$usesharelink	Use the public shared link of image (if not available, the 'nophoto' image will be shown instead)
+ *  @param		string  $subdir			Subdirectory to scan
+ *  @param		object	$object			Object element
+ *  @return     string					Html code to show photo. Number of photos shown is saved in this->nbphoto
+ */
+function digirisk_show_medias_linked($modulepart, $sdir, $size = '', $nbmax = 0, $nbbyrow = 5, $showfilename = 0, $showaction = 0, $maxHeight = 120, $maxWidth = 160, $nolink = 0, $notitle = 0, $usesharelink = 0, $subdir = "", $object = null)
 {
-		global $conf, $user, $langs;
+	global $conf, $langs;
 
 	include_once DOL_DOCUMENT_ROOT . '/core/lib/files.lib.php';
 	include_once DOL_DOCUMENT_ROOT . '/core/lib/images.lib.php';
@@ -1434,11 +1461,10 @@ function digirisk_show_medias_linked($modulepart = 'ecm', $sdir, $size = 0, $nbm
 	$pdir = $subdir . '/' . $object->ref . '/';
 
 	// Defined relative dir to DOL_DATA_ROOT
-	$relativedir = '';
 	if ($dir) {
 		$relativedir = preg_replace('/^' . preg_quote(DOL_DATA_ROOT, '/') . '/', '', $dir);
 		$relativedir = preg_replace('/^[\\/]/', '', $relativedir);
-		$relativedir = preg_replace('/[\\/]$/', '', $relativedir);
+		preg_replace('/[\\/]$/', '', $relativedir);
 	}
 
 	$dirthumb  = $dir . 'thumbs/';
@@ -1447,7 +1473,7 @@ function digirisk_show_medias_linked($modulepart = 'ecm', $sdir, $size = 0, $nbm
 	$return  = '<!-- Photo -->' . "\n";
 	$nbphoto = 0;
 
-	$filearray = dol_dir_list($dir, "files", 0, '', '(\.meta|_preview.*\.png)$', $sortfield, (strtolower($sortorder) == 'desc' ? SORT_DESC : SORT_ASC), 1);
+	$filearray = dol_dir_list($dir, "files", 0, '', '(\.meta|_preview.*\.png)$', $sortfield, SORT_DESC, 1);
 	//echo '<pre>'; print_r( $pdirthumb ); echo '</pre>';
 	if (count($filearray)) {
 		if ($sortfield && $sortorder) {
@@ -1510,14 +1536,12 @@ function digirisk_show_medias_linked($modulepart = 'ecm', $sdir, $size = 0, $nbm
 							$return .= '<!-- Show nophoto file (because file is not shared) -->';
 							$return .= '<img  width="65" height="65" class="photo photowithmargin" height="' . $maxHeight . '" src="' . DOL_URL_ROOT . '/public/theme/common/nophoto.png" title="' . dol_escape_htmltag($alt) . '">';
 						}
+					} elseif (empty($maxHeight) || $photo_vignette && $imgarray['height'] > $maxHeight) {
+						$return .= '<!-- Show thumb -->';
+						$return .= '<img width="' . $maxWidth . '" height="' . $maxHeight . '" class="photo clicked-photo-preview"  src="' . DOL_URL_ROOT . '/viewimage.php?modulepart=' . $modulepart . '&entity=' . $conf->entity . '&file=' . urlencode($pdirthumb . $photo_vignette) . '" title="' . dol_escape_htmltag($alt) . '">';
 					} else {
-						if (empty($maxHeight) || $photo_vignette && $imgarray['height'] > $maxHeight) {
-							$return .= '<!-- Show thumb -->';
-							$return .= '<img width="' . $maxWidth . '" height="' . $maxHeight . '" class="photo clicked-photo-preview"  src="' . DOL_URL_ROOT . '/viewimage.php?modulepart=' . $modulepart . '&entity=' . $conf->entity . '&file=' . urlencode($pdirthumb . $photo_vignette) . '" title="' . dol_escape_htmltag($alt) . '">';
-						} else {
-							$return .= '<!-- Show original file -->';
-							$return .= '<img width="' . $maxWidth . '" height="' . $maxHeight . '" class="photo photowithmargin  clicked-photo-preview" height="' . $maxHeight . '" src="' . DOL_URL_ROOT . '/viewimage.php?modulepart=' . $modulepart . '&entity=' . $conf->entity . '&file=' . urlencode($pdir . $photo) . '" title="' . dol_escape_htmltag($alt) . '">';
-						}
+						$return .= '<!-- Show original file -->';
+						$return .= '<img width="' . $maxWidth . '" height="' . $maxHeight . '" class="photo photowithmargin  clicked-photo-preview" height="' . $maxHeight . '" src="' . DOL_URL_ROOT . '/viewimage.php?modulepart=' . $modulepart . '&entity=' . $conf->entity . '&file=' . urlencode($pdir . $photo) . '" title="' . dol_escape_htmltag($alt) . '">';
 					}
 
 					if (empty($nolink)) $return .= '</a>';
@@ -1591,7 +1615,8 @@ function digirisk_show_medias_linked($modulepart = 'ecm', $sdir, $size = 0, $nbm
  * @param  array       $filter       Filter array. Example array('field'=>'valueforlike', 'customurl'=>...)
  * @param  string      $filtermode   Filter mode (AND or OR)
  * @return array|int                 int <0 if KO, array of pages if OK
- */
+ * @throws Exception
+*/
 function fetchAllSocPeople($sortorder = '', $sortfield = '', $limit = 0, $offset = 0, array $filter = array(), $filtermode = 'AND')
 {
 	global $db;
@@ -1599,6 +1624,7 @@ function fetchAllSocPeople($sortorder = '', $sortfield = '', $limit = 0, $offset
 	dol_syslog(__METHOD__, LOG_DEBUG);
 
 	$records = array();
+	$errors  = array();
 
 	$sql  = "SELECT c.rowid, c.entity, c.fk_soc, c.ref_ext, c.civility as civility_code, c.lastname, c.firstname,";
 	$sql .= " c.address, c.statut, c.zip, c.town,";
@@ -1674,40 +1700,42 @@ function fetchAllSocPeople($sortorder = '', $sortfield = '', $limit = 0, $offset
 }
 
 /**
- *	Return HTML code of the SELECT of list of all contacts (for a third party or all).
- *  This also set the number of contacts found into $this->num
+ * Return HTML code of the SELECT of list of all contacts (for a third party or all).
+ * This also set the number of contacts found into $this->num
  *
  * @since 9.0 Add afterSelectContactOptions hook
  *
- *	@param	int			$socid      	Id ot third party or 0 for all or -1 for empty list
- *	@param  array|int	$selected   	Array of ID of pre-selected contact id
- *	@param  string		$htmlname  	    Name of HTML field ('none' for a not editable field)
- *	@param  int			$showempty     	0=no empty value, 1=add an empty value, 2=add line 'Internal' (used by user edit), 3=add an empty value only if more than one record into list
- *	@param  string		$exclude        List of contacts id to exclude
- *	@param	string		$limitto		Disable answers that are not id in this array list
- *	@param	integer		$showfunction   Add function into label
- *	@param	string		$moreclass		Add more class to class style
- *	@param	bool		$options_only	Return options only (for ajax treatment)
- *	@param	integer		$showsoc	    Add company into label
- * 	@param	int			$forcecombo		Force to use combo box (so no ajax beautify effect)
- *  @param	array		$events			Event options. Example: array(array('method'=>'getContacts', 'url'=>dol_buildpath('/core/ajax/contacts.php',1), 'htmlname'=>'contactid', 'params'=>array('add-customer-contact'=>'disabled')))
- *  @param	string		$moreparam		Add more parameters onto the select tag. For example 'style="width: 95%"' to avoid select2 component to go over parent container
- *  @param	string		$htmlid			Html id to use instead of htmlname
- *  @param	bool		$multiple		add [] in the name of element and add 'multiple' attribut
- *  @param	integer		$disableifempty Set tag 'disabled' on select if there is no choice
- *	@return	 int						<0 if KO, Nb of contact in list if OK
- */
-function digirisk_selectcontacts($socid, $selected = '', $htmlname = 'contactid', $showempty = 0, $exclude = '', $limitto = '', $showfunction = 0, $moreclass = '', $options_only = false, $showsoc = 0, $forcecombo = 0, $events = array(), $moreparam = '', $htmlid = '', $multiple = false, $disableifempty = 0, $exclude_already_add = '')
+ * @param	int			$socid      	Id ot third party or 0 for all or -1 for empty list
+ * @param string $selected Array of ID of pre-selected contact id
+ * @param  string		$htmlname  	    Name of HTML field ('none' for a not editable field)
+ * @param  int			$showempty     	0=no empty value, 1=add an empty value, 2=add line 'Internal' (used by user edit), 3=add an empty value only if more than one record into list
+ * @param  array		$exclude        List of contacts id to exclude
+ * @param	string		$limitto		Disable answers that are not id in this array list
+ * @param	int		$showfunction   Add function into label
+ * @param	string		$moreclass		Add more class to class style
+ * @param	bool		$options_only	Return options only (for ajax treatment)
+ * @param	int		$showsoc	    Add company into label
+ * @param	int			$forcecombo		Force to use combo box (so no ajax beautify effect)
+ * @param	array		$events			Event options. Example: array(array('method'=>'getContacts', 'url'=>dol_buildpath('/core/ajax/contacts.php',1), 'htmlname'=>'contactid', 'params'=>array('add-customer-contact'=>'disabled')))
+ * @param	string		$moreparam		Add more parameters onto the select tag. For example 'style="width: 95%"' to avoid select2 component to go over parent container
+ * @param	string		$htmlid			Html id to use instead of htmlname
+ * @param	bool		$multiple		add [] in the name of element and add 'multiple' attribut
+ * @param	int		$disableifempty Set tag 'disabled' on select if there is no choice
+ * @param string $exclude_already_add
+ * @return	 string|int						<0 if KO, Nb of contact in list if OK
+ *
+*/
+function digirisk_selectcontacts($socid, $selected = '', $htmlname = 'contactid', $showempty = 0, $exclude = array(), $limitto = '', $showfunction = 0, $moreclass = '', $options_only = false, $showsoc = 0, $forcecombo = 0, $events = array(), $moreparam = '', $htmlid = '', $multiple = false, $disableifempty = 0, $exclude_already_add = '')
 {
-	global $conf, $langs, $hookmanager, $action, $db;
+	global $conf, $langs, $hookmanager, $db;
 
 	$langs->loadLangs(array("digiriskdolibarr@digiriskdolibarr", "companies"));
 
 	if (empty($htmlid)) $htmlid = $htmlname;
-	$num                        = 0;
 
-	if ($selected === '') $selected           = array();
-	elseif ( ! is_array($selected)) $selected = array($selected);
+//	if ($selected === '') $selected           = array();
+//	elseif ( ! is_array($selected)) $selected = array($selected);
+	$selected = array($selected);
 	$out                                      = '';
 
 	if ( ! is_object($hookmanager)) {
@@ -1740,8 +1768,8 @@ function digirisk_selectcontacts($socid, $selected = '', $htmlname = 'contactid'
 			$out .= '<select class="flat' . ($moreclass ? ' ' . $moreclass : '') . '" id="' . $htmlid . '" name="' . $htmlname . (($num || empty($disableifempty)) ? '' : ' disabled') . ($multiple ? '[]' : '') . '" ' . ($multiple ? 'multiple' : '') . ' ' . ( ! empty($moreparam) ? $moreparam : '') . '>';
 		}
 
-		if (($showempty == 1 || ($showempty == 3 && $num > 1)) && ! $multiple) $out .= '<option value="0"' . (in_array(0, $selected) ? ' selected' : '') . '>&nbsp;</option>';
-		if ($showempty == 2) $out                                                   .= '<option value="0"' . (in_array(0, $selected) ? ' selected' : '') . '>-- ' . $langs->trans("Internal") . ' --</option>';
+		if ($showempty == 1 || ($showempty == 3 && $num > 1 && ! $multiple)) $out .= '<option value="0"' . (in_array(0, $selected) ? ' selected' : '') .  '>&nbsp;</option>';
+		if ($showempty == 2) $out                                                   .= '<option value="0"' . (in_array(0, $selected) ? ' selected' : '') .  '>-- ' . $langs->trans("Internal") . ' --</option>';
 
 		$i = 0;
 		if ($num) {
@@ -1805,12 +1833,10 @@ function digirisk_selectcontacts($socid, $selected = '', $htmlname = 'contactid'
 							if ($noTooltip == 0 && $disabled) $out    .= ' - (' . $langs->trans('NoEmailContact') . ')';
 							$out                                      .= '</option>';
 						}
-					} else {
-						if (in_array($obj->rowid, $selected)) {
-							$out                                      .= $contactstatic->getFullName($langs) . $extendedInfos;
-							if ($showfunction && $obj->poste) $out    .= ' (' . $obj->poste . ')';
-							if (($showsoc > 0) && $obj->company) $out .= ' - (' . $obj->company . ')';
-						}
+					} elseif (in_array($obj->rowid, $selected)) {
+						$out                                      .= $contactstatic->getFullName($langs) . $extendedInfos;
+						if ($showfunction && $obj->poste) $out    .= ' (' . $obj->poste . ')';
+						if (($showsoc > 0) && $obj->company) $out .= ' - (' . $obj->company . ')';
 					}
 				}
 				$i++;
@@ -1822,14 +1848,14 @@ function digirisk_selectcontacts($socid, $selected = '', $htmlname = 'contactid'
 			$out        .= '</option>';
 		}
 
-		$parameters = array(
-			'socid' => $socid,
-			'htmlname' => $htmlname,
-			'resql' => $resql,
-			'out' => &$out,
-			'showfunction' => $showfunction,
-			'showsoc' => $showsoc,
-		);
+//		$parameters = array(
+//			'socid' => $socid,
+//			'htmlname' => $htmlname,
+//			'resql' => $resql,
+//			'out' => &$out,
+//			'showfunction' => $showfunction,
+//			'showsoc' => $showsoc,
+//		);
 
 		//$reshook = $hookmanager->executeHooks('afterSelectContactOptions', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
 
@@ -1847,16 +1873,17 @@ function digirisk_selectcontacts($socid, $selected = '', $htmlname = 'contactid'
 /**
  * 	Return clickable name (with picto eventually)
  *
- * 	@param	int		$withpicto		          0=No picto, 1=Include picto into link, 2=Only picto
- * 	@param	string	$option			          Variant where the link point to ('', 'nolink')
- * 	@param	int		$addlabel		          0=Default, 1=Add label into string, >1=Add first chars into string
- *  @param	string	$moreinpopup	          Text to add into popup
- *  @param	string	$sep			          Separator between ref and label if option addlabel is set
- *  @param	int   	$notooltip		          1=Disable tooltip
- *  @param  int     $save_lastsearch_value    -1=Auto, 0=No save of lastsearch_values when clicking, 1=Save lastsearch_values whenclicking
- *  @param	string	$morecss				  More css on a link
- * 	@return	string					          String with URL
- */
+* @param $project
+* @param	int		$withpicto		          0=No picto, 1=Include picto into link, 2=Only picto
+* @param	string	$option			          Variant where the link point to ('', 'nolink')
+* @param	int		$addlabel		          0=Default, 1=Add label into string, >1=Add first chars into string
+* @param	string	$moreinpopup	          Text to add into popup
+* @param	string	$sep			          Separator between ref and label if option addlabel is set
+* @param	int   	$notooltip		          1=Disable tooltip
+* @param  int     $save_lastsearch_value    -1=Auto, 0=No save of lastsearch_values when clicking, 1=Save lastsearch_values whenclicking
+* @param	string	$morecss				  More css on a link
+* @return	string					          String with URL
+*/
 function getNomUrlProject($project, $withpicto = 0, $option = '', $addlabel = 0, $moreinpopup = '', $sep = ' - ', $notooltip = 0, $save_lastsearch_value = -1, $morecss = '')
 {
 	global $conf, $langs, $user, $hookmanager;
@@ -1958,7 +1985,7 @@ function getNomUrlProject($project, $withpicto = 0, $option = '', $addlabel = 0,
 function digirisk_select_dictionary($htmlname, $dictionarytable, $keyfield = 'code', $labelfield = 'label', $selected = '', $useempty = 0, $moreattrib = '')
 {
 	// phpcs:enable
-	global $langs, $conf, $db;
+	global $langs, $db;
 
 	$langs->load("admin");
 
@@ -1999,13 +2026,14 @@ function digirisk_select_dictionary($htmlname, $dictionarytable, $keyfield = 'co
 /**
  *    	Return a link on thirdparty (with picto)
  *
- *		@param	int		$withpicto		          Add picto into link (0=No picto, 1=Include picto with link, 2=Picto only)
- *		@param	string	$option			          Target of link ('', 'customer', 'prospect', 'supplier', 'project')
- *		@param	int		$maxlen			          Max length of name
- *      @param	int  	$notooltip		          1=Disable tooltip
- *      @param  int     $save_lastsearch_value    -1=Auto, 0=No save of lastsearch_values when clicking, 1=Save lastsearch_values whenclicking
- *		@return	string					          String with URL
- */
+* @param $thirdparty
+* @param	int		$withpicto		          Add picto into link (0=No picto, 1=Include picto with link, 2=Picto only)
+* @param	string	$option			          Target of link ('', 'customer', 'prospect', 'supplier', 'project')
+* @param	int		$maxlen			          Max length of name
+* @param	int  	$notooltip		          1=Disable tooltip
+* @param  int     $save_lastsearch_value    -1=Auto, 0=No save of lastsearch_values when clicking, 1=Save lastsearch_values whenclicking
+* @return	string					          String with URL
+*/
 function getNomUrlSociety($thirdparty, $withpicto = 0, $option = '', $maxlen = 0, $notooltip = 0, $save_lastsearch_value = -1)
 {
 	global $conf, $langs, $hookmanager;
@@ -2049,16 +2077,12 @@ function getNomUrlSociety($thirdparty, $withpicto = 0, $option = '', $maxlen = 0
 	}
 
 	$result = ''; $label = '';
-	$linkstart = ''; $linkend = '';
+	$linkstart = '';
 
 	if ( ! empty($thirdparty->logo) && class_exists('Form')) {
 		$label .= '<div class="photointooltip">';
 		$label .= Form::showphoto('societe', $thirdparty, 0, 40, 0, '', 'mini', 0); // Important, we must force height so image will have height tags and if image is inside a tooltip, the tooltip manager can calculate height and position correctly the tooltip.
 		$label .= '</div><div style="clear: both;"></div>';
-	} elseif ( ! empty($thirdparty->logo_squarred) && class_exists('Form')) {
-		/*$label.= '<div class="photointooltip">';
-		$label.= Form::showphoto('societe', $thirdparty, 0, 40, 0, 'photowithmargin', 'mini', 0);	// Important, we must force height so image will have height tags and if image is inside a tooltip, the tooltip manager can calculate height and position correctly the tooltip.
-		$label.= '</div><div style="clear: both;"></div>';*/
 	}
 
 	$label .= '<div class="centpercent">';

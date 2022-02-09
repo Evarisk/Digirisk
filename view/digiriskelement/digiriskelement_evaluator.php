@@ -212,7 +212,7 @@ $help_url = 'FR:Module_DigiriskDolibarr#.C3.89valuateur';
 $morejs   = array("/digiriskdolibarr/js/digiriskdolibarr.js.php");
 $morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");
 
-digiriskHeader('', $title, $help_url, '', '', '', $morejs, $morecss);
+digiriskHeader($title, $help_url, $morejs, $morecss);
 
 print '<div id="cardContent" value="">';
 
@@ -549,7 +549,7 @@ if ($object->id > 0) {
 
 			if ( ! empty($arrayfields['t.' . $key]['checked'])) {
 				if ($key == 'assignment_date') {
-					print '<td>' . date('Y/m/d', $evaluator->$key);
+					print '<td>' . dol_print_date($evaluator->$key,'day','tzuser');
 				} elseif ($key == 'duration') {
 					print '<td>' . $evaluator->$key . ' min';
 				} elseif ($key == 'fk_user') {

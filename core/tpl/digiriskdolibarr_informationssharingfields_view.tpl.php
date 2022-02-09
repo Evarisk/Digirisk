@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2017  Laurent Destailleur  <eldy@users.sourceforge.net>
+/* Copyright (C) 2021 EOXIA <dev@eoxia.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -13,14 +13,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
- *
- * Need to have following variables defined:
- * $object (invoice, order, ...)
- * $action
- * $conf
- * $langs
- *
- * $keyforbreak may be defined to key to switch on second column
+ * or see https://www.gnu.org/
  */
 
 // Protection to avoid direct call of template
@@ -34,33 +27,13 @@ if ( ! is_object($form)) $form = new Form($db);
 	<!-- BEGIN PHP TEMPLATE digiriskdolibarr_informationssharingfields_view.tpl -->
 <?php
 
-$informationssharing = json_decode($informationssharing->InformationssharingFillJSON($informationssharing), false, 512, JSON_UNESCAPED_UNICODE)->InformationsSharing;
-//
-////Creation User
-//
-//print '<tr>';
-//print '<td class="titlefield">'.$langs->trans("CreatedBy").'</td>';
-//print '<td>';
-//
-//if ($object->fk_user_creat > 0)
-//{
-//	$usercreat = new User($db);
-//	$result = $usercreat->fetch($object->fk_user_creat);
-//	if ($result < 0) dol_print_error('', $usercreat->error);
-//	elseif ($result > 0) print $usercreat->getNomUrl(-1);
-//}
-//
-////Creation Date
-//print '</td></tr>';
-//
-//print '<tr>';
-//print '<td class="titlefield">'.$langs->trans("CreatedOn").'</td>';
-//print '<td>';
-//
-//print dol_print_date($object->date_creation);
-//
-//print '</td></tr>';
-
+try {
+	$informationssharing = json_decode($informationssharing->InformationsSharingFillJSON($informationssharing), false, 512, JSON_UNESCAPED_UNICODE)->InformationsSharing;
+} catch (Exception $e) {
+	$informationssharing->error = $e->getMessage();
+	dol_syslog($e->getMessage(), LOG_INFO);
+	return -1;
+}
 
 // CSE
 

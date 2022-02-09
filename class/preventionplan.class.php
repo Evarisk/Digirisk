@@ -16,7 +16,7 @@
  */
 
 /**
- * \file        class/preventionplandocument.class.php
+ * \file        class/preventionplan.class.php
  * \ingroup     digiriskdolibarr
  * \brief       This file is a class file for PreventionPlan
  */
@@ -34,10 +34,34 @@ require_once __DIR__ . '/openinghours.class.php';
  */
 class PreventionPlan extends CommonObject
 {
+	/**
+	 * @var DoliDB Database handler.
+	 */
+	public $db;
 
 	/**
-	 * @var int  Does this object support multicompany module ?
-	 * 0=No test on entity, 1=Test with field entity, 'field@table'=Test with link by field@table
+	 * @var string Error string
+	 * @see        $errors
+	 */
+	public $error;
+
+	/**
+	 * @var string[] Array of error strings
+	 */
+	public $errors = array();
+
+	/**
+	 * @var array Result array.
+	 */
+	public $result = array();
+
+	/**
+	 * @var int The object identifier
+	 */
+	public $id;
+
+	/**
+	 * @var string ID to identify managed object.
 	 */
 	public $element = 'preventionplan';
 
@@ -67,10 +91,30 @@ class PreventionPlan extends CommonObject
 	 */
 	public $picto = 'preventionplandocument@digiriskdolibarr';
 
-	const STATUS_IN_PROGRESS       = 1;
-	const STATUS_PENDING_SIGNATURE = 2;
-	const STATUS_LOCKED            = 3;
-	const STATUS_ARCHIVED          = 4;
+	/**
+	 * @var string Label status of const.
+	 */
+	public $labelStatus;
+
+	/**
+	 * @var string Label status short of const.
+	 */
+	public $labelStatusShort;
+
+	/**
+	 * @var array Context element object
+	 */
+	public $context = array();
+
+	/**
+	 * @var PreventionPlanLine[]     Array of subtable lines
+	 */
+	public $lines = array();
+
+	public const STATUS_IN_PROGRESS = 1;
+	public const STATUS_PENDING_SIGNATURE = 2;
+	public const STATUS_LOCKED = 3;
+	public const STATUS_ARCHIVED = 4;
 
 	/**
 	 * @var array  Array with all fields and their property. Do not use it as a static var. It may be modified by constructor.
@@ -165,13 +209,15 @@ class PreventionPlan extends CommonObject
 	/**
 	 * Clone an object into another one
 	 *
-	 * @param  	User 	$user      	User that creates
-	 * @param  	int 	$fromid     Id of object to clone
-	 * @return 	mixed 				New object created, <0 if KO
+	 * @param User $user User that creates
+	 * @param int $fromid Id of object to clone
+	 * @param $options
+	 * @return    mixed                New object created, <0 if KO
+	 * @throws Exception
 	 */
 	public function createFromClone(User $user, $fromid, $options)
 	{
-		global $conf, $langs, $extrafields;
+		global $conf, $langs;
 		$error = 0;
 
 		$signatory         = new PreventionPlanSignature($this->db);
@@ -205,10 +251,10 @@ class PreventionPlan extends CommonObject
 
 		if ( ! empty($signatories) && $signatories > 0) {
 			foreach ($signatories as $arrayRole) {
-				foreach ($arrayRole as $signatory) {
-					$signatoriesID[$signatory->role] = $signatory->id;
-					if ($signatory->role == 'PP_EXT_SOCIETY_INTERVENANTS') {
-						$extintervenant_ids[] = $signatory->id;
+				foreach ($arrayRole as $signatoryRole) {
+					$signatoriesID[$signatoryRole->role] = $signatoryRole->id;
+					if ($signatoryRole->role == 'PP_EXT_SOCIETY_INTERVENANTS') {
+						$extintervenant_ids[] = $signatoryRole->id;
 					}
 				}
 			}
@@ -244,8 +290,10 @@ class PreventionPlan extends CommonObject
 			$digiriskresources->digirisk_dolibarr_set_resources($this->db, $user->id, 'PP_EXT_SOCIETY', 'societe', array(array_shift($resources['PP_EXT_SOCIETY'])->id), $conf->entity, 'preventionplan', $preventionplanid, 1);
 			$digiriskresources->digirisk_dolibarr_set_resources($this->db, $user->id, 'PP_LABOUR_INSPECTOR', 'societe', array(array_shift($resources['PP_LABOUR_INSPECTOR'])->id), $conf->entity, 'preventionplan', $preventionplanid, 1);
 			$digiriskresources->digirisk_dolibarr_set_resources($this->db, $user->id, 'PP_LABOUR_INSPECTOR_ASSIGNED', 'socpeople', array(array_shift($resources['PP_LABOUR_INSPECTOR_ASSIGNED'])->id), $conf->entity, 'preventionplan', $preventionplanid, 1);
-			$signatory->createFromClone($user, $signatoriesID['PP_MAITRE_OEUVRE'], $preventionplanid);
-			$signatory->createFromClone($user, $signatoriesID['PP_EXT_SOCIETY_RESPONSIBLE'], $preventionplanid);
+			if (!empty($signatoriesID)) {
+				$signatory->createFromClone($user, $signatoriesID['PP_MAITRE_OEUVRE'], $preventionplanid);
+				$signatory->createFromClone($user, $signatoriesID['PP_EXT_SOCIETY_RESPONSIBLE'], $preventionplanid);
+			}
 
 			if ( ! empty($options['schedule'])) {
 				if ( ! empty($openinghours)) {
@@ -263,7 +311,7 @@ class PreventionPlan extends CommonObject
 			}
 
 			if ( ! empty($options['preventionplan_risk'])) {
-				$num = (is_array($object->lines) ? count($object->lines) : 0);
+				$num = (!empty($object->lines) ? count($object->lines) : 0);
 				for ($i = 0; $i < $num; $i++) {
 					$line                    = $object->lines[$i];
 					$line->category          = empty($line->category) ? 0 : $line->category;
@@ -316,8 +364,7 @@ class PreventionPlan extends CommonObject
 	{
 		$this->lines = array();
 
-		$result = $this->fetchLinesCommon();
-		return $result;
+		return $this->fetchLinesCommon();
 	}
 
 	/**
@@ -393,7 +440,6 @@ class PreventionPlan extends CommonObject
 		}
 	}
 
-
 	/**
 	 * Update object into database
 	 *
@@ -435,27 +481,27 @@ class PreventionPlan extends CommonObject
 			if ($this->db->num_rows($result)) {
 				$obj      = $this->db->fetch_object($result);
 				$this->id = $obj->rowid;
-				if ($obj->fk_user_author) {
-					$cuser = new User($this->db);
-					$cuser->fetch($obj->fk_user_author);
-					$this->user_creation = $cuser;
-				}
+//				if ($obj->fk_user_author) {
+//					$cuser = new User($this->db);
+//					$cuser->fetch($obj->fk_user_author);
+//					$this->user_creation = $cuser;
+//				}
+//
+//				if ($obj->fk_user_valid) {
+//					$vuser = new User($this->db);
+//					$vuser->fetch($obj->fk_user_valid);
+//					$this->user_validation = $vuser;
+//				}
+//
+//				if ($obj->fk_user_cloture) {
+//					$cluser = new User($this->db);
+//					$cluser->fetch($obj->fk_user_cloture);
+//					$this->user_cloture = $cluser;
+//				}
 
-				if ($obj->fk_user_valid) {
-					$vuser = new User($this->db);
-					$vuser->fetch($obj->fk_user_valid);
-					$this->user_validation = $vuser;
-				}
-
-				if ($obj->fk_user_cloture) {
-					$cluser = new User($this->db);
-					$cluser->fetch($obj->fk_user_cloture);
-					$this->user_cloture = $cluser;
-				}
-
-				$this->date_creation     = $this->db->jdate($obj->datec);
-				$this->date_modification = $this->db->jdate($obj->datem);
-				$this->date_validation   = $this->db->jdate($obj->datev);
+				$this->date_creation     = $this->db->jdate($obj->date_creation);
+//				$this->date_modification = $this->db->jdate($obj->datem);
+//				$this->date_validation   = $this->db->jdate($obj->datev);
 			}
 
 			$this->db->free($result);
@@ -465,11 +511,12 @@ class PreventionPlan extends CommonObject
 	}
 
 	/**
-	 *	Set in progress status
+	 * 	Set in progress status
 	 *
-	 *	@param	User	$user			Object user that modify
-	 *  @param	int		$notrigger		1=Does not execute triggers, 0=Execute triggers
-	 *	@return	int						<0 if KO, >0 if OK
+	 * 	@param User $user Object user that modify
+	 * 	@param int $notrigger 1=Does not execute triggers, 0=Execute triggers
+	 * 	@return    int                        <0 if KO, >0 if OK
+	 * 	@throws Exception
 	 */
 	public function setInProgress($user, $notrigger = 0)
 	{
@@ -478,7 +525,7 @@ class PreventionPlan extends CommonObject
 		return $this->setStatusCommon($user, self::STATUS_IN_PROGRESS, $notrigger, 'PREVENTIONPLAN_INPROGRESS');
 	}
 	/**
-	 *	Set pending signature status
+	 * 	Set pending signature status
 	 *
 	 *	@param	User	$user			Object user that modify
 	 *  @param	int		$notrigger		1=Does not execute triggers, 0=Execute triggers
@@ -533,8 +580,6 @@ class PreventionPlan extends CommonObject
 	 */
 	public function LibStatut($status, $mode = 0)
 	{
-
-		// phpcs:enable
 		if (empty($this->labelStatus) || empty($this->labelStatusShort)) {
 			global $langs;
 			$langs->load("digiriskdolibarr@digiriskdolibarr");
@@ -554,45 +599,34 @@ class PreventionPlan extends CommonObject
 	}
 
 	/**
-	 *    	Return a link on thirdparty (with picto)
+	 *        Return a link on thirdparty (with picto)
 	 *
-	 *		@param	int		$withpicto		          Add picto into link (0=No picto, 1=Include picto with link, 2=Picto only)
-	 *		@param	string	$option			          Target of link ('', 'customer', 'prospect', 'supplier', 'project')
-	 *		@param	int		$maxlen			          Max length of name
-	 *      @param	int  	$notooltip		          1=Disable tooltip
-	 *      @param  int     $save_lastsearch_value    -1=Auto, 0=No save of lastsearch_values when clicking, 1=Save lastsearch_values whenclicking
-	 *		@return	string					          String with URL
+	 * @param int $withpicto Add picto into link (0=No picto, 1=Include picto with link, 2=Picto only)
+	 * @param string $option Target of link ('', 'customer', 'prospect', 'supplier', 'project')
+	 * @param int $maxlen Max length of name
+	 * @param int $notooltip 1=Disable tooltip
+	 * @return    string                              String with URL
 	 */
-	public function getNomUrl($withpicto = 0, $option = '', $maxlen = 0, $notooltip = 0, $save_lastsearch_value = -1)
+	public function getNomUrl($withpicto = 0, $option = '', $maxlen = 0, $notooltip = 0)
 	{
 		global $conf, $langs, $hookmanager;
 
 		if ( ! empty($conf->dol_no_mouse_hover)) $notooltip = 1; // Force disable tooltips
 
-		$name = $this->ref;
-
-
-
+		$name   = $this->ref;
 		$result = ''; $label = '';
-		$linkstart = ''; $linkend = '';
 
 		if ( ! empty($this->logo) && class_exists('Form')) {
 			$label .= '<div class="photointooltip">';
 			$label .= Form::showphoto('societe', $this, 0, 40, 0, '', 'mini', 0); // Important, we must force height so image will have height tags and if image is inside a tooltip, the tooltip manager can calculate height and position correctly the tooltip.
 			$label .= '</div><div style="clear: both;"></div>';
-		} elseif ( ! empty($this->logo_squarred) && class_exists('Form')) {
-			/*$label.= '<div class="photointooltip">';
-			$label.= Form::showphoto('societe', $this, 0, 40, 0, 'photowithmargin', 'mini', 0);	// Important, we must force height so image will have height tags and if image is inside a tooltip, the tooltip manager can calculate height and position correctly the tooltip.
-			$label.= '</div><div style="clear: both;"></div>';*/
 		}
 
 		$label .= '<div class="centpercent">';
 
 		// By default
-		if (empty($linkstart)) {
-			$label    .= '<u>' . $langs->trans("PreventionPlan") . '</u>';
-			$linkstart = '<a href="' . DOL_URL_ROOT . '/custom/digiriskdolibarr/view/preventionplan/preventionplan_card.php?id=' . $this->id;
-		}
+		$label    .= '<u>' . $langs->trans("PreventionPlan") . '</u>';
+		$linkstart = '<a href="' . DOL_URL_ROOT . '/custom/digiriskdolibarr/view/preventionplan/preventionplan_card.php?id=' . $this->id;
 
 		if ( ! empty($this->ref)) {
 			$label .= '<br><b>' . $langs->trans('Ref') . ':</b> ' . $this->ref;
@@ -631,32 +665,29 @@ class PreventionPlan extends CommonObject
 	 *  Output html form to select a third party.
 	 *  Note, you must use the select_company to get the component to select a third party. This function must only be called by select_company.
 	 *
-	 * @param string $selected Preselected type
+	 * @param string|int $selected Preselected type
 	 * @param string $htmlname Name of field in form
 	 * @param string $filter Optional filters criteras (example: 's.rowid <> x', 's.client in (1,3)')
 	 * @param string $showempty Add an empty field (Can be '1' or text to use on empty line like 'SelectThirdParty')
-	 * @param int $showtype Show third party type in combolist (customer, prospect or supplier)
 	 * @param int $forcecombo Force to use standard HTML select component without beautification
 	 * @param array $events Event options. Example: array(array('method'=>'getContacts', 'url'=>dol_buildpath('/core/ajax/contacts.php',1), 'htmlname'=>'contactid', 'params'=>array('add-customer-contact'=>'disabled')))
-	 * @param string $filterkey Filter on key value
 	 * @param int $outputmode 0=HTML select string, 1=Array
 	 * @param int $limit Limit number of answers
 	 * @param string $morecss Add more css styles to the SELECT component
 	 * @param string $moreparam Add more parameters onto the select tag. For example 'style="width: 95%"' to avoid select2 component to go over parent container
 	 * @param bool $multiple add [] in the name of element and add 'multiple' attribut
-	 * @return    string                    HTML string with
+	 * @return array|string
 	 * @throws Exception
 	 */
-	public function select_preventionplan_list($selected = '', $htmlname = 'fk_preventionplan', $filter = '', $showempty = '0', $showtype = 0, $forcecombo = 0, $events = array(), $filterkey = '', $outputmode = 0, $limit = 0, $morecss = 'minwidth100', $moreparam = '', $multiple = false)
+	public function select_preventionplan_list($selected = '', $htmlname = 'fk_preventionplan', $filter = '', $showempty = '1', $forcecombo = 0, $events = array(), $outputmode = 0, $limit = 0, $morecss = 'minwidth100', $moreparam = '', $multiple = false)
 	{
-		global $conf, $user, $langs;
+		global $langs;
 
 		$out      = '';
 		$num      = 0;
 		$outarray = array();
 
-		if ($selected === '') $selected           = array();
-		elseif ( ! is_array($selected)) $selected = array($selected);
+		$selected = array($selected);
 
 		// Clean $filter that may contains sql conditions so sql code
 		if (function_exists('testSqlAndScriptInject')) {
@@ -722,12 +753,28 @@ class PreventionPlan extends CommonObject
 		return $out;
 	}
 }
+
 /**
  *	Class to manage invoice lines.
  *  Saved into database table llx_preventionplandet
  */
 class PreventionPlanLine extends CommonObjectLine
 {
+	/**
+	 * @var DoliDB Database handler.
+	 */
+	public $db;
+
+	/**
+	 * @var string Error string
+	 */
+	public $error;
+
+	/**
+	 * @var int The object identifier
+	 */
+	public $id;
+
 	/**
 	 * @var string ID to identify managed object
 	 */
@@ -737,20 +784,6 @@ class PreventionPlanLine extends CommonObjectLine
 	 * @var string Name of table without prefix where object is stored
 	 */
 	public $table_element = 'digiriskdolibarr_preventionplandet';
-
-	public $ref = '';
-
-	public $date_creation = '';
-
-	public $description = '';
-
-	public $category = '';
-
-	public $prevention_method = '';
-
-	public $fk_preventionplan = '';
-
-	public $fk_element = '';
 
 	/**
 	 * @var array  Array with all fields and their property. Do not use it as a static var. It may be modified by constructor.
@@ -769,6 +802,17 @@ class PreventionPlanLine extends CommonObjectLine
 		'fk_element'        => array('type' => 'integer', 'label' => 'FkElement', 'enabled' => '1', 'position' => 100, 'notnull' => 1, 'visible' => 0,),
 	);
 
+	public $rowid;
+	public $ref;
+	public $ref_ext;
+	public $date_creation;
+	public $tms;
+	public $category;
+	public $description;
+	public $prevention_method;
+	public $fk_preventionplan;
+	public $fk_element;
+
 	/**
 	 * Constructor
 	 *
@@ -776,7 +820,7 @@ class PreventionPlanLine extends CommonObjectLine
 	 */
 	public function __construct(DoliDB $db)
 	{
-		global $conf, $langs;
+		global $conf;
 
 		$this->db = $db;
 
@@ -826,7 +870,7 @@ class PreventionPlanLine extends CommonObjectLine
 	 *
 	 * @param int $parent_id
 	 * @param int $limit
-	 * @return int <0 if KO, >0 if OK
+	 * @return array|int
 	 */
 	public function fetchAll($parent_id = 0, $limit = 0)
 	{
@@ -847,6 +891,7 @@ class PreventionPlanLine extends CommonObjectLine
 			$num = $db->num_rows($result);
 
 			$i = 0;
+			$records = array();
 			while ($i < ($limit ? min($limit, $num) : $num)) {
 				$obj = $db->fetch_object($result);
 
@@ -935,7 +980,7 @@ class PreventionPlanLine extends CommonObjectLine
 	 *    Update line into database
 	 *
 	 * @param User $user User object
-	 * @param int $notrigger Disable triggers
+	 * @param bool $notrigger Disable triggers
 	 * @return        int                    <0 if KO, >0 if OK
 	 * @throws Exception
 	 */
@@ -943,14 +988,11 @@ class PreventionPlanLine extends CommonObjectLine
 	{
 		global $user, $db;
 
-		$error = 0;
-
 		// Clean parameters
 		$this->description = trim($this->description);
 
 		$db->begin();
 
-		// Mise a jour ligne en base
 		$sql  = "UPDATE " . MAIN_DB_PREFIX . "digiriskdolibarr_preventionplandet SET";
 		$sql .= " ref='" . $db->escape($this->ref) . "',";
 		$sql .= " description='" . $db->escape($this->description) . "',";
@@ -983,6 +1025,8 @@ class PreventionPlanLine extends CommonObjectLine
 	/**
 	 *    Delete line in database
 	 *
+	 * @param User $user
+	 * @param bool $notrigger
 	 * @return        int                   <0 if KO, >0 if OK
 	 * @throws Exception
 	 */
@@ -1011,6 +1055,9 @@ class PreventionPlanLine extends CommonObjectLine
 	}
 }
 
+/**
+ * Class PreventionPlanSignature
+ */
 class PreventionPlanSignature extends DigiriskSignature
 {
 	/**
@@ -1018,6 +1065,11 @@ class PreventionPlanSignature extends DigiriskSignature
 	 */
 
 	public $object_type = 'preventionplan';
+
+	/**
+	 * @var array Context element object
+	 */
+	public $context = array();
 
 	/**
 	 * Constructor
@@ -1055,9 +1107,11 @@ class PreventionPlanSignature extends DigiriskSignature
 	/**
 	 * Clone an object into another one
 	 *
-	 * @param  	User 	$user      	User that creates
-	 * @param  	int 	$fromid     Id of object to clone
-	 * @return 	mixed 				New object created, <0 if KO
+	 * @param User $user User that creates
+	 * @param int $fromid Id of object to clone
+	 * @param $preventionplanid
+	 * @return    mixed                New object created, <0 if KO
+	 * @throws Exception
 	 */
 	public function createFromClone(User $user, $fromid, $preventionplanid)
 	{

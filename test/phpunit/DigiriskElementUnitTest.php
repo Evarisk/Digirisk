@@ -202,30 +202,30 @@ class DigiriskElementUnitTest extends PHPUnit\Framework\TestCase
 		return $localobject;
 	}
 
-	/**
-	 * testDigiriskElementInfo
-	 *
-	 * @param   DigiriskElement $localobject Digiriskelement object
-	 * @return  void
-	 *
-	 * @covers  DigiriskElement::info
-	 *
-	 * @depends testDigiriskElementFetch
-	 * The depends says test is run only if previous is ok
-	 */
-	public function testDigiriskElementInfo($localobject) : void
-	{
-		global $conf, $user, $langs, $db;
-		$conf  = $this->savconf;
-		$user  = $this->savuser;
-		$langs = $this->savlangs;
-		$db    = $this->savdb;
-
-		$result = $localobject->info($localobject->id);
-		$this->assertNull($result);
-
-		print __METHOD__ . " id=" . $localobject->id . "\n";
-	}
+//	/**
+//	 * testDigiriskElementInfo
+//	 *
+//	 * @param   DigiriskElement $localobject Digiriskelement object
+//	 * @return  void
+//	 *
+//	 * @covers  DigiriskElement::info
+//	 *
+//	 * @depends testDigiriskElementFetch
+//	 * The depends says test is run only if previous is ok
+//	 */
+//	public function testDigiriskElementInfo($localobject) : void
+//	{
+//		global $conf, $user, $langs, $db;
+//		$conf  = $this->savconf;
+//		$user  = $this->savuser;
+//		$langs = $this->savlangs;
+//		$db    = $this->savdb;
+//
+//		$result = $localobject->info($localobject->id);
+//		$this->assertNull($result);
+//
+//		print __METHOD__ . " id=" . $localobject->id . "\n";
+//	}
 
 	/**
 	 * testDigiriskElementUpdate
@@ -316,7 +316,9 @@ class DigiriskElementUnitTest extends PHPUnit\Framework\TestCase
 		$localobjectList = $localobject->fetchAll();
 
 		$this->assertSame(true, is_array($localobjectList));
-		$this->assertInstanceOf(get_class($localobject), array_shift($localobjectList));
+		if (is_array($localobjectList)) {
+			$this->assertInstanceOf(get_class($localobject), array_shift($localobjectList));
+		}
 		print __METHOD__ . " ok";
 		print "\n";
 	}
@@ -328,6 +330,7 @@ class DigiriskElementUnitTest extends PHPUnit\Framework\TestCase
 	 *
 	 * @covers DigiriskElement::fetchDigiriskElementFlat
 	 *
+	 * @throws Exception
 	 */
 	public function testDigiriskElementFetchDigiriskElementFlat()
 	{

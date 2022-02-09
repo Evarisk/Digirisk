@@ -98,11 +98,11 @@ if ($action == 'addSignature') {
 	$signatory->signature_date = dol_now('tzuser');
 
 	if ( ! $error) {
-		$result = $signatory->update($user, false);
+		$result = $signatory->update($user);
 
 		if ($result > 0) {
 			// Creation signature OK
-			$signatory->setSigned($user, false);
+			$signatory->setSigned($user);
 			$urltogo = str_replace('__ID__', $result, $backtopage);
 			$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
 			header("Location: " . $urltogo);
@@ -122,7 +122,7 @@ if ($action == 'setAbsent') {
 	$signatory->fetch($signatoryID);
 
 	if ( ! $error) {
-		$result = $signatory->setAbsent($user, false);
+		$result = $signatory->setAbsent($user);
 		if ($result > 0) {
 			// set absent OK
 			setEventMessages($langs->trans('Attendant') . ' ' . $signatory->firstname . ' ' . $signatory->lastname . ' ' . $langs->trans('SetAbsentAttendant'), array());
@@ -151,7 +151,7 @@ if ($action == 'send') {
 			require_once DOL_DOCUMENT_ROOT . '/core/class/CMailFile.class.php';
 
 			$from = $conf->global->MAIN_MAIL_EMAIL_FROM;
-			$url  = dol_buildpath('/custom/digiriskdolibarr/public/signature/add_signature.php?track_id=' . $signatory->signature_url, 3);
+			$url  = dol_buildpath('/custom/digiriskdolibarr/public/signature/add_signature.php?track_id=' . $signatory->signature_url  . '&type=' . $object->element, 3);
 
 			$message = $langs->trans('SignatureEmailMessage') . ' ' . $url;
 			$subject = $langs->trans('SignatureEmailSubject') . ' ' . $object->ref;
@@ -207,7 +207,7 @@ if ($action == 'deleteAttendant') {
 	$signatory->fetch($signatoryToDeleteID);
 
 	if ( ! $error) {
-		$result = $signatory->setDeleted($user, false);
+		$result = $signatory->setDeleted($user);
 		if ($result > 0) {
 			setEventMessages($langs->trans('DeleteAttendantMessage') . ' ' . $signatory->firstname . ' ' . $signatory->lastname, array());
 			// Deletion attendant OK
@@ -254,7 +254,7 @@ $morehtmlref .= '</div>';
 
 $morehtmlleft = '<div class="floatleft inline-block valignmiddle divphotoref">' . digirisk_show_photos('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/' . $object->element, 'small', 5, 0, 0, 0, $width, 0, 0, 0, 0, $object->element, $object) . '</div>';
 
-digirisk_banner_tab($object, 'ref', '', 0, 'ref', 'ref', $morehtmlref, '', '', $morehtmlleft);
+digirisk_banner_tab($object, 'ref', '', 0, 'ref', 'ref', $morehtmlref, '', 0, $morehtmlleft);
 
 print dol_get_fiche_end();
 ?>
@@ -275,7 +275,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 
 	//User employer -- Responsable de la société
 	$element = $signatory->fetchSignatory('ACC_USER_EMPLOYER', $id, 'accident');
-	if ($element > 0) {
+	if (is_array($element)) {
 		$element = array_shift($element);
 		$usertmp->fetch($element->element_id);
 	}
@@ -303,7 +303,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	print $langs->trans("UserEmployer");
 	print '</td><td class="center">';
 	if ($object->status == 2) {
-		$signatureUrl = dol_buildpath('/custom/digiriskdolibarr/public/signature/add_signature.php?track_id=' . $element->signature_url, 3);
+		$signatureUrl = dol_buildpath('/custom/digiriskdolibarr/public/signature/add_signature.php?track_id=' . $element->signature_url  . '&type=' . $object->element, 3);
 		print '<a href=' . $signatureUrl . ' target="_blank"><i class="fas fa-external-link-alt"></i></a>';
 	} else {
 		print '-';

@@ -1,4 +1,4 @@
-<?php if (empty($element->signature) && $object->status == 2 || $element->signature == $langs->trans("FileGenerated")) : ?>
+<?php if (empty($element->signature) && ($object->status == 2 || $element->signature == $langs->trans("FileGenerated"))) : ?>
 	<div class="wpeo-button button-blue wpeo-modal-event modal-signature-open modal-open" value="<?php echo $element->id ?>">
 		<span><i class="fas fa-signature"></i> <?php echo $langs->trans('Sign'); ?></span>
 	</div>

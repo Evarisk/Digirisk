@@ -29,6 +29,21 @@ require_once DOL_DOCUMENT_ROOT . '/core/class/commonobject.class.php';
 class DigiriskDocuments extends CommonObject
 {
 	/**
+	 * @var DoliDB Database handler.
+	 */
+	public $db;
+
+	/**
+	 * @var string[] Array of error strings
+	 */
+	public $errors = array();
+
+	/**
+	 * @var int The object identifier
+	 */
+	public $id;
+
+	/**
 	 * @var string ID to identify managed object.
 	 */
 	public $element = 'digiriskdocuments';
@@ -90,7 +105,8 @@ class DigiriskDocuments extends CommonObject
 	public $model_odt;
 	public $last_main_doc;
 	public $fk_user_creat;
-	public $fk_standard;
+	public $parent_type;
+	public $parent_id;
 
 	/**
 	 * Constructor
@@ -169,7 +185,6 @@ class DigiriskDocuments extends CommonObject
 	 * Function for JSON filling before saving in database
 	 *
 	 * @param $object
-	 * @return false|string
 	 */
 	public function DigiriskFillJSON($object) {
 		switch ($object->element) {
@@ -183,10 +198,10 @@ class DigiriskDocuments extends CommonObject
 				$this->json = $this->RiskAssessmentDocumentFillJSON($object);
 				break;
 			case "preventionplandocument":
-				$this->json = $this->PreventionPlanDocumentFillJSON($object);
+				$this->json = $this->PreventionPlanDocumentFillJSON();
 				break;
 			case "firepermitdocument":
-				$this->json = $this->FirePermitDocumentFillJSON($object);
+				$this->json = $this->FirePermitDocumentFillJSON();
 				break;
 		}
 	}
@@ -206,13 +221,14 @@ class DigiriskDocuments extends CommonObject
 	/**
 	 * Load list of objects in memory from the database.
 	 *
-	 * @param  string      $sortorder    Sort Order
-	 * @param  string      $sortfield    Sort field
-	 * @param  int         $limit        limit
-	 * @param  int         $offset       Offset
-	 * @param  array       $filter       Filter array. Example array('field'=>'valueforlike', 'customurl'=>...)
-	 * @param  string      $filtermode   Filter mode (AND or OR)
+	 * @param string $sortorder Sort Order
+	 * @param string $sortfield Sort field
+	 * @param int $limit limit
+	 * @param int $offset Offset
+	 * @param array $filter Filter array. Example array('field'=>'valueforlike', 'customurl'=>...)
+	 * @param string $filtermode Filter mode (AND or OR)
 	 * @return array|int                 int <0 if KO, array of pages if OK
+	 * @throws Exception
 	 */
 	public function fetchAll($sortorder = '', $sortfield = '', $limit = 0, $offset = 0, array $filter = array(), $filtermode = 'AND')
 	{
@@ -308,7 +324,7 @@ class DigiriskDocuments extends CommonObject
 	 *	Load the info information of the object
 	 *
 	 *	@param  int		$id       Id of object
-	 *	@return	void
+	 *	@return	int
 	 */
 	public function info($id)
 	{
@@ -326,30 +342,30 @@ class DigiriskDocuments extends CommonObject
 			{
 				$obj = $this->db->fetch_object($result);
 				$this->id = $obj->rowid;
-				if ($obj->fk_user_author)
-				{
-					$cuser = new User($this->db);
-					$cuser->fetch($obj->fk_user_author);
-					$this->user_creation = $cuser;
-				}
+//				if ($obj->fk_user_author)
+//				{
+//					$cuser = new User($this->db);
+//					$cuser->fetch($obj->fk_user_author);
+//					$this->user_creation = $cuser;
+//				}
+//
+//				if ($obj->fk_user_valid)
+//				{
+//					$vuser = new User($this->db);
+//					$vuser->fetch($obj->fk_user_valid);
+//					$this->user_validation = $vuser;
+//				}
+//
+//				if ($obj->fk_user_cloture)
+//				{
+//					$cluser = new User($this->db);
+//					$cluser->fetch($obj->fk_user_cloture);
+//					$this->user_cloture = $cluser;
+//				}
 
-				if ($obj->fk_user_valid)
-				{
-					$vuser = new User($this->db);
-					$vuser->fetch($obj->fk_user_valid);
-					$this->user_validation = $vuser;
-				}
-
-				if ($obj->fk_user_cloture)
-				{
-					$cluser = new User($this->db);
-					$cluser->fetch($obj->fk_user_cloture);
-					$this->user_cloture = $cluser;
-				}
-
-				$this->date_creation     = $this->db->jdate($obj->datec);
-				$this->date_modification = $this->db->jdate($obj->datem);
-				$this->date_validation   = $this->db->jdate($obj->datev);
+				$this->date_creation = $this->db->jdate($obj->date_creation);
+				//$this->date_modification = $this->db->jdate($obj->datem);
+				//$this->date_validation   = $this->db->jdate($obj->datev);
 			}
 
 			$this->db->free($result);
@@ -395,7 +411,7 @@ class DigiriskDocuments extends CommonObject
 			$result = $this->commonGenerateDocument($modelpath, $modele, $outputlangs, $hidedetails, $hidedesc, $hideref, $moreparams['object']);
 		}
 
-		$this->call_trigger(strtoupper($this->type).'_GENERATE', $moreparams['user'], $parent);
+		$this->call_trigger(strtoupper($this->type).'_GENERATE', $moreparams['user']);
 
 		return $result;
 	}

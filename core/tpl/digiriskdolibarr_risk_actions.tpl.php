@@ -130,7 +130,9 @@ if ( ! $error && $action == 'saveRisk' && $permissiontoadd) {
 
 	if (dol_strlen($data['newParent'])) {
 		$parent_element = $digiriskelement->fetchAll('', '', 0, 0, array('ref' => $data['newParent']));
-		$parent_id      = array_keys($parent_element)[0];
+		if (is_array($parent_element)) {
+			$parent_id = array_keys($parent_element)[0];
+		}
 	}
 
 	$risk->fetch($riskID);

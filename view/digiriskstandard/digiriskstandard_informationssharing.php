@@ -149,14 +149,14 @@ if ($action == 'remove_file' && $permissiontodelete) {
  * View
  */
 
-$emptyobject = new stdClass($db);
+$emptyobject = new stdClass();
 
 $title    = $langs->trans('InformationsSharing');
 $help_url = 'FR:Module_DigiriskDolibarr#Diffusion_d.27informations';
 $morejs   = array("/digiriskdolibarr/js/digiriskdolibarr.js.php");
 $morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");
 
-digiriskHeader('', $title, $help_url, '', '', '', $morejs, $morecss); ?>
+digiriskHeader($title, $help_url, $morejs, $morecss); ?>
 
 <div id="cardContent" value="">
 
@@ -196,7 +196,7 @@ if ($includedocgeneration) {
 	$urlsource  = $_SERVER["PHP_SELF"];
 	$modulepart = 'digiriskdolibarr:InformationsSharing';
 
-	print digiriskshowdocuments($modulepart, $dir_files, $filedir, $urlsource, $permissiontoadd, $permissiontodelete, $conf->global->DIGIRISKDOLIBARR_INFORMATIONSSHARING_DEFAULT_MODEL, 1, 0, 28, 0, '', $langs->trans('InformationsSharing'), '', $langs->defaultlang, '', $informationssharing);
+	print digiriskshowdocuments($modulepart, $dir_files, $filedir, $urlsource, $permissiontoadd, $permissiontodelete, $conf->global->DIGIRISKDOLIBARR_INFORMATIONSSHARING_DEFAULT_MODEL, 1, 0, '', $langs->trans('InformationsSharing'), '', '', $informationssharing);
 }
 
 // End of page

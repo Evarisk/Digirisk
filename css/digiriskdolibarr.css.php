@@ -17,7 +17,7 @@
  */
 
 /**
- * \file    digiriskdolibarr/css/digiriskdolibarr.css.php
+ * \file    css/digiriskdolibarr.css.php
  * \ingroup digiriskdolibarr
  * \brief   CSS file for module DigiriskDolibarr.
  */

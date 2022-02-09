@@ -16,7 +16,7 @@
  */
 
 /**
- * \file        class/preventionplandocument.class.php
+ * \file        class/digiriskdocuments/preventionplandocument.class.php
  * \ingroup     digiriskdolibarr
  * \brief       This file is a class file for PreventionPlanDocument
  */
@@ -33,10 +33,13 @@ require_once __DIR__ . '/../openinghours.class.php';
  */
 class PreventionPlanDocument extends DigiriskDocuments
 {
+	/**
+	 * @var DoliDB Database handler.
+	 */
+	public $db;
 
 	/**
-	 * @var int  Does this object support multicompany module ?
-	 * 0=No test on entity, 1=Test with field entity, 'field@table'=Test with link by field@table
+	 * @var string ID to identify managed object.
 	 */
 	public $element = 'preventionplandocument';
 
@@ -92,10 +95,10 @@ class PreventionPlanDocument extends DigiriskDocuments
 	/**
 	 * Function for JSON filling before saving in database
 	 *
-	 * @param $object
 	 * @return false|string
+	 * @throws Exception
 	 */
-	public function PreventionPlanDocumentFillJSON($object)
+	public function PreventionPlanDocumentFillJSON()
 	{
 		global $conf;
 
@@ -107,6 +110,7 @@ class PreventionPlanDocument extends DigiriskDocuments
 		$preventionplanline = new PreventionPlanLine($this->db);
 		$risk = new Risk($this->db);
 		$openinghours = new Openinghours($this->db);
+		$json         = array();
 
 		$id = GETPOST('id');
 		if ($id > 0) {
@@ -117,11 +121,25 @@ class PreventionPlanDocument extends DigiriskDocuments
 		$digirisk_resources = $resources->digirisk_dolibarr_fetch_resources();
 
 		$extsociety = $resources->fetchResourcesFromObject('PP_EXT_SOCIETY', $preventionplan);
-		$maitreoeuvre = array_shift($signatory->fetchSignatory('PP_MAITRE_OEUVRE', $preventionplan->id, 'preventionplan'));
-		$extsocietyresponsible = array_shift($signatory->fetchSignatory('PP_EXT_SOCIETY_RESPONSIBLE', $preventionplan->id, 'preventionplan'));
+		if ($extsociety < 1) {
+			$extsociety = new stdClass();
+		}
+
+		$maitreoeuvre = $signatory->fetchSignatory('PP_MAITRE_OEUVRE', $preventionplan->id, 'preventionplan');
+		$maitreoeuvre = is_array($maitreoeuvre) ? array_shift($maitreoeuvre) : $maitreoeuvre;
+		$extsocietyresponsible = $signatory->fetchSignatory('PP_EXT_SOCIETY_RESPONSIBLE', $preventionplan->id, 'preventionplan');
+		$extsocietyresponsible  = is_array($extsocietyresponsible) ? array_shift($extsocietyresponsible) : $extsocietyresponsible;
 		$extsocietyintervenants = $signatory->fetchSignatory('PP_EXT_SOCIETY_INTERVENANTS', $preventionplan->id, 'preventionplan');
 		$labourinspector = $resources->fetchResourcesFromObject('PP_LABOUR_INSPECTOR', $preventionplan);
+		if ($labourinspector < 1) {
+			$labourinspector = new stdClass();
+		}
+
 		$labourinspectorcontact = $resources->fetchResourcesFromObject('PP_LABOUR_INSPECTOR_ASSIGNED', $preventionplan);
+		if ($labourinspectorcontact < 1) {
+			$labourinspectorcontact = new stdClass();
+		}
+
 
 		if (!empty ($digirisk_resources)) {
 			$societe->fetch($digirisk_resources['Pompiers']->id[0]);
@@ -138,6 +156,7 @@ class PreventionPlanDocument extends DigiriskDocuments
 		}
 
 		if ($maitreoeuvre->id > 0) {
+			$json['PreventionPlan']['maitre_oeuvre'] = array();
 			$json['PreventionPlan']['maitre_oeuvre']['user_id'] = $maitreoeuvre->id;
 			$json['PreventionPlan']['maitre_oeuvre']['phone'] = $maitreoeuvre->phone;
 			$json['PreventionPlan']['maitre_oeuvre']['firstname'] = $maitreoeuvre->firstname;
@@ -148,15 +167,17 @@ class PreventionPlanDocument extends DigiriskDocuments
 		}
 
 		if ($extsociety->id > 0) {
+			$json['PreventionPlan']['society_outside'] = array();
 			$json['PreventionPlan']['society_outside']['id'] = $extsociety->id;
 			$json['PreventionPlan']['society_outside']['name'] = $extsociety->name;
-			$json['PreventionPlan']['society_outside']['siret'] = $extsociety->siret;
+			$json['PreventionPlan']['society_outside']['siret'] = $extsociety->idprof2;
 			$json['PreventionPlan']['society_outside']['address'] = $extsociety->address;
 			$json['PreventionPlan']['society_outside']['postal'] = $extsociety->zip;
 			$json['PreventionPlan']['society_outside']['town'] = $extsociety->town;
 		}
 
 		if ($extsocietyresponsible->id > 0) {
+			$json['PreventionPlan']['responsable_exterieur'] = array();
 			$json['PreventionPlan']['responsable_exterieur']['id'] = $extsocietyresponsible->id;
 			$json['PreventionPlan']['responsable_exterieur']['firstname'] = $extsocietyresponsible->firstname;
 			$json['PreventionPlan']['responsable_exterieur']['lastname'] = $extsocietyresponsible->lastname;
@@ -168,6 +189,7 @@ class PreventionPlanDocument extends DigiriskDocuments
 
 		if (!empty ($extsocietyintervenants) && $extsocietyintervenants > 0) {
 			foreach ($extsocietyintervenants as $extsocietyintervenant) {
+				$json['PreventionPlan']['intervenant_exterieur'][$extsocietyintervenant->id] = array();
 				$json['PreventionPlan']['intervenant_exterieur'][$extsocietyintervenant->id]['firstname'] = $extsocietyintervenant->firstname;
 				$json['PreventionPlan']['intervenant_exterieur'][$extsocietyintervenant->id]['lastname'] = $extsocietyintervenant->lastname;
 				$json['PreventionPlan']['intervenant_exterieur'][$extsocietyintervenant->id]['phone'] = $extsocietyintervenant->phone;
@@ -178,15 +200,17 @@ class PreventionPlanDocument extends DigiriskDocuments
 		}
 
 		if ($labourinspector->id > 0) {
+			$json['PreventionPlan']['labour_inspector'] = array();
 			$json['PreventionPlan']['labour_inspector']['id'] = $extsociety->id;
 			$json['PreventionPlan']['labour_inspector']['name'] = $extsociety->name;
-			$json['PreventionPlan']['labour_inspector']['siret'] = $extsociety->siret;
+			$json['PreventionPlan']['labour_inspector']['siret'] = $extsociety->idprof2;
 			$json['PreventionPlan']['labour_inspector']['address'] = $extsociety->address;
 			$json['PreventionPlan']['labour_inspector']['postal'] = $extsociety->zip;
 			$json['PreventionPlan']['labour_inspector']['town'] = $extsociety->town;
 		}
 
 		if ($labourinspectorcontact->id > 0) {
+			$json['PreventionPlan']['labour_inspector_contact'] = array();
 			$json['PreventionPlan']['labour_inspector_contact']['id'] = $extsocietyresponsible->id;
 			$json['PreventionPlan']['labour_inspector_contact']['firstname'] = $extsocietyresponsible->firstname;
 			$json['PreventionPlan']['labour_inspector_contact']['lastname'] = $extsocietyresponsible->lastname;

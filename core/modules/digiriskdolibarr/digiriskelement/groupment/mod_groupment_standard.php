@@ -17,9 +17,9 @@
  */
 
 /**
- *	\file       htdocs/custom/digiriskdolibarr/core/modules/digiriskdolibarr/mod_groupment_standard.php
+ *	\file       core/modules/digiriskdolibarr/digiriskelement/groupment/mod_groupment_standard.php
  * \ingroup     digiriskdolibarr
- *	\brief      File containing class for numbering module Standard
+ *	\brief      File containing class for groupment numbering module Standard
  */
 
 require_once __DIR__ . '/../modules_digiriskelement.php';
@@ -53,7 +53,7 @@ class mod_groupment_standard extends ModeleNumRefDigiriskElement
 	/**
 	 *  Returns the description of the numbering model
 	 *
-	 *  @return     string      Texte descripif
+	 *  @return     string      Texte descriptif
 	 */
 	public function info()
 	{
@@ -73,12 +73,11 @@ class mod_groupment_standard extends ModeleNumRefDigiriskElement
 	}
 
 	/**
-	 *    Return next free value
+	 * 	Return next free value
 	 *
-	 * @param Object $object Object we need next value for
-	 *
-	 * @return string                Value if KO, <0 if OK prefix+num
-	 * @throws Exception
+	 *	@param Object $object Object we need next value for
+	 * 	@return string                Value if KO, <0 if KO
+	 * 	@throws Exception
 	 */
 	public function getNextValue($object)
 	{

@@ -16,7 +16,7 @@
 */
 
 /**
- *     \file        admin/ticket.php
+ *     \file        admin/ticket/ticket.php
  *     \ingroup     digiriskdolibarr
  *     \brief       Page to public interface of module DigiriskDolibarr for ticket
  */
@@ -40,9 +40,11 @@ global $conf, $langs, $user, $db;
 
 // Libraries
 require_once DOL_DOCUMENT_ROOT . "/core/lib/admin.lib.php";
-require_once '../../lib/digiriskdolibarr.lib.php';
 include_once DOL_DOCUMENT_ROOT . '/core/class/extrafields.class.php';
 include_once DOL_DOCUMENT_ROOT . '/categories/class/categorie.class.php';
+
+require_once '../../lib/digiriskdolibarr.lib.php';
+
 // Translations
 $langs->loadLangs(array("admin", "digiriskdolibarr@digiriskdolibarr"));
 $extra_fields = new ExtraFields($db);

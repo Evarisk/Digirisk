@@ -17,7 +17,7 @@
  */
 
 /**
- *	\file       htdocs/core/modules/digiriskdolibarr/digiriskdocuments/preventionplandocument/doc_preventionplandocument_odt.modules.php
+ *	\file       core/modules/digiriskdolibarr/digiriskdocuments/preventionplandocument/doc_preventionplandocument_odt.modules.php
  *	\ingroup    digiriskdolibarr
  *	\brief      File of class to build ODT documents for digiriskdolibarr
  */
@@ -39,6 +39,76 @@ require_once __DIR__ . '/../../../../../class/riskanalysis/risksign.class.php';
  */
 class doc_preventionplandocument_odt extends ModeleODTPreventionPlanDocument
 {
+	/**
+	 * @var DoliDB Database handler.
+	 */
+	public $db;
+
+	/**
+	 * @var string Error code (or message)
+	 */
+	public $error;
+
+	/**
+	 * @var array Fullpath file
+	 */
+	public $result;
+
+	/**
+	 * @var string ODT Template Name.
+	 */
+	public $name;
+
+	/**
+	 * @var string ODT Template Description.
+	 */
+	public $description;
+
+	/**
+	 * @var string ODT Template path.
+	 */
+	public $scandir;
+
+	/**
+	 * @var string Format file.
+	 */
+	public $type;
+
+	/**
+	 * @var int Width page.
+	 */
+	public $page_largeur;
+
+	/**
+	 * @var int Height page.
+	 */
+	public $page_hauteur;
+
+	/**
+	 * @var array Format page.
+	 */
+	public $format;
+
+	/**
+	 * @var int Left margin.
+	 */
+	public $marge_gauche;
+
+	/**
+	 * @var int Right margin.
+	 */
+	public $marge_droite;
+
+	/**
+	 * @var int Top margin.
+	 */
+	public $marge_haute;
+
+	/**
+	 * @var int Bottom margin.
+	 */
+	public $marge_basse;
+
 	/**
 	 * Issuer
 	 * @var Societe
@@ -83,7 +153,7 @@ class doc_preventionplandocument_odt extends ModeleODTPreventionPlanDocument
 		$this->marge_haute  = 0;
 		$this->marge_basse  = 0;
 
-		// Recupere emetteur
+		// emetteur
 		$this->emetteur                                                     = $mysoc;
 		if ( ! $this->emetteur->country_code) $this->emetteur->country_code = substr($langs->defaultlang, -2); // By default if not defined
 	}
@@ -101,13 +171,12 @@ class doc_preventionplandocument_odt extends ModeleODTPreventionPlanDocument
 		// Load translation files required by the page
 		$langs->loadLangs(array("errors", "companies"));
 
-		$form   = new Form($this->db);
 		$texte  = $this->description . ".<br>\n";
 		$texte .= '<form action="' . $_SERVER["PHP_SELF"] . '" method="POST">';
 		$texte .= '<input type="hidden" name="token" value="' . newToken() . '">';
 		$texte .= '<input type="hidden" name="action" value="setModuleOptions">';
 		$texte .= '<input type="hidden" name="param1" value="DIGIRISKDOLIBARR_PREVENTIONPLANDOCUMENT_ADDON_ODT_PATH">';
-		$texte .= '<table class="nobordernopadding" width="100%">';
+		$texte .= '<table class="nobordernopadding">';
 
 		// List of directories area
 		$texte      .= '<tr><td>';
@@ -153,18 +222,21 @@ class doc_preventionplandocument_odt extends ModeleODTPreventionPlanDocument
 	}
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
 	/**
 	 *  Function to build a document on disk using the generic odt module.
 	 *
-	 *	@param		PreventionPlanDocument	$object				Object source to build document
-	 *	@param		Translate	$outputlangs		Lang output object
-	 * 	@param		string		$srctemplatepath	Full path of source filename for generator using a template file
-	 *  @param		int			$hidedetails		Do not show line details
-	 *  @param		int			$hidedesc			Do not show desc
-	 *  @param		int			$hideref			Do not show ref
-	 *	@return		int         					1 if OK, <=0 if KO
+	 * @param 	PreventionPlanDocument	$object 			Object source to build document
+	 * @param 	Translate 				$outputlangs 		Lang output object
+	 * @param 	string 					$srctemplatepath 	Full path of source filename for generator using a template file
+	 * @param	int						$hidedetails		Do not show line details
+	 * @param	int						$hidedesc			Do not show desc
+	 * @param	int						$hideref			Do not show ref
+	 * @param 	PreventionPlan			$preventionplan		PreventionPlan Object
+	 * @return	int                            				1 if OK, <=0 if KO
+	 * @throws 	Exception
 	 */
-	public function write_file($object, $outputlangs, $srctemplatepath, $hidedetails = 0, $hidedesc = 0, $hideref = 0, $preventionplan)
+	public function write_file($object, $outputlangs, $srctemplatepath, $hidedetails, $hidedesc, $hideref, $preventionplan)
 	{
 		// phpcs:enable
 		global $user, $langs, $conf, $hookmanager, $action, $mysoc;
@@ -207,7 +279,7 @@ class doc_preventionplandocument_odt extends ModeleODTPreventionPlanDocument
 
 		if (file_exists($dir)) {
 			$filename = preg_split('/preventionplandocument\//', $srctemplatepath);
-			$filename = preg_replace('/template_/', '', $filename[1]);
+			preg_replace('/template_/', '', $filename[1]);
 
 			$date     = dol_print_date(dol_now(), 'dayxcard');
 			$filename = $objectref . '_' . $conf->global->MAIN_INFO_SOCIETE_NOM . '_' . $date . '.odt';
@@ -231,7 +303,7 @@ class doc_preventionplandocument_odt extends ModeleODTPreventionPlanDocument
 			complete_substitutions_array($substitutionarray, $langs, $object);
 			// Call the ODTSubstitution hook
 			$parameters = array('file' => $file, 'object' => $object, 'outputlangs' => $outputlangs, 'substitutionarray' => &$substitutionarray);
-			$reshook    = $hookmanager->executeHooks('ODTSubstitution', $parameters, $this, $action); // Note that $action and $preventionplan may have been modified by some hooks
+			$hookmanager->executeHooks('ODTSubstitution', $parameters, $this, $action); // Note that $action and $preventionplan may have been modified by some hooks
 
 			// Open and load template
 			require_once ODTPHP_PATH . 'odf.php';
@@ -272,8 +344,14 @@ class doc_preventionplandocument_odt extends ModeleODTPreventionPlanDocument
 
 			$digirisk_resources     = $resources->digirisk_dolibarr_fetch_resources();
 			$extsociety             = $resources->fetchResourcesFromObject('PP_EXT_SOCIETY', $preventionplan);
-			$maitreoeuvre           = array_shift($signatory->fetchSignatory('PP_MAITRE_OEUVRE', $preventionplan->id, 'preventionplan'));
-			$extsocietyresponsible  = array_shift($signatory->fetchSignatory('PP_EXT_SOCIETY_RESPONSIBLE', $preventionplan->id, 'preventionplan'));
+			if ($extsociety < 1) {
+				$extsociety = new stdClass();
+			}
+
+			$maitreoeuvre           = $signatory->fetchSignatory('PP_MAITRE_OEUVRE', $preventionplan->id, 'preventionplan');
+			$maitreoeuvre           = is_array($maitreoeuvre) ? array_shift($maitreoeuvre) : $maitreoeuvre;
+			$extsocietyresponsible  = $signatory->fetchSignatory('PP_EXT_SOCIETY_RESPONSIBLE', $preventionplan->id, 'preventionplan');
+			$extsocietyresponsible  = is_array($extsocietyresponsible) ? array_shift($extsocietyresponsible) : $extsocietyresponsible;
 			$extsocietyintervenants = $signatory->fetchSignatory('PP_EXT_SOCIETY_INTERVENANTS', $preventionplan->id, 'preventionplan');
 
 			$tmparray['titre_prevention']             = $preventionplan->ref;
@@ -288,8 +366,9 @@ class doc_preventionplandocument_odt extends ModeleODTPreventionPlanDocument
 
 			$tmparray['date_start_intervention_PPP'] = dol_print_date($preventionplan->date_start, 'dayhoursec', 'tzuser');
 			$tmparray['date_end_intervention_PPP']   = dol_print_date($preventionplan->date_end, 'dayhoursec', 'tzuser');
-			$tmparray['interventions_info']          = count($preventionplanlines) . " " . $langs->trans('PreventionPlanLine');
-
+			if (is_array($preventionplanlines)) {
+				$tmparray['interventions_info'] = count($preventionplanlines) . " " . $langs->trans('PreventionPlanLine');
+			}
 
 			$openinghours = new Openinghours($this->db);
 
@@ -340,7 +419,7 @@ class doc_preventionplandocument_odt extends ModeleODTPreventionPlanDocument
 
 			if ( ! empty($extsociety) && $extsociety > 0) {
 				$tmparray['society_title']    = $extsociety->name;
-				$tmparray['society_siret_id'] = $extsociety->siret;
+				$tmparray['society_siret_id'] = $extsociety->idprof2;
 				$tmparray['society_address']  = $extsociety->address;
 				$tmparray['society_postcode'] = $extsociety->zip;
 				$tmparray['society_town']     = $extsociety->town;
@@ -394,13 +473,10 @@ class doc_preventionplandocument_odt extends ModeleODTPreventionPlanDocument
 					} elseif (preg_match('/logo$/', $key)) {
 						if (file_exists($value)) $odfHandler->setImage($key, $value);
 						else $odfHandler->setVars($key, $langs->transnoentities('ErrorFileNotFound'), true, 'UTF-8');
-					} else // Text
-					{
-						if (empty($value)) {
-							$odfHandler->setVars($key, $langs->trans('NoData'), true, 'UTF-8');
-						} else {
-							$odfHandler->setVars($key, html_entity_decode($value, ENT_QUOTES | ENT_HTML5), true, 'UTF-8');
-						}
+					} elseif (empty($value)) { // Text
+						$odfHandler->setVars($key, $langs->trans('NoData'), true, 'UTF-8');
+					} else {
+						$odfHandler->setVars($key, html_entity_decode($value, ENT_QUOTES | ENT_HTML5), true, 'UTF-8');
 					}
 				} catch (OdfException $e) {
 					dol_syslog($e->getMessage(), LOG_INFO);
@@ -426,12 +502,10 @@ class doc_preventionplandocument_odt extends ModeleODTPreventionPlanDocument
 								try {
 									if ($val == $tmparray['risk']) {
 										$listlines->setImage($key, $val);
+									} elseif (empty($val)) {
+										$listlines->setVars($key, $langs->trans('NoData'), true, 'UTF-8');
 									} else {
-										if (empty($val)) {
-											$listlines->setVars($key, $langs->trans('NoData'), true, 'UTF-8');
-										} else {
-											$listlines->setVars($key, html_entity_decode($val, ENT_QUOTES | ENT_HTML5), true, 'UTF-8');
-										}
+										$listlines->setVars($key, html_entity_decode($val, ENT_QUOTES | ENT_HTML5), true, 'UTF-8');
 									}
 								} catch (OdfException $e) {
 									dol_syslog($e->getMessage(), LOG_INFO);
@@ -475,12 +549,10 @@ class doc_preventionplandocument_odt extends ModeleODTPreventionPlanDocument
 											dol_imageResizeOrCrop($value, 0, $newWidth, $newHeight);
 										}
 										$listlines->setImage($key, $value);
-									} else {  // Text
-										if (empty($val)) {
-											$listlines->setVars($key, $langs->trans('NoData'), true, 'UTF-8');
-										} else {
-											$listlines->setVars($key, html_entity_decode($val, ENT_QUOTES | ENT_HTML5), true, 'UTF-8');
-										}
+									} elseif (empty($value)) {  // Text
+										$listlines->setVars($key, $langs->trans('NoData'), true, 'UTF-8');
+									} else {
+										$listlines->setVars($key, html_entity_decode($value, ENT_QUOTES | ENT_HTML5), true, 'UTF-8');
 									}
 								} catch (OdfException $e) {
 									dol_syslog($e->getMessage(), LOG_INFO);
@@ -513,7 +585,7 @@ class doc_preventionplandocument_odt extends ModeleODTPreventionPlanDocument
 
 			// Call the beforeODTSave hook
 			$parameters = array('odfHandler' => &$odfHandler, 'file' => $file, 'object' => $object, 'outputlangs' => $outputlangs, 'substitutionarray' => &$tmparray);
-			$reshook    = $hookmanager->executeHooks('beforeODTSave', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
+			$hookmanager->executeHooks('beforeODTSave', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
 
 			// Write new file
 			if ( ! empty($conf->global->MAIN_ODT_AS_PDF)) {
@@ -535,10 +607,10 @@ class doc_preventionplandocument_odt extends ModeleODTPreventionPlanDocument
 			}
 
 			$parameters = array('odfHandler' => &$odfHandler, 'file' => $file, 'object' => $object, 'outputlangs' => $outputlangs, 'substitutionarray' => &$tmparray);
-			$reshook    = $hookmanager->executeHooks('afterODTCreation', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
+			$hookmanager->executeHooks('afterODTCreation', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
 
-			if ( ! empty($conf->global->MAIN_UMASK))
-				@chmod($file, octdec($conf->global->MAIN_UMASK));
+//			if ( ! empty($conf->global->MAIN_UMASK))
+//				@chmod($file, octdec($conf->global->MAIN_UMASK));
 
 			$odfHandler = null; // Destroy object
 
@@ -552,7 +624,5 @@ class doc_preventionplandocument_odt extends ModeleODTPreventionPlanDocument
 			$this->error = $langs->transnoentities("ErrorCanNotCreateDir", $dir);
 			return -1;
 		}
-
-		return -1;
 	}
 }

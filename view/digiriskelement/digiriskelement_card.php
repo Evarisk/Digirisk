@@ -221,7 +221,7 @@ if (empty($reshook)) {
  */
 
 $form        = new Form($db);
-$emptyobject = new stdClass($db);
+$emptyobject = new stdClass();
 $formconfirm = '';
 
 $parameters                        = array('formConfirm' => $formconfirm, 'object' => $object);
@@ -253,7 +253,7 @@ $help_url = 'FR:Module_DigiriskDolibarr';
 $morejs   = array("/digiriskdolibarr/js/digiriskdolibarr.js.php");
 $morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");
 
-digiriskHeader('', $title, $help_url, '', '', '', $morejs, $morecss); ?>
+digiriskHeader($title, $help_url, $morejs, $morecss); ?>
 
 	<div id="cardContent" value="">
 
@@ -355,7 +355,7 @@ if (($id || $ref) && $action == 'edit') {
 
 	if ($id != $conf->global->DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH) {
 		print '<tr><td>' . $langs->trans("ParentElement") . '</td><td>';
-		print $object->select_digiriskelement_list($object->fk_parent, 'fk_parent', 'element_type="groupment"', '',  0, 0, array(), '',  0,  0,  'minwidth100',  GETPOST('id'),  false);
+		print $object->select_digiriskelement_list($object->fk_parent, 'fk_parent', 'element_type="groupment"', 0, 0, array(), 0, 0, 'minwidth100', GETPOST('id'), false);
 	}
 
 	print '</td></tr>';
@@ -528,7 +528,7 @@ if ((empty($action) || ($action != 'edit' && $action != 'create'))) {
 				$title        = $langs->trans('WorkUnitDocument');
 			}
 
-			print digiriskshowdocuments($modulepart, $dir_files, $filedir, $urlsource, $permissiontoadd, $permissiontodelete, $defaultmodel, 1, 0, 28, 0, '', $title, '', $langs->defaultlang, '', $digiriskelementdocument);
+			print digiriskshowdocuments($modulepart, $dir_files, $filedir, $urlsource, $permissiontoadd, $permissiontodelete, $defaultmodel, 1, 0, '', $title, '', '', $digiriskelementdocument);
 		}
 
 

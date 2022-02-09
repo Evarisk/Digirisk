@@ -16,7 +16,7 @@
  */
 
 /**
- *      \file       test/phpunit/RiskSignUnitTest.php
+ *      \file       test/phpunit/riskanalysis/RiskSignUnitTest.php
  *      \ingroup    test
  *      \brief      PHPUnit test
  *      \remarks    To run this script as CLI:  phpunit filename.php
@@ -200,13 +200,14 @@ class RiskSignUnitTest extends PHPUnit\Framework\TestCase
 	/**
 	 * testRiskSignFetchFormParent
 	 *
-	 * @param   RiskSign $localobject RiskSign object
+	 * @param RiskSign $localobject RiskSign object
 	 * @return  void
 	 *
 	 * @covers  RiskSign::fetchFromParent
 	 *
 	 * @depends testRiskSignFetch
 	 * The depends says test is run only if previous is ok
+	 * @throws Exception
 	 */
 	public function testRiskSignFetchFromParent($localobject)
 	{
@@ -216,11 +217,13 @@ class RiskSignUnitTest extends PHPUnit\Framework\TestCase
 		$langs = $this->savlangs;
 		$db    = $this->savdb;
 
-		$result = $localobject->fetchFromParent($localobject->fk_element);
+		$localobjectList = $localobject->fetchFromParent($localobject->fk_element);
 
-		$this->assertLessThan($result, 0);
-
-		print __METHOD__ . " id=" . $localobject->id . " result=" . $result . "\n";
+		$this->assertSame(true, is_array($localobjectList));
+		if (is_array($localobjectList)) {
+			$this->assertInstanceOf(get_class($localobject), array_shift($localobjectList));
+		}
+		print __METHOD__ . " id=" . $localobject->id . "\n";
 	}
 
 	/**
@@ -304,7 +307,9 @@ class RiskSignUnitTest extends PHPUnit\Framework\TestCase
 		$localobjectList = $localobject->fetchAll();
 
 		$this->assertSame(true, is_array($localobjectList));
-		$this->assertInstanceOf(get_class($localobject), array_shift($localobjectList));
+		if (is_array($localobjectList)) {
+			$this->assertInstanceOf(get_class($localobject), array_shift($localobjectList));
+		}
 		print __METHOD__ . " ok";
 		print "\n";
 	}

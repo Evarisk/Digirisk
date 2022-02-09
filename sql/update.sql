@@ -47,4 +47,9 @@ DROP TABLE llx_digiriskdolibarr_firepermit_signature;
 -- 9.0.0
 ALTER TABLE llx_digiriskdolibarr_digiriskelement CHANGE rank `rank` integer;
 
+-- 9.0.1
+ALTER TABLE llx_digiriskdolibarr_accident ADD accident_location text;
+ALTER TABLE llx_digiriskdolibarr_accident CHANGE `external_accident` `external_accident` SMALLINT(6) NULL DEFAULT '1';
+-- ALTER TABLE llx_digiriskdolibarr_digiriskelement_extrafields ADD entity integer DEFAULT 1 NOT NULL;
+
 

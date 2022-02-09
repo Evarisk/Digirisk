@@ -16,7 +16,7 @@
  */
 
 /**
- * \file        class/risk.class.php
+ * \file        class/riskanalysis/risk.class.php
  * \ingroup     digiriskdolibarr
  * \brief       This file is a CRUD class file for Risk (Create/Read/Update/Delete)
  */
@@ -30,6 +30,16 @@ require_once __DIR__ . '/../../lib/digiriskdolibarr_function.lib.php';
  */
 class Risk extends CommonObject
 {
+	/**
+	 * @var DoliDB Database handler.
+	 */
+	public $db;
+
+	/**
+	 * @var string[] Array of error strings
+	 */
+	public $errors = array();
+
 	/**
 	 * @var string ID to identify managed object.
 	 */
@@ -151,8 +161,9 @@ class Risk extends CommonObject
 	/**
 	 * Load object in memory from the database
 	 *
-	 * @param int    $parent_id   Id parent object
-	 * @return int         <0 if KO, 0 if not found, >0 if OK
+	 * @param int $parent_id Id parent object
+	 * @return array|int         <0 if KO, 0 if not found, >0 if OK
+	 * @throws Exception
 	 */
 	public function fetchFromParent($parent_id)
 	{
@@ -163,10 +174,11 @@ class Risk extends CommonObject
 	/**
 	 * Load object in memory from the database
 	 *
-	 * @param int        $parent_id   Id parent object
-	 * @param boolean    $get_children_data  Get children risks data
-	 * @param boolean    $get_parents_data   Get parents risks data
-	 * @return int         <0 if KO, 0 if not found, >0 if OK
+	 * @param int $parent_id Id parent object
+	 * @param bool $get_children_data Get children risks data
+	 * @param bool $get_parents_data Get parents risks data
+	 * @return array|int         <0 if KO, 0 if not found, >0 if OK
+	 * @throws Exception
 	 */
 	public function fetchRisksOrderedByCotation($parent_id, $get_children_data = false, $get_parents_data = false)
 	{
@@ -175,12 +187,12 @@ class Risk extends CommonObject
 		$risk    = new Risk($this->db);
 		$result  = $risk->fetchFromParent($parent_id);
 
-		// RISQUES de l'élément appelant.
+		// RISKS de l'élément parent.
 		if ($result > 0 && ! empty($result)) {
 			foreach ($result as $risk) {
 				$evaluation     = new RiskAssessment($this->db);
 				$lastEvaluation = $evaluation->fetchFromParent($risk->id, 1);
-				if ( $lastEvaluation > 0 && ! empty($lastEvaluation) ) {
+				if ( $lastEvaluation > 0 && ! empty($lastEvaluation) && is_array($lastEvaluation)) {
 					$lastEvaluation       = array_shift($lastEvaluation);
 					$risk->lastEvaluation = $lastEvaluation->cotation;
 				}
@@ -190,19 +202,23 @@ class Risk extends CommonObject
 		}
 
 		if ( $get_children_data ) {
-			$elements = recurse_tree($parent_id, 0, $objects);
+			if (is_array($objects)) {
+				$elements = recurse_tree($parent_id, 0, $objects);
+			} else {
+				return -1;
+			}
+
 			if ( $elements > 0 && ! empty($elements) ) {
-				// Super fonction itérations flat.
+				// Super function iterations flat.
 				$it = new RecursiveIteratorIterator(new RecursiveArrayIterator($elements));
+				$element = array();
 				foreach ($it as $key => $v) {
 					$element[$key][$v] = $v;
 				}
 
-				if (is_array($element)) {
-					$children_id = array_shift($element);
-				}
+				$children_id = array_shift($element);
 
-				// RISQUES des enfants du parent.
+				// RISKS parent children.
 				if ( ! empty($children_id)) {
 					foreach ($children_id as $element) {
 						$risk = new Risk($this->db);
@@ -212,7 +228,7 @@ class Risk extends CommonObject
 							foreach ($result as $risk) {
 								$evaluation     = new RiskAssessment($this->db);
 								$lastEvaluation = $evaluation->fetchFromParent($risk->id, 1);
-								if ( $lastEvaluation > 0 && ! empty($lastEvaluation) ) {
+								if ( $lastEvaluation > 0 && ! empty($lastEvaluation)  && is_array($lastEvaluation)) {
 									$lastEvaluation       = array_shift($lastEvaluation);
 									$risk->lastEvaluation = $lastEvaluation->cotation;
 								}
@@ -233,7 +249,7 @@ class Risk extends CommonObject
 					foreach ($result as $risk) {
 						$evaluation     = new RiskAssessment($this->db);
 						$lastEvaluation = $evaluation->fetchFromParent($risk->id, 1);
-						if ( $lastEvaluation > 0 && ! empty($lastEvaluation) ) {
+						if ( $lastEvaluation > 0 && ! empty($lastEvaluation)  && is_array($lastEvaluation)) {
 							$lastEvaluation       = array_shift($lastEvaluation);
 							$risk->lastEvaluation = $lastEvaluation->cotation;
 						}
@@ -258,13 +274,14 @@ class Risk extends CommonObject
 	/**
 	 * Load list of objects in memory from the database.
 	 *
-	 * @param  string      $sortorder    Sort Order
-	 * @param  string      $sortfield    Sort field
-	 * @param  int         $limit        limit
-	 * @param  int         $offset       Offset
-	 * @param  array       $filter       Filter array. Example array('field'=>'valueforlike', 'customurl'=>...)
-	 * @param  string      $filtermode   Filter mode (AND or OR)
+	 * @param string $sortorder Sort Order
+	 * @param string $sortfield Sort field
+	 * @param int $limit limit
+	 * @param int $offset Offset
+	 * @param array $filter Filter array. Example array('field'=>'valueforlike', 'customurl'=>...)
+	 * @param string $filtermode Filter mode (AND or OR)
 	 * @return array|int                 int <0 if KO, array of pages if OK
+	 * @throws Exception
 	 */
 	public function fetchAll($sortorder = '', $sortfield = '', $limit = 0, $offset = 0, array $filter = array(), $filtermode = 'AND')
 	{
@@ -361,15 +378,14 @@ class Risk extends CommonObject
 	public function get_danger_categories()
 	{
 		$json_categories = file_get_contents(DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/js/json/dangerCategories.json');
-		$risk_categories = json_decode($json_categories, true);
-
-		return $risk_categories;
+		return json_decode($json_categories, true);
 	}
 
 	/**
 	 * Get danger category picto path
 	 *
-	 * @return	string $category['thumbnail_name']     path to danger category picto, -1 if don't exist
+	 * @param $object
+	 * @return    string $category['thumbnail_name']     path to danger category picto, -1 if don't exist
 	 */
 	public function get_danger_category($object)
 	{
@@ -386,7 +402,8 @@ class Risk extends CommonObject
 	/**
 	 * Get danger category picto name
 	 *
-	 * @return	string $category['name']     name to danger category picto, -1 if don't exist
+	 * @param $object
+	 * @return    string $category['name']     name to danger category picto, -1 if don't exist
 	 */
 	public function get_danger_category_name($object)
 	{
@@ -403,7 +420,8 @@ class Risk extends CommonObject
 	/**
 	 * Get danger category picto name
 	 *
-	 * @return	string $category['name']     name to danger category picto, -1 if don't exist
+	 * @param $name
+	 * @return    string $category['name']     name to danger category picto, -1 if don't exist
 	 */
 	public function get_danger_category_position_by_name($name)
 	{
@@ -418,6 +436,42 @@ class Risk extends CommonObject
 	}
 
 	/**
+	 * Get danger category picto path
+	 *
+	 * @param int $position
+	 * @return    string $category['thumbnail_name']     path to danger category picto, -1 if don't exist
+	 */
+	public function get_danger_category_by_position($position)
+	{
+		$risk_categories = $this->get_danger_categories();
+		foreach ($risk_categories as $category) {
+			if ($category['position'] == $position) {
+				return $category['thumbnail_name'];
+			}
+		}
+
+		return -1;
+	}
+
+	/**
+	 * Get danger category picto path
+	 *
+	 * @param int $position
+	 * @return    string $category['thumbnail_name']     path to danger category picto, -1 if don't exist
+	 */
+	public function get_danger_category_name_by_position($position)
+	{
+		$risk_categories = $this->get_danger_categories();
+		foreach ($risk_categories as $category) {
+			if ($category['position'] == $position) {
+				return $category['name'];
+			}
+		}
+
+		return -1;
+	}
+
+	/**
 	 * Get fire permit risk categories json in /digiriskdolibarr/js/json/
 	 *
 	 * @return	array $risk_categories
@@ -425,15 +479,14 @@ class Risk extends CommonObject
 	public function get_fire_permit_danger_categories()
 	{
 		$json_categories = file_get_contents(DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/js/json/firePermitDangerCategories.json');
-		$risk_categories = json_decode($json_categories, true);
-
-		return $risk_categories;
+		return json_decode($json_categories, true);
 	}
 
 	/**
 	 * Get fire permit danger category picto path
 	 *
-	 * @return	string $category['thumbnail_name']     path to fire permit danger category picto, -1 if don't exist
+	 * @param $object
+	 * @return    string $category['thumbnail_name']     path to fire permit danger category picto, -1 if don't exist
 	 */
 	public function get_fire_permit_danger_category($object)
 	{
@@ -450,7 +503,8 @@ class Risk extends CommonObject
 	/**
 	 * Get fire permit danger category picto name
 	 *
-	 * @return	string $category['name']     name to fire permit danger category picto, -1 if don't exist
+	 * @param $object
+	 * @return    string $category['name']     name to fire permit danger category picto, -1 if don't exist
 	 */
 	public function get_fire_permit_danger_category_name($object)
 	{
@@ -467,7 +521,9 @@ class Risk extends CommonObject
 	/**
 	 * Get children tasks
 	 *
-	 * @return	array	$records or -1 if error
+	 * @param $risk
+	 * @return array|int $records or -1 if error
+	 * @throws Exception
 	 */
 	public function get_related_tasks($risk)
 	{
@@ -478,6 +534,7 @@ class Risk extends CommonObject
 		if ($resql) {
 			$num = $this->db->num_rows($resql);
 			$i   = 0;
+			$records = array();
 			while ($i < $num) {
 				$obj = $this->db->fetch_object($resql);
 

@@ -120,7 +120,7 @@ if ( ! empty($firepermit->id)) $res = $firepermit->fetch_optionals();
 $head = firepermitPrepareHead($firepermit);
 print dol_get_fiche_head($head, 'firepermitSchedule', $langs->trans("FirePermit"), -1, "digiriskdolibarr@digiriskdolibarr");
 dol_strlen($firepermit->label) ? $morehtmlref = ' - ' . $firepermit->label : '';
-digirisk_banner_tab($firepermit, 'ref', '', 0, 'ref', 'ref', $morehtmlref, 0, '', '', $firepermit->getLibStatut(5));
+digirisk_banner_tab($firepermit, 'ref', '', 0, 'ref', 'ref', $morehtmlref, 0, 0, '', $firepermit->getLibStatut(5));
 
 print dol_get_fiche_end();
 

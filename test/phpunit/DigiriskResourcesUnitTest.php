@@ -387,7 +387,9 @@ class DigiriskResourcesUnitTest extends PHPUnit\Framework\TestCase
 		$localobjectList = $localobject->fetchAll();
 
 		$this->assertSame(true, is_array($localobjectList));
-		$this->assertInstanceOf(get_class($localobject), array_shift($localobjectList));
+		if (is_array($localobjectList)) {
+			$this->assertInstanceOf(get_class($localobject), array_shift($localobjectList));
+		}
 		print __METHOD__ . " ok";
 		print "\n";
 	}

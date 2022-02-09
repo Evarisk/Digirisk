@@ -16,7 +16,7 @@
 */
 
 /**
- *     \file        admin/digirisksignature.php
+ *     \file        admin/config/digirisksignature.php
  *     \ingroup     digiriskdolibarr
  *     \brief       Page to public interface of module DigiriskDolibarr for signature
  */
@@ -40,6 +40,7 @@ global $langs, $user;
 
 // Libraries
 require_once DOL_DOCUMENT_ROOT . "/core/lib/admin.lib.php";
+
 require_once '../../lib/digiriskdolibarr.lib.php';
 
 // Translations

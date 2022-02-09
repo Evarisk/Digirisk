@@ -314,14 +314,14 @@ if (empty($reshook)) {
  * View
  */
 
-$emptyobject = new stdClass($db);
+$emptyobject = new stdClass();
 
 $title    = $langs->trans('RiskAssessmentDocument');
 $help_url = 'FR:Module_DigiriskDolibarr#Document_unique_2';
 $morejs   = array("/digiriskdolibarr/js/digiriskdolibarr.js.php");
 $morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");
 
-digiriskHeader('', $title, $help_url, '', '', '', $morejs, $morecss); ?>
+digiriskHeader($title, $help_url, $morejs, $morecss); ?>
 
 <div id="cardContent" value="">
 
@@ -434,7 +434,7 @@ if ($includedocgeneration && $action != 'edit') {
 	$modulepart = 'digiriskdolibarr:RiskAssessmentDocument';
 
 	$active = isset($conf->global->DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_AUDIT_START_DATE) && strlen($conf->global->DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_AUDIT_START_DATE);
-	print digiriskshowdocuments($modulepart, $dir_files, $filedir, $urlsource, $permissiontoadd, $permissiontodelete, $conf->global->DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_DEFAULT_MODEL, 1, 0, 28, 0, '', $langs->trans('RiskAssessmentDocument'), '', $langs->defaultlang, '', $riskassessmentdocument, 0, 'remove_file', $active, $langs->trans("SetStartEndDateBefore"));
+	print digiriskshowdocuments($modulepart, $dir_files, $filedir, $urlsource, $permissiontoadd, $permissiontodelete, $conf->global->DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_DEFAULT_MODEL, 1, 0, '', $langs->trans('RiskAssessmentDocument'), '', '', $riskassessmentdocument, 0, 'remove_file', $active, $langs->trans("SetStartEndDateBefore"));
 }
 
 // Presend form
@@ -448,7 +448,7 @@ $defaulttopic           = 'Information';
 $diroutput              = $upload_dir . '/riskassessmentdocument';
 $filter                 = array('customsql' => "t.type='riskassessmentdocument'");
 $riskassessmentdocument = $riskassessmentdocument->fetchAll('desc', 't.rowid', 1, 0, $filter, 'AND');
-if ( ! empty($riskassessmentdocument)) {
+if ( ! empty($riskassessmentdocument) && is_array($riskassessmentdocument)) {
 	$riskassessmentdocument = array_shift($riskassessmentdocument);
 	$ref                    = dol_sanitizeFileName($riskassessmentdocument->ref);
 }

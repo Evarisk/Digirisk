@@ -17,9 +17,9 @@
  */
 
 /**
- *	\file       htdocs/custom/digiriskdolibarr/core/modules/digiriskdolibarr/mod_risk_standard.php
+ *	\file       core/modules/digiriskdolibarr/riskanalysis/risk/mod_risk_standard.php
  * \ingroup     digiriskdolibarr
- *	\brief      File containing class for numbering module Standard
+ *	\brief      File containing class for risk numbering module Standard
  */
 
 require_once __DIR__ . '/../modules_riskanalysis.php';
@@ -53,7 +53,7 @@ class mod_risk_standard extends ModeleNumRefRiskAnalysis
 	/**
 	 *  Returns the description of the numbering model
 	 *
-	 *  @return     string      Texte descripif
+	 *  @return     string      Texte descriptif
 	 */
 	public function info()
 	{
@@ -75,10 +75,11 @@ class mod_risk_standard extends ModeleNumRefRiskAnalysis
 	/**
 	 * 	Return next free value
 	 *
-	 *  @param  Object		$object		Object we need next value for
-	 *  @return string      			Value if KO, <0 if KO
+	 *	@param Object $object Object we need next value for
+	 * 	@return string                Value if KO, <0 if KO
+	 * 	@throws Exception
 	 */
-	public function getNextValue($object, $version = 0)
+	public function getNextValue($object)
 	{
 		global $db, $conf;
 

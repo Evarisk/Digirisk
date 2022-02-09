@@ -269,7 +269,18 @@
 				if ($search[$key] == '-1') $search[$key] = '';
 				$mode_search                             = 2;
 			}
-			if ($search[$key] != '') $sql .= natural_search($key, $search[$key], (($key == 'status') ? 2 : $mode_search));
+			if ($key == 'category') {
+				$mode_search = 1;
+			}
+			if ($search[$key] != '') {
+				if ($key == 'ref') {
+					$sql .= " AND (t.ref = '$search[$key]')";
+				} elseif ($key == 'fk_element') {
+					$sql .= " AND (e.ref = '$search[$key]')";
+				} else {
+					$sql .= natural_search($key, $search[$key], (($key == 'status') ? 2 : $mode_search));
+				}
+			}
 		}
 		if ($search_all) $sql .= natural_search(array_keys($fieldstosearchall), $search_all);
 		// Add where from extra fields
@@ -287,21 +298,27 @@
 			$resql = $db->query($sql);
 
 			$nbtotalofrecords = $db->num_rows($resql);
+
 			if (($page * $limit) > $nbtotalofrecords) {	// if total of record found is smaller than page * limit, goto and load page 0
 				$page   = 0;
 				$offset = 0;
 			}
 		}
 
-		if ($limit) $sql .= $db->plimit($limit + 1, $offset);
+		// if total of record found is smaller than limit, no need to do paging and to restart another select with limits set.
+		if (is_numeric($nbtotalofrecords) && ($limit > $nbtotalofrecords || empty($limit))) {
+			$num = $nbtotalofrecords;
+		} else {
+			if ($limit) $sql .= $db->plimit($limit + 1, $offset);
 
-		$resql = $db->query($sql);
-		if ( ! $resql) {
-			dol_print_error($db);
-			exit;
+			$resql = $db->query($sql);
+			if ( ! $resql) {
+				dol_print_error($db);
+				exit;
+			}
+
+			$num = $db->num_rows($resql);
 		}
-
-		$num = $db->num_rows($resql);
 
 		// Direct jump if only one record found
 		if ($num == 1 && ! empty($conf->global->MAIN_SEARCH_DIRECT_OPEN_IF_ONLY_ONE) && $search_all && ! $page) {
@@ -348,7 +365,15 @@
 				if ($search[$key] == '-1') $search[$key] = '';
 				$mode_search                             = 2;
 			}
-			if ($search[$key] != '') $sql .= natural_search($key, $search[$key], (($key == 'status') ? 2 : $mode_search));
+			if ($search[$key] != '') {
+				if ($key == 'ref') {
+					$sql .= " AND (r.ref = '$search[$key]')";
+				} elseif ($key == 'fk_element') {
+					$sql .= " AND (e.ref = '$search[$key]')";
+				} else {
+					$sql .= natural_search($key, $search[$key], (($key == 'status') ? 2 : $mode_search));
+				}
+			}
 		}
 		if ($search_all) $sql .= natural_search(array_keys($fieldstosearchall), $search_all);
 		// Add where from extra fields
@@ -360,14 +385,41 @@
 
 		$sql .= $db->order($sortfield, $sortorder);
 
-		if ($limit) $sql .= $db->plimit($limit + 1, $offset);
+		// Count total nb of records
+		$nbtotalofrecords = '';
+		if (empty($conf->global->MAIN_DISABLE_FULL_SCANLIST)) {
+			$resql = $db->query($sql);
 
-		$resql = $db->query($sql);
-		if ( ! $resql) {
-			dol_print_error($db);
+			$nbtotalofrecords = $db->num_rows($resql);
+
+			if (($page * $limit) > $nbtotalofrecords) {	// if total of record found is smaller than page * limit, goto and load page 0
+				$page   = 0;
+				$offset = 0;
+			}
+		}
+
+		// if total of record found is smaller than limit, no need to do paging and to restart another select with limits set.
+		if (is_numeric($nbtotalofrecords) && ($limit > $nbtotalofrecords || empty($limit))) {
+			$num = $nbtotalofrecords;
+		} else {
+			if ($limit) $sql .= $db->plimit($limit + 1, $offset);
+
+			$resql = $db->query($sql);
+			if ( ! $resql) {
+				dol_print_error($db);
+				exit;
+			}
+
+			$num = $db->num_rows($resql);
+		}
+
+		// Direct jump if only one record found
+		if ($num == 1 && ! empty($conf->global->MAIN_SEARCH_DIRECT_OPEN_IF_ONLY_ONE) && $search_all && ! $page) {
+			$obj = $db->fetch_object($resql);
+			$id  = $obj->rowid;
+			header("Location: " . dol_buildpath('/digiriskdolibarr/view/digiriskelement/digiriskelement_risk.php', 1) . '?id=' . $id);
 			exit;
 		}
-		$num = $db->num_rows($resql);
 	}
 
 	$arrayofselected = is_array($toselect) ? $toselect : array();
@@ -557,7 +609,7 @@
 							<div class="medias"><i class="fas fa-picture-o"></i><?php echo $langs->trans('Medias'); ?></div>
 							<?php
 							$relativepath = 'digiriskdolibarr/medias/thumbs';
-							print digirisk_show_medias_linked('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessment/tmp/RK0', 'small', '', 0, 0, 0, 150, 150, 1, 0, 0, '/riskassessment/tmp/RK0');
+							print digirisk_show_medias_linked('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessment/tmp/RK0', 'small', 0, 0, 0, 0, 150, 150, 1, 0, 0, '/riskassessment/tmp/RK0');
 							?>
 						</div>
 					</div>
@@ -747,7 +799,7 @@
 						<div class="medias"><i class="fas fa-picture-o"></i><?php echo $langs->trans('Medias'); ?></div>
 						<?php
 						$relativepath = 'digiriskdolibarr/medias/thumbs';
-						print digirisk_show_medias_linked('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessment/tmp/RK0', 'small', '', 0, 0, 0, 150, 150, 1, 0, 0, '/riskassessment/tmp/RK0');
+						print digirisk_show_medias_linked('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessment/tmp/RK0', 'small', 0, 0, 0, 0, 150, 150, 1, 0, 0, '/riskassessment/tmp/RK0');
 						?>
 					</div>
 				</div>
@@ -769,7 +821,7 @@
 		<?php endif; ?>
 	<?php endif; ?>
 	<?php $title = $langs->trans('DigiriskElementRisksList');
-	print_barre_liste($title, $page, $_SERVER["PHP_SELF"], $param, $sortfield, $sortorder, $massactionbutton, $num, $num, 'digiriskdolibarr32px.png@digiriskdolibarr', 0, $newcardbutton, '', $limit, 0, 0, 1);
+	print_barre_liste($title, $page, $_SERVER["PHP_SELF"], $param, $sortfield, $sortorder, $massactionbutton, $num, $nbtotalofrecords, 'digiriskdolibarr32px.png@digiriskdolibarr', 0, $newcardbutton, '', $limit, 0, 0, 1);
 
 	include DOL_DOCUMENT_ROOT . '/core/tpl/massactions_pre.tpl.php';
 
@@ -825,7 +877,37 @@
 			if (is_array($val['arrayofkeyval'])) print $form->selectarray('search_' . $key, $val['arrayofkeyval'], $search[$key], $val['notnull'], 0, 0, '', 1, 0, 0, '', 'maxwidth75');
 			elseif (strpos($val['type'], 'integer:') === 0) {
 				print $risk->showInputField($val, $key, $search[$key], '', '', 'search_', 'maxwidth150', 1);
-			} elseif ( ! preg_match('/^(date|timestamp)/', $val['type'])) print '<input type="text" class="flat maxwidth75" name="search_' . $key . '" value="' . dol_escape_htmltag($search[$key]) . '">';
+			} elseif ($key == 'fk_element') {
+				$digiriskelementtmp = new DigiriskElement($db);
+				$digiriskelementtmp->fetch(0, $search['fk_element']);
+				print $digiriskelement->select_digiriskelement_list($digiriskelementtmp->id, 'fk_element', '', 1, 0, array(), 0, 0, 'minwidth100', 0, false, 1);
+				print '<input class="input-hidden-fk_element" type="hidden" name="search_fk_element" value=""/>';
+			} elseif ($key == 'category') { ?>
+				<div class="wpeo-dropdown dropdown-large dropdown-grid category-danger padding">
+					<input class="input-hidden-danger" type="hidden" name="<?php echo 'search_' . $key ?>" value="<?php echo dol_escape_htmltag($search[$key]) ?>" />
+					<?php if (dol_strlen(dol_escape_htmltag($search[$key])) == 0) : ?>
+						<div class="dropdown-toggle dropdown-add-button button-cotation">
+							<span class="wpeo-button button-square-50 button-grey"><i class="fas fa-exclamation-triangle button-icon"></i></span>
+							<img class="danger-category-pic wpeo-tooltip-event hidden" src="" aria-label=""/>
+						</div>
+					<?php else : ?>
+						<div class="dropdown-toggle dropdown-add-button button-cotation wpeo-tooltip-event" aria-label="<?php echo (empty(dol_escape_htmltag($search[$key]))) ? $risk->get_danger_category_name($risk) : $risk->get_danger_category_name_by_position($search[$key]); ?>">
+							<img class="danger-category-pic tooltip hover" src="<?php echo DOL_URL_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . ((empty(dol_escape_htmltag($search[$key]))) ? $risk->get_danger_category($risk) : $risk->get_danger_category_by_position($search[$key])) . '.png'?>" />
+						</div>
+					<?php endif; ?>
+					<ul class="dropdown-content wpeo-gridlayout grid-5 grid-gap-0" style="position: fixed">
+						<?php
+						$dangerCategories = $risk->get_danger_categories();
+						if ( ! empty($dangerCategories) ) :
+							foreach ($dangerCategories as $dangerCategory) : ?>
+								<li class="item dropdown-item wpeo-tooltip-event classfortooltip" data-is-preset="<?php echo ''; ?>" data-id="<?php echo $dangerCategory['position'] ?>" aria-label="<?php echo $dangerCategory['name'] ?>">
+									<img src="<?php echo DOL_URL_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $dangerCategory['thumbnail_name'] . '.png'?>" class="attachment-thumbail size-thumbnail photo photowithmargin" alt="" loading="lazy" width="48" height="48">
+								</li>
+							<?php endforeach;
+						endif; ?>
+					</ul>
+				</div>
+			<?php } elseif ( ! preg_match('/^(date|timestamp)/', $val['type']) && $key != 'category') print '<input type="text" class="flat maxwidth75" name="search_' . $key . '" value="' . dol_escape_htmltag($search[$key]) . '">';
 			print '</td>';
 		}
 	}
@@ -1011,7 +1093,7 @@
 										?>
 										<?php if ($conf->global->DIGIRISKDOLIBARR_MOVE_RISKS) : ?>
 											<input type="hidden" class="current-element-ref" value="<?php echo $objecttmp->ref; ?>">
-											<?php print $objecttmp->select_digiriskelement_list($objecttmp->id,  'socid',  '',  '1',  0, 0, array(), '', 0, 0, 'disabled', '', false, 1); ?>
+											<?php print $objecttmp->select_digiriskelement_list($objecttmp->id, 'socid', '', 0, 0, array(), 0, 0, 'disabled', 0, false, 1); ?>
 										<?php else : ?>
 											<?php print '<span class="opacitymedium">' . '<a href=' . '"../../../digiriskdolibarr/admin/config/riskassessmentdocument.php" target="_blank">' . $langs->trans('SetConfToMoveRisk') . '</a>' . "</span><br>\n"; ?>
 										<?php endif; ?>
@@ -1108,8 +1190,6 @@
 	$parameters = array('arrayfields' => $arrayfields, 'sql' => $sql);
 	$reshook    = $hookmanager->executeHooks('printFieldListFooter', $parameters, $risk); // Note that $action and $risk may have been modified by hook
 	print $hookmanager->resPrint; ?>
-
-
 
 	<?php print '</table>' . "\n";
 	print '<!-- End table -->';

@@ -207,6 +207,10 @@ if (empty($reshook)) {
 			$error++;
 		}
 
+		if ($fk_preventionplan < 0) {
+			setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv('PreventionPlanLinked')), null, 'errors');
+			$error++;
+		}
 
 		if ( ! $error) {
 			$result = $object->create($user, false);
@@ -305,6 +309,11 @@ if (empty($reshook)) {
 			}
 		} elseif (empty($labour_inspector_contact_id)) {
 			setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv('LabourInspector')), null, 'errors');
+			$error++;
+		}
+
+		if ($fk_preventionplan < 0) {
+			setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv('PreventionPlanLinked')), null, 'errors');
 			$error++;
 		}
 
@@ -756,8 +765,9 @@ if ($action == 'create') {
 	print '</td></tr>';
 
 	//FK PREVENTION PLAN
-	print '<tr class="oddeven"><td>' . $langs->trans("PreventionPlanLinked") . '</td><td>';
+	print '<tr class="fieldrequired oddeven"><td>' . $langs->trans("PreventionPlanLinked") . '</td><td>';
 	print $preventionplan->select_preventionplan_list();
+	print '<a href="' . DOL_URL_ROOT . '/custom/digiriskdolibarr/view/preventionplan/preventionplan_card.php?action=create&backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?action=create') . '" target="_blank"><span class="fa fa-plus-circle valignmiddle paddingleft" title="' . $langs->trans("NewPreventionPlan") . '"></span></a>';
 	print '</td></tr>';
 
 	// Other attributes
@@ -1165,9 +1175,9 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 					print '-';
 					print '</td>';
 
-					if (is_object($objectline)) {
-						print $objectline->showOptionals($extrafields, 'edit', array('style' => $bcnd[$var], 'colspan' => $coldisplay), '', '', 1);
-					}
+//					if (is_object($objectline)) {
+//						print $objectline->showOptionals($extrafields, 'edit', array('style' => $bcnd[$var], 'colspan' => $coldisplay), '', '', 1);
+//					}
 					print '</tr>';
 				}
 				print '</tr>';
@@ -1238,7 +1248,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 					print '</td>';
 
 					print '<td class="bordertop nobottom linecollocation">';
-					print $digiriskelement->select_digiriskelement_list($item->fk_element, 'fk_element', '', '', 0, 0, array(), '', 0, 0, 'minwidth100', GETPOST('id'), false, 1);
+					print $digiriskelement->select_digiriskelement_list($item->fk_element, 'fk_element', '', 0, 0, array(), 0, 0, 'minwidth100', GETPOST('id'), false, 1);
 					print '</td>';
 
 					$coldisplay++;
@@ -1291,9 +1301,9 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 					print '</td>';
 					print '</tr>';
 
-					if (is_object($objectline)) {
-						print $objectline->showOptionals($extrafields, 'edit', array('style' => $bcnd[$var], 'colspan' => $coldisplay), '', '', 1);
-					}
+//					if (is_object($objectline)) {
+//						print $objectline->showOptionals($extrafields, 'edit', array('style' => $bcnd[$var], 'colspan' => $coldisplay), '', '', 1);
+//					}
 					print '</form>';
 				} else {
 					print '<td>';
@@ -1345,9 +1355,9 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 						print '</td>';
 					}
 
-					if (is_object($objectline)) {
-						print $objectline->showOptionals($extrafields, 'edit', array('style' => $bcnd[$var], 'colspan' => $coldisplay), '', '', 1);
-					}
+//					if (is_object($objectline)) {
+//						print $objectline->showOptionals($extrafields, 'edit', array('style' => $bcnd[$var], 'colspan' => $coldisplay), '', '', 1);
+//					}
 					print '</tr>';
 				}
 			}
@@ -1365,7 +1375,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 			print $refFirePermitDetMod->getNextValue($objectline);
 			print '</td>';
 			print '<td>';
-			print $digiriskelement->select_digiriskelement_list('', 'fk_element', '', '', 0, 0, array(), '', 0, 0, 'minwidth100', GETPOST('id'), false, 1);
+			print $digiriskelement->select_digiriskelement_list('', 'fk_element', '', 0, 0, array(), 0, 0, 'minwidth100', GETPOST('id'), false, 1);
 			print '</td>';
 
 			$coldisplay++;
@@ -1435,7 +1445,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 		$defaultmodel = $conf->global->DIGIRISKDOLIBARR_FIREPERMITDOCUMENT_DEFAULT_MODEL;
 		$title        = $langs->trans('FirePermitDocument');
 
-		print digiriskshowdocuments($modulepart, $dir_files, $filedir, $urlsource, $permissiontoadd, 0, $defaultmodel, 1, 0, 28, 0, '', $title, '', $langs->defaultlang, '', $firepermitdocument, 0, 'remove_file', $object->status == 3 && empty(dol_dir_list($filedir)), $langs->trans('FirePermitMustBeLocked'));
+		print digiriskshowdocuments($modulepart, $dir_files, $filedir, $urlsource, $permissiontoadd, 0, $defaultmodel, 1, 0, '', $title, '', '', $firepermitdocument, 0, 'remove_file', $object->status == 3 && empty(dol_dir_list($filedir)), $langs->trans('FirePermitMustBeLocked'));
 	}
 
 	if ($permissiontoadd) {

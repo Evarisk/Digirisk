@@ -29,7 +29,7 @@
  */
 function accidentPrepareHead($object)
 {
-	global $db, $langs, $conf, $user;
+	global $langs, $conf, $user;
 
 	$langs->load("digiriskdolibarr@digiriskdolibarr");
 

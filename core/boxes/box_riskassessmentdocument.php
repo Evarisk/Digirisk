@@ -1,11 +1,9 @@
 <?php
-/* Copyright (C) 2004-2017  Laurent Destailleur <eldy@users.sourceforge.net>
- * Copyright (C) 2018-2021  Frédéric France     <frederic.france@netlogic.fr>
- * Copyright (C) ---Put here your own copyright and developer email---
+/* Copyright (C) 2021 EOXIA <dev@eoxia.com>
  *
- * This program is free software: you can redistribute it and/or modify
+ * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
+ * the Free Software Foundation; either version 3 of the License, or
  * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
@@ -14,15 +12,14 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ * or see https://www.gnu.org/
  */
 
 /**
- * \file    htdocs/modulebuilder/template/core/boxes/mymodulewidget1.php
- * \ingroup mymodule
- * \brief   Widget provided by MyModule
- *
- * Put detailed description here.
+ * \file    core/boxes/box_riskassessmentdocument.php
+ * \ingroup digiriskdolibarr
+ * \brief   Widget provided by DigiriskDolibarr
  */
 
 include_once DOL_DOCUMENT_ROOT . "/core/boxes/modules_boxes.php";
@@ -37,6 +34,16 @@ require_once __DIR__ . '/../../class/digiriskdocuments/riskassessmentdocument.cl
  */
 class box_riskassessmentdocument extends ModeleBoxes
 {
+	/**
+	 * @var DoliDb Database handler
+	 */
+	public $db;
+
+	/**
+	 * @var int Maximum lines
+	 */
+	public $max = 5;
+
 	/**
 	 * @var string Alphanumeric ID. Populated by the constructor.
 	 */
@@ -57,11 +64,6 @@ class box_riskassessmentdocument extends ModeleBoxes
 	 * @var string[] Module dependencies
 	 */
 	public $depends = array();
-
-	/**
-	 * @var DoliDb Database handler
-	 */
-	public $db;
 
 	/**
 	 * @var mixed More parameters
@@ -108,6 +110,7 @@ class box_riskassessmentdocument extends ModeleBoxes
 	 *
 	 * @param int $max Maximum number of records to load
 	 * @return void
+	 * @throws Exception
 	 */
 	public function loadBox($max = 5)
 	{
@@ -120,9 +123,8 @@ class box_riskassessmentdocument extends ModeleBoxes
 
 		$filter                 = array('customsql' => "t.type='riskassessmentdocument'");
 		$riskassessmentdocument = $riskassessmentdocument->fetchAll('desc', 't.rowid', 1, 0, $filter, 'AND');
-		if ( ! empty($riskassessmentdocument)) {
+		if ( ! empty($riskassessmentdocument) && $riskassessmentdocument > 0 && is_array($riskassessmentdocument)) {
 			$riskassessmentdocument = array_shift($riskassessmentdocument);
-			$ref                    = dol_sanitizeFileName($riskassessmentdocument->ref);
 		}
 
 		// Populate the head at runtime

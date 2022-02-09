@@ -62,8 +62,9 @@ if (empty($dolibarr_nocache)) {
 	header('Cache-Control: no-cache');
 }
 ?>
+
 /**
- * \file    digiriskdolibarr/js/digiriskdolibarr.js.php
+ * \file    js/digiriskdolibarr.js.php
  * \ingroup digiriskdolibarr
  * \brief   JavaScript file for module DigiriskDolibarr.
  */
@@ -1574,6 +1575,7 @@ window.eoxiaJS.risk.event = function() {
 	$( document ).on( 'click', '.category-danger .item, .wpeo-table .category-danger .item', window.eoxiaJS.risk.selectDanger );
 	$( document ).on( 'click', '.risk-create:not(.button-disable)', window.eoxiaJS.risk.createRisk );
 	$( document ).on( 'click', '.risk-save', window.eoxiaJS.risk.saveRisk );
+	$( document ).on( 'change', '#fk_element', window.eoxiaJS.risk.selectDigiriskElement );
 };
 
 /**
@@ -1816,6 +1818,21 @@ window.eoxiaJS.risk.saveRisk = function ( event ) {
 			actionContainerError.removeClass('hidden');
 		}
 	});
+};
+
+/**
+ * Lors du clic sur un digiriskElement, met a jour la ref du champ de recherche
+ *
+ * @since   9.0.1
+ * @version 9.0.1
+ *
+ * @param  {MouseEvent} event [description]
+ * @return {void}
+ */
+window.eoxiaJS.risk.selectDigiriskElement = function( event ) {
+	let selectTitle = $(this).closest('td').find('#select2-fk_element-container').attr('title')
+	let digiriskElementRef = selectTitle.split(/ /)[0]
+	$('.input-hidden-fk_element').attr('value',digiriskElementRef);
 };
 
 /**
@@ -3318,51 +3335,48 @@ window.eoxiaJS.menu.event = function() {
  * Action Toggle main menu.
  *
  * @since   8.5.0
- * @version 8.5.0
+ * @version 9.0.1
  *
  * @return {void}
  */
 window.eoxiaJS.menu.toggleMenu = function() {
 
-	var menu = $(this).closest('#id-left').find('a.vmenu');
+	var menu = $(this).closest('#id-left').find('a.vmenu, font.vmenudisabled, span.vmenu');
 	var elementParent = $(this).closest('#id-left').find('div.vmenu')
-
+	var text = '';
 
 	if ($(this).find('.minimizeMenu').length > 0) {
 
-		var text = '';
-		menu.each(function (index, value) {
-			text = $(this).html().split(' ');
-			$(this).html(text[0]+' '+text[1]+' '+text[2]);
+		menu.each(function () {
+			text = $(this).html().split('</i>');
+			if (text[1].match(/&gt;/)) {
+				text[1] = text[1].replace(/&gt;/, '')
+			}
+			$(this).attr('title', text[1])
+			$(this).html(text[0]);
 		});
-
-		var elementText = $(this).find('.minimizeMenu').html().split(' ');
-		$(this).find('.minimizeMenu').html(elementText[0]+' '+elementText[1]+' '+elementText[2]+' >');
 
 		elementParent.css('width', '30px');
 		elementParent.find('.blockvmenusearch').hide();
+
+		$('.minimizeMenu').html($('.minimizeMenu').html() + ' >')
 
 		$(this).find('.minimizeMenu').removeClass('minimizeMenu').addClass('maximizeMenu');
 		localStorage.setItem('maximized', 'false')
 
 	} else if ($(this).find('.maximizeMenu').length > 0) {
-		var text2 = '';
-		menu.each(function (index, value) {
-			text2 = $(this).html().split(' ');
-			$(this).html(text2[0]+' '+text2[1]+' '+text2[2]+' '+$(this).attr('title'));
+
+		menu.each(function () {
+			$(this).html($(this).html().replace('&gt;','') + ' ' + $(this).attr('title'));
 		});
 
-		var elementText2 = $(this).find('.maximizeMenu').html().split(' ');
-		$(this).find('.maximizeMenu').html(elementText2[0]+' '+elementText2[1]+' '+elementText2[2]+' Réduire le menu<');
-
-		elementParent.css('width', '');
+		elementParent.css('width', '188px');
 		elementParent.find('.blockvmenusearch').show();
-
-		$(this).find('.maximizeMenu').removeClass('maximizeMenu').addClass('minimizeMenu');
 		$('div.menu_titre').attr('style', 'width: 188px !important')
 
 		localStorage.setItem('maximized', 'true')
 
+		$(this).find('.maximizeMenu').removeClass('maximizeMenu').addClass('minimizeMenu');
 	}
 };
 
@@ -3370,31 +3384,32 @@ window.eoxiaJS.menu.toggleMenu = function() {
  * Action set  menu.
  *
  * @since   8.5.0
- * @version 8.5.0
+ * @version 9.0.1
  *
  * @return {void}
  */
 window.eoxiaJS.menu.setMenu = function() {
 	$('.minimizeMenu').parent().parent().parent().attr('style', 'cursor:pointer ! important')
+
 	if (localStorage.maximized == 'false') {
 		$('#id-left').attr('style', 'display:none !important')
 	}
+
 	if (localStorage.maximized == 'false') {
 		var text = '';
-		var menu = $(document).find('a.vmenu');
+		var menu = $('#id-left').find('a.vmenu, font.vmenudisabled, span.vmenu');
 		var elementParent = $(document).find('div.vmenu')
-		console.log(menu)
-		menu.each(function (index, value) {
-			text = $(this).html().split(' ');
-			$(this).html(text[0]+' '+text[1]+' '+text[2]);
-			console.log($(this))
+
+		menu.each(function () {
+			text = $(this).html().split('</i>');
+			$(this).attr('title', text[1])
+			$(this).html(text[0]);
 		});
 
 		$('#id-left').attr('style', 'display:block !important')
 		$('div.menu_titre').attr('style', 'width: 50px !important')
 
-		var elementText = $('.minimizeMenu').html().split(' ');
-		$('.minimizeMenu').html(elementText[0]+' '+elementText[1]+' '+elementText[2]);
+		$('.minimizeMenu').html($('.minimizeMenu').html() + ' >')
 		$('.minimizeMenu').removeClass('minimizeMenu').addClass('maximizeMenu');
 
 		elementParent.css('width', '30px');
@@ -3433,7 +3448,7 @@ window.eoxiaJS.accident.init = function() {
 window.eoxiaJS.accident.event = function() {
 	$( document ).on( 'submit', ' .sendfile', window.eoxiaJS.accident.tmpStockFile );
 	$( document ).on( 'click', ' .linked-file-delete-workstop', window.eoxiaJS.accident.removeFile );
-	$( document ).on( 'click', '#external_accident', window.eoxiaJS.accident.showExternalAccidentLocation );
+	$( document ).on( 'change', '#external_accident', window.eoxiaJS.accident.showExternalAccidentLocation );
 };
 
 /**
@@ -3506,17 +3521,34 @@ window.eoxiaJS.accident.removeFile = function( event ) {
 window.eoxiaJS.accident.showExternalAccidentLocation = function() {
 	let fkElementField = $(this).closest('.accident-table').find('.fk_element_field')
 	let fkSocField = $(this).closest('.accident-table').find('.fk_soc_field')
+	let accidentLocationField = $(this).closest('.accident-table').find('.accident_location_field')
+	let externalAccident = $(this).closest('.accident-table').find('#select2-external_accident-container').attr('title')
 
-	if (fkSocField.hasClass('hidden')) {
-		fkElementField.attr('style', 'display:none')
-		fkSocField.attr('style', '')
-		fkElementField.addClass('hidden')
-		fkSocField.removeClass('hidden')
-	} else {
-		fkElementField.attr('style', '')
-		fkSocField.attr('style', 'display:none')
-		fkElementField.removeClass('hidden')
-		fkSocField.addClass('hidden')
+	switch (externalAccident) {
+		case 'Non':
+			fkElementField.attr('style', '')
+			fkSocField.attr('style', 'display:none')
+			accidentLocationField.attr('style', 'display:none')
+			fkElementField.removeClass('hidden')
+			fkSocField.addClass('hidden')
+			accidentLocationField.addClass('hidden')
+			break;
+		case 'Oui':
+			fkElementField.attr('style', 'display:none')
+			fkSocField.attr('style', '')
+			accidentLocationField.attr('style', 'display:none')
+			fkElementField.addClass('hidden')
+			fkSocField.removeClass('hidden')
+			accidentLocationField.addClass('hidden')
+			break;
+		case 'Autre':
+			fkElementField.attr('style', 'display:none')
+			fkSocField.attr('style', 'display:none')
+			accidentLocationField.attr('style', '')
+			fkElementField.addClass('hidden')
+			fkSocField.addClass('hidden')
+			accidentLocationField.removeClass('hidden')
+			break;
 	}
 };
 

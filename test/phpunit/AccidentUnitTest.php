@@ -204,30 +204,30 @@ class AccidentUnitTest extends PHPUnit\Framework\TestCase
 		return $localobject;
 	}
 
-	/**
-	 * testAccidentInfo
-	 *
-	 * @param   Accident $localobject Accident object
-	 * @return  void
-	 *
-	 * @covers  Accident::info
-	 *
-	 * @depends testAccidentFetch
-	 * The depends says test is run only if previous is ok
-	 */
-	public function testAccidentInfo($localobject) : void
-	{
-		global $conf, $user, $langs, $db;
-		$conf  = $this->savconf;
-		$user  = $this->savuser;
-		$langs = $this->savlangs;
-		$db    = $this->savdb;
-
-		$result = $localobject->info($localobject->id);
-		$this->assertNull($result);
-
-		print __METHOD__ . " id=" . $localobject->id . "\n";
-	}
+//	/**
+//	 * testAccidentInfo
+//	 *
+//	 * @param   Accident $localobject Accident object
+//	 * @return  void
+//	 *
+//	 * @covers  Accident::info
+//	 *
+//	 * @depends testAccidentFetch
+//	 * The depends says test is run only if previous is ok
+//	 */
+//	public function testAccidentInfo($localobject) : void
+//	{
+//		global $conf, $user, $langs, $db;
+//		$conf  = $this->savconf;
+//		$user  = $this->savuser;
+//		$langs = $this->savlangs;
+//		$db    = $this->savdb;
+//
+//		$result = $localobject->info($localobject->id);
+//		$this->assertNull($result);
+//
+//		print __METHOD__ . " id=" . $localobject->id . "\n";
+//	}
 
 	/**
 	 * testAccidentUpdate
@@ -682,16 +682,18 @@ class AccidentUnitTest extends PHPUnit\Framework\TestCase
 	public function testAccidentWorkStopFetchAll() : void
 	{
 		global $conf, $user, $langs, $db;
-		$conf  = $this->savconf;
-		$user  = $this->savuser;
+		$conf = $this->savconf;
+		$user = $this->savuser;
 		$langs = $this->savlangs;
-		$db    = $this->savdb;
+		$db = $this->savdb;
 
-		$localobjectline     = new AccidentWorkStop($this->savdb);
+		$localobjectline = new AccidentWorkStop($this->savdb);
 		$localobjectlineList = $localobjectline->fetchAll();
 
 		$this->assertSame(true, is_array($localobjectlineList));
-		$this->assertInstanceOf(get_class($localobjectline), array_shift($localobjectlineList));
+		if (is_array($localobjectlineList)) {
+			$this->assertInstanceOf(get_class($localobjectline), array_shift($localobjectlineList));
+		}
 		print __METHOD__ . " ok";
 		print "\n";
 	}
@@ -717,7 +719,9 @@ class AccidentUnitTest extends PHPUnit\Framework\TestCase
 		$localobjectlineList = $localobjectline->fetchAll();
 
 		$this->assertSame(true, is_array($localobjectlineList));
-		$this->assertInstanceOf(get_class($localobjectline), array_shift($localobjectlineList));
+		if (is_array($localobjectlineList)) {
+			$this->assertInstanceOf(get_class($localobjectline), array_shift($localobjectlineList));
+		}
 		print __METHOD__ . " ok";
 		print "\n";
 	}
@@ -743,7 +747,9 @@ class AccidentUnitTest extends PHPUnit\Framework\TestCase
 		$localobjectList = $localobject->fetchAll();
 
 		$this->assertSame(true, is_array($localobjectList));
-		$this->assertInstanceOf(get_class($localobject), array_shift($localobjectList));
+		if (is_array($localobjectList)) {
+			$this->assertInstanceOf(get_class($localobject), array_shift($localobjectList));
+		}
 		print __METHOD__ . " ok";
 		print "\n";
 	}

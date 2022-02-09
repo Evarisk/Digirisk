@@ -36,6 +36,9 @@ if ( ! $res && file_exists("../../../main.inc.php")) $res    = @include "../../.
 if ( ! $res && file_exists("../../../../main.inc.php")) $res = @include "../../../../main.inc.php";
 if ( ! $res) die("Include of main fails");
 
+global $conf, $db, $langs, $user, $hookmanager;
+
+// Libraries
 require_once DOL_DOCUMENT_ROOT . '/core/lib/admin.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/company.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/functions2.lib.php';
@@ -47,8 +50,6 @@ require_once DOL_DOCUMENT_ROOT . '/contact/class/contact.class.php';
 require_once DOL_DOCUMENT_ROOT . '/user/class/user.class.php';
 
 require_once '../class/digiriskresources.class.php';
-
-global $langs, $user, $conf, $db, $hookmanager;
 
 // Translations
 $langs->loadLangs(array('admin', 'companies', "digiriskdolibarr@digiriskdolibarr"));
@@ -82,8 +83,8 @@ if (($action == 'update' && ! GETPOST("cancel", 'alpha')) || ($action == 'update
 	$labourdoctor_id[0]    = GETPOST('labourdoctor_socid', 'int') > 0 ? GETPOST('labourdoctor_socid', 'int') : 0 ;
 	$labourinspector_id[0] = GETPOST('labourinspector_socid', 'int') > 0 ? GETPOST('labourinspector_socid', 'int') : 0;
 
-	$labourdoctor_socpeopleassigned    = ! empty(GETPOST('labourdoctor_contactid', 'array')) ? GETPOST('labourdoctor_contactid', 'array') : (GETPOST('labourdoctor_contactid', 'int') > 0 ? GETPOST('labourdoctor_contactid', 'int') : 0);
-	$labourinspector_socpeopleassigned = ! empty(GETPOST('labourinspector_contactid', 'array')) ? GETPOST('labourinspector_contactid', 'array') : (GETPOST('labourinspector_contactid', 'int') > 0 ? GETPOST('labourinspector_contactid', 'int') : 0);
+	$labourdoctor_socpeopleassigned    = ! empty(GETPOST('labourdoctor_contactid', 'array')) ? GETPOST('labourdoctor_contactid', 'array') : (GETPOST('labourdoctor_contactid', 'int') > 0 ? array(GETPOST('labourdoctor_contactid', 'int')) : array());
+	$labourinspector_socpeopleassigned = ! empty(GETPOST('labourinspector_contactid', 'array')) ? GETPOST('labourinspector_contactid', 'array') : (GETPOST('labourinspector_contactid', 'int') > 0 ? array(GETPOST('labourinspector_contactid', 'int')) :  array());
 
 	$resources->digirisk_dolibarr_set_resources($db, $user->id,  'LabourDoctorSociety',  'societe', $labourdoctor_id, $conf->entity);
 	$resources->digirisk_dolibarr_set_resources($db, $user->id,  'LabourInspectorSociety',  'societe', $labourinspector_id, $conf->entity);

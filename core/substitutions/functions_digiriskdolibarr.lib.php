@@ -22,6 +22,8 @@
  *	\brief      File of functions to substitutions array
  */
 
+require_once __DIR__ . '/../../class/digiriskresources.class.php';
+
 /** 	Function called to complete substitution array (before generating on ODT, or a personalized email)
  * 		functions xxx_completesubstitutionarray are called by make_substitutions() if file
  * 		is inside directory htdocs/core/substitutions
@@ -31,8 +33,6 @@
  *		@param	Object		$object			Object to use to get values
  * 		@return	void					The entry parameter $substitutionarray is modified
  */
-require_once __DIR__ . '/../../class/digiriskresources.class.php';
-
 function digiriskdolibarr_completesubstitutionarray(&$substitutionarray, $langs, $object)
 {
 	$type         = $object->element;

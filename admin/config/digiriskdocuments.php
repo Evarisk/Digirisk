@@ -16,7 +16,7 @@
  */
 
 /**
- * \file    admin/digiriskdocuments/digiriskdocuments.php
+ * \file    admin/config/digiriskdocuments.php
  * \ingroup digiriskdolibarr
  * \brief   Digiriskdolibarr digiriskdocuments page.
  */
@@ -40,6 +40,7 @@ global $langs, $user;
 
 // Libraries
 require_once DOL_DOCUMENT_ROOT . "/core/lib/admin.lib.php";
+
 require_once '../../lib/digiriskdolibarr.lib.php';
 
 // Translations

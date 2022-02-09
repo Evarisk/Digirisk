@@ -250,7 +250,7 @@ $help_url = 'FR:Module_DigiriskDolibarr#Signalisation';
 $morejs   = array("/digiriskdolibarr/js/digiriskdolibarr.js.php");
 $morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");
 
-digiriskHeader('', $title, $help_url, '', '', '', $morejs, $morecss);
+digiriskHeader($title, $help_url, $morejs, $morecss);
 
 print '<div id="cardContent" value="">';
 

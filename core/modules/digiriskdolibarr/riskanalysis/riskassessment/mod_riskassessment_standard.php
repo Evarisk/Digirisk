@@ -17,15 +17,15 @@
  */
 
 /**
- *	\file       htdocs/custom/digiriskdolibarr/core/modules/digiriskdolibarr/mod_riskassessment_standard.php
+ *	\file       core/modules/digiriskdolibarr/riskanalysis/riskassessment/mod_riskassessment_standard.php
  * \ingroup     digiriskdolibarr
- *	\brief      File containing class for numbering module Standard
+ *	\brief      File containing class for riskassessment numbering module Standard
  */
 
 require_once __DIR__ . '/../modules_riskanalysis.php';
 
 /**
- * 	Class to manage risk numbering rules Standard
+ * 	Class to manage riskassessment numbering rules Standard
  */
 class mod_riskassessment_standard extends ModeleNumRefRiskAnalysis
 {
@@ -53,7 +53,7 @@ class mod_riskassessment_standard extends ModeleNumRefRiskAnalysis
 	/**
 	 *  Returns the description of the numbering model
 	 *
-	 *  @return     string      Texte descripif
+	 *  @return     string      Texte descriptif
 	 */
 	public function info()
 	{
@@ -75,10 +75,11 @@ class mod_riskassessment_standard extends ModeleNumRefRiskAnalysis
 	/**
 	 * 	Return next free value
 	 *
-	 *  @param  Object		$object		Object we need next value for
-	 *  @return string      			Value if KO, <0 if KO
+	 *	@param Object $object Object we need next value for
+	 * 	@return string                Value if KO, <0 if KO
+	 * 	@throws Exception
 	 */
-	public function getNextValue($object, $version = 0)
+	public function getNextValue($object)
 	{
 		global $db, $conf;
 
@@ -109,10 +110,11 @@ class mod_riskassessment_standard extends ModeleNumRefRiskAnalysis
 	}
 
 	/**
-	 * 	Return next free value
+	 *    Return next free value
 	 *
-	 *  @param  Object		$object		Object we need next value for
-	 *  @return string      			Value if KO, <0 if KO
+	 * @param Object $object Object we need next value for
+	 * @return string                Value if KO, <0 if KO
+	 * @throws Exception
 	 */
 	public function getLastValue($object)
 	{

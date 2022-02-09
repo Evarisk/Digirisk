@@ -17,7 +17,7 @@
  */
 
 /**
- *  \file			htdocs/core/modules/digiriskdolibarr/modules_digiriskelement.php
+ *  \file			core/modules/digiriskdolibarr/digiriskelement/modules_digiriskelement.php
  *  \ingroup		digiriskdolibarr
  *  \brief			File that contains parent class for digiriskelements numbering models
  */
@@ -35,7 +35,7 @@ abstract class ModeleNumRefDigiriskElement
 	/**
 	 *	Return if a module can be used or not
 	 *
-	 *	@return		boolean     true if module can be used
+	 *	@return        bool     true if module can be used
 	 */
 	public function isEnabled()
 	{
@@ -45,7 +45,7 @@ abstract class ModeleNumRefDigiriskElement
 	/**
 	 *	Returns the default description of the numbering template
 	 *
-	 *	@return     string      Texte descripif
+	 *	@return     string      Texte descriptif
 	 */
 	public function info()
 	{
@@ -58,23 +58,23 @@ abstract class ModeleNumRefDigiriskElement
 	 *  Checks if the numbers already in the database do not
 	 *  cause conflicts that would prevent this numbering working.
 	 *
-	 *	@param	Object		$object		Object we need next value for
-	 *	@return boolean     			false if conflict, true if ok
+	 * @return bool                false if conflict, true if ok
 	 */
-	public function canBeActivated($object)
+	public function canBeActivated()
 	{
 		return true;
 	}
 
 	/**
-	 *	Returns next assigned value
+	 * 	Returns next assigned value
 	 *
-	 *	@param	Object		$object		Object we need next value for
-	 *	@return	string      Valeur
+	 * 	@param	Object 	$object	Object we need next value for
+	 * 	@return	string      	Valeur
 	 */
 	public function getNextValue($object)
 	{
 		global $langs;
+		$object->ref = '';
 		return $langs->trans("NotAvailable");
 	}
 

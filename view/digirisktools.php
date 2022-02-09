@@ -137,6 +137,7 @@ if (GETPOST('dataMigrationImport', 'alpha') && ! empty($conf->global->MAIN_UPLOA
 					$digiriskElement->description  = $element['content'][$i];
 
 					$digiriskElement->array_options['wp_digi_id'] = $element['id'][$i];
+					$digiriskElement->array_options['entity'] = $conf->entity;
 
 					$digiriskElement->fk_parent = $digiriskElement->fetch_id_from_wp_digi_id($element['parent_id'][$i]) ?: 0;
 

@@ -16,7 +16,7 @@
  */
 
 /**
- * \file        class/workunitdocument.class.php
+ * \file        class/digiriskdocuments/workunitdocument.class.php
  * \ingroup     digiriskdolibarr
  * \brief       This file is a class file for WorkUnitDocument
  */
@@ -28,6 +28,10 @@ require_once __DIR__ . '/../digiriskdocuments.class.php';
  */
 class WorkUnitDocument extends DigiriskDocuments
 {
+	/**
+	 * @var DoliDB Database handler.
+	 */
+	public $db;
 
 	/**
 	 * @var int  Does this object support multicompany module ?

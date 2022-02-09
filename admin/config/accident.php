@@ -16,7 +16,7 @@
  */
 
 /**
- * \file    admin/accident.php
+ * \file    admin/config/accident.php
  * \ingroup digiriskdolibarr
  * \brief   Digiriskdolibarr accident page.
  */
@@ -41,8 +41,8 @@ global $conf, $db, $langs, $user;
 // Libraries
 require_once DOL_DOCUMENT_ROOT . "/core/class/html.formprojet.class.php";
 require_once DOL_DOCUMENT_ROOT . "/core/lib/admin.lib.php";
-dol_include_once('/custom/digiriskdolibarr/lib/digiriskdolibarr.lib.php');
-dol_include_once('/custom/digiriskdolibarr/class/digiriskdocuments.class.php');
+
+require_once '../../lib/digiriskdolibarr.lib.php';
 
 // Translations
 $langs->loadLangs(array("admin", "digiriskdolibarr@digiriskdolibarr"));
