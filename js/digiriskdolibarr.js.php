@@ -490,6 +490,9 @@ window.eoxiaJS.modal.openModal = function ( event ) {
 	if ($(this).hasClass('riskassessment-task-list')) {
 		$('#risk_assessment_task_list' + idSelected).addClass('modal-active');
 	}
+	if ($(this).hasClass('riskassessment-task-timespent-edit')) {
+		$('#risk_assessment_task_timespent_edit' + idSelected).addClass('modal-active');
+	}
 
 	// Open modal risksign.
 	if ($(this).hasClass('risksign-add')) {
@@ -2303,6 +2306,7 @@ window.eoxiaJS.riskassessmenttask.event = function() {
 	$( document ).on( 'click', '.riskassessment-task-save', window.eoxiaJS.riskassessmenttask.saveRiskAssessmentTask);
 	$( document ).on( 'click', '.riskassessment-task-delete', window.eoxiaJS.riskassessmenttask.deleteRiskAssessmentTask );
 	$( document ).on( 'click', '.riskassessment-task-timespent-create', window.eoxiaJS.riskassessmenttask.createRiskAssessmentTaskTimeSpent);
+	$( document ).on( 'click', '.riskassessment-task-timespent-save', window.eoxiaJS.riskassessmenttask.saveRiskAssessmentTaskTimeSpent);
 	$( document ).on( 'click', '.riskassessment-task-timespent-delete', window.eoxiaJS.riskassessmenttask.deleteRiskAssessmentTaskTimeSpent );
 };
 
@@ -2624,6 +2628,70 @@ window.eoxiaJS.riskassessmenttask.deleteRiskAssessmentTaskTimeSpent = function (
 		return false;
 	}
 };
+
+/**
+ * Action save riskassessmenttasktimespent.
+ *
+ * @since   9.1.0
+ * @version 9.1.0
+ *
+ * @return {void}
+ */
+window.eoxiaJS.riskassessmenttask.saveRiskAssessmentTaskTimeSpent = function ( event ) {
+	let riskAssessmentTaskTimeSpentID = $(this).attr('value');
+	let element = $(this).closest('.riskassessment-task-timespent-edit-modal');
+	let single = element.find('.riskassessment-task-timespent-container');
+	//let elementRiskAssessmentTask = $(this).closest('.riskassessment-task-timespent-container');
+	let riskId = $(this).closest('.riskassessment-tasks').attr('value')
+	let textToShow = '';
+
+	let date = single.find('#RiskassessmentTaskTimespentDate').val();
+	let comment = single.find('.riskassessment-task-timespent-comment').val()
+	comment = window.eoxiaJS.risk.sanitizeBeforeRequest(comment)
+	let duration = single.find('.riskassessment-task-timespent-duration').val()
+
+	window.eoxiaJS.loader.display($(this));
+	//window.eoxiaJS.loader.display($('.riskassessment-task-single-'+ editedRiskAssessmentTaskId));
+
+	$.ajax({
+		url: document.URL + '&action=saveRiskAssessmentTaskTimeSpent',
+		data: JSON.stringify({
+			//riskAssessmentTaskID: editedRiskAssessmentTaskId,
+			riskAssessmentTaskTimeSpentID: riskAssessmentTaskTimeSpentID,
+			date: date,
+			comment: comment,
+			duration: duration,
+		}),
+		type: "POST",
+		processData: false,
+		contentType: false,
+		success: function ( resp ) {
+			$('.fichecenter').html($(resp).find('#searchFormList'))
+			let actionContainerSuccess = $('.messageSuccessTaskEdit');
+			$('.riskassessment-tasks' + riskId).fadeOut(800);
+			$('.riskassessment-tasks' + riskId).fadeIn(800);
+			textToShow += actionContainerSuccess.find('.valueForEditTask1').val()
+			textToShow += taskRef
+			textToShow += actionContainerSuccess.find('.valueForEditTask2').val()
+
+			actionContainerSuccess.find('a').attr('href', '#risk_row_'+riskId)
+
+			actionContainerSuccess.find('.notice-subtitle .text').text(textToShow)
+			actionContainerSuccess.removeClass('hidden');
+		},
+		error: function ( resp ) {
+			let actionContainerError = $('.messageErrorTaskEdit');
+
+			textToShow += actionContainerError.find('.valueForEditTask1').val()
+			textToShow += taskRef
+			textToShow += actionContainerError.find('.valueForEditTask2').val()
+
+			actionContainerError.find('.notice-subtitle .text').text(textToShow);
+			actionContainerError.removeClass('hidden');
+		}
+	});
+};
+
 
 /**
  * Initialise l'objet "risksign" ainsi que la méthode "init" obligatoire pour la bibliothèque EoxiaJS.

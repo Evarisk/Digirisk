@@ -91,7 +91,7 @@ $related_tasks = $risk->get_related_tasks($risk); ?>
 											<!-- Modal-Header -->
 											<div class="modal-header">
 												<?php $project->fetch($conf->global->DIGIRISKDOLIBARR_DU_PROJECT); ?>
-												<h2 class="modal-title"><?php echo $langs->trans('TaskEdit') . ' ' . $risk->ref . '  ' . $langs->trans('AT') . '  ' . $langs->trans('Project') . '  ' . $project->getNomUrl()  ?><i class="fas fa-info-circle wpeo-tooltip-event" aria-label="<?php echo $langs->trans('HowToSetDUProject'); ?>"></i></h2>
+												<h2 class="modal-title"><?php echo $langs->trans('TaskEdit') . ' ' . getNomUrlTask($related_task, 0, 'withproject') . '  ' . $langs->trans('AT') . '  ' . $langs->trans('Project') . '  ' . $project->getNomUrl()  ?><i class="fas fa-info-circle wpeo-tooltip-event" aria-label="<?php echo $langs->trans('HowToSetDUProject'); ?>"></i></h2>
 												<div class="modal-close"><i class="fas fa-times"></i></div>
 											</div>
 											<!-- Modal EDIT RISK ASSESSMENT TASK Content-->
@@ -176,11 +176,11 @@ $related_tasks = $risk->get_related_tasks($risk); ?>
 																				<!-- BUTTON MODAL RISK ASSESSMENT TASK TIMESPENT EDIT  -->
 																				<div class="riskassessment-task-actions wpeo-gridlayout grid-2 grid-gap-0">
 																					<?php if ($permissiontoadd) : ?>
-																						<div class="riskassessment-task-timespent-edit wpeo-button button-square-50 button-grey modal-open" value="<?php echo $related_task->id ?>">
+																						<div class="riskassessment-task-timespent-edit wpeo-button button-square-50 button-grey modal-open" value="<?php echo $time_spent->timespent_id ?>">
 																							<i class="fas fa-pencil-alt button-icon"></i>
 																						</div>
 																					<?php else : ?>
-																						<div class="wpeo-button button-square-50 button-grey wpeo-tooltip-event" aria-label="<?php echo $langs->trans('PermissionDenied'); ?>" value="<?php echo $related_task->id ?>">
+																						<div class="wpeo-button button-square-50 button-grey wpeo-tooltip-event" aria-label="<?php echo $langs->trans('PermissionDenied'); ?>" value="<?php echo $time_spent->timespent_id ?>">
 																							<i class="fas fa-pencil-alt button-icon"></i>
 																						</div>
 																					<?php endif; ?>
@@ -193,25 +193,30 @@ $related_tasks = $risk->get_related_tasks($risk); ?>
 																			</div>
 																			<!-- RISK ASSESSMENT TASK TIMESPENT EDIT MODAL-->
 																			<div class="riskassessment-task-timespent-edit-modal">
-																				<div class="wpeo-modal modal-riskassessment-task-timespent" id="risk_assessment_task__timespent_edit<?php echo $related_task->id ?>">
+																				<div class="wpeo-modal modal-riskassessment-task-timespent" id="risk_assessment_task_timespent_edit<?php echo $time_spent->timespent_id ?>">
 																					<div class="modal-container wpeo-modal-event">
 																						<!-- Modal-Header -->
 																						<div class="modal-header">
-																							<h2 class="modal-title"><?php echo $langs->trans('TaskEdit') . ' ' . $related_task->ref ?></h2>
+																							<h2 class="modal-title"><?php echo $langs->trans('TaskTimeSpentEdit') . ' ' . getNomUrlTask($related_task, 0, 'withproject') ?></h2>
 																							<div class="modal-close"><i class="fas fa-times"></i></div>
 																						</div>
 																						<!-- Modal EDIT RISK ASSESSMENT TASK Content-->
-																						<div class="modal-content" id="#modalContent<?php echo $related_task->id ?>">
-																							<div class="riskassessment-task-container">
-																								<div class="riskassessment-task">
-																									<span class="title"><?php echo $langs->trans('Label'); ?> <input type="text" class="riskassessment-task-label<?php echo $related_task->id ?>" name="label" value="<?php echo $related_task->label ?>"></span>
+																						<div class="modal-content" id="#modalContent<?php echo $time_spent->timespent_id ?>">
+																							<div class="riskassessment-task-timespent-container">
+																								<div class="riskassessment-task-timespent">
+																									<span class="title"><?php echo $langs->trans('TimeSpent'); ?></span>
+																									<span class="title"><?php echo $langs->trans('Date'); ?></span>
+																									<?php print $form->selectDate($time_spent->timespent_date, 'RiskassessmentTaskTimespentDate', 1, 1, 0, 'riskassessment_task_timespent_form', 1, 0); ?>
+																									<span class="title"><?php echo $langs->trans('Comment'); ?> <input type="text" class="riskassessment-task-timespent-comment" name="comment" value="<?php echo $time_spent->timespent_note; ?>"></span>
+																									<span class="title"><?php echo $langs->trans('Duration'); ?></span>
+																									<span class="time"><?php print '<input type="number" placeholder="minutes" class="riskassessment-task-timespent-duration" name="timespentDuration" value="'.($time_spent->timespent_duration/60).'">'; ?></span>
 																								</div>
 																							</div>
 																						</div>
 																						<!-- Modal-Footer -->
 																						<div class="modal-footer">
 																							<?php if ($permissiontoadd) : ?>
-																								<div class="wpeo-button riskassessment-task-save button-green" value="<?php echo $related_task->id ?>">
+																								<div class="wpeo-button riskassessment-task-timespent-save button-green" value="<?php echo $time_spent->timespent_id ?>">
 																									<i class="fas fa-save"></i> <?php echo $langs->trans('UpdateData'); ?>
 																								</div>
 																							<?php else : ?>
@@ -259,7 +264,6 @@ $related_tasks = $risk->get_related_tasks($risk); ?>
 									<div class="riskassessment-task-content">
 										<div class="riskassessment-task-data" style="justify-content: center;">
 											<span class="name"><?php echo $langs->trans('NoTaskLinked'); ?></span>
-
 											<?php if ($permissiontoadd) : ?>
 												<div class="riskassessment-task-add wpeo-button button-square-40 button-primary wpeo-tooltip-event modal-open risk-list-button" aria-label="<?php echo $langs->trans('AddRiskAssessmentTask') ?>" value="<?php echo $risk->id;?>">
 													<i class="fas fa-plus button-icon"></i>
@@ -303,6 +307,7 @@ $related_tasks = $risk->get_related_tasks($risk); ?>
 										<span class="riskassessment-task-progress progress-<?php echo $related_task->progress ? $related_task->progress : 0 ?>"><?php echo $related_task->progress ? $related_task->progress . " %" : 0 . " %" ?></span>
 									</div>
 									<div class="riskassessment-task-title">
+										<input type="checkbox" id="" class="riskassessment-task-progress-checkbox<?php echo $related_task->id ?>" name="progress-checkbox" value="" <?php echo ($related_task->progress == 100) ? 'checked' : ''; ?>>
 										<span class="riskassessment-task-author-label">
 											<?php echo $related_task->label; ?>
 										</span>
@@ -506,6 +511,7 @@ $related_tasks = $risk->get_related_tasks($risk); ?>
 																<span class="riskassessment-task-progress progress-<?php echo $related_task->progress ? $related_task->progress : 0 ?>"><?php echo $related_task->progress ? $related_task->progress . " %" : 0 . " %" ?></span>
 															</div>
 															<div class="riskassessment-task-title">
+																<input type="checkbox" id="" class="riskassessment-task-progress-checkbox<?php echo $related_task->id ?>" name="progress-checkbox" value="" <?php echo ($related_task->progress == 100) ? 'checked' : ''; ?>>
 																<span class="riskassessment-task-label">
 																	<?php echo $related_task->label; ?>
 																</span>

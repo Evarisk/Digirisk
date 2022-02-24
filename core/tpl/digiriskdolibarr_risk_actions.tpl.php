@@ -483,6 +483,35 @@ if ( ! $error && $action == 'addRiskAssessmentTaskTimeSpent' && $permissiontoadd
 	}
 }
 
+if ( ! $error && $action == 'saveRiskAssessmentTaskTimeSpent' && $permissiontoadd) {
+	$data = json_decode(file_get_contents('php://input'), true);
+
+	$riskAssessmentTaskTimeSpentID = $data['riskAssessmentTaskTimeSpentID'];
+	$date                          = $data['date'];
+	$comment                       = $data['comment'];
+	$duration                      = $data['duration'];
+
+	$task->fetchTimeSpent($riskAssessmentTaskTimeSpentID);
+
+	$task->timespent_date     = strtotime(preg_replace('/\//', '-', $date));
+	$task->timespent_note     = $comment;
+	$task->timespent_duration = $duration * 60;
+
+	$result = $task->updateTimeSpent($user, true);
+
+	if ($result > 0) {
+		// Update task time spent OK
+		$urltogo = str_replace('__ID__', $result, $backtopage);
+		$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
+		header("Location: " . $urltogo);
+		exit;
+	} else {
+		// Update task time spent KO
+		if ( ! empty($task->errors)) setEventMessages(null, $task->errors, 'errors');
+		else setEventMessages($task->error, null, 'errors');
+	}
+}
+
 if ( ! $error && $action == "deleteRiskAssessmentTaskTimeSpent" && $permissiontodelete) {
 	$deleteRiskAssessmentTaskTimeSpentId = GETPOST('deletedRiskAssessmentTaskTimeSpentId');
 
