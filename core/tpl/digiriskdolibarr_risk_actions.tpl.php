@@ -532,6 +532,35 @@ if ( ! $error && $action == "deleteRiskAssessmentTaskTimeSpent" && $permissionto
 	}
 }
 
+if ( ! $error && $action == 'checkTaskProgress' && $permissiontoadd) {
+	$data = json_decode(file_get_contents('php://input'), true);
+
+	$riskAssessmentTaskID = $data['riskAssessmentTaskID'];
+	$taskProgress         = $data['taskProgress'];
+
+	$task->fetch($riskAssessmentTaskID);
+
+	if ($taskProgress == 1) {
+		$task->progress = 100;
+	} else {
+		$task->progress = 0;
+	}
+
+	$result = $task->update($user, true);
+
+	if ($result > 0) {
+		// Update task OK
+		$urltogo = str_replace('__ID__', $result, $backtopage);
+		$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
+		header("Location: " . $urltogo);
+		exit;
+	} else {
+		// Update task KO
+		if ( ! empty($task->errors)) setEventMessages(null, $task->errors, 'errors');
+		else setEventMessages($task->error, null, 'errors');
+	}
+}
+
 if ( ! $error && $action == "addFiles" && $permissiontodelete) {
 	$data = json_decode(file_get_contents('php://input'), true);
 

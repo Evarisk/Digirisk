@@ -2308,6 +2308,7 @@ window.eoxiaJS.riskassessmenttask.event = function() {
 	$( document ).on( 'click', '.riskassessment-task-timespent-create', window.eoxiaJS.riskassessmenttask.createRiskAssessmentTaskTimeSpent);
 	$( document ).on( 'click', '.riskassessment-task-timespent-save', window.eoxiaJS.riskassessmenttask.saveRiskAssessmentTaskTimeSpent);
 	$( document ).on( 'click', '.riskassessment-task-timespent-delete', window.eoxiaJS.riskassessmenttask.deleteRiskAssessmentTaskTimeSpent );
+	$( document ).on( 'click', '.riskassessment-task-progress-checkbox', window.eoxiaJS.riskassessmenttask.checkTaskProgress );
 };
 
 /**
@@ -2692,6 +2693,68 @@ window.eoxiaJS.riskassessmenttask.saveRiskAssessmentTaskTimeSpent = function ( e
 	});
 };
 
+/**
+ * Action check task progress.
+ *
+ * @since   9.1.0
+ * @version 9.1.0
+ *
+ * @return {void}
+ */
+window.eoxiaJS.riskassessmenttask.checkTaskProgress = function ( event ) {
+	let elementRiskAssessmentTask = $(this).closest('.riskassessment-task-container');
+	let RiskAssessmentTaskId = elementRiskAssessmentTask.find('.riskassessment-task-reference').attr('value');
+	let riskId = $(this).closest('.riskassessment-tasks').attr('value');
+	let textToShow = '';
+
+	let taskRef = elementRiskAssessmentTask.attr('value');
+
+	let taskProgress = '';
+	if (elementRiskAssessmentTask.find('.riskassessment-task-progress-checkbox'+RiskAssessmentTaskId).hasClass('progress-checkbox-check')) {
+		taskProgress = 0;
+		elementRiskAssessmentTask.find('.riskassessment-task-progress-checkbox'+RiskAssessmentTaskId).toggleClass('progress-checkbox-check').toggleClass('progress-checkbox-uncheck');
+	} else if (elementRiskAssessmentTask.find('.riskassessment-task-progress-checkbox'+RiskAssessmentTaskId).hasClass('progress-checkbox-uncheck')) {
+		taskProgress = 1;
+		elementRiskAssessmentTask.find('.riskassessment-task-progress-checkbox'+RiskAssessmentTaskId).toggleClass('progress-checkbox-uncheck').toggleClass('progress-checkbox-check');
+	}
+
+	window.eoxiaJS.loader.display($('.riskassessment-task-single-'+ RiskAssessmentTaskId));
+
+	$.ajax({
+		url: document.URL + '&action=checkTaskProgress',
+		data: JSON.stringify({
+			riskAssessmentTaskID: RiskAssessmentTaskId,
+			taskProgress: taskProgress,
+		}),
+		type: "POST",
+		processData: false,
+		contentType: false,
+		success: function ( resp ) {
+			$('.fichecenter').html($(resp).find('#searchFormList'))
+			let actionContainerSuccess = $('.messageSuccessTaskEdit');
+			$('.riskassessment-tasks' + riskId).fadeOut(800);
+			$('.riskassessment-tasks' + riskId).fadeIn(800);
+			textToShow += actionContainerSuccess.find('.valueForEditTask1').val()
+			textToShow += taskRef
+			textToShow += actionContainerSuccess.find('.valueForEditTask2').val()
+
+			actionContainerSuccess.find('a').attr('href', '#risk_row_'+riskId)
+
+			actionContainerSuccess.find('.notice-subtitle .text').text(textToShow)
+			actionContainerSuccess.removeClass('hidden');
+		},
+		error: function ( resp ) {
+			let actionContainerError = $('.messageErrorTaskEdit');
+
+			textToShow += actionContainerError.find('.valueForEditTask1').val()
+			textToShow += taskRef
+			textToShow += actionContainerError.find('.valueForEditTask2').val()
+
+			actionContainerError.find('.notice-subtitle .text').text(textToShow);
+			actionContainerError.removeClass('hidden');
+		}
+	});
+};
 
 /**
  * Initialise l'objet "risksign" ainsi que la méthode "init" obligatoire pour la bibliothèque EoxiaJS.
