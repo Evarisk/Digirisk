@@ -406,10 +406,17 @@ if ( ! $error && $action == 'saveRiskAssessmentTask' && $permissiontoadd) {
 
 	$riskAssessmentTaskID = $data['riskAssessmentTaskID'];
 	$tasktitle            = $data['tasktitle'];
+	$taskProgress         = $data['taskProgress'];
 
 	$task->fetch($riskAssessmentTaskID);
 
 	$task->label = $tasktitle;
+
+	if ($taskProgress == 1) {
+		$task->progress = 100;
+	} else {
+		$task->progress = 0;
+	}
 
 	$result = $task->update($user, true);
 
@@ -441,6 +448,56 @@ if ( ! $error && $action == "deleteRiskAssessmentTask" && $permissiontodelete) {
 		exit;
 	} else {
 		// Delete $task KO
+		if ( ! empty($task->errors)) setEventMessages(null, $task->errors, 'errors');
+		else setEventMessages($task->error, null, 'errors');
+	}
+}
+
+if ( ! $error && $action == 'addRiskAssessmentTaskTimeSpent' && $permissiontoadd) {
+	$data = json_decode(file_get_contents('php://input'), true);
+
+	$taskID   = $data['taskID'];
+	$date     = $data['date'];
+	$comment  = $data['comment'];
+	$duration = $data['duration'];
+
+	$task->fetch($taskID);
+
+	$task->timespent_date     = strtotime(preg_replace('/\//', '-', $date));
+	$task->timespent_note     = $comment;
+	$task->timespent_duration = $duration * 60;
+	$task->timespent_fk_user  = $user->id;
+
+	$result = $task->addTimeSpent($user, true);
+
+	if ($result > 0) {
+		// Creation task time spent OK
+		$urltogo = str_replace('__ID__', $result, $backtopage);
+		$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
+		header("Location: " . $urltogo);
+		exit;
+	} else {
+		// Creation task time spent KO
+		if ( ! empty($task->errors)) setEventMessages(null, $task->errors, 'errors');
+		else setEventMessages($task->error, null, 'errors');
+	}
+}
+
+if ( ! $error && $action == "deleteRiskAssessmentTaskTimeSpent" && $permissiontodelete) {
+	$deleteRiskAssessmentTaskTimeSpentId = GETPOST('deletedRiskAssessmentTaskTimeSpentId');
+
+	$task->fetchTimeSpent($deleteRiskAssessmentTaskTimeSpentId);
+
+	$result = $task->delTimeSpent($user, true);
+
+	if ($result > 0) {
+		// Delete task time spent OK
+		$urltogo = str_replace('__ID__', $result, $backtopage);
+		$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
+		header("Location: " . $urltogo);
+		exit;
+	} else {
+		// Delete task time spent KO
 		if ( ! empty($task->errors)) setEventMessages(null, $task->errors, 'errors');
 		else setEventMessages($task->error, null, 'errors');
 	}

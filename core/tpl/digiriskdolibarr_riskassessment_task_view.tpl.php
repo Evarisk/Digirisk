@@ -39,15 +39,27 @@ $related_tasks = $risk->get_related_tasks($risk); ?>
 									<div class="riskassessment-task-content table-cell">
 										<div class="riskassessment-task-data">
 											<span class="riskassessment-task-reference" value="<?php echo $related_task->id ?>"><?php echo getNomUrlTask($related_task, 0, 'withproject'); ?></span>
+											<span class="riskassessment-task-author">
+												<?php $user->fetch($related_task->fk_user_creat); ?>
+												<?php echo getNomUrl(0, '', 0, 0, 2, 0, '', '', -1, $user); ?>
+											</span>
 											<span class="riskassessment-task-date">
 												<i class="fas fa-calendar-alt"></i> <?php echo date('d/m/Y', (($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_START_DATE && ( ! empty($related_task->date_start))) ? $related_task->date_start : $related_task->date_c)) . (($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_END_DATE && ( ! empty($related_task->date_end))) ? ' - ' . date('d/m/Y', $related_task->date_end) : ''); ?>
+											</span>
+											<span class="riskassessment-task-timespent">
+												<?php $allTimeSpentArray = $related_task->fetchAllTimeSpent($user, 'AND ptt.fk_task='.$related_task->id);
+													$allTimeSpent = 0;
+													foreach ($allTimeSpentArray as $timespent) {
+														$allTimeSpent += $timespent->timespent_duration;
+													}
+												?>
+												<i class="fas fa-clock"></i> <?php echo $allTimeSpent/60 . '/' . $related_task->planned_workload/60 ?>
 											</span>
 											<span class="riskassessment-task-progress progress-<?php echo $related_task->progress ? $related_task->progress : 0 ?>"><?php echo $related_task->progress ? $related_task->progress . " %" : 0 . " %" ?></span>
 										</div>
 										<div class="riskassessment-task-title">
-											<span class="riskassessment-task-author">
-												<?php $user->fetch($related_task->fk_user_creat); ?>
-												<?php echo getNomUrl(0, '', 0, 0, 2, 0, '', '', -1, $user); ?>
+											<span class="riskassessment-task-progress-checkbox">
+												<input type="checkbox" id="" class="" name="" value="" <?php echo ($related_task->progress == 100) ? 'checked' : ''; ?>>
 											</span>
 											<span class="riskassessment-task-author-label">
 												<?php echo $related_task->label; ?>
@@ -84,9 +96,139 @@ $related_tasks = $risk->get_related_tasks($risk); ?>
 											</div>
 											<!-- Modal EDIT RISK ASSESSMENT TASK Content-->
 											<div class="modal-content" id="#modalContent<?php echo $related_task->id ?>">
-												<div class="riskassessment-task-container">
-													<div class="riskassessment-task">
-														<span class="title"><?php echo $langs->trans('Label'); ?> <input type="text" class="riskassessment-task-label<?php echo $related_task->id ?>" name="label" value="<?php echo $related_task->label ?>"></span>
+												<?php $allTimeSpentArray = $related_task->fetchAllTimeSpent($user, 'AND ptt.fk_task='.$related_task->id); ?>
+													<div class="riskassessment-task-container">
+														<div class="riskassessment-task-single">
+															<div class="riskassessment-task-content">
+																<div class="riskassessment-task-data">
+																	<span class="riskassessment-task-reference" value="<?php echo $related_task->id ?>"><?php echo getNomUrlTask($related_task, 0, 'withproject'); ?></span>
+																	<span class="riskassessment-task-author">
+																		<?php $user->fetch($related_task->fk_user_creat); ?>
+																		<?php echo getNomUrl(0, '', 0, 0, 2, 0, '', '', -1, $user); ?>
+																	</span>
+																	<span class="riskassessment-task-date">
+																		<i class="fas fa-calendar-alt"></i> <?php echo date('d/m/Y', (($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_START_DATE && ( ! empty($related_task->date_start))) ? $related_task->date_start : $related_task->date_c)) . (($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_END_DATE && ( ! empty($related_task->date_end))) ? ' - ' . date('d/m/Y', $related_task->date_end) : ''); ?>
+																	</span>
+																	<span class="riskassessment-task-timespent">
+																		<?php $allTimeSpentArray = $related_task->fetchAllTimeSpent($user, 'AND ptt.fk_task='.$related_task->id);
+																		$allTimeSpent = 0;
+																		foreach ($allTimeSpentArray as $timespent) {
+																			$allTimeSpent += $timespent->timespent_duration;
+																		}
+																		?>
+																		<i class="fas fa-clock"></i> <?php echo $allTimeSpent/60 . '/' . $related_task->planned_workload/60 ?>
+																	</span>
+																	<span class="riskassessment-task-progress progress-<?php echo $related_task->progress ? $related_task->progress : 0 ?>"><?php echo $related_task->progress ? $related_task->progress . " %" : 0 . " %" ?></span>
+																</div>
+																<div class="riskassessment-task">
+																	<span class="title">
+																		<input type="checkbox" id="" class="riskassessment-task-progress-checkbox<?php echo $related_task->id ?>" name="progress-checkbox" value="" <?php echo ($related_task->progress == 100) ? 'checked' : ''; ?>>
+																		<input type="text" class="riskassessment-task-label<?php echo $related_task->id ?>" name="label" value="<?php echo $related_task->label ?>">
+																	</span>
+																</div>
+															</div>
+														</div>
+													</div>
+												<hr>
+												<div class="riskassessment-task-timespent-container">
+													<span class="title"><?php echo $langs->trans('TimeSpent'); ?></span>
+													<div class="riskassessment-task-timespent">
+														<span class="title"><?php echo $langs->trans('Date'); ?></span>
+														<?php print $form->selectDate('', 'RiskassessmentTaskTimespentDate', 1, 1, 0, 'riskassessment_task_timespent_form', 1, 0); ?>
+														<span class="title"><?php echo $langs->trans('Comment'); ?> <input type="text" class="riskassessment-task-timespent-comment" name="comment" value=""></span>
+														<span class="title"><?php echo $langs->trans('Duration'); ?></span>
+														<span class="time"><?php print '<input type="number" placeholder="minutes" class="riskassessment-task-timespent-duration" name="timespentDuration" value="">'; ?></span>
+													<?php if ($permissiontoadd) : ?>
+														<div class="wpeo-button riskassessment-task-timespent-create button-square-30 button-rounded" value="<?php echo $related_task->id ?>">
+															<i class="fas fa-plus button-icon"></i>
+														</div>
+													<?php endif; ?>
+														<?php if ( ! empty($allTimeSpentArray) && $allTimeSpentArray > 0) : ?>
+															<?php foreach ($allTimeSpentArray as $time_spent) : ?>
+																<div class="riskassessment-task-timespent-list-content" value="<?php echo $risk->id ?>">
+																	<ul class="riskassessment-task-timespent-list riskassessment-task-timespent-list-<?php echo $related_task->id ?>">
+																		<li class="riskassessment-task riskassessment-task<?php echo $related_task->id ?>" value="<?php echo $related_task->id ?>">
+																			<input type="hidden" class="labelForDelete" value="<?php echo $langs->trans('DeleteTaskTimeSpent', $time_spent->timespent_duration/60) . ' ' . $related_task->ref . ' ?'; ?>">
+																			<div class="riskassessment-task-container riskassessment-task-ref-<?php echo $related_task->id ?>" value="<?php echo $related_task->ref ?>">
+																				<div class="riskassessment-task-content">
+																					<div class="riskassessment-task-single">
+																						<div class="riskassessment-task-content">
+																							<div class="riskassessment-task-data">
+																								<span class="riskassessment-task-author">
+																									<?php $user->fetch($related_task->fk_user_creat); ?>
+																									<?php echo getNomUrl(0, '', 0, 0, 2, 0, '', '', -1, $user); ?>
+																								</span>
+																								<span class="riskassessment-task-timespent-date">
+																									<i class="fas fa-calendar-alt"></i> <?php echo dol_print_date($time_spent->timespent_date, 'dayhour'); ?>
+																								</span>
+																								<span class="riskassessment-task-timespent">
+																									<i class="fas fa-clock"></i> <?php echo $time_spent->timespent_duration/60 . ' mins'; ?>
+																								</span>
+																							</div>
+																							<div class="riskassessment-task-timespent-title">
+																								<span class="riskassessment-task-timespent-comment">
+																									<?php echo $time_spent->timespent_note; ?>
+																								</span>
+																							</div>
+																						</div>
+																					</div>
+																				</div>
+																				<!-- BUTTON MODAL RISK ASSESSMENT TASK TIMESPENT EDIT  -->
+																				<div class="riskassessment-task-actions wpeo-gridlayout grid-2 grid-gap-0">
+																					<?php if ($permissiontoadd) : ?>
+																						<div class="riskassessment-task-timespent-edit wpeo-button button-square-50 button-grey modal-open" value="<?php echo $related_task->id ?>">
+																							<i class="fas fa-pencil-alt button-icon"></i>
+																						</div>
+																					<?php else : ?>
+																						<div class="wpeo-button button-square-50 button-grey wpeo-tooltip-event" aria-label="<?php echo $langs->trans('PermissionDenied'); ?>" value="<?php echo $related_task->id ?>">
+																							<i class="fas fa-pencil-alt button-icon"></i>
+																						</div>
+																					<?php endif; ?>
+																					<?php if ($permissiontodelete) : ?>
+																						<div class="riskassessment-task-timespent-delete wpeo-button button-square-50 button-transparent" value="<?php echo $time_spent->timespent_id ?>">
+																							<i class="fas fa-trash button-icon"></i>
+																						</div>
+																					<?php endif; ?>
+																				</div>
+																			</div>
+																			<!-- RISK ASSESSMENT TASK TIMESPENT EDIT MODAL-->
+																			<div class="riskassessment-task-timespent-edit-modal">
+																				<div class="wpeo-modal modal-riskassessment-task-timespent" id="risk_assessment_task__timespent_edit<?php echo $related_task->id ?>">
+																					<div class="modal-container wpeo-modal-event">
+																						<!-- Modal-Header -->
+																						<div class="modal-header">
+																							<h2 class="modal-title"><?php echo $langs->trans('TaskEdit') . ' ' . $related_task->ref ?></h2>
+																							<div class="modal-close"><i class="fas fa-times"></i></div>
+																						</div>
+																						<!-- Modal EDIT RISK ASSESSMENT TASK Content-->
+																						<div class="modal-content" id="#modalContent<?php echo $related_task->id ?>">
+																							<div class="riskassessment-task-container">
+																								<div class="riskassessment-task">
+																									<span class="title"><?php echo $langs->trans('Label'); ?> <input type="text" class="riskassessment-task-label<?php echo $related_task->id ?>" name="label" value="<?php echo $related_task->label ?>"></span>
+																								</div>
+																							</div>
+																						</div>
+																						<!-- Modal-Footer -->
+																						<div class="modal-footer">
+																							<?php if ($permissiontoadd) : ?>
+																								<div class="wpeo-button riskassessment-task-save button-green" value="<?php echo $related_task->id ?>">
+																									<i class="fas fa-save"></i> <?php echo $langs->trans('UpdateData'); ?>
+																								</div>
+																							<?php else : ?>
+																								<div class="wpeo-button button-grey wpeo-tooltip-event" aria-label="<?php echo $langs->trans('PermissionDenied') ?>">
+																									<i class="fas fa-save"></i> <?php echo $langs->trans('UpdateData'); ?>
+																								</div>
+																							<?php endif;?>
+																						</div>
+																					</div>
+																				</div>
+																			</div>
+																		</li>
+																		<hr>
+																	</ul>
+																</div>
+															<?php endforeach; ?>
+														<?php endif; ?>
 													</div>
 												</div>
 											</div>
@@ -142,19 +284,28 @@ $related_tasks = $risk->get_related_tasks($risk); ?>
 								<div class="riskassessment-task-content table-cell">
 									<div class="riskassessment-task-data">
 										<span class="riskassessment-task-reference" value="<?php echo $related_task->id ?>"><?php echo getNomUrlTask($related_task, 0, 'withproject'); ?></span>
+										<span class="riskassessment-task-author">
+											<?php $user->fetch($related_task->fk_user_creat); ?>
+											<?php echo getNomUrl(0, '', 0, 0, 2, 0, '', '', -1, $user); ?>
+										</span>
 										<span class="riskassessment-task-date">
-												<i class="fas fa-calendar-alt"></i> <?php echo date('d/m/Y', (($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_START_DATE && ( ! empty($related_task->date_start))) ? $related_task->date_start : $related_task->date_c)) . (($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_END_DATE && ( ! empty($related_task->date_end))) ? ' - ' . date('d/m/Y', $related_task->date_end) : ''); ?>
-											</span>
+											<i class="fas fa-calendar-alt"></i> <?php echo date('d/m/Y', (($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_START_DATE && ( ! empty($related_task->date_start))) ? $related_task->date_start : $related_task->date_c)) . (($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_END_DATE && ( ! empty($related_task->date_end))) ? ' - ' . date('d/m/Y', $related_task->date_end) : ''); ?>
+										</span>
+										<span class="riskassessment-task-timespent">
+											<?php $allTimeSpentArray = $related_task->fetchAllTimeSpent($user, 'AND ptt.fk_task='.$related_task->id);
+											$allTimeSpent = 0;
+											foreach ($allTimeSpentArray as $timespent) {
+												$allTimeSpent += $timespent->timespent_duration;
+											}
+											?>
+											<i class="fas fa-clock"></i> <?php echo $allTimeSpent/60 . '/' . $related_task->planned_workload/60 ?>
+										</span>
 										<span class="riskassessment-task-progress progress-<?php echo $related_task->progress ? $related_task->progress : 0 ?>"><?php echo $related_task->progress ? $related_task->progress . " %" : 0 . " %" ?></span>
 									</div>
 									<div class="riskassessment-task-title">
-											<span class="riskassessment-task-author">
-												<?php $user->fetch($related_task->fk_user_creat); ?>
-												<?php echo getNomUrl(0, '', 0, 0, 2, 0, '', '', -1, $user); ?>
-											</span>
 										<span class="riskassessment-task-author-label">
-												<?php echo $related_task->label; ?>
-											</span>
+											<?php echo $related_task->label; ?>
+										</span>
 									</div>
 								</div>
 								<!-- BUTTON MODAL RISK ASSESSMENT TASK EDIT  -->
@@ -220,7 +371,6 @@ $related_tasks = $risk->get_related_tasks($risk); ?>
 							<div class="riskassessment-task-content">
 								<div class="riskassessment-task-data" style="justify-content: center;">
 									<span class="name"><?php echo $langs->trans('NoTaskLinked'); ?></span>
-
 									<?php if ($permissiontoadd) : ?>
 										<div class="riskassessment-task-add wpeo-button button-square-40 button-primary wpeo-tooltip-event modal-open risk-list-button" aria-label="<?php echo $langs->trans('AddRiskAssessmentTask') ?>" value="<?php echo $risk->id;?>">
 											<i class="fas fa-plus button-icon"></i>
@@ -346,16 +496,16 @@ $related_tasks = $risk->get_related_tasks($risk); ?>
 														<div class="riskassessment-task-content">
 															<div class="riskassessment-task-data">
 																<span class="riskassessment-task-reference" value="<?php echo $related_task->id ?>"><?php echo getNomUrlTask($related_task, 0, 'withproject'); ?></span>
+																<span class="riskassessment-task-author">
+																	<?php $user->fetch($related_task->fk_user_creat); ?>
+																	<?php echo getNomUrl(0, '', 0, 0, 2, 0, '', '', -1, $user); ?>
+																</span>
 																<span class="riskassessment-task-date">
 																	<i class="fas fa-calendar-alt"></i> <?php echo date('d/m/Y', (($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_START_DATE && ( ! empty($related_task->date_start))) ? $related_task->date_start : $related_task->date_c)) . (($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_END_DATE && ( ! empty($related_task->date_end))) ? ' - ' . date('d/m/Y', $related_task->date_end) : ''); ?>
 																</span>
 																<span class="riskassessment-task-progress progress-<?php echo $related_task->progress ? $related_task->progress : 0 ?>"><?php echo $related_task->progress ? $related_task->progress . " %" : 0 . " %" ?></span>
 															</div>
 															<div class="riskassessment-task-title">
-																<span class="riskassessment-task-author">
-																	<?php $user->fetch($related_task->fk_user_creat); ?>
-																	<?php echo getNomUrl(0, '', 0, 0, 2, 0, '', '', -1, $user); ?>
-																</span>
 																<span class="riskassessment-task-label">
 																	<?php echo $related_task->label; ?>
 																</span>

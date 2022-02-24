@@ -1173,6 +1173,7 @@ ShowAllTasks = Toutes les tâches
 ShowAllTasksDescription = Afficher toutes les tâches
 NoTaskCompletedThere = Aucune tâche en cours
 NoTaskUnCompletedThere = Aucune tâche terminée
+DeleteTaskTimeSpent = Êtes-vous sûr(e) de vouloir supprimer %s mins de temps consommés de la tâche
 
 
 
