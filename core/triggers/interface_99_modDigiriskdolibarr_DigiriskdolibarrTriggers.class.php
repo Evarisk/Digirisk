@@ -1421,6 +1421,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->datep       = $now;
 				$actioncomm->fk_element  = $object->id;
 				$actioncomm->userownerid = $user->id;
+				$actioncomm->fk_project  = $object->fk_project;
 				$actioncomm->percentage  = -1;
 
 				$actioncomm->create($user);
@@ -1441,6 +1442,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->datep       = $now;
 				$actioncomm->fk_element  = $object->id;
 				$actioncomm->userownerid = $user->id;
+				$actioncomm->fk_project  = $object->fk_project;
 				$actioncomm->percentage  = -1;
 
 				$actioncomm->create($user);
@@ -1463,6 +1465,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->datep       = $now;
 				$actioncomm->fk_element  = $object->id;
 				$actioncomm->userownerid = $user->id;
+				$actioncomm->fk_project  = $object->fk_project;
 				$actioncomm->percentage  = -1;
 
 				$actioncomm->create($user);
