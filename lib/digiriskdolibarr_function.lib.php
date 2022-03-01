@@ -542,9 +542,9 @@ function digiriskHeader($title = '', $help_url = '', $arrayofjs = array(), $arra
 	//Body navigation digirisk
 	$object = new DigiriskElement($db);
 	if ($conf->global->DIGIRISKDOLIBARR_SHOW_HIDDEN_DIGIRISKELEMENT) {
-		$objects = $object->fetchAll('',  'rank',  0,  0);
+		$objects = $object->fetchAll('',  'ranks',  0,  0);
 	} else {
-		$objects = $object->fetchAll('',  'rank',  0,  0, array('customsql' => 'status > 0'));
+		$objects = $object->fetchAll('',  'ranks',  0,  0, array('customsql' => 'status > 0'));
 	}
 
 	$results = array();

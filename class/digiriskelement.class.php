@@ -98,7 +98,7 @@ class DigiriskElement extends CommonObject
 		'fk_user_modif' => array('type' => 'integer:User:user/class/user.class.php', 'label' => 'UserModif', 'enabled' => '1', 'position' => 120, 'notnull' => -1, 'visible' => -2,),
 		'fk_parent'     => array('type' => 'integer', 'label' => 'ParentElement', 'enabled' => '1', 'position' => 130, 'notnull' => 1, 'visible' => 1, 'default' => 0,),
 		'fk_standard'   => array('type' => 'integer', 'label' => 'Standard', 'enabled' => '1', 'position' => 140, 'notnull' => 1, 'visible' => 0, 'default' => 1,),
-		'rank'          => array('type' => 'integer', 'label' => 'Order', 'enabled' => '1', 'position' => 150, 'notnull' => 1, 'visible' => 0),
+		'ranks'         => array('type' => 'integer', 'label' => 'Order', 'enabled' => '1', 'position' => 150, 'notnull' => 1, 'visible' => 0),
 	);
 
 	public $rowid;
@@ -117,7 +117,7 @@ class DigiriskElement extends CommonObject
 	public $fk_user_modif;
 	public $fk_parent;
 	public $fk_standard;
-	public $rank;
+	public $ranks;
 
 	/**
 	 * Constructor
@@ -626,7 +626,7 @@ class DigiriskElement extends CommonObject
 	 */
 	public function getTrashList()
 	{
-		$objects = $this->fetchAll('',  'rank');
+		$objects = $this->fetchAll('',  'ranks');
 		if (is_array($objects)) {
 			$recurse_tree = recurse_tree($this->id, 0, $objects);
 			$ids          = [];
