@@ -511,7 +511,9 @@ $related_tasks = $risk->get_related_tasks($risk); ?>
 																<span class="riskassessment-task-progress progress-<?php echo $related_task->progress ? $related_task->progress : 0 ?>"><?php echo $related_task->progress ? $related_task->progress . " %" : 0 . " %" ?></span>
 															</div>
 															<div class="riskassessment-task-title">
-																<input type="checkbox" id="" class="riskassessment-task-progress-checkbox<?php echo $related_task->id ?>" name="progress-checkbox" value="" <?php echo ($related_task->progress == 100) ? 'checked' : ''; ?>>
+																<span class="riskassessment-task-progress-checkbox">
+																	<input type="checkbox" id="" class="riskassessment-task-progress-checkbox<?php echo $related_task->id; echo($related_task->progress == 100) ? ' progress-checkbox-check' : ' progress-checkbox-uncheck' ?>" name="progress-checkbox" value="" <?php echo ($related_task->progress == 100) ? 'checked' : ''; ?>>
+																</span>
 																<span class="riskassessment-task-label">
 																	<?php echo $related_task->label; ?>
 																</span>
