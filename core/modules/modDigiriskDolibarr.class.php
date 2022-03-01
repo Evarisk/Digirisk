@@ -1288,7 +1288,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			$digiriskelement->ref          = $trashRef;
 			$digiriskelement->label        = $langs->trans('HiddenElements');
 			$digiriskelement->element_type = 'groupment';
-			$digiriskelement->ranks        = 0;
+			$digiriskelement->rank         = 0;
 			$digiriskelement->description  = $langs->trans('TrashGroupment');
 			$digiriskelement->status       = 0;
 			$trash_id                      = $digiriskelement->create($user);

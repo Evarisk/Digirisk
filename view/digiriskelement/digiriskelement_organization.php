@@ -104,7 +104,7 @@ if (empty($reshook)) {
 			foreach ($array_ids as $id) {
 				$digiriskelement = new DigiriskElement($db);
 				$digiriskelement->fetch((int) $id);
-				$digiriskelement->ranks     = $i + 1;
+				$digiriskelement->rank      = $i + 1;
 				$digiriskelement->fk_parent = $array_parent_ids[$i];
 
 				$digiriskelement->update($user);
@@ -138,7 +138,7 @@ llxHeader('', $title, $help_url, '', '', '', $morejs, $morecss);
 ?>
 <div id="cardContent" value="">
 <?php
-$objects = $object->fetchAll('',  'ranks',  0,  0, array('customsql' => 'status > 0'));
+$objects = $object->fetchAll('',  'rank',  0,  0, array('customsql' => 'status > 0'));
 if (is_array($objects)) {
 	$results = recurse_tree(0, 0, $objects);
 } else {
