@@ -1406,6 +1406,68 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->create($user);
 				break;
 
+			case 'TASK_TIMESPENT_CREATE' :
+
+				dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id);
+				require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
+				require_once __DIR__ . '/../../class/digiriskelement.class.php';
+				$now        = dol_now();
+				$actioncomm = new ActionComm($this->db);
+
+				$actioncomm->elementtype = 'task';
+				$actioncomm->code        = 'AC_TASK_TIMESPENT_CREATE';
+				$actioncomm->type_code   = 'AC_OTH_AUTO';
+				$actioncomm->label       = $langs->trans('TaskTimeSpentCreateTrigger');
+				$actioncomm->datep       = $now;
+				$actioncomm->fk_element  = $object->id;
+				$actioncomm->userownerid = $user->id;
+				$actioncomm->percentage  = -1;
+
+				$actioncomm->create($user);
+				break;
+
+			case 'TASK_TIMESPENT_MODIFY' :
+
+				dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id);
+				require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
+				require_once __DIR__ . '/../../class/digiriskelement.class.php';
+				$now        = dol_now();
+				$actioncomm = new ActionComm($this->db);
+
+				$actioncomm->elementtype = 'task';
+				$actioncomm->code        = 'AC_TASK_TIMESPENT_MODIFY';
+				$actioncomm->type_code   = 'AC_OTH_AUTO';
+				$actioncomm->label       = $langs->trans('TaskTimeSpentModifyTrigger');
+				$actioncomm->datep       = $now;
+				$actioncomm->fk_element  = $object->id;
+				$actioncomm->userownerid = $user->id;
+				$actioncomm->percentage  = -1;
+
+				$actioncomm->create($user);
+				break;
+
+			case 'TASK_TIMESPENT_DELETE' :
+
+				dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id);
+				require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
+				require_once __DIR__ . '/../../class/digiriskelement.class.php';
+				$now             = dol_now();
+				$actioncomm      = new ActionComm($this->db);
+				$digiriskelement = new DigiriskElement($this->db);
+				$digiriskelement->fetch($object->fk_element);
+
+				$actioncomm->elementtype = 'task';
+				$actioncomm->code        = 'AC_TASK_TIMESPENT_DELETE';
+				$actioncomm->type_code   = 'AC_OTH_AUTO';
+				$actioncomm->label       = $langs->trans('TaskTimeSpentDeleteTrigger');
+				$actioncomm->datep       = $now;
+				$actioncomm->fk_element  = $object->id;
+				$actioncomm->userownerid = $user->id;
+				$actioncomm->percentage  = -1;
+
+				$actioncomm->create($user);
+				break;
+
 			default:
 				dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id);
 				break;

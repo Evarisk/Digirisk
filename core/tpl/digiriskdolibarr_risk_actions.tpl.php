@@ -468,7 +468,7 @@ if ( ! $error && $action == 'addRiskAssessmentTaskTimeSpent' && $permissiontoadd
 	$task->timespent_duration = $duration * 60;
 	$task->timespent_fk_user  = $user->id;
 
-	$result = $task->addTimeSpent($user, true);
+	$result = $task->addTimeSpent($user, false);
 
 	if ($result > 0) {
 		// Creation task time spent OK
@@ -497,7 +497,7 @@ if ( ! $error && $action == 'saveRiskAssessmentTaskTimeSpent' && $permissiontoad
 	$task->timespent_note     = $comment;
 	$task->timespent_duration = $duration * 60;
 
-	$result = $task->updateTimeSpent($user, true);
+	$result = $task->updateTimeSpent($user, false);
 
 	if ($result > 0) {
 		// Update task time spent OK
@@ -517,7 +517,7 @@ if ( ! $error && $action == "deleteRiskAssessmentTaskTimeSpent" && $permissionto
 
 	$task->fetchTimeSpent($deleteRiskAssessmentTaskTimeSpentId);
 
-	$result = $task->delTimeSpent($user, true);
+	$result = $task->delTimeSpent($user, false);
 
 	if ($result > 0) {
 		// Delete task time spent OK

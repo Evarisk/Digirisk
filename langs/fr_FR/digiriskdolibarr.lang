@@ -1137,8 +1137,12 @@ DigiriskElementRiskSign = Signalisation
 # Tasks - Tâche
 #
 
-# Data - Donnée
+# Trigger - Déclencheur
+TaskTimeSpentCreateTrigger = Temps consommé créé
+TaskTimeSpentModifyTrigger = Temps consommé modifié
+TaskTimeSpentDeleteTrigger = Temps consommé supprimé
 
+# Data - Donnée
 ActionPlan = Plan d'action
 Task = Tâche
 TheTask = La tâche
@@ -1175,6 +1179,7 @@ NoTaskCompletedThere = Aucune tâche en cours
 NoTaskUnCompletedThere = Aucune tâche terminée
 DeleteTaskTimeSpent = Êtes-vous sûr(e) de vouloir supprimer %s mins de temps consommés de la tâche
 TaskTimeSpentEdit = Édition du temps consomé de la tâche
+
 
 
 #
