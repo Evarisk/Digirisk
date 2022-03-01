@@ -104,12 +104,12 @@ HasNotBeenDeletedM = n'a pas été supprimé
 DigiriskDolibarrArea = Bienvenue sur DigiRisk
 WarningDigiriskNotUpdated = Veuillez mettre à jour votre Digirisk en désactivant et réactivant le module en vous rendant sur :
 
-DigiriskUserGroup = Groupe d'utilisateur Digirisk
-DigiriskUserGroupDescription = Le groupe d'utilisateur Digirisk possède les permissions de consulter et modifier tous les objets relatifs à Digirisk
-DigiriskAdminUserGroup = Groupe d'administrateurs Digirisk
-DigiriskAdminUserGroupDescription = Le groupe d'administrateurs Digirisk possède toutes les permissions à Digirisk
-DigiriskAdminUserGroup = Groupe de lecteurs Digirisk
-DigiriskAdminUserGroupDescription = Le groupe de lecteurs Digirisk possède toutes les permissions de lecture, mais aucune d'écriture ni de suppression à Digirisk
+DigiriskUserGroup = Digirisk - Utilisateurs
+DigiriskUserGroupDescription = Le groupe d'utilisateur DigiRisk a les permissions de consulter et modifier les objets relatifs à DigiRisk
+DigiriskAdminUserGroup = DigiRisk - Administrateurs
+DigiriskAdminUserGroupDescription = Le groupe d'administrateur a toutes les permissions à DigiRisk et les modules nécessaires
+DigiriskReaderGroup = DigiRisk - Lecteurs
+DigiriskReaderGroupDescription = Le groupe des lecteurs a toutes les permissions de lecture seule sur DigiRisk et les modules nécessaires
 
 ContractType = Type de contrat
 Apprentice/Student = Apprenti/Elève
