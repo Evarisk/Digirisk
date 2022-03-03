@@ -1,11 +1,5 @@
-.riskassessment-tasks .riskassessment-task-container {
-  min-width: 360px;
-  border: 1px solid rgba(0,0,0,0.1);
-  background: rgba(0,0,0,0.05);
-  padding: 0.5em;
-}
-.riskassessment-task-container {
-  min-width: 360px;
+.riskassessment-tasks .riskassessment-task-container, .riskassessment-task-container {
+  min-width: 430px;
   border: 1px solid rgba(0,0,0,0.1);
   background: rgba(0,0,0,0.05);
   padding: 0.5em;
@@ -70,6 +64,7 @@
   .riskassessment-task-content .riskassessment-task-data {
     display: flex;
     flex-wrap: wrap;
+    font-size: 14px;
 
     > * {
       margin: auto 0.2em;
@@ -117,6 +112,21 @@
     }
   }
 
+  .riskassessment-task-title {
+    display: flex;
+
+    .riskassessment-task-progress-checkbox {
+      margin: auto 0;
+
+      input {
+        width: 20px;
+        height: 20px;
+      }
+    }
+    .riskassessment-task-author-label {
+    }
+  }
+
   .riskassessment-task-add {
     min-width: 40px;
     margin-left: 0.5em;
@@ -138,3 +148,38 @@
   margin: 5px;
 }
 
+
+/** Add comment in modal */
+.riskassessment-task-timespent-add-container {
+  display: flex;
+  background: rgba(0,0,0,0.1);
+  padding: 10px;
+  margin-bottom: 25px;
+
+  > * {
+    margin: auto 5px;
+  }
+  .timespent-comment {
+    flex-grow: 1;
+  }
+  .timespent-date {
+    min-width: 240px;
+  }
+  .timespent-duration {
+    max-width: 100px;
+  }
+  .timespent-add-button {
+    min-width: 30px;
+
+    .wpeo-button {
+      margin-top: 20px;
+    }
+  }
+}
+
+/** List of comments */
+.riskassessment-task-timespent-container .riskassessment-task .riskassessment-task-container {
+  background: #fff;
+  border: 0;
+
+}
