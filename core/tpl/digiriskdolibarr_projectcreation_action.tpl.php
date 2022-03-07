@@ -217,6 +217,9 @@ if ( $conf->global->DIGIRISKDOLIBARR_READERGROUP_SET == 0 ) {
 }
 
 if ( $conf->global->DIGIRISKDOLIBARR_READERGROUP_UPDATED == 0 ) {
+	require_once DOL_DOCUMENT_ROOT . '/user/class/usergroup.class.php';
+
+	$usergroup = new UserGroup($db);
 	$usergroup_id = $conf->global->DIGIRISKDOLIBARR_READERGROUP_SET;
 	if ($usergroup_id > 0) {
 		$usergroup->fetch($usergroup_id);
@@ -278,6 +281,9 @@ if ( $conf->global->DIGIRISKDOLIBARR_USERGROUP_SET == 0 ) {
 }
 
 if ( $conf->global->DIGIRISKDOLIBARR_USERGROUP_UPDATED == 0 ) {
+	require_once DOL_DOCUMENT_ROOT . '/user/class/usergroup.class.php';
+
+	$usergroup = new UserGroup($db);
 	$usergroup_id = $conf->global->DIGIRISKDOLIBARR_USERGROUP_SET;
 	if ($usergroup_id > 0) {
 		$usergroup->fetch($usergroup_id);
@@ -309,6 +315,9 @@ if ( $conf->global->DIGIRISKDOLIBARR_USERGROUP_UPDATED == 0 ) {
 }
 
 if ( $conf->global->DIGIRISKDOLIBARR_USERGROUP_UPDATED == 1 ) {
+	require_once DOL_DOCUMENT_ROOT . '/user/class/usergroup.class.php';
+
+	$usergroup = new UserGroup($db);
 	$usergroup_id = $conf->global->DIGIRISKDOLIBARR_USERGROUP_SET;
 	if ($usergroup_id > 0) {
 		$usergroup->fetch($usergroup_id);
@@ -357,6 +366,9 @@ if ( $conf->global->DIGIRISKDOLIBARR_ADMINUSERGROUP_SET == 0 ) {
 }
 
 if ( $conf->global->DIGIRISKDOLIBARR_ADMINUSERGROUP_UPDATED == 0 ) {
+	require_once DOL_DOCUMENT_ROOT . '/user/class/usergroup.class.php';
+
+	$usergroup = new UserGroup($db);
 	$usergroup_id = $conf->global->DIGIRISKDOLIBARR_ADMINUSERGROUP_SET;
 	if ($usergroup_id > 0) {
 		$usergroup->fetch($usergroup_id);
@@ -372,6 +384,9 @@ if ( $conf->global->DIGIRISKDOLIBARR_ADMINUSERGROUP_UPDATED == 0 ) {
 }
 
 if ( $conf->global->DIGIRISKDOLIBARR_ADMINUSERGROUP_UPDATED == 1 ) {
+	require_once DOL_DOCUMENT_ROOT . '/user/class/usergroup.class.php';
+
+	$usergroup = new UserGroup($db);
 	$usergroup_id = $conf->global->DIGIRISKDOLIBARR_ADMINUSERGROUP_SET;
 	if ($usergroup_id > 0) {
 		$usergroup->fetch($usergroup_id);
