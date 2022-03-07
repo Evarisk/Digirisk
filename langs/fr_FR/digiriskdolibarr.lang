@@ -1187,6 +1187,8 @@ TaskTimeSpentNotEdited = Erreur lors de l'édition de temps comsomé
 TaskTimeSpentWellDeleted = Temps comsomé supprimé
 TaskTimeSpentNotDeleted = Erreur lors de la suppression de temps comsomé
 OnTheTask = sur la tâche
+TaskTimeSpentDuration = Durée du temps comsomé
+TaskTimeSpentDurationDescription = Le temps comsomé ajouté par défaut à chaque tâche
 
 
 

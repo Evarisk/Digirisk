@@ -209,7 +209,7 @@ $related_tasks = $risk->get_related_tasks($risk); ?>
 																	</div>
 																	<div class="timespent-duration">
 																		<span class="title"><?php echo $langs->trans('Duration'); ?></span>
-																		<span class="time"><?php print '<input type="number" placeholder="minutes" class="riskassessment-task-timespent-duration" name="timespentDuration" value="">'; ?></span>
+																		<span class="time"><?php print '<input type="number" placeholder="minutes" class="riskassessment-task-timespent-duration" name="timespentDuration" value="'.$conf->global->DIGIRISKDOLIBARR_EVALUATOR_DURATION.'">'; ?></span>
 																	</div>
 																	<?php if ($permissiontoadd) : ?>
 																		<div class="timespent-add-button">

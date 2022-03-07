@@ -63,8 +63,15 @@ $backtopage = GETPOST('backtopage', 'alpha');
 
 if (($action == 'update' && ! GETPOST("cancel", 'alpha')) || ($action == 'updateedit')) {
 	$EvaluatorDuration = GETPOST('EvaluatorDuration', 'alpha');
+	$TaskTimeSpentDuration = GETPOST('TaskTimeSpentDuration', 'alpha');
 
-	dolibarr_set_const($db, "DIGIRISKDOLIBARR_EVALUATOR_DURATION", $EvaluatorDuration, 'integer', 0, '', $conf->entity);
+	if (!empty($EvaluatorDuration) || $EvaluatorDuration === '0') {
+		dolibarr_set_const($db, "DIGIRISKDOLIBARR_EVALUATOR_DURATION", $EvaluatorDuration, 'integer', 0, '', $conf->entity);
+	}
+
+	if (!empty($TaskTimeSpentDuration) || $TaskTimeSpentDuration === '0') {
+		dolibarr_set_const($db, "DIGIRISKDOLIBARR_TASK_TIMESPENT_DURATION", $TaskTimeSpentDuration, 'integer', 0, '', $conf->entity);
+	}
 
 	if ($action != 'updateedit' && ! $error) {
 		header("Location: " . $_SERVER["PHP_SELF"]);
@@ -507,6 +514,27 @@ print ajax_constantonoff('DIGIRISKDOLIBARR_SHOW_ALL_TASKS');
 print '</td>';
 print '</tr>';
 print '</table>';
+print '<hr>';
+
+print '<form method="POST" action="' . $_SERVER["PHP_SELF"] . '" name="social_form">';
+print '<input type="hidden" name="token" value="' . newToken() . '">';
+print '<input type="hidden" name="action" value="update">';
+print '<table class="noborder centpercent editmode">';
+print '<tr class="liste_titre">';
+print '<td>' . $langs->trans("Name") . '</td>';
+print '<td>' . $langs->trans("Description") . '</td>';
+print '<td>' . $langs->trans("Value") . '</td>';
+print '<td>' . $langs->trans("Action") . '</td>';
+print '</tr>';
+
+print '<tr class="oddeven"><td><label for="TaskTimeSpentDuration">' . $langs->trans("TaskTimeSpentDuration") . '</label></td>';
+print '<td>' . $langs->trans("TaskTimeSpentDurationDescription") . '</td>';
+print '<td><input type="number" name="TaskTimeSpentDuration" value="' . $conf->global->DIGIRISKDOLIBARR_TASK_TIMESPENT_DURATION . '"></td>';
+print '<td><input type="submit" class="button" name="save" value="' . $langs->trans("Save") . '">';
+print '</td></tr>';
+
+print '</table>';
+print '</form>';
 print '<hr>';
 
 // Evaluators
