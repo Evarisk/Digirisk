@@ -88,8 +88,8 @@ $related_tasks = $risk->get_related_tasks($risk); ?>
 								<div class="riskassessment-task-edit-modal">
 									<div class="wpeo-modal modal-riskassessment-task" id="risk_assessment_task_edit<?php echo $related_task->id ?>">
 										<div class="modal-container wpeo-modal-event">
-											<div class="riskassessment-task-single">
-												<div class="riskassessment-task-content">
+											<div class="riskassessment-task-single" value="<?php echo $risk->id ?>">
+												<div class="riskassessment-task-content riskassessment-task-ref-<?php echo $related_task->id ?>" value="<?php echo $related_task->ref ?>">
 													<!-- Modal-Header -->
 													<div class="modal-header">
 														<div class="riskassessment-task-data">
@@ -124,9 +124,77 @@ $related_tasks = $risk->get_related_tasks($risk); ?>
 															</span>
 															<input type="text" class="riskassessment-task-author-label riskassessment-task-label<?php echo $related_task->id ?>" name="label" value="<?php echo $related_task->label ?>">
 														</div>
-
 														<hr>
-
+														<!-- RISKASSESSMENT TASK TIME SPENT NOTICE -->
+														<div class="messageSuccessTaskTimeSpentCreate<?php echo $related_task->id ?> notice hidden">
+															<input type="hidden" class="valueForCreateTaskTimeSpent1" value="<?php echo $langs->trans('TheTaskTimeSpent') . ' ' . $langs->trans('OnTheTask') . ' ' ?>">
+															<input type="hidden" class="valueForCreateTaskTimeSpent2" value="<?php echo ' ' . $langs->trans('HasBeenCreatedM') ?>">
+															<div class="wpeo-notice notice-success riskassessment-task-timespent-create-success-notice">
+																<div class="notice-content">
+																	<div class="notice-title"><?php echo $langs->trans('TaskTimeSpentWellCreated') ?></div>
+																	<div class="notice-subtitle">
+																		<span class="text"></span>
+																	</div>
+																</div>
+																<div class="notice-close"><i class="fas fa-times"></i></div>
+															</div>
+														</div>
+														<div class="messageErrorTaskTimeSpentCreate<?php echo $related_task->id ?> notice hidden">
+															<input type="hidden" class="valueForCreateTaskTimeSpent1" value="<?php echo $langs->trans('TheTaskTimeSpent') . ' ' . $langs->trans('OnTheTask') . ' ' ?>">
+															<input type="hidden" class="valueForCreateTaskTimeSpent2" value="<?php echo ' ' . $langs->trans('HasNotBeenCreateM') ?>">
+															<div class="wpeo-notice notice-warning riskassessment-task-timespent-create-error-notice">
+																<div class="notice-content">
+																	<div class="notice-title"><?php echo $langs->trans('TaskTimeSpentNotCreated') ?></div>
+																</div>
+																<div class="notice-close"><i class="fas fa-times"></i></div>
+															</div>
+														</div>
+														<div class="messageSuccessTaskTimeSpentEdit<?php echo $related_task->id ?> notice hidden">
+															<input type="hidden" class="valueForEditTaskTimeSpent1" value="<?php echo $langs->trans('TheTaskTimeSpent') . ' ' . $langs->trans('OnTheTask') . ' ' ?>">
+															<input type="hidden" class="valueForEditTaskTimeSpent2" value="<?php echo ' ' . $langs->trans('HasBeenEditedM') ?>">
+															<div class="wpeo-notice notice-success riskassessment-task-timespent-edit-success-notice">
+																<div class="notice-content">
+																	<div class="notice-title"><?php echo $langs->trans('TaskTimeSpentWellEdited') ?></div>
+																	<div class="notice-subtitle">
+																		<span class="text"></span>
+																	</div>
+																</div>
+																<div class="notice-close"><i class="fas fa-times"></i></div>
+															</div>
+														</div>
+														<div class="messageErrorTaskTimeSpentEdit<?php echo $related_task->id ?> notice hidden">
+															<input type="hidden" class="valueForEditTaskTimeSpent1" value="<?php echo $langs->trans('TheTaskTimeSpent') . ' ' . $langs->trans('OnTheTask') . ' ' ?>">
+															<input type="hidden" class="valueForEditTaskTimeSpent2" value="<?php echo ' ' . $langs->trans('HasNotBeenEditedM') ?>">
+															<div class="wpeo-notice notice-warning riskassessment-task-timespent-edit-error-notice">
+																<div class="notice-content">
+																	<div class="notice-title"><?php echo $langs->trans('TaskTimeSpentNotEdited') ?></div>
+																</div>
+																<div class="notice-close"><i class="fas fa-times"></i></div>
+															</div>
+														</div>
+														<div class="messageSuccessTaskTimeSpentDelete<?php echo $related_task->id ?> notice hidden">
+															<input type="hidden" class="valueForDeleteTaskTimeSpent1" value="<?php echo $langs->trans('TheTaskTimeSpent') . ' ' . $langs->trans('OnTheTask') . ' ' ?>">
+															<input type="hidden" class="valueForDeleteTaskTimeSpent2" value="<?php echo ' ' . $langs->trans('HasBeenDeletedM') ?>">
+															<div class="wpeo-notice notice-success riskassessment-task-timespent-delete-success-notice">
+																<div class="notice-content">
+																	<div class="notice-title"><?php echo $langs->trans('TaskTimeSpentWellDeleted') ?></div>
+																	<div class="notice-subtitle">
+																		<span class="text"></span>
+																	</div>
+																</div>
+																<div class="notice-close"><i class="fas fa-times"></i></div>
+															</div>
+														</div>
+														<div class="messageErrorTaskTimeSpentDelete<?php echo $related_task->id ?> notice hidden">
+															<input type="hidden" class="valueForDeleteTaskTimeSpent1" value="<?php echo $langs->trans('TheTaskTimeSpent') . ' ' . $langs->trans('OnTheTask') . ' ' ?>">
+															<input type="hidden" class="valueForDeleteTaskTimeSpent2" value="<?php echo ' ' . $langs->trans('HasNotBeenDeletedM') ?>">
+															<div class="wpeo-notice notice-warning riskassessment-task-timespent-delete-error-notice">
+																<div class="notice-content">
+																	<div class="notice-title"><?php echo $langs->trans('TaskTimeSpentNotDeleted') ?></div>
+																</div>
+																<div class="notice-close"><i class="fas fa-times"></i></div>
+															</div>
+														</div>
 														<div class="riskassessment-task-timespent-container">
 															<span class="title"><?php echo $langs->trans('TimeSpent'); ?></span>
 															<div class="riskassessment-task-timespent">
@@ -496,76 +564,6 @@ $related_tasks = $risk->get_related_tasks($risk); ?>
 							<div class="wpeo-notice notice-warning riskassessment-task-delete-error-notice">
 								<div class="notice-content">
 									<div class="notice-title"><?php echo $langs->trans('TaskNotDeleted') ?></div>
-								</div>
-								<div class="notice-close"><i class="fas fa-times"></i></div>
-							</div>
-						</div>
-						<!-- RISKASSESSMENT TASK TIME SPENT NOTICE -->
-						<div class="messageSuccessTaskTimeSpentCreate notice hidden">
-							<input type="hidden" class="valueForCreateTaskTimeSpent1" value="<?php echo $langs->trans('TheTaskTimeSpent') . ' ' ?>">
-							<input type="hidden" class="valueForCreateTaskTimeSpent2" value="<?php echo ' ' . $langs->trans('HasBeenCreatedM') ?>">
-							<div class="wpeo-notice notice-success riskassessment-task-timespent-create-success-notice">
-								<div class="notice-content">
-									<div class="notice-title"><?php echo $langs->trans('TaskTimeSpentWellCreated') ?></div>
-									<div class="notice-subtitle">
-										<span class="text"></span>
-									</div>
-								</div>
-								<div class="notice-close"><i class="fas fa-times"></i></div>
-							</div>
-						</div>
-						<div class="messageErrorTaskTimeSpentCreate notice hidden">
-							<input type="hidden" class="valueForCreateTaskTimeSpent1" value="<?php echo $langs->trans('TheTaskTimeSpent') . ' ' ?>">
-							<input type="hidden" class="valueForCreateTaskTimeSpent2" value="<?php echo ' ' . $langs->trans('HasNotBeenCreateM') ?>">
-							<div class="wpeo-notice notice-warning riskassessment-task-timespent-create-error-notice">
-								<div class="notice-content">
-									<div class="notice-title"><?php echo $langs->trans('TaskTimeSpentNotCreated') ?></div>
-								</div>
-								<div class="notice-close"><i class="fas fa-times"></i></div>
-							</div>
-						</div>
-						<div class="messageSuccessTaskTimeSpentEdit notice hidden">
-							<input type="hidden" class="valueForEditTaskTimeSpent1" value="<?php echo $langs->trans('TheTaskTimeSpent') . ' ' ?>">
-							<input type="hidden" class="valueForEditTaskTimeSpent2" value="<?php echo ' ' . $langs->trans('HasBeenEditedM') ?>">
-							<div class="wpeo-notice notice-success riskassessment-task-timespent-edit-success-notice">
-								<div class="notice-content">
-									<div class="notice-title"><?php echo $langs->trans('TaskTimeSpentWellEdited') ?></div>
-									<div class="notice-subtitle">
-										<span class="text"></span>
-									</div>
-								</div>
-								<div class="notice-close"><i class="fas fa-times"></i></div>
-							</div>
-						</div>
-						<div class="messageErrorTaskTimeSpentEdit notice hidden">
-							<input type="hidden" class="valueForEditTaskTimeSpent1" value="<?php echo $langs->trans('TheTaskTimeSpent') . ' ' ?>">
-							<input type="hidden" class="valueForEditTaskTimeSpent2" value="<?php echo ' ' . $langs->trans('HasNotBeenEditedM') ?>">
-							<div class="wpeo-notice notice-warning riskassessment-task-timespent-edit-error-notice">
-								<div class="notice-content">
-									<div class="notice-title"><?php echo $langs->trans('TaskTimeSpentNotEdited') ?></div>
-								</div>
-								<div class="notice-close"><i class="fas fa-times"></i></div>
-							</div>
-						</div>
-						<div class="messageSuccessTaskTimeSpentDelete notice hidden">
-							<input type="hidden" class="valueForDeleteTaskTimeSpent1" value="<?php echo $langs->trans('TheTaskTimeSpent') . ' ' ?>">
-							<input type="hidden" class="valueForDeleteTaskTimeSpent2" value="<?php echo ' ' . $langs->trans('HasBeenDeletedM') ?>">
-							<div class="wpeo-notice notice-success riskassessment-task-timespent-delete-success-notice">
-								<div class="notice-content">
-									<div class="notice-title"><?php echo $langs->trans('TaskTimeSpentWellDeleted') ?></div>
-									<div class="notice-subtitle">
-										<span class="text"></span>
-									</div>
-								</div>
-								<div class="notice-close"><i class="fas fa-times"></i></div>
-							</div>
-						</div>
-						<div class="messageErrorTaskTimeSpentDelete notice hidden">
-							<input type="hidden" class="valueForDeleteTaskTimeSpent1" value="<?php echo $langs->trans('TheTaskTimeSpent') . ' ' ?>">
-							<input type="hidden" class="valueForDeleteTaskTimeSpent2" value="<?php echo ' ' . $langs->trans('HasNotBeenDeletedM') ?>">
-							<div class="wpeo-notice notice-warning riskassessment-task-timespent-delete-error-notice">
-								<div class="notice-content">
-									<div class="notice-title"><?php echo $langs->trans('TaskTimeSpentNotDeleted') ?></div>
 								</div>
 								<div class="notice-close"><i class="fas fa-times"></i></div>
 							</div>

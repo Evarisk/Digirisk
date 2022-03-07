@@ -1179,6 +1179,14 @@ NoTaskCompletedThere = Aucune tâche en cours
 NoTaskUnCompletedThere = Aucune tâche terminée
 DeleteTaskTimeSpent = Êtes-vous sûr(e) de vouloir supprimer %s mins de temps consommés de la tâche
 TaskTimeSpentEdit = Édition du temps consomé de la tâche
+TheTaskTimeSpent = Le temps comsomé
+TaskTimeSpentWellCreated = Temps comsomé créé
+TaskTimeSpentNotCreated = Erreur lors de la création de temps comsomé
+TaskTimeSpentWellEdited = Temps comsomé édité
+TaskTimeSpentNotEdited = Erreur lors de l'édition de temps comsomé
+TaskTimeSpentWellDeleted = Temps comsomé supprimé
+TaskTimeSpentNotDeleted = Erreur lors de la suppression de temps comsomé
+OnTheTask = sur la tâche
 
 
 
