@@ -216,6 +216,17 @@ if ( $conf->global->DIGIRISKDOLIBARR_READERGROUP_SET == 0 ) {
 	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_READERGROUP_SET', $usergroup_id, 'integer', 0, '', $conf->entity);
 }
 
+if ( $conf->global->DIGIRISKDOLIBARR_READERGROUP_UPDATED == 0 ) {
+	$usergroup_id = $conf->global->DIGIRISKDOLIBARR_READERGROUP_SET;
+	if ($usergroup_id > 0) {
+		$usergroup->fetch($usergroup_id);
+		$usergroup->name = $conf->global->MAIN_INFO_SOCIETE_NOM . ' - ' . $langs->trans('DigiriskReaderGroup');
+		$usergroup->note = $langs->trans('DigiriskReaderGroupDescription');
+		$usergroup->update($user);
+	}
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_READERGROUP_UPDATED', 1, 'integer', 0, '', $conf->entity);
+}
+
 if ( $conf->global->DIGIRISKDOLIBARR_USERGROUP_SET == 0 ) {
 	require_once DOL_DOCUMENT_ROOT . '/user/class/usergroup.class.php';
 
@@ -297,6 +308,17 @@ if ( $conf->global->DIGIRISKDOLIBARR_USERGROUP_UPDATED == 0 ) {
 	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_USERGROUP_UPDATED', 1, 'integer', 0, '', $conf->entity);
 }
 
+if ( $conf->global->DIGIRISKDOLIBARR_USERGROUP_UPDATED == 1 ) {
+	$usergroup_id = $conf->global->DIGIRISKDOLIBARR_USERGROUP_SET;
+	if ($usergroup_id > 0) {
+		$usergroup->fetch($usergroup_id);
+		$usergroup->name = $conf->global->MAIN_INFO_SOCIETE_NOM . ' - ' . $langs->trans('DigiriskReaderGroup');
+		$usergroup->note = $langs->trans('DigiriskReaderGroupDescription');
+		$usergroup->update($user);
+	}
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_USERGROUP_UPDATED', 2, 'integer', 0, '', $conf->entity);
+}
+
 if ( $conf->global->DIGIRISKDOLIBARR_ADMINUSERGROUP_SET == 0 ) {
 	require_once DOL_DOCUMENT_ROOT . '/user/class/usergroup.class.php';
 
@@ -347,6 +369,17 @@ if ( $conf->global->DIGIRISKDOLIBARR_ADMINUSERGROUP_UPDATED == 0 ) {
 	}
 
 	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_ADMINUSERGROUP_UPDATED', 1, 'integer', 0, '', $conf->entity);
+}
+
+if ( $conf->global->DIGIRISKDOLIBARR_ADMINUSERGROUP_UPDATED == 1 ) {
+	$usergroup_id = $conf->global->DIGIRISKDOLIBARR_ADMINUSERGROUP_SET;
+	if ($usergroup_id > 0) {
+		$usergroup->fetch($usergroup_id);
+		$usergroup->name = $conf->global->MAIN_INFO_SOCIETE_NOM . ' - ' . $langs->trans('DigiriskAdminUserGroup');
+		$usergroup->note = $langs->trans('DigiriskAdminUserGroupDescription');
+		$usergroup->update($user);
+	}
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_ADMINUSERGROUP_UPDATED', 2, 'integer', 0, '', $conf->entity);
 }
 
 if ($conf->global->DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH_UPDATED == 0) {
