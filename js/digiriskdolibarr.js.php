@@ -2564,6 +2564,9 @@ window.eoxiaJS.riskassessmenttask.createRiskAssessmentTaskTimeSpent = function (
 			textToShow += taskRef
 			textToShow += actionContainerSuccess.find('.valueForCreateTaskTimeSpent2').val()
 
+			$('#risk_assessment_task_edit'+taskID).first().find('.riskassessment-task-timespent-container').first().append($(resp).find('#risk_assessment_task_edit'+taskID).first().find('.riskassessment-task-timespent-list-content').last())
+			$('.wpeo-loader').removeClass('wpeo-loader')
+
 			actionContainerSuccess.find('.notice-subtitle .text').text(textToShow)
 			actionContainerSuccess.removeClass('hidden');
 		},
