@@ -201,7 +201,7 @@ $related_tasks = $risk->get_related_tasks($risk); ?>
 																<div class="riskassessment-task-timespent-add-container">
 																	<div class="timespent-date">
 																		<span class="title"><?php echo $langs->trans('Date'); ?></span>
-																		<?php print $form->selectDate(dol_now(), 'RiskassessmentTaskTimespentDate', 1, 1, 0, 'riskassessment_task_timespent_form', 1, 0); ?>
+																		<?php print $form->selectDate(dol_now('tzuser'), 'RiskassessmentTaskTimespentDate', 1, 1, 0, 'riskassessment_task_timespent_form', 1, 0); ?>
 																	</div>
 																	<div class="timespent-comment">
 																	<span class="title"><?php echo $langs->trans('Comment'); ?></span>
@@ -236,7 +236,7 @@ $related_tasks = $risk->get_related_tasks($risk); ?>
 																									<?php echo getNomUrl(0, '', 0, 0, 2, 0, '', '', -1, $user); ?>
 																								</span>
 																										<span class="riskassessment-task-timespent-date">
-																									<i class="fas fa-calendar-alt"></i> <?php echo dol_print_date($time_spent->timespent_date, 'dayhour'); ?>
+																									<i class="fas fa-calendar-alt"></i> <?php echo dol_print_date($time_spent->timespent_datehour, 'dayhour'); ?>
 																								</span>
 																										<span class="riskassessment-task-timespent">
 																									<i class="fas fa-clock"></i> <?php echo $time_spent->timespent_duration/60 . ' mins'; ?>
@@ -283,7 +283,7 @@ $related_tasks = $risk->get_related_tasks($risk); ?>
 																										<div class="riskassessment-task-timespent">
 																											<span class="title"><?php echo $langs->trans('TimeSpent'); ?></span>
 																											<span class="title"><?php echo $langs->trans('Date'); ?></span>
-																											<?php print $form->selectDate($time_spent->timespent_date, 'RiskassessmentTaskTimespentDate', 1, 1, 0, 'riskassessment_task_timespent_form', 1, 0); ?>
+																											<?php print $form->selectDate($time_spent->timespent_datehour, 'RiskassessmentTaskTimespentDate', 1, 1, 0, 'riskassessment_task_timespent_form', 1, 0); ?>
 																											<span class="title"><?php echo $langs->trans('Comment'); ?> <input type="text" class="riskassessment-task-timespent-comment" name="comment" value="<?php echo $time_spent->timespent_note; ?>"></span>
 																											<span class="title"><?php echo $langs->trans('Duration'); ?></span>
 																											<span class="time"><?php print '<input type="number" placeholder="minutes" class="riskassessment-task-timespent-duration" name="timespentDuration" value="'.($time_spent->timespent_duration/60).'">'; ?></span>

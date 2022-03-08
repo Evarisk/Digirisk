@@ -2309,6 +2309,8 @@ window.eoxiaJS.riskassessmenttask.event = function() {
 	$( document ).on( 'click', '.riskassessment-task-timespent-save', window.eoxiaJS.riskassessmenttask.saveRiskAssessmentTaskTimeSpent);
 	$( document ).on( 'click', '.riskassessment-task-timespent-delete', window.eoxiaJS.riskassessmenttask.deleteRiskAssessmentTaskTimeSpent );
 	$( document ).on( 'click', '.riskassessment-task-progress-checkbox', window.eoxiaJS.riskassessmenttask.checkTaskProgress );
+	$( document ).on( 'change', '#RiskassessmentTaskTimespentDatehour', window.eoxiaJS.riskassessmenttask.selectRiskassessmentTaskTimespentDateHour );
+	$( document ).on( 'change', '#RiskassessmentTaskTimespentDatemin', window.eoxiaJS.riskassessmenttask.selectRiskassessmentTaskTimespentDateMin );
 };
 
 /**
@@ -2535,6 +2537,8 @@ window.eoxiaJS.riskassessmenttask.createRiskAssessmentTaskTimeSpent = function (
 	let taskRef    =  element.find('.riskassessment-task-ref-'+taskID).attr('value');
 
 	let date     = single.find('#RiskassessmentTaskTimespentDate').val();
+	let hour     = single.find('#RiskassessmentTaskTimespentDatehour').val();
+	let min      = single.find('#RiskassessmentTaskTimespentDatemin').val();
 	let comment  = single.find('.riskassessment-task-timespent-comment').val()
 	comment      = window.eoxiaJS.risk.sanitizeBeforeRequest(comment)
 	let duration = single.find('.riskassessment-task-timespent-duration').val()
@@ -2548,6 +2552,8 @@ window.eoxiaJS.riskassessmenttask.createRiskAssessmentTaskTimeSpent = function (
 		data: JSON.stringify({
 			taskID: taskID,
 			date: date,
+			hour: hour,
+			min: min,
 			comment: comment,
 			duration: duration,
 		}),
@@ -2649,16 +2655,18 @@ window.eoxiaJS.riskassessmenttask.deleteRiskAssessmentTaskTimeSpent = function (
  */
 window.eoxiaJS.riskassessmenttask.saveRiskAssessmentTaskTimeSpent = function ( event ) {
 	let riskAssessmentTaskTimeSpentID = $(this).attr('value');
-	let element = $(this).closest('.riskassessment-task-timespent-edit-modal');
-	let single = element.find('.riskassessment-task-timespent-container');
-	let riskId = $(this).closest('.riskassessment-tasks').attr('value')
-	let taskID = single.attr('value');
+	let element    = $(this).closest('.riskassessment-task-timespent-edit-modal');
+	let single     = element.find('.riskassessment-task-timespent-container');
+	let riskId     = $(this).closest('.riskassessment-tasks').attr('value')
+	let taskID     = single.attr('value');
 	let textToShow = '';
 	let taskRef    =  element.closest('.riskassessment-task').find('.riskassessment-task-ref-'+taskID).attr('value');
 
-	let date = single.find('#RiskassessmentTaskTimespentDate').val();
-	let comment = single.find('.riskassessment-task-timespent-comment').val()
-	comment = window.eoxiaJS.risk.sanitizeBeforeRequest(comment)
+	let date     = single.find('#RiskassessmentTaskTimespentDate').val();
+	let hour     = single.find('#RiskassessmentTaskTimespentDatehour').val();
+	let min      = single.find('#RiskassessmentTaskTimespentDatemin').val();
+	let comment  = single.find('.riskassessment-task-timespent-comment').val()
+	comment      = window.eoxiaJS.risk.sanitizeBeforeRequest(comment)
 	let duration = single.find('.riskassessment-task-timespent-duration').val()
 
 	window.eoxiaJS.loader.display($(this));
@@ -2669,6 +2677,8 @@ window.eoxiaJS.riskassessmenttask.saveRiskAssessmentTaskTimeSpent = function ( e
 		data: JSON.stringify({
 			riskAssessmentTaskTimeSpentID: riskAssessmentTaskTimeSpentID,
 			date: date,
+			hour: hour,
+			min: min,
 			comment: comment,
 			duration: duration,
 		}),
@@ -2763,6 +2773,34 @@ window.eoxiaJS.riskassessmenttask.checkTaskProgress = function ( event ) {
 			actionContainerError.removeClass('hidden');
 		}
 	});
+};
+
+/**
+ * Select riskAssessmentTask TimeSpent date hour.
+ *
+ * @since   1.0.0
+ * @version 1.0.0
+ *
+ * @param  elementParent --- Parent element
+ * @return {void}
+ */
+window.eoxiaJS.riskassessmenttask.selectRiskassessmentTaskTimespentDateHour = function( event ) {
+	$(this).closest('.nowraponall').find('.select-riskassessmenttask-timespent-datehour').remove();
+	$(this).before('<input class="select-riskassessmenttask-timespent-datehour" type="hidden" id="RiskassessmentTaskTimespentDatehour" name="RiskassessmentTaskTimespentDatehour" value='+$(this).val()+'>')
+};
+
+/**
+ * Select riskAssessmentTask TimeSpent date min.
+ *
+ * @since   1.0.0
+ * @version 1.0.0
+ *
+ * @param  elementParent --- Parent element
+ * @return {void}
+ */
+window.eoxiaJS.riskassessmenttask.selectRiskassessmentTaskTimespentDateMin = function( event ) {
+	$(this).closest('.nowraponall').find('.select-riskassessmenttask-timespent-datemin').remove();
+	$(this).before('<input class="select-riskassessmenttask-timespent-datemin" type="hidden" id="RiskassessmentTaskTimespentDatemin" name="RiskassessmentTaskTimespentDatemin" value='+$(this).val()+'>')
 };
 
 /**

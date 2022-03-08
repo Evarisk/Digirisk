@@ -458,12 +458,16 @@ if ( ! $error && $action == 'addRiskAssessmentTaskTimeSpent' && $permissiontoadd
 
 	$taskID   = $data['taskID'];
 	$date     = $data['date'];
+	$hour     = $data['hour'];
+	$min      = $data['min'];
 	$comment  = $data['comment'];
 	$duration = $data['duration'];
 
 	$task->fetch($taskID);
 
 	$task->timespent_date     = strtotime(preg_replace('/\//', '-', $date));
+	$task->timespent_date     = dol_time_plus_duree($task->timespent_date, $hour, 'h');
+	$task->timespent_date     = dol_time_plus_duree($task->timespent_date, $min, 'i');
 	$task->timespent_note     = $comment;
 	$task->timespent_duration = $duration * 60;
 	$task->timespent_fk_user  = $user->id;
@@ -488,13 +492,17 @@ if ( ! $error && $action == 'saveRiskAssessmentTaskTimeSpent' && $permissiontoad
 
 	$riskAssessmentTaskTimeSpentID = $data['riskAssessmentTaskTimeSpentID'];
 	$date                          = $data['date'];
+	$hour                          = $data['hour'];
+	$min                           = $data['min'];
 	$comment                       = $data['comment'];
 	$duration                      = $data['duration'];
 
 	$task->fetchTimeSpent($riskAssessmentTaskTimeSpentID);
 
-	$task->timespent_date     = strtotime(preg_replace('/\//', '-', $date));
-	$task->timespent_note     = $comment;
+	$task->timespent_datehour = strtotime(preg_replace('/\//', '-', $date));
+	$task->timespent_datehour = dol_time_plus_duree($task->timespent_datehour,  $hour, 'h');
+	$task->timespent_datehour = dol_time_plus_duree($task->timespent_datehour, $min, 'i');
+	$task->timespent_note     =  $comment;
 	$task->timespent_duration = $duration * 60;
 
 	$result = $task->updateTimeSpent($user, false);
