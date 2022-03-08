@@ -88,6 +88,9 @@
 .wpeo-modal textarea:focus {
   border: 1px solid rgba(0, 0, 0, 0.6);
 }
+.wpeo-modal select {
+  padding: 1em 0;
+}
 
 .form-label-required::after {
   display: inline-block;
@@ -3417,7 +3420,7 @@
   flex-grow: 1;
 }
 .riskassessment-task-timespent-add-container .timespent-date {
-  min-width: 240px;
+  min-width: 250px;
 }
 .riskassessment-task-timespent-add-container .timespent-duration {
   max-width: 100px;
@@ -3796,6 +3799,9 @@ td > .risk-evaluation-container {
   font-weight: 600;
   margin-bottom: 0.6em;
   display: block;
+}
+.wpeo-modal[class*=modal-riskassessment-task] .modal-container .riskassessment-task-single {
+  display: block !important;
 }
 
 .wpeo-modal[class*=modal-riskassessment-task] .modal-container .riskassessment-task-container {
