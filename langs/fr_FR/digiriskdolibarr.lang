@@ -1177,18 +1177,18 @@ ShowAllTasks = Toutes les tâches
 ShowAllTasksDescription = Afficher toutes les tâches
 NoTaskCompletedThere = Aucune tâche en cours
 NoTaskUnCompletedThere = Aucune tâche terminée
-DeleteTaskTimeSpent = Êtes-vous sûr(e) de vouloir supprimer %s mins de temps consommés de la tâche
-TaskTimeSpentEdit = Édition du temps consomé de la tâche
-TheTaskTimeSpent = Le temps comsomé
-TaskTimeSpentWellCreated = Temps comsomé créé
-TaskTimeSpentNotCreated = Erreur lors de la création de temps comsomé
-TaskTimeSpentWellEdited = Temps comsomé édité
-TaskTimeSpentNotEdited = Erreur lors de l'édition de temps comsomé
-TaskTimeSpentWellDeleted = Temps comsomé supprimé
-TaskTimeSpentNotDeleted = Erreur lors de la suppression de temps comsomé
+DeleteTaskTimeSpent = Êtes-vous sûr(e) de vouloir supprimer %s mins de temps consommé de la tâche
+TaskTimeSpentEdit = Édition du temps consommé de la tâche
+TheTaskTimeSpent = Le temps consommé
+TaskTimeSpentWellCreated = Temps consommé créé
+TaskTimeSpentNotCreated = Erreur lors de la création de temps consommé
+TaskTimeSpentWellEdited = Temps consommé édité
+TaskTimeSpentNotEdited = Erreur lors de l'édition de temps consommé
+TaskTimeSpentWellDeleted = Temps consommé supprimé
+TaskTimeSpentNotDeleted = Erreur lors de la suppression de temps consommé
 OnTheTask = sur la tâche
-TaskTimeSpentDuration = Durée du temps comsomé
-TaskTimeSpentDurationDescription = Le temps comsomé ajouté par défaut à chaque tâche
+TaskTimeSpentDuration = Durée du temps consommé
+TaskTimeSpentDurationDescription = Le temps consommé ajouté par défaut à chaque tâche
 
 
 
