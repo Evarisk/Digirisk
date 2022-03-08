@@ -279,7 +279,7 @@ $related_tasks = $risk->get_related_tasks($risk); ?>
 																								</div>
 																								<!-- Modal EDIT RISK ASSESSMENT TASK Content-->
 																								<div class="modal-content" id="#modalContent<?php echo $time_spent->timespent_id ?>">
-																									<div class="riskassessment-task-timespent-container">
+																									<div class="riskassessment-task-timespent-container" value="<?php echo $related_task->id; ?>">
 																										<div class="riskassessment-task-timespent">
 																											<span class="title"><?php echo $langs->trans('TimeSpent'); ?></span>
 																											<span class="title"><?php echo $langs->trans('Date'); ?></span>
