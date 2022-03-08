@@ -201,7 +201,7 @@ $related_tasks = $risk->get_related_tasks($risk); ?>
 																<div class="riskassessment-task-timespent-add-container">
 																	<div class="timespent-date">
 																		<span class="title"><?php echo $langs->trans('Date'); ?></span>
-																		<?php print $form->selectDate('', 'RiskassessmentTaskTimespentDate', 1, 1, 0, 'riskassessment_task_timespent_form', 1, 0); ?>
+																		<?php print $form->selectDate(dol_now(), 'RiskassessmentTaskTimespentDate', 1, 1, 0, 'riskassessment_task_timespent_form', 1, 0); ?>
 																	</div>
 																	<div class="timespent-comment">
 																	<span class="title"><?php echo $langs->trans('Comment'); ?></span>
