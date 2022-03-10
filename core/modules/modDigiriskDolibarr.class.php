@@ -764,12 +764,12 @@ class modDigiriskdolibarr extends DolibarrModules
 		$this->rights[$r][0] = $this->numero . $r;
 		$this->rights[$r][1] = $langs->trans('LireDigirisk');
 		$this->rights[$r][4] = 'lire';
-		$this->rights[$r][5] = 1;
+		//$this->rights[$r][5] = 1;
 		$r++;
 		$this->rights[$r][0] = $this->numero . $r;
 		$this->rights[$r][1] = $langs->trans('ReadDigirisk');
 		$this->rights[$r][4] = 'read';
-		$this->rights[$r][5] = 1;
+		//$this->rights[$r][5] = 1;
 		$r++;
 
 		/* RISK ASSESSMENT DOCUMENT PERMISSIONS */
