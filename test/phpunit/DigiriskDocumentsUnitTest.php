@@ -313,8 +313,6 @@ class DigiriskDocumentsUnitTest extends PHPUnit\Framework\TestCase
 //
 //		$newobject = new DigiriskDocuments($this->savdb);
 //		$result = $newobject->DigiriskFillJSON($localobject);
-//		echo '<pre>'; print_r( $result ); echo '</pre>'; exit;
-//
 //
 //		$this->assertSame(true, is_string($result));
 //		print __METHOD__ . " ok";

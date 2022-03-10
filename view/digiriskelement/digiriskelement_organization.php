@@ -99,7 +99,6 @@ if (empty($reshook)) {
 		$array_ids        = preg_split('/,/', $ids);
 		$array_parent_ids = preg_split('/,/', $parent_ids);
 		$i                = 0;
-		echo '<pre>'; print_r( $array_ids ); echo '</pre>'; exit;
 
 		if ( ! empty($array_ids) && $array_ids > 0) {
 			foreach ($array_ids as $id) {

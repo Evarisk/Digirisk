@@ -104,12 +104,12 @@ HasNotBeenDeletedM = n'a pas été supprimé
 DigiriskDolibarrArea = Bienvenue sur DigiRisk
 WarningDigiriskNotUpdated = Veuillez mettre à jour votre Digirisk en désactivant et réactivant le module en vous rendant sur :
 
-DigiriskUserGroup = Groupe d'utilisateur Digirisk
-DigiriskUserGroupDescription = Le groupe d'utilisateur Digirisk possède les permissions de consulter et modifier tous les objets relatifs à Digirisk
-DigiriskAdminUserGroup = Groupe d'administrateurs Digirisk
-DigiriskAdminUserGroupDescription = Le groupe d'administrateurs Digirisk possède toutes les permissions à Digirisk
-DigiriskAdminUserGroup = Groupe de lecteurs Digirisk
-DigiriskAdminUserGroupDescription = Le groupe de lecteurs Digirisk possède toutes les permissions de lecture, mais aucune d'écriture ni de suppression à Digirisk
+DigiriskUserGroup = Digirisk - Utilisateurs
+DigiriskUserGroupDescription = Le groupe d'utilisateur DigiRisk a les permissions de consulter et modifier les objets relatifs à DigiRisk
+DigiriskAdminUserGroup = DigiRisk - Administrateurs
+DigiriskAdminUserGroupDescription = Le groupe d'administrateur a toutes les permissions à DigiRisk et les modules nécessaires
+DigiriskReaderGroup = DigiRisk - Lecteurs
+DigiriskReaderGroupDescription = Le groupe des lecteurs a toutes les permissions de lecture seule sur DigiRisk et les modules nécessaires
 
 ContractType = Type de contrat
 Apprentice/Student = Apprenti/Elève
@@ -1137,8 +1137,12 @@ DigiriskElementRiskSign = Signalisation
 # Tasks - Tâche
 #
 
-# Data - Donnée
+# Trigger - Déclencheur
+TaskTimeSpentCreateTrigger = Temps consommé créé
+TaskTimeSpentModifyTrigger = Temps consommé modifié
+TaskTimeSpentDeleteTrigger = Temps consommé supprimé
 
+# Data - Donnée
 ActionPlan = Plan d'action
 Task = Tâche
 TheTask = La tâche
@@ -1173,6 +1177,18 @@ ShowAllTasks = Toutes les tâches
 ShowAllTasksDescription = Afficher toutes les tâches
 NoTaskCompletedThere = Aucune tâche en cours
 NoTaskUnCompletedThere = Aucune tâche terminée
+DeleteTaskTimeSpent = Êtes-vous sûr(e) de vouloir supprimer %s mins de temps consommé de la tâche
+TaskTimeSpentEdit = Édition du temps consommé de la tâche
+TheTaskTimeSpent = Le temps consommé
+TaskTimeSpentWellCreated = Temps consommé créé
+TaskTimeSpentNotCreated = Erreur lors de la création de temps consommé
+TaskTimeSpentWellEdited = Temps consommé édité
+TaskTimeSpentNotEdited = Erreur lors de l'édition de temps consommé
+TaskTimeSpentWellDeleted = Temps consommé supprimé
+TaskTimeSpentNotDeleted = Erreur lors de la suppression de temps consommé
+OnTheTask = sur la tâche
+TaskTimeSpentDuration = Durée du temps consommé
+TaskTimeSpentDurationDescription = Le temps consommé ajouté par défaut à chaque tâche
 
 
 

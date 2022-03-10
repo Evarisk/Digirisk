@@ -340,8 +340,12 @@ class doc_workunitdocument_odt extends ModeleODTWorkUnitDocument
 
 			$filearray = dol_dir_list($conf->digiriskdolibarr->multidir_output[$conf->entity] . '/' . $digiriskelement->element_type . '/' . $digiriskelement->ref . '/thumbs/', "files", 0, '', '(\.odt|_preview.*\.png)$', 'position_name', 'desc', 1);
 			if (count($filearray)) {
-				$image                    = array_shift($filearray);
-				$tmparray['photoDefault'] = $image['fullname'];
+				if (!empty($digiriskelement->photo)) {
+					$file_small               = preg_split('/\./', $digiriskelement->photo);
+					$new_file                 = $file_small[0] . '_small.' . $file_small[1];
+					$image                    = $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/' . $digiriskelement->element_type . '/' . $digiriskelement->ref . '/thumbs/' . $new_file;
+					$tmparray['photoDefault'] = $image;
+				}
 			} else {
 				$nophoto                  = '/public/theme/common/nophoto.png';
 				$tmparray['photoDefault'] = DOL_DOCUMENT_ROOT . $nophoto;

@@ -88,6 +88,9 @@
 .wpeo-modal textarea:focus {
   border: 1px solid rgba(0, 0, 0, 0.6);
 }
+.wpeo-modal select {
+  padding: 1em 0;
+}
 
 .form-label-required::after {
   display: inline-block;
@@ -2859,15 +2862,8 @@
   margin-left: 0.5em;
 }
 
-.riskassessment-tasks .riskassessment-task-container {
-  min-width: 360px;
-  border: 1px solid rgba(0, 0, 0, 0.1);
-  background: rgba(0, 0, 0, 0.05);
-  padding: 0.5em;
-}
-
-.riskassessment-task-container {
-  min-width: 360px;
+.riskassessment-tasks .riskassessment-task-container, .riskassessment-task-container {
+  min-width: 430px;
   border: 1px solid rgba(0, 0, 0, 0.1);
   background: rgba(0, 0, 0, 0.05);
   padding: 0.5em;
@@ -2943,6 +2939,7 @@
   display: flex;
   -ms-flex-wrap: wrap;
   flex-wrap: wrap;
+  font-size: 14px;
 }
 .riskassessment-task-container .riskassessment-task-single .riskassessment-task-content .riskassessment-task-data > * {
   margin: auto 0.2em;
@@ -3373,6 +3370,18 @@
   background: #47e58e;
   color: #fff;
 }
+.riskassessment-task-container .riskassessment-task-single .riskassessment-task-title {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+}
+.riskassessment-task-container .riskassessment-task-single .riskassessment-task-title .riskassessment-task-progress-checkbox {
+  margin: auto 0;
+}
+.riskassessment-task-container .riskassessment-task-single .riskassessment-task-title .riskassessment-task-progress-checkbox input {
+  width: 20px;
+  height: 20px;
+}
 .riskassessment-task-container .riskassessment-task-single .riskassessment-task-add {
   min-width: 40px;
   margin-left: 0.5em;
@@ -3391,6 +3400,42 @@
 
 .riskassessment-task-list {
   margin: 5px;
+}
+
+/** Add comment in modal */
+.riskassessment-task-timespent-add-container {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  background: rgba(0, 0, 0, 0.1);
+  padding: 10px;
+  margin-bottom: 25px;
+}
+.riskassessment-task-timespent-add-container > * {
+  margin: auto 5px;
+}
+.riskassessment-task-timespent-add-container .timespent-comment {
+  -webkit-box-flex: 1;
+  -ms-flex-positive: 1;
+  flex-grow: 1;
+}
+.riskassessment-task-timespent-add-container .timespent-date {
+  min-width: 250px;
+}
+.riskassessment-task-timespent-add-container .timespent-duration {
+  max-width: 100px;
+}
+.riskassessment-task-timespent-add-container .timespent-add-button {
+  min-width: 30px;
+}
+.riskassessment-task-timespent-add-container .timespent-add-button .wpeo-button {
+  margin-top: 20px;
+}
+
+/** List of comments */
+.riskassessment-task-timespent-container .riskassessment-task .riskassessment-task-container {
+  background: #fff;
+  border: 0;
 }
 
 td > .risk-evaluation-container {
@@ -3754,6 +3799,9 @@ td > .risk-evaluation-container {
   font-weight: 600;
   margin-bottom: 0.6em;
   display: block;
+}
+.wpeo-modal[class*=modal-riskassessment-task] .modal-container .riskassessment-task-single {
+  display: block !important;
 }
 
 .wpeo-modal[class*=modal-riskassessment-task] .modal-container .riskassessment-task-container {

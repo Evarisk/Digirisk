@@ -375,7 +375,7 @@ class modDigiriskdolibarr extends DolibarrModules
 		$this->descriptionlong = "Digirisk";
 		$this->editor_name     = 'Evarisk';
 		$this->editor_url      = 'https://evarisk.com';
-		$this->version         = '9.0.1';
+		$this->version         = '9.1.0';
 		$this->const_name      = 'MAIN_MODULE_' . strtoupper($this->name);
 		$this->picto           = 'digiriskdolibarr@digiriskdolibarr';
 
@@ -610,6 +610,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			311 => array('DIGIRISKDOLIBARR_SHOW_TASK_END_DATE','integer', 0,'', $conf->entity),
 			312 => array('DIGIRISKDOLIBARR_SHOW_TASK_PROGRESS','integer', 1,'', $conf->entity),
 			313 => array('DIGIRISKDOLIBARR_SHOW_ALL_TASKS','integer', 1,'', $conf->entity),
+			314 => array('DIGIRISKDOLIBARR_TASK_TIMESPENT_DURATION','integer', 15,'', $conf->entity),
 
 			// CONST PREVENTION PLAN LINE
 			180 => array('MAIN_AGENDA_ACTIONAUTO_PREVENTIONPLANDET_CREATE','chaine',1,'', $conf->entity),
@@ -763,12 +764,12 @@ class modDigiriskdolibarr extends DolibarrModules
 		$this->rights[$r][0] = $this->numero . $r;
 		$this->rights[$r][1] = $langs->trans('LireDigirisk');
 		$this->rights[$r][4] = 'lire';
-		$this->rights[$r][5] = 1;
+		//$this->rights[$r][5] = 1;
 		$r++;
 		$this->rights[$r][0] = $this->numero . $r;
 		$this->rights[$r][1] = $langs->trans('ReadDigirisk');
 		$this->rights[$r][4] = 'read';
-		$this->rights[$r][5] = 1;
+		//$this->rights[$r][5] = 1;
 		$r++;
 
 		/* RISK ASSESSMENT DOCUMENT PERMISSIONS */
