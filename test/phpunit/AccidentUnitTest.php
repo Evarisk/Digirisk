@@ -24,7 +24,22 @@
 
 global $conf, $user, $langs, $db;
 
-require_once __DIR__ . '/../../../../../htdocs/master.inc.php';
+// Load Dolibarr environment
+$res = 0;
+// Try main.inc.php using relative path
+if (!$res && file_exists("../../../htdocs/master.inc.php")) {
+	$res = require_once dirname(__FILE__).'/../../../htdocs/master.inc.php';
+}
+if (!$res && file_exists("../../../../htdocs/master.inc.php")) {
+	$res = require_once dirname(__FILE__).'/../../../../htdocs/master.inc.php';
+}
+if (!$res && file_exists("../../../../../htdocs/master.inc.php")) {
+	$res = require_once dirname(__FILE__).'/../../../../../htdocs/master.inc.php';;
+}
+if (!$res) {
+	die("Include of main fails");
+}
+
 require_once __DIR__ . '/../../class/accident.class.php';
 
 if (empty($user->id)) {
@@ -252,7 +267,7 @@ class AccidentUnitTest extends PHPUnit\Framework\TestCase
 		//$localobject->ref             = $refAccidentMod->getNextValue($localobject);
 		$localobject->ref               = "UpdatedTestRefAccident";
 		$localobject->ref_ext           = "UpdatedTestRefExtAccident";
-		$localobject->entity            = 1;
+		//$localobject->entity            = 1;
 		$localobject->date_creation     = $now;
 		$localobject->tms               = $now;
 		$localobject->status            = 1;
@@ -282,7 +297,7 @@ class AccidentUnitTest extends PHPUnit\Framework\TestCase
 		$this->assertEquals($localobject->id, $newobject->id);
 		$this->assertSame($localobject->ref, $newobject->ref);
 		$this->assertSame($localobject->ref_ext, $newobject->ref_ext);
-		$this->assertSame($localobject->entity, $newobject->entity);
+		//$this->assertSame($localobject->entity, $newobject->entity);
 		$this->assertSame($localobject->date_creation, $newobject->date_creation);
 		$this->assertSame($localobject->tms, $newobject->tms);
 		$this->assertEquals($localobject->status, $newobject->status);
