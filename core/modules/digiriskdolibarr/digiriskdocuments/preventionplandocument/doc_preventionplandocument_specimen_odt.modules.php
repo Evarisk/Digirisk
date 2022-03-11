@@ -186,6 +186,7 @@ class doc_preventionplandocument_specimen_odt extends ModeleODTPreventionPlanDoc
 		foreach ($listofdir as $key => $tmpdir) {
 			$tmpdir = trim($tmpdir);
 			$tmpdir = preg_replace('/DOL_DATA_ROOT/', DOL_DATA_ROOT, $tmpdir);
+			$tmpdir = preg_replace('/DOL_DOCUMENT_ROOT/', DOL_DOCUMENT_ROOT, $tmpdir);
 			if ( ! $tmpdir) {
 				unset($listofdir[$key]); continue;
 			}
@@ -360,9 +361,9 @@ class doc_preventionplandocument_specimen_odt extends ModeleODTPreventionPlanDoc
 			$tmparray['unique_identifier']            = $preventionplan->label;
 			$tmparray['raison_du_plan_de_prevention'] = $preventionplan->raison;
 
-			$tmparray['moyen_generaux_mis_disposition'] = $conf->global->DIGIRISK_GENERAL_MEANS;
-			$tmparray['consigne_generale']              = $conf->global->DIGIRISK_GENERAL_RULES;
-			$tmparray['premiers_secours']               = $conf->global->DIGIRISK_FIRST_AID;
+			$tmparray['moyen_generaux_mis_disposition'] = $conf->global->DIGIRISKDOLIBARR_GENERAL_MEANS;
+			$tmparray['consigne_generale']              = $conf->global->DIGIRISKDOLIBARR_GENERAL_RULES;
+			$tmparray['premiers_secours']               = $conf->global->DIGIRISKDOLIBARR_FIRST_AID;
 
 			$tmparray['date_start_intervention_PPP'] = dol_print_date($preventionplan->date_start, 'dayhoursec', 'tzuser');
 			$tmparray['date_end_intervention_PPP']   = dol_print_date($preventionplan->date_end, 'dayhoursec', 'tzuser');

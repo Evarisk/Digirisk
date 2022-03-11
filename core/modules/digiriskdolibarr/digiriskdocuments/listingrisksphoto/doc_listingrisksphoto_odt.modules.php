@@ -182,6 +182,7 @@ class doc_listingrisksphoto_odt extends ModeleODTListingRisksPhoto
 		foreach ($listofdir as $key => $tmpdir) {
 			$tmpdir = trim($tmpdir);
 			$tmpdir = preg_replace('/DOL_DATA_ROOT/', DOL_DATA_ROOT, $tmpdir);
+			$tmpdir = preg_replace('/DOL_DOCUMENT_ROOT/', DOL_DOCUMENT_ROOT, $tmpdir);
 			if ( ! $tmpdir) {
 				unset($listofdir[$key]); continue;
 			}

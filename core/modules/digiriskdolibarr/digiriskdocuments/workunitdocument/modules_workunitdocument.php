@@ -42,7 +42,7 @@ abstract class ModeleODTWorkUnitDocument extends CommonDocGenerator
 	{
 		$type = 'workunitdocument';
 
-		include_once DOL_DOCUMENT_ROOT . '/core/lib/functions2.lib.php';
+		require_once __DIR__ . '/../../../../../lib/digiriskdolibarr_function.lib.php';
 		return getListOfModels($db, $type, $maxfilenamelength);
 	}
 }
