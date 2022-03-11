@@ -413,6 +413,9 @@
 				if ($search[$key] == '-1') $search[$key] = '';
 				$mode_search                             = 2;
 			}
+			if ($key == 'category') {
+				$mode_search = 1;
+			}
 			if ($search[$key] != '') {
 				if ($key == 'ref') {
 					$sql .= " AND (r.ref = '$search[$key]')";
