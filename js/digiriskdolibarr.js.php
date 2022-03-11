@@ -1007,8 +1007,10 @@ window.eoxiaJS.signature.clearCanvas = function( event ) {
  */
 window.eoxiaJS.signature.createSignature = function() {
 	let elementSignatory = $(this).attr('value');
-	let elementRedirect  = $(this).find('#redirect' + elementSignatory).attr('value');
+	let elementRedirect  = '';
+	let elementCode = '';
 	let elementZone  = $(this).find('#zone' + elementSignatory).attr('value');
+	let elementConfCAPTCHA  = $('#confCAPTCHA').val();
 	let actionContainerSuccess = $('.noticeSignatureSuccess');
 	var signatoryIDPost = '';
 	if (elementSignatory !== 0) {
@@ -1028,12 +1030,28 @@ window.eoxiaJS.signature.createSignature = function() {
 		url = document.URL + '&action=addSignature' + signatoryIDPost;
 		type = "POST";
 	}
+
+	if (elementConfCAPTCHA == 1) {
+		elementCode = $('#securitycode').val();
+		let elementSessionCode = $('#sessionCode').val();
+		if (elementSessionCode == elementCode) {
+			elementRedirect = $('#redirectSignature').val();
+		} else {
+			elementRedirect = $('#redirectSignatureError').val();
+		}
+	} else {
+		elementRedirect = $(this).find('#redirect' + elementSignatory).attr('value');
+	}
+
 	$.ajax({
 		url: url,
 		type: type,
 		processData: false,
 		contentType: 'application/octet-stream',
-		data: signature,
+		data: JSON.stringify({
+			signature: signature,
+			code: elementCode
+		}),
 		success: function( resp ) {
 			if (elementZone == "private") {
 				actionContainerSuccess.html($(resp).find('.noticeSignatureSuccess .all-notice-content'));

@@ -114,7 +114,7 @@ print '</tr>';
 
 print '<tr class="oddeven"><td>';
 print $langs->trans('DigiriskManagement');
-print "</td><td>";
+print '</td><td>';
 print $langs->trans('DigiriskDescription');
 print '</td>';
 
@@ -124,6 +124,17 @@ if ($conf->global->DIGIRISKDOLIBARR_REDIRECT_AFTER_CONNECTION) {
 } else {
 	print '<a class="reposition" href="' . $_SERVER["PHP_SELF"] . '?action=setredirectafterconnection&value=1" alt="' . $langs->trans("Default") . '">' . img_picto($langs->trans("Disabled"), 'switch_off') . '</a>';
 }
+print '</td>';
+print '</tr>';
+
+//Use captcha
+print '<tr class="oddeven"><td>';
+print  $langs->trans("UseCaptcha");
+print '</td><td>';
+print $langs->trans('UseCaptchaDescription');
+print '</td>';
+print '<td class="center">';
+print ajax_constantonoff('DIGIRISKDOLIBARR_USE_CAPTCHA');
 print '</td>';
 print '</tr>';
 print '</table>';
