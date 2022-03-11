@@ -1302,7 +1302,6 @@ TicketShowCompanyLogoHelp = Activez cette option pour masquer le logo de la soci
 YouMustNotifyYourHierarchy = Vous êtes dans l'<b>obligation</b> de prévenir votre hiérarchie
 GoBackToTicketCreation = Aller à la page de suivi des tickets
 SendEmailOnTicketSubmit = Envoyer des emails à la création
-UseCaptchaOnCreateTicketPage = Utilisation du code graphique (CAPTCHA) sur la page de création
 
 
 
@@ -1352,3 +1351,5 @@ PhotoWellSent = La photo a été ajoutée à la bibliothèque de médias
 PhotoNotSent = La photo ne s'est pas correctement envoyée
 PhotoWellSaved = Le(s) média(s) a (ont) bien été ajouté(s)
 PhotoNotSaved = Le(s) média(s) n'a (ont) pas été ajouté(s)
+UseCaptcha = Code graphique (CAPTCHA)
+UseCaptchaDescription = Utilisation du code graphique (CAPTCHA) sur les pages d'interface public

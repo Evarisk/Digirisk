@@ -60,9 +60,9 @@ $langs->loadLangs(array("digiriskdolibarr@digiriskdolibarr", "other", "errors"))
 // Get parameters
 $track_id = GETPOST('track_id', 'alpha');
 $action   = GETPOST('action', 'aZ09');
-$url      = dirname($_SERVER['PHP_SELF']) . '/signature_success.php';
 $source   = GETPOST('source', 'aZ09');
 $type     = GETPOST('type', 'aZ09');
+$url      = dirname($_SERVER['PHP_SELF']) . '/signature_success.php';
 
 // Initialize technical objects
 $user = new User($db);
@@ -101,11 +101,23 @@ if ($reshook < 0) setEventMessages($hookmanager->error, $hookmanager->errors, 'e
 // Action to add record
 if ($action == 'addSignature') {
 	$signatoryID  = GETPOST('signatoryID');
-	$request_body = file_get_contents('php://input');
+	$data = json_decode(file_get_contents('php://input'), true);
 
 	$signatory->fetch($signatoryID);
-	$signatory->signature      = $request_body;
+	$signatory->signature      = $data['signature'];
 	$signatory->signature_date = dol_now();
+
+	// Check Captcha code if is enabled
+	if ( ! empty($conf->global->DIGIRISKDOLIBARR_USE_CAPTCHA)) {
+		$sessionkey = 'dol_antispam_value';
+		$ok         = (array_key_exists($sessionkey, $_SESSION) === true && (strtolower($_SESSION[$sessionkey]) === strtolower($data['code'])));
+
+		if ( ! $ok) {
+			$error++;
+			setEventMessage($langs->trans('ErrorBadValueForCode'), 'errors');
+			$action = '';
+		}
+	}
 
 	if ( ! $error) {
 		$result = $signatory->update($user, false);
@@ -118,6 +130,8 @@ if ($action == 'addSignature') {
 			if ( ! empty($signatory->errors)) setEventMessages(null, $signatory->errors, 'errors');
 			else setEventMessages($signatory->error, null, 'errors');
 		}
+	} else {
+		exit;
 	}
 }
 
@@ -198,6 +212,7 @@ if ( $signatory->role == 'PP_EXT_SOCIETY_INTERVENANTS') {
 <div class="digirisk-signature-container">
 	<div class="wpeo-gridlayout grid-2">
 		<div class="informations">
+			<input type="hidden" id="confCAPTCHA" value="<?php echo $conf->global->DIGIRISKDOLIBARR_USE_CAPTCHA ?>"/>
 			<div class="wpeo-gridlayout grid-2 file-generation">
 				<strong class="grid-align-middle"><?php echo $langs->trans("ThisIsInformationOnDocumentToSign"); ?></strong>
 				<?php if ($type == 'preventionplan') : ?>
@@ -233,6 +248,23 @@ if ( $signatory->role == 'PP_EXT_SOCIETY_INTERVENANTS') {
 			</div>
 		</div>
 	</div>
+	<?php
+	if ( ! empty($conf->global->DIGIRISKDOLIBARR_USE_CAPTCHA)) {
+		require_once DOL_DOCUMENT_ROOT . '/core/lib/security2.lib.php';
+		print '<div class="center"><label for="email"><span class="fieldrequired">' . $langs->trans("SecurityCode") . '</span></label>';
+		print '<span class="span-icon-security inline-block">';
+		print '<input id="securitycode" placeholder="' . $langs->trans("SecurityCode") . '" class="flat input-icon-security width125" type="text" maxlength="5" name="code" tabindex="3" />';
+		print '<input type="hidden" id="sessionCode" value="' . $_SESSION['dol_antispam_value'] . '"/>';
+		print '<input type="hidden" id="redirectSignature" value="' . dirname($_SERVER['PHP_SELF']) . '/signature_success.php' . '"/>';
+		print '<input type="hidden" id="redirectSignatureError" value="' . $_SERVER['REQUEST_URI'] . '"/>';
+		print '</span>';
+		print '<span class="nowrap inline-block">';
+		print '<img class="inline-block valignmiddle" src="' . DOL_URL_ROOT . '/core/antispamimage.php" border="0" width="80" height="32" id="img_securitycode" />';
+		print '<a class="inline-block valignmiddle" href="' . $php_self . '" tabindex="4" data-role="button">' . img_picto($langs->trans("Refresh"), 'refresh', 'id="captcha_refresh_img"') . '</a>';
+		print '</span>';
+		print '</div>';
+	}?>
+</div>
 <?php
 
 llxFooter('', 'public');
