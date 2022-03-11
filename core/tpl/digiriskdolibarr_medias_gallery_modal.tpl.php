@@ -25,7 +25,21 @@ if ( ! $error && $action == "uploadPhoto" && ! empty($conf->global->MAIN_UPLOAD_
 		}
 	}
 }
+
 ?>
+<style>
+	#myProgress {
+		width: 100%;
+		background-color: grey;
+	}
+
+	#myBar {
+		width: 1%;
+		height: 30px;
+		background-color: green;
+	}
+</style>
+
 <!-- START MEDIA GALLERY MODAL -->
 <div class="wpeo-modal modal-photo" id="media_gallery" data-id="<?php echo $object->id ?>">
 	<div class="modal-container wpeo-modal-event">
@@ -36,7 +50,7 @@ if ( ! $error && $action == "uploadPhoto" && ! empty($conf->global->MAIN_UPLOAD_
 		</div>
 		<!-- Modal-Content -->
 		<div class="modal-content" id="#modalMediaGalleryContent">
-			<div class="messageSuccessSendPhoto notice hidden">
+			<div class="messageSuccessSendPhoto notice <?php echo GETPOST('uploadMediasSuccess') == 1 ? '' : 'hidden' ?>">
 				<div class="wpeo-notice notice-success send-photo-success-notice">
 					<div class="notice-content">
 						<div class="notice-title"><?php echo $langs->trans('PhotoWellSent') ?></div>
@@ -60,11 +74,13 @@ if ( ! $error && $action == "uploadPhoto" && ! empty($conf->global->MAIN_UPLOAD_
 				include_once DOL_DOCUMENT_ROOT . '/core/class/html.formfile.class.php';
 				print '<strong>' . $langs->trans('AddFile') . '</strong>'
 				?>
-
 				<input type="file" id="add_media_to_gallery" class="flat minwidth400 maxwidth200onsmartphone" name="userfile[]" multiple accept>
 			<?php } else print '&nbsp;';
 			// End "Add new file" area
 			?>
+			<div id="myProgress" style="display:none">
+				<div id="myBar"></div>
+			</div>
 			<div class="underbanner clearboth"></div>
 			<div class="form-element">
 				<div class="form-field-container">
