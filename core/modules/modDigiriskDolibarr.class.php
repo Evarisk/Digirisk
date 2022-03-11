@@ -1327,42 +1327,42 @@ class modDigiriskdolibarr extends DolibarrModules
 			$labour_inspectorID       = $labour_inspector->create($user);
 
 			$samu         = $societe;
-			$samu->name   = $langs->trans('SAMU');
+			$samu->name   = $langs->trans('SAMU') . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
 			$samu->client = 0;
 			$samu->phone  = '15';
 			$samu->url    = '';
 			$samuID       = $samu->create($user);
 
 			$pompiers         = $societe;
-			$pompiers->name   = $langs->trans('Pompiers');
+			$pompiers->name   = $langs->trans('Pompiers') . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
 			$pompiers->client = 0;
 			$pompiers->phone  = '18';
 			$pompiers->url    = '';
 			$pompiersID       = $pompiers->create($user);
 
 			$police         = $societe;
-			$police->name   = $langs->trans('Police');
+			$police->name   = $langs->trans('Police') . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
 			$police->client = 0;
 			$police->phone  = '17';
 			$police->url    = '';
 			$policeID       = $police->create($user);
 
 			$emergency         = $societe;
-			$emergency->name   = $langs->trans('AllEmergencies');
+			$emergency->name   = $langs->trans('AllEmergencies') . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
 			$emergency->client = 0;
 			$emergency->phone  = '112';
 			$emergency->url    = '';
 			$emergencyID       = $emergency->create($user);
 
 			$rights_defender         = $societe;
-			$rights_defender->name   = $langs->trans('RightsDefender');
+			$rights_defender->name   = $langs->trans('RightsDefender') . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
 			$rights_defender->client = 0;
 			$rights_defender->phone  = '';
 			$rights_defender->url    = '';
 			$rights_defenderID       = $rights_defender->create($user);
 
 			$poison_control_center         = $societe;
-			$poison_control_center->name   = $langs->trans('PoisonControlCenter');
+			$poison_control_center->name   = $langs->trans('PoisonControlCenter') . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
 			$poison_control_center->client = 0;
 			$poison_control_center->phone  = '';
 			$poison_control_center->url    = '';
@@ -1394,14 +1394,14 @@ class modDigiriskdolibarr extends DolibarrModules
 			$labour_inspectorID       = $labour_inspector->create($user);
 
 			$rights_defender         = $societe;
-			$rights_defender->name   = $langs->trans('RightsDefender');
+			$rights_defender->name   = $langs->trans('RightsDefender') . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
 			$rights_defender->client = 0;
 			$rights_defender->phone  = '';
 			$rights_defender->url    = '';
 			$rights_defenderID       = $rights_defender->create($user);
 
 			$poison_control_center         = $societe;
-			$poison_control_center->name   = $langs->trans('PoisonControlCenter');
+			$poison_control_center->name   = $langs->trans('PoisonControlCenter') . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
 			$poison_control_center->client = 0;
 			$poison_control_center->phone  = '';
 			$poison_control_center->url    = '';
@@ -1442,6 +1442,36 @@ class modDigiriskdolibarr extends DolibarrModules
 			$labour_inspectorID = $resources->digirisk_dolibarr_fetch_resource('LabourInspectorSociety');
 			$societe->fetch($labour_inspectorID);
 			$societe->name = $langs->trans('LabourInspectorName') . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
+			$societe->update(0, $user);
+
+			$policeID = $resources->digirisk_dolibarr_fetch_resource('Police');
+			$societe->fetch($policeID);
+			$societe->name = $langs->trans('Police') . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
+			$societe->update(0, $user);
+
+			$samuID = $resources->digirisk_dolibarr_fetch_resource('SAMU');
+			$societe->fetch($samuID);
+			$societe->name = $langs->trans('SAMU') . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
+			$societe->update(0, $user);
+
+			$pompiersID = $resources->digirisk_dolibarr_fetch_resource('Pompiers');
+			$societe->fetch($pompiersID);
+			$societe->name = $langs->trans('Pompiers') . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
+			$societe->update(0, $user);
+
+			$emergencyID = $resources->digirisk_dolibarr_fetch_resource('AllEmergencies');
+			$societe->fetch($emergencyID);
+			$societe->name = $langs->trans('AllEmergencies') . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
+			$societe->update(0, $user);
+
+			$rights_defenderID = $resources->digirisk_dolibarr_fetch_resource('RightsDefender');
+			$societe->fetch($rights_defenderID);
+			$societe->name = $langs->trans('RightsDefender') . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
+			$societe->update(0, $user);
+
+			$poison_control_centerID = $resources->digirisk_dolibarr_fetch_resource('PoisonControlCenter');
+			$societe->fetch($poison_control_centerID);
+			$societe->name = $langs->trans('PoisonControlCenter') . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
 			$societe->update(0, $user);
 
 			dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_THIRDPARTY_UPDATED', 1, 'integer', 0, '', $conf->entity);
