@@ -283,7 +283,7 @@ class doc_groupmentdocument_odt extends ModeleODTGroupmentDocument
 			preg_replace('/template_/', '', $filename[1]);
 
 			$date     = dol_print_date(dol_now(), 'dayxcard');
-			$filename = $objectref . '_' . $digiriskelement->label . '_' . $date . '.odt';
+			$filename = $date . '_' . $digiriskelement->ref . '_' . $objectref . '_' . $digiriskelement->label . '.odt';
 			$filename = str_replace(' ', '_', $filename);
 			$filename = dol_sanitizeFileName($filename);
 

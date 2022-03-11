@@ -283,7 +283,7 @@ class doc_workunitdocument_odt extends ModeleODTWorkUnitDocument
 			preg_replace('/template_/', '', $filename[1]);
 
 			$date     = dol_print_date(dol_now(), 'dayxcard');
-			$filename = $objectref . '_' . $digiriskelement->label . '_' . $date . '.odt';
+			$filename = $date . '_' . $digiriskelement->ref . '_' . $objectref . '_' . $conf->global->MAIN_INFO_SOCIETE_NOM . '.odt';
 			$filename = str_replace(' ', '_', $filename);
 			$filename = dol_sanitizeFileName($filename);
 

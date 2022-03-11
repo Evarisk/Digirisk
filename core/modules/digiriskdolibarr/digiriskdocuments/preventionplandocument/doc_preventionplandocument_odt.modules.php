@@ -283,7 +283,7 @@ class doc_preventionplandocument_odt extends ModeleODTPreventionPlanDocument
 			preg_replace('/template_/', '', $filename[1]);
 
 			$date     = dol_print_date(dol_now(), 'dayxcard');
-			$filename = $objectref . '_' . $conf->global->MAIN_INFO_SOCIETE_NOM . '_' . $date . '.odt';
+			$filename = $date . '_' . $preventionplan->ref . '_' . $objectref . '_' . $conf->global->MAIN_INFO_SOCIETE_NOM . '.odt';
 			$filename = str_replace(' ', '_', $filename);
 			$filename = dol_sanitizeFileName($filename);
 
