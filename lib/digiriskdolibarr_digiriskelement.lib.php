@@ -83,6 +83,13 @@ function digiriskelementPrepareHead($object)
 		$head[$h][2] = 'elementAgenda';
 		$h++;
 
+		if ($user->rights->digiriskdolibarr->accident->read) {
+			$head[$h][0] = dol_buildpath("/digiriskdolibarr/view/accident/accident_list.php", 1) . '?fromid=' . $object->id;
+			$head[$h][1] = '<i class="fas fa-calendar"></i> ' . $langs->trans("Accidents");
+			$head[$h][2] = 'elementAccidents';
+			$h++;
+		}
+
 		complete_head_from_modules($conf, $langs, $object, $head, $h, 'digiriskelement@digiriskdolibarr');
 	}
 	return $head;
