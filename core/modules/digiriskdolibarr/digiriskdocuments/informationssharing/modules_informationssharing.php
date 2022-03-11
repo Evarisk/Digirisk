@@ -43,6 +43,6 @@ abstract class ModeleODTInformationsSharing extends CommonDocGenerator
 		$type = 'informationssharing';
 
 		require_once __DIR__ . '/../../../../../lib/digiriskdolibarr_function.lib.php';
-		return getListOfModels($db, $type, $maxfilenamelength);
+		return getListOfModelsDigirisk($db, $type, $maxfilenamelength);
 	}
 }

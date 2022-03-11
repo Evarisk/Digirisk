@@ -43,6 +43,6 @@ abstract class ModeleODTRiskAssessmentDocument extends CommonDocGenerator
 		$type = 'riskassessmentdocument';
 
 		require_once __DIR__ . '/../../../../../lib/digiriskdolibarr_function.lib.php';
-		return getListOfModels($db, $type, $maxfilenamelength);
+		return getListOfModelsDigirisk($db, $type, $maxfilenamelength);
 	}
 }

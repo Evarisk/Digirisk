@@ -43,6 +43,6 @@ abstract class ModeleODTListingRisksPhoto extends CommonDocGenerator
 		$type = 'listingrisksphoto';
 
 		require_once __DIR__ . '/../../../../../lib/digiriskdolibarr_function.lib.php';
-		return getListOfModels($db, $type, $maxfilenamelength);
+		return getListOfModelsDigirisk($db, $type, $maxfilenamelength);
 	}
 }

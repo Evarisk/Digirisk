@@ -43,6 +43,6 @@ abstract class ModeleODTWorkUnitDocument extends CommonDocGenerator
 		$type = 'workunitdocument';
 
 		require_once __DIR__ . '/../../../../../lib/digiriskdolibarr_function.lib.php';
-		return getListOfModels($db, $type, $maxfilenamelength);
+		return getListOfModelsDigirisk($db, $type, $maxfilenamelength);
 	}
 }

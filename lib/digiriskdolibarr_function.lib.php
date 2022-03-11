@@ -2245,7 +2245,7 @@ function getNomUrlSociety($thirdparty, $withpicto = 0, $option = '', $maxlen = 0
  *  @param  int		    $maxfilenamelength  Max length of value to show
  * 	@return	array|int			    		0 if no module is activated, or array(key=>label). For modules that need directory scan, key is completed with ":filename".
  */
-function getListOfModels($db, $type, $maxfilenamelength = 0)
+function getListOfModelsDigirisk($db, $type, $maxfilenamelength = 0)
 {
     global $conf, $langs;
     $liste = array();
