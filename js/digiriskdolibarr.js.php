@@ -1332,8 +1332,6 @@ window.eoxiaJS.mediaGallery.sendPhoto = function( event ) {
             }
 		})
 	})
-
-
 };
 
 /**

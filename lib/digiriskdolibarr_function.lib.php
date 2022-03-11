@@ -615,7 +615,7 @@ function digiriskHeader($title = '', $help_url = '', $arrayofjs = array(), $arra
 									jQuery( '#unit'+id ).addClass( 'toggled' );
 								});
 
-								<?php $object->fetch(GETPOST('id')); ?>;
+								<?php $object->fetch(GETPOST('id') ?: GETPOST('fromid')); ?>;
 								var idParent = <?php echo json_encode($object->fk_parent);?> ;
 
 								jQuery( '#menu'+idParent).removeClass( 'fa-chevron-right').addClass( 'fa-chevron-down' );

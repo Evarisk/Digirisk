@@ -49,6 +49,7 @@ require_once __DIR__ . '/../../class/digiriskstandard.class.php';
 require_once __DIR__ . '/../../class/preventionplan.class.php';
 require_once __DIR__ . '/../../class/digiriskresources.class.php';
 require_once __DIR__ . '/../../lib/digiriskdolibarr_function.lib.php';
+require_once __DIR__ . '/../../lib/digiriskdolibarr_digiriskelement.lib.php';
 
 global $conf, $db, $hookmanager, $langs, $user;
 
@@ -62,13 +63,13 @@ $show_files  = GETPOST('show_files', 'int');
 $confirm     = GETPOST('confirm', 'alpha');
 $toselect    = GETPOST('toselect', 'array');
 $contextpage = GETPOST('contextpage', 'aZ') ? GETPOST('contextpage', 'aZ') : 'accidentlist';
-
-$limit     = GETPOST('limit', 'int') ? GETPOST('limit', 'int') : $conf->liste_limit;
-$sortfield = GETPOST("sortfield", "alpha");
-$sortorder = GETPOST("sortorder", 'alpha');
-$page      = GETPOSTISSET('pageplusone') ? (GETPOST('pageplusone') - 1) : GETPOST("page", 'int');
-$page      = is_numeric($page) ? $page : 0;
-$page      = $page == -1 ? 0 : $page;
+$fromid      = GETPOST('fromid');
+$limit       = GETPOST('limit', 'int') ? GETPOST('limit', 'int') : $conf->liste_limit;
+$sortfield   = GETPOST("sortfield", "alpha");
+$sortorder   = GETPOST("sortorder", 'alpha');
+$page        = GETPOSTISSET('pageplusone') ? (GETPOST('pageplusone') - 1) : GETPOST("page", 'int');
+$page        = is_numeric($page) ? $page : 0;
+$page        = $page == -1 ? 0 : $page;
 
 // Initialize technical objects
 $accident          = new Accident($db);
@@ -187,11 +188,21 @@ $formother = new FormOther($db);
 $title    = $langs->trans("AccidentList");
 $help_url = '';
 
+if ($fromid > 0) {
+	$objectlinked = $digiriskelement;
+	$objectlinked->fetch($fromid);
+	$head = digiriskelementPrepareHead($objectlinked);
+}
+
 $morejs  = array("/digiriskdolibarr/js/digiriskdolibarr.js.php");
 $morecss = array("/digiriskdolibarr/css/digiriskdolibarr.css");
 
-llxHeader("", $title, $help_url, '', '', '', $morejs, $morecss);
-
+if ($fromid > 0) {
+	digiriskHeader($title, $help_url, $morejs, $morecss);
+	print dol_get_fiche_head($head, 'elementAccidents', $langs->trans("Accident"), -1, $objectlinked->picto);
+} else {
+	llxHeader("", $title, $help_url, '', '', '', $morejs, $morecss);
+}
 // Add $param from extra fields
 include DOL_DOCUMENT_ROOT . '/core/tpl/extrafields_list_search_param.tpl.php';
 
