@@ -426,7 +426,7 @@ ClonePreventionPlanRisk = Cloner les risques du plan de prévention
 CloneAttendantsPreventionPlan = Cloner les participants du plan de prévention
 CloneSchedulePreventionPlan = Cloner les horaires du plan de prévention
 ConfirmClonePreventionPlan = Êtes-vous sûr de vouloir cloner le plan de prévention <b> %s </b> ?
-
+Archived = Archivé
 
 # Email - Mail
 PreventionPlanLabel = Récapitulatif du plan de prévention
