@@ -88,11 +88,11 @@ if (empty($reshook)) {
 		$electionDateDP = explode('/', $electionDateDP);
 		$electionDateDP = $electionDateDP[2] . '-' . $electionDateDP[1] . '-' . $electionDateDP[0];
 
-		dolibarr_set_const($db, "DIGIRISK_PARTICIPATION_AGREEMENT_INFORMATION_PROCEDURE", GETPOST("modalites", 'none'), 'chaine', 0, '', $conf->entity);
-		dolibarr_set_const($db, "DIGIRISK_DEROGATION_SCHEDULE_PERMANENT", GETPOST("permanent", 'none'), 'chaine', 0, '', $conf->entity);
-		dolibarr_set_const($db, "DIGIRISK_DEROGATION_SCHEDULE_OCCASIONAL", GETPOST("occasional", 'none'), 'chaine', 0, '', $conf->entity);
-		dolibarr_set_const($db, "DIGIRISK_CSE_ELECTION_DATE", $electionDateCSE, 'date', 0, '', $conf->entity);
-		dolibarr_set_const($db, "DIGIRISK_DP_ELECTION_DATE", $electionDateDP, 'date', 0, '', $conf->entity);
+		dolibarr_set_const($db, "DIGIRISKDOLIBARR_PARTICIPATION_AGREEMENT_INFORMATION_PROCEDURE", GETPOST("modalites", 'none'), 'chaine', 0, '', $conf->entity);
+		dolibarr_set_const($db, "DIGIRISKDOLIBARR_DEROGATION_SCHEDULE_PERMANENT", GETPOST("permanent", 'none'), 'chaine', 0, '', $conf->entity);
+		dolibarr_set_const($db, "DIGIRISKDOLIBARR_DEROGATION_SCHEDULE_OCCASIONAL", GETPOST("occasional", 'none'), 'chaine', 0, '', $conf->entity);
+		dolibarr_set_const($db, "DIGIRISKDOLIBARR_CSE_ELECTION_DATE", $electionDateCSE, 'date', 0, '', $conf->entity);
+		dolibarr_set_const($db, "DIGIRISKDOLIBARR_DP_ELECTION_DATE", $electionDateDP, 'date', 0, '', $conf->entity);
 
 		$CSEtitulaires = ! empty(GETPOST('TitularsCSE', 'array')) ? GETPOST('TitularsCSE', 'array') : (GETPOST('TitularsCSE', 'int') > 0 ? array(GETPOST('TitularsCSE', 'int')) : array());
 		$CSEsuppleants = ! empty(GETPOST('AlternatesCSE', 'array')) ? GETPOST('AlternatesCSE', 'array') : (GETPOST('AlternatesCSE', 'int') > 0 ? array(GETPOST('AlternatesCSE', 'int')) : array());
@@ -124,7 +124,7 @@ $morecss = array("/digiriskdolibarr/css/digiriskdolibarr.css");
 $counter = 0;
 
 $socialResources = array("TitularsCSE", "AlternatesCSE", "TitularsDP", "AlternatesDP");
-$socialConsts    = array("DIGIRISK_PARTICIPATION_AGREEMENT_INFORMATION_PROCEDURE", "DIGIRISK_DEROGATION_SCHEDULE_PERMANENT", "DIGIRISK_DEROGATION_SCHEDULE_OCCASIONAL", "DIGIRISK_CSE_ELECTION_DATE", "DIGIRISK_DP_ELECTION_DATE");
+$socialConsts    = array("DIGIRISKDOLIBARR_PARTICIPATION_AGREEMENT_INFORMATION_PROCEDURE", "DIGIRISKDOLIBARR_DEROGATION_SCHEDULE_PERMANENT", "DIGIRISKDOLIBARR_DEROGATION_SCHEDULE_OCCASIONAL", "DIGIRISKDOLIBARR_CSE_ELECTION_DATE", "DIGIRISKDOLIBARR_DP_ELECTION_DATE");
 
 $maxnumber = count($socialResources) + count($socialConsts);
 
@@ -152,8 +152,8 @@ $resources = new DigiriskResources($db);
 
 $allLinks = $resources->digirisk_dolibarr_fetch_resources();
 
-$electionDateCSE = $conf->global->DIGIRISK_CSE_ELECTION_DATE;
-$electionDateDP  = $conf->global->DIGIRISK_DP_ELECTION_DATE;
+$electionDateCSE = $conf->global->DIGIRISKDOLIBARR_CSE_ELECTION_DATE;
+$electionDateDP  = $conf->global->DIGIRISKDOLIBARR_DP_ELECTION_DATE;
 
 print '<span class="opacitymedium">' . $langs->trans("DigiriskMenu") . "</span><br>\n";
 print "<br>";
@@ -179,7 +179,7 @@ print '<tr class="liste_titre"><th class="titlefield wordbreak">' . $langs->tran
 // * Terms And Conditions - Modalités *
 
 print '<tr class="oddeven"><td><label for="modalites">' . $langs->trans("TermsAndConditions") . '</label></td><td>';
-$doleditor = new DolEditor('modalites', $conf->global->DIGIRISK_PARTICIPATION_AGREEMENT_INFORMATION_PROCEDURE ? $conf->global->DIGIRISK_PARTICIPATION_AGREEMENT_INFORMATION_PROCEDURE : '', '', 90, 'dolibarr_details', '', false, true, $conf->global->FCKEDITOR_ENABLE_SOCIETE, ROWS_3, '90%');
+$doleditor = new DolEditor('modalites', $conf->global->DIGIRISKDOLIBARR_PARTICIPATION_AGREEMENT_INFORMATION_PROCEDURE ? $conf->global->DIGIRISKDOLIBARR_PARTICIPATION_AGREEMENT_INFORMATION_PROCEDURE : '', '', 90, 'dolibarr_details', '', false, true, $conf->global->FCKEDITOR_ENABLE_SOCIETE, ROWS_3, '90%');
 $doleditor->Create();
 print '</td></tr>';
 
@@ -194,14 +194,14 @@ print '<tr class="liste_titre"><th class="titlefield wordbreak">' . $langs->tran
 // * Permanent - Permanentes *
 
 print '<tr class="oddeven"><td><label for="permanent">' . $langs->trans("PermanentDerogation") . '</label></td><td>';
-$doleditor = new DolEditor('permanent', $conf->global->DIGIRISK_DEROGATION_SCHEDULE_PERMANENT ? $conf->global->DIGIRISK_DEROGATION_SCHEDULE_PERMANENT : '', '', 90, 'dolibarr_details', '', false, true, $conf->global->FCKEDITOR_ENABLE_SOCIETE, ROWS_3, '90%');
+$doleditor = new DolEditor('permanent', $conf->global->DIGIRISKDOLIBARR_DEROGATION_SCHEDULE_PERMANENT ? $conf->global->DIGIRISKDOLIBARR_DEROGATION_SCHEDULE_PERMANENT : '', '', 90, 'dolibarr_details', '', false, true, $conf->global->FCKEDITOR_ENABLE_SOCIETE, ROWS_3, '90%');
 $doleditor->Create();
 print '</td></tr>';
 
 // * Permanent - Permanentes *
 
 print '<tr class="oddeven"><td><label for="occasional">' . $langs->trans("OccasionalDerogation") . '</label></td><td>';
-$doleditor = new DolEditor('occasional', $conf->global->DIGIRISK_DEROGATION_SCHEDULE_OCCASIONAL ? $conf->global->DIGIRISK_DEROGATION_SCHEDULE_OCCASIONAL : '', '', 90, 'dolibarr_details', '', false, true, $conf->global->FCKEDITOR_ENABLE_SOCIETE, ROWS_3, '90%');
+$doleditor = new DolEditor('occasional', $conf->global->DIGIRISKDOLIBARR_DEROGATION_SCHEDULE_OCCASIONAL ? $conf->global->DIGIRISKDOLIBARR_DEROGATION_SCHEDULE_OCCASIONAL : '', '', 90, 'dolibarr_details', '', false, true, $conf->global->FCKEDITOR_ENABLE_SOCIETE, ROWS_3, '90%');
 $doleditor->Create();
 print '</td></tr>';
 

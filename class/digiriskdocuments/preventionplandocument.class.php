@@ -221,9 +221,9 @@ class PreventionPlanDocument extends DigiriskDocuments
 		$json['PreventionPlan']['ref'] = $preventionplan->ref;
 		$json['PreventionPlan']['label'] = $preventionplan->label;
 
-		$json['PreventionPlan']['moyen_generaux_mis_disposition'] = $conf->global->DIGIRISK_GENERAL_MEANS;
-		$json['PreventionPlan']['consigne_generale'] = $conf->global->DIGIRISK_GENERAL_RULES;
-		$json['PreventionPlan']['premiers_secours'] = $conf->global->DIGIRISK_FIRST_AID;
+		$json['PreventionPlan']['moyen_generaux_mis_disposition'] = $conf->global->DIGIRISKDOLIBARR_GENERAL_MEANS;
+		$json['PreventionPlan']['consigne_generale'] = $conf->global->DIGIRISKDOLIBARR_GENERAL_RULES;
+		$json['PreventionPlan']['premiers_secours'] = $conf->global->DIGIRISKDOLIBARR_FIRST_AID;
 
 		$json['PreventionPlan']['date']['start'] = $preventionplan->date_start;
 		$json['PreventionPlan']['date']['end'] = $preventionplan->date_end;

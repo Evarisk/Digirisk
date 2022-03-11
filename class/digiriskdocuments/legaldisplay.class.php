@@ -231,15 +231,15 @@ class LegalDisplay extends DigiriskDocuments
 			$json['LegalDisplay']['working_hour']['saturday_afternoon']  = $opening_hours_saturday[1];
 			$json['LegalDisplay']['working_hour']['sunday_afternoon']    = $opening_hours_sunday[1];
 
-			$json['LegalDisplay']['safety_rule']['location_of_detailed_instruction']                      = $conf->global->DIGIRISK_LOCATION_OF_DETAILED_INSTRUCTION;
-			$json['LegalDisplay']['derogation_schedule']['permanent']                                     = $conf->global->DIGIRISK_DEROGATION_SCHEDULE_PERMANENT;
-			$json['LegalDisplay']['derogation_schedule']['occasional']                                    = $conf->global->DIGIRISK_DEROGATION_SCHEDULE_OCCASIONAL;
-			$json['LegalDisplay']['collective_agreement']['title_of_the_applicable_collective_agreement'] = $conf->global->DIGIRISK_COLLECTIVE_AGREEMENT_TITLE;
-			$json['LegalDisplay']['collective_agreement']['title_of_the_applicable_collective_agreement'] = $conf->global->DIGIRISK_COLLECTIVE_AGREEMENT_TITLE . ' - ' . $this->getIDCCByCode($conf->global->DIGIRISK_COLLECTIVE_AGREEMENT_TITLE)->libelle;
-			$json['LegalDisplay']['collective_agreement']['location_and_access_terms_of_the_agreement']   = $conf->global->DIGIRISK_COLLECTIVE_AGREEMENT_LOCATION;
-			$json['LegalDisplay']['DUER']['how_access_to_duer']                                           = $conf->global->DIGIRISK_DUER_LOCATION;
-			$json['LegalDisplay']['rules']['location']                                                    = $conf->global->DIGIRISK_RULES_LOCATION;
-			$json['LegalDisplay']['participation_agreement']['information_procedures']                    = $conf->global->DIGIRISK_PARTICIPATION_AGREEMENT_INFORMATION_PROCEDURE;
+			$json['LegalDisplay']['safety_rule']['location_of_detailed_instruction']                      = $conf->global->DIGIRISKDOLIBARR_LOCATION_OF_DETAILED_INSTRUCTION;
+			$json['LegalDisplay']['derogation_schedule']['permanent']                                     = $conf->global->DIGIRISKDOLIBARR_DEROGATION_SCHEDULE_PERMANENT;
+			$json['LegalDisplay']['derogation_schedule']['occasional']                                    = $conf->global->DIGIRISKDOLIBARR_DEROGATION_SCHEDULE_OCCASIONAL;
+			$json['LegalDisplay']['collective_agreement']['title_of_the_applicable_collective_agreement'] = $conf->global->DIGIRISKDOLIBARR_COLLECTIVE_AGREEMENT_TITLE;
+			$json['LegalDisplay']['collective_agreement']['title_of_the_applicable_collective_agreement'] = $conf->global->DIGIRISKDOLIBARR_COLLECTIVE_AGREEMENT_TITLE . ' - ' . $this->getIDCCByCode($conf->global->DIGIRISKDOLIBARR_COLLECTIVE_AGREEMENT_TITLE)->libelle;
+			$json['LegalDisplay']['collective_agreement']['location_and_access_terms_of_the_agreement']   = $conf->global->DIGIRISKDOLIBARR_COLLECTIVE_AGREEMENT_LOCATION;
+			$json['LegalDisplay']['DUER']['how_access_to_duer']                                           = $conf->global->DIGIRISKDOLIBARR_DUER_LOCATION;
+			$json['LegalDisplay']['rules']['location']                                                    = $conf->global->DIGIRISKDOLIBARR_RULES_LOCATION;
+			$json['LegalDisplay']['participation_agreement']['information_procedures']                    = $conf->global->DIGIRISKDOLIBARR_PARTICIPATION_AGREEMENT_INFORMATION_PROCEDURE;
 
 			$object->json = json_encode($json, JSON_UNESCAPED_UNICODE);
 
