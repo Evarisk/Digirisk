@@ -418,19 +418,19 @@ while ($i < ($limit ? min($num, $limit) : $num)) {
 				$arrayAccident   = array();
 				$arrayAccident[] = $accident->ref;
 				$arrayAccident[] = $accident->label;
-				$arrayAccident[] = ( ! empty($object->accident_type) ? $object->accident_type : 0);
+				$arrayAccident[] = ( ! empty($accident->accident_type) ? $accident->accident_type : 0);
 				$arrayAccident[] = $accident->accident_date;
 				$arrayAccident[] = $accident->description;
 				$arrayAccident[] = $accident->photo;
-				switch ($object->external_accident) {
+				switch ($accident->external_accident) {
 					case 1:
-						$arrayAccident[] = $object->fk_element;
+						$arrayAccident[] = $accident->fk_element;
 						break;
 					case 2:
-						$arrayAccident[] = $object->fk_soc;
+						$arrayAccident[] = $accident->fk_soc;
 						break;
 					case 3:
-						$arrayAccident[] = $object->accident_location;
+						$arrayAccident[] = $accident->accident_location;
 						break;
 				}
 				$arrayAccident[] = $accident->fk_user_victim;
