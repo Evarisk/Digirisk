@@ -1344,8 +1344,6 @@ window.eoxiaJS.mediaGallery.sendPhoto = function( event ) {
             $('#myBar').animate({
                 width: progress + '%'
             }, 300 );
-			console.log(index)
-			console.log(totalCount)
 			if (index + 1 === totalCount) {
                 elementParent.load( document.URL + '&uploadMediasSuccess=1' + ' .ecm-photo-list');
                 actionContainerSuccess.removeClass('hidden');
