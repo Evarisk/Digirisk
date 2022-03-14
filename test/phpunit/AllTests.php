@@ -31,7 +31,22 @@ global $conf,$user,$langs,$db;
 
 //define('TEST_DB_FORCE_TYPE','mysql'); // This is to force using mysql driver
 //require_once 'PHPUnit/Autoload.php';
-require_once __DIR__ . '/../../../../../htdocs/master.inc.php';
+
+// Load Dolibarr environment
+$res = 0;
+// Try main.inc.php using relative path
+if (!$res && file_exists("../../../htdocs/master.inc.php")) {
+	$res = require_once dirname(__FILE__).'/../../../htdocs/master.inc.php';
+}
+if (!$res && file_exists("../../../../htdocs/master.inc.php")) {
+	$res = require_once dirname(__FILE__).'/../../../../htdocs/master.inc.php';
+}
+if (!$res && file_exists("../../../../../htdocs/master.inc.php")) {
+	$res = require_once dirname(__FILE__).'/../../../../../htdocs/master.inc.php';;
+}
+if (!$res) {
+	die("Include of main fails");
+}
 
 if (empty($user->id)) {
 	print "Load permissions for admin user nb 1\n";

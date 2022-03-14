@@ -375,7 +375,7 @@ class modDigiriskdolibarr extends DolibarrModules
 		$this->descriptionlong = "Digirisk";
 		$this->editor_name     = 'Evarisk';
 		$this->editor_url      = 'https://evarisk.com';
-		$this->version         = '9.1.0';
+		$this->version         = '9.1.1';
 		$this->const_name      = 'MAIN_MODULE_' . strtoupper($this->name);
 		$this->picto           = 'digiriskdolibarr@digiriskdolibarr';
 
@@ -450,218 +450,220 @@ class modDigiriskdolibarr extends DolibarrModules
 		// Constants
 		$this->const = array(
 			// CONST CONFIGURATION
-			1 => array('DIGIRISK_GENERAL_MEANS','chaine','','General means', $conf->entity),
-			2 => array('DIGIRISK_GENERAL_RULES','chaine','','General rules', $conf->entity),
-			3 => array('DIGIRISK_IDCC_DICTIONNARY','chaine','','IDCC of company', $conf->entity),
+			1 => array('DIGIRISKDOLIBAR_GENERAL_MEANS', 'chaine', '', 'General means', 0, 'current'),
+			2 => array('DIGIRISKDOLIBAR_GENERAL_RULES', 'chaine', '', 'General rules', 0, 'current'),
+			3 => array('DIGIRISKDOLIBAR_IDCC_DICTIONNARY', 'chaine', '', 'IDCC of company', 0, 'current'),
+			4 => array('DIGIRISKDOLIBAR_SOCIETY_DESCRIPTION', 'chaine', '', '', 0, 'current'),
 
 			// CONST RISK ASSESSMENTDOCUMENT
-			165 => array('DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_AUDIT_START_DATE','date','','', $conf->entity),
-			166 => array('DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_AUDIT_END_DATE','date','','', $conf->entity),
-			170 => array('DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_RECIPIENT','integer',0,'', $conf->entity),
-			171 => array('DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_METHOD','chaine','* Étape 1 : Récupération des informations<br>- Visite des locaux<br>- Récupération des données du personnel<br><br> * Étape 2 : Définition de la méthodologie et de document<br>- Validation des fiches d\'unité de travail standard<br>- Validation de l\'arborescence des unités<br><br>* Étape 3 : Réalisation de l\'étude de risques<br>- Sensibilisation des personnels aux risques et aux dangers<br>- Création des unités de travail avec le personnel et le ou les responsables<br>- Évaluations des risques par unités de travail avec le personnel<br><br>* Étape 4<br>- Traitement et rédaction du document unique','', $conf->entity),
-			172 => array('DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_SOURCES','chaine','La sensibilisation des risques est définie dans l\'ED840 édité par l\'INRS.<br>Dans ce document vous trouverez:<br>- La définition d\'un risque, d\'un danger et un schéma explicatif<br>- Les explications concernant les différentes methodes d\'évaluation<br>','', $conf->entity),
-			173 => array('DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_SITE_PLANS','chaine','Plan du site','', $conf->entity),
-			174 => array('DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_IMPORTANT_NOTES','chaine','Notes importantes','', $conf->entity),
+			10 => array('DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_AUDIT_START_DATE', 'date', '', '', 0, 'current'),
+			11 => array('DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_AUDIT_END_DATE', 'date', '', '', 0, 'current'),
+			12 => array('DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_RECIPIENT', 'integer', 0, '', 0, 'current'),
+			13 => array('DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_METHOD', 'chaine', '* Étape 1 : Récupération des informations<br>- Visite des locaux<br>- Récupération des données du personnel<br><br> * Étape 2 : Définition de la méthodologie et de document<br>- Validation des fiches d\'unité de travail standard<br>- Validation de l\'arborescence des unités<br><br>* Étape 3 : Réalisation de l\'étude de risques<br>- Sensibilisation des personnels aux risques et aux dangers<br>- Création des unités de travail avec le personnel et le ou les responsables<br>- Évaluations des risques par unités de travail avec le personnel<br><br>* Étape 4<br>- Traitement et rédaction du document unique', '', 0, 'current'),
+			14 => array('DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_SOURCES', 'chaine','La sensibilisation des risques est définie dans l\'ED840 édité par l\'INRS.<br>Dans ce document vous trouverez:<br>- La définition d\'un risque, d\'un danger et un schéma explicatif<br>- Les explications concernant les différentes methodes d\'évaluation<br>', '', 0, 'current'),
+			15 => array('DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_IMPORTANT_NOTES', 'chaine', 'Notes importantes', '', 0, 'current'),
 
-			4 => array('MAIN_AGENDA_ACTIONAUTO_RISKASSESSMENTDOCUMENT_CREATE','chaine',1,'', $conf->entity),
-			5 => array('DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_ADDON','chaine', 'mod_riskassessmentdocument_standard' ,'', $conf->entity),
-			6 => array('DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_ADDON_ODT_PATH','chaine', DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/documents/doctemplates/riskassessmentdocument/' ,'', $conf->entity),
-			7 => array('DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_CUSTOM_ADDON_ODT_PATH','chaine', DOL_DATA_ROOT . '/ecm/digiriskdolibarr/riskassessmentdocument/' ,'', $conf->entity),
-			8 => array('DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_DEFAULT_MODEL','chaine', 'riskassessmentdocument_odt' ,'', $conf->entity),
+			20 => array('MAIN_AGENDA_ACTIONAUTO_RISKASSESSMENTDOCUMENT_CREATE', 'integer', 1, '', 0, 'current'),
+			21 => array('DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_ADDON','chaine', 'mod_riskassessmentdocument_standard', '', 0, 'current'),
+			22 => array('DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_ADDON_ODT_PATH', 'chaine', 'DOL_DOCUMENT_ROOT/custom/digiriskdolibarr/documents/doctemplates/riskassessmentdocument/', '', 0, 'current'),
+			23 => array('DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_CUSTOM_ADDON_ODT_PATH', 'chaine', 'DOL_DATA_ROOT/ecm/digiriskdolibarr/riskassessmentdocument/', '', 0, 'current'),
+			24 => array('DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_DEFAULT_MODEL', 'chaine', 'riskassessmentdocument_odt', '', 0, 'current'),
 
 			// CONST LEGAL DISPLAY
-			10 => array('DIGIRISK_LOCATION_OF_DETAILED_INSTRUCTION','chaine','','Location of detailed instruction', $conf->entity),
-			11 => array('DIGIRISK_DEROGATION_SCHEDULE_PERMANENT','chaine','','Permanent exceptions to working hours', $conf->entity),
-			12 => array('DIGIRISK_DEROGATION_SCHEDULE_OCCASIONAL','chaine','','Occasional exceptions to working hours', $conf->entity),
-			13 => array('DIGIRISK_COLLECTIVE_AGREEMENT_TITLE','chaine','','Title of the collective agreement', $conf->entity),
-			14 => array('DIGIRISK_COLLECTIVE_AGREEMENT_LOCATION','chaine','','Location of the collective agreement', $conf->entity),
-			15 => array('DIGIRISK_DUER_LOCATION','chaine','','Location of risks evaluation', $conf->entity),
-			16 => array('DIGIRISK_RULES_LOCATION','chaine','','Location of rules of procedure', $conf->entity),
-			17 => array('DIGIRISK_PARTICIPATION_AGREEMENT_INFORMATION_PROCEDURE','chaine','','Information procedure of participation agreement', $conf->entity),
-			23 => array('DIGIRISK_FIRST_AID','chaine','','', $conf->entity),
+			30 => array('DIGIRISKDOLIBAR_LOCATION_OF_DETAILED_INSTRUCTION', 'chaine', '', 'Location of detailed instruction', 0, 'current'),
+			31 => array('DIGIRISKDOLIBAR_DEROGATION_SCHEDULE_PERMANENT', 'chaine', '', 'Permanent exceptions to working hours', 0, 'current'),
+			32 => array('DIGIRISKDOLIBAR_DEROGATION_SCHEDULE_OCCASIONAL', 'chaine', '', 'Occasional exceptions to working hours', 0, 'current'),
+			33 => array('DIGIRISKDOLIBAR_COLLECTIVE_AGREEMENT_TITLE', 'chaine', '', 'Title of the collective agreement', 0, 'current'),
+			34 => array('DIGIRISKDOLIBAR_COLLECTIVE_AGREEMENT_LOCATION', 'chaine', '', 'Location of the collective agreement', 0, 'current'),
+			35 => array('DIGIRISKDOLIBAR_DUER_LOCATION','chaine', '', 'Location of risks evaluation', 0, 'current'),
+			36 => array('DIGIRISKDOLIBAR_RULES_LOCATION', 'chaine', '', 'Location of rules of procedure', 0, 'current'),
+			37 => array('DIGIRISKDOLIBAR_PARTICIPATION_AGREEMENT_INFORMATION_PROCEDURE', 'chaine', '', 'Information procedure of participation agreement', 0, 'current'),
+			38 => array('DIGIRISKDOLIBAR_FIRST_AID', 'chaine', '', '', 0, 'current'),
 
-			18 => array('MAIN_AGENDA_ACTIONAUTO_LEGALDISPLAY_CREATE','chaine',1,'', $conf->entity),
-			19 => array('DIGIRISKDOLIBARR_LEGALDISPLAY_ADDON','chaine', 'mod_legaldisplay_standard' ,'', $conf->entity),
-			20 => array('DIGIRISKDOLIBARR_LEGALDISPLAY_ADDON_ODT_PATH','chaine', DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/documents/doctemplates/legaldisplay/' ,'', $conf->entity),
-			21 => array('DIGIRISKDOLIBARR_LEGALDISPLAY_CUSTOM_ADDON_ODT_PATH','chaine', DOL_DATA_ROOT . '/ecm/digiriskdolibarr/legaldisplay/' ,'', $conf->entity),
-			22 => array('DIGIRISKDOLIBARR_LEGALDISPLAY_DEFAULT_MODEL','chaine', 'legaldisplay_odt' ,'', $conf->entity),
+			40 => array('MAIN_AGENDA_ACTIONAUTO_LEGALDISPLAY_CREATE', 'integer', 1, '', 0, 'current'),
+			41 => array('DIGIRISKDOLIBARR_LEGALDISPLAY_ADDON', 'chaine', 'mod_legaldisplay_standard', '', 0, 'current'),
+			42 => array('DIGIRISKDOLIBARR_LEGALDISPLAY_ADDON_ODT_PATH', 'chaine',' DOL_DOCUMENT_ROOT/custom/digiriskdolibarr/documents/doctemplates/legaldisplay/', '', 0, 'current'),
+			43 => array('DIGIRISKDOLIBARR_LEGALDISPLAY_CUSTOM_ADDON_ODT_PATH','chaine',' DOL_DATA_ROOT/ecm/digiriskdolibarr/legaldisplay/', '', 0, 'current'),
+			44 => array('DIGIRISKDOLIBARR_LEGALDISPLAY_DEFAULT_MODEL', 'chaine', 'legaldisplay_odt', '', 0, 'current'),
 
 			// CONST INFORMATIONS SHARING
-			30 => array('MAIN_AGENDA_ACTIONAUTO_INFORMATIONSSHARING_CREATE','chaine',1,'', $conf->entity),
-			31 => array('DIGIRISKDOLIBARR_INFORMATIONSSHARING_ADDON','chaine', 'mod_informationssharing_standard' ,'', $conf->entity),
-			32 => array('DIGIRISKDOLIBARR_INFORMATIONSSHARING_ADDON_ODT_PATH','chaine', DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/documents/doctemplates/informationssharing/' ,'', $conf->entity),
-			33 => array('DIGIRISKDOLIBARR_INFORMATIONSSHARING_CUSTOM_ADDON_ODT_PATH','chaine', DOL_DATA_ROOT . '/ecm/digiriskdolibarr/informationssharing/' ,'', $conf->entity),
-			34 => array('DIGIRISKDOLIBARR_INFORMATIONSSHARING_DEFAULT_MODEL','chaine', 'informationssharing_odt' ,'', $conf->entity),
+			50 => array('MAIN_AGENDA_ACTIONAUTO_INFORMATIONSSHARING_CREATE', 'integer', 1, '', 0, 'current'),
+			51 => array('DIGIRISKDOLIBARR_INFORMATIONSSHARING_ADDON', 'chaine', 'mod_informationssharing_standard', '', 0, 'current'),
+			52 => array('DIGIRISKDOLIBARR_INFORMATIONSSHARING_ADDON_ODT_PATH', 'chaine', 'DOL_DOCUMENT_ROOT/custom/digiriskdolibarr/documents/doctemplates/informationssharing/', '', 0, 'current'),
+			53 => array('DIGIRISKDOLIBARR_INFORMATIONSSHARING_CUSTOM_ADDON_ODT_PATH', 'chaine', 'DOL_DATA_ROOT/ecm/digiriskdolibarr/informationssharing/', '', 0, 'current'),
+			54 => array('DIGIRISKDOLIBARR_INFORMATIONSSHARING_DEFAULT_MODEL', 'chaine', 'informationssharing_odt', '', 0, 'current'),
 
 			// CONST LISTING RISKS ACTION
-			40 => array('MAIN_AGENDA_ACTIONAUTO_LISTINGRISKSACTION_CREATE','chaine',1,'', $conf->entity),
-			41 => array('DIGIRISKDOLIBARR_LISTINGRISKSACTION_ADDON','chaine', 'mod_listingrisksaction_standard' ,'', $conf->entity),
-			42 => array('DIGIRISKDOLIBARR_LISTINGRISKSACTION_ADDON_ODT_PATH','chaine', DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/documents/doctemplates/listingrisksaction/' ,'', $conf->entity),
-			43 => array('DIGIRISKDOLIBARR_LISTINGRISKSACTION_CUSTOM_ADDON_ODT_PATH','chaine', DOL_DATA_ROOT . '/ecm/digiriskdolibarr/listingrisksaction/' ,'', $conf->entity),
-			44 => array('DIGIRISKDOLIBARR_LISTINGRISKSACTION_DEFAULT_MODEL','chaine', 'listingrisksaction_odt' ,'', $conf->entity),
+			60 => array('MAIN_AGENDA_ACTIONAUTO_LISTINGRISKSACTION_CREATE', 'integer', 1, '', 0, 'current'),
+			61 => array('DIGIRISKDOLIBARR_LISTINGRISKSACTION_ADDON', 'chaine', 'mod_listingrisksaction_standard', '', 0, 'current'),
+			62 => array('DIGIRISKDOLIBARR_LISTINGRISKSACTION_ADDON_ODT_PATH', 'chaine', 'DOL_DOCUMENT_ROOT/custom/digiriskdolibarr/documents/doctemplates/listingrisksaction/', '', 0, 'current'),
+			63 => array('DIGIRISKDOLIBARR_LISTINGRISKSACTION_CUSTOM_ADDON_ODT_PATH', 'chaine', 'DOL_DATA_ROOT/ecm/digiriskdolibarr/listingrisksaction/', '', 0, 'current'),
+			64 => array('DIGIRISKDOLIBARR_LISTINGRISKSACTION_DEFAULT_MODEL', 'chaine', 'listingrisksaction_odt', '', 0, 'current'),
 
 			// CONST LISTING RISKS PHOTO
-			50 => array('MAIN_AGENDA_ACTIONAUTO_LISTINGRISKSPHOTO_CREATE','chaine',1,'', $conf->entity),
-			51 => array('DIGIRISKDOLIBARR_LISTINGRISKSPHOTO_ADDON','chaine', 'mod_listingrisksphoto_standard' ,'', $conf->entity),
-			52 => array('DIGIRISKDOLIBARR_LISTINGRISKSPHOTO_ADDON_ODT_PATH','chaine', DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/documents/doctemplates/listingrisksphoto/' ,'', $conf->entity),
-			53 => array('DIGIRISKDOLIBARR_LISTINGRISKSPHOTO_CUSTOM_ADDON_ODT_PATH','chaine', DOL_DATA_ROOT . '/ecm/digiriskdolibarr/listingrisksphoto/' ,'', $conf->entity),
-			54 => array('DIGIRISKDOLIBARR_LISTINGRISKSPHOTO_DEFAULT_MODEL','chaine', 'listingrisksphoto_odt' ,'', $conf->entity),
+			70 => array('MAIN_AGENDA_ACTIONAUTO_LISTINGRISKSPHOTO_CREATE', 'integer', 1, '', 0, 'current'),
+			71 => array('DIGIRISKDOLIBARR_LISTINGRISKSPHOTO_ADDON', 'chaine', 'mod_listingrisksphoto_standard', '', 0, 'current'),
+			72 => array('DIGIRISKDOLIBARR_LISTINGRISKSPHOTO_ADDON_ODT_PATH', 'chaine', 'DOL_DOCUMENT_ROOT/custom/digiriskdolibarr/documents/doctemplates/listingrisksphoto/', '', 0, 'current'),
+			73 => array('DIGIRISKDOLIBARR_LISTINGRISKSPHOTO_CUSTOM_ADDON_ODT_PATH', 'chaine',' DOL_DATA_ROOT/ecm/digiriskdolibarr/listingrisksphoto/', '', 0, 'current'),
+			74 => array('DIGIRISKDOLIBARR_LISTINGRISKSPHOTO_DEFAULT_MODEL', 'chaine', 'listingrisksphoto_odt', '', 0, 'current'),
 
 			// CONST GROUPMENT DOCUMENT
-			60 => array('MAIN_AGENDA_ACTIONAUTO_GROUPMENTDOCUMENT_CREATE','chaine',1,'', $conf->entity),
-			61 => array('DIGIRISKDOLIBARR_GROUPMENTDOCUMENT_ADDON_ODT_PATH','chaine', DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/documents/doctemplates/groupmentdocument/' ,'', $conf->entity),
-			62 => array('DIGIRISKDOLIBARR_GROUPMENTDOCUMENT_CUSTOM_ADDON_ODT_PATH','chaine', DOL_DATA_ROOT . '/ecm/digiriskdolibarr/groupmentdocument/' ,'', $conf->entity),
-			63 => array('DIGIRISKDOLIBARR_GROUPMENTDOCUMENT_ADDON','chaine', 'mod_groupmentdocument_standard' ,'', $conf->entity),
-			64 => array('DIGIRISKDOLIBARR_GROUPMENTDOCUMENT_DEFAULT_MODEL','chaine', 'groupmentdocument_odt' ,'', $conf->entity),
+			80 => array('MAIN_AGENDA_ACTIONAUTO_GROUPMENTDOCUMENT_CREATE', 'integer', 1, '', 0, 'current'),
+			81 => array('DIGIRISKDOLIBARR_GROUPMENTDOCUMENT_ADDON', 'chaine', 'mod_groupmentdocument_standard', '', 0, 'current'),
+			82 => array('DIGIRISKDOLIBARR_GROUPMENTDOCUMENT_ADDON_ODT_PATH', 'chaine', 'DOL_DOCUMENT_ROOT/custom/digiriskdolibarr/documents/doctemplates/groupmentdocument/', '', 0, 'current'),
+			83 => array('DIGIRISKDOLIBARR_GROUPMENTDOCUMENT_CUSTOM_ADDON_ODT_PATH', 'chaine', ' DOL_DATA_ROOT/ecm/digiriskdolibarr/groupmentdocument/', '', 0, 'current'),
+			84 => array('DIGIRISKDOLIBARR_GROUPMENTDOCUMENT_DEFAULT_MODEL', 'chaine', 'groupmentdocument_odt', '', 0, 'current'),
 
 			// CONST WORKUNIT DOCUMENT
-			70 => array('MAIN_AGENDA_ACTIONAUTO_WORKUNITDOCUMENT_CREATE','chaine',1,'', $conf->entity),
-			71 => array('DIGIRISKDOLIBARR_WORKUNITDOCUMENT_ADDON','chaine', 'mod_workunitdocument_standard' ,'', $conf->entity),
-			72 => array('DIGIRISKDOLIBARR_WORKUNITDOCUMENT_ADDON_ODT_PATH','chaine', DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/documents/doctemplates/workunitdocument/' ,'', $conf->entity),
-			73 => array('DIGIRISKDOLIBARR_WORKUNITDOCUMENT_CUSTOM_ADDON_ODT_PATH','chaine', DOL_DATA_ROOT . '/ecm/digiriskdolibarr/workunitdocument/' ,'', $conf->entity),
-			74 => array('DIGIRISKDOLIBARR_WORKUNITDOCUMENT_DEFAULT_MODEL','chaine', 'workunitdocument_odt' ,'', $conf->entity),
+			90 => array('MAIN_AGENDA_ACTIONAUTO_WORKUNITDOCUMENT_CREATE', 'integer', 1, '', 0, 'current'),
+			91 => array('DIGIRISKDOLIBARR_WORKUNITDOCUMENT_ADDON', 'chaine', 'mod_workunitdocument_standard', '', 0, 'current'),
+			92 => array('DIGIRISKDOLIBARR_WORKUNITDOCUMENT_ADDON_ODT_PATH', 'chaine', 'DOL_DOCUMENT_ROOT/custom/digiriskdolibarr/documents/doctemplates/workunitdocument/', '', 0, 'current'),
+			93 => array('DIGIRISKDOLIBARR_WORKUNITDOCUMENT_CUSTOM_ADDON_ODT_PATH', 'chaine', 'DOL_DATA_ROOT/ecm/digiriskdolibarr/workunitdocument/', '', 0, 'current'),
+			94 => array('DIGIRISKDOLIBARR_WORKUNITDOCUMENT_DEFAULT_MODEL', 'chaine', 'workunitdocument_odt', '', 0, 'current'),
 
 			// CONST PREVENTION PLAN
-			80 => array('MAIN_AGENDA_ACTIONAUTO_PREVENTIONPLAN_CREATE','chaine',1,'', $conf->entity),
-			81 => array('DIGIRISKDOLIBARR_PREVENTIONPLAN_ADDON','chaine', 'mod_preventionplan_standard' ,'', $conf->entity),
-			83 => array('MAIN_AGENDA_ACTIONAUTO_PREVENTIONPLAN_CREATE','chaine',1,'', $conf->entity),
-			84 => array('MAIN_AGENDA_ACTIONAUTO_PREVENTIONPLAN_EDIT','chaine',1,'', $conf->entity),
-			250 => array('DIGIRISKDOLIBARR_PREVENTIONPLAN_PROJECT','integer', 0,'', $conf->entity),
-			251 => array('DIGIRISKDOLIBARR_PREVENTIONPLAN_MAITRE_OEUVRE','integer', 0,'', $conf->entity),
+			100 => array('MAIN_AGENDA_ACTIONAUTO_PREVENTIONPLAN_CREATE', 'integer', 1, '', 0, 'current'),
+			101 => array('MAIN_AGENDA_ACTIONAUTO_PREVENTIONPLAN_EDIT', 'integer', 1, '', 0, 'current'),
+			102 => array('DIGIRISKDOLIBARR_PREVENTIONPLAN_ADDON', 'chaine', 'mod_preventionplan_standard', '', 0, 'current'),
+			103 => array('DIGIRISKDOLIBARR_PREVENTIONPLAN_PROJECT', 'integer', 0, '', 0, 'current'),
+			104 => array('DIGIRISKDOLIBARR_PREVENTIONPLAN_MAITRE_OEUVRE', 'integer', 0, '', 0, 'current'),
 
 			// CONST PREVENTION PLAN DOCUMENT
-			85 => array('MAIN_AGENDA_ACTIONAUTO_PREVENTIONPLANDOCUMENT_CREATE','chaine',1,'', $conf->entity),
-
-			86 => array('DIGIRISKDOLIBARR_PREVENTIONPLANDOCUMENT_ADDON','chaine', 'mod_preventionplandocument_standard' ,'', $conf->entity),
-			87 => array('DIGIRISKDOLIBARR_PREVENTIONPLANDOCUMENT_ADDON_ODT_PATH','chaine', DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/documents/doctemplates/preventionplandocument/' ,'', $conf->entity),
-			88 => array('DIGIRISKDOLIBARR_PREVENTIONPLANDOCUMENT_CUSTOM_ADDON_ODT_PATH','chaine', DOL_DATA_ROOT . '/ecm/digiriskdolibarr/preventionplandocument/' ,'', $conf->entity),
-			89 => array('DIGIRISKDOLIBARR_PREVENTIONPLANDOCUMENT_DEFAULT_MODEL','chaine', 'preventionplandocument_odt' ,'', $conf->entity),
-			260 => array('DIGIRISKDOLIBARR_PREVENTIONPLANDOCUMENT_SPECIMEN_ADDON_ODT_PATH','chaine', DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/documents/doctemplates/preventionplandocument/specimen/' ,'', $conf->entity),
+			110 => array('MAIN_AGENDA_ACTIONAUTO_PREVENTIONPLANDOCUMENT_CREATE', 'integer', 1, '', 0, 'current'),
+			111 => array('DIGIRISKDOLIBARR_PREVENTIONPLANDOCUMENT_ADDON', 'chaine', 'mod_preventionplandocument_standard', '', 0, 'current'),
+			112 => array('DIGIRISKDOLIBARR_PREVENTIONPLANDOCUMENT_ADDON_ODT_PATH', 'chaine', 'DOL_DOCUMENT_ROOT/custom/digiriskdolibarr/documents/doctemplates/preventionplandocument/', '', 0, 'current'),
+			113 => array('DIGIRISKDOLIBARR_PREVENTIONPLANDOCUMENT_SPECIMEN_ADDON_ODT_PATH', 'chaine', 'DOL_DOCUMENT_ROOT/custom/digiriskdolibarr/documents/doctemplates/preventionplandocument/specimen/', '', 0, 'current'),
+			114 => array('DIGIRISKDOLIBARR_PREVENTIONPLANDOCUMENT_CUSTOM_ADDON_ODT_PATH', 'chaine', 'DOL_DATA_ROOT/ecm/digiriskdolibarr/preventionplandocument/', '', 0, 'current'),
+			115 => array('DIGIRISKDOLIBARR_PREVENTIONPLANDOCUMENT_DEFAULT_MODEL', 'chaine', 'preventionplandocument_odt', '', 0, 'current'),
 
 			// CONST FIRE PERMIT
-			90 => array('MAIN_AGENDA_ACTIONAUTO_FIREPERMIT_CREATE','chaine',1,'', $conf->entity),
-			91 => array('DIGIRISKDOLIBARR_FIREPERMIT_ADDON','chaine', 'mod_firepermit_standard' ,'', $conf->entity),
-			92 => array('MAIN_AGENDA_ACTIONAUTO_FIREPERMIT_CREATE','chaine',1,'', $conf->entity),
-			93 => array('MAIN_AGENDA_ACTIONAUTO_FIREPERMIT_EDIT','chaine',1,'', $conf->entity),
-			270 => array('DIGIRISKDOLIBARR_FIREPERMIT_PROJECT','integer', 0,'', $conf->entity),
-			271 => array('DIGIRISKDOLIBARR_FIREPERMIT_MAITRE_OEUVRE','integer', 0,'', $conf->entity),
+			120 => array('MAIN_AGENDA_ACTIONAUTO_FIREPERMIT_CREATE','integer', 1, '', 0, 'current'),
+			121 => array('MAIN_AGENDA_ACTIONAUTO_FIREPERMIT_EDIT', 'integer', 1, '', 0, 'current'),
+			122 => array('DIGIRISKDOLIBARR_FIREPERMIT_ADDON', 'chaine', 'mod_firepermit_standard', '', 0, 'current'),
+			123 => array('DIGIRISKDOLIBARR_FIREPERMIT_PROJECT', 'integer', 0, '', 0, 'current'),
+			124 => array('DIGIRISKDOLIBARR_FIREPERMIT_MAITRE_OEUVRE', 'integer', 0, '', 0, 'current'),
 
 			// CONST FIRE PERMIT DOCUMENT
-			94 => array('MAIN_AGENDA_ACTIONAUTO_FIREPERMITDOCUMENT_CREATE','chaine',1,'', $conf->entity),
-
-			95 => array('DIGIRISKDOLIBARR_FIREPERMITDOCUMENT_ADDON','chaine', 'mod_firepermitdocument_standard' ,'', $conf->entity),
-			96 => array('DIGIRISKDOLIBARR_FIREPERMITDOCUMENT_ADDON_ODT_PATH','chaine', DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/documents/doctemplates/firepermitdocument/' ,'', $conf->entity),
-			97 => array('DIGIRISKDOLIBARR_FIREPERMITDOCUMENT_CUSTOM_ADDON_ODT_PATH','chaine', DOL_DATA_ROOT . '/ecm/digiriskdolibarr/firepermitdocument/' ,'', $conf->entity),
-			98 => array('DIGIRISKDOLIBARR_FIREPERMITDOCUMENT_DEFAULT_MODEL','chaine', 'firepermitdocument_odt' ,'', $conf->entity),
-
-			// CONST GROUPMENT
-			100 => array('MAIN_AGENDA_ACTIONAUTO_GROUPMENT_CREATE','chaine',1,'', $conf->entity),
-			101 => array('DIGIRISKDOLIBARR_GROUPMENT_ADDON','chaine', 'mod_groupment_standard' ,'', $conf->entity),
-			102 => array('DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH','integer', 0 ,'', $conf->entity),
-			103 => array('DIGIRISKDOLIBARR_SHOW_HIDDEN_DIGIRISKELEMENT','integer', 0 ,'', $conf->entity),
-			104 => array('DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH_UPDATED','integer', 0 ,'', $conf->entity),
-
-			// CONST WORKUNIT
-			110 => array('MAIN_AGENDA_ACTIONAUTO_WORKUNIT_CREATE','chaine',1,'', $conf->entity),
-			111 => array('DIGIRISKDOLIBARR_WORKUNIT_ADDON','chaine', 'mod_workunit_standard' ,'', $conf->entity),
+			130 => array('MAIN_AGENDA_ACTIONAUTO_FIREPERMITDOCUMENT_CREATE', 'integer', 1, '', 0, 'current'),
+			131 => array('DIGIRISKDOLIBARR_FIREPERMITDOCUMENT_ADDON', 'chaine', 'mod_firepermitdocument_standard', '', 0, 'current'),
+			132 => array('DIGIRISKDOLIBARR_FIREPERMITDOCUMENT_ADDON_ODT_PATH', 'chaine', 'DOL_DOCUMENT_ROOT/custom/digiriskdolibarr/documents/doctemplates/firepermitdocument/', '', 0, 'current'),
+			133 => array('DIGIRISKDOLIBARR_FIREPERMITDOCUMENT_CUSTOM_ADDON_ODT_PATH', 'chaine', ' DOL_DATA_ROOT/ecm/digiriskdolibarr/firepermitdocument/', '', 0, 'current'),
+			134 => array('DIGIRISKDOLIBARR_FIREPERMITDOCUMENT_DEFAULT_MODEL', 'chaine', 'firepermitdocument_odt', '', 0, 'current'),
 
 			//CONST DIGIRISKELEMENT
-			115 => array('DIGIRISKDOLIBARR_DIGIRISKELEMENT_MEDIAS_BACKWARD_COMPATIBILITY','integer', 0 ,'', $conf->entity),
+			140 => array('DIGIRISKDOLIBARR_DIGIRISKELEMENT_MEDIAS_BACKWARD_COMPATIBILITY', 'integer', 0, '', 0, 'current'),
+			141 => array('DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH', 'integer', 0, '', 0, 'current'),
+			142 => array('DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH_UPDATED', 'integer', 0, '', 0, 'current'),
+			143 => array('DIGIRISKDOLIBARR_SHOW_HIDDEN_DIGIRISKELEMENT', 'integer', 0, '', 0, 'current'),
+
+			// CONST GROUPMENT
+			150 => array('MAIN_AGENDA_ACTIONAUTO_GROUPMENT_CREATE', 'integer', 1, '', 0, 'current'),
+			151 => array('DIGIRISKDOLIBARR_GROUPMENT_ADDON', 'chaine', 'mod_groupment_standard', '', 0, 'current'),
+
+			// CONST WORKUNIT
+			160 => array('MAIN_AGENDA_ACTIONAUTO_WORKUNIT_CREATE', 'integer', 1, '', 0, 'current'),
+			161 => array('DIGIRISKDOLIBARR_WORKUNIT_ADDON', 'chaine', 'mod_workunit_standard', '', 0, 'current'),
 
 			// CONST EVALUATOR
-			120 => array('MAIN_AGENDA_ACTIONAUTO_EVALUATOR_CREATE','chaine',1,'', $conf->entity),
-			121 => array('DIGIRISKDOLIBARR_EVALUATOR_ADDON','chaine', 'mod_evaluator_standard' ,'', $conf->entity),
-
-			122 => array('DIGIRISKDOLIBARR_EVALUATOR_DURATION','integer', 15 ,'', $conf->entity),
+			170 => array('MAIN_AGENDA_ACTIONAUTO_EVALUATOR_CREATE', 'integer', 1, '', 0, 'current'),
+			171 => array('DIGIRISKDOLIBARR_EVALUATOR_ADDON', 'chaine', 'mod_evaluator_standard', '', 0, 'current'),
+			172 => array('DIGIRISKDOLIBARR_EVALUATOR_DURATION', 'integer', 15, '', 0, 'current'),
 
 			// CONST RISK ANALYSIS
 
 			// CONST RISK
-			130 => array('MAIN_AGENDA_ACTIONAUTO_RISK_CREATE','chaine',1,'', $conf->entity),
-			131 => array('DIGIRISKDOLIBARR_RISK_ADDON','chaine', 'mod_risk_standard' ,'', $conf->entity),
-			132 => array('DIGIRISKDOLIBARR_RISK_DESCRIPTION','integer', 1 ,'', $conf->entity),
-			133 => array('DIGIRISKDOLIBARR_RISK_CATEGORY_EDIT','integer', 0 ,'', $conf->entity),
-			134 => array('DIGIRISKDOLIBARR_RISK_DESCRIPTION_PREFILL','integer', 0 ,'', $conf->entity),
-			135 => array('DIGIRISKDOLIBARR_SORT_LISTINGS_BY_COTATION','integer', 1 ,'', $conf->entity),
+			180 => array('MAIN_AGENDA_ACTIONAUTO_RISK_CREATE', 'integer', 1, '', 0, 'current'),
+			181 => array('DIGIRISKDOLIBARR_RISK_ADDON', 'chaine', 'mod_risk_standard', '', 0, 'current'),
+			182 => array('DIGIRISKDOLIBARR_RISK_DESCRIPTION', 'integer', 1, '', 0, 'current'),
+			183 => array('DIGIRISKDOLIBARR_RISK_CATEGORY_EDIT', 'integer', 0, '', 0, 'current'),
+			184 => array('DIGIRISKDOLIBARR_RISK_DESCRIPTION_PREFILL', 'integer', 0, '', 0, 'current'),
+			185 => array('DIGIRISKDOLIBARR_SORT_LISTINGS_BY_COTATION', 'integer', 1, '', 0, 'current'),
 
 			// CONST RISK ASSESSMENT
-			140 => array('MAIN_AGENDA_ACTIONAUTO_RISKASSESSMENT_CREATE','chaine',1,'', $conf->entity),
-			141 => array('DIGIRISKDOLIBARR_RISKASSESSMENT_ADDON','chaine', 'mod_riskassessment_standard' ,'', $conf->entity),
-
-			142 => array('DIGIRISKDOLIBARR_MULTIPLE_RISKASSESSMENT_METHOD','integer', 0 ,'', $conf->entity),
-			143 => array('DIGIRISKDOLIBARR_ADVANCED_RISKASSESSMENT_METHOD','integer', 0 ,'', $conf->entity),
-			144 => array('DIGIRISKDOLIBARR_SHOW_RISKASSESSMENT_DATE','integer', 0,'', $conf->entity),
-			145 => array('DIGIRISKDOLIBARR_SHOW_ALL_RISKASESSMENTS','integer', 0,'', $conf->entity),
+			190 => array('MAIN_AGENDA_ACTIONAUTO_RISKASSESSMENT_CREATE', 'integer', 1, '', 0, 'current'),
+			191 => array('DIGIRISKDOLIBARR_RISKASSESSMENT_ADDON', 'chaine', 'mod_riskassessment_standard', '', 0, 'current'),
+			192 => array('DIGIRISKDOLIBARR_MULTIPLE_RISKASSESSMENT_METHOD', 'integer', 0, '', 0, 'current'),
+			193 => array('DIGIRISKDOLIBARR_ADVANCED_RISKASSESSMENT_METHOD', 'integer', 0, '', 0, 'current'),
+			194 => array('DIGIRISKDOLIBARR_SHOW_RISKASSESSMENT_DATE', 'integer', 0, '', 0, 'current'),
+			195 => array('DIGIRISKDOLIBARR_SHOW_ALL_RISKASESSMENTS', 'integer', 0, '', 0, 'current'),
 
 			// CONST RISK SIGN
-			150 => array('MAIN_AGENDA_ACTIONAUTO_RISKSIGN_CREATE','chaine',1,'', $conf->entity),
-			151 => array('DIGIRISKDOLIBARR_RISKSIGN_ADDON','chaine', 'mod_risksign_standard' ,'', $conf->entity),
+			200 => array('MAIN_AGENDA_ACTIONAUTO_RISKSIGN_CREATE', 'integer', 1, '', 0, 'current'),
+			201 => array('DIGIRISKDOLIBARR_RISKSIGN_ADDON', 'chaine', 'mod_risksign_standard', '', 0, 'current'),
 
 			// CONST PROJET
-			155 => array('DIGIRISKDOLIBARR_PROJECT_TAGS_SET','integer', 0,'', $conf->entity),
-			160 => array('DIGIRISKDOLIBARR_DU_PROJECT','integer', 0,'', $conf->entity),
+			210 => array('DIGIRISKDOLIBARR_PROJECT_TAGS_SET', 'integer', 0, '', 0, 'current'),
+			211 => array('DIGIRISKDOLIBARR_DU_PROJECT', 'integer', 0, '', 0, 'current'),
 
 			// CONST TASK
-			161 => array('DIGIRISKDOLIBARR_ACTIVE_STANDARD','integer', 0,'', $conf->entity),
-			162 => array('DIGIRISKDOLIBARR_DOCUMENT_MODELS_SET','integer', 0,'', $conf->entity),
-			163 => array('DIGIRISKDOLIBARR_THIRDPARTY_SET','integer', 0,'', $conf->entity),
-			164 => array('DIGIRISKDOLIBARR_TASK_MANAGEMENT','integer', 1 ,'', $conf->entity),
-			310 => array('DIGIRISKDOLIBARR_SHOW_TASK_START_DATE','integer', 0,'', $conf->entity),
-			311 => array('DIGIRISKDOLIBARR_SHOW_TASK_END_DATE','integer', 0,'', $conf->entity),
-			312 => array('DIGIRISKDOLIBARR_SHOW_TASK_PROGRESS','integer', 1,'', $conf->entity),
-			313 => array('DIGIRISKDOLIBARR_SHOW_ALL_TASKS','integer', 1,'', $conf->entity),
-			314 => array('DIGIRISKDOLIBARR_TASK_TIMESPENT_DURATION','integer', 15,'', $conf->entity),
+			220 => array('DIGIRISKDOLIBARR_TASK_MANAGEMENT', 'integer', 1, '', 0, 'current'),
+			221 => array('DIGIRISKDOLIBARR_SHOW_TASK_START_DATE', 'integer', 0, '', 0, 'current'),
+			222 => array('DIGIRISKDOLIBARR_SHOW_TASK_END_DATE', 'integer', 0, '', 0, 'current'),
+			223 => array('DIGIRISKDOLIBARR_SHOW_TASK_PROGRESS', 'integer', 1, '', 0, 'current'),
+			224 => array('DIGIRISKDOLIBARR_SHOW_ALL_TASKS', 'integer', 1, '', 0, 'current'),
+			225 => array('DIGIRISKDOLIBARR_TASK_TIMESPENT_DURATION', 'integer', 15, '', 0, 'current'),
 
 			// CONST PREVENTION PLAN LINE
-			180 => array('MAIN_AGENDA_ACTIONAUTO_PREVENTIONPLANDET_CREATE','chaine',1,'', $conf->entity),
-			181 => array('DIGIRISKDOLIBARR_PREVENTIONPLANDET_ADDON','chaine', 'mod_preventionplandet_standard','', $conf->entity),
+			240 => array('MAIN_AGENDA_ACTIONAUTO_PREVENTIONPLANDET_CREATE', 'integer', 1, '', 0, 'current'),
+			241 => array('DIGIRISKDOLIBARR_PREVENTIONPLANDET_ADDON', 'chaine', 'mod_preventionplandet_standard', '', 0, 'current'),
 
 			// CONST FIRE PERMIT LINE
-			190 => array('MAIN_AGENDA_ACTIONAUTO_FIREPERMITDET_CREATE','chaine',1,'', $conf->entity),
-			191 => array('DIGIRISKDOLIBARR_FIREPERMITDET_ADDON','chaine', 'mod_firepermitdet_standard','', $conf->entity),
+			250 => array('MAIN_AGENDA_ACTIONAUTO_FIREPERMITDET_CREATE', 'integer', 1, '', 0, 'current'),
+			251 => array('DIGIRISKDOLIBARR_FIREPERMITDET_ADDON', 'chaine', 'mod_firepermitdet_standard', '', 0, 'current'),
 
 			// CONST MODULE
-			200 => array('DIGIRISKDOLIBARR_VERSION','chaine', $this->version,'', $conf->entity),
-			201 => array('DIGIRISKDOLIBARR_SUBPERMCATEGORY_FOR_DOCUMENTS','integer', 1,'', $conf->entity),
-			202 => array('DIGIRISKDOLIBARR_DB_VERSION','chaine', $this->version,'', $conf->entity),
-			203 => array('DIGIRISKDOLIBARR_USERAPI_SET','integer', 0, '', $conf->entity),
-			204 => array('DIGIRISKDOLIBARR_USERGROUP_SET','integer', 0, '', $conf->entity),
-			205 => array('DIGIRISKDOLIBARR_ADMINUSERGROUP_SET','integer', 0, '', $conf->entity),
-			206 => array('DIGIRISKDOLIBARR_CONTACTS_SET','integer', 0, '', $conf->entity),
-			207 => array('DIGIRISKDOLIBARR_REDIRECT_AFTER_CONNECTION','integer', 0, '', $conf->entity),
-			208 => array('DIGIRISKDOLIBARR_USE_CAPTCHA','integer', 0, '', $conf->entity),
+			260 => array('DIGIRISKDOLIBARR_SUBPERMCATEGORY_FOR_DOCUMENTS', 'integer', 1, '', 0, 'current'),
+			261 => array('DIGIRISKDOLIBARR_VERSION','chaine', $this->version, '', 0, 'current'),
+			262 => array('DIGIRISKDOLIBARR_DB_VERSION', 'chaine', $this->version, '', 0, 'current'),
+			263 => array('DIGIRISKDOLIBARR_THIRDPARTY_SET', 'integer', 0, '', 0, 'current'),
+			264 => array('DIGIRISKDOLIBARR_THIRDPARTY_UPDATED', 'integer', 0, '', 0, 'current'),
+			265 => array('DIGIRISKDOLIBARR_CONTACTS_SET', 'integer', 0, '', 0, 'current'),
+			266 => array('DIGIRISKDOLIBARR_USERAPI_SET', 'integer', 0, '', 0, 'current'),
+			267 => array('DIGIRISKDOLIBARR_READERGROUP_SET', 'integer', 0, '', 0, 'current'),
+			268 => array('DIGIRISKDOLIBARR_USERGROUP_SET', 'integer', 0, '', 0, 'current'),
+			269 => array('DIGIRISKDOLIBARR_ADMINUSERGROUP_SET', 'integer', 0, '', 0, 'current'),
+			270 => array('DIGIRISKDOLIBARR_READERGROUP_UPDATED', 'integer', 2, '', 0, 'current'),
+			271 => array('DIGIRISKDOLIBARR_USERGROUP_UPDATED', 'integer', 3, '', 0, 'current'),
+			272 => array('DIGIRISKDOLIBARR_ADMINUSERGROUP_UPDATED', 'integer', 3, '', 0, 'current'),
+			273 => array('DIGIRISKDOLIBARR_REDIRECT_AFTER_CONNECTION', 'integer', 0, '', 0, 'current'),
+			274 => array('DIGIRISKDOLIBARR_USE_CAPTCHA', 'integer', 0, '', 0, 'current'),
+			275 => array('DIGIRISKDOLIBARR_NEW_SIGNATURE_TABLE', 'integer', 1, '', 0, 'current'),
+			276 => array('DIGIRISKDOLIBARR_ACTIVE_STANDARD', 'integer', 0, '', 0, 'current'),
+			277 => array('DIGIRISKDOLIBARR_TRIGGERS_UPDATED', 'integer', 1, '', 0, 'current'),
+			278 => array('DIGIRISKDOLIBARR_CONF_BACKWARD_COMPATIBILITY', 'integer', 1, '', 0, 'current'),
 
 			// CONST SIGNATURE
-			210 => array('DIGIRISKDOLIBARR_SIGNATURE_ENABLE_PUBLIC_INTERFACE','integer', 1,'', $conf->entity),
-			211 => array('DIGIRISKDOLIBARR_SIGNATURE_SHOW_COMPANY_LOGO','integer', 1,'', $conf->entity),
+			280 => array('DIGIRISKDOLIBARR_SIGNATURE_ENABLE_PUBLIC_INTERFACE', 'integer', 1, '', 0, 'current'),
+			281 => array('DIGIRISKDOLIBARR_SIGNATURE_SHOW_COMPANY_LOGO', 'integer', 1, '', 0, 'current'),
 
 			//CONST TICKET & REGISTERS
-			300 => array('DIGIRISKDOLIBARR_TICKET_EXTRAFIELDS', 'integer', 0, '', $conf->entity),
-			301 => array('DIGIRISKDOLIBARR_TICKET_CATEGORIES_CREATED', 'integer', 0, '', $conf->entity),
-			302 => array('DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE','integer', 1,'', $conf->entity),
-			303 => array('DIGIRISKDOLIBARR_TICKET_SHOW_COMPANY_LOGO','integer', 1,'', $conf->entity),
+			290 => array('DIGIRISKDOLIBARR_TICKET_EXTRAFIELDS', 'integer', 0, '', 0, 'current'),
+			291 => array('DIGIRISKDOLIBARR_TICKET_CATEGORIES_CREATED', 'integer', 0, '', 0, 'current'),
+			292 => array('DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE', 'integer', 1, '', 0, 'current'),
+			293 => array('DIGIRISKDOLIBARR_TICKET_SHOW_COMPANY_LOGO', 'integer', 1, '', 0, 'current'),
+			294 => array('DIGIRISKDOLIBARR_TICKET_SUBMITTED_SEND_MAIL_TO', 'integer', 1, '', 0, 'current'),
 
 			// CONST ACCIDENT
-			330 => array('MAIN_AGENDA_ACTIONAUTO_ACCIDENT_CREATE','chaine',1,'', $conf->entity),
-			331 => array('MAIN_AGENDA_ACTIONAUTO_ACCIDENT_EDIT','chaine',1,'', $conf->entity),
-			332 => array('DIGIRISKDOLIBARR_ACCIDENT_ADDON','chaine', 'mod_accident_standard' ,'', $conf->entity),
-			333 => array('DIGIRISKDOLIBARR_ACCIDENT_PROJECT','integer', 0,'', $conf->entity),
+			300 => array('MAIN_AGENDA_ACTIONAUTO_ACCIDENT_CREATE', 'integer', 1, '', 0, 'current'),
+			301 => array('MAIN_AGENDA_ACTIONAUTO_ACCIDENT_EDIT', 'integer', 1, '', 0, 'current'),
+			302 => array('DIGIRISKDOLIBARR_ACCIDENT_ADDON', 'chaine', 'mod_accident_standard', '', 0, 'current'),
+			303 => array('DIGIRISKDOLIBARR_ACCIDENT_PROJECT', 'integer', 0, '', 0, 'current'),
 
 			// CONST ACCIDENT LINE
-			350 => array('MAIN_AGENDA_ACTIONAUTO_ACCIDENT_WORKSTOP_CREATE','chaine',1,'', $conf->entity),
-			351 => array('DIGIRISKDOLIBARR_ACCIDENT_WORKSTOP_ADDON','chaine', 'mod_accident_workstop_standard','', $conf->entity),
-			352 => array('DIGIRISKDOLIBARR_ACCIDENT_LESION_ADDON','chaine', 'mod_accident_lesion_standard','', $conf->entity),
+			310 => array('MAIN_AGENDA_ACTIONAUTO_ACCIDENT_WORKSTOP_CREATE', 'integer', 1, '', 0, 'current'),
+			311 => array('DIGIRISKDOLIBARR_ACCIDENT_WORKSTOP_ADDON', 'chaine', 'mod_accident_workstop_standard', '', 0, 'current'),
+			312 => array('DIGIRISKDOLIBARR_ACCIDENT_LESION_ADDON', 'chaine', 'mod_accident_lesion_standard', '', 0, 'current'),
+
+//			// CONST ACCIDENT DOCUMENT
+//			320 => array('MAIN_AGENDA_ACTIONAUTO_ACCIDENTDOCUMENT_CREATE', 'integer', 1, '', 0, 'current'),
+//			321 => array('DIGIRISKDOLIBARR_ACCIDENTDOCUMENT_ADDON', 'chaine', 'mod_accidentdocument_standard', '', 0, 'current'),
+//			322 => array('DIGIRISKDOLIBARR_ACCIDENTDOCUMENT_ADDON_ODT_PATH','chaine', 'DOL_DOCUMENT_ROOT/custom/digiriskdolibarr/documents/doctemplates/accidentdocument/', '', 0, 'current'),
+//			323 => array('DIGIRISKDOLIBARR_ACCIDENTDOCUMENT_CUSTOM_ADDON_ODT_PATH', 'chaine', 'DOL_DATA_ROOT/ecm/digiriskdolibarr/accidentdocument/', '', 0, 'current'),
+//			324 => array('DIGIRISKDOLIBARR_ACCIDENTDOCUMENT_DEFAULT_MODEL', 'chaine', 'accidentdocument_odt', '', 0, 'current'),
 
 			// GENERAL CONSTS
-			400 => array('MAIN_USE_EXIF_ROTATION','integer',1,'', $conf->entity),
-
-		//          // CONST ACCIDENT DOCUMENT
-		//          360 => array('MAIN_AGENDA_ACTIONAUTO_ACCIDENTDOCUMENT_CREATE','chaine',1,'', $conf->entity),
-		//
-		//          361 => array('DIGIRISKDOLIBARR_ACCIDENTDOCUMENT_ADDON','chaine', 'mod_accidentdocument_standard' ,'', $conf->entity),
-		//          362 => array('DIGIRISKDOLIBARR_ACCIDENTDOCUMENT_ADDON_ODT_PATH','chaine', DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/documents/doctemplates/accidentdocument/' ,'', $conf->entity),
-		//          363 => array('DIGIRISKDOLIBARR_ACCIDENTDOCUMENT_CUSTOM_ADDON_ODT_PATH','chaine', DOL_DATA_ROOT . '/ecm/digiriskdolibarr/accidentdocument/' ,'', $conf->entity),
-		//          364 => array('DIGIRISKDOLIBARR_ACCIDENTDOCUMENT_DEFAULT_MODEL','chaine', 'accidentdocument_odt' ,'', $conf->entity),
+			330 => array('MAIN_USE_EXIF_ROTATION', 'integer', 1, '', 0, 'current'),
+			331 => array('MAIN_EXTRAFIELDS_USE_SELECT2', 'integer', 1, '', 0, 'current'),
 		);
 
 		if ( ! isset($conf->digiriskdolibarr) || ! isset($conf->digiriskdolibarr->enabled) ) {
@@ -672,9 +674,9 @@ class modDigiriskdolibarr extends DolibarrModules
 		// Array to add new pages in new tabs
 		$this->tabs = array();
 		// Example:
-		$this->tabs[] = array('data' => 'mycompany_admin:+security:Sécurité:@digiriskdolibarr:1:/custom/digiriskdolibarr/admin/securityconf.php');  					// To add a new tab identified by code tabname1
+		$this->tabs[] = array('data' => 'mycompany_admin:+security:Sécurité:@digiriskdolibarr:1:/custom/digiriskdolibarr/admin/securityconf.php');  			// To add a new tab identified by code tabname1
 		$this->tabs[] = array('data' => 'mycompany_admin:+social:Social:@digiriskdolibarr:1:/custom/digiriskdolibarr/admin/socialconf.php');  					// To add a new tab identified by code tabname1
-		$this->tabs[] = array('data' => 'thirdparty:+openinghours:Horaires:@digiriskdolibarr:1:/custom/digiriskdolibarr/view/openinghours_card.php?id=__ID__');  					// To add a new tab identified by code tabname1
+		$this->tabs[] = array('data' => 'thirdparty:+openinghours:Horaires:@digiriskdolibarr:1:/custom/digiriskdolibarr/view/openinghours_card.php?id=__ID__'); // To add a new tab identified by code tabname1
 
 		// To remove an existing tab identified by code tabname
 		// Dictionaries
@@ -1128,8 +1130,8 @@ class modDigiriskdolibarr extends DolibarrModules
 			'url' => '/digiriskdolibarr/view/digiriskusers.php',
 			'langs' => 'digiriskdolibarr@digiriskdolibarr',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
 			'position' => 48520 + $r,
-			'enabled' => '$user->rights->user->user->lire',  // Define condition to show or hide menu entry. Use '$conf->digiriskdolibarr->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
-			'perms' => '$user->rights->user->user->lire', // Use 'perms'=>'$user->rights->digiriskdolibarr->level1->level2' if you want your menu with a permission rules
+			'enabled' => '$conf->digiriskdolibarr->enabled',  // Define condition to show or hide menu entry. Use '$conf->digiriskdolibarr->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
+			'perms' => '$user->rights->digiriskdolibarr->adminpage->read', // Use 'perms'=>'$user->rights->digiriskdolibarr->level1->level2' if you want your menu with a permission rules
 			'target' => '',
 			'user' => 0,				                // 0=Menu for internal users, 1=external users, 2=both
 		);
@@ -1144,7 +1146,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			'langs' => 'digiriskdolibarr@digiriskdolibarr',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
 			'position' => 48520 + $r,
 			'enabled' => '$conf->digiriskdolibarr->enabled',  // Define condition to show or hide menu entry. Use '$conf->digiriskdolibarr->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
-			'perms' => '$user->admin && $user->rights->digiriskdolibarr->digiriskelement->read',			                // Use 'perms'=>'$user->rights->digiriskdolibarr->level1->level2' if you want your menu with a permission rules
+			'perms' => '$user->rights->digiriskdolibarr->digiriskelement->read',			                // Use 'perms'=>'$user->rights->digiriskdolibarr->level1->level2' if you want your menu with a permission rules
 			'target' => '_blank',
 			'user' => 0,				                // 0=Menu for internal users, 1=external users, 2=both
 		);
@@ -1159,7 +1161,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			'langs' => 'digiriskdolibarr@digiriskdolibarr',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
 			'position' => 48520 + $r,
 			'enabled' => '$conf->digiriskdolibarr->enabled && $user->admin',  // Define condition to show or hide menu entry. Use '$conf->digiriskdolibarr->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
-			'perms' => '$user->admin',			                // Use 'perms'=>'$user->rights->digiriskdolibarr->level1->level2' if you want your menu with a permission rules
+			'perms' => '$user->admin && $user->rights->digiriskdolibarr->adminpage->read',			                // Use 'perms'=>'$user->rights->digiriskdolibarr->level1->level2' if you want your menu with a permission rules
 			'target' => '',
 			'user' => 0,				                // 0=Menu for internal users, 1=external users, 2=both
 		);
@@ -1318,49 +1320,49 @@ class modDigiriskdolibarr extends DolibarrModules
 			$resources = new DigiriskResources($this->db);
 
 			$labour_inspector         = $societe;
-			$labour_inspector->name   = $langs->trans('LabourInspectorName');
+			$labour_inspector->name   = $langs->trans('LabourInspectorName') . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
 			$labour_inspector->client = 0;
 			$labour_inspector->phone  = '';
 			$labour_inspector->url    = $langs->trans('UrlLabourInspector');
 			$labour_inspectorID       = $labour_inspector->create($user);
 
 			$samu         = $societe;
-			$samu->name   = $langs->trans('SAMU');
+			$samu->name   = $langs->trans('SAMU') . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
 			$samu->client = 0;
 			$samu->phone  = '15';
 			$samu->url    = '';
 			$samuID       = $samu->create($user);
 
 			$pompiers         = $societe;
-			$pompiers->name   = $langs->trans('Pompiers');
+			$pompiers->name   = $langs->trans('Pompiers') . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
 			$pompiers->client = 0;
 			$pompiers->phone  = '18';
 			$pompiers->url    = '';
 			$pompiersID       = $pompiers->create($user);
 
 			$police         = $societe;
-			$police->name   = $langs->trans('Police');
+			$police->name   = $langs->trans('Police') . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
 			$police->client = 0;
 			$police->phone  = '17';
 			$police->url    = '';
 			$policeID       = $police->create($user);
 
 			$emergency         = $societe;
-			$emergency->name   = $langs->trans('AllEmergencies');
+			$emergency->name   = $langs->trans('AllEmergencies') . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
 			$emergency->client = 0;
 			$emergency->phone  = '112';
 			$emergency->url    = '';
 			$emergencyID       = $emergency->create($user);
 
 			$rights_defender         = $societe;
-			$rights_defender->name   = $langs->trans('RightsDefender');
+			$rights_defender->name   = $langs->trans('RightsDefender') . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
 			$rights_defender->client = 0;
 			$rights_defender->phone  = '';
 			$rights_defender->url    = '';
 			$rights_defenderID       = $rights_defender->create($user);
 
 			$poison_control_center         = $societe;
-			$poison_control_center->name   = $langs->trans('PoisonControlCenter');
+			$poison_control_center->name   = $langs->trans('PoisonControlCenter') . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
 			$poison_control_center->client = 0;
 			$poison_control_center->phone  = '';
 			$poison_control_center->url    = '';
@@ -1385,21 +1387,21 @@ class modDigiriskdolibarr extends DolibarrModules
 			$resources = new DigiriskResources($this->db);
 
 			$labour_inspector         = $societe;
-			$labour_inspector->name   = $langs->trans('LabourInspectorName');
+			$labour_inspector->name   = $langs->trans('LabourInspectorName') . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
 			$labour_inspector->client = 0;
 			$labour_inspector->phone  = '';
 			$labour_inspector->url    = $langs->trans('UrlLabourInspector');
 			$labour_inspectorID       = $labour_inspector->create($user);
 
 			$rights_defender         = $societe;
-			$rights_defender->name   = $langs->trans('RightsDefender');
+			$rights_defender->name   = $langs->trans('RightsDefender') . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
 			$rights_defender->client = 0;
 			$rights_defender->phone  = '';
 			$rights_defender->url    = '';
 			$rights_defenderID       = $rights_defender->create($user);
 
 			$poison_control_center         = $societe;
-			$poison_control_center->name   = $langs->trans('PoisonControlCenter');
+			$poison_control_center->name   = $langs->trans('PoisonControlCenter') . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
 			$poison_control_center->client = 0;
 			$poison_control_center->phone  = '';
 			$poison_control_center->url    = '';
@@ -1431,16 +1433,61 @@ class modDigiriskdolibarr extends DolibarrModules
 			dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_CONTACTS_SET', 2, 'integer', 0, '', $conf->entity);
 		}
 
+		if ( $conf->global->DIGIRISKDOLIBARR_THIRDPARTY_UPDATED == 0 ) {
+			require_once DOL_DOCUMENT_ROOT . '/societe/class/societe.class.php';
+			require_once __DIR__ . '/../../class/digiriskresources.class.php';
+
+			$societe   = new Societe($this->db);
+			$resources = new DigiriskResources($this->db);
+			$labour_inspectorID = $resources->digirisk_dolibarr_fetch_resource('LabourInspectorSociety');
+			$societe->fetch($labour_inspectorID);
+			$societe->name = $langs->trans('LabourInspectorName') . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
+			$societe->update(0, $user);
+
+			$policeID = $resources->digirisk_dolibarr_fetch_resource('Police');
+			$societe->fetch($policeID);
+			$societe->name = $langs->trans('Police') . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
+			$societe->update(0, $user);
+
+			$samuID = $resources->digirisk_dolibarr_fetch_resource('SAMU');
+			$societe->fetch($samuID);
+			$societe->name = $langs->trans('SAMU') . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
+			$societe->update(0, $user);
+
+			$pompiersID = $resources->digirisk_dolibarr_fetch_resource('Pompiers');
+			$societe->fetch($pompiersID);
+			$societe->name = $langs->trans('Pompiers') . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
+			$societe->update(0, $user);
+
+			$emergencyID = $resources->digirisk_dolibarr_fetch_resource('AllEmergencies');
+			$societe->fetch($emergencyID);
+			$societe->name = $langs->trans('AllEmergencies') . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
+			$societe->update(0, $user);
+
+			$rights_defenderID = $resources->digirisk_dolibarr_fetch_resource('RightsDefender');
+			$societe->fetch($rights_defenderID);
+			$societe->name = $langs->trans('RightsDefender') . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
+			$societe->update(0, $user);
+
+			$poison_control_centerID = $resources->digirisk_dolibarr_fetch_resource('PoisonControlCenter');
+			$societe->fetch($poison_control_centerID);
+			$societe->name = $langs->trans('PoisonControlCenter') . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
+			$societe->update(0, $user);
+
+			dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_THIRDPARTY_UPDATED', 1, 'integer', 0, '', $conf->entity);
+		}
+
 		// Create extrafields during init
 		include_once DOL_DOCUMENT_ROOT . '/core/class/extrafields.class.php';
 		$extra_fields = new ExtraFields($this->db);
 
-		$extra_fields->update('fk_risk', $langs->trans("fk_risk"), 'sellist', '', 'projet_task', 0, 0, 1020, 'a:1:{s:7:"options";a:1:{s:50:"digiriskdolibarr_risk:ref:rowid::entity = $ENTITY$";N;}}', '', '', 1);
-		$extra_fields->addExtraField('fk_risk', $langs->trans("fk_risk"), 'sellist', 1020, '', 'projet_task', 0, 0, '', 'a:1:{s:7:"options";a:1:{s:50:"digiriskdolibarr_risk:ref:rowid::entity = $ENTITY$";N;}}', '', '', 1);
+		$extra_fields->update('fk_risk', $langs->trans("fk_risk"), 'sellist', '', 'projet_task', 0, 0, 1010, 'a:1:{s:7:"options";a:1:{s:50:"digiriskdolibarr_risk:ref:rowid::entity = $ENTITY$";N;}}', '', '', 1);
+		$extra_fields->addExtraField('fk_risk', $langs->trans("fk_risk"), 'sellist', 1010, '', 'projet_task', 0, 0, '', 'a:1:{s:7:"options";a:1:{s:50:"digiriskdolibarr_risk:ref:rowid::entity = $ENTITY$";N;}}', '', '', 1);
 
 		$extra_fields->addExtraField('fk_preventionplan', $langs->trans("fk_preventionplan"), 'sellist', 1020, '', 'projet_task', 0, 0, '', 'a:1:{s:7:"options";a:1:{s:60:"digiriskdolibarr_preventionplan:ref:rowid::entity = $ENTITY$";N;}}', '', '', 1);
 		$extra_fields->addExtraField('fk_firepermit', $langs->trans("fk_firepermit"), 'sellist', 1030, '', 'projet_task', 0, 0, '', 'a:1:{s:7:"options";a:1:{s:56:"digiriskdolibarr_firepermit:ref:rowid::entity = $ENTITY$";N;}}', '', '', 1);
-		$extra_fields->addExtraField('fk_accident', $langs->trans("fk_accident"), 'sellist', 1020, '', 'projet_task', 0, 0, '', 'a:1:{s:7:"options";a:1:{s:50:"digiriskdolibarr_accident:ref:rowid::entity = $ENTITY$";N;}a:1:{s:7:"options";a:1:{s:50:"digiriskdolibarr_risk:ref:rowid::entity = $ENTITY$";N;}}}', '', '', 1);
+		$extra_fields->update('fk_accident', $langs->trans("fk_accident"), 'sellist', '', 'projet_task', 0, 0, 1040, 'a:1:{s:7:"options";a:1:{s:54:"digiriskdolibarr_accident:ref:rowid::entity = $ENTITY$";N;}}', '', '', 1);
+		$extra_fields->addExtraField('fk_accident', $langs->trans("fk_accident"), 'sellist', 1040, '', 'projet_task', 0, 0, '', 'a:1:{s:7:"options";a:1:{s:54:"digiriskdolibarr_accident:ref:rowid::entity = $ENTITY$";N;}}', '', '', 1);
 
 		//Used for data import from Digirisk Wordpress
 		$extra_fields->update('wp_digi_id', $langs->trans("WPDigiID"), 'int', 100, 'digiriskdolibarr_digiriskelement', 0, 0, 1020, '', '', '', 0);

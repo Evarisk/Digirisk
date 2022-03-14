@@ -53,7 +53,7 @@ if ( $conf->global->DIGIRISKDOLIBARR_DU_PROJECT == 0 || $project->statut == 2 ) 
 	$project->date_end     = $enddate;
 	$project->statut       = 1;
 	$project_id            = $project->create($user);
-	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_DU_PROJECT', $project_id, 'integer', 1, '', $conf->entity);
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_DU_PROJECT', $project_id, 'integer', 0, '', $conf->entity);
 
 	require_once DOL_DOCUMENT_ROOT . '/categories/class/categorie.class.php';
 	$tags = new Categorie($db);
@@ -95,7 +95,7 @@ if ( $conf->global->DIGIRISKDOLIBARR_PREVENTIONPLAN_PROJECT == 0 || $project->st
 	$project->date_end     = $enddate;
 	$project->statut       = 1;
 	$project_id            = $project->create($user);
-	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_PREVENTIONPLAN_PROJECT', $project_id, 'integer', 1, '', $conf->entity);
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_PREVENTIONPLAN_PROJECT', $project_id, 'integer', 0, '', $conf->entity);
 
 	require_once DOL_DOCUMENT_ROOT . '/categories/class/categorie.class.php';
 	$tags = new Categorie($db);
@@ -122,7 +122,7 @@ if ( $conf->global->DIGIRISKDOLIBARR_FIREPERMIT_PROJECT == 0 || $project->statut
 	$project->date_end     = $enddate;
 	$project->statut       = 1;
 	$project_id            = $project->create($user);
-	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_FIREPERMIT_PROJECT', $project_id, 'integer', 1, '', $conf->entity);
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_FIREPERMIT_PROJECT', $project_id, 'integer', 0, '', $conf->entity);
 
 	require_once DOL_DOCUMENT_ROOT . '/categories/class/categorie.class.php';
 	$tags = new Categorie($db);
@@ -149,7 +149,7 @@ if ( $conf->global->DIGIRISKDOLIBARR_ACCIDENT_PROJECT == 0 || $project->statut =
 	$project->date_end     = $enddate;
 	$project->statut       = 1;
 	$project_id            = $project->create($user);
-	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_ACCIDENT_PROJECT', $project_id, 'integer', 1, '', $conf->entity);
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_ACCIDENT_PROJECT', $project_id, 'integer', 0, '', $conf->entity);
 
 	require_once DOL_DOCUMENT_ROOT . '/categories/class/categorie.class.php';
 	$tags = new Categorie($db);
@@ -207,6 +207,7 @@ if ( $conf->global->DIGIRISKDOLIBARR_READERGROUP_SET == 0 ) {
 		$usergroup->addrights(43630226); //ListingRisksPhoto Read
 		$usergroup->addrights(43630229); //RiskSign Read
 		$usergroup->addrights(43630232); //Evaluator Read
+		$usergroup->addrights(43630238); //Accident Read
 		$usergroup->addrights('', 'produit', 'lire');
 		$usergroup->addrights('', 'societe', 'lire');
 		$usergroup->addrights('', 'ecm', 'read');
@@ -228,6 +229,19 @@ if ( $conf->global->DIGIRISKDOLIBARR_READERGROUP_UPDATED == 0 ) {
 		$usergroup->update($user);
 	}
 	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_READERGROUP_UPDATED', 1, 'integer', 0, '', $conf->entity);
+}
+
+if ( $conf->global->DIGIRISKDOLIBARR_READERGROUP_UPDATED == 1 ) {
+	require_once DOL_DOCUMENT_ROOT . '/user/class/usergroup.class.php';
+
+	$usergroup = new UserGroup($db);
+	$usergroup_id = $conf->global->DIGIRISKDOLIBARR_READERGROUP_SET;
+	if ($usergroup_id > 0) {
+		$usergroup->fetch($usergroup_id);
+		//Rights digiriskdolibarr
+		$usergroup->addrights(43630238); //Accident Read
+	}
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_READERGROUP_UPDATED', 2, 'integer', 0, '', $conf->entity);
 }
 
 if ( $conf->global->DIGIRISKDOLIBARR_USERGROUP_SET == 0 ) {
@@ -266,6 +280,8 @@ if ( $conf->global->DIGIRISKDOLIBARR_USERGROUP_SET == 0 ) {
 		$usergroup->addrights(43630230); //RiskSign Create
 		$usergroup->addrights(43630232); //Evaluator Read
 		$usergroup->addrights(43630233); //Evaluator Create
+		$usergroup->addrights(43630238); //Accident Read
+		$usergroup->addrights(43630239); //Accident Create
 		$usergroup->addrights('', 'produit', 'lire');
 		$usergroup->addrights('', 'produit', 'creer');
 		$usergroup->addrights('', 'societe', 'lire');
@@ -288,18 +304,32 @@ if ( $conf->global->DIGIRISKDOLIBARR_USERGROUP_UPDATED == 0 ) {
 	if ($usergroup_id > 0) {
 		$usergroup->fetch($usergroup_id);
 		//Rights digiriskdolibarr
+		$usergroup->addrights(4363020); //DigiriskDolibarr read
 		$usergroup->addrights(4363021); //DigiriskDolibarr lire
+		$usergroup->addrights(4363022); //RiskAssessmentDocument Read
 		$usergroup->addrights(4363023); //RiskAssessmentDocument Create
+		$usergroup->addrights(4363025); //LegalDisplay Read
 		$usergroup->addrights(4363026); //LegalDisplay Create
+		$usergroup->addrights(4363028); //InformationsSharing Read
 		$usergroup->addrights(4363029); //InformationsSharing Create
+		$usergroup->addrights(43630211); //FirePermit Read
 		$usergroup->addrights(43630212); //FirePermit Create
+		$usergroup->addrights(43630214); //Prevention Plan Read
 		$usergroup->addrights(43630215); //Prevention Plan Create
+		$usergroup->addrights(43630217); //DigiriskElement Read
 		$usergroup->addrights(43630218); //DigiriskElement Create
+		$usergroup->addrights(43630220); //Risk Read
 		$usergroup->addrights(43630221); //Risk Create
+		$usergroup->addrights(43630223); //ListingRisksAction Read
 		$usergroup->addrights(43630224); //ListingRisksAction Create
+		$usergroup->addrights(43630226); //ListingRisksPhoto Read
 		$usergroup->addrights(43630227); //ListingRisksPhoto Create
+		$usergroup->addrights(43630229); //RiskSign Read
 		$usergroup->addrights(43630230); //RiskSign Create
+		$usergroup->addrights(43630232); //Evaluator Read
 		$usergroup->addrights(43630233); //Evaluator Create
+		$usergroup->addrights(43630238); //Accident Read
+		$usergroup->addrights(43630239); //Accident Create
 		$usergroup->addrights('', 'produit', 'lire');
 		$usergroup->addrights('', 'produit', 'creer');
 		$usergroup->addrights('', 'societe', 'lire');
@@ -321,11 +351,28 @@ if ( $conf->global->DIGIRISKDOLIBARR_USERGROUP_UPDATED == 1 ) {
 	$usergroup_id = $conf->global->DIGIRISKDOLIBARR_USERGROUP_SET;
 	if ($usergroup_id > 0) {
 		$usergroup->fetch($usergroup_id);
-		$usergroup->name = $conf->global->MAIN_INFO_SOCIETE_NOM . ' - ' . $langs->trans('DigiriskReaderGroup');
-		$usergroup->note = $langs->trans('DigiriskReaderGroupDescription');
+		$usergroup->name = $conf->global->MAIN_INFO_SOCIETE_NOM . ' - ' . $langs->trans('DigiriskUserGroup');
+		$usergroup->note = $langs->trans('DigiriskUserGroupDescription');
 		$usergroup->update($user);
 	}
 	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_USERGROUP_UPDATED', 2, 'integer', 0, '', $conf->entity);
+}
+
+if ( $conf->global->DIGIRISKDOLIBARR_USERGROUP_UPDATED == 2 ) {
+	require_once DOL_DOCUMENT_ROOT . '/user/class/usergroup.class.php';
+
+	$usergroup = new UserGroup($db);
+	$usergroup_id = $conf->global->DIGIRISKDOLIBARR_USERGROUP_SET;
+	if ($usergroup_id > 0) {
+		$usergroup->fetch($usergroup_id);
+		$usergroup->name = $conf->global->MAIN_INFO_SOCIETE_NOM . ' - ' . $langs->trans('DigiriskUserGroup');
+		$usergroup->note = $langs->trans('DigiriskUserGroupDescription');
+		$usergroup->update($user);
+
+		$usergroup->addrights(43630238); //Accident Read
+		$usergroup->addrights(43630239); //Accident Create
+	}
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_USERGROUP_UPDATED', 3, 'integer', 0, '', $conf->entity);
 }
 
 if ( $conf->global->DIGIRISKDOLIBARR_ADMINUSERGROUP_SET == 0 ) {
@@ -355,6 +402,7 @@ if ( $conf->global->DIGIRISKDOLIBARR_ADMINUSERGROUP_SET == 0 ) {
 		$usergroup->addrights('', 'digiriskdolibarr', 'evaluator');              //Evaluator
 		$usergroup->addrights('', 'digiriskdolibarr', 'api');                    //API
 		$usergroup->addrights('', 'digiriskdolibarr', 'adminpage');              //AdminPage
+		$usergroup->addrights('', 'digiriskdolibarr', 'accident'); 			  //Accident
 		$usergroup->addrights('', 'societe');
 		$usergroup->addrights('', 'ecm');
 		$usergroup->addrights('', 'ticket');
@@ -397,6 +445,20 @@ if ( $conf->global->DIGIRISKDOLIBARR_ADMINUSERGROUP_UPDATED == 1 ) {
 	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_ADMINUSERGROUP_UPDATED', 2, 'integer', 0, '', $conf->entity);
 }
 
+if ( $conf->global->DIGIRISKDOLIBARR_ADMINUSERGROUP_UPDATED == 2 ) {
+	require_once DOL_DOCUMENT_ROOT . '/user/class/usergroup.class.php';
+
+	$usergroup = new UserGroup($db);
+	$usergroup_id = $conf->global->DIGIRISKDOLIBARR_ADMINUSERGROUP_SET;
+	if ($usergroup_id > 0) {
+		$usergroup->fetch($usergroup_id);
+		//Rights digiriskdolibarr
+		$usergroup->addrights('', 'digiriskdolibarr', 'accident'); //Accident
+	}
+
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_ADMINUSERGROUP_UPDATED', 3, 'integer', 0, '', $conf->entity);
+}
+
 if ($conf->global->DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH_UPDATED == 0) {
 	require_once __DIR__ . '/../../class/digiriskelement/groupment.class.php';
 
@@ -431,4 +493,235 @@ if ($conf->global->DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH_UPDATED == 0) {
 	if ($result > 0) {
 		dolibarr_set_const($db, 'DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH_UPDATED', 1, 'integer', 0, '', $conf->entity);
 	}
+}
+
+if ($conf->global->DIGIRISKDOLIBARR_CONF_BACKWARD_COMPATIBILITY == 0) {
+	// CONST CONFIGURATION
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_GENERAL_MEANS', dolibarr_get_const($db,'DIGIRISK_GENERAL_MEANS'), 'chaine', 0, 'General means', $conf->entity);
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_GENERAL_RULES', dolibarr_get_const($db,'DIGIRISK_GENERAL_RULES'), 'chaine', 0, 'General rules', $conf->entity);
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_IDCC_DICTIONNARY', dolibarr_get_const($db,'DIGIRISK_IDCC_DICTIONNARY'), 'chaine', 0, 'IDCC of company', $conf->entity);
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_SOCIETY_DESCRIPTION', dolibarr_get_const($db,'DIGIRISK_SOCIETY_DESCRIPTION'), 'chaine', 0, '', $conf->entity);
+
+	dolibarr_del_const($db, 'DIGIRISK_GENERAL_MEANS', $conf->entity);
+	dolibarr_del_const($db, 'DIGIRISK_GENERAL_RULES', $conf->entity);
+	dolibarr_del_const($db, 'DIGIRISK_IDCC_DICTIONNARY', $conf->entity);
+	dolibarr_del_const($db, 'DIGIRISK_SOCIETY_DESCRIPTION', $conf->entity);
+
+	// CONST RISK ASSESSMENT DOCUMENT
+	//dolibarr_set_const($db, 'DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_AUDIT_START_DATE', dolibarr_get_const($db,'DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_AUDIT_START_DATE'), 'date', 0, '', $conf->entity);
+	//dolibarr_set_const($db, 'DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_AUDIT_END_DATE', dolibarr_get_const($db,'DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_AUDIT_END_DATE'), 'date', 0, '', $conf->entity);
+	//dolibarr_set_const($db, 'DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_RECIPIENT',  dolibarr_get_const($db,'DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_RECIPIENT'), 'integer', 0, '', $conf->entity);
+	//dolibarr_set_const($db, 'DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_METHOD',  dolibarr_get_const($db,'DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_METHOD'), 'chaine', 0, 'General means', $conf->entity);
+	//dolibarr_set_const($db, 'DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_SOURCES',  dolibarr_get_const($db,'DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_SOURCES'), 'chaine', 0, 'General means', $conf->entity);
+	//dolibarr_set_const($db, 'DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_IMPORTANT_NOTES', dolibarr_get_const($db,'DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_IMPORTANT_NOTES'), 'chaine', 0, '', $conf->entity);
+
+	dolibarr_del_const($db, 'DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_SITE_PLANS', $conf->entity);
+
+	dolibarr_set_const($db, 'MAIN_AGENDA_ACTIONAUTO_RISKASSESSMENTDOCUMENT_CREATE', 1, 'integer', 0, '', $conf->entity);
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_ADDON', 'mod_riskassessmentdocument_standard', 'chaine', 0, '', $conf->entity);
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_ADDON_ODT_PATH', 'DOL_DOCUMENT_ROOT/custom/digiriskdolibarr/documents/doctemplates/riskassessmentdocument/', 'chaine', 0, '', $conf->entity);
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_CUSTOM_ADDON_ODT_PATH', 'DOL_DATA_ROOT/ecm/digiriskdolibarr/riskassessmentdocument/', 'chaine', 0, '', $conf->entity);
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_DEFAULT_MODEL', 'riskassessmentdocument_odt', 'chaine', 0, '', $conf->entity);
+
+	// CONST LEGAL DISPLAY
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_LOCATION_OF_DETAILED_INSTRUCTION', dolibarr_get_const($db,'DIGIRISK_LOCATION_OF_DETAILED_INSTRUCTION'), 'chaine', 0, 'Location of detailed instruction', $conf->entity);
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_DEROGATION_SCHEDULE_PERMANENT', dolibarr_get_const($db,'DIGIRISK_DEROGATION_SCHEDULE_PERMANENT'), 'chaine', 0, 'Permanent exceptions to working hours', $conf->entity);
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_DEROGATION_SCHEDULE_OCCASIONAL', dolibarr_get_const($db,'DIGIRISK_DEROGATION_SCHEDULE_OCCASIONAL'), 'chaine', 0, 'Occasional exceptions to working hours', $conf->entity);
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_COLLECTIVE_AGREEMENT_TITLE', dolibarr_get_const($db,'DIGIRISK_COLLECTIVE_AGREEMENT_TITLE'), 'chaine', 0, 'Title of the collective agreement', $conf->entity);
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_COLLECTIVE_AGREEMENT_LOCATION', dolibarr_get_const($db,'DIGIRISK_COLLECTIVE_AGREEMENT_LOCATION'), 'chaine', 0, 'Location of the collective agreement', $conf->entity);
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_DUER_LOCATION', dolibarr_get_const($db,'DIGIRISK_DUER_LOCATION'), 'chaine', 0, 'Location of risks evaluation', $conf->entity);
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_RULES_LOCATION', dolibarr_get_const($db,'DIGIRISK_RULES_LOCATION'), 'chaine', 0, 'Location of rules of procedure', $conf->entity);
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_PARTICIPATION_AGREEMENT_INFORMATION_PROCEDURE', dolibarr_get_const($db,'DIGIRISK_PARTICIPATION_AGREEMENT_INFORMATION_PROCEDURE'), 'chaine', 0, 'Information procedure of participation agreement', $conf->entity);
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_FIRST_AID', dolibarr_get_const($db,'DIGIRISK_FIRST_AID'), 'chaine', 0, '', $conf->entity);
+
+	dolibarr_del_const($db, 'DIGIRISK_LOCATION_OF_DETAILED_INSTRUCTION', $conf->entity);
+	dolibarr_del_const($db, 'DIGIRISK_DEROGATION_SCHEDULE_PERMANENT', $conf->entity);
+	dolibarr_del_const($db, 'DIGIRISK_DEROGATION_SCHEDULE_OCCASIONAL', $conf->entity);
+	dolibarr_del_const($db, 'DIGIRISK_COLLECTIVE_AGREEMENT_TITLE', $conf->entity);
+	dolibarr_del_const($db, 'DIGIRISK_COLLECTIVE_AGREEMENT_LOCATION', $conf->entity);
+	dolibarr_del_const($db, 'DIGIRISK_DUER_LOCATION', $conf->entity);
+	dolibarr_del_const($db, 'DIGIRISK_RULES_LOCATION', $conf->entity);
+	dolibarr_del_const($db, 'DIGIRISK_PARTICIPATION_AGREEMENT_INFORMATION_PROCEDURE', $conf->entity);
+	dolibarr_del_const($db, 'DIGIRISK_FIRST_AID', $conf->entity);
+
+	dolibarr_set_const($db, 'MAIN_AGENDA_ACTIONAUTO_LEGALDISPLAY_CREATE', 1, 'integer', 0, '', $conf->entity);
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_LEGALDISPLAY_ADDON', 'mod_legaldisplay_standard', 'chaine', 0, '', $conf->entity);
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_LEGALDISPLAY_ADDON_ODT_PATH', 'DOL_DOCUMENT_ROOT/custom/digiriskdolibarr/documents/doctemplates/legaldisplay/', 'chaine', 0, '', $conf->entity);
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_LEGALDISPLAY_CUSTOM_ADDON_ODT_PATH', 'DOL_DATA_ROOT/ecm/digiriskdolibarr/legaldisplay/', 'chaine', 0, '', $conf->entity);
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_LEGALDISPLAY_DEFAULT_MODEL', 'legaldisplay_odt', 'chaine', 0, '', $conf->entity);
+
+	// CONST INFORMATIONS SHARING
+	dolibarr_set_const($db, 'MAIN_AGENDA_ACTIONAUTO_INFORMATIONSSHARING_CREATE', 1, 'integer', 0, '', $conf->entity);
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_INFORMATIONSSHARING_ADDON', 'mod_informationssharing_standard', 'chaine', 0, '', $conf->entity);
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_INFORMATIONSSHARING_ADDON_ODT_PATH', 'DOL_DOCUMENT_ROOT/custom/digiriskdolibarr/documents/doctemplates/informationssharing/', 'chaine', 0, '', $conf->entity);
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_INFORMATIONSSHARING_CUSTOM_ADDON_ODT_PATH', 'DOL_DATA_ROOT/ecm/digiriskdolibarr/informationssharing/', 'chaine', 0, '', $conf->entity);
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_INFORMATIONSSHARING_DEFAULT_MODEL', 'informationssharing_odt', 'chaine', 0, '', $conf->entity);
+
+	// CONST LISTING RISKS ACTION
+	dolibarr_set_const($db, 'MAIN_AGENDA_ACTIONAUTO_LISTINGRISKSACTION_CREATE', 1, 'integer', 0, '', $conf->entity);
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_LISTINGRISKSACTION_ADDON', 'mod_listingrisksaction_standard', 'chaine', 0, '', $conf->entity);
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_LISTINGRISKSACTION_ADDON_ODT_PATH', 'DOL_DOCUMENT_ROOT/custom/digiriskdolibarr/documents/doctemplates/listingrisksaction/', 'chaine', 0, '', $conf->entity);
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_LISTINGRISKSACTION_CUSTOM_ADDON_ODT_PATH', 'DOL_DATA_ROOT/ecm/digiriskdolibarr/listingrisksaction/', 'chaine', 0, '', $conf->entity);
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_LISTINGRISKSACTION_DEFAULT_MODEL', 'listingrisksaction_odt', 'chaine', 0, '', $conf->entity);
+
+	// CONST LISTING RISKS PHOTO
+	dolibarr_set_const($db, 'MAIN_AGENDA_ACTIONAUTO_LISTINGRISKSPHOTO_CREATE', 1, 'integer', 0, '', $conf->entity);
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_LISTINGRISKSPHOTO_ADDON', 'mod_listingrisksphoto_standard', 'chaine', 0, '', $conf->entity);
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_LISTINGRISKSPHOTO_ADDON_ODT_PATH', 'DOL_DOCUMENT_ROOT/custom/digiriskdolibarr/documents/doctemplates/listingrisksphoto/', 'chaine', 0, '', $conf->entity);
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_LISTINGRISKSPHOTO_CUSTOM_ADDON_ODT_PATH', 'DOL_DATA_ROOT/ecm/digiriskdolibarr/listingrisksphoto/', 'chaine', 0, '', $conf->entity);
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_LISTINGRISKSPHOTO_DEFAULT_MODEL', 'listingrisksphoto_odt', 'chaine', 0, '', $conf->entity);
+
+	// CONST GROUPMENT DOCUMENT
+	dolibarr_set_const($db, 'MAIN_AGENDA_ACTIONAUTO_GROUPMENTDOCUMENT_CREATE', 1, 'integer', 0, '', $conf->entity);
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_GROUPMENTDOCUMENT_ADDON', 'mod_groupmentdocument_standard', 'chaine', 0, '', $conf->entity);
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_GROUPMENTDOCUMENT_ADDON_ODT_PATH', 'DOL_DOCUMENT_ROOT/custom/digiriskdolibarr/documents/doctemplates/groupmentdocument/', 'chaine', 0, '', $conf->entity);
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_GROUPMENTDOCUMENT_CUSTOM_ADDON_ODT_PATH', 'DOL_DATA_ROOT/ecm/digiriskdolibarr/groupmentdocument/', 'chaine', 0, '', $conf->entity);
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_GROUPMENTDOCUMENT_DEFAULT_MODEL', 'groupmentdocument_odt', 'chaine', 0, '', $conf->entity);
+
+	// CONST WORKUNIT DOCUMENT
+	dolibarr_set_const($db, 'MAIN_AGENDA_ACTIONAUTO_WORKUNITDOCUMENT_CREATE', 1, 'integer', 0, '', $conf->entity);
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_WORKUNITDOCUMENT_ADDON', 'mod_workunitdocument_standard', 'chaine', 0, '', $conf->entity);
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_WORKUNITDOCUMENT_ADDON_ODT_PATH', 'DOL_DOCUMENT_ROOT/custom/digiriskdolibarr/documents/doctemplates/workunitdocument/', 'chaine', 0, '', $conf->entity);
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_WORKUNITDOCUMENT_CUSTOM_ADDON_ODT_PATH', 'DOL_DATA_ROOT/ecm/digiriskdolibarr/workunitdocument/', 'chaine', 0, '', $conf->entity);
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_WORKUNITDOCUMENT_DEFAULT_MODEL', 'workunitdocument_odt', 'chaine', 0, '', $conf->entity);
+
+	// CONST PREVENTION PLAN
+	dolibarr_set_const($db, 'MAIN_AGENDA_ACTIONAUTO_PREVENTIONPLAN_CREATE', 1, 'integer', 0, '', $conf->entity);
+	dolibarr_set_const($db, 'MAIN_AGENDA_ACTIONAUTO_PREVENTIONPLAN_EDIT', 1, 'integer', 0, '', $conf->entity);
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_PREVENTIONPLAN_ADDON', 'mod_preventionplan_standard', 'chaine', 0, '', $conf->entity);
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_PREVENTIONPLAN_PROJECT', dolibarr_get_const($db,'DIGIRISKDOLIBARR_PREVENTIONPLAN_PROJECT'), 'integer', 0, '', $conf->entity);
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_PREVENTIONPLAN_MAITRE_OEUVRE', dolibarr_get_const($db,'DIGIRISKDOLIBARR_PREVENTIONPLAN_MAITRE_OEUVRE'), 'integer', 0, '', $conf->entity);
+
+	// CONST PREVENTION PLAN DOCUMENT
+	dolibarr_set_const($db, 'MAIN_AGENDA_ACTIONAUTO_PREVENTIONPLANDOCUMENT_CREATE', 1, 'integer', 0, '', $conf->entity);
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_PREVENTIONPLANDOCUMENT_ADDON', 'mod_preventionplandocument_standard', 'chaine', 0, '', $conf->entity);
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_PREVENTIONPLANDOCUMENT_ADDON_ODT_PATH', 'DOL_DOCUMENT_ROOT/custom/digiriskdolibarr/documents/doctemplates/preventionplandocument/', 'chaine', 0, '', $conf->entity);
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_PREVENTIONPLANDOCUMENT_SPECIMEN_ADDON_ODT_PATH', 'DOL_DOCUMENT_ROOT/custom/digiriskdolibarr/documents/doctemplates/preventionplandocument/specimen/', 'chaine', 0, '', $conf->entity);
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_PREVENTIONPLANDOCUMENT_CUSTOM_ADDON_ODT_PATH', 'DOL_DATA_ROOT/ecm/digiriskdolibarr/preventionplandocument/', 'chaine', 0, '', $conf->entity);
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_PREVENTIONPLANDOCUMENT_DEFAULT_MODEL', 'preventionplandocument_odt', 'chaine', 0, '', $conf->entity);
+
+	// CONST FIRE PERMIT
+	dolibarr_set_const($db, 'MAIN_AGENDA_ACTIONAUTO_FIREPERMIT_CREATE', 1, 'integer', 0, '', $conf->entity);
+	dolibarr_set_const($db, 'MAIN_AGENDA_ACTIONAUTO_FIREPERMIT_EDIT', 1, 'integer', 0, '', $conf->entity);
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_FIREPERMIT_ADDON', 'mod_firepermit_standard', 'chaine', 0, '', $conf->entity);
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_FIREPERMIT_PROJECT',  dolibarr_get_const($db,'DIGIRISKDOLIBARR_FIREPERMIT_PROJECT'), 'integer', 0, '', $conf->entity);
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_FIREPERMIT_MAITRE_OEUVRE',  dolibarr_get_const($db,'DIGIRISKDOLIBARR_FIREPERMIT_MAITRE_OEUVRE'), 'integer', 0, '', $conf->entity);
+
+	// CONST FIRE PERMIT DOCUMENT
+	dolibarr_set_const($db, 'MAIN_AGENDA_ACTIONAUTO_FIREPERMITDOCUMENT_CREATE', 1, 'integer', 0, '', $conf->entity);
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_FIREPERMITDOCUMENT_ADDON', 'mod_firepermitdocument_standard', 'chaine', 0, '', $conf->entity);
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_FIREPERMITDOCUMENT_ADDON_ODT_PATH', 'DOL_DOCUMENT_ROOT/custom/digiriskdolibarr/documents/doctemplates/firepermitdocument/', 'chaine', 0, '', $conf->entity);
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_FIREPERMITDOCUMENT_CUSTOM_ADDON_ODT_PATH', 'DOL_DATA_ROOT/ecm/digiriskdolibarr/firepermitdocument/', 'chaine', 0, '', $conf->entity);
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_FIREPERMITDOCUMENT_DEFAULT_MODEL', 'firepermitdocument_odt', 'chaine', 0, '', $conf->entity);
+
+	//CONST DIGIRISKELEMENT
+	//dolibarr_set_const($db, 'DIGIRISKDOLIBARR_DIGIRISKELEMENT_MEDIAS_BACKWARD_COMPATIBILITY', 1, 'integer', 0, '', $conf->entity);
+	//dolibarr_set_const($db, 'DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH', dolibarr_get_const($db,'DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH'), 'integer', 0, '', $conf->entity);
+	//dolibarr_set_const($db, 'DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH_UPDATED', 1, 'integer', 0, '', $conf->entity);
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_SHOW_HIDDEN_DIGIRISKELEMENT',  dolibarr_get_const($db,'DIGIRISKDOLIBARR_SHOW_HIDDEN_DIGIRISKELEMENT'), 'integer', 0, '', $conf->entity);
+
+	// CONST GROUPMENT
+	dolibarr_set_const($db, 'MAIN_AGENDA_ACTIONAUTO_GROUPMENT_CREATE', 1, 'integer', 0, '', $conf->entity);
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_GROUPMENT_ADDON', 'mod_groupment_standard', 'chaine', 0, '', $conf->entity);
+
+	// CONST WORKUNIT
+	dolibarr_set_const($db, 'MAIN_AGENDA_ACTIONAUTO_WORKUNIT_CREATE', 1, 'integer', 0, '', $conf->entity);
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_WORKUNIT_ADDON', 'mod_workunit_standard', 'chaine', 0, '', $conf->entity);
+
+	// CONST EVALUATOR
+	dolibarr_set_const($db, 'MAIN_AGENDA_ACTIONAUTO_EVALUATOR_CREATE', 1, 'integer', 0, '', $conf->entity);
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_EVALUATOR_ADDON',  'mod_evaluator_standard', 'chaine', 0, '', $conf->entity);
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_EVALUATOR_DURATION',  dolibarr_get_const($db,'DIGIRISKDOLIBARR_EVALUATOR_DURATION'), 'integer', 0, '', $conf->entity);
+
+	// CONST RISK ANALYSIS
+
+	// CONST RISK
+	dolibarr_set_const($db, 'MAIN_AGENDA_ACTIONAUTO_RISK_CREATE', 1, 'integer', 0, '', $conf->entity);
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_RISK_ADDON', 'mod_risk_standard', 'chaine', 0, '', $conf->entity);
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_RISK_DESCRIPTION', dolibarr_get_const($db,'DIGIRISKDOLIBARR_RISK_DESCRIPTION'), 'integer', 0, '', $conf->entity);
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_RISK_CATEGORY_EDIT', dolibarr_get_const($db,'DIGIRISKDOLIBARR_RISK_CATEGORY_EDIT'), 'integer', 0, '', $conf->entity);
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_RISK_DESCRIPTION_PREFILL', dolibarr_get_const($db,'DIGIRISKDOLIBARR_RISK_DESCRIPTION_PREFILL'), 'integer', 0, '', $conf->entity);
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_SORT_LISTINGS_BY_COTATION', dolibarr_get_const($db,'DIGIRISKDOLIBARR_SORT_LISTINGS_BY_COTATION'), 'integer', 0, '', $conf->entity);
+
+	// CONST RISK ASSESSMENT
+	dolibarr_set_const($db, 'MAIN_AGENDA_ACTIONAUTO_RISKASSESSMENT_CREATE', 1, 'integer', 0, '', $conf->entity);
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_RISKASSESSMENT_ADDON', 'mod_riskassessment_standard', 'chaine', 0, '', $conf->entity);
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_MULTIPLE_RISKASSESSMENT_METHOD', dolibarr_get_const($db,'DIGIRISKDOLIBARR_MULTIPLE_RISKASSESSMENT_METHOD'), 'integer', 0, '', $conf->entity);
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_ADVANCED_RISKASSESSMENT_METHOD', dolibarr_get_const($db,'DIGIRISKDOLIBARR_ADVANCED_RISKASSESSMENT_METHOD'), 'integer', 0, '', $conf->entity);
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_SHOW_RISKASSESSMENT_DATE', dolibarr_get_const($db,'DIGIRISKDOLIBARR_SHOW_RISKASSESSMENT_DATE'), 'integer', 0, '', $conf->entity);
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_SHOW_ALL_RISKASESSMENTS', dolibarr_get_const($db,'DIGIRISKDOLIBARR_SHOW_ALL_RISKASESSMENTS'), 'integer', 0, '', $conf->entity);
+
+	// CONST RISK SIGN
+	dolibarr_set_const($db, 'MAIN_AGENDA_ACTIONAUTO_RISKSIGN_CREATE', 1, 'integer', 0, '', $conf->entity);
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_RISKSIGN_ADDON', 'mod_risksign_standard', 'chaine', 0, '', $conf->entity);
+
+	// CONST PROJET
+	//dolibarr_set_const($db, 'DIGIRISKDOLIBARR_PROJECT_TAGS_SET', 2, 'integer', 0, '', $conf->entity);
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_DU_PROJECT', dolibarr_get_const($db,'DIGIRISKDOLIBARR_DU_PROJECT'), 'integer', 0, '', $conf->entity);
+
+	// CONST TASK
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_TASK_MANAGEMENT', dolibarr_get_const($db,'DIGIRISKDOLIBARR_TASK_MANAGEMENT'), 'integer', 0, '', $conf->entity);
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_SHOW_TASK_START_DATE', dolibarr_get_const($db,'DIGIRISKDOLIBARR_SHOW_TASK_START_DATE'), 'integer', 0, '', $conf->entity);
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_SHOW_TASK_END_DATE', dolibarr_get_const($db,'DIGIRISKDOLIBARR_SHOW_TASK_END_DATE'), 'integer', 0, '', $conf->entity);
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_SHOW_TASK_PROGRESS', dolibarr_get_const($db,'DIGIRISKDOLIBARR_SHOW_TASK_PROGRESS'), 'integer', 0, '', $conf->entity);
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_SHOW_ALL_TASKS', dolibarr_get_const($db,'DIGIRISKDOLIBARR_SHOW_ALL_TASKS'), 'integer', 0, '', $conf->entity);
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_TASK_TIMESPENT_DURATION', dolibarr_get_const($db,'DIGIRISKDOLIBARR_TASK_TIMESPENT_DURATION'), 'integer', 0, '', $conf->entity);
+
+	// CONST PREVENTION PLAN LINE
+	dolibarr_set_const($db, 'MAIN_AGENDA_ACTIONAUTO_PREVENTIONPLANDET_CREATE', 1, 'integer', 0, '', $conf->entity);
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_PREVENTIONPLANDET_ADDON', 'mod_preventionplandet_standard', 'chaine', 0, '', $conf->entity);
+
+	// CONST FIRE PERMIT LINE
+	dolibarr_set_const($db, 'MAIN_AGENDA_ACTIONAUTO_FIREPERMITDET_CREATE', 1, 'integer', 0, '', $conf->entity);
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_FIREPERMITDET_ADDON', 'mod_firepermitdet_standard', 'chaine', 0, '', $conf->entity);
+
+	// CONST MODULE
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_SUBPERMCATEGORY_FOR_DOCUMENTS', 1, 'integer', 0, '', $conf->entity);
+	//dolibarr_set_const($db, 'DIGIRISKDOLIBARR_VERSION', $this->version, 'chaine', 0, '', $conf->entity);
+	//dolibarr_set_const($db, 'DIGIRISKDOLIBARR_DB_VERSION', $this->version, 'chaine', 0, '', $conf->entity);
+	//dolibarr_set_const($db, 'DIGIRISKDOLIBARR_THIRDPARTY_SET', 2, 'integer', 0, '', $conf->entity);
+	//dolibarr_set_const($db, 'DIGIRISKDOLIBARR_THIRDPARTY_UPDATED', 1, 'integer', 0, '', $conf->entity);
+	//dolibarr_set_const($db, 'DIGIRISKDOLIBARR_CONTACTS_SET', 2, 'integer', 0, '', $conf->entity);
+	//dolibarr_set_const($db, 'DIGIRISKDOLIBARR_USERAPI_SET', 0, 'integer', 0, '', $conf->entity);
+	//dolibarr_set_const($db, 'DIGIRISKDOLIBARR_READERGROUP_SET', 0, 'integer', 0, '', $conf->entity);
+	//dolibarr_set_const($db, 'DIGIRISKDOLIBARR_USERGROUP_SET', 0, 'integer', 0, '', $conf->entity);
+	//dolibarr_set_const($db, 'DIGIRISKDOLIBARR_ADMINUSERGROUP_SET', 0, 'integer', 0, '', $conf->entity);
+	//dolibarr_set_const($db, 'DIGIRISKDOLIBARR_READERGROUP_UPDATED', 2, 'integer', 0, '', $conf->entity);
+	//dolibarr_set_const($db, 'DIGIRISKDOLIBARR_USERGROUP_UPDATED', 3, 'integer', 0, '', $conf->entity);
+	//dolibarr_set_const($db, 'DIGIRISKDOLIBARR_ADMINUSERGROUP_UPDATED', 3, 'integer', 0, '', $conf->entity);
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_REDIRECT_AFTER_CONNECTION', dolibarr_get_const($db,'DIGIRISKDOLIBARR_REDIRECT_AFTER_CONNECTION'), 'integer', 0, '', $conf->entity);
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_USE_CAPTCHA', dolibarr_get_const($db,'DIGIRISKDOLIBARR_USE_CAPTCHA'), 'integer', 0, '', $conf->entity);
+	//dolibarr_set_const($db, 'DIGIRISKDOLIBARR_ACTIVE_STANDARD', dolibarr_get_const($db,'DIGIRISKDOLIBARR_ACTIVE_STANDARD'), 'integer', 0, '', $conf->entity);
+	//dolibarr_set_const($db, 'DIGIRISKDOLIBARR_NEW_SIGNATURE_TABLE', 1, 'integer', 0, '', $conf->entity);
+	//dolibarr_set_const($db, 'DIGIRISKDOLIBARR_TRIGGERS_UPDATED', 1, 'integer', 0, '', $conf->entity);
+
+	dolibarr_del_const($db, 'DIGIRISKDOLIBARR_DOCUMENT_MODELS_SET', $conf->entity);
+
+	// CONST SIGNATURE
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_SIGNATURE_ENABLE_PUBLIC_INTERFACE', dolibarr_get_const($db,'DIGIRISKDOLIBARR_SIGNATURE_ENABLE_PUBLIC_INTERFACE'), 'integer', 0, '', $conf->entity);
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_SIGNATURE_SHOW_COMPANY_LOGO', dolibarr_get_const($db,'DIGIRISKDOLIBARR_SIGNATURE_SHOW_COMPANY_LOGO'), 'integer', 0, '', $conf->entity);
+
+	//CONST TICKET & REGISTERS
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_TICKET_EXTRAFIELDS', dolibarr_get_const($db,'DIGIRISKDOLIBARR_TICKET_EXTRAFIELDS'), 'integer', 0, '', $conf->entity);
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_TICKET_CATEGORIES_CREATED', dolibarr_get_const($db,'DIGIRISKDOLIBARR_TICKET_CATEGORIES_CREATED'), 'integer', 0, '', $conf->entity);
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE', dolibarr_get_const($db,'DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE'), 'integer', 0, '', $conf->entity);
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_TICKET_SHOW_COMPANY_LOGO', dolibarr_get_const($db,'DIGIRISKDOLIBARR_TICKET_SHOW_COMPANY_LOGO'), 'integer', 0, '', $conf->entity);
+	//dolibarr_set_const($db, 'DIGIRISKDOLIBARR_TICKET_SUBMITTED_SEND_MAIL_TO', dolibarr_get_const($db,'DIGIRISKDOLIBARR_TICKET_SUBMITTED_SEND_MAIL_TO'), 'integer', 0, '', $conf->entity);
+
+	// CONST ACCIDENT
+	dolibarr_set_const($db, 'MAIN_AGENDA_ACTIONAUTO_ACCIDENT_CREATE', 1, 'integer', 0, '', $conf->entity);
+	dolibarr_set_const($db, 'MAIN_AGENDA_ACTIONAUTO_ACCIDENT_EDIT', 1, 'integer', 0, '', $conf->entity);
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_ACCIDENT_ADDON', 'mod_accident_standard', 'chaine', 0, '', $conf->entity);
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_ACCIDENT_PROJECT', dolibarr_get_const($db,'DIGIRISKDOLIBARR_ACCIDENT_PROJECT'), 'integer', 0, '', $conf->entity);
+
+	// CONST ACCIDENT LINE
+	dolibarr_set_const($db, 'MAIN_AGENDA_ACTIONAUTO_ACCIDENT_WORKSTOP_CREATE', 1, 'integer', 0, '', $conf->entity);
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_ACCIDENT_WORKSTOP_ADDON', 'mod_accident_workstop_standard', 'chaine', 0, '', $conf->entity);
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_ACCIDENT_LESION_ADDON', 'mod_accident_lesion_standard', 'chaine', 0, '', $conf->entity);
+
+	// GENERAL CONSTS
+	dolibarr_set_const($db, 'MAIN_USE_EXIF_ROTATION', 1, 'integer', 0, '', $conf->entity);
+	//dolibarr_set_const($db, 'MAIN_EXTRAFIELDS_USE_SELECT2', 1, 'integer', 0, '', $conf->entity);
+
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_CONF_BACKWARD_COMPATIBILITY', 1, 'integer', 0, '', $conf->entity);
 }

@@ -57,6 +57,13 @@ function digiriskelementPrepareHead($object)
 			$h++;
 		}
 
+		if ($user->rights->digiriskdolibarr->accident->read) {
+			$head[$h][0] = dol_buildpath("/digiriskdolibarr/view/accident/accident_list.php", 1) . '?fromid=' . $object->id;
+			$head[$h][1] = '<i class="fas fa-user-injured"></i> ' . $langs->trans("Accidents");
+			$head[$h][2] = 'elementAccidents';
+			$h++;
+		}
+
 		$head[$h][0] = dol_buildpath("/digiriskdolibarr/view/digiriskelement/digiriskelement_card.php", 1) . '?id=' . $object->id;
 		$head[$h][1] = '<i class="fas fa-info-circle"></i> ' . $langs->trans("Card");
 		$head[$h][2] = 'elementCard';

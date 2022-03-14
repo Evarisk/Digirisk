@@ -108,14 +108,14 @@ if (($action == 'update' && ! GETPOST("cancel", 'alpha')) || ($action == 'update
 	$resources->digirisk_dolibarr_set_resources($db, $user->id,  'PoisonControlCenter',  'societe', $antipoison_id, $conf->entity);
 	$resources->digirisk_dolibarr_set_resources($db, $user->id,  'Responsible',  'societe', $responsible_id, $conf->entity);
 
-	dolibarr_set_const($db, "DIGIRISK_LOCATION_OF_DETAILED_INSTRUCTION", GETPOST("emplacementCD", 'none'), 'chaine', 0, '', $conf->entity);
-	dolibarr_set_const($db, "DIGIRISK_SOCIETY_DESCRIPTION", GETPOST("description", 'none'), 'chaine', 0, '', $conf->entity);
-	dolibarr_set_const($db, "DIGIRISK_GENERAL_MEANS", GETPOST("moyensgeneraux", 'none'), 'chaine', 0, '', $conf->entity);
-	dolibarr_set_const($db, "DIGIRISK_GENERAL_RULES", GETPOST("consignesgenerales", 'none'), 'chaine', 0, '', $conf->entity);
-	dolibarr_set_const($db, "DIGIRISK_FIRST_AID", GETPOST("firstaid", 'none'), 'chaine', 0, '', $conf->entity);
-	dolibarr_set_const($db, "DIGIRISK_RULES_LOCATION", GETPOST("emplacementRI", 'none'), 'chaine', 0, '', $conf->entity);
-	dolibarr_set_const($db, "DIGIRISK_DUER_LOCATION", GETPOST("emplacementDU", 'none'), 'chaine', 0, '', $conf->entity);
-	dolibarr_set_const($db, "DIGIRISK_COLLECTIVE_AGREEMENT_LOCATION", GETPOST("emplacementCC", 'none'), 'chaine', 0, '', $conf->entity);
+	dolibarr_set_const($db, "DIGIRISKDOLIBARR_LOCATION_OF_DETAILED_INSTRUCTION", GETPOST("emplacementCD", 'none'), 'chaine', 0, '', $conf->entity);
+	dolibarr_set_const($db, "DIGIRISKDOLIBARR_SOCIETY_DESCRIPTION", GETPOST("description", 'none'), 'chaine', 0, '', $conf->entity);
+	dolibarr_set_const($db, "DIGIRISKDOLIBARR_GENERAL_MEANS", GETPOST("moyensgeneraux", 'none'), 'chaine', 0, '', $conf->entity);
+	dolibarr_set_const($db, "DIGIRISKDOLIBARR_GENERAL_RULES", GETPOST("consignesgenerales", 'none'), 'chaine', 0, '', $conf->entity);
+	dolibarr_set_const($db, "DIGIRISKDOLIBARR_FIRST_AID", GETPOST("firstaid", 'none'), 'chaine', 0, '', $conf->entity);
+	dolibarr_set_const($db, "DIGIRISKDOLIBARR_RULES_LOCATION", GETPOST("emplacementRI", 'none'), 'chaine', 0, '', $conf->entity);
+	dolibarr_set_const($db, "DIGIRISKDOLIBARR_DUER_LOCATION", GETPOST("emplacementDU", 'none'), 'chaine', 0, '', $conf->entity);
+	dolibarr_set_const($db, "DIGIRISKDOLIBARR_COLLECTIVE_AGREEMENT_LOCATION", GETPOST("emplacementCC", 'none'), 'chaine', 0, '', $conf->entity);
 
 	if ($action != 'updateedit' && ! $error) {
 		header("Location: " . $_SERVER["PHP_SELF"]);
@@ -138,7 +138,7 @@ $morecss = array("/digiriskdolibarr/css/digiriskdolibarr.css");
 $counter = 0;
 
 $securityResources = array("SAMU","Pompiers","Police","AllEmergencies","RightsDefender","PoisonControlCenter", "Responsible", "LabourDoctorSociety", "LabourDoctorContact", "LabourInspectorSociety", "LabourInspectorContact" );
-$securityConsts    = array("DIGIRISK_LOCATION_OF_DETAILED_INSTRUCTION", "DIGIRISK_SOCIETY_DESCRIPTION", "DIGIRISK_GENERAL_MEANS", "DIGIRISK_GENERAL_RULES", "DIGIRISK_FIRST_AID", "DIGIRISK_RULES_LOCATION", "DIGIRISK_DUER_LOCATION", "DIGIRISK_COLLECTIVE_AGREEMENT_LOCATION");
+$securityConsts    = array("DIGIRISKDOLIBARR_LOCATION_OF_DETAILED_INSTRUCTION", "DIGIRISKDOLIBARR_SOCIETY_DESCRIPTION", "DIGIRISKDOLIBARR_GENERAL_MEANS", "DIGIRISKDOLIBARR_GENERAL_RULES", "DIGIRISKDOLIBARR_FIRST_AID", "DIGIRISKDOLIBARR_RULES_LOCATION", "DIGIRISKDOLIBARR_DUER_LOCATION", "DIGIRISKDOLIBARR_COLLECTIVE_AGREEMENT_LOCATION");
 $socialResources   = array("TitularsCSE", "AlternatesCSE", "TitularsDP", "AlternatesDP");
 
 $maxnumber = count($securityResources) + count($securityConsts);
@@ -480,7 +480,7 @@ print '</td></tr>';
 // * Location of detailed instructions - Emplacement de la consigne détaillée *
 
 print '<tr class="oddeven"><td><label for="emplacementCD">' . $langs->trans("LocationOfDetailedInstructions") . '</label></td><td>';
-$doleditor = new DolEditor('emplacementCD', $conf->global->DIGIRISK_LOCATION_OF_DETAILED_INSTRUCTION ? $conf->global->DIGIRISK_LOCATION_OF_DETAILED_INSTRUCTION : '', '', 90, 'dolibarr_details', '', false, true, $conf->global->FCKEDITOR_ENABLE_SOCIETE, ROWS_3, '90%');
+$doleditor = new DolEditor('emplacementCD', $conf->global->DIGIRISKDOLIBARR_LOCATION_OF_DETAILED_INSTRUCTION ? $conf->global->DIGIRISKDOLIBARR_LOCATION_OF_DETAILED_INSTRUCTION : '', '', 90, 'dolibarr_details', '', false, true, $conf->global->FCKEDITOR_ENABLE_SOCIETE, ROWS_3, '90%');
 $doleditor->Create();
 print '</td></tr>';
 
@@ -493,28 +493,28 @@ print '<tr class="liste_titre"><th class="titlefield">' . $langs->trans("Society
 // * Description - Emplacement de la consigne détaillée *
 
 print '<tr class="oddeven"><td><label for="description">' . $langs->trans("Description") . '</label></td><td>';
-$doleditor = new DolEditor('description', $conf->global->DIGIRISK_SOCIETY_DESCRIPTION ? $conf->global->DIGIRISK_SOCIETY_DESCRIPTION : '', '', 90, 'dolibarr_details', '', false, true, $conf->global->FCKEDITOR_ENABLE_SOCIETE, ROWS_3, '90%');
+$doleditor = new DolEditor('description', $conf->global->DIGIRISKDOLIBARR_SOCIETY_DESCRIPTION ? $conf->global->DIGIRISKDOLIBARR_SOCIETY_DESCRIPTION : '', '', 90, 'dolibarr_details', '', false, true, $conf->global->FCKEDITOR_ENABLE_SOCIETE, ROWS_3, '90%');
 $doleditor->Create();
 print '</td></tr>';
 
 // * General means at disposal - Moyens généraux mis à disposition *
 
 print '<tr class="oddeven"><td><label for="moyensgeneraux">' . $langs->trans("GeneralMeansAtDisposal") . '</label></td><td>';
-$doleditor = new DolEditor('moyensgeneraux', $conf->global->DIGIRISK_GENERAL_MEANS ? $conf->global->DIGIRISK_GENERAL_MEANS : '', '', 90, 'dolibarr_details', '', false, true, $conf->global->FCKEDITOR_ENABLE_SOCIETE, ROWS_3, '90%');
+$doleditor = new DolEditor('moyensgeneraux', $conf->global->DIGIRISKDOLIBARR_GENERAL_MEANS ? $conf->global->DIGIRISKDOLIBARR_GENERAL_MEANS : '', '', 90, 'dolibarr_details', '', false, true, $conf->global->FCKEDITOR_ENABLE_SOCIETE, ROWS_3, '90%');
 $doleditor->Create();
 print '</td></tr>';
 
 // * General instructions - Consignes générales *
 
 print '<tr class="oddeven"><td><label for="consignesgenerales">' . $langs->trans("GeneralInstructions") . '</label></td><td>';
-$doleditor = new DolEditor('consignesgenerales', $conf->global->DIGIRISK_GENERAL_RULES ? $conf->global->DIGIRISK_GENERAL_RULES : '', '', 90, 'dolibarr_details', '', false, true, $conf->global->FCKEDITOR_ENABLE_SOCIETE, ROWS_3, '90%');
+$doleditor = new DolEditor('consignesgenerales', $conf->global->DIGIRISKDOLIBARR_GENERAL_RULES ? $conf->global->DIGIRISKDOLIBARR_GENERAL_RULES : '', '', 90, 'dolibarr_details', '', false, true, $conf->global->FCKEDITOR_ENABLE_SOCIETE, ROWS_3, '90%');
 $doleditor->Create();
 print '</td></tr>';
 
 // * General instructions - Consignes générales *
 
 print '<tr class="oddeven"><td><label for="firstaid">' . $langs->trans("FirstAid") . '</label></td><td>';
-$doleditor = new DolEditor('firstaid', $conf->global->DIGIRISK_FIRST_AID ? $conf->global->DIGIRISK_FIRST_AID : '', '', 90, 'dolibarr_details', '', false, true, $conf->global->FCKEDITOR_ENABLE_SOCIETE, ROWS_3, '90%');
+$doleditor = new DolEditor('firstaid', $conf->global->DIGIRISKDOLIBARR_FIRST_AID ? $conf->global->DIGIRISKDOLIBARR_FIRST_AID : '', '', 90, 'dolibarr_details', '', false, true, $conf->global->FCKEDITOR_ENABLE_SOCIETE, ROWS_3, '90%');
 $doleditor->Create();
 print '</td></tr>';
 
@@ -525,7 +525,7 @@ print '<tr class="liste_titre"><th class="titlefield wordbreak">' . $langs->tran
 // * Rules of procedure location - Emplacement du règlement intérieur *
 
 print '<tr class="oddeven"><td><label for="emplacementRI">' . $langs->trans("Location") . '</label></td><td>';
-$doleditor = new DolEditor('emplacementRI', $conf->global->DIGIRISK_RULES_LOCATION ? $conf->global->DIGIRISK_RULES_LOCATION : '', '', 90, 'dolibarr_details', '', false, true, $conf->global->FCKEDITOR_ENABLE_SOCIETE, ROWS_3, '90%');
+$doleditor = new DolEditor('emplacementRI', $conf->global->DIGIRISKDOLIBARR_RULES_LOCATION ? $conf->global->DIGIRISKDOLIBARR_RULES_LOCATION : '', '', 90, 'dolibarr_details', '', false, true, $conf->global->FCKEDITOR_ENABLE_SOCIETE, ROWS_3, '90%');
 $doleditor->Create();
 print '</td></tr>';
 
@@ -536,7 +536,7 @@ print '<tr class="liste_titre"><th class="titlefield wordbreak">' . $langs->tran
 // * Risks evaluation location - Emplacement du Document Unique *
 
 print '<tr class="oddeven"><td><label for="emplacementDU">' . $langs->trans("Location") . '</label></td><td>';
-$doleditor = new DolEditor('emplacementDU', $conf->global->DIGIRISK_DUER_LOCATION ? $conf->global->DIGIRISK_DUER_LOCATION : '', '', 90, 'dolibarr_details', '', false, true, $conf->global->FCKEDITOR_ENABLE_SOCIETE, ROWS_3, '90%');
+$doleditor = new DolEditor('emplacementDU', $conf->global->DIGIRISKDOLIBARR_DUER_LOCATION ? $conf->global->DIGIRISKDOLIBARR_DUER_LOCATION : '', '', 90, 'dolibarr_details', '', false, true, $conf->global->FCKEDITOR_ENABLE_SOCIETE, ROWS_3, '90%');
 $doleditor->Create();
 print '</td></tr>';
 
@@ -547,7 +547,7 @@ print '<tr class="liste_titre"><th class="titlefield wordbreak">' . $langs->tran
 // * Collective Agreement location - Emplacement de la Convention collective *
 
 print '<tr class="oddeven"><td><label for="emplacementCC">' . $langs->trans("Location") . '</label></td><td>';
-$doleditor = new DolEditor('emplacementCC', $conf->global->DIGIRISK_COLLECTIVE_AGREEMENT_LOCATION ? $conf->global->DIGIRISK_COLLECTIVE_AGREEMENT_LOCATION : '', '', 90, 'dolibarr_details', '', false, true, $conf->global->FCKEDITOR_ENABLE_SOCIETE, ROWS_3, '90%');
+$doleditor = new DolEditor('emplacementCC', $conf->global->DIGIRISKDOLIBARR_COLLECTIVE_AGREEMENT_LOCATION ? $conf->global->DIGIRISKDOLIBARR_COLLECTIVE_AGREEMENT_LOCATION : '', '', 90, 'dolibarr_details', '', false, true, $conf->global->FCKEDITOR_ENABLE_SOCIETE, ROWS_3, '90%');
 $doleditor->Create();
 print '</td></tr>';
 print '</table>';

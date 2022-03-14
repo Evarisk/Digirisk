@@ -81,7 +81,7 @@ class ActionsDigiriskdolibarr
 				$form      = new Form($db);
 				?>
 				<script>
-					IDCC_form = '<?php $formother->select_dictionary('DIGIRISK_COLLECTIVE_AGREEMENT_TITLE', 'c_conventions_collectives', 'code', 'libelle', $conf->global->DIGIRISK_COLLECTIVE_AGREEMENT_TITLE, 1);?>';
+					IDCC_form = '<?php $formother->select_dictionary('DIGIRISKDOLIBARR_COLLECTIVE_AGREEMENT_TITLE', 'c_conventions_collectives', 'code', 'libelle', $conf->global->DIGIRISKDOLIBARR_COLLECTIVE_AGREEMENT_TITLE, 1);?>';
 
 					let $tr = $('<tr class="oddeven"><td><label for="selectidcc_id"><?php print $form->textwithpicto($langs->trans('IDCC'), $langs->trans('IDCCTooltip'));?></label></td>');
 					$tr.append('<td>' + IDCC_form + '</td></tr>');
@@ -91,7 +91,7 @@ class ActionsDigiriskdolibarr
 				</script>
 				<?php
 			}
-			print ajax_combobox('selectDIGIRISK_COLLECTIVE_AGREEMENT_TITLE');
+			print ajax_combobox('selectDIGIRISKDOLIBARR_COLLECTIVE_AGREEMENT_TITLE');
 		}
 
 		if (true) {
@@ -118,7 +118,7 @@ class ActionsDigiriskdolibarr
 		/* print_r($parameters); print_r($object); echo "action: " . $action; */
 		if ($parameters['currentcontext'] == 'admincompany') {	    // do something only for the context 'somecontext1' or 'somecontext2'
 			if ($action == 'updateedit' || $action == 'update') {
-				dolibarr_set_const($db, "DIGIRISK_COLLECTIVE_AGREEMENT_TITLE", GETPOST("DIGIRISK_COLLECTIVE_AGREEMENT_TITLE", 'nohtml'), 'chaine', 0, '', $conf->entity);
+				dolibarr_set_const($db, "DIGIRISKDOLIBARR_COLLECTIVE_AGREEMENT_TITLE", GETPOST("DIGIRISKDOLIBARR_COLLECTIVE_AGREEMENT_TITLE", 'nohtml'), 'chaine', 0, '', $conf->entity);
 			}
 		}
 

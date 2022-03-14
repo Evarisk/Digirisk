@@ -75,6 +75,7 @@ if ( ! $sortorder) $sortorder = "ASC";
 
 // Define value to know what current user can do on users
 $canadduser = ( ! empty($user->admin) || $user->rights->user->user->creer);
+$permissiontoadd = $user->rights->digiriskdolibarr->adminpage->read;
 
 // Initialize technical object to manage hooks of page. Note that conf->hooks_modules contains array of hook context
 $object = new User($db);
@@ -151,16 +152,10 @@ $search_supervisor       = GETPOST('search_supervisor', 'intcomma');
 $optioncss               = GETPOST('optioncss', 'alpha');
 $search_categ            = GETPOST("search_categ", 'int');
 $catid                   = GETPOST('catid', 'int');
-//echo '<pre>';
-//print_r(GETPOST('action'));
-//print_r((GETPOST('lastname')));
-//echo '</pre>';
-//exit;
+
 // Default search
 if ($search_statut == '') $search_statut                                       = '1';
 if ($mode == 'employee' && ! GETPOSTISSET('search_employee')) $search_employee = 1;
-
-
 
 /*
  * Actions
@@ -200,7 +195,7 @@ if (empty($reshook)) {
 	}
 }
 // Action Add user
-if ($action == 'add' && $canadduser) {
+if ($action == 'add' && $canadduser && $permissiontoadd) {
 	$error = 0;
 
 	if ( ! $_POST["lastname"]) {
@@ -841,7 +836,7 @@ if ($canadduser) {
 									<input style="width:100%" type="text" id="password" placeholder="<?php echo $langs->trans('Password'); ?>" name="password" value="<?php echo $password ?>" autocomplete="new-password" />
 								</div>
 								<div class="table-cell table-300">
-									<?php print $form->select_dolgroups($conf->global->DIGIRISKDOLIBARR_USERGROUP_SET, 'group', 1, '', 0, '', '', $conf->entity); ?>
+									<?php print $form->select_dolgroups($conf->global->DIGIRISKDOLIBARR_READERGROUP_SET, 'group', 1, '', 0, '', '', $conf->entity); ?>
 								</div>
 								<div class="table-cell table-400">
 									<?php print '<label style="margin-left: 50px" for="send_password">' . $langs->trans("SendPassword") . '</label>';

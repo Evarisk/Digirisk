@@ -615,7 +615,7 @@ function digiriskHeader($title = '', $help_url = '', $arrayofjs = array(), $arra
 									jQuery( '#unit'+id ).addClass( 'toggled' );
 								});
 
-								<?php $object->fetch(GETPOST('id')); ?>;
+								<?php $object->fetch(GETPOST('id') ?: GETPOST('fromid')); ?>;
 								var idParent = <?php echo json_encode($object->fk_parent);?> ;
 
 								jQuery( '#menu'+idParent).removeClass( 'fa-chevron-right').addClass( 'fa-chevron-down' );
@@ -2237,3 +2237,97 @@ function getNomUrlSociety($thirdparty, $withpicto = 0, $option = '', $maxlen = 0
 	return $result;
 }
 
+/**
+ * 	Return list of activated modules usable for document generation
+ *
+ * 	@param	DoliDB		$db				    Database handler
+ * 	@param	string		$type			    Type of models (company, invoice, ...)
+ *  @param  int		    $maxfilenamelength  Max length of value to show
+ * 	@return	array|int			    		0 if no module is activated, or array(key=>label). For modules that need directory scan, key is completed with ":filename".
+ */
+function getListOfModelsDigirisk($db, $type, $maxfilenamelength = 0)
+{
+    global $conf, $langs;
+    $liste = array();
+    $found = 0;
+    $dirtoscan = '';
+
+    $sql = "SELECT nom as id, nom as doc_template_name, libelle as label, description as description";
+    $sql .= " FROM ".MAIN_DB_PREFIX."document_model";
+    $sql .= " WHERE type = '".$db->escape($type)."'";
+    $sql .= " AND entity IN (0,".$conf->entity.")";
+    $sql .= " ORDER BY description DESC";
+
+    dol_syslog('/core/lib/function2.lib.php::getListOfModels', LOG_DEBUG);
+    $resql = $db->query($sql);
+    if ($resql) {
+        $num = $db->num_rows($resql);
+        $i = 0;
+        while ($i < $num) {
+            $found = 1;
+
+            $obj = $db->fetch_object($resql);
+
+            // If this generation module needs to scan a directory, then description field is filled
+            // with the constant that contains list of directories to scan (COMPANY_ADDON_PDF_ODT_PATH, ...).
+            if (!empty($obj->description)) {	// A list of directories to scan is defined
+                include_once DOL_DOCUMENT_ROOT.'/core/lib/files.lib.php';
+
+                $const = $obj->description;
+                //irtoscan.=($dirtoscan?',':'').preg_replace('/[\r\n]+/',',',trim($conf->global->$const));
+                $dirtoscan = preg_replace('/[\r\n]+/', ',', trim($conf->global->$const));
+
+                $listoffiles = array();
+
+                // Now we add models found in directories scanned
+                $listofdir = explode(',', $dirtoscan);
+                foreach ($listofdir as $key => $tmpdir) {
+                    $tmpdir = trim($tmpdir);
+                    $tmpdir = preg_replace('/DOL_DATA_ROOT/', DOL_DATA_ROOT, $tmpdir);
+                    $tmpdir = preg_replace('/DOL_DOCUMENT_ROOT/', DOL_DOCUMENT_ROOT, $tmpdir);
+                    if (!$tmpdir) {
+                        unset($listofdir[$key]);
+                        continue;
+                    }
+                    if (is_dir($tmpdir)) {
+                        // all type of template is allowed
+                        $tmpfiles = dol_dir_list($tmpdir, 'files', 0, '', '', 'name', SORT_ASC, 0);
+                        if (count($tmpfiles)) {
+                            $listoffiles = array_merge($listoffiles, $tmpfiles);
+                        }
+                    }
+                }
+
+                if (count($listoffiles)) {
+                    foreach ($listoffiles as $record) {
+                        $max = ($maxfilenamelength ? $maxfilenamelength : 28);
+                        $liste[$obj->id.':'.$record['fullname']] = dol_trunc($record['name'], $max, 'middle');
+                    }
+                } else {
+                    $liste[0] = $obj->label.': '.$langs->trans("None");
+                }
+            } else {
+                if ($type == 'member' && $obj->doc_template_name == 'standard') {   // Special case, if member template, we add variant per format
+                    global $_Avery_Labels;
+                    include_once DOL_DOCUMENT_ROOT.'/core/lib/format_cards.lib.php';
+                    foreach ($_Avery_Labels as $key => $val) {
+                        $liste[$obj->id.':'.$key] = ($obj->label ? $obj->label : $obj->doc_template_name).' '.$val['name'];
+                    }
+                } else {
+                    // Common usage
+                    $liste[$obj->id] = $obj->label ? $obj->label : $obj->doc_template_name;
+                }
+            }
+            $i++;
+        }
+    } else {
+        dol_print_error($db);
+        return -1;
+    }
+
+    if ($found) {
+        return $liste;
+    } else {
+        return 0;
+    }
+}

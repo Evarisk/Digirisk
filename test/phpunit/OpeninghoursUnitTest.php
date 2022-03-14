@@ -24,7 +24,22 @@
 
 global $conf, $user, $langs, $db;
 
-require_once __DIR__ . '/../../../../../htdocs/master.inc.php';
+// Load Dolibarr environment
+$res = 0;
+// Try main.inc.php using relative path
+if (!$res && file_exists("../../../htdocs/master.inc.php")) {
+	$res = require_once dirname(__FILE__).'/../../../htdocs/master.inc.php';
+}
+if (!$res && file_exists("../../../../htdocs/master.inc.php")) {
+	$res = require_once dirname(__FILE__).'/../../../../htdocs/master.inc.php';
+}
+if (!$res && file_exists("../../../../../htdocs/master.inc.php")) {
+	$res = require_once dirname(__FILE__).'/../../../../../htdocs/master.inc.php';;
+}
+if (!$res) {
+	die("Include of main fails");
+}
+
 require_once __DIR__ . '/../../class/openinghours.class.php';
 
 if (empty($user->id)) {

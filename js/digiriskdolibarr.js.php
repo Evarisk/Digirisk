@@ -1007,8 +1007,10 @@ window.eoxiaJS.signature.clearCanvas = function( event ) {
  */
 window.eoxiaJS.signature.createSignature = function() {
 	let elementSignatory = $(this).attr('value');
-	let elementRedirect  = $(this).find('#redirect' + elementSignatory).attr('value');
+	let elementRedirect  = '';
+	let elementCode = '';
 	let elementZone  = $(this).find('#zone' + elementSignatory).attr('value');
+	let elementConfCAPTCHA  = $('#confCAPTCHA').val();
 	let actionContainerSuccess = $('.noticeSignatureSuccess');
 	var signatoryIDPost = '';
 	if (elementSignatory !== 0) {
@@ -1028,12 +1030,28 @@ window.eoxiaJS.signature.createSignature = function() {
 		url = document.URL + '&action=addSignature' + signatoryIDPost;
 		type = "POST";
 	}
+
+	if (elementConfCAPTCHA == 1) {
+		elementCode = $('#securitycode').val();
+		let elementSessionCode = $('#sessionCode').val();
+		if (elementSessionCode == elementCode) {
+			elementRedirect = $('#redirectSignature').val();
+		} else {
+			elementRedirect = $('#redirectSignatureError').val();
+		}
+	} else {
+		elementRedirect = $(this).find('#redirect' + elementSignatory).attr('value');
+	}
+
 	$.ajax({
 		url: url,
 		type: type,
 		processData: false,
 		contentType: 'application/octet-stream',
-		data: signature,
+		data: JSON.stringify({
+			signature: signature,
+			code: elementCode
+		}),
 		success: function( resp ) {
 			if (elementZone == "private") {
 				actionContainerSuccess.html($(resp).find('.noticeSignatureSuccess .all-notice-content'));
@@ -1306,36 +1324,31 @@ window.eoxiaJS.mediaGallery.sendPhoto = function( event ) {
 
 	event.preventDefault()
 	let files    = $(this).prop("files");
-	let formdata = new FormData();
 	let elementParent = $(this).closest('.modal-container').find('.ecm-photo-list-content');
 	let actionContainerSuccess = $('.messageSuccessSendPhoto');
 	let actionContainerError = $('.messageErrorSendPhoto');
-	window.eoxiaJS.loader.display($('#media_gallery').find('.modal-content'));
+	let totalCount = files.length
+    let progress = 0
+    $('#myProgress').attr('style', 'display:block')
 	$.each(files, function(index, file) {
-		console.log(file)
-		formdata.append("userfile[]", file);
-		console.log(formdata)
-
-	})
-
-	$.ajax({
-		url: document.URL + "&action=uploadPhoto",
-		type: "POST",
-		data: formdata,
-		processData: false,
-		contentType: false,
-		success: function ( resp ) {
-			console.log(document.URL)
-
-			$('.wpeo-loader').removeClass('wpeo-loader')
-			window.eoxiaJS.loader.display(elementParent);
-			elementParent.load( document.URL + ' .ecm-photo-list');
-			elementParent.removeClass('wpeo-loader');
-			actionContainerSuccess.removeClass('hidden');
-		},
-		error: function ( ) {
-			actionContainerError.removeClass('hidden');
-		}
+        let formdata = new FormData();
+        formdata.append("userfile[]", file);
+        $.ajax({
+            url: document.URL + "&action=uploadPhoto",
+            type: "POST",
+            data: formdata,
+            processData: false,
+            contentType: false,
+        }).done(function() {
+            progress += (1 / totalCount) * 100
+            $('#myBar').animate({
+                width: progress + '%'
+            }, 300 );
+			if (index + 1 === totalCount) {
+                elementParent.load( document.URL + '&uploadMediasSuccess=1' + ' .ecm-photo-list');
+                actionContainerSuccess.removeClass('hidden');
+            }
+		})
 	})
 };
 

@@ -3681,6 +3681,11 @@ td > .risk-evaluation-container {
   width: 100%;
 }
 
+.wpeo-modal[class*=modal-risk] .modal-container .risk-evaluation-container {
+  padding-bottom: 1em;
+  margin-bottom: 1em;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+}
 .wpeo-modal[class*=modal-risk] .modal-container .risk-evaluation-container .risk-evaluation-header {
   margin-bottom: 1em;
 }
@@ -3998,7 +4003,7 @@ td > .risk-evaluation-container {
   }
 }
 .preview-photo {
-  z-index: 1003 !important;
+  z-index: 2100 !important;
 }
 
 .imgTabTitle {

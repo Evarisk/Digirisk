@@ -49,6 +49,10 @@
 }
 
 .wpeo-modal[class*="modal-risk"] .modal-container .risk-evaluation-container {
+  padding-bottom: 1em;
+  margin-bottom: 1em;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+
   .risk-evaluation-header {
     margin-bottom: 1em;
   }

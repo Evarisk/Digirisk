@@ -187,6 +187,7 @@ class doc_riskassessmentdocument_odt extends ModeleODTRiskAssessmentDocument
 		foreach ($listofdir as $key => $tmpdir) {
 			$tmpdir = trim($tmpdir);
 			$tmpdir = preg_replace('/DOL_DATA_ROOT/', DOL_DATA_ROOT, $tmpdir);
+			$tmpdir = preg_replace('/DOL_DOCUMENT_ROOT/', DOL_DOCUMENT_ROOT, $tmpdir);
 			if ( ! $tmpdir) {
 				unset($listofdir[$key]); continue;
 			}
@@ -283,7 +284,7 @@ class doc_riskassessmentdocument_odt extends ModeleODTRiskAssessmentDocument
 			preg_replace('/template_/', '', $filename[1]);
 
 			$date     = dol_print_date(dol_now(), 'dayxcard');
-			$filename = $objectref . '_' . $conf->global->MAIN_INFO_SOCIETE_NOM . '_' . $date . '.odt';
+			$filename = $date . '_' . $objectref . '_' . $conf->global->MAIN_INFO_SOCIETE_NOM . '.odt';
 			$filename = str_replace(' ', '_', $filename);
 			$filename = dol_sanitizeFileName($filename);
 

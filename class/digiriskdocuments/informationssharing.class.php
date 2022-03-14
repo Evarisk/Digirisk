@@ -112,7 +112,7 @@ class InformationsSharing extends DigiriskDocuments
 		// 		*** JSON FILLING ***
 		if (!empty ($digirisk_resources)) {
 
-			$json['InformationsSharing']['delegues_du_personnels_date']    	  = $conf->global->DIGIRISK_DP_ELECTION_DATE;
+			$json['InformationsSharing']['delegues_du_personnels_date']    	  = $conf->global->DIGIRISKDOLIBARR_DP_ELECTION_DATE;
 			$json['InformationsSharing']['delegues_du_personnels_titulaires'] = '';
 
 			if (!empty ($digirisk_resources['TitularsDP']->id )) {
@@ -153,7 +153,7 @@ class InformationsSharing extends DigiriskDocuments
 			}
 
 			// CSE
-			$json['InformationsSharing']['membres_du_comite_entreprise_date'] = $conf->global->DIGIRISK_CSE_ELECTION_DATE;
+			$json['InformationsSharing']['membres_du_comite_entreprise_date'] = $conf->global->DIGIRISKDOLIBARR_CSE_ELECTION_DATE;
 
 
 			$json['InformationsSharing']['membres_du_comite_entreprise_titulaires'] = '';

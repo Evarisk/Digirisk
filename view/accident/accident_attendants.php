@@ -242,9 +242,10 @@ if ( ! empty($object->id)) $res = $object->fetch_optionals();
 
 // Object card
 // ------------------------------------------------------------
-
 $head = accidentPrepareHead($object);
 print dol_get_fiche_head($head, 'accidentAttendants', $langs->trans("Accident"), -1, "digiriskdolibarr@digiriskdolibarr");
+$height                                   = 80;
+$width                                    = 80;
 dol_strlen($object->label) ? $morehtmlref = '<span>' . ' - ' . $object->label . '</span>' : '';
 $morehtmlref                             .= '<div class="refidno">';
 // Project
@@ -252,7 +253,7 @@ $project->fetch($object->fk_project);
 $morehtmlref .= $langs->trans('Project') . ' : ' . getNomUrlProject($project, 1, 'blank');
 $morehtmlref .= '</div>';
 
-$morehtmlleft = '<div class="floatleft inline-block valignmiddle divphotoref">' . digirisk_show_photos('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/' . $object->element, 'small', 5, 0, 0, 0, $width, 0, 0, 0, 0, $object->element, $object) . '</div>';
+$morehtmlleft = '<div class="floatleft inline-block valignmiddle divphotoref">' . digirisk_show_photos('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/' . $object->element, 'small', 5, 0, 0, 0, $height, $width, 0, 0, 0, $object->element, $object) . '</div>';
 
 digirisk_banner_tab($object, 'ref', '', 0, 'ref', 'ref', $morehtmlref, '', 0, $morehtmlleft);
 
