@@ -522,11 +522,11 @@ if ($object->id > 0) {
 	$selectedfields .= (count($arrayofmassactions) ? $form->showCheckAddButtons('checkforselect', 1) : '');
 
 	print '<div class="div-table-responsive">'; // You can use div-table-responsive-no-min if you dont need reserved height for your table
-	print '<table class="tagtable liste' . ($moreforfilter ? " listwithfilterbefore" : "") . '">' . "\n";
+	print '<table class="tagtable nobottomiftotal liste' . ($moreforfilter ? " listwithfilterbefore" : "") . '">' . "\n";
 
 	// Fields title search
 	// --------------------------------------------------------------------
-	print '<tr class="liste_titre_filter">';
+	print '<tr class="liste_titre">';
 	foreach ($risksign->fields as $key => $val) {
 		$cssforfield                        = (empty($val['css']) ? '' : $val['css']);
 		if ($key == 'status') $cssforfield .= ($cssforfield ? ' ' : '') . 'center';
@@ -549,7 +549,7 @@ if ($object->id > 0) {
 	print $hookmanager->resPrint;
 
 	// Action column
-	print '<td class="liste_titre center">';
+	print '<td class="liste_titre maxwidthsearch">';
 	$searchpicto = $form->showFilterButtons();
 	print $searchpicto;
 	print '</td>';
@@ -662,7 +662,7 @@ if ($object->id > 0) {
 					</div>
 					<?php
 				} elseif ($key == 'description') {
-					print dol_trunc($risksign->description);
+					print dol_trunc($risksign->description, 128, 'wrap', 'UTF-8', 0, 1);
 				} else print $risksign->showOutputField($val, $key, $risksign->$key, '');
 				print '</td>';
 				if ( ! $i) $totalarray['nbfield']++;

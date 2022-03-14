@@ -375,7 +375,7 @@ class modDigiriskdolibarr extends DolibarrModules
 		$this->descriptionlong = "Digirisk";
 		$this->editor_name     = 'Evarisk';
 		$this->editor_url      = 'https://evarisk.com';
-		$this->version         = '9.1.0';
+		$this->version         = '9.1.1';
 		$this->const_name      = 'MAIN_MODULE_' . strtoupper($this->name);
 		$this->picto           = 'digiriskdolibarr@digiriskdolibarr';
 
@@ -674,9 +674,9 @@ class modDigiriskdolibarr extends DolibarrModules
 		// Array to add new pages in new tabs
 		$this->tabs = array();
 		// Example:
-		$this->tabs[] = array('data' => 'mycompany_admin:+security:Sécurité:@digiriskdolibarr:1:/custom/digiriskdolibarr/admin/securityconf.php');  					// To add a new tab identified by code tabname1
+		$this->tabs[] = array('data' => 'mycompany_admin:+security:Sécurité:@digiriskdolibarr:1:/custom/digiriskdolibarr/admin/securityconf.php');  			// To add a new tab identified by code tabname1
 		$this->tabs[] = array('data' => 'mycompany_admin:+social:Social:@digiriskdolibarr:1:/custom/digiriskdolibarr/admin/socialconf.php');  					// To add a new tab identified by code tabname1
-		$this->tabs[] = array('data' => 'thirdparty:+openinghours:Horaires:@digiriskdolibarr:1:/custom/digiriskdolibarr/view/openinghours_card.php?id=__ID__');  					// To add a new tab identified by code tabname1
+		$this->tabs[] = array('data' => 'thirdparty:+openinghours:Horaires:@digiriskdolibarr:1:/custom/digiriskdolibarr/view/openinghours_card.php?id=__ID__'); // To add a new tab identified by code tabname1
 
 		// To remove an existing tab identified by code tabname
 		// Dictionaries
@@ -1130,8 +1130,8 @@ class modDigiriskdolibarr extends DolibarrModules
 			'url' => '/digiriskdolibarr/view/digiriskusers.php',
 			'langs' => 'digiriskdolibarr@digiriskdolibarr',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
 			'position' => 48520 + $r,
-			'enabled' => '$user->rights->user->user->lire',  // Define condition to show or hide menu entry. Use '$conf->digiriskdolibarr->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
-			'perms' => '$user->rights->user->user->lire', // Use 'perms'=>'$user->rights->digiriskdolibarr->level1->level2' if you want your menu with a permission rules
+			'enabled' => '$conf->digiriskdolibarr->enabled',  // Define condition to show or hide menu entry. Use '$conf->digiriskdolibarr->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
+			'perms' => '$user->rights->digiriskdolibarr->adminpage->read', // Use 'perms'=>'$user->rights->digiriskdolibarr->level1->level2' if you want your menu with a permission rules
 			'target' => '',
 			'user' => 0,				                // 0=Menu for internal users, 1=external users, 2=both
 		);
@@ -1146,7 +1146,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			'langs' => 'digiriskdolibarr@digiriskdolibarr',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
 			'position' => 48520 + $r,
 			'enabled' => '$conf->digiriskdolibarr->enabled',  // Define condition to show or hide menu entry. Use '$conf->digiriskdolibarr->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
-			'perms' => '$user->admin && $user->rights->digiriskdolibarr->digiriskelement->read',			                // Use 'perms'=>'$user->rights->digiriskdolibarr->level1->level2' if you want your menu with a permission rules
+			'perms' => '$user->rights->digiriskdolibarr->digiriskelement->read',			                // Use 'perms'=>'$user->rights->digiriskdolibarr->level1->level2' if you want your menu with a permission rules
 			'target' => '_blank',
 			'user' => 0,				                // 0=Menu for internal users, 1=external users, 2=both
 		);
@@ -1161,7 +1161,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			'langs' => 'digiriskdolibarr@digiriskdolibarr',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
 			'position' => 48520 + $r,
 			'enabled' => '$conf->digiriskdolibarr->enabled && $user->admin',  // Define condition to show or hide menu entry. Use '$conf->digiriskdolibarr->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
-			'perms' => '$user->admin',			                // Use 'perms'=>'$user->rights->digiriskdolibarr->level1->level2' if you want your menu with a permission rules
+			'perms' => '$user->admin && $user->rights->digiriskdolibarr->adminpage->read',			                // Use 'perms'=>'$user->rights->digiriskdolibarr->level1->level2' if you want your menu with a permission rules
 			'target' => '',
 			'user' => 0,				                // 0=Menu for internal users, 1=external users, 2=both
 		);
@@ -1327,42 +1327,42 @@ class modDigiriskdolibarr extends DolibarrModules
 			$labour_inspectorID       = $labour_inspector->create($user);
 
 			$samu         = $societe;
-			$samu->name   = $langs->trans('SAMU');
+			$samu->name   = $langs->trans('SAMU') . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
 			$samu->client = 0;
 			$samu->phone  = '15';
 			$samu->url    = '';
 			$samuID       = $samu->create($user);
 
 			$pompiers         = $societe;
-			$pompiers->name   = $langs->trans('Pompiers');
+			$pompiers->name   = $langs->trans('Pompiers') . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
 			$pompiers->client = 0;
 			$pompiers->phone  = '18';
 			$pompiers->url    = '';
 			$pompiersID       = $pompiers->create($user);
 
 			$police         = $societe;
-			$police->name   = $langs->trans('Police');
+			$police->name   = $langs->trans('Police') . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
 			$police->client = 0;
 			$police->phone  = '17';
 			$police->url    = '';
 			$policeID       = $police->create($user);
 
 			$emergency         = $societe;
-			$emergency->name   = $langs->trans('AllEmergencies');
+			$emergency->name   = $langs->trans('AllEmergencies') . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
 			$emergency->client = 0;
 			$emergency->phone  = '112';
 			$emergency->url    = '';
 			$emergencyID       = $emergency->create($user);
 
 			$rights_defender         = $societe;
-			$rights_defender->name   = $langs->trans('RightsDefender');
+			$rights_defender->name   = $langs->trans('RightsDefender') . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
 			$rights_defender->client = 0;
 			$rights_defender->phone  = '';
 			$rights_defender->url    = '';
 			$rights_defenderID       = $rights_defender->create($user);
 
 			$poison_control_center         = $societe;
-			$poison_control_center->name   = $langs->trans('PoisonControlCenter');
+			$poison_control_center->name   = $langs->trans('PoisonControlCenter') . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
 			$poison_control_center->client = 0;
 			$poison_control_center->phone  = '';
 			$poison_control_center->url    = '';
@@ -1394,14 +1394,14 @@ class modDigiriskdolibarr extends DolibarrModules
 			$labour_inspectorID       = $labour_inspector->create($user);
 
 			$rights_defender         = $societe;
-			$rights_defender->name   = $langs->trans('RightsDefender');
+			$rights_defender->name   = $langs->trans('RightsDefender') . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
 			$rights_defender->client = 0;
 			$rights_defender->phone  = '';
 			$rights_defender->url    = '';
 			$rights_defenderID       = $rights_defender->create($user);
 
 			$poison_control_center         = $societe;
-			$poison_control_center->name   = $langs->trans('PoisonControlCenter');
+			$poison_control_center->name   = $langs->trans('PoisonControlCenter') . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
 			$poison_control_center->client = 0;
 			$poison_control_center->phone  = '';
 			$poison_control_center->url    = '';
@@ -1444,6 +1444,36 @@ class modDigiriskdolibarr extends DolibarrModules
 			$societe->name = $langs->trans('LabourInspectorName') . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
 			$societe->update(0, $user);
 
+			$policeID = $resources->digirisk_dolibarr_fetch_resource('Police');
+			$societe->fetch($policeID);
+			$societe->name = $langs->trans('Police') . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
+			$societe->update(0, $user);
+
+			$samuID = $resources->digirisk_dolibarr_fetch_resource('SAMU');
+			$societe->fetch($samuID);
+			$societe->name = $langs->trans('SAMU') . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
+			$societe->update(0, $user);
+
+			$pompiersID = $resources->digirisk_dolibarr_fetch_resource('Pompiers');
+			$societe->fetch($pompiersID);
+			$societe->name = $langs->trans('Pompiers') . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
+			$societe->update(0, $user);
+
+			$emergencyID = $resources->digirisk_dolibarr_fetch_resource('AllEmergencies');
+			$societe->fetch($emergencyID);
+			$societe->name = $langs->trans('AllEmergencies') . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
+			$societe->update(0, $user);
+
+			$rights_defenderID = $resources->digirisk_dolibarr_fetch_resource('RightsDefender');
+			$societe->fetch($rights_defenderID);
+			$societe->name = $langs->trans('RightsDefender') . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
+			$societe->update(0, $user);
+
+			$poison_control_centerID = $resources->digirisk_dolibarr_fetch_resource('PoisonControlCenter');
+			$societe->fetch($poison_control_centerID);
+			$societe->name = $langs->trans('PoisonControlCenter') . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
+			$societe->update(0, $user);
+
 			dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_THIRDPARTY_UPDATED', 1, 'integer', 0, '', $conf->entity);
 		}
 
@@ -1451,12 +1481,13 @@ class modDigiriskdolibarr extends DolibarrModules
 		include_once DOL_DOCUMENT_ROOT . '/core/class/extrafields.class.php';
 		$extra_fields = new ExtraFields($this->db);
 
-		$extra_fields->update('fk_risk', $langs->trans("fk_risk"), 'sellist', '', 'projet_task', 0, 0, 1020, 'a:1:{s:7:"options";a:1:{s:50:"digiriskdolibarr_risk:ref:rowid::entity = $ENTITY$";N;}}', '', '', 1);
-		$extra_fields->addExtraField('fk_risk', $langs->trans("fk_risk"), 'sellist', 1020, '', 'projet_task', 0, 0, '', 'a:1:{s:7:"options";a:1:{s:50:"digiriskdolibarr_risk:ref:rowid::entity = $ENTITY$";N;}}', '', '', 1);
+		$extra_fields->update('fk_risk', $langs->trans("fk_risk"), 'sellist', '', 'projet_task', 0, 0, 1010, 'a:1:{s:7:"options";a:1:{s:50:"digiriskdolibarr_risk:ref:rowid::entity = $ENTITY$";N;}}', '', '', 1);
+		$extra_fields->addExtraField('fk_risk', $langs->trans("fk_risk"), 'sellist', 1010, '', 'projet_task', 0, 0, '', 'a:1:{s:7:"options";a:1:{s:50:"digiriskdolibarr_risk:ref:rowid::entity = $ENTITY$";N;}}', '', '', 1);
 
 		$extra_fields->addExtraField('fk_preventionplan', $langs->trans("fk_preventionplan"), 'sellist', 1020, '', 'projet_task', 0, 0, '', 'a:1:{s:7:"options";a:1:{s:60:"digiriskdolibarr_preventionplan:ref:rowid::entity = $ENTITY$";N;}}', '', '', 1);
 		$extra_fields->addExtraField('fk_firepermit', $langs->trans("fk_firepermit"), 'sellist', 1030, '', 'projet_task', 0, 0, '', 'a:1:{s:7:"options";a:1:{s:56:"digiriskdolibarr_firepermit:ref:rowid::entity = $ENTITY$";N;}}', '', '', 1);
-		$extra_fields->addExtraField('fk_accident', $langs->trans("fk_accident"), 'sellist', 1020, '', 'projet_task', 0, 0, '', 'a:1:{s:7:"options";a:1:{s:50:"digiriskdolibarr_accident:ref:rowid::entity = $ENTITY$";N;}a:1:{s:7:"options";a:1:{s:50:"digiriskdolibarr_risk:ref:rowid::entity = $ENTITY$";N;}}}', '', '', 1);
+		$extra_fields->update('fk_accident', $langs->trans("fk_accident"), 'sellist', '', 'projet_task', 0, 0, 1040, 'a:1:{s:7:"options";a:1:{s:54:"digiriskdolibarr_accident:ref:rowid::entity = $ENTITY$";N;}}', '', '', 1);
+		$extra_fields->addExtraField('fk_accident', $langs->trans("fk_accident"), 'sellist', 1040, '', 'projet_task', 0, 0, '', 'a:1:{s:7:"options";a:1:{s:54:"digiriskdolibarr_accident:ref:rowid::entity = $ENTITY$";N;}}', '', '', 1);
 
 		//Used for data import from Digirisk Wordpress
 		$extra_fields->update('wp_digi_id', $langs->trans("WPDigiID"), 'int', 100, 'digiriskdolibarr_digiriskelement', 0, 0, 1020, '', '', '', 0);

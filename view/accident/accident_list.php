@@ -199,7 +199,27 @@ $morecss = array("/digiriskdolibarr/css/digiriskdolibarr.css");
 
 if ($fromid > 0) {
 	digiriskHeader($title, $help_url, $morejs, $morecss);
-	print dol_get_fiche_head($head, 'elementAccidents', $langs->trans("Accident"), -1, $objectlinked->picto);
+	print dol_get_fiche_head($head, 'elementAccidents', $langs->trans("Accident"), -1, "digiriskdolibarr@digiriskdolibarr");
+	// Object card
+	// ------------------------------------------------------------
+	$height                                   = 80;
+	$width                                    = 80;
+	dol_strlen($objectlinked->label) ? $morehtmlref = ' - ' . $objectlinked->label : '';
+	$morehtmlref                             .= '<div class="refidno">';
+	// ParentElement
+	$parent_element = new DigiriskElement($db);
+	$result         = $parent_element->fetch($objectlinked->fk_parent);
+	if ($result > 0) {
+		$morehtmlref .= $langs->trans("Description") . ' : ' . $objectlinked->description;
+		$morehtmlref .= '<br>' . $langs->trans("ParentElement") . ' : ' . $parent_element->getNomUrl(1, 'blank', 1);
+	} else {
+		$digiriskstandard->fetch($conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD);
+		$morehtmlref .= $langs->trans("Description") . ' : ' . $objectlinked->description;
+		$morehtmlref .= '<br>' . $langs->trans("ParentElement") . ' : ' . $digiriskstandard->getNomUrl(1, 'blank', 1);
+	}
+	$morehtmlref .= '</div>';
+	$morehtmlleft = '<div class="floatleft inline-block valignmiddle divphotoref">' . digirisk_show_photos('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/' . $objectlinked->element_type, 'small', 5, 0, 0, 0, $height, $width, 0, 0, 0, $objectlinked->element_type, $objectlinked) . '</div>';
+	digirisk_banner_tab($objectlinked, 'ref', '', 0, 'ref', 'ref', $morehtmlref, '', 0, $morehtmlleft);
 } else {
 	llxHeader("", $title, $help_url, '', '', '', $morejs, $morecss);
 }
@@ -252,29 +272,32 @@ if (is_array($extrafields->attributes[$accident->table_element]['label']) && cou
 if ($accident->ismultientitymanaged == 1) $sql                                                                                                        .= " WHERE t.entity IN (" . getEntity($accident->element) . ")";
 else $sql                                                                                                                                             .= " WHERE 1 = 1";
 $sql                                                                                                                                                  .= ' AND status != 0';
-
+if ($fromid > 0) {
+	$sql .= ' AND fk_element =' . $fromid;
+}
 
 foreach ($search as $key => $val) {
-		if ($key == 'status' && $search[$key] == -1) continue;
-		$mode_search = (($accident->isInt($accident->fields[$key]) || $accident->isFloat($accident->fields[$key])) ? 1 : 0);
+	if ($key == 'status' && $search[$key] == -1) continue;
+	$mode_search = (($accident->isInt($accident->fields[$key]) || $accident->isFloat($accident->fields[$key])) ? 1 : 0);
 	if (strpos($accident->fields[$key]['type'], 'integer:') === 0) {
 		if ($search[$key] == '-1') $search[$key] = '';
 		$mode_search                             = 2;
 	}
-		if ($search[$key] != '') $sql .= natural_search($key, $search[$key], (($key == 'status') ? 2 : $mode_search));
+	if ($search[$key] != '') $sql .= natural_search($key, $search[$key], (($key == 'status') ? 2 : $mode_search));
 }
-	if ($search_all) $sql .= natural_search(array_keys($fieldstosearchall), $search_all);
-	// Add where from extra fields
-	include DOL_DOCUMENT_ROOT . '/core/tpl/extrafields_list_search_sql.tpl.php';
-	// Add where from hooks
-	$parameters = array();
-	$reshook    = $hookmanager->executeHooks('printFieldListWhere', $parameters, $accident); // Note that $action and $accidentdocument may have been modified by hook
-	$sql       .= $hookmanager->resPrint;
 
-	$sql .= $db->order($sortfield, $sortorder);
+if ($search_all) $sql .= natural_search(array_keys($fieldstosearchall), $search_all);
+// Add where from extra fields
+include DOL_DOCUMENT_ROOT . '/core/tpl/extrafields_list_search_sql.tpl.php';
+// Add where from hooks
+$parameters = array();
+$reshook    = $hookmanager->executeHooks('printFieldListWhere', $parameters, $accident); // Note that $action and $accidentdocument may have been modified by hook
+$sql       .= $hookmanager->resPrint;
 
-	// Count total nb of records
-	$nbtotalofrecords = '';
+$sql .= $db->order($sortfield, $sortorder);
+
+// Count total nb of records
+$nbtotalofrecords = '';
 if (empty($conf->global->MAIN_DISABLE_FULL_SCANLIST)) {
 	$resql = $db->query($sql);
 
@@ -418,19 +441,19 @@ while ($i < ($limit ? min($num, $limit) : $num)) {
 				$arrayAccident   = array();
 				$arrayAccident[] = $accident->ref;
 				$arrayAccident[] = $accident->label;
-				$arrayAccident[] = ( ! empty($object->accident_type) ? $object->accident_type : 0);
+				$arrayAccident[] = ( ! empty($accident->accident_type) ? $accident->accident_type : 0);
 				$arrayAccident[] = $accident->accident_date;
 				$arrayAccident[] = $accident->description;
 				$arrayAccident[] = $accident->photo;
-				switch ($object->external_accident) {
+				switch ($accident->external_accident) {
 					case 1:
-						$arrayAccident[] = $object->fk_element;
+						$arrayAccident[] = $accident->fk_element;
 						break;
 					case 2:
-						$arrayAccident[] = $object->fk_soc;
+						$arrayAccident[] = $accident->fk_soc;
 						break;
 					case 3:
-						$arrayAccident[] = $object->accident_location;
+						$arrayAccident[] = $accident->accident_location;
 						break;
 				}
 				$arrayAccident[] = $accident->fk_user_victim;
@@ -447,7 +470,7 @@ while ($i < ($limit ? min($num, $limit) : $num)) {
 
 				print $advancement . '%';
 				?>
-				<div class="progress-bar progress-bar-info" style="width: 100%; height:20%; background-color: lightgray" title=" <?php echo $advancement ?>%">
+				<div class="progress-bar progress-bar-info" style="width: 100%; height:10px; background-color: lightgray" title=" <?php echo $advancement ?>%">
 					<div class="progress-bar progress-bar-consumed" style="width:  <?php echo $advancement ?>%; background-color: forestgreen" title="0%"></div>
 				</div>
 				<?php
