@@ -836,7 +836,7 @@ if ($canadduser) {
 									<input style="width:100%" type="text" id="password" placeholder="<?php echo $langs->trans('Password'); ?>" name="password" value="<?php echo $password ?>" autocomplete="new-password" />
 								</div>
 								<div class="table-cell table-300">
-									<?php print $form->select_dolgroups($conf->global->DIGIRISKDOLIBARR_USERGROUP_SET, 'group', 1, '', 0, '', '', $conf->entity); ?>
+									<?php print $form->select_dolgroups($conf->global->DIGIRISKDOLIBARR_READERGROUP_SET, 'group', 1, '', 0, '', '', $conf->entity); ?>
 								</div>
 								<div class="table-cell table-400">
 									<?php print '<label style="margin-left: 50px" for="send_password">' . $langs->trans("SendPassword") . '</label>';
