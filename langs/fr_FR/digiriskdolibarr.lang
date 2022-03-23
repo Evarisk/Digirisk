@@ -1042,6 +1042,8 @@ ImportSharedRisks = Importer des risques partagés
 AlreadyImported = Déja importé
 ShowSharedRisks = Risques partagés
 ShowSharedRisksDescription = Afficher les risques partagés dans les documents et les listings
+DigiriskElementSharedRisk = Risques partagés
+SharedRisks = Risques partagés
 
 
 
