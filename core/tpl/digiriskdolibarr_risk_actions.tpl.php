@@ -684,3 +684,34 @@ if ( ! $error && $action == "addToFavorite" && $permissiontodelete) {
 	header("Location: " . $urltogo);
 	exit;
 }
+
+// Action import shared risks
+if ($action == 'confirm_import_shared_risks' && $confirm == 'yes') {
+
+	$digiriskelementtmp = new DigiriskElement($db);
+
+	$allrisks = $risk->fetchAll('',  '',  0,  0, array('customsql' => 'status > 0 AND entity > 0' ));
+
+	foreach ($allrisks as $key => $risks) {
+		$digiriskelementtmp->fetch($risks->fk_element);
+		$options['import_shared_risks'][$risks->id] = GETPOST('import_shared_risks'.'_S' . $risks->entity . '_' . $digiriskelementtmp->ref . '_' . $risks->ref);
+
+		if ($options['import_shared_risks'][$risks->id] == 'on') {
+			if ($object->id > 0) {
+				$object->element = 'digiriskdolibarr_' . $digiriskelementtmp->element;
+				$result = $object->add_object_linked('digiriskdolibarr_' . $risk->element, $risks->id);
+				if ($result > 0) {
+					continue;
+				} else {
+					setEventMessages($object->error, $object->errors, 'errors');
+					$action = '';
+				}
+			}
+		}
+	}
+
+	$urltogo = str_replace('__ID__', $object->id, $backtopage);
+	$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
+	header("Location: " . $urltogo);
+	exit;
+}

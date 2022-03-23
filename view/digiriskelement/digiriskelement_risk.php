@@ -195,6 +195,43 @@ digiriskHeader($title, $help_url, $morejs, $morecss);
 
 print '<div id="cardContent" value="">';
 
+$formconfirm = '';
+
+// Import shared risks confirmation
+if (($action == 'import_shared_risks' && (empty($conf->use_javascript_ajax) || ! empty($conf->dol_use_jmobile)))		// Output when action = clone if jmobile or no js
+	|| ( ! empty($conf->use_javascript_ajax) && empty($conf->dol_use_jmobile))) {							// Always output when not jmobile nor js
+
+	$digiriskelementtmp = new DigiriskElement($db);
+
+	$allrisks = $risk->fetchAll('',  '',  0,  0, array('customsql' => 'status > 0 AND entity > 0' ));
+
+	$formquestionimportsharedrisks = array(
+		'text' => $langs->trans("ConfirmImportSharedRisks"),
+	);
+
+	foreach ($allrisks as $key => $risks) {
+		$digiriskelementtmp->fetch($risks->fk_element);
+		$digiriskelementtmp->element = 'digiriskdolibarr';
+		$digiriskelementtmp->fetchObjectLinked($risks->id, 'digiriskdolibarr_risk', $object->id, 'digiriskdolibarr_digiriskelement', 'AND', 1, 'sourcetype', 0);
+		$alreadyImported = !empty($digiriskelementtmp->linkedObjectsIds) ? 1 : 0;
+		if ($alreadyImported > 0) {
+			$formquestionimportsharedrisks[] = array('type' => 'checkbox', 'name' => 'import_shared_risks'.'_S' . $risks->entity . '_' . $digiriskelementtmp->ref . '_' . $risks->ref, 'label' => 'S' . $risks->entity . ' - ' . $digiriskelementtmp->ref . ' - ' . $risks->ref. ' ' . $langs->trans('AlreadyImported'), 'value' => 0, 'disabled' => 1);
+		} else {
+			$formquestionimportsharedrisks[] = array('type' => 'checkbox', 'name' => 'import_shared_risks'.'_S' . $risks->entity . '_' . $digiriskelementtmp->ref . '_' . $risks->ref, 'label' => 'S' . $risks->entity . ' - ' . $digiriskelementtmp->ref . ' - ' . $risks->ref, 'value' => 1);
+		}
+	}
+	$formconfirm .= $form->formconfirm($_SERVER["PHP_SELF"] . '?id=' . $object->id, $langs->trans('ImportSharedRisks'), $langs->trans('ImportSharedRisks', $object->ref), 'confirm_import_shared_risks', $formquestionimportsharedrisks, 'yes', 'actionButtonImportsharedRisks', 350, 600);
+}
+
+// Call Hook formConfirm
+$parameters                        = array('formConfirm' => $formconfirm, 'object' => $object);
+$reshook                           = $hookmanager->executeHooks('formConfirm', $parameters, $object, $action); // Note that $action and $object may have been modified by hook
+if (empty($reshook)) $formconfirm .= $hookmanager->resPrint;
+elseif ($reshook > 0) $formconfirm = $hookmanager->resPrint;
+
+// Print form confirm
+print $formconfirm;
+
 if ($object->id > 0) {
 	$res = $object->fetch_optionals();
 
@@ -221,6 +258,17 @@ if ($object->id > 0) {
 	$morehtmlref .= '</div>';
 	$morehtmlleft = '<div class="floatleft inline-block valignmiddle divphotoref">' . digirisk_show_photos('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/' . $object->element_type, 'small', 5, 0, 0, 0, $height, $width, 0, 0, 0, $object->element_type, $object) . '</div>';
 	digirisk_banner_tab($object, 'ref', '', 0, 'ref', 'ref', $morehtmlref, '', 0, $morehtmlleft);
+
+	if (!empty($conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS)) {
+		// Buttons for actions
+		print '<div class="tabsAction" >';
+		if ($permissiontoadd) {
+			print '<span class="butAction" id="actionButtonImportSharedRisks" title="" href="' . $_SERVER["PHP_SELF"] . '?id=' . $object->id . '&action=import_shared_risks' . '">' . $langs->trans("ImportSharedRisks") . '</span>';
+		}
+		print '</div>';
+
+		require_once './../../core/tpl/digiriskdolibarr_sharedrisklist_view.tpl.php';
+	}
 
 	require_once './../../core/tpl/digiriskdolibarr_risklist_view.tpl.php';
 }

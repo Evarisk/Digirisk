@@ -1037,6 +1037,13 @@ MoveRisksDescription = Permet de déplacer les risques d'un groupement ou d'une 
 SetConfToMoveRisk = Vous devez d'abord autoriser le déplacement des risques dans "Configuration du module -> Document Unique"
 RiskDescriptionPrefill = Préremplir la description
 RiskDescriptionPrefillDescription = Préremplir la description du risque avec le nom de la catégorie
+DigiriskElementSharedRisksList = Liste des risques partagés
+ImportSharedRisks = Importer des risques partagés
+AlreadyImported = Déja importé
+ShowSharedRisks = Risques partagés
+ShowSharedRisksDescription = Afficher les risques partagés dans les documents et les listings
+
+
 
 #
 # RiskAssessment - Évaluation

@@ -180,7 +180,7 @@ class Risk extends CommonObject
 	 * @return array|int         <0 if KO, 0 if not found, >0 if OK
 	 * @throws Exception
 	 */
-	public function fetchRisksOrderedByCotation($parent_id, $get_children_data = false, $get_parents_data = false)
+	public function fetchRisksOrderedByCotation($parent_id, $get_children_data = false, $get_parents_data = false, $get_shared_data = false)
 	{
 		$object  = new DigiriskElement($this->db);
 		$objects = $object->fetchAll('',  '',  0,  0, array('customsql' => 'status > 0' ));
@@ -261,6 +261,29 @@ class Risk extends CommonObject
 			}
 		}
 
+		if ( $get_shared_data ) {
+			$digiriskelementtmp = new DigiriskElement($this->db);
+
+			$allrisks = $risk->fetchAll('',  '',  0,  0, array('customsql' => 'status > 0 AND entity > 0' ), 'AND', 0);
+
+			foreach ($allrisks as $key => $allrisk) {
+				$digiriskelementtmp->fetch($allrisk->fk_element);
+				$digiriskelementtmp->element = 'digiriskdolibarr';
+				$digiriskelementtmp->fetchObjectLinked($allrisk->id, 'digiriskdolibarr_risk', $object->id, 'digiriskdolibarr_digiriskelement', 'AND', 1, 'sourcetype', 0);
+				$alreadyImported = !empty($digiriskelementtmp->linkedObjectsIds) ? 1 : 0;
+				if ($alreadyImported > 0) {
+					$evaluation     = new RiskAssessment($this->db);
+					$lastEvaluation = $evaluation->fetchFromParent($allrisk->id, 1);
+					if ( $lastEvaluation > 0 && ! empty($lastEvaluation)  && is_array($lastEvaluation)) {
+						$lastEvaluation       = array_shift($lastEvaluation);
+						$allrisk->lastEvaluation = $lastEvaluation->cotation;
+					}
+
+					$risks[$allrisk->id] = $allrisk;
+				}
+			}
+		}
+
 		if ( ! empty($risks) ) {
 			usort($risks, function ($first, $second) {
 				return $first->lastEvaluation < $second->lastEvaluation;
@@ -292,8 +315,9 @@ class Risk extends CommonObject
 		$sql                                                                              = 'SELECT ';
 		$sql                                                                             .= $this->getFieldList();
 		$sql                                                                             .= ' FROM ' . MAIN_DB_PREFIX . $this->table_element . ' as t';
-		if (isset($this->ismultientitymanaged) && $this->ismultientitymanaged == 1) $sql .= ' WHERE t.entity IN (' . getEntity($this->table_element) . ')';
-		else $sql                                                                        .= ' WHERE 1 = 1';
+//		if (isset($this->ismultientitymanaged) && $this->ismultientitymanaged == 1) $sql .= ' WHERE t.entity IN (' . getEntity($this->table_element) . ')';
+//		else $sql                                                                        .= ' WHERE 1 = 1';
+		$sql  .= ' WHERE 1 = 1';
 
 		// Manage filter
 		$sqlwhere = array();

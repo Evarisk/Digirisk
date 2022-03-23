@@ -209,12 +209,10 @@ print "</td><td>";
 print $langs->trans('RiskDescriptionDescription');
 print '</td>';
 
-
 print '<td class="center">';
 print ajax_constantonoff('DIGIRISKDOLIBARR_RISK_DESCRIPTION');
 print '</td>';
 print '</tr>';
-
 
 print '<tr class="oddeven"><td>';
 print $langs->trans('RiskCategoryEdit');
@@ -266,9 +264,19 @@ print "</td><td>";
 print $langs->trans('RiskDescriptionPrefillDescription');
 print '</td>';
 
-
 print '<td class="center">';
 print ajax_constantonoff('DIGIRISKDOLIBARR_RISK_DESCRIPTION_PREFILL');
+print '</td>';
+print '</tr>';
+
+print '<tr class="oddeven"><td>';
+print $langs->trans('ShowSharedRisks');
+print "</td><td>";
+print $langs->trans('ShowSharedRisksDescription');
+print '</td>';
+
+print '<td class="center">';
+print ajax_constantonoff('DIGIRISKDOLIBARR_SHOW_SHARED_RISKS');
 print '</td>';
 print '</tr>';
 
