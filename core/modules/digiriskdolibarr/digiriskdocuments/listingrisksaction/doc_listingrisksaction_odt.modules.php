@@ -364,7 +364,7 @@ class doc_listingrisksaction_odt extends ModeleODTListingRisksAction
 					$risk = new Risk($this->db);
 
 					if ( ! empty($digiriskelement) ) {
-						$risks = $risk->fetchRisksOrderedByCotation($digiriskelement->id, true);
+						$risks = $risk->fetchRisksOrderedByCotation($digiriskelement->id, true, $conf->global->DIGIRISKDOLIBARR_SHOW_PARENT_RISKS, $conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS);
 						if ($risks < 1) {
 							$risks = array();
 						}
@@ -384,7 +384,7 @@ class doc_listingrisksaction_odt extends ModeleODTListingRisksAction
 										if ($scale == $i) {
 											$element = new DigiriskElement($this->db);
 											$element->fetch($line->fk_element);
-											$tmparray['nomElement']            = $element->ref . ' - ' . $element->label;
+											$tmparray['nomElement']            = (!empty($conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS) ? 'S' . $element->entity . ' - ' : '') . $element->ref . ' - ' . $element->label;
 											$tmparray['nomDanger']             = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $line->get_danger_category($line) . '.png';
 											$tmparray['identifiantRisque']     = $line->ref . ' - ' . $lastEvaluation->ref;
 											$tmparray['quotationRisque']       = $lastEvaluation->cotation ? $lastEvaluation->cotation : '0';
@@ -478,7 +478,7 @@ class doc_listingrisksaction_odt extends ModeleODTListingRisksAction
 							$odfHandler->mergeSegment($listlines);
 						}
 					} else {
-						$risks = $risk->fetchRisksOrderedByCotation(0, true);
+						$risks = $risk->fetchRisksOrderedByCotation(0, true, $conf->global->DIGIRISKDOLIBARR_SHOW_PARENT_RISKS, $conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS);
 						if ($risks < 1) {
 							$risks = array();
 						}
@@ -498,7 +498,7 @@ class doc_listingrisksaction_odt extends ModeleODTListingRisksAction
 										if ($scale == $i) {
 											$element = new DigiriskElement($this->db);
 											$element->fetch($line->fk_element);
-											$tmparray['nomElement']            = $element->ref . ' - ' . $element->label;
+											$tmparray['nomElement']            = (!empty($conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS) ? 'S' . $element->entity . ' - ' : '') . $element->ref . ' - ' . $element->label;
 											$tmparray['nomDanger']             = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $line->get_danger_category($line) . '.png';
 											$tmparray['identifiantRisque']     = $line->ref . ' - ' . $lastEvaluation->ref;
 											$tmparray['quotationRisque']       = $lastEvaluation->cotation ? $lastEvaluation->cotation : '0';

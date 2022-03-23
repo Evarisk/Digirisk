@@ -363,7 +363,7 @@ class doc_riskassessmentdocument_odt extends ModeleODTRiskAssessmentDocument
 					$digiriskelementobject = new DigiriskElement($this->db);
 					$digiriskelementlist   = $digiriskelementobject->fetchDigiriskElementFlat(0);
 					$risk                  = new Risk($this->db);
-					$risks                 = $risk->fetchRisksOrderedByCotation(0, true);
+					$risks                 = $risk->fetchRisksOrderedByCotation(0, true, $conf->global->DIGIRISKDOLIBARR_SHOW_PARENT_RISKS, $conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS);
 
 					if ( ! empty($digiriskelementlist) ) {
 						$listlines = $odfHandler->setSegment('elementParHierarchie');
@@ -373,7 +373,7 @@ class doc_riskassessmentdocument_odt extends ModeleODTRiskAssessmentDocument
 							for ($k = 0; $k < $line['depth']; $k++) {
 								$depthHyphens .= '- ';
 							}
-							$tmparray['nomElement'] = $depthHyphens . $line['object']->ref . ' ' . $line['object']->label;
+							$tmparray['nomElement'] = $depthHyphens . (!empty($conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS) ? 'S' . $line['object']->entity . ' - ' : '') . $line['object']->ref . ' ' . $line['object']->label;
 
 							unset($tmparray['object_fields']);
 
@@ -415,7 +415,7 @@ class doc_riskassessmentdocument_odt extends ModeleODTRiskAssessmentDocument
 								}
 							}
 
-							$elementName                 = $digiriskelementsingle['object']->ref . ' ' . $digiriskelementsingle['object']->label;
+							$elementName                 = (!empty($conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS) ? 'S' . $digiriskelementsingle['object']->entity . ' - ' : '') . $digiriskelementsingle['object']->ref . ' ' . $digiriskelementsingle['object']->label;
 							$scale_counter               = $digiriskelementsingle['object']->getRiskAssessmentCategoriesNumber();
 							$cotationarray[$elementName] = array($totalQuotation, $digiriskelementsingle['object']->description,$scale_counter);
 
@@ -474,7 +474,7 @@ class doc_riskassessmentdocument_odt extends ModeleODTRiskAssessmentDocument
 										if ($scale == $i) {
 											$element = new DigiriskElement($this->db);
 											$element->fetch($line->fk_element);
-											$tmparray['nomElement'] = $element->ref . ' - ' . $element->label;
+											$tmparray['nomElement'] = (!empty($conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS) ? 'S' . $element->entity . ' - ' : '') . $element->ref . ' - ' . $element->label;
 											$tmparray['nomDanger'] = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $line->get_danger_category($line) . '.png';
 											$tmparray['identifiantRisque'] = $line->ref . ' - ' . $lastEvaluation->ref;
 											$tmparray['quotationRisque'] = $lastEvaluation->cotation ? $lastEvaluation->cotation : '0';
