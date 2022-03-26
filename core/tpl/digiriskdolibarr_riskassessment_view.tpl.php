@@ -17,14 +17,16 @@ if ( ! empty($allRiskAssessment) && $allRiskAssessment > 0) :
 				</div>
 			<?php endif; ?>
 
-			<?php if ($permissiontoadd) : ?>
-				<div class="risk-evaluation-add risk-evaluation-button wpeo-button button-square-40 button-primary wpeo-tooltip-event modal-open" aria-label="<?php echo $langs->trans('AddRiskAssessment') ?>" value="<?php echo $risk->id;?>">
-					<i class="fas fa-plus button-icon"></i>
-				</div>
-			<?php else : ?>
-				<div class="wpeo-button button-square-40 button-grey wpeo-tooltip-event risk-list-button" aria-label="<?php echo $langs->trans('PermissionDenied') ?>" value="<?php echo $risk->id;?>">
-					<i class="fas fa-plus button-icon"></i>
-				</div>
+			<?php if (empty($conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS)) : ?>
+				<?php if ($permissiontoadd) : ?>
+					<div class="risk-evaluation-add risk-evaluation-button wpeo-button button-square-40 button-primary wpeo-tooltip-event modal-open" aria-label="<?php echo $langs->trans('AddRiskAssessment') ?>" value="<?php echo $risk->id;?>">
+						<i class="fas fa-plus button-icon"></i>
+					</div>
+				<?php else : ?>
+					<div class="wpeo-button button-square-40 button-grey wpeo-tooltip-event risk-list-button" aria-label="<?php echo $langs->trans('PermissionDenied') ?>" value="<?php echo $risk->id;?>">
+						<i class="fas fa-plus button-icon"></i>
+					</div>
+				<?php endif; ?>
 			<?php endif; ?>
 		</div>
 	</div>
@@ -63,10 +65,12 @@ if ( ! empty($allRiskAssessment) && $allRiskAssessment > 0) :
 							</div>
 						</div>
 						<!-- BUTTON MODAL RISK EVALUATION ADD  -->
-						<?php if ($permissiontoadd) : ?>
-							<div class="risk-evaluation-edit risk-evaluation-button wpeo-button button-square-40 button-transparent wpeo-tooltip-event modal-open" aria-label="<?php echo $langs->trans('EditRiskAssessment') ?>" value="<?php echo $lastEvaluation->id;?>">
-								<i class="fas fa-pencil-alt button-icon"></i>
-							</div>
+						<?php if (empty($conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS)) : ?>
+							<?php if ($permissiontoadd) : ?>
+								<div class="risk-evaluation-edit risk-evaluation-button wpeo-button button-square-40 button-transparent wpeo-tooltip-event modal-open" aria-label="<?php echo $langs->trans('EditRiskAssessment') ?>" value="<?php echo $lastEvaluation->id;?>">
+									<i class="fas fa-pencil-alt button-icon"></i>
+								</div>
+							<?php endif; ?>
 						<?php endif; ?>
 					</div>
 				</div>
@@ -384,22 +388,24 @@ if ( ! empty($allRiskAssessment) && $allRiskAssessment > 0) :
 														</div>
 													</div>
 													<!-- BUTTON MODAL RISK EVALUATION EDIT  -->
-													<div class="risk-evaluation-actions wpeo-gridlayout grid-2 grid-gap-0">
+													<?php if (empty($conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS)) : ?>
+														<div class="risk-evaluation-actions wpeo-gridlayout grid-2 grid-gap-0">
 															<?php if ($permissiontoadd) : ?>
-															<div class="risk-evaluation-edit wpeo-button button-square-50 button-grey modal-open" value="<?php echo $cotation->id ?>">
-																<i class="fas fa-pencil-alt button-icon"></i>
-															</div>
+																<div class="risk-evaluation-edit wpeo-button button-square-50 button-grey modal-open" value="<?php echo $cotation->id ?>">
+																	<i class="fas fa-pencil-alt button-icon"></i>
+																</div>
 															<?php else : ?>
-															<div class="wpeo-button button-square-50 button-grey wpeo-tooltip-event"  aria-label="<?php echo $langs->trans('PermissionDenied'); ?>" value="<?php echo $cotation->id ?>">
-																<i class="fas fa-pencil-alt button-icon"></i>
-															</div>
+																<div class="wpeo-button button-square-50 button-grey wpeo-tooltip-event"  aria-label="<?php echo $langs->trans('PermissionDenied'); ?>" value="<?php echo $cotation->id ?>">
+																	<i class="fas fa-pencil-alt button-icon"></i>
+																</div>
 															<?php endif; ?>
 															<?php if ($permissiontodelete) : ?>
-															<div class="risk-evaluation-delete wpeo-button button-square-50 button-transparent">
-																<i class="fas fa-trash button-icon"></i>
-															</div>
+																<div class="risk-evaluation-delete wpeo-button button-square-50 button-transparent">
+																	<i class="fas fa-trash button-icon"></i>
+																</div>
 															<?php endif; ?>
-													</div>
+														</div>
+													<?php endif; ?>
 												</div>
 											</div>
 											</li>
@@ -456,11 +462,13 @@ if ( ! empty($allRiskAssessment) && $allRiskAssessment > 0) :
 						 </div>
 					 </div>
 					 <!-- BUTTON MODAL RISK EVALUATION ADD  -->
-					 <?php if ($permissiontoadd) : ?>
-						 <div class="risk-evaluation-edit risk-evaluation-button wpeo-button button-square-40 button-transparent wpeo-tooltip-event modal-open" aria-label="<?php echo $langs->trans('EditRiskAssessment') ?>" value="<?php echo $lastEvaluation->id;?>">
-							 <i class="fas fa-pencil-alt button-icon"></i>
-						 </div>
-					 <?php endif; ?>
+					<?php if (empty($conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS)) : ?>
+						 <?php if ($permissiontoadd) : ?>
+							 <div class="risk-evaluation-edit risk-evaluation-button wpeo-button button-square-40 button-transparent wpeo-tooltip-event modal-open" aria-label="<?php echo $langs->trans('EditRiskAssessment') ?>" value="<?php echo $lastEvaluation->id;?>">
+								 <i class="fas fa-pencil-alt button-icon"></i>
+							 </div>
+						 <?php endif; ?>
+					<?php endif; ?>
 				 </div>
 			 </div>
 			 <!-- RISK ASSESSMENT MEDIAS MODAL START-->
@@ -667,15 +675,15 @@ if ( ! empty($allRiskAssessment) && $allRiskAssessment > 0) :
 								 </div>
 								 <!-- Modal-Footer -->
 								 <div class="modal-footer">
-										<?php if ($permissiontoadd) : ?>
-										 <div class="wpeo-button risk-evaluation-save button-green modal-close">
-											 <i class="fas fa-save"></i> <?php echo $langs->trans('UpdateData'); ?>
-										 </div>
-										<?php else : ?>
-										 <div class="wpeo-button button-grey wpeo-tooltip-event" aria-label="<?php echo $langs->trans('PermissionDenied') ?>">
-											 <i class="fas fa-plus"></i> <?php echo $langs->trans('UpdateData'); ?>
-										 </div>
-										<?php endif; ?>
+									<?php if ($permissiontoadd) : ?>
+									 <div class="wpeo-button risk-evaluation-save button-green modal-close">
+										 <i class="fas fa-save"></i> <?php echo $langs->trans('UpdateData'); ?>
+									 </div>
+									<?php else : ?>
+									 <div class="wpeo-button button-grey wpeo-tooltip-event" aria-label="<?php echo $langs->trans('PermissionDenied') ?>">
+										 <i class="fas fa-plus"></i> <?php echo $langs->trans('UpdateData'); ?>
+									 </div>
+									<?php endif; ?>
 								 </div>
 							 </div>
 						 </div>
@@ -777,22 +785,24 @@ if ( ! empty($allRiskAssessment) && $allRiskAssessment > 0) :
 													 </div>
 												 </div>
 												 <!-- BUTTON MODAL RISK EVALUATION EDIT  -->
-												 <div class="risk-evaluation-actions wpeo-gridlayout grid-2 grid-gap-0">
+												 <?php if (empty($conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS)) : ?>
+													 <div class="risk-evaluation-actions wpeo-gridlayout grid-2 grid-gap-0">
 															<?php if ($permissiontoadd) : ?>
-														 <div class="risk-evaluation-edit wpeo-button button-square-50 button-grey modal-open" value="<?php echo $cotation->id ?>">
-															 <i class="fas fa-pencil-alt button-icon"></i>
-														 </div>
+																 <div class="risk-evaluation-edit wpeo-button button-square-50 button-grey modal-open" value="<?php echo $cotation->id ?>">
+																	 <i class="fas fa-pencil-alt button-icon"></i>
+																 </div>
 															<?php else : ?>
-														 <div class="wpeo-button button-square-50 button-grey wpeo-tooltip-event"  aria-label="<?php echo $langs->trans('PermissionDenied'); ?>" value="<?php echo $cotation->id ?>">
-															 <i class="fas fa-pencil-alt button-icon"></i>
-														 </div>
+																 <div class="wpeo-button button-square-50 button-grey wpeo-tooltip-event"  aria-label="<?php echo $langs->trans('PermissionDenied'); ?>" value="<?php echo $cotation->id ?>">
+																	 <i class="fas fa-pencil-alt button-icon"></i>
+																 </div>
 															<?php endif; ?>
 															<?php if ($permissiontodelete) : ?>
-														 <div class="risk-evaluation-delete wpeo-button button-square-50 button-transparent">
-															 <i class="fas fa-trash button-icon"></i>
-														 </div>
+																 <div class="risk-evaluation-delete wpeo-button button-square-50 button-transparent">
+																	 <i class="fas fa-trash button-icon"></i>
+																 </div>
 															<?php endif; ?>
-												 </div>
+													 </div>
+												 <?php endif; ?>
 											 </div>
 										 </div>
 										 </li>
@@ -829,14 +839,16 @@ else : ?>
 			</div>
 		<?php endif; ?>
 
-		<?php if ($permissiontoadd) : ?>
-			<div class="risk-evaluation-add risk-evaluation-button wpeo-button button-square-40 button-primary wpeo-tooltip-event modal-open" aria-label="<?php echo $langs->trans('AddRiskAssessment') ?>" value="<?php echo $risk->id;?>">
-				<i class="fas fa-plus button-icon"></i>
-			</div>
-		<?php else : ?>
-			<div class="wpeo-button button-square-40 button-grey wpeo-tooltip-event risk-list-button" aria-label="<?php echo $langs->trans('PermissionDenied') ?>" value="<?php echo $risk->id;?>">
-				<i class="fas fa-plus button-icon"></i>
-			</div>
+		<?php if (empty($conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS)) : ?>
+			<?php if ($permissiontoadd) : ?>
+				<div class="risk-evaluation-add risk-evaluation-button wpeo-button button-square-40 button-primary wpeo-tooltip-event modal-open" aria-label="<?php echo $langs->trans('AddRiskAssessment') ?>" value="<?php echo $risk->id;?>">
+					<i class="fas fa-plus button-icon"></i>
+				</div>
+			<?php else : ?>
+				<div class="wpeo-button button-square-40 button-grey wpeo-tooltip-event risk-list-button" aria-label="<?php echo $langs->trans('PermissionDenied') ?>" value="<?php echo $risk->id;?>">
+					<i class="fas fa-plus button-icon"></i>
+				</div>
+			<?php endif; ?>
 		<?php endif; ?>
 	</div>
 </div>
@@ -848,14 +860,16 @@ else : ?>
 					<span class="name"><?php echo $langs->trans('NoRiskAssessment'); ?></span>
 				</div>
 			</div>
-			<?php if ($permissiontoadd) : ?>
-				<div class="risk-evaluation-add wpeo-button button-square-40 button-primary wpeo-tooltip-event modal-open" aria-label="<?php echo $langs->trans('AddRiskAssessment') ?>" value="<?php echo $risk->id ?>">
-					<i class="fas fa-plus button-icon"></i>
-				</div>
-			<?php else : ?>
-				<div class="wpeo-button button-square-40 button-grey wpeo-tooltip-event" aria-label="<?php echo $langs->trans('PermissionDenied') ?>" value="<?php echo $risk->id;?>">
-					<i class="fas fa-plus button-icon"></i>
-				</div>
+			<?php if (empty($conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS)) : ?>
+				<?php if ($permissiontoadd) : ?>
+					<div class="risk-evaluation-add wpeo-button button-square-40 button-primary wpeo-tooltip-event modal-open" aria-label="<?php echo $langs->trans('AddRiskAssessment') ?>" value="<?php echo $risk->id ?>">
+						<i class="fas fa-plus button-icon"></i>
+					</div>
+				<?php else : ?>
+					<div class="wpeo-button button-square-40 button-grey wpeo-tooltip-event" aria-label="<?php echo $langs->trans('PermissionDenied') ?>" value="<?php echo $risk->id;?>">
+						<i class="fas fa-plus button-icon"></i>
+					</div>
+				<?php endif; ?>
 			<?php endif; ?>
 		</div>
 	</div>
