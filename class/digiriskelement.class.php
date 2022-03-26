@@ -436,8 +436,8 @@ class DigiriskElement extends CommonObject
 		$sql  = "SELECT *";
 		$sql .= " FROM " . MAIN_DB_PREFIX . "digiriskdolibarr_digiriskelement as s";
 
-		$sql              .= " WHERE s.entity IN (" . getEntity($this->table_element) . ")";
-		if ($filter) $sql .= " AND (" . $filter . ")";
+		//$sql              .= " WHERE s.entity IN (" . getEntity($this->table_element) . ")";
+		if ($filter) $sql .= " WHERE (" . $filter . ")";
 		if ($moreparam > 0 ) {
 			$children = $this->fetchDigiriskElementFlat($moreparam);
 			if ( ! empty($children) && $children > 0) {

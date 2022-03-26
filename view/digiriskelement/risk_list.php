@@ -132,6 +132,13 @@ foreach ($evaluation->fields as $key => $val) {
 	if ( ! empty($val['visible'])) $arrayfields['evaluation.' . $key] = array('label' => $val['label'], 'checked' => (($val['visible'] < 0) ? 0 : 1), 'enabled' => ($val['enabled'] && ($val['visible'] != 3)), 'position' => $val['position']);
 }
 
+// Extra fields
+include DOL_DOCUMENT_ROOT.'/core/tpl/extrafields_list_array_fields.tpl.php';
+
+$object->fields = dol_sort_array($risk->fields, 'position');
+$evaluation->fields = dol_sort_array($evaluation->fields, 'position');
+$arrayfields = dol_sort_array($arrayfields, 'position');
+
 // Load Digirisk_element object
 include DOL_DOCUMENT_ROOT . '/core/actions_fetchobject.inc.php'; // Must be include, not include_once.
 

@@ -39,6 +39,7 @@ if ( ! $res) die("Include of main fails");
 require_once DOL_DOCUMENT_ROOT . '/core/lib/images.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/files.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/date.lib.php';
+require_once DOL_DOCUMENT_ROOT . '/core/lib/admin.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/class/html.form.class.php';
 require_once DOL_DOCUMENT_ROOT . '/ecm/class/ecmdirectory.class.php';
 require_once DOL_DOCUMENT_ROOT . '/projet/class/project.class.php';
@@ -123,8 +124,17 @@ foreach ($risk->fields as $key => $val) {
 $arrayfields = array();
 foreach ($risk->fields as $key => $val) {
 	// If $val['visible']==0, then we never show the field
+	if ($val['label'] == 'Entity') {
+		if ($sharedrisks) {
+			$val['visible'] = 5;
+		}
+	}
 	if ($val['label'] == 'ParentElement') {
-		$val['visible'] = 0;
+		if ($sharedrisks) {
+			$val['visible'] = 5;
+		} else {
+			$val['visible'] = 0;
+		}
 	}
 	if ( ! empty($val['visible'])) $arrayfields['t.' . $key] = array('label' => $val['label'], 'checked' => (($val['visible'] < 0) ? 0 : 1), 'enabled' => ($val['enabled'] && ($val['visible'] != 3)), 'position' => $val['position']);
 }
@@ -132,6 +142,13 @@ foreach ($evaluation->fields as $key => $val) {
 	// If $val['visible']==0, then we never show the field
 	if ( ! empty($val['visible'])) $arrayfields['evaluation.' . $key] = array('label' => $val['label'], 'checked' => (($val['visible'] < 0) ? 0 : 1), 'enabled' => ($val['enabled'] && ($val['visible'] != 3)), 'position' => $val['position']);
 }
+
+// Extra fields
+include DOL_DOCUMENT_ROOT.'/core/tpl/extrafields_list_array_fields.tpl.php';
+
+$risk->fields = dol_sort_array($risk->fields, 'position');
+$evaluation->fields = dol_sort_array($evaluation->fields, 'position');
+$arrayfields = dol_sort_array($arrayfields, 'position');
 
 // Load Digirisk_element object
 include DOL_DOCUMENT_ROOT . '/core/actions_fetchobject.inc.php'; // Must be include, not include_once.
@@ -176,7 +193,7 @@ if (empty($reshook)) {
 
 	$error = 0;
 
-	$backtopage = dol_buildpath('/digiriskdolibarr/view/digiriskelement/digiriskelement_risk.php', 1) . '?id=' . ($id > 0 ? $id : '__ID__');
+	$backtopage = dol_buildpath('/digiriskdolibarr/view/digiriskelement/digiriskelement_risk.php', 1) . '?id=' . ($id > 0 ? $id : '__ID__') . ($contextpage = 'sharedrisk' ? '&sharedrisks=' . 1 : '');
 
 	require_once './../../core/tpl/digiriskdolibarr_risk_actions.tpl.php';
 }
@@ -189,6 +206,7 @@ $form = new Form($db);
 if ($sharedrisks) {
 	$title = $langs->trans("DigiriskElementSharedRisk");
 	$tab   = 'elementSharedRisk';
+	$contextpage = 'sharedrisk';
 } else {
 	$title = $langs->trans("DigiriskElementRisk");
 	$tab   = 'elementRisk';

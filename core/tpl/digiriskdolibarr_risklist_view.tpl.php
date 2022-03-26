@@ -326,7 +326,7 @@
 				} elseif ($key == 'fk_element') {
 					$sql .= " AND (e.ref = '$search[$key]')";
 				} else {
-					$sql .= natural_search($key, $search[$key], (($key == 'status') ? 2 : $mode_search));
+					$sql .= natural_search('t.'.$key, $search[$key], (($key == 'status') ? 2 : $mode_search));
 				}
 			}
 		}
@@ -422,7 +422,7 @@
 				} elseif ($key == 'fk_element') {
 					$sql .= " AND (e.ref = '$search[$key]')";
 				} else {
-					$sql .= natural_search($key, $search[$key], (($key == 'status') ? 2 : $mode_search));
+					$sql .= natural_search('r.'.$key, $search[$key], (($key == 'status') ? 2 : $mode_search));
 				}
 			}
 		}
