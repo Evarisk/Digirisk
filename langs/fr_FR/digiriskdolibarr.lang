@@ -1044,6 +1044,9 @@ ShowSharedRisks = Risques partagés
 ShowSharedRisksDescription = Afficher les risques partagés dans les documents et les listings
 DigiriskElementSharedRisk = Risques partagés
 SharedRisks = Risques partagés
+ShareRisk = Activer le partage des risques
+RISKSharing = Partage des risques
+RISKSharingDescription = Sélection des entités qui partagerons leurs risques avec cette entité.
 
 
 
