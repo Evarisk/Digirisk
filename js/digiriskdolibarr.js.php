@@ -1591,7 +1591,8 @@ window.eoxiaJS.risk.event = function() {
 	$( document ).on( 'click', '.category-danger .item, .wpeo-table .category-danger .item', window.eoxiaJS.risk.selectDanger );
 	$( document ).on( 'click', '.risk-create:not(.button-disable)', window.eoxiaJS.risk.createRisk );
 	$( document ).on( 'click', '.risk-save', window.eoxiaJS.risk.saveRisk );
-	$( document ).on( 'change', '#fk_element', window.eoxiaJS.risk.selectDigiriskElement );
+	$( document ).on( 'click', '.risk-unlink-shared', window.eoxiaJS.risk.unlinkSharedRisk );
+	//$( document ).on( 'change', '#fk_element', window.eoxiaJS.risk.selectDigiriskElement );
 };
 
 /**
@@ -1842,6 +1843,61 @@ window.eoxiaJS.risk.selectDigiriskElement = function( event ) {
 	let selectTitle = $(this).closest('td').find('#select2-fk_element-container').attr('title')
 	let digiriskElementRef = selectTitle.split(/ /)[0]
 	$('.input-hidden-fk_element').attr('value',digiriskElementRef);
+};
+
+/**
+ * Action save risk.
+ *
+ * @since   1.0.0
+ * @version 9.0.0
+ *
+ * @return {void}
+ */
+window.eoxiaJS.risk.unlinkSharedRisk = function ( event ) {
+	let riskId = $(this).attr('value');
+	//let elementRisk = $(this).closest('.risk-container').find('.risk-content');
+	let elementParent = $('.fichecenter').find('.div-table-responsive');
+
+	window.eoxiaJS.loader.display($(this));
+
+	let riskRef =  $('.risk_row_'+riskId).find('.risk-container > div:nth-child(1)').text();
+
+	$.ajax({
+		url:  document.URL + '&action=unlinkSharedRisk',
+		type: "POST",
+		processData: false,
+		data: JSON.stringify({
+			riskID: riskId,
+		}),
+		contentType: false,
+		success: function ( resp ) {
+			elementParent.html($(resp).find('.div-table-responsive'))
+			let actionContainerSuccess = $('.messageSuccessRiskEdit');
+
+			$('#risk_row_' + riskId).fadeOut(800);
+			$('#risk_row_' + riskId).fadeIn(800);
+
+			let textToShow = '';
+			textToShow += actionContainerSuccess.find('.valueForEditRisk1').val()
+			textToShow += riskRef
+			textToShow += actionContainerSuccess.find('.valueForEditRisk2').val()
+			actionContainerSuccess.find('a').attr('href', '#risk_row_'+riskId)
+
+			actionContainerSuccess.find('.notice-subtitle .text').text(textToShow)
+			actionContainerSuccess.removeClass('hidden');
+		},
+		error: function ( resp ) {
+			let actionContainerError = $('.messageErrorRiskEdit');
+
+			let textToShow = '';
+			textToShow += actionContainerError.find('.valueForEditRisk1').val()
+			textToShow += riskRef
+			textToShow += actionContainerError.find('.valueForEditRisk2').val()
+
+			actionContainerError.find('.notice-subtitle .text').text(textToShow)
+			actionContainerError.removeClass('hidden');
+		}
+	});
 };
 
 /**
@@ -2321,7 +2377,7 @@ window.eoxiaJS.riskassessmenttask.event = function() {
 	$( document ).on( 'click', '.riskassessment-task-timespent-create', window.eoxiaJS.riskassessmenttask.createRiskAssessmentTaskTimeSpent);
 	$( document ).on( 'click', '.riskassessment-task-timespent-save', window.eoxiaJS.riskassessmenttask.saveRiskAssessmentTaskTimeSpent);
 	$( document ).on( 'click', '.riskassessment-task-timespent-delete', window.eoxiaJS.riskassessmenttask.deleteRiskAssessmentTaskTimeSpent );
-	$( document ).on( 'click', '.riskassessment-task-progress-checkbox', window.eoxiaJS.riskassessmenttask.checkTaskProgress );
+	$( document ).on( 'click', '.riskassessment-task-progress-checkbox:not(.riskassessment-task-progress-checkbox-readonly)', window.eoxiaJS.riskassessmenttask.checkTaskProgress );
 	$( document ).on( 'change', '#RiskassessmentTaskTimespentDatehour', window.eoxiaJS.riskassessmenttask.selectRiskassessmentTaskTimespentDateHour );
 	$( document ).on( 'change', '#RiskassessmentTaskTimespentDatemin', window.eoxiaJS.riskassessmenttask.selectRiskassessmentTaskTimespentDateMin );
 };
