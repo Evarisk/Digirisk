@@ -31,7 +31,14 @@ $related_tasks = $risk->get_related_tasks($risk); ?>
 			<?php if ($conf->global->DIGIRISKDOLIBARR_SHOW_ALL_TASKS) : ?>
 					<?php $nb_of_tasks_in_progress = 0 ?>
 					<?php foreach ($related_tasks as $related_task) : ?>
-						<?php if ((($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_PROGRESS) ? $related_task->progress <= 100 : $related_task->progress < 100)) : ?>
+						<?php if (!empty($conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS)) : ?>
+							<?php $project = new Project($db);
+							$project->fetch($related_task->fk_project);
+							$result = in_array($project->entity, $conf->mc->sharings['project']); ?>
+						<?php else : ?>
+							<?php $result = 1 ?>
+						<?php endif; ?>
+						<?php if ((($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_PROGRESS) ? $related_task->progress <= 100 : $related_task->progress < 100) && $result) : ?>
 							<?php  $nb_of_tasks_in_progress++ ?>
 							<div class="table-cell riskassessment-task-container riskassessment-task-container-<?php echo $related_task->id ?>" value="<?php echo $related_task->ref ?>">
 							<input type="hidden" class="labelForDelete" value="<?php echo $langs->trans('DeleteTask') . ' ' . $related_task->ref . ' ?'; ?>">
@@ -345,7 +352,7 @@ $related_tasks = $risk->get_related_tasks($risk); ?>
 								<div class="riskassessment-task-single riskassessment-task-single-<?php echo $risk->id ?>">
 									<div class="riskassessment-task-content">
 										<div class="riskassessment-task-data" style="justify-content: center;">
-											<span class="name"><?php echo $langs->trans('NoTaskLinked'); ?></span>
+											<span class="name"><?php echo $result > 0 ? $langs->trans('NoTaskLinked') : $langs->trans('NoTaskShared'); ?></span>
 											<?php if (empty($conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS)) : ?>
 												<?php if ($permissiontoadd) : ?>
 													<div class="riskassessment-task-add wpeo-button button-square-40 button-primary wpeo-tooltip-event modal-open risk-list-button" aria-label="<?php echo $langs->trans('AddRiskAssessmentTask') ?>" value="<?php echo $risk->id;?>">
