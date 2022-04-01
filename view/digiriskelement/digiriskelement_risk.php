@@ -228,7 +228,15 @@ if ($sharedrisks) {
 
 		$digiriskelementtmp = new DigiriskElement($db);
 
-		$allrisks = $risk->fetchAll('', '', 0, 0, array('customsql' => 'status > 0 AND entity > 0'));
+		$AllSharingsRisks = $conf->mc->sharings['risk'];
+
+		foreach ($AllSharingsRisks as $Allsharingsrisk) {
+			$filter .= $Allsharingsrisk . ',';
+		}
+
+		$filter = rtrim($filter, ',');
+
+		$allrisks = $risk->fetchAll('', '', 0, 0, array('customsql' => 'status > 0 AND entity IN (' . $filter . ')'));
 
 		$formquestionimportsharedrisks = array(
 			'text' => $langs->trans("ConfirmImportSharedRisks"),

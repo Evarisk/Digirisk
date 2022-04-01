@@ -864,7 +864,10 @@ ElementType = Type d'élément
 ParentElement = Élément parent
 OrganizationSaved = L'organisation et des groupements et des unités de travail a été sauvegardée
 OrganizationNotSaved = L'organisation et des groupements et des unités de travail n'a pas pu être sauvegardée
-DigiriskElementOrganization = Organisation de l'arborescence
+DigiriskElementOrganization = Organisation de l'arborescence*
+ShareDigiriskelement = Activer le partage des groupements et unités de travail
+DIGIRISKELEMENTSharing = Partage des des groupements et unités de travail
+DIGIRISKELEMENTSharingDescription = Sélection des entités qui partagerons leurs groupements et unités de travail avec cette entité.
 
 #
 # Groupment - Groupement
@@ -1201,6 +1204,7 @@ TaskTimeSpentNotDeleted = Erreur lors de la suppression de temps consommé
 OnTheTask = sur la tâche
 TaskTimeSpentDuration = Durée du temps consommé
 TaskTimeSpentDurationDescription = Le temps consommé ajouté par défaut à chaque tâche
+NoTaskShared = Pas de tâche en cours ou partagées
 
 
 
