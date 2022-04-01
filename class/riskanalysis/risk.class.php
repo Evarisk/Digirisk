@@ -54,7 +54,7 @@ class Risk extends CommonObject
 	 * @var int  Does this object support multicompany module ?
 	 * 0=No test on entity, 1=Test with field entity, 'field@table'=Test with link by field@table
 	 */
-	public $ismultientitymanaged = 1;
+	public $ismultientitymanaged = 0;
 
 	/**
 	 * @var int  Does object support extrafields ? 0=No, 1=Yes
@@ -182,10 +182,12 @@ class Risk extends CommonObject
 	 */
 	public function fetchRisksOrderedByCotation($parent_id, $get_children_data = false, $get_parents_data = false, $get_shared_data = false)
 	{
+		global $conf;
 		$object  = new DigiriskElement($this->db);
 		$objects = $object->fetchAll('',  '',  0,  0, array('customsql' => 'status > 0' ));
 		$risk    = new Risk($this->db);
 		$result  = $risk->fetchFromParent($parent_id);
+		$filter = '';
 
 		// RISKS de l'élément parent.
 		if ($result > 0 && ! empty($result)) {
@@ -264,7 +266,15 @@ class Risk extends CommonObject
 		if ( $get_shared_data ) {
 			$digiriskelementtmp = new DigiriskElement($this->db);
 
-			$allrisks = $risk->fetchAll('',  '',  0,  0, array('customsql' => 'status > 0 AND entity > 0' ), 'AND', 0);
+			$AllSharingsRisks = $conf->mc->sharings['risk'];
+
+			foreach ($AllSharingsRisks as $Allsharingsrisk) {
+				$filter .= $Allsharingsrisk . ',';
+			}
+
+			$filter = rtrim($filter, ',');
+
+			$allrisks = $risk->fetchAll('', '', 0, 0, array('customsql' => 'status > 0 AND entity IN (' . $filter . ')'), 'AND', 0);
 
 			foreach ($allrisks as $key => $allrisk) {
 				$digiriskelementtmp->fetch($allrisk->fk_element);
@@ -315,9 +325,8 @@ class Risk extends CommonObject
 		$sql                                                                              = 'SELECT ';
 		$sql                                                                             .= $this->getFieldList();
 		$sql                                                                             .= ' FROM ' . MAIN_DB_PREFIX . $this->table_element . ' as t';
-//		if (isset($this->ismultientitymanaged) && $this->ismultientitymanaged == 1) $sql .= ' WHERE t.entity IN (' . getEntity($this->table_element) . ')';
-//		else $sql                                                                        .= ' WHERE 1 = 1';
-		$sql  .= ' WHERE 1 = 1';
+		if (isset($this->ismultientitymanaged) && $this->ismultientitymanaged == 1) $sql .= ' WHERE t.entity IN (' . getEntity($this->table_element) . ')';
+		else $sql                                                                        .= ' WHERE 1 = 1';
 
 		// Manage filter
 		$sqlwhere = array();
