@@ -60,6 +60,19 @@ if ( $conf->global->DIGIRISKDOLIBARR_DU_PROJECT == 0 || $project->statut == 2 ) 
 
 	$tags->fetch('', 'DU');
 	$tags->add_type($project, 'project');
+
+	$url = '/projet/tasks.php?id=' . $project_id;
+
+	$sql = "UPDATE ".MAIN_DB_PREFIX."menu SET";
+	$sql .= " url='".$db->escape($url)."'";
+	$sql .= " WHERE leftmenu='digiriskactionplan'";
+	$sql .= " AND entity=" . $conf->entity;
+
+	$resql = $db->query($sql);
+	if (!$resql) {
+		$error = "Error ".$db->lasterror();
+		return -1;
+	}
 }
 
 if ($conf->global->DIGIRISKDOLIBARR_PREVENTIONPLAN_PROJECT > 0) {

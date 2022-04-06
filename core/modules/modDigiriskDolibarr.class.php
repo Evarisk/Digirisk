@@ -1144,8 +1144,8 @@ class modDigiriskdolibarr extends DolibarrModules
 			'type' => 'left',			                // This is a Left menu entry
 			'titre' => '<i class="fas fa-tasks"></i>  ' . $langs->trans('ActionPlan'),
 			'mainmenu' => 'digiriskdolibarr',
-			'leftmenu' => 'digirisktools',
-			'url' => !empty($conf->global->DIGIRISKDOLIBARR_DU_PROJECT) ? '/projet/tasks.php?id=' . $conf->global->DIGIRISKDOLIBARR_DU_PROJECT : '/digiriskdolibarr/digiriskdolibarrindex.php',
+			'leftmenu' => 'digiriskactionplan',
+			'url' => '/projet/tasks.php?id=' . $conf->global->DIGIRISKDOLIBARR_DU_PROJECT,
 			'langs' => 'digiriskdolibarr@digiriskdolibarr',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
 			'position' => 48520 + $r,
 			'enabled' => '$conf->digiriskdolibarr->enabled',  // Define condition to show or hide menu entry. Use '$conf->digiriskdolibarr->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
