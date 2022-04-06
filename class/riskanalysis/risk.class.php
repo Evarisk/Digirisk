@@ -54,7 +54,7 @@ class Risk extends CommonObject
 	 * @var int  Does this object support multicompany module ?
 	 * 0=No test on entity, 1=Test with field entity, 'field@table'=Test with link by field@table
 	 */
-	public $ismultientitymanaged = 0;
+	public $ismultientitymanaged = 1;
 
 	/**
 	 * @var int  Does object support extrafields ? 0=No, 1=Yes
@@ -266,15 +266,15 @@ class Risk extends CommonObject
 		if ( $get_shared_data ) {
 			$digiriskelementtmp = new DigiriskElement($this->db);
 
-			$AllSharingsRisks = $conf->mc->sharings['risk'];
+//			$AllSharingsRisks = $conf->mc->sharings['risk'];
+//
+//			foreach ($AllSharingsRisks as $Allsharingsrisk) {
+//				$filter .= $Allsharingsrisk . ',';
+//			}
+//
+//			$filter = rtrim($filter, ',');
 
-			foreach ($AllSharingsRisks as $Allsharingsrisk) {
-				$filter .= $Allsharingsrisk . ',';
-			}
-
-			$filter = rtrim($filter, ',');
-
-			$allrisks = $risk->fetchAll('', '', 0, 0, array('customsql' => 'status > 0 AND entity IN (' . $filter . ')'), 'AND', 0);
+			$allrisks = $risk->fetchAll('', '', 0, 0, array('customsql' => 'status > 0 AND entity NOT IN (' . $conf->entity . ')'), 'AND', 0);
 
 			foreach ($allrisks as $key => $allrisk) {
 				$digiriskelementtmp->fetch($allrisk->fk_element);
@@ -325,7 +325,7 @@ class Risk extends CommonObject
 		$sql                                                                              = 'SELECT ';
 		$sql                                                                             .= $this->getFieldList();
 		$sql                                                                             .= ' FROM ' . MAIN_DB_PREFIX . $this->table_element . ' as t';
-		if (isset($this->ismultientitymanaged) && $this->ismultientitymanaged == 1) $sql .= ' WHERE t.entity IN (' . getEntity($this->table_element) . ')';
+		if (isset($this->ismultientitymanaged) && $this->ismultientitymanaged == 1) $sql .= ' WHERE t.entity IN (' . getEntity($this->element) . ')';
 		else $sql                                                                        .= ' WHERE 1 = 1';
 
 		// Manage filter

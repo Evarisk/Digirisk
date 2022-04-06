@@ -52,5 +52,5 @@ ALTER TABLE llx_digiriskdolibarr_accident ADD accident_location text;
 ALTER TABLE llx_digiriskdolibarr_accident CHANGE `external_accident` `external_accident` SMALLINT(6) NULL DEFAULT '1';
 -- ALTER TABLE llx_digiriskdolibarr_digiriskelement_extrafields ADD entity integer DEFAULT 1 NOT NULL;
 
--- 9.1.0
+-- 9.2.0
 ALTER TABLE `llx_digiriskdolibarr_digiriskelement` CHANGE `rank` `ranks` INT(11) NULL DEFAULT NULL;

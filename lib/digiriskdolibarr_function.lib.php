@@ -2432,6 +2432,8 @@ function select_entity_list($selected = '', $htmlname = 'entity', $filter = '', 
 
 	$selected = array($selected);
 
+	$digiriskelement = new DigiriskElement($db);
+
 	// Clean $filter that may contains sql conditions so sql code
 	if (function_exists('testSqlAndScriptInject')) {
 		if (testSqlAndScriptInject($filter, 3) > 0) {
@@ -2442,8 +2444,8 @@ function select_entity_list($selected = '', $htmlname = 'entity', $filter = '', 
 	$sql  = "SELECT *";
 	$sql .= " FROM " . MAIN_DB_PREFIX . "entity as e";
 
-	//$sql              .= " WHERE s.entity IN (" . getEntity($this->table_element) . ")";
-	$sql .= ' WHERE 1 = 1';
+	$sql              .= " WHERE e.rowid IN (" . getEntity($digiriskelement->element) . ")";
+	//$sql .= ' WHERE 1 = 1';
 	if ($filter) $sql .= " AND (" . $filter . ")";
 //		if ($moreparam > 0 ) {
 //			$children = $this->fetchDigiriskElementFlat($moreparam);

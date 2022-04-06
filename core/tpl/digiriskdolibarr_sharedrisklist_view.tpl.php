@@ -555,11 +555,11 @@
 	// Fields title search
 	// --------------------------------------------------------------------
 
-	$AllSharingsRisks = $conf->mc->sharings['risk'];
-	foreach ($AllSharingsRisks as $Allsharingsrisk) {
-		$filterSharingRisk .= $Allsharingsrisk . ',';
-	}
-	$filterSharingRisk = rtrim($filterSharingRisk, ',');
+//	$AllSharingsRisks = $conf->mc->sharings['risk'];
+//	foreach ($AllSharingsRisks as $Allsharingsrisk) {
+//		$filterSharingRisk .= $Allsharingsrisk . ',';
+//	}
+//	$filterSharingRisk = rtrim($filterSharingRisk, ',');
 
 	print '<tr class="liste_titre">';
 	foreach ($risk->fields as $key => $val) {
@@ -571,9 +571,9 @@
 			elseif (strpos($val['type'], 'integer:') === 0) {
 				print $risk->showInputField($val, $key, $search[$key], '', '', 'search_', 'maxwidth150', 1);
 			} elseif ($key == 'entity') {
-				print select_entity_list($search['entity'], 'search_entity', 'e.rowid IN (' . $filterSharingRisk . ')');
+				print select_entity_list($search['entity'], 'search_entity', 'e.rowid NOT IN (' . $conf->entity . ')');
 			} elseif ($key == 'fk_element') {
-				print $digiriskelement->select_digiriskelement_list($search['fk_element'], 'search_fk_element', 's.entity IN (' . $filterSharingRisk . ')', 1, 0, array(), 0, 0, 'minwidth100', 0, false, 1);
+				print $digiriskelement->select_digiriskelement_list($search['fk_element'], 'search_fk_element', 's.entity NOT IN (' . $conf->entity . ')', 1, 0, array(), 0, 0, 'minwidth100', 0, false, 1);
 			} elseif ($key == 'category') { ?>
 				<div class="wpeo-dropdown dropdown-large dropdown-grid category-danger padding">
 					<input class="input-hidden-danger" type="hidden" name="<?php echo 'search_' . $key ?>" value="<?php echo dol_escape_htmltag($search[$key]) ?>" />

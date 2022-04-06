@@ -690,15 +690,15 @@ if ($action == 'confirm_import_shared_risks' && $confirm == 'yes') {
 
 	$digiriskelementtmp = new DigiriskElement($db);
 
-	$AllSharingsRisks = $conf->mc->sharings['risk'];
+//	$AllSharingsRisks = $conf->mc->sharings['risk'];
+//
+//	foreach ($AllSharingsRisks as $Allsharingsrisk) {
+//		$filter .= $Allsharingsrisk . ',';
+//	}
+//
+//	$filter = rtrim($filter, ',');
 
-	foreach ($AllSharingsRisks as $Allsharingsrisk) {
-		$filter .= $Allsharingsrisk . ',';
-	}
-
-	$filter = rtrim($filter, ',');
-
-	$allrisks = $risk->fetchAll('', '', 0, 0, array('customsql' => 'status > 0 AND entity IN (' . $filter . ')'));
+	$allrisks = $risk->fetchAll('', '', 0, 0, array('customsql' => 'status > 0 AND entity NOT IN (' . $conf->entity . ')'));
 
 	foreach ($allrisks as $key => $risks) {
 		$digiriskelementtmp->fetch($risks->fk_element);
