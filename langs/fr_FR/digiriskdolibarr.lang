@@ -1050,6 +1050,7 @@ SharedRisks = Risques partagés
 ShareRisk = Activer le partage des risques
 RISKSharing = Partage des risques
 RISKSharingDescription = Sélection des entités qui partagerons leurs risques avec cette entité.
+UnlinkSharedRisk = Délier le risque partagé
 
 
 
