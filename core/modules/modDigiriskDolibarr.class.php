@@ -1145,7 +1145,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			'titre' => '<i class="fas fa-tasks"></i>  ' . $langs->trans('ActionPlan'),
 			'mainmenu' => 'digiriskdolibarr',
 			'leftmenu' => 'digirisktools',
-			'url' => '/projet/tasks.php?id=' . $conf->global->DIGIRISKDOLIBARR_DU_PROJECT,
+			'url' => !empty($conf->global->DIGIRISKDOLIBARR_DU_PROJECT) ? '/projet/tasks.php?id=' . $conf->global->DIGIRISKDOLIBARR_DU_PROJECT : '/digiriskdolibarr/digiriskdolibarrindex.php',
 			'langs' => 'digiriskdolibarr@digiriskdolibarr',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
 			'position' => 48520 + $r,
 			'enabled' => '$conf->digiriskdolibarr->enabled',  // Define condition to show or hide menu entry. Use '$conf->digiriskdolibarr->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
@@ -1705,25 +1705,24 @@ class modDigiriskdolibarr extends DolibarrModules
 								'del' => true																	// del : supprime la constante du partage lors de la désactivation du partage principal
 							)
 						)
-					)
-//				'sharingmodulename' => array(			// correspondance des noms de modules pour le lien parent ou compatibilité (ex: 'productsupplierprice'	=> 'product')
-//				'myshare' => 'mymodule',
-//			......
-//					......
-//				),
+					),
+				),
+				'sharingmodulename' => array(			// correspondance des noms de modules pour le lien parent ou compatibilité (ex: 'productsupplierprice'	=> 'product')
+					'digiriskelement' => 'digiriskdolibarr',
+					'risk' => 'digiriskdolibarr',
+				),
 //				'addzero' => array(						// défini si un partage ajoute le 0 (toute les entités) à l'entité courante ex: "entity IN (0, id entite courante)"
 //				'mymoduleshare1',					// Valeur utilisée dans getEntity()
 //				'mymoduleshare2',
 //			......
 //					......
-				)
 			)
 		);
 
 		$externalmodule = json_decode($conf->global->MULTICOMPANY_EXTERNAL_MODULES_SHARING, true);
 		$externalmodule = !empty($conf->global->MULTICOMPANY_EXTERNAL_MODULES_SHARING) ? array_merge($externalmodule, $params) : $params;
 		$jsonformat = json_encode($externalmodule);
-		dolibarr_set_const($this->db, "MULTICOMPANY_EXTERNAL_MODULES_SHARING", $jsonformat, 'json', 0, '', $conf->entity);
+		dolibarr_set_const($this->db, "MULTICOMPANY_EXTERNAL_MODULES_SHARING", $jsonformat, 'json', 0, '', 0);
 		return $this->_init($sql, $options);
 	}
 
@@ -1743,10 +1742,10 @@ class modDigiriskdolibarr extends DolibarrModules
 
 		$options = 'noremoverights';
 
-//		$externalmodule = json_decode($conf->global->MULTICOMPANY_EXTERNAL_MODULES_SHARING, true);
-//		unset($externalmodule['digiriskdolibarr']);  // nom informatif du module externe qui apporte ses paramètres
-//		$jsonformat = json_encode($externalmodule);
-//		dolibarr_set_const($this->db, "MULTICOMPANY_EXTERNAL_MODULES_SHARING", $jsonformat, 'json', 0, '', $conf->entity);
+		$externalmodule = json_decode($conf->global->MULTICOMPANY_EXTERNAL_MODULES_SHARING, true);
+		unset($externalmodule['digiriskdolibarr']);  // nom informatif du module externe qui apporte ses paramètres
+		$jsonformat = json_encode($externalmodule);
+		dolibarr_set_const($this->db, "MULTICOMPANY_EXTERNAL_MODULES_SHARING", $jsonformat, 'json', 0, '', 0);
 
 		return $this->_remove($sql, $options);
 	}
