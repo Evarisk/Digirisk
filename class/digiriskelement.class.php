@@ -417,7 +417,7 @@ class DigiriskElement extends CommonObject
 	 * @return string HTML string with
 	 * @throws Exception
 	 */
-	public function select_digiriskelement_list($selected = '', $htmlname = 'fk_element', $filter = '', $showempty = '1', $forcecombo = 0, $events = array(), $outputmode = 0, $limit = 0, $morecss = 'minwidth100', $moreparam = 0, $multiple = false, $noroot = 0)
+	public function select_digiriskelement_list($selected = '', $htmlname = 'fk_element', $filter = '', $showempty = '1', $forcecombo = 0, $events = array(), $outputmode = 0, $limit = 0, $morecss = 'minwidth100', $moreparam = 0, $multiple = false, $noroot = 0, $contextpage = '')
 	{
 		global $conf, $langs;
 
@@ -485,7 +485,7 @@ class DigiriskElement extends CommonObject
 			if ($num) {
 				while ($i < $num) {
 					$obj   = $this->db->fetch_object($resql);
-					$label = $obj->ref . ' - ' . $obj->label;
+					$label = !empty(!empty($conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS) && $contextpage == 'sharedrisk') ? 'S'. $obj->entity . ' - ' . $obj->ref . ' - ' . $obj->label :  $obj->ref . ' - ' . $obj->label;
 
 
 					if (empty($outputmode)) {
