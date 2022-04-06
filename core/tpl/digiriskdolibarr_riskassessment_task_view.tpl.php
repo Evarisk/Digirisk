@@ -31,10 +31,10 @@ $related_tasks = $risk->get_related_tasks($risk); ?>
 			<?php if ($conf->global->DIGIRISKDOLIBARR_SHOW_ALL_TASKS) : ?>
 					<?php $nb_of_tasks_in_progress = 0 ?>
 					<?php foreach ($related_tasks as $related_task) : ?>
-						<?php if (!empty($conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS)) : ?>
+						<?php if (!empty($conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS) && $contextpage == 'sharedrisk') : ?>
 							<?php $project = new Project($db);
 							$project->fetch($related_task->fk_project);
-							$result = in_array($project->entity, $conf->mc->sharings['project']); ?>
+							$result = !empty($conf->mc->sharings['project']) ? in_array($project->entity, $conf->mc->sharings['project']) : 0; ?>
 						<?php else : ?>
 							<?php $result = 1 ?>
 						<?php endif; ?>
