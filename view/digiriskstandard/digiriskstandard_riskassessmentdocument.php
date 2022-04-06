@@ -213,8 +213,12 @@ if (empty($reshook)) {
 				$moreparams['user']   = $user;
 
 				$digiriskelementdocumentmodel = 'DIGIRISKDOLIBARR_' . strtoupper($digiriskelementdocument->element) . '_DEFAULT_MODEL';
+				$digiriskelementdocumentmodelpath = 'DIGIRISKDOLIBARR_' . strtoupper($digiriskelementdocument->element) . '_ADDON_ODT_PATH';
+				$digiriskelementdocumentmodelpath = preg_replace('/DOL_DOCUMENT_ROOT/', DOL_DOCUMENT_ROOT, $conf->global->$digiriskelementdocumentmodelpath);
+				$templateName = preg_replace( '/_/','.' , $conf->global->$digiriskelementdocumentmodel);
+				$digiriskelementdocumentmodelfinal = $conf->global->$digiriskelementdocumentmodel . ':' . $digiriskelementdocumentmodelpath . 'template_' . $templateName;
 
-				$digiriskelementdocument->generateDocument($conf->global->$digiriskelementdocumentmodel, $outputlangs, $hidedetails, $hidedesc, $hideref, $moreparams);
+				$digiriskelementdocument->generateDocument($digiriskelementdocumentmodelfinal, $outputlangs, $hidedetails, $hidedesc, $hideref, $moreparams);
 
 				// Ajout du fichier au dossier à zipper
 				$sourceFilePath = DOL_DATA_ROOT . $entity . '/digiriskdolibarr/' . $subFolder . '/' . $digiriskelementsingle['object']->ref . '/';
