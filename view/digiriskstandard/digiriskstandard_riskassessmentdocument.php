@@ -189,11 +189,11 @@ if (empty($reshook)) {
 		$date        = dol_print_date(dol_now(), 'dayxcard');
 		$nameSociety = str_replace(' ', '_', $conf->global->MAIN_INFO_SOCIETE_NOM);
 
-		$pathToZip = DOL_DATA_ROOT . $entity . '/digiriskdolibarr/riskassessmentdocument/' . $riskassessmentdocument->ref . '_' . $nameSociety . '_' . $date;
+		$pathToZip = DOL_DATA_ROOT . $entity . '/digiriskdolibarr/riskassessmentdocument/' . $date . '_'. $riskassessmentdocument->ref . '_' . $nameSociety;
 		dol_mkdir($pathToZip);
 
 		// Ajout du fichier au dossier à zipper
-		$nameFile = $riskassessmentdocument->ref . '_' . $conf->global->MAIN_INFO_SOCIETE_NOM . '_' . $date . '.odt';
+		$nameFile = $date . '_' . $riskassessmentdocument->ref . '_' . $conf->global->MAIN_INFO_SOCIETE_NOM . '.odt';
 		$nameFile = str_replace(' ', '_', $nameFile);
 		$nameFile = dol_sanitizeFileName($nameFile);
 		copy(DOL_DATA_ROOT . $entity . '/digiriskdolibarr/riskassessmentdocument/' . $riskassessmentdocument->last_main_doc, $pathToZip . '/' . $nameFile);
@@ -222,7 +222,7 @@ if (empty($reshook)) {
 
 				// Ajout du fichier au dossier à zipper
 				$sourceFilePath = DOL_DATA_ROOT . $entity . '/digiriskdolibarr/' . $subFolder . '/' . $digiriskelementsingle['object']->ref . '/';
-				$nameFile       = $digiriskelementdocument->ref . '_' . $digiriskelementsingle['object']->label . '_' . $riskassessmentdocument->ref . '-' . $date . '.odt';
+				$nameFile       = $date . '_' . $riskassessmentdocument->ref . '_' . $digiriskelementdocument->ref . '_' . $digiriskelementsingle['object']->label . '.odt';
 				$nameFile       = str_replace(' ', '_', $nameFile);
 				$nameFile       = dol_sanitizeFileName($nameFile);
 				copy($sourceFilePath . $digiriskelementdocument->last_main_doc, $pathToZip . '/' . $nameFile);
