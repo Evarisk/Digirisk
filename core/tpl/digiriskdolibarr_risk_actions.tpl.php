@@ -720,7 +720,7 @@ if ($action == 'confirm_import_shared_risks' && $confirm == 'yes') {
 
 	$urltogo = str_replace('__ID__', $object->id, $backtopage);
 	$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
-	header("Location: " . $urltogo);
+	header("Location: " . $urltogo . '&sharedrisks=1');
 	exit;
 }
 
@@ -741,7 +741,7 @@ if (! $error && $action == 'unlinkSharedRisk' && $permissiontodelete) {
 		// Unlink shared risk OK
 		$urltogo = str_replace('__ID__', $object->id, $backtopage);
 		$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
-		header("Location: " . $urltogo);
+		header("Location: " . $urltogo . '&sharedrisks=1');
 		exit;
 	} else {
 		// Unlink shared risk KO
