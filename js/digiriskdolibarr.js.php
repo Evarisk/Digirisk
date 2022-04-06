@@ -1856,27 +1856,26 @@ window.eoxiaJS.risk.unlinkSharedRisk = function ( event ) {
 		contentType: false,
 		success: function ( resp ) {
 			elementParent.html($(resp).find('.div-table-responsive'))
-			let actionContainerSuccess = $('.messageSuccessRiskEdit');
+			let actionContainerSuccess = $('.messageSuccessRiskUnlinkShared');
 
 			$('#risk_row_' + riskId).fadeOut(800);
 			$('#risk_row_' + riskId).fadeIn(800);
 
 			let textToShow = '';
-			textToShow += actionContainerSuccess.find('.valueForEditRisk1').val()
+			textToShow += actionContainerSuccess.find('.valueForUnlinkSharedRisk1').val()
 			textToShow += riskRef
-			textToShow += actionContainerSuccess.find('.valueForEditRisk2').val()
-			actionContainerSuccess.find('a').attr('href', '#risk_row_'+riskId)
+			textToShow += actionContainerSuccess.find('.valueForUnlinkSharedRisk2').val()
 
 			actionContainerSuccess.find('.notice-subtitle .text').text(textToShow)
 			actionContainerSuccess.removeClass('hidden');
 		},
 		error: function ( resp ) {
-			let actionContainerError = $('.messageErrorRiskEdit');
+			let actionContainerError = $('.messageErrorRiskUnlinkShared');
 
 			let textToShow = '';
-			textToShow += actionContainerError.find('.valueForEditRisk1').val()
+			textToShow += actionContainerError.find('.valueForUnlinkSharedRisk1').val()
 			textToShow += riskRef
-			textToShow += actionContainerError.find('.valueForEditRisk2').val()
+			textToShow += actionContainerError.find('.valueForUnlinkSharedRisk2').val()
 
 			actionContainerError.find('.notice-subtitle .text').text(textToShow)
 			actionContainerError.removeClass('hidden');

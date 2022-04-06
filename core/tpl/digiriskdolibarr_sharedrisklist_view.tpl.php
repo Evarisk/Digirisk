@@ -151,6 +151,37 @@
 		</div>
 	</div>
 
+	<div class="messageSuccessRiskUnlinkShared notice hidden">
+		<div class="wpeo-notice notice-success risk-unlink-shared-success-notice">
+			<input type="hidden" class="valueForUnlinkSharedRisk1" value="<?php echo $langs->trans('TheRisk') . ' ' ?>">
+			<input type="hidden" class="valueForUnlinkSharedRisk2" value="<?php echo ' ' . $langs->trans('HasBeenUnlinkSharedM') ?>">
+			<div class="notice-content">
+				<div class="notice-title"><?php echo $langs->trans('RiskWellUnlinkShared') ?></div>
+				<div class="notice-subtitle">
+					<a href="">
+						<span class="text"></span>
+					</a>
+				</div>
+			</div>
+			<div class="notice-close"><i class="fas fa-times"></i></div>
+		</div>
+	</div>
+	<div class="messageErrorRiskUnlinkShared notice hidden">
+		<div class="wpeo-notice notice-warning risk-unlink-shared--error-notice">
+			<input type="hidden" class="valueForUnlinkSharedRisk1" value="<?php echo $langs->trans('TheRisk') . ' ' ?>">
+			<input type="hidden" class="valueForUnlinkSharedRisk2" value="<?php echo ' ' . $langs->trans('HasNotBeenUnlinkSharedM') ?>">
+			<div class="notice-content">
+				<div class="notice-title"><?php echo $langs->trans('RiskNotUnlinkShared') ?></div>
+				<div class="notice-subtitle">
+					<a href="">
+						<span class="text"></span>
+					</a>
+				</div>
+			</div>
+			<div class="notice-close"><i class="fas fa-times"></i></div>
+		</div>
+	</div>
+
 	<!--	RISKASSESSMENT TASKS -->
 	<div class="messageSuccessTaskCreate notice hidden">
 		<div class="wpeo-notice notice-success task-create-success-notice">
@@ -707,16 +738,18 @@
 					<?php
 				} elseif ($key == 'ref') {
 					?>
-					<div><i class="fas fa-exclamation-triangle"></i><?php echo ' ' . $risk->ref; ?></div>
-					<?php if ($permissiontoadd) : ?>
-						<div class="risk-unlink-shared wpeo-button button-square-40 button-primary wpeo-tooltip-event" aria-label="<?php echo $langs->trans('UnlinkSharedRisk') ?>" value="<?php echo $risk->id;?>">
-							<i class="fas fa-unlink button-icon"></i>
-						</div>
-					<?php else : ?>
-						<div class="wpeo-button button-square-40 button-grey wpeo-tooltip-event" aria-label="<?php echo $langs->trans('PermissionDenied') ?>" value="<?php echo $risk->id;?>">
-							<i class="fas fa-unlink button-icon"></i>
-						</div>
-					<?php endif; ?>
+					<div class="risk-container" value="<?php echo $risk->id ?>">
+						<div><i class="fas fa-exclamation-triangle"></i><?php echo ' ' . $risk->ref; ?></div>
+						<?php if ($permissiontoadd) : ?>
+							<div class="risk-unlink-shared wpeo-button button-square-40 button-primary wpeo-tooltip-event" aria-label="<?php echo $langs->trans('UnlinkSharedRisk') ?>" value="<?php echo $risk->id;?>">
+								<i class="fas fa-unlink button-icon"></i>
+							</div>
+						<?php else : ?>
+							<div class="wpeo-button button-square-40 button-grey wpeo-tooltip-event" aria-label="<?php echo $langs->trans('PermissionDenied') ?>" value="<?php echo $risk->id;?>">
+								<i class="fas fa-unlink button-icon"></i>
+							</div>
+						<?php endif; ?>
+					</div>
 					<?php
 				} elseif ($key == 'description') {
 					if ($conf->global->DIGIRISKDOLIBARR_RISK_DESCRIPTION == 0 ) {

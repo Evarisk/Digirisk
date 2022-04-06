@@ -247,10 +247,11 @@ if ($sharedrisks) {
 			$digiriskelementtmp->element = 'digiriskdolibarr';
 			$digiriskelementtmp->fetchObjectLinked($risks->id, 'digiriskdolibarr_risk', $object->id, 'digiriskdolibarr_digiriskelement', 'AND', 1, 'sourcetype', 0);
 			$alreadyImported = !empty($digiriskelementtmp->linkedObjectsIds) ? 1 : 0;
+			$nameEntity = dolibarr_get_const($db, 'MAIN_INFO_SOCIETE_NOM', $risks->entity);
 			if ($alreadyImported > 0) {
-				$formquestionimportsharedrisks[] = array('type' => 'checkbox', 'name' => 'import_shared_risks' . '_S' . $risks->entity . '_' . $digiriskelementtmp->ref . '_' . $risks->ref, 'label' => 'S' . $risks->entity . ' - ' . $digiriskelementtmp->ref . ' - ' . $risks->ref . ' ' . $langs->trans('AlreadyImported'), 'value' => 0, 'disabled' => 1);
+				$formquestionimportsharedrisks[] = array('type' => 'checkbox', 'name' => 'import_shared_risks' . '_S' . $risks->entity . '_' . $digiriskelementtmp->ref . '_' . $risks->ref, 'label' => 'S' . $risks->entity . ' - ' . $nameEntity . ' - ' . $digiriskelementtmp->ref . ' - ' . $risks->ref . ' ' . $langs->trans('AlreadyImported'), 'value' => 0, 'disabled' => 1);
 			} else {
-				$formquestionimportsharedrisks[] = array('type' => 'checkbox', 'name' => 'import_shared_risks' . '_S' . $risks->entity . '_' . $digiriskelementtmp->ref . '_' . $risks->ref, 'label' => 'S' . $risks->entity . ' - ' . $digiriskelementtmp->ref . ' - ' . $risks->ref, 'value' => 1);
+				$formquestionimportsharedrisks[] = array('type' => 'checkbox', 'name' => 'import_shared_risks' . '_S' . $risks->entity . '_' . $digiriskelementtmp->ref . '_' . $risks->ref, 'label' => 'S' . $risks->entity . ' - ' . $nameEntity . ' - ' . $digiriskelementtmp->ref . ' - ' . $risks->ref, 'value' => 1);
 			}
 		}
 		$formconfirm .= $form->formconfirm($_SERVER["PHP_SELF"] . '?id=' . $object->id, $langs->trans('ImportSharedRisks'), $langs->trans('ImportSharedRisks', $object->ref), 'confirm_import_shared_risks', $formquestionimportsharedrisks, 'yes', 'actionButtonImportSharedRisks', 350, 600);
