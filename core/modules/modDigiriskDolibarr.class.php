@@ -1742,10 +1742,15 @@ class modDigiriskdolibarr extends DolibarrModules
 
 		$options = 'noremoverights';
 
-		$externalmodule = json_decode($conf->global->MULTICOMPANY_EXTERNAL_MODULES_SHARING, true);
-		unset($externalmodule['digiriskdolibarr']);  // nom informatif du module externe qui apporte ses paramètres
-		$jsonformat = json_encode($externalmodule);
-		dolibarr_set_const($this->db, "MULTICOMPANY_EXTERNAL_MODULES_SHARING", $jsonformat, 'json', 0, '', 0);
+		if (!empty($conf->global->MULTICOMPANY_EXTERNAL_MODULES_SHARING) && $conf->global->MULTICOMPANY_EXTERNAL_MODULES_SHARING !== 0) {
+			$externalmodule = json_decode($conf->global->MULTICOMPANY_EXTERNAL_MODULES_SHARING, true);
+			if (is_array($externalmodule) && array_key_exists('digiriskdolibarr',$externalmodule) ) {
+				unset($externalmodule['digiriskdolibarr']);  // nom informatif du module externe qui apporte ses paramètres
+			}
+			$jsonformat = json_encode($externalmodule);
+			dolibarr_set_const($this->db, "MULTICOMPANY_EXTERNAL_MODULES_SHARING", $jsonformat, 'json', 0, '', 0);
+		}
+
 
 		return $this->_remove($sql, $options);
 	}
