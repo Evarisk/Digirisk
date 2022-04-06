@@ -193,7 +193,7 @@ if (empty($reshook)) {
 
 	$error = 0;
 
-	$backtopage = dol_buildpath('/digiriskdolibarr/view/digiriskelement/digiriskelement_risk.php', 1) . '?id=' . ($id > 0 ? $id : '__ID__') . ($contextpage = 'sharedrisk' ? '&sharedrisks=' . 1 : '');
+	$backtopage = dol_buildpath('/digiriskdolibarr/view/digiriskelement/digiriskelement_risk.php', 1) . '?id=' . ($id > 0 ? $id : '__ID__') . ($contextpage == 'sharedrisk' ? '&sharedrisks=' . 1 : '');
 
 	require_once './../../core/tpl/digiriskdolibarr_risk_actions.tpl.php';
 }
