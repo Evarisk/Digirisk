@@ -12,145 +12,7 @@
 
 	// NOTICES FOR ACTIONS
 ?>
-<!--	RISK ASSESSMENT-->
-	<div class="messageSuccessEvaluationCreate notice hidden">
-		<div class="wpeo-notice notice-success riskassessment-create-success-notice">
-			<div class="notice-content">
-				<div class="notice-title"><?php echo $langs->trans('RiskAssessmentWellCreated') ?></div>
-				<a href="">
-					<div class="notice-subtitle"><?php echo $langs->trans('TheRiskAssessment') . ' ' . $refEvaluationMod->getLastValue($evaluation) . ' ' . $langs->trans('HasBeenCreatedF') ?></div>
-				</a>
-			</div>
-			<div class="notice-close"><i class="fas fa-times"></i></div>
-		</div>
-	</div>
-	<div class="messageErrorEvaluationCreate notice hidden">
-		<div class="wpeo-notice notice-warning riskassessment-create-error-notice">
-			<div class="notice-content">
-				<div class="notice-title"><?php echo $langs->trans('RiskAssessmentNotCreated') ?></div>
-				<a href="">
-					<div class="notice-subtitle"><?php echo $langs->trans('TheRiskAssessment') . ' ' . $refEvaluationMod->getLastValue($evaluation) . ' ' . $langs->trans('HasNotBeenCreatedF') ?></div>
-				</a>
-			</div>
-			<div class="notice-close"><i class="fas fa-times"></i></div>
-		</div>
-	</div>
-	<div class="messageSuccessEvaluationEdit notice hidden">
-		<input type="hidden" class="valueForEditEvaluation1" value="<?php echo $langs->trans('TheRiskAssessment') . ' ' ?>">
-		<input type="hidden" class="valueForEditEvaluation2" value="<?php echo ' ' . $langs->trans('HasBeenEditedF') ?>">
-		<div class="wpeo-notice notice-success riskassessment-edit-success-notice">
-			<div class="notice-content">
-				<div class="notice-title"><?php echo $langs->trans('RiskAssessmentWellEdited') ?></div>
-				<div class="notice-subtitle">
-					<a href="">
-						<span class="text"></span>
-					</a>
-				</div>
-			</div>
-			<div class="notice-close"><i class="fas fa-times"></i></div>
-		</div>
-	</div>
-	<div class="messageErrorEvaluationEdit notice hidden">
-		<input type="hidden" class="valueForEditEvaluation1" value="<?php echo $langs->trans('TheRiskAssessment') . ' ' ?>">
-		<input type="hidden" class="valueForEditEvaluation2" value="<?php echo ' ' . $langs->trans('HasNotBeenEditedF') ?>">
-		<div class="wpeo-notice notice-warning riskassessment-edit-error-notice">
-			<div class="notice-content">
-				<div class="notice-title"><?php echo $langs->trans('RiskAssessmentNotEdited') ?></div>
-				<div class="notice-subtitle">
-					<a href="">
-						<span class="text"></span>
-					</a>
-				</div>
-			</div>
-			<div class="notice-close"><i class="fas fa-times"></i></div>
-		</div>
-	</div>
-	<div class="messageSuccessEvaluationDelete notice hidden">
-		<input type="hidden" class="valueForDeleteEvaluation1" value="<?php echo $langs->trans('TheRiskAssessment') . ' ' ?>">
-		<input type="hidden" class="valueForDeleteEvaluation2" value="<?php echo ' ' . $langs->trans('HasBeenDeletedF') ?>">
-		<div class="wpeo-notice notice-success riskassessment-delete-success-notice">
-			<div class="notice-content">
-				<div class="notice-title"><?php echo $langs->trans('RiskAssessmentWellDeleted') ?></div>
-				<div class="notice-subtitle">
-					<a href="">
-						<span class="text"></span>
-					</a>
-				</div>
-			</div>
-			<div class="notice-close"><i class="fas fa-times"></i></div>
-		</div>
-	</div>
-	<div class="messageErrorEvaluationDelete notice hidden">
-		<input type="hidden" class="valueForDeleteEvaluation1" value="<?php echo $langs->trans('TheRiskAssessment') . ' ' ?>">
-		<input type="hidden" class="valueForDeleteEvaluation2" value="<?php echo ' ' . $langs->trans('HasNotBeenDeletedF') ?>">
-		<div class="wpeo-notice notice-warning riskassessment-delete-error-notice">
-			<div class="notice-content">
-				<div class="notice-title"><?php echo $langs->trans('RiskAssessmentNotDeleted') ?></div>
-				<div class="notice-subtitle">
-					<a href="">
-						<span class="text"></span>
-					</a>
-				</div>
-			</div>
-			<div class="notice-close"><i class="fas fa-times"></i></div>
-		</div>
-	</div>
-
 	<!--	RISK -->
-	<div class="messageSuccessRiskCreate notice hidden">
-		<div class="wpeo-notice notice-success risk-create-success-notice">
-			<div class="notice-content">
-				<div class="notice-title"><?php echo $langs->trans('RiskWellCreated') ?></div>
-				<div class="notice-subtitle">
-					<a href="#<?php echo $refRiskMod->getLastValue($evaluation) ?>">
-						<?php echo $langs->trans('TheRisk') . ' <strong><u> ' . $refRiskMod->getLastValue($risk) . ' </u></strong> ' . $langs->trans('HasBeenCreatedM') ?>
-					</a>
-				</div>
-			</div>
-			<div class="notice-close"><i class="fas fa-times"></i></div>
-		</div>
-	</div>
-	<div class="messageErrorRiskCreate notice hidden">
-		<div class="wpeo-notice notice-warning risk-create-error-notice">
-			<div class="notice-content">
-				<div class="notice-title"><?php echo $langs->trans('RiskNotCreated') ?></div>
-				<div class="notice-subtitle"><?php echo $langs->trans('TheRisk') . $langs->trans('HasNotBeenCreatedM') ?></div>
-			</div>
-			<div class="notice-close"><i class="fas fa-times"></i></div>
-		</div>
-	</div>
-
-	<div class="messageSuccessRiskEdit notice hidden">
-		<div class="wpeo-notice notice-success risk-edit-success-notice">
-			<input type="hidden" class="valueForEditRisk1" value="<?php echo $langs->trans('TheRisk') . ' ' ?>">
-			<input type="hidden" class="valueForEditRisk2" value="<?php echo ' ' . $langs->trans('HasBeenEditedM') ?>">
-			<div class="notice-content">
-				<div class="notice-title"><?php echo $langs->trans('RiskWellEdited') ?></div>
-				<div class="notice-subtitle">
-					<a href="">
-						<span class="text"></span>
-					</a>
-				</div>
-			</div>
-			<div class="notice-close"><i class="fas fa-times"></i></div>
-		</div>
-	</div>
-	<div class="messageErrorRiskEdit notice hidden">
-		<div class="wpeo-notice notice-warning risk-edit-error-notice">
-			<input type="hidden" class="valueForEditRisk1" value="<?php echo $langs->trans('TheRisk') . ' ' ?>">
-			<input type="hidden" class="valueForEditRisk2" value="<?php echo ' ' . $langs->trans('HasNotBeenEditedM') ?>">
-			<div class="notice-content">
-				<div class="notice-title"><?php echo $langs->trans('RiskNotEdited') ?></div>
-				<div class="notice-subtitle">
-					<a href="">
-						<span class="text"></span>
-					</a>
-				</div>
-			</div>
-			<div class="notice-close"><i class="fas fa-times"></i></div>
-		</div>
-	</div>
-
 	<div class="messageSuccessRiskUnlinkShared notice hidden">
 		<div class="wpeo-notice notice-success risk-unlink-shared-success-notice">
 			<input type="hidden" class="valueForUnlinkSharedRisk1" value="<?php echo $langs->trans('TheRisk') . ' ' ?>">
@@ -181,127 +43,6 @@
 			<div class="notice-close"><i class="fas fa-times"></i></div>
 		</div>
 	</div>
-
-	<!--	RISKASSESSMENT TASKS -->
-	<div class="messageSuccessTaskCreate notice hidden">
-		<div class="wpeo-notice notice-success task-create-success-notice">
-			<div class="notice-content">
-				<div class="notice-title"><?php echo $langs->trans('TaskWellCreated') ?></div>
-				<div class="notice-subtitle">
-						<?php echo $langs->trans('TheTask') . ' ' . $langs->trans('HasBeenCreatedF') ?>
-				</div>
-			</div>
-			<div class="notice-close"><i class="fas fa-times"></i></div>
-		</div>
-	</div>
-	<div class="messageErrorTaskCreate notice hidden">
-		<div class="wpeo-notice notice-warning task-create-error-notice">
-			<div class="notice-content">
-				<div class="notice-title"><?php echo $langs->trans('TaskNotCreated') ?></div>
-				<div class="notice-subtitle"><?php echo $langs->trans('TheTask') . ' ' . $langs->trans('HasNotBeenCreatedF') ?></div>
-			</div>
-			<div class="notice-close"><i class="fas fa-times"></i></div>
-		</div>
-	</div>
-	<div class="messageSuccessTaskEdit notice hidden">
-		<input type="hidden" class="valueForEditTask1" value="<?php echo $langs->trans('TheTask') . ' ' ?>">
-		<input type="hidden" class="valueForEditTask2" value="<?php echo ' ' . $langs->trans('HasBeenEditedF') ?>">
-		<div class="wpeo-notice notice-success riskassessment-task-edit-success-notice">
-			<div class="notice-content">
-				<div class="notice-title"><?php echo $langs->trans('TaskWellEdited') ?></div>
-				<div class="notice-subtitle">
-					<a href="">
-						<span class="text"></span>
-					</a>
-				</div>
-			</div>
-			<div class="notice-close"><i class="fas fa-times"></i></div>
-		</div>
-	</div>
-	<div class="messageErrorTaskEdit notice hidden">
-		<input type="hidden" class="valueForEditTask1" value="<?php echo $langs->trans('TheTask') . ' ' ?>">
-		<input type="hidden" class="valueForEditTask2" value="<?php echo ' ' . $langs->trans('HasNotBeenEditedF') ?>">
-		<div class="wpeo-notice notice-warning riskassessment-task-edit-error-notice">
-			<div class="notice-content">
-				<div class="notice-title"><?php echo $langs->trans('TaskNotEdited') ?></div>
-			</div>
-			<div class="notice-close"><i class="fas fa-times"></i></div>
-		</div>
-	</div>
-	<div class="messageSuccessTaskDelete notice hidden">
-		<input type="hidden" class="valueForDeleteTask1" value="<?php echo $langs->trans('TheTask') . ' ' ?>">
-		<input type="hidden" class="valueForDeleteTask2" value="<?php echo ' ' . $langs->trans('HasBeenDeletedF') ?>">
-		<div class="wpeo-notice notice-success riskassessment-task-delete-success-notice">
-			<div class="notice-content">
-				<div class="notice-title"><?php echo $langs->trans('TaskWellDeleted') ?></div>
-				<div class="notice-subtitle">
-					<a href="">
-						<span class="text"></span>
-					</a>
-				</div>
-			</div>
-			<div class="notice-close"><i class="fas fa-times"></i></div>
-		</div>
-	</div>
-	<div class="messageErrorTaskDelete notice hidden">
-		<input type="hidden" class="valueForDeleteTask1" value="<?php echo $langs->trans('TheTask') . ' ' ?>">
-		<input type="hidden" class="valueForDeleteTask2" value="<?php echo ' ' . $langs->trans('HasNotBeenDeletedF') ?>">
-		<div class="wpeo-notice notice-warning riskassessment-task-delete-error-notice">
-			<div class="notice-content">
-				<div class="notice-title"><?php echo $langs->trans('TaskNotDeleted') ?></div>
-			</div>
-			<div class="notice-close"><i class="fas fa-times"></i></div>
-		</div>
-	</div>
-
-	<!--	RISKASSESSMENT TASKS TIME SPENT -->
-	<div class="messageSuccessTaskTimeSpentEdit notice hidden">
-		<input type="hidden" class="valueForEditTaskTimeSpent1" value="<?php echo $langs->trans('TheTaskTimeSpent') . ' ' . $langs->trans('OnTheTask') . ' ' ?>">
-		<input type="hidden" class="valueForEditTaskTimeSpent2" value="<?php echo ' ' . $langs->trans('HasBeenEditedM') ?>">
-		<div class="wpeo-notice notice-success riskassessment-task-timespent-edit-success-notice">
-			<div class="notice-content">
-				<div class="notice-title"><?php echo $langs->trans('TaskTimeSpentWellEdited') ?></div>
-				<div class="notice-subtitle">
-					<span class="text"></span>
-				</div>
-			</div>
-			<div class="notice-close"><i class="fas fa-times"></i></div>
-		</div>
-	</div>
-	<div class="messageErrorTaskTimeSpentEdit notice hidden">
-		<input type="hidden" class="valueForEditTaskTimeSpent1" value="<?php echo $langs->trans('TheTaskTimeSpent') . ' ' . $langs->trans('OnTheTask') . ' ' ?>">
-		<input type="hidden" class="valueForEditTaskTimeSpent2" value="<?php echo ' ' . $langs->trans('HasNotBeenEditedM') ?>">
-		<div class="wpeo-notice notice-warning riskassessment-task-timespent-edit-error-notice">
-			<div class="notice-content">
-				<div class="notice-title"><?php echo $langs->trans('TaskTimeSpentNotEdited') ?></div>
-			</div>
-			<div class="notice-close"><i class="fas fa-times"></i></div>
-		</div>
-	</div>
-	<div class="messageSuccessTaskTimeSpentDelete notice hidden">
-		<input type="hidden" class="valueForDeleteTaskTimeSpent1" value="<?php echo $langs->trans('TheTaskTimeSpent') . ' ' . $langs->trans('OnTheTask') . ' ' ?>">
-		<input type="hidden" class="valueForDeleteTaskTimeSpent2" value="<?php echo ' ' . $langs->trans('HasBeenDeletedM') ?>">
-		<div class="wpeo-notice notice-success riskassessment-task-timespent-delete-success-notice">
-			<div class="notice-content">
-				<div class="notice-title"><?php echo $langs->trans('TaskTimeSpentWellDeleted') ?></div>
-				<div class="notice-subtitle">
-					<span class="text"></span>
-				</div>
-			</div>
-			<div class="notice-close"><i class="fas fa-times"></i></div>
-		</div>
-	</div>
-	<div class="messageErrorTaskTimeSpentDelete notice hidden">
-		<input type="hidden" class="valueForDeleteTaskTimeSpent1" value="<?php echo $langs->trans('TheTaskTimeSpent') . ' ' . $langs->trans('OnTheTask') . ' ' ?>">
-		<input type="hidden" class="valueForDeleteTaskTimeSpent2" value="<?php echo ' ' . $langs->trans('HasNotBeenDeletedM') ?>">
-		<div class="wpeo-notice notice-warning riskassessment-task-timespent-delete-error-notice">
-			<div class="notice-content">
-				<div class="notice-title"><?php echo $langs->trans('TaskTimeSpentNotDeleted') ?></div>
-			</div>
-			<div class="notice-close"><i class="fas fa-times"></i></div>
-		</div>
-	</div>
-
 
 	<?php
 
@@ -408,7 +149,7 @@
 		if ($num == 1 && ! empty($conf->global->MAIN_SEARCH_DIRECT_OPEN_IF_ONLY_ONE) && $search_all && ! $page) {
 			$obj = $db->fetch_object($resql);
 			$id  = $obj->rowid;
-			header("Location: " . dol_buildpath('/digiriskdolibarr/view/digiriskelement/digiriskelement_risk.php', 1) . '?id=' . $id . '&sharedrisks=' . 1);
+			header("Location: " . dol_buildpath('/digiriskdolibarr/view/digiriskelement/digiriskelement_risk.php', 1) . '?id=' . $id);
 			exit;
 		}
 	} else {
@@ -511,7 +252,7 @@
 		if ($num == 1 && ! empty($conf->global->MAIN_SEARCH_DIRECT_OPEN_IF_ONLY_ONE) && $search_all && ! $page) {
 			$obj = $db->fetch_object($resql);
 			$id  = $obj->rowid;
-			header("Location: " . dol_buildpath('/digiriskdolibarr/view/digiriskelement/digiriskelement_risk.php', 1) . '?id=' . $id . '&sharedrisks=' . 1);
+			header("Location: " . dol_buildpath('/digiriskdolibarr/view/digiriskelement/digiriskelement_risk.php', 1) . '?id=' . $id);
 			exit;
 		}
 	}
@@ -531,8 +272,7 @@
 	include DOL_DOCUMENT_ROOT . '/core/tpl/extrafields_list_search_param.tpl.php';
 
 	// List of mass actions available
-	$arrayofmassactions                                       = array();
-	//if ($permissiontodelete) $arrayofmassactions['predelete'] = '<span class="fa fa-trash paddingrightonly"></span>' . $langs->trans("Delete");
+	$arrayofmassactions = array();
 
 	if ($action != 'list') {
 		$massactionbutton = $form->selectMassAction('', $arrayofmassactions);

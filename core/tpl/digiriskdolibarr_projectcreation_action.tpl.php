@@ -73,6 +73,7 @@ if ( $conf->global->DIGIRISKDOLIBARR_DU_PROJECT == 0 || $project->statut == 2 ) 
 		$error = "Error ".$db->lasterror();
 		return -1;
 	}
+	header("Location: " . $_SERVER['PHP_SELF']);
 }
 
 if ($conf->global->DIGIRISKDOLIBARR_PREVENTIONPLAN_PROJECT > 0) {
@@ -658,6 +659,8 @@ if ($conf->global->DIGIRISKDOLIBARR_CONF_BACKWARD_COMPATIBILITY == 0) {
 	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_SORT_LISTINGS_BY_COTATION', dolibarr_get_const($db,'DIGIRISKDOLIBARR_SORT_LISTINGS_BY_COTATION'), 'integer', 0, '', $conf->entity);
 	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_RISK_DESCRIPTION_PREFILL', dolibarr_get_const($db,'DIGIRISKDOLIBARR_RISK_DESCRIPTION_PREFILL'), 'integer', 0, '', $conf->entity);
 	//dolibarr_set_const($db, 'DIGIRISKDOLIBARR_SHOW_SHARED_RISKS', dolibarr_get_const($db,'DIGIRISKDOLIBARR_SHOW_SHARED_RISKS'), 'integer', 0, '', $conf->entity);
+	//dolibarr_set_const($db, 'DIGIRISKDOLIBARR_SHOW_INHERITED_RISKS', dolibarr_get_const($db,'DIGIRISKDOLIBARR_SHOW_INHERITED_RISKS'), 'integer', 0, '', $conf->entity);
+	//dolibarr_set_const($db, 'DIGIRISKDOLIBARR_SHOW_RISKS', dolibarr_get_const($db,'DIGIRISKDOLIBARR_SHOW_RISKS'), 'integer', 0, '', $conf->entity);
 
 	// CONST RISK ASSESSMENT
 	dolibarr_set_const($db, 'MAIN_AGENDA_ACTIONAUTO_RISKASSESSMENT_CREATE', 1, 'integer', 0, '', $conf->entity);

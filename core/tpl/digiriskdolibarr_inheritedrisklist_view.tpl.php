@@ -1,6 +1,6 @@
 <?php
 	print '<div class="fichecenter wpeo-wrap">';
-	print '<form method="POST" id="searchFormList" enctype="multipart/form-data" action="' . $_SERVER["PHP_SELF"] . '?id=' . $object->id . '&sharedrisks=' . 1 .'">' . "\n";
+	print '<form method="POST" id="searchFormList" enctype="multipart/form-data" action="' . $_SERVER["PHP_SELF"] . '?id=' . $object->id .'">' . "\n";
 	print '<input type="hidden" name="token" value="' . newToken() . '">';
 	print '<input type="hidden" name="formfilteraction" id="formfilteraction" value="list">';
 	print '<input type="hidden" name="action" value="list">';
@@ -9,301 +9,6 @@
 	print '<input type="hidden" name="sortorder" value="' . $sortorder . '">';
 	//print '<input type="hidden" name="page" value="'.$page.'">';
 	print '<input type="hidden" name="contextpage" value="' . $contextpage . '">';
-
-	// NOTICES FOR ACTIONS
-?>
-<!--	RISK ASSESSMENT-->
-	<div class="messageSuccessEvaluationCreate notice hidden">
-		<div class="wpeo-notice notice-success riskassessment-create-success-notice">
-			<div class="notice-content">
-				<div class="notice-title"><?php echo $langs->trans('RiskAssessmentWellCreated') ?></div>
-				<a href="">
-					<div class="notice-subtitle"><?php echo $langs->trans('TheRiskAssessment') . ' ' . $refEvaluationMod->getLastValue($evaluation) . ' ' . $langs->trans('HasBeenCreatedF') ?></div>
-				</a>
-			</div>
-			<div class="notice-close"><i class="fas fa-times"></i></div>
-		</div>
-	</div>
-	<div class="messageErrorEvaluationCreate notice hidden">
-		<div class="wpeo-notice notice-warning riskassessment-create-error-notice">
-			<div class="notice-content">
-				<div class="notice-title"><?php echo $langs->trans('RiskAssessmentNotCreated') ?></div>
-				<a href="">
-					<div class="notice-subtitle"><?php echo $langs->trans('TheRiskAssessment') . ' ' . $refEvaluationMod->getLastValue($evaluation) . ' ' . $langs->trans('HasNotBeenCreatedF') ?></div>
-				</a>
-			</div>
-			<div class="notice-close"><i class="fas fa-times"></i></div>
-		</div>
-	</div>
-	<div class="messageSuccessEvaluationEdit notice hidden">
-		<input type="hidden" class="valueForEditEvaluation1" value="<?php echo $langs->trans('TheRiskAssessment') . ' ' ?>">
-		<input type="hidden" class="valueForEditEvaluation2" value="<?php echo ' ' . $langs->trans('HasBeenEditedF') ?>">
-		<div class="wpeo-notice notice-success riskassessment-edit-success-notice">
-			<div class="notice-content">
-				<div class="notice-title"><?php echo $langs->trans('RiskAssessmentWellEdited') ?></div>
-				<div class="notice-subtitle">
-					<a href="">
-						<span class="text"></span>
-					</a>
-				</div>
-			</div>
-			<div class="notice-close"><i class="fas fa-times"></i></div>
-		</div>
-	</div>
-	<div class="messageErrorEvaluationEdit notice hidden">
-		<input type="hidden" class="valueForEditEvaluation1" value="<?php echo $langs->trans('TheRiskAssessment') . ' ' ?>">
-		<input type="hidden" class="valueForEditEvaluation2" value="<?php echo ' ' . $langs->trans('HasNotBeenEditedF') ?>">
-		<div class="wpeo-notice notice-warning riskassessment-edit-error-notice">
-			<div class="notice-content">
-				<div class="notice-title"><?php echo $langs->trans('RiskAssessmentNotEdited') ?></div>
-				<div class="notice-subtitle">
-					<a href="">
-						<span class="text"></span>
-					</a>
-				</div>
-			</div>
-			<div class="notice-close"><i class="fas fa-times"></i></div>
-		</div>
-	</div>
-	<div class="messageSuccessEvaluationDelete notice hidden">
-		<input type="hidden" class="valueForDeleteEvaluation1" value="<?php echo $langs->trans('TheRiskAssessment') . ' ' ?>">
-		<input type="hidden" class="valueForDeleteEvaluation2" value="<?php echo ' ' . $langs->trans('HasBeenDeletedF') ?>">
-		<div class="wpeo-notice notice-success riskassessment-delete-success-notice">
-			<div class="notice-content">
-				<div class="notice-title"><?php echo $langs->trans('RiskAssessmentWellDeleted') ?></div>
-				<div class="notice-subtitle">
-					<a href="">
-						<span class="text"></span>
-					</a>
-				</div>
-			</div>
-			<div class="notice-close"><i class="fas fa-times"></i></div>
-		</div>
-	</div>
-	<div class="messageErrorEvaluationDelete notice hidden">
-		<input type="hidden" class="valueForDeleteEvaluation1" value="<?php echo $langs->trans('TheRiskAssessment') . ' ' ?>">
-		<input type="hidden" class="valueForDeleteEvaluation2" value="<?php echo ' ' . $langs->trans('HasNotBeenDeletedF') ?>">
-		<div class="wpeo-notice notice-warning riskassessment-delete-error-notice">
-			<div class="notice-content">
-				<div class="notice-title"><?php echo $langs->trans('RiskAssessmentNotDeleted') ?></div>
-				<div class="notice-subtitle">
-					<a href="">
-						<span class="text"></span>
-					</a>
-				</div>
-			</div>
-			<div class="notice-close"><i class="fas fa-times"></i></div>
-		</div>
-	</div>
-
-	<!--	RISK -->
-	<div class="messageSuccessRiskCreate notice hidden">
-		<div class="wpeo-notice notice-success risk-create-success-notice">
-			<div class="notice-content">
-				<div class="notice-title"><?php echo $langs->trans('RiskWellCreated') ?></div>
-				<div class="notice-subtitle">
-					<a href="#<?php echo $refRiskMod->getLastValue($evaluation) ?>">
-						<?php echo $langs->trans('TheRisk') . ' <strong><u> ' . $refRiskMod->getLastValue($risk) . ' </u></strong> ' . $langs->trans('HasBeenCreatedM') ?>
-					</a>
-				</div>
-			</div>
-			<div class="notice-close"><i class="fas fa-times"></i></div>
-		</div>
-	</div>
-	<div class="messageErrorRiskCreate notice hidden">
-		<div class="wpeo-notice notice-warning risk-create-error-notice">
-			<div class="notice-content">
-				<div class="notice-title"><?php echo $langs->trans('RiskNotCreated') ?></div>
-				<div class="notice-subtitle"><?php echo $langs->trans('TheRisk') . $langs->trans('HasNotBeenCreatedM') ?></div>
-			</div>
-			<div class="notice-close"><i class="fas fa-times"></i></div>
-		</div>
-	</div>
-
-	<div class="messageSuccessRiskEdit notice hidden">
-		<div class="wpeo-notice notice-success risk-edit-success-notice">
-			<input type="hidden" class="valueForEditRisk1" value="<?php echo $langs->trans('TheRisk') . ' ' ?>">
-			<input type="hidden" class="valueForEditRisk2" value="<?php echo ' ' . $langs->trans('HasBeenEditedM') ?>">
-			<div class="notice-content">
-				<div class="notice-title"><?php echo $langs->trans('RiskWellEdited') ?></div>
-				<div class="notice-subtitle">
-					<a href="">
-						<span class="text"></span>
-					</a>
-				</div>
-			</div>
-			<div class="notice-close"><i class="fas fa-times"></i></div>
-		</div>
-	</div>
-	<div class="messageErrorRiskEdit notice hidden">
-		<div class="wpeo-notice notice-warning risk-edit-error-notice">
-			<input type="hidden" class="valueForEditRisk1" value="<?php echo $langs->trans('TheRisk') . ' ' ?>">
-			<input type="hidden" class="valueForEditRisk2" value="<?php echo ' ' . $langs->trans('HasNotBeenEditedM') ?>">
-			<div class="notice-content">
-				<div class="notice-title"><?php echo $langs->trans('RiskNotEdited') ?></div>
-				<div class="notice-subtitle">
-					<a href="">
-						<span class="text"></span>
-					</a>
-				</div>
-			</div>
-			<div class="notice-close"><i class="fas fa-times"></i></div>
-		</div>
-	</div>
-
-	<div class="messageSuccessRiskUnlinkShared notice hidden">
-		<div class="wpeo-notice notice-success risk-unlink-shared-success-notice">
-			<input type="hidden" class="valueForUnlinkSharedRisk1" value="<?php echo $langs->trans('TheRisk') . ' ' ?>">
-			<input type="hidden" class="valueForUnlinkSharedRisk2" value="<?php echo ' ' . $langs->trans('HasBeenUnlinkSharedM') ?>">
-			<div class="notice-content">
-				<div class="notice-title"><?php echo $langs->trans('RiskWellUnlinkShared') ?></div>
-				<div class="notice-subtitle">
-					<a href="">
-						<span class="text"></span>
-					</a>
-				</div>
-			</div>
-			<div class="notice-close"><i class="fas fa-times"></i></div>
-		</div>
-	</div>
-	<div class="messageErrorRiskUnlinkShared notice hidden">
-		<div class="wpeo-notice notice-warning risk-unlink-shared--error-notice">
-			<input type="hidden" class="valueForUnlinkSharedRisk1" value="<?php echo $langs->trans('TheRisk') . ' ' ?>">
-			<input type="hidden" class="valueForUnlinkSharedRisk2" value="<?php echo ' ' . $langs->trans('HasNotBeenUnlinkSharedM') ?>">
-			<div class="notice-content">
-				<div class="notice-title"><?php echo $langs->trans('RiskNotUnlinkShared') ?></div>
-				<div class="notice-subtitle">
-					<a href="">
-						<span class="text"></span>
-					</a>
-				</div>
-			</div>
-			<div class="notice-close"><i class="fas fa-times"></i></div>
-		</div>
-	</div>
-
-	<!--	RISKASSESSMENT TASKS -->
-	<div class="messageSuccessTaskCreate notice hidden">
-		<div class="wpeo-notice notice-success task-create-success-notice">
-			<div class="notice-content">
-				<div class="notice-title"><?php echo $langs->trans('TaskWellCreated') ?></div>
-				<div class="notice-subtitle">
-						<?php echo $langs->trans('TheTask') . ' ' . $langs->trans('HasBeenCreatedF') ?>
-				</div>
-			</div>
-			<div class="notice-close"><i class="fas fa-times"></i></div>
-		</div>
-	</div>
-	<div class="messageErrorTaskCreate notice hidden">
-		<div class="wpeo-notice notice-warning task-create-error-notice">
-			<div class="notice-content">
-				<div class="notice-title"><?php echo $langs->trans('TaskNotCreated') ?></div>
-				<div class="notice-subtitle"><?php echo $langs->trans('TheTask') . ' ' . $langs->trans('HasNotBeenCreatedF') ?></div>
-			</div>
-			<div class="notice-close"><i class="fas fa-times"></i></div>
-		</div>
-	</div>
-	<div class="messageSuccessTaskEdit notice hidden">
-		<input type="hidden" class="valueForEditTask1" value="<?php echo $langs->trans('TheTask') . ' ' ?>">
-		<input type="hidden" class="valueForEditTask2" value="<?php echo ' ' . $langs->trans('HasBeenEditedF') ?>">
-		<div class="wpeo-notice notice-success riskassessment-task-edit-success-notice">
-			<div class="notice-content">
-				<div class="notice-title"><?php echo $langs->trans('TaskWellEdited') ?></div>
-				<div class="notice-subtitle">
-					<a href="">
-						<span class="text"></span>
-					</a>
-				</div>
-			</div>
-			<div class="notice-close"><i class="fas fa-times"></i></div>
-		</div>
-	</div>
-	<div class="messageErrorTaskEdit notice hidden">
-		<input type="hidden" class="valueForEditTask1" value="<?php echo $langs->trans('TheTask') . ' ' ?>">
-		<input type="hidden" class="valueForEditTask2" value="<?php echo ' ' . $langs->trans('HasNotBeenEditedF') ?>">
-		<div class="wpeo-notice notice-warning riskassessment-task-edit-error-notice">
-			<div class="notice-content">
-				<div class="notice-title"><?php echo $langs->trans('TaskNotEdited') ?></div>
-			</div>
-			<div class="notice-close"><i class="fas fa-times"></i></div>
-		</div>
-	</div>
-	<div class="messageSuccessTaskDelete notice hidden">
-		<input type="hidden" class="valueForDeleteTask1" value="<?php echo $langs->trans('TheTask') . ' ' ?>">
-		<input type="hidden" class="valueForDeleteTask2" value="<?php echo ' ' . $langs->trans('HasBeenDeletedF') ?>">
-		<div class="wpeo-notice notice-success riskassessment-task-delete-success-notice">
-			<div class="notice-content">
-				<div class="notice-title"><?php echo $langs->trans('TaskWellDeleted') ?></div>
-				<div class="notice-subtitle">
-					<a href="">
-						<span class="text"></span>
-					</a>
-				</div>
-			</div>
-			<div class="notice-close"><i class="fas fa-times"></i></div>
-		</div>
-	</div>
-	<div class="messageErrorTaskDelete notice hidden">
-		<input type="hidden" class="valueForDeleteTask1" value="<?php echo $langs->trans('TheTask') . ' ' ?>">
-		<input type="hidden" class="valueForDeleteTask2" value="<?php echo ' ' . $langs->trans('HasNotBeenDeletedF') ?>">
-		<div class="wpeo-notice notice-warning riskassessment-task-delete-error-notice">
-			<div class="notice-content">
-				<div class="notice-title"><?php echo $langs->trans('TaskNotDeleted') ?></div>
-			</div>
-			<div class="notice-close"><i class="fas fa-times"></i></div>
-		</div>
-	</div>
-
-	<!--	RISKASSESSMENT TASKS TIME SPENT -->
-	<div class="messageSuccessTaskTimeSpentEdit notice hidden">
-		<input type="hidden" class="valueForEditTaskTimeSpent1" value="<?php echo $langs->trans('TheTaskTimeSpent') . ' ' . $langs->trans('OnTheTask') . ' ' ?>">
-		<input type="hidden" class="valueForEditTaskTimeSpent2" value="<?php echo ' ' . $langs->trans('HasBeenEditedM') ?>">
-		<div class="wpeo-notice notice-success riskassessment-task-timespent-edit-success-notice">
-			<div class="notice-content">
-				<div class="notice-title"><?php echo $langs->trans('TaskTimeSpentWellEdited') ?></div>
-				<div class="notice-subtitle">
-					<span class="text"></span>
-				</div>
-			</div>
-			<div class="notice-close"><i class="fas fa-times"></i></div>
-		</div>
-	</div>
-	<div class="messageErrorTaskTimeSpentEdit notice hidden">
-		<input type="hidden" class="valueForEditTaskTimeSpent1" value="<?php echo $langs->trans('TheTaskTimeSpent') . ' ' . $langs->trans('OnTheTask') . ' ' ?>">
-		<input type="hidden" class="valueForEditTaskTimeSpent2" value="<?php echo ' ' . $langs->trans('HasNotBeenEditedM') ?>">
-		<div class="wpeo-notice notice-warning riskassessment-task-timespent-edit-error-notice">
-			<div class="notice-content">
-				<div class="notice-title"><?php echo $langs->trans('TaskTimeSpentNotEdited') ?></div>
-			</div>
-			<div class="notice-close"><i class="fas fa-times"></i></div>
-		</div>
-	</div>
-	<div class="messageSuccessTaskTimeSpentDelete notice hidden">
-		<input type="hidden" class="valueForDeleteTaskTimeSpent1" value="<?php echo $langs->trans('TheTaskTimeSpent') . ' ' . $langs->trans('OnTheTask') . ' ' ?>">
-		<input type="hidden" class="valueForDeleteTaskTimeSpent2" value="<?php echo ' ' . $langs->trans('HasBeenDeletedM') ?>">
-		<div class="wpeo-notice notice-success riskassessment-task-timespent-delete-success-notice">
-			<div class="notice-content">
-				<div class="notice-title"><?php echo $langs->trans('TaskTimeSpentWellDeleted') ?></div>
-				<div class="notice-subtitle">
-					<span class="text"></span>
-				</div>
-			</div>
-			<div class="notice-close"><i class="fas fa-times"></i></div>
-		</div>
-	</div>
-	<div class="messageErrorTaskTimeSpentDelete notice hidden">
-		<input type="hidden" class="valueForDeleteTaskTimeSpent1" value="<?php echo $langs->trans('TheTaskTimeSpent') . ' ' . $langs->trans('OnTheTask') . ' ' ?>">
-		<input type="hidden" class="valueForDeleteTaskTimeSpent2" value="<?php echo ' ' . $langs->trans('HasNotBeenDeletedM') ?>">
-		<div class="wpeo-notice notice-warning riskassessment-task-timespent-delete-error-notice">
-			<div class="notice-content">
-				<div class="notice-title"><?php echo $langs->trans('TaskTimeSpentNotDeleted') ?></div>
-			</div>
-			<div class="notice-close"><i class="fas fa-times"></i></div>
-		</div>
-	</div>
-
-
-	<?php
 
 	$advanced_method_cotation_json  = file_get_contents(DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/js/json/default.json');
 	$advanced_method_cotation_array = json_decode($advanced_method_cotation_json, true);
@@ -328,12 +33,11 @@
 		$sql                                                                                                                                           = preg_replace('/,\s*$/', '', $sql);
 		$sql                                                                                                                                          .= " FROM " . MAIN_DB_PREFIX . $risk->table_element . " as t";
 		$sql                                                                                                                                          .= " LEFT JOIN " . MAIN_DB_PREFIX . $digiriskelement->table_element . " as e on (t.fk_element = e.rowid)";
-		$sql                                                                                                                                          .= " INNER JOIN " . MAIN_DB_PREFIX . 'element_element' . " as el on (t.rowid = el.fk_source)";
 		if (is_array($extrafields->attributes[$risk->table_element]['label']) && count($extrafields->attributes[$risk->table_element]['label'])) $sql .= " LEFT JOIN " . MAIN_DB_PREFIX . $risk->table_element . "_extrafields as ef on (t.rowid = ef.fk_object)";
-		//if ($risk->ismultientitymanaged == 1) $sql                                                                                                    .= " WHERE t.entity IN (" . getEntity($risk->element) . ")";
-		//else $sql                                                                                                                                     .= " WHERE 1 = 1";
+		if ($risk->ismultientitymanaged == 1) $sql                                                                                                    .= " WHERE t.entity IN (" . getEntity($risk->element) . ")";
+		else $sql                                                                                                                                     .= " WHERE 1 = 1";
 		if ( ! $allRisks) {
-			$sql .= " AND el.fk_target = " . $id;
+			$sql .= " AND fk_element = " . $risk->fk_element;
 		} else {
 			foreach ($trashList as $deleted_element => $element_id) {
 				$sql .= " AND fk_element !=" . $element_id;
@@ -356,11 +60,7 @@
 				if ($key == 'ref') {
 					$sql .= " AND (t.ref = '$search[$key]')";
 				} elseif ($key == 'fk_element') {
-					if ( $search[$key] > 0){
-						$sql .= " AND (e.rowid = '$search[$key]')";
-					}
-				} elseif ($key == 'entity') {
-					$sql .= " AND (e.entity = '$search[$key]')";
+					$sql .= " AND (e.ref = '$search[$key]')";
 				} else {
 					$sql .= natural_search('t.'.$key, $search[$key], (($key == 'status') ? 2 : $mode_search));
 				}
@@ -408,7 +108,7 @@
 		if ($num == 1 && ! empty($conf->global->MAIN_SEARCH_DIRECT_OPEN_IF_ONLY_ONE) && $search_all && ! $page) {
 			$obj = $db->fetch_object($resql);
 			$id  = $obj->rowid;
-			header("Location: " . dol_buildpath('/digiriskdolibarr/view/digiriskelement/digiriskelement_risk.php', 1) . '?id=' . $id . '&sharedrisks=' . 1);
+			header("Location: " . dol_buildpath('/digiriskdolibarr/view/digiriskelement/digiriskelement_risk.php', 1) . '?id=' . $id);
 			exit;
 		}
 	} else {
@@ -427,16 +127,13 @@
 		$sql                                                                                                                                                       = preg_replace('/,\s*$/', '', $sql);
 		$sql                                                                                                                                                      .= " FROM " . MAIN_DB_PREFIX . $evaluation->table_element . " as evaluation";
 		$sql                                                                                                                                                      .= " LEFT JOIN " . MAIN_DB_PREFIX . $risk->table_element . " as r on (evaluation.fk_risk = r.rowid)";
-		$sql 																																					  .= " INNER JOIN " . MAIN_DB_PREFIX . 'element_element' . " as el on (r.rowid = el.fk_source)";
-		$sql 																																					  .= " LEFT JOIN " . MAIN_DB_PREFIX . $digiriskelement->table_element . " as e on (r.fk_element = e.rowid)";
+		$sql                                                                                                                                                      .= " LEFT JOIN " . MAIN_DB_PREFIX . $digiriskelement->table_element . " as e on (r.fk_element = e.rowid)";
 		if (is_array($extrafields->attributes[$evaluation->table_element]['label']) && count($extrafields->attributes[$evaluation->table_element]['label'])) $sql .= " LEFT JOIN " . MAIN_DB_PREFIX . $evaluation->table_element . "_extrafields as ef on (evaluation.rowid = ef.fk_object)";
-		//if ($evaluation->ismultientitymanaged == 1) $sql                                                                                                          .= " WHERE evaluation.entity IN (" . getEntity($evaluation->element) . ")";
+		if ($evaluation->ismultientitymanaged == 1) $sql                                                                                                          .= " WHERE evaluation.entity IN (" . getEntity($evaluation->element) . ")";
 		else $sql                                                                                                                                                 .= " WHERE 1 = 1";
 		$sql                                                                                                                                                      .= " AND evaluation.status = 1";
-
 		if ( ! $allRisks) {
-			$sql .= " AND el.fk_target = " . $id;
-			//$sql .= " AND r.fk_element =" . $id;
+			$sql .= " AND r.fk_element =" . $object->fk_parent;
 		} else {
 			foreach ($trashList as $deleted_element => $element_id) {
 				$sql .= " AND r.fk_element !=" . $element_id;
@@ -459,11 +156,7 @@
 				if ($key == 'ref') {
 					$sql .= " AND (r.ref = '$search[$key]')";
 				} elseif ($key == 'fk_element') {
-					if ( $search[$key] > 0){
-						$sql .= " AND (e.rowid = '$search[$key]')";
-					}
-				} elseif ($key == 'entity') {
-					$sql .= " AND (evaluation.entity = '$search[$key]')";
+					$sql .= " AND (e.ref = '$search[$key]')";
 				} else {
 					$sql .= natural_search('r.'.$key, $search[$key], (($key == 'status') ? 2 : $mode_search));
 				}
@@ -511,7 +204,7 @@
 		if ($num == 1 && ! empty($conf->global->MAIN_SEARCH_DIRECT_OPEN_IF_ONLY_ONE) && $search_all && ! $page) {
 			$obj = $db->fetch_object($resql);
 			$id  = $obj->rowid;
-			header("Location: " . dol_buildpath('/digiriskdolibarr/view/digiriskelement/digiriskelement_risk.php', 1) . '?id=' . $id . '&sharedrisks=' . 1);
+			header("Location: " . dol_buildpath('/digiriskdolibarr/view/digiriskelement/digiriskelement_risk.php', 1) . '?id=' . $id);
 			exit;
 		}
 	}
@@ -521,7 +214,6 @@
 	$param                                                                      = '';
 	if ( ! empty($contextpage) && $contextpage != $_SERVER["PHP_SELF"]) $param .= '&contextpage=' . urlencode($contextpage);
 	$param                                                                     .= '&id=' . $id;
-    $param                                                                     .= '&sharedrisks=' . 1;
 	if ($limit > 0 && $limit != $conf->liste_limit) $param                     .= '&limit=' . urlencode($limit);
 	foreach ($search as $key => $val) {
 		if (is_array($search[$key]) && count($search[$key])) foreach ($search[$key] as $skey) $param .= '&search_' . $key . '[]=' . urlencode($skey);
@@ -531,14 +223,13 @@
 	include DOL_DOCUMENT_ROOT . '/core/tpl/extrafields_list_search_param.tpl.php';
 
 	// List of mass actions available
-	$arrayofmassactions                                       = array();
-	//if ($permissiontodelete) $arrayofmassactions['predelete'] = '<span class="fa fa-trash paddingrightonly"></span>' . $langs->trans("Delete");
+	$arrayofmassactions = array();
 
 	if ($action != 'list') {
 		$massactionbutton = $form->selectMassAction('', $arrayofmassactions);
 	} ?>
 
-	<?php $title = $langs->trans('DigiriskElementSharedRisksList');
+	<?php $title = $langs->trans('DigiriskElementInheritedRisksList');
 	print_barre_liste($title, $page, $_SERVER["PHP_SELF"], $param, $sortfield, $sortorder, $massactionbutton, $num, $nbtotalofrecords, 'digiriskdolibarr32px.png@digiriskdolibarr', 0, $newcardbutton, '', $limit, 0, 0, 1);
 
 	include DOL_DOCUMENT_ROOT . '/core/tpl/massactions_pre.tpl.php';
@@ -564,13 +255,13 @@
 	$menuConf = 'MAIN_SELECTEDFIELDS_' . $varpage;
 
 	if ( ! preg_match('/t.description/', $user->conf->$menuConf) && $conf->global->DIGIRISKDOLIBARR_RISK_DESCRIPTION) {
-		$user->conf->$menuConf = 't.entity,t.fk_element,t.ref,evaluation.cotation,t.category,t.description,';
+		$user->conf->$menuConf = 't.fk_element,t.ref,evaluation.cotation,t.category,t.description,';
 	} elseif ( ! $conf->global->DIGIRISKDOLIBARR_RISK_DESCRIPTION) {
 		$user->conf->$menuConf = preg_replace('/t.description,/', '', $user->conf->$menuConf);
 	}
 
 	if ( ! preg_match('/evaluation.has_tasks/', $user->conf->$menuConf) && $conf->global->DIGIRISKDOLIBARR_TASK_MANAGEMENT) {
-		$user->conf->$menuConf .= 't.entity,t.fk_element,t.ref,evaluation.cotation,t.category,evaluation.has_tasks,';
+		$user->conf->$menuConf .= 't.fk_element,t.ref,evaluation.cotation,t.category,evaluation.has_tasks,';
 	} elseif ( ! $conf->global->DIGIRISKDOLIBARR_TASK_MANAGEMENT) {
 		$user->conf->$menuConf = preg_replace('/evaluation.has_tasks,/', '', $user->conf->$menuConf);
 	}
@@ -585,13 +276,6 @@
 
 	// Fields title search
 	// --------------------------------------------------------------------
-
-//	$AllSharingsRisks = $conf->mc->sharings['risk'];
-//	foreach ($AllSharingsRisks as $Allsharingsrisk) {
-//		$filterSharingRisk .= $Allsharingsrisk . ',';
-//	}
-//	$filterSharingRisk = rtrim($filterSharingRisk, ',');
-
 	print '<tr class="liste_titre">';
 	foreach ($risk->fields as $key => $val) {
 		$cssforfield                        = (empty($val['css']) ? '' : $val['css']);
@@ -601,8 +285,6 @@
 			if (is_array($val['arrayofkeyval'])) print $form->selectarray('search_' . $key, $val['arrayofkeyval'], $search[$key], $val['notnull'], 0, 0, '', 1, 0, 0, '', 'maxwidth75');
 			elseif (strpos($val['type'], 'integer:') === 0) {
 				print $risk->showInputField($val, $key, $search[$key], '', '', 'search_', 'maxwidth150', 1);
-			} elseif ($key == 'entity') {
-				print select_entity_list($search['entity'], 'search_entity', 'e.rowid NOT IN (' . $conf->entity . ')');
 			} elseif ($key == 'fk_element') {
 				print $digiriskelement->select_digiriskelement_list($search['fk_element'], 'search_fk_element', 's.entity NOT IN (' . $conf->entity . ')', 1, 0, array(), 0, 0, 'minwidth100', 0, false, 1, $contextpage);
 			} elseif ($key == 'category') { ?>
@@ -720,10 +402,7 @@
 			if ( ! empty($arrayfields['t.' . $key]['checked'])) {
 				print '<td' . ($cssforfield ? ' class="' . $cssforfield . '"' : '') . ' style="width:2%">';
 				if ($key == 'status') print $risk->getLibStatut(5);
-				elseif ($key == 'entity') { ?>
-					<?php
-					print getNomUrlEntity($risk, 1, '');
-				} elseif ($key == 'fk_element') { ?>
+				elseif ($key == 'fk_element') { ?>
 					<?php $parent_element = new DigiriskElement($db);
 					$result               = $parent_element->fetch($risk->fk_element);
 					if ($result > 0) {
@@ -740,15 +419,6 @@
 					?>
 					<div class="risk-container" value="<?php echo $risk->id ?>">
 						<div><i class="fas fa-exclamation-triangle"></i><?php echo ' ' . $risk->ref; ?></div>
-						<?php if ($permissiontoadd) : ?>
-							<div class="risk-unlink-shared wpeo-button button-square-40 button-primary wpeo-tooltip-event" aria-label="<?php echo $langs->trans('UnlinkSharedRisk') ?>" value="<?php echo $risk->id;?>">
-								<i class="fas fa-unlink button-icon"></i>
-							</div>
-						<?php else : ?>
-							<div class="wpeo-button button-square-40 button-grey wpeo-tooltip-event" aria-label="<?php echo $langs->trans('PermissionDenied') ?>" value="<?php echo $risk->id;?>">
-								<i class="fas fa-unlink button-icon"></i>
-							</div>
-						<?php endif; ?>
 					</div>
 					<?php
 				} elseif ($key == 'description') {
