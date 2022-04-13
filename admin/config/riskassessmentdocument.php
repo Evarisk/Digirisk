@@ -226,17 +226,6 @@ print '</td>';
 print '</tr>';
 
 print '<tr class="oddeven"><td>';
-print $langs->trans('ShowParentRisks');
-print "</td><td>";
-print $langs->trans('ShowParentRisksDescription');
-print '</td>';
-
-print '<td class="center">';
-print ajax_constantonoff('DIGIRISKDOLIBARR_SHOW_PARENT_RISKS');
-print '</td>';
-print '</tr>';
-
-print '<tr class="oddeven"><td>';
 print $langs->trans('MoveRisks');
 print "</td><td>";
 print $langs->trans('MoveRisksDescription');
@@ -266,6 +255,28 @@ print '</td>';
 
 print '<td class="center">';
 print ajax_constantonoff('DIGIRISKDOLIBARR_RISK_DESCRIPTION_PREFILL');
+print '</td>';
+print '</tr>';
+
+print '<tr class="oddeven"><td>';
+print $langs->trans('ShowRisks');
+print "</td><td>";
+print $langs->trans('ShowRisksDescription');
+print '</td>';
+
+print '<td class="center">';
+print ajax_constantonoff('DIGIRISKDOLIBARR_SHOW_RISKS');
+print '</td>';
+print '</tr>';
+
+print '<tr class="oddeven"><td>';
+print $langs->trans('ShowInheritedRisks');
+print "</td><td>";
+print $langs->trans('ShowInheritedRisksDescription');
+print '</td>';
+
+print '<td class="center">';
+print ajax_constantonoff('DIGIRISKDOLIBARR_SHOW_INHERITED_RISKS');
 print '</td>';
 print '</tr>';
 

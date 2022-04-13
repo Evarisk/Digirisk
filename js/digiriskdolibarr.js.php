@@ -1592,7 +1592,6 @@ window.eoxiaJS.risk.event = function() {
 	$( document ).on( 'click', '.risk-create:not(.button-disable)', window.eoxiaJS.risk.createRisk );
 	$( document ).on( 'click', '.risk-save', window.eoxiaJS.risk.saveRisk );
 	$( document ).on( 'click', '.risk-unlink-shared', window.eoxiaJS.risk.unlinkSharedRisk );
-	$( document ).on( 'click', '.show-shared-risks, .show-inherited-risks, .show-risks', window.eoxiaJS.risk.ShowRiskList );
 };
 
 /**
@@ -1882,30 +1881,6 @@ window.eoxiaJS.risk.unlinkSharedRisk = function ( event ) {
 			actionContainerError.removeClass('hidden');
 		}
 	});
-};
-
-/**
- * Action save risk.
- *
- * @since   1.0.0
- * @version 9.0.0
- *
- * @return {void}
- */
-window.eoxiaJS.risk.ShowRiskList = function ( event ) {
-	//let element = $(this).closest('.tabBar').find('.test')
-	//let sharedRisk = ''
-	//if (element.hasClass('show-shared-risk')) {
-	//	sharedRisk = 0
-	//	element.fadeOut(800);
-	//	element.toggleClass('show-shared-risk').toggleClass('hide-shared-risk');
-	//} else if (element.hasClass('hide-shared-risk')) {
-	//	sharedRisk = 1
-	//	element.toggleClass('hide-shared-risk').toggleClass('show-shared-risk');
-	//	element.fadeIn(800);
-	//}
-
-	window.location.reload();
 };
 
 /**

@@ -1033,8 +1033,6 @@ AddRisk = Ajouter un risque
 NoDescriptionThere = Aucune description renseignée sur ce risque
 NoRiskThere = "Aucun risque spécifique sur cette unité" Cependant vous pouvez être soumis aux risques génériques de vos groupements de travail.
 fk_risk = Risque lié
-ShowParentRisks = Risques hérités
-ShowParentRisksDescription = Afficher les risques hérités dans les fiches d'unité et de groupement
 MoveRisk = Déplacer le risque
 MoveRisks = Déplacer les risques
 MoveRisksDescription = Permet de déplacer les risques d'un groupement ou d'une unité de travail à un(e) autre
@@ -1058,7 +1056,9 @@ HasBeenUnlinkSharedM =  a été délié
 HasNotBeenUnlinkSharedM = n'a pas été délié
 RiskSharedTooltip = Cette option permet de partager les risques. <br> INFO : Si vous souhaitez pouvoir afficher les tâches, il faut activer l'option de partage des projets.
 ShowInheritedRisks = Risques hérités
+ShowInheritedRisksDescription = Afficher les risques hérités dans les documents et les listings
 ShowRisks = Risques
+ShowRisksDescription = Afficher les risques dans les documents et les listings
 DigiriskElementInheritedRisksList Liste des risques hérités
 ConfirmImportSharedRisks = Veuillez choisir les risques partagés à importer
 

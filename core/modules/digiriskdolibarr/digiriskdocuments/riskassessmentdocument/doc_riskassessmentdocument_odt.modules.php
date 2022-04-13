@@ -363,7 +363,7 @@ class doc_riskassessmentdocument_odt extends ModeleODTRiskAssessmentDocument
 					$digiriskelementobject = new DigiriskElement($this->db);
 					$digiriskelementlist   = $digiriskelementobject->fetchDigiriskElementFlat(0);
 					$risk                  = new Risk($this->db);
-					$risks                 = $risk->fetchRisksOrderedByCotation(0, true, $conf->global->DIGIRISKDOLIBARR_SHOW_PARENT_RISKS, $conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS);
+					$risks                 = $risk->fetchRisksOrderedByCotation(0, true, $conf->global->DIGIRISKDOLIBARR_SHOW_INHERITED_RISKS, $conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS);
 
 					if ( ! empty($digiriskelementlist) ) {
 						$listlines = $odfHandler->setSegment('elementParHierarchie');

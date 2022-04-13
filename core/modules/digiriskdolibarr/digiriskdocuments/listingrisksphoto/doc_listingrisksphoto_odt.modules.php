@@ -363,7 +363,7 @@ class doc_listingrisksphoto_odt extends ModeleODTListingRisksPhoto
 				if ($foundtagforlines) {
 					$risk = new Risk($this->db);
 					if ( ! empty($digiriskelement) ) {
-						$risks = $risk->fetchRisksOrderedByCotation($digiriskelement->id, true, $conf->global->DIGIRISKDOLIBARR_SHOW_PARENT_RISKS, $conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS);
+						$risks = $risk->fetchRisksOrderedByCotation($digiriskelement->id, true, $conf->global->DIGIRISKDOLIBARR_SHOW_INHERITED_RISKS, $conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS);
 						if ($risks < 1) {
 							$risks = array();
 						}
@@ -449,7 +449,7 @@ class doc_listingrisksphoto_odt extends ModeleODTListingRisksPhoto
 							$odfHandler->mergeSegment($listlines);
 						}
 					} else {
-						$risks = $risk->fetchRisksOrderedByCotation(0, true, $conf->global->DIGIRISKDOLIBARR_SHOW_PARENT_RISKS, $conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS);
+						$risks = $risk->fetchRisksOrderedByCotation(0, true, $conf->global->DIGIRISKDOLIBARR_SHOW_INHERITED_RISKS, $conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS);
 						if ($risks < 1) {
 							$risks = array();
 						}

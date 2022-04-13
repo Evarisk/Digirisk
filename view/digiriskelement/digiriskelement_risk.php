@@ -310,16 +310,7 @@ if ($object->id > 0) {
 
 	// Buttons for actions
 	print '<div class="tabsAction" >';
-	print '<span id="actionButtonShowSharedRisks" class="show-shared-risks">' . $langs->trans("ShowSharedRisks");
-	print ajax_constantonoff('DIGIRISKDOLIBARR_SHOW_SHARED_RISKS');
-	print '</span>';
-	print '<span id="actionButtonShowInheritedRisks" class="show-inherited-risks">' . $langs->trans("ShowInheritedRisks");
-	print ajax_constantonoff('DIGIRISKDOLIBARR_SHOW_INHERITED_RISKS');
-	print '</span>';
-	print '<span id="actionButtonShowRisks" class="show-risks">' . $langs->trans("ShowRisks");
-	print ajax_constantonoff('DIGIRISKDOLIBARR_SHOW_RISKS');
-	print '</span>';
-	if ($permissiontoadd) {
+	if ($permissiontoadd && !empty($conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS)) {
 		print '<span class="butAction" id="actionButtonImportSharedRisks" title="" href="' . $_SERVER["PHP_SELF"] . '?id=' . $object->id . '&action=import_shared_risks' . '">' . $langs->trans("ImportSharedRisks") . '</span>';
 	}
 	print '</div>';

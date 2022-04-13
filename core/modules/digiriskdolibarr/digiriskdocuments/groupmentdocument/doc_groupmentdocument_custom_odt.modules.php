@@ -362,7 +362,7 @@ class doc_groupmentdocument_custom_odt extends ModeleODTGroupmentDocument
 				if ($foundtagforlines) {
 					$risk = new Risk($this->db);
 					if ( ! empty($object) ) {
-						$risks = $risk->fetchRisksOrderedByCotation($object->id, false, $conf->global->DIGIRISKDOLIBARR_SHOW_PARENT_RISKS, $conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS);
+						$risks = $risk->fetchRisksOrderedByCotation($object->id, false, $conf->global->DIGIRISKDOLIBARR_SHOW_INHERITED_RISKS, $conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS);
 						if ($risks < 1) {
 							$risks = array();
 						}
