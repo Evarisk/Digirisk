@@ -41,13 +41,6 @@ function digiriskelementPrepareHead($object)
 			$head[$h][1] = '<i class="fas fa-exclamation-triangle"></i> ' . $langs->trans("Risks");
 			$head[$h][2] = 'elementRisk';
 			$h++;
-
-			if (!empty($conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS)) {
-				$head[$h][0] = dol_buildpath("/digiriskdolibarr/view/digiriskelement/digiriskelement_risk.php", 1) . '?id=' . $object->id . '&sharedrisks=' . 1;
-				$head[$h][1] = '<i class="fas fa-exclamation-triangle"></i> ' . $langs->trans("SharedRisks");
-				$head[$h][2] = 'elementSharedRisk';
-				$h++;
-			}
 		}
 
 		if ($user->rights->digiriskdolibarr->evaluator->read) {

@@ -62,21 +62,22 @@ global $conf, $db, $hookmanager, $langs, $user;
 $langs->loadLangs(array("digiriskdolibarr@digiriskdolibarr", "other"));
 
 // Get parameters
-$id          = GETPOST('id', 'int');
-$action      = GETPOST('action', 'aZ09');
-$massaction  = GETPOST('massaction', 'alpha'); // The bulk action (combo box choice into lists)
-$confirm     = GETPOST('confirm', 'alpha');
-$cancel      = GETPOST('cancel', 'aZ09');
-$contextpage = GETPOST('contextpage', 'aZ') ? GETPOST('contextpage', 'aZ') : 'riskcard'; // To manage different context of search
-$backtopage  = GETPOST('backtopage', 'alpha');
-$toselect    = GETPOST('toselect', 'array'); // Array of ids of elements selected into a list
-$limit       = GETPOST('limit', 'int') ? GETPOST('limit', 'int') : $conf->liste_limit;
-$sortfield   = GETPOST('sortfield', 'alpha');
-$sortorder   = GETPOST('sortorder', 'alpha');
-$sharedrisks = GETPOST('sharedrisks', 'int');
-$page        = GETPOSTISSET('pageplusone') ? (GETPOST('pageplusone') - 1) : GETPOST("page", 'int');
-$page        = is_numeric($page) ? $page : 0;
-$page        = $page == -1 ? 0 : $page;
+$id             = GETPOST('id', 'int');
+$action         = GETPOST('action', 'aZ09');
+$massaction     = GETPOST('massaction', 'alpha'); // The bulk action (combo box choice into lists)
+$confirm        = GETPOST('confirm', 'alpha');
+$cancel         = GETPOST('cancel', 'aZ09');
+$contextpage    = GETPOST('contextpage', 'aZ') ? GETPOST('contextpage', 'aZ') : 'riskcard'; // To manage different context of search
+$backtopage     = GETPOST('backtopage', 'alpha');
+$toselect       = GETPOST('toselect', 'array'); // Array of ids of elements selected into a list
+$limit          = GETPOST('limit', 'int') ? GETPOST('limit', 'int') : $conf->liste_limit;
+$sortfield      = GETPOST('sortfield', 'alpha');
+$sortorder      = GETPOST('sortorder', 'alpha');
+$sharedrisks    = GETPOST('sharedrisks', 'int') ? GETPOST('sharedrisks', 'int') : $conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS;
+$inheritedrisks = GETPOST('inheritedrisks', 'int') ? GETPOST('inheritedrisks', 'int') : $conf->global->DIGIRISKDOLIBARR_SHOW_INHERITED_RISKS;
+$page           = GETPOSTISSET('pageplusone') ? (GETPOST('pageplusone') - 1) : GETPOST("page", 'int');
+$page           = is_numeric($page) ? $page : 0;
+$page           = $page == -1 ? 0 : $page;
 
 // Initialize technical objects
 $object           = new DigiriskElement($db);
@@ -193,7 +194,7 @@ if (empty($reshook)) {
 
 	$error = 0;
 
-	$backtopage = dol_buildpath('/digiriskdolibarr/view/digiriskelement/digiriskelement_risk.php', 1) . '?id=' . ($id > 0 ? $id : '__ID__') . ($contextpage == 'sharedrisk' ? '&sharedrisks=' . 1 : '');
+	$backtopage = dol_buildpath('/digiriskdolibarr/view/digiriskelement/digiriskelement_risk.php', 1) . '?id=' . ($id > 0 ? $id : '__ID__');
 
 	require_once './../../core/tpl/digiriskdolibarr_risk_actions.tpl.php';
 }
@@ -203,14 +204,7 @@ if (empty($reshook)) {
  */
 
 $form = new Form($db);
-if ($sharedrisks) {
-	$title = $langs->trans("DigiriskElementSharedRisk");
-	$tab   = 'elementSharedRisk';
-	$contextpage = 'sharedrisk';
-} else {
-	$title = $langs->trans("DigiriskElementRisk");
-	$tab   = 'elementRisk';
-}
+$title    = $langs->trans("DigiriskElementRisk");
 $help_url = 'FR:Module_DigiriskDolibarr#Risques';
 $morejs   = array("/digiriskdolibarr/js/digiriskdolibarr.js.php");
 $morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");
@@ -239,7 +233,7 @@ if ($sharedrisks) {
 		$allrisks = $risk->fetchAll('', '', 0, 0, array('customsql' => 'status > 0 AND entity NOT IN (' . $conf->entity . ')'));
 
 		$formquestionimportsharedrisks = array(
-			'text' => $langs->trans("ConfirmImportSharedRisks"),
+			'text' => '<i class="fas fa-circle-info"></i>' . $langs->trans("ConfirmImportSharedRisks"),
 		);
 
 		foreach ($allrisks as $key => $risks) {
@@ -248,13 +242,32 @@ if ($sharedrisks) {
 			$digiriskelementtmp->fetchObjectLinked($risks->id, 'digiriskdolibarr_risk', $object->id, 'digiriskdolibarr_digiriskelement', 'AND', 1, 'sourcetype', 0);
 			$alreadyImported = !empty($digiriskelementtmp->linkedObjectsIds) ? 1 : 0;
 			$nameEntity = dolibarr_get_const($db, 'MAIN_INFO_SOCIETE_NOM', $risks->entity);
-			if ($alreadyImported > 0) {
-				$formquestionimportsharedrisks[] = array('type' => 'checkbox', 'name' => 'import_shared_risks' . '_S' . $risks->entity . '_' . $digiriskelementtmp->ref . '_' . $risks->ref, 'label' => 'S' . $risks->entity . ' - ' . $nameEntity . ' - ' . $digiriskelementtmp->ref . ' - ' . $risks->ref . ' ' . $langs->trans('AlreadyImported'), 'value' => 0, 'disabled' => 1);
+
+			$pathToThumb = DOL_URL_ROOT . '/viewimage.php?modulepart=digiriskdolibarr&entity=' . $risks->entity . '&file=' . urlencode($digiriskelementtmp->element_type . '/' . $digiriskelementtmp->ref . '/thumbs/');
+			$filearray   = dol_dir_list($conf->digiriskdolibarr->multidir_output[$risks->entity] . '/' . $digiriskelementtmp->element_type . '/' . $digiriskelementtmp->ref . '/', "files", 0, '', '(\.odt|_preview.*\.png)$', 'position_name', 'asc', 1);
+			if (count($filearray)) {
+				$photoDigiriskElement = '<span class="floatleft inline-block valignmiddle divphotoref open-medias-linked modal-open digirisk-element digirisk-element-' . $digiriskelementtmp->id . '" value="' . $digiriskelementtmp->id . '">';
+				$photoDigiriskElement .= '<img width="50" height="50" class="photo clicked-photo-preview" src="' . DOL_URL_ROOT . '/viewimage.php?modulepart=digiriskdolibarr&entity=' . $conf->entity . '&file=' . urlencode($digiriskelementtmp->element_type . '/' . $digiriskelementtmp->ref . '/thumbs/' . preg_replace('/\./', '_small.', $digiriskelementtmp->photo)) . '" >';
+				$photoDigiriskElement .= '<input type="hidden" class="filepath-to-digiriskelement" value="' . $pathToThumb . '"/>';
+				$photoDigiriskElement .= '</span>';
 			} else {
-				$formquestionimportsharedrisks[] = array('type' => 'checkbox', 'name' => 'import_shared_risks' . '_S' . $risks->entity . '_' . $digiriskelementtmp->ref . '_' . $risks->ref, 'label' => 'S' . $risks->entity . ' - ' . $nameEntity . ' - ' . $digiriskelementtmp->ref . ' - ' . $risks->ref, 'value' => 1);
+				$nophoto = '/public/theme/common/nophoto.png';
+				$photoDigiriskElement = '<div class="open-media-gallery modal-open digiriskelement digirisk-element-<?php echo $digiriskelementtmp->id ?>" value="<?php  echo $digiriskelementtmp->id ?>">';
+				$photoDigiriskElement .= '<input type="hidden" class="type-from" value="digiriskelement"/>';
+				$photoDigiriskElement .= '<input type="hidden" class="filepath-to-digiriskelement" value="<?php echo $pathToThumb ?>"/>';
+				$photoDigiriskElement .= '<span class="floatleft inline-block valignmiddle divphotoref"><img width="50" height="50" class="photo photowithmargin clicked-photo-preview" alt="No photo" src=' . DOL_URL_ROOT . $nophoto . '></span>';
+				$photoDigiriskElement .= '</div>';
+			}
+
+			$photoRisk = '<img class="danger-category-pic hover" src=' . DOL_URL_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $risk->get_danger_category($risk) . '.png' . '>';
+
+			if ($alreadyImported > 0) {
+				$formquestionimportsharedrisks[] = array('type' => 'checkbox', 'name' => 'import_shared_risks' . '_S' . $risks->entity . '_' . $digiriskelementtmp->ref . '_' . $risks->ref, 'label' => 'S' . $risks->entity . ' - ' . $nameEntity . ' - ' . $photoDigiriskElement . $digiriskelementtmp->ref . ' - ' . $digiriskelementtmp->label . ' - ' . $photoRisk . $risks->ref . ' ' . $langs->trans('AlreadyImported'), 'value' => 0, 'disabled' => 1);
+			} else {
+				$formquestionimportsharedrisks[] = array('type' => 'checkbox', 'name' => 'import_shared_risks' . '_S' . $risks->entity . '_' . $digiriskelementtmp->ref . '_' . $risks->ref, 'label' => 'S' . $risks->entity . ' - ' . $nameEntity . ' - ' . $photoDigiriskElement . $digiriskelementtmp->ref . ' - ' . $digiriskelementtmp->label . ' - ' . $photoRisk . $risks->ref, 'value' => 1);
 			}
 		}
-		$formconfirm .= $form->formconfirm($_SERVER["PHP_SELF"] . '?id=' . $object->id, $langs->trans('ImportSharedRisks'), $langs->trans('ImportSharedRisks', $object->ref), 'confirm_import_shared_risks', $formquestionimportsharedrisks, 'yes', 'actionButtonImportSharedRisks', 350, 600);
+		$formconfirm .= $form->formconfirm($_SERVER["PHP_SELF"] . '?id=' . $object->id, $langs->trans('ImportSharedRisks'), '', 'confirm_import_shared_risks', $formquestionimportsharedrisks, 'yes', 'actionButtonImportSharedRisks', 350, 600);
 	}
 
 	// Call Hook formConfirm
@@ -271,7 +284,7 @@ if ($object->id > 0) {
 	$res = $object->fetch_optionals();
 
 	$head = digiriskelementPrepareHead($object);
-	dol_fiche_head($head, $tab, $title, -1, "digiriskdolibarr@digiriskdolibarr");
+	dol_fiche_head($head, 'elementRisk', $title, -1, "digiriskdolibarr@digiriskdolibarr");
 
 	// Object card
 	// ------------------------------------------------------------
@@ -294,16 +307,34 @@ if ($object->id > 0) {
 	$morehtmlleft = '<div class="floatleft inline-block valignmiddle divphotoref">' . digirisk_show_photos('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/' . $object->element_type, 'small', 5, 0, 0, 0, $height, $width, 0, 0, 0, $object->element_type, $object) . '</div>';
 	digirisk_banner_tab($object, 'ref', '', 0, 'ref', 'ref', $morehtmlref, '', 0, $morehtmlleft);
 
-	if (!empty($conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS) && $sharedrisks) {
-		// Buttons for actions
-		print '<div class="tabsAction" >';
-		if ($permissiontoadd) {
-			print '<span class="butAction" id="actionButtonImportSharedRisks" title="" href="' . $_SERVER["PHP_SELF"] . '?id=' . $object->id  . '&sharedrisks=' . 1 . '&action=import_shared_risks' . '">' . $langs->trans("ImportSharedRisks") . '</span>';
-		}
-		print '</div>';
+	// Buttons for actions
+	print '<div class="tabsAction" >';
+	print '<span id="actionButtonShowSharedRisks" class="show-shared-risks">' . $langs->trans("ShowSharedRisks");
+	print ajax_constantonoff('DIGIRISKDOLIBARR_SHOW_SHARED_RISKS');
+	print '</span>';
+	print '<span id="actionButtonShowInheritedRisks" class="show-inherited-risks">' . $langs->trans("ShowInheritedRisks");
+	print ajax_constantonoff('DIGIRISKDOLIBARR_SHOW_INHERITED_RISKS');
+	print '</span>';
+	print '<span id="actionButtonShowRisks" class="show-risks">' . $langs->trans("ShowRisks");
+	print ajax_constantonoff('DIGIRISKDOLIBARR_SHOW_RISKS');
+	print '</span>';
+	if ($permissiontoadd) {
+		print '<span class="butAction" id="actionButtonImportSharedRisks" title="" href="' . $_SERVER["PHP_SELF"] . '?id=' . $object->id . '&action=import_shared_risks' . '">' . $langs->trans("ImportSharedRisks") . '</span>';
+	}
+	print '</div>';
 
+	if (!empty($conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS)) {
+		$contextpage = 'sharedrisk';
 		require_once './../../core/tpl/digiriskdolibarr_sharedrisklist_view.tpl.php';
-	} else {
+	}
+
+	if (!empty($conf->global->DIGIRISKDOLIBARR_SHOW_INHERITED_RISKS)) {
+		$contextpage = 'inheritedrisk';
+		require_once './../../core/tpl/digiriskdolibarr_inheritedrisklist_view.tpl.php';
+	}
+
+	if (!empty($conf->global->DIGIRISKDOLIBARR_SHOW_RISKS)) {
+		$contextpage = 'riskcard';
 		require_once './../../core/tpl/digiriskdolibarr_risklist_view.tpl.php';
 	}
 }
