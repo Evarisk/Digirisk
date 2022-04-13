@@ -1,4 +1,4 @@
-cd ../../workflow/phpdocumentor/phpdocumentor
+cd ../../digirisk-workflow/phpdocumentor/phpdocumentor
 composer install
 cd ../../bin
 ./phpdoc -d "..\..\class" -t "..\..\docs"

@@ -1,4 +1,4 @@
-cd workflow/bin/
+cd digirisk-workflow/bin/
 ./phpcbf ../../admin
 ./phpcbf ../../class
 ./phpcbf ../../core
