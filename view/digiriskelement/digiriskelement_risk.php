@@ -243,28 +243,29 @@ if ($sharedrisks) {
 			$alreadyImported = !empty($digiriskelementtmp->linkedObjectsIds) ? 1 : 0;
 			$nameEntity = dolibarr_get_const($db, 'MAIN_INFO_SOCIETE_NOM', $risks->entity);
 
-			$pathToThumb = DOL_URL_ROOT . '/viewimage.php?modulepart=digiriskdolibarr&entity=' . $risks->entity . '&file=' . urlencode($digiriskelementtmp->element_type . '/' . $digiriskelementtmp->ref . '/thumbs/');
-			$filearray   = dol_dir_list($conf->digiriskdolibarr->multidir_output[$risks->entity] . '/' . $digiriskelementtmp->element_type . '/' . $digiriskelementtmp->ref . '/', "files", 0, '', '(\.odt|_preview.*\.png)$', 'position_name', 'asc', 1);
-			if (count($filearray)) {
-				$photoDigiriskElement = '<span class="floatleft inline-block valignmiddle divphotoref open-medias-linked modal-open digirisk-element digirisk-element-' . $digiriskelementtmp->id . '" value="' . $digiriskelementtmp->id . '">';
-				$photoDigiriskElement .= '<img width="50" height="50" class="photo clicked-photo-preview" src="' . DOL_URL_ROOT . '/viewimage.php?modulepart=digiriskdolibarr&entity=' . $conf->entity . '&file=' . urlencode($digiriskelementtmp->element_type . '/' . $digiriskelementtmp->ref . '/thumbs/' . preg_replace('/\./', '_small.', $digiriskelementtmp->photo)) . '" >';
-				$photoDigiriskElement .= '<input type="hidden" class="filepath-to-digiriskelement" value="' . $pathToThumb . '"/>';
-				$photoDigiriskElement .= '</span>';
-			} else {
-				$nophoto = '/public/theme/common/nophoto.png';
-				$photoDigiriskElement = '<div class="open-media-gallery modal-open digiriskelement digirisk-element-<?php echo $digiriskelementtmp->id ?>" value="<?php  echo $digiriskelementtmp->id ?>">';
-				$photoDigiriskElement .= '<input type="hidden" class="type-from" value="digiriskelement"/>';
-				$photoDigiriskElement .= '<input type="hidden" class="filepath-to-digiriskelement" value="<?php echo $pathToThumb ?>"/>';
-				$photoDigiriskElement .= '<span class="floatleft inline-block valignmiddle divphotoref"><img width="50" height="50" class="photo photowithmargin clicked-photo-preview" alt="No photo" src=' . DOL_URL_ROOT . $nophoto . '></span>';
-				$photoDigiriskElement .= '</div>';
-			}
+//			$pathToThumb = DOL_URL_ROOT . '/viewimage.php?modulepart=digiriskdolibarr&entity=' . $risks->entity . '&file=' . urlencode($digiriskelementtmp->element_type . '/' . $digiriskelementtmp->ref . '/thumbs/');
+//			$filearray   = dol_dir_list($conf->digiriskdolibarr->multidir_output[$risks->entity] . '/' . $digiriskelementtmp->element_type . '/' . $digiriskelementtmp->ref . '/', "files", 0, '', '(\.odt|_preview.*\.png)$', 'position_name', 'asc', 1);
+//
+//			if (count($filearray)) {
+//				$photoDigiriskElement = '<span class="floatleft inline-block valignmiddle divphotoref open-medias-linked modal-open digirisk-element digirisk-element-' . $digiriskelementtmp->id . '" value="' . $digiriskelementtmp->id . '">';
+//				$photoDigiriskElement .= '<img width="50" height="50" class="photo clicked-photo-preview" src="' . DOL_URL_ROOT . '/viewimage.php?modulepart=digiriskdolibarr&entity=' . $conf->entity . '&file=' . urlencode($digiriskelementtmp->element_type . '/' . $digiriskelementtmp->ref . '/thumbs/' . preg_replace('/\./', '_small.', $digiriskelementtmp->photo)) . '" >';
+//				$photoDigiriskElement .= '<input type="hidden" class="filepath-to-digiriskelement" value="' . $pathToThumb . '"/>';
+//				$photoDigiriskElement .= '</span>';
+//			} else {
+//				$nophoto = '/public/theme/common/nophoto.png';
+//				$photoDigiriskElement = '<div class="open-media-gallery modal-open digiriskelement digirisk-element-' . $digiriskelementtmp->id . '" value="'. $digiriskelementtmp->id . '">';
+//				$photoDigiriskElement .= '<input type="hidden" class="type-from" value="digiriskelement"/>';
+//				$photoDigiriskElement .= '<input type="hidden" class="filepath-to-digiriskelement" value="' . $pathToThumb . '"/>';
+//				$photoDigiriskElement .= '<span class="floatleft inline-block valignmiddle divphotoref"><img width="50" height="50" class="photo photowithmargin clicked-photo-preview" alt="No photo" src=' . DOL_URL_ROOT . $nophoto . '></span>';
+//				$photoDigiriskElement .= '</div>';
+//			}
 
 			$photoRisk = '<img class="danger-category-pic hover" src=' . DOL_URL_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $risk->get_danger_category($risk) . '.png' . '>';
 
 			if ($alreadyImported > 0) {
-				$formquestionimportsharedrisks[] = array('type' => 'checkbox', 'name' => 'import_shared_risks' . '_S' . $risks->entity . '_' . $digiriskelementtmp->ref . '_' . $risks->ref, 'label' => 'S' . $risks->entity . ' - ' . $nameEntity . ' - ' . $photoDigiriskElement . $digiriskelementtmp->ref . ' - ' . $digiriskelementtmp->label . ' - ' . $photoRisk . $risks->ref . ' ' . $langs->trans('AlreadyImported'), 'value' => 0, 'disabled' => 1);
+				$formquestionimportsharedrisks[] = array('type' => 'checkbox', 'name' => 'import_shared_risks' . '_S' . $risks->entity . '_' . $digiriskelementtmp->ref . '_' . $risks->ref, 'label' => 'S' . $risks->entity . ' - ' . dol_trunc($nameEntity, 32) . ' - ' . $digiriskelementtmp->ref . ' - ' . dol_trunc($digiriskelementtmp->label, 32) . ' - ' . $photoRisk . $risks->ref . ' - ' . dol_trunc($risks->description, 32) . ' ' . $langs->trans('AlreadyImported'), 'value' => 0, 'disabled' => 1);
 			} else {
-				$formquestionimportsharedrisks[] = array('type' => 'checkbox', 'name' => 'import_shared_risks' . '_S' . $risks->entity . '_' . $digiriskelementtmp->ref . '_' . $risks->ref, 'label' => 'S' . $risks->entity . ' - ' . $nameEntity . ' - ' . $photoDigiriskElement . $digiriskelementtmp->ref . ' - ' . $digiriskelementtmp->label . ' - ' . $photoRisk . $risks->ref, 'value' => 1);
+				$formquestionimportsharedrisks[] = array('type' => 'checkbox', 'name' => 'import_shared_risks' . '_S' . $risks->entity . '_' . $digiriskelementtmp->ref . '_' . $risks->ref, 'label' => 'S' . $risks->entity . ' - ' . dol_trunc($nameEntity, 32) . ' - ' . $digiriskelementtmp->ref . ' - ' . dol_trunc($digiriskelementtmp->label, 32) . ' - ' . $photoRisk . $risks->ref . ' - ' . dol_trunc($risks->description, 32), 'value' => 1);
 			}
 		}
 		$formconfirm .= $form->formconfirm($_SERVER["PHP_SELF"] . '?id=' . $object->id, $langs->trans('ImportSharedRisks'), '', 'confirm_import_shared_risks', $formquestionimportsharedrisks, 'yes', 'actionButtonImportSharedRisks', 350, 600);
