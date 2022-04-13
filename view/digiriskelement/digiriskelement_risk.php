@@ -324,9 +324,9 @@ if ($object->id > 0) {
 	}
 	print '</div>';
 
-	if (!empty($conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS)) {
-		$contextpage = 'sharedrisk';
-		require_once './../../core/tpl/digiriskdolibarr_sharedrisklist_view.tpl.php';
+	if (!empty($conf->global->DIGIRISKDOLIBARR_SHOW_RISKS)) {
+		$contextpage = 'riskcard';
+		require_once './../../core/tpl/digiriskdolibarr_risklist_view.tpl.php';
 	}
 
 	if (!empty($conf->global->DIGIRISKDOLIBARR_SHOW_INHERITED_RISKS)) {
@@ -334,9 +334,9 @@ if ($object->id > 0) {
 		require_once './../../core/tpl/digiriskdolibarr_inheritedrisklist_view.tpl.php';
 	}
 
-	if (!empty($conf->global->DIGIRISKDOLIBARR_SHOW_RISKS)) {
-		$contextpage = 'riskcard';
-		require_once './../../core/tpl/digiriskdolibarr_risklist_view.tpl.php';
+	if (!empty($conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS)) {
+		$contextpage = 'sharedrisk';
+		require_once './../../core/tpl/digiriskdolibarr_sharedrisklist_view.tpl.php';
 	}
 }
 
