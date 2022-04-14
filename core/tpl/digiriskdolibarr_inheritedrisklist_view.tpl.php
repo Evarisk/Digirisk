@@ -37,7 +37,17 @@
 		if ($risk->ismultientitymanaged == 1) $sql                                                                                                    .= " WHERE t.entity IN (" . getEntity($risk->element) . ")";
 		else $sql                                                                                                                                     .= " WHERE 1 = 1";
 		if ( ! $allRisks) {
-			$sql .= " AND fk_element = " . $risk->fk_element;
+			$inherited_risk_id = $object->fk_parent;
+			$sql .= " AND r.fk_element IN (" . $inherited_risk_id;
+			while ($inherited_risk_id > 0) {
+				$digiriskelementtmp = new DigiriskElement($db);
+				$digiriskelementtmp->fetch($inherited_risk_id);
+				$inherited_risk_id = $digiriskelementtmp->fk_parent;
+				if ($inherited_risk_id > 0) {
+					$sql .= ','. $inherited_risk_id;
+				}
+			}
+			$sql .= ")";
 		} else {
 			foreach ($trashList as $deleted_element => $element_id) {
 				$sql .= " AND fk_element !=" . $element_id;
@@ -133,7 +143,17 @@
 		else $sql                                                                                                                                                 .= " WHERE 1 = 1";
 		$sql                                                                                                                                                      .= " AND evaluation.status = 1";
 		if ( ! $allRisks) {
-			$sql .= " AND r.fk_element =" . $object->fk_parent;
+			$inherited_risk_id = $object->fk_parent;
+			$sql .= " AND r.fk_element IN (" . $inherited_risk_id;
+			while ($inherited_risk_id > 0) {
+				$digiriskelementtmp = new DigiriskElement($db);
+				$digiriskelementtmp->fetch($inherited_risk_id);
+				$inherited_risk_id = $digiriskelementtmp->fk_parent;
+				if ($inherited_risk_id > 0) {
+					$sql .= ','. $inherited_risk_id;
+				}
+			}
+			$sql .= ")";
 		} else {
 			foreach ($trashList as $deleted_element => $element_id) {
 				$sql .= " AND r.fk_element !=" . $element_id;
@@ -230,7 +250,7 @@
 	} ?>
 
 	<?php $title = $langs->trans('DigiriskElementInheritedRisksList');
-	print_barre_liste($title, $page, $_SERVER["PHP_SELF"], $param, $sortfield, $sortorder, $massactionbutton, $num, $nbtotalofrecords, 'digiriskdolibarr32px.png@digiriskdolibarr', 0, $newcardbutton, '', $limit, 0, 0, 1);
+	print_barre_liste($title, $page, $_SERVER["PHP_SELF"], $param, $sortfield, $sortorder, $massactionbutton, $num, $nbtotalofrecords, 'digiriskdolibarr32px.png@digiriskdolibarr', 0, '', '', $limit, 0, 0, 1);
 
 	include DOL_DOCUMENT_ROOT . '/core/tpl/massactions_pre.tpl.php';
 
