@@ -1709,7 +1709,7 @@ window.eoxiaJS.risk.createRisk = function ( event ) {
 	var task = taskText;
 
 	//Loader
-	window.eoxiaJS.loader.display($('.fichecenter'));
+	window.eoxiaJS.loader.display($('.fichecenter.risklist'));
 
 	$.ajax({
 		url: document.URL + '&action=add',
@@ -1734,12 +1734,12 @@ window.eoxiaJS.risk.createRisk = function ( event ) {
 		processData: false,
 		contentType: false,
 		success: function ( resp ) {
-			$('.fichecenter').html($(resp).find('#searchFormList'))
+			$('.fichecenter.risklist').html($(resp).find('#searchFormListRisks'))
 
 			let actionContainerSuccess = $('.messageSuccessRiskCreate')
 			actionContainerSuccess.html($(resp).find('.risk-create-success-notice'))
 			actionContainerSuccess.removeClass('hidden')
-			$('.fichecenter').removeClass('wpeo-loader');
+			$('.fichecenter.risklist').removeClass('wpeo-loader');
 		},
 		error: function ( resp ) {
 			let actionContainerError = $('.messageErrorRiskCreate');
@@ -1747,7 +1747,7 @@ window.eoxiaJS.risk.createRisk = function ( event ) {
 			actionContainerError.html($(resp).find('.risk-create-error-notice'));
 			actionContainerError.removeClass('hidden');
 
-			$('.fichecenter').removeClass('wpeo-loader');
+			$('.fichecenter.risklist').removeClass('wpeo-loader');
 		}
 	});
 
@@ -1781,7 +1781,7 @@ window.eoxiaJS.risk.saveRisk = function ( event ) {
 		newParent = newParent.split(/ /)[0];
 	}
 
-	let elementParent = $('.fichecenter').find('.div-table-responsive');
+	let elementParent = $('.fichecenter.risklist').find('.div-table-responsive');
 	//window.eoxiaJS.loader.display($(this));
 	if (riskCommentText) {
 		window.eoxiaJS.loader.display($(this).closest('.risk-row-content-' + editedRiskId).find('.risk-description-'+editedRiskId));
@@ -1840,7 +1840,7 @@ window.eoxiaJS.risk.saveRisk = function ( event ) {
 window.eoxiaJS.risk.unlinkSharedRisk = function ( event ) {
 	let riskId = $(this).attr('value');
 	//let elementRisk = $(this).closest('.risk-container').find('.risk-content');
-	let elementParent = $('.fichecenter').find('.div-table-responsive');
+	let elementParent = $('.fichecenter.risklist').find('.div-table-responsive');
 
 	window.eoxiaJS.loader.display($(this));
 
@@ -1856,7 +1856,7 @@ window.eoxiaJS.risk.unlinkSharedRisk = function ( event ) {
 		}),
 		contentType: false,
 		success: function ( resp ) {
-			$('.fichecenter').html($(resp).find('#searchFormList'))
+			$('.fichecenter.risklist').html($(resp).find('#searchFormListRisks'))
 			let actionContainerSuccess = $('.messageSuccessRiskUnlinkShared');
 
 			let textToShow = '';
@@ -2058,7 +2058,7 @@ window.eoxiaJS.evaluation.createEvaluation = function ( event ) {
 		processData: false,
 		contentType: false,
 		success: function( resp ) {
-			$('.fichecenter').html($(resp).find('#searchFormList'))
+			$('.fichecenter.risklist').html($(resp).find('#searchFormListRisks'))
 
 			let actionContainerSuccess = $('.messageSuccessEvaluationCreate');
 
@@ -2216,7 +2216,7 @@ window.eoxiaJS.evaluation.saveEvaluation = function ( event ) {
 				listModalContainer.find('.modal-content .risk-evaluations-list-content').html($(resp).find('.risk-evaluations-list-'+riskId))
 				$('.risk-evaluation-single-content-'+riskId).html($(resp).find('.risk-evaluation-single-'+riskId))
 			} else {
-				$('.fichecenter').html($(resp).find('#searchFormList'))
+				$('.fichecenter.risklist').html($(resp).find('#searchFormListRisks'))
 				$('#risk_row_' + riskId).fadeOut(800);
 				$('#risk_row_' + riskId).fadeIn(800);
 
@@ -2427,7 +2427,7 @@ window.eoxiaJS.riskassessmenttask.createRiskAssessmentTask = function ( event ) 
 		processData: false,
 		contentType: false,
 		success: function ( resp ) {
-			$('.fichecenter').html($(resp).find('#searchFormList'))
+			$('.fichecenter.risklist').html($(resp).find('#searchFormListRisks'))
 			let actionContainerSuccess = $('.messageSuccessTaskCreate');
 
 			$('.riskassessment-tasks' + riskToAssign).fadeOut(800);
@@ -2474,7 +2474,7 @@ window.eoxiaJS.riskassessmenttask.deleteRiskAssessmentTask = function ( event ) 
 			processData: false,
 			contentType: false,
 			success: function ( resp ) {
-				$('.fichecenter').html($(resp).find('#searchFormList'))
+				$('.fichecenter.risklist').html($(resp).find('#searchFormListRisks'))
 				let actionContainerSuccess = $('.messageSuccessTaskDelete');
 				$('.riskassessment-tasks' + riskId).fadeOut(800);
 				$('.riskassessment-tasks' + riskId).fadeIn(800);
@@ -2544,7 +2544,7 @@ window.eoxiaJS.riskassessmenttask.saveRiskAssessmentTask = function ( event ) {
 		processData: false,
 		contentType: false,
 		success: function ( resp ) {
-			$('.fichecenter').html($(resp).find('#searchFormList'))
+			$('.fichecenter.risklist').html($(resp).find('#searchFormListRisks'))
 			let actionContainerSuccess = $('.messageSuccessTaskEdit');
 			$('.riskassessment-tasks' + riskId).fadeOut(800);
 			$('.riskassessment-tasks' + riskId).fadeIn(800);
@@ -2664,7 +2664,7 @@ window.eoxiaJS.riskassessmenttask.deleteRiskAssessmentTaskTimeSpent = function (
 			processData: false,
 			contentType: false,
 			success: function ( resp ) {
-				$('.fichecenter').html($(resp).find('#searchFormList'))
+				$('.fichecenter.risklist').html($(resp).find('#searchFormListRisks'))
 				let actionContainerSuccess = $('.messageSuccessTaskTimeSpentDelete');
 				$('.riskassessment-tasks' + riskId).fadeOut(800);
 				$('.riskassessment-tasks' + riskId).fadeIn(800);
@@ -2737,7 +2737,7 @@ window.eoxiaJS.riskassessmenttask.saveRiskAssessmentTaskTimeSpent = function ( e
 		processData: false,
 		contentType: false,
 		success: function ( resp ) {
-			$('.fichecenter').html($(resp).find('#searchFormList'))
+			$('.fichecenter.risklist').html($(resp).find('#searchFormListRisks'))
 			let actionContainerSuccess = $('.messageSuccessTaskTimeSpentEdit');
 			$('.riskassessment-tasks' + riskId).fadeOut(800);
 			$('.riskassessment-tasks' + riskId).fadeIn(800);
@@ -2800,7 +2800,7 @@ window.eoxiaJS.riskassessmenttask.checkTaskProgress = function ( event ) {
 		processData: false,
 		contentType: false,
 		success: function ( resp ) {
-			$('.fichecenter').html($(resp).find('#searchFormList'))
+			$('.fichecenter.risklist').html($(resp).find('#searchFormListRisks'))
 			let actionContainerSuccess = $('.messageSuccessTaskEdit');
 			$('.riskassessment-tasks' + riskId).fadeOut(800);
 			$('.riskassessment-tasks' + riskId).fadeIn(800);
@@ -2947,7 +2947,7 @@ window.eoxiaJS.risksign.createRiskSign = function ( event ) {
 	var category = elementRiskSign.find('.risksign-category input').val();
 	var description = elementRiskSign.find('.risksign-description textarea').val();
 
-	window.eoxiaJS.loader.display($('.fichecenter'));
+	window.eoxiaJS.loader.display($('.fichecenter.risklist'));
 
 	$.ajax({
 		url: document.URL + '&action=add',
@@ -2959,11 +2959,11 @@ window.eoxiaJS.risksign.createRiskSign = function ( event ) {
 		processData: false,
 		contentType: false,
 		success: function ( resp ) {
-			$('.fichecenter').html($(resp).find('#searchFormList'))
+			$('.fichecenter.risklist').html($(resp).find('#searchFormListRisks'))
 
 			let actionContainerSuccess = $('.messageSuccessRiskSignCreate');
 
-			$('.fichecenter').removeClass('wpeo-loader');
+			$('.fichecenter.risklist').removeClass('wpeo-loader');
 
 			actionContainerSuccess.html($(resp).find('.risksign-create-success-notice'))
 			actionContainerSuccess.removeClass('hidden');
@@ -3007,7 +3007,7 @@ window.eoxiaJS.risksign.saveRiskSign = function ( event ) {
 		processData: false,
 		contentType: false,
 		success: function ( resp ) {
-			$('.fichecenter').html($(resp).find('#searchFormList'))
+			$('.fichecenter.risklist').html($(resp).find('#searchFormListRisks'))
 
 			let actionContainerSuccess = $('.messageSuccessRiskSignEdit');
 
@@ -3113,7 +3113,7 @@ window.eoxiaJS.evaluator.createEvaluator = function ( event ) {
 		processData: false,
 		contentType: false,
 		success: function ( resp ) {
-			$('.fichecenter').html($(resp).find('#searchFormList'))
+			$('.fichecenter.risklist').html($(resp).find('#searchFormListRisks'))
 
 			let actionContainerSuccess = $('.messageSuccessEvaluatorCreate');
 
