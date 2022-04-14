@@ -16,8 +16,7 @@ if ( ! empty($allRiskAssessment) && $allRiskAssessment > 0) :
 					<i class="fas fa-plus"></i> <?php echo $langs->trans('RiskAssessmentList'); ?>
 				</div>
 			<?php endif; ?>
-
-			<?php if ($contextpage != 'sharedrisk') : ?>
+			<?php if ($contextpage != 'sharedrisk' && $contextpage != 'inheritedrisk') : ?>
 				<?php if ($permissiontoadd) : ?>
 					<div class="risk-evaluation-add risk-evaluation-button wpeo-button button-square-40 button-primary wpeo-tooltip-event modal-open" aria-label="<?php echo $langs->trans('AddRiskAssessment') ?>" value="<?php echo $risk->id;?>">
 						<i class="fas fa-plus button-icon"></i>
@@ -65,7 +64,7 @@ if ( ! empty($allRiskAssessment) && $allRiskAssessment > 0) :
 							</div>
 						</div>
 						<!-- BUTTON MODAL RISK EVALUATION ADD  -->
-						<?php if ($contextpage != 'sharedrisk') : ?>
+						<?php if ($contextpage != 'sharedrisk' && $contextpage != 'inheritedrisk') : ?>
 							<?php if ($permissiontoadd) : ?>
 								<div class="risk-evaluation-edit risk-evaluation-button wpeo-button button-square-40 button-transparent wpeo-tooltip-event modal-open" aria-label="<?php echo $langs->trans('EditRiskAssessment') ?>" value="<?php echo $lastEvaluation->id;?>">
 									<i class="fas fa-pencil-alt button-icon"></i>
@@ -388,7 +387,7 @@ if ( ! empty($allRiskAssessment) && $allRiskAssessment > 0) :
 														</div>
 													</div>
 													<!-- BUTTON MODAL RISK EVALUATION EDIT  -->
-													<?php if ($contextpage != 'sharedrisk') : ?>
+													<?php if ($contextpage != 'sharedrisk' && $contextpage != 'inheritedrisk') : ?>
 														<div class="risk-evaluation-actions wpeo-gridlayout grid-2 grid-gap-0">
 															<?php if ($permissiontoadd) : ?>
 																<div class="risk-evaluation-edit wpeo-button button-square-50 button-grey modal-open" value="<?php echo $cotation->id ?>">
@@ -462,7 +461,7 @@ if ( ! empty($allRiskAssessment) && $allRiskAssessment > 0) :
 						 </div>
 					 </div>
 					 <!-- BUTTON MODAL RISK EVALUATION ADD  -->
-					<?php if ($contextpage != 'sharedrisk') : ?>
+					<?php if ($contextpage != 'sharedrisk' && $contextpage != 'inheritedrisk') : ?>
 						 <?php if ($permissiontoadd) : ?>
 							 <div class="risk-evaluation-edit risk-evaluation-button wpeo-button button-square-40 button-transparent wpeo-tooltip-event modal-open" aria-label="<?php echo $langs->trans('EditRiskAssessment') ?>" value="<?php echo $lastEvaluation->id;?>">
 								 <i class="fas fa-pencil-alt button-icon"></i>
@@ -785,7 +784,7 @@ if ( ! empty($allRiskAssessment) && $allRiskAssessment > 0) :
 													 </div>
 												 </div>
 												 <!-- BUTTON MODAL RISK EVALUATION EDIT  -->
-												 <?php if ($contextpage != 'sharedrisk') : ?>
+												 <?php if ($contextpage != 'sharedrisk' && $contextpage != 'inheritedrisk') : ?>
 													 <div class="risk-evaluation-actions wpeo-gridlayout grid-2 grid-gap-0">
 															<?php if ($permissiontoadd) : ?>
 																 <div class="risk-evaluation-edit wpeo-button button-square-50 button-grey modal-open" value="<?php echo $cotation->id ?>">
@@ -839,7 +838,7 @@ else : ?>
 			</div>
 		<?php endif; ?>
 
-		<?php if ($contextpage != 'sharedrisk') : ?>
+		<?php if ($contextpage != 'sharedrisk' && $contextpage != 'inheritedrisk') : ?>
 			<?php if ($permissiontoadd) : ?>
 				<div class="risk-evaluation-add risk-evaluation-button wpeo-button button-square-40 button-primary wpeo-tooltip-event modal-open" aria-label="<?php echo $langs->trans('AddRiskAssessment') ?>" value="<?php echo $risk->id;?>">
 					<i class="fas fa-plus button-icon"></i>
@@ -860,7 +859,7 @@ else : ?>
 					<span class="name"><?php echo $langs->trans('NoRiskAssessment'); ?></span>
 				</div>
 			</div>
-			<?php if ($contextpage != 'sharedrisk') : ?>
+			<?php if ($contextpage != 'sharedrisk' && $contextpage != 'inheritedrisk') : ?>
 				<?php if ($permissiontoadd) : ?>
 					<div class="risk-evaluation-add wpeo-button button-square-40 button-primary wpeo-tooltip-event modal-open" aria-label="<?php echo $langs->trans('AddRiskAssessment') ?>" value="<?php echo $risk->id ?>">
 						<i class="fas fa-plus button-icon"></i>
