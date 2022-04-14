@@ -2947,7 +2947,7 @@ window.eoxiaJS.risksign.createRiskSign = function ( event ) {
 	var category = elementRiskSign.find('.risksign-category input').val();
 	var description = elementRiskSign.find('.risksign-description textarea').val();
 
-	window.eoxiaJS.loader.display($('.fichecenter.risklist'));
+	window.eoxiaJS.loader.display($('.fichecenter'));
 
 	$.ajax({
 		url: document.URL + '&action=add',
@@ -2959,11 +2959,11 @@ window.eoxiaJS.risksign.createRiskSign = function ( event ) {
 		processData: false,
 		contentType: false,
 		success: function ( resp ) {
-			$('.fichecenter.risklist').html($(resp).find('#searchFormListRisks'))
+			$('.fichecenter').html($(resp).find('#searchFormList'))
 
 			let actionContainerSuccess = $('.messageSuccessRiskSignCreate');
 
-			$('.fichecenter.risklist').removeClass('wpeo-loader');
+			$('.fichecenter').removeClass('wpeo-loader');
 
 			actionContainerSuccess.html($(resp).find('.risksign-create-success-notice'))
 			actionContainerSuccess.removeClass('hidden');
@@ -3007,7 +3007,7 @@ window.eoxiaJS.risksign.saveRiskSign = function ( event ) {
 		processData: false,
 		contentType: false,
 		success: function ( resp ) {
-			$('.fichecenter.risklist').html($(resp).find('#searchFormListRisks'))
+			$('.fichecenter').html($(resp).find('#searchFormList'))
 
 			let actionContainerSuccess = $('.messageSuccessRiskSignEdit');
 
@@ -3113,7 +3113,7 @@ window.eoxiaJS.evaluator.createEvaluator = function ( event ) {
 		processData: false,
 		contentType: false,
 		success: function ( resp ) {
-			$('.fichecenter.risklist').html($(resp).find('#searchFormListRisks'))
+			$('.fichecenter').html($(resp).find('#searchFormList'))
 
 			let actionContainerSuccess = $('.messageSuccessEvaluatorCreate');
 
