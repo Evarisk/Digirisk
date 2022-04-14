@@ -280,16 +280,20 @@ print ajax_constantonoff('DIGIRISKDOLIBARR_SHOW_INHERITED_RISKS');
 print '</td>';
 print '</tr>';
 
-print '<tr class="oddeven"><td>';
-print $langs->trans('ShowSharedRisks');
-print "</td><td>";
-print $langs->trans('ShowSharedRisksDescription');
-print '</td>';
+$result = !empty($conf->mc->entities['risk']) ? strpos($conf->mc->entities['risk'], $conf->entity) : 0;
 
-print '<td class="center">';
-print ajax_constantonoff('DIGIRISKDOLIBARR_SHOW_SHARED_RISKS');
-print '</td>';
-print '</tr>';
+if ($conf->multicompany->enabled && !empty($conf->mc->sharings['risk']) && $result > 0) {
+	print '<tr class="oddeven"><td>';
+	print $langs->trans('ShowSharedRisks');
+	print "</td><td>";
+	print $langs->trans('ShowSharedRisksDescription');
+	print '</td>';
+
+	print '<td class="center">';
+	print ajax_constantonoff('DIGIRISKDOLIBARR_SHOW_SHARED_RISKS');
+	print '</td>';
+	print '</tr>';
+}
 
 print '</table>';
 print '<hr>';
