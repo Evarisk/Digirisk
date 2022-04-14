@@ -93,6 +93,9 @@
 			if ($key == 'category') {
 				$mode_search = 1;
 			}
+			if($search[$key] == '-1') {
+				$search[$key] = '';
+			}
 			if ($search[$key] != '') {
 				if ($key == 'ref') {
 					$sql .= " AND (t.ref = '$search[$key]')";
@@ -195,6 +198,9 @@
 			}
 			if ($key == 'category') {
 				$mode_search = 1;
+			}
+			if($search[$key] == '-1') {
+				$search[$key] = '';
 			}
 			if ($search[$key] != '') {
 				if ($key == 'ref') {

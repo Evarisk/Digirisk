@@ -320,11 +320,12 @@
 			if ($key == 'category') {
 				$mode_search = 1;
 			}
+			if($search[$key] == '-1') {
+				$search[$key] = '';
+			}
 			if ($search[$key] != '') {
 				if ($key == 'ref') {
 					$sql .= " AND (t.ref = '$search[$key]')";
-				} elseif ($key == 'fk_element') {
-					$sql .= " AND (e.ref = '$search[$key]')";
 				} else {
 					$sql .= natural_search('t.'.$key, $search[$key], (($key == 'status') ? 2 : $mode_search));
 				}
@@ -416,11 +417,12 @@
 			if ($key == 'category') {
 				$mode_search = 1;
 			}
+			if($search[$key] == '-1') {
+				$search[$key] = '';
+			}
 			if ($search[$key] != '') {
 				if ($key == 'ref') {
 					$sql .= " AND (r.ref = '$search[$key]')";
-				} elseif ($key == 'fk_element') {
-					$sql .= " AND (e.ref = '$search[$key]')";
 				} else {
 					$sql .= natural_search('r.'.$key, $search[$key], (($key == 'status') ? 2 : $mode_search));
 				}
@@ -929,10 +931,7 @@
 			elseif (strpos($val['type'], 'integer:') === 0) {
 				print $risk->showInputField($val, $key, $search[$key], '', '', 'search_', 'maxwidth150', 1);
 			} elseif ($key == 'fk_element') {
-				$digiriskelementtmp = new DigiriskElement($db);
-				$digiriskelementtmp->fetch(0, $search['fk_element']);
-				print $digiriskelement->select_digiriskelement_list($digiriskelementtmp->id, 'fk_element', '', 1, 0, array(), 0, 0, 'minwidth100', 0, false, 1);
-				print '<input class="input-hidden-fk_element" type="hidden" name="search_fk_element" value=""/>';
+				print $digiriskelement->select_digiriskelement_list($search['fk_element'], 'search_fk_element', '', 1, 0, array(), 0, 0, 'minwidth100', 0, false, 1);
 			} elseif ($key == 'category') { ?>
 				<div class="wpeo-dropdown dropdown-large dropdown-grid category-danger padding">
 					<input class="input-hidden-danger" type="hidden" name="<?php echo 'search_' . $key ?>" value="<?php echo dol_escape_htmltag($search[$key]) ?>" />
