@@ -401,24 +401,12 @@ class doc_groupmentdocument_odt extends ModeleODTGroupmentDocument
 
 											if ( ! empty($related_tasks) && is_array($related_tasks)) {
 												foreach ($related_tasks as $related_task) {
+													$AllInitiales = '';
 													$related_task_contact_ids = $related_task->getListContactId();
 													if ( ! empty($related_task_contact_ids) && is_array($related_task_contact_ids)) {
 														foreach ($related_task_contact_ids as $related_task_contact_id) {
 															$user->fetch($related_task_contact_id);
-															$contact_array[$related_task_contact_id] = $user;
-														}
-													}
-													$AllInitiales = '';
-													if ( ! empty($contact_array) && is_array($contact_array)) {
-														foreach ($contact_array as $contact_array_single) {
-															$initiales = '';
-															if (dol_strlen($contact_array_single->firstname)) {
-																$initiales .= str_split($contact_array_single->firstname, 1)[0];
-															}
-															if (dol_strlen($contact_array_single->lastname)) {
-																$initiales .= str_split($contact_array_single->lastname, 1)[0];
-															}
-															$AllInitiales .= strtoupper($initiales) . ',';
+															$AllInitiales .= strtoupper(str_split($user->firstname, 1)[0]. str_split($user->lastname, 1)[0] . ',');
 														}
 													}
 													if ($related_task->progress == 100) {
