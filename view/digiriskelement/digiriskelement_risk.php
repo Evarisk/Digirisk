@@ -262,10 +262,24 @@ if ($sharedrisks) {
 
 			$photoRisk = '<img class="danger-category-pic hover" src=' . DOL_URL_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $risk->get_danger_category($risk) . '.png' . '>';
 
+			$importValue = '<div class="importsharedrisk"><span>' . 'S' . $risks->entity . '</span>';
+			$importValue .= '<span>' . dol_trunc($nameEntity, 32) . '</span>';
+			$importValue .= '</div>';
+
+			$importValue .= '<div class="importsharedrisk"><span>' . $digiriskelementtmp->ref . '</span>';
+			$importValue .= '<span>' . dol_trunc($digiriskelementtmp->label, 32) . '</span>';
+			$importValue .= '</div>';
+
+			$importValue .= '<div class="importsharedrisk">';
+			$importValue .= $photoRisk;
+			$importValue .= '<span>' . $risks->ref  . '</span>';
+			$importValue .= '<span>' . dol_trunc($risks->description, 32) . '</span>';
+			$importValue .= '</div>';
+
 			if ($alreadyImported > 0) {
-				$formquestionimportsharedrisks[] = array('type' => 'checkbox', 'name' => 'import_shared_risks' . '_S' . $risks->entity . '_' . $digiriskelementtmp->ref . '_' . $risks->ref, 'label' => 'S' . $risks->entity . ' - ' . dol_trunc($nameEntity, 32) . ' - ' . $digiriskelementtmp->ref . ' - ' . dol_trunc($digiriskelementtmp->label, 32) . ' - ' . $photoRisk . $risks->ref . ' - ' . dol_trunc($risks->description, 32) . ' ' . $langs->trans('AlreadyImported'), 'value' => 0, 'disabled' => 1);
+				$formquestionimportsharedrisks[] = array('type' => 'checkbox', 'name' => 'import_shared_risks' . '_S' . $risks->entity . '_' . $digiriskelementtmp->ref . '_' . $risks->ref, 'label' => $importValue . ' ' . $langs->trans('AlreadyImported'), 'value' => 0, 'disabled' => 1);
 			} else {
-				$formquestionimportsharedrisks[] = array('type' => 'checkbox', 'name' => 'import_shared_risks' . '_S' . $risks->entity . '_' . $digiriskelementtmp->ref . '_' . $risks->ref, 'label' => 'S' . $risks->entity . ' - ' . dol_trunc($nameEntity, 32) . ' - ' . $digiriskelementtmp->ref . ' - ' . dol_trunc($digiriskelementtmp->label, 32) . ' - ' . $photoRisk . $risks->ref . ' - ' . dol_trunc($risks->description, 32), 'value' => 1);
+				$formquestionimportsharedrisks[] = array('type' => 'checkbox', 'name' => 'import_shared_risks' . '_S' . $risks->entity . '_' . $digiriskelementtmp->ref . '_' . $risks->ref, 'label' => $importValue, 'value' => 1);
 			}
 		}
 		$formconfirm .= $form->formconfirm($_SERVER["PHP_SELF"] . '?id=' . $object->id, $langs->trans('ImportSharedRisks'), '', 'confirm_import_shared_risks', $formquestionimportsharedrisks, 'yes', 'actionButtonImportSharedRisks', 350, 600);
