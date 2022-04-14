@@ -867,7 +867,7 @@ OrganizationNotSaved = L'organisation et des groupements et des unités de trava
 DigiriskElementOrganization = Organisation de l'arborescence*
 ShareDigiriskelement = Activer le partage des groupements et unités de travail
 DIGIRISKELEMENTSharing = Partage des des groupements et unités de travail
-DIGIRISKELEMENTSharingDescription = Sélection des entités qui partagerons leurs groupements et unités de travail avec cette entité.
+DIGIRISKELEMENTSharingDescription = Sélection des entités qui partageront leurs groupements et unités de travail avec cette entité.
 DigiriskElementSharedTooltip = Cette option permet de partager les groupements et unités de travail. <br> INFO : Si vous souhaitez pouvoir afficher les tâches, il faut activer l'option de partage des projets.
 
 #
@@ -1048,7 +1048,7 @@ DigiriskElementSharedRisk = Risques partagés
 SharedRisks = Risques partagés
 ShareRisk = Activer le partage des risques
 RISKSharing = Partage des risques
-RISKSharingDescription = Sélection des entités qui partagerons leurs risques avec cette entité.
+RISKSharingDescription = Sélection des entités qui partageront leurs risques avec cette entité.
 UnlinkSharedRisk = Délier le risque partagé
 RiskWellUnlinkShared = Risque délié
 RiskNotUnlinkShared = Erreur : Risque délié
