@@ -1845,9 +1845,10 @@ window.eoxiaJS.risk.unlinkSharedRisk = function ( event ) {
 	window.eoxiaJS.loader.display($(this));
 
 	let riskRef =  $('.risk_row_'+riskId).find('.risk-container > div:nth-child(1)').text();
+	let url = document.URL.split(/#/);
 
 	$.ajax({
-		url:  document.URL + '&action=unlinkSharedRisk',
+		url: url[0] + '&action=unlinkSharedRisk',
 		type: "POST",
 		processData: false,
 		data: JSON.stringify({
