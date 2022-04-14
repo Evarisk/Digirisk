@@ -1611,112 +1611,50 @@ class modDigiriskdolibarr extends DolibarrModules
 			dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_TRIGGERS_UPDATED', 1, 'integer', 0, '', $conf->entity);
 		}
 
-
-		//Permettre à un module externe d'ajouter son option de partage dans l'onglet options du module
-		//valeur par défaut si une clé n'est pas définie :
-
-		//enable : valeur par défaut : ! empty($conf->mymodule->enabled)
-		//display : valeur par défaut : ! empty($conf->global->MULTICOMPANY_SHARINGS_ENABLED)
-		//tooltip : pas d'aide au format tooltip
-		//input : pas d'interaction avec d'autres boutons on/off
-
-
-//
-//
-//
-//partage qui dépend d'un partage parent, exemple :
-//
-//'productprice' => array(																	// Valeur utilisée dans getEntity()
-//	'type' => 'element',																	// element: partage d'éléments principaux (thirdparty, product, member, etc...)
-//	'icon' => 'money',																		// Font Awesome icon
-//	'lang' => 'langfile@mymodule'															// Fichier de langue contenant les traductions
-//	'tooltip' => 'ProductPriceSharingInfo',													// Message Tooltip (ne pas mettre cette clé si pas de tooltip)
-//	'enable' => '(! empty($conf->product->enabled) || ! empty($conf->service->enabled))',	// Conditions d'activation du partage
-//	'display' => '! empty($conf->global->MULTICOMPANY_PRODUCT_SHARING_ENABLED)',			// L'affichage de ce bloc de partage dépend de l'activation d'un partage parent
-//	'input' => array(																		// input : Paramétrage de la réaction du bouton on/off
-//		'global' => array(																	// global : réaction lorsqu'on désactive l'option de partage global
-//			'hide' => true,																	// hide : cache le bloc de partage lors de la désactivation du partage global
-//			'del' => true																	// del : supprime la constante du partage lors de la désactivation du partage global
-//		),
-//		'product' => array(																	// product (nom du module parent) : réaction lorsqu'on désactive le partage parent (ici le partage des produits/services)
-//			'showhide' => true,																// showhide : afficher/cacher le bloc de partage lors de l'activation/désactivation du partage parent
-//			'del' => true																	// del : suppression de la constante du partage lors de la désactivation du partage parent
-//		)
-//	)
-//	'disable' => true																		// disable : désactive ce bloc de partage si en cours de développement
-//),
-
-
-//partage des objets qui dépendent d'un partage principal, exemple :
-//
-//'proposal' => array(																		// Valeur utilisée dans getEntity()
-//	'type' => 'object',																		// object : partage d'objets (propal, commande, facture, numéro de facture, etc...)
-//	'icon' => 'file-pdf-o',																	// Font Awesome icon
-//	'lang' => 'langfile@mymodule'															// Fichier de langue contenant les traductions
-//	'tooltip' => 'MyToolTipTranslateKey',													// Message Tooltip (ne pas mettre cette clé si pas de tooltip)
-//	'mandatory' => 'thirdparty',															// partage principal obligatoire
-//	'enable' => '(! empty($conf->propal->enabled) && ! empty($conf->societe->enabled))',	// Conditions d'activation du partage
-//	'display' => '! empty($conf->global->MULTICOMPANY_THIRDPARTY_SHARING_ENABLED)',			// L'affichage de ce bloc de partage dépend de l'activation d'un partage principal
-//	'input' => array(																		// input : Paramétrage de la réaction du bouton on/off
-//		'global' => array(																	// global : réaction lorsqu'on désactive l'option de partage global
-//			'hide' => true,																	// hide : cache le bloc de partage lors de la désactivation du partage global
-//			'del' => true																	// del : suppression de la constante du partage lors de la désactivation du partage global
-//		),
-//		'thirdparty' => array(																// thirdparty (nom du module principal) : réaction lorsqu'on désactive le partage principal (ici le partage des tiers)
-//			'showhide' => true,																// showhide : afficher/cacher le bloc de partage lors de l'activation/désactivation du partage principal
-//			'hide' => true,																	// hide : cache le bloc de partage lors de la désactivation du partage principal
-//			'del' => true																	// del : supprime la constante du partage lors de la désactivation du partage principal
-//		)
-//	)
-//),
-
 		$params = array(
-			'digiriskdolibarr' => array(				// nom informatif du module externe qui apporte ses paramètres
-				'sharingelements' => array(				// section des paramètres 'element' et 'object'
+			'digiriskdolibarr' => array(																			// nom informatif du module externe qui apporte ses paramètres
+				'sharingelements' => array(																			// section des paramètres 'element' et 'object'
 					//partage digiriskelement
 					'digiriskelement' => array(																		// Valeur utilisée dans getEntity()
-						'type' => 'element',																// element: partage d'éléments principaux (thirdparty, product, member, etc...)
-						'icon' => 'info-circle',															// Font Awesome icon
-						'lang' => 'digiriskdolibarr@digiriskdolibarr',										// Fichier de langue contenant les traductions
+						'type'    => 'element',																		// element: partage d'éléments principaux (thirdparty, product, member, etc...)
+						'icon'    => 'info-circle',																	// Font Awesome icon
+						'lang'    => 'digiriskdolibarr@digiriskdolibarr',											// Fichier de langue contenant les traductions
 						'tooltip' => 'DigiriskElementSharedTooltip',												// Message Tooltip (ne pas mettre cette clé si pas de tooltip)
-						'input' => array(																	// input : Paramétrage de la réaction du bouton on/off
-							'global' => array(																// global : réaction lorsqu'on désactive l'option de partage global
-								'showhide' => true,															// showhide : afficher/cacher le bloc de partage lors de l'activation/désactivation du partage global
-								'hide' => true,																// hide : cache le bloc de partage lors de la désactivation du partage global
-								'del' => true																// del : suppression de la constante du partage lors de la désactivation du partage global
+						'enable'  => '! empty($conf->digiriskdolibarr->enabled)',									// Conditions d'activation du partage
+						'input'   => array(																			// input : Paramétrage de la réaction du bouton on/off
+							'global' => array(																		// global : réaction lorsqu'on désactive l'option de partage global
+								'showhide' => true,																	// showhide : afficher/cacher le bloc de partage lors de l'activation/désactivation du partage global
+								'hide'     => true,																	// hide : cache le bloc de partage lors de la désactivation du partage global
+								'del'      => true																	// del : suppression de la constante du partage lors de la désactivation du partage global
 							)
 						)
 					),
 					//partage risk
-					'risk' => array(																		// Valeur utilisée dans getEntity()
-						'type' => 'object',																// element: partage d'éléments principaux (thirdparty, product, member, etc...)
-						'icon' => 'exclamation-triangle',															// Font Awesome icon
-						'lang' => 'digiriskdolibarr@digiriskdolibarr',										// Fichier de langue contenant les traductions
-						'tooltip' => 'RiskSharedTooltip',												// Message Tooltip (ne pas mettre cette clé si pas de tooltip)
+					'risk' => array(																				// Valeur utilisée dans getEntity()
+						'type'      => 'object',																	// element: partage d'éléments principaux (thirdparty, product, member, etc...)
+						'icon'      => 'exclamation-triangle',														// Font Awesome icon
+						'lang'      => 'digiriskdolibarr@digiriskdolibarr',											// Fichier de langue contenant les traductions
+						'tooltip'   => 'RiskSharedTooltip',															// Message Tooltip (ne pas mettre cette clé si pas de tooltip)
 						'mandatory' => 'digiriskelement',															// partage principal obligatoire
-						'input' => array(																	// input : Paramétrage de la réaction du bouton on/off
-							'global' => array(																// global : réaction lorsqu'on désactive l'option de partage global
-								'showhide' => true,															// showhide : afficher/cacher le bloc de partage lors de l'activation/désactivation du partage global
-								'hide' => true,																// hide : cache le bloc de partage lors de la désactivation du partage global
-								'del' => true																// del : suppression de la constante du partage lors de la désactivation du partage global
+						'enable'    => '! empty($conf->digiriskdolibarr->enabled)',									// Conditions d'activation du partage
+						'display'   => '! empty($conf->global->MULTICOMPANY_DIGIRISKELEMENT_SHARING_ENABLED)', 		// L'affichage de ce bloc de partage dépend de l'activation d'un partage parent
+						'input'     => array(																		// input : Paramétrage de la réaction du bouton on/off
+							'global' => array(																		// global : réaction lorsqu'on désactive l'option de partage global
+								'hide'     => true,																	// hide : cache le bloc de partage lors de la désactivation du partage global
+								'del'      => true																	// del : suppression de la constante du partage lors de la désactivation du partage global
 							),
-							'digiriskelement' => array(																// thirdparty (nom du module principal) : réaction lorsqu'on désactive le partage principal (ici le partage des tiers)
-								'showhide' => true,																// showhide : afficher/cacher le bloc de partage lors de l'activation/désactivation du partage principal
-								'hide' => true,																	// hide : cache le bloc de partage lors de la désactivation du partage principal
-								'del' => true																	// del : supprime la constante du partage lors de la désactivation du partage principal
+							'digiriskelement' => array(																// digiriskelement (nom du module principal) : réaction lorsqu'on désactive le partage principal (ici le partage des digiriskelements)
+								'showhide' => true,																	// showhide : afficher/cacher le bloc de partage lors de l'activation/désactivation du partage principal
+								'hide'     => true,																	// hide : cache le bloc de partage lors de la désactivation du partage principal
+								'del'      => true																	// del : supprime la constante du partage lors de la désactivation du partage principal
 							)
 						)
 					),
 				),
-				'sharingmodulename' => array(			// correspondance des noms de modules pour le lien parent ou compatibilité (ex: 'productsupplierprice'	=> 'product')
+				'sharingmodulename' => array(																		// correspondance des noms de modules pour le lien parent ou compatibilité (ex: 'productsupplierprice'	=> 'product')
 					'digiriskelement' => 'digiriskdolibarr',
-					'risk' => 'digiriskdolibarr',
+					'risk'            => 'digiriskdolibarr',
 				),
-//				'addzero' => array(						// défini si un partage ajoute le 0 (toute les entités) à l'entité courante ex: "entity IN (0, id entite courante)"
-//				'mymoduleshare1',					// Valeur utilisée dans getEntity()
-//				'mymoduleshare2',
-//			......
-//					......
 			)
 		);
 
