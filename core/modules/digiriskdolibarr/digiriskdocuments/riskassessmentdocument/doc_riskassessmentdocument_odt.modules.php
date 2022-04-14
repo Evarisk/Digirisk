@@ -399,6 +399,12 @@ class doc_riskassessmentdocument_odt extends ModeleODTRiskAssessmentDocument
 
 					if ( ! empty($digiriskelementlist) ) {
 						$totalQuotation = 0;
+						$scale_counter = array(
+							1 => 0,
+							2 => 0,
+							3 => 0,
+							4 => 0
+						);
 						$line           = '';
 						$listlines      = $odfHandler->setSegment('risqueFiche');
 
@@ -415,11 +421,44 @@ class doc_riskassessmentdocument_odt extends ModeleODTRiskAssessmentDocument
 								}
 							}
 
-							$elementName                 = (!empty($conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS) ? 'S' . $digiriskelementsingle['object']->entity . ' - ' : '') . $digiriskelementsingle['object']->ref . ' ' . $digiriskelementsingle['object']->label;
-							$scale_counter               = $digiriskelementsingle['object']->getRiskAssessmentCategoriesNumber();
-							$cotationarray[$elementName] = array($totalQuotation, $digiriskelementsingle['object']->description,$scale_counter);
+							if (!empty($conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS)) {
+								foreach ($risks as $riskline) {
+									$digiriskelementtmp = new DigiriskElement($this->db);
+									$digiriskelementtmp->fetch($riskline->fk_element);
+									$digiriskelementtmp->element = 'digiriskdolibarr';
+									$digiriskelementtmp->fetchObjectLinked($riskline->id, 'digiriskdolibarr_risk', $digiriskelementsingle['object']->id, 'digiriskdolibarr_digiriskelement', 'AND', 1, 'sourcetype', 0);
+									if ($digiriskelementtmp->linkedObjectsIds['digiriskdolibarr_digiriskelement'] > 0 && is_array($digiriskelementtmp->linkedObjectsIds['digiriskdolibarr_digiriskelement'])) {
+										$digiriskelementLinkedId = array_values($digiriskelementtmp->linkedObjectsIds['digiriskdolibarr_digiriskelement']);
+										if (in_array($digiriskelementsingle['object']->id, $digiriskelementLinkedId)) {
+											$evaluation = new RiskAssessment($this->db);
+											$lastEvaluation = $evaluation->fetchFromParent($riskline->id, 1);
+											if ($lastEvaluation > 0 && !empty($lastEvaluation) && is_array($lastEvaluation)) {
+												$lastEvaluation = array_shift($lastEvaluation);
+												$totalQuotation += $lastEvaluation->cotation;
+												$scale                  = $lastEvaluation->get_evaluation_scale();
+												$scale_counter[$scale] += 1;
+											}
+										}
+									}
+								}
+							}
+
+							$elementName                   = (!empty($conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS) ? 'S' . $digiriskelementsingle['object']->entity . ' - ' : '') . $digiriskelementsingle['object']->ref . ' ' . $digiriskelementsingle['object']->label;
+							$scaleCounterWithoutSharedRisk = $digiriskelementsingle['object']->getRiskAssessmentCategoriesNumber();
+
+							foreach ($scale_counter as $key => $value) {
+								$final_scale_counter[$key] = $scale_counter[$key] + $scaleCounterWithoutSharedRisk[$key];
+							}
+
+							$cotationarray[$elementName] = array($totalQuotation, $digiriskelementsingle['object']->description,$final_scale_counter);
 
 							$totalQuotation = 0;
+							$scale_counter = array(
+								1 => 0,
+								2 => 0,
+								3 => 0,
+								4 => 0
+							);
 							unset($tmparray['object_fields']);
 						}
 						//use arsort to sort array according to value
