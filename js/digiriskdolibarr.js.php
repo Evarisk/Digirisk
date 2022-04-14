@@ -1856,11 +1856,8 @@ window.eoxiaJS.risk.unlinkSharedRisk = function ( event ) {
 		}),
 		contentType: false,
 		success: function ( resp ) {
-			elementParent.html($(resp).find('.div-table-responsive'))
+			$('.fichecenter').html($(resp).find('#searchFormList'))
 			let actionContainerSuccess = $('.messageSuccessRiskUnlinkShared');
-
-			$('#risk_row_' + riskId).fadeOut(800);
-			$('#risk_row_' + riskId).fadeIn(800);
 
 			let textToShow = '';
 			textToShow += actionContainerSuccess.find('.valueForUnlinkSharedRisk1').val()
