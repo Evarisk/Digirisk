@@ -113,6 +113,10 @@ $search_all = GETPOST('search_all', 'alphanohtml') ? trim(GETPOST('search_all', 
 $search     = array();
 foreach ($risk->fields as $key => $val) {
 	if (GETPOST('search_' . $key, 'alpha') !== '') $search[$key] = GETPOST('search_' . $key, 'alpha');
+
+	if ($key == 'fk_element' && $contextpage == 'sharedrisk') {
+		$search[$key] = GETPOST('search_' . $key . '_sharedrisk', 'alpha');
+	}
 }
 
 // List of fields to search into when doing a "search in all"
