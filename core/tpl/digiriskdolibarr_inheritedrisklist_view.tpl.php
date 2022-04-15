@@ -280,12 +280,14 @@
 		$user->conf->$menuConf = 't.fk_element,t.ref,evaluation.cotation,t.category,t.description,';
 	} elseif ( ! $conf->global->DIGIRISKDOLIBARR_RISK_DESCRIPTION) {
 		$user->conf->$menuConf = preg_replace('/t.description,/', '', $user->conf->$menuConf);
+		$arrayfields['t.description']['enabled'] = 0;
 	}
 
 	if ( ! preg_match('/evaluation.has_tasks/', $user->conf->$menuConf) && $conf->global->DIGIRISKDOLIBARR_TASK_MANAGEMENT) {
 		$user->conf->$menuConf .= 't.fk_element,t.ref,evaluation.cotation,t.category,evaluation.has_tasks,';
 	} elseif ( ! $conf->global->DIGIRISKDOLIBARR_TASK_MANAGEMENT) {
 		$user->conf->$menuConf = preg_replace('/evaluation.has_tasks,/', '', $user->conf->$menuConf);
+		$arrayfields['evaluation.has_tasks']['enabled'] = 0;
 	}
 
 	$selectedfields  = $form->multiSelectArrayWithCheckbox('selectedfields', $arrayfields, $varpage); // This also change content of $arrayfields

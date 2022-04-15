@@ -335,11 +335,13 @@ if ($object->id > 0) {
 
 	if (!empty($conf->global->DIGIRISKDOLIBARR_SHOW_RISKS)) {
 		$contextpage = 'riskcard';
+		$arrayfields['t.entity']['enabled'] = 0;
 		require_once './../../core/tpl/digiriskdolibarr_risklist_view.tpl.php';
 	}
 
 	if (!empty($conf->global->DIGIRISKDOLIBARR_SHOW_INHERITED_RISKS) && $object->fk_parent > 0) {
 		$contextpage = 'inheritedrisk';
+		$arrayfields['t.entity']['enabled'] = 0;
 		require_once './../../core/tpl/digiriskdolibarr_inheritedrisklist_view.tpl.php';
 	}
 
