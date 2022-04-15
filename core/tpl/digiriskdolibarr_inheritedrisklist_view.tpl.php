@@ -38,7 +38,7 @@
 		else $sql                                                                                                                                     .= " WHERE 1 = 1";
 		if ( ! $allRisks) {
 			$inherited_risk_id = $object->fk_parent;
-			$sql .= " AND r.fk_element IN (" . $inherited_risk_id;
+			$sql .= " AND t.fk_element IN (" . $inherited_risk_id;
 			while ($inherited_risk_id > 0) {
 				$digiriskelementtmp = new DigiriskElement($db);
 				$digiriskelementtmp->fetch($inherited_risk_id);
