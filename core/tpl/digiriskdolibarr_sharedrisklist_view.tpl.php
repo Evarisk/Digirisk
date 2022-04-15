@@ -470,12 +470,12 @@
 				if ($key == 'status') print $risk->getLibStatut(5);
 				elseif ($key == 'entity') { ?>
 					<?php
-					print getNomUrlEntity($risk, 1, '');
+					print getNomUrlEntity($risk, 1, 'nolink');
 				} elseif ($key == 'fk_element') { ?>
 					<?php $parent_element = new DigiriskElement($db);
 					$result               = $parent_element->fetch($risk->fk_element);
 					if ($result > 0) {
-						print $parent_element->getNomUrl(1, 'blank');
+						print $parent_element->getNomUrl(1, 'nolink');
 					}
 				} elseif ($key == 'category') { ?>
 					<div class="table-cell table-50 cell-risk" data-title="Risque">
@@ -487,16 +487,11 @@
 				} elseif ($key == 'ref') {
 					?>
 					<div class="risk-container" value="<?php echo $risk->id ?>">
-						<div><i class="fas fa-exclamation-triangle"></i><?php echo ' ' . $risk->ref; ?></div>
+						<div><i class="fas fa-exclamation-triangle"></i><?php echo ' ' . $risk->ref; ?>
 						<?php if ($permissiontoadd) : ?>
-							<div class="risk-unlink-shared wpeo-button button-square-40 button-primary wpeo-tooltip-event" aria-label="<?php echo $langs->trans('UnlinkSharedRisk') ?>" value="<?php echo $risk->id;?>">
-								<i class="fas fa-unlink button-icon"></i>
-							</div>
-						<?php else : ?>
-							<div class="wpeo-button button-square-40 button-grey wpeo-tooltip-event" aria-label="<?php echo $langs->trans('PermissionDenied') ?>" value="<?php echo $risk->id;?>">
-								<i class="fas fa-unlink button-icon"></i>
-							</div>
+							<i class="risk-unlink-shared wpeo-tooltip-event fas fa-unlink button-icon" aria-label="<?php echo $langs->trans('UnlinkSharedRisk') ?>" value="<?php echo $risk->id;?>"></i>
 						<?php endif; ?>
+						</div>
 					</div>
 					<?php
 				} elseif ($key == 'description') {
