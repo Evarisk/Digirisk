@@ -117,7 +117,7 @@ class PreventionPlanDocument extends DigiriskDocuments
 			$preventionplan->fetch($id);
 		}
 
-		$preventionplanlines = $preventionplanline->fetchAll(GETPOST('id'));
+		$preventionplanlines = $preventionplanline->fetchAll('', '', 0, 0, array(), 'AND', GETPOST('id'));
 		$digirisk_resources = $resources->digirisk_dolibarr_fetch_resources();
 
 		$extsociety = $resources->fetchResourcesFromObject('PP_EXT_SOCIETY', $preventionplan);

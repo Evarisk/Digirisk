@@ -1193,7 +1193,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 		$colspan = 3;
 
 		// Lines
-		$objectlines = $objectline->fetchAll(GETPOST('id'));
+		$objectlines = $objectline->fetchAll('', '', 0, 0, array(), 'AND', GETPOST('id'));
 
 		print '<tr class="liste_titre">';
 		print '<td><span>' . $langs->trans('Ref.') . '</span></td>';

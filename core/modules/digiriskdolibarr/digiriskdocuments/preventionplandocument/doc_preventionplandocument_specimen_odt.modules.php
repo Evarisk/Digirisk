@@ -343,7 +343,7 @@ class doc_preventionplandocument_specimen_odt extends ModeleODTPreventionPlanDoc
 			$preventionplanline = new PreventionPlanLine($this->db);
 			$risk               = new Risk($this->db);
 
-			$preventionplanlines = $preventionplanline->fetchAll(GETPOST('id'));
+			$preventionplanlines = $preventionplanline->fetchAll('', '', 0, 0, array(), 'AND', GETPOST('id'));
 
 			$digirisk_resources     = $resources->digirisk_dolibarr_fetch_resources();
 			$extsociety             = $resources->fetchResourcesFromObject('PP_EXT_SOCIETY', $preventionplan);
