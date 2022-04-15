@@ -3857,8 +3857,13 @@ td > .risk-evaluation-container {
   display: -ms-flexbox;
   display: flex;
 }
-#dialog-confirm-actionButtonImportSharedRisks .tagtr > .tagtd:first-child .importsharedrisk {
-  width: 33.333333%;
+#dialog-confirm-actionButtonImportSharedRisks .tagtr > .tagtd:first-child .importsharedrisk:not(.imported) {
+  width: 30%;
+}
+#dialog-confirm-actionButtonImportSharedRisks .tagtr > .tagtd:first-child .importsharedrisk.imported {
+  width: 10%;
+  text-align: center;
+  font-size: 12px;
 }
 #dialog-confirm-actionButtonImportSharedRisks .tagtr > .tagtd:first-child .importsharedrisk img {
   float: left;
