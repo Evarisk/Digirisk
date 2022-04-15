@@ -1840,7 +1840,7 @@ window.eoxiaJS.risk.saveRisk = function ( event ) {
 window.eoxiaJS.risk.unlinkSharedRisk = function ( event ) {
 	let riskId = $(this).attr('value');
 	//let elementRisk = $(this).closest('.risk-container').find('.risk-content');
-	let elementParent = $('.fichecenter.risklist').find('.div-table-responsive');
+	let elementParent = $('.fichecenter.sharedrisklist').find('.div-table-responsive');
 
 	window.eoxiaJS.loader.display($(this));
 
@@ -1856,8 +1856,10 @@ window.eoxiaJS.risk.unlinkSharedRisk = function ( event ) {
 		}),
 		contentType: false,
 		success: function ( resp ) {
-			$('.fichecenter.risklist').html($(resp).find('#searchFormListRisks'))
+			$('.fichecenter.sharedrisklist .opacitymedium.colorblack.paddingleft').html($(resp).find('#searchFormSharedListRisks .opacitymedium.colorblack.paddingleft'))
 			let actionContainerSuccess = $('.messageSuccessRiskUnlinkShared');
+
+			$('#risk_row_' + riskId).fadeOut(800);
 
 			let textToShow = '';
 			textToShow += actionContainerSuccess.find('.valueForUnlinkSharedRisk1').val()
