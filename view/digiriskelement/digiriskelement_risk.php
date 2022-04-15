@@ -266,17 +266,17 @@ if ($sharedrisks) {
 
 			$photoRisk = '<img class="danger-category-pic hover" src=' . DOL_URL_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $risk->get_danger_category($risk) . '.png' . '>';
 
-			$importValue = '<div class="importsharedrisk"><span>' . 'S' . $risks->entity . '</span>';
+			$importValue = '<div class="importsharedrisk"><span class="importsharedrisk-ref">' . 'S' . $risks->entity . '</span>';
 			$importValue .= '<span>' . dol_trunc($nameEntity, 32) . '</span>';
 			$importValue .= '</div>';
 
-			$importValue .= '<div class="importsharedrisk"><span>' . $digiriskelementtmp->ref . '</span>';
+			$importValue .= '<div class="importsharedrisk"><span class="importsharedrisk-ref">' . $digiriskelementtmp->ref . '</span>';
 			$importValue .= '<span>' . dol_trunc($digiriskelementtmp->label, 32) . '</span>';
 			$importValue .= '</div>';
 
 			$importValue .= '<div class="importsharedrisk">';
 			$importValue .= $photoRisk;
-			$importValue .= '<span>' . $risks->ref  . '</span>';
+			$importValue .= '<span class="importsharedrisk-ref">' . $risks->ref  . '</span>';
 			$importValue .= '<span>' . dol_trunc($risks->description, 32) . '</span>';
 			$importValue .= '</div>';
 
