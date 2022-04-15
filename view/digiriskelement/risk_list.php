@@ -135,7 +135,7 @@ foreach ($evaluation->fields as $key => $val) {
 // Extra fields
 include DOL_DOCUMENT_ROOT.'/core/tpl/extrafields_list_array_fields.tpl.php';
 
-$object->fields = dol_sort_array($risk->fields, 'position');
+$risk->fields = dol_sort_array($risk->fields, 'position');
 $evaluation->fields = dol_sort_array($evaluation->fields, 'position');
 $arrayfields = dol_sort_array($arrayfields, 'position');
 
