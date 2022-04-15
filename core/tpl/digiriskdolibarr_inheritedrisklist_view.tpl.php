@@ -230,6 +230,9 @@
 				exit;
 			}
 		}
+	} else {
+		$num = 0;
+		$nbtotalofrecords = 0;
 	}
 
 	$arrayofselected = is_array($toselect) ? $toselect : array();
@@ -250,9 +253,9 @@
 
 	if ($action != 'list') {
 		$massactionbutton = $form->selectMassAction('', $arrayofmassactions);
-	} ?>
+	}
 
-	<?php $title = $langs->trans('DigiriskElementInheritedRisksList');
+	$title = $langs->trans('DigiriskElementInheritedRisksList');
 	print_barre_liste($title, $page, $_SERVER["PHP_SELF"], $param, $sortfield, $sortorder, $massactionbutton, $num, $nbtotalofrecords, 'digiriskdolibarr32px.png@digiriskdolibarr', 0, '', '', $limit, 0, 0, 1);
 
 	include DOL_DOCUMENT_ROOT . '/core/tpl/massactions_pre.tpl.php';
@@ -441,11 +444,7 @@
 					</div>
 					<?php
 				} elseif ($key == 'ref') {
-					?>
-					<div class="risk-container" value="<?php echo $risk->id ?>">
-						<div><i class="fas fa-exclamation-triangle"></i><?php echo ' ' . $risk->ref; ?></div>
-					</div>
-					<?php
+					print $risk->getNomUrl(1, 'blank');
 				} elseif ($key == 'description') {
 					if ($conf->global->DIGIRISKDOLIBARR_RISK_DESCRIPTION == 0 ) {
 						print $langs->trans('RiskDescriptionNotActivated');
