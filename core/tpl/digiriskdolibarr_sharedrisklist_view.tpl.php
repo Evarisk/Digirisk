@@ -470,7 +470,7 @@
 				if ($key == 'status') print $risk->getLibStatut(5);
 				elseif ($key == 'entity') { ?>
 					<?php
-					print getNomUrlEntity($risk, 1, 'nolink');
+					print getNomUrlEntity($risk, 1, 'nolink', 1);
 				} elseif ($key == 'fk_element') { ?>
 					<?php $parent_element = new DigiriskElement($db);
 					$result               = $parent_element->fetch($risk->fk_element);
