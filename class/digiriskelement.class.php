@@ -601,9 +601,11 @@ class DigiriskElement extends CommonObject
 			$linkclose .= ' class="classfortooltip' . ($morecss ? ' ' . $morecss : '') . '"';
 		} else $linkclose = ($morecss ? ' class="' . $morecss . '"' : '');
 
-		$linkstart  = '<a href="' . $url . '"';
-		$linkstart .= $linkclose . '>';
-		$linkend    = '</a>';
+		if ($option != 'nolink') {
+			$linkstart = '<a href="' . $url . '"';
+			$linkstart .= $linkclose . '>';
+			$linkend = '</a>';
+		}
 
 		$result                      .= $linkstart;
 		if ($withpicto) $result      .= '<i class="fas fa-info-circle"></i>' . ' ';
