@@ -66,9 +66,11 @@ $related_tasks = $risk->get_related_tasks($risk); ?>
 											<span class="riskassessment-task-progress progress-<?php echo $related_task->progress ? $related_task->progress : 0 ?>"><?php echo $related_task->progress ? $related_task->progress . " %" : 0 . " %" ?></span>
 										</div>
 										<div class="riskassessment-task-title">
-											<span class="riskassessment-task-progress-checkbox <?php echo ($contextpage != 'sharedrisk' && $contextpage != 'inheritedrisk') ? '' : 'riskassessment-task-progress-checkbox-readonly'?>">
-												<input type="checkbox" id="" class="riskassessment-task-progress-checkbox<?php echo $related_task->id; echo($related_task->progress == 100) ? ' progress-checkbox-check' : ' progress-checkbox-uncheck' ?>" name="progress-checkbox" value="" <?php echo ($related_task->progress == 100) ? 'checked' : ''; ?>>
-											</span>
+											<?php if ($contextpage != 'sharedrisk' && $contextpage != 'inheritedrisk') : ?>
+												<span class="riskassessment-task-progress-checkbox <?php echo ($contextpage != 'sharedrisk' && $contextpage != 'inheritedrisk') ? '' : 'riskassessment-task-progress-checkbox-readonly'?>">
+													<input type="checkbox" id="" class="riskassessment-task-progress-checkbox<?php echo $related_task->id; echo($related_task->progress == 100) ? ' progress-checkbox-check' : ' progress-checkbox-uncheck' ?>" name="progress-checkbox" value="" <?php echo ($related_task->progress == 100) ? 'checked' : ''; ?>>
+												</span>
+											<?php endif; ?>
 											<span class="riskassessment-task-author-label">
 												<?php echo dol_trunc($related_task->label, 255, 'right', 'UTF-8', 0, $display = 1); ?>
 											</span>
@@ -398,9 +400,11 @@ $related_tasks = $risk->get_related_tasks($risk); ?>
 										<span class="riskassessment-task-progress progress-<?php echo $related_task->progress ? $related_task->progress : 0 ?>"><?php echo $related_task->progress ? $related_task->progress . " %" : 0 . " %" ?></span>
 									</div>
 									<div class="riskassessment-task-title">
-										<span class="riskassessment-task-progress-checkbox <?php echo ($contextpage != 'sharedrisk' && $contextpage != 'inheritedrisk') ? '' : 'riskassessment-task-progress-checkbox-readonly'?>">
-											<input type="checkbox" id="" class="riskassessment-task-progress-checkbox<?php echo $related_task->id; echo($related_task->progress == 100) ? ' progress-checkbox-check' : ' progress-checkbox-uncheck' ?>" name="progress-checkbox" value="" <?php echo ($related_task->progress == 100) ? 'checked' : ''; ?>>
-										</span>
+										<?php if ($contextpage != 'sharedrisk' && $contextpage != 'inheritedrisk') : ?>
+											<span class="riskassessment-task-progress-checkbox <?php echo ($contextpage != 'sharedrisk' && $contextpage != 'inheritedrisk') ? '' : 'riskassessment-task-progress-checkbox-readonly'?>">
+												<input type="checkbox" id="" class="riskassessment-task-progress-checkbox<?php echo $related_task->id; echo($related_task->progress == 100) ? ' progress-checkbox-check' : ' progress-checkbox-uncheck' ?>" name="progress-checkbox" value="" <?php echo ($related_task->progress == 100) ? 'checked' : ''; ?>>
+											</span>
+										<?php endif; ?>
 										<span class="riskassessment-task-author-label">
 											<?php echo dol_trunc($related_task->label, 48, 'wrap', 'UTF-8', 0, $display = 1); ?>
 										</span>
@@ -608,9 +612,11 @@ $related_tasks = $risk->get_related_tasks($risk); ?>
 																<span class="riskassessment-task-progress progress-<?php echo $related_task->progress ? $related_task->progress : 0 ?>"><?php echo $related_task->progress ? $related_task->progress . " %" : 0 . " %" ?></span>
 															</div>
 															<div class="riskassessment-task-title">
-																<span class="riskassessment-task-progress-checkbox <?php echo ($contextpage != 'sharedrisk' && $contextpage != 'inheritedrisk') ? '' : 'riskassessment-task-progress-checkbox-readonly'?>">
-																	<input type="checkbox" id="" class="riskassessment-task-progress-checkbox<?php echo $related_task->id; echo($related_task->progress == 100) ? ' progress-checkbox-check' : ' progress-checkbox-uncheck' ?>" name="progress-checkbox" value="" <?php echo ($related_task->progress == 100) ? 'checked' : ''; ?>>
-																</span>
+																<?php if ($contextpage != 'sharedrisk' && $contextpage != 'inheritedrisk') : ?>
+																	<span class="riskassessment-task-progress-checkbox <?php echo ($contextpage != 'sharedrisk' && $contextpage != 'inheritedrisk') ? '' : 'riskassessment-task-progress-checkbox-readonly'?>">
+																		<input type="checkbox" id="" class="riskassessment-task-progress-checkbox<?php echo $related_task->id; echo($related_task->progress == 100) ? ' progress-checkbox-check' : ' progress-checkbox-uncheck' ?>" name="progress-checkbox" value="" <?php echo ($related_task->progress == 100) ? 'checked' : ''; ?>>
+																	</span>
+																<?php endif;?>
 																<span class="riskassessment-task-label">
 																	<?php echo dol_trunc($related_task->label, 48, 'wrap', 'UTF-8', 0, $display = 1); ?>
 																</span>
