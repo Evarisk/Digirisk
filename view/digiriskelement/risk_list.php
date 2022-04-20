@@ -206,6 +206,11 @@ $allRisks = 1;
 require_once './../../core/tpl/digiriskdolibarr_medias_gallery_modal.tpl.php';
 require_once './../../core/tpl/digiriskdolibarr_risklist_view.tpl.php';
 
+if (!empty($conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS)) {
+	$contextpage = 'sharedrisk';
+	require_once './../../core/tpl/digiriskdolibarr_sharedrisklist_view.tpl.php';
+}
+
 // End of page
 llxFooter();
 $db->close();
