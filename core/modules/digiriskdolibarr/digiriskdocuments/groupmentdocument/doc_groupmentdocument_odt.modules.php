@@ -347,6 +347,9 @@ class doc_groupmentdocument_odt extends ModeleODTGroupmentDocument
 				$tmparray['photoDefault'] = DOL_DOCUMENT_ROOT . $nophoto;
 			}
 
+			if (!empty($conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS)) {
+				$tmparray['entity'] = 'S'. $conf->entity . ' - ';
+			}
 			$tmparray['nom']         = $digiriskelement->label;
 			$tmparray['reference']   = $digiriskelement->ref;
 			$tmparray['description'] = $digiriskelement->description;

@@ -334,7 +334,9 @@ class doc_workunitdocument_odt extends ModeleODTWorkUnitDocument
 			$tmparray = array_merge($substitutionarray, $array_object_from_properties, $array_soc);
 			complete_substitutions_array($tmparray, $outputlangs, $object);
 
-
+			if (!empty($conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS)) {
+				$tmparray['entity'] = 'S'. $conf->entity . ' - ';
+			}
 			$tmparray['nom']         = $digiriskelement->label;
 			$tmparray['reference']   = $digiriskelement->ref;
 			$tmparray['description'] = $digiriskelement->description;
