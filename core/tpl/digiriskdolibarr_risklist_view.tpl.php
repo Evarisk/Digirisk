@@ -1251,4 +1251,6 @@
 	print '</div>' . "\n";
 	print '<!-- End div class="fichecenter" -->';
 
-	dol_fiche_end();
+	if ($contextpage != 'risklist') {
+		dol_fiche_end();
+	}

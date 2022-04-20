@@ -52,16 +52,14 @@
 	$digiriskelement->fetch($conf->global->DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH);
 	$trashList = $digiriskelement->getTrashList();
 
-
 	$risktmp = new Risk($db);
 	$digiriskelementtmp = new DigiriskElement($db);
 	$allrisks = $risktmp->fetchAll('', '', 0, 0, array('customsql' => 'status > 0 AND entity NOT IN (' . $conf->entity . ')'));
 
-
 	// Build and execute select
 	// --------------------------------------------------------------------
 	if ( ! preg_match('/(evaluation)/', $sortfield)) {
-		$sql = 'SELECT ';
+		$sql = 'SELECT DISTINCT ';
 		foreach ($risk->fields as $key => $val) {
 			$sql .= 't.' . $key . ', ';
 		}
@@ -87,7 +85,20 @@
 				$sql .= " AND fk_element !=" . $element_id;
 			}
 			$sql .= " AND fk_element > 0 ";
-			$sql .= " AND e.entity IN (" . getEntity($risk->element) . ") ";
+			$sql .= " AND el.fk_target IN (";
+			foreach ($allrisks as $key => $risks) {
+				$digiriskelementtmp->fetch($risks->fk_element);
+				$digiriskelementList[] = $digiriskelementtmp->id;
+			}
+
+			$digiriskelementList = array_unique($digiriskelementList);
+
+			foreach ($digiriskelementList as $digiriskelementsingle) {
+				$sql .= $digiriskelementsingle . ',';
+			}
+			$sql = dol_substr($sql, 0 , -1);
+			$sql .= ")";
+			//$sql .= " AND e.entity IN (" . getEntity($risk->element) . ") ";
 		}
 
 		foreach ($search as $key => $val) {
