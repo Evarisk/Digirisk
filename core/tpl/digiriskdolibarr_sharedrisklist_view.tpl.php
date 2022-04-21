@@ -54,7 +54,7 @@
 
 	$risktmp = new Risk($db);
 	$digiriskelementtmp = new DigiriskElement($db);
-	$allrisks = $risktmp->fetchAll('', '', 0, 0, array('customsql' => 'status > 0 AND entity NOT IN (' . $conf->entity . ')'));
+	$alldigiriskelement = $digiriskelementtmp->fetchAll('', '', 0, 0, array('customsql' => 'status > 0'), 'AND');
 
 	// Build and execute select
 	// --------------------------------------------------------------------
@@ -86,15 +86,12 @@
 			}
 			$sql .= " AND fk_element > 0 ";
 			$sql .= " AND el.fk_target IN (";
-			foreach ($allrisks as $key => $risks) {
-				$digiriskelementtmp->fetch($risks->fk_element);
-				$digiriskelementList[] = $digiriskelementtmp->id;
+			foreach ($alldigiriskelement as $digiriskelementsingle) {
+				$digiriskelementList[] = $digiriskelementsingle->id;
 			}
-
 			$digiriskelementList = array_unique($digiriskelementList);
-
-			foreach ($digiriskelementList as $digiriskelementsingle) {
-				$sql .= $digiriskelementsingle . ',';
+			foreach ($digiriskelementList as $digiriskelementsinglefinal) {
+				$sql .= $digiriskelementsinglefinal . ',';
 			}
 			$sql = dol_substr($sql, 0 , -1);
 			$sql .= ")";
@@ -205,15 +202,12 @@
 			}
 			$sql .= " AND r.fk_element > 0";
 			$sql .= " AND el.fk_target IN (";
-			foreach ($allrisks as $key => $risks) {
-				$digiriskelementtmp->fetch($risks->fk_element);
-				$digiriskelementList[] = $digiriskelementtmp->id;
+			foreach ($alldigiriskelement as $digiriskelementsingle) {
+				$digiriskelementList[] = $digiriskelementsingle->id;
 			}
-
 			$digiriskelementList = array_unique($digiriskelementList);
-
-			foreach ($digiriskelementList as $digiriskelementsingle) {
-				$sql .= $digiriskelementsingle . ',';
+			foreach ($digiriskelementList as $digiriskelementsinglefinal) {
+				$sql .= $digiriskelementsinglefinal . ',';
 			}
 			$sql = dol_substr($sql, 0 , -1);
 			$sql .= ")";
