@@ -240,6 +240,8 @@ if ($sharedrisks) {
 			'text' => '<i class="fas fa-circle-info"></i>' . $langs->trans("ConfirmImportSharedRisks"),
 		);
 
+		$formquestionimportsharedrisks[] = array('type' => 'checkbox', 'name' =>'select_all_shared_risks', 'value' => 1);
+
 		foreach ($allrisks as $key => $risks) {
 			$digiriskelementtmp->fetch($risks->fk_element);
 			$digiriskelementtmp->element = 'digiriskdolibarr';

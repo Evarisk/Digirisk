@@ -1592,6 +1592,7 @@ window.eoxiaJS.risk.event = function() {
 	$( document ).on( 'click', '.risk-create:not(.button-disable)', window.eoxiaJS.risk.createRisk );
 	$( document ).on( 'click', '.risk-save', window.eoxiaJS.risk.saveRisk );
 	$( document ).on( 'click', '.risk-unlink-shared', window.eoxiaJS.risk.unlinkSharedRisk );
+	$( document ).on( 'click', '#select_all_shared_risks', window.eoxiaJS.risk.SelectAllSharedRisk );
 };
 
 /**
@@ -1830,10 +1831,10 @@ window.eoxiaJS.risk.saveRisk = function ( event ) {
 };
 
 /**
- * Action save risk.
+ * Action unlink shared risk.
  *
- * @since   1.0.0
- * @version 9.0.0
+ * @since   9.2.0
+ * @version 9.2.0
  *
  * @return {void}
  */
@@ -1881,6 +1882,27 @@ window.eoxiaJS.risk.unlinkSharedRisk = function ( event ) {
 			actionContainerError.removeClass('hidden');
 		}
 	});
+};
+
+/**
+ * Action select All shared risk.
+ *
+ * @since   9.2.0
+ * @version 9.2.0
+ *
+ * @return {void}
+ */
+window.eoxiaJS.risk.SelectAllSharedRisk = function ( event ) {
+	if(this.checked) {
+		// Iterate each checkbox
+		$(':checkbox').each(function() {
+			this.checked = true;
+		});
+	} else {
+		$(':checkbox').each(function() {
+			this.checked = false;
+		});
+	}
 };
 
 /**
