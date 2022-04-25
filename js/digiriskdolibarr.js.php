@@ -3047,7 +3047,7 @@ window.eoxiaJS.risksign.saveRiskSign = function ( event ) {
 
 	let riskSignRef =  $('.risksign_row_'+editedRiskSignId).find('.risksign-container > div:nth-child(1)').text();
 
-	window.eoxiaJS.loader.display(elementRiskSign);*
+	window.eoxiaJS.loader.display(elementRiskSign);
 
 	let token = $('.fichecenter').find('input[name="token"]').val();
 
