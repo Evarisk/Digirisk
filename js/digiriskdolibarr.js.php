@@ -1688,6 +1688,8 @@ window.eoxiaJS.risk.createRisk = function ( event ) {
 	evaluationText = window.eoxiaJS.risk.sanitizeBeforeRequest(evaluationText)
 	taskText = window.eoxiaJS.risk.sanitizeBeforeRequest(taskText)
 
+	let token = $('.fichecenter.risklist').find('input[name="token"]').val();
+
 	//Risk
 	var category = elementRisk.find('.risk-category input').val();
 	var description = riskCommentText;
@@ -1713,7 +1715,7 @@ window.eoxiaJS.risk.createRisk = function ( event ) {
 	window.eoxiaJS.loader.display($('.fichecenter.risklist'));
 
 	$.ajax({
-		url: document.URL + '&action=add',
+		url: document.URL + '&action=add&token='+token,
 		type: "POST",
 		data: JSON.stringify({
 			cotation: cotation,
@@ -1789,8 +1791,10 @@ window.eoxiaJS.risk.saveRisk = function ( event ) {
 	}
 	let riskRef =  $('.risk_row_'+editedRiskId).find('.risk-container > div:nth-child(1)').text();
 
+	let token = $('.fichecenter.risklist').find('input[name="token"]').val();
+
 	$.ajax({
-		url:  document.URL + '&action=saveRisk',
+		url:  document.URL + '&action=saveRisk&token='+token,
 		type: "POST",
 		processData: false,
 		data: JSON.stringify({
@@ -1848,8 +1852,10 @@ window.eoxiaJS.risk.unlinkSharedRisk = function ( event ) {
 	let riskRef =  $('.risk_row_'+riskId).find('.risk-container > div:nth-child(1)').text();
 	let url = document.URL.split(/#/);
 
+	let token = $('.fichecenter.risklist').find('input[name="token"]').val();
+
 	$.ajax({
-		url: url[0] + '&action=unlinkSharedRisk',
+		url: url[0] + '&action=unlinkSharedRisk&token='+token,
 		type: "POST",
 		processData: false,
 		data: JSON.stringify({
@@ -2061,8 +2067,10 @@ window.eoxiaJS.evaluation.createEvaluation = function ( event ) {
 	window.eoxiaJS.loader.display($(this));
 	window.eoxiaJS.loader.display($('.risk-evaluation-container-' + riskToAssign));
 
+	let token = $('.fichecenter.risklist').find('input[name="token"]').val();
+
 	$.ajax({
-		url: document.URL + '&action=addEvaluation',
+		url: document.URL + '&action=addEvaluation&token='+token,
 		type: "POST",
 		data: JSON.stringify({
 			cotation: cotation,
@@ -2125,6 +2133,8 @@ window.eoxiaJS.evaluation.deleteEvaluation = function ( event ) {
 	let actionContainerError = $('.messageErrorEvaluationDelete');
 	let evaluationID = element.attr('value');
 
+	let token = $('.fichecenter.risklist').find('input[name="token"]').val();
+
 	var r = confirm(textToShowBeforeDelete);
 	if (r == true) {
 
@@ -2136,7 +2146,7 @@ window.eoxiaJS.evaluation.deleteEvaluation = function ( event ) {
 		window.eoxiaJS.loader.display($(this));
 
 		$.ajax({
-			url:document.URL + '&action=deleteEvaluation&deletedEvaluationId=' + deletedEvaluationId,
+			url:document.URL + '&action=deleteEvaluation&deletedEvaluationId=' + deletedEvaluationId + '&token=' + token,
 			type: "POST",
 			processData: false,
 			contentType: false,
@@ -2215,8 +2225,10 @@ window.eoxiaJS.evaluation.saveEvaluation = function ( event ) {
 
 	window.eoxiaJS.loader.display($(this));
 
+	let token = $('.fichecenter.risklist').find('input[name="token"]').val();
+
 	$.ajax({
-		url: document.URL + '&action=saveEvaluation',
+		url: document.URL + '&action=saveEvaluation&token='+token,
 		type: "POST",
 		processData: false,
 		data: JSON.stringify({
@@ -2441,8 +2453,10 @@ window.eoxiaJS.riskassessmenttask.createRiskAssessmentTask = function ( event ) 
 
 	window.eoxiaJS.loader.display($(this));
 
+	let token = $('.fichecenter.risklist').find('input[name="token"]').val();
+
 	$.ajax({
-		url: document.URL + '&action=addRiskAssessmentTask',
+		url: document.URL + '&action=addRiskAssessmentTask&token='+token,
 		type: "POST",
 		data: JSON.stringify({
 			tasktitle: taskText,
@@ -2485,6 +2499,8 @@ window.eoxiaJS.riskassessmenttask.deleteRiskAssessmentTask = function ( event ) 
 	let deletedRiskAssessmentTaskId = $(this).attr('value');
 	let textToShow = element.find('.labelForDelete').val();
 
+	let token = $('.fichecenter.risklist').find('input[name="token"]').val();
+
 	var r = confirm(textToShow);
 	if (r == true) {
 
@@ -2493,7 +2509,7 @@ window.eoxiaJS.riskassessmenttask.deleteRiskAssessmentTask = function ( event ) 
 		window.eoxiaJS.loader.display($(this));
 
 		$.ajax({
-			url: document.URL + '&action=deleteRiskAssessmentTask&deletedRiskAssessmentTaskId=' + deletedRiskAssessmentTaskId,
+			url: document.URL + '&action=deleteRiskAssessmentTask&deletedRiskAssessmentTaskId=' + deletedRiskAssessmentTaskId + '&token=' + token,
 			type: "POST",
 			processData: false,
 			contentType: false,
@@ -2557,8 +2573,10 @@ window.eoxiaJS.riskassessmenttask.saveRiskAssessmentTask = function ( event ) {
 	window.eoxiaJS.loader.display($(this));
 	window.eoxiaJS.loader.display($('.riskassessment-task-single-'+ editedRiskAssessmentTaskId));
 
+	let token = $('.fichecenter.risklist').find('input[name="token"]').val();
+
 	$.ajax({
-		url: document.URL + '&action=saveRiskAssessmentTask',
+		url: document.URL + '&action=saveRiskAssessmentTask&token='+token,
 		data: JSON.stringify({
 			riskAssessmentTaskID: editedRiskAssessmentTaskId,
 			tasktitle: taskText,
@@ -2620,8 +2638,10 @@ window.eoxiaJS.riskassessmenttask.createRiskAssessmentTaskTimeSpent = function (
 	window.eoxiaJS.loader.display($(this));
 	window.eoxiaJS.loader.display($('.riskassessment-task-single-'+ taskID));
 
+	let token = $('.fichecenter.risklist').find('input[name="token"]').val();
+
 	$.ajax({
-		url: document.URL + '&action=addRiskAssessmentTaskTimeSpent',
+		url: document.URL + '&action=addRiskAssessmentTaskTimeSpent&token='+token,
 		type: "POST",
 		data: JSON.stringify({
 			taskID: taskID,
@@ -2675,6 +2695,8 @@ window.eoxiaJS.riskassessmenttask.deleteRiskAssessmentTaskTimeSpent = function (
 	let deletedRiskAssessmentTaskTimeSpentId = $(this).attr('value');
 	let textToShow = element.find('.labelForDelete').val();
 
+	let token = $('.fichecenter.risklist').find('input[name="token"]').val();
+
 	var r = confirm(textToShow);
 	if (r == true) {
 
@@ -2683,7 +2705,7 @@ window.eoxiaJS.riskassessmenttask.deleteRiskAssessmentTaskTimeSpent = function (
 		window.eoxiaJS.loader.display($(this));
 
 		$.ajax({
-			url: document.URL + '&action=deleteRiskAssessmentTaskTimeSpent&deletedRiskAssessmentTaskTimeSpentId=' + deletedRiskAssessmentTaskTimeSpentId,
+			url: document.URL + '&action=deleteRiskAssessmentTaskTimeSpent&deletedRiskAssessmentTaskTimeSpentId=' + deletedRiskAssessmentTaskTimeSpentId + '&token=' + token,
 			type: "POST",
 			processData: false,
 			contentType: false,
@@ -2747,8 +2769,10 @@ window.eoxiaJS.riskassessmenttask.saveRiskAssessmentTaskTimeSpent = function ( e
 	window.eoxiaJS.loader.display($(this));
 	window.eoxiaJS.loader.display($('.riskassessment-task-single-'+ taskID));
 
+	let token = $('.fichecenter.risklist').find('input[name="token"]').val();
+
 	$.ajax({
-		url: document.URL + '&action=saveRiskAssessmentTaskTimeSpent',
+		url: document.URL + '&action=saveRiskAssessmentTaskTimeSpent&token='+token,
 		data: JSON.stringify({
 			riskAssessmentTaskTimeSpentID: riskAssessmentTaskTimeSpentID,
 			date: date,
@@ -2814,8 +2838,10 @@ window.eoxiaJS.riskassessmenttask.checkTaskProgress = function ( event ) {
 
 	window.eoxiaJS.loader.display($('.riskassessment-task-single-'+ RiskAssessmentTaskId));
 
+	let token = $('.fichecenter.risklist').find('input[name="token"]').val();
+
 	$.ajax({
-		url: document.URL + '&action=checkTaskProgress',
+		url: document.URL + '&action=checkTaskProgress&token='+token,
 		data: JSON.stringify({
 			riskAssessmentTaskID: RiskAssessmentTaskId,
 			taskProgress: taskProgress,
@@ -2973,8 +2999,10 @@ window.eoxiaJS.risksign.createRiskSign = function ( event ) {
 
 	window.eoxiaJS.loader.display($('.fichecenter'));
 
+	let token = $('.fichecenter').find('input[name="token"]').val();
+
 	$.ajax({
-		url: document.URL + '&action=add',
+		url: document.URL + '&action=add&token='+token,
 		type: "POST",
 		data: JSON.stringify({
 			riskSignCategory: category,
@@ -3019,9 +3047,12 @@ window.eoxiaJS.risksign.saveRiskSign = function ( event ) {
 
 	let riskSignRef =  $('.risksign_row_'+editedRiskSignId).find('.risksign-container > div:nth-child(1)').text();
 
-	window.eoxiaJS.loader.display(elementRiskSign);
+	window.eoxiaJS.loader.display(elementRiskSign);*
+
+	let token = $('.fichecenter').find('input[name="token"]').val();
+
 	$.ajax({
-		url: document.URL + '&action=saveRiskSign',
+		url: document.URL + '&action=saveRiskSign&token='+token,
 		data: JSON.stringify({
 			riskSignID: editedRiskSignId,
 			riskSignCategory: category,
@@ -3126,8 +3157,10 @@ window.eoxiaJS.evaluator.createEvaluator = function ( event ) {
 
 	window.eoxiaJS.loader.display(elementParent);
 
+	let token = $('.fichecenter').find('input[name="token"]').val();
+
 	$.ajax({
-		url: document.URL + '&action=add',
+		url: document.URL + '&action=add&token='+token,
 		type: "POST",
 		data: JSON.stringify({
 			evaluatorID: userID,
