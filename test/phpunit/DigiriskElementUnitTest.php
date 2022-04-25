@@ -174,7 +174,7 @@ class DigiriskElementUnitTest extends PHPUnit\Framework\TestCase
 		$localobject->description   = "TestDescriptionDigiriskElement";
 		$localobject->element_type  = 'groupment';
 		$localobject->photo         = 'test.png';
-		$localobject->rank          = 1;
+		$localobject->ranks         = 1;
 		$localobject->fk_user_creat = $user->id ? $user->id : 1;
 		$localobject->fk_user_modif = $user->id ? $user->id : 1;
 		$localobject->fk_parent     = 0;
@@ -274,7 +274,7 @@ class DigiriskElementUnitTest extends PHPUnit\Framework\TestCase
 		$localobject->description   = "UpdatedTestDescriptionDigiriskElement";
 		$localobject->element_type  = 'groupment';
 		$localobject->photo         = 'newtest.png';
-		$localobject->rank          = 1;
+		$localobject->ranks         = 1;
 		$localobject->fk_user_creat = $user->id ? $user->id : 1;
 		$localobject->fk_user_modif = $user->id ? $user->id : 1;
 		$localobject->fk_parent     = 0;
@@ -301,7 +301,7 @@ class DigiriskElementUnitTest extends PHPUnit\Framework\TestCase
 		$this->assertSame($localobject->description, $newobject->description);
 		$this->assertSame($localobject->element_type, $newobject->element_type);
 		$this->assertSame($localobject->photo, $newobject->photo);
-		$this->assertSame($localobject->rank, $newobject->rank);
+		$this->assertSame($localobject->ranks, $newobject->ranks);
 		$this->assertEquals($localobject->fk_user_creat, $newobject->fk_user_creat);
 		$this->assertEquals($localobject->fk_user_modif, $newobject->fk_user_modif);
 		$this->assertEquals($localobject->fk_parent, $newobject->fk_parent);

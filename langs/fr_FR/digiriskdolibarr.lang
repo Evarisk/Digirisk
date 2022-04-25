@@ -864,7 +864,11 @@ ElementType = Type d'élément
 ParentElement = Élément parent
 OrganizationSaved = L'organisation et des groupements et des unités de travail a été sauvegardée
 OrganizationNotSaved = L'organisation et des groupements et des unités de travail n'a pas pu être sauvegardée
-DigiriskElementOrganization = Organisation de l'arborescence
+DigiriskElementOrganization = Organisation de l'arborescence*
+ShareDigiriskelement = Activer le partage des groupements et unités de travail
+DIGIRISKELEMENTSharing = Partage des des groupements et unités de travail
+DIGIRISKELEMENTSharingDescription = Sélection des entités qui partageront leurs groupements et unités de travail avec cette entité.
+DigiriskElementSharedTooltip = Cette option permet de partager les groupements et unités de travail. <br> INFO : Si vous souhaitez pouvoir afficher les tâches, il faut activer l'option de partage des projets.
 
 #
 # Groupment - Groupement
@@ -1029,14 +1033,35 @@ AddRisk = Ajouter un risque
 NoDescriptionThere = Aucune description renseignée sur ce risque
 NoRiskThere = "Aucun risque spécifique sur cette unité" Cependant vous pouvez être soumis aux risques génériques de vos groupements de travail.
 fk_risk = Risque lié
-ShowParentRisks = Risques des éléments parents
-ShowParentRisksDescription = Afficher les risques des éléments parents dans les fiches d'unité et de groupement
 MoveRisk = Déplacer le risque
 MoveRisks = Déplacer les risques
 MoveRisksDescription = Permet de déplacer les risques d'un groupement ou d'une unité de travail à un(e) autre
 SetConfToMoveRisk = Vous devez d'abord autoriser le déplacement des risques dans "Configuration du module -> Document Unique"
 RiskDescriptionPrefill = Préremplir la description
 RiskDescriptionPrefillDescription = Préremplir la description du risque avec le nom de la catégorie
+DigiriskElementSharedRisksList = Liste des risques partagés
+ImportSharedRisks = Importer des risques partagés
+AlreadyImported = Déja importé
+ShowSharedRisks = Risques partagés
+ShowSharedRisksDescription = Afficher les risques partagés dans les documents et les listings
+DigiriskElementSharedRisk = Risques partagés
+SharedRisks = Risques partagés
+ShareRisk = Activer le partage des risques
+RISKSharing = Partage des risques
+RISKSharingDescription = Sélection des entités qui partageront leurs risques avec cette entité.
+UnlinkSharedRisk = Délier le risque partagé
+RiskWellUnlinkShared = Risque délié
+RiskNotUnlinkShared = Erreur : Risque délié
+HasBeenUnlinkSharedM =  a été délié
+HasNotBeenUnlinkSharedM = n'a pas été délié
+RiskSharedTooltip = Cette option permet de partager les risques. <br> INFO : Si vous souhaitez pouvoir afficher les tâches, il faut activer l'option de partage des projets.
+ShowInheritedRisks = Risques hérités
+ShowInheritedRisksDescription = Afficher les risques hérités dans les documents et les listings
+ShowRisks = Risques
+ShowRisksDescription = Afficher les risques dans les documents et les listings
+DigiriskElementInheritedRisksList Liste des risques hérités
+ConfirmImportSharedRisks = Veuillez choisir les risques partagés à importer
+
 
 #
 # RiskAssessment - Évaluation
@@ -1189,6 +1214,7 @@ TaskTimeSpentNotDeleted = Erreur lors de la suppression de temps consommé
 OnTheTask = sur la tâche
 TaskTimeSpentDuration = Durée du temps consommé
 TaskTimeSpentDurationDescription = Le temps consommé ajouté par défaut à chaque tâche
+NoTaskShared = Pas de tâche en cours ou partagées
 
 
 

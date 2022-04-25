@@ -363,7 +363,7 @@ class doc_riskassessmentdocument_odt extends ModeleODTRiskAssessmentDocument
 					$digiriskelementobject = new DigiriskElement($this->db);
 					$digiriskelementlist   = $digiriskelementobject->fetchDigiriskElementFlat(0);
 					$risk                  = new Risk($this->db);
-					$risks                 = $risk->fetchRisksOrderedByCotation(0, true);
+					$risks                 = $risk->fetchRisksOrderedByCotation(0, true, $conf->global->DIGIRISKDOLIBARR_SHOW_INHERITED_RISKS, $conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS);
 
 					if ( ! empty($digiriskelementlist) ) {
 						$listlines = $odfHandler->setSegment('elementParHierarchie');
@@ -373,7 +373,7 @@ class doc_riskassessmentdocument_odt extends ModeleODTRiskAssessmentDocument
 							for ($k = 0; $k < $line['depth']; $k++) {
 								$depthHyphens .= '- ';
 							}
-							$tmparray['nomElement'] = $depthHyphens . $line['object']->ref . ' ' . $line['object']->label;
+							$tmparray['nomElement'] = $depthHyphens . (!empty($conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS) ? 'S' . $line['object']->entity . ' - ' : '') . $line['object']->ref . ' ' . $line['object']->label;
 
 							unset($tmparray['object_fields']);
 
@@ -399,6 +399,12 @@ class doc_riskassessmentdocument_odt extends ModeleODTRiskAssessmentDocument
 
 					if ( ! empty($digiriskelementlist) ) {
 						$totalQuotation = 0;
+						$scale_counter = array(
+							1 => 0,
+							2 => 0,
+							3 => 0,
+							4 => 0
+						);
 						$line           = '';
 						$listlines      = $odfHandler->setSegment('risqueFiche');
 
@@ -415,11 +421,44 @@ class doc_riskassessmentdocument_odt extends ModeleODTRiskAssessmentDocument
 								}
 							}
 
-							$elementName                 = $digiriskelementsingle['object']->ref . ' ' . $digiriskelementsingle['object']->label;
-							$scale_counter               = $digiriskelementsingle['object']->getRiskAssessmentCategoriesNumber();
-							$cotationarray[$elementName] = array($totalQuotation, $digiriskelementsingle['object']->description,$scale_counter);
+							if (!empty($conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS)) {
+								foreach ($risks as $riskline) {
+									$digiriskelementtmp = new DigiriskElement($this->db);
+									$digiriskelementtmp->fetch($riskline->fk_element);
+									$digiriskelementtmp->element = 'digiriskdolibarr';
+									$digiriskelementtmp->fetchObjectLinked($riskline->id, 'digiriskdolibarr_risk', $digiriskelementsingle['object']->id, 'digiriskdolibarr_digiriskelement', 'AND', 1, 'sourcetype', 0);
+									if ($digiriskelementtmp->linkedObjectsIds['digiriskdolibarr_digiriskelement'] > 0 && is_array($digiriskelementtmp->linkedObjectsIds['digiriskdolibarr_digiriskelement'])) {
+										$digiriskelementLinkedId = array_values($digiriskelementtmp->linkedObjectsIds['digiriskdolibarr_digiriskelement']);
+										if (in_array($digiriskelementsingle['object']->id, $digiriskelementLinkedId)) {
+											$evaluation = new RiskAssessment($this->db);
+											$lastEvaluation = $evaluation->fetchFromParent($riskline->id, 1);
+											if ($lastEvaluation > 0 && !empty($lastEvaluation) && is_array($lastEvaluation)) {
+												$lastEvaluation = array_shift($lastEvaluation);
+												$totalQuotation += $lastEvaluation->cotation;
+												$scale                  = $lastEvaluation->get_evaluation_scale();
+												$scale_counter[$scale] += 1;
+											}
+										}
+									}
+								}
+							}
+
+							$elementName                   = (!empty($conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS) ? 'S' . $digiriskelementsingle['object']->entity . ' - ' : '') . $digiriskelementsingle['object']->ref . ' ' . $digiriskelementsingle['object']->label;
+							$scaleCounterWithoutSharedRisk = $digiriskelementsingle['object']->getRiskAssessmentCategoriesNumber();
+
+							foreach ($scale_counter as $key => $value) {
+								$final_scale_counter[$key] = $scale_counter[$key] + $scaleCounterWithoutSharedRisk[$key];
+							}
+
+							$cotationarray[$elementName] = array($totalQuotation, $digiriskelementsingle['object']->description,$final_scale_counter);
 
 							$totalQuotation = 0;
+							$scale_counter = array(
+								1 => 0,
+								2 => 0,
+								3 => 0,
+								4 => 0
+							);
 							unset($tmparray['object_fields']);
 						}
 						//use arsort to sort array according to value
@@ -474,7 +513,7 @@ class doc_riskassessmentdocument_odt extends ModeleODTRiskAssessmentDocument
 										if ($scale == $i) {
 											$element = new DigiriskElement($this->db);
 											$element->fetch($line->fk_element);
-											$tmparray['nomElement'] = $element->ref . ' - ' . $element->label;
+											$tmparray['nomElement'] = (!empty($conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS) ? 'S' . $element->entity . ' - ' : '') . $element->ref . ' - ' . $element->label;
 											$tmparray['nomDanger'] = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $line->get_danger_category($line) . '.png';
 											$tmparray['identifiantRisque'] = $line->ref . ' - ' . $lastEvaluation->ref;
 											$tmparray['quotationRisque'] = $lastEvaluation->cotation ? $lastEvaluation->cotation : '0';
@@ -486,24 +525,12 @@ class doc_riskassessmentdocument_odt extends ModeleODTRiskAssessmentDocument
 
 											if (!empty($related_tasks) && is_array($related_tasks)) {
 												foreach ($related_tasks as $related_task) {
+													$AllInitiales = '';
 													$related_task_contact_ids = $related_task->getListContactId();
 													if (!empty($related_task_contact_ids) && is_array($related_task_contact_ids)) {
 														foreach ($related_task_contact_ids as $related_task_contact_id) {
 															$user->fetch($related_task_contact_id);
-															$contact_array[$related_task_contact_id] = $user;
-														}
-													}
-													$AllInitiales = '';
-													if (!empty($contact_array) && is_array($contact_array)) {
-														foreach ($contact_array as $contact_array_single) {
-															$initiales = '';
-															if (dol_strlen($contact_array_single->firstname)) {
-																$initiales .= str_split($contact_array_single->firstname, 1)[0];
-															}
-															if (dol_strlen($contact_array_single->lastname)) {
-																$initiales .= str_split($contact_array_single->lastname, 1)[0];
-															}
-															$AllInitiales .= strtoupper($initiales) . ',';
+															$AllInitiales .= strtoupper(str_split($user->firstname, 1)[0]. str_split($user->lastname, 1)[0] . ',');
 														}
 													}
 													if ($related_task->progress == 100) {

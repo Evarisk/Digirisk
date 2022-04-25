@@ -375,7 +375,7 @@ class modDigiriskdolibarr extends DolibarrModules
 		$this->descriptionlong = "Digirisk";
 		$this->editor_name     = 'Evarisk';
 		$this->editor_url      = 'https://evarisk.com';
-		$this->version         = '9.1.1';
+		$this->version         = '9.2.0';
 		$this->const_name      = 'MAIN_MODULE_' . strtoupper($this->name);
 		$this->picto           = 'digiriskdolibarr@digiriskdolibarr';
 
@@ -576,8 +576,12 @@ class modDigiriskdolibarr extends DolibarrModules
 			181 => array('DIGIRISKDOLIBARR_RISK_ADDON', 'chaine', 'mod_risk_standard', '', 0, 'current'),
 			182 => array('DIGIRISKDOLIBARR_RISK_DESCRIPTION', 'integer', 1, '', 0, 'current'),
 			183 => array('DIGIRISKDOLIBARR_RISK_CATEGORY_EDIT', 'integer', 0, '', 0, 'current'),
-			184 => array('DIGIRISKDOLIBARR_RISK_DESCRIPTION_PREFILL', 'integer', 0, '', 0, 'current'),
+			184 => array('DIGIRISKDOLIBARR_MOVE_RISKS', 'integer', 0, '', 0, 'current'),
 			185 => array('DIGIRISKDOLIBARR_SORT_LISTINGS_BY_COTATION', 'integer', 1, '', 0, 'current'),
+			186 => array('DIGIRISKDOLIBARR_RISK_DESCRIPTION_PREFILL', 'integer', 0, '', 0, 'current'),
+			187 => array('DIGIRISKDOLIBARR_SHOW_RISKS', 'integer', 1, '', 0, 'current'),
+			188 => array('DIGIRISKDOLIBARR_SHOW_INHERITED_RISKS', 'integer', 0, '', 0, 'current'),
+			189 => array('DIGIRISKDOLIBARR_SHOW_SHARED_RISKS', 'integer', 0, '', 0, 'current'),
 
 			// CONST RISK ASSESSMENT
 			190 => array('MAIN_AGENDA_ACTIONAUTO_RISKASSESSMENT_CREATE', 'integer', 1, '', 0, 'current'),
@@ -1141,7 +1145,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			'type' => 'left',			                // This is a Left menu entry
 			'titre' => '<i class="fas fa-tasks"></i>  ' . $langs->trans('ActionPlan'),
 			'mainmenu' => 'digiriskdolibarr',
-			'leftmenu' => 'digirisktools',
+			'leftmenu' => 'digiriskactionplan',
 			'url' => '/projet/tasks.php?id=' . $conf->global->DIGIRISKDOLIBARR_DU_PROJECT,
 			'langs' => 'digiriskdolibarr@digiriskdolibarr',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
 			'position' => 48520 + $r,
@@ -1171,7 +1175,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			'type' => 'left',			                // This is a Left menu entry
 			'titre' => '<i class="fas fa-cog"></i>  ' . $langs->trans('DigiriskConfig'),
 			'mainmenu' => 'digiriskdolibarr',
-			'leftmenu' => 'digiriskdocumentmodels',
+			'leftmenu' => 'diogiriskconfig',
 			'url' => '/digiriskdolibarr/admin/setup.php',
 			'langs' => 'digiriskdolibarr@digiriskdolibarr',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
 			'position' => 48520 + $r,
@@ -1186,7 +1190,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			'type' => 'left',			                // This is a Left menu entry
 			'titre' => '<i class="fas fa-building"></i>  ' . $langs->trans('DigiriskConfigSociety'),
 			'mainmenu' => 'digiriskdolibarr',
-			'leftmenu' => 'digiriskdocumentmodels',
+			'leftmenu' => 'digirisksocietyconfig',
 			'url' => '/admin/company.php',
 			'langs' => 'digiriskdolibarr@digiriskdolibarr',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
 			'position' => 48520 + $r,
@@ -1290,7 +1294,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			$digiriskelement->ref          = $trashRef;
 			$digiriskelement->label        = $langs->trans('HiddenElements');
 			$digiriskelement->element_type = 'groupment';
-			$digiriskelement->rank         = 0;
+			$digiriskelement->ranks        = 0;
 			$digiriskelement->description  = $langs->trans('TrashGroupment');
 			$digiriskelement->status       = 0;
 			$trash_id                      = $digiriskelement->create($user);
@@ -1607,6 +1611,57 @@ class modDigiriskdolibarr extends DolibarrModules
 			dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_TRIGGERS_UPDATED', 1, 'integer', 0, '', $conf->entity);
 		}
 
+		$params = array(
+			'digiriskdolibarr' => array(																			// nom informatif du module externe qui apporte ses paramètres
+				'sharingelements' => array(																			// section des paramètres 'element' et 'object'
+					//partage digiriskelement
+					'digiriskelement' => array(																		// Valeur utilisée dans getEntity()
+						'type'    => 'element',																		// element: partage d'éléments principaux (thirdparty, product, member, etc...)
+						'icon'    => 'info-circle',																	// Font Awesome icon
+						'lang'    => 'digiriskdolibarr@digiriskdolibarr',											// Fichier de langue contenant les traductions
+						'tooltip' => 'DigiriskElementSharedTooltip',												// Message Tooltip (ne pas mettre cette clé si pas de tooltip)
+						'enable'  => '! empty($conf->digiriskdolibarr->enabled)',									// Conditions d'activation du partage
+						'input'   => array(																			// input : Paramétrage de la réaction du bouton on/off
+							'global' => array(																		// global : réaction lorsqu'on désactive l'option de partage global
+								'showhide' => true,																	// showhide : afficher/cacher le bloc de partage lors de l'activation/désactivation du partage global
+								'hide'     => true,																	// hide : cache le bloc de partage lors de la désactivation du partage global
+								'del'      => true																	// del : suppression de la constante du partage lors de la désactivation du partage global
+							)
+						)
+					),
+					//partage risk
+					'risk' => array(																				// Valeur utilisée dans getEntity()
+						'type'      => 'object',																	// element: partage d'éléments principaux (thirdparty, product, member, etc...)
+						'icon'      => 'exclamation-triangle',														// Font Awesome icon
+						'lang'      => 'digiriskdolibarr@digiriskdolibarr',											// Fichier de langue contenant les traductions
+						'tooltip'   => 'RiskSharedTooltip',															// Message Tooltip (ne pas mettre cette clé si pas de tooltip)
+						'mandatory' => 'digiriskelement',															// partage principal obligatoire
+						'enable'    => '! empty($conf->digiriskdolibarr->enabled)',									// Conditions d'activation du partage
+						'display'   => '! empty($conf->global->MULTICOMPANY_DIGIRISKELEMENT_SHARING_ENABLED)', 		// L'affichage de ce bloc de partage dépend de l'activation d'un partage parent
+						'input'     => array(																		// input : Paramétrage de la réaction du bouton on/off
+							'global' => array(																		// global : réaction lorsqu'on désactive l'option de partage global
+								'hide'     => true,																	// hide : cache le bloc de partage lors de la désactivation du partage global
+								'del'      => true																	// del : suppression de la constante du partage lors de la désactivation du partage global
+							),
+							'digiriskelement' => array(																// digiriskelement (nom du module principal) : réaction lorsqu'on désactive le partage principal (ici le partage des digiriskelements)
+								'showhide' => true,																	// showhide : afficher/cacher le bloc de partage lors de l'activation/désactivation du partage principal
+								'hide'     => true,																	// hide : cache le bloc de partage lors de la désactivation du partage principal
+								'del'      => true																	// del : supprime la constante du partage lors de la désactivation du partage principal
+							)
+						)
+					),
+				),
+				'sharingmodulename' => array(																		// correspondance des noms de modules pour le lien parent ou compatibilité (ex: 'productsupplierprice'	=> 'product')
+					'digiriskelement' => 'digiriskdolibarr',
+					'risk'            => 'digiriskdolibarr',
+				),
+			)
+		);
+
+		$externalmodule = json_decode($conf->global->MULTICOMPANY_EXTERNAL_MODULES_SHARING, true);
+		$externalmodule = !empty($conf->global->MULTICOMPANY_EXTERNAL_MODULES_SHARING) ? array_merge($externalmodule, $params) : $params;
+		$jsonformat = json_encode($externalmodule);
+		dolibarr_set_const($this->db, "MULTICOMPANY_EXTERNAL_MODULES_SHARING", $jsonformat, 'json', 0, '', 0);
 		return $this->_init($sql, $options);
 	}
 
@@ -1620,9 +1675,21 @@ class modDigiriskdolibarr extends DolibarrModules
 	 */
 	public function remove($options = '')
 	{
+		global $conf;
+
 		$sql = array();
 
 		$options = 'noremoverights';
+
+		if (!empty($conf->global->MULTICOMPANY_EXTERNAL_MODULES_SHARING) && $conf->global->MULTICOMPANY_EXTERNAL_MODULES_SHARING !== 0) {
+			$externalmodule = json_decode($conf->global->MULTICOMPANY_EXTERNAL_MODULES_SHARING, true);
+			if (is_array($externalmodule) && array_key_exists('digiriskdolibarr',$externalmodule) ) {
+				unset($externalmodule['digiriskdolibarr']);  // nom informatif du module externe qui apporte ses paramètres
+			}
+			$jsonformat = json_encode($externalmodule);
+			dolibarr_set_const($this->db, "MULTICOMPANY_EXTERNAL_MODULES_SHARING", $jsonformat, 'json', 0, '', 0);
+		}
+
 
 		return $this->_remove($sql, $options);
 	}

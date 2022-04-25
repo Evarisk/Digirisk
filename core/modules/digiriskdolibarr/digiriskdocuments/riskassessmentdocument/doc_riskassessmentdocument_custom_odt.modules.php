@@ -361,7 +361,7 @@ class doc_riskassessmentdocument_custom_odt extends ModeleODTRiskAssessmentDocum
 				if ($foundtagforlines) {
 					$risk = new Risk($this->db);
 					if ( ! empty($object) ) {
-						$risks = $risk->fetchRisksOrderedByCotation($object->id);
+						$risks = $risk->fetchRisksOrderedByCotation($object->id, true, $conf->global->DIGIRISKDOLIBARR_SHOW_INHERITED_RISKS, $conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS);
 						if ($risks < 1) {
 							$risks = array();
 						}

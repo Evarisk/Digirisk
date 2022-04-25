@@ -98,7 +98,7 @@ class DigiriskElement extends CommonObject
 		'fk_user_modif' => array('type' => 'integer:User:user/class/user.class.php', 'label' => 'UserModif', 'enabled' => '1', 'position' => 120, 'notnull' => -1, 'visible' => -2,),
 		'fk_parent'     => array('type' => 'integer', 'label' => 'ParentElement', 'enabled' => '1', 'position' => 130, 'notnull' => 1, 'visible' => 1, 'default' => 0,),
 		'fk_standard'   => array('type' => 'integer', 'label' => 'Standard', 'enabled' => '1', 'position' => 140, 'notnull' => 1, 'visible' => 0, 'default' => 1,),
-		'rank'          => array('type' => 'integer', 'label' => 'Order', 'enabled' => '1', 'position' => 150, 'notnull' => 1, 'visible' => 0),
+		'ranks'         => array('type' => 'integer', 'label' => 'Order', 'enabled' => '1', 'position' => 150, 'notnull' => 1, 'visible' => 0),
 	);
 
 	public $rowid;
@@ -117,7 +117,7 @@ class DigiriskElement extends CommonObject
 	public $fk_user_modif;
 	public $fk_parent;
 	public $fk_standard;
-	public $rank;
+	public $ranks;
 
 	/**
 	 * Constructor
@@ -417,7 +417,7 @@ class DigiriskElement extends CommonObject
 	 * @return string HTML string with
 	 * @throws Exception
 	 */
-	public function select_digiriskelement_list($selected = '', $htmlname = 'fk_element', $filter = '', $showempty = '1', $forcecombo = 0, $events = array(), $outputmode = 0, $limit = 0, $morecss = 'minwidth100', $moreparam = 0, $multiple = false, $noroot = 0)
+	public function select_digiriskelement_list($selected = '', $htmlname = 'fk_element', $filter = '', $showempty = '1', $forcecombo = 0, $events = array(), $outputmode = 0, $limit = 0, $morecss = 'minwidth100', $moreparam = 0, $multiple = false, $noroot = 0, $contextpage = '', $multientitymanagedoff = true)
 	{
 		global $conf, $langs;
 
@@ -436,8 +436,11 @@ class DigiriskElement extends CommonObject
 		$sql  = "SELECT *";
 		$sql .= " FROM " . MAIN_DB_PREFIX . "digiriskdolibarr_digiriskelement as s";
 
-		$sql              .= " WHERE s.entity IN (" . getEntity($this->table_element) . ")";
+		if (isset($this->ismultientitymanaged) && $this->ismultientitymanaged == 1 && $multientitymanagedoff == false) $sql .= ' WHERE s.entity IN (' . getEntity($this->element) . ')';
+		else $sql                                                                        .= ' WHERE s.entity = ' . $conf->entity;
+
 		if ($filter) $sql .= " AND (" . $filter . ")";
+
 		if ($moreparam > 0 ) {
 			$children = $this->fetchDigiriskElementFlat($moreparam);
 			if ( ! empty($children) && $children > 0) {
@@ -482,7 +485,7 @@ class DigiriskElement extends CommonObject
 			if ($num) {
 				while ($i < $num) {
 					$obj   = $this->db->fetch_object($resql);
-					$label = $obj->ref . ' - ' . $obj->label;
+					$label = !empty(!empty($conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS) && $contextpage == 'sharedrisk') ? 'S'. $obj->entity . ' - ' . $obj->ref . ' - ' . $obj->label :  $obj->ref . ' - ' . $obj->label;
 
 
 					if (empty($outputmode)) {
@@ -598,9 +601,11 @@ class DigiriskElement extends CommonObject
 			$linkclose .= ' class="classfortooltip' . ($morecss ? ' ' . $morecss : '') . '"';
 		} else $linkclose = ($morecss ? ' class="' . $morecss . '"' : '');
 
-		$linkstart  = '<a href="' . $url . '"';
-		$linkstart .= $linkclose . '>';
-		$linkend    = '</a>';
+		if ($option != 'nolink') {
+			$linkstart = '<a href="' . $url . '"';
+			$linkstart .= $linkclose . '>';
+			$linkend = '</a>';
+		}
 
 		$result                      .= $linkstart;
 		if ($withpicto) $result      .= '<i class="fas fa-info-circle"></i>' . ' ';
@@ -626,7 +631,7 @@ class DigiriskElement extends CommonObject
 	 */
 	public function getTrashList()
 	{
-		$objects = $this->fetchAll('',  'rank');
+		$objects = $this->fetchAll('',  'ranks');
 		if (is_array($objects)) {
 			$recurse_tree = recurse_tree($this->id, 0, $objects);
 			$ids          = [];

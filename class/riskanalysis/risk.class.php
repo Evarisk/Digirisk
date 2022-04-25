@@ -74,7 +74,7 @@ class Risk extends CommonObject
 		'fk_element' => array('type' => 'integer', 'label' => 'ParentElement', 'enabled' => '1', 'position' => 9, 'notnull' => 1, 'visible' => 1,),
 		'ref' => array('type' => 'varchar(128)', 'label' => 'Ref', 'enabled' => '1', 'position' => 20, 'notnull' => 1, 'visible' => 4, 'noteditable' => '1', 'default' => '(PROV)', 'index' => 1, 'searchall' => 1, 'showoncombobox' => '1', 'comment' => "Reference of object"),
 		'ref_ext' => array('type' => 'varchar(128)', 'label' => 'RefExt', 'enabled' => '1', 'position' => 30, 'notnull' => 0, 'visible' => 0,),
-		'entity' => array('type' => 'integer', 'label' => 'Entity', 'enabled' => '1', 'position' => 40, 'notnull' => 1, 'visible' => 0,),
+		'entity' => array('type' => 'integer', 'label' => 'Entity', 'enabled' => '1', 'position' => 8, 'notnull' => 1, 'visible' => 0,),
 		'date_creation' => array('type' => 'datetime', 'label' => 'DateCreation', 'enabled' => '1', 'position' => 50, 'notnull' => 1, 'visible' => 0,),
 		'tms' => array('type' => 'timestamp', 'label' => 'DateModification', 'enabled' => '1', 'position' => 60, 'notnull' => 0, 'visible' => 0,),
 		'import_key' => array('type' => 'varchar(14)', 'label' => 'ImportId', 'enabled' => '1', 'position' => 70, 'notnull' => -1, 'visible' => 0,),
@@ -180,12 +180,14 @@ class Risk extends CommonObject
 	 * @return array|int         <0 if KO, 0 if not found, >0 if OK
 	 * @throws Exception
 	 */
-	public function fetchRisksOrderedByCotation($parent_id, $get_children_data = false, $get_parents_data = false)
+	public function fetchRisksOrderedByCotation($parent_id, $get_children_data = false, $get_parents_data = false, $get_shared_data = false)
 	{
+		global $conf;
 		$object  = new DigiriskElement($this->db);
 		$objects = $object->fetchAll('',  '',  0,  0, array('customsql' => 'status > 0' ));
 		$risk    = new Risk($this->db);
 		$result  = $risk->fetchFromParent($parent_id);
+		$filter = '';
 
 		// RISKS de l'élément parent.
 		if ($result > 0 && ! empty($result)) {
@@ -261,6 +263,37 @@ class Risk extends CommonObject
 			}
 		}
 
+		if ( $get_shared_data ) {
+			$digiriskelementtmp = new DigiriskElement($this->db);
+
+//			$AllSharingsRisks = $conf->mc->sharings['risk'];
+//
+//			foreach ($AllSharingsRisks as $Allsharingsrisk) {
+//				$filter .= $Allsharingsrisk . ',';
+//			}
+//
+//			$filter = rtrim($filter, ',');
+
+			$allrisks = $risk->fetchAll('', '', 0, 0, array('customsql' => 'status > 0 AND entity NOT IN (' . $conf->entity . ')'), 'AND', 0);
+
+			foreach ($allrisks as $key => $allrisk) {
+				$digiriskelementtmp->fetch($allrisk->fk_element);
+				$digiriskelementtmp->element = 'digiriskdolibarr';
+				$digiriskelementtmp->fetchObjectLinked($allrisk->id, 'digiriskdolibarr_risk', $object->id, 'digiriskdolibarr_digiriskelement', 'AND', 1, 'sourcetype', 0);
+				$alreadyImported = !empty($digiriskelementtmp->linkedObjectsIds) ? 1 : 0;
+				if ($alreadyImported > 0) {
+					$evaluation     = new RiskAssessment($this->db);
+					$lastEvaluation = $evaluation->fetchFromParent($allrisk->id, 1);
+					if ( $lastEvaluation > 0 && ! empty($lastEvaluation)  && is_array($lastEvaluation)) {
+						$lastEvaluation       = array_shift($lastEvaluation);
+						$allrisk->lastEvaluation = $lastEvaluation->cotation;
+					}
+
+					$risks[$allrisk->id] = $allrisk;
+				}
+			}
+		}
+
 		if ( ! empty($risks) ) {
 			usort($risks, function ($first, $second) {
 				return $first->lastEvaluation < $second->lastEvaluation;
@@ -292,7 +325,7 @@ class Risk extends CommonObject
 		$sql                                                                              = 'SELECT ';
 		$sql                                                                             .= $this->getFieldList();
 		$sql                                                                             .= ' FROM ' . MAIN_DB_PREFIX . $this->table_element . ' as t';
-		if (isset($this->ismultientitymanaged) && $this->ismultientitymanaged == 1) $sql .= ' WHERE t.entity IN (' . getEntity($this->table_element) . ')';
+		if (isset($this->ismultientitymanaged) && $this->ismultientitymanaged == 1) $sql .= ' WHERE t.entity IN (' . getEntity($this->element) . ')';
 		else $sql                                                                        .= ' WHERE 1 = 1';
 
 		// Manage filter
@@ -553,5 +586,73 @@ class Risk extends CommonObject
 
 			return -1;
 		}
+	}
+
+	/**
+	 * 	Return clickable name (with picto eventually)
+	 *
+	 * 	@param	int		$withpicto		          0=No picto, 1=Include picto into link, 2=Only picto
+	 * 	@param	string	$option			          Variant where the link point to ('', 'nolink')
+	 * 	@param	int		$addlabel		          0=Default, 1=Add label into string, >1=Add first chars into string
+	 *  @param	string	$moreinpopup	          Text to add into popup
+	 *  @param	string	$sep			          Separator between ref and label if option addlabel is set
+	 *  @param	int   	$notooltip		          1=Disable tooltip
+	 *  @param  int     $save_lastsearch_value    -1=Auto, 0=No save of lastsearch_values when clicking, 1=Save lastsearch_values whenclicking
+	 *  @param	string	$morecss				  More css on a link
+	 * 	@return	string					          String with URL
+	 */
+	public function getNomUrl($withpicto = 0, $option = '', $addlabel = 0, $moreinpopup = '', $sep = ' - ', $notooltip = 0, $save_lastsearch_value = -1, $morecss = '')
+	{
+		global $conf, $langs, $user, $hookmanager;
+
+		if ( ! empty($conf->dol_no_mouse_hover)) $notooltip = 1; // Force disable tooltips
+
+		$result = '';
+
+		$label                          = '';
+		if ($option != 'nolink') $label = '<i class="fas fa-exclamation-triangle"></i> <u class="paddingrightonly">' . $langs->trans('Risk') . '</u>';
+		$label                         .= ($label ? '<br>' : '') . '<b>' . $langs->trans('Ref') . ': </b>' . $this->ref; // The space must be after the : to not being explode when showing the title in img_picto
+		if ($moreinpopup) $label       .= '<br>' . $moreinpopup;
+
+		$url = dol_buildpath('/digiriskdolibarr/view/digiriskelement/digiriskelement_risk.php', 1) . '?id=' . $this->fk_element;
+
+		if ($option != 'nolink') {
+			// Add param to save lastsearch_values or not
+			$add_save_lastsearch_values                                                                                      = ($save_lastsearch_value == 1 ? 1 : 0);
+			if ($save_lastsearch_value == -1 && preg_match('/list\.php/', $_SERVER["PHP_SELF"])) $add_save_lastsearch_values = 1;
+			if ($add_save_lastsearch_values) $url                                                                           .= '&save_lastsearch_values=1';
+		}
+
+		$linkclose = '';
+		if ($option == 'blank') {
+			$linkclose .= ' target=_blank';
+		}
+
+		if (empty($notooltip) && $user->rights->digiriskdolibarr->risk->read) {
+			if ( ! empty($conf->global->MAIN_OPTIMIZEFORTEXTBROWSER)) {
+				$label      = $langs->trans("ShowRisk");
+				$linkclose .= ' alt="' . dol_escape_htmltag($label, 1) . '"';
+			}
+			$linkclose .= ' title="' . dol_escape_htmltag($label, 1) . '"';
+			$linkclose .= ' class="classfortooltip' . ($morecss ? ' ' . $morecss : '') . '"';
+		} else $linkclose = ($morecss ? ' class="' . $morecss . '"' : '');
+
+		$linkstart  = '<a href="' . $url . '"';
+		$linkstart .= $linkclose . '>';
+		$linkend    = '</a>';
+
+		$result                      .= $linkstart;
+		if ($withpicto) $result      .= '<i class="fas fa-exclamation-triangle"></i>' . ' ';
+		if ($withpicto != 2) $result .= $this->ref;
+		$result                      .= $linkend;
+
+		global $action;
+		$hookmanager->initHooks(array('riskdao'));
+		$parameters               = array('id' => $this->id, 'getnomurl' => $result);
+		$reshook                  = $hookmanager->executeHooks('getNomUrl', $parameters, $this, $action); // Note that $action and $this may have been modified by some hooks
+		if ($reshook > 0) $result = $hookmanager->resPrint;
+		else $result             .= $hookmanager->resPrint;
+
+		return $result;
 	}
 }

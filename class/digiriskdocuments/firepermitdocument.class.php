@@ -116,8 +116,8 @@ class FirePermitDocument extends DigiriskDocuments
 			$firepermit->fetch($id);
 		}
 
-		$firepermitlines     = $firepermitline->fetchAll(GETPOST('id'));
-		$preventionplanlines = $preventionplanline->fetchAll($firepermit->fk_preventionplan);
+		$firepermitlines     = $firepermitline->fetchAll('', '', 0, 0, array(), 'AND', GETPOST('id'));
+		$preventionplanlines = $preventionplanline->fetchAll('', '', 0, 0, array(), 'AND', $firepermit->fk_preventionplan);
 		$digirisk_resources  = $resources->digirisk_dolibarr_fetch_resources();
 
 		$extsociety          = $resources->fetchResourcesFromObject('FP_EXT_SOCIETY', $firepermit);

@@ -1591,7 +1591,8 @@ window.eoxiaJS.risk.event = function() {
 	$( document ).on( 'click', '.category-danger .item, .wpeo-table .category-danger .item', window.eoxiaJS.risk.selectDanger );
 	$( document ).on( 'click', '.risk-create:not(.button-disable)', window.eoxiaJS.risk.createRisk );
 	$( document ).on( 'click', '.risk-save', window.eoxiaJS.risk.saveRisk );
-	$( document ).on( 'change', '#fk_element', window.eoxiaJS.risk.selectDigiriskElement );
+	$( document ).on( 'click', '.risk-unlink-shared', window.eoxiaJS.risk.unlinkSharedRisk );
+	$( document ).on( 'click', '#select_all_shared_risks', window.eoxiaJS.risk.SelectAllSharedRisk );
 };
 
 /**
@@ -1709,7 +1710,7 @@ window.eoxiaJS.risk.createRisk = function ( event ) {
 	var task = taskText;
 
 	//Loader
-	window.eoxiaJS.loader.display($('.fichecenter'));
+	window.eoxiaJS.loader.display($('.fichecenter.risklist'));
 
 	$.ajax({
 		url: document.URL + '&action=add',
@@ -1734,12 +1735,12 @@ window.eoxiaJS.risk.createRisk = function ( event ) {
 		processData: false,
 		contentType: false,
 		success: function ( resp ) {
-			$('.fichecenter').html($(resp).find('#searchFormList'))
+			$('.fichecenter.risklist').html($(resp).find('#searchFormListRisks'))
 
 			let actionContainerSuccess = $('.messageSuccessRiskCreate')
 			actionContainerSuccess.html($(resp).find('.risk-create-success-notice'))
 			actionContainerSuccess.removeClass('hidden')
-			$('.fichecenter').removeClass('wpeo-loader');
+			$('.fichecenter.risklist').removeClass('wpeo-loader');
 		},
 		error: function ( resp ) {
 			let actionContainerError = $('.messageErrorRiskCreate');
@@ -1747,7 +1748,7 @@ window.eoxiaJS.risk.createRisk = function ( event ) {
 			actionContainerError.html($(resp).find('.risk-create-error-notice'));
 			actionContainerError.removeClass('hidden');
 
-			$('.fichecenter').removeClass('wpeo-loader');
+			$('.fichecenter.risklist').removeClass('wpeo-loader');
 		}
 	});
 
@@ -1781,7 +1782,7 @@ window.eoxiaJS.risk.saveRisk = function ( event ) {
 		newParent = newParent.split(/ /)[0];
 	}
 
-	let elementParent = $('.fichecenter').find('.div-table-responsive');
+	let elementParent = $('.fichecenter.risklist').find('.div-table-responsive');
 	//window.eoxiaJS.loader.display($(this));
 	if (riskCommentText) {
 		window.eoxiaJS.loader.display($(this).closest('.risk-row-content-' + editedRiskId).find('.risk-description-'+editedRiskId));
@@ -1830,18 +1831,78 @@ window.eoxiaJS.risk.saveRisk = function ( event ) {
 };
 
 /**
- * Lors du clic sur un digiriskElement, met a jour la ref du champ de recherche
+ * Action unlink shared risk.
  *
- * @since   9.0.1
- * @version 9.0.1
+ * @since   9.2.0
+ * @version 9.2.0
  *
- * @param  {MouseEvent} event [description]
  * @return {void}
  */
-window.eoxiaJS.risk.selectDigiriskElement = function( event ) {
-	let selectTitle = $(this).closest('td').find('#select2-fk_element-container').attr('title')
-	let digiriskElementRef = selectTitle.split(/ /)[0]
-	$('.input-hidden-fk_element').attr('value',digiriskElementRef);
+window.eoxiaJS.risk.unlinkSharedRisk = function ( event ) {
+	let riskId = $(this).attr('value');
+	//let elementRisk = $(this).closest('.risk-container').find('.risk-content');
+	let elementParent = $('.fichecenter.sharedrisklist').find('.div-table-responsive');
+
+	window.eoxiaJS.loader.display($(this));
+
+	let riskRef =  $('.risk_row_'+riskId).find('.risk-container > div:nth-child(1)').text();
+	let url = document.URL.split(/#/);
+
+	$.ajax({
+		url: url[0] + '&action=unlinkSharedRisk',
+		type: "POST",
+		processData: false,
+		data: JSON.stringify({
+			riskID: riskId,
+		}),
+		contentType: false,
+		success: function ( resp ) {
+			$('.fichecenter.sharedrisklist .opacitymedium.colorblack.paddingleft').html($(resp).find('#searchFormSharedListRisks .opacitymedium.colorblack.paddingleft'))
+			let actionContainerSuccess = $('.messageSuccessRiskUnlinkShared');
+
+			$('#risk_row_' + riskId).fadeOut(800);
+
+			let textToShow = '';
+			textToShow += actionContainerSuccess.find('.valueForUnlinkSharedRisk1').val()
+			textToShow += riskRef
+			textToShow += actionContainerSuccess.find('.valueForUnlinkSharedRisk2').val()
+
+			actionContainerSuccess.find('.notice-subtitle .text').text(textToShow)
+			actionContainerSuccess.removeClass('hidden');
+		},
+		error: function ( resp ) {
+			let actionContainerError = $('.messageErrorRiskUnlinkShared');
+
+			let textToShow = '';
+			textToShow += actionContainerError.find('.valueForUnlinkSharedRisk1').val()
+			textToShow += riskRef
+			textToShow += actionContainerError.find('.valueForUnlinkSharedRisk2').val()
+
+			actionContainerError.find('.notice-subtitle .text').text(textToShow)
+			actionContainerError.removeClass('hidden');
+		}
+	});
+};
+
+/**
+ * Action select All shared risk.
+ *
+ * @since   9.2.0
+ * @version 9.2.0
+ *
+ * @return {void}
+ */
+window.eoxiaJS.risk.SelectAllSharedRisk = function ( event ) {
+	if(this.checked) {
+		// Iterate each checkbox
+		$(':checkbox').each(function() {
+			this.checked = true;
+		});
+	} else {
+		$(':checkbox').each(function() {
+			this.checked = false;
+		});
+	}
 };
 
 /**
@@ -2021,7 +2082,7 @@ window.eoxiaJS.evaluation.createEvaluation = function ( event ) {
 		processData: false,
 		contentType: false,
 		success: function( resp ) {
-			$('.fichecenter').html($(resp).find('#searchFormList'))
+			$('.fichecenter.risklist').html($(resp).find('#searchFormListRisks'))
 
 			let actionContainerSuccess = $('.messageSuccessEvaluationCreate');
 
@@ -2179,7 +2240,7 @@ window.eoxiaJS.evaluation.saveEvaluation = function ( event ) {
 				listModalContainer.find('.modal-content .risk-evaluations-list-content').html($(resp).find('.risk-evaluations-list-'+riskId))
 				$('.risk-evaluation-single-content-'+riskId).html($(resp).find('.risk-evaluation-single-'+riskId))
 			} else {
-				$('.fichecenter').html($(resp).find('#searchFormList'))
+				$('.fichecenter.risklist').html($(resp).find('#searchFormListRisks'))
 				$('#risk_row_' + riskId).fadeOut(800);
 				$('#risk_row_' + riskId).fadeIn(800);
 
@@ -2321,7 +2382,7 @@ window.eoxiaJS.riskassessmenttask.event = function() {
 	$( document ).on( 'click', '.riskassessment-task-timespent-create', window.eoxiaJS.riskassessmenttask.createRiskAssessmentTaskTimeSpent);
 	$( document ).on( 'click', '.riskassessment-task-timespent-save', window.eoxiaJS.riskassessmenttask.saveRiskAssessmentTaskTimeSpent);
 	$( document ).on( 'click', '.riskassessment-task-timespent-delete', window.eoxiaJS.riskassessmenttask.deleteRiskAssessmentTaskTimeSpent );
-	$( document ).on( 'click', '.riskassessment-task-progress-checkbox', window.eoxiaJS.riskassessmenttask.checkTaskProgress );
+	$( document ).on( 'click', '.riskassessment-task-progress-checkbox:not(.riskassessment-task-progress-checkbox-readonly)', window.eoxiaJS.riskassessmenttask.checkTaskProgress );
 	$( document ).on( 'change', '#RiskassessmentTaskTimespentDatehour', window.eoxiaJS.riskassessmenttask.selectRiskassessmentTaskTimespentDateHour );
 	$( document ).on( 'change', '#RiskassessmentTaskTimespentDatemin', window.eoxiaJS.riskassessmenttask.selectRiskassessmentTaskTimespentDateMin );
 };
@@ -2390,7 +2451,7 @@ window.eoxiaJS.riskassessmenttask.createRiskAssessmentTask = function ( event ) 
 		processData: false,
 		contentType: false,
 		success: function ( resp ) {
-			$('.fichecenter').html($(resp).find('#searchFormList'))
+			$('.fichecenter.risklist').html($(resp).find('#searchFormListRisks'))
 			let actionContainerSuccess = $('.messageSuccessTaskCreate');
 
 			$('.riskassessment-tasks' + riskToAssign).fadeOut(800);
@@ -2437,7 +2498,7 @@ window.eoxiaJS.riskassessmenttask.deleteRiskAssessmentTask = function ( event ) 
 			processData: false,
 			contentType: false,
 			success: function ( resp ) {
-				$('.fichecenter').html($(resp).find('#searchFormList'))
+				$('.fichecenter.risklist').html($(resp).find('#searchFormListRisks'))
 				let actionContainerSuccess = $('.messageSuccessTaskDelete');
 				$('.riskassessment-tasks' + riskId).fadeOut(800);
 				$('.riskassessment-tasks' + riskId).fadeIn(800);
@@ -2507,7 +2568,7 @@ window.eoxiaJS.riskassessmenttask.saveRiskAssessmentTask = function ( event ) {
 		processData: false,
 		contentType: false,
 		success: function ( resp ) {
-			$('.fichecenter').html($(resp).find('#searchFormList'))
+			$('.fichecenter.risklist').html($(resp).find('#searchFormListRisks'))
 			let actionContainerSuccess = $('.messageSuccessTaskEdit');
 			$('.riskassessment-tasks' + riskId).fadeOut(800);
 			$('.riskassessment-tasks' + riskId).fadeIn(800);
@@ -2584,6 +2645,7 @@ window.eoxiaJS.riskassessmenttask.createRiskAssessmentTaskTimeSpent = function (
 			textToShow += actionContainerSuccess.find('.valueForCreateTaskTimeSpent2').val()
 
 			$('#risk_assessment_task_edit'+taskID).first().find('.riskassessment-task-timespent-container').first().append($(resp).find('#risk_assessment_task_edit'+taskID).first().find('.riskassessment-task-timespent-list-content').last())
+			$('.loader-spin').remove();
 			$('.wpeo-loader').removeClass('wpeo-loader')
 
 			actionContainerSuccess.find('.notice-subtitle .text').text(textToShow)
@@ -2626,7 +2688,7 @@ window.eoxiaJS.riskassessmenttask.deleteRiskAssessmentTaskTimeSpent = function (
 			processData: false,
 			contentType: false,
 			success: function ( resp ) {
-				$('.fichecenter').html($(resp).find('#searchFormList'))
+				$('.fichecenter.risklist').html($(resp).find('#searchFormListRisks'))
 				let actionContainerSuccess = $('.messageSuccessTaskTimeSpentDelete');
 				$('.riskassessment-tasks' + riskId).fadeOut(800);
 				$('.riskassessment-tasks' + riskId).fadeIn(800);
@@ -2699,7 +2761,7 @@ window.eoxiaJS.riskassessmenttask.saveRiskAssessmentTaskTimeSpent = function ( e
 		processData: false,
 		contentType: false,
 		success: function ( resp ) {
-			$('.fichecenter').html($(resp).find('#searchFormList'))
+			$('.fichecenter.risklist').html($(resp).find('#searchFormListRisks'))
 			let actionContainerSuccess = $('.messageSuccessTaskTimeSpentEdit');
 			$('.riskassessment-tasks' + riskId).fadeOut(800);
 			$('.riskassessment-tasks' + riskId).fadeIn(800);
@@ -2762,7 +2824,7 @@ window.eoxiaJS.riskassessmenttask.checkTaskProgress = function ( event ) {
 		processData: false,
 		contentType: false,
 		success: function ( resp ) {
-			$('.fichecenter').html($(resp).find('#searchFormList'))
+			$('.fichecenter.risklist').html($(resp).find('#searchFormListRisks'))
 			let actionContainerSuccess = $('.messageSuccessTaskEdit');
 			$('.riskassessment-tasks' + riskId).fadeOut(800);
 			$('.riskassessment-tasks' + riskId).fadeIn(800);

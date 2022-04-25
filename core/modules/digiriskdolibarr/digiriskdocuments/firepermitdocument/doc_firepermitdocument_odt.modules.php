@@ -346,10 +346,10 @@ class doc_firepermitdocument_odt extends ModeleODTFirePermitDocument
 
 			if ($firepermit->fk_preventionplan > 0) {
 				$preventionplan->fetch($firepermit->fk_preventionplan);
-				$preventionplanlines = $preventionplanline->fetchAll($preventionplan->id);
+				$preventionplanlines = $preventionplanline->fetchAll('', '', 0, 0, array(), 'AND', $preventionplan->id);
 			}
 
-			$firepermitlines = $firepermitline->fetchAll($firepermit->id);
+			$firepermitlines = $firepermitline->fetchAll('', '', 0, 0, array(), 'AND', $firepermit->id);
 
 
 			$digirisk_resources     = $resources->digirisk_dolibarr_fetch_resources();

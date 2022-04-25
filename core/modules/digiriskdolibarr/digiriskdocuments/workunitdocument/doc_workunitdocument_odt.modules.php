@@ -334,7 +334,9 @@ class doc_workunitdocument_odt extends ModeleODTWorkUnitDocument
 			$tmparray = array_merge($substitutionarray, $array_object_from_properties, $array_soc);
 			complete_substitutions_array($tmparray, $outputlangs, $object);
 
-
+			if (!empty($conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS)) {
+				$tmparray['entity'] = 'S'. $conf->entity . ' - ';
+			}
 			$tmparray['nom']         = $digiriskelement->label;
 			$tmparray['reference']   = $digiriskelement->ref;
 			$tmparray['description'] = $digiriskelement->description;
@@ -372,7 +374,7 @@ class doc_workunitdocument_odt extends ModeleODTWorkUnitDocument
 				if ($foundtagforlines) {
 					$risk = new Risk($this->db);
 					if ( ! empty($digiriskelement) ) {
-						$risks = $risk->fetchRisksOrderedByCotation($digiriskelement->id, false, $conf->global->DIGIRISKDOLIBARR_SHOW_PARENT_RISKS);
+						$risks = $risk->fetchRisksOrderedByCotation($digiriskelement->id, false, $conf->global->DIGIRISKDOLIBARR_SHOW_INHERITED_RISKS, $conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS);
 						for ($i = 1; $i <= 4; $i++ ) {
 							$listlines = $odfHandler->setSegment('risq' . $i);
 							if ($risks > 0 && ! empty($risks)) {
@@ -390,7 +392,7 @@ class doc_workunitdocument_odt extends ModeleODTWorkUnitDocument
 										if ($scale == $i) {
 											$element = new DigiriskElement($this->db);
 											$element->fetch($line->fk_element);
-											$tmparray['nomElement']            = $element->ref . ' - ' . $element->label;
+											$tmparray['nomElement']            = (!empty($conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS) ? 'S' . $element->entity . ' - ' : '') . $element->ref . ' - ' . $element->label;
 											$tmparray['nomDanger']             = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $line->get_danger_category($line) . '.png';
 											$tmparray['identifiantRisque']     = $line->ref . ' - ' . $lastEvaluation->ref;
 											$tmparray['quotationRisque']       = $lastEvaluation->cotation ? $lastEvaluation->cotation : '0';
@@ -402,24 +404,12 @@ class doc_workunitdocument_odt extends ModeleODTWorkUnitDocument
 
 											if ( ! empty($related_tasks) && is_array($related_tasks)) {
 												foreach ($related_tasks as $related_task) {
+													$AllInitiales = '';
 													$related_task_contact_ids = $related_task->getListContactId();
 													if ( ! empty($related_task_contact_ids) && is_array($related_task_contact_ids)) {
 														foreach ($related_task_contact_ids as $related_task_contact_id) {
 															$user->fetch($related_task_contact_id);
-															$contact_array[$related_task_contact_id] = $user;
-														}
-													}
-													$AllInitiales = '';
-													if ( ! empty($contact_array) && is_array($contact_array)) {
-														foreach ($contact_array as $contact_array_single) {
-															$initiales = '';
-															if (dol_strlen($contact_array_single->firstname)) {
-																$initiales .= str_split($contact_array_single->firstname, 1)[0];
-															}
-															if (dol_strlen($contact_array_single->lastname)) {
-																$initiales .= str_split($contact_array_single->lastname, 1)[0];
-															}
-															$AllInitiales .= strtoupper($initiales) . ',';
+															$AllInitiales .= strtoupper(str_split($user->firstname, 1)[0]. str_split($user->lastname, 1)[0] . ',');
 														}
 													}
 													if ($related_task->progress == 100) {

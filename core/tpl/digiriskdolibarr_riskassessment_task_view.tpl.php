@@ -14,15 +14,16 @@ $related_tasks = $risk->get_related_tasks($risk); ?>
 						<i class="button-icon fas fa-list-ul"></i>
 					</div>
 				<?php endif; ?>
-
-				<?php if ($permissiontoadd) : ?>
-					<div class="riskassessment-task-add wpeo-button button-square-40 button-primary wpeo-tooltip-event modal-open risk-list-button" aria-label="<?php echo $langs->trans('AddRiskAssessmentTask') ?>" value="<?php echo $risk->id;?>">
-						<i class="fas fa-plus button-icon"></i>
-					</div>
-				<?php else : ?>
-					<div class="wpeo-button button-square-40 button-grey wpeo-tooltip-event risk-list-button" aria-label="<?php echo $langs->trans('PermissionDenied') ?>" value="<?php echo $risk->id;?>">
-						<i class="fas fa-plus button-icon"></i>
-					</div>
+				<?php if ($contextpage != 'sharedrisk' && $contextpage != 'inheritedrisk') : ?>
+					<?php if ($permissiontoadd) : ?>
+						<div class="riskassessment-task-add wpeo-button button-square-40 button-primary wpeo-tooltip-event modal-open risk-list-button" aria-label="<?php echo $langs->trans('AddRiskAssessmentTask') ?>" value="<?php echo $risk->id;?>">
+							<i class="fas fa-plus button-icon"></i>
+						</div>
+					<?php else : ?>
+						<div class="wpeo-button button-square-40 button-grey wpeo-tooltip-event risk-list-button" aria-label="<?php echo $langs->trans('PermissionDenied') ?>" value="<?php echo $risk->id;?>">
+							<i class="fas fa-plus button-icon"></i>
+						</div>
+					<?php endif; ?>
 				<?php endif; ?>
 			</div>
 		</div>
@@ -30,7 +31,14 @@ $related_tasks = $risk->get_related_tasks($risk); ?>
 			<?php if ($conf->global->DIGIRISKDOLIBARR_SHOW_ALL_TASKS) : ?>
 					<?php $nb_of_tasks_in_progress = 0 ?>
 					<?php foreach ($related_tasks as $related_task) : ?>
-						<?php if ((($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_PROGRESS) ? $related_task->progress <= 100 : $related_task->progress < 100)) : ?>
+						<?php if (!empty($conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS) && $contextpage == 'sharedrisk') : ?>
+							<?php $project = new Project($db);
+							$project->fetch($related_task->fk_project);
+							$result = !empty($conf->mc->sharings['project']) ? in_array($project->entity, $conf->mc->sharings['project']) : 0; ?>
+						<?php else : ?>
+							<?php $result = 1 ?>
+						<?php endif; ?>
+						<?php if ((($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_PROGRESS) ? $related_task->progress <= 100 : $related_task->progress < 100) && $result) : ?>
 							<?php  $nb_of_tasks_in_progress++ ?>
 							<div class="table-cell riskassessment-task-container riskassessment-task-container-<?php echo $related_task->id ?>" value="<?php echo $related_task->ref ?>">
 							<input type="hidden" class="labelForDelete" value="<?php echo $langs->trans('DeleteTask') . ' ' . $related_task->ref . ' ?'; ?>">
@@ -58,31 +66,35 @@ $related_tasks = $risk->get_related_tasks($risk); ?>
 											<span class="riskassessment-task-progress progress-<?php echo $related_task->progress ? $related_task->progress : 0 ?>"><?php echo $related_task->progress ? $related_task->progress . " %" : 0 . " %" ?></span>
 										</div>
 										<div class="riskassessment-task-title">
-											<span class="riskassessment-task-progress-checkbox">
-												<input type="checkbox" id="" class="riskassessment-task-progress-checkbox<?php echo $related_task->id; echo($related_task->progress == 100) ? ' progress-checkbox-check' : ' progress-checkbox-uncheck' ?>" name="progress-checkbox" value="" <?php echo ($related_task->progress == 100) ? 'checked' : ''; ?>>
-											</span>
+											<?php if ($contextpage != 'sharedrisk' && $contextpage != 'inheritedrisk') : ?>
+												<span class="riskassessment-task-progress-checkbox <?php echo ($contextpage != 'sharedrisk' && $contextpage != 'inheritedrisk') ? '' : 'riskassessment-task-progress-checkbox-readonly'?>">
+													<input type="checkbox" id="" class="riskassessment-task-progress-checkbox<?php echo $related_task->id; echo($related_task->progress == 100) ? ' progress-checkbox-check' : ' progress-checkbox-uncheck' ?>" name="progress-checkbox" value="" <?php echo ($related_task->progress == 100) ? 'checked' : ''; ?>>
+												</span>
+											<?php endif; ?>
 											<span class="riskassessment-task-author-label">
 												<?php echo dol_trunc($related_task->label, 255, 'right', 'UTF-8', 0, $display = 1); ?>
 											</span>
 										</div>
 									</div>
 									<!-- BUTTON MODAL RISK ASSESSMENT TASK EDIT  -->
-									<div class="table-cell riskassessment-task-actions wpeo-gridlayout grid-2 grid-gap-0">
-										<?php if ($permissiontoadd) : ?>
-											<div class="riskassessment-task-edit wpeo-button button-square-40 button-transparent modal-open" value="<?php echo $related_task->id ?>">
-												<i class="fas fa-pencil-alt button-icon"></i>
-											</div>
-										<?php else : ?>
-											<div class="wpeo-button button-square-40 button-grey wpeo-tooltip-event" aria-label="<?php echo $langs->trans('PermissionDenied'); ?>" value="<?php echo $related_task->id ?>">
-												<i class="fas fa-pencil-alt button-icon"></i>
-											</div>
-										<?php endif; ?>
-										<?php if ($permissiontodelete) : ?>
-											<div class="riskassessment-task-delete wpeo-button button-square-40 button-transparent" value="<?php echo $related_task->id ?>">
-												<i class="fas fa-trash button-icon"></i>
-											</div>
-										<?php endif; ?>
-									</div>
+									<?php if ($contextpage != 'sharedrisk' && $contextpage != 'inheritedrisk') : ?>
+										<div class="table-cell riskassessment-task-actions wpeo-gridlayout grid-2 grid-gap-0">
+											<?php if ($permissiontoadd) : ?>
+												<div class="riskassessment-task-edit wpeo-button button-square-40 button-transparent modal-open" value="<?php echo $related_task->id ?>">
+													<i class="fas fa-pencil-alt button-icon"></i>
+												</div>
+											<?php else : ?>
+												<div class="wpeo-button button-square-40 button-grey wpeo-tooltip-event" aria-label="<?php echo $langs->trans('PermissionDenied'); ?>" value="<?php echo $related_task->id ?>">
+													<i class="fas fa-pencil-alt button-icon"></i>
+												</div>
+											<?php endif; ?>
+											<?php if ($permissiontodelete) : ?>
+												<div class="riskassessment-task-delete wpeo-button button-square-40 button-transparent" value="<?php echo $related_task->id ?>">
+													<i class="fas fa-trash button-icon"></i>
+												</div>
+											<?php endif; ?>
+										</div>
+									<?php endif; ?>
 								</div>
 								<!-- RISK ASSESSMENT TASK EDIT MODAL-->
 								<div class="riskassessment-task-edit-modal">
@@ -342,15 +354,17 @@ $related_tasks = $risk->get_related_tasks($risk); ?>
 								<div class="riskassessment-task-single riskassessment-task-single-<?php echo $risk->id ?>">
 									<div class="riskassessment-task-content">
 										<div class="riskassessment-task-data" style="justify-content: center;">
-											<span class="name"><?php echo $langs->trans('NoTaskLinked'); ?></span>
-											<?php if ($permissiontoadd) : ?>
-												<div class="riskassessment-task-add wpeo-button button-square-40 button-primary wpeo-tooltip-event modal-open risk-list-button" aria-label="<?php echo $langs->trans('AddRiskAssessmentTask') ?>" value="<?php echo $risk->id;?>">
-													<i class="fas fa-plus button-icon"></i>
-												</div>
-											<?php else : ?>
-												<div class="wpeo-button button-square-40 button-grey wpeo-tooltip-event risk-list-button" aria-label="<?php echo $langs->trans('PermissionDenied') ?>" value="<?php echo $risk->id;?>">
-													<i class="fas fa-plus button-icon"></i>
-												</div>
+											<span class="name"><?php echo $result > 0 ? $langs->trans('NoTaskLinked') : $langs->trans('NoTaskShared'); ?></span>
+											<?php if ($contextpage != 'sharedrisk' && $contextpage != 'inheritedrisk') : ?>
+												<?php if ($permissiontoadd) : ?>
+													<div class="riskassessment-task-add wpeo-button button-square-40 button-primary wpeo-tooltip-event modal-open risk-list-button" aria-label="<?php echo $langs->trans('AddRiskAssessmentTask') ?>" value="<?php echo $risk->id;?>">
+														<i class="fas fa-plus button-icon"></i>
+													</div>
+												<?php else : ?>
+													<div class="wpeo-button button-square-40 button-grey wpeo-tooltip-event risk-list-button" aria-label="<?php echo $langs->trans('PermissionDenied') ?>" value="<?php echo $risk->id;?>">
+														<i class="fas fa-plus button-icon"></i>
+													</div>
+												<?php endif; ?>
 											<?php endif; ?>
 										</div>
 									</div>
@@ -386,29 +400,35 @@ $related_tasks = $risk->get_related_tasks($risk); ?>
 										<span class="riskassessment-task-progress progress-<?php echo $related_task->progress ? $related_task->progress : 0 ?>"><?php echo $related_task->progress ? $related_task->progress . " %" : 0 . " %" ?></span>
 									</div>
 									<div class="riskassessment-task-title">
-										<input type="checkbox" id="" class="riskassessment-task-progress-checkbox<?php echo $related_task->id ?>" name="progress-checkbox" value="" <?php echo ($related_task->progress == 100) ? 'checked' : ''; ?>>
+										<?php if ($contextpage != 'sharedrisk' && $contextpage != 'inheritedrisk') : ?>
+											<span class="riskassessment-task-progress-checkbox <?php echo ($contextpage != 'sharedrisk' && $contextpage != 'inheritedrisk') ? '' : 'riskassessment-task-progress-checkbox-readonly'?>">
+												<input type="checkbox" id="" class="riskassessment-task-progress-checkbox<?php echo $related_task->id; echo($related_task->progress == 100) ? ' progress-checkbox-check' : ' progress-checkbox-uncheck' ?>" name="progress-checkbox" value="" <?php echo ($related_task->progress == 100) ? 'checked' : ''; ?>>
+											</span>
+										<?php endif; ?>
 										<span class="riskassessment-task-author-label">
 											<?php echo dol_trunc($related_task->label, 48, 'wrap', 'UTF-8', 0, $display = 1); ?>
 										</span>
 									</div>
 								</div>
 								<!-- BUTTON MODAL RISK ASSESSMENT TASK EDIT  -->
-								<div class="table-cell riskassessment-task-actions wpeo-gridlayout grid-2 grid-gap-0">
-									<?php if ($permissiontoadd) : ?>
-										<div class="riskassessment-task-edit wpeo-button button-square-50 button-transparent modal-open" value="<?php echo $related_task->id ?>">
-											<i class="fas fa-pencil-alt button-icon"></i>
-										</div>
-									<?php else : ?>
-										<div class="wpeo-button button-square-50 button-grey wpeo-tooltip-event" aria-label="<?php echo $langs->trans('PermissionDenied'); ?>" value="<?php echo $related_task->id ?>">
-											<i class="fas fa-pencil-alt button-icon"></i>
-										</div>
-									<?php endif; ?>
-									<?php if ($permissiontodelete) : ?>
-										<div class="riskassessment-task-delete wpeo-button button-square-50 button-transparent" value="<?php echo $related_task->id ?>">
-											<i class="fas fa-trash button-icon"></i>
-										</div>
-									<?php endif; ?>
-								</div>
+								<?php if ($contextpage != 'sharedrisk' && $contextpage != 'inheritedrisk') : ?>
+									<div class="table-cell riskassessment-task-actions wpeo-gridlayout grid-2 grid-gap-0">
+										<?php if ($permissiontoadd) : ?>
+											<div class="riskassessment-task-edit wpeo-button button-square-50 button-transparent modal-open" value="<?php echo $related_task->id ?>">
+												<i class="fas fa-pencil-alt button-icon"></i>
+											</div>
+										<?php else : ?>
+											<div class="wpeo-button button-square-50 button-grey wpeo-tooltip-event" aria-label="<?php echo $langs->trans('PermissionDenied'); ?>" value="<?php echo $related_task->id ?>">
+												<i class="fas fa-pencil-alt button-icon"></i>
+											</div>
+										<?php endif; ?>
+										<?php if ($permissiontodelete) : ?>
+											<div class="riskassessment-task-delete wpeo-button button-square-50 button-transparent" value="<?php echo $related_task->id ?>">
+												<i class="fas fa-trash button-icon"></i>
+											</div>
+										<?php endif; ?>
+									</div>
+								<?php endif; ?>
 							</div>
 							<!-- RISK ASSESSMENT TASK EDIT MODAL-->
 							<div class="riskassessment-task-edit-modal">
@@ -455,14 +475,16 @@ $related_tasks = $risk->get_related_tasks($risk); ?>
 							<div class="riskassessment-task-content">
 								<div class="riskassessment-task-data" style="justify-content: center;">
 									<span class="name"><?php echo $langs->trans('NoTaskLinked'); ?></span>
-									<?php if ($permissiontoadd) : ?>
-										<div class="riskassessment-task-add wpeo-button button-square-40 button-primary wpeo-tooltip-event modal-open risk-list-button" aria-label="<?php echo $langs->trans('AddRiskAssessmentTask') ?>" value="<?php echo $risk->id;?>">
-											<i class="fas fa-plus button-icon"></i>
-										</div>
-									<?php else : ?>
-										<div class="wpeo-button button-square-40 button-grey wpeo-tooltip-event risk-list-button" aria-label="<?php echo $langs->trans('PermissionDenied') ?>" value="<?php echo $risk->id;?>">
-											<i class="fas fa-plus button-icon"></i>
-										</div>
+									<?php if ($contextpage != 'sharedrisk' && $contextpage != 'inheritedrisk') : ?>
+										<?php if ($permissiontoadd) : ?>
+											<div class="riskassessment-task-add wpeo-button button-square-40 button-primary wpeo-tooltip-event modal-open risk-list-button" aria-label="<?php echo $langs->trans('AddRiskAssessmentTask') ?>" value="<?php echo $risk->id;?>">
+												<i class="fas fa-plus button-icon"></i>
+											</div>
+										<?php else : ?>
+											<div class="wpeo-button button-square-40 button-grey wpeo-tooltip-event risk-list-button" aria-label="<?php echo $langs->trans('PermissionDenied') ?>" value="<?php echo $risk->id;?>">
+												<i class="fas fa-plus button-icon"></i>
+											</div>
+										<?php endif; ?>
 									<?php endif; ?>
 								</div>
 							</div>
@@ -590,9 +612,11 @@ $related_tasks = $risk->get_related_tasks($risk); ?>
 																<span class="riskassessment-task-progress progress-<?php echo $related_task->progress ? $related_task->progress : 0 ?>"><?php echo $related_task->progress ? $related_task->progress . " %" : 0 . " %" ?></span>
 															</div>
 															<div class="riskassessment-task-title">
-																<span class="riskassessment-task-progress-checkbox">
-																	<input type="checkbox" id="" class="riskassessment-task-progress-checkbox<?php echo $related_task->id; echo($related_task->progress == 100) ? ' progress-checkbox-check' : ' progress-checkbox-uncheck' ?>" name="progress-checkbox" value="" <?php echo ($related_task->progress == 100) ? 'checked' : ''; ?>>
-																</span>
+																<?php if ($contextpage != 'sharedrisk' && $contextpage != 'inheritedrisk') : ?>
+																	<span class="riskassessment-task-progress-checkbox <?php echo ($contextpage != 'sharedrisk' && $contextpage != 'inheritedrisk') ? '' : 'riskassessment-task-progress-checkbox-readonly'?>">
+																		<input type="checkbox" id="" class="riskassessment-task-progress-checkbox<?php echo $related_task->id; echo($related_task->progress == 100) ? ' progress-checkbox-check' : ' progress-checkbox-uncheck' ?>" name="progress-checkbox" value="" <?php echo ($related_task->progress == 100) ? 'checked' : ''; ?>>
+																	</span>
+																<?php endif;?>
 																<span class="riskassessment-task-label">
 																	<?php echo dol_trunc($related_task->label, 48, 'wrap', 'UTF-8', 0, $display = 1); ?>
 																</span>

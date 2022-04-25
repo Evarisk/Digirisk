@@ -766,13 +766,18 @@ class FirePermitLine extends CommonObjectLine
 	}
 
 	/**
-	 *    Load firepermit line line from database
+	 * Load firepermit line line from database
 	 *
+	 * @param string $sortorder Sort Order
+	 * @param string $sortfield Sort field
+	 * @param int $limit offset limit
+	 * @param int $offset offset limit
+	 * @param array $filter filter array
+	 * @param string $filtermode filter mode (AND or OR)
 	 * @param int $parent_id
-	 * @param int $limit
 	 * @return array|int
 	 */
-	public function fetchAll($parent_id = 0, $limit = 0)
+	public function fetchAll($sortorder = '', $sortfield = '', $limit = 0, $offset = 0, array $filter = array(), $filtermode = 'AND', $parent_id = 0)
 	{
 		global $db;
 		$sql  = 'SELECT t.rowid, t.ref, t.date_creation, t.description, t.category, t.use_equipment, t.fk_element';

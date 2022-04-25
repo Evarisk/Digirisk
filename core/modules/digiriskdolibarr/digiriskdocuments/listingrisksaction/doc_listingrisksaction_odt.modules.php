@@ -364,7 +364,7 @@ class doc_listingrisksaction_odt extends ModeleODTListingRisksAction
 					$risk = new Risk($this->db);
 
 					if ( ! empty($digiriskelement) ) {
-						$risks = $risk->fetchRisksOrderedByCotation($digiriskelement->id, true);
+						$risks = $risk->fetchRisksOrderedByCotation($digiriskelement->id, true, $conf->global->DIGIRISKDOLIBARR_SHOW_INHERITED_RISKS, $conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS);
 						if ($risks < 1) {
 							$risks = array();
 						}
@@ -384,7 +384,7 @@ class doc_listingrisksaction_odt extends ModeleODTListingRisksAction
 										if ($scale == $i) {
 											$element = new DigiriskElement($this->db);
 											$element->fetch($line->fk_element);
-											$tmparray['nomElement']            = $element->ref . ' - ' . $element->label;
+											$tmparray['nomElement']            = (!empty($conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS) ? 'S' . $element->entity . ' - ' : '') . $element->ref . ' - ' . $element->label;
 											$tmparray['nomDanger']             = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $line->get_danger_category($line) . '.png';
 											$tmparray['identifiantRisque']     = $line->ref . ' - ' . $lastEvaluation->ref;
 											$tmparray['quotationRisque']       = $lastEvaluation->cotation ? $lastEvaluation->cotation : '0';
@@ -396,24 +396,12 @@ class doc_listingrisksaction_odt extends ModeleODTListingRisksAction
 
 											if ( ! empty($related_tasks) && is_array($related_tasks)) {
 												foreach ($related_tasks as $related_task) {
+													$AllInitiales = '';
 													$related_task_contact_ids = $related_task->getListContactId();
 													if ( ! empty($related_task_contact_ids) && is_array($related_task_contact_ids)) {
 														foreach ($related_task_contact_ids as $related_task_contact_id) {
 															$user->fetch($related_task_contact_id);
-															$contact_array[$related_task_contact_id] = $user;
-														}
-													}
-													$AllInitiales = '';
-													if ( ! empty($contact_array) && is_array($contact_array)) {
-														foreach ($contact_array as $contact_array_single) {
-															$initiales = '';
-															if (dol_strlen($contact_array_single->firstname)) {
-																$initiales .= str_split($contact_array_single->firstname, 1)[0];
-															}
-															if (dol_strlen($contact_array_single->lastname)) {
-																$initiales .= str_split($contact_array_single->lastname, 1)[0];
-															}
-															$AllInitiales .= strtoupper($initiales) . ',';
+															$AllInitiales .= strtoupper(str_split($user->firstname, 1)[0]. str_split($user->lastname, 1)[0] . ',');
 														}
 													}
 													if ($related_task->progress == 100) {
@@ -478,7 +466,7 @@ class doc_listingrisksaction_odt extends ModeleODTListingRisksAction
 							$odfHandler->mergeSegment($listlines);
 						}
 					} else {
-						$risks = $risk->fetchRisksOrderedByCotation(0, true);
+						$risks = $risk->fetchRisksOrderedByCotation(0, true, $conf->global->DIGIRISKDOLIBARR_SHOW_INHERITED_RISKS, $conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS);
 						if ($risks < 1) {
 							$risks = array();
 						}
@@ -498,7 +486,7 @@ class doc_listingrisksaction_odt extends ModeleODTListingRisksAction
 										if ($scale == $i) {
 											$element = new DigiriskElement($this->db);
 											$element->fetch($line->fk_element);
-											$tmparray['nomElement']            = $element->ref . ' - ' . $element->label;
+											$tmparray['nomElement']            = (!empty($conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS) ? 'S' . $element->entity . ' - ' : '') . $element->ref . ' - ' . $element->label;
 											$tmparray['nomDanger']             = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $line->get_danger_category($line) . '.png';
 											$tmparray['identifiantRisque']     = $line->ref . ' - ' . $lastEvaluation->ref;
 											$tmparray['quotationRisque']       = $lastEvaluation->cotation ? $lastEvaluation->cotation : '0';
@@ -510,24 +498,12 @@ class doc_listingrisksaction_odt extends ModeleODTListingRisksAction
 
 											if ( ! empty($related_tasks) && is_array($related_tasks)) {
 												foreach ($related_tasks as $related_task) {
+													$AllInitiales = '';
 													$related_task_contact_ids = $related_task->getListContactId();
 													if ( ! empty($related_task_contact_ids) && is_array($related_task_contact_ids)) {
 														foreach ($related_task_contact_ids as $related_task_contact_id) {
 															$user->fetch($related_task_contact_id);
-															$contact_array[$related_task_contact_id] = $user;
-														}
-													}
-													$AllInitiales = '';
-													if ( ! empty($contact_array) && is_array($contact_array)) {
-														foreach ($contact_array as $contact_array_single) {
-															$initiales = '';
-															if (dol_strlen($contact_array_single->firstname)) {
-																$initiales .= str_split($contact_array_single->firstname, 1)[0];
-															}
-															if (dol_strlen($contact_array_single->lastname)) {
-																$initiales .= str_split($contact_array_single->lastname, 1)[0];
-															}
-															$AllInitiales .= strtoupper($initiales) . ',';
+															$AllInitiales .= strtoupper(str_split($user->firstname, 1)[0]. str_split($user->lastname, 1)[0] . ',');
 														}
 													}
 													if ($related_task->progress == 100) {

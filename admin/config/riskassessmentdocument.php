@@ -209,12 +209,10 @@ print "</td><td>";
 print $langs->trans('RiskDescriptionDescription');
 print '</td>';
 
-
 print '<td class="center">';
 print ajax_constantonoff('DIGIRISKDOLIBARR_RISK_DESCRIPTION');
 print '</td>';
 print '</tr>';
-
 
 print '<tr class="oddeven"><td>';
 print $langs->trans('RiskCategoryEdit');
@@ -224,17 +222,6 @@ print '</td>';
 
 print '<td class="center">';
 print ajax_constantonoff('DIGIRISKDOLIBARR_RISK_CATEGORY_EDIT');
-print '</td>';
-print '</tr>';
-
-print '<tr class="oddeven"><td>';
-print $langs->trans('ShowParentRisks');
-print "</td><td>";
-print $langs->trans('ShowParentRisksDescription');
-print '</td>';
-
-print '<td class="center">';
-print ajax_constantonoff('DIGIRISKDOLIBARR_SHOW_PARENT_RISKS');
 print '</td>';
 print '</tr>';
 
@@ -266,11 +253,47 @@ print "</td><td>";
 print $langs->trans('RiskDescriptionPrefillDescription');
 print '</td>';
 
-
 print '<td class="center">';
 print ajax_constantonoff('DIGIRISKDOLIBARR_RISK_DESCRIPTION_PREFILL');
 print '</td>';
 print '</tr>';
+
+print '<tr class="oddeven"><td>';
+print $langs->trans('ShowRisks');
+print "</td><td>";
+print $langs->trans('ShowRisksDescription');
+print '</td>';
+
+print '<td class="center">';
+print ajax_constantonoff('DIGIRISKDOLIBARR_SHOW_RISKS');
+print '</td>';
+print '</tr>';
+
+print '<tr class="oddeven"><td>';
+print $langs->trans('ShowInheritedRisks');
+print "</td><td>";
+print $langs->trans('ShowInheritedRisksDescription');
+print '</td>';
+
+print '<td class="center">';
+print ajax_constantonoff('DIGIRISKDOLIBARR_SHOW_INHERITED_RISKS');
+print '</td>';
+print '</tr>';
+
+$result = !empty($conf->mc->entities['risk']) ? strpos($conf->mc->entities['risk'], $conf->entity) : 0;
+
+if ($conf->multicompany->enabled && !empty($conf->mc->sharings['risk']) && $result > 0) {
+	print '<tr class="oddeven"><td>';
+	print $langs->trans('ShowSharedRisks');
+	print "</td><td>";
+	print $langs->trans('ShowSharedRisksDescription');
+	print '</td>';
+
+	print '<td class="center">';
+	print ajax_constantonoff('DIGIRISKDOLIBARR_SHOW_SHARED_RISKS');
+	print '</td>';
+	print '</tr>';
+}
 
 print '</table>';
 print '<hr>';

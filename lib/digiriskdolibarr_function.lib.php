@@ -542,9 +542,9 @@ function digiriskHeader($title = '', $help_url = '', $arrayofjs = array(), $arra
 	//Body navigation digirisk
 	$object = new DigiriskElement($db);
 	if ($conf->global->DIGIRISKDOLIBARR_SHOW_HIDDEN_DIGIRISKELEMENT) {
-		$objects = $object->fetchAll('',  'rank',  0,  0);
+		$objects = $object->fetchAll('',  'ranks',  0,  0);
 	} else {
-		$objects = $object->fetchAll('',  'rank',  0,  0, array('customsql' => 'status > 0'));
+		$objects = $object->fetchAll('',  'ranks',  0,  0, array('customsql' => 'status > 0'));
 	}
 
 	$results = array();
@@ -2330,4 +2330,272 @@ function getListOfModelsDigirisk($db, $type, $maxfilenamelength = 0)
     } else {
         return 0;
     }
+}
+
+/**
+ * 	Return clickable name (with picto eventually)
+ *
+ * 	@param	int		$withpicto		          0=No picto, 1=Include picto into link, 2=Only picto
+ * 	@param	string	$option			          Variant where the link point to ('', 'nolink')
+ * 	@param	int		$addlabel		          0=Default, 1=Add label into string, >1=Add first chars into string
+ *  @param	string	$moreinpopup	          Text to add into popup
+ *  @param	string	$sep			          Separator between ref and label if option addlabel is set
+ *  @param	int   	$notooltip		          1=Disable tooltip
+ *  @param  int     $save_lastsearch_value    -1=Auto, 0=No save of lastsearch_values when clicking, 1=Save lastsearch_values whenclicking
+ *  @param	string	$morecss				  More css on a link
+ * 	@return	string					          String with URL
+ */
+function getNomUrlEntity($object, $withpicto = 0, $option = '', $addlabel = 0, $moreinpopup = '', $sep = ' - ', $notooltip = 0, $save_lastsearch_value = -1, $morecss = '')
+{
+	global $conf, $langs, $user, $hookmanager, $db;
+
+	if ( ! empty($conf->dol_no_mouse_hover)) $notooltip = 1; // Force disable tooltips
+
+	$result = '';
+
+	$label = '';
+	$label .= '<i class="fas fa-building"></i> <u class="paddingrightonly">' . $langs->trans('Entity') . '</u>';
+	$label .= ($label ? '<br>' : '') . '<b>' . $langs->trans('Ref') . ': </b>' . 'S' . $object->entity; // The space must be after the : to not being explode when showing the title in img_picto
+	$label .= ($label ? '<br>' : '') . '<b>' . $langs->trans('Label') . ': </b>' .  dolibarr_get_const($db, 'MAIN_INFO_SOCIETE_NOM', $object->entity); // The space must be after the : to not being explode when showing the title in img_picto
+	if ($moreinpopup) $label .= '<br>' . $moreinpopup;
+
+	$url = $_SERVER['REQUEST_URI'];
+
+	if ($option != 'nolink') {
+		// Add param to save lastsearch_values or not
+		$add_save_lastsearch_values                                                                                      = ($save_lastsearch_value == 1 ? 1 : 0);
+		if ($save_lastsearch_value == -1 && preg_match('/list\.php/', $_SERVER["PHP_SELF"])) $add_save_lastsearch_values = 1;
+		if ($add_save_lastsearch_values) $url                                                                           .= '&save_lastsearch_values=1';
+	}
+
+	$linkclose = '';
+	if ($option == 'blank') {
+		$linkclose .= ' target=_blank';
+	}
+
+	if (empty($notooltip) && $user->rights->digiriskdolibarr->digiriskelement->read) {
+		if ( ! empty($conf->global->MAIN_OPTIMIZEFORTEXTBROWSER)) {
+			$label      = $langs->trans("ShowEntity");
+			$linkclose .= ' alt="' . dol_escape_htmltag($label, 1) . '"';
+		}
+		$linkclose .= ' title="' . dol_escape_htmltag($label, 1) . '"';
+		$linkclose .= ' class="classfortooltip' . ($morecss ? ' ' . $morecss : '') . '"';
+	} else $linkclose = ($morecss ? ' class="' . $morecss . '"' : '');
+
+	if ($option != 'nolink') {
+		$linkstart  = '<a href="' . $url . '"';
+		$linkstart .= $linkclose . '>';
+		$linkend    = '</a>';
+	}
+
+	$result                      .= $linkstart;
+	if ($withpicto) $result      .= '<i class="fas fa-building"></i>' . ' ';
+	if ($withpicto != 2) $result .= 'S' . $object->entity;
+	if ($withpicto != 2) $result .= (($addlabel && dolibarr_get_const($db, 'MAIN_INFO_SOCIETE_NOM', $object->entity)) ? $sep . dol_trunc(dolibarr_get_const($db, 'MAIN_INFO_SOCIETE_NOM', $object->entity), ($addlabel > 1 ? $addlabel : 0)) : '');
+	$result                      .= $linkend;
+
+	global $action;
+	$hookmanager->initHooks(array('entitydao'));
+	$parameters               = array('id' => $object->id, 'getnomurl' => $result);
+	$reshook                  = $hookmanager->executeHooks('getNomUrl', $parameters, $object, $action); // Note that $action and $this may have been modified by some hooks
+	if ($reshook > 0) $result = $hookmanager->resPrint;
+	else $result             .= $hookmanager->resPrint;
+
+	return $result;
+}
+
+/**
+ *  Output html form to select a third party.
+ *  Note, you must use the select_company to get the component to select a third party. This function must only be called by select_company.
+ *
+ * @param  string 		$selected Preselected type
+ * @param  string 		$htmlname Name of field in form
+ * @param  string 		$filter Optional filters criteras (example: 's.rowid <> x', 's.client in (1,3)')
+ * @param  string 		$showempty Add an empty field (Can be '1' or text to use on empty line like 'SelectThirdParty')
+ * @param  int 			$forcecombo Force to use standard HTML select component without beautification
+ * @param  array 		$events Event options. Example: array(array('method'=>'getContacts', 'url'=>dol_buildpath('/core/ajax/contacts.php',1), 'htmlname'=>'contactid', 'params'=>array('add-customer-contact'=>'disabled')))
+ * @param  int 			$outputmode 0=HTML select string, 1=Array
+ * @param  int 			$limit Limit number of answers
+ * @param  string 		$morecss Add more css styles to the SELECT component
+ * @param  int	 		$moreparam Add more parameters onto the select tag. For example 'style="width: 95%"' to avoid select2 component to go over parent container
+ * @param  bool 		$multiple add [] in the name of element and add 'multiple' attribut
+ * @param  int 			$noroot
+ * @return string HTML string with
+ * @throws Exception
+ */
+function select_entity_list($selected = '', $htmlname = 'entity', $filter = '', $showempty = '1', $forcecombo = 0, $events = array(), $outputmode = 0, $limit = 0, $morecss = 'minwidth200', $moreparam = 0, $multiple = false)
+{
+	global $conf, $langs, $db;
+
+	$out      = '';
+	$outarray = array();
+
+	$selected = array($selected);
+
+	$digiriskelement = new DigiriskElement($db);
+
+	// Clean $filter that may contains sql conditions so sql code
+	if (function_exists('testSqlAndScriptInject')) {
+		if (testSqlAndScriptInject($filter, 3) > 0) {
+			$filter = '';
+		}
+	}
+	// On recherche les societies
+	$sql  = "SELECT *";
+	$sql .= " FROM " . MAIN_DB_PREFIX . "entity as e";
+
+	$sql              .= " WHERE e.rowid IN (" . getEntity($digiriskelement->element) . ")";
+	//$sql .= ' WHERE 1 = 1';
+	if ($filter) $sql .= " AND (" . $filter . ")";
+//		if ($moreparam > 0 ) {
+//			$children = $this->fetchDigiriskElementFlat($moreparam);
+//			if ( ! empty($children) && $children > 0) {
+//				foreach ($children as $key => $value) {
+//					$sql .= " AND NOT s.rowid =" . $key;
+//				}
+//			}
+//			$sql .= " AND NOT s.rowid =" . $moreparam;
+//		}
+//		if ($conf->global->DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH) {
+//			$masked_content = $this->fetchDigiriskElementFlat($conf->global->DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH);
+//			if ( ! empty($masked_content) && $masked_content > 0) {
+//				foreach ($masked_content as $key => $value) {
+//					$sql .= " AND NOT s.rowid =" . $key;
+//				}
+//			}
+//			$sql .= " AND NOT s.rowid =" . $conf->global->DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH;
+//		}
+	$sql .= $db->order("rowid", "ASC");
+	$sql .= $db->plimit($limit, 0);
+
+	// Build output string
+	//dol_syslog(get_class($this) . "::select_digiriskelement_list", LOG_DEBUG);
+	$resql = $db->query($sql);
+	$num = '';
+	if ($resql) {
+		if ( ! $forcecombo) {
+			include_once DOL_DOCUMENT_ROOT . '/core/lib/ajax.lib.php';
+			$out .= ajax_combobox($htmlname, $events, 0);
+		}
+
+		// Construct $out and $outarray
+		$out .= '<select id="' . $htmlname . '" class="flat' . ($morecss ? ' ' . $morecss : '') . '"' . ($moreparam ? ' ' . $moreparam : '') . ' name="' . $htmlname . ($multiple ? '[]' : '') . '" ' . ($multiple ? 'multiple' : '') . '>' . "\n";
+		$num                  = $db->num_rows($resql);
+		$i                    = 0;
+
+		$textifempty          = (($showempty && ! is_numeric($showempty)) ? $langs->trans($showempty) : '');
+		if ($showempty) $out .= '<option value="-1">' . $textifempty . '</option>' . "\n";
+
+		if ($num) {
+			while ($i < $num) {
+				$obj   = $db->fetch_object($resql);
+				$label = 'S' . $obj->rowid . ' - ' . $obj->label;
+
+
+				if (empty($outputmode)) {
+					if (in_array($obj->rowid, $selected)) {
+						$out .= '<option value="' . $obj->rowid . '" selected>' . $label . '</option>';
+					} else {
+						$out .= '<option value="' . $obj->rowid . '">' . $label . '</option>';
+					}
+				} else {
+					array_push($outarray, array('key' => $obj->rowid, 'value' => $label, 'label' => $label));
+				}
+
+				$i++;
+				if (($i % 10) == 0) $out .= "\n";
+			}
+		}
+		$out .= '</select>' . "\n";
+	} else {
+		dol_print_error($db);
+	}
+
+	$result = array('nbofdigiriskelement' => $num);
+
+	return $out;
+}
+
+/**
+ *	Delete all links between an object $this
+ *
+ *	@param	int		$sourceid		Object source id
+ *	@param  string	$sourcetype		Object source type
+ *	@param  int		$targetid		Object target id
+ *	@param  string	$targettype		Object target type
+ *  @param	int		$rowid			Row id of line to delete. If defined, other parameters are not used.
+ * 	@param	User	$f_user			User that create
+ * 	@param	int		$notrigger		1=Does not execute triggers, 0= execute triggers
+ *	@return     					int	>0 if OK, <0 if KO
+ *	@see	add_object_linked(), updateObjectLinked(), fetchObjectLinked()
+ */
+function deleteObjectLinkedDigirisk($object, $sourceid = null, $sourcetype = '', $targetid = null, $targettype = '', $rowid = '', $f_user = null, $notrigger = 0)
+{
+	global $user;
+	$deletesource = false;
+	$deletetarget = false;
+	$f_user = isset($f_user) ? $f_user : $user;
+
+	if (!empty($sourceid) && !empty($sourcetype) && empty($targetid) && empty($targettype)) {
+		$deletesource = true;
+	} elseif (empty($sourceid) && empty($sourcetype) && !empty($targetid) && !empty($targettype)) {
+		$deletetarget = true;
+	}
+
+	$sourceid = (!empty($sourceid) ? $sourceid : $object->id);
+	$sourcetype = (!empty($sourcetype) ? $sourcetype : $object->element);
+	$targetid = (!empty($targetid) ? $targetid : $object->id);
+	$targettype = (!empty($targettype) ? $targettype : $object->element);
+	$object->db->begin();
+	$error = 0;
+
+	if (!$notrigger) {
+		// Call trigger
+		$object->context['link_id'] = $rowid;
+		$object->context['link_source_id'] = $sourceid;
+		$object->context['link_source_type'] = $sourcetype;
+		$object->context['link_target_id'] = $targetid;
+		$object->context['link_target_type'] = $targettype;
+		$result = $object->call_trigger('OBJECT_LINK_DELETE', $f_user);
+		if ($result < 0) {
+			$error++;
+		}
+		// End call triggers
+	}
+
+	if (!$error) {
+		$sql = "DELETE FROM " . MAIN_DB_PREFIX . "element_element";
+		$sql .= " WHERE";
+		if ($rowid > 0) {
+			$sql .= " rowid = " . ((int) $rowid);
+		} else {
+			if ($deletesource) {
+				$sql .= " fk_source = " . ((int) $sourceid) . " AND sourcetype = '" . $object->db->escape($sourcetype) . "'";
+				$sql .= " AND fk_target = " . ((int) $object->id) . " AND targettype = '" . $object->db->escape($object->element) . "'";
+			} elseif ($deletetarget) {
+				$sql .= " fk_target = " . ((int) $targetid) . " AND targettype = '" . $object->db->escape($targettype) . "'";
+				$sql .= " AND fk_source = " . ((int) $object->id) . " AND sourcetype = '" . $object->db->escape($object->element) . "'";
+			} else {
+				$sql .= " (fk_source = " . ((int) $sourceid) . " AND sourcetype = '" . $object->db->escape($sourcetype) . "')";
+				$sql .= " AND";
+				$sql .= " (fk_target = " . ((int) $targetid) . " AND targettype = '" . $object->db->escape($targettype) . "')";
+			}
+		}
+
+		dol_syslog(get_class($object) . "::deleteObjectLinkedDigirisk", LOG_DEBUG);
+
+		if (!$object->db->query($sql)) {
+			$object->error = $object->db->lasterror();
+			$object->errors[] = $object->error;
+			$error++;
+		}
+	}
+
+	if (!$error) {
+		$object->db->commit();
+		return 1;
+	} else {
+		$object->db->rollback();
+		return 0;
+	}
 }

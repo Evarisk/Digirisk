@@ -362,7 +362,7 @@ class doc_workunitdocument_custom_odt extends ModeleODTWorkUnitDocument
 				if ($foundtagforlines) {
 					$risk = new Risk($this->db);
 					if ( ! empty($object) ) {
-						$risks = $risk->fetchRisksOrderedByCotation($object->id, false, $conf->global->DIGIRISKDOLIBARR_SHOW_PARENT_RISKS);
+						$risks = $risk->fetchRisksOrderedByCotation($object->id, false, $conf->global->DIGIRISKDOLIBARR_SHOW_INHERITED_RISKS, $conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS);
 						if ($risks < 1) {
 							$risks = array();
 						}
@@ -380,7 +380,7 @@ class doc_workunitdocument_custom_odt extends ModeleODTWorkUnitDocument
 										if ($scale == $i) {
 											$element = new DigiriskElement($this->db);
 											$element->fetch($line->fk_element);
-											$tmparray['nomElement'] = $element->ref . ' - ' . $element->label;
+											$tmparray['nomElement'] = (!empty($conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS) ? 'S' . $element->entity . ' - ' : '') . $element->ref . ' - ' . $element->label;
 											$tmparray['nomDanger'] = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $line->get_danger_category($line) . '.png';
 											$tmparray['identifiantRisque'] = $line->ref . ' - ' . $lastEvaluation->ref;
 											$tmparray['quotationRisque'] = $lastEvaluation->cotation;

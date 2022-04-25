@@ -235,7 +235,7 @@ $massactionbutton = $form->selectMassAction('', $arrayofmassactions);
 
 $newcardbutton = '';
 if ($permissiontoadd) {
-	$newcardbutton .= dolGetButtonTitle($langs->trans('NewAccident'), '', 'fa fa-plus-circle', DOL_URL_ROOT . '/custom/digiriskdolibarr/view/accident/accident_card.php?action=create');
+	$newcardbutton .= dolGetButtonTitle($langs->trans('NewAccident'), '', 'fa fa-plus-circle', DOL_URL_ROOT . '/custom/digiriskdolibarr/view/accident/accident_card.php?action=create' . (!empty($fromid) ? '&fromid=' . $fromid : ''));
 }
 
 print '<form method="POST" id="searchFormList" action="' . $_SERVER["PHP_SELF"] . '">';

@@ -1,0 +1,44 @@
+#dialog-confirm-actionButtonImportSharedRisks {
+  .confirmtext {
+    text-align: center;
+    padding: 0.2em 0 0.4em 0;
+  }
+  .tagtable {
+    border-collapse: collapse;
+  }
+  .tagtr {
+    //display: flex;
+    border-bottom: 1px solid rgba(0,0,0,0.2);
+  }
+  .tagtd {
+    padding: 0.3em 0;
+  }
+  .tagtr > .tagtd:first-child {
+    display: flex;
+
+    .importsharedrisk:not(.imported) {
+      width: 30%;
+    }
+    .importsharedrisk.imported {
+      width: 10%;
+      text-align: center;
+      font-size: 12px;
+    }
+    .importsharedrisk {
+      img {
+        float: left;
+        margin-right: 0.4em;
+        max-width: 35px;
+      }
+      > span {
+        display: block;
+      }
+      .importsharedrisk-ref {
+        font-weight: 600;
+      }
+    }
+  }
+  .tagtr > .tagtd:last-child {
+    vertical-align: middle;
+  }
+}

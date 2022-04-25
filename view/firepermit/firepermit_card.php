@@ -1121,7 +1121,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 		$colspan = 3; // Columns: total ht + col edit + col delete
 
 		// Linked prevention plan Lines
-		$preventionplanlines = $preventionplanline->fetchAll($object->fk_preventionplan);
+		$preventionplanlines = $preventionplanline->fetchAll('', '', 0, 0, array(), 'AND', $object->fk_preventionplan);
 
 		print '<tr class="liste_titre">';
 		print '<td><span>' . $langs->trans('Ref.') . '</span></td>';
@@ -1221,7 +1221,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 		$colspan = 3; // Columns: total ht + col edit + col delete
 
 		// Fire permit Lines
-		$firepermitlines = $objectline->fetchAll($object->id);
+		$firepermitlines = $objectline->fetchAll('', '', 0, 0, array(), 'AND', $object->id);
 
 		print '<tr class="liste_titre">';
 		print '<td><span>' . $langs->trans('Ref.') . '</span></td>';

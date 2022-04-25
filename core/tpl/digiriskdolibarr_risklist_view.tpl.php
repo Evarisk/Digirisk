@@ -1,6 +1,6 @@
 <?php
-	print '<div class="fichecenter wpeo-wrap">';
-	print '<form method="POST" id="searchFormList" enctype="multipart/form-data" action="' . $_SERVER["PHP_SELF"] . '?id=' . $object->id . '">' . "\n";
+	print '<div class="fichecenter risklist wpeo-wrap">';
+	print '<form method="POST" id="searchFormListRisks" enctype="multipart/form-data" action="' . $_SERVER["PHP_SELF"] . '?id=' . $object->id . '">' . "\n";
 	print '<input type="hidden" name="token" value="' . newToken() . '">';
 	print '<input type="hidden" name="formfilteraction" id="formfilteraction" value="list">';
 	print '<input type="hidden" name="action" value="list">';
@@ -320,13 +320,14 @@
 			if ($key == 'category') {
 				$mode_search = 1;
 			}
+			if($search[$key] == '-1') {
+				$search[$key] = '';
+			}
 			if ($search[$key] != '') {
 				if ($key == 'ref') {
 					$sql .= " AND (t.ref = '$search[$key]')";
-				} elseif ($key == 'fk_element') {
-					$sql .= " AND (e.ref = '$search[$key]')";
 				} else {
-					$sql .= natural_search($key, $search[$key], (($key == 'status') ? 2 : $mode_search));
+					$sql .= natural_search('t.'.$key, $search[$key], (($key == 'status') ? 2 : $mode_search));
 				}
 			}
 		}
@@ -416,13 +417,14 @@
 			if ($key == 'category') {
 				$mode_search = 1;
 			}
+			if($search[$key] == '-1') {
+				$search[$key] = '';
+			}
 			if ($search[$key] != '') {
 				if ($key == 'ref') {
 					$sql .= " AND (r.ref = '$search[$key]')";
-				} elseif ($key == 'fk_element') {
-					$sql .= " AND (e.ref = '$search[$key]')";
 				} else {
-					$sql .= natural_search($key, $search[$key], (($key == 'status') ? 2 : $mode_search));
+					$sql .= natural_search('r.'.$key, $search[$key], (($key == 'status') ? 2 : $mode_search));
 				}
 			}
 		}
@@ -900,14 +902,15 @@
 		$user->conf->$menuConf = (($varpage == 'risklist') ? 't.fk_element,' : '') . 't.ref,evaluation.cotation,t.category,t.description,';
 	} elseif ( ! $conf->global->DIGIRISKDOLIBARR_RISK_DESCRIPTION) {
 		$user->conf->$menuConf = preg_replace('/t.description,/', '', $user->conf->$menuConf);
+		$arrayfields['t.description']['enabled'] = 0;
 	}
 
 	if ( ! preg_match('/evaluation.has_tasks/', $user->conf->$menuConf) && $conf->global->DIGIRISKDOLIBARR_TASK_MANAGEMENT) {
 		$user->conf->$menuConf .= (($varpage == 'risklist') ? 't.fk_element,' : '') . 't.ref,evaluation.cotation,t.category,evaluation.has_tasks,';
 	} elseif ( ! $conf->global->DIGIRISKDOLIBARR_TASK_MANAGEMENT) {
 		$user->conf->$menuConf = preg_replace('/evaluation.has_tasks,/', '', $user->conf->$menuConf);
+		$arrayfields['evaluation.has_tasks']['enabled'] = 0;
 	}
-
 
 	$selectedfields  = $form->multiSelectArrayWithCheckbox('selectedfields', $arrayfields, $varpage); // This also change content of $arrayfields
 	$selectedfields .= (count($arrayofmassactions) ? $form->showCheckAddButtons('checkforselect', 1) : '');
@@ -929,10 +932,7 @@
 			elseif (strpos($val['type'], 'integer:') === 0) {
 				print $risk->showInputField($val, $key, $search[$key], '', '', 'search_', 'maxwidth150', 1);
 			} elseif ($key == 'fk_element') {
-				$digiriskelementtmp = new DigiriskElement($db);
-				$digiriskelementtmp->fetch(0, $search['fk_element']);
-				print $digiriskelement->select_digiriskelement_list($digiriskelementtmp->id, 'fk_element', '', 1, 0, array(), 0, 0, 'minwidth100', 0, false, 1);
-				print '<input class="input-hidden-fk_element" type="hidden" name="search_fk_element" value=""/>';
+				print $digiriskelement->select_digiriskelement_list($search['fk_element'], 'search_fk_element', '', 1, 0, array(), 0, 0, 'minwidth100', 0, false, 1);
 			} elseif ($key == 'category') { ?>
 				<div class="wpeo-dropdown dropdown-large dropdown-grid category-danger padding">
 					<input class="input-hidden-danger" type="hidden" name="<?php echo 'search_' . $key ?>" value="<?php echo dol_escape_htmltag($search[$key]) ?>" />
@@ -1251,4 +1251,6 @@
 	print '</div>' . "\n";
 	print '<!-- End div class="fichecenter" -->';
 
-	dol_fiche_end();
+	if ($contextpage != 'risklist') {
+		dol_fiche_end();
+	}
