@@ -662,7 +662,7 @@ if ($object->id > 0) {
 					</div>
 					<?php
 				} elseif ($key == 'description') {
-					print dol_trunc($risksign->description, 128, 'wrap', 'UTF-8', 0, 1);
+					print dol_htmlentitiesbr(dol_trunc($risksign->description, 128, 'wrap', 'UTF-8', 0, 1));
 				} else print $risksign->showOutputField($val, $key, $risksign->$key, '');
 				print '</td>';
 				if ( ! $i) $totalarray['nbfield']++;
