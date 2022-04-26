@@ -602,7 +602,7 @@ if ($object->id > 0) {
 			if ($key == 'status') $cssforfield  .= ($cssforfield ? ' ' : '') . 'center';
 			elseif ($key == 'ref') $cssforfield .= ($cssforfield ? ' ' : '') . 'nowrap';
 			if ( ! empty($arrayfields['t.' . $key]['checked'])) {
-				print '<td' . ($cssforfield ? ' class="' . $cssforfield . '"' : '') . ' style="width:2%">';
+				print '<td' . ($cssforfield ? ' class="' . $cssforfield . '"' : '') . '>';
 				if ($key == 'status') print $risksign->getLibStatut(5);
 				elseif ($key == 'category') { ?>
 					<div class="table-cell table-50 cell-risksign-category">
