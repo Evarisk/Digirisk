@@ -72,6 +72,7 @@ $hookmanager->initHooks(array('digiriskelementcard', 'globalcard')); // Note tha
 $permissiontoread = $user->rights->digiriskdolibarr->digiriskelement->read;
 
 if ( ! $permissiontoread) accessforbidden();
+require_once './../../core/tpl/digirisk_security_checks.php';
 
 /*
  * Actions

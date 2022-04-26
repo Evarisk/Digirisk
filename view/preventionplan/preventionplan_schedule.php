@@ -72,7 +72,9 @@ $object->fetch(0, '', $morewhere);
 // Security check - Protection if external user
 $permissiontoread = $user->rights->digiriskdolibarr->preventionplan->read;
 $permissiontoadd  = $user->rights->digiriskdolibarr->preventionplan->write;
+
 if ( ! $permissiontoread) accessforbidden();
+require_once './../../core/tpl/digirisk_security_checks.php';
 
 /*
  * Actions

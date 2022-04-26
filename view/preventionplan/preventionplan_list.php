@@ -108,6 +108,7 @@ $permissiontodelete = $user->rights->digiriskdolibarr->preventionplan->delete;
 
 // Security check - Protection if external user
 if ( ! $permissiontoread) accessforbidden();
+require_once './../../core/tpl/digirisk_security_checks.php';
 
 /*
  * Actions

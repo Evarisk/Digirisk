@@ -165,6 +165,7 @@ $permissiontodelete = $user->rights->digiriskdolibarr->risk->delete;
 
 // Security check
 if ( ! $permissiontoread) accessforbidden();
+require_once './../../core/tpl/digirisk_security_checks.php';
 
 /*
  * Actions
