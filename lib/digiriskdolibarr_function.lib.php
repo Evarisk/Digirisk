@@ -599,7 +599,7 @@ function digiriskHeader($title = '', $help_url = '', $arrayofjs = array(), $arra
 									$('#id-left').attr('style', 'display:none !important')
 								}
 							</script>
-							<?php display_recurse_tree($results) ?>
+							<?php display_recurse_tree($results); ?>
 							<script>
 								// Get previous menu to display it
 								var MENU = localStorage.menu;
@@ -615,7 +615,7 @@ function digiriskHeader($title = '', $help_url = '', $arrayofjs = array(), $arra
 									jQuery( '#unit'+id ).addClass( 'toggled' );
 								});
 
-								<?php $object->fetch(GETPOST('id') ?: GETPOST('fromid')); ?>;
+								<?php $object->fetch(GETPOST('id') ?: GETPOST('fromid')); ?>
 								var idParent = <?php echo json_encode($object->fk_parent);?> ;
 
 								jQuery( '#menu'+idParent).removeClass( 'fa-chevron-right').addClass( 'fa-chevron-down' );
@@ -626,9 +626,11 @@ function digiriskHeader($title = '', $help_url = '', $arrayofjs = array(), $arra
 
 								var params = new window.URLSearchParams(window.location.search);
 								var id = params.get('id');
-								if (document.URL.match(/digiriskelement/) && !document.URL.match(/type=standard/)) {
+								id = !id ? params.get('fromid') : id
+
+								if ((document.URL.match(/digiriskelement/) || document.URL.match(/accident/)) && !document.URL.match(/type=standard/)) {
 									jQuery( '#unit'  + id ).addClass( 'active' );
-									jQuery( '#unit'  +id  ).closest( '.unit' ).attr( 'value', id );
+									jQuery( '#unit'  + id ).closest( '.unit' ).attr( 'value', id );
 								}
 							</script>
 						</ul>
