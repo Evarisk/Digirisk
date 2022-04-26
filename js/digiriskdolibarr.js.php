@@ -1218,6 +1218,8 @@ window.eoxiaJS.mediaGallery.savePhoto = function( event ) {
 	favorite = favorite.replace(/\ /, '')
 	window.eoxiaJS.loader.display($(this));
 
+	let token = $('.fichecenter').find('input[name="token"]').val();
+
 	if (type === 'riskassessment') {
 		mediaLinked = modalFrom.find('.element-linked-medias')
 		window.eoxiaJS.loader.display(mediaLinked);
@@ -1229,7 +1231,7 @@ window.eoxiaJS.mediaGallery.savePhoto = function( event ) {
 		let newPhoto = filepath + favorite.replace(/\./, '_small.')
 
 		$.ajax({
-			url: document.URL + "&action=addFiles",
+			url: document.URL + "&action=addFiles&token=" + token,
 			type: "POST",
 			data: JSON.stringify({
 				risk_id: riskId,
@@ -1264,7 +1266,7 @@ window.eoxiaJS.mediaGallery.savePhoto = function( event ) {
 		let newPhoto = filepath + favorite.replace(/\./, '_small.')
 
 		$.ajax({
-			url: document.URL + "&action=addDigiriskElementFiles",
+			url: document.URL + "&action=addDigiriskElementFiles&token=" + token,
 			type: "POST",
 			data: JSON.stringify({
 				digiriskelement_id: idToSave,
@@ -1331,12 +1333,13 @@ window.eoxiaJS.mediaGallery.sendPhoto = function( event ) {
 	let actionContainerError = $('.messageErrorSendPhoto');
 	let totalCount = files.length
     let progress = 0
+	let token = $('.fichecenter').find('input[name="token"]').val();
     $('#myProgress').attr('style', 'display:block')
 	$.each(files, function(index, file) {
         let formdata = new FormData();
         formdata.append("userfile[]", file);
         $.ajax({
-            url: document.URL + "&action=uploadPhoto",
+            url: document.URL + "&action=uploadPhoto&token=" + token,
             type: "POST",
             data: formdata,
             processData: false,
@@ -1392,6 +1395,7 @@ window.eoxiaJS.mediaGallery.unlinkFile = function( event ) {
 	let previousName = ''
 	let newPhoto = ''
 
+	let token = $('.fichecenter').find('input[name="token"]').val();
 
 	window.eoxiaJS.loader.display($(this).closest('.media-container'));
 
@@ -1409,7 +1413,7 @@ window.eoxiaJS.mediaGallery.unlinkFile = function( event ) {
 		}
 
 		$.ajax({
-			url: document.URL + querySeparator + "action=unlinkFile",
+			url: document.URL + querySeparator + "action=unlinkFile&token=" + token,
 			type: "POST",
 			data: JSON.stringify({
 				risk_id: riskId,
@@ -1436,7 +1440,7 @@ window.eoxiaJS.mediaGallery.unlinkFile = function( event ) {
 		}
 
 		$.ajax({
-			url: document.URL + querySeparator + "action=unlinkDigiriskElementFile",
+			url: document.URL + querySeparator + "action=unlinkDigiriskElementFile&token=" + token,
 			type: "POST",
 			data: JSON.stringify({
 				digiriskelement_id: element_linked_id,
@@ -1493,6 +1497,8 @@ window.eoxiaJS.mediaGallery.addToFavorite = function( event ) {
 
 	window.eoxiaJS.loader.display(mediaContainer);
 
+	let token = $('.fichecenter').find('input[name="token"]').val();
+
 	if (type === 'riskassessment') {
 		previousPhoto = $(this).closest('.modal-container').find('.risk-evaluation-photo .clicked-photo-preview')
 		elementPhotos = $('.risk-evaluation-photo-'+element_linked_id+'.risk-'+riskId)
@@ -1502,7 +1508,7 @@ window.eoxiaJS.mediaGallery.addToFavorite = function( event ) {
 		let saveButton = $(this).closest('.modal-container').find('.risk-evaluation-save')
 		saveButton.addClass('button-disable')
 		$.ajax({
-			url: document.URL + querySeparator + "action=addToFavorite",
+			url: document.URL + querySeparator + "action=addToFavorite&token=" + token,
 			data: JSON.stringify({
 				riskassessment_id: element_linked_id,
 				filename: filename,
@@ -1529,7 +1535,7 @@ window.eoxiaJS.mediaGallery.addToFavorite = function( event ) {
 		let previousName = previousPhoto[0].src.trim().split(/thumbs%2F/)[1].split(/"/)[0]
 
 		jQuery.ajax({
-			url: document.URL + querySeparator + "action=addDigiriskElementPhotoToFavorite",
+			url: document.URL + querySeparator + "action=addDigiriskElementPhotoToFavorite&token=" + token,
 			type: "POST",
 			data: JSON.stringify({
 				digiriskelement_id: element_linked_id,
