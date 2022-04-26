@@ -464,6 +464,8 @@ window.eoxiaJS.modal.openModal = function ( event ) {
 		$('#media_gallery').attr('value', idSelected);
 		$('#media_gallery').find('.type-from').attr('value', $(this).find('.type-from').val());
 		$('#media_gallery').find('.wpeo-button').attr('value', idSelected);
+		$('#media_gallery').find('.clicked-photo').attr('style', '')
+		$('#media_gallery').find('.clicked-photo').removeClass('clicked-photo')
 	} else if ($(this).hasClass('risk-evaluation-edit')) {
 		$('#risk_evaluation_edit' + idSelected).addClass('modal-active');
 	} else if ($(this).hasClass('evaluator-add')) {
