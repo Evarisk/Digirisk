@@ -208,6 +208,10 @@ if ( $signatory->role == 'PP_EXT_SOCIETY_INTERVENANTS') {
 	$element = $signatory->fetchSignatory($signatory->role, $signatory->fk_object, $type);
 	$element = array_shift($element);
 }
+if (dol_strlen($signatory->signature)) {
+	$urltoredirect = dirname($_SERVER['PHP_SELF']) . '/signature_success.php';
+	header('Location: ' . $urltoredirect);
+}
 ?>
 <div class="digirisk-signature-container">
 	<div class="wpeo-gridlayout grid-2">
