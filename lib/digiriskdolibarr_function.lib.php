@@ -556,6 +556,7 @@ function digiriskHeader($title = '', $help_url = '', $arrayofjs = array(), $arra
 	<?php require_once './../../core/tpl/digiriskdolibarr_medias_gallery_modal.tpl.php'; ?>
 
 	<div id="id-container" class="id-container page-ut-gp-list">
+		<input type="hidden" name="token" value="<?php echo newToken(); ?>">
 		<div class="side-nav">
 			<div class="side-nav-responsive"><i class="fas fa-bars"></i> <?php echo "Navigation UT/GP"; ?></div>
 			<div id="id-left">

@@ -1218,7 +1218,7 @@ window.eoxiaJS.mediaGallery.savePhoto = function( event ) {
 	favorite = favorite.replace(/\ /, '')
 	window.eoxiaJS.loader.display($(this));
 
-	let token = $('.fichecenter').find('input[name="token"]').val();
+	let token = $('.id-container').find('input[name="token"]').val();
 
 	if (type === 'riskassessment') {
 		mediaLinked = modalFrom.find('.element-linked-medias')
@@ -1333,7 +1333,7 @@ window.eoxiaJS.mediaGallery.sendPhoto = function( event ) {
 	let actionContainerError = $('.messageErrorSendPhoto');
 	let totalCount = files.length
     let progress = 0
-	let token = $('.fichecenter').find('input[name="token"]').val();
+	let token = $('.id-container.page-ut-gp-list').find('input[name="token"]').val();
     $('#myProgress').attr('style', 'display:block')
 	$.each(files, function(index, file) {
         let formdata = new FormData();
@@ -1395,7 +1395,7 @@ window.eoxiaJS.mediaGallery.unlinkFile = function( event ) {
 	let previousName = ''
 	let newPhoto = ''
 
-	let token = $('.fichecenter').find('input[name="token"]').val();
+	let token = $('.id-container.page-ut-gp-list').find('input[name="token"]').val();
 
 	window.eoxiaJS.loader.display($(this).closest('.media-container'));
 
@@ -1497,7 +1497,7 @@ window.eoxiaJS.mediaGallery.addToFavorite = function( event ) {
 
 	window.eoxiaJS.loader.display(mediaContainer);
 
-	let token = $('.fichecenter').find('input[name="token"]').val();
+	let token = $('.id-container.page-ut-gp-list').find('input[name="token"]').val();
 
 	if (type === 'riskassessment') {
 		previousPhoto = $(this).closest('.modal-container').find('.risk-evaluation-photo .clicked-photo-preview')
