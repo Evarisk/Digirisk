@@ -1600,7 +1600,7 @@ window.eoxiaJS.risk.event = function() {
 	$( document ).on( 'click', '.risk-create:not(.button-disable)', window.eoxiaJS.risk.createRisk );
 	$( document ).on( 'click', '.risk-save', window.eoxiaJS.risk.saveRisk );
 	$( document ).on( 'click', '.risk-unlink-shared', window.eoxiaJS.risk.unlinkSharedRisk );
-	$( document ).on( 'click', '#select_all_shared_risks', window.eoxiaJS.risk.SelectAllSharedRisk );
+	$( document ).on( 'click', '#select_all_shared_risks', window.eoxiaJS.risk.selectAllSharedRisk );
 };
 
 /**
@@ -1906,14 +1906,14 @@ window.eoxiaJS.risk.unlinkSharedRisk = function ( event ) {
  *
  * @return {void}
  */
-window.eoxiaJS.risk.SelectAllSharedRisk = function ( event ) {
+window.eoxiaJS.risk.selectAllSharedRisk = function ( event ) {
 	if(this.checked) {
 		// Iterate each checkbox
-		$(':checkbox').each(function() {
+		$(this).closest('.ui-widget').find(':checkbox').not(':disabled').each(function() {
 			this.checked = true;
 		});
 	} else {
-		$(':checkbox').each(function() {
+		$(this).closest('.ui-widget').find(':checkbox').not(':disabled').each(function() {
 			this.checked = false;
 		});
 	}
