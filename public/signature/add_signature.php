@@ -86,6 +86,10 @@ switch ($type) {
 }
 
 $signatory->fetch('', '', " AND signature_url =" . "'" . $track_id . "'");
+if (dol_strlen($signatory->signature)) {
+	$urltoredirect = dirname($_SERVER['PHP_SELF']) . '/signature_success.php';
+	header('Location: ' . $urltoredirect);
+}
 $object->fetch($signatory->fk_object);
 
 $upload_dir = $conf->digiriskdolibarr->multidir_output[isset($object->entity) ? $object->entity : 1];
@@ -208,10 +212,7 @@ if ( $signatory->role == 'PP_EXT_SOCIETY_INTERVENANTS') {
 	$element = $signatory->fetchSignatory($signatory->role, $signatory->fk_object, $type);
 	$element = array_shift($element);
 }
-if (dol_strlen($signatory->signature)) {
-	$urltoredirect = dirname($_SERVER['PHP_SELF']) . '/signature_success.php';
-	header('Location: ' . $urltoredirect);
-}
+
 ?>
 <div class="digirisk-signature-container">
 	<input type="hidden" name="token" value="<?php echo newToken(); ?>">
@@ -260,7 +261,6 @@ if (dol_strlen($signatory->signature)) {
 		print '<span class="span-icon-security inline-block">';
 		print '<input id="securitycode" placeholder="' . $langs->trans("SecurityCode") . '" class="flat input-icon-security width125" type="text" maxlength="5" name="code" tabindex="3" />';
 		print '<input type="hidden" id="sessionCode" value="' . $_SESSION['dol_antispam_value'] . '"/>';
-		print '<input type="hidden" id="redirectSignature" value="' . dirname($_SERVER['PHP_SELF']) . '/signature_success.php' . '"/>';
 		print '<input type="hidden" id="redirectSignatureError" value="' . $_SERVER['REQUEST_URI'] . '"/>';
 		print '</span>';
 		print '<span class="nowrap inline-block">';

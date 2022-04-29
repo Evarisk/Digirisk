@@ -1038,9 +1038,7 @@ window.eoxiaJS.signature.createSignature = function() {
 	if (elementConfCAPTCHA == 1) {
 		elementCode = $('#securitycode').val();
 		let elementSessionCode = $('#sessionCode').val();
-		if (elementSessionCode == elementCode) {
-			elementRedirect = $('#redirectSignature').val();
-		} else {
+		if (elementSessionCode != elementCode) {
 			elementRedirect = $('#redirectSignatureError').val();
 		}
 	} else {

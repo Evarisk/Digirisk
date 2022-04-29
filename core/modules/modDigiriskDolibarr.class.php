@@ -757,11 +757,11 @@ class modDigiriskdolibarr extends DolibarrModules
 
 		// Boxes/Widgets
 		$this->boxes = array(
-		          0 => array(
-		              'file' => 'box_riskassessmentdocument@digiriskdolibarr',
-		              'note' => '',
-					  'enabledbydefaulton' => 'Home',
-		          )
+			  0 => array(
+				  'file' => 'box_riskassessmentdocument@digiriskdolibarr',
+				  'note' => '',
+				  'enabledbydefaulton' => 'Home',
+			  )
 		);
 
 		// Cronjobs (List of cron jobs entries to add when module is enabled)
@@ -1241,7 +1241,7 @@ class modDigiriskdolibarr extends DolibarrModules
 
 			$preventionPlanSignature     = new PreventionPlanSignature($this->db);
 			$preventionPlanSignatureList = $preventionPlanSignature->fetchAll('', '', 0, 0, array(), 'AND', 'digiriskdolibarr_preventionplan_signature');
-			if (is_array($preventionPlanSignatureList) && count($preventionPlanSignatureList)>0) {
+			if (is_array($preventionPlanSignatureList) && count($preventionPlanSignatureList) > 0) {
 				foreach ($preventionPlanSignatureList as $preventionPlanSignature) {
 					$preventionPlanSignature->create($user, 1);
 				}
@@ -1249,7 +1249,7 @@ class modDigiriskdolibarr extends DolibarrModules
 
 			$firePermitSignature     = new FirePermitSignature($this->db);
 			$firePermitSignatureList = $firePermitSignature->fetchAll('', '', 0, 0, array(), 'AND', 'digiriskdolibarr_firepermit_signature');
-			if (is_array($firePermitSignatureList) && count($firePermitSignatureList)>0) {
+			if (is_array($firePermitSignatureList) && count($firePermitSignatureList) > 0) {
 				foreach ($firePermitSignatureList as $firePermitSignature) {
 					$firePermitSignature->create($user, 1);
 				}
