@@ -1215,7 +1215,7 @@ window.eoxiaJS.mediaGallery.savePhoto = function( event ) {
 
 	let favorite = filenames
 	favorite = favorite.split('vVv')[0]
-	favorite = favorite.replace(/\ /, '')
+	favorite = favorite.replace(/\ /, '+')
 	window.eoxiaJS.loader.display($(this));
 
 	let token = $('.id-container').find('input[name="token"]').val();
@@ -1240,7 +1240,7 @@ window.eoxiaJS.mediaGallery.savePhoto = function( event ) {
 			}),
 			processData: false,
 			contentType: false,
-			success: function ( ) {
+			success: function ( resp ) {
 				$('.wpeo-loader').removeClass('wpeo-loader')
 				parent.removeClass('modal-active')
 				riskAssessmentPhoto.each( function() {
