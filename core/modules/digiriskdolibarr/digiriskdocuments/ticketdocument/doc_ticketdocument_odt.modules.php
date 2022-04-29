@@ -403,12 +403,25 @@ class doc_ticketdocument_odt extends ModeleODTTicketDocument
 						foreach ($event_list as $event) {
 
 							$tmparray['event_ref'] = $event->ref;
-							$tmparray['user'] = $event->ref;
-							$tmparray['type'] = $event->ref;
-							$tmparray['title'] = $event->ref;
-							$tmparray['event_content'] = $event->ref;
-							$tmparray['date'] = $event->ref;
+							$tmparray['user'] = $event->authorid;
+							$tmparray['type'] = $event->type_code;
+							$tmparray['title'] = $event->label;
+							$tmparray['event_content'] = $event->note;
+							$tmparray['date'] = dol_print_date($event->datec, 'dayreduceformat');
 
+							foreach ($tmparray as $key => $val) {
+								try {
+									if (empty($val)) {
+										$listlines->setVars($key, $langs->trans('NoData'), true, 'UTF-8');
+									} else {
+										$listlines->setVars($key, html_entity_decode($val, ENT_QUOTES | ENT_HTML5), true, 'UTF-8');
+									}
+								} catch (OdfException $e) {
+									dol_syslog($e->getMessage(), LOG_INFO);
+								} catch (SegmentException $e) {
+									dol_syslog($e->getMessage(), LOG_INFO);
+								}
+							}
 							$listlines->merge();
 						}
 						$odfHandler->mergeSegment($listlines);
