@@ -350,7 +350,6 @@ class modDigiriskdolibarr extends DolibarrModules
 	 */
 	public $dictionaries = array();
 
-
 	/**
 	 * Constructor. Define names, constants, directories, boxes, permissions
 	 *
@@ -658,6 +657,10 @@ class modDigiriskdolibarr extends DolibarrModules
 			311 => array('DIGIRISKDOLIBARR_ACCIDENT_WORKSTOP_ADDON', 'chaine', 'mod_accident_workstop_standard', '', 0, 'current'),
 			312 => array('DIGIRISKDOLIBARR_ACCIDENT_LESION_ADDON', 'chaine', 'mod_accident_lesion_standard', '', 0, 'current'),
 
+			320 => array('DIGIRISKDOLIBARR_TICKETDOCUMENT_ADDON_ODT_PATH', 'chaine', 'DOL_DOCUMENT_ROOT/custom/digiriskdolibarr/documents/doctemplates/ticketdocument/', '', 0, 'current'),
+			321 => array('DIGIRISKDOLIBARR_TICKETDOCUMENT_ADDON', 'chaine', 'mod_ticketdocument_standard', '', 0, 'current'),
+
+
 //			// CONST ACCIDENT DOCUMENT
 //			320 => array('MAIN_AGENDA_ACTIONAUTO_ACCIDENTDOCUMENT_CREATE', 'integer', 1, '', 0, 'current'),
 //			321 => array('DIGIRISKDOLIBARR_ACCIDENTDOCUMENT_ADDON', 'chaine', 'mod_accidentdocument_standard', '', 0, 'current'),
@@ -681,6 +684,7 @@ class modDigiriskdolibarr extends DolibarrModules
 		$this->tabs[] = array('data' => 'mycompany_admin:+security:Sécurité:@digiriskdolibarr:1:/custom/digiriskdolibarr/admin/securityconf.php');  			// To add a new tab identified by code tabname1
 		$this->tabs[] = array('data' => 'mycompany_admin:+social:Social:@digiriskdolibarr:1:/custom/digiriskdolibarr/admin/socialconf.php');  					// To add a new tab identified by code tabname1
 		$this->tabs[] = array('data' => 'thirdparty:+openinghours:Horaires:@digiriskdolibarr:1:/custom/digiriskdolibarr/view/openinghours_card.php?id=__ID__'); // To add a new tab identified by code tabname1
+		$this->tabs[] = array('data' => 'ticket:+document:History:@digiriskdolibarr:1:/custom/digiriskdolibarr/view/ticket/ticket_documents.php?id=__ID__'); // To add a new tab identified by code tabname1
 
 		// To remove an existing tab identified by code tabname
 		// Dictionaries
@@ -1274,6 +1278,7 @@ class modDigiriskdolibarr extends DolibarrModules
 		delDocumentModel('listingrisksaction_odt', 'listingrisksaction');
 		delDocumentModel('listingrisksphoto_odt', 'listingrisksphoto');
 		delDocumentModel('riskassessmentdocument_odt', 'riskassessmentdocument');
+		delDocumentModel('ticketdocument_odt', 'ticketdocument');
 
 		addDocumentModel('informationssharing_odt', 'informationssharing', 'ODT templates', 'DIGIRISKDOLIBARR_INFORMATIONSSHARING_ADDON_ODT_PATH');
 		addDocumentModel('legaldisplay_odt', 'legaldisplay', 'ODT templates', 'DIGIRISKDOLIBARR_LEGALDISPLAY_ADDON_ODT_PATH');
@@ -1285,6 +1290,7 @@ class modDigiriskdolibarr extends DolibarrModules
 		addDocumentModel('listingrisksaction_odt', 'listingrisksaction', 'ODT templates', 'DIGIRISKDOLIBARR_LISTINGRISKSACTION_ADDON_ODT_PATH');
 		addDocumentModel('listingrisksphoto_odt', 'listingrisksphoto', 'ODT templates', 'DIGIRISKDOLIBARR_LISTINGRISKSPHOTO_ADDON_ODT_PATH');
 		addDocumentModel('riskassessmentdocument_odt', 'riskassessmentdocument', 'ODT templates', 'DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_ADDON_ODT_PATH');
+		addDocumentModel('ticketdocument_odt', 'ticketdocument', 'ODT templates', 'DIGIRISKDOLIBARR_TICKETDOCUMENT_ADDON_ODT_PATH');
 
 		if ( $conf->global->DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH == 0 ) {
 			require_once __DIR__ . '/../../class/digiriskelement/groupment.class.php';
