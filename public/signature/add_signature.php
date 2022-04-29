@@ -214,6 +214,7 @@ if (dol_strlen($signatory->signature)) {
 }
 ?>
 <div class="digirisk-signature-container">
+	<input type="hidden" name="token" value="<?php echo newToken(); ?>">
 	<div class="wpeo-gridlayout grid-2">
 		<div class="informations">
 			<input type="hidden" id="confCAPTCHA" value="<?php echo $conf->global->DIGIRISKDOLIBARR_USE_CAPTCHA ?>"/>

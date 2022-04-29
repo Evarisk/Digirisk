@@ -1023,13 +1023,15 @@ window.eoxiaJS.signature.createSignature = function() {
 		var signature = $(this).closest( '.wpeo-modal' ).find( 'canvas' )[0].toDataURL();
 	}
 
+	let token = $('.modal-signature').find('input[name="token"]').val();
+
 	var url = '';
 	var type = '';
 	if (elementZone == "private") {
-		url = document.URL + '&action=addSignature' + signatoryIDPost;
+		url = document.URL + '&action=addSignature' + signatoryIDPost + '&token=' + token;
 		type = "POST"
 	} else {
-		url = document.URL + '&action=addSignature' + signatoryIDPost;
+		url = document.URL + '&action=addSignature' + signatoryIDPost + '&token=' + token;
 		type = "POST";
 	}
 
@@ -1094,7 +1096,8 @@ window.eoxiaJS.signature.download = function(fileUrl, filename) {
  */
 window.eoxiaJS.signature.autoDownloadSpecimen = function( event ) {
 	let element = $(this).closest('.file-generation')
-	let url = document.URL + '&action=builddoc'
+	let token = $('.digirisk-signature-container').find('input[name="token"]').val();
+	let url = document.URL + '&action=builddoc&token=' + token
 	$.ajax({
 		url: url,
 		type: "POST",
@@ -1104,7 +1107,7 @@ window.eoxiaJS.signature.autoDownloadSpecimen = function( event ) {
 
 			window.eoxiaJS.signature.download(path + filename, filename);
 			$.ajax({
-				url: document.URL + '&action=remove_file',
+				url: document.URL + '&action=remove_file&token=' + token,
 				type: "POST",
 				success: function ( ) {
 				},
