@@ -3872,15 +3872,16 @@ window.eoxiaJS.accident.event = function() {
 window.eoxiaJS.accident.tmpStockFile = function(id) {
 	var files = $('#sendfile').prop('files');
 
-
 	const formData = new FormData();
 	for (let i = 0; i < files.length; i++) {
 		let file = files[i]
 		formData.append('files[]', file)
 	}
 
+	let token = $('.div-table-responsive-no-min').find('input[name="token"]').val();
+
 	$.ajax({
-		url: document.URL + '&action=sendfile&objectlineid=' + id,
+		url: document.URL + '&action=sendfile&objectlineid=' + id + '&token=' + token,
 		type: "POST",
 		processData: false,
 		contentType: false,
@@ -3906,9 +3907,10 @@ window.eoxiaJS.accident.removeFile = function( event ) {
 	let filetodelete = $(this).attr('value');
 	filetodelete = filetodelete.replace('_mini', '')
 	let objectlineid = $(this).closest('.objectline').attr('value')
+	let token = $('.div-table-responsive-no-min').find('input[name="token"]').val();
 
 	$.ajax({
-		url: document.URL + '&action=removefile&filetodelete='+filetodelete+'&objectlineid='+objectlineid,
+		url: document.URL + '&action=removefile&filetodelete='+filetodelete+'&objectlineid='+objectlineid+'&token='+token,
 		type: "POST",
 		processData: false,
 		contentType: false,
