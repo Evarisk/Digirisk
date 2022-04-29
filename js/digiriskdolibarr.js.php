@@ -1436,11 +1436,12 @@ window.eoxiaJS.mediaGallery.unlinkFile = function( event ) {
 		previousPhoto = $('.digirisk-element-'+element_linked_id).find('.photo.clicked-photo-preview')
 		previousName = previousPhoto[0].src.trim().split(/thumbs%2F/)[1].split(/"/)[0]
 
-		if (previousName == filename.replace(/\./, '_small.')) {
-			newPhoto = previousPhoto[0].src.replace(previousName, '')
-		} else {
-			newPhoto = previousPhoto[0].src
-		}
+		//if (previousName == filename.replace(/\./, '_small.')) {
+		//	newPhoto = previousPhoto[0].src.replace(previousName, '')
+		//} else {
+		//	newPhoto = previousPhoto[0].src
+		//}
+		newPhoto = previousPhoto[0].src
 
 		$.ajax({
 			url: document.URL + querySeparator + "action=unlinkDigiriskElementFile&token=" + token,
