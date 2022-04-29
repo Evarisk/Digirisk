@@ -753,10 +753,11 @@ class modDigiriskdolibarr extends DolibarrModules
 
 		// Boxes/Widgets
 		$this->boxes = array(
-		//          0 => array(
-		//              'file' => 'box_riskassessmentdocument@digiriskdolibarr',
-		//              'note' => 'My notes',
-		//          )
+		          0 => array(
+		              'file' => 'box_riskassessmentdocument@digiriskdolibarr',
+		              'note' => '',
+					  'enabledbydefaulton' => 'Home',
+		          )
 		);
 
 		// Cronjobs (List of cron jobs entries to add when module is enabled)
