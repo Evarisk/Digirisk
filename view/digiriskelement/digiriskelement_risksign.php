@@ -118,6 +118,7 @@ $permissiontodelete = $user->rights->digiriskdolibarr->risksign->delete;
 
 // Security check - Protection if external user
 if ( ! $permissiontoread) accessforbidden();
+require_once './../../core/tpl/digirisk_security_checks.php';
 
 /*
  * Actions
@@ -601,7 +602,7 @@ if ($object->id > 0) {
 			if ($key == 'status') $cssforfield  .= ($cssforfield ? ' ' : '') . 'center';
 			elseif ($key == 'ref') $cssforfield .= ($cssforfield ? ' ' : '') . 'nowrap';
 			if ( ! empty($arrayfields['t.' . $key]['checked'])) {
-				print '<td' . ($cssforfield ? ' class="' . $cssforfield . '"' : '') . ' style="width:2%">';
+				print '<td' . ($cssforfield ? ' class="' . $cssforfield . '"' : '') . '>';
 				if ($key == 'status') print $risksign->getLibStatut(5);
 				elseif ($key == 'category') { ?>
 					<div class="table-cell table-50 cell-risksign-category">
@@ -662,7 +663,7 @@ if ($object->id > 0) {
 					</div>
 					<?php
 				} elseif ($key == 'description') {
-					print dol_trunc($risksign->description, 128, 'wrap', 'UTF-8', 0, 1);
+					print dol_htmlentitiesbr(dol_trunc($risksign->description, 128, 'wrap', 'UTF-8', 0, 1));
 				} else print $risksign->showOutputField($val, $key, $risksign->$key, '');
 				print '</td>';
 				if ( ! $i) $totalarray['nbfield']++;

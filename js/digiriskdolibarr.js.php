@@ -464,6 +464,8 @@ window.eoxiaJS.modal.openModal = function ( event ) {
 		$('#media_gallery').attr('value', idSelected);
 		$('#media_gallery').find('.type-from').attr('value', $(this).find('.type-from').val());
 		$('#media_gallery').find('.wpeo-button').attr('value', idSelected);
+		$('#media_gallery').find('.clicked-photo').attr('style', '')
+		$('#media_gallery').find('.clicked-photo').removeClass('clicked-photo')
 	} else if ($(this).hasClass('risk-evaluation-edit')) {
 		$('#risk_evaluation_edit' + idSelected).addClass('modal-active');
 	} else if ($(this).hasClass('evaluator-add')) {
@@ -1021,13 +1023,15 @@ window.eoxiaJS.signature.createSignature = function() {
 		var signature = $(this).closest( '.wpeo-modal' ).find( 'canvas' )[0].toDataURL();
 	}
 
+	let token = $('.modal-signature').find('input[name="token"]').val();
+
 	var url = '';
 	var type = '';
 	if (elementZone == "private") {
-		url = document.URL + '&action=addSignature' + signatoryIDPost;
+		url = document.URL + '&action=addSignature' + signatoryIDPost + '&token=' + token;
 		type = "POST"
 	} else {
-		url = document.URL + '&action=addSignature' + signatoryIDPost;
+		url = document.URL + '&action=addSignature' + signatoryIDPost + '&token=' + token;
 		type = "POST";
 	}
 
@@ -1092,7 +1096,8 @@ window.eoxiaJS.signature.download = function(fileUrl, filename) {
  */
 window.eoxiaJS.signature.autoDownloadSpecimen = function( event ) {
 	let element = $(this).closest('.file-generation')
-	let url = document.URL + '&action=builddoc'
+	let token = $('.digirisk-signature-container').find('input[name="token"]').val();
+	let url = document.URL + '&action=builddoc&token=' + token
 	$.ajax({
 		url: url,
 		type: "POST",
@@ -1102,7 +1107,7 @@ window.eoxiaJS.signature.autoDownloadSpecimen = function( event ) {
 
 			window.eoxiaJS.signature.download(path + filename, filename);
 			$.ajax({
-				url: document.URL + '&action=remove_file',
+				url: document.URL + '&action=remove_file&token=' + token,
 				type: "POST",
 				success: function ( ) {
 				},
@@ -1213,8 +1218,10 @@ window.eoxiaJS.mediaGallery.savePhoto = function( event ) {
 
 	let favorite = filenames
 	favorite = favorite.split('vVv')[0]
-	favorite = favorite.replace(/\ /, '')
+	favorite = favorite.replace(/\ /, '+')
 	window.eoxiaJS.loader.display($(this));
+
+	let token = $('.id-container').find('input[name="token"]').val();
 
 	if (type === 'riskassessment') {
 		mediaLinked = modalFrom.find('.element-linked-medias')
@@ -1227,7 +1234,7 @@ window.eoxiaJS.mediaGallery.savePhoto = function( event ) {
 		let newPhoto = filepath + favorite.replace(/\./, '_small.')
 
 		$.ajax({
-			url: document.URL + "&action=addFiles",
+			url: document.URL + "&action=addFiles&token=" + token,
 			type: "POST",
 			data: JSON.stringify({
 				risk_id: riskId,
@@ -1236,7 +1243,7 @@ window.eoxiaJS.mediaGallery.savePhoto = function( event ) {
 			}),
 			processData: false,
 			contentType: false,
-			success: function ( ) {
+			success: function ( resp ) {
 				$('.wpeo-loader').removeClass('wpeo-loader')
 				parent.removeClass('modal-active')
 				riskAssessmentPhoto.each( function() {
@@ -1262,7 +1269,7 @@ window.eoxiaJS.mediaGallery.savePhoto = function( event ) {
 		let newPhoto = filepath + favorite.replace(/\./, '_small.')
 
 		$.ajax({
-			url: document.URL + "&action=addDigiriskElementFiles",
+			url: document.URL + "&action=addDigiriskElementFiles&token=" + token,
 			type: "POST",
 			data: JSON.stringify({
 				digiriskelement_id: idToSave,
@@ -1329,12 +1336,13 @@ window.eoxiaJS.mediaGallery.sendPhoto = function( event ) {
 	let actionContainerError = $('.messageErrorSendPhoto');
 	let totalCount = files.length
     let progress = 0
+	let token = $('.id-container.page-ut-gp-list').find('input[name="token"]').val();
     $('#myProgress').attr('style', 'display:block')
 	$.each(files, function(index, file) {
         let formdata = new FormData();
         formdata.append("userfile[]", file);
         $.ajax({
-            url: document.URL + "&action=uploadPhoto",
+            url: document.URL + "&action=uploadPhoto&token=" + token,
             type: "POST",
             data: formdata,
             processData: false,
@@ -1390,6 +1398,7 @@ window.eoxiaJS.mediaGallery.unlinkFile = function( event ) {
 	let previousName = ''
 	let newPhoto = ''
 
+	let token = $('.id-container.page-ut-gp-list').find('input[name="token"]').val();
 
 	window.eoxiaJS.loader.display($(this).closest('.media-container'));
 
@@ -1407,7 +1416,7 @@ window.eoxiaJS.mediaGallery.unlinkFile = function( event ) {
 		}
 
 		$.ajax({
-			url: document.URL + querySeparator + "action=unlinkFile",
+			url: document.URL + querySeparator + "action=unlinkFile&token=" + token,
 			type: "POST",
 			data: JSON.stringify({
 				risk_id: riskId,
@@ -1427,14 +1436,15 @@ window.eoxiaJS.mediaGallery.unlinkFile = function( event ) {
 		previousPhoto = $('.digirisk-element-'+element_linked_id).find('.photo.clicked-photo-preview')
 		previousName = previousPhoto[0].src.trim().split(/thumbs%2F/)[1].split(/"/)[0]
 
-		if (previousName == filename.replace(/\./, '_small.')) {
-			newPhoto = previousPhoto[0].src.replace(previousName, '')
-		} else {
-			newPhoto = previousPhoto[0].src
-		}
+		//if (previousName == filename.replace(/\./, '_small.')) {
+		//	newPhoto = previousPhoto[0].src.replace(previousName, '')
+		//} else {
+		//	newPhoto = previousPhoto[0].src
+		//}
+		newPhoto = previousPhoto[0].src
 
 		$.ajax({
-			url: document.URL + querySeparator + "action=unlinkDigiriskElementFile",
+			url: document.URL + querySeparator + "action=unlinkDigiriskElementFile&token=" + token,
 			type: "POST",
 			data: JSON.stringify({
 				digiriskelement_id: element_linked_id,
@@ -1491,6 +1501,8 @@ window.eoxiaJS.mediaGallery.addToFavorite = function( event ) {
 
 	window.eoxiaJS.loader.display(mediaContainer);
 
+	let token = $('.id-container.page-ut-gp-list').find('input[name="token"]').val();
+
 	if (type === 'riskassessment') {
 		previousPhoto = $(this).closest('.modal-container').find('.risk-evaluation-photo .clicked-photo-preview')
 		elementPhotos = $('.risk-evaluation-photo-'+element_linked_id+'.risk-'+riskId)
@@ -1500,7 +1512,7 @@ window.eoxiaJS.mediaGallery.addToFavorite = function( event ) {
 		let saveButton = $(this).closest('.modal-container').find('.risk-evaluation-save')
 		saveButton.addClass('button-disable')
 		$.ajax({
-			url: document.URL + querySeparator + "action=addToFavorite",
+			url: document.URL + querySeparator + "action=addToFavorite&token=" + token,
 			data: JSON.stringify({
 				riskassessment_id: element_linked_id,
 				filename: filename,
@@ -1527,7 +1539,7 @@ window.eoxiaJS.mediaGallery.addToFavorite = function( event ) {
 		let previousName = previousPhoto[0].src.trim().split(/thumbs%2F/)[1].split(/"/)[0]
 
 		jQuery.ajax({
-			url: document.URL + querySeparator + "action=addDigiriskElementPhotoToFavorite",
+			url: document.URL + querySeparator + "action=addDigiriskElementPhotoToFavorite&token=" + token,
 			type: "POST",
 			data: JSON.stringify({
 				digiriskelement_id: element_linked_id,
@@ -1592,7 +1604,7 @@ window.eoxiaJS.risk.event = function() {
 	$( document ).on( 'click', '.risk-create:not(.button-disable)', window.eoxiaJS.risk.createRisk );
 	$( document ).on( 'click', '.risk-save', window.eoxiaJS.risk.saveRisk );
 	$( document ).on( 'click', '.risk-unlink-shared', window.eoxiaJS.risk.unlinkSharedRisk );
-	$( document ).on( 'click', '#select_all_shared_risks', window.eoxiaJS.risk.SelectAllSharedRisk );
+	$( document ).on( 'click', '#select_all_shared_risks', window.eoxiaJS.risk.selectAllSharedRisk );
 };
 
 /**
@@ -1688,6 +1700,8 @@ window.eoxiaJS.risk.createRisk = function ( event ) {
 	evaluationText = window.eoxiaJS.risk.sanitizeBeforeRequest(evaluationText)
 	taskText = window.eoxiaJS.risk.sanitizeBeforeRequest(taskText)
 
+	let token = $('.fichecenter.risklist').find('input[name="token"]').val();
+
 	//Risk
 	var category = elementRisk.find('.risk-category input').val();
 	var description = riskCommentText;
@@ -1713,7 +1727,7 @@ window.eoxiaJS.risk.createRisk = function ( event ) {
 	window.eoxiaJS.loader.display($('.fichecenter.risklist'));
 
 	$.ajax({
-		url: document.URL + '&action=add',
+		url: document.URL + '&action=add&token='+token,
 		type: "POST",
 		data: JSON.stringify({
 			cotation: cotation,
@@ -1789,8 +1803,10 @@ window.eoxiaJS.risk.saveRisk = function ( event ) {
 	}
 	let riskRef =  $('.risk_row_'+editedRiskId).find('.risk-container > div:nth-child(1)').text();
 
+	let token = $('.fichecenter.risklist').find('input[name="token"]').val();
+
 	$.ajax({
-		url:  document.URL + '&action=saveRisk',
+		url:  document.URL + '&action=saveRisk&token='+token,
 		type: "POST",
 		processData: false,
 		data: JSON.stringify({
@@ -1848,8 +1864,10 @@ window.eoxiaJS.risk.unlinkSharedRisk = function ( event ) {
 	let riskRef =  $('.risk_row_'+riskId).find('.risk-container > div:nth-child(1)').text();
 	let url = document.URL.split(/#/);
 
+	let token = $('.fichecenter.risklist').find('input[name="token"]').val();
+
 	$.ajax({
-		url: url[0] + '&action=unlinkSharedRisk',
+		url: url[0] + '&action=unlinkSharedRisk&token='+token,
 		type: "POST",
 		processData: false,
 		data: JSON.stringify({
@@ -1892,14 +1910,14 @@ window.eoxiaJS.risk.unlinkSharedRisk = function ( event ) {
  *
  * @return {void}
  */
-window.eoxiaJS.risk.SelectAllSharedRisk = function ( event ) {
+window.eoxiaJS.risk.selectAllSharedRisk = function ( event ) {
 	if(this.checked) {
 		// Iterate each checkbox
-		$(':checkbox').each(function() {
+		$(this).closest('.ui-widget').find(':checkbox').not(':disabled').each(function() {
 			this.checked = true;
 		});
 	} else {
-		$(':checkbox').each(function() {
+		$(this).closest('.ui-widget').find(':checkbox').not(':disabled').each(function() {
 			this.checked = false;
 		});
 	}
@@ -2061,8 +2079,10 @@ window.eoxiaJS.evaluation.createEvaluation = function ( event ) {
 	window.eoxiaJS.loader.display($(this));
 	window.eoxiaJS.loader.display($('.risk-evaluation-container-' + riskToAssign));
 
+	let token = $('.fichecenter.risklist').find('input[name="token"]').val();
+
 	$.ajax({
-		url: document.URL + '&action=addEvaluation',
+		url: document.URL + '&action=addEvaluation&token='+token,
 		type: "POST",
 		data: JSON.stringify({
 			cotation: cotation,
@@ -2125,6 +2145,8 @@ window.eoxiaJS.evaluation.deleteEvaluation = function ( event ) {
 	let actionContainerError = $('.messageErrorEvaluationDelete');
 	let evaluationID = element.attr('value');
 
+	let token = $('.fichecenter.risklist').find('input[name="token"]').val();
+
 	var r = confirm(textToShowBeforeDelete);
 	if (r == true) {
 
@@ -2136,7 +2158,7 @@ window.eoxiaJS.evaluation.deleteEvaluation = function ( event ) {
 		window.eoxiaJS.loader.display($(this));
 
 		$.ajax({
-			url:document.URL + '&action=deleteEvaluation&deletedEvaluationId=' + deletedEvaluationId,
+			url:document.URL + '&action=deleteEvaluation&deletedEvaluationId=' + deletedEvaluationId + '&token=' + token,
 			type: "POST",
 			processData: false,
 			contentType: false,
@@ -2215,8 +2237,10 @@ window.eoxiaJS.evaluation.saveEvaluation = function ( event ) {
 
 	window.eoxiaJS.loader.display($(this));
 
+	let token = $('.fichecenter.risklist').find('input[name="token"]').val();
+
 	$.ajax({
-		url: document.URL + '&action=saveEvaluation',
+		url: document.URL + '&action=saveEvaluation&token='+token,
 		type: "POST",
 		processData: false,
 		data: JSON.stringify({
@@ -2441,8 +2465,10 @@ window.eoxiaJS.riskassessmenttask.createRiskAssessmentTask = function ( event ) 
 
 	window.eoxiaJS.loader.display($(this));
 
+	let token = $('.fichecenter.risklist').find('input[name="token"]').val();
+
 	$.ajax({
-		url: document.URL + '&action=addRiskAssessmentTask',
+		url: document.URL + '&action=addRiskAssessmentTask&token='+token,
 		type: "POST",
 		data: JSON.stringify({
 			tasktitle: taskText,
@@ -2485,6 +2511,8 @@ window.eoxiaJS.riskassessmenttask.deleteRiskAssessmentTask = function ( event ) 
 	let deletedRiskAssessmentTaskId = $(this).attr('value');
 	let textToShow = element.find('.labelForDelete').val();
 
+	let token = $('.fichecenter.risklist').find('input[name="token"]').val();
+
 	var r = confirm(textToShow);
 	if (r == true) {
 
@@ -2493,7 +2521,7 @@ window.eoxiaJS.riskassessmenttask.deleteRiskAssessmentTask = function ( event ) 
 		window.eoxiaJS.loader.display($(this));
 
 		$.ajax({
-			url: document.URL + '&action=deleteRiskAssessmentTask&deletedRiskAssessmentTaskId=' + deletedRiskAssessmentTaskId,
+			url: document.URL + '&action=deleteRiskAssessmentTask&deletedRiskAssessmentTaskId=' + deletedRiskAssessmentTaskId + '&token=' + token,
 			type: "POST",
 			processData: false,
 			contentType: false,
@@ -2557,8 +2585,10 @@ window.eoxiaJS.riskassessmenttask.saveRiskAssessmentTask = function ( event ) {
 	window.eoxiaJS.loader.display($(this));
 	window.eoxiaJS.loader.display($('.riskassessment-task-single-'+ editedRiskAssessmentTaskId));
 
+	let token = $('.fichecenter.risklist').find('input[name="token"]').val();
+
 	$.ajax({
-		url: document.URL + '&action=saveRiskAssessmentTask',
+		url: document.URL + '&action=saveRiskAssessmentTask&token='+token,
 		data: JSON.stringify({
 			riskAssessmentTaskID: editedRiskAssessmentTaskId,
 			tasktitle: taskText,
@@ -2620,8 +2650,10 @@ window.eoxiaJS.riskassessmenttask.createRiskAssessmentTaskTimeSpent = function (
 	window.eoxiaJS.loader.display($(this));
 	window.eoxiaJS.loader.display($('.riskassessment-task-single-'+ taskID));
 
+	let token = $('.fichecenter.risklist').find('input[name="token"]').val();
+
 	$.ajax({
-		url: document.URL + '&action=addRiskAssessmentTaskTimeSpent',
+		url: document.URL + '&action=addRiskAssessmentTaskTimeSpent&token='+token,
 		type: "POST",
 		data: JSON.stringify({
 			taskID: taskID,
@@ -2675,6 +2707,8 @@ window.eoxiaJS.riskassessmenttask.deleteRiskAssessmentTaskTimeSpent = function (
 	let deletedRiskAssessmentTaskTimeSpentId = $(this).attr('value');
 	let textToShow = element.find('.labelForDelete').val();
 
+	let token = $('.fichecenter.risklist').find('input[name="token"]').val();
+
 	var r = confirm(textToShow);
 	if (r == true) {
 
@@ -2683,7 +2717,7 @@ window.eoxiaJS.riskassessmenttask.deleteRiskAssessmentTaskTimeSpent = function (
 		window.eoxiaJS.loader.display($(this));
 
 		$.ajax({
-			url: document.URL + '&action=deleteRiskAssessmentTaskTimeSpent&deletedRiskAssessmentTaskTimeSpentId=' + deletedRiskAssessmentTaskTimeSpentId,
+			url: document.URL + '&action=deleteRiskAssessmentTaskTimeSpent&deletedRiskAssessmentTaskTimeSpentId=' + deletedRiskAssessmentTaskTimeSpentId + '&token=' + token,
 			type: "POST",
 			processData: false,
 			contentType: false,
@@ -2747,8 +2781,10 @@ window.eoxiaJS.riskassessmenttask.saveRiskAssessmentTaskTimeSpent = function ( e
 	window.eoxiaJS.loader.display($(this));
 	window.eoxiaJS.loader.display($('.riskassessment-task-single-'+ taskID));
 
+	let token = $('.fichecenter.risklist').find('input[name="token"]').val();
+
 	$.ajax({
-		url: document.URL + '&action=saveRiskAssessmentTaskTimeSpent',
+		url: document.URL + '&action=saveRiskAssessmentTaskTimeSpent&token='+token,
 		data: JSON.stringify({
 			riskAssessmentTaskTimeSpentID: riskAssessmentTaskTimeSpentID,
 			date: date,
@@ -2814,8 +2850,10 @@ window.eoxiaJS.riskassessmenttask.checkTaskProgress = function ( event ) {
 
 	window.eoxiaJS.loader.display($('.riskassessment-task-single-'+ RiskAssessmentTaskId));
 
+	let token = $('.fichecenter.risklist').find('input[name="token"]').val();
+
 	$.ajax({
-		url: document.URL + '&action=checkTaskProgress',
+		url: document.URL + '&action=checkTaskProgress&token='+token,
 		data: JSON.stringify({
 			riskAssessmentTaskID: RiskAssessmentTaskId,
 			taskProgress: taskProgress,
@@ -2973,8 +3011,10 @@ window.eoxiaJS.risksign.createRiskSign = function ( event ) {
 
 	window.eoxiaJS.loader.display($('.fichecenter'));
 
+	let token = $('.fichecenter').find('input[name="token"]').val();
+
 	$.ajax({
-		url: document.URL + '&action=add',
+		url: document.URL + '&action=add&token='+token,
 		type: "POST",
 		data: JSON.stringify({
 			riskSignCategory: category,
@@ -3020,8 +3060,11 @@ window.eoxiaJS.risksign.saveRiskSign = function ( event ) {
 	let riskSignRef =  $('.risksign_row_'+editedRiskSignId).find('.risksign-container > div:nth-child(1)').text();
 
 	window.eoxiaJS.loader.display(elementRiskSign);
+
+	let token = $('.fichecenter').find('input[name="token"]').val();
+
 	$.ajax({
-		url: document.URL + '&action=saveRiskSign',
+		url: document.URL + '&action=saveRiskSign&token='+token,
 		data: JSON.stringify({
 			riskSignID: editedRiskSignId,
 			riskSignCategory: category,
@@ -3126,8 +3169,10 @@ window.eoxiaJS.evaluator.createEvaluator = function ( event ) {
 
 	window.eoxiaJS.loader.display(elementParent);
 
+	let token = $('.fichecenter').find('input[name="token"]').val();
+
 	$.ajax({
-		url: document.URL + '&action=add',
+		url: document.URL + '&action=add&token='+token,
 		type: "POST",
 		data: JSON.stringify({
 			evaluatorID: userID,
@@ -3828,15 +3873,16 @@ window.eoxiaJS.accident.event = function() {
 window.eoxiaJS.accident.tmpStockFile = function(id) {
 	var files = $('#sendfile').prop('files');
 
-
 	const formData = new FormData();
 	for (let i = 0; i < files.length; i++) {
 		let file = files[i]
 		formData.append('files[]', file)
 	}
 
+	let token = $('.div-table-responsive-no-min').find('input[name="token"]').val();
+
 	$.ajax({
-		url: document.URL + '&action=sendfile&objectlineid=' + id,
+		url: document.URL + '&action=sendfile&objectlineid=' + id + '&token=' + token,
 		type: "POST",
 		processData: false,
 		contentType: false,
@@ -3862,9 +3908,10 @@ window.eoxiaJS.accident.removeFile = function( event ) {
 	let filetodelete = $(this).attr('value');
 	filetodelete = filetodelete.replace('_mini', '')
 	let objectlineid = $(this).closest('.objectline').attr('value')
+	let token = $('.div-table-responsive-no-min').find('input[name="token"]').val();
 
 	$.ajax({
-		url: document.URL + '&action=removefile&filetodelete='+filetodelete+'&objectlineid='+objectlineid,
+		url: document.URL + '&action=removefile&filetodelete='+filetodelete+'&objectlineid='+objectlineid+'&token='+token,
 		type: "POST",
 		processData: false,
 		contentType: false,

@@ -73,6 +73,7 @@ $permissiontoread = $user->rights->digiriskdolibarr->firepermit->read;
 $permissiontoadd  = $user->rights->digiriskdolibarr->firepermit->write;
 
 if ( ! $permissiontoread) accessforbidden();
+require_once './../../core/tpl/digirisk_security_checks.php';
 
 /*
  * Actions

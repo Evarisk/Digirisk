@@ -105,6 +105,7 @@ $permissiontoadd    = $user->rights->digiriskdolibarr->preventionplan->write;
 $permissiontodelete = $user->rights->digiriskdolibarr->preventionplan->delete;
 
 if ( ! $permissiontoread) accessforbidden();
+require_once './../../core/tpl/digirisk_security_checks.php';
 
 /*
  * Actions

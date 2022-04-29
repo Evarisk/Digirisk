@@ -208,8 +208,13 @@ if ( $signatory->role == 'PP_EXT_SOCIETY_INTERVENANTS') {
 	$element = $signatory->fetchSignatory($signatory->role, $signatory->fk_object, $type);
 	$element = array_shift($element);
 }
+if (dol_strlen($signatory->signature)) {
+	$urltoredirect = dirname($_SERVER['PHP_SELF']) . '/signature_success.php';
+	header('Location: ' . $urltoredirect);
+}
 ?>
 <div class="digirisk-signature-container">
+	<input type="hidden" name="token" value="<?php echo newToken(); ?>">
 	<div class="wpeo-gridlayout grid-2">
 		<div class="informations">
 			<input type="hidden" id="confCAPTCHA" value="<?php echo $conf->global->DIGIRISKDOLIBARR_USE_CAPTCHA ?>"/>

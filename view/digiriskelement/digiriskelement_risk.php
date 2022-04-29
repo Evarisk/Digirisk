@@ -165,6 +165,7 @@ $permissiontodelete = $user->rights->digiriskdolibarr->risk->delete;
 
 // Security check
 if ( ! $permissiontoread) accessforbidden();
+require_once './../../core/tpl/digirisk_security_checks.php';
 
 /*
  * Actions
@@ -288,7 +289,7 @@ if ($sharedrisks) {
 				$formquestionimportsharedrisks[] = array('type' => 'checkbox', 'name' => 'import_shared_risks' . '_S' . $risks->entity . '_' . $digiriskelementtmp->ref . '_' . $risks->ref, 'label' => $importValue, 'value' => 1);
 			}
 		}
-		$formconfirm .= $form->formconfirm($_SERVER["PHP_SELF"] . '?id=' . $object->id, $langs->trans('ImportSharedRisks'), '', 'confirm_import_shared_risks', $formquestionimportsharedrisks, 'yes', 'actionButtonImportSharedRisks', 350, 600);
+		$formconfirm .= $form->formconfirm($_SERVER["PHP_SELF"] . '?id=' . $object->id, $langs->trans('ImportSharedRisks'), '', 'confirm_import_shared_risks', $formquestionimportsharedrisks, 'yes', 'actionButtonImportSharedRisks', 800, 800);
 	}
 
 	// Call Hook formConfirm

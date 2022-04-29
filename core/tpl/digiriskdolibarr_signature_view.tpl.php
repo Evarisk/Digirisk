@@ -7,6 +7,7 @@
 <?php endif; ?>
 
 <div class="modal-signature" value="<?php echo $element->id ?>">
+	<input type="hidden" name="token" value="<?php echo newToken(); ?>">
 	<div class="wpeo-modal modal-signature" id="modal-signature<?php echo $element->id ?>">
 		<div class="modal-container wpeo-modal-event">
 			<!-- Modal-Header-->

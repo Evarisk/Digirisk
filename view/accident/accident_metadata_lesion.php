@@ -75,6 +75,7 @@ $permissiontoadd    = $user->rights->digiriskdolibarr->accident->write;
 $permissiontodelete = $user->rights->digiriskdolibarr->accident->delete;
 
 if ( ! $permissiontoread) accessforbidden();
+require_once './../../core/tpl/digirisk_security_checks.php';
 
 /*
  * Actions
@@ -241,7 +242,7 @@ if (empty($forceall)) $forceall = 0;
 $colspan = 3; // Columns: total ht + col edit + col delete
 
 // Accident Lines
-$accidentlines = $objectline->fetchAll($object->id);
+$accidentlines = $objectline->fetchFromParent($object->id);
 
 print '<tr class="liste_titre">';
 print '<td><span>' . $langs->trans('Ref.') . '</span></td>';

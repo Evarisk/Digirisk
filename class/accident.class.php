@@ -588,7 +588,7 @@ class AccidentWorkStop extends CommonObjectLine
 	 * @param int $limit
 	 * @return array|int  <0 if KO, >0 if OK
 	 */
-	public function fetchAll($parent_id = 0, $limit = 0)
+	public function fetchFromParent($parent_id = 0, $limit = 0)
 	{
 		global $db;
 		$sql  = 'SELECT t.rowid, t.ref, t.date_creation, t.status, t.workstop_days';
@@ -1051,7 +1051,7 @@ class AccidentLesion extends CommonObjectLine
 	 *	@param  int       $limit
 	 * 	@return array|int             <0 if KO, >0 if OK
 	 */
-	public function fetchAll($parent_id = 0, $limit = 0)
+	public function fetchFromParent($parent_id = 0, $limit = 0)
 	{
 		global $db;
 		$sql  = 'SELECT t.rowid, t.ref, t.date_creation, t.lesion_localization, t.lesion_nature';
