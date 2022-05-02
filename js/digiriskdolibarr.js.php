@@ -1388,6 +1388,7 @@ window.eoxiaJS.mediaGallery.unlinkFile = function( event ) {
 	let querySeparator = '?'
 	let riskId = $(this).closest('.modal-risk').attr('value')
 	let type = $(this).closest('.modal-container').find('.type-from').val()
+	let noPhotoPath = $(this).closest('.modal-container').find('.no-photo-path').val()
 	var params = new window.URLSearchParams(window.location.search);
 	var currentElementID = params.get('id')
 
@@ -1425,7 +1426,7 @@ window.eoxiaJS.mediaGallery.unlinkFile = function( event ) {
 			success: function ( ) {
 				$('.wpeo-loader').removeClass('wpeo-loader')
 				riskAssessmentPhoto.each( function() {
-					$(this).find('.clicked-photo-preview').attr('src',newPhoto )
+					$(this).find('.clicked-photo-preview').attr('src',noPhotoPath )
 				});
 				mediaContainer.hide()
 			}
