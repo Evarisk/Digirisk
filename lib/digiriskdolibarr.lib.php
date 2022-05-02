@@ -81,7 +81,7 @@ function digiriskdolibarrAdminPrepareHead()
 	$h++;
 
 	$head[$h][0] = dol_buildpath("/digiriskdolibarr/admin/ticket/ticket.php", 1);
-	$head[$h][1] = $langs->trans("Tickets");
+	$head[$h][1] = '<i class="fa fa-ticket"></i> ' . $langs->trans("Tickets");
 	$head[$h][2] = 'ticket';
 	$h++;
 
