@@ -1216,7 +1216,7 @@ window.eoxiaJS.mediaGallery.savePhoto = function( event ) {
 
 	let favorite = filenames
 	favorite = favorite.split('vVv')[0]
-	favorite = favorite.replace(/\ /, '+')
+	favorite = favorite.replace(/\ /g, '+')
 	window.eoxiaJS.loader.display($(this));
 
 	let token = $('.id-container').find('input[name="token"]').val();
