@@ -826,19 +826,21 @@ function display_recurse_tree($results)
 					<?php } else { ?>
 					<div class="spacer"></div>
 					<?php }
+					$nophoto     = '/dolibarr/htdocs/public/theme/common/nophoto.png';
 					$pathToThumb = DOL_URL_ROOT . '/viewimage.php?modulepart=digiriskdolibarr&entity=' . $conf->entity . '&file=' . urlencode($element['object']->element_type . '/' . $element['object']->ref . '/thumbs/');
 					$filearray   = dol_dir_list($conf->digiriskdolibarr->multidir_output[$conf->entity] . '/' . $element['object']->element_type . '/' . $element['object']->ref . '/', "files", 0, '', '(\.odt|_preview.*\.png)$', 'position_name', 'asc', 1);
-					if (count($filearray) && dol_strlen($element['object']->photo) > 0) {
+					if (count($filearray)) {
 						print '<span class="floatleft inline-block valignmiddle divphotoref open-medias-linked modal-open digirisk-element digirisk-element-' . $element['object']->id . '" value="' . $element['object']->id . '">';
-						 print '<img width="50" height="50" class="photo clicked-photo-preview" src="' . DOL_URL_ROOT . '/viewimage.php?modulepart=digiriskdolibarr&entity=' . $conf->entity . '&file=' . urlencode($element['object']->element_type . '/' . $element['object']->ref . '/thumbs/' . preg_replace('/\./', '_small.', $element['object']->photo)) . '" >';
-						 print '<input type="hidden" class="filepath-to-digiriskelement" value="' . $pathToThumb . '"/>';
-						 print '</span>';
+						$img_path =  dol_strlen($element['object']->photo) > 0 ? DOL_URL_ROOT . '/viewimage.php?modulepart=digiriskdolibarr&entity=' . $conf->entity . '&file=' . urlencode($element['object']->element_type . '/' . $element['object']->ref . '/thumbs/' . preg_replace('/\./', '_small.', $element['object']->photo)) : $nophoto;
+						print '<img width="50" height="50" class="photo clicked-photo-preview" src="'. $img_path .'" >';
+						print '<input type="hidden" class="filepath-to-digiriskelement" value="' . $pathToThumb . '"/>';
+						print '</span>';
 					} else {
-						$nophoto = '/public/theme/common/nophoto.png'; ?>
+						?>
 						<div class="open-media-gallery modal-open digiriskelement digirisk-element-<?php echo $element['object']->id ?>" value="<?php  echo $element['object']->id ?>">
 							<input type="hidden" class="type-from" value="digiriskelement"/>
 							<input type="hidden" class="filepath-to-digiriskelement" value="<?php echo $pathToThumb ?>"/>
-							<span class="floatleft inline-block valignmiddle divphotoref"><img width="50" height="50" class="photo photowithmargin clicked-photo-preview" alt="No photo" src="<?php echo DOL_URL_ROOT . $nophoto ?>"></span>
+							<span class="floatleft inline-block valignmiddle divphotoref"><img width="50" height="50" class="photo photowithmargin clicked-photo-preview" alt="No photo" src="<?php echo $nophoto ?>"></span>
 						</div>
 					<?php } ?>
 					<div class="digirisk-element-medias-modal" style="z-index:1500" value="<?php echo $element['object']->id ?>">
