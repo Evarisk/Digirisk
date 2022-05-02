@@ -42,7 +42,7 @@ if (empty($conf) || ! is_object($conf)) {
 		$nophoto      = '/dolibarr/htdocs/public/theme/common/nophoto.png'; ?>
 		<!-- BUTTON RISK EVALUATION PHOTO MODAL -->
 		<div class="action risk-evaluation-photo default-photo modal-open risk-evaluation-photo-<?php echo $cotation->id > 0 ? $cotation->id : 0 ; echo $risk->id > 0 ? ' risk-' . $risk->id : ' risk-new' ?>">
-			<?php if (isset($cotation->photo)) {
+			<?php if (isset($cotation->photo) && dol_strlen($cotation->photo) > 0) {
 				$filearray = dol_dir_list($conf->digiriskdolibarr->multidir_output[$conf->entity] . '/' . $cotation->element . '/' . $cotation->ref, "files", 0, '', '(\.odt|_preview.*\.png)$', 'position_name', 'asc', 1);
 				if (count($filearray)) {
 					?>
