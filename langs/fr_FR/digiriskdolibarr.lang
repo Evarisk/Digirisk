@@ -1329,7 +1329,12 @@ YouMustNotifyYourHierarchy = Vous êtes dans l'<b>obligation</b> de prévenir vo
 GoBackToTicketCreation = Aller à la page de suivi des tickets
 SendEmailOnTicketSubmit = Envoyer des emails à la création
 
+# Ticket document
 
+DigiriskTicketDocumentNumberingModule = Modèle de numérotation des fiches de ticket de Digirisk
+DigiriskTicketDocumentStandardModel = Renvoie le numéro sous la forme TDn où n est un compteur séquentiel sans rupture et sans remise à 0
+DigiriskTemplateDocumentTicket = Modèle de documents des fiches de tickets de Digirisk
+TicketDocumentDigiriskTemplate = ODT par défaut des fiches de tickets
 
 #
 # Tools - Outils
