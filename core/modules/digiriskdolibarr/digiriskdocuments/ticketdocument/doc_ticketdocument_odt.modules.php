@@ -406,7 +406,8 @@ class doc_ticketdocument_odt extends ModeleODTTicketDocument
 							$tmparray['user'] = $event->authorid;
 							$tmparray['type'] = $event->type_code;
 							$tmparray['title'] = $event->label;
-							$tmparray['event_content'] = $event->note;
+							$content = preg_replace('/<br \/>/', '', $event->note);
+							$tmparray['event_content'] = $content;
 							$tmparray['date'] = dol_print_date($event->datec, 'dayreduceformat');
 
 							foreach ($tmparray as $key => $val) {
