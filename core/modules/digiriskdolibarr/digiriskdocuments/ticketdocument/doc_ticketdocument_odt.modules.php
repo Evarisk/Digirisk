@@ -267,8 +267,8 @@ class doc_ticketdocument_odt extends ModeleODTTicketDocument
 
 		$object->fetch($id);
 
-		$dir                                             = $conf->digiriskdolibarr->multidir_output[isset($object->entity) ? $object->entity : 1] . '/ticketdocument/' . $ticket->ref;
-		$objectref                                       = dol_sanitizeFileName($ticket->ref);
+		$dir       = $conf->digiriskdolibarr->multidir_output[isset($object->entity) ? $object->entity : 1] . '/ticketdocument/' . $ticket->ref;
+		$objectref = dol_sanitizeFileName($ticket->ref);
 		if (preg_match('/specimen/i', $objectref)) $dir .= '/specimen';
 
 		if ( ! file_exists($dir)) {
@@ -337,15 +337,15 @@ class doc_ticketdocument_odt extends ModeleODTTicketDocument
 			$societe            = new Societe($this->db);
 			$ticket->fetch_optionals();
 
-			$tmparray['ref']     = $ticket->ref;
-			$tmparray['lastname']     = $ticket->array_options['options_digiriskdolibarr_ticket_lastname'];
-			$tmparray['firstname']     = $ticket->array_options['options_digiriskdolibarr_ticket_firstname'];
+			$tmparray['ref']              = $ticket->ref;
+			$tmparray['lastname']         = $ticket->array_options['options_digiriskdolibarr_ticket_lastname'];
+			$tmparray['firstname']        = $ticket->array_options['options_digiriskdolibarr_ticket_firstname'];
 			$tmparray['phone_number']     = $ticket->array_options['options_digiriskdolibarr_ticket_phone'];
-			$tmparray['service']     = $ticket->array_options['options_digiriskdolibarr_ticket_service'];
-			$tmparray['location']     = $ticket->array_options['options_digiriskdolibarr_ticket_location'];
+			$tmparray['service']          = $ticket->array_options['options_digiriskdolibarr_ticket_service'];
+			$tmparray['location']         = $ticket->array_options['options_digiriskdolibarr_ticket_location'];
 			$tmparray['declaration_date'] = dol_print_date($ticket->array_options['options_digiriskdolibarr_ticket_date']);
-			$tmparray['creation_date'] = dol_print_date($ticket->date_creation);
-			$tmparray['status'] = $ticket->getLibStatut();
+			$tmparray['creation_date']    = dol_print_date($ticket->date_creation);
+			$tmparray['status']           = $ticket->getLibStatut();
 
 			$user = new User($this->db);
 			$user->fetch($ticket->fk_user_assign);
@@ -367,16 +367,7 @@ class doc_ticketdocument_odt extends ModeleODTTicketDocument
 
 			foreach ($tmparray as $key => $value) {
 				try {
-					if ($key == 'maitre_oeuvre_signature' || $key == 'intervenant_exterieur_signature') { // Image
-						$list     = getimagesize($value);
-						$newWidth = 350;
-						if ($list[0]) {
-							$ratio     = $newWidth / $list[0];
-							$newHeight = $ratio * $list[1];
-							dol_imageResizeOrCrop($value, 0, $newWidth, $newHeight);
-						}
-						$odfHandler->setImage($key, $value);
-					} elseif (preg_match('/photo$/', $key)) {
+					if (preg_match('/photo$/', $key)) {
 						if (file_exists($value)) $odfHandler->setImage($key, $value);
 						else $odfHandler->setVars($key, $langs->transnoentities('ErrorFileNotFound'), true, 'UTF-8');
 					} elseif (empty($value)) { // Text
@@ -469,9 +460,6 @@ class doc_ticketdocument_odt extends ModeleODTTicketDocument
 
 			$parameters = array('odfHandler' => &$odfHandler, 'file' => $file, 'object' => $object, 'outputlangs' => $outputlangs, 'substitutionarray' => &$tmparray);
 			$hookmanager->executeHooks('afterODTCreation', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
-
-//			if ( ! empty($conf->global->MAIN_UMASK))
-//				@chmod($file, octdec($conf->global->MAIN_UMASK));
 
 			$odfHandler = null; // Destroy object
 
