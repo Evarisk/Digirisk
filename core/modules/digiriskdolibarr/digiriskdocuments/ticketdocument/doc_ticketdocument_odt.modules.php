@@ -367,7 +367,7 @@ class doc_ticketdocument_odt extends ModeleODTTicketDocument
 
 			foreach ($tmparray as $key => $value) {
 				try {
-					if (preg_match('/photo$/', $key)) {
+					if (preg_match('/photo$/', $key) || preg_match('/logo$/', $key)) {
 						if (file_exists($value)) $odfHandler->setImage($key, $value);
 						else $odfHandler->setVars($key, $langs->transnoentities('ErrorFileNotFound'), true, 'UTF-8');
 					} elseif (empty($value)) { // Text
