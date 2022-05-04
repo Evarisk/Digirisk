@@ -283,6 +283,12 @@ class doc_ticketdocument_odt extends ModeleODTTicketDocument
 			$filename = preg_split('/ticketdocument\//', $srctemplatepath);
 			preg_replace('/template_/', '', $filename[1]);
 
+			if (preg_match('/_events/', $filename[1])) {
+				$foundtagforlines = 1;
+			} else {
+				$foundtagforlines = 0;
+			}
+
 			$date     = dol_print_date(dol_now(), 'dayxcard');
 			$filename = $date . '_' . $ref . '_' . $objectref . '_' . $conf->global->MAIN_INFO_SOCIETE_NOM . '.odt';
 			$filename = str_replace(' ', '_', $filename);
@@ -352,7 +358,7 @@ class doc_ticketdocument_odt extends ModeleODTTicketDocument
 				$allcategories[] = $cat->label;
 			}
 			$tmparray['categories']       = implode(', ', $allcategories);
-			
+
 			$tmparray['status']           = $ticket->getLibStatut();
 
 			$user = new User($this->db);
@@ -394,7 +400,6 @@ class doc_ticketdocument_odt extends ModeleODTTicketDocument
 
 			// Replace tags of lines
 			try {
-				$foundtagforlines = 1;
 				if ($foundtagforlines) {
 					if ( ! empty($event_list) && $event_list > 0) {
 						$listlines = $odfHandler->setSegment('events');
@@ -470,9 +475,6 @@ class doc_ticketdocument_odt extends ModeleODTTicketDocument
 			$hookmanager->executeHooks('afterODTCreation', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
 
 			$odfHandler = null; // Destroy object
-
-			dol_delete_file($tempdir . "signature.png");
-			dol_delete_file($tempdir . "signature2.png");
 
 			$this->result = array('fullpath' => $file);
 
