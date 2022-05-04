@@ -1328,6 +1328,7 @@ TicketShowCompanyLogoHelp = Activez cette option pour masquer le logo de la soci
 YouMustNotifyYourHierarchy = Vous êtes dans l'<b>obligation</b> de prévenir votre hiérarchie
 GoBackToTicketCreation = Aller à la page de suivi des tickets
 SendEmailOnTicketSubmit = Envoyer des emails à la création
+CatTicketsList = Liste des tags/catégories des tickets
 
 # Ticket document
 

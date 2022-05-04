@@ -1219,6 +1219,79 @@ class modDigiriskdolibarr extends DolibarrModules
 			'target' => '',
 			'user' => 0,				                // 0=Menu for internal users, 1=external users, 2=both
 		);
+
+		// Exports profiles provided by this module
+		$r = 1;
+		$this->export_code[$r] = $this->rights_class.'_'.$r;
+		$this->export_label[$r] = 'Ticket'; // Translation key (used only if key ExportDataset_xxx_z not found)
+		$this->export_icon[$r] = 'ticket';
+		$this->export_enabled[$r] = '!empty($conf->ticket->enabled)';
+		$this->export_permission[$r] = array(array("ticket", "manage"));
+		$this->export_fields_array[$r] = array(
+			's.rowid'=>"IdCompany", 's.nom'=>'CompanyName', 's.address'=>'Address', 's.zip'=>'Zip', 's.town'=>'Town', 's.fk_pays'=>'Country',
+			's.phone'=>'Phone', 's.email'=>'Email', 's.siren'=>'ProfId1', 's.siret'=>'ProfId2', 's.ape'=>'ProfId3', 's.idprof4'=>'ProfId4', 's.code_compta'=>'CustomerAccountancyCode', 's.code_compta_fournisseur'=>'SupplierAccountancyCode',
+			'cat.rowid'=>"CategId", 'cat.label'=>"Label", 'cat.description'=>"Description", 'cat.fk_parent'=>"ParentCategory",
+			't.rowid'=>"Id", 't.ref'=>"Ref", 't.track_id'=>"TicketTrackId", 't.origin_email'=>"OriginEmail", 't.subject'=>"Subject", 't.message'=>"Message", 't.resolution'=>"Resolution", 't.type_code'=>"Type", 't.category_code'=>"TicketCategory", 't.severity_code'=>"Severity",
+		);
+		$this->export_TypeFields_array[$r] = array(
+			's.rowid'=>"List:societe:nom::thirdparty", 's.nom'=>'Text', 's.address'=>'Text', 's.zip'=>'Text', 's.town'=>'Text', 's.fk_pays'=>'List:c_country:label',
+			's.phone'=>'Text', 's.email'=>'Text', 's.siren'=>'Text', 's.siret'=>'Text', 's.ape'=>'Text', 's.idprof4'=>'Text', 's.code_compta'=>'Text', 's.code_compta_fournisseur'=>'Text',
+			'cat.label'=>"Text", 'cat.description'=>"Text", 'cat.fk_parent'=>'List:categorie:label:rowid',
+			't.rowid'=>"List:ticket:ref::ticket", 't.entity'=>'Numeric', 't.ref'=>"Text", 't.track_id'=>"Text", 't.origin_email'=>"Text", 't.subject'=>"Text", 't.message'=>"Text", 't.resolution'=>"Text", 't.type_code'=>"Text", 't.category_code'=>"Text", 't.severity_code'=>"Text",
+		);
+		$this->export_entities_array[$r] = array(
+			's.rowid'=>"company", 's.nom'=>'company', 's.address'=>'company', 's.zip'=>'company', 's.town'=>'company', 's.fk_pays'=>'company',
+			's.phone'=>'company', 's.email'=>'company', 's.siren'=>'company', 's.siret'=>'company', 's.ape'=>'company', 's.idprof4'=>'company', 's.code_compta'=>'company', 's.code_compta_fournisseur'=>'company',
+			'cat.rowid'=>'category', 'cat.label'=>'category', 'cat.description'=>'category', 'cat.fk_parent'=>'category'
+		);
+		// Add multicompany field
+		if (!empty($conf->global->MULTICOMPANY_ENTITY_IN_EXPORT_IF_SHARED)) {
+			$nbofallowedentities = count(explode(',', getEntity('ticket'))); // If ticket are shared, nb will be > 1
+			if (!empty($conf->multicompany->enabled) && $nbofallowedentities > 1) {
+				$this->export_fields_array[$r] += array('t.entity'=>'Entity');
+			}
+		}
+
+		$this->export_fields_array[$r] = array_merge($this->export_fields_array[$r], array());
+		$keyforselect = 'ticket';
+		$keyforelement = 'ticket';
+		$keyforaliasextra = 'extra';
+		include DOL_DOCUMENT_ROOT.'/core/extrafieldsinexport.inc.php';
+
+		$this->export_sql_start[$r] = 'SELECT DISTINCT ';
+		$this->export_sql_end[$r] = ' FROM '.MAIN_DB_PREFIX.'ticket as t';
+		$this->export_sql_end[$r] .= ' LEFT JOIN '.MAIN_DB_PREFIX.'ticket_extrafields as extra ON t.rowid = extra.fk_object';
+		$this->export_sql_end[$r] .= ' LEFT JOIN '.MAIN_DB_PREFIX.'categorie_ticket as ct ON ct.fk_ticket = t.rowid';
+		$this->export_sql_end[$r] .= ' LEFT JOIN '.MAIN_DB_PREFIX.'categorie as cat ON ct.fk_categorie = cat.rowid';
+		$this->export_sql_end[$r] .= ' LEFT JOIN '.MAIN_DB_PREFIX.'societe as s ON t.fk_soc = s.rowid';
+		$this->export_sql_end[$r] .= " WHERE t.entity IN (".getEntity('ticket').")";
+
+		require_once DOL_DOCUMENT_ROOT . '/categories/class/categorie.class.php';
+
+		$r++;
+		$langs->load("categories");
+		$this->export_code[$r] = $this->rights_class.'_12_'.Categorie::$MAP_ID_TO_CODE[12];
+		$this->export_label[$r] = 'CatTicketsList';
+		$this->export_icon[$r] = 'category';
+		$this->export_enabled[$r] = '!empty($conf->ticket->enabled)';
+		$this->export_permission[$r] = array(array("categorie", "lire"), array("ticket", "manage"));
+		$this->export_fields_array[$r] = array('cat.rowid'=>"CategId", 'cat.label'=>"Label", 'cat.description'=>"Description", 'cat.fk_parent'=>"ParentCategory", 't.rowid'=>'TicketId', 't.ref'=>'Ref', 's.rowid'=>"IdThirdParty", 's.nom'=>"Name");
+		$this->export_TypeFields_array[$r] = array('cat.label'=>"Text", 'cat.description'=>"Text", 'cat.fk_parent'=>'List:categorie:label:rowid', 't.ref'=>'Text', 's.rowid'=>"List:societe:nom:rowid", 's.nom'=>"Text");
+		$this->export_entities_array[$r] = array('t.rowid'=>'ticket', 't.ref'=>'ticket', 's.rowid'=>"company", 's.nom'=>"company"); // We define here only fields that use another picto
+
+		$keyforselect = 'ticket';
+		$keyforelement = 'ticket';
+		$keyforaliasextra = 'extra';
+		include DOL_DOCUMENT_ROOT.'/core/extrafieldsinexport.inc.php';
+
+		$this->export_sql_start[$r] = 'SELECT DISTINCT ';
+		$this->export_sql_end[$r]  = ' FROM '.MAIN_DB_PREFIX.'categorie as cat';
+		$this->export_sql_end[$r] .= ' INNER JOIN '.MAIN_DB_PREFIX.'categorie_ticket as ct ON ct.fk_categorie = cat.rowid';
+		$this->export_sql_end[$r] .= ' INNER JOIN '.MAIN_DB_PREFIX.'ticket as t ON t.rowid = ct.fk_ticket';
+		$this->export_sql_end[$r] .= ' LEFT JOIN '.MAIN_DB_PREFIX.'ticket_extrafields as extra ON extra.fk_object = t.rowid';
+		$this->export_sql_end[$r] .= ' LEFT JOIN '.MAIN_DB_PREFIX.'societe as s ON s.rowid = t.fk_soc';
+		$this->export_sql_end[$r] .= ' WHERE cat.entity IN ('.getEntity('category').')';
+		$this->export_sql_end[$r] .= ' AND cat.type = 12';
 	}
 
 	/**
@@ -1226,8 +1299,9 @@ class modDigiriskdolibarr extends DolibarrModules
 	 *  The init function add constants, boxes, permissions and menus (defined in constructor) into Dolibarr database.
 	 *  It also creates data directories
 	 *
-	 *  @param      string  $options    Options when enabling module ('', 'noboxes')
-	 *  @return     int             	1 if OK, 0 if KO
+	 * @param string $options Options when enabling module ('', 'noboxes')
+	 * @return     int                1 if OK, 0 if KO
+	 * @throws Exception
 	 */
 	public function init($options = '')
 	{
