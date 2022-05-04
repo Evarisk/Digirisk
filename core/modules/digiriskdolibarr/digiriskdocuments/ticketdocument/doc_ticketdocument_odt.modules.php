@@ -26,6 +26,7 @@ require_once DOL_DOCUMENT_ROOT . '/core/lib/files.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/images.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/company.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/doc.lib.php';
+require_once DOL_DOCUMENT_ROOT.'/categories/class/categorie.class.php';
 require_once __DIR__ . '/../../../../../class/evaluator.class.php';
 require_once __DIR__ . '/../../../../../class/riskanalysis/risk.class.php';
 require_once __DIR__ . '/../../../../../class/riskanalysis/riskassessment.class.php';
@@ -334,7 +335,6 @@ class doc_ticketdocument_odt extends ModeleODTTicketDocument
 			$tmparray = array_merge($substitutionarray, $array_object_from_properties, $array_object, $array_soc);
 			complete_substitutions_array($tmparray, $outputlangs, $object);
 
-			$societe            = new Societe($this->db);
 			$ticket->fetch_optionals();
 
 			$tmparray['ref']              = $ticket->ref;
@@ -345,6 +345,14 @@ class doc_ticketdocument_odt extends ModeleODTTicketDocument
 			$tmparray['location']         = $ticket->array_options['options_digiriskdolibarr_ticket_location'];
 			$tmparray['declaration_date'] = dol_print_date($ticket->array_options['options_digiriskdolibarr_ticket_date']);
 			$tmparray['creation_date']    = dol_print_date($ticket->date_creation);
+
+			$category = new Categorie($this->db);
+			$categories = $category->containing($ticket->id, Categorie::TYPE_TICKET);
+			foreach ($categories as $cat) {
+				$allcategories[] = $cat->label;
+			}
+			$tmparray['categories']       = implode(', ', $allcategories);
+			
 			$tmparray['status']           = $ticket->getLibStatut();
 
 			$user = new User($this->db);
