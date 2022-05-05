@@ -60,6 +60,11 @@ function digiriskdolibarrAdminPrepareHead()
 	$head[$h][2] = 'accident';
 	$h++;
 
+	$head[$h][0] = dol_buildpath("/digiriskdolibarr/admin/ticket/ticket.php", 1);
+	$head[$h][1] = '<i class="fa fa-ticket"></i> ' . $langs->trans("Tickets");
+	$head[$h][2] = 'ticket';
+	$h++;
+
 	$head[$h][0] = dol_buildpath("/digiriskdolibarr/admin/config/digiriskdocuments.php", 1);
 	$head[$h][1] = '<i class="fas fa-file-alt"></i> ' . $langs->trans("YourDocuments");
 	$head[$h][2] = 'digiriskdocuments';
@@ -78,11 +83,6 @@ function digiriskdolibarrAdminPrepareHead()
 	$head[$h][0] = dol_buildpath("/digiriskdolibarr/admin/config/about.php", 1);
 	$head[$h][1] = '<i class="fab fa-readme"></i> ' . $langs->trans("About");
 	$head[$h][2] = 'about';
-	$h++;
-
-	$head[$h][0] = dol_buildpath("/digiriskdolibarr/admin/ticket/ticket.php", 1);
-	$head[$h][1] = '<i class="fa fa-ticket"></i> ' . $langs->trans("Tickets");
-	$head[$h][2] = 'ticket';
 	$h++;
 
 	complete_head_from_modules($conf, $langs, null, $head, $h, 'digiriskdolibarr');

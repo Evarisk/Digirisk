@@ -648,8 +648,8 @@ class modDigiriskdolibarr extends DolibarrModules
 			291 => array('DIGIRISKDOLIBARR_TICKET_CATEGORIES_CREATED', 'integer', 0, '', 0, 'current'),
 			292 => array('DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE', 'integer', 1, '', 0, 'current'),
 			293 => array('DIGIRISKDOLIBARR_TICKET_SHOW_COMPANY_LOGO', 'integer', 1, '', 0, 'current'),
-			294 => array('DIGIRISKDOLIBARR_TICKET_SUBMITTED_SEND_MAIL_TO', 'integer', 1, '', 0, 'current'),
-
+			294 => array('DIGIRISKDOLIBARR_TICKET_SUBMITTED_SEND_MAIL_TO', 'chaine', '', '', 0, 'current'),
+			295 => array('DIGIRISKDOLIBARR_TICKET_PARENT_CATEGORY', 'integer', 0, '', 0, 'current'),
 			// CONST ACCIDENT
 			300 => array('MAIN_AGENDA_ACTIONAUTO_ACCIDENT_CREATE', 'integer', 1, '', 0, 'current'),
 			301 => array('MAIN_AGENDA_ACTIONAUTO_ACCIDENT_EDIT', 'integer', 1, '', 0, 'current'),

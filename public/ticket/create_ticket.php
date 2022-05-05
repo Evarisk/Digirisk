@@ -61,7 +61,7 @@ require_once DOL_DOCUMENT_ROOT . '/core/modules/ticket/mod_ticket_simple.php';
 
 require_once '../../lib/digiriskdolibarr_function.lib.php';
 
-global $langs;
+global $conf, $db, $langs;
 // Load translation files required by the page
 $langs->loadLangs(array('companies', 'other', 'mails', 'ticket', 'digiriskdolibarr@digiriskdolibarr'));
 

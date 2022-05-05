@@ -40,6 +40,8 @@ global $conf, $langs, $user, $db;
 
 // Libraries
 require_once DOL_DOCUMENT_ROOT . "/core/lib/admin.lib.php";
+require_once DOL_DOCUMENT_ROOT . "/core/lib/admin.lib.php";
+require_once DOL_DOCUMENT_ROOT . "/core/class/html.formother.class.php";
 include_once DOL_DOCUMENT_ROOT . '/core/class/extrafields.class.php';
 include_once DOL_DOCUMENT_ROOT . '/categories/class/categorie.class.php';
 
@@ -200,6 +202,10 @@ if ($action == 'generateCategories') {
 	}
 }
 
+if ($action == 'setParentCategory') {
+	$category_id = GETPOST('parentCategory');
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_TICKET_PARENT_CATEGORY', $category_id, 'integer', 0, '', $conf->entity);
+}
 /*
  * View
  */
@@ -219,7 +225,13 @@ print load_fiche_titre($title, $linkback, 'digiriskdolibarr32px@digiriskdolibarr
 
 // Configuration header
 $head = digiriskdolibarrAdminPrepareHead();
+
+
 print dol_get_fiche_head($head, 'ticket', '', -1, "digiriskdolibarr@digiriskdolibarr");
+print load_fiche_titre('<i class="fa fa-ticket"></i> ' . $langs->trans("TicketManagement"), '', '');
+print '<hr>';
+print load_fiche_titre($langs->trans("PublicInterface"), '', '');
+
 print '<span class="opacitymedium">' . $langs->trans("DigiriskTicketPublicAccess") . '</span> : <a class="wordbreak" href="' . dol_buildpath('/custom/digiriskdolibarr/public/ticket/create_ticket.php', 1) . '" target="_blank" >' . dol_buildpath('/custom/digiriskdolibarr/public/ticket/create_ticket.php', 2) . '</a>';
 print dol_get_fiche_end();
 
@@ -263,48 +275,6 @@ if ( ! empty($conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE)) {
 	print '</td>';
 	print '</tr>';
 
-	// Extrafields generation
-
-	print '<form method="POST" action="' . $_SERVER["PHP_SELF"] . '">';
-	print '<input type="hidden" name="token" value="' . newToken() . '">';
-	print '<input type="hidden" name="action" value="generateExtrafields">';
-	print '<input type="hidden" name="backtopage" value="' . $backtopage . '">';
-
-	print '<tr class="oddeven"><td>' . $langs->trans("GenerateExtrafields") . '</td>';
-	print '<td class="center">';
-	print $conf->global->DIGIRISKDOLIBARR_TICKET_EXTRAFIELDS ? $langs->trans('AlreadyGenerated') : $langs->trans('NotCreated');
-	print '</td>';
-	print '<td class="center">';
-	print $conf->global->DIGIRISKDOLIBARR_TICKET_EXTRAFIELDS ? '<button type="submit" class="wpeo-button button-disable">' . $langs->trans('Create') . '</button> ' : '<button type="submit" class="wpeo-button button-blue">' . $langs->trans('Create') . '</button>';
-	print '</td>';
-
-	print '<td class="center">';
-	print $form->textwithpicto('', $langs->trans("ExtrafieldsGeneration"), 1, 'help');
-	print '</td>';
-	print '</tr>';
-	print '</form>';
-
-	//Categories generation
-
-	print '<form method="POST" action="' . $_SERVER["PHP_SELF"] . '">';
-	print '<input type="hidden" name="token" value="' . newToken() . '">';
-	print '<input type="hidden" name="action" value="generateCategories">';
-	print '<input type="hidden" name="backtopage" value="' . $backtopage . '">';
-
-	print '<tr class="oddeven"><td>' . $langs->trans("GenerateCategories") . '</td>';
-	print '<td class="center">';
-	print $conf->global->DIGIRISKDOLIBARR_TICKET_CATEGORIES_CREATED ? $langs->trans('AlreadyGenerated') : $langs->trans('NotCreated');
-	print '</td>';
-	print '<td class="center">';
-	print $conf->global->DIGIRISKDOLIBARR_TICKET_CATEGORIES_CREATED ? '<button type="submit" class="wpeo-button button-disable">' . $langs->trans('Create') . '</button> ' : '<button type="submit" class="wpeo-button button-blue">' . $langs->trans('Create') . '</button>';
-	print '</td>';
-
-	print '<td class="center">';
-	print $form->textwithpicto('', $langs->trans("CategoriesGeneration"), 1, 'help');
-	print '</td>';
-	print '</tr>';
-	print '</form>';
-
 	//Envoi d'emails automatiques
 	print '<tr class="oddeven"><td>' . $langs->trans("SendEmailOnTicketSubmit") . '</td>';
 	print '<td class="center">';
@@ -333,6 +303,98 @@ if ( ! empty($conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE)) {
 	print '</td>';
 	print '<td class="center">';
 	print $form->textwithpicto('', $langs->trans("MultipleEmailsSeparator"), 1, 'help');
+	print '</td>';
+	print '</tr>';
+	print '</form>';
+
+	print '</table>';
+	print '</div>';
+
+	print load_fiche_titre($langs->trans("TicketCategories"), '', '');
+
+	print '<div class="div-table-responsive-no-min">';
+	print '<table class="noborder centpercent">';
+	print '<tr class="liste_titre">';
+	print '<td>' . $langs->trans("Parameters") . '</td>';
+	print '<td class="center">' . $langs->trans("Status") . '</td>';
+	print '<td class="center">' . $langs->trans("Action") . '</td>';
+	print '<td class="center">' . $langs->trans("ShortInfo") . '</td>';
+	print '</tr>';
+
+	//Categories generation
+
+	print '<form method="POST" action="' . $_SERVER["PHP_SELF"] . '">';
+	print '<input type="hidden" name="token" value="' . newToken() . '">';
+	print '<input type="hidden" name="action" value="generateCategories">';
+	print '<input type="hidden" name="backtopage" value="' . $backtopage . '">';
+
+	print '<tr class="oddeven"><td>' . $langs->trans("GenerateCategories") . '</td>';
+	print '<td class="center">';
+	print $conf->global->DIGIRISKDOLIBARR_TICKET_CATEGORIES_CREATED ? $langs->trans('AlreadyGenerated') : $langs->trans('NotCreated');
+	print '</td>';
+	print '<td class="center">';
+	print $conf->global->DIGIRISKDOLIBARR_TICKET_CATEGORIES_CREATED ? '<button type="submit" class="wpeo-button button-disable">' . $langs->trans('Create') . '</button> ' : '<button type="submit" class="wpeo-button button-blue">' . $langs->trans('Create') . '</button>';
+	print '</td>';
+
+	print '<td class="center">';
+	print $form->textwithpicto('', $langs->trans("CategoriesGeneration"), 1, 'help');
+	print '</td>';
+	print '</tr>';
+	print '</form>';
+
+	//Set default parent category
+
+	print '<form method="POST" action="' . $_SERVER["PHP_SELF"] . '">';
+	print '<input type="hidden" name="token" value="' . newToken() . '">';
+	print '<input type="hidden" name="action" value="setParentCategory">';
+	print '<input type="hidden" name="backtopage" value="' . $backtopage . '">';
+
+	print '<tr class="oddeven"><td>' . $langs->trans("ParentCategory") . '</td>';
+	$formother = new FormOther($db);
+	print '<td class="center">';
+	print $formother->select_categories('ticket', $conf->global->DIGIRISKDOLIBARR_TICKET_PARENT_CATEGORY,'parentCategory');
+	print '</td>';
+
+	print '<td class="center">';
+	print '<button type="submit" class="wpeo-button button-blue">' . $langs->trans('Validate') . '</button>';
+	print '</td>';
+
+	print '<td class="center">';
+	print $form->textwithpicto('', $langs->trans("ParentCategorySetting"), 1, 'help');
+	print '</td>';
+	print '</tr>';
+	print '</form>';
+
+	print '</table>';
+	print '</div>';
+
+	print load_fiche_titre($langs->trans("TicketExtrafields"), '', '');
+
+	// Extrafields generation
+	print '<div class="div-table-responsive-no-min">';
+	print '<table class="noborder centpercent">';
+	print '<tr class="liste_titre">';
+	print '<td>' . $langs->trans("Parameters") . '</td>';
+	print '<td class="center">' . $langs->trans("Status") . '</td>';
+	print '<td class="center">' . $langs->trans("Action") . '</td>';
+	print '<td class="center">' . $langs->trans("ShortInfo") . '</td>';
+	print '</tr>';
+
+	print '<form method="POST" action="' . $_SERVER["PHP_SELF"] . '">';
+	print '<input type="hidden" name="token" value="' . newToken() . '">';
+	print '<input type="hidden" name="action" value="generateExtrafields">';
+	print '<input type="hidden" name="backtopage" value="' . $backtopage . '">';
+
+	print '<tr class="oddeven"><td>' . $langs->trans("GenerateExtrafields") . '</td>';
+	print '<td class="center">';
+	print $conf->global->DIGIRISKDOLIBARR_TICKET_EXTRAFIELDS ? $langs->trans('AlreadyGenerated') : $langs->trans('NotCreated');
+	print '</td>';
+	print '<td class="center">';
+	print $conf->global->DIGIRISKDOLIBARR_TICKET_EXTRAFIELDS ? '<button type="submit" class="wpeo-button button-disable">' . $langs->trans('Create') . '</button> ' : '<button type="submit" class="wpeo-button button-blue">' . $langs->trans('Create') . '</button>';
+	print '</td>';
+
+	print '<td class="center">';
+	print $form->textwithpicto('', $langs->trans("ExtrafieldsGeneration"), 1, 'help');
 	print '</td>';
 	print '</tr>';
 	print '</form>';
