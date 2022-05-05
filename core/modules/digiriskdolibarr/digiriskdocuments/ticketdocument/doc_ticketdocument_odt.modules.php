@@ -365,8 +365,8 @@ class doc_ticketdocument_odt extends ModeleODTTicketDocument
 			$user->fetch($ticket->fk_user_assign);
 			$tmparray['assigned_to'] = $user->firstname . ' ' . $user->lastname;
 
-			$photo_path = $conf->ticket->multidir_output[$conf->entity] . '/' . $ticket->ref . '/thumbs/' ;
-			$filearray = dol_dir_list($photo_path, "files", 0, '', '(\.odt|_preview.*\.png)$', 'position_name', 'desc', 1);
+			$photo_path = $conf->ticket->multidir_output[$conf->entity] . '/' . $ticket->ref . '/thumbs/';
+			$filearray = dol_dir_list($photo_path, "files", 0, '', '(\.odt|_preview.*\.png)$', 'date', 'desc', 1);
 
 			if (count($filearray)) {
 				$tmparray['photo'] = $photo_path . $filearray[1]['name'];
