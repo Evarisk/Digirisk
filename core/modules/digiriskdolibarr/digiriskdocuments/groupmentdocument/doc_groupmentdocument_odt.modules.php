@@ -349,6 +349,8 @@ class doc_groupmentdocument_odt extends ModeleODTGroupmentDocument
 
 			if (!empty($conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS)) {
 				$tmparray['entity'] = 'S'. $conf->entity . ' - ';
+			} else {
+				$tmparray['entity'] = ' ';
 			}
 			$tmparray['nom']         = $digiriskelement->label;
 			$tmparray['reference']   = $digiriskelement->ref;
