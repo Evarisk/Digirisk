@@ -263,6 +263,8 @@ if ($action == 'sendfile') {
 				global $maxwidthmini, $maxheightmini, $maxwidthsmall, $maxheightsmall;
 
 				// Create thumbs
+				$imgThumbLarge = vignette($path_filename_ext, $conf->global->DIGIRISKDOLIBARR_MEDIA_MAX_WIDTH_LARGE, $conf->global->DIGIRISKDOLIBARR_MEDIA_MAX_HEIGHT_LARGE, '_large', 50, "thumbs");
+				$imgThumbMedium = vignette($path_filename_ext, $conf->global->DIGIRISKDOLIBARR_MEDIA_MAX_WIDTH_MEDIUM, $conf->global->DIGIRISKDOLIBARR_MEDIA_MAX_HEIGHT_MEDIUM, '_medium', 50, "thumbs");
 				$imgThumbSmall = vignette($path_filename_ext, $maxwidthsmall, $maxheightsmall, '_small', 50, "thumbs");
 				// Create mini thumbs for image (Ratio is near 16/9)
 				$imgThumbMini = vignette($path_filename_ext, 30, 30, '_mini', 50, "thumbs");

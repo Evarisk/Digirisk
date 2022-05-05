@@ -712,6 +712,10 @@ if ($conf->global->DIGIRISKDOLIBARR_CONF_BACKWARD_COMPATIBILITY == 0) {
 	//dolibarr_set_const($db, 'DIGIRISKDOLIBARR_ACTIVE_STANDARD', dolibarr_get_const($db,'DIGIRISKDOLIBARR_ACTIVE_STANDARD'), 'integer', 0, '', $conf->entity);
 	//dolibarr_set_const($db, 'DIGIRISKDOLIBARR_NEW_SIGNATURE_TABLE', 1, 'integer', 0, '', $conf->entity);
 	//dolibarr_set_const($db, 'DIGIRISKDOLIBARR_TRIGGERS_UPDATED', 1, 'integer', 0, '', $conf->entity);
+	//dolibarr_set_const($db, 'DIGIRISKDOLIBARR_MEDIA_MAX_WIDTH_MEDIUM', 854, 'integer', 0, '', $conf->entity);
+	//dolibarr_set_const($db, 'DIGIRISKDOLIBARR_MEDIA_MAX_HEIGHT_MEDIUM', 480, 'integer', 0, '', $conf->entity);
+	//dolibarr_set_const($db, 'DIGIRISKDOLIBARR_MEDIA_MAX_WIDTH_LARGE', 1280, 'integer', 0, '', $conf->entity);
+	//dolibarr_set_const($db, 'DIGIRISKDOLIBARR_MEDIA_MAX_HEIGHT_LARGE', 720, 'integer', 0, '', $conf->entity);
 
 	dolibarr_del_const($db, 'DIGIRISKDOLIBARR_DOCUMENT_MODELS_SET', $conf->entity);
 

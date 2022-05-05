@@ -77,6 +77,26 @@ if ($action == 'setredirectafterconnection') {
 	dolibarr_set_const($db, $constforval, $value, 'integer', 0, '', $conf->entity);
 }
 
+if ($action == 'setMediaDimension') {
+	$MediaMaxWidthMedium = GETPOST('MediaMaxWidthMedium', 'alpha');
+	$MediaMaxHeightMedium = GETPOST('MediaMaxHeightMedium', 'alpha');
+	$MediaMaxWidthLarge = GETPOST('MediaMaxWidthLarge', 'alpha');
+	$MediaMaxHeightLarge = GETPOST('MediaMaxHeightLarge', 'alpha');
+
+	if (!empty($MediaMaxWidthMedium) || $MediaMaxWidthMedium === '0') {
+		dolibarr_set_const($db, "DIGIRISKDOLIBARR_MEDIA_MAX_WIDTH_MEDIUM", $MediaMaxWidthMedium, 'integer', 0, '', $conf->entity);
+	}
+	if (!empty($MediaMaxHeightMedium) || $MediaMaxHeightMedium === '0') {
+		dolibarr_set_const($db, "DIGIRISKDOLIBARR_MEDIA_MAX_HEIGHT_MEDIUM", $MediaMaxHeightMedium, 'integer', 0, '', $conf->entity);
+	}
+	if (!empty($MediaMaxWidthLarge) || $MediaMaxWidthLarge === '0') {
+		dolibarr_set_const($db, "DIGIRISKDOLIBARR_MEDIA_MAX_WIDTH_LARGE", $MediaMaxWidthLarge, 'integer', 0, '', $conf->entity);
+	}
+	if (!empty($MediaMaxHeightLarge) || $MediaMaxHeightLarge === '0') {
+		dolibarr_set_const($db, "DIGIRISKDOLIBARR_MEDIA_MAX_HEIGHT_LARGE", $MediaMaxHeightLarge, 'integer', 0, '', $conf->entity);
+	}
+}
+
 /*
  * View
  */
@@ -138,6 +158,46 @@ print ajax_constantonoff('DIGIRISKDOLIBARR_USE_CAPTCHA');
 print '</td>';
 print '</tr>';
 print '</table>';
+
+print load_fiche_titre($langs->trans("MediaData"), '', '');
+
+print '<form method="POST" action="' . $_SERVER["PHP_SELF"] . '" name="media_data">';
+print '<input type="hidden" name="token" value="' . newToken() . '">';
+print '<input type="hidden" name="action" value="setMediaDimension">';
+print '<table class="noborder centpercent editmode">';
+print '<tr class="liste_titre">';
+print '<td>' . $langs->trans("Name") . '</td>';
+print '<td>' . $langs->trans("Description") . '</td>';
+print '<td>' . $langs->trans("Value") . '</td>';
+print '<td>' . $langs->trans("Action") . '</td>';
+print '</tr>';
+
+print '<tr class="oddeven"><td><label for="MediaMaxWidthMedium">' . $langs->trans("MediaMaxWidthMedium") . '</label></td>';
+print '<td>' . $langs->trans("MediaMaxWidthMediumDescription") . '</td>';
+print '<td><input type="number" name="MediaMaxWidthMedium" value="' . $conf->global->DIGIRISKDOLIBARR_MEDIA_MAX_WIDTH_MEDIUM . '"></td>';
+print '<td><input type="submit" class="button" name="save" value="' . $langs->trans("Save") . '">';
+print '</td></tr>';
+
+print '<tr class="oddeven"><td><label for="MediaMaxHeightMedium">' . $langs->trans("MediaMaxHeightMedium") . '</label></td>';
+print '<td>' . $langs->trans("MediaMaxHeightMediumDescription") . '</td>';
+print '<td><input type="number" name="MediaMaxHeightMedium" value="' . $conf->global->DIGIRISKDOLIBARR_MEDIA_MAX_HEIGHT_MEDIUM . '"></td>';
+print '<td><input type="submit" class="button" name="save" value="' . $langs->trans("Save") . '">';
+print '</td></tr>';
+
+print '<tr class="oddeven"><td><label for="MediaMaxWidthLarge">' . $langs->trans("MediaMaxWidthLarge") . '</label></td>';
+print '<td>' . $langs->trans("MediaMaxWidthLargeDescription") . '</td>';
+print '<td><input type="number" name="MediaMaxWidthLarge" value="' . $conf->global->DIGIRISKDOLIBARR_MEDIA_MAX_WIDTH_LARGE . '"></td>';
+print '<td><input type="submit" class="button" name="save" value="' . $langs->trans("Save") . '">';
+print '</td></tr>';
+
+print '<tr class="oddeven"><td><label for="MediaMaxHeightLarge">' . $langs->trans("MediaMaxHeightLarge") . '</label></td>';
+print '<td>' . $langs->trans("MediaMaxHeightLargeDescription") . '</td>';
+print '<td><input type="number" name="MediaMaxHeightLarge" value="' . $conf->global->DIGIRISKDOLIBARR_MEDIA_MAX_HEIGHT_LARGE . '"></td>';
+print '<td><input type="submit" class="button" name="save" value="' . $langs->trans("Save") . '">';
+print '</td></tr>';
+
+print '</table>';
+print '</form>';
 
 // Page end
 print dol_get_fiche_end();

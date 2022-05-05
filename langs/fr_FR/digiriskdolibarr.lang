@@ -1350,6 +1350,21 @@ DataMigrationImportRisks = Importation des données des risques de Digirisk
 DataMigrationImportRisksDescription = Importation des données des risques de Digirisk WordPress au format JSON
 ErrorFileNotWellFormatted = Le fichier n'est pas au bon format ou est vide. Vous devez joindre un fichier d'import provenant de Digirisk WordPress nommé DATE_OBJET_export.json
 
+#
+# Media - Media
+#
+
+# Data - Donnée
+MediaData = Données configurables des médias
+MediaMaxWidthMedium = Largeur du média medium
+MediaMaxWidthMediumDescription = Largeur du média (dimension medium) avec pour ratio 16:9
+MediaMaxHeightMedium = Hauteur du média medium
+MediaMaxHeightMediumDescription = Hauteur du média (dimension medium) avec pour ratio 16:9
+MediaMaxWidthLarge = Largeur du média large
+MediaMaxWidthLargeDescription = Largeur du média (dimension large) avec pour ratio 16:9
+MediaMaxHeightLarge = Hauteur du média large
+MediaMaxHeightLargeDescription = Hauteur du média (dimension large) avec pour ratio 16:9
+
 
 
 #

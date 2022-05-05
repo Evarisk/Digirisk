@@ -720,6 +720,8 @@ function display_recurse_tree($results)
 
 					$destfull = $pathToDigiriskElementPhoto . '/' . $filename;
 					// Create thumbs
+					vignette($destfull, $conf->global->DIGIRISKDOLIBARR_MEDIA_MAX_WIDTH_LARGE, $conf->global->DIGIRISKDOLIBARR_MEDIA_MAX_HEIGHT_LARGE, '_large', 50, "thumbs");
+					vignette($destfull, $conf->global->DIGIRISKDOLIBARR_MEDIA_MAX_WIDTH_MEDIUM, $conf->global->DIGIRISKDOLIBARR_MEDIA_MAX_HEIGHT_MEDIUM, '_medium', 50, "thumbs");
 					vignette($destfull, 480, 270, '_small', 50, "thumbs");
 					// Create mini thumbs for image (Ratio is near 16/9)
 					vignette($destfull, 128, 72, '_mini', 50, "thumbs");
