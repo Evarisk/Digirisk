@@ -138,6 +138,43 @@ if (empty($reshook)) {
 		header('Location: ' . $backtopage);
 	}
 
+	// Action to build doc
+	if ($action == 'builddoc' && $permissiontoadd) {
+		$outputlangs = $langs;
+		$newlang     = '';
+
+		if ($conf->global->MAIN_MULTILANGS && empty($newlang) && GETPOST('lang_id', 'aZ09')) $newlang = GETPOST('lang_id', 'aZ09');
+		if ( ! empty($newlang)) {
+			$outputlangs = new Translate("", $conf);
+			$outputlangs->setDefaultLang($newlang);
+		}
+
+		// To be sure vars is defined
+		if (empty($hidedetails)) $hidedetails = 0;
+		if (empty($hidedesc)) $hidedesc       = 0;
+		if (empty($hideref)) $hideref         = 0;
+		if (empty($moreparams)) $moreparams   = null;
+
+		$model = GETPOST('model', 'alpha');
+
+		$moreparams['object'] = $object;
+		$moreparams['user']   = $user;
+
+		$result = $digiriskelementdocument->generateDocument($model, $outputlangs, $hidedetails, $hidedesc, $hideref, $moreparams);
+		if ($result <= 0) {
+			setEventMessages($object->error, $object->errors, 'errors');
+			$action = '';
+		} else {
+			if (empty($donotredirect)) {
+				setEventMessages($langs->trans("FileGenerated") . ' - ' . $digiriskelementdocument->last_main_doc, null);
+				$urltoredirect = $_SERVER['REQUEST_URI'];
+				$urltoredirect = preg_replace('/#builddoc$/', '', $urltoredirect);
+				$urltoredirect = preg_replace('/action=builddoc&?/', '', $urltoredirect); // To avoid infinite loop
+				header('Location: ' . $urltoredirect . '#builddoc');
+				exit;
+			}
+		}
+	}
 
 	// Delete file in doc form
 	if ($action == 'remove_file' && $permissiontodelete) {
