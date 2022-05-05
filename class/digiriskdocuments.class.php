@@ -405,7 +405,7 @@ class DigiriskDocuments extends CommonObject
 		$includedocgeneration = 1;
 		$langs->load("digiriskdolibarr@digiriskdolibarr");
 
-		$modelpath = "core/modules/digiriskdolibarr/digiriskdocuments/".$this->element."/";
+		$modelpath = "custom/digiriskdolibarr/core/modules/digiriskdolibarr/digiriskdocuments/".$this->element."/";
 
 		if ($includedocgeneration) {
 			$result = $this->commonGenerateDocument($modelpath, $modele, $outputlangs, $hidedetails, $hidedesc, $hideref, $moreparams['object']);

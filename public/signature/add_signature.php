@@ -155,7 +155,9 @@ if ($action == 'builddoc') {
 	if (empty($hideref)) $hideref         = 0;
 	if (empty($moreparams)) $moreparams   = null;
 
-	$model = $type.'_specimen_odt';
+	$constforval = "DIGIRISKDOLIBARR_".strtoupper($type.'document')."_SPECIMEN_ADDON_ODT_PATH";
+	$template = preg_replace('/DOL_DOCUMENT_ROOT/', DOL_DOCUMENT_ROOT, $conf->global->$constforval);
+	$model = $type.'document_specimen_odt:'.$template.'template_'.$type.'document_specimen.odt';
 
 	$moreparams['object'] = $object;
 	$moreparams['user']   = $user;
@@ -168,7 +170,7 @@ if ($action == 'builddoc') {
 	} elseif (empty($donotredirect)) {
 		$document_name = $objectdocument->last_main_doc;
 
-		copy($conf->digiriskdolibarr->multidir_output[isset($object->entity) ? $object->entity : 1] . '/' . $type . '/' . $object->ref . '/specimen/' . $document_name, DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/documents/temp/' . $type . '_specimen_' . $track_id . '.odt');
+		copy($conf->digiriskdolibarr->multidir_output[isset($object->entity) ? $object->entity : 1] . '/' . $type.'document' . '/' . $object->ref . '/specimen/' . $document_name, DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/documents/temp/' . $type . '_specimen_' . $track_id . '.odt');
 
 		setEventMessages($langs->trans("FileGenerated") . ' - ' . $document_name, null);
 
