@@ -211,7 +211,6 @@ if (empty($reshook)) {
 				$subFolder = $digiriskelementdocument->element;
 
 				$moreparams['object'] = $digiriskelementsingle['object'];
-				$moreparams['user']   = $user;
 
 				$digiriskelementdocumentmodel = 'DIGIRISKDOLIBARR_' . strtoupper($digiriskelementdocument->element) . '_DEFAULT_MODEL';
 				$digiriskelementdocumentmodelpath = 'DIGIRISKDOLIBARR_' . strtoupper($digiriskelementdocument->element) . '_ADDON_ODT_PATH';
