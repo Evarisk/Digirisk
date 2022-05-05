@@ -1386,3 +1386,6 @@ PhotoNotSaved = Le(s) média(s) n'a (ont) pas été ajouté(s)
 UseCaptcha = Code graphique (CAPTCHA)
 UseCaptchaDescription = Utilisation du code graphique (CAPTCHA) sur les pages d'interface public
 GP/UTParticipation = Participation GP/UT
+LabourDoctorName = AMETRA
+LabourDoctorFirstName = Médecin du
+LabourDoctorLastName = travail

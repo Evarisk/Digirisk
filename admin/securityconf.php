@@ -195,9 +195,9 @@ if ($conf->societe->enabled) {
 	if ($labour_doctor_society->ref == 'LabourDoctorSociety') {
 		$events   = array();
 		$events[] = array('method' => 'getContacts', 'url' => dol_buildpath('/core/ajax/contacts.php?showempty=1', 1), 'htmlname' => 'labourdoctor_contactid', 'params' => array('add-customer-contact' => 'disabled'));
-		$societe->fetch($labour_doctor_society->id);
+		$societe->fetch($labour_doctor_society->id[0]);
 
-		print $form->select_company($labour_doctor_society->id, 'labourdoctor_socid', '', 'SelectThirdParty', 1, 0, $events, 0, 'minwidth300');
+		print $form->select_company($labour_doctor_society->id[0], 'labourdoctor_socid', '', 'SelectThirdParty', 1, 0, $events, 0, 'minwidth300');
 	} else {
 		$events   = array();
 		$events[] = array('method' => 'getContacts', 'url' => dol_buildpath('/core/ajax/contacts.php?showempty=1', 1), 'htmlname' => 'labourdoctor_contactid', 'params' => array('add-customer-contact' => 'disabled'));

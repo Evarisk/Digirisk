@@ -619,7 +619,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			261 => array('DIGIRISKDOLIBARR_VERSION','chaine', $this->version, '', 0, 'current'),
 			262 => array('DIGIRISKDOLIBARR_DB_VERSION', 'chaine', $this->version, '', 0, 'current'),
 			263 => array('DIGIRISKDOLIBARR_THIRDPARTY_SET', 'integer', 0, '', 0, 'current'),
-			264 => array('DIGIRISKDOLIBARR_THIRDPARTY_UPDATED', 'integer', 0, '', 0, 'current'),
+			264 => array('DIGIRISKDOLIBARR_THIRDPARTY_UPDATED', 'integer', 1, '', 0, 'current'),
 			265 => array('DIGIRISKDOLIBARR_CONTACTS_SET', 'integer', 0, '', 0, 'current'),
 			266 => array('DIGIRISKDOLIBARR_USERAPI_SET', 'integer', 0, '', 0, 'current'),
 			267 => array('DIGIRISKDOLIBARR_READERGROUP_SET', 'integer', 0, '', 0, 'current'),
@@ -1405,6 +1405,13 @@ class modDigiriskdolibarr extends DolibarrModules
 			$societe   = new Societe($this->db);
 			$resources = new DigiriskResources($this->db);
 
+			$labour_doctor         = $societe;
+			$labour_doctor->name   = $langs->trans('LabourDoctorName') . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
+			$labour_doctor->client = 0;
+			$labour_doctor->phone  = '';
+			$labour_doctor->url    = '';
+			$labour_doctorID       = $labour_doctor->create($user);
+
 			$labour_inspector         = $societe;
 			$labour_inspector->name   = $langs->trans('LabourInspectorName') . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
 			$labour_inspector->client = 0;
@@ -1454,6 +1461,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			$poison_control_center->url    = '';
 			$poison_control_centerID       = $poison_control_center->create($user);
 
+			$resources->digirisk_dolibarr_set_resources($this->db, 1,  'LabourDoctorSociety',  'societe', array($labour_doctorID), $conf->entity);
 			$resources->digirisk_dolibarr_set_resources($this->db, 1,  'LabourInspectorSociety',  'societe', array($labour_inspectorID), $conf->entity);
 			$resources->digirisk_dolibarr_set_resources($this->db, 1,  'Police',  'societe', array($policeID), $conf->entity);
 			$resources->digirisk_dolibarr_set_resources($this->db, 1,  'SAMU',  'societe', array($samuID), $conf->entity);
@@ -1471,6 +1479,13 @@ class modDigiriskdolibarr extends DolibarrModules
 
 			$societe   = new Societe($this->db);
 			$resources = new DigiriskResources($this->db);
+
+			$labour_doctor         = $societe;
+			$labour_doctor->name   = $langs->trans('LabourDoctorName') . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
+			$labour_doctor->client = 0;
+			$labour_doctor->phone  = '';
+			$labour_doctor->url    = '';
+			$labour_doctorID       = $labour_doctor->create($user);
 
 			$labour_inspector         = $societe;
 			$labour_inspector->name   = $langs->trans('LabourInspectorName') . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
@@ -1493,11 +1508,29 @@ class modDigiriskdolibarr extends DolibarrModules
 			$poison_control_center->url    = '';
 			$poison_control_centerID       = $poison_control_center->create($user);
 
+			$resources->digirisk_dolibarr_set_resources($this->db, 1,  'LabourDoctorSociety',  'societe', array($labour_doctorID), $conf->entity);
 			$resources->digirisk_dolibarr_set_resources($this->db, 1,  'LabourInspectorSociety',  'societe', array($labour_inspectorID), $conf->entity);
 			$resources->digirisk_dolibarr_set_resources($this->db, 1,  'RightsDefender',  'societe', array($rights_defenderID), $conf->entity);
 			$resources->digirisk_dolibarr_set_resources($this->db, 1,  'PoisonControlCenter',  'societe', array($poison_control_centerID), $conf->entity);
 
 			dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_THIRDPARTY_SET', 2, 'integer', 0, '', $conf->entity);
+		} elseif ($conf->global->DIGIRISKDOLIBARR_THIRDPARTY_SET == 2) {
+			require_once DOL_DOCUMENT_ROOT . '/societe/class/societe.class.php';
+			require_once __DIR__ . '/../../class/digiriskresources.class.php';
+
+			$societe   = new Societe($this->db);
+			$resources = new DigiriskResources($this->db);
+
+			$labour_doctor         = $societe;
+			$labour_doctor->name   = $langs->trans('LabourDoctorName') . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
+			$labour_doctor->client = 0;
+			$labour_doctor->phone  = '';
+			$labour_doctor->url    = '';
+			$labour_doctorID       = $labour_doctor->create($user);
+
+			$resources->digirisk_dolibarr_set_resources($this->db, 1,  'LabourDoctorSociety',  'societe', array($labour_doctorID), $conf->entity);
+
+			dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_THIRDPARTY_SET', 3, 'integer', 0, '', $conf->entity);
 		}
 
 		if ( $conf->global->DIGIRISKDOLIBARR_CONTACTS_SET == 0 ) {
@@ -1506,6 +1539,15 @@ class modDigiriskdolibarr extends DolibarrModules
 
 			$contact   = new Contact($this->db);
 			$resources = new DigiriskResources($this->db);
+
+			$allLinks  = $resources->digirisk_dolibarr_fetch_resource('LabourDoctorSociety');
+
+			$labour_doctor            = $contact;
+			$labour_doctor->socid     = $allLinks;
+			$labour_doctor->firstname = $langs->trans('LabourDoctorFirstName');
+			$labour_doctor->lastname  = $langs->trans('LabourDoctorLastName');
+			$labour_doctorID          = $labour_doctor->create($user);
+
 			$allLinks  = $resources->digirisk_dolibarr_fetch_resource('LabourInspectorSociety');
 
 			$labour_inspector            = $contact;
@@ -1514,9 +1556,27 @@ class modDigiriskdolibarr extends DolibarrModules
 			$labour_inspector->lastname  = $langs->trans('LabourInspectorLastName');
 			$labour_inspectorID          = $labour_inspector->create($user);
 
+			$resources->digirisk_dolibarr_set_resources($this->db, 1, 'LabourDoctorContact', 'socpeople', array($labour_doctorID), $conf->entity);
 			$resources->digirisk_dolibarr_set_resources($this->db, 1, 'LabourInspectorContact', 'socpeople', array($labour_inspectorID), $conf->entity);
 
 			dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_CONTACTS_SET', 2, 'integer', 0, '', $conf->entity);
+		} elseif ($conf->global->DIGIRISKDOLIBARR_CONTACTS_SET == 2) {
+			require_once DOL_DOCUMENT_ROOT . '/contact/class/contact.class.php';
+			require_once __DIR__ . '/../../class/digiriskresources.class.php';
+
+			$contact   = new Contact($this->db);
+			$resources = new DigiriskResources($this->db);
+			$allLinks  = $resources->digirisk_dolibarr_fetch_resource('LabourDoctorSociety');
+
+			$labour_doctor            = $contact;
+			$labour_doctor->socid     = $allLinks;
+			$labour_doctor->firstname = $langs->trans('LabourDoctorFirstName');
+			$labour_doctor->lastname  = $langs->trans('LabourDoctorLastName');
+			$labour_doctorID          = $labour_doctor->create($user);
+
+			$resources->digirisk_dolibarr_set_resources($this->db, 1, 'LabourDoctorContact', 'socpeople', array($labour_doctorID), $conf->entity);
+
+			dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_CONTACTS_SET', 3, 'integer', 0, '', $conf->entity);
 		}
 
 		if ( $conf->global->DIGIRISKDOLIBARR_THIRDPARTY_UPDATED == 0 ) {

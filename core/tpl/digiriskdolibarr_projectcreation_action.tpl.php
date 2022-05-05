@@ -697,9 +697,9 @@ if ($conf->global->DIGIRISKDOLIBARR_CONF_BACKWARD_COMPATIBILITY == 0) {
 	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_SUBPERMCATEGORY_FOR_DOCUMENTS', 1, 'integer', 0, '', $conf->entity);
 	//dolibarr_set_const($db, 'DIGIRISKDOLIBARR_VERSION', $this->version, 'chaine', 0, '', $conf->entity);
 	//dolibarr_set_const($db, 'DIGIRISKDOLIBARR_DB_VERSION', $this->version, 'chaine', 0, '', $conf->entity);
-	//dolibarr_set_const($db, 'DIGIRISKDOLIBARR_THIRDPARTY_SET', 2, 'integer', 0, '', $conf->entity);
+	//dolibarr_set_const($db, 'DIGIRISKDOLIBARR_THIRDPARTY_SET', 3, 'integer', 0, '', $conf->entity);
 	//dolibarr_set_const($db, 'DIGIRISKDOLIBARR_THIRDPARTY_UPDATED', 1, 'integer', 0, '', $conf->entity);
-	//dolibarr_set_const($db, 'DIGIRISKDOLIBARR_CONTACTS_SET', 2, 'integer', 0, '', $conf->entity);
+	//dolibarr_set_const($db, 'DIGIRISKDOLIBARR_CONTACTS_SET', 3, 'integer', 0, '', $conf->entity);
 	//dolibarr_set_const($db, 'DIGIRISKDOLIBARR_USERAPI_SET', 0, 'integer', 0, '', $conf->entity);
 	//dolibarr_set_const($db, 'DIGIRISKDOLIBARR_READERGROUP_SET', 0, 'integer', 0, '', $conf->entity);
 	//dolibarr_set_const($db, 'DIGIRISKDOLIBARR_USERGROUP_SET', 0, 'integer', 0, '', $conf->entity);
