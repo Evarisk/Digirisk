@@ -1,9 +1,9 @@
 <?php
-/* Copyright (C) 2017  Laurent Destailleur  <eldy@users.sourceforge.net>
+/* Copyright (C) 2021 EOXIA <dev@eoxia.com>
  *
- * This program is free software; you can redistribute it and/or modify
+ * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 3 of the License, or
+ * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
@@ -12,15 +12,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <https://www.gnu.org/licenses/>.
- *
- * Need to have following variables defined:
- * $object (invoice, order, ...)
- * $action
- * $conf
- * $langs
- *
- * $keyforbreak may be defined to key to switch on second column
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
 // Protection to avoid direct call of template
@@ -31,7 +23,7 @@ if (empty($conf) || ! is_object($conf)) {
 if ( ! is_object($form)) $form = new Form($db);
 
 ?>
-<!-- BEGIN PHP TEMPLATE digiriskdolibarr_legaldisplayfields_view.tpl.php -->
+<!-- BEGIN PHP TEMPLATE digiriskdolibarr_openinghours_view.tpl.php -->
 <?php
 print '<form method="POST" action="' . $_SERVER["PHP_SELF"] . '?id=' . GETPOST('id') . '" >';
 print '<input type="hidden" name="token" value="' . newToken() . '">';
@@ -95,4 +87,4 @@ print '<br>';
 print '</form>';
 
 ?>
-<!-- END PHP TEMPLATE digiriskdolibarr_legaldisplayfields_view.tpl.php -->
+<!-- END PHP TEMPLATE digiriskdolibarr_openinghours_view.tpl.php -->

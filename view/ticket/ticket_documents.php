@@ -786,7 +786,9 @@ $help_url = 'EN:Module_Ticket|FR:DocumentationModuleTicket';
 
 $page_title = $actionobject->getTitle($action);
 
-llxHeader('', $page_title, $help_url);
+$morecss = array("/digiriskdolibarr/css/digiriskdolibarr.css");
+
+llxHeader('', $title, $help_url, '', '', '', array(), $morecss);
 
 if (empty($action) || $action == 'view' || $action == 'addlink' || $action == 'dellink' || $action == 'presend' || $action == 'presend_addmessage' || $action == 'close' || $action == 'abandon' || $action == 'delete' || $action == 'editcustomer' || $action == 'progression' || $action == 'categories' || $action == 'reopen'
 	|| $action == 'editsubject' || $action == 'edit_extras' || $action == 'update_extras' || $action == 'edit_extrafields' || $action == 'set_extrafields' || $action == 'classify' || $action == 'sel_contract' || $action == 'edit_message_init' || $action == 'set_status' || $action == 'dellink') {
@@ -832,9 +834,11 @@ if (empty($action) || $action == 'view' || $action == 'addlink' || $action == 'd
 			$object->next_prev_filter = "te.fk_soc = '".$user->socid."'";
 		}
 
+		$pictopath = dol_buildpath('/digiriskdolibarr/img/digiriskdolibarr32px.png', 1);
+
 		$head = ticket_prepare_head($object);
 
-		print dol_get_fiche_head($head, 'document', $langs->trans("Ticket"), -1, 'ticket');
+		print dol_get_fiche_head($head, 'document', $langs->trans("Ticket"), -1, $pictopath, 1);
 
 		$morehtmlref = '<div class="refidno">';
 		$morehtmlref .= $object->subject;
