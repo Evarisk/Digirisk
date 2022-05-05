@@ -258,16 +258,16 @@ print ajax_constantonoff('DIGIRISKDOLIBARR_RISK_DESCRIPTION_PREFILL');
 print '</td>';
 print '</tr>';
 
-print '<tr class="oddeven"><td>';
-print $langs->trans('ShowRisks');
-print "</td><td>";
-print $langs->trans('ShowRisksDescription');
-print '</td>';
-
-print '<td class="center">';
-print ajax_constantonoff('DIGIRISKDOLIBARR_SHOW_RISKS');
-print '</td>';
-print '</tr>';
+//print '<tr class="oddeven"><td>';
+//print $langs->trans('ShowRisks');
+//print "</td><td>";
+//print $langs->trans('ShowRisksDescription');
+//print '</td>';
+//
+//print '<td class="center">';
+//print ajax_constantonoff('DIGIRISKDOLIBARR_SHOW_RISKS');
+//print '</td>';
+//print '</tr>';
 
 print '<tr class="oddeven"><td>';
 print $langs->trans('ShowInheritedRisks');
