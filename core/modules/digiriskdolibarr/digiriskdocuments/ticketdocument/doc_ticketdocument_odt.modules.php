@@ -375,7 +375,8 @@ class doc_ticketdocument_odt extends ModeleODTTicketDocument
 				$tmparray['photo'] = DOL_DOCUMENT_ROOT . $nophoto;
 			}
 
-			$tmparray['message'] = $ticket->message;
+			$message = preg_replace('/<br \/>/', '', $ticket->message);
+			$tmparray['message'] = $message;
 			$tmparray['generation_date'] = dol_print_date(dol_now());
 
 
