@@ -1369,7 +1369,7 @@ window.eoxiaJS.mediaGallery.sendPhoto = function( event ) {
 window.eoxiaJS.mediaGallery.previewPhoto = function( event ) {
 	setTimeout(function(){
 		$( document ).find('.ui-dialog').addClass('preview-photo');
-	}, 200);
+	}, 800);
 };
 
 /**
