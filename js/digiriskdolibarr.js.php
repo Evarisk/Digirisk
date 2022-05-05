@@ -2851,8 +2851,10 @@ window.eoxiaJS.riskassessmenttask.checkTaskProgress = function ( event ) {
 
 	let token = $('.fichecenter.risklist').find('input[name="token"]').val();
 
+	let url = document.URL + '&action=checkTaskProgress&token='+token
+
 	$.ajax({
-		url: document.URL + '&action=checkTaskProgress&token='+token,
+		url: url,
 		data: JSON.stringify({
 			riskAssessmentTaskID: RiskAssessmentTaskId,
 			taskProgress: taskProgress,
