@@ -36,8 +36,11 @@ if ( ! $res && file_exists("../../../main.inc.php")) $res    = @include "../../.
 if ( ! $res && file_exists("../../../../main.inc.php")) $res = @include "../../../../main.inc.php";
 if ( ! $res) die("Include of main fails");
 
+require_once DOL_DOCUMENT_ROOT . '/projet/class/project.class.php';
+
 require_once __DIR__ . '/../../class/firepermit.class.php';
 require_once __DIR__ . '/../../class/openinghours.class.php';
+require_once __DIR__ . '/../../class/digiriskresources.class.php';
 require_once __DIR__ . '/../../lib/digiriskdolibarr_firepermit.lib.php';
 require_once __DIR__ . '/../../lib/digiriskdolibarr_function.lib.php';
 
@@ -54,8 +57,10 @@ $cancel      = GETPOST('cancel', 'aZ09');
 $contextpage = GETPOST('contextpage', 'aZ') ? GETPOST('contextpage', 'aZ') : 'preventionplanschedule'; // To manage different context of search
 
 // Initialize technical objects
-$firepermit = new FirePermit($db);
-$object     = new Openinghours($db);
+$firepermit        = new FirePermit($db);
+$object            = new Openinghours($db);
+$digiriskresources = new DigiriskResources($db);
+$project           = new Project($db);
 
 $hookmanager->initHooks(array('firepermitschedule', 'globalcard')); // Note that conf->hooks_modules contains array
 
@@ -120,8 +125,18 @@ if ( ! empty($firepermit->id)) $res = $firepermit->fetch_optionals();
 
 $head = firepermitPrepareHead($firepermit);
 print dol_get_fiche_head($head, 'firepermitSchedule', $langs->trans("FirePermit"), -1, "digiriskdolibarr@digiriskdolibarr");
-dol_strlen($firepermit->label) ? $morehtmlref = ' - ' . $firepermit->label : '';
-digirisk_banner_tab($firepermit, 'ref', '', 0, 'ref', 'ref', $morehtmlref, 0, 0, '', $firepermit->getLibStatut(5));
+
+dol_strlen($firepermit->label) ? $morehtmlref = '<span>' . ' - ' . $firepermit->label . '</span>' : '';
+$morehtmlref                             .= '<div class="refidno">';
+// External Society -- Société extérieure
+$ext_society  = $digiriskresources->fetchResourcesFromObject('FP_EXT_SOCIETY', $firepermit);
+$morehtmlref .= $langs->trans('ExtSociety') . ' : ' . $ext_society->getNomUrl(1);
+// Project
+$project->fetch($firepermit->fk_project);
+$morehtmlref .= '<br>' . $langs->trans('Project') . ' : ' . getNomUrlProject($project, 1, 'blank');
+$morehtmlref .= '</div>';
+
+digirisk_banner_tab($firepermit, 'ref', '', 0, 'ref', 'ref', $morehtmlref, '', 0, '', $firepermit->getLibStatut(5));
 
 print dol_get_fiche_end();
 
