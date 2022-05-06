@@ -3371,8 +3371,8 @@ window.eoxiaJS.ticket.init = function() {
  * @return {void}
  */
 window.eoxiaJS.ticket.event = function() {
-	$( document ).on( 'click', '.ticket-register', window.eoxiaJS.ticket.selectRegister );
-	$( document ).on( 'click', '.ticket-pertinence', window.eoxiaJS.ticket.selectPertinence );
+	$( document ).on( 'click', '.ticket-parentCategory', window.eoxiaJS.ticket.selectParentCategory );
+	$( document ).on( 'click', '.ticket-subCategory', window.eoxiaJS.ticket.selectSubCategory );
 	$( document ).on( 'submit', '#sendFile', window.eoxiaJS.ticket.tmpStockFile );
 	$( document ).on( 'click', '.linked-file-delete', window.eoxiaJS.ticket.removeFile );
 };
@@ -3394,14 +3394,14 @@ window.eoxiaJS.ticket.updateFormData = function( ) {
 		requestParams = '?'
 	}
 
-	let register = window.eoxiaJS.ticket.getRegister()
+	let register = window.eoxiaJS.ticket.getParentCategory()
 	if (register > 0) {
-		requestParams += 'register=' + register + '&'
+		requestParams += 'parentCategory=' + register + '&'
 	}
 
-	let pertinence = window.eoxiaJS.ticket.getPertinence()
+	let pertinence = window.eoxiaJS.ticket.getSubCategory()
 	if (pertinence > 0) {
-		requestParams += 'pertinence=' + pertinence  + '&'
+		requestParams += 'subCategory=' + pertinence  + '&'
 	}
 
 	$('.img-fields-container').load(document.URL + requestParams + ' .tableforimgfields');
@@ -3415,9 +3415,9 @@ window.eoxiaJS.ticket.updateFormData = function( ) {
  *
  * @return {void}
  */
-window.eoxiaJS.ticket.selectRegister = function( ) {
-	let pertinenceInput = $('.ticketpublicarea').find("#pertinence");
-	let registerInput = $('.ticketpublicarea').find("#register");
+window.eoxiaJS.ticket.selectParentCategory = function( ) {
+	let pertinenceInput = $('.ticketpublicarea').find("#subCategory");
+	let registerInput = $('.ticketpublicarea').find("#parentCategory");
 
 	pertinenceInput.val(0)
 	registerInput.val($(this).attr('id'))
@@ -3433,8 +3433,8 @@ window.eoxiaJS.ticket.selectRegister = function( ) {
  *
  * @return {void}
  */
-window.eoxiaJS.ticket.getRegister = function( ) {
-	return $('.ticketpublicarea').find("#register").val()
+window.eoxiaJS.ticket.getParentCategory = function( ) {
+	return $('.ticketpublicarea').find("#parentCategory").val()
 };
 
 /**
@@ -3445,8 +3445,8 @@ window.eoxiaJS.ticket.getRegister = function( ) {
  *
  * @return {void}
  */
-window.eoxiaJS.ticket.selectPertinence = function( ) {
-	let pertinenceInput = $('.ticketpublicarea').find("#pertinence");
+window.eoxiaJS.ticket.selectSubCategory = function( ) {
+	let pertinenceInput = $('.ticketpublicarea').find("#subCategory");
 	pertinenceInput.val($(this).attr('id'))
 
 	window.eoxiaJS.ticket.updateFormData()
@@ -3460,8 +3460,8 @@ window.eoxiaJS.ticket.selectPertinence = function( ) {
  *
  * @return {void}
  */
-window.eoxiaJS.ticket.getPertinence = function(  ) {
-	return $('.ticketpublicarea').find("#pertinence").val()
+window.eoxiaJS.ticket.getSubCategory = function(  ) {
+	return $('.ticketpublicarea').find("#subCategory").val()
 };
 
 /**

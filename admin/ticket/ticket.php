@@ -202,10 +202,21 @@ if ($action == 'generateCategories') {
 	}
 }
 
-if ($action == 'setParentCategory') {
-	$category_id = GETPOST('parentCategory');
-	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_TICKET_PARENT_CATEGORY', $category_id, 'integer', 0, '', $conf->entity);
+if ($action == 'setMainCategory') {
+	$category_id = GETPOST('mainCategory');
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_TICKET_MAIN_CATEGORY', $category_id, 'integer', 0, '', $conf->entity);
 }
+
+if ($action == 'setParentCategoryLabel') {
+	$label = GETPOST('parentCategoryLabel');
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_TICKET_PARENT_CATEGORY_LABEL', $label, 'chaine', 0, '', $conf->entity);
+}
+
+if ($action == 'setChildCategoryLabel') {
+	$label = GETPOST('childCategoryLabel');
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_TICKET_CHILD_CATEGORY_LABEL', $label, 'chaine', 0, '', $conf->entity);
+}
+
 /*
  * View
  */
@@ -342,17 +353,39 @@ if ( ! empty($conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE)) {
 	print '</tr>';
 	print '</form>';
 
-	//Set default parent category
+	//Set default main category
 
 	print '<form method="POST" action="' . $_SERVER["PHP_SELF"] . '">';
 	print '<input type="hidden" name="token" value="' . newToken() . '">';
-	print '<input type="hidden" name="action" value="setParentCategory">';
+	print '<input type="hidden" name="action" value="setMainCategory">';
+	print '<input type="hidden" name="backtopage" value="' . $backtopage . '">';
+
+	print '<tr class="oddeven"><td>' . $langs->trans("MainCategory") . '</td>';
+	$formother = new FormOther($db);
+	print '<td class="center">';
+	print $formother->select_categories('ticket', $conf->global->DIGIRISKDOLIBARR_TICKET_MAIN_CATEGORY,'mainCategory');
+	print '</td>';
+
+	print '<td class="center">';
+	print '<button type="submit" class="wpeo-button button-blue">' . $langs->trans('Validate') . '</button>';
+	print '</td>';
+
+	print '<td class="center">';
+	print $form->textwithpicto('', $langs->trans("MainCategorySetting"), 1, 'help');
+	print '</td>';
+	print '</tr>';
+	print '</form>';
+
+	//Set parent category label
+
+	print '<form method="POST" action="' . $_SERVER["PHP_SELF"] . '">';
+	print '<input type="hidden" name="token" value="' . newToken() . '">';
+	print '<input type="hidden" name="action" value="setParentCategoryLabel">';
 	print '<input type="hidden" name="backtopage" value="' . $backtopage . '">';
 
 	print '<tr class="oddeven"><td>' . $langs->trans("ParentCategory") . '</td>';
-	$formother = new FormOther($db);
 	print '<td class="center">';
-	print $formother->select_categories('ticket', $conf->global->DIGIRISKDOLIBARR_TICKET_PARENT_CATEGORY,'parentCategory');
+	print '<input name="parentCategoryLabel" value="'. $conf->global->DIGIRISKDOLIBARR_TICKET_PARENT_CATEGORY_LABEL .'">';
 	print '</td>';
 
 	print '<td class="center">';
@@ -361,6 +394,28 @@ if ( ! empty($conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE)) {
 
 	print '<td class="center">';
 	print $form->textwithpicto('', $langs->trans("ParentCategorySetting"), 1, 'help');
+	print '</td>';
+	print '</tr>';
+	print '</form>';
+
+	//Set child category label
+
+	print '<form method="POST" action="' . $_SERVER["PHP_SELF"] . '">';
+	print '<input type="hidden" name="token" value="' . newToken() . '">';
+	print '<input type="hidden" name="action" value="setChildCategoryLabel">';
+	print '<input type="hidden" name="backtopage" value="' . $backtopage . '">';
+
+	print '<tr class="oddeven"><td>' . $langs->trans("ChildCategory") . '</td>';
+	print '<td class="center">';
+	print '<input name="childCategoryLabel" value="'. $conf->global->DIGIRISKDOLIBARR_TICKET_CHILD_CATEGORY_LABEL .'">';
+	print '</td>';
+
+	print '<td class="center">';
+	print '<button type="submit" class="wpeo-button button-blue">' . $langs->trans('Validate') . '</button>';
+	print '</td>';
+
+	print '<td class="center">';
+	print $form->textwithpicto('', $langs->trans("ChildCategorySetting"), 1, 'help');
 	print '</td>';
 	print '</tr>';
 	print '</form>';
