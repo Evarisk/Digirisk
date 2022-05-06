@@ -285,12 +285,14 @@ class doc_ticketdocument_odt extends ModeleODTTicketDocument
 
 			if (preg_match('/_events/', $filename[1])) {
 				$foundtagforlines = 1;
+				$events = '_events';
 			} else {
 				$foundtagforlines = 0;
+				$events = '';
 			}
 
 			$date     = dol_print_date(dol_now(), 'dayxcard');
-			$filename = $date . '_' . $ref . '_' . $objectref . '_' . $conf->global->MAIN_INFO_SOCIETE_NOM . '.odt';
+			$filename = $date . '_' . $ref . '_' . $objectref . '_' . $conf->global->MAIN_INFO_SOCIETE_NOM . $events . '.odt';
 			$filename = str_replace(' ', '_', $filename);
 			$filename = dol_sanitizeFileName($filename);
 
