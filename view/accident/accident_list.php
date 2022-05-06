@@ -448,7 +448,7 @@ while ($i < ($limit ? min($num, $limit) : $num)) {
 				$arrayAccident[] = $accident->photo;
 				switch ($accident->external_accident) {
 					case 1:
-						$arrayAccident[] = $accident->fk_element;
+						$arrayAccident[] = $accident->fk_element > 0 ? $accident->fk_element : $accident->fk_standard;
 						break;
 					case 2:
 						$arrayAccident[] = $accident->fk_soc;
@@ -496,10 +496,10 @@ while ($i < ($limit ? min($num, $limit) : $num)) {
 			} elseif ($key == 'fk_element') {
 				switch ($accident->external_accident) {
 					case 1:
-						if ($conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD == $accident->fk_element) {
+						if ($accident->fk_standard > 0) {
 							$digiriskstandard->fetch($conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD);
 							print $digiriskstandard->getNomUrl(1, 'blank', 1);
-						} else {
+						} else if ($accident->fk_element > 0) {
 							$digiriskelement->fetch($accident->fk_element);
 							print $digiriskelement->getNomUrl(1, 'blank', 1);
 						}

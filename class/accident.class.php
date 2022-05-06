@@ -125,8 +125,9 @@ class Accident extends CommonObject
 		'fk_user_employer'   => array('type' => 'integer', 'label' => 'UserEmployer', 'enabled' => '1', 'position' => 82, 'notnull' => -1, 'visible' => 1,),
 		'accident_type'      => array('type' => 'text', 'label' => 'AccidentType', 'enabled' => '1', 'position' => 90, 'notnull' => -1, 'visible' => 1, 'css' => 'minwidth150',),
 		'fk_element'         => array('type' => 'integer', 'label' => 'AccidentLocation', 'enabled' => '1', 'position' => 91, 'notnull' => -1, 'visible' => 1,'css' => 'minwidth150',),
-		'fk_soc'             => array('type' => 'integer', 'label' => 'ExtSociety', 'enabled' => '1', 'position' => 92, 'notnull' => -1, 'visible' => 3,),
-		'accident_location'  => array('type' => 'text', 'label' => 'AccidentLocation', 'enabled' => '1', 'position' => 93, 'notnull' => -1, 'visible' => 3, 'css' => 'minwidth150',),
+		'fk_standard'        => array('type' => 'integer', 'label' => 'AccidentLocation', 'enabled' => '1', 'position' => 94, 'notnull' => -1, 'visible' => 0,'css' => 'minwidth150',),
+		'fk_soc'             => array('type' => 'integer', 'label' => 'ExtSociety', 'enabled' => '1', 'position' => 95, 'notnull' => -1, 'visible' => 3,),
+		'accident_location'  => array('type' => 'text', 'label' => 'AccidentLocation', 'enabled' => '1', 'position' => 96, 'notnull' => -1, 'visible' => 3, 'css' => 'minwidth150',),
 		'accident_date'      => array('type' => 'datetime', 'label' => 'AccidentDate', 'enabled' => '1', 'position' => 100, 'notnull' => -1, 'visible' => 1, 'css' => 'minwidth150',),
 		'description'        => array('type' => 'text', 'label' => 'Description', 'enabled' => '1', 'position' => 110, 'notnull' => -1, 'visible' => 1,),
 		'photo'              => array('type' => 'text', 'label' => 'Photo', 'enabled' => '1', 'position' => 120, 'notnull' => -1, 'visible' => 3,),
@@ -153,6 +154,7 @@ class Accident extends CommonObject
 	public $fk_user_creat;
 	public $fk_user_modif;
 	public $fk_element;
+	public $fk_standard;
 	public $fk_soc;
 	public $fk_user_victim;
 	public $fk_user_employer;

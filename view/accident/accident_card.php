@@ -156,12 +156,33 @@ if (empty($reshook)) {
 		$accident_date = dol_mktime(GETPOST('dateohour', 'int'), GETPOST('dateomin', 'int'), 0, GETPOST('dateomonth', 'int'), GETPOST('dateoday', 'int'), GETPOST('dateoyear', 'int'));
 
 		$object->accident_date = $accident_date;
-		if (empty($digiriskelement_id)) {
-			$object->fk_element = $conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD;
-		} else {
-			$object->fk_element = $digiriskelement_id;
-		}
 		$object->fk_soc           = $ext_society_id;
+
+		switch ($external_accident) {
+			case 1:
+				if ($digiriskelement_id == 0) {
+					$object->fk_standard = $conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD;
+					$object->fk_element  = 0;
+					$object->fk_soc      = 0;
+				} else if ($digiriskelement_id > 0) {
+					$object->fk_element = $digiriskelement_id;
+					$object->fk_standard = 0;
+					$object->fk_soc = 0;
+				}
+					break;
+			case 2:
+				$object->fk_element  = 0;
+				$object->fk_standard = 0;
+				$object->fk_soc      = $ext_society_id;
+				$object->accident_location = '';
+				break;
+			case 3:
+				$object->fk_element  = 0;
+				$object->fk_standard = 0;
+				$object->fk_soc      = 0;
+				$object->accident_location = $accident_location;
+				break;
+		}
 		$object->fk_user_employer = $user_employer_id;
 		$object->fk_user_victim   = $user_victim_id;
 		$object->fk_user_creat    = $user->id ?: 1;
@@ -257,13 +278,33 @@ if (empty($reshook)) {
 		$accident_date = dol_mktime(GETPOST('dateohour', 'int'), GETPOST('dateomin', 'int'), 0, GETPOST('dateomonth', 'int'), GETPOST('dateoday', 'int'), GETPOST('dateoyear', 'int'));
 
 		$object->accident_date = $accident_date;
-
-		if (empty($digiriskelement_id)) {
-			$object->fk_element = $conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD;
-		} else {
-			$object->fk_element = $digiriskelement_id;
-		}
 		$object->fk_soc           = $ext_society_id;
+
+		switch ($external_accident) {
+			case 1:
+				if ($digiriskelement_id == 0) {
+					$object->fk_standard = $conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD;
+					$object->fk_element  = 0;
+					$object->fk_soc      = 0;
+				} else if ($digiriskelement_id > 0) {
+					$object->fk_element = $digiriskelement_id;
+					$object->fk_standard = 0;
+					$object->fk_soc = 0;
+				}
+				break;
+			case 2:
+				$object->fk_element  = 0;
+				$object->fk_standard = 0;
+				$object->fk_soc      = $ext_society_id;
+				$object->accident_location = '';
+				break;
+			case 3:
+				$object->fk_element  = 0;
+				$object->fk_standard = 0;
+				$object->fk_soc      = 0;
+				$object->accident_location = $accident_location;
+				break;
+		}
 		$object->fk_user_victim   = $user_victim_id;
 		$object->fk_user_employer = $user_employer_id;
 		$object->fk_user_creat    = $user->id ? $user->id : 1;
@@ -586,7 +627,7 @@ if ($action == 'create') {
 
 	//FkElement -- Lieu de l'accident - DigiriskElement
 	print '<tr class="fk_element_field"><td class="minwidth400">' . $langs->trans("AccidentLocation") . '</td><td>';
-	print $digiriskelement->select_digiriskelement_list(( ! empty(GETPOST('fromid')) ? GETPOST('fromid') : $object->fk_element), 'fk_element', '', 0, 0, array(), 0, 0, 'minwidth300', GETPOST('id'), false, 0);
+	print $digiriskelement->select_digiriskelement_list(( ! empty(GETPOST('fromid')) ? GETPOST('fromid') : $object->fk_element), 'fk_element', '', 0, 0, array(), 0, 0, 'minwidth300', 0, false, 0);
 	print '</td></tr>';
 
 	//FkSoc -- Lieu de l'accident - Société extérieure
@@ -692,7 +733,7 @@ if (($id || $ref) && $action == 'edit') {
 
 	//AccidentLocation -- Lieu de l'accident
 	print '<tr class="' . (($object->external_accident == 1) ? ' fk_element_field' : ' fk_element_field hidden' ) . '" style="' . (($object->external_accident == 1) ? ' ' : ' display:none') . '"><td>' . $langs->trans("AccidentLocation") . '</td><td>';
-	print $digiriskelement->select_digiriskelement_list($object->fk_element, 'fk_element', '', 0, 0, array(), 0, 0, 'minwidth300', GETPOST('id'), false, 0);
+	print $digiriskelement->select_digiriskelement_list($object->fk_element, 'fk_element', '', 0, 0, array(), 0, 0, 'minwidth300', 0, false, 0);
 	print '</td></tr>';
 
 	//FkSoc -- Société extérieure
@@ -773,7 +814,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	$arrayAccident[] = $object->photo;
 	switch ($object->external_accident) {
 		case 1:
-			$arrayAccident[] = $object->fk_element;
+			$arrayAccident[] = $object->fk_element > 0 ? $object->fk_element : $object->fk_standard;
 			break;
 		case 2:
 			$arrayAccident[] = $object->fk_soc;
@@ -901,10 +942,10 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	print '<tr><td class="titlefield">' . $langs->trans("AccidentLocation") . '</td><td>';
 	switch ($object->external_accident) {
 		case 1:
-			if ($conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD == $object->fk_element) {
+			if ($object->fk_standard > 0) {
 				$digiriskstandard->fetch($conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD);
 				print $digiriskstandard->getNomUrl(1, 'blank', 1);
-			} else {
+			} else if ($object->fk_element > 0) {
 				$digiriskelement->fetch($object->fk_element);
 				print $digiriskelement->getNomUrl(1, 'blank', 1);
 			}

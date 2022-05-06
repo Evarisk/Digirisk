@@ -53,4 +53,7 @@ ALTER TABLE llx_digiriskdolibarr_accident CHANGE `external_accident` `external_a
 -- ALTER TABLE llx_digiriskdolibarr_digiriskelement_extrafields ADD entity integer DEFAULT 1 NOT NULL;
 
 -- 9.2.0
-ALTER TABLE `llx_digiriskdolibarr_digiriskelement` CHANGE `rank` `ranks` INT(11) NULL DEFAULT NULL;
+ALTER TABLE llx_digiriskdolibarr_digiriskelement CHANGE `rank` `ranks` INT(11) NULL DEFAULT NULL;
+
+-- 9.3.0
+ALTER TABLE llx_digiriskdolibarr_accident ADD fk_standard integer AFTER fk_element;
