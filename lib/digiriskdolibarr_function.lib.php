@@ -280,7 +280,14 @@ function digiriskshowdocuments($modulepart, $modulesubdir, $filedir, $urlsource,
 
 		if ($conf->browser->layout == 'phone') $urlsource .= '#' . $forname . '_form'; // So we switch to form after a generation
 		if (empty($noform)) $out                          .= '<form action="' . $urlsource . (empty($conf->global->MAIN_JUMP_TAG) ? '' : '#builddoc') . '" id="' . $forname . '_form" method="post">';
-		$out                                              .= '<input type="hidden" name="action" value="builddoc">';
+
+		if (preg_match('/TicketDocument/', $submodulepart)) {
+			$action = 'digiriskbuilddoc';
+		} else {
+			$action = 'builddoc';
+		}
+
+		$out                                              .= '<input type="hidden" name="action" value="'. $action .'">';
 		$out                                              .= '<input type="hidden" name="token" value="' . newToken() . '">';
 
 		$out .= load_fiche_titre($titletoshow, '', '');

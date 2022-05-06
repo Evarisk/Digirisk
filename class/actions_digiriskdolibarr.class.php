@@ -92,6 +92,33 @@ class ActionsDigiriskdolibarr
 				<?php
 			}
 			print ajax_combobox('selectDIGIRISKDOLIBARR_COLLECTIVE_AGREEMENT_TITLE');
+		} else if ($parameters['currentcontext'] == 'ticketcard') {
+			require_once __DIR__ . '/../lib/digiriskdolibarr_function.lib.php';
+			require_once __DIR__ . '/../class/digiriskdocuments/ticketdocument.class.php';
+			require_once __DIR__ . '/../core/modules/digiriskdolibarr/digiriskdocuments/ticketdocument/mod_ticketdocument_standard.php';
+			require_once __DIR__ . '/../core/modules/digiriskdolibarr/digiriskdocuments/ticketdocument/modules_ticketdocument.php';
+			global $langs, $user;
+
+			$object = new Ticket($this->db);
+			$result = $object->fetch(GETPOST('id'),GETPOST('ref','alpha'),GETPOST('track_id','alpha'));
+			$upload_dir = $conf->digiriskdolibarr->multidir_output[isset($object->entity) ? $object->entity : 1];
+			$objref    = dol_sanitizeFileName($object->ref);
+			$dir_files = $object->element . 'document/' . $objref;
+
+			$filedir   = $upload_dir . '/' . $dir_files;
+			$urlsource = $_SERVER["PHP_SELF"] . '?id=' . GETPOST('id');
+
+			$modulepart   = 'digiriskdolibarr:TicketDocument';
+			$defaultmodel = $conf->global->DIGIRISKDOLIBARR_TICKET_DEFAULT_MODEL;
+			$title        = $langs->trans('TicketDocument');
+
+			$html = digiriskshowdocuments($modulepart, $dir_files, $filedir, $urlsource, 1, 0, $defaultmodel, 1, 0, '', $title, '', '', $preventionplandocument, 0, 'remove_file');
+			?>
+
+			<script>
+				jQuery('.fichehalfleft .div-table-responsive-no-min').append(<?php echo json_encode($html) ; ?>)
+			</script>
+			<?php
 		}
 
 		if (true) {
@@ -120,6 +147,56 @@ class ActionsDigiriskdolibarr
 			if ($action == 'updateedit' || $action == 'update') {
 				dolibarr_set_const($db, "DIGIRISKDOLIBARR_COLLECTIVE_AGREEMENT_TITLE", GETPOST("DIGIRISKDOLIBARR_COLLECTIVE_AGREEMENT_TITLE", 'nohtml'), 'chaine', 0, '', $conf->entity);
 			}
+		} else if ($parameters['currentcontext'] == 'ticketcard') {
+			if (GETPOST('action') == 'digiriskbuilddoc') {
+				require_once __DIR__ . '/../lib/digiriskdolibarr_function.lib.php';
+				require_once __DIR__ . '/../class/digiriskdocuments/ticketdocument.class.php';
+				require_once __DIR__ . '/../core/modules/digiriskdolibarr/digiriskdocuments/ticketdocument/mod_ticketdocument_standard.php';
+				require_once __DIR__ . '/../core/modules/digiriskdolibarr/digiriskdocuments/ticketdocument/modules_ticketdocument.php';
+				$object = new Ticket($this->db);
+				$result = $object->fetch(GETPOST('id'),GETPOST('ref','alpha'),GETPOST('track_id','alpha'));
+
+				global $langs, $user;
+				$ticketdocument = new TicketDocument($this->db);
+				$outputlangs = $langs;
+				$newlang     = '';
+
+				if ($conf->global->MAIN_MULTILANGS && empty($newlang) && GETPOST('lang_id', 'aZ09')) $newlang = GETPOST('lang_id', 'aZ09');
+				if ( ! empty($newlang)) {
+					$outputlangs = new Translate("", $conf);
+					$outputlangs->setDefaultLang($newlang);
+				}
+
+				// To be sure vars is defined
+				if (empty($hidedetails)) $hidedetails = 0;
+				if (empty($hidedesc)) $hidedesc       = 0;
+				if (empty($hideref)) $hideref         = 0;
+				if (empty($moreparams)) $moreparams   = null;
+
+				$model = GETPOST('model', 'alpha');
+
+				$moreparams['object'] = $object;
+				$moreparams['user']   = $user;
+
+				$result = $ticketdocument->generateDocument($model, $outputlangs, $hidedetails, $hidedesc, $hideref, $moreparams);
+				if ($result <= 0) {
+					setEventMessages($object->error, $object->errors, 'errors');
+					$action = '';
+				} else {
+					if (empty($donotredirect)) {
+						setEventMessages($langs->trans("FileGenerated") . ' - ' . $ticketdocument->last_main_doc, null);
+
+						$urltoredirect = $_SERVER['REQUEST_URI'];
+						$urltoredirect = preg_replace('/#digiriskbuilddoc$/', '', $urltoredirect);
+						$urltoredirect = preg_replace('/action=digiriskbuilddoc&?/', '', $urltoredirect); // To avoid infinite loop
+
+						header('Location: ' . $urltoredirect );
+						exit;
+					}
+				}
+			}
+
+
 		}
 
 		if (true) {

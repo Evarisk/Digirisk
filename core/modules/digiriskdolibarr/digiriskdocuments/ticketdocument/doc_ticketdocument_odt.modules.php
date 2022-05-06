@@ -354,10 +354,14 @@ class doc_ticketdocument_odt extends ModeleODTTicketDocument
 
 			$category = new Categorie($this->db);
 			$categories = $category->containing($ticket->id, Categorie::TYPE_TICKET);
-			foreach ($categories as $cat) {
-				$allcategories[] = $cat->label;
+			if (!empty($categories)) {
+				foreach ($categories as $cat) {
+					$allcategories[] = $cat->label;
+				}
+				$tmparray['categories']       = implode(', ', $allcategories);
+			} else {
+				$tmparray['categories']       = '';
 			}
-			$tmparray['categories']       = implode(', ', $allcategories);
 
 			$tmparray['status']           = $ticket->getLibStatut();
 

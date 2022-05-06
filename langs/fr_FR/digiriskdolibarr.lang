@@ -1343,6 +1343,7 @@ DigiriskTicketDocumentNumberingModule = Modèle de numérotation des fiches de t
 DigiriskTicketDocumentStandardModel = Renvoie le numéro sous la forme TDn où n est un compteur séquentiel sans rupture et sans remise à 0
 DigiriskTemplateDocumentTicket = Modèle de documents des fiches de tickets de Digirisk
 TicketDocumentDigiriskTemplate = ODT par défaut des fiches de tickets
+TicketDocument = Fiche du ticket
 
 #
 # Tools - Outils

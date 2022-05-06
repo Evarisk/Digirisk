@@ -406,6 +406,7 @@ class modDigiriskdolibarr extends DolibarrModules
 				'globaladmin',
 				'emailtemplates',
 				'mainloginpage',
+				'ticketcard'
 			),
 			'tabs' => array(
 				'mycompany_admin'
@@ -687,7 +688,6 @@ class modDigiriskdolibarr extends DolibarrModules
 		$this->tabs[] = array('data' => 'mycompany_admin:+security:Sécurité:digiriskdolibarr@digiriskdolibarr:1:/custom/digiriskdolibarr/admin/securityconf.php');  			// To add a new tab identified by code tabname1
 		$this->tabs[] = array('data' => 'mycompany_admin:+social:Social:digiriskdolibarr@digiriskdolibarr:1:/custom/digiriskdolibarr/admin/socialconf.php');  					// To add a new tab identified by code tabname1
 		$this->tabs[] = array('data' => 'thirdparty:+openinghours:Horaires:digiriskdolibarr@digiriskdolibarr:1:/custom/digiriskdolibarr/view/openinghours_card.php?id=__ID__'); // To add a new tab identified by code tabname1
-		$this->tabs[] = array('data' => 'ticket:+document:History:digiriskdolibarr@digiriskdolibarr:1:/custom/digiriskdolibarr/view/ticket/ticket_documents.php?id=__ID__'); // To add a new tab identified by code tabname1
 		$this->tabs[] = array('data' => 'user:+participation:GP/UTParticipation:digiriskdolibarr@digiriskdolibarr:1:/custom/digiriskdolibarr/view/digiriskelement/digiriskelement_evaluator.php?fromid=__ID__'); // To add a new tab identified by code tabname1
 
 		// To remove an existing tab identified by code tabname
