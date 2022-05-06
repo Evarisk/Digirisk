@@ -130,10 +130,8 @@ if ( ! empty($societe->id)) $res = $societe->fetch_optionals();
 // ------------------------------------------------------------
 $morehtmlref  = '<div class="refidno">';
 $morehtmlref .= '</div>';
-$pictopath = dol_buildpath('/digiriskdolibarr/img/digiriskdolibarr32px.png', 1);
-
 $head = societe_prepare_head($societe);
-print dol_get_fiche_head($head, 'openinghours', $langs->trans("ThirdParty"), 0, $pictopath, 1);
+print dol_get_fiche_head($head, 'openinghours', $langs->trans("ThirdParty"), 0, 'company');
 $linkback = '<a href="' . DOL_URL_ROOT . '/societe/list.php?restore_lastsearch_values=1">' . $langs->trans("BackToList") . '</a>';
 dol_banner_tab($societe, 'socid', $linkback, ($user->socid ? 0 : 1), 'rowid', 'nom');
 

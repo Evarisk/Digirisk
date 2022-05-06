@@ -159,11 +159,9 @@ llxHeader('', $title, $help_url, '', '', '', $morejs, $morecss);
 
 print load_fiche_titre($title, '', 'title_setup');
 
-$pictopath = dol_buildpath('/digiriskdolibarr/img/digiriskdolibarr32px.png', 1);
-
 $head = company_admin_prepare_head();
 
-print dol_get_fiche_head($head, 'security', $langs->trans("Company"), -1, $pictopath, 1);
+print dol_get_fiche_head($head, 'security', '', -1, '');
 
 print '<span class="opacitymedium">' . $langs->trans("DigiriskMenu") . "</span><br>\n";
 print "<br>";
