@@ -106,11 +106,11 @@ class ActionsDigiriskdolibarr
 			$dir_files = $object->element . 'document/' . $objref;
 
 			$filedir   = $upload_dir . '/' . $dir_files;
-			$urlsource = $_SERVER["PHP_SELF"] . '?id=' . GETPOST('id');
+			$urlsource = $_SERVER["PHP_SELF"] . '?id=' . $object->id;
 
 			$modulepart   = 'digiriskdolibarr:TicketDocument';
 			$defaultmodel = $conf->global->DIGIRISKDOLIBARR_TICKET_DEFAULT_MODEL;
-			$title        = $langs->trans('TicketDocument');
+			$title        = '<img src="'.DOL_URL_ROOT . '/custom/digiriskdolibarr/img/digiriskdolibarr32px.png'.'">' . $langs->trans('TicketDocument');
 
 			$html = digiriskshowdocuments($modulepart, $dir_files, $filedir, $urlsource, 1, 0, $defaultmodel, 1, 0, '', $title, '', '', $preventionplandocument, 0, 'remove_file');
 			?>
