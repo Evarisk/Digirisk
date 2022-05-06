@@ -39,7 +39,8 @@ if (empty($conf) || ! is_object($conf)) {
 		$modulepart   = $entity . 'ecm';
 		$path         = DOL_URL_ROOT . '/document.php?modulepart=' . $modulepart . '&attachment=0&file=' . str_replace('/', '%2F', $relativepath) . '/';
 		$pathToThumb  = DOL_URL_ROOT . '/viewimage.php?modulepart=digiriskdolibarr&entity=' . $conf->entity . '&file=' . urlencode($cotation->element . '/' . $cotation->ref . '/thumbs/');
-		$nophoto      = '/dolibarr/htdocs/public/theme/common/nophoto.png'; ?>
+		$nophoto      = DOL_URL_ROOT.'/public/theme/common/nophoto.png';
+		?>
 		<!-- BUTTON RISK EVALUATION PHOTO MODAL -->
 		<div class="action risk-evaluation-photo default-photo modal-open risk-evaluation-photo-<?php echo $cotation->id > 0 ? $cotation->id : 0 ; echo $risk->id > 0 ? ' risk-' . $risk->id : ' risk-new' ?>">
 			<input hidden class="no-photo-path" value="<?php echo $nophoto ?>">

@@ -828,7 +828,7 @@ function display_recurse_tree($results)
 					<?php } else { ?>
 					<div class="spacer"></div>
 					<?php }
-					$nophoto     = '/dolibarr/htdocs/public/theme/common/nophoto.png';
+					$nophoto     = DOL_URL_ROOT.'/public/theme/common/nophoto.png';
 					$pathToThumb = DOL_URL_ROOT . '/viewimage.php?modulepart=digiriskdolibarr&entity=' . $conf->entity . '&file=' . urlencode($element['object']->element_type . '/' . $element['object']->ref . '/thumbs/');
 					$filearray   = dol_dir_list($conf->digiriskdolibarr->multidir_output[$conf->entity] . '/' . $element['object']->element_type . '/' . $element['object']->ref . '/', "files", 0, '', '(\.odt|_preview.*\.png)$', 'position_name', 'asc', 1);
 					if (count($filearray)) {
