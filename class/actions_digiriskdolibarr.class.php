@@ -77,13 +77,13 @@ class ActionsDigiriskdolibarr
 			<script src="../custom/digiriskdolibarr/js/digiriskdolibarr.js.php"></script>
 			<?php
 			if ($conf->global->MAIN_INFO_SOCIETE_COUNTRY == '1:FR:France') {
-				$formother = new FormOther($db);
+				require_once __DIR__ . '/../lib/digiriskdolibarr_function.lib.php';
 				$form      = new Form($db);
 				$pictopath = dol_buildpath('/digiriskdolibarr/img/digiriskdolibarr32px.png', 1);
 				$pictoDigirisk = img_picto('', $pictopath, '', 1, 0, 0, '', 'pictoDigirisk');
 				?>
 				<script>
-					IDCC_form = '<?php $formother->select_dictionary('DIGIRISKDOLIBARR_COLLECTIVE_AGREEMENT_TITLE', 'c_conventions_collectives', 'code', 'libelle', $conf->global->DIGIRISKDOLIBARR_COLLECTIVE_AGREEMENT_TITLE, 1);?>';
+					IDCC_form = '<?php digirisk_select_dictionary('DIGIRISKDOLIBARR_COLLECTIVE_AGREEMENT_TITLE', 'c_conventions_collectives', 'code', 'libelle', $conf->global->DIGIRISKDOLIBARR_COLLECTIVE_AGREEMENT_TITLE, 1);?>';
 
 					let $tr = $('<tr class="oddeven"><td><label for="selectidcc_id"><?php print $pictoDigirisk . $form->textwithpicto($langs->trans('IDCC'), $langs->trans('IDCCTooltip'));?></label></td>');
 					$tr.append('<td>' + IDCC_form + '</td></tr>');
