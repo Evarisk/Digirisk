@@ -415,7 +415,6 @@ LabourInspectorFirstName = Inspecteur du
 LabourInspectorLastName = travail
 PreventionPlanData = Données du Plan de prévention
 MaitreOeuvreDescription = L'utilisateur utilisé par défaut comme Responsable de l'Entreprise Utilisatrice
-fk_preventionplan = Plan de prévention lié
 PreventionPlanLinked = Plan de prévention lié
 NoPreventionPlanRisk = Aucun risque sur le plan de prévention
 NoPreventionPlanLinked = Aucun plan de prévention lié
@@ -518,7 +517,8 @@ FirePermitDescription = Projet des permis de feu
 FirePermitData = Données du Permis de feu
 FirePermitManagement = Gestion des permis de feu
 FPRProject = Projet lié aux permis de feu
-fk_firepermit = Permis de feu lié
+FirePermitLinked = Permis de feu lié
+
 # Email - Mail
 FirePermitLabel = Récapitulatif du permis de feu
 FirePermitSubject = Email permis de feu
@@ -649,7 +649,7 @@ ConfirmDeleteAccidentWorkStop = Êtes-vous sûr de vouloir supprimer l'arrêt de
 AccidentMetaDataLesion = Données complémentaires des lésions
 TotalWorkStopDays = Nombre total de jour d'arrêt de travail
 RegisterAccident = Accident bénin
-fk_accident = Accident lié
+AccidentLinked = Accident lié
 
 # AccidentTooltip - Tooltip des accidents
 VictimActivityTooltip = Précisez l’activité ou la tâche de la victime au moment de l’accident, c’est-à-dire ce que faisait la victime
@@ -1032,7 +1032,7 @@ RiskDescriptionNotActivated = Veuillez activer le champ description du risque da
 AddRisk = Ajouter un risque
 NoDescriptionThere = Aucune description renseignée sur ce risque
 NoRiskThere = "Aucun risque spécifique sur cette unité" Cependant vous pouvez être soumis aux risques génériques de vos groupements de travail.
-fk_risk = Risque lié
+RiskLinked = Risque lié
 MoveRisk = Déplacer le risque
 MoveRisks = Déplacer les risques
 MoveRisksDescription = Permet de déplacer les risques d'un groupement ou d'une unité de travail à un(e) autre

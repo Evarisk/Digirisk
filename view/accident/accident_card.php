@@ -132,7 +132,7 @@ if (empty($reshook)) {
 		$user_employer_id   = GETPOST('fk_user_employer');
 		$digiriskelement_id = GETPOST('fk_element');
 		$label              = GETPOST('label');
-		$description        = GETPOST('description', 'restricthtml');
+		$description        = GETPOST('description');
 		$accident_type      = GETPOST('accident_type');
 		$external_accident  = GETPOST('external_accident');
 		$accident_location  = GETPOST('accident_location');

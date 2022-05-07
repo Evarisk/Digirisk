@@ -635,6 +635,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			276 => array('DIGIRISKDOLIBARR_ACTIVE_STANDARD', 'integer', 0, '', 0, 'current'),
 			277 => array('DIGIRISKDOLIBARR_TRIGGERS_UPDATED', 'integer', 1, '', 0, 'current'),
 			278 => array('DIGIRISKDOLIBARR_CONF_BACKWARD_COMPATIBILITY', 'integer', 1, '', 0, 'current'),
+			279 => array('DIGIRISKDOLIBARR_ENCODE_BACKWARD_COMPATIBILITY', 'integer', 1, '', 0, 'current'),
 			340 => array('DIGIRISKDOLIBARR_MEDIA_MAX_WIDTH_MEDIUM', 'integer', 854, '', 0, 'current'),
 			341 => array('DIGIRISKDOLIBARR_MEDIA_MAX_HEIGHT_MEDIUM', 'integer', 480, '', 0, 'current'),
 			342 => array('DIGIRISKDOLIBARR_MEDIA_MAX_WIDTH_LARGE', 'integer', 1280, '', 0, 'current'),
@@ -719,7 +720,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			),
 			// Sort order
 			'tabsqlsort' => array(
-				"libelle ASC",
+				"code ASC",
 				"label ASC",
 				"label ASC",
 				"label ASC"
@@ -774,6 +775,7 @@ class modDigiriskdolibarr extends DolibarrModules
 		$this->cronjobs = array();
 
 		// Permissions provided by this module
+		$langs->load("digiriskdolibarr@digiriskdolibarr");
 		$this->rights = array();
 		$r            = 0;
 
@@ -796,7 +798,7 @@ class modDigiriskdolibarr extends DolibarrModules
 		$this->rights[$r][5] = 'read';
 		$r++;
 		$this->rights[$r][0] = $this->numero . $r;
-		$this->rights[$r][1] = $langs->trans('CreateRiskAssessmentDocument');
+		$this->rights[$r][1] = $langs->transnoentities('CreateRiskAssessmentDocument');
 		$this->rights[$r][4] = 'riskassessmentdocument';
 		$this->rights[$r][5] = 'write';
 		$r++;
@@ -808,17 +810,17 @@ class modDigiriskdolibarr extends DolibarrModules
 
 		/* LEGAL DISPLAY PERMISSIONS */
 		$this->rights[$r][0] = $this->numero . $r;
-		$this->rights[$r][1] = $langs->trans('ReadLegalDisplay');
+		$this->rights[$r][1] = $langs->transnoentities('ReadLegalDisplay');
 		$this->rights[$r][4] = 'legaldisplay';
 		$this->rights[$r][5] = 'read';
 		$r++;
 		$this->rights[$r][0] = $this->numero . $r;
-		$this->rights[$r][1] = $langs->trans('CreateLegalDisplay');
+		$this->rights[$r][1] = $langs->transnoentities('CreateLegalDisplay');
 		$this->rights[$r][4] = 'legaldisplay';
 		$this->rights[$r][5] = 'write';
 		$r++;
 		$this->rights[$r][0] = $this->numero . $r;
-		$this->rights[$r][1] = $langs->trans('DeleteLegalDisplay');
+		$this->rights[$r][1] = $langs->transnoentities('DeleteLegalDisplay');
 		$this->rights[$r][4] = 'legaldisplay';
 		$this->rights[$r][5] = 'delete';
 		$r++;
@@ -830,7 +832,7 @@ class modDigiriskdolibarr extends DolibarrModules
 		$this->rights[$r][5] = 'read';
 		$r++;
 		$this->rights[$r][0] = $this->numero . $r;
-		$this->rights[$r][1] = $langs->trans('CreateInformationsSharing');
+		$this->rights[$r][1] = $langs->transnoentities('CreateInformationsSharing');
 		$this->rights[$r][4] = 'informationssharing';
 		$this->rights[$r][5] = 'write';
 		$r++;
@@ -847,7 +849,7 @@ class modDigiriskdolibarr extends DolibarrModules
 		$this->rights[$r][5] = 'read';
 		$r++;
 		$this->rights[$r][0] = $this->numero . $r;
-		$this->rights[$r][1] = $langs->trans('CreateFirePermit');
+		$this->rights[$r][1] = $langs->transnoentities('CreateFirePermit');
 		$this->rights[$r][4] = 'firepermit';
 		$this->rights[$r][5] = 'write';
 		$r++;
@@ -859,34 +861,34 @@ class modDigiriskdolibarr extends DolibarrModules
 
 		/* PREVENTION PLAN PERMISSIONS */
 		$this->rights[$r][0] = $this->numero . $r;
-		$this->rights[$r][1] = $langs->trans('ReadPreventionPlan');
+		$this->rights[$r][1] = $langs->transnoentities('ReadPreventionPlan');
 		$this->rights[$r][4] = 'preventionplan';
 		$this->rights[$r][5] = 'read';
 		$r++;
 		$this->rights[$r][0] = $this->numero . $r;
-		$this->rights[$r][1] = $langs->trans('CreatePreventionPlan');
+		$this->rights[$r][1] = $langs->transnoentities('CreatePreventionPlan');
 		$this->rights[$r][4] = 'preventionplan';
 		$this->rights[$r][5] = 'write';
 		$r++;
 		$this->rights[$r][0] = $this->numero . $r;
-		$this->rights[$r][1] = $langs->trans('DeletePreventionPlan');
+		$this->rights[$r][1] = $langs->transnoentities('DeletePreventionPlan');
 		$this->rights[$r][4] = 'preventionplan';
 		$this->rights[$r][5] = 'delete';
 		$r++;
 
 		/* GP/UT ORGANISATION PERMISSIONS */
 		$this->rights[$r][0] = $this->numero . $r;
-		$this->rights[$r][1] = $langs->trans('ReadDigiriskElement');
+		$this->rights[$r][1] = $langs->transnoentities('ReadDigiriskElement');
 		$this->rights[$r][4] = 'digiriskelement';
 		$this->rights[$r][5] = 'read';
 		$r++;
 		$this->rights[$r][0] = $this->numero . $r;
-		$this->rights[$r][1] = $langs->trans('CreateDigiriskElement');
+		$this->rights[$r][1] = $langs->transnoentities('CreateDigiriskElement');
 		$this->rights[$r][4] = 'digiriskelement';
 		$this->rights[$r][5] = 'write';
 		$r++;
 		$this->rights[$r][0] = $this->numero . $r;
-		$this->rights[$r][1] = $langs->trans('DeleteDigiriskElement');
+		$this->rights[$r][1] = $langs->transnoentities('DeleteDigiriskElement');
 		$this->rights[$r][4] = 'digiriskelement';
 		$this->rights[$r][5] = 'delete';
 		$r++;
@@ -898,7 +900,7 @@ class modDigiriskdolibarr extends DolibarrModules
 		$this->rights[$r][5] = 'read';
 		$r++;
 		$this->rights[$r][0] = $this->numero . $r;
-		$this->rights[$r][1] = $langs->trans('CreateDigiriskRisk');
+		$this->rights[$r][1] = $langs->transnoentities('CreateDigiriskRisk');
 		$this->rights[$r][4] = 'risk';
 		$this->rights[$r][5] = 'write';
 		$r++;
@@ -915,7 +917,7 @@ class modDigiriskdolibarr extends DolibarrModules
 		$this->rights[$r][5] = 'read';
 		$r++;
 		$this->rights[$r][0] = $this->numero . $r;
-		$this->rights[$r][1] = $langs->trans('CreateListingRisksAction');
+		$this->rights[$r][1] = $langs->transnoentities('CreateListingRisksAction');
 		$this->rights[$r][4] = 'listingrisksaction';
 		$this->rights[$r][5] = 'write';
 		$r++;
@@ -932,7 +934,7 @@ class modDigiriskdolibarr extends DolibarrModules
 		$this->rights[$r][5] = 'read';
 		$r++;
 		$this->rights[$r][0] = $this->numero . $r;
-		$this->rights[$r][1] = $langs->trans('CreateListingRisksPhoto');
+		$this->rights[$r][1] = $langs->transnoentities('CreateListingRisksPhoto');
 		$this->rights[$r][4] = 'listingrisksphoto';
 		$this->rights[$r][5] = 'write';
 		$r++;
@@ -949,7 +951,7 @@ class modDigiriskdolibarr extends DolibarrModules
 		$this->rights[$r][5] = 'read';
 		$r++;
 		$this->rights[$r][0] = $this->numero . $r;
-		$this->rights[$r][1] = $langs->trans('CreateDigiriskRiskSign');
+		$this->rights[$r][1] = $langs->transnoentities('CreateDigiriskRiskSign');
 		$this->rights[$r][4] = 'risksign';
 		$this->rights[$r][5] = 'write';
 		$r++;
@@ -961,36 +963,36 @@ class modDigiriskdolibarr extends DolibarrModules
 
 		/* EVALUATOR PERMISSIONS */
 		$this->rights[$r][0] = $this->numero . $r;
-		$this->rights[$r][1] = $langs->trans('ReadEvaluator');
+		$this->rights[$r][1] = $langs->transnoentities('ReadEvaluator');
 		$this->rights[$r][4] = 'evaluator';
 		$this->rights[$r][5] = 'read';
 		$r++;
 		$this->rights[$r][0] = $this->numero . $r;
-		$this->rights[$r][1] = $langs->trans('CreateEvaluator');
+		$this->rights[$r][1] = $langs->transnoentities('CreateEvaluator');
 		$this->rights[$r][4] = 'evaluator';
 		$this->rights[$r][5] = 'write';
 		$r++;
 		$this->rights[$r][0] = $this->numero . $r;
-		$this->rights[$r][1] = $langs->trans('DeleteEvaluator');
+		$this->rights[$r][1] = $langs->transnoentities('DeleteEvaluator');
 		$this->rights[$r][4] = 'evaluator';
 		$this->rights[$r][5] = 'delete';
 		$r++;
 
 		/* ADMINPAGE PANEL ACCESS PERMISSIONS */
 		$this->rights[$r][0] = $this->numero . $r;
-		$this->rights[$r][1] = $langs->trans('ReadAdminPage');
+		$this->rights[$r][1] = $langs->transnoentities('ReadAdminPage');
 		$this->rights[$r][4] = 'adminpage';
 		$this->rights[$r][5] = 'read';
 		$r++;
 
 		/* API PERMISSIONS */
 		$this->rights[$r][0] = $this->numero . $r;
-		$this->rights[$r][1] = $langs->trans('GetAPI');
+		$this->rights[$r][1] = $langs->transnoentities('GetAPI');
 		$this->rights[$r][4] = 'api';
 		$this->rights[$r][5] = 'read';
 		$r++;
 		$this->rights[$r][0] = $this->numero . $r;
-		$this->rights[$r][1] = $langs->trans('PostAPI');
+		$this->rights[$r][1] = $langs->transnoentities('PostAPI');
 		$this->rights[$r][4] = 'api';
 		$this->rights[$r][5] = 'write';
 		$r++;
@@ -1002,7 +1004,7 @@ class modDigiriskdolibarr extends DolibarrModules
 		$this->rights[$r][5] = 'read';
 		$r++;
 		$this->rights[$r][0] = $this->numero . $r;
-		$this->rights[$r][1] = $langs->trans('CreateAccident');
+		$this->rights[$r][1] = $langs->transnoentities('CreateAccident');
 		$this->rights[$r][4] = 'accident';
 		$this->rights[$r][5] = 'write';
 		$r++;
@@ -1094,7 +1096,7 @@ class modDigiriskdolibarr extends DolibarrModules
 		$this->menu[$r++] = array(
 			'fk_menu' => 'fk_mainmenu=digiriskdolibarr',	    // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
 			'type' => 'left',			                // This is a Left menu entry
-			'titre' => '<i class="fas fa-info"></i>  ' . $langs->trans('PreventionPlan'),
+			'titre' => '<i class="fas fa-info"></i>  ' . $langs->transnoentities('PreventionPlan'),
 			'mainmenu' => 'digiriskdolibarr',
 			'leftmenu' => 'digiriskpreventionplan',
 			'url' => '/digiriskdolibarr/view/preventionplan/preventionplan_list.php',
@@ -1199,7 +1201,7 @@ class modDigiriskdolibarr extends DolibarrModules
 		$this->menu[$r++] = array(
 			'fk_menu' => 'fk_mainmenu=digiriskdolibarr',	    // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
 			'type' => 'left',			                // This is a Left menu entry
-			'titre' => '<i class="fas fa-building"></i>  ' . $langs->trans('DigiriskConfigSociety'),
+			'titre' => '<i class="fas fa-building"></i>  ' . $langs->transnoentities('DigiriskConfigSociety'),
 			'mainmenu' => 'digiriskdolibarr',
 			'leftmenu' => 'digirisksocietyconfig',
 			'url' => '/admin/company.php',
@@ -1214,7 +1216,7 @@ class modDigiriskdolibarr extends DolibarrModules
 		$this->menu[$r++] = array(
 			'fk_menu' => 'fk_mainmenu=digiriskdolibarr',	    // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
 			'type' => 'left',			                // This is a Left menu entry
-			'titre' => '<span class="minimizeMenu" title="'. $langs->trans('MinimizeMenu') .'"><i class="fas fa-bars"></i>  ' . $langs->trans('MinimizeMenu') . '</span>',
+			'titre' => '<span class="minimizeMenu" title="'. $langs->transnoentities('MinimizeMenu') .'"><i class="fas fa-bars"></i>  ' . $langs->transnoentities('MinimizeMenu') . '</span>',
 			'mainmenu' => 'digiriskdolibarr',
 			'leftmenu' => '',
 			'url' => '',
@@ -1500,7 +1502,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			$labour_inspectorID       = $labour_inspector->create($user);
 
 			$rights_defender         = $societe;
-			$rights_defender->name   = $langs->trans('RightsDefender') . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
+			$rights_defender->name   = $langs->transnoentities('RightsDefender') . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
 			$rights_defender->client = 0;
 			$rights_defender->phone  = '';
 			$rights_defender->url    = '';
@@ -1549,7 +1551,7 @@ class modDigiriskdolibarr extends DolibarrModules
 
 			$labour_doctor            = $contact;
 			$labour_doctor->socid     = $allLinks;
-			$labour_doctor->firstname = $langs->trans('LabourDoctorFirstName');
+			$labour_doctor->firstname = $langs->transnoentities('LabourDoctorFirstName');
 			$labour_doctor->lastname  = $langs->trans('LabourDoctorLastName');
 			$labour_doctorID          = $labour_doctor->create($user);
 
@@ -1575,7 +1577,7 @@ class modDigiriskdolibarr extends DolibarrModules
 
 			$labour_doctor            = $contact;
 			$labour_doctor->socid     = $allLinks;
-			$labour_doctor->firstname = $langs->trans('LabourDoctorFirstName');
+			$labour_doctor->firstname = $langs->transnoentities('LabourDoctorFirstName');
 			$labour_doctor->lastname  = $langs->trans('LabourDoctorLastName');
 			$labour_doctorID          = $labour_doctor->create($user);
 
@@ -1617,7 +1619,7 @@ class modDigiriskdolibarr extends DolibarrModules
 
 			$rights_defenderID = $resources->digirisk_dolibarr_fetch_resource('RightsDefender');
 			$societe->fetch($rights_defenderID);
-			$societe->name = $langs->trans('RightsDefender') . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
+			$societe->name = $langs->transnoentities('RightsDefender') . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
 			$societe->update(0, $user);
 
 			$poison_control_centerID = $resources->digirisk_dolibarr_fetch_resource('PoisonControlCenter');
@@ -1632,13 +1634,14 @@ class modDigiriskdolibarr extends DolibarrModules
 		include_once DOL_DOCUMENT_ROOT . '/core/class/extrafields.class.php';
 		$extra_fields = new ExtraFields($this->db);
 
-		$extra_fields->update('fk_risk', $langs->trans("fk_risk"), 'sellist', '', 'projet_task', 0, 0, 1010, 'a:1:{s:7:"options";a:1:{s:50:"digiriskdolibarr_risk:ref:rowid::entity = $ENTITY$";N;}}', '', '', 1);
-		$extra_fields->addExtraField('fk_risk', $langs->trans("fk_risk"), 'sellist', 1010, '', 'projet_task', 0, 0, '', 'a:1:{s:7:"options";a:1:{s:50:"digiriskdolibarr_risk:ref:rowid::entity = $ENTITY$";N;}}', '', '', 1);
-
-		$extra_fields->addExtraField('fk_preventionplan', $langs->trans("fk_preventionplan"), 'sellist', 1020, '', 'projet_task', 0, 0, '', 'a:1:{s:7:"options";a:1:{s:60:"digiriskdolibarr_preventionplan:ref:rowid::entity = $ENTITY$";N;}}', '', '', 1);
-		$extra_fields->addExtraField('fk_firepermit', $langs->trans("fk_firepermit"), 'sellist', 1030, '', 'projet_task', 0, 0, '', 'a:1:{s:7:"options";a:1:{s:56:"digiriskdolibarr_firepermit:ref:rowid::entity = $ENTITY$";N;}}', '', '', 1);
-		$extra_fields->update('fk_accident', $langs->trans("fk_accident"), 'sellist', '', 'projet_task', 0, 0, 1040, 'a:1:{s:7:"options";a:1:{s:54:"digiriskdolibarr_accident:ref:rowid::entity = $ENTITY$";N;}}', '', '', 1);
-		$extra_fields->addExtraField('fk_accident', $langs->trans("fk_accident"), 'sellist', 1040, '', 'projet_task', 0, 0, '', 'a:1:{s:7:"options";a:1:{s:54:"digiriskdolibarr_accident:ref:rowid::entity = $ENTITY$";N;}}', '', '', 1);
+		$extra_fields->update('fk_risk', $langs->transnoentities("RiskLinked"), 'sellist', '', 'projet_task', 0, 0, 1010, 'a:1:{s:7:"options";a:1:{s:50:"digiriskdolibarr_risk:ref:rowid::entity = $ENTITY$";N;}}', '', '', 1);
+		$extra_fields->addExtraField('fk_risk', $langs->transnoentities("RiskLinked"), 'sellist', 1010, '', 'projet_task', 0, 0, '', 'a:1:{s:7:"options";a:1:{s:50:"digiriskdolibarr_risk:ref:rowid::entity = $ENTITY$";N;}}', '', '', 1);
+		$extra_fields->update('fk_preventionplan', $langs->transnoentities("PreventionPlanLinked"), 'sellist', '', 'projet_task', 0, 0, 1020, 'a:1:{s:7:"options";a:1:{s:60:"digiriskdolibarr_preventionplan:ref:rowid::entity = $ENTITY$";N;}}', '', '', '', 1);
+		$extra_fields->addExtraField('fk_preventionplan', $langs->transnoentities("PreventionPlanLinked"), 'sellist', 1020, '', 'projet_task', 0, 0, '', 'a:1:{s:7:"options";a:1:{s:60:"digiriskdolibarr_preventionplan:ref:rowid::entity = $ENTITY$";N;}}', '', '', 1);
+		$extra_fields->update('fk_firepermit', $langs->transnoentities("FirePermitLinked"), 'sellist', '', 'projet_task', 0, 0, 1030, 'a:1:{s:7:"options";a:1:{s:56:"digiriskdolibarr_firepermit:ref:rowid::entity = $ENTITY$";N;}}', '', '', '', 1);
+		$extra_fields->addExtraField('fk_firepermit', $langs->transnoentities("FirePermitLinked"), 'sellist', 1030, '', 'projet_task', 0, 0, '', 'a:1:{s:7:"options";a:1:{s:56:"digiriskdolibarr_firepermit:ref:rowid::entity = $ENTITY$";N;}}', '', '', 1);
+		$extra_fields->update('fk_accident', $langs->transnoentities("AccidentLinked"), 'sellist', '', 'projet_task', 0, 0, 1040, 'a:1:{s:7:"options";a:1:{s:54:"digiriskdolibarr_accident:ref:rowid::entity = $ENTITY$";N;}}', '', '', 1);
+		$extra_fields->addExtraField('fk_accident', $langs->transnoentities("AccidentLinked"), 'sellist', 1040, '', 'projet_task', 0, 0, '', 'a:1:{s:7:"options";a:1:{s:54:"digiriskdolibarr_accident:ref:rowid::entity = $ENTITY$";N;}}', '', '', 1);
 
 		//Used for data import from Digirisk Wordpress
 		$extra_fields->update('wp_digi_id', $langs->trans("WPDigiID"), 'int', 100, 'digiriskdolibarr_digiriskelement', 0, 0, 1020, '', '', '', 0);
@@ -1731,7 +1734,7 @@ class modDigiriskdolibarr extends DolibarrModules
 
 			$actioncomm = new Actioncomm($this->db);
 
-			$allGroupments = $actioncomm->getActions($this->db, 0, 0, '', ' AND a.elementtype = "groupment@digiriskdolibarr"');
+			$allGroupments = $actioncomm->getActions(0, 0, '', ' AND a.elementtype = "groupment@digiriskdolibarr"');
 			if ( ! empty($allGroupments)) {
 				foreach ($allGroupments as $allGroupment) {
 					$allGroupment->elementtype = 'digiriskelement@digiriskdolibarr';
@@ -1739,7 +1742,7 @@ class modDigiriskdolibarr extends DolibarrModules
 				}
 			}
 
-			$allWorkunits = $actioncomm->getActions($this->db, 0, 0, '', ' AND a.elementtype = "workunit@digiriskdolibarr"');
+			$allWorkunits = $actioncomm->getActions(0, 0, '', ' AND a.elementtype = "workunit@digiriskdolibarr"');
 			if ( ! empty($allWorkunits)) {
 				foreach ($allWorkunits as $allWorkunit) {
 					$allWorkunit->elementtype = 'digiriskelement@digiriskdolibarr';
@@ -1747,7 +1750,7 @@ class modDigiriskdolibarr extends DolibarrModules
 				}
 			}
 
-			$allCompanies = $actioncomm->getActions($this->db, 0, 0, '', ' AND a.elementtype = "societe@digiriskdolibarr"');
+			$allCompanies = $actioncomm->getActions(0, 0, '', ' AND a.elementtype = "societe@digiriskdolibarr"');
 			if ( ! empty($allCompanies)) {
 				foreach ($allCompanies as $allCompany) {
 					$allCompany->fk_soc = $allCompany->fk_element;
