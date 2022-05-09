@@ -1213,10 +1213,9 @@ window.eoxiaJS.mediaGallery.savePhoto = function( event ) {
 			filenames += $( this ).find('.filename').val() + 'vVv'
 		});
 	}
-
 	let favorite = filenames
 	favorite = favorite.split('vVv')[0]
-	favorite = favorite.replace(/\ /g, '+')
+
 	window.eoxiaJS.loader.display($(this));
 
 	let token = $('.id-container').find('input[name="token"]').val();
@@ -1248,6 +1247,8 @@ window.eoxiaJS.mediaGallery.savePhoto = function( event ) {
 					$(this).find('.clicked-photo-preview').attr('src',newPhoto )
 					$(this).find('.filename').attr('value', favorite.match(/_small/) ? favorite.replace(/\./, '_small.') : favorite)
 				});
+				favorite = favorite.replace(/\ /g, '%20')
+
 				mediaLinked.load(document.URL+'&favorite='+favorite + ' .element-linked-medias-'+idToSave+'.risk-'+riskId)
 				modalFrom.find('.messageSuccessSavePhoto').removeClass('hidden')
 			},
