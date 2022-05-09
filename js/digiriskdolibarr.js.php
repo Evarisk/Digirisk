@@ -1368,9 +1368,12 @@ window.eoxiaJS.mediaGallery.sendPhoto = function( event ) {
  * @return {void}
  */
 window.eoxiaJS.mediaGallery.previewPhoto = function( event ) {
-	setTimeout(function(){
-		$( document ).find('.ui-dialog').addClass('preview-photo');
-	}, 800);
+	var checkExist = setInterval(function() {
+		if ($('.ui-dialog').length) {
+			clearInterval(checkExist);
+			$( document ).find('.ui-dialog').addClass('preview-photo');
+		}
+	}, 100); // check every 100ms
 };
 
 /**
