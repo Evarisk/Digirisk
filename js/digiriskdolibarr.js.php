@@ -1508,7 +1508,10 @@ window.eoxiaJS.mediaGallery.addToFavorite = function( event ) {
 		elementPhotos = $('.risk-evaluation-photo-'+element_linked_id+'.risk-'+riskId)
 
 		$(this).closest('.modal-content').find('.risk-evaluation-photo-single .filename').attr('value', filename)
-		let previousName = previousPhoto[0].src.trim().split(/thumbs%2F/)[1].split(/"/)[0]
+
+		let filepath = modalFrom.find('.risk-evaluation-photo-single .filepath-to-riskassessment').val()
+		let newPhoto = filepath + filename.replace(/\./, '_small.')
+
 		let saveButton = $(this).closest('.modal-container').find('.risk-evaluation-save')
 		saveButton.addClass('button-disable')
 		$.ajax({
@@ -1520,12 +1523,6 @@ window.eoxiaJS.mediaGallery.addToFavorite = function( event ) {
 			type: "POST",
 			processData: false,
 			success: function ( ) {
-				let newPhoto = ''
-				if (previousName.length > 0 ) {
-					newPhoto = previousPhoto[0].src.trim().replace(previousName , filename.replace(/\./, '_small.'))
-				} else {
-					newPhoto = previousPhoto[0].src.trim() + filename.replace(/\./, '_small.')
-				}
 				elementPhotos.each( function() {
 					$(this).find('.clicked-photo-preview').attr('src',newPhoto )
 				});
@@ -1536,7 +1533,8 @@ window.eoxiaJS.mediaGallery.addToFavorite = function( event ) {
 	} else if (type === 'digiriskelement') {
 		previousPhoto = $('.digirisk-element-'+element_linked_id).find('.photo.clicked-photo-preview')
 
-		let previousName = previousPhoto[0].src.trim().split(/thumbs%2F/)[1].split(/"/)[0]
+		let filepath =$('.digirisk-element-'+element_linked_id).find('.filepath-to-digiriskelement').val()
+		let newPhoto = filepath + filename.replace(/\./, '_small.')
 
 		jQuery.ajax({
 			url: document.URL + querySeparator + "action=addDigiriskElementPhotoToFavorite&token=" + token,
@@ -1547,22 +1545,15 @@ window.eoxiaJS.mediaGallery.addToFavorite = function( event ) {
 			}),
 			processData: false,
 			success: function ( resp ) {
-				let newPhoto = ''
-				console.log(id)
-				console.log(element_linked_id)
+
 				if (id === element_linked_id) {
 					console.log($('.arearef.heightref.valignmiddle.centpercent'))
 					console.log($(resp).find('.arearef.heightref.valignmiddle.centpercent'))
 					console.log(resp)
 
-					//$('.arearef.heightref.valignmiddle.centpercent').html($(resp).find('.arearef.heightref.valignmiddle.centpercent'))
 					$('.arearef.heightref.valignmiddle.centpercent').load(' .arearef.heightref.valignmiddle.centpercent')
 				}
-				if (previousName.length > 0 ) {
-					newPhoto = previousPhoto[0].src.trim().replace(previousName , filename.replace(/\./, '_small.'))
-				} else {
-					newPhoto = previousPhoto[0].src.trim() + filename.replace(/\./, '_small.')
-				}
+
 				previousPhoto.attr('src',newPhoto )
 				$('.wpeo-loader').removeClass('wpeo-loader')
 			}
