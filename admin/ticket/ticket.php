@@ -383,7 +383,7 @@ if ( ! empty($conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE)) {
 	print '<input type="hidden" name="action" value="setParentCategoryLabel">';
 	print '<input type="hidden" name="backtopage" value="' . $backtopage . '">';
 
-	print '<tr class="oddeven"><td>' . $langs->trans("ParentCategory") . '</td>';
+	print '<tr class="oddeven"><td>' . $langs->trans("ParentCategoryLabel") . '</td>';
 	print '<td class="center">';
 	print '<input name="parentCategoryLabel" value="'. $conf->global->DIGIRISKDOLIBARR_TICKET_PARENT_CATEGORY_LABEL .'">';
 	print '</td>';
@@ -405,7 +405,7 @@ if ( ! empty($conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE)) {
 	print '<input type="hidden" name="action" value="setChildCategoryLabel">';
 	print '<input type="hidden" name="backtopage" value="' . $backtopage . '">';
 
-	print '<tr class="oddeven"><td>' . $langs->trans("ChildCategory") . '</td>';
+	print '<tr class="oddeven"><td>' . $langs->trans("ChildCategoryLabel") . '</td>';
 	print '<td class="center">';
 	print '<input name="childCategoryLabel" value="'. $conf->global->DIGIRISKDOLIBARR_TICKET_CHILD_CATEGORY_LABEL .'">';
 	print '</td>';

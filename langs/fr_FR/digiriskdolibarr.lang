@@ -1334,8 +1334,13 @@ SendEmailOnTicketSubmitHelp = Activer l'envoi d'e-mail automatique à la créati
 MultipleEmailsSeparator = Pour assigner plusieurs e-mail à notifier, séparez par un ";". Par exemple : "aaaa@bbb.cc;dddd@eee.ff"
 TicketCategories = Catégories des tickets
 TicketExtrafields = Extrafields des tickets
-ParentCategorySetting = Cette option permet de définir la catégorie parente pour l'interface publique des tickets
+MainCategorySetting = Cette option permet de définir la catégorie principale pour l'interface publique des tickets
+ParentCategorySetting = Cette option permet de définir le nom de la catégorie parent pour l'interface publique des tickets
+ChildCategorySetting = Cette option permet de définir le nom de la catégorie enfant pour l'interface publique des tickets
 TicketManagement = Gestion des tickets
+MainCategory = Catégorie principale
+ParentCategoryLabel = Nom de la catégorie parent
+ChildCategoryLabel = Nom de la catégorie enfant
 
 # Ticket document
 
