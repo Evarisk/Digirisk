@@ -339,7 +339,7 @@ print '<div class="centpercent tableforimgfields form-registre">' . "\n";
 print '<p><strong>' . $conf->global->DIGIRISKDOLIBARR_TICKET_PARENT_CATEGORY_LABEL . '</strong></p>';
 print '';
 
-$parentCategoryObject = $category->rechercher($conf->global->DIGIRISKDOLIBARR_TICKET_PARENT_CATEGORY, '', 'ticket', true);
+$parentCategoryObject = $category->rechercher($conf->global->DIGIRISKDOLIBARR_TICKET_MAIN_CATEGORY, '', 'ticket', true);
 
 print '<div class="wpeo-gridlayout grid-3">';
 if ( ! empty($parentCategoryObject) && $parentCategoryObject > 0) {
