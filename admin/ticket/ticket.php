@@ -75,8 +75,8 @@ if ($action == 'setEmails') {
 
 if ($action == 'generateExtrafields') {
 	$ret1 = $extra_fields->addExtraField('digiriskdolibarr_ticket_lastname', $langs->trans("LastName"), 'varchar', 2000, 255, 'ticket', 0, 0, '', '', 1, '', 1);
-	$ret2 = $extra_fields->addExtraField('digiriskdolibarr_ticket_firstname', $langs->trans("FirstName"), 'varchar', 2100, 255, 'ticket', 0, 0, '', '', 1, '', 1);
-	$ret3 = $extra_fields->addExtraField('digiriskdolibarr_ticket_phone', $langs->trans("Phone"), 'phone', 2200, '', 'ticket', 0, 0, '', '', 1, '', 1);
+	$ret2 = $extra_fields->addExtraField('digiriskdolibarr_ticket_firstname', $langs->transnoentities("FirstName"), 'varchar', 2100, 255, 'ticket', 0, 0, '', '', 1, '', 1);
+	$ret3 = $extra_fields->addExtraField('digiriskdolibarr_ticket_phone', $langs->transnoentities("Phone"), 'phone', 2200, '', 'ticket', 0, 0, '', '', 1, '', 1);
 	$ret4 = $extra_fields->addExtraField('digiriskdolibarr_ticket_service', $langs->trans("Service"), 'varchar', 2300, 255, 'ticket', 0, 0, '', '', 1, '', 1);
 	$ret5 = $extra_fields->addExtraField('digiriskdolibarr_ticket_location', $langs->trans("Location"), 'varchar', 2400, 255, 'ticket', 0, 0, '', '', 1, '', 1);
 	$ret6 = $extra_fields->addExtraField('digiriskdolibarr_ticket_date', $langs->trans("Date"), 'datetime', 2500, '', 'ticket', 0, 0, '', '', 1, '', 1);
@@ -133,7 +133,7 @@ if ($action == 'generateCategories') {
 			setEventMessages($category->error, null, 'errors');
 		}
 
-		$category->label       = $langs->trans('SST');
+		$category->label       = $langs->transnoentities('SST');
 		$category->description = '';
 		$category->color       = '';
 		$category->visible     = 1;
@@ -142,7 +142,7 @@ if ($action == 'generateCategories') {
 		$result3               = $category->create($user);
 
 		if ($result3 > 0) {
-			$category->label       = $langs->trans('AnticipatedLeave');
+			$category->label       = $langs->transnoentities('AnticipatedLeave');
 			$category->description = '';
 			$category->color       = '';
 			$category->visible     = 1;
@@ -158,7 +158,7 @@ if ($action == 'generateCategories') {
 			$category->fk_parent   = $result3;
 			$category->create($user);
 
-			$category->label       = $langs->trans('HumanProblem');
+			$category->label       = $langs->transnoentities('HumanProblem');
 			$category->description = '';
 			$category->color       = '';
 			$category->visible     = 1;
@@ -166,7 +166,7 @@ if ($action == 'generateCategories') {
 			$category->fk_parent   = $result3;
 			$category->create($user);
 
-			$category->label       = $langs->trans('MaterialProblem');
+			$category->label       = $langs->transnoentities('MaterialProblem');
 			$category->description = '';
 			$category->color       = '';
 			$category->visible     = 1;
@@ -174,7 +174,7 @@ if ($action == 'generateCategories') {
 			$category->fk_parent   = $result3;
 			$category->create($user);
 
-			$category->label       = $langs->trans('EnhancementSuggestion');
+			$category->label       = $langs->transnoentities('EnhancementSuggestion');
 			$category->description = '';
 			$category->color       = '';
 			$category->visible     = 1;

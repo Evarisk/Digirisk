@@ -488,7 +488,7 @@ if (empty($reshook)) {
 			if ( ! empty($signatories) && $signatories > 0) {
 				foreach ($signatories as $arrayRole) {
 					foreach ($arrayRole as $signatory) {
-						$signatory->signature = $langs->trans("FileGenerated");
+						$signatory->signature = $langs->transnoentities("FileGenerated");
 						$signatory->update($user, false);
 					}
 				}

@@ -285,12 +285,14 @@ class doc_ticketdocument_odt extends ModeleODTTicketDocument
 
 			if (preg_match('/_events/', $filename[1])) {
 				$foundtagforlines = 1;
+				$events = '_events';
 			} else {
 				$foundtagforlines = 0;
+				$events = '';
 			}
 
 			$date     = dol_print_date(dol_now(), 'dayxcard');
-			$filename = $date . '_' . $ref . '_' . $objectref . '_' . $conf->global->MAIN_INFO_SOCIETE_NOM . '.odt';
+			$filename = $date . '_' . $ref . '_' . $objectref . '_' . $conf->global->MAIN_INFO_SOCIETE_NOM . $events . '.odt';
 			$filename = str_replace(' ', '_', $filename);
 			$filename = dol_sanitizeFileName($filename);
 
@@ -369,11 +371,22 @@ class doc_ticketdocument_odt extends ModeleODTTicketDocument
 			$user->fetch($ticket->fk_user_assign);
 			$tmparray['assigned_to'] = $user->firstname . ' ' . $user->lastname;
 
-			$photo_path = $conf->ticket->multidir_output[$conf->entity] . '/' . $ticket->ref . '/thumbs/';
-			$filearray = dol_dir_list($photo_path, "files", 0, '', '(\.odt|_preview.*\.png)$', 'date', 'desc', 1);
+			$photo_path = $conf->ticket->multidir_output[$conf->entity] . '/' . $ticket->ref;
+			$filearray = dol_dir_list($photo_path, "files", 0, '', '(\.odt|_preview.*\.png|\.pdf)$', 'date', 'desc', 1);
+
+			require_once DOL_DOCUMENT_ROOT . '/ecm/class/ecmfiles.class.php';
+
+			$ecm = new EcmFiles($this->db);
 
 			if (count($filearray)) {
-				$tmparray['photo'] = $photo_path . $filearray[1]['name'];
+				foreach ($filearray as $key => $item) {
+					$ecm->fetch('', '', 'ticket/'.$ticket->ref.'/'.$filearray[$key]['name']);
+					$filearray[$key]['position'] = $ecm->position;
+				}
+				$filearray = dol_sort_array($filearray, 'position');
+				$file_small               = preg_split('/\./', $filearray[0]['name']);
+				$new_file                 = $file_small[0] . '_small.' . $file_small[1];
+				$tmparray['photo'] = $photo_path . '/thumbs/' . $new_file;
 			} else {
 				$nophoto                  = '/public/theme/common/nophoto.png';
 				$tmparray['photo'] = DOL_DOCUMENT_ROOT . $nophoto;

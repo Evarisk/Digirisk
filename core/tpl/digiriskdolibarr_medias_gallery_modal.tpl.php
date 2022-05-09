@@ -19,7 +19,7 @@ if ( ! $error && $action == "uploadPhoto" && ! empty($conf->global->MAIN_UPLOAD_
 	}
 	if ( ! $error) {
 		$generatethumbs = 1;
-		$res            = dol_add_file_process($upload_dir, 0, 1, 'userfile', '', null, '', $generatethumbs);
+		$res            = digirisk_dol_add_file_process($upload_dir, 0, 1, 'userfile', '', null, '', $generatethumbs);
 		if ($res > 0) {
 			$result = $ecmdir->changeNbOfFiles('+');
 		}

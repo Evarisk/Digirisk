@@ -132,7 +132,7 @@ if (empty($reshook)) {
 		$user_employer_id   = GETPOST('fk_user_employer');
 		$digiriskelement_id = GETPOST('fk_element');
 		$label              = GETPOST('label');
-		$description        = GETPOST('description', 'restricthtml');
+		$description        = GETPOST('description');
 		$accident_type      = GETPOST('accident_type');
 		$external_accident  = GETPOST('external_accident');
 		$accident_location  = GETPOST('accident_location');
@@ -220,7 +220,7 @@ if (empty($reshook)) {
 				if ( ! $error) {
 					dol_mkdir($filedir);
 					if ( ! empty($filedir)) {
-						$result        = dol_add_file_process($filedir, 0, 1, 'userfile', '', null, '', 1, $object);
+						$result        = digirisk_dol_add_file_process($filedir, 0, 1, 'userfile', '', null, '', 1, $object);
 						$object->photo = $_FILES['userfile']['name'][0];
 					}
 				}
@@ -342,7 +342,7 @@ if (empty($reshook)) {
 				if ( ! $error) {
 					dol_mkdir($filedir);
 					if ( ! empty($filedir)) {
-						$result        = dol_add_file_process($filedir, 0, 1, 'userfile', '', null, '', 1, $object);
+						$result        = digirisk_dol_add_file_process($filedir, 0, 1, 'userfile', '', null, '', 1, $object);
 						$object->photo = $_FILES['userfile']['name'][0];
 					}
 				}
@@ -514,7 +514,7 @@ if (empty($reshook)) {
 			if ( ! $error) {
 				dol_mkdir($filedir);
 				if ( ! empty($filedir)) {
-					$result = dol_add_file_process($filedir, 0, 1, 'files', '', null, '', 1, $object);
+					$result = digirisk_dol_add_file_process($filedir, 0, 1, 'files', '', null, '', 1, $object);
 				}
 			}
 		}

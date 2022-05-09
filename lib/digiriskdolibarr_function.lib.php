@@ -807,7 +807,7 @@ function display_recurse_tree($results)
 		}
 		if ( ! $error) {
 			$generatethumbs = 1;
-			$res            = dol_add_file_process($upload_dir, 0, 1, 'userfile', '', null, '', $generatethumbs);
+			$res            = digirisk_dol_add_file_process($upload_dir, 0, 1, 'userfile', '', null, '', $generatethumbs);
 			if ($res > 0) {
 				$ecmdir->changeNbOfFiles('+');
 			}
@@ -2612,4 +2612,162 @@ function deleteObjectLinkedDigirisk($object, $sourceid = null, $sourcetype = '',
 		$object->db->rollback();
 		return 0;
 	}
+}
+
+/**
+ * Get and save an upload file (for example after submitting a new file a mail form). Database index of file is also updated if donotupdatesession is set.
+ * All information used are in db, conf, langs, user and _FILES.
+ * Note: This function can be used only into a HTML page context.
+ *
+ * @param	string	$upload_dir				Directory where to store uploaded file (note: used to forge $destpath = $upload_dir + filename)
+ * @param	int		$allowoverwrite			1=Allow overwrite existing file
+ * @param	int		$donotupdatesession		1=Do no edit _SESSION variable but update database index. 0=Update _SESSION and not database index. -1=Do not update SESSION neither db.
+ * @param	string	$varfiles				_FILES var name
+ * @param	string	$savingdocmask			Mask to use to define output filename. For example 'XXXXX-__YYYYMMDD__-__file__'
+ * @param	string	$link					Link to add (to add a link instead of a file)
+ * @param   string  $trackid                Track id (used to prefix name of session vars to avoid conflict)
+ * @param	int		$generatethumbs			1=Generate also thumbs for uploaded image files
+ * @param   Object  $object                 Object used to set 'src_object_*' fields
+ * @return	int                             <=0 if KO, >0 if OK
+ * @see dol_remove_file_process()
+ */
+function digirisk_dol_add_file_process($upload_dir, $allowoverwrite = 0, $donotupdatesession = 0, $varfiles = 'addedfile', $savingdocmask = '', $link = null, $trackid = '', $generatethumbs = 1, $object = null)
+{
+	global $db, $user, $conf, $langs;
+
+	$res = 0;
+
+	if (!empty($_FILES[$varfiles])) { // For view $_FILES[$varfiles]['error']
+		dol_syslog('digirisk_dol_add_file_process upload_dir='.$upload_dir.' allowoverwrite='.$allowoverwrite.' donotupdatesession='.$donotupdatesession.' savingdocmask='.$savingdocmask, LOG_DEBUG);
+
+		$result = dol_mkdir($upload_dir);
+		//      var_dump($result);exit;
+		if ($result >= 0) {
+			$TFile = $_FILES[$varfiles];
+			if (!is_array($TFile['name'])) {
+				foreach ($TFile as $key => &$val) {
+					$val = array($val);
+				}
+			}
+
+			$nbfile = count($TFile['name']);
+			$nbok = 0;
+			for ($i = 0; $i < $nbfile; $i++) {
+				if (empty($TFile['name'][$i])) {
+					continue; // For example, when submitting a form with no file name
+				}
+
+				// Define $destfull (path to file including filename) and $destfile (only filename)
+				$destfull = $upload_dir."/".$TFile['name'][$i];
+				$destfile = $TFile['name'][$i];
+				$destfilewithoutext = preg_replace('/\.[^\.]+$/', '', $destfile);
+
+				if ($savingdocmask && strpos($savingdocmask, $destfilewithoutext) !== 0) {
+					$destfull = $upload_dir."/".preg_replace('/__file__/', $TFile['name'][$i], $savingdocmask);
+					$destfile = preg_replace('/__file__/', $TFile['name'][$i], $savingdocmask);
+				}
+
+				$filenameto = basename($destfile);
+				if (preg_match('/^\./', $filenameto)) {
+					$langs->load("errors"); // key must be loaded because we can't rely on loading during output, we need var substitution to be done now.
+					setEventMessages($langs->trans("ErrorFilenameCantStartWithDot", $filenameto), null, 'errors');
+					break;
+				}
+
+				// dol_sanitizeFileName the file name and lowercase extension
+				$info = pathinfo($destfull);
+				$destfull = $info['dirname'].'/'.dol_sanitizeFileName($info['filename'].($info['extension'] != '' ? ('.'.strtolower($info['extension'])) : ''));
+				$info = pathinfo($destfile);
+
+				$destfile = dol_sanitizeFileName($info['filename'].($info['extension'] != '' ? ('.'.strtolower($info['extension'])) : ''));
+
+				// We apply dol_string_nohtmltag also to clean file names (this remove duplicate spaces) because
+				// this function is also applied when we rename and when we make try to download file (by the GETPOST(filename, 'alphanohtml') call).
+				$destfile = dol_string_nohtmltag($destfile);
+				$destfull = dol_string_nohtmltag($destfull);
+
+				// Move file from temp directory to final directory. A .noexe may also be appended on file name.
+				$resupload = dol_move_uploaded_file($TFile['tmp_name'][$i], $destfull, $allowoverwrite, 0, $TFile['error'][$i], 0, $varfiles, $upload_dir);
+
+				if (is_numeric($resupload) && $resupload > 0) {   // $resupload can be 'ErrorFileAlreadyExists'
+					global $maxwidthsmall, $maxheightsmall, $maxwidthmini, $maxheightmini;
+
+					include_once DOL_DOCUMENT_ROOT.'/core/lib/images.lib.php';
+
+					// Generate thumbs.
+					if ($generatethumbs) {
+						if (image_format_supported($destfull) == 1) {
+							// Create thumbs
+							// We can't use $object->addThumbs here because there is no $object known
+							vignette($destfull, $conf->global->DIGIRISKDOLIBARR_MEDIA_MAX_WIDTH_LARGE, $conf->global->DIGIRISKDOLIBARR_MEDIA_MAX_HEIGHT_LARGE, '_large', 50, "thumbs");
+							vignette($destfull, $conf->global->DIGIRISKDOLIBARR_MEDIA_MAX_WIDTH_MEDIUM, $conf->global->DIGIRISKDOLIBARR_MEDIA_MAX_HEIGHT_MEDIUM, '_medium', 50, "thumbs");
+							// Used on logon for example
+							$imgThumbSmall = vignette($destfull, $maxwidthsmall, $maxheightsmall, '_small', 50, "thumbs");
+							// Create mini thumbs for image (Ratio is near 16/9)
+							// Used on menu or for setup page for example
+							$imgThumbMini = vignette($destfull, $maxwidthmini, $maxheightmini, '_mini', 50, "thumbs");
+						}
+					}
+
+					// Update session
+					if (empty($donotupdatesession)) {
+						include_once DOL_DOCUMENT_ROOT.'/core/class/html.formmail.class.php';
+						$formmail = new FormMail($db);
+						$formmail->trackid = $trackid;
+						$formmail->add_attached_files($destfull, $destfile, $TFile['type'][$i]);
+					}
+
+					// Update index table of files (llx_ecm_files)
+					if ($donotupdatesession == 1) {
+						$result = addFileIntoDatabaseIndex($upload_dir, basename($destfile).($resupload == 2 ? '.noexe' : ''), $TFile['name'][$i], 'uploaded', 0, $object);
+						if ($result < 0) {
+							if ($allowoverwrite) {
+								// Do not show error message. We can have an error due to DB_ERROR_RECORD_ALREADY_EXISTS
+							} else {
+								setEventMessages('WarningFailedToAddFileIntoDatabaseIndex', '', 'warnings');
+							}
+						}
+					}
+
+					$nbok++;
+				} else {
+					$langs->load("errors");
+					if ($resupload < 0) {	// Unknown error
+						setEventMessages($langs->trans("ErrorFileNotUploaded"), null, 'errors');
+					} elseif (preg_match('/ErrorFileIsInfectedWithAVirus/', $resupload)) {	// Files infected by a virus
+						setEventMessages($langs->trans("ErrorFileIsInfectedWithAVirus"), null, 'errors');
+					} else // Known error
+					{
+						setEventMessages($langs->trans($resupload), null, 'errors');
+					}
+				}
+			}
+			if ($nbok > 0) {
+				$res = 1;
+				setEventMessages($langs->trans("FileTransferComplete"), null, 'mesgs');
+			}
+		} else {
+			setEventMessages($langs->trans("ErrorFailedToCreateDir", $upload_dir), null, 'errors');
+		}
+	} elseif ($link) {
+		require_once DOL_DOCUMENT_ROOT.'/core/class/link.class.php';
+		$linkObject = new Link($db);
+		$linkObject->entity = $conf->entity;
+		$linkObject->url = $link;
+		$linkObject->objecttype = GETPOST('objecttype', 'alpha');
+		$linkObject->objectid = GETPOST('objectid', 'int');
+		$linkObject->label = GETPOST('label', 'alpha');
+		$res = $linkObject->create($user);
+		$langs->load('link');
+		if ($res > 0) {
+			setEventMessages($langs->trans("LinkComplete"), null, 'mesgs');
+		} else {
+			setEventMessages($langs->trans("ErrorFileNotLinked"), null, 'errors');
+		}
+	} else {
+		$langs->load("errors");
+		setEventMessages($langs->trans("ErrorFieldRequired", $langs->transnoentities("File")), null, 'errors');
+	}
+
+	return $res;
 }

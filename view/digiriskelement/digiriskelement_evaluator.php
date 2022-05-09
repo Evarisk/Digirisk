@@ -246,7 +246,7 @@ if ($object->id > 0 || $fromid > 0) {
 		$head = digiriskelementPrepareHead($object);
 		print dol_get_fiche_head($head, 'elementEvaluator', $title, -1, "digiriskdolibarr@digiriskdolibarr");
 	} else {
-		print dol_get_fiche_head($head, 'participation', $title, -1, "digiriskdolibarr@digiriskdolibarr");
+		print dol_get_fiche_head($head, 'participation', $langs->trans('User'), -1, "user");
 	}
 
 	// Object card
@@ -273,7 +273,7 @@ if ($object->id > 0 || $fromid > 0) {
 	} else {
 		$linkback = '<a href="' . DOL_URL_ROOT . '/user/list.php?restore_lastsearch_values=1">' . $langs->trans("BackToList") . '</a>';
 
-		dol_banner_tab($userObject, 'id', $linkback, $user->rights->user->user->lire || $user->admin);
+		dol_banner_tab($userObject, 'fromid', $linkback, $user->rights->user->user->lire || $user->admin);
 	}
 
 	if ($fromid) {
