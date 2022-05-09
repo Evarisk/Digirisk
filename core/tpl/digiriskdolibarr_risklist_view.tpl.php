@@ -623,7 +623,7 @@
 															<?php foreach ($critere['option']['survey']['request'] as $request) : ?>
 																<div class="table-cell can-select cell-<?php echo  $risk->id ? $risk->id : 0 ; ?>"
 																	 data-type="<?php echo $name ?>"
-																	 data-id="<?php echo  $risk->id ? $risk->id : 0 ; ?>"
+																	 data-id="<?php echo  $risk->id ?: 0 ; ?>"
 																	 data-evaluation-id="<?php echo $evaluation_id ? $evaluation_id : 0 ; ?>"
 																	 data-variable-id="<?php echo $l ; ?>"
 																	 data-seuil="<?php echo  $request['seuil']; ?>">
