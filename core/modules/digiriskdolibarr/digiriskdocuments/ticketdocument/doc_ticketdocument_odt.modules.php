@@ -373,16 +373,17 @@ class doc_ticketdocument_odt extends ModeleODTTicketDocument
 
 			$photo_path = $conf->ticket->multidir_output[$conf->entity] . '/' . $ticket->ref;
 			$filearray = dol_dir_list($photo_path, "files", 0, '', '(\.odt|_preview.*\.png|\.pdf)$', 'date', 'desc', 1);
+			if ($photo_path) {
+				$relativedir = preg_replace('/^'.preg_quote(DOL_DATA_ROOT, '/').'/', '', $photo_path);
+				$relativedir = preg_replace('/^[\\/]/', '', $relativedir);
+			}
+			completeFileArrayWithDatabaseInfo($filearray, $relativedir);
 
 			require_once DOL_DOCUMENT_ROOT . '/ecm/class/ecmfiles.class.php';
 
 			$ecm = new EcmFiles($this->db);
 
 			if (count($filearray)) {
-				foreach ($filearray as $key => $item) {
-					$ecm->fetch('', '', 'ticket/'.$ticket->ref.'/'.$filearray[$key]['name']);
-					$filearray[$key]['position'] = $ecm->position;
-				}
 				$filearray = dol_sort_array($filearray, 'position');
 				$file_small               = preg_split('/\./', $filearray[0]['name']);
 				$new_file                 = $file_small[0] . '_small.' . $file_small[1];
