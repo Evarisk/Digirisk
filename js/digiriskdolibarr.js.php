@@ -1373,7 +1373,7 @@ window.eoxiaJS.mediaGallery.previewPhoto = function( event ) {
 			clearInterval(checkExist);
 			$( document ).find('.ui-dialog').addClass('preview-photo');
 		}
-	}, 100); // check every 100ms
+	}, 100);
 };
 
 /**

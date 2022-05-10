@@ -1828,7 +1828,7 @@ class modDigiriskdolibarr extends DolibarrModules
 		global $conf;
 
 		$sql = array();
-
+		require_once __DIR__ . '/../../../../core/lib/admin.lib.php';
 		$options = 'noremoverights';
 
 		if (!empty($conf->global->MULTICOMPANY_EXTERNAL_MODULES_SHARING) && $conf->global->MULTICOMPANY_EXTERNAL_MODULES_SHARING !== 0) {
