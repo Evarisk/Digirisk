@@ -1287,6 +1287,7 @@ window.eoxiaJS.mediaGallery.savePhoto = function( event ) {
 				photoContainer.addClass('digirisk-element')
 				photoContainer.closest('.unit-container').find('.digirisk-element-medias-modal').load(document.URL+ ' #digirisk_element_medias_modal_'+idToSave)
 
+				favorite = favorite.replace(/\ /g, '%20')
 				if (idToSave === currentElementID) {
 					let digiriskBanner = $('.arearef.heightref')
 					digiriskBanner.load(document.URL+'&favorite='+favorite + ' .arearef.heightref')
