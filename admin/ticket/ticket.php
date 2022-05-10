@@ -349,7 +349,7 @@ if ( ! empty($conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE)) {
 	print $conf->global->DIGIRISKDOLIBARR_TICKET_CATEGORIES_CREATED ? $langs->trans('AlreadyGenerated') : $langs->trans('NotCreated');
 	print '</td>';
 	print '<td class="center">';
-	print $conf->global->DIGIRISKDOLIBARR_TICKET_CATEGORIES_CREATED ? '<input type="submit" class=" butActionRefused" value="'.$langs->trans('Create') .'">' : '<input type="submit" class="button" value="'.$langs->trans('Create') .'">' ;
+	print $conf->global->DIGIRISKDOLIBARR_TICKET_CATEGORIES_CREATED ? '<a type="" class=" butActionRefused" value="">'.$langs->trans('Create') .'</a>' : '<input type="submit" class="button" value="'.$langs->trans('Create') .'">' ;
 	print '</td>';
 
 	print '<td class="center">';
@@ -450,7 +450,7 @@ if ( ! empty($conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE)) {
 	print $conf->global->DIGIRISKDOLIBARR_TICKET_EXTRAFIELDS ? $langs->trans('AlreadyGenerated') : $langs->trans('NotCreated');
 	print '</td>';
 	print '<td class="center">';
-	print $conf->global->DIGIRISKDOLIBARR_TICKET_EXTRAFIELDS ? '<input type="submit" class=" butActionRefused" value="'.$langs->trans('Create') .'">' : '<input type="submit" class="button" value="'.$langs->trans('Create') .'">' ;
+	print $conf->global->DIGIRISKDOLIBARR_TICKET_EXTRAFIELDS ? '<a type="" class=" butActionRefused" value="">'.$langs->trans('Create') .'</a>' : '<input type="submit" class="button" value="'.$langs->trans('Create') .'">' ;
 	print '</td>';
 
 	print '<td class="center">';
