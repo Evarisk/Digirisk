@@ -1338,9 +1338,9 @@ MainCategorySetting = Cette option permet de définir la catégorie principale p
 ParentCategorySetting = Cette option permet de définir le nom de la catégorie parent pour l'interface publique des tickets
 ChildCategorySetting = Cette option permet de définir le nom de la catégorie enfant pour l'interface publique des tickets
 TicketManagement = Gestion des tickets
-MainCategory = Catégorie principale
-ParentCategoryLabel = Nom de la catégorie parent
-ChildCategoryLabel = Nom de la catégorie enfant
+MainCategory = Choix de la catégorie principale
+ParentCategoryLabel = Titre de la catégorie parent
+ChildCategoryLabel = Titre de la catégorie enfant
 
 # Ticket document
 
