@@ -67,10 +67,12 @@ $value      = GETPOST('value', 'alpha');
 if ($action == 'setPublicInterface') {
 	if (GETPOST('value')) dolibarr_set_const($db, 'DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE', 1, 'integer', 0, '', $conf->entity);
 	else dolibarr_set_const($db, 'DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE', 0, 'integer', 0, '', $conf->entity);
+	setEventMessages($langs->trans('TicketPublicInterfaceEnabled'), array());
 }
 
 if ($action == 'setEmails') {
 	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_TICKET_SUBMITTED_SEND_MAIL_TO', GETPOST('emails'), 'integer', 0, '', $conf->entity);
+	setEventMessages($langs->trans('EmailsToNotifySet'), array());
 }
 
 if ($action == 'generateExtrafields') {
@@ -205,16 +207,19 @@ if ($action == 'generateCategories') {
 if ($action == 'setMainCategory') {
 	$category_id = GETPOST('mainCategory');
 	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_TICKET_MAIN_CATEGORY', $category_id, 'integer', 0, '', $conf->entity);
+	setEventMessages($langs->trans('MainCategorySet'), array());
 }
 
 if ($action == 'setParentCategoryLabel') {
 	$label = GETPOST('parentCategoryLabel');
 	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_TICKET_PARENT_CATEGORY_LABEL', $label, 'chaine', 0, '', $conf->entity);
+	setEventMessages($langs->trans('ParentCategoryLabelSet'), array());
 }
 
 if ($action == 'setChildCategoryLabel') {
 	$label = GETPOST('childCategoryLabel');
 	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_TICKET_CHILD_CATEGORY_LABEL', $label, 'chaine', 0, '', $conf->entity);
+	setEventMessages($langs->trans('ChildCategoryLabelSet'), array());
 }
 
 /*

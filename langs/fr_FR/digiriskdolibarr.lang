@@ -1335,12 +1335,17 @@ MultipleEmailsSeparator = Pour assigner plusieurs e-mail à notifier, séparez p
 TicketCategories = Catégories des tickets
 TicketExtrafields = Extrafields des tickets
 MainCategorySetting = Cette option permet de définir la catégorie principale pour l'interface publique des tickets
-ParentCategorySetting = Cette option permet de définir le nom de la catégorie parent pour l'interface publique des tickets
-ChildCategorySetting = Cette option permet de définir le nom de la catégorie enfant pour l'interface publique des tickets
+ParentCategorySetting = Cette option permet de définir le titre de la catégorie parent pour l'interface publique des tickets
+ChildCategorySetting = Cette option permet de définir le titre de la catégorie enfant pour l'interface publique des tickets
 TicketManagement = Gestion des tickets
 MainCategory = Choix de la catégorie principale
 ParentCategoryLabel = Titre de la catégorie parent
 ChildCategoryLabel = Titre de la catégorie enfant
+TicketPublicInterfaceEnabled = L'interface publique des tickets a été activée
+EmailsToNotifySet = Les adresses e-mail à notifier ont bien été enregistrées
+MainCategorySet = La catégorie principale a été définie
+ParentCategoryLabelSet = Le titre de la catégorie parent a été défini
+ChildCategoryLabelSet = Le titre de la catégorie enfant a été défini
 
 # Ticket document
 
