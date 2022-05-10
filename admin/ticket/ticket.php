@@ -344,7 +344,7 @@ if ( ! empty($conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE)) {
 	print '<input type="hidden" name="action" value="generateCategories">';
 	print '<input type="hidden" name="backtopage" value="' . $backtopage . '">';
 
-	print '<tr class="oddeven"><td>' . $langs->trans("GenerateCategories") . '</td>';
+	print '<tr class="oddeven"><td>' . $langs->trans("GenerateCategories") . '<sup> 1</sup></td>';
 	print '<td class="center">';
 	print $conf->global->DIGIRISKDOLIBARR_TICKET_CATEGORIES_CREATED ? $langs->trans('AlreadyGenerated') : $langs->trans('NotCreated');
 	print '</td>';
@@ -388,7 +388,7 @@ if ( ! empty($conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE)) {
 	print '<input type="hidden" name="action" value="setParentCategoryLabel">';
 	print '<input type="hidden" name="backtopage" value="' . $backtopage . '">';
 
-	print '<tr class="oddeven"><td>' . $langs->trans("ParentCategoryLabel") . '</td>';
+	print '<tr class="oddeven"><td>' . $langs->trans("ParentCategoryLabel") . '<sup> 2</sup></td>';
 	print '<td class="center">';
 	print '<input name="parentCategoryLabel" value="'. $conf->global->DIGIRISKDOLIBARR_TICKET_PARENT_CATEGORY_LABEL .'">';
 	print '</td>';
@@ -410,7 +410,7 @@ if ( ! empty($conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE)) {
 	print '<input type="hidden" name="action" value="setChildCategoryLabel">';
 	print '<input type="hidden" name="backtopage" value="' . $backtopage . '">';
 
-	print '<tr class="oddeven"><td>' . $langs->trans("ChildCategoryLabel") . '</td>';
+	print '<tr class="oddeven"><td>' . $langs->trans("ChildCategoryLabel") . '<sup> 3</sup></td>';
 	print '<td class="center">';
 	print '<input name="childCategoryLabel" value="'. $conf->global->DIGIRISKDOLIBARR_TICKET_CHILD_CATEGORY_LABEL .'">';
 	print '</td>';
@@ -445,7 +445,7 @@ if ( ! empty($conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE)) {
 	print '<input type="hidden" name="action" value="generateExtrafields">';
 	print '<input type="hidden" name="backtopage" value="' . $backtopage . '">';
 
-	print '<tr class="oddeven"><td>' . $langs->trans("GenerateExtrafields") . '</td>';
+	print '<tr class="oddeven"><td>' . $langs->trans("GenerateExtrafields") . '<sup> 4</sup></td>';
 	print '<td class="center">';
 	print $conf->global->DIGIRISKDOLIBARR_TICKET_EXTRAFIELDS ? $langs->trans('AlreadyGenerated') : $langs->trans('NotCreated');
 	print '</td>';
@@ -461,6 +461,8 @@ if ( ! empty($conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE)) {
 
 	print '</table>';
 	print '</div>';
+
+	print '<img style="display: block; margin-left: auto; margin-right: auto; width: 50%;" src="'. DOL_URL_ROOT . '/custom/digiriskdolibarr/img/interfacepubliquetickets.PNG'.'">';
 }
 
 
