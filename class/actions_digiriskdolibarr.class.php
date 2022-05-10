@@ -95,34 +95,37 @@ class ActionsDigiriskdolibarr
 			}
 			print ajax_combobox('selectDIGIRISKDOLIBARR_COLLECTIVE_AGREEMENT_TITLE');
 		} else if ($parameters['currentcontext'] == 'ticketcard') {
-			require_once __DIR__ . '/../lib/digiriskdolibarr_function.lib.php';
-			require_once __DIR__ . '/../class/digiriskdocuments/ticketdocument.class.php';
-			require_once __DIR__ . '/../core/modules/digiriskdolibarr/digiriskdocuments/ticketdocument/mod_ticketdocument_standard.php';
-			require_once __DIR__ . '/../core/modules/digiriskdolibarr/digiriskdocuments/ticketdocument/modules_ticketdocument.php';
-			global $langs, $user;
+			if (GETPOST('action') == 'view' || empty(GETPOST('action'))) {
+				require_once __DIR__ . '/../lib/digiriskdolibarr_function.lib.php';
+				require_once __DIR__ . '/../class/digiriskdocuments/ticketdocument.class.php';
+				require_once __DIR__ . '/../core/modules/digiriskdolibarr/digiriskdocuments/ticketdocument/mod_ticketdocument_standard.php';
+				require_once __DIR__ . '/../core/modules/digiriskdolibarr/digiriskdocuments/ticketdocument/modules_ticketdocument.php';
+				global $langs, $user;
 
-			$object = new Ticket($this->db);
-			$result = $object->fetch(GETPOST('id'),GETPOST('ref','alpha'),GETPOST('track_id','alpha'));
-			$upload_dir = $conf->digiriskdolibarr->multidir_output[isset($object->entity) ? $object->entity : 1];
-			$objref    = dol_sanitizeFileName($object->ref);
-			$dir_files = $object->element . 'document/' . $objref;
+				$object = new Ticket($this->db);
+				$result = $object->fetch(GETPOST('id'),GETPOST('ref','alpha'),GETPOST('track_id','alpha'));
+				$upload_dir = $conf->digiriskdolibarr->multidir_output[isset($object->entity) ? $object->entity : 1];
+				$objref    = dol_sanitizeFileName($object->ref);
+				$dir_files = $object->element . 'document/' . $objref;
 
-			$filedir   = $upload_dir . '/' . $dir_files;
-			$urlsource = $_SERVER["PHP_SELF"] . '?id=' . $object->id;
+				$filedir   = $upload_dir . '/' . $dir_files;
+				$urlsource = $_SERVER["PHP_SELF"] . '?id=' . $object->id;
 
-			$modulepart   = 'digiriskdolibarr:TicketDocument';
-			$defaultmodel = $conf->global->DIGIRISKDOLIBARR_TICKET_DEFAULT_MODEL;
-			$pictopath = dol_buildpath('/digiriskdolibarr/img/digiriskdolibarr32px.png', 1);
-			$pictoDigirisk = img_picto('', $pictopath, '', 1, 0, 0, '', 'pictoDigirisk');
-			$title        = $pictoDigirisk . $langs->trans('TicketDocument');
+				$modulepart   = 'digiriskdolibarr:TicketDocument';
+				$defaultmodel = $conf->global->DIGIRISKDOLIBARR_TICKET_DEFAULT_MODEL;
+				$pictopath = dol_buildpath('/digiriskdolibarr/img/digiriskdolibarr32px.png', 1);
+				$pictoDigirisk = img_picto('', $pictopath, '', 1, 0, 0, '', 'pictoDigirisk');
+				$title        = $pictoDigirisk . $langs->trans('TicketDocument');
 
-			$html = digiriskshowdocuments($modulepart, $dir_files, $filedir, $urlsource, 1, 0, $defaultmodel, 1, 0, '', $title, '', '', '', 0, 'remove_file');
-			?>
+				$html = digiriskshowdocuments($modulepart, $dir_files, $filedir, $urlsource, 1, 0, $defaultmodel, 1, 0, '', $title, '', '', '', 0, 'remove_file');
+				?>
 
-			<script>
-				jQuery('.fichehalfleft .div-table-responsive-no-min').append(<?php echo json_encode($html) ; ?>)
-			</script>
-			<?php
+				<script>
+					jQuery('.fichehalfleft .div-table-responsive-no-min').append(<?php echo json_encode($html) ; ?>)
+				</script>
+				<?php
+			}
+
 		}
 
 		if (true) {
