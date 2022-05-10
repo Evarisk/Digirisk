@@ -310,7 +310,7 @@ if ( ! empty($conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE)) {
 	print '<input name="emails" id="emails" value="' . $conf->global->DIGIRISKDOLIBARR_TICKET_SUBMITTED_SEND_MAIL_TO . '">';
 	print '</td>';
 	print '<td class="center">';
-	print '<button class="wpeo-button" type="submit">' . $langs->trans('Save') . '</button>';
+	print '<input type="submit" class="button" value="'. $langs->trans('Save').'">';
 	print '</td>';
 	print '<td class="center">';
 	print $form->textwithpicto('', $langs->trans("MultipleEmailsSeparator"), 1, 'help');
@@ -344,7 +344,7 @@ if ( ! empty($conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE)) {
 	print $conf->global->DIGIRISKDOLIBARR_TICKET_CATEGORIES_CREATED ? $langs->trans('AlreadyGenerated') : $langs->trans('NotCreated');
 	print '</td>';
 	print '<td class="center">';
-	print $conf->global->DIGIRISKDOLIBARR_TICKET_CATEGORIES_CREATED ? '<button type="submit" class="wpeo-button button-disable">' . $langs->trans('Create') . '</button> ' : '<button type="submit" class="wpeo-button button-blue">' . $langs->trans('Create') . '</button>';
+	print $conf->global->DIGIRISKDOLIBARR_TICKET_CATEGORIES_CREATED ? '<input type="submit" class=" butActionRefused" value="'.$langs->trans('Create') .'">' : '<input type="submit" class="button" value="'.$langs->trans('Create') .'">' ;
 	print '</td>';
 
 	print '<td class="center">';
@@ -367,7 +367,7 @@ if ( ! empty($conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE)) {
 	print '</td>';
 
 	print '<td class="center">';
-	print '<button type="submit" class="wpeo-button button-blue">' . $langs->trans('Validate') . '</button>';
+	print '<input type="submit" class="button" value="'. $langs->trans('Save').'">';
 	print '</td>';
 
 	print '<td class="center">';
@@ -389,7 +389,7 @@ if ( ! empty($conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE)) {
 	print '</td>';
 
 	print '<td class="center">';
-	print '<button type="submit" class="wpeo-button button-blue">' . $langs->trans('Validate') . '</button>';
+	print '<input type="submit" class="button" value="'. $langs->trans('Save').'">';
 	print '</td>';
 
 	print '<td class="center">';
@@ -411,7 +411,7 @@ if ( ! empty($conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE)) {
 	print '</td>';
 
 	print '<td class="center">';
-	print '<button type="submit" class="wpeo-button button-blue">' . $langs->trans('Validate') . '</button>';
+	print '<input type="submit" class="button" value="'. $langs->trans('Save').'">';
 	print '</td>';
 
 	print '<td class="center">';
@@ -445,7 +445,7 @@ if ( ! empty($conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE)) {
 	print $conf->global->DIGIRISKDOLIBARR_TICKET_EXTRAFIELDS ? $langs->trans('AlreadyGenerated') : $langs->trans('NotCreated');
 	print '</td>';
 	print '<td class="center">';
-	print $conf->global->DIGIRISKDOLIBARR_TICKET_EXTRAFIELDS ? '<button type="submit" class="wpeo-button button-disable">' . $langs->trans('Create') . '</button> ' : '<button type="submit" class="wpeo-button button-blue">' . $langs->trans('Create') . '</button>';
+	print $conf->global->DIGIRISKDOLIBARR_TICKET_EXTRAFIELDS ? '<input type="submit" class=" butActionRefused" value="'.$langs->trans('Create') .'">' : '<input type="submit" class="button" value="'.$langs->trans('Create') .'">' ;
 	print '</td>';
 
 	print '<td class="center">';
