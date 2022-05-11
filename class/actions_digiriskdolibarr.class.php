@@ -142,26 +142,25 @@ class ActionsDigiriskdolibarr
 	 *  Overloading the doActions function : replacing the parent's function with the one below
 	 *
 	 * @param Hook $parameters metadatas (context, etc...)
+	 * @param $object current object
 	 * @param $action
 	 * @return int              < 0 on error, 0 on success, 1 to replace standard code
 	 */
-	public function doActions($parameters, $action)
+	public function doActions($parameters, $object, $action)
 	{
 		global $db, $conf;
 
 		/* print_r($parameters); print_r($object); echo "action: " . $action; */
 		if ($parameters['currentcontext'] == 'admincompany') {	    // do something only for the context 'somecontext1' or 'somecontext2'
-			if ($action == 'updateedit' || $action == 'update') {
+			if ($action == 'update') {
 				dolibarr_set_const($db, "DIGIRISKDOLIBARR_COLLECTIVE_AGREEMENT_TITLE", GETPOST("DIGIRISKDOLIBARR_COLLECTIVE_AGREEMENT_TITLE", 'nohtml'), 'chaine', 0, '', $conf->entity);
 			}
 		} else if ($parameters['currentcontext'] == 'ticketcard') {
-			if (GETPOST('action') == 'digiriskbuilddoc') {
+			if ($action == 'digiriskbuilddoc') {
 				require_once __DIR__ . '/../lib/digiriskdolibarr_function.lib.php';
 				require_once __DIR__ . '/../class/digiriskdocuments/ticketdocument.class.php';
 				require_once __DIR__ . '/../core/modules/digiriskdolibarr/digiriskdocuments/ticketdocument/mod_ticketdocument_standard.php';
 				require_once __DIR__ . '/../core/modules/digiriskdolibarr/digiriskdocuments/ticketdocument/modules_ticketdocument.php';
-				$object = new Ticket($this->db);
-				$result = $object->fetch(GETPOST('id'),GETPOST('ref','alpha'),GETPOST('track_id','alpha'));
 
 				global $langs, $user;
 				$ticketdocument = new TicketDocument($this->db);
