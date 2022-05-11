@@ -239,7 +239,6 @@ class modDigiriskdolibarr extends DolibarrModules
 	public $export_sql_end;
 	public $export_sql_order;
 
-
 	// For import
 
 	/**
@@ -1230,7 +1229,8 @@ class modDigiriskdolibarr extends DolibarrModules
 
 		// Exports profiles provided by this module
 		$r = 1;
-		$this->export_code[$r] = $this->rights_class.'_'.$r;
+
+		$this->export_code[$r] = $this->rights_class . '_ticket';
 		$this->export_label[$r] = 'Ticket'; // Translation key (used only if key ExportDataset_xxx_z not found)
 		$this->export_icon[$r] = 'Ticket';
 		$this->export_enabled[$r] = '!empty($conf->ticket->enabled)';
@@ -1282,7 +1282,7 @@ class modDigiriskdolibarr extends DolibarrModules
 
 		$r++;
 		$langs->load("categories");
-		$this->export_code[$r] = $this->rights_class.'_12_'.Categorie::$MAP_ID_TO_CODE[12];
+		$this->export_code[$r] = $this->rights_class.'_ticket_categories';
 		$this->export_label[$r] = 'CatTicketsList';
 		$this->export_icon[$r] = 'category';
 		$this->export_enabled[$r] = '!empty($conf->ticket->enabled)';
@@ -1291,8 +1291,8 @@ class modDigiriskdolibarr extends DolibarrModules
 		$this->export_TypeFields_array[$r] = array('cat.label'=>"Text", 'cat.description'=>"Text", 'cat.fk_parent'=>'List:categorie:label:rowid', 't.ref'=>'Text', 's.rowid'=>"List:societe:nom:rowid", 's.nom'=>"Text");
 		$this->export_entities_array[$r] = array('t.rowid'=>'ticket', 't.ref'=>'ticket', 's.rowid'=>"company", 's.nom'=>"company"); // We define here only fields that use another picto
 
-		$keyforselect = 'ticket';
-		$keyforelement = 'ticket';
+		$keyforselect = 'Ticket';
+		$keyforelement = 'Ticket';
 		$keyforaliasextra = 'extra';
 		include DOL_DOCUMENT_ROOT.'/core/extrafieldsinexport.inc.php';
 
