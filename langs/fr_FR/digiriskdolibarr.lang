@@ -115,7 +115,7 @@ ContractType = Type de contrat
 Apprentice/Student = Apprenti/Elève
 Interim = Intérimaire
 ProfessionalQualification = Qualification professionnelle
-
+DigiriskDocumentation = Documentation de Digirisk
 
 #
 # Diaporama page index
@@ -1349,6 +1349,7 @@ EmailsToNotifySet = Les adresses e-mail à notifier ont bien été enregistrées
 MainCategorySet = La catégorie principale a été définie
 ParentCategoryLabelSet = Le titre de la catégorie parent a été défini
 ChildCategoryLabelSet = Le titre de la catégorie enfant a été défini
+TicketPublicInterfaceConfigDocumentation = Pour configurer l'interface publique des tickets, consultez la documentation
 
 # Ticket document
 

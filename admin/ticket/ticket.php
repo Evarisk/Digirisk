@@ -512,8 +512,7 @@ if ( ! empty($conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE)) {
 
 	print '</table>';
 	print '</div>';
-
-	print '<img style="display: block; margin-left: auto; margin-right: auto; width: 50%;" src="'. DOL_URL_ROOT . '/custom/digiriskdolibarr/img/interfacepubliquetickets.PNG'.'">';
+	print '<span class="opacitymedium">' . $langs->trans("TicketPublicInterfaceConfigDocumentation") . '</span> : <a class="wordbreak" href="https://wiki.dolibarr.org/index.php?title=Module_Digirisk#Interface_publique_des_tickets" target="_blank" >' . $langs->transnoentities('DigiriskDocumentation') . '</a>';
 }
 
 
