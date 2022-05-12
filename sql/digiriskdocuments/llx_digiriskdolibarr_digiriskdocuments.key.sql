@@ -16,4 +16,4 @@
 ALTER TABLE llx_digiriskdolibarr_digiriskdocuments ADD INDEX idx_digiriskdolibarr_digiriskdocuments_rowid (rowid);
 ALTER TABLE llx_digiriskdolibarr_digiriskdocuments ADD INDEX idx_digiriskdolibarr_digiriskdocuments_ref (ref);
 ALTER TABLE llx_digiriskdolibarr_digiriskdocuments ADD CONSTRAINT llx_digiriskdolibarr_digiriskdocuments_fk_user_creat FOREIGN KEY (fk_user_creat) REFERENCES llx_user(rowid);
--- ALTER TABLE llx_digiriskdolibarr_digiriskdocuments ADD CONSTRAINT llx_digiriskdolibarr_digiriskdocuments_fk_standard FOREIGN KEY (fk_standard) REFERENCES llx_digiriskdolibarr_digiriskstandard(rowid);
+ALTER TABLE llx_digiriskdolibarr_digiriskdocuments ADD UNIQUE uk_digiriskdocuments_ref (ref, entity);

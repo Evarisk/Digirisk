@@ -14,3 +14,4 @@
 -- along with this program.  If not, see https://www.gnu.org/licenses/.
 
 ALTER TABLE llx_digiriskdolibarr_accident_lesion ADD INDEX idx_digiriskdolibarr_accident_lesion_rowid (rowid);
+ALTER TABLE llx_digiriskdolibarr_accident_lesion ADD UNIQUE uk_accident_lesion_ref (ref, entity);

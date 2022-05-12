@@ -16,3 +16,4 @@
 ALTER TABLE llx_digiriskdolibarr_preventionplandet ADD INDEX idx_digiriskdolibarr_preventionplandet_rowid (rowid);
 ALTER TABLE llx_digiriskdolibarr_preventionplandet ADD INDEX idx_digiriskdolibarr_preventionplandet_ref_ext (ref_ext);
 ALTER TABLE llx_digiriskdolibarr_preventionplandet ADD CONSTRAINT llx_digiriskdolibarr_preventionplandet_fk_user_creat FOREIGN KEY (fk_user_creat) REFERENCES llx_user(rowid);
+ALTER TABLE llx_digiriskdolibarr_preventionplandet ADD UNIQUE uk_preventionplandet_ref (ref, entity);

@@ -56,4 +56,18 @@ ALTER TABLE llx_digiriskdolibarr_accident CHANGE `external_accident` `external_a
 ALTER TABLE llx_digiriskdolibarr_digiriskelement CHANGE `rank` `ranks` INT(11) NULL DEFAULT NULL;
 
 -- 9.3.0
+ALTER TABLE llx_digiriskdolibarr_digiriskelement DROP COLUMN `rank`;
 ALTER TABLE llx_digiriskdolibarr_accident ADD fk_standard integer AFTER fk_element;
+ALTER TABLE llx_digiriskdolibarr_digiriskelement ADD UNIQUE uk_digiriskelement_ref (ref, entity);
+ALTER TABLE llx_digiriskdolibarr_risk ADD UNIQUE uk_risk_ref (ref, entity);
+ALTER TABLE llx_digiriskdolibarr_riskassessment ADD UNIQUE uk_riskassessment_ref (ref, entity);
+ALTER TABLE llx_digiriskdolibarr_risksign ADD UNIQUE uk_risksign_ref (ref, entity);
+ALTER TABLE llx_digiriskdolibarr_evaluator ADD UNIQUE uk_evaluator_ref (ref, entity);
+ALTER TABLE llx_digiriskdolibarr_accident ADD UNIQUE uk_accident_ref (ref, entity);
+ALTER TABLE llx_digiriskdolibarr_accident_lesion ADD UNIQUE uk_accident_lesion_ref (ref, entity);
+ALTER TABLE llx_digiriskdolibarr_accident_workstop ADD UNIQUE uk_accident_workstop_ref (ref, entity);
+ALTER TABLE llx_digiriskdolibarr_preventionplan ADD UNIQUE uk_preventionplan_ref (ref, entity);
+ALTER TABLE llx_digiriskdolibarr_preventionplandet ADD UNIQUE uk_preventionplandet_ref (ref, entity);
+ALTER TABLE llx_digiriskdolibarr_firepermit ADD UNIQUE uk_firepermit_ref (ref, entity);
+ALTER TABLE llx_digiriskdolibarr_firepermitdet ADD UNIQUE uk_firepermitdet_ref (ref, entity);
+ALTER TABLE llx_digiriskdolibarr_digiriskdocuments ADD UNIQUE uk_digiriskdocuments_ref (ref, entity);
