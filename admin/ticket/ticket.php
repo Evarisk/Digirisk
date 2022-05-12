@@ -101,7 +101,7 @@ if ($action == 'generateCategories') {
 	if ($result > 0) {
 		$category->label       = $langs->trans('Accident');
 		$category->description = '';
-		$category->color       = '';
+		$category->color       = 'ff7f00';
 		$category->visible     = 1;
 		$category->type        = 'ticket';
 		$category->fk_parent   = $result;
@@ -137,7 +137,7 @@ if ($action == 'generateCategories') {
 
 		$category->label       = $langs->transnoentities('SST');
 		$category->description = '';
-		$category->color       = '';
+		$category->color       = '3636ed';
 		$category->visible     = 1;
 		$category->type        = 'ticket';
 		$category->fk_parent   = $result;
@@ -182,7 +182,7 @@ if ($action == 'generateCategories') {
 
 		$category->label       = $langs->trans('DGI');
 		$category->description = '';
-		$category->color       = '';
+		$category->color       = 'bf0000';
 		$category->visible     = 1;
 		$category->type        = 'ticket';
 		$category->fk_parent   = $result;
@@ -190,7 +190,7 @@ if ($action == 'generateCategories') {
 
 		$category->label       = $langs->transnoentities('Quality');
 		$category->description = '';
-		$category->color       = '';
+		$category->color       = '007f7f';
 		$category->visible     = 1;
 		$category->type        = 'ticket';
 		$category->fk_parent   = $result;
@@ -219,7 +219,7 @@ if ($action == 'generateCategories') {
 
 		$category->label       = $langs->transnoentities('Environment');
 		$category->description = '';
-		$category->color       = '';
+		$category->color       = '00bf00';
 		$category->visible     = 1;
 		$category->type        = 'ticket';
 		$category->fk_parent   = $result;

@@ -381,7 +381,7 @@ if (GETPOST('parentCategory')) {
 			if ($subCategory->id == GETPOST('subCategory')) {
 				print '<div class="ticket-subCategory center active" id="' . $subCategory->id . '">';
 			} else {
-				print '<div class="ticket-subCategory center" id="' . $subCategory->id . '">';
+				print '<div class="ticket-subCategory center" id="' . $subCategory->id . '" style="background:#ffffff">';
 			}
 			show_category_image($subCategory, $upload_dir);
 			print '<span class="button-label">' . $subCategory->label . '</span>';
