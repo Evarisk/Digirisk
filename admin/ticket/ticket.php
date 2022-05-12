@@ -144,45 +144,38 @@ if ($action == 'generateCategories') {
 		$result3               = $category->create($user);
 
 		if ($result3 > 0) {
-			$category->label       = $langs->transnoentities('AnticipatedLeave');
+			$category->label = $langs->transnoentities('AnticipatedLeave');
 			$category->description = '';
-			$category->color       = '';
-			$category->visible     = 1;
-			$category->type        = 'ticket';
-			$category->fk_parent   = $result3;
+			$category->color = '';
+			$category->visible = 1;
+			$category->type = 'ticket';
+			$category->fk_parent = $result3;
 			$category->create($user);
 
-			$category->label       = $langs->trans('Others');
+			$category->label = $langs->transnoentities('HumanProblem');
 			$category->description = '';
-			$category->color       = '';
-			$category->visible     = 1;
-			$category->type        = 'ticket';
-			$category->fk_parent   = $result3;
+			$category->color = '';
+			$category->visible = 1;
+			$category->type = 'ticket';
+			$category->fk_parent = $result3;
 			$category->create($user);
 
-			$category->label       = $langs->transnoentities('HumanProblem');
+			$category->label = $langs->transnoentities('MaterialProblem');
 			$category->description = '';
-			$category->color       = '';
-			$category->visible     = 1;
-			$category->type        = 'ticket';
-			$category->fk_parent   = $result3;
+			$category->color = '';
+			$category->visible = 1;
+			$category->type = 'ticket';
+			$category->fk_parent = $result3;
 			$category->create($user);
 
-			$category->label       = $langs->transnoentities('MaterialProblem');
+			$category->label = $langs->trans('Others');
 			$category->description = '';
-			$category->color       = '';
-			$category->visible     = 1;
-			$category->type        = 'ticket';
-			$category->fk_parent   = $result3;
+			$category->color = '';
+			$category->visible = 1;
+			$category->type = 'ticket';
+			$category->fk_parent = $result3;
 			$category->create($user);
 
-			$category->label       = $langs->transnoentities('EnhancementSuggestion');
-			$category->description = '';
-			$category->color       = '';
-			$category->visible     = 1;
-			$category->type        = 'ticket';
-			$category->fk_parent   = $result3;
-			$category->create($user);
 		} else {
 			setEventMessages($category->error, null, 'errors');
 		}
@@ -194,6 +187,64 @@ if ($action == 'generateCategories') {
 		$category->type        = 'ticket';
 		$category->fk_parent   = $result;
 		$result4               = $category->create($user);
+
+		$category->label       = $langs->transnoentities('Quality');
+		$category->description = '';
+		$category->color       = '';
+		$category->visible     = 1;
+		$category->type        = 'ticket';
+		$category->fk_parent   = $result;
+		$result4               = $category->create($user);
+
+		if ($result4 > 0) {
+			$category->label = $langs->transnoentities('NonCompliance');
+			$category->description = '';
+			$category->color = '';
+			$category->visible = 1;
+			$category->type = 'ticket';
+			$category->fk_parent = $result4;
+			$category->create($user);
+
+			$category->label = $langs->transnoentities('EnhancementSuggestion');
+			$category->description = '';
+			$category->color = '';
+			$category->visible = 1;
+			$category->type = 'ticket';
+			$category->fk_parent = $result4;
+			$category->create($user);
+
+		} else {
+			setEventMessages($category->error, null, 'errors');
+		}
+
+		$category->label       = $langs->transnoentities('Environment');
+		$category->description = '';
+		$category->color       = '';
+		$category->visible     = 1;
+		$category->type        = 'ticket';
+		$category->fk_parent   = $result;
+		$result5               = $category->create($user);
+
+		if ($result5 > 0) {
+			$category->label = $langs->transnoentities('NonCompliance');
+			$category->description = '';
+			$category->color = '';
+			$category->visible = 1;
+			$category->type = 'ticket';
+			$category->fk_parent = $result5;
+			$category->create($user);
+
+			$category->label = $langs->transnoentities('Others');
+			$category->description = '';
+			$category->color = '';
+			$category->visible = 1;
+			$category->type = 'ticket';
+			$category->fk_parent = $result5;
+			$category->create($user);
+
+		} else {
+			setEventMessages($category->error, null, 'errors');
+		}
 
 		if ($result2 > 0 && $result3 > 0 && $result4 > 0) {
 			dolibarr_set_const($db, 'DIGIRISKDOLIBARR_TICKET_CATEGORIES_CREATED', 1, 'integer', 0, '', $conf->entity);
