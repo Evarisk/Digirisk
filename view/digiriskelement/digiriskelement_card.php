@@ -280,15 +280,6 @@ if ($action == 'create') {
 
 	print '<table class="border centpercent tableforfieldcreate">' . "\n";
 
-	$type           = 'DIGIRISKDOLIBARR_' . strtoupper($element_type) . '_ADDON';
-	$digirisk_addon = $conf->global->$type;
-	$modele         = new $digirisk_addon($db);
-
-	print '<tr><td class="fieldrequired">' . $langs->trans("Ref") . '</td><td>';
-	print '<input hidden class="flat" type="text" size="36" name="ref" id="ref" value="' . $modele->getNextValue($object) . '">';
-	print $modele->getNextValue($object);
-	print '</td></tr>';
-
 	print '<tr><td class="fieldrequired">' . $langs->trans("ParentElement") . '</td><td>';
 	print '<input hidden class="flat" type="text" size="36" name="parent" id="parent">';
 	if (empty($fk_parent)) {
