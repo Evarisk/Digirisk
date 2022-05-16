@@ -168,7 +168,6 @@ class DigiriskElement extends CommonObject
 		$ref = $modele->getNextValue($this);
 		$this->ref = $ref;
 		$this->element     = $this->element_type . '@digiriskdolibarr';
-		$this->element     = $this->element_type . '@digiriskdolibarr';
 		$this->fk_standard = $conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD;
 		return $this->createCommon($user, $notrigger);
 	}
