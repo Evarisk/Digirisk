@@ -104,8 +104,8 @@ if ($reshook < 0) {
 if ($action == 'add') {
 	$error = 0;
 
-	$parentCategory = GETPOST('category');
-	$subCategory     = GETPOST('subcategory');
+	$parentCategory = GETPOST('parentCategory');
+	$subCategory     = GETPOST('subCategory');
 	$message        = GETPOST('message');
 	$ticket_tmp_id  = GETPOST('ticket_id');
 
@@ -401,7 +401,7 @@ print '</div>';
 		<div class="form-element">
 			<span class="form-label"><?php print $langs->trans("Message"); ?></span>
 			<label class="form-field-container">
-				<textarea name="message" id="message"></textarea>
+				<textarea name="message" id="message"><?php echo GETPOST('message');?></textarea>
 			</label>
 		</div>
 		<div class="form-element">
