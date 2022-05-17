@@ -39,7 +39,8 @@ if ( ! $res) die("Include of main fails");
 global $conf, $langs, $user, $db;
 
 // Libraries
-require_once DOL_DOCUMENT_ROOT . "/core/lib/admin.lib.php";
+require_once DOL_DOCUMENT_ROOT . "/core/lib/files.lib.php";
+require_once DOL_DOCUMENT_ROOT . "/core/lib/images.lib.php";
 require_once DOL_DOCUMENT_ROOT . "/core/lib/admin.lib.php";
 require_once DOL_DOCUMENT_ROOT . "/core/class/html.formother.class.php";
 include_once DOL_DOCUMENT_ROOT . '/core/class/extrafields.class.php';
@@ -89,6 +90,8 @@ if ($action == 'generateExtrafields') {
 		setEventMessages($extra_fields->error, null, 'errors');
 	}
 }
+$upload_dir = $conf->categorie->multidir_output[$conf->entity?:1];
+global $maxwidthmini, $maxheightmini, $maxwidthsmall, $maxheightsmall;
 
 if ($action == 'generateCategories') {
 	$category->label       = $langs->trans('Register');
@@ -108,6 +111,16 @@ if ($action == 'generateCategories') {
 		$result2               = $category->create($user);
 
 		if ($result2 > 0) {
+			$dir = $upload_dir.'/'.get_exdir($result2, 2, 0, 0, $category, 'category').$result2."/";
+			$dir .= "photos/";
+			if (!file_exists($dir)) {
+				dol_mkdir($dir);
+			}
+			$origin_file = '../../img/picto_tickets/Accident.png';
+			dol_copy($origin_file, $dir . 'Accident.png');
+			vignette($dir . 'Accident.png', $maxwidthsmall, $maxheightsmall, '_small', 50, "thumbs");
+			vignette($dir . 'Accident.png', $maxwidthmini, $maxheightmini, '_mini', 50, "thumbs");
+
 			$category->label       = $langs->trans('PresquAccident');
 			$category->description = '';
 			$category->color       = '';
