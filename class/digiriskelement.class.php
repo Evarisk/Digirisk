@@ -162,11 +162,13 @@ class DigiriskElement extends CommonObject
 	public function create(User $user, $notrigger = false)
 	{
 		global $conf;
-		$type           = 'DIGIRISKDOLIBARR_' . strtoupper($this->element_type) . '_ADDON';
-		$digirisk_addon = $conf->global->$type;
-		$modele         = new $digirisk_addon($this->db);
-		$ref = $modele->getNextValue($this);
-		$this->ref = $ref;
+		if (!isset($this->ref)) {
+			$type           = 'DIGIRISKDOLIBARR_' . strtoupper($this->element_type) . '_ADDON';
+			$digirisk_addon = $conf->global->$type;
+			$modele         = new $digirisk_addon($this->db);
+			$ref = $modele->getNextValue($this);
+			$this->ref = $ref;
+		}
 		$this->element     = $this->element_type . '@digiriskdolibarr';
 		$this->fk_standard = $conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD;
 		return $this->createCommon($user, $notrigger);
