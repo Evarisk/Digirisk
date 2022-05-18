@@ -258,7 +258,7 @@ class doc_ticketdocument_odt extends ModeleODTTicketDocument
 		if ( ! is_object($outputlangs)) $outputlangs = $langs;
 		$outputlangs->charset_output                 = 'UTF-8';
 
-		$outputlangs->loadLangs(array("main", "dict", "companies", "digiriskdolibarr@digiriskdolibarr"));
+		$outputlangs->loadLangs(array("main", "dict", "companies", "digiriskdolibarr@digiriskdolibarr", "other"));
 
 		$mod = new $conf->global->DIGIRISKDOLIBARR_TICKETDOCUMENT_ADDON($this->db);
 		$ref = $mod->getNextValue($object);
@@ -424,6 +424,8 @@ class doc_ticketdocument_odt extends ModeleODTTicketDocument
 			$actioncomm = new ActionComm($this->db);
 			$event_list = $actioncomm->getActions('',$ticket->id,$ticket->element,'');
 
+			$usertmp = new User($this->db);
+
 			// Replace tags of lines
 			try {
 				if ($foundtagforlines) {
@@ -431,10 +433,10 @@ class doc_ticketdocument_odt extends ModeleODTTicketDocument
 						$listlines = $odfHandler->setSegment('events');
 
 						foreach ($event_list as $event) {
-
+							$usertmp->fetch($event->authorid);
 							$tmparray['event_ref'] = $event->ref;
-							$tmparray['user'] = $event->authorid;
-							$tmparray['type'] = $event->type_code;
+							$tmparray['user'] = $usertmp->firstname . ' ' . $usertmp->lastname;
+							$tmparray['type'] = $outputlangs->transnoentities('Action'.$event->type_code);
 							$tmparray['title'] = $event->label;
 							$content = preg_replace('/<br \/>/', '', $event->note);
 							$tmparray['event_content'] = $content;
