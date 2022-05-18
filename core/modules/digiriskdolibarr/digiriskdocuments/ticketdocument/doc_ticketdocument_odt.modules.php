@@ -353,6 +353,7 @@ class doc_ticketdocument_odt extends ModeleODTTicketDocument
 			$tmparray['location']         = $ticket->array_options['options_digiriskdolibarr_ticket_location'];
 			$tmparray['declaration_date'] = dol_print_date($ticket->array_options['options_digiriskdolibarr_ticket_date']);
 			$tmparray['creation_date']    = dol_print_date($ticket->date_creation);
+			$tmparray['progress']         = !empty($ticket->progress) ? $ticket->progress . ' %' : '0 %';
 
 			$category = new Categorie($this->db);
 			$categories = $category->containing($ticket->id, Categorie::TYPE_TICKET);
@@ -394,9 +395,15 @@ class doc_ticketdocument_odt extends ModeleODTTicketDocument
 			}
 
 			$message = preg_replace('/<br \/>/', '', $ticket->message);
-			$tmparray['message'] = $message;
+			$tmparray['subject'] = $ticket->subject;
+			$tmparray['message']  = $message;
 			$tmparray['generation_date'] = dol_print_date(dol_now());
 
+			$contactlist = $ticket->liste_contact(-1, 'external');
+
+			foreach ($contactlist as $contact) {
+				$tmparray['contacts'] .= $contact['firstname'] . ' ' . $contact['lastname'] . ', ';
+			}
 
 			foreach ($tmparray as $key => $value) {
 				try {
