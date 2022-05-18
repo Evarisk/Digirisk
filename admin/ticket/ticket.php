@@ -47,6 +47,7 @@ include_once DOL_DOCUMENT_ROOT . '/core/class/extrafields.class.php';
 include_once DOL_DOCUMENT_ROOT . '/categories/class/categorie.class.php';
 
 require_once '../../lib/digiriskdolibarr.lib.php';
+require_once '../../lib/digiriskdolibarr_ticket.lib.php';
 
 // Translations
 $langs->loadLangs(array("admin", "digiriskdolibarr@digiriskdolibarr"));
@@ -94,32 +95,14 @@ $upload_dir = $conf->categorie->multidir_output[$conf->entity?:1];
 global $maxwidthmini, $maxheightmini, $maxwidthsmall, $maxheightsmall;
 
 if ($action == 'generateCategories') {
-	$category->label       = $langs->trans('Register');
-	$category->description = '';
-	$category->color       = '';
-	$category->visible     = 1;
-	$category->type        = 'ticket';
 
-	$result = $category->create($user);
+	$result = createTicketCategory($langs->trans('Register'), '', '', 1, 'ticket');
+
 	if ($result > 0) {
-		$category->label       = $langs->trans('Accident');
-		$category->description = '';
-		$category->color       = 'ff7f00';
-		$category->visible     = 1;
-		$category->type        = 'ticket';
-		$category->fk_parent   = $result;
-		$result2               = $category->create($user);
+
+		$result2 = createTicketCategory($langs->trans('Accident'), '', 'ff7f00', 1, 'ticket', $result,'Accident.png');
 
 		if ($result2 > 0) {
-			$dir = $upload_dir.'/'.get_exdir($result2, 2, 0, 0, $category, 'category').$result2."/";
-			$dir .= "photos/";
-			if (!file_exists($dir)) {
-				dol_mkdir($dir);
-			}
-			$origin_file = '../../img/picto_tickets/Accident.png';
-			dol_copy($origin_file, $dir . 'Accident.png');
-			vignette($dir . 'Accident.png', $maxwidthsmall, $maxheightsmall, '_small', 50, "thumbs");
-			vignette($dir . 'Accident.png', $maxwidthmini, $maxheightmini, '_mini', 50, "thumbs");
 
 			$category->label       = $langs->trans('PresquAccident');
 			$category->description = '';
