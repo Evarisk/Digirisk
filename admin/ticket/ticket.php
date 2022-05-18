@@ -104,139 +104,46 @@ if ($action == 'generateCategories') {
 
 		if ($result2 > 0) {
 
-			$category->label       = $langs->trans('PresquAccident');
-			$category->description = '';
-			$category->color       = '';
-			$category->visible     = 1;
-			$category->type        = 'ticket';
-			$category->fk_parent   = $result2;
-			$category->create($user);
+			createTicketCategory($langs->trans('PresquAccident'), '', '', 1, 'ticket', $result2,"Presqu'Accident.png");
+			createTicketCategory($langs->trans('AccidentWithoutDIAT'), '', '', 1, 'ticket', $result2,'Accident_benin.png');
+			createTicketCategory($langs->trans('AccidentWithDIAT'), '', '', 1, 'ticket', $result2,'Accident_du_travail.png');
 
-			$category->label       = $langs->trans('AccidentWithDIAT');
-			$category->description = '';
-			$category->color       = '';
-			$category->visible     = 1;
-			$category->type        = 'ticket';
-			$category->fk_parent   = $result2;
-			$category->create($user);
-
-			$category->label       = $langs->trans('AccidentWithoutDIAT');
-			$category->description = '';
-			$category->color       = '';
-			$category->visible     = 1;
-			$category->type        = 'ticket';
-			$category->fk_parent   = $result2;
-			$category->create($user);
 		} else {
 			setEventMessages($category->error, null, 'errors');
 		}
 
-		$category->label       = $langs->transnoentities('SST');
-		$category->description = '';
-		$category->color       = '3636ed';
-		$category->visible     = 1;
-		$category->type        = 'ticket';
-		$category->fk_parent   = $result;
-		$result3               = $category->create($user);
+		$result3 = createTicketCategory($langs->trans('SST'), '', '3636ed', 1, 'ticket', $result,'Santé_et_Securite.png');
 
 		if ($result3 > 0) {
-			$category->label = $langs->transnoentities('AnticipatedLeave');
-			$category->description = '';
-			$category->color = '';
-			$category->visible = 1;
-			$category->type = 'ticket';
-			$category->fk_parent = $result3;
-			$category->create($user);
 
-			$category->label = $langs->transnoentities('HumanProblem');
-			$category->description = '';
-			$category->color = '';
-			$category->visible = 1;
-			$category->type = 'ticket';
-			$category->fk_parent = $result3;
-			$category->create($user);
-
-			$category->label = $langs->transnoentities('MaterialProblem');
-			$category->description = '';
-			$category->color = '';
-			$category->visible = 1;
-			$category->type = 'ticket';
-			$category->fk_parent = $result3;
-			$category->create($user);
-
-			$category->label = $langs->trans('Others');
-			$category->description = '';
-			$category->color = '';
-			$category->visible = 1;
-			$category->type = 'ticket';
-			$category->fk_parent = $result3;
-			$category->create($user);
+			createTicketCategory($langs->trans('AnticipatedLeave'), '', '', 1, 'ticket', $result3,'Depart_Anticipe.png');
+			createTicketCategory($langs->trans('HumanProblem'), '', '', 1, 'ticket', $result3,'Probleme_Humain.png');
+			createTicketCategory($langs->trans('MaterialProblem'), '', '', 1, 'ticket', $result3,'Probleme_Matériel.png');
+			createTicketCategory($langs->trans('Others'), '', '', 1, 'ticket', $result3,'Autres1.png');
 
 		} else {
 			setEventMessages($category->error, null, 'errors');
 		}
 
-		$category->label       = $langs->trans('DGI');
-		$category->description = '';
-		$category->color       = 'bf0000';
-		$category->visible     = 1;
-		$category->type        = 'ticket';
-		$category->fk_parent   = $result;
-		$result4               = $category->create($user);
+		createTicketCategory($langs->trans('DGI'), '', 'bf0000', 1, 'ticket', $result,'Danger_grave_et_imminent.png');
 
-		$category->label       = $langs->transnoentities('Quality');
-		$category->description = '';
-		$category->color       = '007f7f';
-		$category->visible     = 1;
-		$category->type        = 'ticket';
-		$category->fk_parent   = $result;
-		$result4               = $category->create($user);
+		$result4 = createTicketCategory($langs->trans('Quality'), '', '007f7f', 1, 'ticket', $result,'Qualité.png');
 
 		if ($result4 > 0) {
-			$category->label = $langs->transnoentities('NonCompliance');
-			$category->description = '';
-			$category->color = '';
-			$category->visible = 1;
-			$category->type = 'ticket';
-			$category->fk_parent = $result4;
-			$category->create($user);
 
-			$category->label = $langs->transnoentities('EnhancementSuggestion');
-			$category->description = '';
-			$category->color = '';
-			$category->visible = 1;
-			$category->type = 'ticket';
-			$category->fk_parent = $result4;
-			$category->create($user);
+			createTicketCategory($langs->trans('NonCompliance'), '', '', 1, 'ticket', $result4,'Non_Conformite.png');
+			createTicketCategory($langs->trans('EnhancementSuggestion'), '', '', 1, 'ticket', $result4,"Suggestiondamelioration.png");
 
 		} else {
 			setEventMessages($category->error, null, 'errors');
 		}
 
-		$category->label       = $langs->transnoentities('Environment');
-		$category->description = '';
-		$category->color       = '00bf00';
-		$category->visible     = 1;
-		$category->type        = 'ticket';
-		$category->fk_parent   = $result;
-		$result5               = $category->create($user);
+		$result5 = createTicketCategory($langs->trans('Environment'), '', '00bf00', 1, 'ticket', $result,'Environnement.png');
 
 		if ($result5 > 0) {
-			$category->label = $langs->transnoentities('NonCompliance');
-			$category->description = '';
-			$category->color = '';
-			$category->visible = 1;
-			$category->type = 'ticket';
-			$category->fk_parent = $result5;
-			$category->create($user);
 
-			$category->label = $langs->transnoentities('Others');
-			$category->description = '';
-			$category->color = '';
-			$category->visible = 1;
-			$category->type = 'ticket';
-			$category->fk_parent = $result5;
-			$category->create($user);
+			createTicketCategory($langs->trans('NonCompliance'), '', '', 1, 'ticket', $result5,'Non_Conformite.png');
+			createTicketCategory($langs->trans('Others'), '', '', 1, 'ticket', $result5,'Autres2.png');
 
 		} else {
 			setEventMessages($category->error, null, 'errors');

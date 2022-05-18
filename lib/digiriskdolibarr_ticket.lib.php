@@ -60,5 +60,9 @@ function createTicketCategory($label, $description, $color, $visible, $type, $fk
 		vignette($dir . $photo_name, $maxwidthsmall, $maxheightsmall, '_small', 50, "thumbs");
 		vignette($dir . $photo_name, $maxwidthmini, $maxheightmini, '_mini', 50, "thumbs");
 	}
+<<<<<<< HEAD
 	return 1;
+=======
+	return $result;
+>>>>>>> 9.3.0
 }
