@@ -103,32 +103,6 @@
   left: 4px;
 }
 
-.wpeo-carousel {
-  -webkit-box-sizing: border-box;
-  box-sizing: border-box;
-}
-.wpeo-carousel .wpeo-gridlayout {
-  display: -webkit-box !important;
-  display: -ms-flexbox !important;
-  display: flex !important;
-}
-.wpeo-carousel .wpeo-gridlayout > * {
-  width: 50%;
-}
-.wpeo-carousel * {
-  -webkit-box-sizing: border-box;
-  box-sizing: border-box;
-}
-.wpeo-carousel img {
-  max-width: 100%;
-  display: block;
-  margin: auto;
-  border-radius: 6px;
-}
-.wpeo-carousel .content {
-  margin: auto 0;
-}
-
 .digirisk-page-container {
   max-width: 1000px;
   background: #fff;
