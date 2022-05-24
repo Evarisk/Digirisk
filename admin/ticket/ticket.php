@@ -100,50 +100,50 @@ if ($action == 'generateCategories') {
 
 	if ($result > 0) {
 
-		$result2 = createTicketCategory($langs->trans('Accident'), '', 'ff7f00', 1, 'ticket', $result,'Accident.png');
+		$result2 = createTicketCategory($langs->trans('Accident'), '', 'ff7f00', 1, 'ticket', $result,'pictogramme_Accident_32px.png');
 
 		if ($result2 > 0) {
 
-			createTicketCategory($langs->trans('PresquAccident'), '', '', 1, 'ticket', $result2,"Presqu'Accident.png");
-			createTicketCategory($langs->trans('AccidentWithoutDIAT'), '', '', 1, 'ticket', $result2,'Accident_benin.png');
-			createTicketCategory($langs->trans('AccidentWithDIAT'), '', '', 1, 'ticket', $result2,'Accident_du_travail.png');
+			createTicketCategory($langs->trans('PresquAccident'), '', '', 1, 'ticket', $result2,"pictogramme_presqu-accident_64px.png");
+			createTicketCategory($langs->trans('AccidentWithoutDIAT'), '', '', 1, 'ticket', $result2,'pictogramme_accident-benin_64px.png');
+			createTicketCategory($langs->trans('AccidentWithDIAT'), '', '', 1, 'ticket', $result2,'pictogramme_accident-du-travail_64px.png');
 
 		} else {
 			setEventMessages($category->error, null, 'errors');
 		}
 
-		$result3 = createTicketCategory($langs->trans('SST'), '', '3636ed', 1, 'ticket', $result,'Santé_et_Securite.png');
+		$result3 = createTicketCategory($langs->trans('SST'), '', '3636ed', 1, 'ticket', $result,'pictogramme_Sante-et-securite_32px.png');
 
 		if ($result3 > 0) {
 
-			createTicketCategory($langs->trans('AnticipatedLeave'), '', '', 1, 'ticket', $result3,'Depart_Anticipe.png');
-			createTicketCategory($langs->trans('HumanProblem'), '', '', 1, 'ticket', $result3,'Probleme_Humain.png');
-			createTicketCategory($langs->trans('MaterialProblem'), '', '', 1, 'ticket', $result3,'Probleme_Matériel.png');
-			createTicketCategory($langs->trans('Others'), '', '', 1, 'ticket', $result3,'Autres1.png');
+			createTicketCategory($langs->trans('AnticipatedLeave'), '', '', 1, 'ticket', $result3,'pictogramme_depart-anticipe_64px.png');
+			createTicketCategory($langs->trans('HumanProblem'), '', '', 1, 'ticket', $result3,'pictogramme_Probleme-humain_64px.png');
+			createTicketCategory($langs->trans('MaterialProblem'), '', '', 1, 'ticket', $result3,'pictogramme_Probleme-materiel_64px.png');
+			createTicketCategory($langs->trans('Others'), '', '', 1, 'ticket', $result3,'pictogramme_autres_64px.png');
 
 		} else {
 			setEventMessages($category->error, null, 'errors');
 		}
 
-		createTicketCategory($langs->trans('DGI'), '', 'bf0000', 1, 'ticket', $result,'Danger_grave_et_imminent.png');
+		createTicketCategory($langs->trans('DGI'), '', 'bf0000', 1, 'ticket', $result,'pictogramme_Danger-grave-et-imminent_32px.png');
 
-		$result4 = createTicketCategory($langs->trans('Quality'), '', '007f7f', 1, 'ticket', $result,'Qualité.png');
+		$result4 = createTicketCategory($langs->trans('Quality'), '', '007f7f', 1, 'ticket', $result,'pictogramme_Qualité_32px.png');
 
 		if ($result4 > 0) {
 
-			createTicketCategory($langs->trans('NonCompliance'), '', '', 1, 'ticket', $result4,'Non_Conformite.png');
-			createTicketCategory($langs->trans('EnhancementSuggestion'), '', '', 1, 'ticket', $result4,"Suggestiondamelioration.png");
+			createTicketCategory($langs->trans('NonCompliance'), '', '', 1, 'ticket', $result4,'pictogramme_non-conformite_64px.png');
+			createTicketCategory($langs->trans('EnhancementSuggestion'), '', '', 1, 'ticket', $result4,"pictogramme_suggestions-amelioration_64px.png");
 
 		} else {
 			setEventMessages($category->error, null, 'errors');
 		}
 
-		$result5 = createTicketCategory($langs->trans('Environment'), '', '00bf00', 1, 'ticket', $result,'Environnement.png');
+		$result5 = createTicketCategory($langs->trans('Environment'), '', '00bf00', 1, 'ticket', $result,'pictogramme_environnement_32px.png');
 
 		if ($result5 > 0) {
 
-			createTicketCategory($langs->trans('NonCompliance'), '', '', 1, 'ticket', $result5,'Non_Conformite.png');
-			createTicketCategory($langs->trans('Others'), '', '', 1, 'ticket', $result5,'Autres2.png');
+			createTicketCategory($langs->trans('NonCompliance'), '', '', 1, 'ticket', $result5,'pictogramme_non-conformite_64px.png');
+			createTicketCategory($langs->trans('Others'), '', '', 1, 'ticket', $result5,'pictogramme_autres_64px.png');
 
 		} else {
 			setEventMessages($category->error, null, 'errors');
