@@ -339,63 +339,60 @@ print '<div class="centpercent tableforimgfields form-registre">' . "\n";
 print '<p><strong>' . $conf->global->DIGIRISKDOLIBARR_TICKET_PARENT_CATEGORY_LABEL . '</strong></p>';
 print '';
 
-$parentCategoryObject = $category->rechercher($conf->global->DIGIRISKDOLIBARR_TICKET_MAIN_CATEGORY, '', 'ticket', true);
+$mainCategoryObject = $category->rechercher($conf->global->DIGIRISKDOLIBARR_TICKET_MAIN_CATEGORY, '', 'ticket', true);
 
 print '<div class="wpeo-gridlayout grid-3">';
-if ( ! empty($parentCategoryObject) && $parentCategoryObject > 0) {
-	$parentCategoryChildren = $parentCategoryObject[0]->get_filles();
-	if ( ! empty($parentCategoryChildren) && $parentCategoryChildren > 0) {
+if ( ! empty($mainCategoryObject) && $mainCategoryObject > 0) {
+	$mainCategoryChildren = $mainCategoryObject[0]->get_filles();
+	if ( ! empty($mainCategoryChildren) && $mainCategoryChildren > 0) {
 		$k = 1;
-		foreach ($parentCategoryChildren as $child_category) {
-			if ($child_category->id == GETPOST('parentCategory')) {
-				print '<div class="ticket-parentCategory active" id="' . $child_category->id . '">';
+		foreach ($mainCategoryChildren as $cat) {
+			if ($cat->id == GETPOST('parentCategory')) {
+				print '<div class="ticket-parentCategory ticket-parentCategory'. $cat->id .' active" id="' . $cat->id . '">';
 			} else {
-				print '<div class="ticket-parentCategory" id="' . $child_category->id . '">';
+				print '<div class="ticket-parentCategory ticket-parentCategory'. $cat->id .'" id="' . $cat->id . '">';
 			}
-			print '<div class="wpeo-button" style="background:#'. $child_category->color.'; border-color:#'. $child_category->color .'">';
+			print '<div class="wpeo-button" style="background:#'. $cat->color.'; border-color:#'. $cat->color .'">';
 
-			show_category_image($child_category, $upload_dir);
-			print '<span class="button-label">' . $child_category->label . '</span>';
+			show_category_image($cat, $upload_dir);
+			print '<span class="button-label">' . $cat->label . '</span>';
 			print '</div>';
 
 			print '</div>';
 			$k++;
 		}
-	}
-}
-print '</div>';
+		print '</div>';
 
-print '</div>';
+		print '<div class="centpercent tableforimgfields">' . "\n";
 
-print '<div class="centpercent tableforimgfields">' . "\n";
+		foreach ($mainCategoryChildren as $cat) {
+			$selectedParentCategory = $category;
+			$selectedParentCategory->fetch($cat->id);
+			$selectedParentCategoryChildren = $selectedParentCategory->get_filles();
+			if ( ! empty($selectedParentCategoryChildren)) {
 
-if (GETPOST('parentCategory')) {
-	$selectedRegister = $category;
-	$selectedRegister->fetch(GETPOST('parentCategory'));
-	$selectedRegisterChildren = $selectedRegister->get_filles();
-	if ( ! empty($selectedRegisterChildren)) {
-		print '<p><strong>' . $conf->global->DIGIRISKDOLIBARR_TICKET_CHILD_CATEGORY_LABEL . '</strong></p>';
+				print '<div class="subCategories children'. $cat->id .'" style="display:none">';
+				print '<p><strong>' . $conf->global->DIGIRISKDOLIBARR_TICKET_CHILD_CATEGORY_LABEL . '</strong></p>';
+				print '<div class="wpeo-gridlayout grid-5">';
 
-		print '<div class="wpeo-gridlayout grid-5">';
-		foreach ($selectedRegisterChildren as $subCategory) {
-			if ($subCategory->id == GETPOST('subCategory')) {
-				print '<div class="ticket-subCategory center active" id="' . $subCategory->id . '">';
-			} else {
-				print '<div class="ticket-subCategory center" id="' . $subCategory->id . '" style="background:#ffffff">';
+				foreach ($selectedParentCategoryChildren as $subCategory) {
+					if ($subCategory->id == GETPOST('subCategory')) {
+						print '<div class="ticket-subCategory ticket-subCategory'. $subCategory->id .' center active" id="' . $subCategory->id . '">';
+					} else {
+						print '<div class="ticket-subCategory ticket-subCategory'. $subCategory->id .' center" id="' . $subCategory->id . '" style="background:#ffffff">';
+					}
+					show_category_image($subCategory, $upload_dir);
+					print '<span class="button-label">' . $subCategory->label . '</span>';
+					print '</div>';
+				}
+				print '</div>';
+				print '</div>';
 			}
-			show_category_image($subCategory, $upload_dir);
-			print '<span class="button-label">' . $subCategory->label . '</span>';
-			print '</div>';
 		}
 		print '</div>';
+
 	}
-}
-
-print '</div>';
-
-print '</div>';
-
-?>
+} ?>
 <div class="wpeo-form tableforinputfields">
 	<div class="wpeo-gridlayout grid-2">
 		<div class="form-element">

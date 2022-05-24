@@ -3383,28 +3383,21 @@ window.eoxiaJS.ticket.event = function() {
  */
 window.eoxiaJS.ticket.updateFormData = function( ) {
 
-	let requestParams = ''
-	if (document.URL.match(/\?/)) {
-		requestParams = '&'
-	} else {
-		requestParams = '?'
-	}
+	let parentCategoryID = window.eoxiaJS.ticket.getParentCategory()
+	let subCategoryID = window.eoxiaJS.ticket.getSubCategory()
 
-	let register = window.eoxiaJS.ticket.getParentCategory()
-	if (register > 0) {
-		requestParams += 'parentCategory=' + register + '&'
-	}
+	$('.ticket-parentCategory.active').removeClass('active')
+	$('.ticket-parentCategory'+parentCategoryID).addClass('active')
 
-	let pertinence = window.eoxiaJS.ticket.getSubCategory()
-	if (pertinence > 0) {
-		requestParams += 'subCategory=' + pertinence  + '&'
-	}
+	$('.subCategories').attr('style','display:none')
+	$('.children'+parentCategoryID).attr('style','')
 
-	$('.img-fields-container').load(document.URL + requestParams + ' .tableforimgfields');
+	$('.ticket-subCategory.active').removeClass('active')
+	$('.ticket-subCategory'+subCategoryID).addClass('active')
 };
 
 /**
- * Clique sur un des registres de la liste.
+ * Clique sur une des catégories parentes de la liste.
  *
  * @since   1.1.0
  * @version 1.1.0
@@ -3412,17 +3405,17 @@ window.eoxiaJS.ticket.updateFormData = function( ) {
  * @return {void}
  */
 window.eoxiaJS.ticket.selectParentCategory = function( ) {
-	let pertinenceInput = $('.ticketpublicarea').find("#subCategory");
-	let registerInput = $('.ticketpublicarea').find("#parentCategory");
+	let subCategoryInput = $('.ticketpublicarea').find("#subCategory");
+	let parentCategoryInput = $('.ticketpublicarea').find("#parentCategory");
 
-	pertinenceInput.val(0)
-	registerInput.val($(this).attr('id'))
+	subCategoryInput.val(0)
+	parentCategoryInput.val($(this).attr('id'))
 
 	window.eoxiaJS.ticket.updateFormData()
 };
 
 /**
- * Récupère la valeur du registre sélectionné
+ * Récupère la valeur de la catégorie parente sélectionnée
  *
  * @since   1.1.0
  * @version 1.1.0
@@ -3434,7 +3427,7 @@ window.eoxiaJS.ticket.getParentCategory = function( ) {
 };
 
 /**
- * Clique sur une des pertinences de la liste.
+ * Clique sur une des catégories enfants de la liste.
  *
  * @since   1.1.0
  * @version 1.1.0
@@ -3442,14 +3435,14 @@ window.eoxiaJS.ticket.getParentCategory = function( ) {
  * @return {void}
  */
 window.eoxiaJS.ticket.selectSubCategory = function( ) {
-	let pertinenceInput = $('.ticketpublicarea').find("#subCategory");
-	pertinenceInput.val($(this).attr('id'))
+	let subCategoryInput = $('.ticketpublicarea').find("#subCategory");
+	subCategoryInput.val($(this).attr('id'))
 
 	window.eoxiaJS.ticket.updateFormData()
 };
 
 /**
- * Récupère la valeur de la pertinence sélectionnée
+ * Récupère la valeur de la catégorie enfant sélectionnée
  *
  * @since   1.1.0
  * @version 1.1.0
