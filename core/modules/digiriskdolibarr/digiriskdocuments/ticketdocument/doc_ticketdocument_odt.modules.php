@@ -401,8 +401,12 @@ class doc_ticketdocument_odt extends ModeleODTTicketDocument
 
 			$contactlist = $ticket->liste_contact(-1, 'external');
 
-			foreach ($contactlist as $contact) {
-				$tmparray['contacts'] .= $contact['firstname'] . ' ' . $contact['lastname'] . ', ';
+			if (!empty($contactlist)) {
+				foreach ($contactlist as $contact) {
+					$tmparray['contacts'] .= $contact['firstname'] . ' ' . $contact['lastname'] . ', ';
+				}
+			} else {
+				$tmparray['contacts'] = '';
 			}
 
 			foreach ($tmparray as $key => $value) {
