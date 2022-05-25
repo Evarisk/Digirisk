@@ -298,7 +298,6 @@ if ($action == 'removefile') {
 	$action = '';
 }
 
-
 /*
  * View
  */
@@ -371,7 +370,7 @@ if ( ! empty($mainCategoryObject) && $mainCategoryObject > 0) {
 			$selectedParentCategoryChildren = $selectedParentCategory->get_filles();
 			if ( ! empty($selectedParentCategoryChildren)) {
 
-				print '<div class="subCategories children'. $cat->id .'" style="display:none">';
+				print '<div class="subCategories children'. $cat->id .'"'. (GETPOST('parentCategory') == $cat->id ? '' : ' style="display:none">');
 				print '<p><strong>' . $conf->global->DIGIRISKDOLIBARR_TICKET_CHILD_CATEGORY_LABEL . '</strong></p>';
 				print '<div class="wpeo-gridlayout grid-5">';
 
