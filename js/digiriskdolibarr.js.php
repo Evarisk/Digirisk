@@ -3476,10 +3476,8 @@ window.eoxiaJS.ticket.tmpStockFile = function( ) {
 	fetch(document.URL + '?action=sendfile&ticket_id='+ticket_id, {
 		method: 'POST',
 		body: formData,
-	}).then((response) => {
-		setTimeout(function(){
-			$('#sendFileForm').load(document.URL+ '?ticket_id='+ticket_id + ' #fileLinkedTable')
-		}, 800);
+	}).then(() => {
+		$('#sendFileForm').load(document.URL+ '?ticket_id='+ticket_id + ' #fileLinkedTable')
 	})
 };
 
@@ -3498,10 +3496,8 @@ window.eoxiaJS.ticket.removeFile = function( event ) {
 
 	fetch(document.URL + '?action=removefile&filetodelete='+filetodelete+'&ticket_id='+ticket_id, {
 		method: 'POST',
-	}).then((response) => {
-		setTimeout(function(){
-			$('#sendFileForm').load(document.URL+ '?ticket_id='+ticket_id + ' #fileLinkedTable')
-		}, 800);
+	}).then(() => {
+		$(this).parent().parent().hide()
 	})
 };
 
