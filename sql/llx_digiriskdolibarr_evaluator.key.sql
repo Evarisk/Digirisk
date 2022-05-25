@@ -17,6 +17,4 @@ ALTER TABLE llx_digiriskdolibarr_evaluator ADD INDEX idx_digiriskdolibarr_evalua
 ALTER TABLE llx_digiriskdolibarr_evaluator ADD INDEX idx_digiriskdolibarr_evaluator_ref (ref);
 ALTER TABLE llx_digiriskdolibarr_evaluator ADD INDEX idx_digiriskdolibarr_evaluator_status (status);
 ALTER TABLE llx_digiriskdolibarr_evaluator ADD CONSTRAINT llx_digiriskdolibarr_evaluator_fk_user_creat FOREIGN KEY (fk_user_creat) REFERENCES llx_user(rowid);
-
-
-
+ALTER TABLE llx_digiriskdolibarr_evaluator ADD UNIQUE uk_evaluator_ref (ref, entity);

@@ -39,8 +39,10 @@ if ( ! $res) die("Include of main fails");
 require_once DOL_DOCUMENT_ROOT . '/core/lib/company.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/functions2.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/images.lib.php';
+require_once DOL_DOCUMENT_ROOT . '/projet/class/project.class.php';
 
 require_once __DIR__ . '/../../class/preventionplan.class.php';
+require_once __DIR__ . '/../../class/digiriskresources.class.php';
 require_once __DIR__ . '/../../lib/digiriskdolibarr_preventionplan.lib.php';
 require_once __DIR__ . '/../../lib/digiriskdolibarr_function.lib.php';
 
@@ -76,8 +78,11 @@ if ( ! $sortfield) $sortfield = 'a.datep,a.id';
 if ( ! $sortorder) $sortorder = 'DESC,DESC';
 
 // Initialize technical objects
-$object      = new PreventionPlan($db);
-$extrafields = new ExtraFields($db);
+$object            = new PreventionPlan($db);
+$extrafields       = new ExtraFields($db);
+$digiriskresources = new DigiriskResources($db);
+$project           = new Project($db);
+
 $hookmanager->initHooks(array('preventionplanagenda', 'globalcard')); // Note that conf->hooks_modules contains array
 // Fetch optionals attributes and labels
 $extrafields->fetch_name_optionals_label($object->table_element);
@@ -132,11 +137,20 @@ if ($object->id > 0) {
 
 	// Object card
 	// ------------------------------------------------------------
-	//$width = 80; $cssclass = 'photoref';
-	dol_strlen($object->label) ? $morehtmlref = ' - ' . $object->label : '';
-	//$morehtmlleft .= '<div class="floatleft inline-block valignmiddle divphotoref">'.digirisk_show_photos('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$entity].'/'.$object->element_type, 'small', 5, 0, 0, 0, $width,0, 0, 0, 0, $object->element_type, $object).'</div>';
+	$width = 80; $cssclass = 'photoref';
+	dol_strlen($object->label) ? $morehtmlref = '<span>' . ' - ' . $object->label . '</span>' : '';
+	$morehtmlref                             .= '<div class="refidno">';
+	// External Society -- Société extérieure
+	$ext_society  = $digiriskresources->fetchResourcesFromObject('PP_EXT_SOCIETY', $object);
+	$morehtmlref .= $langs->trans('ExtSociety') . ' : ' . $ext_society->getNomUrl(1);
+	// Project
+	$project->fetch($preventionplan->fk_project);
+	$morehtmlref .= '<br>' . $langs->trans('Project') . ' : ' . getNomUrlProject($project, 1, 'blank');
+	$morehtmlref .= '</div>';
 
-	digirisk_banner_tab($object, 'ref', '', 0, 'ref', 'ref', $morehtmlref, 0, 0, '', $object->getLibStatut(5));
+	//$morehtmlleft = '<div class="floatleft inline-block valignmiddle divphotoref">'.digirisk_show_photos('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$entity].'/'.$object->element_type, 'small', 5, 0, 0, 0, $width,0, 0, 0, 0, $object->element_type, $object).'</div>';
+
+	digirisk_banner_tab($object, 'ref', '', 0, 'ref', 'ref', $morehtmlref, '', 0, $morehtmlleft, $object->getLibStatut(5));
 
 	print '<div class="fichecenter">';
 

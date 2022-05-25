@@ -124,7 +124,8 @@ $types = array(
 	'WorkUnitDocument' 			=> 'workunitdocument',
 	'RiskAssessmentDocument' 	=> 'riskassessmentdocument',
 	'PreventionPlan' 			=> 'preventionplandocument',
-	'FirePermit' 				=> 'firepermitdocument'
+	'FirePermit' 				=> 'firepermitdocument',
+	'Ticket' 					=> 'ticketdocument'
 );
 
 $pictos = array(
@@ -136,7 +137,8 @@ $pictos = array(
 	'WorkUnitDocument' 			=> '<i class="fas fa-info-circle"></i> <span class="ref" style="background: #0d8aff;  font-size: 10px; color: #fff; text-transform: uppercase; font-weight: 600; display: inline-block;; padding: 0.2em 0.4em; line-height: 10px !important">WU</span> ',
 	'RiskAssessmentDocument' 	=> '<i class="fas fa-file-alt"></i> ',
 	'PreventionPlan' 			=> '<i class="fas fa-info"></i> ',
-	'FirePermit' 				=> '<i class="fas fa-fire-alt"></i> '
+	'FirePermit' 				=> '<i class="fas fa-fire-alt"></i> ',
+	'Ticket'	 				=> '<i class="fa fa-ticket"></i> '
 );
 
 foreach ($types as $type => $documentType) {

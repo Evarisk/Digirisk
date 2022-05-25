@@ -1038,9 +1038,7 @@ window.eoxiaJS.signature.createSignature = function() {
 	if (elementConfCAPTCHA == 1) {
 		elementCode = $('#securitycode').val();
 		let elementSessionCode = $('#sessionCode').val();
-		if (elementSessionCode == elementCode) {
-			elementRedirect = $('#redirectSignature').val();
-		} else {
+		if (elementSessionCode != elementCode) {
 			elementRedirect = $('#redirectSignatureError').val();
 		}
 	} else {
@@ -1215,10 +1213,9 @@ window.eoxiaJS.mediaGallery.savePhoto = function( event ) {
 			filenames += $( this ).find('.filename').val() + 'vVv'
 		});
 	}
-
 	let favorite = filenames
 	favorite = favorite.split('vVv')[0]
-	favorite = favorite.replace(/\ /, '+')
+
 	window.eoxiaJS.loader.display($(this));
 
 	let token = $('.id-container').find('input[name="token"]').val();
@@ -1250,6 +1247,8 @@ window.eoxiaJS.mediaGallery.savePhoto = function( event ) {
 					$(this).find('.clicked-photo-preview').attr('src',newPhoto )
 					$(this).find('.filename').attr('value', favorite.match(/_small/) ? favorite.replace(/\./, '_small.') : favorite)
 				});
+				favorite = favorite.replace(/\ /g, '%20')
+
 				mediaLinked.load(document.URL+'&favorite='+favorite + ' .element-linked-medias-'+idToSave+'.risk-'+riskId)
 				modalFrom.find('.messageSuccessSavePhoto').removeClass('hidden')
 			},
@@ -1288,6 +1287,7 @@ window.eoxiaJS.mediaGallery.savePhoto = function( event ) {
 				photoContainer.addClass('digirisk-element')
 				photoContainer.closest('.unit-container').find('.digirisk-element-medias-modal').load(document.URL+ ' #digirisk_element_medias_modal_'+idToSave)
 
+				favorite = favorite.replace(/\ /g, '%20')
 				if (idToSave === currentElementID) {
 					let digiriskBanner = $('.arearef.heightref')
 					digiriskBanner.load(document.URL+'&favorite='+favorite + ' .arearef.heightref')
@@ -1369,9 +1369,12 @@ window.eoxiaJS.mediaGallery.sendPhoto = function( event ) {
  * @return {void}
  */
 window.eoxiaJS.mediaGallery.previewPhoto = function( event ) {
-	setTimeout(function(){
-		$( document ).find('.ui-dialog').addClass('preview-photo');
-	}, 200);
+	var checkExist = setInterval(function() {
+		if ($('.ui-dialog').length) {
+			clearInterval(checkExist);
+			$( document ).find('.ui-dialog').addClass('preview-photo');
+		}
+	}, 100);
 };
 
 /**
@@ -1390,6 +1393,7 @@ window.eoxiaJS.mediaGallery.unlinkFile = function( event ) {
 	let querySeparator = '?'
 	let riskId = $(this).closest('.modal-risk').attr('value')
 	let type = $(this).closest('.modal-container').find('.type-from').val()
+	let noPhotoPath = $(this).closest('.modal-container').find('.no-photo-path').val()
 	var params = new window.URLSearchParams(window.location.search);
 	var currentElementID = params.get('id')
 
@@ -1407,14 +1411,14 @@ window.eoxiaJS.mediaGallery.unlinkFile = function( event ) {
 	if (type === 'riskassessment') {
 		let riskAssessmentPhoto = $('.risk-evaluation-photo-'+element_linked_id)
 		previousPhoto = $(this).closest('.modal-container').find('.risk-evaluation-photo .clicked-photo-preview')
-		previousName = previousPhoto[0].src.trim().split(/thumbs%2F/)[1].split(/"/)[0]
+		//previousName = previousPhoto[0].src.trim().split(/thumbs%2F/)[1].split(/"/)[0]
 
-		if (previousName == filename.replace(/\./, '_small.')) {
-			newPhoto = previousPhoto[0].src.replace(previousName, '')
-		} else {
-			newPhoto = previousPhoto[0].src
-		}
-
+		//if (previousName == filename.replace(/\./, '_small.')) {
+		//	newPhoto = previousPhoto[0].src.replace(previousName, '')
+		//} else {
+		//	newPhoto = previousPhoto[0].src
+		//}
+		newPhoto = previousPhoto[0].src
 		$.ajax({
 			url: document.URL + querySeparator + "action=unlinkFile&token=" + token,
 			type: "POST",
@@ -1427,14 +1431,14 @@ window.eoxiaJS.mediaGallery.unlinkFile = function( event ) {
 			success: function ( ) {
 				$('.wpeo-loader').removeClass('wpeo-loader')
 				riskAssessmentPhoto.each( function() {
-					$(this).find('.clicked-photo-preview').attr('src',newPhoto )
+					$(this).find('.clicked-photo-preview').attr('src',noPhotoPath )
 				});
 				mediaContainer.hide()
 			}
 		});
 	} else if (type === 'digiriskelement') {
 		previousPhoto = $('.digirisk-element-'+element_linked_id).find('.photo.clicked-photo-preview')
-		previousName = previousPhoto[0].src.trim().split(/thumbs%2F/)[1].split(/"/)[0]
+		//previousName = previousPhoto[0].src.trim().split(/thumbs%2F/)[1].split(/"/)[0]
 
 		//if (previousName == filename.replace(/\./, '_small.')) {
 		//	newPhoto = previousPhoto[0].src.replace(previousName, '')
@@ -1508,7 +1512,10 @@ window.eoxiaJS.mediaGallery.addToFavorite = function( event ) {
 		elementPhotos = $('.risk-evaluation-photo-'+element_linked_id+'.risk-'+riskId)
 
 		$(this).closest('.modal-content').find('.risk-evaluation-photo-single .filename').attr('value', filename)
-		let previousName = previousPhoto[0].src.trim().split(/thumbs%2F/)[1].split(/"/)[0]
+
+		let filepath = modalFrom.find('.risk-evaluation-photo-single .filepath-to-riskassessment').val()
+		let newPhoto = filepath + filename.replace(/\./, '_small.')
+
 		let saveButton = $(this).closest('.modal-container').find('.risk-evaluation-save')
 		saveButton.addClass('button-disable')
 		$.ajax({
@@ -1520,12 +1527,6 @@ window.eoxiaJS.mediaGallery.addToFavorite = function( event ) {
 			type: "POST",
 			processData: false,
 			success: function ( ) {
-				let newPhoto = ''
-				if (previousName.length > 0 ) {
-					newPhoto = previousPhoto[0].src.trim().replace(previousName , filename.replace(/\./, '_small.'))
-				} else {
-					newPhoto = previousPhoto[0].src.trim() + filename.replace(/\./, '_small.')
-				}
 				elementPhotos.each( function() {
 					$(this).find('.clicked-photo-preview').attr('src',newPhoto )
 				});
@@ -1536,7 +1537,8 @@ window.eoxiaJS.mediaGallery.addToFavorite = function( event ) {
 	} else if (type === 'digiriskelement') {
 		previousPhoto = $('.digirisk-element-'+element_linked_id).find('.photo.clicked-photo-preview')
 
-		let previousName = previousPhoto[0].src.trim().split(/thumbs%2F/)[1].split(/"/)[0]
+		let filepath =$('.digirisk-element-'+element_linked_id).find('.filepath-to-digiriskelement').val()
+		let newPhoto = filepath + filename.replace(/\./, '_small.')
 
 		jQuery.ajax({
 			url: document.URL + querySeparator + "action=addDigiriskElementPhotoToFavorite&token=" + token,
@@ -1547,22 +1549,15 @@ window.eoxiaJS.mediaGallery.addToFavorite = function( event ) {
 			}),
 			processData: false,
 			success: function ( resp ) {
-				let newPhoto = ''
-				console.log(id)
-				console.log(element_linked_id)
+
 				if (id === element_linked_id) {
 					console.log($('.arearef.heightref.valignmiddle.centpercent'))
 					console.log($(resp).find('.arearef.heightref.valignmiddle.centpercent'))
 					console.log(resp)
 
-					//$('.arearef.heightref.valignmiddle.centpercent').html($(resp).find('.arearef.heightref.valignmiddle.centpercent'))
 					$('.arearef.heightref.valignmiddle.centpercent').load(' .arearef.heightref.valignmiddle.centpercent')
 				}
-				if (previousName.length > 0 ) {
-					newPhoto = previousPhoto[0].src.trim().replace(previousName , filename.replace(/\./, '_small.'))
-				} else {
-					newPhoto = previousPhoto[0].src.trim() + filename.replace(/\./, '_small.')
-				}
+
 				previousPhoto.attr('src',newPhoto )
 				$('.wpeo-loader').removeClass('wpeo-loader')
 			}
@@ -2852,8 +2847,10 @@ window.eoxiaJS.riskassessmenttask.checkTaskProgress = function ( event ) {
 
 	let token = $('.fichecenter.risklist').find('input[name="token"]').val();
 
+	let url = document.URL + '&action=checkTaskProgress&token='+token
+
 	$.ajax({
-		url: document.URL + '&action=checkTaskProgress&token='+token,
+		url: url,
 		data: JSON.stringify({
 			riskAssessmentTaskID: RiskAssessmentTaskId,
 			taskProgress: taskProgress,
@@ -3370,8 +3367,8 @@ window.eoxiaJS.ticket.init = function() {
  * @return {void}
  */
 window.eoxiaJS.ticket.event = function() {
-	$( document ).on( 'click', '.ticket-register', window.eoxiaJS.ticket.selectRegister );
-	$( document ).on( 'click', '.ticket-pertinence', window.eoxiaJS.ticket.selectPertinence );
+	$( document ).on( 'click', '.ticket-parentCategory', window.eoxiaJS.ticket.selectParentCategory );
+	$( document ).on( 'click', '.ticket-subCategory', window.eoxiaJS.ticket.selectSubCategory );
 	$( document ).on( 'submit', '#sendFile', window.eoxiaJS.ticket.tmpStockFile );
 	$( document ).on( 'click', '.linked-file-delete', window.eoxiaJS.ticket.removeFile );
 };
@@ -3386,81 +3383,74 @@ window.eoxiaJS.ticket.event = function() {
  */
 window.eoxiaJS.ticket.updateFormData = function( ) {
 
-	let requestParams = ''
-	if (document.URL.match(/\?/)) {
-		requestParams = '&'
-	} else {
-		requestParams = '?'
-	}
+	let parentCategoryID = window.eoxiaJS.ticket.getParentCategory()
+	let subCategoryID = window.eoxiaJS.ticket.getSubCategory()
 
-	let register = window.eoxiaJS.ticket.getRegister()
-	if (register > 0) {
-		requestParams += 'register=' + register + '&'
-	}
+	$('.ticket-parentCategory.active').removeClass('active')
+	$('.ticket-parentCategory'+parentCategoryID).addClass('active')
 
-	let pertinence = window.eoxiaJS.ticket.getPertinence()
-	if (pertinence > 0) {
-		requestParams += 'pertinence=' + pertinence  + '&'
-	}
+	$('.subCategories').attr('style','display:none')
+	$('.children'+parentCategoryID).attr('style','')
 
-	$('.img-fields-container').load(document.URL + requestParams + ' .tableforimgfields');
+	$('.ticket-subCategory.active').removeClass('active')
+	$('.ticket-subCategory'+subCategoryID).addClass('active')
 };
 
 /**
- * Clique sur un des registres de la liste.
+ * Clique sur une des catégories parentes de la liste.
  *
  * @since   1.1.0
  * @version 1.1.0
  *
  * @return {void}
  */
-window.eoxiaJS.ticket.selectRegister = function( ) {
-	let pertinenceInput = $('.ticketpublicarea').find("#pertinence");
-	let registerInput = $('.ticketpublicarea').find("#register");
+window.eoxiaJS.ticket.selectParentCategory = function( ) {
+	let subCategoryInput = $('.ticketpublicarea').find("#subCategory");
+	let parentCategoryInput = $('.ticketpublicarea').find("#parentCategory");
 
-	pertinenceInput.val(0)
-	registerInput.val($(this).attr('id'))
+	subCategoryInput.val(0)
+	parentCategoryInput.val($(this).attr('id'))
 
 	window.eoxiaJS.ticket.updateFormData()
 };
 
 /**
- * Récupère la valeur du registre sélectionné
+ * Récupère la valeur de la catégorie parente sélectionnée
  *
  * @since   1.1.0
  * @version 1.1.0
  *
  * @return {void}
  */
-window.eoxiaJS.ticket.getRegister = function( ) {
-	return $('.ticketpublicarea').find("#register").val()
+window.eoxiaJS.ticket.getParentCategory = function( ) {
+	return $('.ticketpublicarea').find("#parentCategory").val()
 };
 
 /**
- * Clique sur une des pertinences de la liste.
+ * Clique sur une des catégories enfants de la liste.
  *
  * @since   1.1.0
  * @version 1.1.0
  *
  * @return {void}
  */
-window.eoxiaJS.ticket.selectPertinence = function( ) {
-	let pertinenceInput = $('.ticketpublicarea').find("#pertinence");
-	pertinenceInput.val($(this).attr('id'))
+window.eoxiaJS.ticket.selectSubCategory = function( ) {
+	let subCategoryInput = $('.ticketpublicarea').find("#subCategory");
+	subCategoryInput.val($(this).attr('id'))
 
 	window.eoxiaJS.ticket.updateFormData()
 };
 
 /**
- * Récupère la valeur de la pertinence sélectionnée
+ * Récupère la valeur de la catégorie enfant sélectionnée
  *
  * @since   1.1.0
  * @version 1.1.0
  *
  * @return {void}
  */
-window.eoxiaJS.ticket.getPertinence = function(  ) {
-	return $('.ticketpublicarea').find("#pertinence").val()
+window.eoxiaJS.ticket.getSubCategory = function(  ) {
+	return $('.ticketpublicarea').find("#subCategory").val()
 };
 
 /**
@@ -3482,14 +3472,12 @@ window.eoxiaJS.ticket.tmpStockFile = function( ) {
 		formData.append('files[]', file)
 	}
 	var ticket_id = $('#ticket_id').val()
-
+	window.eoxiaJS.loader.display($('.files-uploaded'));
 	fetch(document.URL + '?action=sendfile&ticket_id='+ticket_id, {
 		method: 'POST',
 		body: formData,
-	}).then((response) => {
-		setTimeout(function(){
-			$('#sendFileForm').load(document.URL+ '?ticket_id='+ticket_id + ' #fileLinkedTable')
-		}, 800);
+	}).then(() => {
+		$('#sendFileForm').load(document.URL+ '?ticket_id='+ticket_id + ' #fileLinkedTable')
 	})
 };
 
@@ -3508,10 +3496,8 @@ window.eoxiaJS.ticket.removeFile = function( event ) {
 
 	fetch(document.URL + '?action=removefile&filetodelete='+filetodelete+'&ticket_id='+ticket_id, {
 		method: 'POST',
-	}).then((response) => {
-		setTimeout(function(){
-			$('#sendFileForm').load(document.URL+ '?ticket_id='+ticket_id + ' #fileLinkedTable')
-		}, 800);
+	}).then(() => {
+		$(this).parent().parent().hide()
 	})
 };
 
@@ -3963,41 +3949,4 @@ window.eoxiaJS.accident.showExternalAccidentLocation = function() {
 			accidentLocationField.removeClass('hidden')
 			break;
 	}
-};
-
-/**
- * Initialise l'objet "slider" ainsi que la méthode "init" obligatoire pour la bibliothèque EoxiaJS.
- *
- * @since   1.0.0
- * @version 1.0.0
- */
-window.eoxiaJS.slider = {};
-
-/**
- * La méthode appelée automatiquement par la bibliothèque EoxiaJS.
- *
- * @since   1.0.0
- * @version 1.0.0
- *
- * @return {void}
- */
-window.eoxiaJS.slider.init = function() {
-	var slider = tns({
-		container: '.wpeo-carousel',
-		items                : 1,
-		gutter               : 0,
-		controls             : true,
-		controlsPosition     : 'bottom',
-		controlsText         : ['<i class="fas fa-angle-left icon"></i>', '<i class="fas fa-angle-right icon"></i>'],
-		nav                  : true,
-		navPosition          : 'bottom',
-		speed                : 600,
-		autoplay             : false,
-		autoplayTimeout      : 4000,
-		autoplayButtonOutput : false,
-		rewind               : true,
-		loop                 : false,
-		autoHeight           : true,
-		mouseDrag            : false
-	});
 };

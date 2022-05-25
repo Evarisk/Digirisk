@@ -94,7 +94,7 @@ if ($conf->global->DIGIRISKDOLIBARR_PREVENTIONPLAN_PROJECT > 0) {
 if ( $conf->global->DIGIRISKDOLIBARR_PREVENTIONPLAN_PROJECT == 0 || $project->statut == 2 ) {
 	$project->ref         = $projectRef->getNextValue($third_party, $project);
 	$project->title       = $langs->trans('PreventionPlanInitial') . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
-	$project->description = $langs->trans('PreventionPlanDescription');
+	$project->description = $langs->transnoentities('PreventionPlanDescription');
 	$project->date_c      = dol_now();
 	$currentYear          = dol_print_date(dol_now(), '%Y');
 	$fiscalMonthStart     = $conf->global->SOCIETE_FISCAL_MONTH_START;
@@ -697,9 +697,9 @@ if ($conf->global->DIGIRISKDOLIBARR_CONF_BACKWARD_COMPATIBILITY == 0) {
 	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_SUBPERMCATEGORY_FOR_DOCUMENTS', 1, 'integer', 0, '', $conf->entity);
 	//dolibarr_set_const($db, 'DIGIRISKDOLIBARR_VERSION', $this->version, 'chaine', 0, '', $conf->entity);
 	//dolibarr_set_const($db, 'DIGIRISKDOLIBARR_DB_VERSION', $this->version, 'chaine', 0, '', $conf->entity);
-	//dolibarr_set_const($db, 'DIGIRISKDOLIBARR_THIRDPARTY_SET', 2, 'integer', 0, '', $conf->entity);
+	//dolibarr_set_const($db, 'DIGIRISKDOLIBARR_THIRDPARTY_SET', 3, 'integer', 0, '', $conf->entity);
 	//dolibarr_set_const($db, 'DIGIRISKDOLIBARR_THIRDPARTY_UPDATED', 1, 'integer', 0, '', $conf->entity);
-	//dolibarr_set_const($db, 'DIGIRISKDOLIBARR_CONTACTS_SET', 2, 'integer', 0, '', $conf->entity);
+	//dolibarr_set_const($db, 'DIGIRISKDOLIBARR_CONTACTS_SET', 3, 'integer', 0, '', $conf->entity);
 	//dolibarr_set_const($db, 'DIGIRISKDOLIBARR_USERAPI_SET', 0, 'integer', 0, '', $conf->entity);
 	//dolibarr_set_const($db, 'DIGIRISKDOLIBARR_READERGROUP_SET', 0, 'integer', 0, '', $conf->entity);
 	//dolibarr_set_const($db, 'DIGIRISKDOLIBARR_USERGROUP_SET', 0, 'integer', 0, '', $conf->entity);
@@ -712,6 +712,11 @@ if ($conf->global->DIGIRISKDOLIBARR_CONF_BACKWARD_COMPATIBILITY == 0) {
 	//dolibarr_set_const($db, 'DIGIRISKDOLIBARR_ACTIVE_STANDARD', dolibarr_get_const($db,'DIGIRISKDOLIBARR_ACTIVE_STANDARD'), 'integer', 0, '', $conf->entity);
 	//dolibarr_set_const($db, 'DIGIRISKDOLIBARR_NEW_SIGNATURE_TABLE', 1, 'integer', 0, '', $conf->entity);
 	//dolibarr_set_const($db, 'DIGIRISKDOLIBARR_TRIGGERS_UPDATED', 1, 'integer', 0, '', $conf->entity);
+	//dolibarr_set_const($db, 'DIGIRISKDOLIBARR_ENCODE_BACKWARD_COMPATIBILITY', 1, 'integer', 0, '', $conf->entity);
+	//dolibarr_set_const($db, 'DIGIRISKDOLIBARR_MEDIA_MAX_WIDTH_MEDIUM', 854, 'integer', 0, '', $conf->entity);
+	//dolibarr_set_const($db, 'DIGIRISKDOLIBARR_MEDIA_MAX_HEIGHT_MEDIUM', 480, 'integer', 0, '', $conf->entity);
+	//dolibarr_set_const($db, 'DIGIRISKDOLIBARR_MEDIA_MAX_WIDTH_LARGE', 1280, 'integer', 0, '', $conf->entity);
+	//dolibarr_set_const($db, 'DIGIRISKDOLIBARR_MEDIA_MAX_HEIGHT_LARGE', 720, 'integer', 0, '', $conf->entity);
 
 	dolibarr_del_const($db, 'DIGIRISKDOLIBARR_DOCUMENT_MODELS_SET', $conf->entity);
 
@@ -742,4 +747,126 @@ if ($conf->global->DIGIRISKDOLIBARR_CONF_BACKWARD_COMPATIBILITY == 0) {
 	//dolibarr_set_const($db, 'MAIN_EXTRAFIELDS_USE_SELECT2', 1, 'integer', 0, '', $conf->entity);
 
 	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_CONF_BACKWARD_COMPATIBILITY', 1, 'integer', 0, '', $conf->entity);
+}
+
+if ($conf->global->DIGIRISKDOLIBARR_ENCODE_BACKWARD_COMPATIBILITY == 0) {
+	$project->fetch($conf->global->DIGIRISKDOLIBARR_PREVENTIONPLAN_PROJECT);
+	$project->description = $langs->transnoentities('PreventionPlanDescription');
+	$project->update($user);
+
+	require_once DOL_DOCUMENT_ROOT . '/core/class/extrafields.class.php';
+
+	$extrafields = new ExtraFields($db);
+
+	$extrafields->fetch_name_optionals_label('ticket');
+
+	if ($extrafields->attributes['ticket']['label']['digiriskdolibarr_ticket_firstname'] && $extrafields->attributes['ticket']['label']['digiriskdolibarr_ticket_phone']) {
+		$extrafields->update('digiriskdolibarr_ticket_firstname', $langs->transnoentities("FirstName"), 'varchar', 255, 'ticket', 0, 0, 2100, '', 1, '', 1);
+		$extrafields->update('digiriskdolibarr_ticket_phone', $langs->transnoentities("Phone"), 'phone', '', 'ticket', 0, 0, 2200, '', 1, '', 1);
+	}
+
+	require_once DOL_DOCUMENT_ROOT . '/categories/class/categorie.class.php';
+	$tags = new Categorie($db);
+
+	$tags->fetch('', $langs->trans('SST'));
+	if ($tags->id > 0) {
+		$tags->label = $langs->transnoentities('SST');
+		$tags->update($user);
+	}
+
+	$tags->fetch('', $langs->trans('AnticipatedLeave'));
+	if ($tags->id > 0) {
+		$tags->label = $langs->transnoentities('AnticipatedLeave');
+		$tags->update($user);
+	}
+
+	$tags->fetch('', $langs->trans('HumanProblem'));
+	if ($tags->id > 0) {
+		$tags->label = $langs->transnoentities('HumanProblem');
+		$tags->update($user);
+	}
+
+	$tags->fetch('', $langs->trans('MaterialProblem'));
+	if ($tags->id > 0) {
+		$tags->label = $langs->transnoentities('MaterialProblem');
+		$tags->update($user);
+	}
+
+	$tags->fetch('', $langs->trans('EnhancementSuggestion'));
+	if ($tags->id > 0) {
+		$tags->label = $langs->transnoentities('EnhancementSuggestion');
+		$tags->update($user);
+	}
+
+	require_once DOL_DOCUMENT_ROOT . '/societe/class/societe.class.php';
+	require_once __DIR__ . '/../../class/digiriskresources.class.php';
+
+	$societe   = new Societe($db);
+	$resources = new DigiriskResources($db);
+	$rights_defenderID = $resources->digirisk_dolibarr_fetch_resource('RightsDefender');
+	$societe->fetch($rights_defenderID);
+	$societe->name = $langs->transnoentities('RightsDefender') . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
+	$societe->update(0, $user);
+
+	require_once DOL_DOCUMENT_ROOT . '/user/class/usergroup.class.php';
+
+	$usergroup = new UserGroup($db);
+
+	$usergroup_id = $conf->global->DIGIRISKDOLIBARR_ADMINUSERGROUP_SET;
+	if ($usergroup_id > 0) {
+		$usergroup->fetch($usergroup_id);
+		$usergroup->note = $langs->transnoentities('DigiriskAdminUserGroupDescription');
+		$usergroup->update($user);
+	}
+
+	$usergroup_id = $conf->global->DIGIRISKDOLIBARR_USERGROUP_SET;
+	if ($usergroup_id > 0) {
+		$usergroup->fetch($usergroup_id);
+		$usergroup->note = $langs->transnoentities('DigiriskUserGroupDescription');
+		$usergroup->update($user);
+	}
+
+	$usergroup_id = $conf->global->DIGIRISKDOLIBARR_READERGROUP_SET;
+	if ($usergroup_id > 0) {
+		$usergroup->fetch($usergroup_id);
+		$usergroup->note = $langs->transnoentities('DigiriskReaderGroupDescription');
+		$usergroup->update($user);
+	}
+
+	require_once __DIR__ . '/../../class/accident.class.php';
+
+	$accident   = new Accident($db);
+
+	$accidents = $accident->fetchAll();
+	foreach ($accidents as $accident) {
+		$accident->description = dol_html_entity_decode($accident->description, ENT_QUOTES|ENT_HTML5);
+		$accident->update($user);
+	}
+
+	require_once __DIR__ . '/../../class/digirisksignature.class.php';
+
+	$signatory = new DigiriskSignature($db);
+
+	$signatories = $signatory->fetchAll();
+	foreach ($signatories as $signatory) {
+		if ($signatory->signature == $langs->trans('FileGenerated')) {
+			$signatory->signature = $langs->transnoentities('FileGenerated');
+			$signatory->update($user);
+		}
+	}
+
+	require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
+
+	$actioncomm = new Actioncomm($db);
+
+	$actioncomms = $actioncomm->getActions();
+	if ( ! empty($actioncomms)) {
+		foreach ($actioncomms as $actioncomm) {
+			$actioncomm->label = dol_html_entity_decode($actioncomm->label, ENT_QUOTES|ENT_HTML5);
+			$actioncomm->note_private = dol_html_entity_decode($actioncomm->note_private, ENT_QUOTES|ENT_HTML5);
+			$actioncomm->update($user);
+		}
+	}
+
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_ENCODE_BACKWARD_COMPATIBILITY', 1, 'integer', 0, '', $conf->entity);
 }

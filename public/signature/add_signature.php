@@ -86,6 +86,10 @@ switch ($type) {
 }
 
 $signatory->fetch('', '', " AND signature_url =" . "'" . $track_id . "'");
+if (dol_strlen($signatory->signature)) {
+	$urltoredirect = dirname($_SERVER['PHP_SELF']) . '/signature_success.php';
+	header('Location: ' . $urltoredirect);
+}
 $object->fetch($signatory->fk_object);
 
 $upload_dir = $conf->digiriskdolibarr->multidir_output[isset($object->entity) ? $object->entity : 1];
@@ -151,7 +155,9 @@ if ($action == 'builddoc') {
 	if (empty($hideref)) $hideref         = 0;
 	if (empty($moreparams)) $moreparams   = null;
 
-	$model = $type.'_specimen_odt';
+	$constforval = "DIGIRISKDOLIBARR_".strtoupper($type.'document')."_SPECIMEN_ADDON_ODT_PATH";
+	$template = preg_replace('/DOL_DOCUMENT_ROOT/', DOL_DOCUMENT_ROOT, $conf->global->$constforval);
+	$model = $type.'document_specimen_odt:'.$template.'template_'.$type.'document_specimen.odt';
 
 	$moreparams['object'] = $object;
 	$moreparams['user']   = $user;
@@ -164,7 +170,7 @@ if ($action == 'builddoc') {
 	} elseif (empty($donotredirect)) {
 		$document_name = $objectdocument->last_main_doc;
 
-		copy($conf->digiriskdolibarr->multidir_output[isset($object->entity) ? $object->entity : 1] . '/' . $type . '/' . $object->ref . '/specimen/' . $document_name, DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/documents/temp/' . $type . '_specimen_' . $track_id . '.odt');
+		copy($conf->digiriskdolibarr->multidir_output[isset($object->entity) ? $object->entity : 1] . '/' . $type.'document' . '/' . $object->ref . '/specimen/' . $document_name, DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/documents/temp/' . $type . '_specimen_' . $track_id . '.odt');
 
 		setEventMessages($langs->trans("FileGenerated") . ' - ' . $document_name, null);
 
@@ -208,10 +214,7 @@ if ( $signatory->role == 'PP_EXT_SOCIETY_INTERVENANTS') {
 	$element = $signatory->fetchSignatory($signatory->role, $signatory->fk_object, $type);
 	$element = array_shift($element);
 }
-if (dol_strlen($signatory->signature)) {
-	$urltoredirect = dirname($_SERVER['PHP_SELF']) . '/signature_success.php';
-	header('Location: ' . $urltoredirect);
-}
+
 ?>
 <div class="digirisk-signature-container">
 	<input type="hidden" name="token" value="<?php echo newToken(); ?>">
@@ -260,12 +263,11 @@ if (dol_strlen($signatory->signature)) {
 		print '<span class="span-icon-security inline-block">';
 		print '<input id="securitycode" placeholder="' . $langs->trans("SecurityCode") . '" class="flat input-icon-security width125" type="text" maxlength="5" name="code" tabindex="3" />';
 		print '<input type="hidden" id="sessionCode" value="' . $_SESSION['dol_antispam_value'] . '"/>';
-		print '<input type="hidden" id="redirectSignature" value="' . dirname($_SERVER['PHP_SELF']) . '/signature_success.php' . '"/>';
 		print '<input type="hidden" id="redirectSignatureError" value="' . $_SERVER['REQUEST_URI'] . '"/>';
 		print '</span>';
 		print '<span class="nowrap inline-block">';
 		print '<img class="inline-block valignmiddle" src="' . DOL_URL_ROOT . '/core/antispamimage.php" border="0" width="80" height="32" id="img_securitycode" />';
-		print '<a class="inline-block valignmiddle" href="' . $php_self . '" tabindex="4" data-role="button">' . img_picto($langs->trans("Refresh"), 'refresh', 'id="captcha_refresh_img"') . '</a>';
+		print '<a class="inline-block valignmiddle" href="" tabindex="4" data-role="button">' . img_picto($langs->trans("Refresh"), 'refresh', 'id="captcha_refresh_img"') . '</a>';
 		print '</span>';
 		print '</div>';
 	}?>

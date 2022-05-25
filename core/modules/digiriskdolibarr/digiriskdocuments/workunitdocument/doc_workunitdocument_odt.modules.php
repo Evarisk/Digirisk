@@ -336,6 +336,8 @@ class doc_workunitdocument_odt extends ModeleODTWorkUnitDocument
 
 			if (!empty($conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS)) {
 				$tmparray['entity'] = 'S'. $conf->entity . ' - ';
+			} else {
+				$tmparray['entity'] = ' ';
 			}
 			$tmparray['nom']         = $digiriskelement->label;
 			$tmparray['reference']   = $digiriskelement->ref;

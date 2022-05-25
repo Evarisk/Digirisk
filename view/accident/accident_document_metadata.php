@@ -127,7 +127,7 @@ if (GETPOST('upload_file', 'alpha') && ! empty($conf->global->MAIN_UPLOAD_DOC)) 
 			// Define if we have to generate thumbs or not
 			$generatethumbs = 1;
 			if ( ! empty($upload_dir)) {
-				$result = dol_add_file_process($upload_dir, 0, 1, 'userfile', GETPOST('savingdocmask', 'alpha'), null, '', $generatethumbs, $object);
+				$result = digirisk_dol_add_file_process($upload_dir, 0, 1, 'userfile', GETPOST('savingdocmask', 'alpha'), null, '', $generatethumbs, $object);
 			}
 
 			if ($result > 0) {

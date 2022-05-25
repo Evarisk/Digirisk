@@ -57,7 +57,7 @@ if ($user->socid > 0) {
 
 // Load mode employee
 $mode  = GETPOST("mode", 'alpha');
-$group = GETPOST("group", "int", 3);
+$group = $conf->global->DIGIRISKDOLIBARR_READERGROUP_SET;
 
 // Load variable for pagination
 $limit     = GETPOST('limit', 'int') ? GETPOST('limit', 'int') : $conf->liste_limit;
@@ -828,19 +828,6 @@ if ($canadduser) {
 								</div>
 								<div class="table-cell table-150">
 									<input type="text" id="firstname" placeholder="<?php echo $langs->trans('FirstName'); ?>" name="firstname" value="<?php dol_escape_htmltag(GETPOST('firstname', 'alphanohtml'))?>" />
-								</div>
-								<div class="table-cell table-300">
-									<input style="width:100%" type="text" id="email" placeholder="<?php echo $langs->trans('Email'); ?>" name="email" value="" />
-								</div>
-								<div class="table-cell table-300">
-									<input style="width:100%" type="text" id="password" placeholder="<?php echo $langs->trans('Password'); ?>" name="password" value="<?php echo $password ?>" autocomplete="new-password" />
-								</div>
-								<div class="table-cell table-300">
-									<?php print $form->select_dolgroups($conf->global->DIGIRISKDOLIBARR_READERGROUP_SET, 'group', 1, '', 0, '', '', $conf->entity); ?>
-								</div>
-								<div class="table-cell table-400">
-									<?php print '<label style="margin-left: 50px" for="send_password">' . $langs->trans("SendPassword") . '</label>';
-									print '<input type="checkbox" id="send_password" name="send_password" style="text-align: right">'; ?>
 								</div>
 								<div class="table-cell">
 									<button type="submit" name="create" style="color: #3495f0; background-color: transparent; width:30%; border:none; margin-right:30%;">

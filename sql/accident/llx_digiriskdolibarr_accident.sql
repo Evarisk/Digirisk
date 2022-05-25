@@ -31,7 +31,8 @@ CREATE TABLE llx_digiriskdolibarr_accident(
 	fk_project        integer,
 	fk_user_creat     integer NOT NULL,
 	fk_user_modif     integer,
-	fk_element        integer,
+    fk_element        integer,
+    fk_standard       integer,
     fk_soc            integer,
 	fk_user_victim    integer,
 	fk_user_employer  integer

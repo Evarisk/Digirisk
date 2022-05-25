@@ -161,7 +161,7 @@ print load_fiche_titre($title, '', 'title_setup');
 
 $head = company_admin_prepare_head();
 
-print dol_get_fiche_head($head, 'security', $langs->trans("Company"), -1, 'company');
+print dol_get_fiche_head($head, 'security', '', -1, '');
 
 print '<span class="opacitymedium">' . $langs->trans("DigiriskMenu") . "</span><br>\n";
 print "<br>";
@@ -193,9 +193,9 @@ if ($conf->societe->enabled) {
 	if ($labour_doctor_society->ref == 'LabourDoctorSociety') {
 		$events   = array();
 		$events[] = array('method' => 'getContacts', 'url' => dol_buildpath('/core/ajax/contacts.php?showempty=1', 1), 'htmlname' => 'labourdoctor_contactid', 'params' => array('add-customer-contact' => 'disabled'));
-		$societe->fetch($labour_doctor_society->id);
+		$societe->fetch($labour_doctor_society->id[0]);
 
-		print $form->select_company($labour_doctor_society->id, 'labourdoctor_socid', '', 'SelectThirdParty', 1, 0, $events, 0, 'minwidth300');
+		print $form->select_company($labour_doctor_society->id[0], 'labourdoctor_socid', '', 'SelectThirdParty', 1, 0, $events, 0, 'minwidth300');
 	} else {
 		$events   = array();
 		$events[] = array('method' => 'getContacts', 'url' => dol_buildpath('/core/ajax/contacts.php?showempty=1', 1), 'htmlname' => 'labourdoctor_contactid', 'params' => array('add-customer-contact' => 'disabled'));

@@ -17,3 +17,4 @@ ALTER TABLE llx_digiriskdolibarr_risk ADD INDEX idx_digiriskdolibarr_risk_rowid 
 ALTER TABLE llx_digiriskdolibarr_risk ADD INDEX idx_digiriskdolibarr_risk_ref (ref);
 ALTER TABLE llx_digiriskdolibarr_risk ADD CONSTRAINT llx_digiriskdolibarr_risk_fk_user_creat FOREIGN KEY (fk_user_creat) REFERENCES llx_user(rowid);
 ALTER TABLE llx_digiriskdolibarr_risk ADD CONSTRAINT llx_digiriskdolibarr_risk_fk_projet FOREIGN KEY (fk_projet) REFERENCES llx_projet(rowid);
+ALTER TABLE llx_digiriskdolibarr_risk ADD UNIQUE uk_risk_ref (ref, entity);

@@ -239,7 +239,6 @@ class modDigiriskdolibarr extends DolibarrModules
 	public $export_sql_end;
 	public $export_sql_order;
 
-
 	// For import
 
 	/**
@@ -350,7 +349,6 @@ class modDigiriskdolibarr extends DolibarrModules
 	 */
 	public $dictionaries = array();
 
-
 	/**
 	 * Constructor. Define names, constants, directories, boxes, permissions
 	 *
@@ -375,7 +373,7 @@ class modDigiriskdolibarr extends DolibarrModules
 		$this->descriptionlong = "Digirisk";
 		$this->editor_name     = 'Evarisk';
 		$this->editor_url      = 'https://evarisk.com';
-		$this->version         = '9.2.1';
+		$this->version         = '9.3.0';
 		$this->const_name      = 'MAIN_MODULE_' . strtoupper($this->name);
 		$this->picto           = 'digiriskdolibarr@digiriskdolibarr';
 
@@ -397,7 +395,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			// Set this to 1 if module has its own theme directory (theme)
 			'theme' => 0,
 			// Set this to relative path of css file if module has its own css file
-			'css' => array(),
+			'css' => array("/digiriskdolibarr/css/digiriskdolibarr.css.php"),
 			// Set this to relative path of js file if module must load a js on all pages
 			'js' => array(),
 			// Set here all hooks context managed by module. To find available hook context, make a "grep -r '>initHooks(' *" on source code. You can also set hook context to 'all'
@@ -407,6 +405,7 @@ class modDigiriskdolibarr extends DolibarrModules
 				'globaladmin',
 				'emailtemplates',
 				'mainloginpage',
+				'ticketcard'
 			),
 			'tabs' => array(
 				'mycompany_admin'
@@ -436,7 +435,7 @@ class modDigiriskdolibarr extends DolibarrModules
 		// Dependencies
 
 		$this->hidden                  = false;
-		$this->depends                 = array('modECM', 'modProjet', 'modSociete', 'modTicket', 'modCategorie', 'modFckeditor', 'modApi');
+		$this->depends                 = array('modECM', 'modProjet', 'modSociete', 'modTicket', 'modCategorie', 'modFckeditor', 'modApi','modExport');
 		$this->requiredby              = array();
 		$this->conflictwith            = array();
 		$this->langfiles               = array("digiriskdolibarr@digiriskdolibarr");
@@ -620,7 +619,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			261 => array('DIGIRISKDOLIBARR_VERSION','chaine', $this->version, '', 0, 'current'),
 			262 => array('DIGIRISKDOLIBARR_DB_VERSION', 'chaine', $this->version, '', 0, 'current'),
 			263 => array('DIGIRISKDOLIBARR_THIRDPARTY_SET', 'integer', 0, '', 0, 'current'),
-			264 => array('DIGIRISKDOLIBARR_THIRDPARTY_UPDATED', 'integer', 0, '', 0, 'current'),
+			264 => array('DIGIRISKDOLIBARR_THIRDPARTY_UPDATED', 'integer', 1, '', 0, 'current'),
 			265 => array('DIGIRISKDOLIBARR_CONTACTS_SET', 'integer', 0, '', 0, 'current'),
 			266 => array('DIGIRISKDOLIBARR_USERAPI_SET', 'integer', 0, '', 0, 'current'),
 			267 => array('DIGIRISKDOLIBARR_READERGROUP_SET', 'integer', 0, '', 0, 'current'),
@@ -635,6 +634,11 @@ class modDigiriskdolibarr extends DolibarrModules
 			276 => array('DIGIRISKDOLIBARR_ACTIVE_STANDARD', 'integer', 0, '', 0, 'current'),
 			277 => array('DIGIRISKDOLIBARR_TRIGGERS_UPDATED', 'integer', 1, '', 0, 'current'),
 			278 => array('DIGIRISKDOLIBARR_CONF_BACKWARD_COMPATIBILITY', 'integer', 1, '', 0, 'current'),
+			279 => array('DIGIRISKDOLIBARR_ENCODE_BACKWARD_COMPATIBILITY', 'integer', 1, '', 0, 'current'),
+			340 => array('DIGIRISKDOLIBARR_MEDIA_MAX_WIDTH_MEDIUM', 'integer', 854, '', 0, 'current'),
+			341 => array('DIGIRISKDOLIBARR_MEDIA_MAX_HEIGHT_MEDIUM', 'integer', 480, '', 0, 'current'),
+			342 => array('DIGIRISKDOLIBARR_MEDIA_MAX_WIDTH_LARGE', 'integer', 1280, '', 0, 'current'),
+			343 => array('DIGIRISKDOLIBARR_MEDIA_MAX_HEIGHT_LARGE', 'integer', 720, '', 0, 'current'),
 
 			// CONST SIGNATURE
 			280 => array('DIGIRISKDOLIBARR_SIGNATURE_ENABLE_PUBLIC_INTERFACE', 'integer', 1, '', 0, 'current'),
@@ -645,7 +649,11 @@ class modDigiriskdolibarr extends DolibarrModules
 			291 => array('DIGIRISKDOLIBARR_TICKET_CATEGORIES_CREATED', 'integer', 0, '', 0, 'current'),
 			292 => array('DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE', 'integer', 1, '', 0, 'current'),
 			293 => array('DIGIRISKDOLIBARR_TICKET_SHOW_COMPANY_LOGO', 'integer', 1, '', 0, 'current'),
-			294 => array('DIGIRISKDOLIBARR_TICKET_SUBMITTED_SEND_MAIL_TO', 'integer', 1, '', 0, 'current'),
+			294 => array('DIGIRISKDOLIBARR_TICKET_SUBMITTED_SEND_MAIL_TO', 'chaine', '', '', 0, 'current'),
+			295 => array('DIGIRISKDOLIBARR_TICKET_PARENT_CATEGORY', 'integer', 0, '', 0, 'current'),
+			296 => array('DIGIRISKDOLIBARR_TICKET_MAIN_CATEGORY', 'integer', 0, '', 0, 'current'),
+			297 => array('DIGIRISKDOLIBARR_TICKET_PARENT_CATEGORY_LABEL', 'chaine', $langs->trans('Registre'), '', 0, 'current'),
+			298 => array('DIGIRISKDOLIBARR_TICKET_CHILD_CATEGORY_LABEL', 'chaine', $langs->trans('Pertinence'), '', 0, 'current'),
 
 			// CONST ACCIDENT
 			300 => array('MAIN_AGENDA_ACTIONAUTO_ACCIDENT_CREATE', 'integer', 1, '', 0, 'current'),
@@ -657,6 +665,9 @@ class modDigiriskdolibarr extends DolibarrModules
 			310 => array('MAIN_AGENDA_ACTIONAUTO_ACCIDENT_WORKSTOP_CREATE', 'integer', 1, '', 0, 'current'),
 			311 => array('DIGIRISKDOLIBARR_ACCIDENT_WORKSTOP_ADDON', 'chaine', 'mod_accident_workstop_standard', '', 0, 'current'),
 			312 => array('DIGIRISKDOLIBARR_ACCIDENT_LESION_ADDON', 'chaine', 'mod_accident_lesion_standard', '', 0, 'current'),
+
+			320 => array('DIGIRISKDOLIBARR_TICKETDOCUMENT_ADDON_ODT_PATH', 'chaine', 'DOL_DOCUMENT_ROOT/custom/digiriskdolibarr/documents/doctemplates/ticketdocument/', '', 0, 'current'),
+			321 => array('DIGIRISKDOLIBARR_TICKETDOCUMENT_ADDON', 'chaine', 'mod_ticketdocument_standard', '', 0, 'current'),
 
 //			// CONST ACCIDENT DOCUMENT
 //			320 => array('MAIN_AGENDA_ACTIONAUTO_ACCIDENTDOCUMENT_CREATE', 'integer', 1, '', 0, 'current'),
@@ -678,9 +689,12 @@ class modDigiriskdolibarr extends DolibarrModules
 		// Array to add new pages in new tabs
 		$this->tabs = array();
 		// Example:
-		$this->tabs[] = array('data' => 'mycompany_admin:+security:Sécurité:@digiriskdolibarr:1:/custom/digiriskdolibarr/admin/securityconf.php');  			// To add a new tab identified by code tabname1
-		$this->tabs[] = array('data' => 'mycompany_admin:+social:Social:@digiriskdolibarr:1:/custom/digiriskdolibarr/admin/socialconf.php');  					// To add a new tab identified by code tabname1
-		$this->tabs[] = array('data' => 'thirdparty:+openinghours:Horaires:@digiriskdolibarr:1:/custom/digiriskdolibarr/view/openinghours_card.php?id=__ID__'); // To add a new tab identified by code tabname1
+		$pictopath = dol_buildpath('/digiriskdolibarr/img/digiriskdolibarr32px.png', 1);
+		$pictoDigirisk = img_picto('', $pictopath, '', 1, 0, 0, '', 'pictoDigirisk');
+		$this->tabs[] = array('data' => 'mycompany_admin:+security:'. $pictoDigirisk .'Sécurité:digiriskdolibarr@digiriskdolibarr:1:/custom/digiriskdolibarr/admin/securityconf.php');  			// To add a new tab identified by code tabname1
+		$this->tabs[] = array('data' => 'mycompany_admin:+social:'. $pictoDigirisk .'Social:digiriskdolibarr@digiriskdolibarr:1:/custom/digiriskdolibarr/admin/socialconf.php');  					// To add a new tab identified by code tabname1
+		$this->tabs[] = array('data' => 'thirdparty:+openinghours:'. $pictoDigirisk .'Horaires:digiriskdolibarr@digiriskdolibarr:1:/custom/digiriskdolibarr/view/openinghours_card.php?id=__ID__'); // To add a new tab identified by code tabname1
+		$this->tabs[] = array('data' => 'user:+participation:'. $pictoDigirisk .'GP/UTParticipation:digiriskdolibarr@digiriskdolibarr:1:/custom/digiriskdolibarr/view/digiriskelement/digiriskelement_evaluator.php?fromid=__ID__'); // To add a new tab identified by code tabname1
 
 		// To remove an existing tab identified by code tabname
 		// Dictionaries
@@ -709,7 +723,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			),
 			// Sort order
 			'tabsqlsort' => array(
-				"libelle ASC",
+				"code ASC",
 				"label ASC",
 				"label ASC",
 				"label ASC"
@@ -753,16 +767,18 @@ class modDigiriskdolibarr extends DolibarrModules
 
 		// Boxes/Widgets
 		$this->boxes = array(
-		//          0 => array(
-		//              'file' => 'box_riskassessmentdocument@digiriskdolibarr',
-		//              'note' => 'My notes',
-		//          )
+			  0 => array(
+				  'file' => 'box_riskassessmentdocument@digiriskdolibarr',
+				  'note' => '',
+				  'enabledbydefaulton' => 'Home',
+			  )
 		);
 
 		// Cronjobs (List of cron jobs entries to add when module is enabled)
 		$this->cronjobs = array();
 
 		// Permissions provided by this module
+		$langs->load("digiriskdolibarr@digiriskdolibarr");
 		$this->rights = array();
 		$r            = 0;
 
@@ -785,7 +801,7 @@ class modDigiriskdolibarr extends DolibarrModules
 		$this->rights[$r][5] = 'read';
 		$r++;
 		$this->rights[$r][0] = $this->numero . $r;
-		$this->rights[$r][1] = $langs->trans('CreateRiskAssessmentDocument');
+		$this->rights[$r][1] = $langs->transnoentities('CreateRiskAssessmentDocument');
 		$this->rights[$r][4] = 'riskassessmentdocument';
 		$this->rights[$r][5] = 'write';
 		$r++;
@@ -797,17 +813,17 @@ class modDigiriskdolibarr extends DolibarrModules
 
 		/* LEGAL DISPLAY PERMISSIONS */
 		$this->rights[$r][0] = $this->numero . $r;
-		$this->rights[$r][1] = $langs->trans('ReadLegalDisplay');
+		$this->rights[$r][1] = $langs->transnoentities('ReadLegalDisplay');
 		$this->rights[$r][4] = 'legaldisplay';
 		$this->rights[$r][5] = 'read';
 		$r++;
 		$this->rights[$r][0] = $this->numero . $r;
-		$this->rights[$r][1] = $langs->trans('CreateLegalDisplay');
+		$this->rights[$r][1] = $langs->transnoentities('CreateLegalDisplay');
 		$this->rights[$r][4] = 'legaldisplay';
 		$this->rights[$r][5] = 'write';
 		$r++;
 		$this->rights[$r][0] = $this->numero . $r;
-		$this->rights[$r][1] = $langs->trans('DeleteLegalDisplay');
+		$this->rights[$r][1] = $langs->transnoentities('DeleteLegalDisplay');
 		$this->rights[$r][4] = 'legaldisplay';
 		$this->rights[$r][5] = 'delete';
 		$r++;
@@ -819,7 +835,7 @@ class modDigiriskdolibarr extends DolibarrModules
 		$this->rights[$r][5] = 'read';
 		$r++;
 		$this->rights[$r][0] = $this->numero . $r;
-		$this->rights[$r][1] = $langs->trans('CreateInformationsSharing');
+		$this->rights[$r][1] = $langs->transnoentities('CreateInformationsSharing');
 		$this->rights[$r][4] = 'informationssharing';
 		$this->rights[$r][5] = 'write';
 		$r++;
@@ -836,7 +852,7 @@ class modDigiriskdolibarr extends DolibarrModules
 		$this->rights[$r][5] = 'read';
 		$r++;
 		$this->rights[$r][0] = $this->numero . $r;
-		$this->rights[$r][1] = $langs->trans('CreateFirePermit');
+		$this->rights[$r][1] = $langs->transnoentities('CreateFirePermit');
 		$this->rights[$r][4] = 'firepermit';
 		$this->rights[$r][5] = 'write';
 		$r++;
@@ -848,34 +864,34 @@ class modDigiriskdolibarr extends DolibarrModules
 
 		/* PREVENTION PLAN PERMISSIONS */
 		$this->rights[$r][0] = $this->numero . $r;
-		$this->rights[$r][1] = $langs->trans('ReadPreventionPlan');
+		$this->rights[$r][1] = $langs->transnoentities('ReadPreventionPlan');
 		$this->rights[$r][4] = 'preventionplan';
 		$this->rights[$r][5] = 'read';
 		$r++;
 		$this->rights[$r][0] = $this->numero . $r;
-		$this->rights[$r][1] = $langs->trans('CreatePreventionPlan');
+		$this->rights[$r][1] = $langs->transnoentities('CreatePreventionPlan');
 		$this->rights[$r][4] = 'preventionplan';
 		$this->rights[$r][5] = 'write';
 		$r++;
 		$this->rights[$r][0] = $this->numero . $r;
-		$this->rights[$r][1] = $langs->trans('DeletePreventionPlan');
+		$this->rights[$r][1] = $langs->transnoentities('DeletePreventionPlan');
 		$this->rights[$r][4] = 'preventionplan';
 		$this->rights[$r][5] = 'delete';
 		$r++;
 
 		/* GP/UT ORGANISATION PERMISSIONS */
 		$this->rights[$r][0] = $this->numero . $r;
-		$this->rights[$r][1] = $langs->trans('ReadDigiriskElement');
+		$this->rights[$r][1] = $langs->transnoentities('ReadDigiriskElement');
 		$this->rights[$r][4] = 'digiriskelement';
 		$this->rights[$r][5] = 'read';
 		$r++;
 		$this->rights[$r][0] = $this->numero . $r;
-		$this->rights[$r][1] = $langs->trans('CreateDigiriskElement');
+		$this->rights[$r][1] = $langs->transnoentities('CreateDigiriskElement');
 		$this->rights[$r][4] = 'digiriskelement';
 		$this->rights[$r][5] = 'write';
 		$r++;
 		$this->rights[$r][0] = $this->numero . $r;
-		$this->rights[$r][1] = $langs->trans('DeleteDigiriskElement');
+		$this->rights[$r][1] = $langs->transnoentities('DeleteDigiriskElement');
 		$this->rights[$r][4] = 'digiriskelement';
 		$this->rights[$r][5] = 'delete';
 		$r++;
@@ -887,7 +903,7 @@ class modDigiriskdolibarr extends DolibarrModules
 		$this->rights[$r][5] = 'read';
 		$r++;
 		$this->rights[$r][0] = $this->numero . $r;
-		$this->rights[$r][1] = $langs->trans('CreateDigiriskRisk');
+		$this->rights[$r][1] = $langs->transnoentities('CreateDigiriskRisk');
 		$this->rights[$r][4] = 'risk';
 		$this->rights[$r][5] = 'write';
 		$r++;
@@ -904,7 +920,7 @@ class modDigiriskdolibarr extends DolibarrModules
 		$this->rights[$r][5] = 'read';
 		$r++;
 		$this->rights[$r][0] = $this->numero . $r;
-		$this->rights[$r][1] = $langs->trans('CreateListingRisksAction');
+		$this->rights[$r][1] = $langs->transnoentities('CreateListingRisksAction');
 		$this->rights[$r][4] = 'listingrisksaction';
 		$this->rights[$r][5] = 'write';
 		$r++;
@@ -921,7 +937,7 @@ class modDigiriskdolibarr extends DolibarrModules
 		$this->rights[$r][5] = 'read';
 		$r++;
 		$this->rights[$r][0] = $this->numero . $r;
-		$this->rights[$r][1] = $langs->trans('CreateListingRisksPhoto');
+		$this->rights[$r][1] = $langs->transnoentities('CreateListingRisksPhoto');
 		$this->rights[$r][4] = 'listingrisksphoto';
 		$this->rights[$r][5] = 'write';
 		$r++;
@@ -938,7 +954,7 @@ class modDigiriskdolibarr extends DolibarrModules
 		$this->rights[$r][5] = 'read';
 		$r++;
 		$this->rights[$r][0] = $this->numero . $r;
-		$this->rights[$r][1] = $langs->trans('CreateDigiriskRiskSign');
+		$this->rights[$r][1] = $langs->transnoentities('CreateDigiriskRiskSign');
 		$this->rights[$r][4] = 'risksign';
 		$this->rights[$r][5] = 'write';
 		$r++;
@@ -950,36 +966,36 @@ class modDigiriskdolibarr extends DolibarrModules
 
 		/* EVALUATOR PERMISSIONS */
 		$this->rights[$r][0] = $this->numero . $r;
-		$this->rights[$r][1] = $langs->trans('ReadEvaluator');
+		$this->rights[$r][1] = $langs->transnoentities('ReadEvaluator');
 		$this->rights[$r][4] = 'evaluator';
 		$this->rights[$r][5] = 'read';
 		$r++;
 		$this->rights[$r][0] = $this->numero . $r;
-		$this->rights[$r][1] = $langs->trans('CreateEvaluator');
+		$this->rights[$r][1] = $langs->transnoentities('CreateEvaluator');
 		$this->rights[$r][4] = 'evaluator';
 		$this->rights[$r][5] = 'write';
 		$r++;
 		$this->rights[$r][0] = $this->numero . $r;
-		$this->rights[$r][1] = $langs->trans('DeleteEvaluator');
+		$this->rights[$r][1] = $langs->transnoentities('DeleteEvaluator');
 		$this->rights[$r][4] = 'evaluator';
 		$this->rights[$r][5] = 'delete';
 		$r++;
 
 		/* ADMINPAGE PANEL ACCESS PERMISSIONS */
 		$this->rights[$r][0] = $this->numero . $r;
-		$this->rights[$r][1] = $langs->trans('ReadAdminPage');
+		$this->rights[$r][1] = $langs->transnoentities('ReadAdminPage');
 		$this->rights[$r][4] = 'adminpage';
 		$this->rights[$r][5] = 'read';
 		$r++;
 
 		/* API PERMISSIONS */
 		$this->rights[$r][0] = $this->numero . $r;
-		$this->rights[$r][1] = $langs->trans('GetAPI');
+		$this->rights[$r][1] = $langs->transnoentities('GetAPI');
 		$this->rights[$r][4] = 'api';
 		$this->rights[$r][5] = 'read';
 		$r++;
 		$this->rights[$r][0] = $this->numero . $r;
-		$this->rights[$r][1] = $langs->trans('PostAPI');
+		$this->rights[$r][1] = $langs->transnoentities('PostAPI');
 		$this->rights[$r][4] = 'api';
 		$this->rights[$r][5] = 'write';
 		$r++;
@@ -991,7 +1007,7 @@ class modDigiriskdolibarr extends DolibarrModules
 		$this->rights[$r][5] = 'read';
 		$r++;
 		$this->rights[$r][0] = $this->numero . $r;
-		$this->rights[$r][1] = $langs->trans('CreateAccident');
+		$this->rights[$r][1] = $langs->transnoentities('CreateAccident');
 		$this->rights[$r][4] = 'accident';
 		$this->rights[$r][5] = 'write';
 		$r++;
@@ -1083,7 +1099,7 @@ class modDigiriskdolibarr extends DolibarrModules
 		$this->menu[$r++] = array(
 			'fk_menu' => 'fk_mainmenu=digiriskdolibarr',	    // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
 			'type' => 'left',			                // This is a Left menu entry
-			'titre' => '<i class="fas fa-info"></i>  ' . $langs->trans('PreventionPlan'),
+			'titre' => '<i class="fas fa-info"></i>  ' . $langs->transnoentities('PreventionPlan'),
 			'mainmenu' => 'digiriskdolibarr',
 			'leftmenu' => 'digiriskpreventionplan',
 			'url' => '/digiriskdolibarr/view/preventionplan/preventionplan_list.php',
@@ -1188,7 +1204,7 @@ class modDigiriskdolibarr extends DolibarrModules
 		$this->menu[$r++] = array(
 			'fk_menu' => 'fk_mainmenu=digiriskdolibarr',	    // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
 			'type' => 'left',			                // This is a Left menu entry
-			'titre' => '<i class="fas fa-building"></i>  ' . $langs->trans('DigiriskConfigSociety'),
+			'titre' => '<i class="fas fa-building"></i>  ' . $langs->transnoentities('DigiriskConfigSociety'),
 			'mainmenu' => 'digiriskdolibarr',
 			'leftmenu' => 'digirisksocietyconfig',
 			'url' => '/admin/company.php',
@@ -1203,7 +1219,7 @@ class modDigiriskdolibarr extends DolibarrModules
 		$this->menu[$r++] = array(
 			'fk_menu' => 'fk_mainmenu=digiriskdolibarr',	    // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
 			'type' => 'left',			                // This is a Left menu entry
-			'titre' => '<span class="minimizeMenu" title="'. $langs->trans('MinimizeMenu') .'"><i class="fas fa-bars"></i>  ' . $langs->trans('MinimizeMenu') . '</span>',
+			'titre' => '<span class="minimizeMenu" title="'. $langs->transnoentities('MinimizeMenu') .'"><i class="fas fa-bars"></i>  ' . $langs->transnoentities('MinimizeMenu') . '</span>',
 			'mainmenu' => 'digiriskdolibarr',
 			'leftmenu' => '',
 			'url' => '',
@@ -1214,6 +1230,84 @@ class modDigiriskdolibarr extends DolibarrModules
 			'target' => '',
 			'user' => 0,				                // 0=Menu for internal users, 1=external users, 2=both
 		);
+
+		// Exports profiles provided by this module
+		$r = 1;
+
+		$this->export_code[$r] = $this->rights_class . '_ticket';
+		$this->export_label[$r] = 'Ticket'; // Translation key (used only if key ExportDataset_xxx_z not found)
+		$this->export_icon[$r] = 'Ticket';
+		$this->export_enabled[$r] = '!empty($conf->ticket->enabled)';
+		$this->export_permission[$r] = array(array("ticket", "manage"));
+		$this->export_fields_array[$r] = array(
+			's.rowid'=>"IdCompany", 's.nom'=>'CompanyName', 's.address'=>'Address', 's.zip'=>'Zip', 's.town'=>'Town', 's.fk_pays'=>'Country',
+			's.phone'=>'Phone', 's.email'=>'Email', 's.siren'=>'ProfId1', 's.siret'=>'ProfId2', 's.ape'=>'ProfId3', 's.idprof4'=>'ProfId4', 's.code_compta'=>'CustomerAccountancyCode', 's.code_compta_fournisseur'=>'SupplierAccountancyCode',
+			'cat.rowid'=>"CategId", 'cat.description'=>"Description", 'cat.fk_parent'=>"ParentCategory",
+			't.rowid'=>"Id", 't.ref'=>"Ref", 't.track_id'=>"TicketTrackId", 't.origin_email'=>"OriginEmail", 't.subject'=>"Subject", 't.message'=>"Message", 't.resolution'=>"Resolution", 't.type_code'=>"Type", 't.category_code'=>"TicketCategory", 't.severity_code'=>"Severity",
+		);
+		$this->export_TypeFields_array[$r] = array(
+			's.rowid'=>"List:societe:nom::thirdparty", 's.nom'=>'Text', 's.address'=>'Text', 's.zip'=>'Text', 's.town'=>'Text', 's.fk_pays'=>'List:c_country:label',
+			's.phone'=>'Text', 's.email'=>'Text', 's.siren'=>'Text', 's.siret'=>'Text', 's.ape'=>'Text', 's.idprof4'=>'Text', 's.code_compta'=>'Text', 's.code_compta_fournisseur'=>'Text',
+			'cat.description'=>"Text", 'cat.fk_parent'=>'List:categorie:label:rowid',
+			't.rowid'=>"List:ticket:ref::ticket", 't.entity'=>'Numeric', 't.ref'=>"Text", 't.track_id'=>"Text", 't.origin_email'=>"Text", 't.subject'=>"Text", 't.message'=>"Text", 't.resolution'=>"Text", 't.type_code'=>"Text", 't.category_code'=>"Text", 't.severity_code'=>"Text",
+		);
+		$this->export_entities_array[$r] = array(
+			's.rowid'=>"company", 's.nom'=>'company', 's.address'=>'company', 's.zip'=>'company', 's.town'=>'company', 's.fk_pays'=>'company',
+			's.phone'=>'company', 's.email'=>'company', 's.siren'=>'company', 's.siret'=>'company', 's.ape'=>'company', 's.idprof4'=>'company', 's.code_compta'=>'company', 's.code_compta_fournisseur'=>'company',
+			'cat.rowid'=>'category', 'cat.description'=>'category', 'cat.fk_parent'=>'category'
+		);
+		// Add multicompany field
+		if (!empty($conf->global->MULTICOMPANY_ENTITY_IN_EXPORT_IF_SHARED)) {
+			$nbofallowedentities = count(explode(',', getEntity('ticket'))); // If ticket are shared, nb will be > 1
+			if (!empty($conf->multicompany->enabled) && $nbofallowedentities > 1) {
+				$this->export_fields_array[$r] += array('t.entity'=>'Entity');
+			}
+		}
+		$this->export_fields_array[$r] = array_merge($this->export_fields_array[$r], array('group_concat(cat.label)'=>'Categories'));
+		$this->export_TypeFields_array[$r] = array_merge($this->export_TypeFields_array[$r], array("group_concat(cat.label)"=>'Text'));
+		$this->export_entities_array[$r] = array_merge($this->export_entities_array[$r], array("group_concat(cat.label)"=>'category'));
+		$this->export_dependencies_array[$r] = array('category'=>'t.rowid');
+		$keyforselect = 'Ticket';
+		$keyforelement = 'Ticket';
+		$keyforaliasextra = 'extra';
+		include DOL_DOCUMENT_ROOT.'/core/extrafieldsinexport.inc.php';
+
+		$this->export_sql_start[$r] = 'SELECT DISTINCT ';
+		$this->export_sql_end[$r] = ' FROM '.MAIN_DB_PREFIX.'ticket as t';
+		$this->export_sql_end[$r] .= ' LEFT JOIN '.MAIN_DB_PREFIX.'ticket_extrafields as extra ON t.rowid = extra.fk_object';
+		$this->export_sql_end[$r] .= ' LEFT JOIN '.MAIN_DB_PREFIX.'categorie_ticket as ct ON ct.fk_ticket = t.rowid';
+		$this->export_sql_end[$r] .= ' LEFT JOIN '.MAIN_DB_PREFIX.'categorie as cat ON ct.fk_categorie = cat.rowid';
+		$this->export_sql_end[$r] .= ' LEFT JOIN '.MAIN_DB_PREFIX.'societe as s ON t.fk_soc = s.rowid';
+		$this->export_sql_end[$r] .= " WHERE t.entity IN (".getEntity('ticket').")";
+
+		$this->export_sql_order[$r] = ' GROUP BY t.ref';
+
+		require_once DOL_DOCUMENT_ROOT . '/categories/class/categorie.class.php';
+
+		$r++;
+		$langs->load("categories");
+		$this->export_code[$r] = $this->rights_class.'_ticket_categories';
+		$this->export_label[$r] = 'CatTicketsList';
+		$this->export_icon[$r] = 'category';
+		$this->export_enabled[$r] = '!empty($conf->ticket->enabled)';
+		$this->export_permission[$r] = array(array("categorie", "lire"), array("ticket", "manage"));
+		$this->export_fields_array[$r] = array('cat.rowid'=>"CategId", 'cat.label'=>"Label", 'cat.description'=>"Description", 'cat.fk_parent'=>"ParentCategory", 't.rowid'=>'TicketId', 't.ref'=>'Ref', 's.rowid'=>"IdThirdParty", 's.nom'=>"Name");
+		$this->export_TypeFields_array[$r] = array('cat.label'=>"Text", 'cat.description'=>"Text", 'cat.fk_parent'=>'List:categorie:label:rowid', 't.ref'=>'Text', 's.rowid'=>"List:societe:nom:rowid", 's.nom'=>"Text");
+		$this->export_entities_array[$r] = array('t.rowid'=>'ticket', 't.ref'=>'ticket', 's.rowid'=>"company", 's.nom'=>"company"); // We define here only fields that use another picto
+
+		$keyforselect = 'Ticket';
+		$keyforelement = 'Ticket';
+		$keyforaliasextra = 'extra';
+		include DOL_DOCUMENT_ROOT.'/core/extrafieldsinexport.inc.php';
+
+		$this->export_sql_start[$r] = 'SELECT DISTINCT ';
+		$this->export_sql_end[$r]  = ' FROM '.MAIN_DB_PREFIX.'categorie as cat';
+		$this->export_sql_end[$r] .= ' INNER JOIN '.MAIN_DB_PREFIX.'categorie_ticket as ct ON ct.fk_categorie = cat.rowid';
+		$this->export_sql_end[$r] .= ' INNER JOIN '.MAIN_DB_PREFIX.'ticket as t ON t.rowid = ct.fk_ticket';
+		$this->export_sql_end[$r] .= ' LEFT JOIN '.MAIN_DB_PREFIX.'ticket_extrafields as extra ON extra.fk_object = t.rowid';
+		$this->export_sql_end[$r] .= ' LEFT JOIN '.MAIN_DB_PREFIX.'societe as s ON s.rowid = t.fk_soc';
+		$this->export_sql_end[$r] .= ' WHERE cat.entity IN ('.getEntity('category').')';
+		$this->export_sql_end[$r] .= ' AND cat.type = 12';
 	}
 
 	/**
@@ -1221,8 +1315,9 @@ class modDigiriskdolibarr extends DolibarrModules
 	 *  The init function add constants, boxes, permissions and menus (defined in constructor) into Dolibarr database.
 	 *  It also creates data directories
 	 *
-	 *  @param      string  $options    Options when enabling module ('', 'noboxes')
-	 *  @return     int             	1 if OK, 0 if KO
+	 * @param string $options Options when enabling module ('', 'noboxes')
+	 * @return     int                1 if OK, 0 if KO
+	 * @throws Exception
 	 */
 	public function init($options = '')
 	{
@@ -1236,7 +1331,7 @@ class modDigiriskdolibarr extends DolibarrModules
 
 			$preventionPlanSignature     = new PreventionPlanSignature($this->db);
 			$preventionPlanSignatureList = $preventionPlanSignature->fetchAll('', '', 0, 0, array(), 'AND', 'digiriskdolibarr_preventionplan_signature');
-			if ( ! empty($preventionPlanSignatureList)) {
+			if (is_array($preventionPlanSignatureList) && count($preventionPlanSignatureList) > 0) {
 				foreach ($preventionPlanSignatureList as $preventionPlanSignature) {
 					$preventionPlanSignature->create($user, 1);
 				}
@@ -1244,7 +1339,7 @@ class modDigiriskdolibarr extends DolibarrModules
 
 			$firePermitSignature     = new FirePermitSignature($this->db);
 			$firePermitSignatureList = $firePermitSignature->fetchAll('', '', 0, 0, array(), 'AND', 'digiriskdolibarr_firepermit_signature');
-			if ( ! empty($firePermitSignatureList)) {
+			if (is_array($firePermitSignatureList) && count($firePermitSignatureList) > 0) {
 				foreach ($firePermitSignatureList as $firePermitSignature) {
 					$firePermitSignature->create($user, 1);
 				}
@@ -1274,6 +1369,7 @@ class modDigiriskdolibarr extends DolibarrModules
 		delDocumentModel('listingrisksaction_odt', 'listingrisksaction');
 		delDocumentModel('listingrisksphoto_odt', 'listingrisksphoto');
 		delDocumentModel('riskassessmentdocument_odt', 'riskassessmentdocument');
+		delDocumentModel('ticketdocument_odt', 'ticketdocument');
 
 		addDocumentModel('informationssharing_odt', 'informationssharing', 'ODT templates', 'DIGIRISKDOLIBARR_INFORMATIONSSHARING_ADDON_ODT_PATH');
 		addDocumentModel('legaldisplay_odt', 'legaldisplay', 'ODT templates', 'DIGIRISKDOLIBARR_LEGALDISPLAY_ADDON_ODT_PATH');
@@ -1285,6 +1381,7 @@ class modDigiriskdolibarr extends DolibarrModules
 		addDocumentModel('listingrisksaction_odt', 'listingrisksaction', 'ODT templates', 'DIGIRISKDOLIBARR_LISTINGRISKSACTION_ADDON_ODT_PATH');
 		addDocumentModel('listingrisksphoto_odt', 'listingrisksphoto', 'ODT templates', 'DIGIRISKDOLIBARR_LISTINGRISKSPHOTO_ADDON_ODT_PATH');
 		addDocumentModel('riskassessmentdocument_odt', 'riskassessmentdocument', 'ODT templates', 'DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_ADDON_ODT_PATH');
+		addDocumentModel('ticketdocument_odt', 'ticketdocument', 'ODT templates', 'DIGIRISKDOLIBARR_TICKETDOCUMENT_ADDON_ODT_PATH');
 
 		if ( $conf->global->DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH == 0 ) {
 			require_once __DIR__ . '/../../class/digiriskelement/groupment.class.php';
@@ -1322,6 +1419,13 @@ class modDigiriskdolibarr extends DolibarrModules
 
 			$societe   = new Societe($this->db);
 			$resources = new DigiriskResources($this->db);
+
+			$labour_doctor         = $societe;
+			$labour_doctor->name   = $langs->trans('LabourDoctorName') . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
+			$labour_doctor->client = 0;
+			$labour_doctor->phone  = '';
+			$labour_doctor->url    = '';
+			$labour_doctorID       = $labour_doctor->create($user);
 
 			$labour_inspector         = $societe;
 			$labour_inspector->name   = $langs->trans('LabourInspectorName') . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
@@ -1372,6 +1476,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			$poison_control_center->url    = '';
 			$poison_control_centerID       = $poison_control_center->create($user);
 
+			$resources->digirisk_dolibarr_set_resources($this->db, 1,  'LabourDoctorSociety',  'societe', array($labour_doctorID), $conf->entity);
 			$resources->digirisk_dolibarr_set_resources($this->db, 1,  'LabourInspectorSociety',  'societe', array($labour_inspectorID), $conf->entity);
 			$resources->digirisk_dolibarr_set_resources($this->db, 1,  'Police',  'societe', array($policeID), $conf->entity);
 			$resources->digirisk_dolibarr_set_resources($this->db, 1,  'SAMU',  'societe', array($samuID), $conf->entity);
@@ -1390,6 +1495,13 @@ class modDigiriskdolibarr extends DolibarrModules
 			$societe   = new Societe($this->db);
 			$resources = new DigiriskResources($this->db);
 
+			$labour_doctor         = $societe;
+			$labour_doctor->name   = $langs->trans('LabourDoctorName') . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
+			$labour_doctor->client = 0;
+			$labour_doctor->phone  = '';
+			$labour_doctor->url    = '';
+			$labour_doctorID       = $labour_doctor->create($user);
+
 			$labour_inspector         = $societe;
 			$labour_inspector->name   = $langs->trans('LabourInspectorName') . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
 			$labour_inspector->client = 0;
@@ -1398,7 +1510,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			$labour_inspectorID       = $labour_inspector->create($user);
 
 			$rights_defender         = $societe;
-			$rights_defender->name   = $langs->trans('RightsDefender') . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
+			$rights_defender->name   = $langs->transnoentities('RightsDefender') . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
 			$rights_defender->client = 0;
 			$rights_defender->phone  = '';
 			$rights_defender->url    = '';
@@ -1411,11 +1523,29 @@ class modDigiriskdolibarr extends DolibarrModules
 			$poison_control_center->url    = '';
 			$poison_control_centerID       = $poison_control_center->create($user);
 
+			$resources->digirisk_dolibarr_set_resources($this->db, 1,  'LabourDoctorSociety',  'societe', array($labour_doctorID), $conf->entity);
 			$resources->digirisk_dolibarr_set_resources($this->db, 1,  'LabourInspectorSociety',  'societe', array($labour_inspectorID), $conf->entity);
 			$resources->digirisk_dolibarr_set_resources($this->db, 1,  'RightsDefender',  'societe', array($rights_defenderID), $conf->entity);
 			$resources->digirisk_dolibarr_set_resources($this->db, 1,  'PoisonControlCenter',  'societe', array($poison_control_centerID), $conf->entity);
 
 			dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_THIRDPARTY_SET', 2, 'integer', 0, '', $conf->entity);
+		} elseif ($conf->global->DIGIRISKDOLIBARR_THIRDPARTY_SET == 2) {
+			require_once DOL_DOCUMENT_ROOT . '/societe/class/societe.class.php';
+			require_once __DIR__ . '/../../class/digiriskresources.class.php';
+
+			$societe   = new Societe($this->db);
+			$resources = new DigiriskResources($this->db);
+
+			$labour_doctor         = $societe;
+			$labour_doctor->name   = $langs->trans('LabourDoctorName') . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
+			$labour_doctor->client = 0;
+			$labour_doctor->phone  = '';
+			$labour_doctor->url    = '';
+			$labour_doctorID       = $labour_doctor->create($user);
+
+			$resources->digirisk_dolibarr_set_resources($this->db, 1,  'LabourDoctorSociety',  'societe', array($labour_doctorID), $conf->entity);
+
+			dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_THIRDPARTY_SET', 3, 'integer', 0, '', $conf->entity);
 		}
 
 		if ( $conf->global->DIGIRISKDOLIBARR_CONTACTS_SET == 0 ) {
@@ -1424,6 +1554,15 @@ class modDigiriskdolibarr extends DolibarrModules
 
 			$contact   = new Contact($this->db);
 			$resources = new DigiriskResources($this->db);
+
+			$allLinks  = $resources->digirisk_dolibarr_fetch_resource('LabourDoctorSociety');
+
+			$labour_doctor            = $contact;
+			$labour_doctor->socid     = $allLinks;
+			$labour_doctor->firstname = $langs->transnoentities('LabourDoctorFirstName');
+			$labour_doctor->lastname  = $langs->trans('LabourDoctorLastName');
+			$labour_doctorID          = $labour_doctor->create($user);
+
 			$allLinks  = $resources->digirisk_dolibarr_fetch_resource('LabourInspectorSociety');
 
 			$labour_inspector            = $contact;
@@ -1432,9 +1571,27 @@ class modDigiriskdolibarr extends DolibarrModules
 			$labour_inspector->lastname  = $langs->trans('LabourInspectorLastName');
 			$labour_inspectorID          = $labour_inspector->create($user);
 
+			$resources->digirisk_dolibarr_set_resources($this->db, 1, 'LabourDoctorContact', 'socpeople', array($labour_doctorID), $conf->entity);
 			$resources->digirisk_dolibarr_set_resources($this->db, 1, 'LabourInspectorContact', 'socpeople', array($labour_inspectorID), $conf->entity);
 
 			dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_CONTACTS_SET', 2, 'integer', 0, '', $conf->entity);
+		} elseif ($conf->global->DIGIRISKDOLIBARR_CONTACTS_SET == 2) {
+			require_once DOL_DOCUMENT_ROOT . '/contact/class/contact.class.php';
+			require_once __DIR__ . '/../../class/digiriskresources.class.php';
+
+			$contact   = new Contact($this->db);
+			$resources = new DigiriskResources($this->db);
+			$allLinks  = $resources->digirisk_dolibarr_fetch_resource('LabourDoctorSociety');
+
+			$labour_doctor            = $contact;
+			$labour_doctor->socid     = $allLinks;
+			$labour_doctor->firstname = $langs->transnoentities('LabourDoctorFirstName');
+			$labour_doctor->lastname  = $langs->trans('LabourDoctorLastName');
+			$labour_doctorID          = $labour_doctor->create($user);
+
+			$resources->digirisk_dolibarr_set_resources($this->db, 1, 'LabourDoctorContact', 'socpeople', array($labour_doctorID), $conf->entity);
+
+			dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_CONTACTS_SET', 3, 'integer', 0, '', $conf->entity);
 		}
 
 		if ( $conf->global->DIGIRISKDOLIBARR_THIRDPARTY_UPDATED == 0 ) {
@@ -1470,7 +1627,7 @@ class modDigiriskdolibarr extends DolibarrModules
 
 			$rights_defenderID = $resources->digirisk_dolibarr_fetch_resource('RightsDefender');
 			$societe->fetch($rights_defenderID);
-			$societe->name = $langs->trans('RightsDefender') . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
+			$societe->name = $langs->transnoentities('RightsDefender') . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
 			$societe->update(0, $user);
 
 			$poison_control_centerID = $resources->digirisk_dolibarr_fetch_resource('PoisonControlCenter');
@@ -1485,13 +1642,14 @@ class modDigiriskdolibarr extends DolibarrModules
 		include_once DOL_DOCUMENT_ROOT . '/core/class/extrafields.class.php';
 		$extra_fields = new ExtraFields($this->db);
 
-		$extra_fields->update('fk_risk', $langs->trans("fk_risk"), 'sellist', '', 'projet_task', 0, 0, 1010, 'a:1:{s:7:"options";a:1:{s:50:"digiriskdolibarr_risk:ref:rowid::entity = $ENTITY$";N;}}', '', '', 1);
-		$extra_fields->addExtraField('fk_risk', $langs->trans("fk_risk"), 'sellist', 1010, '', 'projet_task', 0, 0, '', 'a:1:{s:7:"options";a:1:{s:50:"digiriskdolibarr_risk:ref:rowid::entity = $ENTITY$";N;}}', '', '', 1);
-
-		$extra_fields->addExtraField('fk_preventionplan', $langs->trans("fk_preventionplan"), 'sellist', 1020, '', 'projet_task', 0, 0, '', 'a:1:{s:7:"options";a:1:{s:60:"digiriskdolibarr_preventionplan:ref:rowid::entity = $ENTITY$";N;}}', '', '', 1);
-		$extra_fields->addExtraField('fk_firepermit', $langs->trans("fk_firepermit"), 'sellist', 1030, '', 'projet_task', 0, 0, '', 'a:1:{s:7:"options";a:1:{s:56:"digiriskdolibarr_firepermit:ref:rowid::entity = $ENTITY$";N;}}', '', '', 1);
-		$extra_fields->update('fk_accident', $langs->trans("fk_accident"), 'sellist', '', 'projet_task', 0, 0, 1040, 'a:1:{s:7:"options";a:1:{s:54:"digiriskdolibarr_accident:ref:rowid::entity = $ENTITY$";N;}}', '', '', 1);
-		$extra_fields->addExtraField('fk_accident', $langs->trans("fk_accident"), 'sellist', 1040, '', 'projet_task', 0, 0, '', 'a:1:{s:7:"options";a:1:{s:54:"digiriskdolibarr_accident:ref:rowid::entity = $ENTITY$";N;}}', '', '', 1);
+		$extra_fields->update('fk_risk', $langs->transnoentities("RiskLinked"), 'sellist', '', 'projet_task', 0, 0, 1010, 'a:1:{s:7:"options";a:1:{s:50:"digiriskdolibarr_risk:ref:rowid::entity = $ENTITY$";N;}}', '', '', 1);
+		$extra_fields->addExtraField('fk_risk', $langs->transnoentities("RiskLinked"), 'sellist', 1010, '', 'projet_task', 0, 0, '', 'a:1:{s:7:"options";a:1:{s:50:"digiriskdolibarr_risk:ref:rowid::entity = $ENTITY$";N;}}', '', '', 1);
+		$extra_fields->update('fk_preventionplan', $langs->transnoentities("PreventionPlanLinked"), 'sellist', '', 'projet_task', 0, 0, 1020, 'a:1:{s:7:"options";a:1:{s:60:"digiriskdolibarr_preventionplan:ref:rowid::entity = $ENTITY$";N;}}', '', '', '', 1);
+		$extra_fields->addExtraField('fk_preventionplan', $langs->transnoentities("PreventionPlanLinked"), 'sellist', 1020, '', 'projet_task', 0, 0, '', 'a:1:{s:7:"options";a:1:{s:60:"digiriskdolibarr_preventionplan:ref:rowid::entity = $ENTITY$";N;}}', '', '', 1);
+		$extra_fields->update('fk_firepermit', $langs->transnoentities("FirePermitLinked"), 'sellist', '', 'projet_task', 0, 0, 1030, 'a:1:{s:7:"options";a:1:{s:56:"digiriskdolibarr_firepermit:ref:rowid::entity = $ENTITY$";N;}}', '', '', '', 1);
+		$extra_fields->addExtraField('fk_firepermit', $langs->transnoentities("FirePermitLinked"), 'sellist', 1030, '', 'projet_task', 0, 0, '', 'a:1:{s:7:"options";a:1:{s:56:"digiriskdolibarr_firepermit:ref:rowid::entity = $ENTITY$";N;}}', '', '', 1);
+		$extra_fields->update('fk_accident', $langs->transnoentities("AccidentLinked"), 'sellist', '', 'projet_task', 0, 0, 1040, 'a:1:{s:7:"options";a:1:{s:54:"digiriskdolibarr_accident:ref:rowid::entity = $ENTITY$";N;}}', '', '', 1);
+		$extra_fields->addExtraField('fk_accident', $langs->transnoentities("AccidentLinked"), 'sellist', 1040, '', 'projet_task', 0, 0, '', 'a:1:{s:7:"options";a:1:{s:54:"digiriskdolibarr_accident:ref:rowid::entity = $ENTITY$";N;}}', '', '', 1);
 
 		//Used for data import from Digirisk Wordpress
 		$extra_fields->update('wp_digi_id', $langs->trans("WPDigiID"), 'int', 100, 'digiriskdolibarr_digiriskelement', 0, 0, 1020, '', '', '', 0);
@@ -1584,7 +1742,7 @@ class modDigiriskdolibarr extends DolibarrModules
 
 			$actioncomm = new Actioncomm($this->db);
 
-			$allGroupments = $actioncomm->getActions($this->db, 0, 0, '', ' AND a.elementtype = "groupment@digiriskdolibarr"');
+			$allGroupments = $actioncomm->getActions(0, 0, '', ' AND a.elementtype = "groupment@digiriskdolibarr"');
 			if ( ! empty($allGroupments)) {
 				foreach ($allGroupments as $allGroupment) {
 					$allGroupment->elementtype = 'digiriskelement@digiriskdolibarr';
@@ -1592,7 +1750,7 @@ class modDigiriskdolibarr extends DolibarrModules
 				}
 			}
 
-			$allWorkunits = $actioncomm->getActions($this->db, 0, 0, '', ' AND a.elementtype = "workunit@digiriskdolibarr"');
+			$allWorkunits = $actioncomm->getActions(0, 0, '', ' AND a.elementtype = "workunit@digiriskdolibarr"');
 			if ( ! empty($allWorkunits)) {
 				foreach ($allWorkunits as $allWorkunit) {
 					$allWorkunit->elementtype = 'digiriskelement@digiriskdolibarr';
@@ -1600,7 +1758,7 @@ class modDigiriskdolibarr extends DolibarrModules
 				}
 			}
 
-			$allCompanies = $actioncomm->getActions($this->db, 0, 0, '', ' AND a.elementtype = "societe@digiriskdolibarr"');
+			$allCompanies = $actioncomm->getActions(0, 0, '', ' AND a.elementtype = "societe@digiriskdolibarr"');
 			if ( ! empty($allCompanies)) {
 				foreach ($allCompanies as $allCompany) {
 					$allCompany->fk_soc = $allCompany->fk_element;
@@ -1678,7 +1836,7 @@ class modDigiriskdolibarr extends DolibarrModules
 		global $conf;
 
 		$sql = array();
-
+		require_once __DIR__ . '/../../../../core/lib/admin.lib.php';
 		$options = 'noremoverights';
 
 		if (!empty($conf->global->MULTICOMPANY_EXTERNAL_MODULES_SHARING) && $conf->global->MULTICOMPANY_EXTERNAL_MODULES_SHARING !== 0) {

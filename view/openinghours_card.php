@@ -116,10 +116,13 @@ if ($socid > 0 && empty($societe->id)) {
 	if ($result <= 0) dol_print_error('', $societe->error);
 }
 
-$title                                                                                                                                       = $langs->trans("ThirdParty");
+$title = $langs->trans("ThirdParty");
 if ( ! empty($conf->global->MAIN_HTML_TITLE) && preg_match('/thirdpartynameonly/', $conf->global->MAIN_HTML_TITLE) && $societe->name) $title = $societe->name . " - " . $langs->trans('OpeningHours');
-$help_url                                                                                                                                    = 'EN:Module_Third_Parties|FR:Module_DigiriskDolibarr#L.27onglet_Horaire_de_travail|ES:Empresas';
-llxHeader('', $title, $help_url);
+$help_url = 'EN:Module_Third_Parties|FR:Module_DigiriskDolibarr#L.27onglet_Horaire_de_travail|ES:Empresas';
+
+$morecss = array("/digiriskdolibarr/css/digiriskdolibarr.css");
+
+llxHeader('', $title, $help_url, '', '', '', array(), $morecss);
 
 if ( ! empty($societe->id)) $res = $societe->fetch_optionals();
 
@@ -127,18 +130,18 @@ if ( ! empty($societe->id)) $res = $societe->fetch_optionals();
 // ------------------------------------------------------------
 $morehtmlref  = '<div class="refidno">';
 $morehtmlref .= '</div>';
-
 $head = societe_prepare_head($societe);
 print dol_get_fiche_head($head, 'openinghours', $langs->trans("ThirdParty"), 0, 'company');
 $linkback = '<a href="' . DOL_URL_ROOT . '/societe/list.php?restore_lastsearch_values=1">' . $langs->trans("BackToList") . '</a>';
-dol_banner_tab($societe, 'socid', $linkback, ($user->socid ? 0 : 1), 'rowid', 'nom', '', '', 0, '', '', 'arearefnobottom');
+dol_banner_tab($societe, 'socid', $linkback, ($user->socid ? 0 : 1), 'rowid', 'nom');
 
-print '<span class="opacitymedium">' . $langs->trans("ThirdPartyOpeningHours") . "</span>\n";
+print dol_get_fiche_end();
+
+print load_fiche_titre($langs->trans("ThirdPartyOpeningHours"), '', '');
 
 //Show common fields
 require_once __DIR__ . '/../core/tpl/digiriskdolibarr_openinghours_view.tpl.php';
 
-print dol_get_fiche_end();
 // End of page
 llxFooter();
 $db->close();

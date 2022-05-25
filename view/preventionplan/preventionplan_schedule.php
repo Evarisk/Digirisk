@@ -36,11 +36,14 @@ if ( ! $res && file_exists("../../../main.inc.php")) $res    = @include "../../.
 if ( ! $res && file_exists("../../../../main.inc.php")) $res = @include "../../../../main.inc.php";
 if ( ! $res) die("Include of main fails");
 
+require_once DOL_DOCUMENT_ROOT . '/core/lib/images.lib.php';
+require_once DOL_DOCUMENT_ROOT . '/projet/class/project.class.php';
+
 require_once __DIR__ . '/../../class/preventionplan.class.php';
 require_once __DIR__ . '/../../class/openinghours.class.php';
+require_once __DIR__ . '/../../class/digiriskresources.class.php';
 require_once __DIR__ . '/../../lib/digiriskdolibarr_preventionplan.lib.php';
 require_once __DIR__ . '/../../lib/digiriskdolibarr_function.lib.php';
-require_once DOL_DOCUMENT_ROOT . '/core/lib/images.lib.php';
 
 global $conf, $db, $langs, $user, $hookmanager;
 
@@ -55,8 +58,10 @@ $cancel      = GETPOST('cancel', 'aZ09');
 $contextpage = GETPOST('contextpage', 'aZ') ? GETPOST('contextpage', 'aZ') : 'preventionplanschedule'; // To manage different context of search
 
 // Initialize technical objects
-$preventionplan = new PreventionPlan($db);
-$object         = new Openinghours($db);
+$preventionplan    = new PreventionPlan($db);
+$object            = new Openinghours($db);
+$digiriskresources = new DigiriskResources($db);
+$project           = new Project($db);
 
 $hookmanager->initHooks(array('preventionplanschedule', 'globalcard')); // Note that conf->hooks_modules contains array
 
@@ -121,10 +126,21 @@ if ( ! empty($preventionplan->id)) $res = $preventionplan->fetch_optionals();
 
 $head = preventionplanPrepareHead($preventionplan);
 print dol_get_fiche_head($head, 'preventionplanSchedule', $langs->trans("PreventionPlan"), -1, "digiriskdolibarr@digiriskdolibarr");
-dol_strlen($preventionplan->label) ? $morehtmlref = ' - ' . $preventionplan->label : '';
-//$morehtmlleft .= '<div class="floatleft inline-block valignmiddle divphotoref">'.digirisk_show_photos('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$entity].'/'.$object->element_type, 'small', 5, 0, 0, 0, $width,0, 0, 0, 0, $object->element_type, $object).'</div>';
 
-digirisk_banner_tab($preventionplan, 'ref', '', 0, 'ref', 'ref', $morehtmlref, 0, 0, '', $preventionplan->getLibStatut(5));
+$width = 80; $cssclass = 'photoref';
+dol_strlen($preventionplan->label) ? $morehtmlref = '<span>' . ' - ' . $preventionplan->label . '</span>' : '';
+$morehtmlref                             .= '<div class="refidno">';
+// External Society -- Société extérieure
+$ext_society  = $digiriskresources->fetchResourcesFromObject('PP_EXT_SOCIETY', $preventionplan);
+$morehtmlref .= $langs->trans('ExtSociety') . ' : ' . $ext_society->getNomUrl(1);
+// Project
+$project->fetch($preventionplan->fk_project);
+$morehtmlref .= '<br>' . $langs->trans('Project') . ' : ' . getNomUrlProject($project, 1, 'blank');
+$morehtmlref .= '</div>';
+
+//$morehtmlleft = '<div class="floatleft inline-block valignmiddle divphotoref">'.digirisk_show_photos('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$entity].'/'.$object->element_type, 'small', 5, 0, 0, 0, $width,0, 0, 0, 0, $object->element_type, $object).'</div>';
+
+digirisk_banner_tab($preventionplan, 'ref', '', 0, 'ref', 'ref', $morehtmlref, '', 0, $morehtmlleft, $preventionplan->getLibStatut(5));
 
 print dol_get_fiche_end();
 

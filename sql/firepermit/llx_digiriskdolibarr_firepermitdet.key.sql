@@ -16,3 +16,4 @@
 ALTER TABLE llx_digiriskdolibarr_firepermitdet ADD INDEX idx_digiriskdolibarr_firepermitdet_rowid (rowid);
 ALTER TABLE llx_digiriskdolibarr_firepermitdet ADD INDEX idx_digiriskdolibarr_firepermitdet_ref_ext (ref_ext);
 ALTER TABLE llx_digiriskdolibarr_firepermitdet ADD CONSTRAINT llx_digiriskdolibarr_firepermitdet_fk_user_creat FOREIGN KEY (fk_user_creat) REFERENCES llx_user(rowid);
+ALTER TABLE llx_digiriskdolibarr_firepermitdet ADD UNIQUE uk_firepermitdet_ref (ref, entity);

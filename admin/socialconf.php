@@ -145,7 +145,7 @@ print load_fiche_titre($title, '', 'title_setup');
 
 $head = company_admin_prepare_head();
 
-print dol_get_fiche_head($head, 'social', $langs->trans("Company"), -1, 'company');
+print dol_get_fiche_head($head, 'social', '', -1, '');
 
 $form      = new Form($db);
 $resources = new DigiriskResources($db);

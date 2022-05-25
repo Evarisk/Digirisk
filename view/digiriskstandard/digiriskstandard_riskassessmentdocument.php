@@ -148,7 +148,7 @@ if (empty($reshook)) {
 				if ( ! $error) {
 					$filedir = $upload_dir . '/riskassessmentdocument/';
 					if ( ! empty($filedir)) {
-						$result = dol_add_file_process($filedir, 0, 1, 'userfile', '', null, '', 1, $object);
+						$result = digirisk_dol_add_file_process($filedir, 0, 1, 'userfile', '', null, '', 1, $object);
 					}
 				}
 			}
@@ -211,7 +211,6 @@ if (empty($reshook)) {
 				$subFolder = $digiriskelementdocument->element;
 
 				$moreparams['object'] = $digiriskelementsingle['object'];
-				$moreparams['user']   = $user;
 
 				$digiriskelementdocumentmodel = 'DIGIRISKDOLIBARR_' . strtoupper($digiriskelementdocument->element) . '_DEFAULT_MODEL';
 				$digiriskelementdocumentmodelpath = 'DIGIRISKDOLIBARR_' . strtoupper($digiriskelementdocument->element) . '_ADDON_ODT_PATH';

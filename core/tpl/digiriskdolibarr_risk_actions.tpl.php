@@ -69,6 +69,8 @@ if ( ! $error && $action == 'add' && $permissiontoadd) {
 					$destfull = $pathToEvaluationPhoto . '/' . $file['name'];
 
 					// Create thumbs
+					$imgThumbLarge = vignette($destfull, $conf->global->DIGIRISKDOLIBARR_MEDIA_MAX_WIDTH_LARGE, $conf->global->DIGIRISKDOLIBARR_MEDIA_MAX_HEIGHT_LARGE, '_large', 50, "thumbs");
+					$imgThumbMedium = vignette($destfull, $conf->global->DIGIRISKDOLIBARR_MEDIA_MAX_WIDTH_MEDIUM, $conf->global->DIGIRISKDOLIBARR_MEDIA_MAX_HEIGHT_MEDIUM, '_medium', 50, "thumbs");
 					$imgThumbSmall = vignette($destfull, $maxwidthsmall, $maxheightsmall, '_small', 50, "thumbs");
 					$imgThumbMini  = vignette($destfull, $maxwidthmini, $maxheightmini, '_mini', 50, "thumbs");
 					unlink($file['fullname']);
@@ -260,6 +262,8 @@ if ( ! $error && $action == 'addEvaluation' && $permissiontoadd) {
 			// Create thumbs
 			// We can't use $object->addThumbs here because there is no $object known
 			// Used on logon for example
+			$imgThumbLarge = vignette($destfull, $conf->global->DIGIRISKDOLIBARR_MEDIA_MAX_WIDTH_LARGE, $conf->global->DIGIRISKDOLIBARR_MEDIA_MAX_HEIGHT_LARGE, '_large', 50, "thumbs");
+			$imgThumbMedium = vignette($destfull, $conf->global->DIGIRISKDOLIBARR_MEDIA_MAX_WIDTH_MEDIUM, $conf->global->DIGIRISKDOLIBARR_MEDIA_MAX_HEIGHT_MEDIUM, '_medium', 50, "thumbs");
 			$imgThumbSmall = vignette($destfull, $maxwidthsmall, $maxheightsmall, '_small', 50, "thumbs");
 			// Create mini thumbs for image (Ratio is near 16/9)
 			// Used on menu or for setup page for example
@@ -609,6 +613,8 @@ if ( ! $error && $action == "addFiles" && $permissiontodelete) {
 				$destfull = $pathToEvaluationPhoto . '/' . $filename;
 
 				// Create thumbs
+				$imgThumbLarge = vignette($destfull, $conf->global->DIGIRISKDOLIBARR_MEDIA_MAX_WIDTH_LARGE, $conf->global->DIGIRISKDOLIBARR_MEDIA_MAX_HEIGHT_LARGE, '_large', 50, "thumbs");
+				$imgThumbMedium = vignette($destfull, $conf->global->DIGIRISKDOLIBARR_MEDIA_MAX_WIDTH_MEDIUM, $conf->global->DIGIRISKDOLIBARR_MEDIA_MAX_HEIGHT_MEDIUM, '_medium', 50, "thumbs");
 				$imgThumbSmall = vignette($destfull, $maxwidthsmall, $maxheightsmall, '_small', 50, "thumbs");
 				// Create mini thumbs for image (Ratio is near 16/9)
 				$imgThumbMini = vignette($destfull, $maxwidthmini, $maxheightmini, '_mini', 50, "thumbs");

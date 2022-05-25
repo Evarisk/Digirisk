@@ -61,7 +61,7 @@ require_once DOL_DOCUMENT_ROOT . '/core/modules/ticket/mod_ticket_simple.php';
 
 require_once '../../lib/digiriskdolibarr_function.lib.php';
 
-global $langs;
+global $conf, $db, $langs;
 // Load translation files required by the page
 $langs->loadLangs(array('companies', 'other', 'mails', 'ticket', 'digiriskdolibarr@digiriskdolibarr'));
 
@@ -104,18 +104,18 @@ if ($reshook < 0) {
 if ($action == 'add') {
 	$error = 0;
 
-	$register      = GETPOST('register');
-	$pertinence    = GETPOST('pertinence');
-	$message       = GETPOST('message');
-	$ticket_tmp_id = GETPOST('ticket_id');
+	$parentCategory = GETPOST('parentCategory');
+	$subCategory     = GETPOST('subCategory');
+	$message        = GETPOST('message');
+	$ticket_tmp_id  = GETPOST('ticket_id');
 
 	// Check parameters
-	if (empty($register)) {
-		setEventMessages($langs->trans('ErrorFieldNotEmpty', $langs->transnoentitiesnoconv('Register')), null, 'errors');
+	if (empty($parentCategory)) {
+		setEventMessages($langs->trans('ErrorFieldNotEmpty', $langs->transnoentitiesnoconv('ParentCategory')), null, 'errors');
 		$error++;
 	}
 	// Quand le registre choisi est Danger Grave et Imminent, il ne faut pas check ça
-	//  if (empty($pertinence)) {
+	//  if (empty($subCategory)) {
 	//      setEventMessages($langs->trans('ErrorFieldNotEmpty', $langs->transnoentitiesnoconv('Pertinence')), null, 'errors');
 	//      $error++;
 	//  }
@@ -176,13 +176,13 @@ if ($action == 'add') {
 
 		if ($result > 0) {
 			//Add categories linked
-			$registerCat = $category;
-			$registerCat->fetch($register);
-			$registerCat->add_type($object, Categorie::TYPE_TICKET);
+			$parentCategoryCat = $category;
+			$parentCategoryCat->fetch($parentCategory);
+			$parentCategoryCat->add_type($object, Categorie::TYPE_TICKET);
 
-			$pertinenceCat = $category;
-			$pertinenceCat->fetch($pertinence);
-			$pertinenceCat->add_type($object, Categorie::TYPE_TICKET);
+			$subCategoryCat = $category;
+			$subCategoryCat->fetch($subCategory);
+			$subCategoryCat->add_type($object, Categorie::TYPE_TICKET);
 
 			//Add files linked
 			$ticket_upload_dir = $conf->digiriskdolibarr->multidir_output[isset($conf->entity) ? $conf->entity : 1] . '/temp';
@@ -263,6 +263,8 @@ if ($action == 'sendfile') {
 				global $maxwidthmini, $maxheightmini, $maxwidthsmall, $maxheightsmall;
 
 				// Create thumbs
+				$imgThumbLarge = vignette($path_filename_ext, $conf->global->DIGIRISKDOLIBARR_MEDIA_MAX_WIDTH_LARGE, $conf->global->DIGIRISKDOLIBARR_MEDIA_MAX_HEIGHT_LARGE, '_large', 50, "thumbs");
+				$imgThumbMedium = vignette($path_filename_ext, $conf->global->DIGIRISKDOLIBARR_MEDIA_MAX_WIDTH_MEDIUM, $conf->global->DIGIRISKDOLIBARR_MEDIA_MAX_HEIGHT_MEDIUM, '_medium', 50, "thumbs");
 				$imgThumbSmall = vignette($path_filename_ext, $maxwidthsmall, $maxheightsmall, '_small', 50, "thumbs");
 				// Create mini thumbs for image (Ratio is near 16/9)
 				$imgThumbMini = vignette($path_filename_ext, 30, 30, '_mini', 50, "thumbs");
@@ -296,7 +298,6 @@ if ($action == 'removefile') {
 	$action = '';
 }
 
-
 /*
  * View
  */
@@ -322,8 +323,8 @@ print load_fiche_titre($title_edit, '', "digiriskdolibarr32px@digiriskdolibarr")
 print '<form method="POST" action="' . $_SERVER["PHP_SELF"] . '" id="sendTicketForm">';
 print '<input type="hidden" name="token" value="' . newToken() . '">';
 print '<input type="hidden" name="action" value="add">';
-print '<input type="hidden" id="register" name="register" value="' . GETPOST('register') . '">';
-print '<input type="hidden" id="pertinence" name="pertinence" value="' . GETPOST('pertinence') . '">';
+print '<input type="hidden" id="parentCategory" name="parentCategory" value="' . GETPOST('parentCategory') . '">';
+print '<input type="hidden" id="subCategory" name="subCategory" value="' . GETPOST('subCategory') . '">';
 print '<input type="hidden" id="ticket_id" name="ticket_id" value="' . $ticket_tmp_id . '">';
 print '<input type="hidden" name="id" value="' . $object->id . '">';
 if ($backtopage) print '<input type="hidden" name="backtopage" value="' . $backtopage . '">';
@@ -334,84 +335,69 @@ print dol_get_fiche_head(array(), '0', '', 1);
 print '<div class="img-fields-container">';
 print '<div class="centpercent tableforimgfields form-registre">' . "\n";
 
-print '<p><strong>' . $langs->trans("Register") . '</strong></p>';
+print '<p><strong>' . $conf->global->DIGIRISKDOLIBARR_TICKET_PARENT_CATEGORY_LABEL . '</strong></p>';
 print '';
 
-$registerCategory = $category->rechercher(0, 'Registre', 'ticket', true);
-
+$mainCategoryObject = $category->rechercher($conf->global->DIGIRISKDOLIBARR_TICKET_MAIN_CATEGORY, '', 'ticket', true);
 
 print '<div class="wpeo-gridlayout grid-3">';
-if ( ! empty($registerCategory) && $registerCategory > 0) {
-	$registerChildren = $registerCategory[0]->get_filles();
-	if ( ! empty($registerChildren) && $registerChildren > 0) {
-		foreach ($registerChildren as $register) {
-			if ($register->id == GETPOST('register')) {
-				print '<div class="ticket-register active" id="' . $register->id . '">';
+if ( ! empty($mainCategoryObject) && $mainCategoryObject > 0) {
+	$mainCategoryChildren = $mainCategoryObject[0]->get_filles();
+	if ( ! empty($mainCategoryChildren) && $mainCategoryChildren > 0) {
+		$k = 1;
+		foreach ($mainCategoryChildren as $cat) {
+			if ($cat->id == GETPOST('parentCategory')) {
+				print '<div class="ticket-parentCategory ticket-parentCategory'. $cat->id .' active" id="' . $cat->id . '">';
 			} else {
-				print '<div class="ticket-register" id="' . $register->id . '">';
+				print '<div class="ticket-parentCategory ticket-parentCategory'. $cat->id .'" id="' . $cat->id . '">';
 			}
+			print '<div class="wpeo-button" style="background:#'. $cat->color.'; border-color:#'. $cat->color .'">';
 
-			if ($register->label == $langs->transnoentities('SST')) {
-				print '<div class="wpeo-button button-blue">';
-				show_category_image($register, $upload_dir);
-				print '<span class="button-label">' . $register->label . '</span>';
-				print '</div>';
-			} elseif ($register->label == $langs->transnoentities('Accident')) {
-				print '<div class="wpeo-button button-yellow">';
-				show_category_image($register, $upload_dir);
-				print '<span class="button-label">' . $register->label . '</span>';
-				print '</div>';
-			} elseif ($register->label == $langs->transnoentities('DGI')) {
-				print '<div class="wpeo-button button-red">';
-				show_category_image($register, $upload_dir);
-				print '<span class="button-label">' . $register->label . '</span>';
-				print '</div>';
-			} else {
-				show_category_image($register, $upload_dir);
-			}
+			show_category_image($cat, $upload_dir);
+			print '<span class="button-label">' . $cat->label . '</span>';
 			print '</div>';
-		}
-	}
-}
-print '</div>';
 
-print '</div>';
-
-print '<div class="centpercent tableforimgfields">' . "\n";
-
-if (GETPOST('register')) {
-	$selectedRegister = $category;
-	$selectedRegister->fetch(GETPOST('register'));
-	$selectedRegisterChildren = $selectedRegister->get_filles();
-	if ( ! empty($selectedRegisterChildren)) {
-		print '<p><strong>' . $langs->trans("Pertinence") . '</strong></p>';
-
-		print '<div class="wpeo-gridlayout grid-5">';
-		foreach ($selectedRegisterChildren as $pertinence) {
-			if ($pertinence->id == GETPOST('pertinence')) {
-				print '<div class="ticket-pertinence center active" id="' . $pertinence->id . '">';
-			} else {
-				print '<div class="ticket-pertinence center" id="' . $pertinence->id . '">';
-			}
-			show_category_image($pertinence, $upload_dir);
-			print '<span class="button-label">' . $pertinence->label . '</span>';
 			print '</div>';
+			$k++;
 		}
 		print '</div>';
+
+		print '<div class="centpercent tableforimgfields">' . "\n";
+
+		foreach ($mainCategoryChildren as $cat) {
+			$selectedParentCategory = $category;
+			$selectedParentCategory->fetch($cat->id);
+			$selectedParentCategoryChildren = $selectedParentCategory->get_filles();
+			if ( ! empty($selectedParentCategoryChildren)) {
+
+				print '<div class="subCategories children'. $cat->id .'"'. (GETPOST('parentCategory') == $cat->id ? '' : ' style="display:none">');
+				print '<p><strong>' . $conf->global->DIGIRISKDOLIBARR_TICKET_CHILD_CATEGORY_LABEL . '</strong></p>';
+				print '<div class="wpeo-gridlayout grid-5">';
+
+				foreach ($selectedParentCategoryChildren as $subCategory) {
+					if ($subCategory->id == GETPOST('subCategory')) {
+						print '<div class="ticket-subCategory ticket-subCategory'. $subCategory->id .' center active" id="' . $subCategory->id . '">';
+					} else {
+						print '<div class="ticket-subCategory ticket-subCategory'. $subCategory->id .' center" id="' . $subCategory->id . '" style="background:#ffffff">';
+					}
+					show_category_image($subCategory, $upload_dir);
+					print '<span class="button-label">' . $subCategory->label . '</span>';
+					print '</div>';
+				}
+				print '</div>';
+				print '</div>';
+			}
+		}
+		print '</div>';
+
 	}
-}
-
-print '</div>';
-
-print '</div>';
-
-?>
+} ?>
 <div class="wpeo-form tableforinputfields">
 	<div class="wpeo-gridlayout grid-2">
 		<div class="form-element">
 			<span class="form-label"><?php print $langs->trans("Message"); ?></span>
 			<label class="form-field-container">
-				<textarea name="message" id="message"></textarea>
+				<textarea name="message" id="message"><?php echo GETPOST('message');?></textarea>
 			</label>
 		</div>
 		<div class="form-element">
@@ -427,7 +413,7 @@ print '</div>';
 			<div id="sendFileForm">
 				<div id="fileLinkedTable" class="tableforinputfields">
 					<?php $fileLinkedList = dol_dir_list($conf->digiriskdolibarr->multidir_output[isset($conf->entity) ? $conf->entity : 1] . '/temp/ticket/' . $ticket_tmp_id . '/thumbs/'); ?>
-					<div class="wpeo-table table-flex table-3">
+					<div class="wpeo-table table-flex table-3 files-uploaded">
 						<?php
 						if ( ! empty($fileLinkedList)) {
 							foreach ($fileLinkedList as $fileLinked) {

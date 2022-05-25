@@ -37,6 +37,7 @@ if ( ! $res && file_exists("../../../../main.inc.php")) $res = @include "../../.
 if ( ! $res) die("Include of main fails");
 
 require_once DOL_DOCUMENT_ROOT . '/core/lib/images.lib.php';
+require_once DOL_DOCUMENT_ROOT . '/projet/class/project.class.php';
 
 require_once __DIR__ . '/../../class/digiriskresources.class.php';
 require_once __DIR__ . '/../../class/preventionplan.class.php';
@@ -61,6 +62,7 @@ $digiriskresources = new DigiriskResources($db);
 $usertmp           = new User($db);
 $contact           = new Contact($db);
 $form              = new Form($db);
+$project           = new Project($db);
 
 $object->fetch($id);
 
@@ -283,8 +285,19 @@ if ( ! empty($object->id)) $res = $object->fetch_optionals();
 
 $head = preventionplanPrepareHead($object);
 print dol_get_fiche_head($head, 'preventionplanAttendants', $langs->trans("PreventionPlan"), -1, "digiriskdolibarr@digiriskdolibarr");
-dol_strlen($object->label) ? $morehtmlref = ' - ' . $object->label : '';
-//$morehtmlleft .= '<div class="floatleft inline-block valignmiddle divphotoref">'.digirisk_show_photos('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$entity].'/'.$object->element_type, 'small', 5, 0, 0, 0, $width,0, 0, 0, 0, $object->element_type, $object).'</div>';
+
+$width = 80; $cssclass = 'photoref';
+dol_strlen($object->label) ? $morehtmlref = '<span>' . ' - ' . $object->label . '</span>' : '';
+$morehtmlref                             .= '<div class="refidno">';
+// External Society -- Société extérieure
+$ext_society  = $digiriskresources->fetchResourcesFromObject('PP_EXT_SOCIETY', $object);
+$morehtmlref .= $langs->trans('ExtSociety') . ' : ' . $ext_society->getNomUrl(1);
+// Project
+$project->fetch($preventionplan->fk_project);
+$morehtmlref .= '<br>' . $langs->trans('Project') . ' : ' . getNomUrlProject($project, 1, 'blank');
+$morehtmlref .= '</div>';
+
+//$morehtmlleft = '<div class="floatleft inline-block valignmiddle divphotoref">'.digirisk_show_photos('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$entity].'/'.$object->element_type, 'small', 5, 0, 0, 0, $width,0, 0, 0, 0, $object->element_type, $object).'</div>';
 
 digirisk_banner_tab($object, 'ref', '', 0, 'ref', 'ref', $morehtmlref, '', 0, $morehtmlleft, $object->getLibStatut(5));
 
@@ -397,7 +410,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 		require __DIR__ . "/../../core/tpl/digiriskdolibarr_signature_action_view.tpl.php";
 	}
 	print '</td>';
-	if ($element->signature != $langs->trans("FileGenerated") && $permissiontoadd) {
+	if ($element->signature != $langs->transnoentities("FileGenerated") && $permissiontoadd) {
 		print '<td class="center">';
 		require __DIR__ . "/../../core/tpl/digiriskdolibarr_signature_view.tpl.php";
 		print '</td>';
@@ -450,7 +463,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	if ($object->status == 2 && $permissiontoadd) {
 		require __DIR__ . "/../../core/tpl/digiriskdolibarr_signature_action_view.tpl.php";
 	}	print '</td>';
-	if ($element->signature != $langs->trans("FileGenerated") && $permissiontoadd) {
+	if ($element->signature != $langs->transnoentities("FileGenerated") && $permissiontoadd) {
 		print '<td class="center">';
 		require __DIR__ . "/../../core/tpl/digiriskdolibarr_signature_view.tpl.php";
 		print '</td>';
@@ -514,7 +527,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 				require __DIR__ . "/../../core/tpl/digiriskdolibarr_signature_action_view.tpl.php";
 			}
 			print '</td>';
-			if ($element->signature != $langs->trans("FileGenerated") && $permissiontoadd) {
+			if ($element->signature != $langs->transnoentities("FileGenerated") && $permissiontoadd) {
 				print '<td class="center">';
 				require __DIR__ . "/../../core/tpl/digiriskdolibarr_signature_view.tpl.php";
 				print '</td>';

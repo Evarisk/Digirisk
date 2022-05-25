@@ -115,7 +115,7 @@ ContractType = Type de contrat
 Apprentice/Student = Apprenti/Elève
 Interim = Intérimaire
 ProfessionalQualification = Qualification professionnelle
-
+DigiriskDocumentation = Documentation de Digirisk
 
 #
 # Diaporama page index
@@ -415,7 +415,6 @@ LabourInspectorFirstName = Inspecteur du
 LabourInspectorLastName = travail
 PreventionPlanData = Données du Plan de prévention
 MaitreOeuvreDescription = L'utilisateur utilisé par défaut comme Responsable de l'Entreprise Utilisatrice
-fk_preventionplan = Plan de prévention lié
 PreventionPlanLinked = Plan de prévention lié
 NoPreventionPlanRisk = Aucun risque sur le plan de prévention
 NoPreventionPlanLinked = Aucun plan de prévention lié
@@ -518,7 +517,8 @@ FirePermitDescription = Projet des permis de feu
 FirePermitData = Données du Permis de feu
 FirePermitManagement = Gestion des permis de feu
 FPRProject = Projet lié aux permis de feu
-fk_firepermit = Permis de feu lié
+FirePermitLinked = Permis de feu lié
+
 # Email - Mail
 FirePermitLabel = Récapitulatif du permis de feu
 FirePermitSubject = Email permis de feu
@@ -649,7 +649,7 @@ ConfirmDeleteAccidentWorkStop = Êtes-vous sûr de vouloir supprimer l'arrêt de
 AccidentMetaDataLesion = Données complémentaires des lésions
 TotalWorkStopDays = Nombre total de jour d'arrêt de travail
 RegisterAccident = Accident bénin
-fk_accident = Accident lié
+AccidentLinked = Accident lié
 
 # AccidentTooltip - Tooltip des accidents
 VictimActivityTooltip = Précisez l’activité ou la tâche de la victime au moment de l’accident, c’est-à-dire ce que faisait la victime
@@ -707,19 +707,19 @@ CreateListingRisksPhoto = Créer/Modifier les listing des risques avec photos
 DeleteListingRisksPhoto = Supprimer les listing des risques avec photos
 
 # Trigger - Déclencheur
-ListingRisksPhotoGeneratedWithDolibarr = Listing de risques photo généré avec Dolibarr
+ListingRisksPhotoGeneratedWithDolibarr = Listing des risques avec photos généré avec Dolibarr
 
 # Mod Numbering - Modèle de numérotation
-DigiriskListingRisksPhotoDocumentNumberingModule = Modèle de numérotation des listing des risques photo de Digirisk
+DigiriskListingRisksPhotoDocumentNumberingModule = Modèle de numérotation des listing des risques avec photos de Digirisk
 DigiriskListingRisksPhotoStandardModel = Renvoie le numéro sous la forme RLPn où n est un compteur séquentiel sans rupture et sans remise à 0.
 
 # ODT Template - Template ODT
-DigiriskTemplateDocumentListingRisksPhoto = Modèle de documents des listing des risques photo de Digirisk
-ListingRisksPhotoCustomDigiriskTemplate = ODT custom des listing des risques photo
-ListingRisksPhotoDigiriskTemplate = ODT par défaut des listing des risques photo
+DigiriskTemplateDocumentListingRisksPhoto = Modèle de documents des listing des risques avec photos de Digirisk
+ListingRisksPhotoCustomDigiriskTemplate = ODT custom des listing des risques avec photos
+ListingRisksPhotoDigiriskTemplate = ODT par défaut des listing des risques avec photos
 
 # Data - Donnée
-ListingRisksPhoto = Listing des risques photo
+ListingRisksPhoto = Listing des risques avec photos
 
 
 
@@ -733,19 +733,19 @@ CreateListingRisksAction = Créer/Modifier les listing des risques avec actions 
 DeleteListingRisksAction = Supprimer les listing des risques avec actions correctives
 
 # Trigger - Déclencheur
-ListingRisksActionGeneratedWithDolibarr = Listing de risques actions correctives généré avec Dolibarr
+ListingRisksActionGeneratedWithDolibarr = Listing des risques avec actions correctives généré avec Dolibarr
 
 # Mod Numbering - Modèle de numérotation
-DigiriskListingRisksActionDocumentNumberingModule = Modèle de numérotation des listing des actions correctives de Digirisk
+DigiriskListingRisksActionDocumentNumberingModule = Modèle de numérotation des listing des risques avec actions correctives de Digirisk
 DigiriskListingRisksActionStandardModel = Renvoie le numéro sous la forme RLAn où n est un compteur séquentiel sans rupture et sans remise à 0.
 
 # ODT Template - Template ODT
-DigiriskTemplateDocumentListingRisksAction = Modèle de documents des listing des actions correctives de Digirisk
-ListingRisksActionCustomDigiriskTemplate = ODT custom des listing des actions correctives
-ListingRisksActionDigiriskTemplate = ODT par défaut des listing des actions correctives
+DigiriskTemplateDocumentListingRisksAction = Modèle de documents des listing des risques avec actions correctives de Digirisk
+ListingRisksActionCustomDigiriskTemplate = ODT custom des listing des risques avec actions correctives
+ListingRisksActionDigiriskTemplate = ODT par défaut des listing des risques avec actions correctives
 
 # Data - Donnée
-ListingRisksAction = Listing des actions correctives
+ListingRisksAction = Listing des risques avec actions correctives
 
 
 
@@ -1032,7 +1032,7 @@ RiskDescriptionNotActivated = Veuillez activer le champ description du risque da
 AddRisk = Ajouter un risque
 NoDescriptionThere = Aucune description renseignée sur ce risque
 NoRiskThere = "Aucun risque spécifique sur cette unité" Cependant vous pouvez être soumis aux risques génériques de vos groupements de travail.
-fk_risk = Risque lié
+RiskLinked = Risque lié
 MoveRisk = Déplacer le risque
 MoveRisks = Déplacer les risques
 MoveRisksDescription = Permet de déplacer les risques d'un groupement ou d'une unité de travail à un(e) autre
@@ -1289,6 +1289,7 @@ SignatureManagement = Gestion des signatures
 Register = Registre
 Send = Envoyer
 TicketSend = Ticket envoyé
+CreateTicket = Ticket
 FilesLinked = Photos / Pièces jointes
 AddDocument = Ajouter document
 LastnamePlaceholder = Exemple : Dupont
@@ -1302,25 +1303,28 @@ ExtrafieldsCreated = Création des extrafields de ticket
 AnticipatedLeave = Départ anticipé
 DGI = Danger grave et imminent
 SST = Santé et sécurité au travail
-PresquAccident = PresquAccident
+PresquAccident = Presqu'accident
 Accident = Accident
 EnhancementSuggestion = Suggestion d'amélioration
 MaterialProblem = Problème matériel
 HumanProblem = Problème humain
 Others = Autre
-AccidentWithoutDIAT = Accident sans DIAT
-AccidentWithDIAT = Accident avec DIAT
+AccidentWithoutDIAT = Accident bénin
+AccidentWithDIAT = Accident du travail
+Environment = Environnement
+Quality = Qualité
+NonCompliance = Non conformité
 FirstName = Prénom
 LastName = Nom
 Phone = Téléphone
 DigiriskTicketPublicAccess = Une interface publique ne nécessitant aucune identification est disponible à l'url suivante
 TicketActivatePublicInterface = Activer l'interface publique
-GenerateExtrafields = Génération des extrafields liés au ticket
-GenerateCategories = Génération des catégories liées au ticket
+GenerateExtrafields = Génération des extrafields de ticket par défaut
+GenerateCategories = Génération des catégories de ticket par défaut
 AlreadyGenerated = Déjà généré(e)s
 NotCreated = Pas encore créé(e)s
-ExtrafieldsGeneration = Cette option permet la génération des extrafields liés au ticket
-CategoriesGeneration = Cette option permet la génération des catégories liées au ticket
+ExtrafieldsGeneration = Cette option permet la génération des extrafields par défaut des tickets. Les extrafields créés seront : <br> Nom, Prénom, Téléphone, Service, Lieu & Date
+CategoriesGeneration = Cette option permet la génération des catégories par défaut des tickets. Les catégories créées seront : <br> - Registre <br> - - Accident <br> - - - Presqu'accident, Accident bénin, Accident du travail <br> - - Santé & Sécurité au travail <br> - - - Départ anticipé, Autres, Problème humain, Problème matériel <br> - - Danger grave et imminent <br> - - Qualité <br> - - - Non conformité, Suggestion d'amélioration <br> - - Environnement <br> - - - Non conformité, Autres
 TicketSuccess = Votre registre a été transmis au service prévention sous le numéro :
 TicketPublicAccess = Lien de retour vers l'interface publique des tickets :
 TicketShowCompanyLogo = Afficher le logo de la société dans l'interface publique
@@ -1328,8 +1332,34 @@ TicketShowCompanyLogoHelp = Activez cette option pour masquer le logo de la soci
 YouMustNotifyYourHierarchy = Vous êtes dans l'<b>obligation</b> de prévenir votre hiérarchie
 GoBackToTicketCreation = Aller à la page de suivi des tickets
 SendEmailOnTicketSubmit = Envoyer des emails à la création
+CatTicketsList = Liste des tags/catégories des tickets
+SendEmailTo = Adresse e-mail à notifier
+SendEmailOnTicketSubmitHelp = Activer l'envoi d'e-mail automatique à la création d'un ticket
+MultipleEmailsSeparator = Pour assigner plusieurs e-mail à notifier, séparez par un ";". Par exemple : "aaaa@bbb.cc;dddd@eee.ff"
+TicketCategories = Catégories des tickets
+TicketExtrafields = Extrafields des tickets
+MainCategorySetting = Cette option permet de définir la catégorie dont les sous-catégories apparaîtront dans l'interface publique
+ParentCategorySetting = Cette option permet de définir le titre de la catégorie parent pour l'interface publique des tickets
+ChildCategorySetting = Cette option permet de définir le titre de la catégorie enfant pour l'interface publique des tickets
+TicketManagement = Gestion des tickets
+MainCategory = Choix de la catégorie principale
+ParentCategoryLabel = Titre de la catégorie parent
+ChildCategoryLabel = Titre de la catégorie enfant
+TicketPublicInterfaceEnabled = L'interface publique des tickets a été activée
+EmailsToNotifySet = Les adresses e-mail à notifier ont bien été enregistrées
+MainCategorySet = La catégorie principale a été définie
+ParentCategoryLabelSet = Le titre de la catégorie parent a été défini
+ChildCategoryLabelSet = Le titre de la catégorie enfant a été défini
+TicketPublicInterfaceConfigDocumentation = Pour configurer l'interface publique des tickets, consultez la documentation
+ParentCategory = Catégorie parent
 
+# Ticket document
 
+DigiriskTicketDocumentNumberingModule = Modèle de numérotation des fiches de ticket de Digirisk
+DigiriskTicketDocumentStandardModel = Renvoie le numéro sous la forme TDn où n est un compteur séquentiel sans rupture et sans remise à 0
+DigiriskTemplateDocumentTicket = Modèle de documents des fiches de tickets de Digirisk
+TicketDocumentDigiriskTemplate = ODT par défaut des fiches de tickets
+TicketDocument = Fiche du ticket
 
 #
 # Tools - Outils
@@ -1343,6 +1373,21 @@ DataMigrationImportDescription = Importation des données de l'arborescence de D
 DataMigrationImportRisks = Importation des données des risques de Digirisk
 DataMigrationImportRisksDescription = Importation des données des risques de Digirisk WordPress au format JSON
 ErrorFileNotWellFormatted = Le fichier n'est pas au bon format ou est vide. Vous devez joindre un fichier d'import provenant de Digirisk WordPress nommé DATE_OBJET_export.json
+
+#
+# Media - Media
+#
+
+# Data - Donnée
+MediaData = Données configurables des médias
+MediaMaxWidthMedium = Largeur du média medium
+MediaMaxWidthMediumDescription = Largeur du média (dimension medium) avec pour ratio 16:9
+MediaMaxHeightMedium = Hauteur du média medium
+MediaMaxHeightMediumDescription = Hauteur du média (dimension medium) avec pour ratio 16:9
+MediaMaxWidthLarge = Largeur du média large
+MediaMaxWidthLargeDescription = Largeur du média (dimension large) avec pour ratio 16:9
+MediaMaxHeightLarge = Hauteur du média large
+MediaMaxHeightLargeDescription = Hauteur du média (dimension large) avec pour ratio 16:9
 
 
 
@@ -1379,3 +1424,7 @@ PhotoWellSaved = Le(s) média(s) a (ont) bien été ajouté(s)
 PhotoNotSaved = Le(s) média(s) n'a (ont) pas été ajouté(s)
 UseCaptcha = Code graphique (CAPTCHA)
 UseCaptchaDescription = Utilisation du code graphique (CAPTCHA) sur les pages d'interface public
+GP/UTParticipation = Participation GP/UT
+LabourDoctorName = AMETRA
+LabourDoctorFirstName = Médecin du
+LabourDoctorLastName = travail

@@ -149,7 +149,6 @@ if ($object->id > 0) {
 	digirisk_banner_tab($object, 'ref', '', 0, 'ref', 'ref', $morehtmlref, '', 0, $morehtmlleft);
 
 	print '<div class="fichecenter">';
-	print '<div class="underbanner clearboth"></div>';
 
 	$object->info($object->id);
 	dol_print_object_info($object, 1);

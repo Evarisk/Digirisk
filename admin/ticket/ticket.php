@@ -39,11 +39,15 @@ if ( ! $res) die("Include of main fails");
 global $conf, $langs, $user, $db;
 
 // Libraries
+require_once DOL_DOCUMENT_ROOT . "/core/lib/files.lib.php";
+require_once DOL_DOCUMENT_ROOT . "/core/lib/images.lib.php";
 require_once DOL_DOCUMENT_ROOT . "/core/lib/admin.lib.php";
+require_once DOL_DOCUMENT_ROOT . "/core/class/html.formother.class.php";
 include_once DOL_DOCUMENT_ROOT . '/core/class/extrafields.class.php';
 include_once DOL_DOCUMENT_ROOT . '/categories/class/categorie.class.php';
 
 require_once '../../lib/digiriskdolibarr.lib.php';
+require_once '../../lib/digiriskdolibarr_ticket.lib.php';
 
 // Translations
 $langs->loadLangs(array("admin", "digiriskdolibarr@digiriskdolibarr"));
@@ -65,16 +69,18 @@ $value      = GETPOST('value', 'alpha');
 if ($action == 'setPublicInterface') {
 	if (GETPOST('value')) dolibarr_set_const($db, 'DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE', 1, 'integer', 0, '', $conf->entity);
 	else dolibarr_set_const($db, 'DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE', 0, 'integer', 0, '', $conf->entity);
+	setEventMessages($langs->trans('TicketPublicInterfaceEnabled'), array());
 }
 
 if ($action == 'setEmails') {
 	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_TICKET_SUBMITTED_SEND_MAIL_TO', GETPOST('emails'), 'integer', 0, '', $conf->entity);
+	setEventMessages($langs->trans('EmailsToNotifySet'), array());
 }
 
 if ($action == 'generateExtrafields') {
 	$ret1 = $extra_fields->addExtraField('digiriskdolibarr_ticket_lastname', $langs->trans("LastName"), 'varchar', 2000, 255, 'ticket', 0, 0, '', '', 1, '', 1);
-	$ret2 = $extra_fields->addExtraField('digiriskdolibarr_ticket_firstname', $langs->trans("FirstName"), 'varchar', 2100, 255, 'ticket', 0, 0, '', '', 1, '', 1);
-	$ret3 = $extra_fields->addExtraField('digiriskdolibarr_ticket_phone', $langs->trans("Phone"), 'phone', 2200, '', 'ticket', 0, 0, '', '', 1, '', 1);
+	$ret2 = $extra_fields->addExtraField('digiriskdolibarr_ticket_firstname', $langs->transnoentities("FirstName"), 'varchar', 2100, 255, 'ticket', 0, 0, '', '', 1, '', 1);
+	$ret3 = $extra_fields->addExtraField('digiriskdolibarr_ticket_phone', $langs->transnoentities("Phone"), 'phone', 2200, '', 'ticket', 0, 0, '', '', 1, '', 1);
 	$ret4 = $extra_fields->addExtraField('digiriskdolibarr_ticket_service', $langs->trans("Service"), 'varchar', 2300, 255, 'ticket', 0, 0, '', '', 1, '', 1);
 	$ret5 = $extra_fields->addExtraField('digiriskdolibarr_ticket_location', $langs->trans("Location"), 'varchar', 2400, 255, 'ticket', 0, 0, '', '', 1, '', 1);
 	$ret6 = $extra_fields->addExtraField('digiriskdolibarr_ticket_date', $langs->trans("Date"), 'datetime', 2500, '', 'ticket', 0, 0, '', '', 1, '', 1);
@@ -85,111 +91,64 @@ if ($action == 'generateExtrafields') {
 		setEventMessages($extra_fields->error, null, 'errors');
 	}
 }
+$upload_dir = $conf->categorie->multidir_output[$conf->entity?:1];
+global $maxwidthmini, $maxheightmini, $maxwidthsmall, $maxheightsmall;
 
 if ($action == 'generateCategories') {
-	$category->label       = $langs->trans('Register');
-	$category->description = '';
-	$category->color       = '';
-	$category->visible     = 1;
-	$category->type        = 'ticket';
 
-	$result = $category->create($user);
+	$result = createTicketCategory($langs->trans('Register'), '', '', 1, 'ticket');
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_TICKET_MAIN_CATEGORY', $result, 'integer', 0, '', $conf->entity);
+
 	if ($result > 0) {
-		$category->label       = $langs->trans('Accident');
-		$category->description = '';
-		$category->color       = '';
-		$category->visible     = 1;
-		$category->type        = 'ticket';
-		$category->fk_parent   = $result;
-		$result2               = $category->create($user);
+
+		$result2 = createTicketCategory($langs->trans('Accident'), '', 'ff7f00', 1, 'ticket', $result,'pictogramme_Accident_32px.png');
 
 		if ($result2 > 0) {
-			$category->label       = $langs->trans('PresquAccident');
-			$category->description = '';
-			$category->color       = '';
-			$category->visible     = 1;
-			$category->type        = 'ticket';
-			$category->fk_parent   = $result2;
-			$category->create($user);
 
-			$category->label       = $langs->trans('AccidentWithDIAT');
-			$category->description = '';
-			$category->color       = '';
-			$category->visible     = 1;
-			$category->type        = 'ticket';
-			$category->fk_parent   = $result2;
-			$category->create($user);
+			createTicketCategory($langs->trans('PresquAccident'), '', '', 1, 'ticket', $result2,"pictogramme_presqu-accident_64px.png");
+			createTicketCategory($langs->trans('AccidentWithoutDIAT'), '', '', 1, 'ticket', $result2,'pictogramme_accident-benin_64px.png');
+			createTicketCategory($langs->trans('AccidentWithDIAT'), '', '', 1, 'ticket', $result2,'pictogramme_accident-du-travail_64px.png');
 
-			$category->label       = $langs->trans('AccidentWithoutDIAT');
-			$category->description = '';
-			$category->color       = '';
-			$category->visible     = 1;
-			$category->type        = 'ticket';
-			$category->fk_parent   = $result2;
-			$category->create($user);
 		} else {
 			setEventMessages($category->error, null, 'errors');
 		}
 
-		$category->label       = $langs->trans('SST');
-		$category->description = '';
-		$category->color       = '';
-		$category->visible     = 1;
-		$category->type        = 'ticket';
-		$category->fk_parent   = $result;
-		$result3               = $category->create($user);
+		$result3 = createTicketCategory($langs->trans('SST'), '', '3636ed', 1, 'ticket', $result,'pictogramme_Sante-et-securite_32px.png');
 
 		if ($result3 > 0) {
-			$category->label       = $langs->trans('AnticipatedLeave');
-			$category->description = '';
-			$category->color       = '';
-			$category->visible     = 1;
-			$category->type        = 'ticket';
-			$category->fk_parent   = $result3;
-			$category->create($user);
 
-			$category->label       = $langs->trans('Others');
-			$category->description = '';
-			$category->color       = '';
-			$category->visible     = 1;
-			$category->type        = 'ticket';
-			$category->fk_parent   = $result3;
-			$category->create($user);
+			createTicketCategory($langs->trans('AnticipatedLeave'), '', '', 1, 'ticket', $result3,'pictogramme_depart-anticipe_64px.png');
+			createTicketCategory($langs->trans('HumanProblem'), '', '', 1, 'ticket', $result3,'pictogramme_Probleme-humain_64px.png');
+			createTicketCategory($langs->trans('MaterialProblem'), '', '', 1, 'ticket', $result3,'pictogramme_Probleme-materiel_64px.png');
+			createTicketCategory($langs->trans('Others'), '', '', 1, 'ticket', $result3,'pictogramme_autres_64px.png');
 
-			$category->label       = $langs->trans('HumanProblem');
-			$category->description = '';
-			$category->color       = '';
-			$category->visible     = 1;
-			$category->type        = 'ticket';
-			$category->fk_parent   = $result3;
-			$category->create($user);
-
-			$category->label       = $langs->trans('MaterialProblem');
-			$category->description = '';
-			$category->color       = '';
-			$category->visible     = 1;
-			$category->type        = 'ticket';
-			$category->fk_parent   = $result3;
-			$category->create($user);
-
-			$category->label       = $langs->trans('EnhancementSuggestion');
-			$category->description = '';
-			$category->color       = '';
-			$category->visible     = 1;
-			$category->type        = 'ticket';
-			$category->fk_parent   = $result3;
-			$category->create($user);
 		} else {
 			setEventMessages($category->error, null, 'errors');
 		}
 
-		$category->label       = $langs->trans('DGI');
-		$category->description = '';
-		$category->color       = '';
-		$category->visible     = 1;
-		$category->type        = 'ticket';
-		$category->fk_parent   = $result;
-		$result4               = $category->create($user);
+		createTicketCategory($langs->trans('DGI'), '', 'bf0000', 1, 'ticket', $result,'pictogramme_Danger-grave-et-imminent_32px.png');
+
+		$result4 = createTicketCategory($langs->trans('Quality'), '', '007f7f', 1, 'ticket', $result,'pictogramme_Qualité_32px.png');
+
+		if ($result4 > 0) {
+
+			createTicketCategory($langs->trans('NonCompliance'), '', '', 1, 'ticket', $result4,'pictogramme_non-conformite_64px.png');
+			createTicketCategory($langs->trans('EnhancementSuggestion'), '', '', 1, 'ticket', $result4,"pictogramme_suggestions-amelioration_64px.png");
+
+		} else {
+			setEventMessages($category->error, null, 'errors');
+		}
+
+		$result5 = createTicketCategory($langs->trans('Environment'), '', '00bf00', 1, 'ticket', $result,'pictogramme_environnement_32px.png');
+
+		if ($result5 > 0) {
+
+			createTicketCategory($langs->trans('NonCompliance'), '', '', 1, 'ticket', $result5,'pictogramme_non-conformite_64px.png');
+			createTicketCategory($langs->trans('Others'), '', '', 1, 'ticket', $result5,'pictogramme_autres_64px.png');
+
+		} else {
+			setEventMessages($category->error, null, 'errors');
+		}
 
 		if ($result2 > 0 && $result3 > 0 && $result4 > 0) {
 			dolibarr_set_const($db, 'DIGIRISKDOLIBARR_TICKET_CATEGORIES_CREATED', 1, 'integer', 0, '', $conf->entity);
@@ -198,6 +157,24 @@ if ($action == 'generateCategories') {
 	} else {
 		setEventMessages($category->error, null, 'errors');
 	}
+}
+
+if ($action == 'setMainCategory') {
+	$category_id = GETPOST('mainCategory');
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_TICKET_MAIN_CATEGORY', $category_id, 'integer', 0, '', $conf->entity);
+	setEventMessages($langs->trans('MainCategorySet'), array());
+}
+
+if ($action == 'setParentCategoryLabel') {
+	$label = GETPOST('parentCategoryLabel');
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_TICKET_PARENT_CATEGORY_LABEL', $label, 'chaine', 0, '', $conf->entity);
+	setEventMessages($langs->trans('ParentCategoryLabelSet'), array());
+}
+
+if ($action == 'setChildCategoryLabel') {
+	$label = GETPOST('childCategoryLabel');
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_TICKET_CHILD_CATEGORY_LABEL', $label, 'chaine', 0, '', $conf->entity);
+	setEventMessages($langs->trans('ChildCategoryLabelSet'), array());
 }
 
 /*
@@ -219,7 +196,13 @@ print load_fiche_titre($title, $linkback, 'digiriskdolibarr32px@digiriskdolibarr
 
 // Configuration header
 $head = digiriskdolibarrAdminPrepareHead();
+
+
 print dol_get_fiche_head($head, 'ticket', '', -1, "digiriskdolibarr@digiriskdolibarr");
+print load_fiche_titre('<i class="fa fa-ticket"></i> ' . $langs->trans("TicketManagement"), '', '');
+print '<hr>';
+print load_fiche_titre($langs->trans("PublicInterface"), '', '');
+
 print '<span class="opacitymedium">' . $langs->trans("DigiriskTicketPublicAccess") . '</span> : <a class="wordbreak" href="' . dol_buildpath('/custom/digiriskdolibarr/public/ticket/create_ticket.php', 1) . '" target="_blank" >' . dol_buildpath('/custom/digiriskdolibarr/public/ticket/create_ticket.php', 2) . '</a>';
 print dol_get_fiche_end();
 
@@ -263,48 +246,6 @@ if ( ! empty($conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE)) {
 	print '</td>';
 	print '</tr>';
 
-	// Extrafields generation
-
-	print '<form method="POST" action="' . $_SERVER["PHP_SELF"] . '">';
-	print '<input type="hidden" name="token" value="' . newToken() . '">';
-	print '<input type="hidden" name="action" value="generateExtrafields">';
-	print '<input type="hidden" name="backtopage" value="' . $backtopage . '">';
-
-	print '<tr class="oddeven"><td>' . $langs->trans("GenerateExtrafields") . '</td>';
-	print '<td class="center">';
-	print $conf->global->DIGIRISKDOLIBARR_TICKET_EXTRAFIELDS ? $langs->trans('AlreadyGenerated') : $langs->trans('NotCreated');
-	print '</td>';
-	print '<td class="center">';
-	print $conf->global->DIGIRISKDOLIBARR_TICKET_EXTRAFIELDS ? '<button type="submit" class="wpeo-button button-disable">' . $langs->trans('Create') . '</button> ' : '<button type="submit" class="wpeo-button button-blue">' . $langs->trans('Create') . '</button>';
-	print '</td>';
-
-	print '<td class="center">';
-	print $form->textwithpicto('', $langs->trans("ExtrafieldsGeneration"), 1, 'help');
-	print '</td>';
-	print '</tr>';
-	print '</form>';
-
-	//Categories generation
-
-	print '<form method="POST" action="' . $_SERVER["PHP_SELF"] . '">';
-	print '<input type="hidden" name="token" value="' . newToken() . '">';
-	print '<input type="hidden" name="action" value="generateCategories">';
-	print '<input type="hidden" name="backtopage" value="' . $backtopage . '">';
-
-	print '<tr class="oddeven"><td>' . $langs->trans("GenerateCategories") . '</td>';
-	print '<td class="center">';
-	print $conf->global->DIGIRISKDOLIBARR_TICKET_CATEGORIES_CREATED ? $langs->trans('AlreadyGenerated') : $langs->trans('NotCreated');
-	print '</td>';
-	print '<td class="center">';
-	print $conf->global->DIGIRISKDOLIBARR_TICKET_CATEGORIES_CREATED ? '<button type="submit" class="wpeo-button button-disable">' . $langs->trans('Create') . '</button> ' : '<button type="submit" class="wpeo-button button-blue">' . $langs->trans('Create') . '</button>';
-	print '</td>';
-
-	print '<td class="center">';
-	print $form->textwithpicto('', $langs->trans("CategoriesGeneration"), 1, 'help');
-	print '</td>';
-	print '</tr>';
-	print '</form>';
-
 	//Envoi d'emails automatiques
 	print '<tr class="oddeven"><td>' . $langs->trans("SendEmailOnTicketSubmit") . '</td>';
 	print '<td class="center">';
@@ -329,7 +270,7 @@ if ( ! empty($conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE)) {
 	print '<input name="emails" id="emails" value="' . $conf->global->DIGIRISKDOLIBARR_TICKET_SUBMITTED_SEND_MAIL_TO . '">';
 	print '</td>';
 	print '<td class="center">';
-	print '<button class="wpeo-button" type="submit">' . $langs->trans('Save') . '</button>';
+	print '<input type="submit" class="button" value="'. $langs->trans('Save').'">';
 	print '</td>';
 	print '<td class="center">';
 	print $form->textwithpicto('', $langs->trans("MultipleEmailsSeparator"), 1, 'help');
@@ -339,6 +280,143 @@ if ( ! empty($conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE)) {
 
 	print '</table>';
 	print '</div>';
+
+	print load_fiche_titre($langs->trans("TicketCategories"), '', '');
+
+	print '<div class="div-table-responsive-no-min">';
+	print '<table class="noborder centpercent">';
+	print '<tr class="liste_titre">';
+	print '<td>' . $langs->trans("Parameters") . '</td>';
+	print '<td class="center">' . $langs->trans("Status") . '</td>';
+	print '<td class="center">' . $langs->trans("Action") . '</td>';
+	print '<td class="center">' . $langs->trans("ShortInfo") . '</td>';
+	print '</tr>';
+
+	//Categories generation
+
+	print '<form method="POST" action="' . $_SERVER["PHP_SELF"] . '">';
+	print '<input type="hidden" name="token" value="' . newToken() . '">';
+	print '<input type="hidden" name="action" value="generateCategories">';
+	print '<input type="hidden" name="backtopage" value="' . $backtopage . '">';
+
+	print '<tr class="oddeven"><td>' . $langs->trans("GenerateCategories") . '<sup> 1</sup></td>';
+	print '<td class="center">';
+	print $conf->global->DIGIRISKDOLIBARR_TICKET_CATEGORIES_CREATED ? $langs->trans('AlreadyGenerated') : $langs->trans('NotCreated');
+	print '</td>';
+	print '<td class="center">';
+	print $conf->global->DIGIRISKDOLIBARR_TICKET_CATEGORIES_CREATED ? '<a type="" class=" butActionRefused" value="">'.$langs->trans('Create') .'</a>' : '<input type="submit" class="button" value="'.$langs->trans('Create') .'">' ;
+	print '</td>';
+
+	print '<td class="center">';
+	print $form->textwithpicto('', $langs->trans("CategoriesGeneration"), 1, 'help');
+	print '</td>';
+	print '</tr>';
+	print '</form>';
+
+	//Set default main category
+
+	print '<form method="POST" action="' . $_SERVER["PHP_SELF"] . '">';
+	print '<input type="hidden" name="token" value="' . newToken() . '">';
+	print '<input type="hidden" name="action" value="setMainCategory">';
+	print '<input type="hidden" name="backtopage" value="' . $backtopage . '">';
+
+	print '<tr class="oddeven"><td>' . $langs->trans("MainCategory") . '</td>';
+	$formother = new FormOther($db);
+	print '<td class="center">';
+	print $formother->select_categories('ticket', $conf->global->DIGIRISKDOLIBARR_TICKET_MAIN_CATEGORY,'mainCategory');
+	print '</td>';
+
+	print '<td class="center">';
+	print '<input type="submit" class="button" value="'. $langs->trans('Save').'">';
+	print '</td>';
+
+	print '<td class="center">';
+	print $form->textwithpicto('', $langs->trans("MainCategorySetting"), 1, 'help');
+	print '</td>';
+	print '</tr>';
+	print '</form>';
+
+	//Set parent category label
+
+	print '<form method="POST" action="' . $_SERVER["PHP_SELF"] . '">';
+	print '<input type="hidden" name="token" value="' . newToken() . '">';
+	print '<input type="hidden" name="action" value="setParentCategoryLabel">';
+	print '<input type="hidden" name="backtopage" value="' . $backtopage . '">';
+
+	print '<tr class="oddeven"><td>' . $langs->trans("ParentCategoryLabel") . '<sup> 2</sup></td>';
+	print '<td class="center">';
+	print '<input name="parentCategoryLabel" value="'. $conf->global->DIGIRISKDOLIBARR_TICKET_PARENT_CATEGORY_LABEL .'">';
+	print '</td>';
+
+	print '<td class="center">';
+	print '<input type="submit" class="button" value="'. $langs->trans('Save').'">';
+	print '</td>';
+
+	print '<td class="center">';
+	print $form->textwithpicto('', $langs->trans("ParentCategorySetting"), 1, 'help');
+	print '</td>';
+	print '</tr>';
+	print '</form>';
+
+	//Set child category label
+
+	print '<form method="POST" action="' . $_SERVER["PHP_SELF"] . '">';
+	print '<input type="hidden" name="token" value="' . newToken() . '">';
+	print '<input type="hidden" name="action" value="setChildCategoryLabel">';
+	print '<input type="hidden" name="backtopage" value="' . $backtopage . '">';
+
+	print '<tr class="oddeven"><td>' . $langs->trans("ChildCategoryLabel") . '<sup> 3</sup></td>';
+	print '<td class="center">';
+	print '<input name="childCategoryLabel" value="'. $conf->global->DIGIRISKDOLIBARR_TICKET_CHILD_CATEGORY_LABEL .'">';
+	print '</td>';
+
+	print '<td class="center">';
+	print '<input type="submit" class="button" value="'. $langs->trans('Save').'">';
+	print '</td>';
+
+	print '<td class="center">';
+	print $form->textwithpicto('', $langs->trans("ChildCategorySetting"), 1, 'help');
+	print '</td>';
+	print '</tr>';
+	print '</form>';
+
+	print '</table>';
+	print '</div>';
+
+	print load_fiche_titre($langs->trans("TicketExtrafields"), '', '');
+
+	// Extrafields generation
+	print '<div class="div-table-responsive-no-min">';
+	print '<table class="noborder centpercent">';
+	print '<tr class="liste_titre">';
+	print '<td>' . $langs->trans("Parameters") . '</td>';
+	print '<td class="center">' . $langs->trans("Status") . '</td>';
+	print '<td class="center">' . $langs->trans("Action") . '</td>';
+	print '<td class="center">' . $langs->trans("ShortInfo") . '</td>';
+	print '</tr>';
+
+	print '<form method="POST" action="' . $_SERVER["PHP_SELF"] . '">';
+	print '<input type="hidden" name="token" value="' . newToken() . '">';
+	print '<input type="hidden" name="action" value="generateExtrafields">';
+	print '<input type="hidden" name="backtopage" value="' . $backtopage . '">';
+
+	print '<tr class="oddeven"><td>' . $langs->trans("GenerateExtrafields") . '<sup> 4</sup></td>';
+	print '<td class="center">';
+	print $conf->global->DIGIRISKDOLIBARR_TICKET_EXTRAFIELDS ? $langs->trans('AlreadyGenerated') : $langs->trans('NotCreated');
+	print '</td>';
+	print '<td class="center">';
+	print $conf->global->DIGIRISKDOLIBARR_TICKET_EXTRAFIELDS ? '<a type="" class=" butActionRefused" value="">'.$langs->trans('Create') .'</a>' : '<input type="submit" class="button" value="'.$langs->trans('Create') .'">' ;
+	print '</td>';
+
+	print '<td class="center">';
+	print $form->textwithpicto('', $langs->trans("ExtrafieldsGeneration"), 1, 'help');
+	print '</td>';
+	print '</tr>';
+	print '</form>';
+
+	print '</table>';
+	print '</div>';
+	print '<span class="opacitymedium">' . $langs->trans("TicketPublicInterfaceConfigDocumentation") . '</span> : <a class="wordbreak" href="https://wiki.dolibarr.org/index.php?title=Module_Digirisk#DigiRisk_-_Registre_de_s.C3.A9curit.C3.A9_et_Tickets" target="_blank" >' . $langs->transnoentities('DigiriskDocumentation') . '</a>';
 }
 
 

@@ -488,7 +488,7 @@ if (empty($reshook)) {
 			if ( ! empty($signatories) && $signatories > 0) {
 				foreach ($signatories as $arrayRole) {
 					foreach ($arrayRole as $signatory) {
-						$signatory->signature = $langs->trans("FileGenerated");
+						$signatory->signature = $langs->transnoentities("FileGenerated");
 						$signatory->update($user, false);
 					}
 				}
@@ -667,12 +667,6 @@ if ($action == 'create') {
 	print dol_get_fiche_head();
 
 	print '<table class="border centpercent tableforfieldcreate firepermit-table">' . "\n";
-
-	//Ref -- Ref
-	print '<tr><td class="fieldrequired minwidth400">' . $langs->trans("Ref") . '</td><td>';
-	print '<input hidden class="flat" type="text" size="36" name="ref" id="ref" value="' . $refFirePermitMod->getNextValue($object) . '">';
-	print $refFirePermitMod->getNextValue($object);
-	print '</td></tr>';
 
 	//Label -- Libellé
 	print '<tr><td class="minwidth400">' . $langs->trans("Label") . '</td><td>';

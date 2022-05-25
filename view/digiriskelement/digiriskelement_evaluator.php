@@ -38,6 +38,7 @@ if ( ! $res && file_exists("../../../../main.inc.php")) $res = @include "../../.
 if ( ! $res) die("Include of main fails");
 
 require_once DOL_DOCUMENT_ROOT . '/core/lib/images.lib.php';
+require_once DOL_DOCUMENT_ROOT . '/core/lib/usergroups.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/class/html.form.class.php';
 
 require_once './../../class/digiriskelement.class.php';
@@ -64,6 +65,7 @@ $toselect    = GETPOST('toselect', 'array'); // Array of ids of elements selecte
 $limit       = GETPOST('limit', 'int') ? GETPOST('limit', 'int') : $conf->liste_limit;
 $sortfield   = GETPOST('sortfield', 'alpha');
 $sortorder   = GETPOST('sortorder', 'alpha');
+$fromid      = GETPOST('fromid', 'int'); //element id
 $page        = GETPOSTISSET('pageplusone') ? (GETPOST('pageplusone') - 1) : GETPOST("page", 'int');
 $page        = is_numeric($page) ? $page : 0;
 $page        = $page == -1 ? 0 : $page;
@@ -106,11 +108,27 @@ foreach ($evaluator->fields as $key => $val) {
 $arrayfields = array();
 foreach ($evaluator->fields as $key => $val) {
 	// If $val['visible']==0, then we never show the field
+	if ($val['label'] == 'ParentElement') {
+		if (empty($fromid)) {
+			$val['visible'] = 0;
+		}
+	}
 	if ( ! empty($val['visible'])) $arrayfields['t.' . $key] = array('label' => $val['label'], 'checked' => (($val['visible'] < 0) ? 0 : 1), 'enabled' => ($val['enabled'] && ($val['visible'] != 3)), 'position' => $val['position']);
 }
 
 // Load Digirisk_element object
 include DOL_DOCUMENT_ROOT . '/core/actions_fetchobject.inc.php'; // Must be include, not include_once.
+
+$evaluator->fields = dol_sort_array($evaluator->fields, 'position');
+$arrayfields = dol_sort_array($arrayfields, 'position');
+
+if ($object->id == 0) {
+	$userObject = new User($db);
+	$prehead = 'user_prepare_head';
+	$userObject->fetch($fromid, '', '', 1);
+	$userObject->getrights();
+	$head = $prehead($userObject);
+}
 
 //Permission for digiriskelement_evaluator
 $permissiontoread   = $user->rights->digiriskdolibarr->evaluator->read;
@@ -150,7 +168,7 @@ if (empty($reshook)) {
 
 	$error = 0;
 
-	$backtopage = dol_buildpath('/digiriskdolibarr/view/digiriskelement/digiriskelement_evaluator.php', 1) . '?id=' . ($id > 0 ? $id : '__ID__');
+	$backtopage = dol_buildpath('/digiriskdolibarr/view/digiriskelement/digiriskelement_evaluator.php', 1) . (empty($fromid) ? '?id=' . ($id > 0 ? $id : '__ID__') : '?fromid=' . ($fromid > 0 ? $fromid : '__ID__'));
 
 	if ( ! $error && $action == 'add' && $permissiontoadd) {
 		$data = json_decode(file_get_contents('php://input'), true);
@@ -193,8 +211,8 @@ if (empty($reshook)) {
 				else setEventMessages($evaluator->error, null, 'errors');
 			} else {
 				// Delete evaluator OK
-				$urltogo = str_replace('__ID__', $id, $backtopage);
-				$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
+				$urltogo = str_replace('__ID__', (empty($fromid) ? $id : $fromid), $backtopage);
+				$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', (empty($fromid) ? $id : $fromid), $urltogo); // New method to autoselect project after a New on another form object creation
 				header("Location: " . $urltogo);
 				exit;
 			}
@@ -213,39 +231,57 @@ $help_url = 'FR:Module_DigiriskDolibarr#.C3.89valuateur';
 $morejs   = array("/digiriskdolibarr/js/digiriskdolibarr.js.php");
 $morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");
 
-digiriskHeader($title, $help_url, $morejs, $morecss);
+if ($fromid > 0) {
+	llxHeader('', $title, $help_url, '', 0, 0, $morejs, $morecss);
+} else {
+	digiriskHeader($title, $help_url, $morejs, $morecss);
+}
 
 print '<div id="cardContent" value="">';
 
-if ($object->id > 0) {
+if ($object->id > 0 || $fromid > 0) {
 	$res = $object->fetch_optionals();
 
-	$head = digiriskelementPrepareHead($object);
-	dol_fiche_head($head, 'elementEvaluator', $title, -1, "digiriskdolibarr@digiriskdolibarr");
+	if (empty($fromid)) {
+		$head = digiriskelementPrepareHead($object);
+		print dol_get_fiche_head($head, 'elementEvaluator', $title, -1, "digiriskdolibarr@digiriskdolibarr");
+	} else {
+		print dol_get_fiche_head($head, 'participation', $langs->trans('User'), -1, "user");
+	}
 
 	// Object card
 	// ------------------------------------------------------------
-	$width                                    = 80;
-	$height                                   = 80;
-	dol_strlen($object->label) ? $morehtmlref = ' - ' . $object->label : '';
-	$morehtmlref                             .= '<div class="refidno">';
-	// ParentElement
-	$parent_element = new DigiriskElement($db);
-	$result         = $parent_element->fetch($object->fk_parent);
-	if ($result > 0) {
-		$morehtmlref .= $langs->trans("Description") . ' : ' . $object->description;
-		$morehtmlref .= '<br>' . $langs->trans("ParentElement") . ' : ' . $parent_element->getNomUrl(1, 'blank', 1);
+	if (empty($fromid)) {
+		$width = 80;
+		$height = 80;
+		dol_strlen($object->label) ? $morehtmlref = ' - ' . $object->label : '';
+		$morehtmlref .= '<div class="refidno">';
+		// ParentElement
+		$parent_element = new DigiriskElement($db);
+		$result = $parent_element->fetch($object->fk_parent);
+		if ($result > 0) {
+			$morehtmlref .= $langs->trans("Description") . ' : ' . $object->description;
+			$morehtmlref .= '<br>' . $langs->trans("ParentElement") . ' : ' . $parent_element->getNomUrl(1, 'blank', 1);
+		} else {
+			$digiriskstandard->fetch($conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD);
+			$morehtmlref .= $langs->trans("Description") . ' : ' . $object->description;
+			$morehtmlref .= '<br>' . $langs->trans("ParentElement") . ' : ' . $digiriskstandard->getNomUrl(1, 'blank', 1);
+		}
+		$morehtmlref .= '</div>';
+		$morehtmlleft = '<div class="floatleft inline-block valignmiddle divphotoref">' . digirisk_show_photos('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/' . $object->element_type, 'small', 5, 0, 0, 0, $height, $width, 0, 0, 0, $object->element_type, $object) . '</div>';
+		digirisk_banner_tab($object, 'ref', '', 0, 'ref', 'ref', $morehtmlref, '', 0, $morehtmlleft);
 	} else {
-		$digiriskstandard->fetch($conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD);
-		$morehtmlref .= $langs->trans("Description") . ' : ' . $object->description;
-		$morehtmlref .= '<br>' . $langs->trans("ParentElement") . ' : ' . $digiriskstandard->getNomUrl(1, 'blank', 1);
+		$linkback = '<a href="' . DOL_URL_ROOT . '/user/list.php?restore_lastsearch_values=1">' . $langs->trans("BackToList") . '</a>';
+
+		dol_banner_tab($userObject, 'fromid', $linkback, $user->rights->user->user->lire || $user->admin);
 	}
-	$morehtmlref .= '</div>';
-	$morehtmlleft = '<div class="floatleft inline-block valignmiddle divphotoref">' . digirisk_show_photos('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/' . $object->element_type, 'small', 5, 0, 0, 0, $height, $width, 0, 0, 0, $object->element_type, $object) . '</div>';
-	digirisk_banner_tab($object, 'ref', '', 0, 'ref', 'ref', $morehtmlref, '', 0, $morehtmlleft);
+
+	if ($fromid) {
+		print '<div class="underbanner clearboth"></div>';
+	}
 
 	print '<div class="fichecenter wpeo-wrap">';
-	print '<form method="POST" id="searchFormList" action="' . $_SERVER["PHP_SELF"] . '?id=' . $object->id . '" name="evaluator_form"">' . "\n";
+	print '<form method="POST" id="searchFormList" action="' . $_SERVER["PHP_SELF"] . (empty($fromid) ? '?id=' . $object->id : '?fromid=' . $fromid) . '" name="evaluator_form"">' . "\n";
 	print '<input type="hidden" name="token" value="' . newToken() . '">';
 	print '<input type="hidden" name="formfilteraction" id="formfilteraction" value="list">';
 	print '<input type="hidden" name="action" value="list">';
@@ -296,7 +332,11 @@ if ($object->id > 0) {
 	if (is_array($extrafields->attributes[$evaluator->table_element]['label']) && count($extrafields->attributes[$evaluator->table_element]['label'])) $sql .= " LEFT JOIN " . MAIN_DB_PREFIX . $evaluator->table_element . "_extrafields as ef on (t.rowid = ef.fk_object)";
 	if ($evaluator->ismultientitymanaged == 1) $sql                                                                                                         .= " WHERE t.entity IN (" . getEntity($evaluator->element) . ")";
 	else $sql                                                                                                                                               .= " WHERE 1 = 1";
-	$sql                                                                                                                                                    .= " AND fk_parent = " . $id;
+	if (empty($fromid)) {
+		$sql .= " AND fk_parent = " . $id;
+	} else {
+		$sql .= " AND fk_user = " . $fromid;
+	}
 
 	foreach ($search as $key => $val) {
 		if ($key == 'status' && $search[$key] == -1) continue;
@@ -444,7 +484,7 @@ if ($object->id > 0) {
 	</div>
 
 	<?php $title = $langs->trans('EvaluatorList');
-	print_barre_liste($title, $page, $_SERVER["PHP_SELF"], $param, $sortfield, $sortorder, $massactionbutton, $num, $nbtotalofrecords, '', 0, $newcardbutton, '', $limit, 0, 0, 1);
+	print_barre_liste($title, $page, $_SERVER["PHP_SELF"], $param, $sortfield, $sortorder, $massactionbutton, $num, $nbtotalofrecords, '', 0, (empty($fromid) ? $newcardbutton : ''), '', $limit, 0, 0, 1);
 
 	include DOL_DOCUMENT_ROOT . '/core/tpl/massactions_pre.tpl.php';
 
@@ -482,6 +522,9 @@ if ($object->id > 0) {
 			print '<td class="liste_titre' . ($cssforfield ? ' ' . $cssforfield : '') . '">';
 			if (is_array($val['arrayofkeyval'])) print $form->selectarray('search_' . $key, $val['arrayofkeyval'], $search[$key], $val['notnull'], 0, 0, '', 1, 0, 0, '', 'maxwidth75');
 			elseif (strpos($val['type'], 'integer:') === 0) {
+				if ($key == 'fk_user' && $fromid > 0) {
+					$search[$key] = $fromid;
+				}
 				print $evaluator->showInputField($val, $key, $search[$key], '', '', 'search_', 'maxwidth150', 1);
 			} elseif ( ! preg_match('/^(date|timestamp)/', $val['type'])) print '<input type="text" class="flat maxwidth75" name="search_' . $key . '" value="' . dol_escape_htmltag($search[$key]) . '">';
 			print '</td>';
@@ -557,7 +600,8 @@ if ($object->id > 0) {
 					$user->fetch($evaluator->$key);
 					print '<td>' . $user->getNomUrl(1);
 				} elseif ($key == 'fk_parent') {
-					print '<td>' . $object->getNomUrl($evaluator->$key);
+					$object->fetch($evaluator->fk_parent);
+					print '<td>' . $object->getNomUrl(1, 'blank');
 				} else {
 					print '<td>' . $evaluator->$key;
 				}

@@ -17,3 +17,4 @@ ALTER TABLE llx_digiriskdolibarr_preventionplan ADD INDEX idx_digiriskdolibarr_p
 ALTER TABLE llx_digiriskdolibarr_preventionplan ADD INDEX idx_digiriskdolibarr_preventionplan_ref_ext (ref_ext);
 ALTER TABLE llx_digiriskdolibarr_preventionplan ADD CONSTRAINT llx_digiriskdolibarr_preventionplan_fk_user_creat FOREIGN KEY (fk_user_creat) REFERENCES llx_user(rowid);
 ALTER TABLE llx_digiriskdolibarr_preventionplan ADD CONSTRAINT llx_digiriskdolibarr_preventionplan_fk_project FOREIGN KEY (fk_project) REFERENCES llx_projet(rowid);
+ALTER TABLE llx_digiriskdolibarr_preventionplan ADD UNIQUE uk_preventionplan_ref (ref, entity);

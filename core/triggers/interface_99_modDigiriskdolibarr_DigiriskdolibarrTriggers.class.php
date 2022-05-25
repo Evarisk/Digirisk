@@ -72,7 +72,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 		$this->name        = preg_replace('/^Interface/i', '', get_class($this));
 		$this->family      = "demo";
 		$this->description = "Digiriskdolibarr triggers.";
-		$this->version     = '9.2.1';
+		$this->version     = '9.3.0';
 		$this->picto       = 'digiriskdolibarr@digiriskdolibarr';
 	}
 
@@ -185,7 +185,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 
 				$actioncomm->code        = 'AC_FIREPERMITDOCUMENT_GENERATE';
 				$actioncomm->type_code   = 'AC_OTH_AUTO';
-				$actioncomm->label       = $langs->trans('FirePermitDocumentGeneratedWithDolibarr');
+				$actioncomm->label       = $langs->transnoentities('FirePermitDocumentGeneratedWithDolibarr');
 				$actioncomm->datep       = $now;
 				$actioncomm->fk_element  = $object->parent_id;
 				$actioncomm->userownerid = $user->id;
@@ -204,7 +204,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->elementid   = $object->parent_id;
 				$actioncomm->code        = 'AC_GROUPMENTDOCUMENT_GENERATE';
 				$actioncomm->type_code   = 'AC_OTH_AUTO';
-				$actioncomm->label       = $langs->trans('GroupmentDocumentGeneratedWithDolibarr');
+				$actioncomm->label       = $langs->transnoentities('GroupmentDocumentGeneratedWithDolibarr');
 				$actioncomm->datep       = $now;
 				$actioncomm->fk_element  = $object->parent_id;
 				$actioncomm->userownerid = $user->id;
@@ -223,7 +223,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->elementid   = $object->parent_id;
 				$actioncomm->code        = 'AC_WORKUNITDOCUMENT_GENERATE';
 				$actioncomm->type_code   = 'AC_OTH_AUTO';
-				$actioncomm->label       = $langs->trans('WorkUnitDocumentGeneratedWithDolibarr');
+				$actioncomm->label       = $langs->transnoentities('WorkUnitDocumentGeneratedWithDolibarr');
 				$actioncomm->datep       = $now;
 				$actioncomm->fk_element  = $object->parent_id;
 				$actioncomm->userownerid = $user->id;
@@ -242,7 +242,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->elementid   = $object->parent_id;
 				$actioncomm->code        = 'AC_LISTINGRISKSPHOTO_GENERATE';
 				$actioncomm->type_code   = 'AC_OTH_AUTO';
-				$actioncomm->label       = $langs->trans('ListingRisksPhotoGeneratedWithDolibarr');
+				$actioncomm->label       = $langs->transnoentities('ListingRisksPhotoGeneratedWithDolibarr');
 				$actioncomm->datep       = $now;
 				$actioncomm->fk_element  = $object->parent_id;
 				$actioncomm->userownerid = $user->id;
@@ -262,7 +262,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->elementid   = $object->parent_id;
 				$actioncomm->code        = 'AC_LISTINGRISKSACTION_GENERATE';
 				$actioncomm->type_code   = 'AC_OTH_AUTO';
-				$actioncomm->label       = $langs->trans('ListingRisksActionGeneratedWithDolibarr');
+				$actioncomm->label       = $langs->transnoentities('ListingRisksActionGeneratedWithDolibarr');
 				$actioncomm->datep       = $now;
 				$actioncomm->fk_element  = $object->parent_id;
 				$actioncomm->userownerid = $user->id;
@@ -281,7 +281,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->elementid   = $object->parent_id;
 				$actioncomm->code        = 'AC_RISKASSESSMENTDOCUMENT_GENERATE';
 				$actioncomm->type_code   = 'AC_OTH_AUTO';
-				$actioncomm->label       = $langs->trans('RiskAssessmentDocumentGeneratedWithDolibarr');
+				$actioncomm->label       = $langs->transnoentities('RiskAssessmentDocumentGeneratedWithDolibarr');
 				$actioncomm->datep       = $now;
 				$actioncomm->fk_element  = $object->parent_id;
 				$actioncomm->userownerid = $user->id;
@@ -300,7 +300,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->elementid   = $object->id;
 				$actioncomm->code        = 'AC_DIGIRISKELEMENT_CREATE';
 				$actioncomm->type_code   = 'AC_OTH_AUTO';
-				$actioncomm->label       = $langs->trans($object->element_type . 'CreatedWithDolibarr');
+				$actioncomm->label       = $langs->transnoentities($object->element_type . 'CreatedWithDolibarr');
 				$actioncomm->datep       = $now;
 				$actioncomm->fk_element  = $object->id;
 				$actioncomm->userownerid = $user->id;
@@ -320,7 +320,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 
 				$actioncomm->code        = 'AC_SIGNATURE_GENERATE';
 				$actioncomm->type_code   = 'AC_OTH_AUTO';
-				$actioncomm->label       = $langs->trans('SignatureGeneratedWithDolibarr');
+				$actioncomm->label       = $langs->transnoentities('SignatureGeneratedWithDolibarr');
 				$actioncomm->datep       = $now;
 				$actioncomm->fk_element  = $object->fk_preventionplan;
 				$actioncomm->userownerid = $user->id;
@@ -339,7 +339,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->elementtype = 'preventionplan@digiriskdolibarr';
 				$actioncomm->code        = 'AC_PREVENTIONPLAN_MODIFY';
 				$actioncomm->type_code   = 'AC_OTH_AUTO';
-				$actioncomm->label       = $langs->trans('PreventionPlanModifyTrigger');
+				$actioncomm->label       = $langs->transnoentities('PreventionPlanModifyTrigger');
 				$actioncomm->datep       = $now;
 				$actioncomm->fk_element  = $object->id;
 				$actioncomm->userownerid = $user->id;
@@ -358,7 +358,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->elementtype = 'preventionplan@digiriskdolibarr';
 				$actioncomm->code        = 'AC_PREVENTIONPLAN_INPROGRESS';
 				$actioncomm->type_code   = 'AC_OTH_AUTO';
-				$actioncomm->label       = $langs->trans('PreventionPlanInprogressTrigger');
+				$actioncomm->label       = $langs->transnoentities('PreventionPlanInprogressTrigger');
 				$actioncomm->datep       = $now;
 				$actioncomm->fk_element  = $object->id;
 				$actioncomm->userownerid = $user->id;
@@ -376,7 +376,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->elementtype = 'preventionplan@digiriskdolibarr';
 				$actioncomm->code        = 'AC_PREVENTIONPLAN_PENDINGSIGNATURE';
 				$actioncomm->type_code   = 'AC_OTH_AUTO';
-				$actioncomm->label       = $langs->trans('PreventionPlanPendingSignatureTrigger');
+				$actioncomm->label       = $langs->transnoentities('PreventionPlanPendingSignatureTrigger');
 				$actioncomm->datep       = $now;
 				$actioncomm->fk_element  = $object->id;
 				$actioncomm->userownerid = $user->id;
@@ -395,7 +395,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->elementtype = 'preventionplan@digiriskdolibarr';
 				$actioncomm->code        = 'AC_PREVENTIONPLAN_LOCKED';
 				$actioncomm->type_code   = 'AC_OTH_AUTO';
-				$actioncomm->label       = $langs->trans('PreventionPlanLockTrigger');
+				$actioncomm->label       = $langs->transnoentities('PreventionPlanLockTrigger');
 				$actioncomm->datep       = $now;
 				$actioncomm->fk_element  = $object->id;
 				$actioncomm->userownerid = $user->id;
@@ -414,7 +414,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->elementtype = 'preventionplan@digiriskdolibarr';
 				$actioncomm->code        = 'AC_PREVENTIONPLAN_ARCHIVED';
 				$actioncomm->type_code   = 'AC_OTH_AUTO';
-				$actioncomm->label       = $langs->trans('PreventionPlanArchivedTrigger');
+				$actioncomm->label       = $langs->transnoentities('PreventionPlanArchivedTrigger');
 				$actioncomm->datep       = $now;
 				$actioncomm->fk_element  = $object->id;
 				$actioncomm->userownerid = $user->id;
@@ -433,7 +433,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->elementtype = 'preventionplan@digiriskdolibarr';
 				$actioncomm->code        = 'AC_PREVENTIONPLANLINE_CREATE';
 				$actioncomm->type_code   = 'AC_OTH_AUTO';
-				$actioncomm->label       = $langs->trans('PreventionPlanLineCreateTrigger');
+				$actioncomm->label       = $langs->transnoentities('PreventionPlanLineCreateTrigger');
 				$actioncomm->datep       = $now;
 				$actioncomm->fk_element  = $object->fk_preventionplan;
 				$actioncomm->userownerid = $user->id;
@@ -452,7 +452,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->elementtype = 'preventionplan@digiriskdolibarr';
 				$actioncomm->code        = 'AC_PREVENTIONPLANLINE_MODIFY';
 				$actioncomm->type_code   = 'AC_OTH_AUTO';
-				$actioncomm->label       = $langs->trans('PreventionPlanLineModifyTrigger');
+				$actioncomm->label       = $langs->transnoentities('PreventionPlanLineModifyTrigger');
 				$actioncomm->datep       = $now;
 				$actioncomm->fk_element  = $object->fk_preventionplan;
 				$actioncomm->userownerid = $user->id;
@@ -471,7 +471,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->elementtype = 'preventionplan@digiriskdolibarr';
 				$actioncomm->code        = 'AC_PREVENTIONPLANLINE_DELETE';
 				$actioncomm->type_code   = 'AC_OTH_AUTO';
-				$actioncomm->label       = $langs->trans('PreventionPlanLineDeleteTrigger');
+				$actioncomm->label       = $langs->transnoentities('PreventionPlanLineDeleteTrigger');
 				$actioncomm->datep       = $now;
 				$actioncomm->fk_element  = $object->fk_preventionplan;
 				$actioncomm->userownerid = $user->id;
@@ -490,7 +490,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->elementtype       = 'preventionplan@digiriskdolibarr';
 				$actioncomm->code              = 'AC_PREVENTIONPLANSIGNATURE_ADDATTENDANT';
 				$actioncomm->type_code         = 'AC_OTH_AUTO';
-				$actioncomm->label             = $langs->trans('PreventionPlanAddAttendantTrigger');
+				$actioncomm->label             = $langs->transnoentities('PreventionPlanAddAttendantTrigger');
 				$actioncomm->datep             = $now;
 				$actioncomm->fk_element        = $object->fk_object;
 				$actioncomm->socpeopleassigned = array($object->element_id => $object->element_id);
@@ -509,7 +509,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->elementtype = 'preventionplan@digiriskdolibarr';
 				$actioncomm->code        = 'AC_PREVENTIONPLAN_SENTBYMAIL';
 				$actioncomm->type_code   = 'AC_OTH_AUTO';
-				$actioncomm->label       = $langs->trans('PreventionPlanSentByMailTrigger');
+				$actioncomm->label       = $langs->transnoentities('PreventionPlanSentByMailTrigger');
 				$actioncomm->datep       = $now;
 				$actioncomm->fk_element  = $object->id;
 				$actioncomm->userownerid = $user->id;
@@ -530,7 +530,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->elementtype = 'firepermit@digiriskdolibarr';
 				$actioncomm->code        = 'AC_FIREPERMIT_MODIFY';
 				$actioncomm->type_code   = 'AC_OTH_AUTO';
-				$actioncomm->label       = $langs->trans('FirePermitModifyTrigger');
+				$actioncomm->label       = $langs->transnoentities('FirePermitModifyTrigger');
 				$actioncomm->datep       = $now;
 				$actioncomm->fk_element  = $object->id;
 				$actioncomm->userownerid = $user->id;
@@ -549,7 +549,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->elementtype = 'firepermit@digiriskdolibarr';
 				$actioncomm->code        = 'AC_FIREPERMIT_INPROGRESS';
 				$actioncomm->type_code   = 'AC_OTH_AUTO';
-				$actioncomm->label       = $langs->trans('FirePermitInProgressTrigger');
+				$actioncomm->label       = $langs->transnoentities('FirePermitInProgressTrigger');
 				$actioncomm->datep       = $now;
 				$actioncomm->fk_element  = $object->id;
 				$actioncomm->userownerid = $user->id;
@@ -567,7 +567,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->elementtype = 'firepermit@digiriskdolibarr';
 				$actioncomm->code        = 'AC_FIREPERMIT_PENDINGSIGNATURE';
 				$actioncomm->type_code   = 'AC_OTH_AUTO';
-				$actioncomm->label       = $langs->trans('FirePermitPendingSignatureTrigger');
+				$actioncomm->label       = $langs->transnoentities('FirePermitPendingSignatureTrigger');
 				$actioncomm->datep       = $now;
 				$actioncomm->fk_element  = $object->id;
 				$actioncomm->userownerid = $user->id;
@@ -586,7 +586,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->elementtype = 'firepermit@digiriskdolibarr';
 				$actioncomm->code        = 'AC_FIREPERMIT_LOCKED';
 				$actioncomm->type_code   = 'AC_OTH_AUTO';
-				$actioncomm->label       = $langs->trans('FirePermitLockTrigger');
+				$actioncomm->label       = $langs->transnoentities('FirePermitLockTrigger');
 				$actioncomm->datep       = $now;
 				$actioncomm->fk_element  = $object->id;
 				$actioncomm->userownerid = $user->id;
@@ -605,7 +605,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->elementtype = 'firepermit@digiriskdolibarr';
 				$actioncomm->code        = 'AC_FIREPERMIT_ARCHIVED';
 				$actioncomm->type_code   = 'AC_OTH_AUTO';
-				$actioncomm->label       = $langs->trans('FirePermitArchivedTrigger');
+				$actioncomm->label       = $langs->transnoentities('FirePermitArchivedTrigger');
 				$actioncomm->datep       = $now;
 				$actioncomm->fk_element  = $object->id;
 				$actioncomm->userownerid = $user->id;
@@ -624,7 +624,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->elementtype = 'firepermit@digiriskdolibarr';
 				$actioncomm->code        = 'AC_FIREPERMITLINE_CREATE';
 				$actioncomm->type_code   = 'AC_OTH_AUTO';
-				$actioncomm->label       = $langs->trans('FirePermitLineCreateTrigger');
+				$actioncomm->label       = $langs->transnoentities('FirePermitLineCreateTrigger');
 				$actioncomm->datep       = $now;
 				$actioncomm->fk_element  = $object->fk_firepermit;
 				$actioncomm->userownerid = $user->id;
@@ -643,7 +643,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->elementtype = 'firepermit@digiriskdolibarr';
 				$actioncomm->code        = 'AC_FIREPERMITLINE_MODIFY';
 				$actioncomm->type_code   = 'AC_OTH_AUTO';
-				$actioncomm->label       = $langs->trans('FirePermitLineModifyTrigger');
+				$actioncomm->label       = $langs->transnoentities('FirePermitLineModifyTrigger');
 				$actioncomm->datep       = $now;
 				$actioncomm->fk_element  = $object->fk_firepermit;
 				$actioncomm->userownerid = $user->id;
@@ -662,7 +662,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->elementtype = 'firepermit@digiriskdolibarr';
 				$actioncomm->code        = 'AC_FIREPERMITLINE_DELETE';
 				$actioncomm->type_code   = 'AC_OTH_AUTO';
-				$actioncomm->label       = $langs->trans('FirePermitLineDeleteTrigger');
+				$actioncomm->label       = $langs->transnoentities('FirePermitLineDeleteTrigger');
 				$actioncomm->datep       = $now;
 				$actioncomm->fk_element  = $object->fk_firepermit;
 				$actioncomm->userownerid = $user->id;
@@ -681,7 +681,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->elementtype       = 'firepermit@digiriskdolibarr';
 				$actioncomm->code              = 'AC_FIREPERMITSIGNATURE_ADDATTENDANT';
 				$actioncomm->type_code         = 'AC_OTH_AUTO';
-				$actioncomm->label             = $langs->trans('FirePermitAddAttendantTrigger');
+				$actioncomm->label             = $langs->transnoentities('FirePermitAddAttendantTrigger');
 				$actioncomm->datep             = $now;
 				$actioncomm->fk_element        = $object->fk_object;
 				$actioncomm->socpeopleassigned = array($object->element_id => $object->element_id);
@@ -700,7 +700,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->elementtype = 'firepermit@digiriskdolibarr';
 				$actioncomm->code        = 'AC_FIREPERMIT_SENTBYMAIL';
 				$actioncomm->type_code   = 'AC_OTH_AUTO';
-				$actioncomm->label       = $langs->trans('FirePermitSentByMailTrigger');
+				$actioncomm->label       = $langs->transnoentities('FirePermitSentByMailTrigger');
 				$actioncomm->datep       = $now;
 				$actioncomm->fk_element  = $object->id;
 				$actioncomm->userownerid = $user->id;
@@ -734,9 +734,9 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 
 				if (!empty($people)) {
 					$people->fetch($object->element_id);
-					$actioncomm->label = $langs->trans($object->role . 'Signed') . ' : ' . $people->firstname . ' ' . $people->lastname;
+					$actioncomm->label = $langs->transnoentities($object->role . 'Signed') . ' : ' . $people->firstname . ' ' . $people->lastname;
 				} else {
-					$actioncomm->label = $langs->trans($object->role . 'Signed');
+					$actioncomm->label = $langs->transnoentities($object->role . 'Signed');
 				}
 
 				$actioncomm->datep       = $now;
@@ -764,7 +764,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->elementtype       = $object_type . '@digiriskdolibarr';
 				$actioncomm->code              = 'AC_DIGIRISKSIGNATURE_PENDING_SIGNATURE';
 				$actioncomm->type_code         = 'AC_OTH_AUTO';
-				$actioncomm->label             = $langs->trans('DigiriskSignaturePendingSignatureTrigger');
+				$actioncomm->label             = $langs->transnoentities('DigiriskSignaturePendingSignatureTrigger');
 				$actioncomm->datep             = $now;
 				$actioncomm->fk_element        = $object->fk_object;
 				$actioncomm->socpeopleassigned = array($object->element_id => $object->element_id);
@@ -788,7 +788,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->elementtype       = $object_type . '@digiriskdolibarr';
 				$actioncomm->code              = 'AC_DIGIRISKSIGNATURE_ABSENT';
 				$actioncomm->type_code         = 'AC_OTH_AUTO';
-				$actioncomm->label             = $langs->trans('DigiriskSignatureAbsentTrigger');
+				$actioncomm->label             = $langs->transnoentities('DigiriskSignatureAbsentTrigger');
 				$actioncomm->datep             = $now;
 				$actioncomm->fk_element        = $object->fk_object;
 				$actioncomm->socpeopleassigned = array($object->element_id => $object->element_id);
@@ -812,7 +812,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->elementtype       = $object_type . '@digiriskdolibarr';
 				$actioncomm->code              = 'AC_DIGIRISKSIGNATURE_DELETED';
 				$actioncomm->type_code         = 'AC_OTH_AUTO';
-				$actioncomm->label             = $langs->trans('DigiriskSignatureDeletedTrigger');
+				$actioncomm->label             = $langs->transnoentities('DigiriskSignatureDeletedTrigger');
 				$actioncomm->datep             = $now;
 				$actioncomm->fk_element        = $object->fk_object;
 				$actioncomm->socpeopleassigned = array($object->element_id => $object->element_id);
@@ -886,7 +886,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 										$from = $conf->global->MAIN_MAIL_EMAIL_FROM;
 
 										$message = $object->message;
-										$subject = $langs->trans('NewTicketSubmitted') . ' : ' . $object->subject . $langs->trans('By') . /* extrafield */ '';
+										$subject = $langs->transnoentities('NewTicketSubmitted') . ' : ' . $object->subject . $langs->transnoentities('By') . /* extrafield */ '';
 										$trackid = 'tic' . $object->id;
 
 										// Create form object
@@ -945,9 +945,9 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->code      = 'AC_OPENINGHOURS_CREATE';
 				$actioncomm->type_code = 'AC_OTH_AUTO';
 				if ($object->element_type == 'preventionplan') {
-					$actioncomm->label = $langs->trans('PreventionPlanOpeningHoursCreateTrigger');
+					$actioncomm->label = $langs->transnoentities('PreventionPlanOpeningHoursCreateTrigger');
 				} elseif ($object->element_type == 'firepermit') {
-					$actioncomm->label = $langs->trans('FirePermitOpeningHoursCreateTrigger');
+					$actioncomm->label = $langs->transnoentities('FirePermitOpeningHoursCreateTrigger');
 				}
 				$actioncomm->datep       = $now;
 				$actioncomm->fk_element  = $object->element_id;
@@ -970,7 +970,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->elementtype = 'digiriskelement@digiriskdolibarr';
 				$actioncomm->code        = 'AC_RISK_CREATE';
 				$actioncomm->type_code   = 'AC_OTH_AUTO';
-				$actioncomm->label       = $langs->trans('RiskCreateTrigger');
+				$actioncomm->label       = $langs->transnoentities('RiskCreateTrigger');
 				$actioncomm->datep       = $now;
 				$actioncomm->fk_element  = $object->fk_element;
 				$actioncomm->userownerid = $user->id;
@@ -992,7 +992,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->elementtype = 'digiriskelement@digiriskdolibarr';
 				$actioncomm->code        = 'AC_RISK_MODIFY';
 				$actioncomm->type_code   = 'AC_OTH_AUTO';
-				$actioncomm->label       = $langs->trans('RiskModifyTrigger');
+				$actioncomm->label       = $langs->transnoentities('RiskModifyTrigger');
 				$actioncomm->datep       = $now;
 				$actioncomm->fk_element  = $object->fk_element;
 				$actioncomm->userownerid = $user->id;
@@ -1014,7 +1014,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->elementtype = 'digiriskelement@digiriskdolibarr';
 				$actioncomm->code        = 'AC_RISK_DELETE';
 				$actioncomm->type_code   = 'AC_OTH_AUTO';
-				$actioncomm->label       = $langs->trans('RiskDeleteTrigger');
+				$actioncomm->label       = $langs->transnoentities('RiskDeleteTrigger');
 				$actioncomm->datep       = $now;
 				$actioncomm->fk_element  = $object->fk_element;
 				$actioncomm->userownerid = $user->id;
@@ -1039,7 +1039,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->elementtype = 'digiriskelement@digiriskdolibarr';
 				$actioncomm->code        = 'AC_RISKASSESSMENT_CREATE';
 				$actioncomm->type_code   = 'AC_OTH_AUTO';
-				$actioncomm->label       = $langs->trans('RiskAssessmentCreateTrigger');
+				$actioncomm->label       = $langs->transnoentities('RiskAssessmentCreateTrigger');
 				$actioncomm->datep       = $now;
 				$actioncomm->fk_element  = $risk->fk_element;
 				$actioncomm->userownerid = $user->id;
@@ -1064,7 +1064,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->elementtype = 'digiriskelement@digiriskdolibarr';
 				$actioncomm->code        = 'AC_RISKASSESSMENT_MODIFY';
 				$actioncomm->type_code   = 'AC_OTH_AUTO';
-				$actioncomm->label       = $langs->trans('RiskAssessmentModifyTrigger');
+				$actioncomm->label       = $langs->transnoentities('RiskAssessmentModifyTrigger');
 				$actioncomm->datep       = $now;
 				$actioncomm->fk_element  = $risk->fk_element;
 				$actioncomm->userownerid = $user->id;
@@ -1089,7 +1089,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->elementtype = 'digiriskelement@digiriskdolibarr';
 				$actioncomm->code        = 'AC_RISKASSESSMENT_DELETE';
 				$actioncomm->type_code   = 'AC_OTH_AUTO';
-				$actioncomm->label       = $langs->trans('RiskAssessmentDeleteTrigger');
+				$actioncomm->label       = $langs->transnoentities('RiskAssessmentDeleteTrigger');
 				$actioncomm->datep       = $now;
 				$actioncomm->fk_element  = $risk->fk_element;
 				$actioncomm->userownerid = $user->id;
@@ -1111,7 +1111,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->elementtype = 'digiriskelement@digiriskdolibarr';
 				$actioncomm->code        = 'AC_EVALUATOR_CREATE';
 				$actioncomm->type_code   = 'AC_OTH_AUTO';
-				$actioncomm->label       = $langs->trans('EvaluatorCreateTrigger');
+				$actioncomm->label       = $langs->transnoentities('EvaluatorCreateTrigger');
 				$actioncomm->datep       = $now;
 				$actioncomm->fk_element  = $object->fk_parent;
 				$actioncomm->userownerid = $user->id;
@@ -1133,7 +1133,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->elementtype = 'digiriskelement@digiriskdolibarr';
 				$actioncomm->code        = 'AC_EVALUATOR_MODIFY';
 				$actioncomm->type_code   = 'AC_OTH_AUTO';
-				$actioncomm->label       = $langs->trans('EvaluatorModifyTrigger');
+				$actioncomm->label       = $langs->transnoentities('EvaluatorModifyTrigger');
 				$actioncomm->datep       = $now;
 				$actioncomm->fk_element  = $object->fk_parent;
 				$actioncomm->userownerid = $user->id;
@@ -1155,7 +1155,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->elementtype = 'digiriskelement@digiriskdolibarr';
 				$actioncomm->code        = 'AC_EVALUATOR_DELETE';
 				$actioncomm->type_code   = 'AC_OTH_AUTO';
-				$actioncomm->label       = $langs->trans('EvaluatorDeleteTrigger');
+				$actioncomm->label       = $langs->transnoentities('EvaluatorDeleteTrigger');
 				$actioncomm->datep       = $now;
 				$actioncomm->fk_element  = $object->fk_parent;
 				$actioncomm->userownerid = $user->id;
@@ -1177,7 +1177,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->elementtype = 'digiriskelement@digiriskdolibarr';
 				$actioncomm->code        = 'AC_RISKSIGN_CREATE';
 				$actioncomm->type_code   = 'AC_OTH_AUTO';
-				$actioncomm->label       = $langs->trans('RiskSignCreateTrigger');
+				$actioncomm->label       = $langs->transnoentities('RiskSignCreateTrigger');
 				$actioncomm->datep       = $now;
 				$actioncomm->fk_element  = $object->fk_element;
 				$actioncomm->userownerid = $user->id;
@@ -1199,7 +1199,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->elementtype = 'digiriskelement@digiriskdolibarr';
 				$actioncomm->code        = 'AC_RISKSIGN_MODIFY';
 				$actioncomm->type_code   = 'AC_OTH_AUTO';
-				$actioncomm->label       = $langs->trans('RiskSignModifyTrigger');
+				$actioncomm->label       = $langs->transnoentities('RiskSignModifyTrigger');
 				$actioncomm->datep       = $now;
 				$actioncomm->fk_element  = $object->fk_element;
 				$actioncomm->userownerid = $user->id;
@@ -1221,7 +1221,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->elementtype = 'digiriskelement@digiriskdolibarr';
 				$actioncomm->code        = 'AC_RISKSIGN_DELETE';
 				$actioncomm->type_code   = 'AC_OTH_AUTO';
-				$actioncomm->label       = $langs->trans('RiskSignDeleteTrigger');
+				$actioncomm->label       = $langs->transnoentities('RiskSignDeleteTrigger');
 				$actioncomm->datep       = $now;
 				$actioncomm->fk_element  = $object->fk_element;
 				$actioncomm->userownerid = $user->id;
@@ -1241,7 +1241,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->elementtype = 'accident@digiriskdolibarr';
 				$actioncomm->code        = 'AC_ACCIDENT_MODIFY';
 				$actioncomm->type_code   = 'AC_OTH_AUTO';
-				$actioncomm->label       = $langs->trans('AccidentModifyTrigger');
+				$actioncomm->label       = $langs->transnoentities('AccidentModifyTrigger');
 				$actioncomm->datep       = $now;
 				$actioncomm->fk_element  = $object->id;
 				$actioncomm->userownerid = $user->id;
@@ -1263,7 +1263,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->elementtype = 'accident@digiriskdolibarr';
 				$actioncomm->code        = 'AC_ACCIDENT_DELETE';
 				$actioncomm->type_code   = 'AC_OTH_AUTO';
-				$actioncomm->label       = $langs->trans('AccidentDeleteTrigger');
+				$actioncomm->label       = $langs->transnoentities('AccidentDeleteTrigger');
 				$actioncomm->datep       = $now;
 				$actioncomm->fk_element  = $object->id;
 				$actioncomm->userownerid = $user->id;
@@ -1282,7 +1282,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->elementtype = 'accident@digiriskdolibarr';
 				$actioncomm->code        = 'AC_ACCIDENTWORKSTOP_CREATE';
 				$actioncomm->type_code   = 'AC_OTH_AUTO';
-				$actioncomm->label       = $langs->trans('AccidentWorkStopCreateTrigger');
+				$actioncomm->label       = $langs->transnoentities('AccidentWorkStopCreateTrigger');
 				$actioncomm->datep       = $now;
 				$actioncomm->fk_element  = $object->fk_accident;
 				$actioncomm->userownerid = $user->id;
@@ -1301,7 +1301,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->elementtype = 'accident@digiriskdolibarr';
 				$actioncomm->code        = 'AC_ACCIDENTWORKSTOP_MODIFY';
 				$actioncomm->type_code   = 'AC_OTH_AUTO';
-				$actioncomm->label       = $langs->trans('AccidentWorkStopModifyTrigger');
+				$actioncomm->label       = $langs->transnoentities('AccidentWorkStopModifyTrigger');
 				$actioncomm->datep       = $now;
 				$actioncomm->fk_element  = $object->fk_accident;
 				$actioncomm->userownerid = $user->id;
@@ -1320,7 +1320,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->elementtype = 'accident@digiriskdolibarr';
 				$actioncomm->code        = 'AC_ACCIDENTWORKSTOP_DELETE';
 				$actioncomm->type_code   = 'AC_OTH_AUTO';
-				$actioncomm->label       = $langs->trans('AccidentWorkStopDeleteTrigger');
+				$actioncomm->label       = $langs->transnoentities('AccidentWorkStopDeleteTrigger');
 				$actioncomm->datep       = $now;
 				$actioncomm->fk_element  = $object->fk_accident;
 				$actioncomm->userownerid = $user->id;
@@ -1339,7 +1339,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->elementtype = 'accident@digiriskdolibarr';
 				$actioncomm->code        = 'AC_ACCIDENTLESION_CREATE';
 				$actioncomm->type_code   = 'AC_OTH_AUTO';
-				$actioncomm->label       = $langs->trans('AccidentLesionCreateTrigger');
+				$actioncomm->label       = $langs->transnoentities('AccidentLesionCreateTrigger');
 				$actioncomm->datep       = $now;
 				$actioncomm->fk_element  = $object->fk_accident;
 				$actioncomm->userownerid = $user->id;
@@ -1358,7 +1358,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->elementtype = 'accident@digiriskdolibarr';
 				$actioncomm->code        = 'AC_ACCIDENTLESION_MODIFY';
 				$actioncomm->type_code   = 'AC_OTH_AUTO';
-				$actioncomm->label       = $langs->trans('AccidentLesionModifyTrigger');
+				$actioncomm->label       = $langs->transnoentities('AccidentLesionModifyTrigger');
 				$actioncomm->datep       = $now;
 				$actioncomm->fk_element  = $object->fk_accident;
 				$actioncomm->userownerid = $user->id;
@@ -1377,7 +1377,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->elementtype = 'accident@digiriskdolibarr';
 				$actioncomm->code        = 'AC_ACCIDENTLESION_DELETE';
 				$actioncomm->type_code   = 'AC_OTH_AUTO';
-				$actioncomm->label       = $langs->trans('AccidentLesionDeleteTrigger');
+				$actioncomm->label       = $langs->transnoentities('AccidentLesionDeleteTrigger');
 				$actioncomm->datep       = $now;
 				$actioncomm->fk_element  = $object->fk_accident;
 				$actioncomm->userownerid = $user->id;
@@ -1397,7 +1397,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->elementtype = 'accident@digiriskdolibarr';
 				$actioncomm->code        = 'AC_ACCIDENTMETADATA_CREATE';
 				$actioncomm->type_code   = 'AC_OTH_AUTO';
-				$actioncomm->label       = $langs->trans('AccidentMetaDataCreateTrigger');
+				$actioncomm->label       = $langs->transnoentities('AccidentMetaDataCreateTrigger');
 				$actioncomm->datep       = $now;
 				$actioncomm->fk_element  = $object->fk_accident;
 				$actioncomm->userownerid = $user->id;
@@ -1417,7 +1417,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->elementtype = 'task';
 				$actioncomm->code        = 'AC_TASK_TIMESPENT_CREATE';
 				$actioncomm->type_code   = 'AC_OTH_AUTO';
-				$actioncomm->label       = $langs->trans('TaskTimeSpentCreateTrigger');
+				$actioncomm->label       = $langs->transnoentities('TaskTimeSpentCreateTrigger');
 				$actioncomm->datep       = $now;
 				$actioncomm->fk_element  = $object->id;
 				$actioncomm->userownerid = $user->id;
@@ -1438,7 +1438,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->elementtype = 'task';
 				$actioncomm->code        = 'AC_TASK_TIMESPENT_MODIFY';
 				$actioncomm->type_code   = 'AC_OTH_AUTO';
-				$actioncomm->label       = $langs->trans('TaskTimeSpentModifyTrigger');
+				$actioncomm->label       = $langs->transnoentities('TaskTimeSpentModifyTrigger');
 				$actioncomm->datep       = $now;
 				$actioncomm->fk_element  = $object->id;
 				$actioncomm->userownerid = $user->id;
@@ -1461,7 +1461,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->elementtype = 'task';
 				$actioncomm->code        = 'AC_TASK_TIMESPENT_DELETE';
 				$actioncomm->type_code   = 'AC_OTH_AUTO';
-				$actioncomm->label       = $langs->trans('TaskTimeSpentDeleteTrigger');
+				$actioncomm->label       = $langs->transnoentities('TaskTimeSpentDeleteTrigger');
 				$actioncomm->datep       = $now;
 				$actioncomm->fk_element  = $object->id;
 				$actioncomm->userownerid = $user->id;

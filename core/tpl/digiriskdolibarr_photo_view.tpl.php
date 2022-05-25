@@ -27,7 +27,7 @@ if (empty($conf) || ! is_object($conf)) {
 <!-- BEGIN PHP TEMPLATE core/tpl/digiriskdolibarr_photo_view.tpl.php -->
 
 <?php $permtoupload = $user->rights->ecm->upload;?>
-<div class="risk-evaluation-photo" value="<?php echo $risk->id ?>">
+<div class="risk-evaluation-photo" value="<?php echo ($risk->id > 0 && !preg_match('/PROV/',$risk->ref) ? $risk->id : 0) ?>">
 	<?php if (!$view) : ?>
 		<span class="title"><?php echo $langs->trans('Photo'); ?></span>
 	<?php endif; ?>
@@ -39,12 +39,14 @@ if (empty($conf) || ! is_object($conf)) {
 		$modulepart   = $entity . 'ecm';
 		$path         = DOL_URL_ROOT . '/document.php?modulepart=' . $modulepart . '&attachment=0&file=' . str_replace('/', '%2F', $relativepath) . '/';
 		$pathToThumb  = DOL_URL_ROOT . '/viewimage.php?modulepart=digiriskdolibarr&entity=' . $conf->entity . '&file=' . urlencode($cotation->element . '/' . $cotation->ref . '/thumbs/');
-		$nophoto      = '/dolibarr/htdocs/public/theme/common/nophoto.png'; ?>
+		$nophoto      = DOL_URL_ROOT.'/public/theme/common/nophoto.png';
+		?>
 		<!-- BUTTON RISK EVALUATION PHOTO MODAL -->
-		<div class="action risk-evaluation-photo default-photo modal-open risk-evaluation-photo-<?php echo $cotation->id > 0 ? $cotation->id : 0 ; echo $risk->id > 0 ? ' risk-' . $risk->id : ' risk-new' ?>">
+		<div class="action risk-evaluation-photo default-photo modal-open risk-evaluation-photo-<?php echo $cotation->id > 0 ? $cotation->id : 0 ; echo $risk->id > 0  && !preg_match('/PROV/',$risk->ref) ? ' risk-' . $risk->id : ' risk-new' ?>">
+			<input hidden class="no-photo-path" value="<?php echo $nophoto ?>">
 			<?php if (isset($cotation->photo)) {
 				$filearray = dol_dir_list($conf->digiriskdolibarr->multidir_output[$conf->entity] . '/' . $cotation->element . '/' . $cotation->ref, "files", 0, '', '(\.odt|_preview.*\.png)$', 'position_name', 'asc', 1);
-				if (count($filearray)) {
+				if (count($filearray) && dol_strlen($cotation->photo) > 0) {
 					?>
 					<span class="floatleft inline-block valignmiddle divphotoref risk-evaluation-photo-single">
 						<input class="filepath-to-riskassessment filepath-to-riskassessment-<?php echo $risk->id > 0 ? $risk->id : 'new' ?>" type="hidden" value="<?php echo $pathToThumb ?>">
@@ -63,7 +65,7 @@ if (empty($conf) || ! is_object($conf)) {
 				<?php }
 			} else { ?>
 				<span class="floatleft inline-block valignmiddle divphotoref risk-evaluation-photo-single" value="<?php echo $risk->id ?>">
-					<?php $pathToThumb = DOL_URL_ROOT . '/viewimage.php?modulepart=digiriskdolibarr&entity=' . $conf->entity . '&file=' . urlencode('/riskassessment/tmp/' . ($risk->id > 0 ? $risk->ref : 'RK0') . '/thumbs/');  ?>
+					<?php $pathToThumb = DOL_URL_ROOT . '/viewimage.php?modulepart=digiriskdolibarr&entity=' . $conf->entity . '&file=' . urlencode('/riskassessment/tmp/' . ($risk->id > 0 && !preg_match('/PROV/',$risk->ref) ? $risk->ref : 'RK0') . '/thumbs/');  ?>
 					<input class="filepath-to-riskassessment filepath-to-riskassessment-<?php echo $risk->id > 0 ? $risk->id : 'new' ?>" type="hidden" value="<?php echo $pathToThumb ?>">
 					<input class="filename" type="hidden" value="">
 					<img class="clicked-photo-preview photo maxwidth50"  src="<?php echo $nophoto ?>">

@@ -16,4 +16,4 @@
 ALTER TABLE llx_digiriskdolibarr_riskassessment ADD INDEX idx_digiriskdolibarr_riskassessment_rowid (rowid);
 ALTER TABLE llx_digiriskdolibarr_riskassessment ADD INDEX idx_digiriskdolibarr_riskassessment_ref (ref);
 ALTER TABLE llx_digiriskdolibarr_riskassessment ADD CONSTRAINT llx_digiriskdolibarr_riskassessment_fk_user_creat FOREIGN KEY (fk_user_creat) REFERENCES llx_user(rowid);
-
+ALTER TABLE llx_digiriskdolibarr_riskassessment ADD UNIQUE uk_riskassessment_ref (ref, entity);

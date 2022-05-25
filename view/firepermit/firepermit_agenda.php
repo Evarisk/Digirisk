@@ -39,8 +39,10 @@ if ( ! $res) die("Include of main fails");
 require_once DOL_DOCUMENT_ROOT . '/contact/class/contact.class.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/company.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/functions2.lib.php';
+require_once DOL_DOCUMENT_ROOT . '/projet/class/project.class.php';
 
 require_once __DIR__ . '/../../class/firepermit.class.php';
+require_once __DIR__ . '/../../class/digiriskresources.class.php';
 require_once __DIR__ . '/../../lib/digiriskdolibarr_firepermit.lib.php';
 require_once __DIR__ . '/../../lib/digiriskdolibarr_function.lib.php';
 
@@ -76,8 +78,10 @@ if ( ! $sortfield) $sortfield = 'a.datep,a.id';
 if ( ! $sortorder) $sortorder = 'DESC,DESC';
 
 // Initialize technical objects
-$object      = new FirePermit($db);
-$extrafields = new ExtraFields($db);
+$object            = new FirePermit($db);
+$extrafields       = new ExtraFields($db);
+$digiriskresources = new DigiriskResources($db);
+$project           = new Project($db);
 $hookmanager->initHooks(array('firepermitagenda', 'globalcard')); // Note that conf->hooks_modules contains array
 // Fetch optionals attributes and labels
 $extrafields->fetch_name_optionals_label($object->table_element);
@@ -132,11 +136,19 @@ if ($object->id > 0) {
 
 	// Object card
 	// ------------------------------------------------------------
-	dol_strlen($object->label) ? $morehtmlref = ' - ' . $object->label : '';
+	dol_strlen($object->label) ? $morehtmlref = '<span>' . ' - ' . $object->label . '</span>' : '';
+	$morehtmlref                             .= '<div class="refidno">';
+	// External Society -- Société extérieure
+	$ext_society  = $digiriskresources->fetchResourcesFromObject('FP_EXT_SOCIETY', $object);
+	$morehtmlref .= $langs->trans('ExtSociety') . ' : ' . $ext_society->getNomUrl(1);
+	// Project
+	$project->fetch($object->fk_project);
+	$morehtmlref .= '<br>' . $langs->trans('Project') . ' : ' . getNomUrlProject($project, 1, 'blank');
+	$morehtmlref .= '</div>';
+
 	digirisk_banner_tab($object, 'ref', '', 0, 'ref', 'ref', $morehtmlref, '', 0, '', $object->getLibStatut(5));
 
 	print '<div class="fichecenter">';
-	print '<div class="underbanner clearboth"></div>';
 
 	$object->info($object->id);
 	dol_print_object_info($object, 1);
