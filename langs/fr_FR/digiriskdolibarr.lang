@@ -1351,6 +1351,7 @@ MainCategorySet = La catégorie principale a été définie
 ParentCategoryLabelSet = Le titre de la catégorie parent a été défini
 ChildCategoryLabelSet = Le titre de la catégorie enfant a été défini
 TicketPublicInterfaceConfigDocumentation = Pour configurer l'interface publique des tickets, consultez la documentation
+ParentCategory = Catégorie parent
 
 # Ticket document
 
