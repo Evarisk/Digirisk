@@ -413,7 +413,7 @@ if ( ! empty($mainCategoryObject) && $mainCategoryObject > 0) {
 			<div id="sendFileForm">
 				<div id="fileLinkedTable" class="tableforinputfields">
 					<?php $fileLinkedList = dol_dir_list($conf->digiriskdolibarr->multidir_output[isset($conf->entity) ? $conf->entity : 1] . '/temp/ticket/' . $ticket_tmp_id . '/thumbs/'); ?>
-					<div class="wpeo-table table-flex table-3">
+					<div class="wpeo-table table-flex table-3 files-uploaded">
 						<?php
 						if ( ! empty($fileLinkedList)) {
 							foreach ($fileLinkedList as $fileLinked) {

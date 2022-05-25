@@ -3472,7 +3472,7 @@ window.eoxiaJS.ticket.tmpStockFile = function( ) {
 		formData.append('files[]', file)
 	}
 	var ticket_id = $('#ticket_id').val()
-
+	window.eoxiaJS.loader.display($('.files-uploaded'));
 	fetch(document.URL + '?action=sendfile&ticket_id='+ticket_id, {
 		method: 'POST',
 		body: formData,
