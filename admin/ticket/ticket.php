@@ -416,7 +416,7 @@ if ( ! empty($conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE)) {
 
 	print '</table>';
 	print '</div>';
-	print '<span class="opacitymedium">' . $langs->trans("TicketPublicInterfaceConfigDocumentation") . '</span> : <a class="wordbreak" href="https://wiki.dolibarr.org/index.php?title=Module_Digirisk#Interface_publique_des_tickets" target="_blank" >' . $langs->transnoentities('DigiriskDocumentation') . '</a>';
+	print '<span class="opacitymedium">' . $langs->trans("TicketPublicInterfaceConfigDocumentation") . '</span> : <a class="wordbreak" href="https://wiki.dolibarr.org/index.php?title=Module_Digirisk#DigiRisk_-_Registre_de_s.C3.A9curit.C3.A9_et_Tickets" target="_blank" >' . $langs->transnoentities('DigiriskDocumentation') . '</a>';
 }
 
 
