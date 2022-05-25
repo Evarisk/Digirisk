@@ -97,6 +97,7 @@ global $maxwidthmini, $maxheightmini, $maxwidthsmall, $maxheightsmall;
 if ($action == 'generateCategories') {
 
 	$result = createTicketCategory($langs->trans('Register'), '', '', 1, 'ticket');
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_TICKET_MAIN_CATEGORY', $result, 'integer', 0, '', $conf->entity);
 
 	if ($result > 0) {
 
