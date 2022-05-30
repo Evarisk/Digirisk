@@ -654,6 +654,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			296 => array('DIGIRISKDOLIBARR_TICKET_MAIN_CATEGORY', 'integer', 0, '', 0, 'current'),
 			297 => array('DIGIRISKDOLIBARR_TICKET_PARENT_CATEGORY_LABEL', 'chaine', $langs->trans('Registre'), '', 0, 'current'),
 			298 => array('DIGIRISKDOLIBARR_TICKET_CHILD_CATEGORY_LABEL', 'chaine', $langs->trans('Pertinence'), '', 0, 'current'),
+			299 => array('DIGIRISKDOLIBARR_TICKET_PROJECT', 'integer', 0, '', 0, 'current'),
 
 			// CONST ACCIDENT
 			300 => array('MAIN_AGENDA_ACTIONAUTO_ACCIDENT_CREATE', 'integer', 1, '', 0, 'current'),
@@ -1719,7 +1720,12 @@ class modDigiriskdolibarr extends DolibarrModules
 			$tags->fk_parent = $tag_id;
 			$tags->create($user);
 
-			dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_PROJECT_TAGS_SET', 2, 'integer', 0, '', $conf->entity);
+			$tags->label     = 'TS';
+			$tags->type      = 'project';
+			$tags->fk_parent = $tag_id;
+			$tags->create($user);
+
+			dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_PROJECT_TAGS_SET', 3, 'integer', 0, '', $conf->entity);
 		} elseif ($conf->global->DIGIRISKDOLIBARR_PROJECT_TAGS_SET == 1) {
 			//Install after 8.3.0
 
@@ -1735,6 +1741,20 @@ class modDigiriskdolibarr extends DolibarrModules
 			$tags->create($user);
 
 			dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_PROJECT_TAGS_SET', 2, 'integer', 0, '', $conf->entity);
+		} elseif ($conf->global->DIGIRISKDOLIBARR_PROJECT_TAGS_SET == 2) {
+			//Install after 9.3.0
+
+			require_once DOL_DOCUMENT_ROOT . '/categories/class/categorie.class.php';
+
+			$tags = new Categorie($this->db);
+
+			$tags->fetch('', 'QHSE');
+			$tags->label     = 'TS';
+			$tags->type      = 'project';
+			$tags->fk_parent = $tags->id;
+			$tags->create($user);
+
+			dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_PROJECT_TAGS_SET', 3, 'integer', 0, '', $conf->entity);
 		}
 
 		if ($conf->global->DIGIRISKDOLIBARR_TRIGGERS_UPDATED == 0) {

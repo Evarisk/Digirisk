@@ -157,6 +157,8 @@ if ($action == 'add') {
 
 	$object->message = html_entity_decode($message);
 
+	$object->fk_project = $conf->global->DIGIRISKDOLIBARR_TICKET_PROJECT;
+
 	$extrafields->setOptionalsFromPost(null, $object);
 
 	// Check Captcha code if is enabled

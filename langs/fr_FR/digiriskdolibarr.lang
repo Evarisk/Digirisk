@@ -1352,6 +1352,11 @@ ParentCategoryLabelSet = Le titre de la catégorie parent a été défini
 ChildCategoryLabelSet = Le titre de la catégorie enfant a été défini
 TicketPublicInterfaceConfigDocumentation = Pour configurer l'interface publique des tickets, consultez la documentation
 ParentCategory = Catégorie parent
+TSProject = Projet lié aux tickets
+TicketInitial = TS
+TicketDescription = Projet des tickets
+
+
 
 # Ticket document
 
@@ -1360,6 +1365,8 @@ DigiriskTicketDocumentStandardModel = Renvoie le numéro sous la forme TDn où n
 DigiriskTemplateDocumentTicket = Modèle de documents des fiches de tickets de Digirisk
 TicketDocumentDigiriskTemplate = ODT par défaut des fiches de tickets
 TicketDocument = Fiche du ticket
+
+
 
 #
 # Tools - Outils
@@ -1373,6 +1380,8 @@ DataMigrationImportDescription = Importation des données de l'arborescence de D
 DataMigrationImportRisks = Importation des données des risques de Digirisk
 DataMigrationImportRisksDescription = Importation des données des risques de Digirisk WordPress au format JSON
 ErrorFileNotWellFormatted = Le fichier n'est pas au bon format ou est vide. Vous devez joindre un fichier d'import provenant de Digirisk WordPress nommé DATE_OBJET_export.json
+
+
 
 #
 # Media - Media

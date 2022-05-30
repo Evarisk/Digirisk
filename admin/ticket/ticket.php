@@ -45,6 +45,7 @@ require_once DOL_DOCUMENT_ROOT . "/core/lib/admin.lib.php";
 require_once DOL_DOCUMENT_ROOT . "/core/class/html.formother.class.php";
 include_once DOL_DOCUMENT_ROOT . '/core/class/extrafields.class.php';
 include_once DOL_DOCUMENT_ROOT . '/categories/class/categorie.class.php';
+require_once DOL_DOCUMENT_ROOT . "/core/class/html.formprojet.class.php";
 
 require_once '../../lib/digiriskdolibarr.lib.php';
 require_once '../../lib/digiriskdolibarr_ticket.lib.php';
@@ -65,6 +66,18 @@ $value      = GETPOST('value', 'alpha');
 /*
  * Actions
  */
+
+if (($action == 'update' && ! GETPOST("cancel", 'alpha')) || ($action == 'updateedit')) {
+	$TSProject = GETPOST('TSProject', 'none');
+	$TSProject = preg_split('/_/', $TSProject);
+
+	dolibarr_set_const($db, "DIGIRISKDOLIBARR_TICKET_PROJECT", $TSProject[0], 'integer', 0, '', $conf->entity);
+
+	if ($action != 'updateedit' && ! $error) {
+		header("Location: " . $_SERVER["PHP_SELF"]);
+		exit;
+	}
+}
 
 if ($action == 'setPublicInterface') {
 	if (GETPOST('value')) dolibarr_set_const($db, 'DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE', 1, 'integer', 0, '', $conf->entity);
@@ -181,6 +194,7 @@ if ($action == 'setChildCategoryLabel') {
  * View
  */
 
+if ( ! empty($conf->projet->enabled)) { $formproject = new FormProjets($db); }
 $form = new Form($db);
 
 $help_url = '';
@@ -280,6 +294,31 @@ if ( ! empty($conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE)) {
 
 	print '</table>';
 	print '</div>';
+
+	// Project
+	print load_fiche_titre($langs->trans("LinkedProject"), '', '');
+
+	print '<form method="POST" action="' . $_SERVER["PHP_SELF"] . '" name="project_form">';
+	print '<input type="hidden" name="token" value="' . newToken() . '">';
+	print '<input type="hidden" name="action" value="update">';
+	print '<table class="noborder centpercent editmode">';
+	print '<tr class="liste_titre">';
+	print '<td>' . $langs->trans("Name") . '</td>';
+	print '<td>' . $langs->trans("SelectProject") . '</td>';
+	print '<td>' . $langs->trans("Action") . '</td>';
+	print '</tr>';
+
+	if ( ! empty($conf->projet->enabled)) {
+		$langs->load("projects");
+		print '<tr class="oddeven"><td><label for="TSProject">' . $langs->trans("TSProject") . '</label></td><td>';
+		$numprojet = $formproject->select_projects(0,  23, 'TSProject', 0, 0, 0, 0, 0, 0, 0, '', 0, 0, 'maxwidth500');
+		print ' <a href="' . DOL_URL_ROOT . '/projet/card.php?&action=create&status=1&backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?action=create') . '"><span class="fa fa-plus-circle valignmiddle" title="' . $langs->trans("AddProject") . '"></span></a>';
+		print '<td><input type="submit" class="button" name="save" value="' . $langs->trans("Save") . '">';
+		print '</td></tr>';
+	}
+
+	print '</table>';
+	print '</form>';
 
 	print load_fiche_titre($langs->trans("TicketCategories"), '', '');
 
