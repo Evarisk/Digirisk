@@ -249,6 +249,7 @@ GeneralInstructions = Consignes générales
 RulesOfProcedure = Règlement intérieur
 
 CollectiveAgreement = Conventions collectives
+legaldisplay.odt = Affichage légal
 
 
 
@@ -291,6 +292,9 @@ ElectionDateDP = Date d'élection des DP
 
 Titulars = Titulaires
 Alternates = Suppléants
+informationssharing.odt = Diffusion d'informations
+
+
 
 #
 # PreventionPlan - Plan de prévention
@@ -426,6 +430,7 @@ CloneAttendantsPreventionPlan = Cloner les participants du plan de prévention
 CloneSchedulePreventionPlan = Cloner les horaires du plan de prévention
 ConfirmClonePreventionPlan = Êtes-vous sûr de vouloir cloner le plan de prévention <b> %s </b> ?
 Archived = Archivé
+preventionplandocument.odt = Plan de prévention
 
 # Email - Mail
 PreventionPlanLabel = Récapitulatif du plan de prévention
@@ -518,6 +523,7 @@ FirePermitData = Données du Permis de feu
 FirePermitManagement = Gestion des permis de feu
 FPRProject = Projet lié aux permis de feu
 FirePermitLinked = Permis de feu lié
+firepermitdocument.odt = Permis de feu
 
 # Email - Mail
 FirePermitLabel = Récapitulatif du permis de feu
@@ -721,6 +727,7 @@ ListingRisksPhotoDigiriskTemplate = ODT par défaut des listing des risques avec
 
 # Data - Donnée
 ListingRisksPhoto = Listing des risques avec photos
+listingrisksphoto.odt = Listing des risques avec photos
 
 
 
@@ -747,6 +754,7 @@ ListingRisksActionDigiriskTemplate = ODT par défaut des listing des risques ave
 
 # Data - Donnée
 ListingRisksAction = Listing des risques avec actions correctives
+listingriskaction.odt = Listing des risques avec actions correctives
 
 
 
@@ -787,6 +795,7 @@ SitePlans = Localisation des plans
 SetStartEndDateBefore = Définissez la date de début et la date de fin d'audit sur cette page pour générer ce document
 SetStartEndDateBeforeSendEmail = Définissez la date de début et la date de fin d'audit sur cette page pour envoyer un email
 NoSitePlans = Aucun plan de la société renseigné
+riskassessmentdocument.odt = Document Unique
 
 # Boxes - Widget
 RiskAssessmentDocumentBox = Box Document unique
@@ -821,6 +830,7 @@ GroupmentDocumentDigiriskTemplate = ODT par défaut des fiches de groupement
 
 # Data - Donnée
 GroupmentDocument = Fiche de Groupement
+groupmentdocument.odt = Fiche de Groupement
 
 
 
@@ -844,6 +854,7 @@ WorkUnitDocumentDigiriskTemplate = ODT par défaut des fiches d'unité de travai
 
 # Data - Donnée
 WorkUnitDocument = Fiche d'Unité de travail
+workunitdocument.odt = Fiche d'Unité de travail
 
 
 
@@ -1366,6 +1377,8 @@ DigiriskTicketDocumentStandardModel = Renvoie le numéro sous la forme TDn où n
 DigiriskTemplateDocumentTicket = Modèle de documents des fiches de tickets de Digirisk
 TicketDocumentDigiriskTemplate = ODT par défaut des fiches de tickets
 TicketDocument = Fiche du ticket
+ticketdocument.odt = Fiche du ticket
+ticketdocument_events.odt = Fiche du ticket avec évènements
 
 
 

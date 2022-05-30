@@ -305,11 +305,12 @@ function digiriskshowdocuments($modulepart, $modulesubdir, $filedir, $urlsource,
 			asort($modellist);
 			$out      .= '<span class="hideonsmartphone">' . $langs->trans('Model') . ' </span>';
 			$modellist = array_filter($modellist, 'remove_index');
-			if (is_array($modellist) && count($modellist) == 1) {    // If there is only one element
-				$arraykeys                = array_keys($modellist);
-				$arrayvalues              = preg_replace('/template_/', '', array_values($modellist)[0]);
-				$modellist[$arraykeys[0]] = $arrayvalues;
-				$modelselected            = $arraykeys[0];
+			if (is_array($modellist)) {
+				foreach ($modellist as $key => $modellistsingle) {
+					$arrayvalues              = preg_replace('/template_/', '', $modellistsingle);
+					$modellist[$key] = $langs->trans($arrayvalues);
+					$modelselected            = $key;
+				}
 			}
 			$morecss                                        = 'maxwidth200';
 			if ($conf->browser->layout == 'phone') $morecss = 'maxwidth100';
