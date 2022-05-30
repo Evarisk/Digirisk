@@ -650,6 +650,7 @@ AccidentMetaDataLesion = Données complémentaires des lésions
 TotalWorkStopDays = Nombre total de jour d'arrêt de travail
 RegisterAccident = Accident bénin
 AccidentLinked = Accident lié
+GaugeCounter = Ce champ est utilisé dans le compteur de la jauge
 
 # AccidentTooltip - Tooltip des accidents
 VictimActivityTooltip = Précisez l’activité ou la tâche de la victime au moment de l’accident, c’est-à-dire ce que faisait la victime

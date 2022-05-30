@@ -805,7 +805,6 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	$arrayAccident[] = ( ! empty($object->accident_type) ? $object->accident_type : 0);
 	$arrayAccident[] = $object->accident_date;
 	$arrayAccident[] = $object->description;
-	$arrayAccident[] = $object->photo;
 	switch ($object->external_accident) {
 		case 1:
 			$arrayAccident[] = $object->fk_element > 0 ? $object->fk_element : $object->fk_standard;
@@ -884,7 +883,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 
 	//Label -- Libellé
 	print '<tr><td class="titlefield">';
-	print $langs->trans("Label");
+	print $form->textwithpicto($langs->trans("Label"), $langs->trans("GaugeCounter"), 1, 'info');
 	print '</td>';
 	print '<td>';
 	print $object->label;
@@ -892,7 +891,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 
 	//User Employer -- Responsable de la société
 	print '<tr><td class="titlefield">';
-	print $langs->trans("UserEmployer");
+	print $form->textwithpicto($langs->trans("UserEmployer"), $langs->trans("GaugeCounter"), 1, 'info');
 	print '</td>';
 	print '<td>';
 	$usertmp->fetch($object->fk_user_employer);
@@ -903,7 +902,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 
 	//User Victim -- Victime de l'accident
 	print '<tr><td class="titlefield">';
-	print $langs->trans("UserVictim");
+	print $form->textwithpicto($langs->trans("UserVictim"), $langs->trans("GaugeCounter"), 1, 'info');
 	print '</td>';
 	print '<td>';
 	$usertmp->fetch($object->fk_user_victim);
@@ -914,7 +913,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 
 	//Accident type -- Type de l'accident
 	print '<tr><td class="titlefield">';
-	print $langs->trans("AccidentType");
+	print $form->textwithpicto($langs->trans("AccidentType"), $langs->trans("GaugeCounter"), 1, 'info');
 	print '</td>';
 	print '<td>';
 	if ($object->accident_type == 0) {
@@ -926,14 +925,17 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 
 	//Accident date -- Date de l'accident
 	print '<tr><td class="titlefield">';
-	print $langs->trans("AccidentDate");
+	print $form->textwithpicto($langs->trans("AccidentDate"), $langs->trans("GaugeCounter"), 1, 'info');
 	print '</td>';
 	print '<td>';
 	print dol_print_date($object->accident_date, 'dayhoursec');
 	print '</td></tr>';
 
 	//AccidentLocation -- Lieu de l'accident
-	print '<tr><td class="titlefield">' . $langs->trans("AccidentLocation") . '</td><td>';
+	print '<tr><td class="titlefield">';
+	print $form->textwithpicto($langs->trans("AccidentLocation"), $langs->trans("GaugeCounter"), 1, 'info');
+	print '</td>';
+	print '<td>';
 	switch ($object->external_accident) {
 		case 1:
 			if ($object->fk_standard > 0) {
@@ -954,7 +956,13 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	}
 	print '</td></tr>';
 
-	include DOL_DOCUMENT_ROOT . '/core/tpl/commonfields_view.tpl.php';
+	//Description -- Description
+	print '<tr><td class="titlefield">';
+	print $form->textwithpicto($langs->trans("Description"), $langs->trans("GaugeCounter"), 1, 'info');
+	print '</td>';
+	print '<td>';
+	print $object->description;
+	print '</td></tr>';
 
 	print '</table>';
 	print '</div>';

@@ -445,7 +445,6 @@ while ($i < ($limit ? min($num, $limit) : $num)) {
 				$arrayAccident[] = ( ! empty($accident->accident_type) ? $accident->accident_type : 0);
 				$arrayAccident[] = $accident->accident_date;
 				$arrayAccident[] = $accident->description;
-				$arrayAccident[] = $accident->photo;
 				switch ($accident->external_accident) {
 					case 1:
 						$arrayAccident[] = $accident->fk_element > 0 ? $accident->fk_element : $accident->fk_standard;
