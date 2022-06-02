@@ -47,7 +47,9 @@ require_once './../../class/digiriskdocuments/workunitdocument.class.php';
 require_once './../../lib/digiriskdolibarr_digiriskelement.lib.php';
 require_once './../../lib/digiriskdolibarr_function.lib.php';
 require_once './../../core/modules/digiriskdolibarr/digiriskelement/groupment/mod_groupment_standard.php';
+require_once './../../core/modules/digiriskdolibarr/digiriskelement/groupment/mod_groupment_sirius.php';
 require_once './../../core/modules/digiriskdolibarr/digiriskelement/workunit/mod_workunit_standard.php';
+require_once './../../core/modules/digiriskdolibarr/digiriskelement/workunit/mod_workunit_canopus.php';
 require_once './../../core/modules/digiriskdolibarr/digiriskdocuments/groupmentdocument/modules_groupmentdocument.php';
 require_once './../../core/modules/digiriskdolibarr/digiriskdocuments/workunitdocument/modules_workunitdocument.php';
 

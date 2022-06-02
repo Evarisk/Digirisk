@@ -52,6 +52,18 @@ if ( ! $user->admin) accessforbidden();
 // Parameters
 $backtopage = GETPOST('backtopage', 'alpha');
 
+if (GETPOST('action') == 'setmod') {
+	if (GETPOST('type') == 'groupment') {
+		dolibarr_set_const($db, "DIGIRISKDOLIBARR_GROUPMENT_ADDON", GETPOST('value'), 'chaine', 0, '', $conf->entity);
+	} else if (GETPOST('type') == 'workunit') {
+		dolibarr_set_const($db, "DIGIRISKDOLIBARR_WORKUNIT_ADDON", GETPOST('value'), 'chaine', 0, '', $conf->entity);
+	}
+}
+
+if (GETPOST('action') == 'updateMask') {
+	dolibarr_set_const($db, GETPOST('mask'), GETPOST('addon_value'), 'chaine', 0, '', $conf->entity);
+}
+
 /*
  * View
  */
@@ -140,7 +152,7 @@ foreach ($types as $type => $typeWithCase) {
 							if ($conf->global->$typeConf == $file || $conf->global->$typeConf . '.php' == $file) {
 								print img_picto($langs->trans("Activated"), 'switch_on');
 							} else {
-								print '<a class="reposition" href="' . $_SERVER["PHP_SELF"] . '?action=setmod&value=' . preg_replace('/\.php$/', '', $file) . '&scan_dir=' . $module->scandir . '&label=' . urlencode($module->name) . '" alt="' . $langs->trans("Default") . '">' . img_picto($langs->trans("Disabled"), 'switch_off') . '</a>';
+								print '<a class="reposition" href="' . $_SERVER["PHP_SELF"] . '?action=setmod&value=' . preg_replace('/\.php$/', '', $file) . '&type=' . $type . '&scan_dir=' . $module->scandir . '&label=' . urlencode($module->name) . '" alt="' . $langs->trans("Default") . '">' . img_picto($langs->trans("Disabled"), 'switch_off') . '</a>';
 							}
 							print '</td>';
 

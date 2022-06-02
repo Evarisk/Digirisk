@@ -527,9 +527,17 @@ function digiriskHeader($title = '', $help_url = '', $arrayofjs = array(), $arra
 
 	require_once __DIR__ . '/../class/digiriskelement.class.php';
 	require_once __DIR__ . '/../core/modules/digiriskdolibarr/digiriskelement/groupment/mod_groupment_standard.php';
+	require_once __DIR__ . '/../core/modules/digiriskdolibarr/digiriskelement/groupment/mod_groupment_sirius.php';
 	require_once __DIR__ . '/../core/modules/digiriskdolibarr/digiriskelement/workunit/mod_workunit_standard.php';
+	require_once __DIR__ . '/../core/modules/digiriskdolibarr/digiriskelement/workunit/mod_workunit_canopus.php';
 	$mod_groupment = new $conf->global->DIGIRISKDOLIBARR_GROUPMENT_ADDON();
 	$mod_workunit  = new $conf->global->DIGIRISKDOLIBARR_WORKUNIT_ADDON();
+
+	$groupment_prefix = dol_strlen($mod_groupment->prefix) > 0 ? $mod_groupment->prefix : $conf->global->DIGIRISKDOLIBARR_GROUPMENT_SIRIUS_ADDON;
+	$groupment_prefix = preg_match('/{/',$groupment_prefix) ? preg_split('/{/', $groupment_prefix)[0] : $groupment_prefix;
+
+	$workunit_prefix = dol_strlen($mod_workunit->prefix) > 0 ? $mod_workunit->prefix : $conf->global->DIGIRISKDOLIBARR_WORKUNIT_CANOPUS_ADDON;
+	$workunit_prefix = preg_match('/{/',$workunit_prefix) ? preg_split('/{/', $workunit_prefix)[0] : $workunit_prefix;
 
 	// html header
 	$tmpcsstouse = 'sidebar-collapse' . ($morecssonbody ? ' ' . $morecssonbody : '');
@@ -577,10 +585,10 @@ function digiriskHeader($title = '', $help_url = '', $arrayofjs = array(), $arra
 								<?php if ($user->rights->digiriskdolibarr->digiriskelement->write) : ?>
 									<div class="add-container">
 										<a id="newGroupment" href="../digiriskelement/digiriskelement_card.php?action=create&element_type=groupment&fk_parent=0">
-											<div class="wpeo-button button-square-40 button-secondary wpeo-tooltip-event" data-direction="bottom" data-color="light" aria-label="<?php echo $langs->trans('NewGroupment'); ?>"><strong><?php echo $mod_groupment->prefix; ?></strong><span class="button-add animated fas fa-plus-circle"></span></div>
+											<div class="wpeo-button button-square-40 button-secondary wpeo-tooltip-event" data-direction="bottom" data-color="light" aria-label="<?php echo $langs->trans('NewGroupment'); ?>"><strong><?php echo $groupment_prefix; ?></strong><span class="button-add animated fas fa-plus-circle"></span></div>
 										</a>
 										<a id="newWorkunit" href="../digiriskelement/digiriskelement_card.php?action=create&element_type=workunit&fk_parent=0">
-											<div class="wpeo-button button-square-40 wpeo-tooltip-event" data-direction="bottom" data-color="light" aria-label="<?php echo $langs->trans('NewWorkUnit'); ?>"><strong><?php echo $mod_workunit->prefix; ?></strong><span class="button-add animated fas fa-plus-circle"></span></div>
+											<div class="wpeo-button button-square-40 wpeo-tooltip-event" data-direction="bottom" data-color="light" aria-label="<?php echo $langs->trans('NewWorkUnit'); ?>"><strong><?php echo $workunit_prefix; ?></strong><span class="button-add animated fas fa-plus-circle"></span></div>
 										</a>
 									</div>
 								<?php endif; ?>
@@ -594,10 +602,10 @@ function digiriskHeader($title = '', $help_url = '', $arrayofjs = array(), $arra
 						<?php else : ?>
 							<div class="society-header">
 								<a id="newGroupment" href="../digiriskelement/digiriskelement_card.php?action=create&element_type=groupment&fk_parent=0">
-									<div class="wpeo-button button-square-40 button-secondary wpeo-tooltip-event" data-direction="bottom" data-color="light" aria-label="<?php echo $langs->trans('NewGroupment'); ?>"><strong><?php echo $mod_groupment->prefix; ?></strong><span class="button-add animated fas fa-plus-circle"></span></div>
+									<div class="wpeo-button button-square-40 button-secondary wpeo-tooltip-event" data-direction="bottom" data-color="light" aria-label="<?php echo $langs->trans('NewGroupment'); ?>"><strong><?php echo $groupment_prefix; ?></strong><span class="button-add animated fas fa-plus-circle"></span></div>
 								</a>
 								<a id="newWorkunit" href="../digiriskelement/digiriskelement_card.php?action=create&element_type=workunit&fk_parent=0">
-									<div class="wpeo-button button-square-40 wpeo-tooltip-event" data-direction="bottom" data-color="light" aria-label="<?php echo $langs->trans('NewWorkUnit'); ?>"><strong><?php echo $mod_workunit->prefix; ?></strong><span class="button-add animated fas fa-plus-circle"></span></div>
+									<div class="wpeo-button button-square-40 wpeo-tooltip-event" data-direction="bottom" data-color="light" aria-label="<?php echo $langs->trans('NewWorkUnit'); ?>"><strong><?php echo $workunit_prefix; ?></strong><span class="button-add animated fas fa-plus-circle"></span></div>
 								</a>
 							</div>
 						<?php endif; ?>
@@ -817,6 +825,13 @@ function display_recurse_tree($results)
 
 	$mod_groupment = new $conf->global->DIGIRISKDOLIBARR_GROUPMENT_ADDON();
 	$mod_workunit  = new $conf->global->DIGIRISKDOLIBARR_WORKUNIT_ADDON();
+
+	$groupment_prefix = dol_strlen($mod_groupment->prefix) > 0 ? $mod_groupment->prefix : $conf->global->DIGIRISKDOLIBARR_GROUPMENT_SIRIUS_ADDON;
+	$groupment_prefix = preg_match('/{/',$groupment_prefix) ? preg_split('/{/', $groupment_prefix)[0] : $groupment_prefix;
+
+	$workunit_prefix = dol_strlen($mod_workunit->prefix) > 0 ? $mod_workunit->prefix : $conf->global->DIGIRISKDOLIBARR_WORKUNIT_CANOPUS_ADDON;
+	$workunit_prefix = preg_match('/{/',$workunit_prefix) ? preg_split('/{/', $workunit_prefix)[0] : $workunit_prefix;
+
 ?>
 
 <?php
@@ -927,7 +942,7 @@ function display_recurse_tree($results)
 										class="wpeo-button button-secondary button-square-40 wpeo-tooltip-event"
 										data-direction="bottom" data-color="light"
 										aria-label="<?php echo $langs->trans('NewGroupment'); ?>">
-										<strong><?php echo $mod_groupment->prefix; ?></strong>
+										<strong><?php echo $groupment_prefix; ?></strong>
 										<span class="button-add animated fas fa-plus-circle"></span>
 									</div>
 								</a>
@@ -936,7 +951,7 @@ function display_recurse_tree($results)
 										class="wpeo-button button-square-40 wpeo-tooltip-event"
 										data-direction="bottom" data-color="light"
 										aria-label="<?php echo $langs->trans('NewWorkUnit'); ?>">
-										<strong><?php echo $mod_workunit->prefix; ?></strong>
+										<strong><?php echo $workunit_prefix; ?></strong>
 										<span class="button-add animated fas fa-plus-circle"></span>
 									</div>
 								</a>
