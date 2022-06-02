@@ -1300,7 +1300,7 @@ SignatureManagement = Gestion des signatures
 # Data - Donnée
 Register = Registre
 Send = Envoyer
-TicketSend = Ticket envoyé
+TicketSent = Ticket envoyé
 CreateTicket = Ticket
 FilesLinked = Photos / Pièces jointes
 AddDocument = Ajouter document
