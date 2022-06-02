@@ -114,7 +114,7 @@ if ($action == 'generateCategories') {
 
 	if ($result > 0) {
 
-		$result2 = createTicketCategory($langs->trans('Accident'), '', 'ff7f00', 1, 'ticket', $result,'pictogramme_Accident_32px.png');
+		$result2 = createTicketCategory($langs->trans('Accident'), '', 'FFA660', 1, 'ticket', $result,'pictogramme_Accident_32px.png');
 
 		if ($result2 > 0) {
 
@@ -126,7 +126,7 @@ if ($action == 'generateCategories') {
 			setEventMessages($category->error, null, 'errors');
 		}
 
-		$result3 = createTicketCategory($langs->trans('SST'), '', '3636ed', 1, 'ticket', $result,'pictogramme_Sante-et-securite_32px.png');
+		$result3 = createTicketCategory($langs->trans('SST'), '', '7594F6', 1, 'ticket', $result,'pictogramme_Sante-et-securite_32px.png');
 
 		if ($result3 > 0) {
 
@@ -139,9 +139,9 @@ if ($action == 'generateCategories') {
 			setEventMessages($category->error, null, 'errors');
 		}
 
-		createTicketCategory($langs->trans('DGI'), '', 'bf0000', 1, 'ticket', $result,'pictogramme_Danger-grave-et-imminent_32px.png');
+		createTicketCategory($langs->trans('DGI'), '', 'E96A6A', 1, 'ticket', $result,'pictogramme_Danger-grave-et-imminent_32px.png');
 
-		$result4 = createTicketCategory($langs->trans('Quality'), '', '007f7f', 1, 'ticket', $result,'pictogramme_Qualité_32px.png');
+		$result4 = createTicketCategory($langs->trans('Quality'), '', 'FFDF77', 1, 'ticket', $result,'pictogramme_Qualité_32px.png');
 
 		if ($result4 > 0) {
 
@@ -152,7 +152,7 @@ if ($action == 'generateCategories') {
 			setEventMessages($category->error, null, 'errors');
 		}
 
-		$result5 = createTicketCategory($langs->trans('Environment'), '', '00bf00', 1, 'ticket', $result,'pictogramme_environnement_32px.png');
+		$result5 = createTicketCategory($langs->trans('Environment'), '', '5CD264', 1, 'ticket', $result,'pictogramme_environnement_32px.png');
 
 		if ($result5 > 0) {
 
