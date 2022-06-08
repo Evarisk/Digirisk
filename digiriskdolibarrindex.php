@@ -77,15 +77,56 @@ llxHeader("", $langs->trans("DigiriskDolibarrArea") . ' ' . $digirisk->version, 
 
 print load_fiche_titre($langs->trans("DigiriskDolibarrArea") . ' ' . $digirisk->version, '', 'digiriskdolibarr32px.png@digiriskdolibarr');
 ?>
-
-<?php if ($conf->global->DIGIRISKDOLIBARR_VERSION < $digirisk->version) : ?>
-<div class="wpeo-notice notice-warning">
-	<div class="notice-content">
-		<div class="notice-subtitle"><?php echo $langs->trans("WarningDigiriskNotUpdated"); ?>
-			<a href="<?php echo DOL_URL_ROOT . '/admin/modules.php?mainmenu=home'?>" target="_blank"><?php echo DOL_URL_ROOT . '/admin/modules.php?mainmenu=home'?></a>
+<?php if ($conf->global->DIGIRISKDOLIBARR_JUST_UPDATED == 1) : ?>
+	<div class="wpeo-notice notice-success">
+		<div class="notice-content">
+			<div class="notice-subtitle"><strong><?php echo $langs->trans("DigiriskUpdate"); ?></strong>
+				<?php echo $langs->trans('DigiriskHasBeenUpdatedTo', $digirisk->version) ?>
+			</div>
 		</div>
 	</div>
-</div>
+<?php
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_JUST_UPDATED', 0, 'integer', 0, '', $conf->entity);
+?>
+<?php endif; ?>
+
+<?php if ($conf->global->DIGIRISKDOLIBARR_VERSION != $digirisk->version) : ?>
+<?php
+	$digirisk->remove();
+	global $langs;
+
+	require_once DOL_DOCUMENT_ROOT . '/core/modules/modECM.class.php';
+	require_once DOL_DOCUMENT_ROOT . '/core/modules/modProjet.class.php';
+	require_once DOL_DOCUMENT_ROOT . '/core/modules/modSociete.class.php';
+	require_once DOL_DOCUMENT_ROOT . '/core/modules/modTicket.class.php';
+	require_once DOL_DOCUMENT_ROOT . '/core/modules/modCategorie.class.php';
+	require_once DOL_DOCUMENT_ROOT . '/core/modules/modFckeditor.class.php';
+	require_once DOL_DOCUMENT_ROOT . '/core/modules/modApi.class.php';
+
+	$modEcm       = new modECM($db);
+	$modProjet    = new modProjet($db);
+	$modSociete   = new modSociete($db);
+	$modTicket    = new modTicket($db);
+	$modCategorie = new modCategorie($db);
+	$modFckeditor = new modFckeditor($db);
+	$modApi       = new modApi($db);
+
+	$modEcm->init();
+	$modProjet->init();
+	$modSociete->init();
+	$modTicket->init();
+	$modCategorie->init();
+	$modFckeditor->init();
+	$modApi->init();
+	$langs->loadLangs(array("digiriskdolibarr@digiriskdolibarr", "other"));
+
+	$digirisk->init();
+
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_JUST_UPDATED', 1, 'integer', 0, '', $conf->entity);
+?>
+<script>
+	window.location.reload()
+</script>
 <?php endif; ?>
 <div class="wpeo-notice notice-info">
 	<div class="notice-content">

@@ -48,6 +48,8 @@ HowToSetupIHM = Pour plus de fonctionnalités sur l'affichage de Dolibarr (Confi
 ConfigIHM = Configuration de l'affichage
 ConfigDico =  Accéder à la page de configuration des dictionnaires
 LinkedProject = Projet lié
+DigiriskUpdate = Mise à jour de Digirisk :
+DigiriskHasBeenUpdatedTo = Digirisk a été mis à jour en version %s
 
 #
 # Page À propos
