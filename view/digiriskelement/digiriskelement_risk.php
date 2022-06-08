@@ -267,7 +267,7 @@ if ($sharedrisks) {
 //				$photoDigiriskElement .= '</div>';
 //			}
 
-			$photoRisk = '<img class="danger-category-pic hover" src=' . DOL_URL_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $risk->get_danger_category($risk) . '.png' . '>';
+			$photoRisk = '<img class="danger-category-pic hover" src=' . DOL_URL_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $risks->get_danger_category($risks) . '.png' . '>';
 
 			$importValue = '<div class="importsharedrisk"><span class="importsharedrisk-ref">' . 'S' . $risks->entity . '</span>';
 			$importValue .= '<span>' . dol_trunc($nameEntity, 32) . '</span>';
