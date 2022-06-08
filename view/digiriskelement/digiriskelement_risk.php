@@ -235,7 +235,7 @@ if ($sharedrisks) {
 //
 //		$filter = rtrim($filter, ',');
 
-		$allrisks = $risk->fetchAll('', '', 0, 0, array('customsql' => 'status > 0 AND entity NOT IN (' . $conf->entity . ')'));
+		$allrisks = $risk->fetchAll('ASC', 'fk_element', 0, 0, array('customsql' => 'status > 0 AND entity NOT IN (' . $conf->entity . ')'));
 
 		$formquestionimportsharedrisks = array(
 			'text' => '<i class="fas fa-circle-info"></i>' . $langs->trans("ConfirmImportSharedRisks"),
@@ -267,7 +267,7 @@ if ($sharedrisks) {
 //				$photoDigiriskElement .= '</div>';
 //			}
 
-			$photoRisk = '<img class="danger-category-pic hover" src=' . DOL_URL_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $risk->get_danger_category($risk) . '.png' . '>';
+			$photoRisk = '<img class="danger-category-pic hover" src=' . DOL_URL_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $risks->get_danger_category($risks) . '.png' . '>';
 
 			$importValue = '<div class="importsharedrisk"><span class="importsharedrisk-ref">' . 'S' . $risks->entity . '</span>';
 			$importValue .= '<span>' . dol_trunc($nameEntity, 32) . '</span>';

@@ -373,7 +373,7 @@ class modDigiriskdolibarr extends DolibarrModules
 		$this->descriptionlong = "Digirisk";
 		$this->editor_name     = 'Evarisk';
 		$this->editor_url      = 'https://evarisk.com';
-		$this->version         = '9.3.0';
+		$this->version         = '9.3.1';
 		$this->const_name      = 'MAIN_MODULE_' . strtoupper($this->name);
 		$this->picto           = 'digiriskdolibarr@digiriskdolibarr';
 
@@ -455,8 +455,8 @@ class modDigiriskdolibarr extends DolibarrModules
 			4 => array('DIGIRISKDOLIBAR_SOCIETY_DESCRIPTION', 'chaine', '', '', 0, 'current'),
 
 			// CONST RISK ASSESSMENTDOCUMENT
-			10 => array('DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_AUDIT_START_DATE', 'date', '', '', 0, 'current'),
-			11 => array('DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_AUDIT_END_DATE', 'date', '', '', 0, 'current'),
+			10 => array('DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_AUDIT_START_DATE', 'date', dol_print_date(dol_now(), 'dayrfc', 'tzuser'), '', 0, 'current'),
+			11 => array('DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_AUDIT_END_DATE', 'date', dol_print_date(dol_now(), 'dayrfc', 'tzuser'), '', 0, 'current'),
 			12 => array('DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_RECIPIENT', 'integer', 0, '', 0, 'current'),
 			13 => array('DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_METHOD', 'chaine', '* Étape 1 : Récupération des informations<br>- Visite des locaux<br>- Récupération des données du personnel<br><br> * Étape 2 : Définition de la méthodologie et de document<br>- Validation des fiches d\'unité de travail standard<br>- Validation de l\'arborescence des unités<br><br>* Étape 3 : Réalisation de l\'étude de risques<br>- Sensibilisation des personnels aux risques et aux dangers<br>- Création des unités de travail avec le personnel et le ou les responsables<br>- Évaluations des risques par unités de travail avec le personnel<br><br>* Étape 4<br>- Traitement et rédaction du document unique', '', 0, 'current'),
 			14 => array('DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_SOURCES', 'chaine','La sensibilisation des risques est définie dans l\'ED840 édité par l\'INRS.<br>Dans ce document vous trouverez:<br>- La définition d\'un risque, d\'un danger et un schéma explicatif<br>- Les explications concernant les différentes methodes d\'évaluation<br>', '', 0, 'current'),
@@ -654,6 +654,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			296 => array('DIGIRISKDOLIBARR_TICKET_MAIN_CATEGORY', 'integer', 0, '', 0, 'current'),
 			297 => array('DIGIRISKDOLIBARR_TICKET_PARENT_CATEGORY_LABEL', 'chaine', $langs->trans('Registre'), '', 0, 'current'),
 			298 => array('DIGIRISKDOLIBARR_TICKET_CHILD_CATEGORY_LABEL', 'chaine', $langs->trans('Pertinence'), '', 0, 'current'),
+			299 => array('DIGIRISKDOLIBARR_TICKET_PROJECT', 'integer', 0, '', 0, 'current'),
 
 			// CONST ACCIDENT
 			300 => array('MAIN_AGENDA_ACTIONAUTO_ACCIDENT_CREATE', 'integer', 1, '', 0, 'current'),
@@ -1719,7 +1720,12 @@ class modDigiriskdolibarr extends DolibarrModules
 			$tags->fk_parent = $tag_id;
 			$tags->create($user);
 
-			dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_PROJECT_TAGS_SET', 2, 'integer', 0, '', $conf->entity);
+			$tags->label     = 'TS';
+			$tags->type      = 'project';
+			$tags->fk_parent = $tag_id;
+			$tags->create($user);
+
+			dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_PROJECT_TAGS_SET', 3, 'integer', 0, '', $conf->entity);
 		} elseif ($conf->global->DIGIRISKDOLIBARR_PROJECT_TAGS_SET == 1) {
 			//Install after 8.3.0
 
@@ -1735,6 +1741,20 @@ class modDigiriskdolibarr extends DolibarrModules
 			$tags->create($user);
 
 			dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_PROJECT_TAGS_SET', 2, 'integer', 0, '', $conf->entity);
+		} elseif ($conf->global->DIGIRISKDOLIBARR_PROJECT_TAGS_SET == 2) {
+			//Install after 9.3.0
+
+			require_once DOL_DOCUMENT_ROOT . '/categories/class/categorie.class.php';
+
+			$tags = new Categorie($this->db);
+
+			$tags->fetch('', 'QHSE');
+			$tags->label     = 'TS';
+			$tags->type      = 'project';
+			$tags->fk_parent = $tags->id;
+			$tags->create($user);
+
+			dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_PROJECT_TAGS_SET', 3, 'integer', 0, '', $conf->entity);
 		}
 
 		if ($conf->global->DIGIRISKDOLIBARR_TRIGGERS_UPDATED == 0) {
@@ -1768,6 +1788,8 @@ class modDigiriskdolibarr extends DolibarrModules
 
 			dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_TRIGGERS_UPDATED', 1, 'integer', 0, '', $conf->entity);
 		}
+
+		if ($conf->global->DIGIRISKDOLIBARR_TRIGGERS_UPDATED)
 
 		$params = array(
 			'digiriskdolibarr' => array(																			// nom informatif du module externe qui apporte ses paramètres
