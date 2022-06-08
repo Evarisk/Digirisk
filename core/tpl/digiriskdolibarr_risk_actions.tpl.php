@@ -704,7 +704,7 @@ if ($action == 'confirm_import_shared_risks' && $confirm == 'yes') {
 //
 //	$filter = rtrim($filter, ',');
 
-	$allrisks = $risk->fetchAll('', '', 0, 0, array('customsql' => 'status > 0 AND entity NOT IN (' . $conf->entity . ')'));
+	$allrisks = $risk->fetchAll('', '', 0, 0, array('customsql' => 'status > 0 AND entity NOT IN (' . $conf->entity . ') AND fk_element > 0'));
 
 	foreach ($allrisks as $key => $risks) {
 		$digiriskelementtmp->fetch($risks->fk_element);
