@@ -241,7 +241,7 @@ if ($sharedrisks) {
 			'text' => '<i class="fas fa-circle-info"></i>' . $langs->trans("ConfirmImportSharedRisks"),
 		);
 
-		$formquestionimportsharedrisks[] = array('type' => 'checkbox', 'name' =>'select_all_shared_risks', 'value' => 1);
+		$formquestionimportsharedrisks[] = array('type' => 'checkbox', 'name' =>'select_all_shared_risks', 'value' => 0);
 
 		foreach ($allrisks as $key => $risks) {
 			$digiriskelementtmp->fetch($risks->fk_element);
@@ -286,7 +286,7 @@ if ($sharedrisks) {
 			if ($alreadyImported > 0) {
 				$formquestionimportsharedrisks[] = array('type' => 'checkbox', 'name' => 'import_shared_risks' . '_S' . $risks->entity . '_' . $digiriskelementtmp->ref . '_' . $risks->ref, 'label' => $importValue . '<span class="importsharedrisk imported">' . $langs->trans('AlreadyImported') . '</span>', 'value' => 0, 'disabled' => 1);
 			} else {
-				$formquestionimportsharedrisks[] = array('type' => 'checkbox', 'name' => 'import_shared_risks' . '_S' . $risks->entity . '_' . $digiriskelementtmp->ref . '_' . $risks->ref, 'label' => $importValue, 'value' => 1);
+				$formquestionimportsharedrisks[] = array('type' => 'checkbox', 'name' => 'import_shared_risks' . '_S' . $risks->entity . '_' . $digiriskelementtmp->ref . '_' . $risks->ref, 'label' => $importValue, 'value' => 0);
 			}
 		}
 		$formconfirm .= $form->formconfirm($_SERVER["PHP_SELF"] . '?id=' . $object->id, $langs->trans('ImportSharedRisks'), '', 'confirm_import_shared_risks', $formquestionimportsharedrisks, 'yes', 'actionButtonImportSharedRisks', 800, 800);
