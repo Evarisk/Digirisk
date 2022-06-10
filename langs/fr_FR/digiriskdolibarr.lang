@@ -1369,7 +1369,7 @@ ParentCategory = Catégorie parent
 TSProject = Projet lié aux tickets
 TicketInitial = TS
 TicketDescription = Projet des tickets
-
+TicketProjectUpdated = Le projet par défaut des tickets a été mis à jour
 
 
 # Ticket document
