@@ -89,12 +89,12 @@ if ( $action == "edit" && $permissiontoadd ) {
 } else {
 	print '<tr>';
 	print '<td class="titlefield">' . $langs->trans("AuditStartDate") . '</td><td colspan="2">';
-	print dol_print_date(strtotime($conf->global->DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_AUDIT_START_DATE), '%d/%m/%Y');
+	print dol_print_date($conf->global->DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_AUDIT_START_DATE, '%d/%m/%Y');
 	print '</td></tr>';
 
 	print '<tr>';
 	print '<td class="titlefield">' . $langs->trans("AuditEndDate") . '</td><td colspan="2">';
-	print dol_print_date(strtotime($conf->global->DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_AUDIT_END_DATE), '%d/%m/%Y');
+	print dol_print_date($conf->global->DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_AUDIT_END_DATE, '%d/%m/%Y');
 	print '</td></tr>';
 
 	// Destinataire
