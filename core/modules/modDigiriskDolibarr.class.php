@@ -1192,7 +1192,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			'type' => 'left',			                // This is a Left menu entry
 			'titre' => '<i class="fas fa-cog"></i>  ' . $langs->trans('DigiriskConfig'),
 			'mainmenu' => 'digiriskdolibarr',
-			'leftmenu' => 'diogiriskconfig',
+			'leftmenu' => 'digiriskconfig',
 			'url' => '/digiriskdolibarr/admin/setup.php',
 			'langs' => 'digiriskdolibarr@digiriskdolibarr',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
 			'position' => 48520 + $r,
