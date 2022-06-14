@@ -1440,7 +1440,7 @@ function digirisk_show_medias($sdir, $size = '', $maxHeight = 80, $maxWidth = 80
 								$urladvanced = getAdvancedPreviewUrl($modulepart, 'digiriskdolibarr/medias/' . preg_replace('/_' . $size . '/', '', $val['relativename']), 0, 'entity=' . $conf->entity); ?>
 								<a class="clicked-photo-preview" href="<?php echo $urladvanced; ?>"><i class="fas fa-2x fa-search-plus"></i></a>
 								<?php if (image_format_supported($val['name']) >= 0) : ?>
-									<?php $fullpath = $path . '/' . $val['relativename'] . '&entity=' . $conf->entity; ?>
+									<?php $fullpath = $path . '/' . urlencode($val['relativename']) . '&entity=' . $conf->entity; ?>
 								<input class="filename" type="hidden" value="<?php echo preg_replace('/_' . $size . '/', '', $val['name']) ?>">
 								<img class="photo photo<?php echo $j ?>" height="<?php echo $maxHeight; ?>" width="<?php echo $maxWidth; ?>" src="<?php echo $fullpath; ?>">
 								<?php endif; ?>

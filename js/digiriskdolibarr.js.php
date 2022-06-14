@@ -1243,11 +1243,21 @@ window.eoxiaJS.mediaGallery.savePhoto = function( event ) {
 			success: function ( resp ) {
 				$('.wpeo-loader').removeClass('wpeo-loader')
 				parent.removeClass('modal-active')
+
+				newPhoto = newPhoto.replace(/\ /g, '%20')
+				newPhoto = newPhoto.replace(/\(/g, '%28')
+				newPhoto = newPhoto.replace(/\)/g, '%29')
+				newPhoto = newPhoto.replace(/\+/g, '%2B')
+
 				riskAssessmentPhoto.each( function() {
 					$(this).find('.clicked-photo-preview').attr('src',newPhoto )
 					$(this).find('.filename').attr('value', favorite.match(/_small/) ? favorite.replace(/\./, '_small.') : favorite)
 				});
+
 				favorite = favorite.replace(/\ /g, '%20')
+				favorite = favorite.replace(/\(/g, '%28')
+				favorite = favorite.replace(/\)/g, '%29')
+				favorite = favorite.replace(/\+/g, '%2B')
 
 				mediaLinked.load(document.URL+'&favorite='+favorite + ' .element-linked-medias-'+idToSave+'.risk-'+riskId)
 				modalFrom.find('.messageSuccessSavePhoto').removeClass('hidden')
@@ -1279,6 +1289,12 @@ window.eoxiaJS.mediaGallery.savePhoto = function( event ) {
 			success: function ( resp ) {
 				$('.wpeo-loader').removeClass('wpeo-loader')
 				parent.removeClass('modal-active')
+
+				newPhoto = newPhoto.replace(/\ /g, '%20')
+				newPhoto = newPhoto.replace(/\(/g, '%28')
+				newPhoto = newPhoto.replace(/\)/g, '%29')
+				newPhoto = newPhoto.replace(/\+/g, '%2B')
+
 				digiriskElementPhoto.attr('src',newPhoto )
 
 				let photoContainer = digiriskElementPhoto.closest('.open-media-gallery')
@@ -1288,6 +1304,10 @@ window.eoxiaJS.mediaGallery.savePhoto = function( event ) {
 				photoContainer.closest('.unit-container').find('.digirisk-element-medias-modal').load(document.URL+ ' #digirisk_element_medias_modal_'+idToSave)
 
 				favorite = favorite.replace(/\ /g, '%20')
+				favorite = favorite.replace(/\(/g, '%28')
+				favorite = favorite.replace(/\)/g, '%29')
+				favorite = favorite.replace(/\+/g, '%2B')
+
 				if (idToSave === currentElementID) {
 					let digiriskBanner = $('.arearef.heightref')
 					digiriskBanner.load(document.URL+'&favorite='+favorite + ' .arearef.heightref')
@@ -1527,6 +1547,11 @@ window.eoxiaJS.mediaGallery.addToFavorite = function( event ) {
 			type: "POST",
 			processData: false,
 			success: function ( ) {
+				newPhoto = newPhoto.replace(/\ /g, '%20')
+				newPhoto = newPhoto.replace(/\(/g, '%28')
+				newPhoto = newPhoto.replace(/\)/g, '%29')
+				newPhoto = newPhoto.replace(/\+/g, '%2B')
+
 				elementPhotos.each( function() {
 					$(this).find('.clicked-photo-preview').attr('src',newPhoto )
 				});
@@ -1557,6 +1582,10 @@ window.eoxiaJS.mediaGallery.addToFavorite = function( event ) {
 
 					$('.arearef.heightref.valignmiddle.centpercent').load(' .arearef.heightref.valignmiddle.centpercent')
 				}
+				newPhoto = newPhoto.replace(/\ /g, '%20')
+				newPhoto = newPhoto.replace(/\(/g, '%28')
+				newPhoto = newPhoto.replace(/\)/g, '%29')
+				newPhoto = newPhoto.replace(/\+/g, '%2B')
 
 				previousPhoto.attr('src',newPhoto )
 				$('.wpeo-loader').removeClass('wpeo-loader')
