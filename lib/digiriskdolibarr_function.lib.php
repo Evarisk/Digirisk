@@ -20,7 +20,14 @@
  * \ingroup digiriskdolibarr
  * \brief   Library files with common functions for Digiriskdolibarr
  */
-
+if ( ! defined('NOREQUIREUSER'))  define('NOREQUIREUSER', '1');
+if ( ! defined('NOTOKENRENEWAL')) define('NOTOKENRENEWAL', '1');
+if ( ! defined('NOREQUIREMENU'))  define('NOREQUIREMENU', '1');
+if ( ! defined('NOREQUIREHTML'))  define('NOREQUIREHTML', '1');
+if ( ! defined('NOLOGIN'))        define("NOLOGIN", 1); // This means this output page does not require to be logged.
+if ( ! defined('NOCSRFCHECK'))    define("NOCSRFCHECK", 1); // We accept to go on this page from external web site.
+if ( ! defined('NOIPCHECK'))      define('NOIPCHECK', '1'); // Do not check IP defined into conf $dolibarr_main_restrict_ip
+if ( ! defined('NOBROWSERNOTIF')) define('NOBROWSERNOTIF', '1');
 /**
  *  Show photos of an object (nbmax maximum), into several columns
  *
@@ -1298,7 +1305,7 @@ function show_category_image($object, $upload_dir)
 			$imgWidth  = ($object->imgWidth < $maxWidth) ? $object->imgWidth : $maxWidth;
 			$imgHeight = ($object->imgHeight < $maxHeight) ? $object->imgHeight : $maxHeight;
 
-			print '<img border="0" width="' . $imgWidth . '" height="' . $imgHeight . '" src="' . DOL_URL_ROOT . '/viewimage.php?modulepart=category&entity=' . $object->entity . '&file=' . urlencode($pdir . $filename) . '">';
+			print '<img border="0" width="' . $imgWidth . '" height="' . $imgHeight . '" src="' . DOL_URL_ROOT . '/custom/digiriskdolibarr/documents/viewimage.php?modulepart=category&entity=' . $object->entity . '&file=' . urlencode($pdir . $filename) . '">';
 
 			//          if ($nbbyrow) print '</td>';
 			//          if ($nbbyrow && ($nbphoto % $nbbyrow == 0)) print '</tr>';
@@ -2786,4 +2793,91 @@ function digirisk_dol_add_file_process($upload_dir, $allowoverwrite = 0, $donotu
 	}
 
 	return $res;
+}
+
+
+/**
+ * Security check when accessing to a document (used by document.php, viewimage.php and webservices to get documents).
+ * TODO Replace code that set $accessallowed by a call to restrictedArea()
+ *
+ * @param	string	$modulepart			Module of document ('module', 'module_user_temp', 'module_user' or 'module_temp'). Exemple: 'medias', 'invoice', 'logs', 'tax-vat', ...
+ * @param	string	$original_file		Relative path with filename, relative to modulepart.
+ * @param	string	$entity				Restrict onto entity (0=no restriction)
+ * @param  	User	$fuser				User object (forced)
+ * @param	string	$refname			Ref of object to check permission for external users (autodetect if not provided) or for hierarchy
+ * @param   string  $mode               Check permission for 'read' or 'write'
+ * @return	mixed						Array with access information : 'accessallowed' & 'sqlprotectagainstexternals' & 'original_file' (as a full path name)
+ * @see restrictedArea()
+ */
+function digirisk_check_secure_access_document($modulepart, $original_file, $entity, $fuser = '', $refname = '', $mode = 'read')
+{
+	global $conf, $db, $user, $hookmanager;
+	global $dolibarr_main_data_root, $dolibarr_main_document_root_alt;
+	global $object;
+
+	if (!is_object($fuser)) {
+		$fuser = $user;
+	}
+
+	if (empty($modulepart)) {
+		return 'ErrorBadParameter';
+	}
+	if (empty($entity)) {
+		if (empty($conf->multicompany->enabled)) {
+			$entity = 1;
+		} else {
+			$entity = 0;
+		}
+	}
+	// Fix modulepart for backward compatibility
+	if ($modulepart == 'users') {
+		$modulepart = 'user';
+	}
+	if ($modulepart == 'tva') {
+		$modulepart = 'tax-vat';
+	}
+
+	//print 'dol_check_secure_access_document modulepart='.$modulepart.' original_file='.$original_file.' entity='.$entity;
+	dol_syslog('dol_check_secure_access_document modulepart='.$modulepart.' original_file='.$original_file.' entity='.$entity);
+
+	// We define $accessallowed and $sqlprotectagainstexternals
+	$accessallowed = 0;
+	$sqlprotectagainstexternals = '';
+	$ret = array();
+
+	// Find the subdirectory name as the reference. For example original_file='10/myfile.pdf' -> refname='10'
+	if (empty($refname)) {
+		$refname = basename(dirname($original_file)."/");
+		if ($refname == 'thumbs') {
+			// If we get the thumbns directory, we must go one step higher. For example original_file='10/thumbs/myfile_small.jpg' -> refname='10'
+			$refname = basename(dirname(dirname($original_file))."/");
+		}
+	}
+
+	// Define possible keys to use for permission check
+	$lire = 'lire';
+	$read = 'read';
+	$download = 'download';
+	if ($mode == 'write') {
+		$lire = 'creer';
+		$read = 'write';
+		$download = 'upload';
+	}
+
+	if ($modulepart == 'mycompany' && !empty($conf->mycompany->dir_output)) {
+		// Wrapping for some images
+		$accessallowed = 1;
+		$original_file = $conf->mycompany->dir_output.'/'.$original_file;
+	} elseif ($modulepart == 'category' && !empty($conf->categorie->multidir_output[$entity])) {
+		$accessallowed = 1;
+		$original_file = $conf->categorie->multidir_output[$entity].'/'.$original_file;
+	}
+
+	$ret = array(
+		'accessallowed' => ($accessallowed ? 1 : 0),
+		'sqlprotectagainstexternals' => $sqlprotectagainstexternals,
+		'original_file' => $original_file
+	);
+
+	return $ret;
 }
