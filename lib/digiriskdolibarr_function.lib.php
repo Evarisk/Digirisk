@@ -20,14 +20,7 @@
  * \ingroup digiriskdolibarr
  * \brief   Library files with common functions for Digiriskdolibarr
  */
-if ( ! defined('NOREQUIREUSER'))  define('NOREQUIREUSER', '1');
-if ( ! defined('NOTOKENRENEWAL')) define('NOTOKENRENEWAL', '1');
-if ( ! defined('NOREQUIREMENU'))  define('NOREQUIREMENU', '1');
-if ( ! defined('NOREQUIREHTML'))  define('NOREQUIREHTML', '1');
-if ( ! defined('NOLOGIN'))        define("NOLOGIN", 1); // This means this output page does not require to be logged.
-if ( ! defined('NOCSRFCHECK'))    define("NOCSRFCHECK", 1); // We accept to go on this page from external web site.
-if ( ! defined('NOIPCHECK'))      define('NOIPCHECK', '1'); // Do not check IP defined into conf $dolibarr_main_restrict_ip
-if ( ! defined('NOBROWSERNOTIF')) define('NOBROWSERNOTIF', '1');
+
 /**
  *  Show photos of an object (nbmax maximum), into several columns
  *
@@ -2811,13 +2804,16 @@ function digirisk_dol_add_file_process($upload_dir, $allowoverwrite = 0, $donotu
  */
 function digirisk_check_secure_access_document($modulepart, $original_file, $entity, $fuser = '', $refname = '', $mode = 'read')
 {
-	global $conf, $db, $user, $hookmanager;
-	global $dolibarr_main_data_root, $dolibarr_main_document_root_alt;
-	global $object;
+	if ( ! defined('NOREQUIREUSER'))  define('NOREQUIREUSER', '1');
+	if ( ! defined('NOTOKENRENEWAL')) define('NOTOKENRENEWAL', '1');
+	if ( ! defined('NOREQUIREMENU'))  define('NOREQUIREMENU', '1');
+	if ( ! defined('NOREQUIREHTML'))  define('NOREQUIREHTML', '1');
+	if ( ! defined('NOLOGIN'))        define("NOLOGIN", 1); // This means this output page does not require to be logged.
+	if ( ! defined('NOCSRFCHECK'))    define("NOCSRFCHECK", 1); // We accept to go on this page from external web site.
+	if ( ! defined('NOIPCHECK'))      define('NOIPCHECK', '1'); // Do not check IP defined into conf $dolibarr_main_restrict_ip
+	if ( ! defined('NOBROWSERNOTIF')) define('NOBROWSERNOTIF', '1');
 
-	if (!is_object($fuser)) {
-		$fuser = $user;
-	}
+	global $conf, $user;
 
 	if (empty($modulepart)) {
 		return 'ErrorBadParameter';
@@ -2829,39 +2825,18 @@ function digirisk_check_secure_access_document($modulepart, $original_file, $ent
 			$entity = 0;
 		}
 	}
-	// Fix modulepart for backward compatibility
-	if ($modulepart == 'users') {
-		$modulepart = 'user';
-	}
-	if ($modulepart == 'tva') {
-		$modulepart = 'tax-vat';
-	}
 
 	//print 'dol_check_secure_access_document modulepart='.$modulepart.' original_file='.$original_file.' entity='.$entity;
-	dol_syslog('dol_check_secure_access_document modulepart='.$modulepart.' original_file='.$original_file.' entity='.$entity);
+	dol_syslog('digirisk_check_secure_access_document modulepart='.$modulepart.' original_file='.$original_file.' entity='.$entity);
 
-	// We define $accessallowed and $sqlprotectagainstexternals
 	$accessallowed = 0;
 	$sqlprotectagainstexternals = '';
-	$ret = array();
 
-	// Find the subdirectory name as the reference. For example original_file='10/myfile.pdf' -> refname='10'
 	if (empty($refname)) {
 		$refname = basename(dirname($original_file)."/");
 		if ($refname == 'thumbs') {
-			// If we get the thumbns directory, we must go one step higher. For example original_file='10/thumbs/myfile_small.jpg' -> refname='10'
 			$refname = basename(dirname(dirname($original_file))."/");
 		}
-	}
-
-	// Define possible keys to use for permission check
-	$lire = 'lire';
-	$read = 'read';
-	$download = 'download';
-	if ($mode == 'write') {
-		$lire = 'creer';
-		$read = 'write';
-		$download = 'upload';
 	}
 
 	if ($modulepart == 'mycompany' && !empty($conf->mycompany->dir_output)) {
@@ -2871,6 +2846,9 @@ function digirisk_check_secure_access_document($modulepart, $original_file, $ent
 	} elseif ($modulepart == 'category' && !empty($conf->categorie->multidir_output[$entity])) {
 		$accessallowed = 1;
 		$original_file = $conf->categorie->multidir_output[$entity].'/'.$original_file;
+	} elseif ($modulepart == 'digiriskdolibarr' && !empty($conf->digiriskdolibarr->multidir_output[$entity])) {
+		$accessallowed = 1;
+		$original_file = $conf->digiriskdolibarr->multidir_output[$entity].'/'.$original_file;
 	}
 
 	$ret = array(

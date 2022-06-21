@@ -19,15 +19,13 @@
  */
 
 /**
- *		\file       htdocs/viewimage.php
+ *		\file       digiriskdolibarr/documents/viewimage.php
  *		\brief      Wrapper to show images into Dolibarr screens.
  *		\remarks    Call to wrapper is :
- *					DOL_URL_ROOT.'/viewimage.php?modulepart=diroffile&file=relativepathofofile&cache=0
- *					DOL_URL_ROOT.'/viewimage.php?hashp=sharekey
+ *					DOL_URL_ROOT.'/custom/digiriskdolibarr/documents/viewimage.php?modulepart=diroffile&file=relativepathofofile&cache=0
+ *					DOL_URL_ROOT.'/custom/digiriskdolibarr/documents/viewimage.php?hashp=sharekey
  */
 
-//if (! defined('NOREQUIREUSER'))	define('NOREQUIREUSER','1');	// Not disabled cause need to load personalized language
-//if (! defined('NOREQUIREDB'))		define('NOREQUIREDB','1');		// Not disabled cause need to load personalized language
 if (!defined('NOREQUIRESOC')) {
 	define('NOREQUIRESOC', '1');
 }
@@ -53,15 +51,16 @@ if (!defined('NOREQUIREAJAX')) {
 // Some value of modulepart can be used to get resources that are public so no login are required.
 // Note that only directory logo is free to access without login.
 
-	if (!defined("NOLOGIN")) {
-		define("NOLOGIN", 1);
-	}
-	if (!defined("NOCSRFCHECK")) {
-		define("NOCSRFCHECK", 1); // We accept to go on this page from external web site.
-	}
-	if (!defined("NOIPCHECK")) {
-		define("NOIPCHECK", 1); // Do not check IP defined into conf $dolibarr_main_restrict_ip
-	}
+if (!defined("NOLOGIN")) {
+	define("NOLOGIN", 1);
+}
+if (!defined("NOCSRFCHECK")) {
+	define("NOCSRFCHECK", 1); // We accept to go on this page from external web site.
+}
+if (!defined("NOIPCHECK")) {
+	define("NOIPCHECK", 1); // Do not check IP defined into conf $dolibarr_main_restrict_ip
+}
+
 // For direct external download link, we don't need to load/check we are into a login session
 if (isset($_GET["hashp"]) && !defined("NOLOGIN")) {
 	if (!defined("NOLOGIN")) {
@@ -163,16 +162,6 @@ if ($modulepart == 'fckeditor') {
 	$modulepart = 'medias'; // For backward compatibility
 }
 
-
-
-/*
- * Actions
- */
-
-// None
-
-
-
 /*
  * View
  */
@@ -261,6 +250,7 @@ if ($modulepart === 'medias' && $entity != $conf->entity) {
 	$conf->entity = $entity;
 	$conf->setValues($db);
 }
+
 $conf->setEntityValues($db, $entity);
 
 $check_access = digirisk_check_secure_access_document($modulepart, $original_file, $entity, $user, $refname);
@@ -310,79 +300,34 @@ if (preg_match('/\.\./', $fullpath_original_file) || preg_match('/[<>|]/', $full
 	exit;
 }
 
+// Open and return file
+clearstatcache();
 
+$filename = basename($fullpath_original_file);
 
-if ($modulepart == 'barcode') {
-	$generator = GETPOST("generator", "aZ09");
-	$encoding = GETPOST("encoding", "aZ09");
-	$readable = GETPOST("readable", 'aZ09') ? GETPOST("readable", "aZ09") : "Y";
-	if (in_array($encoding, array('EAN8', 'EAN13'))) {
-		$code = GETPOST("code", 'alphanohtml');
-	} else {
-		$code = GETPOST("code", 'restricthtml'); // This can be rich content (qrcode, datamatrix, ...)
-	}
+// Output files on browser
+dol_syslog("viewimage.php return file $fullpath_original_file filename=$filename content-type=$type");
 
-	if (empty($generator) || empty($encoding)) {
-		print 'Error: Parameter "generator" or "encoding" not defined';
-		exit;
-	}
-
-	$dirbarcode = array_merge(array("/core/modules/barcode/doc/"), $conf->modules_parts['barcode']);
-
-	$result = 0;
-
-	foreach ($dirbarcode as $reldir) {
-		$dir = dol_buildpath($reldir, 0);
-		$newdir = dol_osencode($dir);
-
-		// Check if directory exists (we do not use dol_is_dir to avoid loading files.lib.php)
-		if (!is_dir($newdir)) {
-			continue;
-		}
-
-		$result = @include_once $newdir.$generator.'.modules.php';
-		if ($result) {
-			break;
-		}
-	}
-
-	// Load barcode class
-	$classname = "mod".ucfirst($generator);
-	$module = new $classname($db);
-	if ($module->encodingIsSupported($encoding)) {
-		$result = $module->buildBarCode($code, $encoding, $readable);
-	}
-} else {
-	// Open and return file
-	clearstatcache();
-
-	$filename = basename($fullpath_original_file);
-
-	// Output files on browser
-	dol_syslog("viewimage.php return file $fullpath_original_file filename=$filename content-type=$type");
-
-	// This test is to avoid error images when image is not available (for example thumbs).
-	if (!dol_is_file($fullpath_original_file) && empty($_GET["noalt"])) {
-		$fullpath_original_file = DOL_DOCUMENT_ROOT.'/public/theme/common/nophoto.png';
-		/*$error='Error: File '.$_GET["file"].' does not exists or filesystems permissions are not allowed';
-		print $error;
-		exit;*/
-	}
-
-	// Permissions are ok and file found, so we return it
-	if ($type) {
-		top_httphead($type);
-		header('Content-Disposition: inline; filename="'.basename($fullpath_original_file).'"');
-	} else {
-		top_httphead('image/png');
-		header('Content-Disposition: inline; filename="'.basename($fullpath_original_file).'"');
-	}
-
-	$fullpath_original_file_osencoded = dol_osencode($fullpath_original_file);
-
-	readfile($fullpath_original_file_osencoded);
+// This test is to avoid error images when image is not available (for example thumbs).
+if (!dol_is_file($fullpath_original_file) && empty($_GET["noalt"])) {
+	$fullpath_original_file = DOL_DOCUMENT_ROOT.'/public/theme/common/nophoto.png';
+	/*$error='Error: File '.$_GET["file"].' does not exists or filesystems permissions are not allowed';
+	print $error;
+	exit;*/
 }
 
+// Permissions are ok and file found, so we return it
+if ($type) {
+	top_httphead($type);
+	header('Content-Disposition: inline; filename="'.basename($fullpath_original_file).'"');
+} else {
+	top_httphead('image/png');
+	header('Content-Disposition: inline; filename="'.basename($fullpath_original_file).'"');
+}
+
+$fullpath_original_file_osencoded = dol_osencode($fullpath_original_file);
+
+readfile($fullpath_original_file_osencoded);
 
 if (is_object($db)) {
 	$db->close();
