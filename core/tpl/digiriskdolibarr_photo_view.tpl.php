@@ -33,25 +33,24 @@ if (empty($conf) || ! is_object($conf)) {
 	<?php endif; ?>
 	<div class="risk-evaluation-photo-container wpeo-modal-event tooltip hover">
 		<?php
-		$entity = ($conf->entity > 1) ? '/' . $conf->entity : '';
-
+		$entity = ($cotation->entity > 1) ? '/' . $cotation->entity : '';
 		$relativepath = 'digiriskdolibarr/medias/thumbs/';
 		$modulepart   = $entity . 'ecm';
 		$path         = DOL_URL_ROOT . '/document.php?modulepart=' . $modulepart . '&attachment=0&file=' . str_replace('/', '%2F', $relativepath) . '/';
-		$pathToThumb  = DOL_URL_ROOT . '/viewimage.php?modulepart=digiriskdolibarr&entity=' . $conf->entity . '&file=' . urlencode($cotation->element . '/' . $cotation->ref . '/thumbs/');
+		$pathToThumb  = DOL_URL_ROOT . '/custom/digiriskdolibarr/documents/viewimage.php?modulepart=digiriskdolibarr&entity=' . $cotation->entity . '&file=' . urlencode($cotation->element . '/' . $cotation->ref . '/thumbs/');
 		$nophoto      = DOL_URL_ROOT.'/public/theme/common/nophoto.png';
 		?>
 		<!-- BUTTON RISK EVALUATION PHOTO MODAL -->
 		<div class="action risk-evaluation-photo default-photo modal-open risk-evaluation-photo-<?php echo $cotation->id > 0 ? $cotation->id : 0 ; echo $risk->id > 0  && !preg_match('/PROV/',$risk->ref) ? ' risk-' . $risk->id : ' risk-new' ?>">
 			<input hidden class="no-photo-path" value="<?php echo $nophoto ?>">
 			<?php if (isset($cotation->photo)) {
-				$filearray = dol_dir_list($conf->digiriskdolibarr->multidir_output[$conf->entity] . '/' . $cotation->element . '/' . $cotation->ref, "files", 0, '', '(\.odt|_preview.*\.png)$', 'position_name', 'asc', 1);
-				if (count($filearray) && dol_strlen($cotation->photo) > 0) {
+				$filearray = dol_dir_list($conf->digiriskdolibarr->multidir_output[$cotation->entity] . '/' . $cotation->element . '/' . $cotation->ref, "files", 0, '', '(\.odt|_preview.*\.png)$', 'position_name', 'asc', 1);
+				if (($cotation->entity != $conf->entity || count($filearray)) && dol_strlen($cotation->photo) > 0) {
 					?>
 					<span class="floatleft inline-block valignmiddle divphotoref risk-evaluation-photo-single">
 						<input class="filepath-to-riskassessment filepath-to-riskassessment-<?php echo $risk->id > 0 ? $risk->id : 'new' ?>" type="hidden" value="<?php echo $pathToThumb ?>">
 						<input class="filename" type="hidden" value="">
-						 <?php 	print '<img width="40" class="photo clicked-photo-preview" src="' . DOL_URL_ROOT . '/viewimage.php?modulepart=digiriskdolibarr&entity=' . $conf->entity . '&file=' . urlencode($cotation->element . '/' . $cotation->ref . '/thumbs/' . preg_replace('/\./', '_small.', $cotation->photo)) . '" >';
+						 <?php 	print '<img width="40" class="photo clicked-photo-preview" src="' . DOL_URL_ROOT . '/custom/digiriskdolibarr/documents/viewimage.php?modulepart=digiriskdolibarr&entity=' . $cotation->entity . '&file=' . urlencode($cotation->element . '/' . $cotation->ref . '/thumbs/' . preg_replace('/\./', '_small.', $cotation->photo)) . '" >';
 							?>
 					</span>
 					<?php
@@ -65,7 +64,7 @@ if (empty($conf) || ! is_object($conf)) {
 				<?php }
 			} else { ?>
 				<span class="floatleft inline-block valignmiddle divphotoref risk-evaluation-photo-single" value="<?php echo $risk->id ?>">
-					<?php $pathToThumb = DOL_URL_ROOT . '/viewimage.php?modulepart=digiriskdolibarr&entity=' . $conf->entity . '&file=' . urlencode('/riskassessment/tmp/' . ($risk->id > 0 && !preg_match('/PROV/',$risk->ref) ? $risk->ref : 'RK0') . '/thumbs/');  ?>
+					<?php $pathToThumb = DOL_URL_ROOT . '/custom/digiriskdolibarr/documents/viewimage.php?modulepart=digiriskdolibarr&entity=' . $conf->entity . '&file=' . urlencode('/riskassessment/tmp/' . ($risk->id > 0 && !preg_match('/PROV/',$risk->ref) ? $risk->ref : 'RK0') . '/thumbs/');  ?>
 					<input class="filepath-to-riskassessment filepath-to-riskassessment-<?php echo $risk->id > 0 ? $risk->id : 'new' ?>" type="hidden" value="<?php echo $pathToThumb ?>">
 					<input class="filename" type="hidden" value="">
 					<img class="clicked-photo-preview photo maxwidth50"  src="<?php echo $nophoto ?>">
