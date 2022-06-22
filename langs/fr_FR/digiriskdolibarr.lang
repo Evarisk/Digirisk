@@ -1369,7 +1369,7 @@ ParentCategory = Catégorie parent
 TSProject = Projet lié aux tickets
 TicketInitial = TS
 TicketDescription = Projet des tickets
-
+TicketProjectUpdated = Le projet par défaut des tickets a été mis à jour
 
 
 # Ticket document
@@ -1448,7 +1448,7 @@ PhotoNotSent = La photo ne s'est pas correctement envoyée
 PhotoWellSaved = Le(s) média(s) a (ont) bien été ajouté(s)
 PhotoNotSaved = Le(s) média(s) n'a (ont) pas été ajouté(s)
 UseCaptcha = Code graphique (CAPTCHA)
-UseCaptchaDescription = Utilisation du code graphique (CAPTCHA) sur les pages d'interface public
+UseCaptchaDescription = Utilisation du code graphique (CAPTCHA) sur les pages d'interface publique
 GP/UTParticipation = Participation GP/UT
 LabourDoctorName = AMETRA
 LabourDoctorFirstName = Médecin du

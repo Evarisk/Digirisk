@@ -72,6 +72,7 @@ if (($action == 'update' && ! GETPOST("cancel", 'alpha')) || ($action == 'update
 	$TSProject = preg_split('/_/', $TSProject);
 
 	dolibarr_set_const($db, "DIGIRISKDOLIBARR_TICKET_PROJECT", $TSProject[0], 'integer', 0, '', $conf->entity);
+	setEventMessages($langs->trans('TicketProjectUpdated'), array());
 
 	if ($action != 'updateedit' && ! $error) {
 		header("Location: " . $_SERVER["PHP_SELF"]);
@@ -217,7 +218,7 @@ print load_fiche_titre('<i class="fa fa-ticket"></i> ' . $langs->trans("TicketMa
 print '<hr>';
 print load_fiche_titre($langs->trans("PublicInterface"), '', '');
 
-print '<span class="opacitymedium">' . $langs->trans("DigiriskTicketPublicAccess") . '</span> : <a class="wordbreak" href="' . dol_buildpath('/custom/digiriskdolibarr/public/ticket/create_ticket.php', 1) . '" target="_blank" >' . dol_buildpath('/custom/digiriskdolibarr/public/ticket/create_ticket.php', 2) . '</a>';
+print '<span class="opacitymedium">' . $langs->trans("DigiriskTicketPublicAccess") . '</span> : <a class="wordbreak" href="' . dol_buildpath('/custom/digiriskdolibarr/public/ticket/create_ticket.php?entity=' . $conf->entity, 1) . '" target="_blank" >' . dol_buildpath('/custom/digiriskdolibarr/public/ticket/create_ticket.php?entity=' . $conf->entity, 2) . '</a>';
 print dol_get_fiche_end();
 
 $enabledisablehtml = $langs->trans("TicketActivatePublicInterface") . ' ';
@@ -311,7 +312,7 @@ if ( ! empty($conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE)) {
 	if ( ! empty($conf->projet->enabled)) {
 		$langs->load("projects");
 		print '<tr class="oddeven"><td><label for="TSProject">' . $langs->trans("TSProject") . '</label></td><td>';
-		$numprojet = $formproject->select_projects(0,  23, 'TSProject', 0, 0, 0, 0, 0, 0, 0, '', 0, 0, 'maxwidth500');
+		$numprojet = $formproject->select_projects(0,  $conf->global->DIGIRISKDOLIBARR_TICKET_PROJECT, 'TSProject', 0, 0, 0, 0, 0, 0, 0, '', 0, 0, 'maxwidth500');
 		print ' <a href="' . DOL_URL_ROOT . '/projet/card.php?&action=create&status=1&backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?action=create') . '"><span class="fa fa-plus-circle valignmiddle" title="' . $langs->trans("AddProject") . '"></span></a>';
 		print '<td><input type="submit" class="button" name="save" value="' . $langs->trans("Save") . '">';
 		print '</td></tr>';

@@ -351,8 +351,9 @@ class doc_ticketdocument_odt extends ModeleODTTicketDocument
 			$tmparray['phone_number']     = $ticket->array_options['options_digiriskdolibarr_ticket_phone'];
 			$tmparray['service']          = $ticket->array_options['options_digiriskdolibarr_ticket_service'];
 			$tmparray['location']         = $ticket->array_options['options_digiriskdolibarr_ticket_location'];
-			$tmparray['declaration_date'] = dol_print_date($ticket->array_options['options_digiriskdolibarr_ticket_date']);
-			$tmparray['creation_date']    = dol_print_date($ticket->date_creation);
+			$tmparray['declaration_date'] = dol_print_date($ticket->array_options['options_digiriskdolibarr_ticket_date'], 'dayhoursec', 'tzuser');
+			$tmparray['creation_date']    = dol_print_date($ticket->date_creation, 'dayhoursec', 'tzuser');
+			$tmparray['close_date']       = dol_print_date($ticket->date_close, 'dayhoursec', 'tzuser');
 			$tmparray['progress']         = !empty($ticket->progress) ? $ticket->progress . ' %' : '0 %';
 
 			$category = new Categorie($this->db);
@@ -397,11 +398,22 @@ class doc_ticketdocument_odt extends ModeleODTTicketDocument
 			$message = preg_replace('/<br \/>/', '', $ticket->message);
 			$tmparray['subject'] = $ticket->subject;
 			$tmparray['message']  = $message;
-			$tmparray['generation_date'] = dol_print_date(dol_now());
+			$tmparray['generation_date'] = dol_print_date(dol_now(), 'dayhoursec', 'tzuser');
 
-			$contactlist = $ticket->liste_contact(-1, 'external');
+			$contactlistexternal = $ticket->liste_contact(-1, 'external');
+			$contactlistinternal = $ticket->liste_contact(-1, 'internal');
 
-			if (!empty($contactlist)) {
+			$contactlist = array();
+
+			if (!empty($contactlistexternal) && is_array($contactlistexternal)) {
+				$contactlist = array_merge($contactlist,$contactlistexternal);
+			}
+
+			if (!empty($contactlistinternal) && is_array($contactlistinternal)) {
+				$contactlist = array_merge($contactlist,$contactlistinternal);
+			}
+
+			if (!empty($contactlist) && is_array($contactlist)) {
 				foreach ($contactlist as $contact) {
 					$tmparray['contacts'] .= $contact['firstname'] . ' ' . $contact['lastname'] . ', ';
 				}

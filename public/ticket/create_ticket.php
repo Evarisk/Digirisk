@@ -44,8 +44,9 @@ if ( ! $res && file_exists("../../main.inc.php")) $res          = @include "../.
 if ( ! $res && file_exists("../../../main.inc.php")) $res       = @include "../../../main.inc.php";
 if ( ! $res && file_exists("../../../../main.inc.php")) $res    = @include "../../../../main.inc.php";
 if ( ! $res && file_exists("../../../../../main.inc.php")) $res = @include "../../../../../main.inc.php";
-if ( ! $res) die("Include of main fails");require_once DOL_DOCUMENT_ROOT . '/ticket/class/actions_ticket.class.php';
+if ( ! $res) die("Include of main fails");
 
+require_once DOL_DOCUMENT_ROOT . '/ticket/class/actions_ticket.class.php';
 require_once DOL_DOCUMENT_ROOT . '/core/class/html.formticket.class.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/images.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/ticket.lib.php';
@@ -86,7 +87,13 @@ $modTicket   = new mod_ticket_simple($db);
 
 $extrafields->fetch_name_optionals_label($object->table_element);
 
-$upload_dir = $conf->categorie->multidir_output[isset($conf->entity) ? $conf->entity : 1];
+$entity = GETPOST('entity') ?: $conf->entity;
+
+$conf->setEntityValues($db, $entity);
+
+//ici charger les conf de la bonne entité
+$upload_dir = $conf->categorie->multidir_output[isset($entity) ? $entity : 1];
+
 
 /*
  * Actions
@@ -325,6 +332,7 @@ print load_fiche_titre($title_edit, '', "digiriskdolibarr32px@digiriskdolibarr")
 print '<form method="POST" action="' . $_SERVER["PHP_SELF"] . '" id="sendTicketForm">';
 print '<input type="hidden" name="token" value="' . newToken() . '">';
 print '<input type="hidden" name="action" value="add">';
+print '<input type="hidden" name="entity" value="'. $entity .'">';
 print '<input type="hidden" id="parentCategory" name="parentCategory" value="' . GETPOST('parentCategory') . '">';
 print '<input type="hidden" id="subCategory" name="subCategory" value="' . GETPOST('subCategory') . '">';
 print '<input type="hidden" id="ticket_id" name="ticket_id" value="' . $ticket_tmp_id . '">';
@@ -422,7 +430,8 @@ if ( ! empty($mainCategoryObject) && $mainCategoryObject > 0) {
 								if (preg_match('/mini/', $fileLinked['name'])) { ?>
 									<div class="table-row">
 										<div class="table-cell table-50 table-padding-0">
-											<?php print '<img class="photo"  width="' . $maxHeight . '" src="' . DOL_URL_ROOT . '/viewimage.php?modulepart=digiriskdolibarr&entity=' . $conf->entity . '&file=' . urlencode('/temp/ticket/' . $ticket_tmp_id . '/thumbs/' . $fileLinked['name']) . '" title="' . dol_escape_htmltag($alt) . '">'; ?>
+<!--											--><?php //print '<img class="photo"  width="' . $maxHeight . '" src="' . DOL_URL_ROOT . '/viewimage.php?modulepart=digiriskdolibarr&entity=' . $conf->entity . '&file=' . urlencode('/temp/ticket/' . $ticket_tmp_id . '/thumbs/' . $fileLinked['name']) . '" title="' . dol_escape_htmltag($alt) . '">'; ?>
+											<?php print '<img class="photo"  width="' . $maxHeight . '" src="' . urlencode('/temp/ticket/' . $ticket_tmp_id . '/thumbs/' . $fileLinked['name']) . '" title="' . dol_escape_htmltag($alt) . '">'; ?>
 										</div>
 										<div class="table-cell">
 											<?php print preg_replace('/_mini/', '', $fileLinked['name']); ?>
