@@ -36,6 +36,7 @@ if ( ! $res && file_exists("../../../main.inc.php")) $res    = @include "../../.
 if ( ! $res && file_exists("../../../../main.inc.php")) $res = @include "../../../../main.inc.php";
 if ( ! $res) die("Include of main fails");
 
+require_once DOL_DOCUMENT_ROOT . '/core/lib/date.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/class/html.formfile.class.php';
 require_once DOL_DOCUMENT_ROOT . '/core/class/doleditor.class.php';
 
@@ -382,12 +383,14 @@ if (empty($reshook)) {
 		$parent_id     = GETPOST('parent_id');
 
 		// Initialize object accident line
-		$objectline->date_creation = $object->db->idate($now);
-		$objectline->status        = 1;
-		$objectline->ref           = $refAccidentWorkStopMod->getNextValue($objectline);
-		$objectline->entity        = $conf->entity;
-		$objectline->workstop_days = $workstop_days;
-		$objectline->fk_accident   = $parent_id;
+		$now                           = dol_now();
+		$objectline->date_creation     = $object->db->idate($now);
+		$objectline->status            = 1;
+		$objectline->ref               = $refAccidentWorkStopMod->getNextValue($objectline);
+		$objectline->entity            = $conf->entity;
+		$objectline->workstop_days     = $workstop_days;
+		$objectline->date_end_workstop = $object->db->idate(dol_time_plus_duree($now, $workstop_days, 'd'));
+		$objectline->fk_accident       = $parent_id;
 
 		// Check parameters
 		if (empty($workstop_days)) {
@@ -423,8 +426,9 @@ if (empty($reshook)) {
 		$objectline->fetch($lineid);
 
 		// Initialize object accident line
-		$objectline->workstop_days = $workstop_days;
-		$objectline->fk_accident   = $parent_id;
+		$objectline->workstop_days     = $workstop_days;
+		$objectline->date_end_workstop = $object->db->idate(dol_time_plus_duree(dol_stringtotime($objectline->date_creation), $workstop_days, 'd'));
+		$objectline->fk_accident       = $parent_id;
 
 		if ( ! $error) {
 			$result = $objectline->update($user, false);
@@ -1000,6 +1004,8 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 		print '<tr class="liste_titre">';
 		print '<td><span>' . $langs->trans('Ref.') . '</span></td>';
 		print '<td>' . $langs->trans('WorkStopDays') . '</td>';
+		print '<td>' . $langs->trans('DateStartWorkStop') . '</td>';
+		print '<td>' . $langs->trans('DateEndWorkStop') . '</td>';
 		print '<td>' . $langs->trans('WorkStopDocument') . '</td>';
 		print '<td class="center" colspan="' . $colspan . '">' . $langs->trans('ActionsLine') . '</td>';
 		print '</tr>';
@@ -1022,6 +1028,16 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 					$coldisplay++;
 					print '<td>';
 					print '<input type="number" name="workstop_days" class="minwidth150" value="' . $item->workstop_days . '">';
+					print '</td>';
+
+					$coldisplay++;
+					print '<td>';
+					print dol_print_date($item->date_creation, 'day', 'tzuser');
+					print '</td>';
+
+					$coldisplay++;
+					print '<td>';
+					print dol_print_date($item->date_end_workstop, 'day', 'tzuser');
 					print '</td>';
 
 					$coldisplay++;
@@ -1100,6 +1116,16 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 					$coldisplay++;
 					print '<td>';
 					print $item->workstop_days;
+					print '</td>';
+
+					$coldisplay++;
+					print '<td>';
+					print dol_print_date($item->date_creation, 'day', 'tzuser');
+					print '</td>';
+
+					$coldisplay++;
+					print '<td>';
+					print dol_print_date($item->date_end_workstop, 'day', 'tzuser');
 					print '</td>';
 
 					$coldisplay++;
@@ -1182,6 +1208,14 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 			$coldisplay++;
 			print '<td>';
 			print '<input type="number" name="workstop_days" class="minwidth150" value="">';
+			print '</td>';
+
+			$coldisplay++;
+			print '<td>';
+			print '</td>';
+
+			$coldisplay++;
+			print '<td>';
 			print '</td>';
 
 			$coldisplay++;

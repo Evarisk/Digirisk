@@ -514,14 +514,15 @@ class AccidentWorkStop extends CommonObjectLine
 	 * @var array  Array with all fields and their property. Do not use it as a static var. It may be modified by constructor.
 	 */
 	public $fields = array(
-		'rowid'         => array('type' => 'integer', 'label' => 'TechnicalID', 'enabled' => '1', 'position' => 1, 'notnull' => 1, 'visible' => 0, 'noteditable' => '1', 'index' => 1, 'comment' => "Id"),
-		'ref'           => array('type' => 'varchar(128)', 'label' => 'Ref', 'enabled' => '1', 'position' => 10, 'notnull' => 1, 'visible' => 1, 'noteditable' => '1', 'default' => '(PROV)', 'index' => 1, 'searchall' => 1, 'showoncombobox' => '1', 'comment' => "Reference of object"),
-		'entity'        => array('type' => 'integer', 'label' => 'Entity', 'enabled' => '1', 'position' => 30, 'notnull' => 1, 'visible' => 0,),
-		'date_creation' => array('type' => 'datetime', 'label' => 'DateCreation', 'enabled' => '1', 'position' => 40, 'notnull' => 1, 'visible' => 0,),
-		'tms'           => array('type' => 'timestamp', 'label' => 'DateModification', 'enabled' => '1', 'position' => 50, 'notnull' => 0, 'visible' => 0,),
-		'status'        => array('type' => 'smallint', 'label' => 'Status', 'enabled' => '1', 'position' => 60, 'notnull' => 0, 'visible' => 0, 'index' => 0,),
-		'workstop_days' => array('type' => 'integer', 'label' => 'WorkStopDays', 'enabled' => '1', 'position' => 70, 'notnull' => -1, 'visible' => -1,),
-		'fk_accident'   => array('type' => 'integer', 'label' => 'FkAccident', 'enabled' => '1', 'position' => 80, 'notnull' => 1, 'visible' => 0,),
+		'rowid'             => array('type' => 'integer', 'label' => 'TechnicalID', 'enabled' => '1', 'position' => 1, 'notnull' => 1, 'visible' => 0, 'noteditable' => '1', 'index' => 1, 'comment' => "Id"),
+		'ref'               => array('type' => 'varchar(128)', 'label' => 'Ref', 'enabled' => '1', 'position' => 10, 'notnull' => 1, 'visible' => 1, 'noteditable' => '1', 'default' => '(PROV)', 'index' => 1, 'searchall' => 1, 'showoncombobox' => '1', 'comment' => "Reference of object"),
+		'entity'            => array('type' => 'integer', 'label' => 'Entity', 'enabled' => '1', 'position' => 30, 'notnull' => 1, 'visible' => 0,),
+		'date_creation'     => array('type' => 'datetime', 'label' => 'DateCreation', 'enabled' => '1', 'position' => 40, 'notnull' => 1, 'visible' => 0,),
+		'tms'               => array('type' => 'timestamp', 'label' => 'DateModification', 'enabled' => '1', 'position' => 50, 'notnull' => 0, 'visible' => 0,),
+		'status'            => array('type' => 'smallint', 'label' => 'Status', 'enabled' => '1', 'position' => 60, 'notnull' => 0, 'visible' => 0, 'index' => 0,),
+		'workstop_days'     => array('type' => 'integer', 'label' => 'WorkStopDays', 'enabled' => '1', 'position' => 70, 'notnull' => -1, 'visible' => -1,),
+		'date_end_workstop' => array('type' => 'datetime', 'label' => 'DateEndWorkStop', 'enabled' => '1', 'position' => 80, 'notnull' => 0, 'visible' => 0,),
+		'fk_accident'       => array('type' => 'integer', 'label' => 'FkAccident', 'enabled' => '1', 'position' => 90, 'notnull' => 1, 'visible' => 0,),
 	);
 
 	public $rowid;
@@ -531,6 +532,7 @@ class AccidentWorkStop extends CommonObjectLine
 	public $tms;
 	public $status;
 	public $workstop_days;
+	public $date_end_workstop;
 	public $fk_accident;
 
 	/**
@@ -558,7 +560,7 @@ class AccidentWorkStop extends CommonObjectLine
 	{
 		global $db;
 
-		$sql  = 'SELECT t.rowid, t.ref, t.date_creation, t.status, t.workstop_days, t.fk_accident';
+		$sql  = 'SELECT t.rowid, t.ref, t.date_creation, t.status, t.workstop_days, t.date_end_workstop, t.fk_accident';
 		$sql .= ' FROM ' . MAIN_DB_PREFIX . 'digiriskdolibarr_accident_workstop as t';
 		$sql .= ' WHERE t.rowid = ' . $rowid;
 		$sql .= ' AND entity IN (' . getEntity($this->table_element) . ')';
@@ -567,12 +569,13 @@ class AccidentWorkStop extends CommonObjectLine
 		if ($result) {
 			$objp = $db->fetch_object($result);
 
-			$this->id            = $objp->rowid;
-			$this->ref           = $objp->ref;
-			$this->date_creation = $objp->date_creation;
-			$this->status        = $objp->status;
-			$this->workstop_days = $objp->workstop_days;
-			$this->fk_accident   = $objp->fk_accident;
+			$this->id                = $objp->rowid;
+			$this->ref               = $objp->ref;
+			$this->date_creation     = $objp->date_creation;
+			$this->status            = $objp->status;
+			$this->workstop_days     = $objp->workstop_days;
+			$this->date_end_workstop = $objp->date_end_workstop;
+			$this->fk_accident       = $objp->fk_accident;
 
 			$db->free($result);
 
@@ -593,7 +596,7 @@ class AccidentWorkStop extends CommonObjectLine
 	public function fetchFromParent($parent_id = 0, $limit = 0)
 	{
 		global $db;
-		$sql  = 'SELECT t.rowid, t.ref, t.date_creation, t.status, t.workstop_days';
+		$sql  = 'SELECT t.rowid, t.ref, t.date_creation, t.status, t.workstop_days, t.date_end_workstop';
 		$sql .= ' FROM ' . MAIN_DB_PREFIX . 'digiriskdolibarr_accident_workstop as t';
 		if ($parent_id > 0) {
 			$sql .= ' WHERE t.fk_accident = ' . $parent_id;
@@ -614,12 +617,13 @@ class AccidentWorkStop extends CommonObjectLine
 
 				$record = new self($db);
 
-				$record->id            = $obj->rowid;
-				$record->ref           = $obj->ref;
-				$record->date_creation = $obj->date_creation;
-				$record->status        = $obj->status;
-				$record->workstop_days = $obj->workstop_days;
-				$record->fk_accident   = $obj->fk_accident;
+				$record->id                = $obj->rowid;
+				$record->ref               = $obj->ref;
+				$record->date_creation     = $obj->date_creation;
+				$record->status            = $obj->status;
+				$record->workstop_days     = $obj->workstop_days;
+				$record->date_end_workstop = $obj->date_end_workstop;
+				$record->fk_accident       = $obj->fk_accident;
 
 				$records[$record->id] = $record;
 
@@ -652,7 +656,7 @@ class AccidentWorkStop extends CommonObjectLine
 
 		// Insertion dans base de la ligne
 		$sql  = 'INSERT INTO ' . MAIN_DB_PREFIX . 'digiriskdolibarr_accident_workstop';
-		$sql .= ' (ref, entity, date_creation, status, workstop_days, fk_accident';
+		$sql .= ' (ref, entity, date_creation, status, workstop_days, date_end_workstop, fk_accident';
 		$sql .= ')';
 		$sql .= " VALUES (";
 		$sql .= "'" . $db->escape($this->ref) . "'" . ", ";
@@ -660,6 +664,7 @@ class AccidentWorkStop extends CommonObjectLine
 		$sql .= "'" . $db->escape($db->idate($now)) . "'" . ", ";
 		$sql .= $this->status . ", ";
 		$sql .= $this->workstop_days . ", ";
+		$sql .= "'" . $db->escape($db->idate($this->date_end_workstop)) . "'" . ", ";
 		$sql .= $this->fk_accident;
 
 		$sql .= ')';
@@ -703,6 +708,7 @@ class AccidentWorkStop extends CommonObjectLine
 		$sql .= " ref='" . $db->escape($this->ref) . "',";
 		$sql .= " status=" . $this->status . ",";
 		$sql .= " workstop_days=" . $this->workstop_days . ",";
+		$sql .= " date_end_workstop='" . $db->escape($db->idate($this->date_end_workstop)) . "',";
 		$sql .= " fk_accident=" . $db->escape($this->fk_accident);
 		$sql .= " WHERE rowid = " . $this->id;
 
