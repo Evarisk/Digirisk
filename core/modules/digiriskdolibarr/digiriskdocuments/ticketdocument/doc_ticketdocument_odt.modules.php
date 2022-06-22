@@ -400,9 +400,20 @@ class doc_ticketdocument_odt extends ModeleODTTicketDocument
 			$tmparray['message']  = $message;
 			$tmparray['generation_date'] = dol_print_date(dol_now(), 'dayhoursec', 'tzuser');
 
-			$contactlist = $ticket->liste_contact(-1, 'external');
+			$contactlistexternal = $ticket->liste_contact(-1, 'external');
+			$contactlistinternal = $ticket->liste_contact(-1, 'internal');
 
-			if (!empty($contactlist)) {
+			$contactlist = array();
+
+			if (!empty($contactlistexternal) && is_array($contactlistexternal)) {
+				$contactlist = array_merge($contactlist,$contactlistexternal);
+			}
+
+			if (!empty($contactlistinternal) && is_array($contactlistinternal)) {
+				$contactlist = array_merge($contactlist,$contactlistinternal);
+			}
+
+			if (!empty($contactlist) && is_array($contactlist)) {
 				foreach ($contactlist as $contact) {
 					$tmparray['contacts'] .= $contact['firstname'] . ' ' . $contact['lastname'] . ', ';
 				}
