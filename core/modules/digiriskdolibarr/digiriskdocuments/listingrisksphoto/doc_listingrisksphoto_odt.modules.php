@@ -388,7 +388,8 @@ class doc_listingrisksphoto_odt extends ModeleODTListingRisksPhoto
 											$tmparray['commentaireEvaluation'] = dol_print_date((($conf->global->DIGIRISKDOLIBARR_SHOW_RISKASSESSMENT_DATE && ( ! empty($lastEvaluation->date_riskassessment))) ? $lastEvaluation->date_riskassessment : $lastEvaluation->date_creation), 'dayreduceformat') . ': ' . $lastEvaluation->comment;
 
 											if (dol_strlen($lastEvaluation->photo) && $lastEvaluation !== 'undefined') {
-												$path                      = $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessment/' . $lastEvaluation->ref;
+												$entity = $lastEvaluation->entity > 1 ? '/' . $lastEvaluation->entity : '';
+												$path                      = DOL_DATA_ROOT . $entity . '/digiriskdolibarr/riskassessment/' . $lastEvaluation->ref;
 												$file_small                = preg_split('/\./', $lastEvaluation->photo);
 												$new_file                  = $file_small[0] . '_small.' . $file_small[1];
 												$image                     = $path . '/thumbs/' . $new_file;
@@ -474,7 +475,8 @@ class doc_listingrisksphoto_odt extends ModeleODTListingRisksPhoto
 											$tmparray['commentaireEvaluation'] = dol_print_date((($conf->global->DIGIRISKDOLIBARR_SHOW_RISKASSESSMENT_DATE && ( ! empty($lastEvaluation->date_riskassessment))) ? $lastEvaluation->date_riskassessment : $lastEvaluation->date_creation), 'dayreduceformat') . ': ' . $lastEvaluation->comment;
 
 											if (dol_strlen($lastEvaluation->photo) && $lastEvaluation !== 'undefined') {
-												$path                      = $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessment/' . $lastEvaluation->ref;
+												$entity = $lastEvaluation->entity > 1 ? '/' . $lastEvaluation->entity : '';
+												$path                      = DOL_DATA_ROOT . $entity . '/digiriskdolibarr/riskassessment/' . $lastEvaluation->ref;
 												$file_small                = preg_split('/\./', $lastEvaluation->photo);
 												$new_file                  = $file_small[0] . '_small.' . $file_small[1];
 												$image                     = $path . '/thumbs/' . $new_file;
