@@ -218,7 +218,7 @@ print load_fiche_titre('<i class="fa fa-ticket"></i> ' . $langs->trans("TicketMa
 print '<hr>';
 print load_fiche_titre($langs->trans("PublicInterface"), '', '');
 
-print '<span class="opacitymedium">' . $langs->trans("DigiriskTicketPublicAccess") . '</span> : <a class="wordbreak" href="' . dol_buildpath('/custom/digiriskdolibarr/public/ticket/create_ticket.php', 1) . '" target="_blank" >' . dol_buildpath('/custom/digiriskdolibarr/public/ticket/create_ticket.php', 2) . '</a>';
+print '<span class="opacitymedium">' . $langs->trans("DigiriskTicketPublicAccess") . '</span> : <a class="wordbreak" href="' . dol_buildpath('/custom/digiriskdolibarr/public/ticket/create_ticket.php?entity=' . $conf->entity, 1) . '" target="_blank" >' . dol_buildpath('/custom/digiriskdolibarr/public/ticket/create_ticket.php', 2) . '</a>';
 print dol_get_fiche_end();
 
 $enabledisablehtml = $langs->trans("TicketActivatePublicInterface") . ' ';
