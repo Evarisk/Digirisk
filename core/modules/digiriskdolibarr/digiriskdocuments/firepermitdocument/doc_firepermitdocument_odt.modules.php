@@ -422,6 +422,8 @@ class doc_firepermitdocument_odt extends ModeleODTFirePermitDocument
 
 			if ( ! empty($preventionplanlines) && $preventionplanlines > 0 && is_array($preventionplanlines)) {
 				$tmparray['interventions_info'] = count($preventionplanlines) . " " . $langs->trans('PreventionPlanLine');
+			} else {
+				$tmparray['interventions_info'] = 0;
 			}
 
 			$tmparray['date_start_intervention_FP'] = dol_print_date($firepermit->date_start, 'dayhoursec', 'tzuser');
@@ -458,6 +460,8 @@ class doc_firepermitdocument_odt extends ModeleODTFirePermitDocument
 
 			if ( ! empty($firepermitlines) && $firepermitlines > 0 && is_array($firepermitlines)) {
 				$tmparray['interventions_info_FP'] = count($firepermitlines) . " " . $langs->trans('FirePermitLine');
+			} else {
+				$tmparray['interventions_info_FP'] = 0;
 			}
 
 			//Informations entreprise extérieure
@@ -472,6 +476,8 @@ class doc_firepermitdocument_odt extends ModeleODTFirePermitDocument
 
 			if ( ! empty($extsocietyintervenants) && $extsocietyintervenants > 0 && is_array($extsocietyintervenants)) {
 				$tmparray['intervenants_info'] = count($extsocietyintervenants);
+			} else {
+				$tmparray['intervenants_info'] = 0;
 			}
 
 			$tempdir = $conf->digiriskdolibarr->multidir_output[isset($object->entity) ? $object->entity : 1] . '/temp/';
@@ -530,9 +536,8 @@ class doc_firepermitdocument_odt extends ModeleODTFirePermitDocument
 			try {
 				$foundtagforlines = 1;
 				if ($foundtagforlines) {
+					$listlines = $odfHandler->setSegment('interventions');
 					if ( ! empty($preventionplanlines) && $preventionplanlines > 0) {
-						$listlines = $odfHandler->setSegment('interventions');
-
 						foreach ($preventionplanlines as $line) {
 							$digiriskelement->fetch($line->fk_element);
 
@@ -560,11 +565,30 @@ class doc_firepermitdocument_odt extends ModeleODTFirePermitDocument
 							$listlines->merge();
 						}
 						$odfHandler->mergeSegment($listlines);
+					} else {
+						$tmparray['key_unique']    = '';
+						$tmparray['unite_travail'] = '';
+						$tmparray['action']        = '';
+						$tmparray['risk']          = '';
+						$tmparray['prevention']    = '';
+
+						foreach ($tmparray as $key => $val) {
+							try {
+								if (empty($val)) {
+									$listlines->setVars($key, $langs->trans('NoData'), true, 'UTF-8');
+								} else {
+									$listlines->setVars($key, html_entity_decode($val, ENT_QUOTES | ENT_HTML5), true, 'UTF-8');
+								}
+							} catch (SegmentException $e) {
+								dol_syslog($e->getMessage(), LOG_INFO);
+							}
+						}
+						$listlines->merge();
+						$odfHandler->mergeSegment($listlines);
 					}
 
+					$listlines = $odfHandler->setSegment('interventions_FP');
 					if ( ! empty($firepermitlines) && $firepermitlines > 0) {
-						$listlines = $odfHandler->setSegment('interventions_FP');
-
 						foreach ($firepermitlines as $line) {
 							$digiriskelement->fetch($line->fk_element);
 
@@ -592,10 +616,30 @@ class doc_firepermitdocument_odt extends ModeleODTFirePermitDocument
 							$listlines->merge();
 						}
 						$odfHandler->mergeSegment($listlines);
+					} else {
+						$tmparray['key_unique']      = '';
+						$tmparray['unite_travail']   = '';
+						$tmparray['action']          = '';
+						$tmparray['type_de_travaux'] = '';
+						$tmparray['materiel']        = '';
+
+						foreach ($tmparray as $key => $val) {
+							try {
+								if (empty($val)) {
+									$listlines->setVars($key, $langs->trans('NoData'), true, 'UTF-8');
+								} else {
+									$listlines->setVars($key, html_entity_decode($val, ENT_QUOTES | ENT_HTML5), true, 'UTF-8');
+								}
+							} catch (SegmentException $e) {
+								dol_syslog($e->getMessage(), LOG_INFO);
+							}
+						}
+						$listlines->merge();
+						$odfHandler->mergeSegment($listlines);
 					}
 
+					$listlines = $odfHandler->setSegment('intervenants');
 					if ( ! empty($extsocietyintervenants) && $extsocietyintervenants > 0) {
-						$listlines = $odfHandler->setSegment('intervenants');
 						$k         = 3;
 						foreach ($extsocietyintervenants as $line) {
 							if ($line->status == 5) {
@@ -641,6 +685,27 @@ class doc_firepermitdocument_odt extends ModeleODTFirePermitDocument
 
 							dol_delete_file($tempdir . "signature" . $k . ".png");
 						}
+						$odfHandler->mergeSegment($listlines);
+					} else {
+						$tmparray['intervenants_signature'] = '';
+						$tmparray['name']                   = '';
+						$tmparray['lastname']               = '';
+						$tmparray['phone']                  = '';
+						$tmparray['mail']                   = '';
+						$tmparray['status']                 = '';
+
+						foreach ($tmparray as $key => $val) {
+							try {
+								if (empty($val)) {
+									$listlines->setVars($key, $langs->trans('NoData'), true, 'UTF-8');
+								} else {
+									$listlines->setVars($key, html_entity_decode($val, ENT_QUOTES | ENT_HTML5), true, 'UTF-8');
+								}
+							} catch (SegmentException $e) {
+								dol_syslog($e->getMessage(), LOG_INFO);
+							}
+						}
+						$listlines->merge();
 						$odfHandler->mergeSegment($listlines);
 					}
 				}
