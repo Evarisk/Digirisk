@@ -16,7 +16,7 @@
   .tagtr > .tagtd:first-child {
     display: flex;
 
-    .importsharedrisk:not(.imported) {
+    .importsharedrisk:not(.imported):not(.risk-evaluation-cotation) {
       width: 30%;
     }
     .importsharedrisk.imported {
