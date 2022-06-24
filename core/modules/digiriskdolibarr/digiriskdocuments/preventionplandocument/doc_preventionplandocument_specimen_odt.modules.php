@@ -369,6 +369,8 @@ class doc_preventionplandocument_specimen_odt extends ModeleODTPreventionPlanDoc
 			$tmparray['date_end_intervention_PPP']   = dol_print_date($preventionplan->date_end, 'dayhoursec', 'tzuser');
 			if (is_array($preventionplanlines)) {
 				$tmparray['interventions_info'] = count($preventionplanlines) . " " . $langs->trans('PreventionPlanLine');
+			} else {
+				$tmparray['interventions_info'] = 0;
 			}
 
 			$openinghours = new Openinghours($this->db);
@@ -428,6 +430,8 @@ class doc_preventionplandocument_specimen_odt extends ModeleODTPreventionPlanDoc
 
 			if ( ! empty($extsocietyintervenants) && $extsocietyintervenants > 0 && is_array($extsocietyintervenants)) {
 				$tmparray['intervenants_info'] = count($extsocietyintervenants);
+			} else {
+				$tmparray['intervenants_info'] = 0;
 			}
 
 			//Signatures
@@ -468,9 +472,8 @@ class doc_preventionplandocument_specimen_odt extends ModeleODTPreventionPlanDoc
 			try {
 				$foundtagforlines = 1;
 				if ($foundtagforlines) {
+					$listlines = $odfHandler->setSegment('interventions');
 					if ( ! empty($preventionplanlines) && $preventionplanlines > 0) {
-						$listlines = $odfHandler->setSegment('interventions');
-
 						foreach ($preventionplanlines as $line) {
 							$digiriskelement->fetch($line->fk_element);
 
@@ -498,10 +501,30 @@ class doc_preventionplandocument_specimen_odt extends ModeleODTPreventionPlanDoc
 							$listlines->merge();
 						}
 						$odfHandler->mergeSegment($listlines);
+					} else {
+						$tmparray['key_unique']    = '';
+						$tmparray['unite_travail'] = '';
+						$tmparray['action']        = '';
+						$tmparray['risk']          = '';
+						$tmparray['prevention']    = '';
+
+						foreach ($tmparray as $key => $val) {
+							try {
+								if (empty($val)) {
+									$listlines->setVars($key, $langs->trans('NoData'), true, 'UTF-8');
+								} else {
+									$listlines->setVars($key, html_entity_decode($val, ENT_QUOTES | ENT_HTML5), true, 'UTF-8');
+								}
+							} catch (SegmentException $e) {
+								dol_syslog($e->getMessage(), LOG_INFO);
+							}
+						}
+						$listlines->merge();
+						$odfHandler->mergeSegment($listlines);
 					}
 
+					$listlines = $odfHandler->setSegment('intervenants');
 					if ( ! empty($extsocietyintervenants) && $extsocietyintervenants > 0) {
-						$listlines = $odfHandler->setSegment('intervenants');
 						$k         = 3;
 						foreach ($extsocietyintervenants as $line) {
 							$tmparray['name']     = $line->firstname;
@@ -525,6 +548,27 @@ class doc_preventionplandocument_specimen_odt extends ModeleODTPreventionPlanDoc
 							}
 							$listlines->merge();
 						}
+						$odfHandler->mergeSegment($listlines);
+					} else {
+						$tmparray['intervenants_signature'] = '';
+						$tmparray['name']                   = '';
+						$tmparray['lastname']               = '';
+						$tmparray['phone']                  = '';
+						$tmparray['mail']                   = '';
+						$tmparray['status']                 = '';
+
+						foreach ($tmparray as $key => $val) {
+							try {
+								if (empty($val)) {
+									$listlines->setVars($key, $langs->trans('NoData'), true, 'UTF-8');
+								} else {
+									$listlines->setVars($key, html_entity_decode($val, ENT_QUOTES | ENT_HTML5), true, 'UTF-8');
+								}
+							} catch (SegmentException $e) {
+								dol_syslog($e->getMessage(), LOG_INFO);
+							}
+						}
+						$listlines->merge();
 						$odfHandler->mergeSegment($listlines);
 					}
 				}

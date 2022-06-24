@@ -108,10 +108,10 @@ class FirePermit extends CommonObject
 	  */
 	 public $lines = array();
 
-	public const STATUS_IN_PROGRESS = 1;
-	public const STATUS_PENDING_SIGNATURE = 2;
-	public const STATUS_LOCKED = 3;
-	public const STATUS_ARCHIVED = 4;
+	const STATUS_IN_PROGRESS = 1;
+	const STATUS_PENDING_SIGNATURE = 2;
+	const STATUS_LOCKED = 3;
+	const STATUS_ARCHIVED = 4;
 
 	/**
 	 * @var array  Array with all fields and their property. Do not use it as a static var. It may be modified by constructor.
