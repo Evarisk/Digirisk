@@ -107,7 +107,7 @@ class Accident extends CommonObject
 	 */
 	public $labelStatusShort;
 
-	public const STATUS_IN_PROGRESS = 1;
+	const STATUS_IN_PROGRESS = 1;
 
 	/**
 	 * @var array  Array with all fields and their property. Do not use it as a static var. It may be modified by constructor.

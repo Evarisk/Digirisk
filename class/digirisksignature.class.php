@@ -81,15 +81,15 @@ class DigiriskSignature extends CommonObject
 	 */
 	public $labelStatusShort;
 
-	public const STATUS_DELETED = 0;
-	public const STATUS_REGISTERED = 1;
-	public const STATUS_SIGNATURE_REQUEST = 2;
-	public const STATUS_PENDING_SIGNATURE = 3;
-	public const STATUS_DENIED = 4;
-	public const STATUS_SIGNED = 5;
-	public const STATUS_UNSIGNED = 6;
-	public const STATUS_ABSENT = 7;
-	public const STATUS_JUSTIFIED_ABSENT = 8;
+	const STATUS_DELETED = 0;
+	const STATUS_REGISTERED = 1;
+	const STATUS_SIGNATURE_REQUEST = 2;
+	const STATUS_PENDING_SIGNATURE = 3;
+	const STATUS_DENIED = 4;
+	const STATUS_SIGNED = 5;
+	const STATUS_UNSIGNED = 6;
+	const STATUS_ABSENT = 7;
+	const STATUS_JUSTIFIED_ABSENT = 8;
 
 	/**
 	 * @var array  Array with all fields and their property. Do not use it as a static var. It may be modified by constructor.
