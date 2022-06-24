@@ -373,7 +373,7 @@ class modDigiriskdolibarr extends DolibarrModules
 		$this->descriptionlong = "Digirisk";
 		$this->editor_name     = 'Evarisk';
 		$this->editor_url      = 'https://evarisk.com';
-		$this->version         = '9.3.2';
+		$this->version         = '9.3.3';
 		$this->const_name      = 'MAIN_MODULE_' . strtoupper($this->name);
 		$this->picto           = 'digiriskdolibarr@digiriskdolibarr';
 
@@ -1788,8 +1788,6 @@ class modDigiriskdolibarr extends DolibarrModules
 
 			dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_TRIGGERS_UPDATED', 1, 'integer', 0, '', $conf->entity);
 		}
-
-		if ($conf->global->DIGIRISKDOLIBARR_TRIGGERS_UPDATED)
 
 		$params = array(
 			'digiriskdolibarr' => array(																			// nom informatif du module externe qui apporte ses paramètres

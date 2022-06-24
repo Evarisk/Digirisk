@@ -72,7 +72,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 		$this->name        = preg_replace('/^Interface/i', '', get_class($this));
 		$this->family      = "demo";
 		$this->description = "Digiriskdolibarr triggers.";
-		$this->version     = '9.3.2';
+		$this->version     = '9.3.3';
 		$this->picto       = 'digiriskdolibarr@digiriskdolibarr';
 	}
 
