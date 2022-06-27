@@ -1359,24 +1359,29 @@ window.eoxiaJS.mediaGallery.sendPhoto = function( event ) {
 	let token = $('.id-container.page-ut-gp-list').find('input[name="token"]').val();
     $('#myProgress').attr('style', 'display:block')
 	$.each(files, function(index, file) {
-        let formdata = new FormData();
-        formdata.append("userfile[]", file);
-        $.ajax({
-            url: document.URL + "&action=uploadPhoto&token=" + token,
-            type: "POST",
-            data: formdata,
-            processData: false,
-            contentType: false,
-        }).done(function() {
-            progress += (1 / totalCount) * 100
-            $('#myBar').animate({
-                width: progress + '%'
-            }, 300 );
-			if (index + 1 === totalCount) {
-                elementParent.load( document.URL + '&uploadMediasSuccess=1' + ' .ecm-photo-list');
-                actionContainerSuccess.removeClass('hidden');
-            }
-		})
+		let formdata = new FormData();
+		formdata.append("userfile[]", file);
+		$.ajax({
+			url: document.URL + "&action=uploadPhoto&uploadMediasSuccess=1&token=" + token,
+			type: "POST",
+			data: formdata,
+			processData: false,
+			contentType: false,
+			success: function (resp) {
+				progress += (1 / totalCount) * 100
+				$('#myBar').animate({
+					width: progress + '%'
+				}, 300);
+				if (index + 1 === totalCount) {
+					elementParent.load( document.URL + '&uploadMediasSuccess=1' + ' .ecm-photo-list', () => {
+						setTimeout(() => {
+							$('#myProgress').fadeOut(800)
+						}, 800)
+					});
+					actionContainerSuccess.removeClass('hidden');
+				}
+			}
+		});
 	})
 };
 
