@@ -210,7 +210,7 @@ if ($action == 'send') {
 					if ($result) {
 						$signatory->last_email_sent_date = dol_now('tzuser');
 						$signatory->update($user, true);
-						$signatory->setPendingSignature($user, false);
+						$signatory->setPending($user, false);
 						setEventMessages($langs->trans('SendEmailAt') . ' ' . $signatory->email, array());
 						// This avoid sending mail twice if going out and then back to page
 						header('Location: ' . $_SERVER["PHP_SELF"] . '?id=' . $object->id);
