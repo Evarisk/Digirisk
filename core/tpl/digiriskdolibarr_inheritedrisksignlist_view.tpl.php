@@ -282,56 +282,7 @@ while ($i < ($limit ? min($num, $limit) : $num)) {
 				</div>
 				<?php
 			} elseif ($key == 'ref') {
-				?>
-				<div class="risksign-container" value="<?php echo $risksign->id ?>">
-				<!-- BUTTON MODAL RISK SIGN EDIT -->
-				<div class="risksign-edit modal-open" value="<?php echo $risksign->id ?>"><i class="fas fa-map-signs"></i><?php echo ' ' . $risksign->ref; ?></div>
-				<!-- RISK SIGN EDIT MODAL -->
-				<div id="risksign_edit<?php echo $risksign->id ?>" class="wpeo-modal modal-risksign-<?php echo $risksign->id ?>">
-					<div class="modal-container wpeo-modal-event">
-						<!-- Modal-Header -->
-						<div class="modal-header">
-							<h2 class="modal-title"><?php echo $langs->trans('EditRiskSign') . ' ' . $risksign->ref ?></h2>
-							<div class="modal-close"><i class="fas fa-times"></i></div>
-						</div>
-						<!-- MODAL RISK SIGN EDIT CONTENT -->
-						<div class="modal-content" id="#modalContent">
-							<div class="risksign-content">
-								<div class="risksign-category">
-									<span class="title"><?php echo $langs->trans('RiskSign'); ?></span>
-									<input class="input-hidden-danger" type="hidden" name="risksign_category_id" value=<?php echo $risksign->category ?> />
-									<div class="wpeo-dropdown dropdown-large dropdown-grid risksign-category-danger padding">
-										<div class="dropdown-toggle dropdown-add-button button-cotation wpeo-tooltip-event" aria-label="<?php echo $risksign->get_risksign_category_name($risksign); ?>">
-											<img class="danger-category-pic hover" src="<?php echo DOL_URL_ROOT . '/custom/digiriskdolibarr/img/' . $risksign->get_risksign_category($risksign) ?>"/>
-										</div>
-										<ul class="dropdown-content wpeo-gridlayout grid-5 grid-gap-0">
-											<?php
-											$risksignCategories = $risksign->get_risksign_categories();
-											if ( ! empty($risksignCategories) ) :
-												foreach ($risksignCategories as $risksignCategory) : ?>
-													<li class="item dropdown-item wpeo-tooltip-event" data-is-preset="<?php echo ''; ?>" data-id="<?php echo $risksignCategory['position'] ?>" aria-label="<?php echo $risksignCategory['name'] ?>">
-														<img src="<?php echo DOL_URL_ROOT . '/custom/digiriskdolibarr/img/' . $risksignCategory['name_thumbnail'] ?>" class="attachment-thumbail size-thumbnail photo photowithmargin" alt="" loading="lazy" width="48" height="48">
-													</li>
-												<?php endforeach;
-											endif; ?>
-										</ul>
-									</div>
-								</div>
-								<div class="risksign-description">
-									<span class="title"><?php echo $langs->trans('Description'); ?></span>
-									<?php print '<textarea name="risksignDescription" rows="' . ROWS_2 . '">' . $risksign->description . '</textarea>' . "\n"; ?>
-								</div>
-							</div>
-						</div>
-						<!-- Modal-Footer -->
-						<div class="modal-footer">
-							<div class="risksign-save wpeo-button button-green save modal-close" value="<?php echo $risksign->id ?>">
-								<span><i class="fas fa-save"></i>  <?php echo $langs->trans('UpdateData'); ?></span>
-							</div>
-						</div>
-					</div>
-				</div>
-				<?php
+				print $risksign->getNomUrl(1, 'blank');
 			} elseif ($key == 'description') {
 				print dol_htmlentitiesbr(dol_trunc($risksign->description, 128, 'wrap', 'UTF-8', 0, 1));
 			} else print $risksign->showOutputField($val, $key, $risksign->$key, '');
