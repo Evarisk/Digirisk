@@ -493,6 +493,7 @@ class DigiriskElement extends CommonObject
 				while ($i < $num) {
 					$obj   = $this->db->fetch_object($resql);
 					$label = !empty(!empty($conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS) && $contextpage == 'sharedrisk') ? 'S'. $obj->entity . ' - ' . $obj->ref . ' - ' . $obj->label :  $obj->ref . ' - ' . $obj->label;
+					$label = !empty(!empty($conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKSIGNS) && $contextpage == 'sharedrisksign') ? 'S'. $obj->entity . ' - ' . $obj->ref . ' - ' . $obj->label :  $obj->ref . ' - ' . $obj->label;
 
 
 					if (empty($outputmode)) {
