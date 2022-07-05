@@ -359,8 +359,12 @@ while ($i < ($limit ? min($num, $limit) : $num)) {
 			} elseif ($key == 'ref') {
 				?>
 				<div class="risksign-container" value="<?php echo $risksign->id ?>">
-				<!-- BUTTON MODAL RISK SIGN EDIT -->
-				<div class="risksign-edit modal-open" value="<?php echo $risksign->id ?>"><i class="fas fa-map-signs"></i><?php echo ' ' . $risksign->ref; ?></div>
+				<!-- BUTTON MODAL RISK EDIT -->
+				<?php if ($permissiontoadd) : ?>
+					<div><i class="fas fa-map-signs"></i><?php echo ' ' . $risksign->ref; ?> <i class="risksign-edit wpeo-tooltip-event modal-open fas fa-pencil-alt" aria-label="<?php echo $langs->trans('EditRiskSign'); ?>" value="<?php echo $risksign->id; ?>" id="<?php echo $risksign->ref; ?>"></i></div>
+				<?php else : ?>
+					<div class="risk-edit-no-perm" value="<?php echo $risksign->id ?>"><i class="fas fa-map-signs"></i><?php echo ' ' . $risksign->ref; ?></div>
+				<?php endif; ?>
 				<!-- RISK SIGN EDIT MODAL -->
 				<div id="risksign_edit<?php echo $risksign->id ?>" class="wpeo-modal modal-risksign-<?php echo $risksign->id ?>">
 					<div class="modal-container wpeo-modal-event">
