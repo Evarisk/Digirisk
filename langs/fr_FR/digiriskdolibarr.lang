@@ -1168,9 +1168,28 @@ AddRiskSignTitle = Ajout d'une signalisation
 AddRiskSignButton = Ajouter la signalisation
 EditRiskSign = Édition d'une signalisation
 DeleteRiskSignMessage = Suppression de la signalisation
-
 DigiriskElementRiskSignList = Liste des signalisations
 DigiriskElementRiskSign = Signalisation
+DigiriskElementSharedRiskSignsList = Liste des signalisations partagées
+ImportSharedRiskSigns = Importer des signalisations partagées
+AlreadyImportedF = Déja importée
+ShowSharedRiskSigns = Signalisations partagés
+ShowSharedRiskSignsDescription = Afficher les signalisations partagées dans les documents et les listings
+DigiriskElementSharedRiskSign = Signalisations partagées
+SharedRiskSigns = Signalisations partagées
+ShareRiskSign = Activer le partage des signalisations
+RISKSIGNSharing = Partage des signalisations
+RISKSIGNSharingDescription = Sélection des entités qui partageront leurs signalisations avec cette entité.
+UnlinkSharedRiskSign = Délier la signalisation partagée
+RiskSignWellUnlinkShared = Signalisation délié
+RiskSignNotUnlinkShared = Erreur : Signalisation délié
+HasBeenUnlinkSharedF =  a été déliée
+HasNotBeenUnlinkSharedF = n'a pas été déliée
+RiskSignSharedTooltip = Cette option permet de partager les signalisations. <br> INFO : Si vous souhaitez pouvoir afficher les tâches, il faut activer l'option de partage des projets.
+ShowInheritedRiskSigns = Signalisations héritées
+ShowInheritedRiskSignsDescription = Afficher les signalisations héritées dans les documents et les listings
+DigiriskElementInheritedRiskSignsList Liste des signalisations héritées
+ConfirmImportSharedRiskSigns = Veuillez choisir les signalisations partagées à importer
 
 
 
@@ -1398,6 +1417,8 @@ DataMigrationImportDescription = Importation des données de l'arborescence de D
 DataMigrationImportRisks = Importation des données des risques de Digirisk
 DataMigrationImportRisksDescription = Importation des données des risques de Digirisk WordPress au format JSON
 ErrorFileNotWellFormatted = Le fichier n'est pas au bon format ou est vide. Vous devez joindre un fichier d'import provenant de Digirisk WordPress nommé DATE_OBJET_export.json
+DataMigrationImportRiskSigns = Importation des données des signalisations de Digirisk
+DataMigrationImportRiskSignsDescription = Importation des données des signalisations de Digirisk WordPress au format JSON
 
 
 
