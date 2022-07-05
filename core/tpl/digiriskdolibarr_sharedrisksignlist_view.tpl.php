@@ -242,8 +242,8 @@ foreach ($risksign->fields as $key => $val) {
 						<img class="danger-category-pic wpeo-tooltip-event hidden" src="" aria-label=""/>
 					</div>
 				<?php else : ?>
-					<div class="dropdown-toggle dropdown-add-button wpeo-tooltip-event" aria-label="<?php echo (empty(dol_escape_htmltag($search[$key]))) ? $risksign->get_risksign_category_name($risksign) : $risksign->get_risksign_category_position_by_name($search[$key]); ?>">
-						<img class="danger-category-pic tooltip hover" src="<?php echo DOL_URL_ROOT . '/custom/digiriskdolibarr/img/' . ((empty(dol_escape_htmltag($search[$key]))) ? $risksign->get_risksign_category($risksign) : $risksign->get_risksign_category_position_by_name($search[$key])) ?>" />
+					<div class="dropdown-toggle dropdown-add-button wpeo-tooltip-event" aria-label="<?php echo (empty(dol_escape_htmltag($search[$key]))) ? $risksign->get_risksign_category_name($risksign) : $risksign->get_risksign_category_name_by_position($search[$key]); ?>">
+						<img class="danger-category-pic tooltip hover" src="<?php echo DOL_URL_ROOT . '/custom/digiriskdolibarr/img/' . ((empty(dol_escape_htmltag($search[$key]))) ? $risksign->get_risksign_category($risksign) : $risksign->get_risksign_category_by_position($search[$key])) ?>" />
 					</div>
 				<?php endif; ?>
 				<ul class="dropdown-content wpeo-gridlayout grid-5 grid-gap-0">

@@ -222,6 +222,42 @@ class RiskSign extends CommonObject
 	}
 
 	/**
+	 * Get risksign category picto path
+	 *
+	 * @param int $position
+	 * @return    string $category['name_thumbnail']     path to danger category picto, -1 if don't exist
+	 */
+	public function get_risksign_category_by_position($position)
+	{
+		$risksign_categories  = $this->get_risksign_categories();
+		foreach ($risksign_categories as $category) {
+			if ($category['position'] == $position) {
+				return $category['name_thumbnail'];
+			}
+		}
+
+		return -1;
+	}
+
+	/**
+	 * Get risksign category picto name
+	 *
+	 * @param int $position
+	 * @return    string $category['name']     path to risksign category picto, -1 if don't exist
+	 */
+	public function get_risksign_category_name_by_position($position)
+	{
+		$risksign_categories = $this->get_risksign_categories();
+		foreach ($risksign_categories as $category) {
+			if ($category['position'] == $position) {
+				return $category['name'];
+			}
+		}
+
+		return -1;
+	}
+
+	/**
 	 * Load object in memory from the database
 	 *
 	 * @param int $id Id object
