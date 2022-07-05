@@ -2979,6 +2979,8 @@ window.eoxiaJS.risksign.event = function() {
 	$( document ).on( 'click', '.risksign-category-danger .item, .wpeo-table .risksign-category-danger .item', window.eoxiaJS.risksign.selectRiskSign );
 	$( document ).on( 'click', '.risksign-create:not(.button-disable)', window.eoxiaJS.risksign.createRiskSign );
 	$( document ).on( 'click', '.risksign-save', window.eoxiaJS.risksign.saveRiskSign );
+	$( document ).on( 'click', '.risksign-unlink-shared', window.eoxiaJS.risksign.unlinkSharedRiskSign );
+	$( document ).on( 'click', '#select_all_shared_risksigns', window.eoxiaJS.risksign.selectAllSharedRiskSign );
 };
 
 /**
@@ -3131,6 +3133,83 @@ window.eoxiaJS.risksign.saveRiskSign = function ( event ) {
 		}
 	});
 
+};
+
+/**
+ * Action unlink shared risk sign.
+ *
+ * @since   9.4.0
+ * @version 9.4.0
+ *
+ * @return {void}
+ */
+window.eoxiaJS.risksign.unlinkSharedRiskSign = function ( event ) {
+	let risksignId = $(this).attr('value');
+	//let elementRisk = $(this).closest('.risk-container').find('.risk-content');
+	let elementParent = $('.fichecenter.sharedrisksignlist').find('.div-table-responsive');
+
+	window.eoxiaJS.loader.display($(this));
+
+	let risksignRef =  $('.risksign_row_'+risksignId).find('.risksign-container > div:nth-child(1)').text();
+	let url = document.URL.split(/#/);
+
+	let token = $('.fichecenter.risksignlist').find('input[name="token"]').val();
+
+	$.ajax({
+		url: url[0] + '&action=unlinkSharedRiskSign&token='+token,
+		type: "POST",
+		processData: false,
+		data: JSON.stringify({
+			risksignID: risksignId,
+		}),
+		contentType: false,
+		success: function ( resp ) {
+			$('.fichecenter.sharedrisksignlist .opacitymedium.colorblack.paddingleft').html($(resp).find('#searchFormSharedListRiskSigns .opacitymedium.colorblack.paddingleft'))
+			let actionContainerSuccess = $('.messageSuccessRiskSignUnlinkShared');
+
+			$('#risksign_row_' + risksignId).fadeOut(800);
+
+			let textToShow = '';
+			textToShow += actionContainerSuccess.find('.valueForUnlinkSharedRiskSign1').val()
+			textToShow += risksignRef
+			textToShow += actionContainerSuccess.find('.valueForUnlinkSharedRiskSign2').val()
+
+			actionContainerSuccess.find('.notice-subtitle .text').text(textToShow)
+			actionContainerSuccess.removeClass('hidden');
+		},
+		error: function ( resp ) {
+			let actionContainerError = $('.messageErrorRiskSignUnlinkShared');
+
+			let textToShow = '';
+			textToShow += actionContainerError.find('.valueForUnlinkSharedRiskSign1').val()
+			textToShow += risksignRef
+			textToShow += actionContainerError.find('.valueForUnlinkSharedRiskSign2').val()
+
+			actionContainerError.find('.notice-subtitle .text').text(textToShow)
+			actionContainerError.removeClass('hidden');
+		}
+	});
+};
+
+/**
+ * Action select All shared risk sign.
+ *
+ * @since   9.4.0
+ * @version 9.4.0
+ *
+ * @return {void}
+ */
+window.eoxiaJS.risksign.selectAllSharedRiskSign = function ( event ) {
+	if(this.checked) {
+		// Iterate each checkbox
+		$(this).closest('.ui-widget').find(':checkbox').not(':disabled').each(function() {
+			this.checked = true;
+		});
+	} else {
+		$(this).closest('.ui-widget').find(':checkbox').not(':disabled').each(function() {
+			this.checked = false;
+		});
+	}
 };
 
 /**
