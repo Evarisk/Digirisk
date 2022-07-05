@@ -3855,6 +3855,47 @@ td > .risk-evaluation-container {
   vertical-align: middle;
 }
 
+#dialog-confirm-actionButtonImportSharedRiskSigns .confirmtext {
+  text-align: center;
+  padding: 0.2em 0 0.4em 0;
+}
+#dialog-confirm-actionButtonImportSharedRiskSigns .tagtable {
+  border-collapse: collapse;
+}
+#dialog-confirm-actionButtonImportSharedRiskSigns .tagtr {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+}
+#dialog-confirm-actionButtonImportSharedRiskSigns .tagtd {
+  padding: 0.3em 0;
+}
+#dialog-confirm-actionButtonImportSharedRiskSigns .tagtr > .tagtd:first-child {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+}
+#dialog-confirm-actionButtonImportSharedRiskSigns .tagtr > .tagtd:first-child .importsharedrisksign:not(.imported) {
+  width: 30%;
+}
+#dialog-confirm-actionButtonImportSharedRiskSigns .tagtr > .tagtd:first-child .importsharedrisksign.imported {
+  width: 10%;
+  text-align: center;
+  font-size: 12px;
+}
+#dialog-confirm-actionButtonImportSharedRiskSigns .tagtr > .tagtd:first-child .importsharedrisksign img {
+  float: left;
+  margin-right: 0.4em;
+  max-width: 35px;
+}
+#dialog-confirm-actionButtonImportSharedRiskSigns .tagtr > .tagtd:first-child .importsharedrisksign > span {
+  display: block;
+}
+#dialog-confirm-actionButtonImportSharedRiskSigns .tagtr > .tagtd:first-child .importsharedrisksign .importsharedrisksign-ref {
+  font-weight: 600;
+}
+#dialog-confirm-actionButtonImportSharedRiskSigns .tagtr > .tagtd:last-child {
+  vertical-align: middle;
+}
+
 .wpeo-modal.modal-photo.modal-active {
   z-index: 2014;
 }
