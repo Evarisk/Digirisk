@@ -593,6 +593,9 @@ class modDigiriskdolibarr extends DolibarrModules
 			// CONST RISK SIGN
 			200 => array('MAIN_AGENDA_ACTIONAUTO_RISKSIGN_CREATE', 'integer', 1, '', 0, 'current'),
 			201 => array('DIGIRISKDOLIBARR_RISKSIGN_ADDON', 'chaine', 'mod_risksign_standard', '', 0, 'current'),
+			202 => array('DIGIRISKDOLIBARR_SHOW_RISKSIGNS', 'integer', 1, '', 0, 'current'),
+			203 => array('DIGIRISKDOLIBARR_SHOW_INHERITED_RISKSIGNS', 'integer', 0, '', 0, 'current'),
+			204 => array('DIGIRISKDOLIBARR_SHOW_SHARED_RISKSIGNS', 'integer', 0, '', 0, 'current'),
 
 			// CONST PROJET
 			210 => array('DIGIRISKDOLIBARR_PROJECT_TAGS_SET', 'integer', 0, '', 0, 'current'),
@@ -1828,10 +1831,32 @@ class modDigiriskdolibarr extends DolibarrModules
 							)
 						)
 					),
+					//partage risk sign
+					'risksign' => array(																			// Valeur utilisée dans getEntity()
+						'type'      => 'object',																	// element: partage d'éléments principaux (thirdparty, product, member, etc...)
+						'icon'      => 'map-signs',																	// Font Awesome icon
+						'lang'      => 'digiriskdolibarr@digiriskdolibarr',											// Fichier de langue contenant les traductions
+						'tooltip'   => 'RiskSignSharedTooltip',														// Message Tooltip (ne pas mettre cette clé si pas de tooltip)
+						'mandatory' => 'digiriskelement',															// partage principal obligatoire
+						'enable'    => '! empty($conf->digiriskdolibarr->enabled)',									// Conditions d'activation du partage
+						'display'   => '! empty($conf->global->MULTICOMPANY_DIGIRISKELEMENT_SHARING_ENABLED)', 		// L'affichage de ce bloc de partage dépend de l'activation d'un partage parent
+						'input'     => array(																		// input : Paramétrage de la réaction du bouton on/off
+							'global' => array(																		// global : réaction lorsqu'on désactive l'option de partage global
+								'hide'     => true,																	// hide : cache le bloc de partage lors de la désactivation du partage global
+								'del'      => true																	// del : suppression de la constante du partage lors de la désactivation du partage global
+							),
+							'digiriskelement' => array(																// digiriskelement (nom du module principal) : réaction lorsqu'on désactive le partage principal (ici le partage des digiriskelements)
+								'showhide' => true,																	// showhide : afficher/cacher le bloc de partage lors de l'activation/désactivation du partage principal
+								'hide'     => true,																	// hide : cache le bloc de partage lors de la désactivation du partage principal
+								'del'      => true																	// del : supprime la constante du partage lors de la désactivation du partage principal
+							)
+						)
+					),
 				),
 				'sharingmodulename' => array(																		// correspondance des noms de modules pour le lien parent ou compatibilité (ex: 'productsupplierprice'	=> 'product')
 					'digiriskelement' => 'digiriskdolibarr',
 					'risk'            => 'digiriskdolibarr',
+					'risksign'        => 'digiriskdolibarr',
 				),
 			)
 		);
