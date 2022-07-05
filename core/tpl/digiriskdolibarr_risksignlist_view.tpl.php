@@ -257,7 +257,7 @@ foreach ($risksign->fields as $key => $val) {
 		elseif (strpos($val['type'], 'integer:') === 0) {
 			print $risksign->showInputField($val, $key, $search[$key], '', '', 'search_', 'maxwidth150', 1);
 		} elseif ($key == 'category') { ?>
-			<div class="wpeo-dropdown dropdown-large dropdown-grid category-danger padding">
+			<div class="wpeo-dropdown dropdown-large dropdown-grid category-danger padding" style="position: inherit">
 				<input class="input-hidden-danger" type="hidden" name="<?php echo 'search_' . $key ?>" value="<?php echo dol_escape_htmltag($search[$key]) ?>" />
 				<?php if (dol_strlen(dol_escape_htmltag($search[$key])) == 0) : ?>
 					<div class="dropdown-toggle dropdown-add-button">

@@ -1177,7 +1177,7 @@ ShowSharedRiskSigns = Signalisations partagés
 ShowSharedRiskSignsDescription = Afficher les signalisations partagées dans les documents et les listings
 DigiriskElementSharedRiskSign = Signalisations partagées
 SharedRiskSigns = Signalisations partagées
-ShareRiskSign = Activer le partage des signalisations
+ShareRisksign = Activer le partage des signalisations
 RISKSIGNSharing = Partage des signalisations
 RISKSIGNSharingDescription = Sélection des entités qui partageront leurs signalisations avec cette entité.
 UnlinkSharedRiskSign = Délier la signalisation partagée
@@ -1190,6 +1190,7 @@ ShowInheritedRiskSigns = Signalisations héritées
 ShowInheritedRiskSignsDescription = Afficher les signalisations héritées dans les documents et les listings
 DigiriskElementInheritedRiskSignsList Liste des signalisations héritées
 ConfirmImportSharedRiskSigns = Veuillez choisir les signalisations partagées à importer
+DigiriskRiskSignData = Données configurables des signalisations
 
 
 
