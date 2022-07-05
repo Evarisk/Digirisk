@@ -43,10 +43,12 @@ require_once './../class/digiriskelement/groupment.class.php';
 require_once './../class/digiriskelement/workunit.class.php';
 require_once './../class/riskanalysis/risk.class.php';
 require_once './../class/riskanalysis/riskassessment.class.php';
+require_once './../class/riskanalysis/risksign.class.php';
 require_once './../core/modules/digiriskdolibarr/digiriskelement/groupment/mod_groupment_standard.php';
 require_once './../core/modules/digiriskdolibarr/digiriskelement/workunit/mod_workunit_standard.php';
 require_once './../core/modules/digiriskdolibarr/riskanalysis/risk/mod_risk_standard.php';
 require_once './../core/modules/digiriskdolibarr/riskanalysis/riskassessment/mod_riskassessment_standard.php';
+require_once './../core/modules/digiriskdolibarr/riskanalysis/risksign/mod_risksign_standard.php';
 
 global $conf, $db, $langs, $user;
 
@@ -67,11 +69,13 @@ $groupment            = new Groupment($db);
 $workUnit             = new WorkUnit($db);
 $risk                 = new Risk($db);
 $riskAssessment       = new RiskAssessment($db);
+$risksign             = new RiskSign($db);
 $extrafields          = new ExtraFields($db);
 $refGroupmentMod      = new $conf->global->DIGIRISKDOLIBARR_GROUPMENT_ADDON();
 $refWorkUnitMod       = new $conf->global->DIGIRISKDOLIBARR_WORKUNIT_ADDON();
 $refRiskMod           = new $conf->global->DIGIRISKDOLIBARR_RISK_ADDON();
 $refRiskAssessmentMod = new $conf->global->DIGIRISKDOLIBARR_RISKASSESSMENT_ADDON();
+$refRiskSignMod       = new $conf->global->DIGIRISKDOLIBARR_RISKSIGN_ADDON();
 
 $upload_dir = $conf->digiriskdolibarr->multidir_output[isset($conf->entity) ? $conf->entity : 1];
 
@@ -240,6 +244,62 @@ if (GETPOST('dataMigrationImportRisks', 'alpha') && ! empty($conf->global->MAIN_
 	}
 }
 
+if (GETPOST('dataMigrationImportRiskSigns', 'alpha') && ! empty($conf->global->MAIN_UPLOAD_DOC)) {
+	// Submit file
+	if ( ! empty($_FILES)) {
+		if ( ! preg_match('/\.json/', $_FILES['dataMigrationImportRiskSignsfile']['name'][0]) || $_FILES['dataMigrationImportRiskSignsfile']['size'][0] < 1) {
+			setEventMessages($langs->trans('ErrorFileNotWellFormatted'), null, 'errors');
+		} else {
+			if (is_array($_FILES['dataMigrationImportRiskSignsfile']['tmp_name'])) $userfiles = $_FILES['dataMigrationImportRiskSignsfile']['tmp_name'];
+			else $userfiles                                                               = array($_FILES['dataMigrationImportRiskSignsfile']['tmp_name']);
+
+			foreach ($userfiles as $key => $userfile) {
+				if (empty($_FILES['dataMigrationImportRiskSignsfile']['tmp_name'][$key])) {
+					$error++;
+					if ($_FILES['dataMigrationImportRiskSignsfile']['error'][$key] == 1 || $_FILES['dataMigrationImportRiskSignsfile']['error'][$key] == 2) {
+						setEventMessages($langs->trans('ErrorFileSizeTooLarge'), null, 'errors');
+					} else {
+						setEventMessages($langs->trans("ErrorFieldRequired", $langs->transnoentitiesnoconv("File")), null, 'errors');
+					}
+				}
+			}
+
+			if ( ! $error) {
+				$filedir = $upload_dir . '/temp/';
+				if ( ! empty($filedir)) {
+					$result = dol_add_file_process($filedir, 0, 1, 'dataMigrationImportRiskSignsfile', '', null, '', 0, null);
+				}
+			}
+
+			$json                = file_get_contents($filedir . $_FILES['dataMigrationImportRiskSignsfile']['name'][0]);
+			$digiriskExportArray = json_decode($json, true);
+
+			//Risk
+			foreach ($digiriskExportArray as $digiriskExportRiskSign) {
+				$risksign->ref         = $refRiskSignMod->getNextValue($risksign);
+				$risksign->category    = $risksign->get_risksign_category_position_by_name($digiriskExportRiskSign['recommendation_category']['name']);
+				$risksign->description = $digiriskExportRiskSign['comment']['content'];
+				$risksign->fk_element  = $digiriskElement->fetch_id_from_wp_digi_id($digiriskExportRiskSign['parent_id']);
+
+				if ( ! $error) {
+					$result = $risksign->create($user, true);
+					if ($result < 0) {
+						// Creation risksign KO
+						if ( ! empty($risksign->errors)) setEventMessages(null, $risksign->errors, 'errors');
+						else setEventMessages($risksign->error, null, 'errors');
+					}
+				}
+			}
+		}
+
+		$fileImportRiskSigns = dol_dir_list($filedir, "files", 0, '', '', '', '', 1);
+		$fileImportRiskSigns = array_shift($fileImportRiskSigns);
+		if ( ! empty($fileImportRiskSigns)) {
+			unlink($fileImportRiskSigns['fullname']);
+		}
+	}
+}
+
 /*
  * View
  */
@@ -287,6 +347,18 @@ if ($user->rights->digiriskdolibarr->adminpage->read) {
 	print '<td class="center data-migration-import-risks">';
 	print '<input class="flat" type="file" name="dataMigrationImportRisksfile[]" id="data-migration-import-risks" />';
 	print '<input type="submit" class="button reposition data-migration-submit" name="dataMigrationImportRisks" value="' . $langs->trans("Upload") . '">';
+	print '</td>';
+	print '</tr>';
+
+	print '<tr class="oddeven"><td>';
+	print $langs->trans('DataMigrationImportRiskSigns');
+	print "</td><td>";
+	print $langs->trans('DataMigrationImportRiskSignsDescription');
+	print '</td>';
+
+	print '<td class="center data-migration-import-risksigns">';
+	print '<input class="flat" type="file" name="dataMigrationImportRiskSignsfile[]" id="data-migration-import-risksigns" />';
+	print '<input type="submit" class="button reposition data-migration-submit" name="dataMigrationImportRiskSigns" value="' . $langs->trans("Upload") . '">';
 	print '</td>';
 	print '</tr>';
 	print '</table>';
