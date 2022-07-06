@@ -510,41 +510,43 @@ if ($user->rights->digiriskdolibarr->adminpage->read) {
 	print '<td class="center">' . $langs->trans("Action") . '</td>';
 	print '</tr>';
 
-	print '<tr class="oddeven"><td>';
-	print $langs->trans('DataMigrationImport');
-	print "</td><td>";
-	print $langs->trans('DataMigrationImportDescription');
-	print '</td>';
+	if ($conf->global->DIGIRISKDOLIBARR_TOOLS_ADVANCED_IMPORT == 1) {
+		print '<tr class="oddeven"><td>';
+		print $langs->trans('DataMigrationImport');
+		print "</td><td>";
+		print $langs->trans('DataMigrationImportDescription');
+		print '</td>';
 
-	print '<td class="center data-migration-import">';
-	print '<input class="flat" type="file" name="dataMigrationImportfile[]" id="data-migration-import" />';
-	print '<input type="submit" class="button reposition data-migration-submit" name="dataMigrationImport" value="' . $langs->trans("Upload") . '">';
-	print '</td>';
-	print '</tr>';
+		print '<td class="center data-migration-import">';
+		print '<input class="flat" type="file" name="dataMigrationImportfile[]" id="data-migration-import" />';
+		print '<input type="submit" class="button reposition data-migration-submit" name="dataMigrationImport" value="' . $langs->trans("Upload") . '">';
+		print '</td>';
+		print '</tr>';
 
-	print '<tr class="oddeven"><td>';
-	print $langs->trans('DataMigrationImportRisks');
-	print "</td><td>";
-	print $langs->trans('DataMigrationImportRisksDescription');
-	print '</td>';
+		print '<tr class="oddeven"><td>';
+		print $langs->trans('DataMigrationImportRisks');
+		print "</td><td>";
+		print $langs->trans('DataMigrationImportRisksDescription');
+		print '</td>';
 
-	print '<td class="center data-migration-import-risks">';
-	print '<input class="flat" type="file" name="dataMigrationImportRisksfile[]" id="data-migration-import-risks" />';
-	print '<input type="submit" class="button reposition data-migration-submit" name="dataMigrationImportRisks" value="' . $langs->trans("Upload") . '">';
-	print '</td>';
-	print '</tr>';
+		print '<td class="center data-migration-import-risks">';
+		print '<input class="flat" type="file" name="dataMigrationImportRisksfile[]" id="data-migration-import-risks" />';
+		print '<input type="submit" class="button reposition data-migration-submit" name="dataMigrationImportRisks" value="' . $langs->trans("Upload") . '">';
+		print '</td>';
+		print '</tr>';
 
-	print '<tr class="oddeven"><td>';
-	print $langs->trans('DataMigrationImportRiskSigns');
-	print "</td><td>";
-	print $langs->trans('DataMigrationImportRiskSignsDescription');
-	print '</td>';
+		print '<tr class="oddeven"><td>';
+		print $langs->trans('DataMigrationImportRiskSigns');
+		print "</td><td>";
+		print $langs->trans('DataMigrationImportRiskSignsDescription');
+		print '</td>';
 
-	print '<td class="center data-migration-import-risksigns">';
-	print '<input class="flat" type="file" name="dataMigrationImportRiskSignsfile[]" id="data-migration-import-risksigns" />';
-	print '<input type="submit" class="button reposition data-migration-submit" name="dataMigrationImportRiskSigns" value="' . $langs->trans("Upload") . '">';
-	print '</td>';
-	print '</tr>';
+		print '<td class="center data-migration-import-risksigns">';
+		print '<input class="flat" type="file" name="dataMigrationImportRiskSignsfile[]" id="data-migration-import-risksigns" />';
+		print '<input type="submit" class="button reposition data-migration-submit" name="dataMigrationImportRiskSigns" value="' . $langs->trans("Upload") . '">';
+		print '</td>';
+		print '</tr>';
+	}
 
 	print '<tr class="oddeven"><td>';
 	print $langs->trans('DataMigrationImportGlobal');

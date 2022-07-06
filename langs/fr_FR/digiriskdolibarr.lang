@@ -1426,7 +1426,8 @@ DataMigrationTreeAlreadyImported = Importation des données de l'arborescence d�
 DataMigrationRisksAlreadyImported = Importation des données des risques déjà réalisées
 DataMigrationRiskSignsAlreadyImported = Importation des données des signalisations déjà réalisées
 DataMigrationGlobalAlreadyImported = Importation des données globals (Arborescene, risques et signalisations) déjà réalisées
-
+AdvancedImport = Import avancé
+AdvancedImportDescription = Permet d'importer chaque élément indépendamment (Arborescene, risques et signalisations)
 
 
 #

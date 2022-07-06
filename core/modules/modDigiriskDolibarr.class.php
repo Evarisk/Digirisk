@@ -685,7 +685,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			331 => array('MAIN_EXTRAFIELDS_USE_SELECT2', 'integer', 1, '', 0, 'current'),
 
 			// CONST TOOLS
-			340 => array('DIGIRISKDOLIBARR_TOOLS_ADVANCED_IMPORT', 'integer', 1, '', 0, 'current'),
+			340 => array('DIGIRISKDOLIBARR_TOOLS_ADVANCED_IMPORT', 'integer', 0, '', 0, 'current'),
 			341 => array('DIGIRISKDOLIBARR_TOOLS_TREE_ALREADY_IMPORTED', 'integer', 0, '', 0, 'current'),
 			342 => array('DIGIRISKDOLIBARR_TOOLS_RISKS_ALREADY_IMPORTED', 'integer', 0, '', 0, 'current'),
 			343 => array('DIGIRISKDOLIBARR_TOOLS_RISKSIGNS_ALREADY_IMPORTED', 'integer', 0, '', 0, 'current'),

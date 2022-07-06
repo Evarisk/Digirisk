@@ -157,6 +157,17 @@ print '<td class="center">';
 print ajax_constantonoff('DIGIRISKDOLIBARR_USE_CAPTCHA');
 print '</td>';
 print '</tr>';
+
+// Advanced Import
+print '<tr class="oddeven"><td>';
+print  $langs->trans("AdvancedImport");
+print '</td><td>';
+print $langs->trans('AdvancedImportDescription');
+print '</td>';
+print '<td class="center">';
+print ajax_constantonoff('DIGIRISKDOLIBARR_TOOLS_ADVANCED_IMPORT');
+print '</td>';
+print '</tr>';
 print '</table>';
 
 print load_fiche_titre($langs->trans("MediaData"), '', '');
