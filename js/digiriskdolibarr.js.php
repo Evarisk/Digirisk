@@ -3042,9 +3042,9 @@ window.eoxiaJS.risksign.createRiskSign = function ( event ) {
 	var category = elementRiskSign.find('.risksign-category input').val();
 	var description = elementRiskSign.find('.risksign-description textarea').val();
 
-	window.eoxiaJS.loader.display($('.fichecenter'));
+	window.eoxiaJS.loader.display($('.fichecenter.risksignlist'));
 
-	let token = $('.fichecenter').find('input[name="token"]').val();
+	let token = $('.fichecenter.risksignlist').find('input[name="token"]').val();
 
 	$.ajax({
 		url: document.URL + '&action=add&token='+token,
@@ -3056,11 +3056,11 @@ window.eoxiaJS.risksign.createRiskSign = function ( event ) {
 		processData: false,
 		contentType: false,
 		success: function ( resp ) {
-			$('.fichecenter').html($(resp).find('#searchFormList'))
+			$('.fichecenter.risksignlist').html($(resp).find('#searchFormListRiskSigns'))
 
 			let actionContainerSuccess = $('.messageSuccessRiskSignCreate');
 
-			$('.fichecenter').removeClass('wpeo-loader');
+			$('.fichecenter.risksignlist').removeClass('wpeo-loader');
 
 			actionContainerSuccess.html($(resp).find('.risksign-create-success-notice'))
 			actionContainerSuccess.removeClass('hidden');
@@ -3094,7 +3094,7 @@ window.eoxiaJS.risksign.saveRiskSign = function ( event ) {
 
 	window.eoxiaJS.loader.display(elementRiskSign);
 
-	let token = $('.fichecenter').find('input[name="token"]').val();
+	let token = $('.fichecenter.risksignlist').find('input[name="token"]').val();
 
 	$.ajax({
 		url: document.URL + '&action=saveRiskSign&token='+token,
@@ -3107,7 +3107,7 @@ window.eoxiaJS.risksign.saveRiskSign = function ( event ) {
 		processData: false,
 		contentType: false,
 		success: function ( resp ) {
-			$('.fichecenter').html($(resp).find('#searchFormList'))
+			$('.fichecenter.risksignlist').html($(resp).find('#searchFormListRiskSigns'))
 
 			let actionContainerSuccess = $('.messageSuccessRiskSignEdit');
 

@@ -774,7 +774,7 @@ print '</tr>';
 print '<tr class="oddeven"><td>';
 print $langs->trans('ShowInheritedRiskSigns');
 print "</td><td>";
-print $langs->trans('ShowInheritedRisksSignsDescription');
+print $langs->trans('ShowInheritedRiskSignsDescription');
 print '</td>';
 
 print '<td class="center">';
@@ -788,7 +788,7 @@ if ($conf->multicompany->enabled && !empty($conf->mc->sharings['risksign']) && $
 	print '<tr class="oddeven"><td>';
 	print $langs->trans('ShowSharedRiskSigns');
 	print "</td><td>";
-	print $langs->trans('ShowSharedRisksSignsDescription');
+	print $langs->trans('ShowSharedRiskSignsDescription');
 	print '</td>';
 
 	print '<td class="center">';

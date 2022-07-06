@@ -257,7 +257,7 @@ foreach ($risksign->fields as $key => $val) {
 		elseif (strpos($val['type'], 'integer:') === 0) {
 			print $risksign->showInputField($val, $key, $search[$key], '', '', 'search_', 'maxwidth150', 1);
 		} elseif ($key == 'category') { ?>
-			<div class="wpeo-dropdown dropdown-large dropdown-grid category-danger padding">
+			<div class="wpeo-dropdown dropdown-large dropdown-grid category-danger padding" style="position: inherit">
 				<input class="input-hidden-danger" type="hidden" name="<?php echo 'search_' . $key ?>" value="<?php echo dol_escape_htmltag($search[$key]) ?>" />
 				<?php if (dol_strlen(dol_escape_htmltag($search[$key])) == 0) : ?>
 					<div class="dropdown-toggle dropdown-add-button">
@@ -265,8 +265,8 @@ foreach ($risksign->fields as $key => $val) {
 						<img class="danger-category-pic wpeo-tooltip-event hidden" src="" aria-label=""/>
 					</div>
 				<?php else : ?>
-					<div class="dropdown-toggle dropdown-add-button wpeo-tooltip-event" aria-label="<?php echo (empty(dol_escape_htmltag($search[$key]))) ? $risksign->get_risksign_category_name($risksign) : $risksign->get_risksign_category_position_by_name($search[$key]); ?>">
-						<img class="danger-category-pic tooltip hover" src="<?php echo DOL_URL_ROOT . '/custom/digiriskdolibarr/img/' . ((empty(dol_escape_htmltag($search[$key]))) ? $risksign->get_risksign_category($risksign) : $risksign->get_risksign_category_position_by_name($search[$key])) ?>" />
+					<div class="dropdown-toggle dropdown-add-button wpeo-tooltip-event" aria-label="<?php echo (empty(dol_escape_htmltag($search[$key]))) ? $risksign->get_risksign_category_name($risksign) : $risksign->get_risksign_category_name_by_position($search[$key]); ?>">
+						<img class="danger-category-pic tooltip hover" src="<?php echo DOL_URL_ROOT . '/custom/digiriskdolibarr/img/' . ((empty(dol_escape_htmltag($search[$key]))) ? $risksign->get_risksign_category($risksign) : $risksign->get_risksign_category_by_position($search[$key])) ?>" />
 					</div>
 				<?php endif; ?>
 				<ul class="dropdown-content wpeo-gridlayout grid-5 grid-gap-0">
@@ -359,8 +359,12 @@ while ($i < ($limit ? min($num, $limit) : $num)) {
 			} elseif ($key == 'ref') {
 				?>
 				<div class="risksign-container" value="<?php echo $risksign->id ?>">
-				<!-- BUTTON MODAL RISK SIGN EDIT -->
-				<div class="risksign-edit modal-open" value="<?php echo $risksign->id ?>"><i class="fas fa-map-signs"></i><?php echo ' ' . $risksign->ref; ?></div>
+				<!-- BUTTON MODAL RISK EDIT -->
+				<?php if ($permissiontoadd) : ?>
+					<div><i class="fas fa-map-signs"></i><?php echo ' ' . $risksign->ref; ?> <i class="risksign-edit wpeo-tooltip-event modal-open fas fa-pencil-alt" aria-label="<?php echo $langs->trans('EditRiskSign'); ?>" value="<?php echo $risksign->id; ?>" id="<?php echo $risksign->ref; ?>"></i></div>
+				<?php else : ?>
+					<div class="risk-edit-no-perm" value="<?php echo $risksign->id ?>"><i class="fas fa-map-signs"></i><?php echo ' ' . $risksign->ref; ?></div>
+				<?php endif; ?>
 				<!-- RISK SIGN EDIT MODAL -->
 				<div id="risksign_edit<?php echo $risksign->id ?>" class="wpeo-modal modal-risksign-<?php echo $risksign->id ?>">
 					<div class="modal-container wpeo-modal-event">
