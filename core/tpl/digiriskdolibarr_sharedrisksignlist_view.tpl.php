@@ -53,7 +53,7 @@ $alldigiriskelement = $digiriskelementtmp->fetchAll('', '', 0, 0, array('customs
 
 // Build and execute select
 // --------------------------------------------------------------------
-$sql = 'SELECT ';
+$sql = 'SELECT DISTINCT ';
 foreach ($risksign->fields as $key => $val) {
 	$sql .= 't.' . $key . ', ';
 }
@@ -73,21 +73,26 @@ if (is_array($extrafields->attributes[$risksign->table_element]['label']) && cou
 //if ($risksign->ismultientitymanaged == 1) $sql                                                                                                        .= " WHERE t.entity IN (" . getEntity($risksign->element) . ")";
 //else $sql                                                                                                                                             .= " WHERE 1 = 1";
 //$sql                                                                                                                                                  .= " AND fk_element = " . $id;
-
-foreach ($trashList as $deleted_element => $element_id) {
-	$sql .= " AND fk_element !=" . $element_id;
+if ( ! $allRisks) {
+	$sql .= " AND el.fk_target = " . $id;
+	$sql .= " AND t.entity IN (" . getEntity($risksign->element) . ") ";
+} else {
+	foreach ($trashList as $deleted_element => $element_id) {
+		$sql .= " AND fk_element !=" . $element_id;
+	}
+	$sql .= " AND fk_element > 0";
+	$sql .= " AND el.fk_target IN (";
+	foreach ($alldigiriskelement as $digiriskelementsingle) {
+		$digiriskelementList[] = $digiriskelementsingle->id;
+	}
+	$digiriskelementList = array_unique($digiriskelementList);
+	foreach ($digiriskelementList as $digiriskelementsinglefinal) {
+		$sql .= $digiriskelementsinglefinal . ',';
+	}
+	$sql = dol_substr($sql, 0, -1);
+	$sql .= ")";
+	$sql .= " AND t.entity IN (" . getEntity($risksign->element) . ") ";
 }
-$sql .= " AND fk_element > 0";
-$sql .= " AND el.fk_target IN (";
-foreach ($alldigiriskelement as $digiriskelementsingle) {
-	$digiriskelementList[] = $digiriskelementsingle->id;
-}
-$digiriskelementList = array_unique($digiriskelementList);
-foreach ($digiriskelementList as $digiriskelementsinglefinal) {
-	$sql .= $digiriskelementsinglefinal . ',';
-}
-$sql = dol_substr($sql, 0 , -1);
-$sql .= ")";
 
 foreach ($search as $key => $val) {
 	if ($key == 'status' && $search[$key] == -1) continue;
