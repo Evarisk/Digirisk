@@ -214,9 +214,8 @@ if ( ! empty($moreforfilter)) {
 }
 
 $varpage         = empty($contextpage) ? $_SERVER["PHP_SELF"] : $contextpage;
-$menuConf = 'MAIN_SELECTEDFIELDS_' . $varpage;
-$user->conf->$menuConf = 't.entity,t.fk_element,t.ref,t.category,t.description,';
-
+$arrayfields['t.entity']['checked'] = 1;
+$arrayfields['t.fk_element']['checked'] = 1;
 $selectedfields  = $form->multiSelectArrayWithCheckbox('selectedfields', $arrayfields, $varpage); // This also change content of $arrayfields
 $selectedfields .= (count($arrayofmassactions) ? $form->showCheckAddButtons('checkforselect', 1) : '');
 
