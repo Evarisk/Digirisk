@@ -357,6 +357,30 @@ foreach ($types as $type => $documentType) {
 	}
 
 	print '</table>';
+
+	if ($documentType == 'riskassessmentdocument') {
+		print load_fiche_titre($langs->trans("DigiriskRiskAssessmentDocumentData"), '', '');
+
+		print '<table class="noborder centpercent">';
+		print '<tr class="liste_titre">';
+		print '<td>' . $langs->trans("Name") . '</td>';
+		print '<td>' . $langs->trans("Description") . '</td>';
+		print '<td class="center">' . $langs->trans("Status") . '</td>';
+		print '</tr>';
+
+		print '<tr class="oddeven"><td>';
+		print $langs->trans('ShowTaskDone');
+		print "</td><td>";
+		print $langs->trans('ShowTaskDoneDescription');
+		print '</td>';
+
+		print '<td class="center">';
+		print ajax_constantonoff('DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_SHOW_TASK_DONE');
+		print '</td>';
+		print '</tr>';
+		print '</table>';
+	}
+
 	print '<hr>';
 
 }

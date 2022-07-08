@@ -801,6 +801,10 @@ SetStartEndDateBefore = Définissez la date de début et la date de fin d'audit 
 SetStartEndDateBeforeSendEmail = Définissez la date de début et la date de fin d'audit sur cette page pour envoyer un email
 NoSitePlans = Aucun plan de la société renseigné
 riskassessmentdocument.odt = Document Unique
+DigiriskRiskAssessmentDocumentData = Données configurables du document unique
+ShowTaskDone = Afficher les tâches soldées
+ShowTaskDoneDescription = Permettre de choisir l'affichage des taches soldées dans le Document Unique
+actionPreventionCompletedTaskDone = Les actions soldées ne sont pas affichées
 
 # Boxes - Widget
 RiskAssessmentDocumentBox = Box Document unique
