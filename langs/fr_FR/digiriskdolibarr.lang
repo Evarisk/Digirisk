@@ -1421,14 +1421,14 @@ DataMigrationImportRisksDescription = Importation des données des risques de Di
 ErrorFileNotWellFormatted = Le fichier n'est pas au bon format ou est vide. Vous devez joindre un fichier d'import provenant de Digirisk WordPress nommé DATE_OBJET_export.json
 DataMigrationImportRiskSigns = Importation des données des signalisations de Digirisk
 DataMigrationImportRiskSignsDescription = Importation des données des signalisations de Digirisk WordPress au format JSON
-DataMigrationImportGlobal = Importation des données globals de Digirisk <br> (Arborescene, risques et signalisations)
-DataMigrationImportGlobalDescription = Importation des données globals de Digirisk WordPress au format ZIP <br> (Arborescene, risques et signalisations)
-DataMigrationTreeAlreadyImported = Importation des données de l'arborescence déjà réalisées
-DataMigrationRisksAlreadyImported = Importation des données des risques déjà réalisées
-DataMigrationRiskSignsAlreadyImported = Importation des données des signalisations déjà réalisées
-DataMigrationGlobalAlreadyImported = Importation des données globals (Arborescene, risques et signalisations) déjà réalisées
+DataMigrationImportGlobal = Importation des données globals de Digirisk <br> (Arborescence, risques et signalisations)
+DataMigrationImportGlobalDescription = Importation des données global de Digirisk WordPress au format ZIP <br> (Arborescence, risques et signalisations)
+DataMigrationTreeAlreadyImported = Importation des données de l'arborescence déjà réalisée
+DataMigrationRisksAlreadyImported = Importation des données des risques déjà réalisée
+DataMigrationRiskSignsAlreadyImported = Importation des données des signalisations déjà réalisée
+DataMigrationGlobalAlreadyImported = Importation des données global (Arborescence, risques et signalisations) déjà réalisée
 AdvancedImport = Import avancé
-AdvancedImportDescription = Permet d'importer chaque élément indépendamment (Arborescene, risques et signalisations)
+AdvancedImportDescription = Permet d'importer chaque élément indépendamment (Arborescence, risques et signalisations)
 
 
 #
