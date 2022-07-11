@@ -418,16 +418,17 @@ class doc_groupmentdocument_odt extends ModeleODTGroupmentDocument
 													$contactslistinternal = $related_task->liste_contact(-1, 'internal');
 
 													if ( ! empty($contactslistinternal) && is_array($contactslistinternal)) {
+														$responsible = '';
 														foreach ($contactslistinternal as $contactlistinternal) {
 															if ($contactlistinternal['code'] == 'TASKEXECUTIVE') {
-																$responsible = $contactlistinternal['firstname'] . ' ' . $contactlistinternal['lastname'] . ', ';
+																$responsible .= $contactlistinternal['firstname'] . ' ' . $contactlistinternal['lastname'] . ', ';
 															}
 														}
 													}
 
 													if ($related_task->progress == 100) {
 														$tmparray['actionPreventionCompleted'] .= $langs->trans('Ref') . ' : ' . ($related_task->ref ?: $langs->trans('NoData')) .  "\n";
-														$tmparray['actionPreventionCompleted'] .= $langs->trans('Responsible') . ' : ' . $responsible  . "\n";
+														$tmparray['actionPreventionCompleted'] .= $langs->trans('Responsible') . ' : ' . ($responsible ?: $langs->trans('NoData')) . "\n";
 														$tmparray['actionPreventionCompleted'] .= $langs->trans('DateStart') . ' : ' . dol_print_date((($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_START_DATE && ( ! empty($related_task->date_start))) ? $related_task->date_start : $related_task->date_c), 'dayreduceformat') . ' - ' . $langs->trans('Deadline') . ' : ' . (($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_END_DATE && ( ! empty($related_task->date_end))) ? ' - ' . dol_print_date($related_task->date_end, 'dayreduceformat') : $langs->trans('NoData')) . "\n";
 														if (strcmp($related_task->budget_amount, '')) {
 															$tmparray['actionPreventionCompleted'] .= $langs->trans('Budget') . ' : ' . price($related_task->budget_amount, 0, $langs, 1, 0, 0, $conf->currency) . "\n";
@@ -439,7 +440,7 @@ class doc_groupmentdocument_odt extends ModeleODTGroupmentDocument
 														$tmparray['actionPreventionCompleted'] .= $langs->trans('Description') . ' : ' . ($related_task->description ?: $langs->trans('NoData')). "\n\n";
 													} else {
 														$tmparray['actionPreventionUncompleted'] .= $langs->trans('Ref') . ' : ' . ($related_task->ref ?: $langs->trans('NoData')) . "\n";
-														$tmparray['actionPreventionUncompleted'] .= $langs->trans('Responsible') . ' : ' . $responsible  . "\n";
+														$tmparray['actionPreventionUncompleted'] .= $langs->trans('Responsible') . ' : ' . ($responsible ?: $langs->trans('NoData')) . "\n";
 														$tmparray['actionPreventionUncompleted'] .= $langs->trans('DateStart') . ' : ' . dol_print_date((($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_START_DATE && ( ! empty($related_task->date_start))) ? $related_task->date_start : $related_task->date_c), 'dayreduceformat') . ' - ' . $langs->trans('Deadline') . ' : ' . (($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_END_DATE && ( ! empty($related_task->date_end))) ? ' - ' . dol_print_date($related_task->date_end, 'dayreduceformat') : $langs->trans('NoData')) . "\n";
 														if (strcmp($related_task->budget_amount, '')) {
 															$tmparray['actionPreventionUncompleted'] .= $langs->trans('Budget') . ' : ' . price($related_task->budget_amount, 0, $langs, 1, 0, 0, $conf->currency) . ' - ';
