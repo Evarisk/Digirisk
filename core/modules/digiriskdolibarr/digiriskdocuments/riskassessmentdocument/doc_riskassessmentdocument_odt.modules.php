@@ -559,7 +559,7 @@ class doc_riskassessmentdocument_odt extends ModeleODTRiskAssessmentDocument
 															$tmparray['actionPreventionCompleted'] .= $langs->trans('Label') . ' : ' . ($related_task->label ?: $langs->trans('NoData')) . "\n";
 															$tmparray['actionPreventionCompleted'] .= $langs->trans('Description') . ' : ' . ($related_task->description ?: $langs->trans('NoData')). "\n\n";
 														} else {
-															$tmparray['actionPreventionCompleted'] = $langs->transnoentities('actionPreventionCompletedTaskDone');
+															$tmparray['actionPreventionCompleted'] = $langs->transnoentities('ActionPreventionCompletedTaskDone');
 														}
 													} else {
 														$tmparray['actionPreventionUncompleted'] .= $langs->trans('Ref') . ' : ' . ($related_task->ref ?: $langs->trans('NoData')) . "\n";
