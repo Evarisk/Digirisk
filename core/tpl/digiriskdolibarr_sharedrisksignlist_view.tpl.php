@@ -348,11 +348,7 @@ while ($i < ($limit ? min($num, $limit) : $num)) {
 			} elseif ($key == 'ref') {
 				?>
 				<div class="risksign-container" value="<?php echo $risksign->id ?>">
-					<div><i class="fas fa-map-signs"></i><?php echo ' ' . $risksign->ref; ?>
-						<?php if ($permissiontoadd) : ?>
-							<i class="risksign-unlink-shared wpeo-tooltip-event fas fa-unlink button-icon" aria-label="<?php echo $langs->trans('UnlinkSharedRiskSign') ?>" value="<?php echo $risksign->id;?>"></i>
-						<?php endif; ?>
-					</div>
+					<div><i class="fas fa-map-signs"></i><?php echo ' ' . $risksign->ref; ?></div>
 				</div>
 				<?php
 			} elseif ($key == 'description') {
@@ -377,6 +373,9 @@ while ($i < ($limit ? min($num, $limit) : $num)) {
 
 	// Action column
 	print '<td class="nowrap center">';
+	if ($permissiontoadd) {
+		print '<i class="risksign-unlink-shared wpeo-tooltip-event fas fa-unlink button-icon" aria-label="' . $langs->trans('UnlinkSharedRiskSign') . '" value="' . $risksign->id . '"></i>';
+	}
 	if ($massactionbutton || $massaction) {   // If we are in select mode (massactionbutton defined) or if we have already selected and sent an action ($massaction) defined
 		$selected                                                = 0;
 		if (in_array($risksign->id, $arrayofselected)) $selected = 1;

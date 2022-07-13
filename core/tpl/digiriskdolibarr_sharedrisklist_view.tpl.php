@@ -512,11 +512,7 @@
 				} elseif ($key == 'ref') {
 					?>
 					<div class="risk-container" value="<?php echo $risk->id ?>">
-						<div><i class="fas fa-exclamation-triangle"></i><?php echo ' ' . $risk->ref; ?>
-						<?php if ($permissiontoadd) : ?>
-							<i class="risk-unlink-shared wpeo-tooltip-event fas fa-unlink button-icon" aria-label="<?php echo $langs->trans('UnlinkSharedRisk') ?>" value="<?php echo $risk->id;?>"></i>
-						<?php endif; ?>
-						</div>
+						<div><i class="fas fa-exclamation-triangle"></i><?php echo ' ' . $risk->ref; ?></div>
 					</div>
 					<?php
 				} elseif ($key == 'description') {
@@ -570,6 +566,9 @@
 
 		// Action column
 		print '<td class="nowrap center">';
+		if ($permissiontoadd) {
+			print '<i class="risk-unlink-shared wpeo-tooltip-event fas fa-unlink button-icon" aria-label="' . $langs->trans('UnlinkSharedRisk') . '" value="' . $risk->id . '"></i>';
+		}
 		if ($massactionbutton || $massaction) {   // If we are in select mode (massactionbutton defined) or if we have already selected and sent an action ($massaction) defined
 			$selected                                            = 0;
 			if (in_array($risk->id, $arrayofselected)) $selected = 1;
