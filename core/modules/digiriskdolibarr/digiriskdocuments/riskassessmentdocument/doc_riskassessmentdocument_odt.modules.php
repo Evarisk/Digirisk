@@ -513,11 +513,12 @@ class doc_riskassessmentdocument_odt extends ModeleODTRiskAssessmentDocument
 										if ($scale == $i) {
 											$element = new DigiriskElement($this->db);
 											$element->fetch($line->fk_element);
-											$tmparray['nomElement'] = (!empty($conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS) ? 'S' . $element->entity . ' - ' : '') . $element->ref . ' - ' . $element->label;
-											$tmparray['nomDanger'] = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $line->get_danger_category($line) . '.png';
-											$tmparray['identifiantRisque'] = $line->ref . ' - ' . $lastEvaluation->ref;
-											$tmparray['quotationRisque'] = $lastEvaluation->cotation ? $lastEvaluation->cotation : '0';
-											$tmparray['descriptionRisque'] = $line->description;
+											$tmparray['nomElement']            = (!empty($conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS) ? 'S' . $element->entity . ' - ' : '') . $element->ref . ' - ' . $element->label;
+											$tmparray['nomDanger']             = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $line->get_danger_category($line) . '.png';
+											$tmparray['nomPicto']              = $line->get_danger_category_name($line);
+											$tmparray['identifiantRisque']     = $line->ref . ' - ' . $lastEvaluation->ref;
+											$tmparray['quotationRisque']       = $lastEvaluation->cotation ? $lastEvaluation->cotation : '0';
+											$tmparray['descriptionRisque']     = $line->description;
 											$tmparray['commentaireEvaluation'] = dol_print_date((($conf->global->DIGIRISKDOLIBARR_SHOW_RISKASSESSMENT_DATE && (!empty($lastEvaluation->date_riskassessment))) ? $lastEvaluation->date_riskassessment : $lastEvaluation->date_creation), 'dayreduceformat') . ': ' . $lastEvaluation->comment;
 
 											$related_tasks = $line->get_related_tasks($line);
@@ -650,6 +651,7 @@ class doc_riskassessmentdocument_odt extends ModeleODTRiskAssessmentDocument
 						} else {
 							$tmparray['nomElement']                  = $langs->trans('NoData');
 							$tmparray['nomDanger']                   = $langs->trans('NoData');
+							$tmparray['nomPicto']                    = $langs->trans('NoData');
 							$tmparray['identifiantRisque']           = $langs->trans('NoData');
 							$tmparray['quotationRisque']             = $langs->trans('NoData');
 							$tmparray['descriptionRisque']           = $langs->trans('NoDescriptionThere');
