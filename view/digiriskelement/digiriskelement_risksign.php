@@ -443,17 +443,17 @@ if ($object->id > 0) {
 
 	if (!empty($conf->global->DIGIRISKDOLIBARR_SHOW_RISKSIGNS)) {
 		$contextpage = 'risksigncard';
-		require_once './../../core/tpl/digiriskdolibarr_risksignlist_view.tpl.php';
+		require_once './../../core/tpl/riskanalysis/risksign/digiriskdolibarr_risksignlist_view.tpl.php';
 	}
 
 	if (!empty($conf->global->DIGIRISKDOLIBARR_SHOW_INHERITED_RISKSIGNS)) {
 		$contextpage = 'inheritedrisksign';
-		require_once './../../core/tpl/digiriskdolibarr_inheritedrisksignlist_view.tpl.php';
+		require_once './../../core/tpl/riskanalysis/risksign/digiriskdolibarr_inheritedrisksignlist_view.tpl.php';
 	}
 
 	if (!empty($conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKSIGNS)) {
 		$contextpage = 'sharedrisksign';
-		require_once './../../core/tpl/digiriskdolibarr_sharedrisksignlist_view.tpl.php';
+		require_once './../../core/tpl/riskanalysis/risksign/digiriskdolibarr_sharedrisksignlist_view.tpl.php';
 	}
 }
 

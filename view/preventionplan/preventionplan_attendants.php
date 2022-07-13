@@ -407,12 +407,12 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 
 	print '<td class="center">';
 	if ($object->status == 2 && $permissiontoadd) {
-		require __DIR__ . "/../../core/tpl/digiriskdolibarr_signature_action_view.tpl.php";
+		require __DIR__ . "/../../core/tpl/signature/digiriskdolibarr_signature_action_view.tpl.php";
 	}
 	print '</td>';
 	if ($element->signature != $langs->transnoentities("FileGenerated") && $permissiontoadd) {
 		print '<td class="center">';
-		require __DIR__ . "/../../core/tpl/digiriskdolibarr_signature_view.tpl.php";
+		require __DIR__ . "/../../core/tpl/signature/digiriskdolibarr_signature_view.tpl.php";
 		print '</td>';
 	}
 	print '</tr>';
@@ -461,11 +461,11 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	print '</td>';
 	print '<td class="center">';
 	if ($object->status == 2 && $permissiontoadd) {
-		require __DIR__ . "/../../core/tpl/digiriskdolibarr_signature_action_view.tpl.php";
+		require __DIR__ . "/../../core/tpl/signature/digiriskdolibarr_signature_action_view.tpl.php";
 	}	print '</td>';
 	if ($element->signature != $langs->transnoentities("FileGenerated") && $permissiontoadd) {
 		print '<td class="center">';
-		require __DIR__ . "/../../core/tpl/digiriskdolibarr_signature_view.tpl.php";
+		require __DIR__ . "/../../core/tpl/signature/digiriskdolibarr_signature_view.tpl.php";
 		print '</td>';
 	}
 	print '</tr>';
@@ -524,12 +524,12 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 			print '</td>';
 			print '<td class="center">';
 			if ($object->status < 3 && $permissiontoadd) {
-				require __DIR__ . "/../../core/tpl/digiriskdolibarr_signature_action_view.tpl.php";
+				require __DIR__ . "/../../core/tpl/signature/digiriskdolibarr_signature_action_view.tpl.php";
 			}
 			print '</td>';
 			if ($element->signature != $langs->transnoentities("FileGenerated") && $permissiontoadd) {
 				print '<td class="center">';
-				require __DIR__ . "/../../core/tpl/digiriskdolibarr_signature_view.tpl.php";
+				require __DIR__ . "/../../core/tpl/signature/digiriskdolibarr_signature_view.tpl.php";
 				print '</td>';
 			}
 			print '</tr>';

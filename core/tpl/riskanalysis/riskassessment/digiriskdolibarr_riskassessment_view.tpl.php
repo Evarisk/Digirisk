@@ -43,7 +43,7 @@ if ( ! empty($allRiskAssessment) && $allRiskAssessment > 0) :
 							<?php
 							$cotation = $lastEvaluation;
 							$view = 1;
-							include DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/core/tpl/digiriskdolibarr_photo_view.tpl.php';
+							include DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/core/tpl/medias/digiriskdolibarr_photo_view.tpl.php';
 							$view = 0;
 							?>
 						</div>
@@ -87,7 +87,7 @@ if ( ! empty($allRiskAssessment) && $allRiskAssessment > 0) :
 								<div class="modal-close"><i class="fas fa-times"></i></div>
 							</div>
 							<?php $cotation = $lastEvaluation;
-							include DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/core/tpl/digiriskdolibarr_photo_view.tpl.php'; ?>
+							include DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/core/tpl/medias/digiriskdolibarr_photo_view.tpl.php'; ?>
 
 							<!-- Modal Content-->
 							<div class="modal-content" id="#modalContent<?php echo $lastEvaluation->id ?>">
@@ -245,7 +245,7 @@ if ( ! empty($allRiskAssessment) && $allRiskAssessment > 0) :
 
 												<?php
 												$editModal = 1;
-												include DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/core/tpl/digiriskdolibarr_photo_view.tpl.php';
+												include DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/core/tpl/medias/digiriskdolibarr_photo_view.tpl.php';
 												$editModal = 0;
 												?>
 
@@ -440,7 +440,7 @@ if ( ! empty($allRiskAssessment) && $allRiskAssessment > 0) :
 						 <?php
 						 $cotation = $lastEvaluation;
 						 $view = 1;
-						 include DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/core/tpl/digiriskdolibarr_photo_view.tpl.php';
+						 include DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/core/tpl/medias/digiriskdolibarr_photo_view.tpl.php';
 						 $view = 0;
 						 ?>
 					 </div>
@@ -484,7 +484,7 @@ if ( ! empty($allRiskAssessment) && $allRiskAssessment > 0) :
 							 <div class="modal-close"><i class="fas fa-times"></i></div>
 						 </div>
 						 <?php $cotation = $lastEvaluation;
-							include DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/core/tpl/digiriskdolibarr_photo_view.tpl.php'; ?>
+							include DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/core/tpl/medias/digiriskdolibarr_photo_view.tpl.php'; ?>
 
 						 <!-- Modal Content-->
 						 <div class="modal-content" id="#modalContent<?php echo $lastEvaluation->id ?>">
@@ -642,7 +642,7 @@ if ( ! empty($allRiskAssessment) && $allRiskAssessment > 0) :
 
 												<?php
 												$editModal = 1;
-												include DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/core/tpl/digiriskdolibarr_photo_view.tpl.php';
+												include DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/core/tpl/medias/digiriskdolibarr_photo_view.tpl.php';
 												$editModal = 0;
 												?>
 
@@ -994,7 +994,7 @@ $cotation->method = $lastEvaluation->method ? $lastEvaluation->method : "standar
 							</div>
 						</div>
 
-						<?php include DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/core/tpl/digiriskdolibarr_photo_view.tpl.php'; ?>
+						<?php include DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/core/tpl/medias/digiriskdolibarr_photo_view.tpl.php'; ?>
 
 						<div class="risk-evaluation-calculated-cotation" style="<?php echo ($cotation->method == "advanced") ? " display:block" : " display:none" ?>">
 							<span class="title"><i class="fas fa-chart-line"></i> <?php echo $langs->trans('CalculatedCotation'); ?><required>*</required></span>

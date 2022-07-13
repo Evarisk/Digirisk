@@ -637,7 +637,7 @@
 										</div>
 									</div>
 
-									<?php include DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/core/tpl/digiriskdolibarr_photo_view.tpl.php'; ?>
+									<?php include DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/core/tpl/medias/digiriskdolibarr_photo_view.tpl.php'; ?>
 
 									<div class="risk-evaluation-calculated-cotation" style="display: none">
 										<span class="title"><i class="fas fa-chart-line"></i> <?php echo $langs->trans('CalculatedCotation'); ?><required>*</required></span>
@@ -822,7 +822,7 @@
 								</div>
 							</div>
 
-							<?php include DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/core/tpl/digiriskdolibarr_photo_view.tpl.php'; ?>
+							<?php include DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/core/tpl/medias/digiriskdolibarr_photo_view.tpl.php'; ?>
 
 							<div class="risk-evaluation-calculated-cotation" style="display: none">
 								<span class="title"><i class="fas fa-chart-line"></i> <?php echo $langs->trans('CalculatedCotation'); ?><required>*</required></span>
@@ -1146,7 +1146,7 @@
 											<input type="hidden" class="current-element-ref" value="<?php echo $objecttmp->ref; ?>">
 											<?php print $objecttmp->select_digiriskelement_list($objecttmp->id, 'socid', '', 0, 0, array(), 0, 0, 'disabled', 0, false, 1); ?>
 										<?php else : ?>
-											<?php print '<span class="opacitymedium">' . '<a href=' . '"../../../digiriskdolibarr/admin/config/riskassessmentdocument.php" target="_blank">' . $langs->trans('SetConfToMoveRisk') . '</a>' . "</span><br>\n"; ?>
+											<?php print '<span class="opacitymedium">' . '<a href=' . '"../../../../admin/config/riskassessmentdocument.php" target="_blank">' . $langs->trans('SetConfToMoveRisk') . '</a>' . "</span><br>\n"; ?>
 										<?php endif; ?>
 									</div>
 								</div>
@@ -1192,9 +1192,9 @@
 				$cssforfield = '';
 				print '<td' . ($cssforfield ? ' class="' . $cssforfield . '"' : '') . ' style="vertical-align: top;">';
 				if ($key == 'cotation') {
-					require './../../core/tpl/digiriskdolibarr_riskassessment_view.tpl.php';
+					require './../../core/tpl/riskanalysis/riskassessment/digiriskdolibarr_riskassessment_view.tpl.php';
 				} elseif ($key == 'has_tasks' && $conf->global->DIGIRISKDOLIBARR_TASK_MANAGEMENT) {
-					require './../../core/tpl/digiriskdolibarr_riskassessment_task_view.tpl.php';
+					require './../../core/tpl/riskanalysis/riskassessment/digiriskdolibarr_riskassessment_task_view.tpl.php';
 				} elseif ($conf->global->DIGIRISKDOLIBARR_TASK_MANAGEMENT == 0) {
 					print $langs->trans('TaskManagementNotActivated');
 				} else print $lastEvaluation->showOutputField($val, $key, $lastEvaluation->$key, '');
