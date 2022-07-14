@@ -408,7 +408,8 @@ class modDigiriskdolibarr extends DolibarrModules
 				'ticketcard',
 				'projecttaskcard',
 				'projecttaskscard',
-				'tasklist'
+				'tasklist',
+				'publicnewticketcard'
 			),
 			'tabs' => array(
 				'mycompany_admin'

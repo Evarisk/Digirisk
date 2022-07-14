@@ -204,6 +204,25 @@ class ActionsDigiriskdolibarr
 					}
 				}
 			}
+		} else if ($parameters['currentcontext'] == 'publicnewticketcard') {
+			?>
+			<script>
+				let date = new Date();
+
+				let month    = date.getMonth() + 1;
+				let day      = date.getDate();
+				let fulldate = (day < 10 ? '0' : '') + day + '/' + (month < 10 ? '0' : '') + month + '/' + date.getFullYear();
+				let hour     = date.getHours();
+				let min      = date.getMinutes();
+
+				jQuery('#options_digiriskdolibarr_ticket_date').val(fulldate);
+				jQuery('#options_digiriskdolibarr_ticket_dateday').val((day < 10 ? '0' : '') + day);
+				jQuery('#options_digiriskdolibarr_ticket_datemonth').val((month < 10 ? '0' : '') + month);
+				jQuery('#options_digiriskdolibarr_ticket_dateyear').val(date.getFullYear());
+				jQuery('#options_digiriskdolibarr_ticket_datehour').val((hour < 10 ? '0' : '') + hour);
+				jQuery('#options_digiriskdolibarr_ticket_datemin').val((min < 10 ? '0' : '') + min);
+			</script>
+			<?php
 		}
 
 		if (true) {
