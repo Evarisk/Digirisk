@@ -125,7 +125,85 @@ class ActionsDigiriskdolibarr
 				</script>
 				<?php
 			}
+		} else if (($parameters['currentcontext'] == 'projecttaskcard') || ($parameters['currentcontext'] == 'projecttaskscard') || ($parameters['currentcontext'] == 'tasklist')) {
+			if ((GETPOST('action') == '' || empty(GETPOST('action')) || GETPOST('action') != 'edit')) {
+				require_once __DIR__ . '/../../../projet/class/task.class.php';
+				require_once __DIR__ . '/../class/riskanalysis/risk.class.php';
+				require_once __DIR__ . '/../class/preventionplan.class.php';
+				require_once __DIR__ . '/../class/firepermit.class.php';
+				require_once __DIR__ . '/../class/accident.class.php';
 
+				$task           = new Task($db);
+				$risk           = new Risk($db);
+				$preventionplan = new PreventionPlan($db);
+				$firepermit     = new FirePermit($db);
+				$accident       = new Accident($db);
+
+				if ($parameters['currentcontext'] == 'projecttaskcard') {
+					$task->fetch(GETPOST('id'));
+					$task->fetch_optionals();
+
+					$risk_id           = $task->array_options['options_fk_risk'];
+					$preventionplan_id = $task->array_options['options_fk_preventionplan'];
+					$firepermit_id     = $task->array_options['options_fk_firepermit'];
+					$accident_id       = $task->array_options['options_fk_accident'];
+
+					$risk->fetch($risk_id);
+					$preventionplan->fetch($preventionplan_id);
+					$firepermit->fetch($firepermit_id);
+					$accident->fetch($accident_id);
+					?>
+					<script>
+						jQuery('.project_task_extras_fk_risk').html(<?php echo json_encode($risk->getNomUrl(1, 'blank')) ?>);
+						jQuery('.project_task_extras_fk_preventionplan').html(<?php echo json_encode($preventionplan->getNomUrl(1, 'blank')) ?>);
+						jQuery('.project_task_extras_fk_firepermit').html(<?php echo json_encode($firepermit->getNomUrl(1)) ?>);
+						jQuery('.project_task_extras_fk_accident').html(<?php echo json_encode($accident->getNomUrl(1)) ?>);
+					</script>
+					<?php
+				}
+
+				if (($parameters['currentcontext'] == 'projecttaskscard') || ($parameters['currentcontext'] == 'tasklist')) {
+					$task        = new Task($db);
+					$extrafields = new ExtraFields($db);
+
+					$extrafields->fetch_name_optionals_label($task->table_element);
+					$alltasks = $task->getTasksArray(null, null, 0, 0, 0, '', '-1', '', 0, 0, $extrafields);
+
+					if (is_array($alltasks) && !empty($alltasks)) {
+						foreach ($alltasks as $tasksingle) {
+							$risk_id = $tasksingle->options_fk_risk;
+							$preventionplan_id = $tasksingle->options_fk_preventionplan;
+							$firepermit_id = $tasksingle->options_fk_firepermit;
+							$accident_id = $tasksingle->options_fk_accident;
+
+							$risk->fetch($risk_id);
+							$preventionplan->fetch($preventionplan_id);
+							$firepermit->fetch($firepermit_id);
+							$accident->fetch($accident_id);
+							if ($parameters['currentcontext'] == 'projecttaskscard') {
+								?>
+								<script>
+									jQuery('.div-table-responsive').find('tr[id="row-' + <?php echo $tasksingle->id; ?> +'"]').find('td[data-key="projet_task.fk_risk"]').html(<?php echo json_encode($risk->getNomUrl(1, 'blank')) ?>);
+									jQuery('.div-table-responsive').find('tr[id="row-' + <?php echo $tasksingle->id; ?> +'"]').find('td[data-key="projet_task.fk_preventionplan"]').html(<?php echo json_encode($preventionplan->getNomUrl(1, 'blank')) ?>);
+									jQuery('.div-table-responsive').find('tr[id="row-' + <?php echo $tasksingle->id; ?> +'"]').find('td[data-key="projet_task.fk_firepermit"]').html(<?php echo json_encode($firepermit->getNomUrl(1)) ?>);
+									jQuery('.div-table-responsive').find('tr[id="row-' + <?php echo $tasksingle->id; ?> +'"]').find('td[data-key="projet_task.fk_accident"]').html(<?php echo json_encode($accident->getNomUrl(1)) ?>);
+								</script>
+								<?php
+							}
+							if ($parameters['currentcontext'] == 'tasklist') {
+								?>
+								<script>
+									jQuery('.div-table-responsive').find('tr[data-rowid="' + <?php echo $tasksingle->id; ?> +'"]').find('td[data-key="projet_task.fk_risk"]').html(<?php echo json_encode($risk->getNomUrl(1, 'blank')) ?>);
+									jQuery('.div-table-responsive').find('tr[data-rowid="' + <?php echo $tasksingle->id; ?> +'"]').find('td[data-key="projet_task.fk_preventionplan"]').html(<?php echo json_encode($preventionplan->getNomUrl(1, 'blank')) ?>);
+									jQuery('.div-table-responsive').find('tr[data-rowid="' + <?php echo $tasksingle->id; ?> +'"]').find('td[data-key="projet_task.fk_firepermit"]').html(<?php echo json_encode($firepermit->getNomUrl(1)) ?>);
+									jQuery('.div-table-responsive').find('tr[data-rowid="' + <?php echo $tasksingle->id; ?> +'"]').find('td[data-key="projet_task.fk_accident"]').html(<?php echo json_encode($accident->getNomUrl(1)) ?>);
+								</script>
+								<?php
+							}
+						}
+					}
+				}
+			}
 		}
 
 		if (true) {

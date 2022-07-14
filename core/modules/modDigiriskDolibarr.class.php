@@ -405,7 +405,10 @@ class modDigiriskdolibarr extends DolibarrModules
 				'globaladmin',
 				'emailtemplates',
 				'mainloginpage',
-				'ticketcard'
+				'ticketcard',
+				'projecttaskcard',
+				'projecttaskscard',
+				'tasklist'
 			),
 			'tabs' => array(
 				'mycompany_admin'
