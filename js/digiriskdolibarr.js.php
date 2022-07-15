@@ -2438,6 +2438,7 @@ window.eoxiaJS.riskassessmenttask.event = function() {
 	$( document ).on( 'click', '.riskassessment-task-progress-checkbox:not(.riskassessment-task-progress-checkbox-readonly)', window.eoxiaJS.riskassessmenttask.checkTaskProgress );
 	$( document ).on( 'change', '#RiskassessmentTaskTimespentDatehour', window.eoxiaJS.riskassessmenttask.selectRiskassessmentTaskTimespentDateHour );
 	$( document ).on( 'change', '#RiskassessmentTaskTimespentDatemin', window.eoxiaJS.riskassessmenttask.selectRiskassessmentTaskTimespentDateMin );
+	$( document ).on( 'keyup', '.riskassessment-task-label', window.eoxiaJS.riskassessmenttask.checkRiskassessmentTaskLabelLength );
 };
 
 /**
@@ -2944,6 +2945,32 @@ window.eoxiaJS.riskassessmenttask.selectRiskassessmentTaskTimespentDateHour = fu
 window.eoxiaJS.riskassessmenttask.selectRiskassessmentTaskTimespentDateMin = function( event ) {
 	$(this).closest('.nowraponall').find('.select-riskassessmenttask-timespent-datemin').remove();
 	$(this).before('<input class="select-riskassessmenttask-timespent-datemin" type="hidden" id="RiskassessmentTaskTimespentDatemin" name="RiskassessmentTaskTimespentDatemin" value='+$(this).val()+'>')
+};
+
+/**
+ * Check riskassessmenttask label length
+ *
+ * @since   9.4.0
+ * @version 9.4.0
+ *
+ * @param  {MouseEvent} event [description]
+ * @return {void}
+ */
+window.eoxiaJS.riskassessmenttask.checkRiskassessmentTaskLabelLength = function( event ) {
+	var labelLenght = $(this).val().length;
+	if (labelLenght > 255) {
+		let actionContainerWarning = $('.messageWarningTaskLabel');
+		actionContainerWarning.removeClass('hidden');
+		$('.riskassessment-task-create').removeClass('button-blue');
+		$('.riskassessment-task-create').addClass('button-grey');
+		$('.riskassessment-task-create').addClass('button-disable');
+	} else {
+		let actionContainerWarning = $('.messageWarningTaskLabel');
+		actionContainerWarning.addClass('hidden');
+		$('.riskassessment-task-create').addClass('button-blue');
+		$('.riskassessment-task-create').removeClass('button-grey');
+		$('.riskassessment-task-create').removeClass('button-disable');
+	}
 };
 
 /**
