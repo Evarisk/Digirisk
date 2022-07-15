@@ -520,8 +520,11 @@ class doc_workunitdocument_odt extends ModeleODTWorkUnitDocument
 						if ($evaluators !== -1) {
 							$listlines = $odfHandler->setSegment('utilisateursPresents');
 							foreach ($evaluators as $line) {
+								$element = new DigiriskElement($this->db);
+								$element->fetch($line->fk_element);
 								$user->fetch($line->fk_user);
 
+								$tmparray['nomElement']                 = (!empty($conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_EVALUATORS) ? 'S' . $element->entity . ' - ' : '') . $element->ref . ' - ' . $element->label;
 								$tmparray['idUtilisateur']              = $line->ref;
 								$tmparray['dateAffectationUtilisateur'] = dol_print_date($line->assignment_date, '%d/%m/%Y');
 								$tmparray['dureeEntretien']             = $line->duration;
@@ -563,8 +566,11 @@ class doc_workunitdocument_odt extends ModeleODTWorkUnitDocument
 						if ($risksigns !== -1) {
 							$listlines = $odfHandler->setSegment('affectedRecommandation');
 							foreach ($risksigns as $line) {
+								$element = new DigiriskElement($this->db);
+								$element->fetch($line->fk_element);
 								$path = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/img/';
 
+								$tmparray['nomElement']                = (!empty($conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKSIGNS) ? 'S' . $element->entity . ' - ' : '') . $element->ref . ' - ' . $element->label;
 								$tmparray['recommandationIcon']        = $path . '/' . $risksign->get_risksign_category($line);
 								$tmparray['identifiantRecommandation'] = $line->ref;
 								$tmparray['recommandationName']        = $line->get_risksign_category($line, 'name');
@@ -616,6 +622,16 @@ class doc_workunitdocument_odt extends ModeleODTWorkUnitDocument
 
 								$tmparray['identifiantAccident'] = $line->ref;
 								$tmparray['AccidentName']        = $line->label;
+
+								$accidentWorkStop = new AccidentWorkStop($this->db);
+								$allAccidentWorkStop = $accidentWorkStop->fetchFromParent($line->id);
+								if (!empty($allAccidentWorkStop) && is_array($allAccidentWorkStop)) {
+									foreach ($allAccidentWorkStop as $accidentWorkStopsingle) {
+										$nbAccidentWorkStop += $accidentWorkStopsingle->workstop_days;
+									}
+								}
+
+								$tmparray['AccidentWorkStopDays'] = $nbAccidentWorkStop;
 								$tmparray['AccidentComment']     = $line->description;
 
 								unset($tmparray['object_fields']);
