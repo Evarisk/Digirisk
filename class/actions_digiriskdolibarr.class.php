@@ -96,6 +96,8 @@ class ActionsDigiriskdolibarr
 			print ajax_combobox('selectDIGIRISKDOLIBARR_COLLECTIVE_AGREEMENT_TITLE');
 		} else if ($parameters['currentcontext'] == 'ticketcard') {
 			if (GETPOST('action') == 'view' || empty(GETPOST('action'))) {
+				print '<link rel="stylesheet" type="text/css" href="../custom/digiriskdolibarr/css/digiriskdolibarr.css">';
+
 				require_once __DIR__ . '/../lib/digiriskdolibarr_function.lib.php';
 				require_once __DIR__ . '/../class/digiriskdocuments/ticketdocument.class.php';
 				require_once __DIR__ . '/../core/modules/digiriskdolibarr/digiriskdocuments/ticketdocument/mod_ticketdocument_standard.php';
