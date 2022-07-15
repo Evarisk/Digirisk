@@ -388,8 +388,8 @@ class doc_firepermitdocument_odt extends ModeleODTFirePermitDocument
 			$tmparray['titre_plan_prevention']  = $preventionplan->ref;
 			$tmparray['raison_plan_prevention'] = $preventionplan->label;
 
-			$tmparray['date_start_intervention_PPP'] = dol_print_date($preventionplan->date_start, 'dayhoursec', 'tzuser');
-			$tmparray['date_end_intervention_PPP']   = dol_print_date($preventionplan->date_end, 'dayhoursec', 'tzuser');
+			$tmparray['date_start_intervention_PPP'] = dol_print_date($preventionplan->date_start, 'dayhoursec');
+			$tmparray['date_end_intervention_PPP']   = dol_print_date($preventionplan->date_end, 'dayhoursec');
 
 			$morewhere  = ' AND element_id = ' . $preventionplan->id;
 			$morewhere .= ' AND element_type = ' . "'" . $preventionplan->element . "'";
@@ -426,8 +426,8 @@ class doc_firepermitdocument_odt extends ModeleODTFirePermitDocument
 				$tmparray['interventions_info'] = 0;
 			}
 
-			$tmparray['date_start_intervention_FP'] = dol_print_date($firepermit->date_start, 'dayhoursec', 'tzuser');
-			$tmparray['date_end_intervention_FP']   = dol_print_date($firepermit->date_end, 'dayhoursec', 'tzuser');
+			$tmparray['date_start_intervention_FP'] = dol_print_date($firepermit->date_start, 'dayhoursec');
+			$tmparray['date_end_intervention_FP']   = dol_print_date($firepermit->date_end, 'dayhoursec');
 
 			$morewhere  = ' AND element_id = ' . $firepermit->id;
 			$morewhere .= ' AND element_type = ' . "'" . $firepermit->element . "'";
@@ -489,7 +489,7 @@ class doc_firepermitdocument_odt extends ModeleODTFirePermitDocument
 				$tmparray['maitre_oeuvre_email'] = $maitreoeuvre->email;
 				$tmparray['maitre_oeuvre_phone'] = $maitreoeuvre->phone;
 
-				$tmparray['maitre_oeuvre_signature_date'] = dol_print_date($maitreoeuvre->signature_date, 'dayhoursec', 'tzuser');
+				$tmparray['maitre_oeuvre_signature_date'] = dol_print_date($maitreoeuvre->signature_date, 'dayhoursec');
 				$encoded_image                            = explode(",",  $maitreoeuvre->signature)[1];
 				$decoded_image                            = base64_decode($encoded_image);
 				file_put_contents($tempdir . "signature.png", $decoded_image);
@@ -502,7 +502,7 @@ class doc_firepermitdocument_odt extends ModeleODTFirePermitDocument
 				$tmparray['intervenant_exterieur_email'] = $extsocietyresponsible->email;
 				$tmparray['intervenant_exterieur_phone'] = $extsocietyresponsible->phone;
 
-				$tmparray['intervenant_exterieur_signature_date'] = dol_print_date($extsocietyresponsible->signature_date, 'dayhoursec', 'tzuser');
+				$tmparray['intervenant_exterieur_signature_date'] = dol_print_date($extsocietyresponsible->signature_date, 'dayhoursec');
 				$encoded_image                                    = explode(",",  $extsocietyresponsible->signature)[1];
 				$decoded_image                                    = base64_decode($encoded_image);
 				file_put_contents($tempdir . "signature2.png", $decoded_image);

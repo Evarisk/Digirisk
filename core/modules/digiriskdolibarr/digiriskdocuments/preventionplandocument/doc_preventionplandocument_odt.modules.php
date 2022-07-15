@@ -365,8 +365,8 @@ class doc_preventionplandocument_odt extends ModeleODTPreventionPlanDocument
 			$tmparray['prior_visit_date'] = dol_print_date($preventionplan->prior_visit_date, 'dayhoursec');
 			$tmparray['prior_visit_text'] = $preventionplan->prior_visit_text;
 
-			$tmparray['date_start_intervention_PPP'] = dol_print_date($preventionplan->date_start, 'dayhoursec', 'tzuser');
-			$tmparray['date_end_intervention_PPP']   = dol_print_date($preventionplan->date_end, 'dayhoursec', 'tzuser');
+			$tmparray['date_start_intervention_PPP'] = dol_print_date($preventionplan->date_start, 'dayhoursec');
+			$tmparray['date_end_intervention_PPP']   = dol_print_date($preventionplan->date_end, 'dayhoursec');
 			if (is_array($preventionplanlines)) {
 				$tmparray['interventions_info'] = count($preventionplanlines) . " " . $langs->trans('PreventionPlanLine');
 			} else {
@@ -443,7 +443,7 @@ class doc_preventionplandocument_odt extends ModeleODTPreventionPlanDocument
 				$tmparray['maitre_oeuvre_email'] = $maitreoeuvre->email;
 				$tmparray['maitre_oeuvre_phone'] = $maitreoeuvre->phone;
 
-				$tmparray['maitre_oeuvre_signature_date'] = dol_print_date($maitreoeuvre->signature_date, 'dayhoursec', 'tzuser');
+				$tmparray['maitre_oeuvre_signature_date'] = dol_print_date($maitreoeuvre->signature_date, 'dayhoursec');
 				$encoded_image                            = explode(",",  $maitreoeuvre->signature)[1];
 				$decoded_image                            = base64_decode($encoded_image);
 				file_put_contents($tempdir . "signature.png", $decoded_image);
@@ -457,7 +457,7 @@ class doc_preventionplandocument_odt extends ModeleODTPreventionPlanDocument
 				$tmparray['intervenant_exterieur_phone'] = $extsocietyresponsible->phone;
 
 				//@todo when attendance will be created
-				$tmparray['intervenant_exterieur_signature_date'] = dol_print_date($extsocietyresponsible->signature_date, 'dayhoursec', 'tzuser');
+				$tmparray['intervenant_exterieur_signature_date'] = dol_print_date($extsocietyresponsible->signature_date, 'dayhoursec');
 				$encoded_image                                    = explode(",",  $extsocietyresponsible->signature)[1];
 				$decoded_image                                    = base64_decode($encoded_image);
 				file_put_contents($tempdir . "signature2.png", $decoded_image);
