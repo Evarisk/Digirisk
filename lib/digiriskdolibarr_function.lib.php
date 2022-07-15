@@ -303,7 +303,7 @@ function digiriskshowdocuments($modulepart, $modulesubdir, $filedir, $urlsource,
 		// Model
 		if ( ! empty($modellist)) {
 			asort($modellist);
-			$out      .= '<span class="hideonsmartphone">' . $langs->trans('Model') . ' </span>';
+			$out      .= '<span class="hideonsmartphone"> <i class="fas fa-file-word"></i> </span>';
 			$modellist = array_filter($modellist, 'remove_index');
 			if (is_array($modellist)) {
 				foreach ($modellist as $key => $modellistsingle) {
@@ -325,21 +325,25 @@ function digiriskshowdocuments($modulepart, $modulesubdir, $filedir, $urlsource,
 
 		// Button
 		if ($active) {
-			$genbutton  = '<input class="button buttongen" id="' . $forname . '_generatebutton" name="' . $forname . '_generatebutton"';
-			$genbutton .= ' type="submit" value="' . $buttonlabel . '"';
+			$genbutton  = '<input style="display : none" class="button buttongen" id="' . $forname . '_generatebutton" name="' . $forname . '_generatebutton" type="submit" value="' . $buttonlabel . '"' . '>';
+			$genbutton .= '<label for="' . $forname . '_generatebutton">';
+			$genbutton .= '<div class="wpeo-button button-square-40 button-blue wpeo-tooltip-event" aria-label="' . $langs->trans('Generate') . '"><i class="fas fa-print button-icon"></i><i class="fas fa-check-circle button-add" style="color:#47e58e"></i></div>';
+			$genbutton .= '</label>';
 		} else {
-			$genbutton  = '<input class="button buttongen disabled" name="' . $forname . '_generatebutton" style="cursor: not-allowed"';
-			$genbutton .= '  value="' . $buttonlabel . '"';
+			$genbutton  = '<input style="display : none" class="button buttongen disabled" name="' . $forname . '_generatebutton" style="cursor: not-allowed" value="' . $buttonlabel . '"' . '>';
+			$genbutton .= '<label for="' . $forname . '_generatebutton">';
+			$genbutton .= '<div class="wpeo-button button-square-40 button-grey wpeo-tooltip-event" aria-label="' . $langs->trans('Generate') . '"><i class="fas fa-print button-icon"></i><i class="fas fa-times-circle button-add" style="color:#e05353"></i></div>';
+			$genbutton .= '</label>';
 		}
 
-		if ( ! $allowgenifempty && ! is_array($modellist) && empty($modellist)) $genbutton .= ' disabled';
-		$genbutton                                                                         .= '>';
-		if ($allowgenifempty && ! is_array($modellist) && empty($modellist) && empty($conf->dol_no_mouse_hover) && $modulepart != 'unpaid') {
-			$langs->load("errors");
-			$genbutton .= ' ' . img_warning($langs->transnoentitiesnoconv("WarningNoDocumentModelActivated"));
-		}
-		if ( ! $allowgenifempty && ! is_array($modellist) && empty($modellist) && empty($conf->dol_no_mouse_hover) && $modulepart != 'unpaid') $genbutton = '';
-		if (empty($modellist) && ! $showempty && $modulepart != 'unpaid') $genbutton                                                                      = '';
+//		if ( ! $allowgenifempty && ! is_array($modellist) && empty($modellist)) $genbutton .= ' disabled';
+//		$genbutton                                                                         .= '>';
+//		if ($allowgenifempty && ! is_array($modellist) && empty($modellist) && empty($conf->dol_no_mouse_hover) && $modulepart != 'unpaid') {
+//			$langs->load("errors");
+//			$genbutton .= ' ' . img_warning($langs->transnoentitiesnoconv("WarningNoDocumentModelActivated"));
+//		}
+//		if ( ! $allowgenifempty && ! is_array($modellist) && empty($modellist) && empty($conf->dol_no_mouse_hover) && $modulepart != 'unpaid') $genbutton = '';
+//		if (empty($modellist) && ! $showempty && $modulepart != 'unpaid') $genbutton                                                                      = '';
 		$out                                                                                                                                             .= $genbutton;
 		if ( ! $active) {
 			$htmltooltip  = '';
