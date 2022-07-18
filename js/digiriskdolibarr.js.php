@@ -3871,7 +3871,7 @@ window.eoxiaJS.menu.event = function() {
  * Action Toggle main menu.
  *
  * @since   8.5.0
- * @version 9.0.1
+ * @version 9.4.0
  *
  * @return {void}
  */
@@ -3881,7 +3881,7 @@ window.eoxiaJS.menu.toggleMenu = function() {
 	var elementParent = $(this).closest('#id-left').find('div.vmenu')
 	var text = '';
 
-	if ($(this).find('.minimizeMenu').length > 0) {
+	if ($(this).find('span.vmenu').find('.fa-chevron-circle-left').length > 0) {
 
 		menu.each(function () {
 			text = $(this).html().split('</i>');
@@ -3894,13 +3894,14 @@ window.eoxiaJS.menu.toggleMenu = function() {
 
 		elementParent.css('width', '30px');
 		elementParent.find('.blockvmenusearch').hide();
+		$('span.vmenu').attr('title', ' Agrandir le menu')
 
-		$('.minimizeMenu').html($('.minimizeMenu').html() + ' >')
+		$('span.vmenu').html($('span.vmenu').html());
 
-		$(this).find('.minimizeMenu').removeClass('minimizeMenu').addClass('maximizeMenu');
+		$(this).find('span.vmenu').find('.fa-chevron-circle-left').removeClass('fa-chevron-circle-left').addClass('fa-chevron-circle-right');
 		localStorage.setItem('maximized', 'false')
 
-	} else if ($(this).find('.maximizeMenu').length > 0) {
+	} else if ($(this).find('span.vmenu').find('.fa-chevron-circle-right').length > 0) {
 
 		menu.each(function () {
 			$(this).html($(this).html().replace('&gt;','') + ' ' + $(this).attr('title'));
@@ -3908,11 +3909,13 @@ window.eoxiaJS.menu.toggleMenu = function() {
 
 		elementParent.css('width', '188px');
 		elementParent.find('.blockvmenusearch').show();
-		$('div.menu_titre').attr('style', 'width: 188px !important')
+		$('div.menu_titre').attr('style', 'width: 188px !important; cursor : pointer' )
+		$('span.vmenu').attr('title', ' Réduire le menu')
+		$('span.vmenu').html('<i class="fas fa-chevron-circle-left"></i> Réduire le menu');
 
 		localStorage.setItem('maximized', 'true')
 
-		$(this).find('.maximizeMenu').removeClass('maximizeMenu').addClass('minimizeMenu');
+		$(this).find('span.vmenu').find('.fa-chevron-circle-right').removeClass('fa-chevron-circle-right').addClass('fa-chevron-circle-left');
 	}
 };
 
@@ -3925,7 +3928,7 @@ window.eoxiaJS.menu.toggleMenu = function() {
  * @return {void}
  */
 window.eoxiaJS.menu.setMenu = function() {
-	$('.minimizeMenu').parent().parent().parent().attr('style', 'cursor:pointer ! important')
+	$('span.vmenu').find('.fa-chevron-circle-left').parent().parent().parent().attr('style', 'cursor:pointer ! important')
 
 	if (localStorage.maximized == 'false') {
 		$('#id-left').attr('style', 'display:none !important')
@@ -3944,9 +3947,10 @@ window.eoxiaJS.menu.setMenu = function() {
 
 		$('#id-left').attr('style', 'display:block !important')
 		$('div.menu_titre').attr('style', 'width: 50px !important')
+		$('span.vmenu').attr('title', ' Agrandir le menu')
 
-		$('.minimizeMenu').html($('.minimizeMenu').html() + ' >')
-		$('.minimizeMenu').removeClass('minimizeMenu').addClass('maximizeMenu');
+		$('span.vmenu').html($('span.vmenu').html())
+		$('span.vmenu').find('.fa-chevron-circle-left').removeClass('fa-chevron-circle-left').addClass('fa-chevron-circle-right');
 
 		elementParent.css('width', '30px');
 		elementParent.find('.blockvmenusearch').hide();
