@@ -327,12 +327,13 @@ function digiriskshowdocuments($modulepart, $modulesubdir, $filedir, $urlsource,
 		if ($active) {
 			$genbutton  = '<input style="display : none" class="button buttongen" id="' . $forname . '_generatebutton" name="' . $forname . '_generatebutton" type="submit" value="' . $buttonlabel . '"' . '>';
 			$genbutton .= '<label for="' . $forname . '_generatebutton">';
-			$genbutton .= '<div class="wpeo-button button-square-40 button-blue wpeo-tooltip-event" aria-label="' . $langs->trans('Generate') . '"><i class="fas fa-print button-icon"></i><i class="fas fa-check-circle button-add" style="color:#47e58e"></i></div>';
+			$genbutton .= '<div class="wpeo-button button-square-40 button-blue wpeo-tooltip-event" aria-label="' . $langs->trans('Generate') . '"><i class="fas fa-print button-icon"></i></div>';
 			$genbutton .= '</label>';
 		} else {
 			$genbutton  = '<input style="display : none" class="button buttongen disabled" name="' . $forname . '_generatebutton" style="cursor: not-allowed" value="' . $buttonlabel . '"' . '>';
 			$genbutton .= '<label for="' . $forname . '_generatebutton">';
-			$genbutton .= '<div class="wpeo-button button-square-40 button-grey wpeo-tooltip-event" aria-label="' . $langs->trans('Generate') . '"><i class="fas fa-print button-icon"></i><i class="fas fa-times-circle button-add" style="color:#e05353"></i></div>';
+			$genbutton .= '<i class="fas fa-exclamation-triangle pictowarning wpeo-tooltip-event" aria-label="' . $langs->trans($tooltiptext) . '"></i>';
+			$genbutton .= '<div class="wpeo-button button-square-40 button-grey wpeo-tooltip-event" aria-label="' . $langs->trans('Generate') . '"><i class="fas fa-print button-icon"></i></div>';
 			$genbutton .= '</label>';
 		}
 
@@ -345,14 +346,14 @@ function digiriskshowdocuments($modulepart, $modulesubdir, $filedir, $urlsource,
 //		if ( ! $allowgenifempty && ! is_array($modellist) && empty($modellist) && empty($conf->dol_no_mouse_hover) && $modulepart != 'unpaid') $genbutton = '';
 //		if (empty($modellist) && ! $showempty && $modulepart != 'unpaid') $genbutton                                                                      = '';
 		$out                                                                                                                                             .= $genbutton;
-		if ( ! $active) {
-			$htmltooltip  = '';
-			$htmltooltip .= $tooltiptext;
-
-			$out .= '<span class="center">';
-			$out .= $form->textwithpicto($langs->trans('Help'), $htmltooltip, 1, 0);
-			$out .= '</span>';
-		}
+//		if ( ! $active) {
+//			$htmltooltip  = '';
+//			$htmltooltip .= $tooltiptext;
+//
+//			$out .= '<span class="center">';
+//			$out .= $form->textwithpicto($langs->trans('Help'), $htmltooltip, 1, 0);
+//			$out .= '</span>';
+//		}
 
 		$out .= '</th>';
 
