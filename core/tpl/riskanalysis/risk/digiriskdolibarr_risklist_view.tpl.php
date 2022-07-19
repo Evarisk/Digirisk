@@ -394,6 +394,7 @@
 		$sql                                                                                                                                                      .= " LEFT JOIN " . MAIN_DB_PREFIX . $risk->table_element . " as r on (evaluation.fk_risk = r.rowid)";
 		$sql                                                                                                                                                      .= " LEFT JOIN " . MAIN_DB_PREFIX . $digiriskelement->table_element . " as e on (r.fk_element = e.rowid)";
 		if (is_array($extrafields->attributes[$evaluation->table_element]['label']) && count($extrafields->attributes[$evaluation->table_element]['label'])) $sql .= " LEFT JOIN " . MAIN_DB_PREFIX . $evaluation->table_element . "_extrafields as ef on (evaluation.rowid = ef.fk_object)";
+		if ($sortfield == 'evaluation.has_tasks')                                                                                                            $sql .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'projet_task_extrafields as taskextrafields ON (taskextrafields.fk_risk = r.rowid)';
 		if ($evaluation->ismultientitymanaged == 1) $sql                                                                                                          .= " WHERE evaluation.entity IN (" . getEntity($evaluation->element) . ")";
 		else $sql                                                                                                                                                 .= " WHERE 1 = 1";
 		$sql                                                                                                                                                      .= " AND evaluation.status = 1";
@@ -429,6 +430,7 @@
 			}
 		}
 		if ($search_all) $sql .= natural_search(array_keys($fieldstosearchall), $search_all);
+
 		// Add where from extra fields
 		include DOL_DOCUMENT_ROOT . '/core/tpl/extrafields_list_search_sql.tpl.php';
 		// Add where from hooks
@@ -436,7 +438,11 @@
 		$reshook    = $hookmanager->executeHooks('printFieldListWhere', $parameters, $evaluation); // Note that $action and $evaluation may have been modified by hook
 		$sql       .= $hookmanager->resPrint;
 
-		$sql .= $db->order($sortfield, $sortorder);
+		if ($sortfield == 'evaluation.has_tasks') {
+			$sql .= ' ORDER BY ' . 'taskextrafields.fk_object ' . $sortorder;
+		} else {
+			$sql .= $db->order($sortfield, $sortorder);
+		}
 
 		// Count total nb of records
 		$nbtotalofrecords = '';
