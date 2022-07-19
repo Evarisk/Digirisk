@@ -1258,8 +1258,7 @@ OnTheTask = sur la tâche
 TaskTimeSpentDuration = Durée du temps consommé
 TaskTimeSpentDurationDescription = Le temps consommé ajouté par défaut à chaque tâche
 NoTaskShared = Pas de tâche en cours ou partagées
-WarningTaskLabel = Attention vous avez dépassé le nombre de caractères maximun autorisés (255)
-
+WarningTaskLabel = Attention vous avez dépassé le nombre de caractères maximum autorisé (255)
 
 
 #
