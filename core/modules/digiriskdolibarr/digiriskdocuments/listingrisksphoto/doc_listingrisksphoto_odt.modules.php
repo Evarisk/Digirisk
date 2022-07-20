@@ -407,10 +407,18 @@ class doc_listingrisksphoto_odt extends ModeleODTListingRisksPhoto
 											$hookmanager->executeHooks('ODTSubstitutionLine', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
 											foreach ($tmparray as $key => $val) {
 												try {
-													if (file_exists($val) && $val == $image) {
-														$listlines->setImage($key, $val);
-													} elseif ($val == $tmparray['nomDanger']) {
-														$listlines->setImage($key, $val);
+													if ($key == 'photoAssociee') {
+														if (file_exists($val)) {
+															$listlines->setImage($key, $val);
+														} else {
+															$listlines->setVars($key, $langs->trans('NoData'), true, 'UTF-8');
+														}
+													} elseif ($key == 'nomDanger') {
+														if (file_exists($val)) {
+															$listlines->setImage($key, $val);
+														} else {
+															$listlines->setVars($key, $langs->trans('NoData'), true, 'UTF-8');
+														}
 													} elseif (empty($val) && $val != '0') {
 														$listlines->setVars($key, $langs->trans('NoData'), true, 'UTF-8');
 													} else {
@@ -497,10 +505,18 @@ class doc_listingrisksphoto_odt extends ModeleODTListingRisksPhoto
 											$hookmanager->executeHooks('ODTSubstitutionLine', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
 											foreach ($tmparray as $key => $val) {
 												try {
-													if (file_exists($val) && $val == $image) {
-														$listlines->setImage($key, $val);
-													} elseif ($val == $tmparray['nomDanger']) {
-														$listlines->setImage($key, $val);
+													if ($key == 'photoAssociee') {
+														if (file_exists($val)) {
+															$listlines->setImage($key, $val);
+														} else {
+															$listlines->setVars($key, $langs->trans('NoData'), true, 'UTF-8');
+														}
+													} elseif ($key == 'nomDanger') {
+														if (file_exists($val)) {
+															$listlines->setImage($key, $val);
+														} else {
+															$listlines->setVars($key, $langs->trans('NoData'), true, 'UTF-8');
+														}
 													} elseif (empty($val) && $val != '0') {
 														$listlines->setVars($key, $langs->trans('NoData'), true, 'UTF-8');
 													} else {

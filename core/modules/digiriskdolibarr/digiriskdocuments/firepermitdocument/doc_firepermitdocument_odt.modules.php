@@ -549,7 +549,7 @@ class doc_firepermitdocument_odt extends ModeleODTFirePermitDocument
 
 							foreach ($tmparray as $key => $val) {
 								try {
-									if ($val == $tmparray['risk']) {
+									if ($key == 'risk') {
 										$listlines->setImage($key, $val);
 									} elseif (empty($val)) {
 										$listlines->setVars($key, $langs->trans('NoData'), true, 'UTF-8');
@@ -600,7 +600,7 @@ class doc_firepermitdocument_odt extends ModeleODTFirePermitDocument
 
 							foreach ($tmparray as $key => $val) {
 								try {
-									if ($val == $tmparray['type_de_travaux']) {
+									if ($key == 'type_de_travaux') {
 										$listlines->setImage($key, $val);
 									} elseif (empty($val)) {
 										$listlines->setVars($key, $langs->trans('NoData'), true, 'UTF-8');

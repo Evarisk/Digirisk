@@ -504,7 +504,7 @@ class doc_preventionplandocument_odt extends ModeleODTPreventionPlanDocument
 
 							foreach ($tmparray as $key => $val) {
 								try {
-									if ($val == $tmparray['risk']) {
+									if ($key == 'risk') {
 										$listlines->setImage($key, $val);
 									} elseif (empty($val)) {
 										$listlines->setVars($key, $langs->trans('NoData'), true, 'UTF-8');

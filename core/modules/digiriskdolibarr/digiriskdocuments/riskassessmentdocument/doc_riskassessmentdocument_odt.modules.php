@@ -630,8 +630,12 @@ class doc_riskassessmentdocument_odt extends ModeleODTRiskAssessmentDocument
 											$hookmanager->executeHooks('ODTSubstitutionLine', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
 											foreach ($tmparray as $key => $val) {
 												try {
-													if ($val == $tmparray['nomDanger']) {
-														$listlines->setImage($key, $val);
+													if ($key == 'nomDanger') {
+														if (file_exists($val)) {
+															$listlines->setImage($key, $val);
+														} else {
+															$listlines->setVars($key, $langs->trans('NoData'), true, 'UTF-8');
+														}
 													} elseif (empty($val) && $val != '0') {
 														$listlines->setVars($key, $langs->trans('NoData'), true, 'UTF-8');
 													} else {

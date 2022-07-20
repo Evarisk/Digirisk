@@ -468,10 +468,14 @@ class doc_groupmentdocument_odt extends ModeleODTGroupmentDocument
 
 											foreach ($tmparray as $key => $val) {
 												try {
-													if ($val == $tmparray['nomDanger']) {
-														$listlines->setImage($key, $val);
-													} elseif (empty($val) && $val != '0') {
+													if ($key == 'nomDanger') {
+														if (file_exists($val)) {
+															$listlines->setImage($key, $val);
+														} else {
 															$listlines->setVars($key, $langs->trans('NoData'), true, 'UTF-8');
+														}
+													} elseif (empty($val) && $val != '0') {
+														$listlines->setVars($key, $langs->trans('NoData'), true, 'UTF-8');
 													} else {
 														$listlines->setVars($key, html_entity_decode($val, ENT_QUOTES | ENT_HTML5), true, 'UTF-8');
 													}
