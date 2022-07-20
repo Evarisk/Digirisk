@@ -1414,7 +1414,11 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 		$defaultmodel = $conf->global->DIGIRISKDOLIBARR_PREVENTIONPLANDOCUMENT_DEFAULT_MODEL;
 		$title        = $langs->trans('PreventionPlanDocument');
 
-		print digiriskshowdocuments($modulepart, $dir_files, $filedir, $urlsource, $permissiontoadd, 0, $defaultmodel, 1, 0, '', $title, '', '', $preventionplandocument, 0, 'remove_file', $object->status == 3 && empty(dol_dir_list($filedir)), $langs->trans('PreventionPlanMustBeLocked'));
+		if ($permissiontoadd || $permissiontoread) {
+			$genallowed = 1;
+		}	
+
+		print digiriskshowdocuments($modulepart, $dir_files, $filedir, $urlsource, $genallowed, 0, $defaultmodel, 1, 0, '', $title, '', '', $preventionplandocument, 0, 'remove_file', $object->status == 3 && empty(dol_dir_list($filedir)), $langs->trans('PreventionPlanMustBeLocked'));
 	}
 
 	if ($permissiontoadd) {

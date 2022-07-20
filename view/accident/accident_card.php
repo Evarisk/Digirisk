@@ -1311,7 +1311,11 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 		$defaultmodel = $conf->global->DIGIRISKDOLIBARR_ACCIDENTDOCUMENT_DEFAULT_MODEL;
 		$title        = $langs->trans('AccidentDocument');
 
-		print digiriskshowdocuments($modulepart, $dir_files, $filedir, $urlsource, $permissiontoadd, $permissiontodelete, $defaultmodel, 1, 0, '', $title, '', '', $accidentdocument, 0, 'remove_file', $object->status == 3 ? true : false, $langs->trans('AccidentMustBeLocked'));
+		if ($permissiontoadd || $permissiontoread) {
+			$genallowed = 1;
+		}
+
+		print digiriskshowdocuments($modulepart, $dir_files, $filedir, $urlsource, $genallowed, $permissiontodelete, $defaultmodel, 1, 0, '', $title, '', '', $accidentdocument, 0, 'remove_file', $object->status == 3 ? true : false, $langs->trans('AccidentMustBeLocked'));
 	}
 
 	if ($permissiontoadd) {

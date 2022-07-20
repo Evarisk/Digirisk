@@ -251,7 +251,11 @@ if ($includedocgeneration) {
 
 	$modulepart = 'digiriskdolibarr:ListingRisksPhoto';
 
-	print digiriskshowdocuments($modulepart, $dir_files, $filedir, $urlsource, $permissiontoadd, $permissiontodelete, $conf->global->DIGIRISKDOLIBARR_LISTINGRISKSPHOTO_DEFAULT_MODEL, 1, 0, '', $langs->trans('ListingRisksPhoto'), '', '', $listingrisksphoto);
+	if ($permissiontoadd || $permissiontoread) {
+		$genallowed = 1;
+	}
+
+	print digiriskshowdocuments($modulepart, $dir_files, $filedir, $urlsource, $genallowed, $permissiontodelete, $conf->global->DIGIRISKDOLIBARR_LISTINGRISKSPHOTO_DEFAULT_MODEL, 1, 0, '', $langs->trans('ListingRisksPhoto'), '', '', $listingrisksphoto);
 }
 
 // End of page
