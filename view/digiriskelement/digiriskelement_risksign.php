@@ -71,6 +71,7 @@ $page            = $page == -1 ? 0 : $page;
 
 // Initialize technical objects
 $object           = new DigiriskElement($db);
+$digiriskelement  = new DigiriskElement($db);
 $digiriskstandard = new DigiriskStandard($db);
 $risksign         = new RiskSign($db);
 $extrafields      = new ExtraFields($db);

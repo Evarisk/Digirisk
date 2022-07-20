@@ -94,6 +94,8 @@ if ( ! $allRisks) {
 	$sql .= " AND t.entity IN (" . getEntity($risksign->element) . ") ";
 }
 
+$search['fk_element_shared'] = GETPOST('search_fk_element_shared');
+
 foreach ($search as $key => $val) {
 	if ($key == 'status' && $search[$key] == -1) continue;
 	$mode_search = (($risksign->isInt($risksign->fields[$key]) || $risksign->isFloat($risksign->fields[$key])) ? 1 : 0);
@@ -104,10 +106,12 @@ foreach ($search as $key => $val) {
 	if ($key == 'category') {
 		$mode_search = 1;
 	}
+
 	if($search[$key] == '-1') {
 		$search[$key] = '';
 	}
-	if ($search[$key] != '') {
+
+	if ($search[$key] != '' && $key != 'fk_element') {
 		if ($key == 'ref') {
 			$sql .= " AND (t.ref = '$search[$key]')";
 		} elseif ($key == 'fk_element') {
@@ -116,6 +120,8 @@ foreach ($search as $key => $val) {
 			}
 		} elseif ($key == 'entity') {
 			$sql .= " AND (e.entity = '$search[$key]')";
+		} elseif ($key == 'fk_element_shared') {
+			$sql .= " AND (t.fk_element = '$search[$key]')";
 		} else {
 			$sql .= natural_search('t.'.$key, $search[$key], (($key == 'status') ? 2 : $mode_search));
 		}
@@ -235,7 +241,7 @@ foreach ($risksign->fields as $key => $val) {
 		} elseif ($key == 'entity') {
 			print select_entity_list($search['entity'], 'search_entity', 'e.rowid NOT IN (' . $conf->entity . ')');
 		} elseif ($key == 'fk_element') {
-			print $digiriskelement->select_digiriskelement_list($search['fk_element'], 'search_fk_element', 's.entity NOT IN (' . $conf->entity . ')', 1, 0, array(), 0, 0, 'minwidth100', 0, false, 1, $contextpage, false);
+			print $digiriskelement->select_digiriskelement_list($search['fk_element_shared'], 'search_fk_element_shared', 's.entity NOT IN (' . $conf->entity . ')', 1, 0, array(), 0, 0, 'minwidth100', 0, false, 1, $contextpage, false);
 		} elseif ($key == 'category') { ?>
 			<div class="wpeo-dropdown dropdown-large dropdown-grid category-danger padding" style="position: inherit">
 				<input class="input-hidden-danger" type="hidden" name="<?php echo 'search_' . $key ?>" value="<?php echo dol_escape_htmltag($search[$key]) ?>" />
