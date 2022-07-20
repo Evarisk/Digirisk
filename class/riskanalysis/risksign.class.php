@@ -270,6 +270,65 @@ class RiskSign extends CommonObject
 	}
 
 	/**
+	 * Load object in memory from the database
+	 *
+	 * @param int $parent_id Id parent object
+	 * @param bool $get_children_data Get children risks data
+	 * @param bool $get_parents_data Get parents risks data
+	 * @return array|int         <0 if KO, 0 if not found, >0 if OK
+	 * @throws Exception
+	 */
+	public function fetchRiskSign($parent_id, $get_parents_data = false, $get_shared_data = false)
+	{
+		global $conf;
+		$object   = new DigiriskElement($this->db);
+		$objects  = $object->fetchAll('',  '',  0,  0, array('customsql' => 'status > 0' ));
+		$risksign = new RiskSign($this->db);
+		$result   = $risksign->fetchFromParent($parent_id);
+
+		if ($result > 0 && ! empty($result)) {
+			foreach ($result as $risksign) {
+				$risksigns[$risksign->id] = $risksign;
+			}
+		}
+
+		if ( $get_parents_data ) {
+			$parent_element_id = $objects[$parent_id]->id;
+			while ($parent_element_id > 0) {
+				$result = $risksign->fetchFromParent($parent_element_id);
+				if ($result > 0 && ! empty($result)) {
+					foreach ($result as $risksign) {
+						$risksigns[$risksign->id] = $risksign;
+					}
+				}
+				$parent_element_id = $objects[$parent_element_id]->fk_parent;
+			}
+		}
+
+		if ( $get_shared_data ) {
+			$digiriskelementtmp = new DigiriskElement($this->db);
+
+			$allrisksigns = $risksign->fetchAll('', '', 0, 0, array('customsql' => 'status > 0 AND entity NOT IN (' . $conf->entity . ')'), 'AND', 0);
+
+			foreach ($allrisksigns as $key => $allrisksign) {
+				$digiriskelementtmp->fetch($allrisksign->fk_element);
+				$digiriskelementtmp->element = 'digiriskdolibarr';
+				$digiriskelementtmp->fetchObjectLinked($allrisksign->id, 'digiriskdolibarr_risksign', $object->id, 'digiriskdolibarr_digiriskelement', 'AND', 1, 'sourcetype', 0);
+				$alreadyImported = !empty($digiriskelementtmp->linkedObjectsIds) ? 1 : 0;
+				if ($alreadyImported > 0) {
+					$risksigns[$allrisksign->id] = $allrisksign;
+				}
+			}
+		}
+
+		if ( ! empty($risksigns) ) {
+			return $risksigns;
+		} else {
+			return -1;
+		}
+	}
+
+	/**
 	 * Load list of objects in memory from the database.
 	 *
 	 * @param string $sortorder Sort Order

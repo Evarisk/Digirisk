@@ -566,7 +566,7 @@ class doc_groupmentdocument_odt extends ModeleODTGroupmentDocument
 					$risksign = new RiskSign($this->db);
 
 					if ( ! empty($digiriskelement) ) {
-						$risksigns = $risksign->fetchFromParent($digiriskelement->id);
+						$risksigns = $risksign->fetchRiskSign($digiriskelement->id, $conf->global->DIGIRISKDOLIBARR_SHOW_INHERITED_RISKSIGNS, $conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKSIGNS);
 						$listlines = '';
 						if ($risksigns !== -1) {
 							$listlines = $odfHandler->setSegment('affectedRecommandation');
