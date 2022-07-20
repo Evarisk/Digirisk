@@ -663,6 +663,7 @@ AccidentLinked = Accident lié
 GaugeCounter = Ce champ est utilisé dans le compteur de la jauge
 DateStartWorkStop = Date de début d'arrêt de travail
 DateEndWorkStop = Date de fin d'arrêt de travail
+ReturnWorkDate = Date de reprise d'activité
 
 # AccidentTooltip - Tooltip des accidents
 VictimActivityTooltip = Précisez l’activité ou la tâche de la victime au moment de l’accident, c’est-à-dire ce que faisait la victime
@@ -1271,7 +1272,6 @@ DigiriskSignaturePendingSignatureTrigger = Email envoyé, en attente de la signa
 DigiriskSignatureAbsentTrigger = Participant absent
 DigiriskSignatureDeletedTrigger = Participant supprimé
 
-
 # Data - Donnée
 SignatureResponsibles = Signature des responsables
 SignatureIntervenants = Intervenants
@@ -1401,19 +1401,24 @@ TicketDescription = Projet des tickets
 TicketProjectUpdated = Le projet par défaut des tickets a été mis à jour
 
 
+
 # Ticket document
 
+# Mod Numbering - Modèle de numérotation
 DigiriskTicketDocumentNumberingModule = Modèle de numérotation des fiches de ticket de Digirisk
 DigiriskTicketDocumentStandardModel = Renvoie le numéro sous la forme TDn où n est un compteur séquentiel sans rupture et sans remise à 0
+
+# ODT Template - Template ODT
 DigiriskTemplateDocumentTicket = Modèle de documents des fiches de tickets de Digirisk
 TicketDocumentDigiriskTemplate = ODT par défaut des fiches de tickets
+
+# Data - Donnée
 TicketDocument = Fiche du ticket
 ticketdocument.odt = Fiche du ticket
 ticketdocument_events.odt = Fiche du ticket avec évènements
 TicketSuccessMessageData = Message du ticket
 TicketSuccessMessage= Message de succès du ticket
 TicketSuccessMessageSet = Le message a bien été modifié
-
 
 
 

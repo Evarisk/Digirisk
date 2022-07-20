@@ -861,6 +861,10 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 			}
 		}
 		$morehtmlref .= '<br>' . $langs->trans('TotalWorkStopDays') . ' : ' . $totalworkstopdays;
+
+		$lastaccidentline = end($accidentlines);
+
+		$morehtmlref .= '<br>' . $langs->trans('ReturnWorkDate') . ' : ' . dol_print_date(dol_time_plus_duree(dol_stringtotime($lastaccidentline->date_start_workstop), $lastaccidentline->workstop_days, 'd'), 'dayhour');
 	} else {
 		$morehtmlref .= '<br>' . $langs->trans('RegisterAccident');
 	}
@@ -1043,7 +1047,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 
 					$coldisplay++;
 					print '<td>';
-					print dol_print_date(dol_time_plus_duree(dol_stringtotime($item->date_start_workstop), $item->workstop_days, 'd'), 'dayhour', 'tzuser');
+					print dol_print_date(dol_time_plus_duree(dol_stringtotime($item->date_start_workstop), $item->workstop_days, 'd'), 'dayhour');
 					print '</td>';
 
 					$coldisplay++;
@@ -1126,12 +1130,12 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 
 					$coldisplay++;
 					print '<td>';
-					print dol_print_date($item->date_start_workstop, 'dayhour', 'tzuser');
+					print dol_print_date($item->date_start_workstop, 'dayhour');
 					print '</td>';
 
 					$coldisplay++;
 					print '<td>';
-					print dol_print_date(dol_time_plus_duree(dol_stringtotime($item->date_start_workstop), $item->workstop_days, 'd'), 'dayhour', 'tzuser');
+					print dol_print_date(dol_time_plus_duree(dol_stringtotime($item->date_start_workstop), $item->workstop_days, 'd'), 'dayhour');
 					print '</td>';
 
 					$coldisplay++;
