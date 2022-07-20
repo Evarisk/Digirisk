@@ -881,7 +881,7 @@ HiddenElements = Corbeille
 
 # Data - Donnée
 NewDigiriskElement = Nouveau élément digirisk
-GPUTOrganisation = Organisation des GP/UT
+GPUTOrganization = Organisation des GP/UT
 DigiriskElement = Élément Digirisk
 ElementType = Type d'élément
 ParentElement = Élément parent
