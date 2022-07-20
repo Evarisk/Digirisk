@@ -2,9 +2,9 @@
 
 ## Informations
 
-Version du module: 9.3.3
+Version du module: 9.4.0
 
-Dernière mise à jour: 24/06/2022
+Dernière mise à jour: 21/07/2022
 
 Prérequis:
 * Dolibarr min version 14.0.0
