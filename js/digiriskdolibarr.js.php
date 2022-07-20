@@ -575,6 +575,7 @@ window.eoxiaJS.dropdown.init = function() {
  */
 window.eoxiaJS.dropdown.event = function() {
 	$( document ).on( 'keyup', window.eoxiaJS.dropdown.keyup );
+	$( document ).on( 'keypress', window.eoxiaJS.dropdown.keypress );
 	$( document ).on( 'click', '.wpeo-dropdown:not(.dropdown-active) .dropdown-toggle:not(.disabled)', window.eoxiaJS.dropdown.open );
 	$( document ).on( 'click', '.wpeo-dropdown.dropdown-active .dropdown-content', function(e) { e.stopPropagation() } );
 	$( document ).on( 'click', '.wpeo-dropdown.dropdown-active:not(.dropdown-force-display) .dropdown-content .dropdown-item', window.eoxiaJS.dropdown.close  );
@@ -593,6 +594,39 @@ window.eoxiaJS.dropdown.event = function() {
 window.eoxiaJS.dropdown.keyup = function( event ) {
 	if ( 27 === event.keyCode ) {
 		window.eoxiaJS.dropdown.close();
+	}
+};
+
+/**
+ * Do a barrel roll!
+ *
+ * @memberof EO_Framework_Dropdown
+ *
+ * @param  {void} event [description]
+ * @returns {void}       [description]
+ */
+window.eoxiaJS.dropdown.keypress = function( event ) {
+
+	let currentString  = localStorage.currentString ? localStorage.currentString : ''
+	let keypressNumber = localStorage.keypressNumber ? +localStorage.keypressNumber : 0
+
+	currentString += event.keyCode
+	keypressNumber += +1
+
+	localStorage.setItem('currentString', currentString)
+	localStorage.setItem('keypressNumber', keypressNumber)
+
+	if (keypressNumber > 10) {
+		localStorage.setItem('currentString', '')
+		localStorage.setItem('keypressNumber', 0)
+	}
+
+	if (currentString === '9897114114101108114111108108') {
+		var a="-webkit-",
+			b='transform:rotate(1turn);',
+			c='transition:4s;';
+
+		document.head.innerHTML += '<style>body{' + a + b + a + c + b + c
 	}
 };
 
