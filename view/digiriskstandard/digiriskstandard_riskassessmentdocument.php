@@ -437,7 +437,11 @@ if ($includedocgeneration && $action != 'edit') {
 	$urlsource  = $_SERVER["PHP_SELF"];
 	$modulepart = 'digiriskdolibarr:RiskAssessmentDocument';
 
-	print digiriskshowdocuments($modulepart, $dir_files, $filedir, $urlsource, $permissiontoadd, $permissiontodelete, $conf->global->DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_DEFAULT_MODEL, 1, 0, '', $langs->trans('RiskAssessmentDocument'), '', '', $riskassessmentdocument, 0, 'remove_file');
+	if ($permissiontoadd || $permissiontoread) {
+		$genallowed = 1;
+	}
+
+	print digiriskshowdocuments($modulepart, $dir_files, $filedir, $urlsource, $genallowed, $permissiontodelete, $conf->global->DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_DEFAULT_MODEL, 1, 0, '', $langs->trans('RiskAssessmentDocument'), '', '', $riskassessmentdocument, 0, 'remove_file');
 }
 
 // Presend form

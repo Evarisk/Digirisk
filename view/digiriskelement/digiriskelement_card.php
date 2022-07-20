@@ -520,7 +520,11 @@ if ((empty($action) || ($action != 'edit' && $action != 'create'))) {
 				$title        = $langs->trans('WorkUnitDocument');
 			}
 
-			print digiriskshowdocuments($modulepart, $dir_files, $filedir, $urlsource, $permissiontoadd, $permissiontodelete, $defaultmodel, 1, 0, '', $title, '', '', $digiriskelementdocument);
+			if ($permissiontoadd || $permissiontoread) {
+				$genallowed = 1;
+			}		
+
+			print digiriskshowdocuments($modulepart, $dir_files, $filedir, $urlsource, $genallowed, $permissiontodelete, $defaultmodel, 1, 0, '', $title, '', '', $digiriskelementdocument);
 		}
 
 
