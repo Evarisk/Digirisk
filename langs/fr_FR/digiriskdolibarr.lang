@@ -1410,6 +1410,10 @@ TicketDocumentDigiriskTemplate = ODT par défaut des fiches de tickets
 TicketDocument = Fiche du ticket
 ticketdocument.odt = Fiche du ticket
 ticketdocument_events.odt = Fiche du ticket avec évènements
+TicketSuccessMessageData = Message du ticket
+TicketSuccessMessage= Message de succès du ticket
+TicketSuccessMessageSet = Le message a bien été modifié
+
 
 
 

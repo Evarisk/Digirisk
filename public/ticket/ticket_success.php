@@ -74,7 +74,7 @@ llxHeaderTicketDigirisk($langs->trans("CreateTicket"), "", 0, 0, $morejs, $morec
 	<b><i><p class="center"</p></b></i>
 	<span class="wpeo-notice notice-warning center" style="margin-left: 16%;width: 70%; border-left: solid red 6px; color: red;background: rgba(255, 0, 0, 0.05)">
 		<span class="notice-content" >
-			<span class="notice-subtitle" style="color: red"><?php echo $langs->trans("YouMustNotifyYourHierarchy") . ' ' ?></span>
+			<span class="notice-subtitle" style="color: red"><?php echo $conf->global->DIGIRISKDOLIBARR_TICKET_SUCCESS_MESSAGE ?: $langs->trans('YouMustNotifyYourHierarchy'); ?></span>
 		</span>
 	</span>
 </div>

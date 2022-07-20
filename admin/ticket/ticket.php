@@ -191,6 +191,12 @@ if ($action == 'setChildCategoryLabel') {
 	setEventMessages($langs->trans('ChildCategoryLabelSet'), array());
 }
 
+if ($action == 'setTicketSuccessMessage') {
+	$successmessage = GETPOST('DIGIRISKDOLIBARR_TICKET_SUCCESS_MESSAGE');
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_TICKET_SUCCESS_MESSAGE', $successmessage, 'chaine', 0, '', $conf->entity);
+	setEventMessages($langs->trans('TicketSuccessMessageSet'), array());
+}
+
 /*
  * View
  */
@@ -294,6 +300,34 @@ if ( ! empty($conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE)) {
 	print '</form>';
 
 	print '</table>';
+	
+	print load_fiche_titre($langs->trans("TicketSuccessMessageData"), '', '');
+
+	print '<table class="noborder centpercent">';
+	
+	print '<form method="post" action="'.$_SERVER['PHP_SELF'].'" enctype="multipart/form-data" >';
+	print '<input type="hidden" name="token" value="'.newToken().'">';
+	print '<input type="hidden" name="action" value="setTicketSuccessMessage">';
+	
+	print '<tr class="liste_titre">';
+	print '<td>'.$langs->trans("Name").'</td>';
+	print '<td>' . $langs->trans("Description") . '</td>';
+	print '<td class="center">' . $langs->trans("Action") . '</td>';
+	print "</tr>";
+		
+	// Ticket success message
+	$successmessage = $conf->global->DIGIRISKDOLIBARR_TICKET_SUCCESS_MESSAGE ?: $langs->trans('YouMustNotifyYourHierarchy');
+	print '<tr class="oddeven"><td>'.$langs->trans("TicketSuccessMessage");
+	print '</td><td>';
+	require_once DOL_DOCUMENT_ROOT.'/core/class/doleditor.class.php';
+	$doleditor = new DolEditor('DIGIRISKDOLIBARR_TICKET_SUCCESS_MESSAGE', $successmessage, '100%', 120, 'dolibarr_details', '', false, true, $conf->global->FCKEDITOR_ENABLE_MAIL, ROWS_2, 70);
+	$doleditor->Create();
+	print '</td>';
+	print '<td><input type="submit" class="button" name="save" value="' . $langs->trans("Save") . '">';
+	print '</td></tr>';
+	print '</form>';
+	print '</table>';
+
 	print '</div>';
 
 	// Project

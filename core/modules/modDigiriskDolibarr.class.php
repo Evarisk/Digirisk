@@ -663,20 +663,22 @@ class modDigiriskdolibarr extends DolibarrModules
 			297 => array('DIGIRISKDOLIBARR_TICKET_PARENT_CATEGORY_LABEL', 'chaine', $langs->trans('Registre'), '', 0, 'current'),
 			298 => array('DIGIRISKDOLIBARR_TICKET_CHILD_CATEGORY_LABEL', 'chaine', $langs->trans('Pertinence'), '', 0, 'current'),
 			299 => array('DIGIRISKDOLIBARR_TICKET_PROJECT', 'integer', 0, '', 0, 'current'),
+			300 => array('DIGIRISKDOLIBARR_TICKET_SUCCESS_MESSAGE', 'chaine', $langs->trans('YouMustNotifyYourHierarchy'), '', 0, 'current'),
 
 			// CONST ACCIDENT
-			300 => array('MAIN_AGENDA_ACTIONAUTO_ACCIDENT_CREATE', 'integer', 1, '', 0, 'current'),
-			301 => array('MAIN_AGENDA_ACTIONAUTO_ACCIDENT_EDIT', 'integer', 1, '', 0, 'current'),
-			302 => array('DIGIRISKDOLIBARR_ACCIDENT_ADDON', 'chaine', 'mod_accident_standard', '', 0, 'current'),
-			303 => array('DIGIRISKDOLIBARR_ACCIDENT_PROJECT', 'integer', 0, '', 0, 'current'),
+			310 => array('MAIN_AGENDA_ACTIONAUTO_ACCIDENT_CREATE', 'integer', 1, '', 0, 'current'),
+			311 => array('MAIN_AGENDA_ACTIONAUTO_ACCIDENT_EDIT', 'integer', 1, '', 0, 'current'),
+			312 => array('DIGIRISKDOLIBARR_ACCIDENT_ADDON', 'chaine', 'mod_accident_standard', '', 0, 'current'),
+			313 => array('DIGIRISKDOLIBARR_ACCIDENT_PROJECT', 'integer', 0, '', 0, 'current'),
 
 			// CONST ACCIDENT LINE
-			310 => array('MAIN_AGENDA_ACTIONAUTO_ACCIDENT_WORKSTOP_CREATE', 'integer', 1, '', 0, 'current'),
-			311 => array('DIGIRISKDOLIBARR_ACCIDENT_WORKSTOP_ADDON', 'chaine', 'mod_accident_workstop_standard', '', 0, 'current'),
-			312 => array('DIGIRISKDOLIBARR_ACCIDENT_LESION_ADDON', 'chaine', 'mod_accident_lesion_standard', '', 0, 'current'),
+			320 => array('MAIN_AGENDA_ACTIONAUTO_ACCIDENT_WORKSTOP_CREATE', 'integer', 1, '', 0, 'current'),
+			321 => array('DIGIRISKDOLIBARR_ACCIDENT_WORKSTOP_ADDON', 'chaine', 'mod_accident_workstop_standard', '', 0, 'current'),
+			322 => array('DIGIRISKDOLIBARR_ACCIDENT_LESION_ADDON', 'chaine', 'mod_accident_lesion_standard', '', 0, 'current'),
 
-			320 => array('DIGIRISKDOLIBARR_TICKETDOCUMENT_ADDON_ODT_PATH', 'chaine', 'DOL_DOCUMENT_ROOT/custom/digiriskdolibarr/documents/doctemplates/ticketdocument/', '', 0, 'current'),
-			321 => array('DIGIRISKDOLIBARR_TICKETDOCUMENT_ADDON', 'chaine', 'mod_ticketdocument_standard', '', 0, 'current'),
+			// CONST TICKET DOCUMENT
+			330 => array('DIGIRISKDOLIBARR_TICKETDOCUMENT_ADDON_ODT_PATH', 'chaine', 'DOL_DOCUMENT_ROOT/custom/digiriskdolibarr/documents/doctemplates/ticketdocument/', '', 0, 'current'),
+			331 => array('DIGIRISKDOLIBARR_TICKETDOCUMENT_ADDON', 'chaine', 'mod_ticketdocument_standard', '', 0, 'current'),
 
 //			// CONST ACCIDENT DOCUMENT
 //			320 => array('MAIN_AGENDA_ACTIONAUTO_ACCIDENTDOCUMENT_CREATE', 'integer', 1, '', 0, 'current'),
@@ -686,18 +688,18 @@ class modDigiriskdolibarr extends DolibarrModules
 //			324 => array('DIGIRISKDOLIBARR_ACCIDENTDOCUMENT_DEFAULT_MODEL', 'chaine', 'accidentdocument_odt', '', 0, 'current'),
 
 			// GENERAL CONSTS
-			330 => array('MAIN_USE_EXIF_ROTATION', 'integer', 1, '', 0, 'current'),
-			331 => array('MAIN_EXTRAFIELDS_USE_SELECT2', 'integer', 1, '', 0, 'current'),
+			340 => array('MAIN_USE_EXIF_ROTATION', 'integer', 1, '', 0, 'current'),
+			341 => array('MAIN_EXTRAFIELDS_USE_SELECT2', 'integer', 1, '', 0, 'current'),
 
 			// MENU
-			340 => array('DIGIRISKDOLIBARR_DIGIRISKSTANDARD_MENU_UPDATED', 'integer', 0, '', 0, 'current'),
+			350 => array('DIGIRISKDOLIBARR_DIGIRISKSTANDARD_MENU_UPDATED', 'integer', 0, '', 0, 'current'),
 
 			// CONST TOOLS
-			350 => array('DIGIRISKDOLIBARR_TOOLS_ADVANCED_IMPORT', 'integer', 0, '', 0, 'current'),
-			351 => array('DIGIRISKDOLIBARR_TOOLS_TREE_ALREADY_IMPORTED', 'integer', 0, '', 0, 'current'),
-			352 => array('DIGIRISKDOLIBARR_TOOLS_RISKS_ALREADY_IMPORTED', 'integer', 0, '', 0, 'current'),
-			353 => array('DIGIRISKDOLIBARR_TOOLS_RISKSIGNS_ALREADY_IMPORTED', 'integer', 0, '', 0, 'current'),
-			354 => array('DIGIRISKDOLIBARR_TOOLS_GLOBAL_ALREADY_IMPORTED', 'integer', 0, '', 0, 'current'),
+			360 => array('DIGIRISKDOLIBARR_TOOLS_ADVANCED_IMPORT', 'integer', 0, '', 0, 'current'),
+			361 => array('DIGIRISKDOLIBARR_TOOLS_TREE_ALREADY_IMPORTED', 'integer', 0, '', 0, 'current'),
+			362 => array('DIGIRISKDOLIBARR_TOOLS_RISKS_ALREADY_IMPORTED', 'integer', 0, '', 0, 'current'),
+			363 => array('DIGIRISKDOLIBARR_TOOLS_RISKSIGNS_ALREADY_IMPORTED', 'integer', 0, '', 0, 'current'),
+			364 => array('DIGIRISKDOLIBARR_TOOLS_GLOBAL_ALREADY_IMPORTED', 'integer', 0, '', 0, 'current'),
 		);
 
 		if ( ! isset($conf->digiriskdolibarr) || ! isset($conf->digiriskdolibarr->enabled) ) {
