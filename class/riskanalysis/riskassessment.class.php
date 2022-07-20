@@ -194,7 +194,7 @@ class RiskAssessment extends CommonObject
 		$filter                        = array('customsql' => 'fk_risk=' . $this->db->escape($parent_id));
 		if ($active) $filter['status'] = 1;
 
-		return $this->fetchAll($desc, 'rowid', 0, 0, $filter, 'AND');
+		return $this->fetchAll($desc, 'rowid', 0, 0, $filter, 'AND', 1);
 	}
 
 	/**
@@ -209,7 +209,7 @@ class RiskAssessment extends CommonObject
 	 * @return array|int                 int <0 if KO, array of pages if OK
 	 * @throws Exception
 	 */
-	public function fetchAll($sortorder = '', $sortfield = '', $limit = 0, $offset = 0, array $filter = array(), $filtermode = 'AND')
+	public function fetchAll($sortorder = '', $sortfield = '', $limit = 0, $offset = 0, array $filter = array(), $filtermode = 'AND', $multientityfetch = 0)
 	{
 		dol_syslog(__METHOD__, LOG_DEBUG);
 
@@ -218,7 +218,7 @@ class RiskAssessment extends CommonObject
 		$sql                                                                              = 'SELECT ';
 		$sql                                                                             .= $this->getFieldList();
 		$sql                                                                             .= ' FROM ' . MAIN_DB_PREFIX . $this->table_element . ' as t';
-		if (isset($this->ismultientitymanaged) && $this->ismultientitymanaged == 1) $sql .= ' WHERE t.entity IN (' . getEntity($this->table_element) . ')';
+		if (isset($this->ismultientitymanaged) && $this->ismultientitymanaged == 1 && $multientityfetch == 0) $sql .= ' WHERE t.entity IN (' . getEntity($this->table_element) . ')';
 		else $sql                                                                        .= ' WHERE 1 = 1';
 		// Manage filter
 		$sqlwhere = array();
