@@ -282,7 +282,7 @@
 	// Build and execute select
 	// --------------------------------------------------------------------
 	if ( ! preg_match('/(evaluation)/', $sortfield)) {
-		$sql = 'SELECT ';
+		$sql = 'SELECT DISTINCT ';
 		foreach ($risk->fields as $key => $val) {
 			$sql .= 't.' . $key . ', ';
 		}
@@ -377,7 +377,7 @@
 			exit;
 		}
 	} else {
-		$sql = 'SELECT ';
+		$sql = 'SELECT DISTINCT ';
 		foreach ($evaluation->fields as $key => $val) {
 			$sql .= 'evaluation.' . $key . ', ';
 		}
