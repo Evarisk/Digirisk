@@ -129,15 +129,8 @@ foreach ($risk->fields as $key => $val) {
 $arrayfields = array();
 foreach ($risk->fields as $key => $val) {
 	// If $val['visible']==0, then we never show the field
-	if ($val['label'] == 'Entity') {
+	if ($val['label'] == 'Entity' || $val['label'] == 'ParentElement') {
 		if ($sharedrisks) {
-			$val['visible'] = 5;
-		}
-	}
-	if ($val['label'] == 'ParentElement') {
-		if ($sharedrisks) {
-			$val['visible'] = 5;
-		} else {
 			$val['visible'] = 0;
 		}
 	}
