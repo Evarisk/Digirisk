@@ -418,13 +418,13 @@ class DigiriskElement extends CommonObject
 	 * @param  int 			$outputmode 0=HTML select string, 1=Array
 	 * @param  int 			$limit Limit number of answers
 	 * @param  string 		$morecss Add more css styles to the SELECT component
-	 * @param  int	 		$moreparam Add more parameters onto the select tag. For example 'style="width: 95%"' to avoid select2 component to go over parent container
+	 * @param  int	 		$current_element id of current digiriskelement
 	 * @param  bool 		$multiple add [] in the name of element and add 'multiple' attribut
 	 * @param  int 			$noroot
 	 * @return string HTML string with
 	 * @throws Exception
 	 */
-	public function select_digiriskelement_list($selected = '', $htmlname = 'fk_element', $filter = '', $showempty = '1', $forcecombo = 0, $events = array(), $outputmode = 0, $limit = 0, $morecss = 'minwidth100', $moreparam = 0, $multiple = false, $noroot = 0, $contextpage = '', $multientitymanagedoff = true)
+	public function select_digiriskelement_list($selected = '', $htmlname = 'fk_element', $filter = '', $showempty = '1', $forcecombo = 0, $events = array(), $outputmode = 0, $limit = 0, $morecss = 'minwidth100', $current_element = 0, $multiple = false, $noroot = 0, $contextpage = '', $multientitymanagedoff = true)
 	{
 		global $conf, $langs;
 
@@ -448,24 +448,40 @@ class DigiriskElement extends CommonObject
 
 		if ($filter) $sql .= " AND (" . $filter . ")";
 
-		if ($moreparam > 0 ) {
-			$children = $this->fetchDigiriskElementFlat($moreparam);
+		if ($current_element > 0 ) {
+			$children = $this->fetchDigiriskElementFlat($current_element);
 			if ( ! empty($children) && $children > 0) {
 				foreach ($children as $key => $value) {
 					$sql .= " AND NOT s.rowid =" . $key;
 				}
 			}
-			$sql .= " AND NOT s.rowid =" . $moreparam;
+			$sql .= " AND NOT s.rowid =" . $current_element;
 		}
+
 		if ($conf->global->DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH) {
-			$masked_content = $this->fetchDigiriskElementFlat($conf->global->DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH);
-			if ( ! empty($masked_content) && $masked_content > 0) {
-				foreach ($masked_content as $key => $value) {
-					$sql .= " AND NOT s.rowid =" . $key;
+			$current_entity = $conf->entity;
+			$object = new ActionsMulticompany($this->db);
+
+			$entities = $object->getEntitiesList(false, false, true, true);
+			foreach ($entities as $sub_entity => $entity_name) {
+				$conf->setEntityValues($this->db, $sub_entity);
+				$entities_array[$sub_entity] = $conf->global->DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH;
+			}
+			$conf->setEntityValues($this->db, $current_entity);
+
+			foreach($entities_array as $entity_digiriskelement_trash) {
+				if ($entity_digiriskelement_trash > 0) {
+					$masked_content = $this->fetchDigiriskElementFlat($entity_digiriskelement_trash);
+					if ( ! empty($masked_content) && $masked_content > 0) {
+						foreach ($masked_content as $key => $value) {
+							$sql .= " AND NOT s.rowid =" . $key;
+						}
+					}
+					$sql .= " AND NOT s.rowid =" . $entity_digiriskelement_trash;
 				}
 			}
-			$sql .= " AND NOT s.rowid =" . $conf->global->DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH;
 		}
+
 		$sql .= $this->db->order("rowid", "ASC");
 		$sql .= $this->db->plimit($limit, 0);
 
@@ -480,7 +496,7 @@ class DigiriskElement extends CommonObject
 			}
 
 			// Construct $out and $outarray
-			$out .= '<select id="' . $htmlname . '" class="flat' . ($morecss ? ' ' . $morecss : '') . '"' . ($moreparam ? ' ' . $moreparam : '') . ' name="' . $htmlname . ($multiple ? '[]' : '') . '" ' . ($multiple ? 'multiple' : '') . '>' . "\n";
+			$out .= '<select id="' . $htmlname . '" class="flat' . ($morecss ? ' ' . $morecss : '') . '"' . ($current_element ? ' ' . $current_element : '') . ' name="' . $htmlname . ($multiple ? '[]' : '') . '" ' . ($multiple ? 'multiple' : '') . '>' . "\n";
 			$num                  = $this->db->num_rows($resql);
 			$i                    = 0;
 
