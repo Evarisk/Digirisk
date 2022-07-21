@@ -1243,7 +1243,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 					print '</td>';
 
 					print '<td class="bordertop nobottom linecollocation">';
-					print $digiriskelement->select_digiriskelement_list($item->fk_element, 'fk_element', '', 0, 0, array(), 0, 0, 'minwidth100', GETPOST('id'), false, 1);
+					print $digiriskelement->select_digiriskelement_list($item->fk_element, 'fk_element', '', 0, 0, array(), 0, 0, 'minwidth100', 0, false, 1);
 					print '</td>';
 
 					$coldisplay++;
@@ -1370,7 +1370,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 			print $refFirePermitDetMod->getNextValue($objectline);
 			print '</td>';
 			print '<td>';
-			print $digiriskelement->select_digiriskelement_list('', 'fk_element', '', 0, 0, array(), 0, 0, 'minwidth100', GETPOST('id'), false, 1);
+			print $digiriskelement->select_digiriskelement_list('', 'fk_element', '', 0, 0, array(), 0, 0, 'minwidth100', 0, false, 1);
 			print '</td>';
 
 			$coldisplay++;
@@ -1442,7 +1442,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 
 		if ($permissiontoadd || $permissiontoread) {
 			$genallowed = 1;
-		}	
+		}
 
 		print digiriskshowdocuments($modulepart, $dir_files, $filedir, $urlsource, $genallowed, 0, $defaultmodel, 1, 0, '', $title, '', '', $firepermitdocument, 0, 'remove_file', $object->status == 3 && empty(dol_dir_list($filedir)), $langs->trans('FirePermitMustBeLocked'));
 	}
