@@ -224,7 +224,8 @@ class PreventionPlan extends CommonObject
 		$digiriskresources = new DigiriskResources($this->db);
 		$openinghours      = new Openinghours($this->db);
 
-		$refPreventionPlanMod = new $conf->global->DIGIRISKDOLIBARR_PREVENTIONPLAN_ADDON($this->db);
+		$refPreventionPlanMod    = new $conf->global->DIGIRISKDOLIBARR_PREVENTIONPLAN_ADDON($this->db);
+		$refPreventionPlanDetMod = new  $conf->global->DIGIRISKDOLIBARR_PREVENTIONPLANDET_ADDON($this->db);
 
 		dol_syslog(__METHOD__, LOG_DEBUG);
 
@@ -314,6 +315,9 @@ class PreventionPlan extends CommonObject
 				$num = (!empty($object->lines) ? count($object->lines) : 0);
 				for ($i = 0; $i < $num; $i++) {
 					$line                    = $object->lines[$i];
+					if (property_exists($line, 'ref')) {
+						$line->ref = $refPreventionPlanDetMod->getNextValue($line);
+					}
 					$line->category          = empty($line->category) ? 0 : $line->category;
 					$line->fk_preventionplan = $preventionplanid;
 
