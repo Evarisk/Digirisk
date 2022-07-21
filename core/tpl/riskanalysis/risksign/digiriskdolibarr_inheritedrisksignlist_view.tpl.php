@@ -151,11 +151,15 @@ if ( ! empty($moreforfilter)) {
 	print '</div>';
 }
 
-$varpage         = empty($contextpage) ? $_SERVER["PHP_SELF"] : $contextpage;
-$arrayfields['t.fk_element']['checked'] = 1;
-$arrayfields['t.fk_element']['label'] = $langs->trans('ParentElement');
-$arrayfields['t.fk_element']['enabled'] = 1;
-$arrayfields['t.fk_element']['position'] = 10;
+$varpage = empty($contextpage) ? $_SERVER["PHP_SELF"] : $contextpage;
+
+$arrayfields['t.fk_element']['checked']  = 1;
+$arrayfields['t.fk_element']['label']    = $langs->trans('ParentElement');
+$arrayfields['t.fk_element']['enabled']  = 1;
+$arrayfields['t.fk_element']['position'] = 1;
+
+$arrayfields = dol_sort_array($arrayfields, 'position');
+
 $selectedfields  = $form->multiSelectArrayWithCheckbox('selectedfields', $arrayfields, $varpage); // This also change content of $arrayfields
 $selectedfields .= (count($arrayofmassactions) ? $form->showCheckAddButtons('checkforselect', 1) : '');
 
