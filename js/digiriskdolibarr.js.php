@@ -1414,6 +1414,12 @@ window.eoxiaJS.mediaGallery.sendPhoto = function( event ) {
 					});
 					actionContainerSuccess.removeClass('hidden');
 				}
+			},
+			error : function (resp) {
+				$('#myBar').animate({
+					color: 'red'
+				}, 300);
+				actionContainerError.removeClass('hidden');
 			}
 		});
 	})
