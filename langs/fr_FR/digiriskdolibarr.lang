@@ -50,6 +50,9 @@ ConfigDico =  Accéder à la page de configuration des dictionnaires
 LinkedProject = Projet lié
 DigiriskUpdate = Mise à jour de Digirisk :
 DigiriskHasBeenUpdatedTo = Digirisk a été mis à jour en version %s
+Security = Sécurité
+
+
 
 #
 # Page À propos
