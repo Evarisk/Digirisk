@@ -481,6 +481,7 @@ class doc_preventionplandocument_specimen_odt extends ModeleODTPreventionPlanDoc
 							$tmparray['unite_travail'] = $digiriskelement->ref . " - " . $digiriskelement->label;
 							$tmparray['action']        = $line->description;
 							$tmparray['risk']          = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $risk->get_danger_category($line) . '.png';
+							$tmparray['nomPicto']      = $risk->get_danger_category_name($line);
 							$tmparray['prevention']    = $line->prevention_method;
 
 							foreach ($tmparray as $key => $val) {
@@ -506,6 +507,7 @@ class doc_preventionplandocument_specimen_odt extends ModeleODTPreventionPlanDoc
 						$tmparray['unite_travail'] = '';
 						$tmparray['action']        = '';
 						$tmparray['risk']          = '';
+						$tmparray['nomPicto']      = '';
 						$tmparray['prevention']    = '';
 
 						foreach ($tmparray as $key => $val) {

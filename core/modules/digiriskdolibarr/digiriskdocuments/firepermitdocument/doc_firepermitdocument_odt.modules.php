@@ -343,6 +343,7 @@ class doc_firepermitdocument_odt extends ModeleODTFirePermitDocument
 			$preventionplan     = new PreventionPlan($this->db);
 			$preventionplanline = new PreventionPlanLine($this->db);
 			$openinghours       = new Openinghours($this->db);
+			$openinghoursFP     = new Openinghours($this->db);
 
 			if ($firepermit->fk_preventionplan > 0) {
 				$preventionplan->fetch($firepermit->fk_preventionplan);
@@ -433,30 +434,30 @@ class doc_firepermitdocument_odt extends ModeleODTFirePermitDocument
 			$morewhere .= ' AND element_type = ' . "'" . $firepermit->element . "'";
 			$morewhere .= ' AND status = 1';
 
-			$openinghours->fetch(0, '', $morewhere);
+			$openinghoursFP->fetch(0, '', $morewhere);
 
-			$opening_hours_monday    = explode(' ', $openinghours->monday);
-			$opening_hours_tuesday   = explode(' ', $openinghours->tuesday);
-			$opening_hours_wednesday = explode(' ', $openinghours->wednesday);
-			$opening_hours_thursday  = explode(' ', $openinghours->thursday);
-			$opening_hours_friday    = explode(' ', $openinghours->friday);
-			$opening_hours_saturday  = explode(' ', $openinghours->saturday);
-			$opening_hours_sunday    = explode(' ', $openinghours->sunday);
+			$opening_hours_monday    = explode(' ', $openinghoursFP->monday);
+			$opening_hours_tuesday   = explode(' ', $openinghoursFP->tuesday);
+			$opening_hours_wednesday = explode(' ', $openinghoursFP->wednesday);
+			$opening_hours_thursday  = explode(' ', $openinghoursFP->thursday);
+			$opening_hours_friday    = explode(' ', $openinghoursFP->friday);
+			$opening_hours_saturday  = explode(' ', $openinghoursFP->saturday);
+			$opening_hours_sunday    = explode(' ', $openinghoursFP->sunday);
 
-			$tmparray['lundi_matin']    = $opening_hours_monday[0];
-			$tmparray['lundi_aprem']    = $opening_hours_monday[1];
-			$tmparray['mardi_matin']    = $opening_hours_tuesday[0];
-			$tmparray['mardi_aprem']    = $opening_hours_tuesday[1];
-			$tmparray['mercredi_matin'] = $opening_hours_wednesday[0];
-			$tmparray['mercredi_aprem'] = $opening_hours_wednesday[1];
-			$tmparray['jeudi_matin']    = $opening_hours_thursday[0];
-			$tmparray['jeudi_aprem']    = $opening_hours_thursday[1];
-			$tmparray['vendredi_matin'] = $opening_hours_friday[0];
-			$tmparray['vendredi_aprem'] = $opening_hours_friday[1];
-			$tmparray['samedi_matin']   = $opening_hours_saturday[0];
-			$tmparray['samedi_aprem']   = $opening_hours_saturday[1];
-			$tmparray['dimanche_matin'] = $opening_hours_sunday[0];
-			$tmparray['dimanche_aprem'] = $opening_hours_sunday[1];
+			$tmparray['lundi_matinF']    = $opening_hours_monday[0];
+			$tmparray['lundi_apremF']    = $opening_hours_monday[1];
+			$tmparray['mardi_matinF']    = $opening_hours_tuesday[0];
+			$tmparray['mardi_apremF']    = $opening_hours_tuesday[1];
+			$tmparray['mercredi_matinF'] = $opening_hours_wednesday[0];
+			$tmparray['mercredi_apremF'] = $opening_hours_wednesday[1];
+			$tmparray['jeudi_matinF']    = $opening_hours_thursday[0];
+			$tmparray['jeudi_apremF']    = $opening_hours_thursday[1];
+			$tmparray['vendredi_matinF'] = $opening_hours_friday[0];
+			$tmparray['vendredi_apremF'] = $opening_hours_friday[1];
+			$tmparray['samedi_matinF']   = $opening_hours_saturday[0];
+			$tmparray['samedi_apremF']   = $opening_hours_saturday[1];
+			$tmparray['dimanche_matinF'] = $opening_hours_sunday[0];
+			$tmparray['dimanche_apremF'] = $opening_hours_sunday[1];
 
 			if ( ! empty($firepermitlines) && $firepermitlines > 0 && is_array($firepermitlines)) {
 				$tmparray['interventions_info_FP'] = count($firepermitlines) . " " . $langs->trans('FirePermitLine');
@@ -545,6 +546,7 @@ class doc_firepermitdocument_odt extends ModeleODTFirePermitDocument
 							$tmparray['unite_travail'] = $digiriskelement->ref . " - " . $digiriskelement->label;
 							$tmparray['action']        = $line->description;
 							$tmparray['risk']          = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $risk->get_danger_category($line) . '.png';
+							$tmparray['nomPicto']      = $risk->get_danger_category_name($line);
 							$tmparray['prevention']    = $line->prevention_method;
 
 							foreach ($tmparray as $key => $val) {
@@ -570,6 +572,7 @@ class doc_firepermitdocument_odt extends ModeleODTFirePermitDocument
 						$tmparray['unite_travail'] = '';
 						$tmparray['action']        = '';
 						$tmparray['risk']          = '';
+						$tmparray['nomPicto']      = '';
 						$tmparray['prevention']    = '';
 
 						foreach ($tmparray as $key => $val) {
@@ -596,6 +599,7 @@ class doc_firepermitdocument_odt extends ModeleODTFirePermitDocument
 							$tmparray['unite_travail']   = $digiriskelement->ref . " - " . $digiriskelement->label;
 							$tmparray['action']          = $line->description;
 							$tmparray['type_de_travaux'] = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/img/typeDeTravaux/' . $risk->get_fire_permit_danger_category($line) . '.png';
+							$tmparray['nomPictoT']       = $risk->get_fire_permit_danger_category_name($line);
 							$tmparray['materiel']        = $line->use_equipment;
 
 							foreach ($tmparray as $key => $val) {
@@ -621,6 +625,7 @@ class doc_firepermitdocument_odt extends ModeleODTFirePermitDocument
 						$tmparray['unite_travail']   = '';
 						$tmparray['action']          = '';
 						$tmparray['type_de_travaux'] = '';
+						$tmparray['nomPictoT']       = '';
 						$tmparray['materiel']        = '';
 
 						foreach ($tmparray as $key => $val) {
@@ -687,6 +692,7 @@ class doc_firepermitdocument_odt extends ModeleODTFirePermitDocument
 						}
 						$odfHandler->mergeSegment($listlines);
 					} else {
+						$tmparray['id']                     = '';
 						$tmparray['intervenants_signature'] = '';
 						$tmparray['name']                   = '';
 						$tmparray['lastname']               = '';

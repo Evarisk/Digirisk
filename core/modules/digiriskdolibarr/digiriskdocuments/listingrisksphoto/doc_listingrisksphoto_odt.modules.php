@@ -342,6 +342,7 @@ class doc_listingrisksphoto_odt extends ModeleODTListingRisksPhoto
 			// Call the ODTSubstitution hook
 			$parameters = array('odfHandler' => &$odfHandler, 'file' => $file, 'object' => $object, 'outputlangs' => $outputlangs, 'substitutionarray' => &$tmparray);
 			$hookmanager->executeHooks('ODTSubstitution', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
+			$tmparray['reference'] = $object->ref;
 
 			foreach ($tmparray as $key => $value) {
 				try {
