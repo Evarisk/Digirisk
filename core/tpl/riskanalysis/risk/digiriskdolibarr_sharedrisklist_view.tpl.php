@@ -80,6 +80,7 @@
 		//else $sql                                                                                                                                     .= " WHERE 1 = 1";
 		if ( ! $allRisks) {
 			$sql .= " AND el.fk_target = " . $id;
+			$sql .= " AND el.sourcetype = 'digiriskdolibarr_risk'";
 		} else {
 			foreach ($trashList as $deleted_element => $element_id) {
 				$sql .= " AND fk_element !=" . $element_id;
@@ -95,6 +96,7 @@
 			}
 			$sql = dol_substr($sql, 0 , -1);
 			$sql .= ")";
+			$sql .= " AND el.sourcetype = 'digiriskdolibarr_risk'";
 			//$sql .= " AND e.entity IN (" . getEntity($risk->element) . ") ";
 		}
 
@@ -195,6 +197,7 @@
 
 		if ( ! $allRisks) {
 			$sql .= " AND el.fk_target = " . $id;
+			$sql .= " AND el.sourcetype = 'digiriskdolibarr_risk'";
 			//$sql .= " AND r.fk_element =" . $id;
 		} else {
 			foreach ($trashList as $deleted_element => $element_id) {
@@ -211,6 +214,7 @@
 			}
 			$sql = dol_substr($sql, 0 , -1);
 			$sql .= ")";
+			$sql .= " AND el.sourcetype = 'digiriskdolibarr_risk'";
 			//$sql .= " AND e.entity IN (" . getEntity($evaluation->element) . ")";
 		}
 

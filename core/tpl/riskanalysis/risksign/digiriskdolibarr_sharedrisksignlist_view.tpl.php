@@ -75,6 +75,7 @@ if (is_array($extrafields->attributes[$risksign->table_element]['label']) && cou
 //$sql                                                                                                                                                  .= " AND fk_element = " . $id;
 if ( ! $allRisks) {
 	$sql .= " AND el.fk_target = " . $id;
+	$sql .= " AND el.sourcetype = 'digiriskdolibarr_risksign'";
 	$sql .= " AND t.entity IN (" . getEntity($risksign->element) . ") ";
 } else {
 	foreach ($trashList as $deleted_element => $element_id) {
@@ -91,6 +92,7 @@ if ( ! $allRisks) {
 	}
 	$sql = dol_substr($sql, 0, -1);
 	$sql .= ")";
+	$sql .= " AND el.sourcetype = 'digiriskdolibarr_risksign'";
 	$sql .= " AND t.entity IN (" . getEntity($risksign->element) . ") ";
 }
 
