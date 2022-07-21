@@ -398,9 +398,9 @@ class doc_groupmentdocument_odt extends ModeleODTGroupmentDocument
 											$tmparray['nomDanger']             = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $line->get_danger_category($line) . '.png';
 											$tmparray['nomPicto']              = $line->get_danger_category_name($line);
 											$tmparray['identifiantRisque']     = $line->ref . ' - ' . $lastEvaluation->ref;
-											$tmparray['quotationRisque']       = $lastEvaluation->cotation ? $lastEvaluation->cotation : '0';
+											$tmparray['quotationRisque']       = $lastEvaluation->cotation ?: '0';
 											$tmparray['descriptionRisque']     = $line->description;
-											$tmparray['commentaireEvaluation'] = dol_print_date((($conf->global->DIGIRISKDOLIBARR_SHOW_RISKASSESSMENT_DATE && ( ! empty($lastEvaluation->date_riskassessment))) ? $lastEvaluation->date_riskassessment : $lastEvaluation->date_creation), 'dayreduceformat') . ': ' . $lastEvaluation->comment;
+											$tmparray['commentaireEvaluation'] = $lastEvaluation->comment ? dol_print_date((($conf->global->DIGIRISKDOLIBARR_SHOW_RISKASSESSMENT_DATE && ( ! empty($lastEvaluation->date_riskassessment))) ? $lastEvaluation->date_riskassessment : $lastEvaluation->date_creation), 'dayreduceformat') . ': ' . $lastEvaluation->comment : '';
 
 											$related_tasks = $line->get_related_tasks($line);
 											$user          = new User($this->db);
