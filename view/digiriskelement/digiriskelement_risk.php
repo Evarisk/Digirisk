@@ -130,12 +130,11 @@ $arrayfields = array();
 foreach ($risk->fields as $key => $val) {
 	// If $val['visible']==0, then we never show the field
 	if ($val['label'] == 'Entity' || $val['label'] == 'ParentElement') {
-		if ($sharedrisks) {
-			$val['visible'] = 0;
-		}
+		$val['visible'] = 0;
 	}
 	if ( ! empty($val['visible'])) $arrayfields['t.' . $key] = array('label' => $val['label'], 'checked' => (($val['visible'] < 0) ? 0 : 1), 'enabled' => ($val['enabled'] && ($val['visible'] != 3)), 'position' => $val['position']);
 }
+
 foreach ($evaluation->fields as $key => $val) {
 	// If $val['visible']==0, then we never show the field
 	if ( ! empty($val['visible'])) $arrayfields['evaluation.' . $key] = array('label' => $val['label'], 'checked' => (($val['visible'] < 0) ? 0 : 1), 'enabled' => ($val['enabled'] && ($val['visible'] != 3)), 'position' => $val['position']);
