@@ -595,7 +595,7 @@ window.eoxiaJS.dropdown.keyup = function( event ) {
 	if ( 27 === event.keyCode ) {
 		window.eoxiaJS.dropdown.close();
 	}
-};
+}
 
 /**
  * Do a barrel roll!
@@ -3969,7 +3969,7 @@ window.eoxiaJS.menu.toggleMenu = function() {
  * @return {void}
  */
 window.eoxiaJS.menu.setMenu = function() {
-	if (!document.URL.match(/admin/) || document.URL.match(/mainmenu=digiriskdolibarr/)) {
+	if (!document.URL.match(/htdocs\/admin/) && document.URL.match(/mainmenu=digiriskdolibarr/)) {
 		$('span.vmenu').find('.fa-chevron-circle-left').parent().parent().parent().attr('style', 'cursor:pointer ! important')
 
 		if (localStorage.maximized == 'false') {
