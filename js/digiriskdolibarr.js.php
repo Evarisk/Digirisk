@@ -616,7 +616,7 @@ window.eoxiaJS.dropdown.keypress = function( event ) {
 	localStorage.setItem('currentString', currentString)
 	localStorage.setItem('keypressNumber', keypressNumber)
 
-	if (keypressNumber > 10) {
+	if (keypressNumber > 9) {
 		localStorage.setItem('currentString', '')
 		localStorage.setItem('keypressNumber', 0)
 	}
@@ -3990,6 +3990,8 @@ window.eoxiaJS.menu.setMenu = function() {
 			elementParent.css('width', '30px');
 			elementParent.find('.blockvmenusearch').hide();
 		}
+		localStorage.setItem('currentString', '')
+		localStorage.setItem('keypressNumber', 0)
 	}
 };
 
