@@ -1407,7 +1407,7 @@ function llxHeaderTicketDigirisk($title, $head = "", $disablejs = 0, $disablehea
 */
 function digirisk_show_medias($sdir, $size = '', $maxHeight = 80, $maxWidth = 80)
 {
-	global $conf;
+	global $conf, $langs;
 
 	include_once DOL_DOCUMENT_ROOT . '/core/lib/files.lib.php';
 	include_once DOL_DOCUMENT_ROOT . '/core/lib/images.lib.php';
@@ -1443,7 +1443,11 @@ function digirisk_show_medias($sdir, $size = '', $maxHeight = 80, $maxWidth = 80
 							<figure class="photo-image">
 								<?php
 								$urladvanced = getAdvancedPreviewUrl($modulepart, 'digiriskdolibarr/medias/' . preg_replace('/_' . $size . '/', '', $val['relativename']), 0, 'entity=' . $conf->entity); ?>
-								<a class="clicked-photo-preview" href="<?php echo $urladvanced; ?>"><i class="fas fa-2x fa-search-plus"></i></a>
+								<a class="clicked-photo-preview" href="<?php echo $urladvanced; ?>">
+									<div class="wpeo-button button-square-30 button-transparent wpeo-tooltip-event" aria-label="<?php echo $langs->trans('Preview'); ?>">
+										<i class="fas fa-search-plus"></i>
+									</div>
+								</a>
 								<?php if (image_format_supported($val['name']) >= 0) : ?>
 									<?php $fullpath = $path . '/' . urlencode($val['relativename']) . '&entity=' . $conf->entity; ?>
 								<input class="filename" type="hidden" value="<?php echo preg_replace('/_' . $size . '/', '', $val['name']) ?>">
