@@ -25,3 +25,46 @@
 }
 
 tr.liste_titre th.liste_titre:not(.maxwidthsearch), tr.liste_titre td.liste_titre:not(.maxwidthsearch) { opacity: 1; }
+
+/* Force values on one colum for small screen */
+@media only screen and (max-width: 1600px)
+{
+  //div.fiche {
+  //  margin-<?php print $left; ?>: <?php print (GETPOST('optioncss', 'aZ09') == 'print' ? 6 : ($dol_hide_leftmenu ? '6' : '20')); ?>px;
+  //  margin-<?php print $right; ?>: <?php print (GETPOST('optioncss', 'aZ09') == 'print' ? 8 : 6); ?>px;
+  //}
+  div.fichecenter {
+    width: 100%;
+    clear: both;	/* This is to have div fichecenter that are true rectangles */
+  }
+  div.fichecenterbis {
+    margin-top: 8px;
+  }
+  div.fichethirdleft {
+    float: none;
+    width: auto;
+    padding-bottom: 6px;
+  }
+  div.fichetwothirdright {
+    float: none;
+    width: auto;
+    padding-bottom: 6px;
+  }
+  div.fichehalfleft {
+    float: none;
+    width: auto;
+  }
+  div.fichehalfright {
+    float: none;
+    width: auto;
+  }
+  div.fichehalfright {
+    margin-top: 10px;
+  }
+  div.firstcolumn div.box {
+    padding-right: 0px;
+  }
+  div.secondcolumn div.box {
+    padding-left: 0px;
+  }
+}
