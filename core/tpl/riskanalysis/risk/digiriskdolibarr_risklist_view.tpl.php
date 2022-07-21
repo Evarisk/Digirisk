@@ -906,7 +906,7 @@
 	$menuConf = 'MAIN_SELECTEDFIELDS_' . $varpage;
 
 	if (dol_strlen($user->conf->$menuConf) < 1) {
-		$user->conf->$menuConf = 't.ref,t.category,evaluation.cotation,t.fk_element';
+		$user->conf->$menuConf = 't.ref,t.category,evaluation.cotation,';
 	}
 
 	if ( ! preg_match('/t.description/', $user->conf->$menuConf) && $conf->global->DIGIRISKDOLIBARR_RISK_DESCRIPTION) {

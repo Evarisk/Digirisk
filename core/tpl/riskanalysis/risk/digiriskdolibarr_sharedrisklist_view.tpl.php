@@ -337,20 +337,22 @@
 
 	$varpage  = empty($contextpage) ? $_SERVER["PHP_SELF"] : $contextpage;
 
-	$arrayfields['t.fk_element']['checked'] = 1;
-	$arrayfields['t.fk_element']['label'] = $langs->trans('ParentElement');
-	$arrayfields['t.fk_element']['enabled'] = 1;
-	$arrayfields['t.fk_element']['position'] = 10;
+	$arrayfields['t.entity']['checked']  = 1;
+	$arrayfields['t.entity']['label']    = $langs->trans('Entity');
+	$arrayfields['t.entity']['enabled']  = 1;
+	$arrayfields['t.entity']['position'] = 1;
 
-	$arrayfields['t.entity']['checked'] = 1;
-	$arrayfields['t.entity']['label'] = $langs->trans('Entity');
-	$arrayfields['t.entity']['enabled'] = 1;
-	$arrayfields['t.entity']['position'] = 15;
+	$arrayfields['t.fk_element']['checked']  = 1;
+	$arrayfields['t.fk_element']['label']    = $langs->trans('ParentElement');
+	$arrayfields['t.fk_element']['enabled']  = 1;
+	$arrayfields['t.fk_element']['position'] = 5;
+
+	$arrayfields = dol_sort_array($arrayfields, 'position');
 
 	$menuConf = 'MAIN_SELECTEDFIELDS_' . $varpage;
 
 	if (dol_strlen($user->conf->$menuConf) < 1) {
-		$user->conf->$menuConf = 't.ref,t.category,evaluation.cotation,t.fk_element,t.entity';
+		$user->conf->$menuConf = 't.entity,t.fk_element,t.ref,t.category,evaluation.cotation,';
 	}
 
 	if ( ! preg_match('/t.description/', $user->conf->$menuConf) && $conf->global->DIGIRISKDOLIBARR_RISK_DESCRIPTION) {
