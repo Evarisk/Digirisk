@@ -531,5 +531,3 @@
 	print '<!-- End form -->';
 	print '</div>' . "\n";
 	print '<!-- End div class="fichecenter" -->';
-
-	dol_fiche_end();
