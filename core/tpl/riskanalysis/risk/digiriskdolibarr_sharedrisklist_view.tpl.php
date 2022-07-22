@@ -1,4 +1,8 @@
 <?php
+	$selectedfields_label = 'shared_risklist_selectedfields';
+	// Selection of new fields
+	require './../../class/actions_changeselectedfields.php';
+
 	print '<div class="fichecenter sharedrisklist wpeo-wrap">';
 	print '<form method="POST" id="searchFormSharedListRisks" enctype="multipart/form-data" action="' . $_SERVER["PHP_SELF"] . '?id=' . $object->id .'">' . "\n";
 	print '<input type="hidden" name="token" value="' . newToken() . '">';
@@ -369,7 +373,7 @@
 		$arrayfields['evaluation.has_tasks']['enabled'] = 0;
 	}
 
-	$selectedfields  = $form->multiSelectArrayWithCheckbox('selectedfields', $arrayfields, $varpage); // This also change content of $arrayfields
+	$selectedfields  = $form->multiSelectArrayWithCheckbox('shared_risklist_selectedfields', $arrayfields, $varpage); // This also change content of $arrayfields
 	$selectedfields .= (count($arrayofmassactions) ? $form->showCheckAddButtons('checkforselect', 1) : '');
 
 	print '<div class="div-table-responsive">'; // You can use div-table-responsive-no-min if you dont need reserved height for your table

@@ -81,6 +81,7 @@ $page           = $page == -1 ? 0 : $page;
 
 // Initialize technical objects
 $object           = new DigiriskElement($db);
+$digiriskelement  = new DigiriskElement($db);
 $digiriskstandard = new DigiriskStandard($db);
 $risk             = new Risk($db);
 $evaluation       = new RiskAssessment($db);
@@ -170,8 +171,6 @@ $reshook    = $hookmanager->executeHooks('doActions', $parameters, $risk, $actio
 if ($reshook < 0) setEventMessages($hookmanager->error, $hookmanager->errors, 'errors');
 
 if (empty($reshook)) {
-	// Selection of new fields
-	include DOL_DOCUMENT_ROOT . '/core/actions_changeselectedfields.inc.php';
 
 	// Purge search criteria
 	if (GETPOST('button_removefilter_x', 'alpha') || GETPOST('button_removefilter.x', 'alpha') || GETPOST('button_removefilter', 'alpha')) { // All tests are required to be compatible with all browsers
@@ -381,6 +380,15 @@ if ($object->id > 0) {
 	}
 }
 
+?>
+
+<script>
+	$('.ulrisklist_selectedfields').attr('style','z-index:1050')
+	$('.ulinherited_risklist_selectedfields').attr('style','z-index:1050')
+	$('.ulshared_risklist_selectedfields').attr('style','z-index:1050')
+</script>
+
+<?php
 print '</div>' . "\n";
 print '<!-- End div class="cardcontent" -->';
 

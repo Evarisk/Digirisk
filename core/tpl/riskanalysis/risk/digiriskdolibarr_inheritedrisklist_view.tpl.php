@@ -1,4 +1,8 @@
 <?php
+	$selectedfields_label = 'inherited_risklist_selectedfields';
+	// Selection of new fields
+	require './../../class/actions_changeselectedfields.php';
+
 	print '<div class="fichecenter inheritedrisklist wpeo-wrap">';
 	print '<form method="POST" id="searchFormInheritedListRisks" enctype="multipart/form-data" action="' . $_SERVER["PHP_SELF"] . '?id=' . $object->id .'">' . "\n";
 	print '<input type="hidden" name="token" value="' . newToken() . '">';
@@ -279,14 +283,21 @@
 
 	$varpage  = empty($contextpage) ? $_SERVER["PHP_SELF"] : $contextpage;
 
-	$arrayfields['t.fk_element']['checked'] = 1;
 	$arrayfields['t.fk_element']['label'] = $langs->trans('ParentElement');
+	$arrayfields['t.fk_element']['checked'] = 1;
 	$arrayfields['t.fk_element']['enabled'] = 1;
 	$arrayfields['t.fk_element']['position'] = 1;
 
 	$arrayfields = dol_sort_array($arrayfields, 'position');
 
 	$menuConf = 'MAIN_SELECTEDFIELDS_' . $varpage;
+//echo '<pre>'; print_r( $user->conf->$menuConf ); echo '</pre>';
+//$newarray = explode(',', $user->conf->$menuConf);
+//$newarray = array_unique($newarray);
+//$user->conf->$menuConf = implode(',',$newarray);
+//echo '<pre>'; print_r( $newarray ); echo '</pre>';
+//
+//echo '<pre>'; print_r( $arrayfields ); echo '</pre>';
 
 	if (dol_strlen($user->conf->$menuConf) < 1) {
 		$user->conf->$menuConf = 't.fk_element,t.ref,t.category,evaluation.cotation,';
@@ -306,7 +317,7 @@
 		$arrayfields['evaluation.has_tasks']['enabled'] = 0;
 	}
 
-	$selectedfields  = $form->multiSelectArrayWithCheckbox('selectedfields', $arrayfields, $varpage); // This also change content of $arrayfields
+	$selectedfields  = $form->multiSelectArrayWithCheckbox('inherited_risklist_selectedfields', $arrayfields, $varpage); // This also change content of $arrayfields
 	$selectedfields .= (count($arrayofmassactions) ? $form->showCheckAddButtons('checkforselect', 1) : '');
 
 	print '<div class="div-table-responsive">'; // You can use div-table-responsive-no-min if you dont need reserved height for your table
