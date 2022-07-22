@@ -300,23 +300,23 @@ if ( ! empty($conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE)) {
 	print '</form>';
 
 	print '</table>';
-	
+
 	print load_fiche_titre($langs->trans("TicketSuccessMessageData"), '', '');
 
 	print '<table class="noborder centpercent">';
-	
+
 	print '<form method="post" action="'.$_SERVER['PHP_SELF'].'" enctype="multipart/form-data" >';
 	print '<input type="hidden" name="token" value="'.newToken().'">';
 	print '<input type="hidden" name="action" value="setTicketSuccessMessage">';
-	
+
 	print '<tr class="liste_titre">';
 	print '<td>'.$langs->trans("Name").'</td>';
 	print '<td>' . $langs->trans("Description") . '</td>';
 	print '<td class="center">' . $langs->trans("Action") . '</td>';
 	print "</tr>";
-		
+
 	// Ticket success message
-	$successmessage = $conf->global->DIGIRISKDOLIBARR_TICKET_SUCCESS_MESSAGE ?: $langs->trans('YouMustNotifyYourHierarchy');
+	$successmessage = $langs->trans($conf->global->DIGIRISKDOLIBARR_TICKET_SUCCESS_MESSAGE) ?: $langs->trans('YouMustNotifyYourHierarchy');
 	print '<tr class="oddeven"><td>'.$langs->trans("TicketSuccessMessage");
 	print '</td><td>';
 	require_once DOL_DOCUMENT_ROOT.'/core/class/doleditor.class.php';
