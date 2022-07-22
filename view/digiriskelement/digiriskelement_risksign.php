@@ -142,8 +142,6 @@ $reshook    = $hookmanager->executeHooks('doActions', $parameters, $risksign, $a
 if ($reshook < 0) setEventMessages($hookmanager->error, $hookmanager->errors, 'errors');
 
 if (empty($reshook)) {
-	// Selection of new fields
-	include DOL_DOCUMENT_ROOT . '/core/actions_changeselectedfields.inc.php';
 
 	// Purge search criteria
 	if (GETPOST('button_removefilter_x', 'alpha') || GETPOST('button_removefilter.x', 'alpha') || GETPOST('button_removefilter', 'alpha')) { // All tests are required to be compatible with all browsers
@@ -451,6 +449,15 @@ if ($object->id > 0) {
 print '</div>' . "\n";
 print '<!-- End div class="cardcontent" -->';
 
+?>
+
+	<script>
+		$('.ulrisksignlist_selectedfields').attr('style','z-index:1050')
+		$('.ulinherited_risksignlist_selectedfields').attr('style','z-index:1050')
+		$('.ulshared_risksignlist_selectedfields').attr('style','z-index:1050')
+	</script>
+
+<?php
 // End of page
 llxFooter();
 $db->close();

@@ -1,4 +1,8 @@
 <?php
+$selectedfields_label = 'risksignlist_selectedfields';
+// Selection of new fields
+require './../../class/actions_changeselectedfields.php';
+
 print '<div class="fichecenter risksignlist wpeo-wrap">';
 print '<form method="POST" id="searchFormListRiskSigns" action="' . $_SERVER["PHP_SELF"] . (($contextpage != 'risksignlist') ? '?id=' . $object->id : '') . '">' . "\n";
 print '<input type="hidden" name="token" value="' . newToken() . '">';
@@ -158,60 +162,60 @@ if ($action != 'list') {
 	$newcardbutton = '<div class="wpeo-button button-square-40 button-grey" value="' . $object->id . '"><i class="fas fa-map-signs button-icon wpeo-tooltip-event" aria-label="' . $langs->trans('PermissionDenied') . '"></i><i class="fas fa-plus-circle button-add animated"></i></div>';
 } ?>
 
-	<!-- RISKSIGN ADD MODAL-->
-	<div class="risksign-add-modal" value="<?php echo $object->id ?>">
-		<div class="wpeo-modal modal-risksign-0" id="risksign_add<?php echo $object->id ?>">
-			<div class="modal-container wpeo-modal-event">
-				<!-- Modal-Header -->
-				<div class="modal-header">
-					<h2 class="modal-title"><?php echo $langs->trans('AddRiskSignTitle') . ' ' . $refRiskSignMod->getNextValue($risksign);  ?></h2>
-					<div class="modal-close"><i class="fas fa-times"></i></div>
-				</div>
-				<!-- Modal-ADD RiskSign Content-->
-				<div class="modal-content" id="#modalContent">
-					<div class="risksign-content">
-						<div class="risksign-category">
-							<span class="title"><?php echo $langs->trans('RiskSign'); ?><required>*</required></span>
-							<input class="input-hidden-danger" type="hidden" name="risksign_category_id" value="undefined" />
-							<div class="wpeo-dropdown dropdown-large dropdown-grid risksign-category-danger padding">
-								<div class="dropdown-toggle dropdown-add-button button-cotation">
-									<span class="wpeo-button button-square-50 button-grey"><i class="fas fa-map-signs button-icon"></i><i class="fas fa-plus-circle button-add"></i></span>
-									<img class="danger-category-pic wpeo-tooltip-event hidden" src=""  aria-label=""/>
-								</div>
-								<ul class="dropdown-content wpeo-gridlayout grid-5 grid-gap-0">
-									<?php
-									$risksignCategories = $risksign->get_risksign_categories();
-									if ( ! empty($risksignCategories) ) :
-										foreach ($risksignCategories as $risksignCategory) : ?>
-											<li class="item dropdown-item wpeo-tooltip-event" data-is-preset="<?php echo ''; ?>" data-id="<?php echo $risksignCategory['position'] ?>" aria-label="<?php echo $risksignCategory["name"] ?>">
-												<img src="<?php echo DOL_URL_ROOT . '/custom/digiriskdolibarr/img/' . $risksignCategory['name_thumbnail'] ?>" class="attachment-thumbail size-thumbnail photo photowithmargin" alt="" loading="lazy" width="48" height="48">
-											</li>
-										<?php endforeach;
-									endif; ?>
-								</ul>
+<!-- RISKSIGN ADD MODAL-->
+<div class="risksign-add-modal" value="<?php echo $object->id ?>">
+	<div class="wpeo-modal modal-risksign-0" id="risksign_add<?php echo $object->id ?>">
+		<div class="modal-container wpeo-modal-event">
+			<!-- Modal-Header -->
+			<div class="modal-header">
+				<h2 class="modal-title"><?php echo $langs->trans('AddRiskSignTitle') . ' ' . $refRiskSignMod->getNextValue($risksign);  ?></h2>
+				<div class="modal-close"><i class="fas fa-times"></i></div>
+			</div>
+			<!-- Modal-ADD RiskSign Content-->
+			<div class="modal-content" id="#modalContent">
+				<div class="risksign-content">
+					<div class="risksign-category">
+						<span class="title"><?php echo $langs->trans('RiskSign'); ?><required>*</required></span>
+						<input class="input-hidden-danger" type="hidden" name="risksign_category_id" value="undefined" />
+						<div class="wpeo-dropdown dropdown-large dropdown-grid risksign-category-danger padding">
+							<div class="dropdown-toggle dropdown-add-button button-cotation">
+								<span class="wpeo-button button-square-50 button-grey"><i class="fas fa-map-signs button-icon"></i><i class="fas fa-plus-circle button-add"></i></span>
+								<img class="danger-category-pic wpeo-tooltip-event hidden" src=""  aria-label=""/>
 							</div>
-						</div>
-						<div class="risksign-description">
-							<span class="title"><?php echo $langs->trans('Description'); ?></span>
-							<?php print '<textarea name="risksignDescription" rows="' . ROWS_2 . '">' . ('') . '</textarea>' . "\n"; ?>
+							<ul class="dropdown-content wpeo-gridlayout grid-5 grid-gap-0">
+								<?php
+								$risksignCategories = $risksign->get_risksign_categories();
+								if ( ! empty($risksignCategories) ) :
+									foreach ($risksignCategories as $risksignCategory) : ?>
+										<li class="item dropdown-item wpeo-tooltip-event" data-is-preset="<?php echo ''; ?>" data-id="<?php echo $risksignCategory['position'] ?>" aria-label="<?php echo $risksignCategory["name"] ?>">
+											<img src="<?php echo DOL_URL_ROOT . '/custom/digiriskdolibarr/img/' . $risksignCategory['name_thumbnail'] ?>" class="attachment-thumbail size-thumbnail photo photowithmargin" alt="" loading="lazy" width="48" height="48">
+										</li>
+									<?php endforeach;
+								endif; ?>
+							</ul>
 						</div>
 					</div>
+					<div class="risksign-description">
+						<span class="title"><?php echo $langs->trans('Description'); ?></span>
+						<?php print '<textarea name="risksignDescription" rows="' . ROWS_2 . '">' . ('') . '</textarea>' . "\n"; ?>
+					</div>
 				</div>
-				<!-- Modal-Footer -->
-				<div class="modal-footer">
-					<?php if ($permissiontoadd) : ?>
-						<div class="risksign-create wpeo-button button-primary button-disable modal-close">
-							<span><i class="fas fa-plus"></i>  <?php echo $langs->trans('AddRiskSignButton'); ?></span>
-						</div>
-					<?php else : ?>
-						<div class="wpeo-button button-grey wpeo-tooltip-event" aria-label="<?php echo $langs->trans('PermissionDenied') ?>">
-							<i class="fas fa-plus"></i> <?php echo $langs->trans('AddRiskSignButton'); ?>
-						</div>
-					<?php endif; ?>
-				</div>
+			</div>
+			<!-- Modal-Footer -->
+			<div class="modal-footer">
+				<?php if ($permissiontoadd) : ?>
+					<div class="risksign-create wpeo-button button-primary button-disable modal-close">
+						<span><i class="fas fa-plus"></i>  <?php echo $langs->trans('AddRiskSignButton'); ?></span>
+					</div>
+				<?php else : ?>
+					<div class="wpeo-button button-grey wpeo-tooltip-event" aria-label="<?php echo $langs->trans('PermissionDenied') ?>">
+						<i class="fas fa-plus"></i> <?php echo $langs->trans('AddRiskSignButton'); ?>
+					</div>
+				<?php endif; ?>
 			</div>
 		</div>
 	</div>
+</div>
 
 <?php $title = $langs->trans('DigiriskElementRiskSignList');
 print_barre_liste($title, $page, $_SERVER["PHP_SELF"], $param, $sortfield, $sortorder, $massactionbutton, $num, $nbtotalofrecords, 'digiriskdolibarr32px.png@digiriskdolibarr', 0, $newcardbutton, '', $limit, 0, 0, 1);
@@ -237,7 +241,7 @@ if ( ! empty($moreforfilter)) {
 
 $varpage         = empty($contextpage) ? $_SERVER["PHP_SELF"] : $contextpage;
 
-$selectedfields  = $form->multiSelectArrayWithCheckbox('selectedfields', $arrayfields, $varpage); // This also change content of $arrayfields
+$selectedfields  = $form->multiSelectArrayWithCheckbox('risksignlist_selectedfields', $arrayfields, $varpage); // This also change content of $arrayfields
 $selectedfields .= (count($arrayofmassactions) ? $form->showCheckAddButtons('checkforselect', 1) : '');
 
 print '<div class="div-table-responsive">'; // You can use div-table-responsive-no-min if you dont need reserved height for your table
