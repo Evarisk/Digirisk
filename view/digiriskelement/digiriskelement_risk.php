@@ -244,6 +244,8 @@ if ($sharedrisks) {
 			$lastEvaluation = $risk_assessment->fetchFromParent($risks->id, 1);
 			if (!empty($lastEvaluation)) {
 				$lastEvaluation = array_shift($lastEvaluation);
+			} else {
+				$lastEvaluation = new RiskAssessment($db);
 			}
 
 //			$pathToThumb = DOL_URL_ROOT . '/viewimage.php?modulepart=digiriskdolibarr&entity=' . $risks->entity . '&file=' . urlencode($digiriskelementtmp->element_type . '/' . $digiriskelementtmp->ref . '/thumbs/');
