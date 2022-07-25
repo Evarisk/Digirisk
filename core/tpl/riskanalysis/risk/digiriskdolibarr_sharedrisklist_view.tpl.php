@@ -1,4 +1,8 @@
 <?php
+	$selectedfields_label = 'shared_risklist_selectedfields';
+	// Selection of new fields
+	require './../../class/actions_changeselectedfields.php';
+
 	print '<div class="fichecenter sharedrisklist wpeo-wrap">';
 	print '<form method="POST" id="searchFormSharedListRisks" enctype="multipart/form-data" action="' . $_SERVER["PHP_SELF"] . '?id=' . $object->id .'">' . "\n";
 	print '<input type="hidden" name="token" value="' . newToken() . '">';
@@ -80,6 +84,7 @@
 		//else $sql                                                                                                                                     .= " WHERE 1 = 1";
 		if ( ! $allRisks) {
 			$sql .= " AND el.fk_target = " . $id;
+			$sql .= " AND el.sourcetype = 'digiriskdolibarr_risk'";
 		} else {
 			foreach ($trashList as $deleted_element => $element_id) {
 				$sql .= " AND fk_element !=" . $element_id;
@@ -95,6 +100,7 @@
 			}
 			$sql = dol_substr($sql, 0 , -1);
 			$sql .= ")";
+			$sql .= " AND el.sourcetype = 'digiriskdolibarr_risk'";
 			//$sql .= " AND e.entity IN (" . getEntity($risk->element) . ") ";
 		}
 
@@ -195,6 +201,7 @@
 
 		if ( ! $allRisks) {
 			$sql .= " AND el.fk_target = " . $id;
+			$sql .= " AND el.sourcetype = 'digiriskdolibarr_risk'";
 			//$sql .= " AND r.fk_element =" . $id;
 		} else {
 			foreach ($trashList as $deleted_element => $element_id) {
@@ -211,6 +218,7 @@
 			}
 			$sql = dol_substr($sql, 0 , -1);
 			$sql .= ")";
+			$sql .= " AND el.sourcetype = 'digiriskdolibarr_risk'";
 			//$sql .= " AND e.entity IN (" . getEntity($evaluation->element) . ")";
 		}
 
@@ -332,23 +340,40 @@
 	}
 
 	$varpage  = empty($contextpage) ? $_SERVER["PHP_SELF"] : $contextpage;
+
+	$arrayfields['t.entity']['checked']  = 1;
+	$arrayfields['t.entity']['label']    = $langs->trans('Entity');
+	$arrayfields['t.entity']['enabled']  = 1;
+	$arrayfields['t.entity']['position'] = 1;
+
+	$arrayfields['t.fk_element']['checked']  = 1;
+	$arrayfields['t.fk_element']['label']    = $langs->trans('ParentElement');
+	$arrayfields['t.fk_element']['enabled']  = 1;
+	$arrayfields['t.fk_element']['position'] = 5;
+
+	$arrayfields = dol_sort_array($arrayfields, 'position');
+
 	$menuConf = 'MAIN_SELECTEDFIELDS_' . $varpage;
 
+	if (dol_strlen($user->conf->$menuConf) < 1) {
+		$user->conf->$menuConf = 't.entity,t.fk_element,t.ref,t.category,evaluation.cotation,';
+	}
+
 	if ( ! preg_match('/t.description/', $user->conf->$menuConf) && $conf->global->DIGIRISKDOLIBARR_RISK_DESCRIPTION) {
-		$user->conf->$menuConf = 't.entity,t.fk_element,t.ref,evaluation.cotation,t.category,t.description,';
+		$user->conf->$menuConf = $user->conf->$menuConf  . 't.description,';
 	} elseif ( ! $conf->global->DIGIRISKDOLIBARR_RISK_DESCRIPTION) {
 		$user->conf->$menuConf = preg_replace('/t.description,/', '', $user->conf->$menuConf);
 		$arrayfields['t.description']['enabled'] = 0;
 	}
 
 	if ( ! preg_match('/evaluation.has_tasks/', $user->conf->$menuConf) && $conf->global->DIGIRISKDOLIBARR_TASK_MANAGEMENT) {
-		$user->conf->$menuConf .= 't.entity,t.fk_element,t.ref,evaluation.cotation,t.category,evaluation.has_tasks,';
+		$user->conf->$menuConf .= $user->conf->$menuConf  . 'evaluation.has_tasks,';
 	} elseif ( ! $conf->global->DIGIRISKDOLIBARR_TASK_MANAGEMENT) {
 		$user->conf->$menuConf = preg_replace('/evaluation.has_tasks,/', '', $user->conf->$menuConf);
 		$arrayfields['evaluation.has_tasks']['enabled'] = 0;
 	}
 
-	$selectedfields  = $form->multiSelectArrayWithCheckbox('selectedfields', $arrayfields, $varpage); // This also change content of $arrayfields
+	$selectedfields  = $form->multiSelectArrayWithCheckbox('shared_risklist_selectedfields', $arrayfields, $varpage); // This also change content of $arrayfields
 	$selectedfields .= (count($arrayofmassactions) ? $form->showCheckAddButtons('checkforselect', 1) : '');
 
 	print '<div class="div-table-responsive">'; // You can use div-table-responsive-no-min if you dont need reserved height for your table
@@ -379,7 +404,7 @@
 			} elseif ($key == 'fk_element') {
 				print $digiriskelement->select_digiriskelement_list($search['fk_element'], 'search_fk_element_sharedrisk', 's.entity NOT IN (' . $conf->entity . ')', 1, 0, array(), 0, 0, 'minwidth100', 0, false, 1, $contextpage, false);
 			} elseif ($key == 'category') { ?>
-				<div class="wpeo-dropdown dropdown-large dropdown-grid category-danger padding">
+				<div class="wpeo-dropdown dropdown-large dropdown-grid category-danger padding" style="position: inherit">
 					<input class="input-hidden-danger" type="hidden" name="<?php echo 'search_' . $key ?>" value="<?php echo dol_escape_htmltag($search[$key]) ?>" />
 					<?php if (dol_strlen(dol_escape_htmltag($search[$key])) == 0) : ?>
 						<div class="dropdown-toggle dropdown-add-button button-cotation">
@@ -512,11 +537,7 @@
 				} elseif ($key == 'ref') {
 					?>
 					<div class="risk-container" value="<?php echo $risk->id ?>">
-						<div><i class="fas fa-exclamation-triangle"></i><?php echo ' ' . $risk->ref; ?>
-						<?php if ($permissiontoadd) : ?>
-							<i class="risk-unlink-shared wpeo-tooltip-event fas fa-unlink button-icon" aria-label="<?php echo $langs->trans('UnlinkSharedRisk') ?>" value="<?php echo $risk->id;?>"></i>
-						<?php endif; ?>
-						</div>
+						<div><i class="fas fa-exclamation-triangle"></i><?php echo ' ' . $risk->ref; ?></div>
 					</div>
 					<?php
 				} elseif ($key == 'description') {
@@ -545,9 +566,9 @@
 				$cssforfield = '';
 				print '<td' . ($cssforfield ? ' class="' . $cssforfield . '"' : '') . ' style="vertical-align: top;">';
 				if ($key == 'cotation') {
-					require './../../core/tpl/digiriskdolibarr_riskassessment_view.tpl.php';
+					require './../../core/tpl/riskanalysis/riskassessment/digiriskdolibarr_riskassessment_view.tpl.php';
 				} elseif ($key == 'has_tasks' && $conf->global->DIGIRISKDOLIBARR_TASK_MANAGEMENT) {
-					require './../../core/tpl/digiriskdolibarr_riskassessment_task_view.tpl.php';
+					require './../../core/tpl/riskanalysis/riskassessment/digiriskdolibarr_riskassessment_task_view.tpl.php';
 				} elseif ($conf->global->DIGIRISKDOLIBARR_TASK_MANAGEMENT == 0) {
 					print $langs->trans('TaskManagementNotActivated');
 				} else print $lastEvaluation->showOutputField($val, $key, $lastEvaluation->$key, '');
@@ -570,6 +591,9 @@
 
 		// Action column
 		print '<td class="nowrap center">';
+		if ($permissiontoadd) {
+			print '<i class="risk-unlink-shared wpeo-tooltip-event fas fa-unlink button-icon" aria-label="' . $langs->trans('UnlinkSharedRisk') . '" value="' . $risk->id . '"></i>';
+		}
 		if ($massactionbutton || $massaction) {   // If we are in select mode (massactionbutton defined) or if we have already selected and sent an action ($massaction) defined
 			$selected                                            = 0;
 			if (in_array($risk->id, $arrayofselected)) $selected = 1;

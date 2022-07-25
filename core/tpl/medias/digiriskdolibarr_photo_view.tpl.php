@@ -18,7 +18,7 @@
 
 // Protection to avoid direct call of template
 if (empty($conf) || ! is_object($conf)) {
-	print "Error, template page digiriskdolibarr_photo_view.tpl.tpl.php can't be called as URL";
+	print "Error, template page digiriskdolibarr_photo_view.tpl.php can't be called as URL";
 	exit;
 }
 
@@ -50,9 +50,15 @@ if (empty($conf) || ! is_object($conf)) {
 					<span class="floatleft inline-block valignmiddle divphotoref risk-evaluation-photo-single">
 						<input class="filepath-to-riskassessment filepath-to-riskassessment-<?php echo $risk->id > 0 ? $risk->id : 'new' ?>" type="hidden" value="<?php echo $pathToThumb ?>">
 						<input class="filename" type="hidden" value="">
-						 <?php 	print '<img width="40" class="photo clicked-photo-preview" src="' . DOL_URL_ROOT . '/custom/digiriskdolibarr/documents/viewimage.php?modulepart=digiriskdolibarr&entity=' . $cotation->entity . '&file=' . urlencode($cotation->element . '/' . $cotation->ref . '/thumbs/' . preg_replace('/\./', '_small.', $cotation->photo)) . '" >';
-							?>
+
+						 <?php
+							 $urladvanced = getAdvancedPreviewUrl('ecm', 'digiriskdolibarr/medias/' .  $cotation->photo, 0, 'entity=' . $conf->entity);
+
+							 print '<a class="clicked-photo-preview" href="'. $urladvanced .'">';
+							 print '<img width="40" class="photo clicked-photo-preview" src="' . DOL_URL_ROOT . '/custom/digiriskdolibarr/documents/viewimage.php?modulepart=digiriskdolibarr&entity=' . $cotation->entity . '&file=' . urlencode($cotation->element . '/' . $cotation->ref . '/thumbs/' . preg_replace('/\./', '_small.', $cotation->photo)) . '" ></a>';
+						 ?>
 					</span>
+
 					<?php
 				} else {
 					?>

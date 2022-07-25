@@ -71,7 +71,7 @@ class RiskSign extends CommonObject
 		'rowid'         => array('type' => 'integer', 'label' => 'TechnicalID', 'enabled' => '1', 'position' => 1, 'notnull' => 1, 'visible' => 0, 'noteditable' => '1', 'index' => 1, 'comment' => "Id"),
 		'ref'           => array('type' => 'varchar(128)', 'label' => 'Ref', 'enabled' => '1', 'position' => 10, 'notnull' => 1, 'visible' => 4, 'noteditable' => '1', 'default' => '(PROV)', 'index' => 1, 'searchall' => 1, 'showoncombobox' => '1', 'comment' => "Reference of object"),
 		'ref_ext'       => array('type' => 'varchar(128)', 'label' => 'RefExt', 'enabled' => '1', 'position' => 20, 'notnull' => 0, 'visible' => 0,),
-		'entity'        => array('type' => 'integer', 'label' => 'Entity', 'enabled' => '1', 'position' => 30, 'notnull' => 1, 'visible' => -1,),
+		'entity'        => array('type' => 'integer', 'label' => 'Entity', 'enabled' => '1', 'position' => 8, 'notnull' => 1, 'visible' => -1,),
 		'date_creation' => array('type' => 'datetime', 'label' => 'DateCreation', 'enabled' => '1', 'position' => 40, 'notnull' => 1, 'visible' => 0,),
 		'tms'           => array('type' => 'timestamp', 'label' => 'DateModification', 'enabled' => '1', 'position' => 50, 'notnull' => 0, 'visible' => 0,),
 		'import_key'    => array('type' => 'varchar(14)', 'label' => 'ImportId', 'enabled' => '1', 'position' => 60, 'notnull' => -1, 'visible' => 0,),
@@ -80,7 +80,7 @@ class RiskSign extends CommonObject
 		'description'   => array('type' => 'text', 'label' => 'Description', 'enabled' => '1', 'position' => 90, 'notnull' => 0, 'visible' => 1,),
 		'fk_user_creat' => array('type' => 'integer:User:user/class/user.class.php', 'label' => 'UserAuthor', 'enabled' => '1', 'position' => 100, 'notnull' => 1, 'visible' => 0, 'foreignkey' => 'user.rowid',),
 		'fk_user_modif' => array('type' => 'integer:User:user/class/user.class.php', 'label' => 'UserModif', 'enabled' => '1', 'position' => 110, 'notnull' => -1, 'visible' => 0,),
-		'fk_element'    => array('type' => 'integer', 'label' => 'FK Element', 'enabled' => '1', 'position' => 120, 'notnull' => 1, 'visible' => 0,),
+		'fk_element'    => array('type' => 'integer', 'label' => 'ParentElement', 'enabled' => '1', 'position' => 9, 'notnull' => 1, 'visible' => 1,),
 	);
 
 	public $rowid;
@@ -204,6 +204,60 @@ class RiskSign extends CommonObject
 	}
 
 	/**
+	 * Get risksign category picto name
+	 *
+	 * @param $name
+	 * @return    string $category['name']     name to danger category picto, -1 if don't exist
+	 */
+	public function get_risksign_category_position_by_name($name)
+	{
+		$risksign_categories = $this->get_risksign_categories();
+		foreach ($risksign_categories as $category) {
+			if ($category['name'] == $name) {
+				return $category['position'];
+			}
+		}
+
+		return -1;
+	}
+
+	/**
+	 * Get risksign category picto path
+	 *
+	 * @param int $position
+	 * @return    string $category['name_thumbnail']     path to danger category picto, -1 if don't exist
+	 */
+	public function get_risksign_category_by_position($position)
+	{
+		$risksign_categories  = $this->get_risksign_categories();
+		foreach ($risksign_categories as $category) {
+			if ($category['position'] == $position) {
+				return $category['name_thumbnail'];
+			}
+		}
+
+		return -1;
+	}
+
+	/**
+	 * Get risksign category picto name
+	 *
+	 * @param int $position
+	 * @return    string $category['name']     path to risksign category picto, -1 if don't exist
+	 */
+	public function get_risksign_category_name_by_position($position)
+	{
+		$risksign_categories = $this->get_risksign_categories();
+		foreach ($risksign_categories as $category) {
+			if ($category['position'] == $position) {
+				return $category['name'];
+			}
+		}
+
+		return -1;
+	}
+
+	/**
 	 * Load object in memory from the database
 	 *
 	 * @param int $id Id object
@@ -213,6 +267,65 @@ class RiskSign extends CommonObject
 	public function fetch($id, $ref = null)
 	{
 		return $this->fetchCommon($id, $ref);
+	}
+
+	/**
+	 * Load object in memory from the database
+	 *
+	 * @param int $parent_id Id parent object
+	 * @param bool $get_children_data Get children risks data
+	 * @param bool $get_parents_data Get parents risks data
+	 * @return array|int         <0 if KO, 0 if not found, >0 if OK
+	 * @throws Exception
+	 */
+	public function fetchRiskSign($parent_id, $get_parents_data = false, $get_shared_data = false)
+	{
+		global $conf;
+		$object   = new DigiriskElement($this->db);
+		$objects  = $object->fetchAll('',  '',  0,  0, array('customsql' => 'status > 0' ));
+		$risksign = new RiskSign($this->db);
+		$result   = $risksign->fetchFromParent($parent_id);
+
+		if ($result > 0 && ! empty($result)) {
+			foreach ($result as $risksign) {
+				$risksigns[$risksign->id] = $risksign;
+			}
+		}
+
+		if ( $get_parents_data ) {
+			$parent_element_id = $objects[$parent_id]->id;
+			while ($parent_element_id > 0) {
+				$result = $risksign->fetchFromParent($parent_element_id);
+				if ($result > 0 && ! empty($result)) {
+					foreach ($result as $risksign) {
+						$risksigns[$risksign->id] = $risksign;
+					}
+				}
+				$parent_element_id = $objects[$parent_element_id]->fk_parent;
+			}
+		}
+
+		if ( $get_shared_data ) {
+			$digiriskelementtmp = new DigiriskElement($this->db);
+
+			$allrisksigns = $risksign->fetchAll('', '', 0, 0, array('customsql' => 'status > 0 AND entity NOT IN (' . $conf->entity . ')'), 'AND', 0);
+
+			foreach ($allrisksigns as $key => $allrisksign) {
+				$digiriskelementtmp->fetch($allrisksign->fk_element);
+				$digiriskelementtmp->element = 'digiriskdolibarr';
+				$digiriskelementtmp->fetchObjectLinked($allrisksign->id, 'digiriskdolibarr_risksign', $object->id, 'digiriskdolibarr_digiriskelement', 'AND', 1, 'sourcetype', 0);
+				$alreadyImported = !empty($digiriskelementtmp->linkedObjectsIds) ? 1 : 0;
+				if ($alreadyImported > 0) {
+					$risksigns[$allrisksign->id] = $allrisksign;
+				}
+			}
+		}
+
+		if ( ! empty($risksigns) ) {
+			return $risksigns;
+		} else {
+			return -1;
+		}
 	}
 
 	/**
@@ -236,7 +349,7 @@ class RiskSign extends CommonObject
 		$sql                                                                              = 'SELECT ';
 		$sql                                                                             .= $this->getFieldList();
 		$sql                                                                             .= ' FROM ' . MAIN_DB_PREFIX . $this->table_element . ' as t';
-		if (isset($this->ismultientitymanaged) && $this->ismultientitymanaged == 1) $sql .= ' WHERE t.entity IN (' . getEntity($this->table_element) . ')';
+		if (isset($this->ismultientitymanaged) && $this->ismultientitymanaged == 1) $sql .= ' WHERE t.entity IN (' . getEntity($this->element) . ')';
 		else $sql                                                                        .= ' WHERE 1 = 1';
 		// Manage filter
 		$sqlwhere = array();
@@ -263,7 +376,6 @@ class RiskSign extends CommonObject
 		if ( ! empty($limit)) {
 			$sql .= ' ' . $this->db->plimit($limit, $offset);
 		}
-
 		$resql = $this->db->query($sql);
 		if ($resql) {
 			$num = $this->db->num_rows($resql);
@@ -311,5 +423,73 @@ class RiskSign extends CommonObject
 	public function delete(User $user, $notrigger = false)
 	{
 		return $this->deleteCommon($user, $notrigger);
+	}
+
+	/**
+	 * 	Return clickable name (with picto eventually)
+	 *
+	 * 	@param	int		$withpicto		          0=No picto, 1=Include picto into link, 2=Only picto
+	 * 	@param	string	$option			          Variant where the link point to ('', 'nolink')
+	 * 	@param	int		$addlabel		          0=Default, 1=Add label into string, >1=Add first chars into string
+	 *  @param	string	$moreinpopup	          Text to add into popup
+	 *  @param	string	$sep			          Separator between ref and label if option addlabel is set
+	 *  @param	int   	$notooltip		          1=Disable tooltip
+	 *  @param  int     $save_lastsearch_value    -1=Auto, 0=No save of lastsearch_values when clicking, 1=Save lastsearch_values whenclicking
+	 *  @param	string	$morecss				  More css on a link
+	 * 	@return	string					          String with URL
+	 */
+	public function getNomUrl($withpicto = 0, $option = '', $addlabel = 0, $moreinpopup = '', $sep = ' - ', $notooltip = 0, $save_lastsearch_value = -1, $morecss = '')
+	{
+		global $conf, $langs, $user, $hookmanager;
+
+		if ( ! empty($conf->dol_no_mouse_hover)) $notooltip = 1; // Force disable tooltips
+
+		$result = '';
+
+		$label                          = '';
+		if ($option != 'nolink') $label = '<i class="fas fa-map-signs"></i> <u class="paddingrightonly">' . $langs->trans('RiskSign') . '</u>';
+		$label                         .= ($label ? '<br>' : '') . '<b>' . $langs->trans('Ref') . ': </b>' . $this->ref; // The space must be after the : to not being explode when showing the title in img_picto
+		if ($moreinpopup) $label       .= '<br>' . $moreinpopup;
+
+		$url = dol_buildpath('/digiriskdolibarr/view/digiriskelement/digiriskelement_risksign.php', 1) . '?id=' . $this->fk_element;
+
+		if ($option != 'nolink') {
+			// Add param to save lastsearch_values or not
+			$add_save_lastsearch_values                                                                                      = ($save_lastsearch_value == 1 ? 1 : 0);
+			if ($save_lastsearch_value == -1 && preg_match('/list\.php/', $_SERVER["PHP_SELF"])) $add_save_lastsearch_values = 1;
+			if ($add_save_lastsearch_values) $url                                                                           .= '&save_lastsearch_values=1';
+		}
+
+		$linkclose = '';
+		if ($option == 'blank') {
+			$linkclose .= ' target=_blank';
+		}
+
+		if (empty($notooltip) && $user->rights->digiriskdolibarr->risksign->read) {
+			if ( ! empty($conf->global->MAIN_OPTIMIZEFORTEXTBROWSER)) {
+				$label      = $langs->trans("ShowRiskSign");
+				$linkclose .= ' alt="' . dol_escape_htmltag($label, 1) . '"';
+			}
+			$linkclose .= ' title="' . dol_escape_htmltag($label, 1) . '"';
+			$linkclose .= ' class="classfortooltip' . ($morecss ? ' ' . $morecss : '') . '"';
+		} else $linkclose = ($morecss ? ' class="' . $morecss . '"' : '');
+
+		$linkstart  = '<a href="' . $url . '"';
+		$linkstart .= $linkclose . '>';
+		$linkend    = '</a>';
+
+		$result                      .= $linkstart;
+		if ($withpicto) $result      .= '<i class="fas fa-map-signs"></i>' . ' ';
+		if ($withpicto != 2) $result .= $this->ref;
+		$result                      .= $linkend;
+
+		global $action;
+		$hookmanager->initHooks(array('risksigndao'));
+		$parameters               = array('id' => $this->id, 'getnomurl' => $result);
+		$reshook                  = $hookmanager->executeHooks('getNomUrl', $parameters, $this, $action); // Note that $action and $this may have been modified by some hooks
+		if ($reshook > 0) $result = $hookmanager->resPrint;
+		else $result             .= $hookmanager->resPrint;
+
+		return $result;
 	}
 }

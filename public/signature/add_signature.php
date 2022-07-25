@@ -252,7 +252,7 @@ if ( $signatory->role == 'PP_EXT_SOCIETY_INTERVENANTS') {
 			</div>
 			<br>
 			<div class="signature-element">
-				<?php require  "../../core/tpl/digiriskdolibarr_signature_view.tpl.php"; ?>
+				<?php require "../../core/tpl/signature/digiriskdolibarr_signature_view.tpl.php"; ?>
 			</div>
 		</div>
 	</div>

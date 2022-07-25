@@ -762,6 +762,42 @@ if (is_dir($dir)) {
 }
 print '</table>';
 
+print load_fiche_titre($langs->trans("DigiriskRiskSignData"), '', '');
+
+print '<table class="noborder centpercent">';
+print '<tr class="liste_titre">';
+print '<td>' . $langs->trans("Name") . '</td>';
+print '<td>' . $langs->trans("Description") . '</td>';
+print '<td class="center">' . $langs->trans("Status") . '</td>';
+print '</tr>';
+
+print '<tr class="oddeven"><td>';
+print $langs->trans('ShowInheritedRiskSigns');
+print "</td><td>";
+print $langs->trans('ShowInheritedRiskSignsDescription');
+print '</td>';
+
+print '<td class="center">';
+print ajax_constantonoff('DIGIRISKDOLIBARR_SHOW_INHERITED_RISKSIGNS');
+print '</td>';
+print '</tr>';
+
+$result = !empty($conf->mc->entities['risksign']) ? strpos($conf->mc->entities['risksign'], $conf->entity) : 0;
+
+if ($conf->multicompany->enabled && !empty($conf->mc->sharings['risksign']) && $result > 0) {
+	print '<tr class="oddeven"><td>';
+	print $langs->trans('ShowSharedRiskSigns');
+	print "</td><td>";
+	print $langs->trans('ShowSharedRiskSignsDescription');
+	print '</td>';
+
+	print '<td class="center">';
+	print ajax_constantonoff('DIGIRISKDOLIBARR_SHOW_SHARED_RISKSIGNS');
+	print '</td>';
+	print '</tr>';
+}
+print '</table>';
+
 // Page end
 print dol_get_fiche_end();
 llxFooter();

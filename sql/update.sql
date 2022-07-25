@@ -73,4 +73,4 @@ ALTER TABLE llx_digiriskdolibarr_firepermitdet ADD UNIQUE uk_firepermitdet_ref (
 ALTER TABLE llx_digiriskdolibarr_digiriskdocuments ADD UNIQUE uk_digiriskdocuments_ref (ref, entity);
 
 -- 9.4.0
-ALTER TABLE llx_digiriskdolibarr_accident_workstop ADD date_end_workstop DATETIME NULL AFTER workstop_days;
+ALTER TABLE llx_digiriskdolibarr_accident_workstop ADD date_start_workstop DATETIME NULL AFTER workstop_days;

@@ -70,7 +70,7 @@ if ( ! $error && $action == "uploadPhoto" && ! empty($conf->global->MAIN_UPLOAD_
 			// To attach new file
 			if (( ! empty($conf->use_javascript_ajax) && empty($conf->global->MAIN_ECM_DISABLE_JS)) || ! empty($section)) {
 				$sectiondir = GETPOST('file', 'alpha') ? GETPOST('file', 'alpha') : GETPOST('section_dir', 'alpha');
-				print '<!-- Start form to attach new file in digiriskdolibarr_photo_view.tpl.tpl.php sectionid=' . $section . ' sectiondir=' . $sectiondir . ' -->' . "\n";
+				print '<!-- Start form to attach new file in digiriskdolibarr_photo_view.tpl.php sectionid=' . $section . ' sectiondir=' . $sectiondir . ' -->' . "\n";
 				include_once DOL_DOCUMENT_ROOT . '/core/class/html.formfile.class.php';
 				print '<strong>' . $langs->trans('AddFile') . '</strong>'
 				?>

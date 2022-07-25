@@ -383,14 +383,17 @@ if (empty($reshook)) {
 		$parent_id     = GETPOST('parent_id');
 
 		// Initialize object accident line
-		$now                           = dol_now();
-		$objectline->date_creation     = $object->db->idate($now);
-		$objectline->status            = 1;
-		$objectline->ref               = $refAccidentWorkStopMod->getNextValue($objectline);
-		$objectline->entity            = $conf->entity;
-		$objectline->workstop_days     = $workstop_days;
-		$objectline->date_end_workstop = $object->db->idate(dol_time_plus_duree($now, $workstop_days, 'd'));
-		$objectline->fk_accident       = $parent_id;
+		$now                             = dol_now();
+		$objectline->date_creation       = $object->db->idate($now);
+		$objectline->status              = 1;
+		$objectline->ref                 = $refAccidentWorkStopMod->getNextValue($objectline);
+		$objectline->entity              = $conf->entity;
+		$objectline->workstop_days       = $workstop_days;
+
+		$date_start_workstop = dol_mktime(GETPOST('datestarthour', 'int'), GETPOST('datestartmin', 'int'), 0, GETPOST('datestartmonth', 'int'), GETPOST('datestartday', 'int'), GETPOST('datestartyear', 'int'));
+
+		$objectline->date_start_workstop = $date_start_workstop;
+		$objectline->fk_accident         = $parent_id;
 
 		// Check parameters
 		if (empty($workstop_days)) {
@@ -426,9 +429,12 @@ if (empty($reshook)) {
 		$objectline->fetch($lineid);
 
 		// Initialize object accident line
-		$objectline->workstop_days     = $workstop_days;
-		$objectline->date_end_workstop = $object->db->idate(dol_time_plus_duree(dol_stringtotime($objectline->date_creation), $workstop_days, 'd'));
-		$objectline->fk_accident       = $parent_id;
+		$objectline->workstop_days       = $workstop_days;
+
+		$date_start_workstop = dol_mktime(GETPOST('datestarthour', 'int'), GETPOST('datestartmin', 'int'), 0, GETPOST('datestartmonth', 'int'), GETPOST('datestartday', 'int'), GETPOST('datestartyear', 'int'));
+
+		$objectline->date_start_workstop = $date_start_workstop;
+		$objectline->fk_accident         = $parent_id;
 
 		if ( ! $error) {
 			$result = $objectline->update($user, false);
@@ -855,6 +861,10 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 			}
 		}
 		$morehtmlref .= '<br>' . $langs->trans('TotalWorkStopDays') . ' : ' . $totalworkstopdays;
+
+		$lastaccidentline = end($accidentlines);
+
+		$morehtmlref .= '<br>' . $langs->trans('ReturnWorkDate') . ' : ' . dol_print_date(dol_time_plus_duree(dol_stringtotime($lastaccidentline->date_start_workstop), $lastaccidentline->workstop_days, 'd'), 'dayhour');
 	} else {
 		$morehtmlref .= '<br>' . $langs->trans('RegisterAccident');
 	}
@@ -1032,12 +1042,12 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 
 					$coldisplay++;
 					print '<td>';
-					print dol_print_date($item->date_creation, 'day', 'tzuser');
+					print $form->selectDate($item->date_start_workstop, 'datestart', 1, 1, 0, '', 1);
 					print '</td>';
 
 					$coldisplay++;
 					print '<td>';
-					print dol_print_date($item->date_end_workstop, 'day', 'tzuser');
+					print dol_print_date(dol_time_plus_duree(dol_stringtotime($item->date_start_workstop), $item->workstop_days, 'd'), 'dayhour');
 					print '</td>';
 
 					$coldisplay++;
@@ -1120,12 +1130,12 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 
 					$coldisplay++;
 					print '<td>';
-					print dol_print_date($item->date_creation, 'day', 'tzuser');
+					print dol_print_date($item->date_start_workstop, 'dayhour');
 					print '</td>';
 
 					$coldisplay++;
 					print '<td>';
-					print dol_print_date($item->date_end_workstop, 'day', 'tzuser');
+					print dol_print_date(dol_time_plus_duree(dol_stringtotime($item->date_start_workstop), $item->workstop_days, 'd'), 'dayhour');
 					print '</td>';
 
 					$coldisplay++;
@@ -1212,6 +1222,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 
 			$coldisplay++;
 			print '<td>';
+			print $form->selectDate(dol_now('tzuser'), 'datestart', 1, 1, 0, '', 1);
 			print '</td>';
 
 			$coldisplay++;
@@ -1311,7 +1322,11 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 		$defaultmodel = $conf->global->DIGIRISKDOLIBARR_ACCIDENTDOCUMENT_DEFAULT_MODEL;
 		$title        = $langs->trans('AccidentDocument');
 
-		print digiriskshowdocuments($modulepart, $dir_files, $filedir, $urlsource, $permissiontoadd, $permissiontodelete, $defaultmodel, 1, 0, '', $title, '', '', $accidentdocument, 0, 'remove_file', $object->status == 3 ? true : false, $langs->trans('AccidentMustBeLocked'));
+		if ($permissiontoadd || $permissiontoread) {
+			$genallowed = 1;
+		}
+
+		print digiriskshowdocuments($modulepart, $dir_files, $filedir, $urlsource, $genallowed, $permissiontodelete, $defaultmodel, 1, 0, '', $title, '', '', $accidentdocument, 0, 'remove_file', $object->status == 3 ? true : false, $langs->trans('AccidentMustBeLocked'));
 	}
 
 	if ($permissiontoadd) {

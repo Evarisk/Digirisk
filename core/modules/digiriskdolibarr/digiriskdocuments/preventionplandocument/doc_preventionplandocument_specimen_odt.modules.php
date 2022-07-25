@@ -365,8 +365,8 @@ class doc_preventionplandocument_specimen_odt extends ModeleODTPreventionPlanDoc
 			$tmparray['consigne_generale']              = $conf->global->DIGIRISKDOLIBARR_GENERAL_RULES;
 			$tmparray['premiers_secours']               = $conf->global->DIGIRISKDOLIBARR_FIRST_AID;
 
-			$tmparray['date_start_intervention_PPP'] = dol_print_date($preventionplan->date_start, 'dayhoursec', 'tzuser');
-			$tmparray['date_end_intervention_PPP']   = dol_print_date($preventionplan->date_end, 'dayhoursec', 'tzuser');
+			$tmparray['date_start_intervention_PPP'] = dol_print_date($preventionplan->date_start, 'dayhoursec');
+			$tmparray['date_end_intervention_PPP']   = dol_print_date($preventionplan->date_end, 'dayhoursec');
 			if (is_array($preventionplanlines)) {
 				$tmparray['interventions_info'] = count($preventionplanlines) . " " . $langs->trans('PreventionPlanLine');
 			} else {
@@ -441,7 +441,7 @@ class doc_preventionplandocument_specimen_odt extends ModeleODTPreventionPlanDoc
 				$tmparray['maitre_oeuvre_email'] = $maitreoeuvre->email;
 				$tmparray['maitre_oeuvre_phone'] = $maitreoeuvre->phone;
 
-				$tmparray['maitre_oeuvre_signature_date'] = dol_print_date($maitreoeuvre->signature_date, 'dayhoursec', 'tzuser');
+				$tmparray['maitre_oeuvre_signature_date'] = dol_print_date($maitreoeuvre->signature_date, 'dayhoursec');
 			}
 
 			if ( ! empty($extsocietyresponsible) && $extsocietyresponsible > 0) {
@@ -451,7 +451,7 @@ class doc_preventionplandocument_specimen_odt extends ModeleODTPreventionPlanDoc
 				$tmparray['intervenant_exterieur_phone'] = $extsocietyresponsible->phone;
 
 				//@todo when attendance will be created
-				$tmparray['intervenant_exterieur_signature_date'] = dol_print_date($extsocietyresponsible->signature_date, 'dayhoursec', 'tzuser');
+				$tmparray['intervenant_exterieur_signature_date'] = dol_print_date($extsocietyresponsible->signature_date, 'dayhoursec');
 			}
 
 			foreach ($tmparray as $key => $value) {
@@ -481,6 +481,7 @@ class doc_preventionplandocument_specimen_odt extends ModeleODTPreventionPlanDoc
 							$tmparray['unite_travail'] = $digiriskelement->ref . " - " . $digiriskelement->label;
 							$tmparray['action']        = $line->description;
 							$tmparray['risk']          = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $risk->get_danger_category($line) . '.png';
+							$tmparray['nomPicto']      = $risk->get_danger_category_name($line);
 							$tmparray['prevention']    = $line->prevention_method;
 
 							foreach ($tmparray as $key => $val) {
@@ -506,6 +507,7 @@ class doc_preventionplandocument_specimen_odt extends ModeleODTPreventionPlanDoc
 						$tmparray['unite_travail'] = '';
 						$tmparray['action']        = '';
 						$tmparray['risk']          = '';
+						$tmparray['nomPicto']      = '';
 						$tmparray['prevention']    = '';
 
 						foreach ($tmparray as $key => $val) {

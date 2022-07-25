@@ -1,4 +1,8 @@
 <?php
+	$selectedfields_label = 'inherited_risklist_selectedfields';
+	// Selection of new fields
+	require './../../class/actions_changeselectedfields.php';
+
 	print '<div class="fichecenter inheritedrisklist wpeo-wrap">';
 	print '<form method="POST" id="searchFormInheritedListRisks" enctype="multipart/form-data" action="' . $_SERVER["PHP_SELF"] . '?id=' . $object->id .'">' . "\n";
 	print '<input type="hidden" name="token" value="' . newToken() . '">';
@@ -278,23 +282,42 @@
 	}
 
 	$varpage  = empty($contextpage) ? $_SERVER["PHP_SELF"] : $contextpage;
+
+	$arrayfields['t.fk_element']['label'] = $langs->trans('ParentElement');
+	$arrayfields['t.fk_element']['checked'] = 1;
+	$arrayfields['t.fk_element']['enabled'] = 1;
+	$arrayfields['t.fk_element']['position'] = 1;
+
+	$arrayfields = dol_sort_array($arrayfields, 'position');
+
 	$menuConf = 'MAIN_SELECTEDFIELDS_' . $varpage;
+//echo '<pre>'; print_r( $user->conf->$menuConf ); echo '</pre>';
+//$newarray = explode(',', $user->conf->$menuConf);
+//$newarray = array_unique($newarray);
+//$user->conf->$menuConf = implode(',',$newarray);
+//echo '<pre>'; print_r( $newarray ); echo '</pre>';
+//
+//echo '<pre>'; print_r( $arrayfields ); echo '</pre>';
+
+	if (dol_strlen($user->conf->$menuConf) < 1) {
+		$user->conf->$menuConf = 't.fk_element,t.ref,t.category,evaluation.cotation,';
+	}
 
 	if ( ! preg_match('/t.description/', $user->conf->$menuConf) && $conf->global->DIGIRISKDOLIBARR_RISK_DESCRIPTION) {
-		$user->conf->$menuConf = 't.fk_element,t.ref,evaluation.cotation,t.category,t.description,';
+		$user->conf->$menuConf = $user->conf->$menuConf . 't.description,';
 	} elseif ( ! $conf->global->DIGIRISKDOLIBARR_RISK_DESCRIPTION) {
 		$user->conf->$menuConf = preg_replace('/t.description,/', '', $user->conf->$menuConf);
 		$arrayfields['t.description']['enabled'] = 0;
 	}
 
 	if ( ! preg_match('/evaluation.has_tasks/', $user->conf->$menuConf) && $conf->global->DIGIRISKDOLIBARR_TASK_MANAGEMENT) {
-		$user->conf->$menuConf .= 't.fk_element,t.ref,evaluation.cotation,t.category,evaluation.has_tasks,';
+		$user->conf->$menuConf .= $user->conf->$menuConf  . 'evaluation.has_tasks,';
 	} elseif ( ! $conf->global->DIGIRISKDOLIBARR_TASK_MANAGEMENT) {
 		$user->conf->$menuConf = preg_replace('/evaluation.has_tasks,/', '', $user->conf->$menuConf);
 		$arrayfields['evaluation.has_tasks']['enabled'] = 0;
 	}
 
-	$selectedfields  = $form->multiSelectArrayWithCheckbox('selectedfields', $arrayfields, $varpage); // This also change content of $arrayfields
+	$selectedfields  = $form->multiSelectArrayWithCheckbox('inherited_risklist_selectedfields', $arrayfields, $varpage); // This also change content of $arrayfields
 	$selectedfields .= (count($arrayofmassactions) ? $form->showCheckAddButtons('checkforselect', 1) : '');
 
 	print '<div class="div-table-responsive">'; // You can use div-table-responsive-no-min if you dont need reserved height for your table
@@ -316,7 +339,7 @@
 			} elseif ($key == 'fk_element') {
 				print $digiriskelement->select_digiriskelement_list($search['fk_element'], 'search_fk_element', '', 1, 0, array(), 0, 0, 'minwidth100', 0, false, 1);
 			} elseif ($key == 'category') { ?>
-				<div class="wpeo-dropdown dropdown-large dropdown-grid category-danger padding">
+				<div class="wpeo-dropdown dropdown-large dropdown-grid category-danger padding" style="position: inherit">
 					<input class="input-hidden-danger" type="hidden" name="<?php echo 'search_' . $key ?>" value="<?php echo dol_escape_htmltag($search[$key]) ?>" />
 					<?php if (dol_strlen(dol_escape_htmltag($search[$key])) == 0) : ?>
 						<div class="dropdown-toggle dropdown-add-button button-cotation">
@@ -471,9 +494,9 @@
 				$cssforfield = '';
 				print '<td' . ($cssforfield ? ' class="' . $cssforfield . '"' : '') . ' style="vertical-align: top;">';
 				if ($key == 'cotation') {
-					require './../../core/tpl/digiriskdolibarr_riskassessment_view.tpl.php';
+					require './../../core/tpl/riskanalysis/riskassessment/digiriskdolibarr_riskassessment_view.tpl.php';
 				} elseif ($key == 'has_tasks' && $conf->global->DIGIRISKDOLIBARR_TASK_MANAGEMENT) {
-					require './../../core/tpl/digiriskdolibarr_riskassessment_task_view.tpl.php';
+					require './../../core/tpl/riskanalysis/riskassessment/digiriskdolibarr_riskassessment_task_view.tpl.php';
 				} elseif ($conf->global->DIGIRISKDOLIBARR_TASK_MANAGEMENT == 0) {
 					print $langs->trans('TaskManagementNotActivated');
 				} else print $lastEvaluation->showOutputField($val, $key, $lastEvaluation->$key, '');
@@ -531,5 +554,3 @@
 	print '<!-- End form -->';
 	print '</div>' . "\n";
 	print '<!-- End div class="fichecenter" -->';
-
-	dol_fiche_end();

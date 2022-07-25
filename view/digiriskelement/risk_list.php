@@ -185,7 +185,7 @@ if (empty($reshook)) {
 
 	$backtopage = dol_buildpath('/digiriskdolibarr/view/digiriskelement/risk_list.php', 1);
 
-	require_once './../../core/tpl/digiriskdolibarr_risk_actions.tpl.php';
+	require_once './../../core/tpl/riskanalysis/risk/digiriskdolibarr_risk_actions.tpl.php';
 }
 
 /*
@@ -204,12 +204,12 @@ llxHeader('', $title, $help_url, '', '', '', $morejs, $morecss);
 // Object card
 // ------------------------------------------------------------
 $allRisks = 1;
-require_once './../../core/tpl/digiriskdolibarr_medias_gallery_modal.tpl.php';
-require_once './../../core/tpl/digiriskdolibarr_risklist_view.tpl.php';
+require_once './../../core/tpl/medias/digiriskdolibarr_medias_gallery_modal.tpl.php';
+require_once './../../core/tpl/riskanalysis/risk/digiriskdolibarr_risklist_view.tpl.php';
 
 if (!empty($conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS)) {
 	$contextpage = 'sharedrisk';
-	require_once './../../core/tpl/digiriskdolibarr_sharedrisklist_view.tpl.php';
+	require_once './../../core/tpl/riskanalysis/risk/digiriskdolibarr_sharedrisklist_view.tpl.php';
 }
 
 // End of page

@@ -215,7 +215,8 @@ class FirePermit extends CommonObject
 		$digiriskresources = new DigiriskResources($this->db);
 		$openinghours      = new Openinghours($this->db);
 
-		$refFirePermitMod = new $conf->global->DIGIRISKDOLIBARR_FIREPERMIT_ADDON($this->db);
+		$refFirePermitMod    = new $conf->global->DIGIRISKDOLIBARR_FIREPERMIT_ADDON($this->db);
+		$refFirePermitDetMod = new $conf->global->DIGIRISKDOLIBARR_FIREPERMITDET_ADDON($this->db);
 
 		dol_syslog(__METHOD__, LOG_DEBUG);
 
@@ -305,6 +306,9 @@ class FirePermit extends CommonObject
 				$num = (!empty($object->lines) ? count($object->lines) : 0);
 				for ($i = 0; $i < $num; $i++) {
 					$line                = $object->lines[$i];
+					if (property_exists($line, 'ref')) {
+						$line->ref = $refFirePermitDetMod->getNextValue($line);
+					}
 					$line->category      = empty($line->category) ? 0 : $line->category;
 					$line->fk_firepermit = $firepermtid;
 

@@ -81,6 +81,7 @@ $page           = $page == -1 ? 0 : $page;
 
 // Initialize technical objects
 $object           = new DigiriskElement($db);
+$digiriskelement  = new DigiriskElement($db);
 $digiriskstandard = new DigiriskStandard($db);
 $risk             = new Risk($db);
 $evaluation       = new RiskAssessment($db);
@@ -129,20 +130,12 @@ foreach ($risk->fields as $key => $val) {
 $arrayfields = array();
 foreach ($risk->fields as $key => $val) {
 	// If $val['visible']==0, then we never show the field
-	if ($val['label'] == 'Entity') {
-		if ($sharedrisks) {
-			$val['visible'] = 5;
-		}
-	}
-	if ($val['label'] == 'ParentElement') {
-		if ($sharedrisks) {
-			$val['visible'] = 5;
-		} else {
-			$val['visible'] = 0;
-		}
+	if ($val['label'] == 'Entity' || $val['label'] == 'ParentElement') {
+		$val['visible'] = 0;
 	}
 	if ( ! empty($val['visible'])) $arrayfields['t.' . $key] = array('label' => $val['label'], 'checked' => (($val['visible'] < 0) ? 0 : 1), 'enabled' => ($val['enabled'] && ($val['visible'] != 3)), 'position' => $val['position']);
 }
+
 foreach ($evaluation->fields as $key => $val) {
 	// If $val['visible']==0, then we never show the field
 	if ( ! empty($val['visible'])) $arrayfields['evaluation.' . $key] = array('label' => $val['label'], 'checked' => (($val['visible'] < 0) ? 0 : 1), 'enabled' => ($val['enabled'] && ($val['visible'] != 3)), 'position' => $val['position']);
@@ -178,8 +171,6 @@ $reshook    = $hookmanager->executeHooks('doActions', $parameters, $risk, $actio
 if ($reshook < 0) setEventMessages($hookmanager->error, $hookmanager->errors, 'errors');
 
 if (empty($reshook)) {
-	// Selection of new fields
-	include DOL_DOCUMENT_ROOT . '/core/actions_changeselectedfields.inc.php';
 
 	// Purge search criteria
 	if (GETPOST('button_removefilter_x', 'alpha') || GETPOST('button_removefilter.x', 'alpha') || GETPOST('button_removefilter', 'alpha')) { // All tests are required to be compatible with all browsers
@@ -201,7 +192,7 @@ if (empty($reshook)) {
 
 	$backtopage = dol_buildpath('/digiriskdolibarr/view/digiriskelement/digiriskelement_risk.php', 1) . '?id=' . ($id > 0 ? $id : '__ID__');
 
-	require_once './../../core/tpl/digiriskdolibarr_risk_actions.tpl.php';
+	require_once './../../core/tpl/riskanalysis/risk/digiriskdolibarr_risk_actions.tpl.php';
 }
 
 /*
@@ -253,6 +244,8 @@ if ($sharedrisks) {
 			$lastEvaluation = $risk_assessment->fetchFromParent($risks->id, 1);
 			if (!empty($lastEvaluation)) {
 				$lastEvaluation = array_shift($lastEvaluation);
+			} else {
+				$lastEvaluation = new RiskAssessment($db);
 			}
 
 //			$pathToThumb = DOL_URL_ROOT . '/viewimage.php?modulepart=digiriskdolibarr&entity=' . $risks->entity . '&file=' . urlencode($digiriskelementtmp->element_type . '/' . $digiriskelementtmp->ref . '/thumbs/');
@@ -375,20 +368,29 @@ if ($object->id > 0) {
 
 	if (!empty($conf->global->DIGIRISKDOLIBARR_SHOW_RISKS)) {
 		$contextpage = 'riskcard';
-		require_once './../../core/tpl/digiriskdolibarr_risklist_view.tpl.php';
+		require_once './../../core/tpl/riskanalysis/risk/digiriskdolibarr_risklist_view.tpl.php';
 	}
 
 	if (!empty($conf->global->DIGIRISKDOLIBARR_SHOW_INHERITED_RISKS)) {
 		$contextpage = 'inheritedrisk';
-		require_once './../../core/tpl/digiriskdolibarr_inheritedrisklist_view.tpl.php';
+		require_once './../../core/tpl/riskanalysis/risk/digiriskdolibarr_inheritedrisklist_view.tpl.php';
 	}
 
 	if (!empty($conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS)) {
 		$contextpage = 'sharedrisk';
-		require_once './../../core/tpl/digiriskdolibarr_sharedrisklist_view.tpl.php';
+		require_once './../../core/tpl/riskanalysis/risk/digiriskdolibarr_sharedrisklist_view.tpl.php';
 	}
 }
 
+?>
+
+<script>
+	$('.ulrisklist_selectedfields').attr('style','z-index:1050')
+	$('.ulinherited_risklist_selectedfields').attr('style','z-index:1050')
+	$('.ulshared_risklist_selectedfields').attr('style','z-index:1050')
+</script>
+
+<?php
 print '</div>' . "\n";
 print '<!-- End div class="cardcontent" -->';
 

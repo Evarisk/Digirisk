@@ -303,7 +303,7 @@ function digiriskshowdocuments($modulepart, $modulesubdir, $filedir, $urlsource,
 		// Model
 		if ( ! empty($modellist)) {
 			asort($modellist);
-			$out      .= '<span class="hideonsmartphone">' . $langs->trans('Model') . ' </span>';
+			$out      .= '<span class="hideonsmartphone"> <i class="fas fa-file-word"></i> </span>';
 			$modellist = array_filter($modellist, 'remove_index');
 			if (is_array($modellist)) {
 				foreach ($modellist as $key => $modellistsingle) {
@@ -325,30 +325,35 @@ function digiriskshowdocuments($modulepart, $modulesubdir, $filedir, $urlsource,
 
 		// Button
 		if ($active) {
-			$genbutton  = '<input class="button buttongen" id="' . $forname . '_generatebutton" name="' . $forname . '_generatebutton"';
-			$genbutton .= ' type="submit" value="' . $buttonlabel . '"';
+			$genbutton  = '<input style="display : none" class="button buttongen" id="' . $forname . '_generatebutton" name="' . $forname . '_generatebutton" type="submit" value="' . $buttonlabel . '"' . '>';
+			$genbutton .= '<label for="' . $forname . '_generatebutton">';
+			$genbutton .= '<div class="wpeo-button button-square-40 button-blue wpeo-tooltip-event" aria-label="' . $langs->trans('Generate') . '"><i class="fas fa-print button-icon"></i></div>';
+			$genbutton .= '</label>';
 		} else {
-			$genbutton  = '<input class="button buttongen disabled" name="' . $forname . '_generatebutton" style="cursor: not-allowed"';
-			$genbutton .= '  value="' . $buttonlabel . '"';
+			$genbutton  = '<input style="display : none" class="button buttongen disabled" name="' . $forname . '_generatebutton" style="cursor: not-allowed" value="' . $buttonlabel . '"' . '>';
+			$genbutton .= '<label for="' . $forname . '_generatebutton">';
+			$genbutton .= '<i class="fas fa-exclamation-triangle pictowarning wpeo-tooltip-event" aria-label="' . $langs->trans($tooltiptext) . '"></i>';
+			$genbutton .= '<div class="wpeo-button button-square-40 button-grey wpeo-tooltip-event" aria-label="' . $langs->trans('Generate') . '"><i class="fas fa-print button-icon"></i></div>';
+			$genbutton .= '</label>';
 		}
 
-		if ( ! $allowgenifempty && ! is_array($modellist) && empty($modellist)) $genbutton .= ' disabled';
-		$genbutton                                                                         .= '>';
-		if ($allowgenifempty && ! is_array($modellist) && empty($modellist) && empty($conf->dol_no_mouse_hover) && $modulepart != 'unpaid') {
-			$langs->load("errors");
-			$genbutton .= ' ' . img_warning($langs->transnoentitiesnoconv("WarningNoDocumentModelActivated"));
-		}
-		if ( ! $allowgenifempty && ! is_array($modellist) && empty($modellist) && empty($conf->dol_no_mouse_hover) && $modulepart != 'unpaid') $genbutton = '';
-		if (empty($modellist) && ! $showempty && $modulepart != 'unpaid') $genbutton                                                                      = '';
+//		if ( ! $allowgenifempty && ! is_array($modellist) && empty($modellist)) $genbutton .= ' disabled';
+//		$genbutton                                                                         .= '>';
+//		if ($allowgenifempty && ! is_array($modellist) && empty($modellist) && empty($conf->dol_no_mouse_hover) && $modulepart != 'unpaid') {
+//			$langs->load("errors");
+//			$genbutton .= ' ' . img_warning($langs->transnoentitiesnoconv("WarningNoDocumentModelActivated"));
+//		}
+//		if ( ! $allowgenifempty && ! is_array($modellist) && empty($modellist) && empty($conf->dol_no_mouse_hover) && $modulepart != 'unpaid') $genbutton = '';
+//		if (empty($modellist) && ! $showempty && $modulepart != 'unpaid') $genbutton                                                                      = '';
 		$out                                                                                                                                             .= $genbutton;
-		if ( ! $active) {
-			$htmltooltip  = '';
-			$htmltooltip .= $tooltiptext;
-
-			$out .= '<span class="center">';
-			$out .= $form->textwithpicto($langs->trans('Help'), $htmltooltip, 1, 0);
-			$out .= '</span>';
-		}
+//		if ( ! $active) {
+//			$htmltooltip  = '';
+//			$htmltooltip .= $tooltiptext;
+//
+//			$out .= '<span class="center">';
+//			$out .= $form->textwithpicto($langs->trans('Help'), $htmltooltip, 1, 0);
+//			$out .= '</span>';
+//		}
 
 		$out .= '</th>';
 
@@ -569,7 +574,7 @@ function digiriskHeader($title = '', $help_url = '', $arrayofjs = array(), $arra
 		$results = recurse_tree(0, 0, $objects);
 	} ?>
 
-	<?php require_once './../../core/tpl/digiriskdolibarr_medias_gallery_modal.tpl.php'; ?>
+	<?php require_once './../../core/tpl/medias/digiriskdolibarr_medias_gallery_modal.tpl.php'; ?>
 
 	<div id="id-container" class="id-container page-ut-gp-list">
 		<input type="hidden" name="token" value="<?php echo newToken(); ?>">
@@ -1402,7 +1407,7 @@ function llxHeaderTicketDigirisk($title, $head = "", $disablejs = 0, $disablehea
 */
 function digirisk_show_medias($sdir, $size = '', $maxHeight = 80, $maxWidth = 80)
 {
-	global $conf;
+	global $conf, $langs;
 
 	include_once DOL_DOCUMENT_ROOT . '/core/lib/files.lib.php';
 	include_once DOL_DOCUMENT_ROOT . '/core/lib/images.lib.php';
@@ -1438,7 +1443,11 @@ function digirisk_show_medias($sdir, $size = '', $maxHeight = 80, $maxWidth = 80
 							<figure class="photo-image">
 								<?php
 								$urladvanced = getAdvancedPreviewUrl($modulepart, 'digiriskdolibarr/medias/' . preg_replace('/_' . $size . '/', '', $val['relativename']), 0, 'entity=' . $conf->entity); ?>
-								<a class="clicked-photo-preview" href="<?php echo $urladvanced; ?>"><i class="fas fa-2x fa-search-plus"></i></a>
+								<a class="clicked-photo-preview" href="<?php echo $urladvanced; ?>">
+									<div class="wpeo-button button-square-30 button-transparent wpeo-tooltip-event" aria-label="<?php echo $langs->trans('Preview'); ?>">
+										<i class="fas fa-search-plus"></i>
+									</div>
+								</a>
 								<?php if (image_format_supported($val['name']) >= 0) : ?>
 									<?php $fullpath = $path . '/' . urlencode($val['relativename']) . '&entity=' . $conf->entity; ?>
 								<input class="filename" type="hidden" value="<?php echo preg_replace('/_' . $size . '/', '', $val['name']) ?>">

@@ -181,7 +181,7 @@ print '<div class="fichecenter">';
 print '<table class="border centpercent tableforfield">' . "\n";
 
 //JSON Decode and show fields
-require_once './../../core/tpl/digiriskdolibarr_legaldisplayfields_view.tpl.php';
+require_once './../../core/tpl/digiriskdocuments/digiriskdolibarr_legaldisplayfields_view.tpl.php';
 
 print '</table>';
 print '</div>';
@@ -196,7 +196,11 @@ if ($includedocgeneration) {
 	$urlsource  = $_SERVER["PHP_SELF"];
 	$modulepart = 'digiriskdolibarr:LegalDisplay';
 
-	print digiriskshowdocuments($modulepart, $dir_files, $filedir, $urlsource, $permissiontoadd, $permissiontodelete, $conf->global->DIGIRISKDOLIBARR_LEGALDISPLAY_DEFAULT_MODEL, 1, 0, '', $langs->trans('LegalDisplay'), '', '', $legaldisplay);
+	if ($permissiontoadd || $permissiontoread) {
+		$genallowed = 1;
+	}
+
+	print digiriskshowdocuments($modulepart, $dir_files, $filedir, $urlsource, $genallowed, $permissiontodelete, $conf->global->DIGIRISKDOLIBARR_LEGALDISPLAY_DEFAULT_MODEL, 1, 0, '', $langs->trans('LegalDisplay'), '', '', $legaldisplay);
 }
 
 // End of page

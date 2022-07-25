@@ -92,14 +92,14 @@ if ($action == 'setEmails') {
 }
 
 if ($action == 'generateExtrafields') {
-	$ret1 = $extra_fields->addExtraField('digiriskdolibarr_ticket_lastname', $langs->trans("LastName"), 'varchar', 2000, 255, 'ticket', 0, 0, '', '', 1, '', 1);
-	$ret2 = $extra_fields->addExtraField('digiriskdolibarr_ticket_firstname', $langs->transnoentities("FirstName"), 'varchar', 2100, 255, 'ticket', 0, 0, '', '', 1, '', 1);
-	$ret3 = $extra_fields->addExtraField('digiriskdolibarr_ticket_phone', $langs->transnoentities("Phone"), 'phone', 2200, '', 'ticket', 0, 0, '', '', 1, '', 1);
-	$ret4 = $extra_fields->addExtraField('digiriskdolibarr_ticket_service', $langs->trans("Service"), 'varchar', 2300, 255, 'ticket', 0, 0, '', '', 1, '', 1);
-	$ret5 = $extra_fields->addExtraField('digiriskdolibarr_ticket_location', $langs->trans("Location"), 'varchar', 2400, 255, 'ticket', 0, 0, '', '', 1, '', 1);
-	$ret6 = $extra_fields->addExtraField('digiriskdolibarr_ticket_date', $langs->trans("Date"), 'datetime', 2500, '', 'ticket', 0, 0, '', '', 1, '', 1);
+	$ret1 = $extra_fields->addExtraField('digiriskdolibarr_ticket_lastname', $langs->trans("LastName"), 'varchar', 2000, 255, 'ticket', 0, 0, '', '', 1, '', 1, '', '', 0);
+	$ret2 = $extra_fields->addExtraField('digiriskdolibarr_ticket_firstname', $langs->transnoentities("FirstName"), 'varchar', 2100, 255, 'ticket', 0, 0, '', '', 1, '', 1, '', '', 0);
+	$ret3 = $extra_fields->addExtraField('digiriskdolibarr_ticket_phone', $langs->transnoentities("Phone"), 'phone', 2200, '', 'ticket', 0, 0, '', '', 1, '', 1, '', '', 0);
+	$ret4 = $extra_fields->addExtraField('digiriskdolibarr_ticket_service', $langs->trans("Service"), 'varchar', 2300, 255, 'ticket', 0, 0, '', '', 1, '', 1, '', '', 0);
+	$ret5 = $extra_fields->addExtraField('digiriskdolibarr_ticket_location', $langs->trans("Location"), 'varchar', 2400, 255, 'ticket', 0, 0, '', '', 1, '', 1, '', '', 0);
+	$ret6 = $extra_fields->addExtraField('digiriskdolibarr_ticket_date', $langs->trans("Date"), 'datetime', 2500, '', 'ticket', 0, 0, '', '', 1, '', 1, '', '', 0);
 	if ($ret1 > 0 && $ret2 > 0 && $ret3 > 0 && $ret4 > 0 && $ret5 > 0 && $ret6 > 0) {
-		dolibarr_set_const($db, 'DIGIRISKDOLIBARR_TICKET_EXTRAFIELDS', 1, 'integer', 0, '', $conf->entity);
+		dolibarr_set_const($db, 'DIGIRISKDOLIBARR_TICKET_EXTRAFIELDS', 1, 'integer', 0, '', 0);
 		setEventMessages($langs->trans('ExtrafieldsCreated'), array());
 	} else {
 		setEventMessages($extra_fields->error, null, 'errors');
@@ -189,6 +189,12 @@ if ($action == 'setChildCategoryLabel') {
 	$label = GETPOST('childCategoryLabel');
 	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_TICKET_CHILD_CATEGORY_LABEL', $label, 'chaine', 0, '', $conf->entity);
 	setEventMessages($langs->trans('ChildCategoryLabelSet'), array());
+}
+
+if ($action == 'setTicketSuccessMessage') {
+	$successmessage = GETPOST('DIGIRISKDOLIBARR_TICKET_SUCCESS_MESSAGE');
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_TICKET_SUCCESS_MESSAGE', $successmessage, 'chaine', 0, '', $conf->entity);
+	setEventMessages($langs->trans('TicketSuccessMessageSet'), array());
 }
 
 /*
@@ -294,6 +300,34 @@ if ( ! empty($conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE)) {
 	print '</form>';
 
 	print '</table>';
+
+	print load_fiche_titre($langs->trans("TicketSuccessMessageData"), '', '');
+
+	print '<table class="noborder centpercent">';
+
+	print '<form method="post" action="'.$_SERVER['PHP_SELF'].'" enctype="multipart/form-data" >';
+	print '<input type="hidden" name="token" value="'.newToken().'">';
+	print '<input type="hidden" name="action" value="setTicketSuccessMessage">';
+
+	print '<tr class="liste_titre">';
+	print '<td>'.$langs->trans("Name").'</td>';
+	print '<td>' . $langs->trans("Description") . '</td>';
+	print '<td class="center">' . $langs->trans("Action") . '</td>';
+	print "</tr>";
+
+	// Ticket success message
+	$successmessage = $langs->trans($conf->global->DIGIRISKDOLIBARR_TICKET_SUCCESS_MESSAGE) ?: $langs->trans('YouMustNotifyYourHierarchy');
+	print '<tr class="oddeven"><td>'.$langs->trans("TicketSuccessMessage");
+	print '</td><td>';
+	require_once DOL_DOCUMENT_ROOT.'/core/class/doleditor.class.php';
+	$doleditor = new DolEditor('DIGIRISKDOLIBARR_TICKET_SUCCESS_MESSAGE', $successmessage, '100%', 120, 'dolibarr_details', '', false, true, $conf->global->FCKEDITOR_ENABLE_MAIL, ROWS_2, 70);
+	$doleditor->Create();
+	print '</td>';
+	print '<td><input type="submit" class="button" name="save" value="' . $langs->trans("Save") . '">';
+	print '</td></tr>';
+	print '</form>';
+	print '</table>';
+
 	print '</div>';
 
 	// Project
@@ -439,6 +473,7 @@ if ( ! empty($conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE)) {
 	print '<input type="hidden" name="token" value="' . newToken() . '">';
 	print '<input type="hidden" name="action" value="generateExtrafields">';
 	print '<input type="hidden" name="backtopage" value="' . $backtopage . '">';
+
 
 	print '<tr class="oddeven"><td>' . $langs->trans("GenerateExtrafields") . '<sup><a href="https://wiki.dolibarr.org/index.php?title=Module_Digirisk#DigiRisk_-_Registre_de_s.C3.A9curit.C3.A9_et_Tickets" target="_blank" > 4</a></sup></td>';
 	print '<td class="center">';

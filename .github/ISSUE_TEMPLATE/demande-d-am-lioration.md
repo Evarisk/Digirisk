@@ -2,7 +2,7 @@
 name: Demande d'amélioration
 about: Une idée, des idées pour le projet c'est par ici
 title: "[Amélioration]"
-labels: Enhancement
+labels: Amélioration
 assignees: lmag
 
 ---

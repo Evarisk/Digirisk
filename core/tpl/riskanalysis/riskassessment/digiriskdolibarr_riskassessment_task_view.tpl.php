@@ -509,6 +509,14 @@ $related_tasks = $risk->get_related_tasks($risk); ?>
 					</div>
 					<!-- Modal ADD RISK ASSESSMENT TASK Content-->
 					<div class="modal-content" id="#modalContent<?php echo $risk->id ?>">
+						<div class="messageWarningTaskLabel notice hidden">
+							<div class="wpeo-notice notice-warning riskassessment-task-label-warning-notice">
+								<div class="notice-content">
+									<div class="notice-title"><?php echo $langs->trans('WarningTaskLabel') ?></div>
+								</div>
+								<div class="notice-close"><i class="fas fa-times"></i></div>
+							</div>
+						</div>
 						<div class="riskassessment-task-container">
 							<div class="riskassessment-task">
 								<span class="title"><?php echo $langs->trans('Label'); ?> <input type="text" class="riskassessment-task-label" name="label" value=""></span>

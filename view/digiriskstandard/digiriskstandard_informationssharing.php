@@ -182,7 +182,7 @@ print '<div class="fichecenter">';
 print '<table class="border centpercent tableforfield">' . "\n";
 
 //JSON Decode and show fields
-require_once './../../core/tpl/digiriskdolibarr_informationssharingfields_view.tpl.php';
+require_once './../../core/tpl/digiriskdocuments/digiriskdolibarr_informationssharingfields_view.tpl.php';
 
 print '</table>';
 print '</div>';
@@ -197,7 +197,11 @@ if ($includedocgeneration) {
 	$urlsource  = $_SERVER["PHP_SELF"];
 	$modulepart = 'digiriskdolibarr:InformationsSharing';
 
-	print digiriskshowdocuments($modulepart, $dir_files, $filedir, $urlsource, $permissiontoadd, $permissiontodelete, $conf->global->DIGIRISKDOLIBARR_INFORMATIONSSHARING_DEFAULT_MODEL, 1, 0, '', $langs->trans('InformationsSharing'), '', '', $informationssharing);
+	if ($permissiontoadd || $permissiontoread) {
+		$genallowed = 1;
+	}
+
+	print digiriskshowdocuments($modulepart, $dir_files, $filedir, $urlsource, $genallowed, $permissiontodelete, $conf->global->DIGIRISKDOLIBARR_INFORMATIONSSHARING_DEFAULT_MODEL, 1, 0, '', $langs->trans('InformationsSharing'), '', '', $informationssharing);
 }
 
 // End of page

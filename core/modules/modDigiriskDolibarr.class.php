@@ -373,7 +373,7 @@ class modDigiriskdolibarr extends DolibarrModules
 		$this->descriptionlong = "Digirisk";
 		$this->editor_name     = 'Evarisk';
 		$this->editor_url      = 'https://evarisk.com';
-		$this->version         = '9.3.3';
+		$this->version         = '9.4.0';
 		$this->const_name      = 'MAIN_MODULE_' . strtoupper($this->name);
 		$this->picto           = 'digiriskdolibarr@digiriskdolibarr';
 
@@ -405,7 +405,11 @@ class modDigiriskdolibarr extends DolibarrModules
 				'globaladmin',
 				'emailtemplates',
 				'mainloginpage',
-				'ticketcard'
+				'ticketcard',
+				'projecttaskcard',
+				'projecttaskscard',
+				'tasklist',
+				'publicnewticketcard'
 			),
 			'tabs' => array(
 				'mycompany_admin'
@@ -467,6 +471,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			22 => array('DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_ADDON_ODT_PATH', 'chaine', 'DOL_DOCUMENT_ROOT/custom/digiriskdolibarr/documents/doctemplates/riskassessmentdocument/', '', 0, 'current'),
 			23 => array('DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_CUSTOM_ADDON_ODT_PATH', 'chaine', 'DOL_DATA_ROOT/ecm/digiriskdolibarr/riskassessmentdocument/', '', 0, 'current'),
 			24 => array('DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_DEFAULT_MODEL', 'chaine', 'riskassessmentdocument_odt', '', 0, 'current'),
+			25 => array('DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_SHOW_TASK_DONE', 'integer', 1, '', 0, 'current'),
 
 			// CONST LEGAL DISPLAY
 			30 => array('DIGIRISKDOLIBAR_LOCATION_OF_DETAILED_INSTRUCTION', 'chaine', '', 'Location of detailed instruction', 0, 'current'),
@@ -593,6 +598,9 @@ class modDigiriskdolibarr extends DolibarrModules
 			// CONST RISK SIGN
 			200 => array('MAIN_AGENDA_ACTIONAUTO_RISKSIGN_CREATE', 'integer', 1, '', 0, 'current'),
 			201 => array('DIGIRISKDOLIBARR_RISKSIGN_ADDON', 'chaine', 'mod_risksign_standard', '', 0, 'current'),
+			202 => array('DIGIRISKDOLIBARR_SHOW_RISKSIGNS', 'integer', 1, '', 0, 'current'),
+			203 => array('DIGIRISKDOLIBARR_SHOW_INHERITED_RISKSIGNS', 'integer', 0, '', 0, 'current'),
+			204 => array('DIGIRISKDOLIBARR_SHOW_SHARED_RISKSIGNS', 'integer', 0, '', 0, 'current'),
 
 			// CONST PROJET
 			210 => array('DIGIRISKDOLIBARR_PROJECT_TAGS_SET', 'integer', 0, '', 0, 'current'),
@@ -635,14 +643,14 @@ class modDigiriskdolibarr extends DolibarrModules
 			277 => array('DIGIRISKDOLIBARR_TRIGGERS_UPDATED', 'integer', 1, '', 0, 'current'),
 			278 => array('DIGIRISKDOLIBARR_CONF_BACKWARD_COMPATIBILITY', 'integer', 1, '', 0, 'current'),
 			279 => array('DIGIRISKDOLIBARR_ENCODE_BACKWARD_COMPATIBILITY', 'integer', 1, '', 0, 'current'),
-			340 => array('DIGIRISKDOLIBARR_MEDIA_MAX_WIDTH_MEDIUM', 'integer', 854, '', 0, 'current'),
-			341 => array('DIGIRISKDOLIBARR_MEDIA_MAX_HEIGHT_MEDIUM', 'integer', 480, '', 0, 'current'),
-			342 => array('DIGIRISKDOLIBARR_MEDIA_MAX_WIDTH_LARGE', 'integer', 1280, '', 0, 'current'),
-			343 => array('DIGIRISKDOLIBARR_MEDIA_MAX_HEIGHT_LARGE', 'integer', 720, '', 0, 'current'),
+			280 => array('DIGIRISKDOLIBARR_MEDIA_MAX_WIDTH_MEDIUM', 'integer', 854, '', 0, 'current'),
+			281 => array('DIGIRISKDOLIBARR_MEDIA_MAX_HEIGHT_MEDIUM', 'integer', 480, '', 0, 'current'),
+			282 => array('DIGIRISKDOLIBARR_MEDIA_MAX_WIDTH_LARGE', 'integer', 1280, '', 0, 'current'),
+			283 => array('DIGIRISKDOLIBARR_MEDIA_MAX_HEIGHT_LARGE', 'integer', 720, '', 0, 'current'),
 
 			// CONST SIGNATURE
-			280 => array('DIGIRISKDOLIBARR_SIGNATURE_ENABLE_PUBLIC_INTERFACE', 'integer', 1, '', 0, 'current'),
-			281 => array('DIGIRISKDOLIBARR_SIGNATURE_SHOW_COMPANY_LOGO', 'integer', 1, '', 0, 'current'),
+			285 => array('DIGIRISKDOLIBARR_SIGNATURE_ENABLE_PUBLIC_INTERFACE', 'integer', 1, '', 0, 'current'),
+			286 => array('DIGIRISKDOLIBARR_SIGNATURE_SHOW_COMPANY_LOGO', 'integer', 1, '', 0, 'current'),
 
 			//CONST TICKET & REGISTERS
 			290 => array('DIGIRISKDOLIBARR_TICKET_EXTRAFIELDS', 'integer', 0, '', 0, 'current'),
@@ -655,20 +663,22 @@ class modDigiriskdolibarr extends DolibarrModules
 			297 => array('DIGIRISKDOLIBARR_TICKET_PARENT_CATEGORY_LABEL', 'chaine', $langs->trans('Registre'), '', 0, 'current'),
 			298 => array('DIGIRISKDOLIBARR_TICKET_CHILD_CATEGORY_LABEL', 'chaine', $langs->trans('Pertinence'), '', 0, 'current'),
 			299 => array('DIGIRISKDOLIBARR_TICKET_PROJECT', 'integer', 0, '', 0, 'current'),
+			300 => array('DIGIRISKDOLIBARR_TICKET_SUCCESS_MESSAGE', 'chaine', $langs->trans('YouMustNotifyYourHierarchy'), '', 0, 'current'),
 
 			// CONST ACCIDENT
-			300 => array('MAIN_AGENDA_ACTIONAUTO_ACCIDENT_CREATE', 'integer', 1, '', 0, 'current'),
-			301 => array('MAIN_AGENDA_ACTIONAUTO_ACCIDENT_EDIT', 'integer', 1, '', 0, 'current'),
-			302 => array('DIGIRISKDOLIBARR_ACCIDENT_ADDON', 'chaine', 'mod_accident_standard', '', 0, 'current'),
-			303 => array('DIGIRISKDOLIBARR_ACCIDENT_PROJECT', 'integer', 0, '', 0, 'current'),
+			310 => array('MAIN_AGENDA_ACTIONAUTO_ACCIDENT_CREATE', 'integer', 1, '', 0, 'current'),
+			311 => array('MAIN_AGENDA_ACTIONAUTO_ACCIDENT_EDIT', 'integer', 1, '', 0, 'current'),
+			312 => array('DIGIRISKDOLIBARR_ACCIDENT_ADDON', 'chaine', 'mod_accident_standard', '', 0, 'current'),
+			313 => array('DIGIRISKDOLIBARR_ACCIDENT_PROJECT', 'integer', 0, '', 0, 'current'),
 
 			// CONST ACCIDENT LINE
-			310 => array('MAIN_AGENDA_ACTIONAUTO_ACCIDENT_WORKSTOP_CREATE', 'integer', 1, '', 0, 'current'),
-			311 => array('DIGIRISKDOLIBARR_ACCIDENT_WORKSTOP_ADDON', 'chaine', 'mod_accident_workstop_standard', '', 0, 'current'),
-			312 => array('DIGIRISKDOLIBARR_ACCIDENT_LESION_ADDON', 'chaine', 'mod_accident_lesion_standard', '', 0, 'current'),
+			320 => array('MAIN_AGENDA_ACTIONAUTO_ACCIDENT_WORKSTOP_CREATE', 'integer', 1, '', 0, 'current'),
+			321 => array('DIGIRISKDOLIBARR_ACCIDENT_WORKSTOP_ADDON', 'chaine', 'mod_accident_workstop_standard', '', 0, 'current'),
+			322 => array('DIGIRISKDOLIBARR_ACCIDENT_LESION_ADDON', 'chaine', 'mod_accident_lesion_standard', '', 0, 'current'),
 
-			320 => array('DIGIRISKDOLIBARR_TICKETDOCUMENT_ADDON_ODT_PATH', 'chaine', 'DOL_DOCUMENT_ROOT/custom/digiriskdolibarr/documents/doctemplates/ticketdocument/', '', 0, 'current'),
-			321 => array('DIGIRISKDOLIBARR_TICKETDOCUMENT_ADDON', 'chaine', 'mod_ticketdocument_standard', '', 0, 'current'),
+			// CONST TICKET DOCUMENT
+			330 => array('DIGIRISKDOLIBARR_TICKETDOCUMENT_ADDON_ODT_PATH', 'chaine', 'DOL_DOCUMENT_ROOT/custom/digiriskdolibarr/documents/doctemplates/ticketdocument/', '', 0, 'current'),
+			331 => array('DIGIRISKDOLIBARR_TICKETDOCUMENT_ADDON', 'chaine', 'mod_ticketdocument_standard', '', 0, 'current'),
 
 //			// CONST ACCIDENT DOCUMENT
 //			320 => array('MAIN_AGENDA_ACTIONAUTO_ACCIDENTDOCUMENT_CREATE', 'integer', 1, '', 0, 'current'),
@@ -678,8 +688,18 @@ class modDigiriskdolibarr extends DolibarrModules
 //			324 => array('DIGIRISKDOLIBARR_ACCIDENTDOCUMENT_DEFAULT_MODEL', 'chaine', 'accidentdocument_odt', '', 0, 'current'),
 
 			// GENERAL CONSTS
-			330 => array('MAIN_USE_EXIF_ROTATION', 'integer', 1, '', 0, 'current'),
-			331 => array('MAIN_EXTRAFIELDS_USE_SELECT2', 'integer', 1, '', 0, 'current'),
+			340 => array('MAIN_USE_EXIF_ROTATION', 'integer', 1, '', 0, 'current'),
+			341 => array('MAIN_EXTRAFIELDS_USE_SELECT2', 'integer', 1, '', 0, 'current'),
+
+			// MENU
+			350 => array('DIGIRISKDOLIBARR_DIGIRISKSTANDARD_MENU_UPDATED', 'integer', 0, '', 0, 'current'),
+
+			// CONST TOOLS
+			360 => array('DIGIRISKDOLIBARR_TOOLS_ADVANCED_IMPORT', 'integer', 0, '', 0, 'current'),
+			361 => array('DIGIRISKDOLIBARR_TOOLS_TREE_ALREADY_IMPORTED', 'integer', 0, '', 0, 'current'),
+			362 => array('DIGIRISKDOLIBARR_TOOLS_RISKS_ALREADY_IMPORTED', 'integer', 0, '', 0, 'current'),
+			363 => array('DIGIRISKDOLIBARR_TOOLS_RISKSIGNS_ALREADY_IMPORTED', 'integer', 0, '', 0, 'current'),
+			364 => array('DIGIRISKDOLIBARR_TOOLS_GLOBAL_ALREADY_IMPORTED', 'integer', 0, '', 0, 'current'),
 		);
 
 		if ( ! isset($conf->digiriskdolibarr) || ! isset($conf->digiriskdolibarr->enabled) ) {
@@ -689,13 +709,13 @@ class modDigiriskdolibarr extends DolibarrModules
 
 		// Array to add new pages in new tabs
 		$this->tabs = array();
-		// Example:
-		$pictopath = dol_buildpath('/digiriskdolibarr/img/digiriskdolibarr32px.png', 1);
+		$langs->load("digiriskdolibarr@digiriskdolibarr");
+		$pictopath = dol_buildpath('/custom/digiriskdolibarr/img/digiriskdolibarr32px.png', 1);
 		$pictoDigirisk = img_picto('', $pictopath, '', 1, 0, 0, '', 'pictoDigirisk');
-		$this->tabs[] = array('data' => 'mycompany_admin:+security:'. $pictoDigirisk .'Sécurité:digiriskdolibarr@digiriskdolibarr:1:/custom/digiriskdolibarr/admin/securityconf.php');  			// To add a new tab identified by code tabname1
-		$this->tabs[] = array('data' => 'mycompany_admin:+social:'. $pictoDigirisk .'Social:digiriskdolibarr@digiriskdolibarr:1:/custom/digiriskdolibarr/admin/socialconf.php');  					// To add a new tab identified by code tabname1
-		$this->tabs[] = array('data' => 'thirdparty:+openinghours:'. $pictoDigirisk .'Horaires:digiriskdolibarr@digiriskdolibarr:1:/custom/digiriskdolibarr/view/openinghours_card.php?id=__ID__'); // To add a new tab identified by code tabname1
-		$this->tabs[] = array('data' => 'user:+participation:'. $pictoDigirisk .'GP/UTParticipation:digiriskdolibarr@digiriskdolibarr:1:/custom/digiriskdolibarr/view/digiriskelement/digiriskelement_evaluator.php?fromid=__ID__'); // To add a new tab identified by code tabname1
+		$this->tabs[] = array('data' => 'mycompany_admin:+security:'. $pictoDigirisk . $langs->trans('Security').':digiriskdolibarr@digiriskdolibarr:1:/custom/digiriskdolibarr/admin/securityconf.php');  			// To add a new tab identified by code tabname1
+		$this->tabs[] = array('data' => 'mycompany_admin:+social:'. $pictoDigirisk .$langs->trans('Social').':digiriskdolibarr@digiriskdolibarr:1:/custom/digiriskdolibarr/admin/socialconf.php');  					// To add a new tab identified by code tabname1
+		$this->tabs[] = array('data' => 'thirdparty:+openinghours:'. $pictoDigirisk .$langs->trans('OpeningHours').':digiriskdolibarr@digiriskdolibarr:1:/custom/digiriskdolibarr/view/openinghours_card.php?id=__ID__'); // To add a new tab identified by code tabname1
+		$this->tabs[] = array('data' => 'user:+participation:'. $pictoDigirisk .$langs->trans('GP/UTParticipation').':digiriskdolibarr@digiriskdolibarr:1:/custom/digiriskdolibarr/view/digiriskelement/digiriskelement_evaluator.php?fromid=__ID__'); // To add a new tab identified by code tabname1
 
 		// To remove an existing tab identified by code tabname
 		// Dictionaries
@@ -779,7 +799,6 @@ class modDigiriskdolibarr extends DolibarrModules
 		$this->cronjobs = array();
 
 		// Permissions provided by this module
-		$langs->load("digiriskdolibarr@digiriskdolibarr");
 		$this->rights = array();
 		$r            = 0;
 
@@ -1040,7 +1059,8 @@ class modDigiriskdolibarr extends DolibarrModules
 		$this->menu[$r++] = array(
 			'fk_menu'  => 'fk_mainmenu=digiriskdolibarr', // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
 			'type'     => 'left', // This is a Top menu entry
-			'titre'    => '<i class="fas fa-home"></i>  ' . $langs->trans('Digirisk'),
+			'titre'    => $langs->trans('Digirisk'),
+			'prefix'   => '<i class="fas fa-home"></i>  ',
 			'mainmenu' => 'digiriskdolibarr',
 			'leftmenu' => '',
 			'url'      => '/digiriskdolibarr/digiriskdolibarrindex.php',
@@ -1053,183 +1073,195 @@ class modDigiriskdolibarr extends DolibarrModules
 		);
 
 		$this->menu[$r++] = array(
-			'fk_menu' => 'fk_mainmenu=digiriskdolibarr',	    		// '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
-			'type' => 'left', 										// This is a Left menu entry
-			'titre' => '<i class="fas fa-exclamation-triangle"></i>  ' . $langs->trans('RiskAssessmentDocument'),
+			'fk_menu'  => 'fk_mainmenu=digiriskdolibarr',	    		// '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
+			'type'     => 'left', 										// This is a Left menu entry
+			'titre'    => $langs->trans('RiskAssessmentDocument'),
+			'prefix'   => '<i class="fas fa-exclamation-triangle"></i>  ',
 			'mainmenu' => 'digiriskdolibarr',
 			'leftmenu' => 'digiriskstandard',
-			'url' => '/digiriskdolibarr/view/digiriskstandard/digiriskstandard_card.php?id=' . $conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD,
-			'langs' => 'digiriskdolibarr@digiriskdolibarr',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
+			'url'      => '/digiriskdolibarr/view/digiriskstandard/digiriskstandard_card.php?id=' . $conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD,
+			'langs'    => 'digiriskdolibarr@digiriskdolibarr',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
 			'position' => 48520 + $r,
-			'enabled' => '$conf->digiriskdolibarr->enabled',  // Define condition to show or hide menu entry. Use '$conf->digiriskdolibarr->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
-			'perms' => '$user->rights->digiriskdolibarr->riskassessmentdocument->read', // Use 'perms'=>'$user->rights->digiriskdolibarr->level1->level2' if you want your menu with a permission rules
-			'target' => '',
-			'user' => 0,				                // 0=Menu for internal users, 1=external users, 2=both
+			'enabled'  => '$conf->digiriskdolibarr->enabled',  // Define condition to show or hide menu entry. Use '$conf->digiriskdolibarr->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
+			'perms'    => '$user->rights->digiriskdolibarr->riskassessmentdocument->read', // Use 'perms'=>'$user->rights->digiriskdolibarr->level1->level2' if you want your menu with a permission rules
+			'target'   => '',
+			'user'     => 0,				                // 0=Menu for internal users, 1=external users, 2=both
 		);
 
 		$this->menu[$r++] = array(
-			'fk_menu' => 'fk_mainmenu=digiriskdolibarr',	    		// '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
-			'type' => 'left', 										// This is a Left menu entry
-			'titre' => '<i class="fas fa-network-wired"></i>  ' . $langs->trans('Arborescence'),
+			'fk_menu'  => 'fk_mainmenu=digiriskdolibarr',	    		// '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
+			'type'     => 'left', 										// This is a Left menu entry
+			'titre'    => $langs->trans('Arborescence'),
+			'prefix'   => '<i class="fas fa-network-wired"></i>  ',
 			'mainmenu' => 'digiriskdolibarr',
 			'leftmenu' => 'digiriskstandard',
-			'url' => '/digiriskdolibarr/view/digiriskelement/digiriskelement_organization.php',
-			'langs' => 'digiriskdolibarr@digiriskdolibarr',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
+			'url'      => '/digiriskdolibarr/view/digiriskelement/digiriskelement_organization.php',
+			'langs'    => 'digiriskdolibarr@digiriskdolibarr',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
 			'position' => 48520 + $r,
-			'enabled' => '$conf->digiriskdolibarr->enabled',  // Define condition to show or hide menu entry. Use '$conf->digiriskdolibarr->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
-			'perms' => '$user->rights->digiriskdolibarr->riskassessmentdocument->read', // Use 'perms'=>'$user->rights->digiriskdolibarr->level1->level2' if you want your menu with a permission rules
-			'target' => '',
-			'user' => 0,				                // 0=Menu for internal users, 1=external users, 2=both
+			'enabled'  => '$conf->digiriskdolibarr->enabled',  // Define condition to show or hide menu entry. Use '$conf->digiriskdolibarr->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
+			'perms'    => '$user->rights->digiriskdolibarr->digiriskelement->read', // Use 'perms'=>'$user->rights->digiriskdolibarr->level1->level2' if you want your menu with a permission rules
+			'target'   => '',
+			'user'     => 0,				                // 0=Menu for internal users, 1=external users, 2=both
 		);
 
 		$this->menu[$r++] = array(
-			'fk_menu' => 'fk_mainmenu=digiriskdolibarr',	    // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
-			'type' => 'left',			                // This is a Left menu entry
-			'titre' => '<i class="fas fa-list"></i>  ' . $langs->trans('RiskList'),
+			'fk_menu'  => 'fk_mainmenu=digiriskdolibarr',	    // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
+			'type'     => 'left',			                // This is a Left menu entry
+			'titre'    => $langs->trans('RiskList'),
+			'prefix'   => '<i class="fas fa-list"></i>  ',
 			'mainmenu' => 'digiriskdolibarr',
 			'leftmenu' => 'digirisklistingrisk',
-			'url' => '/digiriskdolibarr/view/digiriskelement/risk_list.php',
-			'langs' => 'digiriskdolibarr@digiriskdolibarr',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
+			'url'      => '/digiriskdolibarr/view/digiriskelement/risk_list.php',
+			'langs'    => 'digiriskdolibarr@digiriskdolibarr',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
 			'position' => 48520 + $r,
-			'enabled' => '$conf->digiriskdolibarr->enabled',  // Define condition to show or hide menu entry. Use '$conf->digiriskdolibarr->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
-			'perms' => '$user->rights->digiriskdolibarr->risk->read', // Use 'perms'=>'$user->rights->digiriskdolibarr->level1->level2' if you want your menu with a permission rules
-			'target' => '',
-			'user' => 0,				                // 0=Menu for internal users, 1=external users, 2=both
+			'enabled'  => '$conf->digiriskdolibarr->enabled',  // Define condition to show or hide menu entry. Use '$conf->digiriskdolibarr->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
+			'perms'    => '$user->rights->digiriskdolibarr->risk->read', // Use 'perms'=>'$user->rights->digiriskdolibarr->level1->level2' if you want your menu with a permission rules
+			'target'   => '',
+			'user'     => 0,				                // 0=Menu for internal users, 1=external users, 2=both
 		);
 
 		$this->menu[$r++] = array(
-			'fk_menu' => 'fk_mainmenu=digiriskdolibarr',	    // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
-			'type' => 'left',			                // This is a Left menu entry
-			'titre' => '<i class="fas fa-info"></i>  ' . $langs->transnoentities('PreventionPlan'),
+			'fk_menu'  => 'fk_mainmenu=digiriskdolibarr',	    // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
+			'type'     => 'left',			                // This is a Left menu entry
+			'titre'    => $langs->transnoentities('PreventionPlan'),
+			'prefix'   => '<i class="fas fa-info"></i>  ',
 			'mainmenu' => 'digiriskdolibarr',
 			'leftmenu' => 'digiriskpreventionplan',
-			'url' => '/digiriskdolibarr/view/preventionplan/preventionplan_list.php',
-			'langs' => 'digiriskdolibarr@digiriskdolibarr',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
+			'url'      => '/digiriskdolibarr/view/preventionplan/preventionplan_list.php',
+			'langs'    => 'digiriskdolibarr@digiriskdolibarr',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
 			'position' => 48520 + $r,
-			'enabled' => '$conf->digiriskdolibarr->enabled',  // Define condition to show or hide menu entry. Use '$conf->digiriskdolibarr->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
-			'perms' => '$user->rights->digiriskdolibarr->preventionplan->read', // Use 'perms'=>'$user->rights->digiriskdolibarr->level1->level2' if you want your menu with a permission rules
-			'target' => '',
-			'user' => 0,				                // 0=Menu for internal users, 1=external users, 2=both
+			'enabled'  => '$conf->digiriskdolibarr->enabled',  // Define condition to show or hide menu entry. Use '$conf->digiriskdolibarr->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
+			'perms'    => '$user->rights->digiriskdolibarr->preventionplan->read', // Use 'perms'=>'$user->rights->digiriskdolibarr->level1->level2' if you want your menu with a permission rules
+			'target'   => '',
+			'user'     => 0,				                // 0=Menu for internal users, 1=external users, 2=both
 		);
 
 		$this->menu[$r++] = array(
-			'fk_menu' => 'fk_mainmenu=digiriskdolibarr',	    // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
-			'type' => 'left',			                // This is a Left menu entry
-			'titre' => '<i class="fas fa-fire-alt"></i>  ' . $langs->trans('FirePermit'),
+			'fk_menu'  => 'fk_mainmenu=digiriskdolibarr',	    // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
+			'type'     => 'left',			                // This is a Left menu entry
+			'titre'    => $langs->trans('FirePermit'),
+			'prefix'   => '<i class="fas fa-fire-alt"></i>  ',
 			'mainmenu' => 'digiriskdolibarr',
 			'leftmenu' => 'digiriskfirepermit',
-			'url' => '/digiriskdolibarr/view/firepermit/firepermit_list.php',
-			'langs' => 'digiriskdolibarr@digiriskdolibarr',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
+			'url'      => '/digiriskdolibarr/view/firepermit/firepermit_list.php',
+			'langs'    => 'digiriskdolibarr@digiriskdolibarr',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
 			'position' => 48520 + $r,
-			'enabled' => '$conf->digiriskdolibarr->enabled',  // Define condition to show or hide menu entry. Use '$conf->digiriskdolibarr->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
-			'perms' => '$user->rights->digiriskdolibarr->firepermit->read', // Use 'perms'=>'$user->rights->digiriskdolibarr->level1->level2' if you want your menu with a permission rules
-			'target' => '',
-			'user' => 0,				                // 0=Menu for internal users, 1=external users, 2=both
+			'enabled'  => '$conf->digiriskdolibarr->enabled',  // Define condition to show or hide menu entry. Use '$conf->digiriskdolibarr->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
+			'perms'    => '$user->rights->digiriskdolibarr->firepermit->read', // Use 'perms'=>'$user->rights->digiriskdolibarr->level1->level2' if you want your menu with a permission rules
+			'target'   => '',
+			'user'     => 0,				                // 0=Menu for internal users, 1=external users, 2=both
 		);
 
 		$this->menu[$r++] = array(
-			'fk_menu' => 'fk_mainmenu=digiriskdolibarr',	    // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
-			'type' => 'left',			                // This is a Left menu entry
-			'titre' => '<i class="fas fa-user-injured"></i>  ' . $langs->trans('Accident'),
+			'fk_menu'  => 'fk_mainmenu=digiriskdolibarr',	    // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
+			'type'     => 'left',			                // This is a Left menu entry
+			'titre'    => $langs->trans('Accident'),
+			'prefix'   => '<i class="fas fa-user-injured"></i>  ',
 			'mainmenu' => 'digiriskdolibarr',
 			'leftmenu' => 'digiriskaccident',
-			'url' => '/digiriskdolibarr/view/accident/accident_list.php',
-			'langs' => 'digiriskdolibarr@digiriskdolibarr',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
+			'url'      => '/digiriskdolibarr/view/accident/accident_list.php',
+			'langs'    => 'digiriskdolibarr@digiriskdolibarr',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
 			'position' => 48520 + $r,
-			'enabled' => '$conf->digiriskdolibarr->enabled',  // Define condition to show or hide menu entry. Use '$conf->digiriskdolibarr->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
-			'perms' => '$user->rights->digiriskdolibarr->accident->read', // Use 'perms'=>'$user->rights->digiriskdolibarr->level1->level2' if you want your menu with a permission rules
-			'target' => '',
-			'user' => 0,				                // 0=Menu for internal users, 1=external users, 2=both
+			'enabled'  => '$conf->digiriskdolibarr->enabled',  // Define condition to show or hide menu entry. Use '$conf->digiriskdolibarr->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
+			'perms'    => '$user->rights->digiriskdolibarr->accident->read', // Use 'perms'=>'$user->rights->digiriskdolibarr->level1->level2' if you want your menu with a permission rules
+			'target'   => '',
+			'user'     => 0,				                // 0=Menu for internal users, 1=external users, 2=both
 		);
 
 		$this->menu[$r++] = array(
 			'fk_menu' => 'fk_mainmenu=digiriskdolibarr',	    // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
-			'type' => 'left',			                // This is a Left menu entry
-			'titre' => '<i class="fas fa-user"></i>  ' . $langs->trans('Users'),
+			'type'     => 'left',			                // This is a Left menu entry
+			'titre'    =>  $langs->trans('Users'),
+			'prefix'   => '<i class="fas fa-user"></i>  ',
 			'mainmenu' => 'digiriskdolibarr',
 			'leftmenu' => 'digiriskusers',
-			'url' => '/digiriskdolibarr/view/digiriskusers.php',
-			'langs' => 'digiriskdolibarr@digiriskdolibarr',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
+			'url'      => '/digiriskdolibarr/view/digiriskusers.php',
+			'langs'    => 'digiriskdolibarr@digiriskdolibarr',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
 			'position' => 48520 + $r,
-			'enabled' => '$conf->digiriskdolibarr->enabled',  // Define condition to show or hide menu entry. Use '$conf->digiriskdolibarr->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
-			'perms' => '$user->rights->digiriskdolibarr->adminpage->read', // Use 'perms'=>'$user->rights->digiriskdolibarr->level1->level2' if you want your menu with a permission rules
-			'target' => '',
-			'user' => 0,				                // 0=Menu for internal users, 1=external users, 2=both
+			'enabled'  => '$conf->digiriskdolibarr->enabled',  // Define condition to show or hide menu entry. Use '$conf->digiriskdolibarr->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
+			'perms'    => '$user->rights->digiriskdolibarr->adminpage->read', // Use 'perms'=>'$user->rights->digiriskdolibarr->level1->level2' if you want your menu with a permission rules
+			'target'   => '',
+			'user'     => 0,				                // 0=Menu for internal users, 1=external users, 2=both
 		);
 
 		$this->menu[$r++] = array(
-			'fk_menu' => 'fk_mainmenu=digiriskdolibarr',	    // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
-			'type' => 'left',			                // This is a Left menu entry
-			'titre' => '<i class="fas fa-tasks"></i>  ' . $langs->trans('ActionPlan'),
+			'fk_menu'  => 'fk_mainmenu=digiriskdolibarr',	    // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
+			'type'     => 'left',			                // This is a Left menu entry
+			'titre'    => $langs->trans('ActionPlan'),
+			'prefix'   => '<i class="fas fa-tasks"></i>  ',
 			'mainmenu' => 'digiriskdolibarr',
 			'leftmenu' => 'digiriskactionplan',
-			'url' => '/projet/tasks.php?id=' . $conf->global->DIGIRISKDOLIBARR_DU_PROJECT,
-			'langs' => 'digiriskdolibarr@digiriskdolibarr',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
+			'url'      => '/projet/tasks.php?id=' . $conf->global->DIGIRISKDOLIBARR_DU_PROJECT,
+			'langs'    => 'digiriskdolibarr@digiriskdolibarr',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
 			'position' => 48520 + $r,
-			'enabled' => '$conf->digiriskdolibarr->enabled',  // Define condition to show or hide menu entry. Use '$conf->digiriskdolibarr->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
-			'perms' => '$user->rights->digiriskdolibarr->digiriskelement->read',			                // Use 'perms'=>'$user->rights->digiriskdolibarr->level1->level2' if you want your menu with a permission rules
-			'target' => '_blank',
-			'user' => 0,				                // 0=Menu for internal users, 1=external users, 2=both
+			'enabled'  => '$conf->digiriskdolibarr->enabled',  // Define condition to show or hide menu entry. Use '$conf->digiriskdolibarr->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
+			'perms'    => '$user->rights->digiriskdolibarr->digiriskelement->read',			                // Use 'perms'=>'$user->rights->digiriskdolibarr->level1->level2' if you want your menu with a permission rules
+			'target'   => '_blank',
+			'user'     => 0,				                // 0=Menu for internal users, 1=external users, 2=both
 		);
 
 		$this->menu[$r++] = array(
-			'fk_menu' => 'fk_mainmenu=digiriskdolibarr',	    // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
-			'type' => 'left',			                // This is a Left menu entry
-			'titre' => '<i class="fas fa-wrench"></i>  ' . $langs->trans('Tools'),
+			'fk_menu'  => 'fk_mainmenu=digiriskdolibarr',	    // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
+			'type'     => 'left',			                // This is a Left menu entry
+			'titre'    => $langs->trans('Tools'),
+			'prefix'   => '<i class="fas fa-wrench"></i>  ',
 			'mainmenu' => 'digiriskdolibarr',
 			'leftmenu' => 'digirisktools',
-			'url' => '/digiriskdolibarr/view/digirisktools.php',
-			'langs' => 'digiriskdolibarr@digiriskdolibarr',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
+			'url'      => '/digiriskdolibarr/view/digirisktools.php',
+			'langs'    => 'digiriskdolibarr@digiriskdolibarr',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
 			'position' => 48520 + $r,
-			'enabled' => '$conf->digiriskdolibarr->enabled && $user->admin',  // Define condition to show or hide menu entry. Use '$conf->digiriskdolibarr->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
-			'perms' => '$user->admin && $user->rights->digiriskdolibarr->adminpage->read',			                // Use 'perms'=>'$user->rights->digiriskdolibarr->level1->level2' if you want your menu with a permission rules
-			'target' => '',
-			'user' => 0,				                // 0=Menu for internal users, 1=external users, 2=both
+			'enabled'  => '$conf->digiriskdolibarr->enabled && $user->admin',  // Define condition to show or hide menu entry. Use '$conf->digiriskdolibarr->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
+			'perms'    => '$user->admin && $user->rights->digiriskdolibarr->adminpage->read',			                // Use 'perms'=>'$user->rights->digiriskdolibarr->level1->level2' if you want your menu with a permission rules
+			'target'   => '',
+			'user'     => 0,				                // 0=Menu for internal users, 1=external users, 2=both
 		);
 
 		$this->menu[$r++] = array(
-			'fk_menu' => 'fk_mainmenu=digiriskdolibarr',	    // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
-			'type' => 'left',			                // This is a Left menu entry
-			'titre' => '<i class="fas fa-cog"></i>  ' . $langs->trans('DigiriskConfig'),
+			'fk_menu'  => 'fk_mainmenu=digiriskdolibarr',	    // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
+			'type'     => 'left',			                // This is a Left menu entry
+			'titre'    => $langs->trans('DigiriskConfig'),
+			'prefix'   => '<i class="fas fa-cog"></i>  ',
 			'mainmenu' => 'digiriskdolibarr',
 			'leftmenu' => 'digiriskconfig',
-			'url' => '/digiriskdolibarr/admin/setup.php',
-			'langs' => 'digiriskdolibarr@digiriskdolibarr',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
+			'url'      => '/digiriskdolibarr/admin/setup.php',
+			'langs'    => 'digiriskdolibarr@digiriskdolibarr',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
 			'position' => 48520 + $r,
-			'enabled' => '$conf->digiriskdolibarr->enabled',  // Define condition to show or hide menu entry. Use '$conf->digiriskdolibarr->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
-			'perms' => '$user->rights->digiriskdolibarr->adminpage->read',			                // Use 'perms'=>'$user->rights->digiriskdolibarr->level1->level2' if you want your menu with a permission rules
-			'target' => '',
-			'user' => 0,				                // 0=Menu for internal users, 1=external users, 2=both
+			'enabled'  => '$conf->digiriskdolibarr->enabled',  // Define condition to show or hide menu entry. Use '$conf->digiriskdolibarr->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
+			'perms'    => '$user->rights->digiriskdolibarr->adminpage->read',			                // Use 'perms'=>'$user->rights->digiriskdolibarr->level1->level2' if you want your menu with a permission rules
+			'target'   => '',
+			'user'     => 0,				                // 0=Menu for internal users, 1=external users, 2=both
 		);
 
 		$this->menu[$r++] = array(
-			'fk_menu' => 'fk_mainmenu=digiriskdolibarr',	    // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
-			'type' => 'left',			                // This is a Left menu entry
-			'titre' => '<i class="fas fa-building"></i>  ' . $langs->transnoentities('DigiriskConfigSociety'),
+			'fk_menu'  => 'fk_mainmenu=digiriskdolibarr',	    // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
+			'type'     => 'left',			                // This is a Left menu entry
+			'titre'    => $langs->transnoentities('DigiriskConfigSociety'),
+			'prefix'   => '<i class="fas fa-building"></i> ',
 			'mainmenu' => 'digiriskdolibarr',
 			'leftmenu' => 'digirisksocietyconfig',
-			'url' => '/admin/company.php',
-			'langs' => 'digiriskdolibarr@digiriskdolibarr',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
+			'url'      => '/admin/company.php',
+			'langs'    => 'digiriskdolibarr@digiriskdolibarr',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
 			'position' => 48520 + $r,
-			'enabled' => '$conf->digiriskdolibarr->enabled && $user->admin',  // Define condition to show or hide menu entry. Use '$conf->digiriskdolibarr->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
-			'perms' => '$user->admin',			                // Use 'perms'=>'$user->rights->digiriskdolibarr->level1->level2' if you want your menu with a permission rules
-			'target' => '',
-			'user' => 0,				                // 0=Menu for internal users, 1=external users, 2=both
+			'enabled'  => '$conf->digiriskdolibarr->enabled && $user->admin',  // Define condition to show or hide menu entry. Use '$conf->digiriskdolibarr->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
+			'perms'    => '$user->admin',			                // Use 'perms'=>'$user->rights->digiriskdolibarr->level1->level2' if you want your menu with a permission rules
+			'target'   => '',
+			'user'     => 0,				                // 0=Menu for internal users, 1=external users, 2=both
 		);
 
 		$this->menu[$r++] = array(
-			'fk_menu' => 'fk_mainmenu=digiriskdolibarr',	    // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
-			'type' => 'left',			                // This is a Left menu entry
-			'titre' => '<span class="minimizeMenu" title="'. $langs->transnoentities('MinimizeMenu') .'"><i class="fas fa-bars"></i>  ' . $langs->transnoentities('MinimizeMenu') . '</span>',
+			'fk_menu'  => 'fk_mainmenu=digiriskdolibarr',	    // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
+			'type'     => 'left',			                // This is a Left menu entry
+			'titre'    => $langs->transnoentities('MinimizeMenu'),
+			'prefix'   => '<i class="fas fa-chevron-circle-left"></i> ',
 			'mainmenu' => 'digiriskdolibarr',
 			'leftmenu' => '',
-			'url' => '',
-			'langs' => '',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
+			'url'      => '',
+			'langs'    => '',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
 			'position' => 48520 + $r,
-			'enabled' => '$conf->digiriskdolibarr->enabled',  // Define condition to show or hide menu entry. Use '$conf->digiriskdolibarr->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
-			'perms' => 1,			                // Use 'perms'=>'$user->rights->digiriskdolibarr->level1->level2' if you want your menu with a permission rules
-			'target' => '',
-			'user' => 0,				                // 0=Menu for internal users, 1=external users, 2=both
+			'enabled'  => '$conf->digiriskdolibarr->enabled',  // Define condition to show or hide menu entry. Use '$conf->digiriskdolibarr->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
+			'perms'    => 1,			                // Use 'perms'=>'$user->rights->digiriskdolibarr->level1->level2' if you want your menu with a permission rules
+			'target'   => '',
+			'user'     => 0,				                // 0=Menu for internal users, 1=external users, 2=both
 		);
 
 		// Exports profiles provided by this module
@@ -1244,13 +1276,13 @@ class modDigiriskdolibarr extends DolibarrModules
 			's.rowid'=>"IdCompany", 's.nom'=>'CompanyName', 's.address'=>'Address', 's.zip'=>'Zip', 's.town'=>'Town', 's.fk_pays'=>'Country',
 			's.phone'=>'Phone', 's.email'=>'Email', 's.siren'=>'ProfId1', 's.siret'=>'ProfId2', 's.ape'=>'ProfId3', 's.idprof4'=>'ProfId4', 's.code_compta'=>'CustomerAccountancyCode', 's.code_compta_fournisseur'=>'SupplierAccountancyCode',
 			'cat.rowid'=>"CategId", 'cat.description'=>"Description", 'cat.fk_parent'=>"ParentCategory",
-			't.rowid'=>"Id", 't.ref'=>"Ref", 't.track_id'=>"TicketTrackId", 't.datec'=>"DateCreation", 't.origin_email'=>"OriginEmail", 't.subject'=>"Subject", 't.message'=>"Message", 't.resolution'=>"Resolution", 't.type_code'=>"Type", 't.category_code'=>"TicketCategory", 't.severity_code'=>"Severity",
+			't.rowid'=>"Id", 't.ref'=>"Ref", 't.track_id'=>"TicketTrackId", 't.datec'=>"DateCreation", 't.origin_email'=>"OriginEmail", 't.subject'=>"Subject", 't.message'=>"Message", 't.fk_statut'=>"Status", 't.resolution'=>"Resolution", 't.type_code'=>"Type", 't.category_code'=>"TicketCategory", 't.severity_code'=>"Severity",
 		);
 		$this->export_TypeFields_array[$r] = array(
 			's.rowid'=>"List:societe:nom::thirdparty", 's.nom'=>'Text', 's.address'=>'Text', 's.zip'=>'Text', 's.town'=>'Text', 's.fk_pays'=>'List:c_country:label',
 			's.phone'=>'Text', 's.email'=>'Text', 's.siren'=>'Text', 's.siret'=>'Text', 's.ape'=>'Text', 's.idprof4'=>'Text', 's.code_compta'=>'Text', 's.code_compta_fournisseur'=>'Text',
 			'cat.description'=>"Text", 'cat.fk_parent'=>'List:categorie:label:rowid',
-			't.rowid'=>"List:ticket:ref::ticket", 't.entity'=>'Numeric', 't.ref'=>"Text", 't.track_id'=>"Text", 't.datec'=>"Date", 't.origin_email'=>"Text", 't.subject'=>"Text", 't.message'=>"Text", 't.resolution'=>"Text", 't.type_code'=>"Text", 't.category_code'=>"Text", 't.severity_code'=>"Text",
+			't.rowid'=>"List:ticket:ref::ticket", 't.entity'=>'Numeric', 't.ref'=>"Text", 't.track_id'=>"Text", 't.datec'=>"Date", 't.origin_email'=>"Text", 't.subject'=>"Text", 't.message'=>"Text", 't.fk_statut'=>"Numeric", 't.resolution'=>"Text", 't.type_code'=>"Text", 't.category_code'=>"Text", 't.severity_code'=>"Text",
 		);
 		$this->export_entities_array[$r] = array(
 			's.rowid'=>"company", 's.nom'=>'company', 's.address'=>'company', 's.zip'=>'company', 's.town'=>'company', 's.fk_pays'=>'company',
@@ -1809,7 +1841,7 @@ class modDigiriskdolibarr extends DolibarrModules
 					),
 					//partage risk
 					'risk' => array(																				// Valeur utilisée dans getEntity()
-						'type'      => 'object',																	// element: partage d'éléments principaux (thirdparty, product, member, etc...)
+						'type'      => 'element',																	// element: partage d'éléments principaux (thirdparty, product, member, etc...)
 						'icon'      => 'exclamation-triangle',														// Font Awesome icon
 						'lang'      => 'digiriskdolibarr@digiriskdolibarr',											// Fichier de langue contenant les traductions
 						'tooltip'   => 'RiskSharedTooltip',															// Message Tooltip (ne pas mettre cette clé si pas de tooltip)
@@ -1828,10 +1860,32 @@ class modDigiriskdolibarr extends DolibarrModules
 							)
 						)
 					),
+					//partage risk sign
+					'risksign' => array(																			// Valeur utilisée dans getEntity()
+						'type'      => 'element',																	// element: partage d'éléments principaux (thirdparty, product, member, etc...)
+						'icon'      => 'map-signs',																	// Font Awesome icon
+						'lang'      => 'digiriskdolibarr@digiriskdolibarr',											// Fichier de langue contenant les traductions
+						'tooltip'   => 'RiskSignSharedTooltip',														// Message Tooltip (ne pas mettre cette clé si pas de tooltip)
+						'mandatory' => 'digiriskelement',															// partage principal obligatoire
+						'enable'    => '! empty($conf->digiriskdolibarr->enabled)',									// Conditions d'activation du partage
+						'display'   => '! empty($conf->global->MULTICOMPANY_DIGIRISKELEMENT_SHARING_ENABLED)', 		// L'affichage de ce bloc de partage dépend de l'activation d'un partage parent
+						'input'     => array(																		// input : Paramétrage de la réaction du bouton on/off
+							'global' => array(																		// global : réaction lorsqu'on désactive l'option de partage global
+								'hide'     => true,																	// hide : cache le bloc de partage lors de la désactivation du partage global
+								'del'      => true																	// del : suppression de la constante du partage lors de la désactivation du partage global
+							),
+							'digiriskelement' => array(																// digiriskelement (nom du module principal) : réaction lorsqu'on désactive le partage principal (ici le partage des digiriskelements)
+								'showhide' => true,																	// showhide : afficher/cacher le bloc de partage lors de l'activation/désactivation du partage principal
+								//'hide'     => true,																	// hide : cache le bloc de partage lors de la désactivation du partage principal
+								'del'      => true																	// del : supprime la constante du partage lors de la désactivation du partage principal
+							)
+						)
+					),
 				),
 				'sharingmodulename' => array(																		// correspondance des noms de modules pour le lien parent ou compatibilité (ex: 'productsupplierprice'	=> 'product')
 					'digiriskelement' => 'digiriskdolibarr',
 					'risk'            => 'digiriskdolibarr',
+					'risksign'        => 'digiriskdolibarr',
 				),
 			)
 		);
