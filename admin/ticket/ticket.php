@@ -197,6 +197,44 @@ if ($action == 'setTicketSuccessMessage') {
 	setEventMessages($langs->trans('TicketSuccessMessageSet'), array());
 }
 
+if ($action == 'generateQRCode') {
+
+	$data = dol_buildpath('/custom/digiriskdolibarr/public/ticket/create_ticket.php?entity=' . $conf->entity, 1);
+	$size = '400x400';
+	$entity = $conf->entity > 1 ? '/' . $conf->entity . '/' : '';
+	$logo = DOL_DATA_ROOT . $entity . '/mycompany/logos/' . $conf->global->MAIN_INFO_SOCIETE_LOGO;
+
+	ob_clean();
+	header('Content-type: image/png');
+
+	$QR = imagecreatefrompng('https://chart.googleapis.com/chart?cht=qr&chld=H|1&chs='.$size.'&chl='.urlencode($data));
+
+	if($logo !== FALSE){
+		$logo = imagecreatefromstring(file_get_contents($logo));
+
+		$QR_width = imagesx($QR);
+		$QR_height = imagesy($QR);
+
+		$logo_width = imagesx($logo);
+		$logo_height = imagesy($logo);
+
+		// Scale logo to fit in the QR Code
+		$logo_qr_width = $QR_width/3;
+		$scale = $logo_width/$logo_qr_width;
+		$logo_qr_height = $logo_height/$scale;
+
+		imagecopyresampled($QR, $logo, $QR_width/3, $QR_height/3, 0, 0, $logo_qr_width, $logo_qr_height, $logo_width, $logo_height);
+	}
+
+	$targetPath = $conf->digiriskdolibarr->multidir_output[$conf->entity?:1] . "/ticketqrcode/";
+	if (! is_dir($targetPath)) {
+		mkdir($targetPath, 0777, true);
+	}
+
+	$targetPath = $targetPath . "ticketQRCode.png";
+	imagepng($QR,$targetPath);
+}
+
 /*
  * View
  */
@@ -457,9 +495,9 @@ if ( ! empty($conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE)) {
 	print '</table>';
 	print '</div>';
 
+	// Extrafields generation
 	print load_fiche_titre($langs->trans("TicketExtrafields"), '', '');
 
-	// Extrafields generation
 	print '<div class="div-table-responsive-no-min">';
 	print '<table class="noborder centpercent">';
 	print '<tr class="liste_titre">';
@@ -491,9 +529,50 @@ if ( ! empty($conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE)) {
 
 	print '</table>';
 	print '</div>';
+
+	// QR Code generation
+	print load_fiche_titre($langs->trans("QRCodeGeneration"), '', '');
+
+	$QRCodeList = dol_dir_list($conf->digiriskdolibarr->multidir_output[$conf->entity?:1] . "/ticketqrcode/");
+	if (is_array($QRCodeList) && !empty($QRCodeList)) {
+		$QRCode = array_shift($QRCodeList);
+	} else {
+		$QRCode = array();
+	}
+
+	print '<div class="div-table-responsive-no-min">';
+	print '<table class="noborder centpercent">';
+	print '<tr class="liste_titre">';
+	print '<td>' . $langs->trans("Parameters") . '</td>';
+	print '<td class="center">' . $langs->trans("Status") . '</td>';
+	print '<td class="center">' . $langs->trans("Action") . '</td>';
+	print '<td class="center">' . $langs->trans("ShortInfo") . '</td>';
+	print '</tr>';
+
+	print '<form method="POST" action="' . $_SERVER["PHP_SELF"] . '">';
+	print '<input type="hidden" name="token" value="' . newToken() . '">';
+	print '<input type="hidden" name="action" value="generateQRCode">';
+	print '<input type="hidden" name="backtopage" value="' . $backtopage . '">';
+
+
+	print '<tr class="oddeven"><td>' . $langs->trans("GenerateQRCode") . '<sup><a href="https://wiki.dolibarr.org/index.php?title=Module_Digirisk#DigiRisk_-_Registre_de_s.C3.A9curit.C3.A9_et_Tickets" target="_blank" > 4</a></sup></td>';
+	print '<td class="center">';
+	print array_key_exists('fullname', $QRCode) ? $langs->trans('QRCodeAlreadyGenerated') : $langs->trans('NotGenerated');
+	print '</td>';
+	print '<td class="center">';
+	print array_key_exists('fullname', $QRCode) ? '<img width="200" src="'.DOL_URL_ROOT . '/custom/digiriskdolibarr/documents/viewimage.php?modulepart=digiriskdolibarr&entity=' . $conf->entity . '&file=' . 'ticketqrcode/'.$QRCode['name'].'">' : '<input type="submit" class="button" value="'.$langs->trans('Generate') .'">' ;
+	print '</td>';
+
+	print '<td class="center minwidth800">';
+	print $form->textwithpicto('', $langs->trans("QRCodeGeneration"));
+	print '</td>';
+	print '</tr>';
+	print '</form>';
+
+	print '</table>';
+	print '</div>';
 	print '<span class="opacitymedium">' . $langs->trans("TicketPublicInterfaceConfigDocumentation") . '</span> : <a href="https://wiki.dolibarr.org/index.php?title=Module_Digirisk#DigiRisk_-_Registre_de_s.C3.A9curit.C3.A9_et_Tickets" target="_blank" >' . $langs->transnoentities('DigiriskDocumentation') . '</a>';
 }
-
 
 // End of page
 llxFooter();

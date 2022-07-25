@@ -1368,6 +1368,7 @@ TicketActivatePublicInterface = Activer l'interface publique
 GenerateExtrafields = Génération des extrafields de ticket par défaut
 GenerateCategories = Génération des catégories de ticket par défaut
 AlreadyGenerated = Déjà généré(e)s
+NotGenerated = Pas encore généré(e)
 NotCreated = Pas encore créé(e)s
 ExtrafieldsGeneration = Cette option permet la génération des extrafields par défaut des tickets. Les extrafields créés seront : <br> Nom, Prénom, Téléphone, Service, Lieu & Date
 CategoriesGeneration = Cette option permet la génération des catégories par défaut des tickets. Les catégories créées seront : <br> - Registre <br> - - Accident <br> - - - Presqu'accident, Accident bénin, Accident du travail <br> - - Santé & Sécurité au travail <br> - - - Départ anticipé, Autres, Problème humain, Problème matériel <br> - - Danger grave et imminent <br> - - Qualité <br> - - - Non conformité, Suggestion d'amélioration <br> - - Environnement <br> - - - Non conformité, Autres
@@ -1402,8 +1403,9 @@ TSProject = Projet lié aux tickets
 TicketInitial = TS
 TicketDescription = Projet des tickets
 TicketProjectUpdated = Le projet par défaut des tickets a été mis à jour
-
-
+QRCodeAlreadyGenerated = QR Code généré
+GenerateQRCode = Générer le QR Code
+QRCodeGeneration = Génération du QR Code
 
 # Ticket document
 
