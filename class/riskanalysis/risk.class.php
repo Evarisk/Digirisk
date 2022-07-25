@@ -284,6 +284,7 @@ class Risk extends CommonObject
 				$digiriskelementtmp->fetch($allrisk->fk_element);
 				$digiriskelementtmp->element = 'digiriskdolibarr';
 				$digiriskelementtmp->fetchObjectLinked($allrisk->id, 'digiriskdolibarr_risk', $object->id, 'digiriskdolibarr_digiriskelement', 'AND', 1, 'sourcetype', 0);
+				// @todo performance leak : iterate on digirisk elements and fetch shared risks instead of this
 				$alreadyImported = !empty($digiriskelementtmp->linkedObjectsIds) ? 1 : 0;
 				if ($alreadyImported > 0) {
 					$evaluation     = new RiskAssessment($this->db);
