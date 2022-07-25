@@ -186,21 +186,25 @@ class Risk extends CommonObject
 		$object  = new DigiriskElement($this->db);
 		$objects = $object->fetchAll('',  '',  0,  0, array('customsql' => 'status > 0' ));
 		$risk    = new Risk($this->db);
-		$result  = $risk->fetchFromParent($parent_id);
-		$filter = '';
+		if ($parent_id > 0) {
+			$result  = $risk->fetchFromParent($parent_id);
 
-		// RISKS de l'élément parent.
-		if ($result > 0 && ! empty($result)) {
-			foreach ($result as $risk) {
-				$evaluation     = new RiskAssessment($this->db);
-				$lastEvaluation = $evaluation->fetchFromParent($risk->id, 1);
-				if ( $lastEvaluation > 0 && ! empty($lastEvaluation) && is_array($lastEvaluation)) {
-					$lastEvaluation       = array_shift($lastEvaluation);
-					$risk->lastEvaluation = $lastEvaluation->cotation;
+			$filter = '';
+
+			// RISKS de l'élément parent.
+			if ($result > 0 && ! empty($result)) {
+				foreach ($result as $risk) {
+					$evaluation     = new RiskAssessment($this->db);
+					$lastEvaluation = $evaluation->fetchFromParent($risk->id, 1);
+					if ( $lastEvaluation > 0 && ! empty($lastEvaluation) && is_array($lastEvaluation)) {
+						$lastEvaluation       = array_shift($lastEvaluation);
+						$risk->lastEvaluation = $lastEvaluation->cotation;
+					}
+
+					$risks[$risk->id] = $risk;
 				}
-
-				$risks[$risk->id] = $risk;
 			}
+
 		}
 
 		if ( $get_children_data ) {
