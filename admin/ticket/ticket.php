@@ -555,7 +555,7 @@ if ( ! empty($conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE)) {
 	print '<input type="hidden" name="backtopage" value="' . $backtopage . '">';
 
 
-	print '<tr class="oddeven"><td>' . $langs->trans("GenerateQRCode") . '<sup><a href="https://wiki.dolibarr.org/index.php?title=Module_Digirisk#DigiRisk_-_Registre_de_s.C3.A9curit.C3.A9_et_Tickets" target="_blank" > 4</a></sup></td>';
+	print '<tr class="oddeven"><td>' . $langs->trans("GenerateQRCode") . '</td>';
 	print '<td class="center">';
 	print array_key_exists('fullname', $QRCode) ? $langs->trans('QRCodeAlreadyGenerated') : $langs->trans('NotGenerated');
 	print '</td>';
