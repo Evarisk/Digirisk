@@ -520,9 +520,8 @@ class doc_workunitdocument_odt extends ModeleODTWorkUnitDocument
 
 					if ( ! empty($digiriskelement) ) {
 						$evaluators = $evaluator->fetchFromParent($digiriskelement->id);
-						$listlines = '';
+						$listlines = $odfHandler->setSegment('utilisateursPresents');
 						if ($evaluators !== -1) {
-							$listlines = $odfHandler->setSegment('utilisateursPresents');
 							foreach ($evaluators as $line) {
 								$element = new DigiriskElement($this->db);
 								$element->fetch($line->fk_element);
@@ -566,9 +565,8 @@ class doc_workunitdocument_odt extends ModeleODTWorkUnitDocument
 
 					if ( ! empty($digiriskelement) ) {
 						$risksigns = $risksign->fetchRiskSign($digiriskelement->id, $conf->global->DIGIRISKDOLIBARR_SHOW_INHERITED_RISKSIGNS, $conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKSIGNS);
-						$listlines = '';
+						$listlines = $odfHandler->setSegment('affectedRecommandation');
 						if ($risksigns !== -1) {
-							$listlines = $odfHandler->setSegment('affectedRecommandation');
 							foreach ($risksigns as $line) {
 								$element = new DigiriskElement($this->db);
 								$element->fetch($line->fk_element);
@@ -611,9 +609,8 @@ class doc_workunitdocument_odt extends ModeleODTWorkUnitDocument
 
 					if ( ! empty($digiriskelement) ) {
 						$accidents = $accident->fetchFromParent($digiriskelement->id);
-						$listlines = '';
+						$listlines = $odfHandler->setSegment('affectedAccident');
 						if ($accidents !== -1) {
-							$listlines = $odfHandler->setSegment('affectedAccident');
 							foreach ($accidents as $line) {
 								$filearray = dol_dir_list($conf->digiriskdolibarr->multidir_output[$conf->entity] . '/' . $line->element . '/' . $line->ref . '/thumbs/', "files", 0, '', '(\.odt|_preview.*\.png)$', 'position_name', 'desc', 1);
 								if (count($filearray)) {
