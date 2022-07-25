@@ -199,7 +199,7 @@ if ($action == 'setTicketSuccessMessage') {
 
 if ($action == 'generateQRCode') {
 
-	$data = dol_buildpath('/custom/digiriskdolibarr/public/ticket/create_ticket.php?entity=' . $conf->entity, 1);
+	$data = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/public/ticket/create_ticket.php?entity=' . $conf->entity;
 	$size = '400x400';
 	$entity = $conf->entity > 1 ? '/' . $conf->entity . '/' : '';
 	$logo = DOL_DATA_ROOT . $entity . '/mycompany/logos/' . $conf->global->MAIN_INFO_SOCIETE_LOGO;
