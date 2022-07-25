@@ -1841,7 +1841,7 @@ class modDigiriskdolibarr extends DolibarrModules
 					),
 					//partage risk
 					'risk' => array(																				// Valeur utilisée dans getEntity()
-						'type'      => 'object',																	// element: partage d'éléments principaux (thirdparty, product, member, etc...)
+						'type'      => 'element',																	// element: partage d'éléments principaux (thirdparty, product, member, etc...)
 						'icon'      => 'exclamation-triangle',														// Font Awesome icon
 						'lang'      => 'digiriskdolibarr@digiriskdolibarr',											// Fichier de langue contenant les traductions
 						'tooltip'   => 'RiskSharedTooltip',															// Message Tooltip (ne pas mettre cette clé si pas de tooltip)
@@ -1862,7 +1862,7 @@ class modDigiriskdolibarr extends DolibarrModules
 					),
 					//partage risk sign
 					'risksign' => array(																			// Valeur utilisée dans getEntity()
-						'type'      => 'object',																	// element: partage d'éléments principaux (thirdparty, product, member, etc...)
+						'type'      => 'element',																	// element: partage d'éléments principaux (thirdparty, product, member, etc...)
 						'icon'      => 'map-signs',																	// Font Awesome icon
 						'lang'      => 'digiriskdolibarr@digiriskdolibarr',											// Fichier de langue contenant les traductions
 						'tooltip'   => 'RiskSignSharedTooltip',														// Message Tooltip (ne pas mettre cette clé si pas de tooltip)
@@ -1876,7 +1876,7 @@ class modDigiriskdolibarr extends DolibarrModules
 							),
 							'digiriskelement' => array(																// digiriskelement (nom du module principal) : réaction lorsqu'on désactive le partage principal (ici le partage des digiriskelements)
 								'showhide' => true,																	// showhide : afficher/cacher le bloc de partage lors de l'activation/désactivation du partage principal
-								'hide'     => true,																	// hide : cache le bloc de partage lors de la désactivation du partage principal
+								//'hide'     => true,																	// hide : cache le bloc de partage lors de la désactivation du partage principal
 								'del'      => true																	// del : supprime la constante du partage lors de la désactivation du partage principal
 							)
 						)
