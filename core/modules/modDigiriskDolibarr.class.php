@@ -664,6 +664,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			298 => array('DIGIRISKDOLIBARR_TICKET_CHILD_CATEGORY_LABEL', 'chaine', $langs->trans('Pertinence'), '', 0, 'current'),
 			299 => array('DIGIRISKDOLIBARR_TICKET_PROJECT', 'integer', 0, '', 0, 'current'),
 			300 => array('DIGIRISKDOLIBARR_TICKET_SUCCESS_MESSAGE', 'chaine', $langs->trans('YouMustNotifyYourHierarchy'), '', 0, 'current'),
+			301 => array('DIGIRISKDOLIBARR_TICKET_SERVICE_EXTRAFIELDS_DELETED', 'integer', 0, '', 0, 'current'),
 
 			// CONST ACCIDENT
 			310 => array('MAIN_AGENDA_ACTIONAUTO_ACCIDENT_CREATE', 'integer', 1, '', 0, 'current'),
@@ -1723,6 +1724,11 @@ class modDigiriskdolibarr extends DolibarrModules
 
 		dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_VERSION', $this->version, 'chaine', 0, '', $conf->entity);
 		dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_DB_VERSION', $this->version, 'chaine', 0, '', $conf->entity);
+
+		if ($conf->global->DIGIRISKDOLIBARR_TICKET_SERVICE_EXTRAFIELDS_DELETED == 0) {
+			$extra_fields->delete('digiriskdolibarr_ticket_service', 'ticket');
+			dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_TICKET_SERVICE_EXTRAFIELDS_DELETED', 1, 'integer', 0, '', $conf->entity);
+		}
 
 		//DigiriskElement favorite medias backward compatibility
 		if ($conf->global->DIGIRISKDOLIBARR_DIGIRISKELEMENT_MEDIAS_BACKWARD_COMPATIBILITY == 0) {

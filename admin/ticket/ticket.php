@@ -95,7 +95,6 @@ if ($action == 'generateExtrafields') {
 	$ret1 = $extra_fields->addExtraField('digiriskdolibarr_ticket_lastname', $langs->trans("LastName"), 'varchar', 2000, 255, 'ticket', 0, 0, '', '', 1, '', 1, '', '', 0);
 	$ret2 = $extra_fields->addExtraField('digiriskdolibarr_ticket_firstname', $langs->transnoentities("FirstName"), 'varchar', 2100, 255, 'ticket', 0, 0, '', '', 1, '', 1, '', '', 0);
 	$ret3 = $extra_fields->addExtraField('digiriskdolibarr_ticket_phone', $langs->transnoentities("Phone"), 'phone', 2200, '', 'ticket', 0, 0, '', '', 1, '', 1, '', '', 0);
-	$ret4 = $extra_fields->addExtraField('digiriskdolibarr_ticket_service', $langs->trans("Service"), 'varchar', 2300, 255, 'ticket', 0, 0, '', '', 1, '', 1, '', '', 0);
 	$ret5 = $extra_fields->addExtraField('digiriskdolibarr_ticket_location', $langs->trans("Location"), 'varchar', 2400, 255, 'ticket', 0, 0, '', '', 1, '', 1, '', '', 0);
 	$ret6 = $extra_fields->addExtraField('digiriskdolibarr_ticket_date', $langs->trans("Date"), 'datetime', 2500, '', 'ticket', 0, 0, '', '', 1, '', 1, '', '', 0);
 	if ($ret1 > 0 && $ret2 > 0 && $ret3 > 0 && $ret4 > 0 && $ret5 > 0 && $ret6 > 0) {
