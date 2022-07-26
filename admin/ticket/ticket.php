@@ -560,8 +560,13 @@ if ( ! empty($conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE)) {
 	print array_key_exists('fullname', $QRCode) ? $langs->trans('QRCodeAlreadyGenerated') : $langs->trans('NotGenerated');
 	print '</td>';
 	print '<td class="center">';
-	$urladvanced = array_key_exists('fullname', $QRCode) ? getAdvancedPreviewUrl('digiriskdolibarr', 'ticketqrcode/' . $QRCode['name']) : '';
-	print array_key_exists('fullname', $QRCode) ? '<a class="clicked-photo-preview" href="'. $urladvanced .'">' . '<img width="200" src="'.DOL_URL_ROOT . '/custom/digiriskdolibarr/documents/viewimage.php?modulepart=digiriskdolibarr&entity=' . $conf->entity . '&file=' . 'ticketqrcode/' . $QRCode['name'] .'">' : '<input type="submit" class="button" value="'.$langs->trans('Generate') .'">' ;
+	if (array_key_exists('fullname', $QRCode)) {
+		$urladvanced = getAdvancedPreviewUrl('digiriskdolibarr', 'ticketqrcode/' . $QRCode['name']);
+		print '<a class="clicked-photo-preview" href="'. $urladvanced .'">' . '<img width="200" src="'.DOL_URL_ROOT . '/custom/digiriskdolibarr/documents/viewimage.php?modulepart=digiriskdolibarr&entity=' . $conf->entity . '&file=' . 'ticketqrcode/' . $QRCode['name'] .'"></a>';
+		print '<a id="download" href="'.DOL_URL_ROOT . '/custom/digiriskdolibarr/documents/viewimage.php?modulepart=digiriskdolibarr&entity=' . $conf->entity . '&file=' . 'ticketqrcode/' . $QRCode['name'] .'" download="'.DOL_URL_ROOT . '/custom/digiriskdolibarr/documents/viewimage.php?modulepart=digiriskdolibarr&entity=' . $conf->entity . '&file=' . 'ticketqrcode/' . $QRCode['name'] .'"><i class="fas fa-download"></i></a>';
+	} else {
+		print '<input type="submit" class="button" value="'.$langs->trans('Generate') .'">' ;
+	}
 	print '</td>';
 
 	print '<td class="center minwidth800">';
