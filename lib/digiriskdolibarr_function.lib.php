@@ -2019,7 +2019,7 @@ function getNomUrlProject($project, $withpicto = 0, $option = '', $addlabel = 0,
  *  @param  string  $moreattrib         More attributes on HTML select tag
  * 	@return	void
  */
-function digirisk_select_dictionary($htmlname, $dictionarytable, $keyfield = 'code', $labelfield = 'label', $selected = '', $useempty = 0, $moreattrib = '')
+function digirisk_select_dictionary($htmlname, $dictionarytable, $keyfield = 'code', $labelfield = 'label', $selected = '', $useempty = 0, $moreattrib = '', $placeholder = '')
 {
 	// phpcs:enable
 	global $langs, $db;
@@ -2035,9 +2035,9 @@ function digirisk_select_dictionary($htmlname, $dictionarytable, $keyfield = 'co
 		$num = $db->num_rows($result);
 		$i   = 0;
 		if ($num) {
-			print '<select id="select' . $htmlname . '" class="flat selectdictionary" name="' . $htmlname . '"' . ($moreattrib ? ' ' . $moreattrib : '') . '>';
+			print '<select value="kk" id="select' . $htmlname . '" class="flat selectdictionary" name="' . $htmlname . '"' . ($moreattrib ? ' ' . $moreattrib : '') . '>';
 			if ($useempty == 1 || ($useempty == 2 && $num > 1)) {
-				print '<option value="-1">&nbsp;</option>';
+				print '<option value="-1">'. (dol_strlen($placeholder) > 0 ? $langs->transnoentities($placeholder) : '') .'&nbsp;</option>';
 			}
 
 			while ($i < $num) {
@@ -2052,6 +2052,8 @@ function digirisk_select_dictionary($htmlname, $dictionarytable, $keyfield = 'co
 				$i++;
 			}
 			print "</select>";
+				print ajax_combobox('select'.$htmlname);
+
 		} else {
 			print $langs->trans("DictionaryEmpty");
 		}
