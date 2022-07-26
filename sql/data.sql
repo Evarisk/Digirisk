@@ -20,6 +20,9 @@ INSERT INTO `llx_c_relative_location` (`rowid`, `entity`, `ref`, `label`, `descr
 INSERT INTO `llx_c_relative_location` (`rowid`, `entity`, `ref`, `label`, `description`, `active`) VALUES(5, 0, 'OnTheWayBetweenMealAndWorkplace', 'OnTheWayBetweenMealAndWorkplace', '', 1);
 INSERT INTO `llx_c_relative_location` (`rowid`, `entity`, `ref`, `label`, `description`, `active`) VALUES(6, 0, 'DuringATripForTheEmployer', 'DuringATripForTheEmployer', '', 1);
 
+INSERT INTO `llx_c_services` (`rowid`, `entity`, `ref`, `label`, `description`, `active`) VALUES(1, 0, 'Administrative', 'Administrative', '', 1);
+INSERT INTO `llx_c_services` (`rowid`, `entity`, `ref`, `label`, `description`, `active`) VALUES(2, 0, 'Accountancy', 'Accountancy', '', 1);
+
 INSERT INTO `llx_c_lesion_localization` (`rowid`, `entity`, `ref`, `label`, `description`, `active`) VALUES(1, 0, 'Trunk', 'Trunk', '', 1);
 INSERT INTO `llx_c_lesion_localization` (`rowid`, `entity`, `ref`, `label`, `description`, `active`) VALUES(2, 0, 'Hand', 'Hand', '', 1);
 INSERT INTO `llx_c_lesion_localization` (`rowid`, `entity`, `ref`, `label`, `description`, `active`) VALUES(3, 0, 'LowerLimbs', 'LowerLimbs', '', 1);

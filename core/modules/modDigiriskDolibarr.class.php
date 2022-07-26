@@ -726,25 +726,29 @@ class modDigiriskdolibarr extends DolibarrModules
 				MAIN_DB_PREFIX . "c_conventions_collectives",
 				MAIN_DB_PREFIX . "c_relative_location",
 				MAIN_DB_PREFIX . "c_lesion_localization",
-				MAIN_DB_PREFIX . "c_lesion_nature"
+				MAIN_DB_PREFIX . "c_lesion_nature",
+				MAIN_DB_PREFIX . "c_services"
 			),
 			// Label of tables
 			'tablib' => array(
 				"CollectiveAgreement",
 				"RelativeLocation",
 				"LesionLocalization",
-				"LesionNature"
+				"LesionNature",
+				"Services"
 			),
 			// Request to select fields
 			'tabsql' => array(
 				'SELECT f.rowid as rowid, f.code, f.libelle, f.active FROM ' . MAIN_DB_PREFIX . 'c_conventions_collectives as f',
 				'SELECT f.rowid as rowid, f.ref, f.label, f.description, f.active FROM ' . MAIN_DB_PREFIX . 'c_relative_location as f',
 				'SELECT f.rowid as rowid, f.ref, f.label, f.description, f.active FROM ' . MAIN_DB_PREFIX . 'c_lesion_localization as f',
-				'SELECT f.rowid as rowid, f.ref, f.label, f.description, f.active FROM ' . MAIN_DB_PREFIX . 'c_lesion_nature as f'
+				'SELECT f.rowid as rowid, f.ref, f.label, f.description, f.active FROM ' . MAIN_DB_PREFIX . 'c_lesion_nature as f',
+				'SELECT f.rowid as rowid, f.ref, f.label, f.description, f.active FROM ' . MAIN_DB_PREFIX . 'c_services as f'
 			),
 			// Sort order
 			'tabsqlsort' => array(
 				"code ASC",
+				"label ASC",
 				"label ASC",
 				"label ASC",
 				"label ASC"
@@ -754,11 +758,13 @@ class modDigiriskdolibarr extends DolibarrModules
 				"code,libelle",
 				"ref,label,description",
 				"ref,label,description",
+				"ref,label,description",
 				"ref,label,description"
 			),
 			// List of fields (list of fields to edit a record)
 			'tabfieldvalue' => array(
 				"code,libelle",
+				"ref,label,description",
 				"ref,label,description",
 				"ref,label,description",
 				"ref,label,description"
@@ -768,6 +774,7 @@ class modDigiriskdolibarr extends DolibarrModules
 				"code,libelle",
 				"ref,label,description",
 				"ref,label,description",
+				"ref,label,description",
 				"ref,label,description"
 			),
 			// Name of columns with primary key (try to always name it 'rowid')
@@ -775,10 +782,12 @@ class modDigiriskdolibarr extends DolibarrModules
 				"rowid",
 				"rowid",
 				"rowid",
+				"rowid",
 				"rowid"
 			),
 			// Condition to show each dictionary
 			'tabcond' => array(
+				$conf->digiriskdolibarr->enabled,
 				$conf->digiriskdolibarr->enabled,
 				$conf->digiriskdolibarr->enabled,
 				$conf->digiriskdolibarr->enabled,
