@@ -653,7 +653,7 @@ UserEmployer = Responsable de la société
 SignatureUserEmployer = Signature du responsable de la société
 CerfaLink = Lien vers le Cerfa
 WorkStopDays = Nombre de jour d'arrêt de travail
-AccidentLesionList = Liste des lésions lié à l'accident
+AccidentLesionList = Liste des lésions liées à l'accident
 DocumentsMetaData = Fichiers joints complémentaires
 WorkStopDocument = Déclaration d'arrêt de travail
 AccidentMetaDataSave = Les données complémentaires de l'accident ont bien été enregistrées
@@ -1413,7 +1413,7 @@ TotalMaterialProblemByService = Nombre de registres avec TAG Problème matériel
 TotalHumanProblemByService = Nombre de registres avec TAG Problème humain total et par service
 TotalDGIByService = Nombre de registres avec TAG Danger Grave et Imminent total et par service
 DashBoardTicket = Tableau de bord des tickets
-
+PleaseSelectAService = Veuillez sélectionner un service
 
 
 # Ticket document
