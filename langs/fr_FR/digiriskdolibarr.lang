@@ -1406,6 +1406,15 @@ TicketProjectUpdated = Le projet par défaut des tickets a été mis à jour
 QRCodeAlreadyGenerated = QR Code généré
 GenerateQRCode = Générer le QR Code
 QRCodeGeneration = Génération du QR Code
+TotalRegisterByService = Nombre de registres crées total et par service
+TotalAccidentWithDIATByService = Nombre de registres avec TAG Accident avec DIAT total et par service
+TotalAccidentWithoutDIATByService = Nombre de registres avec TAG Accident sand DIAT total et par service
+TotalMaterialProblemByService = Nombre de registres avec TAG Problème matériel total et par service
+TotalHumanProblemByService = Nombre de registres avec TAG Problème humain total et par service
+TotalDGIByService = Nombre de registres avec TAG Danger Grave et Imminent total et par service
+DashBoardTicket = Tableau de bord des tickets
+
+
 
 # Ticket document
 

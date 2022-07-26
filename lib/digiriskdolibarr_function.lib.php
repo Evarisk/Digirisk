@@ -2868,3 +2868,42 @@ function digirisk_check_secure_access_document($modulepart, $original_file, $ent
 
 	return $ret;
 }
+
+/**
+ * Load indicators for dashboard
+ *
+ * @param  string  $catName     Name of category
+ * @param  string  $label        Label to show in box
+ * @param  string  $service      Name of service
+ * @return WorkboardResponse|int <0 if KO, WorkboardResponse if OK
+ * @throws Exception
+ */
+function load_board($catName, $label, $service)
+{
+	global $db;
+
+	$categorie = new Categorie($db);
+
+	$categorie->fetch(0, $catName);
+	$allObjects = $categorie->getObjectsInCateg(Categorie::TYPE_TICKET);
+
+	if (is_array($allObjects) && !empty($allObjects)) {
+		foreach ($allObjects as $object) {
+			if (!empty($object->array_options['options_digiriskdolibarr_ticket_service']) && $object->array_options['options_digiriskdolibarr_ticket_service'] == $service && $object->fk_statut != 9) {
+				$arrayCountObject[] = $object;
+			}
+		}
+	}
+
+	if (!empty($arrayCountObject)) {
+		$nbobject = count($arrayCountObject);
+	}
+
+	if ($allObjects > 0) {
+		$response = new WorkboardResponse();
+		$response->label = $label . ' : ' . '<b>'. ($nbobject ?: 0) . '</b>' . '<br>';
+		return $response;
+	} else {
+		return -1;
+	}
+}
