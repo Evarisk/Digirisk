@@ -2903,7 +2903,7 @@ function load_board($cat, $service)
 
 	if (is_array($allObjects) && !empty($allObjects)) {
 		foreach ($allObjects as $object) {
-			if (!empty($object->array_options['options_digiriskdolibarr_ticket_service']) && $object->array_options['options_digiriskdolibarr_ticket_service'] == $service && $object->fk_statut != 9) {
+			if (!empty($object->array_options['options_digiriskdolibarr_ticket_service']) && $object->array_options['options_digiriskdolibarr_ticket_service'] == $service->label && $object->fk_statut != 9) {
 				$arrayCountObject[] = $object;
 			}
 		}
