@@ -3969,7 +3969,7 @@ window.eoxiaJS.menu.toggleMenu = function() {
  * @return {void}
  */
 window.eoxiaJS.menu.setMenu = function() {
-	if (!document.URL.match(/htdocs\/admin/) || document.URL.match(/mainmenu=digiriskdolibarr/)) {
+	if ((!document.URL.match(/htdocs\/admin/) || document.URL.match(/mainmenu=digiriskdolibarr/)) && !document.URL.match(/dashboard_ticket/) ) {
 		$('span.vmenu').find('.fa-chevron-circle-left').parent().parent().parent().attr('style', 'cursor:pointer ! important')
 
 		if (localStorage.maximized == 'false') {
