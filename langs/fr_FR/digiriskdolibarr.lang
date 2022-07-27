@@ -1407,10 +1407,11 @@ QRCodeAlreadyGenerated = QR Code généré
 GenerateQRCode = Générer le QR Code
 QRCodeGeneration = Génération du QR Code
 TotalTagByService = Nombre de registres avec <strong>TAG %s </strong>
-DashBoardTicket = Tableau de bord des tickets
 PleaseSelectAService = Veuillez sélectionner un service
 TicketCreationMailWellSent = Mail de confirmation de création du ticket envoyé
 TicketCreationMailSent = Le mail de création du ticket a été envoyé à %s
+HowToSetupTicketCategories = Pour configurer les categories de ticket, veuillez cliquer sur ce lien :
+ConfigTicketCategories = Congiguration des categories de ticket
 
 # Ticket document
 
@@ -1510,3 +1511,4 @@ GP/UTParticipation = Participation GP/UT
 LabourDoctorName = AMETRA
 LabourDoctorFirstName = Médecin du
 LabourDoctorLastName = travail
+DashBoard = Tableau de bord

@@ -58,9 +58,9 @@ $help_url = 'FR:Module_DigiriskDolibarr';
 $morejs   = array("/digiriskdolibarr/js/digiriskdolibarr.js.php");
 $morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");
 
-llxHeader("", $langs->trans("DashBoardTicket"), $help_url, '', '', '', $morejs, $morecss);
+llxHeader("", $langs->trans("DashBoard"), $help_url, '', '', '', $morejs, $morecss);
 
-print load_fiche_titre($langs->trans("DashBoardTicket"), '', 'digiriskdolibarr32px.png@digiriskdolibarr');
+print load_fiche_titre($langs->trans("DashBoard"), '', 'digiriskdolibarr32px.png@digiriskdolibarr');
 
 /*
  * Dashboard Ticket
@@ -87,21 +87,29 @@ if (empty($conf->global->MAIN_DISABLE_WORKBOARD)) {
 				'photo' => show_category_image($category, $upload_dir, 1)
 			);
 		}
+	} else {
+		print '<div class="wpeo-notice notice-info">';
+		print '<div class="notice-content">';
+		print '<div class="notice-subtitle"><strong>'.$langs->trans("HowToSetupTicketCategories") . '  ' . '<a href=' . '"../admin/ticket/ticket.php#TicketCategories">' . $langs->trans('ConfigTicketCategories') . '</a></strong></div>';
+		print '</div>';
+		print '</div>';
 	}
 
 	print '<div class="fichecenter">';
 
 	if (is_array($arrayService) && !empty($arrayService)) {
 		foreach ($arrayService as $service) {
-			foreach ($arrayCats as $key => $cat) {
-				if (!empty($conf->ticket->enabled) && $user->rights->ticket->read) {
-					$dashboardlines['ticket'][$service->label][$key] = load_board($cat, $service->label);
+			if (is_array($arrayCats) && !empty($arrayCats)) {
+				foreach ($arrayCats as $key => $cat) {
+					if (!empty($conf->ticket->enabled) && $user->rights->ticket->read) {
+						$dashboardlines['ticket'][$service->label][$key] = load_board($cat, $service->label);
+					}
 				}
-			}
 
-			print '<div class="titre inline-block">';
-			print load_fiche_titre($service->label, '', 'service');
-			print '</div>';
+				print '<div class="titre inline-block">';
+				print load_fiche_titre($service->label, '', 'service');
+				print '</div>';
+			}
 
 			// Show dashboard
 			if (!empty($dashboardlines)) {

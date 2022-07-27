@@ -393,7 +393,7 @@ if ( ! empty($conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE)) {
 	print '</table>';
 	print '</form>';
 
-	print load_fiche_titre($langs->trans("TicketCategories"), '', '');
+	print load_fiche_titre($langs->trans("TicketCategories"), '', '', 0, 'TicketCategories');
 
 	print '<div class="div-table-responsive-no-min">';
 	print '<table class="noborder centpercent">';
