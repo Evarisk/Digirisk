@@ -351,6 +351,17 @@ class ActionsDigiriskdolibarr
 					}
 				}
 			}
+		} elseif (in_array($parameters['currentcontext'] , array('ticketlist', 'thirdpartyticket', 'projectticket'))) {
+			if ($action == 'list') {
+				if (GETPOST('button_removefilter_x', 'alpha') || GETPOST('button_removefilter.x', 'alpha') || GETPOST('button_removefilter', 'alpha')) {
+					$searchCategoryTicketList = GETPOST('search_category_ticket_list', 'array');
+					if (is_array($searchCategoryTicketList) && !empty($searchCategoryTicketList)) {
+						$_GET['search_category_ticket_list'] = array();
+					} else {
+						$_GET['search_category_ticket_list'] = '';
+					}
+				}
+			}
 		}
 
 		if (true) {
@@ -420,6 +431,160 @@ class ActionsDigiriskdolibarr
 
 		if (true) {
 			$this->resprints = $value;
+			return 0; // or return 1 to replace standard code
+		} else {
+			$this->errors[] = 'Error message';
+			return -1;
+		}
+	}
+
+	/**
+	 *  Overloading the printFieldListFrom function : replacing the parent's function with the one below
+	 *
+	 * @param Hook $parameters metadatas (context, etc...)
+	 * @param $object current object
+	 * @return int
+	 */
+	public function printFieldListFrom($parameters, $object)
+	{
+		global $conf, $user, $langs;
+
+		/* print_r($parameters); print_r($object); echo "action: " . $action; */
+		if (in_array($parameters['currentcontext'] , array('ticketlist', 'thirdpartyticket', 'projectticket'))) {	    // do something only for the context 'somecontext1' or 'somecontext2'
+			$searchCategoryTicketList = GETPOST('search_category_ticket_list');
+			if (!empty($searchCategoryTicketList)) {
+				$sql = ' LEFT JOIN '.MAIN_DB_PREFIX."categorie_ticket as ct ON t.rowid = ct.fk_ticket"; // We'll need this table joined to the select in order to filter by categ
+			}
+		}
+
+		if (true) {
+			$this->resprints = $sql;
+			return 0; // or return 1 to replace standard code
+		} else {
+			$this->errors[] = 'Error message';
+			return -1;
+		}
+	}
+
+
+	/**
+	 *  Overloading the printFieldListWhere function : replacing the parent's function with the one below
+	 *
+	 * @param Hook $parameters metadatas (context, etc...)
+	 * @param $object current object
+	 * @return int
+	 */
+	public function printFieldListWhere($parameters, $object)
+	{
+		global $conf, $user, $langs;
+
+		/* print_r($parameters); print_r($object); echo "action: " . $action; */
+		if (in_array($parameters['currentcontext'] , array('ticketlist', 'thirdpartyticket', 'projectticket'))) {        // do something only for the context 'somecontext1' or 'somecontext2'
+			$searchCategoryTicketSqlList = array();
+			$searchCategoryTicketList = GETPOST('search_category_ticket_list');
+			if (is_array($searchCategoryTicketList) && !empty($searchCategoryTicketList)) {
+				foreach ($searchCategoryTicketList as $searchCategoryTicket) {
+					if (intval($searchCategoryTicket) == -2) {
+						$searchCategoryTicketSqlList[] = "ct.fk_categorie IS NULL";
+					} elseif (intval($searchCategoryTicket) > 0) {
+						$searchCategoryTicketSqlList[] = "t.rowid IN (SELECT fk_ticket FROM " . MAIN_DB_PREFIX . "categorie_ticket WHERE fk_categorie = " . ((int)$searchCategoryTicket) . ")";
+					}
+				}
+				if (!empty($searchCategoryTicketSqlList)) {
+					$sql = " AND (" . implode(' AND ', $searchCategoryTicketSqlList) . ")";
+				}
+			} else {
+				if (!empty($searchCategoryTicketList) && $searchCategoryTicketList > 0) {
+					$sql = " AND ct.fk_categorie = ".((int) $searchCategoryTicketList);
+				}
+				if ($searchCategoryTicketList == -2) {
+					$sql = " AND ct.fk_categorie IS NULL";
+				}
+			}
+			if (!empty($searchCategoryTicketList)) {
+				$sql .= " GROUP BY t.rowid";
+			}
+		}
+
+		if (true) {
+			$this->resprints = $sql;
+			return 0; // or return 1 to replace standard code
+		} else {
+			$this->errors[] = 'Error message';
+			return -1;
+		}
+	}
+
+
+	/**
+	 *  Overloading the printFieldPreListTitle function : replacing the parent's function with the one below
+	 *
+	 * @param Hook $parameters metadatas (context, etc...)
+	 * @param $object current object
+	 * @return int
+	 */
+	public function printFieldPreListTitle($parameters, $object)
+	{
+		global $conf, $db, $user, $langs;
+
+		/* print_r($parameters); print_r($object); echo "action: " . $action; */
+		if (in_array($parameters['currentcontext'] , array('ticketlist', 'thirdpartyticket', 'projectticket'))) {        // do something only for the context 'somecontext1' or 'somecontext2'
+			require_once DOL_DOCUMENT_ROOT . '/categories/class/categorie.class.php';
+
+			$form = new Form($db);
+
+			// Filter on categories
+			$moreforfilter = '';
+			if (!empty($conf->categorie->enabled) && $user->rights->categorie->lire) {
+				$moreforfilter .= '<div class="divsearchfield">';
+				$moreforfilter .= img_picto($langs->trans('Categories'), 'category', 'class="pictofixedwidth"');
+				$categoriesTicketArr = $form->select_all_categories(Categorie::TYPE_TICKET, '', '', 64, 0, 1);
+				$categoriesTicketArr[-2] = '- ' . $langs->trans('NotCategorized') . ' -';
+				$searchCategoryTicketList = GETPOST('search_category_ticket_list');
+				if (is_array($searchCategoryTicketList) && !empty($searchCategoryTicketList)) {
+					$searchCategoryTicket = GETPOST('search_category_ticket_list', 'array');
+				} else {
+					$searchCategoryTicket = array($searchCategoryTicketList);
+				}
+				$moreforfilter .= Form::multiselectarray('search_category_ticket_list', $categoriesTicketArr, $searchCategoryTicket, 0, 0, 'minwidth300');
+				$moreforfilter .= '</div>';
+			}
+		}
+
+		if (true) {
+			$this->resprints = $moreforfilter;
+			return 0; // or return 1 to replace standard code
+		} else {
+			$this->errors[] = 'Error message';
+			return -1;
+		}
+	}
+
+	/**
+	 *  Overloading the printFieldListSearchParam function : replacing the parent's function with the one below
+	 *
+	 * @param Hook $parameters metadatas (context, etc...)
+	 * @param $object current object
+	 * @return int
+	 */
+	public function printFieldListSearchParam($parameters, $object)
+	{
+		global $conf, $db, $user, $langs;
+
+		/* print_r($parameters); print_r($object); echo "action: " . $action; */
+		if (in_array($parameters['currentcontext'] , array('ticketlist', 'thirdpartyticket', 'projectticket'))) {        // do something only for the context 'somecontext1' or 'somecontext2'
+			$searchCategoryTicketList = GETPOST('search_category_ticket_list');
+			if (is_array($searchCategoryTicketList) && !empty($searchCategoryTicketList)) {
+				foreach ($searchCategoryTicketList as $searchCategoryTicket) {
+					$param .= "&search_category_ticket_list[]=" . urlencode($searchCategoryTicket);
+				}
+			} elseif (!empty($searchCategoryTicketList)) {
+				$param = "&search_category_ticket_list=" . urlencode($searchCategoryTicketList);
+			}
+		}
+
+		if (true) {
+			$this->resprints = $param;
 			return 0; // or return 1 to replace standard code
 		} else {
 			$this->errors[] = 'Error message';

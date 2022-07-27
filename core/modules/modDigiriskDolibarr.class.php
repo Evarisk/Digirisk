@@ -409,7 +409,10 @@ class modDigiriskdolibarr extends DolibarrModules
 				'projecttaskcard',
 				'projecttaskscard',
 				'tasklist',
-				'publicnewticketcard'
+				'publicnewticketcard',
+				'ticketlist',
+				'thirdpartyticket',
+				'projectticket',
 			),
 			'tabs' => array(
 				'mycompany_admin'
