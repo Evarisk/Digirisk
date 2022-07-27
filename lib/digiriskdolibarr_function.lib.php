@@ -2918,7 +2918,7 @@ function load_board($cat, $service)
 		$response->id = $cat['id'];
 		$response->img = $cat['photo'];
 		$response->label = $cat['label'] . ' : ';
-		$response->url = DOL_URL_ROOT . '/ticket/list.php?search_category_ticket_list='.$cat['id'];
+		$response->url = DOL_URL_ROOT . '/ticket/list.php?search_options_digiriskdolibarr_ticket_service='.$service->label.'&search_category_ticket_list='.$cat['id'];
 		$response->nbtodo = ($nbobject ?: 0);
 		return $response;
 	} else {

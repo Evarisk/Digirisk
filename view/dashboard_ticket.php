@@ -102,7 +102,7 @@ if (empty($conf->global->MAIN_DISABLE_WORKBOARD)) {
 			if (is_array($arrayCats) && !empty($arrayCats)) {
 				foreach ($arrayCats as $key => $cat) {
 					if (!empty($conf->ticket->enabled) && $user->rights->ticket->read) {
-						$dashboardlines['ticket'][$service->label][$key] = load_board($cat, $service->label);
+						$dashboardlines['ticket'][$service->label][$key] = load_board($cat, $service);
 					}
 				}
 
