@@ -1349,9 +1349,9 @@ class modDigiriskdolibarr extends DolibarrModules
 		$this->export_icon[$r] = 'category';
 		$this->export_enabled[$r] = '!empty($conf->ticket->enabled)';
 		$this->export_permission[$r] = array(array("categorie", "lire"), array("ticket", "manage"));
-		$this->export_fields_array[$r] = array('cat.rowid'=>"CategId", 'cat.label'=>"Label", 'cat.description'=>"Description", 'cat.fk_parent'=>"ParentCategory", 't.rowid'=>'TicketId', 't.ref'=>'Ref', 's.rowid'=>"IdThirdParty", 's.nom'=>"Name");
+		$this->export_fields_array[$r] = array('cat.rowid'=>"CategId", 'cat.label'=>"Label", 'cat.description'=>"Description", 'cat.fk_parent'=>"ParentCategory", 't.rowid'=>'TicketId', 't.ref'=>'Ref', 't.message' => 'Message', 's.rowid'=>"IdThirdParty", 's.nom'=>"Name");
 		$this->export_TypeFields_array[$r] = array('cat.label'=>"Text", 'cat.description'=>"Text", 'cat.fk_parent'=>'List:categorie:label:rowid', 't.ref'=>'Text', 's.rowid'=>"List:societe:nom:rowid", 's.nom'=>"Text");
-		$this->export_entities_array[$r] = array('t.rowid'=>'ticket', 't.ref'=>'ticket', 's.rowid'=>"company", 's.nom'=>"company"); // We define here only fields that use another picto
+		$this->export_entities_array[$r] = array('t.rowid'=>'ticket', 't.ref'=>'ticket', 't.message' => 'ticket', 's.rowid'=>"company", 's.nom'=>"company"); // We define here only fields that use another picto
 
 		$keyforselect = 'Ticket';
 		$keyforelement = 'Ticket';
