@@ -45,6 +45,8 @@ global $conf, $db, $user, $langs;
 // Load translation files required by the page
 $langs->loadLangs(array("digiriskdolibarr@digiriskdolibarr"));
 
+$upload_dir = $conf->categorie->multidir_output[$conf->entity];
+
 // Security check
 if ( ! $user->rights->digiriskdolibarr->lire && $user->rights->ticket->read) accessforbidden();
 
@@ -82,43 +84,55 @@ if (empty($conf->global->MAIN_DISABLE_WORKBOARD)) {
 		),
 	);
 
-	$arrayCats = array(
-		'Register' => array(
-			'name' => $langs->trans('Register'),
-			'label' => $langs->trans('TotalRegisterByService'),
-		),
-		'AccidentWithDIAT' => array(
-			'name' => $langs->trans('AccidentWithDIAT'),
-			'label' => $langs->trans('TotalAccidentWithDIATByService'),
-		),
-		'AccidentWithoutDIAT' => array(
-			'name' => $langs->trans('AccidentWithoutDIAT'),
-			'label' => $langs->trans('TotalAccidentWithoutDIATByService'),
-		),
-		'MaterialProblem' => array(
-			'name' => $langs->trans('MaterialProblem'),
-			'label' => $langs->trans('TotalMaterialProblemByService'),
-		),
-		'HumanProblem' => array(
-			'name' => $langs->trans('HumanProblem'),
-			'label' => $langs->trans('TotalHumanProblemByService'),
-		),
-//		'RPS' => array(
-//			'name' => $langs->trans('RPS'),
-//			'label' => $langs->trans('Test'),
+	$categorie = new Categorie($db);
+
+	$allCategories = $categorie->get_all_categories('ticket');
+	foreach ($allCategories as $category) {
+		$arrayCats[$category->label] = array(
+			'id' => $category->id,
+			'name' => $category->label,
+			'label' =>  $langs->transnoentities('TotalTagByService', $category->label),
+			'photo' => show_category_image($category, $upload_dir, 1)
+		);
+	}
+
+//	$arrayCats = array(
+//		'Register' => array(
+//			'name' => $langs->trans('Register'),
+//			'label' => $langs->trans('TotalRegisterByService'),
 //		),
-		'DGI' => array(
-			'name' => $langs->trans('DGI'),
-			'label' => $langs->trans('TotalDGIByService'),
-		),
-	);
+//		'AccidentWithDIAT' => array(
+//			'name' => $langs->trans('AccidentWithDIAT'),
+//			'label' => $langs->trans('TotalAccidentWithDIATByService'),
+//		),
+//		'AccidentWithoutDIAT' => array(
+//			'name' => $langs->trans('AccidentWithoutDIAT'),
+//			'label' => $langs->trans('TotalAccidentWithoutDIATByService'),
+//		),
+//		'MaterialProblem' => array(
+//			'name' => $langs->trans('MaterialProblem'),
+//			'label' => $langs->trans('TotalMaterialProblemByService'),
+//		),
+//		'HumanProblem' => array(
+//			'name' => $langs->trans('HumanProblem'),
+//			'label' => $langs->trans('TotalHumanProblemByService'),
+//		),
+////		'RPS' => array(
+////			'name' => $langs->trans('RPS'),
+////			'label' => $langs->trans('Test'),
+////		),
+//		'DGI' => array(
+//			'name' => $langs->trans('DGI'),
+//			'label' => $langs->trans('TotalDGIByService'),
+//		),
+//	);
 
 	print '<div class="fichecenter">';
 
 	foreach ($arrayService as $service) {
 		foreach ($arrayCats as $key => $cat) {
 			if (!empty($conf->ticket->enabled) && $user->rights->ticket->read) {
-				$dashboardlines['ticket'][$service['name']][$key] = load_board($cat['name'], $cat['label'], $service['name']);
+				$dashboardlines['ticket'][$service['name']][$key] = load_board($cat, $service['name']);
 			}
 		}
 
@@ -133,13 +147,16 @@ if (empty($conf->global->MAIN_DISABLE_WORKBOARD)) {
 				$openedDashBoard .= '<div class="box-flex-item"><div class="box-flex-item-with-margin">';
 				$openedDashBoard .= '<div class="info-box info-box-sm">';
 				$openedDashBoard .= '<span class="info-box-icon bg-infobox-ticket">';
-				$openedDashBoard .= '<i class="fa fa-dol-ticket"></i>';
+				$openedDashBoard .= ($board->img) ?: '<i class="fa fa-dol-ticket"></i>';
 				$openedDashBoard .= '</span>';
 				$openedDashBoard .= '<div class="info-box-content">';
 				$openedDashBoard .= '<div class="info-box-title" title="' . strip_tags($key) . '">' . $langs->trans($key) . '</div>';
 				$openedDashBoard .= '<div class="info-box-lines">';
 				$openedDashBoard .= '<div class="info-box-line">';
-				$openedDashBoard .= '<span class="marginrightonly">' . $board->label . '</span>';
+				$openedDashBoard .= '<span class="">' . $board->label;
+				$openedDashBoard .= '<a href="'.$board->url.'" class="info-box-text info-box-text-a">';
+				$openedDashBoard .= '<span class="classfortooltip badge badge-info" title="'.$board->label . $board->nbtodo.'" >' . $board->nbtodo . '</span>';
+				$openedDashBoard .= '</a>';
 				$openedDashBoard .= '</span>';
 				$openedDashBoard .= '</div>';
 				$openedDashBoard .= '</div><!-- /.info-box-lines --></div><!-- /.info-box-content -->';
