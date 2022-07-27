@@ -73,99 +73,63 @@ if (empty($conf->global->MAIN_DISABLE_WORKBOARD)) {
 	// Do not include sections without management permission
 	require_once DOL_DOCUMENT_ROOT.'/core/class/workboardresponse.class.php';
 
-	$arrayService = array(
-		'admin' => array(
-			'name' => $langs->trans('Administration'),
-			'picto' => '<i class="fas fa-hammer"></i>',
-		),
-		'RH' => array(
-			'name' => $langs->trans('RH'),
-			'picto' => '<i class="fas fa-hammer"></i>',
-		),
-	);
+	$arrayService = fetchDictionnary('c_services');
 
 	$categorie = new Categorie($db);
 
 	$allCategories = $categorie->get_all_categories('ticket');
-	foreach ($allCategories as $category) {
-		$arrayCats[$category->label] = array(
-			'id' => $category->id,
-			'name' => $category->label,
-			'label' =>  $langs->transnoentities('TotalTagByService', $category->label),
-			'photo' => show_category_image($category, $upload_dir, 1)
-		);
+	if (is_array($allCategories) && !empty($allCategories)) {
+		foreach ($allCategories as $category) {
+			$arrayCats[$category->label] = array(
+				'id' => $category->id,
+				'name' => $category->label,
+				'label' => $langs->transnoentities('TotalTagByService', $category->label),
+				'photo' => show_category_image($category, $upload_dir, 1)
+			);
+		}
 	}
-
-//	$arrayCats = array(
-//		'Register' => array(
-//			'name' => $langs->trans('Register'),
-//			'label' => $langs->trans('TotalRegisterByService'),
-//		),
-//		'AccidentWithDIAT' => array(
-//			'name' => $langs->trans('AccidentWithDIAT'),
-//			'label' => $langs->trans('TotalAccidentWithDIATByService'),
-//		),
-//		'AccidentWithoutDIAT' => array(
-//			'name' => $langs->trans('AccidentWithoutDIAT'),
-//			'label' => $langs->trans('TotalAccidentWithoutDIATByService'),
-//		),
-//		'MaterialProblem' => array(
-//			'name' => $langs->trans('MaterialProblem'),
-//			'label' => $langs->trans('TotalMaterialProblemByService'),
-//		),
-//		'HumanProblem' => array(
-//			'name' => $langs->trans('HumanProblem'),
-//			'label' => $langs->trans('TotalHumanProblemByService'),
-//		),
-////		'RPS' => array(
-////			'name' => $langs->trans('RPS'),
-////			'label' => $langs->trans('Test'),
-////		),
-//		'DGI' => array(
-//			'name' => $langs->trans('DGI'),
-//			'label' => $langs->trans('TotalDGIByService'),
-//		),
-//	);
 
 	print '<div class="fichecenter">';
 
-	foreach ($arrayService as $service) {
-		foreach ($arrayCats as $key => $cat) {
-			if (!empty($conf->ticket->enabled) && $user->rights->ticket->read) {
-				$dashboardlines['ticket'][$service['name']][$key] = load_board($cat, $service['name']);
-			}
-		}
-
-		print '<div class="test">';
-		print load_fiche_titre($service['name'], '', 'building');
-		print '</div>';
-
-		// Show dashboard
-		if (!empty($dashboardlines)) {
-			$openedDashBoard = '';
-			foreach ($dashboardlines['ticket'][$service['name']] as $key => $board) {
-				$openedDashBoard .= '<div class="box-flex-item"><div class="box-flex-item-with-margin">';
-				$openedDashBoard .= '<div class="info-box info-box-sm">';
-				$openedDashBoard .= '<span class="info-box-icon bg-infobox-ticket">';
-				$openedDashBoard .= ($board->img) ?: '<i class="fa fa-dol-ticket"></i>';
-				$openedDashBoard .= '</span>';
-				$openedDashBoard .= '<div class="info-box-content">';
-				$openedDashBoard .= '<div class="info-box-title" title="' . strip_tags($key) . '">' . $langs->trans($key) . '</div>';
-				$openedDashBoard .= '<div class="info-box-lines">';
-				$openedDashBoard .= '<div class="info-box-line">';
-				$openedDashBoard .= '<span class="">' . $board->label;
-				$openedDashBoard .= '<a href="'.$board->url.'" class="info-box-text info-box-text-a">';
-				$openedDashBoard .= '<span class="classfortooltip badge badge-info" title="'.$board->label . $board->nbtodo.'" >' . $board->nbtodo . '</span>';
-				$openedDashBoard .= '</a>';
-				$openedDashBoard .= '</span>';
-				$openedDashBoard .= '</div>';
-				$openedDashBoard .= '</div><!-- /.info-box-lines --></div><!-- /.info-box-content -->';
-				$openedDashBoard .= '</div><!-- /.info-box -->';
-				$openedDashBoard .= '</div><!-- /.box-flex-item-with-margin -->';
-				$openedDashBoard .= '</div><!-- /.box-flex-item -->';
+	if (is_array($arrayService) && !empty($arrayService)) {
+		foreach ($arrayService as $service) {
+			foreach ($arrayCats as $key => $cat) {
+				if (!empty($conf->ticket->enabled) && $user->rights->ticket->read) {
+					$dashboardlines['ticket'][$service->label][$key] = load_board($cat, $service->label);
+				}
 			}
 
-			print '<div class="opened-dash-board-wrap"><div class="box-flex-container">'.$openedDashBoard.'</div></div>';
+			print '<div class="titre inline-block">';
+			print load_fiche_titre($service->label, '', 'service');
+			print '</div>';
+
+			// Show dashboard
+			if (!empty($dashboardlines)) {
+				$openedDashBoard = '';
+				foreach ($dashboardlines['ticket'][$service->label] as $key => $board) {
+					$openedDashBoard .= '<div class="box-flex-item"><div class="box-flex-item-with-margin">';
+					$openedDashBoard .= '<div class="info-box info-box-sm">';
+					$openedDashBoard .= '<span class="info-box-icon bg-infobox-ticket">';
+					$openedDashBoard .= ($board->img) ?: '<i class="fa fa-dol-ticket"></i>';
+					$openedDashBoard .= '</span>';
+					$openedDashBoard .= '<div class="info-box-content">';
+					$openedDashBoard .= '<div class="info-box-title" title="' . strip_tags($key) . '">' . $langs->trans($key) . '</div>';
+					$openedDashBoard .= '<div class="info-box-lines">';
+					$openedDashBoard .= '<div class="info-box-line">';
+					$openedDashBoard .= '<span class="">' . $board->label;
+					$openedDashBoard .= '<a href="' . $board->url . '" class="info-box-text info-box-text-a">';
+					$openedDashBoard .= '<span class="classfortooltip badge badge-info" title="' . $board->label . $board->nbtodo . '" >' . $board->nbtodo . '</span>';
+					$openedDashBoard .= '</a>';
+					$openedDashBoard .= '</span>';
+					$openedDashBoard .= '</div>';
+					$openedDashBoard .= '</div><!-- /.info-box-lines --></div><!-- /.info-box-content -->';
+					$openedDashBoard .= '</div><!-- /.info-box -->';
+					$openedDashBoard .= '</div><!-- /.box-flex-item-with-margin -->';
+					$openedDashBoard .= '</div><!-- /.box-flex-item -->';
+				}
+
+				print '<div class="opened-dash-board-wrap"><div class="box-flex-container">' . $openedDashBoard . '</div></div>';
+			}
 		}
 	}
 

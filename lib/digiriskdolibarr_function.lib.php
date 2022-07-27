@@ -2925,3 +2925,50 @@ function load_board($cat, $service)
 		return -1;
 	}
 }
+
+/**
+ *  Load dictionnary from database
+ *
+ * 	@param  int       $parent_id
+ *	@param  int       $limit
+ * 	@return array|int             <0 if KO, >0 if OK
+ */
+function fetchDictionnary($tablename)
+{
+	global $db;
+
+	$sql  = 'SELECT t.rowid, t.entity, t.ref, t.label, t.description, t.active';
+	$sql .= ' FROM ' . MAIN_DB_PREFIX . $tablename . ' as t';
+	$sql .= ' WHERE 1 = 1';
+	$sql .= ' AND entity IN (0, ' . getEntity($tablename) . ')';
+
+	$resql = $db->query($sql);
+
+	if ($resql) {
+		$num = $db->num_rows($resql);
+		$i = 0;
+		$records = array();
+		while ($i < $num) {
+			$obj = $db->fetch_object($resql);
+
+			$record = new stdClass();
+
+			$record->id          = $obj->rowid;
+			$record->entity      = $obj->entity;
+			$record->ref         = $obj->ref;
+			$record->label       = $obj->label;
+			$record->description = $obj->description;
+			$record->active      = $obj->active;
+
+			$records[$record->id] = $record;
+
+			$i++;
+		}
+
+		$db->free($resql);
+
+		return $records;
+	} else {
+		return -1;
+	}
+}
