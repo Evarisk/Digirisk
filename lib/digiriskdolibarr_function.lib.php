@@ -2026,6 +2026,7 @@ function digirisk_select_dictionary($htmlname, $dictionarytable, $keyfield = 'co
 
 	$langs->load("admin");
 
+	$out = '';
 	$sql  = "SELECT rowid, " . $keyfield . ", " . $labelfield;
 	$sql .= " FROM " . MAIN_DB_PREFIX . $dictionarytable;
 	$sql .= " ORDER BY " . $labelfield;
@@ -2035,31 +2036,32 @@ function digirisk_select_dictionary($htmlname, $dictionarytable, $keyfield = 'co
 		$num = $db->num_rows($result);
 		$i   = 0;
 		if ($num) {
-			print '<select value="kk" id="select' . $htmlname . '" class="flat selectdictionary" name="' . $htmlname . '"' . ($moreattrib ? ' ' . $moreattrib : '') . '>';
+			$out .= '<select id="select' . $htmlname . '" class="flat selectdictionary" name="' . $htmlname . '"' . ($moreattrib ? ' ' . $moreattrib : '') . '>';
 			if ($useempty == 1 || ($useempty == 2 && $num > 1)) {
-				print '<option value="-1">'. (dol_strlen($placeholder) > 0 ? $langs->transnoentities($placeholder) : '') .'&nbsp;</option>';
+				$out .= '<option value="-1">'. (dol_strlen($placeholder) > 0 ? $langs->transnoentities($placeholder) : '') .'&nbsp;</option>';
 			}
 
 			while ($i < $num) {
 				$obj = $db->fetch_object($result);
 				if ($selected == $obj->rowid || $selected == $langs->transnoentities($obj->$keyfield)) {
-					print '<option value="' . $langs->transnoentities($obj->$keyfield) . '" selected>';
+					$out .= '<option value="' . $langs->transnoentities($obj->$keyfield) . '" selected>';
 				} else {
-					print '<option value="' . $langs->transnoentities($obj->$keyfield) . '">';
+					$out .= '<option value="' . $langs->transnoentities($obj->$keyfield) . '">';
 				}
-				print $langs->transnoentities($obj->$labelfield);
-				print '</option>';
+				$out .= $langs->transnoentities($obj->$labelfield);
+				$out .= '</option>';
 				$i++;
 			}
-			print "</select>";
-				print ajax_combobox('select'.$htmlname);
+			$out .= "</select>";
+				$out .= ajax_combobox('select'.$htmlname);
 
 		} else {
-			print $langs->trans("DictionaryEmpty");
+			$out .= $langs->trans("DictionaryEmpty");
 		}
 	} else {
 		dol_print_error($db);
 	}
+	return $out;
 }
 
 /**

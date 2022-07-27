@@ -81,12 +81,11 @@ class ActionsDigiriskdolibarr
 				$form      = new Form($db);
 				$pictopath = dol_buildpath('/digiriskdolibarr/img/digiriskdolibarr32px.png', 1);
 				$pictoDigirisk = img_picto('', $pictopath, '', 1, 0, 0, '', 'pictoDigirisk');
+				$idcc_form = digirisk_select_dictionary('DIGIRISKDOLIBARR_COLLECTIVE_AGREEMENT_TITLE', 'c_conventions_collectives', 'code', 'libelle', $conf->global->DIGIRISKDOLIBARR_COLLECTIVE_AGREEMENT_TITLE, 1);
 				?>
 				<script>
-					IDCC_form = '<?php digirisk_select_dictionary('DIGIRISKDOLIBARR_COLLECTIVE_AGREEMENT_TITLE', 'c_conventions_collectives', 'code', 'libelle', $conf->global->DIGIRISKDOLIBARR_COLLECTIVE_AGREEMENT_TITLE, 1);?>';
-
 					let $tr = $('<tr class="oddeven"><td><label for="selectidcc_id"><?php print $pictoDigirisk . $form->textwithpicto($langs->trans('IDCC'), $langs->trans('IDCCTooltip'));?></label></td>');
-					$tr.append('<td>' + IDCC_form + '</td></tr>');
+					$tr.append('<td>' + <?php echo json_encode($idcc_form) ; ?> + '</td></tr>');
 
 					let currElement = $('table:nth-child(7) .oddeven:last-child');
 					currElement.after($tr);
