@@ -126,6 +126,21 @@ class ActionsDigiriskdolibarr
 				</script>
 				<?php
 			}
+			if (GETPOST('action') == 'edit_extras' && GETPOST('attribute') == 'digiriskdolibarr_ticket_service') {
+				require_once __DIR__ . '/../lib/digiriskdolibarr_function.lib.php';
+
+				$object = new Ticket($db);
+				$object->fetch(GETPOST('id'),'',GETPOST('track_id'));
+				$selectDictionnary = digirisk_select_dictionary('options_digiriskdolibarr_ticket_service', 'c_services', 'label', 'label', $object->array_options['options_digiriskdolibarr_ticket_service'], 1, '', 'PleaseSelectAService');
+
+				?>
+				<script>
+					jQuery('.ticket_extras_digiriskdolibarr_ticket_service form').prepend(<?php echo json_encode($selectDictionnary) ; ?>)
+					jQuery('#options_digiriskdolibarr_ticket_service').remove()
+					console.log('oui')
+				</script>
+				<?php
+			}
 		} else if (($parameters['currentcontext'] == 'projecttaskcard') || ($parameters['currentcontext'] == 'projecttaskscard') || ($parameters['currentcontext'] == 'tasklist')) {
 			if ((GETPOST('action') == '' || empty(GETPOST('action')) || GETPOST('action') != 'edit')) {
 				require_once __DIR__ . '/../../../projet/class/task.class.php';
@@ -336,8 +351,6 @@ class ActionsDigiriskdolibarr
 					}
 				}
 			}
-
-
 		}
 
 		if (true) {
