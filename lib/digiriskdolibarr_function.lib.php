@@ -1263,7 +1263,7 @@ function getNomUrlTask($task, $withpicto = 0, $option = '', $mode = 'task', $add
 * @param object	$object
 * @param string $upload_dir
 */
-function show_category_image($object, $upload_dir)
+function show_category_image($object, $upload_dir, $noprint = 0)
 {
 
 	global $langs;
@@ -1303,10 +1303,15 @@ function show_category_image($object, $upload_dir)
 			$imgWidth  = ($object->imgWidth < $maxWidth) ? $object->imgWidth : $maxWidth;
 			$imgHeight = ($object->imgHeight < $maxHeight) ? $object->imgHeight : $maxHeight;
 
-			print '<img border="0" width="' . $imgWidth . '" height="' . $imgHeight . '" src="' . DOL_URL_ROOT . '/custom/digiriskdolibarr/documents/viewimage.php?modulepart=category&entity=' . $object->entity . '&file=' . urlencode($pdir . $filename) . '">';
+			if ($noprint) {
+				$out = '<img border="0" width="' . $imgWidth . '" height="' . $imgHeight . '" src="' . DOL_URL_ROOT . '/custom/digiriskdolibarr/documents/viewimage.php?modulepart=category&entity=' . $object->entity . '&file=' . urlencode($pdir . $filename) . '">';
+			} else {
+				print '<img border="0" width="' . $imgWidth . '" height="' . $imgHeight . '" src="' . DOL_URL_ROOT . '/custom/digiriskdolibarr/documents/viewimage.php?modulepart=category&entity=' . $object->entity . '&file=' . urlencode($pdir . $filename) . '">';
+			}
 
 			//          if ($nbbyrow) print '</td>';
 			//          if ($nbbyrow && ($nbphoto % $nbbyrow == 0)) print '</tr>';
+
 		}
 
 		// Ferme tableau
@@ -1318,7 +1323,13 @@ function show_category_image($object, $upload_dir)
 	}
 
 	if ($nbphoto < 1) {
-		print '<div class="opacitymedium">' . $langs->trans("NoPhotoYet") . "</div>";
+		if (!$noprint) {
+			print '<div class="opacitymedium">' . $langs->trans("NoPhotoYet") . "</div>";
+		}
+	}
+
+	if ($noprint) {
+		return $out;
 	}
 }
 
@@ -2876,19 +2887,18 @@ function digirisk_check_secure_access_document($modulepart, $original_file, $ent
 /**
  * Load indicators for dashboard
  *
- * @param  string  $catName     Name of category
- * @param  string  $label        Label to show in box
+ * @param  array   $cat     	 Category info
  * @param  string  $service      Name of service
  * @return WorkboardResponse|int <0 if KO, WorkboardResponse if OK
  * @throws Exception
  */
-function load_board($catName, $label, $service)
+function load_board($cat, $service)
 {
 	global $db;
 
 	$categorie = new Categorie($db);
 
-	$categorie->fetch(0, $catName);
+	$categorie->fetch(0, $cat['name']);
 	$allObjects = $categorie->getObjectsInCateg(Categorie::TYPE_TICKET);
 
 	if (is_array($allObjects) && !empty($allObjects)) {
@@ -2905,8 +2915,59 @@ function load_board($catName, $label, $service)
 
 	if ($allObjects > 0) {
 		$response = new WorkboardResponse();
-		$response->label = $label . ' : ' . '<b>'. ($nbobject ?: 0) . '</b>' . '<br>';
+		$response->id = $cat['id'];
+		$response->img = $cat['photo'];
+		$response->label = $cat['label'] . ' : ';
+		$response->url = DOL_URL_ROOT . '/ticket/list.php';
+		$response->nbtodo = ($nbobject ?: 0);
 		return $response;
+	} else {
+		return -1;
+	}
+}
+
+/**
+ *  Load dictionnary from database
+ *
+ * 	@param  int       $parent_id
+ *	@param  int       $limit
+ * 	@return array|int             <0 if KO, >0 if OK
+ */
+function fetchDictionnary($tablename)
+{
+	global $db;
+
+	$sql  = 'SELECT t.rowid, t.entity, t.ref, t.label, t.description, t.active';
+	$sql .= ' FROM ' . MAIN_DB_PREFIX . $tablename . ' as t';
+	$sql .= ' WHERE 1 = 1';
+	$sql .= ' AND entity IN (0, ' . getEntity($tablename) . ')';
+
+	$resql = $db->query($sql);
+
+	if ($resql) {
+		$num = $db->num_rows($resql);
+		$i = 0;
+		$records = array();
+		while ($i < $num) {
+			$obj = $db->fetch_object($resql);
+
+			$record = new stdClass();
+
+			$record->id          = $obj->rowid;
+			$record->entity      = $obj->entity;
+			$record->ref         = $obj->ref;
+			$record->label       = $obj->label;
+			$record->description = $obj->description;
+			$record->active      = $obj->active;
+
+			$records[$record->id] = $record;
+
+			$i++;
+		}
+
+		$db->free($resql);
+
+		return $records;
 	} else {
 		return -1;
 	}
