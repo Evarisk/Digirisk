@@ -862,6 +862,23 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 										}
 										$mesg .= '</div>';
 										setEventMessages($mesg, null, 'warnings');
+									} else {
+										dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id);
+										require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
+										$now        = dol_now();
+										$actioncomm = new ActionComm($this->db);
+										$actioncomm->elementtype = 'ticket';
+										$actioncomm->code      = 'AC_TICKET_CREATION_MAIL_SENT';
+										$actioncomm->type_code = 'AC_OTH_AUTO';
+										$actioncomm->label = $langs->transnoentities('TicketCreationMailWellSent');
+										$actioncomm->note = $langs->transnoentities('TicketCreationMailSent', $listOfMails);
+										$actioncomm->datep       = $now;
+										$actioncomm->fk_element  = $object->id;
+										$actioncomm->userownerid = $user->id;
+										$actioncomm->percentage  = -1;
+
+										$actioncomm->create($user);
+										break;
 									}
 								} else {
 									setEventMessages($langs->trans('ErrorSetupEmail'), '', 'errors');
@@ -909,6 +926,23 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 													}
 													$mesg .= '</div>';
 													setEventMessages($mesg, null, 'warnings');
+												} else {
+													dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id);
+													require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
+													$now        = dol_now();
+													$actioncomm = new ActionComm($this->db);
+													$actioncomm->elementtype = 'ticket';
+													$actioncomm->code      = 'AC_TICKET_CREATION_MAIL_SENT';
+													$actioncomm->type_code = 'AC_OTH_AUTO';
+													$actioncomm->label = $langs->transnoentities('TicketCreationMailWellSent');
+													$actioncomm->note = $langs->transnoentities('TicketCreationMailSent', $listOfMails);
+													$actioncomm->datep       = $now;
+													$actioncomm->fk_element  = $object->id;
+													$actioncomm->userownerid = $user->id;
+													$actioncomm->percentage  = -1;
+
+													$actioncomm->create($user);
+													break;
 												}
 											} else {
 												setEventMessages($langs->trans('ErrorSetupEmail'), '', 'errors');
