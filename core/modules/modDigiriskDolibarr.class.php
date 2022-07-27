@@ -1724,6 +1724,10 @@ class modDigiriskdolibarr extends DolibarrModules
 		dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_VERSION', $this->version, 'chaine', 0, '', $conf->entity);
 		dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_DB_VERSION', $this->version, 'chaine', 0, '', $conf->entity);
 
+		if ($conf->global->CATEGORIE_RECURSIV_ADD == 0) {
+			dolibarr_set_const($this->db, 'CATEGORIE_RECURSIV_ADD', 1, 'integer', 0, '', $conf->entity);
+		}
+
 		//DigiriskElement favorite medias backward compatibility
 		if ($conf->global->DIGIRISKDOLIBARR_DIGIRISKELEMENT_MEDIAS_BACKWARD_COMPATIBILITY == 0) {
 			require_once __DIR__ . '/../../class/digiriskelement.class.php';
