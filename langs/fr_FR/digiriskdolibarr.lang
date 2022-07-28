@@ -1417,6 +1417,7 @@ ANewTicketHasBeenSubmitted = Un nouveau ticket a été créé via l'interface pu
 SeeTicketUrl = Voir le ticket :
 Administrative = Administratif
 Accountancy = Comptabilité
+TicketCreationSubject = Création de ticket via l'interface publique de Digirisk
 
 # Ticket document
 
