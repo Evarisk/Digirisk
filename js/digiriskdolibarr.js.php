@@ -3551,7 +3551,7 @@ window.eoxiaJS.ticket.event = function() {
 	$( document ).on( 'click', '.ticket-subCategory', window.eoxiaJS.ticket.selectSubCategory );
 	$( document ).on( 'submit', '#sendFile', window.eoxiaJS.ticket.tmpStockFile );
 	$( document ).on( 'click', '.linked-file-delete', window.eoxiaJS.ticket.removeFile );
-	$( document ).on( 'click', '.close-dashboard-info', window.eoxiaJS.ticket.closeDashboardInfo );
+	$( document ).on( 'click', '.close-dashboard-info', window.eoxiaJS.ticket.closeDashBoardInfo );
 };
 
 /**
@@ -3991,7 +3991,7 @@ window.eoxiaJS.menu.toggleMenu = function() {
  * @return {void}
  */
 window.eoxiaJS.menu.setMenu = function() {
-	if ((!document.URL.match(/htdocs\/admin/) || document.URL.match(/mainmenu=digiriskdolibarr/)) && !document.URL.match(/dashboard_ticket/) ) {
+	if ($('.blockvmenu.blockvmenufirst').html().match(/digiriskdolibarr/)) {
 		$('span.vmenu').find('.fa-chevron-circle-left').parent().parent().parent().attr('style', 'cursor:pointer ! important')
 
 		if (localStorage.maximized == 'false') {
