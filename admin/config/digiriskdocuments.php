@@ -40,6 +40,7 @@ global $langs, $user;
 
 // Libraries
 require_once DOL_DOCUMENT_ROOT . "/core/lib/admin.lib.php";
+require_once DOL_DOCUMENT_ROOT . '/core/lib/files.lib.php';
 
 require_once '../../lib/digiriskdolibarr.lib.php';
 
@@ -90,6 +91,53 @@ if ($action == 'setdoc') {
 } elseif ($action == 'setmod') {
 	$constforval = 'DIGIRISKDOLIBARR_'.strtoupper($type)."_ADDON";
 	dolibarr_set_const($db, $constforval, $value, 'chaine', 0, '', $conf->entity);
+}
+
+if ($action == 'setModuleOptions') {
+	$subdir = GETPOST('path');
+	$subdir = preg_replace('/DOL_DATA_ROOT\/ecm\/digiriskdolibarr\//', '', $subdir);
+	$subdir = preg_replace('/\//', '', $subdir);
+
+	$ecmdir = $conf->ecm->multidir_output[$conf->entity?:1];
+	$path = $ecmdir . '/digiriskdolibarr/'. $subdir .'/';
+
+	if (!empty($_FILES)) {
+		if (is_array($_FILES['userfile']['tmp_name'])) {
+			$userfiles = $_FILES['userfile']['tmp_name'];
+		} else {
+			$userfiles = array($_FILES['userfile']['tmp_name']);
+		}
+
+		foreach ($userfiles as $key => $userfile) {
+			if (empty($_FILES['userfile']['tmp_name'][$key])) {
+				$error++;
+				if ($_FILES['userfile']['error'][$key] == 1 || $_FILES['userfile']['error'][$key] == 2) {
+					setEventMessages($langs->trans('ErrorFileSizeTooLarge'), null, 'errors');
+				} else {
+					setEventMessages($langs->trans("ErrorFieldRequired", $langs->transnoentitiesnoconv("File")), null, 'errors');
+				}
+			}
+			if (preg_match('/__.*__/', $_FILES['userfile']['name'][$key])) {
+				$error++;
+				setEventMessages($langs->trans('ErrorWrongFileName'), null, 'errors');
+			}
+		}
+
+		if (!$error) {
+			// Define if we have to generate thumbs or not
+			if (GETPOST('section_dir', 'alpha')) {
+				$generatethumbs = 0;
+			}
+			$allowoverwrite = (GETPOST('overwritefile', 'int') ? 1 : 0);
+
+			if (!empty($upload_dirold) && !empty($conf->global->PRODUCT_USE_OLD_PATH_FOR_PHOTO)) {
+				$result = dol_add_file_process($upload_dirold, $allowoverwrite, 1, 'userfile', GETPOST('savingdocmask', 'alpha'), null, '', $generatethumbs, $object);
+			} elseif (!empty($path)) {
+				$result = dol_add_file_process($path, $allowoverwrite, 1, 'userfile', GETPOST('savingdocmask', 'alpha'), null, '' );
+			}
+		}
+	}
+
 }
 
 
@@ -232,9 +280,6 @@ foreach ($types as $type => $documentType) {
 		}
 	}
 
-	/*
-	*  Documents models for Listing Risks Action
-	*/
 	$trad = "DigiriskTemplateDocument" . $type;
 	print load_fiche_titre($langs->trans($trad), '', '');
 

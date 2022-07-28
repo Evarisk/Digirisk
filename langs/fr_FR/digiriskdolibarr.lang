@@ -1432,6 +1432,7 @@ TicketDocumentDigiriskTemplate = ODT par défaut des fiches de tickets
 # Data - Donnée
 TicketDocument = Fiche du ticket
 ticketdocument.odt = Fiche du ticket
+ticketdocument_custom.odt = Fiche personnalisée du ticket
 ticketdocument_events.odt = Fiche du ticket avec évènements
 TicketSuccessMessageData = Message du ticket
 TicketSuccessMessage= Message de succès du ticket

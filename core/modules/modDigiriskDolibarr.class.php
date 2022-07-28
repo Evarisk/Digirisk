@@ -434,6 +434,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			"/ecm/digiriskdolibarr/workunitdocument",
 			"/ecm/digiriskdolibarr/listingrisksaction",
 			"/ecm/digiriskdolibarr/listingrisksphoto",
+			"/ecm/digiriskdolibarr/ticketdocument",
 			"/ecm/digiriskdolibarr/medias"
 		);
 
@@ -682,6 +683,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			// CONST TICKET DOCUMENT
 			330 => array('DIGIRISKDOLIBARR_TICKETDOCUMENT_ADDON_ODT_PATH', 'chaine', 'DOL_DOCUMENT_ROOT/custom/digiriskdolibarr/documents/doctemplates/ticketdocument/', '', 0, 'current'),
 			331 => array('DIGIRISKDOLIBARR_TICKETDOCUMENT_ADDON', 'chaine', 'mod_ticketdocument_standard', '', 0, 'current'),
+			332 => array('DIGIRISKDOLIBARR_TICKETDOCUMENT_CUSTOM_ADDON_ODT_PATH', 'chaine', 'DOL_DATA_ROOT/ecm/digiriskdolibarr/ticketdocument/', '', 0, 'current'),
 
 //			// CONST ACCIDENT DOCUMENT
 //			320 => array('MAIN_AGENDA_ACTIONAUTO_ACCIDENTDOCUMENT_CREATE', 'integer', 1, '', 0, 'current'),
