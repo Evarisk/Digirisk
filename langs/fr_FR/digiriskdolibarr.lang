@@ -1414,7 +1414,7 @@ HowToSetupTicketCategories = Pour configurer les categories de ticket, veuillez 
 ConfigTicketCategories = Congiguration des categories de ticket
 NewTicketSubmitted = Un ticket a été soumis via l'interface publique
 ANewTicketHasBeenSubmitted = Un nouveau ticket a été créé via l'interface publique
-SeeTicketUrl = Voir le ticket :
+SeeTicketUrl = Voir le ticket : 
 
 # Ticket document
 
