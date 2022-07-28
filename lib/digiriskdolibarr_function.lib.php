@@ -2887,12 +2887,13 @@ function digirisk_check_secure_access_document($modulepart, $original_file, $ent
 /**
  * Load indicators for dashboard
  *
+ * @param  User	   $user		 User object
  * @param  array   $cat     	 Category info
  * @param  string  $service      Name of service
  * @return WorkboardResponse|int <0 if KO, WorkboardResponse if OK
  * @throws Exception
  */
-function load_board($cat, $service)
+function load_board($user, $cat, $service)
 {
 	global $db;
 
@@ -2920,6 +2921,10 @@ function load_board($cat, $service)
 		$response->label = $cat['label'] . ' : ';
 		$response->url = DOL_URL_ROOT . '/ticket/list.php?search_options_digiriskdolibarr_ticket_service='.$service->label.'&search_category_ticket_list='.$cat['id'];
 		$response->nbtodo = ($nbobject ?: 0);
+		$visible = json_decode($user->conf->DIGIRISKDOLIBARR_TICKET_SELECTED_DASHBOARD_INFO);
+		$serviceLabel = $service->label;
+		$catID = $cat['id'];
+		$response->visible = $visible->$serviceLabel->$catID;
 		return $response;
 	} else {
 		return -1;

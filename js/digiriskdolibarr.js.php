@@ -3551,6 +3551,7 @@ window.eoxiaJS.ticket.event = function() {
 	$( document ).on( 'click', '.ticket-subCategory', window.eoxiaJS.ticket.selectSubCategory );
 	$( document ).on( 'submit', '#sendFile', window.eoxiaJS.ticket.tmpStockFile );
 	$( document ).on( 'click', '.linked-file-delete', window.eoxiaJS.ticket.removeFile );
+	$( document ).on( 'click', '.close-dashboard-info', window.eoxiaJS.ticket.closeDashboardInfo );
 };
 
 /**
@@ -3679,6 +3680,27 @@ window.eoxiaJS.ticket.removeFile = function( event ) {
 	}).then(() => {
 		$(this).parent().parent().hide()
 	})
+};
+
+/**
+ * Upload automatiquement le(s) fichier(s) séelectionnés dans ecm/digiriskdolibarr/ticket/tmp/__REF__
+ *
+ * @since   1.1.0
+ * @version 1.1.0
+ *
+ * @return {void}
+ */
+window.eoxiaJS.ticket.closeDashBoardInfo = function() {
+	//let serviceLabel = $(this).attr('data-label');
+	//let catID = $(this).attr('data-catid');
+	//
+	//console.log(serviceLabel)
+	//
+	//fetch(document.URL + '?action=closedashboardinfo&serviceLabel='+serviceLabel+'&catID='+catID, {
+	//	method: 'POST',
+	//}).then(() => {
+	//	$(this).parent().parent().parent().parent().parent().parent().hide()
+	//})
 };
 
 /**
