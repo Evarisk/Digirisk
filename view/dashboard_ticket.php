@@ -43,7 +43,7 @@ require_once './../lib/digiriskdolibarr_function.lib.php';
 global $conf, $db, $langs, $user;
 
 // Load translation files required by the page
-$langs->loadLangs(array("digiriskdolibarr@digiriskdolibarr"));
+$langs->loadLangs(array("boxes", "digiriskdolibarr@digiriskdolibarr"));
 
 // Get parameters
 $action = GETPOST('action', 'aZ09');
@@ -59,6 +59,20 @@ if ( ! $permissiontoread && $user->rights->ticket->read) accessforbidden();
 /*
  * Actions
  */
+if ( $action == 'adddashboardinfo' && $permissiontoread) {
+	$data = json_decode(file_get_contents('php://input'), true);
+
+	$serviceLabel = $data['serviceLabel'];
+	$catID        = $data['catID'];
+
+	$visible = json_decode($user->conf->DIGIRISKDOLIBARR_TICKET_SELECTED_DASHBOARD_INFO);
+	$visible->$serviceLabel->$catID = 1;
+
+	$tabparam['DIGIRISKDOLIBARR_TICKET_SELECTED_DASHBOARD_INFO'] = json_encode($visible);
+
+	dol_set_user_param($db, $conf, $user, $tabparam);
+	$action = '';
+}
 
 if ( $action == 'closedashboardinfo' && $permissiontoread) {
 	$data = json_decode(file_get_contents('php://input'), true);
@@ -125,8 +139,6 @@ if (empty($conf->global->MAIN_DISABLE_WORKBOARD)) {
 		print '</div>';
 	}
 
-	print '<div class="fichecenter">';
-
 	if (is_array($arrayService) && !empty($arrayService)) {
 		foreach ($arrayService as $service) {
 			if (is_array($arrayCats) && !empty($arrayCats)) {
@@ -145,6 +157,26 @@ if (empty($conf->global->MAIN_DISABLE_WORKBOARD)) {
 			dol_set_user_param($db, $conf, $user, $tabparam);
 		}
 	}
+
+	$selectedDashboardInfos = json_decode($user->conf->DIGIRISKDOLIBARR_TICKET_SELECTED_DASHBOARD_INFO);
+	foreach ($selectedDashboardInfos as $key => $selectedDashboardInfo) {
+		foreach ($selectedDashboardInfo as $keycat => $DashboardInfo) {
+			if ($DashboardInfo == 0) {
+				$category->fetch($keycat);
+				$disable[] = $key . ' : ' . $keycat . ' : ' . $langs->transnoentities('TotalTagByService', $category->label);
+			}
+		}
+	}
+
+	if (!empty($disable)) {
+		print Form::selectarray('boxcombo', $disable, -1, $langs->trans("ChooseBoxToAdd") . '...', 0, 0, '', 0, 0, 0, 'ASC', 'maxwidth150onsmartphone hideonprint add-dashboard-info', 0, 'hidden selected', 0, 1);
+		if (!empty($conf->use_javascript_ajax)) {
+			include_once DOL_DOCUMENT_ROOT . '/core/lib/ajax.lib.php';
+			print ajax_combobox("boxcombo");
+		}
+	}
+
+	print '<div class="fichecenter">';
 
 	if (is_array($arrayService) && !empty($arrayService)) {
 		foreach ($arrayService as $service) {

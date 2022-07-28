@@ -3551,6 +3551,7 @@ window.eoxiaJS.ticket.event = function() {
 	$( document ).on( 'click', '.ticket-subCategory', window.eoxiaJS.ticket.selectSubCategory );
 	$( document ).on( 'submit', '#sendFile', window.eoxiaJS.ticket.tmpStockFile );
 	$( document ).on( 'click', '.linked-file-delete', window.eoxiaJS.ticket.removeFile );
+	$( document ).on( 'change', '.add-dashboard-info', window.eoxiaJS.ticket.addDashBoardInfo );
 	$( document ).on( 'click', '.close-dashboard-info', window.eoxiaJS.ticket.closeDashBoardInfo );
 };
 
@@ -3683,15 +3684,50 @@ window.eoxiaJS.ticket.removeFile = function( event ) {
 };
 
 /**
- * Upload automatiquement le(s) fichier(s) séelectionnés dans ecm/digiriskdolibarr/ticket/tmp/__REF__
+ * Add ticket dashboard info for a category by service
  *
- * @since   1.1.0
- * @version 1.1.0
+ * @since   9.5.0
+ * @version 9.5.0
+ *
+ * @return {void}
+ */
+window.eoxiaJS.ticket.addDashBoardInfo = function() {
+	let selectTitle = $('#select2-boxcombo-container').attr('title')
+	let serviceLabel = selectTitle.split(' : ')[0];
+	let catID = selectTitle.split(' : ')[1];
+	let querySeparator = '?';
+
+	let token = $('.dashboardticket').find('input[name="token"]').val();
+
+	document.URL.match(/\?/) ? querySeparator = '&' : 1
+
+	$.ajax({
+		url: document.URL + querySeparator + 'action=adddashboardinfo&token='+token,
+		type: "POST",
+		processData: false,
+		data: JSON.stringify({
+			serviceLabel: serviceLabel,
+			catID: catID
+		}),
+		contentType: false,
+		success: function ( resp ) {
+			window.location.reload();
+		},
+		error: function ( ) {
+		}
+	});
+};
+
+/**
+ * Close ticket dashboard info for a category by service
+ *
+ * @since   9.5.0
+ * @version 9.5.0
  *
  * @return {void}
  */
 window.eoxiaJS.ticket.closeDashBoardInfo = function() {
-	let box = $(this);
+	//let box = $(this);
 	let serviceLabel = $(this).attr('data-label');
 	let catID = $(this).attr('data-catid');
 	let querySeparator = '?';
@@ -3706,11 +3742,12 @@ window.eoxiaJS.ticket.closeDashBoardInfo = function() {
 		processData: false,
 		data: JSON.stringify({
 			serviceLabel: serviceLabel,
-			catID: catID,
+			catID: catID
 		}),
 		contentType: false,
 		success: function ( resp ) {
-			box.closest('.box-flex-item').fadeOut(400)
+			//box.closest('.box-flex-item').fadeOut(400)
+			window.location.reload();
 		},
 		error: function ( ) {
 		}
