@@ -826,6 +826,15 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				//envoi du mail avec les infos de l'objet aux adresses mail configurées
 				//envoi du mail avec une trad puis avec un model
 				$error = 0;
+				$formmail = new FormMail($this->db);
+
+				$arraydefaultmessage = $formmail->getEMailTemplate($this->db, 'ticketcreation', $user, $langs); // If $model_id is empty, preselect the first one
+				$substitutionarray = getCommonSubstitutionArray($langs, 0, null,$object);
+				complete_substitutions_array($substitutionarray, $langs, $object);
+
+				$subject = make_substitutions($arraydefaultmessage->topic,$substitutionarray);
+				$message = make_substitutions($arraydefaultmessage->content,$substitutionarray) . '<br>' . $object->message;
+
 				if ($conf->global->DIGIRISKDOLIBARR_SEND_EMAIL_ON_TICKET_SUBMIT) {
 					if ( ! $error) {
 						$langs->load('mails');
@@ -838,9 +847,6 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 								require_once DOL_DOCUMENT_ROOT . '/core/class/CMailFile.class.php';
 
 								$from = $conf->global->MAIN_MAIL_EMAIL_FROM;
-
-								$message = $object->message;
-								$subject = $langs->trans('NewTicketSubmitted') . ' : ' . $object->subject . $langs->trans('By') . /* extrafield */ '';
 								$trackid = 'tic' . $object->id;
 
 								// Create form object
@@ -901,9 +907,6 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 										require_once DOL_DOCUMENT_ROOT . '/core/class/CMailFile.class.php';
 
 										$from = $conf->global->MAIN_MAIL_EMAIL_FROM;
-
-										$message = $object->message;
-										$subject = $langs->transnoentities('NewTicketSubmitted') . ' : ' . $object->subject . $langs->transnoentities('By') . /* extrafield */ '';
 										$trackid = 'tic' . $object->id;
 
 										// Create form object

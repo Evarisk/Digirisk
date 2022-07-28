@@ -1412,6 +1412,9 @@ TicketCreationMailWellSent = Mail de confirmation de création du ticket envoyé
 TicketCreationMailSent = Le mail de création du ticket a été envoyé à %s
 HowToSetupTicketCategories = Pour configurer les categories de ticket, veuillez cliquer sur ce lien :
 ConfigTicketCategories = Congiguration des categories de ticket
+NewTicketSubmitted = Un ticket a été soumis via l'interface publique
+
+
 
 # Ticket document
 
