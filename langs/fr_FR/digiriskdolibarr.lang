@@ -1415,6 +1415,8 @@ ConfigTicketCategories = Congiguration des categories de ticket
 NewTicketSubmitted = Un ticket a été soumis via l'interface publique
 ANewTicketHasBeenSubmitted = Un nouveau ticket a été créé via l'interface publique
 SeeTicketUrl = Voir le ticket :
+Administrative = Administratif
+Accountancy = Comptabilité
 
 # Ticket document
 
