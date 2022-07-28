@@ -828,7 +828,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$error = 0;
 				$formmail = new FormMail($this->db);
 
-				$arraydefaultmessage = $formmail->getEMailTemplate($this->db, 'ticketcreation', $user, $langs); // If $model_id is empty, preselect the first one
+				$arraydefaultmessage = $formmail->getEMailTemplate($this->db, 'ticket_send', $user, $langs); // If $model_id is empty, preselect the first one
 				$substitutionarray = getCommonSubstitutionArray($langs, 0, null,$object);
 				complete_substitutions_array($substitutionarray, $langs, $object);
 
