@@ -1471,7 +1471,7 @@ window.eoxiaJS.mediaGallery.unlinkFile = function( event ) {
 
 	window.eoxiaJS.loader.display($(this).closest('.media-container'));
 
-	document.URL.match('/?/') ? querySeparator = '&' : 1
+	document.URL.match(/\?/) ? querySeparator = '&' : 1
 
 	if (type === 'riskassessment') {
 		let riskAssessmentPhoto = $('.risk-evaluation-photo-'+element_linked_id)
@@ -1566,7 +1566,7 @@ window.eoxiaJS.mediaGallery.addToFavorite = function( event ) {
 	newFavorite.addClass('fas')
 	newFavorite.removeClass('far')
 
-	document.URL.match('/?/') ? querySeparator = '&' : 1
+	document.URL.match(/\?/) ? querySeparator = '&' : 1
 
 	window.eoxiaJS.loader.display(mediaContainer);
 
@@ -3691,16 +3691,30 @@ window.eoxiaJS.ticket.removeFile = function( event ) {
  * @return {void}
  */
 window.eoxiaJS.ticket.closeDashBoardInfo = function() {
-	//let serviceLabel = $(this).attr('data-label');
-	//let catID = $(this).attr('data-catid');
-	//
-	//console.log(serviceLabel)
-	//
-	//fetch(document.URL + '?action=closedashboardinfo&serviceLabel='+serviceLabel+'&catID='+catID, {
-	//	method: 'POST',
-	//}).then(() => {
-	//	$(this).parent().parent().parent().parent().parent().parent().hide()
-	//})
+	let box = $(this);
+	let serviceLabel = $(this).attr('data-label');
+	let catID = $(this).attr('data-catid');
+	let querySeparator = '?';
+
+	let token = $('.dashboardticket').find('input[name="token"]').val();
+
+	document.URL.match(/\?/) ? querySeparator = '&' : 1
+
+	$.ajax({
+		url: document.URL + querySeparator + 'action=closedashboardinfo&token='+token,
+		type: "POST",
+		processData: false,
+		data: JSON.stringify({
+			serviceLabel: serviceLabel,
+			catID: catID,
+		}),
+		contentType: false,
+		success: function ( resp ) {
+			box.closest('.box-flex-item').fadeOut(400)
+		},
+		error: function ( ) {
+		}
+	});
 };
 
 /**
