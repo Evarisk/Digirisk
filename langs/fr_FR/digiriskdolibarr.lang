@@ -1418,7 +1418,7 @@ SeeTicketUrl = Voir le ticket :
 Administrative = Administratif
 Accountancy = Comptabilité
 TicketCreationSubject = Création de ticket via l'interface publique de Digirisk
-
+TicketDocumentCustomDigiriskTemplate = ODT custom des fiches de tickets
 # Ticket document
 
 # Mod Numbering - Modèle de numérotation
