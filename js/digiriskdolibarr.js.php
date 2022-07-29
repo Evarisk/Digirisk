@@ -3727,7 +3727,7 @@ window.eoxiaJS.ticket.addDashBoardInfo = function() {
  * @return {void}
  */
 window.eoxiaJS.ticket.closeDashBoardInfo = function() {
-	//let box = $(this);
+	let box = $(this);
 	let serviceLabel = $(this).attr('data-label');
 	let catID = $(this).attr('data-catid');
 	let querySeparator = '?';
@@ -3746,8 +3746,9 @@ window.eoxiaJS.ticket.closeDashBoardInfo = function() {
 		}),
 		contentType: false,
 		success: function ( resp ) {
-			//box.closest('.box-flex-item').fadeOut(400)
-			window.location.reload();
+			console.log(resp)
+			box.closest('.box-flex-item').fadeOut(400)
+			$('.add-widget-box').html($(resp).find('.add-widget-box').children())
 		},
 		error: function ( ) {
 		}

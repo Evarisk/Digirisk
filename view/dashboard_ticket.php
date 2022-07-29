@@ -87,6 +87,7 @@ if ( $action == 'closedashboardinfo' && $permissiontoread) {
 
 	dol_set_user_param($db, $conf, $user, $tabparam);
 	$action = '';
+	header('Location:' . $_SERVER['PHP_SELF']);
 }
 
 /*
@@ -169,11 +170,13 @@ if (empty($conf->global->MAIN_DISABLE_WORKBOARD)) {
 	}
 
 	if (!empty($disable)) {
+		print '<div class="add-widget-box">';
 		print Form::selectarray('boxcombo', $disable, -1, $langs->trans("ChooseBoxToAdd") . '...', 0, 0, '', 0, 0, 0, 'ASC', 'maxwidth150onsmartphone hideonprint add-dashboard-info', 0, 'hidden selected', 0, 1);
 		if (!empty($conf->use_javascript_ajax)) {
 			include_once DOL_DOCUMENT_ROOT . '/core/lib/ajax.lib.php';
 			print ajax_combobox("boxcombo");
 		}
+		print '</div>';
 	}
 
 	print '<div class="fichecenter">';
