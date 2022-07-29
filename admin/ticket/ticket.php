@@ -99,11 +99,11 @@ if ($action == 'generateExtrafields') {
 	$ret5 = $extra_fields->addExtraField('digiriskdolibarr_ticket_location', $langs->transnoentities("Location"), 'varchar', 2400, 255, 'ticket', 0, 0, '', '', 1, '', 1, '', '', 0);
 	$ret6 = $extra_fields->addExtraField('digiriskdolibarr_ticket_date', $langs->transnoentities("Date"), 'datetime', 2500, '', 'ticket', 0, 0, '', '', 1, '', 1, '', '', 0);
 	if ($ret1 > 0 && $ret2 > 0 && $ret3 > 0 && $ret4 > 0 && $ret5 > 0 && $ret6 > 0) {
-		dolibarr_set_const($db, 'DIGIRISKDOLIBARR_TICKET_EXTRAFIELDS', 1, 'integer', 0, '', 0);
 		setEventMessages($langs->transnoentities('ExtrafieldsCreated'), array());
 	} else {
 		setEventMessages($extra_fields->error, null, 'errors');
 	}
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_TICKET_EXTRAFIELDS', 1, 'integer', 0, '', 0);
 }
 $upload_dir = $conf->categorie->multidir_output[$conf->entity?:1];
 global $maxwidthmini, $maxheightmini, $maxwidthsmall, $maxheightsmall;
