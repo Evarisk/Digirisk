@@ -118,6 +118,21 @@ class ActionsDigiriskdolibarr
 				$pictoDigirisk = img_picto('', $pictopath, '', 1, 0, 0, '', 'pictoDigirisk');
 				$title        = $pictoDigirisk . $langs->trans('TicketDocument');
 
+				require_once __DIR__ . '/../lib/digiriskdolibarr_function.lib.php';
+
+				if(is_numeric($object->array_options['options_digiriskdolibarr_ticket_service'])) {
+					require_once __DIR__ . './digiriskelement.class.php';
+					$digiriskelement = new DigiriskElement($db);
+					$digiriskelement->fetch($object->array_options['options_digiriskdolibarr_ticket_service']);
+					$selectDictionnary = $digiriskelement->getNomUrl(1);
+					?>
+					<script>
+					jQuery('.ticket_extras_digiriskdolibarr_ticket_service').html('')
+					jQuery('.ticket_extras_digiriskdolibarr_ticket_service').prepend(<?php echo json_encode($selectDictionnary) ; ?>)
+					</script>
+					<?php
+				}
+
 				$html = digiriskshowdocuments($modulepart, $dir_files, $filedir, $urlsource, 1, 0, $defaultmodel, 1, 0, '', $title, '', '', '', 0, 'remove_file');
 				?>
 
@@ -131,13 +146,18 @@ class ActionsDigiriskdolibarr
 
 				$object = new Ticket($db);
 				$object->fetch(GETPOST('id'),'',GETPOST('track_id'));
-				$selectDictionnary = digirisk_select_dictionary('options_digiriskdolibarr_ticket_service', 'c_services', 'label', 'label', $object->array_options['options_digiriskdolibarr_ticket_service'], 1, '', 'PleaseSelectAService');
+				if(is_numeric($object->array_options['options_digiriskdolibarr_ticket_service'])) {
+					require_once __DIR__ . './digiriskelement.class.php';
+					$digiriskelement = new DigiriskElement($db);
+					$selectDictionnary = $digiriskelement->select_digiriskelement_list($object->array_options['options_digiriskdolibarr_ticket_service'], 'options_digiriskdolibarr_ticket_service', '', 1, 0, array(), 0, 0, 'minwidth100', 0, false, 0);
+				} else {
+					$selectDictionnary = digirisk_select_dictionary('options_digiriskdolibarr_ticket_service', 'c_services', 'label', 'label', $object->array_options['options_digiriskdolibarr_ticket_service'], 1, '', 'PleaseSelectAService');
+				}
 
 				?>
 				<script>
-					jQuery('.ticket_extras_digiriskdolibarr_ticket_service form').prepend(<?php echo json_encode($selectDictionnary) ; ?>)
 					jQuery('#options_digiriskdolibarr_ticket_service').remove()
-					console.log('oui')
+					jQuery('.ticket_extras_digiriskdolibarr_ticket_service form').prepend(<?php echo json_encode($selectDictionnary) ; ?>)
 				</script>
 				<?php
 			}

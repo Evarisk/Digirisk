@@ -1421,7 +1421,10 @@ Administrative = Administratif
 Accountancy = Comptabilité
 TicketCreationSubject = Création de ticket via l'interface publique de Digirisk
 TicketDocumentCustomDigiriskTemplate = ODT custom des fiches de tickets
-
+ServicesConfigIsOnThisPage = Configurer le dictionnaire "Services"
+ServiceDictionary = Dictionnaire des services
+ConfigServiceDictionary = Ajouter ou retirer des services
+ShowDigiriskElementOnSelectService = Afficher les éléments de l'arborescence à la place du dictionnaire des services
 
 
 # Ticket document

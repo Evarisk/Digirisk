@@ -823,19 +823,19 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				break;
 
 			case 'TICKET_CREATE' :
-				//envoi du mail avec les infos de l'objet aux adresses mail configurées
-				//envoi du mail avec une trad puis avec un model
-				$error = 0;
-				$formmail = new FormMail($this->db);
-
-				$arraydefaultmessage = $formmail->getEMailTemplate($this->db, 'ticket_send', $user, $langs); // If $model_id is empty, preselect the first one
-				$substitutionarray = getCommonSubstitutionArray($langs, 0, null,$object);
-				complete_substitutions_array($substitutionarray, $langs, $object);
-
-				$subject = make_substitutions($arraydefaultmessage->topic,$substitutionarray);
-				$message = make_substitutions($arraydefaultmessage->content,$substitutionarray) . '<br>' . $object->message;
-
 				if ($conf->global->DIGIRISKDOLIBARR_SEND_EMAIL_ON_TICKET_SUBMIT) {
+					//envoi du mail avec les infos de l'objet aux adresses mail configurées
+					//envoi du mail avec une trad puis avec un model
+					$error = 0;
+					$formmail = new FormMail($this->db);
+
+					$arraydefaultmessage = $formmail->getEMailTemplate($this->db, 'ticket_send', $user, $langs); // If $model_id is empty, preselect the first one
+					$substitutionarray = getCommonSubstitutionArray($langs, 0, null,$object);
+					complete_substitutions_array($substitutionarray, $langs, $object);
+
+					$subject = make_substitutions($arraydefaultmessage->topic,$substitutionarray);
+					$message = make_substitutions($arraydefaultmessage->content,$substitutionarray) . '<br>' . $object->message;
+
 					if ( ! $error) {
 						$langs->load('mails');
 

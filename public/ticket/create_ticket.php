@@ -61,6 +61,7 @@ require_once DOL_DOCUMENT_ROOT . '/categories/class/categorie.class.php';
 require_once DOL_DOCUMENT_ROOT . '/core/modules/ticket/mod_ticket_simple.php';
 
 require_once '../../lib/digiriskdolibarr_function.lib.php';
+require_once '../../class/digiriskelement.class.php';
 
 global $conf, $db, $langs;
 // Load translation files required by the page
@@ -84,6 +85,7 @@ $formfile    = new FormFile($db);
 $extrafields = new ExtraFields($db);
 $category    = new Categorie($db);
 $modTicket   = new mod_ticket_simple($db);
+$digiriskelement = new DigiriskElement($db);
 
 $extrafields->fetch_name_optionals_label($object->table_element);
 
@@ -458,7 +460,14 @@ if ( ! empty($mainCategoryObject) && $mainCategoryObject > 0) {
 	</div>
 	<div class="form-element" style="margin-bottom: 1em; margin-top: 1em">
 		<span class="form-label"><?php print $langs->trans("Service"); ?></span>
-		<?php print digirisk_select_dictionary('options_digiriskdolibarr_ticket_service', 'c_services', 'label', 'label', GETPOST('options_digiriskdolibarr_ticket_service'), 1, '', 'PleaseSelectAService');	?>
+
+		<?php
+		if(!$conf->global->DIGIRISKDOLIBARR_SHOW_DIGIRISKELEMENT_ON_SELECT_SERVICE) {
+			print digirisk_select_dictionary('options_digiriskdolibarr_ticket_service', 'c_services', 'label', 'label', GETPOST('options_digiriskdolibarr_ticket_service'), 1, '', 'PleaseSelectAService');
+		} else {
+			print $digiriskelement->select_digiriskelement_list(GETPOST('options_digiriskdolibarr_ticket_service'), 'options_digiriskdolibarr_ticket_service', '', 1, 0, array(), 0, 0, 'minwidth100', 0, false, 1);
+		}
+		?>
 	</div>
 
 	<?php include DOL_DOCUMENT_ROOT . '/core/tpl/extrafields_add.tpl.php'; ?>
