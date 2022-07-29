@@ -121,6 +121,8 @@ Apprentice/Student = Apprenti/Elève
 Interim = Intérimaire
 ProfessionalQualification = Qualification professionnelle
 DigiriskDocumentation = Documentation de Digirisk
+PleaseNameTheFile = De préférence, nommez le fichier <b> %s </b>
+
 
 #
 # Diaporama page index
@@ -1419,6 +1421,9 @@ Administrative = Administratif
 Accountancy = Comptabilité
 TicketCreationSubject = Création de ticket via l'interface publique de Digirisk
 TicketDocumentCustomDigiriskTemplate = ODT custom des fiches de tickets
+
+
+
 # Ticket document
 
 # Mod Numbering - Modèle de numérotation

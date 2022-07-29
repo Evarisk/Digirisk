@@ -235,7 +235,7 @@ class doc_ticketdocument_custom_odt extends ModeleODTTicketDocument
 		$texte .= '</td>';
 
 		$texte .= '<td rowspan="2" class="tdtop hideonsmartphone">';
-		$texte .= $langs->trans("ExampleOfDirectoriesForModelGen");
+		$texte .= $langs->trans("PleaseNameTheFile", 'template_ticketdocument_custom.odt');
 		$texte .= '</td>';
 		$texte .= '</tr>';
 
