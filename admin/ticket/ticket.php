@@ -202,14 +202,13 @@ if ($action == 'generateQRCode') {
 	$data = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/public/ticket/create_ticket.php?entity=' . $conf->entity;
 	$size = '400x400';
 	$entity = $conf->entity > 1 ? '/' . $conf->entity . '/' : '';
-	$logo = DOL_DATA_ROOT . $entity . '/mycompany/logos/' . $conf->global->MAIN_INFO_SOCIETE_LOGO;
+	$logo = DOL_DATA_ROOT . $entity . 'mycompany/logos/' . $conf->global->MAIN_INFO_SOCIETE_LOGO;
 
 	ob_clean();
-	header('Content-type: image/png');
 
 	$QR = imagecreatefrompng('https://chart.googleapis.com/chart?cht=qr&chld=H|1&chs='.$size.'&chl='.urlencode($data));
 
-	if($logo !== FALSE){
+	if($conf->global->MAIN_INFO_SOCIETE_LOGO != ''){
 		$logo = imagecreatefromstring(file_get_contents($logo));
 
 		$QR_width = imagesx($QR);
