@@ -160,11 +160,13 @@ if (empty($conf->global->MAIN_DISABLE_WORKBOARD)) {
 	}
 
 	$selectedDashboardInfos = json_decode($user->conf->DIGIRISKDOLIBARR_TICKET_SELECTED_DASHBOARD_INFO);
-	foreach ($selectedDashboardInfos as $key => $selectedDashboardInfo) {
-		foreach ($selectedDashboardInfo as $keycat => $DashboardInfo) {
-			if ($DashboardInfo == 0) {
-				$category->fetch($keycat);
-				$disable[] = $key . ' : ' . $keycat . ' : ' . $langs->transnoentities('TotalTagByService', $category->label);
+	if (!empty($selectedDashboardInfos)) {
+		foreach ($selectedDashboardInfos as $key => $selectedDashboardInfo) {
+			foreach ($selectedDashboardInfo as $keycat => $DashboardInfo) {
+				if ($DashboardInfo == 0) {
+					$category->fetch($keycat);
+					$disable[] = $key . ' : ' . $keycat . ' : ' . $langs->transnoentities('TotalTagByService', $category->label);
+				}
 			}
 		}
 	}

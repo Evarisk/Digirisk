@@ -2064,7 +2064,7 @@ function digirisk_select_dictionary($htmlname, $dictionarytable, $keyfield = 'co
 				$i++;
 			}
 			$out .= "</select>";
-				$out .= ajax_combobox('select'.$htmlname);
+			$out .= ajax_combobox('select'.$htmlname);
 
 		} else {
 			$out .= $langs->trans("DictionaryEmpty");
