@@ -152,6 +152,7 @@ if (empty($conf->global->MAIN_DISABLE_WORKBOARD)) {
 				}
 			}
 		}
+
 		if ($user->conf->DIGIRISKDOLIBARR_TICKET_SELECTED_DASHBOARD_INFO_INITIALIZED == 0) {
 			$tabparam['DIGIRISKDOLIBARR_TICKET_SELECTED_DASHBOARD_INFO_INITIALIZED'] = 1;
 			$tabparam['DIGIRISKDOLIBARR_TICKET_SELECTED_DASHBOARD_INFO'] = json_encode($tabparam['DIGIRISKDOLIBARR_TICKET_SELECTED_DASHBOARD_INFO']);
@@ -171,15 +172,14 @@ if (empty($conf->global->MAIN_DISABLE_WORKBOARD)) {
 		}
 	}
 
-	if (!empty($disable)) {
-		print '<div class="add-widget-box">';
+
+		print '<div class="add-widget-box" style="'. (!empty($disable) ? '' : 'display:none').'">';
 		print Form::selectarray('boxcombo', $disable, -1, $langs->trans("ChooseBoxToAdd") . '...', 0, 0, '', 0, 0, 0, 'ASC', 'maxwidth150onsmartphone hideonprint add-dashboard-info', 0, 'hidden selected', 0, 1);
 		if (!empty($conf->use_javascript_ajax)) {
 			include_once DOL_DOCUMENT_ROOT . '/core/lib/ajax.lib.php';
 			print ajax_combobox("boxcombo");
 		}
 		print '</div>';
-	}
 
 	print '<div class="fichecenter">';
 
