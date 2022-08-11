@@ -25,7 +25,7 @@
  * \brief      File that contains the numbering module rules Sirius
  */
 
-require_once DOL_DOCUMENT_ROOT.'/custom/digiriskdolibarr/core/modules/digiriskdolibarr/digiriskelement/modules_digiriskelement.php';
+require_once __DIR__ . '/../modules_digiriskelement.php';
 
 /**
  * Class of file that contains the numbering module rules Sirius
