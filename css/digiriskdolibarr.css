@@ -3505,12 +3505,8 @@ td > .risk-evaluation-container {
   margin: auto 0.2em;
 }
 .risk-evaluation-container .risk-evaluation-single .risk-evaluation-content .risk-evaluation-data .risk-evaluation-reference {
-  color: #263C5C;
+  color: #333333;
   font-weight: 600;
-}
-.risk-evaluation-container .risk-evaluation-single .risk-evaluation-content .risk-evaluation-data .risk-evaluation-reference:hover {
-  text-decoration: underline;
-  cursor: pointer;
 }
 .risk-evaluation-container .risk-evaluation-single .risk-evaluation-content .risk-evaluation-data .risk-evaluation-count {
   background: rgba(0, 0, 0, 0.2);
@@ -3707,10 +3703,6 @@ td > .risk-evaluation-container {
 }
 .wpeo-modal .modal-container .risk-evaluations-list .risk-evaluation > .risk-evaluation-container .risk-evaluation-single .risk-evaluation-reference {
   color: #333333;
-}
-.wpeo-modal .modal-container .risk-evaluations-list .risk-evaluation > .risk-evaluation-container .risk-evaluation-single .risk-evaluation-reference:hover {
-  cursor: auto;
-  text-decoration: none;
 }
 .wpeo-modal .modal-container .risk-evaluations-list .risk-evaluation > .risk-evaluation-container .risk-evaluation-actions {
   margin-left: auto;
