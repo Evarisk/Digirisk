@@ -89,13 +89,8 @@ td > .risk-evaluation-container {
     }
 
     .risk-evaluation-reference {
-      color: $color__secondary;
+      color: $color__text-main;
       font-weight: 600;
-
-      &:hover {
-        text-decoration: underline;
-        cursor: pointer;
-      }
     }
     .risk-evaluation-count {
       background: rgba(0,0,0,0.2);
