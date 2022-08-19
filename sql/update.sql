@@ -77,3 +77,4 @@ ALTER TABLE llx_digiriskdolibarr_accident_workstop ADD date_start_workstop DATET
 
 -- 9.5.0
 UPDATE `llx_c_email_templates` SET `type_template` = 'ticket_send' WHERE `type_template` = 'ticketcreation'
+ALTER TABLE llx_digiriskdolibarr_accident_workstop ADD date_end_workstop DATETIME NULL AFTER date_start_workstop;
