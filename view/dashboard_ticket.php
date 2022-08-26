@@ -193,7 +193,7 @@ if (empty($conf->global->MAIN_DISABLE_WORKBOARD)) {
 				}
 
 				print '<div class="titre inline-block">';
-				print load_fiche_titre($service->label, '', 'service');
+				print load_fiche_titre($langs->transnoentities($service->label), '', 'service');
 				print '</div>';
 			}
 
