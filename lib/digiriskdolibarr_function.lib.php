@@ -2403,6 +2403,8 @@ function getNomUrlEntity($object, $withpicto = 0, $option = '', $addlabel = 0, $
 {
 	global $conf, $langs, $user, $hookmanager, $db;
 
+	require_once DOL_DOCUMENT_ROOT.'/core/lib/admin.lib.php';
+
 	if ( ! empty($conf->dol_no_mouse_hover)) $notooltip = 1; // Force disable tooltips
 
 	$result = '';
