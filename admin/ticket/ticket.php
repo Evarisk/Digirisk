@@ -556,7 +556,7 @@ if ( ! empty($conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE)) {
 	print '</td>';
 
 	print '<td class="center">';
-	print $form->textwithpicto('', $langs->transnoentities("ExtrafieldsGeneration"), 1, 'help');
+	print $form->textwithpicto('', $langs->transnoentities("ServiceToolTip"), 1, 'help');
 	print '</td>';
 	print '</tr>';
 
@@ -568,7 +568,7 @@ if ( ! empty($conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE)) {
 	print '</td>';
 
 	print '<td class="center">';
-	print $form->textwithpicto('', $langs->transnoentities("ExtrafieldsGeneration"), 1, 'help');
+	print $form->textwithpicto('', $langs->transnoentities("DictionaryServiceToolTip"), 1, 'help');
 	print '</td>';
 	print '</tr>';
 	print '</form>';
