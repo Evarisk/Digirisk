@@ -2897,7 +2897,7 @@ function digirisk_check_secure_access_document($modulepart, $original_file, $ent
  */
 function load_board($user, $cat, $service)
 {
-	global $db;
+	global $db, $langs;
 
 	$categorie = new Categorie($db);
 
@@ -2906,7 +2906,7 @@ function load_board($user, $cat, $service)
 
 	if (is_array($allObjects) && !empty($allObjects)) {
 		foreach ($allObjects as $object) {
-			if (!empty($object->array_options['options_digiriskdolibarr_ticket_service']) && $object->array_options['options_digiriskdolibarr_ticket_service'] == $service->label && $object->fk_statut != 9) {
+			if (!empty($object->array_options['options_digiriskdolibarr_ticket_service']) && $object->array_options['options_digiriskdolibarr_ticket_service'] == $langs->transnoentities($service->label) && $object->fk_statut != 9) {
 				$arrayCountObject[] = $object;
 			}
 		}
@@ -2921,7 +2921,7 @@ function load_board($user, $cat, $service)
 		$response->id = $cat['id'];
 		$response->img = $cat['photo'];
 		$response->label = $cat['label'] . ' : ';
-		$response->url = DOL_URL_ROOT . '/ticket/list.php?search_options_digiriskdolibarr_ticket_service='.$service->label.'&search_category_ticket_list='.$cat['id'];
+		$response->url = DOL_URL_ROOT . '/ticket/list.php?search_options_digiriskdolibarr_ticket_service='.$langs->transnoentities($service->label).'&search_category_ticket_list='.$cat['id'];
 		$response->nbtodo = ($nbobject ?: 0);
 		$visible = json_decode($user->conf->DIGIRISKDOLIBARR_TICKET_SELECTED_DASHBOARD_INFO);
 		$serviceLabel = $service->label;
