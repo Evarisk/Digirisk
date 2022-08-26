@@ -725,9 +725,6 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 
 				$actioncomm = new ActionComm($this->db);
 
-
-
-
 				$actioncomm->elementtype = $object->object_type . '@digiriskdolibarr';
 				$actioncomm->code        = 'AC_DIGIRISKSIGNATURE_SIGNED';
 				$actioncomm->type_code   = 'AC_OTH_AUTO';
@@ -767,7 +764,9 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->label             = $langs->transnoentities('DigiriskSignaturePendingSignatureTrigger');
 				$actioncomm->datep             = $now;
 				$actioncomm->fk_element        = $object->fk_object;
-				$actioncomm->socpeopleassigned = array($object->element_id => $object->element_id);
+				if ($object->element_type == 'socpeople') {
+					$actioncomm->socpeopleassigned = array($object->element_id => $object->element_id);
+				}
 				$actioncomm->userownerid       = $user->id;
 				$actioncomm->percentage        = -1;
 
@@ -791,7 +790,9 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->label             = $langs->transnoentities('DigiriskSignatureAbsentTrigger');
 				$actioncomm->datep             = $now;
 				$actioncomm->fk_element        = $object->fk_object;
-				$actioncomm->socpeopleassigned = array($object->element_id => $object->element_id);
+				if ($object->element_type == 'socpeople') {
+					$actioncomm->socpeopleassigned = array($object->element_id => $object->element_id);
+				}
 				$actioncomm->userownerid       = $user->id;
 				$actioncomm->percentage        = -1;
 
@@ -815,7 +816,9 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->label             = $langs->transnoentities('DigiriskSignatureDeletedTrigger');
 				$actioncomm->datep             = $now;
 				$actioncomm->fk_element        = $object->fk_object;
-				$actioncomm->socpeopleassigned = array($object->element_id => $object->element_id);
+				if ($object->element_type == 'socpeople') {
+					$actioncomm->socpeopleassigned = array($object->element_id => $object->element_id);
+				}
 				$actioncomm->userownerid       = $user->id;
 				$actioncomm->percentage        = -1;
 
