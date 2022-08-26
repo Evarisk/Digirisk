@@ -170,7 +170,7 @@ if ($object->id > 0) {
 	print dol_get_fiche_end();
 
 	// Actions buttons
-	$out = '&origin=' . $object->element . '@digiriskdolibarr' . '&originid=' . $object->id . '&backtopage=1&percentage=-1';
+	$out = '&origin=' . $object->element . '@digiriskdolibarr' . '&originid=' . $object->id . '&backtopage='. $_SERVER["PHP_SELF"] . '?id=' . $object->id . '&percentage=-1';
 
 	if ( ! empty($conf->agenda->enabled)) {
 		$linktocreatetimeBtnStatus = ! empty($user->rights->agenda->myactions->create) || ! empty($user->rights->agenda->allactions->create);
