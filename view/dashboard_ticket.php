@@ -138,6 +138,7 @@ if (empty($conf->global->MAIN_DISABLE_WORKBOARD)) {
 		print '<div class="notice-subtitle"><strong>'.$langs->trans("HowToSetupTicketCategories") . '  ' . '<a href=' . '"../admin/ticket/ticket.php#TicketCategories">' . $langs->trans('ConfigTicketCategories') . '</a></strong></div>';
 		print '</div>';
 		print '</div>';
+		exit;
 	}
 
 	if (is_array($arrayService) && !empty($arrayService)) {
@@ -153,7 +154,8 @@ if (empty($conf->global->MAIN_DISABLE_WORKBOARD)) {
 			}
 		}
 
-		if ($user->conf->DIGIRISKDOLIBARR_TICKET_SELECTED_DASHBOARD_INFO_INITIALIZED == 0) {
+		$confArray = json_decode(json_encode($user->conf), TRUE);
+		if ((empty($confArray) && $tabparam['DIGIRISKDOLIBARR_TICKET_SELECTED_DASHBOARD_INFO_INITIALIZED'] == 0)) {
 			$tabparam['DIGIRISKDOLIBARR_TICKET_SELECTED_DASHBOARD_INFO_INITIALIZED'] = 1;
 			$tabparam['DIGIRISKDOLIBARR_TICKET_SELECTED_DASHBOARD_INFO'] = json_encode($tabparam['DIGIRISKDOLIBARR_TICKET_SELECTED_DASHBOARD_INFO']);
 			dol_set_user_param($db, $conf, $user, $tabparam);
