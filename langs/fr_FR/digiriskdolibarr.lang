@@ -51,6 +51,9 @@ LinkedProject = Projet lié
 DigiriskUpdate = Mise à jour de Digirisk :
 DigiriskHasBeenUpdatedTo = Digirisk a été mis à jour en version %s
 Security = Sécurité
+HowToSharedElement = Pour plus d'informations sur la configuratiion des éléments partagés, veuillez vous rendre sur ce lien :
+HowToSharedElementLink = https://wiki.dolibarr.org/index.php?title=Module_Digirisk#Configuration
+ConfigSharedElement = Configuratiion des éléments partagés (risques/signalisations)
 
 
 
