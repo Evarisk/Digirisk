@@ -515,10 +515,10 @@ if ( ! empty($conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE)) {
 
 	print '<tr class="oddeven"><td>' . $langs->transnoentities("GenerateExtrafields") . '<sup><a href="https://wiki.dolibarr.org/index.php?title=Module_Digirisk#DigiRisk_-_Registre_de_s.C3.A9curit.C3.A9_et_Tickets" target="_blank" > 4</a></sup></td>';
 	print '<td class="center">';
-	print $conf->global->DIGIRISKDOLIBARR_TICKET_EXTRAFIELDS ? $langs->transnoentities('AlreadyGenerated') : $langs->transnoentities('NotCreated');
+	print dolibarr_get_const($db, 'DIGIRISKDOLIBARR_TICKET_EXTRAFIELDS', 0) ? $langs->transnoentities('AlreadyGenerated') : $langs->transnoentities('NotCreated');
 	print '</td>';
 	print '<td class="center">';
-	print $conf->global->DIGIRISKDOLIBARR_TICKET_EXTRAFIELDS ? '<a type="" class=" butActionRefused" value="">'.$langs->transnoentities('Create') .'</a>' : '<input type="submit" class="button" value="'.$langs->transnoentities('Create') .'">' ;
+	print dolibarr_get_const($db, 'DIGIRISKDOLIBARR_TICKET_EXTRAFIELDS', 0) ? '<a type="" class=" butActionRefused" value="">'.$langs->transnoentities('Create') .'</a>' : '<input type="submit" class="button" value="'.$langs->transnoentities('Create') .'">' ;
 	print '</td>';
 
 	print '<td class="center">';
