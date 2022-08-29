@@ -39,6 +39,7 @@ if ( ! $res) die("Include of main fails");
 require_once DOL_DOCUMENT_ROOT . '/contact/class/contact.class.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/company.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/functions2.lib.php';
+require_once DOL_DOCUMENT_ROOT . '/categories/class/categorie.class.php';
 
 require_once './../../class/digiriskelement.class.php';
 require_once './../../class/digiriskstandard.class.php';
@@ -93,6 +94,7 @@ if ($id > 0 || ! empty($ref)) $upload_dir = $conf->digiriskdolibarr->multidir_ou
 $permissiontoread   = $user->rights->digiriskdolibarr->digiriskelement->read;
 $permissiontoadd    = $user->rights->digiriskdolibarr->digiriskelement->write;
 $permissiontodelete = $user->rights->digiriskdolibarr->digiriskelement->delete;
+$upload_dir = $conf->categorie->multidir_output[$conf->entity];
 
 if ( ! $permissiontoread) accessforbidden();
 require_once './../../core/tpl/digirisk_security_checks.php';
@@ -105,26 +107,13 @@ $parameters = array('id' => $id);
 $reshook    = $hookmanager->executeHooks('doActions', $parameters, $object, $action); // Note that $action and $object may have been modified by some hooks
 if ($reshook < 0) setEventMessages($hookmanager->error, $hookmanager->errors, 'errors');
 
-if (empty($reshook)) {
-	// Cancel
-	if (GETPOST('cancel', 'alpha') && ! empty($backtopage)) {
-		header("Location: " . $backtopage);
-		exit;
-	}
-
-	// Purge search criteria
-	if (GETPOST('button_removefilter_x', 'alpha') || GETPOST('button_removefilter.x', 'alpha') || GETPOST('button_removefilter', 'alpha')) { // All tests are required to be compatible with all browsers
-		$actioncode          = '';
-		$search_agenda_label = '';
-	}
-}
 
 /*
  *	View
  */
 
 if ($object->id > 0) {
-	$title    = $langs->trans("Agenda");
+	$title    = $langs->trans("Register");
 	$help_url = 'FR:Module_DigiriskDolibarr';
 	$morejs   = array("/digiriskdolibarr/js/digiriskdolibarr.js.php");
 	$morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");
@@ -135,7 +124,7 @@ if ($object->id > 0) {
 	if ( ! empty($conf->notification->enabled)) $langs->load("mails");
 	$head = digiriskelementPrepareHead($object);
 
-	print dol_get_fiche_head($head, 'elementAgenda', $title, -1, "digiriskdolibarr@digiriskdolibarr");
+	print dol_get_fiche_head($head, 'elementRegister', $title, -1, "digiriskdolibarr@digiriskdolibarr");
 
 	// Object card
 	// ------------------------------------------------------------
@@ -169,29 +158,9 @@ if ($object->id > 0) {
 
 	print dol_get_fiche_end();
 
-	// Actions buttons
-	$out = '&origin=' . $object->element . '@digiriskdolibarr' . '&originid=' . $object->id . '&backtopage='. $_SERVER["PHP_SELF"] . '?id=' . $object->id . '&percentage=-1';
+	$digiriskelement = $object;
 
-	if ( ! empty($conf->agenda->enabled)) {
-		$linktocreatetimeBtnStatus = ! empty($user->rights->agenda->myactions->create) || ! empty($user->rights->agenda->allactions->create);
-		$morehtmlcenter            = dolGetButtonTitle($langs->trans('AddAction'), '', 'fa fa-plus-circle', DOL_URL_ROOT . '/comm/action/card.php?action=create' . $out, '', $linktocreatetimeBtnStatus);
-	}
-
-	if ( ! empty($conf->agenda->enabled) && ( ! empty($user->rights->agenda->myactions->read) || ! empty($user->rights->agenda->allactions->read))) {
-		$param                                                                      = '&id=' . $object->id;
-		if ( ! empty($contextpage) && $contextpage != $_SERVER["PHP_SELF"]) $param .= '&contextpage=' . urlencode($contextpage);
-		if ($limit > 0 && $limit != $conf->liste_limit) $param                     .= '&limit=' . urlencode($limit);
-
-		print_barre_liste($langs->trans("ActionsOnGroupment"), 0, $_SERVER["PHP_SELF"], '', $sortfield, $sortorder, '', 0, -1, '', 0, $morehtmlcenter, '', 0, 1, 1);
-
-		// List of all actions
-		$filters                        = array();
-		$filters['search_agenda_label'] = $search_agenda_label;
-
-		// TODO Replace this with same code than into list.php
-		show_actions_done($conf, $langs, $db, $object, null, 0, $actioncode, '', $filters, $sortfield, $sortorder, 'digiriskdolibarr');
-		print '</div>';
-	}
+	require_once __DIR__ . '/../../core/tpl/digiriskdolibarr_dashboard_ticket.tpl.php';
 }
 
 // End of page

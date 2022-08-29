@@ -837,9 +837,6 @@ function display_recurse_tree($results)
 	$workunit_prefix = dol_strlen($mod_workunit->prefix) > 0 ? $mod_workunit->prefix : $conf->global->DIGIRISKDOLIBARR_WORKUNIT_CANOPUS_ADDON;
 	$workunit_prefix = preg_match('/{/',$workunit_prefix) ? preg_split('/{/', $workunit_prefix)[0] : $workunit_prefix;
 
-?>
-
-<?php
 	if ($user->rights->digiriskdolibarr->digiriskelement->read) {
 		if ( ! empty($results)) {
 			foreach ($results as $element) { ?>
@@ -2906,27 +2903,31 @@ function load_board($user, $cat, $service)
 
 	if (is_array($allObjects) && !empty($allObjects)) {
 		foreach ($allObjects as $object) {
-			if (!empty($object->array_options['options_digiriskdolibarr_ticket_service']) && $object->array_options['options_digiriskdolibarr_ticket_service'] == $langs->transnoentities($service->label) && $object->fk_statut != 9) {
+			if (!empty($object->array_options['options_digiriskdolibarr_ticket_service']) && $object->array_options['options_digiriskdolibarr_ticket_service'] == $service->id && $object->fk_statut != 9) {
 				$arrayCountObject[] = $object;
 			}
 		}
 	}
 
+
 	if (!empty($arrayCountObject)) {
 		$nbobject = count($arrayCountObject);
 	}
+
+
 
 	if ($allObjects > 0) {
 		$response = new WorkboardResponse();
 		$response->id = $cat['id'];
 		$response->img = $cat['photo'];
 		$response->label = $cat['label'] . ' : ';
-		$response->url = DOL_URL_ROOT . '/ticket/list.php?search_options_digiriskdolibarr_ticket_service='.$langs->transnoentities($service->label).'&search_category_ticket_list='.$cat['id'];
+		$response->url = DOL_URL_ROOT . '/ticket/list.php?search_options_digiriskdolibarr_ticket_service='.$service->id.'&search_category_ticket_list='.$cat['id'];
 		$response->nbtodo = ($nbobject ?: 0);
 		$visible = json_decode($user->conf->DIGIRISKDOLIBARR_TICKET_SELECTED_DASHBOARD_INFO);
-		$serviceLabel = $service->label;
+		$serviceLabel = $service->id;
 		$catID = $cat['id'];
 		$response->visible = $visible->$serviceLabel->$catID;
+
 		return $response;
 	} else {
 		return -1;

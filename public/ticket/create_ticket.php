@@ -458,12 +458,6 @@ if ( ! empty($mainCategoryObject) && $mainCategoryObject > 0) {
 
 		</div>
 	</div>
-	<div class="form-element" style="margin-bottom: 1em; margin-top: 1em">
-		<span class="form-label"><?php print $langs->trans("Service"); ?></span>
-		<?php
-			print $digiriskelement->select_digiriskelement_list(GETPOST('options_digiriskdolibarr_ticket_service'), 'options_digiriskdolibarr_ticket_service', '', $langs->trans('PleaseSelectADigiriskElement'), 0, array(), 0, 0, 'minwidth100', 0, false, 1);
-		?>
-	</div>
 
 	<?php include DOL_DOCUMENT_ROOT . '/core/tpl/extrafields_add.tpl.php'; ?>
 

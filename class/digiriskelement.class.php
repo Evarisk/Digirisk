@@ -505,6 +505,7 @@ class DigiriskElement extends CommonObject
 			$i                    = 0;
 
 			$textifempty          = (($showempty && ! is_numeric($showempty)) ? $langs->trans($showempty) : '');
+
 			if ($showempty) $out .= '<option value="-1">' . $textifempty . '</option>' . "\n";
 
 			if ( ! $noroot) $out .= '<option value="0" selected>' . $langs->trans('Root') . ' : ' . $conf->global->MAIN_INFO_SOCIETE_NOM . '</option>';

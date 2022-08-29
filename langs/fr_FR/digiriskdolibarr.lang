@@ -902,6 +902,8 @@ DIGIRISKELEMENTSharing = Partage des des groupements et unités de travail
 DIGIRISKELEMENTSharingDescription = Sélection des entités qui partageront leurs groupements et unités de travail avec cette entité.
 DigiriskElementSharedTooltip = Cette option permet de partager les groupements et unités de travail. <br> INFO : Si vous souhaitez pouvoir afficher les tâches, il faut activer l'option de partage des projets.
 PleaseSelectADigiriskElement = Sélectionner un groupement ou une unité de travail...
+Registers = Registres
+
 
 #
 # Groupment - Groupement

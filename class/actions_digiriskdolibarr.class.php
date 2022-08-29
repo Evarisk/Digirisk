@@ -149,12 +149,26 @@ class ActionsDigiriskdolibarr
 				if(is_numeric($object->array_options['options_digiriskdolibarr_ticket_service'])) {
 					require_once __DIR__ . './digiriskelement.class.php';
 					$digiriskelement = new DigiriskElement($db);
-					$selectDictionnary = $digiriskelement->select_digiriskelement_list($object->array_options['options_digiriskdolibarr_ticket_service'], 'options_digiriskdolibarr_ticket_service', '', 1, 0, array(), 0, 0, 'minwidth100', 0, false, 0);
+					$selectDigiriskElement = $digiriskelement->select_digiriskelement_list($object->array_options['options_digiriskdolibarr_ticket_service'], 'options_digiriskdolibarr_ticket_service', '', 1, 0, array(), 0, 0, 'minwidth100', 0, false, 1);
 				}
 				?>
 				<script>
 					jQuery('#options_digiriskdolibarr_ticket_service').remove()
-					jQuery('.ticket_extras_digiriskdolibarr_ticket_service form').prepend(<?php echo json_encode($selectDictionnary) ; ?>)
+					jQuery('.ticket_extras_digiriskdolibarr_ticket_service form').prepend(<?php echo json_encode($selectDigiriskElement) ; ?>)
+				</script>
+				<?php
+			}
+			if (GETPOST('action') == 'create') {
+				require_once __DIR__ . '/../lib/digiriskdolibarr_function.lib.php';
+
+				require_once __DIR__ . './digiriskelement.class.php';
+				$digiriskelement = new DigiriskElement($db);
+				$selectDigiriskElement = $digiriskelement->select_digiriskelement_list(0, 'options_digiriskdolibarr_ticket_service', '', 1, 0, array(), 0, 0, 'minwidth500', 0, false, 1);
+				?>
+				<script>
+					jQuery('#options_digiriskdolibarr_ticket_service').remove()
+					jQuery('#ticket_extras_digiriskdolibarr_ticket_service').remove()
+					jQuery('td.ticket_extras_digiriskdolibarr_ticket_service').append(<?php echo json_encode($selectDigiriskElement) ; ?>)
 				</script>
 				<?php
 			}
@@ -293,6 +307,13 @@ class ActionsDigiriskdolibarr
 				}
 			}
 		} else if ($parameters['currentcontext'] == 'publicnewticketcard') {
+			require_once __DIR__ . '/../lib/digiriskdolibarr_function.lib.php';
+
+			require_once __DIR__ . './digiriskelement.class.php';
+			$digiriskelement = new DigiriskElement($db);
+			$selectDigiriskElement = '<span>'. $langs->trans('Service') .'</span>';
+			$selectDigiriskElement .= $digiriskelement->select_digiriskelement_list(0, 'options_digiriskdolibarr_ticket_service', '', $langs->trans('PleaseSelectADigiriskElement'), 0, array(), 0, 0, 'minwidth500', 0, false, 1);
+			$selectDigiriskElement .= '<div><br></div>';
 			?>
 			<script>
 				let date = new Date();
@@ -309,6 +330,11 @@ class ActionsDigiriskdolibarr
 				jQuery('#options_digiriskdolibarr_ticket_dateyear').val(date.getFullYear());
 				jQuery('#options_digiriskdolibarr_ticket_datehour').val((hour < 10 ? '0' : '') + hour);
 				jQuery('#options_digiriskdolibarr_ticket_datemin').val((min < 10 ? '0' : '') + min);
+
+				jQuery('#options_digiriskdolibarr_ticket_service').remove()
+				jQuery('.select2.select2-container.select2-container--default').remove()
+
+				jQuery('.wpeo-form.tableforinputfields').prepend(<?php echo json_encode($selectDigiriskElement) ; ?>)
 			</script>
 			<?php
 		}

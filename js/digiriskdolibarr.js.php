@@ -3747,6 +3747,7 @@ window.eoxiaJS.ticket.closeDashBoardInfo = function() {
 		contentType: false,
 		success: function ( resp ) {
 			console.log(resp)
+			console.log($(resp).find('.add-widget-box').children())
 			box.closest('.box-flex-item').fadeOut(400)
             $('.add-widget-box').attr('style', '')
 			$('.add-widget-box').html($(resp).find('.add-widget-box').children())
