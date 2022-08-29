@@ -1706,7 +1706,6 @@ class modDigiriskdolibarr extends DolibarrModules
 		$extra_fields->addExtraField('fk_accident', $langs->transnoentities("AccidentLinked"), 'sellist', 1040, '', 'projet_task', 0, 0, '', 'a:1:{s:7:"options";a:1:{s:54:"digiriskdolibarr_accident:ref:rowid::entity = $ENTITY$";N;}}', '', '', 1);
 
 		$extra_fields->delete('digiriskdolibarr_ticket_service', 'ticket');
-		$extra_fields->addExtraField('digiriskdolibarr_ticket_service', $langs->transnoentities("Service"), 'sellist', 2300, '255', 'ticket', 0, 0, '', 'a:1:{s:7:"options";a:1:{s:61:"digiriskdolibarr_digiriskelement:ref:rowid::entity = $ENTITY$";N;}}', '', '', 1, '','',0);
 
 		//Used for data import from Digirisk Wordpress
 		$extra_fields->update('wp_digi_id', $langs->trans("WPDigiID"), 'int', 100, 'digiriskdolibarr_digiriskelement', 0, 0, 1020, '', '', '', 0);
