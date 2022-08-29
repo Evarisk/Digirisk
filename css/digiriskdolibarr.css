@@ -124,6 +124,27 @@
   margin-right: 2px;
 }
 
+.box-flex-item .close-dashboard-info {
+  width: 20px;
+  height: 20px;
+  line-height: 20px;
+  text-align: center;
+  border-radius: 50%;
+  background: #e3e3e3;
+  -webkit-transition: all 0.2s ease-out;
+  transition: all 0.2s ease-out;
+  position: absolute;
+  top: -5px;
+  right: -5px;
+}
+.box-flex-item .close-dashboard-info:hover {
+  cursor: pointer;
+  background: #e05353;
+  color: #fff;
+  -webkit-transform: scale(1.2);
+  transform: scale(1.2);
+}
+
 /*--------------------------------------------------------------
 	Module : Dropdown
 	Version : 1.0.0
