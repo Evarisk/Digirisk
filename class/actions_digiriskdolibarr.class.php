@@ -161,6 +161,24 @@ class ActionsDigiriskdolibarr
 				</script>
 				<?php
 			}
+			if (GETPOST('action') == 'create') {
+				require_once __DIR__ . '/../lib/digiriskdolibarr_function.lib.php';
+
+				$selectDictionnary = '<tr class="valuefieldcreate ticket_extras_digiriskdolibarr_ticket_service trextrafields_collapse" data-element="extrafield" data-targetelement="ticket" data-targetid=""><td class="wordbreak">'.$langs->trans('Service').'</td>';
+				$selectDictionnary .= '<td class="ticket_extras_digiriskdolibarr_ticket_service">';
+				if(!$conf->global->DIGIRISKDOLIBARR_SHOW_DIGIRISKELEMENT_ON_SELECT_SERVICE) {
+					$selectDictionnary .= digirisk_select_dictionary('options_digiriskdolibarr_ticket_service', 'c_services', 'label', 'label', GETPOST('options_digiriskdolibarr_ticket_service'), 1, '', 'PleaseSelectAService', 'minwidth400');
+				} else {
+					$selectDictionnary .= $digiriskelement->select_digiriskelement_list(GETPOST('options_digiriskdolibarr_ticket_service'), 'options_digiriskdolibarr_ticket_service', '', 1, 0, array(), 0, 0, 'minwidth400', 0, false, 1);
+				}
+				$selectDictionnary .= '</td>';
+				$selectDictionnary .= '</tr>';
+				?>
+				<script>
+					jQuery('tr.ticket_extras_digiriskdolibarr_ticket_firstname').after(<?php echo json_encode($selectDictionnary) ; ?>)
+				</script>
+				<?php
+			}
 		} else if (($parameters['currentcontext'] == 'projecttaskcard') || ($parameters['currentcontext'] == 'projecttaskscard') || ($parameters['currentcontext'] == 'tasklist')) {
 			if ((GETPOST('action') == '' || empty(GETPOST('action')) || GETPOST('action') != 'edit')) {
 				require_once __DIR__ . '/../../../projet/class/task.class.php';

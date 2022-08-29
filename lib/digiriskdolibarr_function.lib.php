@@ -2030,7 +2030,7 @@ function getNomUrlProject($project, $withpicto = 0, $option = '', $addlabel = 0,
  *  @param  string  $moreattrib         More attributes on HTML select tag
  * 	@return	void
  */
-function digirisk_select_dictionary($htmlname, $dictionarytable, $keyfield = 'code', $labelfield = 'label', $selected = '', $useempty = 0, $moreattrib = '', $placeholder = '')
+function digirisk_select_dictionary($htmlname, $dictionarytable, $keyfield = 'code', $labelfield = 'label', $selected = '', $useempty = 0, $moreattrib = '', $placeholder = '', $morecss = '')
 {
 	// phpcs:enable
 	global $langs, $db;
@@ -2047,7 +2047,7 @@ function digirisk_select_dictionary($htmlname, $dictionarytable, $keyfield = 'co
 		$num = $db->num_rows($result);
 		$i   = 0;
 		if ($num) {
-			$out .= '<select id="select' . $htmlname . '" class="flat selectdictionary" name="' . $htmlname . '"' . ($moreattrib ? ' ' . $moreattrib : '') . '>';
+			$out .= '<select id="select' . $htmlname . '" class="flat selectdictionary' . ($morecss ? ' ' . $morecss : '') . '" name="' . $htmlname . '"' . ($moreattrib ? ' ' . $moreattrib : '') . '>';
 			if ($useempty == 1 || ($useempty == 2 && $num > 1)) {
 				$out .= '<option value="-1">'. (dol_strlen($placeholder) > 0 ? $langs->transnoentities($placeholder) : '') .'&nbsp;</option>';
 			}
