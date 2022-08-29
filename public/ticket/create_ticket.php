@@ -460,13 +460,8 @@ if ( ! empty($mainCategoryObject) && $mainCategoryObject > 0) {
 	</div>
 	<div class="form-element" style="margin-bottom: 1em; margin-top: 1em">
 		<span class="form-label"><?php print $langs->trans("Service"); ?></span>
-
 		<?php
-		if(!$conf->global->DIGIRISKDOLIBARR_SHOW_DIGIRISKELEMENT_ON_SELECT_SERVICE) {
-			print digirisk_select_dictionary('options_digiriskdolibarr_ticket_service', 'c_services', 'label', 'label', GETPOST('options_digiriskdolibarr_ticket_service'), 1, '', 'PleaseSelectAService');
-		} else {
-			print $digiriskelement->select_digiriskelement_list(GETPOST('options_digiriskdolibarr_ticket_service'), 'options_digiriskdolibarr_ticket_service', '', 1, 0, array(), 0, 0, 'minwidth100', 0, false, 1);
-		}
+			print $digiriskelement->select_digiriskelement_list(GETPOST('options_digiriskdolibarr_ticket_service'), 'options_digiriskdolibarr_ticket_service', '', $langs->trans('PleaseSelectADigiriskElement'), 0, array(), 0, 0, 'minwidth100', 0, false, 1);
 		?>
 	</div>
 

@@ -150,10 +150,7 @@ class ActionsDigiriskdolibarr
 					require_once __DIR__ . './digiriskelement.class.php';
 					$digiriskelement = new DigiriskElement($db);
 					$selectDictionnary = $digiriskelement->select_digiriskelement_list($object->array_options['options_digiriskdolibarr_ticket_service'], 'options_digiriskdolibarr_ticket_service', '', 1, 0, array(), 0, 0, 'minwidth100', 0, false, 0);
-				} else {
-					$selectDictionnary = digirisk_select_dictionary('options_digiriskdolibarr_ticket_service', 'c_services', 'label', 'label', $object->array_options['options_digiriskdolibarr_ticket_service'], 1, '', 'PleaseSelectAService');
 				}
-
 				?>
 				<script>
 					jQuery('#options_digiriskdolibarr_ticket_service').remove()

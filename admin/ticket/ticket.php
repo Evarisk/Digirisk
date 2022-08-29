@@ -530,52 +530,6 @@ if ( ! empty($conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE)) {
 	print '</table>';
 	print '</div>';
 
-	// Link to services dictionary
-	print load_fiche_titre($langs->transnoentities("ServiceDictionary"), '', '');
-
-	print '<div class="div-table-responsive-no-min">';
-	print '<table class="noborder centpercent">';
-	print '<tr class="liste_titre">';
-	print '<td>' . $langs->transnoentities("Parameters") . '</td>';
-	print '<td class="center">' . $langs->transnoentities("Status") . '</td>';
-	print '<td class="center">' . $langs->transnoentities("Action") . '</td>';
-	print '<td class="center">' . $langs->transnoentities("ShortInfo") . '</td>';
-	print '</tr>';
-
-	print '<form method="POST" action="' . $_SERVER["PHP_SELF"] . '">';
-	print '<input type="hidden" name="token" value="' . newToken() . '">';
-	print '<input type="hidden" name="action" value="generateExtrafields">';
-	print '<input type="hidden" name="backtopage" value="' . $backtopage . '">';
-
-
-	print '<tr class="oddeven"><td>' . $langs->transnoentities("ConfigServiceDictionary");
-	print '<td class="center">';
-	print '</td>';
-	print '<td class="center">';
-	print '<a href="'. '/dolibarr/htdocs/admin/dict.php' .'" target="_blank">' .$langs->transnoentities('ServicesConfigIsOnThisPage', dol_buildpath('/admin/dict.php')) . '</a>';
-	print '</td>';
-
-	print '<td class="center">';
-	print $form->textwithpicto('', $langs->transnoentities("ExtrafieldsGeneration"), 1, 'help');
-	print '</td>';
-	print '</tr>';
-
-	print '<tr class="oddeven"><td>' . $langs->transnoentities("ShowDigiriskElementOnSelectService");
-	print '<td class="center">';
-	print ajax_constantonoff('DIGIRISKDOLIBARR_SHOW_DIGIRISKELEMENT_ON_SELECT_SERVICE');
-	print '</td>';
-	print '<td class="center">';
-	print '</td>';
-
-	print '<td class="center">';
-	print $form->textwithpicto('', $langs->transnoentities("ExtrafieldsGeneration"), 1, 'help');
-	print '</td>';
-	print '</tr>';
-	print '</form>';
-
-	print '</table>';
-	print '</div>';
-
 	// QR Code generation
 	print load_fiche_titre($langs->transnoentities("QRCodeGeneration"), '', '');
 
