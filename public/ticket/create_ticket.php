@@ -455,7 +455,6 @@ if ( ! empty($mainCategoryObject) && $mainCategoryObject > 0) {
 					</div>
 				</div>
 			</div>
-
 		</div>
 	</div>
 
