@@ -1712,7 +1712,8 @@ class modDigiriskdolibarr extends DolibarrModules
 			$extra_fields->update('digiriskdolibarr_ticket_service', $langs->transnoentities("GP/UT"), 'sellist', '', 'ticket', 0, 0, 2300, 'a:1:{s:7:"options";a:1:{s:61:"digiriskdolibarr_digiriskelement:ref:rowid::entity = $ENTITY$";N;}}', '', '', 4, '','','',0);
 			$extra_fields->update('digiriskdolibarr_ticket_location', $langs->transnoentities("Location"), 'varchar', '255', 'ticket', 0, 0, 2400, '', 1, '', 1, '','','',0);
 			$extra_fields->update('digiriskdolibarr_ticket_date', $langs->transnoentities("Date"), 'datetime', '', 'ticket', 0, 0, 2500, '', 1, '', 1, '','','',0);
-			}
+			dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_TICKET_EXTRAFIELDS', 1, 'integer', 0, '', 0);
+		}
 
 		//Used for data import from Digirisk Wordpress
 		$extra_fields->update('wp_digi_id', $langs->trans("WPDigiID"), 'int', 100, 'digiriskdolibarr_digiriskelement', 0, 0, 1020, '', '', '', 0);
