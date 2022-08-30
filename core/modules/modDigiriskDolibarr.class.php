@@ -1705,14 +1705,32 @@ class modDigiriskdolibarr extends DolibarrModules
 		$extra_fields->update('fk_accident', $langs->transnoentities("AccidentLinked"), 'sellist', '', 'projet_task', 0, 0, 1040, 'a:1:{s:7:"options";a:1:{s:54:"digiriskdolibarr_accident:ref:rowid::entity = $ENTITY$";N;}}', '', '', 1);
 		$extra_fields->addExtraField('fk_accident', $langs->transnoentities("AccidentLinked"), 'sellist', 1040, '', 'projet_task', 0, 0, '', 'a:1:{s:7:"options";a:1:{s:54:"digiriskdolibarr_accident:ref:rowid::entity = $ENTITY$";N;}}', '', '', 1);
 
-		if (dolibarr_get_const($this->db, 'DIGIRISKDOLIBARR_TICKET_EXTRAFIELDS', 0) || dolibarr_get_const($this->db, 'DIGIRISKDOLIBARR_TICKET_EXTRAFIELDS', $conf->entity)) {
-			$extra_fields->update('digiriskdolibarr_ticket_firstname', $langs->transnoentities("FirstName"), 'varchar', '255', 'ticket', 0, 0, 2000, '', 1, '', 1, '','','',0);
-			$extra_fields->update('digiriskdolibarr_ticket_lastname', $langs->transnoentities("LastName"), 'varchar', '255', 'ticket', 0, 0, 2100, '', 1, '', 1, '','','',0);
-			$extra_fields->update('digiriskdolibarr_ticket_phone', $langs->transnoentities("Phone"), 'phone', '', 'ticket', 0, 0, 2200, '', '', 1, 1, '','','',0);
-			$extra_fields->update('digiriskdolibarr_ticket_service', $langs->transnoentities("GP/UT"), 'sellist', '', 'ticket', 0, 0, 2300, 'a:1:{s:7:"options";a:1:{s:61:"digiriskdolibarr_digiriskelement:ref:rowid::entity = $ENTITY$";N;}}', '', '', 4, '','','',0);
-			$extra_fields->update('digiriskdolibarr_ticket_location', $langs->transnoentities("Location"), 'varchar', '255', 'ticket', 0, 0, 2400, '', 1, '', 1, '','','',0);
-			$extra_fields->update('digiriskdolibarr_ticket_date', $langs->transnoentities("Date"), 'datetime', '', 'ticket', 0, 0, 2500, '', 1, '', 1, '','','',0);
+		if (!$conf->global->DIGIRISKDOLIBARR_TICKET_EXTRAFIELDS_BACKWARD_COMPATIBILITY && (dolibarr_get_const($this->db, 'DIGIRISKDOLIBARR_TICKET_EXTRAFIELDS', 0) || dolibarr_get_const($this->db, 'DIGIRISKDOLIBARR_TICKET_EXTRAFIELDS', $conf->entity))) {
+			if ($conf->multicompany->enabled) {
+				$current_entity = $conf->entity;
+				$object = new ActionsMulticompany($this->db);
+
+				$entities = $object->getEntitiesList(false, false, true, true);
+				foreach ($entities as $sub_entity => $entity_name) {
+					$conf->setEntityValues($this->db, $sub_entity);
+					$extra_fields->delete('digiriskdolibarr_ticket_firstname', 'ticket');
+					$extra_fields->delete('digiriskdolibarr_ticket_lastname', 'ticket');
+					$extra_fields->delete('digiriskdolibarr_ticket_phone', 'ticket');
+					$extra_fields->delete('digiriskdolibarr_ticket_service', 'ticket');
+					$extra_fields->delete('digiriskdolibarr_ticket_location', 'ticket');
+					$extra_fields->delete('digiriskdolibarr_ticket_date', 'ticket');
+				}
+				$conf->setEntityValues($this->db, $current_entity);
+			}
+
+			$extra_fields->addExtraField('digiriskdolibarr_ticket_lastname', $langs->transnoentities("LastName"), 'varchar', 2000, 255, 'ticket', 0, 0, '', '', 1, '', 1, '', '', 0);
+			$extra_fields->addExtraField('digiriskdolibarr_ticket_firstname', $langs->transnoentities("FirstName"), 'varchar', 2100, 255, 'ticket', 0, 0, '', '', 1, '', 1, '', '', 0);
+			$extra_fields->addExtraField('digiriskdolibarr_ticket_phone', $langs->transnoentities("Phone"), 'phone', 2200, '', 'ticket', 0, 0, '', '', 1, '', 1, '', '', 0);
+			$extra_fields->addExtraField('digiriskdolibarr_ticket_service', $langs->transnoentities("Service"), 'sellist', 2300, '255', 'ticket', 0, 0, '', 'a:1:{s:7:"options";a:1:{s:61:"digiriskdolibarr_digiriskelement:ref:rowid::entity = $ENTITY$";N;}}', 1, '', 4, '','',0);
+			$extra_fields->addExtraField('digiriskdolibarr_ticket_location', $langs->transnoentities("Location"), 'varchar', 2400, 255, 'ticket', 0, 0, '', '', 1, '', 1, '', '', 0);
+			$extra_fields->addExtraField('digiriskdolibarr_ticket_date', $langs->transnoentities("Date"), 'datetime', 2500, '', 'ticket', 0, 0, '', '', 1, '', 1, '', '', 0);
 			dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_TICKET_EXTRAFIELDS', 1, 'integer', 0, '', 0);
+			dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_TICKET_EXTRAFIELDS_BACKWARD_COMPATIBILITY', 1, 'integer', 0, '', 0);
 		}
 
 		//Used for data import from Digirisk Wordpress
