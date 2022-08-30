@@ -139,7 +139,7 @@ if (empty($conf->global->MAIN_DISABLE_WORKBOARD)) {
 					$openedDashBoard .= '<span class="close-dashboard-info" data-label="'.$service->id.'" data-catid="'.$board->id.'"><i class="fas fa-times"></i></span>';
 					$openedDashBoard .= '</div>';
 					$openedDashBoard .= '<div class="info-box-lines">';
-					$openedDashBoard .= '<div class="info-box-line">';
+					$openedDashBoard .= '<div class="info-box-line" style="font-size : 20px;">';
 					$openedDashBoard .= '<span class=""><strong>' . $board->label . '</strong>';
 					$openedDashBoard .= '<a href="' . $board->url . '" class="info-box-text info-box-text-a">';
 					$openedDashBoard .= '<span class="classfortooltip badge badge-info" title="' . $board->label . $board->nbtodo . '" >' . $board->nbtodo . '</span>';
@@ -186,7 +186,7 @@ if (empty($conf->global->MAIN_DISABLE_WORKBOARD)) {
 							$openedDashBoard .= '<span class="close-dashboard-info" data-label="'.$service->id.'" data-catid="'.$board->id.'"><i class="fas fa-times"></i></span>';
 							$openedDashBoard .= '</div>';
 							$openedDashBoard .= '<div class="info-box-lines">';
-							$openedDashBoard .= '<div class="info-box-line">';
+							$openedDashBoard .= '<div class="info-box-line" style="font-size : 20px;">';
 							$openedDashBoard .= '<span class=""><strong>' . $board->label . '</strong>';
 							$openedDashBoard .= '<a href="' . $board->url . '" class="info-box-text info-box-text-a">';
 							$openedDashBoard .= '<span class="classfortooltip badge badge-info" title="' . $board->label . $board->nbtodo . '" >' . $board->nbtodo . '</span>';
