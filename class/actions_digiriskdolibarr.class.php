@@ -94,7 +94,7 @@ class ActionsDigiriskdolibarr
 			}
 			print ajax_combobox('selectDIGIRISKDOLIBARR_COLLECTIVE_AGREEMENT_TITLE');
 		} else if ($parameters['currentcontext'] == 'ticketcard') {
-			if (GETPOST('action') == 'view' || empty(GETPOST('action'))) {
+			if (GETPOST('action') == 'view' || empty(GETPOST('action')) || GETPOST('action') == 'update_extras') {
 				print '<link rel="stylesheet" type="text/css" href="../custom/digiriskdolibarr/css/digiriskdolibarr.css">';
 
 				require_once __DIR__ . '/../lib/digiriskdolibarr_function.lib.php';
@@ -155,20 +155,6 @@ class ActionsDigiriskdolibarr
 				<script>
 					jQuery('#options_digiriskdolibarr_ticket_service').remove()
 					jQuery('.ticket_extras_digiriskdolibarr_ticket_service form').prepend(<?php echo json_encode($selectDigiriskElement) ; ?>)
-				</script>
-				<?php
-			}
-			if (GETPOST('action') == 'create') {
-				require_once __DIR__ . '/../lib/digiriskdolibarr_function.lib.php';
-
-				require_once __DIR__ . './digiriskelement.class.php';
-				$digiriskelement = new DigiriskElement($db);
-				$selectDigiriskElement = $digiriskelement->select_digiriskelement_list(0, 'options_digiriskdolibarr_ticket_service', '', 1, 0, array(), 0, 0, 'minwidth500', 0, false, 1);
-				?>
-				<script>
-					jQuery('#options_digiriskdolibarr_ticket_service').remove()
-					jQuery('#ticket_extras_digiriskdolibarr_ticket_service').remove()
-					jQuery('td.ticket_extras_digiriskdolibarr_ticket_service').append(<?php echo json_encode($selectDigiriskElement) ; ?>)
 				</script>
 				<?php
 			}
