@@ -1427,6 +1427,9 @@ Administrative = Administratif
 Accountancy = Comptabilité
 TicketCreationSubject = Création de ticket via l'interface publique de Digirisk
 TicketDocumentCustomDigiriskTemplate = ODT custom des fiches de tickets
+HowToSetupDigiriskElement = Pour configurer les éléments de digirisk (groupements/unités de travail), veuillez cliquer sur ce lien :
+ConfigDigiriskElement = Configuration des éléments de digirisk
+
 
 
 # Ticket document
