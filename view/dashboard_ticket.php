@@ -40,6 +40,7 @@ require_once DOL_DOCUMENT_ROOT . '/categories/class/categorie.class.php';
 
 require_once './../lib/digiriskdolibarr_function.lib.php';
 require_once __DIR__ . '/../class/digiriskelement.class.php';
+
 global $conf, $db, $langs, $user;
 
 // Load translation files required by the page
@@ -58,9 +59,6 @@ $permissiontoread = $user->rights->digiriskdolibarr->lire;
 // Security check
 if ( ! $permissiontoread && $user->rights->ticket->read) accessforbidden();
 
-/*
- * Actions
- */
 /*
  * View
  */

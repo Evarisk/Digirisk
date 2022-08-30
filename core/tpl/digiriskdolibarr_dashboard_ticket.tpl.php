@@ -1,4 +1,7 @@
 <?php
+/*
+ * Actions
+ */
 
 if ( $action == 'adddashboardinfo' && $permissiontoread) {
 	$data = json_decode(file_get_contents('php://input'), true);
@@ -30,6 +33,10 @@ if ( $action == 'closedashboardinfo' && $permissiontoread) {
 	$action = '';
 }
 
+/*
+ * View
+ */
+
 if (empty($conf->global->MAIN_DISABLE_WORKBOARD)) {
 	print '<form method="POST" action="' . $_SERVER["PHP_SELF"] . '" class="dashboardticket" id="dashBoardTicketForm">';
 	print '<input type="hidden" name="token" value="' . newToken() . '">';
@@ -37,7 +44,6 @@ if (empty($conf->global->MAIN_DISABLE_WORKBOARD)) {
 
 	//Array that contains all WorkboardResponse classes to process them
 	$dashboardlines = array();
-	$tabparam['DIGIRISKDOLIBARR_TICKET_SELECTED_DASHBOARD_INFO_INITIALIZED'] = 0;
 
 	// Do not include sections without management permission
 	require_once DOL_DOCUMENT_ROOT.'/core/class/workboardresponse.class.php';
@@ -48,6 +54,8 @@ if (empty($conf->global->MAIN_DISABLE_WORKBOARD)) {
 			$digiriskelementlist[$digiriskelementobject['object']->id] = $digiriskelementobject['object'];
 		}
 	}
+
+	$digiriskelementlist = dol_sort_array($digiriskelementlist, 'ranks');
 
 	$categorie = new Categorie($db);
 
@@ -70,29 +78,6 @@ if (empty($conf->global->MAIN_DISABLE_WORKBOARD)) {
 		exit;
 	}
 
-	$tabparam = array();
-	if (is_array($digiriskelementlist) && !empty($digiriskelementlist)) {
-		foreach ($digiriskelementlist as $service) {
-			if (is_array($arrayCats) && !empty($arrayCats)) {
-				foreach ($arrayCats as $key => $cat) {
-					if (!empty($conf->ticket->enabled) && $user->rights->ticket->read) {
-						if ($tabparam['DIGIRISKDOLIBARR_TICKET_SELECTED_DASHBOARD_INFO_INITIALIZED'] == 0) {
-							$tabparam['DIGIRISKDOLIBARR_TICKET_SELECTED_DASHBOARD_INFO'][$service->id][$cat['id']] = 1;
-						}
-					}
-				}
-			}
-		}
-
-		$confArray = json_decode(json_encode($user->conf), TRUE);
-
-		if ((empty($confArray) && $tabparam['DIGIRISKDOLIBARR_TICKET_SELECTED_DASHBOARD_INFO_INITIALIZED'] == 0)) {
-			$tabparam['DIGIRISKDOLIBARR_TICKET_SELECTED_DASHBOARD_INFO_INITIALIZED'] = 1;
-			$tabparam['DIGIRISKDOLIBARR_TICKET_SELECTED_DASHBOARD_INFO'] = json_encode($tabparam['DIGIRISKDOLIBARR_TICKET_SELECTED_DASHBOARD_INFO']);
-			dol_set_user_param($db, $conf, $user, $tabparam);
-		}
-	}
-
 	$selectedDashboardInfos = json_decode($user->conf->DIGIRISKDOLIBARR_TICKET_SELECTED_DASHBOARD_INFO);
 	if (!empty($selectedDashboardInfos)) {
 		foreach ($selectedDashboardInfos as $key => $selectedDashboardInfo) {
@@ -100,7 +85,7 @@ if (empty($conf->global->MAIN_DISABLE_WORKBOARD)) {
 				if ($DashboardInfo == 0) {
 					$category->fetch($keycat);
 					$digiriskelement->fetch($key);
-					$disabled_services[] = $digiriskelement->ref . ' - ' . $digiriskelement->label . ' : ' . $langs->transnoentities('TotalTagByService', $category->label);
+					$disabled_services[] = $digiriskelement->id . ' : ' . $digiriskelement->ref . ' - ' . $digiriskelement->label . ' : ' . $category->id . ' : ' . $langs->transnoentities('TotalTagByService', $category->label);
 				}
 			}
 		}

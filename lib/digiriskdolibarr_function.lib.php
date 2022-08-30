@@ -2894,7 +2894,7 @@ function digirisk_check_secure_access_document($modulepart, $original_file, $ent
  */
 function load_board($user, $cat, $service)
 {
-	global $db, $langs;
+	global $db;
 
 	$categorie = new Categorie($db);
 
@@ -2909,12 +2909,9 @@ function load_board($user, $cat, $service)
 		}
 	}
 
-
 	if (!empty($arrayCountObject)) {
 		$nbobject = count($arrayCountObject);
 	}
-
-
 
 	if ($allObjects > 0) {
 		$response = new WorkboardResponse();
@@ -2926,8 +2923,11 @@ function load_board($user, $cat, $service)
 		$visible = json_decode($user->conf->DIGIRISKDOLIBARR_TICKET_SELECTED_DASHBOARD_INFO);
 		$serviceLabel = $service->id;
 		$catID = $cat['id'];
-		$response->visible = $visible->$serviceLabel->$catID;
-
+		if (isset($visible->$serviceLabel->$catID) && $visible->$serviceLabel->$catID == 0){
+			$response->visible = 0;
+		} else {
+			$response->visible = 1;
+		}
 		return $response;
 	} else {
 		return -1;
