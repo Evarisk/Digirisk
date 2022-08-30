@@ -160,15 +160,16 @@ class ActionsDigiriskdolibarr
 			}
 			if (GETPOST('action') == 'create') {
 				require_once __DIR__ . '/../lib/digiriskdolibarr_function.lib.php';
-
-				$selectDictionnary = '<tr class="valuefieldcreate ticket_extras_digiriskdolibarr_ticket_service trextrafields_collapse" data-element="extrafield" data-targetelement="ticket" data-targetid=""><td class="wordbreak">'.$langs->trans('Service').'</td>';
-				$selectDictionnary .= '<td class="ticket_extras_digiriskdolibarr_ticket_service">';
-				$selectDictionnary .= $digiriskelement->select_digiriskelement_list(GETPOST('options_digiriskdolibarr_ticket_service'), 'options_digiriskdolibarr_ticket_service', '', 1, 0, array(), 0, 0, 'minwidth400', 0, false, 1);
-				$selectDictionnary .= '</td>';
-				$selectDictionnary .= '</tr>';
+				require_once __DIR__ . './digiriskelement.class.php';
+				$digiriskelement = new DigiriskElement($db);
+				$selectDigiriskElement = '<tr class="valuefieldcreate ticket_extras_digiriskdolibarr_ticket_service trextrafields_collapse" data-element="extrafield" data-targetelement="ticket" data-targetid=""><td class="wordbreak">'.$langs->trans('Service').'</td>';
+				$selectDigiriskElement .= '<td class="ticket_extras_digiriskdolibarr_ticket_service">';
+				$selectDigiriskElement .= $digiriskelement->select_digiriskelement_list(GETPOST('options_digiriskdolibarr_ticket_service'), 'options_digiriskdolibarr_ticket_service', '', 1, 0, array(), 0, 0, 'minwidth500', 0, false, 1);
+				$selectDigiriskElement .= '</td>';
+				$selectDigiriskElement .= '</tr>';
 				?>
 				<script>
-					jQuery('tr.ticket_extras_digiriskdolibarr_ticket_firstname').after(<?php echo json_encode($selectDictionnary) ; ?>)
+					jQuery('tr.ticket_extras_digiriskdolibarr_ticket_firstname').after(<?php echo json_encode($selectDigiriskElement) ; ?>)
 				</script>
 				<?php
 			}
