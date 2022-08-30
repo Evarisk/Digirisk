@@ -885,13 +885,13 @@ workunitdocument.odt = Fiche d'Unité de travail
 #
 
 # Rights  - Droits
-ReadDigiriskElement = Consulter les éléments digirisk
-CreateDigiriskElement = Créer/Modifier les éléments digirisk
-DeleteDigiriskElement = Supprimer les éléments digirisk
+ReadDigiriskElement = Consulter les éléments Digirisk
+CreateDigiriskElement = Créer/Modifier les éléments Digirisk
+DeleteDigiriskElement = Supprimer les éléments Digirisk
 HiddenElements = Corbeille
 
 # Data - Donnée
-NewDigiriskElement = Nouveau élément digirisk
+NewDigiriskElement = Nouveau élément Digirisk
 GPUTOrganization = Organisation des GP/UT
 DigiriskElement = Élément Digirisk
 ElementType = Type d'élément
@@ -1426,8 +1426,8 @@ ANewTicketHasBeenSubmitted = Un nouveau ticket a été créé via l'interface pu
 SeeTicketUrl = Voir le ticket :
 TicketCreationSubject = Création de ticket via l'interface publique de Digirisk
 TicketDocumentCustomDigiriskTemplate = ODT custom des fiches de tickets
-HowToSetupDigiriskElement = Pour configurer les éléments de digirisk (groupements/unités de travail), veuillez cliquer sur ce lien :
-ConfigDigiriskElement = Configuration des éléments de digirisk
+HowToSetupDigiriskElement = Pour configurer les éléments de Digirisk (groupements/unités de travail), veuillez cliquer sur ce lien :
+ConfigDigiriskElement = Configuration des éléments de Digirisk
 
 
 
