@@ -1,4 +1,11 @@
 .box-flex-item {
+  .info-box-icon {
+    display: flex;
+
+    img, i {
+      margin: auto;
+    }
+  }
   .close-dashboard-info {
     width: 20px;
     height: 20px;
@@ -16,6 +23,10 @@
       background: $color__red;
       color: #fff;
       transform: scale(1.2);
+    }
+    > [class*="fa"] {
+      display: inline-block;
+      line-height: 20px;
     }
   }
 }

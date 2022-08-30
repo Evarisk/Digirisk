@@ -124,6 +124,14 @@
   margin-right: 2px;
 }
 
+.box-flex-item .info-box-icon {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+}
+.box-flex-item .info-box-icon img, .box-flex-item .info-box-icon i {
+  margin: auto;
+}
 .box-flex-item .close-dashboard-info {
   width: 20px;
   height: 20px;
@@ -143,6 +151,10 @@
   color: #fff;
   -webkit-transform: scale(1.2);
   transform: scale(1.2);
+}
+.box-flex-item .close-dashboard-info > [class*=fa] {
+  display: inline-block;
+  line-height: 20px;
 }
 
 /*--------------------------------------------------------------
