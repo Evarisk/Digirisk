@@ -163,11 +163,7 @@ class ActionsDigiriskdolibarr
 
 				$selectDictionnary = '<tr class="valuefieldcreate ticket_extras_digiriskdolibarr_ticket_service trextrafields_collapse" data-element="extrafield" data-targetelement="ticket" data-targetid=""><td class="wordbreak">'.$langs->trans('Service').'</td>';
 				$selectDictionnary .= '<td class="ticket_extras_digiriskdolibarr_ticket_service">';
-				if(!$conf->global->DIGIRISKDOLIBARR_SHOW_DIGIRISKELEMENT_ON_SELECT_SERVICE) {
-					$selectDictionnary .= digirisk_select_dictionary('options_digiriskdolibarr_ticket_service', 'c_services', 'label', 'label', GETPOST('options_digiriskdolibarr_ticket_service'), 1, '', 'PleaseSelectAService', 'minwidth400');
-				} else {
-					$selectDictionnary .= $digiriskelement->select_digiriskelement_list(GETPOST('options_digiriskdolibarr_ticket_service'), 'options_digiriskdolibarr_ticket_service', '', 1, 0, array(), 0, 0, 'minwidth400', 0, false, 1);
-				}
+				$selectDictionnary .= $digiriskelement->select_digiriskelement_list(GETPOST('options_digiriskdolibarr_ticket_service'), 'options_digiriskdolibarr_ticket_service', '', 1, 0, array(), 0, 0, 'minwidth400', 0, false, 1);
 				$selectDictionnary .= '</td>';
 				$selectDictionnary .= '</tr>';
 				?>
