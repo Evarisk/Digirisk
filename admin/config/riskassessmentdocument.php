@@ -282,18 +282,20 @@ print '</tr>';
 
 $result = !empty($conf->mc->entities['risk']) ? strpos($conf->mc->entities['risk'], $conf->entity) : 0;
 
-if ($conf->multicompany->enabled && !empty($conf->mc->sharings['risk']) && $result > 0) {
-	print '<tr class="oddeven"><td>';
-	print $langs->trans('ShowSharedRisks');
-	print "</td><td>";
-	print $langs->trans('ShowSharedRisksDescription');
-	print '</td>';
+print '<tr class="oddeven"><td>';
+print $langs->trans('ShowSharedRisks');
+print "</td><td>";
+print $langs->trans('ShowSharedRisksDescription');
+print '</td>';
 
-	print '<td class="center">';
+print '<td class="center">';
+if ($conf->multicompany->enabled && !empty($conf->mc->sharings['risk']) && $result > 0) {
 	print ajax_constantonoff('DIGIRISKDOLIBARR_SHOW_SHARED_RISKS');
-	print '</td>';
-	print '</tr>';
+} else {
+	print $langs->trans('DisabledSharedElement');
 }
+print '</td>';
+print '</tr>';
 
 print '</table>';
 print '<hr>';
@@ -784,18 +786,20 @@ print '</tr>';
 
 $result = !empty($conf->mc->entities['risksign']) ? strpos($conf->mc->entities['risksign'], $conf->entity) : 0;
 
-if ($conf->multicompany->enabled && !empty($conf->mc->sharings['risksign']) && $result > 0) {
-	print '<tr class="oddeven"><td>';
-	print $langs->trans('ShowSharedRiskSigns');
-	print "</td><td>";
-	print $langs->trans('ShowSharedRiskSignsDescription');
-	print '</td>';
+print '<tr class="oddeven"><td>';
+print $langs->trans('ShowSharedRiskSigns');
+print "</td><td>";
+print $langs->trans('ShowSharedRiskSignsDescription');
+print '</td>';
 
-	print '<td class="center">';
+print '<td class="center">';
+if ($conf->multicompany->enabled && !empty($conf->mc->sharings['risksign']) && $result > 0) {
 	print ajax_constantonoff('DIGIRISKDOLIBARR_SHOW_SHARED_RISKSIGNS');
-	print '</td>';
-	print '</tr>';
+} else {
+	print $langs->trans('DisabledSharedElement');
 }
+print '</td>';
+print '</tr>';
 print '</table>';
 
 // Page end

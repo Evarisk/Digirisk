@@ -54,6 +54,7 @@ Security = Sécurité
 HowToSharedElement = Pour plus d'informations sur la configuratiion des éléments partagés, veuillez vous rendre sur ce lien :
 HowToSharedElementLink = https://wiki.dolibarr.org/index.php?title=Module_Digirisk#Configuration
 ConfigSharedElement = Configuratiion des éléments partagés (risques/signalisations)
+DisabledSharedElement = Option désactivée car multi company n'est pas activé ou la configuratiion des éléments partagés (risques/signalisations) n'a pas été effectuée
 
 
 
@@ -1423,8 +1424,6 @@ ConfigTicketCategories = Configuration des catégories de ticket
 NewTicketSubmitted = Un ticket a été soumis via l'interface publique
 ANewTicketHasBeenSubmitted = Un nouveau ticket a été créé via l'interface publique
 SeeTicketUrl = Voir le ticket :
-Administrative = Administratif
-Accountancy = Comptabilité
 TicketCreationSubject = Création de ticket via l'interface publique de Digirisk
 TicketDocumentCustomDigiriskTemplate = ODT custom des fiches de tickets
 HowToSetupDigiriskElement = Pour configurer les éléments de digirisk (groupements/unités de travail), veuillez cliquer sur ce lien :
