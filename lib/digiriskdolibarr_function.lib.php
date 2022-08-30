@@ -2886,13 +2886,13 @@ function digirisk_check_secure_access_document($modulepart, $original_file, $ent
 /**
  * Load indicators for dashboard
  *
- * @param  User	   $user		 User object
- * @param  array   $cat     	 Category info
- * @param  string  $service      Name of service
+ * @param  User	   			$user		 		User object
+ * @param  array   			$cat     	 		Category info
+ * @param  DigiriskElement  $digiriskelement	DigiriskElement object
  * @return WorkboardResponse|int <0 if KO, WorkboardResponse if OK
  * @throws Exception
  */
-function load_board($user, $cat, $service)
+function load_board($user, $cat, $digiriskelement)
 {
 	global $db;
 
@@ -2903,7 +2903,7 @@ function load_board($user, $cat, $service)
 
 	if (is_array($allObjects) && !empty($allObjects)) {
 		foreach ($allObjects as $object) {
-			if (!empty($object->array_options['options_digiriskdolibarr_ticket_service']) && $object->array_options['options_digiriskdolibarr_ticket_service'] == $service->id && $object->fk_statut != 9) {
+			if (!empty($object->array_options['options_digiriskdolibarr_ticket_service']) && $object->array_options['options_digiriskdolibarr_ticket_service'] == $digiriskelement->id && $object->fk_statut != 9) {
 				$arrayCountObject[] = $object;
 			}
 		}
@@ -2918,12 +2918,12 @@ function load_board($user, $cat, $service)
 		$response->id = $cat['id'];
 		$response->img = $cat['photo'];
 		$response->label = $cat['name'] . ' : ';
-		$response->url = DOL_URL_ROOT . '/ticket/list.php?search_options_digiriskdolibarr_ticket_service='.$service->id.'&search_category_ticket_list='.$cat['id'];
+		$response->url = DOL_URL_ROOT . '/ticket/list.php?search_options_digiriskdolibarr_ticket_service='.$digiriskelement->id.'&search_category_ticket_list='.$cat['id'];
 		$response->nbtodo = ($nbobject ?: 0);
-		$visible = json_decode($user->conf->DIGIRISKDOLIBARR_TICKET_SELECTED_DASHBOARD_INFO);
-		$serviceLabel = $service->id;
+		$visible = json_decode($user->conf->DIGIRISKDOLIBARR_TICKET_DISABLED_DASHBOARD_INFO);
+		$digiriskelementID = $digiriskelement->id;
 		$catID = $cat['id'];
-		if (isset($visible->$serviceLabel->$catID) && $visible->$serviceLabel->$catID == 0){
+		if (isset($visible->$digiriskelementID->$catID) && $visible->$digiriskelementID->$catID == 0){
 			$response->visible = 0;
 		} else {
 			$response->visible = 1;

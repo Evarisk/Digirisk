@@ -6,13 +6,13 @@
 if ( $action == 'adddashboardinfo' && $permissiontoread) {
 	$data = json_decode(file_get_contents('php://input'), true);
 
-	$serviceLabel = $data['serviceLabel'];
-	$catID        = $data['catID'];
+	$digiriskelementID = $data['digiriskelementID'];
+	$catID             = $data['catID'];
 
-	$visible = json_decode($user->conf->DIGIRISKDOLIBARR_TICKET_SELECTED_DASHBOARD_INFO);
-	$visible->$serviceLabel->$catID = 1;
+	$visible = json_decode($user->conf->DIGIRISKDOLIBARR_TICKET_DISABLED_DASHBOARD_INFO);
+	$visible->$digiriskelementID->$catID = 1;
 
-	$tabparam['DIGIRISKDOLIBARR_TICKET_SELECTED_DASHBOARD_INFO'] = json_encode($visible);
+	$tabparam['DIGIRISKDOLIBARR_TICKET_DISABLED_DASHBOARD_INFO'] = json_encode($visible);
 
 	dol_set_user_param($db, $conf, $user, $tabparam);
 	$action = '';
@@ -21,13 +21,13 @@ if ( $action == 'adddashboardinfo' && $permissiontoread) {
 if ( $action == 'closedashboardinfo' && $permissiontoread) {
 	$data = json_decode(file_get_contents('php://input'), true);
 
-	$serviceLabel = $data['serviceLabel'];
-	$catID        = $data['catID'];
+	$digiriskelementID = $data['digiriskelementID'];
+	$catID             = $data['catID'];
 
-	$visible = json_decode($user->conf->DIGIRISKDOLIBARR_TICKET_SELECTED_DASHBOARD_INFO);
-	$visible->$serviceLabel->$catID = 0;
+	$visible = json_decode($user->conf->DIGIRISKDOLIBARR_TICKET_DISABLED_DASHBOARD_INFO);
+	$visible->$digiriskelementID->$catID = 0;
 
-	$tabparam['DIGIRISKDOLIBARR_TICKET_SELECTED_DASHBOARD_INFO'] = json_encode($visible);
+	$tabparam['DIGIRISKDOLIBARR_TICKET_DISABLED_DASHBOARD_INFO'] = json_encode($visible);
 
 	dol_set_user_param($db, $conf, $user, $tabparam);
 	$action = '';
@@ -84,22 +84,22 @@ if (empty($conf->global->MAIN_DISABLE_WORKBOARD)) {
 		exit;
 	}
 
-	$selectedDashboardInfos = json_decode($user->conf->DIGIRISKDOLIBARR_TICKET_SELECTED_DASHBOARD_INFO);
-	if (!empty($selectedDashboardInfos)) {
-		foreach ($selectedDashboardInfos as $key => $selectedDashboardInfo) {
-			foreach ($selectedDashboardInfo as $keycat => $DashboardInfo) {
+	$disabledDashboardInfos = json_decode($user->conf->DIGIRISKDOLIBARR_TICKET_DISABLED_DASHBOARD_INFO);
+	if (!empty($disabledDashboardInfos)) {
+		foreach ($disabledDashboardInfos as $key => $disabledDashboardInfo) {
+			foreach ($disabledDashboardInfo as $keycat => $DashboardInfo) {
 				if ($DashboardInfo == 0) {
 					$category->fetch($keycat);
 					$digiriskelement->fetch($key);
-					$disabled_services[] = $digiriskelement->id . ' : ' . $digiriskelement->ref . ' - ' . $digiriskelement->label . ' : ' . $category->id . ' : ' . '<strong>' . $category->label . '</strong>';
+					$disabled_digiriskelements[] = $digiriskelement->id . ' : ' . $digiriskelement->ref . ' - ' . $digiriskelement->label . ' : ' . $category->id . ' : ' . '<strong>' . $category->label . '</strong>';
 				}
 			}
 		}
 	}
 
-	print '<div class="add-widget-box" style="'. (!empty($disabled_services) ? '' : 'display:none').'">';
+	print '<div class="add-widget-box" style="'. (!empty($disabled_digiriskelements) ? '' : 'display:none').'">';
 
-	print Form::selectarray('boxcombo', $disabled_services, -1, $langs->trans("ChooseBoxToAdd") . '...', 0, 0, '', 0, 0, 0, 'ASC', 'maxwidth150onsmartphone hideonprint add-dashboard-info', 0, 'hidden selected', 0, 1);
+	print Form::selectarray('boxcombo', $disabled_digiriskelements, -1, $langs->trans("ChooseBoxToAdd") . '...', 0, 0, '', 0, 0, 0, 'ASC', 'maxwidth150onsmartphone hideonprint add-dashboard-info', 0, 'hidden selected', 0, 1);
 	if (!empty($conf->use_javascript_ajax)) {
 		include_once DOL_DOCUMENT_ROOT . '/core/lib/ajax.lib.php';
 		print ajax_combobox("boxcombo");
@@ -110,24 +110,22 @@ if (empty($conf->global->MAIN_DISABLE_WORKBOARD)) {
 
 	if (GETPOST('id')) {
 		$digiriskelement->fetch(GETPOST('id'));
-		$service = $digiriskelement;
-
 		if (is_array($arrayCats) && !empty($arrayCats)) {
 			foreach ($arrayCats as $key => $cat) {
 				if (!empty($conf->ticket->enabled) && $user->rights->ticket->read) {
-					$dashboardlines['ticket'][$service->id][$key] = load_board($user, $cat, $service);
+					$dashboardlines['ticket'][$digiriskelement->id][$key] = load_board($user, $cat, $digiriskelement);
 				}
 			}
 
 			print '<div class="titre inline-block">';
-			print load_fiche_titre($langs->transnoentities($service->ref), '', 'service');
+			print load_fiche_titre($langs->transnoentities($digiriskelement->ref), '', 'service');
 			print '</div>';
 		}
 
 		// Show dashboard
 		if (!empty($dashboardlines)) {
 			$openedDashBoard = '';
-			foreach ($dashboardlines['ticket'][$service->id] as $key => $board) {
+			foreach ($dashboardlines['ticket'][$digiriskelement->id] as $key => $board) {
 				if ($board->visible) {
 					$openedDashBoard .= '<div class="box-flex-item"><div class="box-flex-item-with-margin">';
 					$openedDashBoard .= '<div class="info-box info-box-sm">';
@@ -136,7 +134,7 @@ if (empty($conf->global->MAIN_DISABLE_WORKBOARD)) {
 					$openedDashBoard .= '</span>';
 					$openedDashBoard .= '<div class="info-box-content">';
 					$openedDashBoard .= '<div class="info-box-title" title="' . strip_tags($key) . '">' . $langs->trans($key);
-					$openedDashBoard .= '<span class="close-dashboard-info" data-label="'.$service->id.'" data-catid="'.$board->id.'"><i class="fas fa-times"></i></span>';
+					$openedDashBoard .= '<span class="close-dashboard-info" data-digiriskelementid="'.$digiriskelement->id.'" data-catid="'.$board->id.'"><i class="fas fa-times"></i></span>';
 					$openedDashBoard .= '</div>';
 					$openedDashBoard .= '<div class="info-box-lines">';
 					$openedDashBoard .= '<div class="info-box-line" style="font-size : 20px;">';
@@ -157,24 +155,23 @@ if (empty($conf->global->MAIN_DISABLE_WORKBOARD)) {
 		}
 	} else {
 		if (is_array($digiriskelementlist) && !empty($digiriskelementlist)) {
-			foreach ($digiriskelementlist as $service) {
-
+			foreach ($digiriskelementlist as $digiriskelement) {
 				if (is_array($arrayCats) && !empty($arrayCats)) {
 					foreach ($arrayCats as $key => $cat) {
 						if (!empty($conf->ticket->enabled) && $user->rights->ticket->read) {
-							$dashboardlines['ticket'][$service->id][$key] = load_board($user, $cat, $service);
+							$dashboardlines['ticket'][$digiriskelement->id][$key] = load_board($user, $cat, $digiriskelement);
 						}
 					}
 
 					print '<div class="titre inline-block">';
-					print load_fiche_titre($langs->transnoentities($service->ref), '', 'service');
+					print load_fiche_titre($langs->transnoentities($digiriskelement->ref), '', 'service');
 					print '</div>';
 				}
 
 				// Show dashboard
 				if (!empty($dashboardlines)) {
 					$openedDashBoard = '';
-					foreach ($dashboardlines['ticket'][$service->id] as $key => $board) {
+					foreach ($dashboardlines['ticket'][$digiriskelement->id] as $key => $board) {
 						if ($board->visible) {
 							$openedDashBoard .= '<div class="box-flex-item"><div class="box-flex-item-with-margin">';
 							$openedDashBoard .= '<div class="info-box info-box-sm">';
@@ -183,7 +180,7 @@ if (empty($conf->global->MAIN_DISABLE_WORKBOARD)) {
 							$openedDashBoard .= '</span>';
 							$openedDashBoard .= '<div class="info-box-content">';
 							$openedDashBoard .= '<div class="info-box-title" title="' . strip_tags($key) . '">' . $langs->trans($key);
-							$openedDashBoard .= '<span class="close-dashboard-info" data-label="'.$service->id.'" data-catid="'.$board->id.'"><i class="fas fa-times"></i></span>';
+							$openedDashBoard .= '<span class="close-dashboard-info" data-digiriskelementid="'.$digiriskelement->id.'" data-catid="'.$board->id.'"><i class="fas fa-times"></i></span>';
 							$openedDashBoard .= '</div>';
 							$openedDashBoard .= '<div class="info-box-lines">';
 							$openedDashBoard .= '<div class="info-box-line" style="font-size : 20px;">';

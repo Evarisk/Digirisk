@@ -3693,7 +3693,7 @@ window.eoxiaJS.ticket.removeFile = function( event ) {
  */
 window.eoxiaJS.ticket.addDashBoardInfo = function() {
 	let selectTitle = $('#select2-boxcombo-container').attr('title')
-	let serviceLabel = selectTitle.split(' : ')[0];
+	let digiriskelementID = selectTitle.split(' : ')[0];
 	let catID = selectTitle.split(' : ')[2];
 	let querySeparator = '?';
 
@@ -3706,7 +3706,7 @@ window.eoxiaJS.ticket.addDashBoardInfo = function() {
 		type: "POST",
 		processData: false,
 		data: JSON.stringify({
-			serviceLabel: serviceLabel,
+			digiriskelementID: digiriskelementID,
 			catID: catID
 		}),
 		contentType: false,
@@ -3728,7 +3728,7 @@ window.eoxiaJS.ticket.addDashBoardInfo = function() {
  */
 window.eoxiaJS.ticket.closeDashBoardInfo = function() {
 	let box = $(this);
-	let serviceLabel = $(this).attr('data-label');
+	let digiriskelementID = $(this).attr('data-digiriskelementid');
 	let catID = $(this).attr('data-catid');
 	let querySeparator = '?';
 
@@ -3741,7 +3741,7 @@ window.eoxiaJS.ticket.closeDashBoardInfo = function() {
 		type: "POST",
 		processData: false,
 		data: JSON.stringify({
-			serviceLabel: serviceLabel,
+			digiriskelementID: digiriskelementID,
 			catID: catID
 		}),
 		contentType: false,
