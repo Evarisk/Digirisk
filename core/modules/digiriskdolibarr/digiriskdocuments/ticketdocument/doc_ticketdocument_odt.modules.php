@@ -27,11 +27,8 @@ require_once DOL_DOCUMENT_ROOT . '/core/lib/images.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/company.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/doc.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/categories/class/categorie.class.php';
-require_once __DIR__ . '/../../../../../class/evaluator.class.php';
-require_once __DIR__ . '/../../../../../class/riskanalysis/risk.class.php';
-require_once __DIR__ . '/../../../../../class/riskanalysis/riskassessment.class.php';
-require_once __DIR__ . '/../../../../../class/riskanalysis/risksign.class.php';
-require_once __DIR__ . '/../../../../../class/accident.class.php';
+
+require_once __DIR__ . '/../../../../../class/digiriskelement.class.php';
 require_once __DIR__ . '/mod_ticketdocument_standard.php';
 require_once __DIR__ . '/modules_ticketdocument.php';
 
@@ -344,12 +341,18 @@ class doc_ticketdocument_odt extends ModeleODTTicketDocument
 			complete_substitutions_array($tmparray, $outputlangs, $object);
 
 			$ticket->fetch_optionals();
+			$digiriskelement = new DigiriskElement($this->db);
 
 			$tmparray['ref']              = $ticket->ref;
 			$tmparray['lastname']         = $ticket->array_options['options_digiriskdolibarr_ticket_lastname'];
 			$tmparray['firstname']        = $ticket->array_options['options_digiriskdolibarr_ticket_firstname'];
 			$tmparray['phone_number']     = $ticket->array_options['options_digiriskdolibarr_ticket_phone'];
-			$tmparray['service']          = $ticket->array_options['options_digiriskdolibarr_ticket_service'];
+			if ($ticket->array_options['options_digiriskdolibarr_ticket_service'] > 0) {
+				$digiriskelement->fetch($ticket->array_options['options_digiriskdolibarr_ticket_service']);
+				$tmparray['service'] =  $digiriskelement->ref . ' - ' . $digiriskelement->label;
+			} else {
+				$tmparray['service'] = '';
+			}
 			$tmparray['location']         = $ticket->array_options['options_digiriskdolibarr_ticket_location'];
 			$tmparray['declaration_date'] = dol_print_date($ticket->array_options['options_digiriskdolibarr_ticket_date'], 'dayhoursec', 'tzuser');
 			$tmparray['creation_date']    = dol_print_date($ticket->date_creation, 'dayhoursec', 'tzuser');
