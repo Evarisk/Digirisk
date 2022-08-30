@@ -121,7 +121,7 @@ class ActionsDigiriskdolibarr
 				require_once __DIR__ . '/../lib/digiriskdolibarr_function.lib.php';
 
 				if(is_numeric($object->array_options['options_digiriskdolibarr_ticket_service']) && $object->array_options['options_digiriskdolibarr_ticket_service'] > 0) {
-					require_once __DIR__ . './digiriskelement.class.php';
+					require_once __DIR__ . '/digiriskelement.class.php';
 					$digiriskelement = new DigiriskElement($db);
 					$digiriskelement->fetch($object->array_options['options_digiriskdolibarr_ticket_service']);
 					$selectDictionnary = $digiriskelement->getNomUrl(1, 'blank');
@@ -147,7 +147,7 @@ class ActionsDigiriskdolibarr
 				$object = new Ticket($db);
 				$object->fetch(GETPOST('id'),'',GETPOST('track_id'));
 				if(is_numeric($object->array_options['options_digiriskdolibarr_ticket_service'])) {
-					require_once __DIR__ . './digiriskelement.class.php';
+					require_once __DIR__ . '/digiriskelement.class.php';
 					$digiriskelement = new DigiriskElement($db);
 					$selectDigiriskElement = $digiriskelement->select_digiriskelement_list($object->array_options['options_digiriskdolibarr_ticket_service'], 'options_digiriskdolibarr_ticket_service', '', 1, 0, array(), 0, 0, 'minwidth100', 0, false, 1);
 				}
@@ -160,9 +160,9 @@ class ActionsDigiriskdolibarr
 			}
 			if (GETPOST('action') == 'create') {
 				require_once __DIR__ . '/../lib/digiriskdolibarr_function.lib.php';
-				require_once __DIR__ . './digiriskelement.class.php';
+				require_once __DIR__ . '/digiriskelement.class.php';
 				$digiriskelement = new DigiriskElement($db);
-				$selectDigiriskElement = '<tr class="valuefieldcreate ticket_extras_digiriskdolibarr_ticket_service trextrafields_collapse" data-element="extrafield" data-targetelement="ticket" data-targetid=""><td class="wordbreak">'.$langs->trans('Service').'</td>';
+				$selectDigiriskElement = '<tr class="valuefieldcreate ticket_extras_digiriskdolibarr_ticket_service trextrafields_collapse" data-element="extrafield" data-targetelement="ticket" data-targetid=""><td class="wordbreak">'.$langs->trans('GP/UT').'</td>';
 				$selectDigiriskElement .= '<td class="ticket_extras_digiriskdolibarr_ticket_service">';
 				$selectDigiriskElement .= $digiriskelement->select_digiriskelement_list(GETPOST('options_digiriskdolibarr_ticket_service'), 'options_digiriskdolibarr_ticket_service', '', 1, 0, array(), 0, 0, 'minwidth500', 0, false, 1);
 				$selectDigiriskElement .= '</td>';
@@ -292,9 +292,9 @@ class ActionsDigiriskdolibarr
 		} else if ($parameters['currentcontext'] == 'publicnewticketcard') {
 			require_once __DIR__ . '/../lib/digiriskdolibarr_function.lib.php';
 
-			require_once __DIR__ . './digiriskelement.class.php';
+			require_once __DIR__ . '/digiriskelement.class.php';
 			$digiriskelement = new DigiriskElement($db);
-			$selectDigiriskElement = '<span>'. $langs->trans('Service') .'</span>';
+			$selectDigiriskElement = '<span>'. $langs->trans('GP/UT') .'</span>';
 			$selectDigiriskElement .= $digiriskelement->select_digiriskelement_list(GETPOST('options_digiriskdolibarr_ticket_service'), 'options_digiriskdolibarr_ticket_service', '', $langs->trans('PleaseSelectADigiriskElement'), 0, array(), 0, 0, 'minwidth500', 0, false, 1);
 			$selectDigiriskElement .= '<div><br></div>';
 			?>
