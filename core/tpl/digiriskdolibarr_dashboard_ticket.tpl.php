@@ -87,11 +87,23 @@ if (empty($conf->global->MAIN_DISABLE_WORKBOARD)) {
 	$disabledDashboardInfos = json_decode($user->conf->DIGIRISKDOLIBARR_TICKET_DISABLED_DASHBOARD_INFO);
 	if (!empty($disabledDashboardInfos)) {
 		foreach ($disabledDashboardInfos as $key => $disabledDashboardInfo) {
-			foreach ($disabledDashboardInfo as $keycat => $DashboardInfo) {
-				if ($DashboardInfo == 0) {
-					$category->fetch($keycat);
-					$digiriskelement->fetch($key);
-					$disabled_digiriskelements[] = $digiriskelement->id . ' : ' . $digiriskelement->ref . ' - ' . $digiriskelement->label . ' : ' . $category->id . ' : ' . '<strong>' . $category->label . '</strong>';
+			if (GETPOST('id')) {
+				if (GETPOST('id') == $key) {
+					foreach ($disabledDashboardInfo as $keycat => $DashboardInfo) {
+						if ($DashboardInfo == 0) {
+							$category->fetch($keycat);
+							$digiriskelement->fetch($key);
+							$disabled_digiriskelements[] = $digiriskelement->id . ' : ' . $digiriskelement->ref . ' - ' . $digiriskelement->label . ' : ' . $category->id . ' : ' . '<strong>' . $category->label . '</strong>';
+						}
+					}
+				}
+			} else {
+				foreach ($disabledDashboardInfo as $keycat => $DashboardInfo) {
+					if ($DashboardInfo == 0) {
+						$category->fetch($keycat);
+						$digiriskelement->fetch($key);
+						$disabled_digiriskelements[] = $digiriskelement->id . ' : ' . $digiriskelement->ref . ' - ' . $digiriskelement->label . ' : ' . $category->id . ' : ' . '<strong>' . $category->label . '</strong>';
+					}
 				}
 			}
 		}
