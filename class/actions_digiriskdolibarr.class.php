@@ -294,7 +294,7 @@ class ActionsDigiriskdolibarr
 
 			require_once __DIR__ . './digiriskelement.class.php';
 			$digiriskelement = new DigiriskElement($db);
-			$selectDigiriskElement = '<span><b>'. $langs->trans('Service') .'</b></span>';
+			$selectDigiriskElement = '<span>'. $langs->trans('Service') .'</span>';
 			$selectDigiriskElement .= $digiriskelement->select_digiriskelement_list(GETPOST('options_digiriskdolibarr_ticket_service'), 'options_digiriskdolibarr_ticket_service', '', $langs->trans('PleaseSelectADigiriskElement'), 0, array(), 0, 0, 'minwidth500', 0, false, 1);
 			$selectDigiriskElement .= '<div><br></div>';
 			?>
