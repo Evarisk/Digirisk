@@ -311,7 +311,7 @@ class ActionsDigiriskdolibarr
 
 			require_once __DIR__ . './digiriskelement.class.php';
 			$digiriskelement = new DigiriskElement($db);
-			$selectDigiriskElement = '<span>'. $langs->trans('Service') .'</span>';
+			$selectDigiriskElement = '<span><b>'. $langs->trans('Service') .'</b></span>';
 			$selectDigiriskElement .= $digiriskelement->select_digiriskelement_list(GETPOST('options_digiriskdolibarr_ticket_service'), 'options_digiriskdolibarr_ticket_service', '', $langs->trans('PleaseSelectADigiriskElement'), 0, array(), 0, 0, 'minwidth500', 0, false, 1);
 			$selectDigiriskElement .= '<div><br></div>';
 			?>
@@ -335,6 +335,9 @@ class ActionsDigiriskdolibarr
 				jQuery('.select2.select2-container.select2-container--default').remove()
 
 				jQuery('.wpeo-form.tableforinputfields').prepend(<?php echo json_encode($selectDigiriskElement) ; ?>)
+
+				jQuery('#options_digiriskdolibarr_ticket_lastname').parent().html(jQuery('#options_digiriskdolibarr_ticket_lastname').parent().html().replace(/Nom/, '<b>Nom</b>'))
+				jQuery('#options_digiriskdolibarr_ticket_lastname').parent().html(jQuery('#options_digiriskdolibarr_ticket_lastname').parent().html().replace(/Prénom/, '<b>Prénom</b>'))
 			</script>
 			<?php
 		}
