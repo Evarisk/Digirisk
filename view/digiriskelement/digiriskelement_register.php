@@ -16,9 +16,9 @@
  */
 
 /**
- *  \file       view/digiriskelement/digiriskelement_agenda.php
+ *  \file       view/digiriskelement/digiriskelement_register.php
  *  \ingroup    digiriskdolibarr
- *  \brief      Page of DigiriskElement events
+ *  \brief      Page of DigiriskElement dashboard ticket
  */
 
 // Load Dolibarr environment
@@ -36,9 +36,6 @@ if ( ! $res && file_exists("../../../main.inc.php")) $res    = @include "../../.
 if ( ! $res && file_exists("../../../../main.inc.php")) $res = @include "../../../../main.inc.php";
 if ( ! $res) die("Include of main fails");
 
-require_once DOL_DOCUMENT_ROOT . '/contact/class/contact.class.php';
-require_once DOL_DOCUMENT_ROOT . '/core/lib/company.lib.php';
-require_once DOL_DOCUMENT_ROOT . '/core/lib/functions2.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/categories/class/categorie.class.php';
 
 require_once './../../class/digiriskelement.class.php';
@@ -58,31 +55,12 @@ $action     = GETPOST('action', 'alpha');
 $cancel     = GETPOST('cancel', 'aZ09');
 $backtopage = GETPOST('backtopage', 'alpha');
 
-if (GETPOST('actioncode', 'array')) {
-	$actioncode                            = GETPOST('actioncode', 'array', 3);
-	if ( ! count($actioncode)) $actioncode = '0';
-} else {
-	$actioncode = GETPOST("actioncode", "alpha", 3) ? GETPOST("actioncode", "alpha", 3) : (GETPOST("actioncode") == '0' ? '0' : (empty($conf->global->AGENDA_DEFAULT_FILTER_TYPE_FOR_OBJECT) ? '' : $conf->global->AGENDA_DEFAULT_FILTER_TYPE_FOR_OBJECT));
-}
-$search_agenda_label = GETPOST('search_agenda_label');
-
-$limit     = GETPOST('limit', 'int') ? GETPOST('limit', 'int') : $conf->liste_limit;
-$sortfield = GETPOST("sortfield", 'alpha');
-$sortorder = GETPOST("sortorder", 'alpha');
-$page      = GETPOSTISSET('pageplusone') ? (GETPOST('pageplusone') - 1) : GETPOST("page", 'int');
-if (empty($page) || $page == -1) { $page = 0; }     // If $page is not defined, or '' or -1
-$offset                       = $limit * $page;
-$pageprev                     = $page - 1;
-$pagenext                     = $page + 1;
-if ( ! $sortfield) $sortfield = 'a.datep,a.id';
-if ( ! $sortorder) $sortorder = 'DESC,DESC';
-
 // Initialize technical objects
 $object           = new DigiriskElement($db);
 $extrafields      = new ExtraFields($db);
 $digiriskstandard = new DigiriskStandard($db);
 
-$hookmanager->initHooks(array('digiriskelementagenda', 'globalcard')); // Note that conf->hooks_modules contains array
+$hookmanager->initHooks(array('digiriskelementregister', 'globalcard')); // Note that conf->hooks_modules contains array
 // Fetch optionals attributes and labels
 $extrafields->fetch_name_optionals_label($object->table_element);
 
@@ -107,7 +85,6 @@ $parameters = array('id' => $id);
 $reshook    = $hookmanager->executeHooks('doActions', $parameters, $object, $action); // Note that $action and $object may have been modified by some hooks
 if ($reshook < 0) setEventMessages($hookmanager->error, $hookmanager->errors, 'errors');
 
-
 /*
  *	View
  */
@@ -119,9 +96,9 @@ if ($object->id > 0) {
 	$morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");
 
 	digiriskHeader($title, $help_url, $morejs, $morecss);
+
 	print '<div id="cardContent" value="">';
 
-	if ( ! empty($conf->notification->enabled)) $langs->load("mails");
 	$head = digiriskelementPrepareHead($object);
 
 	print dol_get_fiche_head($head, 'elementRegister', $title, -1, "digiriskdolibarr@digiriskdolibarr");
@@ -149,14 +126,7 @@ if ($object->id > 0) {
 
 	digirisk_banner_tab($object, 'ref', '', 0, 'ref', 'ref', $morehtmlref, '', 0, $morehtmlleft);
 
-	print '<div class="fichecenter">';
-
-	$object->info($object->id);
-	dol_print_object_info($object, 1);
-
-	print '</div>';
-
-	print dol_get_fiche_end();
+	print load_fiche_titre($langs->trans("DashBoard"), '', 'digiriskdolibarr32px.png@digiriskdolibarr');
 
 	$digiriskelement = $object;
 
