@@ -120,11 +120,11 @@ class ActionsDigiriskdolibarr
 
 				require_once __DIR__ . '/../lib/digiriskdolibarr_function.lib.php';
 
-				if(is_numeric($object->array_options['options_digiriskdolibarr_ticket_service'])) {
+				if(is_numeric($object->array_options['options_digiriskdolibarr_ticket_service']) && $object->array_options['options_digiriskdolibarr_ticket_service'] > 0) {
 					require_once __DIR__ . './digiriskelement.class.php';
 					$digiriskelement = new DigiriskElement($db);
 					$digiriskelement->fetch($object->array_options['options_digiriskdolibarr_ticket_service']);
-					$selectDictionnary = $digiriskelement->getNomUrl(1);
+					$selectDictionnary = $digiriskelement->getNomUrl(1, 'blank');
 					?>
 					<script>
 					jQuery('.ticket_extras_digiriskdolibarr_ticket_service').html('')
