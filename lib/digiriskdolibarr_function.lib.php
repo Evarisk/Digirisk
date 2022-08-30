@@ -2917,7 +2917,7 @@ function load_board($user, $cat, $service)
 		$response = new WorkboardResponse();
 		$response->id = $cat['id'];
 		$response->img = $cat['photo'];
-		$response->label = $cat['label'] . ' : ';
+		$response->label = $cat['name'] . ' : ';
 		$response->url = DOL_URL_ROOT . '/ticket/list.php?search_options_digiriskdolibarr_ticket_service='.$service->id.'&search_category_ticket_list='.$cat['id'];
 		$response->nbtodo = ($nbobject ?: 0);
 		$visible = json_decode($user->conf->DIGIRISKDOLIBARR_TICKET_SELECTED_DASHBOARD_INFO);

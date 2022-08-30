@@ -1415,7 +1415,6 @@ TicketProjectUpdated = Le projet par défaut des tickets a été mis à jour
 QRCodeAlreadyGenerated = QR Code généré
 GenerateQRCode = Générer le QR Code
 QRCodeGeneration = Génération du QR Code
-TotalTagByService = Nombre de registres avec <strong>TAG %s </strong>
 PleaseSelectAService = Veuillez sélectionner un service
 TicketCreationMailWellSent = Mail de confirmation de création du ticket envoyé
 TicketCreationMailSent = Le mail de création du ticket a été envoyé à %s

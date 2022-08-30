@@ -65,7 +65,6 @@ if (empty($conf->global->MAIN_DISABLE_WORKBOARD)) {
 			$arrayCats[$category->label] = array(
 				'id' => $category->id,
 				'name' => $category->label,
-				'label' => $langs->transnoentities('TotalTagByService', $category->label),
 				'photo' => show_category_image($category, $upload_dir, 1)
 			);
 		}
@@ -85,7 +84,7 @@ if (empty($conf->global->MAIN_DISABLE_WORKBOARD)) {
 				if ($DashboardInfo == 0) {
 					$category->fetch($keycat);
 					$digiriskelement->fetch($key);
-					$disabled_services[] = $digiriskelement->id . ' : ' . $digiriskelement->ref . ' - ' . $digiriskelement->label . ' : ' . $category->id . ' : ' . $langs->transnoentities('TotalTagByService', $category->label);
+					$disabled_services[] = $digiriskelement->id . ' : ' . $digiriskelement->ref . ' - ' . $digiriskelement->label . ' : ' . $category->id . ' : ' . '<strong>' . $category->label . '</strong>';
 				}
 			}
 		}
@@ -134,7 +133,7 @@ if (empty($conf->global->MAIN_DISABLE_WORKBOARD)) {
 					$openedDashBoard .= '</div>';
 					$openedDashBoard .= '<div class="info-box-lines">';
 					$openedDashBoard .= '<div class="info-box-line">';
-					$openedDashBoard .= '<span class="">' . $board->label;
+					$openedDashBoard .= '<span class=""><strong>' . $board->label . '</strong>';
 					$openedDashBoard .= '<a href="' . $board->url . '" class="info-box-text info-box-text-a">';
 					$openedDashBoard .= '<span class="classfortooltip badge badge-info" title="' . $board->label . $board->nbtodo . '" >' . $board->nbtodo . '</span>';
 					$openedDashBoard .= '</a>';
@@ -181,7 +180,7 @@ if (empty($conf->global->MAIN_DISABLE_WORKBOARD)) {
 							$openedDashBoard .= '</div>';
 							$openedDashBoard .= '<div class="info-box-lines">';
 							$openedDashBoard .= '<div class="info-box-line">';
-							$openedDashBoard .= '<span class="">' . $board->label;
+							$openedDashBoard .= '<span class=""><strong>' . $board->label . '</strong>';
 							$openedDashBoard .= '<a href="' . $board->url . '" class="info-box-text info-box-text-a">';
 							$openedDashBoard .= '<span class="classfortooltip badge badge-info" title="' . $board->label . $board->nbtodo . '" >' . $board->nbtodo . '</span>';
 							$openedDashBoard .= '</a>';
