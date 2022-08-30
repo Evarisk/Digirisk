@@ -1,4 +1,18 @@
 .box-flex-item {
+
+  .info-box {
+    display: flex;
+    flex-wrap: nowrap;
+
+    .info-box-icon {
+      height: auto !important;
+      border-radius: 0 0 0 15px;
+    }
+    .info-box-content {
+      margin-left: 0 !important;
+    }
+  }
+
   .info-box-icon {
     display: flex;
 
