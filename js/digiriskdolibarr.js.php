@@ -3694,7 +3694,7 @@ window.eoxiaJS.ticket.removeFile = function( event ) {
 window.eoxiaJS.ticket.addDashBoardInfo = function() {
 	let selectTitle = $('#select2-boxcombo-container').attr('title')
 	let serviceLabel = selectTitle.split(' : ')[0];
-	let catID = selectTitle.split(' : ')[1];
+	let catID = selectTitle.split(' : ')[2];
 	let querySeparator = '?';
 
 	let token = $('.dashboardticket').find('input[name="token"]').val();
