@@ -2,13 +2,13 @@
 
 ## Informations
 
-Version du module: 9.4.0
+Version du module: 9.5.0
 
-Dernière mise à jour: 25/07/2022
+Dernière mise à jour: 30/08/2022
 
 Prérequis:
 * Dolibarr min version 14.0.0
-* Dolibarr min version 15.0.2
+* Dolibarr min version 15.0.3
 
 Thème: Eldy Menu
 
