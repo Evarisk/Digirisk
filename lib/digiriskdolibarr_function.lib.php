@@ -230,7 +230,7 @@ function digiriskshowdocuments($modulepart, $modulesubdir, $filedir, $urlsource,
 	// Get list of files
 	$file_list = null;
 	if ( ! empty($filedir)) {
-		$file_list = dol_dir_list($filedir, 'files', 0, '(\.odt|\.zip)', '', 'date', SORT_DESC, 1);
+		$file_list = dol_dir_list($filedir, 'files', 0, '(\.odt|\.zip|\.pdf)', '', 'date', SORT_DESC, 1);
 	}
 	if ($hideifempty && empty($file_list)) return '';
 
@@ -837,9 +837,6 @@ function display_recurse_tree($results)
 	$workunit_prefix = dol_strlen($mod_workunit->prefix) > 0 ? $mod_workunit->prefix : $conf->global->DIGIRISKDOLIBARR_WORKUNIT_CANOPUS_ADDON;
 	$workunit_prefix = preg_match('/{/',$workunit_prefix) ? preg_split('/{/', $workunit_prefix)[0] : $workunit_prefix;
 
-?>
-
-<?php
 	if ($user->rights->digiriskdolibarr->digiriskelement->read) {
 		if ( ! empty($results)) {
 			foreach ($results as $element) { ?>
@@ -1263,7 +1260,7 @@ function getNomUrlTask($task, $withpicto = 0, $option = '', $mode = 'task', $add
 * @param object	$object
 * @param string $upload_dir
 */
-function show_category_image($object, $upload_dir)
+function show_category_image($object, $upload_dir, $noprint = 0)
 {
 
 	global $langs;
@@ -1303,10 +1300,15 @@ function show_category_image($object, $upload_dir)
 			$imgWidth  = ($object->imgWidth < $maxWidth) ? $object->imgWidth : $maxWidth;
 			$imgHeight = ($object->imgHeight < $maxHeight) ? $object->imgHeight : $maxHeight;
 
-			print '<img border="0" width="' . $imgWidth . '" height="' . $imgHeight . '" src="' . DOL_URL_ROOT . '/custom/digiriskdolibarr/documents/viewimage.php?modulepart=category&entity=' . $object->entity . '&file=' . urlencode($pdir . $filename) . '">';
+			if ($noprint) {
+				$out = '<img border="0" width="' . $imgWidth . '" height="' . $imgHeight . '" src="' . DOL_URL_ROOT . '/custom/digiriskdolibarr/documents/viewimage.php?modulepart=category&entity=' . $object->entity . '&file=' . urlencode($pdir . $filename) . '">';
+			} else {
+				print '<img border="0" width="' . $imgWidth . '" height="' . $imgHeight . '" src="' . DOL_URL_ROOT . '/custom/digiriskdolibarr/documents/viewimage.php?modulepart=category&entity=' . $object->entity . '&file=' . urlencode($pdir . $filename) . '">';
+			}
 
 			//          if ($nbbyrow) print '</td>';
 			//          if ($nbbyrow && ($nbphoto % $nbbyrow == 0)) print '</tr>';
+
 		}
 
 		// Ferme tableau
@@ -1318,7 +1320,13 @@ function show_category_image($object, $upload_dir)
 	}
 
 	if ($nbphoto < 1) {
-		print '<div class="opacitymedium">' . $langs->trans("NoPhotoYet") . "</div>";
+		if (!$noprint) {
+			print '<div class="opacitymedium">' . $langs->trans("NoPhotoYet") . "</div>";
+		}
+	}
+
+	if ($noprint) {
+		return $out;
 	}
 }
 
@@ -2019,13 +2027,14 @@ function getNomUrlProject($project, $withpicto = 0, $option = '', $addlabel = 0,
  *  @param  string  $moreattrib         More attributes on HTML select tag
  * 	@return	void
  */
-function digirisk_select_dictionary($htmlname, $dictionarytable, $keyfield = 'code', $labelfield = 'label', $selected = '', $useempty = 0, $moreattrib = '')
+function digirisk_select_dictionary($htmlname, $dictionarytable, $keyfield = 'code', $labelfield = 'label', $selected = '', $useempty = 0, $moreattrib = '', $placeholder = '', $morecss = '')
 {
 	// phpcs:enable
 	global $langs, $db;
 
 	$langs->load("admin");
 
+	$out = '';
 	$sql  = "SELECT rowid, " . $keyfield . ", " . $labelfield;
 	$sql .= " FROM " . MAIN_DB_PREFIX . $dictionarytable;
 	$sql .= " ORDER BY " . $labelfield;
@@ -2035,29 +2044,32 @@ function digirisk_select_dictionary($htmlname, $dictionarytable, $keyfield = 'co
 		$num = $db->num_rows($result);
 		$i   = 0;
 		if ($num) {
-			print '<select id="select' . $htmlname . '" class="flat selectdictionary" name="' . $htmlname . '"' . ($moreattrib ? ' ' . $moreattrib : '') . '>';
+			$out .= '<select id="select' . $htmlname . '" class="flat selectdictionary' . ($morecss ? ' ' . $morecss : '') . '" name="' . $htmlname . '"' . ($moreattrib ? ' ' . $moreattrib : '') . '>';
 			if ($useempty == 1 || ($useempty == 2 && $num > 1)) {
-				print '<option value="-1">&nbsp;</option>';
+				$out .= '<option value="-1">'. (dol_strlen($placeholder) > 0 ? $langs->transnoentities($placeholder) : '') .'&nbsp;</option>';
 			}
 
 			while ($i < $num) {
 				$obj = $db->fetch_object($result);
 				if ($selected == $obj->rowid || $selected == $langs->transnoentities($obj->$keyfield)) {
-					print '<option value="' . $langs->transnoentities($obj->$keyfield) . '" selected>';
+					$out .= '<option value="' . $langs->transnoentities($obj->$keyfield) . '" selected>';
 				} else {
-					print '<option value="' . $langs->transnoentities($obj->$keyfield) . '">';
+					$out .= '<option value="' . $langs->transnoentities($obj->$keyfield) . '">';
 				}
-				print $langs->transnoentities($obj->$labelfield);
-				print '</option>';
+				$out .= $langs->transnoentities($obj->$labelfield);
+				$out .= '</option>';
 				$i++;
 			}
-			print "</select>";
+			$out .= "</select>";
+			$out .= ajax_combobox('select'.$htmlname);
+
 		} else {
-			print $langs->trans("DictionaryEmpty");
+			$out .= $langs->trans("DictionaryEmpty");
 		}
 	} else {
 		dol_print_error($db);
 	}
+	return $out;
 }
 
 /**
@@ -2387,6 +2399,8 @@ function getListOfModelsDigirisk($db, $type, $maxfilenamelength = 0)
 function getNomUrlEntity($object, $withpicto = 0, $option = '', $addlabel = 0, $moreinpopup = '', $sep = ' - ', $notooltip = 0, $save_lastsearch_value = -1, $morecss = '')
 {
 	global $conf, $langs, $user, $hookmanager, $db;
+
+	require_once DOL_DOCUMENT_ROOT.'/core/lib/admin.lib.php';
 
 	if ( ! empty($conf->dol_no_mouse_hover)) $notooltip = 1; // Force disable tooltips
 
@@ -2867,4 +2881,102 @@ function digirisk_check_secure_access_document($modulepart, $original_file, $ent
 	);
 
 	return $ret;
+}
+
+/**
+ * Load indicators for dashboard
+ *
+ * @param  User	   			$user		 		User object
+ * @param  array   			$cat     	 		Category info
+ * @param  DigiriskElement  $digiriskelement	DigiriskElement object
+ * @return WorkboardResponse|int <0 if KO, WorkboardResponse if OK
+ * @throws Exception
+ */
+function load_board($user, $cat, $digiriskelement)
+{
+	global $db;
+
+	$categorie = new Categorie($db);
+
+	$categorie->fetch(0, $cat['name']);
+	$allObjects = $categorie->getObjectsInCateg(Categorie::TYPE_TICKET);
+
+	if (is_array($allObjects) && !empty($allObjects)) {
+		foreach ($allObjects as $object) {
+			if (!empty($object->array_options['options_digiriskdolibarr_ticket_service']) && $object->array_options['options_digiriskdolibarr_ticket_service'] == $digiriskelement->id && $object->fk_statut != 9) {
+				$arrayCountObject[] = $object;
+			}
+		}
+	}
+
+	if (!empty($arrayCountObject)) {
+		$nbobject = count($arrayCountObject);
+	}
+
+	if ($allObjects > 0) {
+		$response = new WorkboardResponse();
+		$response->id = $cat['id'];
+		$response->img = $cat['photo'];
+		$response->label = $cat['name'] . ' : ';
+		$response->url = DOL_URL_ROOT . '/ticket/list.php?search_options_digiriskdolibarr_ticket_service='.$digiriskelement->id.'&search_category_ticket_list='.$cat['id'];
+		$response->nbtodo = ($nbobject ?: 0);
+		$visible = json_decode($user->conf->DIGIRISKDOLIBARR_TICKET_DISABLED_DASHBOARD_INFO);
+		$digiriskelementID = $digiriskelement->id;
+		$catID = $cat['id'];
+		if (isset($visible->$digiriskelementID->$catID) && $visible->$digiriskelementID->$catID == 0){
+			$response->visible = 0;
+		} else {
+			$response->visible = 1;
+		}
+		return $response;
+	} else {
+		return -1;
+	}
+}
+
+/**
+ *  Load dictionnary from database
+ *
+ * 	@param  int       $parent_id
+ *	@param  int       $limit
+ * 	@return array|int             <0 if KO, >0 if OK
+ */
+function fetchDictionnary($tablename)
+{
+	global $db;
+
+	$sql  = 'SELECT t.rowid, t.entity, t.ref, t.label, t.description, t.active';
+	$sql .= ' FROM ' . MAIN_DB_PREFIX . $tablename . ' as t';
+	$sql .= ' WHERE 1 = 1';
+	$sql .= ' AND entity IN (0, ' . getEntity($tablename) . ')';
+
+	$resql = $db->query($sql);
+
+	if ($resql) {
+		$num = $db->num_rows($resql);
+		$i = 0;
+		$records = array();
+		while ($i < $num) {
+			$obj = $db->fetch_object($resql);
+
+			$record = new stdClass();
+
+			$record->id          = $obj->rowid;
+			$record->entity      = $obj->entity;
+			$record->ref         = $obj->ref;
+			$record->label       = $obj->label;
+			$record->description = $obj->description;
+			$record->active      = $obj->active;
+
+			$records[$record->id] = $record;
+
+			$i++;
+		}
+
+		$db->free($resql);
+
+		return $records;
+	} else {
+		return -1;
+	}
 }

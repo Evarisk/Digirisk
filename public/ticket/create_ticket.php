@@ -61,6 +61,7 @@ require_once DOL_DOCUMENT_ROOT . '/categories/class/categorie.class.php';
 require_once DOL_DOCUMENT_ROOT . '/core/modules/ticket/mod_ticket_simple.php';
 
 require_once '../../lib/digiriskdolibarr_function.lib.php';
+require_once '../../class/digiriskelement.class.php';
 
 global $conf, $db, $langs;
 // Load translation files required by the page
@@ -84,6 +85,7 @@ $formfile    = new FormFile($db);
 $extrafields = new ExtraFields($db);
 $category    = new Categorie($db);
 $modTicket   = new mod_ticket_simple($db);
+$digiriskelement = new DigiriskElement($db);
 
 $extrafields->fetch_name_optionals_label($object->table_element);
 
@@ -453,7 +455,6 @@ if ( ! empty($mainCategoryObject) && $mainCategoryObject > 0) {
 					</div>
 				</div>
 			</div>
-
 		</div>
 	</div>
 

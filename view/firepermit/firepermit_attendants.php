@@ -262,7 +262,7 @@ if ($action == 'deleteAttendant') {
 			else setEventMessages($object->error, null, 'errors');
 		}
 	} else {
-		$action = 'create';
+		$action = '';
 	}
 }
 
@@ -322,37 +322,6 @@ print dol_get_fiche_end(); ?>
 	</div>
 </div>
 <?php
-
-// Part to create
-if ($action == 'create') {
-	print load_fiche_titre($title_create, '', "digiriskdolibarr32px@digiriskdolibarr");
-
-	print '<form method="POST" action="' . $_SERVER["HTTP_REFERER"] . '">';
-	print '<input type="hidden" name="token" value="' . newToken() . '">';
-	print '<input type="hidden" name="action" value="addAttendant">';
-	print '<input type="hidden" name="backtopage" value="' . $backtopage . '">';
-
-	if ($backtopageforcancel) print '<input type="hidden" name="backtopageforcancel" value="' . $backtopageforcancel . '">';
-
-	print dol_get_fiche_head(array(), '');
-
-	print '<table class="border centpercent tableforfieldcreate">' . "\n";
-
-	//Intervenants extérieurs
-	print '<tr class="oddeven"><td>' . $langs->trans("ExtSocietyIntervenants") . '</td><td>';
-	print $form->selectcontacts(GETPOST('ext_society', 'int'), '', 'ext_intervenants[]', 1, '', '', 0, 'quatrevingtpercent', false, 0, array(), false, 'multiple', 'ext_intervenants');
-	print '</td></tr>';
-	print '</table>' . "\n";
-
-	print dol_get_fiche_end();
-
-	print '<div class="center">';
-	print '<input type="submit" class="button" id ="actionButtonCreate" name="addAttendant" value="' . dol_escape_htmltag($langs->trans("Create")) . '">';
-	print ' &nbsp; <input type="submit" id ="actionButtonCancelCreate" class="button" name="cancel" value="' . $langs->trans("Cancel") . '">';
-	print '</div>';
-
-	print '</form>';
-}
 
 // Part to show record
 if ((empty($action) || ($action != 'create' && $action != 'edit'))) {

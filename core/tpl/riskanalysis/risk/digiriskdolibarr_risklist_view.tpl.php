@@ -1081,9 +1081,9 @@
 					<div class="risk-container" value="<?php echo $risk->id ?>">
 						<!-- BUTTON MODAL RISK EDIT -->
 						<?php if ($permissiontoadd) : ?>
-							<div><i class="fas fa-exclamation-triangle"></i><?php echo ' ' . $risk->ref; ?> <i class="risk-edit wpeo-tooltip-event modal-open fas fa-pencil-alt" aria-label="<?php echo $langs->trans('EditRisk'); ?>" value="<?php echo $risk->id; ?>" id="<?php echo $risk->ref; ?>"></i></div>
+							<div><?php echo $risk->getNomUrl(1, 'blank'); ?> <i class="risk-edit wpeo-tooltip-event modal-open fas fa-pencil-alt" aria-label="<?php echo $langs->trans('EditRisk'); ?>" value="<?php echo $risk->id; ?>" id="<?php echo $risk->ref; ?>"></i></div>
 						<?php else : ?>
-							<div class="risk-edit-no-perm" value="<?php echo $risk->id ?>"><i class="fas fa-exclamation-triangle"></i><?php echo ' ' . $risk->ref; ?></div>
+							<div class="risk-edit-no-perm" value="<?php echo $risk->id ?>"><?php echo $risk->getNomUrl(1, 'blank'); ?></div>
 						<?php endif; ?>
 						<!-- RISK EDIT MODAL -->
 						<div id="risk_edit<?php echo $risk->id ?>" class="wpeo-modal modal-risk-<?php echo $risk->id ?>">

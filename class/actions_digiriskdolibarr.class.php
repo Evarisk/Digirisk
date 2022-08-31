@@ -81,12 +81,11 @@ class ActionsDigiriskdolibarr
 				$form      = new Form($db);
 				$pictopath = dol_buildpath('/digiriskdolibarr/img/digiriskdolibarr32px.png', 1);
 				$pictoDigirisk = img_picto('', $pictopath, '', 1, 0, 0, '', 'pictoDigirisk');
+				$idcc_form = digirisk_select_dictionary('DIGIRISKDOLIBARR_COLLECTIVE_AGREEMENT_TITLE', 'c_conventions_collectives', 'code', 'libelle', $conf->global->DIGIRISKDOLIBARR_COLLECTIVE_AGREEMENT_TITLE, 1);
 				?>
 				<script>
-					IDCC_form = '<?php digirisk_select_dictionary('DIGIRISKDOLIBARR_COLLECTIVE_AGREEMENT_TITLE', 'c_conventions_collectives', 'code', 'libelle', $conf->global->DIGIRISKDOLIBARR_COLLECTIVE_AGREEMENT_TITLE, 1);?>';
-
 					let $tr = $('<tr class="oddeven"><td><label for="selectidcc_id"><?php print $pictoDigirisk . $form->textwithpicto($langs->trans('IDCC'), $langs->trans('IDCCTooltip'));?></label></td>');
-					$tr.append('<td>' + IDCC_form + '</td></tr>');
+					$tr.append('<td>' + <?php echo json_encode($idcc_form) ; ?> + '</td></tr>');
 
 					let currElement = $('table:nth-child(7) .oddeven:last-child');
 					currElement.after($tr);
@@ -95,7 +94,7 @@ class ActionsDigiriskdolibarr
 			}
 			print ajax_combobox('selectDIGIRISKDOLIBARR_COLLECTIVE_AGREEMENT_TITLE');
 		} else if ($parameters['currentcontext'] == 'ticketcard') {
-			if (GETPOST('action') == 'view' || empty(GETPOST('action'))) {
+			if (GETPOST('action') == 'view' || empty(GETPOST('action')) || GETPOST('action') == 'update_extras') {
 				print '<link rel="stylesheet" type="text/css" href="../custom/digiriskdolibarr/css/digiriskdolibarr.css">';
 
 				require_once __DIR__ . '/../lib/digiriskdolibarr_function.lib.php';
@@ -119,11 +118,58 @@ class ActionsDigiriskdolibarr
 				$pictoDigirisk = img_picto('', $pictopath, '', 1, 0, 0, '', 'pictoDigirisk');
 				$title        = $pictoDigirisk . $langs->trans('TicketDocument');
 
+				require_once __DIR__ . '/../lib/digiriskdolibarr_function.lib.php';
+
+				if(is_numeric($object->array_options['options_digiriskdolibarr_ticket_service']) && $object->array_options['options_digiriskdolibarr_ticket_service'] > 0) {
+					require_once __DIR__ . '/digiriskelement.class.php';
+					$digiriskelement = new DigiriskElement($db);
+					$digiriskelement->fetch($object->array_options['options_digiriskdolibarr_ticket_service']);
+					$selectDictionnary = $digiriskelement->getNomUrl(1, 'blank');
+					?>
+					<script>
+					jQuery('.ticket_extras_digiriskdolibarr_ticket_service').html('')
+					jQuery('.ticket_extras_digiriskdolibarr_ticket_service').prepend(<?php echo json_encode($selectDictionnary) ; ?>)
+					</script>
+					<?php
+				}
+
 				$html = digiriskshowdocuments($modulepart, $dir_files, $filedir, $urlsource, 1, 0, $defaultmodel, 1, 0, '', $title, '', '', '', 0, 'remove_file');
 				?>
 
 				<script>
 					jQuery('.fichehalfleft .div-table-responsive-no-min').append(<?php echo json_encode($html) ; ?>)
+				</script>
+				<?php
+			}
+			if (GETPOST('action') == 'edit_extras' && GETPOST('attribute') == 'digiriskdolibarr_ticket_service') {
+				require_once __DIR__ . '/../lib/digiriskdolibarr_function.lib.php';
+
+				$object = new Ticket($db);
+				$object->fetch(GETPOST('id'),'',GETPOST('track_id'));
+				if(is_numeric($object->array_options['options_digiriskdolibarr_ticket_service'])) {
+					require_once __DIR__ . '/digiriskelement.class.php';
+					$digiriskelement = new DigiriskElement($db);
+					$selectDigiriskElement = $digiriskelement->select_digiriskelement_list($object->array_options['options_digiriskdolibarr_ticket_service'], 'options_digiriskdolibarr_ticket_service', '', 1, 0, array(), 0, 0, 'minwidth100', 0, false, 1);
+				}
+				?>
+				<script>
+					jQuery('#options_digiriskdolibarr_ticket_service').remove()
+					jQuery('.ticket_extras_digiriskdolibarr_ticket_service form').prepend(<?php echo json_encode($selectDigiriskElement) ; ?>)
+				</script>
+				<?php
+			}
+			if (GETPOST('action') == 'create') {
+				require_once __DIR__ . '/../lib/digiriskdolibarr_function.lib.php';
+				require_once __DIR__ . '/digiriskelement.class.php';
+				$digiriskelement = new DigiriskElement($db);
+				$selectDigiriskElement = '<tr class="valuefieldcreate ticket_extras_digiriskdolibarr_ticket_service trextrafields_collapse" data-element="extrafield" data-targetelement="ticket" data-targetid=""><td class="wordbreak">'.$langs->trans('GP/UT').'</td>';
+				$selectDigiriskElement .= '<td class="ticket_extras_digiriskdolibarr_ticket_service">';
+				$selectDigiriskElement .= $digiriskelement->select_digiriskelement_list(GETPOST('options_digiriskdolibarr_ticket_service'), 'options_digiriskdolibarr_ticket_service', '', 1, 0, array(), 0, 0, 'minwidth500', 0, false, 1);
+				$selectDigiriskElement .= '</td>';
+				$selectDigiriskElement .= '</tr>';
+				?>
+				<script>
+					jQuery('tr.ticket_extras_digiriskdolibarr_ticket_firstname').after(<?php echo json_encode($selectDigiriskElement) ; ?>)
 				</script>
 				<?php
 			}
@@ -244,6 +290,13 @@ class ActionsDigiriskdolibarr
 				}
 			}
 		} else if ($parameters['currentcontext'] == 'publicnewticketcard') {
+			require_once __DIR__ . '/../lib/digiriskdolibarr_function.lib.php';
+
+			require_once __DIR__ . '/digiriskelement.class.php';
+			$digiriskelement = new DigiriskElement($db);
+			$selectDigiriskElement = '<span>'. $langs->trans('GP/UT') .'</span>';
+			$selectDigiriskElement .= $digiriskelement->select_digiriskelement_list(GETPOST('options_digiriskdolibarr_ticket_service'), 'options_digiriskdolibarr_ticket_service', '', $langs->trans('PleaseSelectADigiriskElement'), 0, array(), 0, 0, 'minwidth500', 0, false, 1);
+			$selectDigiriskElement .= '<div><br></div>';
 			?>
 			<script>
 				let date = new Date();
@@ -260,6 +313,14 @@ class ActionsDigiriskdolibarr
 				jQuery('#options_digiriskdolibarr_ticket_dateyear').val(date.getFullYear());
 				jQuery('#options_digiriskdolibarr_ticket_datehour').val((hour < 10 ? '0' : '') + hour);
 				jQuery('#options_digiriskdolibarr_ticket_datemin').val((min < 10 ? '0' : '') + min);
+
+				jQuery('#options_digiriskdolibarr_ticket_service').remove()
+				jQuery('.select2.select2-container.select2-container--default').remove()
+
+				jQuery('.wpeo-form.tableforinputfields').prepend(<?php echo json_encode($selectDigiriskElement) ; ?>)
+
+				jQuery('#options_digiriskdolibarr_ticket_lastname').parent().html(jQuery('#options_digiriskdolibarr_ticket_lastname').parent().html().replace(/Nom/, '<b>Nom</b>'))
+				jQuery('#options_digiriskdolibarr_ticket_lastname').parent().html(jQuery('#options_digiriskdolibarr_ticket_lastname').parent().html().replace(/Prénom/, '<b>Prénom</b>'))
 			</script>
 			<?php
 		}
@@ -337,8 +398,17 @@ class ActionsDigiriskdolibarr
 					}
 				}
 			}
-
-
+		} elseif (in_array($parameters['currentcontext'] , array('ticketlist', 'thirdpartyticket', 'projectticket'))) {
+			if ($action == 'list') {
+				if (GETPOST('button_removefilter_x', 'alpha') || GETPOST('button_removefilter.x', 'alpha') || GETPOST('button_removefilter', 'alpha')) {
+					$searchCategoryTicketList = GETPOST('search_category_ticket_list', 'array');
+					if (is_array($searchCategoryTicketList) && !empty($searchCategoryTicketList)) {
+						$_GET['search_category_ticket_list'] = array();
+					} else {
+						$_GET['search_category_ticket_list'] = '';
+					}
+				}
+			}
 		}
 
 		if (true) {
@@ -408,6 +478,160 @@ class ActionsDigiriskdolibarr
 
 		if (true) {
 			$this->resprints = $value;
+			return 0; // or return 1 to replace standard code
+		} else {
+			$this->errors[] = 'Error message';
+			return -1;
+		}
+	}
+
+	/**
+	 *  Overloading the printFieldListFrom function : replacing the parent's function with the one below
+	 *
+	 * @param Hook $parameters metadatas (context, etc...)
+	 * @param $object current object
+	 * @return int
+	 */
+	public function printFieldListFrom($parameters, $object)
+	{
+		global $conf, $user, $langs;
+
+		/* print_r($parameters); print_r($object); echo "action: " . $action; */
+		if (in_array($parameters['currentcontext'] , array('ticketlist', 'thirdpartyticket', 'projectticket'))) {	    // do something only for the context 'somecontext1' or 'somecontext2'
+			$searchCategoryTicketList = GETPOST('search_category_ticket_list');
+			if (!empty($searchCategoryTicketList)) {
+				$sql = ' LEFT JOIN '.MAIN_DB_PREFIX."categorie_ticket as ct ON t.rowid = ct.fk_ticket"; // We'll need this table joined to the select in order to filter by categ
+			}
+		}
+
+		if (true) {
+			$this->resprints = $sql;
+			return 0; // or return 1 to replace standard code
+		} else {
+			$this->errors[] = 'Error message';
+			return -1;
+		}
+	}
+
+
+	/**
+	 *  Overloading the printFieldListWhere function : replacing the parent's function with the one below
+	 *
+	 * @param Hook $parameters metadatas (context, etc...)
+	 * @param $object current object
+	 * @return int
+	 */
+	public function printFieldListWhere($parameters, $object)
+	{
+		global $conf, $user, $langs;
+
+		/* print_r($parameters); print_r($object); echo "action: " . $action; */
+		if (in_array($parameters['currentcontext'] , array('ticketlist', 'thirdpartyticket', 'projectticket'))) {        // do something only for the context 'somecontext1' or 'somecontext2'
+			$searchCategoryTicketSqlList = array();
+			$searchCategoryTicketList = GETPOST('search_category_ticket_list');
+			if (is_array($searchCategoryTicketList) && !empty($searchCategoryTicketList)) {
+				foreach ($searchCategoryTicketList as $searchCategoryTicket) {
+					if (intval($searchCategoryTicket) == -2) {
+						$searchCategoryTicketSqlList[] = "ct.fk_categorie IS NULL";
+					} elseif (intval($searchCategoryTicket) > 0) {
+						$searchCategoryTicketSqlList[] = "t.rowid IN (SELECT fk_ticket FROM " . MAIN_DB_PREFIX . "categorie_ticket WHERE fk_categorie = " . ((int)$searchCategoryTicket) . ")";
+					}
+				}
+				if (!empty($searchCategoryTicketSqlList)) {
+					$sql = " AND (" . implode(' AND ', $searchCategoryTicketSqlList) . ")";
+				}
+			} else {
+				if (!empty($searchCategoryTicketList) && $searchCategoryTicketList > 0) {
+					$sql = " AND ct.fk_categorie = ".((int) $searchCategoryTicketList);
+				}
+				if ($searchCategoryTicketList == -2) {
+					$sql = " AND ct.fk_categorie IS NULL";
+				}
+			}
+			if (!empty($searchCategoryTicketList)) {
+				$sql .= " GROUP BY t.rowid";
+			}
+		}
+
+		if (true) {
+			$this->resprints = $sql;
+			return 0; // or return 1 to replace standard code
+		} else {
+			$this->errors[] = 'Error message';
+			return -1;
+		}
+	}
+
+
+	/**
+	 *  Overloading the printFieldPreListTitle function : replacing the parent's function with the one below
+	 *
+	 * @param Hook $parameters metadatas (context, etc...)
+	 * @param $object current object
+	 * @return int
+	 */
+	public function printFieldPreListTitle($parameters, $object)
+	{
+		global $conf, $db, $user, $langs;
+
+		/* print_r($parameters); print_r($object); echo "action: " . $action; */
+		if (in_array($parameters['currentcontext'] , array('ticketlist', 'thirdpartyticket', 'projectticket'))) {        // do something only for the context 'somecontext1' or 'somecontext2'
+			require_once DOL_DOCUMENT_ROOT . '/categories/class/categorie.class.php';
+
+			$form = new Form($db);
+
+			// Filter on categories
+			$moreforfilter = '';
+			if (!empty($conf->categorie->enabled) && $user->rights->categorie->lire) {
+				$moreforfilter .= '<div class="divsearchfield">';
+				$moreforfilter .= img_picto($langs->trans('Categories'), 'category', 'class="pictofixedwidth"');
+				$categoriesTicketArr = $form->select_all_categories(Categorie::TYPE_TICKET, '', '', 64, 0, 1);
+				$categoriesTicketArr[-2] = '- ' . $langs->trans('NotCategorized') . ' -';
+				$searchCategoryTicketList = GETPOST('search_category_ticket_list');
+				if (is_array($searchCategoryTicketList) && !empty($searchCategoryTicketList)) {
+					$searchCategoryTicket = GETPOST('search_category_ticket_list', 'array');
+				} else {
+					$searchCategoryTicket = array($searchCategoryTicketList);
+				}
+				$moreforfilter .= Form::multiselectarray('search_category_ticket_list', $categoriesTicketArr, $searchCategoryTicket, 0, 0, 'minwidth300');
+				$moreforfilter .= '</div>';
+			}
+		}
+
+		if (true) {
+			$this->resprints = $moreforfilter;
+			return 0; // or return 1 to replace standard code
+		} else {
+			$this->errors[] = 'Error message';
+			return -1;
+		}
+	}
+
+	/**
+	 *  Overloading the printFieldListSearchParam function : replacing the parent's function with the one below
+	 *
+	 * @param Hook $parameters metadatas (context, etc...)
+	 * @param $object current object
+	 * @return int
+	 */
+	public function printFieldListSearchParam($parameters, $object)
+	{
+		global $conf, $db, $user, $langs;
+
+		/* print_r($parameters); print_r($object); echo "action: " . $action; */
+		if (in_array($parameters['currentcontext'] , array('ticketlist', 'thirdpartyticket', 'projectticket'))) {        // do something only for the context 'somecontext1' or 'somecontext2'
+			$searchCategoryTicketList = GETPOST('search_category_ticket_list');
+			if (is_array($searchCategoryTicketList) && !empty($searchCategoryTicketList)) {
+				foreach ($searchCategoryTicketList as $searchCategoryTicket) {
+					$param .= "&search_category_ticket_list[]=" . urlencode($searchCategoryTicket);
+				}
+			} elseif (!empty($searchCategoryTicketList)) {
+				$param = "&search_category_ticket_list=" . urlencode($searchCategoryTicketList);
+			}
+		}
+
+		if (true) {
+			$this->resprints = $param;
 			return 0; // or return 1 to replace standard code
 		} else {
 			$this->errors[] = 'Error message';

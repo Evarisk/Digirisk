@@ -90,6 +90,11 @@ function digiriskelementPrepareHead($object)
 		$head[$h][2] = 'elementAgenda';
 		$h++;
 
+		$head[$h][0] = dol_buildpath("/digiriskdolibarr/view/digiriskelement/digiriskelement_register.php", 1) . '?id=' . $object->id;
+		$head[$h][1] = '<i class="fa fa-ticket"></i> ' . $langs->trans("Registers");
+		$head[$h][2] = 'elementRegister';
+		$h++;
+
 		complete_head_from_modules($conf, $langs, $object, $head, $h, 'digiriskelement@digiriskdolibarr');
 	}
 	return $head;

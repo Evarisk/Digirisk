@@ -51,6 +51,10 @@ LinkedProject = Projet lié
 DigiriskUpdate = Mise à jour de Digirisk :
 DigiriskHasBeenUpdatedTo = Digirisk a été mis à jour en version %s
 Security = Sécurité
+HowToSharedElement = Pour plus d'informations sur la configuratiion des éléments partagés, veuillez vous rendre sur ce lien :
+HowToSharedElementLink = https://wiki.dolibarr.org/index.php?title=Module_Digirisk#Configuration
+ConfigSharedElement = Configuratiion des éléments partagés (risques/signalisations)
+DisabledSharedElement = Option désactivée car multi company n'est pas activé ou la configuratiion des éléments partagés (risques/signalisations) n'a pas été effectuée
 
 
 
@@ -121,6 +125,8 @@ Apprentice/Student = Apprenti/Elève
 Interim = Intérimaire
 ProfessionalQualification = Qualification professionnelle
 DigiriskDocumentation = Documentation de Digirisk
+PleaseNameTheFile = De préférence, nommez le fichier <b> %s </b>
+
 
 #
 # Diaporama page index
@@ -300,6 +306,7 @@ ElectionDateDP = Date d'élection des DP
 Titulars = Titulaires
 Alternates = Suppléants
 informationssharing.odt = Diffusion d'informations
+ChooseBoxToAdd = Ajouter le widget au tableau de bord...
 
 
 
@@ -653,7 +660,7 @@ UserEmployer = Responsable de la société
 SignatureUserEmployer = Signature du responsable de la société
 CerfaLink = Lien vers le Cerfa
 WorkStopDays = Nombre de jour d'arrêt de travail
-AccidentLesionList = Liste des lésions lié à l'accident
+AccidentLesionList = Liste des lésions liées à l'accident
 DocumentsMetaData = Fichiers joints complémentaires
 WorkStopDocument = Déclaration d'arrêt de travail
 AccidentMetaDataSave = Les données complémentaires de l'accident ont bien été enregistrées
@@ -878,13 +885,13 @@ workunitdocument.odt = Fiche d'Unité de travail
 #
 
 # Rights  - Droits
-ReadDigiriskElement = Consulter les éléments digirisk
-CreateDigiriskElement = Créer/Modifier les éléments digirisk
-DeleteDigiriskElement = Supprimer les éléments digirisk
+ReadDigiriskElement = Consulter les éléments Digirisk
+CreateDigiriskElement = Créer/Modifier les éléments Digirisk
+DeleteDigiriskElement = Supprimer les éléments Digirisk
 HiddenElements = Corbeille
 
 # Data - Donnée
-NewDigiriskElement = Nouveau élément digirisk
+NewDigiriskElement = Nouveau élément Digirisk
 GPUTOrganization = Organisation des GP/UT
 DigiriskElement = Élément Digirisk
 ElementType = Type d'élément
@@ -896,6 +903,9 @@ ShareDigiriskelement = Activer le partage des groupements et unités de travail
 DIGIRISKELEMENTSharing = Partage des des groupements et unités de travail
 DIGIRISKELEMENTSharingDescription = Sélection des entités qui partageront leurs groupements et unités de travail avec cette entité.
 DigiriskElementSharedTooltip = Cette option permet de partager les groupements et unités de travail. <br> INFO : Si vous souhaitez pouvoir afficher les tâches, il faut activer l'option de partage des projets.
+PleaseSelectADigiriskElement = Sélectionner un groupement ou une unité de travail...
+Registers = Registres
+
 
 #
 # Groupment - Groupement
@@ -1368,6 +1378,7 @@ TicketActivatePublicInterface = Activer l'interface publique
 GenerateExtrafields = Génération des extrafields de ticket par défaut
 GenerateCategories = Génération des catégories de ticket par défaut
 AlreadyGenerated = Déjà généré(e)s
+NotGenerated = Pas encore généré(e)
 NotCreated = Pas encore créé(e)s
 ExtrafieldsGeneration = Cette option permet la génération des extrafields par défaut des tickets. Les extrafields créés seront : <br> Nom, Prénom, Téléphone, Service, Lieu & Date
 CategoriesGeneration = Cette option permet la génération des catégories par défaut des tickets. Les catégories créées seront : <br> - Registre <br> - - Accident <br> - - - Presqu'accident, Accident bénin, Accident du travail <br> - - Santé & Sécurité au travail <br> - - - Départ anticipé, Autres, Problème humain, Problème matériel <br> - - Danger grave et imminent <br> - - Qualité <br> - - - Non conformité, Suggestion d'amélioration <br> - - Environnement <br> - - - Non conformité, Autres
@@ -1402,6 +1413,21 @@ TSProject = Projet lié aux tickets
 TicketInitial = TS
 TicketDescription = Projet des tickets
 TicketProjectUpdated = Le projet par défaut des tickets a été mis à jour
+QRCodeAlreadyGenerated = QR Code généré
+GenerateQRCode = Générer le QR Code
+QRCodeGeneration = Génération du QR Code
+PleaseSelectAService = Veuillez sélectionner un service
+TicketCreationMailWellSent = Mail de confirmation de création du ticket envoyé
+TicketCreationMailSent = Le mail de création du ticket a été envoyé à %s
+HowToSetupTicketCategories = Pour configurer les catégories de ticket, veuillez cliquer sur ce lien :
+ConfigTicketCategories = Configuration des catégories de ticket
+NewTicketSubmitted = Un ticket a été soumis via l'interface publique
+ANewTicketHasBeenSubmitted = Un nouveau ticket a été créé via l'interface publique
+SeeTicketUrl = Voir le ticket :
+TicketCreationSubject = Création de ticket via l'interface publique de Digirisk
+TicketDocumentCustomDigiriskTemplate = ODT custom des fiches de tickets
+HowToSetupDigiriskElement = Pour configurer les éléments de Digirisk (groupements/unités de travail), veuillez cliquer sur ce lien :
+ConfigDigiriskElement = Configuration des éléments de Digirisk
 
 
 
@@ -1418,6 +1444,7 @@ TicketDocumentDigiriskTemplate = ODT par défaut des fiches de tickets
 # Data - Donnée
 TicketDocument = Fiche du ticket
 ticketdocument.odt = Fiche du ticket
+ticketdocument_custom.odt = Fiche personnalisée du ticket
 ticketdocument_events.odt = Fiche du ticket avec évènements
 TicketSuccessMessageData = Message du ticket
 TicketSuccessMessage= Message de succès du ticket
@@ -1503,3 +1530,4 @@ GP/UTParticipation = Participation GP/UT
 LabourDoctorName = AMETRA
 LabourDoctorFirstName = Médecin du
 LabourDoctorLastName = travail
+DashBoard = Tableau de bord

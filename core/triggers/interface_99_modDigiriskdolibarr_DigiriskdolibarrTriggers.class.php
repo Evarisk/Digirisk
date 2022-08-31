@@ -72,7 +72,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 		$this->name        = preg_replace('/^Interface/i', '', get_class($this));
 		$this->family      = "demo";
 		$this->description = "Digiriskdolibarr triggers.";
-		$this->version     = '9.4.0';
+		$this->version     = '9.5.0';
 		$this->picto       = 'digiriskdolibarr@digiriskdolibarr';
 	}
 
@@ -725,9 +725,6 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 
 				$actioncomm = new ActionComm($this->db);
 
-
-
-
 				$actioncomm->elementtype = $object->object_type . '@digiriskdolibarr';
 				$actioncomm->code        = 'AC_DIGIRISKSIGNATURE_SIGNED';
 				$actioncomm->type_code   = 'AC_OTH_AUTO';
@@ -767,7 +764,9 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->label             = $langs->transnoentities('DigiriskSignaturePendingSignatureTrigger');
 				$actioncomm->datep             = $now;
 				$actioncomm->fk_element        = $object->fk_object;
-				$actioncomm->socpeopleassigned = array($object->element_id => $object->element_id);
+				if ($object->element_type == 'socpeople') {
+					$actioncomm->socpeopleassigned = array($object->element_id => $object->element_id);
+				}
 				$actioncomm->userownerid       = $user->id;
 				$actioncomm->percentage        = -1;
 
@@ -791,7 +790,9 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->label             = $langs->transnoentities('DigiriskSignatureAbsentTrigger');
 				$actioncomm->datep             = $now;
 				$actioncomm->fk_element        = $object->fk_object;
-				$actioncomm->socpeopleassigned = array($object->element_id => $object->element_id);
+				if ($object->element_type == 'socpeople') {
+					$actioncomm->socpeopleassigned = array($object->element_id => $object->element_id);
+				}
 				$actioncomm->userownerid       = $user->id;
 				$actioncomm->percentage        = -1;
 
@@ -815,7 +816,9 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->label             = $langs->transnoentities('DigiriskSignatureDeletedTrigger');
 				$actioncomm->datep             = $now;
 				$actioncomm->fk_element        = $object->fk_object;
-				$actioncomm->socpeopleassigned = array($object->element_id => $object->element_id);
+				if ($object->element_type == 'socpeople') {
+					$actioncomm->socpeopleassigned = array($object->element_id => $object->element_id);
+				}
 				$actioncomm->userownerid       = $user->id;
 				$actioncomm->percentage        = -1;
 
@@ -823,10 +826,19 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				break;
 
 			case 'TICKET_CREATE' :
-				//envoi du mail avec les infos de l'objet aux adresses mail configurées
-				//envoi du mail avec une trad puis avec un model
-				$error = 0;
 				if ($conf->global->DIGIRISKDOLIBARR_SEND_EMAIL_ON_TICKET_SUBMIT) {
+					//envoi du mail avec les infos de l'objet aux adresses mail configurées
+					//envoi du mail avec une trad puis avec un model
+					$error = 0;
+					$formmail = new FormMail($this->db);
+
+					$arraydefaultmessage = $formmail->getEMailTemplate($this->db, 'ticket_send', $user, $langs); // If $model_id is empty, preselect the first one
+					$substitutionarray = getCommonSubstitutionArray($langs, 0, null,$object);
+					complete_substitutions_array($substitutionarray, $langs, $object);
+
+					$subject = make_substitutions($arraydefaultmessage->topic,$substitutionarray);
+					$message = make_substitutions($arraydefaultmessage->content,$substitutionarray) . '<br>' . $object->message;
+
 					if ( ! $error) {
 						$langs->load('mails');
 
@@ -838,9 +850,6 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 								require_once DOL_DOCUMENT_ROOT . '/core/class/CMailFile.class.php';
 
 								$from = $conf->global->MAIN_MAIL_EMAIL_FROM;
-
-								$message = $object->message;
-								$subject = $langs->trans('NewTicketSubmitted') . ' : ' . $object->subject . $langs->trans('By') . /* extrafield */ '';
 								$trackid = 'tic' . $object->id;
 
 								// Create form object
@@ -862,6 +871,23 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 										}
 										$mesg .= '</div>';
 										setEventMessages($mesg, null, 'warnings');
+									} else {
+										dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id);
+										require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
+										$now        = dol_now();
+										$actioncomm = new ActionComm($this->db);
+										$actioncomm->elementtype = 'ticket';
+										$actioncomm->code      = 'AC_TICKET_CREATION_MAIL_SENT';
+										$actioncomm->type_code = 'AC_OTH_AUTO';
+										$actioncomm->label = $langs->transnoentities('TicketCreationMailWellSent');
+										$actioncomm->note = $langs->transnoentities('TicketCreationMailSent', $listOfMails);
+										$actioncomm->datep       = $now;
+										$actioncomm->fk_element  = $object->id;
+										$actioncomm->userownerid = $user->id;
+										$actioncomm->percentage  = -1;
+
+										$actioncomm->create($user);
+										break;
 									}
 								} else {
 									setEventMessages($langs->trans('ErrorSetupEmail'), '', 'errors');
@@ -884,9 +910,6 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 										require_once DOL_DOCUMENT_ROOT . '/core/class/CMailFile.class.php';
 
 										$from = $conf->global->MAIN_MAIL_EMAIL_FROM;
-
-										$message = $object->message;
-										$subject = $langs->transnoentities('NewTicketSubmitted') . ' : ' . $object->subject . $langs->transnoentities('By') . /* extrafield */ '';
 										$trackid = 'tic' . $object->id;
 
 										// Create form object
@@ -909,6 +932,23 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 													}
 													$mesg .= '</div>';
 													setEventMessages($mesg, null, 'warnings');
+												} else {
+													dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id);
+													require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
+													$now        = dol_now();
+													$actioncomm = new ActionComm($this->db);
+													$actioncomm->elementtype = 'ticket';
+													$actioncomm->code      = 'AC_TICKET_CREATION_MAIL_SENT';
+													$actioncomm->type_code = 'AC_OTH_AUTO';
+													$actioncomm->label = $langs->transnoentities('TicketCreationMailWellSent');
+													$actioncomm->note = $langs->transnoentities('TicketCreationMailSent', $listOfMails);
+													$actioncomm->datep       = $now;
+													$actioncomm->fk_element  = $object->id;
+													$actioncomm->userownerid = $user->id;
+													$actioncomm->percentage  = -1;
+
+													$actioncomm->create($user);
+													break;
 												}
 											} else {
 												setEventMessages($langs->trans('ErrorSetupEmail'), '', 'errors');

@@ -17,7 +17,7 @@
  */
 
 /**
- *	\file       core/modules/digiriskdolibarr/digiriskdocuments/ticketdocument/doc_ticketdocument_odt.modules.php
+ *	\file       core/modules/digiriskdolibarr/digiriskdocuments/ticketdocument/doc_ticketdocument_custom_odt.modules.php
  *	\ingroup    digiriskdolibarr
  *	\brief      File of class to build ODT documents for digiriskdolibarr
  */
@@ -35,7 +35,7 @@ require_once __DIR__ . '/modules_ticketdocument.php';
 /**
  *	Class to build documents using ODF templates generator
  */
-class doc_ticketdocument_odt extends ModeleODTTicketDocument
+class doc_ticketdocument_custom_odt extends ModeleODTTicketDocument
 {
 	/**
 	 * @var DoliDB Database handler.
@@ -137,9 +137,9 @@ class doc_ticketdocument_odt extends ModeleODTTicketDocument
 		$langs->loadLangs(array("main", "companies"));
 
 		$this->db          = $db;
-		$this->name        = $langs->trans('TicketDocumentDigiriskTemplate');
+		$this->name        = $langs->trans('TicketDocumentCustomDigiriskTemplate');
 		$this->description = $langs->trans("DocumentModelOdt");
-		$this->scandir     = 'DIGIRISKDOLIBARR_TICKETDOCUMENT_ADDON_ODT_PATH'; // Name of constant that is used to save list of directories to scan
+		$this->scandir     = 'DIGIRISKDOLIBARR_TICKETDOCUMENT_CUSTOM_ADDON_ODT_PATH'; // Name of constant that is used to save list of directories to scan
 
 		// Page size for A4 format
 		$this->type         = 'odt';
@@ -169,23 +169,25 @@ class doc_ticketdocument_odt extends ModeleODTTicketDocument
 		// Load translation files required by the page
 		$langs->loadLangs(array("errors", "companies"));
 
+		$form = new Form($this->db);
+
 		$texte  = $this->description . ".<br>\n";
-		$texte .= '<form action="' . $_SERVER["PHP_SELF"] . '" method="POST">';
+		$texte .= '<form action="' . $_SERVER["PHP_SELF"] . '" method="POST" enctype="multipart/form-data">';
 		$texte .= '<input type="hidden" name="token" value="' . newToken() . '">';
 		$texte .= '<input type="hidden" name="action" value="setModuleOptions">';
-		$texte .= '<input type="hidden" name="param1" value="DIGIRISKDOLIBARR_TICKETDOCUMENT_ADDON_ODT_PATH">';
+		$texte .= '<input type="hidden" name="conf" value="DIGIRISKDOLIBARR_TICKETDOCUMENT_CUSTOM_ADDON_ODT_PATH">';
+		$texte .= '<input type="hidden" name="path" value="' . $conf->global->DIGIRISKDOLIBARR_TICKETDOCUMENT_CUSTOM_ADDON_ODT_PATH . '">';
 		$texte .= '<table class="nobordernopadding">';
 
 		// List of directories area
 		$texte      .= '<tr><td>';
 		$texttitle   = $langs->trans("ListOfDirectories");
-		$listofdir   = explode(',', preg_replace('/[\r\n]+/', ',', trim($conf->global->DIGIRISKDOLIBARR_TICKETDOCUMENT_ADDON_ODT_PATH)));
+		$listofdir   = explode(',', preg_replace('/[\r\n]+/', ',', trim($conf->global->DIGIRISKDOLIBARR_TICKETDOCUMENT_CUSTOM_ADDON_ODT_PATH)));
 		$listoffiles = array();
 
 		foreach ($listofdir as $key => $tmpdir) {
 			$tmpdir = trim($tmpdir);
 			$tmpdir = preg_replace('/DOL_DATA_ROOT/', DOL_DATA_ROOT, $tmpdir);
-			$tmpdir = preg_replace('/DOL_DOCUMENT_ROOT/', DOL_DOCUMENT_ROOT, $tmpdir);
 			if ( ! $tmpdir) {
 				unset($listofdir[$key]); continue;
 			}
@@ -195,17 +197,26 @@ class doc_ticketdocument_odt extends ModeleODTTicketDocument
 				if (count($tmpfiles)) $listoffiles = array_merge($listoffiles, $tmpfiles);
 			}
 		}
+		$texthelp = $langs->trans("ListOfDirectoriesForModelGenODT");
+		// Add list of substitution keys
+		$texthelp .= '<br>' . $langs->trans("FollowingSubstitutionKeysCanBeUsed") . '<br>';
+		$texthelp .= $langs->transnoentitiesnoconv("FullListOnOnlineDocumentation"); // This contains an url, we don't modify it
+
+		$texte .= $form->textwithpicto($texttitle, $texthelp, 1, 'help', '', 1);
+		$texte .= '<div><div style="display: inline-block; min-width: 100px; vertical-align: middle;">';
+		$texte .= '<span class="flat" style="font-weight: bold">';
+		$texte .= $conf->global->DIGIRISKDOLIBARR_TICKETDOCUMENT_CUSTOM_ADDON_ODT_PATH;
+		$texte .= '</span>';
+		$texte .= '</div><div style="display: inline-block; vertical-align: middle;">';
+		$texte .= '<br></div></div>';
 
 		// Scan directories
 		$nbofiles = count($listoffiles);
-		if ( ! empty($conf->global->DIGIRISKDOLIBARR_TICKETDOCUMENT_ADDON_ODT_PATH)) {
-			$texte .= $langs->trans("DigiriskNumberOfModelFilesFound") . ': <b>';
-			//$texte.=$nbofiles?'<a id="a_'.get_class($this).'" href="#">':'';
+		if ( ! empty($conf->global->DIGIRISKDOLIBARR_TICKETDOCUMENT_CUSTOM_ADDON_ODT_PATH)) {
+			$texte .= $langs->trans("NumberOfModelFilesFound") . ': <b>';
 			$texte .= count($listoffiles);
-			//$texte.=$nbofiles?'</a>':'';
 			$texte .= '</b>';
 		}
-
 		if ($nbofiles) {
 			$texte .= '<div id="div_' . get_class($this) . '" class="hidden">';
 			foreach ($listoffiles as $file) {
@@ -213,8 +224,18 @@ class doc_ticketdocument_odt extends ModeleODTTicketDocument
 			}
 			$texte .= '</div>';
 		}
-
+		// Add input to upload a new template file.
+		$texte .= '<div>' . $langs->trans("UploadNewTemplate") . ' <input type="file" name="userfile">';
+		$texte .= '<input type="hidden" value="DIGIRISKDOLIBARR_TICKETDOCUMENT_CUSTOM_ADDON_ODT_PATH" name="keyforuploaddir">';
+		$texte .= '<input type="submit" class="button" value="' . dol_escape_htmltag($langs->trans("Upload")) . '" name="upload">';
+		$texte .= '</div>';
 		$texte .= '</td>';
+
+		$texte .= '<td rowspan="2" class="tdtop hideonsmartphone">';
+		$texte .= $langs->trans("PleaseNameTheFile", 'template_ticketdocument_custom.odt');
+		$texte .= '</td>';
+		$texte .= '</tr>';
+
 		$texte .= '</table>';
 		$texte .= '</form>';
 
@@ -241,7 +262,7 @@ class doc_ticketdocument_odt extends ModeleODTTicketDocument
 		global $user, $langs, $conf, $hookmanager, $action, $mysoc;
 
 		if (empty($srctemplatepath)) {
-			dol_syslog("doc_ticketdocument_odt::write_file parameter srctemplatepath empty", LOG_WARNING);
+			dol_syslog("doc_ticketdocument_custom_odt::write_file parameter srctemplatepath empty", LOG_WARNING);
 			return -1;
 		}
 
@@ -349,7 +370,7 @@ class doc_ticketdocument_odt extends ModeleODTTicketDocument
 			$tmparray['phone_number']     = $ticket->array_options['options_digiriskdolibarr_ticket_phone'];
 			if ($ticket->array_options['options_digiriskdolibarr_ticket_service'] > 0) {
 				$digiriskelement->fetch($ticket->array_options['options_digiriskdolibarr_ticket_service']);
-				$tmparray['service'] =  $digiriskelement->ref . ' - ' . $digiriskelement->label;
+				$tmparray['service'] = $digiriskelement->ref . ' - ' . $digiriskelement->label;
 			} else {
 				$tmparray['service'] = '';
 			}

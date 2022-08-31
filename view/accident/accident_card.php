@@ -391,8 +391,10 @@ if (empty($reshook)) {
 		$objectline->workstop_days       = $workstop_days;
 
 		$date_start_workstop = dol_mktime(GETPOST('datestarthour', 'int'), GETPOST('datestartmin', 'int'), 0, GETPOST('datestartmonth', 'int'), GETPOST('datestartday', 'int'), GETPOST('datestartyear', 'int'));
+		$date_end_workstop   = dol_mktime(GETPOST('dateendhour', 'int'), GETPOST('dateendmin', 'int'), 0, GETPOST('dateendmonth', 'int'), GETPOST('dateendday', 'int'), GETPOST('dateendyear', 'int'));
 
 		$objectline->date_start_workstop = $date_start_workstop;
+		$objectline->date_end_workstop   = $date_end_workstop;
 		$objectline->fk_accident         = $parent_id;
 
 		// Check parameters
@@ -432,8 +434,10 @@ if (empty($reshook)) {
 		$objectline->workstop_days       = $workstop_days;
 
 		$date_start_workstop = dol_mktime(GETPOST('datestarthour', 'int'), GETPOST('datestartmin', 'int'), 0, GETPOST('datestartmonth', 'int'), GETPOST('datestartday', 'int'), GETPOST('datestartyear', 'int'));
+		$date_end_workstop   = dol_mktime(GETPOST('dateendhour', 'int'), GETPOST('dateendmin', 'int'), 0, GETPOST('dateendmonth', 'int'), GETPOST('dateendday', 'int'), GETPOST('dateendyear', 'int'));
 
 		$objectline->date_start_workstop = $date_start_workstop;
+		$objectline->date_end_workstop   = $date_end_workstop;	
 		$objectline->fk_accident         = $parent_id;
 
 		if ( ! $error) {
@@ -864,7 +868,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 
 		$lastaccidentline = end($accidentlines);
 
-		$morehtmlref .= '<br>' . $langs->trans('ReturnWorkDate') . ' : ' . dol_print_date(dol_time_plus_duree(dol_stringtotime($lastaccidentline->date_start_workstop), $lastaccidentline->workstop_days, 'd'), 'dayhour');
+		$morehtmlref .= '<br>' . $langs->trans('ReturnWorkDate') . ' : ' . dol_print_date($lastaccidentline->date_end_workstop, 'dayhour');
 	} else {
 		$morehtmlref .= '<br>' . $langs->trans('RegisterAccident');
 	}
@@ -1047,7 +1051,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 
 					$coldisplay++;
 					print '<td>';
-					print dol_print_date(dol_time_plus_duree(dol_stringtotime($item->date_start_workstop), $item->workstop_days, 'd'), 'dayhour');
+					print $form->selectDate($item->date_end_workstop, 'dateend', 1, 1, 0, '', 1);
 					print '</td>';
 
 					$coldisplay++;
@@ -1135,7 +1139,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 
 					$coldisplay++;
 					print '<td>';
-					print dol_print_date(dol_time_plus_duree(dol_stringtotime($item->date_start_workstop), $item->workstop_days, 'd'), 'dayhour');
+					print dol_print_date($item->date_end_workstop, 'dayhour');
 					print '</td>';
 
 					$coldisplay++;
@@ -1227,6 +1231,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 
 			$coldisplay++;
 			print '<td>';
+			print $form->selectDate(dol_now('tzuser'), 'dateend', 1, 1, 0, '', 1);
 			print '</td>';
 
 			$coldisplay++;

@@ -373,7 +373,7 @@ class modDigiriskdolibarr extends DolibarrModules
 		$this->descriptionlong = "Digirisk";
 		$this->editor_name     = 'Evarisk';
 		$this->editor_url      = 'https://evarisk.com';
-		$this->version         = '9.4.0';
+		$this->version         = '9.5.0';
 		$this->const_name      = 'MAIN_MODULE_' . strtoupper($this->name);
 		$this->picto           = 'digiriskdolibarr@digiriskdolibarr';
 
@@ -409,7 +409,10 @@ class modDigiriskdolibarr extends DolibarrModules
 				'projecttaskcard',
 				'projecttaskscard',
 				'tasklist',
-				'publicnewticketcard'
+				'publicnewticketcard',
+				'ticketlist',
+				'thirdpartyticket',
+				'projectticket',
 			),
 			'tabs' => array(
 				'mycompany_admin'
@@ -431,6 +434,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			"/ecm/digiriskdolibarr/workunitdocument",
 			"/ecm/digiriskdolibarr/listingrisksaction",
 			"/ecm/digiriskdolibarr/listingrisksphoto",
+			"/ecm/digiriskdolibarr/ticketdocument",
 			"/ecm/digiriskdolibarr/medias"
 		);
 
@@ -653,7 +657,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			286 => array('DIGIRISKDOLIBARR_SIGNATURE_SHOW_COMPANY_LOGO', 'integer', 1, '', 0, 'current'),
 
 			//CONST TICKET & REGISTERS
-			290 => array('DIGIRISKDOLIBARR_TICKET_EXTRAFIELDS', 'integer', 0, '', 0, 'current'),
+			290 => array('DIGIRISKDOLIBARR_TICKET_EXTRAFIELDS', 'integer', 0, '', 0, 0),
 			291 => array('DIGIRISKDOLIBARR_TICKET_CATEGORIES_CREATED', 'integer', 0, '', 0, 'current'),
 			292 => array('DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE', 'integer', 1, '', 0, 'current'),
 			293 => array('DIGIRISKDOLIBARR_TICKET_SHOW_COMPANY_LOGO', 'integer', 1, '', 0, 'current'),
@@ -679,6 +683,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			// CONST TICKET DOCUMENT
 			330 => array('DIGIRISKDOLIBARR_TICKETDOCUMENT_ADDON_ODT_PATH', 'chaine', 'DOL_DOCUMENT_ROOT/custom/digiriskdolibarr/documents/doctemplates/ticketdocument/', '', 0, 'current'),
 			331 => array('DIGIRISKDOLIBARR_TICKETDOCUMENT_ADDON', 'chaine', 'mod_ticketdocument_standard', '', 0, 'current'),
+			332 => array('DIGIRISKDOLIBARR_TICKETDOCUMENT_CUSTOM_ADDON_ODT_PATH', 'chaine', 'DOL_DATA_ROOT/ecm/digiriskdolibarr/ticketdocument/', '', 0, 'current'),
 
 //			// CONST ACCIDENT DOCUMENT
 //			320 => array('MAIN_AGENDA_ACTIONAUTO_ACCIDENTDOCUMENT_CREATE', 'integer', 1, '', 0, 'current'),
@@ -1264,6 +1269,22 @@ class modDigiriskdolibarr extends DolibarrModules
 			'user'     => 0,				                // 0=Menu for internal users, 1=external users, 2=both
 		);
 
+		$this->menu[$r++] = array(
+			'fk_menu'  => 'fk_mainmenu=ticket',	    // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
+			'type'     => 'left',			                // This is a Left menu entry
+			'titre'    => $langs->transnoentities('DashBoard'),
+			'prefix'   => $pictoDigirisk,
+			'mainmenu' => 'ticket',
+			'leftmenu' => 'dashboardticket',
+			'url'      => '/digiriskdolibarr/view/dashboard_ticket.php',
+			'langs'    => 'digiriskdolibarr@digiriskdolibarr',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
+			'position' => 48520 + $r,
+			'enabled'  => '$conf->digiriskdolibarr->enabled && $conf->ticket->enabled',  // Define condition to show or hide menu entry. Use '$conf->digiriskdolibarr->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
+			'perms'    => '$user->rights->ticket->read && $user->rights->digiriskdolibarr->lire', // Use 'perms'=>'$user->rights->digiriskdolibarr->level1->level2' if you want your menu with a permission rules
+			'target'   => '',
+			'user'     => 0,				                // 0=Menu for internal users, 1=external users, 2=both
+		);
+
 		// Exports profiles provided by this module
 		$r = 1;
 
@@ -1324,9 +1345,9 @@ class modDigiriskdolibarr extends DolibarrModules
 		$this->export_icon[$r] = 'category';
 		$this->export_enabled[$r] = '!empty($conf->ticket->enabled)';
 		$this->export_permission[$r] = array(array("categorie", "lire"), array("ticket", "manage"));
-		$this->export_fields_array[$r] = array('cat.rowid'=>"CategId", 'cat.label'=>"Label", 'cat.description'=>"Description", 'cat.fk_parent'=>"ParentCategory", 't.rowid'=>'TicketId', 't.ref'=>'Ref', 's.rowid'=>"IdThirdParty", 's.nom'=>"Name");
-		$this->export_TypeFields_array[$r] = array('cat.label'=>"Text", 'cat.description'=>"Text", 'cat.fk_parent'=>'List:categorie:label:rowid', 't.ref'=>'Text', 's.rowid'=>"List:societe:nom:rowid", 's.nom'=>"Text");
-		$this->export_entities_array[$r] = array('t.rowid'=>'ticket', 't.ref'=>'ticket', 's.rowid'=>"company", 's.nom'=>"company"); // We define here only fields that use another picto
+		$this->export_fields_array[$r] = array('cat.rowid'=>"CategId", 'cat.label'=>"Label", 'cat.description'=>"Description", 'cat.fk_parent'=>"ParentCategory", 't.rowid'=>'TicketId', 't.ref'=>'Ref', 't.datec'=>"DateCreation", 't.message' => 'Message', 's.rowid'=>"IdThirdParty", 's.nom'=>"Name");
+		$this->export_TypeFields_array[$r] = array('cat.label'=>"Text", 'cat.description'=>"Text", 'cat.fk_parent'=>'List:categorie:label:rowid', 't.ref'=>'Text', 't.datec'=>"Date", 't.message'=>"Text", 's.rowid'=>"List:societe:nom:rowid", 's.nom'=>"Text");
+		$this->export_entities_array[$r] = array('t.rowid'=>'ticket', 't.ref'=>'ticket', 't.datec'=>'ticket', 't.message' => 'ticket', 's.rowid'=>"company", 's.nom'=>"company"); // We define here only fields that use another picto
 
 		$keyforselect = 'Ticket';
 		$keyforelement = 'Ticket';
@@ -1684,6 +1705,34 @@ class modDigiriskdolibarr extends DolibarrModules
 		$extra_fields->update('fk_accident', $langs->transnoentities("AccidentLinked"), 'sellist', '', 'projet_task', 0, 0, 1040, 'a:1:{s:7:"options";a:1:{s:54:"digiriskdolibarr_accident:ref:rowid::entity = $ENTITY$";N;}}', '', '', 1);
 		$extra_fields->addExtraField('fk_accident', $langs->transnoentities("AccidentLinked"), 'sellist', 1040, '', 'projet_task', 0, 0, '', 'a:1:{s:7:"options";a:1:{s:54:"digiriskdolibarr_accident:ref:rowid::entity = $ENTITY$";N;}}', '', '', 1);
 
+		if (!$conf->global->DIGIRISKDOLIBARR_TICKET_EXTRAFIELDS_BACKWARD_COMPATIBILITY && (dolibarr_get_const($this->db, 'DIGIRISKDOLIBARR_TICKET_EXTRAFIELDS', 0) || dolibarr_get_const($this->db, 'DIGIRISKDOLIBARR_TICKET_EXTRAFIELDS', $conf->entity))) {
+			if ($conf->multicompany->enabled) {
+				$current_entity = $conf->entity;
+				$object = new ActionsMulticompany($this->db);
+
+				$entities = $object->getEntitiesList(false, false, true, true);
+				foreach ($entities as $sub_entity => $entity_name) {
+					$conf->setEntityValues($this->db, $sub_entity);
+					$extra_fields->delete('digiriskdolibarr_ticket_firstname', 'ticket');
+					$extra_fields->delete('digiriskdolibarr_ticket_lastname', 'ticket');
+					$extra_fields->delete('digiriskdolibarr_ticket_phone', 'ticket');
+					$extra_fields->delete('digiriskdolibarr_ticket_service', 'ticket');
+					$extra_fields->delete('digiriskdolibarr_ticket_location', 'ticket');
+					$extra_fields->delete('digiriskdolibarr_ticket_date', 'ticket');
+				}
+				$conf->setEntityValues($this->db, $current_entity);
+			}
+
+			$extra_fields->addExtraField('digiriskdolibarr_ticket_lastname', $langs->transnoentities("LastName"), 'varchar', 2000, 255, 'ticket', 0, 0, '', '', 1, '', 1, '', '', 0);
+			$extra_fields->addExtraField('digiriskdolibarr_ticket_firstname', $langs->transnoentities("FirstName"), 'varchar', 2100, 255, 'ticket', 0, 0, '', '', 1, '', 1, '', '', 0);
+			$extra_fields->addExtraField('digiriskdolibarr_ticket_phone', $langs->transnoentities("Phone"), 'phone', 2200, '', 'ticket', 0, 0, '', '', 1, '', 1, '', '', 0);
+			$extra_fields->addExtraField('digiriskdolibarr_ticket_service', $langs->transnoentities("GP/UT"), 'sellist', 2300, '255', 'ticket', 0, 0, '', 'a:1:{s:7:"options";a:1:{s:61:"digiriskdolibarr_digiriskelement:ref:rowid::entity = $ENTITY$";N;}}', 1, '', 4, '','',0);
+			$extra_fields->addExtraField('digiriskdolibarr_ticket_location', $langs->transnoentities("Location"), 'varchar', 2400, 255, 'ticket', 0, 0, '', '', 1, '', 1, '', '', 0);
+			$extra_fields->addExtraField('digiriskdolibarr_ticket_date', $langs->transnoentities("Date"), 'datetime', 2500, '', 'ticket', 0, 0, '', '', 1, '', 1, '', '', 0);
+			dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_TICKET_EXTRAFIELDS', 1, 'integer', 0, '', 0);
+			dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_TICKET_EXTRAFIELDS_BACKWARD_COMPATIBILITY', 1, 'integer', 0, '', 0);
+		}
+
 		//Used for data import from Digirisk Wordpress
 		$extra_fields->update('wp_digi_id', $langs->trans("WPDigiID"), 'int', 100, 'digiriskdolibarr_digiriskelement', 0, 0, 1020, '', '', '', 0);
 		$extra_fields->addExtraField('wp_digi_id', $langs->trans("WPDigiID"), 'int', 100, '', 'digiriskdolibarr_digiriskelement', 0, 0, '', '', '', '', 0);
@@ -1698,6 +1747,10 @@ class modDigiriskdolibarr extends DolibarrModules
 
 		dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_VERSION', $this->version, 'chaine', 0, '', $conf->entity);
 		dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_DB_VERSION', $this->version, 'chaine', 0, '', $conf->entity);
+
+		if ($conf->global->CATEGORIE_RECURSIV_ADD == 0) {
+			dolibarr_set_const($this->db, 'CATEGORIE_RECURSIV_ADD', 1, 'integer', 0, '', $conf->entity);
+		}
 
 		//DigiriskElement favorite medias backward compatibility
 		if ($conf->global->DIGIRISKDOLIBARR_DIGIRISKELEMENT_MEDIAS_BACKWARD_COMPATIBILITY == 0) {

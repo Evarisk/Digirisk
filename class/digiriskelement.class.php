@@ -460,14 +460,18 @@ class DigiriskElement extends CommonObject
 
 		if ($conf->global->DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH) {
 			$current_entity = $conf->entity;
-			$object = new ActionsMulticompany($this->db);
-
-			$entities = $object->getEntitiesList(false, false, true, true);
-			foreach ($entities as $sub_entity => $entity_name) {
-				$conf->setEntityValues($this->db, $sub_entity);
-				$entities_array[$sub_entity] = $conf->global->DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH;
+			if ($conf->multicompany->enabled) {
+				$object = new ActionsMulticompany($this->db);
+				$conf->global->MULTICOMPANY_TRANSVERSE_MODE = 0;
+				$entities = $object->getEntitiesList(false, false, true, true);
+				foreach ($entities as $sub_entity => $entity_name) {
+					$conf->setEntityValues($this->db, $sub_entity);
+					$entities_array[$sub_entity] = $conf->global->DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH;
+				}
+				$conf->setEntityValues($this->db, $current_entity);
+			} else {
+				$entities_array = array($current_entity => $current_entity);
 			}
-			$conf->setEntityValues($this->db, $current_entity);
 
 			foreach($entities_array as $entity_digiriskelement_trash) {
 				if ($entity_digiriskelement_trash > 0) {
@@ -501,6 +505,7 @@ class DigiriskElement extends CommonObject
 			$i                    = 0;
 
 			$textifempty          = (($showempty && ! is_numeric($showempty)) ? $langs->trans($showempty) : '');
+
 			if ($showempty) $out .= '<option value="-1">' . $textifempty . '</option>' . "\n";
 
 			if ( ! $noroot) $out .= '<option value="0" selected>' . $langs->trans('Root') . ' : ' . $conf->global->MAIN_INFO_SOCIETE_NOM . '</option>';

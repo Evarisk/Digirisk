@@ -1471,7 +1471,7 @@ window.eoxiaJS.mediaGallery.unlinkFile = function( event ) {
 
 	window.eoxiaJS.loader.display($(this).closest('.media-container'));
 
-	document.URL.match('/?/') ? querySeparator = '&' : 1
+	document.URL.match(/\?/) ? querySeparator = '&' : 1
 
 	if (type === 'riskassessment') {
 		let riskAssessmentPhoto = $('.risk-evaluation-photo-'+element_linked_id)
@@ -1566,7 +1566,7 @@ window.eoxiaJS.mediaGallery.addToFavorite = function( event ) {
 	newFavorite.addClass('fas')
 	newFavorite.removeClass('far')
 
-	document.URL.match('/?/') ? querySeparator = '&' : 1
+	document.URL.match(/\?/) ? querySeparator = '&' : 1
 
 	window.eoxiaJS.loader.display(mediaContainer);
 
@@ -3551,6 +3551,8 @@ window.eoxiaJS.ticket.event = function() {
 	$( document ).on( 'click', '.ticket-subCategory', window.eoxiaJS.ticket.selectSubCategory );
 	$( document ).on( 'submit', '#sendFile', window.eoxiaJS.ticket.tmpStockFile );
 	$( document ).on( 'click', '.linked-file-delete', window.eoxiaJS.ticket.removeFile );
+	$( document ).on( 'change', '.add-dashboard-info', window.eoxiaJS.ticket.addDashBoardInfo );
+	$( document ).on( 'click', '.close-dashboard-info', window.eoxiaJS.ticket.closeDashBoardInfo );
 };
 
 /**
@@ -3679,6 +3681,80 @@ window.eoxiaJS.ticket.removeFile = function( event ) {
 	}).then(() => {
 		$(this).parent().parent().hide()
 	})
+};
+
+/**
+ * Add ticket dashboard info for a category by service
+ *
+ * @since   9.5.0
+ * @version 9.5.0
+ *
+ * @return {void}
+ */
+window.eoxiaJS.ticket.addDashBoardInfo = function() {
+	let selectTitle = $('#select2-boxcombo-container').attr('title')
+	let digiriskelementID = selectTitle.split(' : ')[0];
+	let catID = selectTitle.split(' : ')[2];
+	let querySeparator = '?';
+
+	let token = $('.dashboardticket').find('input[name="token"]').val();
+
+	document.URL.match(/\?/) ? querySeparator = '&' : 1
+
+	$.ajax({
+		url: document.URL + querySeparator + 'action=adddashboardinfo&token='+token,
+		type: "POST",
+		processData: false,
+		data: JSON.stringify({
+			digiriskelementID: digiriskelementID,
+			catID: catID
+		}),
+		contentType: false,
+		success: function ( resp ) {
+			window.location.reload();
+		},
+		error: function ( ) {
+		}
+	});
+};
+
+/**
+ * Close ticket dashboard info for a category by service
+ *
+ * @since   9.5.0
+ * @version 9.5.0
+ *
+ * @return {void}
+ */
+window.eoxiaJS.ticket.closeDashBoardInfo = function() {
+	let box = $(this);
+	let digiriskelementID = $(this).attr('data-digiriskelementid');
+	let catID = $(this).attr('data-catid');
+	let querySeparator = '?';
+
+	let token = $('.dashboardticket').find('input[name="token"]').val();
+
+	document.URL.match(/\?/) ? querySeparator = '&' : 1
+
+	$.ajax({
+		url: document.URL + querySeparator + 'action=closedashboardinfo&token='+token,
+		type: "POST",
+		processData: false,
+		data: JSON.stringify({
+			digiriskelementID: digiriskelementID,
+			catID: catID
+		}),
+		contentType: false,
+		success: function ( resp ) {
+			console.log(resp)
+			console.log($(resp).find('.add-widget-box').children())
+			box.closest('.box-flex-item').fadeOut(400)
+            $('.add-widget-box').attr('style', '')
+			$('.add-widget-box').html($(resp).find('.add-widget-box').children())
+		},
+		error: function ( ) {
+		}
+	});
 };
 
 /**
@@ -3969,7 +4045,7 @@ window.eoxiaJS.menu.toggleMenu = function() {
  * @return {void}
  */
 window.eoxiaJS.menu.setMenu = function() {
-	if (!document.URL.match(/htdocs\/admin/) || document.URL.match(/mainmenu=digiriskdolibarr/)) {
+	if ($('.blockvmenu.blockvmenufirst').html().match(/digiriskdolibarr/)) {
 		$('span.vmenu').find('.fa-chevron-circle-left').parent().parent().parent().attr('style', 'cursor:pointer ! important')
 
 		if (localStorage.maximized == 'false') {
