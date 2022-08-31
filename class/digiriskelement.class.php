@@ -462,7 +462,7 @@ class DigiriskElement extends CommonObject
 			$current_entity = $conf->entity;
 			if ($conf->multicompany->enabled) {
 				$object = new ActionsMulticompany($this->db);
-
+				$conf->global->MULTICOMPANY_TRANSVERSE_MODE = 0;
 				$entities = $object->getEntitiesList(false, false, true, true);
 				foreach ($entities as $sub_entity => $entity_name) {
 					$conf->setEntityValues($this->db, $sub_entity);
