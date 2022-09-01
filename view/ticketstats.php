@@ -58,7 +58,7 @@ if (!$user->rights->ticket->read) {
 	accessforbidden();
 }
 
-$object_status      = GETPOST('object_status', 'intcomma');
+$object_status      = GETPOST('object_status', 'array');
 $userid             = GETPOST('userid', 'int');
 $socid              = GETPOST('socid', 'int');
 $digiriskelementid  = GETPOST('digiriskelementid', 'int');
@@ -96,8 +96,8 @@ print load_fiche_titre($title, '', 'ticket');
 dol_mkdir($dir);
 
 $stats = new TicketDigiriskStats($db, $socid, ($userid > 0 ? $userid: 0), ($digiriskelementid > 0 ? $digiriskelementid : 0), ($categticketid > 0 ? $categticketid: 0));
-if ($object_status != '' && $object_status >= 0) {
-	$stats->where .= ' AND tk.fk_statut IN ('.$db->sanitize($db->escape($object_status)).')';
+if (is_array($object_status) && !empty($object_status)) {
+	$stats->where .= ' AND tk.fk_statut IN ('.$db->sanitize(implode(',', $object_status)).')';
 }
 if (is_array($ticketcats) && !empty($ticketcats)) {
 	$stats->from .= ' LEFT JOIN '.MAIN_DB_PREFIX.'categorie_ticket as cattk ON (tk.rowid = cattk.fk_ticket)';
@@ -196,7 +196,7 @@ print $form->select_dolusers($userid, 'userid', 1, '', 0, '', '', $conf->entity,
 // Status
 print '<tr><td class="left">'.$langs->trans("Status").'</td><td class="left">';
 $liststatus = $object->statuts_short;
-print $form->selectarray('object_status', $liststatus, GETPOST('object_status', 'intcomma'), -4, 0, 0, '', 1);
+print $form->multiselectarray('object_status', $liststatus, GETPOST('object_status', 'array'), 0, 0, 'widthcentpercentminusx maxwidth300', 1);
 print '</td></tr>';
 // Year
 print '<tr><td class="left">'.$langs->trans("Year").'</td><td class="left">';
