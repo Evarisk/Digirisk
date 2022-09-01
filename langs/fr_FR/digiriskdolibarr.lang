@@ -1531,3 +1531,5 @@ LabourDoctorName = AMETRA
 LabourDoctorFirstName = Médecin du
 LabourDoctorLastName = travail
 DashBoard = Tableau de bord
+DayWithoutAccident = Jours sans accident(s):
+Close = Fermer

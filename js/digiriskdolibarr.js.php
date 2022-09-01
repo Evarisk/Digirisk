@@ -4244,11 +4244,44 @@ window.eoxiaJS.dashboard.init = function() {
  * @return {void}
  */
 window.eoxiaJS.dashboard.event = function() {
-	$( document ).on( 'click', '.close-dashboard-info', window.eoxiaJS.dashboard.closeDashBoardInfo );
+	$( document ).on( 'change', '.add-dashboard-widget', window.eoxiaJS.dashboard.addDashBoardInfo );
+	$( document ).on( 'click', '.close-dashboard-widget', window.eoxiaJS.dashboard.closeDashBoardInfo );
 };
 
 /**
- * Close index dashboard info for a module
+ * Add widget dashboard info
+ *
+ * @since   9.5.0
+ * @version 9.5.0
+ *
+ * @return {void}
+ */
+window.eoxiaJS.dashboard.addDashBoardInfo = function() {
+	var dashboardWidgetName = document.getElementById('dashBoardForm');
+	var formData = new FormData(dashboardWidgetName);
+	let widgetName = formData.get('boxcombo')
+	let querySeparator = '?';
+	let token = $('.dashboard').find('input[name="token"]').val();
+	document.URL.match(/\?/) ? querySeparator = '&' : 1
+
+	$.ajax({
+		url: document.URL + querySeparator + 'action=adddashboardinfo&token='+token,
+		type: "POST",
+		processData: false,
+		data: JSON.stringify({
+			widgetName: widgetName
+		}),
+		contentType: false,
+		success: function ( resp ) {
+			window.location.reload();
+		},
+		error: function ( ) {
+		}
+	});
+};
+
+/**
+ * Close widget dashboard info
  *
  * @since   9.5.0
  * @version 9.5.0
@@ -4259,7 +4292,6 @@ window.eoxiaJS.dashboard.closeDashBoardInfo = function() {
 	let box = $(this);
 	let dashboardWidgetName = $(this).attr('data-widgetname');
 	let querySeparator = '?';
-	console.log(dashboardWidgetName);
 	let token = $('.dashboard').find('input[name="token"]').val();
 
 	document.URL.match(/\?/) ? querySeparator = '&' : 1
@@ -4269,7 +4301,7 @@ window.eoxiaJS.dashboard.closeDashBoardInfo = function() {
 		type: "POST",
 		processData: false,
 		data: JSON.stringify({
-			dashboardWidgetName: dashboardWidgetName,
+			dashboardWidgetName: dashboardWidgetName
 		}),
 		contentType: false,
 		success: function ( resp ) {

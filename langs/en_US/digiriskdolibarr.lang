@@ -1315,3 +1315,6 @@ GetAPI = Utilisation des routes API Digirisk en méthode GET
 PostAPI = Utilisation des routes API Digirisk en méthode POST
 MinimizeMenu = Réduire le menu
 ActionsLine = Actions
+DashBoard = Tableau de bord
+DayWithoutAccident = Jours sans accident(s):
+Close = Fermer
