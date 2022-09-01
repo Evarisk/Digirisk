@@ -22,7 +22,6 @@ if ($action == 'adddashboardinfo') {
 	$visible = json_decode($user->conf->DIGIRISKDOLIBARR_DISABLED_DASHBOARD_INFO);
 	unset($visible->$dashboardWidgetName);
 
-
 	$tabparam['DIGIRISKDOLIBARR_DISABLED_DASHBOARD_INFO'] = json_encode($visible);
 
 	dol_set_user_param($db, $conf, $user, $tabparam);
@@ -59,7 +58,7 @@ if (empty($conf->global->MAIN_DISABLE_WORKBOARD)) {
 
 	$disableWidgetList = json_decode($user->conf->DIGIRISKDOLIBARR_DISABLED_DASHBOARD_INFO);
 
-	print '<div class="add-widget-box" style="' . (!empty($dashboardLines) ? '' : 'display:none') . '">';
+	print '<div class="add-widget-box" style="' . (empty($disableWidgetList) ? '' : 'display:none') . '">';
 	print Form::selectarray('boxcombo', $dashboardLines, -1, $langs->trans("ChooseBoxToAdd") . '...', 0, 0, '', 0, 0, 0, 'ASC', 'maxwidth150onsmartphone hideonprint add-dashboard-widget', 0, 'hidden selected', 0, 1);
 	if (!empty($conf->use_javascript_ajax)) {
 		include_once DOL_DOCUMENT_ROOT . '/core/lib/ajax.lib.php';
@@ -73,7 +72,7 @@ if (empty($conf->global->MAIN_DISABLE_WORKBOARD)) {
 			if (!isset($disableWidgetList->$key)) {
 				$openedDashBoard .= '<div class="box-flex-item"><div class="box-flex-item-with-margin">';
 				$openedDashBoard .= '<div class="info-box info-box-sm">';
-				$openedDashBoard .= '<span class="info-box-icon bg-infobox-ticket">';
+				$openedDashBoard .= '<span class="info-box-icon">';
 				$openedDashBoard .= '<i class="' . $dashboardLine["picto"] . '"></i>';
 				$openedDashBoard .= '</span>';
 				$openedDashBoard .= '<div class="info-box-content">';
