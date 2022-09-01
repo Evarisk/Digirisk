@@ -134,6 +134,8 @@ print load_fiche_titre($langs->trans("DigiriskDolibarrArea") . ' ' . $digirisk->
 	</div>
 </div>
 <?php
+
+require_once __DIR__ . './core/tpl/digiriskdolibarr_dashboard.tpl.php';
 // End of page
 llxFooter();
 $db->close();
