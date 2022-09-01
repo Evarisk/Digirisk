@@ -130,7 +130,7 @@ if (empty($conf->global->MAIN_DISABLE_WORKBOARD)) {
 			}
 
 			print '<div class="titre inline-block">';
-			print load_fiche_titre($langs->transnoentities($digiriskelement->ref), '', 'service');
+			print load_fiche_titre($digiriskelement->ref . " - " . $digiriskelement->label, '', 'service');
 			print '</div>';
 		}
 
@@ -176,7 +176,7 @@ if (empty($conf->global->MAIN_DISABLE_WORKBOARD)) {
 					}
 
 					print '<div class="titre inline-block">';
-					print load_fiche_titre($langs->transnoentities($digiriskelement->ref), '', 'service');
+					print load_fiche_titre($digiriskelement->ref . " - " . $digiriskelement->label, '', 'service');
 					print '</div>';
 				}
 
