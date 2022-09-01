@@ -1428,6 +1428,7 @@ TicketCreationSubject = Création de ticket via l'interface publique de Digirisk
 TicketDocumentCustomDigiriskTemplate = ODT custom des fiches de tickets
 HowToSetupDigiriskElement = Pour configurer les éléments de Digirisk (groupements/unités de travail), veuillez cliquer sur ce lien :
 ConfigDigiriskElement = Configuration des éléments de Digirisk
+TicketStatistics = Statistiques des tickets
 
 
 
