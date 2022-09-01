@@ -51,10 +51,10 @@ LinkedProject = Projet lié
 DigiriskUpdate = Mise à jour de Digirisk :
 DigiriskHasBeenUpdatedTo = Digirisk a été mis à jour en version %s
 Security = Sécurité
-HowToSharedElement = Pour plus d'informations sur la configuratiion des éléments partagés, veuillez vous rendre sur ce lien :
+HowToSharedElement = Pour plus d'informations sur la configuration des éléments partagés, veuillez vous rendre sur ce lien :
 HowToSharedElementLink = https://wiki.dolibarr.org/index.php?title=Module_Digirisk#Configuration
-ConfigSharedElement = Configuratiion des éléments partagés (risques/signalisations)
-DisabledSharedElement = Option désactivée car multi company n'est pas activé ou la configuratiion des éléments partagés (risques/signalisations) n'a pas été effectuée
+ConfigSharedElement = Configuration des éléments partagés (risques/signalisations)
+DisabledSharedElement = Option désactivée car multi company n'est pas activé ou la configuration des éléments partagés (risques/signalisations) n'a pas été effectuée
 
 
 
