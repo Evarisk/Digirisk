@@ -1065,7 +1065,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			'fk_menu'  => 'fk_mainmenu=digiriskdolibarr', // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
 			'type'     => 'left', // This is a Top menu entry
 			'titre'    => $langs->trans('Digirisk'),
-			'prefix'   => '<i class="fas fa-home"></i>  ',
+			'prefix'   => '<i class="fas fa-home pictofixedwidth"></i>  ',
 			'mainmenu' => 'digiriskdolibarr',
 			'leftmenu' => '',
 			'url'      => '/digiriskdolibarr/digiriskdolibarrindex.php',
@@ -1081,7 +1081,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			'fk_menu'  => 'fk_mainmenu=digiriskdolibarr',	    		// '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
 			'type'     => 'left', 										// This is a Left menu entry
 			'titre'    => $langs->trans('RiskAssessmentDocument'),
-			'prefix'   => '<i class="fas fa-exclamation-triangle"></i>  ',
+			'prefix'   => '<i class="fas fa-exclamation-triangle pictofixedwidth"></i>  ',
 			'mainmenu' => 'digiriskdolibarr',
 			'leftmenu' => 'digiriskstandard',
 			'url'      => '/digiriskdolibarr/view/digiriskstandard/digiriskstandard_card.php?id=' . $conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD,
@@ -1097,7 +1097,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			'fk_menu'  => 'fk_mainmenu=digiriskdolibarr',	    		// '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
 			'type'     => 'left', 										// This is a Left menu entry
 			'titre'    => $langs->trans('Arborescence'),
-			'prefix'   => '<i class="fas fa-network-wired"></i>  ',
+			'prefix'   => '<i class="fas fa-network-wired pictofixedwidth"></i>  ',
 			'mainmenu' => 'digiriskdolibarr',
 			'leftmenu' => 'digiriskstandard',
 			'url'      => '/digiriskdolibarr/view/digiriskelement/digiriskelement_organization.php',
@@ -1113,7 +1113,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			'fk_menu'  => 'fk_mainmenu=digiriskdolibarr',	    // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
 			'type'     => 'left',			                // This is a Left menu entry
 			'titre'    => $langs->trans('RiskList'),
-			'prefix'   => '<i class="fas fa-list"></i>  ',
+			'prefix'   => '<i class="fas fa-list pictofixedwidth"></i>  ',
 			'mainmenu' => 'digiriskdolibarr',
 			'leftmenu' => 'digirisklistingrisk',
 			'url'      => '/digiriskdolibarr/view/digiriskelement/risk_list.php',
@@ -1129,7 +1129,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			'fk_menu'  => 'fk_mainmenu=digiriskdolibarr',	    // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
 			'type'     => 'left',			                // This is a Left menu entry
 			'titre'    => $langs->transnoentities('PreventionPlan'),
-			'prefix'   => '<i class="fas fa-info"></i>  ',
+			'prefix'   => '<i class="fas fa-info pictofixedwidth"></i>  ',
 			'mainmenu' => 'digiriskdolibarr',
 			'leftmenu' => 'digiriskpreventionplan',
 			'url'      => '/digiriskdolibarr/view/preventionplan/preventionplan_list.php',
@@ -1145,7 +1145,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			'fk_menu'  => 'fk_mainmenu=digiriskdolibarr',	    // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
 			'type'     => 'left',			                // This is a Left menu entry
 			'titre'    => $langs->trans('FirePermit'),
-			'prefix'   => '<i class="fas fa-fire-alt"></i>  ',
+			'prefix'   => '<i class="fas fa-fire-alt pictofixedwidth"></i>  ',
 			'mainmenu' => 'digiriskdolibarr',
 			'leftmenu' => 'digiriskfirepermit',
 			'url'      => '/digiriskdolibarr/view/firepermit/firepermit_list.php',
@@ -1161,7 +1161,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			'fk_menu'  => 'fk_mainmenu=digiriskdolibarr',	    // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
 			'type'     => 'left',			                // This is a Left menu entry
 			'titre'    => $langs->trans('Accident'),
-			'prefix'   => '<i class="fas fa-user-injured"></i>  ',
+			'prefix'   => '<i class="fas fa-user-injured pictofixedwidth"></i>  ',
 			'mainmenu' => 'digiriskdolibarr',
 			'leftmenu' => 'digiriskaccident',
 			'url'      => '/digiriskdolibarr/view/accident/accident_list.php',
@@ -1177,7 +1177,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			'fk_menu' => 'fk_mainmenu=digiriskdolibarr',	    // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
 			'type'     => 'left',			                // This is a Left menu entry
 			'titre'    =>  $langs->trans('Users'),
-			'prefix'   => '<i class="fas fa-user"></i>  ',
+			'prefix'   => '<i class="fas fa-user pictofixedwidth"></i>  ',
 			'mainmenu' => 'digiriskdolibarr',
 			'leftmenu' => 'digiriskusers',
 			'url'      => '/digiriskdolibarr/view/digiriskusers.php',
@@ -1193,7 +1193,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			'fk_menu'  => 'fk_mainmenu=digiriskdolibarr',	    // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
 			'type'     => 'left',			                // This is a Left menu entry
 			'titre'    => $langs->trans('ActionPlan'),
-			'prefix'   => '<i class="fas fa-tasks"></i>  ',
+			'prefix'   => '<i class="fas fa-tasks pictofixedwidth"></i>  ',
 			'mainmenu' => 'digiriskdolibarr',
 			'leftmenu' => 'digiriskactionplan',
 			'url'      => '/projet/tasks.php?id=' . $conf->global->DIGIRISKDOLIBARR_DU_PROJECT,
@@ -1209,7 +1209,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			'fk_menu'  => 'fk_mainmenu=digiriskdolibarr',	    // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
 			'type'     => 'left',			                // This is a Left menu entry
 			'titre'    => $langs->trans('Tools'),
-			'prefix'   => '<i class="fas fa-wrench"></i>  ',
+			'prefix'   => '<i class="fas fa-wrench pictofixedwidth"></i>  ',
 			'mainmenu' => 'digiriskdolibarr',
 			'leftmenu' => 'digirisktools',
 			'url'      => '/digiriskdolibarr/view/digirisktools.php',
@@ -1225,7 +1225,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			'fk_menu'  => 'fk_mainmenu=digiriskdolibarr',	    // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
 			'type'     => 'left',			                // This is a Left menu entry
 			'titre'    => $langs->trans('DigiriskConfig'),
-			'prefix'   => '<i class="fas fa-cog"></i>  ',
+			'prefix'   => '<i class="fas fa-cog pictofixedwidth"></i>  ',
 			'mainmenu' => 'digiriskdolibarr',
 			'leftmenu' => 'digiriskconfig',
 			'url'      => '/digiriskdolibarr/admin/setup.php',
@@ -1241,7 +1241,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			'fk_menu'  => 'fk_mainmenu=digiriskdolibarr',	    // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
 			'type'     => 'left',			                // This is a Left menu entry
 			'titre'    => $langs->transnoentities('DigiriskConfigSociety'),
-			'prefix'   => '<i class="fas fa-building"></i> ',
+			'prefix'   => '<i class="fas fa-building pictofixedwidth"></i> ',
 			'mainmenu' => 'digiriskdolibarr',
 			'leftmenu' => 'digirisksocietyconfig',
 			'url'      => '/admin/company.php',
@@ -1257,7 +1257,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			'fk_menu'  => 'fk_mainmenu=digiriskdolibarr',	    // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
 			'type'     => 'left',			                // This is a Left menu entry
 			'titre'    => $langs->transnoentities('MinimizeMenu'),
-			'prefix'   => '<i class="fas fa-chevron-circle-left"></i> ',
+			'prefix'   => '<i class="fas fa-chevron-circle-left pictofixedwidth"></i> ',
 			'mainmenu' => 'digiriskdolibarr',
 			'leftmenu' => '',
 			'url'      => '',
