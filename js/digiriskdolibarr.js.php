@@ -4214,3 +4214,70 @@ window.eoxiaJS.accident.showExternalAccidentLocation = function() {
 			break;
 	}
 };
+
+/**
+ * Initialise l'objet "dashboard" ainsi que la méthode "init" obligatoire pour la bibliothèque EoxiaJS.
+ *
+ * @since   1.1.0
+ * @version 1.1.0
+ */
+window.eoxiaJS.dashboard = {};
+
+/**
+ * La méthode appelée automatiquement par la bibliothèque EoxiaJS.
+ *
+ * @since   1.1.0
+ * @version 1.1.0
+ *
+ * @return {void}
+ */
+window.eoxiaJS.dashboard.init = function() {
+	window.eoxiaJS.dashboard.event();
+};
+
+/**
+ * La méthode contenant tous les événements pour les dashboards.
+ *
+ * @since   1.1.0
+ * @version 1.1.0
+ *
+ * @return {void}
+ */
+window.eoxiaJS.dashboard.event = function() {
+	$( document ).on( 'click', '.close-dashboard-info', window.eoxiaJS.dashboard.closeDashBoardInfo );
+};
+
+/**
+ * Close index dashboard info for a module
+ *
+ * @since   9.5.0
+ * @version 9.5.0
+ *
+ * @return {void}
+ */
+window.eoxiaJS.dashboard.closeDashBoardInfo = function() {
+	let box = $(this);
+	let dashboardWidgetName = $(this).attr('data-widgetname');
+	let querySeparator = '?';
+	console.log(dashboardWidgetName);
+	let token = $('.dashboard').find('input[name="token"]').val();
+
+	document.URL.match(/\?/) ? querySeparator = '&' : 1
+
+	$.ajax({
+		url: document.URL + querySeparator + 'action=closedashboardinfo&token='+token,
+		type: "POST",
+		processData: false,
+		data: JSON.stringify({
+			dashboardWidgetName: dashboardWidgetName,
+		}),
+		contentType: false,
+		success: function ( resp ) {
+			box.closest('.box-flex-item').fadeOut(400)
+			$('.add-widget-box').attr('style', '')
+			$('.add-widget-box').html($(resp).find('.add-widget-box').children())
+		},
+		error: function ( ) {
+		}
+	});
+};
