@@ -379,16 +379,13 @@ class doc_groupmentdocument_odt extends ModeleODTGroupmentDocument
 						$risks = $risk->fetchRisksOrderedByCotation($digiriskelement->id, false, $conf->global->DIGIRISKDOLIBARR_SHOW_INHERITED_RISKS, $conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS);
 						for ($i = 1; $i <= 4; $i++ ) {
 							$listlines = $odfHandler->setSegment('risq' . $i);
-							if ($risks > 0 && ! empty($risks)) {
+							if (is_array($risks) && ! empty($risks)) {
 								foreach ($risks as $line) {
 									$tmparray['actionPreventionUncompleted'] = "";
 									$tmparray['actionPreventionCompleted']   = "";
+									$lastEvaluation = $line->lastEvaluation;
 
-									$evaluation     = new RiskAssessment($this->db);
-									$lastEvaluation = $evaluation->fetchFromParent($line->id, 1);
-
-									if ($lastEvaluation > 0 && ! empty($lastEvaluation) && is_array($lastEvaluation)) {
-										$lastEvaluation = array_shift($lastEvaluation);
+									if ($lastEvaluation->cotation > 0 && ! empty($lastEvaluation) && is_object($lastEvaluation)) {
 										$scale          = $lastEvaluation->get_evaluation_scale();
 
 										if ($scale == $i) {
