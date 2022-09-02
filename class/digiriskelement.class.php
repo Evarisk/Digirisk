@@ -447,6 +447,7 @@ class DigiriskElement extends CommonObject
 		else $sql                                                                        .= ' WHERE s.entity = ' . $conf->entity;
 
 		if ($filter) $sql .= " AND (" . $filter . ")";
+		if ($filter) $sql .= " AND s.status > 0";
 
 		if ($current_element > 0 ) {
 			$children = $this->fetchDigiriskElementFlat($current_element);
@@ -459,31 +460,33 @@ class DigiriskElement extends CommonObject
 		}
 
 		if ($conf->global->DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH) {
-			$current_entity = $conf->entity;
-			if ($conf->multicompany->enabled) {
-				$object = new ActionsMulticompany($this->db);
-				$conf->global->MULTICOMPANY_TRANSVERSE_MODE = 0;
-				$entities = $object->getEntitiesList(false, false, true, true);
-				foreach ($entities as $sub_entity => $entity_name) {
-					$conf->setEntityValues($this->db, $sub_entity);
-					$entities_array[$sub_entity] = $conf->global->DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH;
-				}
-				$conf->setEntityValues($this->db, $current_entity);
-			} else {
-				$entities_array = array($current_entity => $current_entity);
-			}
+			$sql .= " AND NOT s.rowid =" . $conf->global->DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH;
 
-			foreach($entities_array as $entity_digiriskelement_trash) {
-				if ($entity_digiriskelement_trash > 0) {
-					$masked_content = $this->fetchDigiriskElementFlat($entity_digiriskelement_trash);
-					if ( ! empty($masked_content) && $masked_content > 0) {
-						foreach ($masked_content as $key => $value) {
-							$sql .= " AND NOT s.rowid =" . $key;
-						}
-					}
-					$sql .= " AND NOT s.rowid =" . $entity_digiriskelement_trash;
-				}
-			}
+//			$current_entity = $conf->entity;
+//			if ($conf->multicompany->enabled) {
+//				$object = new ActionsMulticompany($this->db);
+//				$conf->global->MULTICOMPANY_TRANSVERSE_MODE = 0;
+//				$entities = $object->getEntitiesList(false, false, true, true);
+//				foreach ($entities as $sub_entity => $entity_name) {
+//					$conf->setEntityValues($this->db, $sub_entity);
+//					$entities_array[$sub_entity] = $conf->global->DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH;
+//				}
+//				$conf->setEntityValues($this->db, $current_entity);
+//			} else {
+//				$entities_array = array($current_entity => $current_entity);
+//			}
+//
+//			foreach($entities_array as $entity_digiriskelement_trash) {
+//				if ($entity_digiriskelement_trash > 0) {
+//					$masked_content = $this->fetchDigiriskElementFlat($entity_digiriskelement_trash);
+//					if ( ! empty($masked_content) && $masked_content > 0) {
+//						foreach ($masked_content as $key => $value) {
+//							$sql .= " AND NOT s.rowid =" . $key;
+//						}
+//					}
+//					$sql .= " AND NOT s.rowid =" . $entity_digiriskelement_trash;
+//				}
+//			}
 		}
 
 		$sql .= $this->db->order("rowid", "ASC");
@@ -513,9 +516,11 @@ class DigiriskElement extends CommonObject
 			if ($num) {
 				while ($i < $num) {
 					$obj   = $this->db->fetch_object($resql);
-					$label = !empty(!empty($conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS) && $contextpage == 'sharedrisk') ? 'S'. $obj->entity . ' - ' . $obj->ref . ' - ' . $obj->label :  $obj->ref . ' - ' . $obj->label;
-					$label = !empty(!empty($conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKSIGNS) && $contextpage == 'sharedrisksign') ? 'S'. $obj->entity . ' - ' . $obj->ref . ' - ' . $obj->label :  $obj->ref . ' - ' . $obj->label;
-
+					if ((!empty($conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS) && $contextpage == 'sharedrisk') || (!empty($conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKSIGNS) && $contextpage == 'sharedrisksign')) {
+						$label = 'S'. $obj->entity . ' - ' . $obj->ref . ' - ' . $obj->label;
+					} else {
+						$label =  $obj->ref . ' - ' . $obj->label;
+					}
 
 					if (empty($outputmode)) {
 						if (in_array($obj->rowid, $selected)) {
