@@ -311,7 +311,7 @@
 				$sql .= " AND fk_element !=" . $element_id;
 			}
 			$sql .= " AND fk_element > 0 ";
-			$sql .= " AND e.entity IN (" . getEntity($risk->element) . ") ";
+			$sql .= " AND e.entity IN (" . $conf->entity . ") ";
 		}
 
 		foreach ($search as $key => $val) {
@@ -409,7 +409,7 @@
 				$sql .= " AND r.fk_element !=" . $element_id;
 			}
 			$sql .= " AND r.fk_element > 0";
-			$sql .= " AND e.entity IN (" . getEntity($evaluation->element) . ")";
+			$sql .= " AND e.entity IN (" . $conf->entity . ")";
 		}
 
 		foreach ($search as $key => $val) {
@@ -1266,6 +1266,3 @@
 	print '</div>' . "\n";
 	print '<!-- End div class="fichecenter" -->';
 
-	if ($contextpage != 'risklist') {
-		dol_fiche_end();
-	}
