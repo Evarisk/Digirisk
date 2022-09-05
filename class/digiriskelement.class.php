@@ -345,27 +345,7 @@ class DigiriskElement extends CommonObject
 			if ($this->db->num_rows($result)) {
 				$obj      = $this->db->fetch_object($result);
 				$this->id = $obj->rowid;
-//				if ($obj->fk_user_author) {
-//					$cuser = new User($this->db);
-//					$cuser->fetch($obj->fk_user_author);
-//					$this->user_creation = $cuser;
-//				}
-//
-//				if ($obj->fk_user_valid) {
-//					$vuser = new User($this->db);
-//					$vuser->fetch($obj->fk_user_valid);
-//					$this->user_validation = $vuser;
-//				}
-//
-//				if ($obj->fk_user_cloture) {
-//					$cluser = new User($this->db);
-//					$cluser->fetch($obj->fk_user_cloture);
-//					$this->user_cloture = $cluser;
-//				}
-
 				$this->date_creation     = $this->db->jdate($obj->date_creation);
-//				$this->date_modification = $this->db->jdate($obj->datem);
-//				$this->date_validation   = $this->db->jdate($obj->datev);
 			}
 
 			$this->db->free($result);
@@ -424,7 +404,7 @@ class DigiriskElement extends CommonObject
 	 * @return string HTML string with
 	 * @throws Exception
 	 */
-	public function select_digiriskelement_list($selected = '', $htmlname = 'fk_element', $filter = '', $showempty = '1', $forcecombo = 0, $events = array(), $outputmode = 0, $limit = 0, $morecss = 'minwidth100', $current_element = 0, $multiple = false, $noroot = 0, $contextpage = '', $multientitymanagedoff = true)
+	public function select_digiriskelement_list($selected = '', $htmlname = 'fk_element', $filter = '', $showempty = '1', $forcecombo = 0, $events = array(), $outputmode = 0, $limit = 0, $morecss = 'minwidth100', $current_element = 0, $multiple = false, $noroot = 0, $contextpage = '', $multientitymanaged = true)
 	{
 		global $conf, $langs;
 
@@ -439,12 +419,14 @@ class DigiriskElement extends CommonObject
 				$filter = '';
 			}
 		}
-		// On recherche les societies
-		$sql  = "SELECT *";
+
+		$deleted_elements = $this->getMultiEntityTrashList();
+
+		$sql  = "SELECT " . $this->getFieldList();
 		$sql .= " FROM " . MAIN_DB_PREFIX . "digiriskdolibarr_digiriskelement as s";
 
-		if (isset($this->ismultientitymanaged) && $this->ismultientitymanaged == 1 && $multientitymanagedoff == false) $sql .= ' WHERE s.entity IN (' . getEntity($this->element) . ')';
-		else $sql                                                                        .= ' WHERE s.entity = ' . $conf->entity;
+		if (isset($this->ismultientitymanaged) && $this->ismultientitymanaged == 1 && $multientitymanaged) $sql .= ' WHERE entity IN (' . getEntity($this->table_element) . ')';
+		else $sql                                                                        .= ' WHERE 1 = 1';
 
 		if ($filter) $sql .= " AND (" . $filter . ")";
 		if ($filter) $sql .= " AND s.status > 0";
@@ -459,34 +441,14 @@ class DigiriskElement extends CommonObject
 			$sql .= " AND NOT s.rowid =" . $current_element;
 		}
 
-		if ($conf->global->DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH) {
-			$sql .= " AND NOT s.rowid =" . $conf->global->DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH;
-
-//			$current_entity = $conf->entity;
-//			if ($conf->multicompany->enabled) {
-//				$object = new ActionsMulticompany($this->db);
-//				$conf->global->MULTICOMPANY_TRANSVERSE_MODE = 0;
-//				$entities = $object->getEntitiesList(false, false, true, true);
-//				foreach ($entities as $sub_entity => $entity_name) {
-//					$conf->setEntityValues($this->db, $sub_entity);
-//					$entities_array[$sub_entity] = $conf->global->DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH;
-//				}
-//				$conf->setEntityValues($this->db, $current_entity);
-//			} else {
-//				$entities_array = array($current_entity => $current_entity);
-//			}
-//
-//			foreach($entities_array as $entity_digiriskelement_trash) {
-//				if ($entity_digiriskelement_trash > 0) {
-//					$masked_content = $this->fetchDigiriskElementFlat($entity_digiriskelement_trash);
-//					if ( ! empty($masked_content) && $masked_content > 0) {
-//						foreach ($masked_content as $key => $value) {
-//							$sql .= " AND NOT s.rowid =" . $key;
-//						}
-//					}
-//					$sql .= " AND NOT s.rowid =" . $entity_digiriskelement_trash;
-//				}
-//			}
+		if (!empty($deleted_elements) && is_array($deleted_elements)) {
+			foreach ($deleted_elements as $entity_deleted_elements) {
+				if (!empty($entity_deleted_elements) && is_array($entity_deleted_elements)) {
+					foreach($entity_deleted_elements as $entity_deleted_element) {
+						$sql .= " AND NOT s.rowid =" . $entity_deleted_element;
+					}
+				}
+			}
 		}
 
 		$sql .= $this->db->order("rowid", "ASC");
@@ -691,7 +653,6 @@ class DigiriskElement extends CommonObject
 	 */
 	public function getMultiEntityTrashList()
 	{
-		global $conf;
 		$this->ismultientitymanaged = 0;
 		$objects = $this->fetchAll('',  'ranks', '','',array('customsql' => ' status > 0'));
 		$digiriskelement_trashes = $this->fetchAll('',  'ranks', '','',array('customsql' => ' status = 0'));
