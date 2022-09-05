@@ -59,6 +59,11 @@
 	$risktmp = new Risk($db);
 	$digiriskelementtmp = new DigiriskElement($db);
 	$alldigiriskelement = $digiriskelementtmp->fetchAll('', '', 0, 0, array('customsql' => 'status > 0'), 'AND');
+	if (!empty($trashList) && is_array($trashList)) {
+		foreach($trashList as $trash_element_id) {
+			unset($alldigiriskelement[$trash_element_id]);
+		}
+	}
 
 	// Build and execute select
 	// --------------------------------------------------------------------

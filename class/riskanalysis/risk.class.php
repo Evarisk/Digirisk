@@ -185,11 +185,16 @@ class Risk extends CommonObject
 		global $conf;
 		$object  = new DigiriskElement($this->db);
 		$objects = $object->fetchAll('',  '',  0,  0, array('customsql' => 'status > 0' ));
+		$trashList = $object->getTrashList();
+		if (!empty($trashList) && is_array($trashList)) {
+			foreach($trashList as $trash_element_id) {
+				unset($objects[$trash_element_id]);
+			}
+		}
+
 		$risk    = new Risk($this->db);
 		if ($parent_id > 0) {
 			$result  = $risk->fetchFromParent($parent_id);
-
-			$filter = '';
 
 			// RISKS de l'élément parent.
 			if ($result > 0 && ! empty($result)) {
@@ -272,11 +277,9 @@ class Risk extends CommonObject
 			if ($parent_id == 0) {
 				$digiriskelement_flatlist = $digiriskelementtmp->fetchDigiriskElementFlat(0);
 				if (is_array($digiriskelement_flatlist) && !empty($digiriskelement_flatlist)) {
-
 					foreach ($digiriskelement_flatlist as $sub_digiriskelement) {
 						$digiriskelement = $sub_digiriskelement['object'];
 						$digiriskelement->fetchObjectLinked(null, '', $digiriskelement->id, 'digiriskdolibarr_digiriskelement', 'AND', 1, 'sourcetype', 0);
-
 						if (!empty($digiriskelement->linkedObjectsIds['digiriskdolibarr_risk'])) {
 							foreach ($digiriskelement->linkedObjectsIds['digiriskdolibarr_risk'] as $risk_id) {
 								$risktmp = new self($this->db);
