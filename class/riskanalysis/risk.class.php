@@ -192,6 +192,8 @@ class Risk extends CommonObject
 		}
 
 		$risk    = new Risk($this->db);
+
+		//For groupment & workunit documents with given id
 		if ($parent_id > 0) {
 			$result  = $risk->fetchFromParent($parent_id);
 
@@ -204,13 +206,14 @@ class Risk extends CommonObject
 						$lastEvaluation       = array_shift($lastEvaluation);
 						$risk->lastEvaluation = $lastEvaluation;
 					}
-
+					$risk->appliedOn = $parent_id;
 					$risks[] = $risk;
 				}
 			}
 
 		}
 
+		//For groupment document if conf is activated and for risks listing of risk assessment document
 		if ( $get_children_data ) {
 			if (is_array($objects)) {
 				$elements = recurse_tree($parent_id, 0, $objects);
@@ -242,7 +245,7 @@ class Risk extends CommonObject
 									$lastEvaluation       = array_shift($lastEvaluation);
 									$risk->lastEvaluation = $lastEvaluation;
 								}
-
+								$risk->appliedOn = $element;
 								$risks[] = $risk;
 							}
 						}
@@ -251,6 +254,7 @@ class Risk extends CommonObject
 			}
 		}
 
+		//for groupment & workunit document if conf is activated
 		if ( $get_parents_data ) {
 			$parent_element_id = $objects[$parent_id]->id;
 			while ($parent_element_id > 0) {
@@ -263,7 +267,7 @@ class Risk extends CommonObject
 							$lastEvaluation       = array_shift($lastEvaluation);
 							$risk->lastEvaluation = $lastEvaluation;
 						}
-
+						$risk->appliedOn = $parent_element_id;
 						$risks[] = $risk;
 					}
 				}
@@ -271,6 +275,7 @@ class Risk extends CommonObject
 			}
 		}
 
+		//For all documents
 		if ( $get_shared_data ) {
 			$digiriskelementtmp = new DigiriskElement($this->db);
 			if ($parent_id == 0) {
