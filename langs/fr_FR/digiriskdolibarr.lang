@@ -818,6 +818,8 @@ DigiriskRiskAssessmentDocumentData = Données configurables du document unique
 ShowTaskDone = Afficher les tâches soldées
 ShowTaskDoneDescription = Permettre d'afficher ou non les tâches soldées dans le Document Unique
 ActionPreventionCompletedTaskDone = Les actions soldées ne sont pas affichées
+AppliedOn = Actif sur :
+
 
 # Boxes - Widget
 RiskAssessmentDocumentBox = Box Document unique

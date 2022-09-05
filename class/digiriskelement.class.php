@@ -442,12 +442,8 @@ class DigiriskElement extends CommonObject
 		}
 
 		if (!empty($deleted_elements) && is_array($deleted_elements)) {
-			foreach ($deleted_elements as $entity_deleted_elements) {
-				if (!empty($entity_deleted_elements) && is_array($entity_deleted_elements)) {
-					foreach($entity_deleted_elements as $entity_deleted_element) {
-						$sql .= " AND NOT s.rowid =" . $entity_deleted_element;
-					}
-				}
+			foreach ($deleted_elements as $deleted_element) {
+				$sql .= " AND NOT s.rowid =" . $deleted_element;
 			}
 		}
 
@@ -664,7 +660,7 @@ class DigiriskElement extends CommonObject
 
 				array_walk_recursive($recurse_tree, function ($item) use (&$ids) {
 					if (is_object($item)) {
-						$ids[$item->entity][$item->id] = $item->id;
+						$ids[$item->id] = $item->id;
 					}
 				}, $ids);
 			}

@@ -368,6 +368,7 @@ class doc_riskassessmentdocument_odt extends ModeleODTRiskAssessmentDocument
 					if ( ! empty($digiriskelementlist) ) {
 						$listlines = $odfHandler->setSegment('elementParHierarchie');
 
+						//Fill digirisk element list table
 						foreach ($digiriskelementlist as $line) {
 							$depthHyphens = '';
 							for ($k = 0; $k < $line['depth']; $k++) {
@@ -395,9 +396,8 @@ class doc_riskassessmentdocument_odt extends ModeleODTRiskAssessmentDocument
 							$listlines->merge();
 						}
 						$odfHandler->mergeSegment($listlines);
-					}
 
-					if ( ! empty($digiriskelementlist) ) {
+						//Fill total cotation by digirisk element table
 						$totalQuotation = 0;
 						$scale_counter = array(
 							1 => 0,
@@ -485,35 +485,33 @@ class doc_riskassessmentdocument_odt extends ModeleODTRiskAssessmentDocument
 						$odfHandler->mergeSegment($listlines);
 					}
 
+					//Fill risks data
 					for ($i = 1; $i <= 4; $i++ ) {
 						$listlines = $odfHandler->setSegment('risq' . $i);
-						if ($risks > 0 && ! empty($risks)) {
+						if (is_array($risks) && ! empty($risks)) {
 							$digiriskelementobject->fetch($conf->global->DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH);
-							$trashList = $digiriskelementobject->getTrashList();
-
+							$trashList = $digiriskelementobject->getMultiEntityTrashList();
 							foreach ($risks as $line) {
 								if ( ! in_array($line->fk_element, $trashList) && $line->fk_element > 0) {
-									//$tmparray['actionPreventionUncompletedDate'] = "";
-									//$tmparray['actionPreventionUncompletedProgress'] = "";
-									//$tmparray['actionPreventionUncompletedContact'] = "";
-									//$tmparray['actionPreventionUncompletedlabel'] = "";
-									//$tmparray['actionPreventionCompletedDate'] = "";
-									//$tmparray['actionPreventionCompletedProgress'] = "";
-									//$tmparray['actionPreventionCompletedContact'] = "";
-									//$tmparray['actionPreventionCompletedlabel'] = "";																													d
 									$tmparray['actionPreventionUncompleted'] = "";
 									$tmparray['actionPreventionCompleted']   = "";
 
-									$evaluation     = new RiskAssessment($this->db);
-									$lastEvaluation = $evaluation->fetchFromParent($line->id, 1);
+									$lastEvaluation = $line->lastEvaluation;
 
-									if ($lastEvaluation > 0 && ! empty($lastEvaluation) && is_array($lastEvaluation)) {
-										$lastEvaluation = array_shift($lastEvaluation);
+									if ($lastEvaluation->cotation > 0 && ! empty($lastEvaluation) && is_object($lastEvaluation)) {
 										$scale = $lastEvaluation->get_evaluation_scale();
 										if ($scale == $i) {
 											$element = new DigiriskElement($this->db);
+											$linked_element =  new DigiriskElement($this->db);
+											$linked_element->fetch($line->appliedOn);
 											$element->fetch($line->fk_element);
-											$tmparray['nomElement']            = (!empty($conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS) ? 'S' . $element->entity . ' - ' : '') . $element->ref . ' - ' . $element->label;
+
+											$nomElement = (!empty($conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS) ? 'S' . $element->entity . ' - ' : '') . $element->ref . ' - ' . $element->label ;
+											if ($line->fk_element != $line->appliedOn) {
+												$nomElement .=  "\n" . $langs->trans('AppliedOn') . ' ' . $linked_element->ref . ' - ' . $linked_element->label;
+											}
+
+											$tmparray['nomElement']            = $nomElement;
 											$tmparray['nomDanger']             = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $line->get_danger_category($line) . '.png';
 											$tmparray['nomPicto']              = $line->get_danger_category_name($line);
 											$tmparray['identifiantRisque']     = $line->ref . ' - ' . $lastEvaluation->ref;
@@ -581,46 +579,6 @@ class doc_riskassessmentdocument_odt extends ModeleODTRiskAssessmentDocument
 												$tmparray['actionPreventionUncompleted'] = "";
 												$tmparray['actionPreventionCompleted'] = "";
 											}
-
-											//$listTask = $odfHandler->setSegment('UncompletedAction' . $i);
-											//if (!empty($related_tasks)) {
-											//	foreach ($related_tasks as $related_task) {
-											//		if ($related_task->progress == 100) {
-											//			$tmparray['actionPreventionCompletedDate'] .= dol_print_date($related_task->date_c, 'dayhourreduceformat', 'tzuser') . "\n";
-											//			$tmparray['actionPreventionCompletedContact'] .= $AllInitiales . "\n";
-											//			$tmparray['actionPreventionCompletedLabel'] .= $related_task->label . "\n";
-											//		} else {
-											//			$tmparray['actionPreventionUncompletedDate'] .= dol_print_date($related_task->date_c, 'dayhourreduceformat', 'tzuser') . "\n";
-											//			$tmparray['actionPreventionUncompletedProgress'] .= $langs->trans('Progress') .' : '. ($related_task->progress ?: 0) . '%'. "\n";
-											//			$tmparray['actionPreventionUncompletedContact'] .= $AllInitiales . "\n";
-											//			$tmparray['actionPreventionUncompletedLabel'] .= $related_task->label . "\n";
-											//		}
-											//		foreach ($tmparray as $key => $val) {
-											//			try {
-											//				if (empty($val)) {
-											//					$listTask->setVars($key, $langs->trans('NoData'), true, 'UTF-8');
-											//				} else {
-											//					$listTask->setVars($key, $val, true, 'UTF-8');
-											//				}
-											//			} catch (OdfException $e) {
-											//				dol_syslog($e->getMessage(), LOG_INFO);
-											//			} catch (SegmentException $e) {
-											//				dol_syslog($e->getMessage(), LOG_INFO);
-											//			}
-											//		}
-											//		$listTask->merge();
-											//	}
-											//	$odfHandler->mergeSegment($listTask);
-											//} else {
-											//	$tmparray['actionPreventionUncompletedDate'] = "";
-											//	$tmparray['actionPreventionUncompletedProgress'] = "";
-											//	$tmparray['actionPreventionUncompletedContact'] = "";
-											//	$tmparray['actionPreventionUncompletedlabel'] = "";
-											//	$tmparray['actionPreventionCompletedDate'] = "";
-											//	$tmparray['actionPreventionCompletedProgress'] = "";
-											//	$tmparray['actionPreventionCompletedContact'] = "";
-											//	$tmparray['actionPreventionCompletedlabel'] = "";
-											//}
 
 											unset($tmparray['object_fields']);
 

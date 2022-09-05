@@ -182,7 +182,6 @@ class Risk extends CommonObject
 	 */
 	public function fetchRisksOrderedByCotation($parent_id, $get_children_data = false, $get_parents_data = false, $get_shared_data = false)
 	{
-		global $conf;
 		$object  = new DigiriskElement($this->db);
 		$objects = $object->fetchAll('',  '',  0,  0, array('customsql' => 'status > 0' ));
 		$trashList = $object->getTrashList();
@@ -206,7 +205,7 @@ class Risk extends CommonObject
 						$risk->lastEvaluation = $lastEvaluation;
 					}
 
-					$risks[$risk->id] = $risk;
+					$risks[] = $risk;
 				}
 			}
 
@@ -244,7 +243,7 @@ class Risk extends CommonObject
 									$risk->lastEvaluation = $lastEvaluation;
 								}
 
-								$risks[$risk->id] = $risk;
+								$risks[] = $risk;
 							}
 						}
 					}
@@ -265,7 +264,7 @@ class Risk extends CommonObject
 							$risk->lastEvaluation = $lastEvaluation;
 						}
 
-						$risks[$risk->id] = $risk;
+						$risks[] = $risk;
 					}
 				}
 				$parent_element_id = $objects[$parent_element_id]->fk_parent;
@@ -290,7 +289,8 @@ class Risk extends CommonObject
 									$lastEvaluation       = array_shift($lastEvaluation);
 									$risktmp->lastEvaluation = $lastEvaluation;
 								}
-								$risks[$risktmp->id] = $risktmp;
+								$risktmp->appliedOn = $digiriskelement->id;
+								$risks[] = $risktmp;
 							}
 						}
 					}
@@ -299,7 +299,6 @@ class Risk extends CommonObject
 			} else {
 				$digiriskelementtmp->fetch($parent_id);
 				$digiriskelementtmp->fetchObjectLinked(null, '', $digiriskelementtmp->id, 'digiriskdolibarr_digiriskelement', 'AND', 1, 'sourcetype', 0);
-
 				if (!empty($digiriskelementtmp->linkedObjectsIds['digiriskdolibarr_risk'])) {
 					foreach ($digiriskelementtmp->linkedObjectsIds['digiriskdolibarr_risk'] as $risk_id) {
 						$risktmp = new self($this->db);
@@ -311,13 +310,13 @@ class Risk extends CommonObject
 							$risktmp->lastEvaluation = $lastEvaluation;
 						}
 
-						$risks[$risktmp->id] = $risktmp;
+						$risks[] = $risktmp;
 					}
 				}
 			}
 		}
 
-		if ( ! empty($risks) ) {
+		if ( ! empty($risks) && is_array($risks)) {
 			usort($risks, function ($first, $second) {
 				return $first->lastEvaluation->cotation < $second->lastEvaluation->cotation;
 			});
