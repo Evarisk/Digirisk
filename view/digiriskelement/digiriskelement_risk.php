@@ -228,7 +228,7 @@ if ($sharedrisks) {
 //		$filter = rtrim($filter, ',');
 
 		$allrisks = $risk->fetchAll('ASC', 'fk_element', 0, 0, array('customsql' => 'status > 0 AND entity NOT IN (' . $conf->entity . ') AND fk_element > 0'));
-
+		$deleted_elements = $object->getMultiEntityTrashList();
 		$formquestionimportsharedrisks = array(
 			'text' => '<i class="fas fa-circle-info"></i>' . $langs->trans("ConfirmImportSharedRisks"),
 		);
@@ -239,8 +239,8 @@ if ($sharedrisks) {
 			$digiriskelementtmp->fetch($risks->fk_element);
 			$digiriskelementtmp->element = 'digiriskdolibarr';
 			$digiriskelementtmp->fetchObjectLinked($risks->id, 'digiriskdolibarr_risk', $object->id, 'digiriskdolibarr_digiriskelement', 'AND', 1, 'sourcetype', 0);
-			$alreadyImported = !empty($digiriskelementtmp->linkedObjectsIds) ? 1 : 0;
-			$nameEntity = dolibarr_get_const($db, 'MAIN_INFO_SOCIETE_NOM', $risks->entity);
+			$alreadyImported = !empty($digiriskelementtmp->linkedObjectsIds['digiriskdolibarr_risk']);
+			$entityName = dolibarr_get_const($db, 'MAIN_INFO_SOCIETE_NOM', $risks->entity);
 			$lastEvaluation = $risk_assessment->fetchFromParent($risks->id, 1);
 			if (!empty($lastEvaluation)) {
 				$lastEvaluation = array_shift($lastEvaluation);
@@ -248,75 +248,61 @@ if ($sharedrisks) {
 				$lastEvaluation = new RiskAssessment($db);
 			}
 
-//			$pathToThumb = DOL_URL_ROOT . '/viewimage.php?modulepart=digiriskdolibarr&entity=' . $risks->entity . '&file=' . urlencode($digiriskelementtmp->element_type . '/' . $digiriskelementtmp->ref . '/thumbs/');
-//			$filearray   = dol_dir_list($conf->digiriskdolibarr->multidir_output[$risks->entity] . '/' . $digiriskelementtmp->element_type . '/' . $digiriskelementtmp->ref . '/', "files", 0, '', '(\.odt|_preview.*\.png)$', 'position_name', 'asc', 1);
-//
-//			if (count($filearray)) {
-//				$photoDigiriskElement = '<span class="floatleft inline-block valignmiddle divphotoref open-medias-linked modal-open digirisk-element digirisk-element-' . $digiriskelementtmp->id . '" value="' . $digiriskelementtmp->id . '">';
-//				$photoDigiriskElement .= '<img width="50" height="50" class="photo clicked-photo-preview" src="' . DOL_URL_ROOT . '/viewimage.php?modulepart=digiriskdolibarr&entity=' . $conf->entity . '&file=' . urlencode($digiriskelementtmp->element_type . '/' . $digiriskelementtmp->ref . '/thumbs/' . preg_replace('/\./', '_small.', $digiriskelementtmp->photo)) . '" >';
-//				$photoDigiriskElement .= '<input type="hidden" class="filepath-to-digiriskelement" value="' . $pathToThumb . '"/>';
-//				$photoDigiriskElement .= '</span>';
-//			} else {
-//				$nophoto = '/public/theme/common/nophoto.png';
-//				$photoDigiriskElement = '<div class="open-media-gallery modal-open digiriskelement digirisk-element-' . $digiriskelementtmp->id . '" value="'. $digiriskelementtmp->id . '">';
-//				$photoDigiriskElement .= '<input type="hidden" class="type-from" value="digiriskelement"/>';
-//				$photoDigiriskElement .= '<input type="hidden" class="filepath-to-digiriskelement" value="' . $pathToThumb . '"/>';
-//				$photoDigiriskElement .= '<span class="floatleft inline-block valignmiddle divphotoref"><img width="50" height="50" class="photo photowithmargin clicked-photo-preview" alt="No photo" src=' . DOL_URL_ROOT . $nophoto . '></span>';
-//				$photoDigiriskElement .= '</div>';
-//			}
+			if (!array_key_exists($digiriskelementtmp->id, $deleted_elements[$digiriskelementtmp->entity])) {
 
-			$photoRisk = '<img class="danger-category-pic hover" src=' . DOL_URL_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $risks->get_danger_category($risks) . '.png' . '>';
+				$photoRisk = '<img class="danger-category-pic hover" src=' . DOL_URL_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $risks->get_danger_category($risks) . '.png' . '>';
 
-			$importValue = '<div class="importsharedrisk"><span class="importsharedrisk-ref">' . 'S' . $risks->entity . '</span>';
-			$importValue .= '<span>' . dol_trunc($nameEntity, 32) . '</span>';
-			$importValue .= '</div>';
+				$importValue = '<div class="importsharedrisk"><span class="importsharedrisk-ref">' . 'S' . $risks->entity . '</span>';
+				$importValue .= '<span>' . dol_trunc($entityName, 32) . '</span>';
+				$importValue .= '</div>';
 
-			$importValue .= '<div class="importsharedrisk"><span class="importsharedrisk-ref">' . $digiriskelementtmp->ref . '</span>';
-			$importValue .= '<span>' . dol_trunc($digiriskelementtmp->label, 32) . '</span>';
-			$importValue .= '</div>';
+				$importValue .= '<div class="importsharedrisk"><span class="importsharedrisk-ref">' . $digiriskelementtmp->ref . '</span>';
+				$importValue .= '<span>' . dol_trunc($digiriskelementtmp->label, 32) . '</span>';
+				$importValue .= '</div>';
 
-			$importValue .= '<div class="importsharedrisk">';
-			$importValue .= $photoRisk;
-			$importValue .= '<span class="importsharedrisk-ref">' . $risks->ref  . '</span>';
-			$importValue .= '<span>' . dol_trunc($risks->description, 32) . '</span>';
-			$importValue .= '</div>';
+				$importValue .= '<div class="importsharedrisk">';
+				$importValue .= $photoRisk;
+				$importValue .= '<span class="importsharedrisk-ref">' . $risks->ref  . '</span>';
+				$importValue .= '<span>' . dol_trunc($risks->description, 32) . '</span>';
+				$importValue .= '</div>';
 
-			$importValue .= '<div class="importsharedrisk risk-evaluation-cotation"  data-scale="'. $lastEvaluation->get_evaluation_scale() .'">';
-			$importValue .= '<span class="importsharedrisk-risk-assessment">' . $lastEvaluation->cotation  . '</span>';
-			$importValue .= '</div>';
+				$importValue .= '<div class="importsharedrisk risk-evaluation-cotation"  data-scale="'. $lastEvaluation->get_evaluation_scale() .'">';
+				$importValue .= '<span class="importsharedrisk-risk-assessment">' . $lastEvaluation->cotation  . '</span>';
+				$importValue .= '</div>';
 
-			$relativepath = 'digiriskdolibarr/medias/thumbs/';
-			$entity = ($conf->entity > 1) ? '/' . $risks->entity : '';
-			$modulepart   = $entity . 'ecm';
-			$path         = DOL_URL_ROOT . '/document.php?modulepart=' . $modulepart . '&attachment=0&file=' . str_replace('/', '%2F', $relativepath) . '/';
-			$pathToThumb  = DOL_URL_ROOT . '/custom/digiriskdolibarr/documents/viewimage.php?modulepart=digiriskdolibarr&entity=' . $risks->entity . '&file=' . urlencode($lastEvaluation->element . '/' . $lastEvaluation->ref . '/thumbs/');
-			$nophoto      = DOL_URL_ROOT.'/public/theme/common/nophoto.png';
+				$relativepath = 'digiriskdolibarr/medias/thumbs/';
+				$entity = ($conf->entity > 1) ? '/' . $risks->entity : '';
+				$modulepart   = $entity . 'ecm';
+				$path         = DOL_URL_ROOT . '/document.php?modulepart=' . $modulepart . '&attachment=0&file=' . str_replace('/', '%2F', $relativepath) . '/';
+				$pathToThumb  = DOL_URL_ROOT . '/custom/digiriskdolibarr/documents/viewimage.php?modulepart=digiriskdolibarr&entity=' . $risks->entity . '&file=' . urlencode($lastEvaluation->element . '/' . $lastEvaluation->ref . '/thumbs/');
+				$nophoto      = DOL_URL_ROOT.'/public/theme/common/nophoto.png';
 
-			$importValue .= '<div class="risk-evaluation-photo risk-evaluation-photo-'. ($lastEvaluation->id > 0 ? $lastEvaluation->id : 0) .  ($risk->id > 0 ? ' risk-' . $risk->id : ' risk-new') .' open-medias-linked">';
-			$importValue .= '<span class="floatleft inline-block valignmiddle divphotoref risk-evaluation-photo-single">';
-			$importValue .= '<input class="filepath-to-riskassessment filepath-to-riskassessment-'.( $risk->id > 0 ? $risk->id : 'new') .'" type="hidden" value="'. $pathToThumb .'">';
-			$importValue .=	'<input class="filename" type="hidden" value="">';
-			if (isset($lastEvaluation->photo) && dol_strlen($lastEvaluation->photo) > 0) {
-				$accessallowed = 1;
+				$importValue .= '<div class="risk-evaluation-photo risk-evaluation-photo-'. ($lastEvaluation->id > 0 ? $lastEvaluation->id : 0) .  ($risk->id > 0 ? ' risk-' . $risk->id : ' risk-new') .' open-medias-linked">';
+				$importValue .= '<span class="floatleft inline-block valignmiddle divphotoref risk-evaluation-photo-single">';
+				$importValue .= '<input class="filepath-to-riskassessment filepath-to-riskassessment-'.( $risk->id > 0 ? $risk->id : 'new') .'" type="hidden" value="'. $pathToThumb .'">';
+				$importValue .=	'<input class="filename" type="hidden" value="">';
+				if (isset($lastEvaluation->photo) && dol_strlen($lastEvaluation->photo) > 0) {
+					$accessallowed = 1;
 
 //				$importValue .=	 '<img width="40" class="photo clicked-photo-preview" src="' . $conf->digiriskdolibarr->multidir_output[$risks->entity?:1] . $lastEvaluation->element . '/' . $lastEvaluation->ref . '/thumbs/' . preg_replace('/\./', '_small.', $lastEvaluation->photo)) . '" >';
 //				$importValue .=	 '<img width="40" class="photo clicked-photo-preview" src="' . DOL_DATA_ROOT . $entity . '/digiriskdolibarr/'. $lastEvaluation->element . '/' . $lastEvaluation->ref . '/thumbs/' . preg_replace('/\./', '_small.', $lastEvaluation->photo) . '" >';
-				$importValue .=	 '<img width="40" class="photo clicked-photo-preview" src="' . DOL_URL_ROOT . '/custom/digiriskdolibarr/documents/viewimage.php?modulepart=digiriskdolibarr&entity=' . $risks->entity . '&file=' . urlencode($lastEvaluation->element . '/' . $lastEvaluation->ref . '/thumbs/' . preg_replace('/\./', '_small.', $lastEvaluation->photo)) . '" >';
-			} else {
-				$importValue .=	 '<img width="40" class="photo clicked-photo-preview" src="'. $nophoto .'" >';
-			}
-			$importValue .= '</span></div>';
+					$importValue .=	 '<img width="40" class="photo clicked-photo-preview" src="' . DOL_URL_ROOT . '/custom/digiriskdolibarr/documents/viewimage.php?modulepart=digiriskdolibarr&entity=' . $risks->entity . '&file=' . urlencode($lastEvaluation->element . '/' . $lastEvaluation->ref . '/thumbs/' . preg_replace('/\./', '_small.', $lastEvaluation->photo)) . '" >';
+				} else {
+					$importValue .=	 '<img width="40" class="photo clicked-photo-preview" src="'. $nophoto .'" >';
+				}
+				$importValue .= '</span></div>';
 
-			$importValue .= '<div class="importsharedrisk">';
-			$importValue .= '<span class="importsharedrisk-risk-assessment">' ;
-			$importValue .=  nl2br(dol_trunc($lastEvaluation->comment, 120));
-			$importValue .=  '</span>';
-			$importValue .= '</div>';
+				$importValue .= '<div class="importsharedrisk">';
+				$importValue .= '<span class="importsharedrisk-risk-assessment">' ;
+				$importValue .=  nl2br(dol_trunc($lastEvaluation->comment, 120));
+				$importValue .=  '</span>';
+				$importValue .= '</div>';
 
-			if ($alreadyImported > 0) {
-				$formquestionimportsharedrisks[] = array('type' => 'checkbox', 'name' => 'import_shared_risks' . '_S' . $risks->entity . '_' . $digiriskelementtmp->ref . '_' . $risks->ref, 'label' => $importValue . '<span class="importsharedrisk imported">' . $langs->trans('AlreadyImported') . '</span>', 'value' => 0, 'disabled' => 1);
-			} else {
-				$formquestionimportsharedrisks[] = array('type' => 'checkbox', 'name' => 'import_shared_risks' . '_S' . $risks->entity . '_' . $digiriskelementtmp->ref . '_' . $risks->ref, 'label' => $importValue, 'value' => 0);
+				if ($alreadyImported > 0) {
+					$formquestionimportsharedrisks[] = array('type' => 'checkbox', 'name' => 'import_shared_risks' . '_S' . $risks->entity . '_' . $digiriskelementtmp->ref . '_' . $risks->ref, 'label' => $importValue . '<span class="importsharedrisk imported">' . $langs->trans('AlreadyImported') . '</span>', 'value' => 0, 'disabled' => 1);
+				} else {
+					$formquestionimportsharedrisks[] = array('type' => 'checkbox', 'name' => 'import_shared_risks' . '_S' . $risks->entity . '_' . $digiriskelementtmp->ref . '_' . $risks->ref, 'label' => $importValue, 'value' => 0);
+				}
 			}
 		}
 		$formconfirm .= $form->formconfirm($_SERVER["PHP_SELF"] . '?id=' . $object->id, $langs->trans('ImportSharedRisks'), '', 'confirm_import_shared_risks', $formquestionimportsharedrisks, 'yes', 'actionButtonImportSharedRisks', 800, 800);

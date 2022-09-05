@@ -665,17 +665,48 @@ class DigiriskElement extends CommonObject
 	 */
 	public function getTrashList()
 	{
+		global $conf;
 		$objects = $this->fetchAll('',  'ranks');
 		if (is_array($objects)) {
-			$recurse_tree = recurse_tree($this->id, 0, $objects);
+			$recurse_tree = recurse_tree($conf->global->DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH, 0, $objects);
 			$ids          = [];
 
 			array_walk_recursive($recurse_tree, function ($item) use (&$ids) {
 				if (is_object($item)) {
-					$ids[ $item->id] = $item->id;
+					$ids[$item->id] = $item->id;
 				}
 			}, $ids);
 
+			return $ids;
+		} else {
+			return array();
+		}
+	}
+
+	/**
+	 *  Return list of deleted elements for all entities
+	 *
+	 * 	@return    array  Array with ids
+	 * 	@throws Exception
+	 */
+	public function getMultiEntityTrashList()
+	{
+		global $conf;
+		$this->ismultientitymanaged = 0;
+		$objects = $this->fetchAll('',  'ranks', '','',array('customsql' => ' status > 0'));
+		$digiriskelement_trashes = $this->fetchAll('',  'ranks', '','',array('customsql' => ' status = 0'));
+		$this->ismultientitymanaged = 1;
+		if (is_array($digiriskelement_trashes) && !empty($digiriskelement_trashes)) {
+			$ids          = [];
+			foreach($digiriskelement_trashes as $digiriskelement_trash) {
+				$recurse_tree = recurse_tree($digiriskelement_trash->id, 0, $objects);
+
+				array_walk_recursive($recurse_tree, function ($item) use (&$ids) {
+					if (is_object($item)) {
+						$ids[$item->entity][$item->id] = $item->id;
+					}
+				}, $ids);
+			}
 			return $ids;
 		} else {
 			return array();
