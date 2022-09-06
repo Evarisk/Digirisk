@@ -411,7 +411,7 @@
 			} elseif ($key == 'fk_element') {
 				print $digiriskelement->select_digiriskelement_list($search['fk_element'], 'search_fk_element_sharedrisk', 's.entity NOT IN (' . $conf->entity . ')', 1, 0, array(), 0, 0, 'minwidth100', 0, false, 1, $contextpage, false);
 			}  elseif ($key == 'applied_on') {
-				print $digiriskelement->select_digiriskelement_list($search['applied_on'], 'search_applied_on_sharedrisk', '', 1, 0, array(), 0, 0, 'minwidth100', 0, false, 1, $contextpage);
+//				print $digiriskelement->select_digiriskelement_list($search['search_applied_on_sharedrisk'], 'search_applied_on_sharedrisk', '', 1, 0, array(), 0, 0, 'minwidth100', 0, false, 1, $contextpage);
 			} elseif ($key == 'category') { ?>
 				<div class="wpeo-dropdown dropdown-large dropdown-grid category-danger padding" style="position: inherit">
 					<input class="input-hidden-danger" type="hidden" name="<?php echo 'search_' . $key ?>" value="<?php echo dol_escape_htmltag($search[$key]) ?>" />

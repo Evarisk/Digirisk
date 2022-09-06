@@ -212,6 +212,14 @@ if (!empty($conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS)) {
 	require_once './../../core/tpl/riskanalysis/risk/digiriskdolibarr_sharedrisklist_view.tpl.php';
 }
 
+?>
+	<script>
+        $('.ulrisklist_selectedfields').attr('style','z-index:1100');
+        $('.ulinherited_risklist_selectedfields').attr('style','z-index:1100');
+        $('.ulshared_risklist_selectedfields').attr('style','z-index:1100');
+	</script>
+<?php
+
 // End of page
 llxFooter();
 $db->close();
