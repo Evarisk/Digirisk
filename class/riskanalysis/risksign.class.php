@@ -286,6 +286,13 @@ class RiskSign extends CommonObject
 		$risksign = new RiskSign($this->db);
 		$result   = $risksign->fetchFromParent($parent_id);
 
+		$trashList = $object->getMultiEntityTrashList();
+		if (!empty($trashList) && is_array($trashList)) {
+			foreach($trashList as $trash_element_id) {
+				unset($objects[$trash_element_id]);
+			}
+		}
+
 		if ($result > 0 && ! empty($result)) {
 			foreach ($result as $risksign) {
 				$risksigns[$risksign->id] = $risksign;
@@ -310,30 +317,30 @@ class RiskSign extends CommonObject
 			if ($parent_id == 0) {
 				$digiriskelement_flatlist = $digiriskelementtmp->fetchDigiriskElementFlat(0);
 				if (is_array($digiriskelement_flatlist) && !empty($digiriskelement_flatlist)) {
-
 					foreach ($digiriskelement_flatlist as $sub_digiriskelement) {
 						$digiriskelement = $sub_digiriskelement['object'];
 						$digiriskelement->fetchObjectLinked(null, '', $digiriskelement->id, 'digiriskdolibarr_digiriskelement', 'AND', 1, 'sourcetype', 0);
-
 						if (!empty($digiriskelement->linkedObjectsIds['digiriskdolibarr_risksign'])) {
 							foreach ($digiriskelement->linkedObjectsIds['digiriskdolibarr_risksign'] as $risksign_id) {
 								$risksign = new self($this->db);
 								$risksign->fetch($risksign_id);
-								$risksigns[$risksign->id] = $risksign;
+								if (!array_key_exists($risksign->fk_element, $trashList)) {
+									$risksigns[$risksign->id] = $risksign;
+								}
 							}
 						}
 					}
 				}
-
 			} else {
 				$digiriskelementtmp->fetch($parent_id);
 				$digiriskelementtmp->fetchObjectLinked(null, '', $digiriskelementtmp->id, 'digiriskdolibarr_digiriskelement', 'AND', 1, 'sourcetype', 0);
-
 				if (!empty($digiriskelementtmp->linkedObjectsIds['digiriskdolibarr_risksign'])) {
-					foreach ($digiriskelementtmp->linkedObjectsIds['digiriskdolibarr_risksign'] as $risk_id) {
+					foreach ($digiriskelementtmp->linkedObjectsIds['digiriskdolibarr_risksign'] as $risksign_id) {
 						$risksign = new self($this->db);
-						$risksign->fetch($risk_id);
-						$risksigns[$risksign->id] = $risksign;
+						$risksign->fetch($risksign_id);
+						if (!array_key_exists($risksign->fk_element, $trashList)) {
+							$risksigns[$risksign->id] = $risksign;
+						}
 					}
 				}
 			}

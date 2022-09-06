@@ -347,6 +347,7 @@ if ($sharedrisksigns) {
 //		$filter = rtrim($filter, ',');
 
 		$allrisksigns = $risksign->fetchAll('ASC', 'fk_element', 0, 0, array('customsql' => 'status > 0 AND entity NOT IN (' . $conf->entity . ') AND fk_element > 0'));
+		$deleted_elements = $object->getMultiEntityTrashList();
 
 		$formquestionimportsharedrisksigns = array(
 			'text' => '<i class="fas fa-circle-info"></i>' . $langs->trans("ConfirmImportSharedRiskSigns"),
@@ -361,27 +362,30 @@ if ($sharedrisksigns) {
 			$alreadyImported = !empty($digiriskelementtmp->linkedObjectsIds) ? 1 : 0;
 			$nameEntity = dolibarr_get_const($db, 'MAIN_INFO_SOCIETE_NOM', $risksigns->entity);
 
-			$photoRiskSign = '<img class="danger-category-pic hover" src=' . DOL_URL_ROOT . '/custom/digiriskdolibarr/img/' . $risksigns->get_risksign_category($risksigns) . '>';
+			if (!array_key_exists($digiriskelementtmp->id, $deleted_elements)) {
+				$photoRiskSign = '<img class="danger-category-pic hover" src=' . DOL_URL_ROOT . '/custom/digiriskdolibarr/img/' . $risksigns->get_risksign_category($risksigns) . '>';
 
-			$importValue = '<div class="importsharedrisksign"><span class="importsharedrisksign-ref">' . 'S' . $risksigns->entity . '</span>';
-			$importValue .= '<span>' . dol_trunc($nameEntity, 32) . '</span>';
-			$importValue .= '</div>';
+				$importValue = '<div class="importsharedrisksign"><span class="importsharedrisksign-ref">' . 'S' . $risksigns->entity . '</span>';
+				$importValue .= '<span>' . dol_trunc($nameEntity, 32) . '</span>';
+				$importValue .= '</div>';
 
-			$importValue .= '<div class="importsharedrisksign"><span class="importsharedrisksign-ref">' . $digiriskelementtmp->ref . '</span>';
-			$importValue .= '<span>' . dol_trunc($digiriskelementtmp->label, 32) . '</span>';
-			$importValue .= '</div>';
+				$importValue .= '<div class="importsharedrisksign"><span class="importsharedrisksign-ref">' . $digiriskelementtmp->ref . '</span>';
+				$importValue .= '<span>' . dol_trunc($digiriskelementtmp->label, 32) . '</span>';
+				$importValue .= '</div>';
 
-			$importValue .= '<div class="importsharedrisksign">';
-			$importValue .= $photoRiskSign;
-			$importValue .= '<span class="importsharedrisksign-ref">' . $risksigns->ref  . '</span>';
-			$importValue .= '<span>' . dol_trunc($risksigns->description, 32) . '</span>';
-			$importValue .= '</div>';
+				$importValue .= '<div class="importsharedrisksign">';
+				$importValue .= $photoRiskSign;
+				$importValue .= '<span class="importsharedrisksign-ref">' . $risksigns->ref . '</span>';
+				$importValue .= '<span>' . dol_trunc($risksigns->description, 32) . '</span>';
+				$importValue .= '</div>';
 
-			if ($alreadyImported > 0) {
-				$formquestionimportsharedrisksigns[] = array('type' => 'checkbox', 'name' => 'import_shared_risksigns' . '_S' . $risksigns->entity . '_' . $digiriskelementtmp->ref . '_' . $risksigns->ref, 'label' => $importValue . '<span class="importsharedrisksigns imported">' . $langs->trans('AlreadyImported') . '</span>', 'value' => 0, 'disabled' => 1);
-			} else {
-				$formquestionimportsharedrisksigns[] = array('type' => 'checkbox', 'name' => 'import_shared_risksigns' . '_S' . $risksigns->entity . '_' . $digiriskelementtmp->ref . '_' . $risksigns->ref, 'label' => $importValue, 'value' => 0);
+				if ($alreadyImported > 0) {
+					$formquestionimportsharedrisksigns[] = array('type' => 'checkbox', 'name' => 'import_shared_risksigns' . '_S' . $risksigns->entity . '_' . $digiriskelementtmp->ref . '_' . $risksigns->ref, 'label' => $importValue . '<span class="importsharedrisksigns imported">' . $langs->trans('AlreadyImported') . '</span>', 'value' => 0, 'disabled' => 1);
+				} else {
+					$formquestionimportsharedrisksigns[] = array('type' => 'checkbox', 'name' => 'import_shared_risksigns' . '_S' . $risksigns->entity . '_' . $digiriskelementtmp->ref . '_' . $risksigns->ref, 'label' => $importValue, 'value' => 0);
+				}
 			}
+
 		}
 		$formconfirm .= $form->formconfirm($_SERVER["PHP_SELF"] . '?id=' . $object->id, $langs->trans('ImportSharedRiskSigns'), '', 'confirm_import_shared_risksigns', $formquestionimportsharedrisksigns, 'yes', 'actionButtonImportSharedRiskSigns', 800, 800);
 	}

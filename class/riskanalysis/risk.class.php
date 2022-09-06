@@ -184,7 +184,7 @@ class Risk extends CommonObject
 	{
 		$object  = new DigiriskElement($this->db);
 		$objects = $object->fetchAll('',  '',  0,  0, array('customsql' => 'status > 0' ));
-		$trashList = $object->getTrashList();
+		$trashList = $object->getMultiEntityTrashList();
 		if (!empty($trashList) && is_array($trashList)) {
 			foreach($trashList as $trash_element_id) {
 				unset($objects[$trash_element_id]);
@@ -288,14 +288,16 @@ class Risk extends CommonObject
 							foreach ($digiriskelement->linkedObjectsIds['digiriskdolibarr_risk'] as $risk_id) {
 								$risktmp = new self($this->db);
 								$risktmp->fetch($risk_id);
-								$evaluation     = new RiskAssessment($this->db);
-								$lastEvaluation = $evaluation->fetchFromParent($risktmp->id, 1);
-								if ( $lastEvaluation > 0 && ! empty($lastEvaluation)  && is_array($lastEvaluation)) {
-									$lastEvaluation       = array_shift($lastEvaluation);
-									$risktmp->lastEvaluation = $lastEvaluation;
+								if (!array_key_exists($risktmp->fk_element, $trashList)) {
+									$evaluation     = new RiskAssessment($this->db);
+									$lastEvaluation = $evaluation->fetchFromParent($risktmp->id, 1);
+									if ( $lastEvaluation > 0 && ! empty($lastEvaluation)  && is_array($lastEvaluation)) {
+										$lastEvaluation       = array_shift($lastEvaluation);
+										$risktmp->lastEvaluation = $lastEvaluation;
+									}
+									$risktmp->appliedOn = $digiriskelement->id;
+									$risks[] = $risktmp;
 								}
-								$risktmp->appliedOn = $digiriskelement->id;
-								$risks[] = $risktmp;
 							}
 						}
 					}
@@ -308,14 +310,16 @@ class Risk extends CommonObject
 					foreach ($digiriskelementtmp->linkedObjectsIds['digiriskdolibarr_risk'] as $risk_id) {
 						$risktmp = new self($this->db);
 						$risktmp->fetch($risk_id);
-						$evaluation     = new RiskAssessment($this->db);
-						$lastEvaluation = $evaluation->fetchFromParent($risktmp->id, 1);
-						if ( $lastEvaluation > 0 && ! empty($lastEvaluation)  && is_array($lastEvaluation)) {
-							$lastEvaluation       = array_shift($lastEvaluation);
-							$risktmp->lastEvaluation = $lastEvaluation;
+						if (!array_key_exists($risktmp->fk_element, $trashList)) {
+							$evaluation = new RiskAssessment($this->db);
+							$lastEvaluation = $evaluation->fetchFromParent($risktmp->id, 1);
+							if ($lastEvaluation > 0 && !empty($lastEvaluation) && is_array($lastEvaluation)) {
+								$lastEvaluation = array_shift($lastEvaluation);
+								$risktmp->lastEvaluation = $lastEvaluation;
+							}
+							$risktmp->appliedOn = $parent_id;
+							$risks[] = $risktmp;
 						}
-						$risktmp->appliedOn = $parent_id;
-						$risks[] = $risktmp;
 					}
 				}
 			}

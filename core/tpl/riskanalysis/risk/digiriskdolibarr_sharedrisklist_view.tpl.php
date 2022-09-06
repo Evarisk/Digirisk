@@ -54,7 +54,7 @@
 	$advanced_method_cotation_array = json_decode($advanced_method_cotation_json, true);
 	$digiriskelement                = new DigiriskElement($db);
 	$digiriskelement->fetch($conf->global->DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH);
-	$trashList = $digiriskelement->getTrashList();
+	$trashList = $digiriskelement->getMultiEntityTrashList();
 
 	$risktmp = new Risk($db);
 	$digiriskelementtmp = new DigiriskElement($db);
@@ -90,6 +90,9 @@
 		if ( ! $allRisks) {
 			$sql .= " AND el.fk_target = " . $id;
 			$sql .= " AND el.sourcetype = 'digiriskdolibarr_risk'";
+			foreach ($trashList as $deleted_element => $element_id) {
+				$sql .= " AND fk_element !=" . $element_id;
+			}
 		} else {
 			foreach ($trashList as $deleted_element => $element_id) {
 				$sql .= " AND fk_element !=" . $element_id;
@@ -207,6 +210,9 @@
 		if ( ! $allRisks) {
 			$sql .= " AND el.fk_target = " . $id;
 			$sql .= " AND el.sourcetype = 'digiriskdolibarr_risk'";
+			foreach ($trashList as $deleted_element => $element_id) {
+				$sql .= " AND fk_element !=" . $element_id;
+			}
 			//$sql .= " AND r.fk_element =" . $id;
 		} else {
 			foreach ($trashList as $deleted_element => $element_id) {
