@@ -3654,13 +3654,17 @@ window.eoxiaJS.ticket.tmpStockFile = function( ) {
 		formData.append('files[]', file)
 	}
 	var ticket_id = $('#ticket_id').val()
+    let querySeparator = '?'
+    document.URL.match(/\?/) ? querySeparator = '&' : 1
+
 	window.eoxiaJS.loader.display($('.files-uploaded'));
-	fetch(document.URL + '?action=sendfile&ticket_id='+ticket_id, {
+
+    fetch(document.URL + querySeparator + 'action=sendfile&ticket_id='+ticket_id, {
 		method: 'POST',
 		body: formData,
-	}).then(() => {
-		$('#sendFileForm').load(document.URL+ '?ticket_id='+ticket_id + ' #fileLinkedTable')
-	})
+	}).then((resp) => {
+        $('#sendFileForm').load(document.URL+ querySeparator + 'ticket_id='+ticket_id + ' #fileLinkedTable')
+})
 };
 
 /**
@@ -3675,10 +3679,13 @@ window.eoxiaJS.ticket.removeFile = function( event ) {
 	let filetodelete = $(this).attr('value');
 	filetodelete = filetodelete.replace('_mini', '')
 	let ticket_id = $('#ticket_id').val()
+    let querySeparator = '?'
 
-	fetch(document.URL + '?action=removefile&filetodelete='+filetodelete+'&ticket_id='+ticket_id, {
+    document.URL.match(/\?/) ? querySeparator = '&' : 1
+
+	fetch(document.URL + querySeparator + 'action=removefile&filetodelete='+filetodelete+'&ticket_id='+ticket_id, {
 		method: 'POST',
-	}).then(() => {
+	}).then((resp) => {
 		$(this).parent().parent().hide()
 	})
 };

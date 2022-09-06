@@ -246,6 +246,9 @@ if ($action == 'sendfile') {
 	include_once DOL_DOCUMENT_ROOT . '/core/lib/files.lib.php';
 
 	$ticket_upload_dir = $conf->digiriskdolibarr->multidir_output[isset($conf->entity) ? $conf->entity : 1] . '/temp';
+	if ( ! is_dir($ticket_upload_dir)) {
+		dol_mkdir($ticket_upload_dir);
+	}
 	if ( ! is_dir($ticket_upload_dir . '/ticket')) {
 		dol_mkdir($ticket_upload_dir . '/ticket');
 	}
@@ -281,9 +284,8 @@ if ($action == 'sendfile') {
 				$imgThumbMini = vignette($path_filename_ext, 30, 30, '_mini', 50, "thumbs");
 			}
 		}
-	} $action = '';
+	}
 }
-
 // Remove file
 if ($action == 'removefile') {
 	include_once DOL_DOCUMENT_ROOT . '/core/lib/files.lib.php';
@@ -432,8 +434,7 @@ if ( ! empty($mainCategoryObject) && $mainCategoryObject > 0) {
 								if (preg_match('/mini/', $fileLinked['name'])) { ?>
 									<div class="table-row">
 										<div class="table-cell table-50 table-padding-0">
-<!--											--><?php //print '<img class="photo"  width="' . $maxHeight . '" src="' . DOL_URL_ROOT . '/viewimage.php?modulepart=digiriskdolibarr&entity=' . $conf->entity . '&file=' . urlencode('/temp/ticket/' . $ticket_tmp_id . '/thumbs/' . $fileLinked['name']) . '" title="' . dol_escape_htmltag($alt) . '">'; ?>
-											<?php print '<img class="photo"  width="' . $maxHeight . '" src="' . urlencode('/temp/ticket/' . $ticket_tmp_id . '/thumbs/' . $fileLinked['name']) . '" title="' . dol_escape_htmltag($alt) . '">'; ?>
+											<?php print '<img class="photo"  width="' . $maxHeight . '" src="' . DOL_URL_ROOT . '/viewimage.php?modulepart=digiriskdolibarr&entity=' . $conf->entity . '&file=' . urlencode('/temp/ticket/' . $ticket_tmp_id . '/thumbs/' . $fileLinked['name']) . '" title="' . dol_escape_htmltag($alt) . '">'; ?>
 										</div>
 										<div class="table-cell">
 											<?php print preg_replace('/_mini/', '', $fileLinked['name']); ?>
