@@ -302,7 +302,6 @@
 	}
 
 	$arrayofselected = is_array($toselect) ? $toselect : array();
-
 	$param                                                                      = '';
 	if ( ! empty($contextpage) && $contextpage != $_SERVER["PHP_SELF"]) $param .= '&contextpage=' . urlencode($contextpage);
 	$param                                                                     .= '&id=' . $id;
@@ -354,14 +353,20 @@
 	$arrayfields['t.fk_element']['checked']  = 1;
 	$arrayfields['t.fk_element']['label']    = $langs->trans('ParentElement');
 	$arrayfields['t.fk_element']['enabled']  = 1;
-	$arrayfields['t.fk_element']['position'] = 5;
+	$arrayfields['t.fk_element']['position'] = 2;
+
+	$arrayfields['t.applied_on']['checked']  = 1;
+	$arrayfields['t.applied_on']['label']    = $langs->trans('AppliedOn');
+	$arrayfields['t.applied_on']['enabled']  = 1;
+	$arrayfields['t.applied_on']['position'] = 9;
+	$arrayfields['t.applied_on']['disablesort'] = 1;
 
 	$arrayfields = dol_sort_array($arrayfields, 'position');
 
 	$menuConf = 'MAIN_SELECTEDFIELDS_' . $varpage;
 
 	if (dol_strlen($user->conf->$menuConf) < 1) {
-		$user->conf->$menuConf = 't.entity,t.fk_element,t.ref,t.category,evaluation.cotation,';
+		$user->conf->$menuConf = 't.entity,t.fk_element,t.applied_on,t.ref,t.category,evaluation.cotation,';
 	}
 
 	if ( ! preg_match('/t.description/', $user->conf->$menuConf) && $conf->global->DIGIRISKDOLIBARR_RISK_DESCRIPTION) {
@@ -388,14 +393,11 @@
 
 	// Fields title search
 	// --------------------------------------------------------------------
-
-//	$AllSharingsRisks = $conf->mc->sharings['risk'];
-//	foreach ($AllSharingsRisks as $Allsharingsrisk) {
-//		$filterSharingRisk .= $Allsharingsrisk . ',';
-//	}
-//	$filterSharingRisk = rtrim($filterSharingRisk, ',');
-
 	print '<tr class="liste_titre">';
+
+	$risk->fields['applied_on'] = $arrayfields['t.applied_on'] ;
+	$risk->fields = dol_sort_array($risk->fields, 'position');
+
 	foreach ($risk->fields as $key => $val) {
 		$cssforfield                        = (empty($val['css']) ? '' : $val['css']);
 		if ($key == 'status') $cssforfield .= ($cssforfield ? ' ' : '') . 'center';
@@ -408,6 +410,8 @@
 				print select_entity_list($search['entity'], 'search_entity', 'e.rowid NOT IN (' . $conf->entity . ')');
 			} elseif ($key == 'fk_element') {
 				print $digiriskelement->select_digiriskelement_list($search['fk_element'], 'search_fk_element_sharedrisk', 's.entity NOT IN (' . $conf->entity . ')', 1, 0, array(), 0, 0, 'minwidth100', 0, false, 1, $contextpage, false);
+			}  elseif ($key == 'applied_on') {
+				print $digiriskelement->select_digiriskelement_list($search['applied_on'], 'search_applied_on_sharedrisk', '', 1, 0, array(), 0, 0, 'minwidth100', 0, false, 1, $contextpage);
 			} elseif ($key == 'category') { ?>
 				<div class="wpeo-dropdown dropdown-large dropdown-grid category-danger padding" style="position: inherit">
 					<input class="input-hidden-danger" type="hidden" name="<?php echo 'search_' . $key ?>" value="<?php echo dol_escape_htmltag($search[$key]) ?>" />
@@ -437,6 +441,7 @@
 			print '</td>';
 		}
 	}
+
 
 	foreach ($evaluation->fields as $key => $val) {
 		$cssforfield                        = (empty($val['css']) ? '' : $val['css']);
@@ -469,7 +474,7 @@
 		$cssforfield                        = (empty($val['css']) ? '' : $val['css']);
 		if ($key == 'status') $cssforfield .= ($cssforfield ? ' ' : '') . 'center';
 		if ( ! empty($arrayfields['t.' . $key]['checked'])) {
-			print getTitleFieldOfList($arrayfields['t.' . $key]['label'], 0, $_SERVER['PHP_SELF'], 't.' . $key, '', $param, ($cssforfield ? 'class="' . $cssforfield . '"' : ''), $sortfield, $sortorder, ($cssforfield ? $cssforfield . ' ' : '')) . "\n";
+			print getTitleFieldOfList($arrayfields['t.' . $key]['label'], 0, $_SERVER['PHP_SELF'], 't.' . $key, '', $param, ($cssforfield ? 'class="' . $cssforfield . '"' : ''), $sortfield, $sortorder, ($cssforfield ? $cssforfield . ' ' : ''), $arrayfields['t.' . $key]['disablesort']) . "\n";
 		}
 	}
 
@@ -498,10 +503,10 @@
 	// contenu
 	$i          = 0;
 	$totalarray = array();
+	unset($risk->fields['applied_on']);
 
 	while ($i < ($limit ? min($num, $limit) : $num)) {
 		$obj = $db->fetch_object($resql);
-
 		if (empty($obj)) break; // Should not happen
 
 		// Si on trie avec un champ d'une évaluation, on fetch le risque et non l'évaluation
@@ -512,8 +517,13 @@
 			$risk->setVarsFromFetchObj($obj);
 		}
 
+		$risk->fetchObjectLinked($risk->id, 'digiriskdolibarr_risk');
+
 		// Show here line of result
 		print '<tr class="oddeven risk-row risk_row_' . $risk->id . ' risk-row-content-' . $risk->id . '" id="risk_row_' . $risk->id . '">';
+		$risk->fields['applied_on'] = $arrayfields['t.applied_on'] ;
+		$risk->fields = dol_sort_array($risk->fields, 'position');
+
 		foreach ($risk->fields as $key => $val) {
 			$cssforfield                                 = (empty($val['css']) ? '' : $val['css']);
 			if ($key == 'status') $cssforfield          .= ($cssforfield ? ' ' : '') . 'center';
@@ -551,6 +561,16 @@
 					} else {
 						print dol_trunc($risk->description, 120);
 					}
+				} elseif ($key == 'applied_on') {
+					if (!empty($risk->linkedObjectsIds['digiriskdolibarr_digiriskelement']) && is_array($risk->linkedObjectsIds['digiriskdolibarr_digiriskelement'])) {
+						foreach($risk->linkedObjectsIds['digiriskdolibarr_digiriskelement'] as $digiriskelement_id) {
+							if (array_key_exists($digiriskelement_id, $alldigiriskelement)) {
+								$digiriskelement->fetch($digiriskelement_id);
+								print $digiriskelement->getNomUrl(1);
+								print '<br>';
+							}
+						}
+					}
 				} else print $risk->showOutputField($val, $key, $risk->$key, '');
 				print '</td>';
 				if ( ! $i) $totalarray['nbfield']++;
@@ -560,6 +580,7 @@
 				}
 			}
 		}
+		unset($risk->fields['applied_on']);
 
 		// Store properties in $lastEvaluation
 		foreach ($evaluation->fields as $key => $val) {
