@@ -2486,43 +2486,22 @@ function select_entity_list($selected = '', $htmlname = 'entity', $filter = '', 
 	$selected = array($selected);
 
 	$digiriskelement = new DigiriskElement($db);
-
 	// Clean $filter that may contains sql conditions so sql code
 	if (function_exists('testSqlAndScriptInject')) {
 		if (testSqlAndScriptInject($filter, 3) > 0) {
 			$filter = '';
 		}
 	}
-	// On recherche les societies
 	$sql  = "SELECT *";
 	$sql .= " FROM " . MAIN_DB_PREFIX . "entity as e";
 
 	$sql              .= " WHERE e.rowid IN (" . getEntity($digiriskelement->element) . ")";
 	//$sql .= ' WHERE 1 = 1';
 	if ($filter) $sql .= " AND (" . $filter . ")";
-//		if ($moreparam > 0 ) {
-//			$children = $this->fetchDigiriskElementFlat($moreparam);
-//			if ( ! empty($children) && $children > 0) {
-//				foreach ($children as $key => $value) {
-//					$sql .= " AND NOT s.rowid =" . $key;
-//				}
-//			}
-//			$sql .= " AND NOT s.rowid =" . $moreparam;
-//		}
-//		if ($conf->global->DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH) {
-//			$masked_content = $this->fetchDigiriskElementFlat($conf->global->DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH);
-//			if ( ! empty($masked_content) && $masked_content > 0) {
-//				foreach ($masked_content as $key => $value) {
-//					$sql .= " AND NOT s.rowid =" . $key;
-//				}
-//			}
-//			$sql .= " AND NOT s.rowid =" . $conf->global->DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH;
-//		}
 	$sql .= $db->order("rowid", "ASC");
 	$sql .= $db->plimit($limit, 0);
 
 	// Build output string
-	//dol_syslog(get_class($this) . "::select_digiriskelement_list", LOG_DEBUG);
 	$resql = $db->query($sql);
 	$num = '';
 	if ($resql) {

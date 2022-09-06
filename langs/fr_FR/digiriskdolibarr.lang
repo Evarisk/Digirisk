@@ -1405,6 +1405,7 @@ MainCategory = Choix de la catégorie principale
 ParentCategoryLabel = Titre de la catégorie parent
 ChildCategoryLabel = Titre de la catégorie enfant
 TicketPublicInterfaceEnabled = L'interface publique des tickets a été activée
+TicketPublicInterface = Interface publique
 EmailsToNotifySet = Les adresses e-mail à notifier ont bien été enregistrées
 MainCategorySet = La catégorie principale a été définie
 ParentCategoryLabelSet = Le titre de la catégorie parent a été défini

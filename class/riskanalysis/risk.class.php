@@ -597,11 +597,9 @@ class Risk extends CommonObject
 			$records = array();
 			while ($i < $num) {
 				$obj = $this->db->fetch_object($resql);
-
 				$record = new Task($this->db);
 				$record->fetch($obj->fk_object);
 				$records[$record->id] = $record;
-
 				$i++;
 			}
 			$this->db->free($resql);
