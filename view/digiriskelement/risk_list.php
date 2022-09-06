@@ -113,6 +113,9 @@ $search_all = GETPOST('search_all', 'alphanohtml') ? trim(GETPOST('search_all', 
 $search     = array();
 foreach ($risk->fields as $key => $val) {
 	if (GETPOST('search_' . $key, 'alpha') !== '') $search[$key] = GETPOST('search_' . $key, 'alpha');
+	if ($key == 'fk_element' && $contextpage == 'sharedrisk') {
+		$search[$key] = GETPOST('search_' . $key . '_sharedrisk', 'alpha');
+	}
 }
 
 // List of fields to search into when doing a "search in all"
@@ -205,8 +208,10 @@ llxHeader('', $title, $help_url, '', '', '', $morejs, $morecss);
 // ------------------------------------------------------------
 $allRisks = 1;
 require_once './../../core/tpl/medias/digiriskdolibarr_medias_gallery_modal.tpl.php';
-require_once './../../core/tpl/riskanalysis/risk/digiriskdolibarr_risklist_view.tpl.php';
-
+if (!empty($conf->global->DIGIRISKDOLIBARR_SHOW_RISKS)) {
+	$contextpage = 'riskcard';
+	require_once './../../core/tpl/riskanalysis/risk/digiriskdolibarr_risklist_view.tpl.php';
+}
 if (!empty($conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS)) {
 	$contextpage = 'sharedrisk';
 	require_once './../../core/tpl/riskanalysis/risk/digiriskdolibarr_sharedrisklist_view.tpl.php';
