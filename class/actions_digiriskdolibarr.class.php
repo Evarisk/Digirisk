@@ -146,11 +146,9 @@ class ActionsDigiriskdolibarr
 
 				$object = new Ticket($db);
 				$object->fetch(GETPOST('id'),'',GETPOST('track_id'));
-				if(is_numeric($object->array_options['options_digiriskdolibarr_ticket_service'])) {
-					require_once __DIR__ . '/digiriskelement.class.php';
-					$digiriskelement = new DigiriskElement($db);
-					$selectDigiriskElement = $digiriskelement->select_digiriskelement_list($object->array_options['options_digiriskdolibarr_ticket_service'], 'options_digiriskdolibarr_ticket_service', '', 1, 0, array(), 0, 0, 'minwidth100', 0, false, 1);
-				}
+				require_once __DIR__ . '/digiriskelement.class.php';
+				$digiriskelement = new DigiriskElement($db);
+				$selectDigiriskElement = $digiriskelement->select_digiriskelement_list($object->array_options['options_digiriskdolibarr_ticket_service'], 'options_digiriskdolibarr_ticket_service', '', 1, 0, array(), 0, 0, 'minwidth100', 0, false, 1);
 				?>
 				<script>
 					jQuery('#options_digiriskdolibarr_ticket_service').remove()

@@ -374,27 +374,36 @@ class doc_groupmentdocument_odt extends ModeleODTGroupmentDocument
 			try {
 				$foundtagforlines = 1;
 				if ($foundtagforlines) {
-					$risk = new Risk($this->db);
+					$risk      = new Risk($this->db);
+					$evaluator = new Evaluator($this->db);
+					$user      = new User($this->db);
+					$risksign  = new RiskSign($this->db);
+					$accident  = new Accident($this->db);
+
 					if ( ! empty($digiriskelement) ) {
+						//Fill risks data
 						$risks = $risk->fetchRisksOrderedByCotation($digiriskelement->id, false, $conf->global->DIGIRISKDOLIBARR_SHOW_INHERITED_RISKS, $conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS);
 						for ($i = 1; $i <= 4; $i++ ) {
 							$listlines = $odfHandler->setSegment('risq' . $i);
-							if ($risks > 0 && ! empty($risks)) {
+							if (is_array($risks) && ! empty($risks)) {
 								foreach ($risks as $line) {
 									$tmparray['actionPreventionUncompleted'] = "";
 									$tmparray['actionPreventionCompleted']   = "";
+									$lastEvaluation = $line->lastEvaluation;
 
-									$evaluation     = new RiskAssessment($this->db);
-									$lastEvaluation = $evaluation->fetchFromParent($line->id, 1);
-
-									if ($lastEvaluation > 0 && ! empty($lastEvaluation) && is_array($lastEvaluation)) {
-										$lastEvaluation = array_shift($lastEvaluation);
+									if ($lastEvaluation->cotation > 0 && ! empty($lastEvaluation) && is_object($lastEvaluation)) {
 										$scale          = $lastEvaluation->get_evaluation_scale();
 
 										if ($scale == $i) {
 											$element = new DigiriskElement($this->db);
+											$linked_element = new DigiriskElement($this->db);
 											$element->fetch($line->fk_element);
-											$tmparray['nomElement']            = (!empty($conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS) ? 'S' . $element->entity . ' - ' : '') . $element->ref . ' - ' . $element->label;
+											$linked_element->fetch($line->appliedOn);
+											$nomElement = (!empty($conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS) ? 'S' . $element->entity . ' - ' : '') . $element->ref . ' - ' . $element->label ;
+											if ($line->fk_element != $line->appliedOn) {
+												$nomElement .=  "\n" . $langs->trans('AppliedOn') . ' ' . $linked_element->ref . ' - ' . $linked_element->label;
+											}
+											$tmparray['nomElement']            = $nomElement;
 											$tmparray['nomDanger']             = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $line->get_danger_category($line) . '.png';
 											$tmparray['nomPicto']              = $line->get_danger_category_name($line);
 											$tmparray['identifiantRisque']     = $line->ref . ' - ' . $lastEvaluation->ref;
@@ -514,16 +523,11 @@ class doc_groupmentdocument_odt extends ModeleODTGroupmentDocument
 							}
 							$odfHandler->mergeSegment($listlines);
 						}
-					}
 
-					$evaluator = new Evaluator($this->db);
-					$user      = new User($this->db);
-
-					if ( ! empty($digiriskelement) ) {
+						//Fill evaluators data
 						$evaluators = $evaluator->fetchFromParent($digiriskelement->id);
-
+						$listlines = $odfHandler->setSegment('utilisateursPresents');
 						if ($evaluators !== -1) {
-							$listlines = $odfHandler->setSegment('utilisateursPresents');
 							foreach ($evaluators as $line) {
 								$element = new DigiriskElement($this->db);
 								$element->fetch($line->fk_element);
@@ -547,7 +551,7 @@ class doc_groupmentdocument_odt extends ModeleODTGroupmentDocument
 										if (file_exists($val)) {
 											$listlines->setImage($key, $val);
 										} elseif (empty($val)) {
-												$listlines->setVars($key, $langs->trans('NoData'), true, 'UTF-8');
+											$listlines->setVars($key, $langs->trans('NoData'), true, 'UTF-8');
 										} else {
 											$listlines->setVars($key, html_entity_decode($val, ENT_QUOTES | ENT_HTML5), true, 'UTF-8');
 										}
@@ -559,13 +563,10 @@ class doc_groupmentdocument_odt extends ModeleODTGroupmentDocument
 								}
 								$listlines->merge();
 							}
-							$odfHandler->mergeSegment($listlines);
 						}
-					}
+						$odfHandler->mergeSegment($listlines);
 
-					$risksign = new RiskSign($this->db);
-
-					if ( ! empty($digiriskelement) ) {
+						//Fill risk signs data
 						$risksigns = $risksign->fetchRiskSign($digiriskelement->id, $conf->global->DIGIRISKDOLIBARR_SHOW_INHERITED_RISKSIGNS, $conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKSIGNS);
 						$listlines = $odfHandler->setSegment('affectedRecommandation');
 						if ($risksigns !== -1) {
@@ -605,11 +606,8 @@ class doc_groupmentdocument_odt extends ModeleODTGroupmentDocument
 							}
 						}
 						$odfHandler->mergeSegment($listlines);
-					}
 
-					$accident = new Accident($this->db);
-
-					if ( ! empty($digiriskelement) ) {
+						//Fill accidents data
 						$accidents = $accident->fetchFromParent($digiriskelement->id);
 						$listlines = $odfHandler->setSegment('affectedAccident');
 						if ($accidents !== -1) {

@@ -51,10 +51,10 @@ LinkedProject = Projet lié
 DigiriskUpdate = Mise à jour de Digirisk :
 DigiriskHasBeenUpdatedTo = Digirisk a été mis à jour en version %s
 Security = Sécurité
-HowToSharedElement = Pour plus d'informations sur la configuratiion des éléments partagés, veuillez vous rendre sur ce lien :
+HowToSharedElement = Pour plus d'informations sur la configuration des éléments partagés, veuillez vous rendre sur ce lien :
 HowToSharedElementLink = https://wiki.dolibarr.org/index.php?title=Module_Digirisk#Configuration
-ConfigSharedElement = Configuratiion des éléments partagés (risques/signalisations)
-DisabledSharedElement = Option désactivée car multi company n'est pas activé ou la configuratiion des éléments partagés (risques/signalisations) n'a pas été effectuée
+ConfigSharedElement = Configuration des éléments partagés (risques/signalisations)
+DisabledSharedElement = Option désactivée car multi company n'est pas activé ou la configuration des éléments partagés (risques/signalisations) n'a pas été effectuée
 
 
 
@@ -87,7 +87,7 @@ DocumentModels = Modèles de documents
 DigiriskMenu = Ajoutez des informations sur votre société/organisation. Cliquez sur le bouton "Enregistrer" en bas de page pour sauvegarder
 DigiriskDocumentsNumberingModule = Modèle de numérotation des documents de Digirisk
 DigiriskNumberOfModelFilesFound = Nombre de modèles par défaut
-DigiriskConfig = Configuration du module
+DigiriskConfig = Configuration
 DigiriskConfigSociety = Configuration société
 PermissionDenied = Permission refusée
 AddUser = Créer un utilisateur
@@ -818,6 +818,8 @@ DigiriskRiskAssessmentDocumentData = Données configurables du document unique
 ShowTaskDone = Afficher les tâches soldées
 ShowTaskDoneDescription = Permettre d'afficher ou non les tâches soldées dans le Document Unique
 ActionPreventionCompletedTaskDone = Les actions soldées ne sont pas affichées
+AppliedOn = Actif sur :
+
 
 # Boxes - Widget
 RiskAssessmentDocumentBox = Box Document unique
@@ -1428,6 +1430,7 @@ TicketCreationSubject = Création de ticket via l'interface publique de Digirisk
 TicketDocumentCustomDigiriskTemplate = ODT custom des fiches de tickets
 HowToSetupDigiriskElement = Pour configurer les éléments de Digirisk (groupements/unités de travail), veuillez cliquer sur ce lien :
 ConfigDigiriskElement = Configuration des éléments de Digirisk
+TicketStatistics = Statistiques des tickets
 
 
 
