@@ -254,7 +254,7 @@ class Risk extends CommonObject
 			}
 		}
 
-		//for groupment & workunit document if conf is activated
+		//for groupment & workunit document if get inherited risks conf is activated
 		if ( $get_parents_data ) {
 			$parent_element_id = $objects[$parent_id]->id;
 			while ($parent_element_id > 0) {
@@ -267,7 +267,7 @@ class Risk extends CommonObject
 							$lastEvaluation       = array_shift($lastEvaluation);
 							$risk->lastEvaluation = $lastEvaluation;
 						}
-						$risk->appliedOn = $parent_element_id;
+						$risk->appliedOn = $parent_id;
 						$risks[] = $risk;
 					}
 				}
@@ -314,7 +314,7 @@ class Risk extends CommonObject
 							$lastEvaluation       = array_shift($lastEvaluation);
 							$risktmp->lastEvaluation = $lastEvaluation;
 						}
-
+						$risktmp->appliedOn = $parent_id;
 						$risks[] = $risktmp;
 					}
 				}

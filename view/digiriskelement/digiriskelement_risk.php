@@ -248,7 +248,7 @@ if ($sharedrisks) {
 				$lastEvaluation = new RiskAssessment($db);
 			}
 
-			if (!array_key_exists($digiriskelementtmp->id, $deleted_elements[$digiriskelementtmp->entity])) {
+			if (!array_key_exists($digiriskelementtmp->id, $deleted_elements)) {
 
 				$photoRisk = '<img class="danger-category-pic hover" src=' . DOL_URL_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $risks->get_danger_category($risks) . '.png' . '>';
 
