@@ -429,7 +429,7 @@ class DigiriskElement extends CommonObject
 		else $sql                                                                        .= ' WHERE 1 = 1';
 
 		if ($filter) $sql .= " AND (" . $filter . ")";
-		if ($filter) $sql .= " AND s.status > 0";
+		$sql .= " AND s.status > 0";
 
 		if ($current_element > 0 ) {
 			$children = $this->fetchDigiriskElementFlat($current_element);
