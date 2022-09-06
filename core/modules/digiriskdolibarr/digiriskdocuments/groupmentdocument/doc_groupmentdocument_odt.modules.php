@@ -527,7 +527,7 @@ class doc_groupmentdocument_odt extends ModeleODTGroupmentDocument
 						//Fill evaluators data
 						$evaluators = $evaluator->fetchFromParent($digiriskelement->id);
 						$listlines = $odfHandler->setSegment('utilisateursPresents');
-						if ($evaluators !== -1) {
+						if (is_array($evaluators) && !empty($evaluators)) {
 							foreach ($evaluators as $line) {
 								$element = new DigiriskElement($this->db);
 								$element->fetch($line->fk_element);
@@ -569,7 +569,7 @@ class doc_groupmentdocument_odt extends ModeleODTGroupmentDocument
 						//Fill risk signs data
 						$risksigns = $risksign->fetchRiskSign($digiriskelement->id, $conf->global->DIGIRISKDOLIBARR_SHOW_INHERITED_RISKSIGNS, $conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKSIGNS);
 						$listlines = $odfHandler->setSegment('affectedRecommandation');
-						if ($risksigns !== -1) {
+						if (is_array($risksigns) && !empty($risksigns)) {
 							foreach ($risksigns as $line) {
 								$element = new DigiriskElement($this->db);
 								$element->fetch($line->fk_element);
@@ -610,7 +610,7 @@ class doc_groupmentdocument_odt extends ModeleODTGroupmentDocument
 						//Fill accidents data
 						$accidents = $accident->fetchFromParent($digiriskelement->id);
 						$listlines = $odfHandler->setSegment('affectedAccident');
-						if ($accidents !== -1) {
+						if (is_array($accidents) && !empty($accidents)) {
 							foreach ($accidents as $line) {
 								$filearray = dol_dir_list($conf->digiriskdolibarr->multidir_output[$conf->entity] . '/' . $line->element . '/' . $line->ref . '/thumbs/', "files", 0, '', '(\.odt|_preview.*\.png)$', 'position_name', 'desc', 1);
 								if (count($filearray)) {
