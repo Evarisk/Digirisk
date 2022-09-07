@@ -395,6 +395,9 @@ if ($catid > 0)     $sql                              .= " AND cu.fk_categorie =
 if ($catid == -2)   $sql                              .= " AND cu.fk_categorie IS NULL";
 if ($search_categ > 0)   $sql                         .= " AND cu.fk_categorie = " . $db->escape($search_categ);
 if ($search_categ == -2) $sql                         .= " AND cu.fk_categorie IS NULL";
+
+$sql .= ' GROUP BY u.rowid';
+
 // Add where from extra fields
 include DOL_DOCUMENT_ROOT . '/core/tpl/extrafields_list_search_sql.tpl.php';
 // Add where from hooks
