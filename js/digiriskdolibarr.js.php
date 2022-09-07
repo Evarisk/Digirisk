@@ -1438,6 +1438,7 @@ window.eoxiaJS.mediaGallery.previewPhoto = function( event ) {
 		if ($('.ui-dialog').length) {
 			clearInterval(checkExist);
 			$( document ).find('.ui-dialog').addClass('preview-photo');
+			$( document ).find('.ui-dialog').css('z-index', '1500');
 		}
 	}, 100);
 };
@@ -2613,8 +2614,6 @@ window.eoxiaJS.riskassessmenttask.deleteRiskAssessmentTask = function ( event ) 
 			},
 			error: function ( resp ) {
 				let response = JSON.parse(resp.responseText)
-				console.log(response.message)
-				console.log(actionContainerError.find('.notice-subtitle .text'))
 
 				let textToShow = '';
 				textToShow += actionContainerError.find('.valueForDeleteTask1').val()
