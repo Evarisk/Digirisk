@@ -222,6 +222,11 @@
 		<div class="wpeo-notice notice-warning riskassessment-task-delete-error-notice">
 			<div class="notice-content">
 				<div class="notice-title"><?php echo $langs->trans('TaskNotDeleted') ?></div>
+				<div class="notice-subtitle">
+					<a href="">
+						<span class="text"></span>
+					</a>
+				</div>
 			</div>
 			<div class="notice-close"><i class="fas fa-times"></i></div>
 		</div>

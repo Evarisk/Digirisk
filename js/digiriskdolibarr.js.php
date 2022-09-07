@@ -2580,6 +2580,8 @@ window.eoxiaJS.riskassessmenttask.deleteRiskAssessmentTask = function ( event ) 
 	let riskId = $(this).closest('.riskassessment-tasks').attr('value');
 	let deletedRiskAssessmentTaskId = $(this).attr('value');
 	let textToShow = element.find('.labelForDelete').val();
+	let actionContainerSuccess = $('.messageSuccessTaskDelete');
+	let actionContainerError = $('.messageErrorTaskDelete');
 
 	let token = $('.fichecenter.risklist').find('input[name="token"]').val();
 
@@ -2597,7 +2599,6 @@ window.eoxiaJS.riskassessmenttask.deleteRiskAssessmentTask = function ( event ) 
 			contentType: false,
 			success: function ( resp ) {
 				$('.fichecenter.risklist').html($(resp).find('#searchFormListRisks'))
-				let actionContainerSuccess = $('.messageSuccessTaskDelete');
 				$('.riskassessment-tasks' + riskId).fadeOut(800);
 				$('.riskassessment-tasks' + riskId).fadeIn(800);
 				let textToShow = '';
@@ -2611,12 +2612,16 @@ window.eoxiaJS.riskassessmenttask.deleteRiskAssessmentTask = function ( event ) 
 				actionContainerSuccess.removeClass('hidden');
 			},
 			error: function ( resp ) {
-				let actionContainerError = $('.messageErrorTaskDelete');
+				let response = JSON.parse(resp.responseText)
+				console.log(response.message)
+				console.log(actionContainerError.find('.notice-subtitle .text'))
 
 				let textToShow = '';
 				textToShow += actionContainerError.find('.valueForDeleteTask1').val()
 				textToShow += riskAssessmentTaskRef
 				textToShow += actionContainerError.find('.valueForDeleteTask2').val()
+				textToShow += ' : '
+				textToShow += response.message
 
 				actionContainerError.find('.notice-subtitle .text').text(textToShow);
 				actionContainerError.removeClass('hidden');
