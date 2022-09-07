@@ -465,7 +465,7 @@ if ($object->id > 0 || $fromid > 0) {
 							</div>
 							<div class="evaluator-date">
 								<span class="title"><?php echo $langs->trans('Date'); ?></span>
-								<?php print $form->selectDate('', 'EvaluatorDate', 0, 0, 0, 'evaluator_form', 1, 1); ?>
+								<?php print $form->selectDate('', 'EvaluatorDate', 0, 0, 0, 'evaluator_form', 1, 1,'','','','','',1,'','','tzuserrel'); ?>
 							</div>
 						</div>
 					</div>
