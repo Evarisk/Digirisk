@@ -208,11 +208,12 @@ if (GETPOST('dataMigrationImportRisks', 'alpha') && ! empty($conf->global->MAIN_
 						$riskAssessment->fk_risk             = $risk->id;
 
 						if ($digiriskExportRisk['evaluation_method']['name'] == 'Evarisk') {
-							$riskAssessment->gravite    = $digiriskExportRisk['evaluation']['variables']['105'];
-							$riskAssessment->exposition = $digiriskExportRisk['evaluation']['variables']['106'];
-							$riskAssessment->occurrence = $digiriskExportRisk['evaluation']['variables']['107'];
-							$riskAssessment->formation  = $digiriskExportRisk['evaluation']['variables']['108'];
-							$riskAssessment->protection = $digiriskExportRisk['evaluation']['variables']['109'];
+							$riskassessment_variables = array_values($digiriskExportRisk['evaluation']['variables']);
+							$riskAssessment->gravite    = $riskassessment_variables[0];
+							$riskAssessment->exposition = $riskassessment_variables[1];
+							$riskAssessment->occurrence = $riskassessment_variables[2];
+							$riskAssessment->formation  = $riskassessment_variables[3];
+							$riskAssessment->protection = $riskassessment_variables[4];
 
 							$riskAssessment->method = 'advanced';
 						} else {
@@ -393,11 +394,12 @@ if (GETPOST('dataMigrationImportGlobal', 'alpha') && ! empty($conf->global->MAIN
 						$riskAssessment->fk_risk             = $risk->id;
 
 						if ($digiriskExportRisk['evaluation_method']['name'] == 'Evarisk') {
-							$riskAssessment->gravite    = $digiriskExportRisk['evaluation']['variables']['105'];
-							$riskAssessment->exposition = $digiriskExportRisk['evaluation']['variables']['106'];
-							$riskAssessment->occurrence = $digiriskExportRisk['evaluation']['variables']['107'];
-							$riskAssessment->formation  = $digiriskExportRisk['evaluation']['variables']['108'];
-							$riskAssessment->protection = $digiriskExportRisk['evaluation']['variables']['109'];
+							$riskassessment_variables = array_values($digiriskExportRisk['evaluation']['variables']);
+							$riskAssessment->gravite    = $riskassessment_variables[0];
+							$riskAssessment->exposition = $riskassessment_variables[1];
+							$riskAssessment->occurrence = $riskassessment_variables[2];
+							$riskAssessment->formation  = $riskassessment_variables[3];
+							$riskAssessment->protection = $riskassessment_variables[4];
 
 							$riskAssessment->method = 'advanced';
 						} else {
