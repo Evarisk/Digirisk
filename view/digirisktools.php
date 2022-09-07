@@ -312,7 +312,7 @@ if (GETPOST('dataMigrationImportGlobal', 'alpha') && ! empty($conf->global->MAIN
 	// Submit file
 	if ( ! empty($_FILES)) {
 		if ( ! preg_match('/\.zip/', $_FILES['dataMigrationImportGlobalfile']['name'][0]) || $_FILES['dataMigrationImportGlobalfile']['size'][0] < 1) {
-			setEventMessages($langs->trans('ErrorFileNotWellFormatted'), null, 'errors');
+			setEventMessages($langs->trans('ErrorFileNotWellFormattedZIP'), null, 'errors');
 		} else {
 			if (is_array($_FILES['dataMigrationImportGlobalfile']['tmp_name'])) $userfiles = $_FILES['dataMigrationImportGlobalfile']['tmp_name'];
 			else $userfiles                                                               = array($_FILES['dataMigrationImportGlobalfile']['tmp_name']);
