@@ -120,7 +120,7 @@ if ($action == 'add') {
 
 	// Check parameters
 	if (empty($parentCategory)) {
-		setEventMessages('<b>' . $langs->trans('ErrorFieldNotEmpty', $langs->transnoentitiesnoconv('ParentCategory')) . '</b>', null, 'errors');
+		setEventMessages('<b>' . $langs->trans('ErrorFieldNotEmpty', $conf->global->DIGIRISKDOLIBARR_TICKET_PARENT_CATEGORY_LABEL) . '</b>', null, 'errors');
 		$error++;
 	}
 	// Quand le registre choisi est Danger Grave et Imminent, il ne faut pas check ça
