@@ -363,7 +363,12 @@ class DigiriskElement extends CommonObject
 	public function getRiskAssessmentCategoriesNumber()
 	{
 		$risk          = new Risk($this->db);
-		$risks         = $risk->fetchFromParent($this->id);
+		if ($this->id > 0) {
+			$risks         = $risk->fetchFromParent($this->id);
+ 		} else {
+			$risks = $risk->fetchRisksOrderedByCotation(0, true, false, true);
+		}
+
 		$scale_counter = array(
 			1 => 0,
 			2 => 0,

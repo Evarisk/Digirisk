@@ -1100,7 +1100,7 @@ ShowRisks = Risques
 ShowRisksDescription = Afficher les risques dans les documents et les listings
 DigiriskElementInheritedRisksList Liste des risques hérités
 ConfirmImportSharedRisks = Veuillez choisir les risques partagés à importer
-
+RisksRepartition = Répartition des risques par cotation
 
 #
 # RiskAssessment - Évaluation

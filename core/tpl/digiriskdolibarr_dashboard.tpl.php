@@ -4,6 +4,7 @@
 */
 
 require_once __DIR__ . '/../../class/accident.class.php';
+require_once __DIR__ . '/../../class/digiriskelement.class.php';
 
 $accident = new Accident($db);
 $lastAccident = $accident->fetchAll('DESC', 'accident_date', 1, 0 );
@@ -12,6 +13,13 @@ if (is_array($lastAccident) && !empty($lastAccident)) {
 	$lastDayWithoutAccident = abs(round($lastTimeAccident / 86400));
 } else {
 	$lastDayWithoutAccident = 0;
+}
+
+$digiriskelement = new DigiriskElement($db);
+$risksRepartition = $digiriskelement->getRiskAssessmentCategoriesNumber();
+
+foreach ($risksRepartition as $riskNumber) {
+	$data .= $riskNumber . ',';
 }
 
 if ($action == 'adddashboardinfo') {
@@ -91,7 +99,47 @@ if (empty($conf->global->MAIN_DISABLE_WORKBOARD)) {
 				$openedDashBoard .= '</div>';
 			}
 		}
+		?>
+		<div class="opened-dash-board-wrap wpeo-gridlayout grid-4">
+			<div>
+				<div class="titre inline-block">
+					<i class="fas fa-exclamation-triangle"></i> <?php echo $langs->trans('RisksRepartition') ?>
+				</div>
+				<div class="" style="width:200px">
+					<canvas class="" id="risksRepartition" width="40" height="40" style="width:50px !important"></canvas>
+					<h3 class="">
+					</h3>
+				</div>
+			</div>
+			<script>
+				const data = {
+					labels: [
+						'Grey',
+						'Yellow',
+						'Red',
+						'Black'
+					],
+					datasets: [{
+						label: 'dzzzzaaaaaaaaaaa',
+						data: [<?php echo $data ?>],
+						backgroundColor: [
+							'rgb(128, 128, 128)',
+							'rgb(255, 205, 86)',
+							'rgb(255, 99, 132)',
+							'rgb(0, 0, 0)',
+						]
+					}]
+				};
+				const ctx = document.getElementById('risksRepartition').getContext('2d');
+				const risksRepartition = new Chart(ctx, {
+					type: 'pie',
+					data: data,
+					options: {}
+				});
+			</script>
+		<?php
 
-		print '<div class="opened-dash-board-wrap"><div class="box-flex-container">' . $openedDashBoard . '</div></div>';
+		print '<div class="box-flex-container">' . $openedDashBoard . '</div>';
+		print '</div>';
 	}
 }

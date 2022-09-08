@@ -324,7 +324,6 @@ class Risk extends CommonObject
 				}
 			}
 		}
-
 		if ( ! empty($risks) && is_array($risks)) {
 			usort($risks, function ($first, $second) {
 				return $first->lastEvaluation->cotation < $second->lastEvaluation->cotation;
