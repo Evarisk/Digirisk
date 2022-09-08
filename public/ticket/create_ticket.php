@@ -120,7 +120,7 @@ if ($action == 'add') {
 
 	// Check parameters
 	if (empty($parentCategory)) {
-		setEventMessages($langs->trans('ErrorFieldNotEmpty', $langs->transnoentitiesnoconv('ParentCategory')), null, 'errors');
+		setEventMessages('<b>' . $langs->trans('ErrorFieldNotEmpty', $langs->transnoentitiesnoconv('ParentCategory')) . '</b>', null, 'errors');
 		$error++;
 	}
 	// Quand le registre choisi est Danger Grave et Imminent, il ne faut pas check ça
@@ -129,24 +129,26 @@ if ($action == 'add') {
 	//      $error++;
 	//  }
 	if (empty($message)) {
-		setEventMessages($langs->trans('ErrorFieldNotEmpty', $langs->transnoentitiesnoconv('Message')), null, 'errors');
+		setEventMessages('<b>' . $langs->trans('ErrorFieldNotEmpty', $langs->transnoentitiesnoconv('Message')) . '</b>', null, 'errors');
 		$error++;
 	}
 
 	if (empty(GETPOST('options_digiriskdolibarr_ticket_lastname'))) {
-		setEventMessages($langs->trans('ErrorFieldNotEmpty', $langs->transnoentitiesnoconv('Lastname')), null, 'errors');
+		setEventMessages('<b>' . $langs->trans('ErrorFieldNotEmpty', $langs->transnoentitiesnoconv('Lastname')) . '</b>', null, 'errors');
 		$error++;
 	}
+
 	if (empty(GETPOST('options_digiriskdolibarr_ticket_firstname'))) {
-		setEventMessages($langs->trans('ErrorFieldNotEmpty', $langs->transnoentitiesnoconv('Firstname')), null, 'errors');
+		setEventMessages('<b>' . $langs->trans('ErrorFieldNotEmpty', $langs->transnoentitiesnoconv('Firstname')) . '</b>', null, 'errors');
 		$error++;
 	}
-	if (empty(GETPOST('options_digiriskdolibarr_ticket_service'))) {
-		setEventMessages($langs->trans('ErrorFieldNotEmpty', $langs->transnoentitiesnoconv('Service')), null, 'errors');
+
+	if (empty(GETPOST('options_digiriskdolibarr_ticket_service')) || GETPOST('options_digiriskdolibarr_ticket_service') == -1) {
+		setEventMessages('<b>' . $langs->trans('ErrorFieldNotEmpty', $langs->transnoentitiesnoconv('Service')) . '</b>', null, 'errors');
 		$error++;
 	}
 	if (empty(GETPOST('options_digiriskdolibarr_ticket_date'))) {
-		setEventMessages($langs->trans('ErrorFieldNotEmpty', $langs->transnoentitiesnoconv('Date')), null, 'errors');
+		setEventMessages('<b>' . $langs->trans('ErrorFieldNotEmpty', $langs->transnoentitiesnoconv('Date')) . '</b>', null, 'errors');
 		$error++;
 	}
 
