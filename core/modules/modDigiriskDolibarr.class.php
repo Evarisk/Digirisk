@@ -590,14 +590,15 @@ class modDigiriskdolibarr extends DolibarrModules
 			187 => array('DIGIRISKDOLIBARR_SHOW_RISKS', 'integer', 1, '', 0, 'current'),
 			188 => array('DIGIRISKDOLIBARR_SHOW_INHERITED_RISKS', 'integer', 0, '', 0, 'current'),
 			189 => array('DIGIRISKDOLIBARR_SHOW_SHARED_RISKS', 'integer', 0, '', 0, 'current'),
+			190 => array('DIGIRISKDOLIBARR_SHOW_RISK_ORIGIN', 'integer', 1, '', 0, 'current'),
 
 			// CONST RISK ASSESSMENT
-			190 => array('MAIN_AGENDA_ACTIONAUTO_RISKASSESSMENT_CREATE', 'integer', 1, '', 0, 'current'),
 			191 => array('DIGIRISKDOLIBARR_RISKASSESSMENT_ADDON', 'chaine', 'mod_riskassessment_standard', '', 0, 'current'),
 			192 => array('DIGIRISKDOLIBARR_MULTIPLE_RISKASSESSMENT_METHOD', 'integer', 0, '', 0, 'current'),
 			193 => array('DIGIRISKDOLIBARR_ADVANCED_RISKASSESSMENT_METHOD', 'integer', 0, '', 0, 'current'),
 			194 => array('DIGIRISKDOLIBARR_SHOW_RISKASSESSMENT_DATE', 'integer', 0, '', 0, 'current'),
 			195 => array('DIGIRISKDOLIBARR_SHOW_ALL_RISKASESSMENTS', 'integer', 0, '', 0, 'current'),
+			196 => array('MAIN_AGENDA_ACTIONAUTO_RISKASSESSMENT_CREATE', 'integer', 1, '', 0, 'current'),
 
 			// CONST RISK SIGN
 			200 => array('MAIN_AGENDA_ACTIONAUTO_RISKSIGN_CREATE', 'integer', 1, '', 0, 'current'),

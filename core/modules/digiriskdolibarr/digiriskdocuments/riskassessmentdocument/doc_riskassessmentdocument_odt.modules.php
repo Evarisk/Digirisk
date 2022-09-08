@@ -506,9 +506,17 @@ class doc_riskassessmentdocument_odt extends ModeleODTRiskAssessmentDocument
 											$linked_element->fetch($line->appliedOn);
 											$element->fetch($line->fk_element);
 
-											$nomElement = (!empty($conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS) ? 'S' . $element->entity . ' - ' : '') . $element->ref . ' - ' . $element->label ;
-											if ($line->fk_element != $line->appliedOn) {
-												$nomElement .=  "\n" . $langs->trans('AppliedOn') . ' ' . $linked_element->ref . ' - ' . $linked_element->label;
+											if ($conf->global->DIGIRISKDOLIBARR_SHOW_RISK_ORIGIN) {
+												$nomElement = (!empty($conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS) ? 'S' . $element->entity . ' - ' : '') . $element->ref . ' - ' . $element->label;
+												if ($line->fk_element != $line->appliedOn) {
+													$nomElement .=  "\n" . $langs->trans('AppliedOn') . ' ' . $linked_element->ref . ' - ' . $linked_element->label;
+												}
+											} else {
+												if ($linked_element->id > 0) {
+													$nomElement =  "\n" . $linked_element->ref . ' - ' . $linked_element->label;
+												} else {
+													$nomElement =  "\n" . $element->ref . ' - ' . $element->label;
+												}
 											}
 
 											$tmparray['nomElement']            = $nomElement;

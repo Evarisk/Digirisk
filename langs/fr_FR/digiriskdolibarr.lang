@@ -1063,7 +1063,6 @@ HowToEnableRiskCategoryEdit = Pour activer la modification de la catégorie de r
 SortRisksListingsByCotation = Trier les risques par cotation
 SortRisksListingsByCotationDescription =  Activer le tri automatique des risques par cotation dans les listings
 ListingHeaderCotation = Liste des évaluations
-
 DigiriskRiskData = Données configurables des risques
 RiskDescription = Description du risque
 RiskDescriptionDescription = Activer le champ description du risque
@@ -1101,6 +1100,9 @@ ShowRisksDescription = Afficher les risques dans les documents et les listings
 DigiriskElementInheritedRisksList Liste des risques hérités
 ConfirmImportSharedRisks = Veuillez choisir les risques partagés à importer
 RisksRepartition = Répartition des risques par cotation
+ShowRiskOrigin = Afficher la provenance du risque
+ShowRiskOriginDescription = Afficher la provenance des risques dans les documents (Fiche UT, Fiche GP, Document Unique, Listings de risques, etc.)
+
 
 #
 # RiskAssessment - Évaluation
