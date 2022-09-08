@@ -60,6 +60,7 @@ if (!$user->rights->ticket->read) {
 
 $object_status      = GETPOST('object_status', 'array');
 $userid             = GETPOST('userid', 'int');
+$userassignid       = GETPOST('userassignid', 'int');
 $socid              = GETPOST('socid', 'int');
 $digiriskelementid  = GETPOST('digiriskelementid', 'int');
 $categticketid      = GETPOST('categticketid', 'int');
@@ -95,7 +96,7 @@ print load_fiche_titre($title, '', 'ticket');
 
 dol_mkdir($dir);
 
-$stats = new TicketDigiriskStats($db, $socid, ($userid > 0 ? $userid: 0), ($digiriskelementid > 0 ? $digiriskelementid : 0), ($categticketid > 0 ? $categticketid: 0));
+$stats = new TicketDigiriskStats($db, $socid, ($userid > 0 ? $userid: 0), ($userassignid > 0 ? $userassignid: 0), ($digiriskelementid > 0 ? $digiriskelementid : 0), ($categticketid > 0 ? $categticketid: 0));
 if (is_array($object_status) && !empty($object_status)) {
 	$stats->where .= ' AND tk.fk_statut IN ('.$db->sanitize(implode(',', $object_status)).')';
 }
@@ -193,6 +194,10 @@ if (!empty($conf->category->enabled)) {
 print '<tr><td class="left">'.$langs->trans("CreatedBy").'</td><td class="left">';
 print img_picto('', 'user', 'class="pictofixedwidth"');
 print $form->select_dolusers($userid, 'userid', 1, '', 0, '', '', $conf->entity, 0, 0, '', 0, '', 'widthcentpercentminusx maxwidth300');
+// Assign at user
+print '<tr><td class="left">'.$langs->trans("AssignedTo").'</td><td class="left">';
+print img_picto('', 'user', 'class="pictofixedwidth"');
+print $form->select_dolusers($userassignid, 'userassignid', 1, '', 0, '', '', $conf->entity, 0, 0, '', 0, '', 'widthcentpercentminusx maxwidth300');
 // Status
 print '<tr><td class="left">'.$langs->trans("Status").'</td><td class="left">';
 $liststatus = $object->statuts_short;

@@ -48,12 +48,13 @@ class TicketDigiriskStats extends DigiriskStats
 	 * 	Constructor
 	 *
 	 * 	@param	DoliDB		$db			          Database handler
-	 * 	@param 	int			$socid		          Id third party for filter. This value must be forced during the new to external user company if user is an external user.
-	 * 	@param	int			$userid    	          Id user for filter (creation user)
-	 * 	@param	int			$digiriskelementid    Id digiriskelement for filter
-	 * 	@param	int			$categticketid        Id category of ticket for filter
+	 * 	@param 	int			$socid		          ID third party for filter. This value must be forced during the new to external user company if user is an external user.
+	 * 	@param	int			$userid    	          ID user for filter (creation user)
+	 * 	@param	int			$userassignid    	  ID user for filter (user assign)
+	 * 	@param	int			$digiriskelementid    ID digiriskelement for filter
+	 * 	@param	int			$categticketid        ID category of ticket for filter
 	 */
-	public function __construct($db, $socid, $userid = 0, $digiriskelementid = 0, $categticketid = 0)
+	public function __construct($db, $socid, $userid = 0, $userassignid = 0, $digiriskelementid = 0, $categticketid = 0)
 	{
 		$this->db = $db;
 		$this->socid = ($socid > 0 ? $socid : 0);
@@ -67,10 +68,15 @@ class TicketDigiriskStats extends DigiriskStats
 		if ($this->socid) {
 			$this->where .= " AND tk.fk_soc = ".((int) $this->socid);
 		}
+
 		if (is_array($this->userid) && count($this->userid) > 0) {
-			$this->where .= ' AND fk_user_create IN ('.$this->db->sanitize(join(',', $this->userid)).')';
+			$this->where .= ' AND tk.fk_user_create IN ('.$this->db->sanitize(join(',', $this->userid)).')';
 		} elseif ($this->userid > 0) {
-			$this->where .= " AND fk_user_create = ".((int) $this->userid);
+			$this->where .= " AND tk.fk_user_create = ".((int) $this->userid);
+		}
+
+		if ($userassignid) {
+			$this->where .= " AND tk.fk_user_assign = ".((int) $userassignid);
 		}
 
 		if ($digiriskelementid) {
