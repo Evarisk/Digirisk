@@ -107,7 +107,7 @@ llxHeader('', $title, $help_url, '', '', '', $morejs, $morecss);
 print load_fiche_titre($title, '', 'ticket');
 
 $head = ticketPrepareHead();
-print dol_get_fiche_head($head, 'exportcsv', $langs->trans("ExportCSV"), -1);
+print dol_get_fiche_head($head, 'exportcsv', $langs->trans("DocumentsAndCSV"), -1);
 
 print '<div class="fichecenter"><div class="fichehalfleft">';
 
@@ -116,7 +116,7 @@ if ( ! empty($dir)) {
 	$file_list = dol_dir_list($dir, 'files', 0, '(\.csv)', '', 'date', SORT_DESC, 1);
 }
 
-print load_fiche_titre($langs->trans("Documents"), '', 'digiriskdolibarr@digiriskdolibarr');
+print load_fiche_titre($langs->trans("CSVFile"), '', 'digiriskdolibarr@digiriskdolibarr');
 
 // Show table
 print '<form method="POST" action="' . $_SERVER["PHP_SELF"] . '" name="form_csv">';
@@ -166,6 +166,49 @@ if ( ! empty($dir)) {
 print '</table>';
 print '</div>';
 print '</form>';
+
+// Get list of files
+if ( ! empty($dir)) {
+	$file_list = dol_dir_list($dir, 'files', 0, '(\.png)', '', 'date', SORT_DESC, 1);
+}
+
+print load_fiche_titre($langs->trans("Documents"), '', 'digiriskdolibarr@digiriskdolibarr');
+
+// Show table
+print '<div class="div-table-responsive-no-min">';
+print '<table class="liste noborder centpercent">';
+print '<tr class="liste_titre">';
+print '<th class="liste_titre center" colspan="3"></th>';
+print '</tr>';
+
+// Get list of files
+if ( ! empty($dir)) {
+	// Loop on each file found
+	if (is_array($file_list)) {
+		foreach ($file_list as $file) {
+			// Show file name with link to download
+			print '<tr class="oddeven">';
+			print '<td class="minwidth200">';
+			print '<a class="documentdownload paddingright" href="' . DOL_URL_ROOT . '/document.php?modulepart=digiriskdolibarr&file=' . urlencode('ticketstats/'.$file['name']) . '&entiy='.$conf->entity . '">';
+			print  img_mime($file["name"], $langs->trans("File") . ': ' . $file["name"]);
+			print  dol_trunc($file["name"], 150);
+			print  '</a>';
+			print  '</td>';
+
+			// Show file size
+			$size = (!empty($file['size']) ? $file['size'] : dol_filesize($dir . "/" . $file["name"]));
+			print '<td class="nowrap right">' . dol_print_size($size, 1, 1) . '</td>';
+
+			// Show file date
+			$date = (!empty($file['date']) ? $file['date'] : dol_filemtime($dir . "/" . $file["name"]));
+			print '<td class="nowrap right">' . dol_print_date($date, 'dayhour', 'tzuser') . '</td>';
+			print '</tr>';
+		}
+	}
+}
+
+print '</table>';
+print '</div>';
 print '</div>';
 print '</div>';
 // End of page

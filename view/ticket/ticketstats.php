@@ -60,6 +60,7 @@ if (!$user->rights->ticket->read) {
 	accessforbidden();
 }
 
+$action             = GETPOST('action', 'aZ09');
 $object_status      = GETPOST('object_status', 'array');
 $userid             = GETPOST('userid', 'int');
 $userassignid       = GETPOST('userassignid', 'int');
@@ -79,10 +80,28 @@ if ($user->socid > 0) {
 	$socid = $user->socid;
 }
 
+$dir = DOL_DATA_ROOT . '/digiriskdolibarr/ticketstats/';
+
 $nowyear   = strftime("%Y", dol_now());
 $year      = GETPOST('year') > 0 ? GETPOST('year', 'int') : $nowyear;
 $startyear = $year - (empty($conf->global->MAIN_STATS_GRAPHS_SHOW_N_YEARS) ? 2 : max(1, min(10, $conf->global->MAIN_STATS_GRAPHS_SHOW_N_YEARS)));
 $endyear   = $year;
+
+/*
+ * Action
+ */
+
+if ($action == 'savegraph') {
+	$data = json_decode(file_get_contents('php://input'), true);
+
+	$data = $data['image'];
+
+	list($type, $data) = explode(';', $data);
+	list(, $data)      = explode(',', $data);
+	$data = base64_decode($data);
+	$filenamenb = $dir.'/ticketdigiriskstatsnbinyear-'.$year.'.png';
+	file_put_contents($filenamenb, $data);
+}
 
 /*
  * View
@@ -91,7 +110,6 @@ $endyear   = $year;
 $form   = new Form($db);
 
 $title = $langs->trans("TicketStatistics");
-$dir = $conf->ticket->dir_temp;
 
 llxHeader('', $title);
 
@@ -148,8 +166,35 @@ if (!$mesg) {
 	$px1->SetTitle($langs->trans("NumberOfTicketsByMonth"));
 
 	$px1->draw($filenamenb, $fileurlnb);
-}
+} ?>
 
+<script>
+	var checkExist = setInterval(function() {
+		if ($("#canvas_ticketdigiriskstatsnbinyear_<?php echo $year; ?>_png").length) {
+			clearInterval(checkExist);
+			var canvas = document.getElementById("canvas_ticketdigiriskstatsnbinyear_<?php echo $year; ?>_png")
+			var image = canvas.toDataURL()
+
+			let token = $('.ticketstats').find('input[name="token"]').val();
+
+			$.ajax({
+				url: document.URL + "?action=savegraph&token=" + token,
+				type: "POST",
+				processData: false,
+				contentType: 'application/octet-stream',
+				data: JSON.stringify({
+					image: image,
+				}),
+				success: function (resp) {
+				},
+				error: function (resp) {
+				}
+			});
+		}
+	}, 500)
+</script>
+
+<?php
 // Show array
 $data = $stats->getAllByYear();
 $arrayyears = array();
@@ -165,7 +210,7 @@ if (!count($arrayyears)) {
 print '<div class="fichecenter"><div class="fichethirdleft">';
 
 // Show filter box
-print '<form name="stats" method="POST" action="'.$_SERVER["PHP_SELF"].'">';
+print '<form class="ticketstats" name="stats" method="POST" action="'.$_SERVER["PHP_SELF"].'">';
 print '<input type="hidden" name="token" value="'.newToken().'">';
 
 print '<table class="noborder centpercent">';
