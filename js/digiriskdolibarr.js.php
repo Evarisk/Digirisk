@@ -2613,6 +2613,8 @@ window.eoxiaJS.riskassessmenttask.deleteRiskAssessmentTask = function ( event ) 
 				actionContainerSuccess.removeClass('hidden');
 			},
 			error: function ( resp ) {
+				$('.wpeo-loader').removeClass('wpeo-loader');
+				window.scrollTo(0, 0);
 				let response = JSON.parse(resp.responseText)
 
 				let textToShow = '';
