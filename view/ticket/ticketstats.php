@@ -16,7 +16,7 @@
  */
 
 /**
- *	    \file       view/ticketstats.php
+ *	    \file       view/ticket/ticketstats.php
  *      \ingroup    digiriskdolibarr
  *		\brief      Page with tickets statistics
  */
@@ -33,6 +33,7 @@ if ( ! $res && $i > 0 && file_exists(dirname(substr($tmp, 0, ($i + 1))) . "/main
 // Try main.inc.php using relative path
 if ( ! $res && file_exists("../../main.inc.php")) $res    = @include "../../main.inc.php";
 if ( ! $res && file_exists("../../../main.inc.php")) $res = @include "../../../main.inc.php";
+if ( ! $res && file_exists("../../../../main.inc.php")) $res = @include "../../../../main.inc.php";
 if ( ! $res) die("Include of main fails");
 
 // Global variables definitions
@@ -45,8 +46,9 @@ if (!empty($conf->category->enabled)) {
 	require_once DOL_DOCUMENT_ROOT.'/categories/class/categorie.class.php';
 }
 
-require_once __DIR__ . '/../class/ticketdigiriskstats.class.php';
-require_once __DIR__ . '/../class/digiriskelement.class.php';
+require_once __DIR__ . '/../../lib/digiriskdolibarr_ticket.lib.php';
+require_once __DIR__ . '/../../class/ticketdigiriskstats.class.php';
+require_once __DIR__ . '/../../class/digiriskelement.class.php';
 
 $WIDTH  = DolGraph::getDefaultGraphSizeForStats('width');
 $HEIGHT = DolGraph::getDefaultGraphSizeForStats('height');
@@ -94,6 +96,9 @@ $dir = $conf->ticket->dir_temp;
 llxHeader('', $title);
 
 print load_fiche_titre($title, '', 'ticket');
+
+$head = ticketPrepareHead();
+print dol_get_fiche_head($head, 'byyear', $langs->trans("TicketStatistics"), -1);
 
 dol_mkdir($dir);
 
@@ -157,17 +162,6 @@ if (!count($arrayyears)) {
 	$arrayyears[$nowyear] = $nowyear;
 }
 
-$h = 0;
-$head = array();
-$head[$h][0] = DOL_URL_ROOT.'/custom/digiriskdolibarr/view/ticketstats.php';
-$head[$h][1] = $langs->trans("ByMonthYear");
-$head[$h][2] = 'byyear';
-$h++;
-
-complete_head_from_modules($conf, $langs, null, $head, $h, 'ticket');
-
-print dol_get_fiche_head($head, 'byyear', $langs->trans("TicketStatistics"), -1);
-
 print '<div class="fichecenter"><div class="fichethirdleft">';
 
 // Show filter box
@@ -190,7 +184,7 @@ print '</td></tr>';
 // Category
 if (!empty($conf->category->enabled)) {
 	$cat_type = Categorie::TYPE_TICKET;
-	$cat_label = $langs->trans("Category").' '.lcfirst($langs->trans("Ticket"));
+	$cat_label = $langs->trans("Category") . ' ' .lcfirst($langs->trans("Ticket"));
 	print '<tr><td>'.$cat_label.'</td><td>';
 	$cate_arbo = $form->select_all_categories($cat_type, null, 'parent', null, null, 1);
 	print img_picto('', 'category', 'class="pictofixedwidth"');

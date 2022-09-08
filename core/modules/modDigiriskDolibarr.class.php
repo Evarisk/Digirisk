@@ -1293,7 +1293,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			'prefix'   => $pictoDigirisk,
 			'mainmenu' => 'ticket',
 			'leftmenu' => 'ticketstats',
-			'url'      => '/digiriskdolibarr/view/ticketstats.php',
+			'url'      => '/digiriskdolibarr/view/ticket/ticketstats.php',
 			'langs'    => 'digiriskdolibarr@digiriskdolibarr',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
 			'position' => 48520 + $r,
 			'enabled'  => '$conf->digiriskdolibarr->enabled && $conf->ticket->enabled',  // Define condition to show or hide menu entry. Use '$conf->digiriskdolibarr->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
@@ -1309,7 +1309,7 @@ class modDigiriskdolibarr extends DolibarrModules
 //			'prefix'   => $pictoDigirisk,
 //			'mainmenu' => 'ticket',
 //			'leftmenu' => 'dashboardticket',
-//			'url'      => '/digiriskdolibarr/view/dashboard_ticket.php',
+//			'url'      => '/digiriskdolibarr/view/ticket/dashboard_ticket.php',
 //			'langs'    => 'digiriskdolibarr@digiriskdolibarr',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
 //			'position' => 48520 + $r,
 //			'enabled'  => '$conf->digiriskdolibarr->enabled && $conf->ticket->enabled',  // Define condition to show or hide menu entry. Use '$conf->digiriskdolibarr->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.

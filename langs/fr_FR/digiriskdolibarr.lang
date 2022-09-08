@@ -1435,6 +1435,10 @@ TicketDocumentCustomDigiriskTemplate = ODT custom des fiches de tickets
 HowToSetupDigiriskElement = Pour configurer les éléments de Digirisk (groupements/unités de travail), veuillez cliquer sur ce lien :
 ConfigDigiriskElement = Configuration des éléments de Digirisk
 TicketStatistics = Statistiques des tickets
+ExportCSV = Exporter en CSV
+GenerateCSV = Générer le fichier CSV
+SuccessGenerateCSV = Fichier CSV %s généré avec succès
+ErrorMissingData = Erreur : impossible de générer le fichier CSV, les données envoyées au fichier sont incorrecte. <br> Veuillez vérifier que vous avez bien des GP/UT assignés à des tickets.
 
 
 

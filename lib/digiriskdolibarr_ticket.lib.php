@@ -62,3 +62,32 @@ function createTicketCategory($label, $description, $color, $visible, $type, $fk
 	}
 	return $result;
 }
+
+/**
+ * Prepare array of tabs for Ticket statistics
+ *
+ * @return 	array Array of tabs
+ */
+function ticketPrepareHead()
+{
+	global $conf, $langs, $user;
+
+	$langs->load("digiriskdolibarr@digiriskdolibarr");
+
+	$h = 0;
+	$head = array();
+	if ($user->rights->ticket->read) {
+		$head[$h][0] = DOL_URL_ROOT . '/custom/digiriskdolibarr/view/ticket/ticketstats.php';
+		$head[$h][1] = $langs->trans("ByMonthYear");
+		$head[$h][2] = 'byyear';
+		$h++;
+
+		$head[$h][0] = DOL_URL_ROOT . '/custom/digiriskdolibarr/view/ticket/ticketstatscsv.php';
+		$head[$h][1] = $langs->trans("ExportCSV");
+		$head[$h][2] = 'exportcsv';
+	}
+
+	complete_head_from_modules($conf, $langs, null, $head, $h, 'ticket');
+
+	return $head;
+}

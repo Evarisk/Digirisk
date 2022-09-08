@@ -23,8 +23,10 @@
 
 include_once DOL_DOCUMENT_ROOT.'/ticket/class/ticket.class.php';
 include_once DOL_DOCUMENT_ROOT.'/core/lib/date.lib.php';
+require_once DOL_DOCUMENT_ROOT . '/categories/class/categorie.class.php';
 
 require_once __DIR__ . '/digiriskstats.php';
+require_once __DIR__ . '/digiriskelement.class.php';
 
 /**
  *	Class to manage stats for tickets
@@ -54,7 +56,7 @@ class TicketDigiriskStats extends DigiriskStats
 	 * 	@param	int			$digiriskelementid    ID digiriskelement for filter
 	 * 	@param	int			$categticketid        ID category of ticket for filter
 	 */
-	public function __construct($db, $socid, $userid = 0, $userassignid = 0, $digiriskelementid = 0, $categticketid = 0)
+	public function __construct($db, $socid = 0, $userid = 0, $userassignid = 0, $digiriskelementid = 0, $categticketid = 0)
 	{
 		$this->db = $db;
 		$this->socid = ($socid > 0 ? $socid : 0);
@@ -147,6 +149,62 @@ class TicketDigiriskStats extends DigiriskStats
 		$sql .= $this->db->order('year', 'DESC');
 
 		return $this->_getAllByYear($sql);
+	}
+
+	/**
+	 * Return nb ticket by GP/UT and Ticket tags
+	 *
+	 * @return array     Array of values
+	 * @throws Exception
+	 */
+	public function getNbTicketByDigiriskElementAndTicketTags() {
+		$digiriskelement = new DigiriskElement($this->db);
+		$categorie       = new Categorie($this->db);
+
+		$digiriskelement_flatlist = $digiriskelement->fetchDigiriskElementFlat(0);
+		if (is_array($digiriskelement_flatlist) && !empty($digiriskelement_flatlist)) {
+			foreach ($digiriskelement_flatlist as $digiriskelementobject) {
+				$digiriskelementlist[$digiriskelementobject['object']->id] = $digiriskelementobject['object'];
+			}
+		}
+
+		$digiriskelementlist = dol_sort_array($digiriskelementlist, 'ranks');
+
+		$allCategories = $categorie->get_all_categories('ticket');
+		if (is_array($allCategories) && !empty($allCategories)) {
+			foreach ($allCategories as $category) {
+				$arrayCats[$category->label] = array(
+					'id' => $category->id,
+					'name' => $category->label
+				);
+			}
+		}
+
+		if (is_array($digiriskelementlist) && !empty($digiriskelementlist)) {
+			if (is_array($arrayCats) && !empty($arrayCats)) {
+				foreach ($digiriskelementlist as $digiriskelement) {
+					foreach ($arrayCats as $key => $cat) {
+						$nbticket = 0;
+						$categorie->fetch($cat['id']);
+						$alltickets = $categorie->getObjectsInCateg(Categorie::TYPE_TICKET);
+						if (is_array($alltickets) && !empty($alltickets)) {
+							foreach ($alltickets as $ticket) {
+								if (!empty($ticket->array_options['options_digiriskdolibarr_ticket_service']) && $ticket->array_options['options_digiriskdolibarr_ticket_service'] == $digiriskelement->id && $ticket->fk_statut != 9) {
+									$nbticket++;
+								}
+							}
+						}
+						$array[$digiriskelement->ref . ' - ' . $digiriskelement->label][html_entity_decode($key, ENT_QUOTES | ENT_HTML5)] = $nbticket;
+					}
+				}
+			}
+		}
+
+		if (!empty($array)) {
+			return $array;
+		} else {
+			return -1;
+		}
 	}
 }
 
