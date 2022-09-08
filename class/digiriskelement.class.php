@@ -492,7 +492,7 @@ class DigiriskElement extends CommonObject
 							$out .= '<option value="' . $obj->rowid . '">' . $label . '</option>';
 						}
 					} else {
-						array_push($outarray, array('key' => $obj->rowid, 'value' => $label, 'label' => $label));
+						$outarray[$obj->rowid] = $label;
 					}
 
 					$i++;
@@ -506,6 +506,9 @@ class DigiriskElement extends CommonObject
 
 		$this->result = array('nbofdigiriskelement' => $num);
 
+		if ($outputmode) {
+			return $outarray;
+		}
 		return $out;
 	}
 

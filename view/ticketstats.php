@@ -65,6 +65,7 @@ $socid              = GETPOST('socid', 'int');
 $digiriskelementid  = GETPOST('digiriskelementid', 'int');
 $categticketid      = GETPOST('categticketid', 'int');
 $ticketcats         = GETPOST('ticketcats', 'array');
+$digirkelementlist  = GETPOST('digirkelementlist', 'array');
 
 // Initialize technical objects
 $object          = new Ticket($db);
@@ -103,6 +104,11 @@ if (is_array($object_status) && !empty($object_status)) {
 if (is_array($ticketcats) && !empty($ticketcats)) {
 	$stats->from .= ' LEFT JOIN '.MAIN_DB_PREFIX.'categorie_ticket as cattk ON (tk.rowid = cattk.fk_ticket)';
 	$stats->where .= ' AND cattk.fk_categorie IN ('.$db->sanitize(implode(',', $ticketcats)).')';
+}
+if (is_array($digirkelementlist) && !empty($digirkelementlist)) {
+	$stats->join .= ' LEFT JOIN '.MAIN_DB_PREFIX.'ticket_extrafields as tkextra ON tk.rowid = tkextra.fk_object';
+	$stats->join .= ' LEFT JOIN '.MAIN_DB_PREFIX.'digiriskdolibarr_digiriskelement as e ON tkextra.digiriskdolibarr_ticket_service = e.rowid';
+	$stats->where .= ' AND e.rowid IN ('.$db->sanitize(implode(',', $digirkelementlist)).')';
 }
 
 // Build graphic number of object
@@ -178,7 +184,8 @@ print '</td></tr>';
 // DigiriskElement
 print '<tr><td class="left">'.$langs->trans("GP/UT").'</td><td class="left">';
 print img_picto('', '', 'class="pictofixedwidth"');
-print $digiriskelement->select_digiriskelement_list($digiriskelementid, 'digiriskelementid', '', 1, 0, array(), 0, 0,'widthcentpercentminusx maxwidth300', '', 0, 1);
+$digirkelementlist = $digiriskelement->select_digiriskelement_list($digiriskelementid, 'digiriskelementid', '', 0, 0, array(), 1);
+print $form->multiselectarray('digirkelementlist', $digirkelementlist, GETPOST('digirkelementlist', 'array'), 0, 0, 'widthcentpercentminusx maxwidth300');
 print '</td></tr>';
 // Category
 if (!empty($conf->category->enabled)) {
