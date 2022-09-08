@@ -545,7 +545,7 @@ class doc_groupmentdocument_odt extends ModeleODTGroupmentDocument
 								$tmparray['nomElement']                 = (!empty($conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_EVALUATORS) ? 'S' . $element->entity . ' - ' : '') . $element->ref . ' - ' . $element->label;
 								$tmparray['idUtilisateur']              = $line->ref;
 								$tmparray['dateAffectationUtilisateur'] = dol_print_date($line->assignment_date, '%d/%m/%Y');
-								$tmparray['dureeEntretien']             = $line->duration;
+								$tmparray['dureeEntretien']             = $line->duration . ' mins';
 								$tmparray['nomUtilisateur']             = $user->lastname;
 								$tmparray['prenomUtilisateur']          = $user->firstname;
 
