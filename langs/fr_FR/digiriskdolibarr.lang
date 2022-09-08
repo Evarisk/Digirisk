@@ -773,6 +773,8 @@ ListingRisksActionDigiriskTemplate = ODT par défaut des listing des risques ave
 # Data - Donnée
 ListingRisksAction = Listing des risques avec actions correctives
 listingriskaction.odt = Listing des risques avec actions correctives
+DigiriskListingRisksActionData = Données configurables des listing des risques avec actions correctives
+ShowTaskDoneListingRisksActionDescription = Permettre d'afficher ou non les tâches soldées dans le listing des risques avec actions correctives
 
 
 
@@ -816,7 +818,7 @@ NoSitePlans = Aucun plan de la société renseigné
 riskassessmentdocument.odt = Document Unique
 DigiriskRiskAssessmentDocumentData = Données configurables du document unique
 ShowTaskDone = Afficher les tâches soldées
-ShowTaskDoneDescription = Permettre d'afficher ou non les tâches soldées dans le Document Unique
+ShowTaskDoneRiskAssessmentDocumentDescription = Permettre d'afficher ou non les tâches soldées dans le Document Unique
 ActionPreventionCompletedTaskDone = Les actions soldées ne sont pas affichées
 AppliedOn = Actif sur :
 
@@ -855,6 +857,8 @@ GroupmentDocumentDigiriskTemplate = ODT par défaut des fiches de groupement
 # Data - Donnée
 GroupmentDocument = Fiche de Groupement
 groupmentdocument.odt = Fiche de Groupement
+DigiriskGroupmentDocumentData = Données configurables des fiches de groupement
+ShowTaskDoneGroupmentDocumentDescription = Permettre d'afficher ou non les tâches soldées dans la fiche de groupement
 
 
 
@@ -879,6 +883,8 @@ WorkUnitDocumentDigiriskTemplate = ODT par défaut des fiches d'unité de travai
 # Data - Donnée
 WorkUnitDocument = Fiche d'Unité de travail
 workunitdocument.odt = Fiche d'Unité de travail
+DigiriskWorkUnitDocumentData = Données configurables des fiches d'unités de travail
+ShowTaskDoneWorkunitDocumentDescription = Permettre d'afficher ou non les tâches soldées dans la fiche d'unité de travail
 
 
 

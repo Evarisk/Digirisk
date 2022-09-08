@@ -403,8 +403,8 @@ foreach ($types as $type => $documentType) {
 
 	print '</table>';
 
-	if ($documentType == 'riskassessmentdocument') {
-		print load_fiche_titre($langs->trans("DigiriskRiskAssessmentDocumentData"), '', '');
+	if ($documentType == 'riskassessmentdocument' || $documentType == 'workunitdocument' || $documentType == 'groupmentdocument' || $documentType == 'listingrisksaction') {
+		print load_fiche_titre($langs->trans('Digirisk'.$type.'Data'), '', '');
 
 		print '<table class="noborder centpercent">';
 		print '<tr class="liste_titre">';
@@ -416,11 +416,11 @@ foreach ($types as $type => $documentType) {
 		print '<tr class="oddeven"><td>';
 		print $langs->trans('ShowTaskDone');
 		print "</td><td>";
-		print $langs->trans('ShowTaskDoneDescription');
+		print $langs->trans('ShowTaskDone'.$type.'Description');
 		print '</td>';
 
 		print '<td class="center">';
-		print ajax_constantonoff('DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_SHOW_TASK_DONE');
+		print ajax_constantonoff('DIGIRISKDOLIBARR_' . strtoupper($documentType) . '_SHOW_TASK_DONE');
 		print '</td>';
 		print '</tr>';
 		print '</table>';
