@@ -82,17 +82,32 @@ class ActionsDigiriskdolibarr
 				$pictopath = dol_buildpath('/digiriskdolibarr/img/digiriskdolibarr32px.png', 1);
 				$pictoDigirisk = img_picto('', $pictopath, '', 1, 0, 0, '', 'pictoDigirisk');
 				$idcc_form = digirisk_select_dictionary('DIGIRISKDOLIBARR_COLLECTIVE_AGREEMENT_TITLE', 'c_conventions_collectives', 'code', 'libelle', $conf->global->DIGIRISKDOLIBARR_COLLECTIVE_AGREEMENT_TITLE, 1);
+				$pee_input = '<input type="checkbox" name="DIGIRISKDOLIBARR_PEE_ENABLED" '. ($conf->global->DIGIRISKDOLIBARR_PEE_ENABLED ? 'checked' : '') .'>';
+				$perco_input = '<input type="checkbox" name="DIGIRISKDOLIBARR_PERCO_ENABLED" '. ($conf->global->DIGIRISKDOLIBARR_PERCO_ENABLED ? 'checked' : '') .'>';
+				$holding_agreement = '<input type="text" name="DIGIRISKDOLIBARR_HOLDING_AGREEMENT" value="'. $conf->global->DIGIRISKDOLIBARR_HOLDING_AGREEMENT .'">';
 				?>
 				<script>
-					let $tr = $('<tr class="oddeven"><td><label for="selectidcc_id"><?php print $pictoDigirisk . $form->textwithpicto($langs->trans('IDCC'), $langs->trans('IDCCTooltip'));?></label></td>');
-					$tr.append('<td>' + <?php echo json_encode($idcc_form) ; ?> + '</td></tr>');
+					let collectiveAgreementDictionary = $('<tr class="oddeven"><td><label for="selectidcc_id"><?php print $pictoDigirisk . $form->textwithpicto($langs->trans('IDCC'), $langs->trans('IDCCTooltip'));?></label></td>');
+					collectiveAgreementDictionary.append('<td>' + <?php echo json_encode($idcc_form) ; ?> + '</td></tr>');
 
-					let currElement = $('table:nth-child(7) .oddeven:last-child');
-					currElement.after($tr);
+					let peeInput = $('<tr class="oddeven"><td><label for="pee"><?php print $pictoDigirisk . $form->textwithpicto($langs->trans('PEE'), $langs->trans('PEETooltip'));?></label></td>');
+					peeInput.append('<td>' + <?php echo json_encode($pee_input) ; ?> + '</td></tr>');
+
+					let percoInput = $('<tr class="oddeven"><td><label for="perco"><?php print $pictoDigirisk . $form->textwithpicto($langs->trans('PERCO'), $langs->trans('PERCOTooltip'));?></label></td>');
+					percoInput.append('<td>' + <?php echo json_encode($perco_input) ; ?> + '</td></tr>');
+
+					let holdingAgreementInput = $('<tr class="oddeven"><td><label for="holdingAgreement"><?php print $pictoDigirisk . $form->textwithpicto($langs->trans('HoldingAgreement'), $langs->trans('HoldingAgreementTooltip'));?></label></td>');
+					holdingAgreementInput.append('<td>' + <?php echo json_encode($holding_agreement) ; ?> + '</td></tr>');
+
+					let currentElement = $('table:nth-child(7) .oddeven:last-child');
+					currentElement.after(collectiveAgreementDictionary);
+					currentElement.after(peeInput);
+					currentElement.after(percoInput);
+					currentElement.after(holdingAgreementInput);
 				</script>
 				<?php
+				print ajax_combobox('selectDIGIRISKDOLIBARR_COLLECTIVE_AGREEMENT_TITLE');
 			}
-			print ajax_combobox('selectDIGIRISKDOLIBARR_COLLECTIVE_AGREEMENT_TITLE');
 		} else if ($parameters['currentcontext'] == 'ticketcard') {
 			if (GETPOST('action') == 'view' || empty(GETPOST('action')) || GETPOST('action') == 'update_extras') {
 				print '<link rel="stylesheet" type="text/css" href="../custom/digiriskdolibarr/css/digiriskdolibarr.css">';
@@ -304,7 +319,7 @@ class ActionsDigiriskdolibarr
 				let fulldate = (day < 10 ? '0' : '') + day + '/' + (month < 10 ? '0' : '') + month + '/' + date.getFullYear();
 				let hour     = date.getHours();
 				let min      = date.getMinutes();
-				
+
 				jQuery('#options_digiriskdolibarr_ticket_lastname').parent().html(jQuery('#options_digiriskdolibarr_ticket_lastname').parent().html().replace(/Nom/, '<b>Nom</b>'))
                 jQuery('#options_digiriskdolibarr_ticket_lastname').parent().html(jQuery('#options_digiriskdolibarr_ticket_lastname').parent().html().replace(/Prénom/, '<b>Prénom</b>'))
 
@@ -349,6 +364,9 @@ class ActionsDigiriskdolibarr
 		if ($parameters['currentcontext'] == 'admincompany') {	    // do something only for the context 'somecontext1' or 'somecontext2'
 			if ($action == 'update') {
 				dolibarr_set_const($db, "DIGIRISKDOLIBARR_COLLECTIVE_AGREEMENT_TITLE", GETPOST("DIGIRISKDOLIBARR_COLLECTIVE_AGREEMENT_TITLE", 'nohtml'), 'chaine', 0, '', $conf->entity);
+				dolibarr_set_const($db, "DIGIRISKDOLIBARR_PEE_ENABLED", GETPOST("DIGIRISKDOLIBARR_PEE_ENABLED") == 'on' ? 1 : 0, 'integer', 0, '', $conf->entity);
+				dolibarr_set_const($db, "DIGIRISKDOLIBARR_PERCO_ENABLED", GETPOST("DIGIRISKDOLIBARR_PERCO_ENABLED") == 'on' ? 1 : 0, 'integer', 0, '', $conf->entity);
+				dolibarr_set_const($db, "DIGIRISKDOLIBARR_HOLDING_AGREEMENT", GETPOST("DIGIRISKDOLIBARR_HOLDING_AGREEMENT"), 'chaine', 0, '', $conf->entity);
 			}
 		} else if ($parameters['currentcontext'] == 'ticketcard') {
 			if ($action == 'digiriskbuilddoc') {

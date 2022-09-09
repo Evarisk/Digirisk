@@ -461,6 +461,9 @@ class modDigiriskdolibarr extends DolibarrModules
 			2 => array('DIGIRISKDOLIBAR_GENERAL_RULES', 'chaine', '', 'General rules', 0, 'current'),
 			3 => array('DIGIRISKDOLIBAR_IDCC_DICTIONNARY', 'chaine', '', 'IDCC of company', 0, 'current'),
 			4 => array('DIGIRISKDOLIBAR_SOCIETY_DESCRIPTION', 'chaine', '', '', 0, 'current'),
+			5 => array('DIGIRISKDOLIBARR_PEE_ENABLED', 'integer', 0, '', 0, 'current'),
+			6 => array('DIGIRISKDOLIBARR_PERCO_ENABLED', 'integer', 0, '', 0, 'current'),
+			6 => array('DIGIRISKDOLIBARR_HOLDING_AGREEMENT', 'chaine', '', '', 0, 'current'),
 
 			// CONST RISK ASSESSMENTDOCUMENT
 			10 => array('DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_AUDIT_START_DATE', 'date', '', '', 0, 'current'),
