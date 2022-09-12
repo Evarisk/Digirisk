@@ -1499,3 +1499,6 @@ LabourDoctorLastName = travail
 DashBoard = Tableau de bord
 DayWithoutAccident = Jours sans accident(s):
 Close = Fermer
+DateRange = Plage de dates
+UseDateRange = Utiliser la plage de dates
+

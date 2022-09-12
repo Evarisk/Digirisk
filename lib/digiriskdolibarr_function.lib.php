@@ -3048,3 +3048,67 @@ function extrafield_soft_delete($attrname, $elementtype = 'member', $extrafields
 			return 0;
 		}
 	}
+
+/**
+ * Return list of fetched instance of elements having this category
+ *
+ * @param  object            $object           Category object
+ * @param  string     	     $type             Type of category ('customer', 'supplier', 'contact', 'product', 'member', ...)
+ * @param  int        	     $onlyids          Return only ids of objects (consume less memory)
+ * @param  int			     $limit		       Limit
+ * @param  int			     $offset		   Offset
+ * @param  string		     $sortfield	       Sort fields
+ * @param  string		     $sortorder	       Sort order ('ASC' or 'DESC');
+ * @param  string            $morewherefilter  Filter
+ * @return array|int                           -1 if KO, array of instance of object if OK
+ * @throws Exception
+ * @see    containsObject()
+*/
+function getObjectsInCategDigirisk($object, $type, $onlyids = 0, $limit = 0, $offset = 0, $sortfield = '', $sortorder = 'ASC', $morewherefilter = '')
+{
+	global $user;
+
+	$objs = array();
+
+	$classnameforobj = 'Ticket';
+	$obj = new $classnameforobj($object->db);
+
+	$sql = "SELECT c.fk_".(empty($object->MAP_CAT_FK[$type]) ? $type : $object->MAP_CAT_FK[$type]);
+	$sql .= " FROM ".MAIN_DB_PREFIX."categorie_".(empty($object->MAP_CAT_TABLE[$type]) ? $type : $object->MAP_CAT_TABLE[$type])." as c";
+	$sql .= ", ".MAIN_DB_PREFIX.(empty($object->MAP_OBJ_TABLE[$type]) ? $type : $object->MAP_OBJ_TABLE[$type])." as o";
+	$sql .= " WHERE o.entity IN (".getEntity($obj->element).")";
+	$sql .= " AND c.fk_categorie = ".((int) $object->id);
+	$sql .= " AND c.fk_".(empty($object->MAP_CAT_FK[$type]) ? $type : $object->MAP_CAT_FK[$type])." = o.rowid";
+	// Protection for external users
+	if (($type == 'customer' || $type == 'supplier') && $user->socid > 0) {
+		$sql .= " AND o.rowid = ".((int) $user->socid);
+	}
+	if ($morewherefilter) {
+		$sql .= $morewherefilter;
+	}
+	if ($limit > 0 || $offset > 0) {
+		$sql .= $object->db->plimit($limit + 1, $offset);
+	}
+	$sql .= $object->db->order($sortfield, $sortorder);
+
+	dol_syslog(get_class($object)."::getObjectsInCateg", LOG_DEBUG);
+	$resql = $object->db->query($sql);
+	if ($resql) {
+		while ($rec = $object->db->fetch_array($resql)) {
+			if ($onlyids) {
+				$objs[] = $rec['fk_'.(empty($object->MAP_CAT_FK[$type]) ? $type : $object->MAP_CAT_FK[$type])];
+			} else {
+				$classnameforobj = 'Ticket';
+
+				$obj = new $classnameforobj($object->db);
+				$obj->fetch($rec['fk_'.(empty($object->MAP_CAT_FK[$type]) ? $type : $object->MAP_CAT_FK[$type])]);
+
+				$objs[] = $obj;
+			}
+		}
+		return $objs;
+	} else {
+		$object->error = $object->db->error().' sql='.$sql;
+		return -1;
+	}
+}

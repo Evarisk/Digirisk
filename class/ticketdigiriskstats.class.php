@@ -154,10 +154,13 @@ class TicketDigiriskStats extends DigiriskStats
 	/**
 	 * Return nb ticket by GP/UT and Ticket tags
 	 *
-	 * @return array     Array of values
+	 * @param  int		$date_start		Timestamp date start
+	 * @param  int		$date_end		Timestamp date end
+	 *
+	 * @return array                    Array of values
 	 * @throws Exception
 	 */
-	public function getNbTicketByDigiriskElementAndTicketTags() {
+	public function getNbTicketByDigiriskElementAndTicketTags($date_start = 0, $date_end = 0) {
 		$digiriskelement = new DigiriskElement($this->db);
 		$categorie       = new Categorie($this->db);
 
@@ -182,11 +185,14 @@ class TicketDigiriskStats extends DigiriskStats
 
 		if (is_array($digiriskelementlist) && !empty($digiriskelementlist)) {
 			if (is_array($arrayCats) && !empty($arrayCats)) {
+				if ($date_start > 0 && $date_end > 0) {
+					$filter = ' AND datec BETWEEN ' . "'" .dol_print_date($date_start, 'dayrfc') . "'" . ' AND ' . "'" . dol_print_date($date_end, 'dayrfc'). "'";
+				}
 				foreach ($digiriskelementlist as $digiriskelement) {
 					foreach ($arrayCats as $key => $cat) {
 						$nbticket = 0;
 						$categorie->fetch($cat['id']);
-						$alltickets = $categorie->getObjectsInCateg(Categorie::TYPE_TICKET);
+						$alltickets = getObjectsInCategDigirisk($categorie, 'ticket', 0, 0, 0, '', 'ASC', $filter);
 						if (is_array($alltickets) && !empty($alltickets)) {
 							foreach ($alltickets as $ticket) {
 								if (!empty($ticket->array_options['options_digiriskdolibarr_ticket_service']) && $ticket->array_options['options_digiriskdolibarr_ticket_service'] == $digiriskelement->id && $ticket->fk_statut != 9) {

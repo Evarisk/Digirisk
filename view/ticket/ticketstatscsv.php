@@ -71,9 +71,13 @@ if ($action == 'generate_csv') {
 	$now = dol_now();
 	$filename = dol_print_date($now, 'dayxcard') . '_ticketstats.csv';
 
+	$date_start = dol_mktime(0, 0, 0, GETPOST('datestartmonth', 'int'), GETPOST('datestartday', 'int'), GETPOST('datestartyear', 'int'));
+	$date_end   = dol_mktime(0, 0, 0, GETPOST('dateendmonth', 'int'), GETPOST('dateendday', 'int'), GETPOST('dateendyear', 'int'));
+	$daterange  = GETPOST('daterange');
+
 	$fp = fopen($dir . $filename, 'w');
 
-	$data = $stats->getNbTicketByDigiriskElementAndTicketTags();
+	$data = $stats->getNbTicketByDigiriskElementAndTicketTags((!empty($daterange) ? $date_start : 0), (!empty($daterange) ? $date_end : 0));
 	if (is_array($data) && !empty($data)) {
 		// Loop through file pointer and a line
 		$arrayCat = array_keys(reset($data));
@@ -96,6 +100,8 @@ if ($action == 'generate_csv') {
 /*
  * View
  */
+
+$form = new Form($db);
 
 $title    = $langs->trans("TicketStatistics");
 $help_url = 'FR:Module_DigiriskDolibarr';
@@ -125,15 +131,24 @@ print '<input type="hidden" name="token" value="' . newToken() . '">';
 
 print '<div class="div-table-responsive-no-min">';
 print '<table class="liste noborder centpercent">';
-print '<tr class="liste_titre">';
-print '<th class="liste_titre center" colspan="3">';
 
+//DateRange -- Plage de date
+$startday = dol_mktime(0, 0, 0, $conf->global->SOCIETE_FISCAL_MONTH_START, 1, strftime("%Y", dol_now()));
+print '<tr><td colspan="2">' . $langs->trans("DateRange") . '</td><td class="right">';
+print $langs->trans('From') . $form->selectDate($startday, 'datestart', 0, 0, 0, '', 1);
+print $langs->trans('At') . $form->selectDate(dol_time_plus_duree($startday, 1, 'y'), 'dateend', 0, 0, 0, '', 1);
+print '</td></tr>';
+
+print '<tr class="liste_titre">';
 // Button
+print '<th class="liste_titre center" colspan="3">';
 print '<b>' . $langs->trans('GenerateCSV') . ' ' . '</b>';
 print '<input style="display : none" class="button buttongen" id="form_csv_generatebutton" name="form_csv_generatebutton" type="submit" value="' . $langs->trans('Generate') . '"' . '>';
 print '<label for="form_csv_generatebutton">';
 print '<div class="wpeo-button button-square-40 button-blue wpeo-tooltip-event" aria-label="' . $langs->trans('Generate') . '"><i class="fas fa-file-csv button-icon"></i></div>';
 print '</label>';
+print ' ' . $langs->trans('UseDateRange') . ' ';
+print '<input type="checkbox" id="daterange" name="daterange"' . (GETPOST('daterange') ? ' checked=""' : '') . '>';
 print '</th>';
 print '</tr>';
 
