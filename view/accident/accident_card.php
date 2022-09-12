@@ -649,7 +649,7 @@ if ($action == 'create') {
 	print '</td></tr>';
 
 	//FkSoc -- Lieu de l'accident - Société extérieure
-	print '<tr class="fk_soc_field hidden"' . (GETPOST('fk_soc') > 0? '' : 'style="display:none"') . '><td class="minwidth400">' . $langs->trans("AccidentLocation") . '</td>';
+	print '<tr class="fk_soc_field hidden"' . (GETPOST('fk_soc') > 0 ? '' : 'style="display:none"') . '><td class="minwidth400">' . $langs->trans("AccidentLocation") . '</td>';
 	print '<td>';
 	//For external user force the company to user company
 	if ( ! empty($user->socid)) {
@@ -668,7 +668,7 @@ if ($action == 'create') {
 
 	//Accident Date -- Date de l'accident
 	print '<tr><td class="minwidth400"><label for="accident_date">' . $langs->trans("AccidentDate") . '</label></td><td>';
-	print $form->selectDate(dol_now('tzuser'), 'dateo', 1, 1, 0, '', 1);
+	print $form->selectDate(GETPOST('dateo') ? strtotime(GETPOST('dateo')) : dol_now('tzuser'), 'dateo', 1, 1, 0, '', 1);
 	print '</td></tr>';
 
 	//Description -- Description
