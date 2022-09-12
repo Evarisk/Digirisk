@@ -59,8 +59,9 @@ if (!$user->rights->ticket->read) {
 	accessforbidden();
 }
 
-$dir = DOL_DATA_ROOT . '/digiriskdolibarr/ticketstats/';
-dol_mkdir($dir);
+$upload_dir = $conf->digiriskdolibarr->multidir_output[$conf->entity];
+$upload_dir = $upload_dir . '/digiriskdolibarr/ticketstats/';
+dol_mkdir($upload_dir);
 
 /*
  * Action
@@ -75,7 +76,7 @@ if ($action == 'generate_csv') {
 	$date_end   = dol_mktime(0, 0, 0, GETPOST('dateendmonth', 'int'), GETPOST('dateendday', 'int'), GETPOST('dateendyear', 'int'));
 	$daterange  = GETPOST('daterange');
 
-	$fp = fopen($dir . $filename, 'w');
+	$fp = fopen($upload_dir . $filename, 'w');
 
 	$data = $stats->getNbTicketByDigiriskElementAndTicketTags((!empty($daterange) ? $date_start : 0), (!empty($daterange) ? $date_end : 0));
 	if (is_array($data) && !empty($data)) {
@@ -118,8 +119,8 @@ print dol_get_fiche_head($head, 'exportcsv', $langs->trans("DocumentsAndCSV"), -
 print '<div class="fichecenter"><div class="fichehalfleft">';
 
 // Get list of files
-if ( ! empty($dir)) {
-	$file_list = dol_dir_list($dir, 'files', 0, '(\.csv)', '', 'date', SORT_DESC, 1);
+if ( ! empty($upload_dir)) {
+	$file_list = dol_dir_list($upload_dir, 'files', 0, '(\.csv)', '', 'date', SORT_DESC, 1);
 }
 
 print load_fiche_titre($langs->trans("CSVFile"), '', 'digiriskdolibarr@digiriskdolibarr');
@@ -133,7 +134,11 @@ print '<div class="div-table-responsive-no-min">';
 print '<table class="liste noborder centpercent">';
 
 //DateRange -- Plage de date
-$startday = dol_mktime(0, 0, 0, $conf->global->SOCIETE_FISCAL_MONTH_START, 1, strftime("%Y", dol_now()));
+if (!empty($conf->global->SOCIETE_FISCAL_MONTH_START)) {
+	$startday = dol_mktime(0, 0, 0, $conf->global->SOCIETE_FISCAL_MONTH_START, 1, strftime("%Y", dol_now()));
+} else {
+	$startday = dol_now();
+}
 print '<tr><td colspan="2">' . $langs->trans("DateRange") . '</td><td class="right">';
 print $langs->trans('From') . $form->selectDate($startday, 'datestart', 0, 0, 0, '', 1);
 print $langs->trans('At') . $form->selectDate(dol_time_plus_duree($startday, 1, 'y'), 'dateend', 0, 0, 0, '', 1);
@@ -153,7 +158,7 @@ print '</th>';
 print '</tr>';
 
 // Get list of files
-if ( ! empty($dir)) {
+if ( ! empty($upload_dir)) {
 	// Loop on each file found
 	if (is_array($file_list)) {
 		foreach ($file_list as $file) {
@@ -167,11 +172,11 @@ if ( ! empty($dir)) {
 			print  '</td>';
 
 			// Show file size
-			$size = (!empty($file['size']) ? $file['size'] : dol_filesize($dir . "/" . $file["name"]));
+			$size = (!empty($file['size']) ? $file['size'] : dol_filesize($upload_dir . "/" . $file["name"]));
 			print '<td class="nowrap right">' . dol_print_size($size, 1, 1) . '</td>';
 
 			// Show file date
-			$date = (!empty($file['date']) ? $file['date'] : dol_filemtime($dir . "/" . $file["name"]));
+			$date = (!empty($file['date']) ? $file['date'] : dol_filemtime($upload_dir . "/" . $file["name"]));
 			print '<td class="nowrap right">' . dol_print_date($date, 'dayhour', 'tzuser') . '</td>';
 			print '</tr>';
 		}
@@ -183,8 +188,8 @@ print '</div>';
 print '</form>';
 
 // Get list of files
-if ( ! empty($dir)) {
-	$file_list = dol_dir_list($dir, 'files', 0, '(\.png)', '', 'date', SORT_DESC, 1);
+if ( ! empty($upload_dir)) {
+	$file_list = dol_dir_list($upload_dir, 'files', 0, '(\.png)', '', 'date', SORT_DESC, 1);
 }
 
 print load_fiche_titre($langs->trans("Documents"), '', 'digiriskdolibarr@digiriskdolibarr');
@@ -197,7 +202,7 @@ print '<th class="liste_titre center" colspan="3"></th>';
 print '</tr>';
 
 // Get list of files
-if ( ! empty($dir)) {
+if ( ! empty($upload_dir)) {
 	// Loop on each file found
 	if (is_array($file_list)) {
 		foreach ($file_list as $file) {
@@ -211,11 +216,11 @@ if ( ! empty($dir)) {
 			print  '</td>';
 
 			// Show file size
-			$size = (!empty($file['size']) ? $file['size'] : dol_filesize($dir . "/" . $file["name"]));
+			$size = (!empty($file['size']) ? $file['size'] : dol_filesize($upload_dir . "/" . $file["name"]));
 			print '<td class="nowrap right">' . dol_print_size($size, 1, 1) . '</td>';
 
 			// Show file date
-			$date = (!empty($file['date']) ? $file['date'] : dol_filemtime($dir . "/" . $file["name"]));
+			$date = (!empty($file['date']) ? $file['date'] : dol_filemtime($upload_dir . "/" . $file["name"]));
 			print '<td class="nowrap right">' . dol_print_date($date, 'dayhour', 'tzuser') . '</td>';
 			print '</tr>';
 		}

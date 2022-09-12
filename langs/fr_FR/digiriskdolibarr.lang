@@ -831,7 +831,7 @@ WorkUnitDocumentDigiriskTemplate = ODT par défaut des fiches d'unité de travai
 WorkUnitDocument = Fiche d'Unité de travail
 workunitdocument.odt = Fiche d'Unité de travail
 DigiriskWorkUnitDocumentData = Données configurables des fiches d'unités de travail
-ShowTaskDoneWorkunitDocumentDescription = Permettre d'afficher ou non les tâches soldées dans la fiche d'unité de travail
+ShowTaskDoneWorkUnitDocumentDescription = Permettre d'afficher ou non les tâches soldées dans la fiche d'unité de travail
 
 
 

@@ -80,7 +80,9 @@ if ($user->socid > 0) {
 	$socid = $user->socid;
 }
 
-$dir = DOL_DATA_ROOT . '/digiriskdolibarr/ticketstats/';
+$upload_dir = $conf->digiriskdolibarr->multidir_output[$conf->entity];
+$upload_dir = $upload_dir . '/digiriskdolibarr/ticketstats/';
+dol_mkdir($upload_dir);
 
 $nowyear   = strftime("%Y", dol_now());
 $year      = GETPOST('year') > 0 ? GETPOST('year', 'int') : $nowyear;
@@ -99,7 +101,7 @@ if ($action == 'savegraph') {
 	list($type, $data) = explode(';', $data);
 	list(, $data)      = explode(',', $data);
 	$data = base64_decode($data);
-	$filenamenb = $dir.'/ticketdigiriskstatsnbinyear-'.$year.'.png';
+	$filenamenb = $upload_dir.'/ticketdigiriskstatsnbinyear-'.$year.'.png';
 	file_put_contents($filenamenb, $data);
 }
 
@@ -117,8 +119,6 @@ print load_fiche_titre($title, '', 'ticket');
 
 $head = ticketPrepareHead();
 print dol_get_fiche_head($head, 'byyear', $langs->trans("TicketStatistics"), -1);
-
-dol_mkdir($dir);
 
 $stats = new TicketDigiriskStats($db, $socid, ($userid > 0 ? $userid: 0), ($userassignid > 0 ? $userassignid: 0), ($digiriskelementid > 0 ? $digiriskelementid : 0), ($categticketid > 0 ? $categticketid: 0));
 if (is_array($object_status) && !empty($object_status)) {
@@ -138,10 +138,10 @@ if (is_array($digirkelementlist) && !empty($digirkelementlist)) {
 $data = $stats->getNbByMonthWithPrevYear($endyear, $startyear, 0, 0, $conf->global->SOCIETE_FISCAL_MONTH_START);
 
 if (empty($user->rights->societe->client->voir) || $user->socid) {
-	$filenamenb = $dir.'/ticketdigiriskstatsnbinyear-'.$user->id.'-'.$year.'.png';
+	$filenamenb = $upload_dir.'/ticketdigiriskstatsnbinyear-'.$user->id.'-'.$year.'.png';
 	$fileurlnb = DOL_URL_ROOT.'/viewimage.php?modulepart=ticketdigiriskstats&file=ticketdigiriskstatsnbinyear-'.$user->id.'-'.$year.'.png';
 } else {
-	$filenamenb = $dir.'/ticketdigiriskstatsnbinyear-'.$year.'.png';
+	$filenamenb = $upload_dir.'/ticketdigiriskstatsnbinyear-'.$year.'.png';
 	$fileurlnb = DOL_URL_ROOT.'/viewimage.php?modulepart=ticketdigiriskstats&file=ticketdigiriskstatsnbinyear-'.$year.'.png';
 }
 
