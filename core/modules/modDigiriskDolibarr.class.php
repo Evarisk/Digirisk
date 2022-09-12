@@ -1733,6 +1733,8 @@ class modDigiriskdolibarr extends DolibarrModules
 
 		// Create extrafields during init
 		include_once DOL_DOCUMENT_ROOT . '/core/class/extrafields.class.php';
+		require_once __DIR__ . '/../../lib/digiriskdolibarr_function.lib.php';
+
 		$extra_fields = new ExtraFields($this->db);
 
 		$extra_fields->update('fk_risk', $langs->transnoentities("RiskLinked"), 'sellist', '', 'projet_task', 0, 0, 1010, 'a:1:{s:7:"options";a:1:{s:50:"digiriskdolibarr_risk:ref:rowid::entity = $ENTITY$";N;}}', '', '', 1);
@@ -1752,14 +1754,22 @@ class modDigiriskdolibarr extends DolibarrModules
 				$entities = $object->getEntitiesList(false, false, true, true);
 				foreach ($entities as $sub_entity => $entity_name) {
 					$conf->setEntityValues($this->db, $sub_entity);
-					$extra_fields->delete('digiriskdolibarr_ticket_firstname', 'ticket');
-					$extra_fields->delete('digiriskdolibarr_ticket_lastname', 'ticket');
-					$extra_fields->delete('digiriskdolibarr_ticket_phone', 'ticket');
-					$extra_fields->delete('digiriskdolibarr_ticket_service', 'ticket');
-					$extra_fields->delete('digiriskdolibarr_ticket_location', 'ticket');
-					$extra_fields->delete('digiriskdolibarr_ticket_date', 'ticket');
+
+					extrafield_soft_delete('digiriskdolibarr_ticket_firstname', 'ticket', $extra_fields);
+					extrafield_soft_delete('digiriskdolibarr_ticket_lastname', 'ticket', $extra_fields);
+					extrafield_soft_delete('digiriskdolibarr_ticket_phone', 'ticket', $extra_fields);
+					extrafield_soft_delete('digiriskdolibarr_ticket_service', 'ticket', $extra_fields);
+					extrafield_soft_delete('digiriskdolibarr_ticket_location', 'ticket', $extra_fields);
+					extrafield_soft_delete('digiriskdolibarr_ticket_date', 'ticket', $extra_fields);
 				}
 				$conf->setEntityValues($this->db, $current_entity);
+			} else {
+				extrafield_soft_delete('digiriskdolibarr_ticket_firstname', 'ticket', $extra_fields);
+				extrafield_soft_delete('digiriskdolibarr_ticket_lastname', 'ticket', $extra_fields);
+				extrafield_soft_delete('digiriskdolibarr_ticket_phone', 'ticket', $extra_fields);
+				extrafield_soft_delete('digiriskdolibarr_ticket_service', 'ticket', $extra_fields);
+				extrafield_soft_delete('digiriskdolibarr_ticket_location', 'ticket', $extra_fields);
+				extrafield_soft_delete('digiriskdolibarr_ticket_date', 'ticket', $extra_fields);
 			}
 
 			$extra_fields->addExtraField('digiriskdolibarr_ticket_lastname', $langs->transnoentities("LastName"), 'varchar', 2000, 255, 'ticket', 0, 0, '', '', 1, '', 1, '', '', 0);
@@ -1768,8 +1778,8 @@ class modDigiriskdolibarr extends DolibarrModules
 			$extra_fields->addExtraField('digiriskdolibarr_ticket_service', $langs->transnoentities("GP/UT"), 'sellist', 2300, '255', 'ticket', 0, 0, '', 'a:1:{s:7:"options";a:1:{s:61:"digiriskdolibarr_digiriskelement:ref:rowid::entity = $ENTITY$";N;}}', 1, '', 4, '','',0);
 			$extra_fields->addExtraField('digiriskdolibarr_ticket_location', $langs->transnoentities("Location"), 'varchar', 2400, 255, 'ticket', 0, 0, '', '', 1, '', 1, '', '', 0);
 			$extra_fields->addExtraField('digiriskdolibarr_ticket_date', $langs->transnoentities("Date"), 'datetime', 2500, '', 'ticket', 0, 0, '', '', 1, '', 1, '', '', 0);
-			dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_TICKET_EXTRAFIELDS', 1, 'integer', 0, '', 0);
-			dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_TICKET_EXTRAFIELDS_BACKWARD_COMPATIBILITY', 1, 'integer', 0, '', 0);
+//			dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_TICKET_EXTRAFIELDS', 1, 'integer', 0, '', 0);
+//			dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_TICKET_EXTRAFIELDS_BACKWARD_COMPATIBILITY', 1, 'integer', 0, '', 0);
 		}
 
 		//Used for data import from Digirisk Wordpress
