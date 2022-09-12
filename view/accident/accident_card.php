@@ -649,7 +649,7 @@ if ($action == 'create') {
 	print '</td></tr>';
 
 	//FkSoc -- Lieu de l'accident - Société extérieure
-	print '<tr class="fk_soc_field hidden" ' . (GETPOST('fk_soc') ? '' : 'style="display:none"') . '><td class="minwidth400">' . $langs->trans("AccidentLocation") . '</td>';
+	print '<tr class="fk_soc_field hidden"' . (GETPOST('fk_soc') > 0? '' : 'style="display:none"') . '><td class="minwidth400">' . $langs->trans("AccidentLocation") . '</td>';
 	print '<td>';
 	//For external user force the company to user company
 	if ( ! empty($user->socid)) {
