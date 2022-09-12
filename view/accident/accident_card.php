@@ -194,6 +194,11 @@ if (empty($reshook)) {
 			$error++;
 		}
 
+		if ($user_employer_id < 0) {
+			setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv('UserEmployer')), null, 'errors');
+			$error++;
+		}
+
 		// Submit file
 		if ( ! empty($conf->global->MAIN_UPLOAD_DOC)) {
 			if ( ! empty($_FILES) && ! empty($_FILES['userfile']['name'][0])) {
@@ -313,6 +318,11 @@ if (empty($reshook)) {
 		// Check parameters
 		if ($user_victim_id < 0) {
 			setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv('UserVictim')), null, 'errors');
+			$error++;
+		}
+
+		if ($user_employer_id < 0) {
+			setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv('UserEmployer')), null, 'errors');
 			$error++;
 		}
 
@@ -437,7 +447,7 @@ if (empty($reshook)) {
 		$date_end_workstop   = dol_mktime(GETPOST('dateendhour', 'int'), GETPOST('dateendmin', 'int'), 0, GETPOST('dateendmonth', 'int'), GETPOST('dateendday', 'int'), GETPOST('dateendyear', 'int'));
 
 		$objectline->date_start_workstop = $date_start_workstop;
-		$objectline->date_end_workstop   = $date_end_workstop;	
+		$objectline->date_end_workstop   = $date_end_workstop;
 		$objectline->fk_accident         = $parent_id;
 
 		if ( ! $error) {
@@ -606,16 +616,16 @@ if ($action == 'create') {
 	if ( ! empty($mysoc->managers)) {
 		$usertmp->fetch('', $mysoc->managers, $mysoc->id, 0, $conf->entity);
 	}
-	$userlist = $form->select_dolusers((($usertmp->id > 0) ? $usertmp->id : $user->id), '', 0, null, 0, '', '', $conf->entity, 0, 0, 'AND u.statut = 1', 0, '', 'minwidth300', 0, 1);
+	$userlist = $form->select_dolusers( GETPOST('fk_user_employer') ?: ($usertmp->id > 0 ? $usertmp->id : $user->id), '', 0, null, 0, '', '', $conf->entity, 0, 0, 'AND u.statut = 1', 0, '', 'minwidth300', 0, 1);
 	print '<tr>';
 	print '<td class="fieldrequired minwidth400" style="width:10%">' . img_picto('', 'user') . ' ' . $form->editfieldkey('UserEmployer', 'UserEmployer_id', '', $object, 0) . '</td>';
 	print '<td>';
-	print $form->selectarray('fk_user_employer', $userlist, (($usertmp->id > 0) ? $usertmp->id : $user->id), $langs->trans('SelectUser'), null, null, null, "40%", 0, 0, '', 'minwidth300', 1);
+	print $form->selectarray('fk_user_employer', $userlist, GETPOST('fk_user_employer') ?: ($usertmp->id > 0 ? $usertmp->id : $user->id), $langs->trans('SelectUser'), null, null, null, "40%", 0, 0, '', 'minwidth300', 1);
 	print ' <a href="' . DOL_URL_ROOT . '/user/card.php?action=create&backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?action=create') . '" target="_blank"><span class="fa fa-plus-circle valignmiddle paddingleft" title="' . $langs->trans("AddUser") . '"></span></a>';
 	print '</td></tr>';
 
-	//User Victim -- Utilisateur victime de l'accient
-	$userlist = $form->select_dolusers(( ! empty(GETPOST('fk_user_victim')) ? GETPOST('fk_user_victim') : $user->id), '', 0, null, 0, '', '', $conf->entity, 0, 0, 'AND u.statut = 1', 0, '', 'minwidth300', 0, 1);
+	//User Victim -- Utilisateur victime de l'accident
+	$userlist = $form->select_dolusers((GETPOST('fk_user_victim') ?: $user->id), '', 0, null, 0, '', '', $conf->entity, 0, 0, 'AND u.statut = 1', 0, '', 'minwidth300', 0, 1);
 	print '<tr>';
 	print '<td class="fieldrequired minwidth400" style="width:10%">' . img_picto('', 'user') . ' ' . $form->editfieldkey('UserVictim', 'UserVictim_id', '', $object, 0) . '</td>';
 	print '<td>';
