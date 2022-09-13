@@ -172,10 +172,6 @@ if (empty($reshook)) {
 			$error++;
 		} else {
 			$usertmp->fetch($maitre_oeuvre_id);
-			if ( ! dol_strlen($usertmp->email)) {
-				setEventMessages($langs->trans('ErrorNoEmailForMaitreOeuvre', $langs->transnoentitiesnoconv('MaitreOeuvre')) . ' : ' . '<a target="_blank" href="' . dol_buildpath('/user/card.php?id=' . $usertmp->id, 2) . '">' . $usertmp->lastname . ' ' . $usertmp->firstname . '</a>', null, 'errors');
-				$error++;
-			}
 		}
 
 		if ($extsociety_id < 0) {
@@ -277,10 +273,6 @@ if (empty($reshook)) {
 			$error++;
 		} else {
 			$usertmp->fetch($maitre_oeuvre_id);
-			if ( ! dol_strlen($usertmp->email)) {
-				setEventMessages($langs->trans('ErrorNoEmailForMaitreOeuvre', $langs->transnoentitiesnoconv('MaitreOeuvre')) . ' : ' . '<a target="_blank" href="' . dol_buildpath('/user/card.php?id=' . $usertmp->id, 2) . '">' . $usertmp->lastname . ' ' . $usertmp->firstname . '</a>', null, 'errors');
-				$error++;
-			}
 		}
 
 		if ($extsociety_id < 0) {
@@ -710,20 +702,13 @@ if ($action == 'create') {
 	print '</td></tr>';
 
 	$ext_society_responsible_id = GETPOST('ext_society_responsible');
-	$contacts                   = fetchAllSocPeople('',  '',  0,  0, array('customsql' => "s.rowid = $ext_society_responsible_id AND c.email IS NULL OR c.email = ''" ));
-	$contacts_no_email          = array();
-	if (is_array($contacts) && ! empty($contacts) && $contacts > 0) {
-		foreach ($contacts as $element) {
-			$contacts_no_email[$element->id] = $element->id;
-		}
-	}
 
 	//External responsible -- Responsable de la société extérieure
 	print '<tr><td class="fieldrequired minwidth400">';
 	$htmltext = img_picto('', 'address') . ' ' . $langs->trans("ExtSocietyResponsible");
-	print $form->textwithpicto($htmltext, $langs->trans('ContactNoEmail'));
+	print $htmltext;
 	print '</td><td>';
-	print digirisk_selectcontacts((empty(GETPOST('ext_society', 'int')) ? -1 : GETPOST('ext_society', 'int')), GETPOST('ext_society_responsible'), 'ext_society_responsible', 1, $contacts_no_email, '', 0, 'minwidth300', false, 0, array(), false, '', 'ext_society_responsible');
+	print $form->selectcontacts((empty(GETPOST('ext_society', 'int')) ? -1 : GETPOST('ext_society', 'int')), $ext_society_responsible_id, 'ext_society_responsible', 1, '', '', 1, 'minwidth100imp widthcentpercentminusxx maxwidth400');
 	print '</td></tr>';
 
 	//Labour inspector Society -- Entreprise Inspecteur du travail
@@ -737,15 +722,7 @@ if ($action == 'create') {
 	print ' <a href="' . DOL_URL_ROOT . '/societe/card.php?action=create&backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?action=create') . '" target="_blank"><span class="fa fa-plus-circle valignmiddle paddingleft" title="' . $langs->trans("AddThirdParty") . '"></span></a>';
 	print '<a href="' . DOL_URL_ROOT . '/custom/digiriskdolibarr/admin/securityconf.php' . '" target="_blank">' . $langs->trans("ConfigureLabourInspector") . '</a>';
 	print '</td></tr>';
-
 	$labour_inspector_contact_id        = (GETPOST('labour_inspector_contact') ? GETPOST('labour_inspector_contact') : ($allLinks['LabourInspectorContact']->id[0] ?: -1));
-	$contacts                           = fetchAllSocPeople('',  '',  0,  0, array('customsql' => "s.rowid = $labour_inspector_contact_id AND c.email IS NULL OR c.email = ''" ));
-	$contacts_no_email_labour_inspector = array();
-	if (is_array($contacts) && ! empty($contacts) && $contacts > 0) {
-		foreach ($contacts as $element) {
-			$contacts_no_email_labour_inspector[$element->id] = $element->id;
-		}
-	}
 
 	if ( ! empty($allLinks['LabourInspectorContact'])) {
 		$contact->fetch($allLinks['LabourInspectorContact']->id[0]);
@@ -754,9 +731,9 @@ if ($action == 'create') {
 	//Labour inspector -- Inspecteur du travail
 	print '<tr><td class="fieldrequired minwidth400">';
 	$htmltext = img_picto('', 'address') . ' ' . $langs->trans("LabourInspector");
-	print $form->textwithpicto($htmltext, $langs->trans('ContactNoEmail'));
+	print $htmltext;
 	print '</td><td>';
-	print digirisk_selectcontacts((GETPOST('labour_inspector') ? GETPOST('labour_inspector') : ($allLinks['LabourInspectorSociety']->id[0] ?: -1)), dol_strlen($contact->email) ? $labour_inspector_contact_id : -1, 'labour_inspector_contact', 1, $contacts_no_email_labour_inspector, '', 0, 'minwidth300', false, 0, array(), false, '', 'labour_inspector_contact');
+	print $form->selectcontacts((GETPOST('labour_inspector') ? GETPOST('labour_inspector') : ($allLinks['LabourInspectorSociety']->id[0] ?: -1)), $labour_inspector_contact_id, 'labour_inspector_contact', 1, '', '', 1, 'minwidth100imp widthcentpercentminusxx maxwidth400');
 	print '</td></tr>';
 
 	//FK PREVENTION PLAN
@@ -846,13 +823,6 @@ if (($id || $ref) && $action == 'edit') {
 	print '</td></tr>';
 
 	$ext_society_responsible_id = is_array($object_signatories['FP_EXT_SOCIETY_RESPONSIBLE']) ? array_shift($object_signatories['FP_EXT_SOCIETY_RESPONSIBLE'])->element_id : GETPOST('ext_society_responsible');
-	$contacts                   = fetchAllSocPeople('',  '',  0,  0, array('customsql' => "s.rowid = $ext_society_responsible_id AND c.email IS NULL OR c.email = ''" ));
-	$contacts_no_email          = array();
-	if (is_array($contacts) && ! empty($contacts) && $contacts > 0) {
-		foreach ($contacts as $element) {
-			$contacts_no_email[$element->id] = $element->id;
-		}
-	}
 
 	if ($ext_society_responsible_id > 0) {
 		$contact->fetch($ext_society_responsible_id);
@@ -862,9 +832,9 @@ if (($id || $ref) && $action == 'edit') {
 	$ext_society = $digiriskresources->fetchResourcesFromObject('FP_EXT_SOCIETY', $object);
 	print '<tr class="oddeven"><td class="fieldrequired minwidth400">';
 	$htmltext = img_picto('', 'address') . ' ' . $langs->trans("ExtSocietyResponsible");
-	print $form->textwithpicto($htmltext, $langs->trans('ContactNoEmail'));
+	print $htmltext;
 	print '</td><td>';
-	print digirisk_selectcontacts($ext_society->id, dol_strlen($contact->email) ? $ext_society_responsible_id : -1, 'ext_society_responsible', 0, $contacts_no_email, '', 0, 'minwidth300', false, 0, array(), false, '', 'ext_society_responsible');
+	print $form->selectcontacts($ext_society->id, dol_strlen($contact->email) ? $ext_society_responsible_id : -1, 'ext_society_responsible', '', 0, '', 1, 'minwidth100imp widthcentpercentminusxx maxwidth400');
 	print '</td></tr>';
 
 	if (is_array($object_resources['FP_LABOUR_INSPECTOR']) && $object_resources['FP_LABOUR_INSPECTOR'] > 0) {
@@ -886,13 +856,6 @@ if (($id || $ref) && $action == 'edit') {
 	print '</td></tr>';
 
 	$labour_inspector_contact           = ! empty($digiriskresources->fetchResourcesFromObject('FP_LABOUR_INSPECTOR_ASSIGNED', $object)) ? $digiriskresources->fetchResourcesFromObject('FP_LABOUR_INSPECTOR_ASSIGNED', $object) : GETPOST('labour_inspector_contact');
-	$contacts                           = fetchAllSocPeople('',  '',  0,  0, array('customsql' => "s.rowid = $labour_inspector_contact->id AND c.email IS NULL OR c.email = ''" ));
-	$contacts_no_email_labour_inspector = array();
-	if (is_array($contacts) && ! empty($contacts) && $contacts > 0) {
-		foreach ($contacts as $element) {
-			$contacts_no_email_labour_inspector[$element->id] = $element->id;
-		}
-	}
 
 	if ($labour_inspector_contact->id > 0) {
 		$contact->fetch($labour_inspector_contact->id);
@@ -902,9 +865,9 @@ if (($id || $ref) && $action == 'edit') {
 	$labour_inspector_society = $digiriskresources->fetchResourcesFromObject('FP_LABOUR_INSPECTOR', $object);
 	print '<tr><td class="fieldrequired minwidth400">';
 	$htmltext = img_picto('', 'address') . ' ' . $langs->trans("LabourInspector");
-	print $form->textwithpicto($htmltext, $langs->trans('ContactNoEmail'));
+	print $htmltext;
 	print '</td><td>';
-	print digirisk_selectcontacts($labour_inspector_society->id, dol_strlen($contact->email) ? $labour_inspector_contact->id : -1, 'labour_inspector_contact', 0, $contacts_no_email_labour_inspector, '', 0, 'minwidth300', false, 0, array(), false, '', 'labour_inspector_contact');
+	print $form->selectcontacts($labour_inspector_society->id, dol_strlen($contact->email) ? $labour_inspector_contact->id : -1, 'labour_inspector_contact', '', 0, '', 1, 'minwidth100imp widthcentpercentminusxx maxwidth400');
 	print '</td></tr>';
 
 	//FK PREVENTION PLAN

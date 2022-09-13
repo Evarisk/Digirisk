@@ -1292,7 +1292,7 @@ ShowDocument = Voir le document
 AddAttendants = Ajouter
 NoAttendants = Pas d'intervenants liés à cet objet. Pour ajouter des intervenants, le statut doit être "En cours".
 SignatureManagement = Gestion des signatures
-
+HasNoEmail = n'a pas d'email
 
 
 #

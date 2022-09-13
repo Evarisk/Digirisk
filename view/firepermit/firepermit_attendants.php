@@ -184,6 +184,31 @@ if ($action == 'send') {
 	$signatoryID = GETPOST('signatoryID');
 	$signatory->fetch($signatoryID);
 
+	if (!dol_strlen($signatory->email)) {
+		if ($signatory->element_type == 'user') {
+			$usertmp = $user;
+			$usertmp->fetch($signatory->element_id);
+			if (dol_strlen($usertmp->email)) {
+				$signatory->email = $usertmp->email;
+				$signatory->update($user, true);
+			}
+		} else if ($signatory->element_type == 'socpeople') {
+			$contact->fetch($signatory->element_id);
+			if (dol_strlen($contact->email)) {
+				$signatory->email = $contact->email;
+				$signatory->update($user, true);
+			}
+		}
+	}
+
+	if (!dol_strlen($signatory->email)) {
+		setEventMessages($langs->trans('Attendant') . ' ' . $signatory->firstname . ' ' . $signatory->lastname . ' ' . $langs->trans('HasNoEmail'), null, 'errors');
+		$urltogo = str_replace('__ID__', $result, $backtopage);
+		$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
+		header("Location: " . $urltogo);
+		exit;
+	}
+
 	if ( ! $error) {
 		$langs->load('mails');
 		$sendto = $signatory->email;
