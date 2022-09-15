@@ -418,32 +418,9 @@ if ((empty($action) || ($action != 'edit' && $action != 'create'))) {
 
 	digirisk_banner_tab($object, 'ref', '', 0, 'ref', 'ref', $morehtmlref, '', 0, $morehtmlleft);
 
-	unset($object->fields['element_type']);
-	unset($object->fields['fk_parent']);
-	unset($object->fields['last_main_doc']);
-	unset($object->fields['entity']);
-
 	print '<div class="fichecenter">';
 	print '<div class="fichehalfleft">';
-	print '<table class="border centpercent tableforfield">' . "\n";
-
-	if ($object->id) {
-		print '<tr><td class="titlefield">' . $langs->trans("ElementType") . '</td><td>';
-		print $langs->trans($object->element_type);
-		print '</td></tr>';
-
-		print '<div class="titlefield hidden elementID" id="elementID" value="' . $object->id . '">' . $langs->trans("ID") . '</div>';
-		print '<tr><td class="titlefield">' . $langs->trans("ParentElement") . '</td><td>';
-		$parent_element = new DigiriskElement($db);
-		$result         = $parent_element->fetch($object->fk_parent);
-		if ($result > 0) {
-			print $parent_element->ref . ( ! empty($parent_element->label) ? ' - ' . $parent_element->label : '');
-		} else {
-			print $conf->global->MAIN_INFO_SOCIETE_NOM;
-		}
-
-		print '</td></tr>';
-	}
+	print '<table class="border centpercent tableforfield">';
 
 	//Show common fields
 	//  include DOL_DOCUMENT_ROOT.'/core/tpl/commonfields_view.tpl.php';
@@ -452,25 +429,6 @@ if ((empty($action) || ($action != 'edit' && $action != 'create'))) {
 	include DOL_DOCUMENT_ROOT . '/core/tpl/extrafields_view.tpl.php';
 
 	print '</table>';
-	print '</div>';
-
-	print '<div class="fichehalfright">';
-	print '<div class="ficheaddleft">';
-
-	print '<table class="border tableforfield" width="100%">';
-
-	// label
-	print '<td class="titlefield tdtop">' . $langs->trans("label") . '</td><td>';
-	print dol_htmlentitiesbr($object->label);
-	print '</td></tr>';
-
-	// Description
-	print '<td class="titlefield tdtop">' . $langs->trans("Description") . '</td><td>';
-	print dol_htmlentitiesbr($object->description);
-	print '</td></tr>';
-
-	print '</table>';
-	print '</div>';
 	print '</div>';
 
 	print '<div class="clearboth"></div>';
@@ -522,7 +480,7 @@ if ((empty($action) || ($action != 'edit' && $action != 'create'))) {
 
 			if ($permissiontoadd || $permissiontoread) {
 				$genallowed = 1;
-			}		
+			}
 
 			print digiriskshowdocuments($modulepart, $dir_files, $filedir, $urlsource, $genallowed, $permissiontodelete, $defaultmodel, 1, 0, '', $title, '', '', $digiriskelementdocument);
 		}
