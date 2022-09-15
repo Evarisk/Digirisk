@@ -16,7 +16,7 @@
  */
 
 /**
- *	\file       dashboard_ticket.php
+ *	\file       view/ticket/dashboard_ticket.php
  *	\ingroup    digiriskdolibarr
  *	\brief      Dashboard page of Ticket
  */
@@ -33,13 +33,14 @@ if ( ! $res && $i > 0 && file_exists(dirname(substr($tmp, 0, ($i + 1))) . "/main
 // Try main.inc.php using relative path
 if ( ! $res && file_exists("../../main.inc.php")) $res    = @include "../../main.inc.php";
 if ( ! $res && file_exists("../../../main.inc.php")) $res = @include "../../../main.inc.php";
+if ( ! $res && file_exists("../../../../main.inc.php")) $res = @include "../../../../main.inc.php";
 if ( ! $res) die("Include of main fails");
 
 require_once DOL_DOCUMENT_ROOT . '/core/lib/admin.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/categories/class/categorie.class.php';
 
-require_once './../lib/digiriskdolibarr_function.lib.php';
-require_once __DIR__ . '/../class/digiriskelement.class.php';
+require_once './../../lib/digiriskdolibarr_function.lib.php';
+require_once __DIR__ . '/../../class/digiriskelement.class.php';
 
 global $conf, $db, $langs, $user;
 

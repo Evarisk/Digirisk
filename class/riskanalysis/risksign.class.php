@@ -286,6 +286,13 @@ class RiskSign extends CommonObject
 		$risksign = new RiskSign($this->db);
 		$result   = $risksign->fetchFromParent($parent_id);
 
+		$trashList = $object->getMultiEntityTrashList();
+		if (!empty($trashList) && is_array($trashList)) {
+			foreach($trashList as $trash_element_id) {
+				unset($objects[$trash_element_id]);
+			}
+		}
+
 		if ($result > 0 && ! empty($result)) {
 			foreach ($result as $risksign) {
 				$risksigns[$risksign->id] = $risksign;
@@ -307,16 +314,34 @@ class RiskSign extends CommonObject
 
 		if ( $get_shared_data ) {
 			$digiriskelementtmp = new DigiriskElement($this->db);
-
-			$allrisksigns = $risksign->fetchAll('', '', 0, 0, array('customsql' => 'status > 0 AND entity NOT IN (' . $conf->entity . ')'), 'AND', 0);
-
-			foreach ($allrisksigns as $key => $allrisksign) {
-				$digiriskelementtmp->fetch($allrisksign->fk_element);
-				$digiriskelementtmp->element = 'digiriskdolibarr';
-				$digiriskelementtmp->fetchObjectLinked($allrisksign->id, 'digiriskdolibarr_risksign', $object->id, 'digiriskdolibarr_digiriskelement', 'AND', 1, 'sourcetype', 0);
-				$alreadyImported = !empty($digiriskelementtmp->linkedObjectsIds) ? 1 : 0;
-				if ($alreadyImported > 0) {
-					$risksigns[$allrisksign->id] = $allrisksign;
+			if ($parent_id == 0) {
+				$digiriskelement_flatlist = $digiriskelementtmp->fetchDigiriskElementFlat(0);
+				if (is_array($digiriskelement_flatlist) && !empty($digiriskelement_flatlist)) {
+					foreach ($digiriskelement_flatlist as $sub_digiriskelement) {
+						$digiriskelement = $sub_digiriskelement['object'];
+						$digiriskelement->fetchObjectLinked(null, '', $digiriskelement->id, 'digiriskdolibarr_digiriskelement', 'AND', 1, 'sourcetype', 0);
+						if (!empty($digiriskelement->linkedObjectsIds['digiriskdolibarr_risksign'])) {
+							foreach ($digiriskelement->linkedObjectsIds['digiriskdolibarr_risksign'] as $risksign_id) {
+								$risksign = new self($this->db);
+								$risksign->fetch($risksign_id);
+								if (!array_key_exists($risksign->fk_element, $trashList)) {
+									$risksigns[$risksign->id] = $risksign;
+								}
+							}
+						}
+					}
+				}
+			} else {
+				$digiriskelementtmp->fetch($parent_id);
+				$digiriskelementtmp->fetchObjectLinked(null, '', $digiriskelementtmp->id, 'digiriskdolibarr_digiriskelement', 'AND', 1, 'sourcetype', 0);
+				if (!empty($digiriskelementtmp->linkedObjectsIds['digiriskdolibarr_risksign'])) {
+					foreach ($digiriskelementtmp->linkedObjectsIds['digiriskdolibarr_risksign'] as $risksign_id) {
+						$risksign = new self($this->db);
+						$risksign->fetch($risksign_id);
+						if (!array_key_exists($risksign->fk_element, $trashList)) {
+							$risksigns[$risksign->id] = $risksign;
+						}
+					}
 				}
 			}
 		}

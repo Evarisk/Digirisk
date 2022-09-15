@@ -112,7 +112,7 @@ class DigiriskSignature extends CommonObject
 		'signature_comment'    => array('type' => 'varchar(255)', 'label' => 'SignatureComment', 'enabled' => '1', 'position' => 130, 'notnull' => 0, 'visible' => 3,),
 		'element_id'           => array('type' => 'integer', 'label' => 'ElementType', 'enabled' => '1', 'position' => 140, 'notnull' => 1, 'visible' => 1,),
 		'element_type'         => array('type' => 'varchar(50)', 'label' => 'ElementType', 'enabled' => '1', 'position' => 150, 'notnull' => 0, 'visible' => 1,),
-		'signature'            => array('type' => 'varchar(255)', 'label' => 'Signature', 'enabled' => '1', 'position' => 160, 'notnull' => 0, 'visible' => 3,),
+		'signature'            => array('type' => 'longtext', 'label' => 'Signature', 'enabled' => '1', 'position' => 160, 'notnull' => 0, 'visible' => 3,),
 		'stamp'                => array('type' => 'varchar(255)', 'label' => 'Stamp', 'enabled' => '1', 'position' => 165, 'notnull' => 0, 'visible' => 3,),
 		'signature_url'        => array('type' => 'varchar(50)', 'label' => 'SignatureUrl', 'enabled' => '1', 'position' => 170, 'notnull' => 0, 'visible' => 1, 'default' => null,),
 		'transaction_url'      => array('type' => 'varchar(50)', 'label' => 'TransactionUrl', 'enabled' => '1', 'position' => 180, 'notnull' => 0, 'visible' => 1,'default' => null,),

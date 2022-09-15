@@ -182,14 +182,20 @@ class Risk extends CommonObject
 	 */
 	public function fetchRisksOrderedByCotation($parent_id, $get_children_data = false, $get_parents_data = false, $get_shared_data = false)
 	{
-		global $conf;
 		$object  = new DigiriskElement($this->db);
 		$objects = $object->fetchAll('',  '',  0,  0, array('customsql' => 'status > 0' ));
+		$trashList = $object->getMultiEntityTrashList();
+		if (!empty($trashList) && is_array($trashList)) {
+			foreach($trashList as $trash_element_id) {
+				unset($objects[$trash_element_id]);
+			}
+		}
+
 		$risk    = new Risk($this->db);
+
+		//For groupment & workunit documents with given id
 		if ($parent_id > 0) {
 			$result  = $risk->fetchFromParent($parent_id);
-
-			$filter = '';
 
 			// RISKS de l'élément parent.
 			if ($result > 0 && ! empty($result)) {
@@ -198,15 +204,16 @@ class Risk extends CommonObject
 					$lastEvaluation = $evaluation->fetchFromParent($risk->id, 1);
 					if ( $lastEvaluation > 0 && ! empty($lastEvaluation) && is_array($lastEvaluation)) {
 						$lastEvaluation       = array_shift($lastEvaluation);
-						$risk->lastEvaluation = $lastEvaluation->cotation;
+						$risk->lastEvaluation = $lastEvaluation;
 					}
-
-					$risks[$risk->id] = $risk;
+					$risk->appliedOn = $parent_id;
+					$risks[] = $risk;
 				}
 			}
 
 		}
 
+		//For groupment document if conf is activated and for risks listing of risk assessment document
 		if ( $get_children_data ) {
 			if (is_array($objects)) {
 				$elements = recurse_tree($parent_id, 0, $objects);
@@ -236,10 +243,10 @@ class Risk extends CommonObject
 								$lastEvaluation = $evaluation->fetchFromParent($risk->id, 1);
 								if ( $lastEvaluation > 0 && ! empty($lastEvaluation)  && is_array($lastEvaluation)) {
 									$lastEvaluation       = array_shift($lastEvaluation);
-									$risk->lastEvaluation = $lastEvaluation->cotation;
+									$risk->lastEvaluation = $lastEvaluation;
 								}
-
-								$risks[$risk->id] = $risk;
+								$risk->appliedOn = $element;
+								$risks[] = $risk;
 							}
 						}
 					}
@@ -247,6 +254,7 @@ class Risk extends CommonObject
 			}
 		}
 
+		//for groupment & workunit document if get inherited risks conf is activated
 		if ( $get_parents_data ) {
 			$parent_element_id = $objects[$parent_id]->id;
 			while ($parent_element_id > 0) {
@@ -257,51 +265,68 @@ class Risk extends CommonObject
 						$lastEvaluation = $evaluation->fetchFromParent($risk->id, 1);
 						if ( $lastEvaluation > 0 && ! empty($lastEvaluation)  && is_array($lastEvaluation)) {
 							$lastEvaluation       = array_shift($lastEvaluation);
-							$risk->lastEvaluation = $lastEvaluation->cotation;
+							$risk->lastEvaluation = $lastEvaluation;
 						}
-
-						$risks[$risk->id] = $risk;
+						$risk->appliedOn = $parent_id;
+						$risks[] = $risk;
 					}
 				}
 				$parent_element_id = $objects[$parent_element_id]->fk_parent;
 			}
 		}
 
+		//For all documents
 		if ( $get_shared_data ) {
 			$digiriskelementtmp = new DigiriskElement($this->db);
-
-//			$AllSharingsRisks = $conf->mc->sharings['risk'];
-//
-//			foreach ($AllSharingsRisks as $Allsharingsrisk) {
-//				$filter .= $Allsharingsrisk . ',';
-//			}
-//
-//			$filter = rtrim($filter, ',');
-
-			$allrisks = $risk->fetchAll('', '', 0, 0, array('customsql' => 'status > 0 AND entity NOT IN (' . $conf->entity . ')'), 'AND', 0);
-
-			foreach ($allrisks as $key => $allrisk) {
-				$digiriskelementtmp->fetch($allrisk->fk_element);
-				$digiriskelementtmp->element = 'digiriskdolibarr';
-				$digiriskelementtmp->fetchObjectLinked($allrisk->id, 'digiriskdolibarr_risk', $object->id, 'digiriskdolibarr_digiriskelement', 'AND', 1, 'sourcetype', 0);
-				// @todo performance leak : iterate on digirisk elements and fetch shared risks instead of this
-				$alreadyImported = !empty($digiriskelementtmp->linkedObjectsIds) ? 1 : 0;
-				if ($alreadyImported > 0) {
-					$evaluation     = new RiskAssessment($this->db);
-					$lastEvaluation = $evaluation->fetchFromParent($allrisk->id, 1);
-					if ( $lastEvaluation > 0 && ! empty($lastEvaluation)  && is_array($lastEvaluation)) {
-						$lastEvaluation       = array_shift($lastEvaluation);
-						$allrisk->lastEvaluation = $lastEvaluation->cotation;
+			if ($parent_id == 0) {
+				$digiriskelement_flatlist = $digiriskelementtmp->fetchDigiriskElementFlat(0);
+				if (is_array($digiriskelement_flatlist) && !empty($digiriskelement_flatlist)) {
+					foreach ($digiriskelement_flatlist as $sub_digiriskelement) {
+						$digiriskelement = $sub_digiriskelement['object'];
+						$digiriskelement->fetchObjectLinked(null, '', $digiriskelement->id, 'digiriskdolibarr_digiriskelement', 'AND', 1, 'sourcetype', 0);
+						if (!empty($digiriskelement->linkedObjectsIds['digiriskdolibarr_risk'])) {
+							foreach ($digiriskelement->linkedObjectsIds['digiriskdolibarr_risk'] as $risk_id) {
+								$risktmp = new self($this->db);
+								$risktmp->fetch($risk_id);
+								if (!array_key_exists($risktmp->fk_element, $trashList)) {
+									$evaluation     = new RiskAssessment($this->db);
+									$lastEvaluation = $evaluation->fetchFromParent($risktmp->id, 1);
+									if ( $lastEvaluation > 0 && ! empty($lastEvaluation)  && is_array($lastEvaluation)) {
+										$lastEvaluation       = array_shift($lastEvaluation);
+										$risktmp->lastEvaluation = $lastEvaluation;
+									}
+									$risktmp->appliedOn = $digiriskelement->id;
+									$risks[] = $risktmp;
+								}
+							}
+						}
 					}
+				}
 
-					$risks[$allrisk->id] = $allrisk;
+			} else {
+				$digiriskelementtmp->fetch($parent_id);
+				$digiriskelementtmp->fetchObjectLinked(null, '', $digiriskelementtmp->id, 'digiriskdolibarr_digiriskelement', 'AND', 1, 'sourcetype', 0);
+				if (!empty($digiriskelementtmp->linkedObjectsIds['digiriskdolibarr_risk'])) {
+					foreach ($digiriskelementtmp->linkedObjectsIds['digiriskdolibarr_risk'] as $risk_id) {
+						$risktmp = new self($this->db);
+						$risktmp->fetch($risk_id);
+						if (!array_key_exists($risktmp->fk_element, $trashList)) {
+							$evaluation = new RiskAssessment($this->db);
+							$lastEvaluation = $evaluation->fetchFromParent($risktmp->id, 1);
+							if ($lastEvaluation > 0 && !empty($lastEvaluation) && is_array($lastEvaluation)) {
+								$lastEvaluation = array_shift($lastEvaluation);
+								$risktmp->lastEvaluation = $lastEvaluation;
+							}
+							$risktmp->appliedOn = $parent_id;
+							$risks[] = $risktmp;
+						}
+					}
 				}
 			}
 		}
-
-		if ( ! empty($risks) ) {
+		if ( ! empty($risks) && is_array($risks)) {
 			usort($risks, function ($first, $second) {
-				return $first->lastEvaluation < $second->lastEvaluation;
+				return $first->lastEvaluation->cotation < $second->lastEvaluation->cotation;
 			});
 			return $risks;
 		} else {
@@ -575,11 +600,9 @@ class Risk extends CommonObject
 			$records = array();
 			while ($i < $num) {
 				$obj = $this->db->fetch_object($resql);
-
 				$record = new Task($this->db);
 				$record->fetch($obj->fk_object);
 				$records[$record->id] = $record;
-
 				$i++;
 			}
 			$this->db->free($resql);

@@ -2486,43 +2486,22 @@ function select_entity_list($selected = '', $htmlname = 'entity', $filter = '', 
 	$selected = array($selected);
 
 	$digiriskelement = new DigiriskElement($db);
-
 	// Clean $filter that may contains sql conditions so sql code
 	if (function_exists('testSqlAndScriptInject')) {
 		if (testSqlAndScriptInject($filter, 3) > 0) {
 			$filter = '';
 		}
 	}
-	// On recherche les societies
 	$sql  = "SELECT *";
 	$sql .= " FROM " . MAIN_DB_PREFIX . "entity as e";
 
 	$sql              .= " WHERE e.rowid IN (" . getEntity($digiriskelement->element) . ")";
 	//$sql .= ' WHERE 1 = 1';
 	if ($filter) $sql .= " AND (" . $filter . ")";
-//		if ($moreparam > 0 ) {
-//			$children = $this->fetchDigiriskElementFlat($moreparam);
-//			if ( ! empty($children) && $children > 0) {
-//				foreach ($children as $key => $value) {
-//					$sql .= " AND NOT s.rowid =" . $key;
-//				}
-//			}
-//			$sql .= " AND NOT s.rowid =" . $moreparam;
-//		}
-//		if ($conf->global->DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH) {
-//			$masked_content = $this->fetchDigiriskElementFlat($conf->global->DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH);
-//			if ( ! empty($masked_content) && $masked_content > 0) {
-//				foreach ($masked_content as $key => $value) {
-//					$sql .= " AND NOT s.rowid =" . $key;
-//				}
-//			}
-//			$sql .= " AND NOT s.rowid =" . $conf->global->DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH;
-//		}
 	$sql .= $db->order("rowid", "ASC");
 	$sql .= $db->plimit($limit, 0);
 
 	// Build output string
-	//dol_syslog(get_class($this) . "::select_digiriskelement_list", LOG_DEBUG);
 	$resql = $db->query($sql);
 	$num = '';
 	if ($resql) {
@@ -2977,6 +2956,159 @@ function fetchDictionnary($tablename)
 
 		return $records;
 	} else {
+		return -1;
+	}
+}
+
+/**
+ *	Delete an optional attribute
+ *
+ *	@param	string	$attrname		Code of attribute to delete
+ *  @param  string	$elementtype    Element type ('member', 'product', 'thirdparty', 'contact', ...)
+ *  @return int              		< 0 if KO, 0 if nothing is done, 1 if OK
+ */
+function extrafield_soft_delete($attrname, $elementtype = 'member', $extrafields)
+{
+	if ($elementtype == 'thirdparty') {
+		$elementtype = 'societe';
+	}
+	if ($elementtype == 'contact') {
+		$elementtype = 'socpeople';
+	}
+
+	$error = 0;
+
+	if (!empty($attrname) && preg_match("/^\w[a-zA-Z0-9-_]*$/", $attrname)) {
+		$result = extrafields_delete_label($attrname, $elementtype, $extrafields);
+		if ($result < 0) {
+			$extrafields->error = $extrafields->db->lasterror();
+			$extrafields->errors[] = $extrafields->db->lasterror();
+			$error++;
+		}
+
+		if (!$error) {
+			$sql = "SELECT COUNT(rowid) as nb";
+			$sql .= " FROM ".MAIN_DB_PREFIX."extrafields";
+			$sql .= " WHERE elementtype = '".$extrafields->db->escape($elementtype)."'";
+			$sql .= " AND name = '".$extrafields->db->escape($attrname)."'";
+			//$sql.= " AND entity IN (0,".$conf->entity.")";      Do not test on entity here. We want to see if there is still on field remaning in other entities before deleting field in table
+			$resql = $extrafields->db->query($sql);
+			if ($resql) {
+				$obj = $extrafields->db->fetch_object($resql);
+				if ($obj->nb <= 0) {
+//					$result = $extrafields->db->DDLDropField(MAIN_DB_PREFIX.$table, $attrname); // This also drop the unique key
+					if ($result < 0) {
+						$extrafields->error = $extrafields->db->lasterror();
+						$extrafields->errors[] = $extrafields->db->lasterror();
+					}
+				}
+			}
+		}
+
+		return $result;
+	} else {
+		return 0;
+	}
+}
+
+// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+	/**
+	 *	Delete description of an optional attribute
+	 *
+	 *	@param	string	$attrname			Code of attribute to delete
+	 *  @param  string	$elementtype        Element type ('member', 'product', 'thirdparty', ...)
+	 *  @return int              			< 0 if KO, 0 if nothing is done, 1 if OK
+	 */
+	function extrafields_delete_label($attrname, $elementtype = 'member', $extrafields)
+	{
+		global $conf;
+
+		if ($elementtype == 'thirdparty') {
+			$elementtype = 'societe';
+		}
+		if ($elementtype == 'contact') {
+			$elementtype = 'socpeople';
+		}
+
+		if (isset($attrname) && $attrname != '' && preg_match("/^\w[a-zA-Z0-9-_]*$/", $attrname)) {
+			$sql = "DELETE FROM ".MAIN_DB_PREFIX."extrafields";
+			$sql .= " WHERE name = '".$extrafields->db->escape($attrname)."'";
+			$sql .= " AND entity IN  (0,".$conf->entity.')';
+			$sql .= " AND elementtype = '".$extrafields->db->escape($elementtype)."'";
+
+			dol_syslog(get_class($extrafields)."::delete_label", LOG_DEBUG);
+			$resql = $extrafields->db->query($sql);
+			if ($resql) {
+				return 1;
+			} else {
+				dol_print_error($extrafields->db);
+				return -1;
+			}
+		} else {
+			return 0;
+		}
+	}
+
+/**
+ * Return list of fetched instance of elements having this category
+ *
+ * @param  object            $object           Category object
+ * @param  string     	     $type             Type of category ('customer', 'supplier', 'contact', 'product', 'member', ...)
+ * @param  int        	     $onlyids          Return only ids of objects (consume less memory)
+ * @param  int			     $limit		       Limit
+ * @param  int			     $offset		   Offset
+ * @param  string		     $sortfield	       Sort fields
+ * @param  string		     $sortorder	       Sort order ('ASC' or 'DESC');
+ * @param  string            $morewherefilter  Filter
+ * @return array|int                           -1 if KO, array of instance of object if OK
+ * @throws Exception
+ * @see    containsObject()
+*/
+function getObjectsInCategDigirisk($object, $type, $onlyids = 0, $limit = 0, $offset = 0, $sortfield = '', $sortorder = 'ASC', $morewherefilter = '')
+{
+	global $user;
+
+	$objs = array();
+
+	$classnameforobj = 'Ticket';
+	$obj = new $classnameforobj($object->db);
+
+	$sql = "SELECT c.fk_".(empty($object->MAP_CAT_FK[$type]) ? $type : $object->MAP_CAT_FK[$type]);
+	$sql .= " FROM ".MAIN_DB_PREFIX."categorie_".(empty($object->MAP_CAT_TABLE[$type]) ? $type : $object->MAP_CAT_TABLE[$type])." as c";
+	$sql .= ", ".MAIN_DB_PREFIX.(empty($object->MAP_OBJ_TABLE[$type]) ? $type : $object->MAP_OBJ_TABLE[$type])." as o";
+	$sql .= " WHERE o.entity IN (".getEntity($obj->element).")";
+	$sql .= " AND c.fk_categorie = ".((int) $object->id);
+	$sql .= " AND c.fk_".(empty($object->MAP_CAT_FK[$type]) ? $type : $object->MAP_CAT_FK[$type])." = o.rowid";
+	// Protection for external users
+	if (($type == 'customer' || $type == 'supplier') && $user->socid > 0) {
+		$sql .= " AND o.rowid = ".((int) $user->socid);
+	}
+	if ($morewherefilter) {
+		$sql .= $morewherefilter;
+	}
+	if ($limit > 0 || $offset > 0) {
+		$sql .= $object->db->plimit($limit + 1, $offset);
+	}
+	$sql .= $object->db->order($sortfield, $sortorder);
+
+	dol_syslog(get_class($object)."::getObjectsInCateg", LOG_DEBUG);
+	$resql = $object->db->query($sql);
+	if ($resql) {
+		while ($rec = $object->db->fetch_array($resql)) {
+			if ($onlyids) {
+				$objs[] = $rec['fk_'.(empty($object->MAP_CAT_FK[$type]) ? $type : $object->MAP_CAT_FK[$type])];
+			} else {
+				$classnameforobj = 'Ticket';
+
+				$obj = new $classnameforobj($object->db);
+				$obj->fetch($rec['fk_'.(empty($object->MAP_CAT_FK[$type]) ? $type : $object->MAP_CAT_FK[$type])]);
+
+				$objs[] = $obj;
+			}
+		}
+		return $objs;
+	} else {
+		$object->error = $object->db->error().' sql='.$sql;
 		return -1;
 	}
 }

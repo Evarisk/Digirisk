@@ -281,23 +281,7 @@ if ($action == 'add' && $canadduser && $permissiontoadd) {
 		}
 
 		// Set entity property
-		$entity = GETPOST('entity', 'int');
-		if ( ! empty($conf->multicompany->enabled)) {
-			if (GETPOST('superadmin', 'int')) {
-				$object->entity = 0;
-			} else {
-				if ( ! empty($conf->global->MULTICOMPANY_TRANSVERSE_MODE)) {
-					$object->entity = 1; // all users are forced into master entity
-				} else {
-					$object->entity = ($entity == '' ? 1 : $entity);
-				}
-			}
-		} else {
-			$object->entity = ($entity == '' ? 1 : $entity);
-			/*if ($user->admin && $user->entity == 0 && GETPOST("admin",'alpha'))
-			{
-			}*/
-		}
+		$object->entity = $conf->entity;
 
 		$db->begin();
 
@@ -370,11 +354,8 @@ if ( ! empty($search_categ) || ! empty($catid)) $sql                            
 // Add fields from hooks
 $parameters = array();
 $reshook    = $hookmanager->executeHooks('printUserListWhere', $parameters); // Note that $action and $object may have been modified by hook
-if ($reshook > 0) {
-	$sql .= $hookmanager->resPrint;
-} else {
-	$sql .= " WHERE u.entity IN (" . getEntity('user') . ")";
-}
+$entities = '0,' . $conf->entity;
+$sql .= " WHERE u.entity IN (" . $entities . ")";
 if ($socid > 0) $sql .= " AND u.fk_soc = " . $socid;
 //if ($search_user != '')       $sql.=natural_search(array('u.login', 'u.lastname', 'u.firstname'), $search_user);
 if ($search_supervisor > 0)   $sql                           .= " AND u.fk_user IN (" . $db->escape($search_supervisor) . ")";
@@ -395,6 +376,9 @@ if ($catid > 0)     $sql                              .= " AND cu.fk_categorie =
 if ($catid == -2)   $sql                              .= " AND cu.fk_categorie IS NULL";
 if ($search_categ > 0)   $sql                         .= " AND cu.fk_categorie = " . $db->escape($search_categ);
 if ($search_categ == -2) $sql                         .= " AND cu.fk_categorie IS NULL";
+
+$sql .= ' GROUP BY u.rowid';
+
 // Add where from extra fields
 include DOL_DOCUMENT_ROOT . '/core/tpl/extrafields_list_search_sql.tpl.php';
 // Add where from hooks

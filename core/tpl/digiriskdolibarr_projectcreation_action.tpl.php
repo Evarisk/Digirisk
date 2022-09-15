@@ -18,6 +18,82 @@
 
 require_once DOL_DOCUMENT_ROOT . '/core/lib/date.lib.php';
 
+//Set multi entity sharing
+
+$params = array(
+	'digiriskdolibarr' => array(																			// nom informatif du module externe qui apporte ses paramètres
+		'sharingelements' => array(																			// section des paramètres 'element' et 'object'
+			//partage digiriskelement
+			'digiriskelement' => array(																		// Valeur utilisée dans getEntity()
+				'type'    => 'element',																		// element: partage d'éléments principaux (thirdparty, product, member, etc...)
+				'icon'    => 'info-circle',																	// Font Awesome icon
+				'lang'    => 'digiriskdolibarr@digiriskdolibarr',											// Fichier de langue contenant les traductions
+				'tooltip' => 'DigiriskElementSharedTooltip',												// Message Tooltip (ne pas mettre cette clé si pas de tooltip)
+				'enable'  => '! empty($conf->digiriskdolibarr->enabled)',									// Conditions d'activation du partage
+				'input'   => array(																			// input : Paramétrage de la réaction du bouton on/off
+					'global' => array(																		// global : réaction lorsqu'on désactive l'option de partage global
+						'showhide' => true,																	// showhide : afficher/cacher le bloc de partage lors de l'activation/désactivation du partage global
+						'hide'     => true,																	// hide : cache le bloc de partage lors de la désactivation du partage global
+						'del'      => true																	// del : suppression de la constante du partage lors de la désactivation du partage global
+					)
+				)
+			),
+			//partage risk
+			'risk' => array(																				// Valeur utilisée dans getEntity()
+				'type'      => 'element',																	// element: partage d'éléments principaux (thirdparty, product, member, etc...)
+				'icon'      => 'exclamation-triangle',														// Font Awesome icon
+				'lang'      => 'digiriskdolibarr@digiriskdolibarr',											// Fichier de langue contenant les traductions
+				'tooltip'   => 'RiskSharedTooltip',															// Message Tooltip (ne pas mettre cette clé si pas de tooltip)
+				'mandatory' => 'digiriskelement',															// partage principal obligatoire
+				'enable'    => '! empty($conf->digiriskdolibarr->enabled)',									// Conditions d'activation du partage
+				'display'   => '! empty($conf->global->MULTICOMPANY_DIGIRISKELEMENT_SHARING_ENABLED)', 		// L'affichage de ce bloc de partage dépend de l'activation d'un partage parent
+				'input'     => array(																		// input : Paramétrage de la réaction du bouton on/off
+					'global' => array(																		// global : réaction lorsqu'on désactive l'option de partage global
+						'hide'     => true,																	// hide : cache le bloc de partage lors de la désactivation du partage global
+						'del'      => true																	// del : suppression de la constante du partage lors de la désactivation du partage global
+					),
+					'digiriskelement' => array(																// digiriskelement (nom du module principal) : réaction lorsqu'on désactive le partage principal (ici le partage des digiriskelements)
+						'showhide' => true,																	// showhide : afficher/cacher le bloc de partage lors de l'activation/désactivation du partage principal
+						'hide'     => true,																	// hide : cache le bloc de partage lors de la désactivation du partage principal
+						'del'      => true																	// del : supprime la constante du partage lors de la désactivation du partage principal
+					)
+				)
+			),
+			//partage risk sign
+			'risksign' => array(																			// Valeur utilisée dans getEntity()
+				'type'      => 'element',																	// element: partage d'éléments principaux (thirdparty, product, member, etc...)
+				'icon'      => 'map-signs',																	// Font Awesome icon
+				'lang'      => 'digiriskdolibarr@digiriskdolibarr',											// Fichier de langue contenant les traductions
+				'tooltip'   => 'RiskSignSharedTooltip',														// Message Tooltip (ne pas mettre cette clé si pas de tooltip)
+				'mandatory' => 'digiriskelement',															// partage principal obligatoire
+				'enable'    => '! empty($conf->digiriskdolibarr->enabled)',									// Conditions d'activation du partage
+				'display'   => '! empty($conf->global->MULTICOMPANY_DIGIRISKELEMENT_SHARING_ENABLED)', 		// L'affichage de ce bloc de partage dépend de l'activation d'un partage parent
+				'input'     => array(																		// input : Paramétrage de la réaction du bouton on/off
+					'global' => array(																		// global : réaction lorsqu'on désactive l'option de partage global
+						'hide'     => true,																	// hide : cache le bloc de partage lors de la désactivation du partage global
+						'del'      => true																	// del : suppression de la constante du partage lors de la désactivation du partage global
+					),
+					'digiriskelement' => array(																// digiriskelement (nom du module principal) : réaction lorsqu'on désactive le partage principal (ici le partage des digiriskelements)
+						'showhide' => true,																	// showhide : afficher/cacher le bloc de partage lors de l'activation/désactivation du partage principal
+						//'hide'     => true,																	// hide : cache le bloc de partage lors de la désactivation du partage principal
+						'del'      => true																	// del : supprime la constante du partage lors de la désactivation du partage principal
+					)
+				)
+			),
+		),
+		'sharingmodulename' => array(																		// correspondance des noms de modules pour le lien parent ou compatibilité (ex: 'productsupplierprice'	=> 'product')
+			'digiriskelement' => 'digiriskdolibarr',
+			'risk'            => 'digiriskdolibarr',
+			'risksign'        => 'digiriskdolibarr',
+		),
+	)
+);
+
+$externalmodule = json_decode($conf->global->MULTICOMPANY_EXTERNAL_MODULES_SHARING, true);
+$externalmodule = !empty($conf->global->MULTICOMPANY_EXTERNAL_MODULES_SHARING) ? array_merge($externalmodule, $params) : $params;
+$jsonformat = json_encode($externalmodule);
+dolibarr_set_const($db, "MULTICOMPANY_EXTERNAL_MODULES_SHARING", $jsonformat, 'json', 0, '', 0);
+
 //Check projet
 if ($conf->global->DIGIRISKDOLIBARR_DU_PROJECT > 0) {
 	$project->fetch($conf->global->DIGIRISKDOLIBARR_DU_PROJECT);

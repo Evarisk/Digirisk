@@ -216,7 +216,6 @@ class modDigiriskdolibarr extends DolibarrModules
 	 */
 	public $descriptionlong;
 
-
 	// For exports
 
 	/**
@@ -251,7 +250,6 @@ class modDigiriskdolibarr extends DolibarrModules
 	 */
 	public $import_label;
 
-
 	/**
 	 * @var string Module constant name
 	 */
@@ -282,7 +280,6 @@ class modDigiriskdolibarr extends DolibarrModules
 	 * e.g.: "admin.php@module"
 	 */
 	public $config_page_url;
-
 
 	/**
 	 * @var string[] List of module class names that must be enabled if this module is enabled. e.g.: array('modAnotherModule', 'FR'=>'modYetAnotherModule')
@@ -320,7 +317,6 @@ class modDigiriskdolibarr extends DolibarrModules
 	 * array('always'='text') or array('FR'='text')
 	 */
 	public $warnings_activation_ext;
-
 
 	/**
 	 * @var array Minimum version of PHP required by module.
@@ -373,7 +369,7 @@ class modDigiriskdolibarr extends DolibarrModules
 		$this->descriptionlong = "Digirisk";
 		$this->editor_name     = 'Evarisk';
 		$this->editor_url      = 'https://evarisk.com';
-		$this->version         = '9.5.0';
+		$this->version         = '9.5.1';
 		$this->const_name      = 'MAIN_MODULE_' . strtoupper($this->name);
 		$this->picto           = 'digiriskdolibarr@digiriskdolibarr';
 
@@ -424,6 +420,7 @@ class modDigiriskdolibarr extends DolibarrModules
 		$this->dirs = array(
 			"/digiriskdolibarr/riskassessment",
 			"/digiriskdolibarr/accident",
+			"/digiriskdolibarr/ticketstats",
 			"/ecm/digiriskdolibarr",
 			"/ecm/digiriskdolibarr/riskassessmentdocument",
 			"/ecm/digiriskdolibarr/legaldisplay",
@@ -461,6 +458,9 @@ class modDigiriskdolibarr extends DolibarrModules
 			2 => array('DIGIRISKDOLIBAR_GENERAL_RULES', 'chaine', '', 'General rules', 0, 'current'),
 			3 => array('DIGIRISKDOLIBAR_IDCC_DICTIONNARY', 'chaine', '', 'IDCC of company', 0, 'current'),
 			4 => array('DIGIRISKDOLIBAR_SOCIETY_DESCRIPTION', 'chaine', '', '', 0, 'current'),
+			5 => array('DIGIRISKDOLIBARR_PEE_ENABLED', 'integer', 0, '', 0, 'current'),
+			6 => array('DIGIRISKDOLIBARR_PERCO_ENABLED', 'integer', 0, '', 0, 'current'),
+			6 => array('DIGIRISKDOLIBARR_HOLDING_AGREEMENT', 'chaine', '', '', 0, 'current'),
 
 			// CONST RISK ASSESSMENTDOCUMENT
 			10 => array('DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_AUDIT_START_DATE', 'date', '', '', 0, 'current'),
@@ -507,6 +507,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			62 => array('DIGIRISKDOLIBARR_LISTINGRISKSACTION_ADDON_ODT_PATH', 'chaine', 'DOL_DOCUMENT_ROOT/custom/digiriskdolibarr/documents/doctemplates/listingrisksaction/', '', 0, 'current'),
 			63 => array('DIGIRISKDOLIBARR_LISTINGRISKSACTION_CUSTOM_ADDON_ODT_PATH', 'chaine', 'DOL_DATA_ROOT/ecm/digiriskdolibarr/listingrisksaction/', '', 0, 'current'),
 			64 => array('DIGIRISKDOLIBARR_LISTINGRISKSACTION_DEFAULT_MODEL', 'chaine', 'listingrisksaction_odt', '', 0, 'current'),
+			65 => array('DIGIRISKDOLIBARR_LISTINGRISKSACTION_SHOW_TASK_DONE', 'integer', 1, '', 0, 'current'),
 
 			// CONST LISTING RISKS PHOTO
 			70 => array('MAIN_AGENDA_ACTIONAUTO_LISTINGRISKSPHOTO_CREATE', 'integer', 1, '', 0, 'current'),
@@ -521,6 +522,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			82 => array('DIGIRISKDOLIBARR_GROUPMENTDOCUMENT_ADDON_ODT_PATH', 'chaine', 'DOL_DOCUMENT_ROOT/custom/digiriskdolibarr/documents/doctemplates/groupmentdocument/', '', 0, 'current'),
 			83 => array('DIGIRISKDOLIBARR_GROUPMENTDOCUMENT_CUSTOM_ADDON_ODT_PATH', 'chaine', ' DOL_DATA_ROOT/ecm/digiriskdolibarr/groupmentdocument/', '', 0, 'current'),
 			84 => array('DIGIRISKDOLIBARR_GROUPMENTDOCUMENT_DEFAULT_MODEL', 'chaine', 'groupmentdocument_odt', '', 0, 'current'),
+			85 => array('DIGIRISKDOLIBARR_GROUPMENTDOCUMENT_SHOW_TASK_DONE', 'integer', 1, '', 0, 'current'),
 
 			// CONST WORKUNIT DOCUMENT
 			90 => array('MAIN_AGENDA_ACTIONAUTO_WORKUNITDOCUMENT_CREATE', 'integer', 1, '', 0, 'current'),
@@ -528,6 +530,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			92 => array('DIGIRISKDOLIBARR_WORKUNITDOCUMENT_ADDON_ODT_PATH', 'chaine', 'DOL_DOCUMENT_ROOT/custom/digiriskdolibarr/documents/doctemplates/workunitdocument/', '', 0, 'current'),
 			93 => array('DIGIRISKDOLIBARR_WORKUNITDOCUMENT_CUSTOM_ADDON_ODT_PATH', 'chaine', 'DOL_DATA_ROOT/ecm/digiriskdolibarr/workunitdocument/', '', 0, 'current'),
 			94 => array('DIGIRISKDOLIBARR_WORKUNITDOCUMENT_DEFAULT_MODEL', 'chaine', 'workunitdocument_odt', '', 0, 'current'),
+			95 => array('DIGIRISKDOLIBARR_WORKUNITDOCUMENT_SHOW_TASK_DONE', 'integer', 1, '', 0, 'current'),
 
 			// CONST PREVENTION PLAN
 			100 => array('MAIN_AGENDA_ACTIONAUTO_PREVENTIONPLAN_CREATE', 'integer', 1, '', 0, 'current'),
@@ -590,14 +593,15 @@ class modDigiriskdolibarr extends DolibarrModules
 			187 => array('DIGIRISKDOLIBARR_SHOW_RISKS', 'integer', 1, '', 0, 'current'),
 			188 => array('DIGIRISKDOLIBARR_SHOW_INHERITED_RISKS', 'integer', 0, '', 0, 'current'),
 			189 => array('DIGIRISKDOLIBARR_SHOW_SHARED_RISKS', 'integer', 0, '', 0, 'current'),
+			190 => array('DIGIRISKDOLIBARR_SHOW_RISK_ORIGIN', 'integer', 1, '', 0, 'current'),
 
 			// CONST RISK ASSESSMENT
-			190 => array('MAIN_AGENDA_ACTIONAUTO_RISKASSESSMENT_CREATE', 'integer', 1, '', 0, 'current'),
 			191 => array('DIGIRISKDOLIBARR_RISKASSESSMENT_ADDON', 'chaine', 'mod_riskassessment_standard', '', 0, 'current'),
 			192 => array('DIGIRISKDOLIBARR_MULTIPLE_RISKASSESSMENT_METHOD', 'integer', 0, '', 0, 'current'),
 			193 => array('DIGIRISKDOLIBARR_ADVANCED_RISKASSESSMENT_METHOD', 'integer', 0, '', 0, 'current'),
 			194 => array('DIGIRISKDOLIBARR_SHOW_RISKASSESSMENT_DATE', 'integer', 0, '', 0, 'current'),
 			195 => array('DIGIRISKDOLIBARR_SHOW_ALL_RISKASESSMENTS', 'integer', 0, '', 0, 'current'),
+			196 => array('MAIN_AGENDA_ACTIONAUTO_RISKASSESSMENT_CREATE', 'integer', 1, '', 0, 'current'),
 
 			// CONST RISK SIGN
 			200 => array('MAIN_AGENDA_ACTIONAUTO_RISKSIGN_CREATE', 'integer', 1, '', 0, 'current'),
@@ -1065,7 +1069,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			'fk_menu'  => 'fk_mainmenu=digiriskdolibarr', // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
 			'type'     => 'left', // This is a Top menu entry
 			'titre'    => $langs->trans('Digirisk'),
-			'prefix'   => '<i class="fas fa-home"></i>  ',
+			'prefix'   => '<i class="fas fa-home pictofixedwidth"></i>  ',
 			'mainmenu' => 'digiriskdolibarr',
 			'leftmenu' => '',
 			'url'      => '/digiriskdolibarr/digiriskdolibarrindex.php',
@@ -1081,7 +1085,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			'fk_menu'  => 'fk_mainmenu=digiriskdolibarr',	    		// '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
 			'type'     => 'left', 										// This is a Left menu entry
 			'titre'    => $langs->trans('RiskAssessmentDocument'),
-			'prefix'   => '<i class="fas fa-exclamation-triangle"></i>  ',
+			'prefix'   => '<i class="fas fa-exclamation-triangle pictofixedwidth"></i>  ',
 			'mainmenu' => 'digiriskdolibarr',
 			'leftmenu' => 'digiriskstandard',
 			'url'      => '/digiriskdolibarr/view/digiriskstandard/digiriskstandard_card.php?id=' . $conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD,
@@ -1097,7 +1101,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			'fk_menu'  => 'fk_mainmenu=digiriskdolibarr',	    		// '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
 			'type'     => 'left', 										// This is a Left menu entry
 			'titre'    => $langs->trans('Arborescence'),
-			'prefix'   => '<i class="fas fa-network-wired"></i>  ',
+			'prefix'   => '<i class="fas fa-network-wired pictofixedwidth"></i>  ',
 			'mainmenu' => 'digiriskdolibarr',
 			'leftmenu' => 'digiriskstandard',
 			'url'      => '/digiriskdolibarr/view/digiriskelement/digiriskelement_organization.php',
@@ -1113,7 +1117,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			'fk_menu'  => 'fk_mainmenu=digiriskdolibarr',	    // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
 			'type'     => 'left',			                // This is a Left menu entry
 			'titre'    => $langs->trans('RiskList'),
-			'prefix'   => '<i class="fas fa-list"></i>  ',
+			'prefix'   => '<i class="fas fa-list pictofixedwidth"></i>  ',
 			'mainmenu' => 'digiriskdolibarr',
 			'leftmenu' => 'digirisklistingrisk',
 			'url'      => '/digiriskdolibarr/view/digiriskelement/risk_list.php',
@@ -1129,7 +1133,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			'fk_menu'  => 'fk_mainmenu=digiriskdolibarr',	    // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
 			'type'     => 'left',			                // This is a Left menu entry
 			'titre'    => $langs->transnoentities('PreventionPlan'),
-			'prefix'   => '<i class="fas fa-info"></i>  ',
+			'prefix'   => '<i class="fas fa-info pictofixedwidth"></i>  ',
 			'mainmenu' => 'digiriskdolibarr',
 			'leftmenu' => 'digiriskpreventionplan',
 			'url'      => '/digiriskdolibarr/view/preventionplan/preventionplan_list.php',
@@ -1145,7 +1149,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			'fk_menu'  => 'fk_mainmenu=digiriskdolibarr',	    // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
 			'type'     => 'left',			                // This is a Left menu entry
 			'titre'    => $langs->trans('FirePermit'),
-			'prefix'   => '<i class="fas fa-fire-alt"></i>  ',
+			'prefix'   => '<i class="fas fa-fire-alt pictofixedwidth"></i>  ',
 			'mainmenu' => 'digiriskdolibarr',
 			'leftmenu' => 'digiriskfirepermit',
 			'url'      => '/digiriskdolibarr/view/firepermit/firepermit_list.php',
@@ -1161,7 +1165,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			'fk_menu'  => 'fk_mainmenu=digiriskdolibarr',	    // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
 			'type'     => 'left',			                // This is a Left menu entry
 			'titre'    => $langs->trans('Accident'),
-			'prefix'   => '<i class="fas fa-user-injured"></i>  ',
+			'prefix'   => '<i class="fas fa-user-injured pictofixedwidth"></i>  ',
 			'mainmenu' => 'digiriskdolibarr',
 			'leftmenu' => 'digiriskaccident',
 			'url'      => '/digiriskdolibarr/view/accident/accident_list.php',
@@ -1177,7 +1181,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			'fk_menu' => 'fk_mainmenu=digiriskdolibarr',	    // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
 			'type'     => 'left',			                // This is a Left menu entry
 			'titre'    =>  $langs->trans('Users'),
-			'prefix'   => '<i class="fas fa-user"></i>  ',
+			'prefix'   => '<i class="fas fa-user pictofixedwidth"></i>  ',
 			'mainmenu' => 'digiriskdolibarr',
 			'leftmenu' => 'digiriskusers',
 			'url'      => '/digiriskdolibarr/view/digiriskusers.php',
@@ -1193,7 +1197,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			'fk_menu'  => 'fk_mainmenu=digiriskdolibarr',	    // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
 			'type'     => 'left',			                // This is a Left menu entry
 			'titre'    => $langs->trans('ActionPlan'),
-			'prefix'   => '<i class="fas fa-tasks"></i>  ',
+			'prefix'   => '<i class="fas fa-tasks pictofixedwidth"></i>  ',
 			'mainmenu' => 'digiriskdolibarr',
 			'leftmenu' => 'digiriskactionplan',
 			'url'      => '/projet/tasks.php?id=' . $conf->global->DIGIRISKDOLIBARR_DU_PROJECT,
@@ -1209,7 +1213,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			'fk_menu'  => 'fk_mainmenu=digiriskdolibarr',	    // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
 			'type'     => 'left',			                // This is a Left menu entry
 			'titre'    => $langs->trans('Tools'),
-			'prefix'   => '<i class="fas fa-wrench"></i>  ',
+			'prefix'   => '<i class="fas fa-wrench pictofixedwidth"></i>  ',
 			'mainmenu' => 'digiriskdolibarr',
 			'leftmenu' => 'digirisktools',
 			'url'      => '/digiriskdolibarr/view/digirisktools.php',
@@ -1225,14 +1229,14 @@ class modDigiriskdolibarr extends DolibarrModules
 			'fk_menu'  => 'fk_mainmenu=digiriskdolibarr',	    // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
 			'type'     => 'left',			                // This is a Left menu entry
 			'titre'    => $langs->trans('DigiriskConfig'),
-			'prefix'   => '<i class="fas fa-cog"></i>  ',
+			'prefix'   => '<i class="fas fa-cog pictofixedwidth"></i>  ',
 			'mainmenu' => 'digiriskdolibarr',
 			'leftmenu' => 'digiriskconfig',
 			'url'      => '/digiriskdolibarr/admin/setup.php',
 			'langs'    => 'digiriskdolibarr@digiriskdolibarr',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
 			'position' => 48520 + $r,
 			'enabled'  => '$conf->digiriskdolibarr->enabled',  // Define condition to show or hide menu entry. Use '$conf->digiriskdolibarr->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
-			'perms'    => '$user->rights->digiriskdolibarr->adminpage->read',			                // Use 'perms'=>'$user->rights->digiriskdolibarr->level1->level2' if you want your menu with a permission rules
+			'perms'    => '$user->rights->digiriskdolibarr->adminpage->read && $user->admin',			                // Use 'perms'=>'$user->rights->digiriskdolibarr->level1->level2' if you want your menu with a permission rules
 			'target'   => '',
 			'user'     => 0,				                // 0=Menu for internal users, 1=external users, 2=both
 		);
@@ -1241,7 +1245,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			'fk_menu'  => 'fk_mainmenu=digiriskdolibarr',	    // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
 			'type'     => 'left',			                // This is a Left menu entry
 			'titre'    => $langs->transnoentities('DigiriskConfigSociety'),
-			'prefix'   => '<i class="fas fa-building"></i> ',
+			'prefix'   => '<i class="fas fa-building pictofixedwidth"></i> ',
 			'mainmenu' => 'digiriskdolibarr',
 			'leftmenu' => 'digirisksocietyconfig',
 			'url'      => '/admin/company.php',
@@ -1256,8 +1260,24 @@ class modDigiriskdolibarr extends DolibarrModules
 		$this->menu[$r++] = array(
 			'fk_menu'  => 'fk_mainmenu=digiriskdolibarr',	    // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
 			'type'     => 'left',			                // This is a Left menu entry
+			'titre'    => $langs->transnoentities('TicketPublicInterface'),
+			'prefix'   => '<i class="fa fa-ticket pictofixedwidth"></i> ',
+			'mainmenu' => 'digiriskdolibarr',
+			'leftmenu' => '',
+			'url'      => '/custom/digiriskdolibarr/public/ticket/create_ticket.php?entity=' . $conf->entity,
+			'langs'    => '',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
+			'position' => 48520 + $r,
+			'enabled'  => '$conf->digiriskdolibarr->enabled && $conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE',  // Define condition to show or hide menu entry. Use '$conf->digiriskdolibarr->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
+			'perms'    => 1,			                // Use 'perms'=>'$user->rights->digiriskdolibarr->level1->level2' if you want your menu with a permission rules
+			'target'   => '',
+			'user'     => 0,				                // 0=Menu for internal users, 1=external users, 2=both
+		);
+
+		$this->menu[$r++] = array(
+			'fk_menu'  => 'fk_mainmenu=digiriskdolibarr',	    // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
+			'type'     => 'left',			                // This is a Left menu entry
 			'titre'    => $langs->transnoentities('MinimizeMenu'),
-			'prefix'   => '<i class="fas fa-chevron-circle-left"></i> ',
+			'prefix'   => '<i class="fas fa-chevron-circle-left pictofixedwidth"></i> ',
 			'mainmenu' => 'digiriskdolibarr',
 			'leftmenu' => '',
 			'url'      => '',
@@ -1275,8 +1295,8 @@ class modDigiriskdolibarr extends DolibarrModules
 			'titre'    => $langs->transnoentities('DashBoard'),
 			'prefix'   => $pictoDigirisk,
 			'mainmenu' => 'ticket',
-			'leftmenu' => 'dashboardticket',
-			'url'      => '/digiriskdolibarr/view/dashboard_ticket.php',
+			'leftmenu' => 'ticketstats',
+			'url'      => '/digiriskdolibarr/view/ticket/ticketstats.php',
 			'langs'    => 'digiriskdolibarr@digiriskdolibarr',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
 			'position' => 48520 + $r,
 			'enabled'  => '$conf->digiriskdolibarr->enabled && $conf->ticket->enabled',  // Define condition to show or hide menu entry. Use '$conf->digiriskdolibarr->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
@@ -1284,6 +1304,22 @@ class modDigiriskdolibarr extends DolibarrModules
 			'target'   => '',
 			'user'     => 0,				                // 0=Menu for internal users, 1=external users, 2=both
 		);
+
+//		$this->menu[$r++] = array(
+//			'fk_menu'  => 'fk_mainmenu=ticket',	    // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
+//			'type'     => 'left',			                // This is a Left menu entry
+//			'titre'    => $langs->transnoentities('DashBoard'),
+//			'prefix'   => $pictoDigirisk,
+//			'mainmenu' => 'ticket',
+//			'leftmenu' => 'dashboardticket',
+//			'url'      => '/digiriskdolibarr/view/ticket/dashboard_ticket.php',
+//			'langs'    => 'digiriskdolibarr@digiriskdolibarr',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
+//			'position' => 48520 + $r,
+//			'enabled'  => '$conf->digiriskdolibarr->enabled && $conf->ticket->enabled',  // Define condition to show or hide menu entry. Use '$conf->digiriskdolibarr->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
+//			'perms'    => '$user->rights->ticket->read && $user->rights->digiriskdolibarr->lire', // Use 'perms'=>'$user->rights->digiriskdolibarr->level1->level2' if you want your menu with a permission rules
+//			'target'   => '',
+//			'user'     => 0,				                // 0=Menu for internal users, 1=external users, 2=both
+//		);
 
 		// Exports profiles provided by this module
 		$r = 1;
@@ -1694,6 +1730,8 @@ class modDigiriskdolibarr extends DolibarrModules
 
 		// Create extrafields during init
 		include_once DOL_DOCUMENT_ROOT . '/core/class/extrafields.class.php';
+		require_once __DIR__ . '/../../lib/digiriskdolibarr_function.lib.php';
+
 		$extra_fields = new ExtraFields($this->db);
 
 		$extra_fields->update('fk_risk', $langs->transnoentities("RiskLinked"), 'sellist', '', 'projet_task', 0, 0, 1010, 'a:1:{s:7:"options";a:1:{s:50:"digiriskdolibarr_risk:ref:rowid::entity = $ENTITY$";N;}}', '', '', 1);
@@ -1713,14 +1751,22 @@ class modDigiriskdolibarr extends DolibarrModules
 				$entities = $object->getEntitiesList(false, false, true, true);
 				foreach ($entities as $sub_entity => $entity_name) {
 					$conf->setEntityValues($this->db, $sub_entity);
-					$extra_fields->delete('digiriskdolibarr_ticket_firstname', 'ticket');
-					$extra_fields->delete('digiriskdolibarr_ticket_lastname', 'ticket');
-					$extra_fields->delete('digiriskdolibarr_ticket_phone', 'ticket');
-					$extra_fields->delete('digiriskdolibarr_ticket_service', 'ticket');
-					$extra_fields->delete('digiriskdolibarr_ticket_location', 'ticket');
-					$extra_fields->delete('digiriskdolibarr_ticket_date', 'ticket');
+
+					extrafield_soft_delete('digiriskdolibarr_ticket_firstname', 'ticket', $extra_fields);
+					extrafield_soft_delete('digiriskdolibarr_ticket_lastname', 'ticket', $extra_fields);
+					extrafield_soft_delete('digiriskdolibarr_ticket_phone', 'ticket', $extra_fields);
+					extrafield_soft_delete('digiriskdolibarr_ticket_service', 'ticket', $extra_fields);
+					extrafield_soft_delete('digiriskdolibarr_ticket_location', 'ticket', $extra_fields);
+					extrafield_soft_delete('digiriskdolibarr_ticket_date', 'ticket', $extra_fields);
 				}
 				$conf->setEntityValues($this->db, $current_entity);
+			} else {
+				extrafield_soft_delete('digiriskdolibarr_ticket_firstname', 'ticket', $extra_fields);
+				extrafield_soft_delete('digiriskdolibarr_ticket_lastname', 'ticket', $extra_fields);
+				extrafield_soft_delete('digiriskdolibarr_ticket_phone', 'ticket', $extra_fields);
+				extrafield_soft_delete('digiriskdolibarr_ticket_service', 'ticket', $extra_fields);
+				extrafield_soft_delete('digiriskdolibarr_ticket_location', 'ticket', $extra_fields);
+				extrafield_soft_delete('digiriskdolibarr_ticket_date', 'ticket', $extra_fields);
 			}
 
 			$extra_fields->addExtraField('digiriskdolibarr_ticket_lastname', $langs->transnoentities("LastName"), 'varchar', 2000, 255, 'ticket', 0, 0, '', '', 1, '', 1, '', '', 0);

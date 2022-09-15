@@ -374,27 +374,46 @@ class doc_workunitdocument_odt extends ModeleODTWorkUnitDocument
 			try {
 				$foundtagforlines = 1;
 				if ($foundtagforlines) {
-					$risk = new Risk($this->db);
+					$risk      = new Risk($this->db);
+					$evaluator = new Evaluator($this->db);
+					$user      = new User($this->db);
+					$risksign  = new RiskSign($this->db);
+					$accident  = new Accident($this->db);
+
 					if ( ! empty($digiriskelement) ) {
+						//Fill risks data
 						$risks = $risk->fetchRisksOrderedByCotation($digiriskelement->id, false, $conf->global->DIGIRISKDOLIBARR_SHOW_INHERITED_RISKS, $conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS);
 						for ($i = 1; $i <= 4; $i++ ) {
 							$listlines = $odfHandler->setSegment('risq' . $i);
-							if ($risks > 0 && ! empty($risks)) {
+							if (is_array($risks) && ! empty($risks)) {
 								foreach ($risks as $line) {
 									$tmparray['actionPreventionUncompleted'] = "";
 									$tmparray['actionPreventionCompleted']   = "";
+									$lastEvaluation = $line->lastEvaluation;
 
-									$evaluation     = new RiskAssessment($this->db);
-									$lastEvaluation = $evaluation->fetchFromParent($line->id, 1);
-
-									if ($lastEvaluation > 0 && ! empty($lastEvaluation) && is_array($lastEvaluation)) {
-										$lastEvaluation = array_shift($lastEvaluation);
+									if ($lastEvaluation->cotation > 0 && ! empty($lastEvaluation) && is_object($lastEvaluation)) {
 										$scale          = $lastEvaluation->get_evaluation_scale();
 
 										if ($scale == $i) {
 											$element = new DigiriskElement($this->db);
+											$linked_element = new DigiriskElement($this->db);
 											$element->fetch($line->fk_element);
-											$tmparray['nomElement']            = (!empty($conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS) ? 'S' . $element->entity . ' - ' : '') . $element->ref . ' - ' . $element->label;
+											$linked_element->fetch($line->appliedOn);
+
+											if ($conf->global->DIGIRISKDOLIBARR_SHOW_RISK_ORIGIN) {
+												$nomElement = (!empty($conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS) ? 'S' . $element->entity . ' - ' : '') . $element->ref . ' - ' . $element->label;
+												if ($line->fk_element != $line->appliedOn) {
+													$nomElement .=  "\n" . $langs->trans('AppliedOn') . ' ' . $linked_element->ref . ' - ' . $linked_element->label;
+												}
+											} else {
+												if ($linked_element->id > 0) {
+													$nomElement =  "\n" . $linked_element->ref . ' - ' . $linked_element->label;
+												} else {
+													$nomElement =  "\n" . $element->ref . ' - ' . $element->label;
+												}
+											}
+
+											$tmparray['nomElement']            = $nomElement;
 											$tmparray['nomDanger']             = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $line->get_danger_category($line) . '.png';
 											$tmparray['nomPicto']              = $line->get_danger_category_name($line);
 											$tmparray['identifiantRisque']     = $line->ref . ' - ' . $lastEvaluation->ref;
@@ -428,17 +447,21 @@ class doc_workunitdocument_odt extends ModeleODTWorkUnitDocument
 													}
 
 													if ($related_task->progress == 100) {
-														$tmparray['actionPreventionCompleted'] .= $langs->trans('Ref') . ' : ' . ($related_task->ref ?: $langs->trans('NoData')) .  "\n";
-														$tmparray['actionPreventionCompleted'] .= $langs->trans('Responsible') . ' : ' . ($responsible ?: $langs->trans('NoData')) . "\n";
-														$tmparray['actionPreventionCompleted'] .= $langs->trans('DateStart') . ' : ' . dol_print_date((($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_START_DATE && ( ! empty($related_task->date_start))) ? $related_task->date_start : $related_task->date_c), 'dayreduceformat') . ' - ' . $langs->trans('Deadline') . ' : ' . (($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_END_DATE && ( ! empty($related_task->date_end))) ? ' - ' . dol_print_date($related_task->date_end, 'dayreduceformat') : $langs->trans('NoData')) . "\n";
-														if (strcmp($related_task->budget_amount, '')) {
-															$tmparray['actionPreventionCompleted'] .= $langs->trans('Budget') . ' : ' . price($related_task->budget_amount, 0, $langs, 1, 0, 0, $conf->currency) . "\n";
+														if ($conf->global->DIGIRISKDOLIBARR_WORKUNITDOCUMENT_SHOW_TASK_DONE > 0) {
+															$tmparray['actionPreventionCompleted'] .= $langs->trans('Ref') . ' : ' . ($related_task->ref ?: $langs->trans('NoData')) .  "\n";
+															$tmparray['actionPreventionCompleted'] .= $langs->trans('Responsible') . ' : ' . ($responsible ?: $langs->trans('NoData')) . "\n";
+															$tmparray['actionPreventionCompleted'] .= $langs->trans('DateStart') . ' : ' . dol_print_date((($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_START_DATE && ( ! empty($related_task->date_start))) ? $related_task->date_start : $related_task->date_c), 'dayreduceformat') . ' - ' . $langs->trans('Deadline') . ' : ' . (($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_END_DATE && ( ! empty($related_task->date_end))) ? ' - ' . dol_print_date($related_task->date_end, 'dayreduceformat') : $langs->trans('NoData')) . "\n";
+															if (strcmp($related_task->budget_amount, '')) {
+																$tmparray['actionPreventionCompleted'] .= $langs->trans('Budget') . ' : ' . price($related_task->budget_amount, 0, $langs, 1, 0, 0, $conf->currency) . "\n";
+															} else {
+																$tmparray['actionPreventionCompleted'] .= $langs->trans('Budget') . ' : ' . $langs->trans('NoData') . "\n";
+															}
+															$tmparray['actionPreventionCompleted'] .= $langs->trans('ContactsAction') . ' : ' . ($AllInitiales ?: $langs->trans('NoData')) . "\n";
+															$tmparray['actionPreventionCompleted'] .= $langs->trans('Label') . ' : ' . ($related_task->label ?: $langs->trans('NoData')) . "\n";
+															$tmparray['actionPreventionCompleted'] .= $langs->trans('Description') . ' : ' . ($related_task->description ?: $langs->trans('NoData')). "\n\n";
 														} else {
-															$tmparray['actionPreventionCompleted'] .= $langs->trans('Budget') . ' : ' . $langs->trans('NoData') . "\n";
+															$tmparray['actionPreventionCompleted'] = $langs->transnoentities('ActionPreventionCompletedTaskDone');
 														}
-														$tmparray['actionPreventionCompleted'] .= $langs->trans('ContactsAction') . ' : ' . ($AllInitiales ?: $langs->trans('NoData')) . "\n";
-														$tmparray['actionPreventionCompleted'] .= $langs->trans('Label') . ' : ' . ($related_task->label ?: $langs->trans('NoData')) . "\n";
-														$tmparray['actionPreventionCompleted'] .= $langs->trans('Description') . ' : ' . ($related_task->description ?: $langs->trans('NoData')). "\n\n";
 													} else {
 														$tmparray['actionPreventionUncompleted'] .= $langs->trans('Ref') . ' : ' . ($related_task->ref ?: $langs->trans('NoData')) . "\n";
 														$tmparray['actionPreventionUncompleted'] .= $langs->trans('Responsible') . ' : ' . ($responsible ?: $langs->trans('NoData')) . "\n";
@@ -513,15 +536,11 @@ class doc_workunitdocument_odt extends ModeleODTWorkUnitDocument
 							}
 							$odfHandler->mergeSegment($listlines);
 						}
-					}
 
-					$evaluator = new Evaluator($this->db);
-					$user      = new User($this->db);
-
-					if ( ! empty($digiriskelement) ) {
+						//Fill evaluators data
 						$evaluators = $evaluator->fetchFromParent($digiriskelement->id);
 						$listlines = $odfHandler->setSegment('utilisateursPresents');
-						if ($evaluators !== -1) {
+						if (is_array($evaluators) && !empty($evaluators)) {
 							foreach ($evaluators as $line) {
 								$element = new DigiriskElement($this->db);
 								$element->fetch($line->fk_element);
@@ -530,7 +549,7 @@ class doc_workunitdocument_odt extends ModeleODTWorkUnitDocument
 								$tmparray['nomElement']                 = (!empty($conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_EVALUATORS) ? 'S' . $element->entity . ' - ' : '') . $element->ref . ' - ' . $element->label;
 								$tmparray['idUtilisateur']              = $line->ref;
 								$tmparray['dateAffectationUtilisateur'] = dol_print_date($line->assignment_date, '%d/%m/%Y');
-								$tmparray['dureeEntretien']             = $line->duration;
+								$tmparray['dureeEntretien']             = $line->duration . ' mins';
 								$tmparray['nomUtilisateur']             = $user->lastname;
 								$tmparray['prenomUtilisateur']          = $user->firstname;
 
@@ -559,58 +578,54 @@ class doc_workunitdocument_odt extends ModeleODTWorkUnitDocument
 							}
 						}
 						$odfHandler->mergeSegment($listlines);
-					}
 
-					$risksign = new RiskSign($this->db);
-
-					if ( ! empty($digiriskelement) ) {
+						//Fill risk signs data
 						$risksigns = $risksign->fetchRiskSign($digiriskelement->id, $conf->global->DIGIRISKDOLIBARR_SHOW_INHERITED_RISKSIGNS, $conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKSIGNS);
 						$listlines = $odfHandler->setSegment('affectedRecommandation');
-						if ($risksigns !== -1) {
+						if (is_array($risksigns) && !empty($risksigns)) {
 							foreach ($risksigns as $line) {
-								$element = new DigiriskElement($this->db);
-								$element->fetch($line->fk_element);
-								$path = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/img/';
+								if ($line->id > 0) {
+									$element = new DigiriskElement($this->db);
+									$element->fetch($line->fk_element);
+									$path = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/img/';
 
-								$tmparray['nomElement']                = (!empty($conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKSIGNS) ? 'S' . $element->entity . ' - ' : '') . $element->ref . ' - ' . $element->label;
-								$tmparray['recommandationIcon']        = $path . '/' . $risksign->get_risksign_category($line);
-								$tmparray['identifiantRecommandation'] = $line->ref;
-								$tmparray['recommandationName']        = $line->get_risksign_category($line, 'name');
-								$tmparray['recommandationComment']     = $line->description;
+									$tmparray['nomElement']                = (!empty($conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKSIGNS) ? 'S' . $element->entity . ' - ' : '') . $element->ref . ' - ' . $element->label;
+									$tmparray['recommandationIcon']        = $path . '/' . $risksign->get_risksign_category($line);
+									$tmparray['identifiantRecommandation'] = $line->ref;
+									$tmparray['recommandationName']        = $line->get_risksign_category($line, 'name');
+									$tmparray['recommandationComment']     = $line->description;
 
-								unset($tmparray['object_fields']);
+									unset($tmparray['object_fields']);
 
-								complete_substitutions_array($tmparray, $outputlangs, $object, $line, "completesubstitutionarray_lines");
-								// Call the ODTSubstitutionLine hook
-								$parameters = array('odfHandler' => &$odfHandler, 'file' => $file, 'object' => $object, 'outputlangs' => $outputlangs, 'substitutionarray' => &$tmparray, 'line' => $line);
-								$hookmanager->executeHooks('ODTSubstitutionLine', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
-								foreach ($tmparray as $key => $val) {
-									try {
-										if (file_exists($val)) {
-											$listlines->setImage($key, $val);
-										} elseif (empty($val)) {
-											$listlines->setVars($key, $langs->trans('NoData'), true, 'UTF-8');
-										} else {
-											$listlines->setVars($key, html_entity_decode($val, ENT_QUOTES | ENT_HTML5), true, 'UTF-8');
+									complete_substitutions_array($tmparray, $outputlangs, $object, $line, "completesubstitutionarray_lines");
+									// Call the ODTSubstitutionLine hook
+									$parameters = array('odfHandler' => &$odfHandler, 'file' => $file, 'object' => $object, 'outputlangs' => $outputlangs, 'substitutionarray' => &$tmparray, 'line' => $line);
+									$hookmanager->executeHooks('ODTSubstitutionLine', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
+									foreach ($tmparray as $key => $val) {
+										try {
+											if (file_exists($val)) {
+												$listlines->setImage($key, $val);
+											} elseif (empty($val)) {
+												$listlines->setVars($key, $langs->trans('NoData'), true, 'UTF-8');
+											} else {
+												$listlines->setVars($key, html_entity_decode($val, ENT_QUOTES | ENT_HTML5), true, 'UTF-8');
+											}
+										} catch (OdfException $e) {
+											dol_syslog($e->getMessage(), LOG_INFO);
+										} catch (SegmentException $e) {
+											dol_syslog($e->getMessage(), LOG_INFO);
 										}
-									} catch (OdfException $e) {
-										dol_syslog($e->getMessage(), LOG_INFO);
-									} catch (SegmentException $e) {
-										dol_syslog($e->getMessage(), LOG_INFO);
 									}
+									$listlines->merge();
 								}
-								$listlines->merge();
 							}
 						}
 						$odfHandler->mergeSegment($listlines);
-					}
 
-					$accident = new Accident($this->db);
-
-					if ( ! empty($digiriskelement) ) {
+						//Fill acidents data
 						$accidents = $accident->fetchFromParent($digiriskelement->id);
 						$listlines = $odfHandler->setSegment('affectedAccident');
-						if ($accidents !== -1) {
+						if (is_array($accidents) && !empty($accidents)) {
 							foreach ($accidents as $line) {
 								$filearray = dol_dir_list($conf->digiriskdolibarr->multidir_output[$conf->entity] . '/' . $line->element . '/' . $line->ref . '/thumbs/', "files", 0, '', '(\.odt|_preview.*\.png)$', 'position_name', 'desc', 1);
 								if (count($filearray)) {

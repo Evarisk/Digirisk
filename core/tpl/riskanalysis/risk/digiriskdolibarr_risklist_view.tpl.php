@@ -4,7 +4,7 @@
 	require './../../class/actions_changeselectedfields.php';
 
 	print '<div class="fichecenter risklist wpeo-wrap">';
-	print '<form method="POST" id="searchFormListRisks" enctype="multipart/form-data" action="' . $_SERVER["PHP_SELF"] . (($contextpage != 'risklist') ? '?id=' . $object->id : '') . '">' . "\n";
+	print '<form method="POST" id="searchFormListRisks" enctype="multipart/form-data" action="' . $_SERVER["PHP_SELF"] . ($object->element == 'digiriskelement' ? '?id=' . $object->id : '') . '">' . "\n";
 	print '<input type="hidden" name="token" value="' . newToken() . '">';
 	print '<input type="hidden" name="formfilteraction" id="formfilteraction" value="list">';
 	print '<input type="hidden" name="action" value="list">';
@@ -222,6 +222,11 @@
 		<div class="wpeo-notice notice-warning riskassessment-task-delete-error-notice">
 			<div class="notice-content">
 				<div class="notice-title"><?php echo $langs->trans('TaskNotDeleted') ?></div>
+				<div class="notice-subtitle">
+					<a href="">
+						<span class="text"></span>
+					</a>
+				</div>
 			</div>
 			<div class="notice-close"><i class="fas fa-times"></i></div>
 		</div>
@@ -311,7 +316,7 @@
 				$sql .= " AND fk_element !=" . $element_id;
 			}
 			$sql .= " AND fk_element > 0 ";
-			$sql .= " AND e.entity IN (" . getEntity($risk->element) . ") ";
+			$sql .= " AND e.entity IN (" . $conf->entity . ") ";
 		}
 
 		foreach ($search as $key => $val) {
@@ -409,7 +414,7 @@
 				$sql .= " AND r.fk_element !=" . $element_id;
 			}
 			$sql .= " AND r.fk_element > 0";
-			$sql .= " AND e.entity IN (" . getEntity($evaluation->element) . ")";
+			$sql .= " AND e.entity IN (" . $conf->entity . ")";
 		}
 
 		foreach ($search as $key => $val) {
@@ -910,7 +915,7 @@
 	$menuConf = 'MAIN_SELECTEDFIELDS_' . $varpage;
 
 	if (dol_strlen($user->conf->$menuConf) < 1) {
-		$user->conf->$menuConf = 't.ref,t.category,evaluation.cotation,';
+		$user->conf->$menuConf = ($contextpage == 'risklist' ? 't.fk_element' : '') . 't.ref,t.category,evaluation.cotation,';
 	}
 
 	if ( ! preg_match('/t.description/', $user->conf->$menuConf) && $conf->global->DIGIRISKDOLIBARR_RISK_DESCRIPTION) {
@@ -1266,6 +1271,3 @@
 	print '</div>' . "\n";
 	print '<!-- End div class="fichecenter" -->';
 
-	if ($contextpage != 'risklist') {
-		dol_fiche_end();
-	}

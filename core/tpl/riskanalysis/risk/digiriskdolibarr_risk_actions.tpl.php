@@ -451,9 +451,9 @@ if ( ! $error && $action == "deleteRiskAssessmentTask" && $permissiontodelete) {
 		header("Location: " . $urltogo);
 		exit;
 	} else {
-		// Delete $task KO
-		if ( ! empty($task->errors)) setEventMessages(null, $task->errors, 'errors');
-		else setEventMessages($task->error, null, 'errors');
+		// Delete task KO
+		header('HTTP/1.1 500 Internal Server Booboo');
+		die(json_encode(array('message' => $langs->transnoentities($task->error), 'code' => '1337')));
 	}
 }
 

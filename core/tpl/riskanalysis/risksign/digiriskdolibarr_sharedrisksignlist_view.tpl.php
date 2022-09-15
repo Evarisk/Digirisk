@@ -51,7 +51,7 @@ print '<input type="hidden" name="contextpage" value="' . $contextpage . '">';
 
 $digiriskelement    = new DigiriskElement($db);
 $digiriskelement->fetch($conf->global->DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH);
-$trashList = $digiriskelement->getTrashList();
+$trashList = $digiriskelement->getMultiEntityTrashList();
 $digiriskelementtmp = new DigiriskElement($db);
 $alldigiriskelement = $digiriskelementtmp->fetchAll('', '', 0, 0, array('customsql' => 'status > 0'), 'AND');
 
@@ -81,6 +81,9 @@ if ( ! $allRisks) {
 	$sql .= " AND el.fk_target = " . $id;
 	$sql .= " AND el.sourcetype = 'digiriskdolibarr_risksign'";
 	$sql .= " AND t.entity IN (" . getEntity($risksign->element) . ") ";
+	foreach ($trashList as $deleted_element => $element_id) {
+		$sql .= " AND fk_element !=" . $element_id;
+	}
 } else {
 	foreach ($trashList as $deleted_element => $element_id) {
 		$sql .= " AND fk_element !=" . $element_id;

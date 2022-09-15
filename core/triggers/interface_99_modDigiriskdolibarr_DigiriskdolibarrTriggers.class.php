@@ -72,7 +72,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 		$this->name        = preg_replace('/^Interface/i', '', get_class($this));
 		$this->family      = "demo";
 		$this->description = "Digiriskdolibarr triggers.";
-		$this->version     = '9.5.0';
+		$this->version     = '9.5.1';
 		$this->picto       = 'digiriskdolibarr@digiriskdolibarr';
 	}
 
@@ -831,9 +831,13 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 					//envoi du mail avec une trad puis avec un model
 					$error = 0;
 					$formmail = new FormMail($this->db);
-
 					$arraydefaultmessage = $formmail->getEMailTemplate($this->db, 'ticket_send', $user, $langs); // If $model_id is empty, preselect the first one
+
+					$table_element = $object->table_element;
+					$object->table_element = '';
 					$substitutionarray = getCommonSubstitutionArray($langs, 0, null,$object);
+					$object->table_element = $table_element;
+
 					complete_substitutions_array($substitutionarray, $langs, $object);
 
 					$subject = make_substitutions($arraydefaultmessage->topic,$substitutionarray);
@@ -946,7 +950,6 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 													$actioncomm->fk_element  = $object->id;
 													$actioncomm->userownerid = $user->id;
 													$actioncomm->percentage  = -1;
-
 													$actioncomm->create($user);
 													break;
 												}

@@ -97,16 +97,7 @@ if ($action == 'addAttendant') {
 	$object->fetch($id);
 	$extintervenant_ids = GETPOST('ext_intervenants');
 
-	//Check email of intervenants
-	if ( ! empty($extintervenant_ids) && $extintervenant_ids > 0) {
-		foreach ($extintervenant_ids as $extintervenant_id) {
-			$contact->fetch($extintervenant_id);
-			if ( ! dol_strlen($contact->email)) {
-				setEventMessages($langs->trans('ErrorNoEmailForExtIntervenant', $langs->transnoentitiesnoconv('ExtIntervenant')), null, 'errors');
-				$error++;
-			}
-		}
-	} else {
+	if (empty($extintervenant_ids) || $extintervenant_ids < 1) {
 		setEventMessages($langs->trans('ErrorNoAttendantSelected', $langs->transnoentitiesnoconv('ExtIntervenant')), null, 'errors');
 	}
 
@@ -184,6 +175,32 @@ if ($action == 'setAbsent') {
 if ($action == 'send') {
 	$signatoryID = GETPOST('signatoryID');
 	$signatory->fetch($signatoryID);
+
+	if (!dol_strlen($signatory->email)) {
+		if ($signatory->element_type == 'user') {
+			$usertmp = $user;
+			$usertmp->fetch($signatory->element_id);
+			if (dol_strlen($usertmp->email)) {
+				$signatory->email = $usertmp->email;
+				$signatory->update($user, true);
+			}
+		} else if ($signatory->element_type == 'socpeople') {
+			$contact->fetch($signatory->element_id);
+			if (dol_strlen($contact->email)) {
+				$signatory->email = $contact->email;
+				$signatory->update($user, true);
+			}
+		}
+	}
+
+	if (!dol_strlen($signatory->email)) {
+		setEventMessages($langs->trans('Attendant') . ' ' . $signatory->firstname . ' ' . $signatory->lastname . ' ' . $langs->trans('HasNoEmail'), null, 'errors');
+		$urltogo = str_replace('__ID__', $result, $backtopage);
+		$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
+		header("Location: " . $urltogo);
+		exit;
+	}
+
 
 	if ( ! $error) {
 		$langs->load('mails');
@@ -459,14 +476,6 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	print '<td class="center">' . $langs->trans("Signature") . '</td>';
 	print '</tr>';
 
-	$contacts          = fetchAllSocPeople('',  '',  0,  0, array('customsql' => "s.rowid = $element->id AND c.email IS NULL OR c.email = ''" ));
-	$contacts_no_email = array();
-	if (is_array($contacts) && ! empty($contacts) && $contacts > 0) {
-		foreach ($contacts as $element_id) {
-			$contacts_no_email[$element_id->id] = $element_id->id;
-		}
-	}
-
 	$already_selected_intervenants[$contact->id] = $contact->id;
 	$j                                           = 1;
 	if (is_array($ext_society_intervenants) && ! empty($ext_society_intervenants) && $ext_society_intervenants > 0) {
@@ -526,7 +535,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 			$ext_society = new StdClass();
 		}
 		print '<tr class="oddeven"><td class="maxwidth200">';
-		print digirisk_selectcontacts($ext_society->id, GETPOST('ext_intervenants'), 'ext_intervenants[]', 0, $contacts_no_email, '', 0, 'width200', false, 1, 0, array(), 'multiple', 'ext_intervenants', false, 0, $already_selected_intervenants);
+		print digirisk_selectcontacts($ext_society->id, GETPOST('ext_intervenants'), 'ext_intervenants[]', 0, '', '', 0, 'width200', false, 1, 0, array(), 'multiple', 'ext_intervenants', false, 0, $already_selected_intervenants);
 		print '</td>';
 		print '<td>' . $langs->trans("ExtSocietyIntervenants") . '</td>';
 		print '<td class="center">';

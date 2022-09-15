@@ -5,3 +5,4 @@ vendor
 .editorconfig
 .gitattributes
 digirisk-workflow
+package-lock.json

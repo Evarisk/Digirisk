@@ -65,13 +65,7 @@ if ( ! empty($id) && ! empty($action) && ! empty($htmlname)) {
 	$return                           = array();
 	if (empty($showempty)) $showempty = 0;
 
-	$contacts          = fetchAllSocPeople('',  '',  0,  0, array('customsql' => "s.rowid = $id AND c.email IS NULL OR c.email = ''" ));
-	$contacts_no_email = array();
-	if (is_array($contacts) && ! empty($contacts) && $contacts > 0) {
-		foreach ($contacts as $element) {
-			$contacts_no_email[$element->id] = $element->id;
-		}
-	}
+	$contacts          = fetchAllSocPeople('',  '',  0,  0, array('customsql' => "s.rowid = " . $id));
 
 	$return['value'] = digirisk_selectcontacts($id, '', $htmlname, $showempty, $contacts_no_email, '', 0, '', true);
 	$return['num']   = $form->num;
