@@ -1,6 +1,6 @@
 <?php
 $lastEvaluation      = $evaluation->fetchFromParent($risk->id, 1);
-$allRiskAssessment   = $evaluation->fetchFromParent($risk->id);
+$allRiskAssessment   = $evaluation->fetchFromParent($risk->id, 0, 'DESC');
 $lastEvaluationCount = count($evaluation->fetchFromParent($risk->id));
 if ( ! empty($allRiskAssessment) && $allRiskAssessment > 0) :
 	$cotationList = $evaluation->fetchFromParent($risk->id, 0, 'DESC'); ?>
