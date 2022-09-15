@@ -216,7 +216,6 @@ class modDigiriskdolibarr extends DolibarrModules
 	 */
 	public $descriptionlong;
 
-
 	// For exports
 
 	/**
@@ -251,7 +250,6 @@ class modDigiriskdolibarr extends DolibarrModules
 	 */
 	public $import_label;
 
-
 	/**
 	 * @var string Module constant name
 	 */
@@ -282,7 +280,6 @@ class modDigiriskdolibarr extends DolibarrModules
 	 * e.g.: "admin.php@module"
 	 */
 	public $config_page_url;
-
 
 	/**
 	 * @var string[] List of module class names that must be enabled if this module is enabled. e.g.: array('modAnotherModule', 'FR'=>'modYetAnotherModule')
@@ -320,7 +317,6 @@ class modDigiriskdolibarr extends DolibarrModules
 	 * array('always'='text') or array('FR'='text')
 	 */
 	public $warnings_activation_ext;
-
 
 	/**
 	 * @var array Minimum version of PHP required by module.
@@ -373,7 +369,7 @@ class modDigiriskdolibarr extends DolibarrModules
 		$this->descriptionlong = "Digirisk";
 		$this->editor_name     = 'Evarisk';
 		$this->editor_url      = 'https://evarisk.com';
-		$this->version         = '9.5.0';
+		$this->version         = '9.5.1';
 		$this->const_name      = 'MAIN_MODULE_' . strtoupper($this->name);
 		$this->picto           = 'digiriskdolibarr@digiriskdolibarr';
 
