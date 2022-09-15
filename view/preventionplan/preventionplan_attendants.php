@@ -97,16 +97,7 @@ if ($action == 'addAttendant') {
 	$object->fetch($id);
 	$extintervenant_ids = GETPOST('ext_intervenants');
 
-	//Check email of intervenants
-	if ( ! empty($extintervenant_ids) && $extintervenant_ids > 0) {
-		foreach ($extintervenant_ids as $extintervenant_id) {
-			$contact->fetch($extintervenant_id);
-			if ( ! dol_strlen($contact->email)) {
-				setEventMessages($langs->trans('ErrorNoEmailForExtIntervenant', $langs->transnoentitiesnoconv('ExtIntervenant')), null, 'errors');
-				$error++;
-			}
-		}
-	} else {
+	if (empty($extintervenant_ids) || $extintervenant_ids < 1) {
 		setEventMessages($langs->trans('ErrorNoAttendantSelected', $langs->transnoentitiesnoconv('ExtIntervenant')), null, 'errors');
 	}
 
@@ -485,14 +476,6 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	print '<td class="center">' . $langs->trans("Signature") . '</td>';
 	print '</tr>';
 
-	$contacts          = fetchAllSocPeople('',  '',  0,  0, array('customsql' => "s.rowid = $element->id AND c.email IS NULL OR c.email = ''" ));
-	$contacts_no_email = array();
-	if (is_array($contacts) && ! empty($contacts) && $contacts > 0) {
-		foreach ($contacts as $element_id) {
-			$contacts_no_email[$element_id->id] = $element_id->id;
-		}
-	}
-
 	$already_selected_intervenants[$contact->id] = $contact->id;
 	$j                                           = 1;
 	if (is_array($ext_society_intervenants) && ! empty($ext_society_intervenants) && $ext_society_intervenants > 0) {
@@ -552,7 +535,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 			$ext_society = new StdClass();
 		}
 		print '<tr class="oddeven"><td class="maxwidth200">';
-		print digirisk_selectcontacts($ext_society->id, GETPOST('ext_intervenants'), 'ext_intervenants[]', 0, $contacts_no_email, '', 0, 'width200', false, 1, 0, array(), 'multiple', 'ext_intervenants', false, 0, $already_selected_intervenants);
+		print digirisk_selectcontacts($ext_society->id, GETPOST('ext_intervenants'), 'ext_intervenants[]', 0, '', '', 0, 'width200', false, 1, 0, array(), 'multiple', 'ext_intervenants', false, 0, $already_selected_intervenants);
 		print '</td>';
 		print '<td>' . $langs->trans("ExtSocietyIntervenants") . '</td>';
 		print '<td class="center">';
