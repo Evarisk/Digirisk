@@ -668,7 +668,7 @@ if ($action == 'create') {
 
 	//Accident Date -- Date de l'accident
 	print '<tr><td class="minwidth400"><label for="accident_date">' . $langs->trans("AccidentDate") . '</label></td><td>';
-	print $form->selectDate(GETPOST('dateo') ? strtotime(GETPOST('dateo')) : dol_now('tzuser'), 'dateo', 1, 1, 0, '', 1);
+	print $form->selectDate(GETPOST('dateo') ? dol_mktime(GETPOST('dateohour', 'int'),GETPOST('dateomin', 'int'),0,GETPOST('dateomonth', 'int'), GETPOST('dateoday', 'int'), GETPOST('dateoyear', 'int')) : dol_now('tzuser'), 'dateo', 1, 1, 0, '', 1);
 	print '</td></tr>';
 
 	//Description -- Description
@@ -774,7 +774,7 @@ if (($id || $ref) && $action == 'edit') {
 
 	//Accident Date -- Date de l'accident
 	print '<tr><td class="minwidth400"><label for="accident_date">' . $langs->trans("AccidentDate") . '</label></td><td>';
-	print $form->selectDate(dol_now('tzuser'), 'dateo', 1, 1, 0, '', 1);
+	print $form->selectDate(GETPOST('dateo') ? dol_mktime(GETPOST('dateohour', 'int'),GETPOST('dateomin', 'int'),0,GETPOST('dateomonth', 'int'), GETPOST('dateoday', 'int'), GETPOST('dateoyear', 'int')) : ($object->accident_date ?: dol_now('tzuser')), 'dateo', 1, 1, 0, '', 1);
 	print '</td></tr>';
 
 	//Description -- Description
