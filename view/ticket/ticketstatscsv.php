@@ -60,7 +60,7 @@ if (!$user->rights->ticket->read) {
 }
 
 $upload_dir = $conf->digiriskdolibarr->multidir_output[$conf->entity];
-$upload_dir = $upload_dir . '/digiriskdolibarr/ticketstats/';
+$upload_dir = $upload_dir . '/ticketstats/';
 dol_mkdir($upload_dir);
 
 /*

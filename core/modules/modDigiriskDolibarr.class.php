@@ -424,6 +424,7 @@ class modDigiriskdolibarr extends DolibarrModules
 		$this->dirs = array(
 			"/digiriskdolibarr/riskassessment",
 			"/digiriskdolibarr/accident",
+			"/digiriskdolibarr/ticketstats",
 			"/ecm/digiriskdolibarr",
 			"/ecm/digiriskdolibarr/riskassessmentdocument",
 			"/ecm/digiriskdolibarr/legaldisplay",
