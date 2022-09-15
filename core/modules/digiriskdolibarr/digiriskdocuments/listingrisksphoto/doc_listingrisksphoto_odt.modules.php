@@ -367,12 +367,10 @@ class doc_listingrisksphoto_odt extends ModeleODTListingRisksPhoto
 					for ($i = 1; $i <= 4; $i++ ) {
 						$listlines = $odfHandler->setSegment('risk' . $i);
 						if (is_array($risks) && !empty($risks)) {
-							foreach ($risks as $line) {
+					 		foreach ($risks as $line) {
 								$lastEvaluation = $line->lastEvaluation;
 								if ( ! empty($lastEvaluation) && $lastEvaluation > 0 && is_object($lastEvaluation)) {
-									$lastEvaluation = array_shift($lastEvaluation);
-									$scale          = $lastEvaluation->get_evaluation_scale();
-
+									$scale = $lastEvaluation->get_evaluation_scale();
 									if ($scale == $i) {
 										$element = new DigiriskElement($this->db);
 										$linked_element =  new DigiriskElement($this->db);

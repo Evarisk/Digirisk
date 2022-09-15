@@ -370,12 +370,9 @@ class doc_listingrisksaction_odt extends ModeleODTListingRisksAction
 								$tmparray['actionPreventionUncompleted'] = "";
 								$tmparray['actionPreventionCompleted']   = "";
 
-								$evaluation     = new RiskAssessment($this->db);
-								$lastEvaluation = $evaluation->fetchFromParent($line->id, 1);
-								if ( ! empty($lastEvaluation) && $lastEvaluation > 0 && is_array($lastEvaluation)) {
-									$lastEvaluation = array_shift($lastEvaluation);
-									$scale          = $lastEvaluation->get_evaluation_scale();
-
+								$lastEvaluation = $line->lastEvaluation;
+								if ( ! empty($lastEvaluation) && $lastEvaluation > 0 && is_object($lastEvaluation)) {
+									$scale = $lastEvaluation->get_evaluation_scale();
 									if ($scale == $i) {
 										$element = new DigiriskElement($this->db);
 										$linked_element =  new DigiriskElement($this->db);
