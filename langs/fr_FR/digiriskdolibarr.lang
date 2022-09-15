@@ -775,6 +775,7 @@ RiskAssessmentDocumentBox = Box Document unique
 RiskAssessmentDocumentBoxTitle = Informations du Document unique
 LastGenerateDate = Date de dernière génération du document unique
 MandatoryUpdateEvery = Mise à jour obligatoire tous les
+NextGenerateDate = Date de prochaine génération du document unique
 
 # Email - Mail
 RiskAssessmentDocumentLabel = Récapitulatif du document unique
@@ -1056,6 +1057,14 @@ RisksRepartition = Répartition des risques par cotation
 ShowRiskOrigin = Afficher la provenance du risque
 ShowRiskOriginDescription = Afficher la provenance des risques dans les documents (Fiche UT, Fiche GP, Document Unique, Listings de risques, etc.)
 
+# Stats - Statistiques
+GreyRisk = Risque faible
+OrangeRisk = Risque à planifier
+RedRisk = Risque à traiter
+BlackRisk = Risque inacceptable
+
+
+
 
 #
 # RiskAssessment - Évaluation
@@ -1111,6 +1120,12 @@ AddRiskAssessmentTask = Ajouter une tâche au risque
 ListRiskAssessmentTask = Liste des tâches du risque
 ShowRiskAssessmentDate = Date des évaluations
 ShowRiskAssessmentDateDescription = Remplace la date de création par la date de début des évaluations dans la fiche et les documents
+
+# Stats - Statistisques
+TasksRepartition = Répartition des tâches par avancement
+TaskAt0Percent = Tâche à 0
+TaskInProgress = Tâche en cours
+TaskAt100Percent = Tâche à 100
 
 
 #
