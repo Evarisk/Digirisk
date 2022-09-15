@@ -35,102 +35,71 @@ try {
 	return -1;
 }
 
-//Creation User
-
-print '<tr>';
-print '<td class="titlefield">' . $langs->trans("CreatedBy") . '</td>';
-print '<td>';
-
-if ($legaldisplay->fk_user_creat > 0) {
-	$usercreat = new User($db);
-	$result    = $usercreat->fetch($legaldisplay->fk_user_creat);
-	if ($result < 0) dol_print_error('', $usercreat->error);
-	elseif ($result > 0) print $usercreat->getNomUrl(-1);
-}
-
-//Creation Date
-print '</td></tr>';
-
-print '<tr>';
-print '<td class="titlefield">' . $langs->trans("CreatedOn") . '</td>';
-print '<td>';
-
-print dol_print_date($legaldisplay->date_creation);
-
-print '</td></tr>';
-
 // Médecin du travail
-
 print '<tr>';
-	print '<td class="titlefield">' . $form->textwithpicto($langs->trans("LabourDoctor"), $langs->trans('HowToSetDataLegalDisplay')) . '</td>';
-	print '<td>';
-		print $legaldisplay->occupational_health_service->name;
-		print '</td></tr>';
+print '<td class="titlefield"><i class="fas fa-hospital-alt"></i> ' . $form->textwithpicto($langs->trans("LabourDoctor"), $langs->trans('HowToSetDataLegalDisplay')) . '</td>';
+print '<td>';
+$contact->fetch($legaldisplay->occupational_health_service->id);
+print $contact->getNomUrl(1);
+print '</td></tr>';
 
 // Inspecteur du travail
 print '<tr>';
-	print '<td class="titlefield">' . $form->textwithpicto($langs->trans("LabourInspector"), $langs->trans('HowToSetDataLegalDisplay')) . '</td>';
-	print '<td>';
-		print $legaldisplay->detective_work->name;
-		print '</td></tr>';
+print '<td class="titlefield"><i class="fas fa-search"></i> ' . $form->textwithpicto($langs->trans("LabourInspector"), $langs->trans('HowToSetDataLegalDisplay')) . '</td>';
+print '<td>';
+$contact->fetch($legaldisplay->detective_work->id);
+print $contact->getNomUrl(1);
+print '</td></tr>';
 
 // SAMU
-
 print '<tr>';
-	print '<td class="titlefield">' . $form->textwithpicto($langs->trans("SAMU"), $langs->trans('HowToSetDataLegalDisplay')) . '</td>';
-	print '<td>';
-		print $legaldisplay->emergency_service->samu;
-		print '</td></tr>';
+print '<td class="titlefield"><i class="fas fa-hospital-alt"></i> ' . $form->textwithpicto($langs->trans("SAMU"), $langs->trans('HowToSetDataLegalDisplay')) . '</td>';
+print '<td>';
+print '<i class="fas fa-phone"></i> ' . $legaldisplay->emergency_service->samu;
+print '</td></tr>';
 
 // Pompiers
-
 print '<tr>';
-	print '<td class="titlefield">' . $form->textwithpicto($langs->trans("Pompiers"), $langs->trans('HowToSetDataLegalDisplay')) . '</td>';
-
+print '<td class="titlefield"><i class="fas fa-ambulance"></i> ' . $form->textwithpicto($langs->trans("Pompiers"), $langs->trans('HowToSetDataLegalDisplay')) . '</td>';
 print '<td>';
-		print $legaldisplay->emergency_service->pompier;
-		print '</td></tr>';
+print '<i class="fas fa-phone"></i> ' . $legaldisplay->emergency_service->pompier;
+print '</td></tr>';
 
 // Police
-
 print '<tr>';
-print '<td class="titlefield">' . $form->textwithpicto($langs->trans("Police"), $langs->trans('HowToSetDataLegalDisplay')) . '</td>';
-	print '<td>';
-		print $legaldisplay->emergency_service->police;
-		print '</td></tr>';
+print '<td class="titlefield"><i class="fas fa-car"></i> ' . $form->textwithpicto($langs->trans("Police"), $langs->trans('HowToSetDataLegalDisplay')) . '</td>';
+print '<td>';
+print '<i class="fas fa-phone"></i> ' . $legaldisplay->emergency_service->police;
+print '</td></tr>';
 
 // Urgences
-
 print '<tr>';
-print '<td class="titlefield">' . $form->textwithpicto($langs->trans("AllEmergencies"), $langs->trans('HowToSetDataLegalDisplay')) . '</td>';
-	print '<td>';
-		print $legaldisplay->emergency_service->emergency;
-		print '</td></tr>';
+print '<td class="titlefield"><i class="fas fa-phone"></i> ' . $form->textwithpicto($langs->trans("AllEmergencies"), $langs->trans('HowToSetDataLegalDisplay')) . '</td>';
+print '<td>';
+print '<i class="fas fa-phone"></i> ' . $legaldisplay->emergency_service->emergency;
+print '</td></tr>';
 
 // Défenseur du droit du travail
-
 print '<tr>';
-print '<td class="titlefield">' . $form->textwithpicto($langs->trans("RightsDefender"), $langs->trans('HowToSetDataLegalDisplay')) . '</td>';
-	print '<td>';
-		print $legaldisplay->emergency_service->right_defender;
-		print '</td></tr>';
+print '<td class="titlefield"><i class="fas fa-gavel"></i> ' . $form->textwithpicto($langs->trans("RightsDefender"), $langs->trans('HowToSetDataLegalDisplay')) . '</td>';
+print '<td>';
+print '<i class="fas fa-phone"></i> ' . $legaldisplay->emergency_service->right_defender;
+print '</td></tr>';
 
 // Centre Antipoison
-
 print '<tr>';
-print '<td class="titlefield">' . $form->textwithpicto($langs->trans("PoisonControlCenter"), $langs->trans('HowToSetDataLegalDisplay')) . '</td>';
-	print '<td>';
-		print $legaldisplay->emergency_service->poison_control_center;
-		print '</td></tr>';
+print '<td class="titlefield"><i class="fas fa-skull-crossbones"></i> ' . $form->textwithpicto($langs->trans("PoisonControlCenter"), $langs->trans('HowToSetDataLegalDisplay')) . '</td>';
+print '<td>';
+print '<i class="fas fa-phone"></i> ' . $legaldisplay->emergency_service->poison_control_center;
+print '</td></tr>';
 
 // Responsable de prévention
-
 print '<tr>';
-print '<td class="titlefield">' . $form->textwithpicto($langs->trans("ResponsibleToNotify"), $langs->trans('HowToSetDataLegalDisplay')) . '</td>';
-	print '<td>';
-		print $legaldisplay->safety_rule->responsible_for_preventing;
-		print '</td></tr>';
-
+print '<td class="titlefield"><i class="fas fa-user"></i> ' . $form->textwithpicto($langs->trans("ResponsibleToNotify"), $langs->trans('HowToSetDataLegalDisplay')) . '</td>';
+print '<td>';
+$usertmp->fetch($legaldisplay->safety_rule->id);
+print $usertmp->getNomUrl(1);
+print '</td></tr>';
 
 ?>
 <!-- END PHP TEMPLATE digiriskdolibarr_legaldisplayfields_view.tpl.php -->

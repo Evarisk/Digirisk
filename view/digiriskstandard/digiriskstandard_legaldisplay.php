@@ -55,6 +55,8 @@ $action = GETPOST('action', 'aZ09');
 // Initialize technical objects
 $object       = new DigiriskStandard($db);
 $legaldisplay = new LegalDisplay($db);
+$contact      = new Contact($db);
+$usertmp      = new User($db);
 $hookmanager->initHooks(array('digiriskelementlegaldisplay', 'globalcard')); // Note that conf->hooks_modules contains array
 
 $object->fetch($conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD);
@@ -175,7 +177,7 @@ $morehtmlref .= '</div>';
 $morehtmlleft = '<div class="floatleft inline-block valignmiddle divphotoref">' . digirisk_show_photos('mycompany', $conf->mycompany->dir_output . '/logos', 'small', 1, 0, 0, 0, $width, 0, 0, 0, 0, 'logos', $emptyobject) . '</div>';
 
 digirisk_banner_tab($object, 'ref', '', 0, 'ref', 'ref', $morehtmlref, '', 0, $morehtmlleft);
-print '<a href="../../admin/socialconf.php" target="_blank">' . $langs->trans('ConfigureSecurityAndSocialData') . ' <i class="fas fa-external-link-alt"></i></a>';
+print '<a href="../../admin/securityconf.php" target="_blank">' . $langs->trans('ConfigureSecurityAndSocialData') . ' <i class="fas fa-external-link-alt"></i></a>';
 print '<hr>';
 print '<div class="fichecenter">';
 print '<table class="border centpercent tableforfield">' . "\n";
