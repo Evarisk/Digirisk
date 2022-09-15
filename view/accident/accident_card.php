@@ -717,7 +717,7 @@ if (($id || $ref) && $action == 'edit') {
 	print '</td></tr>';
 
 	//Label -- Libellé
-	print '<tr><td class="fieldrequired minwidth400">' . $langs->trans("Label") . '</td><td>';
+	print '<tr><td class="minwidth400">' . $langs->trans("Label") . '</td><td>';
 	print '<input class="flat" type="text" size="36" name="label" id="label" value="' . $object->label . '">';
 	print '</td></tr>';
 
