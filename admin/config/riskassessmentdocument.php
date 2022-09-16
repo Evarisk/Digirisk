@@ -520,7 +520,7 @@ print '</tr>';
 print '<tr class="oddeven"><td>';
 print $langs->trans('ShowTaskProgress');
 print "</td><td>";
-print $langs->trans('ShowTaskProgressDescription') . ' %';
+print $langs->trans('ShowTaskProgressDescription') . ' % ' . $langs->trans('ShowTaskProgressDescriptionExtend');
 print '</td>';
 
 print '<td class="center">';
