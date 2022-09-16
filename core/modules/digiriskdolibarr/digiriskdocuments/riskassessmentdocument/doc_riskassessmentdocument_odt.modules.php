@@ -447,7 +447,11 @@ class doc_riskassessmentdocument_odt extends ModeleODTRiskAssessmentDocument
 							$scaleCounterWithoutSharedRisk = $digiriskelementsingle['object']->getRiskAssessmentCategoriesNumber();
 
 							foreach ($scale_counter as $key => $value) {
-								$final_scale_counter[$key] = $scale_counter[$key] + $scaleCounterWithoutSharedRisk[$key];
+								if (is_array($scaleCounterWithoutSharedRisk) && !empty($scaleCounterWithoutSharedRisk)) {
+									$final_scale_counter[$key] = $scale_counter[$key] + $scaleCounterWithoutSharedRisk[$key];
+								} else {
+									$final_scale_counter[$key] = $scale_counter[$key];
+								}
 							}
 
 							$cotationarray[$elementName] = array($totalQuotation, $digiriskelementsingle['object']->description,$final_scale_counter);

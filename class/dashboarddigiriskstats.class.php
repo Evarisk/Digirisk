@@ -70,7 +70,11 @@ class DashboardDigiriskStats extends DigiriskStats
 			),
 		);
 		$array['data'] = $digiriskelement->getRiskAssessmentCategoriesNumber();
-		return $array;
+		if ($array['data'] < 0) {
+			return -1;
+		} else {
+			return $array;
+		}
 	}
 
 	public function load_dashboard_task() {
@@ -136,7 +140,7 @@ class DashboardDigiriskStats extends DigiriskStats
 			$lastTimeAccident = dol_now() - reset($lastAccident)->accident_date;
 			$array = abs(round($lastTimeAccident / 86400));
 		} else {
-			$array = 0;
+			$array = 'N/A';
 		}
 		return $array;
 	}

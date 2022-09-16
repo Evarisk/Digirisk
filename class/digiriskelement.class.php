@@ -357,7 +357,7 @@ class DigiriskElement extends CommonObject
 	/**
 	 * Get riskassessment categorires number
 	 *
-	 * @return array
+	 * @return array|int
 	 * @throws Exception
 	 */
 	public function getRiskAssessmentCategoriesNumber()
@@ -385,9 +385,10 @@ class DigiriskElement extends CommonObject
 					$scale_counter[$scale] += 1;
 				}
 			}
+			return $scale_counter;
+		} else {
+			return -1;
 		}
-
-		return $scale_counter;
 	}
 
 	/**
