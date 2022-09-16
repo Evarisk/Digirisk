@@ -57,10 +57,41 @@ $value      = GETPOST('value', 'alpha');
 $type       = GETPOST('type', 'alpha');
 $const 		= GETPOST('const', 'alpha');
 $label 		= GETPOST('label', 'alpha');
+$modulepart = GETPOST('modulepart', 'aZ09');	// Used by actions_setmoduleoptions.inc.php
 
 /*
  * Actions
  */
+
+if ($action == 'deletefile' && $modulepart == 'ecm' && !empty($user->admin)) {
+	include_once DOL_DOCUMENT_ROOT.'/core/lib/files.lib.php';
+	$keyforuploaddir = GETPOST('keyforuploaddir', 'aZ09');
+
+	$listofdir = explode(',', preg_replace('/[\r\n]+/', ',', trim(getDolGlobalString($keyforuploaddir))));
+	foreach ($listofdir as $key => $tmpdir) {
+		$tmpdir = preg_replace('/DOL_DATA_ROOT\/*/', '', $tmpdir);	// Clean string if we found a hardcoded DOL_DATA_ROOT
+		if (!$tmpdir) {
+			unset($listofdir[$key]);
+			continue;
+		}
+		$tmpdir = DOL_DATA_ROOT.'/'.$tmpdir;	// Complete with DOL_DATA_ROOT. Only files into DOL_DATA_ROOT can be reach/set
+		if (!is_dir($tmpdir)) {
+			if (empty($nomessageinsetmoduleoptions)) {
+				setEventMessages($langs->trans("ErrorDirNotFound", $tmpdir), null, 'warnings');
+			}
+		} else {
+			$upload_dir = $tmpdir;
+			break;	// So we take the first directory found into setup $conf->global->$keyforuploaddir
+		}
+	}
+
+	$filetodelete = $tmpdir.'/'.GETPOST('file');
+	$result = dol_delete_file($filetodelete);
+	if ($result > 0) {
+		setEventMessages($langs->trans("FileWasRemoved", GETPOST('file')), null, 'mesgs');
+		header("Location: " . $_SERVER["PHP_SELF"]);
+	}
+}
 
 // Activate a model
 if ($action == 'set') {
@@ -94,12 +125,26 @@ if ($action == 'setdoc') {
 }
 
 if ($action == 'setModuleOptions') {
-	$subdir = GETPOST('path');
-	$subdir = preg_replace('/DOL_DATA_ROOT\/ecm\/digiriskdolibarr\//', '', $subdir);
-	$subdir = preg_replace('/\//', '', $subdir);
+	include_once DOL_DOCUMENT_ROOT.'/core/lib/files.lib.php';
+	$keyforuploaddir = GETPOST('keyforuploaddir', 'aZ09');
 
-	$ecmdir = $conf->ecm->multidir_output[$conf->entity?:1];
-	$path = $ecmdir . '/digiriskdolibarr/'. $subdir .'/';
+	$listofdir = explode(',', preg_replace('/[\r\n]+/', ',', trim(getDolGlobalString($keyforuploaddir))));
+	foreach ($listofdir as $key => $tmpdir) {
+		$tmpdir = preg_replace('/DOL_DATA_ROOT\/*/', '', $tmpdir);	// Clean string if we found a hardcoded DOL_DATA_ROOT
+		if (!$tmpdir) {
+			unset($listofdir[$key]);
+			continue;
+		}
+		$tmpdir = DOL_DATA_ROOT.'/'.$tmpdir;	// Complete with DOL_DATA_ROOT. Only files into DOL_DATA_ROOT can be reach/set
+		if (!is_dir($tmpdir)) {
+			if (empty($nomessageinsetmoduleoptions)) {
+				setEventMessages($langs->trans("ErrorDirNotFound", $tmpdir), null, 'warnings');
+			}
+		} else {
+			$upload_dir = $tmpdir;
+			break;	// So we take the first directory found into setup $conf->global->$keyforuploaddir
+		}
+	}
 
 	if (!empty($_FILES)) {
 		if (is_array($_FILES['userfile']['tmp_name'])) {
@@ -132,8 +177,8 @@ if ($action == 'setModuleOptions') {
 
 			if (!empty($upload_dirold) && !empty($conf->global->PRODUCT_USE_OLD_PATH_FOR_PHOTO)) {
 				$result = dol_add_file_process($upload_dirold, $allowoverwrite, 1, 'userfile', GETPOST('savingdocmask', 'alpha'), null, '', $generatethumbs, $object);
-			} elseif (!empty($path)) {
-				$result = dol_add_file_process($path, $allowoverwrite, 1, 'userfile', GETPOST('savingdocmask', 'alpha'), null, '' );
+			} elseif (!empty($tmpdir)) {
+				$result = dol_add_file_process($tmpdir, $allowoverwrite, 1, 'userfile', GETPOST('savingdocmask', 'alpha'), null, '' );
 			}
 		}
 	}

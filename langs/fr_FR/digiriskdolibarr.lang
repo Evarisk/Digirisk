@@ -210,6 +210,7 @@ RulesOfProcedure = Règlement intérieur
 
 CollectiveAgreement = Conventions collectives
 legaldisplay.odt = Affichage légal
+legaldisplay_custom.odt = Affichage légal personnalisé
 
 
 
@@ -253,6 +254,7 @@ ElectionDateDP = Date d'élection des DP
 Titulars = Titulaires
 Alternates = Suppléants
 informationssharing.odt = Diffusion d'informations
+informationssharing_custom.odt = Diffusion d'informations personnalisée
 ChooseBoxToAdd = Ajouter le widget au tableau de bord...
 
 
@@ -392,6 +394,7 @@ CloneSchedulePreventionPlan = Cloner les horaires du plan de prévention
 ConfirmClonePreventionPlan = Êtes-vous sûr de vouloir cloner le plan de prévention <b> %s </b> ?
 Archived = Archivé
 preventionplandocument.odt = Plan de prévention
+preventionplandocument_custom.odt = Plan de prévention personnalisé
 
 # Email - Mail
 PreventionPlanLabel = Récapitulatif du plan de prévention
@@ -485,6 +488,7 @@ FirePermitManagement = Gestion des permis de feu
 FPRProject = Projet lié aux permis de feu
 FirePermitLinked = Permis de feu lié
 firepermitdocument.odt = Permis de feu
+firepermitdocument_custom.odt = Permis de feu personnalisé
 
 # Email - Mail
 FirePermitLabel = Récapitulatif du permis de feu
@@ -693,6 +697,7 @@ ListingRisksPhotoDigiriskTemplate = ODT par défaut des listing des risques avec
 # Data - Donnée
 ListingRisksPhoto = Listing des risques avec photos
 listingrisksphoto.odt = Listing des risques avec photos
+listingrisksphoto_custom.odt = Listing des risques avec photos personnalisé
 
 
 
@@ -719,7 +724,8 @@ ListingRisksActionDigiriskTemplate = ODT par défaut des listing des risques ave
 
 # Data - Donnée
 ListingRisksAction = Listing des risques avec actions correctives
-listingriskaction.odt = Listing des risques avec actions correctives
+listingrisksaction.odt = Listing des risques avec actions correctives
+listingrisksaction_custom.odt = Listing des risques avec actions correctives personnalisé
 DigiriskListingRisksActionData = Données configurables des listing des risques avec actions correctives
 ShowTaskDoneListingRisksActionDescription = Permettre d'afficher ou non les tâches soldées dans le listing des risques avec actions correctives
 
@@ -763,6 +769,7 @@ SetStartEndDateBefore = Définissez la date de début et la date de fin d'audit 
 SetStartEndDateBeforeSendEmail = Définissez la date de début et la date de fin d'audit sur cette page pour envoyer un email
 NoSitePlans = Aucun plan de la société renseigné
 riskassessmentdocument.odt = Document Unique
+riskassessmentdocument_custom.odt = Document Unique personnalisé
 DigiriskRiskAssessmentDocumentData = Données configurables du document unique
 ShowTaskDone = Afficher les tâches soldées
 ShowTaskDoneRiskAssessmentDocumentDescription = Permettre d'afficher ou non les tâches soldées dans le Document Unique
@@ -805,6 +812,7 @@ GroupmentDocumentDigiriskTemplate = ODT par défaut des fiches de groupement
 # Data - Donnée
 GroupmentDocument = Fiche de Groupement
 groupmentdocument.odt = Fiche de Groupement
+groupmentdocument_custom.odt = Fiche de Groupement personnalisée
 DigiriskGroupmentDocumentData = Données configurables des fiches de groupement
 ShowTaskDoneGroupmentDocumentDescription = Permettre d'afficher ou non les tâches soldées dans la fiche de groupement
 
@@ -831,6 +839,7 @@ WorkUnitDocumentDigiriskTemplate = ODT par défaut des fiches d'unité de travai
 # Data - Donnée
 WorkUnitDocument = Fiche d'Unité de travail
 workunitdocument.odt = Fiche d'Unité de travail
+workunitdocument_custom.odt = Fiche d'Unité de travail personnalisée
 DigiriskWorkUnitDocumentData = Données configurables des fiches d'unités de travail
 ShowTaskDoneWorkUnitDocumentDescription = Permettre d'afficher ou non les tâches soldées dans la fiche d'unité de travail
 

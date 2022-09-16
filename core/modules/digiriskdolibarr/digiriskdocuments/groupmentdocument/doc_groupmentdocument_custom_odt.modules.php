@@ -214,21 +214,24 @@ class doc_groupmentdocument_custom_odt extends ModeleODTGroupmentDocument
 			$texte .= '</b>';
 		}
 		if ($nbofiles) {
-			$texte .= '<div id="div_' . get_class($this) . '" class="hidden">';
+			$texte .= '<div id="div_' . get_class($this) . '" class="hiddenx">';
+			// Show list of found files
 			foreach ($listoffiles as $file) {
-				$texte .= $file['name'] . '<br>';
+				$texte .= '- '.$file['name'].' &nbsp; <a class="reposition" href="'.DOL_URL_ROOT.'/document.php?modulepart=ecm&file=digiriskdolibarr/groupmentdocument/'.urlencode(basename($file['name'])).'">'.img_picto('', 'listlight').'</a>';
+				$texte .= ' &nbsp; <a class="reposition" href="'.$_SERVER["PHP_SELF"].'?modulepart=ecm&keyforuploaddir=DIGIRISKDOLIBARR_GROUPMENTDOCUMENT_CUSTOM_ADDON_ODT_PATH&action=deletefile&token='.newToken().'&file='.urlencode(basename($file['name'])).'">'.img_picto('', 'delete').'</a>';
+				$texte .= '<br>';
 			}
 			$texte .= '</div>';
 		}
 		// Add input to upload a new template file.
-		$texte .= '<div>' . $langs->trans("UploadNewTemplate") . ' <input type="file" name="uploadfile">';
+		$texte .= '<div>' . $langs->trans("UploadNewTemplate") . ' <input type="file" name="userfile">';
 		$texte .= '<input type="hidden" value="DIGIRISKDOLIBARR_GROUPMENTDOCUMENT_CUSTOM_ADDON_ODT_PATH" name="keyforuploaddir">';
 		$texte .= '<input type="submit" class="button" value="' . dol_escape_htmltag($langs->trans("Upload")) . '" name="upload">';
 		$texte .= '</div>';
 		$texte .= '</td>';
 
 		$texte .= '<td rowspan="2" class="tdtop hideonsmartphone">';
-		$texte .= $langs->trans("ExampleOfDirectoriesForModelGen");
+		$texte .= $langs->trans("PleaseNameTheFile", 'template_groupmentdocument_custom.odt');
 		$texte .= '</td>';
 		$texte .= '</tr>';
 
