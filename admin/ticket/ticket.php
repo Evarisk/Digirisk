@@ -45,7 +45,9 @@ require_once DOL_DOCUMENT_ROOT . "/core/lib/admin.lib.php";
 require_once DOL_DOCUMENT_ROOT . "/core/class/html.formother.class.php";
 include_once DOL_DOCUMENT_ROOT . '/core/class/extrafields.class.php';
 include_once DOL_DOCUMENT_ROOT . '/categories/class/categorie.class.php';
+include_once DOL_DOCUMENT_ROOT . '/ticket/class/ticket.class.php';
 require_once DOL_DOCUMENT_ROOT . "/core/class/html.formprojet.class.php";
+require_once DOL_DOCUMENT_ROOT . '/core/class/doleditor.class.php';
 
 require_once '../../lib/digiriskdolibarr.lib.php';
 require_once '../../lib/digiriskdolibarr_ticket.lib.php';
@@ -54,6 +56,7 @@ require_once '../../lib/digiriskdolibarr_ticket.lib.php';
 $langs->loadLangs(array("admin", "digiriskdolibarr@digiriskdolibarr"));
 $extra_fields = new ExtraFields($db);
 $category     = new Categorie($db);
+$ticket       = new Ticket($db);
 
 // Access control
 if ( ! $user->admin) accessforbidden();
@@ -192,7 +195,7 @@ if ($action == 'setChildCategoryLabel') {
 }
 
 if ($action == 'setTicketSuccessMessage') {
-	$successmessage = GETPOST('DIGIRISKDOLIBARR_TICKET_SUCCESS_MESSAGE');
+	$successmessage = GETPOST('DIGIRISKDOLIBARR_TICKET_SUCCESS_MESSAGE', 'none');
 	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_TICKET_SUCCESS_MESSAGE', $successmessage, 'chaine', 0, '', $conf->entity);
 	setEventMessages($langs->transnoentities('TicketSuccessMessageSet'), array());
 }
@@ -220,7 +223,8 @@ if ($action == 'generateQRCode') {
  */
 
 if ( ! empty($conf->projet->enabled)) { $formproject = new FormProjets($db); }
-$form = new Form($db);
+$form      = new Form($db);
+$formother = new FormOther($db);
 
 $help_url = '';
 $title    = $langs->transnoentities("Ticket");
@@ -332,11 +336,22 @@ if ( ! empty($conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE)) {
 	print '<td class="center">' . $langs->transnoentities("Action") . '</td>';
 	print "</tr>";
 
+	$substitutionarray = getCommonSubstitutionArray($langs, 0, null, $ticket);
+	complete_substitutions_array($substitutionarray, $langs, $ticket);
+
+	// Substitution array/string
+	$helpforsubstitution = '';
+	if (is_array($substitutionarray) && count($substitutionarray)) {
+		$helpforsubstitution .= $langs->trans('AvailableVariables').' :<br>'."\n";
+	}
+	foreach ($substitutionarray as $key => $val) {
+		$helpforsubstitution .= $key.' -> '.$langs->trans(dol_string_nohtmltag(dolGetFirstLineOfText($val))).'<br>';
+	}
+
 	// Ticket success message
 	$successmessage = $langs->transnoentities($conf->global->DIGIRISKDOLIBARR_TICKET_SUCCESS_MESSAGE) ?: $langs->transnoentities('YouMustNotifyYourHierarchy');
-	print '<tr class="oddeven"><td>'.$langs->transnoentities("TicketSuccessMessage");
+	print '<tr class="oddeven"><td>'.$form->textwithpicto($langs->transnoentities("TicketSuccessMessage"), $helpforsubstitution, 1, 'help', '', 0, 2, 'substittooltipfrombody');
 	print '</td><td>';
-	require_once DOL_DOCUMENT_ROOT.'/core/class/doleditor.class.php';
 	$doleditor = new DolEditor('DIGIRISKDOLIBARR_TICKET_SUCCESS_MESSAGE', $successmessage, '100%', 120, 'dolibarr_details', '', false, true, $conf->global->FCKEDITOR_ENABLE_MAIL, ROWS_2, 70);
 	$doleditor->Create();
 	print '</td>';
@@ -412,7 +427,6 @@ if ( ! empty($conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE)) {
 	print '<input type="hidden" name="backtopage" value="' . $backtopage . '">';
 
 	print '<tr class="oddeven"><td>' . $langs->transnoentities("MainCategory") . '</td>';
-	$formother = new FormOther($db);
 	print '<td class="center">';
 	print $formother->select_categories('ticket', $conf->global->DIGIRISKDOLIBARR_TICKET_MAIN_CATEGORY,'mainCategory');
 	print '</td>';
