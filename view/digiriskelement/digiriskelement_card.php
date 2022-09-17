@@ -38,6 +38,7 @@ if ( ! $res) die("Include of main fails");
 
 require_once DOL_DOCUMENT_ROOT . '/core/class/html.formfile.class.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/images.lib.php';
+require_once DOL_DOCUMENT_ROOT . '/core/lib/admin.lib.php';
 
 require_once './../../class/digiriskdocuments.class.php';
 require_once './../../class/digiriskelement.class.php';
@@ -115,6 +116,26 @@ if (empty($reshook)) {
 		if (empty($backtopage) || ($cancel && strpos($backtopage, '__ID__'))) {
 			if (empty($object->id) && (($action != 'add' && $action != 'create') || $cancel)) $backtopage = $backurlforlist;
 			else $backtopage                                                                              = dol_buildpath('/digiriskdolibarr/view/digiriskelement/digiriskelement_card.php', 1) . '?id=' . ($object->id > 0 ? $object->id : '__ID__');
+		}
+	}
+
+	if ($action == 'update' && $permissiontoadd) {
+		$showinselectonpublicticketinterface = GETPOST('show_in_select_on_public_ticket_interface');
+		if (empty($showinselectonpublicticketinterface)) {
+			$disabled_digiriskelement = json_decode($conf->global->DIGIRISKDOLIBARR_DISABLED_DIGIRISKELEMENT_SELECT_PUBLIC_TICKET_INTERFACE);
+			if (!in_array($object->id, (array) $disabled_digiriskelement)) {
+				$disabled_digiriskelement[] = $object->id;
+				$array = json_encode($disabled_digiriskelement);
+				dolibarr_set_const($db, 'DIGIRISKDOLIBARR_DISABLED_DIGIRISKELEMENT_SELECT_PUBLIC_TICKET_INTERFACE', $array, 'chaine', 0, '', $conf->entity);
+			}
+		} else {
+			$disabled_digiriskelement = json_decode($conf->global->DIGIRISKDOLIBARR_DISABLED_DIGIRISKELEMENT_SELECT_PUBLIC_TICKET_INTERFACE);
+			if (in_array($object->id, (array) $disabled_digiriskelement)) {
+				$key = array_search($object->id, $disabled_digiriskelement);
+				unset($disabled_digiriskelement[$key]);
+				$array = json_encode(array_values($disabled_digiriskelement));
+				dolibarr_set_const($db, 'DIGIRISKDOLIBARR_DISABLED_DIGIRISKELEMENT_SELECT_PUBLIC_TICKET_INTERFACE', $array, 'chaine', 0, '', $conf->entity);
+			}
 		}
 	}
 
@@ -302,6 +323,10 @@ if ($action == 'create') {
 	print '<input hidden class="flat" type="text" size="36" name="element_type" value="' . $element_type . '">';
 	print '<input hidden class="flat" type="text" size="36" name="fk_parent" value="' . $fk_parent . '">';
 
+	print '<tr><td>' . $langs->trans("ShowInSelectOnPublicTicketInterface") . '</td><td>';
+	print '<input type="checkbox" id="show_in_select_on_public_ticket_interface" name="show_in_select_on_public_ticket_interface" checked="checked">';
+	print '</td></tr>';
+
 	// Other attributes
 	include DOL_DOCUMENT_ROOT . '/core/tpl/extrafields_add.tpl.php';
 
@@ -341,6 +366,15 @@ if (($id || $ref) && $action == 'edit') {
 
 	// Common attributes
 	include DOL_DOCUMENT_ROOT . '/core/tpl/commonfields_edit.tpl.php';
+
+	$disabled_digiriskelement = json_decode($conf->global->DIGIRISKDOLIBARR_DISABLED_DIGIRISKELEMENT_SELECT_PUBLIC_TICKET_INTERFACE);
+
+	print '<tr><td>';
+	print $langs->trans("ShowInSelectOnPublicTicketInterface");
+	print '</td>';
+	print '<td>';
+	print '<input type="checkbox" id="show_in_select_on_public_ticket_interface" name="show_in_select_on_public_ticket_interface"' . (in_array($object->id, (array) $disabled_digiriskelement) ?  '' : ' checked=""'). '"> ';
+	print '</td></tr>';
 
 	// Other attributes
 	include DOL_DOCUMENT_ROOT . '/core/tpl/extrafields_edit.tpl.php';
@@ -421,6 +455,15 @@ if ((empty($action) || ($action != 'edit' && $action != 'create'))) {
 	print '<div class="fichecenter">';
 	print '<div class="fichehalfleft">';
 	print '<table class="border centpercent tableforfield">';
+
+	$disabled_digiriskelement = json_decode($conf->global->DIGIRISKDOLIBARR_DISABLED_DIGIRISKELEMENT_SELECT_PUBLIC_TICKET_INTERFACE);
+
+	print '<tr><td class="titlefield">';
+	print $langs->trans("ShowInSelectOnPublicTicketInterface");
+	print '</td>';
+	print '<td>';
+	print '<input type="checkbox" id="show_in_select_on_public_ticket_interface" name="show_in_select_on_public_ticket_interface"' . (in_array($object->id, (array) $disabled_digiriskelement) ?  '' : ' checked=""') . '" disabled> ';
+	print '</td></tr>';
 
 	//Show common fields
 	//  include DOL_DOCUMENT_ROOT.'/core/tpl/commonfields_view.tpl.php';

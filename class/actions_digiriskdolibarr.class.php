@@ -304,7 +304,18 @@ class ActionsDigiriskdolibarr
 			require_once __DIR__ . '/digiriskelement.class.php';
 			$digiriskelement = new DigiriskElement($db);
 			$selectDigiriskElement = '<span>'. $langs->trans('GP/UT') .'</span>';
-			$selectDigiriskElement .= $digiriskelement->select_digiriskelement_list(GETPOST('options_digiriskdolibarr_ticket_service'), 'options_digiriskdolibarr_ticket_service', '', $langs->trans('PleaseSelectADigiriskElement'), 0, array(), 0, 0, 'minwidth500', 0, false, 1);
+
+			$disabled_digiriskelement = json_decode($conf->global->DIGIRISKDOLIBARR_DISABLED_DIGIRISKELEMENT_SELECT_PUBLIC_TICKET_INTERFACE);
+			if (is_array($disabled_digiriskelement) && !empty($disabled_digiriskelement)) {
+				$filter = 's.rowid NOT IN (';
+				foreach ($disabled_digiriskelement as $disabled_digiriskelementsingle) {
+					$filter .= $disabled_digiriskelementsingle . ',';
+				}
+				$filter = substr($filter, 0, -1);
+				$filter .= ')';
+			}
+
+			$selectDigiriskElement .= $digiriskelement->select_digiriskelement_list(GETPOST('options_digiriskdolibarr_ticket_service'), 'options_digiriskdolibarr_ticket_service', (!empty($filter) ? $filter : ''), $langs->trans('PleaseSelectADigiriskElement'), 0, array(), 0, 0, 'minwidth500', 0, false, 1);
 			$selectDigiriskElement .= '<div><br></div>';
 			?>
 			<script>

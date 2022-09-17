@@ -870,6 +870,7 @@ DIGIRISKELEMENTSharingDescription = Sélection des entités qui partageront leur
 DigiriskElementSharedTooltip = Cette option permet de partager les groupements et unités de travail. <br> INFO : Si vous souhaitez pouvoir afficher les tâches, il faut activer l'option de partage des projets.
 PleaseSelectADigiriskElement = Sélectionner un groupement ou une unité de travail...
 Registers = Registres
+ShowInSelectOnPublicTicketInterface = Doit apparaitre dans la liste des elements de l'interface publique des tickets
 
 
 #
