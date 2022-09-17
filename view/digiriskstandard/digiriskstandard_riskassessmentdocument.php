@@ -100,9 +100,9 @@ if (empty($reshook)) {
 		$auditStartDate = GETPOST('AuditStartDate', 'none');
 		$auditEndDate   = GETPOST('AuditEndDate', 'none');
 		$recipent       = GETPOST('Recipient', 'alpha');
-		$method         = GETPOST('Method', 'alpha');
-		$sources        = GETPOST('Sources', 'alpha');
-		$importantNote  = GETPOST('ImportantNote', 'alpha');
+		$method         = GETPOST('Method', 'none');
+		$sources        = GETPOST('Sources', 'none');
+		$importantNote  = GETPOST('ImportantNote', 'none');
 
 		if ( strlen($auditStartDate) ) {
 			$auditStartDate = explode('/', $auditStartDate);

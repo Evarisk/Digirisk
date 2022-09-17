@@ -66,13 +66,13 @@ function digiriskdolibarr_completesubstitutionarray(&$substitutionarray, $langs,
 
 			$substitutionarray['responsable_a_prevenir']               = $legaldisplay->safety_rule->responsible_for_preventing;
 			$substitutionarray['telephone']                            = $legaldisplay->safety_rule->phone;
-			$substitutionarray['emplacement_des_consignes_detaillees'] = $legaldisplay->safety_rule->location_of_detailed_instruction;
-			$substitutionarray['permanente']                           = $legaldisplay->derogation_schedule->permanent;
-			$substitutionarray['occasionnelle']                        = $legaldisplay->derogation_schedule->occasional;
+			$substitutionarray['emplacement_des_consignes_detaillees'] = strip_tags($legaldisplay->safety_rule->location_of_detailed_instruction);
+			$substitutionarray['permanente']                           = strip_tags($legaldisplay->derogation_schedule->permanent);
+			$substitutionarray['occasionnelle']                        = strip_tags($legaldisplay->derogation_schedule->occasional);
 			$substitutionarray['intitule']                             = $legaldisplay->collective_agreement->title_of_the_applicable_collective_agreement;
-			$substitutionarray['lieu_modalite']                        = $legaldisplay->collective_agreement->location_and_access_terms_of_the_agreement;
-			$substitutionarray['modalite_information_ap']              = $legaldisplay->participation_agreement->information_procedures;
-			$substitutionarray['modalite_access']                      = $legaldisplay->DUER->how_access_to_duer;
+			$substitutionarray['lieu_modalite']                        = strip_tags($legaldisplay->collective_agreement->location_and_access_terms_of_the_agreement);
+			$substitutionarray['modalite_information_ap']              = strip_tags($legaldisplay->participation_agreement->information_procedures);
+			$substitutionarray['modalite_access']                      = strip_tags($legaldisplay->DUER->how_access_to_duer);
 
 			$substitutionarray['lundi_matin']    = $legaldisplay->working_hour->monday_morning;
 			$substitutionarray['lundi_aprem']    = $legaldisplay->working_hour->monday_afternoon;
@@ -132,9 +132,9 @@ function digiriskdolibarr_completesubstitutionarray(&$substitutionarray, $langs,
 			$substitutionarray['destinataireDUER']   = $riskassessmentdocument->destinataireDUER;
 			$substitutionarray['telephone']          = $riskassessmentdocument->telephone;
 			$substitutionarray['portable']           = $riskassessmentdocument->portable;
-			$substitutionarray['methodologie']       = $langs->trans($riskassessmentdocument->methodologie);
-			$substitutionarray['sources']            = $langs->trans($riskassessmentdocument->sources);
-			$substitutionarray['remarqueImportante'] = $langs->trans($riskassessmentdocument->remarqueImportante);
+			$substitutionarray['methodologie']       = strip_tags($riskassessmentdocument->methodologie);
+			$substitutionarray['sources']            = strip_tags($riskassessmentdocument->sources);
+			$substitutionarray['remarqueImportante'] = strip_tags($riskassessmentdocument->remarqueImportante);
 
 			break;
 	}
