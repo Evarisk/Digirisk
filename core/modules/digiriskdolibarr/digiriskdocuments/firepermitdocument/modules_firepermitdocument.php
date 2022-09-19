@@ -204,9 +204,9 @@ abstract class ModeleODTFirePermitDocument extends CommonDocGenerator
 				$tmparray['police_number'] = $societe->phone;
 			}
 
-			$tmparray['moyen_generaux_mis_disposition'] = $conf->global->DIGIRISKDOLIBARR_GENERAL_MEANS;
-			$tmparray['consigne_generale']              = $conf->global->DIGIRISKDOLIBARR_GENERAL_RULES;
-			$tmparray['premiers_secours']               = $conf->global->DIGIRISKDOLIBARR_FIRST_AID;
+			$tmparray['moyen_generaux_mis_disposition'] = strip_tags($conf->global->DIGIRISKDOLIBARR_GENERAL_MEANS);
+			$tmparray['consigne_generale']              = strip_tags($conf->global->DIGIRISKDOLIBARR_GENERAL_RULES);
+			$tmparray['premiers_secours']               = strip_tags($conf->global->DIGIRISKDOLIBARR_FIRST_AID);
 
 			$tmparray['titre_plan_prevention']  = $preventionplan->ref;
 			$tmparray['raison_plan_prevention'] = $preventionplan->label;
