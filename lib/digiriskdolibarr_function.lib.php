@@ -2056,7 +2056,7 @@ function digirisk_select_dictionary($htmlname, $dictionarytable, $keyfield = 'co
 				} else {
 					$out .= '<option value="' . $langs->transnoentities($obj->$keyfield) . '">';
 				}
-				$out .= $langs->transnoentities($obj->$labelfield);
+				$out .= $langs->transnoentities($obj->$keyfield) . ' ' .  $langs->transnoentities($obj->$labelfield);
 				$out .= '</option>';
 				$i++;
 			}
