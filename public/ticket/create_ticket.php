@@ -144,7 +144,7 @@ if ($action == 'add') {
 	}
 
 	if (empty(GETPOST('options_digiriskdolibarr_ticket_service')) || GETPOST('options_digiriskdolibarr_ticket_service') == -1) {
-		setEventMessages('<b>' . $langs->trans('ErrorFieldNotEmpty', $langs->transnoentitiesnoconv('Service')) . '</b>', null, 'errors');
+		setEventMessages('<b>' . $langs->trans('ErrorFieldNotEmpty', $langs->transnoentitiesnoconv('GP/UT')) . '</b>', null, 'errors');
 		$error++;
 	}
 	if (empty(GETPOST('options_digiriskdolibarr_ticket_date'))) {
