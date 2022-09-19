@@ -689,7 +689,7 @@ class Risk extends CommonObject
 	/**
 	 * Load dashboard info risk, get number risks by cotation.
 	 *
-	 * @return array|int
+	 * @return array
 	 * @throws Exception
 	 */
 	public function load_dashboard_risk()
@@ -718,10 +718,6 @@ class Risk extends CommonObject
 			),
 		);
 		$array['data'] = $digiriskelement->getRiskAssessmentCategoriesNumber();
-		if ($array['data'] < 0) {
-			return -1;
-		} else {
-			return $array;
-		}
+		return $array;
 	}
 }

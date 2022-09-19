@@ -271,11 +271,7 @@ abstract class ModeleODTRiskAssessmentDocument extends CommonDocGenerator
 							$scaleCounterWithoutSharedRisk = $digiriskelementsingle['object']->getRiskAssessmentCategoriesNumber();
 
 							foreach ($scale_counter as $key => $value) {
-								if (is_array($scaleCounterWithoutSharedRisk) && !empty($scaleCounterWithoutSharedRisk)) {
-									$final_scale_counter[$key] = $scale_counter[$key] + $scaleCounterWithoutSharedRisk[$key];
-								} else {
-									$final_scale_counter[$key] = $scale_counter[$key];
-								}
+								$final_scale_counter[$key] = $scale_counter[$key] + $scaleCounterWithoutSharedRisk[$key];
 							}
 
 							$cotationarray[$elementName] = array($totalQuotation, $digiriskelementsingle['object']->description,$final_scale_counter);

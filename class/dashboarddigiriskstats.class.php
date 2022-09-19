@@ -137,33 +137,38 @@ class DashboardDigiriskStats extends DigiriskStats
 
 		if (is_array($dataseries) && !empty($dataseries)) {
 			foreach ($dataseries as $keyelement => $datagraph['data']) {
-				if (is_array($datagraph['data']) && !empty($datagraph['data'])) {
-					$arraykeys = array_keys($datagraph['data']['data']);
-					foreach ($arraykeys as $key) {
-						$data[$keyelement][] = array(
-							0 => $langs->trans($datagraph['data']['labels'][$key]['label']),
-							1 => $datagraph['data']['data'][$key]
-						);
-						$datacolor[$keyelement][] = $langs->trans($datagraph['data']['labels'][$key]['color']);
+				if (is_array($datagraph['data']['data']) && !empty($datagraph['data']['data'])) {
+					foreach ($datagraph['data']['data'] as $datagraphsingle) {
+						$nbdata += $datagraphsingle;
 					}
+					if ($nbdata > 0) {
+						$arraykeys = array_keys($datagraph['data']['data']);
+						foreach ($arraykeys as $key) {
+							$data[$keyelement][] = array(
+								0 => $langs->trans($datagraph['data']['labels'][$key]['label']),
+								1 => $datagraph['data']['data'][$key]
+							);
+							$datacolor[$keyelement][] = $langs->trans($datagraph['data']['labels'][$key]['color']);
+						}
 
-					$filename[$keyelement] = $keyelement . '.png';
-					$fileurl[$keyelement]  = DOL_URL_ROOT . '/viewimage.php?modulepart=digiriskdolibarr&file=' . $keyelement . '.png';
+						$filename[$keyelement] = $keyelement . '.png';
+						$fileurl[$keyelement]  = DOL_URL_ROOT . '/viewimage.php?modulepart=digiriskdolibarr&file=' . $keyelement . '.png';
 
-					$graph = new DolGraph();
-					$graph->SetData($data[$keyelement]);
-					$graph->SetDataColor($datacolor[$keyelement]);
-					$graph->SetType(array('pie'));
-					$graph->SetWidth($WIDTH);
-					$graph->SetHeight($HEIGHT);
-					$graph->setShowLegend(2);
-					$graph->draw($filename[$keyelement], $fileurl[$keyelement]);
-					print '<div class="box-flex-item">';
-					print '<div class="titre inline-block">';
-					print $datagraph['data']['picto'] . ' ' . $datagraph['data']['title'];
-					print '</div>';
-					print $graph->show();
-					print '</div>';
+						$graph = new DolGraph();
+						$graph->SetData($data[$keyelement]);
+						$graph->SetDataColor($datacolor[$keyelement]);
+						$graph->SetType(array('pie'));
+						$graph->SetWidth($WIDTH);
+						$graph->SetHeight($HEIGHT);
+						$graph->setShowLegend(2);
+						$graph->draw($filename[$keyelement], $fileurl[$keyelement]);
+						print '<div class="box-flex-item">';
+						print '<div class="titre inline-block">';
+						print $datagraph['data']['picto'] . ' ' . $datagraph['data']['title'];
+						print '</div>';
+						print $graph->show();
+						print '</div>';
+					}
 				}
 			}
 		}
