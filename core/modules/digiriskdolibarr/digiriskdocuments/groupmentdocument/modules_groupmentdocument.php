@@ -109,6 +109,7 @@ abstract class ModeleODTGroupmentDocument extends CommonDocGenerator
 			$filename = $date . '_' . $digiriskelement->ref . '_' . $objectref . '_' . $digiriskelement->label . '.odt';
 			$filename = str_replace(' ', '_', $filename);
 			$filename = dol_sanitizeFileName($filename);
+			$filename = preg_replace('/[’‘‹›‚]/u', '', $filename);
 
 			$object->last_main_doc = $filename;
 

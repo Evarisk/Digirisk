@@ -117,6 +117,7 @@ abstract class ModeleODTListingRisksAction extends CommonDocGenerator
 			}
 			$filename = str_replace(' ', '_', $filename);
 			$filename = dol_sanitizeFileName($filename);
+			$filename = preg_replace('/[’‘‹›‚]/u', '', $filename);
 
 			$object->last_main_doc = $filename;
 

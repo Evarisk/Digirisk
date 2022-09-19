@@ -108,6 +108,7 @@ abstract class ModeleODTRiskAssessmentDocument extends CommonDocGenerator
 			$filename = $date . '_' . $objectref . '_' . $conf->global->MAIN_INFO_SOCIETE_NOM . '.odt';
 			$filename = str_replace(' ', '_', $filename);
 			$filename = dol_sanitizeFileName($filename);
+			$filename = preg_replace('/[’‘‹›‚]/u', '', $filename);
 
 			$object->last_main_doc = $filename;
 
