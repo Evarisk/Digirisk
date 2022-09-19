@@ -40,7 +40,6 @@ require_once DOL_DOCUMENT_ROOT . '/core/lib/date.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/projet/class/project.class.php';
 require_once DOL_DOCUMENT_ROOT . '/societe/class/societe.class.php';
 require_once DOL_DOCUMENT_ROOT . '/core/modules/project/mod_project_simple.php';
-require_once DOL_DOCUMENT_ROOT . '/core/class/dolgraph.class.php';
 
 require_once './core/modules/modDigiriskDolibarr.class.php';
 require_once __DIR__ . '/class/dashboarddigiriskstats.class.php';
@@ -64,10 +63,6 @@ if ( ! $user->rights->digiriskdolibarr->lire) accessforbidden();
 $action     = GETPOST('action', 'alpha');
 $backtopage = GETPOST('backtopage', 'alpha');
 $value      = GETPOST('value', 'alpha');
-
-$WIDTH  = DolGraph::getDefaultGraphSizeForStats('width');
-$HEIGHT = DolGraph::getDefaultGraphSizeForStats('height');
-
 
 $error = 0;
 

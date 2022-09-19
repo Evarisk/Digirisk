@@ -477,6 +477,24 @@ class Accident extends CommonObject
 
 		return $result;
 	}
+
+	/**
+	 * Load dashboard info accident, get number days without accident.
+	 *
+	 * @return float|int|string
+	 * @throws Exception
+	 */
+	public function load_dashboard_accident()
+	{
+		$lastAccident = $this->fetchAll('DESC', 'accident_date', 1, 0 );
+		if (is_array($lastAccident) && !empty($lastAccident)) {
+			$lastTimeAccident = dol_now() - reset($lastAccident)->accident_date;
+			$value = abs(round($lastTimeAccident / 86400));
+		} else {
+			$value = 'N/A';
+		}
+		return $value;
+	}
 }
 
 /**

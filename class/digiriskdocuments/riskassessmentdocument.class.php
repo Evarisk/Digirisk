@@ -140,4 +140,25 @@ class RiskAssessmentDocument extends DigiriskDocuments
 
 		return $object->json;
 	}
+
+	/**
+	 * Load dashboard info riskassessmentdocument, get number days without accident.
+	 *
+	 * @return array
+	 * @throws Exception
+	 */
+	public function load_dashboard_riskassementdocument()
+	{
+		$filter                      = array('customsql' => "t.type='riskassessmentdocument'");
+		$riskassessmentdocumentarray = $this->fetchAll('desc', 't.rowid', 1, 0, $filter, 'AND');
+		if ( ! empty($riskassessmentdocumentarray) && $riskassessmentdocumentarray > 0 && is_array($riskassessmentdocumentarray)) {
+			$riskassessmentdocument = array_shift($riskassessmentdocumentarray);
+			$array[0] = dol_print_date($riskassessmentdocument->date_creation, 'daytext');
+			$array[1] = dol_print_date(dol_time_plus_duree($riskassessmentdocument->date_creation, '1', 'y'), 'daytext');
+		} else {
+			$array[0] = 'N/A';
+			$array[1] = 'N/A';
+		}
+		return $array;
+	}
 }

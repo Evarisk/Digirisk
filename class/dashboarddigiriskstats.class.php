@@ -21,12 +21,13 @@
  *       \brief      Fichier de la classe de gestion des stats du dashboard
  */
 
-include_once DOL_DOCUMENT_ROOT.'/core/lib/date.lib.php';
-require_once DOL_DOCUMENT_ROOT . '/categories/class/categorie.class.php';
 require_once DOL_DOCUMENT_ROOT . '/projet/class/task.class.php';
+require_once DOL_DOCUMENT_ROOT . '/core/class/dolgraph.class.php';
+require_once DOL_DOCUMENT_ROOT . '/core/class/html.form.class.php';
 
 require_once __DIR__ . '/digiriskstats.php';
-require_once __DIR__ . '/digiriskelement.class.php';
+require_once __DIR__ . '/riskanalysis/risk.class.php';
+require_once __DIR__ . '/digirisktask.class.php';
 require_once __DIR__ . '/digiriskdocuments/riskassessmentdocument.class.php';
 require_once __DIR__ . '/accident.class.php';
 
@@ -45,104 +46,130 @@ class DashboardDigiriskStats extends DigiriskStats
 		$this->db = $db;
 	}
 
-	public function load_dashboard_risk() {
-		global $langs;
+	/**
+	 * Load data and show dashboard.
+	 *
+	 * @return void
+	 * @throws Exception
+	 */
+	public function show_dashboard()
+	{
+		global $conf, $langs, $user;
 
-		$digiriskelement = new DigiriskElement($this->db);
-		$array['title'] = $langs->transnoentities('RisksRepartition');
-		$array['picto'] = '<i class="fas fa-exclamation-triangle"></i>';
-		$array['labels'] = array(
-			1 => array(
-				'label' => $langs->transnoentities('GreyRisk'),
-				'color' => '#ececec'
+		$WIDTH  = DolGraph::getDefaultGraphSizeForStats('width');
+		$HEIGHT = DolGraph::getDefaultGraphSizeForStats('height');
+
+		$risk                 = new Risk($this->db);
+		$digirisktask         = new DigiriskTask($this->db);
+		$accident             = new Accident($this->db);
+		$riskassementdocument = new RiskAssessmentDocument($this->db);
+
+		$dataseries = array(
+			'risk' => $risk->load_dashboard_risk(),
+			'task' => $digirisktask->load_dashboard_task()
+		);
+
+		$accidentdata             = $accident->load_dashboard_accident();
+		$riskassementdocumentdata = $riskassementdocument->load_dashboard_riskassementdocument();
+
+		print '<form method="POST" action="' . $_SERVER["PHP_SELF"] . '" class="dashboard" id="dashBoardForm">';
+		print '<input type="hidden" name="token" value="' . newToken() . '">';
+		print '<input type="hidden" name="action" value="view">';
+
+		$dashboardLines = array(
+			'daywithoutaccident' => array(
+				'label' => $langs->trans("DayWithoutAccident"),
+				'content' => $accidentdata,
+				'picto' => 'fas fa-user-injured'
 			),
-			2 => array(
-				'label' => $langs->transnoentities('OrangeRisk'),
-				'color' => '#e9ad4f'
+			'lastgenerationdateDU' => array(
+				'label' => $langs->trans("LastGenerateDate"),
+				'content' => $riskassementdocumentdata[0],
+				'picto' => 'fas fa-info-circle'
 			),
-			3 => array(
-				'label' => $langs->transnoentities('RedRisk'),
-				'color' => 'e05353'
-			),
-			4 => array(
-				'label' => $langs->transnoentities('BlackRisk'),
-				'color' => '#2b2b2b'
+			'nextgenerationdateDU' => array(
+				'label' => $langs->trans("NextGenerateDate"),
+				'content' => $riskassementdocumentdata[1],
+				'picto' => 'fas fa-info-circle'
 			),
 		);
-		$array['data'] = $digiriskelement->getRiskAssessmentCategoriesNumber();
-		if ($array['data'] < 0) {
-			return -1;
-		} else {
-			return $array;
+
+		$disableWidgetList = json_decode($user->conf->DIGIRISKDOLIBARR_DISABLED_DASHBOARD_INFO);
+
+		print '<div class="add-widget-box" style="' . (!empty($disableWidgetList) ? '' : 'display:none') . '">';
+		print Form::selectarray('boxcombo', $dashboardLines, -1, $langs->trans("ChooseBoxToAdd") . '...', 0, 0, '', 0, 0, 0, 'ASC', 'maxwidth150onsmartphone hideonprint add-dashboard-widget', 0, 'hidden selected', 0, 1);
+		if (!empty($conf->use_javascript_ajax)) {
+			include_once DOL_DOCUMENT_ROOT . '/core/lib/ajax.lib.php';
+			print ajax_combobox("boxcombo");
 		}
-	}
+		print '</div>';
+		print '<div class="fichecenter">';
 
-	public function load_dashboard_task() {
-		global $conf, $langs;
-
-		$task = new Task($this->db);
-
-		$taskarray = $task->getTasksArray(0, 0, $conf->global->DIGIRISKDOLIBARR_DU_PROJECT);
-		if (is_array($taskarray) && !empty($taskarray)) {
-			$array = array();
-			$array['title'] = $langs->transnoentities('TasksRepartition');
-			$array['picto'] = '<i class="fas fa-tasks"></i>';
-			$array['labels'] = array(
-				0 => array(
-					'label' => $langs->transnoentities('TaskAt0Percent') . ' %',
-					'color' => '#e05353'
-				),
-				1 => array(
-					'label' => $langs->transnoentities('TaskInProgress'),
-					'color' => '#e9ad4f'
-				),
-				2 => array(
-					'label' => $langs->transnoentities('TaskAt100Percent') . ' %',
-					'color' => '#47e58e'
-				),
-			);
-			foreach ($taskarray as $tasksingle) {
-				if ($tasksingle->progress == 0) {
-					$array['data'][0] = $array['data'][0] + 1;
-				} elseif ($tasksingle->progress > 0 && $tasksingle->progress < 100) {
-					$array['data'][1] = $array['data'][1] + 1;
-				} else {
-					$array['data'][2] = $array['data'][2] + 1;
+		if (!empty($dashboardLines)) {
+			$openedDashBoard = '';
+			foreach ($dashboardLines as $key => $dashboardLine) {
+				if (!isset($disableWidgetList->$key)) {
+					$openedDashBoard .= '<div class="box-flex-item"><div class="box-flex-item-with-margin">';
+					$openedDashBoard .= '<div class="info-box info-box-sm">';
+					$openedDashBoard .= '<span class="info-box-icon">';
+					$openedDashBoard .= '<i class="' . $dashboardLine["picto"] . '"></i>';
+					$openedDashBoard .= '</span>';
+					$openedDashBoard .= '<div class="info-box-content">';
+					$openedDashBoard .= '<div class="info-box-title" title="' . $langs->trans("Close") . '">';
+					$openedDashBoard .= '<span class="close-dashboard-info" data-widgetname="' . $key . '"><i class="fas fa-times"></i></span>';
+					$openedDashBoard .= '</div>';
+					$openedDashBoard .= '<div class="info-box-lines">';
+					$openedDashBoard .= '<div class="info-box-line" style="font-size : 20px;">';
+					$openedDashBoard .= '<span class=""><strong>' . $dashboardLine["label"] . ' ' . '</strong>';
+					$openedDashBoard .= '<span class="classfortooltip badge badge-info" title="' . $dashboardLine["label"] . ' ' . $dashboardLine["content"] . '" >' . $dashboardLine["content"] . '</span>';
+					$openedDashBoard .= '</span>';
+					$openedDashBoard .= '</div>';
+					$openedDashBoard .= '</div><!-- /.info-box-lines --></div><!-- /.info-box-content -->';
+					$openedDashBoard .= '</div><!-- /.info-box -->';
+					$openedDashBoard .= '</div><!-- /.box-flex-item-with-margin -->';
+					$openedDashBoard .= '</div>';
 				}
 			}
-			return $array;
-		} else {
-			return -1;
+			print '<div class="opened-dash-board-wrap"><div class="box-flex-container">' . $openedDashBoard . '</div></div>';
 		}
-	}
 
-	public function load_dashboard_riskassementdocument() {
-		$riskassessmentdocument = new RiskAssessmentDocument($this->db);
+		print '<div class="box-flex-container">';
 
-		$filter                      = array('customsql' => "t.type='riskassessmentdocument'");
-		$riskassessmentdocumentarray = $riskassessmentdocument->fetchAll('desc', 't.rowid', 1, 0, $filter, 'AND');
-		if ( ! empty($riskassessmentdocumentarray) && $riskassessmentdocumentarray > 0 && is_array($riskassessmentdocumentarray)) {
-			$riskassessmentdocument = array_shift($riskassessmentdocumentarray);
-			$array[0] = dol_print_date($riskassessmentdocument->date_creation, 'daytext');
-			$array[1] = dol_print_date(dol_time_plus_duree($riskassessmentdocument->date_creation, '1', 'y'), 'daytext');
-		} else {
-			$array[0] = 'N/A';
-			$array[1] = 'N/A';
+		if (is_array($dataseries) && !empty($dataseries)) {
+			foreach ($dataseries as $keyelement => $datagraph['data']) {
+				if (is_array($datagraph['data']) && !empty($datagraph['data'])) {
+					$arraykeys = array_keys($datagraph['data']['data']);
+					foreach ($arraykeys as $key) {
+						$data[$keyelement][] = array(
+							0 => $langs->trans($datagraph['data']['labels'][$key]['label']),
+							1 => $datagraph['data']['data'][$key]
+						);
+						$datacolor[$keyelement][] = $langs->trans($datagraph['data']['labels'][$key]['color']);
+					}
+
+					$filename[$keyelement] = $keyelement . '.png';
+					$fileurl[$keyelement]  = DOL_URL_ROOT . '/viewimage.php?modulepart=digiriskdolibarr&file=' . $keyelement . '.png';
+
+					$graph = new DolGraph();
+					$graph->SetData($data[$keyelement]);
+					$graph->SetDataColor($datacolor[$keyelement]);
+					$graph->SetType(array('pie'));
+					$graph->SetWidth($WIDTH);
+					$graph->SetHeight($HEIGHT);
+					$graph->setShowLegend(2);
+					$graph->draw($filename[$keyelement], $fileurl[$keyelement]);
+					print '<div class="box-flex-item">';
+					print '<div class="titre inline-block">';
+					print $datagraph['data']['picto'] . ' ' . $datagraph['data']['title'];
+					print '</div>';
+					print $graph->show();
+					print '</div>';
+				}
+			}
 		}
-		return $array;
-	}
 
-	public function load_dashboard_accident() {
-		$accident = new Accident($this->db);
-
-		$lastAccident = $accident->fetchAll('DESC', 'accident_date', 1, 0 );
-		if (is_array($lastAccident) && !empty($lastAccident)) {
-			$lastTimeAccident = dol_now() - reset($lastAccident)->accident_date;
-			$array = abs(round($lastTimeAccident / 86400));
-		} else {
-			$array = 'N/A';
-		}
-		return $array;
+		print '</div></div></div>';
+		print '</form>';
 	}
 }
 

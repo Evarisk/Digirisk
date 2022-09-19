@@ -23,7 +23,9 @@
 
 require_once DOL_DOCUMENT_ROOT . '/core/class/commonobject.class.php';
 require_once DOL_DOCUMENT_ROOT . '/projet/class/task.class.php';
+
 require_once __DIR__ . '/../../lib/digiriskdolibarr_function.lib.php';
+require_once __DIR__ . '/../digiriskelement.class.php';
 
 /**
  * Class for Risk
@@ -682,5 +684,44 @@ class Risk extends CommonObject
 		else $result             .= $hookmanager->resPrint;
 
 		return $result;
+	}
+
+	/**
+	 * Load dashboard info risk, get number risks by cotation.
+	 *
+	 * @return array|int
+	 * @throws Exception
+	 */
+	public function load_dashboard_risk()
+	{
+		global $langs;
+
+		$digiriskelement = new DigiriskElement($this->db);
+		$array['title'] = $langs->transnoentities('RisksRepartition');
+		$array['picto'] = '<i class="fas fa-exclamation-triangle"></i>';
+		$array['labels'] = array(
+			1 => array(
+				'label' => $langs->transnoentities('GreyRisk'),
+				'color' => '#ececec'
+			),
+			2 => array(
+				'label' => $langs->transnoentities('OrangeRisk'),
+				'color' => '#e9ad4f'
+			),
+			3 => array(
+				'label' => $langs->transnoentities('RedRisk'),
+				'color' => 'e05353'
+			),
+			4 => array(
+				'label' => $langs->transnoentities('BlackRisk'),
+				'color' => '#2b2b2b'
+			),
+		);
+		$array['data'] = $digiriskelement->getRiskAssessmentCategoriesNumber();
+		if ($array['data'] < 0) {
+			return -1;
+		} else {
+			return $array;
+		}
 	}
 }
