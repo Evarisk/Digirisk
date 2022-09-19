@@ -64,6 +64,8 @@ abstract class ModeleODTRiskAssessmentDocument extends CommonDocGenerator
 		// phpcs:enable
 		global $user, $langs, $conf, $hookmanager, $action, $mysoc;
 
+		ini_set('pcre.backtrack_limit', 10000000);
+
 		if (empty($srctemplatepath)) {
 			dol_syslog("doc_riskassessmentdocument_odt::write_file parameter srctemplatepath empty", LOG_WARNING);
 			return -1;
