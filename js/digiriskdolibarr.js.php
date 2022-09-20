@@ -2532,6 +2532,7 @@ window.eoxiaJS.riskassessmenttask.createRiskAssessmentTask = function ( event ) 
 	taskText = window.eoxiaJS.risk.sanitizeBeforeRequest(taskText)
 
 	window.eoxiaJS.loader.display($(this));
+	window.eoxiaJS.loader.display($('.riskassessment-tasks' + riskToAssign));
 
 	let token = $('.fichecenter.risklist').find('input[name="token"]').val();
 
