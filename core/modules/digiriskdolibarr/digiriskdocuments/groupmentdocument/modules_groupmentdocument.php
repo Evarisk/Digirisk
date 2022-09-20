@@ -23,6 +23,7 @@
  */
 
 require_once DOL_DOCUMENT_ROOT . '/core/class/commondocgenerator.class.php';
+require_once DOL_DOCUMENT_ROOT . '/ticket/class/ticket.class.php';
 
 /**
  *	Parent class for documents models
@@ -199,9 +200,10 @@ abstract class ModeleODTGroupmentDocument extends CommonDocGenerator
 				if ($foundtagforlines) {
 					$risk      = new Risk($this->db);
 					$evaluator = new Evaluator($this->db);
-					$user      = new User($this->db);
+					$usertmp   = new User($this->db);
 					$risksign  = new RiskSign($this->db);
 					$accident  = new Accident($this->db);
+					$ticket    = new Ticket($this->db);
 
 					if ( ! empty($digiriskelement) ) {
 						//Fill risks data
@@ -245,7 +247,7 @@ abstract class ModeleODTGroupmentDocument extends CommonDocGenerator
 											$tmparray['commentaireEvaluation'] = $lastEvaluation->comment ? dol_print_date((($conf->global->DIGIRISKDOLIBARR_SHOW_RISKASSESSMENT_DATE && ( ! empty($lastEvaluation->date_riskassessment))) ? $lastEvaluation->date_riskassessment : $lastEvaluation->date_creation), 'dayreduceformat') . ': ' . $lastEvaluation->comment : '';
 
 											$related_tasks = $line->get_related_tasks($line);
-											$user          = new User($this->db);
+											$usertmp       = new User($this->db);
 
 											if ( ! empty($related_tasks) && is_array($related_tasks)) {
 												foreach ($related_tasks as $related_task) {
@@ -253,8 +255,8 @@ abstract class ModeleODTGroupmentDocument extends CommonDocGenerator
 													$related_task_contact_ids = $related_task->getListContactId();
 													if ( ! empty($related_task_contact_ids) && is_array($related_task_contact_ids)) {
 														foreach ($related_task_contact_ids as $related_task_contact_id) {
-															$user->fetch($related_task_contact_id);
-															$AllInitiales .= strtoupper(str_split($user->firstname, 1)[0]. str_split($user->lastname, 1)[0] . ', ');
+															$usertmp->fetch($related_task_contact_id);
+															$AllInitiales .= strtoupper(str_split($usertmp->firstname, 1)[0]. str_split($usertmp->lastname, 1)[0] . ', ');
 														}
 													}
 
@@ -368,13 +370,13 @@ abstract class ModeleODTGroupmentDocument extends CommonDocGenerator
 							foreach ($evaluators as $line) {
 								$element = new DigiriskElement($this->db);
 								$element->fetch($line->fk_element);
-								$user->fetch($line->fk_user);
+								$usertmp->fetch($line->fk_user);
 								$tmparray['nomElement']                 = (!empty($conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_EVALUATORS) ? 'S' . $element->entity . ' - ' : '') . $element->ref . ' - ' . $element->label;
 								$tmparray['idUtilisateur']              = $line->ref;
 								$tmparray['dateAffectationUtilisateur'] = dol_print_date($line->assignment_date, '%d/%m/%Y');
 								$tmparray['dureeEntretien']             = $line->duration . ' mins';
-								$tmparray['nomUtilisateur']             = $user->lastname;
-								$tmparray['prenomUtilisateur']          = $user->firstname;
+								$tmparray['nomUtilisateur']             = $usertmp->lastname;
+								$tmparray['prenomUtilisateur']          = $usertmp->firstname;
 
 								unset($tmparray['object_fields']);
 
@@ -471,6 +473,47 @@ abstract class ModeleODTGroupmentDocument extends CommonDocGenerator
 
 								$tmparray['AccidentWorkStopDays'] = $nbAccidentWorkStop;
 								$tmparray['AccidentComment']      = $line->description;
+
+								unset($tmparray['object_fields']);
+
+								complete_substitutions_array($tmparray, $outputlangs, $object, $line, "completesubstitutionarray_lines");
+								// Call the ODTSubstitutionLine hook
+								$parameters = array('odfHandler' => &$odfHandler, 'file' => $file, 'object' => $object, 'outputlangs' => $outputlangs, 'substitutionarray' => &$tmparray, 'line' => $line);
+								$hookmanager->executeHooks('ODTSubstitutionLine', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
+								foreach ($tmparray as $key => $val) {
+									try {
+										if (file_exists($val)) {
+											$listlines->setImage($key, $val);
+										} elseif (empty($val)) {
+											$listlines->setVars($key, $langs->trans('NoData'), true, 'UTF-8');
+										} else {
+											$listlines->setVars($key, html_entity_decode($val, ENT_QUOTES | ENT_HTML5), true, 'UTF-8');
+										}
+									} catch (OdfException $e) {
+										dol_syslog($e->getMessage(), LOG_INFO);
+									} catch (SegmentException $e) {
+										dol_syslog($e->getMessage(), LOG_INFO);
+									}
+								}
+								$listlines->merge();
+							}
+						}
+						$odfHandler->mergeSegment($listlines);
+
+						//Fill tickets data
+						$filter = array('ef.digiriskdolibarr_ticket_service' => $digiriskelement->id);
+						$ticket->fetchAll($user, '', '', '', 0, '', $filter);
+						$listlines = $odfHandler->setSegment('tickets');
+						if (is_array($ticket->lines) && !empty($ticket->lines)) {
+							foreach ($ticket->lines as $line) {
+								$tmparray['refticket']     = $line->ref;
+								$tmparray['creation_date'] = dol_print_date($line->datec, 'dayhoursec', 'tzuser');
+								$tmparray['subject']       = $line->subject;
+								$tmparray['progress']      = (($line->progress) ?: 0) . ' %';
+
+								$ticketmp = new Ticket($this->db);
+								$ticketmp->fetch($line->id);
+								$tmparray['status'] = $ticketmp->getLibStatut();
 
 								unset($tmparray['object_fields']);
 
