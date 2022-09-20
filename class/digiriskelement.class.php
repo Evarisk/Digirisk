@@ -451,7 +451,7 @@ class DigiriskElement extends CommonObject
 			}
 		}
 
-		$sql .= $this->db->order("rowid", "ASC");
+		$sql .= $this->db->order("ranks", "ASC");
 		$sql .= $this->db->plimit($limit, 0);
 
 		// Build output string
@@ -475,13 +475,25 @@ class DigiriskElement extends CommonObject
 
 			if ( ! $noroot) $out .= '<option value="0" selected>' . $langs->trans('Root') . ' : ' . $conf->global->MAIN_INFO_SOCIETE_NOM . '</option>';
 
+			$digiriskelementlist = $this->fetchDigiriskElementFlat(0);
+
+			if ( ! empty($digiriskelementlist) ) {
+				foreach ($digiriskelementlist as $line) {
+					$depthHyphens = '';
+					for ($k = 0; $k < $line['depth']; $k++) {
+						$depthHyphens .= '- ';
+					}
+					$depth[$line['object']->id] = $depthHyphens;
+				}
+			}
+
 			if ($num) {
 				while ($i < $num) {
 					$obj   = $this->db->fetch_object($resql);
 					if ((!empty($conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS) && $contextpage == 'sharedrisk') || (!empty($conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKSIGNS) && $contextpage == 'sharedrisksign')) {
-						$label = 'S'. $obj->entity . ' - ' . $obj->ref . ' - ' . $obj->label;
+						$label = $depth[$obj->rowid] . 'S'. $obj->entity . ' - ' . $obj->ref . ' - ' . $obj->label;
 					} else {
-						$label =  $obj->ref . ' - ' . $obj->label;
+						$label = $depth[$obj->rowid] . $obj->ref . ' - ' . $obj->label;
 					}
 
 					if (empty($outputmode)) {
