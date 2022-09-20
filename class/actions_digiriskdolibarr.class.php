@@ -304,11 +304,11 @@ class ActionsDigiriskdolibarr
 			$digiriskelement = new DigiriskElement($db);
 			$selectDigiriskElement = '<span>'. $langs->trans('GP/UT') .'</span>';
 
-			$disabled_digiriskelement = json_decode($conf->global->DIGIRISKDOLIBARR_DISABLED_DIGIRISKELEMENT_SELECT_PUBLIC_TICKET_INTERFACE);
-			if (is_array($disabled_digiriskelement) && !empty($disabled_digiriskelement)) {
+			$alldisableddigiriskelement = $digiriskelement->fetchAll('', '', 0, 0, array('customsql' => 't.show_in_selector = 0'));
+			if (is_array($alldisableddigiriskelement) && !empty($alldisableddigiriskelement)) {
 				$filter = 's.rowid NOT IN (';
-				foreach ($disabled_digiriskelement as $disabled_digiriskelementsingle) {
-					$filter .= $disabled_digiriskelementsingle . ',';
+				foreach ($alldisableddigiriskelement as $disabled_digiriskelement) {
+					$filter .= $disabled_digiriskelement->id . ',';
 				}
 				$filter = substr($filter, 0, -1);
 				$filter .= ')';

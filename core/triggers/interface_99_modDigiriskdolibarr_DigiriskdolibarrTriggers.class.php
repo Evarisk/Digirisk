@@ -293,7 +293,6 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 			case 'DIGIRISKELEMENT_CREATE' :
 				dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id);
 				require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
-				require_once DOL_DOCUMENT_ROOT . '/core/lib/admin.lib.php';
 				$now        = dol_now();
 				$actioncomm = new ActionComm($this->db);
 
@@ -308,19 +307,6 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->percentage  = -1;
 
 				$actioncomm->create($user);
-
-				$showinselectonpublicticketinterface = GETPOST('show_in_select_on_public_ticket_interface');
-				if (empty($showinselectonpublicticketinterface)) {
-					$disabled_digiriskelement = json_decode($conf->global->DIGIRISKDOLIBARR_DISABLED_DIGIRISKELEMENT_SELECT_PUBLIC_TICKET_INTERFACE);
-					if (empty($disabled_digiriskelement)) {
-						$array[] = $object->id;
-						$array = json_encode($array);
-					} else {
-						$disabled_digiriskelement[] = $object->id;
-						$array = json_encode($disabled_digiriskelement);
-					}
-					dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_DISABLED_DIGIRISKELEMENT_SELECT_PUBLIC_TICKET_INTERFACE', $array, 'chaine', 0, '', $conf->entity);
-				}
 				break;
 
 			case 'SIGNATURE_GENERATE' :

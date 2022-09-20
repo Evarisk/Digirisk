@@ -569,7 +569,6 @@ class modDigiriskdolibarr extends DolibarrModules
 			141 => array('DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH', 'integer', 0, '', 0, 'current'),
 			142 => array('DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH_UPDATED', 'integer', 0, '', 0, 'current'),
 			143 => array('DIGIRISKDOLIBARR_SHOW_HIDDEN_DIGIRISKELEMENT', 'integer', 0, '', 0, 'current'),
-			144 => array('DIGIRISKDOLIBARR_DISABLED_DIGIRISKELEMENT_SELECT_PUBLIC_TICKET_INTERFACE', 'chaine', '', '', 0, 'current'),
 
 			// CONST GROUPMENT
 			150 => array('MAIN_AGENDA_ACTIONAUTO_GROUPMENT_CREATE', 'integer', 1, '', 0, 'current'),
