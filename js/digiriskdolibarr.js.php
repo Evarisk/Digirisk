@@ -2304,7 +2304,7 @@ window.eoxiaJS.evaluation.saveEvaluation = function ( event ) {
 	})
 
 	window.eoxiaJS.loader.display($(this));
-	window.eoxiaJS.loader.display($('#risk_row_' + riskId));
+	window.eoxiaJS.loader.display($('.risk-evaluation-list-container-'+riskId));
 
 	let token = $('.fichecenter.risklist').find('input[name="token"]').val();
 
