@@ -299,13 +299,16 @@ if ($action == 'removefile') {
 	$fileList          = dol_dir_list($ticket_upload_dir);
 
 	if (is_file($ticket_upload_dir . $filetodelete)) {
+		//Delete file
 		dol_delete_file($ticket_upload_dir . $filetodelete);
 
-		$thumbsList = dol_dir_list($ticket_upload_dir . 'thumbs/');
-		if ( ! empty($thumbsList)) {
-			foreach ($thumbsList as $thumb) {
-				if (preg_match('/' . preg_split('/\./', $filetodelete)[0] . '/', $thumb['name'])) {
-					dol_delete_file($ticket_upload_dir . 'thumbs/' . $thumb['name']);
+		//Delete file thumbs
+		$thumbs_names = getAllThumbsNames($filename);
+		if (!empty($thumbs_names)) {
+			foreach($thumbs_names as $thumb_name) {
+				$thumb_fullname  = $ticket_upload_dir . 'thumbs/' . $thumb_name;
+				if (file_exists($thumb_fullname)) {
+					unlink($thumb_fullname);
 				}
 			}
 		}

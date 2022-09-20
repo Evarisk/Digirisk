@@ -136,9 +136,12 @@ if ( $action == "edit" && $permissiontoadd ) {
 	print '<td>';
 	$filearray = dol_dir_list($conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessmentdocument/', "files", 0, '', '(\.odt|\.zip)', 'date', 'asc', 1);
 	if (count($filearray)) : ?>
-		<?php $file = array_shift($filearray); ?>
+		<?php
+		$file = array_shift($filearray);
+		$thumb_name               = getThumbName($file['name']);
+		?>
 		<span class="">
-			<?php print '<img class="" src="' . DOL_URL_ROOT . '/viewimage.php?modulepart=digiriskdolibarr&entity=' . $conf->entity . '&file=' . urlencode('/riskassessmentdocument/thumbs/' . preg_replace('/\./', '_small.', $file['name'])) . '" >'; ?>
+			<?php print '<img class="" src="' . DOL_URL_ROOT . '/viewimage.php?modulepart=digiriskdolibarr&entity=' . $conf->entity . '&file=' . urlencode('/riskassessmentdocument/thumbs/' . $thumb_name) . '" >'; ?>
 		</span>
 	<?php else : ?>
 		<?php $nophoto = DOL_URL_ROOT . '/public/theme/common/nophoto.png'; ?>

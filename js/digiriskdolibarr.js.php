@@ -1262,7 +1262,8 @@ window.eoxiaJS.mediaGallery.savePhoto = function( event ) {
 		riskAssessmentPhoto = $('.risk-evaluation-photo-'+idToSave+'.risk-'+riskId)
 
 		let filepath = modalFrom.find('.risk-evaluation-photo-single .filepath-to-riskassessment').val()
-		let newPhoto = filepath + favorite.replace(/\./, '_small.')
+		let thumbName = window.eoxiaJS.file.getThumbName(favorite)
+		let newPhoto = filepath + thumbName
 
 		$.ajax({
 			url: document.URL + "&action=addFiles&token=" + token,
@@ -1283,11 +1284,13 @@ window.eoxiaJS.mediaGallery.savePhoto = function( event ) {
 				newPhoto = newPhoto.replace(/\)/g, '%29')
 				newPhoto = newPhoto.replace(/\+/g, '%2B')
 
+				//Update risk assessment main img in "photo" of risk assessment modal
 				riskAssessmentPhoto.each( function() {
 					$(this).find('.clicked-photo-preview').attr('src',newPhoto )
-					$(this).find('.filename').attr('value', favorite.match(/_small/) ? favorite.replace(/\./, '_small.') : favorite)
+					$(this).find('.filename').attr('value', favorite)
 				});
 
+				//Remove special chars from img
 				favorite = favorite.replace(/\ /g, '%20')
 				favorite = favorite.replace(/\(/g, '%28')
 				favorite = favorite.replace(/\)/g, '%29')
@@ -1309,7 +1312,8 @@ window.eoxiaJS.mediaGallery.savePhoto = function( event ) {
 		digiriskElementPhoto = $('.digirisk-element-'+idToSave).find('.clicked-photo-preview')
 
 		let filepath = $('.digirisk-element-'+idToSave).find('.filepath-to-digiriskelement').val()
-		let newPhoto = filepath + favorite.replace(/\./, '_small.')
+		let thumbName = window.eoxiaJS.file.getThumbName(favorite)
+		let newPhoto = filepath + thumbName
 
 		$.ajax({
 			url: document.URL + "&action=addDigiriskElementFiles&token=" + token,
@@ -1477,13 +1481,6 @@ window.eoxiaJS.mediaGallery.unlinkFile = function( event ) {
 	if (type === 'riskassessment') {
 		let riskAssessmentPhoto = $('.risk-evaluation-photo-'+element_linked_id)
 		previousPhoto = $(this).closest('.modal-container').find('.risk-evaluation-photo .clicked-photo-preview')
-		//previousName = previousPhoto[0].src.trim().split(/thumbs%2F/)[1].split(/"/)[0]
-
-		//if (previousName == filename.replace(/\./, '_small.')) {
-		//	newPhoto = previousPhoto[0].src.replace(previousName, '')
-		//} else {
-		//	newPhoto = previousPhoto[0].src
-		//}
 		newPhoto = previousPhoto[0].src
 		$.ajax({
 			url: document.URL + querySeparator + "action=unlinkFile&token=" + token,
@@ -1504,13 +1501,6 @@ window.eoxiaJS.mediaGallery.unlinkFile = function( event ) {
 		});
 	} else if (type === 'digiriskelement') {
 		previousPhoto = $('.digirisk-element-'+element_linked_id).find('.photo.clicked-photo-preview')
-		//previousName = previousPhoto[0].src.trim().split(/thumbs%2F/)[1].split(/"/)[0]
-
-		//if (previousName == filename.replace(/\./, '_small.')) {
-		//	newPhoto = previousPhoto[0].src.replace(previousName, '')
-		//} else {
-		//	newPhoto = previousPhoto[0].src
-		//}
 		newPhoto = previousPhoto[0].src
 
 		$.ajax({
@@ -1580,7 +1570,8 @@ window.eoxiaJS.mediaGallery.addToFavorite = function( event ) {
 		$(this).closest('.modal-content').find('.risk-evaluation-photo-single .filename').attr('value', filename)
 
 		let filepath = modalFrom.find('.risk-evaluation-photo-single .filepath-to-riskassessment').val()
-		let newPhoto = filepath + filename.replace(/\./, '_small.')
+		let thumbName = window.eoxiaJS.file.getThumbName(filename)
+		let newPhoto = filepath + thumbName
 
 		let saveButton = $(this).closest('.modal-container').find('.risk-evaluation-save')
 		saveButton.addClass('button-disable')
@@ -1609,8 +1600,9 @@ window.eoxiaJS.mediaGallery.addToFavorite = function( event ) {
 		previousPhoto = $('.digirisk-element-'+element_linked_id).find('.photo.clicked-photo-preview')
 
 		let filepath =$('.digirisk-element-'+element_linked_id).find('.filepath-to-digiriskelement').val()
-		let newPhoto = filepath + filename.replace(/\./, '_small.')
-
+		let thumbName = window.eoxiaJS.file.getThumbName(filename)
+		let newPhoto = filepath + thumbName
+		
 		jQuery.ajax({
 			url: document.URL + querySeparator + "action=addDigiriskElementPhotoToFavorite&token=" + token,
 			type: "POST",
@@ -4326,4 +4318,38 @@ window.eoxiaJS.dashboard.closeDashBoardInfo = function() {
 		error: function ( ) {
 		}
 	});
+};
+
+/**
+ * Initialise l'objet "file" ainsi que la méthode "init" obligatoire pour la bibliothèque EoxiaJS.
+ *
+ * @since   1.1.0
+ * @version 1.1.0
+ */
+window.eoxiaJS.file = {};
+
+/**
+ * La méthode appelée automatiquement par la bibliothèque EoxiaJS.
+ *
+ * @since   1.1.0
+ * @version 1.1.0
+ *
+ * @return {void}
+ */
+window.eoxiaJS.file.init = function() {
+};
+
+/**
+ * Close widget dashboard info
+ *
+ * @since   9.5.0
+ * @version 9.5.0
+ *
+ * @return {void}
+ */
+window.eoxiaJS.file.getThumbName = function(file, type = 'small') {
+	let fileExtension = file.split('.').pop();
+	let fileName = file.split('.'+fileExtension)[0]
+	let thumbName = fileName + '_' + type + '.' + fileExtension
+	return thumbName;
 };

@@ -282,10 +282,8 @@ if ($sharedrisks) {
 				$importValue .=	'<input class="filename" type="hidden" value="">';
 				if (isset($lastEvaluation->photo) && dol_strlen($lastEvaluation->photo) > 0) {
 					$accessallowed = 1;
-
-//				$importValue .=	 '<img width="40" class="photo clicked-photo-preview" src="' . $conf->digiriskdolibarr->multidir_output[$risks->entity?:1] . $lastEvaluation->element . '/' . $lastEvaluation->ref . '/thumbs/' . preg_replace('/\./', '_small.', $lastEvaluation->photo)) . '" >';
-//				$importValue .=	 '<img width="40" class="photo clicked-photo-preview" src="' . DOL_DATA_ROOT . $entity . '/digiriskdolibarr/'. $lastEvaluation->element . '/' . $lastEvaluation->ref . '/thumbs/' . preg_replace('/\./', '_small.', $lastEvaluation->photo) . '" >';
-					$importValue .=	 '<img width="40" class="photo clicked-photo-preview" src="' . DOL_URL_ROOT . '/custom/digiriskdolibarr/documents/viewimage.php?modulepart=digiriskdolibarr&entity=' . $risks->entity . '&file=' . urlencode($lastEvaluation->element . '/' . $lastEvaluation->ref . '/thumbs/' . preg_replace('/\./', '_small.', $lastEvaluation->photo)) . '" >';
+					$thumb_name = getThumbName($lastEvaluation->photo);
+					$importValue .=	 '<img width="40" class="photo clicked-photo-preview" src="' . DOL_URL_ROOT . '/custom/digiriskdolibarr/documents/viewimage.php?modulepart=digiriskdolibarr&entity=' . $risks->entity . '&file=' . urlencode($lastEvaluation->element . '/' . $lastEvaluation->ref . '/thumbs/' . $thumb_name) . '" >';
 				} else {
 					$importValue .=	 '<img width="40" class="photo clicked-photo-preview" src="'. $nophoto .'" >';
 				}

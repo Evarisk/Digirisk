@@ -637,24 +637,25 @@ if ( ! $error && $action == "unlinkFile" && $permissiontodelete) {
 		$pathToEvaluationPhoto = $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessment/tmp/' . $risktmp->ref;
 	} elseif ($risk_id == 'new') {
 		//create risk
-		$pathToEvaluationPhoto = $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessment/tmp/RK0/';
+		$pathToEvaluationPhoto = $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessment/tmp/RK0';
 	}
 
+	//Delete file
+	if (file_exists($pathToEvaluationPhoto . '/' . $filename)) {
+		unlink($pathToEvaluationPhoto . '/' . $filename);
+	}
 
-	$files = dol_dir_list($pathToEvaluationPhoto);
-
-	foreach ($files as $file) {
-		if (is_file($file['fullname']) && $file['name'] == $filename) {
-			unlink($file['fullname']);
+	//Delete file thumbs
+	$thumbs_names = getAllThumbsNames($filename);
+	if (!empty($thumbs_names)) {
+		foreach($thumbs_names as $thumb_name) {
+			$thumb_fullname  = $pathToEvaluationPhoto . '/thumbs/' . $thumb_name;
+			if (file_exists($thumb_fullname)) {
+				unlink($thumb_fullname);
+			}
 		}
 	}
 
-	$files = dol_dir_list($pathToEvaluationPhoto . '/thumbs');
-	foreach ($files as $file) {
-		if (preg_match('/' . preg_split('/\./', $filename)[0] . '/', $file['name'])) {
-			unlink($file['fullname']);
-		}
-	}
 	if ($riskassessment->photo == $filename) {
 		$riskassessment->photo = '';
 		$riskassessment->update($user, true);

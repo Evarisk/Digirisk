@@ -213,9 +213,8 @@ abstract class ModeleODTTicketDocument extends CommonDocGenerator
 
 			if (count($filearray)) {
 				$filearray = dol_sort_array($filearray, 'position');
-				$file_small               = preg_split('/\./', $filearray[0]['name']);
-				$new_file                 = $file_small[0] . '_small.' . $file_small[1];
-				$tmparray['photo'] = $photo_path . '/thumbs/' . $new_file;
+				$thumb_name = getThumbName($filearray[0]['name']);
+				$tmparray['photo'] = $photo_path . '/thumbs/' . $thumb_name;
 			} else {
 				$nophoto                  = '/public/theme/common/nophoto.png';
 				$tmparray['photo'] = DOL_DOCUMENT_ROOT . $nophoto;

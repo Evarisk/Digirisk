@@ -227,12 +227,10 @@ abstract class ModeleODTListingRisksPhoto extends CommonDocGenerator
 										if (dol_strlen($lastEvaluation->photo) && $lastEvaluation !== 'undefined') {
 											$entity = $lastEvaluation->entity > 1 ? '/' . $lastEvaluation->entity : '';
 											$path                      = DOL_DATA_ROOT . $entity . '/digiriskdolibarr/riskassessment/' . $lastEvaluation->ref;
-											$file_small                = preg_split('/\./', $lastEvaluation->photo);
-											$new_file                  = $file_small[0] . '_small.' . $file_small[1];
-											$image                     = $path . '/thumbs/' . $new_file;
+											$thumb_name               = getThumbName($lastEvaluation->photo);
+											$image                    = $path . '/thumbs/' . $thumb_name;
 											$tmparray['photoAssociee'] = $image;
 										} else {
-											$image = '';
 											$tmparray['photoAssociee'] = $langs->transnoentities('NoFileLinked');
 										}
 										unset($tmparray['object_fields']);

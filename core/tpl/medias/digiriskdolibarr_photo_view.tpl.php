@@ -53,9 +53,9 @@ if (empty($conf) || ! is_object($conf)) {
 
 						 <?php
 							 $urladvanced = getAdvancedPreviewUrl('ecm', 'digiriskdolibarr/medias/' .  $cotation->photo, 0, 'entity=' . $conf->entity);
-
+							 $thumb_name = getThumbName($cotation->photo);
 							 print '<a class="clicked-photo-preview" href="'. $urladvanced .'">';
-							 print '<img width="40" class="photo clicked-photo-preview" src="' . DOL_URL_ROOT . '/custom/digiriskdolibarr/documents/viewimage.php?modulepart=digiriskdolibarr&entity=' . $cotation->entity . '&file=' . urlencode($cotation->element . '/' . $cotation->ref . '/thumbs/' . preg_replace('/\./', '_small.', $cotation->photo)) . '" ></a>';
+							 print '<img width="40" class="photo clicked-photo-preview" src="' . DOL_URL_ROOT . '/custom/digiriskdolibarr/documents/viewimage.php?modulepart=digiriskdolibarr&entity=' . $cotation->entity . '&file=' . urlencode($cotation->element . '/' . $cotation->ref . '/thumbs/' . $thumb_name) . '" ></a>';
 						 ?>
 					</span>
 

@@ -163,8 +163,13 @@ abstract class ModeleODTRiskAssessmentDocument extends CommonDocGenerator
 			$hookmanager->executeHooks('ODTSubstitution', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
 
 			$filearray                 = dol_dir_list($conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessmentdocument/', "files", 0, '', '(\.odt|\.zip)', 'date', 'asc', 1);
-			$sitePlans                 = array_shift($filearray);
-			$tmparray['dispoDesPlans'] = $sitePlans['path'] . '/thumbs/' . preg_replace('/\./', '_small.', $sitePlans['name']);
+			if (is_array($filearray) && !empty($filearray)) {
+				$sitePlans                 = array_shift($filearray);
+				$thumb_name               = getThumbName($sitePlans['name']);
+				$tmparray['dispoDesPlans'] = $sitePlans['path'] . '/thumbs/' . $thumb_name;
+			} else {
+				$tmparray['dispoDesPlans'] = '';
+			}
 
 			foreach ($tmparray as $key => $value) {
 				try {

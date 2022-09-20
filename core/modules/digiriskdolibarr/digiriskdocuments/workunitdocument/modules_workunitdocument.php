@@ -169,9 +169,8 @@ abstract class ModeleODTWorkUnitDocument extends CommonDocGenerator
 			$filearray = dol_dir_list($conf->digiriskdolibarr->multidir_output[$conf->entity] . '/' . $digiriskelement->element_type . '/' . $digiriskelement->ref . '/thumbs/', "files", 0, '', '(\.odt|_preview.*\.png)$', 'position_name', 'desc', 1);
 			if (count($filearray)) {
 				if (!empty($digiriskelement->photo)) {
-					$file_small               = preg_split('/\./', $digiriskelement->photo);
-					$new_file                 = $file_small[0] . '_small.' . $file_small[1];
-					$image                    = $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/' . $digiriskelement->element_type . '/' . $digiriskelement->ref . '/thumbs/' . $new_file;
+					$thumb_name               = getThumbName($digiriskelement->photo);
+					$image                    = $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/' . $digiriskelement->element_type . '/' . $digiriskelement->ref . '/thumbs/' . $thumb_name;
 					$tmparray['photoDefault'] = $image;
 				}
 			} else {

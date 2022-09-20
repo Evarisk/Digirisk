@@ -774,31 +774,27 @@ function display_recurse_tree($results)
 		$digiriskelement = new DigiriskElement($db);
 		$digiriskelement->fetch($digiriskelement_id);
 
-		//edit evaluation
 		if ($digiriskelement->id > 0) {
 			$pathToDigiriskElementPhoto = $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/' . $digiriskelement->element_type . '/' . $digiriskelement->ref ;
-			$files = dol_dir_list($pathToDigiriskElementPhoto);
 
-			foreach ($files as $file) {
-				if (is_file($file['fullname']) && $file['name'] == $filename) {
-					unlink($file['fullname']);
+			//Delete file
+			unlink($pathToDigiriskElementPhoto . '/' . $filename);
+
+			//Delete file thumbs
+			$thumbs_names = getAllThumbsNames($filename);
+			if (!empty($thumbs_names)) {
+				foreach($thumbs_names as $thumb_name) {
+					$thumb_fullname  = $pathToDigiriskElementPhoto . '/thumbs/' . $thumb_name;
+					if (file_exists($thumb_fullname)) {
+						unlink($thumb_fullname);
+					}
 				}
 			}
 
-			$files = dol_dir_list($pathToDigiriskElementPhoto . '/thumbs');
-			foreach ($files as $file) {
-				if (preg_match('/' . preg_split('/\./', $filename)[0] . '/', $file['name'])) {
-					unlink($file['fullname']);
-				}
-			}
 			if ($digiriskelement->photo == $filename) {
 				$digiriskelement->photo = '';
 				$digiriskelement->update($user, true);
 			}
-//			$urltogo = str_replace('__ID__', $id, $backtopage);
-//			$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
-//			header("Location: " . $urltogo);
-//			exit;
 		}
 	}
 
@@ -858,7 +854,7 @@ function display_recurse_tree($results)
 					$filearray   = dol_dir_list($conf->digiriskdolibarr->multidir_output[$conf->entity] . '/' . $element['object']->element_type . '/' . $element['object']->ref . '/', "files", 0, '', '(\.odt|_preview.*\.png)$', 'position_name', 'asc', 1);
 					if (count($filearray)) {
 						print '<span class="floatleft inline-block valignmiddle divphotoref open-medias-linked modal-open digirisk-element digirisk-element-' . $element['object']->id . '" value="' . $element['object']->id . '">';
-						$img_path =  dol_strlen($element['object']->photo) > 0 ? DOL_URL_ROOT . '/viewimage.php?modulepart=digiriskdolibarr&entity=' . $conf->entity . '&file=' . urlencode($element['object']->element_type . '/' . $element['object']->ref . '/thumbs/' . preg_replace('/\./', '_small.', $element['object']->photo)) : $nophoto;
+						$img_path =  dol_strlen($element['object']->photo) > 0 ? DOL_URL_ROOT . '/viewimage.php?modulepart=digiriskdolibarr&entity=' . $conf->entity . '&file=' . urlencode($element['object']->element_type . '/' . $element['object']->ref . '/thumbs/' . getThumbName($element['object']->photo)) : $nophoto;
 						print '<img width="50" height="50" class="photo clicked-photo-preview" src="'. $img_path .'" >';
 						print '<input type="hidden" class="filepath-to-digiriskelement" value="' . $pathToThumb . '"/>';
 						print '</span>';
@@ -3111,4 +3107,50 @@ function getObjectsInCategDigirisk($object, $type, $onlyids = 0, $limit = 0, $of
 		$object->error = $object->db->error().' sql='.$sql;
 		return -1;
 	}
+}
+
+/**
+ * Return file specified thumb name
+ *
+ * @param  object            $object           Category object
+ * @param  string     	     $filename         File name
+ * @param  string        	 $thumb_type       Thumb type (small, mini, large, medium)
+ * @return string
+ * @throws Exception
+*/
+function getThumbName($filename, $thumb_type = 'small')
+{
+	$img_name = pathinfo($filename, PATHINFO_FILENAME);
+	$img_extension = pathinfo($filename, PATHINFO_EXTENSION);
+	$thumb_fullname = $img_name . '_'. $thumb_type .'.' . $img_extension;
+
+	return $thumb_fullname;
+}
+
+/**
+ * Return file thumbs names
+ *
+ * @param  object            $object           Category object
+ * @param  string     	     $filename         File name
+ * @param  string        	 $thumb_type       Thumb type (small, mini, large, medium)
+ * @return string
+ * @throws Exception
+*/
+function getAllThumbsNames($filename)
+{
+	$thumbs_fullnames = array();
+	$thumb_types = array(
+		'large',
+		'medium',
+		'small',
+		'mini'
+	);
+	$img_name = pathinfo($filename, PATHINFO_FILENAME);
+	$img_extension = pathinfo($filename, PATHINFO_EXTENSION);
+
+	foreach ($thumb_types as $thumb_type) {
+		$thumbs_fullnames[] = $img_name . '_'. $thumb_type .'.' . $img_extension;
+	}
+
+	return $thumbs_fullnames;
 }
