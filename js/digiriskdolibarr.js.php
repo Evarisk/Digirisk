@@ -1860,16 +1860,13 @@ window.eoxiaJS.risk.saveRisk = function ( event ) {
 	} else {
 		var description = '';
 	}
-	//var newParent = $(this).closest('.risk-container').find('#select2-socid-container').attr('title');
-	var newParent = $(this).closest('.risk-container').find('#socid option:selected').text();
-	if (newParent) {
-		newParent = newParent.split(/ /)[0];
-	}
+	var newParent = $(this).closest('.risk-container').find('#socid option:selected').val();
 
-	let elementParent = $('.fichecenter.risklist').find('.div-table-responsive');
-	//window.eoxiaJS.loader.display($(this));
+	let elementParent = $('.fichecenter.risklist').find('.div-title-and-table-responsive');
 	if (riskCommentText) {
 		window.eoxiaJS.loader.display($(this).closest('.risk-row-content-' + editedRiskId).find('.risk-description-'+editedRiskId));
+	} else {
+		window.eoxiaJS.loader.display($(this).closest('.risk-row-content-' + editedRiskId))
 	}
 	let riskRef =  $('.risk_row_'+editedRiskId).find('.risk-container > div:nth-child(1)').text();
 
@@ -1887,7 +1884,8 @@ window.eoxiaJS.risk.saveRisk = function ( event ) {
 		}),
 		contentType: false,
 		success: function ( resp ) {
-			elementParent.html($(resp).find('.div-table-responsive'))
+			elementParent.removeClass('wpeo-loader');
+			elementParent.html($(resp).find('.div-title-and-table-responsive'))
 			let actionContainerSuccess = $('.messageSuccessRiskEdit');
 
 			$('#risk_row_' + editedRiskId).fadeOut(800);
@@ -2337,7 +2335,6 @@ window.eoxiaJS.evaluation.saveEvaluation = function ( event ) {
 				$('.fichecenter.risklist').html($(resp).find('#searchFormListRisks'))
 				$('#risk_row_' + riskId).fadeOut(800);
 				$('#risk_row_' + riskId).fadeIn(800);
-
 			}
 			$('.wpeo-loader').removeClass('wpeo-loader')
 			let actionContainerSuccess = $('.messageSuccessEvaluationEdit');

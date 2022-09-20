@@ -125,21 +125,13 @@ if ( ! $error && $action == 'add' && $permissiontoadd) {
 if ( ! $error && $action == 'saveRisk' && $permissiontoadd) {
 	$data = json_decode(file_get_contents('php://input'), true);
 
-	$riskID          = $data['riskID'];
-	$description     = $data['comment'];
-	$category        = $data['category'];
-	$digiriskelement = new DigiriskElement($db);
-
-	if (dol_strlen($data['newParent'])) {
-		$parent_element = $digiriskelement->fetchAll('', '', 0, 0, array('ref' => $data['newParent']));
-		if (is_array($parent_element)) {
-			$parent_id = array_keys($parent_element)[0];
-		}
-	}
+	$riskID      = $data['riskID'];
+	$description = $data['comment'];
+	$category    = $data['category'];
 
 	$risk->fetch($riskID);
-	if ($parent_id > 0) {
-		$risk->fk_element = $parent_id;
+	if ($data['newParent'] > 0) {
+		$risk->fk_element = $data['newParent'];
 	}
 	$risk->description = $description;
 	$risk->category    = $category;

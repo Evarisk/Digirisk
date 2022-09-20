@@ -889,6 +889,7 @@
 		<?php endif; ?>
 	<?php endif; ?>
 	<?php $title = $langs->trans('DigiriskElementRisksList');
+	print '<div class="div-title-and-table-responsive">';
 	print_barre_liste($title, $page, $_SERVER["PHP_SELF"], $param, $sortfield, $sortorder, $massactionbutton, $num, $nbtotalofrecords, 'digiriskdolibarr32px.png@digiriskdolibarr', 0, $newcardbutton, '', $limit, 0, 0, 1);
 
 	include DOL_DOCUMENT_ROOT . '/core/tpl/massactions_pre.tpl.php';
@@ -1266,6 +1267,8 @@
 	print '<!-- End table -->';
 	print '</div>' . "\n";
 	print '<!-- End div class="div-table-responsive" -->';
+	print '</div>' . "\n";
+	print '<!-- End div class="div-title-and-table-responsive" -->';
 	print '</form>' . "\n";
 	print '<!-- End form -->';
 	print '</div>' . "\n";
