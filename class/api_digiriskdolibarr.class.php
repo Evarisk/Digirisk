@@ -21,6 +21,8 @@
  * \brief   File for API management of DigiriskDolibarr.
  */
 
+use Luracast\Restler\RestException;
+
 require_once __DIR__ . '/../core/modules/modDigiriskDolibarr.class.php';
 
 /**
@@ -168,5 +170,116 @@ class DigiriskDolibarr extends DolibarrApi
 	public function uploadNewModule()
 	{
 		return exec('cd ../custom/digiriskdolibarr/shell/pull && bash update_version.sh');
+	}
+
+	/**
+	 * Get dashboard info risks
+	 *
+	 * @param  integer       $entity Entity ID
+	 *
+	 * @return array                 All data for dashboard info risks
+	 *
+	 * @url    GET                   getDashBoardRisks
+	 *
+	 * @throws Exception
+	 * @throws RestException         401 Not allowed
+	 */
+	public function getDashBoardRisks($entity = 1)
+	{
+		if (!DolibarrApiAccess::$user->rights->digiriskdolibarr->risk->read) {
+			throw new RestException(401);
+		}
+
+		global $conf, $db;
+		$entity = GETPOST('DOLENTITY') ? GETPOST('DOLENTITY') : $entity;
+		$conf->setEntityValues($db, $entity);
+
+		require_once __DIR__ . '/riskanalysis/risk.class.php';
+
+		$risk = new Risk($db);
+		return $risk->load_dashboard();
+	}
+
+	/**
+	 * Get dashboard info tasks
+	 *
+	 * @param  integer       $entity Entity ID
+	 *
+	 * @return array                 All data for dashboard info tasks
+	 *
+	 * @url    GET                   getDashBoardInfoTasks
+	 *
+	 * @throws RestException         401 Not allowed
+	 */
+	public function getDashBoardInfoTasks($entity = 1)
+	{
+		if (!DolibarrApiAccess::$user->rights->projet->lire) {
+			throw new RestException(401);
+		}
+
+		global $conf;
+		$entity = GETPOST('DOLENTITY') ? GETPOST('DOLENTITY') : $entity;
+		$conf->setEntityValues($this->db, $entity);
+
+		require_once __DIR__ . '/digirisktask.class.php';
+
+		$digirisktask = new DigiriskTask($this->db);
+		return $digirisktask->load_dashboard();
+	}
+
+	/**
+	 * Get dashboard info riskassessmentdocument
+	 *
+	 * @param  integer       $entity Entity ID
+	 *
+	 * @return array                 All data for dashboard info riskassessmentdocument
+	 *
+	 * @url    GET                   getDashBoardInfoRiskAssessmentDocument
+	 *
+	 * @throws Exception
+	 * @throws RestException         401 Not allowed
+	 */
+	public function getDashBoardInfoRiskAssessmentDocument($entity = 1)
+	{
+		if (!DolibarrApiAccess::$user->rights->digiriskdolibarr->riskassessmentdocument->read) {
+			throw new RestException(401);
+		}
+
+		global $conf;
+		$entity = GETPOST('DOLENTITY') ? GETPOST('DOLENTITY') : $entity;
+		$conf->setEntityValues($this->db, $entity);
+
+		require_once __DIR__ . '/digiriskdocuments/riskassessmentdocument.class.php';
+
+		$riskassessmentdocument = new RiskAssessmentDocument($this->db);
+		return $riskassessmentdocument->load_dashboard();
+	}
+
+	/**
+	 * Get dashboard info accidents
+	 *
+	 * @param  integer       $entity Entity ID
+	 *
+	 * @return array                 All data for dashboard info accidents
+	 *
+	 * @url    GET                   getDashBoardInfoAccidents
+	 *
+	 * @throws Exception
+	 * @throws RestException         401 Not allowed
+	 */
+	public function getDashBoardInfoAccidents($entity = 1)
+	{
+		if (!DolibarrApiAccess::$user->rights->digiriskdolibarr->accident->read) {
+			throw new RestException(401);
+		}
+
+		global $conf;
+		$entity = GETPOST('DOLENTITY') ? GETPOST('DOLENTITY') : $entity;
+		$conf->setEntityValues($this->db, $entity);
+
+		require_once __DIR__ . '/accident.class.php';
+
+		$accident = new Accident($this->db);
+		return $accident->load_dashboard();
 	}
 }
