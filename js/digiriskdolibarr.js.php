@@ -3345,9 +3345,10 @@ window.eoxiaJS.evaluator.createEvaluator = function ( event ) {
 	var userName = $('#select2-fk_user_employer-container').attr('title')
 	var userID = $('#fk_user_employer').find("option:contains('"+userName+"')").attr('value')
 
-	var date = elementEvaluator.find('#EvaluatorDate').val();
-
+	var date     = elementEvaluator.find('#EvaluatorDate').val();
 	var duration = elementEvaluator.find('.evaluator-duration .duration').val();
+	var post     = elementEvaluator.find('.evaluator-post .post').val();
+
 	let elementParent = $(this).closest('.fichecenter').find('.div-table-responsive');
 
 	window.eoxiaJS.loader.display(elementParent);
@@ -3360,7 +3361,8 @@ window.eoxiaJS.evaluator.createEvaluator = function ( event ) {
 		data: JSON.stringify({
 			evaluatorID: userID,
 			date: date,
-			duration: duration
+			duration: duration,
+			post: post
 		}),
 		processData: false,
 		contentType: false,

@@ -175,12 +175,14 @@ if (empty($reshook)) {
 
 		$duration    = $data['duration'];
 		$date        = $data['date'];
+		$post        = $data['post'];
 		$evaluatorID = $data['evaluatorID'];
 
 		$evaluator->ref             = $refEvaluatorMod->getNextValue($evaluator);
 		$evaluator->ref_ext         = $evaluator->ref;
 		$evaluator->assignment_date = strtotime(preg_replace('/\//', '-', $date));
 		$evaluator->duration        = $duration;
+		$evaluator->post            = $post;
 		$evaluator->fk_user         = $evaluatorID;
 		$evaluator->fk_parent       = $object->id;
 		$evaluator->status          = 1;
@@ -458,7 +460,7 @@ if ($object->id > 0 || $fromid > 0) {
 									?>
 
 						</div>
-						<div class="evaluator-assignment wpeo-gridlayout grid-2">
+						<div class="evaluator-assignment wpeo-gridlayout grid-3">
 							<div class="evaluator-duration">
 								<span class="title"><?php echo $langs->trans('Duration'); ?></span>
 								<span class="time"><?php print '<input type="number" class="duration" name="evaluatorDuration" rows="' . ROWS_2 . '" value="' . $conf->global->DIGIRISKDOLIBARR_EVALUATOR_DURATION . '"> min'; ?></span>
@@ -466,6 +468,10 @@ if ($object->id > 0 || $fromid > 0) {
 							<div class="evaluator-date">
 								<span class="title"><?php echo $langs->trans('Date'); ?></span>
 								<?php print $form->selectDate('', 'EvaluatorDate', 0, 0, 0, 'evaluator_form', 1, 1,'','','','','',1,'','','tzuserrel'); ?>
+							</div>
+							<div class="evaluator-post">
+								<span class="title"><?php echo $langs->trans('PostOrFunction'); ?></span>
+								<span class=""><input type="text" class="post" name="evaluatorPost"></span>
 							</div>
 						</div>
 					</div>

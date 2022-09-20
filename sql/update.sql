@@ -80,3 +80,6 @@ ALTER TABLE llx_digiriskdolibarr_accident_workstop ADD date_end_workstop DATETIM
 
 -- 9.5.1
 ALTER TABLE llx_digiriskdolibarr_object_signature CHANGE `signature` `signature` LONGTEXT;
+
+-- 9.6.0
+ALTER TABLE llx_digiriskdolibarr_evaluator ADD post VARCHAR(80) AFTER assignment_date;
