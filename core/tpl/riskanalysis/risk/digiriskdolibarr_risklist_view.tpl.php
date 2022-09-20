@@ -1073,7 +1073,7 @@
 					<?php $parent_element = new DigiriskElement($db);
 					$result               = $parent_element->fetch($risk->fk_element);
 					if ($result > 0) {
-						print $parent_element->getNomUrl(1, 'blank');
+						print $parent_element->getNomUrl(1, 'blank', 1);
 					}
 				} elseif ($key == 'category') { ?>
 					<div class="table-cell table-50 cell-risk" data-title="Risque">
