@@ -45,7 +45,7 @@ class DigiriskTask extends Task
 	 *
 	 * @return array|int
 	 */
-	public function load_dashboard_task()
+	public function load_dashboard()
 	{
 		global $conf, $langs;
 

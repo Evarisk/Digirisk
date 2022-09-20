@@ -49,10 +49,14 @@ class DashboardDigiriskStats extends DigiriskStats
 	/**
 	 * Load data and show dashboard.
 	 *
+	 * @param  int       $show_risk                  Show dashboard risk info
+	 * @param  int       $show_task                  Show dashboard task info
+	 * @param  int       $show_riskassementdocument  Show dashboard riskassessmentdocument info
+	 * @param  int       $show_accident              Show dashboard accident info
 	 * @return void
 	 * @throws Exception
 	 */
-	public function show_dashboard()
+	public function show_dashboard($show_risk = 1, $show_task = 1, $show_riskassementdocument = 1, $show_accident = 1)
 	{
 		global $conf, $langs, $user;
 
@@ -65,29 +69,29 @@ class DashboardDigiriskStats extends DigiriskStats
 		$riskassementdocument = new RiskAssessmentDocument($this->db);
 
 		$dataseries = array(
-			'risk' => $risk->load_dashboard_risk(),
-			'task' => $digirisktask->load_dashboard_task(),
-			'accident' => $accident->load_dashboard_accident()
+			'risk' => ($show_risk) ? $risk->load_dashboard() : -1,
+			'task' => ($show_task) ? $digirisktask->load_dashboard() : -1,
+			'accident' => ($show_accident) ? $accident->load_dashboard() : -1
 		);
 
-		$accidentdata             = $accident->load_dashboard_accident();
-		$riskassementdocumentdata = $riskassementdocument->load_dashboard_riskassementdocument();
+		$accidentdata             = ($show_accident) ? $accident->load_dashboard() : -1;
+		$riskassementdocumentdata = ($show_riskassementdocument) ? $riskassementdocument->load_dashboard() : -1;
 
 		print '<form method="POST" action="' . $_SERVER["PHP_SELF"] . '" class="dashboard" id="dashBoardForm">';
 		print '<input type="hidden" name="token" value="' . newToken() . '">';
 		print '<input type="hidden" name="action" value="view">';
 
 		$dashboardLines = array(
-			'daywithoutaccident' => array(
+			'daywithoutaccident' => ($show_accident) ? array(
 				'label' => array($langs->trans("DayWithoutAccident"), $langs->trans("WorkStopDays")),
 				'content' => array($accidentdata['daywithoutaccident'], $accidentdata['nbworkstopdays']),
 				'picto' => 'fas fa-user-injured'
-			),
-			'lastgenerationdateDU' => array(
+			) : -1,
+			'lastgenerationdateDU' => ($show_riskassementdocument) ? array(
 				'label' => array($langs->trans("LastGenerateDate"), $langs->trans("NextGenerateDate")),
 				'content' => array($riskassementdocumentdata[0], $riskassementdocumentdata[1]),
 				'picto' => 'fas fa-info-circle'
-			)
+			) : -1
 		);
 
 		$disableWidgetList = json_decode($user->conf->DIGIRISKDOLIBARR_DISABLED_DASHBOARD_INFO);
@@ -104,7 +108,7 @@ class DashboardDigiriskStats extends DigiriskStats
 		if (!empty($dashboardLines)) {
 			$openedDashBoard = '';
 			foreach ($dashboardLines as $key => $dashboardLine) {
-				if (!isset($disableWidgetList->$key)) {
+				if (!isset($disableWidgetList->$key) && is_array($dashboardLine) &&!empty($dashboardLine)) {
 					$openedDashBoard .= '<div class="box-flex-item"><div class="box-flex-item-with-margin">';
 					$openedDashBoard .= '<div class="info-box info-box-sm">';
 					$openedDashBoard .= '<span class="info-box-icon">';

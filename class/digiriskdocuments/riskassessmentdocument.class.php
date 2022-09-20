@@ -147,7 +147,7 @@ class RiskAssessmentDocument extends DigiriskDocuments
 	 * @return array
 	 * @throws Exception
 	 */
-	public function load_dashboard_riskassementdocument()
+	public function load_dashboard()
 	{
 		$filter                      = array('customsql' => "t.type='riskassessmentdocument'");
 		$riskassessmentdocumentarray = $this->fetchAll('desc', 't.rowid', 1, 0, $filter, 'AND');

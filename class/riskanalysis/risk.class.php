@@ -692,7 +692,7 @@ class Risk extends CommonObject
 	 * @return array
 	 * @throws Exception
 	 */
-	public function load_dashboard_risk()
+	public function load_dashboard()
 	{
 		global $langs;
 

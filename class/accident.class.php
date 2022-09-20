@@ -479,15 +479,29 @@ class Accident extends CommonObject
 	}
 
 	/**
-	 * Load dashboard info accident, get number days without accident.
+	 * Load dashboard info accident
 	 *
-	 * @return float|int|string
+	 * @return array
 	 * @throws Exception
 	 */
-	public function load_dashboard_accident()
+	public function load_dashboard()
 	{
-		global $langs;
+		$arrayNbDaysWithoutAccident = $this->getNbDaysWithoutAccident();
+		$arrayNbAccidents           = $this->getNbAccidents();
 
+		$array = array_merge($arrayNbDaysWithoutAccident, $arrayNbAccidents);
+
+		return $array;
+	}
+
+
+	/**
+	 * Get number days without accident.
+	 *
+	 * @return array
+	 * @throws Exception
+	 */
+	public function getNbDaysWithoutAccident() {
 		// Number days without accident
 		$lastAccident = $this->fetchAll('DESC', 'accident_date', 1, 0 );
 		if (is_array($lastAccident) && !empty($lastAccident)) {
@@ -496,6 +510,19 @@ class Accident extends CommonObject
 		} else {
 			$array['daywithoutaccident'] = 'N/A';
 		}
+		return $array;
+	}
+
+
+	/**
+	 * Get number accidents.
+	 *
+	 * @return array
+	 * @throws Exception
+	 */
+	public function getNbAccidents() {
+		global $langs;
+
 		// Number accidents
 		$allaccidents = $this->fetchAll();
 		if (is_array($allaccidents) && !empty($allaccidents)) {
@@ -527,7 +554,7 @@ class Accident extends CommonObject
 			}
 			$array['data'][0] = $nbaccidents;
 			$array['data'][1] = $nbaccidentswithoutDIAT;
-			$array['nbworkstopdays'] = $nbworkstopdays;
+			$array['nbworkstopdays'] = $nbworkstopdays ?: 0;
 		} else {
 			$array['data'][0] = 0;
 			$array['data'][1] = 0;
