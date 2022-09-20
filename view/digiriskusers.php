@@ -35,25 +35,23 @@ if ( ! $res && file_exists("../../main.inc.php")) $res    = @include "../../main
 if ( ! $res && file_exists("../../../main.inc.php")) $res = @include "../../../main.inc.php";
 if ( ! $res) die("Include of main fails");
 
+// Libraries
 require_once DOL_DOCUMENT_ROOT . '/core/lib/images.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/security2.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/class/html.formother.class.php';
 require_once DOL_DOCUMENT_ROOT . '/categories/class/categorie.class.php';
 
-if ( ! $user->rights->user->user->lire && ! $user->admin) {
-	accessforbidden();
-}
+require_once __DIR__ . '/../lib/digiriskdolibarr_function.lib.php';
+
+// Global variables definitions
+global $conf, $db, $hookmanager, $langs, $user;
 
 // Load translation files required by page
 $langs->loadLangs(array('users', 'companies', 'hrm'));
 
+// Get parameters
+$action      = GETPOST('action', 'aZ09');
 $contextpage = GETPOST('contextpage', 'aZ') ? GETPOST('contextpage', 'aZ') : 'digiriskuserslist'; // To manage different context of search
-
-// Security check (for external users)
-$socid = 0;
-if ($user->socid > 0) {
-	$socid = $user->socid;
-}
 
 // Load mode employee
 $mode  = GETPOST("mode", 'alpha');
@@ -64,8 +62,6 @@ $limit     = GETPOST('limit', 'int') ? GETPOST('limit', 'int') : $conf->liste_li
 $sortfield = GETPOST('sortfield', 'alpha');
 $sortorder = GETPOST('sortorder', 'alpha');
 $page      = GETPOSTISSET('pageplusone') ? (GETPOST('pageplusone') - 1) : GETPOST("page", 'int');
-$action    = GETPOST('action', 'aZ09');
-
 if (empty($page) || $page == -1) { $page = 0; }
 $offset                       = $limit * $page;
 $pageprev                     = $page - 1;
@@ -73,24 +69,32 @@ $pagenext                     = $page + 1;
 if ( ! $sortfield) $sortfield = "u.login";
 if ( ! $sortorder) $sortorder = "ASC";
 
+// Initialize technical objects
+$object          = new User($db);
+$extrafields     = new ExtraFields($db);
+$userstatic      = new User($db);
+$companystatic   = new Societe($db);
+$usergroupstatic = new UserGroup($db);
+
+$hookmanager->initHooks(array('digiriskuserlist', 'globalcard')); // Note that conf->hooks_modules contains array
+
 // Define value to know what current user can do on users
-$canadduser = ( ! empty($user->admin) || $user->rights->user->user->creer);
+$canadduser      = ( ! empty($user->admin) || $user->rights->user->user->creer);
 $permissiontoadd = $user->rights->digiriskdolibarr->adminpage->read;
 
-// Initialize technical object to manage hooks of page. Note that conf->hooks_modules contains array of hook context
-$object = new User($db);
-$hookmanager->initHooks(array('userlist'));
-$extrafields = new ExtraFields($db);
+if ( ! $user->rights->user->user->lire && ! $user->admin) {
+	accessforbidden();
+}
+
+// Security check (for external users)
+$socid = 0;
+if ($user->socid > 0) {
+	$socid = $user->socid;
+}
 
 // fetch optionals attributes and labels
 $extrafields->fetch_name_optionals_label($object->table_element);
 $search_array_options = $extrafields->getOptionalsFromPost($object->table_element, '', 'search_');
-
-$userstatic      = new User($db);
-$companystatic   = new Societe($db);
-$usergroupstatic = new UserGroup($db);
-$form            = new Form($db);
-$formother       = new FormOther($db);
 
 // List of fields to search into when doing a "search in all"
 $fieldstosearchall = array(
@@ -118,13 +122,14 @@ $arrayfields = array(
 	'u.fk_soc' => array('label' => $langs->trans("Company"), 'checked' => 1),
 	'u.entity' => array('label' => $langs->trans("Entity"), 'checked' => 1, 'enabled' => ( ! empty($conf->multicompany->enabled) && empty($conf->global->MULTICOMPANY_TRANSVERSE_MODE))),
 	'g.fk_usergroup' => array('label' => $langs->trans("UserGroup"), 'checked' => 1),
-	'u.fk_user' => array('label' => $langs->trans("HierarchicalResponsible"), 'checked' => 1),
-	'u.datelastlogin' => array('label' => $langs->trans("LastConnexion"), 'checked' => 1, 'position' => 100),
+	'u.fk_user' => array('label' => $langs->trans("HierarchicalResponsible"), 'checked' => 0),
+	'u.datelastlogin' => array('label' => $langs->trans("LastConnexion"), 'checked' => 0, 'position' => 100),
 	'u.datepreviouslogin' => array('label' => $langs->trans("PreviousConnexion"), 'checked' => 0, 'position' => 110),
 	'u.datec' => array('label' => $langs->trans("DateCreation"), 'checked' => 0, 'position' => 500),
 	'u.tms' => array('label' => $langs->trans("DateModificationShort"), 'checked' => 0, 'position' => 500),
 	'u.statut' => array('label' => $langs->trans("Status"), 'checked' => 1, 'position' => 1000),
 );
+
 // Extra fields
 if (is_array($extrafields->attributes[$object->table_element]['label']) && count($extrafields->attributes[$object->table_element]['label']) > 0) {
 	foreach ($extrafields->attributes[$object->table_element]['label'] as $key => $val) {
@@ -132,6 +137,7 @@ if (is_array($extrafields->attributes[$object->table_element]['label']) && count
 			$arrayfields["ef." . $key] = array('label' => $extrafields->attributes[$object->table_element]['label'][$key], 'checked' => (($extrafields->attributes[$object->table_element]['list'][$key] < 0) ? 0 : 1), 'position' => $extrafields->attributes[$object->table_element]['pos'][$key], 'enabled' => (abs($extrafields->attributes[$object->table_element]['list'][$key]) != 3 && $extrafields->attributes[$object->table_element]['perms'][$key]));
 	}
 }
+
 $object->fields = dol_sort_array($object->fields, 'position');
 $arrayfields    = dol_sort_array($arrayfields, 'position');
 
@@ -149,6 +155,7 @@ $search_api_key          = GETPOST('search_api_key', 'alphanohtml');
 $search_statut           = GETPOST('search_statut', 'intcomma');
 $search_thirdparty       = GETPOST('search_thirdparty', 'alpha');
 $search_supervisor       = GETPOST('search_supervisor', 'intcomma');
+$search_fk_usergroup     = GETPOST('search_fk_usergroup', 'intcomma');
 $optioncss               = GETPOST('optioncss', 'alpha');
 $search_categ            = GETPOST("search_categ", 'int');
 $catid                   = GETPOST('catid', 'int');
@@ -185,6 +192,7 @@ if (empty($reshook)) {
 		$search_statut            = "";
 		$search_thirdparty        = "";
 		$search_supervisor        = "";
+		$search_fk_usergroup      = "";
 		$search_api_key           = "";
 		$search_datelastlogin     = "";
 		$search_datepreviouslogin = "";
@@ -217,62 +225,11 @@ if ($action == 'add' && $canadduser && $permissiontoadd) {
 	}
 
 	if ( ! $error) {
-		$object->lastname     = GETPOST("lastname", 'alphanohtml');
-		$object->firstname    = GETPOST("firstname", 'alphanohtml');
-		$object->login        = $login;
-		$object->api_key      = GETPOST("api_key", 'alphanohtml');
-		$object->gender       = GETPOST("gender", 'aZ09');
-		$birth                = dol_mktime(0, 0, 0, GETPOST('birthmonth', 'int'), GETPOST('birthday', 'int'), GETPOST('birthyear', 'int'));
-		$object->birth        = $birth;
-		$object->admin        = GETPOST("admin", 'int');
-		$object->address      = GETPOST('address', 'alphanohtml');
-		$object->zip          = GETPOST('zipcode', 'alphanohtml');
-		$object->town         = GETPOST('town', 'alphanohtml');
-		$object->country_id   = GETPOST('country_id', 'int');
-		$object->state_id     = GETPOST('state_id', 'int');
-		$object->office_phone = GETPOST("office_phone", 'alphanohtml');
-		$object->office_fax   = GETPOST("office_fax", 'alphanohtml');
-		$object->user_mobile  = GETPOST("user_mobile", 'alphanohtml');
-
-		//$object->skype = GETPOST("skype", 'alphanohtml');
-		//$object->twitter = GETPOST("twitter", 'alphanohtml');
-		//$object->facebook = GETPOST("facebook", 'alphanohtml');
-		//$object->linkedin = GETPOST("linkedin", 'alphanohtml');
-		$object->socialnetworks = array();
-		if ( ! empty($conf->socialnetworks->enabled)) {
-			foreach ($socialnetworks as $key => $value) {
-				$object->socialnetworks[$key] = GETPOST($key, 'alphanohtml');
-			}
-		}
-
-		$object->email                     = preg_replace('/\s+/', '', GETPOST("email", 'alphanohtml'));
-		$object->job                       = GETPOST("job", 'nohtml');
-		$object->signature                 = GETPOST("signature", 'none');
-		$object->accountancy_code          = GETPOST("accountancy_code", 'alphanohtml');
-		$object->note                      = GETPOST("note", 'none');
-		$object->ldap_sid                  = GETPOST("ldap_sid", 'alphanohtml');
-		$object->fk_user                   = GETPOST("fk_user", 'int') > 0 ? GETPOST("fk_user", 'int') : 0;
-		$object->fk_user_expense_validator = GETPOST("fk_user_expense_validator", 'int') > 0 ? GETPOST("fk_user_expense_validator", 'int') : 0;
-		$object->fk_user_holiday_validator = GETPOST("fk_user_holiday_validator", 'int') > 0 ? GETPOST("fk_user_holiday_validator", 'int') : 0;
-		$object->employee                  = GETPOST('employee', 'alphanohtml');
-
-		$object->thm         = GETPOST("thm", 'alphanohtml') != '' ? GETPOST("thm", 'alphanohtml') : '';
-		$object->thm         = price2num($object->thm);
-		$object->tjm         = GETPOST("tjm", 'alphanohtml') != '' ? GETPOST("tjm", 'alphanohtml') : '';
-		$object->tjm         = price2num($object->tjm);
-		$object->salary      = GETPOST("salary", 'alphanohtml') != '' ? GETPOST("salary", 'alphanohtml') : '';
-		$object->salary      = price2num($object->salary);
-		$object->salaryextra = GETPOST("salaryextra", 'alphanohtml') != '' ? GETPOST("salaryextra", 'alphanohtml') : '';
-		$object->weeklyhours = GETPOST("weeklyhours", 'alphanohtml') != '' ? GETPOST("weeklyhours", 'alphanohtml') : '';
-
-		$object->color          = GETPOST("color", 'alphanohtml') != '' ? GETPOST("color", 'alphanohtml') : '';
-		$dateemployment         = dol_mktime(0, 0, 0, GETPOST('dateemploymentmonth', 'int'), GETPOST('dateemploymentday', 'int'), GETPOST('dateemploymentyear', 'int'));
-		$object->dateemployment = $dateemployment;
-
-		$dateemploymentend         = dol_mktime(0, 0, 0, GETPOST('dateemploymentendmonth', 'int'), GETPOST('dateemploymentendday', 'int'), GETPOST('dateemploymentendyear', 'int'));
-		$object->dateemploymentend = $dateemploymentend;
-
-		$object->fk_warehouse = GETPOST('fk_warehouse', 'int');
+		$object->lastname  = GETPOST("lastname", 'alphanohtml');
+		$object->firstname = GETPOST("firstname", 'alphanohtml');
+		$object->login     = $login;
+		$object->email     = preg_replace('/\s+/', '', GETPOST("email", 'alphanohtml'));
+		$object->fk_user   = GETPOST("fk_user", 'int') > 0 ? GETPOST("fk_user", 'int') : 0;
 
 		// Fill array 'array_options' with data from add form
 		$ret = $extrafields->setOptionalsFromPost(null, $object);
@@ -325,7 +282,8 @@ if ($action == 'add' && $canadduser && $permissiontoadd) {
  * View
  */
 
-$htmlother = new FormOther($db);
+$form      = new Form($db);
+$formother = new FormOther($db);
 
 $user2 = new User($db);
 
@@ -376,6 +334,7 @@ if ($catid > 0)     $sql                              .= " AND cu.fk_categorie =
 if ($catid == -2)   $sql                              .= " AND cu.fk_categorie IS NULL";
 if ($search_categ > 0)   $sql                         .= " AND cu.fk_categorie = " . $db->escape($search_categ);
 if ($search_categ == -2) $sql                         .= " AND cu.fk_categorie IS NULL";
+if ($search_fk_usergroup > 0)   $sql                  .= " AND g.fk_usergroup IN (" . $db->escape($search_fk_usergroup) . ")";
 
 $sql .= ' GROUP BY u.rowid';
 
@@ -410,8 +369,6 @@ if ($num == 1 && ! empty($conf->global->MAIN_SEARCH_DIRECT_OPEN_IF_ONLY_ONE) && 
 	exit;
 }
 
-require_once './../lib/digiriskdolibarr_function.lib.php';
-
 $title    = $langs->trans("ListOfUsers");
 $help_url = '';
 $morejs   = array("/digiriskdolibarr/js/digiriskdolibarr.js.php");
@@ -433,16 +390,13 @@ if ($search_accountancy_code != '') $param                                 .= "&
 if ($search_email != '') $param                                            .= "&amp;search_email=" . urlencode($search_email);
 if ($search_api_key != '') $param                                          .= "&amp;search_api_key=" . urlencode($search_api_key);
 if ($search_supervisor > 0) $param                                         .= "&amp;search_supervisor=" . urlencode($search_supervisor);
+if ($search_fk_usergroup > 0) $param                                       .= "&amp;search_fk_usergroup=" . urlencode($search_fk_usergroup);
 if ($search_statut != '') $param                                           .= "&amp;search_statut=" . urlencode($search_statut);
 if ($optioncss != '') $param                                               .= '&amp;optioncss=' . urlencode($optioncss);
 if ($mode != '')      $param                                               .= '&amp;mode=' . urlencode($mode);
 if ($search_categ > 0) $param                                              .= "&amp;search_categ=" . urlencode($search_categ);
 // Add $param from extra fields
 include DOL_DOCUMENT_ROOT . '/core/tpl/extrafields_list_search_param.tpl.php';
-
-$text = $langs->trans("ListOfUsers");
-
-$newcardbutton = '';
 
 print '<form method="POST" id="searchFormList" action="' . $_SERVER["PHP_SELF"] . '">' . "\n";
 if ($optioncss != '') print '<input type="hidden" name="optioncss" value="' . $optioncss . '">';
@@ -453,7 +407,7 @@ print '<input type="hidden" name="sortorder" value="' . $sortorder . '">';
 print '<input type="hidden" name="mode" value="' . $mode . '">';
 print '<input type="hidden" name="contextpage" value="' . $contextpage . '">';
 
-print_barre_liste($text, $page, $_SERVER["PHP_SELF"], $param, $sortfield, $sortorder, "", $num, $nbtotalofrecords, 'user', 0, '' . ' ' . $newcardbutton, '', $limit, 0, 0, 1);
+print_barre_liste($title, $page, $_SERVER["PHP_SELF"], $param, $sortfield, $sortorder, "", $num, $nbtotalofrecords, 'user', 0, '', '', $limit, 0, 0, 1);
 
 if ( ! empty($catid)) {
 	print "<div id='ways'>";
@@ -474,7 +428,7 @@ $moreforfilter = '';
 if ( ! empty($conf->categorie->enabled)) {
 	$moreforfilter .= '<div class="divsearchfield">';
 	$moreforfilter .= $langs->trans('Categories') . ': ';
-	$moreforfilter .= $htmlother->select_categories(Categorie::TYPE_USER, $search_categ, 'search_categ', 1);
+	$moreforfilter .= $formother->select_categories(Categorie::TYPE_USER, $search_categ, 'search_categ', 1);
 	$moreforfilter .= '</div>';
 }
 
@@ -492,7 +446,6 @@ if ($moreforfilter) {
 $varpage = empty($contextpage) ? $_SERVER["PHP_SELF"] : $contextpage;
 
 $selectedfields = $form->multiSelectArrayWithCheckbox('selectedfields', $arrayfields, $varpage); // This also change content of $arrayfields
-
 
 print '<div class="div-table-responsive">';
 print '<table class="tagtable liste' . ($moreforfilter ? " listwithfilterbefore" : "") . '">' . "\n";
@@ -545,6 +498,11 @@ if ( ! empty($arrayfields['u.datelastlogin']['checked'])) {
 }
 if ( ! empty($arrayfields['u.datepreviouslogin']['checked'])) {
 	print '<td class="liste_titre"></td>';
+}
+if ( ! empty($arrayfields['g.fk_usergroup']['checked'])) {
+	print '<td class="liste_titre">';
+	print $form->select_dolgroups($search_fk_usergroup, 'search_fk_usergroup', 1);
+	print '</td>';
 }
 // Extra fields
 include DOL_DOCUMENT_ROOT . '/core/tpl/extrafields_list_search_input.tpl.php';
@@ -779,6 +737,17 @@ while ($i < min($num, $limit)) {
 	$i++;
 }
 
+// If no record found
+if ($num == 0) {
+	$colspan = 1;
+	foreach ($arrayfields as $key => $val) {
+		if (!empty($val['checked'])) {
+			$colspan++;
+		}
+	}
+	print '<tr><td colspan="'.$colspan.'"><span class="opacitymedium">'.$langs->trans("NoRecordFound").'</span></td></tr>';
+}
+
 $parameters = array('arrayfields' => $arrayfields, 'sql' => $sql);
 $reshook    = $hookmanager->executeHooks('printFieldListFooter', $parameters); // Note that $action and $object may have been modified by hook
 print $hookmanager->resPrint;
@@ -813,12 +782,16 @@ if ($canadduser) {
 								<div class="table-cell table-150">
 									<input type="text" id="firstname" placeholder="<?php echo $langs->trans('FirstName'); ?>" name="firstname" value="<?php dol_escape_htmltag(GETPOST('firstname', 'alphanohtml'))?>" />
 								</div>
+								<div class="table-cell table-300">
+									<input style="width:100%" type="email" id="email" placeholder="<?php echo $langs->trans('Email') ; ?>" name="email" value="" />
+								</div>
 								<div class="table-cell">
-									<button type="submit" name="create" style="color: #3495f0; background-color: transparent; width:30%; border:none; margin-right:30%;">
-										<div class="wpeo-button button-square-50 button-event add action-input button-progress">
+									<input type="submit" id="createuseraction" name="createuseraction" style="display : none">
+									<label for="createuseraction">
+										<div class="wpeo-button button-square-50 button-blue wpeo-tooltip-event" aria-label="<?php echo $langs->trans('CreateUser'); ?>">
 											<i class="button-icon fas fa-plus"></i>
 										</div>
-									</button>
+									</label>
 								</div>
 							</div>
 						</div>
