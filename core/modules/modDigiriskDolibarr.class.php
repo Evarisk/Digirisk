@@ -364,8 +364,9 @@ class modDigiriskdolibarr extends DolibarrModules
 		$this->rights_class = 'digiriskdolibarr';
 		// Family can be 'base' (core modules),'crm','financial','hr','projects','products','ecm','technic' (transverse modules),'interface' (link with external tools),'other','...'
 		// It is used to group modules by family in module setup page
-		$this->family          = "interface";
-		$this->module_position = '90';
+		$this->family          = "";
+		$this->module_position = '';
+		$this->familyinfo      = array('Evarisk' => array('position' => '01', 'label' => $langs->trans("Evarisk")));
 		$this->name            = preg_replace('/^mod/i', '', get_class($this));
 		$this->description     = $langs->trans('DigiriskDolibarrDescription');
 		$this->descriptionlong = "Digirisk";
