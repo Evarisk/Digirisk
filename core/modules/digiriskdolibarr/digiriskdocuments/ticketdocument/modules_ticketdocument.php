@@ -221,9 +221,8 @@ abstract class ModeleODTTicketDocument extends CommonDocGenerator
 				$tmparray['photo'] = DOL_DOCUMENT_ROOT . $nophoto;
 			}
 
-			$message = preg_replace('/<br \/>/', '', $ticket->message);
 			$tmparray['subject'] = $ticket->subject;
-			$tmparray['message']  = strip_tags($message);
+			$tmparray['message']  = dol_htmlentitiesbr_decode(strip_tags($ticket->message, '<br>'));
 			$tmparray['generation_date'] = dol_print_date(dol_now(), 'dayhoursec', 'tzuser');
 
 			$contactlistexternal = $ticket->liste_contact(-1, 'external');
@@ -280,8 +279,7 @@ abstract class ModeleODTTicketDocument extends CommonDocGenerator
 							$tmparray['user'] = $usertmp->firstname . ' ' . $usertmp->lastname;
 							$tmparray['type'] = $outputlangs->transnoentities('Action'.$event->type_code);
 							$tmparray['title'] = $event->label;
-							$content = preg_replace('/<br \/>/', '', $event->note);
-							$tmparray['event_content'] = strip_tags($content);
+							$tmparray['event_content'] = dol_htmlentitiesbr_decode(strip_tags($event->note, '<br>'));
 							$tmparray['date'] = dol_print_date($event->datec, 'dayreduceformat');
 
 							foreach ($tmparray as $key => $val) {

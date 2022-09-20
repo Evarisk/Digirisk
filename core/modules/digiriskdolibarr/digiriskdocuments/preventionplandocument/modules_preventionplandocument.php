@@ -181,10 +181,6 @@ abstract class ModeleODTPreventionPlanDocument extends CommonDocGenerator
 			$tmparray['titre_prevention']             = $preventionplan->ref;
 			$tmparray['raison_du_plan_de_prevention'] = $preventionplan->label;
 
-			$tmparray['moyen_generaux_mis_disposition'] = strip_tags($conf->global->DIGIRISKDOLIBARR_GENERAL_MEANS);
-			$tmparray['consigne_generale']              = strip_tags($conf->global->DIGIRISKDOLIBARR_GENERAL_RULES);
-			$tmparray['premiers_secours']               = strip_tags($conf->global->DIGIRISKDOLIBARR_FIRST_AID);
-
 			$tmparray['prior_visit_date'] = dol_print_date($preventionplan->prior_visit_date, 'dayhoursec');
 			$tmparray['prior_visit_text'] = $preventionplan->prior_visit_text;
 

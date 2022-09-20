@@ -157,80 +157,80 @@ class PreventionPlanDocument extends DigiriskDocuments
 
 		if ($maitreoeuvre->id > 0) {
 			$json['PreventionPlan']['maitre_oeuvre'] = array();
-			$json['PreventionPlan']['maitre_oeuvre']['user_id'] = $maitreoeuvre->id;
-			$json['PreventionPlan']['maitre_oeuvre']['phone'] = $maitreoeuvre->phone;
-			$json['PreventionPlan']['maitre_oeuvre']['firstname'] = $maitreoeuvre->firstname;
-			$json['PreventionPlan']['maitre_oeuvre']['lastname'] = $maitreoeuvre->lastname;
-			$json['PreventionPlan']['maitre_oeuvre']['email'] = $maitreoeuvre->email;
-			$json['PreventionPlan']['maitre_oeuvre']['signature'] = $maitreoeuvre->signature;
+			$json['PreventionPlan']['maitre_oeuvre']['user_id']        = $maitreoeuvre->id;
+			$json['PreventionPlan']['maitre_oeuvre']['phone']          = $maitreoeuvre->phone;
+			$json['PreventionPlan']['maitre_oeuvre']['firstname']      = $maitreoeuvre->firstname;
+			$json['PreventionPlan']['maitre_oeuvre']['lastname']       = $maitreoeuvre->lastname;
+			$json['PreventionPlan']['maitre_oeuvre']['email']          = $maitreoeuvre->email;
+			$json['PreventionPlan']['maitre_oeuvre']['signature']      = $maitreoeuvre->signature;
 			$json['PreventionPlan']['maitre_oeuvre']['signature_date'] = $maitreoeuvre->signature_date;
 		}
 
 		if ($extsociety->id > 0) {
 			$json['PreventionPlan']['society_outside'] = array();
-			$json['PreventionPlan']['society_outside']['id'] = $extsociety->id;
-			$json['PreventionPlan']['society_outside']['name'] = $extsociety->name;
-			$json['PreventionPlan']['society_outside']['siret'] = $extsociety->idprof2;
+			$json['PreventionPlan']['society_outside']['id']      = $extsociety->id;
+			$json['PreventionPlan']['society_outside']['name']    = $extsociety->name;
+			$json['PreventionPlan']['society_outside']['siret']   = $extsociety->idprof2;
 			$json['PreventionPlan']['society_outside']['address'] = $extsociety->address;
-			$json['PreventionPlan']['society_outside']['postal'] = $extsociety->zip;
-			$json['PreventionPlan']['society_outside']['town'] = $extsociety->town;
+			$json['PreventionPlan']['society_outside']['postal']  = $extsociety->zip;
+			$json['PreventionPlan']['society_outside']['town']    = $extsociety->town;
 		}
 
 		if ($extsocietyresponsible->id > 0) {
 			$json['PreventionPlan']['responsable_exterieur'] = array();
-			$json['PreventionPlan']['responsable_exterieur']['id'] = $extsocietyresponsible->id;
-			$json['PreventionPlan']['responsable_exterieur']['firstname'] = $extsocietyresponsible->firstname;
-			$json['PreventionPlan']['responsable_exterieur']['lastname'] = $extsocietyresponsible->lastname;
-			$json['PreventionPlan']['responsable_exterieur']['phone'] = $extsocietyresponsible->phone;
-			$json['PreventionPlan']['responsable_exterieur']['email'] = $extsocietyresponsible->email;
-			$json['PreventionPlan']['responsable_exterieur']['signature'] = $extsocietyresponsible->signature;
+			$json['PreventionPlan']['responsable_exterieur']['id']             = $extsocietyresponsible->id;
+			$json['PreventionPlan']['responsable_exterieur']['firstname']      = $extsocietyresponsible->firstname;
+			$json['PreventionPlan']['responsable_exterieur']['lastname']       = $extsocietyresponsible->lastname;
+			$json['PreventionPlan']['responsable_exterieur']['phone']          = $extsocietyresponsible->phone;
+			$json['PreventionPlan']['responsable_exterieur']['email']          = $extsocietyresponsible->email;
+			$json['PreventionPlan']['responsable_exterieur']['signature']      = $extsocietyresponsible->signature;
 			$json['PreventionPlan']['responsable_exterieur']['signature_date'] = $extsocietyresponsible->signature_date;
 		}
 
 		if (!empty ($extsocietyintervenants) && $extsocietyintervenants > 0) {
 			foreach ($extsocietyintervenants as $extsocietyintervenant) {
 				$json['PreventionPlan']['intervenant_exterieur'][$extsocietyintervenant->id] = array();
-				$json['PreventionPlan']['intervenant_exterieur'][$extsocietyintervenant->id]['firstname'] = $extsocietyintervenant->firstname;
-				$json['PreventionPlan']['intervenant_exterieur'][$extsocietyintervenant->id]['lastname'] = $extsocietyintervenant->lastname;
-				$json['PreventionPlan']['intervenant_exterieur'][$extsocietyintervenant->id]['phone'] = $extsocietyintervenant->phone;
-				$json['PreventionPlan']['intervenant_exterieur'][$extsocietyintervenant->id]['email'] = $extsocietyintervenant->email;
-				$json['PreventionPlan']['intervenant_exterieur'][$extsocietyintervenant->id]['signature'] = $extsocietyintervenant->signature;
+				$json['PreventionPlan']['intervenant_exterieur'][$extsocietyintervenant->id]['firstname']      = $extsocietyintervenant->firstname;
+				$json['PreventionPlan']['intervenant_exterieur'][$extsocietyintervenant->id]['lastname']       = $extsocietyintervenant->lastname;
+				$json['PreventionPlan']['intervenant_exterieur'][$extsocietyintervenant->id]['phone']          = $extsocietyintervenant->phone;
+				$json['PreventionPlan']['intervenant_exterieur'][$extsocietyintervenant->id]['email']          = $extsocietyintervenant->email;
+				$json['PreventionPlan']['intervenant_exterieur'][$extsocietyintervenant->id]['signature']      = $extsocietyintervenant->signature;
 				$json['PreventionPlan']['intervenant_exterieur'][$extsocietyintervenant->id]['signature_date'] = $extsocietyintervenant->signature_date;
 			}
 		}
 
 		if ($labourinspector->id > 0) {
 			$json['PreventionPlan']['labour_inspector'] = array();
-			$json['PreventionPlan']['labour_inspector']['id'] = $extsociety->id;
-			$json['PreventionPlan']['labour_inspector']['name'] = $extsociety->name;
-			$json['PreventionPlan']['labour_inspector']['siret'] = $extsociety->idprof2;
+			$json['PreventionPlan']['labour_inspector']['id']      = $extsociety->id;
+			$json['PreventionPlan']['labour_inspector']['name']    = $extsociety->name;
+			$json['PreventionPlan']['labour_inspector']['siret']   = $extsociety->idprof2;
 			$json['PreventionPlan']['labour_inspector']['address'] = $extsociety->address;
-			$json['PreventionPlan']['labour_inspector']['postal'] = $extsociety->zip;
-			$json['PreventionPlan']['labour_inspector']['town'] = $extsociety->town;
+			$json['PreventionPlan']['labour_inspector']['postal']  = $extsociety->zip;
+			$json['PreventionPlan']['labour_inspector']['town']    = $extsociety->town;
 		}
 
 		if ($labourinspectorcontact->id > 0) {
 			$json['PreventionPlan']['labour_inspector_contact'] = array();
-			$json['PreventionPlan']['labour_inspector_contact']['id'] = $extsocietyresponsible->id;
+			$json['PreventionPlan']['labour_inspector_contact']['id']        = $extsocietyresponsible->id;
 			$json['PreventionPlan']['labour_inspector_contact']['firstname'] = $extsocietyresponsible->firstname;
-			$json['PreventionPlan']['labour_inspector_contact']['lastname'] = $extsocietyresponsible->lastname;
-			$json['PreventionPlan']['labour_inspector_contact']['phone'] = $extsocietyresponsible->phone;
-			$json['PreventionPlan']['labour_inspector_contact']['email'] = $extsocietyresponsible->email;
+			$json['PreventionPlan']['labour_inspector_contact']['lastname']  = $extsocietyresponsible->lastname;
+			$json['PreventionPlan']['labour_inspector_contact']['phone']     = $extsocietyresponsible->phone;
+			$json['PreventionPlan']['labour_inspector_contact']['email']     = $extsocietyresponsible->email;
 		}
 
-		$json['PreventionPlan']['ref'] = $preventionplan->ref;
+		$json['PreventionPlan']['ref']   = $preventionplan->ref;
 		$json['PreventionPlan']['label'] = $preventionplan->label;
 
-		$json['PreventionPlan']['moyen_generaux_mis_disposition'] = strip_tags($conf->global->DIGIRISKDOLIBARR_GENERAL_MEANS);
-		$json['PreventionPlan']['consigne_generale'] = strip_tags($conf->global->DIGIRISKDOLIBARR_GENERAL_RULES);
-		$json['PreventionPlan']['premiers_secours'] = strip_tags($conf->global->DIGIRISKDOLIBARR_FIRST_AID);
+		$json['PreventionPlan']['moyen_generaux_mis_disposition'] = dol_htmlentitiesbr_decode(strip_tags($conf->global->DIGIRISKDOLIBARR_GENERAL_MEANS, '<br>'));
+		$json['PreventionPlan']['consigne_generale']              = dol_htmlentitiesbr_decode(strip_tags($conf->global->DIGIRISKDOLIBARR_GENERAL_RULES, '<br>'));
+		$json['PreventionPlan']['premiers_secours']               = dol_htmlentitiesbr_decode(strip_tags($conf->global->DIGIRISKDOLIBARR_FIRST_AID, '<br>'));
 
-		$json['PreventionPlan']['date']['start'] = $preventionplan->date_start;
-		$json['PreventionPlan']['date']['end'] = $preventionplan->date_end;
+		$json['PreventionPlan']['date']['start']      = $preventionplan->date_start;
+		$json['PreventionPlan']['date']['end']        = $preventionplan->date_end;
 		$json['PreventionPlan']['cssct_intervention'] = $preventionplan->cssct_intervention;
-		$json['PreventionPlan']['prior_visit_bool'] = $preventionplan->prior_visit_bool;
-		$json['PreventionPlan']['prior_visit_text'] = $preventionplan->prior_visit_text;
-		$json['PreventionPlan']['prior_visit_date'] = $preventionplan->prior_visit_date;
+		$json['PreventionPlan']['prior_visit_bool']   = $preventionplan->prior_visit_bool;
+		$json['PreventionPlan']['prior_visit_text']   = $preventionplan->prior_visit_text;
+		$json['PreventionPlan']['prior_visit_date']   = $preventionplan->prior_visit_date;
 
 		$morewhere = ' AND element_id = ' . $preventionplan->id;
 		$morewhere .= ' AND element_type = ' . "'" . $preventionplan->element . "'";
@@ -238,26 +238,26 @@ class PreventionPlanDocument extends DigiriskDocuments
 
 		$openinghours->fetch(0, '', $morewhere);
 
-		$opening_hours_monday = explode(' ', $openinghours->monday);
-		$opening_hours_tuesday = explode(' ', $openinghours->tuesday);
+		$opening_hours_monday    = explode(' ', $openinghours->monday);
+		$opening_hours_tuesday   = explode(' ', $openinghours->tuesday);
 		$opening_hours_wednesday = explode(' ', $openinghours->wednesday);
-		$opening_hours_thursday = explode(' ', $openinghours->thursday);
-		$opening_hours_friday = explode(' ', $openinghours->friday);
-		$opening_hours_saturday = explode(' ', $openinghours->saturday);
-		$opening_hours_sunday = explode(' ', $openinghours->sunday);
+		$opening_hours_thursday  = explode(' ', $openinghours->thursday);
+		$opening_hours_friday    = explode(' ', $openinghours->friday);
+		$opening_hours_saturday  = explode(' ', $openinghours->saturday);
+		$opening_hours_sunday    = explode(' ', $openinghours->sunday);
 
-		$json['PreventionPlan']['lundi_matin'] = $opening_hours_monday[0];
-		$json['PreventionPlan']['lundi_aprem'] = $opening_hours_monday[1];
-		$json['PreventionPlan']['mardi_matin'] = $opening_hours_tuesday[0];
-		$json['PreventionPlan']['mardi_aprem'] = $opening_hours_tuesday[1];
+		$json['PreventionPlan']['lundi_matin']    = $opening_hours_monday[0];
+		$json['PreventionPlan']['lundi_aprem']    = $opening_hours_monday[1];
+		$json['PreventionPlan']['mardi_matin']    = $opening_hours_tuesday[0];
+		$json['PreventionPlan']['mardi_aprem']    = $opening_hours_tuesday[1];
 		$json['PreventionPlan']['mercredi_matin'] = $opening_hours_wednesday[0];
 		$json['PreventionPlan']['mercredi_aprem'] = $opening_hours_wednesday[1];
-		$json['PreventionPlan']['jeudi_matin'] = $opening_hours_thursday[0];
-		$json['PreventionPlan']['jeudi_aprem'] = $opening_hours_thursday[1];
+		$json['PreventionPlan']['jeudi_matin']    = $opening_hours_thursday[0];
+		$json['PreventionPlan']['jeudi_aprem']    = $opening_hours_thursday[1];
 		$json['PreventionPlan']['vendredi_matin'] = $opening_hours_friday[0];
 		$json['PreventionPlan']['vendredi_aprem'] = $opening_hours_friday[1];
-		$json['PreventionPlan']['samedi_matin'] = $opening_hours_saturday[0];
-		$json['PreventionPlan']['samedi_aprem'] = $opening_hours_saturday[1];
+		$json['PreventionPlan']['samedi_matin']   = $opening_hours_saturday[0];
+		$json['PreventionPlan']['samedi_aprem']   = $opening_hours_saturday[1];
 		$json['PreventionPlan']['dimanche_matin'] = $opening_hours_sunday[0];
 		$json['PreventionPlan']['dimanche_aprem'] = $opening_hours_sunday[1];
 
@@ -265,10 +265,10 @@ class PreventionPlanDocument extends DigiriskDocuments
 			foreach ($preventionplanlines as $line) {
 				$digiriskelement->fetch($line->fk_element);
 
-				$json['PreventionPlan']['risk'][$line->id]['ref'] = $line->ref;
-				$json['PreventionPlan']['risk'][$line->id]['unite_travail'] = $digiriskelement->ref . " - " . $digiriskelement->label;
-				$json['PreventionPlan']['risk'][$line->id]['description'] = $line->description;
-				$json['PreventionPlan']['risk'][$line->id]['name'] = $risk->get_danger_category_name($line);
+				$json['PreventionPlan']['risk'][$line->id]['ref']               = $line->ref;
+				$json['PreventionPlan']['risk'][$line->id]['unite_travail']     = $digiriskelement->ref . " - " . $digiriskelement->label;
+				$json['PreventionPlan']['risk'][$line->id]['description']       = $line->description;
+				$json['PreventionPlan']['risk'][$line->id]['name']              = $risk->get_danger_category_name($line);
 				$json['PreventionPlan']['risk'][$line->id]['prevention_method'] = $line->prevention_method;
 			}
 		}

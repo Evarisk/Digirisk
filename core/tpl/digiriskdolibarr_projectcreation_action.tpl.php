@@ -1034,3 +1034,38 @@ if ($conf->global->DIGIRISKDOLIBARR_CUSTOM_DOCUMENTS_SET == 0) {
 
 	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_CUSTOM_DOCUMENTS_SET', 1, 'integer', 0, '', $conf->entity);
 }
+
+if ($conf->global->DIGIRISKDOLIBARR_SECURITY_SOCIAL_CONF_UPDATED == 0) {
+	// Security conf
+	if (empty(dolibarr_get_const($db, 'DIGIRISKDOLIBARR_LOCATION_OF_DETAILED_INSTRUCTION'))) {
+		dolibarr_set_const($db, "DIGIRISKDOLIBARR_LOCATION_OF_DETAILED_INSTRUCTION", $langs->transnoentities('LocationOfDetailedInstructionsValue'), 'chaine', 0, '', $conf->entity);
+	}
+	if (empty(dolibarr_get_const($db, 'DIGIRISKDOLIBARR_GENERAL_MEANS'))) {
+		dolibarr_set_const($db, "DIGIRISKDOLIBARR_GENERAL_MEANS", $langs->transnoentities('GeneralMeansAtDisposalValue'), 'chaine', 0, '', $conf->entity);
+	}
+	if (empty(dolibarr_get_const($db, 'DIGIRISKDOLIBARR_GENERAL_RULES'))) {
+		dolibarr_set_const($db, "DIGIRISKDOLIBARR_GENERAL_RULES", $langs->transnoentities('GeneralInstructionsValue'), 'chaine', 0, '', $conf->entity);
+	}
+	if (empty(dolibarr_get_const($db, 'DIGIRISKDOLIBARR_FIRST_AID'))) {
+		dolibarr_set_const($db, "DIGIRISKDOLIBARR_FIRST_AID", $langs->transnoentities('FirstAidValue'), 'chaine', 0, '', $conf->entity);
+	}
+	if (empty(dolibarr_get_const($db, 'DIGIRISKDOLIBARR_RULES_LOCATION'))) {
+		dolibarr_set_const($db, "DIGIRISKDOLIBARR_RULES_LOCATION", $langs->transnoentities('RulesOfProcedureValue'), 'chaine', 0, '', $conf->entity);
+	}
+	if (empty(dolibarr_get_const($db, 'DIGIRISKDOLIBARR_COLLECTIVE_AGREEMENT_LOCATION'))) {
+		dolibarr_set_const($db, "DIGIRISKDOLIBARR_COLLECTIVE_AGREEMENT_LOCATION", $langs->transnoentities('CollectiveAgreementValue'), 'chaine', 0, '', $conf->entity);
+	}
+
+	// Social conf
+	if (empty(dolibarr_get_const($db, 'DIGIRISKDOLIBARR_PARTICIPATION_AGREEMENT_INFORMATION_PROCEDURE'))) {
+		dolibarr_set_const($db, "DIGIRISKDOLIBARR_PARTICIPATION_AGREEMENT_INFORMATION_PROCEDURE", $langs->transnoentities('ParticipationAgreementValue'), 'chaine', 0, '', $conf->entity);
+	}
+	if (empty(dolibarr_get_const($db, 'DIGIRISKDOLIBARR_DEROGATION_SCHEDULE_PERMANENT'))) {
+		dolibarr_set_const($db, "DIGIRISKDOLIBARR_DEROGATION_SCHEDULE_PERMANENT", $langs->transnoentities('PermanentDerogationValue'), 'chaine', 0, '', $conf->entity);
+	}
+	if (empty(dolibarr_get_const($db, 'DIGIRISKDOLIBARR_DEROGATION_SCHEDULE_OCCASIONAL'))) {
+		dolibarr_set_const($db, "DIGIRISKDOLIBARR_DEROGATION_SCHEDULE_OCCASIONAL", $langs->transnoentities('OccasionalDerogationValue'), 'chaine', 0, '', $conf->entity);
+	}
+
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_SECURITY_SOCIAL_CONF_UPDATED', 1, 'integer', 0, '', $conf->entity);
+}

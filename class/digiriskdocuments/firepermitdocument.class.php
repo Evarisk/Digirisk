@@ -223,9 +223,9 @@ class FirePermitDocument extends DigiriskDocuments
 		$json['FirePermit']['ref']   = $firepermit->ref;
 		$json['FirePermit']['label'] = $firepermit->label;
 
-		$json['FirePermit']['moyen_generaux_mis_disposition'] = strip_tags($conf->global->DIGIRISKDOLIBARR_GENERAL_MEANS);
-		$json['FirePermit']['consigne_generale']              = strip_tags($conf->global->DIGIRISKDOLIBARR_GENERAL_RULES);
-		$json['FirePermit']['premiers_secours']               = strip_tags($conf->global->DIGIRISKDOLIBARR_FIRST_AID);
+		$json['FirePermit']['moyen_generaux_mis_disposition'] = dol_htmlentitiesbr_decode(strip_tags($conf->global->DIGIRISKDOLIBARR_GENERAL_MEANS, '<br>'));
+		$json['FirePermit']['consigne_generale']              = dol_htmlentitiesbr_decode(strip_tags($conf->global->DIGIRISKDOLIBARR_GENERAL_RULES, '<br>'));
+		$json['FirePermit']['premiers_secours']               = dol_htmlentitiesbr_decode(strip_tags($conf->global->DIGIRISKDOLIBARR_FIRST_AID, '<br>'));
 
 		$json['FirePermit']['date']['start']     = $firepermit->date_start;
 		$json['FirePermit']['date']['end']       = $firepermit->date_end;

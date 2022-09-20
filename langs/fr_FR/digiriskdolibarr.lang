@@ -144,7 +144,9 @@ ThirdPartyOpeningHours = Horaires du tiers
 
 ExceptionsToWorkingHours = Dérogations aux horaires de travail
 PermanentDerogation = Dérogation permanente
+PermanentDerogationValue = Non
 OccasionalDerogation = Dérogation occasionnelle
+OccasionalDerogationValue = Oui
 ThirdPartyOpeningHoursSave = Les horaires d'ouverture du tiers ont bien été enregistrés
 
 
@@ -156,10 +158,9 @@ ThirdPartyOpeningHoursSave = Les horaires d'ouverture du tiers ont bien été en
 DigiriskDocuments = Document Digirisk
 Responsible = Responsable
 ContactsAction = Contacts action
-HoldingAgreement = Accord de participation
-HoldingAgreementTooltip = Entrez ici les informations relatives à l\'accord de participation
 PERCOTooltip = Si votre société possède un PERCO, cochez cette case
 PEETooltip = Si votre société possède un PEE, cochez cette case
+
 
 
 #
@@ -200,15 +201,20 @@ Police = Police secours
 SafetyInstructions = Consignes de sécurité
 ResponsibleToNotify = Responsable à prévenir
 LocationOfDetailedInstructions = Emplacement de la consigne détaillée
+LocationOfDetailedInstructionsValue = Pas de consigne détaillée sur ce site
 FirstAid = Premiers secours
+FirstAidValue = <h2>Liste des SST présents sur site (Nom, Entreprise, Téléphone)</h2><br><br>Chaque équipe doit être constituée de manière à pouvoir dans toute circonstance prodiguer les gestes de premiers secours à n'importe quel membre de l'équipe.<br />Les Sauveteurs Secouristes au Travail doivent être clairement identifiés et connus de tous.<h2>Conduite à tenir en cas d'accident</h2><br><br><h3>Accident bénin</h3><br><ul><li> - Soins prodigués par les SST</li><br><li> - Présence d'une trousse de secours</li></ul><br><br>Chaque machine est équipée d'au moins une trousse de secours permettent de prodiguer des soins pour des blessures légères.<br><br><h3>Accident grave</h3><br><ul><li> - Avertir le SST présent sur le site</li><br><li> - Déclencher la procédure en cas d'urgence</li><br><li> - Informer le responsable de l'Entreprise Utilisatrice Astreinte Exploitation 24/24h</li><br><li> - Contacter en cas d'accident</li></ul><br><br>L'Entreprise Utilisatrice rappelle en annexe numéros d'urgence. <br />
 AddPhoneNumber = Ajouter un numéro de téléphone à l'utilisateur
 ConfigureLabourInspector = Configurer un inspecteur du travail
 SocietyAdditionalDetails = Informations complémentaires de la société
 GeneralMeansAtDisposal = Moyens généraux mis à disposition
+GeneralMeansAtDisposalValue = <h2>Moyen de secours mis à disposition</h2><br><ul><li> - Infirmerie</li><br><li> - Nos personnels SST sont identifiés sur leurs casques et leur équipement de travail avec le badge SST</li><br><li> - Trousses à pharmacie pour les accidents bénins disponibles sur chaque sites</li></ul><br><br><h2>Consignes en cas d'accident bénins</h2><br><ul><li> - Contacter le SST le plus proche</li><br><li> - Soin avec la trousse à pharmacie mise à disposition</li><br><li> - Déclaration sur le site :</li></ul><br><br><h2>Consignes en cas d'accident</h2><br><ul><li> - Appel Pompiers : 18</li><br><li> - SAMU : 15</li><br><li> - Police Gendarmerie 17</li><br><li> - N&deg; de secours européen : 112</li></ul><br><br><h2>Consignes en cas d'incendie</h2><br>En cas d'incendie, procéder dans cet ordre :<br><ol><li> - Déclencher le signal d'alarme.</li><br><li> - Attaquer le feu (s'il n'est pas trop important) avec un extincteur.</li><br><li> - Si le feu n'est pas éteint après l'usage d'un seul extincteur, ou si le feu est déjà trop important, prévenir les sapeurs-pompiers.</li><br><li> - Fermer les portes et les fenêtres avant de quitter les locaux.</li><br><li> - Demander l'aide des équipes formées.</li><br></ol>
 GeneralInstructions = Consignes générales
+GeneralInstructionsValue = <h2>Toutes les installations</h2><br><br><p>Il est formellement interdit de fumer, de faire du feu ou d'utiliser une flamme nue dans et sur les installations.<br />Si l'intervention nécessite l'utilisation d'une flamme vive (travaux de soudage, etc.), il est impératif d'établir un permis de feu (voir exemple en annexe 9.5).<br />D'une manière générale, l'accès aux installations est interdit aux personnes non autorisées.<br />Chaque intervenant doit être muni de ses titres d'habilitation et attestations de formation. Il doit pouvoir les montrer sur site à la demande de l'Entreprise Utilisatrice.</p><br><br><h2>Habilitations</h2><br>Toute personne intervenante doit disposer d'une copie des habilitations suivantes :<br><ul><li> - Habilitation électrique en fonction des travaux à réaliser</li><br><li> - Attestation de formation ou habilitation aux travaux en hauteur et sauvetage en hauteur</li></ul><br>Et, être en mesure de la présenter sur simple demande de l'Entreprise Utilisatrice, du chargé d'intervention/de travaux ou de tout inspecteur assermenté<br><br><h2>Protections individuelles</h2><br>Toute personne intervenante doit être en mesure de disposer des Équipements de Protection Individuelle suivants selon les types de travaux effectués et les mesures de protection définies dans l'analyse des risques.<br><br><h3>Travaux divers</h3><br><ul><li> - Casque conçu pour les travaux en hauteur (EN397) avec jugulaire et/ou satisfaisant à l'isolement électrique (environnement électrique)</li><br><li> - Chaussures de sécurité</li><br><li> - Protections auditives, en cas de besoin</li><br><li> - Autres (à préciser) : en fonction des travaux réalisés et des risques associés.</li></ul><br><br><h3>Travaux électriques</h3><br><ul><li> - Tapis isolant ou tabouret isolant</li><br><li> - Gants adaptés au domaine de tension</li><br><li> - Casques pour travaux électrique avec écran facial (EN166)</li><br><li> - EPI réglementaires pour intervention HTA (UTE C 18-510)</li></ul><br><br><h3>Autres</h3><br>Note : Les entreprises extérieures doivent fournir à leurs intervenants les EPI désignés ci-dessus. Un tabouret et une perche se trouvent dans les postes de livraison.<br><br><h3>Travaux en hauteur</h3><br><ul><li> - EPI réglementaires (harnais, casque, 2 longes à absorbeurs ou double longe en Y, mousquetons, stop-chute, etc.) à jour de vérification</li><br><li> - Système d'évacuation automatique :</li><br><li> - Nombre : 1 kit évacuateur (désigné pour 2 personnes)</li><li>Localisation : dans la nacelle</li><br><li> - Penser à se munir d'un kit évacuateur supplémentaire si plus de deux personnes en nacelle</li><br><li> - Autre (à préciser) : stop-chute utilisé : HACA de référence 0529 7103 (attache en sternal sur le harnais)</li></ul><br><br>Les stop-chutes doivent être compatibles avec le système d'assurage rigide qui équipe les machines. Les stop-chutes doivent êtres conformes à la dernière norme et avoir passés avec succès les essais complémentaires (tests additionnels CNB/P/11.073 du 13/10/2010) rendus obligatoires par l'Avis du Ministère du Travail du 28 Septembre 2010 afin de garantir la conformité aux exigences de la directive 89/686/CEE.
 RulesOfProcedure = Règlement intérieur
-
+RulesOfProcedureValue = Disponible sur l'affichage obligatoire dans la salle de pause
 CollectiveAgreement = Conventions collectives
+CollectiveAgreementValue = Disponible sur le site du gouvernement :<br /><a href="https://www.service-public.fr/particuliers/vosdroits/F78" target="_blank">https://www.service-public.fr/particuliers/vosdroits/F78</a>
 legaldisplay.odt = Affichage légal
 legaldisplay_custom.odt = Affichage légal personnalisé
 
@@ -243,6 +249,7 @@ HowToSetDataInformationsSharing = Pour configurer les données sur la diffusion 
 ConfigureSecurityAndSocialData = Configurer les données de la société
 
 ParticipationAgreement = Accords de participation
+ParticipationAgreementValue = Oui pour tous les collaborateurs ayant un contrat de travail à durée indéterminée ou déterminée en cours avec l'entreprise, quelle qu'en soit la nature, pourront bénéficier de la participation.<br />Toutefois, une condition d'ancienneté est  requise : 6 mois dans l'entreprise.<br />Pour la détermination de l'ancienneté requise, sont prises en compte tous les contrats de travail exécutés au cours de la période de calcul et des 12 mois qui la précédent.<br />L'ancienneté s'apprécie à la date de clôture de l'exercice concerné ou à la date de départ en cas de rupture de contrat en cours d'exercice.
 TermsAndConditions = Modalités
 
 ESC = Comité Social & Économique
@@ -777,7 +784,9 @@ ShowTaskDone = Afficher les tâches soldées
 ShowTaskDoneRiskAssessmentDocumentDescription = Permettre d'afficher ou non les tâches soldées dans le Document Unique
 ActionPreventionCompletedTaskDone = Les actions soldées ne sont pas affichées
 AppliedOn = Actif sur :
-
+RiskAssessmentDocumentMethod = * Étape 1 : Récupération des informations<br />- Visite des locaux<br />- Récupération des données du personnel<br /><br />* Étape 2 : Définition de la méthodologie et de document<br />- Validation des fiches d'unité de travail standard<br />- Validation de l'arborescence des unités<br /><br />* Étape 3 : Réalisation de l'étude de risques<br />- Sensibilisation des personnels aux risques et aux dangers<br />- Création des unités de travail avec le personnel et le ou les responsables<br />- Évaluations des risques par unités de travail avec le personnel<br /><br />* Étape 4<br />- Traitement et rédaction du document unique
+RiskAssessmentDocumentSources = La sensibilisation des risques est définie dans l'ED840 édité par L'INRS.<br />Dans ce document vous trouverez:<br />- La définition d'un risque, d'un danger et un schéma explicatif<br />- Les explications concernant les différentes méthodes d'évaluation
+RiskAssessmentDocumentImportantNote = Notes importantes :<br />Vous pouvez lire la documentation de DigiRisk ici<br /><a href="https://wiki.dolibarr.org/index.php?title=Module_Digirisk" target="_blank">https://wiki.dolibarr.org/index.php?title=Module_Digirisk</a><br />Vous pouvez suivre le projet ici :<br /><a href="https://github.com/Evarisk/Digirisk/projects?type=classic" target="_blank">https://github.com/Evarisk/Digirisk/projects?type=classic</a><br />Reporter un bug ici<br /><a href="https://github.com/Evarisk/Digirisk/issues" target="_blank">https://github.com/Evarisk/Digirisk/issues</a>
 
 # Boxes - Widget
 RiskAssessmentDocumentBox = Box Document unique
@@ -1524,7 +1533,6 @@ LabourDoctorName = AMETRA
 LabourDoctorFirstName = Médecin du
 LabourDoctorLastName = travail
 DashBoard = Tableau de bord
-DayWithoutAccident = Jours sans accident(s):
 Close = Fermer
 DateRange = Plage de dates
 UseDateRange = Utiliser la plage de dates

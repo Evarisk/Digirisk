@@ -66,13 +66,13 @@ function digiriskdolibarr_completesubstitutionarray(&$substitutionarray, $langs,
 
 			$substitutionarray['responsable_a_prevenir']               = $legaldisplay->safety_rule->responsible_for_preventing;
 			$substitutionarray['telephone']                            = $legaldisplay->safety_rule->phone;
-			$substitutionarray['emplacement_des_consignes_detaillees'] = strip_tags($legaldisplay->safety_rule->location_of_detailed_instruction);
-			$substitutionarray['permanente']                           = strip_tags($legaldisplay->derogation_schedule->permanent);
-			$substitutionarray['occasionnelle']                        = strip_tags($legaldisplay->derogation_schedule->occasional);
+			$substitutionarray['emplacement_des_consignes_detaillees'] = dol_htmlentitiesbr_decode(strip_tags($legaldisplay->safety_rule->location_of_detailed_instruction, '<br>'));
+			$substitutionarray['permanente']                           = dol_htmlentitiesbr_decode(strip_tags($legaldisplay->derogation_schedule->permanent, '<br>'));
+			$substitutionarray['occasionnelle']                        = dol_htmlentitiesbr_decode(strip_tags($legaldisplay->derogation_schedule->occasional, '<br>'));
 			$substitutionarray['intitule']                             = $legaldisplay->collective_agreement->title_of_the_applicable_collective_agreement;
-			$substitutionarray['lieu_modalite']                        = strip_tags($legaldisplay->collective_agreement->location_and_access_terms_of_the_agreement);
-			$substitutionarray['modalite_information_ap']              = strip_tags($legaldisplay->participation_agreement->information_procedures);
-			$substitutionarray['modalite_access']                      = strip_tags($legaldisplay->DUER->how_access_to_duer);
+			$substitutionarray['lieu_modalite']                        = dol_htmlentitiesbr_decode(strip_tags($legaldisplay->collective_agreement->location_and_access_terms_of_the_agreement, '<br>'));
+			$substitutionarray['modalite_information_ap']              = dol_htmlentitiesbr_decode(strip_tags($legaldisplay->participation_agreement->information_procedures, '<br>'));
+			$substitutionarray['modalite_access']                      = dol_htmlentitiesbr_decode(strip_tags($legaldisplay->DUER->how_access_to_duer, '<br>'));
 
 			$substitutionarray['lundi_matin']    = $legaldisplay->working_hour->monday_morning;
 			$substitutionarray['lundi_aprem']    = $legaldisplay->working_hour->monday_afternoon;
@@ -101,23 +101,23 @@ function digiriskdolibarr_completesubstitutionarray(&$substitutionarray, $langs,
 
 			break;
 
-		case 'firepermit':
+		case 'preventionplandocument@digiriskdolibarr':
+
+			$preventionplan = json_decode($object->json, false, 512, JSON_UNESCAPED_UNICODE)->PreventionPlan;
+
+			$substitutionarray['moyen_generaux_mis_disposition'] = dol_htmlentitiesbr_decode(strip_tags($preventionplan->moyen_generaux_mis_disposition, '<br>'));
+			$substitutionarray['consigne_generale']              = dol_htmlentitiesbr_decode(strip_tags($preventionplan->consigne_generale, '<br>'));
+			$substitutionarray['premiers_secours']               = dol_htmlentitiesbr_decode(strip_tags($preventionplan->premiers_secours, '<br>'));
+
+			break;
+
+		case 'firepermitdocument@digiriskdolibarr':
 
 			$firepermit = json_decode($object->json, false, 512, JSON_UNESCAPED_UNICODE)->FirePermit;
 
-			$substitutionarray['unique_identifier_int'] = $firepermit->unique_identifier_int;
-			$substitutionarray['is_end']                = $firepermit->is_end;
-			$substitutionarray['prevention_id']         = $firepermit->prevention_id;
-			$substitutionarray['date_start']            = $firepermit->date_start;
-			$substitutionarray['date_end']              = $firepermit->date_end;
-			$substitutionarray['date_end__is_define']   = $firepermit->date_end__is_define;
-			$substitutionarray['date_closure']          = $firepermit->date_closure;
-			$substitutionarray['former']                = $firepermit->former;
-			$substitutionarray['maitre_oeuvre']         = $firepermit->maitre_oeuvre;
-			$substitutionarray['intervenant_exterieur'] = $firepermit->intervenant_exterieur;
-			$substitutionarray['intervenants']          = $firepermit->intervenants;
-			$substitutionarray['society_outside']       = $firepermit->society_outside;
-			$substitutionarray['taxonomy']              = $firepermit->taxonomy;
+			$substitutionarray['moyen_generaux_mis_disposition'] = dol_htmlentitiesbr_decode(strip_tags($firepermit->moyen_generaux_mis_disposition, '<br>'));
+			$substitutionarray['consigne_generale']              = dol_htmlentitiesbr_decode(strip_tags($firepermit->consigne_generale, '<br>'));
+			$substitutionarray['premiers_secours']               = dol_htmlentitiesbr_decode(strip_tags($firepermit->premiers_secours, '<br>'));
 
 			break;
 
@@ -132,9 +132,9 @@ function digiriskdolibarr_completesubstitutionarray(&$substitutionarray, $langs,
 			$substitutionarray['destinataireDUER']   = $riskassessmentdocument->destinataireDUER;
 			$substitutionarray['telephone']          = $riskassessmentdocument->telephone;
 			$substitutionarray['portable']           = $riskassessmentdocument->portable;
-			$substitutionarray['methodologie']       = strip_tags($riskassessmentdocument->methodologie);
-			$substitutionarray['sources']            = strip_tags($riskassessmentdocument->sources);
-			$substitutionarray['remarqueImportante'] = strip_tags($riskassessmentdocument->remarqueImportante);
+			$substitutionarray['methodologie']       = dol_htmlentitiesbr_decode(strip_tags($riskassessmentdocument->methodologie, '<br>'));
+			$substitutionarray['sources']            = dol_htmlentitiesbr_decode(strip_tags($riskassessmentdocument->sources, '<br>'));
+			$substitutionarray['remarqueImportante'] = dol_htmlentitiesbr_decode(strip_tags($riskassessmentdocument->remarqueImportante, '<br>'));
 
 			break;
 	}
