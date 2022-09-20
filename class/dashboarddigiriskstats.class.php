@@ -66,7 +66,8 @@ class DashboardDigiriskStats extends DigiriskStats
 
 		$dataseries = array(
 			'risk' => $risk->load_dashboard_risk(),
-			'task' => $digirisktask->load_dashboard_task()
+			'task' => $digirisktask->load_dashboard_task(),
+			'accident' => $accident->load_dashboard_accident()
 		);
 
 		$accidentdata             = $accident->load_dashboard_accident();
@@ -78,20 +79,15 @@ class DashboardDigiriskStats extends DigiriskStats
 
 		$dashboardLines = array(
 			'daywithoutaccident' => array(
-				'label' => $langs->trans("DayWithoutAccident"),
-				'content' => $accidentdata,
+				'label' => array($langs->trans("DayWithoutAccident"), $langs->trans("WorkStopDays")),
+				'content' => array($accidentdata['daywithoutaccident'], $accidentdata['nbworkstopdays']),
 				'picto' => 'fas fa-user-injured'
 			),
 			'lastgenerationdateDU' => array(
-				'label' => $langs->trans("LastGenerateDate"),
-				'content' => $riskassementdocumentdata[0],
+				'label' => array($langs->trans("LastGenerateDate"), $langs->trans("NextGenerateDate")),
+				'content' => array($riskassementdocumentdata[0], $riskassementdocumentdata[1]),
 				'picto' => 'fas fa-info-circle'
-			),
-			'nextgenerationdateDU' => array(
-				'label' => $langs->trans("NextGenerateDate"),
-				'content' => $riskassementdocumentdata[1],
-				'picto' => 'fas fa-info-circle'
-			),
+			)
 		);
 
 		$disableWidgetList = json_decode($user->conf->DIGIRISKDOLIBARR_DISABLED_DASHBOARD_INFO);
@@ -120,9 +116,12 @@ class DashboardDigiriskStats extends DigiriskStats
 					$openedDashBoard .= '</div>';
 					$openedDashBoard .= '<div class="info-box-lines">';
 					$openedDashBoard .= '<div class="info-box-line" style="font-size : 20px;">';
-					$openedDashBoard .= '<span class=""><strong>' . $dashboardLine["label"] . ' ' . '</strong>';
-					$openedDashBoard .= '<span class="classfortooltip badge badge-info" title="' . $dashboardLine["label"] . ' ' . $dashboardLine["content"] . '" >' . $dashboardLine["content"] . '</span>';
-					$openedDashBoard .= '</span>';
+					for ($i = 0; $i < count($dashboardLine['label']); $i++) {
+						$openedDashBoard .= '<span class=""><strong>' . $dashboardLine["label"][$i] . ' : ' . '</strong>';
+						$openedDashBoard .= '<span class="classfortooltip badge badge-info" title="' . $dashboardLine["label"][$i]  . ' ' . $dashboardLine["content"][$i]  . '" >' . $dashboardLine["content"][$i]  . '</span>';
+						$openedDashBoard .= '</span>';
+						$openedDashBoard .= '<br>';
+					}
 					$openedDashBoard .= '</div>';
 					$openedDashBoard .= '</div><!-- /.info-box-lines --></div><!-- /.info-box-content -->';
 					$openedDashBoard .= '</div><!-- /.info-box -->';

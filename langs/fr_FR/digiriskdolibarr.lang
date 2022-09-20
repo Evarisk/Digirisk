@@ -625,6 +625,8 @@ GaugeCounter = Ce champ est utilisé dans le compteur de la jauge
 DateStartWorkStop = Date de début d'arrêt de travail
 DateEndWorkStop = Date de fin d'arrêt de travail
 ReturnWorkDate = Date de reprise d'activité
+DayWithoutAccident = Jours sans accident(s)
+AccidentRepartition = Répartition des accidents par type
 
 # AccidentTooltip - Tooltip des accidents
 VictimActivityTooltip = Précisez l’activité ou la tâche de la victime au moment de l’accident, c’est-à-dire ce que faisait la victime

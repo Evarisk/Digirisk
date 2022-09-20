@@ -486,14 +486,54 @@ class Accident extends CommonObject
 	 */
 	public function load_dashboard_accident()
 	{
+		global $langs;
+
+		// Number days without accident
 		$lastAccident = $this->fetchAll('DESC', 'accident_date', 1, 0 );
 		if (is_array($lastAccident) && !empty($lastAccident)) {
 			$lastTimeAccident = dol_now() - reset($lastAccident)->accident_date;
-			$value = abs(round($lastTimeAccident / 86400));
+			$array['daywithoutaccident'] = abs(round($lastTimeAccident / 86400));
 		} else {
-			$value = 'N/A';
+			$array['daywithoutaccident'] = 'N/A';
 		}
-		return $value;
+		// Number accidents
+		$allaccidents = $this->fetchAll();
+		if (is_array($allaccidents) && !empty($allaccidents)) {
+			$array['title'] = $langs->transnoentities('AccidentRepartition');
+			$array['picto'] = '<i class="fas fa-user-injured"></i>';
+			$array['labels'] = array(
+				0 => array(
+					'label' => $langs->transnoentities('AccidentWithDIAT'),
+					'color' => '#e05353'
+				),
+				1 => array(
+					'label' => $langs->transnoentities('AccidentWithoutDIAT'),
+					'color' => '#e9ad4f'
+				),
+			);
+			$accidentworkstop = new AccidentWorkStop($this->db);
+			foreach ($allaccidents as $accident) {
+				$allaccidentworkstop = $accidentworkstop->fetchFromParent($accident->id);
+				if (is_array($allaccidentworkstop) && !empty($allaccidentworkstop)) {
+					foreach ($allaccidentworkstop as $accidentworkstop) {
+						if ($accidentworkstop->id > 0) {
+							$nbworkstopdays += $accidentworkstop->workstop_days;
+						}
+					}
+					$nbaccidents += 1;
+				} else {
+					$nbaccidentswithoutDIAT += 1;
+				}
+			}
+			$array['data'][0] = $nbaccidents;
+			$array['data'][1] = $nbaccidentswithoutDIAT;
+			$array['nbworkstopdays'] = $nbworkstopdays;
+		} else {
+			$array['data'][0] = 0;
+			$array['data'][1] = 0;
+			$array['nbworkstopdays'] = 0;
+		}
+		return $array;
 	}
 }
 
