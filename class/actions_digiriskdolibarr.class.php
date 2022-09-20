@@ -181,19 +181,25 @@ class ActionsDigiriskdolibarr
 				</script>
 				<?php
 			}
-		} else if (($parameters['currentcontext'] == 'projecttaskcard') || ($parameters['currentcontext'] == 'projecttaskscard') || ($parameters['currentcontext'] == 'tasklist')) {
+		} else if (in_array($parameters['currentcontext'], array('projectcard', 'projectcontactcard', 'projecttaskscard', 'projecttasktime', 'projectOverview', 'projecttaskscard', 'tasklist'))) {
 			if ((GETPOST('action') == '' || empty(GETPOST('action')) || GETPOST('action') != 'edit')) {
-				require_once __DIR__ . '/../../../projet/class/task.class.php';
+				require_once DOL_DOCUMENT_ROOT.'/projet/class/project.class.php';
+				require_once DOL_DOCUMENT_ROOT.'/projet/class/task.class.php';
+
 				require_once __DIR__ . '/../class/riskanalysis/risk.class.php';
 				require_once __DIR__ . '/../class/preventionplan.class.php';
 				require_once __DIR__ . '/../class/firepermit.class.php';
 				require_once __DIR__ . '/../class/accident.class.php';
+
+				global $user;
 
 				$task           = new Task($db);
 				$risk           = new Risk($db);
 				$preventionplan = new PreventionPlan($db);
 				$firepermit     = new FirePermit($db);
 				$accident       = new Accident($db);
+				$project        = new Project($db);
+				$extrafields    = new ExtraFields($db);
 
 				if ($parameters['currentcontext'] == 'projecttaskcard') {
 					$task->fetch(GETPOST('id'));
@@ -232,9 +238,6 @@ class ActionsDigiriskdolibarr
 				}
 
 				if (($parameters['currentcontext'] == 'projecttaskscard') || ($parameters['currentcontext'] == 'tasklist')) {
-					$task        = new Task($db);
-					$extrafields = new ExtraFields($db);
-
 					$extrafields->fetch_name_optionals_label($task->table_element);
 					$alltasks = $task->getTasksArray(null, null, 0, 0, 0, '', '-1', '', 0, 0, $extrafields);
 
@@ -295,6 +298,47 @@ class ActionsDigiriskdolibarr
 							}
 						}
 					}
+				}
+
+				if (in_array($parameters['currentcontext'], array('projectcard', 'projectcontactcard', 'projecttaskscard', 'projecttasktime', 'projectOverview'))) {
+					if ($parameters['currentcontext'] == 'projecttasktime') {
+						$project->fetch(GETPOST('projectid'), GETPOST('project_ref'));
+					} else {
+						$project->fetch(GETPOST('id'), GETPOST('ref'));
+					}
+					$alltasks = $task->getTasksArray(null, null, $project->id, 0, 0, '', '-1', '', 0, 0, $extrafields);
+					if (is_array($alltasks) && !empty($alltasks)) {
+						$nbtasks = count($alltasks);
+						foreach ($alltasks as $tasksignle) {
+							$filter = ' AND ptt.fk_task = ' . $tasksignle->id;
+							$alltimespent = $tasksignle->fetchAllTimeSpent($user, $filter);
+							foreach ($alltimespent as $timespent) {
+								$totatconsumedtimeamount += convertSecondToTime($timespent->timespent_duration, 'allhourmin') * $timespent->timespent_thm;
+							}
+							$totatconsumedtime += $tasksignle->duration;
+							$totalprogress += $tasksignle->progress;
+							$totaltasksbudget += $tasksignle->budget_amount;
+						}
+					} else {
+						$totatconsumedtime = 0;
+						$totatconsumedtimeamount = 0;
+						$nbtasks = 0;
+						$totalprogress = 0;
+						$totaltasksbudget = 0;
+					}
+					$outTotatconsumedtime = '<tr><td>' . $langs->trans('TotalConsumedTime') . '</td><td>' . convertSecondToTime($totatconsumedtime, 'allhourmin') . '</td></tr>';
+					$outTotatconsumedtimeamount = '<tr><td>' . $langs->trans('TotalConsumedTimeAmount') . '</td><td>' . price($totatconsumedtimeamount, 0, $langs, 1, 0, 0, $conf->currency) . '</td></tr>';
+					$outNbtasks = '<tr><td>' . $langs->trans('NbTasks') . '</td><td>' . $nbtasks . '</td></tr>';
+					$outTotalprogress = '<tr><td>' . $langs->trans('TotalProgress') . '</td><td>' . (($totalprogress) ? price2num($totalprogress/$nbtasks, 2) . ' %' : '0 %') . '</td></tr>';
+					$outTotaltasksbudget = '<tr><td>' . $langs->trans('TotalBudget') . '</td><td>' . price($totaltasksbudget, 0, $langs, 1, 0, 0, $conf->currency) . '</td></tr>'; ?>
+					<script>
+						jQuery('.fichecenter .fichehalfright .tableforfield tbody tr:last-child').after(<?php echo json_encode($outTotatconsumedtime) ?>);
+						jQuery('.fichecenter .fichehalfright .tableforfield tbody tr:last-child').after(<?php echo json_encode($outTotatconsumedtimeamount) ?>);
+						jQuery('.fichecenter .fichehalfright .tableforfield tbody tr:last-child').after(<?php echo json_encode($outNbtasks) ?>);
+						jQuery('.fichecenter .fichehalfright .tableforfield tbody tr:last-child').after(<?php echo json_encode($outTotalprogress) ?>);
+						jQuery('.fichecenter .fichehalfright .tableforfield tbody tr:last-child').after(<?php echo json_encode($outTotaltasksbudget) ?>);
+					</script>
+					<?php
 				}
 			}
 		} else if ($parameters['currentcontext'] == 'publicnewticketcard') {
