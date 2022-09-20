@@ -597,6 +597,7 @@ if (empty($reshook)) {
 
 	// Action clone object
 	if ($action == 'confirm_clone' && $confirm == 'yes') {
+		$options['clone_label']     = GETPOST('clone_label');
 		$options['firepermit_risk'] = GETPOST('clone_firepermit_risk');
 		$options['attendants']      = GETPOST('clone_attendants');
 		$options['schedule']        = GETPOST('clone_schedule');
@@ -914,7 +915,7 @@ if (($action == 'clone' && (empty($conf->use_javascript_ajax) || ! empty($conf->
 	// Define confirmation messages
 	$formquestionclone = array(
 		'text' => $langs->trans("ConfirmClone"),
-		array('type' => 'text', 'name' => 'clone_ref', 'label' => $langs->trans("NewRefForCloneFirePermit"), 'value' => empty($tmpcode) ? $langs->trans("CopyOf") . ' ' . $object->ref : $tmpcode, 'size' => 24),
+		array('type' => 'text', 'name' => 'clone_label', 'label' => $langs->trans("NewLabelForCloneFirePermit"), 'value' => empty($tmpcode) ? $langs->trans("CopyOf") . ' ' . $object->ref : $tmpcode, 'size' => 24),
 		array('type' => 'checkbox', 'name' => 'clone_firepermit_risk', 'label' => $langs->trans("CloneFirePermitRisk"), 'value' => 1),
 		array('type' => 'checkbox', 'name' => 'clone_attendants', 'label' => $langs->trans("CloneAttendantsFirePermit"), 'value' => 1),
 		array('type' => 'checkbox', 'name' => 'clone_schedule', 'label' => $langs->trans("CloneScheduleFirePermit"), 'value' => 1),

@@ -270,11 +270,11 @@ class PreventionPlan extends CommonObject
 		if (property_exists($object, 'ref')) {
 			$object->ref = $refPreventionPlanMod->getNextValue($object);
 		}
+		if (property_exists($object, 'label')) {
+			$object->label = $options['clone_label'];
+		}
 		if (property_exists($object, 'ref_ext')) {
 			$object->ref_ext = 'digirisk_' . $object->ref;
-		}
-		if (property_exists($object, 'label')) {
-			$object->label = empty($this->fields['label']['default']) ? $langs->trans("CopyOf") . " " . $object->label : $this->fields['label']['default'];
 		}
 		if (property_exists($object, 'date_creation')) {
 			$object->date_creation = dol_now();
