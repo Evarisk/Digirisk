@@ -36,7 +36,7 @@ if ( ! $res && file_exists("../../../main.inc.php")) $res    = @include "../../.
 if ( ! $res && file_exists("../../../../main.inc.php")) $res = @include "../../../../main.inc.php";
 if ( ! $res) die("Include of main fails");
 
-global $langs, $user;
+global $conf, $db, $langs, $user;
 
 // Libraries
 require_once DOL_DOCUMENT_ROOT . "/core/lib/admin.lib.php";
@@ -55,6 +55,7 @@ $langs->loadLangs(array("admin", "digiriskdolibarr@digiriskdolibarr"));
 if ( ! $user->admin) accessforbidden();
 
 // Parameters
+$action     = GETPOST('action', 'alpha');
 $backtopage = GETPOST('backtopage', 'alpha');
 
 /*
@@ -62,8 +63,12 @@ $backtopage = GETPOST('backtopage', 'alpha');
  */
 
 if (($action == 'update' && ! GETPOST("cancel", 'alpha')) || ($action == 'updateedit')) {
+	$DUProject = GETPOST('DUProject', 'none');
+	$DUProject = preg_split('/_/', $DUProject);
 	$EvaluatorDuration = GETPOST('EvaluatorDuration', 'alpha');
 	$TaskTimeSpentDuration = GETPOST('TaskTimeSpentDuration', 'alpha');
+
+	dolibarr_set_const($db, "DIGIRISKDOLIBARR_DU_PROJECT", $DUProject[0], 'integer', 0, '', $conf->entity);
 
 	if (!empty($EvaluatorDuration) || $EvaluatorDuration === '0') {
 		dolibarr_set_const($db, "DIGIRISKDOLIBARR_EVALUATOR_DURATION", $EvaluatorDuration, 'integer', 0, '', $conf->entity);
