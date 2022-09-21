@@ -37,66 +37,47 @@ try {
 
 // CSE
 
-//Date
+// Date
 print '<tr>';
-print '<td class="titlefield">' . $form->textwithpicto($langs->trans("ElectionDateCSE"), $langs->trans('HowToSetDataInformationsSharing')) . '</td>';
+print '<td class="titlefield"><i class="fas fa-calendar-alt"></i> ' . $form->textwithpicto($langs->trans("ElectionDateCSE"), $langs->trans('HowToSetDataInformationsSharing')) . '</td>';
 print '<td>';
-
-print $informationssharing->membres_du_comite_entreprise_date;
+print '<i class="fas fa-calendar-alt"></i> ' . dol_print_date($informationssharing->membres_du_comite_entreprise_date, 'day');
 print '</td></tr>';
 
-print '</td></tr>';
-
-//Titulars
+// Titulars
 print '<tr>';
-print '<td class="titlefield">' . $form->textwithpicto($langs->trans("Titulars"), $langs->trans('HowToSetDataInformationsSharing')) . '</td>';
+print '<td class="titlefield"><i class="fas fa-user"></i> ' . $form->textwithpicto($langs->trans("Titulars"), $langs->trans('HowToSetDataInformationsSharing')) . '</td>';
 print '<td>';
-
-print $informationssharing->membres_du_comite_entreprise_titulaires;
+print $informationssharing->membres_du_comite_entreprise_titulairesFullName;
 print '</td></tr>';
 
-print '</td></tr>';
-
-//Alternates
+// Alternates
 print '<tr>';
-print '<td class="titlefield">' . $form->textwithpicto($langs->trans("Alternates"), $langs->trans('HowToSetDataInformationsSharing')) . '</td>';
+print '<td class="titlefield"><i class="fas fa-user"></i> ' . $form->textwithpicto($langs->trans("Alternates"), $langs->trans('HowToSetDataInformationsSharing')) . '</td>';
 print '<td>';
-
-print $informationssharing->membres_du_comite_entreprise_suppleants;
-print '</td></tr>';
-
+print $informationssharing->membres_du_comite_entreprise_suppleantsFullName;
 print '</td></tr>';
 
 // DP
-
 //Date
 print '<tr>';
-print '<td class="titlefield">' . $form->textwithpicto($langs->trans("ElectionDateDP"), $langs->trans('HowToSetDataInformationsSharing')) . '</td>';
+print '<td class="titlefield"><i class="fas fa-calendar-alt"></i> ' . $form->textwithpicto($langs->trans("ElectionDateDP"), $langs->trans('HowToSetDataInformationsSharing')) . '</td>';
 print '<td>';
-
-print $informationssharing->delegues_du_personnels_date;
-print '</td></tr>';
-
+print '<i class="fas fa-calendar-alt"></i> ' . dol_print_date($informationssharing->delegues_du_personnels_date, 'day');
 print '</td></tr>';
 
 //Titulars
 print '<tr>';
-print '<td class="titlefield">' . $form->textwithpicto($langs->trans("Titulars"), $langs->trans('HowToSetDataInformationsSharing')) . '</td>';
+print '<td class="titlefield"><i class="fas fa-user"></i> ' . $form->textwithpicto($langs->trans("Titulars"), $langs->trans('HowToSetDataInformationsSharing')) . '</td>';
 print '<td>';
-
-print $informationssharing->delegues_du_personnels_titulaires;
-print '</td></tr>';
-
+print $informationssharing->delegues_du_personnels_titulairesFullName;
 print '</td></tr>';
 
 //Alternates
 print '<tr>';
-print '<td class="titlefield">' . $form->textwithpicto($langs->trans("Alternates"), $langs->trans('HowToSetDataInformationsSharing')) . '</td>';
+print '<td class="titlefield"><i class="fas fa-user"></i> ' . $form->textwithpicto($langs->trans("Alternates"), $langs->trans('HowToSetDataInformationsSharing')) . '</td>';
 print '<td>';
-
-print $informationssharing->delegues_du_personnels_suppleants;
-print '</td></tr>';
-
+print $informationssharing->delegues_du_personnels_suppleantsFullName;
 print '</td></tr>';
 
 ?>

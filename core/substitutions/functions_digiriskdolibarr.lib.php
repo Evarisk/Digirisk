@@ -95,9 +95,9 @@ function digiriskdolibarr_completesubstitutionarray(&$substitutionarray, $langs,
 
 			$informationssharing = json_decode($object->json, false, 512, JSON_UNESCAPED_UNICODE)->InformationsSharing;
 
-			$substitutionarray['membres_du_comite_entreprise_date']       = $informationssharing->membres_du_comite_entreprise_date;
-			$substitutionarray['membres_du_comite_entreprise_titulaires'] = $informationssharing->membres_du_comite_entreprise_titulaires;
-			$substitutionarray['membres_du_comite_entreprise_suppleants'] = $informationssharing->membres_du_comite_entreprise_suppleants;
+			$substitutionarray['membres_du_comite_entreprise_date']       = dol_print_date($informationssharing->membres_du_comite_entreprise_date, 'day');
+			$substitutionarray['membres_du_comite_entreprise_titulaires'] = dol_htmlentitiesbr_decode(strip_tags($informationssharing->membres_du_comite_entreprise_titulaires, '<br>'));
+			$substitutionarray['membres_du_comite_entreprise_suppleants'] = dol_htmlentitiesbr_decode(strip_tags($informationssharing->membres_du_comite_entreprise_suppleants, '<br>'));
 
 			break;
 
