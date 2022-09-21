@@ -3552,6 +3552,7 @@ window.eoxiaJS.ticket.event = function() {
 	$( document ).on( 'click', '.linked-file-delete', window.eoxiaJS.ticket.removeFile );
 	$( document ).on( 'change', '.add-dashboard-info', window.eoxiaJS.ticket.addDashBoardInfo );
 	$( document ).on( 'click', '.close-dashboard-info', window.eoxiaJS.ticket.closeDashBoardInfo );
+	$( document ).on( 'keyup', '.email', window.eoxiaJS.ticket.checkValidEmail );
 };
 
 /**
@@ -3761,6 +3762,23 @@ window.eoxiaJS.ticket.closeDashBoardInfo = function() {
 		error: function ( ) {
 		}
 	});
+};
+
+/**
+ * Check if email is valid
+ *
+ * @since   9.6.0
+ * @version 9.6.0
+ *
+ * @return {void}
+ */
+window.eoxiaJS.ticket.checkValidEmail = function() {
+	var reEmail = /^([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$/;
+	if (reEmail.test(this.value) == false) {
+		$(this).attr('style', 'border :3px solid red');
+	} else {
+		$(this).css("border", "3px solid green");
+	}
 };
 
 /**

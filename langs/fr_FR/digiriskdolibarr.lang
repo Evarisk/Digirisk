@@ -622,7 +622,7 @@ AccidentLesionList = Liste des lésions liées à l'accident
 DocumentsMetaData = Fichiers joints complémentaires
 WorkStopDocument = Déclaration d'arrêt de travail
 AccidentMetaDataSave = Les données complémentaires de l'accident ont bien été enregistrées
-ErrorFieldNotEmpty = Erreur : Le champ '%s' ne peut pas être vide
+ErrorFieldNotEmpty = Erreur : le champ <b>'%s'</b> ne peut pas être vide
 ConfirmDeleteAccidentWorkStop = Êtes-vous sûr de vouloir supprimer l'arrêt de travail <b>%s</b> sur l'accident ?
 AccidentMetaDataLesion = Données complémentaires des lésions
 TotalWorkStopDays = Nombre total de jour d'arrêt de travail
@@ -1435,6 +1435,9 @@ GenerateCSV = Générer le fichier CSV
 SuccessGenerateCSV = Fichier CSV %s généré avec succès
 ErrorMissingData = Erreur : impossible de générer le fichier CSV, les données envoyées au fichier sont incorrecte. <br> Veuillez vérifier que vous avez bien des GP/UT assignés à des tickets.
 CSVFile = Fichier CSV
+ErrorFieldEmail = Erreur : l'email doit correspondre au format suivant : <b>'aaa@aaa.fr'</b><br> L'email saisi <b>'%s'</b> ne correspondant pas
+TicketEmailRequired = Email nécessaire pour créer un ticket
+TicketEmailRequiredHelp = Activer cette option pour rendre obligatoire la saisie d'un email pour créer un ticket dans l'interface publique
 
 
 

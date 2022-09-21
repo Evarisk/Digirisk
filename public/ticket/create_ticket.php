@@ -63,7 +63,8 @@ require_once DOL_DOCUMENT_ROOT . '/core/modules/ticket/mod_ticket_simple.php';
 require_once '../../lib/digiriskdolibarr_function.lib.php';
 require_once '../../class/digiriskelement.class.php';
 
-global $conf, $db, $langs;
+global $conf, $db, $hookmanager, $langs;
+
 // Load translation files required by the page
 $langs->loadLangs(array('companies', 'other', 'mails', 'ticket', 'digiriskdolibarr@digiriskdolibarr'));
 
@@ -80,11 +81,11 @@ if ( ! dol_strlen($ticket_tmp_id)) {
 // Initialize technical object to manage hooks of page. Note that conf->hooks_modules contains array of hook context
 $hookmanager->initHooks(array('publicnewticketcard', 'globalcard'));
 
-$object      = new Ticket($db);
-$formfile    = new FormFile($db);
-$extrafields = new ExtraFields($db);
-$category    = new Categorie($db);
-$modTicket   = new mod_ticket_simple($db);
+$object          = new Ticket($db);
+$formfile        = new FormFile($db);
+$extrafields     = new ExtraFields($db);
+$category        = new Categorie($db);
+$modTicket       = new mod_ticket_simple();
 $digiriskelement = new DigiriskElement($db);
 
 $extrafields->fetch_name_optionals_label($object->table_element);
@@ -95,7 +96,6 @@ $conf->setEntityValues($db, $entity);
 
 //ici charger les conf de la bonne entité
 $upload_dir = $conf->categorie->multidir_output[isset($entity) ? $entity : 1];
-
 
 /*
  * Actions
@@ -114,41 +114,58 @@ if ($action == 'add') {
 	$error = 0;
 
 	$parentCategory = GETPOST('parentCategory');
-	$subCategory     = GETPOST('subCategory');
+	$subCategory    = GETPOST('subCategory');
 	$message        = GETPOST('message');
 	$ticket_tmp_id  = GETPOST('ticket_id');
 
 	// Check parameters
 	if (empty($parentCategory)) {
-		setEventMessages('<b>' . $langs->trans('ErrorFieldNotEmpty', $conf->global->DIGIRISKDOLIBARR_TICKET_PARENT_CATEGORY_LABEL) . '</b>', null, 'errors');
+		setEventMessages($langs->trans('ErrorFieldNotEmpty', $conf->global->DIGIRISKDOLIBARR_TICKET_PARENT_CATEGORY_LABEL), array(), 'errors');
 		$error++;
 	}
+
+	if ($conf->global->DIGIRISKDOLIBARR_TICKET_EMAIL_REQUIRED) {
+		$email = GETPOST('email', 'alpha');
+		if (empty($email)) {
+			setEventMessages($langs->trans('ErrorFieldNotEmpty', $langs->transnoentities('Email')), array(), 'errors');
+			$error++;
+		} else {
+			$regEmail = '/^([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$/';
+			if (preg_match($regEmail, $email)) {
+				$object->origin_email = $email;
+			} else {
+				setEventMessages($langs->trans('ErrorFieldEmail', $email), array(), 'errors');
+				$error++;
+			}
+		}
+	}
+
 	// Quand le registre choisi est Danger Grave et Imminent, il ne faut pas check ça
 	//  if (empty($subCategory)) {
 	//      setEventMessages($langs->trans('ErrorFieldNotEmpty', $langs->transnoentitiesnoconv('Pertinence')), null, 'errors');
 	//      $error++;
 	//  }
 	if (empty($message)) {
-		setEventMessages('<b>' . $langs->trans('ErrorFieldNotEmpty', $langs->transnoentitiesnoconv('Message')) . '</b>', null, 'errors');
+		setEventMessages($langs->trans('ErrorFieldNotEmpty', $langs->transnoentitiesnoconv('Message')), array(), 'errors');
 		$error++;
 	}
 
 	if (empty(GETPOST('options_digiriskdolibarr_ticket_lastname'))) {
-		setEventMessages('<b>' . $langs->trans('ErrorFieldNotEmpty', $langs->transnoentitiesnoconv('Lastname')) . '</b>', null, 'errors');
+		setEventMessages($langs->trans('ErrorFieldNotEmpty', $langs->transnoentitiesnoconv('Lastname')), array(), 'errors');
 		$error++;
 	}
 
 	if (empty(GETPOST('options_digiriskdolibarr_ticket_firstname'))) {
-		setEventMessages('<b>' . $langs->trans('ErrorFieldNotEmpty', $langs->transnoentitiesnoconv('Firstname')) . '</b>', null, 'errors');
+		setEventMessages($langs->trans('ErrorFieldNotEmpty', $langs->transnoentitiesnoconv('Firstname')), array(), 'errors');
 		$error++;
 	}
 
 	if (empty(GETPOST('options_digiriskdolibarr_ticket_service')) || GETPOST('options_digiriskdolibarr_ticket_service') == -1) {
-		setEventMessages('<b>' . $langs->trans('ErrorFieldNotEmpty', $langs->transnoentitiesnoconv('GP/UT')) . '</b>', null, 'errors');
+		setEventMessages($langs->trans('ErrorFieldNotEmpty', $langs->transnoentitiesnoconv('GP/UT')), array(), 'errors');
 		$error++;
 	}
 	if (empty(GETPOST('options_digiriskdolibarr_ticket_date'))) {
-		setEventMessages('<b>' . $langs->trans('ErrorFieldNotEmpty', $langs->transnoentitiesnoconv('Date')) . '</b>', null, 'errors');
+		setEventMessages($langs->trans('ErrorFieldNotEmpty', $langs->transnoentitiesnoconv('Date')), array(), 'errors');
 		$error++;
 	}
 
@@ -411,7 +428,16 @@ if ( ! empty($mainCategoryObject) && $mainCategoryObject > 0) {
 
 	}
 } ?>
+
 <div class="wpeo-form tableforinputfields">
+	<?php if ($conf->global->DIGIRISKDOLIBARR_TICKET_EMAIL_REQUIRED) : ?>
+		<div class="form-element">
+			<span class="form-label"><?php print $langs->trans("Email"); ?></span>
+			<label class="form-field-container">
+				<input class="email" type="email" name="email" id="email" value="<?php echo GETPOST('email');?>"/>
+			</label>
+		</div>
+	<?php endif; ?>
 	<div class="wpeo-gridlayout grid-2">
 		<div class="form-element">
 			<span class="form-label"><?php print $langs->trans("Message"); ?></span>

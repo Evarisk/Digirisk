@@ -680,6 +680,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			298 => array('DIGIRISKDOLIBARR_TICKET_CHILD_CATEGORY_LABEL', 'chaine', $langs->trans('Pertinence'), '', 0, 'current'),
 			299 => array('DIGIRISKDOLIBARR_TICKET_PROJECT', 'integer', 0, '', 0, 'current'),
 			300 => array('DIGIRISKDOLIBARR_TICKET_SUCCESS_MESSAGE', 'chaine', $langs->trans('YouMustNotifyYourHierarchy'), '', 0, 'current'),
+			301 => array('DIGIRISKDOLIBARR_TICKET_EMAIL_REQUIRED', 'integer', 0, '', 0, 'current'),
 
 			// CONST ACCIDENT
 			310 => array('MAIN_AGENDA_ACTIONAUTO_ACCIDENT_CREATE', 'integer', 1, '', 0, 'current'),

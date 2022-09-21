@@ -288,6 +288,19 @@ if ( ! empty($conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE)) {
 	print '</td>';
 	print '</tr>';
 
+	// Email Required
+	print '<tr class="oddeven"><td>' . $langs->transnoentities("TicketEmailRequired") . '</td>';
+	print '<td class="center">';
+	print ajax_constantonoff('DIGIRISKDOLIBARR_TICKET_EMAIL_REQUIRED');
+	print '</td>';
+	print '<td class="center">';
+	print '';
+	print '</td>';
+	print '<td class="center">';
+	print $form->textwithpicto('', $langs->transnoentities("TicketEmailRequiredHelp"), 1, 'help');
+	print '</td>';
+	print '</tr>';
+
 	//Envoi d'emails automatiques
 	print '<tr class="oddeven"><td>' . $langs->transnoentities("SendEmailOnTicketSubmit") . '</td>';
 	print '<td class="center">';
