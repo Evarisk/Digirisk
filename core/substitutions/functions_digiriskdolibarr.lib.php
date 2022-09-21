@@ -99,6 +99,10 @@ function digiriskdolibarr_completesubstitutionarray(&$substitutionarray, $langs,
 			$substitutionarray['membres_du_comite_entreprise_titulaires'] = dol_htmlentitiesbr_decode(strip_tags($informationssharing->membres_du_comite_entreprise_titulaires, '<br>'));
 			$substitutionarray['membres_du_comite_entreprise_suppleants'] = dol_htmlentitiesbr_decode(strip_tags($informationssharing->membres_du_comite_entreprise_suppleants, '<br>'));
 
+			$substitutionarray['delegues_du_personnels_date']       = dol_print_date($informationssharing->delegues_du_personnels_date, 'day');
+			$substitutionarray['delegues_du_personnels_titulaires'] = dol_htmlentitiesbr_decode(strip_tags($informationssharing->delegues_du_personnels_titulaires, '<br>'));
+			$substitutionarray['delegues_du_personnels_suppleants'] = dol_htmlentitiesbr_decode(strip_tags($informationssharing->delegues_du_personnels_suppleants, '<br>'));
+
 			break;
 
 		case 'preventionplandocument@digiriskdolibarr':
