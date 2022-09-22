@@ -62,6 +62,7 @@ $id                  = GETPOST('id', 'int');
 $lineid              = GETPOST('lineid', 'int');
 $ref                 = GETPOST('ref', 'alpha');
 $action              = GETPOST('action', 'aZ09');
+$subaction           = GETPOST('subaction', 'aZ09');
 $confirm             = GETPOST('confirm', 'alpha');
 $cancel              = GETPOST('cancel', 'aZ09');
 $contextpage         = GETPOST('contextpage', 'aZ') ? GETPOST('contextpage', 'aZ') : 'accidentcard'; // To manage different context of search
@@ -1039,7 +1040,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 
 		if ( ! empty($accidentlines) && $accidentlines > 0) {
 			foreach ($accidentlines as $key => $item) {
-				if ($action == 'editline' && $lineid == $key) {
+				if (($action == 'editline' || $subaction == 'editline') && $lineid == $key) {
 					print '<form method="POST" action="' . $_SERVER["PHP_SELF"] . '?id=' . $object->id . '">';
 					print '<input type="hidden" name="token" value="' . newToken() . '">';
 					print '<input type="hidden" name="action" value="updateLine">';
@@ -1074,7 +1075,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 						<label class="wpeo-button button-blue" for="sendfile">
 							<i class="fas fa-image button-icon"></i>
 							<span class="button-label"><?php print $langs->trans('AddDocument'); ?></span>
-							<input type="file" name="userfile[]" class="sendfile" multiple="multiple" id="sendfile" onchange="window.eoxiaJS.accident.tmpStockFile(<?php echo $item->id ?>)"  style="display: none"/>
+							<input type="file" name="userfile[]" class="sendfile" multiple="multiple" id="sendfile" onchange="window.eoxiaJS.accident.tmpStockFile(<?php echo $item->id ?>, 'editline')"  style="display: none"/>
 						</label>
 					</div>
 				<div id="sendFileForm<?php echo $item->id ?>">
@@ -1096,7 +1097,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 										<?php print $fileLinked['name']; ?>
 									</div>
 									<div class="table-cell table-50 table-end table-padding-0">
-										<?php print '<div class="linked-file-delete-workstop wpeo-button button-square-50 button-transparent" value="' . $fileLinked['name'] . '"><i class="fas fa-trash button-icon"></i></div>'; ?>
+										<?php print '<div class="linked-file-delete-workstop edit-line wpeo-button button-square-50 button-transparent" value="' . $fileLinked['name'] . '"><i class="fas fa-trash button-icon"></i></div>'; ?>
 									</div>
 								</div> <?php
 							elseif ($fileLinked['type'] != 'dir') : ?>
@@ -1108,7 +1109,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 										<?php print $fileLinked['name']; ?>
 									</div>
 									<div class="table-cell table-50 table-end table-padding-0">
-										<?php print '<div class="linked-file-delete-workstop wpeo-button button-square-50 button-transparent" value="' . $fileLinked['name'] . '"><i class="fas fa-trash button-icon"></i></div>'; ?>
+										<?php print '<div class="linked-file-delete-workstop edit-line wpeo-button button-square-50 button-transparent" value="' . $fileLinked['name'] . '"><i class="fas fa-trash button-icon"></i></div>'; ?>
 									</div>
 								</div>
 							<?php

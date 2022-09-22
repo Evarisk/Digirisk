@@ -4144,7 +4144,7 @@ window.eoxiaJS.accident.event = function() {
  *
  * @return {void}
  */
-window.eoxiaJS.accident.tmpStockFile = function(id) {
+window.eoxiaJS.accident.tmpStockFile = function(id, subaction = '') {
 	var files = $('#sendfile').prop('files');
 
 	const formData = new FormData();
@@ -4154,14 +4154,18 @@ window.eoxiaJS.accident.tmpStockFile = function(id) {
 	}
 
 	let token = $('.div-table-responsive-no-min').find('input[name="token"]').val();
-
+	let subactionPost = subaction.length > 0 ? '&subaction=' + subaction : ''
 	$.ajax({
-		url: document.URL + '&action=sendfile&objectlineid=' + id + '&token=' + token,
+		url: document.URL + '&action=sendfile&objectlineid=' + id + '&token=' + token + subactionPost,
 		type: "POST",
 		processData: false,
 		contentType: false,
 		data: formData,
 		success: function ( resp ) {
+			// ca ne marche pas car l'action ici est sendfile et plus editline donc le % resp ne peut pas contenir la réponse
+			console.log('#fileLinkedTable' + id)/
+			console.log($('#fileLinkedTable' + id))
+			console.log($(resp).find('#fileLinkedTable' + id))
 			$('#sendFileForm' + id).html($(resp).find('#fileLinkedTable' + id))
 		},
 		error: function ( ) {
@@ -4180,12 +4184,13 @@ window.eoxiaJS.accident.tmpStockFile = function(id) {
 
 window.eoxiaJS.accident.removeFile = function( event ) {
 	let filetodelete = $(this).attr('value');
+	let subActionPost = $(this).hasClass('edit-line') ? '&subaction=editline' : ''
 	filetodelete = filetodelete.replace('_mini', '')
 	let objectlineid = $(this).closest('.objectline').attr('value')
 	let token = $('.div-table-responsive-no-min').find('input[name="token"]').val();
 
 	$.ajax({
-		url: document.URL + '&action=removefile&filetodelete='+filetodelete+'&objectlineid='+objectlineid+'&token='+token,
+		url: document.URL + '&action=removefile&filetodelete='+filetodelete+'&objectlineid='+objectlineid+'&token='+token+subActionPost,
 		type: "POST",
 		processData: false,
 		contentType: false,
