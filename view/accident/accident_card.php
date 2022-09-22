@@ -1023,6 +1023,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 
 		// Define colspan for the button 'Add'
 		$colspan = 3; // Columns: total ht + col edit + col delete
+		$img_extensions = array('png', 'jpg', 'jpeg');
 
 		// Accident Lines
 		$accidentlines = $objectline->fetchFromParent($object->id);
@@ -1076,54 +1077,53 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 							<input type="file" name="userfile[]" class="sendfile" multiple="multiple" id="sendfile" onchange="window.eoxiaJS.accident.tmpStockFile(<?php echo $item->id ?>)"  style="display: none"/>
 						</label>
 					</div>
-					<div id="sendFileForm<?php echo $item->id ?>">
-						<div id="fileLinkedTable<?php echo $item->id ?>" class="tableforinputfields objectline" value="<?php echo 0 ?>">
-							<?php $fileLinkedList = dol_dir_list($conf->digiriskdolibarr->multidir_output[isset($conf->entity) ? $conf->entity : 1] . '/accident/' . $object->ref . '/workstop/' . $item->ref . '/'); ?>
-							<div class="wpeo-table table-flex table-3 objectline" value="<?php echo $item->id ?>"">
-								<?php
-								if ( ! empty($fileLinkedList)) {
-									$img_extensions = array('png', 'jpg', 'jpeg');
-									foreach ($fileLinkedList as $fileLinked) {
-										$file_extension = pathinfo($fileLinked['name'], PATHINFO_EXTENSION);
-										if (in_array($file_extension, $img_extensions)) :
-											$thumb_name = getThumbName($fileLinked['name'], 'mini');
-											?>
-											<div class="table-row">
-												<div class="table-cell">
-													<?php print '<img class="photo"  width="50" src="' . DOL_URL_ROOT . '/viewimage.php?modulepart=digiriskdolibarr&entity=' . $conf->entity . '&file=' . urlencode('/accident/' . $object->ref . '/workstop/' . $item->ref . '/thumbs/' . $thumb_name) . '" title="' . dol_escape_htmltag($alt) . '">'; ?>
-												</div>
-												<div class="table-cell">
-													<?php print $fileLinked['name']; ?>
-												</div>
-										<?php
-										elseif ($fileLinked['type'] != 'dir') : ?>
-											<div class="table-row">
-												<div class="table-cell  table-padding-100">
-													<i class="fas fa-file"></i>
-												</div>
-												<div class="table-cell">
-													<?php print $fileLinked['name']; ?>
-												</div>
-											<?php
-										endif;
-									} ?>
+				<div id="sendFileForm<?php echo $item->id ?>">
+				<div id="fileLinkedTable<?php echo $item->id ?>" class="tableforinputfields objectline" value="<?php echo 0 ?>">
+					<?php $fileLinkedList = dol_dir_list($conf->digiriskdolibarr->multidir_output[isset($conf->entity) ? $conf->entity : 1] . '/accident/' . $object->ref . '/workstop/' . $item->ref . '/'); ?>
+					<div class="wpeo-table table-flex table-3 objectline" value="<?php echo $item->id ?>"">
+					<?php
+					if ( ! empty($fileLinkedList)) {
+						foreach ($fileLinkedList as $fileLinked) {
+							$file_extension = pathinfo($fileLinked['name'], PATHINFO_EXTENSION);
+							if (in_array($file_extension, $img_extensions)) :
+								$thumb_name = getThumbName($fileLinked['name'], 'mini');
+								?>
+								<div class="table-row">
+									<div class="table-cell">
+										<?php print '<img class="photo"  width="50" src="' . DOL_URL_ROOT . '/viewimage.php?modulepart=digiriskdolibarr&entity=' . $conf->entity . '&file=' . urlencode('/accident/' . $object->ref . '/workstop/' . $item->ref . '/thumbs/' . $thumb_name) . '" title="' . dol_escape_htmltag($alt) . '">'; ?>
+									</div>
+									<div class="table-cell">
+										<?php print $fileLinked['name']; ?>
+									</div>
+									<div class="table-cell table-50 table-end table-padding-0">
+										<?php print '<div class="linked-file-delete-workstop wpeo-button button-square-50 button-transparent" value="' . $fileLinked['name'] . '"><i class="fas fa-trash button-icon"></i></div>'; ?>
+									</div>
+								</div> <?php
+							elseif ($fileLinked['type'] != 'dir') : ?>
+								<div class="table-row">
+									<div class="table-cell  table-padding-100">
+										<i class="fas fa-file"></i>
+									</div>
+									<div class="table-cell">
+										<?php print $fileLinked['name']; ?>
+									</div>
 									<div class="table-cell table-50 table-end table-padding-0">
 										<?php print '<div class="linked-file-delete-workstop wpeo-button button-square-50 button-transparent" value="' . $fileLinked['name'] . '"><i class="fas fa-trash button-icon"></i></div>'; ?>
 									</div>
 								</div>
-							</div>
+							<?php
+							endif;
+						} ?> </div>
+						</div> <?php
+					} else {
+						?>
+						<div class="table-row">
+							<div class="table-cell"><?php print $langs->trans('NoFileLinked'); ?></div>
 						</div>
-							<?php
-								} else {
-							?>
-								<div class="table-row">
-									<div class="table-cell"><?php print $langs->trans('NoFileLinked'); ?></div>
-								</div>
-							<?php
-								}
-							?>
-					</div>
-					<?php
+						<?php
+					}
+					?>
+					</div> <?php
 					print '</td>';
 
 					$coldisplay += $colspan;
@@ -1159,7 +1159,6 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 					<div class="wpeo-table table-flex table-3 objectline" value="<?php echo $item->id ?>">
 						<?php
 						if ( ! empty($fileLinkedList)) {
-							$img_extensions = array('png', 'jpg', 'jpeg');
 							foreach ($fileLinkedList as $fileLinked) {
 								$file_extension = pathinfo($fileLinked['name'], PATHINFO_EXTENSION);
 								if (in_array($file_extension, $img_extensions)) :
@@ -1211,10 +1210,6 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 						print '<td class="center">';
 						print '-';
 						print '</td>';
-					}
-
-					if (is_object($objectline)) {
-						//                      print $objectline->showOptionals($extrafields, 'edit', array('style' => $bcnd[$var], 'colspan' => $coldisplay), '', '', 1);
 					}
 					print '</tr>';
 				}
@@ -1268,7 +1263,6 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 						<div class="wpeo-table table-flex table-3">
 							<?php
 							if ( ! empty($fileLinkedList)) {
-								$img_extensions = array('png', 'jpg', 'jpeg');
 								foreach ($fileLinkedList as $fileLinked) {
 									$file_extension = pathinfo($fileLinked['name'], PATHINFO_EXTENSION);
 									if (in_array($file_extension, $img_extensions)) :
@@ -1276,12 +1270,15 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 										?>
 										<div class="table-row">
 											<div class="table-cell">
-												<?php print '<img class="photo"  width="50" src="' . DOL_URL_ROOT . '/viewimage.php?modulepart=digiriskdolibarr&entity=' . $conf->entity . '&file=' . urlencode('/accident/' . $object->ref . '/workstop/' . $item->ref . '/thumbs/' . $thumb_name) . '" title="' . dol_escape_htmltag($alt) . '">'; ?>
+												<?php print '<img class="photo"  width="50" src="' . DOL_URL_ROOT . '/viewimage.php?modulepart=digiriskdolibarr&entity=' . $conf->entity . '&file=' . urlencode('/accident/' . $object->ref . '/workstop/temp/thumbs/' . $thumb_name) . '" title="' . dol_escape_htmltag($alt) . '">'; ?>
 											</div>
 											<div class="table-cell">
 												<?php print $fileLinked['name']; ?>
 											</div>
-									<?php
+											<div class="table-cell table-50 table-end table-padding-0">
+												<?php print '<div class="linked-file-delete-workstop wpeo-button button-square-50 button-transparent" value="' . $fileLinked['name'] . '"><i class="fas fa-trash button-icon"></i></div>'; ?>
+											</div>
+										</div> <?php
 									elseif ($fileLinked['type'] != 'dir') : ?>
 										<div class="table-row">
 											<div class="table-cell  table-padding-100">
@@ -1290,14 +1287,13 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 											<div class="table-cell">
 												<?php print $fileLinked['name']; ?>
 											</div>
+											<div class="table-cell table-50 table-end table-padding-0">
+												<?php print '<div class="linked-file-delete-workstop wpeo-button button-square-50 button-transparent" value="' . $fileLinked['name'] . '"><i class="fas fa-trash button-icon"></i></div>'; ?>
+											</div>
+										</div>
 									<?php
 									endif;
-								} ?>
-									<div class="table-cell table-50 table-end table-padding-0">
-										<?php print '<div class="linked-file-delete-workstop wpeo-button button-square-50 button-transparent" value="' . $fileLinked['name'] . '"><i class="fas fa-trash button-icon"></i></div>'; ?>
-									</div>
-								</div>
-								<?php
+								}
 							} else {
 								?>
 								<div class="table-row">
