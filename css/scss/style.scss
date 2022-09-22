@@ -24,6 +24,10 @@
   border: 5px solid #0d8aff;
 }
 
+.box-flex-item {
+  width: auto !important;
+}
+
 tr.liste_titre th.liste_titre:not(.maxwidthsearch), tr.liste_titre td.liste_titre:not(.maxwidthsearch) { opacity: 1; }
 
 /* Force values on one colum for small screen */
