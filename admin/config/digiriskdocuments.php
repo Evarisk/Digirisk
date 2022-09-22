@@ -229,7 +229,7 @@ $selectorAnchor = '<select onchange="location = this.value;">';
 foreach ($types as $type => $documentType) {
 	$selectorAnchor .= '<option value="#' . $langs->trans($type) . '">' . $langs->trans($type) . '</option>';
 }
-$selectorAnchor .= '<select>';
+$selectorAnchor .= '</select>';
 
 print load_fiche_titre($title, $selectorAnchor, 'digiriskdolibarr32px@digiriskdolibarr');
 

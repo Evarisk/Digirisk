@@ -432,7 +432,7 @@ if ( ! empty($mainCategoryObject) && $mainCategoryObject > 0) {
 <div class="wpeo-form tableforinputfields">
 	<?php if ($conf->global->DIGIRISKDOLIBARR_TICKET_EMAIL_REQUIRED) : ?>
 		<div class="form-element">
-			<span class="form-label"><?php print $langs->trans("Email"); ?></span>
+			<span class="form-label"><?php print $langs->trans("Email"); ?><span style="color:red"> *</span></span>
 			<label class="form-field-container">
 				<input class="email" type="email" name="email" id="email" value="<?php echo GETPOST('email');?>"/>
 			</label>
@@ -440,7 +440,7 @@ if ( ! empty($mainCategoryObject) && $mainCategoryObject > 0) {
 	<?php endif; ?>
 	<div class="wpeo-gridlayout grid-2">
 		<div class="form-element">
-			<span class="form-label"><?php print $langs->trans("Message"); ?></span>
+			<span class="form-label"><?php print $langs->trans("Message"); ?><span style="color:red"> *</span></span>
 			<label class="form-field-container">
 				<textarea name="message" id="message"><?php echo GETPOST('message');?></textarea>
 			</label>
@@ -495,7 +495,7 @@ if ( ! empty($mainCategoryObject) && $mainCategoryObject > 0) {
 	<?php
 	if ( ! empty($conf->global->DIGIRISKDOLIBARR_USE_CAPTCHA)) {
 		require_once DOL_DOCUMENT_ROOT . '/core/lib/security2.lib.php';
-		print '<div class="center"><label for="email"><span class="fieldrequired">' . $langs->trans("SecurityCode") . '</span></label>';
+		print '<div class="center"><label for="email"><span class="fieldrequired">' . $langs->trans("SecurityCode") . '</span><span style="color:red"> *</span></label>';
 		print '<span class="span-icon-security inline-block">';
 		print '<input id="securitycode" placeholder="' . $langs->trans("SecurityCode") . '" class="flat input-icon-security width125" type="text" maxlength="5" name="code" tabindex="3" />';
 		print '</span>';
