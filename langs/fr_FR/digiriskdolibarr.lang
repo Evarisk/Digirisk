@@ -132,7 +132,8 @@ PleaseNameTheFile = De préférence, nommez le fichier <b> %s </b>
 # Page index
 #
 
-DigiriskIndexNotice1 = À venir, le Dashboard de DigiRisk
+DigiriskPatchNote = Note de mise à jour DigiRisk %s
+ShowPatchNote = Consulter la note de mise à jour
 
 #
 # Horaires d'ouverture

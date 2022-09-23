@@ -4117,6 +4117,10 @@ td > .risk-evaluation-container {
   width: auto !important;
 }
 
+ul {
+  list-style-type: none;
+}
+
 tr.liste_titre th.liste_titre:not(.maxwidthsearch), tr.liste_titre td.liste_titre:not(.maxwidthsearch) {
   opacity: 1;
 }

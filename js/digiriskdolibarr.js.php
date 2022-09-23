@@ -513,6 +513,11 @@ window.eoxiaJS.modal.openModal = function ( event ) {
 		window.eoxiaJS.signature.modalSignatureOpened( $(this) );
 	}
 
+	// Open modal patch note.
+	if ($(this).hasClass('show-patchnote')) {
+		$('.fiche .wpeo-modal-patchnote').addClass('modal-active');
+	}
+
 	$('.notice').addClass('hidden');
 };
 

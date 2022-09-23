@@ -40,6 +40,7 @@ require_once DOL_DOCUMENT_ROOT . '/core/lib/date.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/projet/class/project.class.php';
 require_once DOL_DOCUMENT_ROOT . '/societe/class/societe.class.php';
 require_once DOL_DOCUMENT_ROOT . '/core/modules/project/mod_project_simple.php';
+require_once DOL_DOCUMENT_ROOT . '/includes/parsedown/Parsedown.php';
 
 require_once './core/modules/modDigiriskDolibarr.class.php';
 require_once __DIR__ . '/class/dashboarddigiriskstats.class.php';
@@ -54,6 +55,7 @@ $digirisk    = new modDigiriskdolibarr($db);
 $project     = new Project($db);
 $third_party = new Societe($db);
 $stats       = new DashboardDigiriskStats($db);
+$parse       = new Parsedown();
 $projectRef  = new $conf->global->PROJECT_ADDON();
 
 // Security check
@@ -137,7 +139,43 @@ print load_fiche_titre($langs->trans("DigiriskDolibarrArea") . ' ' . $digirisk->
 <?php endif; ?>
 <div class="wpeo-notice notice-info">
 	<div class="notice-content">
-		<div class="notice-subtitle"><?php echo $langs->trans("DigiriskIndexNotice1"); ?></div>
+		<div class="notice-title"><?php echo $langs->trans("DigiriskPatchNote", $digirisk->version); ?>
+			<div class="show-patchnote wpeo-button button-square-40 button-blue wpeo-tooltip-event modal-open" aria-label="<?php echo $langs->trans('ShowPatchNote'); ?>">
+				<i class="fas fa-list button-icon"></i>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="wpeo-modal wpeo-modal-patchnote">
+	<div class="modal-container wpeo-modal-event" style="max-width: 1280px; max-height: 1000px">
+		<!-- Modal-Header -->
+		<div class="modal-header">
+			<h2 class="modal-title"><?php echo $langs->trans("DigiriskPatchNote", $digirisk->version);  ?></h2>
+			<div class="modal-close"><i class="fas fa-times"></i></div>
+		</div>
+		<!-- Modal Content-->
+		<div class="modal-content">
+			<?php $ch = curl_init();
+			curl_setopt($ch, CURLOPT_URL, 'https://api.github.com/repos/evarisk/digirisk/releases/tags/' . $digirisk->version);
+			curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+			curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+			curl_setopt($ch, CURLOPT_USERAGENT,'DigiriskDolibarr');
+			$output  = curl_exec($ch);
+			curl_close($ch);
+			$data = json_decode($output);
+			$data->body = preg_replace('/- #\b\d{1,4}\b/', '-', $data->body);
+			$data->body = preg_replace('/- #\b\d{1,4}\b/', '-', $data->body);
+			$html = $parse->text($data->body);
+			print $html;
+			?>
+		</div>
+		<!-- Modal-Footer -->
+		<div class="modal-footer">
+			<div class="wpeo-button button-grey button-uppercase modal-close">
+				<span><?php echo $langs->trans('CloseModal'); ?></span>
+			</div>
+		</div>
 	</div>
 </div>
 <?php
