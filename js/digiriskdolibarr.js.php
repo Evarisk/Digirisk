@@ -2587,7 +2587,7 @@ window.eoxiaJS.riskassessmenttask.deleteRiskAssessmentTask = function ( event ) 
 
 		let riskAssessmentTaskRef =  $('.riskassessment-task-container-'+deletedRiskAssessmentTaskId).attr('value');
 
-		window.eoxiaJS.loader.display($(this));
+		window.eoxiaJS.loader.display($('.riskassessment-task-container-'+deletedRiskAssessmentTaskId));
 
 		$.ajax({
 			url: document.URL + '&action=deleteRiskAssessmentTask&deletedRiskAssessmentTaskId=' + deletedRiskAssessmentTaskId + '&token=' + token,
