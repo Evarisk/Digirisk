@@ -2217,10 +2217,9 @@ window.eoxiaJS.evaluation.deleteEvaluation = function ( event ) {
 
 		let elementParent = $(this).closest('.risk-evaluations-list-content');
 		let riskId = elementParent.attr('value');
-		let evaluationSingle = $('.risk-evaluation-single-content-'+riskId);
 		let evaluationRef =  $('.risk-evaluation-ref-'+evaluationID).attr('value');
 
-		window.eoxiaJS.loader.display($(this));
+		window.eoxiaJS.loader.display($('.risk-evaluation-ref-'+evaluationID));
 
 		$.ajax({
 			url:document.URL + '&action=deleteEvaluation&deletedEvaluationId=' + deletedEvaluationId + '&token=' + token,
@@ -2228,14 +2227,11 @@ window.eoxiaJS.evaluation.deleteEvaluation = function ( event ) {
 			processData: false,
 			contentType: false,
 			success: function ( resp ) {
-				elementParent.load( document.URL + ' .risk-evaluations-list-'+riskId);
-				//elementParent.html($(resp).find('.risk-evaluations-list-'+riskId));
-				evaluationSingle.load( document.URL + ' .risk-evaluation-single-'+riskId);
+				$('risk-evaluation-ref-' + evaluationID).fadeOut(400)
 
 				let evaluationCounterText = $('#risk_row_'+riskId).find('.table-cell-header-label').text()
 				let evaluationCounter = evaluationCounterText.split(/\(/)[1].split(/\)/)[0]
 				$('#risk_row_'+riskId).find('.table-cell-header-label').html('<strong>' + evaluationCounterText.split(/\(/)[0] + '(' + (+evaluationCounter - 1) + ')' + '</strong>')
-				//evaluationSingle.html($(resp).find('.risk-evaluation-single-'+riskId));
 
 				elementParent.removeClass('wpeo-loader');
 
@@ -2327,12 +2323,12 @@ window.eoxiaJS.evaluation.saveEvaluation = function ( event ) {
 		contentType: false,
 		success: function ( resp ) {
 			if (fromList) {
-				listModalContainer.find('.modal-content .risk-evaluations-list-content').html($(resp).find('.risk-evaluations-list-'+riskId))
-				$('.risk-evaluation-single-content-'+riskId).html($(resp).find('.risk-evaluation-single-'+riskId))
+				listModalContainer.find('.risk-evaluation-container-'+evaluationID).html($(resp).find('.risk-evaluation-container-'+evaluationID).children())
+				//$('.risk-evaluation-single-content-'+riskId).html($(resp).find('.risk-evaluation-single-'+riskId))
 			} else {
-				$('.fichecenter.risklist').html($(resp).find('#searchFormListRisks'))
-				$('#risk_row_' + riskId).fadeOut(800);
-				$('#risk_row_' + riskId).fadeIn(800);
+				$('.risk-evaluation-container-'+evaluationID).html($(resp).find('.risk-evaluation-container-'+evaluationID).children())
+				$('.risk-evaluation-container-'+evaluationID).fadeOut(800);
+				$('.risk-evaluation-container-'+evaluationID).fadeIn(800);
 			}
 			$('.wpeo-loader').removeClass('wpeo-loader')
 			let actionContainerSuccess = $('.messageSuccessEvaluationEdit');

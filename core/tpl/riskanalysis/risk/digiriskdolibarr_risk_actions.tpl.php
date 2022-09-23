@@ -347,8 +347,14 @@ if ( ! $error && $action == "deleteEvaluation" && $permissiontodelete) {
 		unlink($file['fullname']);
 	}
 
-	dol_delete_dir($pathToEvaluationPhoto . '/thumbs');
-	dol_delete_dir($pathToEvaluationPhoto);
+	if (is_dir($pathToEvaluationPhoto . '/thumbs')) {
+		dol_delete_dir($pathToEvaluationPhoto . '/thumbs');
+	}
+
+	if (is_dir($pathToEvaluationPhoto)) {
+
+		dol_delete_dir($pathToEvaluationPhoto);
+	}
 
 	$previousEvaluation = $evaluation;
 	$result             = $evaluation->delete($user);
