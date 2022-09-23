@@ -1607,7 +1607,7 @@ window.eoxiaJS.mediaGallery.addToFavorite = function( event ) {
 		let filepath =$('.digirisk-element-'+element_linked_id).find('.filepath-to-digiriskelement').val()
 		let thumbName = window.eoxiaJS.file.getThumbName(filename)
 		let newPhoto = filepath + thumbName
-		
+
 		jQuery.ajax({
 			url: document.URL + querySeparator + "action=addDigiriskElementPhotoToFavorite&token=" + token,
 			type: "POST",
@@ -2301,7 +2301,7 @@ window.eoxiaJS.evaluation.saveEvaluation = function ( event ) {
 	})
 
 	window.eoxiaJS.loader.display($(this));
-	window.eoxiaJS.loader.display($('.risk-evaluation-list-container-'+riskId));
+	window.eoxiaJS.loader.display($('.risk-evaluation-container-'+evaluationID));
 
 	let token = $('.fichecenter.risklist').find('input[name="token"]').val();
 

@@ -32,7 +32,7 @@ if ( ! empty($allRiskAssessment) && $allRiskAssessment > 0) :
 	<?php
 	if ($conf->global->DIGIRISKDOLIBARR_SHOW_ALL_RISKASESSMENTS) :
 		foreach ($allRiskAssessment as $lastEvaluation) : ?>
-			<div class="risk-evaluation-container risk-evaluation-container-<?php echo $risk->id ?>" value="<?php echo $risk->id ?>">
+			<div class="risk-evaluation-container risk-evaluation-container-<?php echo $lastEvaluation->id ?>" value="<?php echo $risk->id ?>">
 				<!-- RISK EVALUATION SINGLE -->
 				<div class="risk-evaluation-single-content risk-evaluation-single-content-<?php echo $risk->id ?>">
 					<div class="risk-evaluation-single risk-evaluation-single-<?php echo $risk->id ?>">
@@ -430,7 +430,7 @@ if ( ! empty($allRiskAssessment) && $allRiskAssessment > 0) :
 		endforeach;
 	else :
 		 $lastEvaluation = array_shift($lastEvaluation); ?>
-		 <div class="risk-evaluation-container risk-evaluation-container-<?php echo $risk->id ?>" value="<?php echo $risk->id ?>">
+		 <div class="risk-evaluation-container risk-evaluation-container-<?php echo $lastEvaluation->id ?>" value="<?php echo $risk->id ?>">
 			 <!-- RISK EVALUATION SINGLE -->
 			 <div class="risk-evaluation-single-content risk-evaluation-single-content-<?php echo $risk->id ?>">
 				 <div class="risk-evaluation-single risk-evaluation-single-<?php echo $risk->id ?>">
@@ -853,7 +853,7 @@ else : ?>
 		<?php endif; ?>
 	</div>
 </div>
-<div class="risk-evaluation-container risk-evaluation-container-<?php echo $risk->id ?>">
+<div class="risk-evaluation-container risk-evaluation-container-<?php echo $lastEvaluation->id ?>">
 	<div class="risk-evaluation-single-content risk-evaluation-single-content-<?php echo $risk->id ?>">
 		<div class="risk-evaluation-single risk-evaluation-single-<?php echo $risk->id ?>">
 			<div class="risk-evaluation-content">
@@ -1026,7 +1026,7 @@ $cotation->method = $lastEvaluation->method ? $lastEvaluation->method : "standar
 				</div>
 				<!-- RISK EVALUATION SINGLE -->
 				<?php if ( ! empty($lastEvaluation) && $lastEvaluation > 0) : ?>
-					<div class="risk-evaluation-container risk-evaluation-container-<?php echo $risk->ref ?>">
+					<div class="risk-evaluation-container risk-evaluation-container-<?php echo $lastEvaluation->id ?>">
 						<h2><?php echo $langs->trans('LastRiskAssessment') . ' ' . $risk->ref; ?></h2>
 						<div class="risk-evaluation-single-content risk-evaluation-single-content-<?php echo $risk->id ?>">
 							<div class="risk-evaluation-single">
