@@ -2142,7 +2142,7 @@ window.eoxiaJS.evaluation.createEvaluation = function ( event ) {
 	})
 
 	window.eoxiaJS.loader.display($(this));
-	window.eoxiaJS.loader.display($('.risk-evaluation-container-' + riskToAssign));
+	window.eoxiaJS.loader.display($('.risk-evaluation-list-container-' + riskToAssign));
 
 	let token = $('.fichecenter.risklist').find('input[name="token"]').val();
 
@@ -2167,17 +2167,17 @@ window.eoxiaJS.evaluation.createEvaluation = function ( event ) {
 		processData: false,
 		contentType: false,
 		success: function( resp ) {
-			$('.fichecenter.risklist').html($(resp).find('#searchFormListRisks'))
+			$('.risk-evaluation-list-container-' + riskToAssign).html($(resp).find('.risk-evaluation-list-container-' + riskToAssign).children())
 
 			let actionContainerSuccess = $('.messageSuccessEvaluationCreate');
 
-			$('#risk_row_' + riskToAssign).fadeOut(800);
-			$('#risk_row_' + riskToAssign).fadeIn(800);
-			console.log(riskToAssign)
+			$('.risk-evaluation-list-container-' + riskToAssign).fadeOut(800);
+			$('.risk-evaluation-list-container-' + riskToAssign).fadeIn(800);
 			actionContainerSuccess.empty()
 			actionContainerSuccess.html($(resp).find('.riskassessment-create-success-notice'))
 			actionContainerSuccess.find('a').attr('href', '#risk_row_'+riskToAssign)
 
+			$('.wpeo-loader').removeClass('wpeo-loader')
 			actionContainerSuccess.removeClass('hidden');
 		},
 		error: function ( resp ) {
