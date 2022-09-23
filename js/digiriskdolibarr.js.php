@@ -2297,7 +2297,12 @@ window.eoxiaJS.evaluation.saveEvaluation = function ( event ) {
 	})
 
 	window.eoxiaJS.loader.display($(this));
-	window.eoxiaJS.loader.display($('.risk-evaluation-container-'+evaluationID));
+
+	if (fromList) {
+		window.eoxiaJS.loader.display($('.risk-evaluation-ref-'+evaluationID));
+	} else {
+		window.eoxiaJS.loader.display($('.risk-evaluation-container-'+evaluationID));
+	}
 
 	let token = $('.fichecenter.risklist').find('input[name="token"]').val();
 
@@ -2322,13 +2327,15 @@ window.eoxiaJS.evaluation.saveEvaluation = function ( event ) {
 		}),
 		contentType: false,
 		success: function ( resp ) {
+
 			if (fromList) {
-				listModalContainer.find('.risk-evaluation-container-'+evaluationID).html($(resp).find('.risk-evaluation-container-'+evaluationID).children())
-				//$('.risk-evaluation-single-content-'+riskId).html($(resp).find('.risk-evaluation-single-'+riskId))
+				listModalContainer.find('.risk-evaluation-ref-'+evaluationID).html($(resp).find('.risk-evaluation-ref-'+evaluationID).children())
+				$('.risk-evaluation-ref-'+evaluationID+':not(.last-risk-assessment)').fadeOut(800);
+				$('.risk-evaluation-ref-'+evaluationID+':not(.last-risk-assessment)').fadeIn(800);
 			} else {
-				$('.risk-evaluation-container-'+evaluationID).html($(resp).find('.risk-evaluation-container-'+evaluationID).children())
-				$('.risk-evaluation-container-'+evaluationID).fadeOut(800);
-				$('.risk-evaluation-container-'+evaluationID).fadeIn(800);
+				$('.risk-evaluation-container-'+evaluationID+':not(.last-risk-assessment)').html($(resp).find('.risk-evaluation-container-'+evaluationID+':not(.last-risk-assessment)').children())
+				$('.risk-evaluation-container-'+evaluationID+':not(.last-risk-assessment)').fadeOut(800);
+				$('.risk-evaluation-container-'+evaluationID+':not(.last-risk-assessment)').fadeIn(800);
 			}
 			$('.wpeo-loader').removeClass('wpeo-loader')
 			let actionContainerSuccess = $('.messageSuccessEvaluationEdit');

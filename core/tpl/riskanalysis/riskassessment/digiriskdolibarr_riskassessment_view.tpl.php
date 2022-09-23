@@ -1026,7 +1026,7 @@ $cotation->method = $lastEvaluation->method ? $lastEvaluation->method : "standar
 				</div>
 				<!-- RISK EVALUATION SINGLE -->
 				<?php if ( ! empty($lastEvaluation) && $lastEvaluation > 0) : ?>
-					<div class="risk-evaluation-container risk-evaluation-container-<?php echo $lastEvaluation->id ?>">
+					<div class="risk-evaluation-container last-risk-assessment risk-evaluation-container-<?php echo $lastEvaluation->id ?>">
 						<h2><?php echo $langs->trans('LastRiskAssessment') . ' ' . $risk->ref; ?></h2>
 						<div class="risk-evaluation-single-content risk-evaluation-single-content-<?php echo $risk->id ?>">
 							<div class="risk-evaluation-single">
