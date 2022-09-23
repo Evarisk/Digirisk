@@ -124,8 +124,8 @@ if ($action == 'add') {
 		$error++;
 	}
 
+	$email = GETPOST('email', 'alpha');
 	if ($conf->global->DIGIRISKDOLIBARR_TICKET_EMAIL_REQUIRED) {
-		$email = GETPOST('email', 'alpha');
 		if (empty($email)) {
 			setEventMessages($langs->trans('ErrorFieldNotEmpty', $langs->transnoentities('Email')), array(), 'errors');
 			$error++;
@@ -137,6 +137,14 @@ if ($action == 'add') {
 				setEventMessages($langs->trans('ErrorFieldEmail', $email), array(), 'errors');
 				$error++;
 			}
+		}
+	} else {
+		$regEmail = '/^([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$/';
+		if (preg_match($regEmail, $email) || empty($email)) {
+			$object->origin_email = $email;
+		} else {
+			setEventMessages($langs->trans('ErrorFieldEmail', $email), array(), 'errors');
+			$error++;
 		}
 	}
 
@@ -430,14 +438,12 @@ if ( ! empty($mainCategoryObject) && $mainCategoryObject > 0) {
 } ?>
 
 <div class="wpeo-form tableforinputfields">
-	<?php if ($conf->global->DIGIRISKDOLIBARR_TICKET_EMAIL_REQUIRED) : ?>
-		<div class="form-element">
-			<span class="form-label"><?php print $langs->trans("Email"); ?><span style="color:red"> *</span></span>
-			<label class="form-field-container">
-				<input class="email" type="email" name="email" id="email" value="<?php echo GETPOST('email');?>"/>
-			</label>
-		</div>
-	<?php endif; ?>
+	<div class="form-element">
+		<span class="form-label" <?php echo (($conf->global->DIGIRISKDOLIBARR_TICKET_EMAIL_REQUIRED) ? '' : 'style="font-weight:300"'); ?>><?php print $langs->trans("Email"); ?><?php echo (($conf->global->DIGIRISKDOLIBARR_TICKET_EMAIL_REQUIRED) ? '<span style="color:red"> *</span>' : ''); ?></span>
+		<label class="form-field-container">
+			<input class="email" type="email" name="email" id="email" value="<?php echo GETPOST('email');?>"/>
+		</label>
+	</div>
 	<div class="wpeo-gridlayout grid-2">
 		<div class="form-element">
 			<span class="form-label"><?php print $langs->trans("Message"); ?><span style="color:red"> *</span></span>

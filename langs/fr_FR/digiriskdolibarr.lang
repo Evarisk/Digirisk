@@ -1437,7 +1437,7 @@ SuccessGenerateCSV = Fichier CSV %s généré avec succès
 ErrorMissingData = Erreur : impossible de générer le fichier CSV, les données envoyées au fichier sont incorrecte. <br> Veuillez vérifier que vous avez bien des GP/UT assignés à des tickets.
 CSVFile = Fichier CSV
 ErrorFieldEmail = Erreur : l'email doit correspondre au format suivant : <b>'aaa@aaa.fr'</b><br> L'email saisi <b>'%s'</b> ne correspondant pas
-TicketEmailRequired = Email nécessaire pour créer un ticket
+TicketEmailRequired = Email obligatoire pour créer un ticket
 TicketEmailRequiredHelp = Activer cette option pour rendre obligatoire la saisie d'un email pour créer un ticket dans l'interface publique
 
 
