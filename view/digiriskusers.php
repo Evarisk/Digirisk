@@ -215,6 +215,20 @@ if ($action == 'add' && $canadduser && $permissiontoadd) {
 		$login = GETPOST('lastname') . GETPOST('firstname');
 	}
 
+	$email = GETPOST('email', 'alpha');
+	if (empty($email)) {
+		setEventMessages($langs->trans('ErrorFieldNotEmpty', $langs->transnoentities('Email')), array(), 'errors');
+		$error++;
+	} else {
+		$regEmail = '/^([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$/';
+		if (preg_match($regEmail, $email)) {
+			$object->origin_email = $email;
+		} else {
+			setEventMessages($langs->trans('ErrorFieldEmail', $email), array(), 'errors');
+			$error++;
+		}
+	}
+
 	if ( ! empty($conf->file->main_limit_users)) { // If option to limit users is set
 		$nb = $object->getNbOfUsers("active");
 		if ($nb >= $conf->file->main_limit_users) {
