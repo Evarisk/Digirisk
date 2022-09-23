@@ -1000,7 +1000,10 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	print $preventionplan->getNomUrl(1, 'blank');
 	print '</td></tr>';
 
-	include DOL_DOCUMENT_ROOT . '/core/tpl/commonfields_view.tpl.php';
+	print '</table>';
+	print '</div>';
+	print '<div class="fichehalfright">';
+	print '<table class="border centpercent tableforfield">';
 
 	//Labour inspector Society -- Entreprise Inspecteur du travail
 	print '<tr><td class="titlefield">';
