@@ -568,11 +568,14 @@ function digiriskHeader($title = '', $help_url = '', $arrayofjs = array(), $arra
 		$objects = $object->fetchAll('',  'ranks',  0,  0, array('customsql' => 'status > 0'));
 	}
 
-	$results = array();
 
-	if (is_array($objects)) {
+	$results = array();
+	if (!is_array($objects) && $objects<0) {
+		setEventMessages($object->error, $object->errors, 'errors');
+	} elseif (is_array($objects) && count($objects)>0) {
 		$results = recurse_tree(0, 0, $objects);
-	} ?>
+	}
+	?>
 
 	<?php require_once './../../core/tpl/medias/digiriskdolibarr_medias_gallery_modal.tpl.php'; ?>
 
