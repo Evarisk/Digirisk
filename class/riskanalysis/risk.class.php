@@ -215,6 +215,7 @@ class Risk extends CommonObject
 
 		}
 
+
 		//For groupment document if conf is activated and for risks listing of risk assessment document
 		if ( $get_children_data ) {
 			if (is_array($objects)) {
@@ -261,7 +262,7 @@ class Risk extends CommonObject
 			$parent_element_id = $objects[$parent_id]->id;
 			while ($parent_element_id > 0) {
 				$result = $risk->fetchFromParent($parent_element_id);
-				if ($result > 0 && ! empty($result)) {
+				if ($result > 0 && ! empty($result) && $parent_element_id !== $parent_id) {
 					foreach ($result as $risk) {
 						$evaluation     = new RiskAssessment($this->db);
 						$lastEvaluation = $evaluation->fetchFromParent($risk->id, 1);
@@ -326,6 +327,7 @@ class Risk extends CommonObject
 				}
 			}
 		}
+
 		if ( ! empty($risks) && is_array($risks)) {
 			usort($risks, function ($first, $second) {
 				return $first->lastEvaluation->cotation < $second->lastEvaluation->cotation;
