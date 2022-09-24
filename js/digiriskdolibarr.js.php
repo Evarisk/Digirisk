@@ -3558,8 +3558,8 @@ window.eoxiaJS.ticket.event = function() {
 	$( document ).on( 'click', '.ticket-subCategory', window.eoxiaJS.ticket.selectSubCategory );
 	$( document ).on( 'submit', '#sendFile', window.eoxiaJS.ticket.tmpStockFile );
 	$( document ).on( 'click', '.linked-file-delete', window.eoxiaJS.ticket.removeFile );
-	$( document ).on( 'change', '.add-dashboard-info', window.eoxiaJS.ticket.addDashBoardInfo );
-	$( document ).on( 'click', '.close-dashboard-info', window.eoxiaJS.ticket.closeDashBoardInfo );
+	$( document ).on( 'change', '.add-dashboard-info', window.eoxiaJS.ticket.addDashBoardTicketInfo );
+	$( document ).on( 'click', '.close-dashboard-info', window.eoxiaJS.ticket.closeDashBoardTicketInfo );
 	$( document ).on( 'keyup', '.email', window.eoxiaJS.ticket.checkValidEmail );
 };
 
@@ -3706,7 +3706,7 @@ window.eoxiaJS.ticket.removeFile = function( event ) {
  *
  * @return {void}
  */
-window.eoxiaJS.ticket.addDashBoardInfo = function() {
+window.eoxiaJS.ticket.addDashBoardTicketInfo = function() {
 	let selectTitle = $('#select2-boxcombo-container').attr('title')
 	let digiriskelementID = selectTitle.split(' : ')[0];
 	let catID = selectTitle.split(' : ')[2];
@@ -3741,7 +3741,7 @@ window.eoxiaJS.ticket.addDashBoardInfo = function() {
  *
  * @return {void}
  */
-window.eoxiaJS.ticket.closeDashBoardInfo = function() {
+window.eoxiaJS.ticket.closeDashBoardTicketInfo = function() {
 	let box = $(this);
 	let digiriskelementID = $(this).attr('data-digiriskelementid');
 	let catID = $(this).attr('data-catid');
@@ -3761,8 +3761,6 @@ window.eoxiaJS.ticket.closeDashBoardInfo = function() {
 		}),
 		contentType: false,
 		success: function ( resp ) {
-			console.log(resp)
-			console.log($(resp).find('.add-widget-box').children())
 			box.closest('.box-flex-item').fadeOut(400)
             $('.add-widget-box').attr('style', '')
 			$('.add-widget-box').html($(resp).find('.add-widget-box').children())
@@ -4294,9 +4292,7 @@ window.eoxiaJS.dashboard.event = function() {
  * @return {void}
  */
 window.eoxiaJS.dashboard.addDashBoardInfo = function() {
-	var dashboardWidgetName = document.getElementById('dashBoardForm');
-	var formData = new FormData(dashboardWidgetName);
-	let widgetName = formData.get('boxcombo')
+	let dashboardWidgetName = $('#select2-boxcombo-container').attr('title')
 	let querySeparator = '?';
 	let token = $('.dashboard').find('input[name="token"]').val();
 	document.URL.match(/\?/) ? querySeparator = '&' : 1
@@ -4306,7 +4302,7 @@ window.eoxiaJS.dashboard.addDashBoardInfo = function() {
 		type: "POST",
 		processData: false,
 		data: JSON.stringify({
-			widgetName: widgetName
+			dashboardWidgetName: dashboardWidgetName
 		}),
 		contentType: false,
 		success: function ( resp ) {
@@ -4330,7 +4326,6 @@ window.eoxiaJS.dashboard.closeDashBoardInfo = function() {
 	let dashboardWidgetName = $(this).attr('data-widgetname');
 	let querySeparator = '?';
 	let token = $('.dashboard').find('input[name="token"]').val();
-
 	document.URL.match(/\?/) ? querySeparator = '&' : 1
 
 	$.ajax({

@@ -82,12 +82,12 @@ class DashboardDigiriskStats extends DigiriskStats
 		print '<input type="hidden" name="action" value="view">';
 
 		$dashboardLines = array(
-			'daywithoutaccident' => ($show_accident) ? array(
+			$langs->trans('Accident') => ($show_accident) ? array(
 				'label' => array($langs->trans("DayWithoutAccident"), $langs->trans("WorkStopDays")),
 				'content' => array($accidentdata['daywithoutaccident'], $accidentdata['nbworkstopdays']),
 				'picto' => 'fas fa-user-injured'
 			) : -1,
-			'lastgenerationdateDU' => ($show_riskassementdocument) ? array(
+			$langs->trans('RiskAssessmentDocument') => ($show_riskassementdocument) ? array(
 				'label' => array($langs->trans("LastGenerateDate"), $langs->trans("NextGenerateDate")),
 				'content' => array($riskassementdocumentdata[0], $riskassementdocumentdata[1]),
 				'picto' => 'fas fa-info-circle'
@@ -96,8 +96,16 @@ class DashboardDigiriskStats extends DigiriskStats
 
 		$disableWidgetList = json_decode($user->conf->DIGIRISKDOLIBARR_DISABLED_DASHBOARD_INFO);
 
-		print '<div class="add-widget-box" style="' . (!empty($disableWidgetList) ? '' : 'display:none') . '">';
-		print Form::selectarray('boxcombo', $dashboardLines, -1, $langs->trans("ChooseBoxToAdd") . '...', 0, 0, '', 0, 0, 0, 'ASC', 'maxwidth150onsmartphone hideonprint add-dashboard-widget', 0, 'hidden selected', 0, 1);
+		if (!empty($dashboardLines)) {
+			foreach ($dashboardLines as $key => $dashboardLine) {
+				if (isset($disableWidgetList->$key) && $disableWidgetList->$key == 0) {
+					$dashboardLinesArray[] = $key;
+				}
+			}
+		}
+
+		print '<div class="add-widget-box" style="' . (!empty((array)$disableWidgetList) ? '' : 'display:none') . '">';
+		print Form::selectarray('boxcombo', $dashboardLinesArray, -1, $langs->trans("ChooseBoxToAdd") . '...', 0, 0, '', 0, 0, 0, 'ASC', 'maxwidth150onsmartphone hideonprint add-dashboard-widget', 0, 'hidden selected', 0, 1);
 		if (!empty($conf->use_javascript_ajax)) {
 			include_once DOL_DOCUMENT_ROOT . '/core/lib/ajax.lib.php';
 			print ajax_combobox("boxcombo");
@@ -116,7 +124,7 @@ class DashboardDigiriskStats extends DigiriskStats
 					$openedDashBoard .= '</span>';
 					$openedDashBoard .= '<div class="info-box-content">';
 					$openedDashBoard .= '<div class="info-box-title" title="' . $langs->trans("Close") . '">';
-					$openedDashBoard .= '<span class="close-dashboard-info" data-widgetname="' . $key . '"><i class="fas fa-times"></i></span>';
+					$openedDashBoard .= '<span class="close-dashboard-widget" data-widgetname="' . $key . '"><i class="fas fa-times"></i></span>';
 					$openedDashBoard .= '</div>';
 					$openedDashBoard .= '<div class="info-box-lines">';
 					$openedDashBoard .= '<div class="info-box-line" style="font-size : 20px;">';
