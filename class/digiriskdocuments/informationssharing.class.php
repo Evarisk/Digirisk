@@ -21,6 +21,8 @@
  * \brief       This file is a class file for InformationsSharing
  */
 
+require_once DOL_DOCUMENT_ROOT.'/contact/class/contact.class.php';
+
 require_once __DIR__ . '/../digiriskdocuments.class.php';
 require_once __DIR__ . '/../digiriskresources.class.php';
 
@@ -111,6 +113,41 @@ class InformationsSharing extends DigiriskDocuments
 
 		// 		*** JSON FILLING ***
 		if (!empty ($digirisk_resources)) {
+			$labour_doctor_contact = new Contact($this->db);
+			$result = $labour_doctor_contact->fetch($digirisk_resources['LabourDoctorContact']->id[0]);
+			if ($result > 0) {
+				$json['InformationsSharing']['occupational_health_service']['id']    = $labour_doctor_contact->id;
+				$json['InformationsSharing']['occupational_health_service']['name']  = $labour_doctor_contact->firstname . " " . $labour_doctor_contact->lastname;
+				$json['InformationsSharing']['occupational_health_service']['phone'] = $labour_doctor_contact->phone_pro;
+			}
+
+			$labour_inspector_contact = new Contact($this->db);
+			$result = $labour_inspector_contact->fetch($digirisk_resources['LabourInspectorContact']->id[0]);
+
+			if ($result > 0) {
+				$json['InformationsSharing']['detective_work']['id']    = $labour_inspector_contact->id;
+				$json['InformationsSharing']['detective_work']['name']  = $labour_inspector_contact->firstname . " " . $labour_inspector_contact->lastname;
+				$json['InformationsSharing']['detective_work']['phone'] = $labour_inspector_contact->phone_pro;
+			}
+
+			$harassment_officer = new User($this->db);
+			$result = $harassment_officer->fetch($digirisk_resources['HarassmentOfficer']->id[0]);
+
+			if ($result > 0) {
+				$json['InformationsSharing']['harassment_officer']['id']    = $harassment_officer->id;
+				$json['InformationsSharing']['harassment_officer']['name']  = $harassment_officer->getFullName($langs);
+				$json['InformationsSharing']['harassment_officer']['phone'] = $harassment_officer->phone_pro;
+			}
+
+			$harassment_officer_cse = new User($this->db);
+			$result = $harassment_officer_cse->fetch($digirisk_resources['HarassmentOfficerCSE']->id[0]);
+
+			if ($result > 0) {
+				$json['InformationsSharing']['harassment_officer_cse']['id']    = $harassment_officer_cse->id;
+				$json['InformationsSharing']['harassment_officer_cse']['name']  = $harassment_officer_cse->getFullName($langs);
+				$json['InformationsSharing']['harassment_officer_cse']['phone'] = $harassment_officer_cse->phone_pro;
+			}
+
 			$json['InformationsSharing']['delegues_du_personnels_date']    	  = $conf->global->DIGIRISKDOLIBARR_DP_ELECTION_DATE;
 			$json['InformationsSharing']['delegues_du_personnels_titulaires'] = '';
 			if (!empty ($digirisk_resources['TitularsDP']->id )) {

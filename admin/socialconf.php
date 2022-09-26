@@ -104,6 +104,12 @@ if (empty($reshook)) {
 		$resources->digirisk_dolibarr_set_resources($db, $user->id, 'TitularsDP', 'societe', $TitularsDP, $conf->entity);
 		$resources->digirisk_dolibarr_set_resources($db, $user->id, 'AlternatesDP', 'societe', $AlternatesDP, $conf->entity);
 
+		$HarassmentOfficer = GETPOST('HarassmentOfficer', 'int');
+		$HarassmentOfficerCSE = GETPOST('HarassmentOfficerCSE', 'int');
+
+		$resources->digirisk_dolibarr_set_resources($db, $user->id, 'HarassmentOfficer', 'user', array($HarassmentOfficer), $conf->entity);
+		$resources->digirisk_dolibarr_set_resources($db, $user->id, 'HarassmentOfficerCSE', 'user', array($HarassmentOfficerCSE), $conf->entity);
+
 		if ($action != 'updateedit' && ! $error) {
 			header("Location: " . $_SERVER["PHP_SELF"]);
 			exit;
@@ -203,6 +209,32 @@ print '</td></tr>';
 print '<tr class="oddeven"><td><label for="occasional">' . $langs->trans("OccasionalDerogation") . '</label></td><td>';
 $doleditor = new DolEditor('occasional', $conf->global->DIGIRISKDOLIBARR_DEROGATION_SCHEDULE_OCCASIONAL ? $conf->global->DIGIRISKDOLIBARR_DEROGATION_SCHEDULE_OCCASIONAL : '', '', 200, 'dolibarr_details', '', false, true, $conf->global->FCKEDITOR_ENABLE_SOCIETE, ROWS_3, '90%');
 $doleditor->Create();
+print '</td></tr>';
+
+/*
+* Harassment officer more 250 employees
+*/
+
+print '<tr class="liste_titre"><th class="titlefield wordbreak">' . $langs->trans("HarassmentOfficer") . '</th><th>' . $langs->trans("") . '</th></tr>' . "\n";
+$HarassmentOfficer = $allLinks['HarassmentOfficer'];
+print '<tr>';
+print '<td>' . $langs->trans("ActionOnUser") . '</td>';
+print '<td colspan="3" class="maxwidthonsmartphone">';
+print $form->select_dolusers($HarassmentOfficer->id, 'HarassmentOfficer', 1, null, 0, '', '', 0, 0, 0, 'AND u.statut = 1', 0, '', 'minwidth300');
+if ( ! GETPOSTISSET('backtopage')) print ' <a href="' . DOL_URL_ROOT . '/user/card.php?action=create&backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?action=create') . '"><span class="fa fa-plus-circle valignmiddle paddingleft" title="' . $langs->trans("AddUser") . '"></span></a>';
+print '</td></tr>';
+
+/*
+* Harassment officer CSE
+*/
+
+print '<tr class="liste_titre"><th class="titlefield wordbreak">' . $langs->trans("HarassmentOfficerCSE") . '</th><th>' . $langs->trans("") . '</th></tr>' . "\n";
+$HarassmentOfficerCSE = $allLinks['HarassmentOfficerCSE'];
+print '<tr>';
+print '<td>' . $langs->trans("ActionOnUser") . '</td>';
+print '<td colspan="3" class="maxwidthonsmartphone">';
+print $form->select_dolusers($HarassmentOfficerCSE->id, 'HarassmentOfficerCSE', 1, null, 0, '', '', 0, 0, 0, 'AND u.statut = 1', 0, '', 'minwidth300');
+if ( ! GETPOSTISSET('backtopage')) print ' <a href="' . DOL_URL_ROOT . '/user/card.php?action=create&backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?action=create') . '"><span class="fa fa-plus-circle valignmiddle paddingleft" title="' . $langs->trans("AddUser") . '"></span></a>';
 print '</td></tr>';
 
 /*

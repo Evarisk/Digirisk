@@ -35,6 +35,42 @@ try {
 	return -1;
 }
 
+// Médecin du travail
+print '<tr>';
+print '<td class="titlefield"><i class="fas fa-hospital-alt"></i> ' . $form->textwithpicto($langs->trans("LabourDoctor"), $langs->trans('HowToSetDataLegalDisplay')) . '</td>';
+print '<td>';
+$contact->fetch($informationssharing->occupational_health_service->id);
+print $contact->getNomUrl(1) . ' ';
+print '<i class="fas fa-phone"></i> '  . $informationssharing->occupational_health_service->phone;
+print '</td></tr>';
+
+// Inspecteur du travail
+print '<tr>';
+print '<td class="titlefield minwidth300"><i class="fas fa-search"></i> ' . $form->textwithpicto($langs->trans("LabourInspector"), $langs->trans('HowToSetDataLegalDisplay')) . '</td>';
+print '<td>';
+$contact->fetch($informationssharing->detective_work->id);
+print $contact->getNomUrl(1) . ' ';
+print '<i class="fas fa-phone"></i> ' . $informationssharing->detective_work->phone;
+print '</td></tr>';
+
+// Harassment officer more 250 employees
+print '<tr>';
+print '<td class="titlefield"><i class="fas fa-user"></i> ' . $form->textwithpicto($langs->trans("HarassmentOfficer"), $langs->trans('HowToSetDataInformationsSharing')) . '</td>';
+print '<td>';
+$user->fetch($informationssharing->harassment_officer->id);
+print $user->getNomUrl(1) . ' ';
+print '<i class="fas fa-phone"></i> ' . $informationssharing->harassment_officer->phone;
+print '</td></tr>';
+
+// Harassment officer CSE
+print '<tr>';
+print '<td class="titlefield"><i class="fas fa-user"></i> ' . $form->textwithpicto($langs->trans("HarassmentOfficerCSE"), $langs->trans('HowToSetDataInformationsSharing')) . '</td>';
+print '<td>';
+$user->fetch($informationssharing->harassment_officer_cse->id);
+print $user->getNomUrl(1) . ' ';
+print '<i class="fas fa-phone"></i> ' . $informationssharing->harassment_officer_cse->phone;
+print '</td></tr>';
+
 // CSE
 
 // Date

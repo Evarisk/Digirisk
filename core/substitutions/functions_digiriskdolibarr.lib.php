@@ -95,6 +95,18 @@ function digiriskdolibarr_completesubstitutionarray(&$substitutionarray, $langs,
 
 			$informationssharing = json_decode($object->json, false, 512, JSON_UNESCAPED_UNICODE)->InformationsSharing;
 
+			$substitutionarray['service_de_sante_nom']       = $informationssharing->occupational_health_service->name;
+			$substitutionarray['service_de_sante_telephone'] = $informationssharing->occupational_health_service->phone;
+
+			$substitutionarray['inspection_du_travail_nom']       = $informationssharing->detective_work->name;
+			$substitutionarray['inspection_du_travail_telephone'] = $informationssharing->detective_work->phone;
+
+			$substitutionarray['referant_harcelement_250_nom']       = $informationssharing->harassment_officer->name;
+			$substitutionarray['referant_harcelement_250_telephone'] = $informationssharing->harassment_officer->phone;
+
+			$substitutionarray['referant_harcelement_nom']       = $informationssharing->harassment_officer_cse->name;
+			$substitutionarray['referant_harcelement_telephone'] = $informationssharing->harassment_officer_cse->phone;
+
 			$substitutionarray['membres_du_comite_entreprise_date']       = dol_print_date($informationssharing->membres_du_comite_entreprise_date, 'day');
 			$substitutionarray['membres_du_comite_entreprise_titulaires'] = dol_htmlentitiesbr_decode(strip_tags($informationssharing->membres_du_comite_entreprise_titulaires, '<br>'));
 			$substitutionarray['membres_du_comite_entreprise_suppleants'] = dol_htmlentitiesbr_decode(strip_tags($informationssharing->membres_du_comite_entreprise_suppleants, '<br>'));

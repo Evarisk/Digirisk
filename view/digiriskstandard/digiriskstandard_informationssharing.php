@@ -55,6 +55,8 @@ $action = GETPOST('action', 'aZ09');
 // Initialize technical objects
 $object              = new DigiriskStandard($db);
 $informationssharing = new InformationsSharing($db);
+$contact             = new Contact($db);
+
 $hookmanager->initHooks(array('digiriskelementinformationssharing', 'globalcard')); // Note that conf->hooks_modules contains array
 
 $object->fetch($conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD);
