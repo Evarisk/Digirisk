@@ -4126,36 +4126,38 @@ window.eoxiaJS.menu.toggleMenu = function() {
  * @return {void}
  */
 window.eoxiaJS.menu.setMenu = function() {
-	if ($('.blockvmenu.blockvmenufirst').html().match(/digiriskdolibarr/)) {
-		$('span.vmenu').find('.fa-chevron-circle-left').parent().parent().parent().attr('style', 'cursor:pointer ! important')
+	if ($('.blockvmenu.blockvmenufirst').length > 0) {
+		if ($('.blockvmenu.blockvmenufirst').html().match(/digiriskdolibarr/)) {
+			$('span.vmenu').find('.fa-chevron-circle-left').parent().parent().parent().attr('style', 'cursor:pointer ! important')
 
-		if (localStorage.maximized == 'false') {
-			$('#id-left').attr('style', 'display:none !important')
+			if (localStorage.maximized == 'false') {
+				$('#id-left').attr('style', 'display:none !important')
+			}
+
+			if (localStorage.maximized == 'false') {
+				var text = '';
+				var menu = $('#id-left').find('a.vmenu, font.vmenudisabled, span.vmenu');
+				var elementParent = $(document).find('div.vmenu')
+
+				menu.each(function () {
+					text = $(this).html().split('</i>');
+					$(this).attr('title', text[1])
+					$(this).html(text[0]);
+				});
+
+				$('#id-left').attr('style', 'display:block !important')
+				$('div.menu_titre').attr('style', 'width: 50px !important')
+				$('span.vmenu').attr('title', ' Agrandir le menu')
+
+				$('span.vmenu').html($('span.vmenu').html())
+				$('span.vmenu').find('.fa-chevron-circle-left').removeClass('fa-chevron-circle-left').addClass('fa-chevron-circle-right');
+
+				elementParent.css('width', '30px');
+				elementParent.find('.blockvmenusearch').hide();
+			}
+			localStorage.setItem('currentString', '')
+			localStorage.setItem('keypressNumber', 0)
 		}
-
-		if (localStorage.maximized == 'false') {
-			var text = '';
-			var menu = $('#id-left').find('a.vmenu, font.vmenudisabled, span.vmenu');
-			var elementParent = $(document).find('div.vmenu')
-
-			menu.each(function () {
-				text = $(this).html().split('</i>');
-				$(this).attr('title', text[1])
-				$(this).html(text[0]);
-			});
-
-			$('#id-left').attr('style', 'display:block !important')
-			$('div.menu_titre').attr('style', 'width: 50px !important')
-			$('span.vmenu').attr('title', ' Agrandir le menu')
-
-			$('span.vmenu').html($('span.vmenu').html())
-			$('span.vmenu').find('.fa-chevron-circle-left').removeClass('fa-chevron-circle-left').addClass('fa-chevron-circle-right');
-
-			elementParent.css('width', '30px');
-			elementParent.find('.blockvmenusearch').hide();
-		}
-		localStorage.setItem('currentString', '')
-		localStorage.setItem('keypressNumber', 0)
 	}
 };
 

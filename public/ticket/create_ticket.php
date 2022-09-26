@@ -48,6 +48,7 @@ if ( ! $res) die("Include of main fails");
 
 require_once DOL_DOCUMENT_ROOT . '/ticket/class/actions_ticket.class.php';
 require_once DOL_DOCUMENT_ROOT . '/core/class/html.formticket.class.php';
+require_once DOL_DOCUMENT_ROOT . '/core/lib/admin.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/images.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/ticket.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/security.lib.php';
@@ -63,7 +64,7 @@ require_once DOL_DOCUMENT_ROOT . '/core/modules/ticket/mod_ticket_simple.php';
 require_once '../../lib/digiriskdolibarr_function.lib.php';
 require_once '../../class/digiriskelement.class.php';
 
-global $conf, $db, $hookmanager, $langs;
+global $conf, $db, $hookmanager, $langs, $mc;
 
 // Load translation files required by the page
 $langs->loadLangs(array('companies', 'other', 'mails', 'ticket', 'digiriskdolibarr@digiriskdolibarr'));
@@ -90,7 +91,11 @@ $digiriskelement = new DigiriskElement($db);
 
 $extrafields->fetch_name_optionals_label($object->table_element);
 
-$entity = GETPOST('entity') ?: $conf->entity;
+$entity = GETPOST('entity');
+
+if (!$conf->multicompany->enabled) {
+	$entity = $conf->entity;
+}
 
 $conf->setEntityValues($db, $entity);
 
@@ -348,175 +353,221 @@ if ($action == 'removefile') {
 $form       = new Form($db);
 $formticket = new FormTicket($db);
 
-if ( ! $conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE) {
-	print '<div class="error">' . $langs->trans('TicketPublicInterfaceForbidden') . '</div>';
-	$db->close();
-	exit();
-}
-
 $arrayofjs  = array("/digiriskdolibarr/js/digiriskdolibarr.js.php");
 $arrayofcss = array('/opensurvey/css/style.css', '/ticket/css/styles.css.php', "/digiriskdolibarr/css/digiriskdolibarr.css");
 
 llxHeaderTicketDigirisk($langs->trans("CreateTicket"), "", 0, 0, $arrayofjs, $arrayofcss);
 
-print '<div class="ticketpublicarea digirisk-page-container">';
+if ($entity > 0) {
+	if ( ! $conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE) {
+		print '<div class="error">' . $langs->trans('TicketPublicInterfaceForbidden') . '</div>';
+		$db->close();
+		exit();
+	}
 
-print load_fiche_titre($title_edit, '', "digiriskdolibarr32px@digiriskdolibarr");
+	print '<div class="ticketpublicarea digirisk-page-container">';
 
-print '<form method="POST" action="' . $_SERVER["PHP_SELF"] . '" id="sendTicketForm">';
-print '<input type="hidden" name="token" value="' . newToken() . '">';
-print '<input type="hidden" name="action" value="add">';
-print '<input type="hidden" name="entity" value="'. $entity .'">';
-print '<input type="hidden" id="parentCategory" name="parentCategory" value="' . GETPOST('parentCategory') . '">';
-print '<input type="hidden" id="subCategory" name="subCategory" value="' . GETPOST('subCategory') . '">';
-print '<input type="hidden" id="ticket_id" name="ticket_id" value="' . $ticket_tmp_id . '">';
-print '<input type="hidden" name="id" value="' . $object->id . '">';
-if ($backtopage) print '<input type="hidden" name="backtopage" value="' . $backtopage . '">';
-if ($backtopageforcancel) print '<input type="hidden" name="backtopageforcancel" value="' . $backtopageforcancel . '">';
+	print load_fiche_titre($title_edit, '', "digiriskdolibarr32px@digiriskdolibarr");
 
-print dol_get_fiche_head(array(), '0', '', 1);
+	print '<form method="POST" action="' . $_SERVER["PHP_SELF"] . '" id="sendTicketForm">';
+	print '<input type="hidden" name="token" value="' . newToken() . '">';
+	print '<input type="hidden" name="action" value="add">';
+	print '<input type="hidden" name="entity" value="'. $entity .'">';
+	print '<input type="hidden" id="parentCategory" name="parentCategory" value="' . GETPOST('parentCategory') . '">';
+	print '<input type="hidden" id="subCategory" name="subCategory" value="' . GETPOST('subCategory') . '">';
+	print '<input type="hidden" id="ticket_id" name="ticket_id" value="' . $ticket_tmp_id . '">';
+	print '<input type="hidden" name="id" value="' . $object->id . '">';
+	if ($backtopage) print '<input type="hidden" name="backtopage" value="' . $backtopage . '">';
+	if ($backtopageforcancel) print '<input type="hidden" name="backtopageforcancel" value="' . $backtopageforcancel . '">';
 
-print '<div class="img-fields-container">';
-print '<div class="centpercent tableforimgfields form-registre">' . "\n";
+	print dol_get_fiche_head(array(), '0', '', 1);
 
-print '<p><strong>' . $conf->global->DIGIRISKDOLIBARR_TICKET_PARENT_CATEGORY_LABEL . '</strong></p>';
-print '';
+	print '<div class="img-fields-container">';
+	print '<div class="centpercent tableforimgfields form-registre">' . "\n";
 
-$mainCategoryObject = $category->rechercher($conf->global->DIGIRISKDOLIBARR_TICKET_MAIN_CATEGORY, '', 'ticket', true);
+	print '<p><strong>' . $conf->global->DIGIRISKDOLIBARR_TICKET_PARENT_CATEGORY_LABEL . '</strong></p>';
+	print '';
 
-print '<div class="wpeo-gridlayout grid-3">';
-if ( ! empty($mainCategoryObject) && $mainCategoryObject > 0) {
-	$mainCategoryChildren = $mainCategoryObject[0]->get_filles();
-	if ( ! empty($mainCategoryChildren) && $mainCategoryChildren > 0) {
-		$k = 1;
-		foreach ($mainCategoryChildren as $cat) {
-			if ($cat->id == GETPOST('parentCategory')) {
-				print '<div class="ticket-parentCategory ticket-parentCategory'. $cat->id .' active" id="' . $cat->id . '">';
-			} else {
-				print '<div class="ticket-parentCategory ticket-parentCategory'. $cat->id .'" id="' . $cat->id . '">';
+	$mainCategoryObject = $category->rechercher($conf->global->DIGIRISKDOLIBARR_TICKET_MAIN_CATEGORY, '', 'ticket', true);
+
+	print '<div class="wpeo-gridlayout grid-3">';
+	if ( ! empty($mainCategoryObject) && $mainCategoryObject > 0) {
+		$mainCategoryChildren = $mainCategoryObject[0]->get_filles();
+		if ( ! empty($mainCategoryChildren) && $mainCategoryChildren > 0) {
+			$k = 1;
+			foreach ($mainCategoryChildren as $cat) {
+				if ($cat->id == GETPOST('parentCategory')) {
+					print '<div class="ticket-parentCategory ticket-parentCategory'. $cat->id .' active" id="' . $cat->id . '">';
+				} else {
+					print '<div class="ticket-parentCategory ticket-parentCategory'. $cat->id .'" id="' . $cat->id . '">';
+				}
+				print '<div class="wpeo-button" style="background:#'. $cat->color.'; border-color:#'. $cat->color .'">';
+
+				show_category_image($cat, $upload_dir);
+				print '<span class="button-label">' . $cat->label . '</span>';
+				print '</div>';
+
+				print '</div>';
+				$k++;
 			}
-			print '<div class="wpeo-button" style="background:#'. $cat->color.'; border-color:#'. $cat->color .'">';
-
-			show_category_image($cat, $upload_dir);
-			print '<span class="button-label">' . $cat->label . '</span>';
 			print '</div>';
 
-			print '</div>';
-			$k++;
-		}
-		print '</div>';
+			print '<div class="centpercent tableforimgfields">' . "\n";
 
-		print '<div class="centpercent tableforimgfields">' . "\n";
+			foreach ($mainCategoryChildren as $cat) {
+				$selectedParentCategory = $category;
+				$selectedParentCategory->fetch($cat->id);
+				$selectedParentCategoryChildren = $selectedParentCategory->get_filles();
+				if ( ! empty($selectedParentCategoryChildren)) {
 
-		foreach ($mainCategoryChildren as $cat) {
-			$selectedParentCategory = $category;
-			$selectedParentCategory->fetch($cat->id);
-			$selectedParentCategoryChildren = $selectedParentCategory->get_filles();
-			if ( ! empty($selectedParentCategoryChildren)) {
+					print '<div class="subCategories children'. $cat->id .'"'. (GETPOST('parentCategory') == $cat->id ? '' : ' style="display:none">');
+					print '<p><strong>' . $conf->global->DIGIRISKDOLIBARR_TICKET_CHILD_CATEGORY_LABEL . '</strong></p>';
+					print '<div class="wpeo-gridlayout grid-5">';
 
-				print '<div class="subCategories children'. $cat->id .'"'. (GETPOST('parentCategory') == $cat->id ? '' : ' style="display:none">');
-				print '<p><strong>' . $conf->global->DIGIRISKDOLIBARR_TICKET_CHILD_CATEGORY_LABEL . '</strong></p>';
-				print '<div class="wpeo-gridlayout grid-5">';
-
-				foreach ($selectedParentCategoryChildren as $subCategory) {
-					if ($subCategory->id == GETPOST('subCategory')) {
-						print '<div class="ticket-subCategory ticket-subCategory'. $subCategory->id .' center active" id="' . $subCategory->id . '">';
-					} else {
-						print '<div class="ticket-subCategory ticket-subCategory'. $subCategory->id .' center" id="' . $subCategory->id . '" style="background:#ffffff">';
+					foreach ($selectedParentCategoryChildren as $subCategory) {
+						if ($subCategory->id == GETPOST('subCategory')) {
+							print '<div class="ticket-subCategory ticket-subCategory'. $subCategory->id .' center active" id="' . $subCategory->id . '">';
+						} else {
+							print '<div class="ticket-subCategory ticket-subCategory'. $subCategory->id .' center" id="' . $subCategory->id . '" style="background:#ffffff">';
+						}
+						show_category_image($subCategory, $upload_dir);
+						print '<span class="button-label">' . $subCategory->label . '</span>';
+						print '</div>';
 					}
-					show_category_image($subCategory, $upload_dir);
-					print '<span class="button-label">' . $subCategory->label . '</span>';
+					print '</div>';
 					print '</div>';
 				}
-				print '</div>';
-				print '</div>';
 			}
+			print '</div>';
+
 		}
-		print '</div>';
+	} ?>
 
-	}
-} ?>
-
-<div class="wpeo-form tableforinputfields">
-	<div class="form-element">
-		<span class="form-label" <?php echo (($conf->global->DIGIRISKDOLIBARR_TICKET_EMAIL_REQUIRED) ? '' : 'style="font-weight:300"'); ?>><?php print $langs->trans("Email"); ?><?php echo (($conf->global->DIGIRISKDOLIBARR_TICKET_EMAIL_REQUIRED) ? '<span style="color:red"> *</span>' : ''); ?></span>
-		<label class="form-field-container">
-			<input class="email" type="email" name="email" id="email" value="<?php echo GETPOST('email');?>"/>
-		</label>
-	</div>
-	<div class="wpeo-gridlayout grid-2">
+	<div class="wpeo-form tableforinputfields">
 		<div class="form-element">
-			<span class="form-label"><?php print $langs->trans("Message"); ?><span style="color:red"> *</span></span>
+			<span class="form-label" <?php echo (($conf->global->DIGIRISKDOLIBARR_TICKET_EMAIL_REQUIRED) ? '' : 'style="font-weight:300"'); ?>><?php print $langs->trans("Email"); ?><?php echo (($conf->global->DIGIRISKDOLIBARR_TICKET_EMAIL_REQUIRED) ? '<span style="color:red"> *</span>' : ''); ?></span>
 			<label class="form-field-container">
-				<textarea name="message" id="message"><?php echo GETPOST('message');?></textarea>
+				<input class="email" type="email" name="email" id="email" value="<?php echo GETPOST('email');?>"/>
 			</label>
 		</div>
-		<div class="form-element">
-			<div class="wpeo-gridlayout grid-2">
-				<span class="form-label"><?php print $langs->trans("FilesLinked"); ?></span>
-				<label class="wpeo-button button-blue" for="sendfile">
-					<i class="fas fa-image button-icon"></i>
-					<span class="button-label"><?php print $langs->trans('AddDocument'); ?></span>
-					<input type="file" name="userfile[]" multiple="multiple" id="sendfile" onchange="window.eoxiaJS.ticket.tmpStockFile()"  style="display: none"/>
+		<div class="wpeo-gridlayout grid-2">
+			<div class="form-element">
+				<span class="form-label"><?php print $langs->trans("Message"); ?><span style="color:red"> *</span></span>
+				<label class="form-field-container">
+					<textarea name="message" id="message"><?php echo GETPOST('message');?></textarea>
 				</label>
 			</div>
+			<div class="form-element">
+				<div class="wpeo-gridlayout grid-2">
+					<span class="form-label"><?php print $langs->trans("FilesLinked"); ?></span>
+					<label class="wpeo-button button-blue" for="sendfile">
+						<i class="fas fa-image button-icon"></i>
+						<span class="button-label"><?php print $langs->trans('AddDocument'); ?></span>
+						<input type="file" name="userfile[]" multiple="multiple" id="sendfile" onchange="window.eoxiaJS.ticket.tmpStockFile()"  style="display: none"/>
+					</label>
+				</div>
 
-			<div id="sendFileForm">
-				<div id="fileLinkedTable" class="tableforinputfields">
-					<?php $fileLinkedList = dol_dir_list($conf->digiriskdolibarr->multidir_output[isset($conf->entity) ? $conf->entity : 1] . '/temp/ticket/' . $ticket_tmp_id . '/thumbs/'); ?>
-					<div class="wpeo-table table-flex table-3 files-uploaded">
-						<?php
-						if ( ! empty($fileLinkedList)) {
-							foreach ($fileLinkedList as $fileLinked) {
-								if (preg_match('/mini/', $fileLinked['name'])) { ?>
-									<div class="table-row">
-										<div class="table-cell table-50 table-padding-0">
-											<?php print '<img class="photo"  width="' . $maxHeight . '" src="' . DOL_URL_ROOT . '/viewimage.php?modulepart=digiriskdolibarr&entity=' . $conf->entity . '&file=' . urlencode('/temp/ticket/' . $ticket_tmp_id . '/thumbs/' . $fileLinked['name']) . '" title="' . dol_escape_htmltag($alt) . '">'; ?>
-										</div>
-										<div class="table-cell">
-											<?php print preg_replace('/_mini/', '', $fileLinked['name']); ?>
-										</div>
-										<div class="table-cell table-50 table-end table-padding-0">
-											<?php print '<div class="linked-file-delete wpeo-button button-square-50 button-transparent" value="' . $fileLinked['name'] . '"><i class="fas fa-trash button-icon"></i></div>'; ?>
-										</div>
-									</div> <?php
-								}
-							}
-						} else {
-							?>
-							<div class="table-row">
-								<div class="table-cell"><?php print $langs->trans('NoFileLinked'); ?></div>
-							</div>
+				<div id="sendFileForm">
+					<div id="fileLinkedTable" class="tableforinputfields">
+						<?php $fileLinkedList = dol_dir_list($conf->digiriskdolibarr->multidir_output[isset($conf->entity) ? $conf->entity : 1] . '/temp/ticket/' . $ticket_tmp_id . '/thumbs/'); ?>
+						<div class="wpeo-table table-flex table-3 files-uploaded">
 							<?php
-						}
-						?>
+							if ( ! empty($fileLinkedList)) {
+								foreach ($fileLinkedList as $fileLinked) {
+									if (preg_match('/mini/', $fileLinked['name'])) { ?>
+										<div class="table-row">
+											<div class="table-cell table-50 table-padding-0">
+												<?php print '<img class="photo"  width="' . $maxHeight . '" src="' . DOL_URL_ROOT . '/viewimage.php?modulepart=digiriskdolibarr&entity=' . $conf->entity . '&file=' . urlencode('/temp/ticket/' . $ticket_tmp_id . '/thumbs/' . $fileLinked['name']) . '" title="' . dol_escape_htmltag($alt) . '">'; ?>
+											</div>
+											<div class="table-cell">
+												<?php print preg_replace('/_mini/', '', $fileLinked['name']); ?>
+											</div>
+											<div class="table-cell table-50 table-end table-padding-0">
+												<?php print '<div class="linked-file-delete wpeo-button button-square-50 button-transparent" value="' . $fileLinked['name'] . '"><i class="fas fa-trash button-icon"></i></div>'; ?>
+											</div>
+										</div> <?php
+									}
+								}
+							} else {
+								?>
+								<div class="table-row">
+									<div class="table-cell"><?php print $langs->trans('NoFileLinked'); ?></div>
+								</div>
+								<?php
+							}
+							?>
+						</div>
 					</div>
 				</div>
 			</div>
 		</div>
+
+		<?php include DOL_DOCUMENT_ROOT . '/core/tpl/extrafields_add.tpl.php'; ?>
+
+		<?php
+		if ( ! empty($conf->global->DIGIRISKDOLIBARR_USE_CAPTCHA)) {
+			require_once DOL_DOCUMENT_ROOT . '/core/lib/security2.lib.php';
+			print '<div class="center"><label for="email"><span class="fieldrequired">' . $langs->trans("SecurityCode") . '</span><span style="color:red"> *</span></label>';
+			print '<span class="span-icon-security inline-block">';
+			print '<input id="securitycode" placeholder="' . $langs->trans("SecurityCode") . '" class="flat input-icon-security width125" type="text" maxlength="5" name="code" tabindex="3" />';
+			print '</span>';
+			print '<span class="nowrap inline-block">';
+			print '<img class="inline-block valignmiddle" src="' . DOL_URL_ROOT . '/core/antispamimage.php" border="0" width="80" height="32" id="img_securitycode" />';
+			print '<a class="inline-block valignmiddle" href="' . $php_self . '" tabindex="4" data-role="button">' . img_picto($langs->trans("Refresh"), 'refresh', 'id="captcha_refresh_img"') . '</a>';
+			print '</span>';
+			print '</div>';
+		}?>
+
+		<?php print '<div class="center"><button form="sendTicketForm" type="submit" id ="actionButtonSave" class="wpeo-button" name="add">' . '<i class="fas fa-paper-plane"></i>    ' . $langs->trans("Send") . '</button>'; ?>
 	</div>
-
-	<?php include DOL_DOCUMENT_ROOT . '/core/tpl/extrafields_add.tpl.php'; ?>
-
 	<?php
-	if ( ! empty($conf->global->DIGIRISKDOLIBARR_USE_CAPTCHA)) {
-		require_once DOL_DOCUMENT_ROOT . '/core/lib/security2.lib.php';
-		print '<div class="center"><label for="email"><span class="fieldrequired">' . $langs->trans("SecurityCode") . '</span><span style="color:red"> *</span></label>';
-		print '<span class="span-icon-security inline-block">';
-		print '<input id="securitycode" placeholder="' . $langs->trans("SecurityCode") . '" class="flat input-icon-security width125" type="text" maxlength="5" name="code" tabindex="3" />';
-		print '</span>';
-		print '<span class="nowrap inline-block">';
-		print '<img class="inline-block valignmiddle" src="' . DOL_URL_ROOT . '/core/antispamimage.php" border="0" width="80" height="32" id="img_securitycode" />';
-		print '<a class="inline-block valignmiddle" href="' . $php_self . '" tabindex="4" data-role="button">' . img_picto($langs->trans("Refresh"), 'refresh', 'id="captcha_refresh_img"') . '</a>';
-		print '</span>';
+
+	print dol_get_fiche_end();
+
+} else {
+	print '<div class="ticketpublicarea digirisk-page-container center">';
+	print '<form method="POST" action="' . $_SERVER["PHP_SELF"] .'">';
+	print '<input type="hidden" name="token" value="' . newToken() . '">';
+
+	print '<h1>' . $langs->trans('WelcomeToPublicTicketInterface') . '</h1>';
+	print '<h2>' . $langs->trans('PleaseSelectAnEntity') . '</h2>';
+
+	$multi_entity_selector = dolibarr_get_const($db, 'DIGIRISKDOLIBARR_SHOW_MULTI_ENTITY_SELECTOR_ON_TICKET_PUBLIC_INTERFACE', 0);
+	if ($multi_entity_selector) {
+		print $mc->select_entities('', 'entity');
+		print '<input class="wpeo-button button-blue" type="submit" value="'. $langs->trans('Go') .'">';
+	} else {
+		$entities_list = $mc->getEntitiesList();
+
+		print '<div class="wpeo-gridlayout grid-4">';
+		if (!empty($entities_list)) {
+			foreach($entities_list as $entityId => $entityName) {
+				$logos_path = DOL_DATA_ROOT . ($entity > 0 ? '/' . $entity : '/') . 'mycompany/logos';
+				$logos_list = dol_dir_list($logos_path);
+				if (is_array($logos_list) && !empty($logos_list)) {
+					$logo = array_shift($logos_list);
+					$logo_fullname = $logo['name'];
+				} else {
+					$logo_fullname = '';
+				}
+
+				print '<a href="'. $_SERVER["PHP_SELF"] . '?entity=' . $entityId .'">';
+				print '<div class="card" style="height: 200px">';
+				print '<br>';
+				print '<img src="'. DOL_URL_ROOT . '/custom/digiriskdolibarr/documents/viewimage.php?modulepart=mycompany&entity=' . $entityId . '&file=' . urlencode('logos/' . $logo_fullname) .'" alt="societyLogo" style="width:40%">';
+				print '<div class="container">';
+				print '<h4><b>'. $entityName .'</b></h4>';
+				print '</div>';
+				print '</div>';
+				print '</a>';
+			}
+		}
 		print '</div>';
-	}?>
+	}
+	print '</form>';
+	print '</div>';
 
-	<?php print '<div class="center"><button form="sendTicketForm" type="submit" id ="actionButtonSave" class="wpeo-button" name="add">' . '<i class="fas fa-paper-plane"></i>    ' . $langs->trans("Send") . '</button>'; ?>
-</div>
-<?php
-
-print dol_get_fiche_end();
+}
 
 // End of page
 llxFooter('', 'public');

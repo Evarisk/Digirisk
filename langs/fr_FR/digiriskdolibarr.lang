@@ -1418,7 +1418,8 @@ TicketDescription = Projet des tickets
 TicketProjectUpdated = Le projet par défaut des tickets a été mis à jour
 QRCodeAlreadyGenerated = QR Code généré
 GenerateQRCode = Générer le QR Code
-QRCodeGeneration = Génération du QR Code
+CompanyQRCodeGeneration = Génération du QR Code de l'entité
+MultiCompanyQRCodeGeneration = Génération du QR Code multi-entité
 TicketCreationMailWellSent = Mail de confirmation de création du ticket envoyé
 TicketCreationMailSent = Le mail de création du ticket a été envoyé à %s
 HowToSetupTicketCategories = Pour configurer les catégories de ticket, veuillez cliquer sur ce lien :
@@ -1439,6 +1440,11 @@ CSVFile = Fichier CSV
 ErrorFieldEmail = Erreur : l'email doit correspondre au format suivant : <b>'aaa@aaa.fr'</b><br> L'email saisi <b>'%s'</b> ne correspondant pas
 TicketEmailRequired = Email obligatoire pour créer un ticket
 TicketEmailRequiredHelp = Activer cette option pour rendre obligatoire la saisie d'un email pour créer un ticket dans l'interface publique
+WelcomeToPublicTicketInterface = Bienvenue sur l'interface publique des tickets
+PleaseSelectAnEntity = Veuillez sélectionner une entité :
+ShowSelectorOnTicketPublicInterface = Afficher le sélecteur multi-entité sur l'interface publique des tickets au lieu de la liste des entités
+ShowSelectorOnTicketPublicInterfaceHelp = Afficher le sélecteur multi-entité sur l'interface publique des tickets au lieu de la liste des entités avec leur logo
+MultiEntityPublicInterface = Interface publique des tickets multi-société
 
 
 

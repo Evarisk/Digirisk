@@ -89,6 +89,13 @@ if ($action == 'setPublicInterface') {
 	setEventMessages($langs->transnoentities('TicketPublicInterfaceEnabled'), array());
 }
 
+if ($action == 'setMultiEntitySelector') {
+	if (GETPOST('value')) dolibarr_set_const($db, 'DIGIRISKDOLIBARR_SHOW_MULTI_ENTITY_SELECTOR_ON_TICKET_PUBLIC_INTERFACE', 1, 'integer', 0, '', 0);
+	else dolibarr_set_const($db, 'DIGIRISKDOLIBARR_SHOW_MULTI_ENTITY_SELECTOR_ON_TICKET_PUBLIC_INTERFACE', 0, 'integer', 0, '', 0);
+//	setEventMessages($langs->transnoentities('TicketPublicInterfaceEnabled'), array());
+}
+
+
 if ($action == 'setEmails') {
 	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_TICKET_SUBMITTED_SEND_MAIL_TO', GETPOST('emails'), 'integer', 0, '', $conf->entity);
 	setEventMessages($langs->transnoentities('EmailsToNotifySet'), array());
@@ -201,14 +208,14 @@ if ($action == 'setTicketSuccessMessage') {
 }
 
 if ($action == 'generateQRCode') {
-	$data = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/public/ticket/create_ticket.php?entity=' . $conf->entity;
+	$urlToEncode = GETPOST('urlToEncode');
+	$targetPath = GETPOST('targetPath');
 	$size = '400x400';
 
 	ob_clean();
 
-	$QR = imagecreatefrompng('https://chart.googleapis.com/chart?cht=qr&chld=H|1&chs='.$size.'&chl='.urlencode($data));
+	$QR = imagecreatefrompng('https://chart.googleapis.com/chart?cht=qr&chld=H|1&chs='.$size.'&chl='.urlencode($urlToEncode));
 
-	$targetPath = $conf->digiriskdolibarr->multidir_output[$conf->entity?:1] . "/ticketqrcode/";
 	if (! is_dir($targetPath)) {
 		mkdir($targetPath, 0777, true);
 	}
@@ -246,6 +253,13 @@ print '<hr>';
 print load_fiche_titre($langs->transnoentities("PublicInterface"), '', '');
 
 print '<span class="opacitymedium">' . $langs->transnoentities("DigiriskTicketPublicAccess") . '</span> : <a class="wordbreak" href="' . dol_buildpath('/custom/digiriskdolibarr/public/ticket/create_ticket.php?entity=' . $conf->entity, 1) . '" target="_blank" >' . dol_buildpath('/custom/digiriskdolibarr/public/ticket/create_ticket.php?entity=' . $conf->entity, 2) . '</a>';
+
+if ($conf->multicompany->enabled) {
+	print load_fiche_titre($langs->transnoentities("MultiEntityPublicInterface"), '', '');
+
+	print '<span class="opacitymedium">' . $langs->transnoentities("DigiriskTicketPublicAccess") . '</span> : <a class="wordbreak" href="' . dol_buildpath('/custom/digiriskdolibarr/public/ticket/create_ticket.php', 1) . '" target="_blank" >' . dol_buildpath('/custom/digiriskdolibarr/public/ticket/create_ticket.php', 2) . '</a>';
+}
+
 print dol_get_fiche_end();
 
 $enabledisablehtml = $langs->transnoentities("TicketActivatePublicInterface") . ' ';
@@ -311,6 +325,29 @@ if ( ! empty($conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE)) {
 	print '</td>';
 	print '<td class="center">';
 	print $form->textwithpicto('', $langs->transnoentities("SendEmailOnTicketSubmitHelp"), 1, 'help');
+	print '</td>';
+	print '</tr>';
+
+	//Page de sélection de l'entité
+	print '<tr class="oddeven"><td>' . $langs->transnoentities("ShowSelectorOnTicketPublicInterface") . '</td>';
+	print '<td class="center">';
+	if (empty($conf->global->DIGIRISKDOLIBARR_SHOW_MULTI_ENTITY_SELECTOR_ON_TICKET_PUBLIC_INTERFACE)) {
+		// Button off, click to enable
+		print '<a class="reposition valignmiddle" href="' . $_SERVER["PHP_SELF"] . '?action=setMultiEntitySelector&token=' . newToken() . '&value=1' . $param . '">';
+		print img_picto($langs->transnoentities("Disabled"), 'switch_off');
+		print '</a>';
+	} else {
+		// Button on, click to disable
+		print '<a class="reposition valignmiddle" href="' . $_SERVER["PHP_SELF"] . '?action=setMultiEntitySelector&token=' . newToken() . '&value=0' . $param . '">';
+		print img_picto($langs->transnoentities("Activated"), 'switch_on');
+		print '</a>';
+	}
+	print '</td>';
+	print '<td class="center">';
+	print '';
+	print '</td>';
+	print '<td class="center">';
+	print $form->textwithpicto('', $langs->transnoentities("ShowSelectorOnTicketPublicInterfaceHelp"), 1, 'help');
 	print '</td>';
 	print '</tr>';
 
@@ -412,7 +449,6 @@ if ( ! empty($conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE)) {
 	print '</tr>';
 
 	//Categories generation
-
 	print '<form method="POST" action="' . $_SERVER["PHP_SELF"] . '">';
 	print '<input type="hidden" name="token" value="' . newToken() . '">';
 	print '<input type="hidden" name="action" value="generateCategories">';
@@ -433,7 +469,6 @@ if ( ! empty($conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE)) {
 	print '</form>';
 
 	//Set default main category
-
 	print '<form method="POST" action="' . $_SERVER["PHP_SELF"] . '">';
 	print '<input type="hidden" name="token" value="' . newToken() . '">';
 	print '<input type="hidden" name="action" value="setMainCategory">';
@@ -455,7 +490,6 @@ if ( ! empty($conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE)) {
 	print '</form>';
 
 	//Set parent category label
-
 	print '<form method="POST" action="' . $_SERVER["PHP_SELF"] . '">';
 	print '<input type="hidden" name="token" value="' . newToken() . '">';
 	print '<input type="hidden" name="action" value="setParentCategoryLabel">';
@@ -536,10 +570,11 @@ if ( ! empty($conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE)) {
 	print '</table>';
 	print '</div>';
 
-	// QR Code generation
-	print load_fiche_titre($langs->transnoentities("QRCodeGeneration"), '', '');
+	// Entity QR Code generation
+	print load_fiche_titre($langs->transnoentities("CompanyQRCodeGeneration"), '', '');
 
-	$QRCodeList = dol_dir_list($conf->digiriskdolibarr->multidir_output[$conf->entity?:1] . "/ticketqrcode/");
+	$qrCodePath = $conf->digiriskdolibarr->multidir_output[$conf->entity?:1] . "/ticketqrcode/";
+	$QRCodeList = dol_dir_list($qrCodePath);
 	if (is_array($QRCodeList) && !empty($QRCodeList)) {
 		$QRCode = array_shift($QRCodeList);
 	} else {
@@ -562,6 +597,13 @@ if ( ! empty($conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE)) {
 
 
 	print '<tr class="oddeven"><td>' . $langs->transnoentities("GenerateQRCode") . '</td>';
+
+	$targetPath = $qrCodePath;
+	$urlToEncode = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/public/ticket/create_ticket.php?entity=' . $conf->entity;
+
+	print '<input hidden name="targetPath" value="'. $targetPath .'">';
+	print '<input hidden name="urlToEncode" value="'. $urlToEncode .'">';
+
 	print '<td class="center">';
 	print array_key_exists('fullname', $QRCode) ? $langs->transnoentities('QRCodeAlreadyGenerated') : $langs->transnoentities('NotGenerated');
 	print '</td>';
@@ -580,6 +622,63 @@ if ( ! empty($conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE)) {
 	print '</td>';
 	print '</tr>';
 	print '</form>';
+
+	if ($conf->multicompany->enabled) {
+
+		// Multi Entity QR Code generation
+		print load_fiche_titre($langs->transnoentities("MultiCompanyQRCodeGeneration"), '', '');
+
+		$qrCodePath = DOL_DATA_ROOT . "/digiriskdolibarr/multicompany/ticketqrcode/";
+		$QRCodeList = dol_dir_list($qrCodePath);
+
+		if (is_array($QRCodeList) && !empty($QRCodeList)) {
+			$QRCode = array_shift($QRCodeList);
+		} else {
+			$QRCode = array();
+		}
+
+		print '<div class="div-table-responsive-no-min">';
+		print '<table class="noborder centpercent">';
+		print '<tr class="liste_titre">';
+		print '<td>' . $langs->transnoentities("Parameters") . '</td>';
+		print '<td class="center">' . $langs->transnoentities("Status") . '</td>';
+		print '<td class="center">' . $langs->transnoentities("Action") . '</td>';
+		print '<td class="center">' . $langs->transnoentities("ShortInfo") . '</td>';
+		print '</tr>';
+
+		print '<form method="POST" action="' . $_SERVER["PHP_SELF"] . '">';
+		print '<input type="hidden" name="token" value="' . newToken() . '">';
+		print '<input type="hidden" name="action" value="generateQRCode">';
+		print '<input type="hidden" name="backtopage" value="' . $backtopage . '">';
+
+
+		print '<tr class="oddeven"><td>' . $langs->transnoentities("GenerateQRCode") . '</td>';
+
+		$targetPath = $qrCodePath;
+		$urlToEncode = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/public/ticket/create_ticket.php';
+
+		print '<input hidden name="targetPath" value="'. $targetPath .'">';
+		print '<input hidden name="urlToEncode" value="'. $urlToEncode .'">';
+
+		print '<td class="center">';
+		print array_key_exists('fullname', $QRCode) ? $langs->transnoentities('QRCodeAlreadyGenerated') : $langs->transnoentities('NotGenerated');
+		print '</td>';
+		print '<td class="center">';
+		if (array_key_exists('fullname', $QRCode)) {
+			$urladvanced = getAdvancedPreviewUrl('digiriskdolibarr', 'ticketqrcode/' . $QRCode['name']);
+			print '<a class="clicked-photo-preview" href="'. $urladvanced .'">' . '<img width="200" src="'.DOL_URL_ROOT . '/custom/digiriskdolibarr/documents/viewimage.php?modulepart=digiriskdolibarr&entity=' . $conf->entity . '&file=' . 'ticketqrcode/' . $QRCode['name'] .'"></a>';
+			print '<a id="download" href="'.DOL_URL_ROOT . '/custom/digiriskdolibarr/documents/viewimage.php?modulepart=digiriskdolibarr' . '&file=' . 'multicompany/ticketqrcode/' . $QRCode['name'] .'" download="'.DOL_URL_ROOT . '/custom/digiriskdolibarr/documents/viewimage.php?modulepart=digiriskdolibarr'. '&file=' . 'multicompany/ticketqrcode/' . $QRCode['name'] .'"><i class="fas fa-download"></i></a>';
+		} else {
+			print '<input type="submit" class="button" value="'.$langs->transnoentities('Generate') .'">' ;
+		}
+		print '</td>';
+
+		print '<td class="center minwidth800">';
+		print $form->textwithpicto('', $langs->transnoentities("QRCodeGeneration"));
+		print '</td>';
+		print '</tr>';
+		print '</form>';
+	}
 
 	print '</table>';
 	print '</div>';

@@ -342,50 +342,53 @@ class ActionsDigiriskdolibarr
 				}
 			}
 		} else if ($parameters['currentcontext'] == 'publicnewticketcard') {
-			require_once __DIR__ . '/../lib/digiriskdolibarr_function.lib.php';
 
-			require_once __DIR__ . '/digiriskelement.class.php';
-			$digiriskelement = new DigiriskElement($db);
-			$selectDigiriskElement = '<span>'. $langs->trans('GP/UT') .'</span>';
+			if (GETPOST('entity') > 0) {
+				require_once __DIR__ . '/../lib/digiriskdolibarr_function.lib.php';
 
-			$alldisableddigiriskelement = $digiriskelement->fetchAll('', '', 0, 0, array('customsql' => 't.show_in_selector = 0'));
-			if (is_array($alldisableddigiriskelement) && !empty($alldisableddigiriskelement)) {
-				$filter = 's.rowid NOT IN (';
-				foreach ($alldisableddigiriskelement as $disabled_digiriskelement) {
-					$filter .= $disabled_digiriskelement->id . ',';
+				require_once __DIR__ . '/digiriskelement.class.php';
+				$digiriskelement = new DigiriskElement($db);
+				$selectDigiriskElement = '<span>'. $langs->trans('GP/UT') .'</span>';
+
+				$alldisableddigiriskelement = $digiriskelement->fetchAll('', '', 0, 0, array('customsql' => 't.show_in_selector = 0'));
+				if (is_array($alldisableddigiriskelement) && !empty($alldisableddigiriskelement)) {
+					$filter = 's.rowid NOT IN (';
+					foreach ($alldisableddigiriskelement as $disabled_digiriskelement) {
+						$filter .= $disabled_digiriskelement->id . ',';
+					}
+					$filter = substr($filter, 0, -1);
+					$filter .= ')';
 				}
-				$filter = substr($filter, 0, -1);
-				$filter .= ')';
+
+				$selectDigiriskElement .= $digiriskelement->select_digiriskelement_list(GETPOST('options_digiriskdolibarr_ticket_service'), 'options_digiriskdolibarr_ticket_service', (!empty($filter) ? $filter : ''), $langs->trans('PleaseSelectADigiriskElement'), 0, array(), 0, 0, 'minwidth500', 0, false, 1);
+				$selectDigiriskElement .= '<div><br></div>';
+				?>
+				<script>
+					let date = new Date();
+
+					let month    = date.getMonth() + 1;
+					let day      = date.getDate();
+					let fulldate = (day < 10 ? '0' : '') + day + '/' + (month < 10 ? '0' : '') + month + '/' + date.getFullYear();
+					let hour     = date.getHours();
+					let min      = date.getMinutes();
+
+					jQuery('#options_digiriskdolibarr_ticket_lastname').parent().html(jQuery('#options_digiriskdolibarr_ticket_lastname').parent().html().replace(/Nom/, '<b>Nom</b><span style="color:red"> *</span>'))
+					jQuery('#options_digiriskdolibarr_ticket_lastname').parent().html(jQuery('#options_digiriskdolibarr_ticket_lastname').parent().html().replace(/Prénom/, '<b>Prénom</b><span style="color:red"> *</span>'))
+
+					jQuery('#options_digiriskdolibarr_ticket_date').val(fulldate);
+					jQuery('#options_digiriskdolibarr_ticket_dateday').val((day < 10 ? '0' : '') + day);
+					jQuery('#options_digiriskdolibarr_ticket_datemonth').val((month < 10 ? '0' : '') + month);
+					jQuery('#options_digiriskdolibarr_ticket_dateyear').val(date.getFullYear());
+					jQuery('#options_digiriskdolibarr_ticket_datehour').val((hour < 10 ? '0' : '') + hour);
+					jQuery('#options_digiriskdolibarr_ticket_datemin').val((min < 10 ? '0' : '') + min);
+
+					jQuery('#options_digiriskdolibarr_ticket_service').remove()
+					jQuery('.select2.select2-container.select2-container--default').remove()
+
+					jQuery('.wpeo-form.tableforinputfields').prepend(<?php echo json_encode($selectDigiriskElement) ; ?>)
+				</script>
+				<?php
 			}
-
-			$selectDigiriskElement .= $digiriskelement->select_digiriskelement_list(GETPOST('options_digiriskdolibarr_ticket_service'), 'options_digiriskdolibarr_ticket_service', (!empty($filter) ? $filter : ''), $langs->trans('PleaseSelectADigiriskElement'), 0, array(), 0, 0, 'minwidth500', 0, false, 1);
-			$selectDigiriskElement .= '<div><br></div>';
-			?>
-			<script>
-				let date = new Date();
-
-				let month    = date.getMonth() + 1;
-				let day      = date.getDate();
-				let fulldate = (day < 10 ? '0' : '') + day + '/' + (month < 10 ? '0' : '') + month + '/' + date.getFullYear();
-				let hour     = date.getHours();
-				let min      = date.getMinutes();
-
-				jQuery('#options_digiriskdolibarr_ticket_lastname').parent().html(jQuery('#options_digiriskdolibarr_ticket_lastname').parent().html().replace(/Nom/, '<b>Nom</b><span style="color:red"> *</span>'))
-                jQuery('#options_digiriskdolibarr_ticket_lastname').parent().html(jQuery('#options_digiriskdolibarr_ticket_lastname').parent().html().replace(/Prénom/, '<b>Prénom</b><span style="color:red"> *</span>'))
-
-                jQuery('#options_digiriskdolibarr_ticket_date').val(fulldate);
-                jQuery('#options_digiriskdolibarr_ticket_dateday').val((day < 10 ? '0' : '') + day);
-                jQuery('#options_digiriskdolibarr_ticket_datemonth').val((month < 10 ? '0' : '') + month);
-                jQuery('#options_digiriskdolibarr_ticket_dateyear').val(date.getFullYear());
-                jQuery('#options_digiriskdolibarr_ticket_datehour').val((hour < 10 ? '0' : '') + hour);
-                jQuery('#options_digiriskdolibarr_ticket_datemin').val((min < 10 ? '0' : '') + min);
-
-                jQuery('#options_digiriskdolibarr_ticket_service').remove()
-                jQuery('.select2.select2-container.select2-container--default').remove()
-
-                jQuery('.wpeo-form.tableforinputfields').prepend(<?php echo json_encode($selectDigiriskElement) ; ?>)
-			</script>
-			<?php
 		}
 
 		if (true) {
