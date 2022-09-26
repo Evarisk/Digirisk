@@ -3314,26 +3314,52 @@ window.eoxiaJS.evaluator.init = function() {
  * La méthode contenant tous les événements pour l'évaluateur.
  *
  * @since   1.0.0
- * @version 1.0.0
+ * @version 9.6.0
  *
  * @return {void}
  */
 window.eoxiaJS.evaluator.event = function() {
 	$( document ).on( 'click', '.evaluator-create', window.eoxiaJS.evaluator.createEvaluator );
-	$( document ).on( 'change', '#userid', window.eoxiaJS.evaluator.selectUser );
+	$( document ).on( 'change', '#fk_user_employer', window.eoxiaJS.evaluator.selectUser );
 };
 
 /**
  * Clique sur une des user de la liste.
  *
  * @since   1.0.0
- * @version 1.0.0
+ * @version 9.6.0
  *
  * @param  {ClickEvent} event L'état du clic.
  * @return {void}
  */
 window.eoxiaJS.evaluator.selectUser = function( event ) {
 	$(this).closest('.evaluator-user').find('.user-selected').val(this.value)
+
+	var elementParent = $(this).closest('.modal-container');
+
+	// Rend le bouton "active".
+	window.eoxiaJS.evaluator.haveDataInInput(elementParent);
+};
+
+/**
+ * Check value on evaluatorUser.
+ *
+ * @since   9.6.0
+ * @version 9.6.0
+ *
+ * @param  elementParent --- Parent element
+ * @return {void}
+ */
+window.eoxiaJS.evaluator.haveDataInInput = function( elementParent ) {
+	var element = elementParent.parent().parent();
+
+	if (element.hasClass('evaluator-add-modal')) {
+		var evaluator_user = element.find('#fk_user_employer');
+		console.log(evaluator_user.val())
+		if ( evaluator_user.val() >= 0 ) {
+			element.find('.button-disable').removeClass('button-disable');
+		}
+	}
 };
 
 /**

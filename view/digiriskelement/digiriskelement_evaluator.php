@@ -479,7 +479,7 @@ if ($object->id > 0 || $fromid > 0) {
 				<!-- Modal-Footer -->
 				<div class="modal-footer">
 					<?php if ($permissiontoadd) : ?>
-						<div class="evaluator-create wpeo-button button-primary modal-close">
+						<div class="evaluator-create wpeo-button button-primary button-disable modal-close">
 							<span><i class="fas fa-plus"></i>  <?php echo $langs->trans('AddEvaluatorButton'); ?></span>
 						</div>
 					<?php else : ?>
